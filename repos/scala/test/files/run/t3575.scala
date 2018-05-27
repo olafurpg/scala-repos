@@ -7,9 +7,27 @@ case class Two[
 
 case class TwoLong[
     @specialized(
-        Char, Boolean, Byte, Short, Int, Long, Float, Double, Unit, AnyRef) A,
+      Char,
+      Boolean,
+      Byte,
+      Short,
+      Int,
+      Long,
+      Float,
+      Double,
+      Unit,
+      AnyRef) A,
     @specialized(
-        Char, Boolean, Byte, Short, Int, Long, Float, Double, Unit, AnyRef) B
+      Char,
+      Boolean,
+      Byte,
+      Short,
+      Int,
+      Long,
+      Float,
+      Double,
+      Unit,
+      AnyRef) B
 ](v: A, w: B)
 
 case class TwoCool[

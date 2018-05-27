@@ -33,23 +33,32 @@ object ShardCoordinator {
     * INTERNAL API
     * Factory method for the [[akka.actor.Props]] of the [[ShardCoordinator]] actor.
     */
-  private[akka] def props(typeName: String,
-                          settings: ClusterShardingSettings,
-                          allocationStrategy: ShardAllocationStrategy): Props =
-    Props(new PersistentShardCoordinator(
-            typeName: String, settings, allocationStrategy))
+  private[akka] def props(
+      typeName: String,
+      settings: ClusterShardingSettings,
+      allocationStrategy: ShardAllocationStrategy): Props =
+    Props(
+      new PersistentShardCoordinator(
+        typeName: String,
+        settings,
+        allocationStrategy))
       .withDeploy(Deploy.local)
 
   /**
     * INTERNAL API
     * Factory method for the [[akka.actor.Props]] of the [[ShardCoordinator]] actor with state based on ddata.
     */
-  private[akka] def props(typeName: String,
-                          settings: ClusterShardingSettings,
-                          allocationStrategy: ShardAllocationStrategy,
-                          replicator: ActorRef): Props =
-    Props(new DDataShardCoordinator(
-            typeName: String, settings, allocationStrategy, replicator))
+  private[akka] def props(
+      typeName: String,
+      settings: ClusterShardingSettings,
+      allocationStrategy: ShardAllocationStrategy,
+      replicator: ActorRef): Props =
+    Props(
+      new DDataShardCoordinator(
+        typeName: String,
+        settings,
+        allocationStrategy,
+        replicator))
       .withDeploy(Deploy.local)
 
   /**
@@ -127,7 +136,8 @@ object ShardCoordinator {
         requester: ActorRef,
         shardId: String,
         currentShardAllocations: java.util.Map[
-            ActorRef, immutable.IndexedSeq[String]]): Future[ActorRef]
+          ActorRef,
+          immutable.IndexedSeq[String]]): Future[ActorRef]
 
     /**
       * Invoked periodically to decide which shards to rebalance to another location.
@@ -137,9 +147,11 @@ object ShardCoordinator {
       *                            you should not include these in the returned set
       * @return a `Future` of the shards to be migrated, may be empty to skip rebalance in this round
       */
-    def rebalance(currentShardAllocations: java.util.Map[
-                      ActorRef, immutable.IndexedSeq[String]],
-                  rebalanceInProgress: java.util.Set[String])
+    def rebalance(
+        currentShardAllocations: java.util.Map[
+          ActorRef,
+          immutable.IndexedSeq[String]],
+        rebalanceInProgress: java.util.Set[String])
       : Future[java.util.Set[String]]
   }
 
@@ -155,8 +167,10 @@ object ShardCoordinator {
     */
   @SerialVersionUID(1L)
   class LeastShardAllocationStrategy(
-      rebalanceThreshold: Int, maxSimultaneousRebalance: Int)
-      extends ShardAllocationStrategy with Serializable {
+      rebalanceThreshold: Int,
+      maxSimultaneousRebalance: Int)
+      extends ShardAllocationStrategy
+      with Serializable {
 
     override def allocateShard(
         requester: ActorRef,
@@ -175,9 +189,11 @@ object ShardCoordinator {
       if (rebalanceInProgress.size < maxSimultaneousRebalance) {
         val (regionWithLeastShards, leastShards) =
           currentShardAllocations.minBy { case (_, v) ⇒ v.size }
-        val mostShards = currentShardAllocations.collect {
-          case (_, v) ⇒ v.filterNot(s ⇒ rebalanceInProgress(s))
-        }.maxBy(_.size)
+        val mostShards = currentShardAllocations
+          .collect {
+            case (_, v) ⇒ v.filterNot(s ⇒ rebalanceInProgress(s))
+          }
+          .maxBy(_.size)
         if (mostShards.size - leastShards.size >= rebalanceThreshold)
           Future.successful(Set(mostShards.head))
         else emptyRebalanceResult
@@ -205,14 +221,16 @@ object ShardCoordinator {
       */
     @SerialVersionUID(1L)
     final case class Register(shardRegion: ActorRef)
-        extends CoordinatorCommand with DeadLetterSuppression
+        extends CoordinatorCommand
+        with DeadLetterSuppression
 
     /**
       * `ShardRegion` in proxy only mode registers to `ShardCoordinator`, until it receives [[RegisterAck]].
       */
     @SerialVersionUID(1L)
     final case class RegisterProxy(shardRegionProxy: ActorRef)
-        extends CoordinatorCommand with DeadLetterSuppression
+        extends CoordinatorCommand
+        with DeadLetterSuppression
 
     /**
       * Acknowledgement from `ShardCoordinator` that [[Register]] or [[RegisterProxy]] was successful.
@@ -227,7 +245,8 @@ object ShardCoordinator {
       */
     @SerialVersionUID(1L)
     final case class GetShardHome(shard: ShardId)
-        extends CoordinatorCommand with DeadLetterSuppression
+        extends CoordinatorCommand
+        with DeadLetterSuppression
 
     /**
       * `ShardCoordinator` replies with this message for [[GetShardHome]] requests.
@@ -290,14 +309,12 @@ object ShardCoordinator {
     // DomainEvents for the persistent state of the event sourced ShardCoordinator
     sealed trait DomainEvent extends ClusterShardingSerializable
     @SerialVersionUID(1L)
-    final case class ShardRegionRegistered(region: ActorRef)
-        extends DomainEvent
+    final case class ShardRegionRegistered(region: ActorRef) extends DomainEvent
     @SerialVersionUID(1L)
     final case class ShardRegionProxyRegistered(regionProxy: ActorRef)
         extends DomainEvent
     @SerialVersionUID(1L)
-    final case class ShardRegionTerminated(region: ActorRef)
-        extends DomainEvent
+    final case class ShardRegionTerminated(region: ActorRef) extends DomainEvent
     @SerialVersionUID(1L)
     final case class ShardRegionProxyTerminated(regionProxy: ActorRef)
         extends DomainEvent
@@ -317,7 +334,7 @@ object ShardCoordinator {
       * Persistent state of the event sourced ShardCoordinator.
       */
     @SerialVersionUID(1L)
-    final case class State private[akka](
+    final case class State private[akka] (
         // region for each shard
         shards: Map[ShardId, ActorRef] = Map.empty,
         // shards for each region
@@ -334,50 +351,61 @@ object ShardCoordinator {
 
       def updated(event: DomainEvent): State = event match {
         case ShardRegionRegistered(region) ⇒
-          require(!regions.contains(region),
-                  s"Region $region already registered: $this")
+          require(
+            !regions.contains(region),
+            s"Region $region already registered: $this")
           copy(regions = regions.updated(region, Vector.empty))
         case ShardRegionProxyRegistered(proxy) ⇒
-          require(!regionProxies.contains(proxy),
-                  s"Region proxy $proxy already registered: $this")
+          require(
+            !regionProxies.contains(proxy),
+            s"Region proxy $proxy already registered: $this")
           copy(regionProxies = regionProxies + proxy)
         case ShardRegionTerminated(region) ⇒
-          require(regions.contains(region),
-                  s"Terminated region $region not registered: $this")
+          require(
+            regions.contains(region),
+            s"Terminated region $region not registered: $this")
           val newUnallocatedShards =
             if (rememberEntities) (unallocatedShards ++ regions(region))
             else unallocatedShards
-          copy(regions = regions - region,
-               shards = shards -- regions(region),
-               unallocatedShards = newUnallocatedShards)
+          copy(
+            regions = regions - region,
+            shards = shards -- regions(region),
+            unallocatedShards = newUnallocatedShards)
         case ShardRegionProxyTerminated(proxy) ⇒
-          require(regionProxies.contains(proxy),
-                  s"Terminated region proxy $proxy not registered: $this")
+          require(
+            regionProxies.contains(proxy),
+            s"Terminated region proxy $proxy not registered: $this")
           copy(regionProxies = regionProxies - proxy)
         case ShardHomeAllocated(shard, region) ⇒
-          require(regions.contains(region),
-                  s"Region $region not registered: $this")
-          require(!shards.contains(shard),
-                  s"Shard [$shard] already allocated: $this")
+          require(
+            regions.contains(region),
+            s"Region $region not registered: $this")
+          require(
+            !shards.contains(shard),
+            s"Shard [$shard] already allocated: $this")
           val newUnallocatedShards =
             if (rememberEntities) (unallocatedShards - shard)
             else unallocatedShards
-          copy(shards = shards.updated(shard, region),
-               regions = regions.updated(region, regions(region) :+ shard),
-               unallocatedShards = newUnallocatedShards)
+          copy(
+            shards = shards.updated(shard, region),
+            regions = regions.updated(region, regions(region) :+ shard),
+            unallocatedShards = newUnallocatedShards)
         case ShardHomeDeallocated(shard) ⇒
           require(
-              shards.contains(shard), s"Shard [$shard] not allocated: $this")
+            shards.contains(shard),
+            s"Shard [$shard] not allocated: $this")
           val region = shards(shard)
-          require(regions.contains(region),
-                  s"Region $region for shard [$shard] not registered: $this")
+          require(
+            regions.contains(region),
+            s"Region $region for shard [$shard] not registered: $this")
           val newUnallocatedShards =
             if (rememberEntities) (unallocatedShards + shard)
             else unallocatedShards
-          copy(shards = shards - shard,
-               regions = regions.updated(
-                     region, regions(region).filterNot(_ == shard)),
-               unallocatedShards = newUnallocatedShards)
+          copy(
+            shards = shards - shard,
+            regions =
+              regions.updated(region, regions(region).filterNot(_ == shard)),
+            unallocatedShards = newUnallocatedShards)
       }
     }
   }
@@ -402,9 +430,10 @@ object ShardCoordinator {
   /**
     * Result of `allocateShard` is piped to self with this message.
     */
-  private final case class AllocateShardResult(shard: ShardId,
-                                               shardRegion: Option[ActorRef],
-                                               getShardHomeSender: ActorRef)
+  private final case class AllocateShardResult(
+      shard: ShardId,
+      shardRegion: Option[ActorRef],
+      getShardHomeSender: ActorRef)
 
   /**
     * Result of `rebalance` is piped to self with this message.
@@ -419,10 +448,11 @@ object ShardCoordinator {
     * parent `ShardCoordinator`. If the process takes longer than the
     * `handOffTimeout` it also sends [[akka.cluster.sharding.RebalanceDone]].
     */
-  private[akka] class RebalanceWorker(shard: String,
-                                      from: ActorRef,
-                                      handOffTimeout: FiniteDuration,
-                                      regions: Set[ActorRef])
+  private[akka] class RebalanceWorker(
+      shard: String,
+      from: ActorRef,
+      handOffTimeout: FiniteDuration,
+      regions: Set[ActorRef])
       extends Actor {
     import Internal._
     regions.foreach(_ ! BeginHandOff(shard))
@@ -452,10 +482,11 @@ object ShardCoordinator {
     }
   }
 
-  private[akka] def rebalanceWorkerProps(shard: String,
-                                         from: ActorRef,
-                                         handOffTimeout: FiniteDuration,
-                                         regions: Set[ActorRef]): Props =
+  private[akka] def rebalanceWorkerProps(
+      shard: String,
+      from: ActorRef,
+      handOffTimeout: FiniteDuration,
+      regions: Set[ActorRef]): Props =
     Props(new RebalanceWorker(shard, from, handOffTimeout, regions))
 }
 
@@ -468,7 +499,8 @@ abstract class ShardCoordinator(
     typeName: String,
     settings: ClusterShardingSettings,
     allocationStrategy: ShardCoordinator.ShardAllocationStrategy)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
   import ShardCoordinator._
   import ShardCoordinator.Internal._
   import ShardRegion.ShardId
@@ -489,9 +521,10 @@ abstract class ShardCoordinator(
   val rebalanceTask = context.system.scheduler
     .schedule(rebalanceInterval, rebalanceInterval, self, RebalanceTick)
 
-  cluster.subscribe(self,
-                    initialStateMode = InitialStateAsEvents,
-                    ClusterShuttingDown.getClass)
+  cluster.subscribe(
+    self,
+    initialStateMode = InitialStateAsEvents,
+    ClusterShuttingDown.getClass)
 
   override def postStop(): Unit = {
     super.postStop()
@@ -501,8 +534,8 @@ abstract class ShardCoordinator(
 
   def isMember(region: ActorRef): Boolean = {
     val regionAddress = region.path.address
-    (region.path.address == self.path.address || cluster.state.members.exists(
-            m ⇒ m.address == regionAddress && m.status == MemberStatus.Up))
+    (region.path.address == self.path.address || cluster.state.members
+      .exists(m ⇒ m.address == regionAddress && m.status == MemberStatus.Up))
   }
 
   def active: Receive =
@@ -525,8 +558,8 @@ abstract class ShardCoordinator(
           }
         } else {
           log.debug(
-              "ShardRegion {} was not registered since the coordinator currently does not know about a node of that region",
-              region)
+            "ShardRegion {} was not registered since the coordinator currently does not know about a node of that region",
+            region)
         }
 
       case RegisterProxy(proxy) ⇒
@@ -546,29 +579,35 @@ abstract class ShardCoordinator(
             case Some(ref) ⇒
               if (regionTerminationInProgress(ref))
                 log.debug(
-                    "GetShardHome [{}] request ignored, due to region [{}] termination in progress.",
-                    shard,
-                    ref)
+                  "GetShardHome [{}] request ignored, due to region [{}] termination in progress.",
+                  shard,
+                  ref)
               else sender() ! ShardHome(shard, ref)
             case None ⇒
               val activeRegions = state.regions -- gracefulShutdownInProgress
               if (activeRegions.nonEmpty) {
                 val getShardHomeSender = sender()
                 val regionFuture = allocationStrategy.allocateShard(
-                    getShardHomeSender, shard, activeRegions)
+                  getShardHomeSender,
+                  shard,
+                  activeRegions)
                 regionFuture.value match {
                   case Some(Success(region)) ⇒
                     continueGetShardHome(shard, region, getShardHomeSender)
                   case _ ⇒
                     // continue when future is completed
-                    regionFuture.map { region ⇒
-                      AllocateShardResult(shard,
-                                          Some(region),
-                                          getShardHomeSender)
-                    }.recover {
-                      case _ ⇒
-                        AllocateShardResult(shard, None, getShardHomeSender)
-                    }.pipeTo(self)
+                    regionFuture
+                      .map { region ⇒
+                        AllocateShardResult(
+                          shard,
+                          Some(region),
+                          getShardHomeSender)
+                      }
+                      .recover {
+                        case _ ⇒
+                          AllocateShardResult(shard, None, getShardHomeSender)
+                      }
+                      .pipeTo(self)
                 }
               }
           }
@@ -603,11 +642,14 @@ abstract class ShardCoordinator(
               continueRebalance(shards)
             case _ ⇒
               // continue when future is completed
-              shardsFuture.map { shards ⇒
-                RebalanceResult(shards)
-              }.recover {
-                case _ ⇒ RebalanceResult(Set.empty)
-              }.pipeTo(self)
+              shardsFuture
+                .map { shards ⇒
+                  RebalanceResult(shards)
+                }
+                .recover {
+                  case _ ⇒ RebalanceResult(Set.empty)
+                }
+                .pipeTo(self)
           }
         }
 
@@ -633,9 +675,10 @@ abstract class ShardCoordinator(
         if (!gracefulShutdownInProgress(region))
           state.regions.get(region) match {
             case Some(shards) ⇒
-              log.debug("Graceful shutdown of region [{}] with shards [{}]",
-                        region,
-                        shards)
+              log.debug(
+                "Graceful shutdown of region [{}] with shards [{}]",
+                region,
+                shards)
               gracefulShutdownInProgress += region
               continueRebalance(shards.toSet)
             case None ⇒
@@ -680,8 +723,7 @@ abstract class ShardCoordinator(
         context.become(shuttingDown)
 
       case ShardRegion.GetCurrentRegions ⇒
-        val reply = ShardRegion.CurrentRegions(
-            state.regions.keySet.map { ref ⇒
+        val reply = ShardRegion.CurrentRegions(state.regions.keySet.map { ref ⇒
           if (ref.path.address.host.isEmpty) cluster.selfAddress
           else ref.path.address
         })
@@ -694,7 +736,9 @@ abstract class ShardCoordinator(
         if (removalMargin != Duration.Zero && t.addressTerminated &&
             aliveRegions(ref)) {
           context.system.scheduler.scheduleOnce(
-              removalMargin, self, DelayedShardRegionTerminated(ref))
+            removalMargin,
+            self,
+            DelayedShardRegionTerminated(ref))
           regionTerminationInProgress += ref
         } else regionTerminated(ref)
       } else if (state.regionProxies.contains(ref)) {
@@ -779,7 +823,9 @@ abstract class ShardCoordinator(
   }
 
   def continueGetShardHome(
-      shard: ShardId, region: ActorRef, getShardHomeSender: ActorRef): Unit =
+      shard: ShardId,
+      region: ActorRef,
+      getShardHomeSender: ActorRef): Unit =
     if (!rebalanceInProgress.contains(shard)) {
       state.shards.get(shard) match {
         case Some(ref) ⇒ getShardHomeSender ! ShardHome(shard, ref)
@@ -795,10 +841,10 @@ abstract class ShardCoordinator(
             }
           } else
             log.debug(
-                "Allocated region {} for shard [{}] is not (any longer) one of the registered regions: {}",
-                region,
-                shard,
-                state)
+              "Allocated region {} for shard [{}] is not (any longer) one of the registered regions: {}",
+              region,
+              shard,
+              state)
       }
     }
 
@@ -809,14 +855,16 @@ abstract class ShardCoordinator(
           case Some(rebalanceFromRegion) ⇒
             rebalanceInProgress += shard
             log.debug(
-                "Rebalance shard [{}] from [{}]", shard, rebalanceFromRegion)
+              "Rebalance shard [{}] from [{}]",
+              shard,
+              rebalanceFromRegion)
             context.actorOf(
-                rebalanceWorkerProps(
-                    shard,
-                    rebalanceFromRegion,
-                    handOffTimeout,
-                    state.regions.keySet union state.regionProxies)
-                  .withDispatcher(context.props.dispatcher))
+              rebalanceWorkerProps(
+                shard,
+                rebalanceFromRegion,
+                handOffTimeout,
+                state.regions.keySet union state.regionProxies)
+                .withDispatcher(context.props.dispatcher))
           case None ⇒
             log.debug("Rebalance of non-existing shard [{}] is ignored", shard)
         }
@@ -858,10 +906,11 @@ class PersistentShardCoordinator(
           if (state.regions.contains(region)) state = state.updated(evt)
           else {
             log.debug(
-                "ShardRegionTerminated, but region {} was not registered. This inconsistency is due to that " +
+              "ShardRegionTerminated, but region {} was not registered. This inconsistency is due to that " +
                 " some stored ActorRef in Akka v2.3.0 and v2.3.1 did not contain full address information. It will be " +
                 "removed by later watch.",
-                region)
+              region
+            )
           }
         case ShardRegionProxyTerminated(proxy) ⇒
           if (state.regionProxies.contains(proxy)) state = state.updated(evt)
@@ -962,8 +1011,9 @@ class DDataShardCoordinator(
 
       case GetFailure(CoordinatorStateKey, _) ⇒
         log.error(
-            "The ShardCoordinator was unable to get an initial state within 'waiting-for-state-timeout' (was retrying): {} millis",
-            waitingForStateTimeout.toMillis)
+          "The ShardCoordinator was unable to get an initial state within 'waiting-for-state-timeout' (was retrying): {} millis",
+          waitingForStateTimeout.toMillis
+        )
         // repeat until GetSuccess
         getState()
 
@@ -985,7 +1035,8 @@ class DDataShardCoordinator(
 
   // this state will stash all messages until it receives UpdateSuccess
   def waitingForUpdate[E <: DomainEvent](
-      evt: E, afterUpdateCallback: DomainEvent ⇒ Unit): Receive = {
+      evt: E,
+      afterUpdateCallback: DomainEvent ⇒ Unit): Receive = {
     case UpdateSuccess(CoordinatorStateKey, Some(`evt`)) ⇒
       log.debug("The coordinator state was successfully updated with {}", evt)
       context.unbecome()
@@ -994,18 +1045,19 @@ class DDataShardCoordinator(
 
     case UpdateTimeout(CoordinatorStateKey, Some(`evt`)) ⇒
       log.error(
-          "The ShardCoordinator was unable to update a distributed state within 'updating-state-timeout'={} millis (was retrying), event={}",
-          updatingStateTimeout.toMillis,
-          evt)
+        "The ShardCoordinator was unable to update a distributed state within 'updating-state-timeout'={} millis (was retrying), event={}",
+        updatingStateTimeout.toMillis,
+        evt
+      )
       // repeat until UpdateSuccess
       sendUpdate(evt)
 
     case ModifyFailure(CoordinatorStateKey, error, cause, Some(`evt`)) ⇒
       log.error(
-          cause,
-          "The ShardCoordinator was unable to update a distributed state with error {} and event {}.Coordinator will be restarted",
-          error,
-          evt)
+        cause,
+        "The ShardCoordinator was unable to update a distributed state with error {} and event {}.Coordinator will be restarted",
+        error,
+        evt)
       throw cause
 
     case _ ⇒ stash()
@@ -1017,8 +1069,9 @@ class DDataShardCoordinator(
   }
 
   def update[E <: DomainEvent](evt: E)(f: E ⇒ Unit): Unit = {
-    context.become(waitingForUpdate(evt, f.asInstanceOf[DomainEvent ⇒ Unit]),
-                   discardOld = false)
+    context.become(
+      waitingForUpdate(evt, f.asInstanceOf[DomainEvent ⇒ Unit]),
+      discardOld = false)
     sendUpdate(evt)
   }
 
@@ -1027,10 +1080,11 @@ class DDataShardCoordinator(
 
   def sendUpdate(evt: DomainEvent) = {
     val s = state.updated(evt)
-    replicator ! Update(CoordinatorStateKey,
-                        LWWRegister(initEmptyState),
-                        WriteMajority(updatingStateTimeout),
-                        Some(evt)) { reg ⇒
+    replicator ! Update(
+      CoordinatorStateKey,
+      LWWRegister(initEmptyState),
+      WriteMajority(updatingStateTimeout),
+      Some(evt)) { reg ⇒
       reg.withValue(s)
     }
   }

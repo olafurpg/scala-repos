@@ -54,7 +54,7 @@ class FixedInetResolverTest extends FunSuite {
 
         Await.result(request.toFuture(), 2.milliseconds) match {
           case Addr.Bound(_, _) =>
-          case _ => fail("Resolution should have succeeded")
+          case _                => fail("Resolution should have succeeded")
         }
       }
 
@@ -75,7 +75,7 @@ class FixedInetResolverTest extends FunSuite {
 
         Await.result(request.toFuture(), 2.milliseconds) match {
           case Addr.Neg =>
-          case x => fail(s"Resolution should have failed: $x")
+          case x        => fail(s"Resolution should have failed: $x")
         }
       }
 

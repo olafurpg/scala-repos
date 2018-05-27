@@ -44,7 +44,7 @@ object LiftIO {
       def liftIO[A](ioa: IO[A]) = EitherT(LiftIO[F].liftIO(ioa.map(\/.right)))
     }
 
-  implicit def streamTLiftIO[F[_]: LiftIO : Applicative] =
+  implicit def streamTLiftIO[F[_]: LiftIO: Applicative] =
     new LiftIO[StreamT[F, ?]] {
       def liftIO[A](ioa: IO[A]) =
         StreamT(LiftIO[F].liftIO(ioa.map(StreamT.Yield(_, StreamT.empty))))
@@ -55,7 +55,7 @@ object LiftIO {
       def liftIO[A](ioa: IO[A]) = Kleisli(_ => LiftIO[F].liftIO(ioa))
     }
 
-  implicit def writerTLiftIO[F[_]: LiftIO, W : Monoid] =
+  implicit def writerTLiftIO[F[_]: LiftIO, W: Monoid] =
     new LiftIO[WriterT[F, W, ?]] {
       def liftIO[A](ioa: IO[A]) =
         WriterT(LiftIO[F].liftIO(ioa.map((Monoid[W].zero, _))))

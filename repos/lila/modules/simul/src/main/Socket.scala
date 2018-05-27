@@ -12,13 +12,14 @@ import lila.hub.TimeBomb
 import lila.socket.actorApi.{Connected => _, _}
 import lila.socket.{SocketActor, History, Historical}
 
-private[simul] final class Socket(simulId: String,
-                                  val history: History[Messadata],
-                                  getSimul: Simul.ID => Fu[Option[Simul]],
-                                  jsonView: JsonView,
-                                  lightUser: String => Option[LightUser],
-                                  uidTimeout: Duration,
-                                  socketTimeout: Duration)
+private[simul] final class Socket(
+    simulId: String,
+    val history: History[Messadata],
+    getSimul: Simul.ID => Fu[Option[Simul]],
+    jsonView: JsonView,
+    lightUser: String => Option[LightUser],
+    uidTimeout: Duration,
+    socketTimeout: Duration)
     extends SocketActor[Member](uidTimeout)
     with Historical[Member, Messadata] {
 
@@ -27,7 +28,8 @@ private[simul] final class Socket(simulId: String,
   private var delayedCrowdNotification = false
 
   private def redirectPlayer(
-      game: lila.game.Game, colorOption: Option[chess.Color]) {
+      game: lila.game.Game,
+      colorOption: Option[chess.Color]) {
     colorOption foreach { color =>
       val player = game player color
       player.userId foreach { userId =>
@@ -60,23 +62,25 @@ private[simul] final class Socket(simulId: String,
     case Aborted => notifyVersion("aborted", Json.obj(), Messadata())
 
     case PingVersion(uid, v) => {
-        ping(uid)
-        timeBomb.delay
-        withMember(uid) { m =>
-          history.since(v).fold(resync(m))(_ foreach sendMessage(m))
-        }
+      ping(uid)
+      timeBomb.delay
+      withMember(uid) { m =>
+        history.since(v).fold(resync(m))(_ foreach sendMessage(m))
       }
+    }
 
     case Broom => {
-        broom
-        if (timeBomb.boom) self ! PoisonPill
-      }
+      broom
+      if (timeBomb.boom) self ! PoisonPill
+    }
 
     case lila.chat.actorApi.ChatLine(_, line) =>
       line match {
         case line: lila.chat.UserLine =>
           notifyVersion(
-              "message", lila.chat.Line toJson line, Messadata(line.troll))
+            "message",
+            lila.chat.Line toJson line,
+            Messadata(line.troll))
         case _ =>
       }
 

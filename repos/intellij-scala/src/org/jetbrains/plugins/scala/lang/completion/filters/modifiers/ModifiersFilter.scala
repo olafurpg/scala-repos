@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NonNls
 import org.jetbrains.plugins.scala.lang.completion.ScalaCompletionUtil._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params._
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 22.05.2008
   */
@@ -18,7 +18,7 @@ class ModifiersFilter extends ElementFilter {
     if (context.isInstanceOf[PsiComment]) return false
     if (element.isInstanceOf[PsiIdentifier]) return false
     val (leaf, _) = processPsiLeafForFilter(
-        getLeafByOffset(context.getTextRange.getStartOffset, context))
+      getLeafByOffset(context.getTextRange.getStartOffset, context))
 
     if (leaf != null) {
       val parent = leaf.getParent

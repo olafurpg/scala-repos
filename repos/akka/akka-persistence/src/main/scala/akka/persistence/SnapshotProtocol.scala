@@ -13,7 +13,9 @@ package akka.persistence
   */
 @SerialVersionUID(1L) //#snapshot-metadata
 final case class SnapshotMetadata(
-    persistenceId: String, sequenceNr: Long, timestamp: Long = 0L)
+    persistenceId: String,
+    sequenceNr: Long,
+    timestamp: Long = 0L)
 //#snapshot-metadata
 
 object SnapshotMetadata {
@@ -63,7 +65,8 @@ final case class DeleteSnapshotsSuccess(criteria: SnapshotSelectionCriteria)
   */
 @SerialVersionUID(1L)
 final case class SaveSnapshotFailure(
-    metadata: SnapshotMetadata, cause: Throwable)
+    metadata: SnapshotMetadata,
+    cause: Throwable)
     extends SnapshotProtocol.Response
 
 /**
@@ -74,7 +77,8 @@ final case class SaveSnapshotFailure(
   */
 @SerialVersionUID(1L)
 final case class DeleteSnapshotFailure(
-    metadata: SnapshotMetadata, cause: Throwable)
+    metadata: SnapshotMetadata,
+    cause: Throwable)
     extends SnapshotProtocol.Response
 
 /**
@@ -85,7 +89,8 @@ final case class DeleteSnapshotFailure(
   */
 @SerialVersionUID(1L)
 final case class DeleteSnapshotsFailure(
-    criteria: SnapshotSelectionCriteria, cause: Throwable)
+    criteria: SnapshotSelectionCriteria,
+    cause: Throwable)
     extends SnapshotProtocol.Response
 
 /**
@@ -110,10 +115,11 @@ final case class SnapshotOffer(metadata: SnapshotMetadata, snapshot: Any)
   * @see [[Recovery]]
   */
 @SerialVersionUID(1L)
-final case class SnapshotSelectionCriteria(maxSequenceNr: Long = Long.MaxValue,
-                                           maxTimestamp: Long = Long.MaxValue,
-                                           minSequenceNr: Long = 0L,
-                                           minTimestamp: Long = 0L) {
+final case class SnapshotSelectionCriteria(
+    maxSequenceNr: Long = Long.MaxValue,
+    maxTimestamp: Long = Long.MaxValue,
+    minSequenceNr: Long = 0L,
+    minTimestamp: Long = 0L) {
 
   /**
     * INTERNAL API.
@@ -128,8 +134,8 @@ final case class SnapshotSelectionCriteria(maxSequenceNr: Long = Long.MaxValue,
     */
   private[persistence] def matches(metadata: SnapshotMetadata): Boolean =
     metadata.sequenceNr <= maxSequenceNr &&
-    metadata.timestamp <= maxTimestamp &&
-    metadata.sequenceNr >= minSequenceNr && metadata.timestamp >= minTimestamp
+      metadata.timestamp <= maxTimestamp &&
+      metadata.sequenceNr >= minSequenceNr && metadata.timestamp >= minTimestamp
 }
 
 object SnapshotSelectionCriteria {
@@ -153,12 +159,16 @@ object SnapshotSelectionCriteria {
   /**
     * Java API.
     */
-  def create(maxSequenceNr: Long,
-             maxTimestamp: Long,
-             minSequenceNr: Long,
-             minTimestamp: Long) =
+  def create(
+      maxSequenceNr: Long,
+      maxTimestamp: Long,
+      minSequenceNr: Long,
+      minTimestamp: Long) =
     SnapshotSelectionCriteria(
-        maxSequenceNr, maxTimestamp, minSequenceNr, minTimestamp)
+      maxSequenceNr,
+      maxTimestamp,
+      minSequenceNr,
+      minTimestamp)
 
   /**
     * Java API.
@@ -211,9 +221,10 @@ private[persistence] object SnapshotProtocol {
     * @param criteria criteria for selecting a snapshot from which recovery should start.
     * @param toSequenceNr upper sequence number bound (inclusive) for recovery.
     */
-  final case class LoadSnapshot(persistenceId: String,
-                                criteria: SnapshotSelectionCriteria,
-                                toSequenceNr: Long)
+  final case class LoadSnapshot(
+      persistenceId: String,
+      criteria: SnapshotSelectionCriteria,
+      toSequenceNr: Long)
       extends Request
 
   /**
@@ -222,7 +233,8 @@ private[persistence] object SnapshotProtocol {
     * @param snapshot loaded snapshot, if any.
     */
   final case class LoadSnapshotResult(
-      snapshot: Option[SelectedSnapshot], toSequenceNr: Long)
+      snapshot: Option[SelectedSnapshot],
+      toSequenceNr: Long)
       extends Response
 
   /**
@@ -248,6 +260,7 @@ private[persistence] object SnapshotProtocol {
     * @param criteria criteria for selecting snapshots to be deleted.
     */
   final case class DeleteSnapshots(
-      persistenceId: String, criteria: SnapshotSelectionCriteria)
+      persistenceId: String,
+      criteria: SnapshotSelectionCriteria)
       extends Request
 }

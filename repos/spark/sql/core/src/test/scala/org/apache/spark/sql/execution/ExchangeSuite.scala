@@ -19,8 +19,16 @@ package org.apache.spark.sql.execution
 
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.catalyst.expressions.{Alias, Literal}
-import org.apache.spark.sql.catalyst.plans.physical.{HashPartitioning, IdentityBroadcastMode, SinglePartition}
-import org.apache.spark.sql.execution.exchange.{BroadcastExchange, ReusedExchange, ShuffleExchange}
+import org.apache.spark.sql.catalyst.plans.physical.{
+  HashPartitioning,
+  IdentityBroadcastMode,
+  SinglePartition
+}
+import org.apache.spark.sql.execution.exchange.{
+  BroadcastExchange,
+  ReusedExchange,
+  ShuffleExchange
+}
 import org.apache.spark.sql.execution.joins.HashedRelationBroadcastMode
 import org.apache.spark.sql.test.SharedSQLContext
 
@@ -30,9 +38,9 @@ class ExchangeSuite extends SparkPlanTest with SharedSQLContext {
   test("shuffling UnsafeRows in exchange") {
     val input = (1 to 1000).map(Tuple1.apply)
     checkAnswer(
-        input.toDF(),
-        plan => ShuffleExchange(SinglePartition, plan),
-        input.map(Row.fromTuple)
+      input.toDF(),
+      plan => ShuffleExchange(SinglePartition, plan),
+      input.map(Row.fromTuple)
     )
   }
 
@@ -59,7 +67,9 @@ class ExchangeSuite extends SparkPlanTest with SharedSQLContext {
     val hashMode = HashedRelationBroadcastMode(true, output, plan.output)
     val exchange2 = BroadcastExchange(hashMode, plan)
     val hashMode2 = HashedRelationBroadcastMode(
-        true, Alias(output.head, "id2")() :: Nil, plan.output)
+      true,
+      Alias(output.head, "id2")() :: Nil,
+      plan.output)
     val exchange3 = BroadcastExchange(hashMode2, plan)
     val exchange4 = ReusedExchange(output, exchange3)
 

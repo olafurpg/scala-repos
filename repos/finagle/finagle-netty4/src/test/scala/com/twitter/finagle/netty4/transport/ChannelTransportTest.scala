@@ -3,7 +3,11 @@ package com.twitter.finagle.netty4.transport
 import com.twitter.conversions.time._
 import com.twitter.finagle._
 import com.twitter.util.{Throw, Return, Await, Future}
-import io.netty.channel.{ChannelPromise, ChannelHandlerContext, ChannelOutboundHandlerAdapter}
+import io.netty.channel.{
+  ChannelPromise,
+  ChannelHandlerContext,
+  ChannelOutboundHandlerAdapter
+}
 import io.netty.channel.embedded.EmbeddedChannel
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
@@ -12,7 +16,8 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
 @RunWith(classOf[JUnitRunner])
 class ChannelTransportTest
-    extends FunSuite with GeneratorDrivenPropertyChecks
+    extends FunSuite
+    with GeneratorDrivenPropertyChecks
     with OneInstancePerTest {
 
   val timeout = 10.seconds
@@ -25,11 +30,10 @@ class ChannelTransportTest
     ch.pipeline()
       .removeFirst()
 
-      (tr, ch)
+    (tr, ch)
   }
 
-  def assertSeenWhatsWritten[A](
-      written: Boolean, a: A, seen: Future[A]): Unit =
+  def assertSeenWhatsWritten[A](written: Boolean, a: A, seen: Future[A]): Unit =
     assert(!written || (written && Await.result(seen, timeout) == a))
 
   def assertFailedRead[A](seen: Future[A], e: Exception): Unit = {
@@ -74,28 +78,29 @@ class ChannelTransportTest
 
   test("write (failure)") {
     val e = new Exception()
-    channel.pipeline.addLast(
-        new ChannelOutboundHandlerAdapter {
-      override def write(ctx: ChannelHandlerContext,
-                         msg: scala.Any,
-                         promise: ChannelPromise): Unit = {
+    channel.pipeline.addLast(new ChannelOutboundHandlerAdapter {
+      override def write(
+          ctx: ChannelHandlerContext,
+          msg: scala.Any,
+          promise: ChannelPromise): Unit = {
         // we fail every single write to the pipeline
         promise.setFailure(e)
       }
     })
 
     forAll { s: String =>
-      assert(transport.write(s).poll == Some(
-              Throw(ChannelException(e, transport.remoteAddress))))
+      assert(
+        transport.write(s).poll == Some(
+          Throw(ChannelException(e, transport.remoteAddress))))
     }
   }
 
   test("write (ok)") {
-    channel.pipeline.addLast(
-        new ChannelOutboundHandlerAdapter {
-      override def write(ctx: ChannelHandlerContext,
-                         msg: scala.Any,
-                         promise: ChannelPromise): Unit = {
+    channel.pipeline.addLast(new ChannelOutboundHandlerAdapter {
+      override def write(
+          ctx: ChannelHandlerContext,
+          msg: scala.Any,
+          promise: ChannelPromise): Unit = {
         // we succeed every single write to the pipeline
         promise.setSuccess()
       }
@@ -108,11 +113,11 @@ class ChannelTransportTest
 
   test("write (interrupted by caller)") {
     var p: Option[ChannelPromise] = None
-    channel.pipeline.addLast(
-        new ChannelOutboundHandlerAdapter {
-      override def write(ctx: ChannelHandlerContext,
-                         msg: scala.Any,
-                         promise: ChannelPromise): Unit = {
+    channel.pipeline.addLast(new ChannelOutboundHandlerAdapter {
+      override def write(
+          ctx: ChannelHandlerContext,
+          msg: scala.Any,
+          promise: ChannelPromise): Unit = {
         // we store pending promise to make sure it's canceled
         p = Some(promise)
       }
@@ -128,11 +133,11 @@ class ChannelTransportTest
   }
 
   test("write (canceled by callee)") {
-    channel.pipeline.addLast(
-        new ChannelOutboundHandlerAdapter {
-      override def write(ctx: ChannelHandlerContext,
-                         msg: scala.Any,
-                         promise: ChannelPromise): Unit = {
+    channel.pipeline.addLast(new ChannelOutboundHandlerAdapter {
+      override def write(
+          ctx: ChannelHandlerContext,
+          msg: scala.Any,
+          promise: ChannelPromise): Unit = {
         // we cancel every single write
         promise.cancel(false /*mayInterruptIfRunning*/ )
       }
@@ -172,8 +177,10 @@ class ChannelTransportTest
     assert(!transport.onClose.isDefined)
     channel.pipeline.fireExceptionCaught(e)
 
-    assert(Await.result(transport.onClose, timeout) == ChannelException(
-            e, transport.remoteAddress))
+    assert(
+      Await.result(transport.onClose, timeout) == ChannelException(
+        e,
+        transport.remoteAddress))
     assert(transport.status == Status.Closed)
   }
 
@@ -182,7 +189,7 @@ class ChannelTransportTest
 
     Await.ready(transport.close(), timeout)
     intercept[ChannelClosedException](
-        throw Await.result(transport.onClose, timeout))
+      throw Await.result(transport.onClose, timeout))
     assert(transport.status == Status.Closed)
     assert(!channel.isOpen)
   }

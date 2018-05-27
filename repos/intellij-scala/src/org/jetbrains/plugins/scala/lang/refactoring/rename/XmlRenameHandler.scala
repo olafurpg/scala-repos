@@ -36,26 +36,28 @@ class XmlRenameHandler extends RenameHandler {
 
     element.getParent match {
       case _: ScXmlPairedTag => true
-      case _ => false
+      case _                 => false
     }
   }
 
   def isRenaming(dataContext: DataContext): Boolean =
     isAvailableOnDataContext(dataContext)
 
-  def invoke(project: Project,
-             editor: Editor,
-             file: PsiFile,
-             dataContext: DataContext) {
+  def invoke(
+      project: Project,
+      editor: Editor,
+      file: PsiFile,
+      dataContext: DataContext) {
     if (!isRenaming(dataContext)) return
     val element = file.findElementAt(editor.getCaretModel.getOffset)
 
     if (element != null) invoke(project, Array(element), dataContext)
   }
 
-  def invoke(project: Project,
-             elements: Array[PsiElement],
-             dataContext: DataContext) {
+  def invoke(
+      project: Project,
+      elements: Array[PsiElement],
+      dataContext: DataContext) {
     import scala.collection.JavaConversions._
 
     if (!isRenaming(dataContext) || elements == null || elements.length != 1)
@@ -63,7 +65,8 @@ class XmlRenameHandler extends RenameHandler {
 
     val element =
       if (elements(0) == null ||
-          !elements(0).getParent.isInstanceOf[ScXmlPairedTag]) return else
+          !elements(0).getParent.isInstanceOf[ScXmlPairedTag]) return
+      else
         elements(0).getParent.asInstanceOf[ScXmlPairedTag]
     if (element.getMatchedTag == null || element.getTagNameElement == null ||
         element.getMatchedTag.getTagNameElement == null) return
@@ -76,17 +79,18 @@ class XmlRenameHandler extends RenameHandler {
     def highlightMatched() {
       val colorsManager = EditorColorsManager.getInstance()
       val attributes = colorsManager.getGlobalScheme.getAttributes(
-          EditorColors.WRITE_SEARCH_RESULT_ATTRIBUTES)
+        EditorColors.WRITE_SEARCH_RESULT_ATTRIBUTES)
 
       HighlightManager
         .getInstance(editor.getProject)
-        .addOccurrenceHighlight(editor,
-                                matchedRange.getStartOffset,
-                                matchedRange.getEndOffset,
-                                attributes,
-                                0,
-                                rangeHighlighters,
-                                null)
+        .addOccurrenceHighlight(
+          editor,
+          matchedRange.getStartOffset,
+          matchedRange.getEndOffset,
+          attributes,
+          0,
+          rangeHighlighters,
+          null)
 
       rangeHighlighters.foreach { a =>
         a.setGreedyToLeft(true)
@@ -97,54 +101,73 @@ class XmlRenameHandler extends RenameHandler {
     def rename() {
       CommandProcessor
         .getInstance()
-        .executeCommand(project, new Runnable {
-          def run() {
-            extensions.inWriteAction {
-              val offset = editor.getCaretModel.getOffset
-              val template = buildTemplate()
-              editor.getCaretModel.moveToOffset(
+        .executeCommand(
+          project,
+          new Runnable {
+            def run() {
+              extensions.inWriteAction {
+                val offset = editor.getCaretModel.getOffset
+                val template = buildTemplate()
+                editor.getCaretModel.moveToOffset(
                   element.getParent.getTextOffset)
 
-              TemplateManager
-                .getInstance(project)
-                .startTemplate(editor, template, new TemplateEditingAdapter {
-                  override def templateFinished(template: Template,
-                                                brokenOff: Boolean) {
-                    templateCancelled(template)
-                  }
+                TemplateManager
+                  .getInstance(project)
+                  .startTemplate(
+                    editor,
+                    template,
+                    new TemplateEditingAdapter {
+                      override def templateFinished(
+                          template: Template,
+                          brokenOff: Boolean) {
+                        templateCancelled(template)
+                      }
 
-                  override def templateCancelled(template: Template) {
-                    val highlightManager =
-                      HighlightManager.getInstance(project)
-                    rangeHighlighters.foreach { a =>
-                      highlightManager.removeSegmentHighlighter(editor, a)
+                      override def templateCancelled(template: Template) {
+                        val highlightManager =
+                          HighlightManager.getInstance(project)
+                        rangeHighlighters.foreach { a =>
+                          highlightManager.removeSegmentHighlighter(editor, a)
+                        }
+                      }
+                    },
+                    new PairProcessor[String, String] {
+                      def process(s: String, t: String): Boolean =
+                        !(t.length == 0 || t.charAt(t.length - 1) == ' ')
                     }
-                  }
-                }, new PairProcessor[String, String] {
-                  def process(s: String, t: String): Boolean =
-                    !(t.length == 0 || t.charAt(t.length - 1) == ' ')
-                })
+                  )
 
-              highlightMatched()
-              editor.getCaretModel.moveToOffset(offset)
+                highlightMatched()
+                editor.getCaretModel.moveToOffset(offset)
+              }
             }
-          }
-        }, RefactoringBundle.message("rename.title"), null)
+          },
+          RefactoringBundle.message("rename.title"),
+          null
+        )
     }
 
     def buildTemplate(): Template = {
       val builder = new TemplateBuilderImpl(element.getParent)
 
       builder.replaceElement(
-          element.getTagNameElement, "first", new EmptyExpression {
-        override def calculateQuickResult(context: ExpressionContext): Result =
-          new TextResult(
+        element.getTagNameElement,
+        "first",
+        new EmptyExpression {
+          override def calculateQuickResult(
+              context: ExpressionContext): Result =
+            new TextResult(
               Option(element.getTagName).getOrElse(elementStartName))
-        override def calculateResult(context: ExpressionContext): Result =
-          calculateQuickResult(context)
-      }, true)
+          override def calculateResult(context: ExpressionContext): Result =
+            calculateQuickResult(context)
+        },
+        true
+      )
       builder.replaceElement(
-          element.getMatchedTag.getTagNameElement, "second", "first", false)
+        element.getMatchedTag.getTagNameElement,
+        "second",
+        "first",
+        false)
 
       builder.buildInlineTemplate()
     }

@@ -23,7 +23,9 @@ import scala.concurrent.duration.Duration
 import org.scalatest.{BeforeAndAfter, Matchers}
 
 class FutureActionSuite
-    extends SparkFunSuite with BeforeAndAfter with Matchers
+    extends SparkFunSuite
+    with BeforeAndAfter
+    with Matchers
     with LocalSparkContext {
 
   before {

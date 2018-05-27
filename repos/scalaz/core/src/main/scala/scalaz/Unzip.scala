@@ -16,7 +16,8 @@ trait Unzip[F[_]] { self =>
 
   /**The composition of Unzips `F` and `G`, `[x]F[G[x]]`, is a Unzip */
   def compose[G[_]](
-      implicit T0: Functor[F], G0: Unzip[G]): Unzip[λ[α => F[G[α]]]] =
+      implicit T0: Functor[F],
+      G0: Unzip[G]): Unzip[λ[α => F[G[α]]]] =
     new CompositionUnzip[F, G] {
       implicit def F = self
       implicit def T = T0

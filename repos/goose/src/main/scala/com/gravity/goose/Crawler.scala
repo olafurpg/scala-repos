@@ -25,7 +25,10 @@ import org.jsoup.nodes.{Document, Element}
 import org.jsoup.Jsoup
 import java.io.File
 import utils.{ParsingCandidate, URLHelper, Logging}
-import com.gravity.goose.outputformatters.{StandardOutputFormatter, OutputFormatter}
+import com.gravity.goose.outputformatters.{
+  StandardOutputFormatter,
+  OutputFormatter
+}
 
 /**
   * Created by Jim Plush
@@ -33,7 +36,9 @@ import com.gravity.goose.outputformatters.{StandardOutputFormatter, OutputFormat
   * Date: 8/18/11
   */
 case class CrawlCandidate(
-    config: Configuration, url: String, rawHTML: String = null)
+    config: Configuration,
+    url: String,
+    rawHTML: String = null)
 
 class Crawler(config: Configuration) {
 
@@ -71,30 +76,30 @@ class Crawler(config: Configuration) {
 
       extractor.calculateBestNodeBasedOnClustering(article) match {
         case Some(node: Element) => {
-            article.topNode = node
-            article.movies = extractor.extractVideos(article.topNode)
+          article.topNode = node
+          article.movies = extractor.extractVideos(article.topNode)
 
-            if (config.enableImageFetching) {
-              trace(logPrefix + "Image fetching enabled...")
-              val imageExtractor = getImageExtractor(article)
-              try {
-                if (article.rawDoc == null) {
-                  article.topImage = new Image
-                } else {
-                  article.topImage = imageExtractor.getBestImage(
-                      article.rawDoc, article.topNode)
-                }
-              } catch {
-                case e: Exception => {
-                    warn(e, e.toString)
-                  }
+          if (config.enableImageFetching) {
+            trace(logPrefix + "Image fetching enabled...")
+            val imageExtractor = getImageExtractor(article)
+            try {
+              if (article.rawDoc == null) {
+                article.topImage = new Image
+              } else {
+                article.topImage =
+                  imageExtractor.getBestImage(article.rawDoc, article.topNode)
+              }
+            } catch {
+              case e: Exception => {
+                warn(e, e.toString)
               }
             }
-            article.topNode = extractor.postExtractionCleanup(article.topNode)
-
-            article.cleanedArticleText = outputFormatter.getFormattedText(
-                article.topNode)
           }
+          article.topNode = extractor.postExtractionCleanup(article.topNode)
+
+          article.cleanedArticleText =
+            outputFormatter.getFormattedText(article.topNode)
+        }
         case _ => trace("NO ARTICLE FOUND")
       }
       releaseResources(article)
@@ -104,15 +109,17 @@ class Crawler(config: Configuration) {
     article
   }
 
-  def getHTML(crawlCandidate: CrawlCandidate,
-              parsingCandidate: ParsingCandidate): Option[String] = {
+  def getHTML(
+      crawlCandidate: CrawlCandidate,
+      parsingCandidate: ParsingCandidate): Option[String] = {
     if (crawlCandidate.rawHTML != null) {
       Some(crawlCandidate.rawHTML)
     } else {
-      config.getHtmlFetcher.getHtml(config, parsingCandidate.url.toString) match {
+      config.getHtmlFetcher
+        .getHtml(config, parsingCandidate.url.toString) match {
         case Some(html) => {
-            Some(html)
-          }
+          Some(html)
+        }
         case _ => None
       }
     }
@@ -137,9 +144,9 @@ class Crawler(config: Configuration) {
       Some(Jsoup.parse(rawlHtml))
     } catch {
       case e: Exception => {
-          trace("Unable to parse " + url + " properly into JSoup Doc")
-          None
-        }
+        trace("Unable to parse " + url + " properly into JSoup Doc")
+        None
+      }
     }
   }
 
@@ -156,15 +163,13 @@ class Crawler(config: Configuration) {
 
     val dir: File = new File(config.localStoragePath)
 
-    dir.list.foreach(
-        filename =>
-          {
-        if (filename.startsWith(article.linkhash)) {
-          val f: File = new File(dir.getAbsolutePath + "/" + filename)
-          if (!f.delete) {
-            warn("Unable to remove temp file: " + filename)
-          }
+    dir.list.foreach(filename => {
+      if (filename.startsWith(article.linkhash)) {
+        val f: File = new File(dir.getAbsolutePath + "/" + filename)
+        if (!f.delete) {
+          warn("Unable to remove temp file: " + filename)
         }
+      }
     })
   }
 }

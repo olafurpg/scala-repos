@@ -66,7 +66,8 @@ class InterpolatedStringParserTest extends SimpleTestCase {
   def testExpressionWithSeparatedFormatter() {
     assertMatches(parse("$foo %d")) {
       case Injection(ElementText("foo"), None) :: Text(" ") :: Injection(
-          ElementText("\"%\""), None) :: Text("d") :: Nil =>
+            ElementText("\"%\""),
+            None) :: Text("d") :: Nil =>
     }
   }
 
@@ -78,23 +79,25 @@ class InterpolatedStringParserTest extends SimpleTestCase {
 
   def testFormattedComplexBlockExpression() {
     assertMatches(parse("${null; foo}%d")) {
-      case Injection(ElementText("{null; foo}"),
-                     Some(Specifier(Span(_, 0, 2), "%d"))) :: Nil =>
+      case Injection(
+            ElementText("{null; foo}"),
+            Some(Specifier(Span(_, 0, 2), "%d"))) :: Nil =>
     }
   }
 
   def testMixed() {
     assertMatches(parse("foo $exp ${it.name}%2d bar")) {
       case Text("foo ") :: Injection(ElementText("exp"), None) :: Text(" ") :: Injection(
-          ElementText("it.name"),
-          Some(Specifier(Span(_, 0, 3), "%2d"))) :: Text(" bar") :: Nil =>
+            ElementText("it.name"),
+            Some(Specifier(Span(_, 0, 3), "%2d"))) :: Text(" bar") :: Nil =>
     }
   }
 
   def testUnformattedWithSpecifiers() {
     assertMatches(parse("$foo%d", formatted = false)) {
       case Injection(ElementText("foo"), None) :: Injection(
-          ElementText("\"%\""), None) :: Text("d") :: Nil =>
+            ElementText("\"%\""),
+            None) :: Text("d") :: Nil =>
     }
   }
 
@@ -104,16 +107,18 @@ class InterpolatedStringParserTest extends SimpleTestCase {
     }
   }
 
-  private def parse(content: String,
-                    formatted: Boolean = true,
-                    multiline: Boolean = false): List[StringPart] = {
+  private def parse(
+      content: String,
+      formatted: Boolean = true,
+      multiline: Boolean = false): List[StringPart] = {
     val element = literal(content, formatted, multiline)
     InterpolatedStringParser.parse(element).get.toList
   }
 
-  private def literal(s: String,
-                      formatted: Boolean,
-                      multiline: Boolean): ScInterpolatedStringLiteral = {
+  private def literal(
+      s: String,
+      formatted: Boolean,
+      multiline: Boolean): ScInterpolatedStringLiteral = {
     val text = {
       val prefix = if (formatted) "f" else "s"
       val quote = if (multiline) "\"\"\"" else "\""

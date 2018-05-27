@@ -19,7 +19,11 @@ import scala.language.experimental.macros
 import scala.reflect.macros.Context
 
 import com.twitter.scalding._
-import com.twitter.scalding.serialization.macros.impl.ordered_serialization.{CompileTimeLengthTypes, ProductLike, TreeOrderedBuf}
+import com.twitter.scalding.serialization.macros.impl.ordered_serialization.{
+  CompileTimeLengthTypes,
+  ProductLike,
+  TreeOrderedBuf
+}
 import CompileTimeLengthTypes._
 import java.nio.ByteBuffer
 import com.twitter.scalding.serialization.OrderedSerialization
@@ -60,10 +64,11 @@ object PrimitiveOrderedBuf {
       PrimitiveOrderedBuf(c)(tpe, "Double", 8, true)
   }
 
-  def apply(c: Context)(outerType: c.Type,
-                        javaTypeStr: String,
-                        lenInBytes: Int,
-                        boxed: Boolean): TreeOrderedBuf[c.type] = {
+  def apply(c: Context)(
+      outerType: c.Type,
+      javaTypeStr: String,
+      lenInBytes: Int,
+      boxed: Boolean): TreeOrderedBuf[c.type] = {
     import c.universe._
     val javaType = newTermName(javaTypeStr)
 
@@ -75,8 +80,7 @@ object PrimitiveOrderedBuf {
     val bbGetter = newTermName("read" + shortName)
     val bbPutter = newTermName("write" + shortName)
 
-    def genBinaryCompare(
-        inputStreamA: TermName, inputStreamB: TermName): Tree =
+    def genBinaryCompare(inputStreamA: TermName, inputStreamB: TermName): Tree =
       q"""_root_.java.lang.$javaType.compare($inputStreamA.$bbGetter, $inputStreamB.$bbGetter)"""
 
     def accessor(e: c.TermName): c.Tree = {
@@ -89,7 +93,8 @@ object PrimitiveOrderedBuf {
       override val ctx: c.type = c
       override val tpe = outerType
       override def compareBinary(
-          inputStreamA: ctx.TermName, inputStreamB: ctx.TermName) =
+          inputStreamA: ctx.TermName,
+          inputStreamB: ctx.TermName) =
         genBinaryCompare(inputStreamA, inputStreamB)
       override def hash(element: ctx.TermName): ctx.Tree = {
         // This calls out the correctly named item in Hasher
@@ -105,7 +110,8 @@ object PrimitiveOrderedBuf {
       }
 
       override def compare(
-          elementA: ctx.TermName, elementB: ctx.TermName): ctx.Tree =
+          elementA: ctx.TermName,
+          elementB: ctx.TermName): ctx.Tree =
         if (boxed) q"""$elementA.compareTo($elementB)"""
         else q"""_root_.java.lang.$javaType.compare($elementA, $elementB)"""
 

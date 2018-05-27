@@ -18,7 +18,11 @@
 package org.apache.spark.ml.feature
 
 import org.apache.spark.SparkFunSuite
-import org.apache.spark.ml.attribute.{AttributeGroup, BinaryAttribute, NominalAttribute}
+import org.apache.spark.ml.attribute.{
+  AttributeGroup,
+  BinaryAttribute,
+  NominalAttribute
+}
 import org.apache.spark.ml.param.ParamsSuite
 import org.apache.spark.ml.util.DefaultReadWriteTest
 import org.apache.spark.mllib.linalg.Vector
@@ -28,12 +32,14 @@ import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.types._
 
 class OneHotEncoderSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   def stringIndexed(): DataFrame = {
     val data = sc.parallelize(
-        Seq((0, "a"), (1, "b"), (2, "c"), (3, "a"), (4, "a"), (5, "c")), 2)
+      Seq((0, "a"), (1, "b"), (2, "c"), (3, "a"), (4, "a"), (5, "c")),
+      2)
     val df = sqlContext.createDataFrame(data).toDF("id", "label")
     val indexer = new StringIndexer()
       .setInputCol("label")
@@ -64,12 +70,13 @@ class OneHotEncoderSuite
       .collect()
       .toSet
     // a -> 0, b -> 2, c -> 1
-    val expected = Set((0, 1.0, 0.0, 0.0),
-                       (1, 0.0, 0.0, 1.0),
-                       (2, 0.0, 1.0, 0.0),
-                       (3, 1.0, 0.0, 0.0),
-                       (4, 1.0, 0.0, 0.0),
-                       (5, 0.0, 1.0, 0.0))
+    val expected = Set(
+      (0, 1.0, 0.0, 0.0),
+      (1, 0.0, 0.0, 1.0),
+      (2, 0.0, 1.0, 0.0),
+      (3, 1.0, 0.0, 0.0),
+      (4, 1.0, 0.0, 0.0),
+      (5, 0.0, 1.0, 0.0))
     assert(output === expected)
   }
 
@@ -89,12 +96,13 @@ class OneHotEncoderSuite
       .collect()
       .toSet
     // a -> 0, b -> 2, c -> 1
-    val expected = Set((0, 1.0, 0.0),
-                       (1, 0.0, 0.0),
-                       (2, 0.0, 1.0),
-                       (3, 1.0, 0.0),
-                       (4, 1.0, 0.0),
-                       (5, 0.0, 1.0))
+    val expected = Set(
+      (0, 1.0, 0.0),
+      (1, 0.0, 0.0),
+      (2, 0.0, 1.0),
+      (3, 1.0, 0.0),
+      (4, 1.0, 0.0),
+      (5, 0.0, 1.0))
     assert(output === expected)
   }
 
@@ -110,12 +118,14 @@ class OneHotEncoderSuite
     val output = encoder.transform(df)
     val group = AttributeGroup.fromStructField(output.schema("encoded"))
     assert(group.size === 2)
-    assert(group.getAttr(0) === BinaryAttribute.defaultAttr
-          .withName("small")
-          .withIndex(0))
-    assert(group.getAttr(1) === BinaryAttribute.defaultAttr
-          .withName("medium")
-          .withIndex(1))
+    assert(
+      group.getAttr(0) === BinaryAttribute.defaultAttr
+        .withName("small")
+        .withIndex(0))
+    assert(
+      group.getAttr(1) === BinaryAttribute.defaultAttr
+        .withName("medium")
+        .withIndex(1))
   }
 
   test("input column without ML attribute") {
@@ -127,12 +137,14 @@ class OneHotEncoderSuite
     val output = encoder.transform(df)
     val group = AttributeGroup.fromStructField(output.schema("encoded"))
     assert(group.size === 2)
-    assert(group.getAttr(0) === BinaryAttribute.defaultAttr
-          .withName("0")
-          .withIndex(0))
-    assert(group.getAttr(1) === BinaryAttribute.defaultAttr
-          .withName("1")
-          .withIndex(1))
+    assert(
+      group.getAttr(0) === BinaryAttribute.defaultAttr
+        .withName("0")
+        .withIndex(0))
+    assert(
+      group.getAttr(1) === BinaryAttribute.defaultAttr
+        .withName("1")
+        .withIndex(1))
   }
 
   test("read/write") {
@@ -151,12 +163,13 @@ class OneHotEncoderSuite
       .withColumn("intLabel", df("labelIndex").cast(IntegerType))
       .withColumn("floatLabel", df("labelIndex").cast(FloatType))
       .withColumn("decimalLabel", df("labelIndex").cast(DecimalType(10, 0)))
-    val cols = Array("labelIndex",
-                     "shortLabel",
-                     "longLabel",
-                     "intLabel",
-                     "floatLabel",
-                     "decimalLabel")
+    val cols = Array(
+      "labelIndex",
+      "shortLabel",
+      "longLabel",
+      "intLabel",
+      "floatLabel",
+      "decimalLabel")
     for (col <- cols) {
       val encoder = new OneHotEncoder()
         .setInputCol(col)
@@ -174,12 +187,13 @@ class OneHotEncoderSuite
         .collect()
         .toSet
       // a -> 0, b -> 2, c -> 1
-      val expected = Set((0, 1.0, 0.0, 0.0),
-                         (1, 0.0, 0.0, 1.0),
-                         (2, 0.0, 1.0, 0.0),
-                         (3, 1.0, 0.0, 0.0),
-                         (4, 1.0, 0.0, 0.0),
-                         (5, 0.0, 1.0, 0.0))
+      val expected = Set(
+        (0, 1.0, 0.0, 0.0),
+        (1, 0.0, 0.0, 1.0),
+        (2, 0.0, 1.0, 0.0),
+        (3, 1.0, 0.0, 0.0),
+        (4, 1.0, 0.0, 0.0),
+        (5, 0.0, 1.0, 0.0))
       assert(output === expected)
     }
   }

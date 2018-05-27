@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Unzip` */
-final class UnzipOps[F[_], A] private[syntax](val self: F[A])(
+final class UnzipOps[F[_], A] private[syntax] (val self: F[A])(
     implicit val F: Unzip[F])
     extends Ops[F[A]] {
   ////
@@ -19,11 +19,10 @@ trait ToUnzipOps extends ToUnzipOps0 {
     new UnzipOps[F, A](v)
 
   ////
-  implicit def ToUnzipPairOps[F[_], A, B](v: F[(A, B)])(
-      implicit F0: Unzip[F]) =
+  implicit def ToUnzipPairOps[F[_], A, B](v: F[(A, B)])(implicit F0: Unzip[F]) =
     new UnzipPairOps[F, A, B](v)(F0)
 
-  final class UnzipPairOps[F[_], A, B] private[syntax](self: F[(A, B)])(
+  final class UnzipPairOps[F[_], A, B] private[syntax] (self: F[(A, B)])(
       implicit F: Unzip[F]) {
     def unfzip: (F[A], F[B]) =
       F.unzip(self)

@@ -22,11 +22,11 @@ class ScalaRunConfigurationRefactoringListenerProvider
     new RefactoringElementListener {
       def elementMoved(newElement: PsiElement) = newElement match {
         case td: ScTemplateDefinition => listener.elementMoved(wrap(td))
-        case _ =>
+        case _                        =>
       }
       def elementRenamed(newElement: PsiElement) = newElement match {
         case td: ScTemplateDefinition => listener.elementRenamed(wrap(td))
-        case _ =>
+        case _                        =>
       }
     }
   }

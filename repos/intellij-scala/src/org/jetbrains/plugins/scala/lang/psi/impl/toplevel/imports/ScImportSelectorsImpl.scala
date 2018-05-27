@@ -14,13 +14,14 @@ import org.jetbrains.plugins.scala.lang.parser.ScalaElementTypes
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports._
 import org.jetbrains.plugins.scala.lang.psi.stubs.ScImportSelectorsStub
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 20.02.2008
   */
-class ScImportSelectorsImpl private (stub: StubElement[ScImportSelectors],
-                                     nodeType: IElementType,
-                                     node: ASTNode)
+class ScImportSelectorsImpl private (
+    stub: StubElement[ScImportSelectors],
+    nodeType: IElementType,
+    node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
     with ScImportSelectors {
   def this(node: ASTNode) = { this(null, null, node) }
@@ -44,6 +45,7 @@ class ScImportSelectorsImpl private (stub: StubElement[ScImportSelectors],
   }
 
   def selectors: Array[ScImportSelector] =
-    getStubOrPsiChildren(ScalaElementTypes.IMPORT_SELECTOR,
-                         JavaArrayFactoryUtil.ScImportSelectorFactory)
+    getStubOrPsiChildren(
+      ScalaElementTypes.IMPORT_SELECTOR,
+      JavaArrayFactoryUtil.ScImportSelectorFactory)
 }

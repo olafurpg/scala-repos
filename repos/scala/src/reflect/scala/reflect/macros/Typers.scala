@@ -53,17 +53,19 @@ trait Typers { self: blackbox.Context =>
   /** @see `Typers.typecheck`
     */
   @deprecated("Use `c.typecheck` instead", "2.11.0")
-  def typeCheck(tree: Tree,
-                pt: Type = universe.WildcardType,
-                silent: Boolean = false,
-                withImplicitViewsDisabled: Boolean = false,
-                withMacrosDisabled: Boolean = false): Tree =
-    typecheck(tree,
-              TERMmode,
-              pt,
-              silent,
-              withImplicitViewsDisabled,
-              withMacrosDisabled)
+  def typeCheck(
+      tree: Tree,
+      pt: Type = universe.WildcardType,
+      silent: Boolean = false,
+      withImplicitViewsDisabled: Boolean = false,
+      withMacrosDisabled: Boolean = false): Tree =
+    typecheck(
+      tree,
+      TERMmode,
+      pt,
+      silent,
+      withImplicitViewsDisabled,
+      withMacrosDisabled)
 
   /** Typechecks the provided tree against the expected type `pt` in the macro callsite context
     *  under typechecking mode specified in `mode` with [[EXPRmode]] being default.
@@ -80,12 +82,13 @@ trait Typers { self: blackbox.Context =>
     *
     *  @throws scala.reflect.macros.TypecheckException
     */
-  def typecheck(tree: Tree,
-                mode: TypecheckMode = TERMmode,
-                pt: Type = universe.WildcardType,
-                silent: Boolean = false,
-                withImplicitViewsDisabled: Boolean = false,
-                withMacrosDisabled: Boolean = false): Tree
+  def typecheck(
+      tree: Tree,
+      mode: TypecheckMode = TERMmode,
+      pt: Type = universe.WildcardType,
+      silent: Boolean = false,
+      withImplicitViewsDisabled: Boolean = false,
+      withMacrosDisabled: Boolean = false): Tree
 
   /** Infers an implicit value of the expected type `pt` in the macro callsite context.
     *  Optional `pos` parameter provides a position that will be associated with the implicit search.
@@ -97,10 +100,11 @@ trait Typers { self: blackbox.Context =>
     *
     *  @throws scala.reflect.macros.TypecheckException
     */
-  def inferImplicitValue(pt: Type,
-                         silent: Boolean = true,
-                         withMacrosDisabled: Boolean = false,
-                         pos: Position = enclosingPosition): Tree
+  def inferImplicitValue(
+      pt: Type,
+      silent: Boolean = true,
+      withMacrosDisabled: Boolean = false,
+      pos: Position = enclosingPosition): Tree
 
   /** Infers an implicit view from the provided tree `tree` of the type `from` to the type `to` in the macro callsite context.
     *  Optional `pos` parameter provides a position that will be associated with the implicit search.
@@ -112,12 +116,13 @@ trait Typers { self: blackbox.Context =>
     *
     *  @throws scala.reflect.macros.TypecheckException
     */
-  def inferImplicitView(tree: Tree,
-                        from: Type,
-                        to: Type,
-                        silent: Boolean = true,
-                        withMacrosDisabled: Boolean = false,
-                        pos: Position = enclosingPosition): Tree
+  def inferImplicitView(
+      tree: Tree,
+      from: Type,
+      to: Type,
+      silent: Boolean = true,
+      withMacrosDisabled: Boolean = false,
+      pos: Position = enclosingPosition): Tree
 
   /** Recursively resets locally defined symbols and types in a given tree.
     *  WARNING: Don't use this API, go for [[untypecheck]] instead.

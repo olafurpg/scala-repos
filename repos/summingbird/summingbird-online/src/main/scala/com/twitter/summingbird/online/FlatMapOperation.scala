@@ -92,11 +92,11 @@ class FunctionKeyFlatMapOperation[K1, K2, V](
   val boxed = Externalizer(fm)
   def apply(t: (K1, V)) = {
     Future.value(
-        boxed
-          .get(t._1)
-          .map { newK =>
-        (newK, t._2)
-      })
+      boxed
+        .get(t._1)
+        .map { newK =>
+          (newK, t._2)
+        })
   }
 }
 
@@ -105,8 +105,8 @@ class IdentityFlatMapOperation[T] extends FlatMapOperation[T, T] {
   def apply(t: T): Future[TraversableOnce[T]] = Future.value(Some(t))
 
   // But if we are composed with something else, just become it
-  override def andThen[V](
-      fmo: FlatMapOperation[T, V]): FlatMapOperation[T, V] = fmo
+  override def andThen[V](fmo: FlatMapOperation[T, V]): FlatMapOperation[T, V] =
+    fmo
 }
 
 object FlatMapOperation {

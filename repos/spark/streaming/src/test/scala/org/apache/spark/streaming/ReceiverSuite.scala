@@ -157,8 +157,7 @@ class ReceiverSuite extends TestSuiteBase with Timeouts with Serializable {
     val recordedBlocks = blockGeneratorListener.arrayBuffers
     val recordedData = recordedBlocks.flatten
     assert(blockGeneratorListener.arrayBuffers.size > 0, "No blocks received")
-    assert(
-        recordedData.toSet === generatedData.toSet, "Received data not same")
+    assert(recordedData.toSet === generatedData.toSet, "Received data not same")
 
     // recordedData size should be close to the expected rate; use an error margin proportional to
     // the value, so that rate changes don't cause a brittle test
@@ -166,9 +165,9 @@ class ReceiverSuite extends TestSuiteBase with Timeouts with Serializable {
     val maxExpectedMessages = expectedMessages + 0.05 * expectedMessages
     val numMessages = recordedData.size
     assert(
-        numMessages >= minExpectedMessages &&
+      numMessages >= minExpectedMessages &&
         numMessages <= maxExpectedMessages,
-        s"#records received = $numMessages, not between $minExpectedMessages and $maxExpectedMessages"
+      s"#records received = $numMessages, not between $minExpectedMessages and $maxExpectedMessages"
     )
 
     // XXX Checking every block would require an even distribution of messages across blocks,
@@ -185,9 +184,9 @@ class ReceiverSuite extends TestSuiteBase with Timeouts with Serializable {
       validBlocks.map(block => block.size).sum / validBlocks.size
 
     assert(
-        averageBlockSize >= minExpectedMessagesPerBlock &&
+      averageBlockSize >= minExpectedMessagesPerBlock &&
         averageBlockSize <= maxExpectedMessagesPerBlock,
-        s"# records in received blocks = [$receivedBlockSizes], not between " +
+      s"# records in received blocks = [$receivedBlockSizes], not between " +
         s"$minExpectedMessagesPerBlock and $maxExpectedMessagesPerBlock, on average"
     )
   }
@@ -253,8 +252,9 @@ class ReceiverSuite extends TestSuiteBase with Timeouts with Serializable {
 
         // Run until sufficient WAL files have been generated and
         // the first WAL files has been deleted
-        eventually(timeout(20 seconds),
-                   interval(batchDuration.milliseconds millis)) {
+        eventually(
+          timeout(20 seconds),
+          interval(batchDuration.milliseconds millis)) {
           val (logFiles1, logFiles2) = getBothCurrentLogFiles()
           allLogFiles1 ++= logFiles1
           allLogFiles2 ++= logFiles2
@@ -309,21 +309,24 @@ class ReceiverSuite extends TestSuiteBase with Timeouts with Serializable {
       singles += data
     }
 
-    def pushBytes(bytes: ByteBuffer,
-                  optionalMetadata: Option[Any],
-                  optionalBlockId: Option[StreamBlockId]) {
+    def pushBytes(
+        bytes: ByteBuffer,
+        optionalMetadata: Option[Any],
+        optionalBlockId: Option[StreamBlockId]) {
       byteBuffers += bytes
     }
 
-    def pushIterator(iterator: Iterator[_],
-                     optionalMetadata: Option[Any],
-                     optionalBlockId: Option[StreamBlockId]) {
+    def pushIterator(
+        iterator: Iterator[_],
+        optionalMetadata: Option[Any],
+        optionalBlockId: Option[StreamBlockId]) {
       iterators += iterator
     }
 
-    def pushArrayBuffer(arrayBuffer: ArrayBuffer[_],
-                        optionalMetadata: Option[Any],
-                        optionalBlockId: Option[StreamBlockId]) {
+    def pushArrayBuffer(
+        arrayBuffer: ArrayBuffer[_],
+        optionalMetadata: Option[Any],
+        optionalBlockId: Option[StreamBlockId]) {
       arrayBuffers += arrayBuffer
     }
 

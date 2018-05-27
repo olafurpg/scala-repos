@@ -27,7 +27,7 @@ trait Keys { self: BaseClient =>
   def dump(key: ChannelBuffer): Future[Option[ChannelBuffer]] =
     doRequest(Dump(key)) {
       case BulkReply(message) => Future.value(Some(message))
-      case EmptyBulkReply() => Future.value(None)
+      case EmptyBulkReply()   => Future.value(None)
     }
 
   /**
@@ -137,9 +137,10 @@ trait Keys { self: BaseClient =>
     * @param cursor, count, pattern
     * @return cursor followed by matching keys
     */
-  def scan(cursor: JLong,
-           count: Option[JLong],
-           pattern: Option[ChannelBuffer]): Future[Seq[ChannelBuffer]] =
+  def scan(
+      cursor: JLong,
+      count: Option[JLong],
+      pattern: Option[ChannelBuffer]): Future[Seq[ChannelBuffer]] =
     doRequest(Scan(cursor, count, pattern)) {
       case MBulkReply(messages) =>
         Future.value(ReplyFormat.toChannelBuffers(messages))
@@ -155,11 +156,11 @@ trait Keys { self: BaseClient =>
   def ttl(key: ChannelBuffer): Future[Option[JLong]] =
     doRequest(Ttl(key)) {
       case IntegerReply(n) => {
-          if (n != -1) {
-            Future.value(Some(n))
-          } else {
-            Future.value(None)
-          }
+        if (n != -1) {
+          Future.value(Some(n))
+        } else {
+          Future.value(None)
         }
+      }
     }
 }

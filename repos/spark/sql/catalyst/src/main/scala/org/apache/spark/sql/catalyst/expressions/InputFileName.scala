@@ -19,7 +19,10 @@ package org.apache.spark.sql.catalyst.expressions
 
 import org.apache.spark.rdd.SqlNewHadoopRDDState
 import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.catalyst.expressions.codegen.{CodegenContext, ExprCode}
+import org.apache.spark.sql.catalyst.expressions.codegen.{
+  CodegenContext,
+  ExprCode
+}
 import org.apache.spark.sql.types.{DataType, StringType}
 import org.apache.spark.unsafe.types.UTF8String
 
@@ -27,8 +30,9 @@ import org.apache.spark.unsafe.types.UTF8String
   * Expression that returns the name of the current file being read in using [[SqlNewHadoopRDD]]
   */
 @ExpressionDescription(
-    usage = "_FUNC_() - Returns the name of the current file being read if available",
-    extended = "> SELECT _FUNC_();\n ''")
+  usage =
+    "_FUNC_() - Returns the name of the current file being read if available",
+  extended = "> SELECT _FUNC_();\n ''")
 case class InputFileName() extends LeafExpression with Nondeterministic {
 
   override def nullable: Boolean = true
@@ -46,6 +50,6 @@ case class InputFileName() extends LeafExpression with Nondeterministic {
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
     ev.isNull = "false"
     s"final ${ctx.javaType(dataType)} ${ev.value} = " +
-    "org.apache.spark.rdd.SqlNewHadoopRDDState.getInputFileName();"
+      "org.apache.spark.rdd.SqlNewHadoopRDDState.getInputFileName();"
   }
 }

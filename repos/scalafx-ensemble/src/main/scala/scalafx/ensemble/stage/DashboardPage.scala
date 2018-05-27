@@ -40,7 +40,7 @@ class DashboardPage(dashPart: String = "dashboard") extends DisplayablePage {
   def getPage = {
     val thumbs = dashPart match {
       case "dashboard" => tree.getDashThumbsCtrl
-      case _ => tree.getDashThumb(dashPart)
+      case _           => tree.getDashThumb(dashPart)
     }
 
     new ScrollPane {

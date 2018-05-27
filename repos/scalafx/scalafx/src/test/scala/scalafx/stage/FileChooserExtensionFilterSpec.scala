@@ -43,9 +43,10 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class FileChooserExtensionFilterSpec
     extends SimpleSFXDelegateSpec[
-        jfxs.FileChooser.ExtensionFilter, FileChooser.ExtensionFilter](
-        classOf[jfxs.FileChooser.ExtensionFilter],
-        classOf[FileChooser.ExtensionFilter]) {
+      jfxs.FileChooser.ExtensionFilter,
+      FileChooser.ExtensionFilter](
+      classOf[jfxs.FileChooser.ExtensionFilter],
+      classOf[FileChooser.ExtensionFilter]) {
 
   override protected def getJavaClassInstance =
     new jfxs.FileChooser.ExtensionFilter("Description", "txt")

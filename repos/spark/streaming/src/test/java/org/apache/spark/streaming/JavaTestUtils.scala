@@ -23,7 +23,11 @@ import scala.collection.JavaConverters._
 import scala.reflect.ClassTag
 
 import org.apache.spark.api.java.JavaRDDLike
-import org.apache.spark.streaming.api.java.{JavaDStreamLike, JavaDStream, JavaStreamingContext}
+import org.apache.spark.streaming.api.java.{
+  JavaDStreamLike,
+  JavaDStream,
+  JavaStreamingContext
+}
 
 /** Exposes streaming test functionality in a Java-friendly way. */
 trait JavaTestBase extends TestSuiteBase {
@@ -32,9 +36,10 @@ trait JavaTestBase extends TestSuiteBase {
     * Create a [[org.apache.spark.streaming.TestInputStream]] and attach it to the supplied context.
     * The stream will be derived from the supplied lists of Java objects.
     */
-  def attachTestInputStream[T](ssc: JavaStreamingContext,
-                               data: JList[JList[T]],
-                               numPartitions: Int) = {
+  def attachTestInputStream[T](
+      ssc: JavaStreamingContext,
+      data: JList[JList[T]],
+      numPartitions: Int) = {
     val seqData = data.asScala.map(_.asScala)
 
     implicit val cm: ClassTag[T] =
@@ -48,8 +53,9 @@ trait JavaTestBase extends TestSuiteBase {
     * [[org.apache.spark.streaming.TestOutputStream]].
     **/
   def attachTestOutputStream[
-      T, This <: JavaDStreamLike[T, This, R], R <: JavaRDDLike[T, R]](
-      dstream: JavaDStreamLike[T, This, R]) = {
+      T,
+      This <: JavaDStreamLike[T, This, R],
+      R <: JavaRDDLike[T, R]](dstream: JavaDStreamLike[T, This, R]) = {
     implicit val cm: ClassTag[T] =
       implicitly[ClassTag[AnyRef]].asInstanceOf[ClassTag[T]]
     val ostream = new TestOutputStreamWithPartitions(dstream.dstream)
@@ -63,9 +69,10 @@ trait JavaTestBase extends TestSuiteBase {
     *
     * Returns a list of items for each RDD.
     */
-  def runStreams[V](ssc: JavaStreamingContext,
-                    numBatches: Int,
-                    numExpectedOutput: Int): JList[JList[V]] = {
+  def runStreams[V](
+      ssc: JavaStreamingContext,
+      numBatches: Int,
+      numExpectedOutput: Int): JList[JList[V]] = {
     implicit val cm: ClassTag[V] =
       implicitly[ClassTag[AnyRef]].asInstanceOf[ClassTag[V]]
     ssc.getState()

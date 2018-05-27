@@ -5,29 +5,47 @@ import com.twitter.finagle._
 import com.twitter.finagle.dispatch.GenSerialClientDispatcher
 import com.twitter.finagle.filter.PayloadSizeFilter
 import com.twitter.finagle.http.codec._
-import com.twitter.finagle.http.filter.{ClientContextFilter, DtabFilter, HttpNackFilter, ServerContextFilter}
+import com.twitter.finagle.http.filter.{
+  ClientContextFilter,
+  DtabFilter,
+  HttpNackFilter,
+  ServerContextFilter
+}
 import com.twitter.finagle.stats.{NullStatsReceiver, StatsReceiver}
 import com.twitter.finagle.tracing._
 import com.twitter.finagle.transport.Transport
 import com.twitter.util.{Closable, StorageUnit, Try}
-import org.jboss.netty.channel.{Channel, ChannelEvent, ChannelHandlerContext, ChannelPipelineFactory, Channels, UpstreamMessageEvent}
+import org.jboss.netty.channel.{
+  Channel,
+  ChannelEvent,
+  ChannelHandlerContext,
+  ChannelPipelineFactory,
+  Channels,
+  UpstreamMessageEvent
+}
 import org.jboss.netty.handler.codec.http._
 
-private[finagle] case class BadHttpRequest(httpVersion: HttpVersion,
-                                           method: HttpMethod,
-                                           uri: String,
-                                           exception: Exception)
+private[finagle] case class BadHttpRequest(
+    httpVersion: HttpVersion,
+    method: HttpMethod,
+    uri: String,
+    exception: Exception)
     extends DefaultHttpRequest(httpVersion, method, uri)
 
 object BadHttpRequest {
   def apply(exception: Exception) =
     new BadHttpRequest(
-        HttpVersion.HTTP_1_0, HttpMethod.GET, "/bad-http-request", exception)
+      HttpVersion.HTTP_1_0,
+      HttpMethod.GET,
+      "/bad-http-request",
+      exception)
 }
 
 /** Convert exceptions to BadHttpRequests */
 class SafeHttpServerCodec(
-    maxInitialLineLength: Int, maxHeaderSize: Int, maxChunkSize: Int)
+    maxInitialLineLength: Int,
+    maxHeaderSize: Int,
+    maxChunkSize: Int)
     extends HttpServerCodec(maxInitialLineLength, maxHeaderSize, maxChunkSize) {
   override def handleUpstream(ctx: ChannelHandlerContext, e: ChannelEvent) {
     // this only catches Codec exceptions -- when a handler calls sendUpStream(), it
@@ -38,8 +56,11 @@ class SafeHttpServerCodec(
     } catch {
       case ex: Exception =>
         val channel = ctx.getChannel()
-        ctx.sendUpstream(new UpstreamMessageEvent(
-                channel, BadHttpRequest(ex), channel.getRemoteAddress()))
+        ctx.sendUpstream(
+          new UpstreamMessageEvent(
+            channel,
+            BadHttpRequest(ex),
+            channel.getRemoteAddress()))
     }
   }
 }
@@ -77,8 +98,7 @@ case class Http(
     _maxHeaderSize: StorageUnit = 8192.bytes,
     _streaming: Boolean = false,
     _statsReceiver: StatsReceiver = NullStatsReceiver
-)
-    extends CodecFactory[Request, Response] {
+) extends CodecFactory[Request, Response] {
 
   def this(
       _compressionLevel: Int,
@@ -92,25 +112,27 @@ case class Http(
       _maxHeaderSize: StorageUnit,
       _streaming: Boolean
   ) =
-    this(_compressionLevel,
-         _maxRequestSize,
-         _maxResponseSize,
-         _decompressionEnabled,
-         _channelBufferUsageTracker,
-         _annotateCipherHeader,
-         _enableTracing,
-         _maxInitialLineLength,
-         _maxHeaderSize,
-         _streaming,
-         NullStatsReceiver)
+    this(
+      _compressionLevel,
+      _maxRequestSize,
+      _maxResponseSize,
+      _decompressionEnabled,
+      _channelBufferUsageTracker,
+      _annotateCipherHeader,
+      _enableTracing,
+      _maxInitialLineLength,
+      _maxHeaderSize,
+      _streaming,
+      NullStatsReceiver
+    )
 
   require(
-      _maxRequestSize < 2.gigabytes,
-      s"maxRequestSize should be less than 2 Gb, but was ${_maxRequestSize}")
+    _maxRequestSize < 2.gigabytes,
+    s"maxRequestSize should be less than 2 Gb, but was ${_maxRequestSize}")
 
   require(
-      _maxResponseSize < 2.gigabytes,
-      s"maxResponseSize should be less than 2 Gb, but was ${_maxResponseSize}")
+    _maxResponseSize < 2.gigabytes,
+    s"maxResponseSize should be less than 2 Gb, but was ${_maxResponseSize}")
 
   def compressionLevel(level: Int) = copy(_compressionLevel = level)
   def maxRequestSize(bufferSize: StorageUnit) =
@@ -137,15 +159,17 @@ case class Http(
           val maxInitialLineLengthInBytes = _maxInitialLineLength.inBytes.toInt
           val maxHeaderSizeInBytes = _maxHeaderSize.inBytes.toInt
           val maxChunkSize = 8192
-          pipeline.addLast("httpCodec",
-                           new HttpClientCodec(maxInitialLineLengthInBytes,
-                                               maxHeaderSizeInBytes,
-                                               maxChunkSize))
+          pipeline.addLast(
+            "httpCodec",
+            new HttpClientCodec(
+              maxInitialLineLengthInBytes,
+              maxHeaderSizeInBytes,
+              maxChunkSize))
 
           if (!_streaming)
             pipeline.addLast(
-                "httpDechunker",
-                new HttpChunkAggregator(_maxResponseSize.inBytes.toInt))
+              "httpDechunker",
+              new HttpChunkAggregator(_maxResponseSize.inBytes.toInt))
 
           if (_decompressionEnabled)
             pipeline.addLast("httpDecompressor", new HttpContentDecompressor)
@@ -168,25 +192,27 @@ case class Http(
         // Waiting on CSL-915 for a proper fix.
         underlying.map { u =>
           val filters = new ClientContextFilter[Request, Response].andThenIf(
-              !_streaming -> new PayloadSizeFilter[Request, Response](
-                  params[param.Stats].statsReceiver,
-                  _.content.length,
-                  _.content.length
-              ))
+            !_streaming -> new PayloadSizeFilter[Request, Response](
+              params[param.Stats].statsReceiver,
+              _.content.length,
+              _.content.length
+            ))
 
           filters.andThen(new DelayedReleaseService(u))
         }
 
       override def newClientTransport(
-          ch: Channel, statsReceiver: StatsReceiver): Transport[Any, Any] =
+          ch: Channel,
+          statsReceiver: StatsReceiver): Transport[Any, Any] =
         new HttpTransport(super.newClientTransport(ch, statsReceiver))
 
       override def newClientDispatcher(
-          transport: Transport[Any, Any], params: Stack.Params) =
+          transport: Transport[Any, Any],
+          params: Stack.Params) =
         new HttpClientDispatcher(
-            transport,
-            params[param.Stats].statsReceiver
-              .scope(GenSerialClientDispatcher.StatsScope)
+          transport,
+          params[param.Stats].statsReceiver
+            .scope(GenSerialClientDispatcher.StatsScope)
         )
 
       override def newTraceInitializer =
@@ -202,36 +228,41 @@ case class Http(
           val pipeline = Channels.pipeline()
           if (_channelBufferUsageTracker.isDefined) {
             pipeline.addLast(
-                "channelBufferManager",
-                new ChannelBufferManager(_channelBufferUsageTracker.get))
+              "channelBufferManager",
+              new ChannelBufferManager(_channelBufferUsageTracker.get))
           }
 
           val maxRequestSizeInBytes = _maxRequestSize.inBytes.toInt
           val maxInitialLineLengthInBytes = _maxInitialLineLength.inBytes.toInt
           val maxHeaderSizeInBytes = _maxHeaderSize.inBytes.toInt
-          pipeline.addLast("httpCodec",
-                           new SafeHttpServerCodec(maxInitialLineLengthInBytes,
-                                                   maxHeaderSizeInBytes,
-                                                   maxRequestSizeInBytes))
+          pipeline.addLast(
+            "httpCodec",
+            new SafeHttpServerCodec(
+              maxInitialLineLengthInBytes,
+              maxHeaderSizeInBytes,
+              maxRequestSizeInBytes))
 
           if (_compressionLevel > 0) {
             pipeline.addLast(
-                "httpCompressor", new HttpContentCompressor(_compressionLevel))
+              "httpCompressor",
+              new HttpContentCompressor(_compressionLevel))
           } else if (_compressionLevel == -1) {
             pipeline.addLast("httpCompressor", new TextualContentCompressor)
           }
 
           // The payload size handler should come before the RespondToExpectContinue handler so that we don't
           // send a 100 CONTINUE for oversize requests we have no intention of handling.
-          pipeline.addLast("payloadSizeHandler",
-                           new PayloadSizeHandler(maxRequestSizeInBytes))
+          pipeline.addLast(
+            "payloadSizeHandler",
+            new PayloadSizeHandler(maxRequestSizeInBytes))
 
           // Response to ``Expect: Continue'' requests.
-          pipeline.addLast(
-              "respondToExpectContinue", new RespondToExpectContinue)
+          pipeline
+            .addLast("respondToExpectContinue", new RespondToExpectContinue)
           if (!_streaming)
-            pipeline.addLast("httpDechunker",
-                             new HttpChunkAggregator(maxRequestSizeInBytes))
+            pipeline.addLast(
+              "httpDechunker",
+              new HttpChunkAggregator(maxRequestSizeInBytes))
 
           _annotateCipherHeader foreach { headerName: String =>
             pipeline.addLast("annotateCipher", new AnnotateCipher(headerName))
@@ -255,8 +286,11 @@ case class Http(
         new HttpNackFilter(stats)
           .andThen(new DtabFilter.Finagle[Request])
           .andThen(new ServerContextFilter[Request, Response])
-          .andThenIf(!_streaming -> new PayloadSizeFilter[Request, Response](
-                  stats, _.content.length, _.content.length))
+          .andThenIf(
+            !_streaming -> new PayloadSizeFilter[Request, Response](
+              stats,
+              _.content.length,
+              _.content.length))
           .andThen(underlying)
       }
 
@@ -300,7 +334,7 @@ object HttpTracing {
   private[http] def stripParameters(uri: String): String = {
     uri.indexOf('?') match {
       case -1 => uri
-      case n => uri.substring(0, n)
+      case n  => uri.substring(0, n)
     }
   }
 }
@@ -381,9 +415,9 @@ private object TraceInfo {
   def getFlags(request: Request): Flags = {
     try {
       Flags(
-          Option(request.headers.get(Header.Flags))
-            .map(_.toLong)
-            .getOrElse(0L))
+        Option(request.headers.get(Header.Flags))
+          .map(_.toLong)
+          .getOrElse(0L))
     } catch {
       case _: Throwable => Flags()
     }

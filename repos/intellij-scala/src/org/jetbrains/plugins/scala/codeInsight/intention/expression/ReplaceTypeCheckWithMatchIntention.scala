@@ -10,7 +10,11 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.plugins.scala.codeInspection.typeChecking.IsInstanceOfCall
 import org.jetbrains.plugins.scala.codeInspection.typeChecking.TypeCheckToMatchUtil._
 import org.jetbrains.plugins.scala.extensions.inWriteAction
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScGenericCall, ScIfStmt, ScMatchStmt}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScGenericCall,
+  ScIfStmt,
+  ScMatchStmt
+}
 import org.jetbrains.plugins.scala.lang.refactoring.util.InplaceRenameHelper
 
 /**
@@ -21,20 +25,21 @@ object ReplaceTypeCheckWithMatchIntention {
   def familyName = "Replace type check with pattern matching"
 }
 
-class ReplaceTypeCheckWithMatchIntention
-    extends PsiElementBaseIntentionAction {
+class ReplaceTypeCheckWithMatchIntention extends PsiElementBaseIntentionAction {
   def getFamilyName: String = ReplaceTypeCheckWithMatchIntention.familyName
 
   override def getText: String = getFamilyName
 
   def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+      project: Project,
+      editor: Editor,
+      element: PsiElement): Boolean = {
     for {
       IsInstanceOfCall(iioCall) <- Option(
-          PsiTreeUtil.getParentOfType(element, classOf[ScGenericCall], false))
+        PsiTreeUtil.getParentOfType(element, classOf[ScGenericCall], false))
       ifStmt <- Option(PsiTreeUtil.getParentOfType(iioCall, classOf[ScIfStmt]))
-      condition <- ifStmt.condition if findIsInstanceOfCalls(
-                      condition, onlyFirst = false) contains iioCall
+      condition <- ifStmt.condition
+      if findIsInstanceOfCalls(condition, onlyFirst = false) contains iioCall
     } {
       val offset = editor.getCaretModel.getOffset
       if (offset >= iioCall.getTextRange.getStartOffset &&
@@ -46,13 +51,13 @@ class ReplaceTypeCheckWithMatchIntention
   def invoke(project: Project, editor: Editor, element: PsiElement) {
     for {
       IsInstanceOfCall(iioCall) <- Option(
-          PsiTreeUtil.getParentOfType(element, classOf[ScGenericCall], false))
+        PsiTreeUtil.getParentOfType(element, classOf[ScGenericCall], false))
       ifStmt <- Option(PsiTreeUtil.getParentOfType(iioCall, classOf[ScIfStmt]))
-      condition <- ifStmt.condition if findIsInstanceOfCalls(
-                      condition, onlyFirst = false) contains iioCall
+      condition <- ifStmt.condition
+      if findIsInstanceOfCalls(condition, onlyFirst = false) contains iioCall
     } {
-      val (matchStmtOption, renameData) = buildMatchStmt(
-          ifStmt, iioCall, onlyFirst = false)
+      val (matchStmtOption, renameData) =
+        buildMatchStmt(ifStmt, iioCall, onlyFirst = false)
       for (matchStmt <- matchStmtOption) {
         val newMatch = inWriteAction {
           ifStmt

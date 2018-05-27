@@ -22,7 +22,10 @@ import java.nio.ByteBuffer
 
 import scala.util.Random
 
-import com.amazonaws.auth.{BasicAWSCredentials, DefaultAWSCredentialsProviderChain}
+import com.amazonaws.auth.{
+  BasicAWSCredentials,
+  DefaultAWSCredentialsProviderChain
+}
 import com.amazonaws.regions.RegionUtils
 import com.amazonaws.services.kinesis.AmazonKinesisClient
 import com.amazonaws.services.kinesis.clientlibrary.lib.worker.InitialPositionInStream
@@ -77,7 +80,8 @@ object KinesisWordCountASL extends Logging {
   def main(args: Array[String]) {
     // Check that all required args were passed in.
     if (args.length != 3) {
-      System.err.println("""
+      System.err.println(
+        """
           |Usage: KinesisWordCountASL <app-name> <stream-name> <endpoint-url> <region-name>
           |
           |    <app-name> is the name of the consumer app, used to track the read data in DynamoDB
@@ -101,9 +105,10 @@ object KinesisWordCountASL extends Logging {
     // from the AWS Java SDK.
     val credentials = new DefaultAWSCredentialsProviderChain().getCredentials()
     require(
-        credentials != null,
-        "No AWS credentials found. Please specify credentials using one of the methods specified " +
-        "in http://docs.aws.amazon.com/AWSSdkDocsJava/latest/DeveloperGuide/credentials.html")
+      credentials != null,
+      "No AWS credentials found. Please specify credentials using one of the methods specified " +
+        "in http://docs.aws.amazon.com/AWSSdkDocsJava/latest/DeveloperGuide/credentials.html"
+    )
     val kinesisClient = new AmazonKinesisClient(credentials)
     kinesisClient.setEndpoint(endpointUrl)
     val numShards = kinesisClient
@@ -136,14 +141,15 @@ object KinesisWordCountASL extends Logging {
 
     // Create the Kinesis DStreams
     val kinesisStreams = (0 until numStreams).map { i =>
-      KinesisUtils.createStream(ssc,
-                                appName,
-                                streamName,
-                                endpointUrl,
-                                regionName,
-                                InitialPositionInStream.LATEST,
-                                kinesisCheckpointInterval,
-                                StorageLevel.MEMORY_AND_DISK_2)
+      KinesisUtils.createStream(
+        ssc,
+        appName,
+        streamName,
+        endpointUrl,
+        regionName,
+        InitialPositionInStream.LATEST,
+        kinesisCheckpointInterval,
+        StorageLevel.MEMORY_AND_DISK_2)
     }
 
     // Union all the streams
@@ -182,7 +188,8 @@ object KinesisWordCountASL extends Logging {
 object KinesisWordProducerASL {
   def main(args: Array[String]) {
     if (args.length != 4) {
-      System.err.println("""
+      System.err.println(
+        """
           |Usage: KinesisWordProducerASL <stream-name> <endpoint-url> <records-per-sec>
                                          <words-per-record>
           |
@@ -204,29 +211,30 @@ object KinesisWordProducerASL {
     val Array(stream, endpoint, recordsPerSecond, wordsPerRecord) = args
 
     // Generate the records and return the totals
-    val totals = generate(
-        stream, endpoint, recordsPerSecond.toInt, wordsPerRecord.toInt)
+    val totals =
+      generate(stream, endpoint, recordsPerSecond.toInt, wordsPerRecord.toInt)
 
     // Print the array of (word, total) tuples
     println("Totals for the words sent")
     totals.foreach(println(_))
   }
 
-  def generate(stream: String,
-               endpoint: String,
-               recordsPerSecond: Int,
-               wordsPerRecord: Int): Seq[(String, Int)] = {
+  def generate(
+      stream: String,
+      endpoint: String,
+      recordsPerSecond: Int,
+      wordsPerRecord: Int): Seq[(String, Int)] = {
 
     val randomWords = List("spark", "you", "are", "my", "father")
     val totals = scala.collection.mutable.Map[String, Int]()
 
     // Create the low-level Kinesis Client from the AWS Java SDK.
     val kinesisClient = new AmazonKinesisClient(
-        new DefaultAWSCredentialsProviderChain())
+      new DefaultAWSCredentialsProviderChain())
     kinesisClient.setEndpoint(endpoint)
 
     println(
-        s"Putting records onto stream $stream and endpoint $endpoint at a rate of" +
+      s"Putting records onto stream $stream and endpoint $endpoint at a rate of" +
         s" $recordsPerSecond records per second and $wordsPerRecord words per record")
 
     // Iterate and put records onto the stream per the given recordPerSec and wordsPerRecord
@@ -235,16 +243,15 @@ object KinesisWordProducerASL {
       val records = (1 to recordsPerSecond.toInt).foreach { recordNum =>
         // Randomly generate wordsPerRecord number of words
         val data = (1 to wordsPerRecord.toInt)
-          .map(x =>
-                {
-              // Get a random index to a word
-              val randomWordIdx = Random.nextInt(randomWords.size)
-              val randomWord = randomWords(randomWordIdx)
+          .map(x => {
+            // Get a random index to a word
+            val randomWordIdx = Random.nextInt(randomWords.size)
+            val randomWord = randomWords(randomWordIdx)
 
-              // Increment total count to compare to server counts later
-              totals(randomWord) = totals.getOrElse(randomWord, 0) + 1
+            // Increment total count to compare to server counts later
+            totals(randomWord) = totals.getOrElse(randomWord, 0) + 1
 
-              randomWord
+            randomWord
           })
           .mkString(" ")
 
@@ -281,7 +288,8 @@ private[streaming] object StreamingExamples extends Logging {
     if (!log4jInitialized) {
       // We first log something to initialize Spark's default logging, then we override the
       // logging level.
-      logInfo("Setting log level to [WARN] for streaming example." +
+      logInfo(
+        "Setting log level to [WARN] for streaming example." +
           " To override add a custom log4j.properties to the classpath.")
       Logger.getRootLogger.setLevel(Level.WARN)
     }

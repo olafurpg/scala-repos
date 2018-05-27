@@ -30,16 +30,19 @@ class DataFrameCallbackSuite extends QueryTest with SharedSQLContext {
   import functions._
 
   test(
-      "execute callback functions when a DataFrame action finished successfully") {
+    "execute callback functions when a DataFrame action finished successfully") {
     val metrics = ArrayBuffer.empty[(String, QueryExecution, Long)]
     val listener = new QueryExecutionListener {
       // Only test successful case here, so no need to implement `onFailure`
-      override def onFailure(funcName: String,
-                             qe: QueryExecution,
-                             exception: Exception): Unit = {}
+      override def onFailure(
+          funcName: String,
+          qe: QueryExecution,
+          exception: Exception): Unit = {}
 
       override def onSuccess(
-          funcName: String, qe: QueryExecution, duration: Long): Unit = {
+          funcName: String,
+          qe: QueryExecution,
+          duration: Long): Unit = {
         metrics += ((funcName, qe, duration))
       }
     }
@@ -66,13 +69,17 @@ class DataFrameCallbackSuite extends QueryTest with SharedSQLContext {
     val metrics = ArrayBuffer.empty[(String, QueryExecution, Exception)]
     val listener = new QueryExecutionListener {
       override def onFailure(
-          funcName: String, qe: QueryExecution, exception: Exception): Unit = {
+          funcName: String,
+          qe: QueryExecution,
+          exception: Exception): Unit = {
         metrics += ((funcName, qe, exception))
       }
 
       // Only test failed case here, so no need to implement `onSuccess`
       override def onSuccess(
-          funcName: String, qe: QueryExecution, duration: Long): Unit = {}
+          funcName: String,
+          qe: QueryExecution,
+          duration: Long): Unit = {}
     }
     sqlContext.listenerManager.register(listener)
 
@@ -97,15 +104,18 @@ class DataFrameCallbackSuite extends QueryTest with SharedSQLContext {
     val metrics = ArrayBuffer.empty[Long]
     val listener = new QueryExecutionListener {
       // Only test successful case here, so no need to implement `onFailure`
-      override def onFailure(funcName: String,
-                             qe: QueryExecution,
-                             exception: Exception): Unit = {}
+      override def onFailure(
+          funcName: String,
+          qe: QueryExecution,
+          exception: Exception): Unit = {}
 
       override def onSuccess(
-          funcName: String, qe: QueryExecution, duration: Long): Unit = {
+          funcName: String,
+          qe: QueryExecution,
+          duration: Long): Unit = {
         val metric = qe.executedPlan match {
           case w: WholeStageCodegen => w.child.longMetric("numOutputRows")
-          case other => other.longMetric("numOutputRows")
+          case other                => other.longMetric("numOutputRows")
         }
         metrics += metric.value.value
       }
@@ -134,12 +144,15 @@ class DataFrameCallbackSuite extends QueryTest with SharedSQLContext {
     val metrics = ArrayBuffer.empty[Long]
     val listener = new QueryExecutionListener {
       // Only test successful case here, so no need to implement `onFailure`
-      override def onFailure(funcName: String,
-                             qe: QueryExecution,
-                             exception: Exception): Unit = {}
+      override def onFailure(
+          funcName: String,
+          qe: QueryExecution,
+          exception: Exception): Unit = {}
 
       override def onSuccess(
-          funcName: String, qe: QueryExecution, duration: Long): Unit = {
+          funcName: String,
+          qe: QueryExecution,
+          duration: Long): Unit = {
         metrics += qe.executedPlan.longMetric("dataSize").value.value
         val bottomAgg = qe.executedPlan.children(0).children(0)
         metrics += bottomAgg.longMetric("dataSize").value.value

@@ -16,25 +16,27 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScMember
 object PrivateBeanProperty extends AnnotatorPart[ScAnnotation] {
   def kind = classOf[ScAnnotation]
 
-  def annotate(element: ScAnnotation,
-               holder: AnnotationHolder,
-               typeAware: Boolean = false): Unit = {
+  def annotate(
+      element: ScAnnotation,
+      holder: AnnotationHolder,
+      typeAware: Boolean = false): Unit = {
     if (!isBeanPropertyAnnotation(element)) return
     val member = PsiTreeUtil.getParentOfType(element, classOf[ScMember])
     def registerProblem() = {
       val toPublicFix = new MakeNonPrivateQuickFix(member, toProtected = false)
-      val toProtectedFix = new MakeNonPrivateQuickFix(
-          member, toProtected = true)
+      val toProtectedFix =
+        new MakeNonPrivateQuickFix(member, toProtected = true)
       val privateMod = member.getModifierList.accessModifier.get
       val errorAnnotation = holder.createErrorAnnotation(
-          privateMod, "Bean property should not be private")
+        privateMod,
+        "Bean property should not be private")
       errorAnnotation.registerFix(toPublicFix)
       errorAnnotation.registerFix(toProtectedFix)
     }
     member match {
       case v: ScVariable if v.isPrivate => registerProblem()
-      case v: ScValue if v.isPrivate => registerProblem()
-      case _ =>
+      case v: ScValue if v.isPrivate    => registerProblem()
+      case _                            =>
     }
   }
 

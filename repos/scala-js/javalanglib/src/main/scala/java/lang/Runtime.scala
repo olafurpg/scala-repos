@@ -14,7 +14,8 @@ class Runtime private {
 
     envInfo.exitFunction.fold {
       // We don't have an exit function. Fail
-      throw new SecurityException("Cannot terminate a JavaScript program. " +
+      throw new SecurityException(
+        "Cannot terminate a JavaScript program. " +
           "Define a JavaScript function `__ScalaJSEnv.exitFunction` to " +
           "be called on exit.")
     } { exitFunction =>

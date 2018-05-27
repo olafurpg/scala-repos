@@ -28,7 +28,9 @@ object CommandUtil {
     }
 
   def aligned(
-      pre: String, sep: String, in: Seq[(String, String)]): Seq[String] =
+      pre: String,
+      sep: String,
+      in: Seq[(String, String)]): Seq[String] =
     if (in.isEmpty) Nil
     else {
       val width = in.map(_._1.length).max
@@ -61,12 +63,13 @@ object CommandUtil {
         } catch {
           case pse: PatternSyntaxException =>
             sys.error(
-                "Invalid regular expression (java.util.regex syntax).\n" +
+              "Invalid regular expression (java.util.regex syntax).\n" +
                 pse.getMessage)
         }
     }
-  def searchHelp(selected: String,
-                 detailMap: Map[String, String]): Map[String, String] = {
+  def searchHelp(
+      selected: String,
+      detailMap: Map[String, String]): Map[String, String] = {
     val pattern = Pattern.compile(selected, HelpPatternFlags)
     detailMap flatMap {
       case (k, v) =>
@@ -81,7 +84,7 @@ object CommandUtil {
   }
   def layoutDetails(details: Map[String, String]): String =
     details.map { case (k, v) => k + "\n\n  " + v } mkString
-    ("\n", "\n\n", "\n")
+      ("\n", "\n\n", "\n")
 
   final val HelpPatternFlags = Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
 }

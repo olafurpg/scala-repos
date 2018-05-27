@@ -45,23 +45,26 @@ object JarJar {
     def data = sbt.IO.readBytes(file)
   }
 
-  private def newMainProcessor(patterns: java.util.List[PatternElement],
-                               verbose: Boolean,
-                               skipManifest: Boolean): JarProcessor = {
+  private def newMainProcessor(
+      patterns: java.util.List[PatternElement],
+      verbose: Boolean,
+      skipManifest: Boolean): JarProcessor = {
     val cls = Class.forName("org.pantsbuild.jarjar.MainProcessor")
-    val constructor = cls.getConstructor(classOf[java.util.List[_]],
-                                         java.lang.Boolean.TYPE,
-                                         java.lang.Boolean.TYPE)
+    val constructor = cls.getConstructor(
+      classOf[java.util.List[_]],
+      java.lang.Boolean.TYPE,
+      java.lang.Boolean.TYPE)
     constructor.setAccessible(true)
     constructor
       .newInstance(patterns, Boolean.box(verbose), Boolean.box(skipManifest))
       .asInstanceOf[JarProcessor]
   }
 
-  def apply(in: Iterator[Entry],
-            outdir: File,
-            config: Seq[JarJarConfig],
-            verbose: Boolean = false): Seq[File] = {
+  def apply(
+      in: Iterator[Entry],
+      outdir: File,
+      config: Seq[JarJarConfig],
+      verbose: Boolean = false): Seq[File] = {
     val patterns = config.map(_.toPatternElement).asJava
     val processor = newMainProcessor(patterns, verbose, false)
     def process(e: Entry): Option[File] = {
@@ -79,8 +82,8 @@ object JarJar {
           } catch {
             case ex: Exception =>
               throw new IOException(
-                  s"Failed to write ${e.name} / ${f.getParentFile} / ${f.getParentFile.exists}",
-                  ex)
+                s"Failed to write ${e.name} / ${f.getParentFile} / ${f.getParentFile.exists}",
+                ex)
           }
           Some(f)
         }

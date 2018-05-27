@@ -51,7 +51,9 @@ case class DepthTraversal(node: Element, parentDepth: Int, siblingDepth: Int)
   * //todo this is a straight java to scala conversion, need to add the nicities of scala, all these null checks make me dizzy
   */
 class StandardImageExtractor(
-    httpClient: HttpClient, article: Article, config: Configuration)
+    httpClient: HttpClient,
+    article: Article,
+    config: Configuration)
     extends ImageExtractor {
 
   /**
@@ -80,7 +82,7 @@ class StandardImageExtractor(
   var sb: StringBuilder = new StringBuilder
   // create negative elements
   sb.append(
-      ".html|.gif|.ico|button|twitter.jpg|facebook.jpg|ap_buy_photo|digg.jpg|digg.png|delicious.png|facebook.png|reddit.jpg|doubleclick|diggthis|diggThis|adserver|/ads/|ec.atdmt.com")
+    ".html|.gif|.ico|button|twitter.jpg|facebook.jpg|ap_buy_photo|digg.jpg|digg.png|delicious.png|facebook.png|reddit.jpg|doubleclick|diggthis|diggThis|adserver|/ads/|ec.atdmt.com")
   sb.append("|mediaplex.com|adsatt|view.atdmt")
   matchBadImageNames = Pattern.compile(sb.toString()).matcher(string.empty)
 
@@ -154,9 +156,9 @@ class StandardImageExtractor(
       false
     } catch {
       case e: Exception => {
-          e.printStackTrace()
-          return false
-        }
+        e.printStackTrace()
+        return false
+      }
     }
   }
 
@@ -184,9 +186,9 @@ class StandardImageExtractor(
       false
     } catch {
       case e: Exception => {
-          logger.error(e.toString, e)
-          false
-        }
+        logger.error(e.toString, e)
+        false
+      }
     }
   }
 
@@ -217,15 +219,16 @@ class StandardImageExtractor(
     None
   }
 
-  def getDepthLevel(node: Element,
-                    parentDepth: Int,
-                    siblingDepth: Int): Option[DepthTraversal] = {
+  def getDepthLevel(
+      node: Element,
+      parentDepth: Int,
+      siblingDepth: Int): Option[DepthTraversal] = {
     val MAX_PARENT_DEPTH = 2
     if (parentDepth > MAX_PARENT_DEPTH) {
       trace(
-          logPrefix +
+        logPrefix +
           "ParentDepth is greater than %d, aborting depth traversal".format(
-              MAX_PARENT_DEPTH))
+            MAX_PARENT_DEPTH))
       None
     } else {
       try {
@@ -234,12 +237,12 @@ class StandardImageExtractor(
         Some(DepthTraversal(siblingNode, parentDepth, siblingDepth + 1))
       } catch {
         case e: NullPointerException => {
-            if (node != null) {
-              Some(DepthTraversal(node.parent, parentDepth + 1, 0))
-            } else {
-              None
-            }
+          if (node != null) {
+            Some(DepthTraversal(node.parent, parentDepth + 1, 0))
+          } else {
+            None
           }
+        }
       }
     }
   }
@@ -256,67 +259,72 @@ class StandardImageExtractor(
     * @param node
     */
   private def checkForLargeImages(
-      node: Element, parentDepthLevel: Int, siblingDepthLevel: Int) {
+      node: Element,
+      parentDepthLevel: Int,
+      siblingDepthLevel: Int) {
     trace(
-        logPrefix +
-        "Checking for large images - parent depth %d sibling depth: %d".format(
-            parentDepthLevel, siblingDepthLevel))
+      logPrefix +
+        "Checking for large images - parent depth %d sibling depth: %d"
+          .format(parentDepthLevel, siblingDepthLevel))
 
     getImageCandidates(node) match {
       case Some(goodImages) => {
-          trace(
-              logPrefix +
-              "checkForLargeImages: After findImagesThatPassByteSizeTest we have: " +
-              goodImages.size + " at parent depth: " + parentDepthLevel)
-          val scoredImages = downloadImagesAndGetResults(
-              goodImages, parentDepthLevel)
-          var highScoreImage: Element = null
-          scoredImages.foreach {
-            case (key, value) => {
-                if (highScoreImage == null) {
-                  highScoreImage = key
-                } else {
-                  if (value > scoredImages.get(highScoreImage).get) {
-                    highScoreImage = key
-                  }
-                }
-              }
-          }
-
-          if (highScoreImage != null) {
-            val f: File = new File(highScoreImage.attr("tempImagePath"))
-            this.image.topImageNode = highScoreImage
-            this.image.imageSrc = buildImagePath(highScoreImage.attr("src"))
-            this.image.imageExtractionType = "bigimage"
-            this.image.bytes = f.length.asInstanceOf[Int]
-            if (scoredImages.size > 0) {
-              this.image.confidenceScore = (100 / scoredImages.size)
+        trace(logPrefix +
+          "checkForLargeImages: After findImagesThatPassByteSizeTest we have: " +
+          goodImages.size + " at parent depth: " + parentDepthLevel)
+        val scoredImages =
+          downloadImagesAndGetResults(goodImages, parentDepthLevel)
+        var highScoreImage: Element = null
+        scoredImages.foreach {
+          case (key, value) => {
+            if (highScoreImage == null) {
+              highScoreImage = key
             } else {
-              this.image.confidenceScore = 0
-            }
-            trace(logPrefix + "High Score Image is: " + buildImagePath(
-                    highScoreImage.attr("src")))
-          } else {
-            getDepthLevel(node, parentDepthLevel, siblingDepthLevel) match {
-              case Some(depthObj) => {
-                  checkForLargeImages(depthObj.node,
-                                      depthObj.parentDepth,
-                                      depthObj.siblingDepth)
-                }
-              case None => trace("Image iteration is over!")
+              if (value > scoredImages.get(highScoreImage).get) {
+                highScoreImage = key
+              }
             }
           }
         }
-      case None => {
 
+        if (highScoreImage != null) {
+          val f: File = new File(highScoreImage.attr("tempImagePath"))
+          this.image.topImageNode = highScoreImage
+          this.image.imageSrc = buildImagePath(highScoreImage.attr("src"))
+          this.image.imageExtractionType = "bigimage"
+          this.image.bytes = f.length.asInstanceOf[Int]
+          if (scoredImages.size > 0) {
+            this.image.confidenceScore = (100 / scoredImages.size)
+          } else {
+            this.image.confidenceScore = 0
+          }
+          trace(
+            logPrefix + "High Score Image is: " + buildImagePath(
+              highScoreImage.attr("src")))
+        } else {
           getDepthLevel(node, parentDepthLevel, siblingDepthLevel) match {
             case Some(depthObj) => {
-                checkForLargeImages(
-                    depthObj.node, depthObj.parentDepth, depthObj.siblingDepth)
-              }
+              checkForLargeImages(
+                depthObj.node,
+                depthObj.parentDepth,
+                depthObj.siblingDepth)
+            }
             case None => trace("Image iteration is over!")
           }
         }
+      }
+      case None => {
+
+        getDepthLevel(node, parentDepthLevel, siblingDepthLevel) match {
+          case Some(depthObj) => {
+            checkForLargeImages(
+              depthObj.node,
+              depthObj.parentDepth,
+              depthObj.siblingDepth)
+          }
+          case None => trace("Image iteration is over!")
+        }
+      }
     }
   }
 
@@ -335,33 +343,33 @@ class StandardImageExtractor(
     var cnt: Int = 0
     val goodImages: ArrayList[Element] = new ArrayList[Element]
 
-    images.foreach(
-        image =>
-          {
-        try {
-          if (cnt > 30) {
-            trace(logPrefix +
-                "Abort! they have over 30 images near the top node: " +
-                this.doc.baseUri)
-            return Some(goodImages)
-          }
-          val bytes: Int = getBytesForImage(image.attr("src"))
-
-          val MAX_BYTES_SIZE: Int = 15728640
-          if ((bytes == 0 || bytes > minBytesForImages) &&
-              bytes < MAX_BYTES_SIZE) {
-            trace(logPrefix +
-                "findImagesThatPassByteSizeTest: Found potential image - size: " +
-                bytes + " src: " + image.attr("src"))
-            goodImages.add(image)
-          } else {
-            trace(logPrefix + " Removing image: " + image.attr("src"))
-            image.remove()
-          }
-        } catch {
-          case e: Exception => warn(e, e.toString)
+    images.foreach(image => {
+      try {
+        if (cnt > 30) {
+          trace(
+            logPrefix +
+              "Abort! they have over 30 images near the top node: " +
+              this.doc.baseUri)
+          return Some(goodImages)
         }
-        cnt += 1
+        val bytes: Int = getBytesForImage(image.attr("src"))
+
+        val MAX_BYTES_SIZE: Int = 15728640
+        if ((bytes == 0 || bytes > minBytesForImages) &&
+            bytes < MAX_BYTES_SIZE) {
+          trace(
+            logPrefix +
+              "findImagesThatPassByteSizeTest: Found potential image - size: " +
+              bytes + " src: " + image.attr("src"))
+          goodImages.add(image)
+        } else {
+          trace(logPrefix + " Removing image: " + image.attr("src"))
+          image.remove()
+        }
+      } catch {
+        case e: Exception => warn(e, e.toString)
+      }
+      cnt += 1
     })
 
     trace(logPrefix + " Now leaving findImagesThatPassByteSizeTest")
@@ -434,10 +442,10 @@ class StandardImageExtractor(
         }
       } catch {
         case e: NullPointerException => {
-            if (logger.isDebugEnabled) {
-              logger.debug(e.toString, e)
-            }
+          if (logger.isDebugEnabled) {
+            logger.debug(e.toString, e)
           }
+        }
       }
     }
     if (knownImage != null) {
@@ -469,8 +477,8 @@ class StandardImageExtractor(
       newImage = imageURL.toString
     } catch {
       case e: MalformedURLException => {
-          logger.error("Unable to get Image Path: " + image)
-        }
+        logger.error("Unable to get Image Path: " + image)
+      }
     }
     newImage
   }
@@ -489,7 +497,8 @@ class StandardImageExtractor(
       link = link.replace(" ", "%20")
       val localContext: HttpContext = new BasicHttpContext
       localContext.setAttribute(
-          ClientContext.COOKIE_STORE, HtmlFetcher.emptyCookieStore)
+        ClientContext.COOKIE_STORE,
+        HtmlFetcher.emptyCookieStore)
       httpget = new HttpGet(link)
       var response: HttpResponse = null
       response = httpClient.execute(httpget, localContext)
@@ -503,20 +512,20 @@ class StandardImageExtractor(
         }
       } catch {
         case e: NullPointerException => {
-            warn(e, "SRC: " + src + " " + e.toString)
-          }
+          warn(e, "SRC: " + src + " " + e.toString)
+        }
       }
     } catch {
       case e: Exception => {
-          warn(e, "BIG SRC: " + src + " " + e.toString)
-        }
+        warn(e, "BIG SRC: " + src + " " + e.toString)
+      }
     } finally {
       try {
         httpget.abort()
       } catch {
         case e: NullPointerException => {
-            logger.error("HttpGet is null, can't abortz")
-          }
+          logger.error("HttpGet is null, can't abortz")
+        }
       }
     }
     bytes
@@ -534,7 +543,8 @@ class StandardImageExtractor(
     * @return
     */
   private def downloadImagesAndGetResults(
-      images: ArrayList[Element], depthLevel: Int): HashMap[Element, Float] = {
+      images: ArrayList[Element],
+      depthLevel: Int): HashMap[Element, Float] = {
     val imageResults: HashMap[Element, Float] = new HashMap[Element, Float]
     var cnt: Int = 1
     var initialArea: Float = 0
@@ -551,10 +561,14 @@ class StandardImageExtractor(
       try {
         val imageSource: String = this.buildImagePath(image.attr("src"))
         val localSrcPath: String = ImageSaver.storeTempImage(
-            this.httpClient, this.linkhash, imageSource, config)
+          this.httpClient,
+          this.linkhash,
+          imageSource,
+          config)
         if (localSrcPath == null) {
           if (logger.isDebugEnabled) {
-            logger.debug("unable to store this image locally: IMGSRC: " +
+            logger.debug(
+              "unable to store this image locally: IMGSRC: " +
                 image.attr("src") + " BUILD SRC: " + imageSource)
           }
           continueVar = false
@@ -568,13 +582,15 @@ class StandardImageExtractor(
           image.attr("tempImagePath", localSrcPath)
           try {
             var imageDims: ImageDetails = ImageUtils.getImageDimensions(
-                config.imagemagickIdentifyPath, localSrcPath)
+              config.imagemagickIdentifyPath,
+              localSrcPath)
             width = imageDims.getWidth
             height = imageDims.getHeight
             if (depthLevel > 1) {
               if (width < 300) {
                 if (logger.isDebugEnabled) {
-                  logger.debug("going depthlevel: " + depthLevel +
+                  logger.debug(
+                    "going depthlevel: " + depthLevel +
                       " and img was only: " + width + " wide: " + localSrcPath)
                 }
                 continueVar = false
@@ -582,14 +598,15 @@ class StandardImageExtractor(
             }
           } catch {
             case e: IOException => {
-                throw e
-              }
+              throw e
+            }
           }
         }
         if (continueVar) {
           if (this.isBannerDimensions(width, height)) {
             if (logger.isDebugEnabled) {
-              logger.debug(image.attr("src") +
+              logger.debug(
+                image.attr("src") +
                   " seems like a fishy image dimension wise, skipping it")
             }
             image.remove()
@@ -599,7 +616,8 @@ class StandardImageExtractor(
         if (continueVar) {
           if (width < 50) {
             if (logger.isDebugEnabled) {
-              logger.debug(image.attr("src") + " is too small width: " +
+              logger.debug(
+                image.attr("src") + " is too small width: " +
                   width + " removing..")
             }
             image.remove()
@@ -619,7 +637,7 @@ class StandardImageExtractor(
             totalScore = sequenceScore.asInstanceOf[Float] * areaDifference
           }
           trace(
-              logPrefix + imageSource + " Area is: " + area +
+            logPrefix + imageSource + " Area is: " + area +
               " sequence score: " + sequenceScore + " totalScore: " +
               totalScore)
           cnt += 1;
@@ -629,8 +647,8 @@ class StandardImageExtractor(
       } catch {
         case e: SecretGifException => {}
         case e: Exception => {
-            warn(e, e.toString)
-          }
+          warn(e, e.toString)
+        }
       }
     }
     imageResults

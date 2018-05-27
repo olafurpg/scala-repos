@@ -18,9 +18,10 @@ trait TeamHelper {
 
   def teamIdToName(id: String): String = api teamName id getOrElse id
 
-  def teamLink(id: String,
-               cssClass: Option[String] = None,
-               withIcon: Boolean = true): Html = Html {
+  def teamLink(
+      id: String,
+      cssClass: Option[String] = None,
+      withIcon: Boolean = true): Html = Html {
     val klass = cssClass.??(c => s""" class="$c"""")
     val href = routes.Team.show(id)
     val content = teamIdToName(id)

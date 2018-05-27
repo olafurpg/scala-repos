@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -41,23 +41,24 @@ trait StdCodecs {
   implicit def IndexedSeqCodec[A](
       implicit elemCodec: Codec[A]): Codec[IndexedSeq[A]]
   implicit def ArrayCodec[A](
-      implicit elemCodec: Codec[A], m: Manifest[A]): Codec[Array[A]]
+      implicit elemCodec: Codec[A],
+      m: Manifest[A]): Codec[Array[A]]
 
   def codecForCType(cType: CType): Codec[_] = cType match {
     case cType: CValueType[_] => codecForCValueType(cType)
-    case _: CNullType => Codec.ConstCodec(true)
+    case _: CNullType         => Codec.ConstCodec(true)
   }
 
   def codecForCValueType[A](cType: CValueType[A]): Codec[A] =
     try {
       cType match {
         case CBoolean => BooleanCodec
-        case CString => StringCodec
-        case CLong => LongCodec
-        case CDouble => DoubleCodec
-        case CNum => BigDecimalCodec
-        case CDate => DateTimeCodec
-        case CPeriod => PeriodCodec
+        case CString  => StringCodec
+        case CLong    => LongCodec
+        case CDouble  => DoubleCodec
+        case CNum     => BigDecimalCodec
+        case CDate    => DateTimeCodec
+        case CPeriod  => PeriodCodec
         case CArrayType(elemType) =>
           ArrayCodec(codecForCValueType(elemType), elemType.manifest)
       }
@@ -86,6 +87,7 @@ trait RowFormatCodecs extends StdCodecs { self: RowFormat =>
       implicit elemCodec: Codec[A]): Codec[IndexedSeq[A]] =
     Codec.IndexedSeqCodec(elemCodec)
   implicit def ArrayCodec[A](
-      implicit elemCodec: Codec[A], m: Manifest[A]): Codec[Array[A]] =
+      implicit elemCodec: Codec[A],
+      m: Manifest[A]): Codec[Array[A]] =
     Codec.ArrayCodec(elemCodec)(m)
 }

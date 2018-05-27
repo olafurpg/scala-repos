@@ -19,8 +19,7 @@ object PriorityDispatcherSpec {
     """
 
   class Unbounded(settings: ActorSystem.Settings, config: Config)
-      extends UnboundedPriorityMailbox(
-          PriorityGenerator({
+      extends UnboundedPriorityMailbox(PriorityGenerator({
         case i: Int ⇒ i //Reverse order
         case 'Result ⇒ Int.MaxValue
       }: Any ⇒ Int))
@@ -34,7 +33,8 @@ object PriorityDispatcherSpec {
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class PriorityDispatcherSpec
-    extends AkkaSpec(PriorityDispatcherSpec.config) with DefaultTimeout {
+    extends AkkaSpec(PriorityDispatcherSpec.config)
+    with DefaultTimeout {
 
   "A PriorityDispatcher" must {
     "Order it's messages according to the specified comparator using an unbounded mailbox" in {

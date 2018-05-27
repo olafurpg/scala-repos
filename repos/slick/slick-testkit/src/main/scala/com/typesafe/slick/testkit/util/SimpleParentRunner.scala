@@ -1,7 +1,11 @@
 package com.typesafe.slick.testkit.util
 
 import org.junit.runner.{Runner, Description}
-import org.junit.runner.notification.{StoppedByUserException, Failure, RunNotifier}
+import org.junit.runner.notification.{
+  StoppedByUserException,
+  Failure,
+  RunNotifier
+}
 import org.junit.runner.manipulation._
 import org.junit.runners.model._
 import scala.collection.JavaConverters._
@@ -12,7 +16,9 @@ import java.lang.reflect.InvocationTargetException
   * extensible (in the way we need it), and more Scala-like.
   */
 abstract class SimpleParentRunner[T](testClass: Class[_])
-    extends Runner with Filterable with Sortable {
+    extends Runner
+    with Filterable
+    with Sortable {
 
   private var _children: Seq[T] = null
   protected final def children = {
@@ -30,7 +36,8 @@ abstract class SimpleParentRunner[T](testClass: Class[_])
   protected def runChild(child: T, notifier: RunNotifier): Unit = {
     val desc = describeChild(child)
     notifier.fireTestStarted(desc)
-    try runChildInner(child, notifier) catch {
+    try runChildInner(child, notifier)
+    catch {
       case t: Throwable => addFailure(t, notifier, desc)
     } finally notifier.fireTestFinished(desc)
   }
@@ -39,7 +46,9 @@ abstract class SimpleParentRunner[T](testClass: Class[_])
     children.foreach(ch => runChild(ch, notifier))
 
   protected final def addFailure(
-      t: Throwable, notifier: RunNotifier, desc: Description): Unit = t match {
+      t: Throwable,
+      notifier: RunNotifier,
+      desc: Description): Unit = t match {
     case t: MultipleFailureException =>
       t.getFailures.asScala.foreach(t2 => addFailure(t2, notifier, desc))
     case i: InvocationTargetException =>
@@ -50,15 +59,17 @@ abstract class SimpleParentRunner[T](testClass: Class[_])
 
   def getDescription = {
     val desc = Description.createSuiteDescription(
-        testClass.getName, testClass.getAnnotations: _*)
+      testClass.getName,
+      testClass.getAnnotations: _*)
     for (ch <- children) desc.addChild(describeChild(ch))
     desc
   }
 
   def run(notifier: RunNotifier) {
-    try runChildren(notifier) catch {
+    try runChildren(notifier)
+    catch {
       case e: StoppedByUserException => throw e
-      case e: Throwable => addFailure(e, notifier, getDescription)
+      case e: Throwable              => addFailure(e, notifier, getDescription)
     }
   }
 
@@ -75,8 +86,7 @@ abstract class SimpleParentRunner[T](testClass: Class[_])
 
   final def sort(sorter: Sorter) {
     children.foreach(sorter.apply _)
-    children = children.sorted(
-        new Ordering[T] {
+    children = children.sorted(new Ordering[T] {
       def compare(o1: T, o2: T): Int =
         sorter.compare(describeChild(o1), describeChild(o2))
     })

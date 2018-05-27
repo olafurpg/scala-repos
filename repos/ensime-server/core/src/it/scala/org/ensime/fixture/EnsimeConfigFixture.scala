@@ -42,7 +42,7 @@ object EnsimeConfigFixture {
   lazy val dotEnsime = File("../.ensime")
   if (!dotEnsime.exists) {
     System.err.println(
-        "The .ensime file must exist to run the integration tests." +
+      "The .ensime file must exist to run the integration tests." +
         " Type 'sbt gen-ensime' to create it"
     )
     System.err.flush()
@@ -56,40 +56,37 @@ object EnsimeConfigFixture {
 
   // not completely empty, has a reference to the scala-library jar
   lazy val EmptyTestProject: EnsimeConfig = EnsimeTestProject.copy(
-      subprojects = EnsimeTestProject.subprojects
-          .filter(_.name == "testingEmpty"),
-      javaLibs = Nil
+    subprojects = EnsimeTestProject.subprojects
+      .filter(_.name == "testingEmpty"),
+    javaLibs = Nil
   )
   lazy val SimpleTestProject: EnsimeConfig = EnsimeTestProject.copy(
-      subprojects = EnsimeTestProject.subprojects.filter(
-            _.name == "testingSimple")
+    subprojects =
+      EnsimeTestProject.subprojects.filter(_.name == "testingSimple")
   )
   lazy val SimpleJarTestProject: EnsimeConfig = EnsimeTestProject.copy(
-      subprojects = EnsimeTestProject.subprojects
-          .filter(_.name == "testingSimpleJar"),
-      javaLibs = Nil
+    subprojects = EnsimeTestProject.subprojects
+      .filter(_.name == "testingSimpleJar"),
+    javaLibs = Nil
   )
   lazy val ImplicitsTestProject: EnsimeConfig = EnsimeTestProject.copy(
-      subprojects = EnsimeTestProject.subprojects
-          .filter(_.name == "testingImplicits"),
-      javaLibs = Nil
+    subprojects = EnsimeTestProject.subprojects
+      .filter(_.name == "testingImplicits"),
+    javaLibs = Nil
   )
   lazy val TimingTestProject: EnsimeConfig = EnsimeTestProject.copy(
-      subprojects = EnsimeTestProject.subprojects
-          .filter(_.name == "testingTiming"),
-      javaLibs = Nil
+    subprojects = EnsimeTestProject.subprojects
+      .filter(_.name == "testingTiming"),
+    javaLibs = Nil
   )
   lazy val DebugTestProject: EnsimeConfig = EnsimeTestProject.copy(
-      subprojects = EnsimeTestProject.subprojects.filter(
-            _.name == "testingDebug")
+    subprojects = EnsimeTestProject.subprojects.filter(_.name == "testingDebug")
   )
   lazy val DocsTestProject: EnsimeConfig = EnsimeTestProject.copy(
-      subprojects = EnsimeTestProject.subprojects.filter(
-            _.name == "testingDocs")
+    subprojects = EnsimeTestProject.subprojects.filter(_.name == "testingDocs")
   )
   lazy val JavaTestProject: EnsimeConfig = EnsimeTestProject.copy(
-      subprojects = EnsimeTestProject.subprojects.filter(
-            _.name == "testingJava")
+    subprojects = EnsimeTestProject.subprojects.filter(_.name == "testingJava")
   )
 
   // generates an empty single module project in a temporary directory
@@ -104,12 +101,12 @@ object EnsimeConfigFixture {
 
     def rename(from: File): File = {
       val toPath = from.getAbsolutePath.replace(
-          source.root.getAbsolutePath,
-          target.getAbsolutePath
+        source.root.getAbsolutePath,
+        target.getAbsolutePath
       )
       require(
-          toPath != from.getAbsolutePath,
-          s"${source.root.getAbsolutePath} ${target.getAbsolutePath} in ${from.getAbsolutePath}")
+        toPath != from.getAbsolutePath,
+        s"${source.root.getAbsolutePath} ${target.getAbsolutePath} in ${from.getAbsolutePath}")
       File(toPath)
     }
 
@@ -127,21 +124,21 @@ object EnsimeConfigFixture {
     // I tried using shapeless everywhere here, but it OOMd the compiler :-(
 
     def cloneModule(m: EnsimeModule): EnsimeModule = m.copy(
-        target = m.target.map(renameAndCopyTarget),
-        targets = m.targets.map(renameAndCopyTarget),
-        testTarget = m.testTarget.map(renameAndCopyTarget),
-        testTargets = m.testTargets.map(renameAndCopyTarget),
-        sourceRoots = m.sourceRoots.map(renameAndCopy)
+      target = m.target.map(renameAndCopyTarget),
+      targets = m.targets.map(renameAndCopyTarget),
+      testTarget = m.testTarget.map(renameAndCopyTarget),
+      testTargets = m.testTargets.map(renameAndCopyTarget),
+      sourceRoots = m.sourceRoots.map(renameAndCopy)
     )
 
     val cacheDir = rename(source.cacheDir)
     cacheDir.mkdirs()
     val config = EnsimeConfigProtocol.validated(
-        source.copy(
-            rootDir = rename(source.rootDir),
-            cacheDir = cacheDir,
-            subprojects = source.subprojects.map(cloneModule)
-        ))
+      source.copy(
+        rootDir = rename(source.rootDir),
+        cacheDir = cacheDir,
+        subprojects = source.subprojects.map(cloneModule)
+      ))
 
     // HACK: we must force OS line endings on sources or the tests
     // (which have fixed points within the file) will fail on Windows
@@ -178,7 +175,9 @@ trait IsolatedEnsimeConfigFixture extends Suite with EnsimeConfigFixture {
   * a project that is cloned once for the test suite.
   */
 trait SharedEnsimeConfigFixture
-    extends Suite with EnsimeConfigFixture with BeforeAndAfterAll {
+    extends Suite
+    with EnsimeConfigFixture
+    with BeforeAndAfterAll {
   import EnsimeConfigFixture._
 
   private val tmpDir = Files.createTempDir()

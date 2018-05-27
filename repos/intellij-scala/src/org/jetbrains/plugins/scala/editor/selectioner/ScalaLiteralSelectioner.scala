@@ -20,14 +20,15 @@ class ScalaLiteralSelectioner extends ExtendWordSelectionHandlerBase {
       val children = l.getNode.getChildren(null)
       children.length == 1 &&
       (children(0).getElementType == ScalaTokenTypes.tSTRING ||
-          children(0).getElementType == ScalaTokenTypes.tMULTILINE_STRING)
+      children(0).getElementType == ScalaTokenTypes.tMULTILINE_STRING)
     case _ => false
   }
 
-  override def select(e: PsiElement,
-                      editorText: CharSequence,
-                      cursorOffset: Int,
-                      editor: Editor) = {
+  override def select(
+      e: PsiElement,
+      editorText: CharSequence,
+      cursorOffset: Int,
+      editor: Editor) = {
     val list = super.select(e, editorText, cursorOffset, editor)
     val r = e.getTextRange
     val text = e.getText

@@ -71,8 +71,8 @@ object LatencyCompensation {
       val description =
         "Sets a latency compensation to be added based on the destination address"
       val parameters = Seq(
-          implicitly[Stack.Param[AddrMetadata]],
-          implicitly[Stack.Param[Compensator]]
+        implicitly[Stack.Param[AddrMetadata]],
+        implicitly[Stack.Param[Compensator]]
       )
       def make(prms: Stack.Params, next: Stack[ServiceFactory[Req, Rep]]) = {
 
@@ -81,7 +81,7 @@ object LatencyCompensation {
         val Compensator(configured) = prms[Compensator]
         val compensator = DefaultOverride() match {
           case Some(v) if !prms.contains[Compensator] => v.compensator
-          case _ => configured
+          case _                                      => configured
         }
 
         val AddrMetadata(metadata) = prms[AddrMetadata]

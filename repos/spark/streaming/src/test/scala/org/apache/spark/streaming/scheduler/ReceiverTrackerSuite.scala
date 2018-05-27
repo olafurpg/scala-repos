@@ -22,7 +22,11 @@ import scala.collection.mutable.ArrayBuffer
 import org.scalatest.concurrent.Eventually._
 import org.scalatest.time.SpanSugar._
 
-import org.apache.spark.scheduler.{SparkListener, SparkListenerTaskStart, TaskLocality}
+import org.apache.spark.scheduler.{
+  SparkListener,
+  SparkListenerTaskStart,
+  TaskLocality
+}
 import org.apache.spark.scheduler.TaskLocality.TaskLocality
 import org.apache.spark.storage.{StorageLevel, StreamBlockId}
 import org.apache.spark.streaming._
@@ -33,65 +37,62 @@ import org.apache.spark.streaming.receiver._
 class ReceiverTrackerSuite extends TestSuiteBase {
 
   test("send rate update to receivers") {
-    withStreamingContext(new StreamingContext(conf, Milliseconds(100))) {
-      ssc =>
-        val newRateLimit = 100L
-        val inputDStream = new RateTestInputDStream(ssc)
-        val tracker = new ReceiverTracker(ssc)
-        tracker.start()
-        try {
-          // we wait until the Receiver has registered with the tracker,
-          // otherwise our rate update is lost
-          eventually(timeout(5 seconds)) {
-            assert(RateTestReceiver.getActive().nonEmpty)
-          }
-
-          // Verify that the rate of the block generator in the receiver get updated
-          val activeReceiver = RateTestReceiver.getActive().get
-          tracker.sendRateUpdate(inputDStream.id, newRateLimit)
-          eventually(timeout(5 seconds)) {
-            assert(
-                activeReceiver.getDefaultBlockGeneratorRateLimit() === newRateLimit,
-                "default block generator did not receive rate update")
-            assert(
-                activeReceiver.getCustomBlockGeneratorRateLimit() === newRateLimit,
-                "other block generator did not receive rate update")
-          }
-        } finally {
-          tracker.stop(false)
+    withStreamingContext(new StreamingContext(conf, Milliseconds(100))) { ssc =>
+      val newRateLimit = 100L
+      val inputDStream = new RateTestInputDStream(ssc)
+      val tracker = new ReceiverTracker(ssc)
+      tracker.start()
+      try {
+        // we wait until the Receiver has registered with the tracker,
+        // otherwise our rate update is lost
+        eventually(timeout(5 seconds)) {
+          assert(RateTestReceiver.getActive().nonEmpty)
         }
+
+        // Verify that the rate of the block generator in the receiver get updated
+        val activeReceiver = RateTestReceiver.getActive().get
+        tracker.sendRateUpdate(inputDStream.id, newRateLimit)
+        eventually(timeout(5 seconds)) {
+          assert(
+            activeReceiver.getDefaultBlockGeneratorRateLimit() === newRateLimit,
+            "default block generator did not receive rate update")
+          assert(
+            activeReceiver.getCustomBlockGeneratorRateLimit() === newRateLimit,
+            "other block generator did not receive rate update")
+        }
+      } finally {
+        tracker.stop(false)
+      }
     }
   }
 
   test("should restart receiver after stopping it") {
-    withStreamingContext(new StreamingContext(conf, Milliseconds(100))) {
-      ssc =>
-        @volatile var startTimes = 0
-        ssc.addStreamingListener(
-            new StreamingListener {
-          override def onReceiverStarted(
-              receiverStarted: StreamingListenerReceiverStarted): Unit = {
-            startTimes += 1
-          }
-        })
-        val input = ssc.receiverStream(new StoppableReceiver)
-        val output = new TestOutputStream(input)
-        output.register()
-        ssc.start()
-        StoppableReceiver.shouldStop = true
-        eventually(timeout(10 seconds), interval(10 millis)) {
-          // The receiver is stopped once, so if it's restarted, it should be started twice.
-          assert(startTimes === 2)
+    withStreamingContext(new StreamingContext(conf, Milliseconds(100))) { ssc =>
+      @volatile var startTimes = 0
+      ssc.addStreamingListener(new StreamingListener {
+        override def onReceiverStarted(
+            receiverStarted: StreamingListenerReceiverStarted): Unit = {
+          startTimes += 1
         }
+      })
+      val input = ssc.receiverStream(new StoppableReceiver)
+      val output = new TestOutputStream(input)
+      output.register()
+      ssc.start()
+      StoppableReceiver.shouldStop = true
+      eventually(timeout(10 seconds), interval(10 millis)) {
+        // The receiver is stopped once, so if it's restarted, it should be started twice.
+        assert(startTimes === 2)
+      }
     }
   }
 
   test(
-      "SPARK-11063: TaskSetManager should use Receiver RDD's preferredLocations") {
+    "SPARK-11063: TaskSetManager should use Receiver RDD's preferredLocations") {
     // Use ManualClock to prevent from starting batches so that we can make sure the only task is
     // for starting the Receiver
-    val _conf = conf.clone.set(
-        "spark.streaming.clock", "org.apache.spark.util.ManualClock")
+    val _conf = conf.clone
+      .set("spark.streaming.clock", "org.apache.spark.util.ManualClock")
     withStreamingContext(new StreamingContext(_conf, Milliseconds(100))) {
       ssc =>
         @volatile var receiverTaskLocality: TaskLocality = null
@@ -122,8 +123,7 @@ private[streaming] class RateTestInputDStream(_ssc: StreamingContext)
   var publishedRates = 0
 
   override val rateController: Option[RateController] = {
-    Some(
-        new RateController(id, new ConstantEstimator(100)) {
+    Some(new RateController(id, new ConstantEstimator(100)) {
       override def publish(rate: Long): Unit = {
         publishedRates += 1
       }
@@ -133,17 +133,19 @@ private[streaming] class RateTestInputDStream(_ssc: StreamingContext)
 
 /** A receiver implementation for testing rate controlling */
 private[streaming] class RateTestReceiver(
-    receiverId: Int, host: Option[String] = None)
+    receiverId: Int,
+    host: Option[String] = None)
     extends Receiver[Int](StorageLevel.MEMORY_ONLY) {
 
   private lazy val customBlockGenerator = supervisor.createBlockGenerator(
-      new BlockGeneratorListener {
-        override def onPushBlock(
-            blockId: StreamBlockId, arrayBuffer: ArrayBuffer[_]): Unit = {}
-        override def onError(message: String, throwable: Throwable): Unit = {}
-        override def onGenerateBlock(blockId: StreamBlockId): Unit = {}
-        override def onAddData(data: Any, metadata: Any): Unit = {}
-      }
+    new BlockGeneratorListener {
+      override def onPushBlock(
+          blockId: StreamBlockId,
+          arrayBuffer: ArrayBuffer[_]): Unit = {}
+      override def onError(message: String, throwable: Throwable): Unit = {}
+      override def onGenerateBlock(blockId: StreamBlockId): Unit = {}
+      override def onAddData(data: Any, metadata: Any): Unit = {}
+    }
   )
 
   setReceiverId(receiverId)

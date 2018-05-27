@@ -28,14 +28,16 @@ object Packaging {
   }
 
   def compressPackagedPlugin(source: File, destination: File): Unit =
-    IO.zip((source.getParentFile ***) pair
-           (relativeTo(source.getParentFile), false),
-           destination)
+    IO.zip(
+      (source.getParentFile ***) pair
+        (relativeTo(source.getParentFile), false),
+      destination)
 
   import PackageEntry._
 
-  def convertEntriesToMappings(entries: Seq[PackageEntry],
-                               libraries: Classpath): Seq[(File, String)] = {
+  def convertEntriesToMappings(
+      entries: Seq[PackageEntry],
+      libraries: Classpath): Seq[(File, String)] = {
     val resolvedLibraries = (for {
       jarFile <- libraries
       moduleId <- jarFile.get(moduleID.key)

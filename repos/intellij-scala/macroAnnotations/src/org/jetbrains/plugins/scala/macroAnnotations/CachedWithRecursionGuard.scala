@@ -15,9 +15,12 @@ import scala.reflect.macros.whitebox
   * Date: 9/28/15.
   */
 class CachedWithRecursionGuard[T](
-    element: Any, defaultValue: => Any, dependecyItem: Object)
+    element: Any,
+    defaultValue: => Any,
+    dependecyItem: Object)
     extends StaticAnnotation {
-  def macroTransform(annottees: Any*) = macro CachedWithRecursionGuard.cachedWithRecursionGuardImpl
+  def macroTransform(annottees: Any*) =
+    macro CachedWithRecursionGuard.cachedWithRecursionGuardImpl
 }
 
 object CachedWithRecursionGuard {
@@ -30,10 +33,11 @@ object CachedWithRecursionGuard {
     def parameters: (Tree, Tree, Tree, Tree) = c.prefix.tree match {
       case q"new CachedWithRecursionGuard[$t](..$params)"
           if params.length == 3 =>
-        (params.head,
-         params(1),
-         modCountParamToModTracker(c)(params(2), params.head),
-         t)
+        (
+          params.head,
+          params(1),
+          modCountParamToModTracker(c)(params(2), params.head),
+          t)
       case _ => abort("Wrong annotation parameters!")
     }
 
@@ -69,8 +73,7 @@ object CachedWithRecursionGuard {
           $cachesUtilFQN.incrementModCountForFunsWithModifiedReturn()
           $cachesUtilFQN.getWithRecursionPreventingWithRollback[$providerType, $retTp]($element, $keyVarName, $builder, $defaultValue)
           """
-        val updatedDef = DefDef(
-            mods, name, tpParams, params, retTp, updatedRhs)
+        val updatedDef = DefDef(mods, name, tpParams, params, retTp, updatedRhs)
         val res = q"""
           private val $keyVarName = $cachesUtilFQN.getOrCreateKey[$keyTypeFQN[$cachedValueTypeFQN[$retTp]]]($keyId)
 

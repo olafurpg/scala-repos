@@ -7,7 +7,9 @@ import org.scalatest._
 import prop._
 
 class PackageCheck
-    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+    extends PropSpec
+    with Matchers
+    with GeneratorDrivenPropertyChecks {
   fib(0) shouldBe 0
   fib(1) shouldBe 1
   property("fib(n + 2) = fib(n + 1) + fib(n)") {

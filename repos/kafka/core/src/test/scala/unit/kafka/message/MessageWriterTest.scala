@@ -32,15 +32,17 @@ class MessageWriterTest extends JUnitSuite {
     (0 until size).map(_ => rnd.nextInt(10).toByte).toArray
   }
 
-  private def mkMessageWithWriter(key: Array[Byte] = null,
-                                  bytes: Array[Byte],
-                                  codec: CompressionCodec): Message = {
+  private def mkMessageWithWriter(
+      key: Array[Byte] = null,
+      bytes: Array[Byte],
+      codec: CompressionCodec): Message = {
     val writer = new MessageWriter(100)
-    writer.write(key = key,
-                 codec = codec,
-                 timestamp = Message.NoTimestamp,
-                 timestampType = TimestampType.CREATE_TIME,
-                 magicValue = Message.MagicValue_V1) { output =>
+    writer.write(
+      key = key,
+      codec = codec,
+      timestamp = Message.NoTimestamp,
+      timestampType = TimestampType.CREATE_TIME,
+      magicValue = Message.MagicValue_V1) { output =>
       val out =
         if (codec == NoCompressionCodec) output
         else CompressionFactory(codec, output)
@@ -59,7 +61,8 @@ class MessageWriterTest extends JUnitSuite {
   }
 
   private def compress(
-      bytes: Array[Byte], codec: CompressionCodec): Array[Byte] = {
+      bytes: Array[Byte],
+      codec: CompressionCodec): Array[Byte] = {
     val baos = new ByteArrayOutputStream()
     val out = CompressionFactory(codec, baos)
     out.write(bytes)
@@ -68,7 +71,8 @@ class MessageWriterTest extends JUnitSuite {
   }
 
   private def decompress(
-      compressed: Array[Byte], codec: CompressionCodec): Array[Byte] = {
+      compressed: Array[Byte],
+      codec: CompressionCodec): Array[Byte] = {
     toArray(CompressionFactory(codec, new ByteArrayInputStream(compressed)))
   }
 
@@ -112,23 +116,27 @@ class MessageWriterTest extends JUnitSuite {
     val bytes = mkRandomArray(4096)
     val actual = mkMessageWithWriter(bytes = bytes, codec = NoCompressionCodec)
     val expected = new Message(
-        bytes, Message.NoTimestamp, NoCompressionCodec, Message.MagicValue_V1)
+      bytes,
+      Message.NoTimestamp,
+      NoCompressionCodec,
+      Message.MagicValue_V1)
     assertEquals(expected.buffer, actual.buffer)
   }
 
   @Test
   def testWithCompressionAttribute(): Unit = {
     val bytes = mkRandomArray(4096)
-    val actual = mkMessageWithWriter(
-        bytes = bytes, codec = SnappyCompressionCodec)
-    val expected = new Message(compress(bytes, SnappyCompressionCodec),
-                               Message.NoTimestamp,
-                               SnappyCompressionCodec,
-                               Message.MagicValue_V1)
+    val actual =
+      mkMessageWithWriter(bytes = bytes, codec = SnappyCompressionCodec)
+    val expected = new Message(
+      compress(bytes, SnappyCompressionCodec),
+      Message.NoTimestamp,
+      SnappyCompressionCodec,
+      Message.MagicValue_V1)
 
     assertEquals(
-        decompress(toArray(expected.payload), SnappyCompressionCodec).toSeq,
-        decompress(toArray(actual.payload), SnappyCompressionCodec).toSeq
+      decompress(toArray(expected.payload), SnappyCompressionCodec).toSeq,
+      decompress(toArray(actual.payload), SnappyCompressionCodec).toSeq
     )
   }
 
@@ -136,13 +144,14 @@ class MessageWriterTest extends JUnitSuite {
   def testWithKey(): Unit = {
     val key = mkRandomArray(123)
     val bytes = mkRandomArray(4096)
-    val actual = mkMessageWithWriter(
-        bytes = bytes, key = key, codec = NoCompressionCodec)
-    val expected = new Message(bytes = bytes,
-                               key = key,
-                               timestamp = Message.NoTimestamp,
-                               codec = NoCompressionCodec,
-                               magicValue = Message.MagicValue_V1)
+    val actual =
+      mkMessageWithWriter(bytes = bytes, key = key, codec = NoCompressionCodec)
+    val expected = new Message(
+      bytes = bytes,
+      key = key,
+      timestamp = Message.NoTimestamp,
+      codec = NoCompressionCodec,
+      magicValue = Message.MagicValue_V1)
 
     assertEquals(expected.buffer, actual.buffer)
   }

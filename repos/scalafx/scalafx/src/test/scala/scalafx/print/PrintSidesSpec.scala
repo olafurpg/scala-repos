@@ -38,6 +38,6 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class PrintSidesSpec
     extends SFXEnumDelegateSpec[jfxp.PrintSides, PrintSides](
-        javaClass = classOf[jfxp.PrintSides],
-        scalaClass = classOf[PrintSides],
-        companion = PrintSides)
+      javaClass = classOf[jfxp.PrintSides],
+      scalaClass = classOf[PrintSides],
+      companion = PrintSides)

@@ -29,7 +29,7 @@ object CSS extends DispatchSnippet {
     case "blueprint" =>
       _ =>
         blueprint
-      case "fancyType" =>
+    case "fancyType" =>
       _ =>
         fancyType
   }
@@ -51,7 +51,8 @@ object CSS extends DispatchSnippet {
         media="screen, projection"/>
       <link rel="stylesheet" href={"/" + LiftRules.resourceServerPath +
                                    "/blueprint/print.css"} type="text/css" media="print"/>
-    </xml:group> ++ Unparsed("""
+    </xml:group> ++ Unparsed(
+      """
   <!--[if IE]><link rel="stylesheet" href=""" + '"' +
         S.contextPath + """/""" + LiftRules.resourceServerPath +
         """/blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->

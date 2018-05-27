@@ -76,7 +76,8 @@ trait Test1 {
     for (c <- cls.getDeclaredClasses) {
       mods = AccessFlags.asString(c.getModifiers)
       kind = if (c.isInterface) "interface" else "class"
-      println("  " + mods + kind + " " + c.getName + " of class " +
+      println(
+        "  " + mods + kind + " " + c.getName + " of class " +
           c.getEnclosingClass.getName)
     }
   }

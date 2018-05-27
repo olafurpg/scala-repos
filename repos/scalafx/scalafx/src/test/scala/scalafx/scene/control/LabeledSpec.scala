@@ -32,7 +32,11 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
 import scalafx.Includes._
-import scalafx.testutil.{AlignmentDelegateSpec, RunOnApplicationThread, SimpleSFXDelegateSpec}
+import scalafx.testutil.{
+  AlignmentDelegateSpec,
+  RunOnApplicationThread,
+  SimpleSFXDelegateSpec
+}
 
 /**
   * Labeled Spec tests.
@@ -40,7 +44,8 @@ import scalafx.testutil.{AlignmentDelegateSpec, RunOnApplicationThread, SimpleSF
 @RunWith(classOf[JUnitRunner])
 class LabeledSpec
     extends SimpleSFXDelegateSpec[jfxsc.Labeled, Labeled](
-        classOf[jfxsc.Labeled], classOf[Labeled])
+      classOf[jfxsc.Labeled],
+      classOf[Labeled])
     with AlignmentDelegateSpec[jfxsc.Labeled, Labeled]
     with RunOnApplicationThread {
 

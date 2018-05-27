@@ -24,8 +24,9 @@ trait JavaPlatform extends Platform {
 
   def classPath: ClassPath[AbstractFile] = {
     assert(
-        settings.YclasspathImpl.value == ClassPathRepresentationType.Recursive,
-        "To use recursive classpath representation you must enable it with -YclasspathImpl:recursive compiler option.")
+      settings.YclasspathImpl.value == ClassPathRepresentationType.Recursive,
+      "To use recursive classpath representation you must enable it with -YclasspathImpl:recursive compiler option."
+    )
 
     if (currentClassPath.isEmpty)
       currentClassPath = Some(new PathResolver(settings).result)
@@ -34,8 +35,9 @@ trait JavaPlatform extends Platform {
 
   private[nsc] lazy val flatClassPath: FlatClassPath = {
     assert(
-        settings.YclasspathImpl.value == ClassPathRepresentationType.Flat,
-        "To use flat classpath representation you must enable it with -YclasspathImpl:flat compiler option.")
+      settings.YclasspathImpl.value == ClassPathRepresentationType.Flat,
+      "To use flat classpath representation you must enable it with -YclasspathImpl:flat compiler option."
+    )
 
     new FlatClassPathResolver(settings).result
   }
@@ -46,16 +48,15 @@ trait JavaPlatform extends Platform {
     currentClassPath = Some(new DeltaClassPath(currentClassPath.get, subst))
 
   def platformPhases = List(
-      flatten, // get rid of inner classes
-      genBCode // generate .class files
+    flatten, // get rid of inner classes
+    genBCode // generate .class files
   )
 
   lazy val externalEquals = getDecl(BoxesRunTimeClass, nme.equals_)
   lazy val externalEqualsNumNum = getDecl(BoxesRunTimeClass, nme.equalsNumNum)
-  lazy val externalEqualsNumChar = getDecl(
-      BoxesRunTimeClass, nme.equalsNumChar)
-  lazy val externalEqualsNumObject = getDecl(
-      BoxesRunTimeClass, nme.equalsNumObject)
+  lazy val externalEqualsNumChar = getDecl(BoxesRunTimeClass, nme.equalsNumChar)
+  lazy val externalEqualsNumObject =
+    getDecl(BoxesRunTimeClass, nme.equalsNumObject)
 
   /** We could get away with excluding BoxedBooleanClass for the
     *  purpose of equality testing since it need not compare equal

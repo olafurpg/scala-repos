@@ -15,7 +15,8 @@ private trait ApertureTesting {
   class Empty extends Exception
 
   protected trait TestBal
-      extends Balancer[Unit, Unit] with Aperture[Unit, Unit] {
+      extends Balancer[Unit, Unit]
+      with Aperture[Unit, Unit] {
     protected val rng = Rng(12345L)
     protected val emptyException = new Empty
     protected val maxEffort = 10
@@ -45,8 +46,7 @@ private trait ApertureTesting {
     def apply(conn: ClientConnection) = {
       n += 1
       p += 1
-      Future.value(
-          new Service[Unit, Unit] {
+      Future.value(new Service[Unit, Unit] {
         def apply(unit: Unit) = ???
         override def close(deadline: Time) = {
           p -= 1
@@ -190,7 +190,8 @@ private class LoadBandTest extends FunSuite with ApertureTesting {
   val rng = Rng()
 
   class Bal(protected val lowLoad: Double, protected val highLoad: Double)
-      extends TestBal with LoadBand[Unit, Unit] {
+      extends TestBal
+      with LoadBand[Unit, Unit] {
     def this() = this(0.5, 2.0)
     protected def smoothWin = Duration.Zero
   }

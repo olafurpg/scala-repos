@@ -24,12 +24,13 @@ class ShortestPathsSuite extends SparkFunSuite with LocalSparkContext {
 
   test("Shortest Path Computations") {
     withSpark { sc =>
-      val shortestPaths = Set((1, Map(1 -> 0, 4 -> 2)),
-                              (2, Map(1 -> 1, 4 -> 2)),
-                              (3, Map(1 -> 2, 4 -> 1)),
-                              (4, Map(1 -> 2, 4 -> 0)),
-                              (5, Map(1 -> 1, 4 -> 1)),
-                              (6, Map(1 -> 3, 4 -> 1)))
+      val shortestPaths = Set(
+        (1, Map(1 -> 0, 4 -> 2)),
+        (2, Map(1 -> 1, 4 -> 2)),
+        (3, Map(1 -> 2, 4 -> 1)),
+        (4, Map(1 -> 2, 4 -> 0)),
+        (5, Map(1 -> 1, 4 -> 1)),
+        (6, Map(1 -> 3, 4 -> 1)))
       val edgeSeq =
         Seq((1, 2), (1, 5), (2, 3), (2, 5), (3, 4), (4, 5), (4, 6)).flatMap {
           case e => Seq(e, e.swap)

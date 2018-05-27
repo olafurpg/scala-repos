@@ -42,7 +42,7 @@ class ScalaApplicationUsagesCollector
 
         ModuleRootManager.getInstance(module).getSdk match {
           case jsdk: JavaSdk => java_version = Option(jsdk.getVersionString)
-          case _ =>
+          case _             =>
         }
       }
 
@@ -74,7 +74,8 @@ class ScalaApplicationUsagesCollector
         checkLibrary("securesocial", "SecureSocial")
         checkLibrary("com.github.dwhjames.awswrap", "AWSWrap")
         checkLibrary(
-            "com.github.mauricio.async.db.postgresql", "postgresql-async")
+          "com.github.mauricio.async.db.postgresql",
+          "postgresql-async")
         checkLibrary("com.netflix.edda", "Edda")
         checkLibrary("redis", "Rediscala")
         checkLibrary("scalaz", "Scalaz")

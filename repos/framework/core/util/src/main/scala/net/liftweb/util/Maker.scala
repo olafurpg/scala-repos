@@ -63,7 +63,8 @@ trait SimpleInjector extends Injector {
     * the scope of the call.
     */
   abstract class Inject[T](_default: Vendor[T])(implicit man: Manifest[T])
-      extends StackableMaker[T] with Vendor[T] {
+      extends StackableMaker[T]
+      with Vendor[T] {
     registerInjection(this)(man)
 
     /**
@@ -143,7 +144,7 @@ trait StackableMaker[T] extends Maker[T] {
 
   private def stack: List[PValueHolder[Maker[T]]] = _stack.get() match {
     case null => Nil
-    case x => x
+    case x    => x
   }
 
   /**
@@ -177,7 +178,7 @@ trait StackableMaker[T] extends Maker[T] {
       case x :: rest =>
         x.get.make match {
           case Full(v) => Full(v)
-          case _ => find(rest)
+          case _       => find(rest)
         }
     }
 

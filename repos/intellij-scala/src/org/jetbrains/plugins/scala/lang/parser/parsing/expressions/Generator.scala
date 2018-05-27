@@ -6,7 +6,10 @@ package expressions
 
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
-import org.jetbrains.plugins.scala.lang.parser.parsing.patterns.{Guard, Pattern1}
+import org.jetbrains.plugins.scala.lang.parser.parsing.patterns.{
+  Guard,
+  Pattern1
+}
 
 /**
   * @author Alexander Podkhalyuzin
@@ -35,7 +38,7 @@ object Generator {
     genMarker.done(ScalaElementTypes.GENERATOR)
     builder.getTokenType match {
       case ScalaTokenTypes.kIF => Guard parse builder
-      case _ =>
+      case _                   =>
     }
     return true
   }

@@ -9,13 +9,11 @@ case class Query(
     categories: Option[Set[String]],
     whiteList: Option[Set[String]],
     blackList: Option[Set[String]]
-)
-    extends Serializable
+) extends Serializable
 
 case class PredictedResult(
     itemScores: Array[ItemScore]
-)
-    extends Serializable
+) extends Serializable
 
 case class ItemScore(
     item: String,
@@ -23,14 +21,14 @@ case class ItemScore(
     date: String,
     imdbUrl: String,
     score: Double
-)
-    extends Serializable
+) extends Serializable
 
 object SimilarProductEngine extends IEngineFactory {
   def apply() = {
-    new Engine(classOf[DataSource],
-               classOf[Preparator],
-               Map("als" -> classOf[ALSAlgorithm]),
-               classOf[Serving])
+    new Engine(
+      classOf[DataSource],
+      classOf[Preparator],
+      Map("als" -> classOf[ALSAlgorithm]),
+      classOf[Serving])
   }
 }

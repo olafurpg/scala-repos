@@ -25,9 +25,9 @@ object HttpClient {
       // success and failure values:
       service(request) flatMap { response =>
         response.status match {
-          case Status.Ok => Future.value(response)
+          case Status.Ok        => Future.value(response)
           case Status.Forbidden => Future.exception(new InvalidRequest)
-          case _ => Future.exception(new Exception(response.status.reason))
+          case _                => Future.exception(new Exception(response.status.reason))
         }
       }
     }
@@ -57,7 +57,8 @@ object HttpClient {
     }
   }
 
-  private[this] def makeAuthorizedRequest(client: Service[Request, Response]) = {
+  private[this] def makeAuthorizedRequest(
+      client: Service[Request, Response]) = {
     val authorizedRequest = Request(Version.Http11, Method.Get, "/")
     authorizedRequest.headerMap.add(Fields.Authorization, "open sesame")
 
@@ -74,7 +75,8 @@ object HttpClient {
     // use the onFailure callback since we convert HTTP 4xx and 5xx class
     // responses to Exceptions.
     client(unauthorizedRequest) onFailure { error =>
-      println("))) Unauthorized request errored (as desired): " +
+      println(
+        "))) Unauthorized request errored (as desired): " +
           error.getClass.getName)
     }
   }

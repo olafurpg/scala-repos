@@ -68,11 +68,12 @@ object RoutesCompiler {
     * @param reverseRouter Whether a reverse router should be generated.
     * @param namespaceReverseRouter Whether the reverse router should be namespaced.
     */
-  case class RoutesCompilerTask(file: File,
-                                additionalImports: Seq[String],
-                                forwardsRouter: Boolean,
-                                reverseRouter: Boolean,
-                                namespaceReverseRouter: Boolean)
+  case class RoutesCompilerTask(
+      file: File,
+      additionalImports: Seq[String],
+      forwardsRouter: Boolean,
+      reverseRouter: Boolean,
+      namespaceReverseRouter: Boolean)
 
   /**
     * Compile the given routes file

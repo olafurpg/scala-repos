@@ -1,7 +1,9 @@
 package lila.forumSearch
 
 private[forumSearch] case class Query(
-    text: String, staff: Boolean, troll: Boolean)
+    text: String,
+    staff: Boolean,
+    troll: Boolean)
 
 object Query {
 

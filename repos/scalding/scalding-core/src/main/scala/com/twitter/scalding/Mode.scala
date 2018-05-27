@@ -51,8 +51,7 @@ object Mode {
     * a work-around for the fact that Job only accepts an Args object,
     * but needs a Mode inside.
     */
-  private class ArgsWithMode(
-      argsMap: Map[String, List[String]], val mode: Mode)
+  private class ArgsWithMode(argsMap: Map[String, List[String]], val mode: Mode)
       extends Args(argsMap) {
     override def +(keyvals: (String, Iterable[String])): Args =
       new ArgsWithMode(super.+(keyvals).m, mode)
@@ -64,7 +63,7 @@ object Mode {
   /** Get a Mode if this Args was the result of a putMode */
   def getMode(args: Args): Option[Mode] = args match {
     case withMode: ArgsWithMode => Some(withMode.mode)
-    case _ => None
+    case _                      => None
   }
 
   val CascadingFlowConnectorClassKey = "cascading.flow.connector.class"
@@ -88,7 +87,7 @@ object Mode {
     if (!strictSources) {
       // TODO we should do smarter logging here
       println(
-          "[Scalding:INFO] using --tool.partialok. Missing log data won't cause errors.")
+        "[Scalding:INFO] using --tool.partialok. Missing log data won't cause errors.")
     }
 
     if (args.boolean("local")) Local(strictSources)
@@ -100,18 +99,16 @@ object Mode {
       config.set(CascadingFlowProcessClassKey, DefaultHadoopFlowProcess)
       Hdfs(strictSources, config)
     } else if (args.boolean("hadoop2-mr1")) {
-      config.set(
-          CascadingFlowConnectorClassKey, DefaultHadoop2Mr1FlowConnector)
+      config.set(CascadingFlowConnectorClassKey, DefaultHadoop2Mr1FlowConnector)
       config.set(CascadingFlowProcessClassKey, DefaultHadoop2Mr1FlowProcess)
       Hdfs(strictSources, config)
     } else if (args.boolean("hadoop2-tez")) {
-      config.set(
-          CascadingFlowConnectorClassKey, DefaultHadoop2TezFlowConnector)
+      config.set(CascadingFlowConnectorClassKey, DefaultHadoop2TezFlowConnector)
       config.set(CascadingFlowProcessClassKey, DefaultHadoop2TezFlowProcess)
       Hdfs(strictSources, config)
     } else
       throw ArgsException(
-          "[ERROR] Mode must be one of --local, --hadoop1, --hadoop2-mr1, --hadoop2-tez or --hdfs, you provided none")
+        "[ERROR] Mode must be one of --local, --hadoop1, --hadoop2-mr1, --hadoop2-tez or --hdfs, you provided none")
   }
 }
 
@@ -123,8 +120,8 @@ trait Mode extends java.io.Serializable {
   def openForRead(config: Config, tap: Tap[_, _, _]): TupleEntryIterator
 
   @deprecated(
-      "A Config is needed, especially if any kryo serialization has been used",
-      "0.12.0")
+    "A Config is needed, especially if any kryo serialization has been used",
+    "0.12.0")
   final def openForRead(tap: Tap[_, _, _]): TupleEntryIterator =
     openForRead(Config.defaultFrom(this), tap)
 
@@ -149,16 +146,17 @@ trait HadoopMode extends Mode {
         LoggerFactory
           .getLogger(getClass)
           .error(
-              "Could not create class from: %s in config key: %s, Job may fail."
-                .format(conf.get(jarKey), AppProps.APP_JAR_CLASS),
-              err)
+            "Could not create class from: %s in config key: %s, Job may fail."
+              .format(conf.get(jarKey), AppProps.APP_JAR_CLASS),
+            err)
         // Just delete the key and see if it fails when cascading tries to submit
         asMap - jarKey
       case None => asMap
     }
 
     val flowConnectorClass = jobConf.get(
-        Mode.CascadingFlowConnectorClassKey, Mode.DefaultHadoopFlowConnector)
+      Mode.CascadingFlowConnectorClassKey,
+      Mode.DefaultHadoopFlowConnector)
 
     try {
       val clazz = Class.forName(flowConnectorClass)
@@ -166,11 +164,11 @@ trait HadoopMode extends Mode {
       ctor.newInstance(finalMap.asJava).asInstanceOf[FlowConnector]
     } catch {
       case ncd: ClassNotFoundException => {
-          throw new ModeLoadException(
-              "Failed to load Cascading flow connector class " +
-              flowConnectorClass,
-              ncd)
-        }
+        throw new ModeLoadException(
+          "Failed to load Cascading flow connector class " +
+            flowConnectorClass,
+          ncd)
+      }
     }
   }
 
@@ -182,7 +180,8 @@ trait HadoopMode extends Mode {
     config.toMap.foreach { case (k, v) => conf.set(k, v) }
 
     val flowProcessClass = jobConf.get(
-        Mode.CascadingFlowProcessClassKey, Mode.DefaultHadoopFlowProcess)
+      Mode.CascadingFlowProcessClassKey,
+      Mode.DefaultHadoopFlowProcess)
 
     val fp = try {
       val clazz = Class.forName(flowProcessClass)
@@ -190,11 +189,11 @@ trait HadoopMode extends Mode {
       ctor.newInstance(conf).asInstanceOf[FlowProcess[JobConf]]
     } catch {
       case ncd: ClassNotFoundException => {
-          throw new ModeLoadException(
-              "Failed to load Cascading flow process class " +
-              flowProcessClass,
-              ncd)
-        }
+        throw new ModeLoadException(
+          "Failed to load Cascading flow process class " +
+            flowProcessClass,
+          ncd)
+      }
     }
 
     htap.retrieveSourceFields(fp)
@@ -236,9 +235,11 @@ case class Hdfs(strict: Boolean, @transient conf: Configuration)
   }
 }
 
-case class HadoopTest(@transient conf: Configuration,
-                      @transient buffers: Source => Option[Buffer[Tuple]])
-    extends HadoopMode with TestMode {
+case class HadoopTest(
+    @transient conf: Configuration,
+    @transient buffers: Source => Option[Buffer[Tuple]])
+    extends HadoopMode
+    with TestMode {
 
   // This is a map from source.toString to disk path
   private val writePaths = MMap[Source, String]()
@@ -265,7 +266,8 @@ case class HadoopTest(@transient conf: Configuration,
   def getWritePathFor(src: Source): String = {
     val rndIdx = new java.util.Random().nextInt(1 << 30)
     writePaths.getOrElseUpdate(
-        src, allocateNewPath(basePath + src.getClass.getName, rndIdx))
+      src,
+      allocateNewPath(basePath + src.getClass.getName, rndIdx))
   }
 
   def finalize(src: Source) {
@@ -274,8 +276,7 @@ case class HadoopTest(@transient conf: Configuration,
      * functions, and those functions have been documented accordingly to
      * warn about this invariant.
      */
-    @SuppressWarnings(
-        Array("org.brianmckenna.wartremover.warts.OptionPartial")) // Get the buffer for the given source, and empty it:
+    @SuppressWarnings(Array("org.brianmckenna.wartremover.warts.OptionPartial")) // Get the buffer for the given source, and empty it:
     val buf = buffers(src).get
     buf.clear()
     // Now fill up this buffer with the content of the file
@@ -301,4 +302,5 @@ case class Local(strictSources: Boolean) extends CascadingLocal {
   * Memory only testing for unit tests
   */
 case class Test(buffers: (Source) => Option[Buffer[Tuple]])
-    extends TestMode with CascadingLocal
+    extends TestMode
+    with CascadingLocal

@@ -24,11 +24,14 @@ class IncrementalLexerHighlightingTest
     typed foreach {
       case '\r' =>
         CommandProcessor.getInstance.executeCommand(
-            myFixture.getProject, new Runnable {
-          def run() {
-            myFixture.performEditorAction(IdeActions.ACTION_EDITOR_BACKSPACE)
-          }
-        }, "", null)
+          myFixture.getProject,
+          new Runnable {
+            def run() {
+              myFixture.performEditorAction(IdeActions.ACTION_EDITOR_BACKSPACE)
+            }
+          },
+          "",
+          null)
       case '\n' =>
         CommandProcessor
           .getInstance()
@@ -55,27 +58,28 @@ class IncrementalLexerHighlightingTest
       .getSegments
 
     assert(
-        incSegments.getSegmentCount == segments.getSegmentCount,
-        s"Different segment count for incremental (${incSegments.getSegmentCount}) and full (${segments.getSegmentCount}) highlightings ")
+      incSegments.getSegmentCount == segments.getSegmentCount,
+      s"Different segment count for incremental (${incSegments.getSegmentCount}) and full (${segments.getSegmentCount}) highlightings "
+    )
 
     for (i <- 0 until incSegments.getSegmentCount) {
       val startI = incSegments getSegmentStart i
       val start = segments getSegmentStart i
       assert(
-          start == startI,
-          s"Different segment start in incremental ($startI) and full ($start) highlightings in segment #$i")
+        start == startI,
+        s"Different segment start in incremental ($startI) and full ($start) highlightings in segment #$i")
 
       val endI = incSegments getSegmentEnd i
       val end = segments getSegmentEnd i
       assert(
-          endI == end,
-          s"Different segment end in incremental ($endI) and full ($end) highlightings in segment #$i")
+        endI == end,
+        s"Different segment end in incremental ($endI) and full ($end) highlightings in segment #$i")
 
       val dataI = incSegments getSegmentData i
       val data = incSegments getSegmentData i
       assert(
-          dataI == data,
-          s"Different segment data in incremental ($dataI) and full ($data) highlightings in segment #$i")
+        dataI == data,
+        s"Different segment data in incremental ($dataI) and full ($data) highlightings in segment #$i")
     }
   }
 
@@ -94,7 +98,7 @@ class IncrementalLexerHighlightingTest
   def testScl7330() {
     val text =
       "object ololo {\n" + s"(escritorTexto$CARET_MARKER)\n" +
-      "iniBloque(s\"\"\"filename=\"$fich\"\"\"\")\n" + "}"
+        "iniBloque(s\"\"\"filename=\"$fich\"\"\"\")\n" + "}"
 
     genericTestHighlighting(text, ',', ' ', '\r', '\r')
   }
@@ -256,7 +260,7 @@ class Sincronizador(servidor: String, ruta: String, soporte: String, tblsProcesa
         |
         |    if (true) {
         |      """ + CARET_MARKER +
-      """"Unsupported payment type: [$paymentType]" ; val a = 1
+        """"Unsupported payment type: [$paymentType]" ; val a = 1
         |    }
         |  }
         |}

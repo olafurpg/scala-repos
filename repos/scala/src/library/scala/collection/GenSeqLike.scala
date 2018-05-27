@@ -31,7 +31,9 @@ import generic._
   *  Unlike iterables, sequences always have a defined order of elements.
   */
 trait GenSeqLike[+A, +Repr]
-    extends Any with GenIterableLike[A, Repr] with Equals
+    extends Any
+    with GenIterableLike[A, Repr]
+    with Equals
     with Parallelizable[A, parallel.ParSeq[A]] {
   def seq: Seq[A]
 
@@ -344,10 +346,10 @@ trait GenSeqLike[+A, +Repr]
     *    {{{
     *       scala> val a = List(1)
     *       a: List[Int] = List(1)
-    *       
+    *
     *       scala> val b = a :+ 2
     *       b: List[Int] = List(1, 2)
-    *       
+    *
     *       scala> println(a)
     *       List(1)
     *    }}}
@@ -482,6 +484,6 @@ trait GenSeqLike[+A, +Repr]
     */
   override def equals(that: Any): Boolean = that match {
     case that: GenSeq[_] => (that canEqual this) && (this sameElements that)
-    case _ => false
+    case _               => false
   }
 }

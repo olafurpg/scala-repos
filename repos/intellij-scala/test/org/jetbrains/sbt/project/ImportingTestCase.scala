@@ -23,7 +23,8 @@ import org.jetbrains.sbt.settings.SbtSystemSettings
   * @since 8/4/15.
   */
 abstract class ImportingTestCase
-    extends ExternalSystemImportingTestCase with ProjectStructureMatcher
+    extends ExternalSystemImportingTestCase
+    with ProjectStructureMatcher
     with SbtStructureSetup {
 
   val Log = Logger.getInstance(this.getClass)
@@ -47,7 +48,8 @@ abstract class ImportingTestCase
   override protected def getTestsTempDir: String =
     "" // Use default temp directory
 
-  override protected def getCurrentExternalProjectSettings: ExternalProjectSettings = {
+  override protected def getCurrentExternalProjectSettings
+    : ExternalProjectSettings = {
     val settings = new SbtProjectSettings
     val internalSdk = JavaAwareProjectJdkTableImpl.getInstanceEx.getInternalJdk
     settings.setJdk(internalSdk.getName)
@@ -61,6 +63,6 @@ abstract class ImportingTestCase
   }
 
   private def setUpProjectDirectory(): Unit =
-    myProjectRoot = LocalFileSystem.getInstance.refreshAndFindFileByIoFile(
-        testProjectDir)
+    myProjectRoot =
+      LocalFileSystem.getInstance.refreshAndFindFileByIoFile(testProjectDir)
 }

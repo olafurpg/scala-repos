@@ -31,7 +31,15 @@ import javafx.{event => jfxe, util => jfxu}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, DoubleProperty, IntegerProperty, ObjectProperty, ReadOnlyDoubleProperty, ReadOnlyIntegerProperty, ReadOnlyObjectProperty}
+import scalafx.beans.property.{
+  BooleanProperty,
+  DoubleProperty,
+  IntegerProperty,
+  ObjectProperty,
+  ReadOnlyDoubleProperty,
+  ReadOnlyIntegerProperty,
+  ReadOnlyObjectProperty
+}
 import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
 import scalafx.util.Duration
 
@@ -49,8 +57,9 @@ object MediaPlayer {
       * Media and MediaView objects associated with disposed player can be reused.
       */
     val Disposed = new Status(jfxsm.MediaPlayer.Status.DISPOSED)
-    @deprecated("Use Disposed; DISPOSED will be removed in a future release",
-                "8.0.60-R10")
+    @deprecated(
+      "Use Disposed; DISPOSED will be removed in a future release",
+      "8.0.60-R10")
     val DISPOSED = Disposed
 
     /**
@@ -58,7 +67,8 @@ object MediaPlayer {
       */
     val Halted = new Status(jfxsm.MediaPlayer.Status.HALTED)
     @deprecated(
-        "Use Halted; HALTED will be removed in a future release", "8.0.60-R10")
+      "Use Halted; HALTED will be removed in a future release",
+      "8.0.60-R10")
     val HALTED = Halted
 
     /**
@@ -66,15 +76,17 @@ object MediaPlayer {
       */
     val Paused = new Status(jfxsm.MediaPlayer.Status.PAUSED)
     @deprecated(
-        "Use Paused; PAUSED will be removed in a future release", "8.0.60-R10")
+      "Use Paused; PAUSED will be removed in a future release",
+      "8.0.60-R10")
     val PAUSED = Paused
 
     /**
       * State of the player when it is currently playing.
       */
     val Playing = new Status(jfxsm.MediaPlayer.Status.PLAYING)
-    @deprecated("Use Playing; PLAYING will be removed in a future release",
-                "8.0.60-R10")
+    @deprecated(
+      "Use Playing; PLAYING will be removed in a future release",
+      "8.0.60-R10")
     val PLAYING = Playing
 
     /**
@@ -82,7 +94,8 @@ object MediaPlayer {
       */
     val Ready = new Status(jfxsm.MediaPlayer.Status.READY)
     @deprecated(
-        "Use Ready; READY will be removed in a future release", "8.0.60-R10")
+      "Use Ready; READY will be removed in a future release",
+      "8.0.60-R10")
     val READY = Ready
 
     /**
@@ -90,29 +103,31 @@ object MediaPlayer {
       * have enough data to continue playing.
       */
     val Stalled = new Status(jfxsm.MediaPlayer.Status.STALLED)
-    @deprecated("Use Stalled; STALLED will be removed in a future release",
-                "8.0.60-R10")
+    @deprecated(
+      "Use Stalled; STALLED will be removed in a future release",
+      "8.0.60-R10")
     val STALLED = Stalled
 
     /**
       * State of the player when playback has stopped.
       */
     val Stopped = new Status(jfxsm.MediaPlayer.Status.STOPPED)
-    @deprecated("Use Stopped; STOPPED will be removed in a future release",
-                "8.0.60-R10")
+    @deprecated(
+      "Use Stopped; STOPPED will be removed in a future release",
+      "8.0.60-R10")
     val STOPPED = Stopped
 
     /**
       * State of the player immediately after creation.
       */
     val Unknown = new Status(jfxsm.MediaPlayer.Status.UNKNOWN)
-    @deprecated("Use Unknown; UNKNOWN will be removed in a future release",
-                "8.0.60-R10")
+    @deprecated(
+      "Use Unknown; UNKNOWN will be removed in a future release",
+      "8.0.60-R10")
     val UNKNOWN = Unknown
 
     protected override def unsortedValues: Array[Status] =
-      Array(
-          Disposed, Halted, Paused, Playing, Ready, Stalled, Stopped, Unknown)
+      Array(Disposed, Halted, Paused, Playing, Ready, Stalled, Stopped, Unknown)
   }
 
   /**

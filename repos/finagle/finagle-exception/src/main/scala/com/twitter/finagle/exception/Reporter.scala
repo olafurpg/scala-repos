@@ -3,8 +3,17 @@ package com.twitter.finagle.exception
 import com.twitter.app.GlobalFlag
 import com.twitter.conversions.time._
 import com.twitter.finagle.builder.ClientBuilder
-import com.twitter.finagle.exception.thriftscala.{LogEntry, ResultCode, Scribe, Scribe$FinagleClient}
-import com.twitter.finagle.stats.{ClientStatsReceiver, NullStatsReceiver, StatsReceiver}
+import com.twitter.finagle.exception.thriftscala.{
+  LogEntry,
+  ResultCode,
+  Scribe,
+  Scribe$FinagleClient
+}
+import com.twitter.finagle.stats.{
+  ClientStatsReceiver,
+  NullStatsReceiver,
+  StatsReceiver
+}
 import com.twitter.finagle.thrift.{Protocols, ThriftClientFramedCodec}
 import com.twitter.finagle.tracing.Trace
 import com.twitter.finagle.util.ReporterFactory
@@ -44,7 +53,9 @@ object Reporter {
     * receive method is called does not report any endpoints.
     */
   def defaultReporter(
-      scribeHost: String, scribePort: Int, serviceName: String): Reporter = {
+      scribeHost: String,
+      scribePort: Int,
+      serviceName: String): Reporter = {
     new Reporter(makeClient(scribeHost, scribePort), serviceName)
   }
 
@@ -71,8 +82,9 @@ object Reporter {
     * monitor option.
     */
   @deprecated("Use reporterFactory instead")
-  def sourceReporter(scribeHost: String,
-                     scribePort: Int): (String, SocketAddress) => Monitor = {
+  def sourceReporter(
+      scribeHost: String,
+      scribePort: Int): (String, SocketAddress) => Monitor = {
     monitorFactory(scribeHost, scribePort).serverMonitor
   }
 
@@ -86,8 +98,7 @@ object Reporter {
 
       def clientMonitor(serviceName: String): Reporter =
         new Reporter(scribeClient, serviceName).withClient()
-      def serverMonitor(
-          serviceName: String, address: SocketAddress): Reporter =
+      def serverMonitor(serviceName: String, address: SocketAddress): Reporter =
         new Reporter(scribeClient, serviceName).withSource(address)
     }
 
@@ -120,12 +131,13 @@ object Reporter {
   * which case there should be no network failure. If there is failure in this case, something else
   * is very wrong!
   */
-sealed case class Reporter(client: Scribe[Future],
-                           serviceName: String,
-                           statsReceiver: StatsReceiver = NullStatsReceiver,
-                           private val sourceAddress: Option[String] = Some(
-                                 InetAddress.getLoopbackAddress.getHostName),
-                           private val clientAddress: Option[String] = None)
+sealed case class Reporter(
+    client: Scribe[Future],
+    serviceName: String,
+    statsReceiver: StatsReceiver = NullStatsReceiver,
+    private val sourceAddress: Option[String] = Some(
+      InetAddress.getLoopbackAddress.getHostName),
+    private val clientAddress: Option[String] = None)
     extends Monitor {
 
   private[this] val okCounter = statsReceiver.counter("report_exception_ok")
@@ -161,8 +173,8 @@ sealed case class Reporter(client: Scribe[Future],
     * endpoint).
     */
   def createEntry(e: Throwable): LogEntry = {
-    var se = new ServiceException(
-        serviceName, e, Time.now, Trace.id.traceId.toLong)
+    var se =
+      new ServiceException(serviceName, e, Time.now, Trace.id.traceId.toLong)
 
     sourceAddress foreach { sa =>
       se = se withSource sa
@@ -171,8 +183,7 @@ sealed case class Reporter(client: Scribe[Future],
       se = se withClient ca
     }
 
-    LogEntry(
-        Reporter.scribeCategory, GZIPStringEncoder.encodeString(se.toJson))
+    LogEntry(Reporter.scribeCategory, GZIPStringEncoder.encodeString(se.toJson))
   }
 
   /**
@@ -183,7 +194,7 @@ sealed case class Reporter(client: Scribe[Future],
     */
   def handle(t: Throwable): Boolean = {
     client.log(createEntry(t) :: Nil) onSuccess {
-      case ResultCode.Ok => okCounter.incr()
+      case ResultCode.Ok       => okCounter.incr()
       case ResultCode.TryLater => tryLaterCounter.incr()
     } onFailure {
       case e => statsReceiver.counter("report_exception_" + e.toString).incr()
@@ -195,8 +206,8 @@ sealed case class Reporter(client: Scribe[Future],
 
 object host
     extends GlobalFlag[InetSocketAddress](
-        new InetSocketAddress("localhost", 1463),
-        "Host to scribe exception messages")
+      new InetSocketAddress("localhost", 1463),
+      "Host to scribe exception messages")
 
 class ExceptionReporter extends ReporterFactory {
   private[this] val client =

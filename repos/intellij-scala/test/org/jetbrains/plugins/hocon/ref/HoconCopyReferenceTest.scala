@@ -17,5 +17,4 @@ class HoconCopyReferenceTest
       .getTransferData(DataFlavor.stringFlavor)
       .asInstanceOf[String]
 }
-object HoconCopyReferenceTest
-    extends TestSuiteCompanion[HoconCopyReferenceTest]
+object HoconCopyReferenceTest extends TestSuiteCompanion[HoconCopyReferenceTest]

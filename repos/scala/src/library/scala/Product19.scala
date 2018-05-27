@@ -11,70 +11,92 @@ package scala
 
 object Product19 {
   def unapply[
-      T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19](
-      x: Product19[T1,
-                   T2,
-                   T3,
-                   T4,
-                   T5,
-                   T6,
-                   T7,
-                   T8,
-                   T9,
-                   T10,
-                   T11,
-                   T12,
-                   T13,
-                   T14,
-                   T15,
-                   T16,
-                   T17,
-                   T18,
-                   T19]): Option[Product19[T1,
-                                           T2,
-                                           T3,
-                                           T4,
-                                           T5,
-                                           T6,
-                                           T7,
-                                           T8,
-                                           T9,
-                                           T10,
-                                           T11,
-                                           T12,
-                                           T13,
-                                           T14,
-                                           T15,
-                                           T16,
-                                           T17,
-                                           T18,
-                                           T19]] =
+      T1,
+      T2,
+      T3,
+      T4,
+      T5,
+      T6,
+      T7,
+      T8,
+      T9,
+      T10,
+      T11,
+      T12,
+      T13,
+      T14,
+      T15,
+      T16,
+      T17,
+      T18,
+      T19](
+      x: Product19[
+        T1,
+        T2,
+        T3,
+        T4,
+        T5,
+        T6,
+        T7,
+        T8,
+        T9,
+        T10,
+        T11,
+        T12,
+        T13,
+        T14,
+        T15,
+        T16,
+        T17,
+        T18,
+        T19]): Option[Product19[
+    T1,
+    T2,
+    T3,
+    T4,
+    T5,
+    T6,
+    T7,
+    T8,
+    T9,
+    T10,
+    T11,
+    T12,
+    T13,
+    T14,
+    T15,
+    T16,
+    T17,
+    T18,
+    T19]] =
     Some(x)
 }
 
 /** Product19 is a cartesian product of 19 components.
   *  @since 2.3
   */
-trait Product19[+T1,
-                +T2,
-                +T3,
-                +T4,
-                +T5,
-                +T6,
-                +T7,
-                +T8,
-                +T9,
-                +T10,
-                +T11,
-                +T12,
-                +T13,
-                +T14,
-                +T15,
-                +T16,
-                +T17,
-                +T18,
-                +T19]
-    extends Any with Product {
+trait Product19[
+    +T1,
+    +T2,
+    +T3,
+    +T4,
+    +T5,
+    +T6,
+    +T7,
+    +T8,
+    +T9,
+    +T10,
+    +T11,
+    +T12,
+    +T13,
+    +T14,
+    +T15,
+    +T16,
+    +T17,
+    +T18,
+    +T19]
+    extends Any
+    with Product {
 
   /** The arity of this product.
     *  @return 19
@@ -90,16 +112,16 @@ trait Product19[+T1,
     */
   @throws(classOf[IndexOutOfBoundsException])
   override def productElement(n: Int) = n match {
-    case 0 => _1
-    case 1 => _2
-    case 2 => _3
-    case 3 => _4
-    case 4 => _5
-    case 5 => _6
-    case 6 => _7
-    case 7 => _8
-    case 8 => _9
-    case 9 => _10
+    case 0  => _1
+    case 1  => _2
+    case 2  => _3
+    case 3  => _4
+    case 4  => _5
+    case 5  => _6
+    case 6  => _7
+    case 7  => _8
+    case 8  => _9
+    case 9  => _10
     case 10 => _11
     case 11 => _12
     case 12 => _13
@@ -109,7 +131,7 @@ trait Product19[+T1,
     case 16 => _17
     case 17 => _18
     case 18 => _19
-    case _ => throw new IndexOutOfBoundsException(n.toString())
+    case _  => throw new IndexOutOfBoundsException(n.toString())
   }
 
   /** A projection of element 1 of this Product.

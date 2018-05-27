@@ -55,7 +55,7 @@ object RowIterator {
   def fromScala(scalaIter: Iterator[InternalRow]): RowIterator = {
     scalaIter match {
       case wrappedRowIter: RowIteratorToScala => wrappedRowIter.rowIter
-      case _ => new RowIteratorFromScala(scalaIter)
+      case _                                  => new RowIteratorFromScala(scalaIter)
     }
   }
 }

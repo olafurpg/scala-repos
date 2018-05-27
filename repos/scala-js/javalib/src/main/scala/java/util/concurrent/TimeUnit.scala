@@ -101,7 +101,13 @@ object TimeUnit {
   }
 
   private[this] val _values: Array[TimeUnit] = Array(
-      NANOSECONDS, MICROSECONDS, MILLISECONDS, SECONDS, MINUTES, HOURS, DAYS)
+    NANOSECONDS,
+    MICROSECONDS,
+    MILLISECONDS,
+    SECONDS,
+    MINUTES,
+    HOURS,
+    DAYS)
 
   // deliberately without type ascription to make them compile-time constants
   private final val C0 = 1L

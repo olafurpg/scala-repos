@@ -33,10 +33,10 @@ class FlowErrorDocSpec extends AkkaSpec {
     //#resume
     val decider: Supervision.Decider = {
       case _: ArithmeticException => Supervision.Resume
-      case _ => Supervision.Stop
+      case _                      => Supervision.Stop
     }
     implicit val materializer = ActorMaterializer(
-        ActorMaterializerSettings(system).withSupervisionStrategy(decider))
+      ActorMaterializerSettings(system).withSupervisionStrategy(decider))
     val source = Source(0 to 5).map(100 / _)
     val result = source.runWith(Sink.fold(0)(_ + _))
     // the element causing division by zero will be dropped
@@ -51,7 +51,7 @@ class FlowErrorDocSpec extends AkkaSpec {
     implicit val materializer = ActorMaterializer()
     val decider: Supervision.Decider = {
       case _: ArithmeticException => Supervision.Resume
-      case _ => Supervision.Stop
+      case _                      => Supervision.Stop
     }
     val flow = Flow[Int]
       .filter(100 / _ < 50)
@@ -72,7 +72,7 @@ class FlowErrorDocSpec extends AkkaSpec {
     implicit val materializer = ActorMaterializer()
     val decider: Supervision.Decider = {
       case _: IllegalArgumentException => Supervision.Restart
-      case _ => Supervision.Stop
+      case _                           => Supervision.Stop
     }
     val flow = Flow[Int]
       .scan(0) { (acc, elem) =>

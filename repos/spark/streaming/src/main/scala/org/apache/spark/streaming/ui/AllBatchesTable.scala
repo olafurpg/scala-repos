@@ -21,7 +21,9 @@ import scala.xml.Node
 
 import org.apache.spark.ui.{UIUtils => SparkUIUtils}
 
-private[ui] abstract class BatchTableBase(tableId: String, batchInterval: Long) {
+private[ui] abstract class BatchTableBase(
+    tableId: String,
+    batchInterval: Long) {
 
   protected def columns: Seq[Node] = {
     <th>Batch Time</th>
@@ -44,13 +46,16 @@ private[ui] abstract class BatchTableBase(tableId: String, batchInterval: Long) 
   protected def getFirstFailureTableCell(batch: BatchUIData): Seq[Node] = {
     val firstFailureReason =
       batch.outputOperations.flatMap(_._2.failureReason).headOption
-    firstFailureReason.map { failureReason =>
-      val failureReasonForUI =
-        UIUtils.createOutputOperationFailureForUI(failureReason)
-      UIUtils.failureReasonCell(failureReasonForUI,
-                                rowspan = 1,
-                                includeFirstLineInExpandDetails = false)
-    }.getOrElse(<td>-</td>)
+    firstFailureReason
+      .map { failureReason =>
+        val failureReasonForUI =
+          UIUtils.createOutputOperationFailureForUI(failureReason)
+        UIUtils.failureReasonCell(
+          failureReasonForUI,
+          rowspan = 1,
+          includeFirstLineInExpandDetails = false)
+      }
+      .getOrElse(<td>-</td>)
   }
 
   protected def baseRow(batch: BatchUIData): Seq[Node] = {
@@ -115,9 +120,10 @@ private[ui] abstract class BatchTableBase(tableId: String, batchInterval: Long) 
   protected def renderRows: Seq[Node]
 }
 
-private[ui] class ActiveBatchTable(runningBatches: Seq[BatchUIData],
-                                   waitingBatches: Seq[BatchUIData],
-                                   batchInterval: Long)
+private[ui] class ActiveBatchTable(
+    runningBatches: Seq[BatchUIData],
+    waitingBatches: Seq[BatchUIData],
+    batchInterval: Long)
     extends BatchTableBase("active-batches-table", batchInterval) {
 
   private val firstFailureReason = getFirstFailureReason(runningBatches)
@@ -163,7 +169,8 @@ private[ui] class ActiveBatchTable(runningBatches: Seq[BatchUIData],
 }
 
 private[ui] class CompletedBatchTable(
-    batches: Seq[BatchUIData], batchInterval: Long)
+    batches: Seq[BatchUIData],
+    batchInterval: Long)
     extends BatchTableBase("completed-batches-table", batchInterval) {
 
   private val firstFailureReason = getFirstFailureReason(batches)

@@ -9,23 +9,28 @@ import java.util.TimeZone
 
 object DiffUtil {
 
-  def compareContents(original: Seq[String],
-                      revised: Seq[String],
-                      originalFile: File = new File("a"),
-                      revisedFile: File = new File("b")): String = {
+  def compareContents(
+      original: Seq[String],
+      revised: Seq[String],
+      originalFile: File = new File("a"),
+      revisedFile: File = new File("b")): String = {
     import collection.JavaConverters._
     val diff = difflib.DiffUtils.diff(original.asJava, revised.asJava)
     val originalInfo =
       originalFile.getAbsolutePath() + "\t" + fileModificationTimeOrEpoch(
-          originalFile)
+        originalFile)
     val revisedInfo =
       revisedFile.getAbsolutePath() + "\t" + fileModificationTimeOrEpoch(
-          revisedFile)
+        revisedFile)
     if (diff.getDeltas.isEmpty) ""
     else
       difflib.DiffUtils
         .generateUnifiedDiff(
-            originalInfo, revisedInfo, original.asJava, diff, 1)
+          originalInfo,
+          revisedInfo,
+          original.asJava,
+          diff,
+          1)
         .asScala
         .mkString("", "\n", "\n")
   }

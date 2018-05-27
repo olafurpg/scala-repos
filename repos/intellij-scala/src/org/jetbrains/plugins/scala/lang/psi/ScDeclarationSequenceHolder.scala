@@ -11,23 +11,29 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScStableCodeReferenceElement
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScDeclaredElementsHolder
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScNamedElement
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScTypeDefinition, ScTrait, ScClass, ScObject}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScTypeDefinition,
+  ScTrait,
+  ScClass,
+  ScObject
+}
 import org.jetbrains.plugins.scala.lang.resolve.ResolveTargets
 import org.jetbrains.plugins.scala.lang.resolve.processor.BaseProcessor
 
 import scala.collection.Seq
 
 trait ScDeclarationSequenceHolder extends ScalaPsiElement {
-  override def processDeclarations(processor: PsiScopeProcessor,
-                                   state: ResolveState,
-                                   lastParent: PsiElement,
-                                   place: PsiElement): Boolean = {
+  override def processDeclarations(
+      processor: PsiScopeProcessor,
+      state: ResolveState,
+      lastParent: PsiElement,
+      place: PsiElement): Boolean = {
     def processElement(e: PsiElement, state: ResolveState): Boolean = {
       def isOkForFakeCompanionModule(t: ScTypeDefinition): Boolean = {
         (processor match {
           case b: BaseProcessor =>
             b.kinds.contains(ResolveTargets.OBJECT) ||
-            b.kinds.contains(ResolveTargets.VAL)
+              b.kinds.contains(ResolveTargets.VAL)
           case _ => true
         }) && t.fakeCompanionModule.isDefined
       }
@@ -40,7 +46,7 @@ trait ScDeclarationSequenceHolder extends ScalaPsiElement {
           }
           c.getSyntheticImplicitMethod match {
             case Some(impl) => if (!processElement(impl, state)) return false
-            case _ =>
+            case _          =>
           }
           true
         case t: ScTrait =>
@@ -66,7 +72,7 @@ trait ScDeclarationSequenceHolder extends ScalaPsiElement {
     if (lastParent != null) {
       var run = lastParent match {
         case element: ScalaPsiElement => element.getDeepSameElementInContext
-        case _ => lastParent
+        case _                        => lastParent
       }
       while (run != null) {
         ProgressManager.checkCanceled()

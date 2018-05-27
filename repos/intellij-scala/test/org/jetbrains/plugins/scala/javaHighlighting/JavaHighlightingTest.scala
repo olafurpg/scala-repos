@@ -5,8 +5,15 @@ import com.intellij.ide.highlighter.JavaFileType
 import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.pom.java.LanguageLevel
 import com.intellij.psi.{PsiDocumentManager, PsiFile}
-import org.jetbrains.plugins.scala.annotator.{AnnotatorHolderMock, ScalaAnnotator, _}
-import org.jetbrains.plugins.scala.base.{ScalaFixtureTestCase, ScalaLibraryLoader}
+import org.jetbrains.plugins.scala.annotator.{
+  AnnotatorHolderMock,
+  ScalaAnnotator,
+  _
+}
+import org.jetbrains.plugins.scala.base.{
+  ScalaFixtureTestCase,
+  ScalaLibraryLoader
+}
 import org.jetbrains.plugins.scala.extensions.PsiElementExt
 import org.jetbrains.plugins.scala.util.TestUtils
 import org.junit.Assert
@@ -112,8 +119,11 @@ class JavaHighlightingTest extends ScalaFixtureTestCase {
         |}
       """.stripMargin
 
-    assertMatches(messagesFromJavaCode(
-            scala, java, javaClassName = "JavaHighlightingValueTypes")) {
+    assertMatches(
+      messagesFromJavaCode(
+        scala,
+        java,
+        javaClassName = "JavaHighlightingValueTypes")) {
       case Error("(42.0)", CannotBeApplied()) :: Nil =>
     }
   }
@@ -132,8 +142,11 @@ class JavaHighlightingTest extends ScalaFixtureTestCase {
         |}
       """.stripMargin
 
-    assertNoErrors(messagesFromJavaCode(
-            scalaFileText = "", java, javaClassName = "OptionApply"))
+    assertNoErrors(
+      messagesFromJavaCode(
+        scalaFileText = "",
+        java,
+        javaClassName = "OptionApply"))
   }
 
   def testAccessBacktick(): Unit = {
@@ -155,7 +168,7 @@ class JavaHighlightingTest extends ScalaFixtureTestCase {
       """.stripMargin
 
     assertMatches(
-        messagesFromJavaCode(scala, java, javaClassName = "TestJavaAAA")) {
+      messagesFromJavaCode(scala, java, javaClassName = "TestJavaAAA")) {
       case Error("get$u0060type$u0060", CannotResolveMethod()) :: Nil =>
     }
   }
@@ -183,7 +196,7 @@ class JavaHighlightingTest extends ScalaFixtureTestCase {
       """.stripMargin
 
     assertNoErrors(
-        messagesFromJavaCode(scala, java, javaClassName = "ThrowsJava"))
+      messagesFromJavaCode(scala, java, javaClassName = "ThrowsJava"))
   }
 
   def testOverrideFinal(): Unit = {
@@ -242,7 +255,7 @@ class JavaHighlightingTest extends ScalaFixtureTestCase {
       """.stripMargin
 
     assertNoErrors(
-        messagesFromJavaCode(scala, java, javaClassName = "CaseClassExtended"))
+      messagesFromJavaCode(scala, java, javaClassName = "CaseClassExtended"))
   }
 
   def testOverrideDefaultWithStaticSCL8861(): Unit = {
@@ -328,7 +341,7 @@ class JavaHighlightingTest extends ScalaFixtureTestCase {
         |}
       """.stripMargin
     assertNoErrors(
-        messagesFromJavaCode(scalaCode, javaCode, "JavaClientSCL3390"))
+      messagesFromJavaCode(scalaCode, javaCode, "JavaClientSCL3390"))
     assertNoErrors(messagesFromScalaCode(scalaCode, javaCode))
   }
 
@@ -392,7 +405,7 @@ class JavaHighlightingTest extends ScalaFixtureTestCase {
         |public class SCL8866A extends Base<String, String> {}
       """.stripMargin
     assertNoErrors(
-        messagesFromJavaCode(scalaCode, javaCode, javaClassName = "SCL8866A"))
+      messagesFromJavaCode(scalaCode, javaCode, javaClassName = "SCL8866A"))
   }
 
   def testOverrideScalaFromJavaUpperBound(): Unit = {
@@ -411,8 +424,11 @@ class JavaHighlightingTest extends ScalaFixtureTestCase {
         |}
       """.stripMargin
 
-    assertNoErrors(messagesFromJavaCode(
-            scalaCode, javaCode, javaClassName = "SCL5852WrapsFoo"))
+    assertNoErrors(
+      messagesFromJavaCode(
+        scalaCode,
+        javaCode,
+        javaClassName = "SCL5852WrapsFoo"))
   }
 
   def testGenericsParameterizedInnerClass(): Unit = {
@@ -529,12 +545,14 @@ class JavaHighlightingTest extends ScalaFixtureTestCase {
     assertNoErrors(messagesFromJavaCode(scalaCode, javaCode, "SCL9661"))
   }
 
-  def messagesFromJavaCode(scalaFileText: String,
-                           javaFileText: String,
-                           javaClassName: String): List[Message] = {
+  def messagesFromJavaCode(
+      scalaFileText: String,
+      javaFileText: String,
+      javaClassName: String): List[Message] = {
     myFixture.addFileToProject("dummy.scala", scalaFileText)
     val myFile: PsiFile = myFixture.addFileToProject(
-        javaClassName + JavaFileType.DOT_DEFAULT_EXTENSION, javaFileText)
+      javaClassName + JavaFileType.DOT_DEFAULT_EXTENSION,
+      javaFileText)
     myFixture.openFileInEditor(myFile.getVirtualFile)
     val allInfo = myFixture.doHighlighting()
 
@@ -547,7 +565,8 @@ class JavaHighlightingTest extends ScalaFixtureTestCase {
   }
 
   def messagesFromScalaCode(
-      scalaFileText: String, javaFileText: String): List[Message] = {
+      scalaFileText: String,
+      javaFileText: String): List[Message] = {
     myFixture.addFileToProject("dummy.java", javaFileText)
     myFixture.configureByText("dummy.scala", scalaFileText)
     PsiDocumentManager.getInstance(getProject).commitAllDocuments()
@@ -558,14 +577,13 @@ class JavaHighlightingTest extends ScalaFixtureTestCase {
     getFile.depthFirst.foreach(annotator.annotate(_, mock))
     mock.annotations.filter {
       case Error(_, null) | Error(null, _) => false
-      case Error(_, _) => true
-      case _ => false
+      case Error(_, _)                     => true
+      case _                               => false
     }
   }
 
   def assertMatches[T](actual: T)(pattern: PartialFunction[T, Unit]) {
-    Assert.assertTrue(
-        "actual: " + actual.toString, pattern.isDefinedAt(actual))
+    Assert.assertTrue("actual: " + actual.toString, pattern.isDefinedAt(actual))
   }
 
   def assertNoErrors(messages: List[Message]): Unit = {
@@ -577,7 +595,7 @@ class JavaHighlightingTest extends ScalaFixtureTestCase {
   val CannotResolveMethod = ContainsPattern("Cannot resolve method")
   val CannotBeApplied = ContainsPattern("cannot be applied")
   val CannotBeInstantianted = ContainsPattern(
-      "is abstract; cannot be instantiated")
+    "is abstract; cannot be instantiated")
 
   case class ContainsPattern(fragment: String) {
     def unapply(s: String) = s.contains(fragment)
@@ -589,8 +607,8 @@ class JavaHighlightingTest extends ScalaFixtureTestCase {
     super.setUp()
 
     TestUtils.setLanguageLevel(getProject, LanguageLevel.JDK_1_8)
-    scalaLibraryLoader = new ScalaLibraryLoader(
-        getProject, myFixture.getModule, null)
+    scalaLibraryLoader =
+      new ScalaLibraryLoader(getProject, myFixture.getModule, null)
     scalaLibraryLoader.loadScala(TestUtils.DEFAULT_SCALA_SDK_VERSION)
   }
 

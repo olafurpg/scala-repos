@@ -53,10 +53,11 @@ trait TreeAndTypeAnalysis extends Debugging {
             binder.name != nme.WILDCARD && !(pt <:< pat.tpe)
           if (settings.warnUnsoundMatch && unsoundAssumptionUsed)
             reporter.warning(
-                pat.pos,
-                sm"""The value matched by $pat is bound to ${binder.name}, which may be used under the
+              pat.pos,
+              sm"""The value matched by $pat is bound to ${binder.name}, which may be used under the
                   |unsound assumption that it has type ${pat.tpe}, whereas we can only safely
-                  |count on it having type $pt, as the pattern is matched using `==` (see SI-1503).""")
+                  |count on it having type $pt, as the pattern is matched using `==` (see SI-1503)."""
+            )
 
           pat.tpe
         }
@@ -88,9 +89,9 @@ trait TreeAndTypeAnalysis extends Debugging {
   def equivalentTree(a: Tree, b: Tree): Boolean = (a, b) match {
     case (Select(qual1, _), Select(qual2, _)) =>
       equivalentTree(qual1, qual2) && a.symbol == b.symbol
-    case (Ident(_), Ident(_)) => a.symbol == b.symbol
+    case (Ident(_), Ident(_))       => a.symbol == b.symbol
     case (Literal(c1), Literal(c2)) => c1 == c2
-    case (This(_), This(_)) => a.symbol == b.symbol
+    case (This(_), This(_))         => a.symbol == b.symbol
     case (Apply(fun1, args1), Apply(fun2, args2)) =>
       equivalentTree(fun1, fun2) && args1.corresponds(args2)(equivalentTree)
     // Those are the only cases we need to handle in the pattern matcher
@@ -149,15 +150,16 @@ trait TreeAndTypeAnalysis extends Debugging {
               sym.sealedChildren.toList
                 .sortBy(_.sealedSortName)
                 .filterNot(x =>
-                      x.isSealed && x.isAbstractClass &&
-                      !isPrimitiveValueClass(x))
+                  x.isSealed && x.isAbstractClass &&
+                    !isPrimitiveValueClass(x))
             }
 
             // enumerate only direct subclasses,
             // subclasses of subclasses are enumerated in the next iteration
             // and added to a new group
             def groupChildren(
-                wl: List[Symbol], acc: List[List[Type]]): List[List[Type]] =
+                wl: List[Symbol],
+                acc: List[List[Type]]): List[List[Type]] =
               wl match {
                 case hd :: tl =>
                   val children = enumerateChildren(hd)
@@ -172,28 +174,28 @@ trait TreeAndTypeAnalysis extends Debugging {
 
             groupChildren(sym :: Nil, Nil)
           } else {
-            val subclasses = debug.patmatResult(
-                s"enum $sym sealed, subclasses")(
+            val subclasses =
+              debug.patmatResult(s"enum $sym sealed, subclasses")(
                 // symbols which are both sealed and abstract need not be covered themselves, because
                 // all of their children must be and they cannot otherwise be created.
                 sym.sealedDescendants.toList sortBy (_.sealedSortName) filterNot
-                (x =>
-                      x.isSealed && x.isAbstractClass &&
+                  (x =>
+                    x.isSealed && x.isAbstractClass &&
                       !isPrimitiveValueClass(x))
-            )
+              )
 
             List(
-                debug.patmatResult(
-                    s"enum sealed tp=$tp, tpApprox=$tpApprox as") {
-              // valid subtypes are turned into checkable types, as we are entering the realm of the dynamic
-              filterChildren(subclasses)
-            })
+              debug.patmatResult(s"enum sealed tp=$tp, tpApprox=$tpApprox as") {
+                // valid subtypes are turned into checkable types, as we are entering the realm of the dynamic
+                filterChildren(subclasses)
+              })
           }
         case sym if sym.isCase =>
           List(List(tp))
 
         case sym =>
-          debug.patmat("enum unsealed " +
+          debug.patmat(
+            "enum unsealed " +
               ((tp, sym, sym.isSealed, isPrimitiveValueClass(sym))))
           Nil
       }
@@ -226,8 +228,8 @@ trait TreeAndTypeAnalysis extends Debugging {
     def uncheckableType(tp: Type): Boolean = {
       val checkable =
         ((isTupleType(tp) &&
-                tupleComponents(tp).exists(tp => !uncheckableType(tp))) ||
-            enumerateSubtypes(tp, grouped = false).nonEmpty)
+          tupleComponents(tp).exists(tp => !uncheckableType(tp))) ||
+          enumerateSubtypes(tp, grouped = false).nonEmpty)
       // if (!checkable) debug.patmat("deemed uncheckable: "+ tp)
       !checkable
     }
@@ -235,7 +237,9 @@ trait TreeAndTypeAnalysis extends Debugging {
 }
 
 trait MatchApproximation
-    extends TreeAndTypeAnalysis with ScalaLogic with MatchTreeMaking {
+    extends TreeAndTypeAnalysis
+    with ScalaLogic
+    with MatchTreeMaking {
   import global._
   import global.definitions._
 
@@ -275,16 +279,16 @@ trait MatchApproximation
 
       def uniqueEqualityProp(testedPath: Tree, rhs: Tree): Prop =
         uniqueEqualityProps getOrElseUpdate
-        ((testedPath, rhs), Eq(Var(testedPath), ValueConst(rhs)))
+          ((testedPath, rhs), Eq(Var(testedPath), ValueConst(rhs)))
 
       // overridden in TreeMakersToPropsIgnoreNullChecks
       def uniqueNonNullProp(testedPath: Tree): Prop =
         uniqueNonNullProps getOrElseUpdate
-        (testedPath, Not(Eq(Var(testedPath), NullConst)))
+          (testedPath, Not(Eq(Var(testedPath), NullConst)))
 
       def uniqueTypeProp(testedPath: Tree, pt: Type): Prop =
         uniqueTypeProps getOrElseUpdate
-        ((testedPath, pt), Eq(Var(testedPath), TypeConst(checkableType(pt))))
+          ((testedPath, pt), Eq(Var(testedPath), TypeConst(checkableType(pt))))
 
       // a variable in this set should never be replaced by a tree that "does not consist of a selection on a variable in this set" (intuitively)
       private val pointsToBound = mutable.HashSet(root)
@@ -352,9 +356,9 @@ trait MatchApproximation
           val okSubst =
             Substitution(unboundFrom, unboundTo map (normalize(_))) // it's important substitution does not duplicate trees here -- it helps to keep hash consing simple, anyway
           pointsToBound ++=
-          ((okSubst.from, okSubst.to).zipped filter { (f, t) =>
-                pointsToBound exists (sym => t.exists(_.symbol == sym))
-              })._1
+            ((okSubst.from, okSubst.to).zipped filter { (f, t) =>
+              pointsToBound exists (sym => t.exists(_.symbol == sym))
+            })._1
           // debug.patmat("pointsToBound: "+ pointsToBound)
 
           accumSubst >>= okSubst
@@ -393,17 +397,20 @@ trait MatchApproximation
                   uniqueNonNullProp(binderToUniqueTree(testedBinder))
                 def equalsTest(pat: Tree, testedBinder: Symbol) =
                   uniqueEqualityProp(
-                      binderToUniqueTree(testedBinder), unique(pat))
+                    binderToUniqueTree(testedBinder),
+                    unique(pat))
                 // rewrite eq test to type test against the singleton type `pat.tpe`; unrelated to == (uniqueEqualityProp), could be null
                 def eqTest(pat: Tree, testedBinder: Symbol) =
                   uniqueTypeProp(
-                      binderToUniqueTree(testedBinder), uniqueTp(pat.tpe))
+                    binderToUniqueTree(testedBinder),
+                    uniqueTp(pat.tpe))
                 def tru = True
               }
               ttm.renderCondition(condStrategy)
             case EqualityTestTreeMaker(prevBinder, patTree, _) =>
               uniqueEqualityProp(
-                  binderToUniqueTree(prevBinder), unique(patTree))
+                binderToUniqueTree(prevBinder),
+                unique(patTree))
             case AlternativesTreeMaker(_, altss, _) =>
               \/(altss map (alts => /\(alts map this)))
             case ProductExtractorTreeMaker(testedBinder, None) =>
@@ -411,12 +418,12 @@ trait MatchApproximation
             case SubstOnlyTreeMaker(_, _) => True
             case GuardTreeMaker(guard) =>
               guard.tpe match {
-                case ConstantTrue => True
+                case ConstantTrue  => True
                 case ConstantFalse => False
-                case _ => handleUnknown(tm)
+                case _             => handleUnknown(tm)
               }
-            case ExtractorTreeMaker(_, _, _) |
-                ProductExtractorTreeMaker(_, _) | BodyTreeMaker(_, _) =>
+            case ExtractorTreeMaker(_, _, _) | ProductExtractorTreeMaker(_, _) |
+                BodyTreeMaker(_, _) =>
               handleUnknown(tm)
           }
         }
@@ -433,9 +440,10 @@ trait MatchApproximation
       private val rewriteListPattern: PartialFunction[TreeMaker, Prop] = {
         case p @ ExtractorTreeMaker(_, _, testedBinder)
             if testedBinder.tpe.typeSymbol == ListClass &&
-            p.checkedLength == Some(0) =>
-          uniqueEqualityProp(binderToUniqueTree(p.prevBinder),
-                             unique(Ident(NilModule) setType NilModule.tpe))
+              p.checkedLength == Some(0) =>
+          uniqueEqualityProp(
+            binderToUniqueTree(p.prevBinder),
+            unique(Ident(NilModule) setType NilModule.tpe))
       }
       val fullRewrite = (irrefutableExtractor orElse rewriteListPattern)
       val refutableRewrite = irrefutableExtractor
@@ -459,16 +467,17 @@ trait MatchApproximation
     }
 
     def approximateMatchConservative(
-        root: Symbol, cases: List[List[TreeMaker]]): List[List[Test]] =
+        root: Symbol,
+        cases: List[List[TreeMaker]]): List[List[Test]] =
       (new TreeMakersToProps(root)).approximateMatch(cases)
 
     // turns a case (represented as a list of abstract tests)
     // into a proposition that is satisfiable if the case may match
     protected final def caseWithoutBodyToProp(tests: List[Test]): Prop =
       /\(
-          tests
-            .takeWhile(t => !t.treeMaker.isInstanceOf[BodyTreeMaker])
-            .map(t => t.prop))
+        tests
+          .takeWhile(t => !t.treeMaker.isInstanceOf[BodyTreeMaker])
+          .map(t => t.prop))
 
     def showTreeMakers(cases: List[List[TreeMaker]]) = {
       debug.patmat("treeMakers:")
@@ -503,9 +512,10 @@ trait MatchAnalysis extends MatchApproximation {
     // the case is reachable if there is a model for -P /\ C,
     // thus, the case is unreachable if there is no model for -(-P /\ C),
     // or, equivalently, P \/ -C, or C => P
-    def unreachableCase(prevBinder: Symbol,
-                        cases: List[List[TreeMaker]],
-                        pt: Type): Option[Int] = {
+    def unreachableCase(
+        prevBinder: Symbol,
+        cases: List[List[TreeMaker]],
+        pt: Type): Option[Int] = {
       val start =
         if (Statistics.canEnable) Statistics.startTimer(patmatAnaReach)
         else null
@@ -524,10 +534,10 @@ trait MatchAnalysis extends MatchApproximation {
         approximate(False) map (t => Not(caseWithoutBodyToProp(t)))
 
       try {
-        val (eqAxiomsFail, symbolicCasesFail) = removeVarEq(
-            propsCasesFail, modelNull = true)
-        val (eqAxiomsOk, symbolicCasesOk) = removeVarEq(
-            propsCasesOk, modelNull = true)
+        val (eqAxiomsFail, symbolicCasesFail) =
+          removeVarEq(propsCasesFail, modelNull = true)
+        val (eqAxiomsOk, symbolicCasesOk) =
+          removeVarEq(propsCasesOk, modelNull = true)
         val eqAxioms =
           simplify(And(eqAxiomsOk, eqAxiomsFail)) // I'm pretty sure eqAxiomsOk == eqAxiomsFail, but not 100% sure.
 
@@ -539,9 +549,10 @@ trait MatchAnalysis extends MatchApproximation {
         var reachable = true
         var caseIndex = 0
 
-        debug.patmat("reachability, vars:\n" +
+        debug.patmat(
+          "reachability, vars:\n" +
             ((propsCasesFail flatMap gatherVariables).distinct map (_.describe) mkString
-                ("\n")))
+              ("\n")))
         debug.patmat(s"equality axioms:\n$eqAxiomsOk")
 
         // invariant (prefixRest.length == current.length) && (prefix.reverse ++ prefixRest == symbolicCasesFail)
@@ -576,9 +587,10 @@ trait MatchAnalysis extends MatchApproximation {
 
     // exhaustivity
 
-    def exhaustive(prevBinder: Symbol,
-                   cases: List[List[TreeMaker]],
-                   pt: Type): List[String] =
+    def exhaustive(
+        prevBinder: Symbol,
+        cases: List[List[TreeMaker]],
+        pt: Type): List[String] =
       if (uncheckableType(prevBinder.info)) Nil
       else {
         // customize TreeMakersToProps (which turns a tree of tree makers into a more abstract DAG of tests)
@@ -594,15 +606,20 @@ trait MatchAnalysis extends MatchApproximation {
 
         val approx = new TreeMakersToPropsIgnoreNullChecks(prevBinder)
         val symbolicCases =
-          approx.approximateMatch(cases, approx.onUnknown { tm =>
-            approx.fullRewrite.applyOrElse[TreeMaker, Prop](tm, {
-              case BodyTreeMaker(_, _) =>
-                True // irrelevant -- will be discarded by symbolCase later
-              case _ => // debug.patmat("backing off due to "+ tm)
-                backoff = true
-                False
-            })
-          }) map caseWithoutBodyToProp
+          approx.approximateMatch(
+            cases,
+            approx.onUnknown { tm =>
+              approx.fullRewrite.applyOrElse[TreeMaker, Prop](
+                tm, {
+                  case BodyTreeMaker(_, _) =>
+                    True // irrelevant -- will be discarded by symbolCase later
+                  case _ => // debug.patmat("backing off due to "+ tm)
+                    backoff = true
+                    False
+                }
+              )
+            }
+          ) map caseWithoutBodyToProp
 
         if (backoff) Nil
         else {
@@ -630,8 +647,8 @@ trait MatchAnalysis extends MatchApproximation {
 
           try {
             // find the models (under which the match fails)
-            val matchFailModels = findAllModelsFor(
-                propToSolvable(matchFails), prevBinder.pos)
+            val matchFailModels =
+              findAllModelsFor(propToSolvable(matchFails), prevBinder.pos)
 
             val scrutVar = Var(prevBinderTree)
             val counterExamples = {
@@ -666,7 +683,7 @@ trait MatchAnalysis extends MatchApproximation {
         //         with Nil and List().
         val result = mutable.Buffer[CounterExample]()
         for (example <- examples
-                           if (!result.exists(example coveredBy _))) result += example
+             if (!result.exists(example coveredBy _))) result += example
         result.toList
       }
     }
@@ -700,10 +717,10 @@ trait MatchAnalysis extends MatchApproximation {
     }
     case class ListExample(ctorArgs: List[CounterExample])
         extends CounterExample {
-      protected[MatchAnalyzer] override def flattenConsArgs: List[
-          CounterExample] = ctorArgs match {
+      protected[MatchAnalyzer] override def flattenConsArgs
+        : List[CounterExample] = ctorArgs match {
         case hd :: tl :: Nil => hd :: tl.flattenConsArgs
-        case _ => Nil
+        case _               => Nil
       }
       protected[MatchAnalyzer] lazy val elems = flattenConsArgs
 
@@ -711,7 +728,8 @@ trait MatchAnalysis extends MatchApproximation {
         other match {
           case other @ ListExample(_) =>
             this == other ||
-            ((elems.length == other.elems.length) && (elems zip other.elems).forall {
+              ((elems.length == other.elems.length) && (elems zip other.elems)
+                .forall {
                   case (a, b) => a coveredBy b
                 })
           case _ => super.coveredBy(other)
@@ -727,7 +745,8 @@ trait MatchAnalysis extends MatchApproximation {
         other match {
           case TupleExample(otherArgs) =>
             this == other ||
-            ((ctorArgs.length == otherArgs.length) && (ctorArgs zip otherArgs).forall {
+              ((ctorArgs.length == otherArgs.length) && (ctorArgs zip otherArgs)
+                .forall {
                   case (a, b) => a coveredBy b
                 })
           case _ => super.coveredBy(other)
@@ -737,7 +756,7 @@ trait MatchAnalysis extends MatchApproximation {
         extends CounterExample {
       override def toString =
         cls.decodedName +
-        (if (cls.isModuleClass) "" else ctorArgs.mkString("(", ", ", ")"))
+          (if (cls.isModuleClass) "" else ctorArgs.mkString("(", ", ", ")"))
     }
 
     case object WildcardExample extends CounterExample {
@@ -749,25 +768,25 @@ trait MatchAnalysis extends MatchApproximation {
 
     // returns a mapping from variable to
     // equal and notEqual symbols
-    def modelToVarAssignment(
-        model: Model): Map[Var, (Seq[Const], Seq[Const])] =
-      model.toSeq.groupBy { f =>
-        f match { case (sym, value) => sym.variable }
-      }.mapValues { xs =>
-        val (trues, falses) = xs.partition(_._2)
-        (trues map (_._1.const), falses map (_._1.const))
-      // should never be more than one value in trues...
-      }
+    def modelToVarAssignment(model: Model): Map[Var, (Seq[Const], Seq[Const])] =
+      model.toSeq
+        .groupBy { f =>
+          f match { case (sym, value) => sym.variable }
+        }
+        .mapValues { xs =>
+          val (trues, falses) = xs.partition(_._2)
+          (trues map (_._1.const), falses map (_._1.const))
+        // should never be more than one value in trues...
+        }
 
-    def varAssignmentString(
-        varAssignment: Map[Var, (Seq[Const], Seq[Const])]) =
+    def varAssignmentString(varAssignment: Map[Var, (Seq[Const], Seq[Const])]) =
       varAssignment.toSeq
         .sortBy(_._1.toString)
         .map {
           case (v, (trues, falses)) =>
             val assignment =
               "== " + (trues mkString ("(", ", ", ")")) + "  != (" +
-              (falses mkString (", ")) + ")"
+                (falses mkString (", ")) + ")"
             v + "(=" + v.path + ": " + v.staticTpCheckable + ") " + assignment
         }
         .mkString("\n")
@@ -813,7 +832,8 @@ trait MatchAnalysis extends MatchApproximation {
       // x1.hd.hd = ...
       // ...
       val varAssignment = modelToVarAssignment(model)
-      debug.patmat("var assignment for model " + model + ":\n" +
+      debug.patmat(
+        "var assignment for model " + model + ":\n" +
           varAssignmentString(varAssignment))
 
       // group symbols that assign values to the same variables (i.e., symbols are mutually exclusive)
@@ -842,8 +862,7 @@ trait MatchAnalysis extends MatchApproximation {
           val oneHot = for {
             s <- syms
           } yield {
-            addVarAssignment(
-                List(s.const), syms.filterNot(_ == s).map(_.const))
+            addVarAssignment(List(s.const), syms.filterNot(_ == s).map(_.const))
           }
           allEqual :: allNotEqual :: oneHot
         } else {
@@ -857,9 +876,8 @@ trait MatchAnalysis extends MatchApproximation {
         // we need the cartesian product here,
         // since we want to report all missing cases
         // (i.e., combinations)
-        val cartesianProd = expanded.reduceLeft(
-            (xs, ys) =>
-              for {
+        val cartesianProd = expanded.reduceLeft((xs, ys) =>
+          for {
             map1 <- xs
             map2 <- ys
           } yield {
@@ -886,9 +904,9 @@ trait MatchAnalysis extends MatchApproximation {
       : Option[CounterExample] = {
       // chop a path into a list of symbols
       def chop(path: Tree): List[Symbol] = path match {
-        case Ident(_) => List(path.symbol)
+        case Ident(_)          => List(path.symbol)
         case Select(pre, name) => chop(pre) :+ path.symbol
-        case _ =>
+        case _                 =>
           // debug.patmat("don't know how to chop "+ path)
           Nil
       }
@@ -900,7 +918,8 @@ trait MatchAnalysis extends MatchApproximation {
         private def findVar(path: List[Symbol]) = path match {
           case List(root) if root == scrutVar.path.symbol => Some(scrutVar)
           case _ =>
-            varAssignment.find { case (v, a) => chop(v.path) == path }
+            varAssignment
+              .find { case (v, a) => chop(v.path) == path }
               .map(_._1)
         }
 
@@ -932,26 +951,28 @@ trait MatchAnalysis extends MatchApproximation {
 
       // node in the tree that describes how to construct a counter-example
       case class VariableAssignment(
-          variable: Var, equalTo: List[Const], notEqualTo: List[Const]) {
+          variable: Var,
+          equalTo: List[Const],
+          notEqualTo: List[Const]) {
         private val fields: mutable.Map[Symbol, VariableAssignment] =
           mutable.HashMap.empty
         // need to prune since the model now incorporates all super types of a constant (needed for reachability)
         private lazy val uniqueEqualTo =
           equalTo filterNot
-          (subsumed =>
-                equalTo.exists(better =>
-                      (better ne subsumed) &&
-                      instanceOfTpImplies(better.tp, subsumed.tp)))
+            (subsumed =>
+              equalTo.exists(better =>
+                (better ne subsumed) &&
+                  instanceOfTpImplies(better.tp, subsumed.tp)))
         private lazy val inSameDomain =
           uniqueEqualTo forall
-          (const =>
-                variable.domainSyms.exists(_.exists(_.const.tp =:= const.tp)))
+            (const =>
+              variable.domainSyms.exists(_.exists(_.const.tp =:= const.tp)))
         private lazy val prunedEqualTo =
           uniqueEqualTo filterNot
-          (subsumed => variable.staticTpCheckable <:< subsumed.tp)
+            (subsumed => variable.staticTpCheckable <:< subsumed.tp)
         private lazy val ctor = (prunedEqualTo match {
           case List(TypeConst(tp)) => tp
-          case _ => variable.staticTpCheckable
+          case _                   => variable.staticTpCheckable
         }).typeSymbol.primaryConstructor
         private lazy val ctorParams =
           if (ctor.paramss.isEmpty) Nil else ctor.paramss.head
@@ -967,7 +988,7 @@ trait MatchAnalysis extends MatchApproximation {
 
         def allFieldAssignmentsLegal: Boolean =
           (fields.keySet subsetOf caseFieldAccs.toSet) &&
-          fields.values.forall(_.allFieldAssignmentsLegal)
+            fields.values.forall(_.allFieldAssignmentsLegal)
 
         private lazy val nonTrivialNonEqualTo = notEqualTo.filterNot { c =>
           c.isAny
@@ -976,18 +997,19 @@ trait MatchAnalysis extends MatchApproximation {
         // NoExample if the constructor call is ill-typed
         // (thus statically impossible -- can we incorporate this into the formula?)
         // beBrief is used to suppress negative information nested in tuples -- it tends to get too noisy
-        def toCounterExample(
-            beBrief: Boolean = false): Option[CounterExample] =
+        def toCounterExample(beBrief: Boolean = false): Option[CounterExample] =
           if (!allFieldAssignmentsLegal) Some(NoExample)
           else {
             debug.patmat(
-                "describing " +
-                ((variable,
-                  equalTo,
-                  notEqualTo,
-                  fields,
-                  cls,
-                  allFieldAssignmentsLegal)))
+              "describing " +
+                (
+                  (
+                    variable,
+                    equalTo,
+                    notEqualTo,
+                    fields,
+                    cls,
+                    allFieldAssignmentsLegal)))
             val res = prunedEqualTo match {
               // a definite assignment to a value
               case List(eq: ValueConst) if fields.isEmpty =>
@@ -998,33 +1020,36 @@ trait MatchAnalysis extends MatchApproximation {
               //  --> typical example is when the scrutinee is a tuple and all the cases first unwrap that tuple and only then test something interesting
               case _
                   if cls != NoSymbol && !isPrimitiveValueClass(cls) &&
-                  (uniqueEqualTo.nonEmpty ||
+                    (uniqueEqualTo.nonEmpty ||
                       (fields.nonEmpty && prunedEqualTo.isEmpty &&
-                          notEqualTo.isEmpty)) =>
+                        notEqualTo.isEmpty)) =>
                 def args(brevity: Boolean = beBrief) = {
                   // figure out the constructor arguments from the field assignment
                   val argLen = (caseFieldAccs.length min ctorParams.length)
 
                   val examples = (0 until argLen)
-                    .map(i =>
-                          fields
-                            .get(caseFieldAccs(i))
-                            .map(_.toCounterExample(brevity)) getOrElse Some(
-                              WildcardExample))
+                    .map(
+                      i =>
+                        fields
+                          .get(caseFieldAccs(i))
+                          .map(_.toCounterExample(brevity)) getOrElse Some(
+                          WildcardExample))
                     .toList
                   sequence(examples)
                 }
 
                 cls match {
                   case ConsClass =>
-                    args().map {
-                      case List(NoExample, l: ListExample) =>
-                        // special case for neg/t7020.scala:
-                        // if we find a counter example `??::*` we report `*::*` instead
-                        // since the `??` originates from uniqueEqualTo containing several instanced of the same type
-                        List(WildcardExample, l)
-                      case args => args
-                    }.map(ListExample)
+                    args()
+                      .map {
+                        case List(NoExample, l: ListExample) =>
+                          // special case for neg/t7020.scala:
+                          // if we find a counter example `??::*` we report `*::*` instead
+                          // since the `??` originates from uniqueEqualTo containing several instanced of the same type
+                          List(WildcardExample, l)
+                        case args => args
+                      }
+                      .map(ListExample)
                   case _ if isTupleSymbol(cls) =>
                     args(brevity = true).map(TupleExample)
                   case _ if cls.isSealed && cls.isAbstractClass =>
@@ -1046,7 +1071,7 @@ trait MatchAnalysis extends MatchApproximation {
                 else {
                   val eqTo =
                     equalTo.headOption getOrElse TypeConst(
-                        variable.staticTpCheckable)
+                      variable.staticTpCheckable)
                   Some(NegativeExample(eqTo, nonTrivialNonEqualTo))
                 }
 
@@ -1074,10 +1099,11 @@ trait MatchAnalysis extends MatchApproximation {
       VariableAssignment(scrutVar).toCounterExample()
     }
 
-    def analyzeCases(prevBinder: Symbol,
-                     cases: List[List[TreeMaker]],
-                     pt: Type,
-                     suppression: Suppression): Unit = {
+    def analyzeCases(
+        prevBinder: Symbol,
+        cases: List[List[TreeMaker]],
+        pt: Type,
+        suppression: Suppression): Unit = {
       if (!suppression.suppressUnreachable) {
         unreachableCase(prevBinder, cases, pt) foreach { caseIndex =>
           reportUnreachable(cases(caseIndex).last.pos)

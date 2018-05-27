@@ -120,11 +120,11 @@ class IndexedRowMatrix @Since("1.0.0")(
       val rowIndex = row.index
       row.vector match {
         case SparseVector(size, indices, values) =>
-          Iterator.tabulate(indices.length)(
-              i => MatrixEntry(rowIndex, indices(i), values(i)))
+          Iterator.tabulate(indices.length)(i =>
+            MatrixEntry(rowIndex, indices(i), values(i)))
         case DenseVector(values) =>
-          Iterator.tabulate(values.length)(
-              i => MatrixEntry(rowIndex, i, values(i)))
+          Iterator.tabulate(values.length)(i =>
+            MatrixEntry(rowIndex, i, values(i)))
       }
     }
     new CoordinateMatrix(entries, numRows(), numCols())
@@ -158,8 +158,9 @@ class IndexedRowMatrix @Since("1.0.0")(
     : SingularValueDecomposition[IndexedRowMatrix, Matrix] = {
 
     val n = numCols().toInt
-    require(k > 0 && k <= n,
-            s"Requested k singular values but got k=$k and numCols=$n.")
+    require(
+      k > 0 && k <= n,
+      s"Requested k singular values but got k=$k and numCols=$n.")
     val indices = rows.map(_.index)
     val svd = toRowMatrix().computeSVD(k, computeU, rCond)
     val U =

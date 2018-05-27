@@ -24,9 +24,13 @@ import scala.util.Try
   * Provides generic features for controller implementations.
   */
 abstract class ControllerBase
-    extends ScalatraFilter with ClientSideValidationFormSupport
-    with JacksonJsonSupport with I18nSupport with FlashMapSupport
-    with Validations with SystemSettingsService {
+    extends ScalatraFilter
+    with ClientSideValidationFormSupport
+    with JacksonJsonSupport
+    with I18nSupport
+    with FlashMapSupport
+    with Validations
+    with SystemSettingsService {
 
   implicit val jsonFormats = gitbucket.core.api.JsonFormat.jsonFormats
 
@@ -38,9 +42,10 @@ abstract class ControllerBase
 //  // Don't set content type via Accept header.
 //  override def format(implicit request: HttpServletRequest) = ""
 
-  override def doFilter(request: ServletRequest,
-                        response: ServletResponse,
-                        chain: FilterChain): Unit =
+  override def doFilter(
+      request: ServletRequest,
+      response: ServletResponse,
+      chain: FilterChain): Unit =
     try {
       val httpRequest = request.asInstanceOf[HttpServletRequest]
       val httpResponse = response.asInstanceOf[HttpServletResponse]
@@ -55,7 +60,7 @@ abstract class ControllerBase
         if (account == null) {
           // Redirect to login form
           httpResponse.sendRedirect(
-              baseUrl + "/signin?redirect=" + StringUtil.urlEncode(path))
+            baseUrl + "/signin?redirect=" + StringUtil.urlEncode(path))
         } else if (account.isAdmin) {
           // H2 Console (administrators only)
           chain.doFilter(request, response)
@@ -85,10 +90,10 @@ abstract class ControllerBase
   implicit def context: Context = {
     contextCache.get match {
       case null => {
-          val context = Context(loadSystemSettings(), LoginAccount, request)
-          contextCache.set(context)
-          context
-        }
+        val context = Context(loadSystemSettings(), LoginAccount, request)
+        contextCache.set(context)
+        context
+      }
       case context => context
     }
   }
@@ -104,8 +109,8 @@ abstract class ControllerBase
       action
     }
 
-  override def ajaxGet[T](
-      path: String, form: ValueType[T])(action: T => Any): Route =
+  override def ajaxGet[T](path: String, form: ValueType[T])(
+      action: T => Any): Route =
     super.ajaxGet(path, form) { form =>
       request.setAttribute(Keys.Request.Ajax, "true")
       action(form)
@@ -117,8 +122,8 @@ abstract class ControllerBase
       action
     }
 
-  override def ajaxPost[T](
-      path: String, form: ValueType[T])(action: T => Any): Route =
+  override def ajaxPost[T](path: String, form: ValueType[T])(
+      action: T => Any): Route =
     super.ajaxPost(path, form) { form =>
       request.setAttribute(Keys.Request.Ajax, "true")
       action(form)
@@ -148,23 +153,24 @@ abstract class ControllerBase
           org.scalatra.Unauthorized(redirect("/signin"))
         } else {
           org.scalatra.Unauthorized(
-              redirect("/signin?redirect=" + StringUtil.urlEncode(
-                      defining(request.getQueryString) { queryString =>
+            redirect("/signin?redirect=" + StringUtil.urlEncode(
+              defining(request.getQueryString) { queryString =>
                 request.getRequestURI.substring(request.getContextPath.length) +
-                (if (queryString != null) "?" + queryString else "")
+                  (if (queryString != null) "?" + queryString else "")
               }
-                  )))
+            )))
         }
       }
     }
 
   // TODO Scala 2.11
-  override def url(path: String,
-                   params: Iterable[(String, Any)] = Iterable.empty,
-                   includeContextPath: Boolean = true,
-                   includeServletPath: Boolean = true,
-                   absolutize: Boolean = true,
-                   withSessionId: Boolean = true)(
+  override def url(
+      path: String,
+      params: Iterable[(String, Any)] = Iterable.empty,
+      includeContextPath: Boolean = true,
+      includeServletPath: Boolean = true,
+      absolutize: Boolean = true,
+      withSessionId: Boolean = true)(
       implicit request: HttpServletRequest,
       response: HttpServletResponse): String =
     if (path.startsWith("http")) path
@@ -185,12 +191,13 @@ abstract class ControllerBase
 
   // jenkins send message as 'application/x-www-form-urlencoded' but scalatra already parsed as multi-part-request.
   def extractFromJsonBody[A](
-      implicit request: HttpServletRequest, mf: Manifest[A]): Option[A] = {
+      implicit request: HttpServletRequest,
+      mf: Manifest[A]): Option[A] = {
     (request.contentType.map(_.split(";").head.toLowerCase) match {
       case Some("application/x-www-form-urlencoded") =>
         multiParams.keys.headOption.map(parse(_))
       case Some("application/json") => Some(parsedBody)
-      case _ => Some(parse(request.body))
+      case _                        => Some(parse(request.body))
     }).filterNot(_ == JNothing).flatMap(j => Try(j.extract[A]).toOption)
   }
 }
@@ -198,20 +205,21 @@ abstract class ControllerBase
 /**
   * Context object for the current request.
   */
-case class Context(settings: SystemSettingsService.SystemSettings,
-                   loginAccount: Option[Account],
-                   request: HttpServletRequest) {
+case class Context(
+    settings: SystemSettingsService.SystemSettings,
+    loginAccount: Option[Account],
+    request: HttpServletRequest) {
   val path = settings.baseUrl.getOrElse(request.getContextPath)
   val currentPath =
     request.getRequestURI.substring(request.getContextPath.length)
   val baseUrl = settings.baseUrl(request)
   val host = new java.net.URL(baseUrl).getHost
   val platform = request.getHeader("User-Agent") match {
-    case null => null
-    case agent if agent.contains("Mac") => "mac"
+    case null                             => null
+    case agent if agent.contains("Mac")   => "mac"
     case agent if agent.contains("Linux") => "linux"
-    case agent if agent.contains("Win") => "windows"
-    case _ => null
+    case agent if agent.contains("Win")   => "windows"
+    case _                                => null
   }
 
   /**
@@ -237,7 +245,9 @@ trait AccountManagementControllerBase extends ControllerBase {
   self: AccountService =>
 
   protected def updateImage(
-      userName: String, fileId: Option[String], clearImage: Boolean): Unit =
+      userName: String,
+      fileId: Option[String],
+      clearImage: Boolean): Unit =
     if (clearImage) {
       getAccountByUserName(userName).flatMap(_.image).map { image =>
         new java.io.File(getUserUploadDir(userName), image).delete()
@@ -247,10 +257,10 @@ trait AccountManagementControllerBase extends ControllerBase {
       fileId.map { fileId =>
         val filename =
           "avatar." + FileUtil.getExtension(
-              session.getAndRemove(Keys.Session.Upload(fileId)).get)
+            session.getAndRemove(Keys.Session.Upload(fileId)).get)
         FileUtils.moveFile(
-            new java.io.File(getTemporaryDir(session.getId), fileId),
-            new java.io.File(getUserUploadDir(userName), filename)
+          new java.io.File(getTemporaryDir(session.getId), fileId),
+          new java.io.File(getUserUploadDir(userName), filename)
         )
         updateAvatarImage(userName, Some(filename))
       }
@@ -258,7 +268,9 @@ trait AccountManagementControllerBase extends ControllerBase {
 
   protected def uniqueUserName: Constraint = new Constraint() {
     override def validate(
-        name: String, value: String, messages: Messages): Option[String] =
+        name: String,
+        value: String,
+        messages: Messages): Option[String] =
       getAccountByUserName(value, true).map { _ =>
         "User already exists."
       }
@@ -266,15 +278,18 @@ trait AccountManagementControllerBase extends ControllerBase {
 
   protected def uniqueMailAddress(paramName: String = ""): Constraint =
     new Constraint() {
-      override def validate(name: String,
-                            value: String,
-                            params: Map[String, String],
-                            messages: Messages): Option[String] =
-        getAccountByMailAddress(value, true).filter { x =>
-          if (paramName.isEmpty) true
-          else Some(x.userName) != params.get(paramName)
-        }.map { _ =>
-          "Mail address is already registered."
-        }
+      override def validate(
+          name: String,
+          value: String,
+          params: Map[String, String],
+          messages: Messages): Option[String] =
+        getAccountByMailAddress(value, true)
+          .filter { x =>
+            if (paramName.isEmpty) true
+            else Some(x.userName) != params.get(paramName)
+          }
+          .map { _ =>
+            "Mail address is already registered."
+          }
     }
 }

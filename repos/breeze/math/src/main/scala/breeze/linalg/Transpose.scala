@@ -45,8 +45,9 @@ object Transpose extends TransposeLowPrio {
 }
 
 trait TransposeLowPrio {
-  implicit def liftOps[Op, T, U, R, RT](implicit op: UFunc.UImpl2[Op, T, U, R],
-                                        canTranspose: CanTranspose[R, RT])
+  implicit def liftOps[Op, T, U, R, RT](
+      implicit op: UFunc.UImpl2[Op, T, U, R],
+      canTranspose: CanTranspose[R, RT])
     : UFunc.UImpl2[Op, Transpose[T], Transpose[U], RT] = {
     new UFunc.UImpl2[Op, Transpose[T], Transpose[U], RT] {
       def apply(a: Transpose[T], b: Transpose[U]) = {

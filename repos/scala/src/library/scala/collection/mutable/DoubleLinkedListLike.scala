@@ -55,11 +55,11 @@ import scala.annotation.migration
   *  @define coll double linked list
   */
 @deprecated(
-    "Low-level linked lists are deprecated due to idiosyncrasies in interface and incomplete features.",
-    "2.11.0")
-trait DoubleLinkedListLike[
-    A, This <: Seq[A] with DoubleLinkedListLike[A, This]]
-    extends SeqLike[A, This] with LinkedListLike[A, This] { self =>
+  "Low-level linked lists are deprecated due to idiosyncrasies in interface and incomplete features.",
+  "2.11.0")
+trait DoubleLinkedListLike[A, This <: Seq[A] with DoubleLinkedListLike[A, This]]
+    extends SeqLike[A, This]
+    with LinkedListLike[A, This] { self =>
 
   /** A reference to the node in the linked list preceding the current node. */
   var prev: This = _
@@ -94,8 +94,9 @@ trait DoubleLinkedListLike[
     *  current node, i.e. `this` node itself will still point "into" the list it
     *  was in.
     */
-  @migration("Double linked list now removes the current node from the list.",
-             "2.9.0")
+  @migration(
+    "Double linked list now removes the current node from the list.",
+    "2.9.0")
   def remove(): Unit = if (nonEmpty) {
     next.prev = prev
     if (prev ne null) prev.next = next // because this could be the first node
@@ -117,7 +118,7 @@ trait DoubleLinkedListLike[
   private def outofbounds(n: Int) =
     throw new IndexOutOfBoundsException(n.toString)
 
-  override def drop(n: Int): This = super [SeqLike].drop(n)
+  override def drop(n: Int): This = super[SeqLike].drop(n)
   override def tail = drop(1)
   override def apply(n: Int): A = atLocation(n)(_.elem)(outofbounds(n))
   override def update(n: Int, x: A): Unit =

@@ -13,10 +13,12 @@ import org.jboss.netty.handler.codec.http.{HttpRequest, HttpChunk, HttpResponse}
 /**
   * Stream chunks into StreamResponses.
   */
-private[twitter] class StreamClientDispatcher[Req : RequestType](
-    trans: Transport[Any, Any], statsReceiver: StatsReceiver)
+private[twitter] class StreamClientDispatcher[Req: RequestType](
+    trans: Transport[Any, Any],
+    statsReceiver: StatsReceiver)
     extends GenSerialClientDispatcher[Req, StreamResponse, Any, Any](
-        trans, statsReceiver) {
+      trans,
+      statsReceiver) {
   import Bijections._
   import GenSerialClientDispatcher.wrapWriteException
 
@@ -31,12 +33,14 @@ private[twitter] class StreamClientDispatcher[Req : RequestType](
         Future.Done
 
       case chunk: HttpChunk =>
-        out.send(ChannelBufferBuf.Owned(chunk.getContent)).sync() before readChunks(
-            out)
+        out
+          .send(ChannelBufferBuf.Owned(chunk.getContent))
+          .sync() before readChunks(out)
 
       case invalid =>
-        Future.exception(new IllegalArgumentException(
-                "invalid message \"%s\"".format(invalid)))
+        Future.exception(
+          new IllegalArgumentException(
+            "invalid message \"%s\"".format(invalid)))
     }
 
   protected def dispatch(req: Req, p: Promise[StreamResponse]) =
@@ -76,8 +80,9 @@ private[twitter] class StreamClientDispatcher[Req : RequestType](
             }
 
           case invalid =>
-            Future.exception(new IllegalArgumentException(
-                    "invalid message \"%s\"".format(invalid)))
+            Future.exception(
+              new IllegalArgumentException(
+                "invalid message \"%s\"".format(invalid)))
         }
       }
 }

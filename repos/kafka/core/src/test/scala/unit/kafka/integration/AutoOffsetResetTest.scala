@@ -5,7 +5,7 @@
   * The ASF licenses this file to You under the Apache License, Version 2.0
   * (the "License"); you may not use this file except in compliance with
   * the License.  You may obtain a copy of the License at
-  * 
+  *
   *    http://www.apache.org/licenses/LICENSE-2.0
   *
   * Unless required by applicable law or agreed to in writing, software
@@ -17,7 +17,12 @@
 package kafka.integration
 
 import kafka.utils.{ZKGroupTopicDirs, Logging}
-import kafka.consumer.{ConsumerTimeoutException, ConsumerConfig, ConsumerConnector, Consumer}
+import kafka.consumer.{
+  ConsumerTimeoutException,
+  ConsumerConfig,
+  ConsumerConnector,
+  Consumer
+}
 import kafka.server._
 import kafka.utils.TestUtils
 import kafka.serializer._
@@ -28,8 +33,8 @@ import org.apache.log4j.{Level, Logger}
 import org.junit.Assert._
 
 @deprecated(
-    "This test has been deprecated and it will be removed in a future release",
-    "0.10.0.0")
+  "This test has been deprecated and it will be removed in a future release",
+  "0.10.0.0")
 class AutoOffsetResetTest extends KafkaServerTestHarness with Logging {
 
   def generateConfigs() =
@@ -62,12 +67,14 @@ class AutoOffsetResetTest extends KafkaServerTestHarness with Logging {
   @Test
   def testResetToEarliestWhenOffsetTooHigh() =
     assertEquals(
-        NumMessages, resetAndConsume(NumMessages, "smallest", LargeOffset))
+      NumMessages,
+      resetAndConsume(NumMessages, "smallest", LargeOffset))
 
   @Test
   def testResetToEarliestWhenOffsetTooLow() =
     assertEquals(
-        NumMessages, resetAndConsume(NumMessages, "smallest", SmallOffset))
+      NumMessages,
+      resetAndConsume(NumMessages, "smallest", SmallOffset))
 
   @Test
   def testResetToLatestWhenOffsetTooHigh() =
@@ -77,18 +84,19 @@ class AutoOffsetResetTest extends KafkaServerTestHarness with Logging {
   def testResetToLatestWhenOffsetTooLow() =
     assertEquals(0, resetAndConsume(NumMessages, "largest", SmallOffset))
 
-  /* Produce the given number of messages, create a consumer with the given offset policy, 
-   * then reset the offset to the given value and consume until we get no new messages. 
+  /* Produce the given number of messages, create a consumer with the given offset policy,
+   * then reset the offset to the given value and consume until we get no new messages.
    * Returns the count of messages received.
    */
   def resetAndConsume(numMessages: Int, resetTo: String, offset: Long): Int = {
     TestUtils.createTopic(zkUtils, topic, 1, 1, servers)
 
     val producer: Producer[String, Array[Byte]] = TestUtils.createProducer(
-        TestUtils.getBrokerListStrFromServers(servers),
-        keyEncoder = classOf[StringEncoder].getName)
+      TestUtils.getBrokerListStrFromServers(servers),
+      keyEncoder = classOf[StringEncoder].getName)
 
-    for (i <- 0 until numMessages) producer.send(
+    for (i <- 0 until numMessages)
+      producer.send(
         new KeyedMessage[String, Array[Byte]](topic, topic, "test".getBytes))
 
     // update offset in zookeeper for consumer to jump "forward" in time
@@ -101,7 +109,9 @@ class AutoOffsetResetTest extends KafkaServerTestHarness with Logging {
     val consumerConfig = new ConsumerConfig(consumerProps)
 
     TestUtils.updateConsumerOffset(
-        consumerConfig, dirs.consumerOffsetDir + "/" + "0", offset)
+      consumerConfig,
+      dirs.consumerOffsetDir + "/" + "0",
+      offset)
     info("Updated consumer offset to " + offset)
 
     val consumerConnector: ConsumerConnector = Consumer.create(consumerConfig)

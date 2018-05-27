@@ -40,10 +40,10 @@ trait CodegenSupport extends SparkPlan {
   private def variablePrefix: String = this match {
     case _: TungstenAggregate => "agg"
     case _: BroadcastHashJoin => "bhj"
-    case _: SortMergeJoin => "smj"
-    case _: PhysicalRDD => "rdd"
-    case _: DataSourceScan => "scan"
-    case _ => nodeName.toLowerCase
+    case _: SortMergeJoin     => "smj"
+    case _: PhysicalRDD       => "rdd"
+    case _: DataSourceScan    => "scan"
+    case _                    => nodeName.toLowerCase
   }
 
   /**
@@ -116,9 +116,10 @@ trait CodegenSupport extends SparkPlan {
   /**
     * Consume the columns generated from current SparkPlan, call it's parent.
     */
-  final def consume(ctx: CodegenContext,
-                    input: Seq[ExprCode],
-                    row: String = null): String = {
+  final def consume(
+      ctx: CodegenContext,
+      input: Seq[ExprCode],
+      row: String = null): String = {
     if (input != null) {
       assert(input.length == output.length)
     }
@@ -140,9 +141,10 @@ trait CodegenSupport extends SparkPlan {
     * Returns source code to evaluate the variables for required attributes, and clear the code
     * of evaluated variables, to prevent them to be evaluated twice..
     */
-  protected def evaluateRequiredVariables(attributes: Seq[Attribute],
-                                          variables: Seq[ExprCode],
-                                          required: AttributeSet): String = {
+  protected def evaluateRequiredVariables(
+      attributes: Seq[Attribute],
+      variables: Seq[ExprCode],
+      required: AttributeSet): String = {
     var evaluateVars = ""
     variables.zipWithIndex.foreach {
       case (ev, i) =>
@@ -170,10 +172,11 @@ trait CodegenSupport extends SparkPlan {
     * If the row is not null, we create variables to access the columns that are actually used by
     * current plan before calling doConsume().
     */
-  def consumeChild(ctx: CodegenContext,
-                   child: SparkPlan,
-                   input: Seq[ExprCode],
-                   row: String = null): String = {
+  def consumeChild(
+      ctx: CodegenContext,
+      child: SparkPlan,
+      input: Seq[ExprCode],
+      row: String = null): String = {
     ctx.freshNamePrefix = variablePrefix
     val inputVars =
       if (row != null) {
@@ -215,7 +218,9 @@ trait CodegenSupport extends SparkPlan {
     *   # call consume(), which will call parent.doConsume()
     */
   protected def doConsume(
-      ctx: CodegenContext, input: Seq[ExprCode], row: String): String = {
+      ctx: CodegenContext,
+      input: Seq[ExprCode],
+      row: String): String = {
     throw new UnsupportedOperationException
   }
 }
@@ -227,7 +232,8 @@ trait CodegenSupport extends SparkPlan {
   * an RDD iterator of InternalRow.
   */
 case class InputAdapter(child: SparkPlan)
-    extends UnaryNode with CodegenSupport {
+    extends UnaryNode
+    with CodegenSupport {
 
   override def output: Seq[Attribute] = child.output
   override def outputPartitioning: Partitioning = child.outputPartitioning
@@ -249,10 +255,12 @@ case class InputAdapter(child: SparkPlan)
     val input = ctx.freshName("input")
     // Right now, InputAdapter is only used when there is one upstream.
     ctx.addMutableState(
-        "scala.collection.Iterator", input, s"$input = inputs[0];")
+      "scala.collection.Iterator",
+      input,
+      s"$input = inputs[0];")
 
-    val exprs = output.zipWithIndex.map(
-        x => new BoundReference(x._2, x._1.dataType, true))
+    val exprs = output.zipWithIndex.map(x =>
+      new BoundReference(x._2, x._1.dataType, true))
     val row = ctx.freshName("row")
     ctx.INPUT_ROW = row
     ctx.currentVars = null
@@ -302,7 +310,8 @@ case class InputAdapter(child: SparkPlan)
   * used to generated code for BoundReference.
   */
 case class WholeStageCodegen(child: SparkPlan)
-    extends UnaryNode with CodegenSupport {
+    extends UnaryNode
+    with CodegenSupport {
 
   override def output: Seq[Attribute] = child.output
   override def outputPartitioning: Partitioning = child.outputPartitioning
@@ -382,10 +391,11 @@ case class WholeStageCodegen(child: SparkPlan)
     throw new UnsupportedOperationException
   }
 
-  override def consumeChild(ctx: CodegenContext,
-                            child: SparkPlan,
-                            input: Seq[ExprCode],
-                            row: String = null): String = {
+  override def consumeChild(
+      ctx: CodegenContext,
+      child: SparkPlan,
+      input: Seq[ExprCode],
+      row: String = null): String = {
 
     val doCopy =
       if (ctx.copyResult) {
@@ -429,7 +439,7 @@ case class WholeStageCodegen(child: SparkPlan)
 
   private def collectInputs(plan: SparkPlan): Seq[SparkPlan] = plan match {
     case InputAdapter(c) => c :: Nil
-    case other => other.children.flatMap(collectInputs)
+    case other           => other.children.flatMap(collectInputs)
   }
 
   override def treeChildren: Seq[SparkPlan] = {
@@ -446,10 +456,10 @@ case class CollapseCodegenStages(conf: SQLConf) extends Rule[SparkPlan] {
 
   private def supportCodegen(e: Expression): Boolean = e match {
     case e: LeafExpression => true
-    case e: CaseWhen => e.shouldCodegen
+    case e: CaseWhen       => e.shouldCodegen
     // CodegenFallback requires the input to be an InternalRow
     case e: CodegenFallback => false
-    case _ => true
+    case _                  => true
   }
 
   private def supportCodegen(plan: SparkPlan): Boolean = plan match {
@@ -468,8 +478,9 @@ case class CollapseCodegenStages(conf: SQLConf) extends Rule[SparkPlan] {
   private def insertInputAdapter(plan: SparkPlan): SparkPlan = plan match {
     case j @ SortMergeJoin(_, _, _, _, left, right) if j.supportCodegen =>
       // The children of SortMergeJoin should do codegen separately.
-      j.copy(left = InputAdapter(insertWholeStageCodegen(left)),
-             right = InputAdapter(insertWholeStageCodegen(right)))
+      j.copy(
+        left = InputAdapter(insertWholeStageCodegen(left)),
+        right = InputAdapter(insertWholeStageCodegen(right)))
     case p if !supportCodegen(p) =>
       // collapse them recursively
       InputAdapter(insertWholeStageCodegen(p))

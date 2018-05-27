@@ -36,28 +36,32 @@ private[classification] object GLMClassificationModel {
 
     /** Model data for import/export */
     case class Data(
-        weights: Vector, intercept: Double, threshold: Option[Double])
+        weights: Vector,
+        intercept: Double,
+        threshold: Option[Double])
 
     /**
       * Helper method for saving GLM classification model metadata and data.
       * @param modelClass  String name for model class, to be saved with metadata
       * @param numClasses  Number of classes label can take, to be saved with metadata
       */
-    def save(sc: SparkContext,
-             path: String,
-             modelClass: String,
-             numFeatures: Int,
-             numClasses: Int,
-             weights: Vector,
-             intercept: Double,
-             threshold: Option[Double]): Unit = {
+    def save(
+        sc: SparkContext,
+        path: String,
+        modelClass: String,
+        numFeatures: Int,
+        numClasses: Int,
+        weights: Vector,
+        intercept: Double,
+        threshold: Option[Double]): Unit = {
       val sqlContext = SQLContext.getOrCreate(sc)
       import sqlContext.implicits._
 
       // Create JSON metadata.
       val metadata = compact(
-          render(("class" -> modelClass) ~ ("version" -> thisFormatVersion) ~
-              ("numFeatures" -> numFeatures) ~ ("numClasses" -> numClasses)))
+        render(
+          ("class" -> modelClass) ~ ("version" -> thisFormatVersion) ~
+            ("numFeatures" -> numFeatures) ~ ("numClasses" -> numClasses)))
       sc.parallelize(Seq(metadata), 1)
         .saveAsTextFile(Loader.metadataPath(path))
 
@@ -79,11 +83,11 @@ private[classification] object GLMClassificationModel {
       val dataRDD = sqlContext.read.parquet(datapath)
       val dataArray =
         dataRDD.select("weights", "intercept", "threshold").take(1)
-      assert(dataArray.length == 1,
-             s"Unable to load $modelClass data from: $datapath")
-      val data = dataArray(0)
       assert(
-          data.size == 3, s"Unable to load $modelClass data from: $datapath")
+        dataArray.length == 1,
+        s"Unable to load $modelClass data from: $datapath")
+      val data = dataArray(0)
+      assert(data.size == 3, s"Unable to load $modelClass data from: $datapath")
       val (weights, intercept) = data match {
         case Row(weights: Vector, intercept: Double, _) =>
           (weights, intercept)

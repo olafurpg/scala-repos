@@ -27,20 +27,24 @@ object TimePathedSource {
     String.format(pattern, date.toCalendar(tz))
 
   def stepSize(pattern: String, tz: TimeZone): Option[Duration] =
-    List("%1$tH" -> Hours(1),
-         "%1$td" -> Days(1)(tz),
-         "%1$tm" -> Months(1)(tz),
-         "%1$tY" -> Years(1)(tz)).find { unitDur: (String, Duration) =>
-      pattern.contains(unitDur._1)
-    }.map(_._2)
+    List(
+      "%1$tH" -> Hours(1),
+      "%1$td" -> Days(1)(tz),
+      "%1$tm" -> Months(1)(tz),
+      "%1$tY" -> Years(1)(tz))
+      .find { unitDur: (String, Duration) =>
+        pattern.contains(unitDur._1)
+      }
+      .map(_._2)
 
   /**
     * Gives all paths in the given daterange with windows based on the provided duration.
     */
-  def allPathsWithDuration(pattern: String,
-                           duration: Duration,
-                           dateRange: DateRange,
-                           tz: TimeZone): Iterable[String] =
+  def allPathsWithDuration(
+      pattern: String,
+      duration: Duration,
+      dateRange: DateRange,
+      tz: TimeZone): Iterable[String] =
     // This method is exhaustive, but too expensive for Cascading's JobConf writing.
     dateRange.each(duration).map { dr: DateRange =>
       toPath(pattern, dr.start, tz)
@@ -49,9 +53,10 @@ object TimePathedSource {
   /**
     * Gives all read paths in the given daterange.
     */
-  def readPathsFor(pattern: String,
-                   dateRange: DateRange,
-                   tz: TimeZone): Iterable[String] = {
+  def readPathsFor(
+      pattern: String,
+      dateRange: DateRange,
+      tz: TimeZone): Iterable[String] = {
     TimePathedSource.stepSize(pattern, tz) match {
       case Some(duration) =>
         allPathsWithDuration(pattern, duration, dateRange, tz)
@@ -63,7 +68,9 @@ object TimePathedSource {
     * Gives the write path based on daterange end.
     */
   def writePathFor(
-      pattern: String, dateRange: DateRange, tz: TimeZone): String = {
+      pattern: String,
+      dateRange: DateRange,
+      tz: TimeZone): String = {
     assert(pattern != "/*", "Pattern must not be /*")
     assert(pattern.takeRight(2) == "/*", "Pattern must end with /* " + pattern)
     val stripped = pattern.dropRight(2)
@@ -72,7 +79,9 @@ object TimePathedSource {
 }
 
 abstract class TimeSeqPathedSource(
-    val patterns: Seq[String], val dateRange: DateRange, val tz: TimeZone)
+    val patterns: Seq[String],
+    val dateRange: DateRange,
+    val tz: TimeZone)
     extends FileSource {
 
   override def hdfsPaths = patterns.flatMap { pattern: String =>
@@ -112,20 +121,20 @@ abstract class TimeSeqPathedSource(
       case (path, good) =>
         if (!good) {
           System.err.println(
-              "[ERROR] Path: " + path + " is missing in: " + toString)
+            "[ERROR] Path: " + path + " is missing in: " + toString)
         }
         good
     }
 
   override def toString =
     "TimeSeqPathedSource(" + patterns.mkString(",") + ", " + dateRange + ", " +
-    tz + ")"
+      tz + ")"
 
   override def equals(that: Any) =
     (that != null) && (this.getClass == that.getClass) &&
-    this.patterns == that.asInstanceOf[TimeSeqPathedSource].patterns &&
-    this.dateRange == that.asInstanceOf[TimeSeqPathedSource].dateRange &&
-    this.tz == that.asInstanceOf[TimeSeqPathedSource].tz
+      this.patterns == that.asInstanceOf[TimeSeqPathedSource].patterns &&
+      this.dateRange == that.asInstanceOf[TimeSeqPathedSource].dateRange &&
+      this.tz == that.asInstanceOf[TimeSeqPathedSource].tz
 
   override def hashCode =
     patterns.hashCode + 31 * dateRange.hashCode + (31 ^ 2) * tz.hashCode
@@ -137,7 +146,9 @@ abstract class TimeSeqPathedSource(
   * For writing, we write to the directory specified by the END time.
   */
 abstract class TimePathedSource(
-    val pattern: String, dateRange: DateRange, tz: TimeZone)
+    val pattern: String,
+    dateRange: DateRange,
+    tz: TimeZone)
     extends TimeSeqPathedSource(Seq(pattern), dateRange, tz) {
 
   //Write to the path defined by the end time:

@@ -4,26 +4,37 @@ import org.apache.zookeeper.ZooKeeper
 
 import com.twitter.concurrent.{Broker, Offer, Serialized}
 import com.twitter.logging.Logger
-import com.twitter.util.{Await, Duration, Future, Promise, Return, TimeoutException, Timer}
+import com.twitter.util.{
+  Await,
+  Duration,
+  Future,
+  Promise,
+  Return,
+  TimeoutException,
+  Timer
+}
 
 /**
   * An Asynchronous ZooKeeper Client.
   */
-case class NativeConnector(connectString: String,
-                           connectTimeout: Option[Duration],
-                           sessionTimeout: Duration,
-                           timer: Timer,
-                           authenticate: Option[AuthInfo] = None)
-    extends Connector with Serialized {
+case class NativeConnector(
+    connectString: String,
+    connectTimeout: Option[Duration],
+    sessionTimeout: Duration,
+    timer: Timer,
+    authenticate: Option[AuthInfo] = None)
+    extends Connector
+    with Serialized {
   override val name = "native-zk-connector"
 
   protected[this] def mkConnection = {
-    new NativeConnector.Connection(connectString,
-                                   connectTimeout,
-                                   sessionTimeout,
-                                   authenticate,
-                                   timer,
-                                   log)
+    new NativeConnector.Connection(
+      connectString,
+      connectTimeout,
+      sessionTimeout,
+      authenticate,
+      timer,
+      log)
   }
 
   onSessionEvent {
@@ -69,9 +80,9 @@ case class NativeConnector(connectString: String,
       connection match {
         case None => Future.Unit
         case Some(c) => {
-            connection = None
-            c.release()
-          }
+          connection = None
+          c.release()
+        }
       }
     }.flatten
 }
@@ -89,21 +100,23 @@ object NativeConnector {
     NativeConnector(connectString, Some(connectTimeout), sessionTimeout, timer)
   }
 
-  def apply(connectString: String,
-            connectTimeout: Duration,
-            sessionTimeout: Duration,
-            authenticate: Option[AuthInfo])(
+  def apply(
+      connectString: String,
+      connectTimeout: Duration,
+      sessionTimeout: Duration,
+      authenticate: Option[AuthInfo])(
       implicit timer: Timer): NativeConnector = {
-    NativeConnector(connectString,
-                    Some(connectTimeout),
-                    sessionTimeout,
-                    timer,
-                    authenticate)
+    NativeConnector(
+      connectString,
+      Some(connectTimeout),
+      sessionTimeout,
+      timer,
+      authenticate)
   }
 
   case class ConnectTimeoutException(connectString: String, timeout: Duration)
       extends TimeoutException(
-          "timeout connecting to %s after %s".format(connectString, timeout))
+        "timeout connecting to %s after %s".format(connectString, timeout))
 
   /**
     * Maintains connection and ensures all session events are published.
@@ -111,12 +124,13 @@ object NativeConnector {
     *
     * apply() and release() must not be called concurrently. This is enforced by NativeConnector.
     */
-  protected class Connection(connectString: String,
-                             connectTimeout: Option[Duration],
-                             sessionTimeout: Duration,
-                             authenticate: Option[AuthInfo],
-                             timer: Timer,
-                             log: Logger) {
+  protected class Connection(
+      connectString: String,
+      connectTimeout: Option[Duration],
+      sessionTimeout: Duration,
+      authenticate: Option[AuthInfo],
+      timer: Timer,
+      log: Logger) {
 
     @volatile protected[this] var zookeeper: Option[ZooKeeper] = None
 
@@ -149,7 +163,7 @@ object NativeConnector {
               connectPromise.updateIfEmpty(Return(zk))
               authenticate foreach { auth =>
                 log.info("Authenticating to zk as %s".format(
-                        new String(auth.data, "UTF-8")))
+                  new String(auth.data, "UTF-8")))
                 zk.addAuthInfo(auth.mode, auth.data)
               }
             }
@@ -173,8 +187,7 @@ object NativeConnector {
     }
 
     protected[this] def mkZooKeeper = {
-      new ZooKeeper(
-          connectString, sessionTimeout.inMillis.toInt, sessionBroker)
+      new ZooKeeper(connectString, sessionTimeout.inMillis.toInt, sessionBroker)
     }
 
     def release(): Future[Unit] = Future {

@@ -22,26 +22,26 @@ class ImplicitAnalyzer(val global: RichPresentationCompiler) {
           t match {
             case t: ApplyImplicitView =>
               implicits.append(
-                  ImplicitConversionInfo(
-                      treeP.startOrCursor,
-                      treeP.endOrCursor,
-                      SymbolInfo(t.fun.symbol)
-                  ))
+                ImplicitConversionInfo(
+                  treeP.startOrCursor,
+                  treeP.endOrCursor,
+                  SymbolInfo(t.fun.symbol)
+                ))
             case t: ApplyToImplicitArgs =>
               val funIsImplicit = t.fun match {
                 case tt: ApplyImplicitView => true
-                case _ => false
+                case _                     => false
               }
               implicits.append(
-                  ImplicitParamInfo(
-                      treeP.startOrCursor,
-                      treeP.endOrCursor,
-                      SymbolInfo(t.fun.symbol),
-                      t.args.map { a =>
+                ImplicitParamInfo(
+                  treeP.startOrCursor,
+                  treeP.endOrCursor,
+                  SymbolInfo(t.fun.symbol),
+                  t.args.map { a =>
                     SymbolInfo(a.symbol)
                   },
-                      funIsImplicit
-                  ))
+                  funIsImplicit
+                ))
             case _ =>
           }
         } catch {

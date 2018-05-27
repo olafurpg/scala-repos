@@ -10,7 +10,8 @@ package scala
 package runtime
 
 final class RichDouble(val self: Double)
-    extends AnyVal with FractionalProxy[Double] {
+    extends AnyVal
+    with FractionalProxy[Double] {
   protected def num = scala.math.Numeric.DoubleIsFractional
   protected def ord = scala.math.Ordering.Double
   protected def integralNum = scala.math.Numeric.DoubleAsIfIntegral

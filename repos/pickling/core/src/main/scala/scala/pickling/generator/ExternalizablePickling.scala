@@ -15,15 +15,16 @@ private[pickling] class ExternalizablePickling extends PicklingAlgorithm {
     * Attempts to construct pickling logic for a given type.
     */
   override def generate(
-      tpe: IrClass, logger: AlgorithmLogger): AlgorithmResult = {
+      tpe: IrClass,
+      logger: AlgorithmLogger): AlgorithmResult = {
     if (isExternalizable(tpe)) {
       logger.warn(
-          s"Using Externalizable interface for $tpe.  This may be less efficient than writing your own pickler/unpickler.")
+        s"Using Externalizable interface for $tpe.  This may be less efficient than writing your own pickler/unpickler.")
       AlgorithmSucccess(
-          PickleUnpickleImplementation(
-              pickle = PickleEntry(Seq(PickleExternalizable(tpe))),
-              unpickle = UnpickleExternalizable(tpe)
-          ))
+        PickleUnpickleImplementation(
+          pickle = PickleEntry(Seq(PickleExternalizable(tpe))),
+          unpickle = UnpickleExternalizable(tpe)
+        ))
     } else AlgorithmFailure(s"$tpe does not extend java.io.Externalizable")
   }
 }

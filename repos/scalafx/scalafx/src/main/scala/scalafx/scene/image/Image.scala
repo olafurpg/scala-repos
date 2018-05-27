@@ -31,7 +31,11 @@ import javafx.scene.{image => jfxsi}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{ReadOnlyBooleanProperty, ReadOnlyDoubleProperty, ReadOnlyObjectProperty}
+import scalafx.beans.property.{
+  ReadOnlyBooleanProperty,
+  ReadOnlyDoubleProperty,
+  ReadOnlyObjectProperty
+}
 import scalafx.delegate.SFXDelegate
 
 object Image {
@@ -50,17 +54,19 @@ class Image(override val delegate: jfxsi.Image)
   /**
     * Construct a new Image with the specified parameters.
     */
-  def this(inputStream: InputStream,
-           requestedWidth: Double,
-           requestedHeight: Double,
-           preserveRatio: Boolean,
-           smooth: Boolean) =
+  def this(
+      inputStream: InputStream,
+      requestedWidth: Double,
+      requestedHeight: Double,
+      preserveRatio: Boolean,
+      smooth: Boolean) =
     this(
-        new jfxsi.Image(inputStream,
-                        requestedWidth,
-                        requestedWidth,
-                        preserveRatio,
-                        smooth))
+      new jfxsi.Image(
+        inputStream,
+        requestedWidth,
+        requestedWidth,
+        preserveRatio,
+        smooth))
 
   /**
     * Construct an Image which pixels are loaded from the specified url.
@@ -76,31 +82,38 @@ class Image(override val delegate: jfxsi.Image)
   /**
     * Construct a new Image with the specified parameters.
     */
-  def this(url: String,
-           requestedWidth: Double,
-           requestedHeight: Double,
-           preserveRatio: Boolean,
-           smooth: Boolean) =
+  def this(
+      url: String,
+      requestedWidth: Double,
+      requestedHeight: Double,
+      preserveRatio: Boolean,
+      smooth: Boolean) =
     this(
-        new jfxsi.Image(
-            url, requestedWidth, requestedWidth, preserveRatio, smooth))
+      new jfxsi.Image(
+        url,
+        requestedWidth,
+        requestedWidth,
+        preserveRatio,
+        smooth))
 
   /**
     * Construct a new Image with the specified parameters.
     */
-  def this(url: String,
-           requestedWidth: Double,
-           requestedHeight: Double,
-           preserveRatio: Boolean,
-           smooth: Boolean,
-           backgroundLoading: Boolean) =
+  def this(
+      url: String,
+      requestedWidth: Double,
+      requestedHeight: Double,
+      preserveRatio: Boolean,
+      smooth: Boolean,
+      backgroundLoading: Boolean) =
     this(
-        new jfxsi.Image(url,
-                        requestedWidth,
-                        requestedWidth,
-                        preserveRatio,
-                        smooth,
-                        backgroundLoading))
+      new jfxsi.Image(
+        url,
+        requestedWidth,
+        requestedWidth,
+        preserveRatio,
+        smooth,
+        backgroundLoading))
 
   /**
     *

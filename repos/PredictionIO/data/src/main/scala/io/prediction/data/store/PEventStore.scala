@@ -65,15 +65,15 @@ object PEventStore {
     val (appId, channelId) = Common.appNameToId(appName, channelName)
 
     eventsDb.find(
-        appId = appId,
-        channelId = channelId,
-        startTime = startTime,
-        untilTime = untilTime,
-        entityType = entityType,
-        entityId = entityId,
-        eventNames = eventNames,
-        targetEntityType = targetEntityType,
-        targetEntityId = targetEntityId
+      appId = appId,
+      channelId = channelId,
+      startTime = startTime,
+      untilTime = untilTime,
+      entityType = entityType,
+      entityId = entityId,
+      eventNames = eventNames,
+      targetEntityType = targetEntityType,
+      targetEntityId = targetEntityId
     )(sc)
   }
 
@@ -89,23 +89,24 @@ object PEventStore {
     * @param sc Spark context
     * @return RDD[(String, PropertyMap)] RDD of entityId and PropetyMap pair
     */
-  def aggregateProperties(appName: String,
-                          entityType: String,
-                          channelName: Option[String] = None,
-                          startTime: Option[DateTime] = None,
-                          untilTime: Option[DateTime] = None,
-                          required: Option[Seq[String]] = None)(
+  def aggregateProperties(
+      appName: String,
+      entityType: String,
+      channelName: Option[String] = None,
+      startTime: Option[DateTime] = None,
+      untilTime: Option[DateTime] = None,
+      required: Option[Seq[String]] = None)(
       sc: SparkContext): RDD[(String, PropertyMap)] = {
 
     val (appId, channelId) = Common.appNameToId(appName, channelName)
 
     eventsDb.aggregateProperties(
-        appId = appId,
-        entityType = entityType,
-        channelId = channelId,
-        startTime = startTime,
-        untilTime = untilTime,
-        required = required
+      appId = appId,
+      entityType = entityType,
+      channelId = channelId,
+      startTime = startTime,
+      untilTime = untilTime,
+      required = required
     )(sc)
   }
 }

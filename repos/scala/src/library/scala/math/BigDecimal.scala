@@ -152,8 +152,8 @@ object BigDecimal {
     *  @return the constructed `BigDecimal`
     */
   @deprecated(
-      "MathContext is not applied to Doubles in valueOf.  Use BigDecimal.decimal to use rounding, or java.math.BigDecimal.valueOf to avoid it.",
-      "2.11")
+    "MathContext is not applied to Doubles in valueOf.  Use BigDecimal.decimal to use rounding, or java.math.BigDecimal.valueOf to avoid it.",
+    "2.11")
   def valueOf(d: Double, mc: MathContext): BigDecimal =
     apply(BigDec valueOf d, mc)
 
@@ -170,8 +170,8 @@ object BigDecimal {
     *  use `valueOf(f.toDouble)` or `decimal(f)` instead.
     */
   @deprecated(
-      "Float arguments to valueOf may not do what you wish.  Use decimal or valueOf(f.toDouble).",
-      "2.11")
+    "Float arguments to valueOf may not do what you wish.  Use decimal or valueOf(f.toDouble).",
+    "2.11")
   def valueOf(f: Float): BigDecimal = valueOf(f.toDouble)
 
   /** Constructs a `BigDecimal` using the java BigDecimal static
@@ -179,8 +179,8 @@ object BigDecimal {
     *  use `valueOf(f.toDouble)` or `decimal(f)` instead.
     */
   @deprecated(
-      "Float arguments to valueOf may not do what you wish.  Use decimal or valueOf(f.toDouble).",
-      "2.11")
+    "Float arguments to valueOf may not do what you wish.  Use decimal or valueOf(f.toDouble).",
+    "2.11")
   def valueOf(f: Float, mc: MathContext): BigDecimal = valueOf(f.toDouble, mc)
 
   /** Constructs a `BigDecimal` whose value is equal to that of the
@@ -270,13 +270,15 @@ object BigDecimal {
   def apply(d: Double, mc: MathContext): BigDecimal = decimal(d, mc)
 
   @deprecated(
-      "The default conversion from Float may not do what you want.  Use BigDecimal.decimal for a String representation, or explicitly convert the Float with .toDouble.",
-      "2.11")
+    "The default conversion from Float may not do what you want.  Use BigDecimal.decimal for a String representation, or explicitly convert the Float with .toDouble.",
+    "2.11"
+  )
   def apply(x: Float): BigDecimal = apply(x.toDouble)
 
   @deprecated(
-      "The default conversion from Float may not do what you want.  Use BigDecimal.decimal for a String representation, or explicitly convert the Float with .toDouble.",
-      "2.11")
+    "The default conversion from Float may not do what you want.  Use BigDecimal.decimal for a String representation, or explicitly convert the Float with .toDouble.",
+    "2.11"
+  )
   def apply(x: Float, mc: MathContext): BigDecimal = apply(x.toDouble, mc)
 
   /** Translates a character array representation of a `BigDecimal`
@@ -344,8 +346,9 @@ object BigDecimal {
   def apply(bd: BigDec): BigDecimal = apply(bd, defaultMathContext)
 
   @deprecated(
-      "This method appears to round a java.math.BigDecimal but actually doesn't.  Use new BigDecimal(bd, mc) instead for no rounding, or BigDecimal.decimal(bd, mc) for rounding.",
-      "2.11")
+    "This method appears to round a java.math.BigDecimal but actually doesn't.  Use new BigDecimal(bd, mc) instead for no rounding, or BigDecimal.decimal(bd, mc) for rounding.",
+    "2.11"
+  )
   def apply(bd: BigDec, mc: MathContext): BigDecimal = new BigDecimal(bd, mc)
 
   /** Implicit conversion from `Int` to `BigDecimal`. */
@@ -413,7 +416,9 @@ object BigDecimal {
   *  @version 1.1
   */
 final class BigDecimal(val bigDecimal: BigDec, val mc: MathContext)
-    extends ScalaNumber with ScalaNumericConversions with Serializable
+    extends ScalaNumber
+    with ScalaNumericConversions
+    with Serializable
     with Ordered[BigDecimal] {
   def this(bigDecimal: BigDec) =
     this(bigDecimal, BigDecimal.defaultMathContext)
@@ -434,14 +439,16 @@ final class BigDecimal(val bigDecimal: BigDec, val mc: MathContext)
   // Note--not lazy val because we can't afford the extra space.
   private final var computedHashCode: Int = BigDecimal.hashCodeNotComputed
   private final def computeHashCode(): Unit = {
-    computedHashCode = if (isWhole && (precision - scale) < BigDecimal.maximumHashScale)
-      toBigInt.hashCode
-    else if (isDecimalDouble) doubleValue.##
-    else {
-      val temp = bigDecimal.stripTrailingZeros
-      scala.util.hashing.MurmurHash3.mixLast(
-          temp.scaleByPowerOfTen(temp.scale).toBigInteger.hashCode, temp.scale)
-    }
+    computedHashCode =
+      if (isWhole && (precision - scale) < BigDecimal.maximumHashScale)
+        toBigInt.hashCode
+      else if (isDecimalDouble) doubleValue.##
+      else {
+        val temp = bigDecimal.stripTrailingZeros
+        scala.util.hashing.MurmurHash3.mixLast(
+          temp.scaleByPowerOfTen(temp.scale).toBigInteger.hashCode,
+          temp.scale)
+      }
   }
 
   /** Returns the hash code for this BigDecimal.
@@ -466,7 +473,7 @@ final class BigDecimal(val bigDecimal: BigDec, val mc: MathContext)
     case that: BigDecimal => this equals that
     case that: BigInt =>
       that.bitLength > (precision - scale - 2) * BigDecimal.deci2binary &&
-      this.toBigIntExact.exists(that equals _)
+        this.toBigIntExact.exists(that equals _)
     case that: Double =>
       !that.isInfinity && {
         val d = toDouble
@@ -491,8 +498,8 @@ final class BigDecimal(val bigDecimal: BigDec, val mc: MathContext)
     * By default, `decimal` creation is used, so `isDecimalFloat` is probably what you want.
     */
   @deprecated(
-      "What constitutes validity is unclear.  Use `isExactFloat`, `isBinaryFloat`, or `isDecimalFloat` instead.",
-      "2.11")
+    "What constitutes validity is unclear.  Use `isExactFloat`, `isBinaryFloat`, or `isDecimalFloat` instead.",
+    "2.11")
   def isValidFloat = {
     val f = toFloat
     !f.isInfinity && bigDecimal.compareTo(new BigDec(f.toDouble)) == 0
@@ -503,8 +510,8 @@ final class BigDecimal(val bigDecimal: BigDec, val mc: MathContext)
     * By default, `decimal` creation is used, so `isDecimalDouble` is probably what you want.
     */
   @deprecated(
-      "Validity has distinct meanings.  Use `isExactDouble`, `isBinaryDouble`, or `isDecimalDouble` instead.",
-      "2.11")
+    "Validity has distinct meanings.  Use `isExactDouble`, `isBinaryDouble`, or `isDecimalDouble` instead.",
+    "2.11")
   def isValidDouble = {
     val d = toDouble
     !d.isInfinity && bigDecimal.compareTo(new BigDec(d)) == 0
@@ -600,14 +607,14 @@ final class BigDecimal(val bigDecimal: BigDec, val mc: MathContext)
     */
   def min(that: BigDecimal): BigDecimal = (this compare that) match {
     case x if x <= 0 => this
-    case _ => that
+    case _           => that
   }
 
   /** Returns the maximum of this and that, or this if the two are equal
     */
   def max(that: BigDecimal): BigDecimal = (this compare that) match {
     case x if x >= 0 => this
-    case _ => that
+    case _           => that
   }
 
   /** Remainder after dividing this by that.
@@ -798,7 +805,8 @@ final class BigDecimal(val bigDecimal: BigDec, val mc: MathContext)
     */
   def toBigIntExact(): Option[BigInt] =
     if (isWhole()) {
-      try Some(new BigInt(this.bigDecimal.toBigIntegerExact())) catch {
+      try Some(new BigInt(this.bigDecimal.toBigIntegerExact()))
+      catch {
         case _: ArithmeticException => None
       }
     } else None

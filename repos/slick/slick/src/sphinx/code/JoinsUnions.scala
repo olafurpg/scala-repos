@@ -6,7 +6,8 @@ object JoinsUnions extends App {
 
   class Suppliers(tag: Tag)
       extends Table[(Int, String, String, String, String, String)](
-          tag, "SUPPLIERS") {
+        tag,
+        "SUPPLIERS") {
     def id = column[Int]("SUP_ID", O.PrimaryKey)
     def name = column[String]("SUP_NAME")
     def street = column[String]("STREET")
@@ -105,7 +106,8 @@ object JoinsUnions extends App {
 
   val zipWithJoin = for {
     res <- coffees.zipWith(
-        suppliers, (c: Coffees, s: Suppliers) => (c.name, s.name))
+      suppliers,
+      (c: Coffees, s: Suppliers) => (c.name, s.name))
   } yield res
   //#zip
   //println(zipJoinQuery.result.statements.head)

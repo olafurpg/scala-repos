@@ -17,8 +17,9 @@ trait Series {
     * @param defaultStroke
     * @return
     */
-  def getChartStuff(defaultName: Int => String,
-                    defaultColor: Int => Paint,
-                    defaultStroke: Int => Stroke)
+  def getChartStuff(
+      defaultName: Int => String,
+      defaultColor: Int => Paint,
+      defaultStroke: Int => Stroke)
     : (org.jfree.data.xy.XYDataset, XYItemRenderer)
 }

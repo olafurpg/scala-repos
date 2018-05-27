@@ -62,15 +62,16 @@ case class ArrayType(elementType: DataType, containsNull: Boolean)
   protected def this() = this(null, false)
 
   private[sql] def buildFormattedString(
-      prefix: String, builder: StringBuilder): Unit = {
+      prefix: String,
+      builder: StringBuilder): Unit = {
     builder.append(
-        s"$prefix-- element: ${elementType.typeName} (containsNull = $containsNull)\n")
+      s"$prefix-- element: ${elementType.typeName} (containsNull = $containsNull)\n")
     DataType.buildFormattedString(elementType, s"$prefix    |", builder)
   }
 
   override private[sql] def jsonValue =
     ("type" -> typeName) ~ ("elementType" -> elementType.jsonValue) ~
-    ("containsNull" -> containsNull)
+      ("containsNull" -> containsNull)
 
   /**
     * The default size of a value of the ArrayType is 100 * the default size of the element type.
@@ -95,11 +96,11 @@ case class ArrayType(elementType: DataType, containsNull: Boolean)
     new Ordering[ArrayData] {
       private[this] val elementOrdering: Ordering[Any] = elementType match {
         case dt: AtomicType => dt.ordering.asInstanceOf[Ordering[Any]]
-        case a: ArrayType => a.interpretedOrdering.asInstanceOf[Ordering[Any]]
-        case s: StructType => s.interpretedOrdering.asInstanceOf[Ordering[Any]]
+        case a: ArrayType   => a.interpretedOrdering.asInstanceOf[Ordering[Any]]
+        case s: StructType  => s.interpretedOrdering.asInstanceOf[Ordering[Any]]
         case other =>
           throw new IllegalArgumentException(
-              s"Type $other does not support ordered operations")
+            s"Type $other does not support ordered operations")
       }
 
       def compare(x: ArrayData, y: ArrayData): Int = {
@@ -118,8 +119,9 @@ case class ArrayType(elementType: DataType, containsNull: Boolean)
           } else if (isNullRight) {
             return 1
           } else {
-            val comp = elementOrdering.compare(leftArray.get(i, elementType),
-                                               rightArray.get(i, elementType))
+            val comp = elementOrdering.compare(
+              leftArray.get(i, elementType),
+              rightArray.get(i, elementType))
             if (comp != 0) {
               return comp
             }

@@ -27,7 +27,8 @@ import org.apache.spark.storage.StorageUtils
   * at the end of the stream (e.g. to close a memory-mapped file).
   */
 private[spark] class ByteBufferInputStream(
-    private var buffer: ByteBuffer, dispose: Boolean = false)
+    private var buffer: ByteBuffer,
+    dispose: Boolean = false)
     extends InputStream {
 
   override def read(): Int = {

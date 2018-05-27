@@ -20,7 +20,7 @@ class StatusTest extends FunSuite {
   test("matches unknown status") {
     Status(99) match {
       case Unknown(_) =>
-      case status => fail(s"$status should be UnknownStatus")
+      case status     => fail(s"$status should be UnknownStatus")
     }
   }
 
@@ -28,7 +28,7 @@ class StatusTest extends FunSuite {
     100 until 200 foreach { code =>
       Status(code) match {
         case Informational(_) =>
-        case status => fail(s"$status should be Informational")
+        case status           => fail(s"$status should be Informational")
       }
     }
   }
@@ -37,7 +37,7 @@ class StatusTest extends FunSuite {
     200 until 300 foreach { code =>
       Status(code) match {
         case Successful(_) =>
-        case status => fail(s"$status should be Successful")
+        case status        => fail(s"$status should be Successful")
       }
     }
   }
@@ -46,7 +46,7 @@ class StatusTest extends FunSuite {
     300 until 400 foreach { code =>
       Status(code) match {
         case Redirection(_) =>
-        case status => fail(s"$status should be Redirection")
+        case status         => fail(s"$status should be Redirection")
       }
     }
   }
@@ -55,7 +55,7 @@ class StatusTest extends FunSuite {
     400 until 500 foreach { code =>
       Status(code) match {
         case ClientError(_) =>
-        case status => fail(s"$status should be ClientError")
+        case status         => fail(s"$status should be ClientError")
       }
     }
   }
@@ -64,7 +64,7 @@ class StatusTest extends FunSuite {
     500 until 600 foreach { code =>
       Status(code) match {
         case ServerError(_) =>
-        case status => fail(s"$status should be ServerError")
+        case status         => fail(s"$status should be ServerError")
       }
     }
   }
@@ -73,7 +73,7 @@ class StatusTest extends FunSuite {
     600 until 700 foreach { code =>
       Status(601) match {
         case Unknown(_) =>
-        case status => fail(s"$status should be UnknownStatus")
+        case status     => fail(s"$status should be UnknownStatus")
       }
     }
   }

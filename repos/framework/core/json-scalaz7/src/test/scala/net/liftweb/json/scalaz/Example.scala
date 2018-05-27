@@ -19,7 +19,7 @@ object Example extends Specification {
     val json = parse(""" {"street": "Manhattan 2", "zip": "00223" } """)
     val a1 =
       field[String]("zip")(json) <*>
-      (field[String]("street")(json) map Address.curried)
+        (field[String]("street")(json) map Address.curried)
     val a2 = (field[String]("street")(json) |@| field[String]("zip")(json)) {
       Address
     }
@@ -45,23 +45,24 @@ object Example extends Specification {
     }
 
     val p = parse(
-        """ {"name":"joe","age":34,"address":{"street": "Manhattan 2", "zip": "00223" }} """)
+      """ {"name":"joe","age":34,"address":{"street": "Manhattan 2", "zip": "00223" }} """)
     val person = Person.applyJSON(
-        field[String]("name"), field[Int]("age"), field[Address]("address"))(p)
-    person mustEqual Success(
-        Person("joe", 34, Address("Manhattan 2", "00223")))
+      field[String]("name"),
+      field[Int]("age"),
+      field[Address]("address"))(p)
+    person mustEqual Success(Person("joe", 34, Address("Manhattan 2", "00223")))
   }
 
   "Format Person with Address" in {
     implicit def addrJSON: JSONW[Address] = new JSONW[Address] {
       def write(a: Address) =
         makeObj(
-            ("street" -> toJSON(a.street)) :: ("zip" -> toJSON(a.zipCode)) :: Nil)
+          ("street" -> toJSON(a.street)) :: ("zip" -> toJSON(a.zipCode)) :: Nil)
     }
 
     val p = Person("joe", 34, Address("Manhattan 2", "00223"))
     val json = makeObj(
-        ("name" -> toJSON(p.name)) :: ("age" -> toJSON(p.age)) ::
+      ("name" -> toJSON(p.name)) :: ("age" -> toJSON(p.age)) ::
         ("address" -> toJSON(p.address)) :: Nil)
     json.shows mustEqual """{"name":"joe","age":34,"address":{"street":"Manhattan 2","zip":"00223"}}"""
   }
@@ -69,7 +70,7 @@ object Example extends Specification {
   "Parse Map" in {
     val json = parse(""" {"street": "Manhattan 2", "zip": "00223" } """)
     fromJSON[Map[String, String]](json) mustEqual Success(
-        Map("street" -> "Manhattan 2", "zip" -> "00223"))
+      Map("street" -> "Manhattan 2", "zip" -> "00223"))
   }
 
   "Format Map" in {

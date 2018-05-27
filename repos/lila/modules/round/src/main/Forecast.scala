@@ -7,20 +7,21 @@ import chess.format.Uci
 import chess.{Pos, Move}
 import lila.game.Game
 
-case class Forecast(_id: String, // player full id
-                    steps: Forecast.Steps,
-                    date: DateTime) {
+case class Forecast(
+    _id: String, // player full id
+    steps: Forecast.Steps,
+    date: DateTime) {
 
   def apply(g: Game, lastMove: Move): Option[(Forecast, Uci.Move)] =
     nextMove(g, lastMove) map { move =>
       copy(
-          steps = steps.collect {
-            case (fst :: snd :: rest)
-                if rest.nonEmpty && g.turns == fst.ply && fst.is(lastMove) &&
+        steps = steps.collect {
+          case (fst :: snd :: rest)
+              if rest.nonEmpty && g.turns == fst.ply && fst.is(lastMove) &&
                 snd.is(move) =>
-              rest
-          },
-          date = DateTime.now
+            rest
+        },
+        date = DateTime.now
       ) -> move
     }
 
@@ -40,12 +41,13 @@ object Forecast {
 
   def maxPlies(steps: Steps): Int = ~steps.map(_.size).sortBy(-_).lastOption
 
-  case class Step(ply: Int,
-                  uci: String,
-                  san: String,
-                  fen: String,
-                  check: Option[Boolean],
-                  dests: String) {
+  case class Step(
+      ply: Int,
+      uci: String,
+      san: String,
+      fen: String,
+      check: Option[Boolean],
+      dests: String) {
 
     def is(move: Move) = move.toUci.uci == uci
     def is(move: Uci.Move) = move.uci == uci

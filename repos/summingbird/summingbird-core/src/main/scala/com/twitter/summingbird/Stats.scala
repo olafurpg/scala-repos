@@ -33,7 +33,9 @@ trait PlatformStatProvider {
   // Returns an incrementor function for the Counter wrapped in an Option
   // to ensure we catch when the incrementor cannot be obtained for the specified jobID
   def counterIncrementor(
-      jobId: JobId, group: Group, name: Name): Option[CounterIncrementor]
+      jobId: JobId,
+      group: Group,
+      name: Name): Option[CounterIncrementor]
 }
 
 object SummingbirdRuntimeStats {
@@ -69,7 +71,9 @@ object SummingbirdRuntimeStats {
     platformStatProviders.add(new WeakReference(pp))
 
   def getPlatformCounterIncrementor(
-      jobID: JobId, group: Group, name: Name): CounterIncrementor = {
+      jobID: JobId,
+      group: Group,
+      name: Name): CounterIncrementor = {
     platformsInit
     // Find the PlatformMetricProvider (PMP) that matches the jobID
     // return the incrementor for the Counter specified by group/name
@@ -78,15 +82,17 @@ object SummingbirdRuntimeStats {
       provRef <- platformStatProviders.toSeq
       prov <- provRef.get
       incr <- prov.counterIncrementor(jobID, group, name)
-    } yield incr).toList.headOption.getOrElse(sys.error(
-            "Could not find the platform stat provider for jobID " + jobID))
+    } yield incr).toList.headOption.getOrElse(
+      sys.error("Could not find the platform stat provider for jobID " + jobID))
   }
 }
 
 object JobCounters {
   @annotation.tailrec
   private[this] final def getOrElseUpdate[K, V](
-      map: ConcurrentHashMap[K, V], k: K, default: => V): V = {
+      map: ConcurrentHashMap[K, V],
+      k: K,
+      default: => V): V = {
     val v = map.get(k)
     if (v == null) {
       map.putIfAbsent(k, default)
@@ -96,8 +102,8 @@ object JobCounters {
     }
   }
 
-  private val registeredCountersForJob: ConcurrentHashMap[
-      JobId, ParHashSet[(Group, Name)]] =
+  private val registeredCountersForJob
+    : ConcurrentHashMap[JobId, ParHashSet[(Group, Name)]] =
     new ConcurrentHashMap[JobId, ParHashSet[(Group, Name)]]()
 
   def getCountersForJob(jobID: JobId): Option[Seq[(Group, Name)]] =
@@ -105,7 +111,9 @@ object JobCounters {
 
   def registerCounter(jobID: JobId, group: Group, name: Name): Unit = {
     val set = getOrElseUpdate(
-        registeredCountersForJob, jobID, ParHashSet[(Group, Name)]())
+      registeredCountersForJob,
+      jobID,
+      ParHashSet[(Group, Name)]())
     set += ((group, name))
   }
 }

@@ -6,36 +6,43 @@ import com.intellij.psi.impl.ConstantExpressionEvaluator
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScLiteral
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScReferencePattern
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScParenthesisedExpr, ScReferenceExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression,
+  ScParenthesisedExpr,
+  ScReferenceExpression
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScPatternDefinition
 
 /**
   * @author Alexander Podkhalyuzin
   */
 class ScalaConstantExpressionEvaluator extends ConstantExpressionEvaluator {
-  def computeExpression(expression: PsiElement,
-                        throwExceptionOnOverflow: Boolean,
-                        auxEvaluator: AuxEvaluator): AnyRef = {
+  def computeExpression(
+      expression: PsiElement,
+      throwExceptionOnOverflow: Boolean,
+      auxEvaluator: AuxEvaluator): AnyRef = {
     expression match {
       case expr: ScExpression => evaluate(expr)
-      case _ => null
+      case _                  => null
     }
   }
 
   def computeConstantExpression(
-      expression: PsiElement, throwExceptionOnOverflow: Boolean): AnyRef = {
+      expression: PsiElement,
+      throwExceptionOnOverflow: Boolean): AnyRef = {
     expression match {
       case ref: ScReferenceExpression =>
         computeConstantExpression(ref.resolve(), throwExceptionOnOverflow)
       case refPattern: ScReferencePattern =>
         computeConstantExpression(
-            ScalaPsiUtil nameContext refPattern, throwExceptionOnOverflow)
+          ScalaPsiUtil nameContext refPattern,
+          throwExceptionOnOverflow)
       case deff: ScPatternDefinition =>
         deff.expr.map {
           case e => computeConstantExpression(e, throwExceptionOnOverflow)
         }.orNull
       case expr: ScExpression => evaluate(expr)
-      case _ => null
+      case _                  => null
     }
   }
 
@@ -45,7 +52,7 @@ class ScalaConstantExpressionEvaluator extends ConstantExpressionEvaluator {
       case p: ScParenthesisedExpr =>
         p.expr match {
           case Some(e) => evaluate(e)
-          case _ => null
+          case _       => null
         }
       case _ => null
     }

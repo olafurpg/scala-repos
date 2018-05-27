@@ -19,7 +19,9 @@ abstract class ScalaBaseGenerateAction(val handler: CodeInsightActionHandler)
     extends BaseGenerateAction(handler) {
 
   override protected def isValidForFile(
-      project: Project, editor: Editor, file: PsiFile): Boolean = {
+      project: Project,
+      editor: Editor,
+      file: PsiFile): Boolean = {
     lazy val classOk = {
       PsiDocumentManager
         .getInstance(project)
@@ -29,7 +31,7 @@ abstract class ScalaBaseGenerateAction(val handler: CodeInsightActionHandler)
     }
     lazy val handlerIsValid = handler match {
       case l: LanguageCodeInsightActionHandler => l.isValidFor(editor, file)
-      case _ => true
+      case _                                   => true
     }
     file.isInstanceOf[ScalaFile] && file.isWritable && classOk &&
     handlerIsValid
@@ -38,7 +40,8 @@ abstract class ScalaBaseGenerateAction(val handler: CodeInsightActionHandler)
   override protected def isValidForClass(targetClass: PsiClass): Boolean = true
 
   override protected def getTargetClass(
-      editor: Editor, file: PsiFile): PsiClass = {
+      editor: Editor,
+      file: PsiFile): PsiClass = {
     val offset: Int = editor.getCaretModel.getOffset
     val element: PsiElement = file.findElementAt(offset)
     PsiTreeUtil.getParentOfType(element, classOf[ScTemplateDefinition])

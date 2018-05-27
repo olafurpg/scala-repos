@@ -7,12 +7,13 @@ import scala.math.Ordering
 import scala.collection.JavaConversions._
 
 class ConcurrentSkipListSet[E] private (inner: TreeSet[E])
-    extends AbstractSet[E] with NavigableSet[E] with Cloneable
+    extends AbstractSet[E]
+    with NavigableSet[E]
+    with Cloneable
     with Serializable {
 
   def this(collection: Collection[_ <: E]) = {
-    this(
-        new TreeSet[E](collection) {
+    this(new TreeSet[E](collection) {
       override def add(e: E): Boolean =
         inner.add(Box(e))
     })
@@ -87,10 +88,11 @@ class ConcurrentSkipListSet[E] private (inner: TreeSet[E])
   def last(): E =
     inner.last
 
-  def subSet(fromElement: E,
-             fromInclusive: Boolean,
-             toElement: E,
-             toInclusive: Boolean): NavigableSet[E] =
+  def subSet(
+      fromElement: E,
+      fromInclusive: Boolean,
+      toElement: E,
+      toInclusive: Boolean): NavigableSet[E] =
     inner.subSet(fromElement, fromInclusive, toElement, toInclusive)
 
   def headSet(toElement: E, inclusive: Boolean): NavigableSet[E] =

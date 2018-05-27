@@ -13,6 +13,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.xml._
   * Date: 21.04.2008
   */
 class ScXmlElementImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScXmlElement {
+    extends ScalaPsiElementImpl(node)
+    with ScXmlElement {
   override def toString: String = "XmlElement"
 }

@@ -37,15 +37,18 @@ object CycleMethod
 
   val NoCycle = new CycleMethod(jfxsp.CycleMethod.NO_CYCLE)
   @deprecated(
-      "Use NoCycle; NO_CYCLE will be removed in a future release", "2.2.60")
+    "Use NoCycle; NO_CYCLE will be removed in a future release",
+    "2.2.60")
   val NO_CYCLE = NoCycle
   val Reflect = new CycleMethod(jfxsp.CycleMethod.REFLECT)
   @deprecated(
-      "Use Reflect; REFLECT will be removed in a future release", "2.2.60")
+    "Use Reflect; REFLECT will be removed in a future release",
+    "2.2.60")
   val REFLECT = Reflect
   val Repeat = new CycleMethod(jfxsp.CycleMethod.REPEAT)
   @deprecated(
-      "Use Repeat; REPEAT will be removed in a future release", "2.2.60")
+    "Use Repeat; REPEAT will be removed in a future release",
+    "2.2.60")
   val REPEAT = Repeat
 
   protected override def unsortedValues: Array[CycleMethod] =

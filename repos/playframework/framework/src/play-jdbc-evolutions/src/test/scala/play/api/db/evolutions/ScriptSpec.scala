@@ -21,8 +21,8 @@ object ScriptSpec extends Specification {
 
     "not delimit statements on double-semicolons, rather escaping them to a single semicolon" in {
       val statements = IndexedSeq(
-          "SELECT * FROM punctuation WHERE characters = ';' OR characters = ';;'",
-          "DROP the_beat"
+        "SELECT * FROM punctuation WHERE characters = ';' OR characters = ';;'",
+        "DROP the_beat"
       )
 
       // double the semicolons
@@ -71,7 +71,7 @@ object ScriptSpec extends Specification {
         .map(i => Evolution(i, s"DummySQLUP$i", s"DummySQLDOWN$i"))
       val upRest =
         Evolution(9, "DifferentDummySQLUP", "DifferentDummySQLDOWN") +:
-        (1 to 8).reverse
+          (1 to 8).reverse
           .map(i => Evolution(i, s"DummySQLUP$i", s"DummySQLDOWN$i"))
 
       val (conflictingDowns, conflictingUps) =
@@ -89,8 +89,10 @@ object ScriptSpec extends Specification {
         .map(i => Evolution(i, s"DummySQLUP$i", s"DummySQLDOWN$i"))
       val upRest =
         (6 to 9).reverse.map(i =>
-              Evolution(i, s"DummySQLUP$i", s"DummySQLDOWN$i")) ++: Evolution(
-            5, "DifferentDummySQLUP", "DifferentDummySQLDOWN") +: (1 to 4).reverse
+          Evolution(i, s"DummySQLUP$i", s"DummySQLDOWN$i")) ++: Evolution(
+          5,
+          "DifferentDummySQLUP",
+          "DifferentDummySQLDOWN") +: (1 to 4).reverse
           .map(i => Evolution(i, s"DummySQLUP$i", s"DummySQLDOWN$i"))
 
       val (conflictingDowns, conflictingUps) =
@@ -111,7 +113,7 @@ object ScriptSpec extends Specification {
       val upRest =
         (2 to 9).reverse
           .map(i => Evolution(i, s"DummySQLUP$i", s"DummySQLDOWN$i")) ++: List(
-            Evolution(1, "DifferentDummySQLUP", "DifferentDummySQLDOWN"))
+          Evolution(1, "DifferentDummySQLUP", "DifferentDummySQLDOWN"))
 
       val (conflictingDowns, conflictingUps) =
         Evolutions.conflictings(downRest, upRest)

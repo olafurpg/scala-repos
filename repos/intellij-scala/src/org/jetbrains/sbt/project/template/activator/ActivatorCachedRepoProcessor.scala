@@ -45,7 +45,7 @@ class ActivatorCachedRepoProcessor extends ProjectComponent {
 
         try {
           downloaded = ActivatorRepoProcessor.downloadStringFromRepo(
-              s"$urlString/$PROPERTIES")
+            s"$urlString/$PROPERTIES")
         } catch {
           case io: IOException => error("Can't download index", io)
         }
@@ -72,10 +72,10 @@ class ActivatorCachedRepoProcessor extends ProjectComponent {
         case hash =>
           val tmpFile = FileUtil.createTempFile(s"index-$hash", ".zip", true)
           val downloaded = ActivatorRepoProcessor.downloadFile(
-              s"$urlString/${indexName(hash)}",
-              tmpFile.getCanonicalPath,
-              errorStr,
-              ProgressManager.getInstance().getProgressIndicator)
+            s"$urlString/${indexName(hash)}",
+            tmpFile.getCanonicalPath,
+            errorStr,
+            ProgressManager.getInstance().getProgressIndicator)
 
           if (downloaded) {
             indexFile = Some((hash, tmpFile))
@@ -137,37 +137,42 @@ class ActivatorCachedRepoProcessor extends ProjectComponent {
   }
 
   private def getOrDownloadTemplate(
-      templateId: String, pathTo: File, onError: String => Unit) {
+      templateId: String,
+      pathTo: File,
+      onError: String => Unit) {
     var hasError = false
 
     val fileName = ActivatorRepoProcessor.templateFileName(templateId)
     val cachedTemplate = new File(getCacheDataPath, fileName)
 
-    val myOnError = (a: String) =>
-      {
+    val myOnError = (a: String) => {
 
-        hasError = true
+      hasError = true
 
-        if (!cachedTemplate.exists()) {
-          onError(a)
-          return
-        }
+      if (!cachedTemplate.exists()) {
+        onError(a)
+        return
+      }
 
-        try {
-          FileUtil.copy(cachedTemplate, pathTo)
-        } catch {
-          case _: IOException => onError(a)
-        }
+      try {
+        FileUtil.copy(cachedTemplate, pathTo)
+      } catch {
+        case _: IOException => onError(a)
+      }
     }
 
     ActivatorRepoProcessor.downloadTemplateFromRepo(
-        templateId, pathTo, myOnError)
+      templateId,
+      pathTo,
+      myOnError)
     workOffline = hasError
     if (!workOffline) cacheFile(pathTo, cachedTemplate)
   }
 
   def createTemplate(
-      templateId: String, extractTo: File, onError: String => Unit) {
+      templateId: String,
+      extractTo: File,
+      onError: String => Unit) {
     val contentDir =
       FileUtilRt.createTempDirectory(s"$templateId-template-content", "", true)
     val contentFile = new File(contentDir, "content.zip")

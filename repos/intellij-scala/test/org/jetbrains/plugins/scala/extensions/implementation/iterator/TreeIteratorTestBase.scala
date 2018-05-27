@@ -44,19 +44,20 @@ abstract class TreeIteratorTestBase extends IteratorTestCase {
 
   def testPredicateOnFirstChild() = {
     assertIterates(
-        "0, 1.1", createIterator(parse("0 (1.1)"), _.toString != "1.1"))
+      "0, 1.1",
+      createIterator(parse("0 (1.1)"), _.toString != "1.1"))
   }
 
   def testPredicateOnMiddleChild() = {
     assertIterates(
-        "0, 1.1, 1.2, 1.3",
-        createIterator(parse("0 (1.1, 1.2, 1.3)"), _.toString != "1.2"))
+      "0, 1.1, 1.2, 1.3",
+      createIterator(parse("0 (1.1, 1.2, 1.3)"), _.toString != "1.2"))
   }
 
   def testPredicateOnNested() = {
     assertIterates(
-        "0, 1.1, 1.2",
-        createIterator(parse("0 (1.1 (1.2 (1.3)))"), _.toString != "1.2"))
+      "0, 1.1, 1.2",
+      createIterator(parse("0 (1.1 (1.2 (1.3)))"), _.toString != "1.2"))
   }
 
   final override def createIterator(element: PsiElement) =

@@ -42,8 +42,8 @@ object ConstraintsBase {
     */
   val ConstrainToPref = jfxsl.ConstraintsBase.CONSTRAIN_TO_PREF
   @deprecated(
-      "Use ConstrainToPref; CONSTRAIN_TO_PREF will be removed in a future release",
-      "8.0.60-R10")
+    "Use ConstrainToPref; CONSTRAIN_TO_PREF will be removed in a future release",
+    "8.0.60-R10")
   val CONSTRAIN_TO_PREF = ConstrainToPref
 }
 

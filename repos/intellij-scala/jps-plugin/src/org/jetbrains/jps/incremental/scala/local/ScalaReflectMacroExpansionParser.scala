@@ -1,6 +1,11 @@
 package org.jetbrains.jps.incremental.scala.local
 
-import java.io.{BufferedOutputStream, ObjectOutputStream, File, FileOutputStream}
+import java.io.{
+  BufferedOutputStream,
+  ObjectOutputStream,
+  File,
+  FileOutputStream
+}
 import java.util.regex.Pattern
 
 import com.intellij.openapi.application.PathManager
@@ -25,8 +30,8 @@ object ScalaReflectMacroExpansionParser {
   var expansions = mutable.ListBuffer[MacroExpansion]()
 
   val placeRegex = Pattern.compile(
-      "^performing macro expansion (.+) at source-(.+),line-(\\d+),offset=(\\d+)$",
-      Pattern.DOTALL | Pattern.MULTILINE)
+    "^performing macro expansion (.+) at source-(.+),line-(\\d+),offset=(\\d+)$",
+    Pattern.DOTALL | Pattern.MULTILINE)
 //  val expansionRegex = Pattern.compile("^\\s*\\{(.+)\\}\\s+Block.*$", Pattern.DOTALL | Pattern.MULTILINE)
   val expansionRegex =
     Pattern.compile("^(.+)\\n[^\\n]+$", Pattern.DOTALL | Pattern.MULTILINE)
@@ -35,7 +40,7 @@ object ScalaReflectMacroExpansionParser {
     import ParsingState._
     parsingState match {
       case INIT | EXPANSION => message.startsWith(placePrefix)
-      case PLACE => message == delim
+      case PLACE            => message == delim
 //      case DELIM            => message.startsWith(expansionPrefix)
       case DELIM => true
     }
@@ -48,11 +53,13 @@ object ScalaReflectMacroExpansionParser {
         val matcher = placeRegex.matcher(message)
         if (!matcher.matches()) reset()
         else {
-          expansions += MacroExpansion(Place(matcher.group(1),
-                                             matcher.group(2),
-                                             matcher.group(3).toInt,
-                                             matcher.group(4).toInt),
-                                       "")
+          expansions += MacroExpansion(
+            Place(
+              matcher.group(1),
+              matcher.group(2),
+              matcher.group(3).toInt,
+              matcher.group(4).toInt),
+            "")
           parsingState = PLACE
         }
       case PLACE =>
@@ -62,8 +69,8 @@ object ScalaReflectMacroExpansionParser {
         val matcher = expansionRegex.matcher(message)
         if (!matcher.matches()) reset()
         else {
-          expansions(expansions.length - 1) = MacroExpansion(
-              expansions.last.place, matcher.group(1))
+          expansions(expansions.length - 1) =
+            MacroExpansion(expansions.last.place, matcher.group(1))
           parsingState = EXPANSION
         }
     }
@@ -73,7 +80,7 @@ object ScalaReflectMacroExpansionParser {
 
   def serializeExpansions(context: CompileContext) = {
     val file = new File(
-        System.getProperty("java.io.tmpdir") +
+      System.getProperty("java.io.tmpdir") +
         s"/../../expansion-${context.getProjectDescriptor.getProject.getName}")
     val fo = new BufferedOutputStream(new FileOutputStream(file))
     val so = new ObjectOutputStream(fo)

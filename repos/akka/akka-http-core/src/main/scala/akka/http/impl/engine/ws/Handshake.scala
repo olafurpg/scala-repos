@@ -66,7 +66,7 @@ private[http] object Handshake {
     def websocketUpgrade(
         headers: List[HttpHeader],
         hostHeaderPresent: Boolean): Option[UpgradeToWebSocket] = {
-      def find[T <: HttpHeader : ClassTag]: Option[T] =
+      def find[T <: HttpHeader: ClassTag]: Option[T] =
         headers.collectFirst {
           case t: T ⇒ t
         }
@@ -94,14 +94,16 @@ private[http] object Handshake {
           def requestedProtocols: Seq[String] = clientSupportedSubprotocols
 
           def handle(
-              handler: Either[Graph[FlowShape[FrameEvent, FrameEvent], Any],
-                              Graph[FlowShape[Message, Message], Any]],
+              handler: Either[
+                Graph[FlowShape[FrameEvent, FrameEvent], Any],
+                Graph[FlowShape[Message, Message], Any]],
               subprotocol: Option[String]): HttpResponse = {
             require(
-                subprotocol.forall(
-                    chosen ⇒ clientSupportedSubprotocols.contains(chosen)),
-                s"Tried to choose invalid subprotocol '$subprotocol' which wasn't offered by the client: [${requestedProtocols
-                  .mkString(", ")}]")
+              subprotocol.forall(chosen ⇒
+                clientSupportedSubprotocols.contains(chosen)),
+              s"Tried to choose invalid subprotocol '$subprotocol' which wasn't offered by the client: [${requestedProtocols
+                .mkString(", ")}]"
+            )
             buildResponse(key.get, handler, subprotocol)
           }
 
@@ -140,16 +142,18 @@ private[http] object Handshake {
      */
     def buildResponse(
         key: `Sec-WebSocket-Key`,
-        handler: Either[Graph[FlowShape[FrameEvent, FrameEvent], Any],
-                        Graph[FlowShape[Message, Message], Any]],
+        handler: Either[
+          Graph[FlowShape[FrameEvent, FrameEvent], Any],
+          Graph[FlowShape[Message, Message], Any]],
         subprotocol: Option[String]): HttpResponse =
       HttpResponse(
-          StatusCodes.SwitchingProtocols,
-          subprotocol.map(p ⇒ `Sec-WebSocket-Protocol`(Seq(p))).toList ::: List(
-              UpgradeHeader,
-              ConnectionUpgradeHeader,
-              `Sec-WebSocket-Accept`.forKey(key),
-              UpgradeToWebSocketResponseHeader(handler)))
+        StatusCodes.SwitchingProtocols,
+        subprotocol.map(p ⇒ `Sec-WebSocket-Protocol`(Seq(p))).toList ::: List(
+          UpgradeHeader,
+          ConnectionUpgradeHeader,
+          `Sec-WebSocket-Accept`.forKey(key),
+          UpgradeToWebSocketResponseHeader(handler))
+      )
   }
 
   object Client {
@@ -158,10 +162,11 @@ private[http] object Handshake {
     /**
       * Builds a WebSocket handshake request.
       */
-    def buildRequest(uri: Uri,
-                     extraHeaders: immutable.Seq[HttpHeader],
-                     subprotocols: Seq[String],
-                     random: Random): (HttpRequest, `Sec-WebSocket-Key`) = {
+    def buildRequest(
+        uri: Uri,
+        extraHeaders: immutable.Seq[HttpHeader],
+        subprotocols: Seq[String],
+        random: Random): (HttpRequest, `Sec-WebSocket-Key`) = {
       val keyBytes = new Array[Byte](16)
       random.nextBytes(keyBytes)
       val key = `Sec-WebSocket-Key`(keyBytes)
@@ -172,10 +177,11 @@ private[http] object Handshake {
       //version, protocol, extensions, origin
 
       val headers =
-        Seq(UpgradeHeader,
-            ConnectionUpgradeHeader,
-            key,
-            SecWebSocketVersionHeader) ++ protocol ++ extraHeaders
+        Seq(
+          UpgradeHeader,
+          ConnectionUpgradeHeader,
+          key,
+          SecWebSocketVersionHeader) ++ protocol ++ extraHeaders
 
       (HttpRequest(HttpMethods.GET, uri.toRelative, headers), key)
     }
@@ -184,9 +190,10 @@ private[http] object Handshake {
       * Tries to validate the HTTP response. Returns either Right(settings) or an error message if
       * the response cannot be validated.
       */
-    def validateResponse(response: HttpResponse,
-                         subprotocols: Seq[String],
-                         key: `Sec-WebSocket-Key`)
+    def validateResponse(
+        response: HttpResponse,
+        subprotocols: Seq[String],
+        key: `Sec-WebSocket-Key`)
       : Either[String, NegotiatedWebSocketSettings] = {
       /*
        From http://tools.ietf.org/html/rfc6455#section-4.1
@@ -240,7 +247,8 @@ private[http] object Handshake {
       }
 
       def check[T](value: HttpResponse ⇒ T)(
-          condition: T ⇒ Boolean, msg: T ⇒ String): Expectation =
+          condition: T ⇒ Boolean,
+          msg: T ⇒ String): Expectation =
         new Expectation {
           def apply(resp: HttpResponse): Option[String] = {
             val v = value(resp)
@@ -249,35 +257,40 @@ private[http] object Handshake {
           }
         }
 
-      def compare(candidate: HttpHeader,
-                  caseInsensitive: Boolean): Option[HttpHeader] ⇒ Boolean = {
+      def compare(
+          candidate: HttpHeader,
+          caseInsensitive: Boolean): Option[HttpHeader] ⇒ Boolean = {
         case Some(`candidate`) if !caseInsensitive ⇒ true
         case Some(header)
             if caseInsensitive &&
-            candidate.value.toRootLowerCase == header.value.toRootLowerCase ⇒
+              candidate.value.toRootLowerCase == header.value.toRootLowerCase ⇒
           true
         case _ ⇒ false
       }
 
-      def headerExists(candidate: HttpHeader,
-                       showExactOther: Boolean = true,
-                       caseInsensitive: Boolean = false): Expectation =
+      def headerExists(
+          candidate: HttpHeader,
+          showExactOther: Boolean = true,
+          caseInsensitive: Boolean = false): Expectation =
         check(_.headers.find(_.name == candidate.name))(
-            compare(candidate, caseInsensitive), {
-          case Some(other) if showExactOther ⇒
-            s"response that was missing required `$candidate` header. Found `$other` with the wrong value."
-          case Some(_) ⇒ s"response with invalid `${candidate.name}` header."
-          case None ⇒
-            s"response that was missing required `${candidate.name}` header."
-        })
+          compare(candidate, caseInsensitive), {
+            case Some(other) if showExactOther ⇒
+              s"response that was missing required `$candidate` header. Found `$other` with the wrong value."
+            case Some(_) ⇒ s"response with invalid `${candidate.name}` header."
+            case None ⇒
+              s"response that was missing required `${candidate.name}` header."
+          }
+        )
 
       val expectations: Expectation =
-        check(_.status)(_ == StatusCodes.SwitchingProtocols,
-                        "unexpected status code: " + _) &&
-        headerExists(UpgradeHeader, caseInsensitive = true) &&
-        headerExists(ConnectionUpgradeHeader, caseInsensitive = true) &&
-        headerExists(
-            `Sec-WebSocket-Accept`.forKey(key), showExactOther = false)
+        check(_.status)(
+          _ == StatusCodes.SwitchingProtocols,
+          "unexpected status code: " + _) &&
+          headerExists(UpgradeHeader, caseInsensitive = true) &&
+          headerExists(ConnectionUpgradeHeader, caseInsensitive = true) &&
+          headerExists(
+            `Sec-WebSocket-Accept`.forKey(key),
+            showExactOther = false)
 
       expectations(response) match {
         case None ⇒
@@ -291,8 +304,8 @@ private[http] object Handshake {
             Right(NegotiatedWebSocketSettings(Some(subs.get)))
           else
             Left(
-                s"response that indicated that the given subprotocol was not supported. (client supported: ${subprotocols
-              .mkString(", ")}, server supported: $subs)")
+              s"response that indicated that the given subprotocol was not supported. (client supported: ${subprotocols
+                .mkString(", ")}, server supported: $subs)")
         case Some(problem) ⇒ Left(problem)
       }
     }
@@ -301,5 +314,5 @@ private[http] object Handshake {
   val UpgradeHeader = Upgrade(List(UpgradeProtocol("websocket")))
   val ConnectionUpgradeHeader = Connection(List("upgrade"))
   val SecWebSocketVersionHeader = `Sec-WebSocket-Version`(
-      Seq(CurrentWebSocketVersion))
+    Seq(CurrentWebSocketVersion))
 }

@@ -37,7 +37,7 @@ object CanZipAndTraverseValues {
       var i = 0
       if (arr.size != arr2.size) {
         throw new IllegalArgumentException(
-            "Arrays to be visited must have same size")
+          "Arrays to be visited must have same size")
       }
       while (i < arr.size) {
         visit(arr(i), arr2(i))

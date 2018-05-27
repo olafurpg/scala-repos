@@ -55,18 +55,22 @@ object AkkaSpec {
 }
 
 abstract class AkkaSpec(_system: ActorSystem)
-    extends TestKit(_system) with WordSpecLike with Matchers
-    with BeforeAndAfterAll with WatchedByCoroner
-    with ConversionCheckedTripleEquals with ScalaFutures {
+    extends TestKit(_system)
+    with WordSpecLike
+    with Matchers
+    with BeforeAndAfterAll
+    with WatchedByCoroner
+    with ConversionCheckedTripleEquals
+    with ScalaFutures {
 
   implicit val patience = PatienceConfig(
-      testKitSettings.DefaultTimeout.duration)
+    testKitSettings.DefaultTimeout.duration)
 
   def this(config: Config) =
     this(
-        ActorSystem(
-            AkkaSpec.getCallerName(getClass),
-            ConfigFactory.load(config.withFallback(AkkaSpec.testConf))))
+      ActorSystem(
+        AkkaSpec.getCallerName(getClass),
+        ConfigFactory.load(config.withFallback(AkkaSpec.testConf))))
 
   def this(s: String) = this(ConfigFactory.parseString(s))
 
@@ -108,7 +112,7 @@ abstract class AkkaSpec(_system: ActorSystem)
     if (!sys.log.isDebugEnabled) {
       def mute(clazz: Class[_]): Unit =
         sys.eventStream.publish(
-            Mute(DeadLettersFilter(clazz)(occurrences = Int.MaxValue)))
+          Mute(DeadLettersFilter(clazz)(occurrences = Int.MaxValue)))
       if (messageClasses.isEmpty) mute(classOf[AnyRef])
       else messageClasses foreach mute
     }
@@ -119,8 +123,8 @@ abstract class AkkaSpec(_system: ActorSystem)
       def areEqual(a: Class[A], b: Class[B]) = a == b
     }
 
-  implicit def setEqualityConstraint[A, T <: Set[_ <: A]]: Constraint[
-      Set[A], T] =
+  implicit def setEqualityConstraint[A, T <: Set[_ <: A]]
+    : Constraint[Set[A], T] =
     new Constraint[Set[A], T] {
       def areEqual(a: Set[A], b: T) = a == b
     }

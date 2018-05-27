@@ -28,18 +28,18 @@ class MailChimpConnectorSpec extends Specification with ConnectorTestUtil {
     "convert subscribe to event JSON" in {
 
       val subscribe = Map(
-          "type" -> "subscribe",
-          "fired_at" -> "2009-03-26 21:35:57",
-          "data[id]" -> "8a25ff1d98",
-          "data[list_id]" -> "a6b5da1054",
-          "data[email]" -> "api@mailchimp.com",
-          "data[email_type]" -> "html",
-          "data[merges][EMAIL]" -> "api@mailchimp.com",
-          "data[merges][FNAME]" -> "MailChimp",
-          "data[merges][LNAME]" -> "API",
-          "data[merges][INTERESTS]" -> "Group1,Group2", //optional
-          "data[ip_opt]" -> "10.20.10.30",
-          "data[ip_signup]" -> "10.20.10.30"
+        "type" -> "subscribe",
+        "fired_at" -> "2009-03-26 21:35:57",
+        "data[id]" -> "8a25ff1d98",
+        "data[list_id]" -> "a6b5da1054",
+        "data[email]" -> "api@mailchimp.com",
+        "data[email_type]" -> "html",
+        "data[merges][EMAIL]" -> "api@mailchimp.com",
+        "data[merges][FNAME]" -> "MailChimp",
+        "data[merges][LNAME]" -> "API",
+        "data[merges][INTERESTS]" -> "Group1,Group2", //optional
+        "data[ip_opt]" -> "10.20.10.30",
+        "data[ip_signup]" -> "10.20.10.30"
       )
 
       val expected = """
@@ -72,20 +72,20 @@ class MailChimpConnectorSpec extends Specification with ConnectorTestUtil {
     "convert unsubscribe to event JSON" in {
 
       val unsubscribe = Map(
-          "type" -> "unsubscribe",
-          "fired_at" -> "2009-03-26 21:40:57",
-          "data[action]" -> "unsub",
-          "data[reason]" -> "manual",
-          "data[id]" -> "8a25ff1d98",
-          "data[list_id]" -> "a6b5da1054",
-          "data[email]" -> "api+unsub@mailchimp.com",
-          "data[email_type]" -> "html",
-          "data[merges][EMAIL]" -> "api+unsub@mailchimp.com",
-          "data[merges][FNAME]" -> "MailChimp",
-          "data[merges][LNAME]" -> "API",
-          "data[merges][INTERESTS]" -> "Group1,Group2", //optional 
-          "data[ip_opt]" -> "10.20.10.30",
-          "data[campaign_id]" -> "cb398d21d2"
+        "type" -> "unsubscribe",
+        "fired_at" -> "2009-03-26 21:40:57",
+        "data[action]" -> "unsub",
+        "data[reason]" -> "manual",
+        "data[id]" -> "8a25ff1d98",
+        "data[list_id]" -> "a6b5da1054",
+        "data[email]" -> "api+unsub@mailchimp.com",
+        "data[email_type]" -> "html",
+        "data[merges][EMAIL]" -> "api+unsub@mailchimp.com",
+        "data[merges][FNAME]" -> "MailChimp",
+        "data[merges][LNAME]" -> "API",
+        "data[merges][INTERESTS]" -> "Group1,Group2", //optional
+        "data[ip_opt]" -> "10.20.10.30",
+        "data[campaign_id]" -> "cb398d21d2"
       )
 
       val expected = """
@@ -116,21 +116,21 @@ class MailChimpConnectorSpec extends Specification with ConnectorTestUtil {
       check(MailChimpConnector, unsubscribe, expected)
     }
 
-    //check profile update to event Json 
+    //check profile update to event Json
     "convert profile update to event JSON" in {
 
       val profileUpdate = Map(
-          "type" -> "profile",
-          "fired_at" -> "2009-03-26 21:31:21",
-          "data[id]" -> "8a25ff1d98",
-          "data[list_id]" -> "a6b5da1054",
-          "data[email]" -> "api@mailchimp.com",
-          "data[email_type]" -> "html",
-          "data[merges][EMAIL]" -> "api@mailchimp.com",
-          "data[merges][FNAME]" -> "MailChimp",
-          "data[merges][LNAME]" -> "API",
-          "data[merges][INTERESTS]" -> "Group1,Group2", //optional
-          "data[ip_opt]" -> "10.20.10.30"
+        "type" -> "profile",
+        "fired_at" -> "2009-03-26 21:31:21",
+        "data[id]" -> "8a25ff1d98",
+        "data[list_id]" -> "a6b5da1054",
+        "data[email]" -> "api@mailchimp.com",
+        "data[email_type]" -> "html",
+        "data[merges][EMAIL]" -> "api@mailchimp.com",
+        "data[merges][FNAME]" -> "MailChimp",
+        "data[merges][LNAME]" -> "API",
+        "data[merges][INTERESTS]" -> "Group1,Group2", //optional
+        "data[ip_opt]" -> "10.20.10.30"
       )
 
       val expected = """
@@ -158,16 +158,16 @@ class MailChimpConnectorSpec extends Specification with ConnectorTestUtil {
       check(MailChimpConnector, profileUpdate, expected)
     }
 
-    //check email update to event Json 
+    //check email update to event Json
     "convert email update to event JSON" in {
 
       val emailUpdate = Map(
-          "type" -> "upemail",
-          "fired_at" -> "2009-03-26 22:15:09",
-          "data[list_id]" -> "a6b5da1054",
-          "data[new_id]" -> "51da8c3259",
-          "data[new_email]" -> "api+new@mailchimp.com",
-          "data[old_email]" -> "api+old@mailchimp.com"
+        "type" -> "upemail",
+        "fired_at" -> "2009-03-26 22:15:09",
+        "data[list_id]" -> "a6b5da1054",
+        "data[new_id]" -> "51da8c3259",
+        "data[new_email]" -> "api+new@mailchimp.com",
+        "data[old_email]" -> "api+old@mailchimp.com"
       )
 
       val expected = """
@@ -188,16 +188,16 @@ class MailChimpConnectorSpec extends Specification with ConnectorTestUtil {
       check(MailChimpConnector, emailUpdate, expected)
     }
 
-    //check cleaned email to event Json 
+    //check cleaned email to event Json
     "convert cleaned email to event JSON" in {
 
       val cleanedEmail = Map(
-          "type" -> "cleaned",
-          "fired_at" -> "2009-03-26 22:01:00",
-          "data[list_id]" -> "a6b5da1054",
-          "data[campaign_id]" -> "4fjk2ma9xd",
-          "data[reason]" -> "hard",
-          "data[email]" -> "api+cleaned@mailchimp.com"
+        "type" -> "cleaned",
+        "fired_at" -> "2009-03-26 22:01:00",
+        "data[list_id]" -> "a6b5da1054",
+        "data[campaign_id]" -> "4fjk2ma9xd",
+        "data[reason]" -> "hard",
+        "data[email]" -> "api+cleaned@mailchimp.com"
       )
 
       val expected = """
@@ -217,17 +217,17 @@ class MailChimpConnectorSpec extends Specification with ConnectorTestUtil {
       check(MailChimpConnector, cleanedEmail, expected)
     }
 
-    //check campaign sending status to event Json 
+    //check campaign sending status to event Json
     "convert campaign sending status to event JSON" in {
 
       val campaign = Map(
-          "type" -> "campaign",
-          "fired_at" -> "2009-03-26 22:15:09",
-          "data[id]" -> "5aa2102003",
-          "data[subject]" -> "Test Campaign Subject",
-          "data[status]" -> "sent",
-          "data[reason]" -> "",
-          "data[list_id]" -> "a6b5da1054"
+        "type" -> "campaign",
+        "fired_at" -> "2009-03-26 22:15:09",
+        "data[id]" -> "5aa2102003",
+        "data[subject]" -> "Test Campaign Subject",
+        "data[status]" -> "sent",
+        "data[reason]" -> "",
+        "data[list_id]" -> "a6b5da1054"
       )
 
       val expected = """

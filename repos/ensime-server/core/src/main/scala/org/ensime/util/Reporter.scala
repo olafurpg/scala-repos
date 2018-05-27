@@ -19,7 +19,8 @@ trait ReportHandler {
 }
 
 class PresentationReporter(handler: ReportHandler)
-    extends Reporter with PositionBackCompat {
+    extends Reporter
+    with PositionBackCompat {
 
   val log = LoggerFactory.getLogger(classOf[PresentationReporter])
   private var enabled = true
@@ -34,7 +35,10 @@ class PresentationReporter(handler: ReportHandler)
   }
 
   override def info0(
-      pos: Position, msg: String, severity: Severity, force: Boolean): Unit = {
+      pos: Position,
+      msg: String,
+      severity: Severity,
+      force: Boolean): Unit = {
     severity.count += 1
     try {
       if (severity.id == 0) {
@@ -52,13 +56,13 @@ class PresentationReporter(handler: ReportHandler)
               }
 
             val note = new Note(
-                f,
-                formatMessage(msg),
-                NoteSeverity(severity.id),
-                pos.startOrCursor,
-                pos.endOrCursor,
-                pos.line,
-                posColumn
+              f,
+              formatMessage(msg),
+              NoteSeverity(severity.id),
+              pos.startOrCursor,
+              pos.endOrCursor,
+              pos.line,
+              posColumn
             )
             handler.reportScalaNotes(List(note))
           }
@@ -73,7 +77,7 @@ class PresentationReporter(handler: ReportHandler)
   def formatMessage(msg: String): String = {
     augmentString(msg).map {
       case '\n' | '\r' => ' '
-      case c => c
+      case c           => c
     }
   }
 }

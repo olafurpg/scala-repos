@@ -114,8 +114,8 @@ trait ZookeeperStateMonitor {
     // get one work item off the broker and schedule it into the future pool
     zookeeperWorkQueue.recv.sync() onSuccess {
       case op: (() => Unit) => {
-          scheduleReadCachePoolConfig(op)
-        }
+        scheduleReadCachePoolConfig(op)
+      }
     }
   }
 
@@ -131,8 +131,8 @@ trait ZookeeperStateMonitor {
 
         // read cache pool config data and leave a node data watch
         val data = zkClient
-          .get(Amount.of(DefaultZKWaitTimeout.inMilliseconds,
-                         Time.MILLISECONDS))
+          .get(
+            Amount.of(DefaultZKWaitTimeout.inMilliseconds, Time.MILLISECONDS))
           .getData(zkPath, true, null)
 
         applyZKData(data)
@@ -150,8 +150,8 @@ trait ZookeeperStateMonitor {
 
         // get children list and leave a node children watch
         val children = zkClient
-          .get(Amount.of(DefaultZKWaitTimeout.inMilliseconds,
-                         Time.MILLISECONDS))
+          .get(
+            Amount.of(DefaultZKWaitTimeout.inMilliseconds, Time.MILLISECONDS))
           .getChildren(zkPath, true, null)
 
         applyZKChildren(children.toList)
@@ -168,12 +168,12 @@ trait ZookeeperStateMonitor {
 
         // reset watch for node data and children
         val data = zkClient
-          .get(Amount.of(DefaultZKWaitTimeout.inMilliseconds,
-                         Time.MILLISECONDS))
+          .get(
+            Amount.of(DefaultZKWaitTimeout.inMilliseconds, Time.MILLISECONDS))
           .getData(zkPath, true, null)
         val children = zkClient
-          .get(Amount.of(DefaultZKWaitTimeout.inMilliseconds,
-                         Time.MILLISECONDS))
+          .get(
+            Amount.of(DefaultZKWaitTimeout.inMilliseconds, Time.MILLISECONDS))
           .getChildren(zkPath, true, null)
     }
 

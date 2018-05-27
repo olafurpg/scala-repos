@@ -79,7 +79,7 @@ object Test {
                                                                                                                           case Some(
                                                                                                                               b30) =>
                                                                                                                             println(
-                                                                                                                                "yay")
+                                                                                                                              "yay")
                                                                                                                           case None =>
                                                                                                                             None
                                                                                                                         }

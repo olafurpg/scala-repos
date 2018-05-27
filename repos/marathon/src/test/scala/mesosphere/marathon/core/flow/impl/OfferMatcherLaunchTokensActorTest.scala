@@ -5,7 +5,11 @@ import akka.testkit.TestActorRef
 import mesosphere.marathon.MarathonSpec
 import mesosphere.marathon.core.flow.LaunchTokenConfig
 import mesosphere.marathon.core.matcher.manager.OfferMatcherManager
-import mesosphere.marathon.core.task.bus.{TaskStatusUpdateTestHelper, MarathonTaskStatusTestHelper, TaskStatusObservables}
+import mesosphere.marathon.core.task.bus.{
+  TaskStatusUpdateTestHelper,
+  MarathonTaskStatusTestHelper,
+  TaskStatusObservables
+}
 import mesosphere.marathon.core.task.bus.TaskStatusObservables.TaskStatusUpdate
 import org.mockito.Mockito
 import rx.lang.scala.{Observable, Subject}
@@ -62,8 +66,8 @@ class OfferMatcherLaunchTokensActorTest extends MarathonSpec {
     offerMatcherManager = mock[OfferMatcherManager]
 
     actorRef = TestActorRef[OfferMatcherLaunchTokensActor](
-        OfferMatcherLaunchTokensActor.props(
-            conf, taskStatusObservables, offerMatcherManager)
+      OfferMatcherLaunchTokensActor
+        .props(conf, taskStatusObservables, offerMatcherManager)
     )
   }
 

@@ -10,21 +10,24 @@ object Test {
       def entries = (0 until i).map(i => (new Foo, i)).toList
       def elements = entries.map(_._1)
 
-      val maps = Seq[Map[Foo, Int]](new mutable.HashMap,
-                                    new mutable.LinkedHashMap,
-                                    immutable.HashMap.empty).map(_ ++ entries)
+      val maps = Seq[Map[Foo, Int]](
+        new mutable.HashMap,
+        new mutable.LinkedHashMap,
+        immutable.HashMap.empty).map(_ ++ entries)
       test[Map[Foo, Int]](maps, entries.size, assertMap _)
 
-      val sets = Seq[Set[Foo]](new mutable.HashSet,
-                               new mutable.LinkedHashSet,
-                               immutable.HashSet.empty).map(_ ++ elements)
+      val sets = Seq[Set[Foo]](
+        new mutable.HashSet,
+        new mutable.LinkedHashSet,
+        immutable.HashSet.empty).map(_ ++ elements)
       test[Set[Foo]](sets, entries.size, assertSet _)
     }
   }
 
-  private def test[A <: AnyRef](collections: Seq[A],
-                                expectedSize: Int,
-                                assertFunction: (A, Int) => Unit) {
+  private def test[A <: AnyRef](
+      collections: Seq[A],
+      expectedSize: Int,
+      assertFunction: (A, Int) => Unit) {
     for (collection <- collections) {
       assertFunction(collection, expectedSize)
 
@@ -34,9 +37,10 @@ object Test {
 
       assertFunction(deserializedCollection, expectedSize)
       assert(
-          deserializedCollection.getClass == collection.getClass,
-          "collection class should remain the same after deserialization (" +
-          deserializedCollection.getClass + " != " + collection.getClass + ")")
+        deserializedCollection.getClass == collection.getClass,
+        "collection class should remain the same after deserialization (" +
+          deserializedCollection.getClass + " != " + collection.getClass + ")"
+      )
       Foo.hashCodeModifier = 0
     }
   }
@@ -56,23 +60,26 @@ object Test {
   }
 
   private def assertMap[A, B](map: Map[A, B], expectedSize: Int) {
-    assert(expectedSize == map.size,
-           "expected map size: " + expectedSize + ", actual size: " + map.size)
+    assert(
+      expectedSize == map.size,
+      "expected map size: " + expectedSize + ", actual size: " + map.size)
     map.foreach {
       case (k, v) =>
-        assert(map.contains(k),
-               "contains should return true for key in the map, key: " + k)
+        assert(
+          map.contains(k),
+          "contains should return true for key in the map, key: " + k)
         assert(map(k) == v)
     }
   }
 
   private def assertSet[A](set: Set[A], expectedSize: Int) {
-    assert(expectedSize == set.size,
-           "expected set size: " + expectedSize + ", actual size: " + set.size)
+    assert(
+      expectedSize == set.size,
+      "expected set size: " + expectedSize + ", actual size: " + set.size)
     set.foreach { e =>
       assert(
-          set.contains(e),
-          "contains should return true for element in the set, element: " + e)
+        set.contains(e),
+        "contains should return true for element in the set, element: " + e)
     }
   }
 

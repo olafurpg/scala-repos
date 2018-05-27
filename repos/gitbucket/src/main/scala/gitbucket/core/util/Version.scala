@@ -38,11 +38,12 @@ object Versions {
 
   private val logger = LoggerFactory.getLogger(Versions.getClass)
 
-  def update(conn: Connection,
-             headVersion: Version,
-             currentVersion: Version,
-             versions: Seq[Version],
-             cl: ClassLoader)(save: Connection => Unit): Unit = {
+  def update(
+      conn: Connection,
+      headVersion: Version,
+      currentVersion: Version,
+      versions: Seq[Version],
+      cl: ClassLoader)(save: Connection => Unit): Unit = {
     logger.debug("Start schema update")
     try {
       if (currentVersion == headVersion) {
@@ -50,7 +51,7 @@ object Versions {
       } else if (currentVersion.versionString != "0.0" &&
                  !versions.contains(currentVersion)) {
         logger.warn(
-            s"Skip migration because ${currentVersion.versionString} is illegal version.")
+          s"Skip migration because ${currentVersion.versionString} is illegal version.")
       } else {
         versions
           .takeWhile(_ != currentVersion)
@@ -58,14 +59,14 @@ object Versions {
           .foreach(_.update(conn, cl))
         save(conn)
         logger.debug(
-            s"Updated from ${currentVersion.versionString} to ${headVersion.versionString}")
+          s"Updated from ${currentVersion.versionString} to ${headVersion.versionString}")
       }
     } catch {
       case ex: Throwable => {
-          logger.error("Failed to schema update", ex)
-          ex.printStackTrace()
-          conn.rollback()
-        }
+        logger.error("Failed to schema update", ex)
+        ex.printStackTrace()
+        conn.rollback()
+      }
     }
     logger.debug("End schema update")
   }

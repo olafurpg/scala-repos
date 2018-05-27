@@ -37,12 +37,13 @@ object OneShot extends Specification with RequestKit with XmlMatchers {
     val l = InetAddress.getLocalHost
     tryo { l.isReachable(50) } match {
       case Full(true) => l.getHostAddress
-      case _ => "127.0.0.1"
+      case _          => "127.0.0.1"
     }
   }
 
   private val host_ = System.getProperty(
-      "net.liftweb.webapptest.oneshot.host", reachableLocalAddress)
+    "net.liftweb.webapptest.oneshot.host",
+    reachableLocalAddress)
   private val port_ =
     System.getProperty("net.liftweb.webapptest.oneshot.port", "8181").toInt
 

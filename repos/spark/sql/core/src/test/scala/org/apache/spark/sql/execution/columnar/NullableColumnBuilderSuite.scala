@@ -19,7 +19,10 @@ package org.apache.spark.sql.execution.columnar
 
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.sql.catalyst.CatalystTypeConverters
-import org.apache.spark.sql.catalyst.expressions.{GenericMutableRow, UnsafeProjection}
+import org.apache.spark.sql.catalyst.expressions.{
+  GenericMutableRow,
+  UnsafeProjection
+}
 import org.apache.spark.sql.types._
 
 class TestNullableColumnBuilder[JvmType](columnType: ColumnType[JvmType])
@@ -39,20 +42,22 @@ object TestNullableColumnBuilder {
 class NullableColumnBuilderSuite extends SparkFunSuite {
   import org.apache.spark.sql.execution.columnar.ColumnarTestUtils._
 
-  Seq(BOOLEAN,
-      BYTE,
-      SHORT,
-      INT,
-      LONG,
-      FLOAT,
-      DOUBLE,
-      STRING,
-      BINARY,
-      COMPACT_DECIMAL(15, 10),
-      LARGE_DECIMAL(20, 10),
-      STRUCT(StructType(StructField("a", StringType) :: Nil)),
-      ARRAY(ArrayType(IntegerType)),
-      MAP(MapType(IntegerType, StringType))).foreach {
+  Seq(
+    BOOLEAN,
+    BYTE,
+    SHORT,
+    INT,
+    LONG,
+    FLOAT,
+    DOUBLE,
+    STRING,
+    BINARY,
+    COMPACT_DECIMAL(15, 10),
+    LARGE_DECIMAL(20, 10),
+    STRUCT(StructType(StructField("a", StringType) :: Nil)),
+    ARRAY(ArrayType(IntegerType)),
+    MAP(MapType(IntegerType, StringType))
+  ).foreach {
     testNullableColumnBuilder(_)
   }
 
@@ -107,9 +112,10 @@ class NullableColumnBuilderSuite extends SparkFunSuite {
       val actual = new GenericMutableRow(new Array[Any](1))
       (0 until 4).foreach { _ =>
         columnType.extract(buffer, actual, 0)
-        assert(converter(actual.get(0, dataType)) === converter(
-                   randomRow.get(0, dataType)),
-               "Extracted value didn't equal to the original one")
+        assert(
+          converter(actual.get(0, dataType)) === converter(
+            randomRow.get(0, dataType)),
+          "Extracted value didn't equal to the original one")
       }
 
       assert(!buffer.hasRemaining)

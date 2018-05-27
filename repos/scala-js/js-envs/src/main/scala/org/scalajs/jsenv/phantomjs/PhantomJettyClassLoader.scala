@@ -17,7 +17,8 @@ import org.scalajs.core.tools.io.IO
   *  JVM for the rest of the project.
   */
 final class PhantomJettyClassLoader(
-    jettyLoader: ClassLoader, parent: ClassLoader)
+    jettyLoader: ClassLoader,
+    parent: ClassLoader)
     extends ClassLoader(parent) {
 
   def this(loader: ClassLoader) =
@@ -27,11 +28,11 @@ final class PhantomJettyClassLoader(
     *  Basically everything defined in JettyWebsocketManager.
     */
   private val bridgeClasses = Set(
-      "org.scalajs.jsenv.phantomjs.JettyWebsocketManager",
-      "org.scalajs.jsenv.phantomjs.JettyWebsocketManager$WSLogger",
-      "org.scalajs.jsenv.phantomjs.JettyWebsocketManager$ComWebSocketListener",
-      "org.scalajs.jsenv.phantomjs.JettyWebsocketManager$$anon$1",
-      "org.scalajs.jsenv.phantomjs.JettyWebsocketManager$$anon$2"
+    "org.scalajs.jsenv.phantomjs.JettyWebsocketManager",
+    "org.scalajs.jsenv.phantomjs.JettyWebsocketManager$WSLogger",
+    "org.scalajs.jsenv.phantomjs.JettyWebsocketManager$ComWebSocketListener",
+    "org.scalajs.jsenv.phantomjs.JettyWebsocketManager$$anon$1",
+    "org.scalajs.jsenv.phantomjs.JettyWebsocketManager$$anon$2"
   )
 
   override protected def loadClass(name: String, resolve: Boolean): Class[_] = {

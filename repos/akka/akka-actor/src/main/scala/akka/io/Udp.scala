@@ -79,10 +79,13 @@ object Udp extends ExtensionId[UdpExt] with ExtensionIdProvider {
     * [[Bind]] in that case.
     */
   final case class Send(
-      payload: ByteString, target: InetSocketAddress, ack: Event)
+      payload: ByteString,
+      target: InetSocketAddress,
+      ack: Event)
       extends Command {
     require(
-        ack != null, "ack must be non-null. Use NoAck if you don't want acks.")
+      ack != null,
+      "ack must be non-null. Use NoAck if you don't want acks.")
 
     def wantsAck: Boolean = !ack.isInstanceOf[NoAck]
   }
@@ -97,9 +100,10 @@ object Udp extends ExtensionId[UdpExt] with ExtensionIdProvider {
     * The listener actor for the newly bound port will reply with a [[Bound]]
     * message, or the manager will reply with a [[CommandFailed]] message.
     */
-  final case class Bind(handler: ActorRef,
-                        localAddress: InetSocketAddress,
-                        options: immutable.Traversable[SocketOption] = Nil)
+  final case class Bind(
+      handler: ActorRef,
+      localAddress: InetSocketAddress,
+      options: immutable.Traversable[SocketOption] = Nil)
       extends Command
 
   /**
@@ -199,7 +203,7 @@ object Udp extends ExtensionId[UdpExt] with ExtensionIdProvider {
 
     val NrOfSelectors: Int =
       getInt("nr-of-selectors") requiring
-      (_ > 0, "nr-of-selectors must be > 0")
+        (_ > 0, "nr-of-selectors must be > 0")
     val DirectBufferSize: Int = getIntBytes("direct-buffer-size")
     val MaxDirectBufferPoolSize: Int = getInt("direct-buffer-pool-limit")
     val BatchReceiveLimit: Int = getInt("receive-throughput")
@@ -222,12 +226,12 @@ class UdpExt(system: ExtendedActorSystem) extends IO.Extension {
   import Udp.UdpSettings
 
   val settings: UdpSettings = new UdpSettings(
-      system.settings.config.getConfig("akka.io.udp"))
+    system.settings.config.getConfig("akka.io.udp"))
 
   val manager: ActorRef = {
     system.systemActorOf(
-        props = Props(classOf[UdpManager], this).withDeploy(Deploy.local),
-        name = "IO-UDP-FF")
+      props = Props(classOf[UdpManager], this).withDeploy(Deploy.local),
+      name = "IO-UDP-FF")
   }
 
   /**
@@ -239,7 +243,8 @@ class UdpExt(system: ExtendedActorSystem) extends IO.Extension {
     * INTERNAL API
     */
   private[io] val bufferPool: BufferPool = new DirectByteBufferPool(
-      settings.DirectBufferSize, settings.MaxDirectBufferPoolSize)
+    settings.DirectBufferSize,
+    settings.MaxDirectBufferPoolSize)
 }
 
 /**
@@ -281,7 +286,9 @@ object UdpMessage {
     * [[Udp.Bind]] in that case.
     */
   def send(
-      payload: ByteString, target: InetSocketAddress, ack: Event): Command =
+      payload: ByteString,
+      target: InetSocketAddress,
+      ack: Event): Command =
     Send(payload, target, ack)
 
   /**
@@ -296,9 +303,10 @@ object UdpMessage {
     * The listener actor for the newly bound port will reply with a [[Udp.Bound]]
     * message, or the manager will reply with a [[Udp.CommandFailed]] message.
     */
-  def bind(handler: ActorRef,
-           endpoint: InetSocketAddress,
-           options: JIterable[SocketOption]): Command =
+  def bind(
+      handler: ActorRef,
+      endpoint: InetSocketAddress,
+      options: JIterable[SocketOption]): Command =
     Bind(handler, endpoint, options.asScala.to)
 
   /**

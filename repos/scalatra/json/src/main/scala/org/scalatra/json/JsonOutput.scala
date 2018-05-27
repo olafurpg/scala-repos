@@ -69,8 +69,9 @@ trait JsonOutput[T] extends ApiFormats with JsonMethods[T] {
             // Status must always be 200 on JSONP, since it's loaded in a <script> tag.
             status = 200
             if (rosettaFlashGuard) writer.write("/**/")
-            writer.write("%s(%s);".format(
-                    some, compact(render(transformResponseBody(jv)))))
+            writer.write(
+              "%s(%s);"
+                .format(some, compact(render(transformResponseBody(jv)))))
           case _ =>
             contentType = formats("json")
             if (jsonVulnerabilityGuard) writer.write(VulnerabilityPrelude)
@@ -81,11 +82,12 @@ trait JsonOutput[T] extends ApiFormats with JsonMethods[T] {
 
   protected def writeJsonAsXml(json: JValue, writer: Writer) {
     if (json != JNothing)
-      XML.write(response.writer,
-                xmlRootNode.copy(child = toXml(json)),
-                response.characterEncoding.get,
-                xmlDecl = true,
-                doctype = null)
+      XML.write(
+        response.writer,
+        xmlRootNode.copy(child = toXml(json)),
+        response.characterEncoding.get,
+        xmlDecl = true,
+        doctype = null)
   }
 
   protected def writeJson(json: JValue, writer: Writer)

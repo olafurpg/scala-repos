@@ -13,8 +13,8 @@ import akka.testkit.AkkaSpec
 
 abstract class BaseTwoStreamsSetup extends AkkaSpec {
 
-  val settings = ActorMaterializerSettings(system).withInputBuffer(
-      initialSize = 2, maxSize = 2)
+  val settings = ActorMaterializerSettings(system)
+    .withInputBuffer(initialSize = 2, maxSize = 2)
 
   implicit val materializer = ActorMaterializer(settings)
 
@@ -23,7 +23,8 @@ abstract class BaseTwoStreamsSetup extends AkkaSpec {
   type Outputs
 
   def setup(
-      p1: Publisher[Int], p2: Publisher[Int]): TestSubscriber.Probe[Outputs]
+      p1: Publisher[Int],
+      p2: Publisher[Int]): TestSubscriber.Probe[Outputs]
 
   def failedPublisher[T]: Publisher[T] = TestPublisher.error[T](TestException)
 

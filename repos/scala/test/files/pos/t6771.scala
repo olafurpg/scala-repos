@@ -4,6 +4,6 @@ object Test {
 
   a match {
     case Some(x) => println(x)
-    case None =>
+    case None    =>
   }
 }

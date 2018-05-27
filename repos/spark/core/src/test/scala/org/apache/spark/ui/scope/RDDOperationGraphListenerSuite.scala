@@ -127,11 +127,13 @@ class RDDOperationGraphListenerSuite extends SparkFunSuite {
       val jobId = startJob(numStages, listener)
       // End some, but not all, stages that belong to this job
       // This is to ensure that we have both completed and skipped stages
-      (startingStageIdForJob until stageIdCounter).filter { i =>
-        i % 2 == 0
-      }.foreach { i =>
-        endStage(i, listener)
-      }
+      (startingStageIdForJob until stageIdCounter)
+        .filter { i =>
+          i % 2 == 0
+        }
+        .foreach { i =>
+          endStage(i, listener)
+        }
       // End all jobs
       endJob(jobId, listener)
     }
@@ -210,7 +212,8 @@ class RDDOperationGraphListenerSuite extends SparkFunSuite {
 
   /** Start a job with the specified number of stages. */
   private def startJob(
-      numStages: Int, listener: RDDOperationGraphListener): Int = {
+      numStages: Int,
+      listener: RDDOperationGraphListener): Int = {
     assert(numStages > 0, "I will not run a job with 0 stages for you.")
     val stageInfos = (0 until numStages).map { _ =>
       val stageInfo =
@@ -230,17 +233,17 @@ class RDDOperationGraphListenerSuite extends SparkFunSuite {
 
   /** Start the stage specified by the given ID. */
   private def startStage(
-      stageId: Int, listener: RDDOperationGraphListener): Unit = {
-    val stageInfo = new StageInfo(
-        stageId, 0, "s", 0, Seq.empty, Seq.empty, "d")
+      stageId: Int,
+      listener: RDDOperationGraphListener): Unit = {
+    val stageInfo = new StageInfo(stageId, 0, "s", 0, Seq.empty, Seq.empty, "d")
     listener.onStageSubmitted(new SparkListenerStageSubmitted(stageInfo))
   }
 
   /** Finish the stage specified by the given ID. */
   private def endStage(
-      stageId: Int, listener: RDDOperationGraphListener): Unit = {
-    val stageInfo = new StageInfo(
-        stageId, 0, "s", 0, Seq.empty, Seq.empty, "d")
+      stageId: Int,
+      listener: RDDOperationGraphListener): Unit = {
+    val stageInfo = new StageInfo(stageId, 0, "s", 0, Seq.empty, Seq.empty, "d")
     listener.onStageCompleted(new SparkListenerStageCompleted(stageInfo))
   }
 

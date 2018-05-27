@@ -13,15 +13,17 @@ object TextBodyParserSpec extends PlaySpecification {
 
   "The text body parser" should {
 
-    def parse(text: String,
-              contentType: Option[String],
-              encoding: String,
-              bodyParser: BodyParser[String] = BodyParsers.parse.tolerantText)(
+    def parse(
+        text: String,
+        contentType: Option[String],
+        encoding: String,
+        bodyParser: BodyParser[String] = BodyParsers.parse.tolerantText)(
         implicit mat: Materializer) = {
       await(
-          bodyParser(FakeRequest().withHeaders(
-                  contentType.map(CONTENT_TYPE -> _).toSeq: _*))
-            .run(Source.single(ByteString(text, encoding)))
+        bodyParser(
+          FakeRequest().withHeaders(
+            contentType.map(CONTENT_TYPE -> _).toSeq: _*))
+          .run(Source.single(ByteString(text, encoding)))
       )
     }
 
@@ -31,11 +33,11 @@ object TextBodyParserSpec extends PlaySpecification {
 
     "honour the declared charset" in new WithApplication() {
       parse("bär", Some("text/plain; charset=utf-8"), "utf-8") must beRight(
-          "bär")
+        "bär")
       parse("bär", Some("text/plain; charset=utf-16"), "utf-16") must beRight(
-          "bär")
+        "bär")
       parse("bär", Some("text/plain; charset=iso-8859-1"), "iso-8859-1") must beRight(
-          "bär")
+        "bär")
     }
 
     "default to iso-8859-1 encoding" in new WithApplication() {
@@ -45,7 +47,7 @@ object TextBodyParserSpec extends PlaySpecification {
 
     "accept text/plain content type" in new WithApplication() {
       parse("bar", Some("text/plain"), "utf-8", BodyParsers.parse.text) must beRight(
-          "bar")
+        "bar")
     }
 
     "reject non text/plain content types" in new WithApplication() {

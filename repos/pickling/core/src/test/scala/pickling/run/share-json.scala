@@ -69,7 +69,7 @@ class ShareJsonTest extends FunSuite {
       fail("Expected a stack overflow or out of memory error")
     } catch {
       case x: StackOverflowError => ()
-      case x: OutOfMemoryError => ()
+      case x: OutOfMemoryError   => ()
     }
   }
 

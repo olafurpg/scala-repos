@@ -8,9 +8,17 @@ package xml
 import com.intellij.lang.ASTNode
 import com.intellij.psi._
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScPattern, ScPatterns}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScPattern,
+  ScPatterns
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr.xml._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure,
+  Success,
+  TypeResult,
+  TypingContext
+}
 import org.jetbrains.plugins.scala.lang.psi.types.{ScDesignatorType, ScType}
 
 import scala.collection.mutable.ArrayBuffer
@@ -20,11 +28,12 @@ import scala.collection.mutable.ArrayBuffer
   * Date: 21.04.2008
   */
 class ScXmlPatternImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScXmlPattern {
+    extends ScalaPsiElementImpl(node)
+    with ScXmlPattern {
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case visitor: ScalaElementVisitor => super.accept(visitor)
-      case _ => super.accept(visitor)
+      case _                            => super.accept(visitor)
     }
   }
 

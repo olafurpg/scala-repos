@@ -36,7 +36,8 @@ object ActorConfigurationVerificationSpec {
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class ActorConfigurationVerificationSpec
     extends AkkaSpec(ActorConfigurationVerificationSpec.config)
-    with DefaultTimeout with BeforeAndAfterEach {
+    with DefaultTimeout
+    with BeforeAndAfterEach {
   import ActorConfigurationVerificationSpec._
 
   override def atStartup {
@@ -46,38 +47,42 @@ class ActorConfigurationVerificationSpec
   "An Actor configured with a BalancingDispatcher" must {
     "fail verification with a ConfigurationException if also configured with a RoundRobinPool" in {
       intercept[ConfigurationException] {
-        system.actorOf(RoundRobinPool(2)
-              .withDispatcher("balancing-dispatcher")
-              .props(Props[TestActor]))
+        system.actorOf(
+          RoundRobinPool(2)
+            .withDispatcher("balancing-dispatcher")
+            .props(Props[TestActor]))
       }
     }
     "fail verification with a ConfigurationException if also configured with a BroadcastPool" in {
       intercept[ConfigurationException] {
-        system.actorOf(BroadcastPool(2)
-              .withDispatcher("balancing-dispatcher")
-              .props(Props[TestActor]))
+        system.actorOf(
+          BroadcastPool(2)
+            .withDispatcher("balancing-dispatcher")
+            .props(Props[TestActor]))
       }
     }
     "fail verification with a ConfigurationException if also configured with a RandomPool" in {
       intercept[ConfigurationException] {
-        system.actorOf(RandomPool(2)
-              .withDispatcher("balancing-dispatcher")
-              .props(Props[TestActor]))
+        system.actorOf(
+          RandomPool(2)
+            .withDispatcher("balancing-dispatcher")
+            .props(Props[TestActor]))
       }
     }
     "fail verification with a ConfigurationException if also configured with a SmallestMailboxPool" in {
       intercept[ConfigurationException] {
-        system.actorOf(SmallestMailboxPool(2)
-              .withDispatcher("balancing-dispatcher")
-              .props(Props[TestActor]))
+        system.actorOf(
+          SmallestMailboxPool(2)
+            .withDispatcher("balancing-dispatcher")
+            .props(Props[TestActor]))
       }
     }
     "fail verification with a ConfigurationException if also configured with a ScatterGatherFirstCompletedPool" in {
       intercept[ConfigurationException] {
-        system.actorOf(ScatterGatherFirstCompletedPool(nrOfInstances = 2,
-                                                       within = 2 seconds)
-              .withDispatcher("balancing-dispatcher")
-              .props(Props[TestActor]))
+        system.actorOf(
+          ScatterGatherFirstCompletedPool(nrOfInstances = 2, within = 2 seconds)
+            .withDispatcher("balancing-dispatcher")
+            .props(Props[TestActor]))
       }
     }
     "not fail verification with a ConfigurationException also not configured with a Router" in {
@@ -86,8 +91,9 @@ class ActorConfigurationVerificationSpec
   }
   "An Actor configured with a non-balancing dispatcher" must {
     "not fail verification with a ConfigurationException if also configured with a Router" in {
-      system.actorOf(RoundRobinPool(2).props(
-              Props[TestActor].withDispatcher("pinned-dispatcher")))
+      system.actorOf(
+        RoundRobinPool(2).props(
+          Props[TestActor].withDispatcher("pinned-dispatcher")))
     }
 
     "fail verification if the dispatcher cannot be found" in {
@@ -98,15 +104,17 @@ class ActorConfigurationVerificationSpec
 
     "fail verification if the dispatcher cannot be found for the head of a router" in {
       intercept[ConfigurationException] {
-        system.actorOf(RoundRobinPool(1, routerDispatcher = "does not exist")
-              .props(Props[TestActor]))
+        system.actorOf(
+          RoundRobinPool(1, routerDispatcher = "does not exist")
+            .props(Props[TestActor]))
       }
     }
 
     "fail verification if the dispatcher cannot be found for the routees of a router" in {
       intercept[ConfigurationException] {
-        system.actorOf(RoundRobinPool(1).props(
-                Props[TestActor].withDispatcher("does not exist")))
+        system.actorOf(
+          RoundRobinPool(1).props(
+            Props[TestActor].withDispatcher("does not exist")))
       }
     }
   }

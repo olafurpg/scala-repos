@@ -29,7 +29,8 @@ import cascading.tuple.Fields
   * This is a base class for partition-based output sources
   */
 abstract class PartitionSource(val openWritesThreshold: Option[Int] = None)
-    extends SchemedSource with HfsTapProvider {
+    extends SchemedSource
+    with HfsTapProvider {
 
   // The root path of the partitioned output.
   def basePath: String
@@ -49,29 +50,29 @@ abstract class PartitionSource(val openWritesThreshold: Option[Int] = None)
     readOrWrite match {
       case Read =>
         throw new InvalidSourceException(
-            "Using PartitionSource for input not yet implemented")
+          "Using PartitionSource for input not yet implemented")
       case Write => {
-          mode match {
-            case Local(_) => {
-                val localTap = new FileTap(localScheme, basePath, sinkMode)
-                openWritesThreshold match {
-                  case Some(threshold) =>
-                    new LPartitionTap(localTap, partition, threshold)
-                  case None => new LPartitionTap(localTap, partition)
-                }
-              }
-            case hdfsMode @ Hdfs(_, _) => {
-                val hfsTap = createHfsTap(hdfsScheme, basePath, sinkMode)
-                getHPartitionTap(hfsTap)
-              }
-            case hdfsTest @ HadoopTest(_, _) => {
-                val hfsTap = createHfsTap(
-                    hdfsScheme, hdfsTest.getWritePathFor(this), sinkMode)
-                getHPartitionTap(hfsTap)
-              }
-            case _ => TestTapFactory(this, hdfsScheme).createTap(readOrWrite)
+        mode match {
+          case Local(_) => {
+            val localTap = new FileTap(localScheme, basePath, sinkMode)
+            openWritesThreshold match {
+              case Some(threshold) =>
+                new LPartitionTap(localTap, partition, threshold)
+              case None => new LPartitionTap(localTap, partition)
+            }
           }
+          case hdfsMode @ Hdfs(_, _) => {
+            val hfsTap = createHfsTap(hdfsScheme, basePath, sinkMode)
+            getHPartitionTap(hfsTap)
+          }
+          case hdfsTest @ HadoopTest(_, _) => {
+            val hfsTap =
+              createHfsTap(hdfsScheme, hdfsTest.getWritePathFor(this), sinkMode)
+            getHPartitionTap(hfsTap)
+          }
+          case _ => TestTapFactory(this, hdfsScheme).createTap(readOrWrite)
         }
+      }
     }
   }
 
@@ -83,14 +84,14 @@ abstract class PartitionSource(val openWritesThreshold: Option[Int] = None)
   override def validateTaps(mode: Mode): Unit = {
     if (basePath == null) {
       throw new InvalidSourceException(
-          "basePath cannot be null for PartitionTap")
+        "basePath cannot be null for PartitionTap")
     }
   }
 
   private[this] def getHPartitionTap(hfsTap: Hfs): HPartitionTap = {
     openWritesThreshold match {
       case Some(threshold) => new HPartitionTap(hfsTap, partition, threshold)
-      case None => new HPartitionTap(hfsTap, partition)
+      case None            => new HPartitionTap(hfsTap, partition)
     }
   }
 }
@@ -113,17 +114,19 @@ abstract class PartitionSource(val openWritesThreshold: Option[Int] = None)
   * @param sinkMode How to handle conflicts with existing output.
   */
 object PartitionedTsv {
-  def apply(basePath: String,
-            delimiter: String = "/",
-            pathFields: Fields = Fields.ALL,
-            writeHeader: Boolean = false,
-            tsvFields: Fields = Fields.ALL,
-            sinkMode: SinkMode = SinkMode.REPLACE) =
-    new PartitionedTsv(basePath,
-                       new DelimitedPartition(pathFields, delimiter),
-                       writeHeader,
-                       tsvFields,
-                       sinkMode)
+  def apply(
+      basePath: String,
+      delimiter: String = "/",
+      pathFields: Fields = Fields.ALL,
+      writeHeader: Boolean = false,
+      tsvFields: Fields = Fields.ALL,
+      sinkMode: SinkMode = SinkMode.REPLACE) =
+    new PartitionedTsv(
+      basePath,
+      new DelimitedPartition(pathFields, delimiter),
+      writeHeader,
+      tsvFields,
+      sinkMode)
 }
 
 /**
@@ -134,12 +137,14 @@ object PartitionedTsv {
   * @param writeHeader Flag to indicate that the header should be written to the file.
   * @param sinkMode How to handle conflicts with existing output.
   */
-case class PartitionedTsv(override val basePath: String,
-                          override val partition: Partition,
-                          override val writeHeader: Boolean,
-                          val tsvFields: Fields,
-                          override val sinkMode: SinkMode)
-    extends PartitionSource with DelimitedScheme {
+case class PartitionedTsv(
+    override val basePath: String,
+    override val partition: Partition,
+    override val writeHeader: Boolean,
+    val tsvFields: Fields,
+    override val sinkMode: SinkMode)
+    extends PartitionSource
+    with DelimitedScheme {
 
   override val fields = tsvFields
 }
@@ -157,15 +162,17 @@ case class PartitionedTsv(override val basePath: String,
   * @param sinkMode How to handle conflicts with existing output.
   */
 object PartitionedSequenceFile {
-  def apply(basePath: String,
-            delimiter: String = "/",
-            pathFields: Fields = Fields.ALL,
-            sequenceFields: Fields = Fields.ALL,
-            sinkMode: SinkMode = SinkMode.REPLACE) =
-    new PartitionedSequenceFile(basePath,
-                                new DelimitedPartition(pathFields, delimiter),
-                                sequenceFields,
-                                sinkMode)
+  def apply(
+      basePath: String,
+      delimiter: String = "/",
+      pathFields: Fields = Fields.ALL,
+      sequenceFields: Fields = Fields.ALL,
+      sinkMode: SinkMode = SinkMode.REPLACE) =
+    new PartitionedSequenceFile(
+      basePath,
+      new DelimitedPartition(pathFields, delimiter),
+      sequenceFields,
+      sinkMode)
 }
 
 /**
@@ -176,11 +183,13 @@ object PartitionedSequenceFile {
   * @param sequenceFields The set of fields to use for the sequence file.
   * @param sinkMode How to handle conflicts with existing output.
   */
-case class PartitionedSequenceFile(override val basePath: String,
-                                   override val partition: Partition,
-                                   val sequenceFields: Fields,
-                                   override val sinkMode: SinkMode)
-    extends PartitionSource with SequenceFileScheme {
+case class PartitionedSequenceFile(
+    override val basePath: String,
+    override val partition: Partition,
+    val sequenceFields: Fields,
+    override val sinkMode: SinkMode)
+    extends PartitionSource
+    with SequenceFileScheme {
 
   override val fields = sequenceFields
 }

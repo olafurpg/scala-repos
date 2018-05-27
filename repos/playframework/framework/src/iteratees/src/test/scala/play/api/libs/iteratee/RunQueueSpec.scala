@@ -60,8 +60,9 @@ object RunQueueSpec extends Specification with ExecutionSpecification {
     "run code in order" in {
       import ExecutionContext.Implicits.global
 
-      def percentageOfRunsWithOrderingErrors(runSize: Int,
-                                             queueTester: QueueTester): Int = {
+      def percentageOfRunsWithOrderingErrors(
+          runSize: Int,
+          queueTester: QueueTester): Int = {
         val results: Seq[Future[Int]] = for (i <- 0 until 9) yield {
           countOrderingErrors(runSize, queueTester)
         }
@@ -79,8 +80,8 @@ object RunQueueSpec extends Specification with ExecutionSpecification {
       var errorPercentage = 0
       while (errorPercentage < 90 && runSize < 1000000) {
         runSize = runSize << 1
-        errorPercentage = percentageOfRunsWithOrderingErrors(
-            runSize, new NaiveQueueTester())
+        errorPercentage =
+          percentageOfRunsWithOrderingErrors(runSize, new NaiveQueueTester())
       }
       //println(s"Got $errorPercentage% ordering errors on run size of $runSize")
 

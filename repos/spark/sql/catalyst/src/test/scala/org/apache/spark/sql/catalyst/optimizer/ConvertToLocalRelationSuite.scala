@@ -34,16 +34,19 @@ class ConvertToLocalRelationSuite extends PlanTest {
 
   test("Project on LocalRelation should be turned into a single LocalRelation") {
     val testRelation =
-      LocalRelation(LocalRelation('a.int, 'b.int).output,
-                    InternalRow(1, 2) :: InternalRow(4, 5) :: Nil)
+      LocalRelation(
+        LocalRelation('a.int, 'b.int).output,
+        InternalRow(1, 2) :: InternalRow(4, 5) :: Nil)
 
     val correctAnswer =
-      LocalRelation(LocalRelation('a1.int, 'b1.int).output,
-                    InternalRow(1, 3) :: InternalRow(4, 6) :: Nil)
+      LocalRelation(
+        LocalRelation('a1.int, 'b1.int).output,
+        InternalRow(1, 3) :: InternalRow(4, 6) :: Nil)
 
     val projectOnLocal =
-      testRelation.select(UnresolvedAttribute("a").as("a1"),
-                          (UnresolvedAttribute("b") + 1).as("b1"))
+      testRelation.select(
+        UnresolvedAttribute("a").as("a1"),
+        (UnresolvedAttribute("b") + 1).as("b1"))
 
     val optimized = Optimize.execute(projectOnLocal.analyze)
 

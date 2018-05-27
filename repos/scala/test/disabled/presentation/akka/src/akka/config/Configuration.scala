@@ -13,7 +13,9 @@ object Configuration {
   val DefaultPath = new File(".").getCanonicalPath
   val DefaultImporter = new FilesystemImporter(DefaultPath)
 
-  def load(data: String, importer: Importer = DefaultImporter): Configuration = {
+  def load(
+      data: String,
+      importer: Importer = DefaultImporter): Configuration = {
     val parser = new ConfigParser(importer = importer)
     new Configuration(parser parse data)
   }
@@ -40,7 +42,9 @@ object Configuration {
     fromResource(filename, ClassLoader.getSystemClassLoader)
   }
 
-  def fromResource(filename: String, classLoader: ClassLoader): Configuration = {
+  def fromResource(
+      filename: String,
+      classLoader: ClassLoader): Configuration = {
     val importer = new ResourceImporter(classLoader)
     fromFile(filename, importer)
   }
@@ -155,7 +159,7 @@ class Configuration(val map: Map[String, Any]) {
     getBoolean(key, defaultValue)
 
   def apply(key: String): String = getString(key) match {
-    case None => throw new ConfigurationException("undefined config: " + key)
+    case None    => throw new ConfigurationException("undefined config: " + key)
     case Some(v) => v
   }
 

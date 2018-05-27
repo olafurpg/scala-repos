@@ -25,8 +25,7 @@ object FakesSpec extends PlaySpecification {
   "FakeApplication" should {
 
     "allow adding routes inline" in {
-      running(
-          _.routes {
+      running(_.routes {
         case ("GET", "/inline") =>
           Action {
             Results.Ok("inline route")
@@ -45,12 +44,14 @@ object FakesSpec extends PlaySpecification {
 
   "FakeRequest" should {
     def app =
-      GuiceApplicationBuilder().routes {
-        case (PUT, "/process") =>
-          Action { req =>
-            Results.Ok(req.headers.get(CONTENT_TYPE) getOrElse "")
-          }
-      }.build()
+      GuiceApplicationBuilder()
+        .routes {
+          case (PUT, "/process") =>
+            Action { req =>
+              Results.Ok(req.headers.get(CONTENT_TYPE) getOrElse "")
+            }
+        }
+        .build()
 
     "Define Content-Type header based on body" in new WithApplication(app) {
       val xml = <foo>
@@ -75,7 +76,7 @@ object FakesSpec extends PlaySpecification {
       val req = FakeRequest(PUT, "/process")
         .withRawBody(bytes)
         .withHeaders(
-            CONTENT_TYPE -> "text/xml;charset=utf-16le"
+          CONTENT_TYPE -> "text/xml;charset=utf-16le"
         )
       route(req) aka "response" must beSome.which { resp =>
         contentAsString(resp) aka "content" must_== "text/xml;charset=utf-16le"

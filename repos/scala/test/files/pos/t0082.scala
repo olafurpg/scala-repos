@@ -1,7 +1,7 @@
 object Main {
 
   def min0[A](less: (A, A) => Boolean, xs: List[A]): Option[A] = xs match {
-    case List() => None
+    case List()  => None
     case List(x) => Some(x)
 //      case x :: Nil => Some(x)
     case y :: ys =>

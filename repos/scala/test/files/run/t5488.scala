@@ -1,8 +1,9 @@
 class A0[@specialized(Int, AnyRef) A]()
 class B0[@specialized(Int, AnyRef) A, @specialized(Int, AnyRef) B]()
-class C0[@specialized(Int, AnyRef) A,
-         @specialized(Int, AnyRef) B,
-         @specialized(Int, AnyRef) C]()
+class C0[
+    @specialized(Int, AnyRef) A,
+    @specialized(Int, AnyRef) B,
+    @specialized(Int, AnyRef) C]()
 
 object Test {
   def main(args: Array[String]) {

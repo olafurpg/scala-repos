@@ -8,7 +8,11 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.ScModifierList
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScAnnotation
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScTypeAliasDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScTypeParamClause
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypeResult,
+  TypingContext
+}
 import org.jetbrains.plugins.scala.lang.psi.types.{ScType, TypeAliasSignature}
 
 /**
@@ -16,7 +20,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.{ScType, TypeAliasSignature}
   * @since 04/04/14.
   */
 class ScLightTypeAliasDefinition(
-    s: TypeAliasSignature, val ta: ScTypeAliasDefinition)
+    s: TypeAliasSignature,
+    val ta: ScTypeAliasDefinition)
     extends LightElement(ta.getManager, ta.getLanguage)
     with ScTypeAliasDefinition {
   setNavigationElement(ta)
@@ -36,7 +41,7 @@ class ScLightTypeAliasDefinition(
     Success(s.lowerBound, Some(this))
 
   override def getOriginalElement: PsiElement =
-    super [ScTypeAliasDefinition].getOriginalElement
+    super[ScTypeAliasDefinition].getOriginalElement
 
   override def toString: String = ta.toString
 
@@ -83,8 +88,8 @@ class ScLightTypeAliasDefinition(
   override def typeParametersClause: Option[ScTypeParamClause] =
     ta.typeParametersClause.map(new ScLightTypeParamClause(s.typeParams, _))
 
-  override protected def findChildrenByClassScala[
-      T >: Null <: ScalaPsiElement](clazz: Class[T]): Array[T] =
+  override protected def findChildrenByClassScala[T >: Null <: ScalaPsiElement](
+      clazz: Class[T]): Array[T] =
     throw new UnsupportedOperationException("Operation on light element")
 
   override protected def findChildByClassScala[T >: Null <: ScalaPsiElement](

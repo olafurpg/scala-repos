@@ -53,10 +53,11 @@ import org.apache.spark.storage.StorageLevel
   */
 @Since("1.6.0")
 @Experimental
-class BisectingKMeans private (private var k: Int,
-                               private var maxIterations: Int,
-                               private var minDivisibleClusterSize: Double,
-                               private var seed: Long)
+class BisectingKMeans private (
+    private var k: Int,
+    private var maxIterations: Int,
+    private var minDivisibleClusterSize: Double,
+    private var seed: Long)
     extends Logging {
 
   import BisectingKMeans._
@@ -89,8 +90,9 @@ class BisectingKMeans private (private var k: Int,
     */
   @Since("1.6.0")
   def setMaxIterations(maxIterations: Int): this.type = {
-    require(maxIterations > 0,
-            s"maxIterations must be positive but got $maxIterations.")
+    require(
+      maxIterations > 0,
+      s"maxIterations must be positive but got $maxIterations.")
     this.maxIterations = maxIterations
     this
   }
@@ -108,8 +110,8 @@ class BisectingKMeans private (private var k: Int,
   @Since("1.6.0")
   def setMinDivisibleClusterSize(minDivisibleClusterSize: Double): this.type = {
     require(
-        minDivisibleClusterSize > 0.0,
-        s"minDivisibleClusterSize must be positive but got $minDivisibleClusterSize.")
+      minDivisibleClusterSize > 0.0,
+      s"minDivisibleClusterSize must be positive but got $minDivisibleClusterSize.")
     this.minDivisibleClusterSize = minDivisibleClusterSize
     this
   }
@@ -145,7 +147,7 @@ class BisectingKMeans private (private var k: Int,
   def run(input: RDD[Vector]): BisectingKMeansModel = {
     if (input.getStorageLevel == StorageLevel.NONE) {
       logWarning(
-          s"The input RDD ${input.id} is not directly cached, which may hurt performance if" +
+        s"The input RDD ${input.id} is not directly cached, which may hurt performance if" +
           " its parent RDDs are also not cached.")
     }
     val d = input.map(_.size).first()
@@ -168,50 +170,58 @@ class BisectingKMeans private (private var k: Int,
       } else {
         math.ceil(minDivisibleClusterSize * n).toLong
       }
-    logInfo(
-        s"The minimum number of points of a divisible cluster is $minSize.")
+    logInfo(s"The minimum number of points of a divisible cluster is $minSize.")
     var inactiveClusters = mutable.Seq.empty[(Long, ClusterSummary)]
     val random = new Random(seed)
     var numLeafClustersNeeded = k - 1
     var level = 1
     while (activeClusters.nonEmpty && numLeafClustersNeeded > 0 &&
-    level < LEVEL_LIMIT) {
+           level < LEVEL_LIMIT) {
       // Divisible clusters are sufficiently large and have non-trivial cost.
       var divisibleClusters = activeClusters.filter {
         case (_, summary) =>
           (summary.size >= minSize) &&
-          (summary.cost > MLUtils.EPSILON * summary.size)
+            (summary.cost > MLUtils.EPSILON * summary.size)
       }
       // If we don't need all divisible clusters, take the larger ones.
       if (divisibleClusters.size > numLeafClustersNeeded) {
-        divisibleClusters = divisibleClusters.toSeq.sortBy {
-          case (_, summary) =>
-            -summary.size
-        }.take(numLeafClustersNeeded).toMap
+        divisibleClusters = divisibleClusters.toSeq
+          .sortBy {
+            case (_, summary) =>
+              -summary.size
+          }
+          .take(numLeafClustersNeeded)
+          .toMap
       }
       if (divisibleClusters.nonEmpty) {
         val divisibleIndices = divisibleClusters.keys.toSet
         logInfo(s"Dividing ${divisibleIndices.size} clusters on level $level.")
-        var newClusterCenters = divisibleClusters.flatMap {
-          case (index, summary) =>
-            val (left, right) = splitCenter(summary.center, random)
-            Iterator((leftChildIndex(index), left),
-                     (rightChildIndex(index), right))
-        }.map(identity) // workaround for a Scala bug (SI-7005) that produces a not serializable map
+        var newClusterCenters = divisibleClusters
+          .flatMap {
+            case (index, summary) =>
+              val (left, right) = splitCenter(summary.center, random)
+              Iterator(
+                (leftChildIndex(index), left),
+                (rightChildIndex(index), right))
+          }
+          .map(identity) // workaround for a Scala bug (SI-7005) that produces a not serializable map
         var newClusters: Map[Long, ClusterSummary] = null
         var newAssignments: RDD[(Long, VectorWithNorm)] = null
         for (iter <- 0 until maxIterations) {
-          newAssignments = updateAssignments(
-              assignments, divisibleIndices, newClusterCenters).filter {
-            case (index, _) =>
-              divisibleIndices.contains(parentIndex(index))
-          }
+          newAssignments =
+            updateAssignments(assignments, divisibleIndices, newClusterCenters)
+              .filter {
+                case (index, _) =>
+                  divisibleIndices.contains(parentIndex(index))
+              }
           newClusters = summarize(d, newAssignments)
           newClusterCenters = newClusters.mapValues(_.center).map(identity)
         }
         // TODO: Unpersist old indices.
         val indices = updateAssignments(
-            assignments, divisibleIndices, newClusterCenters).keys
+          assignments,
+          divisibleIndices,
+          newClusterCenters).keys
           .persist(StorageLevel.MEMORY_AND_DISK)
         assignments = indices.zip(vectors)
         inactiveClusters ++= activeClusters
@@ -219,7 +229,7 @@ class BisectingKMeans private (private var k: Int,
         numLeafClustersNeeded -= divisibleClusters.size
       } else {
         logInfo(
-            s"None active and divisible clusters left on level $level. Stop iterations.")
+          s"None active and divisible clusters left on level $level. Stop iterations.")
         inactiveClusters ++= activeClusters
         activeClusters = Map.empty
       }
@@ -247,15 +257,17 @@ private object BisectingKMeans extends Serializable {
 
   /** Returns the left child index of the given node index. */
   private def leftChildIndex(index: Long): Long = {
-    require(index <= MAX_DIVISIBLE_CLUSTER_INDEX,
-            s"Child index out of bound: 2 * $index.")
+    require(
+      index <= MAX_DIVISIBLE_CLUSTER_INDEX,
+      s"Child index out of bound: 2 * $index.")
     2 * index
   }
 
   /** Returns the right child index of the given node index. */
   private def rightChildIndex(index: Long): Long = {
-    require(index <= MAX_DIVISIBLE_CLUSTER_INDEX,
-            s"Child index out of bound: 2 * $index + 1.")
+    require(
+      index <= MAX_DIVISIBLE_CLUSTER_INDEX,
+      s"Child index out of bound: 2 * $index + 1.")
     2 * index + 1
   }
 
@@ -275,8 +287,8 @@ private object BisectingKMeans extends Serializable {
       assignments: RDD[(Long, VectorWithNorm)]): Map[Long, ClusterSummary] = {
     assignments
       .aggregateByKey(new ClusterSummaryAggregator(d))(
-          seqOp = (agg, v) => agg.add(v),
-          combOp = (agg1, agg2) => agg1.merge(agg2)
+        seqOp = (agg, v) => agg.add(v),
+        combOp = (agg1, agg2) => agg1.merge(agg2)
       )
       .mapValues(_.summary)
       .collect()
@@ -328,8 +340,9 @@ private object BisectingKMeans extends Serializable {
     * @param random a random number generator
     * @return initial centers
     */
-  private def splitCenter(center: VectorWithNorm,
-                          random: Random): (VectorWithNorm, VectorWithNorm) = {
+  private def splitCenter(
+      center: VectorWithNorm,
+      random: Random): (VectorWithNorm, VectorWithNorm) = {
     val d = center.vector.size
     val norm = center.norm
     val level = 1e-4 * norm
@@ -348,9 +361,10 @@ private object BisectingKMeans extends Serializable {
     * @param newClusterCenters new cluster centers
     * @return new assignments
     */
-  private def updateAssignments(assignments: RDD[(Long, VectorWithNorm)],
-                                divisibleIndices: Set[Long],
-                                newClusterCenters: Map[Long, VectorWithNorm])
+  private def updateAssignments(
+      assignments: RDD[(Long, VectorWithNorm)],
+      divisibleIndices: Set[Long],
+      newClusterCenters: Map[Long, VectorWithNorm])
     : RDD[(Long, VectorWithNorm)] = {
     assignments.map {
       case (index, v) =>
@@ -396,7 +410,12 @@ private object BisectingKMeans extends Serializable {
         val left = buildSubTree(leftIndex)
         val right = buildSubTree(rightIndex)
         new ClusteringTreeNode(
-            index, size, center, cost, height, Array(left, right))
+          index,
+          size,
+          center,
+          cost,
+          height,
+          Array(left, right))
       } else {
         val index = leafIndex
         leafIndex += 1
@@ -416,7 +435,9 @@ private object BisectingKMeans extends Serializable {
     * @param cost the sum of squared distances to the center
     */
   private case class ClusterSummary(
-      size: Long, center: VectorWithNorm, cost: Double)
+      size: Long,
+      center: VectorWithNorm,
+      cost: Double)
 }
 
 /**
@@ -432,7 +453,7 @@ private object BisectingKMeans extends Serializable {
   */
 @Since("1.6.0")
 @Experimental
-private[clustering] class ClusteringTreeNode private[clustering](
+private[clustering] class ClusteringTreeNode private[clustering] (
     val index: Int,
     val size: Long,
     private val centerWithNorm: VectorWithNorm,
@@ -485,8 +506,9 @@ private[clustering] class ClusteringTreeNode private[clustering](
     * Predicts the cluster index and the cost of the input point.
     */
   private def predict(pointWithNorm: VectorWithNorm): (Int, Double) = {
-    predict(pointWithNorm,
-            KMeans.fastSquaredDistance(centerWithNorm, pointWithNorm))
+    predict(
+      pointWithNorm,
+      KMeans.fastSquaredDistance(centerWithNorm, pointWithNorm))
   }
 
   /**
@@ -497,14 +519,18 @@ private[clustering] class ClusteringTreeNode private[clustering](
     */
   @tailrec
   private def predict(
-      pointWithNorm: VectorWithNorm, cost: Double): (Int, Double) = {
+      pointWithNorm: VectorWithNorm,
+      cost: Double): (Int, Double) = {
     if (isLeaf) {
       (index, cost)
     } else {
-      val (selectedChild, minCost) = children.map { child =>
-        (child,
-         KMeans.fastSquaredDistance(child.centerWithNorm, pointWithNorm))
-      }.minBy(_._2)
+      val (selectedChild, minCost) = children
+        .map { child =>
+          (
+            child,
+            KMeans.fastSquaredDistance(child.centerWithNorm, pointWithNorm))
+        }
+        .minBy(_._2)
       selectedChild.predict(pointWithNorm, minCost)
     }
   }

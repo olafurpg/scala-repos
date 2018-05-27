@@ -12,8 +12,10 @@ class EditorMock(text: String, offset: Int) extends EditorStub {
   override def offsetToLogicalPosition(offset: Int) = {
     val s = text.take(offset)
     new LogicalPosition(
-        s.count(_ == '\n'),
-        s.reverse.takeWhile(_ != '\n').length) // Workaround for SI-5971 (should be "s.view.reverse.")
+      s.count(_ == '\n'),
+      s.reverse
+        .takeWhile(_ != '\n')
+        .length) // Workaround for SI-5971 (should be "s.view.reverse.")
   }
 
   override def logicalPositionToOffset(pos: LogicalPosition) =
@@ -27,5 +29,7 @@ class EditorMock(text: String, offset: Int) extends EditorStub {
     new CaretModelMock(offset, offsetToLogicalPosition(offset))
 
   override def offsetToVisualPosition(
-      i: Int, b: Boolean, b1: Boolean): VisualPosition = null
+      i: Int,
+      b: Boolean,
+      b1: Boolean): VisualPosition = null
 }

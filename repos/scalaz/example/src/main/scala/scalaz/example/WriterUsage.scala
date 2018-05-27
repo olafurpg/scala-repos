@@ -17,7 +17,7 @@ object WriterUsage extends App {
     watson <- Person("Watson", 40).set(List("Create Watson"))
     address <- Address("Baker Street", "London").set(List("Create address."))
     _ <- List(
-        "tell lets us log something in between. Writer[List[String], Unit]").tell
+      "tell lets us log something in between. Writer[List[String], Unit]").tell
     moveWatson <- watson
       .copy(address = Some(address))
       .set(List("Move to new address."))

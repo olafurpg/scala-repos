@@ -9,14 +9,14 @@ import com.twitter.util.Future
   * to specify a Cluster to supplement the initial static set. All operations
   * that would remove entries in the minimum set are censored and counted.
   */
-@deprecated("Use `com.twitter.finagle.Name` to represent clusters instead",
-            "2014-11-21")
+@deprecated(
+  "Use `com.twitter.finagle.Name` to represent clusters instead",
+  "2014-11-21")
 class MinimumSetCluster[T](
     minimum: Set[T],
     supplementary: Cluster[T],
     statsReceiver: StatsReceiver = NullStatsReceiver
-)
-    extends Cluster[T] {
+) extends Cluster[T] {
 
   private[this] val censoredAdd = statsReceiver.counter("censored_add")
   private[this] val censoredRem = statsReceiver.counter("censored_rem")

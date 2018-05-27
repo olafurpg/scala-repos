@@ -28,7 +28,7 @@ import com.twitter.summingbird.scalding._
   * Use this when you have written JUST BEFORE the store.
   * This is what you get from an IntermediateWrite in Builder API.
   */
-class BatchedDeltaService[K, V : Semigroup](
+class BatchedDeltaService[K, V: Semigroup](
     val store: batch.BatchedStore[K, V],
     val deltas: batch.BatchedSink[(K, V)],
     override val reducers: Option[Int] = None)
@@ -54,8 +54,9 @@ class BatchedDeltaService[K, V : Semigroup](
     * You are guaranteed that all the service data needed
     * to do the join is present.
     */
-  override def lookup[W](incoming: TypedPipe[(Timestamp, (K, W))],
-                         servStream: TypedPipe[(Timestamp, (K, Option[V]))])
+  override def lookup[W](
+      incoming: TypedPipe[(Timestamp, (K, W))],
+      servStream: TypedPipe[(Timestamp, (K, Option[V]))])
     : TypedPipe[(Timestamp, (K, (W, Option[V])))] = {
 
     def flatOpt[T](o: Option[Option[T]]): Option[T] = o.flatMap(identity)

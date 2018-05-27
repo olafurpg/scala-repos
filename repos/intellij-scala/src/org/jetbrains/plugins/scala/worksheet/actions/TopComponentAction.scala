@@ -29,10 +29,11 @@ trait TopComponentAction extends TopComponentDisplayable {
   def actionIcon: Icon
 
   def getActionButton = {
-    val button = new ActionButton(this,
-                                  getTemplatePresentation,
-                                  ActionPlaces.EDITOR_TOOLBAR,
-                                  ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE)
+    val button = new ActionButton(
+      this,
+      getTemplatePresentation,
+      ActionPlaces.EDITOR_TOOLBAR,
+      ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE)
     button setToolTipText genericText
     button
   }
@@ -46,7 +47,9 @@ trait TopComponentAction extends TopComponentDisplayable {
     val text =
       shortcutId flatMap {
         case id =>
-          KeymapManager.getInstance.getActiveKeymap.getShortcuts(id).headOption map {
+          KeymapManager.getInstance.getActiveKeymap
+            .getShortcuts(id)
+            .headOption map {
             case shortcut =>
               genericText + (" (" + KeymapUtil.getShortcutText(shortcut) + ")")
           }
@@ -82,9 +85,11 @@ trait TopComponentAction extends TopComponentDisplayable {
       val editor = FileEditorManager.getInstance(project).getSelectedTextEditor
 
       extensions.inReadAction {
-        PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument) match {
+        PsiDocumentManager
+          .getInstance(project)
+          .getPsiFile(editor.getDocument) match {
           case sf: ScalaFile if sf.isWorksheetFile => enable()
-          case _ => disable()
+          case _                                   => disable()
         }
       }
     } catch {

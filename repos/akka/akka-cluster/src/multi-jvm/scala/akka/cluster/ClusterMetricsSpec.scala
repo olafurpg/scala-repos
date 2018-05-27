@@ -4,7 +4,7 @@
 
 package akka.cluster
 
-// TODO remove metrics 
+// TODO remove metrics
 
 import scala.language.postfixOps
 import scala.concurrent.duration._
@@ -21,8 +21,9 @@ object ClusterMetricsMultiJvmSpec extends MultiNodeConfig {
   val fourth = role("fourth")
   val fifth = role("fifth")
 
-  commonConfig(debugConfig(on = false).withFallback(
-          MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet))
+  commonConfig(
+    debugConfig(on = false).withFallback(
+      MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet))
 }
 
 class ClusterMetricsMultiJvmNode1 extends ClusterMetricsSpec
@@ -41,20 +42,20 @@ abstract class ClusterMetricsSpec
 
   "Cluster metrics" must {
     "periodically collect metrics on each node, publish ClusterMetricsChanged to the event stream, " +
-    "and gossip metrics around the node ring" taggedAs LongRunningTest in within(
-        60 seconds) {
+      "and gossip metrics around the node ring" taggedAs LongRunningTest in within(
+      60 seconds) {
       awaitClusterUp(roles: _*)
       enterBarrier("cluster-started")
       awaitAssert(
-          clusterView.members.count(_.status == MemberStatus.Up) should ===(
-              roles.size))
+        clusterView.members.count(_.status == MemberStatus.Up) should ===(
+          roles.size))
       awaitAssert(clusterView.clusterMetrics.size should ===(roles.size))
       val collector = MetricsCollector(cluster.system, cluster.settings)
       collector.sample.metrics.size should be > (3)
       enterBarrier("after")
     }
     "reflect the correct number of node metrics in cluster view" taggedAs LongRunningTest in within(
-        30 seconds) {
+      30 seconds) {
       runOn(second) {
         cluster.leave(first)
       }

@@ -1,10 +1,11 @@
 package java.nio
 
-private[nio] final class StringCharBuffer private (_capacity: Int,
-                                                   _csq: CharSequence,
-                                                   _csqOffset: Int,
-                                                   _initialPosition: Int,
-                                                   _initialLimit: Int)
+private[nio] final class StringCharBuffer private (
+    _capacity: Int,
+    _csq: CharSequence,
+    _csqOffset: Int,
+    _initialPosition: Int,
+    _initialLimit: Int)
     extends CharBuffer(_capacity) {
 
   position(_initialPosition)
@@ -20,8 +21,8 @@ private[nio] final class StringCharBuffer private (_capacity: Int,
   }
 
   def duplicate(): CharBuffer = {
-    val result = new StringCharBuffer(
-        capacity, _csq, _csqOffset, position, limit)
+    val result =
+      new StringCharBuffer(capacity, _csq, _csqOffset, position, limit)
     result._mark = this._mark
     result
   }
@@ -32,7 +33,11 @@ private[nio] final class StringCharBuffer private (_capacity: Int,
     if (start < 0 || end < start || end > remaining)
       throw new IndexOutOfBoundsException
     new StringCharBuffer(
-        capacity, _csq, _csqOffset, position + start, position + end)
+      capacity,
+      _csq,
+      _csqOffset,
+      position + start,
+      position + end)
   }
 
   @noinline
@@ -78,27 +83,38 @@ private[nio] final class StringCharBuffer private (_capacity: Int,
 
   @inline
   override private[nio] def load(
-      startIndex: Int, dst: Array[Char], offset: Int, length: Int): Unit =
+      startIndex: Int,
+      dst: Array[Char],
+      offset: Int,
+      length: Int): Unit =
     GenBuffer(this).generic_load(startIndex, dst, offset, length)
 
   @inline
   override private[nio] def store(
-      startIndex: Int, src: Array[Char], offset: Int, length: Int): Unit =
+      startIndex: Int,
+      src: Array[Char],
+      offset: Int,
+      length: Int): Unit =
     throw new ReadOnlyBufferException
 }
 
 private[nio] object StringCharBuffer {
-  private[nio] def wrap(csq: CharSequence,
-                        csqOffset: Int,
-                        capacity: Int,
-                        initialPosition: Int,
-                        initialLength: Int): CharBuffer = {
+  private[nio] def wrap(
+      csq: CharSequence,
+      csqOffset: Int,
+      capacity: Int,
+      initialPosition: Int,
+      initialLength: Int): CharBuffer = {
     if (csqOffset < 0 || capacity < 0 || csqOffset + capacity > csq.length)
       throw new IndexOutOfBoundsException
     val initialLimit = initialPosition + initialLength
     if (initialPosition < 0 || initialLength < 0 || initialLimit > capacity)
       throw new IndexOutOfBoundsException
     new StringCharBuffer(
-        capacity, csq, csqOffset, initialPosition, initialLimit)
+      capacity,
+      csq,
+      csqOffset,
+      initialPosition,
+      initialLimit)
   }
 }

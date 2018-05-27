@@ -91,7 +91,8 @@ case class QueryRequest(sqlStatement: String)
   */
 case class PrepareRequest(sqlStatement: String)
     extends SimpleCommandRequest(
-        Command.COM_STMT_PREPARE, sqlStatement.getBytes)
+      Command.COM_STMT_PREPARE,
+      sqlStatement.getBytes)
 
 /**
   * Client response sent during connection phase.
@@ -108,14 +109,13 @@ case class HandshakeResponse(
     serverCap: Capability,
     charset: Short,
     maxPacketSize: Int
-)
-    extends Request {
+) extends Request {
   import Capability._
   override val seq: Short = 1
 
   lazy val hashPassword = password match {
     case Some(p) => encryptPassword(p, salt)
-    case None => Array[Byte]()
+    case None    => Array[Byte]()
   }
 
   def toPacket = {
@@ -123,7 +123,7 @@ case class HandshakeResponse(
     val dbStrSize = database.map { _.length + 1 }.getOrElse(0)
     val packetBodySize =
       username.getOrElse("").length + hashPassword.length + dbStrSize +
-      fixedBodySize
+        fixedBodySize
     val bw = BufferWriter(new Array[Byte](packetBodySize))
     bw.writeInt(clientCap.mask)
     bw.writeInt(maxPacketSize)
@@ -164,8 +164,7 @@ class ExecuteRequest(
     val params: IndexedSeq[Parameter],
     val hasNewParams: Boolean,
     val flags: Byte
-)
-    extends CommandRequest(Command.COM_STMT_EXECUTE) {
+) extends CommandRequest(Command.COM_STMT_EXECUTE) {
   private[this] val log = Logger.getLogger("finagle-mysql")
 
   private[this] def makeNullBitmap(
@@ -185,14 +184,16 @@ class ExecuteRequest(
   }
 
   private[this] def writeTypeCode(
-      param: Parameter, writer: BufferWriter): Unit = {
+      param: Parameter,
+      writer: BufferWriter): Unit = {
     val typeCode = param.typeCode
     if (typeCode != -1) writer.writeShort(typeCode)
     else {
       // Unsupported type. Write the error to log, and write the type as null.
       // This allows us to safely skip writing the parameter without corrupting the buffer.
-      log.warning("Unknown parameter %s will be treated as SQL NULL.".format(
-              param.getClass.getName))
+      log.warning(
+        "Unknown parameter %s will be treated as SQL NULL.".format(
+          param.getClass.getName))
       writer.writeShort(Type.Null)
     }
   }
@@ -208,7 +209,8 @@ class ExecuteRequest(
     * Writes the parameter into its MySQL binary representation.
     */
   private[this] def writeParam(
-      param: Parameter, writer: BufferWriter): BufferWriter = {
+      param: Parameter,
+      writer: BufferWriter): BufferWriter = {
     param.writeTo(writer)
     writer
   }
@@ -236,11 +238,12 @@ class ExecuteRequest(
       if (hasNewParams) {
         val types = BufferWriter(new Array[Byte](params.size * 2))
         params foreach { writeTypeCode(_, types) }
-        Buffer(bw,
-               Buffer(nullBitmap),
-               Buffer(Array(newParamsBound)),
-               types,
-               values)
+        Buffer(
+          bw,
+          Buffer(nullBitmap),
+          Buffer(Array(newParamsBound)),
+          types,
+          values)
       } else {
         Buffer(bw, Buffer(nullBitmap), Buffer(Array(newParamsBound)), values)
       }
@@ -256,7 +259,7 @@ object ExecuteRequest {
       flags: Byte = 0
   ) = {
     val sanitizedParams = params.map {
-      case null => Parameter.NullParameter
+      case null  => Parameter.NullParameter
       case other => other
     }
     new ExecuteRequest(stmtId, sanitizedParams, hasNewParams, flags)
@@ -265,10 +268,11 @@ object ExecuteRequest {
   def unapply(executeRequest: ExecuteRequest)
     : Option[(Int, IndexedSeq[Parameter], Boolean, Byte)] = {
     Some(
-        (executeRequest.stmtId,
-         executeRequest.params,
-         executeRequest.hasNewParams,
-         executeRequest.flags))
+      (
+        executeRequest.stmtId,
+        executeRequest.params,
+        executeRequest.hasNewParams,
+        executeRequest.flags))
   }
 }
 

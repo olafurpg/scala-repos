@@ -16,12 +16,13 @@ class ConcurrentSetTest extends WordSpecLike with Matchers {
     "contain all values" in {
       val set = ConcurrentSet[Int]()
 
-      val futures = for (i <- 0 until 10) yield
-        Future {
-          val start = i * 100000
-          val end = start + 100000
-          for (i <- start until end) set.add(i)
-        }
+      val futures = for (i <- 0 until 10)
+        yield
+          Future {
+            val start = i * 100000
+            val end = start + 100000
+            for (i <- start until end) set.add(i)
+          }
 
       Await.ready(Future.sequence(futures), Duration.Inf)
 
@@ -32,10 +33,11 @@ class ConcurrentSetTest extends WordSpecLike with Matchers {
     "contain no duplicate values" in {
       val set = ConcurrentSet[Int]()
 
-      val futures = for (i <- 0 until 10) yield
-        Future {
-          for (i <- 0 until 100000) set.add(i)
-        }
+      val futures = for (i <- 0 until 10)
+        yield
+          Future {
+            for (i <- 0 until 100000) set.add(i)
+          }
 
       Await.ready(Future.sequence(futures), Duration.Inf)
 
@@ -46,19 +48,21 @@ class ConcurrentSetTest extends WordSpecLike with Matchers {
     "contain all added and none of the removed values" in {
       val set = ConcurrentSet[Int]((0 until 500000): _*)
 
-      val addFutures = for (i <- 5 until 10) yield
-        Future {
-          val start = i * 100000
-          val end = start + 100000
-          for (i <- start until end) set.add(i)
-        }
+      val addFutures = for (i <- 5 until 10)
+        yield
+          Future {
+            val start = i * 100000
+            val end = start + 100000
+            for (i <- start until end) set.add(i)
+          }
 
-      val removeFutures = for (i <- 0 until 5) yield
-        Future {
-          val start = i * 100000
-          val end = start + 100000
-          for (i <- start until end) set.remove(i)
-        }
+      val removeFutures = for (i <- 0 until 5)
+        yield
+          Future {
+            val start = i * 100000
+            val end = start + 100000
+            for (i <- start until end) set.remove(i)
+          }
 
       Await.ready(Future.sequence(addFutures ++ removeFutures), Duration.Inf)
 

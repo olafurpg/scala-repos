@@ -23,7 +23,7 @@ object Foo {
 object Test {
   def f(x: Int): Int = x match {
     case Foo(1024l) => 1
-    case _ => 2
+    case _          => 2
   }
   def main(args: Array[String]): Unit = {
     println(f(10))

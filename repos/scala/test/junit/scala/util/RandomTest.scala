@@ -7,7 +7,7 @@ class RandomTest {
   @Test def testAlphanumeric: Unit = {
     def isAlphaNum(c: Char) =
       (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') ||
-      (c >= '0' && c <= '9')
+        (c >= '0' && c <= '9')
 
     val items = Random.alphanumeric.take(100000)
     for (c <- items) {

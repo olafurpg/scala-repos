@@ -8,6 +8,6 @@ trait ResponseCommon extends Parser {
 
   override abstract def parse(t: Any): Unit = t match {
     case ("params", value: List[_]) => value.foreach { paramsParser.parse(_) }
-    case _ => super.parse(t)
+    case _                          => super.parse(t)
   }
 }

@@ -19,9 +19,9 @@ trait Interpolation { self: Spec =>
 
   object interpolate {
     def mapper: Map[String, () => String] = Map(
-        "PROGRAM" -> (() => programInfo.runner),
-        "ALLOPTIONS" -> (() => options.all mkString " "),
-        "MAINCLASS" -> (() => programInfo.mainClass)
+      "PROGRAM" -> (() => programInfo.runner),
+      "ALLOPTIONS" -> (() => options.all mkString " "),
+      "MAINCLASS" -> (() => programInfo.mainClass)
     )
 
     private def mark(key: String) = "@@" + key + "@@"

@@ -74,7 +74,9 @@ class CoordinateMatrix @Since("1.0.0")(
   @Since("1.3.0")
   def transpose(): CoordinateMatrix = {
     new CoordinateMatrix(
-        entries.map(x => MatrixEntry(x.j, x.i, x.value)), numCols(), numRows())
+      entries.map(x => MatrixEntry(x.j, x.i, x.value)),
+      numCols(),
+      numRows())
   }
 
   /** Converts to IndexedRowMatrix. The number of columns must be within the integer range. */
@@ -83,7 +85,7 @@ class CoordinateMatrix @Since("1.0.0")(
     val nl = numCols()
     if (nl > Int.MaxValue) {
       sys.error(
-          s"Cannot convert to a row-oriented format because the number of columns $nl is " +
+        s"Cannot convert to a row-oriented format because the number of columns $nl is " +
           "too large.")
     }
     val n = nl.toInt
@@ -123,36 +125,44 @@ class CoordinateMatrix @Since("1.0.0")(
   @Since("1.3.0")
   def toBlockMatrix(rowsPerBlock: Int, colsPerBlock: Int): BlockMatrix = {
     require(
-        rowsPerBlock > 0,
-        s"rowsPerBlock needs to be greater than 0. rowsPerBlock: $rowsPerBlock")
+      rowsPerBlock > 0,
+      s"rowsPerBlock needs to be greater than 0. rowsPerBlock: $rowsPerBlock")
     require(
-        colsPerBlock > 0,
-        s"colsPerBlock needs to be greater than 0. colsPerBlock: $colsPerBlock")
+      colsPerBlock > 0,
+      s"colsPerBlock needs to be greater than 0. colsPerBlock: $colsPerBlock")
     val m = numRows()
     val n = numCols()
     val numRowBlocks = math.ceil(m.toDouble / rowsPerBlock).toInt
     val numColBlocks = math.ceil(n.toDouble / colsPerBlock).toInt
-    val partitioner = GridPartitioner(
-        numRowBlocks, numColBlocks, entries.partitions.length)
+    val partitioner =
+      GridPartitioner(numRowBlocks, numColBlocks, entries.partitions.length)
 
-    val blocks: RDD[((Int, Int), Matrix)] = entries.map { entry =>
-      val blockRowIndex = (entry.i / rowsPerBlock).toInt
-      val blockColIndex = (entry.j / colsPerBlock).toInt
+    val blocks: RDD[((Int, Int), Matrix)] = entries
+      .map { entry =>
+        val blockRowIndex = (entry.i / rowsPerBlock).toInt
+        val blockColIndex = (entry.j / colsPerBlock).toInt
 
-      val rowId = entry.i % rowsPerBlock
-      val colId = entry.j % colsPerBlock
+        val rowId = entry.i % rowsPerBlock
+        val colId = entry.j % colsPerBlock
 
-      ((blockRowIndex, blockColIndex), (rowId.toInt, colId.toInt, entry.value))
-    }.groupByKey(partitioner).map {
-      case ((blockRowIndex, blockColIndex), entry) =>
-        val effRows =
-          math.min(m - blockRowIndex.toLong * rowsPerBlock, rowsPerBlock).toInt
-        val effCols = math
-          .min(n - blockColIndex.toLong * colsPerBlock, colsPerBlock)
-          .toInt
-          ((blockRowIndex, blockColIndex),
-           SparseMatrix.fromCOO(effRows, effCols, entry))
-    }
+        (
+          (blockRowIndex, blockColIndex),
+          (rowId.toInt, colId.toInt, entry.value))
+      }
+      .groupByKey(partitioner)
+      .map {
+        case ((blockRowIndex, blockColIndex), entry) =>
+          val effRows =
+            math
+              .min(m - blockRowIndex.toLong * rowsPerBlock, rowsPerBlock)
+              .toInt
+          val effCols = math
+            .min(n - blockColIndex.toLong * colsPerBlock, colsPerBlock)
+            .toInt
+          (
+            (blockRowIndex, blockColIndex),
+            SparseMatrix.fromCOO(effRows, effCols, entry))
+      }
     new BlockMatrix(blocks, rowsPerBlock, colsPerBlock, m, n)
   }
 

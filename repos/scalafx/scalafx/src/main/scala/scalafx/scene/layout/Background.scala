@@ -41,11 +41,12 @@ object Background {
   /** An empty Background, useful to use instead of null. */
   val Empty = jfxsl.Background.EMPTY
   @deprecated(
-      "Use Empty; EMPTY will be removed in a future release", "8.0.60-R10")
+    "Use Empty; EMPTY will be removed in a future release",
+    "8.0.60-R10")
   val EMPTY = Empty
 
-  def classCssMetaData: Seq[
-      javafx.css.CssMetaData[_ <: javafx.css.Styleable, _]] =
+  def classCssMetaData
+    : Seq[javafx.css.CssMetaData[_ <: javafx.css.Styleable, _]] =
     jfxsl.Background.getClassCssMetaData
 }
 

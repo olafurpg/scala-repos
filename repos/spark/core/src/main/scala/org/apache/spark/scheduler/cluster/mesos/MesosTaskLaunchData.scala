@@ -27,7 +27,8 @@ import org.apache.spark.internal.Logging
   * Wrapper for serializing the data sent when launching Mesos tasks.
   */
 private[spark] case class MesosTaskLaunchData(
-    serializedTask: ByteBuffer, attemptNumber: Int)
+    serializedTask: ByteBuffer,
+    attemptNumber: Int)
     extends Logging {
 
   def toByteString: ByteString = {

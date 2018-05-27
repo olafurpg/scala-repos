@@ -77,8 +77,8 @@ class LeaderProxyFilterTest extends MarathonSpec {
     verify(leaderInfo, times(12)).elected
     verify(leaderInfo, times(12)).currentLeaderHostPort()
     verify(response, times(1)).sendError(
-        HttpStatus.SC_SERVICE_UNAVAILABLE,
-        LeaderProxyFilter.ERROR_STATUS_NO_CURRENT_LEADER)
+      HttpStatus.SC_SERVICE_UNAVAILABLE,
+      LeaderProxyFilter.ERROR_STATUS_NO_CURRENT_LEADER)
   }
 
   test("forward to leader without query string") {
@@ -118,9 +118,9 @@ class LeaderProxyFilterTest extends MarathonSpec {
     verify(request, atLeastOnce()).getRequestURI
     verify(request, atLeastOnce()).getQueryString
     verify(forwarder, times(1)).forward(
-        new URL("http://otherhost:9999/test?argument=blieh"),
-        request,
-        response)
+      new URL("http://otherhost:9999/test?argument=blieh"),
+      request,
+      response)
   }
 
   test("use https if http is disabled") {
@@ -144,12 +144,14 @@ class LeaderProxyFilterTest extends MarathonSpec {
   }
 
   test(
-      "successfully wait for consistent leadership info, then someone else is the leader") {
+    "successfully wait for consistent leadership info, then someone else is the leader") {
     // When we have inconsistent leadership info
     init()
     when(leaderInfo.elected).thenReturn(false)
     when(leaderInfo.currentLeaderHostPort()).thenReturn(
-        Some("host:10000"), Some("host:10000"), Some("otherhost:9999"))
+      Some("host:10000"),
+      Some("host:10000"),
+      Some("otherhost:9999"))
     when(request.getRequestURI).thenReturn("/test")
     when(request.getQueryString).thenReturn(null)
 
@@ -199,7 +201,7 @@ class LeaderProxyFilterTest extends MarathonSpec {
     verify(leaderInfo, times(12)).elected
     verify(leaderInfo, times(12)).currentLeaderHostPort()
     verify(response, times(1)).sendError(
-        HttpStatus.SC_SERVICE_UNAVAILABLE,
-        LeaderProxyFilter.ERROR_STATUS_NO_CURRENT_LEADER)
+      HttpStatus.SC_SERVICE_UNAVAILABLE,
+      LeaderProxyFilter.ERROR_STATUS_NO_CURRENT_LEADER)
   }
 }

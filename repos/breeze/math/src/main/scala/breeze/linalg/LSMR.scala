@@ -23,12 +23,13 @@ object LSMR extends SerializableLogging {
   /**
     * Solves the problem min pow(norm(A * x - b), 2) + regularization * pow(norm(x), 2)
     */
-  def solve[M, MT, V](A: M,
-                      b: V,
-                      regularization: Double = 0.0,
-                      tolerance: Double = 1E-9,
-                      maxIter: Int = 1000,
-                      quiet: Boolean = false)(
+  def solve[M, MT, V](
+      A: M,
+      b: V,
+      regularization: Double = 0.0,
+      tolerance: Double = 1E-9,
+      maxIter: Int = 1000,
+      quiet: Boolean = false)(
       implicit multMV: OpMulMatrix.Impl2[M, V, V],
       transA: CanTranspose[M, MT],
       multMTV: OpMulMatrix.Impl2[MT, V, V],
@@ -191,10 +192,10 @@ object LSMR extends SerializableLogging {
 
       if (!quiet)
         logger.info(f"Residual: $normr%.2g $normAr%.2g " +
-            f":: convtest1: $test1%.2g <? $rtol%.2g :: convtest2: $test2%.2g <? $atol%.2g")
+          f":: convtest1: $test1%.2g <? $rtol%.2g :: convtest2: $test2%.2g <? $atol%.2g")
 
       converged = normr == 0.0 || (iter >= maxIter) || (test1 < rtol) ||
-      (test2 < atol)
+        (test2 < atol)
     }
 
     x

@@ -36,7 +36,7 @@ trait SimpleController {
       case Some(nl) =>
         nl.take(1) match {
           case Nil => Empty
-          case l => Full(l.head)
+          case l   => Full(l.head)
         }
     }
   }
@@ -45,9 +45,9 @@ trait SimpleController {
 
   def get(name: String): Box[String] =
     httpRequest.session.attribute(name) match {
-      case null => Empty
+      case null      => Empty
       case n: String => Full(n)
-      case _ => Empty
+      case _         => Empty
     }
 
   def set(name: String, value: String) {

@@ -47,8 +47,8 @@ object ScalaExtendingPlay extends Specification {
   class MyI18nModule extends play.api.inject.Module {
     def bindings(environment: Environment, configuration: Configuration) = {
       Seq(
-          bind[Langs].to[DefaultLangs],
-          bind[MessagesApi].to[MyMessagesApi]
+        bind[Langs].to[DefaultLangs],
+        bind[MessagesApi].to[MyMessagesApi]
       )
     }
   }

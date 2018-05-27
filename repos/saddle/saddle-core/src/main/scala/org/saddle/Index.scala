@@ -137,7 +137,9 @@ trait Index[@spec(Boolean, Int, Long, Double) T] extends Serializable {
     * @tparam C Result of promoting types A, B
     */
   def concat[B, C](other: Index[B])(
-      implicit p: Promoter[T, B, C], mc: ST[C], oc: ORD[C]): Index[C]
+      implicit p: Promoter[T, B, C],
+      mc: ST[C],
+      oc: ORD[C]): Index[C]
 
   /**
     * Find the first location whereby inserting a key would maintain a sorted index. Index
@@ -349,7 +351,8 @@ trait Index[@spec(Boolean, Int, Long, Double) T] extends Serializable {
   def getIndexer(other: Index[T]): Option[Array[Int]] = {
     val ixer = this.join(other, index.RightJoin)
     require(
-        ixer.index.length == other.length, "Could not reindex unambiguously")
+      ixer.index.length == other.length,
+      "Could not reindex unambiguously")
     ixer.lTake
   }
 
@@ -420,12 +423,12 @@ trait Index[@spec(Boolean, Int, Long, Double) T] extends Serializable {
 
     if (!isContiguous)
       throw Index.IndexException(
-          "Cannot traverse index that is not contiguous in its values")
+        "Cannot traverse index that is not contiguous in its values")
 
     val prevSpot = locator.get(current.get) - 1
     prevSpot match {
       case x if x >= 0 => raw(x)
-      case _ => current
+      case _           => current
     }
   }
 
@@ -440,12 +443,12 @@ trait Index[@spec(Boolean, Int, Long, Double) T] extends Serializable {
 
     if (!isContiguous)
       throw Index.IndexException(
-          "Cannot traverse index that is not contiguous in its values")
+        "Cannot traverse index that is not contiguous in its values")
 
     val nextSpot = locator.get(current.get) + locator.count(current.get)
     nextSpot match {
       case x if x < length => raw(x)
-      case _ => current
+      case _               => current
     }
   }
 
@@ -456,7 +459,7 @@ trait Index[@spec(Boolean, Int, Long, Double) T] extends Serializable {
     * @param f Function to map with
     * @tparam B Type of resulting elements
     */
-  def map[@spec(Boolean, Int, Long, Double) B : ST : ORD](f: T => B): Index[B]
+  def map[@spec(Boolean, Int, Long, Double) B: ST: ORD](f: T => B): Index[B]
 
   /**
     * Convert Index elements to an IndexedSeq.
@@ -511,8 +514,8 @@ trait Index[@spec(Boolean, Int, Long, Double) T] extends Serializable {
       buf.append("[Index %d x 1]\n" format (length))
 
       def createRow(r: Int) = {
-        val lst = for ((l, v) <- (vlens zip sm.strList(raw(r)))) yield
-          v.formatted("%" + l + "s")
+        val lst = for ((l, v) <- (vlens zip sm.strList(raw(r))))
+          yield v.formatted("%" + l + "s")
         lst.mkString(" ") + "\n"
       }
 
@@ -540,7 +543,7 @@ object Index {
     * @param values Vec
     * @tparam C Type of elements in Vec
     */
-  def apply[C : ST : ORD](values: Vec[C]): Index[C] =
+  def apply[C: ST: ORD](values: Vec[C]): Index[C] =
     implicitly[ST[C]].makeIndex(values)
 
   /**
@@ -548,7 +551,7 @@ object Index {
     * @param arr Array
     * @tparam C Type of elements in array
     */
-  def apply[C : ST : ORD](arr: Array[C]): Index[C] = apply(Vec(arr))
+  def apply[C: ST: ORD](arr: Array[C]): Index[C] = apply(Vec(arr))
 
   /**
     * Factory method to create an index from a sequence of elements, eg
@@ -561,7 +564,7 @@ object Index {
     * @param values Seq[C]
     * @tparam C Type of elements in Seq
     */
-  def apply[C : ST : ORD](values: C*): Index[C] = apply(values.toArray)
+  def apply[C: ST: ORD](values: C*): Index[C] = apply(values.toArray)
 
   /**
     * Factory method to create an Index; the basic use case is to construct
@@ -604,7 +607,7 @@ object Index {
     * Factor method to create an empty Index
     * @tparam C type of Index
     */
-  def empty[C : ST : ORD]: Index[C] = Index(Array.empty[C])
+  def empty[C: ST: ORD]: Index[C] = Index(Array.empty[C])
 
   // (safe) conversions
 
@@ -613,14 +616,14 @@ object Index {
     * @param arr Array
     * @tparam C Type of elements in array
     */
-  implicit def arrayToIndex[C : ST : ORD](arr: Array[C]) = Index(arr)
+  implicit def arrayToIndex[C: ST: ORD](arr: Array[C]) = Index(arr)
 
   /**
     * A Vec may be implicitly converted to an Index
     * @param s Vec
     * @tparam C Type of elements in Vec
     */
-  implicit def vecToIndex[C : ST : ORD](s: Vec[C]) = Index(s.toArray)
+  implicit def vecToIndex[C: ST: ORD](s: Vec[C]) = Index(s.toArray)
 
   /**
     * Provides an index-specific exception

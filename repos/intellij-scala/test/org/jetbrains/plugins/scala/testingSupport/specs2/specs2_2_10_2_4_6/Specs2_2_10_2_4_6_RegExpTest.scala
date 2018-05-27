@@ -7,4 +7,5 @@ import org.jetbrains.plugins.scala.testingSupport.specs2.Specs2RegExpTestNameTes
   * @since 03.07.2015.
   */
 class Specs2_2_10_2_4_6_RegExpTest
-    extends Specs2RegExpTestNameTest with Specs2_2_10_2_4_6_Base {}
+    extends Specs2RegExpTestNameTest
+    with Specs2_2_10_2_4_6_Base {}

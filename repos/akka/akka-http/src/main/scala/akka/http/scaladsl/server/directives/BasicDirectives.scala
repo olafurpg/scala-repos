@@ -54,8 +54,7 @@ trait BasicDirectives {
       f: PartialFunction[RouteResult, Future[RouteResult]]): Directive0 =
     mapRouteResultWith(f.applyOrElse(_, FastFuture.successful[RouteResult]))
 
-  def recoverRejections(
-      f: immutable.Seq[Rejection] ⇒ RouteResult): Directive0 =
+  def recoverRejections(f: immutable.Seq[Rejection] ⇒ RouteResult): Directive0 =
     mapRouteResultPF { case RouteResult.Rejected(rejections) ⇒ f(rejections) }
 
   def recoverRejectionsWith(
@@ -94,8 +93,8 @@ trait BasicDirectives {
   /**
     * Injects the given values into a directive.
     */
-  def tprovide[L : Tuple](values: L): Directive[L] =
-    Directive { _ (values) }
+  def tprovide[L: Tuple](values: L): Directive[L] =
+    Directive { _(values) }
 
   /**
     * Extracts a single value using the given function.
@@ -106,7 +105,7 @@ trait BasicDirectives {
   /**
     * Extracts a number of values using the given function.
     */
-  def textract[L : Tuple](f: RequestContext ⇒ L): Directive[L] =
+  def textract[L: Tuple](f: RequestContext ⇒ L): Directive[L] =
     Directive { inner ⇒ ctx ⇒
       inner(f(ctx))(ctx)
     }
@@ -223,18 +222,18 @@ trait BasicDirectives {
 
 object BasicDirectives extends BasicDirectives {
   private val _extractUnmatchedPath: Directive1[Uri.Path] = extract(
-      _.unmatchedPath)
+    _.unmatchedPath)
   private val _extractRequest: Directive1[HttpRequest] = extract(_.request)
   private val _extractUri: Directive1[Uri] = extract(_.request.uri)
   private val _extractExecutionContext: Directive1[ExecutionContextExecutor] =
     extract(_.executionContext)
   private val _extractMaterializer: Directive1[Materializer] = extract(
-      _.materializer)
+    _.materializer)
   private val _extractLog: Directive1[LoggingAdapter] = extract(_.log)
   private val _extractSettings: Directive1[RoutingSettings] = extract(
-      _.settings)
+    _.settings)
   private val _extractParserSettings: Directive1[ParserSettings] = extract(
-      _.parserSettings)
+    _.parserSettings)
   private val _extractRequestContext: Directive1[RequestContext] = extract(
-      conforms)
+    conforms)
 }

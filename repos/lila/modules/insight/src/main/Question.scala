@@ -1,7 +1,9 @@
 package lila.insight
 
 case class Question[X](
-    dimension: Dimension[X], metric: Metric, filters: List[Filter[_]])
+    dimension: Dimension[X],
+    metric: Metric,
+    filters: List[Filter[_]])
 
 case class Filter[A](dimension: Dimension[A], selected: List[A]) {
 

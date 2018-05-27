@@ -12,18 +12,24 @@ import scala.xml._
 
 class InvalidManifestException(where: Node, expected: String)
     extends Exception(
-        s"Malformed library manifest at '$where', expected $expected")
+      s"Malformed library manifest at '$where', expected $expected")
 
 // TODO: allow user to provide compiler settings for sources set
 case class InjectorDescriptor(
-    version: Int, iface: String, impl: String, sources: Seq[String])
+    version: Int,
+    iface: String,
+    impl: String,
+    sources: Seq[String])
 
 case class PluginDescriptor(
-    since: Version, until: Version, injectors: Seq[InjectorDescriptor])
+    since: Version,
+    until: Version,
+    injectors: Seq[InjectorDescriptor])
 
-case class JarManifest(pluginDescriptors: Seq[PluginDescriptor],
-                       jarPath: String,
-                       modTimeStamp: Long)(val isBlackListed: Boolean) {
+case class JarManifest(
+    pluginDescriptors: Seq[PluginDescriptor],
+    jarPath: String,
+    modTimeStamp: Long)(val isBlackListed: Boolean) {
   def serialize() = {
     <intellij-compat>
       {for (PluginDescriptor(since, until, injtors) <- pluginDescriptors) {
@@ -43,7 +49,8 @@ case class JarManifest(pluginDescriptors: Seq[PluginDescriptor],
 
 object JarManifest {
   def deserialize(
-      f: VirtualFile, containingJar: VirtualFile = null): JarManifest = {
+      f: VirtualFile,
+      containingJar: VirtualFile = null): JarManifest = {
     val jar =
       Option(containingJar).getOrElse(VfsUtilCore.getVirtualFileForJar(f))
     deserialize(XML.load(f.getInputStream), jar)
@@ -74,12 +81,15 @@ object JarManifest {
     elem \\ "intellij-compat" match {
       case NodeSeq.Empty =>
         throw new InvalidManifestException(
-            elem, "<intellij-compat> with plugin descriptors")
+          elem,
+          "<intellij-compat> with plugin descriptors")
       case xss: NodeSeq =>
-        JarManifest((xss \\ "scala-plugin").map(buildPluginDescriptor),
-                    containingJar.getPath.replaceAll("!/", ""),
-                    new File(containingJar.getPath.replaceAll("!/", ""))
-                      .lastModified())(isBlackListed = false)
+        JarManifest(
+          (xss \\ "scala-plugin").map(buildPluginDescriptor),
+          containingJar.getPath.replaceAll("!/", ""),
+          new File(containingJar.getPath.replaceAll("!/", ""))
+            .lastModified()
+        )(isBlackListed = false)
     }
   }
 }

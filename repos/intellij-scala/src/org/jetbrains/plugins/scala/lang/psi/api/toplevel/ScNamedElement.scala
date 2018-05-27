@@ -21,14 +21,15 @@ import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.JavaIdentifi
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
 
 trait ScNamedElement
-    extends ScalaPsiElement with PsiNameIdentifierOwner
+    extends ScalaPsiElement
+    with PsiNameIdentifierOwner
     with NavigatablePsiElement {
   def name: String = {
     this match {
       case st: StubBasedPsiElement[_] =>
         st.getStub match {
           case namedStub: NamedStub[_] => namedStub.getName
-          case _ => nameInner
+          case _                       => nameInner
         }
       case _ => nameInner
     }
@@ -72,36 +73,43 @@ trait ScNamedElement
       def getPresentableText: String = name
       def getTextAttributesKey: TextAttributesKey = null
       def getLocationString: String = clazz match {
-        case _: ScTypeDefinition => "(" + clazz.qualifiedName + ")"
+        case _: ScTypeDefinition        => "(" + clazz.qualifiedName + ")"
         case x: ScNewTemplateDefinition => "(<anonymous>)"
-        case _ => ""
+        case _                          => ""
       }
       override def getIcon(open: Boolean) = parentMember match {
         case mem: ScMember => mem.getIcon(0)
-        case _ => null
+        case _             => null
       }
     }
   }
 
   override def getIcon(flags: Int) =
     ScalaPsiUtil.nameContext(this) match {
-      case null => null
+      case null            => null
       case c: ScCaseClause => Icons.PATTERN_VAL
-      case x => x.getIcon(flags)
+      case x               => x.getIcon(flags)
     }
 
   abstract override def getUseScope: SearchScope = {
     ScalaPsiUtil.intersectScopes(
-        super.getUseScope, ScalaPsiUtil.nameContext(this) match {
-      case member: ScMember if member != this => Some(member.getUseScope)
-      case caseClause: ScCaseClause => Some(new LocalSearchScope(caseClause))
-      case elem @ (_: ScEnumerator | _: ScGenerator) =>
-        Option(
+      super.getUseScope,
+      ScalaPsiUtil.nameContext(this) match {
+        case member: ScMember if member != this => Some(member.getUseScope)
+        case caseClause: ScCaseClause           => Some(new LocalSearchScope(caseClause))
+        case elem @ (_: ScEnumerator | _: ScGenerator) =>
+          Option(
             PsiTreeUtil.getContextOfType(elem, true, classOf[ScForStatement]))
-          .orElse(Option(PsiTreeUtil.getContextOfType(
-                      elem, true, classOf[ScBlock], classOf[ScMember])))
-          .map(new LocalSearchScope(_))
-      case _ => None
-    })
+            .orElse(
+              Option(
+                PsiTreeUtil.getContextOfType(
+                  elem,
+                  true,
+                  classOf[ScBlock],
+                  classOf[ScMember])))
+            .map(new LocalSearchScope(_))
+        case _ => None
+      }
+    )
   }
 }

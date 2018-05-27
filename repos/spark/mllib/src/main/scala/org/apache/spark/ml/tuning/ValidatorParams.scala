@@ -35,8 +35,8 @@ private[ml] trait ValidatorParams extends Params {
     *
     * @group param
     */
-  val estimator: Param[Estimator[_]] = new Param(
-      this, "estimator", "estimator for selection")
+  val estimator: Param[Estimator[_]] =
+    new Param(this, "estimator", "estimator for selection")
 
   /** @group getParam */
   def getEstimator: Estimator[_] = $(estimator)
@@ -46,8 +46,8 @@ private[ml] trait ValidatorParams extends Params {
     *
     * @group param
     */
-  val estimatorParamMaps: Param[Array[ParamMap]] = new Param(
-      this, "estimatorParamMaps", "param maps for the estimator")
+  val estimatorParamMaps: Param[Array[ParamMap]] =
+    new Param(this, "estimatorParamMaps", "param maps for the estimator")
 
   /** @group getParam */
   def getEstimatorParamMaps: Array[ParamMap] = $(estimatorParamMaps)
@@ -58,16 +58,17 @@ private[ml] trait ValidatorParams extends Params {
     * @group param
     */
   val evaluator: Param[Evaluator] = new Param(
-      this,
-      "evaluator",
-      "evaluator used to select hyper-parameters that maximize the validated metric")
+    this,
+    "evaluator",
+    "evaluator used to select hyper-parameters that maximize the validated metric")
 
   /** @group getParam */
   def getEvaluator: Evaluator = $(evaluator)
 
   protected def transformSchemaImpl(schema: StructType): StructType = {
-    require($(estimatorParamMaps).nonEmpty,
-            s"Validator requires non-empty estimatorParamMaps")
+    require(
+      $(estimatorParamMaps).nonEmpty,
+      s"Validator requires non-empty estimatorParamMaps")
     val firstEstimatorParamMap = $(estimatorParamMaps).head
     val est = $(estimator)
     for (paramMap <- $(estimatorParamMaps).tail) {

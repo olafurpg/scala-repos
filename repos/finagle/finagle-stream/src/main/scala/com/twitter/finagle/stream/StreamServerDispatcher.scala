@@ -10,11 +10,10 @@ import org.jboss.netty.handler.codec.http._
 /**
   * Stream StreamResponse messages into HTTP chunks.
   */
-private[twitter] class StreamServerDispatcher[Req : RequestType](
+private[twitter] class StreamServerDispatcher[Req: RequestType](
     trans: Transport[Any, Any],
     service: Service[Req, StreamResponse]
-)
-    extends GenSerialServerDispatcher[Req, StreamResponse, Any, Any](trans) {
+) extends GenSerialServerDispatcher[Req, StreamResponse, Any, Any](trans) {
   import Bijections._
 
   trans.onClose ensure {
@@ -39,22 +38,26 @@ private[twitter] class StreamServerDispatcher[Req : RequestType](
     case invalid =>
       eos.setDone()
       Future.exception(
-          new IllegalArgumentException(s"Invalid message: $invalid"))
+        new IllegalArgumentException(s"Invalid message: $invalid"))
   }
 
   protected def handle(rep: StreamResponse) = {
     val httpRes: HttpResponse = from(rep.info)
 
-    httpRes.setChunked(httpRes.getProtocolVersion == HttpVersion.HTTP_1_1 &&
+    httpRes.setChunked(
+      httpRes.getProtocolVersion == HttpVersion.HTTP_1_1 &&
         httpRes.headers.get(HttpHeaders.Names.CONTENT_LENGTH) == null)
 
     if (httpRes.isChunked) {
-      HttpHeaders.setHeader(httpRes,
-                            HttpHeaders.Names.TRANSFER_ENCODING,
-                            HttpHeaders.Values.CHUNKED)
+      HttpHeaders.setHeader(
+        httpRes,
+        HttpHeaders.Names.TRANSFER_ENCODING,
+        HttpHeaders.Values.CHUNKED)
     } else {
       HttpHeaders.setHeader(
-          httpRes, HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE)
+        httpRes,
+        HttpHeaders.Names.CONNECTION,
+        HttpHeaders.Values.CLOSE)
     }
 
     val f = trans

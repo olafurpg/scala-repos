@@ -42,19 +42,20 @@ class MapStatusSuite extends SparkFunSuite {
     assert(MapStatus.decompressSize(0) === 0)
     for (size <- Seq(2L, 10L, 100L, 50000L, 1000000L, 1000000000L)) {
       val size2 = MapStatus.decompressSize(MapStatus.compressSize(size))
-      assert(size2 >= 0.99 * size && size2 <= 1.11 * size,
-             "size " + size + " decompressed to " + size2 +
-             ", which is out of range")
+      assert(
+        size2 >= 0.99 * size && size2 <= 1.11 * size,
+        "size " + size + " decompressed to " + size2 +
+          ", which is out of range")
     }
   }
 
   test("MapStatus should never report non-empty blocks' sizes as 0") {
     import Math._
     for (numSizes <- Seq(1, 10, 100, 1000, 10000);
-    mean <- Seq(0L, 100L, 10000L, Int.MaxValue.toLong);
-    stddev <- Seq(0.0, 0.01, 0.5, 1.0)) {
+         mean <- Seq(0L, 100L, 10000L, Int.MaxValue.toLong);
+         stddev <- Seq(0.0, 0.01, 0.5, 1.0)) {
       val sizes = Array.fill[Long](numSizes)(
-          abs(round(Random.nextGaussian() * stddev)) + mean)
+        abs(round(Random.nextGaussian() * stddev)) + mean)
       val status = MapStatus(BlockManagerId("a", "b", 10), sizes)
       val status1 = compressAndDecompressMapStatus(status)
       for (i <- 0 until numSizes) {
@@ -79,7 +80,7 @@ class MapStatusSuite extends SparkFunSuite {
   }
 
   test(
-      "HighlyCompressedMapStatus: estimated size should be the average non-empty block size") {
+    "HighlyCompressedMapStatus: estimated size should be the average non-empty block size") {
     val sizes = Array.tabulate[Long](3000) { i =>
       i.toLong
     }
@@ -106,7 +107,7 @@ class MapStatusSuite extends SparkFunSuite {
   test("RoaringBitmap: runOptimize succeeded") {
     val r = new RoaringBitmap
     (1 to 200000).foreach(i =>
-          if (i % 200 != 0) {
+      if (i % 200 != 0) {
         r.add(i)
     })
     val size1 = r.getSizeInBytes
@@ -120,7 +121,7 @@ class MapStatusSuite extends SparkFunSuite {
   test("RoaringBitmap: runOptimize failed") {
     val r = new RoaringBitmap
     (1 to 200000).foreach(i =>
-          if (i % 200 == 0) {
+      if (i % 200 == 0) {
         r.add(i)
     })
     val size1 = r.getSizeInBytes

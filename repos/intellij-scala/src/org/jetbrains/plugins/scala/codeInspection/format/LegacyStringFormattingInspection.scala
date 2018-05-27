@@ -4,7 +4,10 @@ package codeInspection.format
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
-import org.jetbrains.plugins.scala.codeInspection.{AbstractFixOnPsiElement, AbstractInspection}
+import org.jetbrains.plugins.scala.codeInspection.{
+  AbstractFixOnPsiElement,
+  AbstractInspection
+}
 import org.jetbrains.plugins.scala.format._
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
@@ -16,9 +19,9 @@ class LegacyStringFormattingInspection extends AbstractInspection {
     case element
         if FormattedStringParser.extractFormatCall(element).isDefined =>
       holder.registerProblem(
-          element,
-          "Legacy string formatting, an interpolated string can be used instead",
-          new QuickFix(element))
+        element,
+        "Legacy string formatting, an interpolated string can be used instead",
+        new QuickFix(element))
   }
 
   private class QuickFix(e: PsiElement)

@@ -3,7 +3,14 @@ package com.twitter.finagle.loadbalancer
 import com.twitter.finagle.service.FailingFactory
 import com.twitter.finagle.stats.StatsReceiver
 import com.twitter.finagle.util.{Rng, Ring, Ema}
-import com.twitter.finagle.{ClientConnection, NoBrokersAvailableException, ServiceFactory, ServiceFactoryProxy, ServiceProxy, Status}
+import com.twitter.finagle.{
+  ClientConnection,
+  NoBrokersAvailableException,
+  ServiceFactory,
+  ServiceFactoryProxy,
+  ServiceProxy,
+  Status
+}
 import com.twitter.util.{Activity, Return, Future, Throw, Time, Duration, Timer}
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -48,7 +55,9 @@ private class ApertureLoadBandBalancer[Req, Rep](
     protected implicit val timer: Timer,
     protected val statsReceiver: StatsReceiver,
     protected val emptyException: NoBrokersAvailableException)
-    extends Balancer[Req, Rep] with Aperture[Req, Rep] with LoadBand[Req, Rep]
+    extends Balancer[Req, Rep]
+    with Aperture[Req, Rep]
+    with LoadBand[Req, Rep]
     with Updating[Req, Rep] {
 
   protected[this] val maxEffortExhausted =
@@ -106,7 +115,7 @@ private trait Aperture[Req, Rep] { self: Balancer[Req, Rep] =>
 
     private[this] val (up, down) = vector.partition(nodeUp) match {
       case (Vector(), down) => (down, Vector.empty)
-      case updown => updown
+      case updown           => updown
     }
 
     private[this] val (ring, unitWidth, maxAperture) =
@@ -265,10 +274,12 @@ private trait LoadBand[Req, Rep] {
     else if (a <= lowLoad && aperture > minAperture) narrow()
   }
 
-  protected case class Node(factory: ServiceFactory[Req, Rep],
-                            counter: AtomicInteger,
-                            token: Int)
-      extends ServiceFactoryProxy[Req, Rep](factory) with NodeT[Req, Rep] {
+  protected case class Node(
+      factory: ServiceFactory[Req, Rep],
+      counter: AtomicInteger,
+      token: Int)
+      extends ServiceFactoryProxy[Req, Rep](factory)
+      with NodeT[Req, Rep] {
     type This = Node
 
     def load: Double = counter.get
@@ -278,8 +289,7 @@ private trait LoadBand[Req, Rep] {
       adjustNode(this, 1)
       super.apply(conn).transform {
         case Return(svc) =>
-          Future.value(
-              new ServiceProxy(svc) {
+          Future.value(new ServiceProxy(svc) {
             override def close(deadline: Time) =
               super.close(deadline).ensure {
                 adjustNode(Node.this, -1)
@@ -294,7 +304,8 @@ private trait LoadBand[Req, Rep] {
   }
 
   protected def newNode(
-      factory: ServiceFactory[Req, Rep], statsReceiver: StatsReceiver) =
+      factory: ServiceFactory[Req, Rep],
+      statsReceiver: StatsReceiver) =
     Node(factory, new AtomicInteger(0), rng.nextInt())
 
   private[this] val failingLoad = new AtomicInteger(0)

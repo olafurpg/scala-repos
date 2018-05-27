@@ -47,7 +47,7 @@ class Metrics @Inject()(val registry: MetricRegistry) {
   }
 
   @throws[IllegalArgumentException](
-      "if this function is called multiple times for the same name.")
+    "if this function is called multiple times for the same name.")
   def gauge[G <: Gauge[_]](name: String, gauge: G): G = {
     registry.register(name, gauge)
     gauge
@@ -81,7 +81,8 @@ object Metrics {
   class Timer(private[metrics] val timer: com.codahale.metrics.Timer) {
     def timeFuture[T](future: => Future[T]): Future[T] = {
       val startTime = System.nanoTime()
-      val f = try future catch {
+      val f = try future
+      catch {
         case NonFatal(e) =>
           timer.update(System.nanoTime() - startTime, TimeUnit.NANOSECONDS)
           throw e

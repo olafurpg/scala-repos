@@ -113,7 +113,9 @@ object Object extends Object {
     * MDN
     */
   def defineProperty(
-      o: Object, p: String, attributes: PropertyDescriptor): o.type = native
+      o: Object,
+      p: String,
+      attributes: PropertyDescriptor): o.type = native
 
   /**
     * The Object.defineProperties() method defines new or modifies existing

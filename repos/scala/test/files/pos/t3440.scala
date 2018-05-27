@@ -11,8 +11,8 @@ object test {
   }
 
   (new {}: Any) match {
-    case 8 => Int8
+    case 8  => Int8
     case 16 => Int16
-    case _ => sys.error("")
+    case _  => sys.error("")
   }
 }

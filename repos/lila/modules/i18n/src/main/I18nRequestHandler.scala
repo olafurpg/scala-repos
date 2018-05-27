@@ -6,7 +6,9 @@ import play.api.mvc.{Action, RequestHeader, Handler, Result}
 import lila.common.HTTPRequest
 
 final class I18nRequestHandler(
-    pool: I18nPool, protocol: String, cdnDomain: String) {
+    pool: I18nPool,
+    protocol: String,
+    cdnDomain: String) {
 
   def apply(req: RequestHeader): Option[Handler] =
     if (HTTPRequest.isRedirectable(req) && req.host != cdnDomain &&
@@ -14,7 +16,8 @@ final class I18nRequestHandler(
     else None
 
   def forUser(
-      req: RequestHeader, userOption: Option[lila.user.User]): Option[Result] =
+      req: RequestHeader,
+      userOption: Option[lila.user.User]): Option[Result] =
     for {
       userLang <- userOption.flatMap(_.lang) if HTTPRequest.isRedirectable(req)
       reqLang <- pool domainLang req if userLang != reqLang.language

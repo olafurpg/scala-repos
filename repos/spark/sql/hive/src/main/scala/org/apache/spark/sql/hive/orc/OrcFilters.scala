@@ -69,18 +69,20 @@ private[orc] object OrcFilters extends Logging {
       conjunction <- convertibleFilters.reduceOption(And)
       // Then tries to build a single ORC `SearchArgument` for the conjunction predicate
       builder <- buildSearchArgument(
-          conjunction, SearchArgumentFactory.newBuilder())
+        conjunction,
+        SearchArgumentFactory.newBuilder())
     } yield builder.build()
   }
 
   private def buildSearchArgument(
-      expression: Filter, builder: Builder): Option[Builder] = {
+      expression: Filter,
+      builder: Builder): Option[Builder] = {
     def newBuilder = SearchArgumentFactory.newBuilder()
 
     def isSearchableLiteral(value: Any): Boolean = value match {
       // These are types recognized by the `SearchArgumentImpl.BuilderImpl.boxLiteral()` method.
-      case _: String | _: Long | _: Double | _: Byte | _: Short |
-          _: Integer | _: Float =>
+      case _: String | _: Long | _: Double | _: Byte | _: Short | _: Integer |
+          _: Float =>
         true
       case _: DateWritable | _: HiveDecimal | _: HiveChar | _: HiveVarchar =>
         true
@@ -136,8 +138,7 @@ private[orc] object OrcFilters extends Logging {
       case GreaterThan(attribute, value) if isSearchableLiteral(value) =>
         Some(builder.startNot().lessThanEquals(attribute, value).end())
 
-      case GreaterThanOrEqual(attribute, value)
-          if isSearchableLiteral(value) =>
+      case GreaterThanOrEqual(attribute, value) if isSearchableLiteral(value) =>
         Some(builder.startNot().lessThan(attribute, value).end())
 
       case IsNull(attribute) =>
@@ -148,10 +149,10 @@ private[orc] object OrcFilters extends Logging {
 
       case In(attribute, values) if values.forall(isSearchableLiteral) =>
         Some(
-            builder
-              .startAnd()
-              .in(attribute, values.map(_.asInstanceOf[AnyRef]): _*)
-              .end())
+          builder
+            .startAnd()
+            .in(attribute, values.map(_.asInstanceOf[AnyRef]): _*)
+            .end())
 
       case _ => None
     }

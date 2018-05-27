@@ -19,10 +19,11 @@ trait HttpServiceBase {
   /**
     * Starts a server on the given interface and port and uses the route to handle incoming requests.
     */
-  def bindRoute(interface: String,
-                port: Int,
-                route: Route,
-                system: ActorSystem): CompletionStage[ServerBinding] = {
+  def bindRoute(
+      interface: String,
+      port: Int,
+      route: Route,
+      system: ActorSystem): CompletionStage[ServerBinding] = {
     implicit val sys = system
     implicit val materializer = ActorMaterializer()
     handleConnectionsWithRoute(interface, port, route, system, materializer)
@@ -31,11 +32,12 @@ trait HttpServiceBase {
   /**
     * Starts a server on the given interface and port and uses the route to handle incoming requests.
     */
-  def bindRoute(interface: String,
-                port: Int,
-                route: Route,
-                system: ActorSystem,
-                materializer: Materializer): CompletionStage[ServerBinding] =
+  def bindRoute(
+      interface: String,
+      port: Int,
+      route: Route,
+      system: ActorSystem,
+      materializer: Materializer): CompletionStage[ServerBinding] =
     handleConnectionsWithRoute(interface, port, route, system, materializer)
 
   /**
@@ -55,7 +57,7 @@ trait HttpServiceBase {
     Http(system)
       .bind(interface, port)
       .toMat(Sink.foreach(_.handleWith(RouteResult.route2HandlerFlow(r))))(
-          Keep.left)
+        Keep.left)
       .run()(materializer)
       .toJava
   }

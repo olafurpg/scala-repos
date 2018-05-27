@@ -26,7 +26,10 @@ import scopt.OptionParser
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.examples.mllib.AbstractParams
 import org.apache.spark.ml.{Pipeline, PipelineStage}
-import org.apache.spark.ml.classification.{GBTClassificationModel, GBTClassifier}
+import org.apache.spark.ml.classification.{
+  GBTClassificationModel,
+  GBTClassifier
+}
 import org.apache.spark.ml.feature.{StringIndexer, VectorIndexer}
 import org.apache.spark.ml.regression.{GBTRegressionModel, GBTRegressor}
 import org.apache.spark.sql.DataFrame
@@ -47,19 +50,20 @@ import org.apache.spark.sql.DataFrame
   */
 object GBTExample {
 
-  case class Params(input: String = null,
-                    testInput: String = "",
-                    dataFormat: String = "libsvm",
-                    algo: String = "classification",
-                    maxDepth: Int = 5,
-                    maxBins: Int = 32,
-                    minInstancesPerNode: Int = 1,
-                    minInfoGain: Double = 0.0,
-                    maxIter: Int = 10,
-                    fracTest: Double = 0.2,
-                    cacheNodeIds: Boolean = false,
-                    checkpointDir: Option[String] = None,
-                    checkpointInterval: Int = 10)
+  case class Params(
+      input: String = null,
+      testInput: String = "",
+      dataFormat: String = "libsvm",
+      algo: String = "classification",
+      maxDepth: Int = 5,
+      maxBins: Int = 32,
+      minInstancesPerNode: Int = 1,
+      minInfoGain: Double = 0.0,
+      maxIter: Int = 10,
+      fracTest: Double = 0.2,
+      cacheNodeIds: Boolean = false,
+      checkpointDir: Option[String] = None,
+      checkpointInterval: Int = 10)
       extends AbstractParams[Params]
 
   def main(args: Array[String]) {
@@ -69,7 +73,7 @@ object GBTExample {
       head("GBTExample: an example Gradient-Boosted Trees app.")
       opt[String]("algo")
         .text(
-            s"algorithm (classification, regression), default: ${defaultParams.algo}")
+          s"algorithm (classification, regression), default: ${defaultParams.algo}")
         .action((x, c) => c.copy(algo = x))
       opt[Int]("maxDepth")
         .text(s"max depth of the tree, default: ${defaultParams.maxDepth}")
@@ -78,44 +82,45 @@ object GBTExample {
         .text(s"max number of bins, default: ${defaultParams.maxBins}")
         .action((x, c) => c.copy(maxBins = x))
       opt[Int]("minInstancesPerNode")
-        .text(s"min number of instances required at child nodes to create the parent split," +
+        .text(
+          s"min number of instances required at child nodes to create the parent split," +
             s" default: ${defaultParams.minInstancesPerNode}")
         .action((x, c) => c.copy(minInstancesPerNode = x))
       opt[Double]("minInfoGain")
         .text(
-            s"min info gain required to create a split, default: ${defaultParams.minInfoGain}")
+          s"min info gain required to create a split, default: ${defaultParams.minInfoGain}")
         .action((x, c) => c.copy(minInfoGain = x))
       opt[Int]("maxIter")
-        .text(
-            s"number of trees in ensemble, default: ${defaultParams.maxIter}")
+        .text(s"number of trees in ensemble, default: ${defaultParams.maxIter}")
         .action((x, c) => c.copy(maxIter = x))
       opt[Double]("fracTest")
-        .text(s"fraction of data to hold out for testing.  If given option testInput, " +
+        .text(
+          s"fraction of data to hold out for testing.  If given option testInput, " +
             s"this option is ignored. default: ${defaultParams.fracTest}")
         .action((x, c) => c.copy(fracTest = x))
       opt[Boolean]("cacheNodeIds")
         .text(s"whether to use node Id cache during training, " +
-            s"default: ${defaultParams.cacheNodeIds}")
+          s"default: ${defaultParams.cacheNodeIds}")
         .action((x, c) => c.copy(cacheNodeIds = x))
       opt[String]("checkpointDir")
         .text(
-            s"checkpoint directory where intermediate node Id caches will be stored, " +
+          s"checkpoint directory where intermediate node Id caches will be stored, " +
             s"default: ${defaultParams.checkpointDir match {
-          case Some(strVal) => strVal
-          case None => "None"
-        }}")
+              case Some(strVal) => strVal
+              case None         => "None"
+            }}")
         .action((x, c) => c.copy(checkpointDir = Some(x)))
       opt[Int]("checkpointInterval")
         .text(s"how often to checkpoint the node Id cache, " +
-            s"default: ${defaultParams.checkpointInterval}")
+          s"default: ${defaultParams.checkpointInterval}")
         .action((x, c) => c.copy(checkpointInterval = x))
       opt[String]("testInput")
-        .text(s"input path to test dataset.  If given, option fracTest is ignored." +
+        .text(
+          s"input path to test dataset.  If given, option fracTest is ignored." +
             s" default: ${defaultParams.testInput}")
         .action((x, c) => c.copy(testInput = x))
       opt[String]("dataFormat")
-        .text(
-            "data format: libsvm (default), dense (deprecated in Spark v1.1)")
+        .text("data format: libsvm (default), dense (deprecated in Spark v1.1)")
         .action((x, c) => c.copy(dataFormat = x))
       arg[String]("<input>")
         .text("input path to labeled examples")
@@ -124,7 +129,7 @@ object GBTExample {
       checkConfig { params =>
         if (params.fracTest < 0 || params.fracTest >= 1) {
           failure(
-              s"fracTest ${params.fracTest} value incorrect; should be in [0,1).")
+            s"fracTest ${params.fracTest} value incorrect; should be in [0,1).")
         } else {
           success
         }
@@ -151,12 +156,13 @@ object GBTExample {
 
     // Load training and test data and cache it.
     val (training: DataFrame, test: DataFrame) =
-      DecisionTreeExample.loadDatasets(sc,
-                                       params.input,
-                                       params.dataFormat,
-                                       params.testInput,
-                                       algo,
-                                       params.fracTest)
+      DecisionTreeExample.loadDatasets(
+        sc,
+        params.input,
+        params.dataFormat,
+        params.testInput,
+        algo,
+        params.fracTest)
 
     // Set up Pipeline
     val stages = new mutable.ArrayBuffer[PipelineStage]()
@@ -200,8 +206,7 @@ object GBTExample {
           .setCheckpointInterval(params.checkpointInterval)
           .setMaxIter(params.maxIter)
       case _ =>
-        throw new IllegalArgumentException(
-            "Algo ${params.algo} not supported.")
+        throw new IllegalArgumentException("Algo ${params.algo} not supported.")
     }
     stages += dt
     val pipeline = new Pipeline().setStages(stages.toArray)
@@ -231,8 +236,7 @@ object GBTExample {
           println(rfModel) // Print model summary.
         }
       case _ =>
-        throw new IllegalArgumentException(
-            "Algo ${params.algo} not supported.")
+        throw new IllegalArgumentException("Algo ${params.algo} not supported.")
     }
 
     // Evaluate model on training, test data
@@ -240,20 +244,27 @@ object GBTExample {
       case "classification" =>
         println("Training data results:")
         DecisionTreeExample.evaluateClassificationModel(
-            pipelineModel, training, labelColName)
+          pipelineModel,
+          training,
+          labelColName)
         println("Test data results:")
         DecisionTreeExample.evaluateClassificationModel(
-            pipelineModel, test, labelColName)
+          pipelineModel,
+          test,
+          labelColName)
       case "regression" =>
         println("Training data results:")
         DecisionTreeExample.evaluateRegressionModel(
-            pipelineModel, training, labelColName)
+          pipelineModel,
+          training,
+          labelColName)
         println("Test data results:")
         DecisionTreeExample.evaluateRegressionModel(
-            pipelineModel, test, labelColName)
+          pipelineModel,
+          test,
+          labelColName)
       case _ =>
-        throw new IllegalArgumentException(
-            "Algo ${params.algo} not supported.")
+        throw new IllegalArgumentException("Algo ${params.algo} not supported.")
     }
 
     sc.stop()

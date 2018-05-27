@@ -29,7 +29,7 @@ object TypeParam {
     if (mayHaveVariance) {
       builder.getTokenText match {
         case "+" | "-" => builder.advanceLexer()
-        case _ =>
+        case _         =>
       }
     }
     builder.getTokenType match {

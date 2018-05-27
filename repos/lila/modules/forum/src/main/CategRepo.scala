@@ -12,16 +12,18 @@ object CategRepo {
 
   def withTeams(teams: Set[String]): Fu[List[Categ]] =
     $find(
-        $query($or(Seq(
-                    Json.obj("team" -> $exists(false)),
-                    Json.obj("team" -> $in(teams))
-                ))) sort $sort.asc("pos"))
+      $query(
+        $or(
+          Seq(
+            Json.obj("team" -> $exists(false)),
+            Json.obj("team" -> $in(teams))
+          ))) sort $sort.asc("pos"))
 
   def nextPosition: Fu[Int] =
     $primitive.one(
-        $select.all,
-        "pos",
-        _ sort $sort.desc("pos")
+      $select.all,
+      "pos",
+      _ sort $sort.desc("pos")
     )(_.asOpt[Int]) map (~_ + 1)
 
   def nbPosts(id: String): Fu[Int] =

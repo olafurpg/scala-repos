@@ -20,7 +20,9 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
   * @author Alexander Podkhalyuzin
   */
 class ScVariableDeclarationImpl private (
-    stub: StubElement[ScVariable], nodeType: IElementType, node: ASTNode)
+    stub: StubElement[ScVariable],
+    nodeType: IElementType,
+    node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
     with ScVariableDeclaration {
   def this(node: ASTNode) = { this(null, null, node) }
@@ -54,7 +56,7 @@ class ScVariableDeclarationImpl private (
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case s: ScalaElementVisitor => s.visitVariableDeclaration(this)
-      case _ => super.accept(visitor)
+      case _                      => super.accept(visitor)
     }
   }
 }

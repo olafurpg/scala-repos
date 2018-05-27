@@ -35,10 +35,14 @@ import scala.collection.parallel.mutable.ParHashSet
   *  @define willNotTerminateInf
   */
 @SerialVersionUID(1L)
-class HashSet[A] private[collection](contents: FlatHashTable.Contents[A])
-    extends AbstractSet[A] with Set[A] with GenericSetTemplate[A, HashSet]
-    with SetLike[A, HashSet[A]] with FlatHashTable[A]
-    with CustomParallelizable[A, ParHashSet[A]] with Serializable {
+class HashSet[A] private[collection] (contents: FlatHashTable.Contents[A])
+    extends AbstractSet[A]
+    with Set[A]
+    with GenericSetTemplate[A, HashSet]
+    with SetLike[A, HashSet[A]]
+    with FlatHashTable[A]
+    with CustomParallelizable[A, ParHashSet[A]]
+    with Serializable {
   initWithContents(contents)
 
   def this() = this(null)
@@ -61,7 +65,7 @@ class HashSet[A] private[collection](contents: FlatHashTable.Contents[A])
 
   override def clear() { clearTable() }
 
-  override def iterator: Iterator[A] = super [FlatHashTable].iterator
+  override def iterator: Iterator[A] = super[FlatHashTable].iterator
 
   override def foreach[U](f: A => U) {
     var i = 0

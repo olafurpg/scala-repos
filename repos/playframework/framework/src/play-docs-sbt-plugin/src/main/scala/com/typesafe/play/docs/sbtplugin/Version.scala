@@ -12,8 +12,11 @@ private[sbtplugin] object Version {
       Version(era.toInt, major.toInt, minor.toInt, qual)
     case _ =>
       throw new IllegalArgumentException(
-          s"$version is not a valid version string")
+        s"$version is not a valid version string")
   }
 }
 private[sbtplugin] case class Version(
-    era: Int, major: Int, minor: Int, qualifier: Option[String])
+    era: Int,
+    major: Int,
+    minor: Int,
+    qualifier: Option[String])

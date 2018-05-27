@@ -115,7 +115,7 @@ abstract class Filter[-ReqIn, +RepOut, +ReqOut, -RepIn]
   ): Filter[ReqIn, RepOut, Req2, Rep2] =
     condAndFilter match {
       case (true, filter) => andThen(filter)
-      case (false, _) => this
+      case (false, _)     => this
     }
 }
 
@@ -154,8 +154,7 @@ object Filter {
         override def toString() = factory.toString()
       }
 
-    def apply(
-        request: ReqIn, service: Service[ReqOut, RepIn]): Future[RepOut] =
+    def apply(request: ReqIn, service: Service[ReqOut, RepIn]): Future[RepOut] =
       build(service)(request)
   }
 
@@ -174,8 +173,8 @@ object Filter {
       service(request)
   }
 
-  implicit def canStackFromSvc[Req, Rep]: CanStackFrom[
-      Filter[Req, Rep, Req, Rep], Service[Req, Rep]] =
+  implicit def canStackFromSvc[Req, Rep]
+    : CanStackFrom[Filter[Req, Rep, Req, Rep], Service[Req, Rep]] =
     new CanStackFrom[Filter[Req, Rep, Req, Rep], Service[Req, Rep]] {
       def toStackable(_role: Stack.Role, filter: Filter[Req, Rep, Req, Rep]) =
         new Stack.Module0[Service[Req, Rep]] {
@@ -185,8 +184,8 @@ object Filter {
         }
     }
 
-  implicit def canStackFromFac[Req, Rep]: CanStackFrom[
-      Filter[Req, Rep, Req, Rep], ServiceFactory[Req, Rep]] =
+  implicit def canStackFromFac[Req, Rep]
+    : CanStackFrom[Filter[Req, Rep, Req, Rep], ServiceFactory[Req, Rep]] =
     new CanStackFrom[Filter[Req, Rep, Req, Rep], ServiceFactory[Req, Rep]] {
       def toStackable(_role: Stack.Role, filter: Filter[Req, Rep, Req, Rep]) =
         new Stack.Module0[ServiceFactory[Req, Rep]] {

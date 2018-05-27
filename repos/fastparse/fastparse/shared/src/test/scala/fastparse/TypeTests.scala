@@ -6,8 +6,8 @@ package fastparse
   */
 object TypeTests {
   class P[T] {
-    def ~[V, R](other: P[V])(
-        implicit sum: Implicits.Sequencer[T, V, R]): P[R] = new P[R]
+    def ~[V, R](other: P[V])(implicit sum: Implicits.Sequencer[T, V, R]): P[R] =
+      new P[R]
     def rep[R](implicit rep: Implicits.Repeater[T, R]): P[R] = new P[R]
     def ?[R](implicit rep: Implicits.Optioner[T, R]): P[R] = new P[R]
   }

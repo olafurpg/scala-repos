@@ -29,8 +29,9 @@ class ClassJSTest {
     test(classOf[Array[js.Dictionary[_]]], classOf[js.Dictionary[_]])
 
     test(classOf[Array[Array[js.Date]]], classOf[Array[js.Date]])
-    test(classOf[Array[Array[js.Dictionary[_]]]],
-         classOf[Array[js.Dictionary[_]]])
+    test(
+      classOf[Array[Array[js.Dictionary[_]]]],
+      classOf[Array[js.Dictionary[_]]])
 
     test(classOf[js.Date], null)
     test(classOf[js.Dictionary[_]], null)

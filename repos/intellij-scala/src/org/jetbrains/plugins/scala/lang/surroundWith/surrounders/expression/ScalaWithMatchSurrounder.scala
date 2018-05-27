@@ -22,10 +22,10 @@ class ScalaWithMatchSurrounder extends ScalaExpressionSurrounder {
   }
   override def isApplicable(element: PsiElement): Boolean = {
     element match {
-      case _: ScBlockExpr => true
-      case _: ScBlock => false
+      case _: ScBlockExpr                     => true
+      case _: ScBlock                         => false
       case _: ScExpression | _: PsiWhiteSpace => true
-      case e => ScalaPsiUtil.isLineTerminator(e)
+      case e                                  => ScalaPsiUtil.isLineTerminator(e)
     }
   }
 
@@ -45,7 +45,7 @@ class ScalaWithMatchSurrounder extends ScalaExpressionSurrounder {
     (if (elements.length == 1 &&
          !needBraces(elements(0))) super.getTemplateAsString(elements)
      else "(" + super.getTemplateAsString(elements) + ")") +
-    s" match {\ncase a  $arrow\n}"
+      s" match {\ncase a  $arrow\n}"
   }
 
   override def getTemplateDescription = "match"
@@ -55,7 +55,7 @@ class ScalaWithMatchSurrounder extends ScalaExpressionSurrounder {
       case x: ScParenthesisedExpr =>
         x.expr match {
           case Some(y) => y
-          case _ => return x.getTextRange
+          case _       => return x.getTextRange
         }
       case x => x
     }

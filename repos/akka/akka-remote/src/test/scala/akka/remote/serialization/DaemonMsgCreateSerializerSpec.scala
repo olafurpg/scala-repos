@@ -8,7 +8,14 @@ import language.postfixOps
 import akka.serialization.SerializationExtension
 import com.typesafe.config.ConfigFactory
 import akka.testkit.AkkaSpec
-import akka.actor.{Actor, Address, Props, Deploy, OneForOneStrategy, SupervisorStrategy}
+import akka.actor.{
+  Actor,
+  Address,
+  Props,
+  Deploy,
+  OneForOneStrategy,
+  SupervisorStrategy
+}
 import akka.remote.{DaemonMsgCreate, RemoteScope}
 import akka.routing.{RoundRobinPool, FromConfig}
 import scala.concurrent.duration._
@@ -34,33 +41,36 @@ class DaemonMsgCreateSerializerSpec extends AkkaSpec {
 
     "resolve DaemonMsgCreateSerializer" in {
       ser.serializerFor(classOf[DaemonMsgCreate]).getClass should ===(
-          classOf[DaemonMsgCreateSerializer])
+        classOf[DaemonMsgCreateSerializer])
     }
 
     "serialize and de-serialize DaemonMsgCreate with FromClassCreator" in {
       verifySerialization {
-        DaemonMsgCreate(props = Props[MyActor],
-                        deploy = Deploy(),
-                        path = "foo",
-                        supervisor = supervisor)
+        DaemonMsgCreate(
+          props = Props[MyActor],
+          deploy = Deploy(),
+          path = "foo",
+          supervisor = supervisor)
       }
     }
 
     "serialize and de-serialize DaemonMsgCreate with FromClassCreator, with null parameters for Props" in {
       verifySerialization {
-        DaemonMsgCreate(props = Props(classOf[MyActorWithParam], null),
-                        deploy = Deploy(),
-                        path = "foo",
-                        supervisor = supervisor)
+        DaemonMsgCreate(
+          props = Props(classOf[MyActorWithParam], null),
+          deploy = Deploy(),
+          path = "foo",
+          supervisor = supervisor)
       }
     }
 
     "serialize and de-serialize DaemonMsgCreate with function creator" in {
       verifySerialization {
-        DaemonMsgCreate(props = Props(new MyActor),
-                        deploy = Deploy(),
-                        path = "foo",
-                        supervisor = supervisor)
+        DaemonMsgCreate(
+          props = Props(new MyActor),
+          deploy = Deploy(),
+          path = "foo",
+          supervisor = supervisor)
       }
     }
 
@@ -71,38 +81,44 @@ class DaemonMsgCreateSerializerSpec extends AkkaSpec {
           case _ ⇒ SupervisorStrategy.Escalate
         }
         val deploy1 = Deploy(
-            path = "path1",
-            config = ConfigFactory.parseString("a=1"),
-            routerConfig = RoundRobinPool(
-                  nrOfInstances = 5, supervisorStrategy = supervisorStrategy),
-            scope = RemoteScope(Address("akka", "Test", "host1", 1921)),
-            dispatcher = "mydispatcher")
+          path = "path1",
+          config = ConfigFactory.parseString("a=1"),
+          routerConfig = RoundRobinPool(
+            nrOfInstances = 5,
+            supervisorStrategy = supervisorStrategy),
+          scope = RemoteScope(Address("akka", "Test", "host1", 1921)),
+          dispatcher = "mydispatcher"
+        )
         val deploy2 =
-          Deploy(path = "path2",
-                 config = ConfigFactory.parseString("a=2"),
-                 routerConfig = FromConfig,
-                 scope = RemoteScope(Address("akka", "Test", "host2", 1922)),
-                 dispatcher = Deploy.NoDispatcherGiven)
-        DaemonMsgCreate(props = Props[MyActor]
-                            .withDispatcher("my-disp")
-                            .withDeploy(deploy1),
-                        deploy = deploy2,
-                        path = "foo",
-                        supervisor = supervisor)
+          Deploy(
+            path = "path2",
+            config = ConfigFactory.parseString("a=2"),
+            routerConfig = FromConfig,
+            scope = RemoteScope(Address("akka", "Test", "host2", 1922)),
+            dispatcher = Deploy.NoDispatcherGiven
+          )
+        DaemonMsgCreate(
+          props = Props[MyActor]
+            .withDispatcher("my-disp")
+            .withDeploy(deploy1),
+          deploy = deploy2,
+          path = "foo",
+          supervisor = supervisor)
       }
     }
 
     def verifySerialization(msg: DaemonMsgCreate): Unit = {
       assertDaemonMsgCreate(
-          msg,
-          ser
-            .deserialize(ser.serialize(msg).get, classOf[DaemonMsgCreate])
-            .get
-            .asInstanceOf[DaemonMsgCreate])
+        msg,
+        ser
+          .deserialize(ser.serialize(msg).get, classOf[DaemonMsgCreate])
+          .get
+          .asInstanceOf[DaemonMsgCreate])
     }
 
     def assertDaemonMsgCreate(
-        expected: DaemonMsgCreate, got: DaemonMsgCreate): Unit = {
+        expected: DaemonMsgCreate,
+        got: DaemonMsgCreate): Unit = {
       // can't compare props.creator when function
       got.props.clazz should ===(expected.props.clazz)
       got.props.args.length should ===(expected.props.args.length)

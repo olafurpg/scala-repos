@@ -16,7 +16,13 @@ limitations under the License.
 package com.twitter.scalding
 
 import cascading.flow.hadoop.HadoopFlow
-import cascading.flow.{Flow, FlowDef, FlowListener, FlowStepListener, FlowStepStrategy}
+import cascading.flow.{
+  Flow,
+  FlowDef,
+  FlowListener,
+  FlowStepListener,
+  FlowStepStrategy
+}
 import cascading.flow.planner.BaseFlowStep
 import cascading.pipe.Pipe
 import com.twitter.scalding.reducer_estimation.ReducerEstimatorStepStrategy
@@ -47,11 +53,10 @@ trait ExecutionContext {
   private def updateStepConfigWithDescriptions(
       step: BaseFlowStep[JobConf]): Unit = {
     val conf = step.getConfig
-    getIdentifierOpt(ExecutionContext.getDesc(step)).foreach(
-        descriptionString =>
-          {
+    getIdentifierOpt(ExecutionContext.getDesc(step))
+      .foreach(descriptionString => {
         conf.set(Config.StepDescriptions, descriptionString)
-    })
+      })
   }
 
   final def buildFlow: Try[Flow[_]] =
@@ -106,12 +111,12 @@ trait ExecutionContext {
               case Success(fn) => fn(mode, configWithId)
               case Failure(e) =>
                 throw new Exception(
-                    "Failed to decode flow step strategy when submitting job",
-                    e)
+                  "Failed to decode flow step strategy when submitting job",
+                  e)
             }
 
           val optionalFinalStrategy = FlowStepStrategies().sumOption(
-              reducerEstimatorStrategy ++ otherStrategies)
+            reducerEstimatorStrategy ++ otherStrategies)
 
           optionalFinalStrategy.foreach { strategy =>
             flow.setFlowStepStrategy(strategy)
@@ -127,7 +132,8 @@ trait ExecutionContext {
             case Success(fn) => flow.addStepListener(fn(mode, configWithId))
             case Failure(e) =>
               new Exception(
-                  "Failed to decode flow step listener when submitting job", e)
+                "Failed to decode flow step listener when submitting job",
+                e)
           }
 
         case _ => ()
@@ -145,7 +151,7 @@ trait ExecutionContext {
   final def run: Future[JobStats] =
     buildFlow match {
       case Success(flow) => Execution.run(flow)
-      case Failure(err) => Future.failed(err)
+      case Failure(err)  => Future.failed(err)
     }
 
   /**
@@ -169,7 +175,7 @@ object ExecutionContext {
       baseFlowStep: BaseFlowStep[T]): Seq[String] = {
     baseFlowStep.getGraph.vertexSet.asScala.toSeq.flatMap(_ match {
       case pipe: Pipe => RichPipe.getPipeDescriptions(pipe)
-      case _ => List() // no descriptions
+      case _          => List() // no descriptions
     })
   }
   /*

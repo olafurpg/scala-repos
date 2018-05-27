@@ -37,7 +37,9 @@ import org.apache.spark.util.Utils
   * directory is created as fake input. Temporal storage would be deleted in the end.
   */
 class WholeTextFileRecordReaderSuite
-    extends SparkFunSuite with BeforeAndAfterAll with Logging {
+    extends SparkFunSuite
+    with BeforeAndAfterAll
+    with Logging {
   private var sc: SparkContext = _
   private var factory: CompressionCodecFactory = _
 
@@ -57,8 +59,8 @@ class WholeTextFileRecordReaderSuite
     // Set the block size of local file system to test whether files are split right or not.
     sc.hadoopConfiguration.setLong("fs.local.block.size", 32)
     sc.hadoopConfiguration.set(
-        "io.compression.codecs",
-        "org.apache.hadoop.io.compress.GzipCodec,org.apache.hadoop.io.compress.DefaultCodec")
+      "io.compression.codecs",
+      "org.apache.hadoop.io.compress.GzipCodec,org.apache.hadoop.io.compress.DefaultCodec")
     factory = new CompressionCodecFactory(sc.hadoopConfiguration)
   }
 
@@ -70,17 +72,18 @@ class WholeTextFileRecordReaderSuite
     }
   }
 
-  private def createNativeFile(inputDir: File,
-                               fileName: String,
-                               contents: Array[Byte],
-                               compress: Boolean) = {
+  private def createNativeFile(
+      inputDir: File,
+      fileName: String,
+      contents: Array[Byte],
+      compress: Boolean) = {
     val out =
       if (compress) {
         val codec = new GzipCodec
         val path =
           s"${inputDir.toString}/$fileName${codec.getDefaultExtension}"
         codec.createOutputStream(
-            new DataOutputStream(new FileOutputStream(path)))
+          new DataOutputStream(new FileOutputStream(path)))
       } else {
         val path = s"${inputDir.toString}/$fileName"
         new DataOutputStream(new FileOutputStream(path))
@@ -107,16 +110,18 @@ class WholeTextFileRecordReaderSuite
 
     val res = sc.wholeTextFiles(dir.toString, 3).collect()
 
-    assert(res.size === WholeTextFileRecordReaderSuite.fileNames.size,
-           "Number of files read out does not fit with the actual value.")
+    assert(
+      res.size === WholeTextFileRecordReaderSuite.fileNames.size,
+      "Number of files read out does not fit with the actual value.")
 
     for ((filename, contents) <- res) {
       val shortName = filename.split('/').last
-      assert(WholeTextFileRecordReaderSuite.fileNames.contains(shortName),
-             s"Missing file name $filename.")
-      assert(contents === new Text(
-                 WholeTextFileRecordReaderSuite.files(shortName)).toString,
-             s"file $filename contents can not match.")
+      assert(
+        WholeTextFileRecordReaderSuite.fileNames.contains(shortName),
+        s"Missing file name $filename.")
+      assert(
+        contents === new Text(WholeTextFileRecordReaderSuite.files(shortName)).toString,
+        s"file $filename contents can not match.")
     }
 
     Utils.deleteRecursively(dir)
@@ -133,17 +138,19 @@ class WholeTextFileRecordReaderSuite
 
     val res = sc.wholeTextFiles(dir.toString, 3).collect()
 
-    assert(res.size === WholeTextFileRecordReaderSuite.fileNames.size,
-           "Number of files read out does not fit with the actual value.")
+    assert(
+      res.size === WholeTextFileRecordReaderSuite.fileNames.size,
+      "Number of files read out does not fit with the actual value.")
 
     for ((filename, contents) <- res) {
       val shortName = filename.split('/').last.split('.')(0)
 
-      assert(WholeTextFileRecordReaderSuite.fileNames.contains(shortName),
-             s"Missing file name $filename.")
-      assert(contents === new Text(
-                 WholeTextFileRecordReaderSuite.files(shortName)).toString,
-             s"file $filename contents can not match.")
+      assert(
+        WholeTextFileRecordReaderSuite.fileNames.contains(shortName),
+        s"Missing file name $filename.")
+      assert(
+        contents === new Text(WholeTextFileRecordReaderSuite.files(shortName)).toString,
+        s"file $filename contents can not match.")
     }
 
     Utils.deleteRecursively(dir)

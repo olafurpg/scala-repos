@@ -41,18 +41,18 @@ class EnsembleToolBar extends EnsembleExample {
     padding = Insets(20)
     top = new ToolBar {
       content = List(
-          new Button {
-            text = "Home"
-            minWidth = 75
-          },
-          new Button {
-            text = "Options"
-            minWidth = 75
-          },
-          new Button {
-            text = "Help"
-            minWidth = 75
-          }
+        new Button {
+          text = "Home"
+          minWidth = 75
+        },
+        new Button {
+          text = "Options"
+          minWidth = 75
+        },
+        new Button {
+          text = "Help"
+          minWidth = 75
+        }
       )
     }
   }

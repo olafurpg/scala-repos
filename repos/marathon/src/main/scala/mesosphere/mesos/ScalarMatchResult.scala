@@ -39,14 +39,15 @@ object ScalarMatchResult {
 }
 
 /** An unsuccessful match of a scalar resource. */
-case class NoMatch(resourceName: String,
-                   requiredValue: Double,
-                   offeredValue: Double,
-                   scope: ScalarMatchResult.Scope)
+case class NoMatch(
+    resourceName: String,
+    requiredValue: Double,
+    offeredValue: Double,
+    scope: ScalarMatchResult.Scope)
     extends ScalarMatchResult {
 
   require(
-      scope == ScalarMatchResult.Scope.NoneDisk ||
+    scope == ScalarMatchResult.Scope.NoneDisk ||
       resourceName == Resource.DISK)
   require(requiredValue > offeredValue)
 
@@ -57,14 +58,15 @@ case class NoMatch(resourceName: String,
 }
 
 /** A successful match of a scalar resource requirement. */
-case class ScalarMatch(resourceName: String,
-                       requiredValue: Double,
-                       consumed: Iterable[ScalarMatch.Consumption],
-                       scope: ScalarMatchResult.Scope)
+case class ScalarMatch(
+    resourceName: String,
+    requiredValue: Double,
+    consumed: Iterable[ScalarMatch.Consumption],
+    scope: ScalarMatchResult.Scope)
     extends ScalarMatchResult {
 
   require(
-      scope == ScalarMatchResult.Scope.NoneDisk ||
+    scope == ScalarMatchResult.Scope.NoneDisk ||
       resourceName == Resource.DISK)
   require(consumedValue >= requiredValue)
 
@@ -91,7 +93,8 @@ case class ScalarMatch(resourceName: String,
 object ScalarMatch {
 
   /** A (potentially partial) consumption of a scalar resource. */
-  case class Consumption(consumedValue: Double,
-                         role: String,
-                         reservation: Option[Protos.Resource.ReservationInfo])
+  case class Consumption(
+      consumedValue: Double,
+      role: String,
+      reservation: Option[Protos.Resource.ReservationInfo])
 }

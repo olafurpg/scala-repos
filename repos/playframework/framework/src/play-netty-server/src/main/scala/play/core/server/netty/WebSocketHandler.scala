@@ -25,19 +25,20 @@ private[server] object WebSocketHandler {
     * compliant manner.
     */
   def messageFlowToFrameProcessor(
-      flow: Flow[Message, Message, _], bufferLimit: Int)(
-      implicit mat: Materializer)
-    : Processor[WebSocketFrame, WebSocketFrame] = {
+      flow: Flow[Message, Message, _],
+      bufferLimit: Int)(
+      implicit mat: Materializer): Processor[WebSocketFrame, WebSocketFrame] = {
 
     // The reason we use a processor is that we *must* release the buffers synchronously, since Akka streams drops
     // messages, which will mean we can't release the ByteBufs in the messages.
-    SynchronousMappedStreams.transform(WebSocketFlowHandler
-                                         .webSocketProtocol(bufferLimit)
-                                         .join(flow)
-                                         .toProcessor
-                                         .run(),
-                                       frameToMessage,
-                                       messageToFrame)
+    SynchronousMappedStreams.transform(
+      WebSocketFlowHandler
+        .webSocketProtocol(bufferLimit)
+        .join(flow)
+        .toProcessor
+        .run(),
+      frameToMessage,
+      messageToFrame)
   }
 
   /**
@@ -52,11 +53,11 @@ private[server] object WebSocketHandler {
     ReferenceCountUtil.release(frame)
 
     val messageType = frame match {
-      case _: TextWebSocketFrame => MessageType.Text
-      case _: BinaryWebSocketFrame => MessageType.Binary
-      case close: CloseWebSocketFrame => MessageType.Close
-      case _: PingWebSocketFrame => MessageType.Ping
-      case _: PongWebSocketFrame => MessageType.Pong
+      case _: TextWebSocketFrame         => MessageType.Text
+      case _: BinaryWebSocketFrame       => MessageType.Binary
+      case close: CloseWebSocketFrame    => MessageType.Close
+      case _: PingWebSocketFrame         => MessageType.Ping
+      case _: PongWebSocketFrame         => MessageType.Pong
       case _: ContinuationWebSocketFrame => MessageType.Continuation
     }
 

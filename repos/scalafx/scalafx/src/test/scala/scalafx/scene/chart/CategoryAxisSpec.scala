@@ -42,5 +42,6 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class CategoryAxisSpec
     extends SimpleSFXDelegateSpec[jfxsc.CategoryAxis, CategoryAxis](
-        classOf[jfxsc.CategoryAxis], classOf[CategoryAxis])
+      classOf[jfxsc.CategoryAxis],
+      classOf[CategoryAxis])
     with RunOnApplicationThread

@@ -16,7 +16,8 @@ import scala.collection.Seq
   * Date: 06.03.2008
   */
 class ScMethodCallImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScMethodCall {
+    extends ScalaPsiElementImpl(node)
+    with ScMethodCall {
   def getInvokedExpr: ScExpression =
     findChildByClassScala(classOf[ScExpression])
 
@@ -26,21 +27,21 @@ class ScMethodCallImpl(node: ASTNode)
   override def getEffectiveInvokedExpr: ScExpression = {
     findChildByClassScala(classOf[ScExpression]) match {
       case x: ScParenthesisedExpr => x.expr.getOrElse(x)
-      case x => x
+      case x                      => x
     }
   }
 
   override def argumentExpressionsIncludeUpdateCall: Seq[ScExpression] = {
     updateExpression() match {
       case Some(expr) => argumentExpressions ++ Seq(expr)
-      case _ => argumentExpressions
+      case _          => argumentExpressions
     }
   }
 
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case visitor: ScalaElementVisitor => super.accept(visitor)
-      case _ => super.accept(visitor)
+      case _                            => super.accept(visitor)
     }
   }
 

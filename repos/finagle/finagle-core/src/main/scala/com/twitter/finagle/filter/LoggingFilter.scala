@@ -8,7 +8,9 @@ trait LogFormatter[-Req, Rep] {
   def format(request: Req, reply: Rep, replyTime: Duration): String
 
   def formatException(
-      request: Req, throwable: Throwable, replyTime: Duration): String
+      request: Req,
+      throwable: Throwable,
+      replyTime: Duration): String
 }
 
 /**
@@ -37,7 +39,9 @@ trait LoggingFilter[Req, Rep] extends SimpleFilter[Req, Rep] {
   }
 
   protected def logException(
-      replyTime: Duration, request: Req, throwable: Throwable) {
+      replyTime: Duration,
+      request: Req,
+      throwable: Throwable) {
     val line = formatter.formatException(request, throwable, replyTime)
     log.info(throwable, line)
   }

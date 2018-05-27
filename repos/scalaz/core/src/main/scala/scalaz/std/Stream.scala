@@ -2,11 +2,16 @@ package scalaz
 package std
 
 trait StreamInstances {
-  implicit val streamInstance: Traverse[Stream] with MonadPlus[Stream] with BindRec[
-      Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream] with IsEmpty[
-      Stream] with Cobind[Stream] = new Traverse[Stream] with MonadPlus[Stream]
-  with BindRec[Stream] with Zip[Stream] with Unzip[Stream]
-  with Align[Stream] with IsEmpty[Stream] with Cobind[Stream] {
+  implicit val streamInstance: Traverse[Stream]
+    with MonadPlus[Stream]
+    with BindRec[Stream]
+    with Zip[Stream]
+    with Unzip[Stream]
+    with Align[Stream]
+    with IsEmpty[Stream]
+    with Cobind[Stream] = new Traverse[Stream] with MonadPlus[Stream]
+  with BindRec[Stream] with Zip[Stream] with Unzip[Stream] with Align[Stream]
+  with IsEmpty[Stream] with Cobind[Stream] {
     override def cojoin[A](a: Stream[A]) = a.tails.toStream.init
     def cobind[A, B](fa: Stream[A])(f: Stream[A] => B): Stream[B] =
       map(cojoin(fa))(f)
@@ -40,8 +45,7 @@ trait StreamInstances {
         implicit M: Monoid[B]) =
       this.foldRight(fa, M.zero)((a, b) => M.append(f(a), b))
 
-    override def foldRight[A, B](
-        fa: Stream[A], z: => B)(f: (A, => B) => B): B =
+    override def foldRight[A, B](fa: Stream[A], z: => B)(f: (A, => B) => B): B =
       if (fa.isEmpty) z
       else f(fa.head, foldRight(fa.tail, z)(f))
 
@@ -88,7 +92,7 @@ trait StreamInstances {
           abs match {
             case \/-(b) #:: tail => b #:: go(tail)
             case -\/(a) #:: tail => rec(f(a) #::: tail)
-            case Stream.Empty => Stream.Empty
+            case Stream.Empty    => Stream.Empty
           }
         rec(s)
       }
@@ -113,13 +117,13 @@ trait StreamInstances {
       def point[A](a: => A) = Zip(Stream.continually(a))
       def ap[A, B](fa: => (Stream[A] @@ Zip))(f: => (Stream[A => B] @@ Zip)) = {
         Zip(
-            if (Tag.unwrap(f).isEmpty || Tag.unwrap(fa).isEmpty)
-              Stream.empty[B]
-            else
-              Stream.cons(
-                  (Tag.unwrap(f).head)(Tag.unwrap(fa).head),
-                  Tag.unwrap(
-                      ap(Zip(Tag.unwrap(fa).tail))(Zip(Tag.unwrap(f).tail)))))
+          if (Tag.unwrap(f).isEmpty || Tag.unwrap(fa).isEmpty)
+            Stream.empty[B]
+          else
+            Stream.cons(
+              (Tag.unwrap(f).head)(Tag.unwrap(fa).head),
+              Tag.unwrap(
+                ap(Zip(Tag.unwrap(fa).tail))(Zip(Tag.unwrap(f).tail)))))
       }
     }
 
@@ -144,7 +148,7 @@ trait StreamInstances {
           else {
             A.order(a.head, b.head) match {
               case EQ => order(a.tail, b.tail)
-              case x => x
+              case x  => x
             }
           }
         }
@@ -167,7 +171,7 @@ trait StreamFunctions {
 
   final def toZipper[A](as: Stream[A]): Option[Zipper[A]] =
     as match {
-      case Empty => None
+      case Empty   => None
       case h #:: t => Some(Zipper.zipper(empty, h, t))
     }
 
@@ -183,14 +187,14 @@ trait StreamFunctions {
   final def heads[A](as: Stream[A]): Stream[Stream[A]] =
     as match {
       case h #:: t => scala.Stream(h) #:: heads(t).map(h #:: _)
-      case _ => empty
+      case _       => empty
     }
 
   /** `[as, as.tail, as.tail.tail, ..., Stream(as.last)]` */
   final def tails[A](as: Stream[A]): Stream[Stream[A]] =
     as match {
       case h #:: t => as #:: tails(t)
-      case _ => empty
+      case _       => empty
     }
 
   final def zapp[A, B, C](a: Stream[A])(
@@ -203,15 +207,13 @@ trait StreamFunctions {
 
   final def unfoldForest[A, B](as: Stream[A])(
       f: A => (B, () => Stream[A])): Stream[Tree[B]] =
-    as.map(
-        a =>
-          {
-        def unfoldTree(x: A): Tree[B] =
-          f(x) match {
-            case (b, bs) => Tree.Node(b, unfoldForest(bs())(f))
-          }
+    as.map(a => {
+      def unfoldTree(x: A): Tree[B] =
+        f(x) match {
+          case (b, bs) => Tree.Node(b, unfoldForest(bs())(f))
+        }
 
-        unfoldTree(a)
+      unfoldTree(a)
     })
 
   final def unfoldForestM[A, B, M[_]: Monad](as: Stream[A])(
@@ -223,8 +225,8 @@ trait StreamFunctions {
 
     def unfoldTreeM(v: A) =
       Monad[M].bind(f(v))((abs: (B, Stream[A])) =>
-            Monad[M].map(unfoldForestM[A, B, M](abs._2)(f))(
-                (ts: Stream[Tree[B]]) => Tree.Node(abs._1, ts)))
+        Monad[M].map(unfoldForestM[A, B, M](abs._2)(f))((ts: Stream[Tree[B]]) =>
+          Tree.Node(abs._1, ts)))
 
     mapM(as, unfoldTreeM)
   }
@@ -233,23 +235,23 @@ trait StreamFunctions {
   final def intersperse[A](as: Stream[A], a: A): Stream[A] = {
     def loop(rest: Stream[A]): Stream[A] = rest match {
       case Stream.Empty => Stream.empty
-      case h #:: t => a #:: h #:: loop(t)
+      case h #:: t      => a #:: h #:: loop(t)
     }
     as match {
       case Stream.Empty => Stream.empty
-      case h #:: t => h #:: loop(t)
+      case h #:: t      => h #:: loop(t)
     }
   }
 
   def unfold[A, B](seed: A)(f: A => Option[(B, A)]): Stream[B] =
     f(seed) match {
-      case None => Stream.empty
+      case None         => Stream.empty
       case Some((b, a)) => Stream.cons(b, unfold(a)(f))
     }
 
   def unfoldm[A, B](seed: A)(f: A => Maybe[(B, A)]): Stream[B] =
     f(seed) match {
-      case Maybe.Empty() => Stream.empty
+      case Maybe.Empty()      => Stream.empty
       case Maybe.Just((b, a)) => Stream.cons(b, unfoldm(a)(f))
     }
 }

@@ -10,7 +10,7 @@ import Prop._
 trait AlternativeTests[F[_]] extends ApplicativeTests[F] with MonoidKTests[F] {
   def laws: AlternativeLaws[F]
 
-  def alternative[A : Arbitrary, B : Arbitrary, C : Arbitrary](
+  def alternative[A: Arbitrary, B: Arbitrary, C: Arbitrary](
       implicit ArbFA: Arbitrary[F[A]],
       ArbFB: Arbitrary[F[B]],
       ArbFC: Arbitrary[F[C]],
@@ -26,11 +26,11 @@ trait AlternativeTests[F[_]] extends ApplicativeTests[F] with MonoidKTests[F] {
       val bases: Seq[(String, RuleSet)] = Nil
       val parents: Seq[RuleSet] = Seq(monoidK[A], applicative[A, B, C])
       val props: Seq[(String, Prop)] = Seq(
-          "left distributivity" -> forAll(
-              laws.alternativeLeftDistributivity[A, B] _),
-          "right distributivity" -> forAll(
-              laws.alternativeRightDistributivity[A, B] _),
-          "right absorption" -> forAll(laws.alternativeRightAbsorption[A, B] _)
+        "left distributivity" -> forAll(
+          laws.alternativeLeftDistributivity[A, B] _),
+        "right distributivity" -> forAll(
+          laws.alternativeRightDistributivity[A, B] _),
+        "right absorption" -> forAll(laws.alternativeRightAbsorption[A, B] _)
       )
     }
   }

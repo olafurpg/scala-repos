@@ -21,12 +21,13 @@ object FlipComparisonInInfixExprIntention {
   def familyName = "Flip comparison in infix expression."
 }
 
-class FlipComparisonInInfixExprIntention
-    extends PsiElementBaseIntentionAction {
+class FlipComparisonInInfixExprIntention extends PsiElementBaseIntentionAction {
   def getFamilyName = FlipComparisonInInfixExprIntention.familyName
 
   def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+      project: Project,
+      editor: Editor,
+      element: PsiElement): Boolean = {
     val infixExpr: ScInfixExpr =
       PsiTreeUtil.getParentOfType(element, classOf[ScInfixExpr], false)
     if (infixExpr == null) return false
@@ -62,19 +63,20 @@ class FlipComparisonInInfixExprIntention
     val start = infixExpr.getTextRange.getStartOffset
     val diff =
       editor.getCaretModel.getOffset -
-      infixExpr.operation.nameId.getTextRange.getStartOffset
+        infixExpr.operation.nameId.getTextRange.getStartOffset
     val expr = new StringBuilder
-    val replaceOper = Map("equals" -> "equals",
-                          "==" -> "==",
-                          "!=" -> "!=",
-                          "eq" -> "eq",
-                          "ne" -> "ne",
-                          ">" -> "<",
-                          "<" -> ">",
-                          ">=" -> "<=",
-                          "<=" -> ">=",
-                          "&&" -> "&&",
-                          "||" -> "||")
+    val replaceOper = Map(
+      "equals" -> "equals",
+      "==" -> "==",
+      "!=" -> "!=",
+      "eq" -> "eq",
+      "ne" -> "ne",
+      ">" -> "<",
+      "<" -> ">",
+      ">=" -> "<=",
+      "<=" -> ">=",
+      "&&" -> "&&",
+      "||" -> "||")
 
     expr
       .append(infixExpr.getArgExpr.getText)
@@ -84,7 +86,8 @@ class FlipComparisonInInfixExprIntention
       .append(infixExpr.getBaseExpr.getText)
 
     val newInfixExpr = ScalaPsiElementFactory.createExpressionFromText(
-        expr.toString(), element.getManager)
+      expr.toString(),
+      element.getManager)
 
     val size =
       newInfixExpr

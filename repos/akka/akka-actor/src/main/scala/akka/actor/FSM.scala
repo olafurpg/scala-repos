@@ -89,16 +89,19 @@ object FSM {
     */
   // FIXME: what about the cancellable?
   private[akka] final case class Timer(
-      name: String, msg: Any, repeat: Boolean, generation: Int)(
-      context: ActorContext)
+      name: String,
+      msg: Any,
+      repeat: Boolean,
+      generation: Int)(context: ActorContext)
       extends NoSerializationVerificationNeeded {
     private var ref: Option[Cancellable] = _
     private val scheduler = context.system.scheduler
     private implicit val executionContext = context.dispatcher
 
     def schedule(actor: ActorRef, timeout: FiniteDuration): Unit =
-      ref = Some(if (repeat) scheduler.schedule(timeout, timeout, actor, this)
-          else scheduler.scheduleOnce(timeout, actor, this))
+      ref = Some(
+        if (repeat) scheduler.schedule(timeout, timeout, actor, this)
+        else scheduler.scheduleOnce(timeout, actor, this))
 
     def cancel(): Unit =
       if (ref.isDefined) {
@@ -127,24 +130,30 @@ object FSM {
     * INTERNAL API
     * Using a subclass for binary compatibility reasons
     */
-  private[akka] class SilentState[S, D](_stateName: S,
-                                        _stateData: D,
-                                        _timeout: Option[FiniteDuration],
-                                        _stopReason: Option[Reason],
-                                        _replies: List[Any])
+  private[akka] class SilentState[S, D](
+      _stateName: S,
+      _stateData: D,
+      _timeout: Option[FiniteDuration],
+      _stopReason: Option[Reason],
+      _replies: List[Any])
       extends State[S, D](
-          _stateName, _stateData, _timeout, _stopReason, _replies) {
+        _stateName,
+        _stateData,
+        _timeout,
+        _stopReason,
+        _replies) {
 
     /**
       * INTERNAL API
       */
     private[akka] override def notifies: Boolean = false
 
-    override def copy(stateName: S = stateName,
-                      stateData: D = stateData,
-                      timeout: Option[FiniteDuration] = timeout,
-                      stopReason: Option[Reason] = stopReason,
-                      replies: List[Any] = replies): State[S, D] = {
+    override def copy(
+        stateName: S = stateName,
+        stateData: D = stateData,
+        timeout: Option[FiniteDuration] = timeout,
+        stopReason: Option[Reason] = stopReason,
+        replies: List[Any] = replies): State[S, D] = {
       new SilentState(stateName, stateData, timeout, stopReason, replies)
     }
   }
@@ -154,11 +163,12 @@ object FSM {
     * name, the state data, possibly custom timeout, stop reason and replies
     * accumulated while processing the last message.
     */
-  case class State[S, D](stateName: S,
-                         stateData: D,
-                         timeout: Option[FiniteDuration] = None,
-                         stopReason: Option[Reason] = None,
-                         replies: List[Any] = Nil) {
+  case class State[S, D](
+      stateName: S,
+      stateData: D,
+      timeout: Option[FiniteDuration] = None,
+      stopReason: Option[Reason] = None,
+      replies: List[Any] = Nil) {
 
     /**
       * INTERNAL API
@@ -166,11 +176,12 @@ object FSM {
     private[akka] def notifies: Boolean = true
 
     // defined here to be able to override it in SilentState
-    def copy(stateName: S = stateName,
-             stateData: D = stateData,
-             timeout: Option[FiniteDuration] = timeout,
-             stopReason: Option[Reason] = stopReason,
-             replies: List[Any] = replies): State[S, D] = {
+    def copy(
+        stateName: S = stateName,
+        stateData: D = stateData,
+        timeout: Option[FiniteDuration] = timeout,
+        stopReason: Option[Reason] = stopReason,
+        replies: List[Any] = replies): State[S, D] = {
       new State(stateName, stateData, timeout, stopReason, replies)
     }
 
@@ -235,7 +246,9 @@ object FSM {
     * `onTermination` block.
     */
   final case class StopEvent[S, D](
-      reason: Reason, currentState: S, stateData: D)
+      reason: Reason,
+      currentState: S,
+      stateData: D)
       extends NoSerializationVerificationNeeded
 }
 
@@ -375,7 +388,9 @@ trait FSM[S, D] extends Actor with Listeners with ActorLogging {
     * @param timeout state timeout for the initial state, overriding the default timeout for that state
     */
   final def startWith(
-      stateName: S, stateData: D, timeout: Timeout = None): Unit =
+      stateName: S,
+      stateData: D,
+      timeout: Timeout = None): Unit =
     currentState = FSM.State(stateName, stateData, timeout)
 
   /**
@@ -401,7 +416,8 @@ trait FSM[S, D] extends Actor with Listeners with ActorLogging {
     * @return descriptor for staying in current state
     */
   final def stay(): State =
-    goto(currentState.stateName).withNotification(false) // cannot directly use currentState because of the timeout field
+    goto(currentState.stateName)
+      .withNotification(false) // cannot directly use currentState because of the timeout field
 
   /**
     * Produce change descriptor to stop this FSM actor with reason "Normal".
@@ -436,12 +452,14 @@ trait FSM[S, D] extends Actor with Listeners with ActorLogging {
     * @param timeout delay of first message delivery and between subsequent messages
     * @param repeat send once if false, scheduleAtFixedRate if true
     */
-  final def setTimer(name: String,
-                     msg: Any,
-                     timeout: FiniteDuration,
-                     repeat: Boolean = false): Unit = {
+  final def setTimer(
+      name: String,
+      msg: Any,
+      timeout: FiniteDuration,
+      repeat: Boolean = false): Unit = {
     if (debugEvent)
-      log.debug("setting " + (if (repeat) "repeating " else "") + "timer '" +
+      log.debug(
+        "setting " + (if (repeat) "repeating " else "") + "timer '" +
           name + "'/" + timeout + ": " + msg)
     if (timers contains name) {
       timers(name).cancel
@@ -565,7 +583,7 @@ trait FSM[S, D] extends Actor with Listeners with ActorLogging {
   final def nextStateData = nextState match {
     case null ⇒
       throw new IllegalStateException(
-          "nextStateData is only available during onTransition")
+        "nextStateData is only available during onTransition")
     case x ⇒ x.stateData
   }
 
@@ -598,7 +616,9 @@ trait FSM[S, D] extends Actor with Listeners with ActorLogging {
   private val stateTimeouts = mutable.Map[S, Timeout]()
 
   private def register(
-      name: S, function: StateFunction, timeout: Timeout): Unit = {
+      name: S,
+      function: StateFunction,
+      timeout: Timeout): Unit = {
     if (stateFunctions contains name) {
       stateFunctions(name) = stateFunctions(name) orElse function
       stateTimeouts(name) = timeout orElse stateTimeouts(name)
@@ -669,13 +689,13 @@ trait FSM[S, D] extends Actor with Listeners with ActorLogging {
     case Deafen(actorRef) ⇒
       listeners.remove(actorRef)
     case value ⇒ {
-        if (timeoutFuture.isDefined) {
-          timeoutFuture.get.cancel()
-          timeoutFuture = None
-        }
-        generation += 1
-        processMsg(value, sender())
+      if (timeoutFuture.isDefined) {
+        timeoutFuture.get.cancel()
+        timeoutFuture = None
       }
+      generation += 1
+      processMsg(value, sender())
+    }
   }
 
   private def processMsg(value: Any, source: AnyRef): Unit = {
@@ -710,8 +730,8 @@ trait FSM[S, D] extends Actor with Listeners with ActorLogging {
   private[akka] def makeTransition(nextState: State): Unit = {
     if (!stateFunctions.contains(nextState.stateName)) {
       terminate(
-          stay withStopReason Failure(
-              "Next state %s does not exist".format(nextState.stateName)))
+        stay withStopReason Failure(
+          "Next state %s does not exist".format(nextState.stateName)))
     } else {
       nextState.replies.reverse foreach { r ⇒
         sender() ! r
@@ -727,8 +747,9 @@ trait FSM[S, D] extends Actor with Listeners with ActorLogging {
 
       def scheduleTimeout(d: FiniteDuration): Some[Cancellable] = {
         import context.dispatcher
-        Some(context.system.scheduler
-              .scheduleOnce(d, self, TimeoutMarker(generation)))
+        Some(
+          context.system.scheduler
+            .scheduleOnce(d, self, TimeoutMarker(generation)))
       }
 
       currentState.timeout match {
@@ -768,8 +789,8 @@ trait FSM[S, D] extends Actor with Listeners with ActorLogging {
       timeoutFuture.foreach { _.cancel() }
       currentState = nextState
 
-      val stopEvent = StopEvent(
-          reason, currentState.stateName, currentState.stateData)
+      val stopEvent =
+        StopEvent(reason, currentState.stateName, currentState.stateData)
       if (terminateEvent.isDefinedAt(stopEvent)) terminateEvent(stopEvent)
     }
   }
@@ -816,7 +837,8 @@ trait LoggingFSM[S, D] extends FSM[S, D] {
   }
 
   private[akka] abstract override def processEvent(
-      event: Event, source: AnyRef): Unit = {
+      event: Event,
+      source: AnyRef): Unit = {
     if (debugEvent) {
       val srcstr = source match {
         case s: String ⇒ s
@@ -849,7 +871,7 @@ trait LoggingFSM[S, D] extends FSM[S, D] {
   protected def getLog: IndexedSeq[LogEntry[S, D]] = {
     val log =
       events zip states filter (_._1 ne null) map
-      (x ⇒ LogEntry(x._2.asInstanceOf[S], x._1.stateData, x._1.event))
+        (x ⇒ LogEntry(x._2.asInstanceOf[S], x._1.stateData, x._1.event))
     if (full) {
       IndexedSeq() ++ log.drop(pos) ++ log.take(pos)
     } else {

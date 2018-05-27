@@ -18,11 +18,13 @@ import akka.io.UdpConnected._
 /**
   * INTERNAL API
   */
-private[io] class UdpConnection(udpConn: UdpConnectedExt,
-                                channelRegistry: ChannelRegistry,
-                                commander: ActorRef,
-                                connect: Connect)
-    extends Actor with ActorLogging
+private[io] class UdpConnection(
+    udpConn: UdpConnectedExt,
+    channelRegistry: ChannelRegistry,
+    commander: ActorRef,
+    connect: Connect)
+    extends Actor
+    with ActorLogging
     with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
 
   import connect._
@@ -114,7 +116,8 @@ private[io] class UdpConnection(udpConn: UdpConnectedExt,
       }
     }
     val buffer = bufferPool.acquire()
-    try innerRead(BatchReceiveLimit, buffer) finally {
+    try innerRead(BatchReceiveLimit, buffer)
+    finally {
       registration.enableInterest(OP_READ)
       bufferPool.release(buffer)
     }
@@ -142,7 +145,8 @@ private[io] class UdpConnection(udpConn: UdpConnectedExt,
   override def postStop(): Unit =
     if (channel.isOpen) {
       log.debug("Closing DatagramChannel after being stopped")
-      try channel.close() catch {
+      try channel.close()
+      catch {
         case NonFatal(e) ⇒ log.debug("Error closing DatagramChannel: {}", e)
       }
     }
@@ -153,10 +157,10 @@ private[io] class UdpConnection(udpConn: UdpConnectedExt,
     } catch {
       case NonFatal(e) ⇒
         log.debug(
-            "Failure while connecting UDP channel to remote address [{}] local address [{}]: {}",
-            remoteAddress,
-            localAddress.getOrElse("undefined"),
-            e)
+          "Failure while connecting UDP channel to remote address [{}] local address [{}]: {}",
+          remoteAddress,
+          localAddress.getOrElse("undefined"),
+          e)
         commander ! CommandFailed(connect)
         context.stop(self)
     }

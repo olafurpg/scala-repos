@@ -28,13 +28,14 @@ abstract class JSEnvTest {
       val hasBadLog =
         log exists {
           case Log(level, _) if level >= Level.Warn => true
-          case Trace(_) => true
-          case _ => false
+          case Trace(_)                             => true
+          case _                                    => false
         }
 
-      assertFalse("VM shouldn't log errors, warnings or traces. Log:\n" +
-                  log.mkString("\n"),
-                  hasBadLog)
+      assertFalse(
+        "VM shouldn't log errors, warnings or traces. Log:\n" +
+          log.mkString("\n"),
+        hasBadLog)
       assertEquals("Output should match", expectedOut, console.getLog)
     }
 

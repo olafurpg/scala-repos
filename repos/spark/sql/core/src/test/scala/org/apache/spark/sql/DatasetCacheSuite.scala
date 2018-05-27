@@ -72,6 +72,7 @@ class DatasetCacheSuite extends QueryTest with SharedSQLContext {
     assert(!sqlContext.isCached(ds), "The Dataset ds should not be cached.")
     agged.unpersist()
     assert(
-        !sqlContext.isCached(agged), "The Dataset agged should not be cached.")
+      !sqlContext.isCached(agged),
+      "The Dataset agged should not be cached.")
   }
 }

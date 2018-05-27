@@ -3,12 +3,13 @@ package lila.wiki
 import java.text.Normalizer
 import java.util.regex.Matcher.quoteReplacement
 
-case class Page(id: String,
-                slug: String,
-                number: Int,
-                lang: String,
-                title: String,
-                body: String) {
+case class Page(
+    id: String,
+    slug: String,
+    number: Int,
+    lang: String,
+    title: String,
+    body: String) {
 
   def isDefaultLang = lang == Page.DefaultLang
 }
@@ -22,12 +23,13 @@ object Page {
   def make(name: String, body: String): Option[Page] = name match {
     case NameRegex(lang, numberStr, title) =>
       parseIntOption(numberStr) map { number =>
-        Page(id = name,
-             number = number,
-             slug = slugify(title),
-             lang = lang,
-             title = title.replace("-", " "),
-             body = body)
+        Page(
+          id = name,
+          number = number,
+          slug = slugify(title),
+          lang = lang,
+          title = title.replace("-", " "),
+          body = body)
       }
     case _ => none
   }

@@ -16,7 +16,7 @@ object EventAdapterSpec {
 
   final val JournalModelClassName =
     classOf[EventAdapterSpec].getCanonicalName + "$" +
-    classOf[JournalModel].getSimpleName
+      classOf[JournalModel].getSimpleName
   trait JournalModel {
     def payload: Any
     def tags: immutable.Set[String]
@@ -29,7 +29,7 @@ object EventAdapterSpec {
 
   final val DomainEventClassName =
     classOf[EventAdapterSpec].getCanonicalName + "$" +
-    classOf[DomainEvent].getSimpleName
+      classOf[DomainEvent].getSimpleName
   trait DomainEvent
   final case class TaggedDataChanged(tags: immutable.Set[String], value: Int)
       extends DomainEvent
@@ -81,8 +81,10 @@ object EventAdapterSpec {
   }
 
   class PersistAllIncomingActor(
-      name: String, override val journalPluginId: String)
-      extends NamedPersistentActor(name) with PersistentActor {
+      name: String,
+      override val journalPluginId: String)
+      extends NamedPersistentActor(name)
+      with PersistentActor {
 
     var state: List[Any] = Nil
 
@@ -105,16 +107,19 @@ object EventAdapterSpec {
 }
 
 class EventAdapterSpec(
-    journalName: String, journalConfig: Config, adapterConfig: Config)
+    journalName: String,
+    journalConfig: Config,
+    adapterConfig: Config)
     extends PersistenceSpec(journalConfig.withFallback(adapterConfig))
     with ImplicitSender {
 
   import EventAdapterSpec._
 
   def this(journalName: String) {
-    this("inmem",
-         PersistenceSpec.config("inmem", "InmemPersistentTaggingSpec"),
-         ConfigFactory.parseString(s"""
+    this(
+      "inmem",
+      PersistenceSpec.config("inmem", "InmemPersistentTaggingSpec"),
+      ConfigFactory.parseString(s"""
          |akka.persistence.journal {
          |
          |  common-event-adapters {
@@ -158,14 +163,17 @@ class EventAdapterSpec(
          |    dir = "journal-3"
          |  }
          |}
-      """.stripMargin))
+      """.stripMargin)
+    )
   }
 
   def persister(name: String, journalId: String = journalName) =
-    system.actorOf(Props(classOf[PersistAllIncomingActor],
-                         name,
-                         "akka.persistence.journal." + journalId),
-                   name)
+    system.actorOf(
+      Props(
+        classOf[PersistAllIncomingActor],
+        name,
+        "akka.persistence.journal." + journalId),
+      name)
 
   def toJournal(in: Any, journalId: String = journalName) =
     Persistence(system)
@@ -198,7 +206,7 @@ class EventAdapterSpec(
       val event = UserDataChanged("name", 42)
       toJournal(event, "with-actor-system") should equal(event)
       fromJournal(event, "with-actor-system") should equal(
-          SingleEventSeq(event))
+        SingleEventSeq(event))
     }
   }
 }
@@ -258,10 +266,14 @@ trait NoAdapters {
 // because it always would use the same leveldb directory anyway (based on class name),
 // yet we need different instances of the plugin. For inmem it does not matter, it can survive many instances.
 class InmemEventAdapterSpec
-    extends EventAdapterSpec("inmem") with ReplayPassThrough with NoAdapters
+    extends EventAdapterSpec("inmem")
+    with ReplayPassThrough
+    with NoAdapters
 
 class LeveldbBaseEventAdapterSpec extends EventAdapterSpec("leveldb")
 class LeveldbReplayPassThroughEventAdapterSpec
-    extends EventAdapterSpec("leveldb") with ReplayPassThrough
+    extends EventAdapterSpec("leveldb")
+    with ReplayPassThrough
 class LeveldbNoAdaptersEventAdapterSpec
-    extends EventAdapterSpec("leveldb") with NoAdapters
+    extends EventAdapterSpec("leveldb")
+    with NoAdapters

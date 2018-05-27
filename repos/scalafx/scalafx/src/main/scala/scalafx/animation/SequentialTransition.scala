@@ -66,8 +66,10 @@ object SequentialTransition extends AnimationStatics {
   * @define DV Default value:
   */
 class SequentialTransition(
-    override val delegate: jfxa.SequentialTransition = new jfxa.SequentialTransition)
-    extends Transition(delegate) with SFXDelegate[jfxa.SequentialTransition] {
+    override val delegate: jfxa.SequentialTransition =
+      new jfxa.SequentialTransition)
+    extends Transition(delegate)
+    with SFXDelegate[jfxa.SequentialTransition] {
 
   // CONSTRUCTORS
 

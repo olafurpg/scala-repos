@@ -21,7 +21,9 @@ import akka.actor.Props
 import akka.testkit.AkkaSpec
 
 abstract class PersistenceSpec(config: Config)
-    extends AkkaSpec(config) with BeforeAndAfterEach with Cleanup
+    extends AkkaSpec(config)
+    with BeforeAndAfterEach
+    with Cleanup
     with PersistenceMatchers {
   this: AkkaSpec ⇒
   private var _name: String = _
@@ -42,7 +44,7 @@ abstract class PersistenceSpec(config: Config)
   /**
     * Creates a persistent actor with current name as constructor argument.
     */
-  def namedPersistentActor[T <: NamedPersistentActor : ClassTag] =
+  def namedPersistentActor[T <: NamedPersistentActor: ClassTag] =
     system.actorOf(Props(implicitly[ClassTag[T]].runtimeClass, name))
 
   override protected def beforeEach() {
@@ -51,10 +53,11 @@ abstract class PersistenceSpec(config: Config)
 }
 
 object PersistenceSpec {
-  def config(plugin: String,
-             test: String,
-             serialization: String = "on",
-             extraConfig: Option[String] = None) =
+  def config(
+      plugin: String,
+      test: String,
+      serialization: String = "on",
+      extraConfig: Option[String] = None) =
     extraConfig
       .map(ConfigFactory.parseString(_))
       .getOrElse(ConfigFactory.empty())
@@ -74,10 +77,11 @@ object PersistenceSpec {
 trait Cleanup {
   this: AkkaSpec ⇒
   val storageLocations =
-    List("akka.persistence.journal.leveldb.dir",
-         "akka.persistence.journal.leveldb-shared.store.dir",
-         "akka.persistence.snapshot-store.local.dir").map(
-        s ⇒ new File(system.settings.config.getString(s)))
+    List(
+      "akka.persistence.journal.leveldb.dir",
+      "akka.persistence.journal.leveldb-shared.store.dir",
+      "akka.persistence.snapshot-store.local.dir").map(s ⇒
+      new File(system.settings.config.getString(s)))
 
   override protected def atStartup() {
     storageLocations.foreach(FileUtils.deleteDirectory)
@@ -117,9 +121,10 @@ trait PersistenceMatchers {
         sortedNrs = nrs.sorted if nrs != sortedNrs
       } yield
         MatchResult(
-            false,
-            s"""Messages sequence with prefix ${prefixes(pos)} was not sorted! Was: $seq"""",
-            s"""Messages sequence with prefix ${prefixes(pos)} was sorted! Was: $seq"""")
+          false,
+          s"""Messages sequence with prefix ${prefixes(pos)} was not sorted! Was: $seq"""",
+          s"""Messages sequence with prefix ${prefixes(pos)} was sorted! Was: $seq""""
+        )
 
       if (results.forall(_.matches)) MatchResult(true, "", "")
       else results.find(r ⇒ !r.matches).get

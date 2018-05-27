@@ -8,7 +8,10 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiDocumentManager, PsiElement}
 import org.jetbrains.plugins.scala.extensions._
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScMethodCall, ScReferenceExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScMethodCall,
+  ScReferenceExpression
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
 /**
@@ -25,7 +28,9 @@ class ReplaceEqualsOrEqualityInMethodCallExprIntention
     ReplaceEqualsOrEqualityInMethodCallExprIntention.familyName
 
   def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+      project: Project,
+      editor: Editor,
+      element: PsiElement): Boolean = {
     val methodCallExpr: ScMethodCall =
       PsiTreeUtil.getParentOfType(element, classOf[ScMethodCall], false)
     if (methodCallExpr == null) return false
@@ -72,17 +77,19 @@ class ReplaceEqualsOrEqualityInMethodCallExprIntention
       .getText
 
     expr
-      .append(methodCallExpr.getInvokedExpr
-            .asInstanceOf[ScReferenceExpression]
-            .qualifier
-            .get
-            .getText)
+      .append(
+        methodCallExpr.getInvokedExpr
+          .asInstanceOf[ScReferenceExpression]
+          .qualifier
+          .get
+          .getText)
       .append(".")
       .append(replaceOper(oper))
       .append(methodCallExpr.args.getText)
 
     val newMethodCallExpr = ScalaPsiElementFactory.createExpressionFromText(
-        expr.toString(), element.getManager)
+      expr.toString(),
+      element.getManager)
 
     val size =
       newMethodCallExpr

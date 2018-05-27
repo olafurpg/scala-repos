@@ -34,21 +34,22 @@ object GenerateUnsafeProjection
 
   /** Returns true iff we support this data type. */
   def canSupport(dataType: DataType): Boolean = dataType match {
-    case NullType => true
-    case t: AtomicType => true
-    case _: CalendarIntervalType => true
-    case t: StructType => t.toSeq.forall(field => canSupport(field.dataType))
-    case t: ArrayType if canSupport(t.elementType) => true
+    case NullType                                               => true
+    case t: AtomicType                                          => true
+    case _: CalendarIntervalType                                => true
+    case t: StructType                                          => t.toSeq.forall(field => canSupport(field.dataType))
+    case t: ArrayType if canSupport(t.elementType)              => true
     case MapType(kt, vt, _) if canSupport(kt) && canSupport(vt) => true
-    case udt: UserDefinedType[_] => canSupport(udt.sqlType)
-    case _ => false
+    case udt: UserDefinedType[_]                                => canSupport(udt.sqlType)
+    case _                                                      => false
   }
 
   // TODO: if the nullability of field is correct, we can use it to save null check.
-  private def writeStructToBuffer(ctx: CodegenContext,
-                                  input: String,
-                                  fieldTypes: Seq[DataType],
-                                  bufferHolder: String): String = {
+  private def writeStructToBuffer(
+      ctx: CodegenContext,
+      input: String,
+      fieldTypes: Seq[DataType],
+      bufferHolder: String): String = {
     val fieldEvals = fieldTypes.zipWithIndex.map {
       case (dt, i) =>
         val fieldName = ctx.freshName("fieldName")
@@ -63,23 +64,28 @@ object GenerateUnsafeProjection
         ${writeUnsafeData(ctx, s"((UnsafeRow) $input)", bufferHolder)}
       } else {
         ${writeExpressionsToBuffer(
-        ctx, input, fieldEvals, fieldTypes, bufferHolder)}
+      ctx,
+      input,
+      fieldEvals,
+      fieldTypes,
+      bufferHolder)}
       }
     """
   }
 
-  private def writeExpressionsToBuffer(ctx: CodegenContext,
-                                       row: String,
-                                       inputs: Seq[ExprCode],
-                                       inputTypes: Seq[DataType],
-                                       bufferHolder: String,
-                                       isTopLevel: Boolean = false): String = {
+  private def writeExpressionsToBuffer(
+      ctx: CodegenContext,
+      row: String,
+      inputs: Seq[ExprCode],
+      inputTypes: Seq[DataType],
+      bufferHolder: String,
+      isTopLevel: Boolean = false): String = {
     val rowWriterClass = classOf[UnsafeRowWriter].getName
     val rowWriter = ctx.freshName("rowWriter")
     ctx.addMutableState(
-        rowWriterClass,
-        rowWriter,
-        s"this.$rowWriter = new $rowWriterClass($bufferHolder, ${inputs.length});")
+      rowWriterClass,
+      rowWriter,
+      s"this.$rowWriter = new $rowWriterClass($bufferHolder, ${inputs.length});")
 
     val resetWriter =
       if (isTopLevel) {
@@ -101,7 +107,7 @@ object GenerateUnsafeProjection
       case ((input, dataType), index) =>
         val dt = dataType match {
           case udt: UserDefinedType[_] => udt.sqlType
-          case other => other
+          case other                   => other
         }
         val tmpCursor = ctx.freshName("tmpCursor")
 
@@ -119,7 +125,10 @@ object GenerateUnsafeProjection
               // written later.
               final int $tmpCursor = $bufferHolder.cursor;
               ${writeStructToBuffer(
-                ctx, input.value, t.map(_.dataType), bufferHolder)}
+              ctx,
+              input.value,
+              t.map(_.dataType),
+              bufferHolder)}
               $rowWriter.setOffsetAndSize($index, $tmpCursor, $bufferHolder.cursor - $tmpCursor);
             """
 
@@ -175,30 +184,32 @@ object GenerateUnsafeProjection
   }
 
   // TODO: if the nullability of array element is correct, we can use it to save null check.
-  private def writeArrayToBuffer(ctx: CodegenContext,
-                                 input: String,
-                                 elementType: DataType,
-                                 bufferHolder: String): String = {
+  private def writeArrayToBuffer(
+      ctx: CodegenContext,
+      input: String,
+      elementType: DataType,
+      bufferHolder: String): String = {
     val arrayWriterClass = classOf[UnsafeArrayWriter].getName
     val arrayWriter = ctx.freshName("arrayWriter")
-    ctx.addMutableState(arrayWriterClass,
-                        arrayWriter,
-                        s"this.$arrayWriter = new $arrayWriterClass();")
+    ctx.addMutableState(
+      arrayWriterClass,
+      arrayWriter,
+      s"this.$arrayWriter = new $arrayWriterClass();")
     val numElements = ctx.freshName("numElements")
     val index = ctx.freshName("index")
     val element = ctx.freshName("element")
 
     val et = elementType match {
       case udt: UserDefinedType[_] => udt.sqlType
-      case other => other
+      case other                   => other
     }
 
     val jt = ctx.javaType(et)
 
     val fixedElementSize = et match {
       case t: DecimalType if t.precision <= Decimal.MAX_LONG_DIGITS => 8
-      case _ if ctx.isPrimitiveType(jt) => et.defaultSize
-      case _ => 0
+      case _ if ctx.isPrimitiveType(jt)                             => et.defaultSize
+      case _                                                        => 0
     }
 
     val writeElement = et match {
@@ -248,11 +259,12 @@ object GenerateUnsafeProjection
   }
 
   // TODO: if the nullability of value element is correct, we can use it to save null check.
-  private def writeMapToBuffer(ctx: CodegenContext,
-                               input: String,
-                               keyType: DataType,
-                               valueType: DataType,
-                               bufferHolder: String): String = {
+  private def writeMapToBuffer(
+      ctx: CodegenContext,
+      input: String,
+      keyType: DataType,
+      valueType: DataType,
+      bufferHolder: String): String = {
     val keys = ctx.freshName("keys")
     val values = ctx.freshName("values")
     val tmpCursor = ctx.freshName("tmpCursor")
@@ -286,7 +298,9 @@ object GenerateUnsafeProjection
     * we can directly write it.
     */
   private def writeUnsafeData(
-      ctx: CodegenContext, input: String, bufferHolder: String) = {
+      ctx: CodegenContext,
+      input: String,
+      bufferHolder: String) = {
     val sizeInBytes = ctx.freshName("sizeInBytes")
     s"""
       final int $sizeInBytes = $input.getSizeInBytes();
@@ -297,9 +311,10 @@ object GenerateUnsafeProjection
     """
   }
 
-  def createCode(ctx: CodegenContext,
-                 expressions: Seq[Expression],
-                 useSubexprElimination: Boolean = false): ExprCode = {
+  def createCode(
+      ctx: CodegenContext,
+      expressions: Seq[Expression],
+      useSubexprElimination: Boolean = false): ExprCode = {
     val exprEvals = ctx.generateExpressions(expressions, useSubexprElimination)
     val exprTypes = expressions.map(_.dataType)
 
@@ -310,16 +325,17 @@ object GenerateUnsafeProjection
     }
 
     val result = ctx.freshName("result")
-    ctx.addMutableState("UnsafeRow",
-                        result,
-                        s"$result = new UnsafeRow(${expressions.length});")
+    ctx.addMutableState(
+      "UnsafeRow",
+      result,
+      s"$result = new UnsafeRow(${expressions.length});")
 
     val holder = ctx.freshName("holder")
     val holderClass = classOf[BufferHolder].getName
     ctx.addMutableState(
-        holderClass,
-        holder,
-        s"this.$holder = new $holderClass($result, ${numVarLenFields * 32});")
+      holderClass,
+      holder,
+      s"this.$holder = new $holderClass($result, ${numVarLenFields * 32});")
 
     val resetBufferHolder =
       if (numVarLenFields == 0) {
@@ -338,7 +354,12 @@ object GenerateUnsafeProjection
     val evalSubexpr = ctx.subexprFunctions.mkString("\n")
 
     val writeExpressions = writeExpressionsToBuffer(
-        ctx, ctx.INPUT_ROW, exprEvals, exprTypes, holder, isTopLevel = true)
+      ctx,
+      ctx.INPUT_ROW,
+      exprEvals,
+      exprTypes,
+      holder,
+      isTopLevel = true)
 
     val code = s"""
         $resetBufferHolder
@@ -353,11 +374,13 @@ object GenerateUnsafeProjection
     in.map(ExpressionCanonicalizer.execute)
 
   protected def bind(
-      in: Seq[Expression], inputSchema: Seq[Attribute]): Seq[Expression] =
+      in: Seq[Expression],
+      inputSchema: Seq[Attribute]): Seq[Expression] =
     in.map(BindReferences.bindReference(_, inputSchema))
 
-  def generate(expressions: Seq[Expression],
-               subexpressionEliminationEnabled: Boolean): UnsafeProjection = {
+  def generate(
+      expressions: Seq[Expression],
+      subexpressionEliminationEnabled: Boolean): UnsafeProjection = {
     create(canonicalize(expressions), subexpressionEliminationEnabled)
   }
 
@@ -400,7 +423,7 @@ object GenerateUnsafeProjection
       """
 
     logDebug(
-        s"code for ${expressions.mkString(",")}:\n${CodeFormatter.format(code)}")
+      s"code for ${expressions.mkString(",")}:\n${CodeFormatter.format(code)}")
 
     val c = CodeGenerator.compile(code)
     c.generate(ctx.references.toArray).asInstanceOf[UnsafeProjection]

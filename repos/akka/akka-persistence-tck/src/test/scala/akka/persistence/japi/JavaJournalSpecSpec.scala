@@ -9,5 +9,4 @@ import org.scalatest.DoNotDiscover
 
 /* Only checking that compilation works with the constructor here as expected (no other abstract fields leaked) */
 @DoNotDiscover
-class JavaJournalSpecSpec
-    extends JavaJournalSpec(ConfigFactory.parseString(""))
+class JavaJournalSpecSpec extends JavaJournalSpec(ConfigFactory.parseString(""))

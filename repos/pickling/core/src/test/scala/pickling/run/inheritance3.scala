@@ -13,21 +13,25 @@ abstract class Employee {
 }
 
 case class Firefighter(
-    val name: String, val age: Int, val salary: Int, val since: Int)
-    extends Employee with Person
+    val name: String,
+    val age: Int,
+    val salary: Int,
+    val since: Int)
+    extends Employee
+    with Person
 
 class Inheritance3Test extends FunSuite {
   test("main") {
     val f = new Firefighter(
-        name = "Joey",
-        age = 32,
-        salary = 30000,
-        since = 1999
+      name = "Joey",
+      age = 32,
+      salary = 30000,
+      since = 1999
     )
 
     val pickleF = (f: Firefighter).pickle
     assert(
-        pickleF.value === """
+      pickleF.value === """
       |{
       |  "$type": "scala.pickling.inheritance3.Firefighter",
       |  "name": "Joey",
@@ -40,7 +44,7 @@ class Inheritance3Test extends FunSuite {
 
     val pickleE = (f: Employee).pickle
     assert(
-        pickleE.value === """
+      pickleE.value === """
       |{
       |  "$type": "scala.pickling.inheritance3.Firefighter",
       |  "name": "Joey",
@@ -53,7 +57,7 @@ class Inheritance3Test extends FunSuite {
 
     val pickleP = (f: Person).pickle
     assert(
-        pickleP.value === """
+      pickleP.value === """
       |{
       |  "$type": "scala.pickling.inheritance3.Firefighter",
       |  "name": "Joey",

@@ -189,7 +189,7 @@ class BigDecimalArithmeticTest {
     val bScale = 70
     val res =
       "2779231855146903674747706830969461168692256919247547952" +
-      "2608549363170374005512836303475980101168105698072946555" + "6862849"
+        "2608549363170374005512836303475980101168105698072946555" + "6862849"
     val resScale = 0
     val rem = "3.4935796954060524114470681810486417234751682675102093970E-15"
     val remScale = 70
@@ -475,8 +475,8 @@ class BigDecimalArithmeticTest {
     val rm = RoundingMode.HALF_UP
     val c =
       "50000260373164286401361913262100972218038099522752460421" +
-      "05959924024355721031761947728703598332749334086415670525" +
-      "3761096961.670"
+        "05959924024355721031761947728703598332749334086415670525" +
+        "3761096961.670"
     val aNumber = new BigDecimal(new BigInteger(a), aScale)
     val bNumber = new BigDecimal(new BigInteger(b), bScale)
     val result = aNumber.divide(bNumber, newScale, rm)
@@ -515,7 +515,8 @@ class BigDecimalArithmeticTest {
     val aNumber = new BigDecimal(new BigInteger(a), aScale)
     val bNumber = new BigDecimal(new BigInteger(b), bScale)
     expectThrows(
-        classOf[IllegalArgumentException], aNumber.divide(bNumber, 100))
+      classOf[IllegalArgumentException],
+      aNumber.divide(bNumber, 100))
   }
 
   @Test def testDivideExceptionRM(): Unit = {
@@ -525,8 +526,9 @@ class BigDecimalArithmeticTest {
     val bScale = 10
     val aNumber = new BigDecimal(new BigInteger(a), aScale)
     val bNumber = new BigDecimal(new BigInteger(b), bScale)
-    expectThrows(classOf[ArithmeticException],
-                 aNumber.divide(bNumber, BigDecimal.ROUND_UNNECESSARY))
+    expectThrows(
+      classOf[ArithmeticException],
+      aNumber.divide(bNumber, BigDecimal.ROUND_UNNECESSARY))
   }
 
   @Test def testDivideExpEqualsZero(): Unit = {
@@ -574,8 +576,9 @@ class BigDecimalArithmeticTest {
   @Test def testDivideLargeScale(): Unit = {
     val arg1 = new BigDecimal("320.0E+2147483647")
     val arg2 = new BigDecimal("6E-2147483647")
-    expectThrows(classOf[ArithmeticException],
-                 arg1.divide(arg2, Int.MaxValue, RoundingMode.CEILING))
+    expectThrows(
+      classOf[ArithmeticException],
+      arg1.divide(arg2, Int.MaxValue, RoundingMode.CEILING))
   }
 
   @Test def testDivideRemainderIsZero(): Unit = {
@@ -1003,11 +1006,14 @@ class BigDecimalArithmeticTest {
     quotient = BigDecimal.ZERO.negate().divide(BigDecimal.ONE)
     assertTrue(BigDecimal.ZERO == quotient)
     expectThrows(
-        classOf[ArithmeticException], BigDecimal.ZERO.divide(BigDecimal.ZERO))
+      classOf[ArithmeticException],
+      BigDecimal.ZERO.divide(BigDecimal.ZERO))
     expectThrows(
-        classOf[ArithmeticException], BigDecimal.ONE.divide(BigDecimal.ZERO))
-    expectThrows(classOf[ArithmeticException],
-                 BigDecimal.ONE.divideToIntegralValue(BigDecimal.ZERO))
+      classOf[ArithmeticException],
+      BigDecimal.ONE.divide(BigDecimal.ZERO))
+    expectThrows(
+      classOf[ArithmeticException],
+      BigDecimal.ONE.divideToIntegralValue(BigDecimal.ZERO))
   }
 
   @Test def testDivideToIntegralValue_on_floating_points__issue_1979(): Unit = {
@@ -1142,9 +1148,9 @@ class BigDecimalArithmeticTest {
     val exp = 10
     val c =
       "8004424019039195734129783677098845174704975003788210729597" +
-      "4875206425711159855030832837132149513512555214958035390490" +
-      "798520842025826.594316163502809818340013610490541783276343" +
-      "6514490899700151256484355936102754469438371850240000000000"
+        "4875206425711159855030832837132149513512555214958035390490" +
+        "798520842025826.594316163502809818340013610490541783276343" +
+        "6514490899700151256484355936102754469438371850240000000000"
     val cScale = 100
     val aNumber = new BigDecimal(new BigInteger(a), aScale)
     val result = aNumber.pow(exp)

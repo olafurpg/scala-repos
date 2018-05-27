@@ -48,7 +48,9 @@ class IndexBool(keys: Vec[Boolean]) extends Index[Boolean] {
     Index(array.remove(keys, locs))
 
   def concat[B, C](x: Index[B])(
-      implicit wd: Promoter[Boolean, B, C], mc: ST[C], oc: ORD[C]): Index[C] =
+      implicit wd: Promoter[Boolean, B, C],
+      mc: ST[C],
+      oc: ORD[C]): Index[C] =
     Index(util.Concat.append[Boolean, B, C](toArray, x.toArray))
 
   def isMonotonic: Boolean = monotonic
@@ -60,7 +62,8 @@ class IndexBool(keys: Vec[Boolean]) extends Index[Boolean] {
   def reversed: Index[Boolean] = new IndexBool(toVec.reversed)
 
   def join(
-      other: Index[Boolean], how: JoinType = LeftJoin): ReIndexer[Boolean] =
+      other: Index[Boolean],
+      how: JoinType = LeftJoin): ReIndexer[Boolean] =
     JoinerImpl.join(this, other, how)
 
   // Intersects two indices if both have set semantics
@@ -93,7 +96,7 @@ class IndexBool(keys: Vec[Boolean]) extends Index[Boolean] {
     locator.get(t) + locator.count(t)
   }
 
-  def map[@spec(Boolean, Int, Long, Double) B : ST : ORD](
+  def map[@spec(Boolean, Int, Long, Double) B: ST: ORD](
       f: Boolean => B): Index[B] =
     Index(VecImpl.map(keys)(f).toArray)
 

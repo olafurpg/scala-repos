@@ -18,9 +18,10 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 /**
   * @author Alexander Podkhalyuzin
   */
-class ScClassParentsImpl private (stub: StubElement[ScTemplateParents],
-                                  nodeType: IElementType,
-                                  node: ASTNode)
+class ScClassParentsImpl private (
+    stub: StubElement[ScTemplateParents],
+    nodeType: IElementType,
+    node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
     with ScClassParents {
   def this(node: ASTNode) = { this(null, null, node) }
@@ -34,7 +35,9 @@ class ScClassParentsImpl private (stub: StubElement[ScTemplateParents],
   def superTypes: Seq[ScType] = {
     val stub = getStub
     if (stub != null) {
-      return stub.asInstanceOf[ScTemplateParentsStub].getTemplateParentsTypes ++ syntheticTypeElements
+      return stub
+        .asInstanceOf[ScTemplateParentsStub]
+        .getTemplateParentsTypes ++ syntheticTypeElements
         .map(_.getType(TypingContext.empty).getOrAny)
     }
     allTypeElements.map(_.getType(TypingContext.empty).getOrAny)
@@ -49,7 +52,7 @@ class ScClassParentsImpl private (stub: StubElement[ScTemplateParents],
     }
     (constructor match {
       case Some(x) => Array[ScTypeElement](x.typeElement)
-      case None => Array[ScTypeElement]()
+      case None    => Array[ScTypeElement]()
     }) ++ findChildrenByClassScala(classOf[ScTypeElement])
   }
 }

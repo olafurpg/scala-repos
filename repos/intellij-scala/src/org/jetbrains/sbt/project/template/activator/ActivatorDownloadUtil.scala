@@ -15,10 +15,13 @@ object ActivatorDownloadUtil {
   private val CONTENT_LENGTH_TEMPLATE: String = "${content-length}"
 
   def downloadContentToFile(
-      progress: ProgressIndicator, url: String, outputFile: File) {
+      progress: ProgressIndicator,
+      url: String,
+      outputFile: File) {
     val parentDirExists: Boolean = FileUtil.createParentDirs(outputFile)
     if (!parentDirExists)
-      throw new IOException("Parent dir of '" + outputFile.getAbsolutePath +
+      throw new IOException(
+        "Parent dir of '" + outputFile.getAbsolutePath +
           "' can not be created!")
 
     val out = new BufferedOutputStream(new FileOutputStream(outputFile))
@@ -28,7 +31,9 @@ object ActivatorDownloadUtil {
   }
 
   def download(
-      progress: ProgressIndicator, location: String, output: OutputStream) {
+      progress: ProgressIndicator,
+      location: String,
+      output: OutputStream) {
     val originalText: String = if (progress != null) progress.getText else null
     substituteContentLength(progress, originalText, -1)
     if (progress != null) progress.setText2("Downloading " + location)
@@ -43,11 +48,15 @@ object ActivatorDownloadUtil {
               val contentLength: Int = request.getConnection.getContentLength
               substituteContentLength(progress, originalText, contentLength)
               NetUtils.copyStreamContent(
-                  progress, request.getInputStream, output, contentLength)
+                progress,
+                request.getInputStream,
+                output,
+                contentLength)
             } catch {
               case e: IOException =>
                 throw new IOException(
-                    HttpRequests.createErrorMessage(e, request, true), e)
+                  HttpRequests.createErrorMessage(e, request, true),
+                  e)
             }
 
             null
@@ -60,7 +69,9 @@ object ActivatorDownloadUtil {
   }
 
   private def substituteContentLength(
-      progress: ProgressIndicator, text: String, contentLengthInBytes: Int) {
+      progress: ProgressIndicator,
+      text: String,
+      contentLengthInBytes: Int) {
     if (progress == null || text == null) return
 
     val ind = text indexOf CONTENT_LENGTH_TEMPLATE
@@ -69,7 +80,7 @@ object ActivatorDownloadUtil {
       val mes: String = formatContentLength(contentLengthInBytes)
       val newText: String =
         text.substring(0, ind) + mes + text.substring(
-            ind + CONTENT_LENGTH_TEMPLATE.length)
+          ind + CONTENT_LENGTH_TEMPLATE.length)
       progress.setText(newText)
     }
   }

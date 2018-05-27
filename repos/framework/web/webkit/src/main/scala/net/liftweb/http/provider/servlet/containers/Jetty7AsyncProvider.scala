@@ -33,16 +33,17 @@ object Jetty7AsyncProvider extends AsyncProviderMeta {
   // contSupport below gets inferred as a Class[?0] existential.
   import scala.language.existentials
 
-  private val (hasContinuations_?,
-               contSupport,
-               getContinuation,
-               getAttribute,
-               setAttribute,
-               suspendMeth,
-               setTimeout,
-               resumeMeth,
-               isExpired,
-               isResumed) = {
+  private val (
+    hasContinuations_?,
+    contSupport,
+    getContinuation,
+    getAttribute,
+    setAttribute,
+    suspendMeth,
+    setTimeout,
+    resumeMeth,
+    isExpired,
+    isResumed) = {
     try {
       val cc =
         Class.forName("org.eclipse.jetty.continuation.ContinuationSupport")
@@ -57,16 +58,17 @@ object Jetty7AsyncProvider extends AsyncProviderMeta {
       val resume = cci.getMethod("resume")
       val isExpired = cci.getMethod("isExpired")
       val isResumed = cci.getMethod("isResumed")
-      (true,
-       (cc),
-       (meth),
-       (getAttribute),
-       (setAttribute),
-       (suspend),
-       setTimeout,
-       resume,
-       isExpired,
-       isResumed)
+      (
+        true,
+        (cc),
+        (meth),
+        (getAttribute),
+        (setAttribute),
+        (suspend),
+        setTimeout,
+        resume,
+        isExpired,
+        isResumed)
     } catch {
       case e: Exception =>
         (false, null, null, null, null, null, null, null, null, null)
@@ -107,7 +109,7 @@ class Jetty7AsyncProvider(req: HTTPRequest) extends ServletAsyncProvider {
         setAttribute.invoke(cont, "__liftCometState", null)
         ret match {
           case (r: Req, lr: LiftResponse) => Some(r -> lr)
-          case _ => None
+          case _                          => None
         }
       } catch {
         case e: Exception => None

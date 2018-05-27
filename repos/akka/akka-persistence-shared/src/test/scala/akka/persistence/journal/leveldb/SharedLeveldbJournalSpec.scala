@@ -54,7 +54,7 @@ object SharedLeveldbJournalSpec {
 
   class ExampleApp(probe: ActorRef, storePath: ActorPath) extends Actor {
     val p = context.actorOf(
-        Props(classOf[ExamplePersistentActor], probe, context.system.name))
+      Props(classOf[ExamplePersistentActor], probe, context.system.name))
 
     def receive = {
       case ActorIdentity(1, Some(store)) ⇒
@@ -68,7 +68,8 @@ object SharedLeveldbJournalSpec {
 }
 
 class SharedLeveldbJournalSpec
-    extends AkkaSpec(SharedLeveldbJournalSpec.config) with Cleanup {
+    extends AkkaSpec(SharedLeveldbJournalSpec.config)
+    with Cleanup {
   import SharedLeveldbJournalSpec._
 
   val systemA = ActorSystem("SysA", system.settings.config)
@@ -88,10 +89,11 @@ class SharedLeveldbJournalSpec
 
       system.actorOf(Props[SharedLeveldbStore], "store")
       val storePath =
-        RootActorPath(system
-              .asInstanceOf[ExtendedActorSystem]
-              .provider
-              .getDefaultAddress) / "user" / "store"
+        RootActorPath(
+          system
+            .asInstanceOf[ExtendedActorSystem]
+            .provider
+            .getDefaultAddress) / "user" / "store"
 
       val appA =
         systemA.actorOf(Props(classOf[ExampleApp], probeA.ref, storePath))

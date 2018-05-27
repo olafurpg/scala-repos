@@ -30,19 +30,21 @@ object LeaderAndIsr {
   val LeaderDuringDelete = -2
 }
 
-case class LeaderAndIsr(var leader: Int,
-                        var leaderEpoch: Int,
-                        var isr: List[Int],
-                        var zkVersion: Int) {
+case class LeaderAndIsr(
+    var leader: Int,
+    var leaderEpoch: Int,
+    var isr: List[Int],
+    var zkVersion: Int) {
   def this(leader: Int, isr: List[Int]) =
-    this(leader,
-         LeaderAndIsr.initialLeaderEpoch,
-         isr,
-         LeaderAndIsr.initialZKVersion)
+    this(
+      leader,
+      LeaderAndIsr.initialLeaderEpoch,
+      isr,
+      LeaderAndIsr.initialZKVersion)
 
   override def toString(): String = {
     Json.encode(
-        Map("leader" -> leader, "leader_epoch" -> leaderEpoch, "isr" -> isr))
+      Map("leader" -> leader, "leader_epoch" -> leaderEpoch, "isr" -> isr))
   }
 }
 
@@ -57,10 +59,10 @@ object PartitionStateInfo {
     val replicationFactor = buffer.getInt
     val replicas = for (i <- 0 until replicationFactor) yield buffer.getInt
     PartitionStateInfo(
-        LeaderIsrAndControllerEpoch(
-            LeaderAndIsr(leader, leaderEpoch, isr.toList, zkVersion),
-            controllerEpoch),
-        replicas.toSet)
+      LeaderIsrAndControllerEpoch(
+        LeaderAndIsr(leader, leaderEpoch, isr.toList, zkVersion),
+        controllerEpoch),
+      replicas.toSet)
   }
 }
 
@@ -83,20 +85,19 @@ case class PartitionStateInfo(
   def sizeInBytes(): Int = {
     val size =
       4 /* epoch of the controller that elected the leader */ +
-      4 /* leader broker id */ + 4 /* leader epoch */ +
-      4 /* number of replicas in isr */ +
-      4 * leaderIsrAndControllerEpoch.leaderAndIsr.isr.size /* replicas in isr */ +
-      4 /* zk version */ + 4 /* replication factor */ + allReplicas.size * 4
+        4 /* leader broker id */ + 4 /* leader epoch */ +
+        4 /* number of replicas in isr */ +
+        4 * leaderIsrAndControllerEpoch.leaderAndIsr.isr.size /* replicas in isr */ +
+        4 /* zk version */ + 4 /* replication factor */ + allReplicas.size * 4
     size
   }
 
   override def toString(): String = {
     val partitionStateInfo = new StringBuilder
     partitionStateInfo.append(
-        "(LeaderAndIsrInfo:" + leaderIsrAndControllerEpoch.toString)
+      "(LeaderAndIsrInfo:" + leaderIsrAndControllerEpoch.toString)
     partitionStateInfo.append(",ReplicationFactor:" + replicationFactor + ")")
-    partitionStateInfo.append(
-        ",AllReplicas:" + allReplicas.mkString(",") + ")")
+    partitionStateInfo.append(",AllReplicas:" + allReplicas.mkString(",") + ")")
     partitionStateInfo.toString()
   }
 }

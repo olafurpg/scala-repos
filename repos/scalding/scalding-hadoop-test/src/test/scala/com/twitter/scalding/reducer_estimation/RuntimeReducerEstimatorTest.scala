@@ -1,8 +1,15 @@
 package com.twitter.scalding.reducer_estimation
 
 import com.twitter.scalding._
-import com.twitter.scalding.reducer_estimation.RuntimeReducerEstimator.{RuntimePerReducer, EstimationScheme, IgnoreInputSize}
-import com.twitter.scalding.platform.{HadoopPlatformJobTest, HadoopSharedPlatformTest}
+import com.twitter.scalding.reducer_estimation.RuntimeReducerEstimator.{
+  RuntimePerReducer,
+  EstimationScheme,
+  IgnoreInputSize
+}
+import com.twitter.scalding.platform.{
+  HadoopPlatformJobTest,
+  HadoopSharedPlatformTest
+}
 import org.scalatest.{Matchers, WordSpec}
 import scala.collection.JavaConverters._
 import scala.util.{Success, Try}
@@ -11,11 +18,13 @@ object HistoryService1 extends HistoryServiceWithData {
   import HistoryServiceWithData._
 
   def fetchHistory(
-      info: FlowStrategyInfo, maxHistory: Int): Try[Seq[FlowStepHistory]] =
+      info: FlowStrategyInfo,
+      maxHistory: Int): Try[Seq[FlowStepHistory]] =
     Success(
-        Seq(makeHistory(inputSize * 2, 0, List(10, 1000, 3000)),
-            makeHistory(inputSize / 2, 0, List(10, 200, 400)),
-            makeHistory(inputSize * 4, 0, List(10, 2400, 3000))))
+      Seq(
+        makeHistory(inputSize * 2, 0, List(10, 1000, 3000)),
+        makeHistory(inputSize / 2, 0, List(10, 200, 400)),
+        makeHistory(inputSize * 4, 0, List(10, 2400, 3000))))
 }
 
 class Estimator1 extends RuntimeReducerEstimator {
@@ -35,7 +44,9 @@ class DummyEstimator extends ReducerEstimator {
 }
 
 class RuntimeReducerEstimatorTest
-    extends WordSpec with Matchers with HadoopSharedPlatformTest {
+    extends WordSpec
+    with Matchers
+    with HadoopSharedPlatformTest {
 
   "Single-step job with runtime-based reducer estimator" should {
     "set reducers correctly with median estimation scheme" in {
@@ -168,8 +179,8 @@ class RuntimeReducerEstimatorTest
         .addReducerEstimator(classOf[EmptyRuntimeEstimator])
         .addReducerEstimator(classOf[DummyEstimator])
 
-      HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, config), cluster).inspectCompletedFlow {
-        flow =>
+      HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, config), cluster)
+        .inspectCompletedFlow { flow =>
           val steps = flow.getFlowSteps.asScala
           assert(steps.length == 1)
 
@@ -179,7 +190,7 @@ class RuntimeReducerEstimatorTest
           // so it should have fallen back to DummyEstimator,
           // which returns 42.
           assert(conf.getNumReduceTasks == 42)
-      }
+        }
     }
 
     "not set reducers when history service fails" in {
@@ -187,8 +198,8 @@ class RuntimeReducerEstimatorTest
         .addReducerEstimator(classOf[ErrorRuntimeEstimator])
         .addReducerEstimator(classOf[DummyEstimator])
 
-      HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, config), cluster).inspectCompletedFlow {
-        flow =>
+      HadoopPlatformJobTest(new SimpleJobWithNoSetReducers(_, config), cluster)
+        .inspectCompletedFlow { flow =>
           val steps = flow.getFlowSteps.asScala
           assert(steps.length == 1)
 
@@ -198,7 +209,7 @@ class RuntimeReducerEstimatorTest
           // so it should have fallen back to DummyEstimator,
           // which returns 42.
           assert(conf.getNumReduceTasks == 42)
-      }
+        }
     }
   }
 }

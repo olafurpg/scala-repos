@@ -310,10 +310,10 @@ class BufChannelBufferTest extends FunSuite with BeforeAndAfter {
   }
 
   test("random byte access") {
-    val buf = Buf.ByteArray.Owned(0
-          .until(CAPACITY)
-          .map(_ => random.nextInt().asInstanceOf[Byte])
-          .toArray)
+    val buf = Buf.ByteArray.Owned(
+      0.until(CAPACITY)
+        .map(_ => random.nextInt().asInstanceOf[Byte])
+        .toArray)
     val bcb = new BufChannelBuffer(buf)
 
     random.setSeed(seed)
@@ -1303,12 +1303,9 @@ class BufChannelBufferTest extends FunSuite with BeforeAndAfter {
 
   test("slice endianness") {
     assertEquals(buffer.order(), buffer.slice(0, buffer.capacity()).order())
-    assertEquals(
-        buffer.order(), buffer.slice(0, buffer.capacity() - 1).order())
-    assertEquals(
-        buffer.order(), buffer.slice(1, buffer.capacity() - 1).order())
-    assertEquals(
-        buffer.order(), buffer.slice(1, buffer.capacity() - 2).order())
+    assertEquals(buffer.order(), buffer.slice(0, buffer.capacity() - 1).order())
+    assertEquals(buffer.order(), buffer.slice(1, buffer.capacity() - 1).order())
+    assertEquals(buffer.order(), buffer.slice(1, buffer.capacity() - 2).order())
   }
 
   test("slice index") {
@@ -1318,13 +1315,17 @@ class BufChannelBufferTest extends FunSuite with BeforeAndAfter {
     assertEquals(0, buffer.slice(1, buffer.capacity() - 2).readerIndex())
 
     assertEquals(
-        buffer.capacity(), buffer.slice(0, buffer.capacity()).writerIndex())
-    assertEquals(buffer.capacity() - 1,
-                 buffer.slice(0, buffer.capacity() - 1).writerIndex())
-    assertEquals(buffer.capacity() - 1,
-                 buffer.slice(1, buffer.capacity() - 1).writerIndex())
-    assertEquals(buffer.capacity() - 2,
-                 buffer.slice(1, buffer.capacity() - 2).writerIndex())
+      buffer.capacity(),
+      buffer.slice(0, buffer.capacity()).writerIndex())
+    assertEquals(
+      buffer.capacity() - 1,
+      buffer.slice(0, buffer.capacity() - 1).writerIndex())
+    assertEquals(
+      buffer.capacity() - 1,
+      buffer.slice(1, buffer.capacity() - 1).writerIndex())
+    assertEquals(
+      buffer.capacity() - 2,
+      buffer.slice(1, buffer.capacity() - 2).writerIndex())
   }
 
   test("equals") {
@@ -1337,16 +1338,16 @@ class BufChannelBufferTest extends FunSuite with BeforeAndAfter {
     val bcb = new BufChannelBuffer(Buf.ByteArray.Owned(bytes))
     bcb.setIndex(0, value.length)
 
+    assertEquals(bcb, ChannelBuffers.wrappedBuffer(ByteOrder.BIG_ENDIAN, value))
     assertEquals(
-        bcb, ChannelBuffers.wrappedBuffer(ByteOrder.BIG_ENDIAN, value))
-    assertEquals(
-        bcb, ChannelBuffers.wrappedBuffer(ByteOrder.LITTLE_ENDIAN, value))
+      bcb,
+      ChannelBuffers.wrappedBuffer(ByteOrder.LITTLE_ENDIAN, value))
 
     value(0) = (value(0) + 1).asInstanceOf[Byte]
     assert(
-        !bcb.equals(ChannelBuffers.wrappedBuffer(ByteOrder.BIG_ENDIAN, value)))
-    assert(!bcb.equals(
-            ChannelBuffers.wrappedBuffer(ByteOrder.LITTLE_ENDIAN, value)))
+      !bcb.equals(ChannelBuffers.wrappedBuffer(ByteOrder.BIG_ENDIAN, value)))
+    assert(
+      !bcb.equals(ChannelBuffers.wrappedBuffer(ByteOrder.LITTLE_ENDIAN, value)))
   }
 
   test("compareTo") {
@@ -1369,38 +1370,38 @@ class BufChannelBufferTest extends FunSuite with BeforeAndAfter {
     bcb.setIndex(0, value.length)
 
     assertEquals(
-        0,
-        bcb.compareTo(
-            ChannelBuffers.wrappedBuffer(ByteOrder.BIG_ENDIAN, value)))
+      0,
+      bcb.compareTo(ChannelBuffers.wrappedBuffer(ByteOrder.BIG_ENDIAN, value)))
     assertEquals(
-        0,
-        bcb.compareTo(
-            ChannelBuffers.wrappedBuffer(ByteOrder.LITTLE_ENDIAN, value)))
+      0,
+      bcb.compareTo(
+        ChannelBuffers.wrappedBuffer(ByteOrder.LITTLE_ENDIAN, value)))
 
     value(0) = (value(0) + 1).asInstanceOf[Byte]
     assert(bcb.compareTo(
-            ChannelBuffers.wrappedBuffer(ByteOrder.BIG_ENDIAN, value)) < 0)
-    assert(bcb.compareTo(
-            ChannelBuffers.wrappedBuffer(ByteOrder.LITTLE_ENDIAN, value)) < 0)
+      ChannelBuffers.wrappedBuffer(ByteOrder.BIG_ENDIAN, value)) < 0)
+    assert(
+      bcb.compareTo(
+        ChannelBuffers.wrappedBuffer(ByteOrder.LITTLE_ENDIAN, value)) < 0)
     value(0) = (value(0) - 2).asInstanceOf[Byte]
     assert(bcb.compareTo(
-            ChannelBuffers.wrappedBuffer(ByteOrder.BIG_ENDIAN, value)) > 0)
-    assert(bcb.compareTo(
-            ChannelBuffers.wrappedBuffer(ByteOrder.LITTLE_ENDIAN, value)) > 0)
+      ChannelBuffers.wrappedBuffer(ByteOrder.BIG_ENDIAN, value)) > 0)
+    assert(
+      bcb.compareTo(
+        ChannelBuffers.wrappedBuffer(ByteOrder.LITTLE_ENDIAN, value)) > 0)
     value(0) = (value(0) + 1).asInstanceOf[Byte]
 
-    assert(bcb.compareTo(ChannelBuffers.wrappedBuffer(
-                ByteOrder.BIG_ENDIAN, value, 0, 31)) > 0)
-    assert(bcb.compareTo(ChannelBuffers.wrappedBuffer(
-                ByteOrder.LITTLE_ENDIAN, value, 0, 31)) > 0)
-    assert(bcb
-          .slice(0, 31)
-          .compareTo(ChannelBuffers.wrappedBuffer(ByteOrder.BIG_ENDIAN, value)) < 0)
     assert(
-        bcb
-          .slice(0, 31)
-          .compareTo(ChannelBuffers.wrappedBuffer(ByteOrder.LITTLE_ENDIAN,
-                                                  value)) < 0)
+      bcb.compareTo(
+        ChannelBuffers.wrappedBuffer(ByteOrder.BIG_ENDIAN, value, 0, 31)) > 0)
+    assert(bcb.compareTo(
+      ChannelBuffers.wrappedBuffer(ByteOrder.LITTLE_ENDIAN, value, 0, 31)) > 0)
+    assert(bcb
+      .slice(0, 31)
+      .compareTo(ChannelBuffers.wrappedBuffer(ByteOrder.BIG_ENDIAN, value)) < 0)
+    assert(bcb
+      .slice(0, 31)
+      .compareTo(ChannelBuffers.wrappedBuffer(ByteOrder.LITTLE_ENDIAN, value)) < 0)
   }
 
   test("toString") {
@@ -1431,8 +1432,9 @@ class BufChannelBufferTest extends FunSuite with BeforeAndAfter {
     random.nextBytes(value)
     val bcb = new BufChannelBuffer(Buf.ByteArray.Owned(value))
     0.until(CAPACITY - BLOCK_SIZE + 1, BLOCK_SIZE) foreach { i =>
-      assertEquals(ByteBuffer.wrap(value, i, BLOCK_SIZE),
-                   bcb.toByteBuffer(i, BLOCK_SIZE))
+      assertEquals(
+        ByteBuffer.wrap(value, i, BLOCK_SIZE),
+        bcb.toByteBuffer(i, BLOCK_SIZE))
     }
   }
 

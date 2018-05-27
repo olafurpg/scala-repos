@@ -12,9 +12,25 @@ import sbt.io.Path._
 import sbt.io.IO
 
 import sbinary.DefaultProtocol.FileFormat
-import sbt.internal.util.Cache.{defaultEquiv, hConsCache, hNilCache, seqCache, seqFormat, streamFormat, StringFormat, UnitFormat, wrapIn}
+import sbt.internal.util.Cache.{
+  defaultEquiv,
+  hConsCache,
+  hNilCache,
+  seqCache,
+  seqFormat,
+  streamFormat,
+  StringFormat,
+  UnitFormat,
+  wrapIn
+}
 import sbt.internal.util.Tracked.{inputChanged, outputChanged}
-import sbt.internal.util.{FilesInfo, HashFileInfo, HNil, ModifiedFileInfo, PlainFileInfo}
+import sbt.internal.util.{
+  FilesInfo,
+  HashFileInfo,
+  HNil,
+  ModifiedFileInfo,
+  PlainFileInfo
+}
 import sbt.internal.util.FilesInfo.{exists, hash, lastModified}
 import xsbti.Reporter
 
@@ -24,36 +40,48 @@ object Doc {
   import RawCompileLike._
   def scaladoc(label: String, cache: File, compiler: AnalyzingCompiler): Gen =
     scaladoc(label, cache, compiler, Seq())
-  def scaladoc(label: String,
-               cache: File,
-               compiler: AnalyzingCompiler,
-               fileInputOptions: Seq[String]): Gen =
-    cached(cache,
-           fileInputOptions,
-           prepare(label + " Scala API documentation", compiler.doc))
-  def javadoc(label: String,
-              cache: File,
-              doc: sbt.internal.inc.javac.JavaTools,
-              log: Logger,
-              reporter: Reporter): Gen =
+  def scaladoc(
+      label: String,
+      cache: File,
+      compiler: AnalyzingCompiler,
+      fileInputOptions: Seq[String]): Gen =
+    cached(
+      cache,
+      fileInputOptions,
+      prepare(label + " Scala API documentation", compiler.doc))
+  def javadoc(
+      label: String,
+      cache: File,
+      doc: sbt.internal.inc.javac.JavaTools,
+      log: Logger,
+      reporter: Reporter): Gen =
     javadoc(label, cache, doc, log, reporter, Seq())
-  def javadoc(label: String,
-              cache: File,
-              doc: sbt.internal.inc.javac.JavaTools,
-              log: Logger,
-              reporter: Reporter,
-              fileInputOptions: Seq[String]): Gen =
-    cached(cache,
-           fileInputOptions,
-           prepare(label + " Java API documentation",
-                   filterSources(javaSourcesOnly,
-                                 (sources: Seq[File], classpath: Seq[File],
-                                 outputDirectory: File, options: Seq[String],
-                                 maxErrors: Int, log: Logger) =>
-                                   {
-                                     // doc.doc
-                                     ???
-                                 })))
+  def javadoc(
+      label: String,
+      cache: File,
+      doc: sbt.internal.inc.javac.JavaTools,
+      log: Logger,
+      reporter: Reporter,
+      fileInputOptions: Seq[String]): Gen =
+    cached(
+      cache,
+      fileInputOptions,
+      prepare(
+        label + " Java API documentation",
+        filterSources(
+          javaSourcesOnly,
+          (
+              sources: Seq[File],
+              classpath: Seq[File],
+              outputDirectory: File,
+              options: Seq[String],
+              maxErrors: Int,
+              log: Logger) => {
+            // doc.doc
+            ???
+          })
+      )
+    )
 
   val javaSourcesOnly: File => Boolean = _.getName.endsWith(".java")
 
@@ -64,44 +92,50 @@ object Doc {
   // def apply(maximumErrors: Int, compiler: sbt.compiler.Javadoc) = new Javadoc(maximumErrors, compiler)
 
   private[sbt] final class Scaladoc(
-      maximumErrors: Int, compiler: AnalyzingCompiler)
+      maximumErrors: Int,
+      compiler: AnalyzingCompiler)
       extends Doc {
-    def apply(label: String,
-              sources: Seq[File],
-              classpath: Seq[File],
-              outputDirectory: File,
-              options: Seq[String],
-              log: Logger) {
-      generate("Scala",
-               label,
-               compiler.doc,
-               sources,
-               classpath,
-               outputDirectory,
-               options,
-               maximumErrors,
-               log)
+    def apply(
+        label: String,
+        sources: Seq[File],
+        classpath: Seq[File],
+        outputDirectory: File,
+        options: Seq[String],
+        log: Logger) {
+      generate(
+        "Scala",
+        label,
+        compiler.doc,
+        sources,
+        classpath,
+        outputDirectory,
+        options,
+        maximumErrors,
+        log)
     }
   }
   private[sbt] final class Javadoc(
-      maximumErrors: Int, doc: sbt.internal.inc.Javadoc)
+      maximumErrors: Int,
+      doc: sbt.internal.inc.Javadoc)
       extends Doc {
-    def apply(label: String,
-              sources: Seq[File],
-              classpath: Seq[File],
-              outputDirectory: File,
-              options: Seq[String],
-              log: Logger) {
+    def apply(
+        label: String,
+        sources: Seq[File],
+        classpath: Seq[File],
+        outputDirectory: File,
+        options: Seq[String],
+        log: Logger) {
       // javadoc doesn't handle *.scala properly, so we evict them from javadoc sources list.
-      generate("Java",
-               label,
-               doc.doc,
-               sources.filterNot(_.name.endsWith(".scala")),
-               classpath,
-               outputDirectory,
-               options,
-               maximumErrors,
-               log)
+      generate(
+        "Java",
+        label,
+        doc.doc,
+        sources.filterNot(_.name.endsWith(".scala")),
+        classpath,
+        outputDirectory,
+        options,
+        maximumErrors,
+        log)
     }
   }
 }
@@ -111,20 +145,22 @@ sealed trait Doc {
 
   //   def apply(label: String, sources: Seq[File], classpath: Seq[File], outputDirectory: File, options: Seq[String], log: Logger): Unit
 
-  private[sbt] final def generate(variant: String,
-                                  label: String,
-                                  docf: Gen,
-                                  sources: Seq[File],
-                                  classpath: Seq[File],
-                                  outputDirectory: File,
-                                  options: Seq[String],
-                                  maxErrors: Int,
-                                  log: Logger) {
+  private[sbt] final def generate(
+      variant: String,
+      label: String,
+      docf: Gen,
+      sources: Seq[File],
+      classpath: Seq[File],
+      outputDirectory: File,
+      options: Seq[String],
+      maxErrors: Int,
+      log: Logger) {
     val logSnip = variant + " API documentation"
     if (sources.isEmpty)
       log.info("No sources available, skipping " + logSnip + "...")
     else {
-      log.info("Generating " + logSnip + " for " + label + " sources to " +
+      log.info(
+        "Generating " + logSnip + " for " + label + " sources to " +
           outputDirectory.absolutePath + "...")
       IO.delete(outputDirectory)
       IO.createDirectory(outputDirectory)

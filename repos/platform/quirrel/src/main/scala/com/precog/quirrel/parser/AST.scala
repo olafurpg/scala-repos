@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -46,27 +46,31 @@ trait AST extends Phases {
 
   def printSExp(tree: Expr, indent: String = ""): String = tree match {
     case Add(_, left, right) =>
-      "%s(+\n%s\n%s)".format(indent,
-                             printSExp(left, indent + "  "),
-                             printSExp(right, indent + "  "))
+      "%s(+\n%s\n%s)".format(
+        indent,
+        printSExp(left, indent + "  "),
+        printSExp(right, indent + "  "))
     case Sub(_, left, right) =>
-      "%s(-\n%s\n%s)".format(indent,
-                             printSExp(left, indent + "  "),
-                             printSExp(right, indent + "  "))
+      "%s(-\n%s\n%s)".format(
+        indent,
+        printSExp(left, indent + "  "),
+        printSExp(right, indent + "  "))
     case Mul(_, left, right) =>
-      "%s(*\n%s\n%s)".format(indent,
-                             printSExp(left, indent + "  "),
-                             printSExp(right, indent + "  "))
+      "%s(*\n%s\n%s)".format(
+        indent,
+        printSExp(left, indent + "  "),
+        printSExp(right, indent + "  "))
     case Div(_, left, right) =>
-      "%s(/\n%s\n%s)".format(indent,
-                             printSExp(left, indent + "  "),
-                             printSExp(right, indent + "  "))
+      "%s(/\n%s\n%s)".format(
+        indent,
+        printSExp(left, indent + "  "),
+        printSExp(right, indent + "  "))
     case Neg(_, child) =>
       "%s(neg\n%s)".format(indent, printSExp(child, indent + "  "))
-    case Paren(_, child) => printSExp(child, indent)
+    case Paren(_, child)  => printSExp(child, indent)
     case NumLit(_, value) => indent + value
-    case TicVar(_, id) => indent + id
-    case _ => indent + "<unprintable>"
+    case TicVar(_, id)    => indent + id
+    case _                => indent + "<unprintable>"
   }
 
   def printInfix(tree: Expr): String = tree match {
@@ -78,11 +82,11 @@ trait AST extends Phases {
       "(%s * %s)".format(printInfix(left), printInfix(right))
     case Div(_, left, right) =>
       "(%s / %s)".format(printInfix(left), printInfix(right))
-    case Neg(_, child) => "neg%s".format(printInfix(child))
-    case Paren(_, child) => "(%s)".format(printInfix(child))
+    case Neg(_, child)    => "neg%s".format(printInfix(child))
+    case Paren(_, child)  => "(%s)".format(printInfix(child))
     case NumLit(_, value) => value
-    case TicVar(_, id) => id
-    case _ => "<unprintable>"
+    case TicVar(_, id)    => id
+    case _                => "<unprintable>"
   }
 
   def prettyPrint(e: Expr, level: Int = 0): String = {
@@ -90,262 +94,271 @@ trait AST extends Phases {
 
     val back = e match {
       case e @ Let(loc, id, params, left, right) => {
-          val paramStr = params map { indent + "  - " + _ } mkString "\n"
+        val paramStr = params map { indent + "  - " + _ } mkString "\n"
 
-          indent + "type: let\n" + indent + "id: " + id + "\n" + indent +
+        indent + "type: let\n" + indent + "id: " + id + "\n" + indent +
           "params:\n" + paramStr + "\n" + indent + "left:\n" +
           prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
           prettyPrint(right, level + 2)
-        }
+      }
 
       case Solve(loc, constraints, child) => {
-          val constraintsStr =
-            constraints map { indent + "  -\n" + prettyPrint(_, level + 4) } mkString "\n"
+        val constraintsStr =
+          constraints map { indent + "  -\n" + prettyPrint(_, level + 4) } mkString "\n"
 
-          indent + "type: solve\n" + indent + "constraints:\n" +
+        indent + "type: solve\n" + indent + "constraints:\n" +
           constraintsStr + "\n" + indent + "child:\n" + prettyPrint(
-              child, level + 2)
-        }
+          child,
+          level + 2)
+      }
 
       case Import(loc, spec, child) => {
-          val specStr = spec match {
-            case WildcardImport(prefix) => prefix mkString ("", "::", "::_")
-            case SpecificImport(prefix) => prefix mkString "::"
-          }
-
-          indent + "type: import\n" + indent + "spec: " + specStr + indent +
-          "child: \n" + prettyPrint(child, level + 2)
+        val specStr = spec match {
+          case WildcardImport(prefix) => prefix mkString ("", "::", "::_")
+          case SpecificImport(prefix) => prefix mkString "::"
         }
+
+        indent + "type: import\n" + indent + "spec: " + specStr + indent +
+          "child: \n" + prettyPrint(child, level + 2)
+      }
 
       case Assert(loc, pred, child) => {
-          indent + "type: assert\n" + indent + "pred: " +
+        indent + "type: assert\n" + indent + "pred: " +
           prettyPrint(pred, level + 2) + indent + "child: \n" + prettyPrint(
-              child, level + 2)
-        }
+          child,
+          level + 2)
+      }
 
       case Observe(loc, data, samples) => {
-          indent + "type: observe\n" + indent + "data: " +
+        indent + "type: observe\n" + indent + "data: " +
           prettyPrint(data, level + 2) + indent + "samples: \n" + prettyPrint(
-              samples, level + 2)
-        }
+          samples,
+          level + 2)
+      }
 
       case New(loc, child) => {
-          indent + "type: new\n" + indent + "child:\n" + prettyPrint(
-              child, level + 2)
-        }
+        indent + "type: new\n" + indent + "child:\n" + prettyPrint(
+          child,
+          level + 2)
+      }
 
       case Relate(loc, from: Expr, to: Expr, in: Expr) => {
-          indent + "type: \n" + indent + "from:\n" +
+        indent + "type: \n" + indent + "from:\n" +
           prettyPrint(from, level + 2) + "\n" + indent + "to:\n" +
           prettyPrint(to, level + 2) + "\n" + indent + "in:\n" + prettyPrint(
-              in, level + 2)
-        }
+          in,
+          level + 2)
+      }
 
       case t @ TicVar(loc, id) => {
-          indent + "type: ticvar\n" + indent + "id: " + id + "\n" + indent +
+        indent + "type: ticvar\n" + indent + "id: " + id + "\n" + indent +
           "binding: " + t.binding.toString
-        }
+      }
 
       case StrLit(loc, value) => {
-          indent + "type: str\n" + indent + "value: " + value
-        }
+        indent + "type: str\n" + indent + "value: " + value
+      }
 
       case NumLit(loc, value) => {
-          indent + "type: num\n" + indent + "value: " + value
-        }
+        indent + "type: num\n" + indent + "value: " + value
+      }
 
       case BoolLit(loc, value) => {
-          indent + "type: bool\n" + indent + "value: " + value
-        }
+        indent + "type: bool\n" + indent + "value: " + value
+      }
 
       case UndefinedLit(loc) => {
-          indent + "type: undefined\n"
-        }
+        indent + "type: undefined\n"
+      }
 
       case NullLit(loc) => {
-          indent + "type: null\n"
-        }
+        indent + "type: null\n"
+      }
 
       case ObjectDef(loc, props) => {
-          val propStr =
-            props map {
-              case (name, value) => {
-                  indent + "  - \n" + indent + "    name: " + name + "\n" +
-                  indent + "    value:\n" + prettyPrint(value, level + 6)
-                }
-            } mkString "\n"
+        val propStr =
+          props map {
+            case (name, value) => {
+              indent + "  - \n" + indent + "    name: " + name + "\n" +
+                indent + "    value:\n" + prettyPrint(value, level + 6)
+            }
+          } mkString "\n"
 
-          indent + "type: object\n" + indent + "properties:\n" + propStr
-        }
+        indent + "type: object\n" + indent + "properties:\n" + propStr
+      }
 
       case ArrayDef(loc, values) => {
-          val valStr =
-            values map { indent + "  -\n" + prettyPrint(_, level + 4) } mkString "\n"
+        val valStr =
+          values map { indent + "  -\n" + prettyPrint(_, level + 4) } mkString "\n"
 
-          indent + "type: array\n" + indent + "values:\n" + valStr
-        }
+        indent + "type: array\n" + indent + "values:\n" + valStr
+      }
 
       case Descent(loc, child, property) => {
-          indent + "type: descent\n" + indent + "child:\n" +
+        indent + "type: descent\n" + indent + "child:\n" +
           prettyPrint(child, level + 2) + "\n" + indent + "property: " +
           property
-        }
+      }
 
       case MetaDescent(loc, child, property) => {
-          indent + "type: meta-descent\n" + indent + "child:\n" +
+        indent + "type: meta-descent\n" + indent + "child:\n" +
           prettyPrint(child, level + 2) + "\n" + indent + "property: " +
           property
-        }
+      }
 
       case Deref(loc, left, right) => {
-          indent + "type: deref\n" + indent + "left:\n" + prettyPrint(
-              left, level + 2) + "\n"
-          indent + "right:\n" + prettyPrint(right, level + 2)
-        }
+        indent + "type: deref\n" + indent + "left:\n" + prettyPrint(
+          left,
+          level + 2) + "\n"
+        indent + "right:\n" + prettyPrint(right, level + 2)
+      }
 
       case d @ Dispatch(loc, name, actuals) => {
-          val actualsStr =
-            actuals map { indent + "  -\n" + prettyPrint(_, level + 4) } mkString "\n"
+        val actualsStr =
+          actuals map { indent + "  -\n" + prettyPrint(_, level + 4) } mkString "\n"
 
-          indent + "type: dispatch\n" + indent + "name: " + name + "\n" +
+        indent + "type: dispatch\n" + indent + "name: " + name + "\n" +
           indent + "actuals:\n" + actualsStr + "\n" + indent + "binding: " +
           d.binding.toString + "\n" + indent + "is-reduction: " + d.isReduction
-        }
+      }
 
       case Cond(loc, pred, left, right) =>
         indent + "type: cond\n" + indent + "pred:\n" +
-        prettyPrint(pred, level + 2) + "\n" + indent + "left:\n" +
-        prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
-        prettyPrint(right, level + 2)
+          prettyPrint(pred, level + 2) + "\n" + indent + "left:\n" +
+          prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
+          prettyPrint(right, level + 2)
 
       case Where(loc, left, right) => {
-          indent + "type: where\n" + indent + "left:\n" +
+        indent + "type: where\n" + indent + "left:\n" +
           prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
           prettyPrint(right, level + 2)
-        }
+      }
 
       case With(loc, left, right) => {
-          indent + "type: with\n" + indent + "left:\n" +
+        indent + "type: with\n" + indent + "left:\n" +
           prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
           prettyPrint(right, level + 2)
-        }
+      }
 
       case Union(loc, left, right) => {
-          indent + "type: union\n" + indent + "left:\n" +
+        indent + "type: union\n" + indent + "left:\n" +
           prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
           prettyPrint(right, level + 2)
-        }
+      }
 
       case Intersect(loc, left, right) => {
-          indent + "type: intersect\n" + indent + "left:\n" +
+        indent + "type: intersect\n" + indent + "left:\n" +
           prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
           prettyPrint(right, level + 2)
-        }
+      }
 
       case Difference(loc, left, right) => {
-          indent + "type: without\n" + indent + "left:\n" +
+        indent + "type: without\n" + indent + "left:\n" +
           prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
           prettyPrint(right, level + 2)
-        }
+      }
 
       case Add(loc, left, right) => {
-          indent + "type: add\n" + indent + "left:\n" +
+        indent + "type: add\n" + indent + "left:\n" +
           prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
           prettyPrint(right, level + 2)
-        }
+      }
 
       case Sub(loc, left, right) => {
-          indent + "type: sub\n" + indent + "left:\n" +
+        indent + "type: sub\n" + indent + "left:\n" +
           prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
           prettyPrint(right, level + 2)
-        }
+      }
 
       case Mul(loc, left, right) => {
-          indent + "type: mul\n" + indent + "left:\n" +
+        indent + "type: mul\n" + indent + "left:\n" +
           prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
           prettyPrint(right, level + 2)
-        }
+      }
 
       case Div(loc, left, right) => {
-          indent + "type: div\n" + indent + "left:\n" +
+        indent + "type: div\n" + indent + "left:\n" +
           prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
           prettyPrint(right, level + 2)
-        }
+      }
 
       case Mod(loc, left, right) => {
-          indent + "type: mod\n" + indent + "left:\n" +
+        indent + "type: mod\n" + indent + "left:\n" +
           prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
           prettyPrint(right, level + 2)
-        }
+      }
 
       case Pow(loc, left, right) => {
-          indent + "type: pow\n" + indent + "left:\n" +
+        indent + "type: pow\n" + indent + "left:\n" +
           prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
           prettyPrint(right, level + 2)
-        }
+      }
 
       case Lt(loc, left, right) => {
-          indent + "type: lt\n" + indent + "left:\n" +
+        indent + "type: lt\n" + indent + "left:\n" +
           prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
           prettyPrint(right, level + 2)
-        }
+      }
 
       case LtEq(loc, left, right) => {
-          indent + "type: LtEq\n" + indent + "left:\n" +
+        indent + "type: LtEq\n" + indent + "left:\n" +
           prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
           prettyPrint(right, level + 2)
-        }
+      }
 
       case Gt(loc, left, right) => {
-          indent + "type: gt\n" + indent + "left:\n" +
+        indent + "type: gt\n" + indent + "left:\n" +
           prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
           prettyPrint(right, level + 2)
-        }
+      }
 
       case GtEq(loc, left, right) => {
-          indent + "type: GtEq\n" + indent + "left:\n" +
+        indent + "type: GtEq\n" + indent + "left:\n" +
           prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
           prettyPrint(right, level + 2)
-        }
+      }
 
       case Eq(loc, left, right) => {
-          indent + "type: eq\n" + indent + "left:\n" +
+        indent + "type: eq\n" + indent + "left:\n" +
           prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
           prettyPrint(right, level + 2)
-        }
+      }
 
       case NotEq(loc, left, right) => {
-          indent + "type: noteq\n" + indent + "left:\n" +
+        indent + "type: noteq\n" + indent + "left:\n" +
           prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
           prettyPrint(right, level + 2)
-        }
+      }
 
       case Or(loc, left, right) => {
-          indent + "type: or\n" + indent + "left:\n" +
+        indent + "type: or\n" + indent + "left:\n" +
           prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
           prettyPrint(right, level + 2)
-        }
+      }
 
       case And(loc, left, right) => {
-          indent + "type: and\n" + indent + "left:\n" +
+        indent + "type: and\n" + indent + "left:\n" +
           prettyPrint(left, level + 2) + "\n" + indent + "right:\n" +
           prettyPrint(right, level + 2)
-        }
+      }
 
       case Comp(loc, child) => {
-          indent + "type: comp\n" + indent + "child:\n" + prettyPrint(
-              child, level + 2)
-        }
+        indent + "type: comp\n" + indent + "child:\n" + prettyPrint(
+          child,
+          level + 2)
+      }
 
       case Neg(loc, child) => {
-          indent + "type: neg\n" + indent + "child:\n" + prettyPrint(
-              child, level + 2)
-        }
+        indent + "type: neg\n" + indent + "child:\n" + prettyPrint(
+          child,
+          level + 2)
+      }
 
       case Paren(loc, child) => {
-          indent + "type: paren\n" + indent + "child:\n" + prettyPrint(
-              child, level + 2)
-        }
+        indent + "type: paren\n" + indent + "child:\n" + prettyPrint(
+          child,
+          level + 2)
+      }
     }
 
     val constraintStr =
@@ -354,8 +367,8 @@ trait AST extends Phases {
       } getOrElse ""
 
     indent + "nodeId: " + e.nodeId + "\n" + indent + "line: " + e.loc.lineNum +
-    "\n" + indent + "col: " + e.loc.colNum + "\n" + back + "\n" + indent +
-    "provenance: " + e.provenance.toString + constraintStr
+      "\n" + indent + "col: " + e.loc.colNum + "\n" + back + "\n" + indent +
+      "provenance: " + e.provenance.toString + constraintStr
   }
 
   protected def bindRoot(root: Expr, e: Expr) {
@@ -364,9 +377,9 @@ trait AST extends Phases {
         case e: Expr => bindRoot(root, e)
 
         case (e1: Expr, e2: Expr) => {
-            bindRoot(root, e1)
-            bindRoot(root, e2)
-          }
+          bindRoot(root, e1)
+          bindRoot(root, e2)
+        }
 
         case (e: Expr, _) => bindRoot(root, e)
         case (_, e: Expr) => bindRoot(root, e)
@@ -378,9 +391,9 @@ trait AST extends Phases {
     e.root = root
 
     e.productIterator foreach {
-      case e: Expr => bindRoot(root, e)
+      case e: Expr      => bindRoot(root, e)
       case v: Vector[_] => v foreach bindElements
-      case _ =>
+      case _            =>
     }
   }
 
@@ -463,7 +476,7 @@ trait AST extends Phases {
       val result =
         productIterator map {
           case ls: LineStream => "<%d:%d>".format(ls.lineNum, ls.colNum)
-          case x => x.toString
+          case x              => x.toString
         }
 
       productPrefix + "(%s)".format(result mkString ",")
@@ -472,21 +485,21 @@ trait AST extends Phases {
     def equalsIgnoreLoc(that: Expr): Boolean = (this, that) match {
       case (a, b) if a == b => true
 
-      case (Let(_, id1, params1, left1, right1),
-            Let(_, id2, params2, left2, right2)) =>
+      case (
+          Let(_, id1, params1, left1, right1),
+          Let(_, id2, params2, left2, right2)) =>
         (id1 == id2) && (params1 == params2) && (left1 equalsIgnoreLoc left2) &&
-        (right1 equalsIgnoreLoc right2)
+          (right1 equalsIgnoreLoc right2)
 
-      case (Solve(_, constraints1, child1), Solve(_, constraints2, child2)) =>
-        {
-          val sizing = constraints1.length == constraints2.length
-          val contents =
-            constraints1 zip constraints2 forall {
-              case (e1, e2) => e1 equalsIgnoreLoc e2
-            }
+      case (Solve(_, constraints1, child1), Solve(_, constraints2, child2)) => {
+        val sizing = constraints1.length == constraints2.length
+        val contents =
+          constraints1 zip constraints2 forall {
+            case (e1, e2) => e1 equalsIgnoreLoc e2
+          }
 
-          sizing && contents && (child1 equalsIgnoreLoc child2)
-        }
+        sizing && contents && (child1 equalsIgnoreLoc child2)
+      }
 
       case (Import(_, spec1, child1), Import(_, spec2, child2)) =>
         (child1 equalsIgnoreLoc child2) && (spec1 == spec2)
@@ -502,7 +515,7 @@ trait AST extends Phases {
 
       case (Relate(_, from1, to1, in1), Relate(_, from2, to2, in2)) =>
         (from1 equalsIgnoreLoc from2) && (to1 equalsIgnoreLoc to2) &&
-        (in1 equalsIgnoreLoc in2)
+          (in1 equalsIgnoreLoc in2)
 
       case (TicVar(_, id1), TicVar(_, id2)) =>
         id1 == id2
@@ -523,53 +536,55 @@ trait AST extends Phases {
         true
 
       case (ObjectDef(_, props1), ObjectDef(_, props2)) => {
-          // TODO ordering
-          val sizing = props1.length == props2.length
-          val contents =
-            props1 zip props2 forall {
-              case ((key1, value1), (key2, value2)) =>
-                (key1 == key2) && (value1 equalsIgnoreLoc value2)
-            }
+        // TODO ordering
+        val sizing = props1.length == props2.length
+        val contents =
+          props1 zip props2 forall {
+            case ((key1, value1), (key2, value2)) =>
+              (key1 == key2) && (value1 equalsIgnoreLoc value2)
+          }
 
-          sizing && contents
-        }
+        sizing && contents
+      }
 
       case (ArrayDef(_, values1), ArrayDef(_, values2)) => {
-          val sizing = values1.length == values2.length
-          val contents =
-            values1 zip values2 forall {
-              case (e1, e2) => e1 equalsIgnoreLoc e2
-            }
+        val sizing = values1.length == values2.length
+        val contents =
+          values1 zip values2 forall {
+            case (e1, e2) => e1 equalsIgnoreLoc e2
+          }
 
-          sizing && contents
-        }
+        sizing && contents
+      }
 
       case (Descent(_, child1, property1), Descent(_, child2, property2)) =>
         (child1 equalsIgnoreLoc child2) && (property1 == property2)
 
-      case (MetaDescent(_, child1, property1),
-            MetaDescent(_, child2, property2)) =>
+      case (
+          MetaDescent(_, child1, property1),
+          MetaDescent(_, child2, property2)) =>
         (child1 equalsIgnoreLoc child2) && (property1 == property2)
 
       case (Deref(_, left1, right1), Deref(_, left2, right2)) =>
         (left1 equalsIgnoreLoc left2) && (right1 equalsIgnoreLoc right2)
 
-      case (d1 @ Dispatch(_, name1, actuals1),
-            d2 @ Dispatch(_, name2, actuals2)) => {
-          val naming = name1 == name2
-          val sizing = actuals1.length == actuals2.length
-          val binding = d1.binding == d2.binding
-          val contents =
-            actuals1 zip actuals2 forall {
-              case (e1, e2) => e1 equalsIgnoreLoc e2
-            }
+      case (
+          d1 @ Dispatch(_, name1, actuals1),
+          d2 @ Dispatch(_, name2, actuals2)) => {
+        val naming = name1 == name2
+        val sizing = actuals1.length == actuals2.length
+        val binding = d1.binding == d2.binding
+        val contents =
+          actuals1 zip actuals2 forall {
+            case (e1, e2) => e1 equalsIgnoreLoc e2
+          }
 
-          naming && sizing && binding && contents
-        }
+        naming && sizing && binding && contents
+      }
 
       case (Cond(_, pred1, left1, right1), Cond(_, pred2, left2, right2)) =>
         (pred1 equalsIgnoreLoc pred2) && (left1 equalsIgnoreLoc left2) &&
-        (right1 equalsIgnoreLoc right2)
+          (right1 equalsIgnoreLoc right2)
 
       case (Where(_, left1, right1), Where(_, left2, right2)) =>
         (left1 equalsIgnoreLoc left2) && (right1 equalsIgnoreLoc right2)
@@ -638,7 +653,7 @@ trait AST extends Phases {
     def hashCodeIgnoreLoc: Int = this match {
       case Let(_, id, params, left, right) =>
         id.hashCode + params.hashCode + left.hashCodeIgnoreLoc +
-        right.hashCodeIgnoreLoc
+          right.hashCodeIgnoreLoc
 
       case Solve(_, constraints, child) =>
         (constraints map { _.hashCodeIgnoreLoc } sum) + child.hashCodeIgnoreLoc
@@ -670,10 +685,10 @@ trait AST extends Phases {
       case NullLit(_) => "null".hashCode
 
       case ObjectDef(_, props) => {
-          props map {
-            case (key, value) => key.hashCode + value.hashCodeIgnoreLoc
-          } sum
-        }
+        props map {
+          case (key, value) => key.hashCode + value.hashCodeIgnoreLoc
+        } sum
+      }
 
       case ArrayDef(_, values) =>
         values map { _.hashCodeIgnoreLoc } sum
@@ -689,11 +704,11 @@ trait AST extends Phases {
 
       case d @ Dispatch(_, name, actuals) =>
         name.hashCode + d.binding.hashCode +
-        (actuals map { _.hashCodeIgnoreLoc } sum)
+          (actuals map { _.hashCodeIgnoreLoc } sum)
 
       case Cond(_, pred, left, right) =>
         "if".hashCode + pred.hashCodeIgnoreLoc + "then".hashCode +
-        left.hashCodeIgnoreLoc + "else".hashCode + right.hashCodeIgnoreLoc
+          left.hashCodeIgnoreLoc + "else".hashCode + right.hashCodeIgnoreLoc
 
       case Where(_, left, right) =>
         left.hashCodeIgnoreLoc + "where".hashCode + right.hashCodeIgnoreLoc
@@ -767,7 +782,7 @@ trait AST extends Phases {
   private[quirrel] case class ExprWrapper(expr: Expr) {
     override def equals(a: Any): Boolean = a match {
       case ExprWrapper(expr2) => expr equalsIgnoreLoc expr2
-      case _ => false
+      case _                  => false
     }
 
     override def hashCode = expr.hashCodeIgnoreLoc
@@ -848,11 +863,12 @@ trait AST extends Phases {
      * Raw AST nodes
      */
 
-    final case class Let(loc: LineStream,
-                         name: Identifier,
-                         params: Vector[String],
-                         left: Expr,
-                         right: Expr)
+    final case class Let(
+        loc: LineStream,
+        name: Identifier,
+        params: Vector[String],
+        left: Expr,
+        right: Expr)
         extends PrecedenceUnaryNode {
       val sym = 'let
 
@@ -888,15 +904,18 @@ trait AST extends Phases {
     }
 
     final case class Solve(
-        loc: LineStream, constraints: Vector[Expr], child: Expr)
-        extends Expr with Node {
+        loc: LineStream,
+        constraints: Vector[Expr],
+        child: Expr)
+        extends Expr
+        with Node {
       val sym = 'solve
 
       def form =
         'solve ~
-        (constraints.init map { _ ~ 'comma } reduceOption { _ ~ _ } map {
-              _ ~ constraints.last ~ child
-            } getOrElse (constraints.last ~ child))
+          (constraints.init map { _ ~ 'comma } reduceOption { _ ~ _ } map {
+            _ ~ constraints.last ~ child
+          } getOrElse (constraints.last ~ child))
 
       def children = child +: constraints toList
 
@@ -906,7 +925,7 @@ trait AST extends Phases {
 
       lazy val criticalConstraints = constraints filter {
         case TicVar(_, _) => false
-        case _ => true
+        case _            => true
       } toSet
 
       private val _buckets =
@@ -921,7 +940,9 @@ trait AST extends Phases {
     }
 
     final case class Import(loc: LineStream, spec: ImportSpec, child: Expr)
-        extends Expr with UnaryOp with PrecedenceUnaryNode {
+        extends Expr
+        with UnaryOp
+        with PrecedenceUnaryNode {
       val sym = 'import
       val isPrefix = true
     }
@@ -947,13 +968,15 @@ trait AST extends Phases {
     }
 
     final case class New(loc: LineStream, child: Expr)
-        extends Expr with PrecedenceUnaryNode {
+        extends Expr
+        with PrecedenceUnaryNode {
       val sym = 'new
       val isPrefix = true
     }
 
     final case class Relate(loc: LineStream, from: Expr, to: Expr, in: Expr)
-        extends Expr with Node {
+        extends Expr
+        with Node {
       val sym = 'relate
 
       def form = from ~ 'relate ~ to ~ in
@@ -991,7 +1014,8 @@ trait AST extends Phases {
     }
 
     final case class ObjectDef(loc: LineStream, props: Vector[(String, Expr)])
-        extends Expr with NaryOp {
+        extends Expr
+        with NaryOp {
       val sym = 'object
 
       def values = props map { _._2 }
@@ -1007,7 +1031,8 @@ trait AST extends Phases {
     }
 
     final case class ArrayDef(loc: LineStream, values: Vector[Expr])
-        extends Expr with NaryOp {
+        extends Expr
+        with NaryOp {
       val sym = 'array
 
       def form = {
@@ -1020,28 +1045,35 @@ trait AST extends Phases {
     }
 
     final case class Descent(loc: LineStream, child: Expr, property: String)
-        extends Expr with UnaryOp with PrecedenceUnaryNode {
+        extends Expr
+        with UnaryOp
+        with PrecedenceUnaryNode {
       val sym = 'descent
       val isPrefix = false
     }
 
-    final case class MetaDescent(
-        loc: LineStream, child: Expr, property: String)
-        extends Expr with UnaryOp with PrecedenceUnaryNode {
+    final case class MetaDescent(loc: LineStream, child: Expr, property: String)
+        extends Expr
+        with UnaryOp
+        with PrecedenceUnaryNode {
       val sym = 'metaDescent
       val isPrefix = false
     }
 
     final case class Deref(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with BinaryOp {
+        extends Expr
+        with BinaryOp {
       val sym = 'deref
 
       override def form = left ~ 'leftBracket ~ right ~ 'rightBracket
     }
 
     final case class Dispatch(
-        loc: LineStream, name: Identifier, actuals: Vector[Expr])
-        extends Expr with NaryOp {
+        loc: LineStream,
+        name: Identifier,
+        actuals: Vector[Expr])
+        extends Expr
+        with NaryOp {
       val sym = 'dispatch
 
       def values = actuals
@@ -1064,7 +1096,8 @@ trait AST extends Phases {
     }
 
     final case class Cond(loc: LineStream, pred: Expr, left: Expr, right: Expr)
-        extends Expr with NaryOp {
+        extends Expr
+        with NaryOp {
       val sym = 'cond
 
       def values = Vector(pred, left, right)
@@ -1075,120 +1108,144 @@ trait AST extends Phases {
     }
 
     final case class Where(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with BinaryOp {
+        extends Expr
+        with BinaryOp {
       val sym = 'where
       override val disallowsInfinite = true
     }
 
     final case class With(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with BinaryOp {
+        extends Expr
+        with BinaryOp {
       val sym = 'with
       override val disallowsInfinite = true
     }
 
     final case class Union(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with BinaryOp {
+        extends Expr
+        with BinaryOp {
       val sym = 'union
     }
 
     final case class Intersect(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with BinaryOp {
+        extends Expr
+        with BinaryOp {
       val sym = 'intersect
     }
 
     final case class Difference(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with BinaryOp {
+        extends Expr
+        with BinaryOp {
       val sym = 'difference
     }
 
     final case class Add(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with BinaryOp {
+        extends Expr
+        with BinaryOp {
       val sym = 'add
     }
 
     final case class Sub(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with BinaryOp {
+        extends Expr
+        with BinaryOp {
       val sym = 'sub
     }
 
     final case class Mul(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with BinaryOp {
+        extends Expr
+        with BinaryOp {
       val sym = 'mul
     }
 
     final case class Div(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with BinaryOp {
+        extends Expr
+        with BinaryOp {
       val sym = 'div
     }
 
     final case class Mod(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with BinaryOp {
+        extends Expr
+        with BinaryOp {
       val sym = 'mod
     }
 
     final case class Pow(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with BinaryOp {
+        extends Expr
+        with BinaryOp {
       val sym = 'pow
     }
 
     final case class Lt(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with ComparisonOp {
+        extends Expr
+        with ComparisonOp {
       val sym = 'lt
     }
 
     final case class LtEq(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with ComparisonOp {
+        extends Expr
+        with ComparisonOp {
       val sym = 'lteq
     }
 
     final case class Gt(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with ComparisonOp {
+        extends Expr
+        with ComparisonOp {
       val sym = 'gt
     }
 
     final case class GtEq(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with ComparisonOp {
+        extends Expr
+        with ComparisonOp {
       val sym = 'gteq
     }
 
     final case class Eq(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with ComparisonOp {
+        extends Expr
+        with ComparisonOp {
       val sym = 'eq
       override val disallowsInfinite = true
     }
 
     final case class NotEq(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with ComparisonOp {
+        extends Expr
+        with ComparisonOp {
       val sym = 'noteq
       override val disallowsInfinite = true
     }
 
     final case class And(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with BinaryOp {
+        extends Expr
+        with BinaryOp {
       val sym = 'and
       override val disallowsInfinite = true
     }
 
     final case class Or(loc: LineStream, left: Expr, right: Expr)
-        extends Expr with BinaryOp {
+        extends Expr
+        with BinaryOp {
       val sym = 'or
       override val disallowsInfinite = true
     }
 
     final case class Comp(loc: LineStream, child: Expr)
-        extends Expr with UnaryOp with PrecedenceUnaryNode {
+        extends Expr
+        with UnaryOp
+        with PrecedenceUnaryNode {
       val sym = 'comp
       val isPrefix = true
     }
 
     final case class Neg(loc: LineStream, child: Expr)
-        extends Expr with UnaryOp with PrecedenceUnaryNode {
+        extends Expr
+        with UnaryOp
+        with PrecedenceUnaryNode {
       val sym = 'neg
       val isPrefix = true
     }
 
     final case class Paren(loc: LineStream, child: Expr)
-        extends Expr with UnaryOp {
+        extends Expr
+        with UnaryOp {
       val sym = 'paren
       def form = 'leftParen ~ child ~ 'rightParen
       def children = child :: Nil

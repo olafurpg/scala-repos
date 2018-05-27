@@ -32,7 +32,8 @@ import org.apache.spark.sql.hive.{HiveContext, HiveMetastoreTypes}
 
 private[hive] class SparkSQLDriver(
     val context: HiveContext = SparkSQLEnv.hiveContext)
-    extends Driver with Logging {
+    extends Driver
+    with Logging {
 
   private[hive] var tableSchema: Schema = _
   private[hive] var hiveResponse: Seq[String] = _
@@ -44,11 +45,14 @@ private[hive] class SparkSQLDriver(
     logDebug(s"Result Schema: ${analyzed.output}")
     if (analyzed.output.isEmpty) {
       new Schema(
-          Arrays.asList(new FieldSchema("Response code", "string", "")), null)
+        Arrays.asList(new FieldSchema("Response code", "string", "")),
+        null)
     } else {
       val fieldSchemas = analyzed.output.map { attr =>
         new FieldSchema(
-            attr.name, HiveMetastoreTypes.toMetastoreType(attr.dataType), "")
+          attr.name,
+          HiveMetastoreTypes.toMetastoreType(attr.dataType),
+          "")
       }
 
       new Schema(fieldSchemas.asJava, null)
@@ -67,11 +71,17 @@ private[hive] class SparkSQLDriver(
       case ae: AnalysisException =>
         logDebug(s"Failed in [$command]", ae)
         new CommandProcessorResponse(
-            1, ExceptionUtils.getStackTrace(ae), null, ae)
+          1,
+          ExceptionUtils.getStackTrace(ae),
+          null,
+          ae)
       case cause: Throwable =>
         logError(s"Failed in [$command]", cause)
         new CommandProcessorResponse(
-            1, ExceptionUtils.getStackTrace(cause), null, cause)
+          1,
+          ExceptionUtils.getStackTrace(cause),
+          null,
+          cause)
     }
   }
 

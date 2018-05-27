@@ -216,12 +216,10 @@ object M8 {
     override def toString(): String = {
       val buffer: StringBuilder = new StringBuilder();
       buffer.append('[');
-      foreach(
-          i =>
-            {
-          if (buffer.length > 1) { buffer.append(','); () }; // !!! ; ()
-          buffer.append(i);
-          ()
+      foreach(i => {
+        if (buffer.length > 1) { buffer.append(','); () }; // !!! ; ()
+        buffer.append(i);
+        ()
       });
       buffer.append(']');
       buffer.toString();
@@ -264,13 +262,13 @@ object M8 {
 
     def intersect0(that: IntSet, accu: IntSet): IntSet =
       right.intersect0(
+        that,
+        left.intersect0(
           that,
-          left.intersect0(
-              that, if (that.contains(elem)) accu.incl(elem) else accu));
+          if (that.contains(elem)) accu.incl(elem) else accu));
 
     def filter0(f: Int => Boolean, accu: IntSet): IntSet =
-      right.filter0(
-          f, left.filter0(f, if (f(elem)) accu.incl(elem) else accu));
+      right.filter0(f, left.filter0(f, if (f(elem)) accu.incl(elem) else accu));
   }
 
   def test = {

@@ -1,7 +1,14 @@
 package spire
 package std
 
-import spire.algebra.{EuclideanRing, IsIntegral, MetricSpace, NRoot, Order, Signed}
+import spire.algebra.{
+  EuclideanRing,
+  IsIntegral,
+  MetricSpace,
+  NRoot,
+  Order,
+  Signed
+}
 
 trait BigIntIsEuclideanRing extends EuclideanRing[BigInt] {
   override def minus(a: BigInt, b: BigInt): BigInt = a - b
@@ -27,7 +34,7 @@ trait BigIntIsNRoot extends NRoot[BigInt] {
       -nroot(-a, k)
     } else if (a < 0) {
       throw new ArithmeticException(
-          "Cannot find %d-root of negative number." format k)
+        "Cannot find %d-root of negative number." format k)
     } else {
       def findNroot(b: BigInt, i: Int): BigInt =
         if (i < 0) {
@@ -65,7 +72,9 @@ trait BigIntIsSigned extends Signed[BigInt] {
 }
 
 trait BigIntIsReal
-    extends IsIntegral[BigInt] with BigIntOrder with BigIntIsSigned
+    extends IsIntegral[BigInt]
+    with BigIntOrder
+    with BigIntIsSigned
     with Serializable {
   def toDouble(n: BigInt): Double = n.toDouble
   def toBigInt(n: BigInt): BigInt = n
@@ -77,8 +86,11 @@ trait BigIntIsMetricSpace extends MetricSpace[BigInt, BigInt] {
 
 @SerialVersionUID(0L)
 class BigIntAlgebra
-    extends BigIntIsEuclideanRing with BigIntIsNRoot with BigIntIsMetricSpace
-    with BigIntIsReal with Serializable
+    extends BigIntIsEuclideanRing
+    with BigIntIsNRoot
+    with BigIntIsMetricSpace
+    with BigIntIsReal
+    with Serializable
 
 trait BigIntInstances {
   implicit final val BigIntAlgebra = new BigIntAlgebra

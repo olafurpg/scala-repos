@@ -23,7 +23,7 @@ import scala.language.implicitConversions
 /**
   * Public API but not intended for subclassing
   */
-abstract class ServerSettings private[akka]()
+abstract class ServerSettings private[akka] ()
     extends akka.http.javadsl.settings.ServerSettings {
   self: ServerSettingsImpl ⇒
   def serverHeader: Option[Server]
@@ -98,8 +98,7 @@ abstract class ServerSettings private[akka]()
     self.copy(parserSettings = newValue)
   def withWebsocketRandomFactory(newValue: () ⇒ Random): ServerSettings =
     self.copy(websocketRandomFactory = newValue)
-  def withSocketOptions(
-      newValue: immutable.Seq[SocketOption]): ServerSettings =
+  def withSocketOptions(newValue: immutable.Seq[SocketOption]): ServerSettings =
     self.copy(socketOptions = newValue)
 }
 

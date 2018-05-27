@@ -8,14 +8,17 @@ import com.intellij.psi.{PsiElement, PsiWhiteSpace}
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScTypeElement
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypeBoundsOwner
-import org.jetbrains.plugins.scala.lang.psi.types.result.{TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  TypeResult,
+  TypingContext
+}
 import org.jetbrains.plugins.scala.lang.psi.types.{Any, Nothing, ScType}
 
 trait ScTypeBoundsOwnerImpl extends ScTypeBoundsOwner {
   //todo[CYCLIC]
   def lowerBound: TypeResult[ScType] =
     wrapWith(lowerTypeElement, Nothing) flatMap
-    (_.getType(TypingContext.empty))
+      (_.getType(TypingContext.empty))
 
   def upperBound: TypeResult[ScType] =
     wrapWith(upperTypeElement, Any) flatMap (_.getType(TypingContext.empty))
@@ -31,7 +34,7 @@ trait ScTypeBoundsOwnerImpl extends ScTypeBoundsOwner {
     if (tUpper != null) {
       ScalaPsiUtil.getNextSiblingOfType(tUpper, classOf[ScTypeElement]) match {
         case null => None
-        case te => Some(te)
+        case te   => Some(te)
       }
     } else None
   }
@@ -41,7 +44,7 @@ trait ScTypeBoundsOwnerImpl extends ScTypeBoundsOwner {
     if (tLower != null) {
       ScalaPsiUtil.getNextSiblingOfType(tLower, classOf[ScTypeElement]) match {
         case null => None
-        case te => Some(te)
+        case te   => Some(te)
       }
     } else None
   }
@@ -64,13 +67,14 @@ trait ScTypeBoundsOwnerImpl extends ScTypeBoundsOwner {
   override def removeImplicitBounds() {
     var node = getNode.getFirstChildNode
     while (node != null &&
-    !Set(ScalaTokenTypes.tCOLON, ScalaTokenTypes.tVIEW)(node.getElementType)) {
+           !Set(ScalaTokenTypes.tCOLON, ScalaTokenTypes.tVIEW)(
+             node.getElementType)) {
       node = node.getTreeNext
     }
     if (node == null) return
     node.getPsi.getPrevSibling match {
       case ws: PsiWhiteSpace => ws.delete()
-      case _ =>
+      case _                 =>
     }
     node.getTreeParent.removeRange(node, null)
   }

@@ -41,8 +41,10 @@ private[log] case object LogCleaningPaused extends LogCleaningState
   *  requested to be resumed.
   */
 private[log] class LogCleanerManager(
-    val logDirs: Array[File], val logs: Pool[TopicAndPartition, Log])
-    extends Logging with KafkaMetricsGroup {
+    val logDirs: Array[File],
+    val logs: Pool[TopicAndPartition, Log])
+    extends Logging
+    with KafkaMetricsGroup {
 
   override val loggerName = classOf[LogCleaner].getName
 
@@ -52,7 +54,7 @@ private[log] class LogCleanerManager(
   /* the offset checkpoints holding the last cleaned point for each log */
   private val checkpoints = logDirs
     .map(dir =>
-          (dir, new OffsetCheckpoint(new File(dir, offsetCheckpointFile))))
+      (dir, new OffsetCheckpoint(new File(dir, offsetCheckpointFile))))
     .toMap
 
   /* the set of logs currently being cleaned */
@@ -85,36 +87,44 @@ private[log] class LogCleanerManager(
   def grabFilthiestLog(): Option[LogToClean] = {
     inLock(lock) {
       val lastClean = allCleanerCheckpoints()
-      val dirtyLogs = logs.filter {
-        case (topicAndPartition, log) =>
-          log.config.compact // skip any logs marked for delete rather than dedupe
-      }.filterNot {
-        case (topicAndPartition, log) =>
-          inProgress.contains(topicAndPartition) // skip any logs already in-progress
-      }.map {
-        case (topicAndPartition, log) =>
-          // create a LogToClean instance for each
-          // if the log segments are abnormally truncated and hence the checkpointed offset
-          // is no longer valid, reset to the log starting offset and log the error event
-          val logStartOffset = log.logSegments.head.baseOffset
-          val firstDirtyOffset = {
-            val offset = lastClean.getOrElse(topicAndPartition, logStartOffset)
-            if (offset < logStartOffset) {
-              error("Resetting first dirty offset to log start offset %d since the checkpointed offset %d is invalid."
+      val dirtyLogs = logs
+        .filter {
+          case (topicAndPartition, log) =>
+            log.config.compact // skip any logs marked for delete rather than dedupe
+        }
+        .filterNot {
+          case (topicAndPartition, log) =>
+            inProgress.contains(topicAndPartition) // skip any logs already in-progress
+        }
+        .map {
+          case (topicAndPartition, log) =>
+            // create a LogToClean instance for each
+            // if the log segments are abnormally truncated and hence the checkpointed offset
+            // is no longer valid, reset to the log starting offset and log the error event
+            val logStartOffset = log.logSegments.head.baseOffset
+            val firstDirtyOffset = {
+              val offset =
+                lastClean.getOrElse(topicAndPartition, logStartOffset)
+              if (offset < logStartOffset) {
+                error(
+                  "Resetting first dirty offset to log start offset %d since the checkpointed offset %d is invalid."
                     .format(logStartOffset, offset))
-              logStartOffset
-            } else {
-              offset
+                logStartOffset
+              } else {
+                offset
+              }
             }
-          }
-          LogToClean(topicAndPartition, log, firstDirtyOffset)
-      }.filter(ltc => ltc.totalBytes > 0) // skip any empty logs
+            LogToClean(topicAndPartition, log, firstDirtyOffset)
+        }
+        .filter(ltc => ltc.totalBytes > 0) // skip any empty logs
 
-      this.dirtiestLogCleanableRatio = if (!dirtyLogs.isEmpty)
-        dirtyLogs.max.cleanableRatio else 0
+      this.dirtiestLogCleanableRatio =
+        if (!dirtyLogs.isEmpty)
+          dirtyLogs.max.cleanableRatio
+        else 0
       // and must meet the minimum threshold for dirty byte ratio
-      val cleanableLogs = dirtyLogs.filter(
-          ltc => ltc.cleanableRatio > ltc.log.config.minCleanableRatio)
+      val cleanableLogs = dirtyLogs.filter(ltc =>
+        ltc.cleanableRatio > ltc.log.config.minCleanableRatio)
       if (cleanableLogs.isEmpty) {
         None
       } else {
@@ -159,15 +169,16 @@ private[log] class LogCleanerManager(
               inProgress.put(topicAndPartition, LogCleaningAborted)
             case s =>
               throw new IllegalStateException(
-                  "Compaction for partition %s cannot be aborted and paused since it is in %s state."
-                    .format(topicAndPartition, s))
+                "Compaction for partition %s cannot be aborted and paused since it is in %s state."
+                  .format(topicAndPartition, s))
           }
       }
       while (!isCleaningInState(topicAndPartition, LogCleaningPaused)) pausedCleaningCond
         .await(100, TimeUnit.MILLISECONDS)
     }
-    info("The cleaning for partition %s is aborted and paused".format(
-            topicAndPartition))
+    info(
+      "The cleaning for partition %s is aborted and paused".format(
+        topicAndPartition))
   }
 
   /**
@@ -178,16 +189,16 @@ private[log] class LogCleanerManager(
       inProgress.get(topicAndPartition) match {
         case None =>
           throw new IllegalStateException(
-              "Compaction for partition %s cannot be resumed since it is not paused."
-                .format(topicAndPartition))
+            "Compaction for partition %s cannot be resumed since it is not paused."
+              .format(topicAndPartition))
         case Some(state) =>
           state match {
             case LogCleaningPaused =>
               inProgress.remove(topicAndPartition)
             case s =>
               throw new IllegalStateException(
-                  "Compaction for partition %s cannot be resumed since it is in %s state."
-                    .format(topicAndPartition, s))
+                "Compaction for partition %s cannot be resumed since it is in %s state."
+                  .format(topicAndPartition, s))
           }
       }
     }
@@ -197,8 +208,9 @@ private[log] class LogCleanerManager(
   /**
     *  Check if the cleaning for a partition is in a particular state. The caller is expected to hold lock while making the call.
     */
-  private def isCleaningInState(topicAndPartition: TopicAndPartition,
-                                expectedState: LogCleaningState): Boolean = {
+  private def isCleaningInState(
+      topicAndPartition: TopicAndPartition,
+      expectedState: LogCleaningState): Boolean = {
     inProgress.get(topicAndPartition) match {
       case None => false
       case Some(state) =>
@@ -218,7 +230,8 @@ private[log] class LogCleanerManager(
   }
 
   def updateCheckpoints(
-      dataDir: File, update: Option[(TopicAndPartition, Long)]) {
+      dataDir: File,
+      update: Option[(TopicAndPartition, Long)]) {
     inLock(lock) {
       val checkpoint = checkpoints(dataDir)
       val existing = checkpoint.read().filterKeys(logs.keys) ++ update
@@ -227,7 +240,9 @@ private[log] class LogCleanerManager(
   }
 
   def maybeTruncateCheckpoint(
-      dataDir: File, topicAndPartition: TopicAndPartition, offset: Long) {
+      dataDir: File,
+      topicAndPartition: TopicAndPartition,
+      offset: Long) {
     inLock(lock) {
       if (logs.get(topicAndPartition).config.compact) {
         val checkpoint = checkpoints(dataDir)
@@ -243,7 +258,9 @@ private[log] class LogCleanerManager(
     * Save out the endOffset and remove the given log from the in-progress set, if not aborted.
     */
   def doneCleaning(
-      topicAndPartition: TopicAndPartition, dataDir: File, endOffset: Long) {
+      topicAndPartition: TopicAndPartition,
+      dataDir: File,
+      endOffset: Long) {
     inLock(lock) {
       inProgress(topicAndPartition) match {
         case LogCleaningInProgress =>
@@ -254,8 +271,8 @@ private[log] class LogCleanerManager(
           pausedCleaningCond.signalAll()
         case s =>
           throw new IllegalStateException(
-              "In-progress partition %s cannot be in %s state.".format(
-                  topicAndPartition, s))
+            "In-progress partition %s cannot be in %s state."
+              .format(topicAndPartition, s))
       }
     }
   }

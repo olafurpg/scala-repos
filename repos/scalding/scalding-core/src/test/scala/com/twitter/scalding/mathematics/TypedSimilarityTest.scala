@@ -35,17 +35,18 @@ class TypedCosineSimJob(args: Args) extends Job(args) {
     }
   }
   // Just keep the degree
-  .map { edge =>
-    edge.mapData { _._2 }
-  }
+    .map { edge =>
+      edge.mapData { _._2 }
+    }
 
   simOf(graph, { n: Int =>
     n % 2 == 0
   }, { n: Int =>
     n % 2 == 1
   }).map { edge =>
-    (edge.from, edge.to, edge.data)
-  }.write(TypedTsv[(Int, Int, Double)]("out"))
+      (edge.from, edge.to, edge.data)
+    }
+    .write(TypedTsv[(Int, Int, Double)]("out"))
 }
 
 class TypedDimsumCosineSimJob(args: Args) extends Job(args) {
@@ -62,8 +63,10 @@ class TypedDimsumCosineSimJob(args: Args) extends Job(args) {
   }, { n: Int =>
     n % 2 == 1
   }).map { edge =>
-    (edge.from, edge.to, edge.data)
-  }.toPipe('from, 'to, 'data).write(TypedTsv[(Int, Int, Double)]("out"))
+      (edge.from, edge.to, edge.data)
+    }
+    .toPipe('from, 'to, 'data)
+    .write(TypedTsv[(Int, Int, Double)]("out"))
 }
 
 class TypedSimilarityTest extends WordSpec with Matchers {
@@ -96,8 +99,9 @@ class TypedSimilarityTest extends WordSpec with Matchers {
         seq.map { case (from, to) => (from, 1.0) }.toMap
     }
     for ((k1, v1) <- matrix if (k1 % 2 == 0);
-    (k2, v2) <- matrix if (k2 % 2 == 1)) yield
-    ((k1, k2) -> (dot(v1, v2) / scala.math.sqrt(dot(v1, v1) * dot(v2, v2))))
+         (k2, v2) <- matrix if (k2 % 2 == 1))
+      yield
+        ((k1, k2) -> (dot(v1, v2) / scala.math.sqrt(dot(v1, v1) * dot(v2, v2))))
   }
 
   def weightedCosineOf(es: Seq[(Int, Int, Double)]): Map[(Int, Int), Double] = {
@@ -107,8 +111,9 @@ class TypedSimilarityTest extends WordSpec with Matchers {
         seq.map { case (from, to, weight) => (from, weight) }.toMap
     }
     for ((k1, v1) <- matrix if (k1 % 2 == 0);
-    (k2, v2) <- matrix if (k2 % 2 == 1)) yield
-    ((k1, k2) -> (dot(v1, v2) / scala.math.sqrt(dot(v1, v1) * dot(v2, v2))))
+         (k2, v2) <- matrix if (k2 % 2 == 1))
+      yield
+        ((k1, k2) -> (dot(v1, v2) / scala.math.sqrt(dot(v1, v1) * dot(v2, v2))))
   }
 
   "A TypedCosineJob" should {

@@ -59,19 +59,20 @@ case class FakeRequest[A](
       headers: Headers = this.headers,
       remoteAddress: String = this.remoteAddress,
       secure: Boolean = this.secure,
-      clientCertificateChain: Option[Seq[X509Certificate]] = this.clientCertificateChain,
+      clientCertificateChain: Option[Seq[X509Certificate]] =
+        this.clientCertificateChain,
       body: B = this.body): FakeRequest[B] = {
     new FakeRequest[B](
-        method,
-        uri,
-        headers,
-        body,
-        remoteAddress,
-        version,
-        id,
-        tags,
-        secure,
-        clientCertificateChain
+      method,
+      uri,
+      headers,
+      body,
+      remoteAddress,
+      version,
+      id,
+      tags,
+      secure,
+      clientCertificateChain
     )
   }
 
@@ -98,9 +99,9 @@ case class FakeRequest[A](
     */
   def withFlash(data: (String, String)*): FakeRequest[A] = {
     withHeaders(
-        play.api.http.HeaderNames.COOKIE -> Cookies.mergeCookieHeader(
-            headers.get(play.api.http.HeaderNames.COOKIE).getOrElse(""),
-            Seq(Flash.encodeAsCookie(new Flash(flash.data ++ data)))))
+      play.api.http.HeaderNames.COOKIE -> Cookies.mergeCookieHeader(
+        headers.get(play.api.http.HeaderNames.COOKIE).getOrElse(""),
+        Seq(Flash.encodeAsCookie(new Flash(flash.data ++ data)))))
   }
 
   /**
@@ -108,9 +109,9 @@ case class FakeRequest[A](
     */
   def withCookies(cookies: Cookie*): FakeRequest[A] = {
     withHeaders(
-        play.api.http.HeaderNames.COOKIE -> Cookies.mergeCookieHeader(
-            headers.get(play.api.http.HeaderNames.COOKIE).getOrElse(""),
-            cookies))
+      play.api.http.HeaderNames.COOKIE -> Cookies.mergeCookieHeader(
+        headers.get(play.api.http.HeaderNames.COOKIE).getOrElse(""),
+        cookies))
   }
 
   /**
@@ -118,10 +119,9 @@ case class FakeRequest[A](
     */
   def withSession(newSessions: (String, String)*): FakeRequest[A] = {
     withHeaders(
-        play.api.http.HeaderNames.COOKIE -> Cookies.mergeCookieHeader(
-            headers.get(play.api.http.HeaderNames.COOKIE).getOrElse(""),
-            Seq(Session.encodeAsCookie(
-                    new Session(session.data ++ newSessions)))))
+      play.api.http.HeaderNames.COOKIE -> Cookies.mergeCookieHeader(
+        headers.get(play.api.http.HeaderNames.COOKIE).getOrElse(""),
+        Seq(Session.encodeAsCookie(new Session(session.data ++ newSessions)))))
   }
 
   /**
@@ -130,8 +130,8 @@ case class FakeRequest[A](
   def withFormUrlEncodedBody(
       data: (String, String)*): FakeRequest[AnyContentAsFormUrlEncoded] = {
     copyFakeRequest(
-        body = AnyContentAsFormUrlEncoded(
-              play.utils.OrderPreserving.groupBy(data.toSeq)(_._1)))
+      body = AnyContentAsFormUrlEncoded(
+        play.utils.OrderPreserving.groupBy(data.toSeq)(_._1)))
   }
 
   def certs = Future.successful(IndexedSeq.empty)
@@ -200,7 +200,8 @@ object FakeRequest {
     * Constructs a new request.
     */
   def apply(
-      method: String, path: String): FakeRequest[AnyContentAsEmpty.type] = {
+      method: String,
+      path: String): FakeRequest[AnyContentAsEmpty.type] = {
     FakeRequest(method, path, FakeHeaders(), AnyContentAsEmpty)
   }
 
@@ -222,11 +223,13 @@ import play.api.Application
 @deprecated("Use GuiceApplicationBuilder instead.", "2.5.0")
 case class FakeApplication(
     override val path: java.io.File = new java.io.File("."),
-    override val classloader: ClassLoader = classOf[FakeApplication].getClassLoader,
+    override val classloader: ClassLoader =
+      classOf[FakeApplication].getClassLoader,
     additionalConfiguration: Map[String, _ <: Any] = Map.empty,
     @deprecated("Use dependency injection", "2.5.0") withGlobal: Option[
-        GlobalSettings] = None,
-    withRoutes: PartialFunction[(String, String), Handler] = PartialFunction.empty)
+      GlobalSettings] = None,
+    withRoutes: PartialFunction[(String, String), Handler] =
+      PartialFunction.empty)
     extends Application {
 
   private val app: Application = new GuiceApplicationBuilder()

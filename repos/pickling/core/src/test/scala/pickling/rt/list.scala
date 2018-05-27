@@ -37,9 +37,10 @@ class RuntimeListAnyRefSuite extends FunSuite {
   }
 
   test("tuple with array") {
-    val lst: List[(Int, Array[Double])] = List((4, Array.ofDim[Double](10)),
-                                               (5, Array.ofDim[Double](10)),
-                                               (6, Array.ofDim[Double](10)))
+    val lst: List[(Int, Array[Double])] = List(
+      (4, Array.ofDim[Double](10)),
+      (5, Array.ofDim[Double](10)),
+      (6, Array.ofDim[Double](10)))
     val p = (lst: Any).pickle
     val up = p.unpickle[Any]
     val upl = up.asInstanceOf[List[(Int, Array[Double])]]

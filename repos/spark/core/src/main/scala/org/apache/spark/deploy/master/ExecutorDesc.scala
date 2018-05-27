@@ -19,11 +19,12 @@ package org.apache.spark.deploy.master
 
 import org.apache.spark.deploy.{ExecutorDescription, ExecutorState}
 
-private[master] class ExecutorDesc(val id: Int,
-                                   val application: ApplicationInfo,
-                                   val worker: WorkerInfo,
-                                   val cores: Int,
-                                   val memory: Int) {
+private[master] class ExecutorDesc(
+    val id: Int,
+    val application: ApplicationInfo,
+    val worker: WorkerInfo,
+    val cores: Int,
+    val memory: Int) {
 
   var state = ExecutorState.LAUNCHING
 
@@ -38,7 +39,7 @@ private[master] class ExecutorDesc(val id: Int,
     other match {
       case info: ExecutorDesc =>
         fullId == info.fullId && worker.id == info.worker.id &&
-        cores == info.cores && memory == info.memory
+          cores == info.cores && memory == info.memory
       case _ => false
     }
   }

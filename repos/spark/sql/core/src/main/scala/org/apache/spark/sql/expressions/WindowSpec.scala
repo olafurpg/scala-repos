@@ -30,9 +30,10 @@ import org.apache.spark.sql.catalyst.expressions._
   * @since 1.4.0
   */
 @Experimental
-class WindowSpec private[sql](partitionSpec: Seq[Expression],
-                              orderSpec: Seq[SortOrder],
-                              frame: catalyst.expressions.WindowFrame) {
+class WindowSpec private[sql] (
+    partitionSpec: Seq[Expression],
+    orderSpec: Seq[SortOrder],
+    frame: catalyst.expressions.WindowFrame) {
 
   /**
     * Defines the partitioning columns in a [[WindowSpec]].
@@ -114,22 +115,23 @@ class WindowSpec private[sql](partitionSpec: Seq[Expression],
 
   private def between(typ: FrameType, start: Long, end: Long): WindowSpec = {
     val boundaryStart = start match {
-      case 0 => CurrentRow
+      case 0             => CurrentRow
       case Long.MinValue => UnboundedPreceding
-      case x if x < 0 => ValuePreceding(-start.toInt)
-      case x if x > 0 => ValueFollowing(start.toInt)
+      case x if x < 0    => ValuePreceding(-start.toInt)
+      case x if x > 0    => ValueFollowing(start.toInt)
     }
 
     val boundaryEnd = end match {
-      case 0 => CurrentRow
+      case 0             => CurrentRow
       case Long.MaxValue => UnboundedFollowing
-      case x if x < 0 => ValuePreceding(-end.toInt)
-      case x if x > 0 => ValueFollowing(end.toInt)
+      case x if x < 0    => ValuePreceding(-end.toInt)
+      case x if x > 0    => ValueFollowing(end.toInt)
     }
 
-    new WindowSpec(partitionSpec,
-                   orderSpec,
-                   SpecifiedWindowFrame(typ, boundaryStart, boundaryEnd))
+    new WindowSpec(
+      partitionSpec,
+      orderSpec,
+      SpecifiedWindowFrame(typ, boundaryStart, boundaryEnd))
   }
 
   /**

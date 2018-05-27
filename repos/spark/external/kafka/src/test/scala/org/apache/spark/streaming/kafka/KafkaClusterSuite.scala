@@ -38,7 +38,7 @@ class KafkaClusterSuite extends SparkFunSuite with BeforeAndAfterAll {
     kafkaTestUtils.createTopic(topic)
     kafkaTestUtils.sendMessages(topic, Map("a" -> 1))
     kc = new KafkaCluster(
-        Map("metadata.broker.list" -> kafkaTestUtils.brokerAddress))
+      Map("metadata.broker.list" -> kafkaTestUtils.brokerAddress))
   }
 
   override def afterAll() {
@@ -59,7 +59,8 @@ class KafkaClusterSuite extends SparkFunSuite with BeforeAndAfterAll {
 
     val err = kc.getPartitions(Set(topic + "BAD"))
     assert(
-        err.isLeft, "getPartitions for a nonexistant topic should be an error")
+      err.isLeft,
+      "getPartitions for a nonexistant topic should be an error")
   }
 
   test("leader offset apis") {

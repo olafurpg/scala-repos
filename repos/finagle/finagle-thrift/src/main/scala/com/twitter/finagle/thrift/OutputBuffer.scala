@@ -9,7 +9,9 @@ import org.apache.thrift.transport.TMemoryBuffer
   * output to byte arrays
   */
 private[finagle] object OutputBuffer {
-  def messageToArray(message: TBase[_, _], protocolFactory: TProtocolFactory) = {
+  def messageToArray(
+      message: TBase[_, _],
+      protocolFactory: TProtocolFactory) = {
     val buffer = new OutputBuffer(protocolFactory)
     message.write(buffer())
     buffer.toArray

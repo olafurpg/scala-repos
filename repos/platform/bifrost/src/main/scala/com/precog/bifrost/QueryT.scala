@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -42,14 +42,14 @@ trait SwappableMonad[Q[+ _]] extends Monad[Q] {
 final case class QueryT[Q[+ _], M[+ _], +A](run: M[Q[A]]) {
   import scalaz.syntax.monad._
 
-  def map[B](f: A => B)(
-      implicit M: Functor[M], Q: Functor[Q]): QueryT[Q, M, B] =
+  def map[B](
+      f: A => B)(implicit M: Functor[M], Q: Functor[Q]): QueryT[Q, M, B] =
     QueryT(run map { _ map f })
 
   def flatMap[B](f: A => QueryT[Q, M, B])(
-      implicit M: Monad[M], Q: SwappableMonad[Q]): QueryT[Q, M, B] = {
-    QueryT(
-        run flatMap { (state0: Q[A]) =>
+      implicit M: Monad[M],
+      Q: SwappableMonad[Q]): QueryT[Q, M, B] = {
+    QueryT(run flatMap { (state0: Q[A]) =>
       Q.swap(state0 map f map (_.run)) map { _ flatMap identity }
     })
   }
@@ -57,7 +57,8 @@ final case class QueryT[Q[+ _], M[+ _], +A](run: M[Q[A]]) {
 
 trait QueryTCompanion[Q[+ _]] extends QueryTInstances[Q] with QueryTHoist[Q] {
   def apply[Q[+ _], M[+ _], A](a: M[A])(
-      implicit M: Functor[M], Q: SwappableMonad[Q]): QueryT[Q, M, A] = {
+      implicit M: Functor[M],
+      Q: SwappableMonad[Q]): QueryT[Q, M, A] = {
     QueryT(M.map(a)(Q.point(_)))
   }
 }
@@ -108,8 +109,7 @@ trait QueryTMonad[Q[+ _], M[+ _]]
     super.map(ma)(f)
   override def ap[A, B](ma: => QueryT[Q, M, A])(
       mf: => QueryT[Q, M, A => B]): QueryT[Q, M, B] = {
-    QueryT(
-        M.ap(ma.run)(M.map(mf.run) { (qf: Q[A => B]) =>
+    QueryT(M.ap(ma.run)(M.map(mf.run) { (qf: Q[A => B]) =>
       { (qa: Q[A]) =>
         Q.ap(qa)(qf)
       }

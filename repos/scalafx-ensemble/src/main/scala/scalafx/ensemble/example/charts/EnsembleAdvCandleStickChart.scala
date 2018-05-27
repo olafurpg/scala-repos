@@ -57,47 +57,48 @@ import scalafx.ensemble.commons.EnsembleExample
   */
 class EnsembleAdvCandleStickChart extends EnsembleExample {
 
-  case class CandleStick(day: Int,
-                         open: Double,
-                         close: Double,
-                         high: Double,
-                         low: Double,
-                         average: Double)
+  case class CandleStick(
+      day: Int,
+      open: Double,
+      close: Double,
+      high: Double,
+      low: Double,
+      average: Double)
 
   def getContent = {
 
     val data = Array[CandleStick](
-        CandleStick(1, 25, 20, 32, 16, 20),
-        CandleStick(2, 26, 30, 33, 22, 25),
-        CandleStick(3, 30, 38, 40, 20, 32),
-        CandleStick(4, 24, 30, 34, 22, 30),
-        CandleStick(5, 26, 36, 40, 24, 32),
-        CandleStick(6, 28, 38, 45, 25, 34),
-        CandleStick(7, 36, 30, 44, 28, 39),
-        CandleStick(8, 30, 18, 36, 16, 31),
-        CandleStick(9, 40, 50, 52, 36, 41),
-        CandleStick(10, 30, 34, 38, 28, 36),
-        CandleStick(11, 24, 12, 30, 8, 32.4),
-        CandleStick(12, 28, 40, 46, 25, 31.6),
-        CandleStick(13, 28, 18, 36, 14, 32.6),
-        CandleStick(14, 38, 30, 40, 26, 30.6),
-        CandleStick(15, 28, 33, 40, 28, 30.6),
-        CandleStick(16, 25, 10, 32, 6, 30.1),
-        CandleStick(17, 26, 30, 42, 18, 27.3),
-        CandleStick(18, 20, 18, 30, 10, 21.9),
-        CandleStick(19, 20, 10, 30, 5, 21.9),
-        CandleStick(20, 26, 16, 32, 10, 17.9),
-        CandleStick(21, 38, 40, 44, 32, 18.9),
-        CandleStick(22, 26, 40, 41, 12, 18.9),
-        CandleStick(23, 30, 18, 34, 10, 18.9),
-        CandleStick(24, 12, 23, 26, 12, 18.2),
-        CandleStick(25, 30, 40, 45, 16, 18.9),
-        CandleStick(26, 25, 35, 38, 20, 21.4),
-        CandleStick(27, 24, 12, 30, 8, 19.6),
-        CandleStick(28, 23, 44, 46, 15, 22.2),
-        CandleStick(29, 28, 18, 30, 12, 23),
-        CandleStick(30, 28, 18, 30, 12, 23.2),
-        CandleStick(31, 28, 18, 30, 12, 22)
+      CandleStick(1, 25, 20, 32, 16, 20),
+      CandleStick(2, 26, 30, 33, 22, 25),
+      CandleStick(3, 30, 38, 40, 20, 32),
+      CandleStick(4, 24, 30, 34, 22, 30),
+      CandleStick(5, 26, 36, 40, 24, 32),
+      CandleStick(6, 28, 38, 45, 25, 34),
+      CandleStick(7, 36, 30, 44, 28, 39),
+      CandleStick(8, 30, 18, 36, 16, 31),
+      CandleStick(9, 40, 50, 52, 36, 41),
+      CandleStick(10, 30, 34, 38, 28, 36),
+      CandleStick(11, 24, 12, 30, 8, 32.4),
+      CandleStick(12, 28, 40, 46, 25, 31.6),
+      CandleStick(13, 28, 18, 36, 14, 32.6),
+      CandleStick(14, 38, 30, 40, 26, 30.6),
+      CandleStick(15, 28, 33, 40, 28, 30.6),
+      CandleStick(16, 25, 10, 32, 6, 30.1),
+      CandleStick(17, 26, 30, 42, 18, 27.3),
+      CandleStick(18, 20, 18, 30, 10, 21.9),
+      CandleStick(19, 20, 10, 30, 5, 21.9),
+      CandleStick(20, 26, 16, 32, 10, 17.9),
+      CandleStick(21, 38, 40, 44, 32, 18.9),
+      CandleStick(22, 26, 40, 41, 12, 18.9),
+      CandleStick(23, 30, 18, 34, 10, 18.9),
+      CandleStick(24, 12, 23, 26, 12, 18.2),
+      CandleStick(25, 30, 40, 45, 16, 18.9),
+      CandleStick(26, 25, 35, 38, 20, 21.4),
+      CandleStick(27, 24, 12, 30, 8, 19.6),
+      CandleStick(28, 23, 44, 46, 15, 22.2),
+      CandleStick(29, 28, 18, 30, 12, 23),
+      CandleStick(30, 28, 18, 30, 12, 23.2),
+      CandleStick(31, 28, 18, 30, 12, 22)
     )
 
     createChart(data)
@@ -148,9 +149,10 @@ class EnsembleAdvCandleStickChart extends EnsembleExample {
       * @param yAxis The y axis to use
       * @param data The data to use, this is the actual list used so any changes to it will be reflected in the chart
       */
-    def this(xAxis: Axis[Number],
-             yAxis: Axis[Number],
-             data: ObservableBuffer[jfxsc.XYChart.Series[Number, Number]]) {
+    def this(
+        xAxis: Axis[Number],
+        yAxis: Axis[Number],
+        data: ObservableBuffer[jfxsc.XYChart.Series[Number, Number]]) {
       this(xAxis, yAxis)
       setData(data)
     }
@@ -180,7 +182,7 @@ class EnsembleAdvCandleStickChart extends EnsembleExample {
       for (series <- data) {
         val seriesPath: Option[Path] = series.node() match {
           case path: jfxss.Path => Some(path)
-          case _ => None
+          case _                => None
         }
         seriesPath.foreach(_.elements.clear())
 
@@ -201,11 +203,15 @@ class EnsembleAdvCandleStickChart extends EnsembleExample {
                     case _ => -1
                   }
                   candle.update(
-                      yClose - yOpen, yHigh - yOpen, yLow - yOpen, candleWidth)
-                  candle.updateTooltip(item.YValue().doubleValue,
-                                       dayValues.close,
-                                       dayValues.high,
-                                       dayValues.low)
+                    yClose - yOpen,
+                    yHigh - yOpen,
+                    yLow - yOpen,
+                    candleWidth)
+                  candle.updateTooltip(
+                    item.YValue().doubleValue,
+                    dayValues.close,
+                    dayValues.high,
+                    dayValues.low)
                   candle.layoutX = x
                   candle.layoutY = yOpen
                 case _ =>
@@ -262,7 +268,8 @@ class EnsembleAdvCandleStickChart extends EnsembleExample {
     }
 
     override protected def seriesAdded(
-        series: jfxsc.XYChart.Series[Number, Number], seriesIndex: Int) {
+        series: jfxsc.XYChart.Series[Number, Number],
+        seriesIndex: Int) {
       for (j <- 0 until series.data().size) {
         val item = series.data()(j)
         val candle = Candle(seriesIndex, item, j)
@@ -307,8 +314,8 @@ class EnsembleAdvCandleStickChart extends EnsembleExample {
     override protected def updateAxisRange() {
 
       if (xAxis.isAutoRanging) {
-        val xData = for (series <- data; seriesData <- series.data()) yield
-          seriesData.XValue()
+        val xData = for (series <- data; seriesData <- series.data())
+          yield seriesData.XValue()
         xAxis.invalidateRange(xData)
       }
 
@@ -340,12 +347,15 @@ class EnsembleAdvCandleStickChart extends EnsembleExample {
       * @return New candle node to represent the give data item
       */
     def apply(
-        seriesIndex: Int, item: XYChart.Data[_, _], itemIndex: Int): Node = {
+        seriesIndex: Int,
+        item: XYChart.Data[_, _],
+        itemIndex: Int): Node = {
       var candle = item.node()
       candle match {
         case c: Candle =>
           c.setSeriesAndDataStyleClasses(
-              "series" + seriesIndex, "data" + itemIndex)
+            "series" + seriesIndex,
+            "data" + itemIndex)
         case _ =>
           candle = new Candle("series" + seriesIndex, "data" + itemIndex)
           item.node = candle
@@ -355,8 +365,9 @@ class EnsembleAdvCandleStickChart extends EnsembleExample {
   }
 
   /** Candle node used for drawing a candle */
-  private class Candle(private var seriesStyleClass: String,
-                       private var dataStyleClass: String)
+  private class Candle(
+      private var seriesStyleClass: String,
+      private var dataStyleClass: String)
       extends jfxs.Group {
 
     private val highLowLine: Line = new Line
@@ -373,16 +384,18 @@ class EnsembleAdvCandleStickChart extends EnsembleExample {
     Tooltip.install(bar, tooltip)
 
     def setSeriesAndDataStyleClasses(
-        seriesStyleClass: String, dataStyleClass: String) {
+        seriesStyleClass: String,
+        dataStyleClass: String) {
       this.seriesStyleClass = seriesStyleClass
       this.dataStyleClass = dataStyleClass
       updateStyleClasses()
     }
 
-    def update(closeOffset: Double,
-               highOffset: Double,
-               lowOffset: Double,
-               candleWidth: Double) {
+    def update(
+        closeOffset: Double,
+        highOffset: Double,
+        lowOffset: Double,
+        candleWidth: Double) {
       openAboveClose = closeOffset > 0
       updateStyleClasses()
       highLowLine.startY = highOffset
@@ -410,10 +423,10 @@ class EnsembleAdvCandleStickChart extends EnsembleExample {
         if (openAboveClose) "open-above-close" else "close-above-open"
 
       styleClass = Seq("candlestick-candle", seriesStyleClass, dataStyleClass)
-      highLowLine.styleClass = Seq(
-          "candlestick-line", seriesStyleClass, dataStyleClass, closeVsOpen)
-      bar.styleClass = Seq(
-          "candlestick-bar", seriesStyleClass, dataStyleClass, closeVsOpen)
+      highLowLine.styleClass =
+        Seq("candlestick-line", seriesStyleClass, dataStyleClass, closeVsOpen)
+      bar.styleClass =
+        Seq("candlestick-bar", seriesStyleClass, dataStyleClass, closeVsOpen)
     }
   }
 
@@ -439,7 +452,14 @@ class EnsembleAdvCandleStickChart extends EnsembleExample {
     GridPane.setConstraints(low, 0, 3)
     GridPane.setConstraints(lowValue, 1, 3)
     getChildren.addAll(
-        open, openValue, close, closeValue, high, highValue, low, lowValue)
+      open,
+      openValue,
+      close,
+      closeValue,
+      high,
+      highValue,
+      low,
+      lowValue)
 
     def update(open: Double, close: Double, high: Double, low: Double) {
       openValue.text = open.toString

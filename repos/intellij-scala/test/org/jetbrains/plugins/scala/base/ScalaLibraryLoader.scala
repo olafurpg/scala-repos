@@ -12,7 +12,12 @@ import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.impl.VirtualFilePointerManagerImpl
 import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess
 import com.intellij.openapi.vfs.pointers.VirtualFilePointerManager
-import com.intellij.openapi.vfs.{JarFileSystem, LocalFileSystem, VfsUtil, VirtualFile}
+import com.intellij.openapi.vfs.{
+  JarFileSystem,
+  LocalFileSystem,
+  VfsUtil,
+  VirtualFile
+}
 import com.intellij.testFramework.PsiTestUtil
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.SyntheticClasses
@@ -28,12 +33,13 @@ import scala.collection.mutable.ArrayBuffer
   * Nikolay.Tropin
   * 5/29/13
   */
-class ScalaLibraryLoader(project: Project,
-                         module: Module,
-                         rootPath: String,
-                         isIncludeReflectLibrary: Boolean = false,
-                         javaSdk: Option[Sdk] = None,
-                         additionalLibraries: Array[String] = Array.empty) {
+class ScalaLibraryLoader(
+    project: Project,
+    module: Module,
+    rootPath: String,
+    isIncludeReflectLibrary: Boolean = false,
+    javaSdk: Option[Sdk] = None,
+    additionalLibraries: Array[String] = Array.empty) {
 
   private val addedLibraries = ArrayBuffer[Library]()
 
@@ -54,8 +60,8 @@ class ScalaLibraryLoader(project: Project,
 
     addScalaSdk(module, libVersion, isIncludeReflectLibrary)
 
-    additionalLibraries.foreach(
-        name => addLibrary(module, CommonLibrary(name, libVersion)))
+    additionalLibraries.foreach(name =>
+      addLibrary(module, CommonLibrary(name, libVersion)))
 
     javaSdk.foreach { sdk =>
       val rootModel = ModuleRootManager.getInstance(module).getModifiableModel
@@ -88,22 +94,25 @@ class ScalaLibraryLoader(project: Project,
   }
 
   def addScalaSdk(
-      module: Module, sdkVersion: ScalaSdkVersion, loadReflect: Boolean) = {
+      module: Module,
+      sdkVersion: ScalaSdkVersion,
+      loadReflect: Boolean) = {
     val compilerPath = TestUtils.getScalaCompilerPath(sdkVersion)
     val libraryPath = TestUtils.getScalaLibraryPath(sdkVersion)
     val reflectPath = TestUtils.getScalaReflectPath(sdkVersion)
 
     val scalaSdkJars =
       Seq(libraryPath, compilerPath) ++
-      (if (loadReflect) Seq(reflectPath) else Seq.empty)
+        (if (loadReflect) Seq(reflectPath) else Seq.empty)
     val classRoots = scalaSdkJars
       .map(path =>
-            JarFileSystem.getInstance.refreshAndFindFileByPath(path + "!/"))
+        JarFileSystem.getInstance.refreshAndFindFileByPath(path + "!/"))
       .asJava
 
     val scalaLibrarySrc = TestUtils.getScalaLibrarySrc(sdkVersion)
-    val srcsRoots = Seq(JarFileSystem.getInstance.refreshAndFindFileByPath(
-            scalaLibrarySrc + "!/")).asJava
+    val srcsRoots = Seq(
+      JarFileSystem.getInstance.refreshAndFindFileByPath(
+        scalaLibrarySrc + "!/")).asJava
     val scalaSdkLib =
       PsiTestUtil.addProjectLibrary(module, "scala-sdk", classRoots, srcsRoots)
     val languageLevel = Artifact.ScalaCompiler
@@ -113,7 +122,8 @@ class ScalaLibraryLoader(project: Project,
 
     inWriteAction {
       scalaSdkLib.convertToScalaSdkWith(
-          languageLevel, scalaSdkJars.map(new File(_)))
+        languageLevel,
+        scalaSdkJars.map(new File(_)))
       module.attach(scalaSdkLib)
       addedLibraries += scalaSdkLib
     }
@@ -127,7 +137,9 @@ class ScalaLibraryLoader(project: Project,
     addLibrary(module, lib.name, lib.path)
 
   private def addLibrary(
-      module: Module, libraryName: String, mockLib: String): Unit = {
+      module: Module,
+      libraryName: String,
+      mockLib: String): Unit = {
     if (module.libraries.exists(_.getName == libraryName)) return
 
     VfsRootAccess.allowRootAccess(mockLib)
@@ -140,7 +152,8 @@ class ScalaLibraryLoader(project: Project,
     val libRoot: File = new File(mockLib)
     assert(libRoot.exists)
     libModel.addRoot(
-        VfsUtil.getUrlForLibraryRoot(libRoot), OrderRootType.CLASSES)
+      VfsUtil.getUrlForLibraryRoot(libRoot),
+      OrderRootType.CLASSES)
 
     inWriteAction {
       libModel.commit()
@@ -166,13 +179,14 @@ object ScalaLibraryLoader {
     val mockJdk = TestUtils.getDefaultJdk
     VfsRootAccess.allowRootAccess(mockJdk)
     val javaSdk = Some(
-        JavaSdk.getInstance.createJdk("java sdk", mockJdk, false))
-    new ScalaLibraryLoader(project,
-                           module,
-                           rootPath,
-                           isIncludeReflectLibrary,
-                           javaSdk,
-                           additionalLibraries)
+      JavaSdk.getInstance.createJdk("java sdk", mockJdk, false))
+    new ScalaLibraryLoader(
+      project,
+      module,
+      rootPath,
+      isIncludeReflectLibrary,
+      javaSdk,
+      additionalLibraries)
   }
 }
 
@@ -186,7 +200,7 @@ private object CommonLibrary {
       case "spray" =>
         CommonLibrary("spray", TestUtils.getMockSprayLib(version))
       case "cats" => CommonLibrary("cats", TestUtils.getCatsLib(version))
-      case _ => throw new IllegalArgumentException(s"Unknown library: $name")
+      case _      => throw new IllegalArgumentException(s"Unknown library: $name")
     }
   }
 }

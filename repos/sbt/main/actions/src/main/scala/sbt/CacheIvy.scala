@@ -3,9 +3,23 @@
  */
 package sbt
 
-import Predef.{Map, Set, implicitly} // excludes *both 2.10.x conforms and 2.11.x $conforms in source compatible manner.
+import Predef.{
+  Map,
+  Set,
+  implicitly
+} // excludes *both 2.10.x conforms and 2.11.x $conforms in source compatible manner.
 
-import sbt.internal.util.{Cache, HList, HNil, InputCache, LinePosition, LineRange, NoPosition, RangePosition, SourcePosition}
+import sbt.internal.util.{
+  Cache,
+  HList,
+  HNil,
+  InputCache,
+  LinePosition,
+  LineRange,
+  NoPosition,
+  RangePosition,
+  SourcePosition
+}
 import sbt.internal.util.FileInfo.{exists, hash}
 import sbt.internal.util.Types.{:+:, idFun}
 import java.io.File
@@ -56,12 +70,13 @@ object CacheIvy {
 
   import Cache._
   implicit def wrapHL[W, H, T <: HList](
-      implicit f: W => H :+: T, cache: InputCache[H :+: T]): InputCache[W] =
+      implicit f: W => H :+: T,
+      cache: InputCache[H :+: T]): InputCache[W] =
     Cache.wrapIn(f, cache)
 
   lazy val excludeMap: Format[Map[ModuleID, Set[String]]] = implicitly
   lazy val updateIC: InputCache[
-      IvyConfiguration :+: ModuleSettings :+: UpdateConfiguration :+: HNil] =
+    IvyConfiguration :+: ModuleSettings :+: UpdateConfiguration :+: HNil] =
     implicitly
   /*	def deliverIC: InputCache[IvyConfiguration :+: ModuleSettings :+: DeliverConfiguration :+: HNil] = implicitly
 	def publishIC: InputCache[IvyConfiguration :+: ModuleSettings :+: PublishConfiguration :+: HNil] = implicitly*/
@@ -71,93 +86,106 @@ object CacheIvy {
 
   implicit lazy val updateReportFormat: Format[UpdateReport] = {
     import DefaultProtocol.{StringFormat, FileFormat}
-    wrap[UpdateReport,
-         (File, Seq[ConfigurationReport], UpdateStats, Map[File, Long])](
-        rep =>
-          (rep.cachedDescriptor, rep.configurations, rep.stats, rep.stamps), {
-          case (cd, cs, stats, stamps) =>
-            new UpdateReport(cd, cs, stats, stamps)
-        })
+    wrap[
+      UpdateReport,
+      (File, Seq[ConfigurationReport], UpdateStats, Map[File, Long])](
+      rep =>
+        (rep.cachedDescriptor, rep.configurations, rep.stats, rep.stamps), {
+        case (cd, cs, stats, stamps) =>
+          new UpdateReport(cd, cs, stats, stamps)
+      })
   }
   implicit def updateStatsFormat: Format[UpdateStats] =
     wrap[UpdateStats, (Long, Long, Long)](
-        us => (us.resolveTime, us.downloadTime, us.downloadSize), {
-      case (rt, dt, ds) => new UpdateStats(rt, dt, ds, true)
-    })
-  implicit def confReportFormat(implicit m: Format[String],
-                                mr: Format[Seq[ModuleReport]],
-                                oar: Format[Seq[OrganizationArtifactReport]])
+      us => (us.resolveTime, us.downloadTime, us.downloadSize), {
+        case (rt, dt, ds) => new UpdateStats(rt, dt, ds, true)
+      })
+  implicit def confReportFormat(
+      implicit m: Format[String],
+      mr: Format[Seq[ModuleReport]],
+      oar: Format[Seq[OrganizationArtifactReport]])
     : Format[ConfigurationReport] =
-    wrap[ConfigurationReport,
-         (String, Seq[ModuleReport], Seq[OrganizationArtifactReport])](
-        r => (r.configuration, r.modules, r.details), {
-      case (c, m, d) => new ConfigurationReport(c, m, d)
-    })
-  implicit def moduleReportFormat(implicit cf: Format[Seq[Caller]],
-                                  ff: Format[File]): Format[ModuleReport] = {
-    wrap[ModuleReport,
-         (ModuleID, Seq[(Artifact, File)], Seq[Artifact], Option[String],
-         Option[Long], Option[String], Option[String], Boolean, Option[String],
-         Option[String], Option[String], Option[String], Map[String, String],
-         Option[Boolean], Option[String], Seq[String],
-         Seq[(String, Option[String])],
-         Seq[Caller])](m =>
-                         (m.module,
-                          m.artifacts,
-                          m.missingArtifacts,
-                          m.status,
-                          m.publicationDate map { _.getTime },
-                          m.resolver,
-                          m.artifactResolver,
-                          m.evicted,
-                          m.evictedData,
-                          m.evictedReason,
-                          m.problem,
-                          m.homepage,
-                          m.extraAttributes,
-                          m.isDefault,
-                          m.branch,
-                          m.configurations,
-                          m.licenses,
-                          m.callers), {
-                         case (m,
-                               as,
-                               ms,
-                               s,
-                               pd,
-                               r,
-                               a,
-                               e,
-                               ed,
-                               er,
-                               p,
-                               h,
-                               ea,
-                               d,
-                               b,
-                               cs,
-                               ls,
-                               ks) =>
-                           new ModuleReport(m, as, ms, s, pd map {
-                             new ju.Date(_)
-                           }, r, a, e, ed, er, p, h, ea, d, b, cs, ls, ks)
-                       })
+    wrap[
+      ConfigurationReport,
+      (String, Seq[ModuleReport], Seq[OrganizationArtifactReport])](
+      r => (r.configuration, r.modules, r.details), {
+        case (c, m, d) => new ConfigurationReport(c, m, d)
+      })
+  implicit def moduleReportFormat(
+      implicit cf: Format[Seq[Caller]],
+      ff: Format[File]): Format[ModuleReport] = {
+    wrap[
+      ModuleReport,
+      (
+          ModuleID,
+          Seq[(Artifact, File)],
+          Seq[Artifact],
+          Option[String],
+          Option[Long],
+          Option[String],
+          Option[String],
+          Boolean,
+          Option[String],
+          Option[String],
+          Option[String],
+          Option[String],
+          Map[String, String],
+          Option[Boolean],
+          Option[String],
+          Seq[String],
+          Seq[(String, Option[String])],
+          Seq[Caller])](
+      m =>
+        (
+          m.module,
+          m.artifacts,
+          m.missingArtifacts,
+          m.status,
+          m.publicationDate map { _.getTime },
+          m.resolver,
+          m.artifactResolver,
+          m.evicted,
+          m.evictedData,
+          m.evictedReason,
+          m.problem,
+          m.homepage,
+          m.extraAttributes,
+          m.isDefault,
+          m.branch,
+          m.configurations,
+          m.licenses,
+          m.callers), {
+        case (m, as, ms, s, pd, r, a, e, ed, er, p, h, ea, d, b, cs, ls, ks) =>
+          new ModuleReport(m, as, ms, s, pd map {
+            new ju.Date(_)
+          }, r, a, e, ed, er, p, h, ea, d, b, cs, ls, ks)
+      }
+    )
   }
-  implicit def artifactFormat(implicit sf: Format[String],
-                              uf: Format[Option[URL]]): Format[Artifact] = {
-    wrap[Artifact,
-         (String, String, String, Option[String], Seq[Configuration],
-         Option[URL], Map[String, String])](
-        a =>
-          (a.name,
-           a.`type`,
-           a.extension,
-           a.classifier,
-           a.configurations.toSeq,
-           a.url,
-           a.extraAttributes), {
-          case (n, t, x, c, cs, u, e) => Artifact(n, t, x, c, cs, u, e)
-        }
+  implicit def artifactFormat(
+      implicit sf: Format[String],
+      uf: Format[Option[URL]]): Format[Artifact] = {
+    wrap[
+      Artifact,
+      (
+          String,
+          String,
+          String,
+          Option[String],
+          Seq[Configuration],
+          Option[URL],
+          Map[String, String])](
+      a =>
+        (
+          a.name,
+          a.`type`,
+          a.extension,
+          a.classifier,
+          a.configurations.toSeq,
+          a.url,
+          a.extraAttributes), {
+        case (n, t, x, c, cs, u, e) => Artifact(n, t, x, c, cs, u, e)
+      }
     )
   }
   implicit def organizationArtifactReportFormat(
@@ -165,41 +193,53 @@ object CacheIvy {
       bf: Format[Boolean],
       df: Format[Seq[ModuleReport]]): Format[OrganizationArtifactReport] =
     wrap[OrganizationArtifactReport, (String, String, Seq[ModuleReport])](
-        m => (m.organization, m.name, m.modules), {
-      case (o, n, r) => OrganizationArtifactReport(o, n, r)
-    })
+      m => (m.organization, m.name, m.modules), {
+        case (o, n, r) => OrganizationArtifactReport(o, n, r)
+      })
   implicit def callerFormat: Format[Caller] =
-    wrap[Caller,
-         (ModuleID, Seq[String], Map[String, String], Boolean, Boolean,
-         Boolean, Boolean)](c =>
-                              (c.caller,
-                               c.callerConfigurations,
-                               c.callerExtraAttributes,
-                               c.isForceDependency,
-                               c.isChangingDependency,
-                               c.isTransitiveDependency,
-                               c.isDirectlyForceDependency), {
-                              case (c, cc, ea, fd, cd, td, df) =>
-                                new Caller(c, cc, ea, fd, cd, td, df)
-                            })
+    wrap[
+      Caller,
+      (
+          ModuleID,
+          Seq[String],
+          Map[String, String],
+          Boolean,
+          Boolean,
+          Boolean,
+          Boolean)](
+      c =>
+        (
+          c.caller,
+          c.callerConfigurations,
+          c.callerExtraAttributes,
+          c.isForceDependency,
+          c.isChangingDependency,
+          c.isTransitiveDependency,
+          c.isDirectlyForceDependency), {
+        case (c, cc, ea, fd, cd, td, df) =>
+          new Caller(c, cc, ea, fd, cd, td, df)
+      }
+    )
   implicit def exclusionRuleFormat(
       implicit sf: Format[String]): Format[InclExclRule] =
     wrap[InclExclRule, (String, String, String, Seq[String])](
-        e => (e.organization, e.name, e.artifact, e.configurations), {
-      case (o, n, a, cs) => InclExclRule(o, n, a, cs)
-    })
+      e => (e.organization, e.name, e.artifact, e.configurations), {
+        case (o, n, a, cs) => InclExclRule(o, n, a, cs)
+      })
   implicit def crossVersionFormat: Format[CrossVersion] =
     wrap(crossToInt, crossFromInt)
   implicit def sourcePositionFormat: Format[SourcePosition] =
-    wrap[SourcePosition, (Int, String, Int, Int)]({
-      case NoPosition => (0, "", 0, 0)
-      case LinePosition(p, s) => (1, p, s, 0)
-      case RangePosition(p, LineRange(s, e)) => (2, p, s, e)
-    }, {
-      case (0, _, _, _) => NoPosition
-      case (1, p, s, _) => LinePosition(p, s)
-      case (2, p, s, e) => RangePosition(p, LineRange(s, e))
-    })
+    wrap[SourcePosition, (Int, String, Int, Int)](
+      {
+        case NoPosition                        => (0, "", 0, 0)
+        case LinePosition(p, s)                => (1, p, s, 0)
+        case RangePosition(p, LineRange(s, e)) => (2, p, s, e)
+      }, {
+        case (0, _, _, _) => NoPosition
+        case (1, p, s, _) => LinePosition(p, s)
+        case (2, p, s, e) => RangePosition(p, LineRange(s, e))
+      }
+    )
   private[this] final val DisabledValue = 0
   private[this] final val BinaryValue = 1
   private[this] final val FullValue = 2
@@ -208,27 +248,35 @@ object CacheIvy {
   private[this] val crossFromInt = (i: Int) =>
     i match {
       case BinaryValue => new Binary(idFun); case FullValue => new Full(idFun);
-      case _ => Disabled
+      case _           => Disabled
   }
   private[this] val crossToInt = (c: CrossVersion) =>
     c match {
       case Disabled => 0; case b: Binary => BinaryValue;
-      case f: Full => FullValue
+      case f: Full  => FullValue
   }
 
   implicit def moduleIDFormat(
-      implicit sf: Format[String], bf: Format[Boolean]): Format[ModuleID] =
-    wrap[ModuleID,
-         ((String, String, String, Option[String], Option[String]), (Boolean,
-         Boolean, Boolean, Seq[Artifact], Seq[InclusionRule],
-         Seq[ExclusionRule], Map[String, String], CrossVersion))](
-        m =>
-          ((m.organization,
-            m.name,
-            m.revision,
-            m.configurations,
-            m.branchName),
-           (m.isChanging,
+      implicit sf: Format[String],
+      bf: Format[Boolean]): Format[ModuleID] =
+    wrap[
+      ModuleID,
+      (
+          (String, String, String, Option[String], Option[String]),
+          (
+              Boolean,
+              Boolean,
+              Boolean,
+              Seq[Artifact],
+              Seq[InclusionRule],
+              Seq[ExclusionRule],
+              Map[String, String],
+              CrossVersion))](
+      m =>
+        (
+          (m.organization, m.name, m.revision, m.configurations, m.branchName),
+          (
+            m.isChanging,
             m.isTransitive,
             m.isForce,
             m.explicitArtifacts,
@@ -236,9 +284,9 @@ object CacheIvy {
             m.exclusions,
             m.extraAttributes,
             m.crossVersion)), {
-          case ((o, n, r, cs, br), (ch, t, f, as, incl, excl, x, cv)) =>
-            ModuleID(o, n, r, cs, ch, t, f, as, incl, excl, x, cv, br)
-        }
+        case ((o, n, r, cs, br), (ch, t, f, as, incl, excl, x, cv)) =>
+          ModuleID(o, n, r, cs, ch, t, f, as, incl, excl, x, cv, br)
+      }
     )
   // For some reason sbinary seems to detect unserialized instance Set[ModuleID] to be not equal. #1620
   implicit def moduleSetIC: InputCache[Set[ModuleID]] = {
@@ -267,13 +315,13 @@ object CacheIvy {
   implicit def inlineIvyIC: InputCache[InlineIvyConfiguration] = wrapIn
   implicit def moduleSettingsIC: InputCache[ModuleSettings] =
     unionInputCache[
-        ModuleSettings,
-        PomConfiguration :+: InlineConfiguration :+: InlineConfigurationWithExcludes :+: IvyFileConfiguration :+: HNil]
+      ModuleSettings,
+      PomConfiguration :+: InlineConfiguration :+: InlineConfigurationWithExcludes :+: IvyFileConfiguration :+: HNil]
 
   implicit def ivyConfigurationIC: InputCache[IvyConfiguration] =
     unionInputCache[
-        IvyConfiguration,
-        InlineIvyConfiguration :+: ExternalIvyConfiguration :+: HNil]
+      IvyConfiguration,
+      InlineIvyConfiguration :+: ExternalIvyConfiguration :+: HNil]
 
   object L4 {
     implicit val inlineWithExcludesToHL =
@@ -290,8 +338,8 @@ object CacheIvy {
   }
   import L4._
 
-  implicit def inlineWithExcludesIC: InputCache[
-      InlineConfigurationWithExcludes] = wrapIn
+  implicit def inlineWithExcludesIC
+    : InputCache[InlineConfigurationWithExcludes] = wrapIn
   implicit def inlineIC: InputCache[InlineConfiguration] = wrapIn
   implicit def moduleConfIC: InputCache[ModuleConfiguration] = wrapIn
 
@@ -322,8 +370,8 @@ object CacheIvy {
   implicit lazy val chainedIC: InputCache[ChainedResolver] =
     InputCache.lzy(wrapIn)
   implicit lazy val resolverIC: InputCache[Resolver] = unionInputCache[
-      Resolver,
-      ChainedResolver :+: MavenRepository :+: MavenCache :+: FileRepository :+: URLRepository :+: SshRepository :+: SftpRepository :+: RawRepository :+: HNil]
+    Resolver,
+    ChainedResolver :+: MavenRepository :+: MavenCache :+: FileRepository :+: URLRepository :+: SshRepository :+: SftpRepository :+: RawRepository :+: HNil]
   implicit def moduleIC: InputCache[ModuleID] = wrapIn
   implicitly[InputCache[Seq[Configuration]]]
 
@@ -342,7 +390,7 @@ object CacheIvy {
     implicit def artifactToHL =
       (a: Artifact) =>
         a.name :+: a.`type` :+: a.extension :+: a.classifier :+: names(
-            a.configurations) :+: a.url :+: a.extraAttributes :+: HNil
+          a.configurations) :+: a.url :+: a.extraAttributes :+: HNil
     implicit def inclExclToHL =
       (e: InclExclRule) =>
         e.organization :+: e.name :+: e.artifact :+: e.configurations :+: HNil
@@ -409,6 +457,7 @@ object CacheIvy {
   implicit def confIC: InputCache[Configuration] = wrapIn
 
   implicit def authIC: InputCache[SshAuthentication] =
-    unionInputCache[SshAuthentication,
-                    PasswordAuthentication :+: KeyFileAuthentication :+: HNil]
+    unionInputCache[
+      SshAuthentication,
+      PasswordAuthentication :+: KeyFileAuthentication :+: HNil]
 }

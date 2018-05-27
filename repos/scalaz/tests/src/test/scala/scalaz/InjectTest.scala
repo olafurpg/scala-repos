@@ -22,7 +22,8 @@ object InjectTest extends SpecLite {
 
   sealed trait Test1AlgebraFunctions {
     def test1[F[_]](keys: Seq[String])(
-        implicit F: Functor[F], I: Test1Algebra :<: F): Free[F, Int] =
+        implicit F: Functor[F],
+        I: Test1Algebra :<: F): Free[F, Int] =
       inject[F, Test1Algebra, Int](Test1(keys, Free.pure(_)))
   }
 
@@ -43,7 +44,8 @@ object InjectTest extends SpecLite {
 
   sealed trait Test2AlgebraFunctions {
     def test2[F[_]](keys: Seq[String])(
-        implicit F: Functor[F], I: Test2Algebra :<: F): Free[F, Int] =
+        implicit F: Functor[F],
+        I: Test2Algebra :<: F): Free[F, Int] =
       inject[F, Test2Algebra, Int](Test2(keys, Free.pure(_)))
   }
 
@@ -64,7 +66,8 @@ object InjectTest extends SpecLite {
 
   sealed trait Test3AlgebraFunctions {
     def test3[F[_]](keys: Seq[String])(
-        implicit F: Functor[F], I: Test3Algebra :<: F): Free[F, Int] =
+        implicit F: Functor[F],
+        I: Test3Algebra :<: F): Free[F, Int] =
       inject[F, Test3Algebra, Int](Test3(keys, Free.pure(_)))
   }
 
@@ -76,11 +79,14 @@ object InjectTest extends SpecLite {
 
   "inj" in {
     def run[A](algebra: Free[T, A]): A =
-      algebra.resume.fold({
-        case Coproduct(-\/(Test3(k, h))) => run(h(k.length))
-        case Coproduct(\/-(Coproduct(-\/(Test1(k, h))))) => run(h(k.length))
-        case Coproduct(\/-(Coproduct(\/-(Test2(k, h))))) => run(h(k.length))
-      }, a => a)
+      algebra.resume.fold(
+        {
+          case Coproduct(-\/(Test3(k, h)))                 => run(h(k.length))
+          case Coproduct(\/-(Coproduct(-\/(Test1(k, h))))) => run(h(k.length))
+          case Coproduct(\/-(Coproduct(\/-(Test2(k, h))))) => run(h(k.length))
+        },
+        a => a
+      )
 
     val res = for {
       a <- test1[T](Seq("a1", "a2", "a3"))
@@ -92,11 +98,11 @@ object InjectTest extends SpecLite {
   }
 
   "prj" in {
-    def distr[F[_], A](
-        t: Free[F, A])(implicit F: Functor[F],
-                       I0: Test1Algebra :<: F,
-                       I1: Test2Algebra :<: F,
-                       I2: Test3Algebra :<: F): Option[Free[F, A]] =
+    def distr[F[_], A](t: Free[F, A])(
+        implicit F: Functor[F],
+        I0: Test1Algebra :<: F,
+        I1: Test2Algebra :<: F,
+        I2: Test3Algebra :<: F): Option[Free[F, A]] =
       for {
         Test1(x, h) <- match_[F, Test1Algebra, A](t)
         Test2(y, k) <- match_[F, Test2Algebra, A](h(x.length))
@@ -104,8 +110,8 @@ object InjectTest extends SpecLite {
       } yield l((x ++ y ++ z).length)
 
     val res = distr[T, Int](
-        (test1[T](Seq("a")) >> test2[T](Seq("b")): Free[T, Int]) >> test3[T](
-            Seq("c")))
+      (test1[T](Seq("a")) >> test2[T](Seq("b")): Free[T, Int]) >> test3[T](
+        Seq("c")))
 
     (res == Some(Free.pure[T, Int](3))) must_=== (true)
   }

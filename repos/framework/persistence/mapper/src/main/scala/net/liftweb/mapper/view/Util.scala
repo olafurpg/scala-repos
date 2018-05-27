@@ -45,11 +45,12 @@ object Util {
     * argument.
     */
   def bindFields[T <: Mapper[T]](
-      mapper: T, nsfn: MappedField[_, T] => NodeSeq): NodeSeq => NodeSeq = {
-    case xml.Elem(_, name, _, _, _ *) =>
+      mapper: T,
+      nsfn: MappedField[_, T] => NodeSeq): NodeSeq => NodeSeq = {
+    case xml.Elem(_, name, _, _, _*) =>
       mapper.fieldByName(name) match {
         case Full(field) => nsfn(field)
-        case _ => NodeSeq.Empty
+        case _           => NodeSeq.Empty
       }
     case ns => ns
   }
@@ -66,7 +67,7 @@ object Util {
     * returned by this method, passing this method the mapper instance whose fields should be used and
     * a function that returns BindParams to process the "field:" prefixed nodes.
     * This method takes an additional filter function to restrict certain fields from being
-    * displayed. There is an overload without it too. 
+    * displayed. There is an overload without it too.
     */
   def eachField[T <: net.liftweb.mapper.Mapper[T]](
       mapper: T,
@@ -103,7 +104,7 @@ object Util {
           }
         }
 
-      bind.map(_ (ns))
+      bind.map(_(ns))
     }
   }
   def eachField[T <: net.liftweb.mapper.Mapper[T]](

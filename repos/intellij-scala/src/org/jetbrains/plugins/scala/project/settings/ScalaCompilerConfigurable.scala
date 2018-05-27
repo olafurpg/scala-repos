@@ -11,7 +11,8 @@ import scala.collection.JavaConverters._
   * @author Pavel Fatin
   */
 class ScalaCompilerConfigurable(
-    project: Project, configuration: ScalaCompilerConfiguration)
+    project: Project,
+    configuration: ScalaCompilerConfiguration)
     extends AbstractConfigurable("Scala Compiler") {
   private val form = new ScalaCompilerConfigurationPanel(project)
 
@@ -21,15 +22,16 @@ class ScalaCompilerConfigurable(
 
   def isModified =
     form.getIncrementalityType != configuration.incrementalityType ||
-    profiles.getDefaultProfile.getSettings.getState != configuration.defaultProfile.getSettings.getState ||
-    !profiles.getModuleProfiles.asScala
-      .corresponds(configuration.customProfiles)(
-        _.getSettings.getState == _.getSettings.getState)
+      profiles.getDefaultProfile.getSettings.getState != configuration.defaultProfile.getSettings.getState ||
+      !profiles.getModuleProfiles.asScala
+        .corresponds(configuration.customProfiles)(
+          _.getSettings.getState == _.getSettings.getState)
 
   def reset() {
     form.setIncrementalityType(configuration.incrementalityType)
     profiles.initProfiles(
-        configuration.defaultProfile, configuration.customProfiles.asJava)
+      configuration.defaultProfile,
+      configuration.customProfiles.asJava)
   }
 
   def apply() {

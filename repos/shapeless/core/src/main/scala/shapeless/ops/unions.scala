@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-15 Miles Sabin 
+ * Copyright (c) 2014-15 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,8 +53,8 @@ object union {
     def apply[C <: Coproduct, K](
         implicit selector: Selector[C, K]): Aux[C, K, selector.V] = selector
 
-    implicit def hdSelector[K, V0, T <: Coproduct]: Aux[
-        FieldType[K, V0] :+: T, K, V0] =
+    implicit def hdSelector[K, V0, T <: Coproduct]
+      : Aux[FieldType[K, V0] :+: T, K, V0] =
       new Selector[FieldType[K, V0] :+: T, K] {
         type V = V0
         def apply(u: FieldType[K, V] :+: T): Out = u match {
@@ -66,7 +66,7 @@ object union {
 
   /**
     * Type class supporting collecting the keys of a union as an `HList`.
-    * 
+    *
     * @author Miles Sabin
     */
   trait Keys[U <: Coproduct] extends DepFn0 with Serializable {
@@ -95,7 +95,7 @@ object union {
 
   /**
     * Type class supporting collecting the value of a union as a `Coproduct`.
-    * 
+    *
     * @author Miles Sabin
     */
   trait Values[U <: Coproduct] extends DepFn1[U] with Serializable {
@@ -146,7 +146,8 @@ object union {
     }
 
     implicit def cconsFields[K, V, T <: Coproduct](
-        implicit key: Witness.Aux[K], tailFields: Fields[T])
+        implicit key: Witness.Aux[K],
+        tailFields: Fields[T])
       : Aux[FieldType[K, V] :+: T, (K, V) :+: tailFields.Out] =
       new Fields[FieldType[K, V] :+: T] {
         type Out = (K, V) :+: tailFields.Out
@@ -241,10 +242,11 @@ object union {
       }
 
     implicit def cconsMapValues[HF, K, V, T <: Coproduct](
-        implicit hc: Case1[HF, V], tailMapValues: MapValues[HF, T])
-      : Aux[HF,
-            FieldType[K, V] :+: T,
-            FieldType[K, hc.Result] :+: tailMapValues.Out] =
+        implicit hc: Case1[HF, V],
+        tailMapValues: MapValues[HF, T]): Aux[
+      HF,
+      FieldType[K, V] :+: T,
+      FieldType[K, hc.Result] :+: tailMapValues.Out] =
       new MapValues[HF, FieldType[K, V] :+: T] {
         type Out = FieldType[K, hc.Result] :+: tailMapValues.Out
         def apply(c: FieldType[K, V] :+: T) = c match {

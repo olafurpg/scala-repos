@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NonNls
 import org.jetbrains.plugins.scala.lang.completion.ScalaCompletionUtil._
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScInfixTypeElement
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 28.05.2008
   */
@@ -22,7 +22,7 @@ class ForSomeFilter extends ElementFilter {
       if (parent == null) return false
       parent.getParent match {
         case _: ScInfixTypeElement => return true
-        case _ => return false
+        case _                     => return false
       }
     }
     false

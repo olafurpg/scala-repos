@@ -96,7 +96,7 @@ trait Formats { self: Formats =>
       Ordering[Int].on[(Class[_], FieldSerializer[_])](x => delta(x._1, clazz))
     fieldSerializers filter (_._1.isAssignableFrom(clazz)) match {
       case Nil => None
-      case xs => Some((xs min ord)._2)
+      case xs  => Some((xs min ord)._2)
     }
   }
 
@@ -109,8 +109,8 @@ trait Formats { self: Formats =>
   def customDeserializer(implicit format: Formats) =
     customSerializers
       .foldLeft(Map(): PartialFunction[(TypeInfo, JValue), Any]) { (acc, x) =>
-      acc.orElse(x.deserialize)
-    }
+        acc.orElse(x.deserialize)
+      }
 }
 
 /** Conversions between String and Date.
@@ -181,11 +181,13 @@ trait TypeHints {
     def hintFor(clazz: Class[_]): String =
       components
         .filter(_.containsHint_?(clazz))
-        .map(th =>
-              (th.hintFor(clazz),
-               th.classFor(th.hintFor(clazz))
-                 .getOrElse(
-                     sys.error("hintFor/classFor not invertible for " + th))))
+        .map(
+          th =>
+            (
+              th.hintFor(clazz),
+              th.classFor(th.hintFor(clazz))
+                .getOrElse(
+                  sys.error("hintFor/classFor not invertible for " + th))))
         .sortWith((x, y) => (delta(x._2, clazz) - delta(y._2, clazz)) < 0)
         .head
         ._1
@@ -193,7 +195,7 @@ trait TypeHints {
     def classFor(hint: String): Option[Class[_]] = {
       def hasClass(h: TypeHints) =
         scala.util.control.Exception.allCatch opt (h.classFor(hint)) map
-        (_.isDefined) getOrElse (false)
+          (_.isDefined) getOrElse (false)
 
       components find (hasClass) flatMap (_.classFor(hint))
     }
@@ -223,7 +225,7 @@ private[json] object ClassDelta {
       1 + delta(class1.getSuperclass, class2)
     } else
       sys.error(
-          "Don't call delta unless one class is assignable from the other")
+        "Don't call delta unless one class is assignable from the other")
   }
 }
 
@@ -257,7 +259,7 @@ case class FullTypeHints(hints: List[Class[_]]) extends TypeHints {
   */
 object DefaultFormats extends DefaultFormats {
   val losslessDate = new ThreadLocal(
-      new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"))
+    new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"))
   val UTC = TimeZone.getTimeZone("UTC")
 }
 
@@ -298,12 +300,13 @@ trait DefaultFormats extends Formats {
 }
 
 private[json] class ThreadLocal[A](init: => A)
-    extends java.lang.ThreadLocal[A] with (() => A) {
+    extends java.lang.ThreadLocal[A]
+    with (() => A) {
   override def initialValue = init
   def apply = get
 }
 
-class CustomSerializer[A : Manifest](
+class CustomSerializer[A: Manifest](
     ser: Formats => (PartialFunction[JValue, A], PartialFunction[Any, JValue]))
     extends Serializer[A] {
 

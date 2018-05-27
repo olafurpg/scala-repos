@@ -52,20 +52,22 @@ private[v1] class JacksonMessageWriter extends MessageBodyWriter[Object] {
   mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
   mapper.setDateFormat(JacksonMessageWriter.makeISODateFormat)
 
-  override def isWriteable(aClass: Class[_],
-                           `type`: Type,
-                           annotations: Array[Annotation],
-                           mediaType: MediaType): Boolean = {
+  override def isWriteable(
+      aClass: Class[_],
+      `type`: Type,
+      annotations: Array[Annotation],
+      mediaType: MediaType): Boolean = {
     true
   }
 
-  override def writeTo(t: Object,
-                       aClass: Class[_],
-                       `type`: Type,
-                       annotations: Array[Annotation],
-                       mediaType: MediaType,
-                       multivaluedMap: MultivaluedMap[String, AnyRef],
-                       outputStream: OutputStream): Unit = {
+  override def writeTo(
+      t: Object,
+      aClass: Class[_],
+      `type`: Type,
+      annotations: Array[Annotation],
+      mediaType: MediaType,
+      multivaluedMap: MultivaluedMap[String, AnyRef],
+      outputStream: OutputStream): Unit = {
     t match {
       case ErrorWrapper(err) =>
         outputStream.write(err.getBytes(StandardCharsets.UTF_8))
@@ -73,11 +75,12 @@ private[v1] class JacksonMessageWriter extends MessageBodyWriter[Object] {
     }
   }
 
-  override def getSize(t: Object,
-                       aClass: Class[_],
-                       `type`: Type,
-                       annotations: Array[Annotation],
-                       mediaType: MediaType): Long = {
+  override def getSize(
+      t: Object,
+      aClass: Class[_],
+      `type`: Type,
+      annotations: Array[Annotation],
+      mediaType: MediaType): Long = {
     -1L
   }
 }

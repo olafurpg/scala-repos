@@ -6,7 +6,8 @@ import java.nio._
 import java.nio.charset._
 
 class OutputStreamWriter(
-    private[this] var out: OutputStream, private[this] var enc: CharsetEncoder)
+    private[this] var out: OutputStream,
+    private[this] var enc: CharsetEncoder)
     extends Writer {
 
   private[this] var closed: Boolean = false
@@ -25,10 +26,11 @@ class OutputStreamWriter(
   private[this] var outBuf: ByteBuffer = ByteBuffer.allocate(4096)
 
   def this(out: OutputStream, cs: Charset) =
-    this(out,
-         cs.newEncoder
-           .onMalformedInput(CodingErrorAction.REPLACE)
-           .onUnmappableCharacter(CodingErrorAction.REPLACE))
+    this(
+      out,
+      cs.newEncoder
+        .onMalformedInput(CodingErrorAction.REPLACE)
+        .onUnmappableCharacter(CodingErrorAction.REPLACE))
 
   def this(out: OutputStream) =
     this(out, Charset.defaultCharset)
@@ -91,10 +93,11 @@ class OutputStreamWriter(
       val result = enc.encode(cbuf, outBuf, true)
       if (result.isUnderflow) {
         assert(
-            !cbuf.hasRemaining,
-            "CharsetEncoder.encode() should not have returned UNDERFLOW when " +
+          !cbuf.hasRemaining,
+          "CharsetEncoder.encode() should not have returned UNDERFLOW when " +
             "both endOfInput and inBuf.hasRemaining are true. It should have " +
-            "returned a MalformedInput error instead.")
+            "returned a MalformedInput error instead."
+        )
       } else if (result.isOverflow) {
         makeRoomInOutBuf()
         loopEncode()

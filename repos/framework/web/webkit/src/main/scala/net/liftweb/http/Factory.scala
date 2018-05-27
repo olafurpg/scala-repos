@@ -35,9 +35,9 @@ trait Factory extends SimpleInjector {
     * request specific vendors and use doWith to define the vendor just for
     * the scope of the call.
     */
-  abstract class FactoryMaker[T](_default: Vendor[T])(
-      implicit man: Manifest[T])
-      extends StackableMaker[T] with Vendor[T] {
+  abstract class FactoryMaker[T](_default: Vendor[T])(implicit man: Manifest[T])
+      extends StackableMaker[T]
+      with Vendor[T] {
     registerInjection(this)(man)
 
     /**

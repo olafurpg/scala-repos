@@ -59,14 +59,13 @@ object Tags {
 
   /** Converts a sequence of rules into a function that identifies whether a set of tasks are allowed to execute concurrently based on their merged tags. */
   def predicate(rules: Seq[Rule]): TagMap => Boolean =
-    m =>
-      {
-        @tailrec def loop(rules: List[Rule]): Boolean =
-          rules match {
-            case x :: xs => x(m) && loop(xs)
-            case Nil => true
-          }
-        loop(rules.toList)
+    m => {
+      @tailrec def loop(rules: List[Rule]): Boolean =
+        rules match {
+          case x :: xs => x(m) && loop(xs)
+          case Nil     => true
+        }
+      loop(rules.toList)
     }
 
   def getInt(m: TagMap, tag: Tag): Int = m.getOrElse(tag, 0)

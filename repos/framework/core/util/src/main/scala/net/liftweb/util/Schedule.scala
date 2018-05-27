@@ -29,7 +29,7 @@ class ScheduleJBridge {
 /**
   * The Schedule object schedules an actor to be ping-ed with a given message after a specified
   * delay. If you need recurrent scheduled pings you will need to reschedule.
-  * 
+  *
   * The schedule methods return a ScheduledFuture object which can be cancelled if necessary
   */
 object Schedule extends Schedule
@@ -37,7 +37,7 @@ object Schedule extends Schedule
 /**
   * The Schedule object schedules an actor to be ping-ed with a given message after a specified
   * delay. If you need recurrent scheduled pings you will need to reschedule.
-  * 
+  *
   * The schedule methods return a ScheduledFuture object which can be cancelled if necessary
   */
 sealed trait Schedule extends Loggable {
@@ -57,15 +57,16 @@ sealed trait Schedule extends Loggable {
   @volatile var blockingQueueSize: Box[Int] = Full(200000)
 
   @volatile var buildExecutor: () => ThreadPoolExecutor = () =>
-    new ThreadPoolExecutor(threadPoolSize,
-                           maxThreadPoolSize,
-                           60,
-                           TimeUnit.SECONDS,
-                           blockingQueueSize match {
-                             case Full(x) =>
-                               new ArrayBlockingQueue(x)
-                             case _ => new LinkedBlockingQueue
-                           })
+    new ThreadPoolExecutor(
+      threadPoolSize,
+      maxThreadPoolSize,
+      60,
+      TimeUnit.SECONDS,
+      blockingQueueSize match {
+        case Full(x) =>
+          new ArrayBlockingQueue(x)
+        case _ => new LinkedBlockingQueue
+      })
 
   /** The underlying <code>java.util.concurrent.ScheduledExecutor</code> */
   private var service: ScheduledExecutorService =
@@ -97,7 +98,9 @@ sealed trait Schedule extends Loggable {
     * the <code>to<code> Actor after the specified TimeSpan <code>delay</code>.
     */
   def schedule[T](
-      to: SimpleActor[T], msg: T, delay: TimeSpan): ScheduledFuture[Unit] =
+      to: SimpleActor[T],
+      msg: T,
+      delay: TimeSpan): ScheduledFuture[Unit] =
     this.schedule(() => Helpers.tryo(to ! msg), delay)
 
   /**
@@ -107,7 +110,9 @@ sealed trait Schedule extends Loggable {
     * the <code>to<code> Actor after the specified TimeSpan <code>delay</code>.
     */
   def perform[T](
-      to: SimpleActor[T], msg: T, delay: Long): ScheduledFuture[Unit] =
+      to: SimpleActor[T],
+      msg: T,
+      delay: Long): ScheduledFuture[Unit] =
     this.schedule(() => Helpers.tryo(to ! msg), TimeSpan(delay))
 
   /**

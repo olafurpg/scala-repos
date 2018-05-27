@@ -159,7 +159,7 @@ class CounterService extends Actor {
     */
   def initStorage() {
     storage = Some(
-        context.watch(context.actorOf(Props[Storage], name = "storage")))
+      context.watch(context.actorOf(Props[Storage], name = "storage")))
     // Tell the counter, if any, to use the new storage
     counter foreach { _ ! UseStorage(storage) }
     // We need the initial value to be able to operate
@@ -205,7 +205,7 @@ class CounterService extends Actor {
       case None =>
         if (backlog.size >= MaxBacklog)
           throw new ServiceUnavailable(
-              "CounterService not available, lack of initial value")
+            "CounterService not available, lack of initial value")
         backlog :+= (sender() -> msg)
     }
   }
@@ -271,7 +271,7 @@ class Storage extends Actor {
 
   def receive = LoggingReceive {
     case Store(Entry(key, count)) => db.save(key, count)
-    case Get(key) => sender() ! Entry(key, db.load(key).getOrElse(0L))
+    case Get(key)                 => sender() ! Entry(key, db.load(key).getOrElse(0L))
   }
 }
 

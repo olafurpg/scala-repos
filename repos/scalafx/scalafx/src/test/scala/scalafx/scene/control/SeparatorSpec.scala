@@ -42,5 +42,6 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class SeparatorSpec
     extends SimpleSFXDelegateSpec[jfxsc.Separator, Separator](
-        classOf[jfxsc.Separator], classOf[Separator])
+      classOf[jfxsc.Separator],
+      classOf[Separator])
     with RunOnApplicationThread

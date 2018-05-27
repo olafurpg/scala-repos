@@ -30,7 +30,14 @@ import javafx.{animation => jfxa, event => jfxe, util => jfxu}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, DoubleProperty, IntegerProperty, ObjectProperty, ReadOnlyDoubleProperty, ReadOnlyObjectProperty}
+import scalafx.beans.property.{
+  BooleanProperty,
+  DoubleProperty,
+  IntegerProperty,
+  ObjectProperty,
+  ReadOnlyDoubleProperty,
+  ReadOnlyObjectProperty
+}
 import scalafx.delegate._
 import scalafx.util.Duration
 import scalafx.util.Duration.sfxDuration2jfx
@@ -44,8 +51,9 @@ trait AnimationStatics {
     * Used to specify an animation that repeats indefinitely, until the stop() method is called.
     */
   val Indefinite = jfxa.Animation.INDEFINITE
-  @deprecated("Use Indefinite; INDEFINITE will be removed in a future release",
-              "2.2.60")
+  @deprecated(
+    "Use Indefinite; INDEFINITE will be removed in a future release",
+    "2.2.60")
   val INDEFINITE = Indefinite
 }
 
@@ -78,7 +86,8 @@ object Animation extends AnimationStatics {
       */
     val Paused = new Status(jfxa.Animation.Status.PAUSED)
     @deprecated(
-        "Use Paused; PAUSED will be removed in a future release", "2.2.60")
+      "Use Paused; PAUSED will be removed in a future release",
+      "2.2.60")
     val PAUSED = Paused
 
     /**
@@ -86,7 +95,8 @@ object Animation extends AnimationStatics {
       */
     val Running = new Status(jfxa.Animation.Status.RUNNING)
     @deprecated(
-        "Use Running; RUNNING will be removed in a future release", "2.2.60")
+      "Use Running; RUNNING will be removed in a future release",
+      "2.2.60")
     val RUNNING = Running
 
     /**
@@ -94,7 +104,8 @@ object Animation extends AnimationStatics {
       */
     val Stopped = new Status(jfxa.Animation.Status.STOPPED)
     @deprecated(
-        "Use Stopped; STOPPED will be removed in a future release", "2.2.60")
+      "Use Stopped; STOPPED will be removed in a future release",
+      "2.2.60")
     val STOPPED = Stopped
 
     protected override def unsortedValues: Array[Status] =

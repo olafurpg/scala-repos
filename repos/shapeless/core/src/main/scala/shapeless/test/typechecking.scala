@@ -29,7 +29,8 @@ import scala.reflect.macros.{whitebox, TypecheckException}
   */
 object illTyped {
   def apply(code: String): Unit = macro IllTypedMacros.applyImplNoExp
-  def apply(code: String, expected: String): Unit = macro IllTypedMacros.applyImpl
+  def apply(code: String, expected: String): Unit =
+    macro IllTypedMacros.applyImpl
 }
 
 @macrocompat.bundle
@@ -43,23 +44,26 @@ class IllTypedMacros(val c: whitebox.Context) {
     val (expPat, expMsg) = expected match {
       case null => (null, "Expected some error.")
       case Literal(Constant(s: String)) =>
-        (Pattern.compile(s, Pattern.CASE_INSENSITIVE | Pattern.DOTALL),
-         "Expected error matching: " + s)
+        (
+          Pattern.compile(s, Pattern.CASE_INSENSITIVE | Pattern.DOTALL),
+          "Expected error matching: " + s)
     }
 
     try {
       val dummy0 = TermName(c.freshName)
       val dummy1 = TermName(c.freshName)
       c.typecheck(c.parse(s"object $dummy0 { val $dummy1 = { $codeStr } }"))
-      c.abort(c.enclosingPosition,
-              "Type-checking succeeded unexpectedly.\n" + expMsg)
+      c.abort(
+        c.enclosingPosition,
+        "Type-checking succeeded unexpectedly.\n" + expMsg)
     } catch {
       case e: TypecheckException =>
         val msg = e.getMessage
         if ((expected ne null) && !(expPat.matcher(msg)).matches)
-          c.abort(c.enclosingPosition,
-                  "Type-checking failed in an unexpected way.\n" + expMsg +
-                  "\nActual error: " + msg)
+          c.abort(
+            c.enclosingPosition,
+            "Type-checking failed in an unexpected way.\n" + expMsg +
+              "\nActual error: " + msg)
     }
 
     q"()"

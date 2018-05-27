@@ -15,8 +15,8 @@ import akka.testkit.AkkaSpec
 
 class HeadSinkSpec extends AkkaSpec with ScriptedTest {
 
-  val settings = ActorMaterializerSettings(system).withInputBuffer(
-      initialSize = 2, maxSize = 16)
+  val settings = ActorMaterializerSettings(system)
+    .withInputBuffer(initialSize = 2, maxSize = 16)
 
   implicit val materializer = ActorMaterializer(settings)
 
@@ -82,7 +82,7 @@ class HeadSinkSpec extends AkkaSpec with ScriptedTest {
 
     "yield None for empty stream" in assertAllStagesStopped {
       Await.result(Source.empty[Int].runWith(Sink.headOption), 1.second) should be(
-          None)
+        None)
     }
   }
 }

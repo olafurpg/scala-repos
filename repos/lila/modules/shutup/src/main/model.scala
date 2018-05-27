@@ -1,20 +1,23 @@
 package lila.shutup
 
-case class UserRecord(_id: String,
-                      puf: Option[List[Double]],
-                      tef: Option[List[Double]],
-                      prm: Option[List[Double]],
-                      prc: Option[List[Double]],
-                      puc: Option[List[Double]]) {
+case class UserRecord(
+    _id: String,
+    puf: Option[List[Double]],
+    tef: Option[List[Double]],
+    prm: Option[List[Double]],
+    prc: Option[List[Double]],
+    puc: Option[List[Double]]) {
 
   def userId = _id
 
   def reports: List[TextReport] =
-    List(TextReport(TextType.PublicForumMessage, ~puf),
-         TextReport(TextType.TeamForumMessage, ~tef),
-         TextReport(TextType.PrivateMessage, ~prm),
-         TextReport(TextType.PrivateChat, ~prc),
-         TextReport(TextType.PublicChat, ~puc))
+    List(
+      TextReport(TextType.PublicForumMessage, ~puf),
+      TextReport(TextType.TeamForumMessage, ~tef),
+      TextReport(TextType.PrivateMessage, ~prm),
+      TextReport(TextType.PrivateChat, ~prc),
+      TextReport(TextType.PublicChat, ~puc)
+    )
 }
 
 case class TextAnalysis(text: String, badWords: List[String]) {
@@ -27,14 +30,15 @@ case class TextAnalysis(text: String, badWords: List[String]) {
 }
 
 sealed abstract class TextType(
-    val key: String, val rotation: Int, val name: String)
+    val key: String,
+    val rotation: Int,
+    val name: String)
 
 object TextType {
 
   case object PublicForumMessage
       extends TextType("puf", 20, "Public forum message")
-  case object TeamForumMessage
-      extends TextType("tef", 20, "Team forum message")
+  case object TeamForumMessage extends TextType("tef", 20, "Team forum message")
   case object PrivateMessage extends TextType("prm", 20, "Private message")
   case object PrivateChat extends TextType("prc", 60, "Private chat")
   case object PublicChat extends TextType("puc", 60, "Public chat")

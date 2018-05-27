@@ -92,7 +92,7 @@ object MixedBag extends App {
 
     def flattenWriter[A](t: Tree[A]): DList[A] = {
       def flatten(t: Tree[A]): Writer[DList[A], Unit] = t.resume match {
-        case \/-(a) => DList(a).tell
+        case \/-(a)      => DList(a).tell
         case -\/((x, y)) => flatten(x) >> flatten(y)
       }
       flatten(t).run._1

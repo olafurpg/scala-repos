@@ -76,8 +76,8 @@ class Eval(target: Option[File]) {
   } catch {
     case e: Throwable =>
       throw new RuntimeException(
-          "Unable to load Scala interpreter from classpath (scala-compiler jar is missing?)",
-          e)
+        "Unable to load Scala interpreter from classpath (scala-compiler jar is missing?)",
+        e)
   }
 
   private lazy val libPath = try {
@@ -85,8 +85,8 @@ class Eval(target: Option[File]) {
   } catch {
     case e: Throwable =>
       throw new RuntimeException(
-          "Unable to load scala base object from classpath (scala-library jar is missing?)",
-          e)
+        "Unable to load scala base object from classpath (scala-library jar is missing?)",
+        e)
   }
 
   /**
@@ -97,17 +97,17 @@ class Eval(target: Option[File]) {
     * }
     */
   protected lazy val preprocessors: Seq[Preprocessor] = Seq(
-      new IncludePreprocessor(
-          Seq(
-              new ClassScopedResolver(getClass),
-              new FilesystemResolver(new File(".")),
-              new FilesystemResolver(new File("." + File.separator + "config"))
-          ) ++
-          (Option(System.getProperty("com.twitter.util.Eval.includePath")) map {
-                path =>
-                  new FilesystemResolver(new File(path))
-              })
-      )
+    new IncludePreprocessor(
+      Seq(
+        new ClassScopedResolver(getClass),
+        new FilesystemResolver(new File(".")),
+        new FilesystemResolver(new File("." + File.separator + "config"))
+      ) ++
+        (Option(System.getProperty("com.twitter.util.Eval.includePath")) map {
+          path =>
+            new FilesystemResolver(new File(path))
+        })
+    )
   )
 
   // For derived classes to provide an alternate compiler message handler.
@@ -118,7 +118,10 @@ class Eval(target: Option[File]) {
 
   // Primary encapsulation around native Scala compiler
   private[this] lazy val compiler = new StringCompiler(
-      codeWrapperLineOffset, target, compilerSettings, compilerMessageHandler)
+    codeWrapperLineOffset,
+    target,
+    compilerSettings,
+    compilerMessageHandler)
 
   /**
     * run preprocessors on our string, returning a String that is the processed source
@@ -152,9 +155,11 @@ class Eval(target: Option[File]) {
   def apply[T](files: File*): T = {
     if (target.isDefined) {
       val targetDir = target.get
-      val unprocessedSource = files.map {
-        scala.io.Source.fromFile(_).mkString
-      }.mkString("\n")
+      val unprocessedSource = files
+        .map {
+          scala.io.Source.fromFile(_).mkString
+        }
+        .mkString("\n")
       val processed = sourceForString(unprocessedSource)
       val sourceChecksum = uniqueId(processed, None)
       val checksumFile = new File(targetDir, "checksum")
@@ -179,8 +184,9 @@ class Eval(target: Option[File]) {
       val className = "Evaluator__%s_%s".format(cleanBaseName, sourceChecksum)
       applyProcessed(className, processed, false)
     } else {
-      apply(files.map { scala.io.Source.fromFile(_).mkString }.mkString("\n"),
-            true)
+      apply(
+        files.map { scala.io.Source.fromFile(_).mkString }.mkString("\n"),
+        true)
     }
   }
 
@@ -207,7 +213,9 @@ class Eval(target: Option[File]) {
     * same as apply[T], but does not run preprocessors.
     */
   def applyProcessed[T](
-      className: String, code: String, resetState: Boolean): T = {
+      className: String,
+      code: String,
+      resetState: Boolean): T = {
     val cls = compiler(wrapCodeInClass(className, code), className, resetState)
     cls
       .getConstructor()
@@ -263,7 +271,8 @@ class Eval(target: Option[File]) {
     * @throws CompilerException if not Eval-able.
     */
   def check(files: File*) {
-    val code = files.map { scala.io.Source.fromFile(_).mkString }
+    val code = files
+      .map { scala.io.Source.fromFile(_).mkString }
       .mkString("\n")
     check(code)
   }
@@ -283,12 +292,13 @@ class Eval(target: Option[File]) {
   }
 
   private[util] def uniqueId(
-      code: String, idOpt: Option[Int] = Some(jvmId)): String = {
+      code: String,
+      idOpt: Option[Int] = Some(jvmId)): String = {
     val digest = MessageDigest.getInstance("SHA-1").digest(code.getBytes())
     val sha = new BigInteger(1, digest).toString(16)
     idOpt match {
       case Some(id) => sha + "_" + jvmId
-      case _ => sha
+      case _        => sha
     }
   }
 
@@ -303,7 +313,7 @@ class Eval(target: Option[File]) {
      */
     val fileName = f.getName
     val baseName = fileName.lastIndexOf('.') match {
-      case -1 => fileName
+      case -1  => fileName
       case dot => fileName.substring(0, dot)
     }
     baseName.regexSub(Eval.classCleaner) { m =>
@@ -317,7 +327,7 @@ class Eval(target: Option[File]) {
    */
   private[this] def wrapCodeInClass(className: String, code: String) = {
     "class " + className + " extends (() => Any) {\n" + "  def apply() = {\n" +
-    code + "\n" + "  }\n" + "}\n"
+      code + "\n" + "  }\n" + "}\n"
   }
 
   /*
@@ -360,7 +370,7 @@ class Eval(target: Option[File]) {
         case _ => Nil
       }
       cl.getParent match {
-        case null => (cp :: acc).reverse
+        case null   => (cp :: acc).reverse
         case parent => getClassPath(parent, cp :: acc)
       }
     }
@@ -453,17 +463,17 @@ class Eval(target: Option[File]) {
               resolver.resolvable(path)
             } match {
               case Some(r: Resolver) => {
-                  // recursively process includes
-                  if (maxDepth == 0) {
-                    throw new IllegalStateException(
-                        "Exceeded maximum recusion depth")
-                  } else {
-                    apply(StreamIO.buffer(r.get(path)).toString, maxDepth - 1)
-                  }
+                // recursively process includes
+                if (maxDepth == 0) {
+                  throw new IllegalStateException(
+                    "Exceeded maximum recusion depth")
+                } else {
+                  apply(StreamIO.buffer(r.get(path)).toString, maxDepth - 1)
                 }
+              }
               case _ =>
                 throw new IllegalStateException(
-                    "No resolver could find '%s'".format(path))
+                  "No resolver could find '%s'".format(path))
             }
           } else {
             line
@@ -475,7 +485,7 @@ class Eval(target: Option[File]) {
 
   lazy val compilerOutputDir = target match {
     case Some(dir) => AbstractFile.getDirectory(dir)
-    case None => new VirtualDirectory("(memory)", None)
+    case None      => new VirtualDirectory("(memory)", None)
   }
 
   class EvalSettings(targetDir: Option[File]) extends Settings {
@@ -483,18 +493,19 @@ class Eval(target: Option[File]) {
     outputDirs.setSingleOutput(compilerOutputDir)
     private[this] val pathList = compilerPath ::: libPath
     bootclasspath.value = pathList.mkString(File.pathSeparator)
-    classpath.value = (pathList ::: impliedClassPath).mkString(
-        File.pathSeparator)
+    classpath.value =
+      (pathList ::: impliedClassPath).mkString(File.pathSeparator)
   }
 
   /**
     * Dynamic scala compiler. Lots of (slow) state is created, so it may be advantageous to keep
     * around one of these and reuse it.
     */
-  private class StringCompiler(lineOffset: Int,
-                               targetDir: Option[File],
-                               settings: Settings,
-                               messageHandler: Option[Reporter]) {
+  private class StringCompiler(
+      lineOffset: Int,
+      targetDir: Option[File],
+      settings: Settings,
+      messageHandler: Option[Reporter]) {
 
     val cache = new mutable.HashMap[String, Class[_]]()
     val target = compilerOutputDir
@@ -511,9 +522,9 @@ class Eval(target: Option[File]) {
         def display(pos: Position, message: String, severity: Severity) {
           severity.count += 1
           val severityName = severity match {
-            case ERROR => "error: "
+            case ERROR   => "error: "
             case WARNING => "warning: "
-            case _ => ""
+            case _       => ""
           }
           // the line number is not always available
           val lineMessage = try {
@@ -522,9 +533,9 @@ class Eval(target: Option[File]) {
             case _: Throwable => ""
           }
           messages += (severityName + lineMessage + ": " + message) ::
-          (if (pos.isDefined) {
+            (if (pos.isDefined) {
              pos.inUltimateSource(pos.source).lineContent.stripLineEnd ::
-             (" " * (pos.column - 1) + "^") :: Nil
+               (" " * (pos.column - 1) + "^") :: Nil
            } else {
              Nil
            })
@@ -546,27 +557,27 @@ class Eval(target: Option[File]) {
      * Class loader for finding classes compiled by this StringCompiler.
      * After each reset, this class loader will not be able to find old compiled classes.
      */
-    var classLoader = new AbstractFileClassLoader(
-        target, this.getClass.getClassLoader)
+    var classLoader =
+      new AbstractFileClassLoader(target, this.getClass.getClassLoader)
 
     def reset() {
       targetDir match {
         case None => {
-            target.asInstanceOf[VirtualDirectory].clear()
-          }
+          target.asInstanceOf[VirtualDirectory].clear()
+        }
         case Some(t) => {
-            target.foreach { abstractFile =>
-              if (abstractFile.file == null ||
-                  abstractFile.file.getName.endsWith(".class")) {
-                abstractFile.delete()
-              }
+          target.foreach { abstractFile =>
+            if (abstractFile.file == null ||
+                abstractFile.file.getName.endsWith(".class")) {
+              abstractFile.delete()
             }
           }
+        }
       }
       cache.clear()
       reporter.reset()
-      classLoader = new AbstractFileClassLoader(
-          target, this.getClass.getClassLoader)
+      classLoader =
+        new AbstractFileClassLoader(target, this.getClass.getClassLoader)
     }
 
     object Debug {
@@ -623,9 +634,10 @@ class Eval(target: Option[File]) {
     /**
       * Compile a new class, load it, and return it. Thread-safe.
       */
-    def apply(code: String,
-              className: String,
-              resetState: Boolean = true): Class[_] = {
+    def apply(
+        code: String,
+        className: String,
+        resetState: Boolean = true): Class[_] = {
       synchronized {
         if (resetState) reset()
         findClass(className).getOrElse {
@@ -638,6 +650,6 @@ class Eval(target: Option[File]) {
 
   class CompilerException(val messages: List[List[String]])
       extends Exception(
-          "Compiler exception " +
+        "Compiler exception " +
           messages.map(_.mkString("\n")).mkString("\n"))
 }

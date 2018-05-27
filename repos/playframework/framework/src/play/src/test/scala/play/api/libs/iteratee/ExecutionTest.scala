@@ -31,11 +31,14 @@ class ExecutionTest {
     _testExecution(ec1 => _testExecution(ec2 => f(ec1, ec2)))
   }
 
-  def testExecution[A](f: F.Function3[
-          TestExecutionContext, TestExecutionContext, TestExecutionContext, A])
-    : A = {
+  def testExecution[A](
+      f: F.Function3[
+        TestExecutionContext,
+        TestExecutionContext,
+        TestExecutionContext,
+        A]): A = {
     _testExecution(
-        ec1 => _testExecution(ec2 => _testExecution(ec3 => f(ec1, ec2, ec3))))
+      ec1 => _testExecution(ec2 => _testExecution(ec3 => f(ec1, ec2, ec3))))
   }
 
   private def _mustExecute[A](expectedCount: => Int)(
@@ -43,8 +46,8 @@ class ExecutionTest {
     _testExecution { tec =>
       val result = f(tec)
       assert(
-          tec.executionCount == expectedCount,
-          s"Expected execution count of $expectedCount but recorded ${tec.executionCount}")
+        tec.executionCount == expectedCount,
+        s"Expected execution count of $expectedCount but recorded ${tec.executionCount}")
       result
     }
   }
@@ -53,10 +56,11 @@ class ExecutionTest {
     _mustExecute(expectedCount)(c.accept)
   }
 
-  def mustExecute(expectedCount1: Int,
-                  expectedCount2: Int,
-                  c: BiConsumer[ExecutionContext, ExecutionContext]): Unit = {
-    _mustExecute(expectedCount1)(
-        ec1 => _mustExecute(expectedCount2)(ec2 => c.accept(ec1, ec2)))
+  def mustExecute(
+      expectedCount1: Int,
+      expectedCount2: Int,
+      c: BiConsumer[ExecutionContext, ExecutionContext]): Unit = {
+    _mustExecute(expectedCount1)(ec1 =>
+      _mustExecute(expectedCount2)(ec2 => c.accept(ec1, ec2)))
   }
 }

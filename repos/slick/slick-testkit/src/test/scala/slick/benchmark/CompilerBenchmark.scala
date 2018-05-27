@@ -49,11 +49,11 @@ object CompilerBenchmark {
         Console.readLine()
       }*/
       println(
-          String.format(
-              "Creating: %1$7.3f ms, toNode: %2$7.3f ms, compiling: %3$7.3f ms",
-              t1.asInstanceOf[AnyRef],
-              t2.asInstanceOf[AnyRef],
-              t3.asInstanceOf[AnyRef]))
+        String.format(
+          "Creating: %1$7.3f ms, toNode: %2$7.3f ms, compiling: %3$7.3f ms",
+          t1.asInstanceOf[AnyRef],
+          t2.asInstanceOf[AnyRef],
+          t3.asInstanceOf[AnyRef]))
       compileMS = t3
     }
 
@@ -62,10 +62,11 @@ object CompilerBenchmark {
       val pms = (phaseNanos(p.name)(0) / 1000000.0 / COUNT_COMPILE)
       val percentage = pms / compileMS * 100.0
       println(
-          String.format("Phase %1$25s: %2$7.3f ms, %3$7.3f %%",
-                        p.name,
-                        pms.asInstanceOf[AnyRef],
-                        percentage.asInstanceOf[AnyRef]))
+        String.format(
+          "Phase %1$25s: %2$7.3f ms, %3$7.3f %%",
+          p.name,
+          pms.asInstanceOf[AnyRef],
+          percentage.asInstanceOf[AnyRef]))
     }
   }
 
@@ -87,7 +88,8 @@ object CompilerBenchmark {
   def queriesFromNewComposition: Vector[Rep[_]] = {
     class SuppliersStd(tag: Tag)
         extends Table[(Int, String, String, String, String, String)](
-            tag, "SUPPLIERS") {
+          tag,
+          "SUPPLIERS") {
       def id =
         column[Int]("SUP_ID", O.PrimaryKey) // This is the primary key column
       def name = column[String]("SUP_NAME")
@@ -157,7 +159,7 @@ object CompilerBenchmark {
           .sortBy(_._1.price)
           .take(2)
           .filter(_._1.name =!= "Colombian")
-          (c2, s2) <- q1b_0
+        (c2, s2) <- q1b_0
       } yield (c.name, s.city, c2.name)
     val q2 = for {
       c <- coffees.filter(_.price < 900).map(_.*)
@@ -217,7 +219,7 @@ object CompilerBenchmark {
     val q7b = q7 filter (_._1 =!= "Colombian")
     val q8 = for {
       (c1, c2) <- coffees.filter(_.price < 900) joinLeft coffees.filter(
-          _.price < 800) on (_.name === _.name)
+        _.price < 800) on (_.name === _.name)
     } yield (c1.name, c2.map(_.name))
     val q8b = for {
       t <- coffees.sortBy(_.sales).take(1) joinLeft coffees
@@ -227,31 +229,32 @@ object CompilerBenchmark {
         .take(4) on (_._1.supID === _.supID)
     } yield (t._1, t._2)
 
-    Vector(qa,
-           qa2,
-           qb,
-           qb2,
-           qc,
-           q0,
-           q1,
-           q1b_0,
-           q1b,
-           q2,
-           q3,
-           q3b,
-           q4,
-           q4b_0,
-           q4b,
-           q5_0,
-           q5,
-           q5b,
-           q6,
-           q7a,
-           q1,
-           q71,
-           q7b,
-           q8,
-           q8b)
+    Vector(
+      qa,
+      qa2,
+      qb,
+      qb2,
+      qc,
+      q0,
+      q1,
+      q1b_0,
+      q1b,
+      q2,
+      q3,
+      q3b,
+      q4,
+      q4b_0,
+      q4b,
+      q5_0,
+      q5,
+      q5b,
+      q6,
+      q7a,
+      q1,
+      q71,
+      q7b,
+      q8,
+      q8b)
   }
 
   def queriesFromAdancedFusion: Vector[Rep[_]] = {
@@ -305,8 +308,7 @@ object CompilerBenchmark {
   }
 
   def queriesFromNewFusion: Vector[Rep[_]] = {
-    class A(tag: Tag)
-        extends Table[(Int, String, String)](tag, "A_NEWFUSION") {
+    class A(tag: Tag) extends Table[(Int, String, String)](tag, "A_NEWFUSION") {
       def id = column[Int]("id")
       def a = column[String]("a")
       def b = column[String]("b")
@@ -325,12 +327,13 @@ object CompilerBenchmark {
     val q5c = as.filter(_.b === "b").map(_.id).to[Set]
     val q6 = (as join as).groupBy(j => (j._1.a, j._1.b)).map {
       case (ab, rs) =>
-        (ab,
-         rs.length,
-         rs.map(_._1).length,
-         rs.map(_._2).length,
-         rs.map(_._1.id).max,
-         rs.map(_._1.id).length)
+        (
+          ab,
+          rs.length,
+          rs.map(_._1).length,
+          rs.map(_._2).length,
+          rs.map(_._1.id).max,
+          rs.map(_._1.id).length)
     }
     val q7 = q6.filter(_._1._1 === "a").map(_._5.getOrElse(0))
     val q8 = as.sortBy(_.id.desc).map(_.a)
@@ -347,37 +350,38 @@ object CompilerBenchmark {
     val q13 = (as.filter(_.id < 2) union as.filter(_.id > 2)).map(_.id)
     val q14 = q13.to[Set]
     val q15 = (as.map(a => a.id.?).filter(_ < 2) unionAll as
-          .map(a => a.id.?)
-          .filter(_ > 2)).map(_.get).to[Set]
+      .map(a => a.id.?)
+      .filter(_ > 2)).map(_.get).to[Set]
     val q16 = (as.map(a => a.id.?).filter(_ < 2) unionAll as
-          .map(a => a.id.?)
-          .filter(_ > 2)).map(_.getOrElse(-1)).to[Set].filter(_ =!= 42)
+      .map(a => a.id.?)
+      .filter(_ > 2)).map(_.getOrElse(-1)).to[Set].filter(_ =!= 42)
     val q17 = as.sortBy(_.id).zipWithIndex.filter(_._2 < 2L).map {
       case (a, i) => (a.id, i)
     }
 
-    Vector[Rep[_]](q1,
-                   q2,
-                   q3,
-                   q4,
-                   q5a,
-                   q5b,
-                   q5c,
-                   q6,
-                   q7,
-                   q8,
-                   q9a,
-                   q9b,
-                   q10,
-                   q11a,
-                   q11b,
-                   q11c,
-                   q11d,
-                   q11e,
-                   q11f,
-                   q12,
-                   q13,
-                   q14, /*q15,*/ q16,
-                   q17)
+    Vector[Rep[_]](
+      q1,
+      q2,
+      q3,
+      q4,
+      q5a,
+      q5b,
+      q5c,
+      q6,
+      q7,
+      q8,
+      q9a,
+      q9b,
+      q10,
+      q11a,
+      q11b,
+      q11c,
+      q11d,
+      q11e,
+      q11f,
+      q12,
+      q13,
+      q14, /*q15,*/ q16,
+      q17)
   }
 }

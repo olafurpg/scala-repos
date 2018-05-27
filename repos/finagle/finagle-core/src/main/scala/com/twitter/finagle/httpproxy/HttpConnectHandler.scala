@@ -1,8 +1,15 @@
 package com.twitter.finagle.httpproxy
 
 import com.twitter.finagle.client.Transporter.Credentials
-import com.twitter.finagle.netty3.{SocketAddressResolveHandler, SocketAddressResolver}
-import com.twitter.finagle.{ChannelClosedException, ConnectionFailedException, InconsistentStateException}
+import com.twitter.finagle.netty3.{
+  SocketAddressResolveHandler,
+  SocketAddressResolver
+}
+import com.twitter.finagle.{
+  ChannelClosedException,
+  ConnectionFailedException,
+  InconsistentStateException
+}
 import com.twitter.io.Charsets
 import com.twitter.util.Base64StringEncoder
 
@@ -26,14 +33,14 @@ object HttpConnectHandler {
       proxyCredentials: Option[Credentials]
   ): HttpConnectHandler = {
     val clientCodec = new HttpClientCodec()
-    val handler = new HttpConnectHandler(
-        proxyAddr, addr, clientCodec, proxyCredentials)
+    val handler =
+      new HttpConnectHandler(proxyAddr, addr, clientCodec, proxyCredentials)
     pipeline.addFirst("httpProxyCodec", handler)
     proxyAddr match {
       case proxyInetAddr: InetSocketAddress if proxyInetAddr.isUnresolved =>
-        pipeline.addFirst("socketAddressResolver",
-                          new SocketAddressResolveHandler(
-                              SocketAddressResolver.random, addr))
+        pipeline.addFirst(
+          "socketAddressResolver",
+          new SocketAddressResolveHandler(SocketAddressResolver.random, addr))
       case _ =>
     }
     pipeline.addFirst("clientCodec", clientCodec)
@@ -49,10 +56,11 @@ object HttpConnectHandler {
   }
 }
 
-class HttpConnectHandler(proxyAddr: SocketAddress,
-                         addr: InetSocketAddress,
-                         clientCodec: HttpClientCodec,
-                         proxyCredentials: Option[Credentials])
+class HttpConnectHandler(
+    proxyAddr: SocketAddress,
+    addr: InetSocketAddress,
+    clientCodec: HttpClientCodec,
+    proxyCredentials: Option[Credentials])
     extends SimpleChannelHandler {
 
   private[this] val connectFuture = new AtomicReference[ChannelFuture](null)
@@ -63,22 +71,27 @@ class HttpConnectHandler(proxyAddr: SocketAddress,
   }
 
   private[this] def writeRequest(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent) {
+      ctx: ChannelHandlerContext,
+      e: ChannelStateEvent) {
     val hostNameWithPort = addr.getAddress.getHostName + ":" + addr.getPort
     val req = new DefaultHttpRequest(
-        HttpVersion.HTTP_1_1, HttpMethod.CONNECT, hostNameWithPort)
+      HttpVersion.HTTP_1_1,
+      HttpMethod.CONNECT,
+      hostNameWithPort)
     req.headers().set("Host", hostNameWithPort)
     proxyCredentials.foreach { creds =>
       req
         .headers()
-        .set(HttpHeaders.Names.PROXY_AUTHORIZATION,
-             proxyAuthorizationHeader(creds))
+        .set(
+          HttpHeaders.Names.PROXY_AUTHORIZATION,
+          proxyAuthorizationHeader(creds))
     }
     Channels.write(ctx, Channels.future(ctx.getChannel), req, null)
   }
 
   override def connectRequested(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent) {
+      ctx: ChannelHandlerContext,
+      e: ChannelStateEvent) {
     e match {
       case de: DownstreamChannelStateEvent =>
         if (!connectFuture.compareAndSet(null, e.getFuture)) {
@@ -88,16 +101,14 @@ class HttpConnectHandler(proxyAddr: SocketAddress,
 
         // proxy cancellation
         val wrappedConnectFuture = Channels.future(de.getChannel, true)
-        de.getFuture.addListener(
-            new ChannelFutureListener {
+        de.getFuture.addListener(new ChannelFutureListener {
           def operationComplete(f: ChannelFuture) {
             if (f.isCancelled) wrappedConnectFuture.cancel()
           }
         })
         // Proxy failures here so that if the connect fails, it is
         // propagated to the listener, not just on the channel.
-        wrappedConnectFuture.addListener(
-            new ChannelFutureListener {
+        wrappedConnectFuture.addListener(new ChannelFutureListener {
           def operationComplete(f: ChannelFuture) {
             if (f.isSuccess || f.isCancelled) return
 
@@ -106,7 +117,10 @@ class HttpConnectHandler(proxyAddr: SocketAddress,
         })
 
         val wrappedEvent = new DownstreamChannelStateEvent(
-            de.getChannel, wrappedConnectFuture, de.getState, proxyAddr)
+          de.getChannel,
+          wrappedConnectFuture,
+          de.getState,
+          proxyAddr)
 
         super.connectRequested(ctx, wrappedEvent)
 
@@ -117,7 +131,8 @@ class HttpConnectHandler(proxyAddr: SocketAddress,
 
   // we delay propagating connection upstream until we've completed the proxy connection.
   override def channelConnected(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent) {
+      ctx: ChannelHandlerContext,
+      e: ChannelStateEvent) {
     if (connectFuture.get eq null) {
       fail(ctx.getChannel, new InconsistentStateException(addr))
       return
@@ -126,7 +141,7 @@ class HttpConnectHandler(proxyAddr: SocketAddress,
     // proxy cancellations again.
     connectFuture.get.addListener(new ChannelFutureListener {
       def operationComplete(f: ChannelFuture) {
-        if (f.isSuccess) HttpConnectHandler. super.channelConnected(ctx, e)
+        if (f.isSuccess) HttpConnectHandler.super.channelConnected(ctx, e)
         else if (f.isCancelled)
           fail(ctx.getChannel, new ChannelClosedException(addr))
       }
@@ -147,7 +162,7 @@ class HttpConnectHandler(proxyAddr: SocketAddress,
       connectFuture.get.setSuccess()
     } else {
       val cause = new Throwable(
-          "unexpected response status received by HttpConnectHandler:" +
+        "unexpected response status received by HttpConnectHandler:" +
           resp.getStatus)
 
       fail(e.getChannel, new ConnectionFailedException(cause, addr))

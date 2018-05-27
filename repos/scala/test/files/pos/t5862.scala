@@ -30,11 +30,12 @@ class MapReduceJob {
     MMap.empty
 
   def addTaggedMapper[A, K, V](
-      input: DataSource, m: TaggedMapper[A, K, V]): Unit = {
+      input: DataSource,
+      m: TaggedMapper[A, K, V]): Unit = {
     if (!mappers.contains(input)) mappers += (input -> MSet(m))
     else mappers(input) += m // : Unit
 
     m.tags.foreach { tag =>
-    }
+      }
   }
 }

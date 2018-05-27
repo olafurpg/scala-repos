@@ -16,7 +16,7 @@ object DatabaseMeta {
     if (r.hasMoreColumns)
       r.nextString match {
         case "YES" => Some(true)
-        case "NO" => Some(false)
-        case _ => None
+        case "NO"  => Some(false)
+        case _     => None
       } else None
 }

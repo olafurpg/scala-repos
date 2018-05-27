@@ -87,7 +87,7 @@ class BinaryCLMTTest extends Specification {
         clmt.copy(check = A3.some)
       }
       read(
-          "11110000" :: _0_ :: "00000001" :: "10000110" :: "10011111" :: "00111111" :: Nil) must_== {
+        "11110000" :: _0_ :: "00000001" :: "10000110" :: "10011111" :: "00111111" :: Nil) must_== {
         clmt.copy(lastMoveTime = Some(99999), check = Some(H8))
       }
     }

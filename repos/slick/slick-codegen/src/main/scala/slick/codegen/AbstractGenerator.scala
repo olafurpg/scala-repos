@@ -147,7 +147,7 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
       def doc =
         if (classEnabled) {
           s"Entity class storing rows of table ${TableValue.name}\n" +
-          columns.map(c => "@param " + c.name + " " + c.doc).mkString("\n")
+            columns.map(c => "@param " + c.name + " " + c.doc).mkString("\n")
         } else {
           s"Row type of table ${TableValue.name}\n"
         }
@@ -161,7 +161,7 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
         @group Basic customization overrides */
     def PlainSqlMapper: PlainSqlMapper
 
-    /** Plain SQL GetResult mapper generator definition 
+    /** Plain SQL GetResult mapper generator definition
         @group Basic customization overrides */
     trait PlainSqlMapperDef extends TermDef {
       def doc =
@@ -176,7 +176,7 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
         @group Basic customization overrides */
     def TableClass: TableClass
 
-    /** Table class generator definition 
+    /** Table class generator definition
         @group Basic customization overrides */
     trait TableClassDef extends TypeDef {
 
@@ -200,13 +200,15 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
           val collidingTerms = columns.map(_.rawName) intersect scalaKeywords
           if (collidingTerms.nonEmpty)
             "\nNOTE: The following names collided with Scala keywords and were escaped: " +
-            collidingTerms.mkString(", ") else ""
+              collidingTerms.mkString(", ")
+          else ""
         } + {
           val collidingTerms =
             columns.map(_.rawName) intersect slickTableTermMembersNoArgs
           if (collidingTerms.nonEmpty)
             "\nNOTE: The following names collided with Scala method names and were disambiguated: " +
-            collidingTerms.mkString(", ") else ""
+              collidingTerms.mkString(", ")
+          else ""
         }
       def rawName: String = tableName(model.name.table)
       def code: Code
@@ -226,11 +228,11 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
         }
 
         Seq[Seq[Def]](
-            Seq(StarDef, OptionDef),
-            columns,
-            primaryKey.toSeq,
-            foreignKeys,
-            indices
+          Seq(StarDef, OptionDef),
+          columns,
+          primaryKey.toSeq,
+          foreignKeys,
+          indices
         )
       }
 
@@ -248,7 +250,7 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
         @group Basic customization overrides */
     def TableValue: TableValue
 
-    /** Table value generator definition (generates a collection-like value representing this database table). 
+    /** Table value generator definition (generates a collection-like value representing this database table).
         @group Basic customization overrides */
     trait TableValueDef extends TermDef {
       def doc =
@@ -266,7 +268,7 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
 
     /**
       * Column related generator definition
-      * @group Basic customization overrides 
+      * @group Basic customization overrides
       * @param model corresponding Slick meta model component
       */
     abstract case class ColumnDef(val model: m.Column) extends TermDef {
@@ -290,8 +292,9 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
       /** Indicates whether this column should be user facing as a nullable column with default None even though it is not. Useful for autoInc columns. */
       final def fakeNullable = autoIncLastAsOption && autoInc
 
-      assert(!(model.nullable && fakeNullable),
-             s"Cannot enable 'fakeNullable' for a 'nullable' column. $model")
+      assert(
+        !(model.nullable && fakeNullable),
+        s"Cannot enable 'fakeNullable' for a 'nullable' column. $model")
 
       /** Indicates whether this is an auto increment column */
       final def autoInc = model.options.contains(ColumnOption.AutoInc)
@@ -301,10 +304,12 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
 
       /** Generates code for the ColumnOptions (DBType, AutoInc, etc.) */
       def options: Iterable[Code] =
-        model.options.filter {
-          case t: SqlProfile.ColumnOption.SqlType => dbType
-          case _ => true
-        }.flatMap(columnOptionCode(_).toSeq)
+        model.options
+          .filter {
+            case t: SqlProfile.ColumnOption.SqlType => dbType
+            case _                                  => true
+          }
+          .flatMap(columnOptionCode(_).toSeq)
 
       /** Indicates if a (non-portable) DBType ColumnOption should be generated */
       def dbType: Boolean = false
@@ -314,15 +319,18 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
 
       /** Generates a literal represenation of the default value or None in case of an Option-typed autoinc column */
       def default: Option[Code] =
-        model.options.collect {
-          case RelationalProfile.ColumnOption.Default(value) => value
-          case _ if fakeNullable => None
-        }.map(defaultCode).headOption
+        model.options
+          .collect {
+            case RelationalProfile.ColumnOption.Default(value) => value
+            case _ if fakeNullable                             => None
+          }
+          .map(defaultCode)
+          .headOption
 
       def rawName: String = model.name.toCamelCase.uncapitalize
       def doc: String =
         "Database column " + model.name + " " +
-        model.options.map(_.toString).mkString(", ")
+          model.options.map(_.toString).mkString(", ")
     }
 
     /** Primary key generator virtual class */
@@ -335,11 +343,10 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
     /**
       * PrimaryKey related generator definition
       * (Currently only used for composite primary keys.)
-      * @group Basic customization overrides 
+      * @group Basic customization overrides
       * @param model corresponding Slick meta model component
       */
-    abstract case class PrimaryKeyDef(val model: m.PrimaryKey)
-        extends TermDef {
+    abstract case class PrimaryKeyDef(val model: m.PrimaryKey) extends TermDef {
 
       /** Columns code generators in correct order */
       final lazy val columns: Seq[Column] =
@@ -367,11 +374,10 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
 
     /**
       * ForeignKey related generator definition
-      * @group Basic customization overrides 
+      * @group Basic customization overrides
       * @param model corresponding Slick meta model component
       */
-    abstract case class ForeignKeyDef(val model: m.ForeignKey)
-        extends TermDef {
+    abstract case class ForeignKeyDef(val model: m.ForeignKey) extends TermDef {
       private val id = freshFkId
 
       /** Referencing Table code generator */
@@ -383,7 +389,7 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
 
       /** Referenced Table code generator */
       final lazy val referencedTable: Table = tablesByName(
-          model.referencedTable)
+        model.referencedTable)
 
       /** Referenced Columns code generators */
       final lazy val referencedColumns: Seq[TableDef#Column] =
@@ -400,12 +406,12 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
           val fksToSameTable =
             foreignKeys.filter(_.referencedTable == referencedTable)
           require(
-              fksToSameTable.filter(_.model.name.isEmpty).size <= 1,
-              s"Found multiple unnamed foreign keys to same table, please manually provide names using overrides. ${referencingTable.model.name.table} -> ${referencedTable.model.name.table}"
+            fksToSameTable.filter(_.model.name.isEmpty).size <= 1,
+            s"Found multiple unnamed foreign keys to same table, please manually provide names using overrides. ${referencingTable.model.name.table} -> ${referencedTable.model.name.table}"
           )
           val baseName = referencedTable.TableClass.rawName.uncapitalize + "Fk"
           disambiguateTerm(
-              if (fksToSameTable.size > 1) baseName + id else baseName)
+            if (fksToSameTable.size > 1) baseName + id else baseName)
         })
       def doc =
         s"Foreign key referencing ${referencedTable.TableValue.name} (database name ${dbName})"
@@ -426,7 +432,7 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
 
     /**
       * Index related generator definition
-      * @group Basic customization overrides 
+      * @group Basic customization overrides
       * @param model corresponding Slick meta model component
       */
     abstract case class IndexDef(val model: m.Index) extends TermDef {
@@ -442,8 +448,8 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
       def rawName = disambiguateTerm("index" + id)
       def doc: String =
         (if (model.unique) "Uniqueness " else "") + "Index over " +
-        columns.map(_.name).mkString("(", ",", ")") +
-        s" (database name ${dbName})"
+          columns.map(_.name).mkString("(", ",", ")") +
+          s" (database name ${dbName})"
     }
 
     /** Common interface for any kind of definition within the generated code */
@@ -477,12 +483,12 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
       override def docWithCode: Code = {
         val newdoc =
           doc +
-          (if (scalaKeywords.contains(rawName))
-             s"\nNOTE: The name was escaped because it collided with a Scala keyword."
-           else "") +
-          (if (slickTableTermMembersNoArgs.contains(rawName))
-             s"\nNOTE: The name was disambiguated because it collided with Slick's method Table#$rawName."
-           else "")
+            (if (scalaKeywords.contains(rawName))
+               s"\nNOTE: The name was escaped because it collided with a Scala keyword."
+             else "") +
+            (if (slickTableTermMembersNoArgs.contains(rawName))
+               s"\nNOTE: The name was disambiguated because it collided with Slick's method Table#$rawName."
+             else "")
         codegen.docWithCode(newdoc, code)
       }
 
@@ -526,75 +532,78 @@ trait GeneratorHelpers[Code, TermName, TypeName] {
   def docWithCode(comment: String, code: Code): Code
 
   /** Words that are reserved keywords in Scala */
-  val scalaKeywords = Seq("abstract",
-                          "case",
-                          "catch",
-                          "class",
-                          "def",
-                          "do",
-                          "else",
-                          "extends",
-                          "false",
-                          "final",
-                          "finally",
-                          "for",
-                          "forSome",
-                          "if",
-                          "implicit",
-                          "import",
-                          "lazy",
-                          "match",
-                          "new",
-                          "null",
-                          "object",
-                          "override",
-                          "package",
-                          "private",
-                          "protected",
-                          "return",
-                          "sealed",
-                          "super",
-                          "this",
-                          "throw",
-                          "trait",
-                          "try",
-                          "true",
-                          "type",
-                          "val",
-                          "var",
-                          "while",
-                          "with",
-                          "yield",
-                          ":",
-                          "=",
-                          "=>",
-                          "<-",
-                          "<:",
-                          "<%",
-                          ">:",
-                          "#",
-                          "@")
+  val scalaKeywords = Seq(
+    "abstract",
+    "case",
+    "catch",
+    "class",
+    "def",
+    "do",
+    "else",
+    "extends",
+    "false",
+    "final",
+    "finally",
+    "for",
+    "forSome",
+    "if",
+    "implicit",
+    "import",
+    "lazy",
+    "match",
+    "new",
+    "null",
+    "object",
+    "override",
+    "package",
+    "private",
+    "protected",
+    "return",
+    "sealed",
+    "super",
+    "this",
+    "throw",
+    "trait",
+    "try",
+    "true",
+    "type",
+    "val",
+    "var",
+    "while",
+    "with",
+    "yield",
+    ":",
+    "=",
+    "=>",
+    "<-",
+    "<:",
+    "<%",
+    ">:",
+    "#",
+    "@"
+  )
 
   /** Existing term member names in Table[_] that do not take parameters */
   val slickTableTermMembersNoArgs = Seq(
-      // Rep
-      Seq("toNode"),
-      // AbstractTable
-      Seq("*",
-          "tableIdentitySymbol",
-          "create_*",
-          "foreignKeys",
-          "indexes",
-          "primaryKeys",
-          "schemaName",
-          "tableConstraints",
-          "tableName",
-          "tableNode",
-          "tableTag"),
-      // Table
-      Seq("O", "tableIdentitySymbol", "tableProvider"),
-      // generated code
-      Seq("_tableTag")
+    // Rep
+    Seq("toNode"),
+    // AbstractTable
+    Seq(
+      "*",
+      "tableIdentitySymbol",
+      "create_*",
+      "foreignKeys",
+      "indexes",
+      "primaryKeys",
+      "schemaName",
+      "tableConstraints",
+      "tableName",
+      "tableNode",
+      "tableTag"),
+    // Table
+    Seq("O", "tableIdentitySymbol", "tableProvider"),
+    // generated code
+    Seq("_tableTag")
   ).flatten
   /* currently disambiguated using overloading
   /** Existing term member names in Table[_] that take parameters */
@@ -630,7 +639,7 @@ trait GeneratorHelpers[Code, TermName, TypeName] {
     final def uncapitalize: String = str(0).toString.toLowerCase + str.tail
 
     /**
-      * Capitalizes the first (16 bit) character of each word separated by one or more '_'. Lower cases all other characters. 
+      * Capitalizes the first (16 bit) character of each word separated by one or more '_'. Lower cases all other characters.
       * Removes one '_' from each sequence of one or more subsequent '_' (to avoid collision).
       * (Warning: Not unicode-safe, uses String#apply)
       */
@@ -639,7 +648,7 @@ trait GeneratorHelpers[Code, TermName, TypeName] {
         .split("_")
         .map {
           case "" => "_"
-          case s => s
+          case s  => s
         } // avoid possible collisions caused by multiple '_'
         .map(_.capitalize)
         .mkString("")

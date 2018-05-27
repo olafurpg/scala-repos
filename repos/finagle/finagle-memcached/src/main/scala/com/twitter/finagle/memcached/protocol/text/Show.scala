@@ -20,14 +20,16 @@ class ResponseToEncoding extends OneToOneEncoder {
   private[this] val DELETED = Buf.Utf8("DELETED")
 
   def encode(
-      ctx: ChannelHandlerContext, ch: Channel, message: AnyRef): Decoding =
+      ctx: ChannelHandlerContext,
+      ch: Channel,
+      message: AnyRef): Decoding =
     message match {
-      case Stored() => Tokens(Seq(STORED))
-      case NotStored() => Tokens(Seq(NOT_STORED))
-      case Exists() => Tokens(Seq(EXISTS))
-      case Deleted() => Tokens(Seq(DELETED))
-      case NotFound() => Tokens(Seq(NOT_FOUND))
-      case NoOp() => Tokens(Nil)
+      case Stored()      => Tokens(Seq(STORED))
+      case NotStored()   => Tokens(Seq(NOT_STORED))
+      case Exists()      => Tokens(Seq(EXISTS))
+      case Deleted()     => Tokens(Seq(DELETED))
+      case NotFound()    => Tokens(Seq(NOT_FOUND))
+      case NoOp()        => Tokens(Nil)
       case Number(value) => Tokens(Seq(Buf.Utf8(value.toString)))
       case Error(cause) =>
         val formatted: Seq[Array[Byte]] = ExceptionHandler.format(cause)
@@ -81,33 +83,35 @@ class CommandToEncoding extends OneToOneEncoder {
     if (i == 0) ZeroBuf else Buf.Utf8(i.toString)
 
   def encode(
-      ctx: ChannelHandlerContext, ch: Channel, message: AnyRef): Decoding =
+      ctx: ChannelHandlerContext,
+      ch: Channel,
+      message: AnyRef): Decoding =
     message match {
       case Add(key, flags, expiry, value) =>
         TokensWithData(
-            Seq(ADD, key, intToUtf8(flags), intToUtf8(expiry.inSeconds)),
-            value)
+          Seq(ADD, key, intToUtf8(flags), intToUtf8(expiry.inSeconds)),
+          value)
       case Set(key, flags, expiry, value) =>
         TokensWithData(
-            Seq(SET, key, intToUtf8(flags), intToUtf8(expiry.inSeconds)),
-            value)
+          Seq(SET, key, intToUtf8(flags), intToUtf8(expiry.inSeconds)),
+          value)
       case Replace(key, flags, expiry, value) =>
         TokensWithData(
-            Seq(REPLACE, key, intToUtf8(flags), intToUtf8(expiry.inSeconds)),
-            value)
+          Seq(REPLACE, key, intToUtf8(flags), intToUtf8(expiry.inSeconds)),
+          value)
       case Append(key, flags, expiry, value) =>
         TokensWithData(
-            Seq(APPEND, key, intToUtf8(flags), intToUtf8(expiry.inSeconds)),
-            value)
+          Seq(APPEND, key, intToUtf8(flags), intToUtf8(expiry.inSeconds)),
+          value)
       case Prepend(key, flags, expiry, value) =>
         TokensWithData(
-            Seq(PREPEND, key, intToUtf8(flags), intToUtf8(expiry.inSeconds)),
-            value)
+          Seq(PREPEND, key, intToUtf8(flags), intToUtf8(expiry.inSeconds)),
+          value)
       case Cas(key, flags, expiry, value, casUnique) =>
         TokensWithData(
-            Seq(CAS, key, intToUtf8(flags), intToUtf8(expiry.inSeconds)),
-            value,
-            Some(casUnique))
+          Seq(CAS, key, intToUtf8(flags), intToUtf8(expiry.inSeconds)),
+          value,
+          Some(casUnique))
       case Get(keys) =>
         Tokens(GET +: keys)
       case Gets(keys) =>
@@ -116,9 +120,9 @@ class CommandToEncoding extends OneToOneEncoder {
         Tokens(GETV +: keys)
       case Upsert(key, flags, expiry, value, version) =>
         TokensWithData(
-            Seq(UPSERT, key, intToUtf8(flags), intToUtf8(expiry.inSeconds)),
-            value,
-            Some(version))
+          Seq(UPSERT, key, intToUtf8(flags), intToUtf8(expiry.inSeconds)),
+          value,
+          Some(version))
       case Incr(key, amount) =>
         Tokens(Seq(INCR, key, Buf.Utf8(amount.toString)))
       case Decr(key, amount) =>
@@ -132,7 +136,9 @@ class CommandToEncoding extends OneToOneEncoder {
 }
 
 class ExceptionHandler extends SimpleChannelUpstreamHandler {
-  override def exceptionCaught(ctx: ChannelHandlerContext, e: ExceptionEvent) = {
+  override def exceptionCaught(
+      ctx: ChannelHandlerContext,
+      e: ExceptionEvent) = {
     val formatted = ExceptionHandler.formatWithEol(e.getCause)
     Channels.write(ctx.getChannel, ChannelBuffers.copiedBuffer(formatted: _*))
   }
@@ -147,9 +153,9 @@ object ExceptionHandler {
   private val Newlines = "[\\r\\n]".r
 
   def formatWithEol(e: Throwable) = format(e) match {
-    case head :: Nil => Seq(head, DELIMITER)
+    case head :: Nil         => Seq(head, DELIMITER)
     case head :: tail :: Nil => Seq(head, SPACE, tail, DELIMITER)
-    case _ => throw e
+    case _                   => throw e
   }
 
   def format(e: Throwable) = e match {

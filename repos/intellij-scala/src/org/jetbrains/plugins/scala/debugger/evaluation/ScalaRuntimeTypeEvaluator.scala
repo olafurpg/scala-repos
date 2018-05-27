@@ -4,9 +4,17 @@ package debugger.evaluation
 import com.intellij.debugger.codeinsight.RuntimeTypeEvaluator
 import com.intellij.debugger.engine.ContextUtil
 import com.intellij.debugger.engine.evaluation.expression.ExpressionEvaluator
-import com.intellij.debugger.engine.evaluation.{CodeFragmentKind, EvaluationContextImpl, TextWithImportsImpl}
+import com.intellij.debugger.engine.evaluation.{
+  CodeFragmentKind,
+  EvaluationContextImpl,
+  TextWithImportsImpl
+}
 import com.intellij.debugger.impl.DebuggerContextImpl
-import com.intellij.debugger.{DebuggerBundle, DebuggerInvocationUtil, EvaluatingComputable}
+import com.intellij.debugger.{
+  DebuggerBundle,
+  DebuggerInvocationUtil,
+  EvaluatingComputable
+}
 import com.intellij.openapi.application.{AccessToken, ReadAction}
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.progress.ProgressIndicator
@@ -31,10 +39,11 @@ import org.jetbrains.plugins.scala.lang.psi.types.ScType.ExtractClass
   * Nikolay.Tropin
   * 8/8/13
   */
-abstract class ScalaRuntimeTypeEvaluator(@Nullable editor: Editor,
-                                         expression: PsiElement,
-                                         context: DebuggerContextImpl,
-                                         indicator: ProgressIndicator)
+abstract class ScalaRuntimeTypeEvaluator(
+    @Nullable editor: Editor,
+    expression: PsiElement,
+    context: DebuggerContextImpl,
+    indicator: ProgressIndicator)
     extends RuntimeTypeEvaluator(editor, expression, context, indicator) {
 
   override def evaluate(evaluationContext: EvaluationContextImpl): PsiType = {
@@ -42,16 +51,20 @@ abstract class ScalaRuntimeTypeEvaluator(@Nullable editor: Editor,
 
     val evaluator: ExpressionEvaluator =
       DebuggerInvocationUtil.commitAndRunReadAction(
-          project, new EvaluatingComputable[ExpressionEvaluator] {
-        def compute: ExpressionEvaluator = {
-          val textWithImports = new TextWithImportsImpl(
-              CodeFragmentKind.CODE_BLOCK, expression.getText)
-          val codeFragment = new ScalaCodeFragmentFactory()
-            .createCodeFragment(textWithImports, expression, project)
-          ScalaEvaluatorBuilder.build(
-              codeFragment, ContextUtil.getSourcePosition(evaluationContext))
+        project,
+        new EvaluatingComputable[ExpressionEvaluator] {
+          def compute: ExpressionEvaluator = {
+            val textWithImports = new TextWithImportsImpl(
+              CodeFragmentKind.CODE_BLOCK,
+              expression.getText)
+            val codeFragment = new ScalaCodeFragmentFactory()
+              .createCodeFragment(textWithImports, expression, project)
+            ScalaEvaluatorBuilder.build(
+              codeFragment,
+              ContextUtil.getSourcePosition(evaluationContext))
+          }
         }
-      })
+      )
     val value: Value = evaluator.evaluate(evaluationContext)
     if (value != null) {
       inReadAction {
@@ -61,8 +74,7 @@ abstract class ScalaRuntimeTypeEvaluator(@Nullable editor: Editor,
       }
     } else
       throw EvaluationException(
-          DebuggerBundle.message(
-              "evaluation.error.surrounded.expression.null"))
+        DebuggerBundle.message("evaluation.error.surrounded.expression.null"))
   }
 }
 
@@ -81,8 +93,8 @@ object ScalaRuntimeTypeEvaluator {
     jdiType match {
       case classType: ClassType =>
         val superclass: ClassType = classType.superclass
-        val stdTypeNames = Seq(
-            "java.lang.Object", "scala.Any", "scala.AnyRef", "scala.AnyVal")
+        val stdTypeNames =
+          Seq("java.lang.Object", "scala.Any", "scala.AnyRef", "scala.AnyVal")
         if (superclass != null && !stdTypeNames.contains(superclass.name)) {
           psiClass = findPsiClass(project, superclass)
           if (psiClass != null) {
@@ -114,10 +126,10 @@ object ScalaRuntimeTypeEvaluator {
     scType match {
       case ExtractClass(psiClass) =>
         psiClass match {
-          case _: ScObject => false
-          case owner: ScModifierListOwner => !owner.hasFinalModifier
+          case _: ScObject                                => false
+          case owner: ScModifierListOwner                 => !owner.hasFinalModifier
           case _ if scType.isInstanceOf[PsiPrimitiveType] => false
-          case _ => !psiClass.hasModifierProperty(PsiModifier.FINAL)
+          case _                                          => !psiClass.hasModifierProperty(PsiModifier.FINAL)
         }
       case _ => false
     }

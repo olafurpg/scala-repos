@@ -27,18 +27,20 @@ package object config {
   /* Common app configuration. */
 
   private[spark] val APPLICATION_TAGS = ConfigBuilder("spark.yarn.tags")
-    .doc("Comma-separated list of strings to pass through as YARN application tags appearing " +
+    .doc(
+      "Comma-separated list of strings to pass through as YARN application tags appearing " +
         "in YARN Application Reports, which can be used for filtering when querying YARN.")
     .stringConf
     .toSequence
     .optional
 
-  private[spark] val ATTEMPT_FAILURE_VALIDITY_INTERVAL_MS = ConfigBuilder(
-      "spark.yarn.am.attemptFailuresValidityInterval")
-    .doc("Interval after which AM failures will be considered independent and " +
-        "not accumulate towards the attempt count.")
-    .timeConf(TimeUnit.MILLISECONDS)
-    .optional
+  private[spark] val ATTEMPT_FAILURE_VALIDITY_INTERVAL_MS =
+    ConfigBuilder("spark.yarn.am.attemptFailuresValidityInterval")
+      .doc(
+        "Interval after which AM failures will be considered independent and " +
+          "not accumulate towards the attempt count.")
+      .timeConf(TimeUnit.MILLISECONDS)
+      .optional
 
   private[spark] val MAX_APP_ATTEMPTS =
     ConfigBuilder("spark.yarn.maxAppAttempts")
@@ -53,15 +55,17 @@ package object config {
       .withDefault(false)
 
   private[spark] val GATEWAY_ROOT_PATH = ConfigBuilder(
-      "spark.yarn.config.gatewayPath")
-    .doc("Root of configuration paths that is present on gateway nodes, and will be replaced " +
+    "spark.yarn.config.gatewayPath")
+    .doc(
+      "Root of configuration paths that is present on gateway nodes, and will be replaced " +
         "with the corresponding path in cluster machines.")
     .stringConf
     .withDefault(null)
 
   private[spark] val REPLACEMENT_ROOT_PATH = ConfigBuilder(
-      "spark.yarn.config.replacementPath")
-    .doc(s"Path to use as a replacement for ${GATEWAY_ROOT_PATH.key} when launching processes " +
+    "spark.yarn.config.replacementPath")
+    .doc(
+      s"Path to use as a replacement for ${GATEWAY_ROOT_PATH.key} when launching processes " +
         "in the YARN cluster.")
     .stringConf
     .withDefault(null)
@@ -70,7 +74,7 @@ package object config {
     ConfigBuilder("spark.yarn.queue").stringConf.withDefault("default")
 
   private[spark] val HISTORY_SERVER_ADDRESS = ConfigBuilder(
-      "spark.yarn.historyServer.address").stringConf.optional
+    "spark.yarn.historyServer.address").stringConf.optional
 
   /* File distribution. */
 
@@ -86,10 +90,10 @@ package object config {
     .optional
 
   private[spark] val ARCHIVES_TO_DISTRIBUTE = ConfigBuilder(
-      "spark.yarn.dist.archives").stringConf.optional
+    "spark.yarn.dist.archives").stringConf.optional
 
   private[spark] val FILES_TO_DISTRIBUTE = ConfigBuilder(
-      "spark.yarn.dist.files").stringConf.optional
+    "spark.yarn.dist.files").stringConf.optional
 
   private[spark] val PRESERVE_STAGING_FILES =
     ConfigBuilder("spark.yarn.preserve.staging.files")
@@ -106,14 +110,15 @@ package object config {
   /* Cluster-mode launcher configuration. */
 
   private[spark] val WAIT_FOR_APP_COMPLETION = ConfigBuilder(
-      "spark.yarn.submit.waitAppCompletion")
-    .doc("In cluster mode, whether to wait for the application to finish before exiting the " +
+    "spark.yarn.submit.waitAppCompletion")
+    .doc(
+      "In cluster mode, whether to wait for the application to finish before exiting the " +
         "launcher process.")
     .booleanConf
     .withDefault(true)
 
   private[spark] val REPORT_INTERVAL = ConfigBuilder(
-      "spark.yarn.report.interval")
+    "spark.yarn.report.interval")
     .doc("Interval between reports of the current app status in cluster mode.")
     .timeConf(TimeUnit.MILLISECONDS)
     .withDefaultString("1s")
@@ -131,13 +136,13 @@ package object config {
       .optional
 
   private[spark] val CONTAINER_LAUNCH_MAX_THREADS = ConfigBuilder(
-      "spark.yarn.containerLauncherMaxThreads").intConf.withDefault(25)
+    "spark.yarn.containerLauncherMaxThreads").intConf.withDefault(25)
 
   private[spark] val MAX_EXECUTOR_FAILURES = ConfigBuilder(
-      "spark.yarn.max.executor.failures").intConf.optional
+    "spark.yarn.max.executor.failures").intConf.optional
 
   private[spark] val MAX_REPORTER_THREAD_FAILURES = ConfigBuilder(
-      "spark.yarn.scheduler.reporterThread.maxFailures").intConf.withDefault(5)
+    "spark.yarn.scheduler.reporterThread.maxFailures").intConf.withDefault(5)
 
   private[spark] val RM_HEARTBEAT_INTERVAL =
     ConfigBuilder("spark.yarn.scheduler.heartbeat.interval-ms")
@@ -150,7 +155,8 @@ package object config {
       .withDefaultString("200ms")
 
   private[spark] val SCHEDULER_SERVICES = ConfigBuilder("spark.yarn.services")
-    .doc("A comma-separated list of class names of services to add to the scheduler.")
+    .doc(
+      "A comma-separated list of class names of services to add to the scheduler.")
     .stringConf
     .toSequence
     .withDefault(Nil)
@@ -173,7 +179,7 @@ package object config {
       .optional
 
   private[spark] val AM_MEMORY_OVERHEAD = ConfigBuilder(
-      "spark.yarn.am.memoryOverhead").bytesConf(ByteUnit.MiB).optional
+    "spark.yarn.am.memoryOverhead").bytesConf(ByteUnit.MiB).optional
 
   private[spark] val AM_MEMORY = ConfigBuilder("spark.yarn.am.memory")
     .bytesConf(ByteUnit.MiB)
@@ -185,12 +191,12 @@ package object config {
     ConfigBuilder("spark.driver.cores").intConf.optional
 
   private[spark] val DRIVER_MEMORY_OVERHEAD = ConfigBuilder(
-      "spark.yarn.driver.memoryOverhead").bytesConf(ByteUnit.MiB).optional
+    "spark.yarn.driver.memoryOverhead").bytesConf(ByteUnit.MiB).optional
 
   /* Executor configuration. */
 
   private[spark] val EXECUTOR_MEMORY_OVERHEAD = ConfigBuilder(
-      "spark.yarn.executor.memoryOverhead").bytesConf(ByteUnit.MiB).optional
+    "spark.yarn.executor.memoryOverhead").bytesConf(ByteUnit.MiB).optional
 
   private[spark] val EXECUTOR_NODE_LABEL_EXPRESSION =
     ConfigBuilder("spark.yarn.executor.nodeLabelExpression")
@@ -201,14 +207,15 @@ package object config {
   /* Security configuration. */
 
   private[spark] val CREDENTIAL_FILE_MAX_COUNT = ConfigBuilder(
-      "spark.yarn.credentials.file.retention.count").intConf.withDefault(5)
+    "spark.yarn.credentials.file.retention.count").intConf.withDefault(5)
 
   private[spark] val CREDENTIALS_FILE_MAX_RETENTION = ConfigBuilder(
-      "spark.yarn.credentials.file.retention.days").intConf.withDefault(5)
+    "spark.yarn.credentials.file.retention.days").intConf.withDefault(5)
 
   private[spark] val NAMENODES_TO_ACCESS = ConfigBuilder(
-      "spark.yarn.access.namenodes")
-    .doc("Extra NameNode URLs for which to request delegation tokens. The NameNode that hosts " +
+    "spark.yarn.access.namenodes")
+    .doc(
+      "Extra NameNode URLs for which to request delegation tokens. The NameNode that hosts " +
         "fs.defaultFS does not need to be listed here.")
     .stringConf
     .toSequence
@@ -222,7 +229,7 @@ package object config {
   /* Private configs. */
 
   private[spark] val CREDENTIALS_FILE_PATH = ConfigBuilder(
-      "spark.yarn.credentials.file").internal.stringConf.withDefault(null)
+    "spark.yarn.credentials.file").internal.stringConf.withDefault(null)
 
   // Internal config to propagate the location of the user's jar to the driver/executors
   private[spark] val APP_JAR =
@@ -230,6 +237,5 @@ package object config {
 
   // Internal config to propagate the locations of any extra jars to add to the classpath
   // of the executors
-  private[spark] val SECONDARY_JARS = ConfigBuilder(
-      "spark.yarn.secondary.jars").internal.stringConf.toSequence.optional
+  private[spark] val SECONDARY_JARS = ConfigBuilder("spark.yarn.secondary.jars").internal.stringConf.toSequence.optional
 }

@@ -39,6 +39,6 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class VerticalDirectionSpec
     extends SFXEnumDelegateSpec[jfxg.VerticalDirection, VerticalDirection](
-        javaClass = classOf[jfxg.VerticalDirection],
-        scalaClass = classOf[VerticalDirection],
-        companion = VerticalDirection)
+      javaClass = classOf[jfxg.VerticalDirection],
+      scalaClass = classOf[VerticalDirection],
+      companion = VerticalDirection)

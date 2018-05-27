@@ -7,7 +7,9 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class CommonsStatsReceiverTest
-    extends FunSuite with BeforeAndAfter with OneInstancePerTest {
+    extends FunSuite
+    with BeforeAndAfter
+    with OneInstancePerTest {
 
   before {
     Stats.flush
@@ -18,7 +20,7 @@ class CommonsStatsReceiverTest
   }
 
   test(
-      "counter should return a new counter object with the given name and reflect incr operations") {
+    "counter should return a new counter object with the given name and reflect incr operations") {
     val counter = (new CommonsStatsReceiver()).counter("foo")
     assert(Stats.getVariable("foo").read.asInstanceOf[Long] == 0)
     counter.incr(7)

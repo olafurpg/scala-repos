@@ -52,13 +52,16 @@ class DirectCompileTest extends ClearAfterClass {
     assertTrue(f.name == "f")
     assertTrue(g.name == "g")
 
-    assertSameCode(instructionsFromMethod(f).dropNonOp,
-                   List(IntOp(BIPUSH, 10), Op(IRETURN)))
+    assertSameCode(
+      instructionsFromMethod(f).dropNonOp,
+      List(IntOp(BIPUSH, 10), Op(IRETURN)))
 
-    assertSameCode(instructionsFromMethod(g).dropNonOp,
-                   List(VarOp(ALOAD, 0),
-                        Invoke(INVOKEVIRTUAL, "C", "f", "()I", itf = false),
-                        Op(IRETURN)))
+    assertSameCode(
+      instructionsFromMethod(g).dropNonOp,
+      List(
+        VarOp(ALOAD, 0),
+        Invoke(INVOKEVIRTUAL, "C", "f", "()I", itf = false),
+        Op(IRETURN)))
   }
 
   @Test
@@ -66,19 +69,21 @@ class DirectCompileTest extends ClearAfterClass {
     // makes sure that dropNoOp doesn't drop labels that are being used
     val List(f) =
       compileMethods(compiler)("""def f(x: Int) = if (x == 0) "a" else "b"""")
-    assertSameCode(instructionsFromMethod(f).dropLinesFrames,
-                   List(
-                       Label(0),
-                       VarOp(ILOAD, 1),
-                       Op(ICONST_0),
-                       Jump(IF_ICMPNE, Label(7)),
-                       Ldc(LDC, "a"),
-                       Op(ARETURN),
-                       Label(7),
-                       Ldc(LDC, "b"),
-                       Op(ARETURN),
-                       Label(11)
-                   ))
+    assertSameCode(
+      instructionsFromMethod(f).dropLinesFrames,
+      List(
+        Label(0),
+        VarOp(ILOAD, 1),
+        Op(ICONST_0),
+        Jump(IF_ICMPNE, Label(7)),
+        Ldc(LDC, "a"),
+        Op(ARETURN),
+        Label(7),
+        Ldc(LDC, "b"),
+        Op(ARETURN),
+        Label(11)
+      )
+    )
   }
 
   @Test
@@ -89,13 +94,14 @@ class DirectCompileTest extends ClearAfterClass {
     val ins = getSingleMethod(b, "g").instructions
     assert(ins exists {
       case Invoke(_, "B", "f", _, _) => true
-      case _ => false
+      case _                         => false
     }, ins)
   }
 
   @Test
   def compileErroneous(): Unit = {
-    compileClasses(compiler)("class C { def f: String = 1 }",
-                             allowMessage = _.msg contains "type mismatch")
+    compileClasses(compiler)(
+      "class C { def f: String = 1 }",
+      allowMessage = _.msg contains "type mismatch")
   }
 }

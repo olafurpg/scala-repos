@@ -27,8 +27,8 @@ import script._
   *  @define coll buffer proxy
   */
 @deprecated(
-    "Proxying is deprecated due to lack of use and compiler-level support.",
-    "2.11.0")
+  "Proxying is deprecated due to lack of use and compiler-level support.",
+  "2.11.0")
 trait BufferProxy[A] extends Buffer[A] with Proxy {
 
   def self: Buffer[A]

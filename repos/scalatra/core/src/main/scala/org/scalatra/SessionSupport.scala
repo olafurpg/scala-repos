@@ -24,7 +24,6 @@ trait SessionSupport { self: ServletApiImplicits =>
   /**
     * The current session.  If none exists, None is returned.
     */
-  def sessionOption(
-      implicit request: HttpServletRequest): Option[HttpSession] =
+  def sessionOption(implicit request: HttpServletRequest): Option[HttpSession] =
     Option(request.getSession(false))
 }

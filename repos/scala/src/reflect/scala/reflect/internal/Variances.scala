@@ -26,7 +26,8 @@ trait Variances { self: SymbolTable =>
     @inline private def withinRefinement(body: => Type): Type = {
       val saved = inRefinement
       inRefinement = true
-      try body finally inRefinement = saved
+      try body
+      finally inRefinement = saved
     }
 
     /** Is every symbol in the owner chain between `site` and the owner of `sym`
@@ -43,19 +44,22 @@ trait Variances { self: SymbolTable =>
     }
 
     protected def issueVarianceError(
-        base: Symbol, sym: Symbol, required: Variance): Unit = ()
+        base: Symbol,
+        sym: Symbol,
+        required: Variance): Unit = ()
 
     // Flip occurrences of type parameters and parameters, unless
     //  - it's a constructor, or case class factory or extractor
     //  - it's a type parameter of tvar's owner.
-    def shouldFlip(sym: Symbol, tvar: Symbol) = (sym.isParameter &&
+    def shouldFlip(sym: Symbol, tvar: Symbol) =
+      (sym.isParameter &&
         !(tvar.isTypeParameterOrSkolem && sym.isTypeParameterOrSkolem &&
-            tvar.owner == sym.owner))
+          tvar.owner == sym.owner))
     // return Bivariant if `sym` is local to a term
     // or is private[this] or protected[this]
     def isLocalOnly(sym: Symbol) =
       !sym.owner.isClass ||
-      (sym.isTerm // ?? shouldn't this be sym.owner.isTerm according to the comments above?
+        (sym.isTerm // ?? shouldn't this be sym.owner.isTerm according to the comments above?
           && (sym.isLocalToThis || sym.isSuperAccessor) // super accessors are implicitly local #4345
           && !escapedLocals(sym))
 
@@ -78,13 +82,13 @@ trait Variances { self: SymbolTable =>
            else if (isLocalOnly(sym)) Bivariant
            else if (sym.isAliasType)
              (// Unsound pre-2.11 behavior preserved under -Xsource:2.10
-              if (settings.isScala211 || sym.isOverridingSymbol) Invariant
-              else {
-                currentRun.reporting.deprecationWarning(
-                    sym.pos,
-                    s"Construct depends on unsound variance analysis and will not compile in scala 2.11 and beyond")
-                Bivariant
-              })
+             if (settings.isScala211 || sym.isOverridingSymbol) Invariant
+             else {
+               currentRun.reporting.deprecationWarning(
+                 sym.pos,
+                 s"Construct depends on unsound variance analysis and will not compile in scala 2.11 and beyond")
+               Bivariant
+             })
            else v)
         def loop(sym: Symbol, v: Variance): Variance =
           (if (sym == tvar.owner || v.isBivariant) v
@@ -104,22 +108,22 @@ trait Variances { self: SymbolTable =>
           def sym_s = s"$sym (${sym.variance}${sym.locationString})"
           def base_s =
             s"$base in ${base.owner}" +
-            (if (base.owner.isClass) "" else " in " + base.owner.enclClass)
+              (if (base.owner.isClass) "" else " in " + base.owner.enclClass)
           log(s"verifying $sym_s is $required at $base_s")
           if (sym.variance != required) issueVarianceError(base, sym, required)
         }
       }
       override def mapOver(decls: Scope): Scope = {
         decls foreach
-        (sym =>
-              withVariance(if (sym.isAliasType) Invariant else variance)(
-                  this(sym.info)))
+          (sym =>
+            withVariance(if (sym.isAliasType) Invariant else variance)(
+              this(sym.info)))
         decls
       }
       private def resultTypeOnly(tp: Type) = tp match {
         case mt: MethodType => !inRefinement
-        case pt: PolyType => true
-        case _ => false
+        case pt: PolyType   => true
+        case _              => false
       }
 
       /** For PolyTypes, type parameters are skipped because they are defined
@@ -129,12 +133,12 @@ trait Variances { self: SymbolTable =>
         */
       def apply(tp: Type): Type = {
         tp match {
-          case _ if isUncheckedVariance(tp) =>
-          case _ if resultTypeOnly(tp) => this(tp.resultType)
+          case _ if isUncheckedVariance(tp)          =>
+          case _ if resultTypeOnly(tp)               => this(tp.resultType)
           case TypeRef(_, sym, _) if sym.isAliasType => this(tp.normalize)
           case TypeRef(_, sym, _) if !sym.variance.isInvariant =>
             checkVarianceOfSymbol(sym); mapOver(tp)
-          case RefinedType(_, _) => withinRefinement(mapOver(tp))
+          case RefinedType(_, _)            => withinRefinement(mapOver(tp))
           case ClassInfoType(parents, _, _) => parents foreach this
           case mt @ MethodType(_, result) =>
             flipped(mt.paramTypes foreach this); this(result)
@@ -148,7 +152,8 @@ trait Variances { self: SymbolTable =>
       def validateDefinition(base: Symbol) {
         val saved = this.base
         this.base = base
-        try apply(base.info) finally this.base = saved
+        try apply(base.info)
+        finally this.base = saved
       }
     }
 
@@ -161,7 +166,8 @@ trait Variances { self: SymbolTable =>
       def sym = tree.symbol
       // No variance check for object-private/protected methods/values.
       // Or constructors, or case class factory or extractor.
-      def skip = (sym == NoSymbol || sym.isLocalToThis ||
+      def skip =
+        (sym == NoSymbol || sym.isLocalToThis ||
           sym.owner.isConstructor || sym.owner.isCaseApplyOrUnapply)
       tree match {
         case defn: MemberDef if skip =>
@@ -208,18 +214,18 @@ trait Variances { self: SymbolTable =>
       if (sym.isAliasType) inType(sym.info).cut else inType(sym.info)
     def inType(tp: Type): Variance = tp match {
       case ErrorType | WildcardType | NoType | NoPrefix => Bivariant
-      case ThisType(_) | ConstantType(_) => Bivariant
-      case TypeRef(_, `tparam`, _) => Covariant
-      case BoundedWildcardType(bounds) => inType(bounds)
-      case NullaryMethodType(restpe) => inType(restpe)
-      case SingleType(pre, sym) => inType(pre)
+      case ThisType(_) | ConstantType(_)                => Bivariant
+      case TypeRef(_, `tparam`, _)                      => Covariant
+      case BoundedWildcardType(bounds)                  => inType(bounds)
+      case NullaryMethodType(restpe)                    => inType(restpe)
+      case SingleType(pre, sym)                         => inType(pre)
       case TypeRef(pre, _, _) if tp.isHigherKinded =>
         inType(pre) // a type constructor cannot occur in tp's args
-      case TypeRef(pre, sym, args) => inType(pre) & inArgs(sym, args)
-      case TypeBounds(lo, hi) => inType(lo).flip & inType(hi)
-      case RefinedType(parents, defs) => inTypes(parents) & inSyms(defs.toList)
-      case MethodType(params, restpe) => inSyms(params).flip & inType(restpe)
-      case PolyType(tparams, restpe) => inSyms(tparams).flip & inType(restpe)
+      case TypeRef(pre, sym, args)          => inType(pre) & inArgs(sym, args)
+      case TypeBounds(lo, hi)               => inType(lo).flip & inType(hi)
+      case RefinedType(parents, defs)       => inTypes(parents) & inSyms(defs.toList)
+      case MethodType(params, restpe)       => inSyms(params).flip & inType(restpe)
+      case PolyType(tparams, restpe)        => inSyms(tparams).flip & inType(restpe)
       case ExistentialType(tparams, restpe) => inSyms(tparams) & inType(restpe)
       case AnnotatedType(annots, tp) =>
         inTypes(annots map (_.atp)) & inType(tp)

@@ -17,7 +17,11 @@
 
 package org.apache.spark.sql.catalyst.plans.logical
 
-import org.apache.spark.sql.catalyst.expressions.{Attribute, AttributeSet, Expression}
+import org.apache.spark.sql.catalyst.expressions.{
+  Attribute,
+  AttributeSet,
+  Expression
+}
 
 /**
   * Transforms the input by forking and running the specified script.
@@ -27,11 +31,12 @@ import org.apache.spark.sql.catalyst.expressions.{Attribute, AttributeSet, Expre
   * @param output the attributes that are produced by the script.
   * @param ioschema the input and output schema applied in the execution of the script.
   */
-case class ScriptTransformation(input: Seq[Expression],
-                                script: String,
-                                output: Seq[Attribute],
-                                child: LogicalPlan,
-                                ioschema: ScriptInputOutputSchema)
+case class ScriptTransformation(
+    input: Seq[Expression],
+    script: String,
+    output: Seq[Attribute],
+    child: LogicalPlan,
+    ioschema: ScriptInputOutputSchema)
     extends UnaryNode {
   override def references: AttributeSet =
     AttributeSet(input.flatMap(_.references))

@@ -16,14 +16,18 @@ import scala.collection.mutable.{Set => MSet}
   * properly when GC concurrently collects elements in this set.
   */
 final class WeakHashSet[A <: AnyRef](
-    val initialCapacity: Int, val loadFactor: Double)
-    extends Set[A] with Function1[A, Boolean] with MSet[A] {
+    val initialCapacity: Int,
+    val loadFactor: Double)
+    extends Set[A]
+    with Function1[A, Boolean]
+    with MSet[A] {
 
   import WeakHashSet._
 
   def this() =
-    this(initialCapacity = WeakHashSet.defaultInitialCapacity,
-         loadFactor = WeakHashSet.defaultLoadFactor)
+    this(
+      initialCapacity = WeakHashSet.defaultInitialCapacity,
+      loadFactor = WeakHashSet.defaultLoadFactor)
 
   type This = WeakHashSet[A]
 
@@ -46,7 +50,7 @@ final class WeakHashSet[A <: AnyRef](
   private def computeCapacity = {
     if (initialCapacity < 0)
       throw new IllegalArgumentException(
-          "initial capacity cannot be less than 0")
+        "initial capacity cannot be less than 0")
     var candidate = 1
     while (candidate < initialCapacity) {
       candidate *= 2
@@ -92,7 +96,7 @@ final class WeakHashSet[A <: AnyRef](
   private[this] def remove(bucket: Int, prevEntry: Entry[A], entry: Entry[A]) {
     prevEntry match {
       case null => table(bucket) = entry.tail
-      case _ => prevEntry.tail = entry.tail
+      case _    => prevEntry.tail = entry.tail
     }
     count -= 1
   }
@@ -137,12 +141,12 @@ final class WeakHashSet[A <: AnyRef](
       def linkedListLoop(entry: Entry[A]): Unit = entry match {
         case null => ()
         case _ => {
-            val bucket = bucketFor(entry.hash)
-            val oldNext = entry.tail
-            entry.tail = table(bucket)
-            table(bucket) = entry
-            linkedListLoop(oldNext)
-          }
+          val bucket = bucketFor(entry.hash)
+          val oldNext = entry.tail
+          entry.tail = table(bucket)
+          table(bucket) = entry
+          linkedListLoop(oldNext)
+        }
       }
       linkedListLoop(oldTable(oldBucket))
 
@@ -156,52 +160,52 @@ final class WeakHashSet[A <: AnyRef](
     case null =>
       throw new NullPointerException("WeakHashSet cannot hold nulls")
     case _ => {
-        removeStaleEntries()
-        val hash = elem.hashCode
-        val bucket = bucketFor(hash)
+      removeStaleEntries()
+      val hash = elem.hashCode
+      val bucket = bucketFor(hash)
 
-        @tailrec
-        def linkedListLoop(entry: Entry[A]): A = entry match {
-          case null => null.asInstanceOf[A]
-          case _ => {
-              val entryElem = entry.get
-              if (elem == entryElem) entryElem
-              else linkedListLoop(entry.tail)
-            }
+      @tailrec
+      def linkedListLoop(entry: Entry[A]): A = entry match {
+        case null => null.asInstanceOf[A]
+        case _ => {
+          val entryElem = entry.get
+          if (elem == entryElem) entryElem
+          else linkedListLoop(entry.tail)
         }
-
-        linkedListLoop(table(bucket))
       }
+
+      linkedListLoop(table(bucket))
+    }
   }
   // add an element to this set unless it's already in there and return the element
   def findEntryOrUpdate(elem: A): A = elem match {
     case null =>
       throw new NullPointerException("WeakHashSet cannot hold nulls")
     case _ => {
-        removeStaleEntries()
-        val hash = elem.hashCode
-        val bucket = bucketFor(hash)
-        val oldHead = table(bucket)
+      removeStaleEntries()
+      val hash = elem.hashCode
+      val bucket = bucketFor(hash)
+      val oldHead = table(bucket)
 
-        def add() = {
-          table(bucket) = new Entry(elem, hash, oldHead, queue)
-          count += 1
-          if (count > threshold) resize()
-          elem
-        }
-
-        @tailrec
-        def linkedListLoop(entry: Entry[A]): A = entry match {
-          case null => add()
-          case _ => {
-              val entryElem = entry.get
-              if (elem == entryElem) entryElem
-              else linkedListLoop(entry.tail)
-            }
-        }
-
-        linkedListLoop(oldHead)
+      def add() = {
+        table(bucket) = new Entry(elem, hash, oldHead, queue)
+        count += 1
+        if (count > threshold) resize()
+        elem
       }
+
+      @tailrec
+      def linkedListLoop(entry: Entry[A]): A = entry match {
+        case null => add()
+        case _ => {
+          val entryElem = entry.get
+          if (elem == entryElem) entryElem
+          else linkedListLoop(entry.tail)
+        }
+      }
+
+      linkedListLoop(oldHead)
+    }
   }
 
   // add an element to this set unless it's already in there and return this set
@@ -209,27 +213,27 @@ final class WeakHashSet[A <: AnyRef](
     case null =>
       throw new NullPointerException("WeakHashSet cannot hold nulls")
     case _ => {
-        removeStaleEntries()
-        val hash = elem.hashCode
-        val bucket = bucketFor(hash)
-        val oldHead = table(bucket)
+      removeStaleEntries()
+      val hash = elem.hashCode
+      val bucket = bucketFor(hash)
+      val oldHead = table(bucket)
 
-        def add() {
-          table(bucket) = new Entry(elem, hash, oldHead, queue)
-          count += 1
-          if (count > threshold) resize()
-        }
-
-        @tailrec
-        def linkedListLoop(entry: Entry[A]): Unit = entry match {
-          case null => add()
-          case _ if (elem == entry.get) => ()
-          case _ => linkedListLoop(entry.tail)
-        }
-
-        linkedListLoop(oldHead)
-        this
+      def add() {
+        table(bucket) = new Entry(elem, hash, oldHead, queue)
+        count += 1
+        if (count > threshold) resize()
       }
+
+      @tailrec
+      def linkedListLoop(entry: Entry[A]): Unit = entry match {
+        case null                     => add()
+        case _ if (elem == entry.get) => ()
+        case _                        => linkedListLoop(entry.tail)
+      }
+
+      linkedListLoop(oldHead)
+      this
+    }
   }
 
   def +=(elem: A) = this + elem
@@ -241,20 +245,20 @@ final class WeakHashSet[A <: AnyRef](
   override def -(elem: A): this.type = elem match {
     case null => this
     case _ => {
-        removeStaleEntries()
-        val bucket = bucketFor(elem.hashCode)
+      removeStaleEntries()
+      val bucket = bucketFor(elem.hashCode)
 
-        @tailrec
-        def linkedListLoop(prevEntry: Entry[A], entry: Entry[A]): Unit =
-          entry match {
-            case null => ()
-            case _ if (elem == entry.get) => remove(bucket, prevEntry, entry)
-            case _ => linkedListLoop(entry, entry.tail)
-          }
+      @tailrec
+      def linkedListLoop(prevEntry: Entry[A], entry: Entry[A]): Unit =
+        entry match {
+          case null                     => ()
+          case _ if (elem == entry.get) => remove(bucket, prevEntry, entry)
+          case _                        => linkedListLoop(entry, entry.tail)
+        }
 
-        linkedListLoop(null, table(bucket))
-        this
-      }
+      linkedListLoop(null, table(bucket))
+      this
+    }
   }
 
   def -=(elem: A) = this - elem
@@ -358,18 +362,18 @@ final class WeakHashSet[A <: AnyRef](
         var entry = table(bucket)
         while (entry != null) {
           assert(
-              entry.get != null,
-              s"$entry had a null value indicated that gc activity was happening during diagnostic validation or that a null value was inserted")
+            entry.get != null,
+            s"$entry had a null value indicated that gc activity was happening during diagnostic validation or that a null value was inserted")
           computedCount += 1
           val cachedHash = entry.hash
           val realHash = entry.get.hashCode
           assert(
-              cachedHash == realHash,
-              s"for $entry cached hash was $cachedHash but should have been $realHash")
+            cachedHash == realHash,
+            s"for $entry cached hash was $cachedHash but should have been $realHash")
           val computedBucket = bucketFor(realHash)
           assert(
-              computedBucket == bucket,
-              s"for $entry the computed bucket was $computedBucket but should have been $bucket")
+            computedBucket == bucket,
+            s"for $entry the computed bucket was $computedBucket but should have been $bucket")
 
           entry = entry.tail
         }
@@ -378,8 +382,8 @@ final class WeakHashSet[A <: AnyRef](
       }
 
       assert(
-          computedCount == count,
-          s"The computed count was $computedCount but should have been $count")
+        computedCount == count,
+        s"The computed count was $computedCount but should have been $count")
     }
 
     /**
@@ -418,7 +422,10 @@ object WeakHashSet {
     * a link to the next Entry in the same bucket
     */
   private class Entry[A](
-      element: A, val hash: Int, var tail: Entry[A], queue: ReferenceQueue[A])
+      element: A,
+      val hash: Int,
+      var tail: Entry[A],
+      queue: ReferenceQueue[A])
       extends WeakReference[A](element, queue)
 
   val defaultInitialCapacity = 16

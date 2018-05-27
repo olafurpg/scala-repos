@@ -34,7 +34,7 @@ class OneToOneDependency[T](rdd: RDD[T]) extends NarrowDependency[T](rdd) {
 class SparkConf(loadDefaults: Boolean)
 class SparkContext(config: SparkConf)
 
-class RDD[T : ClassTag](
+class RDD[T: ClassTag](
     @transient private var sc: SparkContext,
     @transient private var deps: Seq[Dependency[_]]
 ) /*extends Serializable with Logging*/ {
@@ -50,8 +50,9 @@ class RDD[T : ClassTag](
   override def toString = s"RDD($x)"
 }
 
-class FlatMappedRDD[U : ClassTag, T : ClassTag](
-    val prev: RDD[T], f: T => TraversableOnce[U])
+class FlatMappedRDD[U: ClassTag, T: ClassTag](
+    val prev: RDD[T],
+    f: T => TraversableOnce[U])
     extends RDD[U](prev) {
 
   private var fun = f

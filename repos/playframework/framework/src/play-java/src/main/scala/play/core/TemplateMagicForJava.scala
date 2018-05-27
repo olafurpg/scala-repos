@@ -31,17 +31,18 @@ object PlayMagicForJava {
       jField: play.data.Form.Field): play.api.data.Field = {
 
     new play.api.data.Field(
-        null,
-        jField.name,
-        jField.constraints.asScala.map { jT =>
-          jT._1 -> jT._2.asScala
-        },
-        Option(jField.format).map(f => f._1 -> f._2.asScala),
-        jField.errors.asScala.map { jE =>
-          play.api.data
-            .FormError(jE.key, jE.messages.asScala, jE.arguments.asScala)
-        },
-        Option(jField.value)) {
+      null,
+      jField.name,
+      jField.constraints.asScala.map { jT =>
+        jT._1 -> jT._2.asScala
+      },
+      Option(jField.format).map(f => f._1 -> f._2.asScala),
+      jField.errors.asScala.map { jE =>
+        play.api.data
+          .FormError(jE.key, jE.messages.asScala, jE.arguments.asScala)
+      },
+      Option(jField.value)
+    ) {
 
       override def apply(key: String) = {
         javaFieldtoScalaField(jField.sub(key))

@@ -19,7 +19,12 @@ package org.apache.spark.input
 
 import org.apache.hadoop.fs.Path
 import org.apache.hadoop.io.{BytesWritable, LongWritable}
-import org.apache.hadoop.mapreduce.{InputSplit, JobContext, RecordReader, TaskAttemptContext}
+import org.apache.hadoop.mapreduce.{
+  InputSplit,
+  JobContext,
+  RecordReader,
+  TaskAttemptContext
+}
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat
 
 import org.apache.spark.internal.Logging
@@ -42,7 +47,8 @@ private[spark] object FixedLengthBinaryInputFormat {
 }
 
 private[spark] class FixedLengthBinaryInputFormat
-    extends FileInputFormat[LongWritable, BytesWritable] with Logging {
+    extends FileInputFormat[LongWritable, BytesWritable]
+    with Logging {
 
   private var recordLength = -1
 
@@ -67,7 +73,9 @@ private[spark] class FixedLengthBinaryInputFormat
     * will start at the first byte of a record, and the last byte will the last byte of a record.
     */
   override def computeSplitSize(
-      blockSize: Long, minSize: Long, maxSize: Long): Long = {
+      blockSize: Long,
+      minSize: Long,
+      maxSize: Long): Long = {
     val defaultSize = super.computeSplitSize(blockSize, minSize, maxSize)
     // If the default size is less than the length of a record, make it equal to it
     // Otherwise, make sure the split size is as close to possible as the default size,
@@ -84,7 +92,8 @@ private[spark] class FixedLengthBinaryInputFormat
     * Create a FixedLengthBinaryRecordReader
     */
   override def createRecordReader(
-      split: InputSplit, context: TaskAttemptContext)
+      split: InputSplit,
+      context: TaskAttemptContext)
     : RecordReader[LongWritable, BytesWritable] = {
     new FixedLengthBinaryRecordReader
   }

@@ -98,6 +98,6 @@ trait ZeroVeryLowPriority {
 trait ZeroLowPriority extends ZeroVeryLowPriority {
   this: Zero.type =>
 
-  implicit def zeroFromSemiring[T : Semiring] =
+  implicit def zeroFromSemiring[T: Semiring] =
     Zero(implicitly[Semiring[T]].zero)
 }

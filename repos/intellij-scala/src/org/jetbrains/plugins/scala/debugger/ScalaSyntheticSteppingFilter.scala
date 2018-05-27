@@ -1,6 +1,10 @@
 package org.jetbrains.plugins.scala.debugger
 
-import com.intellij.debugger.engine.{DebugProcess, ExtraSteppingFilter, SuspendContext}
+import com.intellij.debugger.engine.{
+  DebugProcess,
+  ExtraSteppingFilter,
+  SuspendContext
+}
 import com.intellij.psi.PsiElement
 import com.sun.jdi.Location
 import com.sun.jdi.request.StepRequest
@@ -28,10 +32,11 @@ class ScalaSyntheticSteppingFilter extends ExtraSteppingFilter {
     StepRequest.STEP_INTO
 
   private def isSynthetic(
-      location: Location, debugProcess: DebugProcess): Boolean = {
+      location: Location,
+      debugProcess: DebugProcess): Boolean = {
     val positionManager = ScalaPositionManager.instance(debugProcess) match {
       case Some(m) => m
-      case None => return true
+      case None    => return true
     }
 
     val method = location.method()
@@ -50,7 +55,7 @@ class ScalaSyntheticSteppingFilter extends ExtraSteppingFilter {
       positionManager.findElementByReferenceType(location.declaringType()) match {
         case Some(td: ScTemplateDefinition) =>
           td.functions.forall(f => !nameMatches(name, f.name)) &&
-          !hasLocalFun(name, td)
+            !hasLocalFun(name, td)
         case _ => false
       }
     }
@@ -58,10 +63,10 @@ class ScalaSyntheticSteppingFilter extends ExtraSteppingFilter {
 
   private def hasLocalFun(name: String, td: PsiElement): Boolean = {
     td.depthFirst(elem =>
-            elem == td || !ScalaEvaluatorBuilderUtil.isGenerateClass(elem))
+        elem == td || !ScalaEvaluatorBuilderUtil.isGenerateClass(elem))
       .exists {
         case fun: ScFunction if fun.isLocal => nameMatches(name, fun.name)
-        case _ => false
+        case _                              => false
       }
   }
 

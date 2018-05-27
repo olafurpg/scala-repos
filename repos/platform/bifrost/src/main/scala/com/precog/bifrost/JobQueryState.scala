@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -34,7 +34,7 @@ sealed trait JobQueryState[+A] {
 
   def getOrElse[AA >: A](aa: => AA) = this match {
     case Cancelled | Expired => aa
-    case Running(_, value) => value
+    case Running(_, value)   => value
   }
 }
 
@@ -63,8 +63,8 @@ trait JobQueryStateMonad extends SwappableMonad[JobQueryState] {
       implicit M: Monad[M]): M[JobQueryState[A]] = {
     state match {
       case Running(resources, ma) => M.map(ma)(Running(resources, _))
-      case Cancelled => M.point(Cancelled)
-      case Expired => M.point(Expired)
+      case Cancelled              => M.point(Cancelled)
+      case Expired                => M.point(Expired)
     }
   }
 
@@ -90,8 +90,8 @@ trait JobQueryStateMonad extends SwappableMonad[JobQueryState] {
   override def map[A, B](fa: JobQueryState[A])(f: A => B): JobQueryState[B] =
     maybeCancel(fa) match {
       case Running(resources, value) => Running(resources, f(value))
-      case Cancelled => Cancelled
-      case Expired => Expired
+      case Cancelled                 => Cancelled
+      case Expired                   => Expired
     }
 
   def bind[A, B](fa: JobQueryState[A])(
@@ -101,9 +101,9 @@ trait JobQueryStateMonad extends SwappableMonad[JobQueryState] {
         case Running(resources1, value) =>
           Running(resources0 ++ resources1, value)
         case Cancelled => Cancelled
-        case Expired => Expired
+        case Expired   => Expired
       }
     case Cancelled => Cancelled
-    case Expired => Expired
+    case Expired   => Expired
   }
 }

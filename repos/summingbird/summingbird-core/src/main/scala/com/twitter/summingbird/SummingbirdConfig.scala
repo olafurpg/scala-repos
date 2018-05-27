@@ -53,7 +53,7 @@ trait MutableStringConfig {
     assert(config != null)
     config.get(key) match {
       case Some(s) => s.toString
-      case None => null
+      case None    => null
     }
   }
 
@@ -78,9 +78,10 @@ object WrappingConfig {
     new WrappingConfig(backingConfig, Map[String, AnyRef](), Set[String]())
 }
 
-case class WrappingConfig(private val backingConfig: ReadableMap,
-                          updates: Map[String, AnyRef],
-                          removes: Set[String])
+case class WrappingConfig(
+    private val backingConfig: ReadableMap,
+    updates: Map[String, AnyRef],
+    removes: Set[String])
     extends SummingbirdConfig {
 
   def get(key: String) = {

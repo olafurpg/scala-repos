@@ -19,21 +19,25 @@ package org.apache.spark.sql.catalyst.expressions
 
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.analysis.TypeCheckResult
-import org.apache.spark.sql.catalyst.expressions.codegen.{CodegenContext, ExprCode}
+import org.apache.spark.sql.catalyst.expressions.codegen.{
+  CodegenContext,
+  ExprCode
+}
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan
 import org.apache.spark.sql.catalyst.util.TypeUtils
 import org.apache.spark.sql.types._
 import org.apache.spark.util.Utils
 
 object InterpretedPredicate {
-  def create(expression: Expression,
-             inputSchema: Seq[Attribute]): (InternalRow => Boolean) =
+  def create(
+      expression: Expression,
+      inputSchema: Seq[Attribute]): (InternalRow => Boolean) =
     create(BindReferences.bindReference(expression, inputSchema))
 
   def create(expression: Expression): (InternalRow => Boolean) = {
     expression.foreach {
       case n: Nondeterministic => n.setInitialValues()
-      case _ =>
+      case _                   =>
     }
     (r: InternalRow) =>
       expression.eval(r).asInstanceOf[Boolean]
@@ -68,7 +72,8 @@ trait PredicateHelper {
 
   // Substitute any known alias from a map.
   protected def replaceAlias(
-      condition: Expression, aliases: AttributeMap[Expression]): Expression = {
+      condition: Expression,
+      aliases: AttributeMap[Expression]): Expression = {
     condition.transform {
       case a: Attribute => aliases.getOrElse(a, a)
     }
@@ -89,7 +94,9 @@ trait PredicateHelper {
 }
 
 case class Not(child: Expression)
-    extends UnaryExpression with Predicate with ImplicitCastInputTypes {
+    extends UnaryExpression
+    with Predicate
+    with ImplicitCastInputTypes {
 
   override def toString: String = s"NOT $child"
 
@@ -109,7 +116,8 @@ case class Not(child: Expression)
   * Evaluates to `true` if `list` contains `value`.
   */
 case class In(value: Expression, list: Seq[Expression])
-    extends Predicate with ImplicitCastInputTypes {
+    extends Predicate
+    with ImplicitCastInputTypes {
 
   require(list != null, "list should not be null")
 
@@ -190,7 +198,8 @@ case class In(value: Expression, list: Seq[Expression])
   * static.
   */
 case class InSet(child: Expression, hset: Set[Any])
-    extends UnaryExpression with Predicate {
+    extends UnaryExpression
+    with Predicate {
 
   require(hset != null, "hset could not be null")
 
@@ -221,11 +230,13 @@ case class InSet(child: Expression, hset: Set[Any])
     val hsetTerm = ctx.freshName("hset")
     val hasNullTerm = ctx.freshName("hasNull")
     ctx.addMutableState(
-        setName,
-        hsetTerm,
-        s"$hsetTerm = (($InSetName)references[${ctx.references.size - 1}]).getHSet();")
+      setName,
+      hsetTerm,
+      s"$hsetTerm = (($InSetName)references[${ctx.references.size - 1}]).getHSet();")
     ctx.addMutableState(
-        "boolean", hasNullTerm, s"$hasNullTerm = $hsetTerm.contains(null);")
+      "boolean",
+      hasNullTerm,
+      s"$hasNullTerm = $hsetTerm.contains(null);")
     s"""
       ${childGen.code}
       boolean ${ev.isNull} = ${childGen.isNull};
@@ -247,7 +258,8 @@ case class InSet(child: Expression, hset: Set[Any])
 }
 
 case class And(left: Expression, right: Expression)
-    extends BinaryOperator with Predicate {
+    extends BinaryOperator
+    with Predicate {
 
   override def inputType: AbstractDataType = BooleanType
 
@@ -298,7 +310,8 @@ case class And(left: Expression, right: Expression)
 }
 
 case class Or(left: Expression, right: Expression)
-    extends BinaryOperator with Predicate {
+    extends BinaryOperator
+    with Predicate {
 
   override def inputType: AbstractDataType = BooleanType
 
@@ -357,10 +370,10 @@ abstract class BinaryComparison extends BinaryOperator with Predicate {
       // faster version
       defineCodeGen(ctx, ev, (c1, c2) => s"$c1 $symbol $c2")
     } else {
-      defineCodeGen(ctx,
-                    ev,
-                    (c1,
-                    c2) => s"${ctx.genComp(left.dataType, c1, c2)} $symbol 0")
+      defineCodeGen(
+        ctx,
+        ev,
+        (c1, c2) => s"${ctx.genComp(left.dataType, c1, c2)} $symbol 0")
     }
   }
 }
@@ -374,9 +387,9 @@ private[sql] object BinaryComparison {
 private[sql] object Equality {
   def unapply(e: BinaryComparison): Option[(Expression, Expression)] =
     e match {
-      case EqualTo(l, r) => Some((l, r))
+      case EqualTo(l, r)       => Some((l, r))
       case EqualNullSafe(l, r) => Some((l, r))
-      case _ => None
+      case _                   => None
     }
 }
 
@@ -390,15 +403,18 @@ case class EqualTo(left: Expression, right: Expression)
   protected override def nullSafeEval(input1: Any, input2: Any): Any = {
     if (left.dataType == FloatType) {
       Utils.nanSafeCompareFloats(
-          input1.asInstanceOf[Float], input2.asInstanceOf[Float]) == 0
+        input1.asInstanceOf[Float],
+        input2.asInstanceOf[Float]) == 0
     } else if (left.dataType == DoubleType) {
       Utils.nanSafeCompareDoubles(
-          input1.asInstanceOf[Double], input2.asInstanceOf[Double]) == 0
+        input1.asInstanceOf[Double],
+        input2.asInstanceOf[Double]) == 0
     } else if (left.dataType != BinaryType) {
       input1 == input2
     } else {
       java.util.Arrays.equals(
-          input1.asInstanceOf[Array[Byte]], input2.asInstanceOf[Array[Byte]])
+        input1.asInstanceOf[Array[Byte]],
+        input2.asInstanceOf[Array[Byte]])
     }
   }
 
@@ -426,15 +442,18 @@ case class EqualNullSafe(left: Expression, right: Expression)
     } else {
       if (left.dataType == FloatType) {
         Utils.nanSafeCompareFloats(
-            input1.asInstanceOf[Float], input2.asInstanceOf[Float]) == 0
+          input1.asInstanceOf[Float],
+          input2.asInstanceOf[Float]) == 0
       } else if (left.dataType == DoubleType) {
         Utils.nanSafeCompareDoubles(
-            input1.asInstanceOf[Double], input2.asInstanceOf[Double]) == 0
+          input1.asInstanceOf[Double],
+          input2.asInstanceOf[Double]) == 0
       } else if (left.dataType != BinaryType) {
         input1 == input2
       } else {
         java.util.Arrays.equals(
-            input1.asInstanceOf[Array[Byte]], input2.asInstanceOf[Array[Byte]])
+          input1.asInstanceOf[Array[Byte]],
+          input2.asInstanceOf[Array[Byte]])
       }
     }
   }

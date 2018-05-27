@@ -26,7 +26,7 @@ trait PsiElementExtTrait {
   def parentsInFile: Iterator[PsiElement] = {
     repr match {
       case _: PsiFile | _: PsiDirectory => Iterator.empty
-      case _ => new ParentsIterator(repr).takeWhile(!_.isInstanceOf[PsiFile])
+      case _                            => new ParentsIterator(repr).takeWhile(!_.isInstanceOf[PsiFile])
     }
   }
 
@@ -35,22 +35,24 @@ trait PsiElementExtTrait {
   def getPrevSiblingNotWhitespace: PsiElement = {
     var prev: PsiElement = repr.getPrevSibling
     while (prev != null &&
-    (prev.isInstanceOf[PsiWhiteSpace] ||
-        prev.getNode.getElementType == ScalaTokenTypes.tWHITE_SPACE_IN_LINE)) prev = prev.getPrevSibling
+           (prev.isInstanceOf[PsiWhiteSpace] ||
+           prev.getNode.getElementType == ScalaTokenTypes.tWHITE_SPACE_IN_LINE)) prev =
+      prev.getPrevSibling
     prev
   }
 
   def getPrevSiblingNotWhitespaceComment: PsiElement = {
     var prev: PsiElement = repr.getPrevSibling
     while (prev != null &&
-    (prev.isInstanceOf[PsiWhiteSpace] ||
-        prev.getNode.getElementType == ScalaTokenTypes.tWHITE_SPACE_IN_LINE ||
-        prev.isInstanceOf[PsiComment])) prev = prev.getPrevSibling
+           (prev.isInstanceOf[PsiWhiteSpace] ||
+           prev.getNode.getElementType == ScalaTokenTypes.tWHITE_SPACE_IN_LINE ||
+           prev.isInstanceOf[PsiComment])) prev = prev.getPrevSibling
     prev
   }
 
-  def getPrevSiblingCondition(condition: PsiElement => Boolean,
-                              strict: Boolean = true): Option[PsiElement] = {
+  def getPrevSiblingCondition(
+      condition: PsiElement => Boolean,
+      strict: Boolean = true): Option[PsiElement] = {
     if (!strict && condition(repr)) return Some(repr)
     var prev: PsiElement = PsiTreeUtil.prevLeaf(repr)
     while (prev != null && !condition(prev)) {
@@ -62,17 +64,18 @@ trait PsiElementExtTrait {
   def getNextSiblingNotWhitespace: PsiElement = {
     var next: PsiElement = repr.getNextSibling
     while (next != null &&
-    (next.isInstanceOf[PsiWhiteSpace] ||
-        next.getNode.getElementType == ScalaTokenTypes.tWHITE_SPACE_IN_LINE)) next = next.getNextSibling
+           (next.isInstanceOf[PsiWhiteSpace] ||
+           next.getNode.getElementType == ScalaTokenTypes.tWHITE_SPACE_IN_LINE)) next =
+      next.getNextSibling
     next
   }
 
   def getNextSiblingNotWhitespaceComment: PsiElement = {
     var next: PsiElement = repr.getNextSibling
     while (next != null &&
-    (next.isInstanceOf[PsiWhiteSpace] ||
-        next.getNode.getElementType == ScalaTokenTypes.tWHITE_SPACE_IN_LINE ||
-        next.isInstanceOf[PsiComment])) next = next.getNextSibling
+           (next.isInstanceOf[PsiWhiteSpace] ||
+           next.getNode.getElementType == ScalaTokenTypes.tWHITE_SPACE_IN_LINE ||
+           next.isInstanceOf[PsiComment])) next = next.getNextSibling
     next
   }
 
@@ -109,6 +112,6 @@ trait PsiElementExtTrait {
 
   def containingScalaFile: Option[ScalaFile] = repr.getContainingFile match {
     case sf: ScalaFile => Some(sf)
-    case _ => None
+    case _             => None
   }
 }

@@ -6,14 +6,15 @@ import mesosphere.mesos.protos.Implicits.slaveIDToProto
 import mesosphere.mesos.protos.SlaveID
 import org.apache.mesos.{Protos => mesos}
 
-case class TaskFailure(appId: PathId,
-                       taskId: mesos.TaskID,
-                       state: mesos.TaskState,
-                       message: String = "",
-                       host: String = "",
-                       version: Timestamp = Timestamp.now,
-                       timestamp: Timestamp = Timestamp.now,
-                       slaveId: Option[mesos.SlaveID] = None)
+case class TaskFailure(
+    appId: PathId,
+    taskId: mesos.TaskID,
+    state: mesos.TaskState,
+    message: String = "",
+    host: String = "",
+    version: Timestamp = Timestamp.now,
+    timestamp: Timestamp = Timestamp.now,
+    slaveId: Option[mesos.SlaveID] = None)
     extends MarathonState[Protos.TaskFailure, TaskFailure] {
 
   override def mergeFromProto(proto: Protos.TaskFailure): TaskFailure =
@@ -46,22 +47,22 @@ object TaskFailure {
 
   def empty: TaskFailure = {
     TaskFailure(
-        PathId.empty,
-        mesos.TaskID.newBuilder().setValue("").build,
-        mesos.TaskState.TASK_STAGING
+      PathId.empty,
+      mesos.TaskID.newBuilder().setValue("").build,
+      mesos.TaskState.TASK_STAGING
     )
   }
 
   def apply(proto: Protos.TaskFailure): TaskFailure =
     TaskFailure(
-        appId = proto.getAppId.toPath,
-        taskId = proto.getTaskId,
-        state = proto.getState,
-        message = proto.getMessage,
-        host = proto.getHost,
-        version = Timestamp(proto.getVersion),
-        timestamp = Timestamp(proto.getTimestamp),
-        slaveId = if (proto.hasSlaveId) Some(proto.getSlaveId) else None
+      appId = proto.getAppId.toPath,
+      taskId = proto.getTaskId,
+      state = proto.getState,
+      message = proto.getMessage,
+      host = proto.getHost,
+      version = Timestamp(proto.getVersion),
+      timestamp = Timestamp(proto.getTimestamp),
+      slaveId = if (proto.hasSlaveId) Some(proto.getSlaveId) else None
     )
 
   object FromMesosStatusUpdateEvent {
@@ -70,33 +71,33 @@ object TaskFailure {
 
     def apply(statusUpdate: MesosStatusUpdateEvent): Option[TaskFailure] = {
       val MesosStatusUpdateEvent(
-      slaveId,
-      taskId,
-      taskStateStr,
-      message,
-      appId,
-      host,
-      _,
-      _,
-      version,
-      _,
-      ts
+        slaveId,
+        taskId,
+        taskStateStr,
+        message,
+        appId,
+        host,
+        _,
+        _,
+        version,
+        _,
+        ts
       ) = statusUpdate
 
       val state = taskState(taskStateStr)
 
       if (isFailureState(state))
         Some(
-            TaskFailure(
-                appId,
-                taskId.mesosTaskId,
-                state,
-                message,
-                host,
-                Timestamp(version),
-                Timestamp(ts),
-                Option(slaveIDToProto(SlaveID(slaveId)))
-            ))
+          TaskFailure(
+            appId,
+            taskId.mesosTaskId,
+            state,
+            message,
+            host,
+            Timestamp(version),
+            Timestamp(ts),
+            Option(slaveIDToProto(SlaveID(slaveId)))
+          ))
       else None
     }
   }
@@ -108,7 +109,7 @@ object TaskFailure {
     import mesos.TaskState._
     state match {
       case TASK_FAILED | TASK_LOST | TASK_ERROR => true
-      case _ => false
+      case _                                    => false
     }
   }
 }

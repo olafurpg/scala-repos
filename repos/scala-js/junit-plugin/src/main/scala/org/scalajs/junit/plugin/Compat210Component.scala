@@ -14,20 +14,20 @@ trait Compat210Component {
 
   import global._
 
-  def newValDef(
-      sym: Symbol, rhs: Tree)(mods: Modifiers = Modifiers(sym.flags),
-                              name: TermName = sym.name.toTermName,
-                              tpt: Tree = TypeTreeMemberType(sym)): ValDef = {
+  def newValDef(sym: Symbol, rhs: Tree)(
+      mods: Modifiers = Modifiers(sym.flags),
+      name: TermName = sym.name.toTermName,
+      tpt: Tree = TypeTreeMemberType(sym)): ValDef = {
     atPos(sym.pos)(ValDef(mods, name, tpt, rhs)) setSymbol sym
   }
 
   def newDefDef(sym: Symbol, rhs: Tree)(
       mods: Modifiers = Modifiers(sym.flags),
       name: TermName = sym.name.toTermName,
-      tparams: List[TypeDef] = sym.typeParams.map(
-            sym => newTypeDef(sym, typeBoundsTree(sym))()),
-      vparamss: List[List[ValDef]] = mapParamss(sym)(
-            sym => newValDef(sym, EmptyTree)()),
+      tparams: List[TypeDef] =
+        sym.typeParams.map(sym => newTypeDef(sym, typeBoundsTree(sym))()),
+      vparamss: List[List[ValDef]] =
+        mapParamss(sym)(sym => newValDef(sym, EmptyTree)()),
       tpt: Tree = TypeTreeMemberType(sym)): DefDef = {
     atPos(sym.pos)(DefDef(mods, name, tparams, vparamss, tpt, rhs))
       .setSymbol(sym)
@@ -45,7 +45,7 @@ trait Compat210Component {
       mods: Modifiers = Modifiers(sym.flags),
       name: TypeName = sym.name.toTypeName,
       tparams: List[TypeDef] = sym.typeParams
-          .map(sym => newTypeDef(sym, typeBoundsTree(sym))())): TypeDef = {
+        .map(sym => newTypeDef(sym, typeBoundsTree(sym))())): TypeDef = {
     atPos(sym.pos)(TypeDef(mods, name, tparams, rhs)) setSymbol sym
   }
 
@@ -56,10 +56,11 @@ trait Compat210Component {
     atPos(sym.pos)(typeBoundsTree(sym.info.bounds))
 
   implicit final class GenCompat(self: global.TreeGen) {
-    def mkClassDef(mods: Modifiers,
-                   name: TypeName,
-                   tparams: List[TypeDef],
-                   templ: Template): ClassDef = {
+    def mkClassDef(
+        mods: Modifiers,
+        name: TypeName,
+        tparams: List[TypeDef],
+        templ: Template): ClassDef = {
       val isInterface =
         mods.isTrait && templ.body.forall(treeInfo.isInterfaceMember)
       val mods1 = if (isInterface) mods | Flags.INTERFACE else mods

@@ -22,7 +22,11 @@ import org.junit.runners.Parameterized
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized.Parameters
 import org.junit.{After, Before, Test}
-import org.apache.kafka.clients.producer.{ProducerRecord, KafkaProducer, ProducerConfig}
+import org.apache.kafka.clients.producer.{
+  ProducerRecord,
+  KafkaProducer,
+  ProducerConfig
+}
 import org.junit.Assert._
 
 import kafka.api.FetchRequestBuilder
@@ -67,18 +71,21 @@ class ProducerCompressionTest(compression: String)
   def testCompression() {
 
     val props = new Properties()
-    props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
-              TestUtils.getBrokerListStrFromServers(Seq(server)))
+    props.put(
+      ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
+      TestUtils.getBrokerListStrFromServers(Seq(server)))
     props.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, compression)
     props.put(ProducerConfig.BATCH_SIZE_CONFIG, "66000")
     props.put(ProducerConfig.LINGER_MS_CONFIG, "200")
-    props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
-              "org.apache.kafka.common.serialization.ByteArraySerializer")
-    props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
-              "org.apache.kafka.common.serialization.ByteArraySerializer")
+    props.put(
+      ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+      "org.apache.kafka.common.serialization.ByteArraySerializer")
+    props.put(
+      ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+      "org.apache.kafka.common.serialization.ByteArraySerializer")
     var producer = new KafkaProducer[Array[Byte], Array[Byte]](props)
-    val consumer = new SimpleConsumer(
-        "localhost", server.boundPort(), 100, 1024 * 1024, "")
+    val consumer =
+      new SimpleConsumer("localhost", server.boundPort(), 100, 1024 * 1024, "")
 
     try {
       // create topic
@@ -90,28 +97,37 @@ class ProducerCompressionTest(compression: String)
 
       // make sure the returned messages are correct
       val now = System.currentTimeMillis()
-      val responses = for (message <- messages) yield
-        producer.send(new ProducerRecord[Array[Byte], Array[Byte]](
-                topic, null, now, null, message))
+      val responses = for (message <- messages)
+        yield
+          producer.send(
+            new ProducerRecord[Array[Byte], Array[Byte]](
+              topic,
+              null,
+              now,
+              null,
+              message))
       val futures = responses.toList
       for ((future, offset) <- futures zip (0 until numRecords)) {
         assertEquals(offset.toLong, future.get.offset)
       }
 
       // make sure the fetched message count match
-      val fetchResponse = consumer.fetch(new FetchRequestBuilder()
-            .addFetch(topic, partition, 0, Int.MaxValue)
-            .build())
+      val fetchResponse = consumer.fetch(
+        new FetchRequestBuilder()
+          .addFetch(topic, partition, 0, Int.MaxValue)
+          .build())
       val messageSet =
         fetchResponse.messageSet(topic, partition).iterator.toBuffer
-      assertEquals("Should have fetched " + numRecords + " messages",
-                   numRecords,
-                   messageSet.size)
+      assertEquals(
+        "Should have fetched " + numRecords + " messages",
+        numRecords,
+        messageSet.size)
 
       var index = 0
       for (message <- messages) {
-        assertEquals(new Message(bytes = message, now, Message.MagicValue_V1),
-                     messageSet(index).message)
+        assertEquals(
+          new Message(bytes = message, now, Message.MagicValue_V1),
+          messageSet(index).message)
         assertEquals(index.toLong, messageSet(index).offset)
         index += 1
       }

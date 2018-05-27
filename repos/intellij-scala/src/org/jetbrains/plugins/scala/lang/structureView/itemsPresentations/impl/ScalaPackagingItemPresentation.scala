@@ -15,6 +15,6 @@ class ScalaPackagingItemPresentation(private val element: ScPackaging)
     extends ScalaItemPresentation(element) {
   def getPresentableText: String = {
     ScalaElementPresentation.getPackagingPresentableText(
-        myElement.asInstanceOf[ScPackaging])
+      myElement.asInstanceOf[ScPackaging])
   }
 }

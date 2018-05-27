@@ -15,20 +15,21 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.ScBlockExpr
 class ScalaCodeBlockSelectioner extends ExtendWordSelectionHandlerBase {
   def canSelect(e: PsiElement) = e.isInstanceOf[ScBlockExpr]
 
-  override def select(e: PsiElement,
-                      editorText: CharSequence,
-                      cursorOffset: Int,
-                      editor: Editor): util.List[TextRange] = {
+  override def select(
+      e: PsiElement,
+      editorText: CharSequence,
+      cursorOffset: Int,
+      editor: Editor): util.List[TextRange] = {
     var firstChild = e.getNode.getFirstChildNode
     var lastChild = e.getNode.getLastChildNode
     if (firstChild.getElementType == ScalaTokenTypes.tLBRACE &&
         lastChild.getElementType == ScalaTokenTypes.tRBRACE) {
       while (firstChild.getTreeNext != null &&
-      firstChild.getTreeNext.getElementType == TokenType.WHITE_SPACE) {
+             firstChild.getTreeNext.getElementType == TokenType.WHITE_SPACE) {
         firstChild = firstChild.getTreeNext
       }
       while (lastChild.getTreePrev != null &&
-      lastChild.getTreePrev.getElementType == TokenType.WHITE_SPACE) {
+             lastChild.getTreePrev.getElementType == TokenType.WHITE_SPACE) {
         lastChild = lastChild.getTreePrev
       }
       val start = firstChild.getTextRange.getEndOffset
@@ -36,7 +37,8 @@ class ScalaCodeBlockSelectioner extends ExtendWordSelectionHandlerBase {
       if (start >= end) new util.ArrayList[TextRange]() // '{   }' case
       else
         ExtendWordSelectionHandlerBase.expandToWholeLine(
-            editorText, new TextRange(start, end))
+          editorText,
+          new TextRange(start, end))
     } else new util.ArrayList[TextRange]
   }
 }

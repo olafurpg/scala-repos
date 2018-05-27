@@ -57,7 +57,8 @@ package object codegen {
       if (!packageDir.exists()) { packageDir.mkdir() }
 
       val classFile = new java.io.File(
-          packageDir, generatedClass.getName.split("\\.").last + ".class")
+        packageDir,
+        generatedClass.getName.split("\\.").last + ".class")
 
       val outfile = new java.io.FileOutputStream(classFile)
       outfile.write(generatedBytes)
@@ -65,7 +66,7 @@ package object codegen {
 
       // scalastyle:off println
       println(
-          s"javap -p -v -classpath ${dumpDirectory.getCanonicalPath} ${generatedClass.getName}".!!)
+        s"javap -p -v -classpath ${dumpDirectory.getCanonicalPath} ${generatedClass.getName}".!!)
       // scalastyle:on println
     }
   }

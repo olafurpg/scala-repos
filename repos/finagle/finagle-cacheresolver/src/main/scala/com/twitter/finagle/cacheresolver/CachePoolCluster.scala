@@ -10,8 +10,16 @@ import com.twitter.concurrent.Spool.*::
 import com.twitter.conversions.time._
 import com.twitter.finagle.{Group, Resolver, Addr, Address}
 import com.twitter.finagle.builder.Cluster
-import com.twitter.finagle.stats.{ClientStatsReceiver, StatsReceiver, NullStatsReceiver}
-import com.twitter.finagle.zookeeper.{ZkGroup, DefaultZkClientFactory, ZookeeperServerSetCluster}
+import com.twitter.finagle.stats.{
+  ClientStatsReceiver,
+  StatsReceiver,
+  NullStatsReceiver
+}
+import com.twitter.finagle.zookeeper.{
+  ZkGroup,
+  DefaultZkClientFactory,
+  ZookeeperServerSetCluster
+}
 import com.twitter.finagle.{Group, Resolver}
 import com.twitter.thrift.ServiceInstance
 import com.twitter.thrift.Status.ALIVE
@@ -20,7 +28,10 @@ import scala.collection.mutable
 
 // Type definition representing a cache node
 case class CacheNode(
-    host: String, port: Int, weight: Int, key: Option[String] = None)
+    host: String,
+    port: Int,
+    weight: Int,
+    key: Option[String] = None)
     extends SocketAddress {
   // Use overloads to keep the same ABI
   def this(host: String, port: Int, weight: Int) =
@@ -52,12 +63,14 @@ class TwitterCacheResolver extends Resolver {
           .get(DefaultZkClientFactory.hostSet(zkHosts))
           ._1
         val group = CacheNodeGroup.newZkCacheNodeGroup(
-            path, zkClient, ClientStatsReceiver.scope(scheme).scope(path))
+          path,
+          zkClient,
+          ClientStatsReceiver.scope(scheme).scope(path))
         group.set.map(toUnresolvedAddr)
 
       case _ =>
         throw new TwitterCacheResolverException(
-            "Invalid twcache format \"%s\"".format(arg))
+          "Invalid twcache format \"%s\"".format(arg))
     }
   }
 
@@ -78,7 +91,7 @@ object CacheNodeGroup {
   def apply(hosts: String) = {
     val hostSeq =
       hosts.split(Array(' ', ',')).filter((_ != "")).map(_.split(":")).map {
-        case Array(host) => (host, 11211, 1, None)
+        case Array(host)       => (host, 11211, 1, None)
         case Array(host, port) => (host, port.toInt, 1, None)
         case Array(host, port, weight) =>
           (host, port.toInt, weight.toInt, None)
@@ -86,14 +99,14 @@ object CacheNodeGroup {
           (host, port.toInt, weight.toInt, Some(key))
       }
 
-    newStaticGroup(
-        hostSeq.map {
+    newStaticGroup(hostSeq.map {
       case (host, port, weight, key) => new CacheNode(host, port, weight, key)
     }.toSet)
   }
 
   def apply(
-      group: Group[SocketAddress], useOnlyResolvedAddress: Boolean = false) =
+      group: Group[SocketAddress],
+      useOnlyResolvedAddress: Boolean = false) =
     group collect {
       case node: CacheNode => node
       // Note: we ignore weights here
@@ -116,10 +129,13 @@ object CacheNodeGroup {
       statsReceiver: StatsReceiver = NullStatsReceiver
   ) =
     new ZookeeperCacheNodeGroup(
-        zkPath = path, zkClient = zkClient, statsReceiver = statsReceiver)
+      zkPath = path,
+      zkClient = zkClient,
+      statsReceiver = statsReceiver)
 
   private[finagle] def fromVarAddr(
-      va: Var[Addr], useOnlyResolvedAddress: Boolean = false) =
+      va: Var[Addr],
+      useOnlyResolvedAddress: Boolean = false) =
     new Group[CacheNode] {
       protected[finagle] val set: Var[Set[CacheNode]] =
         va map {
@@ -168,10 +184,11 @@ object CachePoolCluster {
     *                   the same as no backup pool.
     * @param statsReceiver Optional, the destination to report the stats to
     */
-  def newZkCluster(zkPath: String,
-                   zkClient: ZooKeeperClient,
-                   backupPool: Option[Set[CacheNode]] = None,
-                   statsReceiver: StatsReceiver = NullStatsReceiver) =
+  def newZkCluster(
+      zkPath: String,
+      zkClient: ZooKeeperClient,
+      backupPool: Option[Set[CacheNode]] = None,
+      statsReceiver: StatsReceiver = NullStatsReceiver) =
     new ZookeeperCachePoolCluster(zkPath, zkClient, backupPool, statsReceiver)
 
   /**
@@ -188,8 +205,8 @@ object CachePoolCluster {
       zkClient: ZooKeeperClient
   ) =
     new ZookeeperServerSetCluster(
-        ServerSets.create(
-            zkClient, ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL, zkPath)
+      ServerSets
+        .create(zkClient, ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL, zkPath)
     ) map {
       case addr: InetSocketAddress =>
         CacheNode(addr.getHostName, addr.getPort, 1)
@@ -208,10 +225,10 @@ trait CachePoolCluster extends Cluster[CacheNode] {
   private[this] var cachePoolChanges =
     new Promise[Spool[Cluster.Change[CacheNode]]]
 
-  def snap: (Seq[CacheNode],
-  Future[Spool[Cluster.Change[CacheNode]]]) = cachePool synchronized {
-    (cachePool.toSeq, cachePoolChanges)
-  }
+  def snap: (Seq[CacheNode], Future[Spool[Cluster.Change[CacheNode]]]) =
+    cachePool synchronized {
+      (cachePool.toSeq, cachePoolChanges)
+    }
 
   /**
     * TODO: pick up new rev of Cluster once it's ready
@@ -248,10 +265,10 @@ trait CachePoolCluster extends Cluster[CacheNode] {
   */
 object CachePoolConfig {
   val jsonCodec: Codec[CachePoolConfig] = JsonCodec.create(
-      classOf[CachePoolConfig],
-      new GsonBuilder()
-        .setExclusionStrategies(JsonCodec.getThriftExclusionStrategy())
-        .create())
+    classOf[CachePoolConfig],
+    new GsonBuilder()
+      .setExclusionStrategies(JsonCodec.getThriftExclusionStrategy())
+      .create())
 }
 
 /**
@@ -262,7 +279,8 @@ object CachePoolConfig {
   * pool migrating state, backup cache servers list, or replication role, etc
   */
 case class CachePoolConfig(
-    cachePoolSize: Int, detectKeyRemapping: Boolean = false)
+    cachePoolSize: Int,
+    detectKeyRemapping: Boolean = false)
 
 /**
   *  Cache pool based on a static list
@@ -294,18 +312,19 @@ object ZookeeperCachePoolCluster {
   *                   the same as no backup pool.
   * @param statsReceiver Optional, the destination to report the stats to
   */
-class ZookeeperCachePoolCluster private[cacheresolver](
+class ZookeeperCachePoolCluster private[cacheresolver] (
     protected val zkPath: String,
     protected val zkClient: ZooKeeperClient,
     backupPool: Option[Set[CacheNode]] = None,
     protected val statsReceiver: StatsReceiver = NullStatsReceiver)
-    extends CachePoolCluster with ZookeeperStateMonitor {
+    extends CachePoolCluster
+    with ZookeeperStateMonitor {
 
   import ZookeeperCachePoolCluster._
 
   private[this] val zkServerSetCluster =
-    new ZookeeperServerSetCluster(ServerSets.create(
-            zkClient, ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL, zkPath)) map {
+    new ZookeeperServerSetCluster(ServerSets
+      .create(zkClient, ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL, zkPath)) map {
       case addr: InetSocketAddress =>
         CacheNode(addr.getHostName, addr.getPort, 1)
     }
@@ -358,9 +377,11 @@ class ZookeeperCachePoolCluster private[cacheresolver](
       // It will only block for 10 seconds after which it should trigger alerting metrics and schedule
       // another try
       val newSet = Await.result(
-          waitForClusterComplete(
-              snapshotSeq.toSet, expectedClusterSize, snapshotChanges),
-          CachePoolWaitCompleteTimeout)
+        waitForClusterComplete(
+          snapshotSeq.toSet,
+          expectedClusterSize,
+          snapshotChanges),
+        CachePoolWaitCompleteTimeout)
 
       updatePool(newSet)
     }
@@ -409,8 +430,8 @@ class ZookeeperCacheNodeGroup(
     protected val zkPath: String,
     protected val zkClient: ZooKeeperClient,
     protected val statsReceiver: StatsReceiver = NullStatsReceiver
-)
-    extends Group[CacheNode] with ZookeeperStateMonitor {
+) extends Group[CacheNode]
+    with ZookeeperStateMonitor {
 
   protected[finagle] val set = Var(Set[CacheNode]())
 
@@ -441,7 +462,7 @@ class ZookeeperCacheNodeGroup(
       val expectedGroupSize = cachePoolConfig.cachePoolSize
       if (expectedGroupSize != zkGroup.members.size)
         throw new IllegalStateException(
-            "Underlying group size not equal to expected size")
+          "Underlying group size not equal to expected size")
 
       set() = zkGroup.members
     }
@@ -453,7 +474,7 @@ class ZookeeperCacheNodeGroup(
       val newMembers = zkGroup.members
       if (newMembers.size != children.size)
         throw new IllegalStateException(
-            "Underlying children size not equal to expected children size")
+          "Underlying children size not equal to expected children size")
 
       if (newMembers.size == members.size) {
         val removed = (members &~ newMembers)

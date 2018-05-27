@@ -66,14 +66,14 @@ final class HListOps[L <: HList](l: L) extends Serializable {
   /**
     * Prepend the argument `HList` to this `HList`.
     */
-  def ++:[P <: HList](prefix: P)(
-      implicit prepend: Prepend[P, L]): prepend.Out = prepend(prefix, l)
+  def ++:[P <: HList](prefix: P)(implicit prepend: Prepend[P, L]): prepend.Out =
+    prepend(prefix, l)
 
   /**
     * Prepend the argument `HList` to this `HList`.
     */
-  def :::[P <: HList](prefix: P)(
-      implicit prepend: Prepend[P, L]): prepend.Out = prepend(prefix, l)
+  def :::[P <: HList](prefix: P)(implicit prepend: Prepend[P, L]): prepend.Out =
+    prepend(prefix, l)
 
   /**
     * Prepend the reverse of the argument `HList` to this `HList`.
@@ -613,7 +613,7 @@ final class HListOps[L <: HList](l: L) extends Serializable {
     */
   def runtimeLength: Int = {
     @tailrec def loop(l: HList, acc: Int): Int = l match {
-      case HNil => acc
+      case HNil     => acc
       case hd :: tl => loop(tl, acc + 1)
     }
 

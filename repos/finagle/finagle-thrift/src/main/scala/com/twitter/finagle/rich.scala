@@ -14,28 +14,31 @@ import scala.reflect.ClassTag
 private[twitter] object ThriftUtil {
   private type BinaryService = Service[Array[Byte], Array[Byte]]
 
-  private val thriftFinagleClientParamTypes = Seq(
-      classOf[Service[_, _]], classOf[TProtocolFactory])
+  private val thriftFinagleClientParamTypes =
+    Seq(classOf[Service[_, _]], classOf[TProtocolFactory])
 
-  private val scrooge2FinagleClientParamTypes = Seq(classOf[Service[_, _]],
-                                                    classOf[TProtocolFactory],
-                                                    classOf[Option[_]],
-                                                    classOf[StatsReceiver])
+  private val scrooge2FinagleClientParamTypes = Seq(
+    classOf[Service[_, _]],
+    classOf[TProtocolFactory],
+    classOf[Option[_]],
+    classOf[StatsReceiver])
 
-  private val scrooge3FinagleClientParamTypes = Seq(classOf[Service[_, _]],
-                                                    classOf[TProtocolFactory],
-                                                    classOf[String],
-                                                    classOf[StatsReceiver])
+  private val scrooge3FinagleClientParamTypes = Seq(
+    classOf[Service[_, _]],
+    classOf[TProtocolFactory],
+    classOf[String],
+    classOf[StatsReceiver])
 
   private val scrooge3FinagleClientWithRepClassifierParamTypes = Seq(
-      classOf[Service[_, _]],
-      classOf[TProtocolFactory],
-      classOf[String],
-      classOf[StatsReceiver],
-      classOf[ResponseClassifier])
+    classOf[Service[_, _]],
+    classOf[TProtocolFactory],
+    classOf[String],
+    classOf[StatsReceiver],
+    classOf[ResponseClassifier])
 
   def findClass1(name: String): Option[Class[_]] =
-    try Some(Class.forName(name)) catch {
+    try Some(Class.forName(name))
+    catch {
       case _: ClassNotFoundException => None
     }
 
@@ -45,7 +48,8 @@ private[twitter] object ThriftUtil {
     } yield cls.asInstanceOf[Class[A]]
 
   def findConstructor[A](
-      clz: Class[A], paramTypes: Class[_]*): Option[Constructor[A]] =
+      clz: Class[A],
+      paramTypes: Class[_]*): Option[Constructor[A]] =
     try {
       Some(clz.getConstructor(paramTypes: _*))
     } catch {
@@ -53,8 +57,11 @@ private[twitter] object ThriftUtil {
     }
 
   def findMethod(
-      clz: Class[_], name: String, params: Class[_]*): Option[Method] =
-    try Some(clz.getMethod(name, params: _*)) catch {
+      clz: Class[_],
+      name: String,
+      params: Class[_]*): Option[Method] =
+    try Some(clz.getMethod(name, params: _*))
+    catch {
       case _: NoSuchMethodException => None
     }
 
@@ -109,10 +116,15 @@ private[twitter] object ThriftUtil {
         baseName <- findRootWithSuffix(clsName, "$FutureIface")
         clientCls <- findClass[Iface](baseName + "$FinagledClient")
         cons <- findConstructor(
-            clientCls, scrooge3FinagleClientWithRepClassifierParamTypes: _*)
+          clientCls,
+          scrooge3FinagleClientWithRepClassifierParamTypes: _*)
       } yield
         cons.newInstance(
-            underlying, protocolFactory, "", sr, responseClassifier)
+          underlying,
+          protocolFactory,
+          "",
+          sr,
+          responseClassifier)
 
     def tryScrooge3FinagledClient: Option[Iface] =
       for {
@@ -133,7 +145,10 @@ private[twitter] object ThriftUtil {
         swiftClass <- findSwiftClass(cls)
         proxy <- findClass1("com.twitter.finagle.exp.swift.SwiftProxy")
         meth <- findMethod(
-            proxy, "newClient", classOf[Service[_, _]], classOf[ClassTag[_]])
+          proxy,
+          "newClient",
+          classOf[Service[_, _]],
+          classOf[ClassTag[_]])
       } yield {
         val manifest = ClassTag(swiftClass).asInstanceOf[ClassTag[Iface]]
         meth.invoke(null, underlying, manifest).asInstanceOf[Iface]
@@ -144,7 +159,7 @@ private[twitter] object ThriftUtil {
 
     iface getOrElse {
       throw new IllegalArgumentException(
-          "Iface %s is not a valid thrift iface".format(clsName))
+        "Iface %s is not a valid thrift iface".format(clsName))
     }
   }
 
@@ -169,40 +184,40 @@ private[twitter] object ThriftUtil {
     def tryScroogeFinagleService(iface: Class[_]): Option[BinaryService] =
       (for {
         baseName <- findRootWithSuffix(iface.getName, "$FutureIface") orElse Some(
-            iface.getName)
+          iface.getName)
         serviceCls <- findClass[BinaryService](baseName + "$FinagleService") orElse findClass[
-            BinaryService](baseName + "$FinagledService")
+          BinaryService](baseName + "$FinagledService")
         baseClass <- findClass1(baseName)
       } yield {
         // The new constructor takes one more 'label' paramater than the old one, so we first try find
         // the new constructor, it it doesn't not exist, fallback to the one without 'label' parameter.
-        val oldParameters = Seq(baseClass,
-                                classOf[TProtocolFactory],
-                                classOf[StatsReceiver],
-                                Integer.TYPE)
+        val oldParameters = Seq(
+          baseClass,
+          classOf[TProtocolFactory],
+          classOf[StatsReceiver],
+          Integer.TYPE)
         val newParameters = oldParameters :+ classOf[String]
-        val oldArgs = Seq(
-            impl, protocolFactory, stats, Int.box(maxThriftBufferSize))
+        val oldArgs =
+          Seq(impl, protocolFactory, stats, Int.box(maxThriftBufferSize))
         val newArgs = oldArgs :+ label
         def newConsCall: Option[BinaryService] =
           findConstructor(serviceCls, newParameters: _*).map(
-              cons => cons.newInstance(newArgs: _*)
+            cons => cons.newInstance(newArgs: _*)
           )
         def oldConsCall: Option[BinaryService] =
           findConstructor(serviceCls, oldParameters: _*).map(
-              cons => cons.newInstance(oldArgs: _*)
+            cons => cons.newInstance(oldArgs: _*)
           )
         newConsCall.orElse(oldConsCall)
       }).flatten
 
     // The legacy $FinagleService that doesn't take stats.
-    def tryLegacyScroogeFinagleService(
-        iface: Class[_]): Option[BinaryService] =
+    def tryLegacyScroogeFinagleService(iface: Class[_]): Option[BinaryService] =
       for {
         baseName <- findRootWithSuffix(iface.getName, "$FutureIface") orElse Some(
-            iface.getName)
+          iface.getName)
         serviceCls <- findClass[BinaryService](baseName + "$FinagleService") orElse findClass[
-            BinaryService](baseName + "$FinagledService")
+          BinaryService](baseName + "$FinagledService")
         cons <- findConstructor(serviceCls, iface, classOf[TProtocolFactory])
       } yield cons.newInstance(impl, protocolFactory)
 
@@ -210,20 +225,20 @@ private[twitter] object ThriftUtil {
       for {
         _ <- findSwiftClass(iface)
         swiftServiceCls <- findClass1(
-            "com.twitter.finagle.exp.swift.SwiftService")
+          "com.twitter.finagle.exp.swift.SwiftService")
         const <- findConstructor(swiftServiceCls, classOf[Object])
       } yield const.newInstance(impl).asInstanceOf[BinaryService]
 
     def tryClass(cls: Class[_]): Option[BinaryService] =
       tryThriftFinagleService(cls) orElse tryScroogeFinagleService(cls) orElse tryLegacyScroogeFinagleService(
-          cls) orElse trySwiftService(cls) orElse
-      (Option(cls.getSuperclass) ++ cls.getInterfaces).view
-        .flatMap(tryClass)
-        .headOption
+        cls) orElse trySwiftService(cls) orElse
+        (Option(cls.getSuperclass) ++ cls.getInterfaces).view
+          .flatMap(tryClass)
+          .headOption
 
     tryClass(impl.getClass).getOrElse {
       throw new IllegalArgumentException(
-          "argument implements no candidate ifaces")
+        "argument implements no candidate ifaces")
     }
   }
 
@@ -232,14 +247,16 @@ private[twitter] object ThriftUtil {
     * interface using whichever Thrift code-generation toolchain is available.
     * (Legacy version for backward-compatibility).
     */
-  def serverFromIface(impl: AnyRef,
-                      protocolFactory: TProtocolFactory,
-                      serviceName: String): BinaryService = {
-    serverFromIface(impl,
-                    protocolFactory,
-                    LoadedStatsReceiver,
-                    Thrift.maxThriftBufferSize,
-                    serviceName)
+  def serverFromIface(
+      impl: AnyRef,
+      protocolFactory: TProtocolFactory,
+      serviceName: String): BinaryService = {
+    serverFromIface(
+      impl,
+      protocolFactory,
+      LoadedStatsReceiver,
+      Thrift.maxThriftBufferSize,
+      serviceName)
   }
 }
 
@@ -340,17 +357,17 @@ trait ThriftRichClient { self: Client[ThriftClientRequest, Array[Byte]] =>
   /**
     * $clientUse
     */
-  def newIface[Iface : ClassTag](dest: String): Iface = {
+  def newIface[Iface: ClassTag](dest: String): Iface = {
     val (n, l) = Resolver.evalLabeled(dest)
     newIface[Iface](n, l)
   }
 
-  def newIface[Iface : ClassTag](dest: String, label: String): Iface = {
+  def newIface[Iface: ClassTag](dest: String, label: String): Iface = {
     val cls = implicitly[ClassTag[Iface]].runtimeClass
     newIface[Iface](Resolver.eval(dest), label, cls)
   }
 
-  def newIface[Iface : ClassTag](dest: Name, label: String): Iface = {
+  def newIface[Iface: ClassTag](dest: Name, label: String): Iface = {
     val cls = implicitly[ClassTag[Iface]].runtimeClass
     newIface[Iface](dest, label, cls)
   }
@@ -359,8 +376,9 @@ trait ThriftRichClient { self: Client[ThriftClientRequest, Array[Byte]] =>
     * $clientUse
     */
   @deprecated(
-      "Use destination names via newIface(String) or newIface(Name)", "6.7.x")
-  def newIface[Iface : ClassTag](group: Group[SocketAddress]): Iface = {
+    "Use destination names via newIface(String) or newIface(Name)",
+    "6.7.x")
+  def newIface[Iface: ClassTag](group: Group[SocketAddress]): Iface = {
     val cls = implicitly[ClassTag[Iface]].runtimeClass
     newIface[Iface](group, cls)
   }
@@ -369,11 +387,12 @@ trait ThriftRichClient { self: Client[ThriftClientRequest, Array[Byte]] =>
     * $clientUse
     */
   @deprecated(
-      "Use destination names via newIface(String) or newIface(Name)", "6.7.x")
+    "Use destination names via newIface(String) or newIface(Name)",
+    "6.7.x")
   def newIface[Iface](group: Group[SocketAddress], cls: Class[_]): Iface =
     group match {
       case LabelledGroup(g, label) => newIface(Name.fromGroup(g), label, cls)
-      case _ => newIface(Name.fromGroup(group), "", cls)
+      case _                       => newIface(Name.fromGroup(group), "", cls)
     }
 
   /**
@@ -502,21 +521,25 @@ trait ThriftRichServer { self: Server[Array[Byte], Array[Byte]] =>
     * $serveIface
     */
   def serveIface(addr: String, iface: AnyRef): ListeningServer =
-    serve(addr,
-          serverFromIface(iface,
-                          protocolFactory,
-                          serverStats,
-                          maxThriftBufferSize,
-                          serverLabel))
+    serve(
+      addr,
+      serverFromIface(
+        iface,
+        protocolFactory,
+        serverStats,
+        maxThriftBufferSize,
+        serverLabel))
 
   /**
     * $serveIface
     */
   def serveIface(addr: SocketAddress, iface: AnyRef): ListeningServer =
-    serve(addr,
-          serverFromIface(iface,
-                          protocolFactory,
-                          serverStats,
-                          maxThriftBufferSize,
-                          serverLabel))
+    serve(
+      addr,
+      serverFromIface(
+        iface,
+        protocolFactory,
+        serverStats,
+        maxThriftBufferSize,
+        serverLabel))
 }

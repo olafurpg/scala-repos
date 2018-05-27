@@ -31,7 +31,7 @@ object ToolsUtils {
       !(validHostPort.isEmpty) && validHostPort.size == hostPorts.length
     if (!isValid)
       CommandLineUtils.printUsageAndDie(
-          parser,
-          "Please provide valid host:port like host1:9091,host2:9092\n ")
+        parser,
+        "Please provide valid host:port like host1:9091,host2:9092\n ")
   }
 }

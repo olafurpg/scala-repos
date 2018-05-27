@@ -26,15 +26,15 @@ object TypeCheckerWithExplicitTypesAST {
   val boolT = TyBuiltin("Bool")
 
   def litToTy(l: Literal): Type = l match {
-    case Num(_) => numT
+    case Num(_)  => numT
     case Bool(_) => boolT
   }
 
   val predef: TypeEnv = Map(
-      "+" -> (TyLam(numT, TyLam(numT, numT))),
-      "-" -> (TyLam(numT, TyLam(numT, numT))),
-      "==" -> (TyLam(numT, TyLam(numT, boolT))),
-      "&&" -> (TyLam(boolT, TyLam(boolT, boolT))),
-      "||" -> (TyLam(boolT, TyLam(boolT, boolT)))
+    "+" -> (TyLam(numT, TyLam(numT, numT))),
+    "-" -> (TyLam(numT, TyLam(numT, numT))),
+    "==" -> (TyLam(numT, TyLam(numT, boolT))),
+    "&&" -> (TyLam(boolT, TyLam(boolT, boolT))),
+    "||" -> (TyLam(boolT, TyLam(boolT, boolT)))
   )
 }

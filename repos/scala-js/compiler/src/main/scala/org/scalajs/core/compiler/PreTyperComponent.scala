@@ -61,7 +61,8 @@ import nsc._
   *  @author Nicolas Stucki
   */
 abstract class PreTyperComponent
-    extends plugins.PluginComponent with transform.Transform
+    extends plugins.PluginComponent
+    with transform.Transform
     with PluginComponent210Compat {
 
   import global._
@@ -78,25 +79,27 @@ abstract class PreTyperComponent
       case tree: ClassDef if needsAnnotations(tree) =>
         val newBody = tree.impl.body.map {
           case vdef: ValDef if needsAnnotations(vdef) =>
-            treeCopy.ValDef(vdef,
-                            withWasPublic(vdef.mods),
-                            vdef.name,
-                            vdef.tpt,
-                            transform(vdef.rhs))
+            treeCopy.ValDef(
+              vdef,
+              withWasPublic(vdef.mods),
+              vdef.name,
+              vdef.tpt,
+              transform(vdef.rhs))
 
           case ddef: DefDef if needsAnnotations(ddef) =>
-            treeCopy.DefDef(ddef,
-                            withWasPublic(ddef.mods),
-                            ddef.name,
-                            ddef.tparams,
-                            ddef.vparamss,
-                            ddef.tpt,
-                            transform(ddef.rhs))
+            treeCopy.DefDef(
+              ddef,
+              withWasPublic(ddef.mods),
+              ddef.name,
+              ddef.tparams,
+              ddef.vparamss,
+              ddef.tpt,
+              transform(ddef.rhs))
 
           case member => transform(member)
         }
-        val newImpl = treeCopy.Template(
-            tree.impl, tree.impl.parents, tree.impl.self, newBody)
+        val newImpl = treeCopy
+          .Template(tree.impl, tree.impl.parents, tree.impl.self, newBody)
         treeCopy.ClassDef(tree, tree.mods, tree.name, tree.tparams, newImpl)
 
       case tree: Template =>
@@ -117,7 +120,7 @@ abstract class PreTyperComponent
     classDef.impl.body.exists {
       case vdef: ValDef => needsAnnotations(vdef)
       case ddef: DefDef => needsAnnotations(ddef)
-      case _ => false
+      case _            => false
     }
   }
 
@@ -136,8 +139,8 @@ abstract class PreTyperComponent
 
   private def anonymousClassMethodWasPublicAnnotation: Tree = {
     val runtimePackage = Select(
-        Select(Select(Select(Ident(nme.ROOTPKG), nme.scala_), scalajs), js),
-        nme.annotation)
+      Select(Select(Select(Ident(nme.ROOTPKG), nme.scala_), scalajs), js),
+      nme.annotation)
     val cls = Select(runtimePackage, wasPublicBeforeTyper)
     Apply(Select(New(cls), nme.CONSTRUCTOR), Nil)
   }

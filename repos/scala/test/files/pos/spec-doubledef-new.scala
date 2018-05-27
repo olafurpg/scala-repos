@@ -15,9 +15,10 @@ class C extends A[Int] {
   override def getWith[@specialized(Int) Z](f: Int => Z) = f(value)
 }
 
-abstract class B[T,
-                 @specialized(scala.Int) U : TypeTag,
-                 @specialized(scala.Int) V <% Ordered[V]] {
+abstract class B[
+    T,
+    @specialized(scala.Int) U: TypeTag,
+    @specialized(scala.Int) V <% Ordered[V]] {
   val u: U
   val v: V
 

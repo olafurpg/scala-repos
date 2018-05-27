@@ -22,8 +22,8 @@ trait BigDecimalIsField extends Field[BigDecimal] {
 
   def quot(a: BigDecimal, b: BigDecimal): BigDecimal = a.quot(b)
   def mod(a: BigDecimal, b: BigDecimal): BigDecimal = a % b
-  override def quotmod(
-      a: BigDecimal, b: BigDecimal): (BigDecimal, BigDecimal) = a /% b
+  override def quotmod(a: BigDecimal, b: BigDecimal): (BigDecimal, BigDecimal) =
+    a /% b
   def gcd(a: BigDecimal, b: BigDecimal): BigDecimal = {
     import java.math.BigInteger
 
@@ -32,9 +32,10 @@ trait BigDecimalIsField extends Field[BigDecimal] {
     val Ten = BigInteger.TEN
 
     @tailrec
-    def reduce0(n: BigInteger,
-                prime: BigInteger,
-                shift: Int = 0): (Int, BigInteger) = {
+    def reduce0(
+        n: BigInteger,
+        prime: BigInteger,
+        shift: Int = 0): (Int, BigInteger) = {
       val Array(div, rem) = n.divideAndRemainder(prime)
       if (n == BigInteger.ZERO || rem != BigInteger.ZERO) {
         (shift, n)
@@ -50,10 +51,11 @@ trait BigDecimalIsField extends Field[BigDecimal] {
       (shift2 + shift10, shift5 + shift10, n2)
     }
 
-    def gcd0(val0: BigInteger,
-             exp0: Int,
-             val1: BigInteger,
-             exp1: Int): BigDecimal = {
+    def gcd0(
+        val0: BigInteger,
+        exp0: Int,
+        val1: BigInteger,
+        exp1: Int): BigDecimal = {
       val (shiftTwo0, shiftFive0, shifted0) = reduce(val0)
       val (shiftTwo1, shiftFive1, shifted1) = reduce(val1)
       val sharedTwo = spire.math.min(shiftTwo0, shiftTwo1 + exp1 - exp0)
@@ -84,7 +86,7 @@ trait BigDecimalIsNRoot extends NRoot[BigDecimal] {
   def nroot(a: BigDecimal, k: Int): BigDecimal = {
     if (a.mc.getPrecision <= 0)
       throw new ArithmeticException(
-          "Cannot find the nroot of a BigDecimal with unlimited precision.")
+        "Cannot find the nroot of a BigDecimal with unlimited precision.")
     NRoot.nroot(a, k, a.mc)
   }
 
@@ -94,13 +96,14 @@ trait BigDecimalIsNRoot extends NRoot[BigDecimal] {
   override def sqrt(n: BigDecimal): BigDecimal = {
     if (n.mc.getPrecision <= 0)
       throw new ArithmeticException(
-          "Cannot find the sqrt of a BigDecimal with unlimited precision.")
+        "Cannot find the sqrt of a BigDecimal with unlimited precision.")
 
     def approxSqrt(x: BigDecimal): BigDecimal =
       if (x < Double.MaxValue) BigDecimal(Math.sqrt(x.toDouble), x.mc)
       else
         approxSqrt(x / Double.MaxValue) * BigDecimal(
-            Math.sqrt(Double.MaxValue), x.mc)
+          Math.sqrt(Double.MaxValue),
+          x.mc)
 
     @tailrec def loop(x: BigDecimal, y: BigDecimal): BigDecimal =
       if (x == y) y else loop(y, ((n / y) + y) / two)
@@ -113,7 +116,8 @@ trait BigDecimalIsNRoot extends NRoot[BigDecimal] {
 
 @SerialVersionUID(1L)
 class BigDecimalIsTrig(mc: MathContext = BigDecimal.defaultMathContext)
-    extends Trig[BigDecimal] with Serializable {
+    extends Trig[BigDecimal]
+    with Serializable {
   import spire.math.Real
 
   val bits = Real.digitsToBits(mc.getPrecision + 1)
@@ -170,7 +174,8 @@ trait BigDecimalIsSigned extends Signed[BigDecimal] {
 }
 
 trait BigDecimalIsReal
-    extends IsRational[BigDecimal] with BigDecimalOrder
+    extends IsRational[BigDecimal]
+    with BigDecimalOrder
     with BigDecimalIsSigned {
   def toDouble(x: BigDecimal): Double = x.toDouble
   def ceil(a: BigDecimal): BigDecimal = a.setScale(0, CEILING)
@@ -182,7 +187,9 @@ trait BigDecimalIsReal
 
 @SerialVersionUID(0L)
 class BigDecimalAlgebra
-    extends BigDecimalIsField with BigDecimalIsNRoot with BigDecimalIsReal
+    extends BigDecimalIsField
+    with BigDecimalIsNRoot
+    with BigDecimalIsReal
     with Serializable
 
 trait BigDecimalInstances {

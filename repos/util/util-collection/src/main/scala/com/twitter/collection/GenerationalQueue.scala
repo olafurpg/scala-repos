@@ -39,7 +39,7 @@ class ExactGenerationalQueue[A] extends GenerationalQueue[A] {
     else
       container.min match {
         case (a, t) if (t.untilNow > age) => Some(a)
-        case _ => None
+        case _                            => None
       }
   }
 
@@ -82,10 +82,10 @@ class BucketGenerationalQueue[A](timeout: Duration)
 
     override def toString() =
       "TimeBucket(origin=%d, size=%d, age=%s, count=%d)".format(
-          origin.inMilliseconds,
-          span.inMilliseconds,
-          age().toString,
-          super.size
+        origin.inMilliseconds,
+        span.inMilliseconds,
+        age().toString,
+        super.size
       )
   }
 
@@ -95,9 +95,8 @@ class BucketGenerationalQueue[A](timeout: Duration)
   private[this] def maybeGrowChain() = {
     // NB: age of youngest element is negative when bucket isn't expired
     val growChain = buckets.headOption
-      .map((bucket) =>
-            {
-          bucket.age() > Duration.Zero
+      .map((bucket) => {
+        bucket.age() > Duration.Zero
       })
       .getOrElse(true)
 

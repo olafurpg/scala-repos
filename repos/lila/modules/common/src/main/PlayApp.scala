@@ -44,8 +44,7 @@ object PlayApp {
         .reverse
         .map { messageFile =>
           Messages
-            .parse(Messages.UrlMessageSource(messageFile),
-                   messageFile.toString)
+            .parse(Messages.UrlMessageSource(messageFile), messageFile.toString)
             .fold(e => throw e, identity)
         }
         .foldLeft(Map.empty[String, String]) { _ ++ _ }
@@ -64,9 +63,10 @@ object PlayApp {
     !(loadConfig getBoolean "app.scheduler.disabled")
 
   def scheduler =
-    new Scheduler(system.scheduler,
-                  enabled = enableScheduler && isServer,
-                  debug = loadConfig getBoolean "app.scheduler.debug")
+    new Scheduler(
+      system.scheduler,
+      enabled = enableScheduler && isServer,
+      debug = loadConfig getBoolean "app.scheduler.debug")
 
   def lifecycle =
     withApp(_.injector.instanceOf[play.api.inject.ApplicationLifecycle])

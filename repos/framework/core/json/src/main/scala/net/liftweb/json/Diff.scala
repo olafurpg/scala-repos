@@ -26,7 +26,7 @@ case class Diff(changed: JValue, added: JValue, deleted: JValue) {
   def map(f: JValue => JValue): Diff = {
     def applyTo(x: JValue) = x match {
       case JNothing => JNothing
-      case _ => f(x)
+      case _        => f(x)
     }
     Diff(applyTo(changed), applyTo(added), applyTo(deleted))
   }
@@ -34,7 +34,7 @@ case class Diff(changed: JValue, added: JValue, deleted: JValue) {
   private[json] def toField(name: String): Diff = {
     def applyTo(x: JValue) = x match {
       case JNothing => JNothing
-      case _ => JObject(JField(name, x))
+      case _        => JObject(JField(name, x))
     }
     Diff(applyTo(changed), applyTo(added), applyTo(deleted))
   }
@@ -54,24 +54,25 @@ object Diff {
     * </pre>
     */
   def diff(val1: JValue, val2: JValue): Diff = (val1, val2) match {
-    case (x, y) if x == y => Diff(JNothing, JNothing, JNothing)
-    case (JObject(xs), JObject(ys)) => diffFields(xs, ys)
-    case (JArray(xs), JArray(ys)) => diffVals(xs, ys)
+    case (x, y) if x == y               => Diff(JNothing, JNothing, JNothing)
+    case (JObject(xs), JObject(ys))     => diffFields(xs, ys)
+    case (JArray(xs), JArray(ys))       => diffVals(xs, ys)
     case (JInt(x), JInt(y)) if (x != y) => Diff(JInt(y), JNothing, JNothing)
     case (JDouble(x), JDouble(y)) if (x != y) =>
       Diff(JDouble(y), JNothing, JNothing)
     case (JString(x), JString(y)) if (x != y) =>
       Diff(JString(y), JNothing, JNothing)
     case (JBool(x), JBool(y)) if (x != y) => Diff(JBool(y), JNothing, JNothing)
-    case (x, y) => Diff(JNothing, y, x)
+    case (x, y)                           => Diff(JNothing, y, x)
   }
 
   private def diffFields(vs1: List[JField], vs2: List[JField]) = {
     def diffRec(xleft: List[JField], yleft: List[JField]): Diff = xleft match {
       case Nil =>
-        Diff(JNothing,
-             if (yleft.isEmpty) JNothing else JObject(yleft),
-             JNothing)
+        Diff(
+          JNothing,
+          if (yleft.isEmpty) JNothing else JObject(yleft),
+          JNothing)
       case x :: xs =>
         yleft find (_.name == x.name) match {
           case Some(y) =>

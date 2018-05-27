@@ -13,4 +13,8 @@ package ast.parser
   *  @param nested The brace pairs nested in this one
   */
 case class BracePair(
-    loff: Int, lindent: Int, roff: Int, rindent: Int, nested: List[BracePair])
+    loff: Int,
+    lindent: Int,
+    roff: Int,
+    rindent: Int,
+    nested: List[BracePair])

@@ -14,12 +14,12 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
   */
 class ScalaRenameFileQuickFix(myFile: ScalaFile, name: String)
     extends AbstractFixOnPsiElement(
-        "Rename File " + myFile.name + " to " + name, myFile) {
+      "Rename File " + myFile.name + " to " + name,
+      myFile) {
   def doApplyFix(project: Project): Unit = {
     /*(new RenameRefactoringImpl(project, file, name, false, true)).run*/
     val file = getElement
-    ApplicationManager.getApplication.invokeLater(
-        new Runnable {
+    ApplicationManager.getApplication.invokeLater(new Runnable {
       def run() {
         val processor: RenameProcessor =
           new RenameProcessor(project, file, name, false, false)

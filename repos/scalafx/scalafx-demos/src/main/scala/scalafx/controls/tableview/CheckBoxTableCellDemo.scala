@@ -49,9 +49,9 @@ object CheckBoxTableCellDemo extends JFXApp {
   }
 
   val data = ObservableBuffer[Item](
-      (1 to 10).map { i =>
-        new Item(i % 2 == 0, s"Item $i")
-      }
+    (1 to 10).map { i =>
+      new Item(i % 2 == 0, s"Item $i")
+    }
   )
 
   stage = new PrimaryStage {
@@ -59,23 +59,23 @@ object CheckBoxTableCellDemo extends JFXApp {
     scene = new Scene {
       root = new TableView[Item](data) {
         columns ++= List(
-            new TableColumn[Item, java.lang.Boolean] {
-              text = "Selected"
-              // We need to explicitly cast `_.value.selected` to modify boolean type parameters.
-              // `scala.Boolean` type is different from `java.lang.Boolean`, but eventually represented the same way
-              // by the compiler.
-              cellValueFactory = _.value.selected
-                .asInstanceOf[ObservableValue[java.lang.Boolean,
-                                              java.lang.Boolean]]
-              cellFactory = CheckBoxTableCell.forTableColumn(this)
-              editable = true
-              prefWidth = 180
-            },
-            new TableColumn[Item, String] {
-              text = "Name"
-              cellValueFactory = { _.value.name }
-              prefWidth = 180
-            }
+          new TableColumn[Item, java.lang.Boolean] {
+            text = "Selected"
+            // We need to explicitly cast `_.value.selected` to modify boolean type parameters.
+            // `scala.Boolean` type is different from `java.lang.Boolean`, but eventually represented the same way
+            // by the compiler.
+            cellValueFactory = _.value.selected
+              .asInstanceOf[
+                ObservableValue[java.lang.Boolean, java.lang.Boolean]]
+            cellFactory = CheckBoxTableCell.forTableColumn(this)
+            editable = true
+            prefWidth = 180
+          },
+          new TableColumn[Item, String] {
+            text = "Name"
+            cellValueFactory = { _.value.name }
+            prefWidth = 180
+          }
         )
         editable = true
       }

@@ -64,9 +64,9 @@ final case class Attributes(attributeList: List[Attributes.Attribute] = Nil) {
     */
   def getAttribute[T <: Attribute](c: Class[T]): Optional[T] =
     Optional.ofNullable(
-        attributeList.foldLeft(
-            null.asInstanceOf[T]
-        )((acc, attr) ⇒ if (c.isInstance(attr)) c.cast(attr) else acc))
+      attributeList.foldLeft(
+        null.asInstanceOf[T]
+      )((acc, attr) ⇒ if (c.isInstance(attr)) c.cast(attr) else acc))
 
   /**
     * Java API: Get the first (least specific) attribute of a given `Class` or subclass thereof.
@@ -79,7 +79,7 @@ final case class Attributes(attributeList: List[Attributes.Attribute] = Nil) {
   /**
     * Scala API: get all attributes of a given type (or subtypes thereof).
     */
-  def filtered[T <: Attribute : ClassTag]: List[T] = {
+  def filtered[T <: Attribute: ClassTag]: List[T] = {
     val c = implicitly[ClassTag[T]].runtimeClass.asInstanceOf[Class[T]]
     attributeList.collect {
       case attr if c.isAssignableFrom(attr.getClass) ⇒ c.cast(attr)
@@ -90,20 +90,20 @@ final case class Attributes(attributeList: List[Attributes.Attribute] = Nil) {
     * Scala API: Get the last (most specific) attribute of a given type parameter T `Class` or subclass thereof.
     * If no such attribute exists the `default` value is returned.
     */
-  def get[T <: Attribute : ClassTag](default: T): T =
+  def get[T <: Attribute: ClassTag](default: T): T =
     getAttribute(classTag[T].runtimeClass.asInstanceOf[Class[T]], default)
 
   /**
     * Scala API: Get the first (least specific) attribute of a given type parameter T `Class` or subclass thereof.
     * If no such attribute exists the `default` value is returned.
     */
-  def getFirst[T <: Attribute : ClassTag](default: T): T =
+  def getFirst[T <: Attribute: ClassTag](default: T): T =
     getAttribute(classTag[T].runtimeClass.asInstanceOf[Class[T]], default)
 
   /**
     * Scala API: Get the last (most specific) attribute of a given type parameter T `Class` or subclass thereof.
     */
-  def get[T <: Attribute : ClassTag]: Option[T] = {
+  def get[T <: Attribute: ClassTag]: Option[T] = {
     val c = classTag[T].runtimeClass.asInstanceOf[Class[T]]
     attributeList.reverseIterator.collectFirst[T] {
       case attr if c.isInstance(attr) => c.cast(attr)
@@ -113,7 +113,7 @@ final case class Attributes(attributeList: List[Attributes.Attribute] = Nil) {
   /**
     * Scala API: Get the first (least specific) attribute of a given type parameter T `Class` or subclass thereof.
     */
-  def getFirst[T <: Attribute : ClassTag]: Option[T] = {
+  def getFirst[T <: Attribute: ClassTag]: Option[T] = {
     val c = classTag[T].runtimeClass.asInstanceOf[Class[T]]
     attributeList.collectFirst {
       case attr if c.isInstance(attr) => c.cast(attr)
@@ -151,7 +151,9 @@ final case class Attributes(attributeList: List[Attributes.Attribute] = Nil) {
       default: String = "unknown-operation"): String = {
     @tailrec
     def concatNames(
-        i: Iterator[Attribute], first: String, buf: StringBuilder): String =
+        i: Iterator[Attribute],
+        first: String,
+        buf: StringBuilder): String =
       if (i.hasNext)
         i.next() match {
           case Name(n) ⇒
@@ -181,9 +183,10 @@ object Attributes {
   trait Attribute
   final case class Name(n: String) extends Attribute
   final case class InputBuffer(initial: Int, max: Int) extends Attribute
-  final case class LogLevels(onElement: Logging.LogLevel,
-                             onFinish: Logging.LogLevel,
-                             onFailure: Logging.LogLevel)
+  final case class LogLevels(
+      onElement: Logging.LogLevel,
+      onFinish: Logging.LogLevel,
+      onFailure: Logging.LogLevel)
       extends Attribute
   final case object AsyncBoundary extends Attribute
 
@@ -226,12 +229,15 @@ object Attributes {
     * Passing in null as any of the arguments sets the level to its default value, which is:
     * `Debug` for `onElement` and `onFinish`, and `Error` for `onFailure`.
     */
-  def createLogLevels(onElement: Logging.LogLevel,
-                      onFinish: Logging.LogLevel,
-                      onFailure: Logging.LogLevel) =
-    logLevels(onElement = Option(onElement).getOrElse(Logging.DebugLevel),
-              onFinish = Option(onFinish).getOrElse(Logging.DebugLevel),
-              onFailure = Option(onFailure).getOrElse(Logging.ErrorLevel))
+  def createLogLevels(
+      onElement: Logging.LogLevel,
+      onFinish: Logging.LogLevel,
+      onFailure: Logging.LogLevel) =
+    logLevels(
+      onElement = Option(onElement).getOrElse(Logging.DebugLevel),
+      onFinish = Option(onFinish).getOrElse(Logging.DebugLevel),
+      onFailure = Option(onFailure).getOrElse(Logging.ErrorLevel)
+    )
 
   /**
     * Configures `log()` stage log-levels to be used when logging.
@@ -239,9 +245,10 @@ object Attributes {
     *
     * See [[Attributes.createLogLevels]] for Java API
     */
-  def logLevels(onElement: Logging.LogLevel = Logging.DebugLevel,
-                onFinish: Logging.LogLevel = Logging.DebugLevel,
-                onFailure: Logging.LogLevel = Logging.ErrorLevel) =
+  def logLevels(
+      onElement: Logging.LogLevel = Logging.DebugLevel,
+      onFinish: Logging.LogLevel = Logging.DebugLevel,
+      onFailure: Logging.LogLevel = Logging.ErrorLevel) =
     Attributes(LogLevels(onElement, onFinish, onFailure))
 
   /**
@@ -296,12 +303,15 @@ object ActorAttributes {
     * Passing in null as any of the arguments sets the level to its default value, which is:
     * `Debug` for `onElement` and `onFinish`, and `Error` for `onFailure`.
     */
-  def createLogLevels(onElement: Logging.LogLevel,
-                      onFinish: Logging.LogLevel,
-                      onFailure: Logging.LogLevel) =
-    logLevels(onElement = Option(onElement).getOrElse(Logging.DebugLevel),
-              onFinish = Option(onFinish).getOrElse(Logging.DebugLevel),
-              onFailure = Option(onFailure).getOrElse(Logging.ErrorLevel))
+  def createLogLevels(
+      onElement: Logging.LogLevel,
+      onFinish: Logging.LogLevel,
+      onFailure: Logging.LogLevel) =
+    logLevels(
+      onElement = Option(onElement).getOrElse(Logging.DebugLevel),
+      onFinish = Option(onFinish).getOrElse(Logging.DebugLevel),
+      onFailure = Option(onFailure).getOrElse(Logging.ErrorLevel)
+    )
 
   /**
     * Configures `log()` stage log-levels to be used when logging.
@@ -309,8 +319,9 @@ object ActorAttributes {
     *
     * See [[Attributes.createLogLevels]] for Java API
     */
-  def logLevels(onElement: Logging.LogLevel = Logging.DebugLevel,
-                onFinish: Logging.LogLevel = Logging.DebugLevel,
-                onFailure: Logging.LogLevel = Logging.ErrorLevel) =
+  def logLevels(
+      onElement: Logging.LogLevel = Logging.DebugLevel,
+      onFinish: Logging.LogLevel = Logging.DebugLevel,
+      onFailure: Logging.LogLevel = Logging.ErrorLevel) =
     Attributes(LogLevels(onElement, onFinish, onFailure))
 }

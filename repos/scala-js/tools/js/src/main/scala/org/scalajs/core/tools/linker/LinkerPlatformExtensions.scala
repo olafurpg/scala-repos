@@ -27,13 +27,17 @@ trait LinkerPlatformExtensions {
       if (disableOptimizer) None
       else Some(IncOptimizer.factory)
 
-    val frontend = new LinkerFrontend(semantics,
-                                      outputMode.esLevel,
-                                      withSourceMap,
-                                      frontendConfig,
-                                      optOptimizerFactory)
+    val frontend = new LinkerFrontend(
+      semantics,
+      outputMode.esLevel,
+      withSourceMap,
+      frontendConfig,
+      optOptimizerFactory)
     val backend = new BasicLinkerBackend(
-        semantics, outputMode, withSourceMap, backendConfig)
+      semantics,
+      outputMode,
+      withSourceMap,
+      backendConfig)
     new Linker(frontend, backend)
   }
 }

@@ -18,8 +18,7 @@ object MainLoop {
     // We've disabled jline shutdown hooks to prevent classloader leaks, and have been careful to always restore
     // the jline terminal in finally blocks, but hitting ctrl+c prevents finally blocks from being executed, in that
     // case the only way to restore the terminal is in a shutdown hook.
-    val shutdownHook = new Thread(
-        new Runnable {
+    val shutdownHook = new Thread(new Runnable {
       def run(): Unit = TerminalFactory.get().restore()
     })
 
@@ -34,7 +33,8 @@ object MainLoop {
   /** Run loop that evaluates remaining commands and manages changes to global logging configuration.*/
   @tailrec
   def runLoggedLoop(
-      state: State, logBacking: GlobalLogBacking): xsbti.MainResult =
+      state: State,
+      logBacking: GlobalLogBacking): xsbti.MainResult =
     runAndClearLast(state, logBacking) match {
       case ret: Return =>
         // delete current and last log files when exiting normally
@@ -53,13 +53,14 @@ object MainLoop {
 
   /** Runs the next sequence of commands, cleaning up global logging after any exceptions. */
   def runAndClearLast(state: State, logBacking: GlobalLogBacking): RunNext =
-    try runWithNewLog(state, logBacking) catch {
+    try runWithNewLog(state, logBacking)
+    catch {
       case e: xsbti.FullReload =>
         deleteLastLog(logBacking)
         throw e // pass along a reboot request
       case e: Throwable =>
         System.err.println(
-            "sbt appears to be exiting abnormally.\n  The log file for this session is at " +
+          "sbt appears to be exiting abnormally.\n  The log file for this session is at " +
             logBacking.file)
         deleteLastLog(logBacking)
         throw e
@@ -76,12 +77,14 @@ object MainLoop {
       val newLogging = state.globalLogging.newLogger(out, logBacking)
       transferLevels(state, newLogging)
       val loggedState = state.copy(globalLogging = newLogging)
-      try run(loggedState) finally out.close()
+      try run(loggedState)
+      finally out.close()
     }
 
   /** Transfers logging and trace levels from the old global loggers to the new ones. */
   private[this] def transferLevels(
-      state: State, logging: GlobalLogging): Unit = {
+      state: State,
+      logging: GlobalLogging): Unit = {
     val old = state.globalLogging
     Logger.transferLevels(old.backed, logging.backed)
     (old.full, logging.full) match {
@@ -100,17 +103,17 @@ object MainLoop {
   /** Runs the next sequence of commands that doesn't require global logging changes.*/
   @tailrec def run(state: State): RunNext =
     state.next match {
-      case State.Continue => run(next(state))
+      case State.Continue       => run(next(state))
       case State.ClearGlobalLog => new ClearGlobalLog(state.continue)
-      case State.KeepLastLog => new KeepGlobalLog(state.continue)
-      case ret: State.Return => new Return(ret.result)
+      case State.KeepLastLog    => new KeepGlobalLog(state.continue)
+      case ret: State.Return    => new Return(ret.result)
     }
 
   def next(state: State): State =
     ErrorHandling.wideConvert { state.process(Command.process) } match {
-      case Right(s) => s
+      case Right(s)                  => s
       case Left(t: xsbti.FullReload) => throw t
-      case Left(t) => state.handleError(t)
+      case Left(t)                   => state.handleError(t)
     }
 
   @deprecated("Use State.handleError", "0.13.0")

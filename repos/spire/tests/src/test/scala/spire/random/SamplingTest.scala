@@ -8,7 +8,9 @@ import prop._
 import org.scalacheck._
 
 class SamplingTest
-    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+    extends PropSpec
+    with Matchers
+    with GeneratorDrivenPropertyChecks {
   val rng = spire.random.rng.Lcg64.fromTime()
 
   val Size = 100

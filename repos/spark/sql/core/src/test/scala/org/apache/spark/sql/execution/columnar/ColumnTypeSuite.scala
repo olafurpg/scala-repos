@@ -24,7 +24,10 @@ import org.apache.spark.SparkFunSuite
 import org.apache.spark.internal.Logging
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.catalyst.CatalystTypeConverters
-import org.apache.spark.sql.catalyst.expressions.{GenericMutableRow, UnsafeProjection}
+import org.apache.spark.sql.catalyst.expressions.{
+  GenericMutableRow,
+  UnsafeProjection
+}
 import org.apache.spark.sql.execution.columnar.ColumnarTestUtils._
 import org.apache.spark.sql.types._
 
@@ -33,24 +36,26 @@ class ColumnTypeSuite extends SparkFunSuite with Logging {
   private val MAP_TYPE = MAP(MapType(IntegerType, StringType))
   private val ARRAY_TYPE = ARRAY(ArrayType(IntegerType))
   private val STRUCT_TYPE = STRUCT(
-      StructType(StructField("a", StringType) :: Nil))
+    StructType(StructField("a", StringType) :: Nil))
 
   test("defaultSize") {
-    val checks = Map(NULL -> 0,
-                     BOOLEAN -> 1,
-                     BYTE -> 1,
-                     SHORT -> 2,
-                     INT -> 4,
-                     LONG -> 8,
-                     FLOAT -> 4,
-                     DOUBLE -> 8,
-                     COMPACT_DECIMAL(15, 10) -> 8,
-                     LARGE_DECIMAL(20, 10) -> 12,
-                     STRING -> 8,
-                     BINARY -> 16,
-                     STRUCT_TYPE -> 20,
-                     ARRAY_TYPE -> 16,
-                     MAP_TYPE -> 32)
+    val checks = Map(
+      NULL -> 0,
+      BOOLEAN -> 1,
+      BYTE -> 1,
+      SHORT -> 2,
+      INT -> 4,
+      LONG -> 8,
+      FLOAT -> 4,
+      DOUBLE -> 8,
+      COMPACT_DECIMAL(15, 10) -> 8,
+      LARGE_DECIMAL(20, 10) -> 12,
+      STRING -> 8,
+      BINARY -> 16,
+      STRUCT_TYPE -> 20,
+      ARRAY_TYPE -> 16,
+      MAP_TYPE -> 32
+    )
 
     checks.foreach {
       case (columnType, expectedSize) =>
@@ -62,7 +67,9 @@ class ColumnTypeSuite extends SparkFunSuite with Logging {
 
   test("actualSize") {
     def checkActualSize(
-        columnType: ColumnType[_], value: Any, expected: Int): Unit = {
+        columnType: ColumnType[_],
+        value: Any,
+        expected: Int): Unit = {
 
       assertResult(expected, s"Wrong actualSize for $columnType") {
         val row = new GenericMutableRow(1)
@@ -82,7 +89,9 @@ class ColumnTypeSuite extends SparkFunSuite with Logging {
     checkActualSize(FLOAT, Float.MaxValue, 4)
     checkActualSize(DOUBLE, Double.MaxValue, 8)
     checkActualSize(
-        STRING, "hello", 4 + "hello".getBytes(StandardCharsets.UTF_8).length)
+      STRING,
+      "hello",
+      4 + "hello".getBytes(StandardCharsets.UTF_8).length)
     checkActualSize(BINARY, Array.fill[Byte](4)(0.toByte), 4 + 4)
     checkActualSize(COMPACT_DECIMAL(15, 10), Decimal(0, 15, 10), 8)
     checkActualSize(LARGE_DECIMAL(20, 10), Decimal(0, 20, 10), 5)
@@ -132,9 +141,10 @@ class ColumnTypeSuite extends SparkFunSuite with Logging {
         val expected = converter(row.get(0, columnType.dataType))
         val extracted = converter(columnType.extract(buffer))
         assert(
-            expected === extracted,
-            s"Extracted value didn't equal to the original one. $expected != $extracted, buffer =" +
-            dumpBuffer(buffer.duplicate().rewind().asInstanceOf[ByteBuffer]))
+          expected === extracted,
+          s"Extracted value didn't equal to the original one. $expected != $extracted, buffer =" +
+            dumpBuffer(buffer.duplicate().rewind().asInstanceOf[ByteBuffer])
+        )
       }
     }
   }

@@ -51,11 +51,13 @@ trait ProductTypeClassCompanion[C[_]] extends Serializable {
   implicit def deriveHNil: C[HNil] = typeClass.emptyProduct
 
   implicit def deriveHCons[H, T <: HList](
-      implicit ch: Lazy[C[H]], ct: Lazy[C[T]]): C[H :: T] =
+      implicit ch: Lazy[C[H]],
+      ct: Lazy[C[T]]): C[H :: T] =
     typeClass.product(ch.value, ct.value)
 
   implicit def deriveInstance[F, G](
-      implicit gen: Generic.Aux[F, G], cg: Lazy[C[G]]): C[F] =
+      implicit gen: Generic.Aux[F, G],
+      cg: Lazy[C[G]]): C[F] =
     typeClass.project(cg.value, gen.to _, gen.from _)
 }
 
@@ -157,7 +159,8 @@ trait TypeClassCompanion[C[_]] extends ProductTypeClassCompanion[C] {
   implicit def deriveCNil: C[CNil] = typeClass.emptyCoproduct
 
   implicit def deriveCCons[H, T <: Coproduct](
-      implicit ch: Lazy[C[H]], ct: Lazy[C[T]]): C[H :+: T] =
+      implicit ch: Lazy[C[H]],
+      ct: Lazy[C[T]]): C[H :+: T] =
     typeClass.coproduct(ch.value, ct.value)
 }
 
@@ -174,7 +177,9 @@ trait LabelledTypeClass[C[_]] extends LabelledProductTypeClass[C] {
     * instance for the coproduct `L :+: R`.
     */
   def coproduct[L, R <: Coproduct](
-      name: String, cl: => C[L], cr: => C[R]): C[L :+: R]
+      name: String,
+      cl: => C[L],
+      cr: => C[R]): C[L :+: R]
 
   /**
     * The empty coproduct

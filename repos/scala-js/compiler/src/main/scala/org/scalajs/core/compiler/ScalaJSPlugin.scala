@@ -6,7 +6,10 @@
 package org.scalajs.core.compiler
 
 import scala.tools.nsc._
-import scala.tools.nsc.plugins.{Plugin => NscPlugin, PluginComponent => NscPluginComponent}
+import scala.tools.nsc.plugins.{
+  Plugin => NscPlugin,
+  PluginComponent => NscPluginComponent
+}
 import scala.collection.{mutable, immutable}
 
 import java.net.{URI, URISyntaxException}
@@ -27,7 +30,9 @@ class ScalaJSPlugin(val global: Global) extends NscPlugin {
       List[NscPluginComponent](PrepInteropComponent)
     } else {
       List[NscPluginComponent](
-          PreTyperComponentComponent, PrepInteropComponent, GenCodeComponent)
+        PreTyperComponentComponent,
+        PrepInteropComponent,
+        GenCodeComponent)
     }
   }
 
@@ -90,7 +95,8 @@ class ScalaJSPlugin(val global: Global) extends NscPlugin {
   }
 
   override def processOptions(
-      options: List[String], error: String => Unit): Unit = {
+      options: List[String],
+      error: String => Unit): Unit = {
     import ScalaJSOptions.URIMap
     import scalaJSOpts._
 
@@ -132,11 +138,11 @@ class ScalaJSPlugin(val global: Global) extends NscPlugin {
     // Verify constraints
     if (_sourceURIMaps.nonEmpty && relSourceMap.isDefined)
       error(
-          "You may not use mapSourceURI and relSourceMap together. " +
+        "You may not use mapSourceURI and relSourceMap together. " +
           "Use another mapSourceURI option without second URI.")
     else if (_sourceURIMaps.nonEmpty && absSourceMap.isDefined)
       error(
-          "You may not use mapSourceURI and absSourceMap together. " +
+        "You may not use mapSourceURI and absSourceMap together. " +
           "Use another mapSourceURI option.")
     else if (absSourceMap.isDefined && relSourceMap.isEmpty)
       error("absSourceMap requires the use of relSourceMap")

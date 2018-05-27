@@ -22,8 +22,7 @@ import Series.Vec2RollingStats
   * Rolling statistical methods made available on numeric Series objects via enrichment.
   * These methods scan over the Series and compute cumulative values.
   */
-class SeriesRollingStats[X : ST : ORD, T : Vec2RollingStats : ST](
-    s: Series[X, T]) {
+class SeriesRollingStats[X: ST: ORD, T: Vec2RollingStats: ST](s: Series[X, T]) {
   protected val ev = implicitly[Vec2RollingStats[T]]
 
   /**
@@ -32,8 +31,9 @@ class SeriesRollingStats[X : ST : ORD, T : Vec2RollingStats : ST](
     * @param winSz Size of the sliding window
     */
   def rollingCount(winSz: Int): Series[X, Int] =
-    Series(ev(s.values).rollingCount(winSz),
-           s.index.slice(winSz - 1, s.values.length))
+    Series(
+      ev(s.values).rollingCount(winSz),
+      s.index.slice(winSz - 1, s.values.length))
 
   /**
     * Rolling sum; compute sum of elements in Series over a sliding window, ignoring any NA
@@ -41,8 +41,9 @@ class SeriesRollingStats[X : ST : ORD, T : Vec2RollingStats : ST](
     * @param winSz Size of the sliding window
     */
   def rollingSum(winSz: Int): Series[X, T] =
-    Series(ev(s.values).rollingSum(winSz),
-           s.index.slice(winSz - 1, s.values.length))
+    Series(
+      ev(s.values).rollingSum(winSz),
+      s.index.slice(winSz - 1, s.values.length))
 
   /**
     * Rolling mean; compute mean of elements in Series over a sliding window, ignoring any NA
@@ -50,8 +51,9 @@ class SeriesRollingStats[X : ST : ORD, T : Vec2RollingStats : ST](
     * @param winSz Size of the sliding window
     */
   def rollingMean(winSz: Int): Series[X, Double] =
-    Series(ev(s.values).rollingMean(winSz),
-           s.index.slice(winSz - 1, s.values.length))
+    Series(
+      ev(s.values).rollingMean(winSz),
+      s.index.slice(winSz - 1, s.values.length))
 
   /**
     * Rolling median; compute mean of elements in Series over a sliding window, ignoring any NA
@@ -59,8 +61,9 @@ class SeriesRollingStats[X : ST : ORD, T : Vec2RollingStats : ST](
     * @param winSz Size of the sliding window
     */
   def rollingMedian(winSz: Int): Series[X, Double] =
-    Series(ev(s.values).rollingMedian(winSz),
-           s.index.slice(winSz - 1, s.values.length))
+    Series(
+      ev(s.values).rollingMedian(winSz),
+      s.index.slice(winSz - 1, s.values.length))
 }
 
 object SeriesRollingStats {
@@ -73,6 +76,6 @@ object SeriesRollingStats {
     * @tparam X Type of index
     * @tparam T Type of elements
     */
-  def apply[X : ST : ORD, T : Vec2RollingStats : ST](s: Series[X, T]) =
+  def apply[X: ST: ORD, T: Vec2RollingStats: ST](s: Series[X, T]) =
     new SeriesRollingStats(s)
 }

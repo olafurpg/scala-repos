@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-13 Miles Sabin 
+ * Copyright (c) 2012-13 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,12 @@ import poly._
 
 /*
  * Examples of Scrap Your Boilerplate in action
- * 
+ *
  * @author Miles Sabin
  */
 object SybClassExamples {
 
-  // Example taken from the original SYB paper: 
+  // Example taken from the original SYB paper:
   // "Scrap your boilerplate: a practical approach to generic programming", Ralf Laemmel, Simon Peyton Jones
   //   http://research.microsoft.com/en-us/um/people/simonpj/papers/hmap/
   case class Company(depts: List[Dept])
@@ -45,17 +45,20 @@ object SybClassExamples {
 
   def paradise: Unit = {
     val beforeRaise = Company(
-        List(
-            Dept("Research",
-                 Employee(Person("Ralf", "Amsterdam"), Salary(8000)),
-                 List(
-                     Employee(Person("Joost", "Amsterdam"), Salary(1000)),
-                     Employee(Person("Marlow", "Cambridge"), Salary(2000))
-                 )),
-            Dept("Strategy",
-                 Employee(Person("Blair", "London"), Salary(100000)),
-                 List())
-        )
+      List(
+        Dept(
+          "Research",
+          Employee(Person("Ralf", "Amsterdam"), Salary(8000)),
+          List(
+            Employee(Person("Joost", "Amsterdam"), Salary(1000)),
+            Employee(Person("Marlow", "Cambridge"), Salary(2000))
+          )
+        ),
+        Dept(
+          "Strategy",
+          Employee(Person("Blair", "London"), Salary(100000)),
+          List())
+      )
     )
 
     // Compute a new company structure with all salaries increased by 10%
@@ -65,17 +68,20 @@ object SybClassExamples {
     println(afterRaise)
 
     val expected = Company(
-        List(
-            Dept("Research",
-                 Employee(Person("Ralf", "Amsterdam"), Salary(8800)),
-                 List(
-                     Employee(Person("Joost", "Amsterdam"), Salary(1100)),
-                     Employee(Person("Marlow", "Cambridge"), Salary(2200))
-                 )),
-            Dept("Strategy",
-                 Employee(Person("Blair", "London"), Salary(110000)),
-                 List())
-        )
+      List(
+        Dept(
+          "Research",
+          Employee(Person("Ralf", "Amsterdam"), Salary(8800)),
+          List(
+            Employee(Person("Joost", "Amsterdam"), Salary(1100)),
+            Employee(Person("Marlow", "Cambridge"), Salary(2200))
+          )
+        ),
+        Dept(
+          "Strategy",
+          Employee(Person("Blair", "London"), Salary(110000)),
+          List())
+      )
     )
 
     assert(afterRaise == expected)
@@ -87,20 +93,20 @@ object SybClassExamples {
 
   def recursion: Unit = {
     val tree: Tree[Int] = Node(
+      Node(
         Node(
-            Node(
-                Leaf(1),
-                Node(
-                    Leaf(2),
-                    Leaf(3)
-                )
-            ),
-            Leaf(4)
+          Leaf(1),
+          Node(
+            Leaf(2),
+            Leaf(3)
+          )
         ),
-        Node(
-            Leaf(5),
-            Leaf(6)
-        )
+        Leaf(4)
+      ),
+      Node(
+        Leaf(5),
+        Leaf(6)
+      )
     )
 
     object inc extends ->((i: Int) => i + 1)
@@ -108,20 +114,20 @@ object SybClassExamples {
     println(result)
 
     val expected: Tree[Int] = Node(
+      Node(
         Node(
-            Node(
-                Leaf(2),
-                Node(
-                    Leaf(3),
-                    Leaf(4)
-                )
-            ),
-            Leaf(5)
+          Leaf(2),
+          Node(
+            Leaf(3),
+            Leaf(4)
+          )
         ),
-        Node(
-            Leaf(6),
-            Leaf(7)
-        )
+        Leaf(5)
+      ),
+      Node(
+        Leaf(6),
+        Leaf(7)
+      )
     )
 
     assert(expected == result)

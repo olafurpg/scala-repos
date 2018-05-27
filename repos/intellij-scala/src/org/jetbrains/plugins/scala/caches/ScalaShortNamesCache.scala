@@ -9,7 +9,11 @@ import com.intellij.psi.stubs.StubIndex
 import com.intellij.util.containers.HashSet
 import com.intellij.util.{ArrayUtil, Processor}
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiElement
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTrait, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject,
+  ScTrait,
+  ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.stubs.index.ScalaIndexKeys
 
 import scala.collection.mutable.ArrayBuffer
@@ -19,14 +23,15 @@ import scala.collection.mutable.ArrayBuffer
   */
 class ScalaShortNamesCache(project: Project) extends PsiShortNamesCache {
   def getClassesByName(
-      name: String, scope: GlobalSearchScope): Array[PsiClass] = {
+      name: String,
+      scope: GlobalSearchScope): Array[PsiClass] = {
     def isOkForJava(elem: ScalaPsiElement): Boolean = {
       var res = true
       var element = elem.getParent
       while (element != null && res) {
         element match {
           case o: ScObject if o.isPackageObject => res = false
-          case _ =>
+          case _                                =>
         }
         element = element.getParent
       }
@@ -54,7 +59,7 @@ class ScalaShortNamesCache(project: Project) extends PsiShortNamesCache {
         case o: ScObject if isOkForJava(o) =>
           o.fakeCompanionClass match {
             case Some(clz) => add(clz)
-            case _ =>
+            case _         =>
           }
         case _ =>
       }
@@ -71,7 +76,7 @@ class ScalaShortNamesCache(project: Project) extends PsiShortNamesCache {
           case c: ScTypeDefinition if isOkForJava(c) =>
             c.fakeCompanionModule match {
               case Some(o) => add(o)
-              case _ =>
+              case _       =>
             }
           case _ =>
         }
@@ -89,7 +94,7 @@ class ScalaShortNamesCache(project: Project) extends PsiShortNamesCache {
             add(c.fakeCompanionClass)
             c.fakeCompanionModule match {
               case Some(o) => add(o)
-              case _ =>
+              case _       =>
             }
           case _ =>
         }
@@ -101,9 +106,10 @@ class ScalaShortNamesCache(project: Project) extends PsiShortNamesCache {
     else res.toArray
   }
 
-  def processMethodsWithName(name: String,
-                             scope: GlobalSearchScope,
-                             processor: Processor[PsiMethod]): Boolean = {
+  def processMethodsWithName(
+      name: String,
+      scope: GlobalSearchScope,
+      processor: Processor[PsiMethod]): Boolean = {
     //todo:
     true
   }
@@ -121,13 +127,15 @@ class ScalaShortNamesCache(project: Project) extends PsiShortNamesCache {
   }
 
   def getMethodsByName(
-      name: String, scope: GlobalSearchScope): Array[PsiMethod] = {
+      name: String,
+      scope: GlobalSearchScope): Array[PsiMethod] = {
     PsiMethod.EMPTY_ARRAY //todo:
   }
 
-  def getMethodsByNameIfNotMoreThan(name: String,
-                                    scope: GlobalSearchScope,
-                                    maxCount: Int): Array[PsiMethod] = {
+  def getMethodsByNameIfNotMoreThan(
+      name: String,
+      scope: GlobalSearchScope,
+      maxCount: Int): Array[PsiMethod] = {
     getMethodsByName(name, scope) //todo:
   }
 
@@ -140,7 +148,8 @@ class ScalaShortNamesCache(project: Project) extends PsiShortNamesCache {
   }
 
   def getFieldsByName(
-      name: String, scope: GlobalSearchScope): Array[PsiField] = {
+      name: String,
+      scope: GlobalSearchScope): Array[PsiField] = {
     PsiField.EMPTY_ARRAY //todo:
   }
 
@@ -152,12 +161,13 @@ class ScalaShortNamesCache(project: Project) extends PsiShortNamesCache {
     //todo:
   }
 
-  def getFieldsByNameIfNotMoreThan(name: String,
-                                   scope: GlobalSearchScope,
-                                   maxCount: Int): Array[PsiField] = {
+  def getFieldsByNameIfNotMoreThan(
+      name: String,
+      scope: GlobalSearchScope,
+      maxCount: Int): Array[PsiField] = {
     Array.empty //todo:
   }
 
   private var LOG: Logger = Logger.getInstance(
-      "#org.jetbrains.plugins.scala.caches.ScalaShortNamesCache")
+    "#org.jetbrains.plugins.scala.caches.ScalaShortNamesCache")
 }

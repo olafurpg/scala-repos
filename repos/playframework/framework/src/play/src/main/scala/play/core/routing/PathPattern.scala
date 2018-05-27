@@ -40,7 +40,8 @@ case class PathPattern(parts: Seq[PathPart]) {
   import java.util.regex._
 
   private def decodeIfEncoded(
-      decode: Boolean, groupCount: Int): Matcher => Either[Throwable, String] =
+      decode: Boolean,
+      groupCount: Int): Matcher => Either[Throwable, String] =
     matcher =>
       Exception.allCatch[String].either {
         if (decode) {
@@ -51,18 +52,21 @@ case class PathPattern(parts: Seq[PathPart]) {
     }
 
   private lazy val (regex, groups) = {
-    Some(parts.foldLeft(
-            "", Map.empty[String, Matcher => Either[Throwable, String]], 0) {
-      (s, e) =>
+    Some(
+      parts.foldLeft(
+        "",
+        Map.empty[String, Matcher => Either[Throwable, String]],
+        0) { (s, e) =>
         e match {
           case StaticPart(p) => ((s._1 + Pattern.quote(p)), s._2, s._3)
           case DynamicPart(k, r, encodeable) => {
-              ((s._1 + "(" + r + ")"),
-               (s._2 + (k -> decodeIfEncoded(encodeable, s._3 + 1))),
-               s._3 + 1 + Pattern.compile(r).matcher("").groupCount)
-            }
+            (
+              (s._1 + "(" + r + ")"),
+              (s._2 + (k -> decodeIfEncoded(encodeable, s._3 + 1))),
+              s._3 + 1 + Pattern.compile(r).matcher("").groupCount)
+          }
         }
-    }).map {
+      }).map {
       case (r, g, _) => Pattern.compile("^" + r + "$") -> g
     }.get
   }
@@ -76,8 +80,7 @@ case class PathPattern(parts: Seq[PathPart]) {
   def apply(path: String): Option[Map[String, Either[Throwable, String]]] = {
     val matcher = regex.matcher(path)
     if (matcher.matches) {
-      Some(
-          groups.map {
+      Some(groups.map {
         case (name, g) => name -> g(matcher)
       }.toMap)
     } else {

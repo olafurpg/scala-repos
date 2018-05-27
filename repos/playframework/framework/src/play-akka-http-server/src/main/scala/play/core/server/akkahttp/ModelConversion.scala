@@ -14,7 +14,11 @@ import play.api.Logger
 import play.api.http.HeaderNames._
 import play.api.http.{HttpChunk, HttpEntity => PlayHttpEntity}
 import play.api.mvc._
-import play.core.server.common.{ConnectionInfo, ForwardedHeaderHandler, ServerResultUtils}
+import play.core.server.common.{
+  ConnectionInfo,
+  ForwardedHeaderHandler,
+  ServerResultUtils
+}
 
 import scala.collection.immutable
 
@@ -30,25 +34,26 @@ private[akkahttp] class ModelConversion(
     * Convert an Akka `HttpRequest` to a `RequestHeader` and an `Enumerator`
     * for its body.
     */
-  def convertRequest(requestId: Long,
-                     remoteAddress: InetSocketAddress,
-                     secureProtocol: Boolean,
-                     request: HttpRequest)(implicit fm: Materializer)
+  def convertRequest(
+      requestId: Long,
+      remoteAddress: InetSocketAddress,
+      secureProtocol: Boolean,
+      request: HttpRequest)(implicit fm: Materializer)
     : (RequestHeader, Option[Source[ByteString, Any]]) = {
     (
-        convertRequestHeader(
-            requestId, remoteAddress, secureProtocol, request),
-        convertRequestBody(request)
+      convertRequestHeader(requestId, remoteAddress, secureProtocol, request),
+      convertRequestBody(request)
     )
   }
 
   /**
     * Convert an Akka `HttpRequest` to a `RequestHeader`.
     */
-  private def convertRequestHeader(requestId: Long,
-                                   remoteAddress: InetSocketAddress,
-                                   secureProtocol: Boolean,
-                                   request: HttpRequest): RequestHeader = {
+  private def convertRequestHeader(
+      requestId: Long,
+      remoteAddress: InetSocketAddress,
+      secureProtocol: Boolean,
+      request: HttpRequest): RequestHeader = {
     val remoteHostAddress = remoteAddress.getAddress.getHostAddress
     // Taken from PlayDefaultUpstreamHander
 
@@ -66,7 +71,7 @@ private[akkahttp] class ModelConversion(
       override def uri =
         request.header[`Raw-Request-URI`].map(_.value) getOrElse {
           logger.warn(
-              "Can't get raw request URI. Please set akka.http.server.raw-request-uri-header = true")
+            "Can't get raw request URI. Please set akka.http.server.raw-request-uri-header = true")
           request.uri.toString
         }
       override def path = request.uri.path.toString
@@ -76,7 +81,9 @@ private[akkahttp] class ModelConversion(
       override val headers = convertRequestHeaders(request)
       private lazy val remoteConnection: ConnectionInfo = {
         forwardedHeaderHandler.remoteConnection(
-            remoteAddressArg.getAddress, secureProtocol, headers)
+          remoteAddressArg.getAddress,
+          secureProtocol,
+          headers)
       }
       override def remoteAddress = remoteConnection.address.getHostAddress
       override def secure = remoteConnection.secure
@@ -93,8 +100,9 @@ private[akkahttp] class ModelConversion(
       case HttpEntity.Strict(contentType, _) =>
         Seq((CONTENT_TYPE, contentType.value))
       case HttpEntity.Default(contentType, contentLength, _) =>
-        Seq((CONTENT_TYPE, contentType.value),
-            (CONTENT_LENGTH, contentLength.toString))
+        Seq(
+          (CONTENT_TYPE, contentType.value),
+          (CONTENT_LENGTH, contentLength.toString))
       case HttpEntity.Chunked(contentType, _) =>
         Seq((CONTENT_TYPE, contentType.value))
     }
@@ -128,31 +136,32 @@ private[akkahttp] class ModelConversion(
   /**
     * Convert a Play `Result` object into an Akka `HttpResponse` object.
     */
-  def convertResult(requestHeaders: RequestHeader,
-                    unvalidated: Result,
-                    protocol: HttpProtocol)(
-      implicit mat: Materializer): HttpResponse = {
+  def convertResult(
+      requestHeaders: RequestHeader,
+      unvalidated: Result,
+      protocol: HttpProtocol)(implicit mat: Materializer): HttpResponse = {
 
     val result = ServerResultUtils.validateResult(requestHeaders, unvalidated)
     val convertedHeaders: AkkaHttpHeaders = convertResponseHeaders(
-        result.header.headers)
-    val entity = convertResultBody(
-        requestHeaders, convertedHeaders, result, protocol)
+      result.header.headers)
+    val entity =
+      convertResultBody(requestHeaders, convertedHeaders, result, protocol)
     val connectionHeader =
       ServerResultUtils.determineConnectionHeader(requestHeaders, result)
     val closeHeader = connectionHeader.header.map(Connection(_))
     HttpResponse(
-        status = result.header.status,
-        headers = convertedHeaders.misc ++ closeHeader,
-        entity = entity,
-        protocol = protocol
+      status = result.header.status,
+      headers = convertedHeaders.misc ++ closeHeader,
+      entity = entity,
+      protocol = protocol
     )
   }
 
-  def convertResultBody(requestHeaders: RequestHeader,
-                        convertedHeaders: AkkaHttpHeaders,
-                        result: Result,
-                        protocol: HttpProtocol): ResponseEntity = {
+  def convertResultBody(
+      requestHeaders: RequestHeader,
+      convertedHeaders: AkkaHttpHeaders,
+      result: Result,
+      protocol: HttpProtocol): ResponseEntity = {
 
     val contentType =
       result.body.contentType.fold(ContentTypes.NoContentType: ContentType) {
@@ -189,16 +198,18 @@ private[akkahttp] class ModelConversion(
 
   private def convertHeaders(
       headers: Iterable[(String, String)]): immutable.Seq[HttpHeader] = {
-    headers.map {
-      case (name, value) =>
-        HttpHeader.parse(name, value) match {
-          case HttpHeader.ParsingResult.Ok(
-              header, errors /* errors are ignored if Ok */ ) =>
-            header
-          case HttpHeader.ParsingResult.Error(error) =>
-            sys.error(s"Error parsing header: $error")
-        }
-    }.to[immutable.Seq]
+    headers
+      .map {
+        case (name, value) =>
+          HttpHeader.parse(name, value) match {
+            case HttpHeader.ParsingResult
+                  .Ok(header, errors /* errors are ignored if Ok */ ) =>
+              header
+            case HttpHeader.ParsingResult.Error(error) =>
+              sys.error(s"Error parsing header: $error")
+          }
+      }
+      .to[immutable.Seq]
   }
 
   /**

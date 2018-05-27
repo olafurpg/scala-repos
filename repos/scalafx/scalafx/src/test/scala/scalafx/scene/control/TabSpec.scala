@@ -41,4 +41,5 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class TabSpec
     extends SimpleSFXDelegateSpec[jfxsc.Tab, Tab](
-        classOf[jfxsc.Tab], classOf[Tab])
+      classOf[jfxsc.Tab],
+      classOf[Tab])

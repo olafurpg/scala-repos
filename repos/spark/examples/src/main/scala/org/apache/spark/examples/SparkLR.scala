@@ -53,7 +53,8 @@ object SparkLR {
   }
 
   def showWarning() {
-    System.err.println("""WARN: This is a naive implementation of Logistic Regression and is given as an example!
+    System.err.println(
+      """WARN: This is a naive implementation of Logistic Regression and is given as an example!
         |Please use either org.apache.spark.mllib.classification.LogisticRegressionWithSGD or
         |org.apache.spark.mllib.classification.LogisticRegressionWithLBFGS
         |for more conventional use.
@@ -75,9 +76,11 @@ object SparkLR {
 
     for (i <- 1 to ITERATIONS) {
       println("On iteration " + i)
-      val gradient = points.map { p =>
-        p.x * (1 / (1 + exp(-p.y * (w.dot(p.x)))) - 1) * p.y
-      }.reduce(_ + _)
+      val gradient = points
+        .map { p =>
+          p.x * (1 / (1 + exp(-p.y * (w.dot(p.x)))) - 1) * p.y
+        }
+        .reduce(_ + _)
       w -= gradient
     }
 

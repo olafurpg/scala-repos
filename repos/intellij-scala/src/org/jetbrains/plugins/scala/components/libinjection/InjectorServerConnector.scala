@@ -5,7 +5,10 @@ import java.io.File
 import com.intellij.openapi.module.Module
 import org.jetbrains.jps.incremental.messages.BuildMessage.Kind
 import org.jetbrains.jps.incremental.scala.Client
-import org.jetbrains.plugins.scala.compiler.{RemoteServerConnectorBase, RemoteServerRunner}
+import org.jetbrains.plugins.scala.compiler.{
+  RemoteServerConnectorBase,
+  RemoteServerRunner
+}
 
 import scala.annotation.tailrec
 import scala.collection.mutable.ListBuffer
@@ -13,21 +16,23 @@ import scala.collection.mutable.ListBuffer
 /**
   * Created by mucianm on 18.03.16.
   */
-class InjectorServerConnector(module: Module,
-                              filesToCompile: Seq[File],
-                              outputDir: File,
-                              val platformClasspath: Seq[File])
+class InjectorServerConnector(
+    module: Module,
+    filesToCompile: Seq[File],
+    outputDir: File,
+    val platformClasspath: Seq[File])
     extends RemoteServerConnectorBase(module, filesToCompile, outputDir) {
   override val additionalCp: Seq[File] = platformClasspath
 
   val errors = ListBuffer[String]()
 
   val client = new Client {
-    override def message(kind: Kind,
-                         text: String,
-                         source: Option[File],
-                         line: Option[Long],
-                         column: Option[Long]): Unit = {
+    override def message(
+        kind: Kind,
+        text: String,
+        source: Option[File],
+        line: Option[Long],
+        column: Option[Long]): Unit = {
       if (kind == Kind.ERROR) errors += text
     }
     override def deleted(module: File): Unit = {}
@@ -41,7 +46,8 @@ class InjectorServerConnector(module: Module,
 
   @tailrec
   private def classfiles(
-      dir: File, namePrefix: String = ""): Array[(File, String)] =
+      dir: File,
+      namePrefix: String = ""): Array[(File, String)] =
     dir.listFiles() match {
       case Array(d) if d.isDirectory =>
         classfiles(d, s"$namePrefix${d.getName}.")
@@ -55,10 +61,11 @@ class InjectorServerConnector(module: Module,
     val compilationProcess =
       new RemoteServerRunner(project).buildProcess(arguments, client)
     var result: Either[Array[(File, String)], Seq[String]] = Right(
-        Seq("Compilation failed"))
+      Seq("Compilation failed"))
     compilationProcess.addTerminationCallback {
-      result = if (errors.nonEmpty) Right(errors)
-      else Left(classfiles(outputDir))
+      result =
+        if (errors.nonEmpty) Right(errors)
+        else Left(classfiles(outputDir))
     }
     compilationProcess.run()
     result

@@ -45,8 +45,8 @@ object Pagination {
     */
   val StyleClassBullet = jfxsc.Pagination.STYLE_CLASS_BULLET
   @deprecated(
-      "Use StyleClassBullet; STYLE_CLASS_BULLET will be removed in a future release",
-      "8.0.60-R10")
+    "Use StyleClassBullet; STYLE_CLASS_BULLET will be removed in a future release",
+    "8.0.60-R10")
   val STYLE_CLASS_BULLET = StyleClassBullet
 
   /**
@@ -54,17 +54,17 @@ object Pagination {
     */
   val Indeterminate = jfxsc.Pagination.INDETERMINATE
   @deprecated(
-      "Use Indeterminate; INDETERMINATE will be removed in a future release",
-      "8.0.60-R10")
+    "Use Indeterminate; INDETERMINATE will be removed in a future release",
+    "8.0.60-R10")
   val INDETERMINATE = Indeterminate
 }
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/Pagination.html]]
   */
-class Pagination(
-    override val delegate: jfxsc.Pagination = new jfxsc.Pagination)
-    extends Control(delegate) with SFXDelegate[jfxsc.Pagination] {
+class Pagination(override val delegate: jfxsc.Pagination = new jfxsc.Pagination)
+    extends Control(delegate)
+    with SFXDelegate[jfxsc.Pagination] {
 
   /**
     * Constructs a new Pagination control with the specified page count.

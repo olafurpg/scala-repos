@@ -21,7 +21,9 @@ class ScalaPostfixTemplateProvider extends PostfixTemplateProvider {
   override def preExpand(file: PsiFile, editor: Editor): Unit = {}
 
   override def preCheck(
-      copyFile: PsiFile, realEditor: Editor, currentOffset: Int): PsiFile =
+      copyFile: PsiFile,
+      realEditor: Editor,
+      currentOffset: Int): PsiFile =
     copyFile
 
   override def afterExpand(file: PsiFile, editor: Editor): Unit = {}
@@ -30,28 +32,28 @@ class ScalaPostfixTemplateProvider extends PostfixTemplateProvider {
 object ScalaPostfixTemplateProvider {
   protected def templates: util.Set[PostfixTemplate] =
     ContainerUtil.newHashSet(
-        new ScalaTryPostfixTemplate,
-        new ScalaAssertPostfixTemplate,
-        new ScalaCastPostfixTemplate,
-        new ScalaElseExpressionPostfixTemplate,
-        new ScalaIfExpressionPostfixTemplate,
-        new ScalaMatchPostfixTemplate,
-        new ScalaForEachPostfixTemplate,
-        new ScalaIntroduceFieldPostfixTemplate,
-        new ScalaIntorduceVariablePostfixTemplate,
-        new ScalaNotPostfixTemplate,
-        new ScalaNotPostfixTemplate("!"),
-        new ScalaParenthesizedExpressionPostfixTemplate,
-        new ScalaReturnPostfixTemplate,
-        new ScalaPrintlnPostfixTemplate,
-        new ScalaThrowExceptionPostfixTemplate,
-        new ScalaWhilePostfixTemplate,
-        new ScalaDoWhilePostfixTemplate,
-        new ScalaIsNullPostfixTemplate,
-        new ScalaNotNullPostfixTemplate,
-        new ScalaNotNullPostfixTemplate("nn"),
-        new ScalaOptionPostfixTemplate,
-        new ScalaSeqPostfixTemplate,
-        new ScalaListPostfixTemplate
+      new ScalaTryPostfixTemplate,
+      new ScalaAssertPostfixTemplate,
+      new ScalaCastPostfixTemplate,
+      new ScalaElseExpressionPostfixTemplate,
+      new ScalaIfExpressionPostfixTemplate,
+      new ScalaMatchPostfixTemplate,
+      new ScalaForEachPostfixTemplate,
+      new ScalaIntroduceFieldPostfixTemplate,
+      new ScalaIntorduceVariablePostfixTemplate,
+      new ScalaNotPostfixTemplate,
+      new ScalaNotPostfixTemplate("!"),
+      new ScalaParenthesizedExpressionPostfixTemplate,
+      new ScalaReturnPostfixTemplate,
+      new ScalaPrintlnPostfixTemplate,
+      new ScalaThrowExceptionPostfixTemplate,
+      new ScalaWhilePostfixTemplate,
+      new ScalaDoWhilePostfixTemplate,
+      new ScalaIsNullPostfixTemplate,
+      new ScalaNotNullPostfixTemplate,
+      new ScalaNotNullPostfixTemplate("nn"),
+      new ScalaOptionPostfixTemplate,
+      new ScalaSeqPostfixTemplate,
+      new ScalaListPostfixTemplate
     )
 }

@@ -39,11 +39,12 @@ object Reflect {
     * @tparam Default The default implementation of `ScalaTrait` if no user implementation has been provided
     * @return Zero or more bindings to provide `ScalaTrait`
     */
-  def bindingsFromConfiguration[ScalaTrait,
-                                JavaInterface,
-                                JavaAdapter <: ScalaTrait,
-                                JavaDelegate <: JavaInterface,
-                                Default <: ScalaTrait](
+  def bindingsFromConfiguration[
+      ScalaTrait,
+      JavaInterface,
+      JavaAdapter <: ScalaTrait,
+      JavaDelegate <: JavaInterface,
+      Default <: ScalaTrait](
       environment: Environment,
       config: PlayConfig,
       key: String,
@@ -54,23 +55,26 @@ object Reflect {
       javaDelegate: ClassTag[JavaDelegate],
       default: ClassTag[Default]): Seq[Binding[_]] = {
 
-    def bind[T : SubClassOf]: BindingKey[T] =
+    def bind[T: SubClassOf]: BindingKey[T] =
       BindingKey(implicitly[SubClassOf[T]].runtimeClass)
 
     configuredClass[ScalaTrait, JavaInterface, Default](
-        environment, config, key, defaultClassName) match {
+      environment,
+      config,
+      key,
+      defaultClassName) match {
 
       // Directly implements the scala trait
       case Some(Left(direct)) =>
         Seq(
-            bind[ScalaTrait].to(direct),
-            bind[JavaInterface].to[JavaDelegate]
+          bind[ScalaTrait].to(direct),
+          bind[JavaInterface].to[JavaDelegate]
         )
       // Implements the java interface
       case Some(Right(java)) =>
         Seq(
-            bind[ScalaTrait].to[JavaAdapter],
-            bind[JavaInterface].to(java)
+          bind[ScalaTrait].to[JavaAdapter],
+          bind[JavaInterface].to(java)
         )
 
       case None => Nil
@@ -106,22 +110,26 @@ object Reflect {
       environment: Environment,
       config: PlayConfig,
       key: String,
-      defaultClassName: String)(implicit scalaTrait: SubClassOf[ScalaTrait],
-                                javaInterface: SubClassOf[JavaInterface],
-                                default: ClassTag[Default])
+      defaultClassName: String)(
+      implicit scalaTrait: SubClassOf[ScalaTrait],
+      javaInterface: SubClassOf[JavaInterface],
+      default: ClassTag[Default])
     : Option[Either[Class[_ <: ScalaTrait], Class[_ <: JavaInterface]]] = {
 
     def loadClass(
-        className: String, notFoundFatal: Boolean): Option[Class[_]] = {
+        className: String,
+        notFoundFatal: Boolean): Option[Class[_]] = {
       try {
         Some(environment.classLoader.loadClass(className))
       } catch {
         case e: ClassNotFoundException if !notFoundFatal => None
-        case e: VirtualMachineError => throw e
-        case e: ThreadDeath => throw e
+        case e: VirtualMachineError                      => throw e
+        case e: ThreadDeath                              => throw e
         case e: Throwable =>
           throw new PlayException(
-              s"Cannot load $key", s"$key [$className] was not loaded.", e)
+            s"Cannot load $key",
+            s"$key [$className] was not loaded.",
+            e)
       }
     }
 
@@ -148,39 +156,42 @@ object Reflect {
 
       case unknown =>
         throw new PlayException(
-            s"Cannot load $key",
-            s"$key [${unknown.getClass}}] does not implement ${scalaTrait.runtimeClass} or ${javaInterface.runtimeClass}.")
+          s"Cannot load $key",
+          s"$key [${unknown.getClass}}] does not implement ${scalaTrait.runtimeClass} or ${javaInterface.runtimeClass}.")
     }
   }
 
-  def createInstance[T : ClassTag](fqcn: String, classLoader: ClassLoader): T = {
+  def createInstance[T: ClassTag](fqcn: String, classLoader: ClassLoader): T = {
     try {
       createInstance(getClass(fqcn, classLoader))
     } catch {
       case e: VirtualMachineError => throw e
-      case e: ThreadDeath => throw e
+      case e: ThreadDeath         => throw e
       case e: Throwable =>
         val name = simpleName(implicitly[ClassTag[T]].runtimeClass)
         throw new PlayException(
-            s"Cannot load $name", s"$name [$fqcn] cannot be instantiated.", e)
+          s"Cannot load $name",
+          s"$name [$fqcn] cannot be instantiated.",
+          e)
     }
   }
 
-  def getClass[T : ClassTag](
-      fqcn: String, classLoader: ClassLoader): Class[_ <: T] = {
+  def getClass[T: ClassTag](
+      fqcn: String,
+      classLoader: ClassLoader): Class[_ <: T] = {
     val c = Class.forName(fqcn, false, classLoader).asInstanceOf[Class[_ <: T]]
     val t = implicitly[ClassTag[T]].runtimeClass
     if (t.isAssignableFrom(c)) c
     else throw new ClassCastException(t + " is not assignable from " + c)
   }
 
-  def createInstance[T : ClassTag](clazz: Class[_]): T = {
+  def createInstance[T: ClassTag](clazz: Class[_]): T = {
     val o = clazz.newInstance
     val t = implicitly[ClassTag[T]].runtimeClass
     if (t.isInstance(o)) o.asInstanceOf[T]
     else
       throw new ClassCastException(
-          clazz.getName + " is not an instance of " + t)
+        clazz.getName + " is not an instance of " + t)
   }
 
   def simpleName(clazz: Class[_]): String = {
@@ -199,8 +210,8 @@ object Reflect {
   }
 
   object SubClassOf {
-    implicit def provide[T : ClassTag]: SubClassOf[T] =
+    implicit def provide[T: ClassTag]: SubClassOf[T] =
       new SubClassOf[T](
-          implicitly[ClassTag[T]].runtimeClass.asInstanceOf[Class[T]])
+        implicitly[ClassTag[T]].runtimeClass.asInstanceOf[Class[T]])
   }
 }

@@ -50,8 +50,8 @@ case class Event(
 ) {
   override def toString(): String = {
     s"Event(id=$eventId,event=$event,eType=$entityType,eId=$entityId," +
-    s"tType=$targetEntityType,tId=$targetEntityId,p=$properties,t=$eventTime," +
-    s"tags=$tags,pKey=$prId,ct=$creationTime)"
+      s"tType=$targetEntityType,tId=$targetEntityId,p=$properties,t=$eventTime," +
+      s"tags=$tags,pKey=$prId,ct=$creationTime)"
   }
 }
 
@@ -111,31 +111,42 @@ object EventValidation {
     require(!e.event.isEmpty, "event must not be empty.")
     require(!e.entityType.isEmpty, "entityType must not be empty string.")
     require(!e.entityId.isEmpty, "entityId must not be empty string.")
-    require(e.targetEntityType.map(!_.isEmpty).getOrElse(true),
-            "targetEntityType must not be empty string")
-    require(e.targetEntityId.map(!_.isEmpty).getOrElse(true),
-            "targetEntityId must not be empty string.")
-    require(!((e.targetEntityType != None) && (e.targetEntityId == None)),
-            "targetEntityType and targetEntityId must be specified together.")
-    require(!((e.targetEntityType == None) && (e.targetEntityId != None)),
-            "targetEntityType and targetEntityId must be specified together.")
-    require(!((e.event == "$unset") && e.properties.isEmpty),
-            "properties cannot be empty for $unset event")
-    require(!isReservedPrefix(e.event) || isSpecialEvents(e.event),
-            s"${e.event} is not a supported reserved event name.")
-    require(!isSpecialEvents(e.event) ||
-            ((e.targetEntityType == None) && (e.targetEntityId == None)),
-            s"Reserved event ${e.event} cannot have targetEntity")
     require(
-        !isReservedPrefix(e.entityType) || isBuiltinEntityTypes(e.entityType),
-        s"The entityType ${e.entityType} is not allowed. " +
-        s"'pio_' is a reserved name prefix.")
+      e.targetEntityType.map(!_.isEmpty).getOrElse(true),
+      "targetEntityType must not be empty string")
     require(
-        e.targetEntityType.map { t =>
+      e.targetEntityId.map(!_.isEmpty).getOrElse(true),
+      "targetEntityId must not be empty string.")
+    require(
+      !((e.targetEntityType != None) && (e.targetEntityId == None)),
+      "targetEntityType and targetEntityId must be specified together.")
+    require(
+      !((e.targetEntityType == None) && (e.targetEntityId != None)),
+      "targetEntityType and targetEntityId must be specified together.")
+    require(
+      !((e.event == "$unset") && e.properties.isEmpty),
+      "properties cannot be empty for $unset event")
+    require(
+      !isReservedPrefix(e.event) || isSpecialEvents(e.event),
+      s"${e.event} is not a supported reserved event name.")
+    require(
+      !isSpecialEvents(e.event) ||
+        ((e.targetEntityType == None) && (e.targetEntityId == None)),
+      s"Reserved event ${e.event} cannot have targetEntity")
+    require(
+      !isReservedPrefix(e.entityType) || isBuiltinEntityTypes(e.entityType),
+      s"The entityType ${e.entityType} is not allowed. " +
+        s"'pio_' is a reserved name prefix."
+    )
+    require(
+      e.targetEntityType
+        .map { t =>
           (!isReservedPrefix(t) || isBuiltinEntityTypes(t))
-        }.getOrElse(true),
-        s"The targetEntityType ${e.targetEntityType.get} is not allowed. " +
-        s"'pio_' is a reserved name prefix.")
+        }
+        .getOrElse(true),
+      s"The targetEntityType ${e.targetEntityType.get} is not allowed. " +
+        s"'pio_' is a reserved name prefix."
+    )
     validateProperties(e)
   }
 
@@ -158,9 +169,10 @@ object EventValidation {
     */
   def validateProperties(e: Event): Unit = {
     e.properties.keySet.foreach { k =>
-      require(!isReservedPrefix(k) || builtinProperties.contains(k),
-              s"The property ${k} is not allowed. " +
-              s"'pio_' is a reserved name prefix.")
+      require(
+        !isReservedPrefix(k) || builtinProperties.contains(k),
+        s"The property ${k} is not allowed. " +
+          s"'pio_' is a reserved name prefix.")
     }
   }
 }

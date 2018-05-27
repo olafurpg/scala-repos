@@ -20,18 +20,18 @@ import scala.concurrent.duration._
   * When a test extends this trait it will automatically get overridden versions of
   * TestServer and WithServer that delegate to the correct server backend.
   */
-trait ServerIntegrationSpecification
-    extends PendingUntilFixed with AroundEach { parent =>
+trait ServerIntegrationSpecification extends PendingUntilFixed with AroundEach {
+  parent =>
   implicit def integrationServerProvider: ServerProvider
 
   /**
     * Retry up to 3 times.
     */
-  def around[R : AsResult](r: => R) = {
+  def around[R: AsResult](r: => R) = {
     AsResult(EventuallyResults.eventually(1, 20.milliseconds)(r))
   }
 
-  implicit class UntilAkkaHttpFixed[T : AsResult](t: => T) {
+  implicit class UntilAkkaHttpFixed[T: AsResult](t: => T) {
 
     /**
       * We may want to skip some tests if they're slow due to timeouts. This tag
@@ -47,9 +47,10 @@ trait ServerIntegrationSpecification
   /**
     * Override the standard TestServer factory method.
     */
-  def TestServer(port: Int,
-                 application: Application = play.api.PlayCoreTestApplication(),
-                 sslPort: Option[Int] = None): play.api.test.TestServer = {
+  def TestServer(
+      port: Int,
+      application: Application = play.api.PlayCoreTestApplication(),
+      sslPort: Option[Int] = None): play.api.test.TestServer = {
     play.api.test
       .TestServer(port, application, sslPort, Some(integrationServerProvider))
   }
@@ -61,7 +62,9 @@ trait ServerIntegrationSpecification
       app: play.api.Application = play.api.test.FakeApplication(),
       port: Int = play.api.test.Helpers.testServerPort)
       extends play.api.test.WithServer(
-          app, port, serverProvider = Some(integrationServerProvider))
+        app,
+        port,
+        serverProvider = Some(integrationServerProvider))
 }
 trait NettyIntegrationSpecification extends ServerIntegrationSpecification {
   override def integrationServerProvider: ServerProvider = NettyServer.provider

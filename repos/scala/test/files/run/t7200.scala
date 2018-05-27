@@ -22,9 +22,9 @@ object Test extends App {
         Nel(f(l), l.tail match {
           case Nil => Nil
           case h :: t => {
-              val r = coflatMap(f)(Nel(h, t)) // ok w/ type args
-              r.head :: r.tail
-            }
+            val r = coflatMap(f)(Nel(h, t)) // ok w/ type args
+            r.head :: r.tail
+          }
         })
   }
 

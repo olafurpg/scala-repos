@@ -9,20 +9,51 @@ import com.intellij.psi._
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.InferUtil.SafeCheckException
 import org.jetbrains.plugins.scala.lang.psi.api.base._
-import org.jetbrains.plugins.scala.lang.psi.api.base.types.{ScParameterizedTypeElement, ScSimpleTypeElement, ScTypeElement}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScAssignStmt, ScExpression, ScNewTemplateDefinition, ScReferenceExpression}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScParameter, ScTypeParam}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScTypeAliasDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.base.types.{
+  ScParameterizedTypeElement,
+  ScSimpleTypeElement,
+  ScTypeElement
+}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScAssignStmt,
+  ScExpression,
+  ScNewTemplateDefinition,
+  ScReferenceExpression
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScParameter,
+  ScTypeParam
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction,
+  ScTypeAliasDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypeParametersOwner
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{ScClassParents, ScExtendsBlock}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{
+  ScClassParents,
+  ScExtendsBlock
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.{InferUtil, ScalaElementVisitor}
 import org.jetbrains.plugins.scala.lang.psi.impl.base.types.ScSimpleTypeElementImpl
 import org.jetbrains.plugins.scala.lang.psi.types.Compatibility.Expression
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{Parameter, ScMethodType, ScTypePolymorphicType, TypeParameter}
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success, TypeResult, TypingContext}
-import org.jetbrains.plugins.scala.lang.resolve.{ResolveUtils, ScalaResolveResult}
+import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{
+  Parameter,
+  ScMethodType,
+  ScTypePolymorphicType,
+  TypeParameter
+}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure,
+  Success,
+  TypeResult,
+  TypingContext
+}
+import org.jetbrains.plugins.scala.lang.resolve.{
+  ResolveUtils,
+  ScalaResolveResult
+}
 import org.jetbrains.plugins.scala.macroAnnotations.{Cached, ModCount}
 
 import scala.collection.Seq
@@ -34,7 +65,8 @@ import scala.collection.mutable.ArrayBuffer
   * Date: 22.02.2008
   */
 class ScConstructorImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScConstructor {
+    extends ScalaPsiElementImpl(node)
+    with ScConstructor {
 
   def typeElement: ScTypeElement =
     findNotNullChildByClass(classOf[ScTypeElement])
@@ -76,13 +108,16 @@ class ScConstructorImpl(node: ASTNode)
   }
 
   //todo: duplicate ScSimpleTypeElementImpl
-  def parameterize(tp: ScType, clazz: PsiClass, subst: ScSubstitutor): ScType = {
+  def parameterize(
+      tp: ScType,
+      clazz: PsiClass,
+      subst: ScSubstitutor): ScType = {
     if (clazz.getTypeParameters.isEmpty) {
       tp
     } else {
       ScParameterizedType(tp, clazz.getTypeParameters.map {
         case tp: ScTypeParam => new ScTypeParameterType(tp, subst)
-        case ptp => new ScTypeParameterType(ptp, subst)
+        case ptp             => new ScTypeParameterType(ptp, subst)
       })
     }
   }
@@ -100,7 +135,8 @@ class ScConstructorImpl(node: ASTNode)
     innerMultiType(i, isShape = false)
 
   private def innerMultiType(
-      i: Int, isShape: Boolean): Seq[TypeResult[ScType]] = {
+      i: Int,
+      isShape: Boolean): Seq[TypeResult[ScType]] = {
     def FAILURE = Failure("Can't resolve type", Some(this))
     def workWithResolveResult(
         constr: PsiMethod,
@@ -113,11 +149,12 @@ class ScConstructorImpl(node: ASTNode)
         case ta: ScTypeAliasDefinition =>
           subst.subst(ta.aliasedType.getOrElse(return FAILURE))
         case _ =>
-          parameterize(ScSimpleTypeElementImpl
-                         .calculateReferenceType(ref, shapesOnly = true)
-                         .getOrElse(return FAILURE),
-                       clazz,
-                       subst)
+          parameterize(
+            ScSimpleTypeElementImpl
+              .calculateReferenceType(ref, shapesOnly = true)
+              .getOrElse(return FAILURE),
+            clazz,
+            subst)
       }
       val res = constr match {
         case fun: ScMethodLike =>
@@ -127,16 +164,19 @@ class ScConstructorImpl(node: ASTNode)
           subst.subst(methodType)
         case method: PsiMethod =>
           if (i > 0)
-            return Failure("Java constructors only have one parameter section",
-                           Some(this))
+            return Failure(
+              "Java constructors only have one parameter section",
+              Some(this))
           ResolveUtils.javaMethodType(
-              method, subst, getResolveScope, Some(subst.subst(tp)))
+            method,
+            subst,
+            getResolveScope,
+            Some(subst.subst(tp)))
       }
       val typeParameters: Seq[TypeParameter] = r.getActualElement match {
         case tp: ScTypeParametersOwner if tp.typeParameters.nonEmpty =>
           tp.typeParameters.map(new TypeParameter(_))
-        case ptp: PsiTypeParameterListOwner
-            if ptp.getTypeParameters.nonEmpty =>
+        case ptp: PsiTypeParameterListOwner if ptp.getTypeParameters.nonEmpty =>
           ptp.getTypeParameters.toSeq.map(new TypeParameter(_))
         case _ => return Success(res, Some(this))
       }
@@ -144,11 +184,15 @@ class ScConstructorImpl(node: ASTNode)
         case p: ScParameterizedTypeElement =>
           val zipped = p.typeArgList.typeArgs.zip(typeParameters)
           val appSubst = new ScSubstitutor(
-              new HashMap[(String, PsiElement), ScType] ++ zipped.map {
-            case (arg, typeParam) =>
-              ((typeParam.name, ScalaPsiUtil.getPsiElementId(typeParam.ptp)),
-               arg.getType(TypingContext.empty).getOrAny)
-          }, Map.empty, None)
+            new HashMap[(String, PsiElement), ScType] ++ zipped.map {
+              case (arg, typeParam) =>
+                (
+                  (typeParam.name, ScalaPsiUtil.getPsiElementId(typeParam.ptp)),
+                  arg.getType(TypingContext.empty).getOrAny)
+            },
+            Map.empty,
+            None
+          )
           Success(appSubst.subst(res), Some(this))
         case _ =>
           var nonValueType = ScTypePolymorphicType(res, typeParameters)
@@ -156,16 +200,18 @@ class ScConstructorImpl(node: ASTNode)
             case Some(expected) =>
               try {
                 nonValueType = InferUtil.localTypeInference(
-                    nonValueType.internalType,
-                    Seq(new Parameter(
-                            "", None, expected, false, false, false, 0)),
-                    Seq(
-                        new Expression(InferUtil
-                              .undefineSubstitutor(nonValueType.typeParameters)
-                              .subst(subst.subst(tp).inferValueType))),
-                    nonValueType.typeParameters,
-                    shouldUndefineParameters = false,
-                    filterTypeParams = false)
+                  nonValueType.internalType,
+                  Seq(
+                    new Parameter("", None, expected, false, false, false, 0)),
+                  Seq(
+                    new Expression(
+                      InferUtil
+                        .undefineSubstitutor(nonValueType.typeParameters)
+                        .subst(subst.subst(tp).inferValueType))),
+                  nonValueType.typeParameters,
+                  shouldUndefineParameters = false,
+                  filterTypeParams = false
+                )
               } catch {
                 case s: SafeCheckException => //ignore
               }
@@ -186,27 +232,29 @@ class ScConstructorImpl(node: ASTNode)
               buffer += workWithResolveResult(constr, r, subst, s, ref)
             case ScalaResolveResult(clazz: PsiClass, subst)
                 if !clazz.isInstanceOf[ScTemplateDefinition] &&
-                clazz.isAnnotationType =>
+                  clazz.isAnnotationType =>
               val params = clazz.getMethods.flatMap {
                 case p: PsiAnnotationMethod =>
-                  val paramType = subst.subst(ScType.create(
-                          p.getReturnType, getProject, getResolveScope))
+                  val paramType = subst.subst(
+                    ScType.create(p.getReturnType, getProject, getResolveScope))
                   Seq(
-                      Parameter(p.getName,
-                                None,
-                                paramType,
-                                paramType,
-                                p.getDefaultValue != null,
-                                isRepeated = false,
-                                isByName = false))
+                    Parameter(
+                      p.getName,
+                      None,
+                      paramType,
+                      paramType,
+                      p.getDefaultValue != null,
+                      isRepeated = false,
+                      isByName = false))
                 case _ => Seq.empty
               }
               buffer +=
-                Success(ScMethodType(ScDesignatorType(clazz),
-                                     params,
-                                     isImplicit = false)(getProject,
-                                                         getResolveScope),
-                        Some(this))
+                Success(
+                  ScMethodType(
+                    ScDesignatorType(clazz),
+                    params,
+                    isImplicit = false)(getProject, getResolveScope),
+                  Some(this))
             case _ =>
           }
           buffer.toSeq
@@ -226,7 +274,7 @@ class ScConstructorImpl(node: ASTNode)
     case p: ScParameterizedTypeElement =>
       p.typeElement match {
         case s: ScSimpleTypeElement => Some(s)
-        case _ => None
+        case _                      => None
       }
     case _ => None
   }
@@ -238,7 +286,7 @@ class ScConstructorImpl(node: ASTNode)
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case s: ScalaElementVisitor => s.visitConstructor(this)
-      case _ => super.accept(visitor)
+      case _                      => super.accept(visitor)
     }
   }
 

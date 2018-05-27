@@ -43,7 +43,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class CameraSpec
     extends SimpleSFXDelegateSpec[jfxs.Camera, Camera](
-        classOf[jfxs.Camera], classOf[Camera]) {
+      classOf[jfxs.Camera],
+      classOf[Camera]) {
 
   override protected def getScalaClassInstance = new PerspectiveCamera()
   override protected def getJavaClassInstance = getScalaClassInstance.delegate

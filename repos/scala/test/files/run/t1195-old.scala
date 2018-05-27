@@ -9,7 +9,7 @@ object Test {
   val g1 = g()
   val h1 = h()
 
-  def m[T : Manifest](x: T) = println(manifest[T])
+  def m[T: Manifest](x: T) = println(manifest[T])
 
   def main(args: Array[String]): Unit = {
     m(f)

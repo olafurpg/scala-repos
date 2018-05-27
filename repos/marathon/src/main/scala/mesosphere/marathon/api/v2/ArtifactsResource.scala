@@ -16,7 +16,8 @@ import mesosphere.marathon.io.storage.StorageProvider
 
 @Path("v2/artifacts")
 class ArtifactsResource @Inject()(
-    val config: MarathonConf, val storage: StorageProvider)
+    val config: MarathonConf,
+    val storage: StorageProvider)
     extends RestResource {
 
   /**
@@ -24,8 +25,9 @@ class ArtifactsResource @Inject()(
     */
   @POST
   @Consumes(Array(MediaType.MULTIPART_FORM_DATA))
-  def uploadFile(@FormParam("file") upload: InputStream,
-                 @FormParam("file") info: FormInfo): Response =
+  def uploadFile(
+      @FormParam("file") upload: InputStream,
+      @FormParam("file") info: FormInfo): Response =
     storeFile(info.getFileName, upload)
 
   /**
@@ -34,15 +36,17 @@ class ArtifactsResource @Inject()(
   @PUT
   @Path("{path:.+}")
   @Consumes(Array(MediaType.MULTIPART_FORM_DATA))
-  def uploadFilePut(@PathParam("path") path: String,
-                    @FormParam("file") upload: InputStream): Response =
+  def uploadFilePut(
+      @PathParam("path") path: String,
+      @FormParam("file") upload: InputStream): Response =
     storeFile(path, upload)
 
   @POST
   @Path("{path:.+}")
   @Consumes(Array(MediaType.MULTIPART_FORM_DATA))
-  def uploadFilePost(@PathParam("path") path: String,
-                     @FormParam("file") upload: InputStream): Response =
+  def uploadFilePost(
+      @PathParam("path") path: String,
+      @FormParam("file") upload: InputStream): Response =
     storeFile(path, upload)
 
   private def storeFile(path: String, upload: InputStream) = {

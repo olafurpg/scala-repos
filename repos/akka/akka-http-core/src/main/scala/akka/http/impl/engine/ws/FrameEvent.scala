@@ -27,8 +27,7 @@ private[http] sealed trait FrameEvent extends FrameEventOrError {
   * Starts a frame. Contains the frame's headers. May contain all the data of the frame if `lastPart == true`. Otherwise,
   * following events will be `FrameData` events that contain the remaining data of the frame.
   */
-private[http] final case class FrameStart(
-    header: FrameHeader, data: ByteString)
+private[http] final case class FrameStart(header: FrameHeader, data: ByteString)
     extends FrameEvent {
   def lastPart: Boolean = data.size == header.length
   def withData(data: ByteString): FrameStart = copy(data = data)
@@ -45,42 +44,47 @@ private[http] final case class FrameData(data: ByteString, lastPart: Boolean)
 }
 
 /** Model of the frame header */
-private[http] final case class FrameHeader(opcode: Protocol.Opcode,
-                                           mask: Option[Int],
-                                           length: Long,
-                                           fin: Boolean,
-                                           rsv1: Boolean = false,
-                                           rsv2: Boolean = false,
-                                           rsv3: Boolean = false)
+private[http] final case class FrameHeader(
+    opcode: Protocol.Opcode,
+    mask: Option[Int],
+    length: Long,
+    fin: Boolean,
+    rsv1: Boolean = false,
+    rsv2: Boolean = false,
+    rsv3: Boolean = false)
 
 private[http] object FrameEvent {
-  def empty(opcode: Protocol.Opcode,
-            fin: Boolean,
-            rsv1: Boolean = false,
-            rsv2: Boolean = false,
-            rsv3: Boolean = false): FrameStart =
+  def empty(
+      opcode: Protocol.Opcode,
+      fin: Boolean,
+      rsv1: Boolean = false,
+      rsv2: Boolean = false,
+      rsv3: Boolean = false): FrameStart =
     fullFrame(opcode, None, ByteString.empty, fin, rsv1, rsv2, rsv3)
-  def fullFrame(opcode: Protocol.Opcode,
-                mask: Option[Int],
-                data: ByteString,
-                fin: Boolean,
-                rsv1: Boolean = false,
-                rsv2: Boolean = false,
-                rsv3: Boolean = false): FrameStart =
+  def fullFrame(
+      opcode: Protocol.Opcode,
+      mask: Option[Int],
+      data: ByteString,
+      fin: Boolean,
+      rsv1: Boolean = false,
+      rsv2: Boolean = false,
+      rsv3: Boolean = false): FrameStart =
     FrameStart(
-        FrameHeader(opcode, mask, data.length, fin, rsv1, rsv2, rsv3), data)
-  val emptyLastContinuationFrame: FrameStart = empty(
-      Protocol.Opcode.Continuation, fin = true)
+      FrameHeader(opcode, mask, data.length, fin, rsv1, rsv2, rsv3),
+      data)
+  val emptyLastContinuationFrame: FrameStart =
+    empty(Protocol.Opcode.Continuation, fin = true)
 
-  def closeFrame(closeCode: Int,
-                 reason: String = "",
-                 mask: Option[Int] = None): FrameStart = {
+  def closeFrame(
+      closeCode: Int,
+      reason: String = "",
+      mask: Option[Int] = None): FrameStart = {
     require(closeCode >= 1000, s"Invalid close code: $closeCode")
     val body =
       ByteString(((closeCode & 0xff00) >> 8).toByte, (closeCode & 0xff).toByte) ++ ByteString(
-          reason, "UTF8")
+        reason,
+        "UTF8")
 
-    fullFrame(
-        Opcode.Close, mask, FrameEventParser.mask(body, mask), fin = true)
+    fullFrame(Opcode.Close, mask, FrameEventParser.mask(body, mask), fin = true)
   }
 }

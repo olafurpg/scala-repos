@@ -49,9 +49,8 @@ trait ModelSnippet[T <: Mapper[T]] extends StatefulSnippet {
   /**
     * Action when save is successful. Defaults to using the ModelView's redirectOnSave
     */
-  var onSave = (view: MV[T]) =>
-    {
-      view.redirectOnSave.foreach(redirectTo)
+  var onSave = (view: MV[T]) => {
+    view.redirectOnSave.foreach(redirectTo)
   }
 
   /**
@@ -67,8 +66,8 @@ trait ModelSnippet[T <: Mapper[T]] extends StatefulSnippet {
   def load(entity: T) = view.entity = entity
 
   def dispatch: DispatchIt = {
-    case "list" => list _
-    case "edit" => edit _
+    case "list"      => list _
+    case "edit"      => edit _
     case "newOrEdit" => view.newOrEdit
   }
 
@@ -100,7 +99,7 @@ class ModelView[T <: Mapper[T]](var entity: T, val snippet: ModelSnippet[T]) {
   var redirectOnSave: Option[String] = Some("list")
 
   /**
-    * Loads this entity into the snippet so it can be edited 
+    * Loads this entity into the snippet so it can be edited
     */
   def load = snippet.load(entity)
 
@@ -181,6 +180,6 @@ class ModelView[T <: Mapper[T]](var entity: T, val snippet: ModelSnippet[T]) {
         s".$name *" #> field.toForm.openOr(field.asHtml)
       }
       .openOrThrowException(
-          "If nobody has complained about this giving a NPE, I'll assume it is safe")
+        "If nobody has complained about this giving a NPE, I'll assume it is safe")
   }
 }

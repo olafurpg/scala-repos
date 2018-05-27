@@ -8,7 +8,10 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.ScLiteral
 import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlockExpr, ScExpression}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypingContext
+}
 
 /**
   * Pavel Fatin
@@ -37,7 +40,7 @@ case class Injection(expression: ScExpression, specifier: Option[Specifier])
   def value = expression match {
     case literal: ScLiteral => literal.getValue.toString
     case block: ScBlockExpr => block.exprs.headOption.map(_.getText).mkString
-    case element => element.getText
+    case element            => element.getText
   }
 
   def format = specifier.map(_.format).getOrElse("")
@@ -54,7 +57,7 @@ case class Injection(expression: ScExpression, specifier: Option[Specifier])
 
   def isComplexBlock = expression match {
     case block: ScBlockExpr => block.exprs.length > 1
-    case _ => false
+    case _                  => false
   }
 
   def problem: Option[InjectionProblem] = specifier.flatMap { it =>
@@ -70,7 +73,7 @@ case class Injection(expression: ScExpression, specifier: Option[Specifier])
               None
             } catch {
               case e: IllegalFormatConversionException => Some(Inapplicable)
-              case e: IllegalFormatException => Some(Malformed)
+              case e: IllegalFormatException           => Some(Malformed)
             }
           case _ => Some(Malformed)
         }

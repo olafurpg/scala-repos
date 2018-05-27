@@ -32,7 +32,8 @@ sealed abstract class Query[+E, U, C[_]] extends QueryBase[C[U]] { self =>
     val aliased = shaped.encodeRef(Ref(generator)).value
     val fv = f(aliased)
     new WrappingQuery[F, T, C](
-        new Bind(generator, toNode, fv.toNode), fv.shaped)
+      new Bind(generator, toNode, fv.toNode),
+      fv.shaped)
   }
 
   /** Build a new query by applying a function to all elements of this query. */
@@ -47,7 +48,8 @@ sealed abstract class Query[+E, U, C[_]] extends QueryBase[C[U]] { self =>
     val aliased = shaped.encodeRef(Ref(generator))
     val fv = f(aliased.value)
     new WrappingQuery[E, U, C](
-        Filter.ifRefutable(generator, toNode, wrapExpr(wt(fv).toNode)), shaped)
+      Filter.ifRefutable(generator, toNode, wrapExpr(wt(fv).toNode)),
+      shaped)
   }
 
   /** Select all elements of this query which satisfy a predicate. Unlike
@@ -63,7 +65,7 @@ sealed abstract class Query[+E, U, C[_]] extends QueryBase[C[U]] { self =>
   /** Select all elements of this query which satisfy a predicate. This method
     * is used when desugaring for-comprehensions over queries. There is no
     * reason to call it directly because it is the same as `filter`. */
-  def withFilter[T : CanBeQueryCondition](f: E => T) =
+  def withFilter[T: CanBeQueryCondition](f: E => T) =
     filterHelper(f, identity)
 
   /** Join two queries with a cross join or inner join.
@@ -72,14 +74,15 @@ sealed abstract class Query[+E, U, C[_]] extends QueryBase[C[U]] { self =>
     val leftGen, rightGen = new AnonSymbol
     val aliased1 = shaped.encodeRef(Ref(leftGen))
     val aliased2 = q2.shaped.encodeRef(Ref(rightGen))
-    new BaseJoinQuery[E, E2, U, U2, C, E, E2](leftGen,
-                                              rightGen,
-                                              toNode,
-                                              q2.toNode,
-                                              JoinType.Inner,
-                                              aliased1.zip(aliased2),
-                                              aliased1.value,
-                                              aliased2.value)
+    new BaseJoinQuery[E, E2, U, U2, C, E, E2](
+      leftGen,
+      rightGen,
+      toNode,
+      q2.toNode,
+      JoinType.Inner,
+      aliased1.zip(aliased2),
+      aliased1.value,
+      aliased2.value)
   }
 
   /** Join two queries with a left outer join.
@@ -95,14 +98,14 @@ sealed abstract class Query[+E, U, C[_]] extends QueryBase[C[U]] { self =>
     val aliased2 =
       ShapedValue(ol.lift(q2.shaped.value), sh).encodeRef(Ref(rightGen))
     new BaseJoinQuery[E, O2, U, U2, C, E, E2](
-        leftGen,
-        rightGen,
-        toNode,
-        q2.toNode,
-        JoinType.LeftOption,
-        aliased1.zip(aliased2),
-        aliased1.value,
-        q2.shaped.encodeRef(Ref(rightGen)).value)
+      leftGen,
+      rightGen,
+      toNode,
+      q2.toNode,
+      JoinType.LeftOption,
+      aliased1.zip(aliased2),
+      aliased1.value,
+      q2.shaped.encodeRef(Ref(rightGen)).value)
   }
 
   /** Join two queries with a right outer join.
@@ -110,22 +113,22 @@ sealed abstract class Query[+E, U, C[_]] extends QueryBase[C[U]] { self =>
     * The left side of the join is lifted to an `Option`. If at least one element on the left
     * matches, all matching elements are returned as `Some`, otherwise a single `None` row is
     * returned. */
-  def joinRight[E1 >: E, E2, U2, D[_], O1, U1](
-      q2: Query[E2, U2, D])(implicit ol: OptionLift[E1, O1],
-                            sh: Shape[FlatShapeLevel, O1, U1, _]) = {
+  def joinRight[E1 >: E, E2, U2, D[_], O1, U1](q2: Query[E2, U2, D])(
+      implicit ol: OptionLift[E1, O1],
+      sh: Shape[FlatShapeLevel, O1, U1, _]) = {
     val leftGen, rightGen = new AnonSymbol
     val aliased1 =
       ShapedValue(ol.lift(shaped.value), sh).encodeRef(Ref(leftGen))
     val aliased2 = q2.shaped.encodeRef(Ref(rightGen))
     new BaseJoinQuery[O1, E2, U1, U2, C, E, E2](
-        leftGen,
-        rightGen,
-        toNode,
-        q2.toNode,
-        JoinType.RightOption,
-        aliased1.zip(aliased2),
-        shaped.encodeRef(Ref(leftGen)).value,
-        aliased2.value)
+      leftGen,
+      rightGen,
+      toNode,
+      q2.toNode,
+      JoinType.RightOption,
+      aliased1.zip(aliased2),
+      shaped.encodeRef(Ref(leftGen)).value,
+      aliased2.value)
   }
 
   /** Join two queries with a full outer join.
@@ -144,29 +147,32 @@ sealed abstract class Query[+E, U, C[_]] extends QueryBase[C[U]] { self =>
     val aliased2 =
       ShapedValue(ol2.lift(q2.shaped.value), sh2).encodeRef(Ref(rightGen))
     new BaseJoinQuery[O1, O2, U1, U2, C, E, E2](
-        leftGen,
-        rightGen,
-        toNode,
-        q2.toNode,
-        JoinType.OuterOption,
-        aliased1.zip(aliased2),
-        shaped.encodeRef(Ref(leftGen)).value,
-        q2.shaped.encodeRef(Ref(rightGen)).value)
+      leftGen,
+      rightGen,
+      toNode,
+      q2.toNode,
+      JoinType.OuterOption,
+      aliased1.zip(aliased2),
+      shaped.encodeRef(Ref(leftGen)).value,
+      q2.shaped.encodeRef(Ref(rightGen)).value
+    )
   }
 
   private[this] def standardJoin[E2, U2, D[_]](
-      q2: Query[E2, U2, D], jt: JoinType) = {
+      q2: Query[E2, U2, D],
+      jt: JoinType) = {
     val leftGen, rightGen = new AnonSymbol
     val aliased1 = shaped.encodeRef(Ref(leftGen))
     val aliased2 = q2.shaped.encodeRef(Ref(rightGen))
-    new BaseJoinQuery[E, E2, U, U2, C, E, E2](leftGen,
-                                              rightGen,
-                                              toNode,
-                                              q2.toNode,
-                                              jt,
-                                              aliased1.zip(aliased2),
-                                              aliased1.value,
-                                              aliased2.value)
+    new BaseJoinQuery[E, E2, U, U2, C, E, E2](
+      leftGen,
+      rightGen,
+      toNode,
+      q2.toNode,
+      jt,
+      aliased1.zip(aliased2),
+      aliased1.value,
+      aliased2.value)
   }
 
   /** Return a query formed from this query and another query by combining
@@ -184,17 +190,18 @@ sealed abstract class Query[+E, U, C[_]] extends QueryBase[C[U]] { self =>
   def zipWithIndex = {
     val leftGen, rightGen = new AnonSymbol
     val aliased1 = shaped.encodeRef(Ref(leftGen))
-    val aliased2 = ShapedValue(Rep.forNode[Long](Ref(rightGen)),
-                               Shape.repColumnShape[Long, FlatShapeLevel])
+    val aliased2 = ShapedValue(
+      Rep.forNode[Long](Ref(rightGen)),
+      Shape.repColumnShape[Long, FlatShapeLevel])
     new BaseJoinQuery[E, Rep[Long], U, Long, C, E, Rep[Long]](
-        leftGen,
-        rightGen,
-        toNode,
-        RangeFrom(0L),
-        JoinType.Zip,
-        aliased1.zip(aliased2),
-        aliased1.value,
-        aliased2.value)
+      leftGen,
+      rightGen,
+      toNode,
+      RangeFrom(0L),
+      JoinType.Zip,
+      aliased1.zip(aliased2),
+      aliased1.value,
+      aliased2.value)
   }
 
   /** Sort this query according to a function which extracts the ordering
@@ -203,8 +210,8 @@ sealed abstract class Query[+E, U, C[_]] extends QueryBase[C[U]] { self =>
     val generator = new AnonSymbol
     val aliased = shaped.encodeRef(Ref(generator))
     new WrappingQuery[E, U, C](
-        SortBy(generator, toNode, ConstArray.from(f(aliased.value).columns)),
-        shaped)
+      SortBy(generator, toNode, ConstArray.from(f(aliased.value).columns)),
+      shaped)
   }
 
   /** Sort this query according to a the ordering of its elements. */
@@ -213,19 +220,20 @@ sealed abstract class Query[+E, U, C[_]] extends QueryBase[C[U]] { self =>
   /** Partition this query into a query of pairs of a key and a nested query
     * containing the elements for the key, according to some discriminator
     * function. */
-  def groupBy[K, T, G, P](
-      f: E => K)(implicit kshape: Shape[_ <: FlatShapeLevel, K, T, G],
-                 vshape: Shape[_ <: FlatShapeLevel, E, _, P])
+  def groupBy[K, T, G, P](f: E => K)(
+      implicit kshape: Shape[_ <: FlatShapeLevel, K, T, G],
+      vshape: Shape[_ <: FlatShapeLevel, E, _, P])
     : Query[(G, Query[P, U, Seq]), (T, Query[P, U, Seq]), C] = {
     val sym = new AnonSymbol
     val key =
       ShapedValue(f(shaped.encodeRef(Ref(sym)).value), kshape).packedValue
     val value = ShapedValue(
-        pack.to[Seq],
-        RepShape[FlatShapeLevel, Query[P, U, Seq], Query[P, U, Seq]])
+      pack.to[Seq],
+      RepShape[FlatShapeLevel, Query[P, U, Seq], Query[P, U, Seq]])
     val group = GroupBy(sym, toNode, key.toNode)
     new WrappingQuery[(G, Query[P, U, Seq]), (T, Query[P, U, Seq]), C](
-        group, key.zip(value))
+      group,
+      key.zip(value))
   }
 
   def encodeRef(path: Node): Query[E, U, C] = new Query[E, U, C] {
@@ -290,7 +298,7 @@ sealed abstract class Query[+E, U, C[_]] extends QueryBase[C[U]] { self =>
     * order duplicates are removed. This method is equivalent to `distinctOn(identity)`. */
   def distinct: Query[E, U, C] =
     distinctOn[E, U](identity)(
-        shaped.shape.asInstanceOf[Shape[FlatShapeLevel, E, U, _]])
+      shaped.shape.asInstanceOf[Shape[FlatShapeLevel, E, U, _]])
 
   /** Remove duplicate elements which are the same in the given projection. When used on an
     * ordered Query, there is no guarantee in which order duplicates are removed. */
@@ -300,7 +308,8 @@ sealed abstract class Query[+E, U, C[_]] extends QueryBase[C[U]] { self =>
     val aliased = shaped.encodeRef(Ref(generator)).value
     val fv = f(aliased)
     new WrappingQuery[E, U, C](
-        Distinct(generator, toNode, shape.toNode(fv)), shaped)
+      Distinct(generator, toNode, shape.toNode(fv)),
+      shaped)
   }
 
   /** Change the collection type to build when executing the query. */
@@ -323,8 +332,8 @@ sealed abstract class Query[+E, U, C[_]] extends QueryBase[C[U]] { self =>
 object Query {
 
   /** Lift a scalar value to a Query. */
-  def apply[E, U, R](
-      value: E)(implicit unpack: Shape[_ <: FlatShapeLevel, E, U, R])
+  def apply[E, U, R](value: E)(
+      implicit unpack: Shape[_ <: FlatShapeLevel, E, U, R])
     : Query[R, U, Seq] = {
     val shaped = ShapedValue(value, unpack).packedValue
     new WrappingQuery[R, U, Seq](Pure(shaped.toNode), shaped)
@@ -337,27 +346,30 @@ object Query {
   }
 
   @inline implicit def queryShape[
-      Level >: NestedShapeLevel <: ShapeLevel, T, Q <: QueryBase[_]](
-      implicit ev: Q <:< Rep[T]) = RepShape[Level, Q, T]
+      Level >: NestedShapeLevel <: ShapeLevel,
+      T,
+      Q <: QueryBase[_]](implicit ev: Q <:< Rep[T]) = RepShape[Level, Q, T]
 }
 
 /** A typeclass for types that can be used as predicates in `filter` calls. */
 @implicitNotFound(
-    "Type ${T} cannot be a query condition (only Boolean, Rep[Boolean] and Rep[Option[Boolean]] are allowed")
+  "Type ${T} cannot be a query condition (only Boolean, Rep[Boolean] and Rep[Option[Boolean]] are allowed")
 trait CanBeQueryCondition[-T] extends (T => Rep[_])
 
 object CanBeQueryCondition {
   // Using implicits with explicit type annotation here (instead of previously implicit objects)
-  // because otherwise they would not be found in this file above this line. 
+  // because otherwise they would not be found in this file above this line.
   // See https://github.com/slick/slick/pull/217
-  implicit val BooleanColumnCanBeQueryCondition: CanBeQueryCondition[Rep[
-          Boolean]] = new CanBeQueryCondition[Rep[Boolean]] {
-    def apply(value: Rep[Boolean]) = value
-  }
-  implicit val BooleanOptionColumnCanBeQueryCondition: CanBeQueryCondition[Rep[
-          Option[Boolean]]] = new CanBeQueryCondition[Rep[Option[Boolean]]] {
-    def apply(value: Rep[Option[Boolean]]) = value
-  }
+  implicit val BooleanColumnCanBeQueryCondition
+    : CanBeQueryCondition[Rep[Boolean]] =
+    new CanBeQueryCondition[Rep[Boolean]] {
+      def apply(value: Rep[Boolean]) = value
+    }
+  implicit val BooleanOptionColumnCanBeQueryCondition
+    : CanBeQueryCondition[Rep[Option[Boolean]]] =
+    new CanBeQueryCondition[Rep[Option[Boolean]]] {
+      def apply(value: Rep[Option[Boolean]]) = value
+    }
   implicit val BooleanCanBeQueryCondition: CanBeQueryCondition[Boolean] =
     new CanBeQueryCondition[Boolean] {
       def apply(value: Boolean) = new LiteralColumn(value)
@@ -365,7 +377,8 @@ object CanBeQueryCondition {
 }
 
 class WrappingQuery[+E, U, C[_]](
-    val toNode: Node, val shaped: ShapedValue[_ <: E, U])
+    val toNode: Node,
+    val shaped: ShapedValue[_ <: E, U])
     extends Query[E, U, C]
 
 final class BaseJoinQuery[+E1, +E2, U1, U2, C[_], +B1, +B2](
@@ -378,14 +391,15 @@ final class BaseJoinQuery[+E1, +E2, U1, U2, C[_], +B1, +B2](
     b1: B1,
     b2: B2)
     extends WrappingQuery[(E1, E2), (U1, U2), C](
-        AJoin(leftGen, rightGen, left, right, jt, LiteralNode(true)), base) {
+      AJoin(leftGen, rightGen, left, right, jt, LiteralNode(true)),
+      base) {
 
   /** Add a join condition to a join operation. */
   def on[T <: Rep[_]](pred: (B1, B2) => T)(
       implicit wt: CanBeQueryCondition[T]): Query[(E1, E2), (U1, U2), C] =
     new WrappingQuery[(E1, E2), (U1, U2), C](
-        AJoin(leftGen, rightGen, left, right, jt, wt(pred(b1, b2)).toNode),
-        base)
+      AJoin(leftGen, rightGen, left, right, jt, wt(pred(b1, b2)).toNode),
+      base)
 }
 
 /** Represents a database table. Profiles add extension methods to TableQuery
@@ -394,8 +408,7 @@ final class BaseJoinQuery[+E1, +E2, U1, U2, C[_], +B1, +B2](
 class TableQuery[E <: AbstractTable[_]](cons: Tag => E)
     extends Query[E, E#TableElementType, Seq] {
   lazy val shaped = {
-    val baseTable = cons(
-        new BaseTag { base =>
+    val baseTable = cons(new BaseTag { base =>
       def taggedAs(path: Node): AbstractTable[_] =
         cons(new RefTag(path) {
           def taggedAs(path: Node) = base.taggedAs(path)
@@ -419,8 +432,9 @@ object TableQuery {
     new TableQuery[E](cons)
 
   /** Create a TableQuery for a table row class which has a constructor of type (Tag). */
-  def apply[E <: AbstractTable[_]]: TableQuery[E] = macro TableQueryMacroImpl
-    .apply[E]
+  def apply[E <: AbstractTable[_]]: TableQuery[E] =
+    macro TableQueryMacroImpl
+      .apply[E]
 }
 
 object TableQueryMacroImpl {
@@ -429,16 +443,18 @@ object TableQueryMacroImpl {
       implicit e: c.WeakTypeTag[E]): c.Expr[TableQuery[E]] = {
     import c.universe._
     val cons = c.Expr[Tag => E](
-        Function(
-            List(ValDef(Modifiers(Flag.PARAM),
-                        TermName("tag"),
-                        Ident(typeOf[Tag].typeSymbol),
-                        EmptyTree)),
-            Apply(
-                Select(New(TypeTree(e.tpe)), termNames.CONSTRUCTOR),
-                List(Ident(TermName("tag")))
-            )
-        ))
+      Function(
+        List(
+          ValDef(
+            Modifiers(Flag.PARAM),
+            TermName("tag"),
+            Ident(typeOf[Tag].typeSymbol),
+            EmptyTree)),
+        Apply(
+          Select(New(TypeTree(e.tpe)), termNames.CONSTRUCTOR),
+          List(Ident(TermName("tag")))
+        )
+      ))
     reify { TableQuery.apply[E](cons.splice) }
   }
 }

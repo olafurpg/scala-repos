@@ -52,7 +52,7 @@ class LAFuture[T](val scheduler: LAScheduler) {
           toDo = Nil
           onFailure = Nil
           onComplete.foreach(f =>
-                LAFuture.executeWithObservers(scheduler, () => f(Full(value))))
+            LAFuture.executeWithObservers(scheduler, () => f(Full(value))))
           onComplete = Nil
           ret
         } else Nil
@@ -60,8 +60,7 @@ class LAFuture[T](val scheduler: LAScheduler) {
         notifyAll()
       }
     }
-    funcs.foreach(
-        f => LAFuture.executeWithObservers(scheduler, () => f(value)))
+    funcs.foreach(f => LAFuture.executeWithObservers(scheduler, () => f(value)))
   }
 
   /**
@@ -70,7 +69,7 @@ class LAFuture[T](val scheduler: LAScheduler) {
     */
   def complete(value: Box[T]): Unit = {
     value match {
-      case Full(v) => satisfy(v)
+      case Full(v)     => satisfy(v)
       case x: EmptyBox => fail(x)
     }
   }
@@ -113,9 +112,8 @@ class LAFuture[T](val scheduler: LAScheduler) {
 
   def flatMap[A](f: T => LAFuture[A]): LAFuture[A] = {
     val ret = new LAFuture[A](scheduler)
-    onComplete(
-        v =>
-          v match {
+    onComplete(v =>
+      v match {
         case Full(v) =>
           Box.tryo(f(v)) match {
             case Full(successfullyComputedFuture) =>
@@ -233,10 +231,10 @@ class LAFuture[T](val scheduler: LAScheduler) {
       if (!satisfied && !aborted) {
         aborted = true
         failure = e
-        onFailure.foreach(
-            f => LAFuture.executeWithObservers(scheduler, () => f(e)))
-        onComplete.foreach(
-            f => LAFuture.executeWithObservers(scheduler, () => f(e)))
+        onFailure.foreach(f =>
+          LAFuture.executeWithObservers(scheduler, () => f(e)))
+        onComplete.foreach(f =>
+          LAFuture.executeWithObservers(scheduler, () => f(e)))
         onComplete = Nil
         onFailure = Nil
         toDo = Nil
@@ -270,16 +268,16 @@ object LAFuture {
     * @tparam T the type
     * @return an LAFuture that will yield its value when the value has been computed
     */
-  def apply[T](f: () => T, scheduler: LAScheduler = LAScheduler): LAFuture[T] = {
+  def apply[T](
+      f: () => T,
+      scheduler: LAScheduler = LAScheduler): LAFuture[T] = {
     val ret = new LAFuture[T](scheduler)
-    scheduler.execute(
-        () =>
-          {
-        try {
-          ret.satisfy(f())
-        } catch {
-          case e: Exception => ret.fail(e)
-        }
+    scheduler.execute(() => {
+      try {
+        ret.satisfy(f())
+      } catch {
+        case e: Exception => ret.fail(e)
+      }
     })
     ret
   }
@@ -304,22 +302,20 @@ object LAFuture {
   private def notifyObservers(future: LAFuture[_]) {
     val observers = threadInfo.get()
     if (null eq observers) {} else {
-      observers.foreach(_ (future))
+      observers.foreach(_(future))
     }
   }
 
   private def executeWithObservers(scheduler: LAScheduler, f: () => Unit) {
     val cur = threadInfo.get()
-    scheduler.execute(
-        () =>
-          {
-        val old = threadInfo.get()
-        threadInfo.set(cur)
-        try {
-          f()
-        } finally {
-          threadInfo.set(old)
-        }
+    scheduler.execute(() => {
+      val old = threadInfo.get()
+      threadInfo.set(cur)
+      try {
+        f()
+      } finally {
+        threadInfo.set(old)
+      }
     })
   }
 
@@ -402,16 +398,16 @@ object LAFuture {
             sync.synchronized {
               vb match {
                 case Full(v) => {
-                    vals.insert(idx, Full(v))
-                    gotCnt += 1
-                    if (gotCnt >= len) {
-                      ret.satisfy(Full(vals.toList.flatten))
-                    }
+                  vals.insert(idx, Full(v))
+                  gotCnt += 1
+                  if (gotCnt >= len) {
+                    ret.satisfy(Full(vals.toList.flatten))
                   }
+                }
 
                 case eb: EmptyBox => {
-                    ret.satisfy(eb)
-                  }
+                  ret.satisfy(eb)
+                }
               }
             }
           }

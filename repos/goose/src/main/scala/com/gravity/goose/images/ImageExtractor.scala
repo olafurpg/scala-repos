@@ -26,13 +26,14 @@ import com.gravity.goose.utils.{Logging, CanLog}
   * Date: 8/18/11
   */
 // represents a file stored on disk that we've downloaded
-case class LocallyStoredImage(imgSrc: String,
-                              localFileName: String,
-                              linkhash: String,
-                              bytes: Long,
-                              fileExtension: String = "",
-                              height: Int = 0,
-                              width: Int = 0)
+case class LocallyStoredImage(
+    imgSrc: String,
+    localFileName: String,
+    linkhash: String,
+    bytes: Long,
+    fileExtension: String = "",
+    height: Int = 0,
+    width: Int = 0)
 
 trait ImageExtractor extends CanLog {
 

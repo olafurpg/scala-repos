@@ -40,7 +40,7 @@ object NumberConverter {
       // => uval = x + 2*MAX + 2
       // Now, use the fact: (a+b)/c = a/c + b/c + (a%c+b%c)/c
       x / m + 2 * (Long.MaxValue / m) + 2 / m +
-      (x % m + 2 * (Long.MaxValue % m) + 2 % m) / m
+        (x % m + 2 * (Long.MaxValue % m) + 2 % m) / m
     }
   }
 
@@ -175,6 +175,6 @@ object NumberConverter {
       value(resultStartPos) = '-'
     }
     UTF8String.fromBytes(
-        java.util.Arrays.copyOfRange(value, resultStartPos, value.length))
+      java.util.Arrays.copyOfRange(value, resultStartPos, value.length))
   }
 }

@@ -20,7 +20,12 @@ import kafka.common.KafkaException
 import kafka.coordinator.{GroupOverview, GroupSummary, MemberSummary}
 import kafka.utils.Logging
 import org.apache.kafka.clients._
-import org.apache.kafka.clients.consumer.internals.{ConsumerNetworkClient, ConsumerProtocol, RequestFuture, SendFailedException}
+import org.apache.kafka.clients.consumer.internals.{
+  ConsumerNetworkClient,
+  ConsumerProtocol,
+  RequestFuture,
+  SendFailedException
+}
 import org.apache.kafka.common.config.ConfigDef.{Importance, Type}
 import org.apache.kafka.common.config.{AbstractConfig, ConfigDef}
 import org.apache.kafka.common.errors.DisconnectException
@@ -35,15 +40,17 @@ import org.apache.kafka.common.{Cluster, Node, TopicPartition}
 import scala.collection.JavaConversions._
 import scala.collection.JavaConverters._
 
-class AdminClient(val time: Time,
-                  val requestTimeoutMs: Int,
-                  val client: ConsumerNetworkClient,
-                  val bootstrapBrokers: List[Node])
+class AdminClient(
+    val time: Time,
+    val requestTimeoutMs: Int,
+    val client: ConsumerNetworkClient,
+    val bootstrapBrokers: List[Node])
     extends Logging {
 
-  private def send(target: Node,
-                   api: ApiKeys,
-                   request: AbstractRequest): Struct = {
+  private def send(
+      target: Node,
+      api: ApiKeys,
+      request: AbstractRequest): Struct = {
     var now = time.milliseconds()
     val deadline = now + requestTimeoutMs
     var future: RequestFuture[ClientResponse] = null
@@ -56,7 +63,7 @@ class AdminClient(val time: Time,
 
       now = time.milliseconds()
     } while (now < deadline &&
-    future.exception().isInstanceOf[SendFailedException])
+      future.exception().isInstanceOf[SendFailedException])
 
     throw future.exception()
   }
@@ -72,7 +79,7 @@ class AdminClient(val time: Time,
         }
     }
     throw new RuntimeException(
-        s"Request ${api} failed on brokers ${bootstrapBrokers}")
+      s"Request ${api} failed on brokers ${bootstrapBrokers}")
   }
 
   private def findCoordinator(groupId: String): Node = {
@@ -129,19 +136,20 @@ class AdminClient(val time: Time,
 
   def listAllConsumerGroupsFlattened(): List[GroupOverview] = {
     listAllGroupsFlattened.filter(
-        _.protocolType == ConsumerProtocol.PROTOCOL_TYPE)
+      _.protocolType == ConsumerProtocol.PROTOCOL_TYPE)
   }
 
   def describeGroup(groupId: String): GroupSummary = {
     val coordinator = findCoordinator(groupId)
-    val responseBody = send(coordinator,
-                            ApiKeys.DESCRIBE_GROUPS,
-                            new DescribeGroupsRequest(List(groupId).asJava))
+    val responseBody = send(
+      coordinator,
+      ApiKeys.DESCRIBE_GROUPS,
+      new DescribeGroupsRequest(List(groupId).asJava))
     val response = new DescribeGroupsResponse(responseBody)
     val metadata = response.groups().get(groupId)
     if (metadata == null)
       throw new KafkaException(
-          s"Response from broker contained no metadata for group ${groupId}")
+        s"Response from broker contained no metadata for group ${groupId}")
 
     Errors.forCode(metadata.errorCode()).maybeThrow()
     val members = metadata
@@ -149,23 +157,26 @@ class AdminClient(val time: Time,
       .map { member =>
         val metadata = Utils.readBytes(member.memberMetadata())
         val assignment = Utils.readBytes(member.memberAssignment())
-        MemberSummary(member.memberId(),
-                      member.clientId(),
-                      member.clientHost(),
-                      metadata,
-                      assignment)
+        MemberSummary(
+          member.memberId(),
+          member.clientId(),
+          member.clientHost(),
+          metadata,
+          assignment)
       }
       .toList
-    GroupSummary(metadata.state(),
-                 metadata.protocolType(),
-                 metadata.protocol(),
-                 members)
+    GroupSummary(
+      metadata.state(),
+      metadata.protocolType(),
+      metadata.protocol(),
+      members)
   }
 
-  case class ConsumerSummary(memberId: String,
-                             clientId: String,
-                             clientHost: String,
-                             assignment: List[TopicPartition])
+  case class ConsumerSummary(
+      memberId: String,
+      clientId: String,
+      clientHost: String,
+      assignment: List[TopicPartition])
 
   def describeConsumerGroup(groupId: String): List[ConsumerSummary] = {
     val group = describeGroup(groupId)
@@ -173,16 +184,17 @@ class AdminClient(val time: Time,
 
     if (group.protocolType != ConsumerProtocol.PROTOCOL_TYPE)
       throw new IllegalArgumentException(
-          s"Group ${groupId} with protocol type '${group.protocolType}' is not a valid consumer group")
+        s"Group ${groupId} with protocol type '${group.protocolType}' is not a valid consumer group")
 
     if (group.state == "Stable") {
       group.members.map { member =>
         val assignment = ConsumerProtocol.deserializeAssignment(
-            ByteBuffer.wrap(member.assignment))
-        new ConsumerSummary(member.memberId,
-                            member.clientId,
-                            member.clientHost,
-                            assignment.partitions().asScala.toList)
+          ByteBuffer.wrap(member.assignment))
+        new ConsumerSummary(
+          member.memberId,
+          member.clientId,
+          member.clientHost,
+          assignment.partitions().asScala.toList)
       }
     } else {
       List.empty
@@ -205,15 +217,18 @@ object AdminClient {
   val AdminClientIdSequence = new AtomicInteger(1)
   val AdminConfigDef = {
     val config = new ConfigDef()
-      .define(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG,
-              Type.LIST,
-              Importance.HIGH,
-              CommonClientConfigs.BOOSTRAP_SERVERS_DOC)
-      .define(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG,
-              ConfigDef.Type.STRING,
-              CommonClientConfigs.DEFAULT_SECURITY_PROTOCOL,
-              ConfigDef.Importance.MEDIUM,
-              CommonClientConfigs.SECURITY_PROTOCOL_DOC)
+      .define(
+        CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG,
+        Type.LIST,
+        Importance.HIGH,
+        CommonClientConfigs.BOOSTRAP_SERVERS_DOC)
+      .define(
+        CommonClientConfigs.SECURITY_PROTOCOL_CONFIG,
+        ConfigDef.Type.STRING,
+        CommonClientConfigs.DEFAULT_SECURITY_PROTOCOL,
+        ConfigDef.Importance.MEDIUM,
+        CommonClientConfigs.SECURITY_PROTOCOL_DOC
+      )
       .withClientSslSupport()
       .withClientSaslSupport()
     config
@@ -244,29 +259,35 @@ object AdminClient {
     val bootstrapCluster = Cluster.bootstrap(brokerAddresses)
     metadata.update(bootstrapCluster, 0)
 
-    val selector = new Selector(DefaultConnectionMaxIdleMs,
-                                metrics,
-                                time,
-                                "admin",
-                                channelBuilder)
+    val selector = new Selector(
+      DefaultConnectionMaxIdleMs,
+      metrics,
+      time,
+      "admin",
+      channelBuilder)
 
     val networkClient = new NetworkClient(
-        selector,
-        metadata,
-        "admin-" + AdminClientIdSequence.getAndIncrement(),
-        DefaultMaxInFlightRequestsPerConnection,
-        DefaultReconnectBackoffMs,
-        DefaultSendBufferBytes,
-        DefaultReceiveBufferBytes,
-        DefaultRequestTimeoutMs,
-        time)
+      selector,
+      metadata,
+      "admin-" + AdminClientIdSequence.getAndIncrement(),
+      DefaultMaxInFlightRequestsPerConnection,
+      DefaultReconnectBackoffMs,
+      DefaultSendBufferBytes,
+      DefaultReceiveBufferBytes,
+      DefaultRequestTimeoutMs,
+      time
+    )
 
     val highLevelClient = new ConsumerNetworkClient(
-        networkClient, metadata, time, DefaultRetryBackoffMs)
+      networkClient,
+      metadata,
+      time,
+      DefaultRetryBackoffMs)
 
-    new AdminClient(time,
-                    DefaultRequestTimeoutMs,
-                    highLevelClient,
-                    bootstrapCluster.nodes().asScala.toList)
+    new AdminClient(
+      time,
+      DefaultRequestTimeoutMs,
+      highLevelClient,
+      bootstrapCluster.nodes().asScala.toList)
   }
 }

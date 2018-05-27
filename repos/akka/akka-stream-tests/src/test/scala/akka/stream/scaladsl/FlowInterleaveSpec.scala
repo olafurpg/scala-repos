@@ -65,7 +65,7 @@ class FlowInterleaveSpec extends BaseTwoStreamsSetup {
 
     "not work with segmentSize = 0" in assertAllStagesStopped {
       an[IllegalArgumentException] mustBe thrownBy(
-          Source(0 to 2).interleave(Source(3 to 5), 0).runWith(Sink.head))
+        Source(0 to 2).interleave(Source(3 to 5), 0).runWith(Sink.head))
     }
 
     "not work when segmentSize > than stream elements" in assertAllStagesStopped {
@@ -76,7 +76,7 @@ class FlowInterleaveSpec extends BaseTwoStreamsSetup {
       probe
         .expectSubscription()
         .request(25)
-        (0 to 15).foreach(probe.expectNext)
+      (0 to 15).foreach(probe.expectNext)
       probe.expectComplete()
 
       val probe2 = TestSubscriber.manualProbe[Int]()
@@ -86,7 +86,7 @@ class FlowInterleaveSpec extends BaseTwoStreamsSetup {
       probe2
         .expectSubscription()
         .request(100)
-        (1 to 10).foreach(probe2.expectNext)
+      (1 to 10).foreach(probe2.expectNext)
       (21 to 25).foreach(probe2.expectNext)
       (11 to 20).foreach(probe2.expectNext)
       probe2.expectComplete()

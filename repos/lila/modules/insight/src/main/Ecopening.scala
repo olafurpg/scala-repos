@@ -1,11 +1,12 @@
 package lila.insight
 
-case class Ecopening(eco: Ecopening.ECO,
-                     family: Ecopening.FamilyName,
-                     name: String,
-                     private val moves: String,
-                     fen: Ecopening.FEN,
-                     lastMoveUci: String)
+case class Ecopening(
+    eco: Ecopening.ECO,
+    family: Ecopening.FamilyName,
+    name: String,
+    private val moves: String,
+    fen: Ecopening.FEN,
+    lastMoveUci: String)
     extends Ordered[Ecopening] {
 
   private lazy val moveList = moves.split(' ').toList
@@ -19,8 +20,8 @@ case class Ecopening(eco: Ecopening.ECO,
     .zipWithIndex
     .map {
       case (List(w, b), i) => s"${i + 1}. $w $b"
-      case (List(w), i) => s"${i + 1}. $w"
-      case _ => ""
+      case (List(w), i)    => s"${i + 1}. $w"
+      case _               => ""
     }
     .mkString(" ")
 
@@ -41,11 +42,11 @@ object Ecopening {
     ops.foldLeft(Map.empty[FamilyName, Family]) {
       case (fams, op) =>
         fams +
-        (op.family -> fams
-              .get(op.family)
-              .fold(Family(op.family, List(op.eco))) { existing =>
-                existing.copy(ecos = op.eco :: existing.ecos)
-              })
+          (op.family -> fams
+            .get(op.family)
+            .fold(Family(op.family, List(op.eco))) { existing =>
+              existing.copy(ecos = op.eco :: existing.ecos)
+            })
     }
 
   def fromGame(game: lila.game.Game): Option[Ecopening] =
@@ -54,9 +55,9 @@ object Ecopening {
     else
       chess.Replay
         .boards(
-            moveStrs = game.pgnMoves take EcopeningDB.MAX_MOVES,
-            initialFen = none,
-            variant = chess.variant.Standard
+          moveStrs = game.pgnMoves take EcopeningDB.MAX_MOVES,
+          initialFen = none,
+          variant = chess.variant.Standard
         )
         .toOption flatMap matchChronoBoards
 

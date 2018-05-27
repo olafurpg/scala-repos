@@ -21,12 +21,13 @@ class EvaluationWorkflowSuite extends FunSuite with SharedSparkContext {
       engineEvaluator = (new Engine1(), MetricEvaluator(new Metric0()))
     }
 
-    val result = EvaluationWorkflow.runEvaluation(sc,
-                                                  Eval,
-                                                  engine,
-                                                  engineParamsList,
-                                                  evaluator,
-                                                  WorkflowParams())
+    val result = EvaluationWorkflow.runEvaluation(
+      sc,
+      Eval,
+      engine,
+      engineParamsList,
+      evaluator,
+      WorkflowParams())
 
     result.bestScore.score shouldBe 0.3
     result.bestEngineParams shouldBe ep1
@@ -46,12 +47,13 @@ class EvaluationWorkflowSuite extends FunSuite with SharedSparkContext {
       engineEvaluator = (new Engine1(), MetricEvaluator(new Metric1()))
     }
 
-    val result = EvaluationWorkflow.runEvaluation(sc,
-                                                  Eval,
-                                                  engine,
-                                                  engineParamsList,
-                                                  evaluator,
-                                                  WorkflowParams())
+    val result = EvaluationWorkflow.runEvaluation(
+      sc,
+      Eval,
+      engine,
+      engineParamsList,
+      evaluator,
+      WorkflowParams())
 
     result.bestScore.score shouldBe Metric1.Result(0, 0.3)
     result.bestEngineParams shouldBe ep1

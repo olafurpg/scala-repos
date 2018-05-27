@@ -3,11 +3,24 @@ package org.jetbrains.sbt.project.template.activator
 import java.io.File
 import javax.swing.Icon
 
-import com.intellij.ide.util.projectWizard.{ModuleBuilder, ModuleWizardStep, SdkSettingsStep, SettingsStep}
+import com.intellij.ide.util.projectWizard.{
+  ModuleBuilder,
+  ModuleWizardStep,
+  SdkSettingsStep,
+  SettingsStep
+}
 import com.intellij.openapi.externalSystem.service.project.wizard.AbstractExternalModuleBuilder
-import com.intellij.openapi.externalSystem.settings.{AbstractExternalSystemSettings, ExternalSystemSettingsListener}
+import com.intellij.openapi.externalSystem.settings.{
+  AbstractExternalSystemSettings,
+  ExternalSystemSettingsListener
+}
 import com.intellij.openapi.externalSystem.util.ExternalSystemApiUtil
-import com.intellij.openapi.module.{JavaModuleType, ModifiableModuleModel, Module, ModuleType}
+import com.intellij.openapi.module.{
+  JavaModuleType,
+  ModifiableModuleModel,
+  Module,
+  ModuleType
+}
 import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.projectRoots.{JavaSdk, SdkTypeId}
@@ -29,7 +42,8 @@ import org.jetbrains.sbt.project.template.activator.ActivatorRepoProcessor.DocDa
   */
 class ActivatorProjectBuilder
     extends AbstractExternalModuleBuilder[SbtProjectSettings](
-        SbtProjectSystem.Id, new SbtProjectSettings) {
+      SbtProjectSystem.Id,
+      new SbtProjectSettings) {
   //TODO Refactor me
   private var allTemplates: Map[String, DocData] = Map.empty
   private val repoProcessor = new ActivatorCachedRepoProcessor
@@ -89,9 +103,9 @@ class ActivatorProjectBuilder
     val settings = ExternalSystemApiUtil
       .getSettings(modifiableRootModel.getProject, SbtProjectSystem.Id)
       .asInstanceOf[AbstractExternalSystemSettings[
-              _ <: AbstractExternalSystemSettings[_, SbtProjectSettings, _],
-              SbtProjectSettings,
-              _ <: ExternalSystemSettingsListener[SbtProjectSettings]]]
+        _ <: AbstractExternalSystemSettings[_, SbtProjectSettings, _],
+        SbtProjectSettings,
+        _ <: ExternalSystemSettingsListener[SbtProjectSettings]]]
 
     getExternalProjectSettings setExternalProjectPath getContentEntryPath
     settings linkProject getExternalProjectSettings
@@ -136,13 +150,15 @@ class ActivatorProjectBuilder
     val moduleDir = new File(path)
     if (!moduleDir.exists()) moduleDir.mkdirs()
 
-    doWithProgress(repoProcessor.createTemplate(id, moduleDir, error),
-                   "Downloading template...")
+    doWithProgress(
+      repoProcessor.createTemplate(id, moduleDir, error),
+      "Downloading template...")
   }
 
   private def downloadTemplateList() {
-    doWithProgress({ allTemplates = repoProcessor.extractRepoData() },
-    "Downloading list of templates...")
+    doWithProgress(
+      { allTemplates = repoProcessor.extractRepoData() },
+      "Downloading list of templates...")
   }
 
   private def doWithProgress(body: => Unit, title: String) {

@@ -44,12 +44,13 @@ object KMeansDataGenerator {
     * @param numPartitions Number of partitions of the generated RDD; default 2
     */
   @Since("0.8.0")
-  def generateKMeansRDD(sc: SparkContext,
-                        numPoints: Int,
-                        k: Int,
-                        d: Int,
-                        r: Double,
-                        numPartitions: Int = 2): RDD[Array[Double]] = {
+  def generateKMeansRDD(
+      sc: SparkContext,
+      numPoints: Int,
+      k: Int,
+      d: Int,
+      r: Double,
+      numPartitions: Int = 2): RDD[Array[Double]] = {
     // First, generate some centers
     val rand = new Random(42)
     val centers = Array.fill(k)(Array.fill(d)(rand.nextGaussian() * r))
@@ -65,7 +66,8 @@ object KMeansDataGenerator {
   def main(args: Array[String]) {
     if (args.length < 6) {
       // scalastyle:off println
-      println("Usage: KMeansGenerator " +
+      println(
+        "Usage: KMeansGenerator " +
           "<master> <output_dir> <num_points> <k> <d> <r> [<num_partitions>]")
       // scalastyle:on println
       System.exit(1)

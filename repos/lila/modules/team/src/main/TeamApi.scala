@@ -10,11 +10,12 @@ import lila.user.{User, UserContext}
 import org.joda.time.Period
 import tube._
 
-final class TeamApi(cached: Cached,
-                    notifier: Notifier,
-                    forum: ActorSelection,
-                    indexer: ActorSelection,
-                    timeline: ActorSelection) {
+final class TeamApi(
+    cached: Cached,
+    notifier: Notifier,
+    forum: ActorSelection,
+    indexer: ActorSelection,
+    timeline: ActorSelection) {
 
   val creationPeriod = Period weeks 1
 
@@ -25,25 +26,27 @@ final class TeamApi(cached: Cached,
   def create(setup: TeamSetup, me: User): Option[Fu[Team]] =
     me.canTeam option {
       val s = setup.trim
-      val team = Team.make(name = s.name,
-                           location = s.location,
-                           description = s.description,
-                           open = s.isOpen,
-                           createdBy = me)
+      val team = Team.make(
+        name = s.name,
+        location = s.location,
+        description = s.description,
+        open = s.isOpen,
+        createdBy = me)
       $insert(team) >> MemberRepo.add(team.id, me.id) >>- {
         (cached.teamIdsCache invalidate me.id)
         (forum ! MakeTeam(team.id, team.name))
         (indexer ! InsertTeam(team))
         (timeline ! Propagate(
-                TeamCreate(me.id, team.id)
-            ).toFollowersOf(me.id))
+          TeamCreate(me.id, team.id)
+        ).toFollowersOf(me.id))
       } inject team
     }
 
   def update(team: Team, edit: TeamEdit, me: User): Funit = edit.trim |> { e =>
-    team.copy(location = e.location,
-              description = e.description,
-              open = e.isOpen) |> { team =>
+    team.copy(
+      location = e.location,
+      description = e.description,
+      open = e.isOpen) |> { team =>
       $update(team) >>- (indexer ! InsertTeam(team))
     }
   }
@@ -80,7 +83,7 @@ final class TeamApi(cached: Cached,
       result ← ~(teamOption |@| ctx.me.filter(_.canTeam))({
         case (team, user) if team.open =>
           (doJoin(team, user.id) inject Joined(team).some): Fu[
-              Option[Requesting]]
+            Option[Requesting]]
         case (team, user) =>
           fuccess(Motivate(team).some: Option[Requesting])
       })
@@ -97,7 +100,7 @@ final class TeamApi(cached: Cached,
       _ -> belongsTo(team.id, user.id)
     } map {
       case (false, false) => true
-      case _ => false
+      case _              => false
     }
 
   def createRequest(team: Team, setup: RequestSetup, user: User): Funit =
@@ -118,7 +121,7 @@ final class TeamApi(cached: Cached,
       _ ← userOption
         .filter(_ => accept)
         .??(user =>
-              doJoin(team, user.id) >>- notifier.acceptRequest(team, request))
+          doJoin(team, user.id) >>- notifier.acceptRequest(team, request))
     } yield ()
 
   def doJoin(team: Team, userId: String): Funit =
@@ -140,7 +143,7 @@ final class TeamApi(cached: Cached,
   def doQuit(team: Team, userId: String): Funit =
     belongsTo(team.id, userId) ?? {
       MemberRepo.remove(team.id, userId) >> TeamRepo.incMembers(team.id, -1) >>-
-      (cached.teamIdsCache invalidate userId)
+        (cached.teamIdsCache invalidate userId)
     }
 
   def quitAll(userId: String): Funit = MemberRepo.removeByUser(userId)
@@ -156,7 +159,7 @@ final class TeamApi(cached: Cached,
   // delete for ever, with members but not forums
   def delete(team: Team): Funit =
     $remove(team) >> MemberRepo.removeByteam(team.id) >>-
-    (indexer ! RemoveTeam(team.id))
+      (indexer ! RemoveTeam(team.id))
 
   def belongsTo(teamId: String, userId: String): Boolean =
     cached.teamIds(userId) contains teamId

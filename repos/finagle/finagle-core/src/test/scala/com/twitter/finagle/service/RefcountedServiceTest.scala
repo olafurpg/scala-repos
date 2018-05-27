@@ -22,7 +22,7 @@ class RefcountedServiceTest extends FunSuite with MockitoSugar {
   }
 
   test(
-      "PoolServiceWrapper should call release() immediately when no requests have been made") {
+    "PoolServiceWrapper should call release() immediately when no requests have been made") {
     val h = new PoolServiceWrapperHelper
     import h._
 
@@ -32,7 +32,7 @@ class RefcountedServiceTest extends FunSuite with MockitoSugar {
   }
 
   test(
-      "PoolServiceWrapper should call release() after pending request finishes") {
+    "PoolServiceWrapper should call release() after pending request finishes") {
     val h = new PoolServiceWrapperHelper
     import h._
 

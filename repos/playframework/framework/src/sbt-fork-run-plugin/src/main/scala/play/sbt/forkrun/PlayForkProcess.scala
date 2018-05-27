@@ -5,18 +5,23 @@ package play.sbt.forkrun
 
 import sbt._
 import java.io.File
-import java.lang.{Process => JProcess, ProcessBuilder => JProcessBuilder, Runtime => JRuntime}
+import java.lang.{
+  Process => JProcess,
+  ProcessBuilder => JProcessBuilder,
+  Runtime => JRuntime
+}
 import java.util.concurrent.CountDownLatch
 import scala.concurrent.duration.FiniteDuration
 
-case class PlayForkOptions(workingDirectory: File,
-                           jvmOptions: Seq[String],
-                           classpath: Seq[File],
-                           baseDirectory: File,
-                           configKey: String,
-                           logLevel: Level.Value,
-                           logSbtEvents: Boolean,
-                           shutdownTimeout: FiniteDuration)
+case class PlayForkOptions(
+    workingDirectory: File,
+    jvmOptions: Seq[String],
+    classpath: Seq[File],
+    baseDirectory: File,
+    configKey: String,
+    logLevel: Level.Value,
+    logSbtEvents: Boolean,
+    shutdownTimeout: FiniteDuration)
 
 /**
   * This differs from sbt's fork run mainly in the way that the process is stopped.
@@ -29,30 +34,32 @@ case class PlayForkOptions(workingDirectory: File,
 object PlayForkProcess {
   def apply(options: PlayForkOptions, args: Seq[String], log: Logger): Unit = {
     val logProperties = Seq(
-        "-Dfork.run.log.level=" + options.logLevel.toString,
-        "-Dfork.run.log.events=" + options.logSbtEvents)
+      "-Dfork.run.log.level=" + options.logLevel.toString,
+      "-Dfork.run.log.events=" + options.logSbtEvents)
     val jvmOptions = options.jvmOptions ++ logProperties
     val arguments =
       Seq(options.baseDirectory.getAbsolutePath, options.configKey) ++ args
-    run(options.workingDirectory,
-        jvmOptions,
-        options.classpath,
-        "play.forkrun.ForkRun",
-        arguments,
-        log,
-        options.shutdownTimeout)
+    run(
+      options.workingDirectory,
+      jvmOptions,
+      options.classpath,
+      "play.forkrun.ForkRun",
+      arguments,
+      log,
+      options.shutdownTimeout)
   }
 
-  def run(workingDirectory: File,
-          jvmOptions: Seq[String],
-          classpath: Seq[File],
-          mainClass: String,
-          arguments: Seq[String],
-          log: Logger,
-          shutdownTimeout: FiniteDuration): Unit = {
+  def run(
+      workingDirectory: File,
+      jvmOptions: Seq[String],
+      classpath: Seq[File],
+      mainClass: String,
+      arguments: Seq[String],
+      log: Logger,
+      shutdownTimeout: FiniteDuration): Unit = {
     val java = (file(sys.props("java.home")) / "bin" / "java").absolutePath
-    val (classpathEnv, options) = makeOptions(
-        jvmOptions, classpath, mainClass, arguments)
+    val (classpathEnv, options) =
+      makeOptions(jvmOptions, classpath, mainClass, arguments)
     val command = (java +: options).toArray
     val builder = new JProcessBuilder(command: _*)
     builder.directory(workingDirectory)
@@ -75,22 +82,26 @@ object PlayForkProcess {
       timedWaitFor(process, shutdownTimeout.toMillis) match {
         case None =>
           log.info(
-              "Forked Play process did not exit on its own, terminating it")
+            "Forked Play process did not exit on its own, terminating it")
           // fire-and-forget sigterm, may or may not work
           process.destroy()
         case Some(x) =>
           log.info(s"Forked Play process exited with status: $x")
       }
       // now join our logging threads (process is supposed to be gone, so nothing to log)
-      try process.getInputStream.close() catch { case _: Exception => }
-      try process.getErrorStream.close() catch { case _: Exception => }
+      try process.getInputStream.close()
+      catch { case _: Exception => }
+      try process.getErrorStream.close()
+      catch { case _: Exception => }
       outputThread.join()
       errorThread.join()
     }
     val shutdownHook = newThread { stop() }
     JRuntime.getRuntime.addShutdownHook(shutdownHook)
-    try process.waitFor() catch { case _: InterruptedException => stop() }
-    try JRuntime.getRuntime.removeShutdownHook(shutdownHook) catch {
+    try process.waitFor()
+    catch { case _: InterruptedException => stop() }
+    try JRuntime.getRuntime.removeShutdownHook(shutdownHook)
+    catch {
       case _: IllegalStateException =>
     } // thrown when already shutting down
   }
@@ -106,10 +117,11 @@ object PlayForkProcess {
         else None
     }
 
-  def makeOptions(jvmOptions: Seq[String],
-                  classpath: Seq[File],
-                  mainClass: String,
-                  arguments: Seq[String]): (Option[String], Seq[String]) = {
+  def makeOptions(
+      jvmOptions: Seq[String],
+      classpath: Seq[File],
+      mainClass: String,
+      arguments: Seq[String]): (Option[String], Seq[String]) = {
     val classpathOption = Path.makeString(classpath)
     val options =
       jvmOptions ++ Seq("-classpath", classpathOption, mainClass) ++ arguments

@@ -4,8 +4,10 @@ import scala.collection.mutable._
 import scala.collection.generic._
 
 class RingBuffer[A](m: Int)
-    extends Buffer[A] with GenericTraversableTemplate[A, RingBuffer]
-    with BufferLike[A, RingBuffer[A]] with Builder[A, List[A]] {
+    extends Buffer[A]
+    with GenericTraversableTemplate[A, RingBuffer]
+    with BufferLike[A, RingBuffer[A]]
+    with Builder[A, List[A]] {
   private val buf = new ListBuffer[A]
 
   private def resize(): Unit = while (buf.size > m) buf.remove(0)

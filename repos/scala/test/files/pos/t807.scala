@@ -36,7 +36,7 @@ trait IfElseMatcher extends BraceMatcher {
     object ifLink extends IfLink;
     object openParen extends parenPair.OpenLink;
     override def link(b: Boolean): Link = b match {
-      case true => ifLink;
+      case true  => ifLink;
       case false => openParen;
     }
   }

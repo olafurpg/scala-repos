@@ -22,7 +22,9 @@ import Stages._
 case class RequestLine(method: String, resource: String, version: String)
 case class HeaderLine(name: String, value: String)
 case class HttpRequest(
-    request: RequestLine, headers: List[HeaderLine], body: Array[Byte])
+    request: RequestLine,
+    headers: List[HeaderLine],
+    body: Array[Byte])
 
 object HttpRequest {
   def codec(bytesReadCounter: Int => Unit, bytesWrittenCounter: Int => Unit) =
@@ -44,9 +46,12 @@ object HttpRequest {
     readLine(true, "UTF-8") { line =>
       if (line == "") {
         // end of headers
-        val contentLength = headers.find { _.name == "content-length" }.map {
-          _.value.toInt
-        }.getOrElse(0)
+        val contentLength = headers
+          .find { _.name == "content-length" }
+          .map {
+            _.value.toInt
+          }
+          .getOrElse(0)
         readBytes(contentLength) { data =>
           emit(HttpRequest(requestLine, headers.reverse, data))
         }

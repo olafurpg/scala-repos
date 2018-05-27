@@ -13,7 +13,7 @@ import MemberStatus._
   * and roles.
   */
 @SerialVersionUID(1L)
-class Member private[cluster](
+class Member private[cluster] (
     val uniqueAddress: UniqueAddress,
     private[cluster] val upNumber: Int, // INTERNAL API
     val status: MemberStatus,
@@ -52,8 +52,9 @@ class Member private[cluster](
     val oldStatus = this.status
     if (status == oldStatus) this
     else {
-      require(allowedTransitions(oldStatus)(status),
-              s"Invalid member status transition [ ${this} -> ${status}]")
+      require(
+        allowedTransitions(oldStatus)(status),
+        s"Invalid member status transition [ ${this} -> ${status}]")
       new Member(uniqueAddress, upNumber, status, roles)
     }
   }
@@ -75,7 +76,8 @@ object Member {
     * Create a new member with status Joining.
     */
   private[cluster] def apply(
-      uniqueAddress: UniqueAddress, roles: Set[String]): Member =
+      uniqueAddress: UniqueAddress,
+      roles: Set[String]): Member =
     new Member(uniqueAddress, Int.MaxValue, Joining, roles)
 
   /**
@@ -244,14 +246,17 @@ object MemberStatus {
   /**
     * INTERNAL API
     */
-  private[cluster] val allowedTransitions: Map[MemberStatus, Set[MemberStatus]] =
-    Map(Joining -> Set(WeaklyUp, Up, Down, Removed),
-        WeaklyUp -> Set(Up, Down, Removed),
-        Up -> Set(Leaving, Down, Removed),
-        Leaving -> Set(Exiting, Down, Removed),
-        Down -> Set(Removed),
-        Exiting -> Set(Removed, Down),
-        Removed -> Set.empty[MemberStatus])
+  private[cluster] val allowedTransitions
+    : Map[MemberStatus, Set[MemberStatus]] =
+    Map(
+      Joining -> Set(WeaklyUp, Up, Down, Removed),
+      WeaklyUp -> Set(Up, Down, Removed),
+      Up -> Set(Leaving, Down, Removed),
+      Leaving -> Set(Exiting, Down, Removed),
+      Down -> Set(Removed),
+      Exiting -> Set(Removed, Down),
+      Removed -> Set.empty[MemberStatus]
+    )
 }
 
 /**

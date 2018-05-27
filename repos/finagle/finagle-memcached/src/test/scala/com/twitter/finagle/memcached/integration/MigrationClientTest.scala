@@ -2,7 +2,11 @@ package com.twitter.finagle.memcached.integration
 
 import com.twitter.common.io.FileUtils._
 import com.twitter.common.quantity.{Amount, Time}
-import com.twitter.common.zookeeper.{ServerSets, ZooKeeperClient, ZooKeeperUtils}
+import com.twitter.common.zookeeper.{
+  ServerSets,
+  ZooKeeperClient,
+  ZooKeeperUtils
+}
 import com.twitter.conversions.time._
 import com.twitter.finagle.Memcached
 import com.twitter.finagle.cacheresolver.CachePoolConfig
@@ -22,8 +26,11 @@ import org.scalatest.{BeforeAndAfter, BeforeAndAfterEach, FunSuite}
 
 @RunWith(classOf[JUnitRunner])
 class MigrationClientTest
-    extends FunSuite with BeforeAndAfterEach with BeforeAndAfter
-    with Eventually with IntegrationPatience {
+    extends FunSuite
+    with BeforeAndAfterEach
+    with BeforeAndAfter
+    with Eventually
+    with IntegrationPatience {
 
   /**
     * Note: This integration test requires a real Memcached server to run.
@@ -45,21 +52,22 @@ class MigrationClientTest
     val loopback = InetAddress.getLoopbackAddress
 
     // start zookeeper server and create zookeeper client
-    zookeeperServer = new ZooKeeperServer(createTempDir(),
-                                          createTempDir(),
-                                          ZooKeeperServer.DEFAULT_TICK_TIME)
+    zookeeperServer = new ZooKeeperServer(
+      createTempDir(),
+      createTempDir(),
+      ZooKeeperServer.DEFAULT_TICK_TIME)
     connectionFactory = ServerCnxnFactory(loopback)
     connectionFactory.startup(zookeeperServer)
     zookeeperServerPort = zookeeperServer.getClientPort
 
     zookeeperClient = new ZooKeeperClient(
-        Amount.of(10, Time.MILLISECONDS),
-        new InetSocketAddress(loopback, zookeeperServerPort))
+      Amount.of(10, Time.MILLISECONDS),
+      new InetSocketAddress(loopback, zookeeperServerPort))
 
     // set-up old pool
     val oldPoolCluster = new ZookeeperServerSetCluster(
-        ServerSets.create(
-            zookeeperClient, ZooKeeperUtils.OPEN_ACL_UNSAFE, oldPoolPath))
+      ServerSets
+        .create(zookeeperClient, ZooKeeperUtils.OPEN_ACL_UNSAFE, oldPoolPath))
     (0 to 1) foreach { _ =>
       TestMemcachedServer.start() match {
         case Some(server) =>
@@ -71,8 +79,8 @@ class MigrationClientTest
 
     // set-up new pool
     val newPoolCluster = new ZookeeperServerSetCluster(
-        ServerSets.create(
-            zookeeperClient, ZooKeeperUtils.OPEN_ACL_UNSAFE, newPoolPath))
+      ServerSets
+        .create(zookeeperClient, ZooKeeperUtils.OPEN_ACL_UNSAFE, newPoolPath))
     (0 to 1) foreach { _ =>
       TestMemcachedServer.start() match {
         case Some(server) =>
@@ -84,7 +92,7 @@ class MigrationClientTest
 
     // set config data
     val cachePoolConfig: CachePoolConfig = new CachePoolConfig(
-        cachePoolSize = 2)
+      cachePoolSize = 2)
     val output: ByteArrayOutputStream = new ByteArrayOutputStream
     CachePoolConfig.jsonCodec.serialize(cachePoolConfig, output)
     zookeeperClient.get().setData(oldPoolPath, output.toByteArray, -1)
@@ -111,14 +119,18 @@ class MigrationClientTest
   if (!sys.props.contains("SKIP_FLAKY")) // CSL-1719
     test("not migrating yet") {
       val client1 =
-        Memcached.client.newRichClient(dest = "twcache!localhost:" +
-              zookeeperServerPort + "!" + oldPoolPath)
+        Memcached.client.newRichClient(
+          dest = "twcache!localhost:" +
+            zookeeperServerPort + "!" + oldPoolPath)
       val client2 =
-        Memcached.client.newRichClient(dest = "twcache!localhost:" +
-              zookeeperServerPort + "!" + newPoolPath)
+        Memcached.client.newRichClient(
+          dest = "twcache!localhost:" +
+            zookeeperServerPort + "!" + newPoolPath)
       val migrationClient = MigrationClient.newMigrationClient(
-          "localhost:" + zookeeperServerPort, basePath)
-      migrationClient.loadZKData() // force loading the config to fully set-up the client
+        "localhost:" + zookeeperServerPort,
+        basePath)
+      migrationClient
+        .loadZKData() // force loading the config to fully set-up the client
 
       eventually { Await.result(migrationClient.get("test")) }
 
@@ -141,28 +153,34 @@ class MigrationClientTest
       zookeeperClient.get().setData(basePath, migrationDataArray, -1)
 
       val client1 =
-        Memcached.client.newRichClient(dest = "twcache!localhost:" +
-              zookeeperServerPort + "!" + oldPoolPath)
+        Memcached.client.newRichClient(
+          dest = "twcache!localhost:" +
+            zookeeperServerPort + "!" + oldPoolPath)
       val client2 =
-        Memcached.client.newRichClient(dest = "twcache!localhost:" +
-              zookeeperServerPort + "!" + newPoolPath)
+        Memcached.client.newRichClient(
+          dest = "twcache!localhost:" +
+            zookeeperServerPort + "!" + newPoolPath)
       val migrationClient = MigrationClient.newMigrationClient(
-          "localhost:" + zookeeperServerPort, basePath)
-      migrationClient.loadZKData() // force loading the config to fully set-up the client
+        "localhost:" + zookeeperServerPort,
+        basePath)
+      migrationClient
+        .loadZKData() // force loading the config to fully set-up the client
 
       eventually { Await.result(migrationClient.get("test")) }
 
       assert(Await.result(migrationClient.get("foo"), TIMEOUT) == None)
       Await.result(migrationClient.set("foo", Buf.Utf8("bar")), TIMEOUT)
 
-      assert(Await.result(migrationClient.get("foo"), TIMEOUT).get == Buf.Utf8(
-              "bar"))
+      assert(
+        Await.result(migrationClient.get("foo"), TIMEOUT).get == Buf.Utf8(
+          "bar"))
 
       assert(Await.result(client1.get("foo"), TIMEOUT).get == Buf.Utf8("bar"))
       eventually {
         assert(
-            Await.result(client2.get("foo")).map { case Buf.Utf8(s) => s } == Some(
-                "bar"))
+          Await
+            .result(client2.get("foo"))
+            .map { case Buf.Utf8(s) => s } == Some("bar"))
       }
     }
   }
@@ -176,14 +194,18 @@ class MigrationClientTest
       zookeeperClient.get().setData(basePath, migrationDataArray, -1)
 
       val client1 =
-        Memcached.client.newRichClient(dest = "twcache!localhost:" +
-              zookeeperServerPort + "!" + oldPoolPath)
+        Memcached.client.newRichClient(
+          dest = "twcache!localhost:" +
+            zookeeperServerPort + "!" + oldPoolPath)
       val client2 =
-        Memcached.client.newRichClient(dest = "twcache!localhost:" +
-              zookeeperServerPort + "!" + newPoolPath)
+        Memcached.client.newRichClient(
+          dest = "twcache!localhost:" +
+            zookeeperServerPort + "!" + newPoolPath)
       val migrationClient = MigrationClient.newMigrationClient(
-          "localhost:" + zookeeperServerPort, basePath)
-      migrationClient.loadZKData() // force loading the config to fully set-up the client
+        "localhost:" + zookeeperServerPort,
+        basePath)
+      migrationClient
+        .loadZKData() // force loading the config to fully set-up the client
 
       eventually { Await.result(migrationClient.get("test")) }
 
@@ -200,8 +222,9 @@ class MigrationClientTest
       assert(cl1Res == "bar")
       eventually {
         assert(
-            Await.result(client2.get("foo")).map { case Buf.Utf8(s) => s } == Some(
-                "bar"))
+          Await
+            .result(client2.get("foo"))
+            .map { case Buf.Utf8(s) => s } == Some("bar"))
       }
     }
 
@@ -214,14 +237,18 @@ class MigrationClientTest
       zookeeperClient.get().setData(basePath, migrationDataArray, -1)
 
       val client1 =
-        Memcached.client.newRichClient(dest = "twcache!localhost:" +
-              zookeeperServerPort + "!" + oldPoolPath)
+        Memcached.client.newRichClient(
+          dest = "twcache!localhost:" +
+            zookeeperServerPort + "!" + oldPoolPath)
       val client2 =
-        Memcached.client.newRichClient(dest = "twcache!localhost:" +
-              zookeeperServerPort + "!" + newPoolPath)
+        Memcached.client.newRichClient(
+          dest = "twcache!localhost:" +
+            zookeeperServerPort + "!" + newPoolPath)
       val migrationClient = MigrationClient.newMigrationClient(
-          "localhost:" + zookeeperServerPort, basePath)
-      migrationClient.loadZKData() // force loading the config to fully set-up the client
+        "localhost:" + zookeeperServerPort,
+        basePath)
+      migrationClient
+        .loadZKData() // force loading the config to fully set-up the client
 
       eventually { Await.result(migrationClient.get("test")) }
 
@@ -248,14 +275,18 @@ class MigrationClientTest
       zookeeperClient.get().setData(basePath, migrationDataArray, -1)
 
       val client1 =
-        Memcached.client.newRichClient(dest = "twcache!localhost:" +
-              zookeeperServerPort + "!" + oldPoolPath)
+        Memcached.client.newRichClient(
+          dest = "twcache!localhost:" +
+            zookeeperServerPort + "!" + oldPoolPath)
       val client2 =
-        Memcached.client.newRichClient(dest = "twcache!localhost:" +
-              zookeeperServerPort + "!" + newPoolPath)
+        Memcached.client.newRichClient(
+          dest = "twcache!localhost:" +
+            zookeeperServerPort + "!" + newPoolPath)
       val migrationClient = MigrationClient.newMigrationClient(
-          "localhost:" + zookeeperServerPort, basePath)
-      migrationClient.loadZKData() // force loading the config to fully set-up the client
+        "localhost:" + zookeeperServerPort,
+        basePath)
+      migrationClient
+        .loadZKData() // force loading the config to fully set-up the client
 
       eventually { Await.result(migrationClient.get("test")) }
 
@@ -272,8 +303,9 @@ class MigrationClientTest
       assert(res3 == "bar")
       eventually {
         assert(
-            Await.result(client2.get("foo")).map { case Buf.Utf8(s) => s } == Some(
-                "bar"))
+          Await
+            .result(client2.get("foo"))
+            .map { case Buf.Utf8(s) => s } == Some("bar"))
       }
     }
 }

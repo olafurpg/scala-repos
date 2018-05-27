@@ -23,42 +23,41 @@ import JsonDSL._
 
 object JodaTimeSerializers {
   def all =
-    List(DurationSerializer,
-         InstantSerializer,
-         DateTimeSerializer,
-         DateMidnightSerializer,
-         IntervalSerializer(),
-         LocalDateSerializer(),
-         LocalTimeSerializer(),
-         PeriodSerializer)
+    List(
+      DurationSerializer,
+      InstantSerializer,
+      DateTimeSerializer,
+      DateMidnightSerializer,
+      IntervalSerializer(),
+      LocalDateSerializer(),
+      LocalTimeSerializer(),
+      PeriodSerializer
+    )
 }
 
 case object PeriodSerializer
-    extends CustomSerializer[Period](
-        format =>
-          ({
+    extends CustomSerializer[Period](format =>
+      ({
         case JString(p) => new Period(p)
-        case JNull => null
+        case JNull      => null
       }, {
         case p: Period => JString(p.toString)
       }))
 
 case object DurationSerializer
-    extends CustomSerializer[Duration](
-        format =>
-          ({
+    extends CustomSerializer[Duration](format =>
+      ({
         case JInt(d) => new Duration(d.longValue)
-        case JNull => null
+        case JNull   => null
       }, {
         case d: Duration => JInt(d.getMillis)
       }))
 
 case object InstantSerializer
-    extends CustomSerializer[Instant](
-        format =>
-          ({
+    extends CustomSerializer[Instant](format =>
+      ({
         case JInt(i) => new Instant(i.longValue)
-        case JNull => null
+        case JNull   => null
       }, {
         case i: Instant => JInt(i.getMillis)
       }))
@@ -72,21 +71,19 @@ object DateParser {
 }
 
 case object DateTimeSerializer
-    extends CustomSerializer[DateTime](
-        format =>
-          ({
+    extends CustomSerializer[DateTime](format =>
+      ({
         case JString(s) => new DateTime(DateParser.parse(s, format))
-        case JNull => null
+        case JNull      => null
       }, {
         case d: DateTime => JString(format.dateFormat.format(d.toDate))
       }))
 
 case object DateMidnightSerializer
-    extends CustomSerializer[DateMidnight](
-        format =>
-          ({
+    extends CustomSerializer[DateMidnight](format =>
+      ({
         case JString(s) => new DateMidnight(DateParser.parse(s, format))
-        case JNull => null
+        case JNull      => null
       }, {
         case d: DateMidnight => JString(format.dateFormat.format(d.toDate))
       }))
@@ -94,8 +91,7 @@ case object DateMidnightSerializer
 private[ext] case class _Interval(start: Long, end: Long)
 object IntervalSerializer {
   def apply() =
-    new ClassSerializer(
-        new ClassType[Interval, _Interval]() {
+    new ClassSerializer(new ClassType[Interval, _Interval]() {
       def unwrap(i: _Interval)(implicit format: Formats) =
         new Interval(i.start, i.end)
       def wrap(i: Interval)(implicit format: Formats) =
@@ -106,8 +102,7 @@ object IntervalSerializer {
 private[ext] case class _LocalDate(year: Int, month: Int, day: Int)
 object LocalDateSerializer {
   def apply() =
-    new ClassSerializer(
-        new ClassType[LocalDate, _LocalDate]() {
+    new ClassSerializer(new ClassType[LocalDate, _LocalDate]() {
       def unwrap(d: _LocalDate)(implicit format: Formats) =
         new LocalDate(d.year, d.month, d.day)
       def wrap(d: LocalDate)(implicit format: Formats) =
@@ -116,17 +111,21 @@ object LocalDateSerializer {
 }
 
 private[ext] case class _LocalTime(
-    hour: Int, minute: Int, second: Int, millis: Int)
+    hour: Int,
+    minute: Int,
+    second: Int,
+    millis: Int)
 object LocalTimeSerializer {
   def apply() =
     new ClassSerializer(new ClassType[LocalTime, _LocalTime]() {
       def unwrap(t: _LocalTime)(implicit format: Formats) =
         new LocalTime(t.hour, t.minute, t.second, t.millis)
       def wrap(t: LocalTime)(implicit format: Formats) =
-        _LocalTime(t.getHourOfDay,
-                   t.getMinuteOfHour,
-                   t.getSecondOfMinute,
-                   t.getMillisOfSecond)
+        _LocalTime(
+          t.getHourOfDay,
+          t.getMinuteOfHour,
+          t.getSecondOfMinute,
+          t.getMillisOfSecond)
     })
 }
 
@@ -135,7 +134,7 @@ private[ext] trait ClassType[A, B] {
   def wrap(a: A)(implicit format: Formats): B
 }
 
-case class ClassSerializer[A : Manifest, B : Manifest](t: ClassType[A, B])
+case class ClassSerializer[A: Manifest, B: Manifest](t: ClassType[A, B])
     extends Serializer[A] {
   private val Class = implicitly[Manifest[A]].runtimeClass
 

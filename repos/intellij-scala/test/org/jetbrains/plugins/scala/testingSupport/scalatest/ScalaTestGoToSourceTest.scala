@@ -23,10 +23,11 @@ trait ScalaTestGoToSourceTest extends ScalaTestTestCase {
   def getFailedLocationLine: Int
 
   private def addGoToSourceTest(testName: String) =
-    addFileToProject(testName + ".scala",
-                     "import org.scalatest._\n\n" + "class " + testName +
-                     " extends FlatSpec with GivenWhenThen {" +
-                     """
+    addFileToProject(
+      testName + ".scala",
+      "import org.scalatest._\n\n" + "class " + testName +
+        " extends FlatSpec with GivenWhenThen {" +
+        """
           | "Successful test" should "run fine" in {
           | }
           |
@@ -42,19 +43,20 @@ trait ScalaTestGoToSourceTest extends ScalaTestTestCase {
           | }
           |}
           |
-        """.stripMargin)
+        """.stripMargin
+    )
 
   def testGoToSuccessfulLocation(): Unit = {
     val testName = "SuccessfulGoToLocationTest"
     addGoToSourceTest(testName)
 
     runGoToSourceTest(
-        3,
-        5,
-        testName + ".scala",
-        checkConfigAndSettings(_, testName, "Successful test should run fine"),
-        getSuccessfulTestPath,
-        getSuccessfulLocationLine)
+      3,
+      5,
+      testName + ".scala",
+      checkConfigAndSettings(_, testName, "Successful test should run fine"),
+      getSuccessfulTestPath,
+      getSuccessfulLocationLine)
   }
 
   def testGoToPendingLocation(): Unit = {
@@ -62,12 +64,12 @@ trait ScalaTestGoToSourceTest extends ScalaTestTestCase {
     addGoToSourceTest(testName)
 
     runGoToSourceTest(
-        6,
-        5,
-        testName + ".scala",
-        checkConfigAndSettings(_, testName, "pending test should be pending"),
-        getPendingTestPath,
-        getPendingLocationLine)
+      6,
+      5,
+      testName + ".scala",
+      checkConfigAndSettings(_, testName, "pending test should be pending"),
+      getPendingTestPath,
+      getPendingLocationLine)
   }
 
   def testGoToIgnoredLocation(): Unit = {
@@ -76,13 +78,15 @@ trait ScalaTestGoToSourceTest extends ScalaTestTestCase {
 
     //since finders API ignored ignored tests and provides neighbours for the same scope instead of ignored test poitned to
     //we run all the tests
-    runGoToSourceTest(2,
-                      5,
-                      testName + ".scala",
-                      checkConfigAndSettings(_, testName),
-                      //notice that runConfig test name and testTree test name differ by !!! IGNORED !!! suffix
-                      getIgnoredTestPath,
-                      getIgnoredLocationLine)
+    runGoToSourceTest(
+      2,
+      5,
+      testName + ".scala",
+      checkConfigAndSettings(_, testName),
+      //notice that runConfig test name and testTree test name differ by !!! IGNORED !!! suffix
+      getIgnoredTestPath,
+      getIgnoredLocationLine
+    )
   }
 
   def testGoToFailedTest(): Unit = {
@@ -90,11 +94,11 @@ trait ScalaTestGoToSourceTest extends ScalaTestTestCase {
     addGoToSourceTest(testName)
 
     runGoToSourceTest(
-        13,
-        5,
-        testName + ".scala",
-        checkConfigAndSettings(_, testName, "failed test should fail"),
-        getFailedTestPath,
-        getFailedLocationLine)
+      13,
+      5,
+      testName + ".scala",
+      checkConfigAndSettings(_, testName, "failed test should fail"),
+      getFailedTestPath,
+      getFailedLocationLine)
   }
 }

@@ -16,8 +16,14 @@ import scala.concurrent.duration._
   * Boilerplate remover and preferred testing style in ENSIME.
   */
 trait EnsimeSpec
-    extends FlatSpec with Matchers with Inside with Retries with Eventually
-    with TryValues with Inspectors with TypeCheckedTripleEquals {
+    extends FlatSpec
+    with Matchers
+    with Inside
+    with Retries
+    with Eventually
+    with TryValues
+    with Inspectors
+    with TypeCheckedTripleEquals {
 
   SLF4JBridgeHandler.removeHandlersForRootLogger()
   SLF4JBridgeHandler.install()
@@ -30,8 +36,8 @@ trait EnsimeSpec
   override val spanScaleFactor: Double =
     ConfigFactory.load().getDouble("akka.test.timefactor")
   implicit override val patienceConfig = PatienceConfig(
-      timeout = scaled(akkaTimeout),
-      interval = scaled(Span(5, Millis))
+    timeout = scaled(akkaTimeout),
+    interval = scaled(Span(5, Millis))
   )
 
   // taggedAs(org.scalatest.tagobject.Retryable)

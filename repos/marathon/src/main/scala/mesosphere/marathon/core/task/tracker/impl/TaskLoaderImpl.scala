@@ -10,8 +10,7 @@ import scala.concurrent.Future
 /**
   * Loads all task data into an [[TaskTracker.TasksByApp]] from a [[TaskRepository]].
   */
-private[tracker] class TaskLoaderImpl(repo: TaskRepository)
-    extends TaskLoader {
+private[tracker] class TaskLoaderImpl(repo: TaskRepository) extends TaskLoader {
   import scala.concurrent.ExecutionContext.Implicits.global
 
   private[this] val log = LoggerFactory.getLogger(getClass.getName)

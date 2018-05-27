@@ -15,7 +15,8 @@ import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.HttpEncodings
 
 class Deflate(val messageFilter: HttpMessage ⇒ Boolean)
-    extends Coder with StreamDecoder {
+    extends Coder
+    with StreamDecoder {
   val encoding = HttpEncodings.deflate
   def newCompressor = new DeflateCompressor
   def newDecompressorStage(maxBytesPerChunk: Int) =
@@ -44,7 +45,8 @@ class DeflateCompressor extends Compressor {
   override final def finish(): ByteString = finishWithBuffer(newTempBuffer())
 
   protected def compressWithBuffer(
-      input: ByteString, buffer: Array[Byte]): ByteString = {
+      input: ByteString,
+      buffer: Array[Byte]): ByteString = {
     require(deflater.needsInput())
     deflater.setInput(input.toArray)
     drainDeflater(deflater, buffer)
@@ -107,7 +109,9 @@ class DeflateDecompressor(
 
     override def afterInflate = inflateState
     override def afterBytesRead(
-        buffer: Array[Byte], offset: Int, length: Int): Unit = {}
+        buffer: Array[Byte],
+        offset: Int,
+        length: Int): Unit = {}
 
     startWith(inflateState)
   }
@@ -138,9 +142,10 @@ abstract class DeflateDecompressorBase(
         if (read > 0) {
           afterBytesRead(buffer, 0, read)
           val next = if (inflater.finished()) afterInflate else this
-          ParseResult(Some(ByteString.fromArray(buffer, 0, read)),
-                      next,
-                      noPostProcessing)
+          ParseResult(
+            Some(ByteString.fromArray(buffer, 0, read)),
+            next,
+            noPostProcessing)
         } else {
           if (inflater.finished())
             ParseResult(None, afterInflate, noPostProcessing)

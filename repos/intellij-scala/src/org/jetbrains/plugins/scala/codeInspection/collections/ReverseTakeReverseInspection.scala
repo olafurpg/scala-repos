@@ -19,9 +19,9 @@ object ReverseTakeReverse extends SimplificationType {
     expr match {
       case qual `.reverse` () `.take` (n) `.reverse` () =>
         Some(
-            replace(expr)
-              .withText(invocationText(qual, "takeRight", n))
-              .highlightFrom(qual))
+          replace(expr)
+            .withText(invocationText(qual, "takeRight", n))
+            .highlightFrom(qual))
       case _ => None
     }
 }

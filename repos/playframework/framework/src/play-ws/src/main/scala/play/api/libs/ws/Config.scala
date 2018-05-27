@@ -15,21 +15,23 @@ import scala.concurrent.duration._
 /**
   * WS client config
   */
-case class WSClientConfig(connectionTimeout: Duration = 2.minutes,
-                          idleTimeout: Duration = 2.minutes,
-                          requestTimeout: Duration = 2.minutes,
-                          followRedirects: Boolean = true,
-                          useProxyProperties: Boolean = true,
-                          userAgent: Option[String] = None,
-                          compressionEnabled: Boolean = false,
-                          ssl: SSLConfig = SSLConfig())
+case class WSClientConfig(
+    connectionTimeout: Duration = 2.minutes,
+    idleTimeout: Duration = 2.minutes,
+    requestTimeout: Duration = 2.minutes,
+    followRedirects: Boolean = true,
+    useProxyProperties: Boolean = true,
+    userAgent: Option[String] = None,
+    compressionEnabled: Boolean = false,
+    ssl: SSLConfig = SSLConfig())
 
 /**
   * This class creates a DefaultWSClientConfig object from the play.api.Configuration.
   */
 @Singleton
 class WSConfigParser @Inject()(
-    configuration: Configuration, environment: Environment)
+    configuration: Configuration,
+    environment: Environment)
     extends Provider[WSClientConfig] {
 
   def get = parse()
@@ -51,15 +53,18 @@ class WSConfigParser @Inject()(
     val compressionEnabled = config.get[Boolean]("compressionEnabled")
 
     val sslConfig = new SSLConfigParser(
-        config.get[PlayConfig]("ssl"), environment.classLoader).parse()
+      config.get[PlayConfig]("ssl"),
+      environment.classLoader).parse()
 
-    WSClientConfig(connectionTimeout = connectionTimeout,
-                   idleTimeout = idleTimeout,
-                   requestTimeout = requestTimeout,
-                   followRedirects = followRedirects,
-                   useProxyProperties = useProxyProperties,
-                   userAgent = userAgent,
-                   compressionEnabled = compressionEnabled,
-                   ssl = sslConfig)
+    WSClientConfig(
+      connectionTimeout = connectionTimeout,
+      idleTimeout = idleTimeout,
+      requestTimeout = requestTimeout,
+      followRedirects = followRedirects,
+      useProxyProperties = useProxyProperties,
+      userAgent = userAgent,
+      compressionEnabled = compressionEnabled,
+      ssl = sslConfig
+    )
   }
 }

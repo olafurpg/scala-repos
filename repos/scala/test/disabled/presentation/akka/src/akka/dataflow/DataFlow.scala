@@ -49,11 +49,10 @@ object DataFlow {
   def thread[A <: AnyRef, R <: AnyRef](body: Function[A, R]) =
     actorOf(new ReactiveEventBasedThread(body.apply)).start()
 
-  private class ReactiveEventBasedThread[A <: AnyRef, T <: AnyRef](
-      body: A => T)
+  private class ReactiveEventBasedThread[A <: AnyRef, T <: AnyRef](body: A => T)
       extends Actor {
     def receive = {
-      case Exit => self.stop()
+      case Exit    => self.stop()
       case message => self.reply(body(message.asInstanceOf[A]))
     }
   }
@@ -84,7 +83,7 @@ object DataFlow {
             while (dataFlow.blockedReaders.peek ne null) dataFlow.blockedReaders.poll ! s
           } else
             throw new DataFlowVariableException(
-                "Attempt to change data flow variable (from [" +
+              "Attempt to change data flow variable (from [" +
                 dataFlow.value.get + "] to [" + v + "])")
         case Exit => self.stop()
       }
@@ -97,10 +96,10 @@ object DataFlow {
         case Get =>
           dataFlow.value.get match {
             case Some(value) => self reply value
-            case None => readerFuture = self.senderFuture
+            case None        => readerFuture = self.senderFuture
           }
         case Set(v: T) => readerFuture.map(_ completeWithResult v)
-        case Exit => self.stop()
+        case Exit      => self.stop()
       }
     }
 
@@ -113,7 +112,7 @@ object DataFlow {
       if (this.value.get.isEmpty) in ! Set(ref())
       else
         throw new DataFlowVariableException(
-            "Attempt to change data flow variable (from [" + this.value.get +
+          "Attempt to change data flow variable (from [" + this.value.get +
             "] to [" + ref() + "])")
     }
 
@@ -130,7 +129,7 @@ object DataFlow {
       if (this.value.get.isEmpty) in ! Set(value)
       else
         throw new DataFlowVariableException(
-            "Attempt to change data flow variable (from [" + this.value.get +
+          "Attempt to change data flow variable (from [" + this.value.get +
             "] to [" + value + "])")
     }
 
@@ -163,8 +162,8 @@ object DataFlow {
         }
 
         result.getOrElse(
-            throw new DataFlowVariableException("Timed out (after " +
-                timeoutMs + " milliseconds) while waiting for result"))
+          throw new DataFlowVariableException("Timed out (after " +
+            timeoutMs + " milliseconds) while waiting for result"))
       }
     }
 

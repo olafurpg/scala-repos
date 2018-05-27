@@ -17,7 +17,8 @@ import ParserOutput._
   * INTERNAL API
   */
 private[http] class HttpResponseParser(
-    _settings: ParserSettings, _headerParser: HttpHeaderParser)
+    _settings: ParserSettings,
+    _headerParser: HttpHeaderParser)
     extends HttpMessageParser[ResponseOutput](_settings, _headerParser) {
   import HttpResponseParser._
   import HttpMessageParser._
@@ -81,7 +82,7 @@ private[http] class HttpResponseParser(
           else skipReason(idx + 1)
         else
           throw new ParsingException(
-              "Response reason phrase exceeds the configured limit of " +
+            "Response reason phrase exceeds the configured limit of " +
               maxResponseReasonLength + " characters")
       skipReason(startIdx)
     } else if (byteChar(input, cursor + 3) == '\r' &&
@@ -93,16 +94,17 @@ private[http] class HttpResponseParser(
   def handleInformationalResponses: Boolean = true
 
   // http://tools.ietf.org/html/rfc7230#section-3.3
-  def parseEntity(headers: List[HttpHeader],
-                  protocol: HttpProtocol,
-                  input: ByteString,
-                  bodyStart: Int,
-                  clh: Option[`Content-Length`],
-                  cth: Option[`Content-Type`],
-                  teh: Option[`Transfer-Encoding`],
-                  expect100continue: Boolean,
-                  hostHeaderPresent: Boolean,
-                  closeAfterResponseCompletion: Boolean): StateResult = {
+  def parseEntity(
+      headers: List[HttpHeader],
+      protocol: HttpProtocol,
+      input: ByteString,
+      bodyStart: Int,
+      clh: Option[`Content-Length`],
+      cth: Option[`Content-Type`],
+      teh: Option[`Transfer-Encoding`],
+      expect100continue: Boolean,
+      hostHeaderPresent: Boolean,
+      closeAfterResponseCompletion: Boolean): StateResult = {
 
     def emitResponseStart(
         createEntity: EntityCreator[ResponseOutput, ResponseEntity],
@@ -155,8 +157,8 @@ private[http] class HttpResponseParser(
               } else {
                 emitResponseStart(defaultEntity(cth, contentLength))
                 parseFixedLengthBody(
-                    contentLength, closeAfterResponseCompletion)(
-                    input, bodyStart)
+                  contentLength,
+                  closeAfterResponseCompletion)(input, bodyStart)
               }
             case None ⇒
               emitResponseStart {
@@ -165,7 +167,8 @@ private[http] class HttpResponseParser(
                     case EntityPart(bytes) ⇒ bytes
                   }
                   HttpEntity.CloseDelimited(
-                      contentType(cth), HttpEntity.limitableByteSource(data))
+                    contentType(cth),
+                    HttpEntity.limitableByteSource(data))
                 }
               }
               setCompletionHandling(HttpMessageParser.CompletionOk)
@@ -173,35 +176,39 @@ private[http] class HttpResponseParser(
           }
 
         case Some(te) ⇒
-          val completedHeaders = addTransferEncodingWithChunkedPeeled(
-              headers, te)
+          val completedHeaders =
+            addTransferEncodingWithChunkedPeeled(headers, te)
           if (te.isChunked) {
             if (clh.isEmpty) {
               emitResponseStart(chunkedEntity(cth), completedHeaders)
-              parseChunk(input,
-                         bodyStart,
-                         closeAfterResponseCompletion,
-                         totalBytesRead = 0L)
+              parseChunk(
+                input,
+                bodyStart,
+                closeAfterResponseCompletion,
+                totalBytesRead = 0L)
             } else
               failMessageStart(
-                  "A chunked response must not contain a Content-Length header.")
+                "A chunked response must not contain a Content-Length header.")
           } else
-            parseEntity(completedHeaders,
-                        protocol,
-                        input,
-                        bodyStart,
-                        clh,
-                        cth,
-                        teh = None,
-                        expect100continue,
-                        hostHeaderPresent,
-                        closeAfterResponseCompletion)
+            parseEntity(
+              completedHeaders,
+              protocol,
+              input,
+              bodyStart,
+              clh,
+              cth,
+              teh = None,
+              expect100continue,
+              hostHeaderPresent,
+              closeAfterResponseCompletion)
       }
     } else finishEmptyResponse()
   }
 
   def parseToCloseBody(
-      input: ByteString, bodyStart: Int, totalBytesRead: Long): StateResult = {
+      input: ByteString,
+      bodyStart: Int,
+      totalBytesRead: Long): StateResult = {
     val newTotalBytes = totalBytesRead + math.max(0, input.length - bodyStart)
     if (input.length > bodyStart)
       emit(EntityPart(input.drop(bodyStart).compact))
@@ -223,6 +230,6 @@ private[http] object HttpResponseParser {
 
   private[http] object OneHundredContinueError
       extends RuntimeException(
-          "Received error response for request with `Expect: 100-continue` header")
+        "Received error response for request with `Expect: 100-continue` header")
       with NoStackTrace
 }

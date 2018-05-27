@@ -34,9 +34,10 @@ trait HttpErrorHandler {
     * @param statusCode The error status code.  Must be greater or equal to 400, and less than 500.
     * @param message The error message.
     */
-  def onClientError(request: RequestHeader,
-                    statusCode: Int,
-                    message: String = ""): Future[Result]
+  def onClientError(
+      request: RequestHeader,
+      statusCode: Int,
+      message: String = ""): Future[Result]
 
   /**
     * Invoked when a server error occurs.
@@ -45,7 +46,8 @@ trait HttpErrorHandler {
     * @param exception The server error.
     */
   def onServerError(
-      request: RequestHeader, exception: Throwable): Future[Result]
+      request: RequestHeader,
+      exception: Throwable): Future[Result]
 }
 
 object HttpErrorHandler {
@@ -56,15 +58,16 @@ object HttpErrorHandler {
   def bindingsFromConfiguration(
       environment: Environment,
       configuration: Configuration): Seq[Binding[_]] = {
-    Reflect.bindingsFromConfiguration[HttpErrorHandler,
-                                      play.http.HttpErrorHandler,
-                                      JavaHttpErrorHandlerAdapter,
-                                      JavaHttpErrorHandlerDelegate,
-                                      GlobalSettingsHttpErrorHandler](
-        environment,
-        PlayConfig(configuration),
-        "play.http.errorHandler",
-        "ErrorHandler")
+    Reflect.bindingsFromConfiguration[
+      HttpErrorHandler,
+      play.http.HttpErrorHandler,
+      JavaHttpErrorHandlerAdapter,
+      JavaHttpErrorHandlerDelegate,
+      GlobalSettingsHttpErrorHandler](
+      environment,
+      PlayConfig(configuration),
+      "play.http.errorHandler",
+      "ErrorHandler")
   }
 }
 
@@ -90,18 +93,22 @@ private[play] class GlobalSettingsHttpErrorHandler @Inject()(
     * @param statusCode The error status code.  Must be greater or equal to 400, and less than 500.
     * @param message The error message.
     */
-  def onClientError(request: RequestHeader, statusCode: Int, message: String) = {
+  def onClientError(
+      request: RequestHeader,
+      statusCode: Int,
+      message: String) = {
     statusCode match {
       case BAD_REQUEST => global.get.onBadRequest(request, message)
       case FORBIDDEN =>
         Future.successful(Forbidden(views.html.defaultpages.unauthorized()))
       case NOT_FOUND => global.get.onHandlerNotFound(request)
       case clientError if statusCode >= 400 && statusCode < 500 =>
-        Future.successful(Results.Status(clientError)(views.html.defaultpages
-                  .badRequest(request.method, request.uri, message)))
+        Future.successful(
+          Results.Status(clientError)(views.html.defaultpages
+            .badRequest(request.method, request.uri, message)))
       case nonClientError =>
         throw new IllegalArgumentException(
-            s"onClientError invoked with non client error status code $statusCode: $message")
+          s"onClientError invoked with non client error status code $statusCode: $message")
     }
   }
 
@@ -127,21 +134,24 @@ private[play] class GlobalSettingsHttpErrorHandler @Inject()(
   *               this.
   */
 @Singleton
-class DefaultHttpErrorHandler(environment: Environment,
-                              configuration: Configuration,
-                              sourceMapper: Option[SourceMapper] = None,
-                              router: => Option[Router] = None)
+class DefaultHttpErrorHandler(
+    environment: Environment,
+    configuration: Configuration,
+    sourceMapper: Option[SourceMapper] = None,
+    router: => Option[Router] = None)
     extends HttpErrorHandler {
 
   @Inject
-  def this(environment: Environment,
-           configuration: Configuration,
-           sourceMapper: OptionalSourceMapper,
-           router: Provider[Router]) =
-    this(environment,
-         configuration,
-         sourceMapper.sourceMapper,
-         Some(router.get))
+  def this(
+      environment: Environment,
+      configuration: Configuration,
+      sourceMapper: OptionalSourceMapper,
+      router: Provider[Router]) =
+    this(
+      environment,
+      configuration,
+      sourceMapper.sourceMapper,
+      Some(router.get))
 
   private val playEditor = configuration.getString("play.editor")
 
@@ -152,17 +162,18 @@ class DefaultHttpErrorHandler(environment: Environment,
     * @param statusCode The error status code.  Must be greater or equal to 400, and less than 500.
     * @param message The error message.
     */
-  def onClientError(request: RequestHeader,
-                    statusCode: Int,
-                    message: String): Future[Result] = statusCode match {
+  def onClientError(
+      request: RequestHeader,
+      statusCode: Int,
+      message: String): Future[Result] = statusCode match {
     case BAD_REQUEST => onBadRequest(request, message)
-    case FORBIDDEN => onForbidden(request, message)
-    case NOT_FOUND => onNotFound(request, message)
+    case FORBIDDEN   => onForbidden(request, message)
+    case NOT_FOUND   => onNotFound(request, message)
     case clientError if statusCode >= 400 && statusCode < 500 =>
       onOtherClientError(request, statusCode, message)
     case nonClientError =>
       throw new IllegalArgumentException(
-          s"onClientError invoked with non client error status code $statusCode: $message")
+        s"onClientError invoked with non client error status code $statusCode: $message")
   }
 
   /**
@@ -172,11 +183,10 @@ class DefaultHttpErrorHandler(environment: Environment,
     * @param message The error message.
     */
   protected def onBadRequest(
-      request: RequestHeader, message: String): Future[Result] =
-    Future.successful(
-        BadRequest(views.html.defaultpages.badRequest(request.method,
-                                                      request.uri,
-                                                      message)))
+      request: RequestHeader,
+      message: String): Future[Result] =
+    Future.successful(BadRequest(
+      views.html.defaultpages.badRequest(request.method, request.uri, message)))
 
   /**
     * Invoked when a client makes a request that was forbidden.
@@ -185,7 +195,8 @@ class DefaultHttpErrorHandler(environment: Environment,
     * @param message The error message.
     */
   protected def onForbidden(
-      request: RequestHeader, message: String): Future[Result] =
+      request: RequestHeader,
+      message: String): Future[Result] =
     Future.successful(Forbidden(views.html.defaultpages.unauthorized()))
 
   /**
@@ -195,9 +206,9 @@ class DefaultHttpErrorHandler(environment: Environment,
     * @param message A message.
     */
   protected def onNotFound(
-      request: RequestHeader, message: String): Future[Result] = {
-    Future.successful(
-        NotFound(environment.mode match {
+      request: RequestHeader,
+      message: String): Future[Result] = {
+    Future.successful(NotFound(environment.mode match {
       case Mode.Prod =>
         views.html.defaultpages.notFound(request.method, request.uri)
       case _ =>
@@ -214,11 +225,13 @@ class DefaultHttpErrorHandler(environment: Environment,
     * @param statusCode The error status code.  Must be greater or equal to 400, and less than 500.
     * @param message The error message.
     */
-  protected def onOtherClientError(request: RequestHeader,
-                                   statusCode: Int,
-                                   message: String): Future[Result] = {
-    Future.successful(Results.Status(statusCode)(views.html.defaultpages
-              .badRequest(request.method, request.uri, message)))
+  protected def onOtherClientError(
+      request: RequestHeader,
+      statusCode: Int,
+      message: String): Future[Result] = {
+    Future.successful(
+      Results.Status(statusCode)(views.html.defaultpages
+        .badRequest(request.method, request.uri, message)))
   }
 
   /**
@@ -232,17 +245,20 @@ class DefaultHttpErrorHandler(environment: Environment,
     * @param exception The server error.
     */
   def onServerError(
-      request: RequestHeader, exception: Throwable): Future[Result] = {
+      request: RequestHeader,
+      exception: Throwable): Future[Result] = {
     try {
       val usefulException =
         HttpErrorHandlerExceptions.throwableToUsefulException(
-            sourceMapper, environment.mode == Mode.Prod, exception)
+          sourceMapper,
+          environment.mode == Mode.Prod,
+          exception)
 
       logServerError(request, usefulException)
 
       environment.mode match {
         case Mode.Prod => onProdServerError(request, usefulException)
-        case _ => onDevServerError(request, usefulException)
+        case _         => onDevServerError(request, usefulException)
       }
     } catch {
       case NonFatal(e) =>
@@ -260,13 +276,16 @@ class DefaultHttpErrorHandler(environment: Environment,
     * @param usefulException The server error.
     */
   protected def logServerError(
-      request: RequestHeader, usefulException: UsefulException) {
-    Logger.error("""
+      request: RequestHeader,
+      usefulException: UsefulException) {
+    Logger.error(
+      """
                     |
                     |! @%s - Internal server error, for (%s) [%s] ->
-                    | """.stripMargin.format(
-                     usefulException.id, request.method, request.uri),
-                 usefulException)
+                    | """.stripMargin
+        .format(usefulException.id, request.method, request.uri),
+      usefulException
+    )
   }
 
   /**
@@ -276,9 +295,11 @@ class DefaultHttpErrorHandler(environment: Environment,
     * @param exception The exception.
     */
   protected def onDevServerError(
-      request: RequestHeader, exception: UsefulException): Future[Result] =
-    Future.successful(InternalServerError(
-            views.html.defaultpages.devError(playEditor, exception)))
+      request: RequestHeader,
+      exception: UsefulException): Future[Result] =
+    Future.successful(
+      InternalServerError(
+        views.html.defaultpages.devError(playEditor, exception)))
 
   /**
     * Invoked in prod mode when a server error occurs.
@@ -290,9 +311,10 @@ class DefaultHttpErrorHandler(environment: Environment,
     * @param exception The exception.
     */
   protected def onProdServerError(
-      request: RequestHeader, exception: UsefulException): Future[Result] =
+      request: RequestHeader,
+      exception: UsefulException): Future[Result] =
     Future.successful(
-        InternalServerError(views.html.defaultpages.error(exception)))
+      InternalServerError(views.html.defaultpages.error(exception)))
 }
 
 /**
@@ -319,9 +341,9 @@ object HttpErrorHandlerExceptions {
       val source = sourceMapper.flatMap(_.sourceFor(other))
 
       new PlayException.ExceptionSource(
-          "Execution exception",
-          "[%s: %s]".format(other.getClass.getSimpleName, other.getMessage),
-          other) {
+        "Execution exception",
+        "[%s: %s]".format(other.getClass.getSimpleName, other.getMessage),
+        other) {
         def line =
           source.flatMap(_._2).map(_.asInstanceOf[java.lang.Integer]).orNull
         def position = null
@@ -336,7 +358,10 @@ object HttpErrorHandlerExceptions {
   */
 object DefaultHttpErrorHandler
     extends DefaultHttpErrorHandler(
-        Environment.simple(), Configuration.empty, None, None)
+      Environment.simple(),
+      Configuration.empty,
+      None,
+      None)
 
 /**
   * A lazy HTTP error handler, that looks up the error handler from the current application
@@ -364,14 +389,17 @@ private[play] class JavaHttpErrorHandlerDelegate @Inject()(
   import play.api.libs.iteratee.Execution.Implicits.trampoline
 
   def onClientError(
-      request: Http.RequestHeader, statusCode: Int, message: String) =
+      request: Http.RequestHeader,
+      statusCode: Int,
+      message: String) =
     FutureConverters.toJava(
-        delegate
-          .onClientError(request._underlyingHeader(), statusCode, message)
-          .map(_.asJava))
+      delegate
+        .onClientError(request._underlyingHeader(), statusCode, message)
+        .map(_.asJava))
 
   def onServerError(request: Http.RequestHeader, exception: Throwable) =
-    FutureConverters.toJava(delegate
-          .onServerError(request._underlyingHeader(), exception)
-          .map(_.asJava))
+    FutureConverters.toJava(
+      delegate
+        .onServerError(request._underlyingHeader(), exception)
+        .map(_.asJava))
 }

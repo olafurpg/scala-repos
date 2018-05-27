@@ -16,10 +16,11 @@ import akka.stream.stage.{OutHandler, InHandler, GraphStageLogic, GraphStage}
 private[http] object One2OneBidiFlow {
 
   case class UnexpectedOutputException(element: Any)
-      extends RuntimeException(element.toString) with NoStackTrace
+      extends RuntimeException(element.toString)
+      with NoStackTrace
   case object OutputTruncationException
       extends RuntimeException(
-          "Inner stream finished before inputs completed. Outputs might have been truncated.")
+        "Inner stream finished before inputs completed. Outputs might have been truncated.")
       with NoStackTrace
 
   /**
@@ -50,8 +51,7 @@ private[http] object One2OneBidiFlow {
 
     override def toString = "One2OneBidi"
 
-    override def createLogic(
-        effectiveAttributes: Attributes): GraphStageLogic =
+    override def createLogic(effectiveAttributes: Attributes): GraphStageLogic =
       new GraphStageLogic(shape) {
         private var pending = 0
         private var pullSuppressed = false
@@ -69,34 +69,40 @@ private[http] object One2OneBidiFlow {
           override def onUpstreamFinish(): Unit = complete(inOut)
         })
 
-        setHandler(inOut, new OutHandler {
-          override def onPull(): Unit =
-            if (pending < maxPending || maxPending == -1) pull(inIn)
-            else pullSuppressed = true
-          override def onDownstreamFinish(): Unit = {
-            if (!isClosed(inIn)) innerFlowCancelled = true
-            cancel(inIn)
+        setHandler(
+          inOut,
+          new OutHandler {
+            override def onPull(): Unit =
+              if (pending < maxPending || maxPending == -1) pull(inIn)
+              else pullSuppressed = true
+            override def onDownstreamFinish(): Unit = {
+              if (!isClosed(inIn)) innerFlowCancelled = true
+              cancel(inIn)
+            }
           }
-        })
+        )
 
-        setHandler(outIn, new InHandler {
-          override def onPush(): Unit = {
-            val element = grab(outIn)
-            if (pending > 0) {
-              pending -= 1
-              push(outOut, element)
-              if (pullSuppressed) {
-                pullSuppressed = false
-                pull(inIn)
-              }
-            } else throw new UnexpectedOutputException(element)
+        setHandler(
+          outIn,
+          new InHandler {
+            override def onPush(): Unit = {
+              val element = grab(outIn)
+              if (pending > 0) {
+                pending -= 1
+                push(outOut, element)
+                if (pullSuppressed) {
+                  pullSuppressed = false
+                  pull(inIn)
+                }
+              } else throw new UnexpectedOutputException(element)
+            }
+            override def onUpstreamFinish(): Unit = {
+              if (pending == 0 && isClosed(inIn) && !innerFlowCancelled)
+                complete(outOut)
+              else throw OutputTruncationException
+            }
           }
-          override def onUpstreamFinish(): Unit = {
-            if (pending == 0 && isClosed(inIn) && !innerFlowCancelled)
-              complete(outOut)
-            else throw OutputTruncationException
-          }
-        })
+        )
 
         setHandler(outOut, new OutHandler {
           override def onPull(): Unit = pull(outIn)

@@ -29,31 +29,33 @@ import org.apache.spark.sql.execution.metric.SQLMetrics
   * Performs an inner hash join of two child relations by first shuffling the data using the join
   * keys.
   */
-case class ShuffledHashJoin(leftKeys: Seq[Expression],
-                            rightKeys: Seq[Expression],
-                            joinType: JoinType,
-                            buildSide: BuildSide,
-                            condition: Option[Expression],
-                            left: SparkPlan,
-                            right: SparkPlan)
-    extends BinaryNode with HashJoin {
+case class ShuffledHashJoin(
+    leftKeys: Seq[Expression],
+    rightKeys: Seq[Expression],
+    joinType: JoinType,
+    buildSide: BuildSide,
+    condition: Option[Expression],
+    left: SparkPlan,
+    right: SparkPlan)
+    extends BinaryNode
+    with HashJoin {
 
   override private[sql] lazy val metrics = Map(
-      "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext,
-                                                     "number of output rows"))
+    "numOutputRows" -> SQLMetrics
+      .createLongMetric(sparkContext, "number of output rows"))
 
   override def outputPartitioning: Partitioning = joinType match {
     case Inner =>
       PartitioningCollection(
-          Seq(left.outputPartitioning, right.outputPartitioning))
-    case LeftSemi => left.outputPartitioning
-    case LeftOuter => left.outputPartitioning
+        Seq(left.outputPartitioning, right.outputPartitioning))
+    case LeftSemi   => left.outputPartitioning
+    case LeftOuter  => left.outputPartitioning
     case RightOuter => right.outputPartitioning
     case FullOuter =>
       UnknownPartitioning(left.outputPartitioning.numPartitions)
     case x =>
       throw new IllegalArgumentException(
-          s"ShuffledHashJoin should not take $x as the JoinType")
+        s"ShuffledHashJoin should not take $x as the JoinType")
   }
 
   override def requiredChildDistribution: Seq[Distribution] =
@@ -77,36 +79,34 @@ case class ShuffledHashJoin(leftKeys: Seq[Expression],
           case LeftOuter =>
             val keyGenerator = streamSideKeyGenerator
             val resultProj = createResultProjection
-            streamIter.flatMap(
-                currentRow =>
-                  {
-                val rowKey = keyGenerator(currentRow)
-                joinedRow.withLeft(currentRow)
-                leftOuterIterator(rowKey,
-                                  joinedRow,
-                                  hashed.get(rowKey),
-                                  resultProj,
-                                  numOutputRows)
+            streamIter.flatMap(currentRow => {
+              val rowKey = keyGenerator(currentRow)
+              joinedRow.withLeft(currentRow)
+              leftOuterIterator(
+                rowKey,
+                joinedRow,
+                hashed.get(rowKey),
+                resultProj,
+                numOutputRows)
             })
 
           case RightOuter =>
             val keyGenerator = streamSideKeyGenerator
             val resultProj = createResultProjection
-            streamIter.flatMap(
-                currentRow =>
-                  {
-                val rowKey = keyGenerator(currentRow)
-                joinedRow.withRight(currentRow)
-                rightOuterIterator(rowKey,
-                                   hashed.get(rowKey),
-                                   joinedRow,
-                                   resultProj,
-                                   numOutputRows)
+            streamIter.flatMap(currentRow => {
+              val rowKey = keyGenerator(currentRow)
+              joinedRow.withRight(currentRow)
+              rightOuterIterator(
+                rowKey,
+                hashed.get(rowKey),
+                joinedRow,
+                resultProj,
+                numOutputRows)
             })
 
           case x =>
             throw new IllegalArgumentException(
-                s"ShuffledHashJoin should not take $x as the JoinType")
+              s"ShuffledHashJoin should not take $x as the JoinType")
         }
     }
   }

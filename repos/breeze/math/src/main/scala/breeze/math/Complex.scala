@@ -73,8 +73,9 @@ case class Complex(real: Double, imag: Double) {
     Complex(this.real - that, this.imag)
 
   def *(that: Complex) =
-    Complex(this.real * that.real - this.imag * that.imag,
-            this.real * that.imag + this.imag * that.real)
+    Complex(
+      this.real * that.real - this.imag * that.imag,
+      this.real * that.imag + this.imag * that.real)
 
   def *(that: Int) =
     Complex(this.real * that, this.imag * that)
@@ -90,8 +91,9 @@ case class Complex(real: Double, imag: Double) {
 
   def /(that: Complex) = {
     val denom = that.real * that.real + that.imag * that.imag
-    Complex((this.real * that.real + this.imag * that.imag) / denom,
-            (this.imag * that.real - this.real * that.imag) / denom)
+    Complex(
+      (this.real * that.real + this.imag * that.imag) / denom,
+      (this.imag * that.real - this.real * that.imag) / denom)
   }
 
   def /(that: Int) =
@@ -149,12 +151,12 @@ case class Complex(real: Double, imag: Double) {
 
   override def equals(that: Any) = that match {
     case that: Complex => this.real == that.real && this.imag == that.imag
-    case real: Double => this.real == real && this.imag == 0
-    case real: Int => this.real == real && this.imag == 0
-    case real: Short => this.real == real && this.imag == 0
-    case real: Long => this.real == real && this.imag == 0
-    case real: Float => this.real == real && this.imag == 0
-    case _ => false
+    case real: Double  => this.real == real && this.imag == 0
+    case real: Int     => this.real == real && this.imag == 0
+    case real: Short   => this.real == real && this.imag == 0
+    case real: Long    => this.real == real && this.imag == 0
+    case real: Float   => this.real == real && this.imag == 0
+    case _             => false
   }
 
   // ensure hashcode contract is maintained for comparison to non-Complex numbers
@@ -213,7 +215,7 @@ object Complex { outer =>
 
     def toDouble(a: Complex) =
       throw new UnsupportedOperationException(
-          "Cannot automatically convert complex numbers to doubles")
+        "Cannot automatically convert complex numbers to doubles")
 
     def isNaN(a: Complex) =
       a.real.isNaN || a.imag.isNaN
@@ -489,7 +491,8 @@ object Complex { outer =>
 
   /** `Complex` as `scala.math.Fractional` trait. */
   trait ComplexIsFractional
-      extends ComplexIsConflicted with Fractional[Complex] {
+      extends ComplexIsConflicted
+      with Fractional[Complex] {
     def div(x: Complex, y: Complex): Complex = x / y
   }
 
@@ -510,7 +513,8 @@ object Complex { outer =>
     * `Ordering` is required because `Numeric` extends `Ordering`.  Hence,
     * an ordering based upon the real then imaginary components is used. */
   implicit object ComplexIsFractional
-      extends ComplexIsFractional with ComplexOrdering
+      extends ComplexIsFractional
+      with ComplexOrdering
 
   implicit object logComplexImpl
       extends breeze.numerics.log.Impl[Complex, Complex] {

@@ -29,7 +29,8 @@ object RawTimers extends js.GlobalScope {
     *          to [[clearTimeout]].
     */
   def setTimeout(
-      handler: js.Function0[Any], interval: Double): SetTimeoutHandle =
+      handler: js.Function0[Any],
+      interval: Double): SetTimeoutHandle =
     js.native
 
   /** Cancel a timeout execution
@@ -46,7 +47,8 @@ object RawTimers extends js.GlobalScope {
     *          to [[clearInterval]].
     */
   def setInterval(
-      handler: js.Function0[Any], interval: Double): SetIntervalHandle =
+      handler: js.Function0[Any],
+      interval: Double): SetIntervalHandle =
     js.native
 
   /** Cancel an interval execution

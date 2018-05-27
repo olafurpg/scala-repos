@@ -15,7 +15,9 @@ import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.TypeDefinition
   * Date: 20.02.2008
   */
 trait ScObject
-    extends ScTypeDefinition with ScTypedDefinition with ScMember
+    extends ScTypeDefinition
+    with ScTypedDefinition
+    with ScMember
     with ScDeclaredElementsHolder {
   //Is this object generated as case class companion module
   private var isSyntheticCaseClassCompanion: Boolean = false
@@ -40,15 +42,16 @@ trait ScObject
   /** Is this object accessible from a stable path from the root package? */
   def isStatic: Boolean = containingClass match {
     case obj: ScObject => obj.isStatic
-    case null => true
-    case _ => false
+    case null          => true
+    case _             => false
   }
 
   /**
     * @return returns every time the same result, even after modification
     *         so it's reaonable to use it only for Predef and scala classes
     */
-  def getHardParameterlessSignatures: TypeDefinitionMembers.ParameterlessNodes.Map
+  def getHardParameterlessSignatures
+    : TypeDefinitionMembers.ParameterlessNodes.Map
 
   /**
     * @return returns every time the same result, even after modification

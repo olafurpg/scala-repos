@@ -21,11 +21,14 @@ class Specs2TestFramework extends AbstractTestFramework {
   override protected def getLibraryDependencies(
       scalaVersion: Option[String]): Seq[String] = scalaVersion match {
     case Some(v) if v.startsWith("2.11") =>
-      Seq("\"org.specs2\" % \"specs2-core_2.11\" % \"latest.integration\" % \"test\"")
+      Seq(
+        "\"org.specs2\" % \"specs2-core_2.11\" % \"latest.integration\" % \"test\"")
     case Some(v) if v.startsWith("2.10") =>
-      Seq("\"org.specs2\" % \"specs2-core_2.10\" % \"latest.integration\" % \"test\"")
+      Seq(
+        "\"org.specs2\" % \"specs2-core_2.10\" % \"latest.integration\" % \"test\"")
     case _ =>
-      Seq("\"org.specs2\" %% \"specs2-core\" % \"latest.integration\" % \"test\"")
+      Seq(
+        "\"org.specs2\" %% \"specs2-core\" % \"latest.integration\" % \"test\"")
   }
 
   override protected def getLibraryResolvers(

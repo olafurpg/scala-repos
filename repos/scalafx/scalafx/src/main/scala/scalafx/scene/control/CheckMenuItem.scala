@@ -42,7 +42,8 @@ object CheckMenuItem {
 /** A MenuItem that can be toggled between selected and unselected states. */
 class CheckMenuItem(
     override val delegate: jfxsc.CheckMenuItem = new jfxsc.CheckMenuItem)
-    extends MenuItem with SFXDelegate[jfxsc.CheckMenuItem] {
+    extends MenuItem
+    with SFXDelegate[jfxsc.CheckMenuItem] {
 
   /** Constructs a CheckMenuItem and sets the display text with the specified text. */
   def this(text: String) = this(new jfxsc.CheckMenuItem(text))

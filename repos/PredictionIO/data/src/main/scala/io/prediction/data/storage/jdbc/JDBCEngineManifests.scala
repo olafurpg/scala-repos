@@ -22,8 +22,11 @@ import scalikejdbc._
 
 /** JDBC implementation of [[EngineManifests]] */
 class JDBCEngineManifests(
-    client: String, config: StorageClientConfig, prefix: String)
-    extends EngineManifests with Logging {
+    client: String,
+    config: StorageClientConfig,
+    prefix: String)
+    extends EngineManifests
+    with Logging {
 
   /** Database table name for this data access object */
   val tableName = JDBCUtils.prefixTableName(prefix, "enginemanifests")
@@ -106,11 +109,13 @@ class JDBCEngineManifests(
 
   /** Convert JDBC results to [[EngineManifest]] */
   def resultToEngineManifest(rs: WrappedResultSet): EngineManifest = {
-    EngineManifest(id = rs.string("id"),
-                   version = rs.string("version"),
-                   name = rs.string("engineName"),
-                   description = rs.stringOpt("description"),
-                   files = rs.string("files").split(","),
-                   engineFactory = rs.string("engineFactory"))
+    EngineManifest(
+      id = rs.string("id"),
+      version = rs.string("version"),
+      name = rs.string("engineName"),
+      description = rs.stringOpt("description"),
+      files = rs.string("files").split(","),
+      engineFactory = rs.string("engineFactory")
+    )
   }
 }

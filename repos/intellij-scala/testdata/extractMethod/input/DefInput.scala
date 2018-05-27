@@ -6,7 +6,7 @@ class DefInput {
     /*start*/
     g match {
       case 77 => print(g)
-      case _ => print(goo(g))
+      case _  => print(goo(g))
     }
     /*end*/
     print("exit")

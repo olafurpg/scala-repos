@@ -64,7 +64,8 @@ object Shape {
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/shape/Shape.html]].
   */
 abstract class Shape(override val delegate: jfxss.Shape)
-    extends Node(delegate) with SFXDelegate[jfxss.Shape] {
+    extends Node(delegate)
+    with SFXDelegate[jfxss.Shape] {
 
   /**
     * Defines parameters to fill the interior of an Shape using the settings of the Paint context.
@@ -97,7 +98,7 @@ abstract class Shape(override val delegate: jfxss.Shape)
   }
 
   /**
-    * The end cap style of this Shape as one of the following values that define possible end cap styles: 
+    * The end cap style of this Shape as one of the following values that define possible end cap styles:
     * `StrokeLineCap.BUTT`, `StrokeLineCap.ROUND`, and `StrokeLineCap.SQUARE`.
     */
   def strokeLineCap: ObjectProperty[jfxss.StrokeLineCap] =
@@ -124,7 +125,7 @@ abstract class Shape(override val delegate: jfxss.Shape)
   }
 
   /**
-    * Defines parameters of a stroke that is drawn around the outline of a Shape using the settings of the specified 
+    * Defines parameters of a stroke that is drawn around the outline of a Shape using the settings of the specified
     * Paint.
     */
   def stroke: ObjectProperty[jfxsp.Paint] = delegate.strokeProperty
@@ -156,7 +157,7 @@ abstract class Shape(override val delegate: jfxss.Shape)
     delegate.getStrokeDashArray
 
   /**
-    * Sets the list of lengths of the dash segments, replacing the prior content. If you want append to current 
+    * Sets the list of lengths of the dash segments, replacing the prior content. If you want append to current
     * content, use `+==` or similar.
     *
     * @param c List of lengths of the dash segments to replace prior content.

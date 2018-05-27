@@ -23,34 +23,34 @@ import org.ensime.sexp.util.ThreadLocalSupport
   * `OptionAltFormat`.
   */
 trait StandardFormats extends ThreadLocalSupport {
-  implicit def optionFormat[T : SexpFormat]: SexpFormat[Option[T]] =
+  implicit def optionFormat[T: SexpFormat]: SexpFormat[Option[T]] =
     new SexpFormat[Option[T]] {
       def write(option: Option[T]) = option match {
         case Some(x) => SexpList(x.toSexp)
-        case None => SexpNil
+        case None    => SexpNil
       }
       def read(value: Sexp) = value match {
-        case SexpNil => None
+        case SexpNil     => None
         case SexpList(s) => Some(s.head.convertTo[T])
-        case x => deserializationError(x)
+        case x           => deserializationError(x)
       }
     }
 
   import scala.util.Success
   import scala.util.Failure
   import SexpFormatUtils._
-  implicit def eitherFormat[L : SexpFormat, R : SexpFormat]: SexpFormat[Either[
-          L, R]] =
+  implicit def eitherFormat[L: SexpFormat, R: SexpFormat]
+    : SexpFormat[Either[L, R]] =
     new SexpFormat[Either[L, R]] {
       def write(either: Either[L, R]) = either match {
-        case Left(b) => b.toSexp
+        case Left(b)  => b.toSexp
         case Right(a) => a.toSexp
       }
       def read(value: Sexp) =
         (value.convertTo(safeReader[L]), value.convertTo(safeReader[R])) match {
           case (Success(l), Failure(_)) => Left(l)
           case (Failure(l), Success(r)) => Right(r)
-          case (_, _) => deserializationError(value)
+          case (_, _)                   => deserializationError(value)
         }
     }
 
@@ -62,12 +62,11 @@ trait StandardFormats extends ThreadLocalSupport {
     def write(t: T): Sexp = SexpString(via.toSexpString(t))
     def read(v: Sexp): T = v match {
       case SexpString(s) => via.fromSexpString(s)
-      case x => deserializationError(x)
+      case x             => deserializationError(x)
     }
   }
 
-  implicit val UuidFormat: SexpFormat[UUID] = viaString(
-      new ViaString[UUID] {
+  implicit val UuidFormat: SexpFormat[UUID] = viaString(new ViaString[UUID] {
     def toSexpString(uuid: UUID) = uuid.toString
     def fromSexpString(s: String) = UUID.fromString(s)
   })
@@ -79,14 +78,12 @@ trait StandardFormats extends ThreadLocalSupport {
   //   def fromSexpString(s: String) = new URL(s)
   // })
 
-  implicit val UriFormat: SexpFormat[URI] = viaString(
-      new ViaString[URI] {
+  implicit val UriFormat: SexpFormat[URI] = viaString(new ViaString[URI] {
     def toSexpString(uri: URI) = uri.toASCIIString
     def fromSexpString(s: String) = new URI(s)
   })
 
-  implicit val FileFormat: SexpFormat[File] = viaString(
-      new ViaString[File] {
+  implicit val FileFormat: SexpFormat[File] = viaString(new ViaString[File] {
     def toSexpString(file: File) = file.getPath
     def fromSexpString(s: String) = new File(s)
   })
@@ -119,15 +116,15 @@ trait StandardFormats extends ThreadLocalSupport {
 trait OptionAltFormat {
   this: StandardFormats =>
 
-  override implicit def optionFormat[T : SexpFormat]: SexpFormat[Option[T]] =
+  override implicit def optionFormat[T: SexpFormat]: SexpFormat[Option[T]] =
     new SexpFormat[Option[T]] {
       def write(option: Option[T]) = option match {
         case Some(x) => x.toSexp
-        case None => SexpNil
+        case None    => SexpNil
       }
       def read(value: Sexp) = value match {
         case SexpNil => None
-        case x => Some(x.convertTo[T])
+        case x       => Some(x.convertTo[T])
       }
     }
 }

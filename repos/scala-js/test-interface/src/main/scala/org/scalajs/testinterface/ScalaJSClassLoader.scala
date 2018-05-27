@@ -14,7 +14,8 @@ final class ScalaJSClassLoader(val namespace: js.Dynamic)
     extends ClassLoader(null) {
 
   private def nimp: Nothing =
-    throw new NotImplementedError("A ScalaJSClassLoader is a dummy. " +
+    throw new NotImplementedError(
+      "A ScalaJSClassLoader is a dummy. " +
         "Use scala.scalajs.testinterface.TestUtils to instantiate things.")
 
   override def clearAssertionStatus(): Unit = nimp
@@ -23,8 +24,10 @@ final class ScalaJSClassLoader(val namespace: js.Dynamic)
   override def getResources(name: String): Enumeration[URL] = nimp
   override def loadClass(name: String): Class[_] = nimp
   override def setClassAssertionStatus(
-      className: String, enabled: Boolean): Unit = nimp
+      className: String,
+      enabled: Boolean): Unit = nimp
   override def setDefaultAssertionStatus(enabled: Boolean): Unit = nimp
   override def setPackageAssertionStatus(
-      packageName: String, enabled: Boolean): Unit = nimp
+      packageName: String,
+      enabled: Boolean): Unit = nimp
 }

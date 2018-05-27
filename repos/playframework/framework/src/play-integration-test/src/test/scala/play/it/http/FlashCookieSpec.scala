@@ -12,33 +12,38 @@ import play.core.server.Server
 import play.it._
 
 object NettyFlashCookieSpec
-    extends FlashCookieSpec with NettyIntegrationSpecification
+    extends FlashCookieSpec
+    with NettyIntegrationSpecification
 object AkkaHttpFlashCookieSpec
-    extends FlashCookieSpec with AkkaHttpIntegrationSpecification
+    extends FlashCookieSpec
+    with AkkaHttpIntegrationSpecification
 
 trait FlashCookieSpec
-    extends PlaySpecification with ServerIntegrationSpecification
+    extends PlaySpecification
+    with ServerIntegrationSpecification
     with WsTestClient {
 
   sequential
 
   def appWithRedirect =
-    GuiceApplicationBuilder().routes {
-      case ("GET", "/flash") =>
-        Action {
-          Redirect("/landing").flashing(
+    GuiceApplicationBuilder()
+      .routes {
+        case ("GET", "/flash") =>
+          Action {
+            Redirect("/landing").flashing(
               "success" -> "found"
-          )
-        }
-      case ("GET", "/set-cookie") =>
-        Action {
-          Ok.withCookies(Cookie("some-cookie", "some-value"))
-        }
-      case ("GET", "/landing") =>
-        Action {
-          Ok("ok")
-        }
-    }.build()
+            )
+          }
+        case ("GET", "/set-cookie") =>
+          Action {
+            Ok.withCookies(Cookie("some-cookie", "some-value"))
+          }
+        case ("GET", "/landing") =>
+          Action {
+            Ok("ok")
+          }
+      }
+      .build()
 
   def withClientAndServer[T](block: WSClient => T) = {
     val app = appWithRedirect
@@ -78,11 +83,11 @@ trait FlashCookieSpec
       ws =>
         val response = await(ws.url("/flash").withFollowRedirects(false).get())
         val Some(flashCookie) = readFlashCookie(response)
-        val response2 = await(ws
-              .url("/set-cookie")
-              .withHeaders(
-                  "Cookie" -> s"${flashCookie.name.get}=${flashCookie.value.get}")
-              .get())
+        val response2 = await(
+          ws.url("/set-cookie")
+            .withHeaders(
+              "Cookie" -> s"${flashCookie.name.get}=${flashCookie.value.get}")
+            .get())
 
         readFlashCookie(response2) must beSome.like {
           case cookie => cookie.value must beNone
@@ -94,7 +99,7 @@ trait FlashCookieSpec
     }
 
     "honor configuration for flash.secure" in Helpers.running(
-        _.configure("play.http.flash.secure" -> true)) { _ =>
+      _.configure("play.http.flash.secure" -> true)) { _ =>
       Flash.encodeAsCookie(Flash()).secure must beTrue
     }
   }

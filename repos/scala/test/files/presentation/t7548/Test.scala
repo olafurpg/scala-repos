@@ -13,7 +13,7 @@ object Test extends InteractiveTest {
     compiler.askTypeAt(pos, res)
     res.get match {
       case Left(tree) => compiler.ask(() => reporter.println(tree.tpe))
-      case Right(ex) => reporter.println(ex)
+      case Right(ex)  => reporter.println(ex)
     }
   }
 }

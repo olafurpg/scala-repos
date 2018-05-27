@@ -40,41 +40,43 @@ class VecBool(values: Array[Boolean]) extends Vec[Boolean] { self =>
 
   def unary_-(): Vec[Boolean] = map(!_)
 
-  def concat[B, C](v: Vec[B])(
-      implicit wd: Promoter[Boolean, B, C], mc: ST[C]): Vec[C] =
+  def concat[B, C](
+      v: Vec[B])(implicit wd: Promoter[Boolean, B, C], mc: ST[C]): Vec[C] =
     Vec(util.Concat.append[Boolean, B, C](toArray, v.toArray))
 
-  def foldLeft[@spec(Boolean, Int, Long, Double) B : ST](init: B)(
+  def foldLeft[@spec(Boolean, Int, Long, Double) B: ST](init: B)(
       f: (B, Boolean) => B): B =
     VecImpl.foldLeft(this)(init)(f)
 
-  def foldLeftWhile[@spec(Boolean, Int, Long, Double) B : ST](init: B)(
+  def foldLeftWhile[@spec(Boolean, Int, Long, Double) B: ST](init: B)(
       f: (B, Boolean) => B)(cond: (B, Boolean) => Boolean): B =
     VecImpl.foldLeftWhile(this)(init)(f)(cond)
 
-  def filterFoldLeft[@spec(Boolean, Int, Long, Double) B : ST](
+  def filterFoldLeft[@spec(Boolean, Int, Long, Double) B: ST](
       pred: (Boolean) => Boolean)(init: B)(f: (B, Boolean) => B): B =
     VecImpl.filterFoldLeft(this)(pred)(init)(f)
 
-  def filterScanLeft[@spec(Boolean, Int, Long, Double) B : ST](
+  def filterScanLeft[@spec(Boolean, Int, Long, Double) B: ST](
       pred: (Boolean) => Boolean)(init: B)(f: (B, Boolean) => B): Vec[B] =
     VecImpl.filterScanLeft(this)(pred)(init)(f)
 
-  def rolling[@spec(Boolean, Int, Long, Double) B : ST](
-      winSz: Int, f: Vec[Boolean] => B): Vec[B] =
+  def rolling[@spec(Boolean, Int, Long, Double) B: ST](
+      winSz: Int,
+      f: Vec[Boolean] => B): Vec[B] =
     VecImpl.rolling(this)(winSz, f)
 
-  def map[@spec(Boolean, Int, Long, Double) B : ST](f: Boolean => B): Vec[B] =
+  def map[@spec(Boolean, Int, Long, Double) B: ST](f: Boolean => B): Vec[B] =
     VecImpl.map(this)(f)
 
-  def flatMap[@spec(Boolean, Int, Long, Double) B : ST](
+  def flatMap[@spec(Boolean, Int, Long, Double) B: ST](
       f: Boolean => Vec[B]): Vec[B] = VecImpl.flatMap(this)(f)
 
-  def scanLeft[@spec(Boolean, Int, Long, Double) B : ST](init: B)(
+  def scanLeft[@spec(Boolean, Int, Long, Double) B: ST](init: B)(
       f: (B, Boolean) => B): Vec[B] = VecImpl.scanLeft(this)(init)(f)
 
-  def zipMap[@spec(Int, Long, Double) B : ST,
-             @spec(Boolean, Int, Long, Double) C : ST](other: Vec[B])(
+  def zipMap[
+      @spec(Int, Long, Double) B: ST,
+      @spec(Boolean, Int, Long, Double) C: ST](other: Vec[B])(
       f: (Boolean, B) => C): Vec[C] =
     VecImpl.zipMap(this, other)(f)
 
@@ -93,7 +95,7 @@ class VecBool(values: Array[Boolean]) extends Vec[Boolean] { self =>
           val loc = b + i * stride
           if (loc >= ub)
             throw new ArrayIndexOutOfBoundsException(
-                "Cannot access location %d >= length %d".format(loc, ub))
+              "Cannot access location %d >= length %d".format(loc, ub))
           self.apply(loc)
         }
 
@@ -115,8 +117,7 @@ class VecBool(values: Array[Boolean]) extends Vec[Boolean] { self =>
         val loc = b + i
         if (loc >= e || loc < b)
           throw new ArrayIndexOutOfBoundsException(
-              "Cannot access location %d (vec length %d)".format(
-                  i, self.length))
+            "Cannot access location %d (vec length %d)".format(i, self.length))
         else if (loc >= self.length || loc < 0) scalarTag.missing
         else self.apply(loc)
       }

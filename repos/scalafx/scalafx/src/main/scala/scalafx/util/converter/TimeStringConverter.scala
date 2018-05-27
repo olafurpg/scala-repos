@@ -40,8 +40,7 @@ object TimeStringConverter {
 
 class TimeStringConverter(
     delegate: jfxuc.TimeStringConverter = new jfxuc.TimeStringConverter)
-    extends DateTimeStringConverterDelegate[jfxuc.TimeStringConverter](
-        delegate) {
+    extends DateTimeStringConverterDelegate[jfxuc.TimeStringConverter](delegate) {
 
   def this(locale: Locale) = this(new jfxuc.TimeStringConverter(locale))
 

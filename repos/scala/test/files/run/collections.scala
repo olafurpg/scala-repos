@@ -62,7 +62,7 @@ object Test extends App {
       var x = 0
       for (i <- 0 to 10000) s get i match {
         case Some(i) => x += i
-        case None =>
+        case None    =>
       }
       println("test3: " + x)
     }
@@ -73,7 +73,7 @@ object Test extends App {
         for (i <- 0 to 10000) {
           s get i match {
             case Some(i) => x += i
-            case None =>
+            case None    =>
           }
           s1 = s1 + ((i + 10000) -> i)
         }
@@ -96,7 +96,7 @@ object Test extends App {
       var x = 0
       for (i <- 0 to 10000) s get i match {
         case Some(i) => x += i
-        case None =>
+        case None    =>
       }
       println("test3: " + x)
     }

@@ -39,7 +39,8 @@ object SVGPath {
 }
 
 class SVGPath(override val delegate: jfxss.SVGPath = new jfxss.SVGPath())
-    extends Shape(delegate) with SFXDelegate[jfxss.SVGPath] {
+    extends Shape(delegate)
+    with SFXDelegate[jfxss.SVGPath] {
   def content: StringProperty = delegate.contentProperty
   def content_=(v: String) {
     content() = v

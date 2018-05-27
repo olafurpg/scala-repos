@@ -46,8 +46,9 @@ trait BatchedWindowService[K, V] extends batch.BatchedService[K, V] {
     * The batched window never reads an aggregated last. Instead we just output
     * an empty pipe that is outside the window.
     */
-  def readLast(exclusiveUB: BatchID,
-               mode: Mode): Try[(BatchID, FlowProducer[TypedPipe[(K, V)]])] = {
+  def readLast(
+      exclusiveUB: BatchID,
+      mode: Mode): Try[(BatchID, FlowProducer[TypedPipe[(K, V)]])] = {
     val earliestInput = batcher.earliestTimeOf(exclusiveUB)
     val earliestNeededKey = earliestInput - windowSize
     // We may need values from this batch:
@@ -62,8 +63,9 @@ trait BatchedWindowService[K, V] extends batch.BatchedService[K, V] {
     * You are guaranteed that all the service data needed
     * to do the join is present
     */
-  override def lookup[W](incoming: TypedPipe[(Timestamp, (K, W))],
-                         servStream: TypedPipe[(Timestamp, (K, Option[V]))])
+  override def lookup[W](
+      incoming: TypedPipe[(Timestamp, (K, W))],
+      servStream: TypedPipe[(Timestamp, (K, Option[V]))])
     : TypedPipe[(Timestamp, (K, (W, Option[V])))] = {
 
     def flatOpt[T](o: Option[Option[T]]): Option[T] = o.flatMap(identity)

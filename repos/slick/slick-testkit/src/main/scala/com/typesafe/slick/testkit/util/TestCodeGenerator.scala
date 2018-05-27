@@ -27,15 +27,15 @@ trait TestCodeGenerator {
         def indent(code: String): String = code
         def code: String = ""
       }.writeStringToFile(
-          s"""
+        s"""
          |package $packageName
          |object AllTests extends com.typesafe.slick.testkit.util.TestCodeRunner.AllTests {
          |  val clns = Seq(${clns.map("\"" + _ + "\"").mkString(", ")})
          |}
        """.stripMargin,
-          args(0),
-          packageName,
-          "AllTests.scala"
+        args(0),
+        packageName,
+        "AllTests.scala"
       )
     } catch {
       case ex: Throwable =>
@@ -43,10 +43,11 @@ trait TestCodeGenerator {
         System.exit(1)
     }
 
-  class Config(val objectName: String,
-               val tdb: JdbcTestDB,
-               tdbName: String,
-               initScripts: Seq[String]) { self =>
+  class Config(
+      val objectName: String,
+      val tdb: JdbcTestDB,
+      tdbName: String,
+      initScripts: Seq[String]) { self =>
     def useSingleLineStatements = false
 
     def slickProfile = tdb.profile.getClass.getName.replaceAll("\\$", "")
@@ -85,12 +86,14 @@ trait TestCodeGenerator {
           val db = tdb.createDB()
           try {
             val m = Await.result(
-                db.run((init >> generator).withPinnedSession), Duration.Inf)
-            m.writeToFile(profile = slickProfile,
-                          folder = dir,
-                          pkg = packageName,
-                          objectName,
-                          fileName = objectName + ".scala")
+              db.run((init >> generator).withPinnedSession),
+              Duration.Inf)
+            m.writeToFile(
+              profile = slickProfile,
+              folder = dir,
+              pkg = packageName,
+              objectName,
+              fileName = objectName + ".scala")
           } finally db.close
         } finally tdb.cleanUpAfter()
         Some(s"$packageName.$objectName")
@@ -103,11 +106,10 @@ trait TestCodeGenerator {
 
     class MyGen(model: Model) extends SourceCodeGenerator(model) {
       override def entityName =
-        sqlName =>
-          {
-            val baseName = super.entityName(sqlName)
-            if (baseName.dropRight(3).last == 's') baseName.dropRight(4)
-            else baseName
+        sqlName => {
+          val baseName = super.entityName(sqlName)
+          if (baseName.dropRight(3).last == 's') baseName.dropRight(4)
+          else baseName
         }
       override def parentType =
         Some("com.typesafe.slick.testkit.util.TestCodeRunner.TestCase")
@@ -139,7 +141,8 @@ class TestCodeRunner(tests: TestCodeRunner.AllTests) {
       try {
         val a = t.test
         val db = tdb.createDB()
-        try Await.result(db.run(a.withPinnedSession), Duration.Inf) catch {
+        try Await.result(db.run(a.withPinnedSession), Duration.Inf)
+        catch {
           case e: ExecutionException => throw e.getCause
         } finally db.close()
       } finally tdb.cleanUpAfter()

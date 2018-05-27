@@ -76,15 +76,13 @@ trait WebServer {
             media <- MediaTypes.forExtension(Files.getFileExtension(entry))
             content <- docJarContent(filename, entry)
           } yield {
-            HttpResponse(
-                entity = HttpEntity(ContentType(media, None), content))
+            HttpResponse(entity = HttpEntity(ContentType(media, None), content))
           }
         }
       }
     } ~ path("jerky") {
       get {
-        jsonWebsocket[RpcRequestEnvelope, RpcResponseEnvelope](
-            websocketHandler)
+        jsonWebsocket[RpcRequestEnvelope, RpcResponseEnvelope](websocketHandler)
       }
     }
   }

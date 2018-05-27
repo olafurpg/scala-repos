@@ -18,13 +18,13 @@ object Macros {
     val next =
       if (c.enclosingMacros.length < 3)
         c.Expr[Unit](
-            Select(Ident(c.mirror.staticModule("Macros")), TermName("foo")))
+          Select(Ident(c.mirror.staticModule("Macros")), TermName("foo")))
       else c.Expr[Unit](Literal(Constant(())))
     c.universe.reify {
       println(
-          c.Expr[String](
-                Literal(Constant(normalizePaths(c.enclosingMacros.toString))))
-            .splice)
+        c.Expr[String](
+            Literal(Constant(normalizePaths(c.enclosingMacros.toString))))
+          .splice)
       next.splice
     }
   }

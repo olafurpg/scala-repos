@@ -15,11 +15,19 @@ limitations under the License.
  */
 package com.twitter.scalding.serialization
 
-import org.apache.hadoop.io.serializer.{Serialization => HSerialization, Deserializer, Serializer}
+import org.apache.hadoop.io.serializer.{
+  Serialization => HSerialization,
+  Deserializer,
+  Serializer
+}
 import org.apache.hadoop.conf.{Configurable, Configuration}
 
 import java.io.{InputStream, OutputStream}
-import com.twitter.bijection.{Injection, JavaSerializationInjection, Base64String}
+import com.twitter.bijection.{
+  Injection,
+  JavaSerializationInjection,
+  Base64String
+}
 import scala.collection.JavaConverters._
 
 /**
@@ -54,13 +62,13 @@ class WrappedSerialization[T] extends HSerialization[T] with Configurable {
 
   def getSerializer(c: Class[T]): Serializer[T] =
     new BinarySerializer(
-        getSerialization(c).getOrElse(
-            sys.error(s"Serialization for class: ${c} not found")))
+      getSerialization(c).getOrElse(
+        sys.error(s"Serialization for class: ${c} not found")))
 
   def getDeserializer(c: Class[T]): Deserializer[T] =
     new BinaryDeserializer(
-        getSerialization(c).getOrElse(
-            sys.error(s"Serialization for class: ${c} not found")))
+      getSerialization(c).getOrElse(
+        sys.error(s"Serialization for class: ${c} not found")))
 }
 
 class BinarySerializer[T](buf: Serialization[T]) extends Serializer[T] {
@@ -103,19 +111,27 @@ object WrappedSerialization {
     "com.twitter.scalding.serialization.WrappedSerialization"
 
   def rawSetBinary(
-      bufs: Iterable[ClassSerialization[_]], fn: (String, String) => Unit) = {
-    fn(confKey, bufs.map {
-      case (cls, buf) => s"${cls.getName}:${serialize(buf)}"
-    }.mkString(","))
+      bufs: Iterable[ClassSerialization[_]],
+      fn: (String, String) => Unit) = {
+    fn(
+      confKey,
+      bufs
+        .map {
+          case (cls, buf) => s"${cls.getName}:${serialize(buf)}"
+        }
+        .mkString(","))
   }
   def setBinary(
-      conf: Configuration, bufs: Iterable[ClassSerialization[_]]): Unit =
+      conf: Configuration,
+      bufs: Iterable[ClassSerialization[_]]): Unit =
     rawSetBinary(bufs, { case (k, v) => conf.set(k, v) })
 
   def getBinary(conf: Configuration): Map[Class[_], Serialization[_]] =
-    conf.iterator.asScala.map { it =>
-      (it.getKey, it.getValue)
-    }.filter(_._1.startsWith(confKey))
+    conf.iterator.asScala
+      .map { it =>
+        (it.getKey, it.getValue)
+      }
+      .filter(_._1.startsWith(confKey))
       .map {
         case (_, clsbuf) =>
           clsbuf.split(":") match {

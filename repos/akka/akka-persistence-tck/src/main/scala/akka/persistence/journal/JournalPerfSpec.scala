@@ -13,8 +13,11 @@ import com.typesafe.config.Config
 
 object JournalPerfSpec {
   class BenchActor(
-      override val persistenceId: String, replyTo: ActorRef, replyAfter: Int)
-      extends PersistentActor with ActorLogging {
+      override val persistenceId: String,
+      replyTo: ActorRef,
+      replyAfter: Int)
+      extends PersistentActor
+      with ActorLogging {
 
     var counter = 0
 
@@ -22,31 +25,35 @@ object JournalPerfSpec {
       case c @ Cmd("p", payload) ⇒
         persist(c) { d ⇒
           counter += 1
-          require(d.payload == counter,
-                  s"Expected to receive [$counter] yet got: [${d.payload}]")
+          require(
+            d.payload == counter,
+            s"Expected to receive [$counter] yet got: [${d.payload}]")
           if (counter == replyAfter) replyTo ! d.payload
         }
 
       case c @ Cmd("pa", payload) ⇒
         persistAsync(c) { d ⇒
           counter += 1
-          require(d.payload == counter,
-                  s"Expected to receive [$counter] yet got: [${d.payload}]")
+          require(
+            d.payload == counter,
+            s"Expected to receive [$counter] yet got: [${d.payload}]")
           if (counter == replyAfter) replyTo ! d.payload
         }
 
       case c @ Cmd("par", payload) ⇒
         counter += 1
         persistAsync(c) { d ⇒
-          require(d.payload == counter,
-                  s"Expected to receive [$counter] yet got: [${d.payload}]")
+          require(
+            d.payload == counter,
+            s"Expected to receive [$counter] yet got: [${d.payload}]")
         }
         if (counter == replyAfter) replyTo ! payload
 
       case c @ Cmd("n", payload) ⇒
         counter += 1
-        require(payload == counter,
-                s"Expected to receive [$counter] yet got: [${payload}]")
+        require(
+          payload == counter,
+          s"Expected to receive [$counter] yet got: [${payload}]")
         if (counter == replyAfter) replyTo ! payload
 
       case ResetCounter ⇒
@@ -56,8 +63,9 @@ object JournalPerfSpec {
     override def receiveRecover: Receive = {
       case Cmd(_, payload) ⇒
         counter += 1
-        require(payload == counter,
-                s"Expected to receive [$counter] yet got: [${payload}]")
+        require(
+          payload == counter,
+          s"Expected to receive [$counter] yet got: [${payload}]")
         if (counter == replyAfter) replyTo ! payload
     }
   }
@@ -88,7 +96,9 @@ abstract class JournalPerfSpec(config: Config) extends JournalSpec(config) {
     system.actorOf(Props(classOf[BenchActor], pid, testProbe.ref, replyAfter))
 
   def feedAndExpectLast(
-      actor: ActorRef, mode: String, cmnds: immutable.Seq[Int]): Unit = {
+      actor: ActorRef,
+      mode: String,
+      cmnds: immutable.Seq[Int]): Unit = {
     cmnds foreach { c ⇒
       actor ! Cmd(mode, c)
     }
@@ -112,7 +122,7 @@ abstract class JournalPerfSpec(config: Config) extends JournalSpec(config) {
       i += 1
     }
     info(
-        s"Average time: ${(measurements.map(_.toNanos).sum / measurementIterations).nanos.toMillis} ms")
+      s"Average time: ${(measurements.map(_.toNanos).sum / measurementIterations).nanos.toMillis} ms")
   }
 
   /** Override in order to customize timeouts used for expectMsg, in order to tune the awaits to your journal's perf */

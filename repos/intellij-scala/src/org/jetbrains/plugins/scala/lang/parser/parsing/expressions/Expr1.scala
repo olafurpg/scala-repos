@@ -20,7 +20,7 @@ import org.jetbrains.plugins.scala.lang.parser.util.{ParserPatcher, ParserUtils}
  *         | 'do' Expr [semi] 'while' '(' Expr ')'
  *         | 'for' ('(' Enumerators ')' | '{' Enumerators '}') {nl} ['yield'] Expr
  *         | 'throw' Expr
- * 
+ *
  *         | implicit Id => Expr  # Not in Scala Specification yet!
  *
  *         | 'return' [Expr]
@@ -202,7 +202,7 @@ object Expr1 {
             }
             builder.getTokenType match {
               case ScalaTokenTypes.tRPARENTHESIS => builder.advanceLexer()
-              case _ => builder error ErrMsg("rparenthesis.expected")
+              case _                             => builder error ErrMsg("rparenthesis.expected")
             }
             builder.restoreNewlinesState
           case _ =>

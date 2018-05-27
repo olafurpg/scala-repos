@@ -10,7 +10,9 @@ import prop._
 import spire.util.Opt
 
 class SafeLongCheck
-    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+    extends PropSpec
+    with Matchers
+    with GeneratorDrivenPropertyChecks {
 
   import SafeLong.zero
 
@@ -19,7 +21,7 @@ class SafeLongCheck
 
   def invariant(z: SafeLong): SafeLong = {
     z match {
-      case SafeLongLong(_) => ()
+      case SafeLongLong(_)       => ()
       case SafeLongBigInteger(n) => BigInt(n).isValidLong shouldBe false
     }
     z

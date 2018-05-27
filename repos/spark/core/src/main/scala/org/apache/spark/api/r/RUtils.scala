@@ -34,7 +34,7 @@ private[spark] object RUtils {
     val sparkHome =
       sys.env.get("SPARK_HOME").orElse(sys.props.get("spark.test.home"))
     sparkHome.map(
-        Seq(_, "R", "lib").mkString(File.separator)
+      Seq(_, "R", "lib").mkString(File.separator)
     )
   }
 
@@ -53,8 +53,9 @@ private[spark] object RUtils {
         (sys.props("spark.master"), sys.props("spark.submit.deployMode"))
       } else {
         val sparkConf = SparkEnv.get.conf
-        (sparkConf.get("spark.master"),
-         sparkConf.get("spark.submit.deployMode", "client"))
+        (
+          sparkConf.get("spark.master"),
+          sparkConf.get("spark.submit.deployMode", "client"))
       }
 
     val isYarnCluster =
@@ -82,7 +83,7 @@ private[spark] object RUtils {
       // TODO: support this for Mesos
       val sparkRPkgPath = localSparkRPackagePath.getOrElse {
         throw new SparkException(
-            "SPARK_HOME not set. Can't locate SparkR package.")
+          "SPARK_HOME not set. Can't locate SparkR package.")
       }
       if (!rPackages.isEmpty) {
         Seq(sparkRPkgPath, rPackages.get)

@@ -21,10 +21,12 @@ import scala.reflect.ClassTag
 class CollectionsTest extends CollectionsTestBase {
 
   private def checkImmutablilityOfCollectionApi[E](
-      coll: ju.Collection[E], elem: E): Unit = {
+      coll: ju.Collection[E],
+      elem: E): Unit = {
     expectThrows(classOf[UnsupportedOperationException], coll.add(elem))
     expectThrows(
-        classOf[UnsupportedOperationException], coll.addAll(List(elem)))
+      classOf[UnsupportedOperationException],
+      coll.addAll(List(elem)))
     assertFalse(coll.addAll(List.empty[E]))
 
     if (coll.count(_ == elem) != coll.size)
@@ -50,20 +52,26 @@ class CollectionsTest extends CollectionsTestBase {
   private def checkImmutablilityOfSetApi[E](set: ju.Set[E], elem: E): Unit =
     checkImmutablilityOfCollectionApi(set, elem)
 
-  private def checkImmutablilityOfListApi[E](list: ju.List[E], elem: E): Unit = {
+  private def checkImmutablilityOfListApi[E](
+      list: ju.List[E],
+      elem: E): Unit = {
     checkImmutablilityOfCollectionApi(list, elem)
     expectThrows(classOf[UnsupportedOperationException], list.add(0, elem))
     assertFalse(list.addAll(0, List.empty[E]))
     expectThrows(
-        classOf[UnsupportedOperationException], list.addAll(0, List(elem)))
+      classOf[UnsupportedOperationException],
+      list.addAll(0, List(elem)))
     expectThrows(classOf[UnsupportedOperationException], list.remove(0))
   }
 
   private def checkImmutablilityOfMapApi[K, V](
-      map: ju.Map[K, V], k: K, v: V): Unit = {
+      map: ju.Map[K, V],
+      k: K,
+      v: V): Unit = {
     expectThrows(classOf[UnsupportedOperationException], map.put(k, v))
     expectThrows(
-        classOf[UnsupportedOperationException], map.putAll(Map(k -> v)))
+      classOf[UnsupportedOperationException],
+      map.putAll(Map(k -> v)))
     map.putAll(Map.empty[K, V]) // Should not throw
 
     if (map.containsKey(k)) expectThrows(classOf[Throwable], map.remove(k))
@@ -74,7 +82,7 @@ class CollectionsTest extends CollectionsTestBase {
   }
 
   @Test def emptySet(): Unit = {
-    def test[E : ClassTag](toElem: Int => E): Unit = {
+    def test[E: ClassTag](toElem: Int => E): Unit = {
       val emptySet = ju.Collections.emptySet[E]
       assertTrue(emptySet.isEmpty)
       assertEquals(0, emptySet.size)
@@ -88,7 +96,7 @@ class CollectionsTest extends CollectionsTestBase {
   }
 
   @Test def emptyList(): Unit = {
-    def test[E : ClassTag](toElem: Int => E): Unit = {
+    def test[E: ClassTag](toElem: Int => E): Unit = {
       val emptyList = ju.Collections.emptyList[E]
       assertTrue(emptyList.isEmpty)
       assertEquals(0, emptyList.size)
@@ -118,7 +126,7 @@ class CollectionsTest extends CollectionsTestBase {
   }
 
   @Test def singleton(): Unit = {
-    def test[E : ClassTag](toElem: Int => E): Unit = {
+    def test[E: ClassTag](toElem: Int => E): Unit = {
       val singletonSet = ju.Collections.singleton[E](toElem(0))
       assertTrue(singletonSet.contains(toElem(0)))
       assertEquals(1, singletonSet.size)
@@ -133,7 +141,7 @@ class CollectionsTest extends CollectionsTestBase {
   }
 
   @Test def singletonList(): Unit = {
-    def test[E : ClassTag](toElem: Int => E): Unit = {
+    def test[E: ClassTag](toElem: Int => E): Unit = {
       val singletonList = ju.Collections.singletonList[E](toElem(0))
       assertTrue(singletonList.contains(toElem(0)))
       assertEquals(1, singletonList.size)
@@ -164,7 +172,7 @@ class CollectionsTest extends CollectionsTestBase {
   }
 
   @Test def nCopies(): Unit = {
-    def test[E : ClassTag](toElem: Int => E): Unit = {
+    def test[E: ClassTag](toElem: Int => E): Unit = {
       for (n <- Seq(1, 4, 543)) {
         val nCopies = ju.Collections.nCopies(n, toElem(0))
         assertTrue(nCopies.contains(toElem(0)))
@@ -182,8 +190,9 @@ class CollectionsTest extends CollectionsTestBase {
       checkImmutablilityOfListApi(zeroCopies, toElem(0))
 
       for (n <- Seq(-1, -4, -543)) {
-        expectThrows(classOf[IllegalArgumentException],
-                     ju.Collections.nCopies(n, toElem(0)))
+        expectThrows(
+          classOf[IllegalArgumentException],
+          ju.Collections.nCopies(n, toElem(0)))
       }
     }
 

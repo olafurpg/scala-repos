@@ -52,46 +52,49 @@ private[v1] class AllJobsResource(ui: SparkUI) {
 
 private[v1] object AllJobsResource {
 
-  def getStatusToJobs(ui: SparkUI): Seq[(JobExecutionStatus, Seq[JobUIData])] = {
+  def getStatusToJobs(
+      ui: SparkUI): Seq[(JobExecutionStatus, Seq[JobUIData])] = {
     val statusToJobs = ui.jobProgressListener.synchronized {
       Seq(
-          JobExecutionStatus.RUNNING -> ui.jobProgressListener.activeJobs.values.toSeq,
-          JobExecutionStatus.SUCCEEDED -> ui.jobProgressListener.completedJobs.toSeq,
-          JobExecutionStatus.FAILED -> ui.jobProgressListener.failedJobs.reverse.toSeq
+        JobExecutionStatus.RUNNING -> ui.jobProgressListener.activeJobs.values.toSeq,
+        JobExecutionStatus.SUCCEEDED -> ui.jobProgressListener.completedJobs.toSeq,
+        JobExecutionStatus.FAILED -> ui.jobProgressListener.failedJobs.reverse.toSeq
       )
     }
     statusToJobs
   }
 
-  def convertJobData(job: JobUIData,
-                     listener: JobProgressListener,
-                     includeStageDetails: Boolean): JobData = {
+  def convertJobData(
+      job: JobUIData,
+      listener: JobProgressListener,
+      includeStageDetails: Boolean): JobData = {
     listener.synchronized {
       val lastStageInfo = listener.stageIdToInfo.get(job.stageIds.max)
       val lastStageData = lastStageInfo.flatMap { s =>
         listener.stageIdToData.get((s.stageId, s.attemptId))
       }
-      val lastStageName = lastStageInfo.map { _.name }
+      val lastStageName = lastStageInfo
+        .map { _.name }
         .getOrElse("(Unknown Stage Name)")
       val lastStageDescription = lastStageData.flatMap { _.description }
       new JobData(
-          jobId = job.jobId,
-          name = lastStageName,
-          description = lastStageDescription,
-          submissionTime = job.submissionTime.map { new Date(_) },
-          completionTime = job.completionTime.map { new Date(_) },
-          stageIds = job.stageIds,
-          jobGroup = job.jobGroup,
-          status = job.status,
-          numTasks = job.numTasks,
-          numActiveTasks = job.numActiveTasks,
-          numCompletedTasks = job.numCompletedTasks,
-          numSkippedTasks = job.numCompletedTasks,
-          numFailedTasks = job.numFailedTasks,
-          numActiveStages = job.numActiveStages,
-          numCompletedStages = job.completedStageIndices.size,
-          numSkippedStages = job.numSkippedStages,
-          numFailedStages = job.numFailedStages
+        jobId = job.jobId,
+        name = lastStageName,
+        description = lastStageDescription,
+        submissionTime = job.submissionTime.map { new Date(_) },
+        completionTime = job.completionTime.map { new Date(_) },
+        stageIds = job.stageIds,
+        jobGroup = job.jobGroup,
+        status = job.status,
+        numTasks = job.numTasks,
+        numActiveTasks = job.numActiveTasks,
+        numCompletedTasks = job.numCompletedTasks,
+        numSkippedTasks = job.numCompletedTasks,
+        numFailedTasks = job.numFailedTasks,
+        numActiveStages = job.numActiveStages,
+        numCompletedStages = job.completedStageIndices.size,
+        numSkippedStages = job.numSkippedStages,
+        numFailedStages = job.numFailedStages
       )
     }
   }

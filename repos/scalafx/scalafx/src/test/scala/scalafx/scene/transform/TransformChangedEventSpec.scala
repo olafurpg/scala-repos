@@ -38,5 +38,7 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class TransformChangedEventSpec
     extends SimpleSFXDelegateSpec[
-        jfxst.TransformChangedEvent, TransformChangedEvent](
-        classOf[jfxst.TransformChangedEvent], classOf[TransformChangedEvent])
+      jfxst.TransformChangedEvent,
+      TransformChangedEvent](
+      classOf[jfxst.TransformChangedEvent],
+      classOf[TransformChangedEvent])

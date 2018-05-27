@@ -44,7 +44,8 @@ object MongoPasswordField {
 }
 
 class MongoPasswordField[OwnerType <: BsonRecord[OwnerType]](
-    rec: OwnerType, minLen: Int)
+    rec: OwnerType,
+    minLen: Int)
     extends JsonObjectField[OwnerType, Password](rec, Password) {
 
   def this(rec: OwnerType) = {
@@ -60,10 +61,10 @@ class MongoPasswordField[OwnerType <: BsonRecord[OwnerType]](
   override def set_!(in: Box[Password]): Box[Password] = {
     validatorValue = in
     in.map(
-        p =>
-          if (p.salt.length == 0) // only encrypt the password if it hasn't already been encrypted
-            Password(MongoPasswordField.encrypt(p.pwd, salt_i.get), salt_i.get)
-          else p)
+      p =>
+        if (p.salt.length == 0) // only encrypt the password if it hasn't already been encrypted
+          Password(MongoPasswordField.encrypt(p.pwd, salt_i.get), salt_i.get)
+        else p)
   }
 
   override def validate: List[FieldError] = runValidation(validatorValue)
@@ -74,18 +75,18 @@ class MongoPasswordField[OwnerType <: BsonRecord[OwnerType]](
       name={funcName}
       value=""
       tabindex={tabIndex.toString}/>
-    
+
   }
 
   override def toForm: Box[NodeSeq] =
     uniqueFieldId match {
       case Full(id) => Full(elem % ("id" -> id))
-      case _ => Full(elem)
+      case _        => Full(elem)
     }
 
   private def validatePassword(pwd: Password): List[FieldError] = pwd match {
-    case null | Password("", _) |
-        Password("*", _) | Password(MongoPasswordField.blankPw, _) =>
+    case null | Password("", _) | Password("*", _) |
+        Password(MongoPasswordField.blankPw, _) =>
       Text(S.?("password.must.be.set"))
     case Password(pwd, _) if pwd.length < minLen =>
       Text(S.?("password.too.short"))

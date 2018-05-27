@@ -32,8 +32,7 @@ class JavaLoggerSpec extends AkkaSpec(JavaLoggerSpec.config) {
 
   val logger = logging.Logger.getLogger("akka://JavaLoggerSpec/user/log")
   logger.setUseParentHandlers(false) // turn off output of test LogRecords
-  logger.addHandler(
-      new logging.Handler {
+  logger.addHandler(new logging.Handler {
     def publish(record: logging.LogRecord) {
       testActor ! record
     }
@@ -59,7 +58,7 @@ class JavaLoggerSpec extends AkkaSpec(JavaLoggerSpec.config) {
       record.getMessage should ===("Simulated error")
       record.getThrown.isInstanceOf[RuntimeException] should ===(true)
       record.getSourceClassName should ===(
-          classOf[JavaLoggerSpec.LogProducer].getName)
+        classOf[JavaLoggerSpec.LogProducer].getName)
       record.getSourceMethodName should ===(null)
     }
 
@@ -75,7 +74,7 @@ class JavaLoggerSpec extends AkkaSpec(JavaLoggerSpec.config) {
       record.getMessage should ===("3 is the magic number")
       record.getThrown should ===(null)
       record.getSourceClassName should ===(
-          classOf[JavaLoggerSpec.LogProducer].getName)
+        classOf[JavaLoggerSpec.LogProducer].getName)
       record.getSourceMethodName should ===(null)
     }
   }

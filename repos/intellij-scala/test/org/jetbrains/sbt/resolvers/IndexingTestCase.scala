@@ -30,10 +30,11 @@ abstract class IndexingTestCase extends ScalaFixtureTestCase {
     index
   }
 
-  def assertIndexContentsEquals(index: SbtResolverIndex,
-                                groups: Set[String],
-                                artifacts: Set[String],
-                                versions: Set[String]): Unit = {
+  def assertIndexContentsEquals(
+      index: SbtResolverIndex,
+      groups: Set[String],
+      artifacts: Set[String],
+      versions: Set[String]): Unit = {
     assertEquals(index.groups(), groups)
     assertEquals(index.artifacts(), artifacts)
     artifacts foreach { a =>

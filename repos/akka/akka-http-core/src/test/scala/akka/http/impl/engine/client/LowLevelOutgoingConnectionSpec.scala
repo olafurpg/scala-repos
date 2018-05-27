@@ -23,7 +23,8 @@ import akka.http.impl.util._
 import akka.testkit.AkkaSpec
 
 class LowLevelOutgoingConnectionSpec
-    extends AkkaSpec("akka.loggers = []\n akka.loglevel = OFF") with Inside {
+    extends AkkaSpec("akka.loggers = []\n akka.loglevel = OFF")
+    with Inside {
   implicit val materializer = ActorMaterializer()
 
   "The connection-level client implementation" should {
@@ -47,11 +48,13 @@ class LowLevelOutgoingConnectionSpec
 
       "has a request with default entity" in new TestSetup {
         val probe = TestPublisher.manualProbe[ByteString]()
-        requestsSub.sendNext(HttpRequest(
-                PUT,
-                entity = HttpEntity(ContentTypes.`application/octet-stream`,
-                                    8,
-                                    Source.fromPublisher(probe))))
+        requestsSub.sendNext(
+          HttpRequest(
+            PUT,
+            entity = HttpEntity(
+              ContentTypes.`application/octet-stream`,
+              8,
+              Source.fromPublisher(probe))))
         expectWireData("""PUT / HTTP/1.1
             |Host: example.com
             |User-Agent: akka-http/test
@@ -263,11 +266,13 @@ class LowLevelOutgoingConnectionSpec
 
       "catch the request entity stream being shorter than the Content-Length" in new TestSetup {
         val probe = TestPublisher.manualProbe[ByteString]()
-        requestsSub.sendNext(HttpRequest(
-                PUT,
-                entity = HttpEntity(ContentTypes.`application/octet-stream`,
-                                    8,
-                                    Source.fromPublisher(probe))))
+        requestsSub.sendNext(
+          HttpRequest(
+            PUT,
+            entity = HttpEntity(
+              ContentTypes.`application/octet-stream`,
+              8,
+              Source.fromPublisher(probe))))
         expectWireData("""PUT / HTTP/1.1
             |Host: example.com
             |User-Agent: akka-http/test
@@ -292,11 +297,13 @@ class LowLevelOutgoingConnectionSpec
 
       "catch the request entity stream being longer than the Content-Length" in new TestSetup {
         val probe = TestPublisher.manualProbe[ByteString]()
-        requestsSub.sendNext(HttpRequest(
-                PUT,
-                entity = HttpEntity(ContentTypes.`application/octet-stream`,
-                                    8,
-                                    Source.fromPublisher(probe))))
+        requestsSub.sendNext(
+          HttpRequest(
+            PUT,
+            entity = HttpEntity(
+              ContentTypes.`application/octet-stream`,
+              8,
+              Source.fromPublisher(probe))))
         expectWireData("""PUT / HTTP/1.1
             |Host: example.com
             |User-Agent: akka-http/test
@@ -423,10 +430,11 @@ class LowLevelOutgoingConnectionSpec
         implicit class XResponse(response: HttpResponse) {
           def expectStrictEntityWithLength(bytes: Int) =
             response shouldEqual HttpResponse(
-                entity = Strict(ContentTypes.`application/octet-stream`,
-                                ByteString(entityBase take bytes)))
+              entity = Strict(
+                ContentTypes.`application/octet-stream`,
+                ByteString(entityBase take bytes)))
 
-          def expectEntity[T <: HttpEntity : ClassTag](bytes: Int) =
+          def expectEntity[T <: HttpEntity: ClassTag](bytes: Int) =
             inside(response) {
               case HttpResponse(_, _, entity: T, _) ⇒
                 entity
@@ -436,22 +444,24 @@ class LowLevelOutgoingConnectionSpec
                   .utf8String shouldEqual entityBase.take(bytes)
             }
 
-          def expectSizeErrorInEntityOfType[T <: HttpEntity : ClassTag](
-              limit: Int, actualSize: Option[Long] = None) =
+          def expectSizeErrorInEntityOfType[T <: HttpEntity: ClassTag](
+              limit: Int,
+              actualSize: Option[Long] = None) =
             inside(response) {
               case HttpResponse(_, _, entity: T, _) ⇒
                 def gatherBytes =
                   entity.dataBytes
                     .runFold(ByteString.empty)(_ ++ _)
                     .awaitResult(100.millis)
-                  (the[Exception] thrownBy gatherBytes).getCause shouldEqual EntityStreamSizeException(
-                    limit, actualSize)
+                (the[Exception] thrownBy gatherBytes).getCause shouldEqual EntityStreamSizeException(
+                  limit,
+                  actualSize)
             }
         }
       }
 
       "the config setting (strict entity)" in new LengthVerificationTest(
-          maxContentLength = 10) {
+        maxContentLength = 10) {
         sendStandardRequest()
         sendStrictResponseWithLength(10)
         expectResponse().expectStrictEntityWithLength(10)
@@ -461,11 +471,12 @@ class LowLevelOutgoingConnectionSpec
         sendStandardRequest()
         sendStrictResponseWithLength(11)
         expectResponse().expectSizeErrorInEntityOfType[Default](
-            limit = 10, actualSize = Some(11))
+          limit = 10,
+          actualSize = Some(11))
       }
 
       "the config setting (default entity)" in new LengthVerificationTest(
-          maxContentLength = 10) {
+        maxContentLength = 10) {
         sendStandardRequest()
         sendDefaultResponseWithLength(10)
         expectResponse().expectEntity[Default](10)
@@ -473,11 +484,12 @@ class LowLevelOutgoingConnectionSpec
         sendStandardRequest()
         sendDefaultResponseWithLength(11)
         expectResponse().expectSizeErrorInEntityOfType[Default](
-            limit = 10, actualSize = Some(11))
+          limit = 10,
+          actualSize = Some(11))
       }
 
       "the config setting (chunked entity)" in new LengthVerificationTest(
-          maxContentLength = 10) {
+        maxContentLength = 10) {
         sendStandardRequest()
         sendChunkedResponseWithLength(10)
         expectResponse().expectEntity[Chunked](10)
@@ -502,7 +514,7 @@ class LowLevelOutgoingConnectionSpec
       }
 
       "a smaller programmatically-set limit (strict entity)" in new LengthVerificationTest(
-          maxContentLength = 12) {
+        maxContentLength = 12) {
         sendStandardRequest()
         sendStrictResponseWithLength(10)
         expectResponse()
@@ -515,12 +527,13 @@ class LowLevelOutgoingConnectionSpec
         sendStrictResponseWithLength(11)
         expectResponse()
           .mapEntity(_ withSizeLimit 10)
-          .expectSizeErrorInEntityOfType[Default](limit = 10,
-                                                  actualSize = Some(11))
+          .expectSizeErrorInEntityOfType[Default](
+            limit = 10,
+            actualSize = Some(11))
       }
 
       "a smaller programmatically-set limit (default entity)" in new LengthVerificationTest(
-          maxContentLength = 12) {
+        maxContentLength = 12) {
         sendStandardRequest()
         sendDefaultResponseWithLength(10)
         expectResponse()
@@ -531,12 +544,13 @@ class LowLevelOutgoingConnectionSpec
         sendDefaultResponseWithLength(11)
         expectResponse()
           .mapEntity(_ withSizeLimit 10)
-          .expectSizeErrorInEntityOfType[Default](limit = 10,
-                                                  actualSize = Some(11))
+          .expectSizeErrorInEntityOfType[Default](
+            limit = 10,
+            actualSize = Some(11))
       }
 
       "a smaller programmatically-set limit (chunked entity)" in new LengthVerificationTest(
-          maxContentLength = 12) {
+        maxContentLength = 12) {
         sendStandardRequest()
         sendChunkedResponseWithLength(10)
         expectResponse()
@@ -568,7 +582,7 @@ class LowLevelOutgoingConnectionSpec
       }
 
       "a larger programmatically-set limit (strict entity)" in new LengthVerificationTest(
-          maxContentLength = 8) {
+        maxContentLength = 8) {
         // entities that would be strict but have a Content-Length > the configured maximum are delivered
         // as single element Default entities!
         sendStandardRequest()
@@ -581,12 +595,13 @@ class LowLevelOutgoingConnectionSpec
         sendStrictResponseWithLength(11)
         expectResponse()
           .mapEntity(_ withSizeLimit 10)
-          .expectSizeErrorInEntityOfType[Default](limit = 10,
-                                                  actualSize = Some(11))
+          .expectSizeErrorInEntityOfType[Default](
+            limit = 10,
+            actualSize = Some(11))
       }
 
       "a larger programmatically-set limit (default entity)" in new LengthVerificationTest(
-          maxContentLength = 8) {
+        maxContentLength = 8) {
         sendStandardRequest()
         sendDefaultResponseWithLength(10)
         expectResponse()
@@ -597,12 +612,13 @@ class LowLevelOutgoingConnectionSpec
         sendDefaultResponseWithLength(11)
         expectResponse()
           .mapEntity(_ withSizeLimit 10)
-          .expectSizeErrorInEntityOfType[Default](limit = 10,
-                                                  actualSize = Some(11))
+          .expectSizeErrorInEntityOfType[Default](
+            limit = 10,
+            actualSize = Some(11))
       }
 
       "a larger programmatically-set limit (chunked entity)" in new LengthVerificationTest(
-          maxContentLength = 8) {
+        maxContentLength = 8) {
         sendStandardRequest()
         sendChunkedResponseWithLength(10)
         expectResponse()
@@ -637,9 +653,11 @@ class LowLevelOutgoingConnectionSpec
     "support requests with an `Expect: 100-continue` headers" which {
 
       "have a strict entity and receive a `100 Continue` response" in new TestSetup {
-        requestsSub.sendNext(HttpRequest(POST,
-                                         headers = List(Expect.`100-continue`),
-                                         entity = "ABCDEF"))
+        requestsSub.sendNext(
+          HttpRequest(
+            POST,
+            headers = List(Expect.`100-continue`),
+            entity = "ABCDEF"))
         expectWireData("""POST / HTTP/1.1
             |Expect: 100-continue
             |Host: example.com
@@ -672,12 +690,14 @@ class LowLevelOutgoingConnectionSpec
 
       "have a default entity and receive a `100 Continue` response" in new TestSetup {
         val entityParts = List("ABC", "DE", "FGH").map(ByteString(_))
-        requestsSub.sendNext(HttpRequest(
-                POST,
-                headers = List(Expect.`100-continue`),
-                entity = HttpEntity(ContentTypes.`application/octet-stream`,
-                                    8,
-                                    Source(entityParts))))
+        requestsSub.sendNext(
+          HttpRequest(
+            POST,
+            headers = List(Expect.`100-continue`),
+            entity = HttpEntity(
+              ContentTypes.`application/octet-stream`,
+              8,
+              Source(entityParts))))
         expectWireData("""POST / HTTP/1.1
             |Expect: 100-continue
             |Host: example.com
@@ -711,9 +731,11 @@ class LowLevelOutgoingConnectionSpec
       }
 
       "receive a normal response" in new TestSetup {
-        requestsSub.sendNext(HttpRequest(POST,
-                                         headers = List(Expect.`100-continue`),
-                                         entity = "ABCDEF"))
+        requestsSub.sendNext(
+          HttpRequest(
+            POST,
+            headers = List(Expect.`100-continue`),
+            entity = "ABCDEF"))
         expectWireData("""POST / HTTP/1.1
             |Expect: 100-continue
             |Host: example.com
@@ -741,9 +763,11 @@ class LowLevelOutgoingConnectionSpec
       }
 
       "receive an error response" in new TestSetup {
-        requestsSub.sendNext(HttpRequest(POST,
-                                         headers = List(Expect.`100-continue`),
-                                         entity = "ABCDEF"))
+        requestsSub.sendNext(
+          HttpRequest(
+            POST,
+            headers = List(Expect.`100-continue`),
+            entity = "ABCDEF"))
         requestsSub.sendComplete()
         expectWireData("""POST / HTTP/1.1
             |Expect: 100-continue
@@ -799,11 +823,11 @@ class LowLevelOutgoingConnectionSpec
 
     def settings = {
       val s = ClientConnectionSettings(system).withUserAgentHeader(
-          Some(`User-Agent`(List(ProductVersion("akka-http", "test")))))
+        Some(`User-Agent`(List(ProductVersion("akka-http", "test")))))
       if (maxResponseContentLength < 0) s
       else
         s.withParserSettings(
-            s.parserSettings.withMaxContentLength(maxResponseContentLength))
+          s.parserSettings.withMaxContentLength(maxResponseContentLength))
     }
 
     val (netOut, netIn) = {
@@ -811,19 +835,22 @@ class LowLevelOutgoingConnectionSpec
       val netIn = TestPublisher.manualProbe[ByteString]()
 
       RunnableGraph
-        .fromGraph(GraphDSL.create(OutgoingConnectionBlueprint(
-                    Host("example.com"), settings, NoLogging)) {
-          implicit b ⇒ client ⇒
+        .fromGraph(
+          GraphDSL.create(
+            OutgoingConnectionBlueprint(
+              Host("example.com"),
+              settings,
+              NoLogging)) { implicit b ⇒ client ⇒
             import GraphDSL.Implicits._
             Source.fromPublisher(netIn) ~> Flow[ByteString].map(
-                SessionBytes(null, _)) ~> client.in2
+              SessionBytes(null, _)) ~> client.in2
             client.out1 ~> Flow[SslTlsOutbound].collect {
               case SendBytes(x) ⇒ x
             } ~> Sink.fromSubscriber(netOut)
             Source.fromPublisher(requests) ~> client.in1
             client.out2 ~> Sink.fromSubscriber(responses)
             ClosedShape
-        })
+          })
         .run()
 
       netOut -> netIn
@@ -853,7 +880,7 @@ class LowLevelOutgoingConnectionSpec
     def expectWireData(s: String) = {
       netOutSub.request(1)
       netOut.expectNext().utf8String shouldEqual s.stripMarginWithNewline(
-          "\r\n")
+        "\r\n")
     }
 
     def closeNetworkInput(): Unit = netInSub.sendComplete()

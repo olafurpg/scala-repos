@@ -12,10 +12,11 @@ import StringUtil._
 
 trait CommitsService {
 
-  def getCommitComments(owner: String,
-                        repository: String,
-                        commitId: String,
-                        includePullRequest: Boolean)(implicit s: Session) =
+  def getCommitComments(
+      owner: String,
+      repository: String,
+      commitId: String,
+      includePullRequest: Boolean)(implicit s: Session) =
     CommitComments filter { t =>
       t.byCommit(owner, repository, commitId) &&
       (t.issueId.isEmpty || includePullRequest)
@@ -29,26 +30,29 @@ trait CommitsService {
       } firstOption
     else None
 
-  def createCommitComment(owner: String,
-                          repository: String,
-                          commitId: String,
-                          loginUser: String,
-                          content: String,
-                          fileName: Option[String],
-                          oldLine: Option[Int],
-                          newLine: Option[Int],
-                          issueId: Option[Int])(implicit s: Session): Int =
-    CommitComments.autoInc insert CommitComment(userName = owner,
-                                                repositoryName = repository,
-                                                commitId = commitId,
-                                                commentedUserName = loginUser,
-                                                content = content,
-                                                fileName = fileName,
-                                                oldLine = oldLine,
-                                                newLine = newLine,
-                                                registeredDate = currentDate,
-                                                updatedDate = currentDate,
-                                                issueId = issueId)
+  def createCommitComment(
+      owner: String,
+      repository: String,
+      commitId: String,
+      loginUser: String,
+      content: String,
+      fileName: Option[String],
+      oldLine: Option[Int],
+      newLine: Option[Int],
+      issueId: Option[Int])(implicit s: Session): Int =
+    CommitComments.autoInc insert CommitComment(
+      userName = owner,
+      repositoryName = repository,
+      commitId = commitId,
+      commentedUserName = loginUser,
+      content = content,
+      fileName = fileName,
+      oldLine = oldLine,
+      newLine = newLine,
+      registeredDate = currentDate,
+      updatedDate = currentDate,
+      issueId = issueId
+    )
 
   def updateCommitComment(commentId: Int, content: String)(
       implicit s: Session) =

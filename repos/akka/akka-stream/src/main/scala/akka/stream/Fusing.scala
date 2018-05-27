@@ -52,7 +52,7 @@ object Fusing {
     def unapply[S <: Shape, M](g: Graph[S, M]): Option[(FusedModule, S)] =
       g.module match {
         case f: FusedModule => Some((f, g.shape))
-        case _ => None
+        case _              => None
       }
   }
 
@@ -63,9 +63,10 @@ object Fusing {
     * the wirings in a more accessible form, allowing traversal from port to upstream
     * or downstream port and from there to the owning module (or graph vertex).
     */
-  final case class StructuralInfo(upstreams: immutable.Map[InPort, OutPort],
-                                  downstreams: immutable.Map[OutPort, InPort],
-                                  inOwners: immutable.Map[InPort, Module],
-                                  outOwners: immutable.Map[OutPort, Module],
-                                  allModules: Set[Module])
+  final case class StructuralInfo(
+      upstreams: immutable.Map[InPort, OutPort],
+      downstreams: immutable.Map[OutPort, InPort],
+      inOwners: immutable.Map[InPort, Module],
+      outOwners: immutable.Map[OutPort, Module],
+      allModules: Set[Module])
 }

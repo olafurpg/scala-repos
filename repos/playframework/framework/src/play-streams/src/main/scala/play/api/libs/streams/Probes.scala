@@ -39,39 +39,42 @@ object Probes {
   def publisherProbe[T](
       name: String,
       publisher: Publisher[T],
-      messageLogger: T => String = (t: T) =>
-          t.toString): Publisher[T] = new Publisher[T] with Probe {
-    val probeName = name
-    val startTime = System.nanoTime()
+      messageLogger: T => String = (t: T) => t.toString): Publisher[T] =
+    new Publisher[T] with Probe {
+      val probeName = name
+      val startTime = System.nanoTime()
 
-    def subscribe(subscriber: Subscriber[_ >: T]) = {
-      log("subscribe", subscriber.toString)(publisher.subscribe(
-              subscriberProbe(name, subscriber, messageLogger, startTime)))
+      def subscribe(subscriber: Subscriber[_ >: T]) = {
+        log("subscribe", subscriber.toString)(
+          publisher.subscribe(
+            subscriberProbe(name, subscriber, messageLogger, startTime)))
+      }
     }
-  }
 
-  def subscriberProbe[T](name: String,
-                         subscriber: Subscriber[_ >: T],
-                         messageLogger: T => String = (t: T) => t.toString,
-                         start: Long = System.nanoTime()): Subscriber[T] =
+  def subscriberProbe[T](
+      name: String,
+      subscriber: Subscriber[_ >: T],
+      messageLogger: T => String = (t: T) => t.toString,
+      start: Long = System.nanoTime()): Subscriber[T] =
     new Subscriber[T] with Probe {
       val probeName = name
       val startTime = start
 
       def onError(t: Throwable) = {
         log("onError", s"${t.getClass}: ${t.getMessage}", t.printStackTrace())(
-            subscriber.onError(t))
+          subscriber.onError(t))
       }
       def onSubscribe(subscription: Subscription) =
-        log("onSubscribe", subscription.toString)(subscriber.onSubscribe(
-                subscriptionProbe(name, subscription, start)))
+        log("onSubscribe", subscription.toString)(
+          subscriber.onSubscribe(subscriptionProbe(name, subscription, start)))
       def onComplete() = log("onComplete")(subscriber.onComplete())
       def onNext(t: T) = log("onNext", messageLogger(t))(subscriber.onNext(t))
     }
 
-  def subscriptionProbe(name: String,
-                        subscription: Subscription,
-                        start: Long = System.nanoTime()): Subscription =
+  def subscriptionProbe(
+      name: String,
+      subscription: Subscription,
+      start: Long = System.nanoTime()): Subscription =
     new Subscription with Probe {
       val probeName = name
       val startTime = start
@@ -81,11 +84,12 @@ object Probes {
         log("request", n.toString)(subscription.request(n))
     }
 
-  def processorProbe[In, Out](name: String,
-                              processor: Processor[In, Out],
-                              inLogger: In => String = (in: In) => in.toString,
-                              outLogger: Out => String = (out: Out) =>
-                                  out.toString): Processor[In, Out] = {
+  def processorProbe[In, Out](
+      name: String,
+      processor: Processor[In, Out],
+      inLogger: In => String = (in: In) => in.toString,
+      outLogger: Out => String = (out: Out) => out.toString)
+    : Processor[In, Out] = {
     val subscriber = subscriberProbe(name + "-in", processor, inLogger)
     val publisher = publisherProbe(name + "-out", processor, outLogger)
     new Processor[In, Out] {
@@ -99,11 +103,11 @@ object Probes {
     }
   }
 
-  def flowProbe[T](name: String,
-                   messageLogger: T => String = (t: T) =>
-                       t.toString): Flow[T, T, _] = {
+  def flowProbe[T](
+      name: String,
+      messageLogger: T => String = (t: T) => t.toString): Flow[T, T, _] = {
     Flow[T].transform(() =>
-          new PushPullStage[T, T] with Probe {
+      new PushPullStage[T, T] with Probe {
         override def startTime: Long = System.nanoTime()
         override def probeName: String = name
 
@@ -117,9 +121,10 @@ object Probes {
         override def onDownstreamFinish(ctx: Context[T]) =
           log("onDownstreamFinish")(super.onDownstreamFinish(ctx))
         override def onUpstreamFailure(cause: Throwable, ctx: Context[T]) =
-          log("onUpstreamFailure",
-              s"${cause.getClass}: ${cause.getMessage}",
-              cause.printStackTrace())(super.onUpstreamFailure(cause, ctx))
+          log(
+            "onUpstreamFailure",
+            s"${cause.getClass}: ${cause.getMessage}",
+            cause.printStackTrace())(super.onUpstreamFailure(cause, ctx))
         override def postStop() = log("postStop")(super.postStop())
         override def decide(t: Throwable) = log("decide")(super.decide(t))
         override def restart() = log("restart")(super.restart())

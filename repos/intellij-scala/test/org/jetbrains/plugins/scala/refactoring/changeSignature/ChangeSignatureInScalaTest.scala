@@ -2,11 +2,17 @@ package org.jetbrains.plugins.scala
 package refactoring.changeSignature
 
 import com.intellij.psi.PsiMember
-import com.intellij.refactoring.changeSignature.{ChangeSignatureProcessorBase, ParameterInfo}
+import com.intellij.refactoring.changeSignature.{
+  ChangeSignatureProcessorBase,
+  ParameterInfo
+}
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScMethodLike
 import org.jetbrains.plugins.scala.lang.psi.types
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
-import org.jetbrains.plugins.scala.lang.refactoring.changeSignature.{ScalaChangeSignatureHandler, ScalaParameterInfo}
+import org.jetbrains.plugins.scala.lang.refactoring.changeSignature.{
+  ScalaChangeSignatureHandler,
+  ScalaParameterInfo
+}
 import org.junit.Assert._
 
 /**
@@ -19,7 +25,8 @@ class ChangeSignatureInScalaTest extends ChangeSignatureTestBase {
     val element = new ScalaChangeSignatureHandler()
       .findTargetMember(getFileAdapter, getEditorAdapter)
     assertTrue(
-        "<caret> is not on method name", element.isInstanceOf[ScMethodLike])
+      "<caret> is not on method name",
+      element.isInstanceOf[ScMethodLike])
     element.asInstanceOf[ScMethodLike]
   }
 
@@ -31,7 +38,11 @@ class ChangeSignatureInScalaTest extends ChangeSignatureTestBase {
       newReturnType: String,
       newParams: => Seq[Seq[ParameterInfo]]): ChangeSignatureProcessorBase = {
     scalaProcessor(
-        newVisibility, newName, newReturnType, newParams, isAddDefaultValue)
+      newVisibility,
+      newName,
+      newReturnType,
+      newParams,
+      isAddDefaultValue)
   }
 
   override def mainFileName(testName: String): String = testName + ".scala"
@@ -40,14 +51,21 @@ class ChangeSignatureInScalaTest extends ChangeSignatureTestBase {
   override def secondFileName(testName: String): String = null
   override def secondFileAfterName(testName: String): String = null
 
-  private def parameterInfo(name: String,
-                            oldIdx: Int,
-                            tpe: ScType,
-                            defVal: String = "",
-                            isRep: Boolean = false,
-                            isByName: Boolean = false) = {
+  private def parameterInfo(
+      name: String,
+      oldIdx: Int,
+      tpe: ScType,
+      defVal: String = "",
+      isRep: Boolean = false,
+      isByName: Boolean = false) = {
     new ScalaParameterInfo(
-        name, oldIdx, tpe, getProjectAdapter, isRep, isByName, defVal)
+      name,
+      oldIdx,
+      tpe,
+      getProjectAdapter,
+      isRep,
+      isByName,
+      defVal)
   }
 
   def testVisibility(): Unit = {
@@ -59,73 +77,80 @@ class ChangeSignatureInScalaTest extends ChangeSignatureTestBase {
   def testAddRepeatedParam(): Unit = {
     isAddDefaultValue = false
     val params = Seq(
-        parameterInfo("i", 0, types.Int),
-        parameterInfo("b", 1, types.Boolean),
-        parameterInfo("xs", -1, types.Int, isRep = true, defVal = "1"))
+      parameterInfo("i", 0, types.Int),
+      parameterInfo("b", 1, types.Boolean),
+      parameterInfo("xs", -1, types.Int, isRep = true, defVal = "1"))
     doTest(null, "foo", null, Seq(params))
   }
 
   def testAddRepeatedWithoutDefault(): Unit = {
     isAddDefaultValue = false
-    val params = Seq(parameterInfo("i", 0, types.Int),
-                     parameterInfo("xs", -1, types.Int, isRep = true))
+    val params = Seq(
+      parameterInfo("i", 0, types.Int),
+      parameterInfo("xs", -1, types.Int, isRep = true))
     doTest(null, "foo", null, Seq(params))
   }
 
   def testMakeRepeatedParam(): Unit = {
     isAddDefaultValue = false
-    val params = Seq(parameterInfo("i", 0, types.Int),
-                     parameterInfo("b", 1, types.Boolean, isRep = true))
+    val params = Seq(
+      parameterInfo("i", 0, types.Int),
+      parameterInfo("b", 1, types.Boolean, isRep = true))
     doTest(null, "foo", null, Seq(params))
   }
 
   def testRemoveRepeatedParam(): Unit = {
     isAddDefaultValue = false
     val params = Seq(
-        parameterInfo("i", 0, types.Int), parameterInfo("b", 1, types.Boolean))
+      parameterInfo("i", 0, types.Int),
+      parameterInfo("b", 1, types.Boolean))
     doTest(null, "foo", null, Seq(params))
   }
 
   def testNoDefaultArg(): Unit = {
     isAddDefaultValue = true
-    val params = Seq(
-        parameterInfo("i", 0, types.Int), parameterInfo("j", -1, types.Int))
+    val params =
+      Seq(parameterInfo("i", 0, types.Int), parameterInfo("j", -1, types.Int))
     doTest(null, "foo", null, Seq(params))
   }
 
   def testNoDefaultArg2(): Unit = {
     isAddDefaultValue = false
-    val params = Seq(
-        parameterInfo("i", 0, types.Int), parameterInfo("j", -1, types.Int))
+    val params =
+      Seq(parameterInfo("i", 0, types.Int), parameterInfo("j", -1, types.Int))
     doTest(null, "foo", null, Seq(params))
   }
 
   def testAnonFunWithDefaultArg(): Unit = {
     isAddDefaultValue = true
-    val params = Seq(parameterInfo("i", 0, types.Int),
-                     parameterInfo("j", -1, types.Int, "0"))
+    val params = Seq(
+      parameterInfo("i", 0, types.Int),
+      parameterInfo("j", -1, types.Int, "0"))
     doTest(null, "foo", null, Seq(params))
   }
 
   def testAnonFunModifyCall(): Unit = {
     isAddDefaultValue = false
-    val params = Seq(parameterInfo("i", 0, types.Int),
-                     parameterInfo("j", -1, types.Int, "0"))
+    val params = Seq(
+      parameterInfo("i", 0, types.Int),
+      parameterInfo("j", -1, types.Int, "0"))
     doTest(null, "foo", null, Seq(params))
   }
 
   def testAnonFunManyParams(): Unit = {
     isAddDefaultValue = true
-    val params = Seq(parameterInfo("j", 1, types.Int),
-                     parameterInfo("b", 2, types.Boolean),
-                     parameterInfo("s", -1, types.AnyRef, "\"\""))
+    val params = Seq(
+      parameterInfo("j", 1, types.Int),
+      parameterInfo("b", 2, types.Boolean),
+      parameterInfo("s", -1, types.AnyRef, "\"\""))
     doTest(null, "foo", null, Seq(params))
   }
 
   def testLocalFunction(): Unit = {
     isAddDefaultValue = true
-    val params = Seq(parameterInfo("i", 0, types.Int),
-                     parameterInfo("s", -1, types.Boolean, "true"))
+    val params = Seq(
+      parameterInfo("i", 0, types.Int),
+      parameterInfo("s", -1, types.Boolean, "true"))
     doTest(null, "local", null, Seq(params))
   }
 
@@ -137,19 +162,23 @@ class ChangeSignatureInScalaTest extends ChangeSignatureTestBase {
 
   def testAddClauseConstructorVararg(): Unit = {
     isAddDefaultValue = false
-    val params = Seq(Seq(parameterInfo("b", 0, types.Boolean)),
-                     Seq(parameterInfo("x", -1, types.Int, "10"),
-                         parameterInfo("i", 1, types.Int, isRep = true)))
+    val params = Seq(
+      Seq(parameterInfo("b", 0, types.Boolean)),
+      Seq(
+        parameterInfo("x", -1, types.Int, "10"),
+        parameterInfo("i", 1, types.Int, isRep = true)))
     doTest(null, "AddClauseConstructorVararg", null, params)
   }
 
   def testCaseClass(): Unit = {
     isAddDefaultValue = true
     val params = Seq(
-        Seq(parameterInfo("ii", 0, types.Int),
-            parameterInfo("argss", 2, types.Int, isRep = true)),
-        Seq(parameterInfo("cc", 1, types.Char),
-            parameterInfo("b", -1, types.Boolean, "true"))
+      Seq(
+        parameterInfo("ii", 0, types.Int),
+        parameterInfo("argss", 2, types.Int, isRep = true)),
+      Seq(
+        parameterInfo("cc", 1, types.Char),
+        parameterInfo("b", -1, types.Boolean, "true"))
     )
     doTest(null, "CClass", null, params)
   }

@@ -2,8 +2,8 @@ object Test {
   def f(): Int = {
     try {
       val g = (1 to 10 map { i =>
-            return 16; i
-          }).sum
+        return 16; i
+      }).sum
       g
     } catch {
       case x: runtime.NonLocalReturnControl[_] =>

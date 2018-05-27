@@ -98,8 +98,9 @@ class FunctionAnnotatorTest extends SimpleTestCase {
   }
 
   def testTry(): Unit = {
-    assertMatches(messages(
-            """
+    assertMatches(
+      messages(
+        """
         |def myFunc(): Int = {
         |  try {
         |    val something = "some string"
@@ -109,7 +110,7 @@ class FunctionAnnotatorTest extends SimpleTestCase {
         |  }
         |}
       """.stripMargin
-        )) {
+      )) {
       case Error("}", TypeMismatch()) :: Nil =>
     }
   }
@@ -194,7 +195,7 @@ class FunctionAnnotatorTest extends SimpleTestCase {
 
   def testInheritedTypeReturnType() {
     assertMatches(
-        messages("trait T { def f: T }; new T { def f = { return new T }}")) {
+      messages("trait T { def f: T }; new T { def f = { return new T }}")) {
       case Error("return", NeedsResultType()) :: Nil =>
     }
   }
@@ -213,7 +214,7 @@ class FunctionAnnotatorTest extends SimpleTestCase {
 
   def testTypeReturnWrongTypeMultiple() {
     assertMatches(
-        messages("def f: A = { if(1 > 2) return new B else return new B }")) {
+      messages("def f: A = { if(1 > 2) return new B else return new B }")) {
       case Error("new B", TypeMismatch()) :: Error("new B", TypeMismatch()) :: Nil =>
     }
   }

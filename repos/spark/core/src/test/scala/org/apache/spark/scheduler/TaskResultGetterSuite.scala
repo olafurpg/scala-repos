@@ -45,14 +45,17 @@ import org.apache.spark.util.{MutableURLClassLoader, RpcUtils, Utils}
   * TaskResult is retrieved.
   */
 private class ResultDeletingTaskResultGetter(
-    sparkEnv: SparkEnv, scheduler: TaskSchedulerImpl)
+    sparkEnv: SparkEnv,
+    scheduler: TaskSchedulerImpl)
     extends TaskResultGetter(sparkEnv, scheduler) {
   var removedResult = false
 
   @volatile var removeBlockSuccessfully = false
 
   override def enqueueSuccessfulTask(
-      taskSetManager: TaskSetManager, tid: Long, serializedData: ByteBuffer) {
+      taskSetManager: TaskSetManager,
+      tid: Long,
+      serializedData: ByteBuffer) {
     if (!removedResult) {
       // Only remove the result once, since we'd like to test the case where the task eventually
       // succeeds.
@@ -95,7 +98,9 @@ private class MyTaskResultGetter(env: SparkEnv, scheduler: TaskSchedulerImpl)
   def taskResults: Seq[DirectTaskResult[_]] = _taskResults
 
   override def enqueueSuccessfulTask(
-      tsm: TaskSetManager, tid: Long, data: ByteBuffer): Unit = {
+      tsm: TaskSetManager,
+      tid: Long,
+      data: ByteBuffer): Unit = {
     // work on a copy since the super class still needs to use the buffer
     val newBuffer = data.duplicate()
     _taskResults += env.closureSerializer
@@ -109,7 +114,9 @@ private class MyTaskResultGetter(env: SparkEnv, scheduler: TaskSchedulerImpl)
   * Tests related to handling task results (both direct and indirect).
   */
 class TaskResultGetterSuite
-    extends SparkFunSuite with BeforeAndAfter with LocalSparkContext {
+    extends SparkFunSuite
+    with BeforeAndAfter
+    with LocalSparkContext {
 
   // Set the RPC message size to be as small as possible (it must be an integer, so 1 is as small
   // as we can make it) so the tests don't take too long.
@@ -131,8 +138,9 @@ class TaskResultGetterSuite
     assert(result === 1.to(maxRpcMessageSize).toArray)
 
     val RESULT_BLOCK_ID = TaskResultBlockId(0)
-    assert(sc.env.blockManager.master.getLocations(RESULT_BLOCK_ID).size === 0,
-           "Expect result to be removed from the block manager.")
+    assert(
+      sc.env.blockManager.master.getLocations(RESULT_BLOCK_ID).size === 0,
+      "Expect result to be removed from the block manager.")
   }
 
   test("task retried if result missing from block manager") {
@@ -179,14 +187,16 @@ class TaskResultGetterSuite
     val srcDir = new File(tempDir, "repro/")
     srcDir.mkdirs()
     val excSource =
-      new JavaSourceFromString(new File(srcDir, "MyException").getAbsolutePath,
-                               """package repro;
+      new JavaSourceFromString(
+        new File(srcDir, "MyException").getAbsolutePath,
+        """package repro;
         |
         |public class MyException extends Exception {
         |}
-      """.stripMargin)
-    val excFile = TestUtils.createCompiledClass(
-        "MyException", srcDir, excSource, Seq.empty)
+      """.stripMargin
+      )
+    val excFile =
+      TestUtils.createCompiledClass("MyException", srcDir, excSource, Seq.empty)
     val jarFile =
       new File(tempDir, "testJar-%s.jar".format(System.currentTimeMillis()))
     TestUtils.createJar(Seq(excFile), jarFile, directoryPrefix = Some("repro"))

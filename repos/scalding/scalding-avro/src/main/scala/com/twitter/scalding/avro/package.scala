@@ -33,7 +33,9 @@ package object avro {
   }
 
   def writeUnpackedAvro[T <: Product](
-      pipe: TypedPipe[T], path: String, schema: Schema)(
+      pipe: TypedPipe[T],
+      path: String,
+      schema: Schema)(
       implicit mf: Manifest[T],
       conv: TupleConverter[T],
       set: TupleSetter[T],
@@ -43,8 +45,8 @@ package object avro {
     val sink = UnpackedAvroSource[T](path, Some(schema))
     val outFields = {
       val schemaFields = schema.getFields
-      schemaFields.asScala.foldLeft(new Fields())(
-          (cFields, sField) => cFields.append(new Fields(sField.name())))
+      schemaFields.asScala.foldLeft(new Fields())((cFields, sField) =>
+        cFields.append(new Fields(sField.name())))
     }
     pipe.toPipe(outFields).write(sink)
   }

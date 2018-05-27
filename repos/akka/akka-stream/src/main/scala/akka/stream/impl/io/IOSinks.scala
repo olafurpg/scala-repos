@@ -9,7 +9,12 @@ import akka.stream.IOResult
 import akka.stream.impl.SinkModule
 import akka.stream.impl.StreamLayout.Module
 import akka.stream.impl.Stages.DefaultAttributes.IODispatcher
-import akka.stream.{ActorMaterializer, MaterializationContext, Attributes, SinkShape}
+import akka.stream.{
+  ActorMaterializer,
+  MaterializationContext,
+  Attributes,
+  SinkShape
+}
 import akka.stream.ActorAttributes.Dispatcher
 import akka.util.ByteString
 import scala.concurrent.{Future, Promise}
@@ -19,10 +24,11 @@ import scala.concurrent.{Future, Promise}
   * Creates simple synchronous (Java 6 compatible) Sink which writes all incoming elements to the given file
   * (creating it before hand if necessary).
   */
-private[akka] final class FileSink(f: File,
-                                   options: Set[StandardOpenOption],
-                                   val attributes: Attributes,
-                                   shape: SinkShape[ByteString])
+private[akka] final class FileSink(
+    f: File,
+    options: Set[StandardOpenOption],
+    val attributes: Attributes,
+    shape: SinkShape[ByteString])
     extends SinkModule[ByteString, Future[IOResult]](shape) {
 
   override protected def label: String = s"FileSink($f, $options)"
@@ -33,13 +39,15 @@ private[akka] final class FileSink(f: File,
 
     val ioResultPromise = Promise[IOResult]()
     val props = FileSubscriber.props(
-        f, ioResultPromise, settings.maxInputBufferSize, options)
+      f,
+      ioResultPromise,
+      settings.maxInputBufferSize,
+      options)
     val dispatcher =
       context.effectiveAttributes.get[Dispatcher](IODispatcher).dispatcher
 
     val ref = materializer.actorOf(context, props.withDispatcher(dispatcher))
-    (akka.stream.actor.ActorSubscriber[ByteString](ref),
-     ioResultPromise.future)
+    (akka.stream.actor.ActorSubscriber[ByteString](ref), ioResultPromise.future)
   }
 
   override protected def newInstance(
@@ -55,10 +63,11 @@ private[akka] final class FileSink(f: File,
   * Creates simple synchronous (Java 6 compatible) Sink which writes all incoming elements to the given file
   * (creating it before hand if necessary).
   */
-private[akka] final class OutputStreamSink(createOutput: () ⇒ OutputStream,
-                                           val attributes: Attributes,
-                                           shape: SinkShape[ByteString],
-                                           autoFlush: Boolean)
+private[akka] final class OutputStreamSink(
+    createOutput: () ⇒ OutputStream,
+    val attributes: Attributes,
+    shape: SinkShape[ByteString],
+    autoFlush: Boolean)
     extends SinkModule[ByteString, Future[IOResult]](shape) {
 
   override def create(context: MaterializationContext) = {
@@ -69,11 +78,13 @@ private[akka] final class OutputStreamSink(createOutput: () ⇒ OutputStream,
     val os = createOutput() // if it fails, we fail the materialization
 
     val props = OutputStreamSubscriber.props(
-        os, ioResultPromise, settings.maxInputBufferSize, autoFlush)
+      os,
+      ioResultPromise,
+      settings.maxInputBufferSize,
+      autoFlush)
 
     val ref = materializer.actorOf(context, props)
-    (akka.stream.actor.ActorSubscriber[ByteString](ref),
-     ioResultPromise.future)
+    (akka.stream.actor.ActorSubscriber[ByteString](ref), ioResultPromise.future)
   }
 
   override protected def newInstance(

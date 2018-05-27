@@ -49,22 +49,24 @@ object Connection extends App {
   {
     //#forURL
     val db = Database.forURL(
-        "jdbc:h2:mem:test1;DB_CLOSE_DELAY=-1", driver = "org.h2.Driver")
+      "jdbc:h2:mem:test1;DB_CLOSE_DELAY=-1",
+      driver = "org.h2.Driver")
     //#forURL
     db.close
   };
   {
     //#forURL2
     val db = Database.forURL(
-        "jdbc:h2:mem:test1;DB_CLOSE_DELAY=-1",
-        driver = "org.h2.Driver",
-        executor = AsyncExecutor("test1", numThreads = 10, queueSize = 1000))
+      "jdbc:h2:mem:test1;DB_CLOSE_DELAY=-1",
+      driver = "org.h2.Driver",
+      executor = AsyncExecutor("test1", numThreads = 10, queueSize = 1000))
     //#forURL2
     db.close
   }
-  val db = Database.forURL("jdbc:h2:mem:test2;INIT=" +
-                           coffees.schema.createStatements.mkString("\\;"),
-                           driver = "org.h2.Driver")
+  val db = Database.forURL(
+    "jdbc:h2:mem:test2;INIT=" +
+      coffees.schema.createStatements.mkString("\\;"),
+    driver = "org.h2.Driver")
   try {
     val lines = new ArrayBuffer[Any]()
     def println(s: Any) = lines += s;
@@ -88,9 +90,9 @@ object Connection extends App {
       // Use Akka Streams for more elaborate stream processing.
       //#stream
       val f = //#stream
-      p.foreach { s =>
-        println(s"Element: $s")
-      }
+        p.foreach { s =>
+          println(s"Element: $s")
+        }
       //#stream
       Await.result(f, Duration.Inf)
     };
@@ -121,15 +123,15 @@ object Connection extends App {
       val countAction = coffees.length.result
 
       val rollbackAction = (coffees ++= Seq(
-              ("Cold_Drip", new SerialBlob(Array[Byte](101))),
-              ("Dutch_Coffee", new SerialBlob(Array[Byte](49)))
-          )).flatMap { _ =>
+        ("Cold_Drip", new SerialBlob(Array[Byte](101))),
+        ("Dutch_Coffee", new SerialBlob(Array[Byte](49)))
+      )).flatMap { _ =>
         DBIO.failed(new Exception("Roll it back"))
       }.transactionally
 
       val errorHandleAction = rollbackAction.asTry.flatMap {
         case Failure(e: Throwable) => DBIO.successful(e.getMessage)
-        case Success(_) => DBIO.successful("never reached")
+        case Success(_)            => DBIO.successful("never reached")
       }
 
       // Here we show that that coffee count is the same before and after the attempted insert.
@@ -138,7 +140,7 @@ object Connection extends App {
         case ((initialCount, result), finalCount) =>
           // init: 5, final: 5, result: Roll it back
           println(
-              s"init: ${initialCount}, final: ${finalCount}, result: ${result}")
+            s"init: ${initialCount}, final: ${finalCount}, result: ${result}")
           result
       }
 

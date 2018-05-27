@@ -87,12 +87,13 @@ object RefactorType {
   case object AddImport extends RefactorType('addImport)
 
   def allTypes =
-    Seq(Rename,
-        ExtractMethod,
-        ExtractLocal,
-        InlineLocal,
-        OrganizeImports,
-        AddImport)
+    Seq(
+      Rename,
+      ExtractMethod,
+      ExtractLocal,
+      InlineLocal,
+      OrganizeImports,
+      AddImport)
 }
 
 case class SourceFileInfo(

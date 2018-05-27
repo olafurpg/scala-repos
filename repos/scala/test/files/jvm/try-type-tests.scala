@@ -49,9 +49,9 @@ trait TryStandard {
     val t = Success(1)
     val n = t.filter(x => x < 0)
     n match {
-      case Success(v) => assert(false)
+      case Success(v)                         => assert(false)
       case Failure(e: NoSuchElementException) => assert(true)
-      case _ => assert(false)
+      case _                                  => assert(false)
     }
   }
 
@@ -95,7 +95,7 @@ trait TryStandard {
     val n = t.failed
     n match {
       case Failure(e: UnsupportedOperationException) => assert(true)
-      case _ => assert(false)
+      case _                                         => assert(false)
     }
   }
 
@@ -104,7 +104,7 @@ trait TryStandard {
     val n = t.failed
     n match {
       case Success(e: Exception) => assert(true)
-      case _ => assert(false)
+      case _                     => assert(false)
     }
   }
 

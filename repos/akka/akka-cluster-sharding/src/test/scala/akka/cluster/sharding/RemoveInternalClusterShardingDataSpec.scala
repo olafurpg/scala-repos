@@ -95,18 +95,19 @@ class RemoveInternalClusterShardingDataSpec
     with ImplicitSender {
   import RemoveInternalClusterShardingDataSpec._
 
-  val storageLocations = List("akka.persistence.journal.leveldb.dir",
-                              "akka.persistence.snapshot-store.local.dir").map(
-      s ⇒ new File(system.settings.config.getString(s)))
+  val storageLocations = List(
+    "akka.persistence.journal.leveldb.dir",
+    "akka.persistence.snapshot-store.local.dir").map(s ⇒
+    new File(system.settings.config.getString(s)))
 
   override protected def atStartup() {
-    storageLocations.foreach(
-        dir ⇒ if (dir.exists) FileUtils.deleteDirectory(dir))
+    storageLocations.foreach(dir ⇒
+      if (dir.exists) FileUtils.deleteDirectory(dir))
   }
 
   override protected def afterTermination() {
-    storageLocations.foreach(
-        dir ⇒ if (dir.exists) FileUtils.deleteDirectory(dir))
+    storageLocations.foreach(dir ⇒
+      if (dir.exists) FileUtils.deleteDirectory(dir))
   }
 
   // same persistenceId as is used by ShardCoordinator
@@ -115,13 +116,13 @@ class RemoveInternalClusterShardingDataSpec
 
   def hasSnapshots(typeName: String): Boolean = {
     system.actorOf(
-        Props(classOf[HasSnapshots], persistenceId(typeName), testActor))
+      Props(classOf[HasSnapshots], persistenceId(typeName), testActor))
     expectMsgType[Boolean]
   }
 
   def hasEvents(typeName: String): Boolean = {
     system.actorOf(
-        Props(classOf[HasEvents], persistenceId(typeName), testActor))
+      Props(classOf[HasEvents], persistenceId(typeName), testActor))
     expectMsgType[Boolean]
   }
 
@@ -130,17 +131,26 @@ class RemoveInternalClusterShardingDataSpec
       Cluster(system).join(Cluster(system).selfAddress)
       val settings = ClusterShardingSettings(system)
       ClusterSharding(system).start(
-          "type1", Props[EchoActor], settings, extractEntityId, extractShardId)
+        "type1",
+        Props[EchoActor],
+        settings,
+        extractEntityId,
+        extractShardId)
       ClusterSharding(system).start(
-          "type2", Props[EchoActor], settings, extractEntityId, extractShardId)
+        "type2",
+        Props[EchoActor],
+        settings,
+        extractEntityId,
+        extractShardId)
     }
 
     "work when no data" in within(10.seconds) {
       hasSnapshots("type1") should ===(false)
       hasEvents("type1") should ===(false)
       val rm =
-        system.actorOf(RemoveInternalClusterShardingData.RemoveOnePersistenceId
-              .props(journalPluginId = "", persistenceId("type1"), testActor))
+        system.actorOf(
+          RemoveInternalClusterShardingData.RemoveOnePersistenceId
+            .props(journalPluginId = "", persistenceId("type1"), testActor))
       watch(rm)
       expectMsg(Result(Success(Removals(false, false))))
       expectTerminated(rm)
@@ -154,8 +164,9 @@ class RemoveInternalClusterShardingDataSpec
       hasEvents("type1") should ===(true)
 
       val rm =
-        system.actorOf(RemoveInternalClusterShardingData.RemoveOnePersistenceId
-              .props(journalPluginId = "", persistenceId("type1"), testActor))
+        system.actorOf(
+          RemoveInternalClusterShardingData.RemoveOnePersistenceId
+            .props(journalPluginId = "", persistenceId("type1"), testActor))
       watch(rm)
       expectMsg(Result(Success(Removals(true, false))))
       expectTerminated(rm)
@@ -174,8 +185,9 @@ class RemoveInternalClusterShardingDataSpec
       hasEvents("type2") should ===(true)
 
       val rm =
-        system.actorOf(RemoveInternalClusterShardingData.RemoveOnePersistenceId
-              .props(journalPluginId = "", persistenceId("type2"), testActor))
+        system.actorOf(
+          RemoveInternalClusterShardingData.RemoveOnePersistenceId
+            .props(journalPluginId = "", persistenceId("type2"), testActor))
       watch(rm)
       expectMsg(Result(Success(Removals(true, true))))
       expectTerminated(rm)
@@ -191,11 +203,12 @@ class RemoveInternalClusterShardingDataSpec
       Cluster(system).join(Cluster(system).selfAddress)
       val settings = ClusterShardingSettings(system)
       typeNames.foreach { typeName ⇒
-        ClusterSharding(system).start(typeName,
-                                      Props[EchoActor],
-                                      settings,
-                                      extractEntityId,
-                                      extractShardId)
+        ClusterSharding(system).start(
+          typeName,
+          Props[EchoActor],
+          settings,
+          extractEntityId,
+          extractShardId)
       }
     }
 
@@ -212,11 +225,12 @@ class RemoveInternalClusterShardingDataSpec
       }
 
       val result =
-        RemoveInternalClusterShardingData.remove(system,
-                                                 journalPluginId = "",
-                                                 typeNames.toSet,
-                                                 terminateSystem = false,
-                                                 remove2dot3Data = true)
+        RemoveInternalClusterShardingData.remove(
+          system,
+          journalPluginId = "",
+          typeNames.toSet,
+          terminateSystem = false,
+          remove2dot3Data = true)
       Await.ready(result, remaining)
 
       typeNames.foreach { typeName ⇒

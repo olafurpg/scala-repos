@@ -20,10 +20,9 @@ import time._
 
 class SeriesSpec extends Specification {
   "reindex works on dates" in {
-    val s1 = Series(Vec(1d, 2, 3),
-                    Index(datetime(2005, 1, 1),
-                          datetime(2005, 1, 2),
-                          datetime(2005, 1, 3)))
+    val s1 = Series(
+      Vec(1d, 2, 3),
+      Index(datetime(2005, 1, 1), datetime(2005, 1, 2), datetime(2005, 1, 3)))
     val s2 =
       Series(Vec(5d, 7), Index(datetime(2005, 1, 1), datetime(2005, 1, 3)))
 

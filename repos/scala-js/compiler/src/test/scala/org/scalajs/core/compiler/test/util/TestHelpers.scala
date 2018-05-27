@@ -27,11 +27,12 @@ trait TestHelpers extends DirectTest {
 
     def hasErrors(expected: String): Unit = {
       val reps = repResult {
-        assertFalse(
-            "snippet shouldn't compile", compileString(preamble + code))
+        assertFalse("snippet shouldn't compile", compileString(preamble + code))
       }
       assertEquals(
-          "should have right errors", expected.stripMargin.trim, reps.trim)
+        "should have right errors",
+        expected.stripMargin.trim,
+        reps.trim)
     }
 
     def hasWarns(expected: String): Unit = {
@@ -39,7 +40,9 @@ trait TestHelpers extends DirectTest {
         assertTrue("snippet should compile", compileString(preamble + code))
       }
       assertEquals(
-          "should have right warnings", expected.stripMargin.trim, reps.trim)
+        "should have right warnings",
+        expected.stripMargin.trim,
+        reps.trim)
     }
 
     def hasNoWarns(): Unit = {

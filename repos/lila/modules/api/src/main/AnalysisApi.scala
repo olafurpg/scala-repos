@@ -13,11 +13,11 @@ private[api] final class AnalysisApi {
       case ((info, adviceOption), move) =>
         Json
           .obj(
-              "eval" -> info.score.map(_.centipawns),
-              "mate" -> info.mate,
-              "variation" -> info.variation.isEmpty
-                .fold(JsNull, info.variation mkString " "),
-              "comment" -> adviceOption.map(_.makeComment(false, true))
+            "eval" -> info.score.map(_.centipawns),
+            "mate" -> info.mate,
+            "variation" -> info.variation.isEmpty
+              .fold(JsNull, info.variation mkString " "),
+            "comment" -> adviceOption.map(_.makeComment(false, true))
           )
           .noNull
     })
@@ -27,7 +27,7 @@ private[api] final class AnalysisApi {
       .find(_._1 == color)
       .map(_._2)
       .map(s =>
-            JsObject(s map {
+        JsObject(s map {
           case (nag, nb) => nag.toString.toLowerCase -> JsNumber(nb)
         }))
 }

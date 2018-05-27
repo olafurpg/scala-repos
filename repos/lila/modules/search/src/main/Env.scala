@@ -8,7 +8,9 @@ import akka.actor.ActorSystem
 import com.typesafe.config.Config
 
 final class Env(
-    config: Config, system: ActorSystem, scheduler: lila.common.Scheduler) {
+    config: Config,
+    system: ActorSystem,
+    scheduler: lila.common.Scheduler) {
 
   private val Enabled = config getBoolean "enabled"
   private val Writeable = config getBoolean "writeable"
@@ -22,7 +24,8 @@ final class Env(
 object Env {
 
   lazy val current =
-    "search" boot new Env(config = lila.common.PlayApp loadConfig "search",
-                          system = lila.common.PlayApp.system,
-                          scheduler = lila.common.PlayApp.scheduler)
+    "search" boot new Env(
+      config = lila.common.PlayApp loadConfig "search",
+      system = lila.common.PlayApp.system,
+      scheduler = lila.common.PlayApp.scheduler)
 }

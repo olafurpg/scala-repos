@@ -37,9 +37,10 @@ case class MissingQueryParamRejection(parameterName: String) extends Rejection
   * Rejection created by parameter filters.
   * Signals that the request was rejected because a query parameter could not be interpreted.
   */
-case class MalformedQueryParamRejection(parameterName: String,
-                                        errorMsg: String,
-                                        cause: Option[Throwable] = None)
+case class MalformedQueryParamRejection(
+    parameterName: String,
+    errorMsg: String,
+    cause: Option[Throwable] = None)
     extends Rejection
 
 /**
@@ -52,9 +53,10 @@ case class MissingFormFieldRejection(fieldName: String) extends Rejection
   * Rejection created by form field filters.
   * Signals that the request was rejected because a form field could not be interpreted.
   */
-case class MalformedFormFieldRejection(fieldName: String,
-                                       errorMsg: String,
-                                       cause: Option[Throwable] = None)
+case class MalformedFormFieldRejection(
+    fieldName: String,
+    errorMsg: String,
+    cause: Option[Throwable] = None)
     extends Rejection
 
 /**
@@ -67,9 +69,10 @@ case class MissingHeaderRejection(headerName: String) extends Rejection
   * Rejection created by header directives.
   * Signals that the request was rejected because a header value is malformed.
   */
-case class MalformedHeaderRejection(headerName: String,
-                                    errorMsg: String,
-                                    cause: Option[Throwable] = None)
+case class MalformedHeaderRejection(
+    headerName: String,
+    errorMsg: String,
+    cause: Option[Throwable] = None)
     extends Rejection
 
 /**
@@ -93,7 +96,8 @@ case class UnsupportedRequestEncodingRejection(supported: HttpEncoding)
   * The actualEntityLength gives the client a hint to create satisfiable ByteRanges.
   */
 case class UnsatisfiableRangeRejection(
-    unsatisfiableRanges: immutable.Seq[ByteRange], actualEntityLength: Long)
+    unsatisfiableRanges: immutable.Seq[ByteRange],
+    actualEntityLength: Long)
     extends Rejection
 
 /**
@@ -111,7 +115,8 @@ case class TooManyRangesRejection(maxRanges: Int) extends Rejection
   * will usually trigger a `ValidationRejection` instead.
   */
 case class MalformedRequestContentRejection(
-    message: String, cause: Option[Throwable] = None)
+    message: String,
+    cause: Option[Throwable] = None)
     extends Rejection
 
 /**
@@ -201,8 +206,7 @@ case class UnsupportedWebSocketSubprotocolRejection(supportedProtocol: String)
   * thrown by domain model constructors (e.g. via `require`).
   * It signals that an expected value was semantically invalid.
   */
-case class ValidationRejection(
-    message: String, cause: Option[Throwable] = None)
+case class ValidationRejection(message: String, cause: Option[Throwable] = None)
     extends Rejection
 
 /**

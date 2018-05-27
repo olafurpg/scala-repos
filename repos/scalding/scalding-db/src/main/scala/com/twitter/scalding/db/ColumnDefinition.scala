@@ -21,11 +21,12 @@ import com.twitter.scalding.TupleConverter
 case class ColumnName(toStr: String) extends AnyVal
 case class SqlTypeName(toStr: String) extends AnyVal
 
-case class ColumnDefinition(jdbcType: SqlType,
-                            name: ColumnName,
-                            nullable: IsNullable,
-                            sizeOpt: Option[Int],
-                            defaultValue: Option[String])
+case class ColumnDefinition(
+    jdbcType: SqlType,
+    name: ColumnName,
+    nullable: IsNullable,
+    sizeOpt: Option[Int],
+    defaultValue: Option[String])
     extends Serializable
 
 trait ColumnDefinitionProvider[T] extends Serializable {

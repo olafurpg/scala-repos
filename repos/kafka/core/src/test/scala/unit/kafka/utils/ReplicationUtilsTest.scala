@@ -34,26 +34,30 @@ class ReplicationUtilsTest extends ZooKeeperTestHarness {
   val zkVersion = 1
   val topicPath = "/brokers/topics/my-topic-test/partitions/0/state"
   val topicData = Json.encode(
-      Map("controller_epoch" -> 1,
-          "leader" -> 1,
-          "versions" -> 1,
-          "leader_epoch" -> 1,
-          "isr" -> List(1, 2)))
+    Map(
+      "controller_epoch" -> 1,
+      "leader" -> 1,
+      "versions" -> 1,
+      "leader_epoch" -> 1,
+      "isr" -> List(1, 2)))
   val topicDataVersionMismatch = Json.encode(
-      Map("controller_epoch" -> 1,
-          "leader" -> 1,
-          "versions" -> 2,
-          "leader_epoch" -> 1,
-          "isr" -> List(1, 2)))
+    Map(
+      "controller_epoch" -> 1,
+      "leader" -> 1,
+      "versions" -> 2,
+      "leader_epoch" -> 1,
+      "isr" -> List(1, 2)))
   val topicDataMismatch = Json.encode(
-      Map("controller_epoch" -> 1,
-          "leader" -> 1,
-          "versions" -> 2,
-          "leader_epoch" -> 2,
-          "isr" -> List(1, 2)))
+    Map(
+      "controller_epoch" -> 1,
+      "leader" -> 1,
+      "versions" -> 2,
+      "leader_epoch" -> 2,
+      "isr" -> List(1, 2)))
 
   val topicDataLeaderIsrAndControllerEpoch = LeaderIsrAndControllerEpoch(
-      LeaderAndIsr(1, leaderEpoch, List(1, 2), 0), controllerEpoch)
+    LeaderAndIsr(1, leaderEpoch, List(1, 2), 0),
+    controllerEpoch)
 
   @Before
   override def setUp() {
@@ -94,39 +98,42 @@ class ReplicationUtilsTest extends ZooKeeperTestHarness {
     // regular update
     val newLeaderAndIsr1 = new LeaderAndIsr(brokerId, leaderEpoch, replicas, 0)
     val (updateSucceeded1, newZkVersion1) =
-      ReplicationUtils.updateLeaderAndIsr(zkUtils,
-                                          "my-topic-test",
-                                          partitionId,
-                                          newLeaderAndIsr1,
-                                          controllerEpoch,
-                                          0)
+      ReplicationUtils.updateLeaderAndIsr(
+        zkUtils,
+        "my-topic-test",
+        partitionId,
+        newLeaderAndIsr1,
+        controllerEpoch,
+        0)
     assertTrue(updateSucceeded1)
     assertEquals(newZkVersion1, 1)
 
     // mismatched zkVersion with the same data
-    val newLeaderAndIsr2 = new LeaderAndIsr(
-        brokerId, leaderEpoch, replicas, zkVersion + 1)
+    val newLeaderAndIsr2 =
+      new LeaderAndIsr(brokerId, leaderEpoch, replicas, zkVersion + 1)
     val (updateSucceeded2, newZkVersion2) =
-      ReplicationUtils.updateLeaderAndIsr(zkUtils,
-                                          "my-topic-test",
-                                          partitionId,
-                                          newLeaderAndIsr2,
-                                          controllerEpoch,
-                                          zkVersion + 1)
+      ReplicationUtils.updateLeaderAndIsr(
+        zkUtils,
+        "my-topic-test",
+        partitionId,
+        newLeaderAndIsr2,
+        controllerEpoch,
+        zkVersion + 1)
     assertTrue(updateSucceeded2)
     // returns true with existing zkVersion
     assertEquals(newZkVersion2, 1)
 
     // mismatched zkVersion and leaderEpoch
-    val newLeaderAndIsr3 = new LeaderAndIsr(
-        brokerId, leaderEpoch + 1, replicas, zkVersion + 1)
+    val newLeaderAndIsr3 =
+      new LeaderAndIsr(brokerId, leaderEpoch + 1, replicas, zkVersion + 1)
     val (updateSucceeded3, newZkVersion3) =
-      ReplicationUtils.updateLeaderAndIsr(zkUtils,
-                                          "my-topic-test",
-                                          partitionId,
-                                          newLeaderAndIsr3,
-                                          controllerEpoch,
-                                          zkVersion + 1)
+      ReplicationUtils.updateLeaderAndIsr(
+        zkUtils,
+        "my-topic-test",
+        partitionId,
+        newLeaderAndIsr3,
+        controllerEpoch,
+        zkVersion + 1)
     assertFalse(updateSucceeded3)
     assertEquals(newZkVersion3, -1)
   }
@@ -135,11 +142,15 @@ class ReplicationUtilsTest extends ZooKeeperTestHarness {
   def testGetLeaderIsrAndEpochForPartition() {
     val leaderIsrAndControllerEpoch =
       ReplicationUtils.getLeaderIsrAndEpochForPartition(
-          zkUtils, topic, partitionId)
+        zkUtils,
+        topic,
+        partitionId)
     assertEquals(
-        topicDataLeaderIsrAndControllerEpoch, leaderIsrAndControllerEpoch.get)
-    assertEquals(None,
-                 ReplicationUtils.getLeaderIsrAndEpochForPartition(
-                     zkUtils, topic, partitionId + 1))
+      topicDataLeaderIsrAndControllerEpoch,
+      leaderIsrAndControllerEpoch.get)
+    assertEquals(
+      None,
+      ReplicationUtils
+        .getLeaderIsrAndEpochForPartition(zkUtils, topic, partitionId + 1))
   }
 }

@@ -24,8 +24,11 @@ import scala.util.Random
 
 /** JDBC implementation of [[AccessKeys]] */
 class JDBCAccessKeys(
-    client: String, config: StorageClientConfig, prefix: String)
-    extends AccessKeys with Logging {
+    client: String,
+    config: StorageClientConfig,
+    prefix: String)
+    extends AccessKeys
+    with Logging {
 
   /** Database table name for this data access object */
   val tableName = JDBCUtils.prefixTableName(prefix, "accesskeys")
@@ -64,12 +67,11 @@ class JDBCAccessKeys(
       .apply()
   }
 
-  def getByAppid(appid: Int): Seq[AccessKey] = DB readOnly {
-    implicit session =>
-      sql"SELECT accesskey, appid, events FROM $tableName WHERE appid = $appid"
-        .map(resultToAccessKey)
-        .list()
-        .apply()
+  def getByAppid(appid: Int): Seq[AccessKey] = DB readOnly { implicit session =>
+    sql"SELECT accesskey, appid, events FROM $tableName WHERE appid = $appid"
+      .map(resultToAccessKey)
+      .list()
+      .apply()
   }
 
   def update(accessKey: AccessKey): Unit = DB localTx { implicit session =>
@@ -90,8 +92,8 @@ class JDBCAccessKeys(
   /** Convert JDBC results to [[AccessKey]] */
   def resultToAccessKey(rs: WrappedResultSet): AccessKey = {
     AccessKey(
-        key = rs.string("accesskey"),
-        appid = rs.int("appid"),
-        events = rs.stringOpt("events").map(_.split(",").toSeq).getOrElse(Nil))
+      key = rs.string("accesskey"),
+      appid = rs.int("appid"),
+      events = rs.stringOpt("events").map(_.split(",").toSeq).getOrElse(Nil))
   }
 }

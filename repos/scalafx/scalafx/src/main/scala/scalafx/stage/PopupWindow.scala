@@ -45,81 +45,83 @@ object PopupWindow {
     */
   object AnchorLocation
       extends SFXEnumDelegateCompanion[
-          jfxs.PopupWindow.AnchorLocation, AnchorLocation] {
+        jfxs.PopupWindow.AnchorLocation,
+        AnchorLocation] {
 
     /** Represents bottom left content corner. */
     val ContentBottomLeft = new AnchorLocation(
-        jfxs.PopupWindow.AnchorLocation.CONTENT_BOTTOM_LEFT)
+      jfxs.PopupWindow.AnchorLocation.CONTENT_BOTTOM_LEFT)
     @deprecated(
-        "Use ContentBottomLeft; CONTENT_BOTTOM_LEFT will be removed in a future release",
-        "8.0.60-R10")
+      "Use ContentBottomLeft; CONTENT_BOTTOM_LEFT will be removed in a future release",
+      "8.0.60-R10")
     val CONTENT_BOTTOM_LEFT = ContentBottomLeft
 
     /** Represents bottom right content corner. */
     val ContentBottomRight = new AnchorLocation(
-        jfxs.PopupWindow.AnchorLocation.CONTENT_BOTTOM_RIGHT)
+      jfxs.PopupWindow.AnchorLocation.CONTENT_BOTTOM_RIGHT)
     @deprecated(
-        "Use ContentBottomRight; CONTENT_BOTTOM_RIGHT will be removed in a future release",
-        "8.0.60-R10")
+      "Use ContentBottomRight; CONTENT_BOTTOM_RIGHT will be removed in a future release",
+      "8.0.60-R10")
     val CONTENT_BOTTOM_RIGHT = ContentBottomRight
 
     /** Represents top left content corner. */
     val ContentTopLeft = new AnchorLocation(
-        jfxs.PopupWindow.AnchorLocation.CONTENT_TOP_LEFT)
+      jfxs.PopupWindow.AnchorLocation.CONTENT_TOP_LEFT)
     @deprecated(
-        "Use ContentTopLeft; CONTENT_TOP_LEFT will be removed in a future release",
-        "8.0.60-R10")
+      "Use ContentTopLeft; CONTENT_TOP_LEFT will be removed in a future release",
+      "8.0.60-R10")
     val CONTENT_TOP_LEFT = ContentTopLeft
 
     /** Represents top right content corner. */
     val ContentTopRight = new AnchorLocation(
-        jfxs.PopupWindow.AnchorLocation.CONTENT_TOP_RIGHT)
+      jfxs.PopupWindow.AnchorLocation.CONTENT_TOP_RIGHT)
     @deprecated(
-        "Use ContentTopRight; CONTENT_TOP_RIGHT will be removed in a future release",
-        "8.0.60-R10")
+      "Use ContentTopRight; CONTENT_TOP_RIGHT will be removed in a future release",
+      "8.0.60-R10")
     val CONTENT_TOP_RIGHT = ContentTopRight
 
     /** Represents bottom left window corner. */
     val WindowBottomLeft = new AnchorLocation(
-        jfxs.PopupWindow.AnchorLocation.WINDOW_BOTTOM_LEFT)
+      jfxs.PopupWindow.AnchorLocation.WINDOW_BOTTOM_LEFT)
     @deprecated(
-        "Use WindowBottomLeft; WINDOW_BOTTOM_LEFT will be removed in a future release",
-        "8.0.60-R10")
+      "Use WindowBottomLeft; WINDOW_BOTTOM_LEFT will be removed in a future release",
+      "8.0.60-R10")
     val WINDOW_BOTTOM_LEFT = WindowBottomLeft
 
     /** Represents bottom right window corner. */
     val WindowBottomRight = new AnchorLocation(
-        jfxs.PopupWindow.AnchorLocation.WINDOW_BOTTOM_RIGHT)
+      jfxs.PopupWindow.AnchorLocation.WINDOW_BOTTOM_RIGHT)
     @deprecated(
-        "Use WindowBottomRight; WINDOW_BOTTOM_RIGHT will be removed in a future release",
-        "8.0.60-R10")
+      "Use WindowBottomRight; WINDOW_BOTTOM_RIGHT will be removed in a future release",
+      "8.0.60-R10")
     val WINDOW_BOTTOM_RIGHT = WindowBottomRight
 
     /** Represents top left window corner. */
     val WindowTopLeft = new AnchorLocation(
-        jfxs.PopupWindow.AnchorLocation.WINDOW_TOP_LEFT)
+      jfxs.PopupWindow.AnchorLocation.WINDOW_TOP_LEFT)
     @deprecated(
-        "Use WindowTopLeft; WINDOW_TOP_LEFT will be removed in a future release",
-        "8.0.60-R10")
+      "Use WindowTopLeft; WINDOW_TOP_LEFT will be removed in a future release",
+      "8.0.60-R10")
     val WINDOW_TOP_LEFT = WindowTopLeft
 
     /** Represents top right window corner. */
     val WindowTopRight = new AnchorLocation(
-        jfxs.PopupWindow.AnchorLocation.WINDOW_TOP_RIGHT)
+      jfxs.PopupWindow.AnchorLocation.WINDOW_TOP_RIGHT)
     @deprecated(
-        "Use WindowTopRight; WINDOW_TOP_RIGHT will be removed in a future release",
-        "8.0.60-R10")
+      "Use WindowTopRight; WINDOW_TOP_RIGHT will be removed in a future release",
+      "8.0.60-R10")
     val WINDOW_TOP_RIGHT = WindowTopRight
 
     protected override def unsortedValues: Array[AnchorLocation] =
-      Array(ContentBottomLeft,
-            ContentBottomRight,
-            ContentTopLeft,
-            ContentTopRight,
-            WindowBottomLeft,
-            WindowBottomRight,
-            WindowTopLeft,
-            WindowTopRight)
+      Array(
+        ContentBottomLeft,
+        ContentBottomRight,
+        ContentTopLeft,
+        ContentTopRight,
+        WindowBottomLeft,
+        WindowBottomRight,
+        WindowTopLeft,
+        WindowTopRight)
   }
 
   /** Anchor location constants for popup anchor point selection.
@@ -131,7 +133,8 @@ object PopupWindow {
 }
 
 abstract class PopupWindow(override val delegate: jfxs.PopupWindow)
-    extends Window(delegate) with SFXDelegate[jfxs.PopupWindow] {
+    extends Window(delegate)
+    with SFXDelegate[jfxs.PopupWindow] {
 
   /** Specifies the popup anchor point which is used in popup positioning. */
   def anchorLocation: ObjectProperty[jfxs.PopupWindow.AnchorLocation] =

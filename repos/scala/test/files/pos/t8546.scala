@@ -9,8 +9,8 @@ class F1() {
   // No warnings here
   private def foo(t: T) = t match {
     case A(m) => println("A:" + m)
-    case B() => println("B")
-    case C => println("C")
+    case B()  => println("B")
+    case C    => println("C")
   }
 
   def test(m: Int): Unit = {
@@ -29,8 +29,8 @@ class F2[M]() {
   // match may not be exhaustive. It would fail on the following input: C
   private def foo(t: T) = t match {
     case A(m) => println("A:" + m)
-    case B() => println("B")
-    case C => println("C")
+    case B()  => println("B")
+    case C    => println("C")
   }
 
   def test(m: M): Unit = {

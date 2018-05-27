@@ -18,10 +18,11 @@ class TestResultListener(private val testConfigurationName: String)
       i += 1
     }
 
-    assert(terminated,
-           "test " + testConfigurationName +
-           " did not terminate correctly; captured outputs:\n" +
-           builder.toString())
+    assert(
+      terminated,
+      "test " + testConfigurationName +
+        " did not terminate correctly; captured outputs:\n" +
+        builder.toString())
     builder.toString()
   }
 
@@ -29,7 +30,9 @@ class TestResultListener(private val testConfigurationName: String)
 
   private var terminated = false
 
-  override def onTextAvailable(event: ProcessEvent, outputType: Key[_]): Unit = {
+  override def onTextAvailable(
+      event: ProcessEvent,
+      outputType: Key[_]): Unit = {
     val text = event.getText
     import TestResultListener._
     if (text.contains(testResultPrefix) && text.contains(testResultSuffix)) {
@@ -42,7 +45,8 @@ class TestResultListener(private val testConfigurationName: String)
   }
 
   override def processWillTerminate(
-      event: ProcessEvent, willBeDestroyed: Boolean): Unit = {
+      event: ProcessEvent,
+      willBeDestroyed: Boolean): Unit = {
     //TODO: implement me
   }
 

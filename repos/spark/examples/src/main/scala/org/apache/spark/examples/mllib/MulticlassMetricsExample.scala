@@ -35,7 +35,8 @@ object MulticlassMetricsExample {
     // $example on$
     // Load training data in LIBSVM format
     val data = MLUtils.loadLibSVMFile(
-        sc, "data/mllib/sample_multiclass_classification_data.txt")
+      sc,
+      "data/mllib/sample_multiclass_classification_data.txt")
 
     // Split data into training (60%) and test (40%)
     val Array(training, test) = data.randomSplit(Array(0.6, 0.4), seed = 11L)
@@ -94,7 +95,7 @@ object MulticlassMetricsExample {
     println(s"Weighted recall: ${metrics.weightedRecall}")
     println(s"Weighted F1 score: ${metrics.weightedFMeasure}")
     println(
-        s"Weighted false positive rate: ${metrics.weightedFalsePositiveRate}")
+      s"Weighted false positive rate: ${metrics.weightedFalsePositiveRate}")
     // $example off$
   }
 }

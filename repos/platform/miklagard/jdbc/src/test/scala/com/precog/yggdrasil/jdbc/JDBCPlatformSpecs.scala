@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -51,13 +51,13 @@ object JDBCPlatformSpecEngine extends Logging {
   Class.forName("org.h2.Driver")
 
   def jvToSQL(jv: JValue): (String, String) = jv match {
-    case JBool(v) => ("BOOL", v.toString)
-    case JNumLong(v) => ("BIGINT", v.toString)
+    case JBool(v)      => ("BOOL", v.toString)
+    case JNumLong(v)   => ("BIGINT", v.toString)
     case JNumDouble(v) => ("DOUBLE", v.toString)
     case JNumBigDec(v) => ("DECIMAL", v.toString)
-    case JNumStr(v) => ("DECIMAL", v)
-    case JString(v) => ("VARCHAR", "'" + v.replaceAll("'", "\\'") + "'")
-    case _ => sys.error("SQL conversion doesn't support: " + jv)
+    case JNumStr(v)    => ("DECIMAL", v)
+    case JString(v)    => ("VARCHAR", "'" + v.replaceAll("'", "\\'") + "'")
+    case _             => sys.error("SQL conversion doesn't support: " + jv)
   }
 
   private[this] val lock = new Object
@@ -100,7 +100,7 @@ object JDBCPlatformSpecEngine extends Logging {
   val checkUnused = new Runnable {
     def run = lock.synchronized {
       logger.debug(
-          "Checking for unused JDBCPlatformSpecEngine. Count = " + refcount)
+        "Checking for unused JDBCPlatformSpecEngine. Count = " + refcount)
       if (refcount == 0) {
         logger.debug("Shutting down DB after final release")
         shutdown()
@@ -118,7 +118,7 @@ object JDBCPlatformSpecEngine extends Logging {
     if (dataDirURL == null || dataDirURL.getProtocol != "file") {
       logger.error("No data dir: " + dataDirURL)
       throw new Exception(
-          "Failed to locate test_data directory. Found: " + dataDirURL)
+        "Failed to locate test_data directory. Found: " + dataDirURL)
     }
 
     logger.debug("Loading from " + dataDirURL)
@@ -141,22 +141,27 @@ object JDBCPlatformSpecEngine extends Logging {
                   jv =>
                     jv.flattenWithPath.map {
                       case (p, v) =>
-                        (JDBCColumnarTableModule.escapePath(
-                             p.toString.drop(1)),
-                         jvToSQL(v))
+                        (
+                          JDBCColumnarTableModule.escapePath(
+                            p.toString.drop(1)),
+                          jvToSQL(v))
                     }
                 }
 
                 // Two passes: first one constructs a schema for the table, second inserts data
                 val schema = rows.foldLeft(Set[(String, String)]()) {
                   case (acc, properties) =>
-                    acc ++(properties.map { case (p, (t, _)) => (p, t) }).toSet
+                    acc ++ (properties.map { case (p, (t, _)) => (p, t) }).toSet
                 }
 
                 val ddlCreate =
-                  "CREATE TABLE %s (%s);".format(tableName, schema.map {
-                    case (p, t) => p + " " + t
-                  }.mkString(", "))
+                  "CREATE TABLE %s (%s);".format(
+                    tableName,
+                    schema
+                      .map {
+                        case (p, t) => p + " " + t
+                      }
+                      .mkString(", "))
 
                 logger.debug("Create = " + ddlCreate)
 
@@ -172,7 +177,9 @@ object JDBCPlatformSpecEngine extends Logging {
                     val values = properties.map(_._2._2).mkString(", ")
 
                     val insert = "INSERT INTO %s (%s) VALUES (%s);".format(
-                        tableName, columns, values)
+                      tableName,
+                      columns,
+                      values)
 
                     logger.debug("Inserting with " + insert)
 
@@ -189,7 +196,7 @@ object JDBCPlatformSpecEngine extends Logging {
                 val stmt2 = conn2.createStatement
 
                 val rs = stmt2.executeQuery(
-                    "SELECT COUNT(*) AS total FROM " + tableName)
+                  "SELECT COUNT(*) AS total FROM " + tableName)
 
                 rs.next
 
@@ -216,13 +223,18 @@ object JDBCPlatformSpecEngine extends Logging {
 }
 
 trait JDBCPlatformSpecs
-    extends ParseEvalStackSpecs[Future] with JDBCColumnarTableModule
-    with Logging with StringIdMemoryDatasetConsumer[Future] {
+    extends ParseEvalStackSpecs[Future]
+    with JDBCColumnarTableModule
+    with Logging
+    with StringIdMemoryDatasetConsumer[Future] {
   self =>
 
   class YggConfig
-      extends ParseEvalStackSpecConfig with IdSourceConfig with EvaluatorConfig
-      with ColumnarTableModuleConfig with BlockStoreColumnarTableModuleConfig
+      extends ParseEvalStackSpecConfig
+      with IdSourceConfig
+      with EvaluatorConfig
+      with ColumnarTableModuleConfig
+      with BlockStoreColumnarTableModuleConfig
       with JDBCColumnarTableModuleConfig
 
   object yggConfig extends YggConfig
@@ -232,7 +244,8 @@ trait JDBCPlatformSpecs
 
   implicit val M: Monad[Future] with Comonad[Future] =
     new blueeyes.bkka.UnsafeFutureComonad(
-        asyncContext, yggConfig.maxEvalDuration)
+      asyncContext,
+      yggConfig.maxEvalDuration)
 
   val unescapeColumnNames = true
 
@@ -251,20 +264,25 @@ trait JDBCPlatformSpecs
     val databaseMap = Map("test" -> JDBCPlatformSpecEngine.dbURL)
 
     override def load(
-        table: Table, apiKey: APIKey, tpe: JType): Future[Table] = {
+        table: Table,
+        apiKey: APIKey,
+        tpe: JType): Future[Table] = {
       // Rewrite paths of the form /foo/bar/baz to /test/foo_bar_baz
-      val pathFixTS = Map1(Leaf(Source), CF1P("fix_paths") {
-        case orig: StrColumn =>
-          new StrColumn {
-            def apply(row: Int): String = {
-              val newPath =
-                "/test/" + orig(row).replaceAll("^/|/$", "").replace('/', '_')
-              logger.debug("Fixed %s to %s".format(orig(row), newPath))
-              newPath
+      val pathFixTS = Map1(
+        Leaf(Source),
+        CF1P("fix_paths") {
+          case orig: StrColumn =>
+            new StrColumn {
+              def apply(row: Int): String = {
+                val newPath =
+                  "/test/" + orig(row).replaceAll("^/|/$", "").replace('/', '_')
+                logger.debug("Fixed %s to %s".format(orig(row), newPath))
+                newPath
+              }
+              def isDefinedAt(row: Int) = orig.isDefinedAt(row)
             }
-            def isDefinedAt(row: Int) = orig.isDefinedAt(row)
-          }
-      })
+        }
+      )
       val transformed = table.transform(pathFixTS)
       super.load(transformed, apiKey, tpe)
     }

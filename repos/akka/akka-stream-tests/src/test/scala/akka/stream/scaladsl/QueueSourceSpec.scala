@@ -152,8 +152,9 @@ class QueueSourceSpec extends AkkaSpec {
       val s = TestSubscriber.manualProbe[Int]()
       val probe = TestProbe()
       val queue =
-        TestSourceStage(new QueueSource[Int](1, OverflowStrategy.dropHead),
-                        probe).to(Sink.fromSubscriber(s)).run()
+        TestSourceStage(
+          new QueueSource[Int](1, OverflowStrategy.dropHead),
+          probe).to(Sink.fromSubscriber(s)).run()
       val sub = s.expectSubscription
 
       sub.request(1)

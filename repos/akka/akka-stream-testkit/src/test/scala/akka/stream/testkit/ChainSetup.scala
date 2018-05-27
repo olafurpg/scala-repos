@@ -7,28 +7,31 @@ import akka.stream.scaladsl._
 import org.reactivestreams.Publisher
 import akka.stream.ActorMaterializer
 
-class ChainSetup[In, Out, M](stream: Flow[In, In, NotUsed] ⇒ Flow[In, Out, M],
-                             val settings: ActorMaterializerSettings,
-                             materializer: ActorMaterializer,
-                             toPublisher: (Source[Out, _],
-                             ActorMaterializer) ⇒ Publisher[Out])(
+class ChainSetup[In, Out, M](
+    stream: Flow[In, In, NotUsed] ⇒ Flow[In, Out, M],
+    val settings: ActorMaterializerSettings,
+    materializer: ActorMaterializer,
+    toPublisher: (Source[Out, _], ActorMaterializer) ⇒ Publisher[Out])(
     implicit val system: ActorSystem) {
 
-  def this(stream: Flow[In, In, NotUsed] ⇒ Flow[In, Out, M],
-           settings: ActorMaterializerSettings,
-           toPublisher: (Source[Out, _], ActorMaterializer) ⇒ Publisher[Out])(
+  def this(
+      stream: Flow[In, In, NotUsed] ⇒ Flow[In, Out, M],
+      settings: ActorMaterializerSettings,
+      toPublisher: (Source[Out, _], ActorMaterializer) ⇒ Publisher[Out])(
       implicit system: ActorSystem) =
     this(stream, settings, ActorMaterializer(settings)(system), toPublisher)(
-        system)
+      system)
 
-  def this(stream: Flow[In, In, NotUsed] ⇒ Flow[In, Out, M],
-           settings: ActorMaterializerSettings,
-           materializerCreator: (ActorMaterializerSettings,
-           ActorRefFactory) ⇒ ActorMaterializer,
-           toPublisher: (Source[Out, _], ActorMaterializer) ⇒ Publisher[Out])(
+  def this(
+      stream: Flow[In, In, NotUsed] ⇒ Flow[In, Out, M],
+      settings: ActorMaterializerSettings,
+      materializerCreator: (
+          ActorMaterializerSettings,
+          ActorRefFactory) ⇒ ActorMaterializer,
+      toPublisher: (Source[Out, _], ActorMaterializer) ⇒ Publisher[Out])(
       implicit system: ActorSystem) =
     this(stream, settings, materializerCreator(settings, system), toPublisher)(
-        system)
+      system)
 
   val upstream = TestPublisher.manualProbe[In]()
   val downstream = TestSubscriber.probe[Out]()

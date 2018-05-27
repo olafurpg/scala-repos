@@ -1,6 +1,11 @@
 package org.jetbrains.plugins.scala.debugger.evaluation.util
 
-import com.intellij.debugger.engine.{DebugProcess, DebugProcessImpl, JVMName, JVMNameUtil}
+import com.intellij.debugger.engine.{
+  DebugProcess,
+  DebugProcessImpl,
+  JVMName,
+  JVMNameUtil
+}
 import com.intellij.debugger.jdi.VirtualMachineProxyImpl
 import com.intellij.debugger.{DebuggerBundle, NoDataException, SourcePosition}
 import com.intellij.lang.ASTNode
@@ -10,23 +15,52 @@ import com.intellij.psi._
 import com.intellij.psi.util.PsiTreeUtil
 import com.sun.jdi.{ObjectReference, ReferenceType, Value}
 import org.jetbrains.plugins.scala.debugger.ScalaPositionManager
-import org.jetbrains.plugins.scala.debugger.evaluation.{EvaluationException, ScalaEvaluatorBuilderUtil}
+import org.jetbrains.plugins.scala.debugger.evaluation.{
+  EvaluationException,
+  ScalaEvaluatorBuilderUtil
+}
 import org.jetbrains.plugins.scala.debugger.filters.ScalaDebuggerSettings
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScBindingPattern, ScCaseClause}
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScMethodLike, ScPrimaryConstructor, ScReferenceElement}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScAnnotations, ScExpression, ScForStatement, ScNewTemplateDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScBindingPattern,
+  ScCaseClause
+}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScMethodLike,
+  ScPrimaryConstructor,
+  ScReferenceElement
+}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScAnnotations,
+  ScExpression,
+  ScForStatement,
+  ScNewTemplateDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScClassParameter, ScParameter}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScClassParameter,
+  ScParameter
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.packaging.ScPackaging
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{ScEarlyDefinitions, ScTypedDefinition}
-import org.jetbrains.plugins.scala.lang.psi.api.{ScalaFile, ScalaRecursiveElementVisitor}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{
+  ScEarlyDefinitions,
+  ScTypedDefinition
+}
+import org.jetbrains.plugins.scala.lang.psi.api.{
+  ScalaFile,
+  ScalaRecursiveElementVisitor
+}
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
-import org.jetbrains.plugins.scala.lang.psi.types.{ScFunctionType, ScSubstitutor, ScType, ValueClassType}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  ScFunctionType,
+  ScSubstitutor,
+  ScType,
+  ValueClassType
+}
 
 import scala.annotation.tailrec
 import scala.collection.mutable
@@ -86,22 +120,22 @@ object DebuggerUtil {
   def getJVMQualifiedName(tp: ScType): JVMName = {
     import org.jetbrains.plugins.scala.lang.psi.types._
     tp match {
-      case Any => JVMNameUtil.getJVMRawText("java.lang.Object")
+      case Any  => JVMNameUtil.getJVMRawText("java.lang.Object")
       case Null => JVMNameUtil.getJVMRawText("scala.Null") //shouldn't be
       case AnyRef =>
         JVMNameUtil.getJVMRawText("java.lang.Object") //shouldn't be
-      case Nothing => JVMNameUtil.getJVMRawText("scala.Nothing") //shouldn't be
+      case Nothing   => JVMNameUtil.getJVMRawText("scala.Nothing") //shouldn't be
       case Singleton => JVMNameUtil.getJVMRawText("java.lang.Object")
-      case AnyVal => JVMNameUtil.getJVMRawText("scala.AnyVal") //shouldn't be
-      case Unit => JVMNameUtil.getJVMRawText("java.lang.Void")
-      case Boolean => JVMNameUtil.getJVMRawText("java.lang.Boolean")
-      case Char => JVMNameUtil.getJVMRawText("java.lang.Character")
-      case Int => JVMNameUtil.getJVMRawText("java.lang.Int")
-      case Long => JVMNameUtil.getJVMRawText("java.lang.Long")
-      case Float => JVMNameUtil.getJVMRawText("java.lang.Float")
-      case Double => JVMNameUtil.getJVMRawText("java.lang.Double")
-      case Byte => JVMNameUtil.getJVMRawText("java.lang.Byte")
-      case Short => JVMNameUtil.getJVMRawText("java.lang.Short")
+      case AnyVal    => JVMNameUtil.getJVMRawText("scala.AnyVal") //shouldn't be
+      case Unit      => JVMNameUtil.getJVMRawText("java.lang.Void")
+      case Boolean   => JVMNameUtil.getJVMRawText("java.lang.Boolean")
+      case Char      => JVMNameUtil.getJVMRawText("java.lang.Character")
+      case Int       => JVMNameUtil.getJVMRawText("java.lang.Int")
+      case Long      => JVMNameUtil.getJVMRawText("java.lang.Long")
+      case Float     => JVMNameUtil.getJVMRawText("java.lang.Float")
+      case Double    => JVMNameUtil.getJVMRawText("java.lang.Double")
+      case Byte      => JVMNameUtil.getJVMRawText("java.lang.Byte")
+      case Short     => JVMNameUtil.getJVMRawText("java.lang.Short")
       case JavaArrayType(arg) =>
         val buff = new JVMNameBuffer()
         buff.append(getJVMQualifiedName(arg))
@@ -118,7 +152,7 @@ object DebuggerUtil {
       case _ =>
         ScType.extractClass(tp) match {
           case Some(clazz) => getClassJVMName(clazz)
-          case None => JVMNameUtil.getJVMRawText(ScType.canonicalText(tp))
+          case None        => JVMNameUtil.getJVMRawText(ScType.canonicalText(tp))
         }
     }
   }
@@ -126,21 +160,21 @@ object DebuggerUtil {
   def getJVMStringForType(tp: ScType, isParam: Boolean = true): String = {
     import org.jetbrains.plugins.scala.lang.psi.types._
     tp match {
-      case AnyRef => "Ljava/lang/Object;"
-      case Any => "Ljava/lang/Object;"
-      case Singleton => "Ljava/lang/Object;"
-      case Null => "Lscala/Null$;"
-      case Nothing => "Lscala/Nothing$;"
-      case Boolean => "Z"
-      case Byte => "B"
-      case Char => "C"
-      case Short => "S"
-      case Int => "I"
-      case Long => "J"
-      case Float => "F"
-      case Double => "D"
-      case Unit if isParam => "Lscala/runtime/BoxedUnit;"
-      case Unit => "V"
+      case AnyRef             => "Ljava/lang/Object;"
+      case Any                => "Ljava/lang/Object;"
+      case Singleton          => "Ljava/lang/Object;"
+      case Null               => "Lscala/Null$;"
+      case Nothing            => "Lscala/Nothing$;"
+      case Boolean            => "Z"
+      case Byte               => "B"
+      case Char               => "C"
+      case Short              => "S"
+      case Int                => "I"
+      case Long               => "J"
+      case Float              => "F"
+      case Double             => "D"
+      case Unit if isParam    => "Lscala/runtime/BoxedUnit;"
+      case Unit               => "V"
       case JavaArrayType(arg) => "[" + getJVMStringForType(arg)
       case ScParameterizedType(ScDesignatorType(clazz: PsiClass), Seq(arg))
           if clazz.qualifiedName == "scala.Array" =>
@@ -152,7 +186,7 @@ object DebuggerUtil {
           case Some(obj: ScTypeDefinition) =>
             "L" + obj.getQualifiedNameForDebugger.replace('.', '/') + ";"
           case Some(clazz) => "L" + clazz.qualifiedName.replace('.', '/') + ";"
-          case _ => "Ljava/lang/Object;"
+          case _           => "Ljava/lang/Object;"
         }
     }
   }
@@ -163,13 +197,14 @@ object DebuggerUtil {
       case _: ScFunction | _: ScPrimaryConstructor =>
         function.containingClass match {
           case td: ScTypeDefinition => td.typeParameters
-          case _ => Seq.empty
+          case _                    => Seq.empty
         }
       case _ => Seq.empty
     }
     val subst = typeParams.foldLeft(ScSubstitutor.empty) { (subst, tp) =>
       subst.bindT(
-          (tp.name, ScalaPsiUtil.getPsiElementId(tp)), tp.upperBound.getOrAny)
+        (tp.name, ScalaPsiUtil.getPsiElementId(tp)),
+        tp.upperBound.getOrAny)
     }
     val localParameters = function match {
       case fun: ScFunctionDefinition if fun.isLocal =>
@@ -177,7 +212,7 @@ object DebuggerUtil {
       case fun if fun.isConstructor =>
         fun.containingClass match {
           case c: ScClass => localParamsForConstructor(c)
-          case _ => Seq.empty
+          case _          => Seq.empty
         }
 
       case _ => Seq.empty
@@ -186,7 +221,7 @@ object DebuggerUtil {
       case cl: ScClass if ValueClassType.isValueClass(cl) =>
         cl.constructors match {
           case Array(pc: ScPrimaryConstructor) => pc.parameters.headOption
-          case _ => None
+          case _                               => None
         }
       case _ => None
     }
@@ -199,7 +234,8 @@ object DebuggerUtil {
     val resultType = function match {
       case fun: ScFunction if !fun.isConstructor =>
         getJVMStringForType(
-            subst.subst(fun.returnType.getOrAny), isParam = false)
+          subst.subst(fun.returnType.getOrAny),
+          isParam = false)
       case _: ScFunction | _: ScPrimaryConstructor => "V"
     }
     JVMNameUtil.getJVMRawText(paramTypes + resultType)
@@ -218,11 +254,11 @@ object DebuggerUtil {
       case clazz: ScClass if clazz.isTopLevel =>
         clazz.constructor match {
           case Some(cnstr) => DebuggerUtil.getFunctionJVMSignature(cnstr)
-          case _ => JVMNameUtil.getJVMRawText("()V")
+          case _           => JVMNameUtil.getJVMRawText("()V")
         }
-      case clazz: ScClass => new JVMConstructorSignature(clazz)
+      case clazz: ScClass  => new JVMConstructorSignature(clazz)
       case clazz: PsiClass => JVMNameUtil.getJVMRawText("()V")
-      case _ => JVMNameUtil.getJVMRawText("()V")
+      case _               => JVMNameUtil.getJVMRawText("()V")
     }
   }
 
@@ -231,11 +267,11 @@ object DebuggerUtil {
       case expr @ ExpressionType(tp) if ScalaPsiUtil.isByNameArgument(expr) =>
         (Seq.empty, tp)
       case ExpressionType(ScFunctionType(retT, argTypes)) => (argTypes, retT)
-      case _ => return None
+      case _                                              => return None
     }
     val trueReturnType = returnType match {
       case ValueClassType(inner) => inner
-      case _ => returnType
+      case _                     => returnType
     }
 
     val paramText = argumentTypes
@@ -246,80 +282,84 @@ object DebuggerUtil {
   }
 
   private def parameterForJVMSignature(
-      param: ScTypedDefinition, subst: ScSubstitutor) = param match {
-    case p: ScParameter if p.isRepeatedParameter => "Lscala/collection/Seq;"
+      param: ScTypedDefinition,
+      subst: ScSubstitutor) = param match {
+    case p: ScParameter if p.isRepeatedParameter   => "Lscala/collection/Seq;"
     case p: ScParameter if p.isCallByNameParameter => "Lscala/Function0;"
     case _ =>
       getJVMStringForType(
-          subst.subst(param.getType(TypingContext.empty).getOrAny))
+        subst.subst(param.getType(TypingContext.empty).getOrAny))
   }
 
-  def createValue(vm: VirtualMachineProxyImpl, tp: ScType, b: Boolean): Value = {
+  def createValue(
+      vm: VirtualMachineProxyImpl,
+      tp: ScType,
+      b: Boolean): Value = {
     import org.jetbrains.plugins.scala.lang.psi.types._
     tp match {
       case Boolean => vm.mirrorOf(b)
-      case Unit => vm.mirrorOfVoid()
-      case _ => null
+      case Unit    => vm.mirrorOfVoid()
+      case _       => null
     }
   }
 
   def createValue(vm: VirtualMachineProxyImpl, tp: ScType, b: Long): Value = {
     import org.jetbrains.plugins.scala.lang.psi.types._
     tp match {
-      case Long => vm.mirrorOf(b)
-      case Int => vm.mirrorOf(b.toInt)
-      case Byte => vm.mirrorOf(b.toByte)
-      case Short => vm.mirrorOf(b.toShort)
-      case Char => vm.mirrorOf(b.toChar)
-      case Float => vm.mirrorOf(b.toFloat)
+      case Long   => vm.mirrorOf(b)
+      case Int    => vm.mirrorOf(b.toInt)
+      case Byte   => vm.mirrorOf(b.toByte)
+      case Short  => vm.mirrorOf(b.toShort)
+      case Char   => vm.mirrorOf(b.toChar)
+      case Float  => vm.mirrorOf(b.toFloat)
       case Double => vm.mirrorOf(b.toDouble)
-      case Unit => vm.mirrorOfVoid()
-      case _ => null
+      case Unit   => vm.mirrorOfVoid()
+      case _      => null
     }
   }
 
   def createValue(vm: VirtualMachineProxyImpl, tp: ScType, b: Char): Value = {
     import org.jetbrains.plugins.scala.lang.psi.types._
     tp match {
-      case Long => vm.mirrorOf(b)
-      case Int => vm.mirrorOf(b.toInt)
-      case Byte => vm.mirrorOf(b.toByte)
-      case Short => vm.mirrorOf(b.toShort)
-      case Char => vm.mirrorOf(b.toChar)
-      case Float => vm.mirrorOf(b.toFloat)
+      case Long   => vm.mirrorOf(b)
+      case Int    => vm.mirrorOf(b.toInt)
+      case Byte   => vm.mirrorOf(b.toByte)
+      case Short  => vm.mirrorOf(b.toShort)
+      case Char   => vm.mirrorOf(b.toChar)
+      case Float  => vm.mirrorOf(b.toFloat)
       case Double => vm.mirrorOf(b.toDouble)
-      case Unit => vm.mirrorOfVoid()
-      case _ => null
+      case Unit   => vm.mirrorOfVoid()
+      case _      => null
     }
   }
 
   def createValue(vm: VirtualMachineProxyImpl, tp: ScType, b: Double): Value = {
     import org.jetbrains.plugins.scala.lang.psi.types._
     tp match {
-      case Long => vm.mirrorOf(b)
-      case Int => vm.mirrorOf(b.toInt)
-      case Byte => vm.mirrorOf(b.toByte)
-      case Short => vm.mirrorOf(b.toShort)
-      case Char => vm.mirrorOf(b.toChar)
-      case Float => vm.mirrorOf(b.toFloat)
+      case Long   => vm.mirrorOf(b)
+      case Int    => vm.mirrorOf(b.toInt)
+      case Byte   => vm.mirrorOf(b.toByte)
+      case Short  => vm.mirrorOf(b.toShort)
+      case Char   => vm.mirrorOf(b.toChar)
+      case Float  => vm.mirrorOf(b.toFloat)
       case Double => vm.mirrorOf(b.toDouble)
-      case Unit => vm.mirrorOfVoid()
-      case _ => null
+      case Unit   => vm.mirrorOfVoid()
+      case _      => null
     }
   }
 
   def createValue(vm: VirtualMachineProxyImpl, tp: ScType, b: Float): Value = {
     import org.jetbrains.plugins.scala.lang.psi.types._
     tp match {
-      case Long => vm.mirrorOf(b)
-      case Int => vm.mirrorOf(b.toInt)
-      case Byte => vm.mirrorOf(b.toByte)
-      case Short => vm.mirrorOf(b.toShort)
-      case Char => vm.mirrorOf(b.toChar)
-      case Float => vm.mirrorOf(b.toFloat)
+      case Long   => vm.mirrorOf(b)
+      case Int    => vm.mirrorOf(b.toInt)
+      case Byte   => vm.mirrorOf(b.toByte)
+      case Short  => vm.mirrorOf(b.toShort)
+      case Char   => vm.mirrorOf(b.toChar)
+      case Float  => vm.mirrorOf(b.toFloat)
       case Double => vm.mirrorOf(b.toDouble)
-      case Unit => vm.mirrorOfVoid()
-      case _ => null
+      case Unit   => vm.mirrorOfVoid()
+      case _      => null
     }
   }
 
@@ -329,17 +369,16 @@ object DebuggerUtil {
         case Some(refType) => refType.name
         case _ =>
           throw EvaluationException(
-              DebuggerBundle.message(
-                  "error.class.not.loaded", getDisplayName(process)))
+            DebuggerBundle
+              .message("error.class.not.loaded", getDisplayName(process)))
       }
     }
 
     def getDisplayName(debugProcess: DebugProcessImpl): String = {
-      ApplicationManager.getApplication.runReadAction(
-          new Computable[String] {
+      ApplicationManager.getApplication.runReadAction(new Computable[String] {
         def compute: String = {
-          JVMNameUtil.getSourcePositionClassDisplayName(
-              debugProcess, sourcePosition)
+          JVMNameUtil
+            .getSourcePositionClassDisplayName(debugProcess, sourcePosition)
         }
       })
     }
@@ -353,8 +392,9 @@ object DebuggerUtil {
         case Some(refType) => refType.methodsByName("<init>").get(0).signature()
         case None =>
           throw EvaluationException(
-              DebuggerBundle.message(
-                  "error.class.not.loaded", inReadAction(clazz.qualifiedName)))
+            DebuggerBundle.message(
+              "error.class.not.loaded",
+              inReadAction(clazz.qualifiedName)))
       }
     }
 
@@ -369,8 +409,9 @@ object DebuggerUtil {
       .getOrElse(default)
   }
 
-  def jvmClassAtPosition(sourcePosition: SourcePosition,
-                         debugProcess: DebugProcess): Option[ReferenceType] = {
+  def jvmClassAtPosition(
+      sourcePosition: SourcePosition,
+      debugProcess: DebugProcess): Option[ReferenceType] = {
     val allClasses = try {
       debugProcess.getPositionManager.getAllClasses(sourcePosition)
     } catch {
@@ -384,13 +425,15 @@ object DebuggerUtil {
   def withoutBackticks(name: String): String = {
     val backticked = """\$u0060(.+)\$u0060""".r
     name match {
-      case null => null
+      case null           => null
       case backticked(id) => id
-      case _ => name
+      case _              => name
     }
   }
 
-  def getClassJVMName(clazz: PsiClass, withPostfix: Boolean = false): JVMName = {
+  def getClassJVMName(
+      clazz: PsiClass,
+      withPostfix: Boolean = false): JVMName = {
     clazz match {
       case t: ScNewTemplateDefinition =>
         new JVMClassAt(SourcePosition.createFromElement(t))
@@ -407,9 +450,10 @@ object DebuggerUtil {
   }
 
   def classnamePostfix(
-      t: ScTemplateDefinition, withPostfix: Boolean = false): String = {
+      t: ScTemplateDefinition,
+      withPostfix: Boolean = false): String = {
     t match {
-      case t: ScTrait if withPostfix => "$class"
+      case t: ScTrait if withPostfix                       => "$class"
       case o: ScObject if withPostfix || o.isPackageObject => "$"
       case c: ScClass if withPostfix && ValueClassType.isValueClass(c) =>
         "$" //methods from a value class always delegate to the companion object
@@ -419,8 +463,8 @@ object DebuggerUtil {
 
   def getSourcePositions(
       elem: PsiElement,
-      lines: mutable.HashSet[SourcePosition] = new mutable.HashSet[
-            SourcePosition]): Set[SourcePosition] = {
+      lines: mutable.HashSet[SourcePosition] =
+        new mutable.HashSet[SourcePosition]): Set[SourcePosition] = {
     val node = elem.getNode
     val children: Array[ASTNode] =
       if (node != null) node.getChildren(null) else Array.empty[ASTNode]
@@ -457,7 +501,8 @@ object DebuggerUtil {
   }
 
   private def unwrapRuntimeRef(
-      value: AnyRef, typeNameCondition: String => Boolean) = value match {
+      value: AnyRef,
+      typeNameCondition: String => Boolean) = value match {
     case _ if !ScalaDebuggerSettings.getInstance().DONT_SHOW_RUNTIME_REFS =>
       value
     case objRef: ObjectReference =>
@@ -478,7 +523,7 @@ object DebuggerUtil {
     fun.body match {
       //to exclude references from default parameters
       case Some(b) => localParams(b, fun, container, visited)
-      case _ => Seq.empty
+      case _       => Seq.empty
     }
   }
 
@@ -500,19 +545,20 @@ object DebuggerUtil {
     val container = ScalaEvaluatorBuilderUtil.getContextClass {
       owner match {
         case pc: ScPrimaryConstructor => pc.containingClass
-        case fun => fun
+        case fun                      => fun
       }
     }
     param.getDefaultExpression match {
       case Some(expr) => localParams(expr, owner, container, visited)
-      case None => Seq.empty
+      case None       => Seq.empty
     }
   }
 
-  def localParams(block: PsiElement,
-                  excludeContext: PsiElement,
-                  container: PsiElement,
-                  visited: mutable.HashSet[PsiElement] = mutable.HashSet.empty)
+  def localParams(
+      block: PsiElement,
+      excludeContext: PsiElement,
+      container: PsiElement,
+      visited: mutable.HashSet[PsiElement] = mutable.HashSet.empty)
     : Seq[ScTypedDefinition] = {
     def atRightPlace(elem: PsiElement): Boolean = {
       if (PsiTreeUtil.isContextAncestor(excludeContext, elem, false))
@@ -560,26 +606,26 @@ object DebuggerUtil {
         }
       }
     })
-    buf.toSeq.sortBy(
-        e => (e.isInstanceOf[ScObject], e.getTextRange.getStartOffset))
+    buf.toSeq.sortBy(e =>
+      (e.isInstanceOf[ScObject], e.getTextRange.getStartOffset))
   }
 
   def isLocalV(resolve: PsiElement): Boolean = {
     resolve match {
       case _: PsiLocalVariable => true
       case _: ScClassParameter => false
-      case _: PsiParameter => true
+      case _: PsiParameter     => true
       case b: ScBindingPattern =>
         ScalaPsiUtil.nameContext(b) match {
           case v @ (_: ScValue | _: ScVariable) =>
             !v.getContext.isInstanceOf[ScTemplateBody] &&
-            !v.getContext.isInstanceOf[ScEarlyDefinitions]
+              !v.getContext.isInstanceOf[ScEarlyDefinitions]
           case clause: ScCaseClause => true
-          case _ => true //todo: for generator/enumerators
+          case _                    => true //todo: for generator/enumerators
         }
       case o: ScObject =>
         !o.getContext.isInstanceOf[ScTemplateBody] &&
-        ScalaPsiUtil.getContextOfType(o, true, classOf[PsiClass]) != null
+          ScalaPsiUtil.getContextOfType(o, true, classOf[PsiClass]) != null
       case _ => false
     }
   }
@@ -599,18 +645,18 @@ object DebuggerUtil {
           return true
         isLocalClass(parent)
       case _: ScPackaging | _: ScalaFile => false
-      case _ => true
+      case _                             => true
     }
   }
 
   def getContainingMethod(elem: PsiElement): Option[PsiElement] = {
     (Iterator(elem) ++ elem.parentsInFile).collectFirst {
-      case c if ScalaPositionManager.isLambda(c) => c
-      case m: PsiMethod => m
-      case tb: ScTemplateBody => tb
-      case ed: ScEarlyDefinitions => ed
+      case c if ScalaPositionManager.isLambda(c)     => c
+      case m: PsiMethod                              => m
+      case tb: ScTemplateBody                        => tb
+      case ed: ScEarlyDefinitions                    => ed
       case ChildOf(f: ScalaFile) if f.isScriptFile() => f
-      case c: ScClass => c
+      case c: ScClass                                => c
     }
   }
 
@@ -626,11 +672,11 @@ object DebuggerUtil {
         val firstSignificant = elem.children.find {
           case ElementType(t)
               if ScalaTokenTypes.WHITES_SPACES_AND_COMMENTS_TOKEN_SET.contains(
-                  t) =>
+                t) =>
             false
-          case _: ScAnnotations => false
+          case _: ScAnnotations          => false
           case e if e.getTextLength == 0 => false
-          case _ => true
+          case _                         => true
         }
         firstSignificant.getOrElse(elem)
       case _ => elem

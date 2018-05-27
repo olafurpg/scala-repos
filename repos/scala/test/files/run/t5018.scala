@@ -7,8 +7,7 @@ object Test {
     val buffer = new ByteArrayOutputStream
     val out = new ObjectOutputStream(buffer)
     out.writeObject(obj)
-    val in = new ObjectInputStream(
-        new ByteArrayInputStream(buffer.toByteArray))
+    val in = new ObjectInputStream(new ByteArrayInputStream(buffer.toByteArray))
     in.readObject.asInstanceOf[T]
   }
 

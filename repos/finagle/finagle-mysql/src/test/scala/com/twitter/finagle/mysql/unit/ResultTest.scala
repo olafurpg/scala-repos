@@ -36,26 +36,8 @@ class HandshakeInitTest extends FunSuite {
     assert(h.status == 2)
     assert(h.salt.length == 20)
     assert(
-        h.salt === Array[Byte](100,
-                               118,
-                               72,
-                               64,
-                               73,
-                               45,
-                               67,
-                               74,
-                               42,
-                               52,
-                               100,
-                               124,
-                               99,
-                               90,
-                               119,
-                               107,
-                               52,
-                               94,
-                               93,
-                               58))
+      h.salt === Array[Byte](100, 118, 72, 64, 73, 45, 67, 74, 42, 52, 100, 124,
+        99, 90, 119, 107, 52, 94, 93, 58))
   })
 
   test("decode protocol version 10 with auth plugin name")(new HexDump {
@@ -135,8 +117,9 @@ class PrepareOKTest extends FunSuite with HexDump {
     assert(p.id == 1)
     assert(p.numOfParams == 2)
     assert(p.numOfCols == 1)
-    assert(packets.size >= 1 + p.numOfParams,
-           "expected %d param packets".format(p.numOfParams))
+    assert(
+      packets.size >= 1 + p.numOfParams,
+      "expected %d param packets".format(p.numOfParams))
     val params =
       packets.drop(1) /*drop header*/.take(p.numOfParams).map(Field.decode(_))
     val p1 = params(0)
@@ -147,8 +130,9 @@ class PrepareOKTest extends FunSuite with HexDump {
     assert(p2.name == "?")
     assert(p2.fieldType == Type.VarString)
     assert(p2.charset == Charset.Binary)
-    assert(packets.size >= 1 + p.numOfParams + p.numOfCols,
-           "expected %d column packets".format(p.numOfCols))
+    assert(
+      packets.size >= 1 + p.numOfParams + p.numOfCols,
+      "expected %d column packets".format(p.numOfCols))
     val cols = packets
       .drop(2 + p.numOfParams) /*drop header + eof + params*/
       .take(p.numOfCols)
@@ -170,16 +154,17 @@ class BinaryResultSetTest extends FunSuite with HexDump {
   test("decode") {
     assert(packets.size == 5, "expected at least 5 packet")
     val rs =
-      ResultSet.decode(true)(packets.head,
-                             packets.drop(1).take(1), /* column_count = 1 */
-                             packets.drop(3).take(1) /* drop eof, 1 row */
+      ResultSet.decode(true)(
+        packets.head,
+        packets.drop(1).take(1), /* column_count = 1 */
+        packets.drop(3).take(1) /* drop eof, 1 row */
       )
     assert(rs.fields.size == 1)
     assert(rs.rows.size == 1)
     assert(rs.fields(0).name == "col1")
     rs.rows(0)("col1") match {
       case Some(StringValue(s)) => assert(s == "foobar")
-      case v => fail("expected StringValue(foobar), but got %s".format(v))
+      case v                    => fail("expected StringValue(foobar), but got %s".format(v))
     }
   }
 }

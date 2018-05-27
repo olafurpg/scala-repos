@@ -30,8 +30,7 @@ class ChannelBufferTransportTest extends FunSuite with MockitoSugar {
     verify(buf).writeBytes(bb, 1, 2)
   }
 
-  test(
-      "ChannelBufferToTransport reads bytes from the underlying ChannelBuffer") {
+  test("ChannelBufferToTransport reads bytes from the underlying ChannelBuffer") {
     val c = new ChannelContext
     import c._
 

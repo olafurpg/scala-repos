@@ -8,7 +8,7 @@ import cats.laws.discipline.{FunctorTests, SerializableTests}
 import org.scalacheck.Arbitrary
 
 class CoyonedaTests extends CatsSuite {
-  implicit def coyonedaArbitrary[F[_]: Functor, A : Arbitrary](
+  implicit def coyonedaArbitrary[F[_]: Functor, A: Arbitrary](
       implicit F: Arbitrary[F[A]]): Arbitrary[Coyoneda[F, A]] =
     Arbitrary(F.arbitrary.map(Coyoneda.lift))
 
@@ -19,10 +19,12 @@ class CoyonedaTests extends CatsSuite {
         FA.eqv(a.run, b.run)
     }
 
-  checkAll("Coyoneda[Option, ?]",
-           FunctorTests[Coyoneda[Option, ?]].functor[Int, Int, Int])
-  checkAll("Functor[Coyoneda[Option, ?]]",
-           SerializableTests.serializable(Functor[Coyoneda[Option, ?]]))
+  checkAll(
+    "Coyoneda[Option, ?]",
+    FunctorTests[Coyoneda[Option, ?]].functor[Int, Int, Int])
+  checkAll(
+    "Functor[Coyoneda[Option, ?]]",
+    SerializableTests.serializable(Functor[Coyoneda[Option, ?]]))
 
   test("toYoneda and then toCoyoneda is identity") {
     forAll { (y: Coyoneda[Option, Int]) =>

@@ -9,8 +9,7 @@ import akka.stream.testkit.{TestSubscriber, TestPublisher, TestUtils, Utils}
 import akka.http.scaladsl.model.headers
 import akka.testkit.AkkaSpec
 
-class ClientCancellationSpec
-    extends AkkaSpec("""
+class ClientCancellationSpec extends AkkaSpec("""
     akka.loglevel = DEBUG
     akka.io.tcp.trace-logging = off""") {
 
@@ -24,12 +23,14 @@ class ClientCancellationSpec
     }, address.getHostName, address.getPort)(noncheckedMaterializer)
 
     val addressTls = TestUtils.temporaryServerAddress()
-    Http().bindAndHandleSync({ req ⇒
-      HttpResponse()
-    }, // TLS client does full-close, no need for the connection:close header
-    addressTls.getHostName,
-    addressTls.getPort, connectionContext = ConnectionContext.https(
-          SSLContext.getDefault))(noncheckedMaterializer)
+    Http().bindAndHandleSync(
+      { req ⇒
+        HttpResponse()
+      }, // TLS client does full-close, no need for the connection:close header
+      addressTls.getHostName,
+      addressTls.getPort,
+      connectionContext = ConnectionContext.https(SSLContext.getDefault)
+    )(noncheckedMaterializer)
 
     def testCase(connection: Flow[HttpRequest, HttpResponse, Any]): Unit =
       Utils.assertAllStagesStopped {
@@ -52,29 +53,30 @@ class ClientCancellationSpec
 
     "support cancellation in pooled outgoing connection" in {
       testCase(
-          Flow[HttpRequest]
-            .map((_, ()))
-            .via(Http().cachedHostConnectionPool(
-                    address.getHostName,
-                    address.getPort)(noncheckedMaterializer))
-            .map(_._1.get))
+        Flow[HttpRequest]
+          .map((_, ()))
+          .via(Http().cachedHostConnectionPool(
+            address.getHostName,
+            address.getPort)(noncheckedMaterializer))
+          .map(_._1.get))
     }
 
     "support cancellation in simple outgoing connection with TLS" in {
       pending
-      testCase(Http().outgoingConnectionHttps(addressTls.getHostName,
-                                              addressTls.getPort))
+      testCase(
+        Http()
+          .outgoingConnectionHttps(addressTls.getHostName, addressTls.getPort))
     }
 
     "support cancellation in pooled outgoing connection with TLS" in {
       pending
       testCase(
-          Flow[HttpRequest]
-            .map((_, ()))
-            .via(Http().cachedHostConnectionPoolHttps(
-                    addressTls.getHostName,
-                    addressTls.getPort)(noncheckedMaterializer))
-            .map(_._1.get))
+        Flow[HttpRequest]
+          .map((_, ()))
+          .via(Http().cachedHostConnectionPoolHttps(
+            addressTls.getHostName,
+            addressTls.getPort)(noncheckedMaterializer))
+          .map(_._1.get))
     }
   }
 }

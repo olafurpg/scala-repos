@@ -1,8 +1,7 @@
 import org.scalacheck._, Prop._, Gen._, Arbitrary._
 import scala.reflect.runtime.universe._, Flag._
 
-object TermConstructionProps
-    extends QuasiquoteProperties("term construction") {
+object TermConstructionProps extends QuasiquoteProperties("term construction") {
   property("unquote single tree return tree itself") = forAll { (t: Tree) =>
     q"$t" ≈ t
   }
@@ -44,11 +43,13 @@ object TermConstructionProps
 
   property("unquote trees into block") = forAll {
     (t1: Tree, t2: Tree, t3: Tree) =>
-      blockInvariant(q"""{
+      blockInvariant(
+        q"""{
       $t1
       $t2
       $t3
-    }""", List(t1, t2, t3))
+    }""",
+        List(t1, t2, t3))
   }
 
   property("unquote tree into new") = forAll { (tree: Tree) =>
@@ -67,11 +68,14 @@ object TermConstructionProps
   property("unquote list and non-list fun arguments") = forAll {
     (fun: Tree, arg1: Tree, arg2: Tree, args: List[Tree]) =>
       q"$fun(..$args, $arg1, $arg2)" ≈ Apply(
-          fun, args ++ List(arg1) ++ List(arg2)) &&
+        fun,
+        args ++ List(arg1) ++ List(arg2)) &&
       q"$fun($arg1, ..$args, $arg2)" ≈ Apply(
-          fun, List(arg1) ++ args ++ List(arg2)) &&
-      q"$fun($arg1, $arg2, ..$args)" ≈ Apply(fun,
-                                             List(arg1) ++ List(arg2) ++ args)
+        fun,
+        List(arg1) ++ args ++ List(arg2)) &&
+      q"$fun($arg1, $arg2, ..$args)" ≈ Apply(
+        fun,
+        List(arg1) ++ List(arg2) ++ args)
   }
 
   property("unquote into new") = forAll { (name: TypeName, body: List[Tree]) =>
@@ -99,9 +103,12 @@ object TermConstructionProps
   property("unquote trees into while loop") = forAll {
     (cond: Tree, body: Tree) =>
       val LabelDef(
-      _,
-      List(),
-      If(cond1, Block(List(body1), Apply(_, List())), Literal(Constant(())))) =
+        _,
+        List(),
+        If(
+          cond1,
+          Block(List(body1), Apply(_, List())),
+          Literal(Constant(())))) =
         q"while($cond) $body"
       body1 ≈ body && cond1 ≈ cond
   }
@@ -109,21 +116,23 @@ object TermConstructionProps
   property("unquote trees into do while loop") = forAll {
     (cond: Tree, body: Tree) =>
       val LabelDef(
-      _,
-      List(),
-      Block(List(body1), If(cond1, Apply(_, List()), Literal(Constant(()))))) =
+        _,
+        List(),
+        Block(
+          List(body1),
+          If(cond1, Apply(_, List()), Literal(Constant(()))))) =
         q"do $body while($cond)"
       body1 ≈ body && cond1 ≈ cond
   }
 
   def blockInvariant(quote: Tree, trees: List[Tree]) =
     quote ≈
-    (trees match {
-          case Nil => q"{}"
-          case _ :+ last if !last.isTerm => Block(trees, q"()")
-          case head :: Nil => head
-          case init :+ last => Block(init, last)
-        })
+      (trees match {
+        case Nil                       => q"{}"
+        case _ :+ last if !last.isTerm => Block(trees, q"()")
+        case head :: Nil               => head
+        case init :+ last              => Block(init, last)
+      })
 
   property("unquote list of trees into block (1)") = forAll {
     (trees: List[Tree]) =>
@@ -229,9 +238,11 @@ object TermConstructionProps
   property("SI-6842") = test {
     val cases: List[Tree] = cq"a => b" :: cq"_ => c" :: Nil
     assertEqAst(
-        q"1 match { case ..$cases }", "1 match { case a => b case _ => c }")
-    assertEqAst(q"try 1 catch { case ..$cases }",
-                "try 1 catch { case a => b case _ => c }")
+      q"1 match { case ..$cases }",
+      "1 match { case a => b case _ => c }")
+    assertEqAst(
+      q"try 1 catch { case ..$cases }",
+      "try 1 catch { case a => b case _ => c }")
   }
 
   property("SI-8009") = test {
@@ -319,7 +330,8 @@ object TermConstructionProps
   property("consistent variable order") = test {
     val q"$a = $b = $c = $d = $e = $f = $g = $h = $k = $l" =
       q"a = b = c = d = e = f = g = h = k = l"
-    assert(a ≈ q"a" && b ≈ q"b" && c ≈ q"c" && d ≈ q"d" && e ≈ q"e" &&
+    assert(
+      a ≈ q"a" && b ≈ q"b" && c ≈ q"c" && d ≈ q"d" && e ≈ q"e" &&
         g ≈ q"g" && h ≈ q"h" && k ≈ q"k" && l ≈ q"l")
   }
 

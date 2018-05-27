@@ -28,7 +28,9 @@ import scala.util.{Failure, Success, Try}
   * This is the type that should be fed to cascading to enable binary comparators
   */
 class CascadingBinaryComparator[T](ob: OrderedSerialization[T])
-    extends Comparator[T] with StreamComparator[InputStream] with CHasher[T]
+    extends Comparator[T]
+    with StreamComparator[InputStream]
+    with CHasher[T]
     with Serializable {
 
   override def compare(a: T, b: T) = ob.compare(a, b)
@@ -59,7 +61,7 @@ object CascadingBinaryComparator {
 
       def error(s: String): Try[Unit] =
         Failure(
-            new RuntimeException("Cannot verify OrderedSerialization: " + s))
+          new RuntimeException("Cannot verify OrderedSerialization: " + s))
 
       if (m.isEmpty) error(s"Splice must have KeySelectors: $s")
       else {
@@ -74,7 +76,7 @@ object CascadingBinaryComparator {
                   .isInstanceOf[CascadingBinaryComparator[_]]) Success(())
             else
               error(
-                  s"pipe: $s, fields: $fields, comparators: ${fields.getComparators.toList}")
+                s"pipe: $s, fields: $fields, comparators: ${fields.getComparators.toList}")
         })
       }
     }
@@ -85,15 +87,17 @@ object CascadingBinaryComparator {
       if (bfs.getGraph.vertexSet.asScala.exists {
             case gb: GroupBy => check(gb).isFailure
             case cg: CoGroup => check(cg).isFailure
-            case _ => false // only do sorting in groupBy/cogroupBy
+            case _           => false // only do sorting in groupBy/cogroupBy
           }) {
         Some(getDesc(bfs).mkString(", "))
       } else None
 
     // Get all the steps that have missing OrderedSerializations
-    val missing = flow.getFlowSteps.asScala.map {
-      case bfs: BaseFlowStep[_] => getDescriptionsForMissingOrdSer(bfs)
-    }.collect { case Some(desc) => desc }
+    val missing = flow.getFlowSteps.asScala
+      .map {
+        case bfs: BaseFlowStep[_] => getDescriptionsForMissingOrdSer(bfs)
+      }
+      .collect { case Some(desc) => desc }
 
     if (missing.isEmpty) Success(())
     else {

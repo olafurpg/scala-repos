@@ -22,7 +22,12 @@ import com.twitter.conversions.time._
 import com.twitter.finagle.stats.InMemoryStatsReceiver
 import com.twitter.util.{RandomSocket, Time}
 import java.util.concurrent.atomic.AtomicInteger
-import java.util.concurrent.{ArrayBlockingQueue, RejectedExecutionHandler, TimeUnit, ThreadPoolExecutor}
+import java.util.concurrent.{
+  ArrayBlockingQueue,
+  RejectedExecutionHandler,
+  TimeUnit,
+  ThreadPoolExecutor
+}
 import java.util.{logging => javalog}
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
@@ -48,13 +53,13 @@ class ScribeHandlerTest extends WordSpec with BeforeAndAfter with Eventually {
     "build a scribe RPC call" in {
       Time.withCurrentTimeFrozen { _ =>
         val scribe = ScribeHandler(
-            // Hack to make sure that the buffer doesn't get flushed.
-            port = portWithoutListener,
-            bufferTime = 100.milliseconds,
-            maxMessagesToBuffer = 10000,
-            formatter = new Formatter(timezone = Some("UTC")),
-            category = "test",
-            level = Some(Level.DEBUG)
+          // Hack to make sure that the buffer doesn't get flushed.
+          port = portWithoutListener,
+          bufferTime = 100.milliseconds,
+          maxMessagesToBuffer = 10000,
+          formatter = new Formatter(timezone = Some("UTC")),
+          category = "test",
+          level = Some(Level.DEBUG)
         ).apply()
 
         scribe.updateLastTransmission()
@@ -63,27 +68,27 @@ class ScribeHandlerTest extends WordSpec with BeforeAndAfter with Eventually {
 
         assert(scribe.queue.size == 2)
         assert(
-            scribe.makeBuffer(2).array.hexlify ==
+          scribe.makeBuffer(2).array.hexlify ==
             ("000000b080010001000000034c6f67000000000f0001" +
-                "0c000000020b000100000004746573740b0002000000" +
-                "36494e46205b32303038303332392d30353a35333a31" +
-                "362e3732325d2068656c6c6f3a205468697320697320" +
-                "61206d6573736167652e0a000b000100000004746573" +
-                "740b00020000003c494e46205b32303038303332392d" +
-                "30353a35333a31362e3732325d2068656c6c6f3a2054" +
-                "68697320697320616e6f74686572206d657373616765" + "2e0a0000"))
+              "0c000000020b000100000004746573740b0002000000" +
+              "36494e46205b32303038303332392d30353a35333a31" +
+              "362e3732325d2068656c6c6f3a205468697320697320" +
+              "61206d6573736167652e0a000b000100000004746573" +
+              "740b00020000003c494e46205b32303038303332392d" +
+              "30353a35333a31362e3732325d2068656c6c6f3a2054" +
+              "68697320697320616e6f74686572206d657373616765" + "2e0a0000"))
       }
     }
 
     "be able to log binary data" in {
       Time.withCurrentTimeFrozen { _ =>
         val scribe = ScribeHandler(
-            port = portWithoutListener,
-            bufferTime = 100.milliseconds,
-            maxMessagesToBuffer = 10000,
-            formatter = new Formatter(timezone = Some("UTC")),
-            category = "test",
-            level = Some(Level.DEBUG)
+          port = portWithoutListener,
+          bufferTime = 100.milliseconds,
+          maxMessagesToBuffer = 10000,
+          formatter = new Formatter(timezone = Some("UTC")),
+          category = "test",
+          level = Some(Level.DEBUG)
         ).apply()
 
         val bytes = Array[Byte](1, 2, 3, 4, 5)
@@ -99,12 +104,12 @@ class ScribeHandlerTest extends WordSpec with BeforeAndAfter with Eventually {
       val statsReceiver = new InMemoryStatsReceiver
 
       val scribe = ScribeHandler(
-          port = portWithoutListener,
-          bufferTime = 5.seconds,
-          maxMessagesToBuffer = 1,
-          formatter = BareFormatter,
-          category = "test",
-          statsReceiver = statsReceiver
+        port = portWithoutListener,
+        bufferTime = 5.seconds,
+        maxMessagesToBuffer = 1,
+        formatter = BareFormatter,
+        category = "test",
+        statsReceiver = statsReceiver
       ).apply()
 
       scribe.updateLastTransmission()
@@ -121,11 +126,12 @@ class ScribeHandlerTest extends WordSpec with BeforeAndAfter with Eventually {
       // Use a mock ThreadPoolExecutor to force syncronize execution,
       // to ensure reliably test connection backoff.
       class MockThreadPoolExecutor
-          extends ThreadPoolExecutor(1,
-                                     1,
-                                     0L,
-                                     TimeUnit.MILLISECONDS,
-                                     new ArrayBlockingQueue[Runnable](5)) {
+          extends ThreadPoolExecutor(
+            1,
+            1,
+            0L,
+            TimeUnit.MILLISECONDS,
+            new ArrayBlockingQueue[Runnable](5)) {
         override def execute(command: Runnable): Unit = command.run()
       }
 
@@ -133,16 +139,18 @@ class ScribeHandlerTest extends WordSpec with BeforeAndAfter with Eventually {
       // although the test just checked a short moment ago.
       // Solution: try multiple times until it gets a connection failure.
       def scribeWithConnectionFailure(retries: Int): ScribeHandler = {
-        val scribe = new ScribeHandler(hostname = "localhost",
-                                       port = portWithoutListener,
-                                       category = "test",
-                                       bufferTime = 5.seconds,
-                                       connectBackoff = 15.seconds,
-                                       maxMessagesPerTransaction = 1,
-                                       maxMessagesToBuffer = 4,
-                                       formatter = BareFormatter,
-                                       level = None,
-                                       statsReceiver = statsReceiver) {
+        val scribe = new ScribeHandler(
+          hostname = "localhost",
+          port = portWithoutListener,
+          category = "test",
+          bufferTime = 5.seconds,
+          connectBackoff = 15.seconds,
+          maxMessagesPerTransaction = 1,
+          maxMessagesToBuffer = 4,
+          formatter = BareFormatter,
+          level = None,
+          statsReceiver = statsReceiver
+        ) {
           override private[logging] val flusher = new MockThreadPoolExecutor
         }
         scribe.publish(record1)
@@ -169,20 +177,21 @@ class ScribeHandlerTest extends WordSpec with BeforeAndAfter with Eventually {
       val statsReceiver = new InMemoryStatsReceiver
 
       val scribe = ScribeHandler(
-          port = portWithoutListener,
-          bufferTime = 5.seconds,
-          maxMessagesToBuffer = 1,
-          formatter = BareFormatter,
-          category = "test",
-          statsReceiver = statsReceiver
+        port = portWithoutListener,
+        bufferTime = 5.seconds,
+        maxMessagesToBuffer = 1,
+        formatter = BareFormatter,
+        category = "test",
+        statsReceiver = statsReceiver
       ).apply()
 
       // Set up a rejectedExecutionHandler to count number of rejected tasks.
       val rejected = new AtomicInteger(0)
       scribe.flusher.setRejectedExecutionHandler(new RejectedExecutionHandler {
         val inner = scribe.flusher.getRejectedExecutionHandler()
-        def rejectedExecution(r: Runnable,
-                              executor: ThreadPoolExecutor): Unit = {
+        def rejectedExecution(
+            r: Runnable,
+            executor: ThreadPoolExecutor): Unit = {
           rejected.getAndIncrement()
           inner.rejectedExecution(r, executor)
         }

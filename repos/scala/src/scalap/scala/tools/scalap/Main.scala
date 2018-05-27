@@ -32,7 +32,8 @@ class Main {
   val BYTES_VALUE = "bytes"
 
   val versionMsg = "Scala classfile decoder %s -- %s\n".format(
-      Properties.versionString, Properties.copyrightString)
+    Properties.versionString,
+    Properties.copyrightString)
 
   /**Verbose program run?
     */
@@ -96,7 +97,7 @@ class Main {
 
     ScalaSigParser.parse(classFile) match {
       case Some(scalaSig) => parseScalaSignature(scalaSig, isPackageObject)
-      case None => ""
+      case None           => ""
     }
   }
 
@@ -108,7 +109,7 @@ class Main {
     // find the classfile
     val encName = classname match {
       case "scala.AnyRef" => "java.lang.Object"
-      case _ =>
+      case _              =>
         // we have to encode every fragment of a name separately, otherwise the NameTransformer
         // will encode using unicode escaping dot separators as well
         // we can afford allocations because this is not a performance critical code
@@ -118,7 +119,8 @@ class Main {
     path.findClassFile(encName) match {
       case Some(classFile) =>
         if (verbose) {
-          Console.println(Console.BOLD + "FILENAME" + Console.RESET + " = " +
+          Console.println(
+            Console.BOLD + "FILENAME" + Console.RESET + " = " +
               classFile.path)
         }
         val bytes = classFile.toByteArray
@@ -183,7 +185,7 @@ object Main extends Main {
       // construct a custom class path
       val cpArg =
         List(opts.classpath, opts.cp) map arguments.getArgument reduceLeft
-        (_ orElse _)
+          (_ orElse _)
 
       val settings = new Settings()
 
@@ -195,7 +197,8 @@ object Main extends Main {
 
       // print the classpath if output is verbose
       if (verbose)
-        Console.println(Console.BOLD + "CLASSPATH" + Console.RESET + " = " +
+        Console.println(
+          Console.BOLD + "CLASSPATH" + Console.RESET + " = " +
             path.asClassPathString)
 
       // process all given classes
@@ -223,10 +226,11 @@ object Main extends Main {
         settings.YclasspathImpl.value match {
           case ClassPathRepresentationType.Flat =>
             AggregateFlatClassPath(
-                new FlatClassPathFactory(settings).classesInExpandedPath(cp))
+              new FlatClassPathFactory(settings).classesInExpandedPath(cp))
           case ClassPathRepresentationType.Recursive =>
-            new JavaClassPath(DefaultJavaContext.classesInExpandedPath(cp),
-                              DefaultJavaContext)
+            new JavaClassPath(
+              DefaultJavaContext.classesInExpandedPath(cp),
+              DefaultJavaContext)
         }
       case _ =>
         settings.classpath.value = "." // include '.' in the default classpath SI-6669

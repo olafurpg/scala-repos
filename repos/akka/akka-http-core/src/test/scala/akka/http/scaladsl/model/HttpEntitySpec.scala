@@ -19,8 +19,7 @@ import akka.http.impl.util.StreamUtils
 
 import scala.util.Random
 
-class HttpEntitySpec
-    extends FreeSpec with MustMatchers with BeforeAndAfterAll {
+class HttpEntitySpec extends FreeSpec with MustMatchers with BeforeAndAfterAll {
   val tpe: ContentType = ContentTypes.`application/octet-stream`
   val abc = ByteString("abc")
   val de = ByteString("de")
@@ -28,7 +27,8 @@ class HttpEntitySpec
   val ijk = ByteString("ijk")
 
   val testConf: Config =
-    ConfigFactory.parseString("""
+    ConfigFactory.parseString(
+      """
   akka.event-handlers = ["akka.testkit.TestEventListener"]
   akka.loglevel = WARNING""")
   implicit val system = ActorSystem(getClass.getSimpleName, testConf)
@@ -42,24 +42,30 @@ class HttpEntitySpec
         Strict(tpe, abc) must collectBytesTo(abc)
       }
       "Default" in {
-        Default(tpe, 11, source(abc, de, fgh, ijk)) must collectBytesTo(abc,
-                                                                        de,
-                                                                        fgh,
-                                                                        ijk)
+        Default(tpe, 11, source(abc, de, fgh, ijk)) must collectBytesTo(
+          abc,
+          de,
+          fgh,
+          ijk)
       }
       "CloseDelimited" in {
-        CloseDelimited(tpe, source(abc, de, fgh, ijk)) must collectBytesTo(abc,
-                                                                           de,
-                                                                           fgh,
-                                                                           ijk)
+        CloseDelimited(tpe, source(abc, de, fgh, ijk)) must collectBytesTo(
+          abc,
+          de,
+          fgh,
+          ijk)
       }
       "Chunked w/o LastChunk" in {
         Chunked(tpe, source(Chunk(abc), Chunk(fgh), Chunk(ijk))) must collectBytesTo(
-            abc, fgh, ijk)
+          abc,
+          fgh,
+          ijk)
       }
       "Chunked with LastChunk" in {
         Chunked(tpe, source(Chunk(abc), Chunk(fgh), Chunk(ijk), LastChunk)) must collectBytesTo(
-            abc, fgh, ijk)
+          abc,
+          fgh,
+          ijk)
       }
     }
     "support contentLength" - {
@@ -68,7 +74,7 @@ class HttpEntitySpec
       }
       "Default" in {
         Default(tpe, 11, source(abc, de, fgh, ijk)).contentLengthOption mustEqual Some(
-            11)
+          11)
       }
       "CloseDelimited" in {
         CloseDelimited(tpe, source(abc, de, fgh, ijk)).contentLengthOption mustEqual None
@@ -83,61 +89,57 @@ class HttpEntitySpec
       }
       "Default" in {
         Default(tpe, 11, source(abc, de, fgh, ijk)) must strictifyTo(
-            Strict(tpe, abc ++ de ++ fgh ++ ijk))
+          Strict(tpe, abc ++ de ++ fgh ++ ijk))
       }
       "CloseDelimited" in {
         CloseDelimited(tpe, source(abc, de, fgh, ijk)) must strictifyTo(
-            Strict(tpe, abc ++ de ++ fgh ++ ijk))
+          Strict(tpe, abc ++ de ++ fgh ++ ijk))
       }
       "Chunked w/o LastChunk" in {
         Chunked(tpe, source(Chunk(abc), Chunk(fgh), Chunk(ijk))) must strictifyTo(
-            Strict(tpe, abc ++ fgh ++ ijk))
+          Strict(tpe, abc ++ fgh ++ ijk))
       }
       "Chunked with LastChunk" in {
         Chunked(tpe, source(Chunk(abc), Chunk(fgh), Chunk(ijk), LastChunk)) must strictifyTo(
-            Strict(tpe, abc ++ fgh ++ ijk))
+          Strict(tpe, abc ++ fgh ++ ijk))
       }
       "Infinite data stream" in {
         val neverCompleted = Promise[ByteString]()
         intercept[TimeoutException] {
-          Await.result(Default(tpe,
-                               42,
-                               Source.fromFuture(neverCompleted.future))
-                         .toStrict(100.millis),
-                       150.millis)
+          Await.result(
+            Default(tpe, 42, Source.fromFuture(neverCompleted.future))
+              .toStrict(100.millis),
+            150.millis)
         }.getMessage must be(
-            "HttpEntity.toStrict timed out after 100 milliseconds while still waiting for outstanding data")
+          "HttpEntity.toStrict timed out after 100 milliseconds while still waiting for outstanding data")
       }
     }
     "support transformDataBytes" - {
       "Strict" in {
         Strict(tpe, abc) must transformTo(
-            Strict(tpe, doubleChars("abc") ++ trailer))
+          Strict(tpe, doubleChars("abc") ++ trailer))
       }
       "Default" in {
         Default(tpe, 11, source(abc, de, fgh, ijk)) must transformTo(
-            Strict(tpe, doubleChars("abcdefghijk") ++ trailer))
+          Strict(tpe, doubleChars("abcdefghijk") ++ trailer))
       }
       "CloseDelimited" in {
         CloseDelimited(tpe, source(abc, de, fgh, ijk)) must transformTo(
-            Strict(tpe, doubleChars("abcdefghijk") ++ trailer))
+          Strict(tpe, doubleChars("abcdefghijk") ++ trailer))
       }
       "Chunked w/o LastChunk" in {
         Chunked(tpe, source(Chunk(abc), Chunk(fgh), Chunk(ijk))) must transformTo(
-            Strict(tpe, doubleChars("abcfghijk") ++ trailer))
+          Strict(tpe, doubleChars("abcfghijk") ++ trailer))
       }
       "Chunked with LastChunk" in {
         Chunked(tpe, source(Chunk(abc), Chunk(fgh), Chunk(ijk), LastChunk)) must transformTo(
-            Strict(tpe, doubleChars("abcfghijk") ++ trailer))
+          Strict(tpe, doubleChars("abcfghijk") ++ trailer))
       }
       "Chunked with extra LastChunk" in {
-        Chunked(tpe,
-                source(Chunk(abc),
-                       Chunk(fgh),
-                       Chunk(ijk),
-                       LastChunk,
-                       LastChunk)) must transformTo(
-            Strict(tpe, doubleChars("abcfghijk") ++ trailer))
+        Chunked(
+          tpe,
+          source(Chunk(abc), Chunk(fgh), Chunk(ijk), LastChunk, LastChunk)) must transformTo(
+          Strict(tpe, doubleChars("abcfghijk") ++ trailer))
       }
     }
     "support toString" - {
@@ -150,16 +152,15 @@ class HttpEntitySpec
         val nonBinaryType = ContentTypes.`application/json`
         val entity = Strict(nonBinaryType, abc)
         entity must renderStrictDataAs(
-            entity.data.decodeString(nonBinaryType.charset.value))
+          entity.data.decodeString(nonBinaryType.charset.value))
       }
       "Strict with non-binary MediaType and over 4096 bytes" in {
         val utf8Type = ContentTypes.`text/plain(UTF-8)`
         val longString = Random.alphanumeric.take(10000).mkString
         val entity =
-          Strict(utf8Type,
-                 ByteString.apply(longString, utf8Type.charset.value))
+          Strict(utf8Type, ByteString.apply(longString, utf8Type.charset.value))
         entity must renderStrictDataAs(
-            s"${longString.take(4095)} ... (10000 bytes total)")
+          s"${longString.take(4095)} ... (10000 bytes total)")
       }
       "Default" in {
         val entity = Default(tpe, 11, source(abc, de, fgh, ijk))
@@ -179,44 +180,42 @@ class HttpEntitySpec
         HttpEntity.Empty.withoutSizeLimit
         withReturnType[UniversalEntity](Strict(tpe, abc).withoutSizeLimit)
         withReturnType[RequestEntity](
-            Strict(tpe, abc).asInstanceOf[RequestEntity].withoutSizeLimit)
+          Strict(tpe, abc).asInstanceOf[RequestEntity].withoutSizeLimit)
         withReturnType[ResponseEntity](
-            Strict(tpe, abc).asInstanceOf[ResponseEntity].withoutSizeLimit)
+          Strict(tpe, abc).asInstanceOf[ResponseEntity].withoutSizeLimit)
       }
       "Default" in {
         withReturnType[Default](
-            Default(tpe, 11, source(abc, de, fgh, ijk)).withoutSizeLimit)
+          Default(tpe, 11, source(abc, de, fgh, ijk)).withoutSizeLimit)
         withReturnType[RequestEntity](
-            Default(tpe, 11, source(abc, de, fgh, ijk))
-              .asInstanceOf[RequestEntity]
-              .withoutSizeLimit)
+          Default(tpe, 11, source(abc, de, fgh, ijk))
+            .asInstanceOf[RequestEntity]
+            .withoutSizeLimit)
         withReturnType[ResponseEntity](
-            Default(tpe, 11, source(abc, de, fgh, ijk))
-              .asInstanceOf[ResponseEntity]
-              .withoutSizeLimit)
+          Default(tpe, 11, source(abc, de, fgh, ijk))
+            .asInstanceOf[ResponseEntity]
+            .withoutSizeLimit)
       }
       "CloseDelimited" in {
         withReturnType[CloseDelimited](
-            CloseDelimited(tpe, source(abc, de, fgh, ijk)).withoutSizeLimit)
+          CloseDelimited(tpe, source(abc, de, fgh, ijk)).withoutSizeLimit)
         withReturnType[ResponseEntity](
-            CloseDelimited(tpe, source(abc, de, fgh, ijk))
-              .asInstanceOf[ResponseEntity]
-              .withoutSizeLimit)
+          CloseDelimited(tpe, source(abc, de, fgh, ijk))
+            .asInstanceOf[ResponseEntity]
+            .withoutSizeLimit)
       }
       "Chunked" in {
-        withReturnType[Chunked](Chunked(tpe,
-                                        source(Chunk(abc),
-                                               Chunk(fgh),
-                                               Chunk(ijk),
-                                               LastChunk)).withoutSizeLimit)
+        withReturnType[Chunked](Chunked(
+          tpe,
+          source(Chunk(abc), Chunk(fgh), Chunk(ijk), LastChunk)).withoutSizeLimit)
         withReturnType[RequestEntity](
-            Chunked(tpe, source(Chunk(abc), Chunk(fgh), Chunk(ijk), LastChunk))
-              .asInstanceOf[RequestEntity]
-              .withoutSizeLimit)
+          Chunked(tpe, source(Chunk(abc), Chunk(fgh), Chunk(ijk), LastChunk))
+            .asInstanceOf[RequestEntity]
+            .withoutSizeLimit)
         withReturnType[ResponseEntity](
-            Chunked(tpe, source(Chunk(abc), Chunk(fgh), Chunk(ijk), LastChunk))
-              .asInstanceOf[ResponseEntity]
-              .withoutSizeLimit)
+          Chunked(tpe, source(Chunk(abc), Chunk(fgh), Chunk(ijk), LastChunk))
+            .asInstanceOf[ResponseEntity]
+            .withoutSizeLimit)
       }
     }
   }
@@ -246,14 +245,15 @@ class HttpEntitySpec
     Matcher { strict: Strict ⇒
       val expectedRendering =
         s"${strict.productPrefix}(${strict.contentType},$dataRendering)"
-      MatchResult(strict.toString == expectedRendering,
-                  strict.toString + " != " + expectedRendering,
-                  strict.toString + " == " + expectedRendering)
+      MatchResult(
+        strict.toString == expectedRendering,
+        strict.toString + " != " + expectedRendering,
+        strict.toString + " == " + expectedRendering)
     }
 
   def duplicateBytesTransformer(): Flow[ByteString, ByteString, NotUsed] =
-    Flow[ByteString].transform(
-        () ⇒ StreamUtils.byteStringTransformer(doubleChars, () ⇒ trailer))
+    Flow[ByteString].transform(() ⇒
+      StreamUtils.byteStringTransformer(doubleChars, () ⇒ trailer))
 
   def trailer: ByteString = ByteString("--dup")
   def doubleChars(bs: ByteString): ByteString =

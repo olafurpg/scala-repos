@@ -20,11 +20,11 @@ object Utility {
   import scala.reflect.internal.Chars.SU
 
   private val unescMap = Map(
-      "lt" -> '<',
-      "gt" -> '>',
-      "amp" -> '&',
-      "quot" -> '"',
-      "apos" -> '\''
+    "lt" -> '<',
+    "gt" -> '>',
+    "amp" -> '&',
+    "quot" -> '"',
+    "apos" -> '\''
   )
 
   /**
@@ -37,7 +37,9 @@ object Utility {
     ((unescMap get ref) map (s append _)).orNull
 
   def parseAttributeValue[T](
-      value: String, text: String => T, entityRef: String => T): List[T] = {
+      value: String,
+      text: String => T,
+      entityRef: String => T): List[T] = {
     val sb = new StringBuilder
     var rfb: StringBuilder = null
     val nb = new mutable.ListBuffer[T]()
@@ -97,10 +99,11 @@ object Utility {
     * }}}
     * See [66]
     */
-  def parseCharRef(ch: () => Char,
-                   nextch: () => Unit,
-                   reportSyntaxError: String => Unit,
-                   reportTruncatedError: String => Unit): String = {
+  def parseCharRef(
+      ch: () => Char,
+      nextch: () => Unit,
+      reportSyntaxError: String => Unit,
+      reportTruncatedError: String => Unit): String = {
     val hex = (ch() == 'x') && { nextch(); true }
     val base = if (hex) 16 else 10
     var i = 0
@@ -111,14 +114,15 @@ object Utility {
         case 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'A' | 'B' | 'C' | 'D' | 'E' |
             'F' =>
           if (!hex)
-            reportSyntaxError("hex char not allowed in decimal char ref\n" +
+            reportSyntaxError(
+              "hex char not allowed in decimal char ref\n" +
                 "Did you mean to write &#x ?")
           else i = i * base + ch().asDigit
         case SU =>
           reportTruncatedError("")
         case _ =>
           reportSyntaxError(
-              "character '" + ch() + "' not allowed in char ref\n")
+            "character '" + ch() + "' not allowed in char ref\n")
       }
       nextch()
     }
@@ -130,7 +134,7 @@ object Utility {
     *  }}} */
   final def isSpace(ch: Char): Boolean = ch match {
     case '\u0009' | '\u000A' | '\u000D' | '\u0020' => true
-    case _ => false
+    case _                                         => false
   }
 
   /** {{{
@@ -145,11 +149,11 @@ object Utility {
 
     isNameStart(ch) ||
     (getType(ch).toByte match {
-          case COMBINING_SPACING_MARK | ENCLOSING_MARK | NON_SPACING_MARK |
-              MODIFIER_LETTER | DECIMAL_DIGIT_NUMBER =>
-            true
-          case _ => ".-:" contains ch
-        })
+      case COMBINING_SPACING_MARK | ENCLOSING_MARK | NON_SPACING_MARK |
+          MODIFIER_LETTER | DECIMAL_DIGIT_NUMBER =>
+        true
+      case _ => ".-:" contains ch
+    })
   }
 
   /** {{{

@@ -3,7 +3,11 @@ package com.twitter.finagle.memcached.util
 import collection.mutable.ArrayBuffer
 import com.google.common.base.Strings
 import com.twitter.io.Charsets
-import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers, ChannelBufferIndexFinder}
+import org.jboss.netty.buffer.{
+  ChannelBuffer,
+  ChannelBuffers,
+  ChannelBufferIndexFinder
+}
 import scala.language.implicitConversions
 
 private[finagle] object ChannelBufferUtils {
@@ -72,8 +76,9 @@ private[finagle] object ChannelBufferUtils {
     def split: Seq[ChannelBuffer] =
       split(FIND_SPACE, 1)
 
-    def split(indexFinder: ChannelBufferIndexFinder,
-              delimiterLength: Int): Seq[ChannelBuffer] = {
+    def split(
+        indexFinder: ChannelBufferIndexFinder,
+        delimiterLength: Int): Seq[ChannelBuffer] = {
       val tokens = new ArrayBuffer[ChannelBuffer](5)
       var scratch = buffer
       while (scratch.capacity > 0) {
@@ -85,8 +90,8 @@ private[finagle] object ChannelBufferUtils {
         } else {
           tokens += scratch.slice(0, tokenLength).copy
           scratch = scratch.slice(
-              tokenLength + delimiterLength,
-              scratch.capacity - tokenLength - delimiterLength)
+            tokenLength + delimiterLength,
+            scratch.capacity - tokenLength - delimiterLength)
         }
       }
       tokens

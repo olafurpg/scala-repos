@@ -34,13 +34,14 @@ object Servlet30AsyncProvider extends AsyncProviderMeta {
   // cc below gets inferred as a Class[?0] existential.
   import scala.language.existentials
 
-  private lazy val (hasContinuations_?,
-                    cc,
-                    asyncClass,
-                    startAsync,
-                    getResponse,
-                    complete,
-                    isSupported) = {
+  private lazy val (
+    hasContinuations_?,
+    cc,
+    asyncClass,
+    startAsync,
+    getResponse,
+    complete,
+    isSupported) = {
     try {
       val cc = Class.forName("javax.servlet.ServletRequest")
       val asyncClass = Class.forName("javax.servlet.AsyncContext")
@@ -51,13 +52,7 @@ object Servlet30AsyncProvider extends AsyncProviderMeta {
       (true, cc, asyncClass, startAsync, getResponse, complete, isSupported)
     } catch {
       case e: Exception =>
-        (false,
-         null,
-         null,
-         null,
-         null,
-         null,
-         null)
+        (false, null, null, null, null, null, null)
     }
   }
 
@@ -80,7 +75,8 @@ object Servlet30AsyncProvider extends AsyncProviderMeta {
   *
   */
 class Servlet30AsyncProvider(req: HTTPRequest)
-    extends ServletAsyncProvider with Loggable {
+    extends ServletAsyncProvider
+    with Loggable {
   import scala.language.reflectiveCalls
 
   private var asyncCtx: Object = null

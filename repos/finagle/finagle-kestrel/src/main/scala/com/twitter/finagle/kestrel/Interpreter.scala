@@ -50,8 +50,8 @@ class Interpreter(queues: LoadingCache[Buf, BlockingDeque[Buf]])
             throw new InvalidStateTransition("Transaction", "get/close")
           case OpenTransaction(txnQueueName, _) =>
             require(
-                queueName == txnQueueName,
-                "Cannot operate on a different queue than the one for which you have an open transaction")
+              queueName == txnQueueName,
+              "Cannot operate on a different queue than the one for which you have an open transaction")
             state = NoTransaction()
             Values(Seq.empty)
         }
@@ -61,8 +61,8 @@ class Interpreter(queues: LoadingCache[Buf, BlockingDeque[Buf]])
             throw new InvalidStateTransition("Transaction", "get/close/open")
           case OpenTransaction(txnQueueName, _) =>
             require(
-                queueName == txnQueueName,
-                "Cannot operate on a different queue than the one for which you have an open transaction")
+              queueName == txnQueueName,
+              "Cannot operate on a different queue than the one for which you have an open transaction")
             state = NoTransaction()
             apply(Open(queueName, timeout))
         }
@@ -72,8 +72,8 @@ class Interpreter(queues: LoadingCache[Buf, BlockingDeque[Buf]])
             throw new InvalidStateTransition("Transaction", "get/abort")
           case OpenTransaction(txnQueueName, item) =>
             require(
-                queueName == txnQueueName,
-                "Cannot operate on a different queue than the one for which you have an open transaction")
+              queueName == txnQueueName,
+              "Cannot operate on a different queue than the one for which you have an open transaction")
 
             queues.get(queueName).addFirst(item)
             state = NoTransaction()

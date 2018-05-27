@@ -53,7 +53,9 @@ import scala.collection.JavaConverters._
   * (accessed via asMap) thus we need to keep instances of each of these underlying classes.
   */
 private[serverset2] abstract class ZkNodeDataCache[Entity](
-    clusterPath: String, entityType: String, statsReceiver: StatsReceiver) {
+    clusterPath: String,
+    entityType: String,
+    statsReceiver: StatsReceiver) {
   private[this] val logger = Logger(getClass)
 
   /** zkSession needs to be set via setSession before the cache is used */
@@ -75,10 +77,10 @@ private[serverset2] abstract class ZkNodeDataCache[Entity](
     CacheBuilder
       .newBuilder()
       .build(
-          new CacheLoader[String, Future[Seq[Entity]]] {
-            override def load(path: String): Future[Seq[Entity]] =
-              loadEntity(path)
-          }
+        new CacheLoader[String, Future[Seq[Entity]]] {
+          override def load(path: String): Future[Seq[Entity]] =
+            loadEntity(path)
+        }
       )
 
   private[this] val asMap = underlying.asMap
@@ -109,7 +111,8 @@ private[serverset2] abstract class ZkNodeDataCache[Entity](
 
 /** See [[ZkNodeDataCache]] comment */
 private[serverset2] class ZkEntryCache(
-    clusterPath: String, statsReceiver: StatsReceiver)
+    clusterPath: String,
+    statsReceiver: StatsReceiver)
     extends ZkNodeDataCache[Entry](clusterPath, "Entry", statsReceiver) {
   override def parseNode(path: String, data: String): Seq[Entry] =
     Entry.parseJson(path, data)
@@ -117,11 +120,12 @@ private[serverset2] class ZkEntryCache(
 
 /** See [[ZkNodeDataCache]] comment */
 private[serverset2] class ZkVectorCache(
-    clusterPath: String, statsReceiver: StatsReceiver)
+    clusterPath: String,
+    statsReceiver: StatsReceiver)
     extends ZkNodeDataCache[Vector](clusterPath, "Vector", statsReceiver) {
   override def parseNode(path: String, data: String): Seq[Vector] =
     Vector.parseJson(data) match {
       case Some(vector) => Seq(vector)
-      case _ => Nil
+      case _            => Nil
     }
 }

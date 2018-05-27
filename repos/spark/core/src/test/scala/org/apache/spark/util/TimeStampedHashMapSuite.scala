@@ -105,7 +105,7 @@ class TimeStampedHashMapSuite extends SparkFunSuite {
 
       // filter
       val filtered = testMap2.filter { case (_, v) => v.toInt % 2 == 0 }
-      val evenPairs = pairs.filter { case (_, v) => v.toInt % 2 == 0 }
+      val evenPairs = pairs.filter { case (_, v)   => v.toInt % 2 == 0 }
       assert(filtered.iterator.toSet === evenPairs.toSet)
 
       // foreach
@@ -153,7 +153,7 @@ class TimeStampedHashMapSuite extends SparkFunSuite {
 
     val threads =
       (1 to 25).map(i =>
-            new Thread() {
+        new Thread() {
           override def run() {
             try {
               for (j <- 1 to 1000) {

@@ -38,6 +38,6 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class MediaPlayerStatusSpec
     extends SFXEnumDelegateSpec[jfxsm.MediaPlayer.Status, MediaPlayer.Status](
-        classOf[jfxsm.MediaPlayer.Status],
-        classOf[MediaPlayer.Status],
-        MediaPlayer.Status)
+      classOf[jfxsm.MediaPlayer.Status],
+      classOf[MediaPlayer.Status],
+      MediaPlayer.Status)

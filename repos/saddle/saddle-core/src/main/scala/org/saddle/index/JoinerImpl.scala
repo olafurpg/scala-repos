@@ -23,7 +23,7 @@ import locator.Locator
   * Concrete implementation of Joiner instance which is specialized on basic
   * types.
   */
-class JoinerImpl[@spec(Boolean, Int, Long, Double) T : ST : ORD]
+class JoinerImpl[@spec(Boolean, Int, Long, Double) T: ST: ORD]
     extends Joiner[T] {
   private implicit def wrapArray(arr: Array[Int]): Option[Array[Int]] =
     Some(arr)
@@ -35,7 +35,7 @@ class JoinerImpl[@spec(Boolean, Int, Long, Double) T : ST : ORD]
       how match {
         case InnerJoin => intersect(left, right)
         case OuterJoin => union(left, right)
-        case LeftJoin => leftJoinUnique(left, right)
+        case LeftJoin  => leftJoinUnique(left, right)
         case RightJoin => leftJoinUnique(right, left).swap
       }
     } else if (right.isUnique && how == LeftJoin) {
@@ -46,13 +46,13 @@ class JoinerImpl[@spec(Boolean, Int, Long, Double) T : ST : ORD]
       how match {
         case InnerJoin => innerJoinMonotonic(left, right)
         case OuterJoin => outerJoinMonotonic(left, right)
-        case LeftJoin => leftJoinMonotonic(left, right)
+        case LeftJoin  => leftJoinMonotonic(left, right)
         case RightJoin => leftJoinMonotonic(right, left).swap
       }
     } else {
       how match {
         case RightJoin => factorizedJoin(right, left, LeftJoin).swap
-        case _ => factorizedJoin(left, right, how)
+        case _         => factorizedJoin(left, right, how)
       }
     }
   }
@@ -107,7 +107,9 @@ class JoinerImpl[@spec(Boolean, Int, Long, Double) T : ST : ORD]
   // driver function
 
   private def factorizedJoin(
-      left: Index[T], right: Index[T], how: JoinType): ReIndexer[T] = {
+      left: Index[T],
+      right: Index[T],
+      how: JoinType): ReIndexer[T] = {
     // factorize left and right inputs
     val rizer = new Factorizer(left.length + right.length)
     val leftLabels = rizer.factorize(left)
@@ -115,8 +117,8 @@ class JoinerImpl[@spec(Boolean, Int, Long, Double) T : ST : ORD]
 
     val max_groups = rizer.numUniq
 
-    val JoinResult(lTake, rTake) = JoinHelper(
-        leftLabels, rightLabels, max_groups, how)
+    val JoinResult(lTake, rTake) =
+      JoinHelper(leftLabels, rightLabels, max_groups, how)
 
     // construct new joint index
     val newIdx = array.empty[T](lTake.length)
@@ -165,49 +167,55 @@ class JoinerImpl[@spec(Boolean, Int, Long, Double) T : ST : ORD]
 
   // helper trait to store three values into three arrays at location loc
   private trait TripleArrayStore {
-    def apply(ar1: Array[Int],
-              ar2: Array[Int],
-              ar3: Array[T],
-              v1: Int,
-              v2: Int,
-              v3: T,
-              loc: Int)
+    def apply(
+        ar1: Array[Int],
+        ar2: Array[Int],
+        ar3: Array[T],
+        v1: Int,
+        v2: Int,
+        v3: T,
+        loc: Int)
   }
 
   private object TNoOp extends TripleArrayStore {
-    def apply(ar1: Array[Int],
-              ar2: Array[Int],
-              ar3: Array[T],
-              v1: Int,
-              v2: Int,
-              v3: T,
-              loc: Int) {}
+    def apply(
+        ar1: Array[Int],
+        ar2: Array[Int],
+        ar3: Array[T],
+        v1: Int,
+        v2: Int,
+        v3: T,
+        loc: Int) {}
   }
 
   private object TStore extends TripleArrayStore {
-    def apply(ar1: Array[Int],
-              ar2: Array[Int],
-              ar3: Array[T],
-              v1: Int,
-              v2: Int,
-              v3: T,
-              loc: Int) {
+    def apply(
+        ar1: Array[Int],
+        ar2: Array[Int],
+        ar3: Array[T],
+        v1: Int,
+        v2: Int,
+        v3: T,
+        loc: Int) {
       ar1(loc) = v1
       ar2(loc) = v2
       ar3(loc) = v3
     }
   }
 
-  def innerJoinMonotonicUnique(left: Index[T], right: Index[T]): ReIndexer[T] = {
+  def innerJoinMonotonicUnique(
+      left: Index[T],
+      right: Index[T]): ReIndexer[T] = {
     val scalar = left.scalarTag
 
     val ll = left.length
     val rl = right.length
 
     if (ll == 0 || rl == 0)
-      ReIndexer(Some(Array.empty[Int]),
-                Some(Array.empty[Int]),
-                Index(Array.empty[T]))
+      ReIndexer(
+        Some(Array.empty[Int]),
+        Some(Array.empty[Int]),
+        Index(Array.empty[T]))
     else {
       // first, count
       var i = 0
@@ -269,10 +277,11 @@ class JoinerImpl[@spec(Boolean, Int, Long, Double) T : ST : ORD]
     val nright = right.length
 
     // first pass counts
-    def passThru(callback: TripleArrayStore,
-                 l: Array[Int],
-                 r: Array[Int],
-                 res: Array[T]): Int = {
+    def passThru(
+        callback: TripleArrayStore,
+        l: Array[Int],
+        r: Array[Int],
+        res: Array[T]): Int = {
       var lc = 0
       var rc = 0
       var rgrp = 0
@@ -340,7 +349,9 @@ class JoinerImpl[@spec(Boolean, Int, Long, Double) T : ST : ORD]
     ReIndexer(Some(lres), Some(rres), Index(Vec(result)))
   }
 
-  def outerJoinMonotonicUnique(left: Index[T], right: Index[T]): ReIndexer[T] = {
+  def outerJoinMonotonicUnique(
+      left: Index[T],
+      right: Index[T]): ReIndexer[T] = {
     val scalar = left.scalarTag
 
     val ll = left.length
@@ -445,10 +456,11 @@ class JoinerImpl[@spec(Boolean, Int, Long, Double) T : ST : ORD]
     val nright = right.length
 
     // first pass counts
-    def passThru(callback: TripleArrayStore,
-                 l: Array[Int],
-                 r: Array[Int],
-                 res: Array[T]): Int = {
+    def passThru(
+        callback: TripleArrayStore,
+        l: Array[Int],
+        r: Array[Int],
+        res: Array[T]): Int = {
       var lc = 0
       var rc = 0
       var done = false
@@ -498,9 +510,9 @@ class JoinerImpl[@spec(Boolean, Int, Long, Double) T : ST : ORD]
               var ldups = 0
               var rdups = 0
               while (lc + ldups < nleft &&
-              lval == left.raw(lc + ldups)) ldups += 1
+                     lval == left.raw(lc + ldups)) ldups += 1
               while (rc + rdups < nright &&
-              rval == right.raw(rc + rdups)) rdups += 1
+                     rval == right.raw(rc + rdups)) rdups += 1
               var m = 0
               while (m < ldups) {
                 var n = 0
@@ -609,10 +621,11 @@ class JoinerImpl[@spec(Boolean, Int, Long, Double) T : ST : ORD]
     val nleft = left.length
     val nright = right.length
 
-    def passThru(callback: TripleArrayStore,
-                 l: Array[Int],
-                 r: Array[Int],
-                 res: Array[T]): Int = {
+    def passThru(
+        callback: TripleArrayStore,
+        l: Array[Int],
+        r: Array[Int],
+        res: Array[T]): Int = {
       var lc = 0
       var rc = 0
       var rgrp = 0
@@ -673,7 +686,9 @@ class JoinerImpl[@spec(Boolean, Int, Long, Double) T : ST : ORD]
 }
 
 private[saddle] object JoinerImpl {
-  def join[@spec(Boolean, Int, Long, Double) T : ST : ORD](
-      left: Index[T], right: Index[T], how: JoinType) =
+  def join[@spec(Boolean, Int, Long, Double) T: ST: ORD](
+      left: Index[T],
+      right: Index[T],
+      how: JoinType) =
     (new JoinerImpl[T]).join(left, right, how)
 }

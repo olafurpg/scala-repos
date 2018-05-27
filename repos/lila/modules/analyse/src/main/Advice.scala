@@ -17,10 +17,10 @@ sealed trait Advice {
     withEval.??(evalComment ?? { c =>
       s"($c) "
     }) +
-    (this match {
-          case MateAdvice(seq, _, _, _) => seq.desc
-          case CpAdvice(nag, _, _) => nag.toString
-        }) + "." + {
+      (this match {
+        case MateAdvice(seq, _, _, _) => seq.desc
+        case CpAdvice(nag, _, _)      => nag.toString
+      }) + "." + {
       withBestMove ?? {
         info.variation.headOption ?? { move =>
           s" Best move was $move."
@@ -62,8 +62,8 @@ private[analyse] object CpAdvice {
   //   nag ← cpNags find { case (d, n) => d <= delta } map (_._2)
   // } yield CpAdvice(nag, info, prev)
 
-  private val cpNags = List(
-      300 -> Nag.Blunder, 100 -> Nag.Mistake, 50 -> Nag.Inaccuracy)
+  private val cpNags =
+    List(300 -> Nag.Blunder, 100 -> Nag.Mistake, 50 -> Nag.Inaccuracy)
 
   def apply(prev: Info, info: Info): Option[CpAdvice] =
     for {
@@ -87,14 +87,17 @@ private[analyse] case object MateCreated
 private[analyse] object MateSequence {
   def apply(prev: Option[Int], next: Option[Int]): Option[MateSequence] =
     (prev, next).some collect {
-      case (None, Some(n)) if n < 0 => MateCreated
-      case (Some(p), None) if p > 0 => MateLost
-      case (Some(p), Some(n)) if (p > 0) && (n < 0) => MateLost
+      case (None, Some(n)) if n < 0                        => MateCreated
+      case (Some(p), None) if p > 0                        => MateLost
+      case (Some(p), Some(n)) if (p > 0) && (n < 0)        => MateLost
       case (Some(p), Some(n)) if p > 0 && n >= p && p <= 5 => MateDelayed
     }
 }
 private[analyse] case class MateAdvice(
-    sequence: MateSequence, nag: Nag, info: Info, prev: Info)
+    sequence: MateSequence,
+    nag: Nag,
+    info: Info,
+    prev: Info)
     extends Advice
 private[analyse] object MateAdvice {
 
@@ -102,18 +105,17 @@ private[analyse] object MateAdvice {
     def reverse(m: Int) = info.color.fold(m, -m)
     def prevScore = reverse(prev.score ?? (_.centipawns))
     def nextScore = reverse(info.score ?? (_.centipawns))
-    MateSequence(prev.mate map reverse, info.mate map reverse) map {
-      sequence =>
-        val nag = sequence match {
-          case MateCreated if prevScore < -999 => Nag.Inaccuracy
-          case MateCreated if prevScore < -700 => Nag.Mistake
-          case MateCreated => Nag.Blunder
-          case MateLost if nextScore > 999 => Nag.Inaccuracy
-          case MateLost if nextScore > 700 => Nag.Mistake
-          case MateLost => Nag.Blunder
-          case MateDelayed => Nag.Inaccuracy
-        }
-        MateAdvice(sequence, nag, info, prev)
+    MateSequence(prev.mate map reverse, info.mate map reverse) map { sequence =>
+      val nag = sequence match {
+        case MateCreated if prevScore < -999 => Nag.Inaccuracy
+        case MateCreated if prevScore < -700 => Nag.Mistake
+        case MateCreated                     => Nag.Blunder
+        case MateLost if nextScore > 999     => Nag.Inaccuracy
+        case MateLost if nextScore > 700     => Nag.Mistake
+        case MateLost                        => Nag.Blunder
+        case MateDelayed                     => Nag.Inaccuracy
+      }
+      MateAdvice(sequence, nag, info, prev)
     }
   }
 }

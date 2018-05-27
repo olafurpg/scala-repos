@@ -25,26 +25,28 @@ sealed case class ScalaLanguageLevel(ordinal: Int, version: String)
 }
 
 object ScalaLanguageLevel {
-  val Values = Array(Scala_2_7,
-                     Scala_2_8,
-                     Scala_2_9,
-                     Scala_2_10,
-                     Scala_2_11,
-                     Scala_2_12,
-                     Dotty)
+  val Values = Array(
+    Scala_2_7,
+    Scala_2_8,
+    Scala_2_9,
+    Scala_2_10,
+    Scala_2_11,
+    Scala_2_12,
+    Dotty)
 
   val Default = Scala_2_11
 
   // We have to rely on the Java's enumeration for library property serialization
   private val LevelToProxy = Map(
-      (null, null),
-      Scala_2_7 -> ScalaLanguageLevelProxy.Scala_2_7,
-      Scala_2_8 -> ScalaLanguageLevelProxy.Scala_2_8,
-      Scala_2_9 -> ScalaLanguageLevelProxy.Scala_2_9,
-      Scala_2_10 -> ScalaLanguageLevelProxy.Scala_2_10,
-      Scala_2_11 -> ScalaLanguageLevelProxy.Scala_2_11,
-      Scala_2_12 -> ScalaLanguageLevelProxy.Scala_2_12,
-      Dotty -> ScalaLanguageLevelProxy.Dotty)
+    (null, null),
+    Scala_2_7 -> ScalaLanguageLevelProxy.Scala_2_7,
+    Scala_2_8 -> ScalaLanguageLevelProxy.Scala_2_8,
+    Scala_2_9 -> ScalaLanguageLevelProxy.Scala_2_9,
+    Scala_2_10 -> ScalaLanguageLevelProxy.Scala_2_10,
+    Scala_2_11 -> ScalaLanguageLevelProxy.Scala_2_11,
+    Scala_2_12 -> ScalaLanguageLevelProxy.Scala_2_12,
+    Dotty -> ScalaLanguageLevelProxy.Dotty
+  )
 
   private val ProxyToLevel = LevelToProxy.map(_.swap)
 

@@ -38,10 +38,11 @@ class HttpMuxer(
     * Pattern ending with "/" indicates prefix matching; otherwise exact matching.
     */
   def withHandler(
-      pattern: String, service: Service[Request, Response]): HttpMuxer = {
+      pattern: String,
+      service: Service[Request, Response]): HttpMuxer = {
     val norm = normalize(pattern)
     new HttpMuxer(
-        handlers.filterNot { case (pat, _) => pat == norm } :+
+      handlers.filterNot { case (pat, _) => pat == norm } :+
         ((norm, service)))
   }
 
@@ -63,7 +64,7 @@ class HttpMuxer(
 
     matching match {
       case Some((_, service)) => service(request)
-      case None => Future.value(Response(request.version, Status.NotFound))
+      case None               => Future.value(Response(request.version, Status.NotFound))
     }
   }
 
@@ -100,7 +101,8 @@ object HttpMuxer extends Service[Request, Response] {
     }
 
   def addRichHandler(
-      pattern: String, service: Service[Request, Response]): Unit =
+      pattern: String,
+      service: Service[Request, Response]): Unit =
     addHandler(pattern, service)
 
   def patterns: Seq[String] = underlying.patterns
@@ -108,8 +110,9 @@ object HttpMuxer extends Service[Request, Response] {
   private[this] val log = Logger.getLogger(getClass.getName)
 
   for (handler <- LoadService[HttpMuxHandler]()) {
-    log.info("HttpMuxer[%s] = %s(%s)".format(
-            handler.pattern, handler.getClass.getName, handler))
+    log.info(
+      "HttpMuxer[%s] = %s(%s)"
+        .format(handler.pattern, handler.getClass.getName, handler))
     addHandler(handler.pattern, handler)
   }
 }

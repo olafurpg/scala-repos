@@ -6,7 +6,7 @@ package base
 
 import com.intellij.psi.PsiNamedElement
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 07.03.2008
   */
@@ -36,7 +36,7 @@ trait ScAccessModifier extends ScalaPsiElement {
     }
     idText match {
       case Some(id) => builder.append(s"[$id]")
-      case _ =>
+      case _        =>
     }
     builder.toString()
   }

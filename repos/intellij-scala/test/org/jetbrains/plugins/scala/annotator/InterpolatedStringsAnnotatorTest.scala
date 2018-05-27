@@ -28,7 +28,8 @@ class InterpolatedStringsAnnotatorTest
     val annotatorMessages = collectAnnotatorMessages(text)
     if (!annotatorMessages.exists(_.toString == message)) {
       Assert.assertTrue(
-          "annotator messages is empty", annotatorMessages.nonEmpty)
+        "annotator messages is empty",
+        annotatorMessages.nonEmpty)
       Assert.assertEquals(message, annotatorMessages.head)
     }
   }
@@ -64,17 +65,19 @@ class InterpolatedStringsAnnotatorTest
 
   def testMultiResolve() {
     messageExists(
-        header + "d\"blah $s1 blah $s2 blah\"",
-        "ErrorWithRange((445,446),Value 'd' is not a member of StringContext)")
+      header + "d\"blah $s1 blah $s2 blah\"",
+      "ErrorWithRange((445,446),Value 'd' is not a member of StringContext)")
   }
 
   def testMultipleResolve() {
-    messageExists(header + "c\"blah blah $i1 $i2\"",
-                  "Error(i1,Type mismatch, expected: String, actual: Int)")
+    messageExists(
+      header + "c\"blah blah $i1 $i2\"",
+      "Error(i1,Type mismatch, expected: String, actual: Int)")
   }
 
   def testMultipleResolve2() {
-    messageExists(header + "c\"blah $i1 blah $s1 $i2\"",
-                  "Error(i2,Too many arguments for method c(String, String))")
+    messageExists(
+      header + "c\"blah $i1 blah $s1 $i2\"",
+      "Error(i2,Too many arguments for method c(String, String))")
   }
 }

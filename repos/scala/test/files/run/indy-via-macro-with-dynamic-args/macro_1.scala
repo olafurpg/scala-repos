@@ -12,23 +12,24 @@ object Macro {
     */
   def matcher(pat: String, text: CharSequence): Matcher = macro Macro.impl
   def impl(c: Context)(pat: c.Tree, text: c.Tree): c.Tree = {
-    def Indy(bootstrapMethod: c.Symbol,
-             bootstrapArgs: List[c.universe.Literal],
-             dynArgs: List[c.Tree]): c.Tree = {
+    def Indy(
+        bootstrapMethod: c.Symbol,
+        bootstrapArgs: List[c.universe.Literal],
+        dynArgs: List[c.Tree]): c.Tree = {
       val symtab = c.universe.asInstanceOf[SymbolTable]
       import symtab._
       val paramSym =
         NoSymbol.newTermSymbol(TermName("x")).setInfo(typeOf[CharSequence])
       val dummySymbol = NoSymbol
         .newTermSymbol(TermName("matcher"))
-        .setInfo(internal.methodType(
-                paramSym :: Nil, typeOf[java.util.regex.Matcher]))
+        .setInfo(
+          internal.methodType(paramSym :: Nil, typeOf[java.util.regex.Matcher]))
       val bootstrapArgTrees: List[Tree] =
         Literal(Constant(bootstrapMethod)).setType(NoType) :: bootstrapArgs
           .asInstanceOf[List[Tree]]
       val result = ApplyDynamic(
-          Ident(dummySymbol).setType(dummySymbol.info),
-          bootstrapArgTrees ::: dynArgs.asInstanceOf[List[Tree]])
+        Ident(dummySymbol).setType(dummySymbol.info),
+        bootstrapArgTrees ::: dynArgs.asInstanceOf[List[Tree]])
       result.setType(dummySymbol.info.resultType)
       result.asInstanceOf[c.Tree]
     }

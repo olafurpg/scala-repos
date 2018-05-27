@@ -11,7 +11,7 @@ class IssuesServiceSpec extends FunSuite with ServiceSpecBase {
 
       def getCommitStatues =
         dummyService.getCommitStatues(
-            List(("user1", "repo1", 1), ("user1", "repo1", 2)))
+          List(("user1", "repo1", 1), ("user1", "repo1", 2)))
 
       assert(getCommitStatues == Map.empty)
 
@@ -21,15 +21,16 @@ class IssuesServiceSpec extends FunSuite with ServiceSpecBase {
 
       assert(getCommitStatues == Map.empty)
 
-      val cs = dummyService.createCommitStatus("user1",
-                                               "repo1",
-                                               "shasha",
-                                               "default",
-                                               CommitState.SUCCESS,
-                                               Some("http://exmple.com/ci"),
-                                               Some("exampleService"),
-                                               now,
-                                               user1)
+      val cs = dummyService.createCommitStatus(
+        "user1",
+        "repo1",
+        "shasha",
+        "default",
+        CommitState.SUCCESS,
+        Some("http://exmple.com/ci"),
+        Some("exampleService"),
+        now,
+        user1)
 
       assert(getCommitStatues == Map.empty)
 
@@ -41,51 +42,69 @@ class IssuesServiceSpec extends FunSuite with ServiceSpecBase {
       assert(getCommitStatues == Map.empty)
 
       // if there is a status, state is that
-      val cs2 = dummyService.createCommitStatus("user1",
-                                                "repo1",
-                                                "feature1",
-                                                "default",
-                                                CommitState.SUCCESS,
-                                                Some("http://exmple.com/ci"),
-                                                Some("exampleService"),
-                                                now,
-                                                user1)
+      val cs2 = dummyService.createCommitStatus(
+        "user1",
+        "repo1",
+        "feature1",
+        "default",
+        CommitState.SUCCESS,
+        Some("http://exmple.com/ci"),
+        Some("exampleService"),
+        now,
+        user1)
       assert(
-          getCommitStatues == Map(("user1", "repo1", 2) -> CommitStatusInfo(
-                  1,
-                  1,
-                  Some("default"),
-                  Some(CommitState.SUCCESS),
-                  Some("http://exmple.com/ci"),
-                  Some("exampleService"))))
+        getCommitStatues == Map(
+          ("user1", "repo1", 2) -> CommitStatusInfo(
+            1,
+            1,
+            Some("default"),
+            Some(CommitState.SUCCESS),
+            Some("http://exmple.com/ci"),
+            Some("exampleService"))))
 
       // if there are two statuses, state is none
-      val cs3 = dummyService.createCommitStatus("user1",
-                                                "repo1",
-                                                "feature1",
-                                                "pend",
-                                                CommitState.PENDING,
-                                                Some("http://exmple.com/ci"),
-                                                Some("exampleService"),
-                                                now,
-                                                user1)
-      assert(getCommitStatues == Map(("user1", "repo1", 2) -> CommitStatusInfo(
-                  2, 1, None, None, None, None)))
+      val cs3 = dummyService.createCommitStatus(
+        "user1",
+        "repo1",
+        "feature1",
+        "pend",
+        CommitState.PENDING,
+        Some("http://exmple.com/ci"),
+        Some("exampleService"),
+        now,
+        user1)
+      assert(
+        getCommitStatues == Map(
+          ("user1", "repo1", 2) -> CommitStatusInfo(
+            2,
+            1,
+            None,
+            None,
+            None,
+            None)))
 
       // get only statuses in query issues
       val (is3, pr3) =
         generateNewPullRequest("user1/repo1/master", "user1/repo1/feature3")
-      val cs4 = dummyService.createCommitStatus("user1",
-                                                "repo1",
-                                                "feature3",
-                                                "none",
-                                                CommitState.PENDING,
-                                                None,
-                                                None,
-                                                now,
-                                                user1)
-      assert(getCommitStatues == Map(("user1", "repo1", 2) -> CommitStatusInfo(
-                  2, 1, None, None, None, None)))
+      val cs4 = dummyService.createCommitStatus(
+        "user1",
+        "repo1",
+        "feature3",
+        "none",
+        CommitState.PENDING,
+        None,
+        None,
+        now,
+        user1)
+      assert(
+        getCommitStatues == Map(
+          ("user1", "repo1", 2) -> CommitStatusInfo(
+            2,
+            1,
+            None,
+            None,
+            None,
+            None)))
     }
   }
 }

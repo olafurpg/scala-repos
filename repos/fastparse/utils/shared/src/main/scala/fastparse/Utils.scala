@@ -14,7 +14,8 @@ object MacroUtils {
     * Char predicates that are unfeasible at runtime, e.g. because they're too
     * slow or because they don't work in Scala.js
     */
-  def preCompute(pred: Char => Boolean): fastparse.Utils.CharBitSet = macro preComputeImpl
+  def preCompute(pred: Char => Boolean): fastparse.Utils.CharBitSet =
+    macro preComputeImpl
 
   def preComputeImpl(c: Compat.Context)(
       pred: c.Expr[Char => Boolean]): c.Expr[Utils.CharBitSet] = {
@@ -42,7 +43,7 @@ object Utils {
     val len = s.length
     while (i < len) {
       (s.charAt(i): @switch) match {
-        case '"' => sb.append("\\\"")
+        case '"'  => sb.append("\\\"")
         case '\\' => sb.append("\\\\")
         case '\b' => sb.append("\\b")
         case '\f' => sb.append("\\f")
@@ -61,22 +62,8 @@ object Utils {
 
   object CharBitSet {
     val hexChars = Seq(
-        '0',
-        '1',
-        '2',
-        '3',
-        '4',
-        '5',
-        '6',
-        '7',
-        '8',
-        '9',
-        'a',
-        'b',
-        'c',
-        'd',
-        'e',
-        'f'
+      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e',
+      'f'
     )
     def hex2Int(hex: String): Int = {
       var res = 0
@@ -142,7 +129,7 @@ object Utils {
   final class TrieNode(strings: Seq[String]) {
 
     val (min, max, arr) = {
-      val children = strings.filter(!_.isEmpty).groupBy(_ (0)).map {
+      val children = strings.filter(!_.isEmpty).groupBy(_(0)).map {
         case (k, ss) => k -> new TrieNode(ss.map(_.tail))
       }
       if (children.size == 0) (0.toChar, 0.toChar, new Array[TrieNode](0))
@@ -173,10 +160,10 @@ object Utils {
           if (next == null) currentRes
           else
             rec(
-                offset + 1,
-                next,
-                if (next.word) offset
-                else currentRes
+              offset + 1,
+              next,
+              if (next.word) offset
+              else currentRes
             )
         }
       }

@@ -49,7 +49,9 @@ final class IRFileCache {
   /** Approximate statistics about the cache usage */
   def stats: IRFileCache.Stats = {
     new IRFileCache.Stats(
-        statsReused.get, statsInvalidated.get, statsTreesRead.get)
+      statsReused.get,
+      statsInvalidated.get,
+      statsTreesRead.get)
   }
 
   /** Reset statistics */
@@ -226,13 +228,14 @@ final class IRFileCache {
 
     private def extractIRFiles(file: IRContainer) = file match {
       case IRContainer.File(file) => file :: Nil
-      case IRContainer.Jar(jar) => jar.sjsirFiles
+      case IRContainer.Jar(jar)   => jar.sjsirFiles
     }
   }
 
   private final class PersistentIRFile(
       private[this] var _irFile: VirtualRelativeIRFile)
-      extends VirtualScalaJSIRFile with RelativeVirtualFile {
+      extends VirtualScalaJSIRFile
+      with RelativeVirtualFile {
 
     import ir.Trees._
     import ir.Infos
@@ -279,7 +282,8 @@ final class IRFileCache {
     */
   @inline
   private def clearOnThrow[T](body: => T): T = {
-    try body catch {
+    try body
+    catch {
       case t: Throwable =>
         globalCache.clear()
         throw t
@@ -293,7 +297,7 @@ object IRFileCache {
     /** Descriptive line to display in logs */
     def logLine: String = {
       s"reused: $reused -- " + s"invalidated: $invalidated -- " +
-      s"trees read: $treesRead"
+        s"trees read: $treesRead"
     }
   }
 

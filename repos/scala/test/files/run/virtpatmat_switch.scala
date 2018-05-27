@@ -12,13 +12,13 @@ object Test extends App {
   def charSwitch(x: Char) = x match {
     case 'a' => "got a"
     case 'b' => "got b"
-    case _ => "got some letter"
+    case _   => "got some letter"
   }
 
   def byteSwitch(x: Byte) = x match {
     case 'a' => "got a"
     case 'b' => "got b"
-    case _ => "got some letter"
+    case _   => "got some letter"
   }
 
   println(charSwitch('a'))

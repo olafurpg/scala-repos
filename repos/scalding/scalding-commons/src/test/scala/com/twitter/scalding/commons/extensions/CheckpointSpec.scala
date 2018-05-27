@@ -83,8 +83,7 @@ class CheckpointSpec extends WordSpec {
     val out = Set((0, 1, 2.0), (0, 0, 1.0), (1, 1, 4.0), (2, 1, 8.0))
 
     // Verifies output when passed as a callback to JobTest.sink().
-    def verifyOutput[A](
-        expectedOutput: Set[A], actualOutput: Buffer[A]): Unit =
+    def verifyOutput[A](expectedOutput: Set[A], actualOutput: Buffer[A]): Unit =
       assert(actualOutput.toSet === expectedOutput)
 
     // Runs a test in both local test and hadoop test mode, verifies the final
@@ -154,8 +153,7 @@ class TypedCheckpointSpec extends WordSpec {
     val out = Set((0, 1, 2.0), (0, 0, 1.0), (1, 1, 4.0), (2, 1, 8.0))
 
     // Verifies output when passed as a callback to JobTest.sink().
-    def verifyOutput[A](
-        expectedOutput: Set[A], actualOutput: Buffer[A]): Unit =
+    def verifyOutput[A](expectedOutput: Set[A], actualOutput: Buffer[A]): Unit =
       assert(actualOutput.toSet === expectedOutput)
 
     // Runs a test in both local test and hadoop test mode, verifies the final
@@ -165,7 +163,7 @@ class TypedCheckpointSpec extends WordSpec {
       test
         .arg("checkpoint.format", "tsv")
         .sink[(Int, Int, Double)](TypedTsv[(Int, Int, Double)]("output"))(
-            verifyOutput(out, _))
+          verifyOutput(out, _))
         .run
         .runHadoop
         .finish

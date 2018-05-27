@@ -24,7 +24,8 @@ final class RoundRobinRoutingLogic extends RoutingLogic {
   val next = new AtomicLong
 
   override def select(
-      message: Any, routees: immutable.IndexedSeq[Routee]): Routee =
+      message: Any,
+      routees: immutable.IndexedSeq[Routee]): Routee =
     if (routees.nonEmpty) {
       val size = routees.size
       val index = (next.getAndIncrement % size).asInstanceOf[Int]
@@ -67,15 +68,18 @@ final class RoundRobinRoutingLogic extends RoutingLogic {
 final case class RoundRobinPool(
     override val nrOfInstances: Int,
     override val resizer: Option[Resizer] = None,
-    override val supervisorStrategy: SupervisorStrategy = Pool.defaultSupervisorStrategy,
+    override val supervisorStrategy: SupervisorStrategy =
+      Pool.defaultSupervisorStrategy,
     override val routerDispatcher: String = Dispatchers.DefaultDispatcherId,
     override val usePoolDispatcher: Boolean = false)
-    extends Pool with PoolOverrideUnsetConfig[RoundRobinPool] {
+    extends Pool
+    with PoolOverrideUnsetConfig[RoundRobinPool] {
 
   def this(config: Config) =
-    this(nrOfInstances = config.getInt("nr-of-instances"),
-         resizer = Resizer.fromConfig(config),
-         usePoolDispatcher = config.hasPath("pool-dispatcher"))
+    this(
+      nrOfInstances = config.getInt("nr-of-instances"),
+      resizer = Resizer.fromConfig(config),
+      usePoolDispatcher = config.hasPath("pool-dispatcher"))
 
   /**
     * Java API

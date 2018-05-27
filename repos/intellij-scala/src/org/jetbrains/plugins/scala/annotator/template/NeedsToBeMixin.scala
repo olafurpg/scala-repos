@@ -6,8 +6,16 @@ import com.intellij.psi.{PsiElement, PsiMethod}
 import org.jetbrains.plugins.scala.annotator.AnnotatorPart
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScBindingPattern
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScNewTemplateDefinition
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunctionDefinition, ScPatternDefinition, ScVariableDefinition}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScTemplateDefinition, ScTrait, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunctionDefinition,
+  ScPatternDefinition,
+  ScVariableDefinition
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScTemplateDefinition,
+  ScTrait,
+  ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.TypeDefinitionMembers
 import org.jetbrains.plugins.scala.lang.psi.types.PhysicalSignature
 
@@ -18,9 +26,10 @@ import org.jetbrains.plugins.scala.lang.psi.types.PhysicalSignature
 object NeedsToBeMixin extends AnnotatorPart[ScTemplateDefinition] {
   def kind: Class[ScTemplateDefinition] = classOf[ScTemplateDefinition]
 
-  def annotate(element: ScTemplateDefinition,
-               holder: AnnotationHolder,
-               typeAware: Boolean) {
+  def annotate(
+      element: ScTemplateDefinition,
+      holder: AnnotationHolder,
+      typeAware: Boolean) {
     if (element.isInstanceOf[ScTrait]) return
     val signaturesIterator = TypeDefinitionMembers
       .getSignatures(element)
@@ -42,21 +51,21 @@ object NeedsToBeMixin extends AnnotatorPart[ScTemplateDefinition] {
                     node.info.namedElement match {
                       case f: ScFunctionDefinition =>
                         !f.hasModifierPropertyScala("abstract") ||
-                        !f.hasModifierProperty("override")
+                          !f.hasModifierProperty("override")
                       case v: ScBindingPattern =>
                         v.nameContext match {
                           case v: ScVariableDefinition
                               if !f.hasModifierPropertyScala("abstract") ||
-                              !f.hasModifierPropertyScala("override") =>
+                                !f.hasModifierPropertyScala("override") =>
                             true
                           case v: ScPatternDefinition
                               if !f.hasModifierPropertyScala("abstract") ||
-                              !f.hasModifierPropertyScala("override") =>
+                                !f.hasModifierPropertyScala("override") =>
                             true
                           case _ => false
                         }
                       case m: PsiMethod => !m.hasModifierProperty("abstract")
-                      case _ => false
+                      case _            => false
                     }
                 } match {
                   case Some(_) => //do nothing
@@ -71,10 +80,11 @@ object NeedsToBeMixin extends AnnotatorPart[ScTemplateDefinition] {
                     }
                     if (place != null) {
                       holder.createErrorAnnotation(
-                          place,
-                          message(kindOf(element),
-                                  element.name,
-                                  (f.name, f.containingClass.name)))
+                        place,
+                        message(
+                          kindOf(element),
+                          element.name,
+                          (f.name, f.containingClass.name)))
                     }
                 }
               }
@@ -87,6 +97,6 @@ object NeedsToBeMixin extends AnnotatorPart[ScTemplateDefinition] {
 
   def message(kind: String, name: String, member: (String, String)) = {
     s"$kind '$name' needs to be mixin, since member '${member._1}' in '${member._2}' is marked 'abstract' and 'override', " +
-    s"but no concrete implementation could be found in a base class"
+      s"but no concrete implementation could be found in a base class"
   }
 }

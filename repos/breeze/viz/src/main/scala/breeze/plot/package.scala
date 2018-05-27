@@ -22,15 +22,16 @@ package object plot {
     * @param labels Optional in-graph labels for some points.
     * @param tips Optional mouse-over tooltips for some points.
     */
-  def plot[X, Y, V](x: X,
-                    y: Y,
-                    style: Char = '-',
-                    colorcode: String = null,
-                    name: String = null,
-                    lines: Boolean = true,
-                    shapes: Boolean = false,
-                    labels: (Int) => String = null.asInstanceOf[Int => String],
-                    tips: (Int) => String = null.asInstanceOf[Int => String])(
+  def plot[X, Y, V](
+      x: X,
+      y: Y,
+      style: Char = '-',
+      colorcode: String = null,
+      name: String = null,
+      lines: Boolean = true,
+      shapes: Boolean = false,
+      labels: (Int) => String = null.asInstanceOf[Int => String],
+      tips: (Int) => String = null.asInstanceOf[Int => String])(
       implicit xv: DomainFunction[X, Int, V],
       yv: DomainFunction[Y, Int, V],
       vv: V => Double): Series = new Series {
@@ -44,12 +45,12 @@ package object plot {
       type K = Int
 
       val dataset = XYDataset[Int](
-          items = xv.domain(x),
-          name = if (name == null) defaultName(0) else name,
-          x = (k: K) => vv(xv(x, k)),
-          y = (k: K) => vv(yv(y, k)),
-          label = (k: K) => if (labels != null) labels(k) else null,
-          tip = (k: K) => if (tips != null) tips(k) else null
+        items = xv.domain(x),
+        name = if (name == null) defaultName(0) else name,
+        x = (k: K) => vv(xv(x, k)),
+        y = (k: K) => vv(yv(y, k)),
+        label = (k: K) => if (labels != null) labels(k) else null,
+        tip = (k: K) => if (tips != null) tips(k) else null
       )
 
       // initialize the series renderer
@@ -66,18 +67,20 @@ package object plot {
       renderer.setSeriesOutlineStroke(0, defaultStroke(0))
 
       val tooltipGenerator = new org.jfree.chart.labels.XYToolTipGenerator() {
-        override def generateToolTip(dataset: org.jfree.data.xy.XYDataset,
-                                     series: Int,
-                                     item: Int): String = {
+        override def generateToolTip(
+            dataset: org.jfree.data.xy.XYDataset,
+            series: Int,
+            item: Int): String = {
           dataset.asInstanceOf[XYDataset[_]].getTip(series, item)
         }
       }
       renderer.setSeriesToolTipGenerator(0, tooltipGenerator)
 
       val labelGenerator = new org.jfree.chart.labels.XYItemLabelGenerator() {
-        override def generateLabel(dataset: org.jfree.data.xy.XYDataset,
-                                   series: Int,
-                                   item: Int): String = {
+        override def generateLabel(
+            dataset: org.jfree.data.xy.XYDataset,
+            series: Int,
+            item: Int): String = {
           dataset.asInstanceOf[XYDataset[_]].getLabel(series, item)
         }
       }
@@ -99,7 +102,7 @@ package object plot {
           renderer.setSeriesShape(0, Plot.plus)
         case _ =>
           throw new IllegalArgumentException(
-              "Expected style to be one of - . or +")
+            "Expected style to be one of - . or +")
       }
 
       dataset -> renderer
@@ -128,9 +131,10 @@ package object plot {
       colors: Int => Paint = null.asInstanceOf[Int => Paint],
       labels: Int => String = null.asInstanceOf[Int => String],
       tips: Int => String = null.asInstanceOf[Int => String],
-      name: String = null)(implicit xv: DomainFunction[X, Int, V],
-                           yv: DomainFunction[Y, Int, V],
-                           vv: V => Double): Series = new Series {
+      name: String = null)(
+      implicit xv: DomainFunction[X, Int, V],
+      yv: DomainFunction[Y, Int, V],
+      vv: V => Double): Series = new Series {
     require(xv.domain(x) == yv.domain(y), "Domains must match!")
 
     /**
@@ -152,29 +156,30 @@ package object plot {
       type K = Int
       // initialize dataset
       val dataset = XYZDataset(
-          items = items,
-          name = if (name == null) defaultName(0) else name,
-          x = (k: K) => vv(xv(x, k)),
-          y = (k: K) => vv(yv(y, k)),
-          z = (k: K) => size(k),
-          label = (k: K) => if (labels != null) labels(k) else null,
-          tip = (k: K) => if (tips != null) tips(k) else null
+        items = items,
+        name = if (name == null) defaultName(0) else name,
+        x = (k: K) => vv(xv(x, k)),
+        y = (k: K) => vv(yv(y, k)),
+        z = (k: K) => size(k),
+        label = (k: K) => if (labels != null) labels(k) else null,
+        tip = (k: K) => if (tips != null) tips(k) else null
       )
 
       // initialize the series renderer
       import org.jfree.chart.renderer.xy.XYBubbleRenderer
-      val renderer = new XYBubbleRenderer(
-          XYBubbleRenderer.SCALE_ON_DOMAIN_AXIS) {
-        val stroke = new java.awt.BasicStroke(0f)
-        override def getItemPaint(series: Int, item: Int): java.awt.Paint =
-          paintScale(items(item))
-        override def getItemStroke(series: Int, item: Int) = stroke
-      }
+      val renderer =
+        new XYBubbleRenderer(XYBubbleRenderer.SCALE_ON_DOMAIN_AXIS) {
+          val stroke = new java.awt.BasicStroke(0f)
+          override def getItemPaint(series: Int, item: Int): java.awt.Paint =
+            paintScale(items(item))
+          override def getItemStroke(series: Int, item: Int) = stroke
+        }
 
       val tooltipGenerator = new org.jfree.chart.labels.XYToolTipGenerator() {
-        override def generateToolTip(dataset: org.jfree.data.xy.XYDataset,
-                                     series: Int,
-                                     item: Int): String = {
+        override def generateToolTip(
+            dataset: org.jfree.data.xy.XYDataset,
+            series: Int,
+            item: Int): String = {
           dataset.asInstanceOf[XYZDataset[_]].getTip(0, item)
         }
       }
@@ -182,9 +187,10 @@ package object plot {
 
       val labelGenerator =
         new org.jfree.chart.labels.BubbleXYItemLabelGenerator() {
-          override def generateLabel(dataset: org.jfree.data.xy.XYDataset,
-                                     series: Int,
-                                     item: Int): String = {
+          override def generateLabel(
+              dataset: org.jfree.data.xy.XYDataset,
+              series: Int,
+              item: Int): String = {
             dataset.asInstanceOf[XYZDataset[_]].getLabel(0, item)
           }
         }
@@ -197,7 +203,8 @@ package object plot {
 
   /** Plots a histogram of the given data into the given number of bins */
   def hist[D, K, V](data: D, bins: HistogramBins = 10, name: String = null)(
-      implicit xv: DomainFunction[D, Int, V], vv: V => Double): Series =
+      implicit xv: DomainFunction[D, Int, V],
+      vv: V => Double): Series =
     new Series {
       val values = xv.domain(data).map(xv(data, _)).map(vv)
       val (min, max) = (values.min, values.max)
@@ -221,20 +228,21 @@ package object plot {
           defaultColor: (Int) => Paint,
           defaultStroke: (Int) => Stroke): (xy.XYDataset, XYItemRenderer) = {
         val dataset = new org.jfree.data.xy.XYBarDataset(
-            XYDataset(
-                name = if (name == null) defaultName(0) else name,
-                items = IndexedSeq.range(0, counts.length),
-                x = (i: Int) =>
-                    if (i == binner.splits.length) {
-                    binner.splits(i - 1) + width / 2.0
-                  } else {
-                    binner.splits(i) - width / 2.0
-                },
-                y = (i: Int) => counts(i),
-                label = (i: Int) => null,
-                tip = (i: Int) => null
-            ),
-            width)
+          XYDataset(
+            name = if (name == null) defaultName(0) else name,
+            items = IndexedSeq.range(0, counts.length),
+            x = (i: Int) =>
+              if (i == binner.splits.length) {
+                binner.splits(i - 1) + width / 2.0
+              } else {
+                binner.splits(i) - width / 2.0
+            },
+            y = (i: Int) => counts(i),
+            label = (i: Int) => null,
+            tip = (i: Int) => null
+          ),
+          width
+        )
 
         val renderer = new org.jfree.chart.renderer.xy.XYBarRenderer
         renderer.setSeriesPaint(0, defaultColor(0))
@@ -245,7 +253,7 @@ package object plot {
         renderer.setSeriesOutlineStroke(0, defaultStroke(0))
         renderer.setShadowVisible(false)
         renderer.setBarPainter(
-            new org.jfree.chart.renderer.xy.StandardXYBarPainter())
+          new org.jfree.chart.renderer.xy.StandardXYBarPainter())
 
         dataset -> renderer
       }
@@ -268,9 +276,9 @@ package object plot {
       name: String = null,
       offset: (Int, Int) = (0, 0),
       labels: PartialFunction[(Int, Int), String] = null
-          .asInstanceOf[PartialFunction[(Int, Int), String]],
+        .asInstanceOf[PartialFunction[(Int, Int), String]],
       tips: PartialFunction[(Int, Int), String] = null
-          .asInstanceOf[PartialFunction[(Int, Int), String]]): Series =
+        .asInstanceOf[PartialFunction[(Int, Int), String]]): Series =
     new Series {
 
       val mt = img
@@ -286,16 +294,16 @@ package object plot {
           defaultStroke: (Int) => Stroke): (xy.XYDataset, XYItemRenderer) = {
         // initialize dataset
         val dataset = XYZDataset(
-            items = items,
-            name = if (name == null) defaultName(0) else name,
-            x = (k: (Int, Int)) => k._2 + offset._2,
-            y = (k: (Int, Int)) => k._1 + offset._1,
-            z = (k: (Int, Int)) => mt(k._1, k._2),
-            label = (k: (Int, Int)) =>
-                if (labels != null && labels.isDefinedAt(k)) labels(k)
-                else null,
-            tip = (k: (Int, Int)) =>
-                if (tips != null && tips.isDefinedAt(k)) tips(k) else null
+          items = items,
+          name = if (name == null) defaultName(0) else name,
+          x = (k: (Int, Int)) => k._2 + offset._2,
+          y = (k: (Int, Int)) => k._1 + offset._1,
+          z = (k: (Int, Int)) => mt(k._1, k._2),
+          label = (k: (Int, Int)) =>
+            if (labels != null && labels.isDefinedAt(k)) labels(k)
+            else null,
+          tip = (k: (Int, Int)) =>
+            if (tips != null && tips.isDefinedAt(k)) tips(k) else null
         )
 
         // initialize renderer
@@ -310,9 +318,10 @@ package object plot {
 
         val tooltipGenerator =
           new org.jfree.chart.labels.XYToolTipGenerator() {
-            override def generateToolTip(dataset: org.jfree.data.xy.XYDataset,
-                                         series: Int,
-                                         item: Int): String = {
+            override def generateToolTip(
+                dataset: org.jfree.data.xy.XYDataset,
+                series: Int,
+                item: Int): String = {
               dataset.asInstanceOf[XYZDataset[_]].getTip(series, item)
             }
           }
@@ -320,9 +329,10 @@ package object plot {
 
         val labelGenerator =
           new org.jfree.chart.labels.XYItemLabelGenerator() {
-            override def generateLabel(dataset: org.jfree.data.xy.XYDataset,
-                                       series: Int,
-                                       item: Int): String = {
+            override def generateLabel(
+                dataset: org.jfree.data.xy.XYDataset,
+                series: Int,
+                item: Int): String = {
               dataset.asInstanceOf[XYZDataset[_]].getLabel(series, item)
             }
           }

@@ -6,7 +6,7 @@ class E extends C {
   override def foo: Int = {
     (None: Option[Int]).getOrElse {
       class C
-      E. super.foo
+      E.super.foo
     }
   }
 }

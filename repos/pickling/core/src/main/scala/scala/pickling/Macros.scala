@@ -26,9 +26,8 @@ trait TypeAnalysis extends Macro {
       if (tools.treatAsSealed(classSym)) {
         tools.directSubclasses(classSym).flatMap(cl => whyNotClosed(cl.asType))
       } else {
-        List(
-            s"'${sym.fullName}' allows unknown subclasses (it is not sealed or final isCaseClass=${isCaseClass(
-            sym)} isEffectivelyFinal=${sym.isEffectivelyFinal} isSealed=${classSym.isSealed} directSubclasses=${tools
+        List(s"'${sym.fullName}' allows unknown subclasses (it is not sealed or final isCaseClass=${isCaseClass(
+          sym)} isEffectivelyFinal=${sym.isEffectivelyFinal} isSealed=${classSym.isSealed} directSubclasses=${tools
           .directSubclasses(classSym)})")
       }
     } else {
@@ -46,9 +45,9 @@ trait PickleMacros extends Macro with TypeAnalysis {
   import c.universe._
   import definitions._
 
-  def pickleTo[T : c.WeakTypeTag](output: c.Tree)(format: c.Tree): c.Tree = {
+  def pickleTo[T: c.WeakTypeTag](output: c.Tree)(format: c.Tree): c.Tree = {
     val tpe = weakTypeOf[T]
-    val q"${ _ }($pickleeArg)" = c.prefix.tree
+    val q"${_}($pickleeArg)" = c.prefix.tree
     val endPickle =
       if (shouldBotherAboutCleaning(tpe)) q"clearPicklees()" else q"";
     val pickleeName = newTermName("picklee$pickleTo$")

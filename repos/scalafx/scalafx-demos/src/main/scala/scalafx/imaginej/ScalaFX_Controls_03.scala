@@ -64,8 +64,7 @@ object ScalaFX_Controls_03 extends JFXApp {
     val selectedToggle = theToggleGroup.getSelectedToggle
     if (selectedToggle != null) {
       val userDataString = selectedToggle.getUserData.toString
-      iconImageView.image = new Image(
-          this, "images/" + userDataString + ".jpg")
+      iconImageView.image = new Image(this, "images/" + userDataString + ".jpg")
     }
   }
 
@@ -87,9 +86,9 @@ object ScalaFX_Controls_03 extends JFXApp {
   val vBox = new VBox {
     spacing = 10
     children = List(
-        homeRadioButton,
-        calendarRadioButton,
-        contactsRadioButton
+      homeRadioButton,
+      calendarRadioButton,
+      contactsRadioButton
     )
   }
 
@@ -99,8 +98,8 @@ object ScalaFX_Controls_03 extends JFXApp {
     spacing = 50
     padding = Insets(20, 10, 10, 20)
     children = List(
-        vBox,
-        iconImageView
+      vBox,
+      iconImageView
     )
   }
 

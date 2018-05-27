@@ -26,13 +26,14 @@ object AgeRange {
         } yield {
           (from, to) match {
             case (Right(from), Right(to)) => Right(AgeRange(from, to))
-            case _ => Left("Unable to bind an AgeRange")
+            case _                        => Left("Unable to bind an AgeRange")
           }
         }
       }
       override def unbind(key: String, ageRange: AgeRange): String = {
         intBinder.unbind("from", ageRange.from) + "&" + intBinder.unbind(
-            "to", ageRange.to)
+          "to",
+          ageRange.to)
       }
     }
   //#bind

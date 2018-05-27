@@ -18,8 +18,9 @@ class ConfigParser(
   val sections = mutable.Stack[String]()
 
   def createPrefix = {
-    prefix = if (sections.isEmpty) ""
-    else sections.toList.reverse.mkString("", ".", ".")
+    prefix =
+      if (sections.isEmpty) ""
+      else sections.toList.reverse.mkString("", ".", ".")
   }
 
   override val whiteSpace = """(\s+|#[^\n]*\n)+""".r
@@ -29,7 +30,7 @@ class ConfigParser(
   val numberToken: Parser[String] = """-?\d+(\.\d+)?""".r
   val stringToken: Parser[String] =
     ("\"" + """([^\\\"]|\\[^ux]|\\\n|\\u[0-9a-fA-F]{4}|\\x[0-9a-fA-F]{2})*""" +
-        "\"").r
+      "\"").r
   val booleanToken: Parser[String] = "(true|on|false|off)".r
   val identToken: Parser[String] =
     """([\da-zA-Z_][-\w]*)(\.[a-zA-Z_][-\w]*)*""".r
@@ -53,7 +54,7 @@ class ConfigParser(
   def includeFile = "include" ~> string ^^ {
     case filename: String =>
       new ConfigParser(prefix, map, importer) parse importer.importFile(
-          filename)
+        filename)
   }
 
   def assignment = identToken ~ assignToken ~ value ^^ {
@@ -76,9 +77,9 @@ class ConfigParser(
 
   def parse(in: String): Map[String, Any] = {
     parseAll(root, in) match {
-      case Success(result, _) => map.toMap
+      case Success(result, _)  => map.toMap
       case x @ Failure(msg, _) => throw new ConfigurationException(x.toString)
-      case x @ Error(msg, _) => throw new ConfigurationException(x.toString)
+      case x @ Error(msg, _)   => throw new ConfigurationException(x.toString)
     }
   }
 }

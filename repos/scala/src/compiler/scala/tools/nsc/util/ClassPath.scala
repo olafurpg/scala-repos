@@ -36,7 +36,7 @@ object ClassPath {
     /* Get all subdirectories, jars, zips out of a directory. */
     def lsDir(dir: Directory, filt: String => Boolean = _ => true) =
       dir.list filter (x => filt(x.name) && (x.isDirectory || isJarOrZip(x))) map
-      (_.path) toList
+        (_.path) toList
 
     if (pattern == "*") lsDir(Directory("."))
     else if (pattern endsWith wildSuffix) lsDir(Directory(pattern dropRight 2))
@@ -71,7 +71,7 @@ object ClassPath {
       case null => Nil
       case dir =>
         dir filter (_.isClassContainer) map
-        (x => new java.io.File(dir.file, x.name) getPath) toList
+          (x => new java.io.File(dir.file, x.name) getPath) toList
     }
   }
 
@@ -84,11 +84,12 @@ object ClassPath {
 
     val baseDir = file.parent
     new Jar(file).classPathElements map
-    (elem => specToURL(elem) getOrElse (baseDir / elem).toURL)
+      (elem => specToURL(elem) getOrElse (baseDir / elem).toURL)
   }
 
   def specToURL(spec: String): Option[URL] =
-    try Some(new URL(spec)) catch { case _: MalformedURLException => None }
+    try Some(new URL(spec))
+    catch { case _: MalformedURLException => None }
 
   /** A class modeling aspects of a ClassPath which should be
     *  propagated to any classpaths it creates.
@@ -114,8 +115,8 @@ object ClassPath {
 
     def sourcesInPath(path: String): List[ClassPath[T]] =
       for (file <- expandPath(path, expandStar = false);
-      dir <- Option(AbstractFile getDirectory file)) yield
-        new SourcePath[T](dir, this)
+           dir <- Option(AbstractFile getDirectory file))
+        yield new SourcePath[T](dir, this)
   }
 
   def manifests: List[java.net.URL] = {
@@ -182,8 +183,8 @@ abstract class ClassPath[T] extends ClassFileLookup[T] {
   /** Merge classpath of `platform` and `urls` into merged classpath */
   def mergeUrlsIntoClassPath(urls: URL*): MergedClassPath[T] = {
     // Collect our new jars/directories and add them to the existing set of classpaths
-    val allEntries = (entries ++ urls.map(
-            url => context.newClassPath(io.AbstractFile.getURL(url)))).distinct
+    val allEntries = (entries ++ urls.map(url =>
+      context.newClassPath(io.AbstractFile.getURL(url)))).distinct
 
     // Combine all of our classpaths (old and new) into one merged classpath
     new MergedClassPath(allEntries, context)
@@ -220,8 +221,8 @@ abstract class ClassPath[T] extends ClassFileLookup[T] {
           case x: ClassRepresentation[T] => x
           case x =>
             throw new FatalError(
-                "Unexpected ClassRep '%s' found searching for name '%s'"
-                  .format(x, name))
+              "Unexpected ClassRep '%s' found searching for name '%s'"
+                .format(x, name))
         }
       case _ =>
         classes find (_.name == name)
@@ -230,7 +231,7 @@ abstract class ClassPath[T] extends ClassFileLookup[T] {
   override def findClassFile(name: String): Option[AbstractFile] =
     findClass(name) match {
       case Some(ClassRepresentation(Some(x: AbstractFile), _)) => Some(x)
-      case _ => None
+      case _                                                   => None
     }
 
   override def asSourcePathString: String = sourcepaths.mkString(pathSeparator)
@@ -238,7 +239,7 @@ abstract class ClassPath[T] extends ClassFileLookup[T] {
   def sortString = join(split(asClassPathString).sorted: _*)
   override def equals(that: Any) = that match {
     case x: ClassPath[_] => this.sortString == x.sortString
-    case _ => false
+    case _               => false
   }
   override def hashCode = sortString.hashCode()
 }
@@ -276,7 +277,8 @@ class SourcePath[T](dir: AbstractFile, val context: ClassPathContext[T])
   * A directory (or a .jar file) containing classfiles and packages
   */
 class DirectoryClassPath(
-    val dir: AbstractFile, val context: ClassPathContext[AbstractFile])
+    val dir: AbstractFile,
+    val context: ClassPathContext[AbstractFile])
     extends ClassPath[AbstractFile] {
   import FileUtils.AbstractFileOps
 
@@ -298,8 +300,8 @@ class DirectoryClassPath(
         case pf: io.PlainFile =>
           pf.givenPath match {
             case _: io.Directory => true
-            case _: io.File => false
-            case _ => f.isDirectory
+            case _: io.File      => false
+            case _               => f.isDirectory
           }
         case _ =>
           f.isDirectory
@@ -317,9 +319,11 @@ class DirectoryClassPath(
 }
 
 class DeltaClassPath[T](
-    original: MergedClassPath[T], subst: Map[ClassPath[T], ClassPath[T]])
+    original: MergedClassPath[T],
+    subst: Map[ClassPath[T], ClassPath[T]])
     extends MergedClassPath[T](
-        original.entries map (e => subst getOrElse (e, e)), original.context) {
+      original.entries map (e => subst getOrElse (e, e)),
+      original.context) {
   // not sure we should require that here. Commented out for now.
   // require(subst.keySet subsetOf original.entries.toSet)
   // We might add specialized operations for computing classes packages here. Not sure it's worth it.
@@ -328,12 +332,14 @@ class DeltaClassPath[T](
 /**
   * A classpath unifying multiple class- and sourcepath entries.
   */
-class MergedClassPath[T](override val entries: IndexedSeq[ClassPath[T]],
-                         val context: ClassPathContext[T])
+class MergedClassPath[T](
+    override val entries: IndexedSeq[ClassPath[T]],
+    val context: ClassPathContext[T])
     extends ClassPath[T] {
 
   def this(
-      entries: TraversableOnce[ClassPath[T]], context: ClassPathContext[T]) =
+      entries: TraversableOnce[ClassPath[T]],
+      context: ClassPathContext[T]) =
     this(entries.toIndexedSeq, context)
 
   def name = entries.head.name
@@ -343,7 +349,7 @@ class MergedClassPath[T](override val entries: IndexedSeq[ClassPath[T]],
 
   override def origin =
     Some(
-        entries map (x => x.origin getOrElse x.name) mkString
+      entries map (x => x.origin getOrElse x.name) mkString
         ("Merged(", ", ", ")"))
   override def asClassPathString: String =
     join(entries map (_.asClassPathString): _*)
@@ -394,15 +400,15 @@ class MergedClassPath[T](override val entries: IndexedSeq[ClassPath[T]],
   private def addPackage(to: ClassPath[T], pkg: ClassPath[T]) = {
     val newEntries: IndexedSeq[ClassPath[T]] = to match {
       case cp: MergedClassPath[_] => cp.entries :+ pkg
-      case _ => IndexedSeq(to, pkg)
+      case _                      => IndexedSeq(to, pkg)
     }
     new MergedClassPath[T](newEntries, context)
   }
 
   def show() {
     println(
-        "ClassPath %s has %d entries and results in:\n".format(
-            name, entries.size))
+      "ClassPath %s has %d entries and results in:\n"
+        .format(name, entries.size))
     asClassPathString split ':' foreach (x => println("  " + x))
   }
 
@@ -415,5 +421,6 @@ class MergedClassPath[T](override val entries: IndexedSeq[ClassPath[T]],
   * as AbstractFile. nsc.io.ZipArchive is used to view zip/jar archives as directories.
   */
 class JavaClassPath(
-    containers: IndexedSeq[ClassPath[AbstractFile]], context: JavaContext)
+    containers: IndexedSeq[ClassPath[AbstractFile]],
+    context: JavaContext)
     extends MergedClassPath[AbstractFile](containers, context) {}

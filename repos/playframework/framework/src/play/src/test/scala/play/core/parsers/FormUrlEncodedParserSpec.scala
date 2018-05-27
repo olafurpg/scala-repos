@@ -18,9 +18,10 @@ object FormUrlEncodedParserSpec extends Specification {
     }
     "decode forms with ampersands and semicolons" in {
       FormUrlEncodedParser.parse("foo1=bar1&foo2=bar2;foo3=bar3") must_==
-        Map("foo1" -> List("bar1"),
-            "foo2" -> List("bar2"),
-            "foo3" -> List("bar3"))
+        Map(
+          "foo1" -> List("bar1"),
+          "foo2" -> List("bar2"),
+          "foo3" -> List("bar3"))
     }
     "decode form elements with multiple values" in {
       FormUrlEncodedParser.parse("foo=bar1&foo=bar2") must_==
@@ -43,8 +44,8 @@ object FormUrlEncodedParserSpec extends Specification {
         "Zero=zero&One=one&Two=two&Three=three&Four=four&Five=five&Six=six&Seven=seven"
       val result: Map[String, Seq[String]] =
         FormUrlEncodedParser.parse(url_encoded)
-      val strings = (for (k <- result.keysIterator) yield
-        "&" + k + "=" + result(k).head).mkString
+      val strings = (for (k <- result.keysIterator)
+        yield "&" + k + "=" + result(k).head).mkString
       val reconstructed = strings.substring(1)
       reconstructed must equalTo(url_encoded)
     }

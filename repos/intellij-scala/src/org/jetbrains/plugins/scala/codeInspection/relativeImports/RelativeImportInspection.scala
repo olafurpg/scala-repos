@@ -1,10 +1,17 @@
 package org.jetbrains.plugins.scala
 package codeInspection.relativeImports
 
-import com.intellij.codeInspection.{LocalQuickFix, ProblemDescriptor, ProblemsHolder}
+import com.intellij.codeInspection.{
+  LocalQuickFix,
+  ProblemDescriptor,
+  ProblemsHolder
+}
 import com.intellij.openapi.project.Project
 import com.intellij.psi.{PsiElement, PsiPackage}
-import org.jetbrains.plugins.scala.codeInspection.{AbstractFixOnPsiElement, AbstractInspection}
+import org.jetbrains.plugins.scala.codeInspection.{
+  AbstractFixOnPsiElement,
+  AbstractInspection
+}
 import org.jetbrains.plugins.scala.lang.formatting.settings.ScalaCodeStyleSettings
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScStableCodeReferenceElement
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.ScImportExpr
@@ -56,7 +63,7 @@ object RelativeImportInspection {
   def qual(st: ScStableCodeReferenceElement): ScStableCodeReferenceElement =
     st.qualifier match {
       case Some(q) => qual(q)
-      case _ => st
+      case _       => st
     }
 }
 
@@ -73,9 +80,11 @@ private class EnableFullQualifiedImports extends LocalQuickFix {
 }
 
 private class MakeFullQualifiedImportFix(
-    q: ScStableCodeReferenceElement, fqn: String)
+    q: ScStableCodeReferenceElement,
+    fqn: String)
     extends AbstractFixOnPsiElement(
-        ScalaBundle.message("make.import.fully.qualified"), q) {
+      ScalaBundle.message("make.import.fully.qualified"),
+      q) {
 
   def doApplyFix(project: Project) {
     val ref = getElement
@@ -85,10 +94,10 @@ private class MakeFullQualifiedImportFix(
     import org.jetbrains.plugins.scala.codeInspection.relativeImports.RelativeImportInspection.qual
     val newFqn = qual(newRef).resolve() match {
       case p: PsiPackage if p.getQualifiedName.contains(".") => "_root_." + fqn
-      case p: PsiPackage => fqn
-      case _ => "_root_." + fqn
+      case p: PsiPackage                                     => fqn
+      case _                                                 => "_root_." + fqn
     }
     ref.replace(
-        ScalaPsiElementFactory.createReferenceFromText(newFqn, ref.getManager))
+      ScalaPsiElementFactory.createReferenceFromText(newFqn, ref.getManager))
   }
 }

@@ -16,8 +16,7 @@ object BalancingDispatcherSpec {
 }
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class BalancingDispatcherSpec
-    extends AkkaSpec(BalancingDispatcherSpec.config) {
+class BalancingDispatcherSpec extends AkkaSpec(BalancingDispatcherSpec.config) {
 
   val delayableActorDispatcher = "pooled-dispatcher"
 
@@ -28,10 +27,10 @@ class BalancingDispatcherSpec
 
     def receive = {
       case x: Int ⇒ {
-          Thread.sleep(delay)
-          invocationCount += 1
-          finishedCounter.countDown()
-        }
+        Thread.sleep(delay)
+        invocationCount += 1
+        finishedCounter.countDown()
+      }
     }
   }
 
@@ -54,12 +53,14 @@ class BalancingDispatcherSpec
       val finishedCounter = new CountDownLatch(110)
 
       val slow = system
-        .actorOf(Props(new DelayableActor(50, finishedCounter))
-              .withDispatcher(delayableActorDispatcher))
+        .actorOf(
+          Props(new DelayableActor(50, finishedCounter))
+            .withDispatcher(delayableActorDispatcher))
         .asInstanceOf[ActorRefWithCell]
       val fast = system
-        .actorOf(Props(new DelayableActor(10, finishedCounter))
-              .withDispatcher(delayableActorDispatcher))
+        .actorOf(
+          Props(new DelayableActor(10, finishedCounter))
+            .withDispatcher(delayableActorDispatcher))
         .asInstanceOf[ActorRefWithCell]
 
       var sentToFast = 0
@@ -102,11 +103,11 @@ class BalancingDispatcherSpec
         .actor
         .asInstanceOf[DelayableActor]
         .invocationCount should be >
-      (slow.underlying
-            .asInstanceOf[ActorCell]
-            .actor
-            .asInstanceOf[DelayableActor]
-            .invocationCount)
+        (slow.underlying
+          .asInstanceOf[ActorCell]
+          .actor
+          .asInstanceOf[DelayableActor]
+          .invocationCount)
       system.stop(slow)
       system.stop(fast)
     }

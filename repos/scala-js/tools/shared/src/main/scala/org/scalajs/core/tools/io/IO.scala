@@ -73,22 +73,26 @@ object IO {
 
   def copyTo(in: VirtualTextFile, out: WritableVirtualTextFile): Unit = {
     val writer = out.contentWriter
-    try writeTo(in, writer) finally writer.close()
+    try writeTo(in, writer)
+    finally writer.close()
   }
 
   def copyTo(in: VirtualBinaryFile, out: WritableVirtualBinaryFile): Unit = {
     val outStream = out.outputStream
-    try writeTo(in, outStream) finally outStream.close()
+    try writeTo(in, outStream)
+    finally outStream.close()
   }
 
   def writeTo(vf: VirtualBinaryFile, out: OutputStream): Unit = {
     val in = vf.inputStream
-    try pipe(in, out) finally in.close()
+    try pipe(in, out)
+    finally in.close()
   }
 
   def writeTo(vf: VirtualTextFile, writer: Writer): Unit = {
     val reader = vf.reader
-    try pipe(reader, writer) finally reader.close()
+    try pipe(reader, writer)
+    finally reader.close()
   }
 
   /** Pipes data from `in` to `out` */
@@ -125,7 +129,8 @@ object IO {
     *  Adds a '\n' after each file.
     */
   def concatFiles(
-      output: WritableVirtualTextFile, files: Seq[VirtualTextFile]): Unit = {
+      output: WritableVirtualTextFile,
+      files: Seq[VirtualTextFile]): Unit = {
     val out = output.contentWriter
 
     try {
@@ -140,5 +145,5 @@ object IO {
   }
 
   @inline
-  private def newBuffer[T : ClassTag] = new Array[T](4096)
+  private def newBuffer[T: ClassTag] = new Array[T](4096)
 }

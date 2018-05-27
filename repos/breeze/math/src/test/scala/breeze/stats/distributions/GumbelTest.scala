@@ -24,8 +24,11 @@ import org.scalatest.prop._
 
 @RunWith(classOf[JUnitRunner])
 class GumbelTest
-    extends FunSuite with Checkers with UnivariateContinuousDistrTestBase
-    with MomentsTestBase[Double] with HasCdfTestBase {
+    extends FunSuite
+    with Checkers
+    with UnivariateContinuousDistrTestBase
+    with MomentsTestBase[Double]
+    with HasCdfTestBase {
   type Distr = Gumbel
   import org.scalacheck.Arbitrary.arbitrary
 
@@ -37,10 +40,10 @@ class GumbelTest
 
   implicit def arbDistr = Arbitrary {
     for (location <- arbitrary[Double].map { x =>
-      math.abs(x) % 1000.0 + 1.1
-    }; // Gumbel pdf at 0 not defined when location == 1
-    scale <- arbitrary[Double].map { x =>
-      math.abs(x) % 8.0 + 1.0
-    }) yield new Gumbel(location, scale)(RandBasis.mt0)
+           math.abs(x) % 1000.0 + 1.1
+         }; // Gumbel pdf at 0 not defined when location == 1
+         scale <- arbitrary[Double].map { x =>
+           math.abs(x) % 8.0 + 1.0
+         }) yield new Gumbel(location, scale)(RandBasis.mt0)
   }
 }

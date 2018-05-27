@@ -18,7 +18,15 @@ package com.twitter.scalding
 import cascading.tuple.Fields
 import cascading.tuple.{Tuple => CTuple}
 
-import com.twitter.algebird.{Semigroup, Ring, AveragedValue, Moments, HyperLogLogMonoid, HLL, Aggregator}
+import com.twitter.algebird.{
+  Semigroup,
+  Ring,
+  AveragedValue,
+  Moments,
+  HyperLogLogMonoid,
+  HLL,
+  Aggregator
+}
 
 import com.twitter.algebird.mutable.PriorityQueueMonoid
 
@@ -49,8 +57,8 @@ trait ReduceOperations[+Self <: ReduceOperations[Self]]
     *
     * Assumed to be a commutative operation.  If you don't want that, use .forceToReducers
     */
-  def mapReduceMap[T, X, U](fieldDef: (Fields, Fields))(
-      mapfn: T => X)(redfn: (X, X) => X)(mapfn2: X => U)(
+  def mapReduceMap[T, X, U](fieldDef: (Fields, Fields))(mapfn: T => X)(
+      redfn: (X, X) => X)(mapfn2: X => U)(
       implicit startConv: TupleConverter[T],
       middleSetter: TupleSetter[X],
       middleConv: TupleConverter[X],
@@ -99,20 +107,23 @@ trait ReduceOperations[+Self <: ReduceOperations[Self]]
     * }}}
     */
   def approximateUniqueCount[T <% Array[Byte]: TupleConverter](
-      f: (Fields, Fields), errPercent: Double = 1.0) = {
+      f: (Fields, Fields),
+      errPercent: Double = 1.0) = {
     hyperLogLogMap[T, Double](f, errPercent) { _.estimatedSize }
   }
 
   def hyperLogLog[T <% Array[Byte]: TupleConverter](
-      f: (Fields, Fields), errPercent: Double = 1.0) = {
+      f: (Fields, Fields),
+      errPercent: Double = 1.0) = {
     hyperLogLogMap[T, HLL](f, errPercent) { hll =>
       hll
     }
   }
 
   private[this] def hyperLogLogMap[
-      T <% Array[Byte]: TupleConverter, U : TupleSetter](
-      f: (Fields, Fields), errPercent: Double = 1.0)(fn: HLL => U) = {
+      T <% Array[Byte]: TupleConverter,
+      U: TupleSetter](f: (Fields, Fields), errPercent: Double = 1.0)(
+      fn: HLL => U) = {
     //bits = log(m) == 2 *log(104/errPercent) = 2log(104) - 2*log(errPercent)
     def log2(x: Double) = scala.math.log(x) / scala.math.log(2.0)
     val bits = 2 * scala.math.ceil(log2(104) - log2(errPercent)).toInt
@@ -126,7 +137,7 @@ trait ReduceOperations[+Self <: ReduceOperations[Self]]
     * This is count with a predicate: only counts the tuples for which
     * `fn(tuple)` is true
     */
-  def count[T : TupleConverter](fieldDef: (Fields, Fields))(
+  def count[T: TupleConverter](fieldDef: (Fields, Fields))(
       fn: T => Boolean): Self = {
     mapPlusMap(fieldDef) { (arg: T) =>
       if (fn(arg)) 1L else 0L
@@ -174,14 +185,16 @@ trait ReduceOperations[+Self <: ReduceOperations[Self]]
     // Make sure the fields are strings:
     mapList[(String, AnyRef), CTuple](fieldDef) { outputList =>
       val asMap = outputList.toMap
-      assert(asMap.size == outputList.size,
-             "Repeated pivot key fields: " + outputList.toString)
+      assert(
+        asMap.size == outputList.size,
+        "Repeated pivot key fields: " + outputList.toString)
       val values = fieldDef._2.iterator.asScala
       // Look up this key:
-      .map { fname =>
-        asMap.getOrElse(fname.asInstanceOf[String],
-                        defaultVal.asInstanceOf[AnyRef])
-      }
+        .map { fname =>
+          asMap.getOrElse(
+            fname.asInstanceOf[String],
+            defaultVal.asInstanceOf[AnyRef])
+        }
       // Create the cascading tuple
       new CTuple(values.toSeq: _*)
     }
@@ -202,7 +215,7 @@ trait ReduceOperations[+Self <: ReduceOperations[Self]]
   /*
    * check if a predicate is satisfied for all in the values for this key
    */
-  def forall[T : TupleConverter](fieldDef: (Fields, Fields))(
+  def forall[T: TupleConverter](fieldDef: (Fields, Fields))(
       fn: (T) => Boolean): Self = {
     mapReduceMap(fieldDef)(fn)({ (x: Boolean, y: Boolean) =>
       x && y
@@ -247,7 +260,8 @@ trait ReduceOperations[+Self <: ReduceOperations[Self]]
     * STRONGLY PREFER TO AVOID THIS. Try reduce or plus and an O(1) memory algorithm.
     */
   def mapList[T, R](fieldDef: (Fields, Fields))(fn: (List[T]) => R)(
-      implicit conv: TupleConverter[T], setter: TupleSetter[R]): Self = {
+      implicit conv: TupleConverter[T],
+      setter: TupleSetter[R]): Self = {
     val midset = implicitly[TupleSetter[List[T]]]
     val midconv = implicitly[TupleConverter[List[T]]]
 
@@ -262,14 +276,18 @@ trait ReduceOperations[+Self <: ReduceOperations[Self]]
     } { fn(_) }(conv, midset, midconv, setter)
   }
 
-  def mapPlusMap[T, X, U](fieldDef: (Fields, Fields))(
-      mapfn: T => X)(mapfn2: X => U)(implicit startConv: TupleConverter[T],
-                                     middleSetter: TupleSetter[X],
-                                     middleConv: TupleConverter[X],
-                                     endSetter: TupleSetter[U],
-                                     sgX: Semigroup[X]): Self = {
+  def mapPlusMap[T, X, U](fieldDef: (Fields, Fields))(mapfn: T => X)(
+      mapfn2: X => U)(
+      implicit startConv: TupleConverter[T],
+      middleSetter: TupleSetter[X],
+      middleConv: TupleConverter[X],
+      endSetter: TupleSetter[U],
+      sgX: Semigroup[X]): Self = {
     mapReduceMap[T, X, U](fieldDef)(mapfn)((x, y) => sgX.plus(x, y))(mapfn2)(
-        startConv, middleSetter, middleConv, endSetter)
+      startConv,
+      middleSetter,
+      middleConv,
+      endSetter)
   }
 
   private def extremum(max: Boolean, fieldDef: (Fields, Fields)): Self = {
@@ -304,10 +322,11 @@ trait ReduceOperations[+Self <: ReduceOperations[Self]]
     * field. The result will be start, each item.toString separated by sep,
     * followed by end for convenience there several common variants below
     */
-  def mkString(fieldDef: (Fields, Fields),
-               start: String,
-               sep: String,
-               end: String): Self = {
+  def mkString(
+      fieldDef: (Fields, Fields),
+      start: String,
+      sep: String,
+      end: String): Self = {
     mapList[String, String](fieldDef) { _.mkString(start, sep, end) }
   }
   def mkString(fieldDef: (Fields, Fields), sep: String): Self =
@@ -320,7 +339,10 @@ trait ReduceOperations[+Self <: ReduceOperations[Self]]
     * column
     */
   def mkString(
-      fieldDef: Symbol, start: String, sep: String, end: String): Self = {
+      fieldDef: Symbol,
+      start: String,
+      sep: String,
+      end: String): Self = {
     val f: Fields = fieldDef
     mkString((f, f), start, sep, end)
   }
@@ -346,7 +368,8 @@ trait ReduceOperations[+Self <: ReduceOperations[Self]]
     * so if your operation is faster for the accumulator to be on one side, be aware.
     */
   def reduce[T](fieldDef: (Fields, Fields))(fn: (T, T) => T)(
-      implicit setter: TupleSetter[T], conv: TupleConverter[T]): Self = {
+      implicit setter: TupleSetter[T],
+      conv: TupleConverter[T]): Self = {
     mapReduceMap[T, T, T](fieldDef)({ t =>
       t
     })(fn)({ t =>
@@ -355,7 +378,8 @@ trait ReduceOperations[+Self <: ReduceOperations[Self]]
   }
   //Same as reduce(f->f)
   def reduce[T](fieldDef: Symbol*)(fn: (T, T) => T)(
-      implicit setter: TupleSetter[T], conv: TupleConverter[T]): Self = {
+      implicit setter: TupleSetter[T],
+      conv: TupleConverter[T]): Self = {
     reduce(fieldDef -> fieldDef)(fn)(setter, conv)
   }
 
@@ -367,9 +391,10 @@ trait ReduceOperations[+Self <: ReduceOperations[Self]]
     *
     * Assumed to be a commutative operation.  If you don't want that, use .forceToReducers
     */
-  def sum[T](fd: (Fields, Fields))(implicit sg: Semigroup[T],
-                                   tconv: TupleConverter[T],
-                                   tset: TupleSetter[T]): Self = {
+  def sum[T](fd: (Fields, Fields))(
+      implicit sg: Semigroup[T],
+      tconv: TupleConverter[T],
+      tset: TupleSetter[T]): Self = {
     // We reverse the order because the left is the old value in reduce, and for list concat
     // we are much better off concatenating into the bigger list
     reduce[T](fd)({ (left, right) =>
@@ -381,17 +406,19 @@ trait ReduceOperations[+Self <: ReduceOperations[Self]]
     * The same as `sum(fs -> fs)`
     * Assumed to be a commutative operation.  If you don't want that, use .forceToReducers
     */
-  def sum[T](fs: Symbol*)(implicit sg: Semigroup[T],
-                          tconv: TupleConverter[T],
-                          tset: TupleSetter[T]): Self =
+  def sum[T](fs: Symbol*)(
+      implicit sg: Semigroup[T],
+      tconv: TupleConverter[T],
+      tset: TupleSetter[T]): Self =
     sum[T](fs -> fs)(sg, tconv, tset)
 
   /**
     * Returns the product of all the items in this grouping
     */
-  def times[T](fd: (Fields, Fields))(implicit ring: Ring[T],
-                                     tconv: TupleConverter[T],
-                                     tset: TupleSetter[T]): Self = {
+  def times[T](fd: (Fields, Fields))(
+      implicit ring: Ring[T],
+      tconv: TupleConverter[T],
+      tset: TupleSetter[T]): Self = {
     // We reverse the order because the left is the old value in reduce, and for list concat
     // we are much better off concatenating into the bigger list
     reduce[T](fd)({ (left, right) =>
@@ -402,9 +429,10 @@ trait ReduceOperations[+Self <: ReduceOperations[Self]]
   /**
     * The same as `times(fs -> fs)`
     */
-  def times[T](fs: Symbol*)(implicit ring: Ring[T],
-                            tconv: TupleConverter[T],
-                            tset: TupleSetter[T]): Self = {
+  def times[T](fs: Symbol*)(
+      implicit ring: Ring[T],
+      tconv: TupleConverter[T],
+      tset: TupleSetter[T]): Self = {
     times[T](fs -> fs)(ring, tconv, tset)
   }
 
@@ -469,7 +497,7 @@ trait ReduceOperations[+Self <: ReduceOperations[Self]]
     *
     * topClicks will be a List[(Long,Long)]
     */
-  def sortWithTake[T : TupleConverter](f: (Fields, Fields), k: Int)(
+  def sortWithTake[T: TupleConverter](f: (Fields, Fields), k: Int)(
       lt: (T, T) => Boolean): Self = {
     val ord = Ordering.fromLessThan(lt);
     sortedTake(f, k)(implicitly[TupleConverter[T]], ord)
@@ -479,7 +507,8 @@ trait ReduceOperations[+Self <: ReduceOperations[Self]]
     * Reverse of above when the implicit ordering makes sense.
     */
   def sortedReverseTake[T](f: (Fields, Fields), k: Int)(
-      implicit conv: TupleConverter[T], ord: Ordering[T]): Self = {
+      implicit conv: TupleConverter[T],
+      ord: Ordering[T]): Self = {
     sortedTake[T](f, k)(conv, ord.reverse)
   }
 
@@ -487,7 +516,8 @@ trait ReduceOperations[+Self <: ReduceOperations[Self]]
     * Same as above but useful when the implicit ordering makes sense.
     */
   def sortedTake[T](f: (Fields, Fields), k: Int)(
-      implicit conv: TupleConverter[T], ord: Ordering[T]): Self = {
+      implicit conv: TupleConverter[T],
+      ord: Ordering[T]): Self = {
 
     assert(f._2.size == 1, "output field size must be 1")
     implicit val mon = new PriorityQueueMonoid[T](k)

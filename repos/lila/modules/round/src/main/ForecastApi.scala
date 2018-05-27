@@ -30,16 +30,16 @@ final class ForecastApi(coll: Coll, roundMap: akka.actor.ActorSelection) {
     lila.mon.round.forecast.create()
     coll
       .update(
-          BSONDocument("_id" -> pov.fullId),
-          Forecast(_id = pov.fullId, steps = steps, date = DateTime.now).truncate,
-          upsert = true)
+        BSONDocument("_id" -> pov.fullId),
+        Forecast(_id = pov.fullId, steps = steps, date = DateTime.now).truncate,
+        upsert = true)
       .void
   }
 
   def save(pov: Pov, steps: Forecast.Steps): Funit = firstStep(steps) match {
-    case None => coll.remove(BSONDocument("_id" -> pov.fullId)).void
+    case None                                         => coll.remove(BSONDocument("_id" -> pov.fullId)).void
     case Some(step) if pov.game.turns == step.ply - 1 => saveSteps(pov, steps)
-    case _ => fufail(Forecast.OutOfSync)
+    case _                                            => fufail(Forecast.OutOfSync)
   }
 
   def playAndSave(pov: Pov, uciMove: String, steps: Forecast.Steps): Funit =
@@ -47,12 +47,14 @@ final class ForecastApi(coll: Coll, roundMap: akka.actor.ActorSelection) {
     else
       Uci.Move(uciMove).fold[Funit](fufail(s"Invalid move $uciMove")) { uci =>
         val promise = Promise[Unit]
-        roundMap ! Tell(pov.game.id,
-                        actorApi.round.HumanPlay(playerId = pov.playerId,
-                                                 uci = uci,
-                                                 blur = true,
-                                                 lag = Duration.Zero,
-                                                 promise = promise.some))
+        roundMap ! Tell(
+          pov.game.id,
+          actorApi.round.HumanPlay(
+            playerId = pov.playerId,
+            uci = uci,
+            blur = true,
+            lag = Duration.Zero,
+            promise = promise.some))
         saveSteps(pov, steps) >> promise.future
       }
 
@@ -98,9 +100,10 @@ final class ForecastApi(coll: Coll, roundMap: akka.actor.ActorSelection) {
 
   def clearGame(g: Game) =
     coll
-      .remove(BSONDocument(
-              "_id" -> BSONDocument("$in" -> chess.Color.all.map(g.fullIdOf))
-          ))
+      .remove(
+        BSONDocument(
+          "_id" -> BSONDocument("$in" -> chess.Color.all.map(g.fullIdOf))
+        ))
       .void
 
   def clearPov(pov: Pov) = coll.remove(BSONDocument("_id" -> pov.fullId)).void

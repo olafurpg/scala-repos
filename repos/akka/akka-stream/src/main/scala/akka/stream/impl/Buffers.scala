@@ -210,7 +210,8 @@ private[akka] final class BoundedBuffer[T](val capacity: Int)
   }
 
   private final class DynamicQueue(startIdx: Int)
-      extends ju.LinkedList[T] with Buffer[T] {
+      extends ju.LinkedList[T]
+      with Buffer[T] {
     override def capacity = BoundedBuffer.this.capacity
     override def used = size
     override def isFull = size == capacity

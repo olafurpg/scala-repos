@@ -95,9 +95,12 @@ object TokenBucket {
     * @return actorRef, needed to call consume later.
     */
   def create(
-      system: ActorSystem, size: Int, rate: Float, clock: Clock = new Clock {
-    override def now: Long = System.currentTimeMillis
-  })(implicit context: ExecutionContext): Consumer = {
+      system: ActorSystem,
+      size: Int,
+      rate: Float,
+      clock: Clock = new Clock {
+        override def now: Long = System.currentTimeMillis
+      })(implicit context: ExecutionContext): Consumer = {
     require(size > 0)
     require(size <= 1000)
     require(rate >= 0.000001f)

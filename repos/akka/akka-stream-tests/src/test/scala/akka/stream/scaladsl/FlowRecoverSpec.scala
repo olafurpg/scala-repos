@@ -12,8 +12,8 @@ import scala.util.control.NoStackTrace
 
 class FlowRecoverSpec extends AkkaSpec {
 
-  val settings = ActorMaterializerSettings(system).withInputBuffer(
-      initialSize = 1, maxSize = 1)
+  val settings = ActorMaterializerSettings(system)
+    .withInputBuffer(initialSize = 1, maxSize = 1)
 
   implicit val materializer = ActorMaterializer(settings)
 
@@ -21,9 +21,11 @@ class FlowRecoverSpec extends AkkaSpec {
 
   "A Recover" must {
     "recover when there is a handler" in assertAllStagesStopped {
-      Source(1 to 4).map { a ⇒
-        if (a == 3) throw ex else a
-      }.recover { case t: Throwable ⇒ 0 }
+      Source(1 to 4)
+        .map { a ⇒
+          if (a == 3) throw ex else a
+        }
+        .recover { case t: Throwable ⇒ 0 }
         .runWith(TestSink.probe[Int])
         .requestNext(1)
         .requestNext(2)
@@ -33,9 +35,11 @@ class FlowRecoverSpec extends AkkaSpec {
     }
 
     "failed stream if handler is not for such exception type" in assertAllStagesStopped {
-      Source(1 to 3).map { a ⇒
-        if (a == 2) throw ex else a
-      }.recover { case t: IndexOutOfBoundsException ⇒ 0 }
+      Source(1 to 3)
+        .map { a ⇒
+          if (a == 2) throw ex else a
+        }
+        .recover { case t: IndexOutOfBoundsException ⇒ 0 }
         .runWith(TestSink.probe[Int])
         .requestNext(1)
         .request(1)

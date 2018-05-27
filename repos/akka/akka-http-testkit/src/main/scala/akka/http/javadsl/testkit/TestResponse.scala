@@ -24,8 +24,10 @@ import akka.http.javadsl.model._
   * implementations for the abstract assertion methods.
   */
 abstract class TestResponse(
-    _response: HttpResponse, awaitAtMost: FiniteDuration)(
-    implicit ec: ExecutionContext, materializer: Materializer) {
+    _response: HttpResponse,
+    awaitAtMost: FiniteDuration)(
+    implicit ec: ExecutionContext,
+    materializer: Materializer) {
 
   /**
     * Returns the strictified entity of the response. It will be strictified on first access.
@@ -59,9 +61,10 @@ abstract class TestResponse(
     */
   def entityAs[T](unmarshaller: Unmarshaller[T]): T =
     Unmarshal(response)
-      .to(unmarshaller.asInstanceOf[UnmarshallerImpl[T]].scalaUnmarshaller,
-          ec,
-          materializer)
+      .to(
+        unmarshaller.asInstanceOf[UnmarshallerImpl[T]].scalaUnmarshaller,
+        ec,
+        materializer)
       .awaitResult(awaitAtMost)
 
   /**
@@ -86,8 +89,9 @@ abstract class TestResponse(
   def header[T <: HttpHeader](clazz: Class[T]): T =
     response
       .header(ClassTag(clazz))
-      .getOrElse(doFail(
-              s"Expected header of type ${clazz.getSimpleName} but wasn't found."))
+      .getOrElse(
+        doFail(
+          s"Expected header of type ${clazz.getSimpleName} but wasn't found."))
 
   /**
     * Assert on the numeric status code.
@@ -129,15 +133,17 @@ abstract class TestResponse(
     * Assert on the response entity to equal the given object after applying an [[akka.http.javadsl.server.Unmarshaller]].
     */
   def assertEntityAs[T <: AnyRef](
-      unmarshaller: Unmarshaller[T], expected: T): TestResponse =
+      unmarshaller: Unmarshaller[T],
+      expected: T): TestResponse =
     assertEqualsKind(expected, entityAs(unmarshaller), "entity")
 
   /**
     * Assert that a given header instance exists in the response.
     */
   def assertHeaderExists(expected: HttpHeader): TestResponse = {
-    assertTrue(response.headers.exists(_ == expected),
-               s"Header $expected was missing.")
+    assertTrue(
+      response.headers.exists(_ == expected),
+      s"Header $expected was missing.")
     this
   }
 
@@ -146,8 +152,9 @@ abstract class TestResponse(
     */
   def assertHeaderKindExists(name: String): TestResponse = {
     val lowercased = name.toRootLowerCase
-    assertTrue(response.headers.exists(_.is(lowercased)),
-               s"Expected `$name` header was missing.")
+    assertTrue(
+      response.headers.exists(_.is(lowercased)),
+      s"Expected `$name` header was missing.")
     this
   }
 
@@ -160,9 +167,9 @@ abstract class TestResponse(
     if (headers.isEmpty) fail(s"Expected `$name` header was missing.")
     else
       assertTrue(
-          headers.exists(_.value == value),
-          s"`$name` header was found but had the wrong value. Found headers: ${headers
-            .mkString(", ")}")
+        headers.exists(_.value == value),
+        s"`$name` header was found but had the wrong value. Found headers: ${headers
+          .mkString(", ")}")
 
     this
   }
@@ -172,12 +179,16 @@ abstract class TestResponse(
     else f(response)
 
   protected def assertEqualsKind(
-      expected: AnyRef, actual: AnyRef, kind: String): TestResponse = {
+      expected: AnyRef,
+      actual: AnyRef,
+      kind: String): TestResponse = {
     assertEquals(expected, actual, s"Unexpected $kind!")
     this
   }
   protected def assertEqualsKind(
-      expected: Int, actual: Int, kind: String): TestResponse = {
+      expected: Int,
+      actual: Int,
+      kind: String): TestResponse = {
     assertEquals(expected, actual, s"Unexpected $kind!")
     this
   }
@@ -190,7 +201,9 @@ abstract class TestResponse(
 
   protected def fail(message: String): Unit
   protected def assertEquals(
-      expected: AnyRef, actual: AnyRef, message: String): Unit
+      expected: AnyRef,
+      actual: AnyRef,
+      message: String): Unit
   protected def assertEquals(expected: Int, actual: Int, message: String): Unit
   protected def assertTrue(predicate: Boolean, message: String): Unit
 }

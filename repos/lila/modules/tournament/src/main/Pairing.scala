@@ -5,15 +5,16 @@ import lila.game.{Game, PovRef, IdGenerator}
 
 import org.joda.time.DateTime
 
-case class Pairing(id: String, // game Id
-                   tourId: String,
-                   status: chess.Status,
-                   user1: String,
-                   user2: String,
-                   winner: Option[String],
-                   turns: Option[Int],
-                   berserk1: Int,
-                   berserk2: Int) {
+case class Pairing(
+    id: String, // game Id
+    tourId: String,
+    status: chess.Status,
+    user1: String,
+    user2: String,
+    winner: Option[String],
+    turns: Option[Int],
+    berserk1: Int,
+    berserk2: Int) {
 
   def gameId = id
 
@@ -63,15 +64,16 @@ private[tournament] object Pairing {
   case class LastOpponents(hash: Map[String, String])
 
   def apply(tourId: String, u1: String, u2: String): Pairing =
-    new Pairing(id = IdGenerator.game,
-                tourId = tourId,
-                status = chess.Status.Created,
-                user1 = u1,
-                user2 = u2,
-                winner = none,
-                turns = none,
-                berserk1 = 0,
-                berserk2 = 0)
+    new Pairing(
+      id = IdGenerator.game,
+      tourId = tourId,
+      status = chess.Status.Created,
+      user1 = u1,
+      user2 = u2,
+      winner = none,
+      turns = none,
+      berserk1 = 0,
+      berserk2 = 0)
 
   case class Prep(tourId: String, user1: String, user2: String) {
     def toPairing(firstGetsWhite: Boolean) =

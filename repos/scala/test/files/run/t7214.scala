@@ -26,7 +26,7 @@ class Crash {
   }
   (t: Any) match {
     case Extractor(_) =>
-    case _ =>
+    case _            =>
   }
 
   // checking that correct outer tests are applied when

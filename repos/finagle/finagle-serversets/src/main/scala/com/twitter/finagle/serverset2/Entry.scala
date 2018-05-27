@@ -35,17 +35,17 @@ case class Endpoint(
     shard: Int,
     status: Endpoint.Status.Value,
     memberId: String
-)
-    extends Entry {
+) extends Entry {
 
   override def equals(that: Any) =
     that match {
       case that: Endpoint =>
-        java.util.Arrays.equals(this.names.asInstanceOf[Array[Object]],
-                                that.names.asInstanceOf[Array[Object]]) &&
-        this.host == that.host && this.port == that.port &&
-        this.shard == that.shard && this.status == that.status &&
-        this.memberId == that.memberId
+        java.util.Arrays.equals(
+          this.names.asInstanceOf[Array[Object]],
+          that.names.asInstanceOf[Array[Object]]) &&
+          this.host == that.host && this.port == that.port &&
+          this.shard == that.shard && this.status == that.status &&
+          this.memberId == that.memberId
       case _ => super.equals(that)
     }
 }
@@ -67,18 +67,24 @@ object Entry {
 
 object Endpoint {
   val Empty = Endpoint(
-      null, null, Int.MinValue, Int.MinValue, Endpoint.Status.Unknown, "")
+    null,
+    null,
+    Int.MinValue,
+    Int.MinValue,
+    Endpoint.Status.Unknown,
+    "")
 
   object Status extends Enumeration {
     val Dead, Starting, Alive, Stopping, Stopped, Warning, Unknown = Value
 
-    private val map = Map("DEAD" -> Dead,
-                          "STARTING" -> Starting,
-                          "ALIVE" -> Alive,
-                          "STOPPING" -> Stopping,
-                          "STOPPED" -> Stopped,
-                          "WARNING" -> Warning,
-                          "UNKNOWN" -> Unknown)
+    private val map = Map(
+      "DEAD" -> Dead,
+      "STARTING" -> Starting,
+      "ALIVE" -> Alive,
+      "STOPPING" -> Stopping,
+      "STOPPED" -> Stopped,
+      "WARNING" -> Warning,
+      "UNKNOWN" -> Unknown)
 
     def ofString(s: String): Option[Value] = map.get(s)
   }
@@ -111,26 +117,26 @@ object Endpoint {
         status <- Status.ofString(s)
       } yield status
     } getOrElse Endpoint.Status.Unknown
-    val tmpl = Endpoint.Empty.copy(
-        shard = shard.getOrElse(Int.MinValue), status = status)
+    val tmpl = Endpoint.Empty
+      .copy(shard = shard.getOrElse(Int.MinValue), status = status)
 
     val namesByHostPort =
       Memoize.snappable[(String, Int), ArrayBuffer[String]] {
         case (host, port) =>
           new ArrayBuffer[String]
       }
-    for (map <- d("serviceEndpoint"); hostport <- parseEndpoint(map)) namesByHostPort(
-        hostport) += null
+    for (map <- d("serviceEndpoint"); hostport <- parseEndpoint(map))
+      namesByHostPort(hostport) += null
     for {
       map <- d("additionalEndpoints") collect {
         case m: java.util.Map[_, _] => m
       }
       key <- map.keySet().asScala collect { case k: String => k }
-                if key.isInstanceOf[String]
+      if key.isInstanceOf[String]
       hostport <- parseEndpoint(map.get(key))
     } namesByHostPort(hostport) += key
 
-    for (((host, port), names) <- namesByHostPort.snap.toSeq) yield
-      tmpl.copy(names = names.toArray, host = host, port = port)
+    for (((host, port), names) <- namesByHostPort.snap.toSeq)
+      yield tmpl.copy(names = names.toArray, host = host, port = port)
   }
 }

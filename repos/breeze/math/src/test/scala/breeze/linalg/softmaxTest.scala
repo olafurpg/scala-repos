@@ -28,6 +28,6 @@ import org.scalatest.FunSuite
 class softmaxTest extends FunSuite {
   test("softmax on negative infinities works") {
     assert(
-        softmax(Array(Double.NegativeInfinity, Double.NegativeInfinity)) === Double.NegativeInfinity)
+      softmax(Array(Double.NegativeInfinity, Double.NegativeInfinity)) === Double.NegativeInfinity)
   }
 }

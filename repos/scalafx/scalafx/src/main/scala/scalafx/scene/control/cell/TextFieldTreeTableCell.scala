@@ -85,8 +85,9 @@ object TextFieldTreeTableCell {
   /**
     * Added to satisfy Spec tests.
     */
-  @deprecated(message = "Use forTreeTableColumn[S, T](StringConverter[T])",
-              since = "1.0")
+  @deprecated(
+    message = "Use forTreeTableColumn[S, T](StringConverter[T])",
+    since = "1.0")
   def forTreeTableColumn[S, T](converter: jfxu.StringConverter[T]) =
     jfxscc.TextFieldTreeTableCell.forTreeTableColumn[S, T](converter)
 }
@@ -100,8 +101,9 @@ object TextFieldTreeTableCell {
   *
   * @define TFTC `TextFieldTreeTableCell`
   */
-class TextFieldTreeTableCell[S, T](override val delegate: jfxscc.TextFieldTreeTableCell[
-        S, T] = new jfxscc.TextFieldTreeTableCell[S, T])
+class TextFieldTreeTableCell[S, T](
+    override val delegate: jfxscc.TextFieldTreeTableCell[S, T] =
+      new jfxscc.TextFieldTreeTableCell[S, T])
     extends TreeTableCell[S, T](delegate)
     with ConvertableCell[jfxscc.TextFieldTreeTableCell[S, T], T, T]
     with UpdatableCell[jfxscc.TextFieldTreeTableCell[S, T], T]

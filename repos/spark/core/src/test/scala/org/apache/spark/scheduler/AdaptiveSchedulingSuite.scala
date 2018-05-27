@@ -53,8 +53,10 @@ class AdaptiveSchedulingSuite extends SparkFunSuite with LocalSparkContext {
     val dep = new ShuffleDependency[Int, Int, Int](rdd, new HashPartitioner(3))
     val shuffled = new CustomShuffledRDD[Int, Int, Int](dep, Array(0, 2))
     assert(shuffled.partitions.length === 2)
-    assert(shuffled.glom().map(_.toSet).collect().toSet == Set(
-            Set((0, 0), (1, 1)), Set((2, 2))))
+    assert(
+      shuffled.glom().map(_.toSet).collect().toSet == Set(
+        Set((0, 0), (1, 1)),
+        Set((2, 2))))
   }
 
   test("fetching all map output partitions in one reduce") {

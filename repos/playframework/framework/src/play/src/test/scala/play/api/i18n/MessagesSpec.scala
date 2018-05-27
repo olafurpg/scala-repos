@@ -13,16 +13,20 @@ import play.core.test.FakeRequest
 
 object MessagesSpec extends Specification {
   val testMessages = Map(
-      "default" -> Map("title" -> "English Title",
-                       "foo" -> "English foo",
-                       "bar" -> "English pub"),
-      "fr" -> Map("title" -> "Titre francais", "foo" -> "foo francais"),
-      "fr-CH" -> Map("title" -> "Titre suisse"))
+    "default" -> Map(
+      "title" -> "English Title",
+      "foo" -> "English foo",
+      "bar" -> "English pub"),
+    "fr" -> Map("title" -> "Titre francais", "foo" -> "foo francais"),
+    "fr-CH" -> Map("title" -> "Titre suisse")
+  )
   val api = new DefaultMessagesApi(
-      new Environment(new File("."), this.getClass.getClassLoader, Mode.Dev),
-      Configuration.reference,
-      new DefaultLangs(Configuration.reference ++ Configuration.from(
-              Map("play.i18n.langs" -> Seq("en", "fr", "fr-CH"))))) {
+    new Environment(new File("."), this.getClass.getClassLoader, Mode.Dev),
+    Configuration.reference,
+    new DefaultLangs(
+      Configuration.reference ++ Configuration.from(
+        Map("play.i18n.langs" -> Seq("en", "fr", "fr-CH"))))
+  ) {
     override protected def loadAllMessages = testMessages
   }
 
@@ -62,10 +66,11 @@ object MessagesSpec extends Specification {
 
     "support setting the language on a result" in {
       val cookie = Cookies
-        .decodeSetCookieHeader(api
-              .setLang(Results.Ok, Lang("en-AU"))
-              .header
-              .headers("Set-Cookie"))
+        .decodeSetCookieHeader(
+          api
+            .setLang(Results.Ok, Lang("en-AU"))
+            .header
+            .headers("Set-Cookie"))
         .head
       cookie.name must_== "PLAY_LANG"
       cookie.value must_== "en-AU"
@@ -94,22 +99,22 @@ object MessagesSpec extends Specification {
       }
       "when a cookie and an acceptable lang are available" in {
         api
-          .preferred(FakeRequest()
-                .withCookies(Cookie("PLAY_LANG", "fr"))
-                .withHeaders("Accept-Language" -> "en"))
+          .preferred(
+            FakeRequest()
+              .withCookies(Cookie("PLAY_LANG", "fr"))
+              .withHeaders("Accept-Language" -> "en"))
           .lang must_== Lang("fr")
       }
     }
 
     "report error for invalid lang" in {
       new DefaultMessagesApi(
-          new Environment(new File("."),
-                          this.getClass.getClassLoader,
-                          Mode.Dev),
-          Configuration.reference,
-          new DefaultLangs(Configuration.reference ++ Configuration.from(
-                  Map("play.i18n.langs" -> Seq("invalid_language"))))) must throwA[
-          PlayException]
+        new Environment(new File("."), this.getClass.getClassLoader, Mode.Dev),
+        Configuration.reference,
+        new DefaultLangs(
+          Configuration.reference ++ Configuration.from(
+            Map("play.i18n.langs" -> Seq("invalid_language"))))
+      ) must throwA[PlayException]
     }
   }
 

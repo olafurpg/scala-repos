@@ -24,24 +24,31 @@ object IntroduceVariableTestUtil {
   def extract2[T, U](x: (T, U)): U = x._2
 
   def getContainerOne(
-      startOffset: Int, endOffset: Int, file: ScalaFile, occLength: Int) = {
+      startOffset: Int,
+      endOffset: Int,
+      file: ScalaFile,
+      occLength: Int) = {
     val commonParentOne = PsiTreeUtil.findCommonParent(
-        file.findElementAt(startOffset), file.findElementAt(endOffset - 1))
-    ScalaPsiUtil.getParentOfType(commonParentOne,
-                                 occLength == 1,
-                                 classOf[ScalaFile],
-                                 classOf[ScBlock],
-                                 classOf[ScTemplateBody])
+      file.findElementAt(startOffset),
+      file.findElementAt(endOffset - 1))
+    ScalaPsiUtil.getParentOfType(
+      commonParentOne,
+      occLength == 1,
+      classOf[ScalaFile],
+      classOf[ScBlock],
+      classOf[ScTemplateBody])
   }
 
-  def getValidator(project: Project,
-                   editor: Editor,
-                   file: ScalaFile,
-                   startOffset: Int,
-                   endOffset: Int): ScalaValidator = {
-    PsiTreeUtil.getParentOfType(file.findElementAt(startOffset),
-                                classOf[ScExpression],
-                                classOf[ScTypeElement]) match {
+  def getValidator(
+      project: Project,
+      editor: Editor,
+      file: ScalaFile,
+      startOffset: Int,
+      endOffset: Int): ScalaValidator = {
+    PsiTreeUtil.getParentOfType(
+      file.findElementAt(startOffset),
+      classOf[ScExpression],
+      classOf[ScTypeElement]) match {
       case x: ScExpression =>
         getVariableValidator(project, editor, file, startOffset, endOffset)
       case x: ScTypeElement =>
@@ -50,11 +57,12 @@ object IntroduceVariableTestUtil {
     }
   }
 
-  def getVariableValidator(project: Project,
-                           editor: Editor,
-                           file: ScalaFile,
-                           startOffset: Int,
-                           endOffset: Int): ScalaVariableValidator = {
+  def getVariableValidator(
+      project: Project,
+      editor: Editor,
+      file: ScalaFile,
+      startOffset: Int,
+      endOffset: Int): ScalaVariableValidator = {
     val (expr: ScExpression, _) = ScalaRefactoringUtil
       .getExpression(project, editor, file, startOffset, endOffset)
       .get
@@ -62,25 +70,28 @@ object IntroduceVariableTestUtil {
     val fileEncloser = ScalaRefactoringUtil.fileEncloser(startOffset, file)
     val occurrences: Array[TextRange] =
       ScalaRefactoringUtil.getOccurrenceRanges(
-          ScalaRefactoringUtil.unparExpr(expr), fileEncloser)
+        ScalaRefactoringUtil.unparExpr(expr),
+        fileEncloser)
 
     val container: PsiElement = ScalaRefactoringUtil.enclosingContainer(
-        ScalaRefactoringUtil.commonParent(file, occurrences: _*))
-    val containerOne = getContainerOne(
-        startOffset, endOffset, file, occurrences.length)
-    new ScalaVariableValidator(new ScalaIntroduceVariableHandler,
-                               project,
-                               expr,
-                               occurrences.isEmpty,
-                               container,
-                               containerOne)
+      ScalaRefactoringUtil.commonParent(file, occurrences: _*))
+    val containerOne =
+      getContainerOne(startOffset, endOffset, file, occurrences.length)
+    new ScalaVariableValidator(
+      new ScalaIntroduceVariableHandler,
+      project,
+      expr,
+      occurrences.isEmpty,
+      container,
+      containerOne)
   }
 
-  def getTypeValidator(project: Project,
-                       editor: Editor,
-                       file: ScalaFile,
-                       startOffset: Int,
-                       endOffset: Int): ScalaTypeValidator = {
+  def getTypeValidator(
+      project: Project,
+      editor: Editor,
+      file: ScalaFile,
+      startOffset: Int,
+      endOffset: Int): ScalaTypeValidator = {
     val typeElement = ScalaRefactoringUtil
       .getTypeElement(project, editor, file, startOffset, endOffset)
       .get
@@ -89,15 +100,16 @@ object IntroduceVariableTestUtil {
     val occurrences =
       ScalaRefactoringUtil.getTypeElementOccurrences(typeElement, fileEncloser)
     val container = ScalaRefactoringUtil.enclosingContainer(
-        PsiTreeUtil.findCommonParent(occurrences: _*))
+      PsiTreeUtil.findCommonParent(occurrences: _*))
 
-    val containerOne = getContainerOne(
-        startOffset, endOffset, file, occurrences.length)
-    new ScalaTypeValidator(new ScalaIntroduceVariableHandler,
-                           project,
-                           typeElement,
-                           occurrences.isEmpty,
-                           container,
-                           containerOne)
+    val containerOne =
+      getContainerOne(startOffset, endOffset, file, occurrences.length)
+    new ScalaTypeValidator(
+      new ScalaIntroduceVariableHandler,
+      project,
+      typeElement,
+      occurrences.isEmpty,
+      container,
+      containerOne)
   }
 }

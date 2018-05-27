@@ -17,7 +17,13 @@
 package net.liftweb
 package common
 
-import java.util.{List => JavaList, Iterator => JavaIterator, ArrayList, ListIterator, Collection => JavaCollection}
+import java.util.{
+  List => JavaList,
+  Iterator => JavaIterator,
+  ArrayList,
+  ListIterator,
+  Collection => JavaCollection
+}
 
 /**
   * An immutable singly linked list that uses the Scala List class as backing
@@ -165,7 +171,7 @@ final case class SimpleList[T](underlying: List[T]) extends JavaList[T] {
       case _ =>
         contains(it.next().asInstanceOf[Object]) match {
           case false => false
-          case _ => check()
+          case _     => check()
         }
     }
 
@@ -322,7 +328,7 @@ final case class SimpleVector[T](underlying: Vector[T]) extends JavaList[T] {
       case _ =>
         contains(it.next().asInstanceOf[Object]) match {
           case false => false
-          case _ => check()
+          case _     => check()
         }
     }
 

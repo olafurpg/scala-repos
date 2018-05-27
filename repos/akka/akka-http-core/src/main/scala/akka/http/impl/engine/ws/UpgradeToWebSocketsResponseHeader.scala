@@ -9,8 +9,9 @@ import akka.http.scaladsl.model.ws.Message
 import akka.stream.{Graph, FlowShape}
 
 private[http] final case class UpgradeToWebSocketResponseHeader(
-    handler: Either[Graph[FlowShape[FrameEvent, FrameEvent], Any],
-                    Graph[FlowShape[Message, Message], Any]])
+    handler: Either[
+      Graph[FlowShape[FrameEvent, FrameEvent], Any],
+      Graph[FlowShape[Message, Message], Any]])
     extends InternalCustomHeader("UpgradeToWebSocketResponseHeader")
 
 private[http] abstract class InternalCustomHeader(val name: String)

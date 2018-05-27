@@ -41,9 +41,10 @@ object MarkovChain {
           .map(me => (me.j.toInt, me.value / total))
           .sortBy(_._1)
 
-        new SparseVector(noOfStates,
-                         sortedTopN.map(_._1).toArray,
-                         sortedTopN.map(_._2).toArray)
+        new SparseVector(
+          noOfStates,
+          sortedTopN.map(_._1).toArray,
+          sortedTopN.map(_._2).toArray)
       }
 
     new MarkovChainModel(transitionVectors, topN)
@@ -57,7 +58,8 @@ object MarkovChain {
   * @param n top N used to construct the model
   */
 case class MarkovChainModel(
-    transitionVectors: RDD[(Int, SparseVector)], n: Int) {
+    transitionVectors: RDD[(Int, SparseVector)],
+    n: Int) {
 
   /**
     * Calculate the probabilities of the next state
@@ -66,14 +68,16 @@ case class MarkovChainModel(
     */
   def predict(currentState: Seq[Double]): Seq[Double] = {
     // multiply the input with transition matrix row by row
-    val nextStateVectors = transitionVectors.map {
-      case (rowIndex, vector) =>
-        val values = vector.indices.map { index =>
-          vector(index) * currentState(rowIndex)
-        }
+    val nextStateVectors = transitionVectors
+      .map {
+        case (rowIndex, vector) =>
+          val values = vector.indices.map { index =>
+            vector(index) * currentState(rowIndex)
+          }
 
-        Vectors.sparse(currentState.size, vector.indices, values)
-    }.collect()
+          Vectors.sparse(currentState.size, vector.indices, values)
+      }
+      .collect()
 
     // sum up to get the total probabilities
     (0 until currentState.size).map { index =>

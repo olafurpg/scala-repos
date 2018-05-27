@@ -37,12 +37,13 @@ class NoSuchTableException(db: String, table: String)
 }
 
 class NoSuchPartitionException(
-    db: String, table: String, spec: TablePartitionSpec)
+    db: String,
+    table: String,
+    spec: TablePartitionSpec)
     extends NoSuchItemException {
 
   override def getMessage: String = {
-    s"Partition not found in table $table database $db:\n" + spec.mkString(
-        "\n")
+    s"Partition not found in table $table database $db:\n" + spec.mkString("\n")
   }
 }
 

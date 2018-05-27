@@ -37,7 +37,8 @@ import org.apache.spark.rdd.RDD
   *                        Same length as LabeledPoint.features, but values are bin indices.
   */
 private[spark] class TreePoint(
-    val label: Double, val binnedFeatures: Array[Int])
+    val label: Double,
+    val binnedFeatures: Array[Int])
     extends Serializable {}
 
 private[spark] object TreePoint {
@@ -50,15 +51,16 @@ private[spark] object TreePoint {
     * @param metadata  Learning and dataset metadata
     * @return  TreePoint dataset representation
     */
-  def convertToTreeRDD(input: RDD[LabeledPoint],
-                       bins: Array[Array[Bin]],
-                       metadata: DecisionTreeMetadata): RDD[TreePoint] = {
+  def convertToTreeRDD(
+      input: RDD[LabeledPoint],
+      bins: Array[Array[Bin]],
+      metadata: DecisionTreeMetadata): RDD[TreePoint] = {
     // Construct arrays for featureArity for efficiency in the inner loop.
     val featureArity: Array[Int] = new Array[Int](metadata.numFeatures)
     var featureIndex = 0
     while (featureIndex < metadata.numFeatures) {
-      featureArity(featureIndex) = metadata.featureArity.getOrElse(
-          featureIndex, 0)
+      featureArity(featureIndex) =
+        metadata.featureArity.getOrElse(featureIndex, 0)
       featureIndex += 1
     }
     input.map { x =>
@@ -72,15 +74,16 @@ private[spark] object TreePoint {
     * @param featureArity  Array indexed by feature, with value 0 for continuous and numCategories
     *                      for categorical features.
     */
-  private def labeledPointToTreePoint(labeledPoint: LabeledPoint,
-                                      bins: Array[Array[Bin]],
-                                      featureArity: Array[Int]): TreePoint = {
+  private def labeledPointToTreePoint(
+      labeledPoint: LabeledPoint,
+      bins: Array[Array[Bin]],
+      featureArity: Array[Int]): TreePoint = {
     val numFeatures = labeledPoint.features.size
     val arr = new Array[Int](numFeatures)
     var featureIndex = 0
     while (featureIndex < numFeatures) {
-      arr(featureIndex) = findBin(
-          featureIndex, labeledPoint, featureArity(featureIndex), bins)
+      arr(featureIndex) =
+        findBin(featureIndex, labeledPoint, featureArity(featureIndex), bins)
       featureIndex += 1
     }
     new TreePoint(labeledPoint.label, arr)
@@ -92,10 +95,11 @@ private[spark] object TreePoint {
     * @param featureArity  0 for continuous features; number of categories for categorical features.
     * @param bins   Bins for features, of size (numFeatures, numBins).
     */
-  private def findBin(featureIndex: Int,
-                      labeledPoint: LabeledPoint,
-                      featureArity: Int,
-                      bins: Array[Array[Bin]]): Int = {
+  private def findBin(
+      featureIndex: Int,
+      labeledPoint: LabeledPoint,
+      featureArity: Int,
+      bins: Array[Array[Bin]]): Int = {
 
     /**
       * Binary search helper method for continuous feature.
@@ -125,10 +129,9 @@ private[spark] object TreePoint {
       // Perform binary search for finding bin for continuous features.
       val binIndex = binarySearchForBins()
       if (binIndex == -1) {
-        throw new RuntimeException(
-            "No bin was found for continuous feature." +
-            " This error can occur when given invalid data values (such as NaN)." +
-            s" Feature index: $featureIndex.  Feature value: ${labeledPoint.features(featureIndex)}")
+        throw new RuntimeException("No bin was found for continuous feature." +
+          " This error can occur when given invalid data values (such as NaN)." +
+          s" Feature index: $featureIndex.  Feature value: ${labeledPoint.features(featureIndex)}")
       }
       binIndex
     } else {
@@ -136,7 +139,7 @@ private[spark] object TreePoint {
       val featureValue = labeledPoint.features(featureIndex)
       if (featureValue < 0 || featureValue >= featureArity) {
         throw new IllegalArgumentException(
-            s"DecisionTree given invalid data:" +
+          s"DecisionTree given invalid data:" +
             s" Feature $featureIndex is categorical with values in" +
             s" {0,...,${featureArity - 1}," +
             s" but a data point gives it value $featureValue.\n" +

@@ -7,7 +7,11 @@ import com.intellij.openapi.actionSystem.{ActionManager, IdeActions}
 import com.intellij.openapi.project.{Project => IJProject}
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.util.Getter
-import com.intellij.openapi.vcs.changes.{Change, ShortDiffDetails, VcsChangeDetailsManager}
+import com.intellij.openapi.vcs.changes.{
+  Change,
+  ShortDiffDetails,
+  VcsChangeDetailsManager
+}
 import com.intellij.openapi.vfs.VirtualFile
 import scala.collection.JavaConversions._
 import scala.collection.mutable
@@ -25,7 +29,8 @@ class ChangesConfirmationDialog private (
     private val changes: List[BuildFileChange],
     var myChangesBrowser: BuildFileChangeBrowser,
     val fileStatusMap: mutable.Map[
-        VirtualFile, (BuildFileModifiedStatus, Long)],
+      VirtualFile,
+      (BuildFileModifiedStatus, Long)],
     val canExcludeChanges: Boolean = false)
     extends DialogWrapper(project) {
 
@@ -34,8 +39,7 @@ class ChangesConfirmationDialog private (
 
   def selectedChanges: List[BuildFileChange] = {
     myChangesBrowser.getViewer.getIncludedChanges
-      .map(
-          change => BuildFileChange.swap(change.asInstanceOf[BuildFileChange]))
+      .map(change => BuildFileChange.swap(change.asInstanceOf[BuildFileChange]))
       .toList
   }
 
@@ -46,19 +50,26 @@ class ChangesConfirmationDialog private (
       new java.util.ArrayList[Change]()
     swappedChanges.addAll(changes.map(BuildFileChange.swap))
     val changesBrowser = new BuildFileChangeBrowser(
-        project, swappedChanges, canExcludeChanges, fileStatusMap)
+      project,
+      swappedChanges,
+      canExcludeChanges,
+      fileStatusMap)
     myChangesBrowser = changesBrowser
     changesBrowser.setChangesToDisplay(swappedChanges)
     changesBrowser.addToolbarAction(
-        ActionManager.getInstance.getAction(IdeActions.ACTION_EDIT_SOURCE))
+      ActionManager.getInstance.getAction(IdeActions.ACTION_EDIT_SOURCE))
     rootPane.add(changesBrowser)
 
-    val diffDetails = new ShortDiffDetails(project, new Getter[Array[Change]] {
-      def get: Array[Change] = {
-        val selectedChanges = changesBrowser.getViewer.getSelectedChanges
-        selectedChanges.toArray(new Array[Change](selectedChanges.size))
-      }
-    }, VcsChangeDetailsManager.getInstance(project))
+    val diffDetails = new ShortDiffDetails(
+      project,
+      new Getter[Array[Change]] {
+        def get: Array[Change] = {
+          val selectedChanges = changesBrowser.getViewer.getSelectedChanges
+          selectedChanges.toArray(new Array[Change](selectedChanges.size))
+        }
+      },
+      VcsChangeDetailsManager.getInstance(project)
+    )
     diffDetails.setParent(changesBrowser)
 
     rootPane
@@ -66,10 +77,10 @@ class ChangesConfirmationDialog private (
 }
 
 object ChangesConfirmationDialog {
-  def apply(project: IJProject,
-            changes: List[BuildFileChange],
-            fileChangesMap: mutable.Map[
-                VirtualFile, (BuildFileModifiedStatus, Long)])
+  def apply(
+      project: IJProject,
+      changes: List[BuildFileChange],
+      fileChangesMap: mutable.Map[VirtualFile, (BuildFileModifiedStatus, Long)])
     : ChangesConfirmationDialog =
     new ChangesConfirmationDialog(project, changes, null, fileChangesMap)
 }

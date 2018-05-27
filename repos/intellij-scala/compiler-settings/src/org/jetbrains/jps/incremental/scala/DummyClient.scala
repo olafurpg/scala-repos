@@ -9,11 +9,12 @@ import org.jetbrains.jps.incremental.messages.BuildMessage.Kind
   * Date: 12.02.15.
   */
 class DummyClient extends Client {
-  override def message(kind: Kind,
-                       text: String,
-                       source: Option[File],
-                       line: Option[Long],
-                       column: Option[Long]) {}
+  override def message(
+      kind: Kind,
+      text: String,
+      source: Option[File],
+      line: Option[Long],
+      column: Option[Long]) {}
 
   override def deleted(module: File) {}
 

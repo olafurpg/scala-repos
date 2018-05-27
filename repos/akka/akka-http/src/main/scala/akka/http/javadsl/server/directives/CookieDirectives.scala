@@ -17,6 +17,8 @@ abstract class CookieDirectives extends CodingDirectives {
     */
   @varargs
   def setCookie(
-      cookie: HttpCookie, innerRoute: Route, moreInnerRoutes: Route*): Route =
+      cookie: HttpCookie,
+      innerRoute: Route,
+      moreInnerRoutes: Route*): Route =
     RouteStructure.SetCookie(cookie)(innerRoute, moreInnerRoutes.toList)
 }

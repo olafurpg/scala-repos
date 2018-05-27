@@ -29,37 +29,46 @@ final class LeaderboardApi(coll: Coll, maxPerPage: Int) {
     import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework._
     coll
       .aggregate(
-          Match(BSONDocument("u" -> user.id)),
-          List(GroupField("v")("nb" -> SumValue(1),
-                               "points" -> Push("s"),
-                               "ratios" -> Push("w")))
+        Match(BSONDocument("u" -> user.id)),
+        List(
+          GroupField("v")(
+            "nb" -> SumValue(1),
+            "points" -> Push("s"),
+            "ratios" -> Push("w")))
       )
       .map {
         _.documents map leaderboardAggregationResultBSONHandler.read
       }
       .map { aggs =>
         ChartData {
-          aggs.flatMap { agg =>
-            PerfType.byId get agg._id map {
-              _ -> ChartData.PerfResult(nb = agg.nb,
-                                        points = ChartData.Ints(agg.points),
-                                        rank = ChartData.Ints(agg.ratios))
+          aggs
+            .flatMap { agg =>
+              PerfType.byId get agg._id map {
+                _ -> ChartData.PerfResult(
+                  nb = agg.nb,
+                  points = ChartData.Ints(agg.points),
+                  rank = ChartData.Ints(agg.ratios))
+              }
             }
-          }.sortLike(PerfType.leaderboardable, _._1)
+            .sortLike(PerfType.leaderboardable, _._1)
         }
       }
   }
 
   private def paginator(
-      user: User, page: Int, sort: BSONDocument): Fu[Paginator[TourEntry]] =
-    Paginator(adapter = new BSONAdapter[Entry](
-                    collection = coll,
-                    selector = BSONDocument("u" -> user.id),
-                    projection = BSONDocument(),
-                    sort = sort
-                ) mapFutureList withTournaments,
-              currentPage = page,
-              maxPerPage = maxPerPage)
+      user: User,
+      page: Int,
+      sort: BSONDocument): Fu[Paginator[TourEntry]] =
+    Paginator(
+      adapter = new BSONAdapter[Entry](
+        collection = coll,
+        selector = BSONDocument("u" -> user.id),
+        projection = BSONDocument(),
+        sort = sort
+      ) mapFutureList withTournaments,
+      currentPage = page,
+      maxPerPage = maxPerPage
+    )
 
   private def withTournaments(entries: Seq[Entry]): Fu[Seq[TourEntry]] =
     TournamentRepo byIds entries.map(_.tourId) map { tours =>
@@ -96,9 +105,10 @@ object LeaderboardApi {
       case head :: tail =>
         tail.foldLeft(head) {
           case (acc, res) =>
-            PerfResult(nb = acc.nb + res.nb,
-                       points = res.points ::: acc.points,
-                       rank = res.rank ::: acc.rank)
+            PerfResult(
+              nb = acc.nb + res.nb,
+              points = res.points ::: acc.points,
+              rank = res.rank ::: acc.rank)
         }
       case Nil => PerfResult(0, Ints(Nil), Ints(Nil))
     }
@@ -121,6 +131,9 @@ object LeaderboardApi {
     }
 
     case class AggregationResult(
-        _id: Int, nb: Int, points: List[Int], ratios: List[Int])
+        _id: Int,
+        nb: Int,
+        points: List[Int],
+        ratios: List[Int])
   }
 }

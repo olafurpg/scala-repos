@@ -21,10 +21,11 @@ package support
   * @author dlwh
   */
 class TensorValues[K, V, +This](
-    private val tensor: This, active: Boolean = false, f: (V) => Boolean = {
-  (x: Any) =>
-    true
-})(implicit ev: This <:< Tensor[K, V]) {
+    private val tensor: This,
+    active: Boolean = false,
+    f: (V) => Boolean = { (x: Any) =>
+      true
+    })(implicit ev: This <:< Tensor[K, V]) {
   def size = tensor.size
 
   def iterator = {
@@ -50,7 +51,7 @@ class TensorValues[K, V, +This](
   def map[TT >: This, O, That](fn: (V) => O)(
       implicit bf: CanMapValues[TT, V, O, That]): That = {
     tensor.mapValues(fn)(
-        bf.asInstanceOf[CanMapValues[Tensor[K, V], V, O, That]])
+      bf.asInstanceOf[CanMapValues[Tensor[K, V], V, O, That]])
   }
 
   def exists(f: V => Boolean) = iterator exists f

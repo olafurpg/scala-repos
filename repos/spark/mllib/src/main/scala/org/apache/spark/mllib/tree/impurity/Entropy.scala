@@ -68,7 +68,9 @@ object Entropy extends Impurity {
   @Since("1.0.0")
   @DeveloperApi
   override def calculate(
-      count: Double, sum: Double, sumSquares: Double): Double =
+      count: Double,
+      sum: Double,
+      sumSquares: Double): Double =
     throw new UnsupportedOperationException("Entropy.calculate")
 
   /**
@@ -86,25 +88,27 @@ object Entropy extends Impurity {
   * @param numClasses  Number of classes for label.
   */
 private[tree] class EntropyAggregator(numClasses: Int)
-    extends ImpurityAggregator(numClasses) with Serializable {
+    extends ImpurityAggregator(numClasses)
+    with Serializable {
 
   /**
     * Update stats for one (node, feature, bin) with the given label.
     * @param allStats  Flat stats array, with stats for this (node, feature, bin) contiguous.
     * @param offset    Start index of stats for this (node, feature, bin).
     */
-  def update(allStats: Array[Double],
-             offset: Int,
-             label: Double,
-             instanceWeight: Double): Unit = {
+  def update(
+      allStats: Array[Double],
+      offset: Int,
+      label: Double,
+      instanceWeight: Double): Unit = {
     if (label >= statsSize) {
       throw new IllegalArgumentException(
-          s"EntropyAggregator given label $label" +
+        s"EntropyAggregator given label $label" +
           s" but requires label < numClasses (= $statsSize).")
     }
     if (label < 0) {
       throw new IllegalArgumentException(
-          s"EntropyAggregator given label $label" +
+        s"EntropyAggregator given label $label" +
           s"but requires label is non-negative.")
     }
     allStats(offset + label.toInt) += instanceWeight
@@ -160,8 +164,8 @@ private[spark] class EntropyCalculator(stats: Array[Double])
   override def prob(label: Double): Double = {
     val lbl = label.toInt
     require(
-        lbl < stats.length,
-        s"EntropyCalculator.prob given invalid label: $lbl (should be < ${stats.length}")
+      lbl < stats.length,
+      s"EntropyCalculator.prob given invalid label: $lbl (should be < ${stats.length}")
     require(lbl >= 0, "Entropy does not support negative labels")
     val cnt = count
     if (cnt == 0) {

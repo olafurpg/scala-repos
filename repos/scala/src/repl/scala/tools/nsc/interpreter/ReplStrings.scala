@@ -17,8 +17,8 @@ trait ReplStrings {
     val res = new StringBuilder
     for (c <- str) c match {
       case '"' | '\'' | '\\' => res += '\\'; res += c
-      case _ if c.isControl => res ++= Chars.char2uescape(c)
-      case _ => res += c
+      case _ if c.isControl  => res ++= Chars.char2uescape(c)
+      case _                 => res += c
     }
     res.toString
   }

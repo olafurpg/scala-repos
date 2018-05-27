@@ -77,12 +77,13 @@ private[math] object Division {
     *  @param bLength the divisor's length
     *  @return the remainder
     */
-  def divide(quot: Array[Int],
-             quotLength: Int,
-             a: Array[Int],
-             aLength: Int,
-             b: Array[Int],
-             bLength: Int): Array[Int] = {
+  def divide(
+      quot: Array[Int],
+      quotLength: Int,
+      a: Array[Int],
+      aLength: Int,
+      b: Array[Int],
+      bLength: Int): Array[Int] = {
     val normA =
       new Array[Int](aLength + 1) // the normalized dividend an extra byte is needed for correct shift
     val normB = new Array[Int](bLength + 1) // the normalized divisor
@@ -153,7 +154,11 @@ private[math] object Division {
       // from normA.
       if (guessDigit != 0) {
         val borrow = Division.multiplyAndSubtract(
-            normA, j - normBLength, normB, normBLength, guessDigit)
+          normA,
+          j - normBLength,
+          normB,
+          normBLength,
+          guessDigit)
         // Step D5: check the borrow
         if (borrow != 0) {
           // Step D6: compensating addition
@@ -161,7 +166,7 @@ private[math] object Division {
           var carry: Long = 0
           for (k <- 0 until normBLength) {
             carry += (normA(j - normBLength + k) & UINT_MAX) +
-            (normB(k) & UINT_MAX)
+              (normB(k) & UINT_MAX)
             normA(j - normBLength + k) = carry.toInt
             carry >>>= 32
           }
@@ -192,7 +197,9 @@ private[math] object Division {
     *  @return an array of the form {@code [quotient, remainder]}.
     */
   def divideAndRemainderByInteger(
-      bi: BigInteger, divisor: Int, divisorSign: Int): QuotAndRem = {
+      bi: BigInteger,
+      divisor: Int,
+      divisorSign: Int): QuotAndRem = {
     val valDigits = bi.digits
     val valLen = bi.numberLength
     val valSign = bi.sign
@@ -211,8 +218,7 @@ private[math] object Division {
       var remainderDigits: Array[Int] = Array()
       val div = divideArrayByInt(quotientDigits, valDigits, valLen, divisor)
       remainderDigits = Array(div)
-      val result0 = new BigInteger(
-          quotientSign, quotientLength, quotientDigits)
+      val result0 = new BigInteger(quotientSign, quotientLength, quotientDigits)
       val result1 = new BigInteger(valSign, 1, remainderDigits)
       result0.cutOffLeadingZeroes()
       result1.cutOffLeadingZeroes()
@@ -232,7 +238,10 @@ private[math] object Division {
     *  @return remainder
     */
   def divideArrayByInt(
-      dest: Array[Int], src: Array[Int], srcLength: Int, divisor: Int): Int = {
+      dest: Array[Int],
+      src: Array[Int],
+      srcLength: Int,
+      divisor: Int): Int = {
     var rem: Long = 0
     val bLong: Long = divisor & UINT_MAX
     var i = srcLength - 1
@@ -329,9 +338,10 @@ private[math] object Division {
     *  @ar.org.fitc.ref "C. K. Koc - Montgomery Reduction with Even Modulus"
     *  @see BigInteger#modPow(BigInteger, BigInteger)
     */
-  def evenModPow(base: BigInteger,
-                 exponent: BigInteger,
-                 modulus: BigInteger): BigInteger = {
+  def evenModPow(
+      base: BigInteger,
+      exponent: BigInteger,
+      modulus: BigInteger): BigInteger = {
     // STEP 1: Obtain the factorization 'modulus'= q * 2^j.
     val j = modulus.getLowestSetBit
     val q = modulus.shiftRight(j)
@@ -368,7 +378,7 @@ private[math] object Division {
       while (i >= 0) {
         if (res(i) != modulusDigits(i)) {
           doSub = (res(i) != 0) &&
-          ((res(i) & UINT_MAX) > (modulusDigits(i) & UINT_MAX))
+            ((res(i) & UINT_MAX) > (modulusDigits(i) & UINT_MAX))
           //force break
           i = 0
         }
@@ -418,8 +428,8 @@ private[math] object Division {
       // Optimization for small operands
       // (op2.bitLength() < 32) implies by INV (op1.bitLength() < 32)
       if ((op2.numberLength == 1) && (op2.digits(0) > 0)) {
-        op2 = BigInteger.valueOf(
-            Division.gcdBinary(op1.intValue(), op2.intValue()))
+        op2 =
+          BigInteger.valueOf(Division.gcdBinary(op1.intValue(), op2.intValue()))
       } else {
         // Implements one step of the Euclidean algorithm
         // To reduce one operand if it's much smaller than the other one
@@ -692,10 +702,11 @@ private[math] object Division {
     *                   Multiplication Algorithms"
     *  @see #modPowOdd(BigInteger, BigInteger, BigInteger)
     */
-  def monPro(a: BigInteger,
-             b: BigInteger,
-             modulus: BigInteger,
-             n2: Int): BigInteger = {
+  def monPro(
+      a: BigInteger,
+      b: BigInteger,
+      modulus: BigInteger,
+      n2: Int): BigInteger = {
     val modulusLen = modulus.numberLength
     val res = new Array[Int]((modulusLen << 1) + 1)
 
@@ -717,7 +728,11 @@ private[math] object Division {
     *  @return the carry element of subtraction
     */
   def multiplyAndSubtract(
-      a: Array[Int], start: Int, b: Array[Int], bLen: Int, c: Int): Int = {
+      a: Array[Int],
+      start: Int,
+      b: Array[Int],
+      bLen: Int,
+      c: Int): Int = {
     var carry0: Long = 0
     var carry1: Long = 0
     for (i <- 0 until bLen) {
@@ -743,9 +758,10 @@ private[math] object Division {
     *  @see #squareAndMultiply(BigInteger, BigInteger, BigInteger, BigInteger,
     *       int)
     */
-  def oddModPow(base: BigInteger,
-                exponent: BigInteger,
-                modulus: BigInteger): BigInteger = {
+  def oddModPow(
+      base: BigInteger,
+      exponent: BigInteger,
+      modulus: BigInteger): BigInteger = {
     val k = modulus.numberLength << 5
     // n-residue of base [base * r (mod modulus)]
     val a2 = base.shiftLeft(k).mod(modulus)
@@ -815,7 +831,10 @@ private[math] object Division {
     *  @param divisor the divisor
     *  @return remainder
     */
-  def remainderArrayByInt(src: Array[Int], srcLength: Int, divisor: Int): Int = {
+  def remainderArrayByInt(
+      src: Array[Int],
+      srcLength: Int,
+      divisor: Int): Int = {
     var result: Long = 0
     var i = srcLength - 1
     while (i >= 0) {
@@ -838,11 +857,12 @@ private[math] object Division {
     *
     *  @see #oddModPow(BigInteger, BigInteger, BigInteger)
     */
-  def slidingWindow(x2: BigInteger,
-                    a2: BigInteger,
-                    exponent: BigInteger,
-                    modulus: BigInteger,
-                    n2: Int): BigInteger = {
+  def slidingWindow(
+      x2: BigInteger,
+      a2: BigInteger,
+      exponent: BigInteger,
+      modulus: BigInteger,
+      n2: Int): BigInteger = {
     // fill odd low pows of a2
     val pows = new Array[BigInteger](8)
     var res: BigInteger = x2
@@ -888,11 +908,12 @@ private[math] object Division {
     res
   }
 
-  def squareAndMultiply(x2: BigInteger,
-                        a2: BigInteger,
-                        exponent: BigInteger,
-                        modulus: BigInteger,
-                        n2: Int): BigInteger = {
+  def squareAndMultiply(
+      x2: BigInteger,
+      a2: BigInteger,
+      exponent: BigInteger,
+      modulus: BigInteger,
+      n2: Int): BigInteger = {
     var res = x2
     var i = exponent.bitLength() - 1
     while (i >= 0) {
@@ -954,7 +975,9 @@ private[math] object Division {
   }
 
   private def monReduction(
-      res: Array[Int], modulus: BigInteger, n2: Int): Unit = {
+      res: Array[Int],
+      modulus: BigInteger,
+      n2: Int): Unit = {
     import Multiplication._
 
     val modulusDigits = modulus.digits
@@ -964,8 +987,8 @@ private[math] object Division {
       var innnerCarry: Long = 0
       val m = Multiplication.unsignedMultAddAdd(res(i), n2, 0, 0).toInt
       for (j <- 0 until modulusLen) {
-        innnerCarry = unsignedMultAddAdd(
-            m, modulusDigits(j), res(i + j), innnerCarry.toInt)
+        innnerCarry =
+          unsignedMultAddAdd(m, modulusDigits(j), res(i + j), innnerCarry.toInt)
         res(i + j) = innnerCarry.toInt
         innnerCarry >>>= 32
       }

@@ -15,18 +15,18 @@ import breeze.stats.distributions.Rand
 import spire.syntax.cfor._
 
 /**
-  * Proximal operators and ADMM based Primal-Dual QP Solver 
-  * 
+  * Proximal operators and ADMM based Primal-Dual QP Solver
+  *
   * Reference: http://www.stanford.edu/~boyd/papers/admm/quadprog/quadprog.html
-  * 
-  * 
+  *
+  *
   * It solves problem that has the following structure
-  * 
+  *
   * 1/2 x'Hx + f'x + g(x)
   * s.t Aeqx = b
   *
   * g(x) represents the following constraints which covers ALS based matrix factorization use-cases
-  * 
+  *
   * 1. x >= 0
   * 2. lb <= x <= ub
   * 3. L1(x)
@@ -42,37 +42,40 @@ import spire.syntax.cfor._
   * @param alpha over-relaxation parameter default 1.0 1.5 - 1.8 can improve convergence
   * @author debasish83
   */
-class QuadraticMinimizer(nGram: Int,
-                         proximal: Proximal = null,
-                         Aeq: DenseMatrix[Double] = null,
-                         beq: DenseVector[Double] = null,
-                         maxIters: Int = -1,
-                         abstol: Double = 1e-6,
-                         reltol: Double = 1e-4,
-                         alpha: Double = 1.0)
+class QuadraticMinimizer(
+    nGram: Int,
+    proximal: Proximal = null,
+    Aeq: DenseMatrix[Double] = null,
+    beq: DenseVector[Double] = null,
+    maxIters: Int = -1,
+    abstol: Double = 1e-6,
+    reltol: Double = 1e-4,
+    alpha: Double = 1.0)
     extends SerializableLogging {
 
   type BDM = DenseMatrix[Double]
   type BDV = DenseVector[Double]
 
-  case class State private[QuadraticMinimizer](x: BDV,
-                                               u: BDV,
-                                               z: BDV,
-                                               scale: BDV,
-                                               R: BDM,
-                                               pivot: Array[Int],
-                                               xHat: BDV,
-                                               zOld: BDV,
-                                               residual: BDV,
-                                               s: BDV,
-                                               iter: Int,
-                                               converged: Boolean) {}
+  case class State private[QuadraticMinimizer] (
+      x: BDV,
+      u: BDV,
+      z: BDV,
+      scale: BDV,
+      R: BDM,
+      pivot: Array[Int],
+      xHat: BDV,
+      zOld: BDV,
+      residual: BDV,
+      s: BDV,
+      iter: Int,
+      converged: Boolean) {}
 
   val linearEquality = if (Aeq != null) Aeq.rows else 0
 
   if (linearEquality > 0)
-    require(beq.length == linearEquality,
-            s"QuadraticMinimizer linear equalities should match beq vector")
+    require(
+      beq.length == linearEquality,
+      s"QuadraticMinimizer linear equalities should match beq vector")
 
   val n = nGram + linearEquality
   val full = n * n
@@ -142,8 +145,9 @@ class QuadraticMinimizer(nGram: Int,
     * @param upper upper triangular gram matrix specified in primitive array
     */
   def updateGram(upper: Array[Double]): Unit = {
-    require(upper.length == upperSize,
-            s"QuadraticMinimizer:updateGram upper triangular size mismatch")
+    require(
+      upper.length == upperSize,
+      s"QuadraticMinimizer:updateGram upper triangular size mismatch")
     var i = 0
     var pos = 0
     var h = 0.0
@@ -202,13 +206,14 @@ class QuadraticMinimizer(nGram: Int,
     if (linearEquality > 0) {
       val equality = nlinear + beq.length
       require(
-          wsH.rows == equality && wsH.cols == equality,
-          s"QuadraticMinimizer:reset quasi definite and linear size mismatch")
+        wsH.rows == equality && wsH.cols == equality,
+        s"QuadraticMinimizer:reset quasi definite and linear size mismatch")
       // TO DO : Use LDL' for symmetric quasi definite matrix lapack.dsytrf
       lapack.dgetrf(n, n, wsH.data, scala.math.max(1, n), pivot, info)
     } else {
-      require(wsH.rows == nlinear && wsH.cols == nlinear,
-              s"QuadraticMinimizer:reset cholesky and linear size mismatch")
+      require(
+        wsH.rows == nlinear && wsH.cols == nlinear,
+        s"QuadraticMinimizer:reset cholesky and linear size mismatch")
       lapack.dpotrf("L", n, wsH.data, scala.math.max(1, n), info)
     }
 
@@ -219,14 +224,15 @@ class QuadraticMinimizer(nGram: Int,
     State(x, u, z, scale, wsH, pivot, xHat, zOld, residual, s, 0, false)
   }
 
-  private def updatePrimal(q: BDV,
-                           x: BDV,
-                           u: BDV,
-                           z: BDV,
-                           scale: BDV,
-                           rho: Double,
-                           R: BDM,
-                           pivot: Array[Int]) = {
+  private def updatePrimal(
+      q: BDV,
+      x: BDV,
+      u: BDV,
+      z: BDV,
+      scale: BDV,
+      rho: Double,
+      R: BDM,
+      pivot: Array[Int]) = {
     //scale = rho*(z - u) - q
     cforRange(0 until z.length) { i =>
       val entryScale = rho * (z(i) - u(i)) - q(i)
@@ -264,10 +270,11 @@ class QuadraticMinimizer(nGram: Int,
     * @param resetState use true if you want to hot start based on the provided state
     * @return converged state from ADMM algorithm
     */
-  def minimizeAndReturnState(q: DenseVector[Double],
-                             rho: Double,
-                             initialState: State,
-                             resetState: Boolean = true): State = {
+  def minimizeAndReturnState(
+      q: DenseVector[Double],
+      rho: Double,
+      initialState: State,
+      resetState: Boolean = true): State = {
     val startState = if (resetState) reset(q, initialState) else initialState
     import startState._
 
@@ -339,7 +346,18 @@ class QuadraticMinimizer(nGram: Int,
 
       if (residualNorm < epsPrimal && sNorm < epsDual) {
         return State(
-            x, u, z, scale, R, pivot, xHat, zOld, residual, s, nextIter, true)
+          x,
+          u,
+          z,
+          scale,
+          R,
+          pivot,
+          xHat,
+          zOld,
+          residual,
+          s,
+          nextIter,
+          true)
       }
       nextIter += 1
     }
@@ -348,18 +366,19 @@ class QuadraticMinimizer(nGram: Int,
 
   private def computeRhoSparse(H: DenseMatrix[Double]): Double = {
     val eigenMax = QuadraticMinimizer.normColumn(H)
-    require(linearEquality <= 0,
-            s"QuadraticMinimizer:computeRho L1 with affine not supported")
+    require(
+      linearEquality <= 0,
+      s"QuadraticMinimizer:computeRho L1 with affine not supported")
     val eigenMin = QuadraticMinimizer.approximateMinEigen(H)
     sqrt(eigenMin * eigenMax)
   }
 
   private def computeRho(H: DenseMatrix[Double]): Double = {
     proximal match {
-      case null => 0.0
-      case ProximalL1(lambda: Double) => computeRhoSparse(H)
+      case null                                      => 0.0
+      case ProximalL1(lambda: Double)                => computeRhoSparse(H)
       case ProjectProbabilitySimplex(lambda: Double) => computeRhoSparse(H)
-      case _ => sqrt(QuadraticMinimizer.normColumn(H))
+      case _                                         => sqrt(QuadraticMinimizer.normColumn(H))
     }
   }
 
@@ -373,7 +392,8 @@ class QuadraticMinimizer(nGram: Int,
     * @return converged state from QuadraticMinimizer
     */
   def minimizeAndReturnState(
-      q: DenseVector[Double], initialState: State): State = {
+      q: DenseVector[Double],
+      initialState: State): State = {
     val rho = computeRho(wsH)
     cforRange(0 until q.length) { i =>
       wsH.update(i, i, wsH(i, i) + rho)
@@ -389,9 +409,10 @@ class QuadraticMinimizer(nGram: Int,
     * @param initialState provide a initialState using initialState API for memory optimization
     * @return converged state from QuadraticMinimizer
     */
-  def minimizeAndReturnState(H: DenseMatrix[Double],
-                             q: DenseVector[Double],
-                             initialState: State): State = {
+  def minimizeAndReturnState(
+      H: DenseMatrix[Double],
+      q: DenseVector[Double],
+      initialState: State): State = {
     updateGram(H)
     minimizeAndReturnState(q, initialState)
   }
@@ -404,9 +425,10 @@ class QuadraticMinimizer(nGram: Int,
     * @param initialState provide a initialState using initialState API for memory optimization
     * @return converged state from QuadraticMinimizer
     */
-  def minimizeAndReturnState(upper: Array[Double],
-                             q: DenseVector[Double],
-                             initialState: State): State = {
+  def minimizeAndReturnState(
+      upper: Array[Double],
+      q: DenseVector[Double],
+      initialState: State): State = {
     updateGram(upper)
     minimizeAndReturnState(q, initialState)
   }
@@ -419,7 +441,8 @@ class QuadraticMinimizer(nGram: Int,
     * @return converged solution
     */
   def minimize(
-      q: DenseVector[Double], initialState: State): DenseVector[Double] = {
+      q: DenseVector[Double],
+      initialState: State): DenseVector[Double] = {
     minimizeAndReturnState(q, initialState).z
   }
 
@@ -431,9 +454,10 @@ class QuadraticMinimizer(nGram: Int,
     * @param initialState provide an optional initialState for memory optimization
     * @return converged solution
     */
-  def minimize(H: DenseMatrix[Double],
-               q: DenseVector[Double],
-               initialState: State): DenseVector[Double] = {
+  def minimize(
+      H: DenseMatrix[Double],
+      q: DenseVector[Double],
+      initialState: State): DenseVector[Double] = {
     minimizeAndReturnState(H, q, initialState).z
   }
 
@@ -445,21 +469,24 @@ class QuadraticMinimizer(nGram: Int,
     * @param initialState provide an optional initialState for memory optimization
     * @return converged solution
     */
-  def minimize(upper: Array[Double],
-               q: DenseVector[Double],
-               initialState: State): DenseVector[Double] = {
+  def minimize(
+      upper: Array[Double],
+      q: DenseVector[Double],
+      initialState: State): DenseVector[Double] = {
     minimizeAndReturnState(upper, q, initialState).z
   }
 
   def minimizeAndReturnState(
-      H: DenseMatrix[Double], q: DenseVector[Double]): State =
+      H: DenseMatrix[Double],
+      q: DenseVector[Double]): State =
     minimizeAndReturnState(H, q, initialize)
 
   def minimizeAndReturnState(q: DenseVector[Double]): State =
     minimizeAndReturnState(q, initialize)
 
   def minimize(
-      H: DenseMatrix[Double], q: DenseVector[Double]): DenseVector[Double] =
+      H: DenseMatrix[Double],
+      q: DenseVector[Double]): DenseVector[Double] =
     minimize(H, q, initialize)
 
   def minimize(q: DenseVector[Double]): DenseVector[Double] =
@@ -472,11 +499,12 @@ object QuadraticMinimizer {
     * y := alpha * A * x + beta * y
     * For `DenseMatrix` A.
     */
-  def gemv(alpha: Double,
-           A: DenseMatrix[Double],
-           x: DenseVector[Double],
-           beta: Double,
-           y: DenseVector[Double]): Unit = {
+  def gemv(
+      alpha: Double,
+      A: DenseMatrix[Double],
+      x: DenseVector[Double],
+      beta: Double,
+      y: DenseVector[Double]): Unit = {
     val tStrA = if (A.isTranspose) "T" else "N"
     val mA = if (!A.isTranspose) A.rows else A.cols
     val nA = if (!A.isTranspose) A.rows else A.cols
@@ -490,16 +518,28 @@ object QuadraticMinimizer {
     * @param pivot pivot from LU factorization
     * @param x the linear term for the solve which will also host the result
     */
-  def dgetrs(A: DenseMatrix[Double],
-             pivot: Array[Int],
-             x: DenseVector[Double]): Unit = {
+  def dgetrs(
+      A: DenseMatrix[Double],
+      pivot: Array[Int],
+      x: DenseVector[Double]): Unit = {
     val n = x.length
     require(A.rows == n)
     val nrhs = 1
     val info: intW = new intW(0)
 
     lapack.dgetrs(
-        "No transpose", n, nrhs, A.data, 0, n, pivot, 0, x.data, 0, n, info)
+      "No transpose",
+      n,
+      nrhs,
+      A.data,
+      0,
+      n,
+      pivot,
+      0,
+      x.data,
+      0,
+      n,
+      info)
     if (info.`val` > 0)
       throw new LapackException("DGETRS: LU solve unsuccessful")
   }
@@ -519,7 +559,7 @@ object QuadraticMinimizer {
 
     if (info.`val` > 0)
       throw new LapackException(
-          "DPOTRS : Leading minor of order i of A is not positive definite.")
+        "DPOTRS : Leading minor of order i of A is not positive definite.")
   }
 
   //upper bound on max eigen value
@@ -551,35 +591,37 @@ object QuadraticMinimizer {
     1.0 / pmInv.eigen(R, init)
   }
 
-  def apply(rank: Int,
-            constraint: Constraint,
-            lambda: Double = 1.0): QuadraticMinimizer = {
+  def apply(
+      rank: Int,
+      constraint: Constraint,
+      lambda: Double = 1.0): QuadraticMinimizer = {
     constraint match {
-      case SMOOTH => new QuadraticMinimizer(rank)
+      case SMOOTH   => new QuadraticMinimizer(rank)
       case POSITIVE => new QuadraticMinimizer(rank, ProjectPos())
       case BOX => {
-          //Direct QP with bounds
-          val lb = DenseVector.zeros[Double](rank)
-          val ub = DenseVector.ones[Double](rank)
-          new QuadraticMinimizer(rank, ProjectBox(lb, ub))
-        }
+        //Direct QP with bounds
+        val lb = DenseVector.zeros[Double](rank)
+        val ub = DenseVector.ones[Double](rank)
+        new QuadraticMinimizer(rank, ProjectBox(lb, ub))
+      }
       case PROBABILITYSIMPLEX => {
-          new QuadraticMinimizer(rank, ProjectProbabilitySimplex(lambda))
-        }
+        new QuadraticMinimizer(rank, ProjectProbabilitySimplex(lambda))
+      }
       case EQUALITY => {
-          //Direct QP with equality and positivity constraint
-          val Aeq = DenseMatrix.ones[Double](1, rank)
-          val beq = DenseVector.ones[Double](1)
-          new QuadraticMinimizer(rank, ProjectPos(), Aeq, beq)
-        }
+        //Direct QP with equality and positivity constraint
+        val Aeq = DenseMatrix.ones[Double](1, rank)
+        val beq = DenseVector.ones[Double](1)
+        new QuadraticMinimizer(rank, ProjectPos(), Aeq, beq)
+      }
       case SPARSE =>
         new QuadraticMinimizer(rank, ProximalL1().setLambda(lambda))
     }
   }
 
-  def computeObjective(h: DenseMatrix[Double],
-                       q: DenseVector[Double],
-                       x: DenseVector[Double]): Double = {
+  def computeObjective(
+      h: DenseMatrix[Double],
+      q: DenseVector[Double],
+      x: DenseVector[Double]): Double = {
     val res = (x.t * h * x) * 0.5 + q.dot(x)
     res
   }
@@ -591,9 +633,10 @@ object QuadraticMinimizer {
     }
   }
 
-  def optimizeWithLBFGS(init: DenseVector[Double],
-                        H: DenseMatrix[Double],
-                        q: DenseVector[Double]) = {
+  def optimizeWithLBFGS(
+      init: DenseVector[Double],
+      H: DenseMatrix[Double],
+      q: DenseVector[Double]) = {
     val lbfgs = new LBFGS[DenseVector[Double]](-1, 7)
     val state = lbfgs.minimizeAndReturnState(Cost(H, q), init)
     state.x
@@ -603,7 +646,7 @@ object QuadraticMinimizer {
     if (args.length < 4) {
       println("Usage: QpSolver n m lambda beta")
       println(
-          "Test QpSolver with a simple quadratic function of dimension n and m equalities lambda beta for elasticNet")
+        "Test QpSolver with a simple quadratic function of dimension n and m equalities lambda beta for elasticNet")
       sys.exit(1)
     }
 
@@ -614,11 +657,11 @@ object QuadraticMinimizer {
     val beta = args(3).toDouble
 
     println(
-        s"Generating randomized QPs with rank ${problemSize} equalities ${nequalities}")
+      s"Generating randomized QPs with rank ${problemSize} equalities ${nequalities}")
     val (aeq, b, bl, bu, q, h) = QpGenerator(problemSize, nequalities)
 
     println(
-        s"Test QuadraticMinimizer, CG , BFGS and OWLQN with $problemSize variables and $nequalities equality constraints")
+      s"Test QuadraticMinimizer, CG , BFGS and OWLQN with $problemSize variables and $nequalities equality constraints")
 
     val luStart = System.nanoTime()
     val luResult = h \ q :* (-1.0)
@@ -636,17 +679,16 @@ object QuadraticMinimizer {
     val qpTime = System.nanoTime() - qpStart
 
     val startBFGS = System.nanoTime()
-    val bfgsResult = optimizeWithLBFGS(
-        DenseVector.rand[Double](problemSize), h, q)
+    val bfgsResult =
+      optimizeWithLBFGS(DenseVector.rand[Double](problemSize), h, q)
     val bfgsTime = System.nanoTime() - startBFGS
 
-    println(s"||qp - lu|| norm ${norm(result - luResult, 2)} max-norm ${norm(
-        result - luResult, inf)}")
-    println(s"||cg - lu|| norm ${norm(cgResult - luResult, 2)} max-norm ${norm(
-        cgResult - luResult, inf)}")
     println(
-        s"||bfgs - lu|| norm ${norm(bfgsResult - luResult, 2)} max-norm ${norm(
-        bfgsResult - luResult, inf)}")
+      s"||qp - lu|| norm ${norm(result - luResult, 2)} max-norm ${norm(result - luResult, inf)}")
+    println(
+      s"||cg - lu|| norm ${norm(cgResult - luResult, 2)} max-norm ${norm(cgResult - luResult, inf)}")
+    println(
+      s"||bfgs - lu|| norm ${norm(bfgsResult - luResult, 2)} max-norm ${norm(bfgsResult - luResult, inf)}")
 
     val luObj = computeObjective(h, q, luResult)
     val bfgsObj = computeObjective(h, q, bfgsResult)
@@ -655,7 +697,7 @@ object QuadraticMinimizer {
     println(s"Objective lu $luObj bfgs $bfgsObj qp $qpObj")
 
     println(
-        s"dim ${problemSize} lu ${luTime / 1e6} ms qp ${qpTime / 1e6} ms cg ${cgTime / 1e6} ms bfgs ${bfgsTime / 1e6} ms")
+      s"dim ${problemSize} lu ${luTime / 1e6} ms qp ${qpTime / 1e6} ms cg ${cgTime / 1e6} ms bfgs ${bfgsTime / 1e6} ms")
 
     val lambdaL1 = lambda * beta
     val lambdaL2 = lambda * (1 - beta)
@@ -674,11 +716,11 @@ object QuadraticMinimizer {
       owlqn.minimizeAndReturnState(Cost(regularizedGram, q), init)
     val owlqnTime = System.nanoTime() - startOWLQN
 
+    println(s"||owlqn - sparseqp|| norm ${norm(
+      owlqnResult.x - sparseQpResult.x,
+      2)} inf-norm ${norm(owlqnResult.x - sparseQpResult.x, inf)}")
     println(
-        s"||owlqn - sparseqp|| norm ${norm(owlqnResult.x - sparseQpResult.x, 2)} inf-norm ${norm(
-        owlqnResult.x - sparseQpResult.x, inf)}")
-    println(
-        s"sparseQp ${sparseQpTime / 1e6} ms iters ${sparseQpResult.iter} owlqn ${owlqnTime / 1e6} ms iters ${owlqnResult.iter}")
+      s"sparseQp ${sparseQpTime / 1e6} ms iters ${sparseQpResult.iter} owlqn ${owlqnTime / 1e6} ms iters ${owlqnResult.iter}")
 
     val posQp = QuadraticMinimizer(h.rows, POSITIVE, 0.0)
     val posQpStart = System.nanoTime()
@@ -691,7 +733,7 @@ object QuadraticMinimizer {
     val nnlsTime = System.nanoTime() - nnlsStart
 
     println(
-        s"posQp ${posQpTime / 1e6} ms iters ${posQpResult.iter} nnls ${nnlsTime / 1e6} ms iters ${nnlsResult.iter}")
+      s"posQp ${posQpTime / 1e6} ms iters ${posQpResult.iter} nnls ${nnlsTime / 1e6} ms iters ${nnlsResult.iter}")
 
     val boundsQp = new QuadraticMinimizer(h.rows, ProjectBox(bl, bu))
     val boundsQpStart = System.nanoTime()
@@ -699,7 +741,7 @@ object QuadraticMinimizer {
     val boundsQpTime = System.nanoTime() - boundsQpStart
 
     println(
-        s"boundsQp ${boundsQpTime / 1e6} ms iters ${boundsQpResult.iter} converged ${boundsQpResult.converged}")
+      s"boundsQp ${boundsQpTime / 1e6} ms iters ${boundsQpResult.iter} converged ${boundsQpResult.converged}")
 
     val qpEquality = new QuadraticMinimizer(h.rows, ProjectPos(), aeq, b)
     val qpEqualityStart = System.nanoTime()
@@ -707,6 +749,6 @@ object QuadraticMinimizer {
     val qpEqualityTime = System.nanoTime() - qpEqualityStart
 
     println(
-        s"Qp Equality ${qpEqualityTime / 1e6} ms iters ${qpEqualityResult.iter} converged ${qpEqualityResult.converged}")
+      s"Qp Equality ${qpEqualityTime / 1e6} ms iters ${qpEqualityResult.iter} converged ${qpEqualityResult.converged}")
   }
 }

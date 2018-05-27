@@ -188,7 +188,7 @@ abstract class BCodeSyncAndTry extends BCodeBodyBuilder {
             case Typed(Ident(nme.WILDCARD), tpt) =>
               NamelessEH(tpeTK(tpt).asClassBType, caseBody)
             case Ident(nme.WILDCARD) => NamelessEH(jlThrowableRef, caseBody)
-            case Bind(_, _) => BoundEH(pat.symbol, caseBody)
+            case Bind(_, _)          => BoundEH(pat.symbol, caseBody)
           }
         }
 
@@ -296,7 +296,7 @@ abstract class BCodeSyncAndTry extends BCodeBodyBuilder {
           currProgramPoint() // version of the finally-clause reached via unhandled exception.
         protect(startTryBody, finalHandler, finalHandler, null)
         val Local(eTK, _, eIdx, _) = locals(
-            locals.makeLocal(jlThrowableRef, "exc"))
+          locals.makeLocal(jlThrowableRef, "exc"))
         bc.store(eIdx, eTK)
         emitFinalizer(finalizer, null, isDuplicate = true)
         bc.load(eIdx, eTK)
@@ -362,16 +362,17 @@ abstract class BCodeSyncAndTry extends BCodeBodyBuilder {
       }
     }
 
-    def protect(start: asm.Label,
-                end: asm.Label,
-                handler: asm.Label,
-                excType: ClassBType) {
+    def protect(
+        start: asm.Label,
+        end: asm.Label,
+        handler: asm.Label,
+        excType: ClassBType) {
       val excInternalName: String =
         if (excType == null) null
         else excType.internalName
       assert(
-          start != end,
-          "protecting a range of zero instructions leads to illegal class format. Solution: add a NOP to that range.")
+        start != end,
+        "protecting a range of zero instructions leads to illegal class format. Solution: add a NOP to that range.")
       mnode.visitTryCatchBlock(start, end, handler, excInternalName)
     }
 

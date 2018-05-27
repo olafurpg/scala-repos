@@ -155,8 +155,9 @@ object Generic {
     */
   def apply[T](implicit gen: Generic[T]): Aux[T, gen.Repr] = gen
 
-  implicit def materialize[T, R]: Aux[T, R] = macro GenericMacros
-    .materialize[T, R]
+  implicit def materialize[T, R]: Aux[T, R] =
+    macro GenericMacros
+      .materialize[T, R]
 }
 
 /**
@@ -232,7 +233,10 @@ object LabelledGeneric {
 
   /** Handles the Coproduct case (specifying subclasses derive from a sealed trait) */
   implicit def materializeCoproduct[
-      T, K <: HList, V <: Coproduct, R <: Coproduct](
+      T,
+      K <: HList,
+      V <: Coproduct,
+      R <: Coproduct](
       implicit lab: DefaultSymbolicLabelling.Aux[T, K],
       gen: Generic.Aux[T, V],
       zip: coproduct.ZipWithKeys.Aux[K, V, R],
@@ -255,15 +259,17 @@ object IsTuple {
 class HasProductGeneric[T] extends Serializable
 
 object HasProductGeneric {
-  implicit def apply[T]: HasProductGeneric[T] = macro GenericMacros
-    .mkHasProductGeneric[T]
+  implicit def apply[T]: HasProductGeneric[T] =
+    macro GenericMacros
+      .mkHasProductGeneric[T]
 }
 
 class HasCoproductGeneric[T] extends Serializable
 
 object HasCoproductGeneric {
-  implicit def apply[T]: HasCoproductGeneric[T] = macro GenericMacros
-    .mkHasCoproductGeneric[T]
+  implicit def apply[T]: HasCoproductGeneric[T] =
+    macro GenericMacros
+      .mkHasCoproductGeneric[T]
 }
 
 @macrocompat.bundle
@@ -309,7 +315,7 @@ trait CaseClassMacros extends ReprTypes {
 
   def isProductAux(tpe: Type): Boolean =
     tpe.typeSymbol.isClass &&
-    (isCaseClassLike(classSym(tpe)) || HasApplyUnapply(tpe) ||
+      (isCaseClassLike(classSym(tpe)) || HasApplyUnapply(tpe) ||
         HasCtorUnapply(tpe))
 
   def isProduct(tpe: Type): Boolean =
@@ -317,7 +323,7 @@ trait CaseClassMacros extends ReprTypes {
 
   def isProduct1(tpe: Type): Boolean =
     lowerKind(tpe) =:= typeOf[Unit] ||
-    (!(lowerKind(tpe) =:= typeOf[AnyRef]) && isProductAux(tpe))
+      (!(lowerKind(tpe) =:= typeOf[AnyRef]) && isProductAux(tpe))
 
   def isCoproduct(tpe: Type): Boolean = {
     val sym = tpe.typeSymbol
@@ -368,9 +374,9 @@ trait CaseClassMacros extends ReprTypes {
   def accessiblePrimaryCtorOf(tpe: Type): Option[Symbol] = {
     for {
       ctor <- tpe.decls.find { sym =>
-               sym.isMethod && sym.asMethod.isPrimaryConstructor &&
-               isAccessible(tpe, sym)
-             } if !ctor.isJava || productCtorsOf(tpe).size == 1
+        sym.isMethod && sym.asMethod.isPrimaryConstructor &&
+        isAccessible(tpe, sym)
+      } if !ctor.isJava || productCtorsOf(tpe).size == 1
     } yield ctor
   }
 
@@ -443,7 +449,8 @@ trait CaseClassMacros extends ReprTypes {
                 c.internal.singleType(valPre, valSym)
               } else {
                 val path =
-                  suffix.tail.init.map(_.name.toTermName) :+ suffix.last.name.toTypeName
+                  suffix.tail.init
+                    .map(_.name.toTermName) :+ suffix.last.name.toTypeName
                 val (subTpePre, subTpeSym) = mkDependentRef(basePre, path)
                 c.internal.typeRef(subTpePre, subTpeSym, substituteArgs)
               }
@@ -456,7 +463,7 @@ trait CaseClassMacros extends ReprTypes {
       ctors
     } else
       abort(
-          s"$tpe is not a case class, case class-like, a sealed trait or Unit")
+        s"$tpe is not a case class, case class-like, a sealed trait or Unit")
   }
 
   def nameAsString(name: Name): String = name.decodedName.toString.trim
@@ -477,7 +484,8 @@ trait CaseClassMacros extends ReprTypes {
 
   def mkLabelTpe(name: Name): Type =
     appliedType(
-        atatTpe, List(typeOf[scala.Symbol], constantType(nameAsValue(name))))
+      atatTpe,
+      List(typeOf[scala.Symbol], constantType(nameAsValue(name))))
 
   def mkFieldTpe(name: Name, valueTpe: Type): Type = {
     appliedType(fieldTypeTpe, List(mkLabelTpe(name), valueTpe))
@@ -538,8 +546,8 @@ trait CaseClassMacros extends ReprTypes {
       case PolyType(params, body) if params.head.asType.toType =:= param =>
         appliedTypTree1(body, param, arg)
       case t @ TypeRef(pre, sym, List()) if t.takesTypeArgs =>
-        val argTrees = t.typeParams.map(
-            sym => appliedTypTree1(sym.asType.toType, param, arg))
+        val argTrees = t.typeParams.map(sym =>
+          appliedTypTree1(sym.asType.toType, param, arg))
         AppliedTypeTree(mkAttributedRef(pre, sym), argTrees)
       case TypeRef(pre, sym, List()) =>
         mkAttributedRef(pre, sym)
@@ -547,8 +555,8 @@ trait CaseClassMacros extends ReprTypes {
         val argTrees = args.map(appliedTypTree1(_, param, arg))
         AppliedTypeTree(mkAttributedRef(pre, sym), argTrees)
       case t if t.takesTypeArgs =>
-        val argTrees = t.typeParams.map(
-            sym => appliedTypTree1(sym.asType.toType, param, arg))
+        val argTrees = t.typeParams.map(sym =>
+          appliedTypTree1(sym.asType.toType, param, arg))
         AppliedTypeTree(mkAttributedRef(tpe.typeConstructor), argTrees)
       case t =>
         tq"$tpe"
@@ -561,15 +569,17 @@ trait CaseClassMacros extends ReprTypes {
         AppliedTypeTree(mkAttributedRef(cons), List(mkTypTree(tpe), acc))
     }
 
-  def mkCompoundTypTree1(nil: Type,
-                         cons: Type,
-                         items: List[Type],
-                         param: Type,
-                         arg: TypeName): Tree =
+  def mkCompoundTypTree1(
+      nil: Type,
+      cons: Type,
+      items: List[Type],
+      param: Type,
+      arg: TypeName): Tree =
     items.foldRight(mkAttributedRef(nil): Tree) {
       case (tpe, acc) =>
         AppliedTypeTree(
-            mkAttributedRef(cons), List(appliedTypTree1(tpe, param, arg), acc))
+          mkAttributedRef(cons),
+          List(appliedTypTree1(tpe, param, arg), acc))
     }
 
   def mkHListTypTree(items: List[Type]): Tree =
@@ -581,11 +591,13 @@ trait CaseClassMacros extends ReprTypes {
   def mkCoproductTypTree(items: List[Type]): Tree =
     mkCompoundTypTree(cnilTpe, cconsTpe, items)
 
-  def mkCoproductTypTree1(
-      items: List[Type], param: Type, arg: TypeName): Tree =
+  def mkCoproductTypTree1(items: List[Type], param: Type, arg: TypeName): Tree =
     mkCompoundTypTree1(cnilTpe, cconsTpe, items, param, arg)
 
-  def unfoldCompoundTpe(compoundTpe: Type, nil: Type, cons: Type): List[Type] = {
+  def unfoldCompoundTpe(
+      compoundTpe: Type,
+      nil: Type,
+      cons: Type): List[Type] = {
     @tailrec
     def loop(tpe: Type, acc: List[Type]): List[Type] =
       tpe.dealias match {
@@ -613,7 +625,7 @@ trait CaseClassMacros extends ReprTypes {
     tpe match {
       case t if (tpe.takesTypeArgs) => t.typeParams.head.asType.toType
       case TypeRef(_, _, List(arg)) => arg
-      case _ => NoType
+      case _                        => NoType
     }
 
   def reprTypTree(tpe: Type): Tree = {
@@ -641,14 +653,15 @@ trait CaseClassMacros extends ReprTypes {
 
     sym.isCaseClass ||
     (!sym.isAbstract && !sym.isTrait && !(sym == symbolOf[Object]) &&
-        sym.knownDirectSubclasses.isEmpty && checkCtor)
+    sym.knownDirectSubclasses.isEmpty && checkCtor)
   }
 
   def isCaseObjectLike(sym: ClassSymbol): Boolean = sym.isModuleClass
 
   def isCaseAccessorLike(sym: TermSymbol): Boolean =
     !isNonGeneric(sym) && sym.isPublic &&
-    (if (sym.owner.asClass.isCaseClass) sym.isCaseAccessor else sym.isAccessor)
+      (if (sym.owner.asClass.isCaseClass) sym.isCaseAccessor
+       else sym.isAccessor)
 
   def isSealedHierarchyClassSymbol(symbol: ClassSymbol): Boolean = {
     def helper(classSym: ClassSymbol): Boolean = {
@@ -694,8 +707,8 @@ trait CaseClassMacros extends ReprTypes {
       .asInstanceOf[global.analyzer.Typer]
     val typerContext = typer.context
     typerContext.isAccessible(
-        sym.asInstanceOf[global.Symbol],
-        pre.asInstanceOf[global.Type]
+      sym.asInstanceOf[global.Symbol],
+      pre.asInstanceOf[global.Type]
     )
   }
   def isAccessible(tpe: Type): Boolean =
@@ -736,11 +749,11 @@ trait CaseClassMacros extends ReprTypes {
                   val lookupResult =
                     ctx.scope.lookupAll(name).filter(criterion).toList
                   lookupResult match {
-                    case Nil => NoSymbol
+                    case Nil          => NoSymbol
                     case List(unique) => unique
                     case _ =>
                       aabort(
-                          s"unexpected multiple results for a companion symbol lookup for $original#{$original.id}")
+                        s"unexpected multiple results for a companion symbol lookup for $original#{$original.id}")
                   }
                 }
                 if (s != NoSymbol && s.owner == expectedOwner) res = s
@@ -751,11 +764,12 @@ trait CaseClassMacros extends ReprTypes {
           }
       }
       ctx
-        .patchedLookup(original.asInstanceOf[global.Symbol].name.companionName,
-                       owner.asInstanceOf[global.Symbol])
+        .patchedLookup(
+          original.asInstanceOf[global.Symbol].name.companionName,
+          owner.asInstanceOf[global.Symbol])
         .suchThat(sym =>
-              (original.isTerm || sym.hasModuleFlag) &&
-              (sym isCoDefinedWith original.asInstanceOf[global.Symbol]))
+          (original.isTerm || sym.hasModuleFlag) &&
+            (sym isCoDefinedWith original.asInstanceOf[global.Symbol]))
         .asInstanceOf[c.universe.Symbol]
     }
   }
@@ -826,14 +840,15 @@ trait CaseClassMacros extends ReprTypes {
     if (fields.length != ts.length) None
     else {
       @tailrec
-      def loop(fields: Seq[(TermName, Type)],
-               ts: Seq[Type],
-               acc: List[(TermName, Type)]): Option[List[(TermName, Type)]] =
+      def loop(
+          fields: Seq[(TermName, Type)],
+          ts: Seq[Type],
+          acc: List[(TermName, Type)]): Option[List[(TermName, Type)]] =
         ts match {
           case Nil => Some(acc.reverse)
-          case Seq(hd, tl @ _ *) =>
+          case Seq(hd, tl @ _*) =>
             fields.span { case (_, tpe) => !(tpe =:= hd) } match {
-              case (fpre, List(f, fsuff @ _ *)) =>
+              case (fpre, List(f, fsuff @ _*)) =>
                 loop(fpre ++ fsuff, tl, f :: acc)
               case _ => None
             }
@@ -854,8 +869,8 @@ trait CaseClassMacros extends ReprTypes {
         val applyParamss = applySym.asMethod.paramLists
         if (applyParamss.length == 1)
           alignFields(
-              tpe,
-              applyParamss.head.map(tpe => unByName(tpe.infoIn(companionTpe))))
+            tpe,
+            applyParamss.head.map(tpe => unByName(tpe.infoIn(companionTpe))))
         else None
       } else None
     }
@@ -877,7 +892,7 @@ trait CaseClassMacros extends ReprTypes {
               if o <:< typeOf[Product] =>
             Some(args)
           case TypeRef(_, _, args @ List(arg)) => Some(args)
-          case _ => None
+          case _                               => None
         } else None
     }
   }
@@ -892,7 +907,8 @@ trait CaseClassMacros extends ReprTypes {
           val ctorParamss = ctorSym.asMethod.infoIn(tpe).paramLists
           if (ctorParamss.length == 1)
             alignFields(
-                tpe, ctorParamss.head.map(param => unByName(param.info)))
+              tpe,
+              ctorParamss.head.map(param => unByName(param.info)))
           else None
         case _ => None
       }
@@ -970,9 +986,10 @@ trait CaseClassMacros extends ReprTypes {
         }
       }
 
-      def mkCtorDtor1(elems: List[(TermName, TermName, Type)],
-                      pattern: Tree,
-                      rhs: List[Tree]) = {
+      def mkCtorDtor1(
+          elems: List[(TermName, TermName, Type)],
+          pattern: Tree,
+          rhs: List[Tree]) = {
         val reprPattern = elems.foldRight(q"_root_.shapeless.HNil": Tree) {
           case ((bound, _, _), acc) => pq"_root_.shapeless.::($bound, $acc)"
         }
@@ -1059,7 +1076,7 @@ class GenericMacros(val c: whitebox.Context) extends CaseClassMacros {
   import internal.constantType
   import Flag._
 
-  def materialize[T : WeakTypeTag, R : WeakTypeTag]: Tree = {
+  def materialize[T: WeakTypeTag, R: WeakTypeTag]: Tree = {
     val tpe = weakTypeOf[T]
     if (isReprType(tpe))
       abort("No Generic instance available for HList or Coproduct")
@@ -1114,7 +1131,7 @@ class GenericMacros(val c: whitebox.Context) extends CaseClassMacros {
     """
   }
 
-  def mkIsTuple[T : WeakTypeTag]: Tree = {
+  def mkIsTuple[T: WeakTypeTag]: Tree = {
     val tTpe = weakTypeOf[T]
     if (!isTuple(tTpe))
       abort(s"Unable to materialize IsTuple for non-tuple type $tTpe")
@@ -1122,7 +1139,7 @@ class GenericMacros(val c: whitebox.Context) extends CaseClassMacros {
     q"""new _root_.shapeless.IsTuple[$tTpe]: _root_.shapeless.IsTuple[$tTpe]"""
   }
 
-  def mkHasProductGeneric[T : WeakTypeTag]: Tree = {
+  def mkHasProductGeneric[T: WeakTypeTag]: Tree = {
     val tTpe = weakTypeOf[T]
     if (isReprType(tTpe) || !isProduct(tTpe))
       abort(s"Unable to materialize HasProductGeneric for $tTpe")
@@ -1130,7 +1147,7 @@ class GenericMacros(val c: whitebox.Context) extends CaseClassMacros {
     q"""new _root_.shapeless.HasProductGeneric[$tTpe]: _root_.shapeless.HasProductGeneric[$tTpe]"""
   }
 
-  def mkHasCoproductGeneric[T : WeakTypeTag]: Tree = {
+  def mkHasCoproductGeneric[T: WeakTypeTag]: Tree = {
     val tTpe = weakTypeOf[T]
     if (isReprType(tTpe) || !isCoproduct(tTpe))
       abort(s"Unable to materialize HasCoproductGeneric for $tTpe")

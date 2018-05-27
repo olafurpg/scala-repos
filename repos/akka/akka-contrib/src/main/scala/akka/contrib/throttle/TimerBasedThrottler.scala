@@ -111,9 +111,10 @@ private[throttle] object TimerBasedThrottler {
   final case class Message(message: Any, sender: ActorRef)
 
   // The data of the FSM
-  final case class Data(target: Option[ActorRef],
-                        callsLeftInThisPeriod: Int,
-                        queue: Q[Message])
+  final case class Data(
+      target: Option[ActorRef],
+      callsLeftInThisPeriod: Int,
+      queue: Q[Message])
 }
 
 /**
@@ -236,7 +237,7 @@ class TimerBasedThrottler(var rate: Rate) extends Actor with FSM[State, Data] {
       stay using d.copy(queue = queue.enqueue(Message(msg, context.sender())))
     case Event(msg, d @ Data(Some(_), _, Seq())) ⇒
       goto(Active) using deliverMessages(
-          d.copy(queue = Q(Message(msg, context.sender()))))
+        d.copy(queue = Q(Message(msg, context.sender()))))
     // Note: The case Event(msg, t @ Data(Some(_), _, _, Seq(_*))) should never happen here.
   }
 
@@ -269,7 +270,7 @@ class TimerBasedThrottler(var rate: Rate) extends Actor with FSM[State, Data] {
     // Period ends and we get more occasions to send messages
     case Event(Tick, d @ Data(_, _, _)) ⇒
       stay using deliverMessages(
-          d.copy(callsLeftInThisPeriod = rate.numberOfCalls))
+        d.copy(callsLeftInThisPeriod = rate.numberOfCalls))
 
     // Queue a message (when we cannot send messages in the current period anymore)
     case Event(msg, d @ Data(_, 0, queue)) ⇒
@@ -278,7 +279,7 @@ class TimerBasedThrottler(var rate: Rate) extends Actor with FSM[State, Data] {
     // Queue a message (when we can send some more messages in the current period)
     case Event(msg, d @ Data(_, _, queue)) ⇒
       stay using deliverMessages(
-          d.copy(queue = queue.enqueue(Message(msg, context.sender()))))
+        d.copy(queue = queue.enqueue(Message(msg, context.sender()))))
   }
 
   onTransition {
@@ -306,7 +307,7 @@ class TimerBasedThrottler(var rate: Rate) extends Actor with FSM[State, Data] {
       .foreach(x ⇒ data.target.get.tell(x.message, x.sender))
 
     data.copy(
-        queue = queue.drop(nrOfMsgToSend),
-        callsLeftInThisPeriod = data.callsLeftInThisPeriod - nrOfMsgToSend)
+      queue = queue.drop(nrOfMsgToSend),
+      callsLeftInThisPeriod = data.callsLeftInThisPeriod - nrOfMsgToSend)
   }
 }

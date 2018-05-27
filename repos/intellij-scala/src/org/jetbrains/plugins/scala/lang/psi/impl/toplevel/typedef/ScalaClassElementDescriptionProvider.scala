@@ -1,6 +1,10 @@
 package org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef
 
-import com.intellij.psi.{ElementDescriptionLocation, ElementDescriptionProvider, PsiElement}
+import com.intellij.psi.{
+  ElementDescriptionLocation,
+  ElementDescriptionProvider,
+  PsiElement
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScObject
 import org.jetbrains.plugins.scala.lang.psi.light.PsiClassWrapper
 
@@ -10,11 +14,12 @@ import org.jetbrains.plugins.scala.lang.psi.light.PsiClassWrapper
   */
 class ScalaClassElementDescriptionProvider extends ElementDescriptionProvider {
   def getElementDescription(
-      element: PsiElement, location: ElementDescriptionLocation): String = {
+      element: PsiElement,
+      location: ElementDescriptionLocation): String = {
     element match {
-      case o: ScObject => o.name
+      case o: ScObject              => o.name
       case wrapper: PsiClassWrapper => wrapper.definition.name
-      case _ => null
+      case _                        => null
     }
   }
 }

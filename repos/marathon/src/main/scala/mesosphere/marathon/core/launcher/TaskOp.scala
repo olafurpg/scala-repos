@@ -33,10 +33,11 @@ sealed trait TaskOp {
 object TaskOp {
 
   /** Launch a task on the offer. */
-  case class Launch(taskInfo: MesosProtos.TaskInfo,
-                    newTask: Task,
-                    oldTask: Option[Task] = None,
-                    offerOperations: Iterable[MesosProtos.Offer.Operation])
+  case class Launch(
+      taskInfo: MesosProtos.TaskInfo,
+      newTask: Task,
+      oldTask: Option[Task] = None,
+      offerOperations: Iterable[MesosProtos.Offer.Operation])
       extends TaskOp {
 
     override def taskId: Task.Id = newTask.taskId
@@ -45,7 +46,8 @@ object TaskOp {
     def applyToOffer(offer: MesosProtos.Offer): MesosProtos.Offer = {
       import scala.collection.JavaConverters._
       ResourceUtil.consumeResourcesFromOffer(
-          offer, taskInfo.getResourcesList.asScala)
+        offer,
+        taskInfo.getResourcesList.asScala)
     }
   }
 

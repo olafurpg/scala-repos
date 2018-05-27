@@ -17,8 +17,8 @@ class ConnectionHandler(
     project: ActorRef,
     broadcaster: ActorRef,
     target: ActorRef
-)
-    extends Actor with ActorLogging {
+) extends Actor
+    with ActorLogging {
 
   override def preStart(): Unit = {
     broadcaster ! Broadcaster.Register

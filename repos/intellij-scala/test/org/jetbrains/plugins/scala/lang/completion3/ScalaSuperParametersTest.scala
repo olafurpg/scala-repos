@@ -33,7 +33,7 @@ class TUI {
       """.replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "x, y, z").get)
+      activeLookup.find(le => le.getLookupString == "x, y, z").get)
     checkResultByText(resultText)
   }
 
@@ -61,7 +61,7 @@ class TUI {
       """.replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "x, y").get)
+      activeLookup.find(le => le.getLookupString == "x, y").get)
     checkResultByText(resultText)
   }
 
@@ -89,7 +89,7 @@ class TUI {
       """.replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "x, y").get)
+      activeLookup.find(le => le.getLookupString == "x, y").get)
     checkResultByText(resultText)
   }
 
@@ -127,7 +127,7 @@ class TUI {
       """.replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "x, y").get)
+      activeLookup.find(le => le.getLookupString == "x, y").get)
     checkResultByText(resultText)
   }
 
@@ -165,7 +165,7 @@ class TUI {
       """.replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "x, y, z").get)
+      activeLookup.find(le => le.getLookupString == "x, y, z").get)
     checkResultByText(resultText)
   }
 }

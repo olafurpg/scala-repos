@@ -30,7 +30,7 @@ private final class Stream(geoIp: MaxMindIpGeo, geoIpCacheTtl: Duration)
       ipCache get ip foreach { point =>
         val game = games get id match {
           case Some(game) => game withPoint point
-          case None => Stream.Game(id, List(point))
+          case None       => Stream.Game(id, List(point))
         }
         games += (id -> game)
         channel push Stream.Event.Add(game)
@@ -49,7 +49,7 @@ private final class Stream(geoIp: MaxMindIpGeo, geoIpCacheTtl: Duration)
 
   val producer =
     enumerator &> Enumeratee.map[Stream.Event].apply[JsValue] {
-      case Stream.Event.Add(game) => game2json(makeMd5)(game)
+      case Stream.Event.Add(game)  => game2json(makeMd5)(game)
       case Stream.Event.Remove(id) => Json.obj("id" -> id)
     }
 
@@ -73,12 +73,12 @@ object Stream {
 
   private val bytes2base64 = java.util.Base64.getEncoder.encodeToString _
   private def game2json(md5: MessageDigest)(game: Game): JsValue = Json.obj(
-      "id" -> bytes2base64(md5.digest(game.id getBytes "UTF-8") take 6),
-      "ps" -> Json.toJson {
-        game.points.map { p =>
-          List(p.lat, p.lon) map truncate
-        }
+    "id" -> bytes2base64(md5.digest(game.id getBytes "UTF-8") take 6),
+    "ps" -> Json.toJson {
+      game.points.map { p =>
+        List(p.lat, p.lon) map truncate
       }
+    }
   )
 
   case class Point(lat: Double, lon: Double)

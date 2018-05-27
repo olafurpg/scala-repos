@@ -9,14 +9,15 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
   * User: Alexander Podkhalyuzin
   * Date: 30.03.2010
   */
-case class ExtractMethodOutput(paramName: String,
-                               returnType: ScType,
-                               needNewDefinition: Boolean,
-                               fromElement: ScTypedDefinition) {
+case class ExtractMethodOutput(
+    paramName: String,
+    returnType: ScType,
+    needNewDefinition: Boolean,
+    fromElement: ScTypedDefinition) {
 
   val isVal = ScalaPsiUtil.nameContext(fromElement) match {
     case _: ScValue | _: ScFunction => true
-    case _ => false
+    case _                          => false
   }
 }
 
@@ -24,9 +25,10 @@ object ExtractMethodOutput {
 
   def from(variableData: ScalaVariableData) = {
     val element = variableData.element
-    ExtractMethodOutput(element.name,
-                        variableData.scType,
-                        variableData.isInsideOfElements,
-                        element)
+    ExtractMethodOutput(
+      element.name,
+      variableData.scType,
+      variableData.isInsideOfElements,
+      element)
   }
 }

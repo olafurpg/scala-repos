@@ -23,7 +23,7 @@ case object NoScalaVersion extends ScalaVersion {
 
   def compare(that: ScalaVersion): Int = that match {
     case NoScalaVersion => 0
-    case _ => 1
+    case _              => 1
   }
 }
 
@@ -34,7 +34,10 @@ case object NoScalaVersion extends ScalaVersion {
   * to segregate builds
   */
 case class SpecificScalaVersion(
-    major: Int, minor: Int, rev: Int, build: ScalaBuild)
+    major: Int,
+    minor: Int,
+    rev: Int,
+    build: ScalaBuild)
     extends ScalaVersion {
   def unparse = s"${major}.${minor}.${rev}${build.unparse}"
 
@@ -50,7 +53,7 @@ case class SpecificScalaVersion(
       else if (rev > thatRev) 1
       else build compare thatBuild
     case AnyScalaVersion => 1
-    case NoScalaVersion => -1
+    case NoScalaVersion  => -1
   }
 }
 
@@ -62,7 +65,7 @@ case object AnyScalaVersion extends ScalaVersion {
 
   def compare(that: ScalaVersion): Int = that match {
     case AnyScalaVersion => 0
-    case _ => -1
+    case _               => -1
   }
 }
 
@@ -79,30 +82,34 @@ object ScalaVersion {
   private val mspat = """(?i)m(\d*)""".r
 
   def apply(
-      versionString: String, errorHandler: String => Unit): ScalaVersion = {
+      versionString: String,
+      errorHandler: String => Unit): ScalaVersion = {
     def error() = errorHandler(
-        s"Bad version (${versionString}) not major[.minor[.revision[-suffix]]]"
+      s"Bad version (${versionString}) not major[.minor[.revision[-suffix]]]"
     )
 
     def toInt(s: String) = s match {
       case null | "" => 0
-      case _ => s.toInt
+      case _         => s.toInt
     }
 
     def toBuild(s: String) = s match {
       case null | "FINAL" => Final
-      case rcpat(i) => RC(toInt(i))
-      case mspat(i) => Milestone(toInt(i))
-      case _ /* | "" */ => Development(s)
+      case rcpat(i)       => RC(toInt(i))
+      case mspat(i)       => Milestone(toInt(i))
+      case _ /* | "" */   => Development(s)
     }
 
     versionString match {
       case "none" => NoScalaVersion
-      case "" => NoScalaVersion
-      case "any" => AnyScalaVersion
+      case ""     => NoScalaVersion
+      case "any"  => AnyScalaVersion
       case vpat(majorS, minorS, revS, buildS) =>
         SpecificScalaVersion(
-            toInt(majorS), toInt(minorS), toInt(revS), toBuild(buildS))
+          toInt(majorS),
+          toInt(minorS),
+          toInt(revS),
+          toBuild(buildS))
       case _ => error(); AnyScalaVersion
     }
   }
@@ -160,7 +167,7 @@ case object Final extends ScalaBuild {
     case Final => 0
     // a final is newer than anything other than a development build or another final
     case Development(_) => -1
-    case _ => 1
+    case _              => 1
   }
 }
 
@@ -175,7 +182,7 @@ case class RC(n: Int) extends ScalaBuild {
     case RC(thatN) => n - thatN
     // an rc is older than anything other than a milestone or another rc
     case Milestone(_) => 1
-    case _ => -1
+    case _            => -1
   }
 }
 

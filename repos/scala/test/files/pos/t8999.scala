@@ -32,10 +32,11 @@ object Types {
   final case class RecordType(fields: List[RecordType.Field]) extends Type
 
   object RecordType {
-    final case class Field(name: String,
-                           originalName: Option[String],
-                           tpe: Type,
-                           mutable: Boolean)
+    final case class Field(
+        name: String,
+        originalName: Option[String],
+        tpe: Type,
+        mutable: Boolean)
   }
 
   case object NoType extends Type
@@ -109,7 +110,9 @@ object Trees {
   case class Continue(label: Option[Ident] = None) extends Tree
 
   case class Match(
-      selector: Tree, cases: List[(List[Literal], Tree)], default: Tree)
+      selector: Tree,
+      cases: List[(List[Literal], Tree)],
+      default: Tree)
       extends Tree
 
   case class Debugger() extends Tree
@@ -120,14 +123,15 @@ object Trees {
 
   case class StoreModule(cls: ClassType, value: Tree) extends Tree
 
-  case class Select(qualifier: Tree, item: Ident, mutable: Boolean)
-      extends Tree
+  case class Select(qualifier: Tree, item: Ident, mutable: Boolean) extends Tree
 
-  case class Apply(receiver: Tree, method: Ident, args: List[Tree])
-      extends Tree
+  case class Apply(receiver: Tree, method: Ident, args: List[Tree]) extends Tree
 
   case class StaticApply(
-      receiver: Tree, cls: ClassType, method: Ident, args: List[Tree])
+      receiver: Tree,
+      cls: ClassType,
+      method: Ident,
+      args: List[Tree])
       extends Tree
 
   case class TraitImplApply(impl: ClassType, method: Ident, args: List[Tree])
@@ -169,7 +173,9 @@ object Trees {
       extends Tree
 
   case class JSBracketMethodApply(
-      receiver: Tree, method: Tree, args: List[Tree])
+      receiver: Tree,
+      method: Tree,
+      args: List[Tree])
       extends Tree
 
   case class JSDelete(prop: Tree) extends Tree
@@ -210,31 +216,39 @@ object Trees {
 
   case class This() extends Tree
 
-  case class Closure(captureParams: List[ParamDef],
-                     params: List[ParamDef],
-                     body: Tree,
-                     captureValues: List[Tree])
+  case class Closure(
+      captureParams: List[ParamDef],
+      params: List[ParamDef],
+      body: Tree,
+      captureValues: List[Tree])
       extends Tree
 
-  case class ClassDef(name: Ident,
-                      kind: ClassKind,
-                      parent: Option[Ident],
-                      ancestors: List[Ident],
-                      defs: List[Tree])
+  case class ClassDef(
+      name: Ident,
+      kind: ClassKind,
+      parent: Option[Ident],
+      ancestors: List[Ident],
+      defs: List[Tree])
       extends Tree
 
   case class MethodDef(
-      name: PropertyName, args: List[ParamDef], resultType: Type, body: Tree)
+      name: PropertyName,
+      args: List[ParamDef],
+      resultType: Type,
+      body: Tree)
       extends Tree
 
-  case class PropertyDef(name: PropertyName,
-                         getterBody: Tree,
-                         setterArg: ParamDef,
-                         setterBody: Tree)
+  case class PropertyDef(
+      name: PropertyName,
+      getterBody: Tree,
+      setterArg: ParamDef,
+      setterBody: Tree)
       extends Tree
 
   case class ConstructorExportDef(
-      name: String, args: List[ParamDef], body: Tree)
+      name: String,
+      args: List[ParamDef],
+      body: Tree)
       extends Tree
 
   case class ModuleExportDef(fullName: String) extends Tree
@@ -249,53 +263,52 @@ object Main {
   private def transform(tree: Tree) = {
     val ObjectClass = "O"
     tree match {
-      case VarDef(_, _, _, rhs) =>
-      case tree: Block =>
-      case Labeled(ident @ Ident(label, _), tpe, body) =>
-      case Assign(lhs, rhs) =>
-      case Return(expr, optLabel) =>
-      case If(cond, thenp, elsep) =>
-      case While(cond, body, optLabel) =>
-      case DoWhile(body, cond, None) =>
-      case Try(block, errVar, EmptyTree, finalizer) =>
-      case Try(
-          block, errVar @ Ident(name, originalName), handler, finalizer) =>
-      case Throw(expr) =>
-      case Continue(optLabel) =>
-      case Match(selector, cases, default) =>
-      case New(cls, ctor, args) =>
-      case StoreModule(cls, value) =>
-      case tree: Select =>
-      case tree: Apply =>
-      case tree: StaticApply =>
-      case tree: TraitImplApply =>
-      case tree @ UnaryOp(_, arg) =>
-      case tree @ BinaryOp(op, lhs, rhs) =>
-      case NewArray(tpe, lengths) =>
-      case ArrayValue(tpe, elems) =>
-      case ArrayLength(array) =>
-      case ArraySelect(array, index) =>
-      case RecordValue(tpe, elems) =>
-      case IsInstanceOf(expr, ClassType(ObjectClass)) =>
-      case IsInstanceOf(expr, tpe) =>
-      case AsInstanceOf(expr, ClassType(ObjectClass)) =>
-      case AsInstanceOf(expr, cls) =>
-      case Unbox(arg, charCode) =>
-      case GetClass(expr) =>
-      case JSNew(ctor, args) =>
-      case JSDotSelect(qualifier, item) =>
-      case JSBracketSelect(qualifier, item) =>
-      case tree: JSFunctionApply =>
-      case JSDotMethodApply(receiver, method, args) =>
-      case JSBracketMethodApply(receiver, method, args) =>
-      case JSDelete(JSDotSelect(obj, prop)) =>
-      case JSDelete(JSBracketSelect(obj, prop)) =>
-      case JSUnaryOp(op, lhs) =>
-      case JSBinaryOp(op, lhs, rhs) =>
-      case JSArrayConstr(items) =>
-      case JSObjectConstr(fields) =>
-      case _: VarRef | _: This =>
-      case Closure(captureParams, params, body, captureValues) =>
+      case VarDef(_, _, _, rhs)                                               =>
+      case tree: Block                                                        =>
+      case Labeled(ident @ Ident(label, _), tpe, body)                        =>
+      case Assign(lhs, rhs)                                                   =>
+      case Return(expr, optLabel)                                             =>
+      case If(cond, thenp, elsep)                                             =>
+      case While(cond, body, optLabel)                                        =>
+      case DoWhile(body, cond, None)                                          =>
+      case Try(block, errVar, EmptyTree, finalizer)                           =>
+      case Try(block, errVar @ Ident(name, originalName), handler, finalizer) =>
+      case Throw(expr)                                                        =>
+      case Continue(optLabel)                                                 =>
+      case Match(selector, cases, default)                                    =>
+      case New(cls, ctor, args)                                               =>
+      case StoreModule(cls, value)                                            =>
+      case tree: Select                                                       =>
+      case tree: Apply                                                        =>
+      case tree: StaticApply                                                  =>
+      case tree: TraitImplApply                                               =>
+      case tree @ UnaryOp(_, arg)                                             =>
+      case tree @ BinaryOp(op, lhs, rhs)                                      =>
+      case NewArray(tpe, lengths)                                             =>
+      case ArrayValue(tpe, elems)                                             =>
+      case ArrayLength(array)                                                 =>
+      case ArraySelect(array, index)                                          =>
+      case RecordValue(tpe, elems)                                            =>
+      case IsInstanceOf(expr, ClassType(ObjectClass))                         =>
+      case IsInstanceOf(expr, tpe)                                            =>
+      case AsInstanceOf(expr, ClassType(ObjectClass))                         =>
+      case AsInstanceOf(expr, cls)                                            =>
+      case Unbox(arg, charCode)                                               =>
+      case GetClass(expr)                                                     =>
+      case JSNew(ctor, args)                                                  =>
+      case JSDotSelect(qualifier, item)                                       =>
+      case JSBracketSelect(qualifier, item)                                   =>
+      case tree: JSFunctionApply                                              =>
+      case JSDotMethodApply(receiver, method, args)                           =>
+      case JSBracketMethodApply(receiver, method, args)                       =>
+      case JSDelete(JSDotSelect(obj, prop))                                   =>
+      case JSDelete(JSBracketSelect(obj, prop))                               =>
+      case JSUnaryOp(op, lhs)                                                 =>
+      case JSBinaryOp(op, lhs, rhs)                                           =>
+      case JSArrayConstr(items)                                               =>
+      case JSObjectConstr(fields)                                             =>
+      case _: VarRef | _: This                                                =>
+      case Closure(captureParams, params, body, captureValues)                =>
       case _: Skip | _: Debugger | _: LoadModule | _: JSEnvInfo | _: Literal |
           EmptyTree =>
     }

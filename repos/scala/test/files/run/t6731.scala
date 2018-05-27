@@ -5,7 +5,7 @@ object Util {
   def show[T](x: T): T = { println(x); x }
   def mkArgs(xs: Any*) =
     xs map { case ((k, v)) => k + "=" + v; case x => "" + x } mkString
-    ("(", ", ", ")")
+      ("(", ", ", ")")
 }
 import Util._
 
@@ -29,13 +29,13 @@ object Mono extends MonoDynamic {
   def f5 = f(f(f(f(f(f(this.bar)))))) + f(f(f(f(f(f(this.baz))))))
   def f6 =
     f(f(f(f(f(f(this.bar(bippy = 1, boppy = 2))))))) + f(
-        f(f(f(f(f(this.baz))))))
+      f(f(f(f(f(this.baz))))))
 }
 
 object Poly extends Dynamic {
-  def selectDynamic[T : ClassTag](name: String): String =
+  def selectDynamic[T: ClassTag](name: String): String =
     show(s"$this.$name[${classTag[T]}]")
-  def applyDynamic[T : ClassTag](name: String)(args: Any*): String =
+  def applyDynamic[T: ClassTag](name: String)(args: Any*): String =
     show(args.mkString(s"$this.$name[${classTag[T]}](", ", ", ")"))
 
   def f(s: String): String = s
@@ -95,8 +95,8 @@ object Named extends Dynamic {
 }
 
 object Named2 extends Dynamic {
-  def applyDynamic(name: String)(a: Any)(
-      b: Any = "b", c: Any = "c"): Named2.type = {
+  def applyDynamic(name: String)(
+      a: Any)(b: Any = "b", c: Any = "c"): Named2.type = {
     show(this + "." + name + mkArgs(a) + mkArgs(b, c))
     this
   }

@@ -16,7 +16,8 @@ import DocParser.Parsed
   *  otherwise cause the compiler to go haywire.
   */
 class DocParser(settings: nsc.Settings, reporter: Reporter)
-    extends Global(settings, reporter) with ScaladocGlobalTrait {
+    extends Global(settings, reporter)
+    with ScaladocGlobalTrait {
   def this(settings: Settings) = this(settings, new ConsoleReporter(settings))
   def this() = this(new Settings(Console println _))
 
@@ -36,7 +37,8 @@ class DocParser(settings: nsc.Settings, reporter: Reporter)
       case x: PackageDef => x.stats flatMap (t => loop(enclosing :+ x, t))
       case x: DocDef =>
         new Parsed(enclosing, x) :: loop(
-            enclosing :+ x.definition, x.definition)
+          enclosing :+ x.definition,
+          x.definition)
       case x => x.children flatMap (t => loop(enclosing, t))
     }
     loop(Nil, docUnit(code))
@@ -68,8 +70,9 @@ object DocParser {
     }
     def raw: String = docDef.comment.raw
 
-    override def toString = (nameChain.init
-          .map(x => if (x.isTypeName) x + "#" else x + ".")
-          .mkString + nameChain.last)
+    override def toString =
+      (nameChain.init
+        .map(x => if (x.isTypeName) x + "#" else x + ".")
+        .mkString + nameChain.last)
   }
 }

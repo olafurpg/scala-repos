@@ -9,7 +9,10 @@ import com.intellij.psi.impl.source.codeStyle.CodeEditUtil
 import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunctionDefinition, ScPatternDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunctionDefinition,
+  ScPatternDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.util.IntentionAvailabilityChecker
 
@@ -23,29 +26,31 @@ class AddBracesIntention extends PsiElementBaseIntentionAction {
 
   def isAvailable(project: Project, editor: Editor, element: PsiElement) =
     check(project, editor, element).isDefined &&
-    IntentionAvailabilityChecker.checkIntention(this, element)
+      IntentionAvailabilityChecker.checkIntention(this, element)
 
   override def invoke(project: Project, editor: Editor, element: PsiElement) {
     if (element == null || !element.isValid) return
     check(project, editor, element) match {
       case Some(x) => x()
-      case None =>
+      case None    =>
     }
   }
 
-  private def check(project: Project,
-                    editor: Editor,
-                    element: PsiElement): Option[() => Unit] = {
+  private def check(
+      project: Project,
+      editor: Editor,
+      element: PsiElement): Option[() => Unit] = {
     val containing = ScalaPsiUtil.getParentOfType(
-        element,
-        true,
-        classOf[ScPatternDefinition],
-        classOf[ScIfStmt],
-        classOf[ScFunctionDefinition],
-        classOf[ScTryBlock],
-        classOf[ScFinallyBlock],
-        classOf[ScWhileStmt],
-        classOf[ScDoStmt])
+      element,
+      true,
+      classOf[ScPatternDefinition],
+      classOf[ScIfStmt],
+      classOf[ScFunctionDefinition],
+      classOf[ScTryBlock],
+      classOf[ScFinallyBlock],
+      classOf[ScWhileStmt],
+      classOf[ScDoStmt]
+    )
 
     def isAncestorOfElement(ancestor: PsiElement) =
       PsiTreeUtil.isContextAncestor(ancestor, element, false)
@@ -62,7 +67,7 @@ class AddBracesIntention extends PsiElementBaseIntentionAction {
       case tryBlock: ScTryBlock if !tryBlock.hasRBrace =>
         tryBlock.statements match {
           case Seq(x: ScExpression) if isAncestorOfElement(x) => Some(x)
-          case _ => None
+          case _                                              => None
         }
       case finallyBlock: ScFinallyBlock =>
         finallyBlock.expression.filter(isAncestorOfElement)
@@ -79,16 +84,19 @@ class AddBracesIntention extends PsiElementBaseIntentionAction {
         editor.getDocument.getLineNumber(x.getTextRange.getEndOffset)
       val isBlock = x match {
         case _: ScBlockExpr => true
-        case _ => false
+        case _              => false
       }
       startLine == endLine && !isBlock
     }
     oneLinerExpr.map { expr => () =>
       {
         val replacement = ScalaPsiElementFactory.createExpressionFromText(
-            "{\n%s}".format(expr.getText), expr.getManager)
+          "{\n%s}".format(expr.getText),
+          expr.getManager)
         CodeEditUtil.replaceChild(
-            expr.getParent.getNode, expr.getNode, replacement.getNode)
+          expr.getParent.getNode,
+          expr.getNode,
+          replacement.getNode)
       }
     }
   }

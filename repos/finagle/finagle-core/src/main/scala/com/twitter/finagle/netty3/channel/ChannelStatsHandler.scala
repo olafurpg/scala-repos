@@ -6,7 +6,14 @@ import java.io.IOException
 import java.util.concurrent.atomic.{AtomicInteger, AtomicLong}
 import java.util.logging.{Level, Logger}
 import org.jboss.netty.buffer.ChannelBuffer
-import org.jboss.netty.channel.{ChannelHandlerContext, ChannelStateEvent, ExceptionEvent, MessageEvent, WriteCompletionEvent, SimpleChannelHandler}
+import org.jboss.netty.channel.{
+  ChannelHandlerContext,
+  ChannelStateEvent,
+  ExceptionEvent,
+  MessageEvent,
+  WriteCompletionEvent,
+  SimpleChannelHandler
+}
 
 /**
   * A [[org.jboss.netty.channel.ChannelHandler]] that tracks channel/connection
@@ -38,7 +45,8 @@ class ChannelStatsHandler(statsReceiver: StatsReceiver)
   }
 
   override def channelOpen(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent): Unit = {
+      ctx: ChannelHandlerContext,
+      e: ChannelStateEvent): Unit = {
     elapsed = Stopwatch.start()
     ctx.setAttachment(new AtomicLong(0), new AtomicLong(0))
     connects.incr()
@@ -48,7 +56,8 @@ class ChannelStatsHandler(statsReceiver: StatsReceiver)
   }
 
   override def writeComplete(
-      ctx: ChannelHandlerContext, e: WriteCompletionEvent) {
+      ctx: ChannelHandlerContext,
+      e: WriteCompletionEvent) {
     val (_, channelWriteCount) =
       ctx.getAttachment().asInstanceOf[(AtomicLong, AtomicLong)]
 
@@ -78,13 +87,13 @@ class ChannelStatsHandler(statsReceiver: StatsReceiver)
   private[this] val closedCount = statsReceiver.counter("closed")
 
   override def closeRequested(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent) {
+      ctx: ChannelHandlerContext,
+      e: ChannelStateEvent) {
     closesCount.incr()
     super.closeRequested(ctx, e)
   }
 
-  override def channelClosed(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent) {
+  override def channelClosed(ctx: ChannelHandlerContext, e: ChannelStateEvent) {
     closedCount.incr()
     closeChans.incr()
 
@@ -104,7 +113,8 @@ class ChannelStatsHandler(statsReceiver: StatsReceiver)
   }
 
   override def exceptionCaught(
-      ctx: ChannelHandlerContext, evt: ExceptionEvent) {
+      ctx: ChannelHandlerContext,
+      evt: ExceptionEvent) {
     val m =
       if (evt.getCause != null) evt.getCause.getClass.getName else "unknown"
     exceptions.counter(m).incr()
@@ -112,7 +122,7 @@ class ChannelStatsHandler(statsReceiver: StatsReceiver)
     if (!Monitor.isActive) {
       val level = evt.getCause match {
         case t: IOException => Level.FINE
-        case _ => Level.WARNING
+        case _              => Level.WARNING
       }
       log.log(level, "ChannelStatsHandler caught an exception", evt.getCause)
     }
@@ -126,7 +136,8 @@ class ChannelStatsHandler(statsReceiver: StatsReceiver)
   private[this] def socketDuration(now: Time): Duration = now - since
 
   override def channelInterestChanged(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent): Unit = {
+      ctx: ChannelHandlerContext,
+      e: ChannelStateEvent): Unit = {
     val now = Time.now
     super.channelInterestChanged(ctx, e)
     val isWritable = ctx.getChannel.isWritable()

@@ -45,8 +45,8 @@ object PageDisplayer {
           displayPage(new DashboardPage(value.split("-")(1).trim()))
         } else {
           displayPage(
-              EnsembleTabbedPage.buildTab(
-                  value.split(">")(1).trim(), value.split(">")(0).trim()))
+            EnsembleTabbedPage
+              .buildTab(value.split(">")(1).trim(), value.split(">")(0).trim()))
         }
     }
   }

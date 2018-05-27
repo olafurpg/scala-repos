@@ -37,7 +37,7 @@ case class First(child: Expression, ignoreNullsExpr: Expression)
     case Literal(b: Boolean, BooleanType) => b
     case _ =>
       throw new AnalysisException(
-          "The second argument of First should be a boolean literal.")
+        "The second argument of First should be a boolean literal.")
   }
 
   override def children: Seq[Expression] = child :: Nil
@@ -61,20 +61,20 @@ case class First(child: Expression, ignoreNullsExpr: Expression)
     first :: valueSet :: Nil
 
   override lazy val initialValues: Seq[Literal] = Seq(
-      /* first = */ Literal.create(null, child.dataType),
-      /* valueSet = */ Literal.create(false, BooleanType)
+    /* first = */ Literal.create(null, child.dataType),
+    /* valueSet = */ Literal.create(false, BooleanType)
   )
 
   override lazy val updateExpressions: Seq[Expression] = {
     if (ignoreNulls) {
       Seq(
-          /* first = */ If(Or(valueSet, IsNull(child)), first, child),
-          /* valueSet = */ Or(valueSet, IsNotNull(child))
+        /* first = */ If(Or(valueSet, IsNull(child)), first, child),
+        /* valueSet = */ Or(valueSet, IsNotNull(child))
       )
     } else {
       Seq(
-          /* first = */ If(valueSet, first, child),
-          /* valueSet = */ Literal.create(true, BooleanType)
+        /* first = */ If(valueSet, first, child),
+        /* valueSet = */ Literal.create(true, BooleanType)
       )
     }
   }
@@ -84,8 +84,8 @@ case class First(child: Expression, ignoreNullsExpr: Expression)
     // to true, we use first.right. If not, we use first.right (even if valueSet.right is
     // false, we are safe to do so because first.right will be null in this case).
     Seq(
-        /* first = */ If(valueSet.left, first.left, first.right),
-        /* valueSet = */ Or(valueSet.left, valueSet.right)
+      /* first = */ If(valueSet.left, first.left, first.right),
+      /* valueSet = */ Or(valueSet.left, valueSet.right)
     )
   }
 

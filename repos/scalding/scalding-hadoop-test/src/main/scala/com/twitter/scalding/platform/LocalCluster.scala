@@ -29,8 +29,7 @@ import org.slf4j.LoggerFactory
 import org.slf4j.impl.Log4jLoggerAdapter
 
 object LocalCluster {
-  private final val HADOOP_CLASSPATH_DIR = new Path(
-      "/tmp/hadoop-classpath-lib")
+  private final val HADOOP_CLASSPATH_DIR = new Path("/tmp/hadoop-classpath-lib")
   private final val MUTEX = new RandomAccessFile("NOTICE", "rw").getChannel
 
   def apply() = new LocalCluster()
@@ -100,7 +99,12 @@ class LocalCluster(mutex: Boolean = true) {
     val dfs = new MiniDFSCluster(conf, 4, true, null)
     val fileSystem = dfs.getFileSystem
     val cluster = new MiniMRCluster(
-        4, fileSystem.getUri.toString, 1, null, null, new JobConf(conf))
+      4,
+      fileSystem.getUri.toString,
+      1,
+      null,
+      null,
+      new JobConf(conf))
     val mrJobConf = cluster.createJobConf()
     mrJobConf.setInt("mapred.submit.replication", 2)
     mrJobConf.set("mapred.map.max.attempts", "2")
@@ -120,7 +124,8 @@ class LocalCluster(mutex: Boolean = true) {
     mrJobConf.setReduceSpeculativeExecution(false)
     mrJobConf.set("mapreduce.user.classpath.first", "true")
 
-    LOG.debug("Creating directory to store jars on classpath: " +
+    LOG.debug(
+      "Creating directory to store jars on classpath: " +
         LocalCluster.HADOOP_CLASSPATH_DIR)
     fileSystem.mkdirs(LocalCluster.HADOOP_CLASSPATH_DIR)
 
@@ -132,32 +137,34 @@ class LocalCluster(mutex: Boolean = true) {
     //TODO I desperately want there to be a better way to do this. I'd love to be able to run ./sbt assembly and depend
     // on that, but I couldn't figure out how to make that work.
     val baseClassPath =
-      List(getClass,
-           classOf[JobConf],
-           classOf[Option[_]],
-           classOf[LoggerFactory],
-           classOf[Log4jLoggerAdapter],
-           classOf[org.apache.hadoop.net.StaticMapping],
-           classOf[org.apache.hadoop.yarn.server.MiniYARNCluster],
-           classOf[com.twitter.scalding.Args],
-           classOf[org.apache.log4j.LogManager],
-           classOf[com.twitter.scalding.RichDate],
-           classOf[cascading.tuple.TupleException],
-           classOf[com.twitter.chill.Externalizer[_]],
-           classOf[com.twitter.chill.algebird.AveragedValueSerializer],
-           classOf[com.twitter.algebird.Semigroup[_]],
-           classOf[com.twitter.chill.KryoInstantiator],
-           classOf[org.jgrapht.ext.EdgeNameProvider[_]],
-           classOf[org.apache.commons.lang.StringUtils],
-           classOf[cascading.scheme.local.TextDelimited],
-           classOf[org.apache.commons.logging.LogFactory],
-           classOf[org.apache.commons.codec.binary.Base64],
-           classOf[com.twitter.scalding.IntegralComparator],
-           classOf[org.apache.commons.collections.Predicate],
-           classOf[com.esotericsoftware.kryo.KryoSerializable],
-           classOf[com.twitter.chill.hadoop.KryoSerialization],
-           classOf[com.twitter.maple.tap.TupleMemoryInputFormat],
-           classOf[org.apache.commons.configuration.Configuration]).foreach {
+      List(
+        getClass,
+        classOf[JobConf],
+        classOf[Option[_]],
+        classOf[LoggerFactory],
+        classOf[Log4jLoggerAdapter],
+        classOf[org.apache.hadoop.net.StaticMapping],
+        classOf[org.apache.hadoop.yarn.server.MiniYARNCluster],
+        classOf[com.twitter.scalding.Args],
+        classOf[org.apache.log4j.LogManager],
+        classOf[com.twitter.scalding.RichDate],
+        classOf[cascading.tuple.TupleException],
+        classOf[com.twitter.chill.Externalizer[_]],
+        classOf[com.twitter.chill.algebird.AveragedValueSerializer],
+        classOf[com.twitter.algebird.Semigroup[_]],
+        classOf[com.twitter.chill.KryoInstantiator],
+        classOf[org.jgrapht.ext.EdgeNameProvider[_]],
+        classOf[org.apache.commons.lang.StringUtils],
+        classOf[cascading.scheme.local.TextDelimited],
+        classOf[org.apache.commons.logging.LogFactory],
+        classOf[org.apache.commons.codec.binary.Base64],
+        classOf[com.twitter.scalding.IntegralComparator],
+        classOf[org.apache.commons.collections.Predicate],
+        classOf[com.esotericsoftware.kryo.KryoSerializable],
+        classOf[com.twitter.chill.hadoop.KryoSerialization],
+        classOf[com.twitter.maple.tap.TupleMemoryInputFormat],
+        classOf[org.apache.commons.configuration.Configuration]
+      ).foreach {
         addClassSourceToClassPath(_)
       }
     this
@@ -175,11 +182,11 @@ class LocalCluster(mutex: Boolean = true) {
       LOG.debug("Not yet on Hadoop classpath: " + resourceDir)
       val localJarFile =
         if (resourceDir.isDirectory) MakeJar(resourceDir) else resourceDir
-      val hdfsJarPath = new Path(
-          LocalCluster.HADOOP_CLASSPATH_DIR, localJarFile.getName)
+      val hdfsJarPath =
+        new Path(LocalCluster.HADOOP_CLASSPATH_DIR, localJarFile.getName)
       fileSystem.copyFromLocalFile(
-          new Path("file://%s".format(localJarFile.getAbsolutePath)),
-          hdfsJarPath)
+        new Path("file://%s".format(localJarFile.getAbsolutePath)),
+        hdfsJarPath)
       DistributedCache.addFileToClassPath(hdfsJarPath, jobConf, fileSystem)
       LOG.debug("Added to Hadoop classpath: " + localJarFile)
       classpath += resourceDir

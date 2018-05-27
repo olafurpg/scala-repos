@@ -9,12 +9,12 @@ object IntList {
 object Test extends App {
   IntList(1, IntList(2, NilIL)) match {
     case IntList(a1, IntList(a2, IntList(a3, y))) => println(a1 + a2 + a3)
-    case IntList(x, y) => println(x)
+    case IntList(x, y)                            => println(x)
   }
 
   IntList(1, IntList(2, IntList(3, NilIL))) match {
     case IntList(a1, IntList(a2, IntList(a3, y))) => println(a1 + a2 + a3)
-    case IntList(x, y) => println(x)
+    case IntList(x, y)                            => println(x)
   }
 }
 

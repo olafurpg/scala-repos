@@ -21,9 +21,10 @@ import java.util.zip.{ZipFile, ZipEntry}
 
 object Scalajsp {
 
-  private case class Options(infos: Boolean = false,
-                             jar: Option[File] = None,
-                             fileNames: Seq[String] = Seq.empty)
+  private case class Options(
+      infos: Boolean = false,
+      jar: Option[File] = None,
+      fileNames: Seq[String] = Seq.empty)
 
   def main(args: Array[String]): Unit = {
     val parser = new scopt.OptionParser[Options]("scalajsp") {
@@ -40,12 +41,16 @@ object Scalajsp {
           c.copy(jar = Some(x))
         }
         .text("Read *.sjsir file(s) from the given JAR.")
-      opt[Unit]('i', "infos").action { (_, c) =>
-        c.copy(infos = true)
-      }.text("Show DCE infos instead of trees")
-      opt[Unit]('s', "supported").action { (_, _) =>
-        printSupported(); sys.exit()
-      }.text("Show supported Scala.js IR versions")
+      opt[Unit]('i', "infos")
+        .action { (_, c) =>
+          c.copy(infos = true)
+        }
+        .text("Show DCE infos instead of trees")
+      opt[Unit]('s', "supported")
+        .action { (_, _) =>
+          printSupported(); sys.exit()
+        }
+        .text("Show supported Scala.js IR versions")
       version("version").abbr("v").text("Show scalajsp version")
       help("help").abbr("h").text("prints this usage text")
 
@@ -75,7 +80,8 @@ object Scalajsp {
   }
 
   private def displayFileContent(
-      vfile: VirtualScalaJSIRFile, opts: Options): Unit = {
+      vfile: VirtualScalaJSIRFile,
+      opts: Options): Unit = {
     if (opts.infos) new InfoPrinter(stdout).print(vfile.info)
     else new IRTreePrinter(stdout).printTopLevelTree(vfile.tree)
 
@@ -114,5 +120,5 @@ object Scalajsp {
   }
 
   private val stdout = new BufferedWriter(
-      new OutputStreamWriter(Console.out, "UTF-8"))
+    new OutputStreamWriter(Console.out, "UTF-8"))
 }

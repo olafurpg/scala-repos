@@ -56,16 +56,15 @@ object Event {
     */
   val NullSourceTarget: jfxe.EventTarget = jfxe.Event.NULL_SOURCE_TARGET
   @deprecated(
-      "Use NullSourceTarget; NULL_SOURCE_TARGET will be removed in a future release",
-      "8.0.60-R10")
+    "Use NullSourceTarget; NULL_SOURCE_TARGET will be removed in a future release",
+    "8.0.60-R10")
   val NULL_SOURCE_TARGET = NullSourceTarget
 }
 
 /**
   * Wrapper class for [[http://docs.oracle.com/javase/8/javafx/api/javafx/event/Event.html Event]].
   */
-class Event(override val delegate: jfxe.Event)
-    extends SFXDelegate[jfxe.Event] {
+class Event(override val delegate: jfxe.Event) extends SFXDelegate[jfxe.Event] {
 
   /**
     * Construct a new Event with the specified event type.
@@ -81,9 +80,10 @@ class Event(override val delegate: jfxe.Event)
     * @param target the event target to associate with the event
     * @param eventType The event type
     */
-  def this(source: Any,
-           target: jfxe.EventTarget,
-           eventType: EventType[_ <: Event]) =
+  def this(
+      source: Any,
+      target: jfxe.EventTarget,
+      eventType: EventType[_ <: Event]) =
     this(new Event(source, target, eventType))
 
   /**

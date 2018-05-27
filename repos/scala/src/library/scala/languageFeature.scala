@@ -13,7 +13,8 @@ import scala.annotation.meta
 object languageFeature {
 
   @meta.languageFeature(
-      "extension of type scala.Dynamic", enableRequired = true)
+    "extension of type scala.Dynamic",
+    enableRequired = true)
   sealed trait dynamics
   object dynamics extends dynamics
 
@@ -22,7 +23,8 @@ object languageFeature {
   object postfixOps extends postfixOps
 
   @meta.languageFeature(
-      "reflective access of structural type member #", enableRequired = false)
+    "reflective access of structural type member #",
+    enableRequired = false)
   sealed trait reflectiveCalls
   object reflectiveCalls extends reflectiveCalls
 
@@ -35,7 +37,8 @@ object languageFeature {
   object higherKinds extends higherKinds
 
   @meta.languageFeature(
-      "#, which cannot be expressed by wildcards, ", enableRequired = false)
+    "#, which cannot be expressed by wildcards, ",
+    enableRequired = false)
   sealed trait existentials
   object existentials extends existentials
 

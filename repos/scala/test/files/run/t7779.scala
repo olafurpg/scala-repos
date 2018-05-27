@@ -46,7 +46,7 @@ package pack {
 
 object Test extends App {
   import reflect.runtime.universe._
-  def test[T : TypeTag] = {
+  def test[T: TypeTag] = {
     val tt = typeTag[T]
     val clz = tt.mirror.runtimeClass(tt.tpe)
     assert(classOf[Marker].isAssignableFrom(clz), clz.toString)
@@ -54,13 +54,13 @@ object Test extends App {
 
   test[Short]
   test[O.:::::::::::::::::::::::::::::::::::::::::::::::::.type]
-  test[C#D#`:::::::::::::::::::::::::::::::::::::::::::::::::`]
+  test[C#D# `:::::::::::::::::::::::::::::::::::::::::::::::::`]
 
   test[pack.Short]
   test[pack.O.:::::::::::::::::::::::::::::::::::::::::::::::::.type]
-  test[pack.C#D#`:::::::::::::::::::::::::::::::::::::::::::::::::`]
+  test[pack.C#D# `:::::::::::::::::::::::::::::::::::::::::::::::::`]
 
   test[pack.p2.Short]
   test[pack.p2.O.:::::::::::::::::::::::::::::::::::::::::::::::::.type]
-  test[pack.p2.C#D#`:::::::::::::::::::::::::::::::::::::::::::::::::`]
+  test[pack.p2.C#D# `:::::::::::::::::::::::::::::::::::::::::::::::::`]
 }

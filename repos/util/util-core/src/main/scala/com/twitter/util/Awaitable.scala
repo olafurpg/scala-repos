@@ -141,8 +141,9 @@ object Await {
     */
   @throws(classOf[TimeoutException])
   @throws(classOf[InterruptedException])
-  def all(awaitables: java.util.Collection[Awaitable[_]],
-          timeout: Duration): Unit =
+  def all(
+      awaitables: java.util.Collection[Awaitable[_]],
+      timeout: Duration): Unit =
     all(awaitables.asScala.toSeq, timeout)
 }
 

@@ -124,7 +124,8 @@ class PostScript(filename: String, _width: Double, _height: Double)
   }
 
   def plotLine(x1: Double, y1: Double, x2: Double, y2: Double): Unit = {
-    Console.println(round(x1) + " " + round(y1) + " m " + round(x2) + " " +
+    Console.println(
+      round(x1) + " " + round(y1) + " m " + round(x2) + " " +
         round(y2) + " l");
   }
 
@@ -132,7 +133,7 @@ class PostScript(filename: String, _width: Double, _height: Double)
   Console.println("%!PS-Adobe-3.0 EPSF-3.0\n%%Title: ProgrammationIV");
   Console.println("%%Creator: LAMP");
   Console.println(
-      "%%BoundingBox: 0 0 " + mm2ps(psWidth) + " " + mm2ps(psHeight));
+    "%%BoundingBox: 0 0 " + mm2ps(psWidth) + " " + mm2ps(psHeight));
   Console.println("%%EndComments\n");
   Console.println("/m {moveto} bind def\n/l {lineto} bind def\n");
   Console.println(mm2ps(line_thickness) + " setlinewidth\nnewpath");
@@ -160,9 +161,10 @@ object M0 {
       painter: Painter): Painter = { frame: Frame =>
     {
       val newOrigin = frame.coordMap(origin);
-      val newFrame = new Frame(newOrigin,
-                               frame.coordMap(newX) - newOrigin,
-                               frame.coordMap(newY) - newOrigin);
+      val newFrame = new Frame(
+        newOrigin,
+        frame.coordMap(newX) - newOrigin,
+        frame.coordMap(newY) - newOrigin);
       painter(newFrame)
     }
   }
@@ -170,27 +172,31 @@ object M0 {
   /** Flip the painter vertically
     */
   def flipVert: Painter => Painter =
-    transformPainter(new Vector(0.0, 1.0),
-                     new Vector(1.0, 1.0),
-                     new Vector(0.0, 0.0));
+    transformPainter(
+      new Vector(0.0, 1.0),
+      new Vector(1.0, 1.0),
+      new Vector(0.0, 0.0));
 
   /** Flip the painter horizontally
     */
   def flipHoriz: Painter => Painter =
-    transformPainter(new Vector(1.0, 0.0),
-                     new Vector(0.0, 0.0),
-                     new Vector(1.0, 1.0));
+    transformPainter(
+      new Vector(1.0, 0.0),
+      new Vector(0.0, 0.0),
+      new Vector(1.0, 1.0));
 
   /** Compose a painter that draws p1 on the left of p2
     */
   def beside(p1: Painter, p2: Painter): Painter = { frame: Frame =>
     {
-      transformPainter(new Vector(0.0, 0.0),
-                       new Vector(0.5, 0.0),
-                       new Vector(0.0, 1.0))(p1)(frame);
-      transformPainter(new Vector(0.5, 0.0),
-                       new Vector(1.0, 0.0),
-                       new Vector(0.5, 1.0))(p2)(frame)
+      transformPainter(
+        new Vector(0.0, 0.0),
+        new Vector(0.5, 0.0),
+        new Vector(0.0, 1.0))(p1)(frame);
+      transformPainter(
+        new Vector(0.5, 0.0),
+        new Vector(1.0, 0.0),
+        new Vector(0.5, 1.0))(p2)(frame)
     }
   }
 
@@ -198,12 +204,14 @@ object M0 {
     */
   def below(p1: Painter, p2: Painter): Painter = { frame: Frame =>
     {
-      transformPainter(new Vector(0.0, 0.0),
-                       new Vector(1.0, 0.0),
-                       new Vector(0.0, 0.5))(p1)(frame);
-      transformPainter(new Vector(0.0, 0.5),
-                       new Vector(1.0, 0.5),
-                       new Vector(0.0, 1.0))(p2)(frame)
+      transformPainter(
+        new Vector(0.0, 0.0),
+        new Vector(1.0, 0.0),
+        new Vector(0.0, 0.5))(p1)(frame);
+      transformPainter(
+        new Vector(0.0, 0.5),
+        new Vector(1.0, 0.5),
+        new Vector(0.0, 1.0))(p2)(frame)
     }
   }
 
@@ -218,15 +226,17 @@ object M0 {
   // A small test painter.
   def house(canvas: Graphics)(frame: Frame): Unit = {
     canvas.drawPolySegment(frame)(
-        List(new Vector(0.0, 0.0),
-             new Vector(1.0, 0.0),
-             new Vector(1.0, 2.0 / 3.0),
-             new Vector(0.0, 2.0 / 3.0),
-             new Vector(0.5, 1.0),
-             new Vector(1.0, 2.0 / 3.0),
-             new Vector(0.0, 0.0),
-             new Vector(0.0, 2.0 / 3.0),
-             new Vector(1.0, 0.0)));
+      List(
+        new Vector(0.0, 0.0),
+        new Vector(1.0, 0.0),
+        new Vector(1.0, 2.0 / 3.0),
+        new Vector(0.0, 2.0 / 3.0),
+        new Vector(0.5, 1.0),
+        new Vector(1.0, 2.0 / 3.0),
+        new Vector(0.0, 0.0),
+        new Vector(0.0, 2.0 / 3.0),
+        new Vector(1.0, 0.0)
+      ));
     canvas.repaint
   }
 
@@ -235,9 +245,10 @@ object M0 {
     val canvas: Graphics = new PostScript(psfile, 2, 2);
 
     // the identity frame
-    val identFrame = new Frame(new Vector(0.0, 0.0),
-                               new Vector(1.0, 0.0),
-                               new Vector(0.0, 1.0));
+    val identFrame = new Frame(
+      new Vector(0.0, 0.0),
+      new Vector(1.0, 0.0),
+      new Vector(0.0, 1.0));
 
     // Create a basic painter...
     val p: Painter = house(canvas);

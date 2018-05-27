@@ -43,15 +43,13 @@ class Mxml {
 
   private def processChildren(children: Seq[Any]): List[Mxml] = {
 
-    children.toList.flatMap(
-        e =>
-          {
+    children.toList.flatMap(e => {
 
-        e match {
+      e match {
 
-          case s: scala.collection.Traversable[_] => s
-          case a => List(a)
-        }
+        case s: scala.collection.Traversable[_] => s
+        case a                                  => List(a)
+      }
     })
   }
 }

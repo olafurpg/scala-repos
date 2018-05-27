@@ -44,10 +44,12 @@ object SimpleParamsExample {
     // We use LabeledPoint, which is a case class.  Spark SQL can convert RDDs of case classes
     // into DataFrames, where it uses the case class metadata to infer the schema.
     val training = sc.parallelize(
-        Seq(LabeledPoint(1.0, Vectors.dense(0.0, 1.1, 0.1)),
-            LabeledPoint(0.0, Vectors.dense(2.0, 1.0, -1.0)),
-            LabeledPoint(0.0, Vectors.dense(2.0, 1.3, 1.0)),
-            LabeledPoint(1.0, Vectors.dense(0.0, 1.2, -0.5))))
+      Seq(
+        LabeledPoint(1.0, Vectors.dense(0.0, 1.1, 0.1)),
+        LabeledPoint(0.0, Vectors.dense(2.0, 1.0, -1.0)),
+        LabeledPoint(0.0, Vectors.dense(2.0, 1.3, 1.0)),
+        LabeledPoint(1.0, Vectors.dense(0.0, 1.2, -0.5))
+      ))
 
     // Create a LogisticRegression instance.  This instance is an Estimator.
     val lr = new LogisticRegression()
@@ -64,7 +66,7 @@ object SimpleParamsExample {
     // This prints the parameter (name: value) pairs, where names are unique IDs for this
     // LogisticRegression instance.
     println(
-        "Model 1 was fit using parameters: " + model1.parent.extractParamMap())
+      "Model 1 was fit using parameters: " + model1.parent.extractParamMap())
 
     // We may alternatively specify parameters using a ParamMap,
     // which supports several methods for specifying parameters.
@@ -81,13 +83,14 @@ object SimpleParamsExample {
     // paramMapCombined overrides all parameters set earlier via lr.set* methods.
     val model2 = lr.fit(training.toDF(), paramMapCombined)
     println(
-        "Model 2 was fit using parameters: " + model2.parent.extractParamMap())
+      "Model 2 was fit using parameters: " + model2.parent.extractParamMap())
 
     // Prepare test data.
     val test = sc.parallelize(
-        Seq(LabeledPoint(1.0, Vectors.dense(-1.0, 1.5, 1.3)),
-            LabeledPoint(0.0, Vectors.dense(3.0, 2.0, -0.1)),
-            LabeledPoint(1.0, Vectors.dense(0.0, 2.2, -1.5))))
+      Seq(
+        LabeledPoint(1.0, Vectors.dense(-1.0, 1.5, 1.3)),
+        LabeledPoint(0.0, Vectors.dense(3.0, 2.0, -0.1)),
+        LabeledPoint(1.0, Vectors.dense(0.0, 2.2, -1.5))))
 
     // Make predictions on test data using the Transformer.transform() method.
     // LogisticRegressionModel.transform will only use the 'features' column.
@@ -98,10 +101,11 @@ object SimpleParamsExample {
       .select("features", "label", "myProbability", "prediction")
       .collect()
       .foreach {
-        case Row(features: Vector,
-                 label: Double,
-                 prob: Vector,
-                 prediction: Double) =>
+        case Row(
+            features: Vector,
+            label: Double,
+            prob: Vector,
+            prediction: Double) =>
           println(s"($features, $label) -> prob=$prob, prediction=$prediction")
       }
 

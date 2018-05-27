@@ -55,7 +55,8 @@ class DynamicVariable[T](init: T) {
     val oldval = value
     tl set newval
 
-    try thunk finally tl set oldval
+    try thunk
+    finally tl set oldval
   }
 
   /** Change the currently bound value, discarding the old value.

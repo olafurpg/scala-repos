@@ -39,7 +39,8 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class PopupWindowAnchorLocationSpec
     extends SFXEnumDelegateSpec[
-        jfxs.PopupWindow.AnchorLocation, PopupWindow.AnchorLocation](
-        classOf[jfxs.PopupWindow.AnchorLocation],
-        classOf[PopupWindow.AnchorLocation],
-        PopupWindow.AnchorLocation)
+      jfxs.PopupWindow.AnchorLocation,
+      PopupWindow.AnchorLocation](
+      classOf[jfxs.PopupWindow.AnchorLocation],
+      classOf[PopupWindow.AnchorLocation],
+      PopupWindow.AnchorLocation)

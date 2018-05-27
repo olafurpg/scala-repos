@@ -67,8 +67,11 @@ import scala.language.higherKinds
   *  @define coll traversable collection
   */
 trait TraversableLike[+A, +Repr]
-    extends Any with HasNewBuilder[A, Repr] with FilterMonadic[A, Repr]
-    with TraversableOnce[A] with GenTraversableLike[A, Repr]
+    extends Any
+    with HasNewBuilder[A, Repr]
+    with FilterMonadic[A, Repr]
+    with TraversableOnce[A]
+    with GenTraversableLike[A, Repr]
     with Parallelizable[A, ParIterable[A]] {
   self =>
 
@@ -227,7 +230,8 @@ trait TraversableLike[+A, +Repr]
       implicit bf: CanBuildFrom[Repr, B, That]): That =
     (that ++ seq)(breakOut)
 
-  def map[B, That](f: A => B)(implicit bf: CanBuildFrom[Repr, B, That]): That = {
+  def map[B, That](f: A => B)(
+      implicit bf: CanBuildFrom[Repr, B, That]): That = {
     def builder = {
       // extracted to keep method size under 35 bytes, so that it can be JIT-inlined
       val b = bf(repr)
@@ -379,8 +383,8 @@ trait TraversableLike[+A, +Repr]
   }
 
   @migration(
-      "The behavior of `scanRight` has changed. The previous behavior can be reproduced with scanRight.reverse.",
-      "2.9.0")
+    "The behavior of `scanRight` has changed. The previous behavior can be reproduced with scanRight.reverse.",
+    "2.9.0")
   def scanRight[B, That](z: B)(op: (A, B) => B)(
       implicit bf: CanBuildFrom[Repr, B, That]): That = {
     var scanned = List(z)
@@ -480,7 +484,9 @@ trait TraversableLike[+A, +Repr]
 
   // Precondition: from >= 0, until > 0, builder already configured for building.
   private[this] def sliceInternal(
-      from: Int, until: Int, b: Builder[A, Repr]): Repr = {
+      from: Int,
+      until: Int,
+      b: Builder[A, Repr]): Repr = {
     var i = 0
     breakable {
       for (x <- this) {
@@ -493,7 +499,9 @@ trait TraversableLike[+A, +Repr]
   }
   // Precondition: from >= 0
   private[scala] def sliceWithKnownDelta(
-      from: Int, until: Int, delta: Int): Repr = {
+      from: Int,
+      until: Int,
+      delta: Int): Repr = {
     val b = newBuilder
     if (until <= from) b.result
     else {
@@ -585,8 +593,8 @@ trait TraversableLike[+A, +Repr]
   }
 
   @deprecatedOverriding(
-      "Enforce contract of toTraversable that if it is Traversable it returns itself.",
-      "2.11.0")
+    "Enforce contract of toTraversable that if it is Traversable it returns itself.",
+    "2.11.0")
   def toTraversable: Traversable[A] = thisCollection
 
   def toIterator: Iterator[A] = toStream.iterator

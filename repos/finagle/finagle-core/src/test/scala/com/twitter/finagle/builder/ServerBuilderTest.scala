@@ -18,7 +18,10 @@ import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 
 @RunWith(classOf[JUnitRunner])
 class ServerBuilderTest
-    extends FunSuite with Eventually with IntegrationPatience with MockitoSugar
+    extends FunSuite
+    with Eventually
+    with IntegrationPatience
+    with MockitoSugar
     with IntegrationBase {
 
   trait ServerBuilderHelper {
@@ -46,8 +49,9 @@ class ServerBuilderTest
         val entries = GlobalRegistry.get.toSet
         val unspecified =
           entries.count(_.key.startsWith(Seq("server", "not-specified")))
-        assert(unspecified == 0,
-               "saw registry keys with 'not-specified' protocol")
+        assert(
+          unspecified == 0,
+          "saw registry keys with 'not-specified' protocol")
         val specified =
           entries.count(_.key.startsWith(Seq("server", expected)))
         assert(specified > 0, "did not see expected protocol registry keys")
@@ -70,8 +74,9 @@ class ServerBuilderTest
         val entry =
           specified.head // data is repeated as entry.key, just take the first
         val hostAndPort = entry.key.filter(_.contains("127.0.0.1")).head
-        assert(!hostAndPort.contains(":0"),
-               "unbounded address in server registry")
+        assert(
+          !hostAndPort.contains(":0"),
+          "unbounded address in server registry")
         server.close()
       }
     }
@@ -110,7 +115,8 @@ class ServerBuilderTest
   }
 
   verifyProtocolRegistry(
-      "#codec(CodecFactory#Server)FancyCodec", expected = "fancy") {
+    "#codec(CodecFactory#Server)FancyCodec",
+    expected = "fancy") {
     class FancyCodec extends CodecFactory[String, String] {
       def client = { config =>
         new com.twitter.finagle.Codec[String, String] {
@@ -133,7 +139,8 @@ class ServerBuilderTest
   }
 
   verifyServerBoundAddress(
-      "#codec(CodecFactory#Server)FancyCodec", expected = "fancy") {
+    "#codec(CodecFactory#Server)FancyCodec",
+    expected = "fancy") {
     class FancyCodec extends CodecFactory[String, String] {
       def client = { config =>
         new com.twitter.finagle.Codec[String, String] {

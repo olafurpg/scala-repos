@@ -13,16 +13,18 @@ import scala.concurrent.duration.{FiniteDuration, _}
 /**
   * INTERNAL API
   */
-private[stream] class Throttle[T](cost: Int,
-                                  per: FiniteDuration,
-                                  maximumBurst: Int,
-                                  costCalculation: (T) ⇒ Int,
-                                  mode: ThrottleMode)
+private[stream] class Throttle[T](
+    cost: Int,
+    per: FiniteDuration,
+    maximumBurst: Int,
+    costCalculation: (T) ⇒ Int,
+    mode: ThrottleMode)
     extends SimpleLinearGraphStage[T] {
   require(cost > 0, "cost must be > 0")
   require(per.toMillis > 0, "per time must be > 0")
-  require(!(mode == ThrottleMode.Enforcing && maximumBurst < 0),
-          "maximumBurst must be > 0 in Enforcing mode")
+  require(
+    !(mode == ThrottleMode.Enforcing && maximumBurst < 0),
+    "maximumBurst must be > 0 in Enforcing mode")
 
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
     new TimerGraphStageLogic(shape) {
@@ -35,43 +37,48 @@ private[stream] class Throttle[T](cost: Int,
 
       var currentElement: Option[T] = None
 
-      setHandler(in, new InHandler {
-        val scaledMaximumBurst = scale(maximumBurst)
+      setHandler(
+        in,
+        new InHandler {
+          val scaledMaximumBurst = scale(maximumBurst)
 
-        override def onUpstreamFinish(): Unit =
-          if (isAvailable(out) && isTimerActive(timerName)) willStop = true
-          else completeStage()
+          override def onUpstreamFinish(): Unit =
+            if (isAvailable(out) && isTimerActive(timerName)) willStop = true
+            else completeStage()
 
-        override def onPush(): Unit = {
-          val elem = grab(in)
-          val elementCost = scale(costCalculation(elem))
+          override def onPush(): Unit = {
+            val elem = grab(in)
+            val elementCost = scale(costCalculation(elem))
 
-          if (lastTokens >= elementCost) {
-            lastTokens -= elementCost
-            push(out, elem)
-          } else {
-            val currentTime = now()
-            val currentTokens =
-              Math.min((currentTime - previousTime) * speed + lastTokens,
-                       scaledMaximumBurst)
-            if (currentTokens < elementCost)
-              mode match {
-                case Shaping ⇒
-                  currentElement = Some(elem)
-                  val waitTime = (elementCost - currentTokens) / speed
-                  previousTime = currentTime + waitTime
-                  scheduleOnce(timerName, waitTime.nanos)
-                case Enforcing ⇒
-                  failStage(new RateExceededException(
-                          "Maximum throttle throughput exceeded"))
-              } else {
-              lastTokens = currentTokens - elementCost
-              previousTime = currentTime
+            if (lastTokens >= elementCost) {
+              lastTokens -= elementCost
               push(out, elem)
+            } else {
+              val currentTime = now()
+              val currentTokens =
+                Math.min(
+                  (currentTime - previousTime) * speed + lastTokens,
+                  scaledMaximumBurst)
+              if (currentTokens < elementCost)
+                mode match {
+                  case Shaping ⇒
+                    currentElement = Some(elem)
+                    val waitTime = (elementCost - currentTokens) / speed
+                    previousTime = currentTime + waitTime
+                    scheduleOnce(timerName, waitTime.nanos)
+                  case Enforcing ⇒
+                    failStage(
+                      new RateExceededException(
+                        "Maximum throttle throughput exceeded"))
+                } else {
+                lastTokens = currentTokens - elementCost
+                previousTime = currentTime
+                push(out, elem)
+              }
             }
           }
         }
-      })
+      )
 
       override protected def onTimer(key: Any): Unit = {
         push(out, currentElement.get)

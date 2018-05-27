@@ -35,7 +35,9 @@ private[spark] trait BlockDataManager {
     * already existed.
     */
   def putBlockData(
-      blockId: BlockId, data: ManagedBuffer, level: StorageLevel): Boolean
+      blockId: BlockId,
+      data: ManagedBuffer,
+      level: StorageLevel): Boolean
 
   /**
     * Release locks acquired by [[putBlockData()]] and [[getBlockData()]].

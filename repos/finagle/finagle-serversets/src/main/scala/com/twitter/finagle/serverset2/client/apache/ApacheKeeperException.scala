@@ -13,15 +13,15 @@ private[serverset2] object ApacheKeeperException {
     */
   def apply(err: Int, path: Option[String]): Option[KeeperException] =
     err match {
-      case 0 => None
-      case -1 => Some(KeeperException.SystemError(path))
-      case -2 => Some(KeeperException.RuntimeInconsistency(path))
-      case -3 => Some(KeeperException.DataInconsistency(path))
-      case -4 => Some(KeeperException.ConnectionLoss(path))
-      case -5 => Some(KeeperException.MarshallingError(path))
-      case -6 => Some(KeeperException.Unimplemented(path))
-      case -7 => Some(KeeperException.OperationTimeout(path))
-      case -8 => Some(KeeperException.BadArguments(path))
+      case 0    => None
+      case -1   => Some(KeeperException.SystemError(path))
+      case -2   => Some(KeeperException.RuntimeInconsistency(path))
+      case -3   => Some(KeeperException.DataInconsistency(path))
+      case -4   => Some(KeeperException.ConnectionLoss(path))
+      case -5   => Some(KeeperException.MarshallingError(path))
+      case -6   => Some(KeeperException.Unimplemented(path))
+      case -7   => Some(KeeperException.OperationTimeout(path))
+      case -8   => Some(KeeperException.BadArguments(path))
       case -100 => Some(KeeperException.APIError(path))
       case -101 => Some(KeeperException.NoNode(path))
       case -102 => Some(KeeperException.NoAuth(path))
@@ -39,6 +39,6 @@ private[serverset2] object ApacheKeeperException {
       case -121 => Some(KeeperException.ReconfigInProgress(path))
       case -122 => Some(KeeperException.EphemeralOnLocalSession(path))
       case -123 => Some(KeeperException.NoWatcher(path))
-      case _ => Some(KeeperException.UnknownError(path))
+      case _    => Some(KeeperException.UnknownError(path))
     }
 }

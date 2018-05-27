@@ -19,10 +19,10 @@ class chi2TestTest extends FunSuite with Matchers {
 
   test("Chi2 test multiple comparisons pt 2") {
     chi2Test((14, 200), Seq((20, 200), (20, 200)))(0).pVal should be(
-        0.4845 +- threshold)
+      0.4845 +- threshold)
   }
   test("Chi2 test multiple comparisons pt 3") {
     chi2Test((14, 200), Seq((20, 200), (20, 200), (20, 200)))(0).pVal should be(
-        0.6299 +- threshold)
+      0.6299 +- threshold)
   }
 }

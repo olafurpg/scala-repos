@@ -43,17 +43,19 @@ trait ToolBox[U <: scala.reflect.api.Universe] {
   /** @see `Typers.typecheck`
     */
   @deprecated("Use `tb.typecheck` instead", "2.11.0")
-  def typeCheck(tree: u.Tree,
-                pt: u.Type = u.WildcardType,
-                silent: Boolean = false,
-                withImplicitViewsDisabled: Boolean = false,
-                withMacrosDisabled: Boolean = false): u.Tree =
-    typecheck(tree,
-              TERMmode,
-              pt,
-              silent,
-              withImplicitViewsDisabled,
-              withMacrosDisabled)
+  def typeCheck(
+      tree: u.Tree,
+      pt: u.Type = u.WildcardType,
+      silent: Boolean = false,
+      withImplicitViewsDisabled: Boolean = false,
+      withMacrosDisabled: Boolean = false): u.Tree =
+    typecheck(
+      tree,
+      TERMmode,
+      pt,
+      silent,
+      withImplicitViewsDisabled,
+      withMacrosDisabled)
 
   /** Typechecks a tree against the expected type `pt`
     *  under typechecking mode specified in `mode` with [[EXPRmode]] being default.
@@ -70,12 +72,13 @@ trait ToolBox[U <: scala.reflect.api.Universe] {
     *    `withImplicitViewsDisabled` recursively prohibits implicit views (though, implicit vals will still be looked up and filled in), default value is false
     *    `withMacrosDisabled` recursively prohibits macro expansions and macro-based implicits, default value is false
     */
-  def typecheck(tree: u.Tree,
-                mode: TypecheckMode = TERMmode,
-                pt: u.Type = u.WildcardType,
-                silent: Boolean = false,
-                withImplicitViewsDisabled: Boolean = false,
-                withMacrosDisabled: Boolean = false): u.Tree
+  def typecheck(
+      tree: u.Tree,
+      mode: TypecheckMode = TERMmode,
+      pt: u.Type = u.WildcardType,
+      silent: Boolean = false,
+      withImplicitViewsDisabled: Boolean = false,
+      withMacrosDisabled: Boolean = false): u.Tree
 
   /** Infers an implicit value of the expected type `pt` in top-level context.
     *  Optional `pos` parameter provides a position that will be associated with the implicit search.
@@ -89,10 +92,11 @@ trait ToolBox[U <: scala.reflect.api.Universe] {
     *  Such errors don't vanish and can be inspected by turning on -Xlog-implicits.
     *  Unlike in `typecheck`, `silent` is true by default.
     */
-  def inferImplicitValue(pt: u.Type,
-                         silent: Boolean = true,
-                         withMacrosDisabled: Boolean = false,
-                         pos: u.Position = u.NoPosition): u.Tree
+  def inferImplicitValue(
+      pt: u.Type,
+      silent: Boolean = true,
+      withMacrosDisabled: Boolean = false,
+      pos: u.Position = u.NoPosition): u.Tree
 
   /** Infers an implicit view from the provided tree `tree` from the type `from` to the type `to` in the toplevel context.
     *  Optional `pos` parameter provides a position that will be associated with the implicit search.
@@ -106,12 +110,13 @@ trait ToolBox[U <: scala.reflect.api.Universe] {
     *  Such errors don't vanish and can be inspected by turning on -Xlog-implicits.
     *  Unlike in `typecheck`, `silent` is true by default.
     */
-  def inferImplicitView(tree: u.Tree,
-                        from: u.Type,
-                        to: u.Type,
-                        silent: Boolean = true,
-                        withMacrosDisabled: Boolean = false,
-                        pos: u.Position = u.NoPosition): u.Tree
+  def inferImplicitView(
+      tree: u.Tree,
+      from: u.Type,
+      to: u.Type,
+      silent: Boolean = true,
+      withMacrosDisabled: Boolean = false,
+      pos: u.Position = u.NoPosition): u.Tree
 
   /** Recursively resets locally defined symbols and types in a given tree.
     *  WARNING: Don't use this API, go for [[untypecheck]] instead.

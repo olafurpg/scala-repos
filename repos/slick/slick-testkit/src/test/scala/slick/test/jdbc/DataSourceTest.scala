@@ -18,9 +18,10 @@ class DataSourceTest {
     import dc.profile.api._
     try {
       assertEquals(
-          1,
-          Await.result(
-              dc.db.run(sql"select lock_mode()".as[Int].head), Duration.Inf))
+        1,
+        Await.result(
+          dc.db.run(sql"select lock_mode()".as[Int].head),
+          Duration.Inf))
     } finally dc.db.close
   }
 
@@ -29,9 +30,10 @@ class DataSourceTest {
     import dc.profile.api._
     try {
       assertEquals(
-          2,
-          Await.result(
-              dc.db.run(sql"select lock_mode()".as[Int].head), Duration.Inf))
+        2,
+        Await.result(
+          dc.db.run(sql"select lock_mode()".as[Int].head),
+          Duration.Inf))
     } finally dc.db.close
   }
 
@@ -40,11 +42,12 @@ class DataSourceTest {
     MockDriver.reset
     val db = JdbcBackend.Database.forConfig("databaseUrl")
     try {
-      try Await.result(db.run(sqlu"dummy"), Duration.Inf) catch {
+      try Await.result(db.run(sqlu"dummy"), Duration.Inf)
+      catch {
         case ex: SQLException =>
       }
       val (url, info) = MockDriver.getLast.getOrElse(
-          fail("No connection data recorded").asInstanceOf[Nothing])
+        fail("No connection data recorded").asInstanceOf[Nothing])
       assertEquals("jdbc:postgresql://host/dbname", url)
       assertEquals("user", info.getProperty("user"))
       assertEquals("pass", info.getProperty("password"))
@@ -63,7 +66,8 @@ class MockDriver extends Driver {
   def acceptsURL(url: String): Boolean = true
   def jdbcCompliant(): Boolean = false
   def getPropertyInfo(
-      url: String, info: Properties): Array[DriverPropertyInfo] = Array()
+      url: String,
+      info: Properties): Array[DriverPropertyInfo] = Array()
   def getMinorVersion: Int = 0
   def getParentLogger: Logger =
     throw new SQLException("feature not implemented")

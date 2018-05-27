@@ -49,25 +49,27 @@ object BackgroundSize {
 }
 
 /**
-  * @author Jarek Sacha 
+  * @author Jarek Sacha
   */
 class BackgroundSize(override val delegate: jfxsl.BackgroundSize)
     extends SFXDelegate[jfxsl.BackgroundSize] {
 
   /** Create a new BackgroundSize. */
-  def this(width: Double,
-           height: Double,
-           widthAsPercentage: Boolean,
-           heightAsPercentage: Boolean,
-           contain: Boolean,
-           cover: Boolean) =
+  def this(
+      width: Double,
+      height: Double,
+      widthAsPercentage: Boolean,
+      heightAsPercentage: Boolean,
+      contain: Boolean,
+      cover: Boolean) =
     this(
-        new jfxsl.BackgroundSize(width,
-                                 height,
-                                 widthAsPercentage,
-                                 heightAsPercentage,
-                                 contain,
-                                 cover))
+      new jfxsl.BackgroundSize(
+        width,
+        height,
+        widthAsPercentage,
+        heightAsPercentage,
+        contain,
+        cover))
 
   /** The height of the area within the Region where the associated BackgroundImage should render. */
   def width: Double = delegate.getHeight

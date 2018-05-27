@@ -13,12 +13,12 @@ class Dependency[T]
 class SparkConf(loadDefaults: Boolean)
 class SparkContext(config: SparkConf)
 
-class RDD[T : ClassTag](
+class RDD[T: ClassTag](
     @transient private var sc: SparkContext,
     @transient private var deps: Seq[Dependency[_]]
 )
 
-class RangePartitioner[K : ClassTag, V](
+class RangePartitioner[K: ClassTag, V](
     @transient val partitions: Int,
     @transient val rdd: RDD[_ <: Product2[K, V]],
     private var ascending: Boolean = true) {

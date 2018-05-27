@@ -48,12 +48,13 @@ object EvolutionsSpec extends Specification {
       val scripts = evolutions.scripts(Seq(b1, a2, b3))
 
       scripts must have length (6)
-      scripts must_== Seq(DownScript(a3),
-                          DownScript(a2),
-                          DownScript(a1),
-                          UpScript(b1),
-                          UpScript(a2),
-                          UpScript(b3))
+      scripts must_== Seq(
+        DownScript(a3),
+        DownScript(a2),
+        DownScript(a1),
+        UpScript(b1),
+        UpScript(a2),
+        UpScript(b3))
 
       evolutions.evolve(scripts, autocommit = true)
 
@@ -71,11 +72,11 @@ object EvolutionsSpec extends Specification {
       val fixed = evolutions.scripts(Seq(a1, a2, a3))
 
       evolutions.evolve(broken, autocommit = true) must throwAn[
-          InconsistentDatabase]
+        InconsistentDatabase]
 
       // inconsistent until resolved
       evolutions.evolve(fixed, autocommit = true) must throwAn[
-          InconsistentDatabase]
+        InconsistentDatabase]
 
       evolutions.resolve(1)
 
@@ -101,7 +102,8 @@ object EvolutionsSpec extends Specification {
     trait ProvideHelperForTesting {
       this: WithEvolutions =>
       Evolutions.withEvolutions(
-          database, SimpleEvolutionsReader.forDefault(a1, a2, a3)) {
+        database,
+        SimpleEvolutionsReader.forDefault(a1, a2, a3)) {
         // Check that there's data in the database
         val resultSet = executeQuery("select * from test")
         resultSet.next must beTrue
@@ -169,52 +171,52 @@ object EvolutionsSpec extends Specification {
 
   trait WithDerbyEvolutions extends WithEvolutions {
     override lazy val database: Database = Databases(
-        driver = "org.apache.derby.jdbc.EmbeddedDriver",
-        url = "jdbc:derby:memory:default;create=true"
+      driver = "org.apache.derby.jdbc.EmbeddedDriver",
+      url = "jdbc:derby:memory:default;create=true"
     )
   }
 
   trait WithDerbyEvolutionsSchema extends WithDerbyEvolutions {
     override lazy val evolutions: DatabaseEvolutions = new DatabaseEvolutions(
-        database = database,
-        schema = "testschema"
+      database = database,
+      schema = "testschema"
     )
   }
 
   object TestEvolutions {
     val a1 = Evolution(
-        1,
-        "create table test (id bigint not null, name varchar(255));",
-        "drop table test;"
+      1,
+      "create table test (id bigint not null, name varchar(255));",
+      "drop table test;"
     )
 
     val a2 = Evolution(
-        2,
-        "alter table test add column age int;",
-        "alter table test drop age;"
+      2,
+      "alter table test add column age int;",
+      "alter table test drop age;"
     )
 
     val a3 = Evolution(
-        3,
-        "insert into test (id, name, age) values (1, 'alice', 42);",
-        "delete from test;"
+      3,
+      "insert into test (id, name, age) values (1, 'alice', 42);",
+      "delete from test;"
     )
 
     val b1 = Evolution(
-        1,
-        "create table test (id bigint not null, content varchar(255));",
-        "drop table test;"
+      1,
+      "create table test (id bigint not null, content varchar(255));",
+      "drop table test;"
     )
 
     val b3 = Evolution(
-        3,
-        "insert into test (id, content, age) values (1, 'bob', 42);",
-        "delete from test;"
+      3,
+      "insert into test (id, content, age) values (1, 'bob', 42);",
+      "delete from test;"
     )
 
     val c1 = Evolution(
-        1,
-        "creaTYPOe table test (id bigint not null, name varchar(255));"
+      1,
+      "creaTYPOe table test (id bigint not null, name varchar(255));"
     )
   }
 }

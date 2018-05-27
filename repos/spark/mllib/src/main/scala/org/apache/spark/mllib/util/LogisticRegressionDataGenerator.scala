@@ -45,12 +45,13 @@ object LogisticRegressionDataGenerator {
     * @param probOne Probability that a label is 1 (and not 0). Default value is 0.5.
     */
   @Since("0.8.0")
-  def generateLogisticRDD(sc: SparkContext,
-                          nexamples: Int,
-                          nfeatures: Int,
-                          eps: Double,
-                          nparts: Int = 2,
-                          probOne: Double = 0.5): RDD[LabeledPoint] = {
+  def generateLogisticRDD(
+      sc: SparkContext,
+      nexamples: Int,
+      nfeatures: Int,
+      eps: Double,
+      nparts: Int = 2,
+      probOne: Double = 0.5): RDD[LabeledPoint] = {
     val data = sc.parallelize(0 until nexamples, nparts).map { idx =>
       val rnd = new Random(42 + idx)
 
@@ -67,9 +68,8 @@ object LogisticRegressionDataGenerator {
   def main(args: Array[String]) {
     if (args.length != 5) {
       // scalastyle:off println
-      println(
-          "Usage: LogisticRegressionGenerator " +
-          "<master> <output_dir> <num_examples> <num_features> <num_partitions>")
+      println("Usage: LogisticRegressionGenerator " +
+        "<master> <output_dir> <num_examples> <num_features> <num_partitions>")
       // scalastyle:on println
       System.exit(1)
     }

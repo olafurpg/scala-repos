@@ -46,9 +46,8 @@ trait ResultConverterDomain {
 }
 
 /** An efficient (albeit boxed) ResultConverter for Product/Tuple values. */
-final case class ProductResultConverter[
-    M <: ResultConverterDomain, T <: Product](
-    elementConverters: ResultConverter[M, _]*)
+final case class ProductResultConverter[M <: ResultConverterDomain,
+T <: Product](elementConverters: ResultConverter[M, _]*)
     extends ResultConverter[M, T] {
   private[this] val cha = elementConverters.to[Array]
   private[this] val len = cha.length
@@ -90,24 +89,18 @@ final case class ProductResultConverter[
 }
 
 /** Result converter that can write to multiple sub-converters and read from the first one */
-final case class CompoundResultConverter[M <: ResultConverterDomain,
-                                         @specialized(Byte,
-                                                      Short,
-                                                      Int,
-                                                      Long,
-                                                      Char,
-                                                      Float,
-                                                      Double,
-                                                      Boolean) T](
-    width: Int, childConverters: ResultConverter[M, T]*)
+final case class CompoundResultConverter[
+    M <: ResultConverterDomain,
+    @specialized(Byte, Short, Int, Long, Char, Float, Double, Boolean) T](
+    width: Int,
+    childConverters: ResultConverter[M, T]*)
     extends ResultConverter[M, T] {
   private[this] val cha = childConverters.to[Array]
   private[this] val len = cha.length
 
   def read(pr: Reader) = {
     if (len == 0)
-      throw new SlickException(
-          "Cannot read from empty CompoundResultConverter")
+      throw new SlickException("Cannot read from empty CompoundResultConverter")
     else cha(0).read(pr)
   }
   def update(value: T, pr: Updater) = {
@@ -140,16 +133,20 @@ final class UnitResultConverter[M <: ResultConverterDomain]
 }
 
 final class GetOrElseResultConverter[M <: ResultConverterDomain, T](
-    child: ResultConverter[M, Option[T]], default: () => T)
+    child: ResultConverter[M, Option[T]],
+    default: () => T)
     extends ResultConverter[M, T] {
   def read(pr: Reader) = child.read(pr).getOrElse(default())
   def update(value: T, pr: Updater) = child.update(Some(value), pr)
   def set(value: T, pp: Writer) = child.set(Some(value), pp)
   def width = child.width
   override def getDumpInfo =
-    super.getDumpInfo.copy(mainInfo = (try default().toString catch {
-      case e: Throwable => "[" + e.getClass.getName + "]"
-    }), children = Vector(("child", child)))
+    super.getDumpInfo.copy(
+      mainInfo = (try default().toString
+      catch {
+        case e: Throwable => "[" + e.getClass.getName + "]"
+      }),
+      children = Vector(("child", child)))
 }
 
 final class IsDefinedResultConverter[M <: ResultConverterDomain](
@@ -166,7 +163,9 @@ final class IsDefinedResultConverter[M <: ResultConverterDomain](
 }
 
 final case class TypeMappingResultConverter[M <: ResultConverterDomain, T, C](
-    child: ResultConverter[M, C], toBase: T => C, toMapped: C => T)
+    child: ResultConverter[M, C],
+    toBase: T => C,
+    toMapped: C => T)
     extends ResultConverter[M, T] {
   def read(pr: Reader) = toMapped(child.read(pr))
   def update(value: T, pr: Updater) = child.update(toBase(value), pr)
@@ -176,9 +175,9 @@ final case class TypeMappingResultConverter[M <: ResultConverterDomain, T, C](
     super.getDumpInfo.copy(children = Vector(("child", child)))
 }
 
-final case class OptionRebuildingResultConverter[
-    M <: ResultConverterDomain, T](
-    discriminator: ResultConverter[M, Boolean], data: ResultConverter[M, T])
+final case class OptionRebuildingResultConverter[M <: ResultConverterDomain, T](
+    discriminator: ResultConverter[M, Boolean],
+    data: ResultConverter[M, T])
     extends ResultConverter[M, Option[T]] {
   def read(pr: Reader): Option[T] =
     if (discriminator.read(pr)) Some(data.read(pr)) else None
@@ -188,8 +187,8 @@ final case class OptionRebuildingResultConverter[
     throw new SlickException("Cannot insert/update non-primitive Option value")
   def width = discriminator.width + data.width
   override def getDumpInfo =
-    super.getDumpInfo.copy(
-        children = Vector(("discriminator", discriminator), ("data", data)))
+    super.getDumpInfo
+      .copy(children = Vector(("discriminator", discriminator), ("data", data)))
 }
 
 /** A `ResultConverter` that simplifies the implementation of fast path
@@ -214,8 +213,9 @@ abstract class SimpleFastPathResultConverter[M <: ResultConverterDomain, T](
   def set(value: T, pp: Writer) = rc.set(value, pp)
 
   override def getDumpInfo =
-    super.getDumpInfo.copy(name = "SimpleFastPathResultConverter",
-                           mainInfo = "",
-                           children = Vector(("rc", rc)))
+    super.getDumpInfo.copy(
+      name = "SimpleFastPathResultConverter",
+      mainInfo = "",
+      children = Vector(("rc", rc)))
   def width = rc.width
 }

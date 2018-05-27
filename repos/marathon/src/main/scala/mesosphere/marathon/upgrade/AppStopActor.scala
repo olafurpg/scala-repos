@@ -10,11 +10,12 @@ import org.apache.mesos.SchedulerDriver
 import scala.collection.mutable
 import scala.concurrent.Promise
 
-class AppStopActor(val driver: SchedulerDriver,
-                   val taskTracker: TaskTracker,
-                   val eventBus: EventStream,
-                   app: AppDefinition,
-                   val promise: Promise[Unit])
+class AppStopActor(
+    val driver: SchedulerDriver,
+    val taskTracker: TaskTracker,
+    val eventBus: EventStream,
+    app: AppDefinition,
+    val promise: Promise[Unit])
     extends StoppingBehavior {
 
   override var idsToKill: mutable.Set[Task.Id] =

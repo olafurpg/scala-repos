@@ -27,7 +27,8 @@ import org.scalajs.core.tools.logging._
 
 /** Checker for the validity of the IR. */
 private final class InfoChecker(
-    infoAndTrees: Traversable[(ClassInfo, ClassDef)], logger: Logger) {
+    infoAndTrees: Traversable[(ClassInfo, ClassDef)],
+    logger: Logger) {
 
   private var errorCount: Int = 0
 
@@ -85,7 +86,9 @@ private final class InfoChecker(
   }
 
   private def checkMethodInfo(
-      className: String, info: MethodInfo, expectedInfo: MethodInfo): Unit = {
+      className: String,
+      info: MethodInfo,
+      expectedInfo: MethodInfo): Unit = {
 
     /* Note that it is fine for the actual info to contain *more* than the
      * expected info. It can produce non-optimal results, but it is still
@@ -100,8 +103,9 @@ private final class InfoChecker(
       expected.forall(actualSet)
     }
 
-    def mapIncludes(actual: Map[String, List[String]],
-                    expected: Map[String, List[String]]) = {
+    def mapIncludes(
+        actual: Map[String, List[String]],
+        expected: Map[String, List[String]]) = {
       expected forall {
         case (cls, expectedMethods) =>
           actual.get(cls) exists { actualMethods =>
@@ -115,17 +119,18 @@ private final class InfoChecker(
         info.isAbstract != expectedInfo.isAbstract ||
         info.isExported != expectedInfo.isExported ||
         !mapIncludes(info.methodsCalled, expectedInfo.methodsCalled) ||
-        !mapIncludes(info.methodsCalledStatically,
-                     expectedInfo.methodsCalledStatically) ||
-        !mapIncludes(info.staticMethodsCalled,
-                     expectedInfo.staticMethodsCalled) || !listIncludes(
-            info.instantiatedClasses, expectedInfo.instantiatedClasses) ||
+        !mapIncludes(
+          info.methodsCalledStatically,
+          expectedInfo.methodsCalledStatically) ||
+        !mapIncludes(info.staticMethodsCalled, expectedInfo.staticMethodsCalled) || !listIncludes(
+          info.instantiatedClasses,
+          expectedInfo.instantiatedClasses) ||
         !listIncludes(info.accessedModules, expectedInfo.accessedModules) ||
         !listIncludes(info.usedInstanceTests, expectedInfo.usedInstanceTests) ||
         !listIncludes(info.accessedClassData, expectedInfo.accessedClassData)) {
       errorCount += 1
       logger.error(
-          s"Method info mismatch for $className.${expectedInfo.encodedName}" +
+        s"Method info mismatch for $className.${expectedInfo.encodedName}" +
           (if (expectedInfo.isStatic) " (static)" else ""))
       logger.error(s"Expected:\n${methodInfoString(expectedInfo)}")
       logger.error(s"Got:\n${methodInfoString(info)}")
@@ -153,8 +158,9 @@ object InfoChecker {
     *
     *  @return Count of info checking errors (0 in case of success)
     */
-  def check(infoAndTrees: Traversable[(ClassInfo, ClassDef)],
-            logger: Logger): Int = {
+  def check(
+      infoAndTrees: Traversable[(ClassInfo, ClassDef)],
+      logger: Logger): Int = {
     new InfoChecker(infoAndTrees, logger).check()
   }
 }

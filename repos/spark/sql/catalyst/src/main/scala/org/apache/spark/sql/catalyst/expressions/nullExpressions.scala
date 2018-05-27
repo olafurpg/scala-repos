@@ -19,7 +19,10 @@ package org.apache.spark.sql.catalyst.expressions
 
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.analysis.TypeCheckResult
-import org.apache.spark.sql.catalyst.expressions.codegen.{CodegenContext, ExprCode}
+import org.apache.spark.sql.catalyst.expressions.codegen.{
+  CodegenContext,
+  ExprCode
+}
 import org.apache.spark.sql.catalyst.util.TypeUtils
 import org.apache.spark.sql.types._
 
@@ -44,10 +47,11 @@ case class Coalesce(children: Seq[Expression]) extends Expression {
   override def checkInputDataTypes(): TypeCheckResult = {
     if (children == Nil) {
       TypeCheckResult.TypeCheckFailure(
-          "input to function coalesce cannot be empty")
+        "input to function coalesce cannot be empty")
     } else {
       TypeUtils.checkForSameTypeInputExpr(
-          children.map(_.dataType), "function coalesce")
+        children.map(_.dataType),
+        "function coalesce")
     }
   }
 
@@ -70,9 +74,10 @@ case class Coalesce(children: Seq[Expression]) extends Expression {
       ${firstEval.code}
       boolean ${ev.isNull} = ${firstEval.isNull};
       ${ctx.javaType(dataType)} ${ev.value} = ${firstEval.value};
-    """ + rest.map { e =>
-      val eval = e.gen(ctx)
-      s"""
+    """ + rest
+      .map { e =>
+        val eval = e.gen(ctx)
+        s"""
         if (${ev.isNull}) {
           ${eval.code}
           if (!${eval.isNull}) {
@@ -81,7 +86,8 @@ case class Coalesce(children: Seq[Expression]) extends Expression {
           }
         }
       """
-    }.mkString("\n")
+      }
+      .mkString("\n")
   }
 }
 
@@ -89,7 +95,9 @@ case class Coalesce(children: Seq[Expression]) extends Expression {
   * Evaluates to `true` iff it's NaN.
   */
 case class IsNaN(child: Expression)
-    extends UnaryExpression with Predicate with ImplicitCastInputTypes {
+    extends UnaryExpression
+    with Predicate
+    with ImplicitCastInputTypes {
 
   override def inputTypes: Seq[AbstractDataType] =
     Seq(TypeCollection(DoubleType, FloatType))
@@ -103,7 +111,7 @@ case class IsNaN(child: Expression)
     } else {
       child.dataType match {
         case DoubleType => value.asInstanceOf[Double].isNaN
-        case FloatType => value.asInstanceOf[Float].isNaN
+        case FloatType  => value.asInstanceOf[Float].isNaN
       }
     }
   }
@@ -127,13 +135,15 @@ case class IsNaN(child: Expression)
   * This Expression is useful for mapping NaN values to null.
   */
 case class NaNvl(left: Expression, right: Expression)
-    extends BinaryExpression with ImplicitCastInputTypes {
+    extends BinaryExpression
+    with ImplicitCastInputTypes {
 
   override def dataType: DataType = left.dataType
 
   override def inputTypes: Seq[AbstractDataType] =
-    Seq(TypeCollection(DoubleType, FloatType),
-        TypeCollection(DoubleType, FloatType))
+    Seq(
+      TypeCollection(DoubleType, FloatType),
+      TypeCollection(DoubleType, FloatType))
 
   override def eval(input: InternalRow): Any = {
     val value = left.eval(input)
@@ -200,8 +210,7 @@ case class IsNull(child: Expression) extends UnaryExpression with Predicate {
 /**
   * An expression that is evaluated to true if the input is not null.
   */
-case class IsNotNull(child: Expression)
-    extends UnaryExpression with Predicate {
+case class IsNotNull(child: Expression) extends UnaryExpression with Predicate {
   override def nullable: Boolean = false
 
   override def eval(input: InternalRow): Any = {
@@ -251,11 +260,12 @@ case class AtLeastNNonNulls(n: Int, children: Seq[Expression])
 
   override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
     val nonnull = ctx.freshName("nonnull")
-    val code = children.map { e =>
-      val eval = e.gen(ctx)
-      e.dataType match {
-        case DoubleType | FloatType =>
-          s"""
+    val code = children
+      .map { e =>
+        val eval = e.gen(ctx)
+        e.dataType match {
+          case DoubleType | FloatType =>
+            s"""
             if ($nonnull < $n) {
               ${eval.code}
               if (!${eval.isNull} && !Double.isNaN(${eval.value})) {
@@ -263,8 +273,8 @@ case class AtLeastNNonNulls(n: Int, children: Seq[Expression])
               }
             }
           """
-        case _ =>
-          s"""
+          case _ =>
+            s"""
             if ($nonnull < $n) {
               ${eval.code}
               if (!${eval.isNull}) {
@@ -272,8 +282,9 @@ case class AtLeastNNonNulls(n: Int, children: Seq[Expression])
               }
             }
           """
+        }
       }
-    }.mkString("\n")
+      .mkString("\n")
     s"""
       int $nonnull = 0;
       $code

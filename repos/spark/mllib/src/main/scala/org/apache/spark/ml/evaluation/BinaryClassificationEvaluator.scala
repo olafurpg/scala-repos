@@ -20,7 +20,12 @@ package org.apache.spark.ml.evaluation
 import org.apache.spark.annotation.{Experimental, Since}
 import org.apache.spark.ml.param._
 import org.apache.spark.ml.param.shared._
-import org.apache.spark.ml.util.{DefaultParamsReadable, DefaultParamsWritable, Identifiable, SchemaUtils}
+import org.apache.spark.ml.util.{
+  DefaultParamsReadable,
+  DefaultParamsWritable,
+  Identifiable,
+  SchemaUtils
+}
 import org.apache.spark.mllib.evaluation.BinaryClassificationMetrics
 import org.apache.spark.mllib.linalg.{Vector, VectorUDT}
 import org.apache.spark.sql.{DataFrame, Row}
@@ -36,7 +41,9 @@ import org.apache.spark.sql.types.DoubleType
 @Experimental
 class BinaryClassificationEvaluator @Since("1.4.0")(
     @Since("1.4.0") override val uid: String)
-    extends Evaluator with HasRawPredictionCol with HasLabelCol
+    extends Evaluator
+    with HasRawPredictionCol
+    with HasLabelCol
     with DefaultParamsWritable {
 
   @Since("1.2.0")
@@ -50,10 +57,11 @@ class BinaryClassificationEvaluator @Since("1.4.0")(
   val metricName: Param[String] = {
     val allowedParams =
       ParamValidators.inArray(Array("areaUnderROC", "areaUnderPR"))
-    new Param(this,
-              "metricName",
-              "metric name in evaluation (areaUnderROC|areaUnderPR)",
-              allowedParams)
+    new Param(
+      this,
+      "metricName",
+      "metric name in evaluation (areaUnderROC|areaUnderPR)",
+      allowedParams)
   }
 
   /** @group getParam */
@@ -87,7 +95,9 @@ class BinaryClassificationEvaluator @Since("1.4.0")(
   override def evaluate(dataset: DataFrame): Double = {
     val schema = dataset.schema
     SchemaUtils.checkColumnTypes(
-        schema, $(rawPredictionCol), Seq(DoubleType, new VectorUDT))
+      schema,
+      $(rawPredictionCol),
+      Seq(DoubleType, new VectorUDT))
     SchemaUtils.checkColumnType(schema, $(labelCol), DoubleType)
 
     // TODO: When dataset metadata has been implemented, check rawPredictionCol vector length = 2.
@@ -101,7 +111,7 @@ class BinaryClassificationEvaluator @Since("1.4.0")(
     val metrics = new BinaryClassificationMetrics(scoreAndLabels)
     val metric = $(metricName) match {
       case "areaUnderROC" => metrics.areaUnderROC()
-      case "areaUnderPR" => metrics.areaUnderPR()
+      case "areaUnderPR"  => metrics.areaUnderPR()
     }
     metrics.unpersist()
     metric
@@ -110,7 +120,7 @@ class BinaryClassificationEvaluator @Since("1.4.0")(
   @Since("1.5.0")
   override def isLargerBetter: Boolean = $(metricName) match {
     case "areaUnderROC" => true
-    case "areaUnderPR" => true
+    case "areaUnderPR"  => true
   }
 
   @Since("1.4.1")

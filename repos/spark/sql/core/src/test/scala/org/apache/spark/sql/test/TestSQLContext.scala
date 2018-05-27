@@ -29,9 +29,10 @@ private[sql] class TestSQLContext(sc: SparkContext) extends SQLContext(sc) {
 
   def this() {
     this(
-        new SparkContext("local[2]",
-                         "test-sql-context",
-                         new SparkConf().set("spark.sql.testkey", "true")))
+      new SparkContext(
+        "local[2]",
+        "test-sql-context",
+        new SparkConf().set("spark.sql.testkey", "true")))
   }
 
   @transient
@@ -67,6 +68,6 @@ private[sql] object TestSQLContext {
     * A map used to store all confs that need to be overridden in sql/core unit tests.
     */
   val overrideConfs: Map[String, String] = Map(
-      // Fewer shuffle partitions to speed up testing.
-      SQLConf.SHUFFLE_PARTITIONS.key -> "5")
+    // Fewer shuffle partitions to speed up testing.
+    SQLConf.SHUFFLE_PARTITIONS.key -> "5")
 }

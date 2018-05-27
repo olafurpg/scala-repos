@@ -7,7 +7,8 @@ import com.typesafe.config.{ConfigFactory, Config}
 object HttpHeaderParserTestBed extends App {
 
   val testConf: Config =
-    ConfigFactory.parseString("""
+    ConfigFactory.parseString(
+      """
     akka.event-handlers = ["akka.testkit.TestEventListener"]
     akka.loglevel = ERROR
     akka.http.parsing.max-header-name-length = 20
@@ -17,8 +18,8 @@ object HttpHeaderParserTestBed extends App {
 
   val parser = HttpHeaderParser.prime {
     HttpHeaderParser.unprimed(
-        ParserSettings(system),
-        warnOnIllegalHeader = info ⇒ system.log.warning(info.formatPretty))
+      ParserSettings(system),
+      warnOnIllegalHeader = info ⇒ system.log.warning(info.formatPretty))
   }
 
   println {
@@ -30,7 +31,9 @@ object HttpHeaderParserTestBed extends App {
        |
        |formatSizes: ${parser.formatSizes}
        |contentHistogram: ${parser.contentHistogram.mkString(
-           "\n  ", "\n  ", "\n")}
+         "\n  ",
+         "\n  ",
+         "\n")}
      """.stripMargin.replace("%TRIE%", parser.formatTrie)
   }
 

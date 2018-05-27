@@ -46,11 +46,11 @@ class EnsembleAdvancedLineChart extends EnsembleExample {
 
     // Create sample data. Here we use a collection of (x,y) pairs
     val xyData = Seq(
-        20d -> 50d,
-        40d -> 80d,
-        50d -> 90d,
-        70d -> 30d,
-        170d -> 122d
+      20d -> 50d,
+      40d -> 80d,
+      50d -> 90d,
+      70d -> 30d,
+      170d -> 122d
     )
 
     // Prepare series

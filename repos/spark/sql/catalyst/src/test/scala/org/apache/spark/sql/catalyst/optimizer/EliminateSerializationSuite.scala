@@ -23,7 +23,11 @@ import org.apache.spark.sql.catalyst.dsl.expressions._
 import org.apache.spark.sql.catalyst.dsl.plans._
 import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
 import org.apache.spark.sql.catalyst.expressions.NewInstance
-import org.apache.spark.sql.catalyst.plans.logical.{LocalRelation, LogicalPlan, MapPartitions}
+import org.apache.spark.sql.catalyst.plans.logical.{
+  LocalRelation,
+  LogicalPlan,
+  MapPartitions
+}
 import org.apache.spark.sql.catalyst.plans.PlanTest
 import org.apache.spark.sql.catalyst.rules.RuleExecutor
 
@@ -35,7 +39,7 @@ class EliminateSerializationSuite extends PlanTest {
       Batch("Serialization", FixedPoint(100), EliminateSerialization) :: Nil
   }
 
-  implicit private def productEncoder[T <: Product : TypeTag] =
+  implicit private def productEncoder[T <: Product: TypeTag] =
     ExpressionEncoder[T]()
   private val func = identity[Iterator[(Int, Int)]] _
   private val func2 = identity[Iterator[OtherTuple]] _

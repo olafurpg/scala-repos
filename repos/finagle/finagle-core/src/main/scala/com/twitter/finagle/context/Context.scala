@@ -14,7 +14,7 @@ import scala.collection.mutable
   * in a linked list; context lookup requires a linear search.
   */
 trait Context {
-  type Key [A]
+  type Key[A]
 
   sealed trait Env {
 
@@ -139,7 +139,7 @@ trait Context {
 
   private[finagle] def env: Env = local() match {
     case Some(env) => env
-    case None => Empty
+    case None      => Empty
   }
 
   /**
@@ -364,7 +364,7 @@ final class MarshalledContext extends Context {
 
     private[this] def copy(buf: Buf): Buf = buf match {
       case ChannelBufferBuf(cb) => Buf.ByteBuffer.Shared(cb.toByteBuffer)
-      case _ => buf
+      case _                    => buf
     }
   }
 }

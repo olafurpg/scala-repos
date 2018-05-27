@@ -102,14 +102,13 @@ class SliderControls(target: Slider)
     text = originalBlockIncrement.get.toString
   }
   target.blockIncrement.onChange(
-      txfBlockIncrement.text = target.blockIncrement.get.toString)
+    txfBlockIncrement.text = target.blockIncrement.get.toString)
   txfBlockIncrement.onAction = handle {
     fillDoublePropertyFromText(target.blockIncrement, txfBlockIncrement, false)
   }
 
   val txfLabelFormatter = new TextField
-  txfLabelFormatter.text.onChange(
-      if (txfLabelFormatter.text.get.isEmpty) {
+  txfLabelFormatter.text.onChange(if (txfLabelFormatter.text.get.isEmpty) {
     target.labelFormatter = null
   } else {
     target.labelFormatter = new DoubleStringConverter
@@ -120,7 +119,7 @@ class SliderControls(target: Slider)
     text = originalMajorTickUnit.toString
   }
   target.majorTickUnit.onChange(
-      txfMajorTickUnit.text = target.majorTickUnit.get.toString)
+    txfMajorTickUnit.text = target.majorTickUnit.get.toString)
   txfMajorTickUnit.onAction = handle {
     fillDoublePropertyFromText(target.majorTickUnit, txfMajorTickUnit, false)
   }
@@ -139,7 +138,7 @@ class SliderControls(target: Slider)
     text = originalMinorTickCount.toString
   }
   target.minorTickCount.onChange(
-      txfMinorTickCount.text = target.minorTickCount.get.toString)
+    txfMinorTickCount.text = target.minorTickCount.get.toString)
   txfMinorTickCount.onAction = handle {
     fillIntPropertyFromText(target.minorTickCount, txfMinorTickCount, false)
   }
@@ -184,11 +183,13 @@ class SliderControls(target: Slider)
     toggleGroup = tggOrientation
   }
   rdbHorizontal.selected = (target.orientation.get() == Orientation.Horizontal)
-  target.orientation.onChange(rdbHorizontal.selected =
+  target.orientation.onChange(
+    rdbHorizontal.selected =
       (target.orientation.get() == Orientation.Horizontal))
   tggOrientation.selectedToggle.onChange {
-    target.orientation = if (rdbHorizontal.selected.get) Orientation.Horizontal
-    else Orientation.Vertical
+    target.orientation =
+      if (rdbHorizontal.selected.get) Orientation.Horizontal
+      else Orientation.Vertical
   }
 
   super.addNode("Value", txfValue)

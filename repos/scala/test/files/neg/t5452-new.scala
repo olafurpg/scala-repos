@@ -17,8 +17,8 @@ case class Queryable[T]() {
 }
 
 object Queryable {
-  def apply[T : ClassTag] = ???
-  def apply[T : ClassTag](t: Tree) = ???
+  def apply[T: ClassTag] = ???
+  def apply[T: ClassTag](t: Tree) = ???
 }
 
 trait CoffeesTable {

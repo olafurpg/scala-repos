@@ -23,9 +23,10 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.ScParamClauseStub
   * @author Alexander Podkhalyuzin
   * Date: 22.02.2008
   */
-class ScParameterClauseImpl private (stub: StubElement[ScParameterClause],
-                                     nodeType: IElementType,
-                                     node: ASTNode)
+class ScParameterClauseImpl private (
+    stub: StubElement[ScParameterClause],
+    nodeType: IElementType,
+    node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
     with ScParameterClause {
 
@@ -38,7 +39,8 @@ class ScParameterClauseImpl private (stub: StubElement[ScParameterClause],
 
   def parameters: Seq[ScParameter] = {
     getStubOrPsiChildren[ScParameter](
-        TokenSets.PARAMETERS, JavaArrayFactoryUtil.ScParameterFactory)
+      TokenSets.PARAMETERS,
+      JavaArrayFactoryUtil.ScParameterFactory)
   }
 
   @volatile
@@ -59,7 +61,7 @@ class ScParameterClauseImpl private (stub: StubElement[ScParameterClause],
             case p: ScPrimaryConstructor =>
               p.containingClass match {
                 case c: ScClass => c
-                case _ => return parameters
+                case _          => return parameters
               }
             case _ => return parameters
           }
@@ -70,9 +72,9 @@ class ScParameterClauseImpl private (stub: StubElement[ScParameterClause],
             //it's important for all calculations to have the same psi here
             if (synthClauseModCount == modCount) return synthClause
             synthClause = ScalaPsiUtil.syntheticParamClause(
-                typeParametersOwner,
-                clauses,
-                typeParametersOwner.isInstanceOf[ScClass])
+              typeParametersOwner,
+              clauses,
+              typeParametersOwner.isInstanceOf[ScClass])
             synthClauseModCount = modCount
             synthClause
           }
@@ -121,10 +123,11 @@ class ScParameterClauseImpl private (stub: StubElement[ScParameterClause],
   }
 
   override def owner: PsiElement = {
-    ScalaPsiUtil.getContextOfType(this,
-                                  true,
-                                  classOf[ScFunctionExpr],
-                                  classOf[ScFunction],
-                                  classOf[ScPrimaryConstructor])
+    ScalaPsiUtil.getContextOfType(
+      this,
+      true,
+      classOf[ScFunctionExpr],
+      classOf[ScFunction],
+      classOf[ScPrimaryConstructor])
   }
 }

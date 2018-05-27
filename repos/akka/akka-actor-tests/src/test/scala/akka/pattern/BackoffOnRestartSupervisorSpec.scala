@@ -47,11 +47,12 @@ class BackoffOnRestartSupervisorSpec extends AkkaSpec with ImplicitSender {
 
   def supervisorProps(probeRef: ActorRef) = {
     val options = Backoff
-      .onFailure(TestActor.props(probeRef),
-                 "someChildName",
-                 200 millis,
-                 10 seconds,
-                 0.0)
+      .onFailure(
+        TestActor.props(probeRef),
+        "someChildName",
+        200 millis,
+        10 seconds,
+        0.0)
       .withSupervisorStrategy(OneForOneStrategy() {
         case _: TestActor.StoppingException ⇒ SupervisorStrategy.Stop
       })
@@ -67,7 +68,7 @@ class BackoffOnRestartSupervisorSpec extends AkkaSpec with ImplicitSender {
   trait Setup2 {
     val probe = TestProbe()
     val parent = system.actorOf(
-        TestParentActor.props(probe.ref, supervisorProps(probe.ref)))
+      TestParentActor.props(probe.ref, supervisorProps(probe.ref)))
     probe.expectMsg("STARTED")
     val child = probe.lastSender
   }
@@ -141,11 +142,12 @@ class BackoffOnRestartSupervisorSpec extends AkkaSpec with ImplicitSender {
     "accept commands while child is terminating" in {
       val postStopLatch = new CountDownLatch(1)
       val options = Backoff
-        .onFailure(Props(new SlowlyFailingActor(postStopLatch)),
-                   "someChildName",
-                   1 nanos,
-                   1 nanos,
-                   0.0)
+        .onFailure(
+          Props(new SlowlyFailingActor(postStopLatch)),
+          "someChildName",
+          1 nanos,
+          1 nanos,
+          0.0)
         .withSupervisorStrategy(OneForOneStrategy(loggingEnabled = false) {
           case _: TestActor.StoppingException ⇒ SupervisorStrategy.Stop
         })

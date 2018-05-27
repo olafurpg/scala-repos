@@ -25,14 +25,15 @@ class ScalaEqEvaluator(left: Evaluator, right: Evaluator) extends Evaluator {
         DebuggerUtilsEx.createValue(vm, "boolean", leftResult == rightResult)
       case (v1: PrimitiveValue, v2: PrimitiveValue)
           if DebuggerUtils.isInteger(leftResult) &&
-          DebuggerUtils.isInteger(rightResult) =>
-        DebuggerUtilsEx.createValue(
-            vm, "boolean", v1.longValue == v2.longValue)
+            DebuggerUtils.isInteger(rightResult) =>
+        DebuggerUtilsEx.createValue(vm, "boolean", v1.longValue == v2.longValue)
       case (v1: PrimitiveValue, v2: PrimitiveValue)
           if DebuggerUtils.isNumeric(leftResult) &&
-          DebuggerUtils.isNumeric(rightResult) =>
+            DebuggerUtils.isNumeric(rightResult) =>
         DebuggerUtilsEx.createValue(
-            vm, "boolean", v1.doubleValue == v2.doubleValue)
+          vm,
+          "boolean",
+          v1.doubleValue == v2.doubleValue)
       case (v1: BooleanValue, v2: BooleanValue) =>
         DebuggerUtilsEx.createValue(vm, "boolean", v1 == v2)
       case (v1: CharValue, v2: CharValue) =>
@@ -41,8 +42,7 @@ class ScalaEqEvaluator(left: Evaluator, right: Evaluator) extends Evaluator {
         DebuggerUtilsEx.createValue(vm, "boolean", v1.uniqueID == v2.uniqueID)
       case _ =>
         throw EvaluationException(
-            DebuggerBundle.message(
-                "evaluation.error.incompatible.types", "=="))
+          DebuggerBundle.message("evaluation.error.incompatible.types", "=="))
     }
   }
 

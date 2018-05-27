@@ -6,7 +6,13 @@
 package scala.tools.nsc
 package backend.jvm
 
-import java.io.{DataOutputStream, FileOutputStream, IOException, OutputStream, File => JFile}
+import java.io.{
+  DataOutputStream,
+  FileOutputStream,
+  IOException,
+  OutputStream,
+  File => JFile
+}
 import scala.tools.nsc.io._
 import java.util.jar.Attributes.Name
 import scala.language.postfixOps
@@ -30,16 +36,19 @@ trait BytecodeWriters {
     * @param clsName cls.getName
     */
   def getFile(
-      base: AbstractFile, clsName: String, suffix: String): AbstractFile = {
+      base: AbstractFile,
+      clsName: String,
+      suffix: String): AbstractFile = {
     def ensureDirectory(dir: AbstractFile): AbstractFile =
       if (dir.isDirectory) dir
       else
         throw new FileConflictException(
-            s"${base.path}/$clsName$suffix: ${dir.path} is not a directory",
-            dir)
+          s"${base.path}/$clsName$suffix: ${dir.path} is not a directory",
+          dir)
     var dir = base
     val pathParts = clsName.split("[./]").toList
-    for (part <- pathParts.init) dir = ensureDirectory(dir) subdirectoryNamed part
+    for (part <- pathParts.init)
+      dir = ensureDirectory(dir) subdirectoryNamed part
     ensureDirectory(dir) fileNamed pathParts.last + suffix
   }
   def getFile(sym: Symbol, clsName: String, suffix: String): AbstractFile =
@@ -50,8 +59,8 @@ trait BytecodeWriters {
     val doDump = settings.Ydumpclasses.isSetByUser
     (emitAsmp, doDump) match {
       case (false, false) => new ClassBytecodeWriter {}
-      case (false, true) => new ClassBytecodeWriter with DumpBytecodeWriter {}
-      case (true, false) => new ClassBytecodeWriter with AsmpBytecodeWriter
+      case (false, true)  => new ClassBytecodeWriter with DumpBytecodeWriter {}
+      case (true, false)  => new ClassBytecodeWriter with AsmpBytecodeWriter
       case (true, true) =>
         new ClassBytecodeWriter with AsmpBytecodeWriter
         with DumpBytecodeWriter {}
@@ -59,10 +68,11 @@ trait BytecodeWriters {
   }
 
   trait BytecodeWriter {
-    def writeClass(label: String,
-                   jclassName: String,
-                   jclassBytes: Array[Byte],
-                   outfile: AbstractFile): Unit
+    def writeClass(
+        label: String,
+        jclassName: String,
+        jclassBytes: Array[Byte],
+        outfile: AbstractFile): Unit
     def close(): Unit = ()
   }
 
@@ -72,17 +82,19 @@ trait BytecodeWriters {
        else List(Name.MAIN_CLASS -> settings.mainClass.value))
     val writer = new Jar(jfile).jarWriter(jarMainAttrs: _*)
 
-    def writeClass(label: String,
-                   jclassName: String,
-                   jclassBytes: Array[Byte],
-                   outfile: AbstractFile) {
+    def writeClass(
+        label: String,
+        jclassName: String,
+        jclassBytes: Array[Byte],
+        outfile: AbstractFile) {
       assert(
-          outfile == null,
-          "The outfile formal param is there just because ClassBytecodeWriter overrides this method and uses it.")
+        outfile == null,
+        "The outfile formal param is there just because ClassBytecodeWriter overrides this method and uses it.")
       val path = jclassName + ".class"
       val out = writer.newOutputStream(path)
 
-      try out.write(jclassBytes, 0, jclassBytes.length) finally out.flush()
+      try out.write(jclassBytes, 0, jclassBytes.length)
+      finally out.flush()
 
       informProgress("added " + label + path + " to jar")
     }
@@ -109,16 +121,17 @@ trait BytecodeWriters {
         val cr = new asm.ClassReader(jclassBytes)
         cr.accept(cnode, 0)
         val trace = new scala.tools.asm.util.TraceClassVisitor(
-            new java.io.PrintWriter(new java.io.StringWriter()))
+          new java.io.PrintWriter(new java.io.StringWriter()))
         cnode.accept(trace)
         trace.p.print(pw)
       } finally pw.close()
     }
 
-    abstract override def writeClass(label: String,
-                                     jclassName: String,
-                                     jclassBytes: Array[Byte],
-                                     outfile: AbstractFile) {
+    abstract override def writeClass(
+        label: String,
+        jclassName: String,
+        jclassBytes: Array[Byte],
+        outfile: AbstractFile) {
       super.writeClass(label, jclassName, jclassBytes, outfile)
 
       val segments = jclassName.split("[./]")
@@ -131,16 +144,18 @@ trait BytecodeWriters {
   }
 
   trait ClassBytecodeWriter extends BytecodeWriter {
-    def writeClass(label: String,
-                   jclassName: String,
-                   jclassBytes: Array[Byte],
-                   outfile: AbstractFile) {
+    def writeClass(
+        label: String,
+        jclassName: String,
+        jclassBytes: Array[Byte],
+        outfile: AbstractFile) {
       assert(
-          outfile != null,
-          "Precisely this override requires its invoker to hand out a non-null AbstractFile.")
+        outfile != null,
+        "Precisely this override requires its invoker to hand out a non-null AbstractFile.")
       val outstream = new DataOutputStream(outfile.bufferedOutput)
 
-      try outstream.write(jclassBytes, 0, jclassBytes.length) finally outstream
+      try outstream.write(jclassBytes, 0, jclassBytes.length)
+      finally outstream
         .close()
       informProgress("wrote '" + label + "' to " + outfile)
     }
@@ -149,19 +164,23 @@ trait BytecodeWriters {
   trait DumpBytecodeWriter extends BytecodeWriter {
     val baseDir = Directory(settings.Ydumpclasses.value).createDirectory()
 
-    abstract override def writeClass(label: String,
-                                     jclassName: String,
-                                     jclassBytes: Array[Byte],
-                                     outfile: AbstractFile) {
+    abstract override def writeClass(
+        label: String,
+        jclassName: String,
+        jclassBytes: Array[Byte],
+        outfile: AbstractFile) {
       super.writeClass(label, jclassName, jclassBytes, outfile)
 
       val pathName = jclassName
       val dumpFile =
-        pathName.split("[./]").foldLeft(baseDir: Path)(_ / _) changeExtension "class" toFile;
+        pathName
+          .split("[./]")
+          .foldLeft(baseDir: Path)(_ / _) changeExtension "class" toFile;
       dumpFile.parent.createDirectory()
       val outstream = new DataOutputStream(new FileOutputStream(dumpFile.path))
 
-      try outstream.write(jclassBytes, 0, jclassBytes.length) finally outstream
+      try outstream.write(jclassBytes, 0, jclassBytes.length)
+      finally outstream
         .close()
     }
   }

@@ -40,30 +40,34 @@ object Producer2FlatMapOperation {
           p match {
             case LeftJoinedProducer(_, wrapper) =>
               FlatMapOperation
-                .combine(acc.asInstanceOf[FlatMapOperation[Any, (Any, Any)]],
-                         wrapper.asInstanceOf[OnlineServiceFactory[Any, Any]])
+                .combine(
+                  acc.asInstanceOf[FlatMapOperation[Any, (Any, Any)]],
+                  wrapper.asInstanceOf[OnlineServiceFactory[Any, Any]])
                 .asInstanceOf[FlatMapOperation[Any, Any]]
             case OptionMappedProducer(_, op) =>
-              acc.andThen(FlatMapOperation[Any, Any](op
-                        .andThen(_.iterator)
-                        .asInstanceOf[Any => TraversableOnce[Any]]))
+              acc.andThen(
+                FlatMapOperation[Any, Any](
+                  op.andThen(_.iterator)
+                    .asInstanceOf[Any => TraversableOnce[Any]]))
             case FlatMappedProducer(_, op) =>
-              acc.andThen(FlatMapOperation(op)
-                    .asInstanceOf[FlatMapOperation[Any, Any]])
+              acc.andThen(
+                FlatMapOperation(op)
+                  .asInstanceOf[FlatMapOperation[Any, Any]])
             case WrittenProducer(_, sinkSupplier) =>
               acc.andThen(FlatMapOperation.write(() => sinkSupplier.toFn))
             case IdentityKeyedProducer(_) => acc
-            case MergedProducer(_, _) => acc
-            case NamedProducer(_, _) => acc
-            case AlsoProducer(_, _) => acc
+            case MergedProducer(_, _)     => acc
+            case NamedProducer(_, _)      => acc
+            case AlsoProducer(_, _)       => acc
             case Source(_) =>
               sys.error("Should not schedule a source inside a flat mapper")
             case Summer(_, _, _) =>
               sys.error("Should not schedule a Summer inside a flat mapper")
             case KeyFlatMappedProducer(_, op) =>
-              acc.andThen(FlatMapOperation
-                    .keyFlatMap[Any, Any, Any](op)
-                    .asInstanceOf[FlatMapOperation[Any, Any]])
+              acc.andThen(
+                FlatMapOperation
+                  .keyFlatMap[Any, Any, Any](op)
+                  .asInstanceOf[FlatMapOperation[Any, Any]])
           }
       }
       .asInstanceOf[FlatMapOperation[T, U]]

@@ -22,24 +22,32 @@ package com.twitter.scalding {
   import com.twitter.chill.MeatLocker
   import scala.collection.JavaConverters._
 
-  import com.twitter.algebird.{Semigroup, StatefulSummer, SummingWithHitsCache, AdaptiveCache}
+  import com.twitter.algebird.{
+    Semigroup,
+    StatefulSummer,
+    SummingWithHitsCache,
+    AdaptiveCache
+  }
   import com.twitter.scalding.mathematics.Poisson
   import serialization.Externalizer
   import scala.util.Try
 
   trait ScaldingPrepare[C] extends Operation[C] {
     abstract override def prepare(
-        flowProcess: FlowProcess[_], operationCall: OperationCall[C]) {
+        flowProcess: FlowProcess[_],
+        operationCall: OperationCall[C]) {
       RuntimeStats.addFlowProcess(flowProcess)
       super.prepare(flowProcess, operationCall)
     }
   }
 
-  class FlatMapFunction[S, T](@transient fn: S => TraversableOnce[T],
-                              fields: Fields,
-                              conv: TupleConverter[S],
-                              set: TupleSetter[T])
-      extends BaseOperation[Any](fields) with Function[Any]
+  class FlatMapFunction[S, T](
+      @transient fn: S => TraversableOnce[T],
+      fields: Fields,
+      conv: TupleConverter[S],
+      set: TupleSetter[T])
+      extends BaseOperation[Any](fields)
+      with Function[Any]
       with ScaldingPrepare[Any] {
     val lockedFn = Externalizer(fn)
 
@@ -56,11 +64,13 @@ package com.twitter.scalding {
     }
   }
 
-  class MapFunction[S, T](@transient fn: S => T,
-                          fields: Fields,
-                          conv: TupleConverter[S],
-                          set: TupleSetter[T])
-      extends BaseOperation[Any](fields) with Function[Any]
+  class MapFunction[S, T](
+      @transient fn: S => T,
+      fields: Fields,
+      conv: TupleConverter[S],
+      set: TupleSetter[T])
+      extends BaseOperation[Any](fields)
+      with Function[Any]
       with ScaldingPrepare[Any] {
     val lockedFn = Externalizer(fn)
     def operate(flowProcess: FlowProcess[_], functionCall: FunctionCall[Any]) {
@@ -74,7 +84,8 @@ package com.twitter.scalding {
     in some edge cases.
    */
   object IdentityFunction
-      extends BaseOperation[Any](Fields.ALL) with Function[Any]
+      extends BaseOperation[Any](Fields.ALL)
+      with Function[Any]
       with ScaldingPrepare[Any] {
     def operate(flowProcess: FlowProcess[_], functionCall: FunctionCall[Any]) {
       functionCall.getOutputCollector.add(functionCall.getArguments)
@@ -82,7 +93,8 @@ package com.twitter.scalding {
   }
 
   class CleanupIdentityFunction(@transient fn: () => Unit)
-      extends BaseOperation[Any](Fields.ALL) with Function[Any]
+      extends BaseOperation[Any](Fields.ALL)
+      with Function[Any]
       with ScaldingPrepare[Any] {
 
     val lockedEf = Externalizer(fn)
@@ -91,16 +103,19 @@ package com.twitter.scalding {
       functionCall.getOutputCollector.add(functionCall.getArguments)
     }
     override def cleanup(
-        flowProcess: FlowProcess[_], operationCall: OperationCall[Any]) {
-      Try.apply(lockedEf.get).foreach(_ ())
+        flowProcess: FlowProcess[_],
+        operationCall: OperationCall[Any]) {
+      Try.apply(lockedEf.get).foreach(_())
     }
   }
 
-  class CollectFunction[S, T](@transient fn: PartialFunction[S, T],
-                              fields: Fields,
-                              conv: TupleConverter[S],
-                              set: TupleSetter[T])
-      extends BaseOperation[Any](fields) with Function[Any]
+  class CollectFunction[S, T](
+      @transient fn: PartialFunction[S, T],
+      fields: Fields,
+      conv: TupleConverter[S],
+      set: TupleSetter[T])
+      extends BaseOperation[Any](fields)
+      with Function[Any]
       with ScaldingPrepare[Any] {
 
     val lockedFn = Externalizer(fn)
@@ -146,13 +161,15 @@ package com.twitter.scalding {
     val COUNTER_GROUP = "MapsideReduce"
   }
 
-  class MapsideReduce[V](@transient commutativeSemigroup: Semigroup[V],
-                         keyFields: Fields,
-                         valueFields: Fields,
-                         cacheSize: Option[Int])(
-      implicit conv: TupleConverter[V], set: TupleSetter[V])
+  class MapsideReduce[V](
+      @transient commutativeSemigroup: Semigroup[V],
+      keyFields: Fields,
+      valueFields: Fields,
+      cacheSize: Option[Int])(
+      implicit conv: TupleConverter[V],
+      set: TupleSetter[V])
       extends BaseOperation[MapsideCache[Tuple, V]](
-          Fields.join(keyFields, valueFields))
+        Fields.join(keyFields, valueFields))
       with Function[MapsideCache[Tuple, V]]
       with ScaldingPrepare[MapsideCache[Tuple, V]] {
 
@@ -168,13 +185,14 @@ package com.twitter.scalding {
     }
 
     @inline
-    private def add(evicted: Option[Map[Tuple, V]],
-                    functionCall: FunctionCall[MapsideCache[Tuple, V]]) {
+    private def add(
+        evicted: Option[Map[Tuple, V]],
+        functionCall: FunctionCall[MapsideCache[Tuple, V]]) {
       // Use iterator and while for optimal performance (avoid closures/fn calls)
       if (evicted.isDefined) {
         // Don't use pattern matching in performance-critical code
         @SuppressWarnings(
-            Array("org.brianmckenna.wartremover.warts.OptionPartial"))
+          Array("org.brianmckenna.wartremover.warts.OptionPartial"))
         val it = evicted.get.iterator
         val tecol = functionCall.getOutputCollector
         while (it.hasNext) {
@@ -186,8 +204,9 @@ package com.twitter.scalding {
       }
     }
 
-    override def operate(flowProcess: FlowProcess[_],
-                         functionCall: FunctionCall[MapsideCache[Tuple, V]]) {
+    override def operate(
+        flowProcess: FlowProcess[_],
+        functionCall: FunctionCall[MapsideCache[Tuple, V]]) {
       val cache = functionCall.getContext
       val keyValueTE = functionCall.getArguments
       // Have to keep a copy of the key tuple because cascading will modify it
@@ -197,8 +216,9 @@ package com.twitter.scalding {
       add(evicted, functionCall)
     }
 
-    override def flush(flowProcess: FlowProcess[_],
-                       operationCall: OperationCall[MapsideCache[Tuple, V]]) {
+    override def flush(
+        flowProcess: FlowProcess[_],
+        operationCall: OperationCall[MapsideCache[Tuple, V]]) {
       // Docs say it is safe to do this cast:
       // http://docs.cascading.org/cascading/2.1/javadoc/cascading/operation/Operation.html#flush(cascading.flow.FlowProcess, cascading.operation.OperationCall)
       val functionCall =
@@ -224,15 +244,16 @@ package com.twitter.scalding {
       valueFields: Fields,
       cacheSize: Option[Int])(implicit setKV: TupleSetter[(K, V)])
       extends BaseOperation[MapsideCache[K, V]](
-          Fields.join(keyFields, valueFields))
+        Fields.join(keyFields, valueFields))
       with Function[MapsideCache[K, V]]
       with ScaldingPrepare[MapsideCache[K, V]] {
 
     val boxedSemigroup = Externalizer(commutativeSemigroup)
     val lockedFn = Externalizer(fn)
 
-    override def prepare(flowProcess: FlowProcess[_],
-                         operationCall: OperationCall[MapsideCache[K, V]]) {
+    override def prepare(
+        flowProcess: FlowProcess[_],
+        operationCall: OperationCall[MapsideCache[K, V]]) {
       //Set up the context:
       implicit val sg: Semigroup[V] = boxedSemigroup.get
       val cache = MapsideCache[K, V](cacheSize, flowProcess)
@@ -240,11 +261,11 @@ package com.twitter.scalding {
     }
 
     // Don't use pattern matching in a performance-critical section
-    @SuppressWarnings(
-        Array("org.brianmckenna.wartremover.warts.OptionPartial"))
+    @SuppressWarnings(Array("org.brianmckenna.wartremover.warts.OptionPartial"))
     @inline
-    private def add(evicted: Option[Map[K, V]],
-                    functionCall: FunctionCall[MapsideCache[K, V]]) {
+    private def add(
+        evicted: Option[Map[K, V]],
+        functionCall: FunctionCall[MapsideCache[K, V]]) {
       // Use iterator and while for optimal performance (avoid closures/fn calls)
       if (evicted.isDefined) {
         val it = evicted.get.iterator
@@ -260,7 +281,8 @@ package com.twitter.scalding {
     import scala.collection.mutable.{Map => MMap}
 
     private[this] class CollectionBackedMap[K, V](val backingMap: MMap[K, V])
-        extends Map[K, V] with java.io.Serializable {
+        extends Map[K, V]
+        with java.io.Serializable {
       def get(key: K) = backingMap.get(key)
 
       def iterator = backingMap.iterator
@@ -271,12 +293,12 @@ package com.twitter.scalding {
     }
 
     // Don't use pattern matching in a performance-critical section
-    @SuppressWarnings(
-        Array("org.brianmckenna.wartremover.warts.OptionPartial"))
-    private[this] def mergeTraversableOnce[K, V : Semigroup](
+    @SuppressWarnings(Array("org.brianmckenna.wartremover.warts.OptionPartial"))
+    private[this] def mergeTraversableOnce[K, V: Semigroup](
         items: TraversableOnce[(K, V)]): Map[K, V] = {
       val mutable =
-        scala.collection.mutable.OpenHashMap[K, V]() // Scala's OpenHashMap seems faster than Java and Scala's HashMap Impl's
+        scala.collection.mutable
+          .OpenHashMap[K, V]() // Scala's OpenHashMap seems faster than Java and Scala's HashMap Impl's
       val innerIter = items.toIterator
       while (innerIter.hasNext) {
         val (k, v) = innerIter.next
@@ -289,18 +311,20 @@ package com.twitter.scalding {
       new CollectionBackedMap(mutable)
     }
 
-    override def operate(flowProcess: FlowProcess[_],
-                         functionCall: FunctionCall[MapsideCache[K, V]]) {
+    override def operate(
+        flowProcess: FlowProcess[_],
+        functionCall: FunctionCall[MapsideCache[K, V]]) {
       val cache = functionCall.getContext
       implicit val sg = boxedSemigroup.get
       val res: Map[K, V] = mergeTraversableOnce(
-          lockedFn.get(functionCall.getArguments))
+        lockedFn.get(functionCall.getArguments))
       val evicted = cache.putAll(res)
       add(evicted, functionCall)
     }
 
-    override def flush(flowProcess: FlowProcess[_],
-                       operationCall: OperationCall[MapsideCache[K, V]]) {
+    override def flush(
+        flowProcess: FlowProcess[_],
+        operationCall: OperationCall[MapsideCache[K, V]]) {
       // Docs say it is safe to do this cast:
       // http://docs.cascading.org/cascading/2.1/javadoc/cascading/operation/Operation.html#flush(cascading.flow.FlowProcess, cascading.operation.OperationCall)
       val functionCall =
@@ -309,8 +333,9 @@ package com.twitter.scalding {
       add(cache.flush, functionCall)
     }
 
-    override def cleanup(flowProcess: FlowProcess[_],
-                         operationCall: OperationCall[MapsideCache[K, V]]) {
+    override def cleanup(
+        flowProcess: FlowProcess[_],
+        operationCall: OperationCall[MapsideCache[K, V]]) {
       // The cache may be large, but super sure we drop any reference to it ASAP
       // probably overly defensive, but it's super cheap.
       operationCall.setContext(null)
@@ -330,11 +355,14 @@ package com.twitter.scalding {
     val ADAPTIVE_CACHE_KEY = "scalding.mapsidecache.adaptive"
 
     private def getCacheSize(fp: FlowProcess[_]): Int =
-      Option(fp.getStringProperty(SIZE_CONFIG_KEY)).filterNot { _.isEmpty }.map {
-        _.toInt
-      }.getOrElse(DEFAULT_CACHE_SIZE)
+      Option(fp.getStringProperty(SIZE_CONFIG_KEY))
+        .filterNot { _.isEmpty }
+        .map {
+          _.toInt
+        }
+        .getOrElse(DEFAULT_CACHE_SIZE)
 
-    def apply[K, V : Semigroup](
+    def apply[K, V: Semigroup](
         cacheSize: Option[Int],
         flowProcess: FlowProcess[_]): MapsideCache[K, V] = {
       val size = cacheSize.getOrElse { getCacheSize(flowProcess) }
@@ -347,20 +375,21 @@ package com.twitter.scalding {
   }
 
   class SummingMapsideCache[K, V](
-      flowProcess: FlowProcess[_], summingCache: SummingWithHitsCache[K, V])
+      flowProcess: FlowProcess[_],
+      summingCache: SummingWithHitsCache[K, V])
       extends MapsideCache[K, V] {
-    private[this] val misses = CounterImpl(
-        flowProcess, StatKey(MapsideReduce.COUNTER_GROUP, "misses"))
-    private[this] val hits = CounterImpl(
-        flowProcess, StatKey(MapsideReduce.COUNTER_GROUP, "hits"))
+    private[this] val misses =
+      CounterImpl(flowProcess, StatKey(MapsideReduce.COUNTER_GROUP, "misses"))
+    private[this] val hits =
+      CounterImpl(flowProcess, StatKey(MapsideReduce.COUNTER_GROUP, "hits"))
     private[this] val evictions = CounterImpl(
-        flowProcess, StatKey(MapsideReduce.COUNTER_GROUP, "evictions"))
+      flowProcess,
+      StatKey(MapsideReduce.COUNTER_GROUP, "evictions"))
 
     def flush = summingCache.flush
 
     // Don't use pattern matching in performance-critical code
-    @SuppressWarnings(
-        Array("org.brianmckenna.wartremover.warts.OptionPartial"))
+    @SuppressWarnings(Array("org.brianmckenna.wartremover.warts.OptionPartial"))
     def put(key: K, value: V): Option[Map[K, V]] = {
       val (curHits, evicted) = summingCache.putWithHits(Map(key -> value))
       misses.increment(1 - curHits)
@@ -371,8 +400,7 @@ package com.twitter.scalding {
     }
 
     // Don't use pattern matching in a performance-critical section
-    @SuppressWarnings(
-        Array("org.brianmckenna.wartremover.warts.OptionPartial"))
+    @SuppressWarnings(Array("org.brianmckenna.wartremover.warts.OptionPartial"))
     def putAll(kvs: Map[K, V]): Option[Map[K, V]] = {
       val (curHits, evicted) = summingCache.putWithHits(kvs)
       misses.increment(kvs.size - curHits)
@@ -384,24 +412,25 @@ package com.twitter.scalding {
   }
 
   class AdaptiveMapsideCache[K, V](
-      flowProcess: FlowProcess[_], adaptiveCache: AdaptiveCache[K, V])
+      flowProcess: FlowProcess[_],
+      adaptiveCache: AdaptiveCache[K, V])
       extends MapsideCache[K, V] {
-    private[this] val misses = CounterImpl(
-        flowProcess, StatKey(MapsideReduce.COUNTER_GROUP, "misses"))
-    private[this] val hits = CounterImpl(
-        flowProcess, StatKey(MapsideReduce.COUNTER_GROUP, "hits"))
-    private[this] val capacity = CounterImpl(
-        flowProcess, StatKey(MapsideReduce.COUNTER_GROUP, "capacity"))
-    private[this] val sentinel = CounterImpl(
-        flowProcess, StatKey(MapsideReduce.COUNTER_GROUP, "sentinel"))
+    private[this] val misses =
+      CounterImpl(flowProcess, StatKey(MapsideReduce.COUNTER_GROUP, "misses"))
+    private[this] val hits =
+      CounterImpl(flowProcess, StatKey(MapsideReduce.COUNTER_GROUP, "hits"))
+    private[this] val capacity =
+      CounterImpl(flowProcess, StatKey(MapsideReduce.COUNTER_GROUP, "capacity"))
+    private[this] val sentinel =
+      CounterImpl(flowProcess, StatKey(MapsideReduce.COUNTER_GROUP, "sentinel"))
     private[this] val evictions = CounterImpl(
-        flowProcess, StatKey(MapsideReduce.COUNTER_GROUP, "evictions"))
+      flowProcess,
+      StatKey(MapsideReduce.COUNTER_GROUP, "evictions"))
 
     def flush = adaptiveCache.flush
 
     // Don't use pattern matching in performance-critical code
-    @SuppressWarnings(
-        Array("org.brianmckenna.wartremover.warts.OptionPartial"))
+    @SuppressWarnings(Array("org.brianmckenna.wartremover.warts.OptionPartial"))
     def put(key: K, value: V) = {
       val (stats, evicted) = adaptiveCache.putWithStats(Map(key -> value))
       misses.increment(1 - stats.hits)
@@ -415,8 +444,7 @@ package com.twitter.scalding {
     }
 
     // Don't use pattern matching in a performance-critical section
-    @SuppressWarnings(
-        Array("org.brianmckenna.wartremover.warts.OptionPartial"))
+    @SuppressWarnings(Array("org.brianmckenna.wartremover.warts.OptionPartial"))
     def putAll(kvs: Map[K, V]): Option[Map[K, V]] = {
       val (stats, evicted) = adaptiveCache.putWithStats(kvs)
       misses.increment(kvs.size - stats.hits)
@@ -437,16 +465,19 @@ package com.twitter.scalding {
       @transient bf: => C, // begin function returns a context
       @transient ef: C => Unit, // end function to clean up context object
       fields: Fields)
-      extends BaseOperation[C](fields) with ScaldingPrepare[C] {
+      extends BaseOperation[C](fields)
+      with ScaldingPrepare[C] {
     val lockedBf = Externalizer(() => bf)
     val lockedEf = Externalizer(ef)
     override def prepare(
-        flowProcess: FlowProcess[_], operationCall: OperationCall[C]) {
+        flowProcess: FlowProcess[_],
+        operationCall: OperationCall[C]) {
       operationCall.setContext(lockedBf.get.apply)
     }
 
     override def cleanup(
-        flowProcess: FlowProcess[_], operationCall: OperationCall[C]) {
+        flowProcess: FlowProcess[_],
+        operationCall: OperationCall[C]) {
       lockedEf.get(operationCall.getContext)
     }
   }
@@ -456,17 +487,18 @@ package com.twitter.scalding {
    */
   class SideEffectMapFunction[S, C, T](
       bf: => C, // begin function returns a context
-      @transient fn: (C,
-      S) => T, // function that takes a context and a tuple and generate a new tuple
+      @transient fn: (C, S) => T, // function that takes a context and a tuple and generate a new tuple
       ef: C => Unit, // end function to clean up context object
       fields: Fields,
       conv: TupleConverter[S],
       set: TupleSetter[T])
-      extends SideEffectBaseOperation[C](bf, ef, fields) with Function[C] {
+      extends SideEffectBaseOperation[C](bf, ef, fields)
+      with Function[C] {
     val lockedFn = Externalizer(fn)
 
     override def operate(
-        flowProcess: FlowProcess[_], functionCall: FunctionCall[C]) {
+        flowProcess: FlowProcess[_],
+        functionCall: FunctionCall[C]) {
       val context = functionCall.getContext
       val s = conv(functionCall.getArguments)
       val res = lockedFn.get(context, s)
@@ -479,17 +511,18 @@ package com.twitter.scalding {
    */
   class SideEffectFlatMapFunction[S, C, T](
       bf: => C, // begin function returns a context
-      @transient fn: (C,
-      S) => TraversableOnce[T], // function that takes a context and a tuple, returns TraversableOnce of T
+      @transient fn: (C, S) => TraversableOnce[T], // function that takes a context and a tuple, returns TraversableOnce of T
       ef: C => Unit, // end function to clean up context object
       fields: Fields,
       conv: TupleConverter[S],
       set: TupleSetter[T])
-      extends SideEffectBaseOperation[C](bf, ef, fields) with Function[C] {
+      extends SideEffectBaseOperation[C](bf, ef, fields)
+      with Function[C] {
     val lockedFn = Externalizer(fn)
 
     override def operate(
-        flowProcess: FlowProcess[_], functionCall: FunctionCall[C]) {
+        flowProcess: FlowProcess[_],
+        functionCall: FunctionCall[C]) {
       val context = functionCall.getContext
       val s = conv(functionCall.getArguments)
       lockedFn.get(context, s) foreach { t =>
@@ -499,7 +532,9 @@ package com.twitter.scalding {
   }
 
   class FilterFunction[T](@transient fn: T => Boolean, conv: TupleConverter[T])
-      extends BaseOperation[Any] with Filter[Any] with ScaldingPrepare[Any] {
+      extends BaseOperation[Any]
+      with Filter[Any]
+      with ScaldingPrepare[Any] {
     val lockedFn = Externalizer(fn)
 
     def isRemove(flowProcess: FlowProcess[_], filterCall: FilterCall[Any]) = {
@@ -509,12 +544,14 @@ package com.twitter.scalding {
 
   // All the following are operations for use in GroupBuilder
 
-  class FoldAggregator[T, X](@transient fn: (X, T) => X,
-                             @transient init: X,
-                             fields: Fields,
-                             conv: TupleConverter[T],
-                             set: TupleSetter[X])
-      extends BaseOperation[X](fields) with Aggregator[X]
+  class FoldAggregator[T, X](
+      @transient fn: (X, T) => X,
+      @transient init: X,
+      fields: Fields,
+      conv: TupleConverter[T],
+      set: TupleSetter[X])
+      extends BaseOperation[X](fields)
+      with Aggregator[X]
       with ScaldingPrepare[X] {
     val lockedFn = Externalizer(fn)
     private val lockedInit = MeatLocker(init)
@@ -542,13 +579,15 @@ package com.twitter.scalding {
   /*
    * fields are the declared fields of this aggregator
    */
-  class MRMAggregator[T, X, U](@transient inputFsmf: T => X,
-                               @transient inputRfn: (X, X) => X,
-                               @transient inputMrfn: X => U,
-                               fields: Fields,
-                               conv: TupleConverter[T],
-                               set: TupleSetter[U])
-      extends BaseOperation[Tuple](fields) with Aggregator[Tuple]
+  class MRMAggregator[T, X, U](
+      @transient inputFsmf: T => X,
+      @transient inputRfn: (X, X) => X,
+      @transient inputMrfn: X => U,
+      fields: Fields,
+      conv: TupleConverter[T],
+      set: TupleSetter[U])
+      extends BaseOperation[Tuple](fields)
+      with Aggregator[Tuple]
       with ScaldingPrepare[Tuple] {
     val fsmf = Externalizer(inputFsmf)
     val rfn = Externalizer(inputRfn)
@@ -612,7 +651,9 @@ package com.twitter.scalding {
      * results.
      */
     override final def aggregate(
-        flowProcess: FlowProcess[_], args: TupleEntry, context: Tuple) = {
+        flowProcess: FlowProcess[_],
+        args: TupleEntry,
+        context: Tuple) = {
       var nextContext: Tuple = null
       val newContextObj =
         if (null == context) {
@@ -647,11 +688,12 @@ package com.twitter.scalding {
     * attempts to be optimal with respect to memory allocations and performance, not functional
     * style purity.
     */
-  class MRMFunctor[T, X](@transient inputMrfn: T => X,
-                         @transient inputRfn: (X, X) => X,
-                         fields: Fields,
-                         conv: TupleConverter[T],
-                         set: TupleSetter[X])
+  class MRMFunctor[T, X](
+      @transient inputMrfn: T => X,
+      @transient inputRfn: (X, X) => X,
+      fields: Fields,
+      conv: TupleConverter[T],
+      set: TupleSetter[X])
       extends FoldFunctor[X](fields) {
 
     val mrfn = Externalizer(inputMrfn)
@@ -668,30 +710,37 @@ package com.twitter.scalding {
   /**
     * MapReduceMapBy Class
     */
-  class MRMBy[T, X, U](arguments: Fields,
-                       middleFields: Fields,
-                       declaredFields: Fields,
-                       mfn: T => X,
-                       rfn: (X, X) => X,
-                       mfn2: X => U,
-                       startConv: TupleConverter[T],
-                       midSet: TupleSetter[X],
-                       midConv: TupleConverter[X],
-                       endSet: TupleSetter[U])
+  class MRMBy[T, X, U](
+      arguments: Fields,
+      middleFields: Fields,
+      declaredFields: Fields,
+      mfn: T => X,
+      rfn: (X, X) => X,
+      mfn2: X => U,
+      startConv: TupleConverter[T],
+      midSet: TupleSetter[X],
+      midConv: TupleConverter[X],
+      endSet: TupleSetter[U])
       extends AggregateBy(
-          arguments,
-          new MRMFunctor[T, X](mfn, rfn, middleFields, startConv, midSet),
-          new MRMAggregator[X, X, U](
-              args => args, rfn, mfn2, declaredFields, midConv, endSet))
+        arguments,
+        new MRMFunctor[T, X](mfn, rfn, middleFields, startConv, midSet),
+        new MRMAggregator[X, X, U](
+          args => args,
+          rfn,
+          mfn2,
+          declaredFields,
+          midConv,
+          endSet))
 
-  class BufferOp[I, T, X](@transient init: I,
-                          @transient inputIterfn: (I,
-                          Iterator[T]) => TraversableOnce[X],
-                          fields: Fields,
-                          conv: TupleConverter[T],
-                          set: TupleSetter[X])
+  class BufferOp[I, T, X](
+      @transient init: I,
+      @transient inputIterfn: (I, Iterator[T]) => TraversableOnce[X],
+      fields: Fields,
+      conv: TupleConverter[T],
+      set: TupleSetter[X])
       extends BaseOperation[Any](fields)
-      with Buffer[Any] with ScaldingPrepare[Any] {
+      with Buffer[Any]
+      with ScaldingPrepare[Any] {
     val iterfn = Externalizer(inputIterfn)
     private val lockedInit = MeatLocker(init)
     def initCopy = lockedInit.copy
@@ -718,7 +767,8 @@ package com.twitter.scalding {
       fields: Fields,
       conv: TupleConverter[T],
       set: TupleSetter[X])
-      extends SideEffectBaseOperation[C](bf, ef, fields) with Buffer[C] {
+      extends SideEffectBaseOperation[C](bf, ef, fields)
+      with Buffer[C] {
     val iterfn = Externalizer(inputIterfn)
     private val lockedInit = MeatLocker(init)
     def initCopy = lockedInit.copy
@@ -736,18 +786,22 @@ package com.twitter.scalding {
   }
 
   class SampleWithReplacement(
-      frac: Double, val seed: Int = new java.util.Random().nextInt)
-      extends BaseOperation[Poisson]() with Function[Poisson]
+      frac: Double,
+      val seed: Int = new java.util.Random().nextInt)
+      extends BaseOperation[Poisson]()
+      with Function[Poisson]
       with ScaldingPrepare[Poisson] {
     override def prepare(
-        flowProcess: FlowProcess[_], operationCall: OperationCall[Poisson]) {
+        flowProcess: FlowProcess[_],
+        operationCall: OperationCall[Poisson]) {
       super.prepare(flowProcess, operationCall)
       val p = new Poisson(frac, seed)
       operationCall.setContext(p);
     }
 
     def operate(
-        flowProcess: FlowProcess[_], functionCall: FunctionCall[Poisson]) {
+        flowProcess: FlowProcess[_],
+        functionCall: FunctionCall[Poisson]) {
       val r = functionCall.getContext.nextInt
       for (i <- 0 until r) functionCall.getOutputCollector().add(Tuple.NULL)
     }
@@ -759,7 +813,8 @@ package com.twitter.scalding {
       convV: TupleConverter[V],
       @transient reduceFn: (K, Iterator[V]) => Iterator[U],
       valueField: Fields)
-      extends BaseOperation[Any](valueField) with Buffer[Any]
+      extends BaseOperation[Any](valueField)
+      with Buffer[Any]
       with ScaldingPrepare[Any] {
     val reduceFnSer = Externalizer(reduceFn)
 

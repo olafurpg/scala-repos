@@ -35,13 +35,13 @@ class HttpsRulesSpec extends Specification {
 
     "generate a correct Strict-Transport-Security header without sub-domains" in {
       HttpsRules(Some(Duration(1440, SECONDS)), false).headers must_== List(
-          "Strict-Transport-Security" -> "max-age=1440"
+        "Strict-Transport-Security" -> "max-age=1440"
       )
     }
 
     "generate a correct Strict-Transport-Security header including sub-domains" in {
       HttpsRules(Some(Duration(1440, SECONDS)), true).headers must_== List(
-          "Strict-Transport-Security" -> "max-age=1440 ; includeSubDomains"
+        "Strict-Transport-Security" -> "max-age=1440 ; includeSubDomains"
       )
     }
   }
@@ -56,8 +56,8 @@ class ContentSecurityPolicySpec extends Specification {
 
     "default to allowing script eval and script sources only from self" in {
       ContentSecurityPolicy().scriptSources must_== List(
-          ContentSourceRestriction.UnsafeEval,
-          ContentSourceRestriction.Self
+        ContentSourceRestriction.UnsafeEval,
+        ContentSourceRestriction.Self
       )
     }
 
@@ -114,8 +114,9 @@ class ContentSecurityPolicySpec extends Specification {
           case (headerName, _)
               if headerName.contains("Content-Security-Policy") =>
             headerName
-        } must_== List("Content-Security-Policy-Report-Only",
-                       "X-Content-Security-Policy-Report-Only")
+        } must_== List(
+        "Content-Security-Policy-Report-Only",
+        "X-Content-Security-Policy-Report-Only")
     }
 
     "provide no headers with enforcement and logging disabled" in {
@@ -124,75 +125,83 @@ class ContentSecurityPolicySpec extends Specification {
 
     "correctly generate restriction strings for the various restriction types" in {
       ContentSecurityPolicy(
-          defaultSources = Nil,
-          imageSources = Nil,
-          styleSources = Nil,
-          reportUri = None,
-          scriptSources = List(
-                ContentSourceRestriction.All,
-                ContentSourceRestriction.Host("https://base.*.example.com"),
-                ContentSourceRestriction.Scheme("data"),
-                ContentSourceRestriction.None,
-                ContentSourceRestriction.Self,
-                ContentSourceRestriction.UnsafeInline,
-                ContentSourceRestriction.UnsafeEval
-            )
-      ).headers(enforce = true).head._2 must_== "script-src * https://base.*.example.com data: 'none' 'self' 'unsafe-inline' 'unsafe-eval'"
+        defaultSources = Nil,
+        imageSources = Nil,
+        styleSources = Nil,
+        reportUri = None,
+        scriptSources = List(
+          ContentSourceRestriction.All,
+          ContentSourceRestriction.Host("https://base.*.example.com"),
+          ContentSourceRestriction.Scheme("data"),
+          ContentSourceRestriction.None,
+          ContentSourceRestriction.Self,
+          ContentSourceRestriction.UnsafeInline,
+          ContentSourceRestriction.UnsafeEval
+        )
+      ).headers(enforce = true)
+        .head
+        ._2 must_== "script-src * https://base.*.example.com data: 'none' 'self' 'unsafe-inline' 'unsafe-eval'"
     }
 
     "not generate a restriction string for empty restrictions" in {
       ContentSecurityPolicy(
-          Nil,
-          Nil,
-          Nil,
-          Nil,
-          Nil,
-          Nil,
-          Nil,
-          Nil,
-          Nil,
-          reportUri = None
+        Nil,
+        Nil,
+        Nil,
+        Nil,
+        Nil,
+        Nil,
+        Nil,
+        Nil,
+        Nil,
+        reportUri = None
       ).headers(enforce = true).head._2 must_== ""
     }
 
     "combine restrictions for multiple content types correctly" in {
       ContentSecurityPolicy(
-          defaultSources = List(ContentSourceRestriction.Self),
-          fontSources = List(
-                ContentSourceRestriction.Host("https://base.*.example.com")),
-          frameSources = List(ContentSourceRestriction.Scheme("data")),
-          imageSources = List(ContentSourceRestriction.All),
-          mediaSources = List(ContentSourceRestriction.None),
-          scriptSources = List(ContentSourceRestriction.Self),
-          styleSources = List(ContentSourceRestriction.UnsafeInline),
-          reportUri = None
-      ).headers(enforce = true).head._2 must_== "default-src 'self'; font-src https://base.*.example.com; frame-src data:; img-src *; media-src 'none'; script-src 'self'; style-src 'unsafe-inline'"
+        defaultSources = List(ContentSourceRestriction.Self),
+        fontSources =
+          List(ContentSourceRestriction.Host("https://base.*.example.com")),
+        frameSources = List(ContentSourceRestriction.Scheme("data")),
+        imageSources = List(ContentSourceRestriction.All),
+        mediaSources = List(ContentSourceRestriction.None),
+        scriptSources = List(ContentSourceRestriction.Self),
+        styleSources = List(ContentSourceRestriction.UnsafeInline),
+        reportUri = None
+      ).headers(enforce = true)
+        .head
+        ._2 must_== "default-src 'self'; font-src https://base.*.example.com; frame-src data:; img-src *; media-src 'none'; script-src 'self'; style-src 'unsafe-inline'"
     }
 
     "include the report URI" in {
       ContentSecurityPolicy(
-          defaultSources = List(ContentSourceRestriction.Self),
-          fontSources = Nil,
-          frameSources = Nil,
-          imageSources = Nil,
-          mediaSources = Nil,
-          scriptSources = Nil,
-          styleSources = Nil,
-          reportUri = Some(new URI("/example/uri"))
-      ).headers(enforce = true, logViolations = true).head._2 must_== "default-src 'self'; report-uri /example/uri"
+        defaultSources = List(ContentSourceRestriction.Self),
+        fontSources = Nil,
+        frameSources = Nil,
+        imageSources = Nil,
+        mediaSources = Nil,
+        scriptSources = Nil,
+        styleSources = Nil,
+        reportUri = Some(new URI("/example/uri"))
+      ).headers(enforce = true, logViolations = true)
+        .head
+        ._2 must_== "default-src 'self'; report-uri /example/uri"
     }
 
     "include the report URI even if logging is disabled provided enforcement is enabled" in {
       ContentSecurityPolicy(
-          defaultSources = List(ContentSourceRestriction.Self),
-          fontSources = Nil,
-          frameSources = Nil,
-          imageSources = Nil,
-          mediaSources = Nil,
-          scriptSources = Nil,
-          styleSources = Nil,
-          reportUri = Some(new java.net.URI("/example/uri"))
-      ).headers(enforce = true, logViolations = false).head._2 must_== "default-src 'self'; report-uri /example/uri"
+        defaultSources = List(ContentSourceRestriction.Self),
+        fontSources = Nil,
+        frameSources = Nil,
+        imageSources = Nil,
+        mediaSources = Nil,
+        scriptSources = Nil,
+        styleSources = Nil,
+        reportUri = Some(new java.net.URI("/example/uri"))
+      ).headers(enforce = true, logViolations = false)
+        .head
+        ._2 must_== "default-src 'self'; report-uri /example/uri"
     }
   }
 }

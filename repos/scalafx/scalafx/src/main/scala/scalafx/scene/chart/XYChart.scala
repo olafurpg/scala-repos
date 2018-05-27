@@ -31,7 +31,12 @@ import javafx.{scene => jfxs}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, ObjectProperty, ReadOnlyObjectProperty, StringProperty}
+import scalafx.beans.property.{
+  BooleanProperty,
+  ObjectProperty,
+  ReadOnlyObjectProperty,
+  StringProperty
+}
 import scalafx.collections.ObservableBuffer
 import scalafx.delegate.SFXDelegate
 import scalafx.scene.Node
@@ -52,8 +57,8 @@ object XYChart {
   }
 
   class Data[X, Y](
-      override val delegate: jfxsc.XYChart.Data[X, Y] = new jfxsc.XYChart.Data[
-            X, Y]())
+      override val delegate: jfxsc.XYChart.Data[X, Y] =
+        new jfxsc.XYChart.Data[X, Y]())
       extends SFXDelegate[jfxsc.XYChart.Data[X, Y]] {
 
     def extraValue: ObjectProperty[AnyRef] = delegate.extraValueProperty
@@ -86,13 +91,14 @@ object XYChart {
       new jfxsc.XYChart.Series[X, Y](data)
 
     def apply[X, Y](
-        name: String, data: ObservableBuffer[jfxsc.XYChart.Data[X, Y]]) =
+        name: String,
+        data: ObservableBuffer[jfxsc.XYChart.Data[X, Y]]) =
       new jfxsc.XYChart.Series[X, Y](name, data)
   }
 
   class Series[X, Y](
-      override val delegate: jfxsc.XYChart.Series[X, Y] = new jfxsc.XYChart.Series[
-            X, Y]())
+      override val delegate: jfxsc.XYChart.Series[X, Y] =
+        new jfxsc.XYChart.Series[X, Y]())
       extends SFXDelegate[jfxsc.XYChart.Series[X, Y]] {
 
     def chart: ReadOnlyObjectProperty[jfxsc.XYChart[X, Y]] =
@@ -119,7 +125,8 @@ object XYChart {
 }
 
 abstract class XYChart[X, Y](override val delegate: jfxsc.XYChart[X, Y])
-    extends Chart(delegate) with SFXDelegate[jfxsc.XYChart[X, Y]] {
+    extends Chart(delegate)
+    with SFXDelegate[jfxsc.XYChart[X, Y]] {
 
   def alternativeColumnFillVisible: BooleanProperty =
     delegate.alternativeColumnFillVisibleProperty

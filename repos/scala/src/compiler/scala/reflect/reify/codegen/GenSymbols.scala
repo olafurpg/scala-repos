@@ -76,12 +76,12 @@ trait GenSymbols { self: Reifier =>
       } else {
         if (reifyDebug)
           println(
-              "Locatable: %s (%s) owned by %s (%s) at %s".format(
-                  sym,
-                  sym.accurateKindString,
-                  sym.owner,
-                  sym.owner.accurateKindString,
-                  sym.owner.fullNameString))
+            "Locatable: %s (%s) owned by %s (%s) at %s".format(
+              sym,
+              sym.accurateKindString,
+              sym.owner,
+              sym.owner.accurateKindString,
+              sym.owner.fullNameString))
         val rowner = reify(sym.owner)
         val rname = reify(sym.name.toString)
         if (sym.isType) mirrorBuildCall(nme.selectType, rowner, rname)
@@ -90,7 +90,10 @@ trait GenSymbols { self: Reifier =>
           val index = sym.owner.info.decl(sym.name).alternatives indexOf sym
           assert(index >= 0, sym)
           mirrorBuildCall(
-              nme.selectOverloadedMethod, rowner, rname, reify(index))
+            nme.selectOverloadedMethod,
+            rowner,
+            rname,
+            reify(index))
         } else mirrorBuildCall(nme.selectTerm, rowner, rname)
       }
     } else {
@@ -105,9 +108,10 @@ trait GenSymbols { self: Reifier =>
     reifyIntoSymtab(binding.symbol) { sym =>
       if (reifyDebug)
         println(
-            "Free term" + (if (sym.isCapturedVariable) " (captured)" else "") +
+          "Free term" + (if (sym.isCapturedVariable) " (captured)" else "") +
             ": " + sym + "(" + sym.accurateKindString + ")")
-      val name = newTermName("" + nme.REIFY_FREE_PREFIX + sym.name +
+      val name = newTermName(
+        "" + nme.REIFY_FREE_PREFIX + sym.name +
           (if (sym.isType) nme.REIFY_FREE_THIS_SUFFIX else ""))
       // We need to note whether the free value being reified is stable or not to guide subsequent reflective compilation.
       // Here's why reflection compilation needs our help.
@@ -140,22 +144,25 @@ trait GenSymbols { self: Reifier =>
         assert(binding.isInstanceOf[Ident], showRaw(binding))
         val capturedBinding = referenceCapturedVariable(sym)
         Reification(
-            name,
+          name,
+          capturedBinding,
+          mirrorBuildCall(
+            nme.newFreeTerm,
+            reify(sym.name.toString),
             capturedBinding,
-            mirrorBuildCall(nme.newFreeTerm,
-                            reify(sym.name.toString),
-                            capturedBinding,
-                            mirrorBuildCall(nme.FlagsRepr, reify(sym.flags)),
-                            reify(origin(sym))))
+            mirrorBuildCall(nme.FlagsRepr, reify(sym.flags)),
+            reify(origin(sym)))
+        )
       } else {
         Reification(
-            name,
+          name,
+          binding,
+          mirrorBuildCall(
+            nme.newFreeTerm,
+            reify(sym.name.toString),
             binding,
-            mirrorBuildCall(nme.newFreeTerm,
-                            reify(sym.name.toString),
-                            binding,
-                            mirrorBuildCall(nme.FlagsRepr, reify(sym.flags)),
-                            reify(origin(sym))))
+            mirrorBuildCall(nme.FlagsRepr, reify(sym.flags)),
+            reify(origin(sym))))
       }
     }
 
@@ -166,12 +173,13 @@ trait GenSymbols { self: Reifier =>
       state.reificationIsConcrete = false
       val name: TermName = nme.REIFY_FREE_PREFIX append sym.name
       Reification(
-          name,
-          binding,
-          mirrorBuildCall(nme.newFreeType,
-                          reify(sym.name.toString),
-                          mirrorBuildCall(nme.FlagsRepr, reify(sym.flags)),
-                          reify(origin(sym))))
+        name,
+        binding,
+        mirrorBuildCall(
+          nme.newFreeType,
+          reify(sym.name.toString),
+          mirrorBuildCall(nme.FlagsRepr, reify(sym.flags)),
+          reify(origin(sym))))
     }
 
   def reifySymDef(sym: Symbol): Tree =
@@ -182,14 +190,16 @@ trait GenSymbols { self: Reifier =>
       def reifiedOwner =
         if (sym.owner.isLocatable) reify(sym.owner) else reifySymDef(sym.owner)
       Reification(
-          name,
-          Ident(sym),
-          mirrorBuildCall(nme.newNestedSymbol,
-                          reifiedOwner,
-                          reify(sym.name),
-                          reify(sym.pos),
-                          mirrorBuildCall(nme.FlagsRepr, reify(sym.flags)),
-                          reify(sym.isClass)))
+        name,
+        Ident(sym),
+        mirrorBuildCall(
+          nme.newNestedSymbol,
+          reifiedOwner,
+          reify(sym.name),
+          reify(sym.pos),
+          mirrorBuildCall(nme.FlagsRepr, reify(sym.flags)),
+          reify(sym.isClass))
+      )
     }
 
   case class Reification(name: Name, binding: Tree, tree: Tree)

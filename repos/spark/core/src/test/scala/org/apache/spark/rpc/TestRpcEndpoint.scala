@@ -58,7 +58,8 @@ class TestRpcEndpoint extends ThreadSafeRpcEndpoint with TripleEquals {
     * `remoteAddress`.
     */
   override def onNetworkError(
-      cause: Throwable, remoteAddress: RpcAddress): Unit = {
+      cause: Throwable,
+      remoteAddress: RpcAddress): Unit = {
     onNetworkErrorMessages += cause -> remoteAddress
   }
 
@@ -117,7 +118,8 @@ class TestRpcEndpoint extends ThreadSafeRpcEndpoint with TripleEquals {
   }
 
   def verifySingleOnNetworkErrorMessage(
-      cause: Throwable, remoteAddress: RpcAddress): Unit = {
+      cause: Throwable,
+      remoteAddress: RpcAddress): Unit = {
     verifyOnNetworkErrorMessages(List(cause -> remoteAddress))
   }
 

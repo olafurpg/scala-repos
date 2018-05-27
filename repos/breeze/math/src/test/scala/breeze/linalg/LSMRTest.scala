@@ -10,8 +10,8 @@ class LSMRTest extends FunSuite {
 
   test("simple dense solve") {
     val matrix = DenseMatrix(
-        (1.0, 3.0, 4.0),
-        (2.0, 0.0, 6.0)
+      (1.0, 3.0, 4.0),
+      (2.0, 0.0, 6.0)
     )
     val b = DenseVector(1.0, 3.0)
     val lsmrSolved = LSMR.solve(matrix, b)
@@ -22,8 +22,8 @@ class LSMRTest extends FunSuite {
 
   test("regularized solve") {
     val matrix = DenseMatrix(
-        (1.0, 3.0, 4.0),
-        (2.0, 0.0, 6.0)
+      (1.0, 3.0, 4.0),
+      (2.0, 0.0, 6.0)
     )
     val b = DenseVector(1.0, 3.0)
     // checked against original implementation
@@ -37,8 +37,8 @@ class LSMRTest extends FunSuite {
 
   test("regularized solve, 2.0") {
     val matrix = DenseMatrix(
-        (1.0, 3.0, 4.0),
-        (2.0, 0.0, 6.0)
+      (1.0, 3.0, 4.0),
+      (2.0, 0.0, 6.0)
     )
     val b = DenseVector(1.0, 3.0)
     val bfgsSolved = lbfgsSolve(matrix, b, 2.0)
@@ -60,9 +60,10 @@ class LSMRTest extends FunSuite {
     assert(norm(bfgsSolved - lsmrSolved) < 1E-2, s"$bfgsSolved $lsmrSolved")
   }
 
-  private def lbfgsSolve(mat: DenseMatrix[Double],
-                         target: DenseVector[Double],
-                         reg: Double = 0.0) = {
+  private def lbfgsSolve(
+      mat: DenseMatrix[Double],
+      target: DenseVector[Double],
+      reg: Double = 0.0) = {
     val obj = new DiffFunction[DenseVector[Double]] {
       override def calculate(
           x: DenseVector[Double]): (Double, DenseVector[Double]) = {
@@ -71,7 +72,9 @@ class LSMRTest extends FunSuite {
       }
     }
     GradientTester.test[Int, DenseVector[Double]](
-        obj, DenseVector.rand[Double](mat.cols, gen), 1.0)
+      obj,
+      DenseVector.rand[Double](mat.cols, gen),
+      1.0)
 
     new LBFGS[DenseVector[Double]](tolerance = 1E-9)
       .minimize(obj, DenseVector.rand[Double](mat.cols, gen))
@@ -109,15 +112,18 @@ class LSMRTest extends FunSuite {
 
       implicit object mulADV
           extends OpMulMatrix.Impl2[
-              A.type, DenseVector[Double], DenseVector[Double]] {
+            A.type,
+            DenseVector[Double],
+            DenseVector[Double]] {
         override def apply(
-            v: A.type, v2: DenseVector[Double]): DenseVector[Double] = {
+            v: A.type,
+            v2: DenseVector[Double]): DenseVector[Double] = {
           assert(v2.length == n)
           val d = DenseVector.range(1, n + 1).map(_.toDouble)
           val y1 =
             (DenseVector.tabulate(n + 1)(i => if (i < n) v2(i) * d(i) else 0.0) +
-                DenseVector.tabulate(n + 1)(
-                    i => if (i > 0) v2(i - 1) * d(i - 1) else 0.0))
+              DenseVector.tabulate(n + 1)(i =>
+                if (i > 0) v2(i - 1) * d(i - 1) else 0.0))
 
           if (m <= n + 1) {
             y1(0 until m)
@@ -129,14 +135,17 @@ class LSMRTest extends FunSuite {
 
       implicit object mulATDV
           extends OpMulMatrix.Impl2[
-              Transpose[A.type], DenseVector[Double], DenseVector[Double]] {
-        override def apply(v: Transpose[A.type],
-                           v2: DenseVector[Double]): DenseVector[Double] = {
+            Transpose[A.type],
+            DenseVector[Double],
+            DenseVector[Double]] {
+        override def apply(
+            v: Transpose[A.type],
+            v2: DenseVector[Double]): DenseVector[Double] = {
           assert(v2.length == m)
           val d = DenseVector.range(1, m + 1).map(_.toDouble)
           val y1 =
-            ((d :* v2) + DenseVector.tabulate(m)(
-                    i => if (i < m - 1) d(i) * v2(i + 1) else 0.0))
+            ((d :* v2) + DenseVector.tabulate(m)(i =>
+              if (i < m - 1) d(i) * v2(i + 1) else 0.0))
 
           if (m >= n) {
             y1(0 until n)

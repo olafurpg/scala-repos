@@ -80,11 +80,13 @@ object Test2 {
   println("(true,false)=" + load[(Boolean, Boolean)](dump((true, false))))
   println()
 
-  println("List(List(1), List(2))=" +
+  println(
+    "List(List(1), List(2))=" +
       load[List[List[Int]]](dump(List(List(1), List(2)))))
   println()
 
-  println("Array(Array(1), Array(2))=" +
+  println(
+    "Array(Array(1), Array(2))=" +
       loadArray[Array[Int]](dump(Array(Array(1), Array(2)))))
   println()
 }
@@ -115,7 +117,7 @@ object Marshal {
       case _: ClassCastException =>
         in.close()
         throw new ClassCastException(
-            "type mismatch;" + "\n found : " + found + "\n required: " +
+          "type mismatch;" + "\n found : " + found + "\n required: " +
             expected)
     }
   }

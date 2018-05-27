@@ -53,8 +53,9 @@ object SparkSqlExample {
       }
     }
 
-    test(results.size == 5,
-         "Unexpected number of selected elements: " + results)
+    test(
+      results.size == 5,
+      "Unexpected number of selected elements: " + results)
     println("Test succeeded")
     sc.stop()
   }

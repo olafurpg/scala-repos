@@ -53,11 +53,15 @@ class FailureSuite extends SparkFunSuite with BeforeAndAfter with Logging {
 
   test("multiple failures with map") {
     MasterFailureTest.testMap(
-        directory.getAbsolutePath, numBatches, batchDuration)
+      directory.getAbsolutePath,
+      numBatches,
+      batchDuration)
   }
 
   test("multiple failures with updateStateByKey") {
     MasterFailureTest.testUpdateStateByKey(
-        directory.getAbsolutePath, numBatches, batchDuration)
+      directory.getAbsolutePath,
+      numBatches,
+      batchDuration)
   }
 }

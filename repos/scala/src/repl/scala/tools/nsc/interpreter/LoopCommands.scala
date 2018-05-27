@@ -48,10 +48,11 @@ trait LoopCommands {
     def nullary(name: String, help: String, f: () => Result): LoopCommand =
       new NullaryCmd(name, help, _ => f())
 
-    def cmd(name: String,
-            usage: String,
-            help: String,
-            f: String => Result): LoopCommand =
+    def cmd(
+        name: String,
+        usage: String,
+        help: String,
+        f: String => Result): LoopCommand =
       if (usage == "") new NullaryCmd(name, help, f)
       else new LineCmd(name, usage, help, f)
   }
@@ -62,14 +63,20 @@ trait LoopCommands {
   }
 
   class LineCmd(
-      name: String, argWord: String, help: String, f: String => Result)
+      name: String,
+      argWord: String,
+      help: String,
+      f: String => Result)
       extends LoopCommand(name, help) {
     override def usage = argWord
     def apply(line: String): Result = f(line)
   }
 
   class VarArgsCmd(
-      name: String, argWord: String, help: String, f: List[String] => Result)
+      name: String,
+      argWord: String,
+      help: String,
+      f: List[String] => Result)
       extends LoopCommand(name, help) {
     override def usage = argWord
     def apply(line: String): Result = apply(words(line))

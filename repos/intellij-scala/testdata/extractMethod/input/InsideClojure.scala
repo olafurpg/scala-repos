@@ -5,7 +5,7 @@ class InsideClojure {
         /*start*/
         p + 1
         p + 2
-/*end*/
+        /*end*/
       }
     }
   }

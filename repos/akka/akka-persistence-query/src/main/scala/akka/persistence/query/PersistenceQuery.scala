@@ -14,7 +14,8 @@ import com.typesafe.config.Config
   * Persistence extension for queries.
   */
 object PersistenceQuery
-    extends ExtensionId[PersistenceQuery] with ExtensionIdProvider {
+    extends ExtensionId[PersistenceQuery]
+    with ExtensionIdProvider {
 
   /**
     * Java API.
@@ -55,7 +56,8 @@ class PersistenceQuery(system: ExtendedActorSystem) extends Extension {
     * read journal configuration entry.
     */
   final def getReadJournalFor[T <: javadsl.ReadJournal](
-      clazz: Class[T], readJournalPluginId: String): T =
+      clazz: Class[T],
+      readJournalPluginId: String): T =
     readJournalPluginFor(readJournalPluginId).javadslPlugin.asInstanceOf[T]
 
   @tailrec private def readJournalPluginFor(
@@ -71,19 +73,22 @@ class PersistenceQuery(system: ExtendedActorSystem) extends Extension {
               system: ExtendedActorSystem): PluginHolder = {
             val provider = createPlugin(configPath)
             PluginHolder(
-                provider.scaladslReadJournal(), provider.javadslReadJournal())
+              provider.scaladslReadJournal(),
+              provider.javadslReadJournal())
           }
         }
         readJournalPluginExtensionIds.compareAndSet(
-            extensionIdMap, extensionIdMap.updated(configPath, extensionId))
+          extensionIdMap,
+          extensionIdMap.updated(configPath, extensionId))
         readJournalPluginFor(readJournalPluginId) // Recursive invocation.
     }
   }
 
   private def createPlugin(configPath: String): ReadJournalProvider = {
     require(
-        !isEmpty(configPath) && system.settings.config.hasPath(configPath),
-        s"'reference.conf' is missing persistence read journal plugin config path: '${configPath}'")
+      !isEmpty(configPath) && system.settings.config.hasPath(configPath),
+      s"'reference.conf' is missing persistence read journal plugin config path: '${configPath}'"
+    )
     val pluginConfig = system.settings.config.getConfig(configPath)
     val pluginClassName = pluginConfig.getString("class")
     log.debug(s"Create plugin: ${configPath} ${pluginClassName}")
@@ -95,15 +100,20 @@ class PersistenceQuery(system: ExtendedActorSystem) extends Extension {
         .createInstanceFor[ReadJournalProvider](pluginClass, args)
 
     instantiate((classOf[ExtendedActorSystem], system) :: (
-            classOf[Config], pluginConfig) :: Nil).recoverWith {
-      case x: NoSuchMethodException ⇒
-        instantiate((classOf[ExtendedActorSystem], system) :: Nil)
-    }.recoverWith { case x: NoSuchMethodException ⇒ instantiate(Nil) }.recoverWith {
-      case ex: Exception ⇒
-        Failure.apply(new IllegalArgumentException(
-                s"Unable to create read journal plugin instance for path [$configPath], class [$pluginClassName]!",
-                ex))
-    }.get
+      classOf[Config],
+      pluginConfig) :: Nil)
+      .recoverWith {
+        case x: NoSuchMethodException ⇒
+          instantiate((classOf[ExtendedActorSystem], system) :: Nil)
+      }
+      .recoverWith { case x: NoSuchMethodException ⇒ instantiate(Nil) }
+      .recoverWith {
+        case ex: Exception ⇒
+          Failure.apply(new IllegalArgumentException(
+            s"Unable to create read journal plugin instance for path [$configPath], class [$pluginClassName]!",
+            ex))
+      }
+      .get
   }
 
   /** Check for default or missing identity. */

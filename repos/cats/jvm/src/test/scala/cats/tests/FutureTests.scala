@@ -21,7 +21,7 @@ class FutureTests extends CatsSuite {
   def futureXor[A](f: Future[A]): Future[Xor[Throwable, A]] =
     f.map(Xor.right[Throwable, A]).recover { case t => Xor.left(t) }
 
-  implicit def eqfa[A : Eq]: Eq[Future[A]] =
+  implicit def eqfa[A: Eq]: Eq[Future[A]] =
     new Eq[Future[A]] {
       def eqv(fx: Future[A], fy: Future[A]): Boolean = {
         val fz = futureXor(fx) zip futureXor(fy)
@@ -35,9 +35,10 @@ class FutureTests extends CatsSuite {
 
   // Need non-fatal Throwables for Future recoverWith/handleError
   implicit val nonFatalArbitrary: Arbitrary[Throwable] = Arbitrary(
-      arbitrary[Exception].map(identity))
+    arbitrary[Exception].map(identity))
 
-  checkAll("Future[Int]",
-           MonadErrorTests[Future, Throwable].monadError[Int, Int, Int])
+  checkAll(
+    "Future[Int]",
+    MonadErrorTests[Future, Throwable].monadError[Int, Int, Int])
   checkAll("Future[Int]", ComonadTests[Future].comonad[Int, Int, Int])
 }

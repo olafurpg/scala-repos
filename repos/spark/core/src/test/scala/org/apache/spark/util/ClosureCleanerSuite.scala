@@ -19,7 +19,12 @@ package org.apache.spark.util
 
 import java.io.NotSerializableException
 
-import org.apache.spark.{SparkContext, SparkException, SparkFunSuite, TaskContext}
+import org.apache.spark.{
+  SparkContext,
+  SparkException,
+  SparkFunSuite,
+  TaskContext
+}
 import org.apache.spark.LocalSparkContext._
 import org.apache.spark.partial.CountEvaluator
 import org.apache.spark.rdd.RDD
@@ -53,15 +58,14 @@ class ClosureCleanerSuite extends SparkFunSuite {
     assert(obj.run() === 96) // 4 * (1+2+3+4) + 4 * (1+2+3+4) + 16 * 1
   }
 
-  test(
-      "toplevel return statements in closures are identified at cleaning time") {
+  test("toplevel return statements in closures are identified at cleaning time") {
     intercept[ReturnStatementInClosureException] {
       TestObjectWithBogusReturns.run()
     }
   }
 
   test(
-      "return statements from named functions nested in closures don't raise exceptions") {
+    "return statements from named functions nested in closures don't raise exceptions") {
     val result = TestObjectWithNestedReturns.run()
     assert(result === 1)
   }
@@ -77,7 +81,7 @@ class ClosureCleanerSuite extends SparkFunSuite {
         case rse: ReturnStatementInClosureException => // Success!
         case e @ (_: NotSerializableException | _: SparkException) =>
           fail(s"Expected ReturnStatementInClosureException, but got $e.\n" +
-              "This means the closure provided by user is not actually cleaned.")
+            "This means the closure provided by user is not actually cleaned.")
       }
     }
 
@@ -187,7 +191,7 @@ class NonSerializable(val id: Int = -1) {
   override def equals(other: Any): Boolean = {
     other match {
       case o: NonSerializable => id == o.id
-      case _ => false
+      case _                  => false
     }
   }
 }
@@ -316,44 +320,60 @@ class TestClassWithNesting(val y: Int) extends Serializable {
   */
 private object TestUserClosuresActuallyCleaned {
   def testMap(rdd: RDD[Int]): Unit = {
-    rdd.map { _ =>
-      return; 0
-    }.count()
+    rdd
+      .map { _ =>
+        return; 0
+      }
+      .count()
   }
   def testFlatMap(rdd: RDD[Int]): Unit = {
-    rdd.flatMap { _ =>
-      return; Seq()
-    }.count()
+    rdd
+      .flatMap { _ =>
+        return; Seq()
+      }
+      .count()
   }
   def testFilter(rdd: RDD[Int]): Unit = {
-    rdd.filter { _ =>
-      return; true
-    }.count()
+    rdd
+      .filter { _ =>
+        return; true
+      }
+      .count()
   }
   def testSortBy(rdd: RDD[Int]): Unit = {
-    rdd.sortBy { _ =>
-      return; 1
-    }.count()
+    rdd
+      .sortBy { _ =>
+        return; 1
+      }
+      .count()
   }
   def testKeyBy(rdd: RDD[Int]): Unit = {
-    rdd.keyBy { _ =>
-      return; 1
-    }.count()
+    rdd
+      .keyBy { _ =>
+        return; 1
+      }
+      .count()
   }
   def testGroupBy(rdd: RDD[Int]): Unit = {
-    rdd.groupBy { _ =>
-      return; 1
-    }.count()
+    rdd
+      .groupBy { _ =>
+        return; 1
+      }
+      .count()
   }
   def testMapPartitions(rdd: RDD[Int]): Unit = {
-    rdd.mapPartitions { it =>
-      return; it
-    }.count()
+    rdd
+      .mapPartitions { it =>
+        return; it
+      }
+      .count()
   }
   def testMapPartitionsWithIndex(rdd: RDD[Int]): Unit = {
-    rdd.mapPartitionsWithIndex { (_, it) =>
-      return; it
-    }.count()
+    rdd
+      .mapPartitionsWithIndex { (_, it) =>
+        return; it
+      }
+      .count()
   }
   def testZipPartitions2(rdd: RDD[Int]): Unit = {
     rdd.zipPartitions(rdd) { case (it1, it2) => return; it1 }.count()
@@ -393,7 +413,7 @@ private object TestUserClosuresActuallyCleaned {
   }
   def testTreeAggregate(rdd: RDD[Int]): Unit = {
     rdd.treeAggregate(0)({ case (_, _) => return; 1 }, {
-      case (_, _) => return; 1
+      case (_, _)                      => return; 1
     })
   }
 
@@ -402,14 +422,15 @@ private object TestUserClosuresActuallyCleaned {
     rdd
       .combineByKey({ _ =>
         return; 1
-      }: Int => Int, { case (_, _) => return; 1 }: (Int,
-      Int) => Int, { case (_, _) => return; 1 }: (Int, Int) => Int)
+      }: Int => Int, { case (_, _) => return; 1 }: (Int, Int) => Int, {
+        case (_, _)                => return; 1
+      }: (Int, Int) => Int)
       .count()
   }
   def testAggregateByKey(rdd: RDD[(Int, Int)]): Unit = {
     rdd
       .aggregateByKey(0)({ case (_, _) => return; 1 }, {
-        case (_, _) => return; 1
+        case (_, _)                    => return; 1
       })
       .count()
   }
@@ -468,10 +489,10 @@ private object TestUserClosuresActuallyCleaned {
   def testSubmitJob(sc: SparkContext): Unit = {
     val rdd = sc.parallelize(1 to 10, 10)
     sc.submitJob(
-        rdd, { _ =>
-          return; 1
-        }: Iterator[Int] => Int,
-        Seq.empty, { case (_, _) => return }: (Int, Int) => Unit, { return }
+      rdd, { _ =>
+        return; 1
+      }: Iterator[Int] => Int,
+      Seq.empty, { case (_, _) => return }: (Int, Int) => Unit, { return }
     )
   }
 }
@@ -495,27 +516,25 @@ class TestCreateNullValue {
     // Bring in all primitive types into the closure such that they become
     // parameters of the closure constructor. This allows us to test whether
     // null values are created correctly for each type.
-    val nestedClosure = () =>
-      {
-        // scalastyle:off println
-        if (s.toString == "123") {
-          // Don't really output them to avoid noisy
-          println(bo)
-          println(c)
-          println(b)
-          println(s)
-          println(i)
-          println(l)
-          println(f)
-          println(d)
-        }
+    val nestedClosure = () => {
+      // scalastyle:off println
+      if (s.toString == "123") {
+        // Don't really output them to avoid noisy
+        println(bo)
+        println(c)
+        println(b)
+        println(s)
+        println(i)
+        println(l)
+        println(f)
+        println(d)
+      }
 
-        val closure = () =>
-          {
-            println(getX)
-        }
-        // scalastyle:on println
-        ClosureCleaner.clean(closure)
+      val closure = () => {
+        println(getX)
+      }
+      // scalastyle:on println
+      ClosureCleaner.clean(closure)
     }
     nestedClosure()
   }

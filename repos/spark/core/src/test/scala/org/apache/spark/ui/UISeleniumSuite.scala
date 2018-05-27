@@ -71,7 +71,9 @@ private[spark] class SparkUICssErrorHandler extends DefaultCssErrorHandler {
   * Selenium tests for the Spark Web UI.
   */
 class UISeleniumSuite
-    extends SparkFunSuite with WebBrowser with Matchers
+    extends SparkFunSuite
+    with WebBrowser
+    with Matchers
     with BeforeAndAfterAll {
 
   implicit var webDriver: WebDriver = _
@@ -125,17 +127,17 @@ class UISeleniumSuite
       eventually(timeout(5 seconds), interval(50 milliseconds)) {
         goToUi(ui, "/storage/rdd/?id=0")
         val tableRowText = findAll(
-            cssSelector("#rdd-storage-by-block-table td")).map(_.text).toSeq
+          cssSelector("#rdd-storage-by-block-table td")).map(_.text).toSeq
         tableRowText should contain(StorageLevels.DISK_ONLY.description)
       }
 
       val storageJson = getJson(ui, "storage/rdd")
       storageJson.children.length should be(1)
       (storageJson \ "storageLevel").extract[String] should be(
-          StorageLevels.DISK_ONLY.description)
+        StorageLevels.DISK_ONLY.description)
       val rddJson = getJson(ui, "storage/rdd/0")
       (rddJson \ "storageLevel").extract[String] should be(
-          StorageLevels.DISK_ONLY.description)
+        StorageLevels.DISK_ONLY.description)
 
       rdd.unpersist()
       rdd.persist(StorageLevels.MEMORY_ONLY).count()
@@ -148,17 +150,17 @@ class UISeleniumSuite
       eventually(timeout(5 seconds), interval(50 milliseconds)) {
         goToUi(ui, "/storage/rdd/?id=0")
         val tableRowText = findAll(
-            cssSelector("#rdd-storage-by-block-table td")).map(_.text).toSeq
+          cssSelector("#rdd-storage-by-block-table td")).map(_.text).toSeq
         tableRowText should contain(StorageLevels.MEMORY_ONLY.description)
       }
 
       val updatedStorageJson = getJson(ui, "storage/rdd")
       updatedStorageJson.children.length should be(1)
       (updatedStorageJson \ "storageLevel").extract[String] should be(
-          StorageLevels.MEMORY_ONLY.description)
+        StorageLevels.MEMORY_ONLY.description)
       val updatedRddJson = getJson(ui, "storage/rdd/0")
       (updatedRddJson \ "storageLevel").extract[String] should be(
-          StorageLevels.MEMORY_ONLY.description)
+        StorageLevels.MEMORY_ONLY.description)
     }
   }
 
@@ -180,7 +182,7 @@ class UISeleniumSuite
       val stageJson = getJson(sc.ui.get, "stages")
       stageJson.children.length should be(1)
       (stageJson \ "status").extract[String] should be(
-          StageStatus.FAILED.name())
+        StageStatus.FAILED.name())
 
       // Regression test for SPARK-2105
       class NotSerializable
@@ -233,7 +235,7 @@ class UISeleniumSuite
   }
 
   test(
-      "jobs page should not display job group name unless some job was submitted in a job group") {
+    "jobs page should not display job group name unless some job was submitted in a job group") {
     withSpark(newSparkContext()) { sc =>
       // If no job has been run in a job group, then "(Job Group)" should not appear in the header
       sc.parallelize(Seq(1, 2, 3)).count()
@@ -284,7 +286,11 @@ class UISeleniumSuite
           val reduceId = taskContext.partitionId()
           val message = "Simulated fetch failure"
           throw new FetchFailedException(
-              bmAddress, shuffleId, mapId, reduceId, message)
+            bmAddress,
+            shuffleId,
+            mapId,
+            reduceId,
+            message)
         } else {
           x
         }
@@ -293,14 +299,14 @@ class UISeleniumSuite
       eventually(timeout(5 seconds), interval(50 milliseconds)) {
         goToUi(sc, "/jobs")
         find(cssSelector(".stage-progress-cell")).get.text should be(
-            "2/2 (1 failed)")
+          "2/2 (1 failed)")
         // Ideally, the following test would pass, but currently we overcount completed tasks
         // if task recomputations occur:
         // find(cssSelector(".progress-cell .progress")).get.text should be ("2/2 (1 failed)")
         // Instead, we guarantee that the total number of tasks is always correct, while the number
         // of completed tasks may be higher:
         find(cssSelector(".progress-cell .progress")).get.text should be(
-            "3/2 (1 failed)")
+          "3/2 (1 failed)")
       }
       val jobJson = getJson(sc.ui.get, "jobs")
       (jobJson \ "numTasks").extract[Int] should be(2)
@@ -339,7 +345,7 @@ class UISeleniumSuite
   }
 
   test(
-      "job details page should display useful information for stages that haven't started") {
+    "job details page should display useful information for stages that haven't started") {
     withSpark(newSparkContext()) { sc =>
       // Create a multi-stage job with a long delay in the first stage:
       val rdd = sc
@@ -402,8 +408,7 @@ class UISeleniumSuite
     }
   }
 
-  test(
-      "stages that aren't run appear as 'skipped stages' after a job finishes") {
+  test("stages that aren't run appear as 'skipped stages' after a job finishes") {
     withSpark(newSparkContext()) { sc =>
       // Create an RDD that involves multiple stages:
       val rdd = sc
@@ -436,7 +441,7 @@ class UISeleniumSuite
   }
 
   test(
-      "jobs with stages that are skipped should show correct link descriptions on all jobs page") {
+    "jobs with stages that are skipped should show correct link descriptions on all jobs page") {
     withSpark(newSparkContext()) { sc =>
       // Create an RDD that involves multiple stages:
       val rdd = sc
@@ -464,8 +469,7 @@ class UISeleniumSuite
       val sparkUI = sc.ui.get
 
       val newTab = new WebUITab(sparkUI, "foo") {
-        attachPage(
-            new WebUIPage("") {
+        attachPage(new WebUIPage("") {
           def render(request: HttpServletRequest): Seq[Node] = {
             <b>"html magic"</b>
           }
@@ -478,7 +482,7 @@ class UISeleniumSuite
         find(cssSelector("""ul li a[href*="stages"]""")) should not be (None)
         find(cssSelector("""ul li a[href*="storage"]""")) should not be (None)
         find(cssSelector("""ul li a[href*="environment"]""")) should not be
-        (None)
+          (None)
         find(cssSelector("""ul li a[href*="foo"]""")) should not be (None)
       }
       eventually(timeout(10 seconds), interval(50 milliseconds)) {
@@ -493,7 +497,7 @@ class UISeleniumSuite
         find(cssSelector("""ul li a[href*="stages"]""")) should not be (None)
         find(cssSelector("""ul li a[href*="storage"]""")) should not be (None)
         find(cssSelector("""ul li a[href*="environment"]""")) should not be
-        (None)
+          (None)
         find(cssSelector("""ul li a[href*="foo"]""")) should be(None)
       }
       eventually(timeout(10 seconds), interval(50 milliseconds)) {
@@ -521,7 +525,8 @@ class UISeleniumSuite
         }
         .countAsync()
       eventually(timeout(5 seconds), interval(50 milliseconds)) {
-        val url = new URL(sc.ui.get.appUIAddress.stripSuffix("/") +
+        val url = new URL(
+          sc.ui.get.appUIAddress.stripSuffix("/") +
             "/stages/stage/kill/?id=0&terminate=true")
         // SPARK-6846: should be POST only but YARN AM doesn't proxy POST
         getResponseCode(url, "GET") should be(200)
@@ -557,17 +562,17 @@ class UISeleniumSuite
       }
 
       val expJobInfo = Seq(
-          ("9", "collect"),
-          ("8", "count")
+        ("9", "collect"),
+        ("8", "count")
       )
 
       eventually(timeout(1 second), interval(50 milliseconds)) {
         goToUi(sc, "/jobs")
         // The completed jobs table should have two rows. The first row will be the most recent job:
         find("completed-summary").get.text should be(
-            "Completed Jobs: 10, only showing 2")
+          "Completed Jobs: 10, only showing 2")
         find("completed").get.text should be(
-            "Completed Jobs (10, only showing 2)")
+          "Completed Jobs (10, only showing 2)")
         val rows = findAll(cssSelector("tbody tr")).toIndexedSeq.map {
           _.underlying
         }
@@ -607,17 +612,17 @@ class UISeleniumSuite
       badJob._3 should be(Some("unknown job: 7"))
 
       val expStageInfo = Seq(
-          ("19", "collect"),
-          ("18", "count"),
-          ("17", "groupBy")
+        ("19", "collect"),
+        ("18", "count"),
+        ("17", "groupBy")
       )
 
       eventually(timeout(1 second), interval(50 milliseconds)) {
         goToUi(sc, "/stages")
         find("completed-summary").get.text should be(
-            "Completed Stages: 20, only showing 3")
+          "Completed Stages: 20, only showing 3")
         find("completed").get.text should be(
-            "Completed Stages (20, only showing 3)")
+          "Completed Stages (20, only showing 3)")
         val rows = findAll(cssSelector("tbody tr")).toIndexedSeq.map {
           _.underlying
         }
@@ -648,7 +653,7 @@ class UISeleniumSuite
 
       goToUi(sc, "/stages/stage/?id=12&attempt=0")
       find("no-info").get.text should be(
-          "No information to display for Stage 12 (Attempt 0)")
+        "No information to display for Stage 12 (Attempt 0)")
       val badStage =
         HistoryServerSuite.getContentAndCode(apiUrl(sc.ui.get, "stages/12/0"))
       badStage._1 should be(HttpServletResponse.SC_NOT_FOUND)
@@ -660,7 +665,7 @@ class UISeleniumSuite
       badAttempt._1 should be(HttpServletResponse.SC_NOT_FOUND)
       badAttempt._2 should be(None)
       badAttempt._3 should be(
-          Some("unknown attempt for stage 19.  Found attempts: [0]"))
+        Some("unknown attempt for stage 19.  Found attempts: [0]"))
 
       val badStageAttemptList =
         HistoryServerSuite.getContentAndCode(apiUrl(sc.ui.get, "stages/12"))
@@ -673,7 +678,7 @@ class UISeleniumSuite
   test("live UI json application list") {
     withSpark(newSparkContext()) { sc =>
       val appListRawJson = HistoryServerSuite.getUrl(
-          new URL(sc.ui.get.appUIAddress + "/api/v1/applications"))
+        new URL(sc.ui.get.appUIAddress + "/api/v1/applications"))
       val appListJsonAst = JsonMethods.parse(appListRawJson)
       appListJsonAst.children.length should be(1)
       val attempts = (appListJsonAst \ "attempts").children
@@ -698,40 +703,52 @@ class UISeleniumSuite
       rdd.count()
 
       val stage0 = Source
-        .fromURL(sc.ui.get.appUIAddress +
+        .fromURL(
+          sc.ui.get.appUIAddress +
             "/stages/stage/?id=0&attempt=0&expandDagViz=true")
         .mkString
-      assert(stage0.contains("digraph G {\n  subgraph clusterstage_0 {\n    " +
-              "label=&quot;Stage 0&quot;;\n    subgraph "))
       assert(
-          stage0.contains("{\n      label=&quot;parallelize&quot;;\n      " +
-              "0 [label=&quot;ParallelCollectionRDD [0]"))
-      assert(stage0.contains("{\n      label=&quot;map&quot;;\n      " +
-              "1 [label=&quot;MapPartitionsRDD [1]"))
-      assert(stage0.contains("{\n      label=&quot;groupBy&quot;;\n      " +
-              "2 [label=&quot;MapPartitionsRDD [2]"))
+        stage0.contains("digraph G {\n  subgraph clusterstage_0 {\n    " +
+          "label=&quot;Stage 0&quot;;\n    subgraph "))
+      assert(
+        stage0.contains("{\n      label=&quot;parallelize&quot;;\n      " +
+          "0 [label=&quot;ParallelCollectionRDD [0]"))
+      assert(
+        stage0.contains("{\n      label=&quot;map&quot;;\n      " +
+          "1 [label=&quot;MapPartitionsRDD [1]"))
+      assert(
+        stage0.contains("{\n      label=&quot;groupBy&quot;;\n      " +
+          "2 [label=&quot;MapPartitionsRDD [2]"))
 
       val stage1 = Source
-        .fromURL(sc.ui.get.appUIAddress +
+        .fromURL(
+          sc.ui.get.appUIAddress +
             "/stages/stage/?id=1&attempt=0&expandDagViz=true")
         .mkString
-      assert(stage1.contains("digraph G {\n  subgraph clusterstage_1 {\n    " +
-              "label=&quot;Stage 1&quot;;\n    subgraph "))
-      assert(stage1.contains("{\n      label=&quot;groupBy&quot;;\n      " +
-              "3 [label=&quot;ShuffledRDD [3]"))
-      assert(stage1.contains("{\n      label=&quot;map&quot;;\n      " +
-              "4 [label=&quot;MapPartitionsRDD [4]"))
-      assert(stage1.contains("{\n      label=&quot;groupBy&quot;;\n      " +
-              "5 [label=&quot;MapPartitionsRDD [5]"))
+      assert(
+        stage1.contains("digraph G {\n  subgraph clusterstage_1 {\n    " +
+          "label=&quot;Stage 1&quot;;\n    subgraph "))
+      assert(
+        stage1.contains("{\n      label=&quot;groupBy&quot;;\n      " +
+          "3 [label=&quot;ShuffledRDD [3]"))
+      assert(
+        stage1.contains("{\n      label=&quot;map&quot;;\n      " +
+          "4 [label=&quot;MapPartitionsRDD [4]"))
+      assert(
+        stage1.contains("{\n      label=&quot;groupBy&quot;;\n      " +
+          "5 [label=&quot;MapPartitionsRDD [5]"))
 
       val stage2 = Source
-        .fromURL(sc.ui.get.appUIAddress +
+        .fromURL(
+          sc.ui.get.appUIAddress +
             "/stages/stage/?id=2&attempt=0&expandDagViz=true")
         .mkString
-      assert(stage2.contains("digraph G {\n  subgraph clusterstage_2 {\n    " +
-              "label=&quot;Stage 2&quot;;\n    subgraph "))
-      assert(stage2.contains("{\n      label=&quot;groupBy&quot;;\n      " +
-              "6 [label=&quot;ShuffledRDD [6]"))
+      assert(
+        stage2.contains("digraph G {\n  subgraph clusterstage_2 {\n    " +
+          "label=&quot;Stage 2&quot;;\n    subgraph "))
+      assert(
+        stage2.contains("{\n      label=&quot;groupBy&quot;;\n      " +
+          "6 [label=&quot;ShuffledRDD [6]"))
     }
   }
 
@@ -753,7 +770,7 @@ class UISeleniumSuite
 
   def apiUrl(ui: SparkUI, path: String): URL = {
     new URL(
-        ui.appUIAddress + "/api/v1/applications/" + ui.sc.get.applicationId +
+      ui.appUIAddress + "/api/v1/applications/" + ui.sc.get.applicationId +
         "/" + path)
   }
 }

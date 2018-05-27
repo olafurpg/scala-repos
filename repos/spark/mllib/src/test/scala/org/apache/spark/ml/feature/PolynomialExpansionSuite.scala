@@ -22,13 +22,19 @@ import org.scalatest.exceptions.TestFailedException
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.ml.param.ParamsSuite
 import org.apache.spark.ml.util.DefaultReadWriteTest
-import org.apache.spark.mllib.linalg.{DenseVector, SparseVector, Vector, Vectors}
+import org.apache.spark.mllib.linalg.{
+  DenseVector,
+  SparseVector,
+  Vector,
+  Vectors
+}
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.mllib.util.TestingUtils._
 import org.apache.spark.sql.Row
 
 class PolynomialExpansionSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   test("params") {
@@ -36,48 +42,32 @@ class PolynomialExpansionSuite
   }
 
   private val data = Array(
-      Vectors.sparse(3, Seq((0, -2.0), (1, 2.3))),
-      Vectors.dense(-2.0, 2.3),
-      Vectors.dense(0.0, 0.0, 0.0),
-      Vectors.dense(0.6, -1.1, -3.0),
-      Vectors.sparse(3, Seq())
+    Vectors.sparse(3, Seq((0, -2.0), (1, 2.3))),
+    Vectors.dense(-2.0, 2.3),
+    Vectors.dense(0.0, 0.0, 0.0),
+    Vectors.dense(0.6, -1.1, -3.0),
+    Vectors.sparse(3, Seq())
   )
 
   private val twoDegreeExpansion: Array[Vector] = Array(
-      Vectors.sparse(
-          9, Array(0, 1, 2, 3, 4), Array(-2.0, 4.0, 2.3, -4.6, 5.29)),
-      Vectors.dense(-2.0, 4.0, 2.3, -4.6, 5.29),
-      Vectors.dense(new Array[Double](9)),
-      Vectors.dense(0.6, 0.36, -1.1, -0.66, 1.21, -3.0, -1.8, 3.3, 9.0),
-      Vectors.sparse(9, Array.empty, Array.empty))
+    Vectors.sparse(9, Array(0, 1, 2, 3, 4), Array(-2.0, 4.0, 2.3, -4.6, 5.29)),
+    Vectors.dense(-2.0, 4.0, 2.3, -4.6, 5.29),
+    Vectors.dense(new Array[Double](9)),
+    Vectors.dense(0.6, 0.36, -1.1, -0.66, 1.21, -3.0, -1.8, 3.3, 9.0),
+    Vectors.sparse(9, Array.empty, Array.empty)
+  )
 
   private val threeDegreeExpansion: Array[Vector] = Array(
-      Vectors.sparse(
-          19,
-          Array(0, 1, 2, 3, 4, 5, 6, 7, 8),
-          Array(-2.0, 4.0, -8.0, 2.3, -4.6, 9.2, 5.29, -10.58, 12.17)),
-      Vectors.dense(-2.0, 4.0, -8.0, 2.3, -4.6, 9.2, 5.29, -10.58, 12.17),
-      Vectors.dense(new Array[Double](19)),
-      Vectors.dense(0.6,
-                    0.36,
-                    0.216,
-                    -1.1,
-                    -0.66,
-                    -0.396,
-                    1.21,
-                    0.726,
-                    -1.331,
-                    -3.0,
-                    -1.8,
-                    -1.08,
-                    3.3,
-                    1.98,
-                    -3.63,
-                    9.0,
-                    5.4,
-                    -9.9,
-                    -27.0),
-      Vectors.sparse(19, Array.empty, Array.empty))
+    Vectors.sparse(
+      19,
+      Array(0, 1, 2, 3, 4, 5, 6, 7, 8),
+      Array(-2.0, 4.0, -8.0, 2.3, -4.6, 9.2, 5.29, -10.58, 12.17)),
+    Vectors.dense(-2.0, 4.0, -8.0, 2.3, -4.6, 9.2, 5.29, -10.58, 12.17),
+    Vectors.dense(new Array[Double](19)),
+    Vectors.dense(0.6, 0.36, 0.216, -1.1, -0.66, -0.396, 1.21, 0.726, -1.331,
+      -3.0, -1.8, -1.08, 3.3, 1.98, -3.63, 9.0, 5.4, -9.9, -27.0),
+    Vectors.sparse(19, Array.empty, Array.empty)
+  )
 
   test("Polynomial expansion with default parameter") {
     val df = sqlContext
@@ -99,7 +89,8 @@ class PolynomialExpansionSuite
           assert(expanded ~== expected absTol 1e-1)
         case _ =>
           throw new TestFailedException(
-              "Unmatched data types after polynomial expansion", 0)
+            "Unmatched data types after polynomial expansion",
+            0)
       }
   }
 
@@ -124,7 +115,8 @@ class PolynomialExpansionSuite
           assert(expanded ~== expected absTol 1e-1)
         case _ =>
           throw new TestFailedException(
-              "Unmatched data types after polynomial expansion", 0)
+            "Unmatched data types after polynomial expansion",
+            0)
       }
   }
 
@@ -146,7 +138,8 @@ class PolynomialExpansionSuite
           assert(expanded ~== expected absTol 1e-1)
         case _ =>
           throw new TestFailedException(
-              "Unmatched data types after polynomial expansion", 0)
+            "Unmatched data types after polynomial expansion",
+            0)
       }
   }
 

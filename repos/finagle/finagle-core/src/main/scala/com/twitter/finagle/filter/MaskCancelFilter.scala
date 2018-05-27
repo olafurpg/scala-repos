@@ -1,6 +1,12 @@
 package com.twitter.finagle.filter
 
-import com.twitter.finagle.{Service, ServiceFactory, SimpleFilter, Stack, Stackable}
+import com.twitter.finagle.{
+  Service,
+  ServiceFactory,
+  SimpleFilter,
+  Stack,
+  Stackable
+}
 import com.twitter.util.Future
 
 object MaskCancelFilter {
@@ -28,7 +34,7 @@ object MaskCancelFilter {
       def make(_param: Param, next: ServiceFactory[Req, Rep]) = {
         _param match {
           case Param(true) => new MaskCancelFilter[Req, Rep] andThen next
-          case _ => next
+          case _           => next
         }
       }
     }

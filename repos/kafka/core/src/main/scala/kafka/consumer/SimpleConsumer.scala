@@ -5,7 +5,7 @@
   * The ASF licenses this file to You under the Apache License, Version 2.0
   * (the "License"); you may not use this file except in compliance with
   * the License.  You may obtain a copy of the License at
-  * 
+  *
   *    http://www.apache.org/licenses/LICENSE-2.0
   *
   * Unless required by applicable law or agreed to in writing, software
@@ -16,7 +16,10 @@
   */
 package kafka.consumer
 
-import java.nio.channels.{AsynchronousCloseException, ClosedByInterruptException}
+import java.nio.channels.{
+  AsynchronousCloseException,
+  ClosedByInterruptException
+}
 import java.util.concurrent.TimeUnit
 
 import kafka.api._
@@ -30,20 +33,25 @@ import org.apache.kafka.common.utils.Utils._
   * A consumer of kafka messages
   */
 @threadsafe
-class SimpleConsumer(val host: String,
-                     val port: Int,
-                     val soTimeout: Int,
-                     val bufferSize: Int,
-                     val clientId: String)
+class SimpleConsumer(
+    val host: String,
+    val port: Int,
+    val soTimeout: Int,
+    val bufferSize: Int,
+    val clientId: String)
     extends Logging {
 
   ConsumerConfig.validateClientId(clientId)
   private val lock = new Object()
   private val blockingChannel = new BlockingChannel(
-      host, port, bufferSize, BlockingChannel.UseDefaultBufferSize, soTimeout)
+    host,
+    port,
+    bufferSize,
+    BlockingChannel.UseDefaultBufferSize,
+    soTimeout)
   private val fetchRequestAndResponseStats =
     FetchRequestAndResponseStatsRegistry.getFetchRequestAndResponseStats(
-        clientId)
+      clientId)
   private var isClosed = false
 
   private def connect(): BlockingChannel = {
@@ -197,19 +205,20 @@ class SimpleConsumer(val host: String,
     * @param consumerId Id of the consumer which could be a consumer client, SimpleConsumerShell or a follower broker.
     * @return Requested offset.
     */
-  def earliestOrLatestOffset(topicAndPartition: TopicAndPartition,
-                             earliestOrLatest: Long,
-                             consumerId: Int): Long = {
+  def earliestOrLatestOffset(
+      topicAndPartition: TopicAndPartition,
+      earliestOrLatest: Long,
+      consumerId: Int): Long = {
     val request = OffsetRequest(
-        requestInfo = Map(topicAndPartition -> PartitionOffsetRequestInfo(
-                  earliestOrLatest, 1)),
-        clientId = clientId,
-        replicaId = consumerId)
+      requestInfo = Map(
+        topicAndPartition -> PartitionOffsetRequestInfo(earliestOrLatest, 1)),
+      clientId = clientId,
+      replicaId = consumerId)
     val partitionErrorAndOffset =
       getOffsetsBefore(request).partitionErrorAndOffsets(topicAndPartition)
     val offset = partitionErrorAndOffset.error match {
       case ErrorMapping.NoError => partitionErrorAndOffset.offsets.head
-      case _ => throw ErrorMapping.exceptionFor(partitionErrorAndOffset.error)
+      case _                    => throw ErrorMapping.exceptionFor(partitionErrorAndOffset.error)
     }
     offset
   }

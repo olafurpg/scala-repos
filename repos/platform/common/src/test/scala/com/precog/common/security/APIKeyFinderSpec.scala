@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -69,21 +69,23 @@ trait APIKeyFinderSpec[M[+ _]] extends Specification {
         val path = Path("/user1/")
         val key = keyFinder.createAPIKey(accountId, None, None).copoint
         val permissions: Set[Permission] = Set(
-            ReadPermission(path, WrittenByAccount(accountId)),
-            DeletePermission(path, WrittenByAccount(accountId)),
-            WritePermission(path, WriteAs(accountId))
+          ReadPermission(path, WrittenByAccount(accountId)),
+          DeletePermission(path, WrittenByAccount(accountId)),
+          WritePermission(path, WriteAs(accountId))
         )
 
-        keyFinder.hasCapability(key.apiKey, permissions, None).copoint must beTrue
+        keyFinder
+          .hasCapability(key.apiKey, permissions, None)
+          .copoint must beTrue
       }
     }
 
     "grant full permissions to another user" in {
       val path = Path("/user1/")
       val permissions: Set[Permission] = Set(
-          ReadPermission(path, WrittenByAccount("user1")),
-          WritePermission(path, WriteAsAny),
-          DeletePermission(path, WrittenByAny)
+        ReadPermission(path, WrittenByAccount("user1")),
+        WritePermission(path, WriteAsAny),
+        DeletePermission(path, WrittenByAny)
       )
 
       val (key0, key1, grantId, mgr) = (for {
@@ -91,7 +93,12 @@ trait APIKeyFinderSpec[M[+ _]] extends Specification {
         key0 <- mgr.newStandardAPIKeyRecord("user1", None, None)
         key1 <- mgr.newStandardAPIKeyRecord("user2", None, None)
         grant <- mgr.createGrant(
-            None, None, key0.apiKey, Set.empty, permissions, None)
+          None,
+          None,
+          key0.apiKey,
+          Set.empty,
+          permissions,
+          None)
       } yield (key0.apiKey, key1.apiKey, grant.grantId, mgr)).copoint
 
       withAPIKeyFinder(mgr) { keyFinder =>
@@ -131,9 +138,9 @@ trait APIKeyFinderSpec[M[+ _]] extends Specification {
     "return false when capabilities expire" in {
       val path = Path("/user1/")
       val permissions: Set[Permission] = Set(
-          ReadPermission(path, WrittenByAccount("user1")),
-          WritePermission(path, WriteAsAny),
-          DeletePermission(path, WrittenByAny)
+        ReadPermission(path, WrittenByAccount("user1")),
+        WritePermission(path, WriteAsAny),
+        DeletePermission(path, WrittenByAny)
       )
 
       val expiration = new DateTime(100)
@@ -145,7 +152,12 @@ trait APIKeyFinderSpec[M[+ _]] extends Specification {
         key0 <- mgr.newStandardAPIKeyRecord("user1", None, None)
         key1 <- mgr.newStandardAPIKeyRecord("user2", None, None)
         grant <- mgr.createGrant(
-            None, None, key0.apiKey, Set.empty, permissions, Some(expiration))
+          None,
+          None,
+          key0.apiKey,
+          Set.empty,
+          permissions,
+          Some(expiration))
       } yield (key0.apiKey, key1.apiKey, grant.grantId, mgr)).copoint
 
       withAPIKeyFinder(mgr) { keyFinder =>
@@ -168,10 +180,16 @@ trait APIKeyFinderSpec[M[+ _]] extends Specification {
       } yield (rootKey, key0.apiKey, key1.apiKey, mgr)).copoint
 
       withAPIKeyFinder(mgr) { keyFinder =>
-        keyFinder.findAPIKey(key0, Some(rootKey)).copoint.get.issuerChain mustEqual List(
-            rootKey)
-        keyFinder.findAPIKey(key1, Some(rootKey)).copoint.get.issuerChain mustEqual List(
-            key0, rootKey)
+        keyFinder
+          .findAPIKey(key0, Some(rootKey))
+          .copoint
+          .get
+          .issuerChain mustEqual List(rootKey)
+        keyFinder
+          .findAPIKey(key1, Some(rootKey))
+          .copoint
+          .get
+          .issuerChain mustEqual List(key0, rootKey)
       }
     }
 
@@ -192,11 +210,10 @@ trait APIKeyFinderSpec[M[+ _]] extends Specification {
 }
 
 class DirectAPIKeyFinderSpec extends Specification {
-  include(
-      new APIKeyFinderSpec[Need] {
+  include(new APIKeyFinderSpec[Need] {
     val M = Need.need
-    def withAPIKeyFinder[A](
-        mgr: APIKeyManager[Need])(f: APIKeyFinder[Need] => A): A = {
+    def withAPIKeyFinder[A](mgr: APIKeyManager[Need])(
+        f: APIKeyFinder[Need] => A): A = {
       f(new DirectAPIKeyFinder(mgr))
     }
   })

@@ -40,7 +40,8 @@ private[spark] object BlockManagerMessages {
 
   // Remove all blocks belonging to a specific broadcast.
   case class RemoveBroadcast(
-      broadcastId: Long, removeFromDriver: Boolean = true)
+      broadcastId: Long,
+      removeFromDriver: Boolean = true)
       extends ToBlockManagerSlave
 
   /**
@@ -53,17 +54,20 @@ private[spark] object BlockManagerMessages {
   //////////////////////////////////////////////////////////////////////////////////
   sealed trait ToBlockManagerMaster
 
-  case class RegisterBlockManager(blockManagerId: BlockManagerId,
-                                  maxMemSize: Long,
-                                  sender: RpcEndpointRef)
+  case class RegisterBlockManager(
+      blockManagerId: BlockManagerId,
+      maxMemSize: Long,
+      sender: RpcEndpointRef)
       extends ToBlockManagerMaster
 
-  case class UpdateBlockInfo(var blockManagerId: BlockManagerId,
-                             var blockId: BlockId,
-                             var storageLevel: StorageLevel,
-                             var memSize: Long,
-                             var diskSize: Long)
-      extends ToBlockManagerMaster with Externalizable {
+  case class UpdateBlockInfo(
+      var blockManagerId: BlockManagerId,
+      var blockId: BlockId,
+      var storageLevel: StorageLevel,
+      var memSize: Long,
+      var diskSize: Long)
+      extends ToBlockManagerMaster
+      with Externalizable {
 
     def this() = this(null, null, null, 0, 0) // For deserialization only
 
@@ -108,7 +112,8 @@ private[spark] object BlockManagerMessages {
       extends ToBlockManagerMaster
 
   case class GetMatchingBlockIds(
-      filter: BlockId => Boolean, askSlaves: Boolean = true)
+      filter: BlockId => Boolean,
+      askSlaves: Boolean = true)
       extends ToBlockManagerMaster
 
   case class BlockManagerHeartbeat(blockManagerId: BlockManagerId)

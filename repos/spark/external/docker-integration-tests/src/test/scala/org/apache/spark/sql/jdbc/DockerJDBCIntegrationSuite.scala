@@ -24,7 +24,11 @@ import scala.collection.JavaConverters._
 import scala.util.control.NonFatal
 
 import com.spotify.docker.client._
-import com.spotify.docker.client.messages.{ContainerConfig, HostConfig, PortBinding}
+import com.spotify.docker.client.messages.{
+  ContainerConfig,
+  HostConfig,
+  PortBinding
+}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.concurrent.Eventually
 import org.scalatest.time.SpanSugar._
@@ -57,7 +61,9 @@ abstract class DatabaseOnDocker {
 }
 
 abstract class DockerJDBCIntegrationSuite
-    extends SparkFunSuite with BeforeAndAfterAll with Eventually
+    extends SparkFunSuite
+    with BeforeAndAfterAll
+    with Eventually
     with SharedSQLContext {
 
   val db: DatabaseOnDocker
@@ -76,7 +82,7 @@ abstract class DockerJDBCIntegrationSuite
       } catch {
         case NonFatal(e) =>
           log.error(
-              "Exception while connecting to Docker. Check whether Docker is running.")
+            "Exception while connecting to Docker. Check whether Docker is running.")
           throw e
       }
       // Ensure that the Docker image is installed:
@@ -85,7 +91,7 @@ abstract class DockerJDBCIntegrationSuite
       } catch {
         case e: ImageNotFoundException =>
           log.warn(
-              s"Docker image ${db.imageName} not found; pulling image from registry")
+            s"Docker image ${db.imageName} not found; pulling image from registry")
           docker.pull(db.imageName)
       }
       // Configure networking (necessary for boot2docker / Docker Machine)
@@ -100,7 +106,7 @@ abstract class DockerJDBCIntegrationSuite
         .builder()
         .networkMode("bridge")
         .portBindings(Map(s"${db.jdbcPort}/tcp" -> List(
-                    PortBinding.of(dockerIp, externalPort)).asJava).asJava)
+          PortBinding.of(dockerIp, externalPort)).asJava).asJava)
         .build()
       // Create the database container:
       val config = ContainerConfig

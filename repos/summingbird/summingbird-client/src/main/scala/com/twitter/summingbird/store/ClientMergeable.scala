@@ -27,24 +27,28 @@ import com.twitter.util.Future
 import scala.collection.breakOut
 
 object ClientMergeable {
-  def apply[K, V](offlineStore: ReadableStore[K, (BatchID, V)],
-                  onlineStore: ReadableStore[(K, BatchID), V] with Mergeable[
-                      (K, BatchID), V],
-                  batchesToKeep: Int)(
-      implicit batcher: Batcher, monoid: Semigroup[V]): ClientMergeable[K, V] =
-    new ClientMergeable[K, V](offlineStore,
-                              onlineStore,
-                              batcher,
-                              batchesToKeep,
-                              ClientStore.defaultOnlineKeyFilter[K],
-                              FutureCollector.bestEffort)
+  def apply[K, V](
+      offlineStore: ReadableStore[K, (BatchID, V)],
+      onlineStore: ReadableStore[(K, BatchID), V] with Mergeable[
+        (K, BatchID),
+        V],
+      batchesToKeep: Int)(
+      implicit batcher: Batcher,
+      monoid: Semigroup[V]): ClientMergeable[K, V] =
+    new ClientMergeable[K, V](
+      offlineStore,
+      onlineStore,
+      batcher,
+      batchesToKeep,
+      ClientStore.defaultOnlineKeyFilter[K],
+      FutureCollector.bestEffort)
 }
 
 /**
   * This is like a ClientStore except that it can perform
   * a merge into the online store and return the total sum.
   */
-class ClientMergeable[K, V : Semigroup](
+class ClientMergeable[K, V: Semigroup](
     offlineStore: ReadableStore[K, (BatchID, V)],
     onlineStore: ReadableStore[(K, BatchID), V] with Mergeable[(K, BatchID), V],
     batcher: Batcher,
@@ -54,12 +58,13 @@ class ClientMergeable[K, V : Semigroup](
     extends Mergeable[(K, BatchID), V] {
 
   def readable: ClientStore[K, V] =
-    new ClientStore(offlineStore,
-                    onlineStore,
-                    batcher,
-                    batchesToKeep,
-                    onlineKeyFilter,
-                    collector)
+    new ClientStore(
+      offlineStore,
+      onlineStore,
+      batcher,
+      batchesToKeep,
+      onlineKeyFilter,
+      collector)
 
   import MergeOperations.FOpt
 
@@ -90,9 +95,13 @@ class ClientMergeable[K, V : Semigroup](
      * mergeing two different batches for the same key is presumably rare,
      * it is probably not worth it.
      */
-    val batchForKey: Map[K1, V] = ks.groupBy { case ((k, batchId), v) => k }.iterator.map {
-      case (k, kvs) => kvs.minBy { case ((_, batchId), _) => batchId }
-    }.toMap
+    val batchForKey: Map[K1, V] = ks
+      .groupBy { case ((k, batchId), v) => k }
+      .iterator
+      .map {
+        case (k, kvs) => kvs.minBy { case ((_, batchId), _) => batchId }
+      }
+      .toMap
 
     val nextCall = ks -- batchForKey.keys
 
@@ -112,21 +121,26 @@ class ClientMergeable[K, V : Semigroup](
   private def multiMergeUnique[K1 <: (K, BatchID)](
       ks: Map[K1, V]): Map[K1, FOpt[V]] = {
     // Here we assume each K appears only once, because the previous call ensures it
-    val result = ks.groupBy { case ((_, batchId), _) => batchId }.iterator.map {
-      case (batch, kvs) =>
-        val batchKeys: Set[K] = kvs.map { case ((k, _), _) => k }(breakOut)
-        val existing: Map[K, FOpt[V]] =
-          readable.multiGetBatch[K](batch.prev, batchKeys)
-        // Now we merge into the current store:
-        val preMerge: Map[K, FOpt[V]] = onlineStore
-          .multiMerge(kvs)
-          .map { case ((k, _), v) => (k, v) }(breakOut)
+    val result = ks
+      .groupBy { case ((_, batchId), _) => batchId }
+      .iterator
+      .map {
+        case (batch, kvs) =>
+          val batchKeys: Set[K] = kvs.map { case ((k, _), _) => k }(breakOut)
+          val existing: Map[K, FOpt[V]] =
+            readable.multiGetBatch[K](batch.prev, batchKeys)
+          // Now we merge into the current store:
+          val preMerge: Map[K, FOpt[V]] = onlineStore
+            .multiMerge(kvs)
+            .map { case ((k, _), v) => (k, v) }(breakOut)
 
           (batch, mm.plus(existing, preMerge))
-    }.flatMap {
-      case (b, kvs) =>
-        kvs.iterator.map { case (k, v) => ((k, b), v) }
-    }.toMap
+      }
+      .flatMap {
+        case (b, kvs) =>
+          kvs.iterator.map { case (k, v) => ((k, b), v) }
+      }
+      .toMap
     // Since the type is a subclass, we need to jump through this hoop:
     ks.iterator.map { case (k1, _) => (k1, result(k1)) }.toMap
   }

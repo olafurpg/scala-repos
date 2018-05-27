@@ -25,21 +25,22 @@ import com.sun.tools.javac.tree.JCTree._
 trait UnsafeHelpers extends SLF4JLogging {
 
   protected def unsafeGetElement(
-      info: CompilationInfo, t: Tree): Option[Element] = {
+      info: CompilationInfo,
+      t: Tree): Option[Element] = {
     t match {
       case t: JCCompilationUnit => Some(t.packge)
-      case t: JCClassDecl => Some(t.sym)
-      case t: JCMethodDecl => Some(t.sym)
-      case t: JCVariableDecl => Some(t.sym)
-      case t: JCIdent => Some(t.sym)
-      case t: JCFieldAccess => Some(t.sym)
+      case t: JCClassDecl       => Some(t.sym)
+      case t: JCMethodDecl      => Some(t.sym)
+      case t: JCVariableDecl    => Some(t.sym)
+      case t: JCIdent           => Some(t.sym)
+      case t: JCFieldAccess     => Some(t.sym)
       // TODO: Workaround for java 6
       //      case t: JCMemberReference => Some(t.sym)
-      case t: JCNewClass => Some(t.constructor)
+      case t: JCNewClass         => Some(t.constructor)
       case t: JCMethodInvocation => unsafeGetElement(info, t.meth)
-      case t: JCTypeApply => unsafeGetElement(info, t.clazz)
-      case t: JCTree => if (t.`type` != null) Some(t.`type`.tsym) else None
-      case _ => None
+      case t: JCTypeApply        => unsafeGetElement(info, t.clazz)
+      case t: JCTree             => if (t.`type` != null) Some(t.`type`.tsym) else None
+      case _                     => None
     }
   }
 }

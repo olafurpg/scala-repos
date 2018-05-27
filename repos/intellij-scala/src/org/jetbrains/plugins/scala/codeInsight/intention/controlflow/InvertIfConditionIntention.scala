@@ -6,7 +6,12 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiDocumentManager, PsiElement}
 import org.jetbrains.plugins.scala.extensions._
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlockExpr, ScExpression, ScIfStmt, ScInfixExpr}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScBlockExpr,
+  ScExpression,
+  ScIfStmt,
+  ScInfixExpr
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.util.IntentionUtils
 
@@ -24,7 +29,9 @@ class InvertIfConditionIntention extends PsiElementBaseIntentionAction {
   override def getText: String = getFamilyName
 
   def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+      project: Project,
+      editor: Editor,
+      element: PsiElement): Boolean = {
     val ifStmt: ScIfStmt =
       PsiTreeUtil.getParentOfType(element, classOf[ScIfStmt], false)
     if (ifStmt == null) return false
@@ -37,7 +44,7 @@ class InvertIfConditionIntention extends PsiElementBaseIntentionAction {
 
     val offset = editor.getCaretModel.getOffset
     if (!(ifStmt.getTextRange.getStartOffset <= offset &&
-            offset <= condition.getTextRange.getStartOffset - 1)) return false
+          offset <= condition.getTextRange.getStartOffset - 1)) return false
 
     val elseBranch = ifStmt.elseBranch.orNull
     if (elseBranch != null) return elseBranch.isInstanceOf[ScBlockExpr]
@@ -66,14 +73,15 @@ class InvertIfConditionIntention extends PsiElementBaseIntentionAction {
           } else {
             infixExpr.getArgExpr.getText
           }
-        val replaceOper = Map("==" -> "!=",
-                              "!=" -> "==",
-                              ">" -> "<=",
-                              "<" -> ">=",
-                              ">=" -> "<",
-                              "<=" -> ">",
-                              "&&" -> "||",
-                              "||" -> "&&")
+        val replaceOper = Map(
+          "==" -> "!=",
+          "!=" -> "==",
+          ">" -> "<=",
+          "<" -> ">=",
+          ">=" -> "<",
+          "<=" -> ">",
+          "&&" -> "||",
+          "||" -> "&&")
         val buf = new StringBuilder
         buf
           .append(first)
@@ -97,12 +105,13 @@ class InvertIfConditionIntention extends PsiElementBaseIntentionAction {
       .append(" else ")
     val res = ifStmt.thenBranch.get match {
       case e: ScBlockExpr => e.getText
-      case _ => "{\n" + ifStmt.thenBranch.get.getText + "\n}"
+      case _              => "{\n" + ifStmt.thenBranch.get.getText + "\n}"
     }
     expr.append(res)
     val newStmt: ScExpression =
       ScalaPsiElementFactory.createExpressionFromText(
-          expr.toString(), element.getManager)
+        expr.toString(),
+        element.getManager)
 
     inWriteAction {
       ifStmt.replaceExpression(newStmt, true)

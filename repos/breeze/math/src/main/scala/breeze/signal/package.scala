@@ -49,32 +49,34 @@ package object signal {
     * @param dt  time step (CAUTION: 1.0/fs; specify default of -1 if using fs)
     * @param shifted whether to return fourierShift'ed frequencies, default=false
     */
-  def fourierFreq(windowLength: Int,
-                  fs: Double = -1,
-                  dt: Double = -1,
-                  shifted: Boolean = false): DenseVector[Double] = {
-    require(fs > 0 || dt > 0,
-            "Must specify either a valid fs or a valid dt argument.")
+  def fourierFreq(
+      windowLength: Int,
+      fs: Double = -1,
+      dt: Double = -1,
+      shifted: Boolean = false): DenseVector[Double] = {
+    require(
+      fs > 0 || dt > 0,
+      "Must specify either a valid fs or a valid dt argument.")
     if (fs > 0 && dt > 0)
       require(
-          fs == 1d / dt,
-          "If fs and dt are both specified, fs == 1.0/dt must be true. Otherwise, they are incompatible")
+        fs == 1d / dt,
+        "If fs and dt are both specified, fs == 1.0/dt must be true. Otherwise, they are incompatible")
     val realFs = if (fs < 0 && dt > 0) 1d / dt else fs
 
     val shiftedFreq =
       if (isEven(windowLength)) {
         DenseVector.vertcat(
-            DenseVector.tabulate(0 to windowLength / 2 - 1)(
-                (i: Int) => i.toDouble * realFs / windowLength.toDouble),
-            DenseVector.tabulate(-windowLength / 2 to -1)(
-                (i: Int) => i.toDouble * realFs / windowLength.toDouble)
+          DenseVector.tabulate(0 to windowLength / 2 - 1)((i: Int) =>
+            i.toDouble * realFs / windowLength.toDouble),
+          DenseVector.tabulate(-windowLength / 2 to -1)((i: Int) =>
+            i.toDouble * realFs / windowLength.toDouble)
         )
       } else {
         DenseVector.vertcat(
-            DenseVector.tabulate(0 to (windowLength - 1) / 2)(
-                (i: Int) => i.toDouble * realFs / windowLength.toDouble),
-            DenseVector.tabulate(-(windowLength - 1) / 2 to -1)(
-                (i: Int) => i.toDouble * realFs / windowLength.toDouble)
+          DenseVector.tabulate(0 to (windowLength - 1) / 2)((i: Int) =>
+            i.toDouble * realFs / windowLength.toDouble),
+          DenseVector.tabulate(-(windowLength - 1) / 2 to -1)((i: Int) =>
+            i.toDouble * realFs / windowLength.toDouble)
         )
       }
     if (shifted) fourierShift(shiftedFreq) else shiftedFreq
@@ -100,7 +102,13 @@ package object signal {
       method: OptMethod = OptMethod.Automatic
   )(implicit canConvolve: CanConvolve[Input, KernelType, Output]): Output =
     canConvolve(
-        data, kernel, range, correlate = false, overhang, padding, method)
+      data,
+      kernel,
+      range,
+      correlate = false,
+      overhang,
+      padding,
+      method)
 
   /**Correlates DenseVectors.</p>
     * Implementation is via the implicit trait CanConvolve[ InputType,  OutputType ],
@@ -116,7 +124,13 @@ package object signal {
       method: OptMethod = OptMethod.Automatic
   )(implicit canConvolve: CanConvolve[Input, KernelType, Output]): Output =
     canConvolve(
-        data, kernel, range, correlate = true, overhang, padding, method)
+      data,
+      kernel,
+      range,
+      correlate = true,
+      overhang,
+      padding,
+      method)
 
   // </editor-fold>
 
@@ -164,14 +178,15 @@ package object signal {
       overhang: OptOverhang = OptOverhang.None,
       padding: OptPadding = OptPadding.Boundary)(
       implicit canFilterBPBS: CanFilterBPBS[Input, Output]): Output =
-    canFilterBPBS(data,
-                  omegas,
-                  sampleRate,
-                  taps,
-                  bandStop = false,
-                  kernelDesign,
-                  overhang,
-                  padding)
+    canFilterBPBS(
+      data,
+      omegas,
+      sampleRate,
+      taps,
+      bandStop = false,
+      kernelDesign,
+      overhang,
+      padding)
 
   /** Bandstop filter the input data.
     *
@@ -195,14 +210,15 @@ package object signal {
       overhang: OptOverhang = OptOverhang.None,
       padding: OptPadding = OptPadding.Boundary)(
       implicit canFilterBPBS: CanFilterBPBS[Input, Output]): Output =
-    canFilterBPBS(data,
-                  omegas,
-                  sampleRate,
-                  taps,
-                  bandStop = true,
-                  kernelDesign,
-                  overhang,
-                  padding)
+    canFilterBPBS(
+      data,
+      omegas,
+      sampleRate,
+      taps,
+      bandStop = true,
+      kernelDesign,
+      overhang,
+      padding)
 
   // </editor-fold>
 
@@ -230,14 +246,15 @@ package object signal {
       overhang: OptOverhang = OptOverhang.None,
       padding: OptPadding = OptPadding.Boundary)(
       implicit canFilterLPHP: CanFilterLPHP[Input, Output]): Output =
-    canFilterLPHP(data,
-                  omega,
-                  sampleRate,
-                  taps,
-                  lowPass = true,
-                  kernelDesign,
-                  overhang,
-                  padding)
+    canFilterLPHP(
+      data,
+      omega,
+      sampleRate,
+      taps,
+      lowPass = true,
+      kernelDesign,
+      overhang,
+      padding)
 
   /** Highpass filter the input data.
     *
@@ -261,14 +278,15 @@ package object signal {
       overhang: OptOverhang = OptOverhang.None,
       padding: OptPadding = OptPadding.Boundary)(
       implicit canFilterLPHP: CanFilterLPHP[Input, Output]): Output =
-    canFilterLPHP(data,
-                  omega,
-                  sampleRate,
-                  taps,
-                  lowPass = false,
-                  kernelDesign,
-                  overhang,
-                  padding)
+    canFilterLPHP(
+      data,
+      omega,
+      sampleRate,
+      taps,
+      lowPass = false,
+      kernelDesign,
+      overhang,
+      padding)
 
   // </editor-fold>
 
@@ -319,7 +337,11 @@ package object signal {
       implicit canDesignFilterDecimation: CanDesignFilterDecimation[Output])
     : Output =
     canDesignFilterDecimation(
-        factor, multiplier, optDesignMethod, optWindow, optFilterOrder)
+      factor,
+      multiplier,
+      optDesignMethod,
+      optWindow,
+      optFilterOrder)
 
   // </editor-fold>
 
@@ -332,9 +354,10 @@ package object signal {
     *                 for OptOverhang.PreserveLength, the edges will feature symmetrical odd windows of increasing size,
     *                 ie ( median( {0} ), median( {0, 1, 2} ), median( {0, 1, 2, 3, 4} )... )
     */
-  def filterMedian[Input](data: DenseVector[Input],
-                          windowLength: Int,
-                          overhang: OptOverhang = OptOverhang.PreserveLength)(
+  def filterMedian[Input](
+      data: DenseVector[Input],
+      windowLength: Int,
+      overhang: OptOverhang = OptOverhang.PreserveLength)(
       implicit canFilterMedian: CanFilterMedian[Input]): DenseVector[Input] =
     canFilterMedian(data, windowLength, overhang)
   def filterMedian[Input](data: DenseVector[Input], windowLength: Int)(

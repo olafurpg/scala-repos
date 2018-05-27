@@ -38,7 +38,8 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class ModifierValueSpec
     extends SFXEnumDelegateSpec[
-        jfxsi.KeyCombination.ModifierValue, KeyCombination.ModifierValue](
-        classOf[jfxsi.KeyCombination.ModifierValue],
-        classOf[KeyCombination.ModifierValue],
-        KeyCombination.ModifierValue)
+      jfxsi.KeyCombination.ModifierValue,
+      KeyCombination.ModifierValue](
+      classOf[jfxsi.KeyCombination.ModifierValue],
+      classOf[KeyCombination.ModifierValue],
+      KeyCombination.ModifierValue)

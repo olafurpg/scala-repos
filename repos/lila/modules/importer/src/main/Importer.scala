@@ -13,19 +13,23 @@ import lila.game.{Game, GameRepo, Pov}
 import lila.hub.actorApi.map.Tell
 import lila.round.actorApi.round._
 
-final class Importer(roundMap: ActorRef,
-                     delay: FiniteDuration,
-                     scheduler: akka.actor.Scheduler) {
+final class Importer(
+    roundMap: ActorRef,
+    delay: FiniteDuration,
+    scheduler: akka.actor.Scheduler) {
 
-  def apply(data: ImportData,
-            user: Option[String],
-            forceId: Option[String] = None): Fu[Game] = {
+  def apply(
+      data: ImportData,
+      user: Option[String],
+      forceId: Option[String] = None): Fu[Game] = {
 
     def gameExists(processing: => Fu[Game]): Fu[Game] =
       GameRepo.findPgnImport(data.pgn) flatMap { _.fold(processing)(fuccess) }
 
     def applyResult(
-        game: Game, result: Option[Result], situation: Situation): Game =
+        game: Game,
+        result: Option[Result],
+        situation: Situation): Game =
       if (game.finished) game
       else
         situation.status match {
@@ -51,10 +55,11 @@ final class Importer(roundMap: ActorRef,
             game.pgnImport.flatMap(_.user).isDefined ?? GameRepo
               .setImportCreatedAt(game)
           } >> {
-            GameRepo.finish(id = game.id,
-                            winnerColor = game.winnerColor,
-                            winnerId = None,
-                            status = game.status)
+            GameRepo.finish(
+              id = game.id,
+              winnerColor = game.winnerColor,
+              winnerId = None,
+              status = game.status)
           } inject game
       }
     }

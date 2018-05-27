@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -52,7 +52,8 @@ final class JSONIngestProcessing(
     recordStyle: JSONRecordStyle,
     maxFields: Int,
     storage: IngestStore)(implicit M: Monad[Future])
-    extends IngestProcessing with Logging {
+    extends IngestProcessing
+    with Logging {
 
   def forRequest(
       request: HttpRequest[_]): ValidationNel[String, IngestProcessor] = {
@@ -65,12 +66,13 @@ final class JSONIngestProcessing(
   }
 
   case class JSONParseState(parser: AsyncParser, report: IngestReport) {
-    def update(newParser: AsyncParser,
-               newIngested: Int,
-               newErrors: Seq[(Int, String)] = Seq.empty) = {
-      JSONParseState(newParser,
-                     IngestReport(report.ingested + newIngested,
-                                  report.errors ++ newErrors))
+    def update(
+        newParser: AsyncParser,
+        newIngested: Int,
+        newErrors: Seq[(Int, String)] = Seq.empty) = {
+      JSONParseState(
+        newParser,
+        IngestReport(report.ingested + newIngested, report.errors ++ newErrors))
     }
   }
 
@@ -93,16 +95,17 @@ final class JSONIngestProcessing(
         case JSONValueStyle =>
           values flatMap {
             case JArray(elements) => elements
-            case value => Seq(value)
+            case value            => Seq(value)
           }
 
         case JSONStreamStyle =>
           values
       }
 
-      def ingestAllOrNothing(state: JSONParseState,
-                             stream: StreamT[Future, Array[Byte]],
-                             streamRef: StreamRef): Future[IngestReport] = {
+      def ingestAllOrNothing(
+          state: JSONParseState,
+          stream: StreamT[Future, Array[Byte]],
+          streamRef: StreamRef): Future[IngestReport] = {
         def accumulate(
             state: JSONParseState,
             records: Vector[JValue],
@@ -117,13 +120,14 @@ final class JSONIngestProcessing(
                 parsed.values.indexWhere(_.flattenWithPath.size > maxFields)
               val errors =
                 parsed.errors.map(pe => (pe.line, pe.msg)) ++
-                (overLargeIdx >= 0).option(
+                  (overLargeIdx >= 0).option(
                     overLargeIdx + state.report.ingested -> overLargeMsg)
 
               if (errors.isEmpty) {
-                accumulate(state.update(updatedParser, ingestSize),
-                           records ++ parsed.values,
-                           rest)
+                accumulate(
+                  state.update(updatedParser, ingestSize),
+                  records ++ parsed.values,
+                  rest)
               } else {
                 IngestReport(0, errors).point[Future]
               }
@@ -135,21 +139,22 @@ final class JSONIngestProcessing(
                 parsed.values.indexWhere(_.flattenWithPath.size > maxFields)
               val errors =
                 parsed.errors.map(pe => (pe.line, pe.msg)) ++
-                (overLargeIdx >= 0).option(
+                  (overLargeIdx >= 0).option(
                     overLargeIdx + state.report.ingested -> overLargeMsg)
 
               if (errors.isEmpty) {
                 val completedRecords = records ++ parsed.values
-                storage.store(apiKey,
-                              path,
-                              authorities,
-                              completedRecords,
-                              jobId,
-                              streamRef.terminate) map {
+                storage.store(
+                  apiKey,
+                  path,
+                  authorities,
+                  completedRecords,
+                  jobId,
+                  streamRef.terminate) map {
                   _.fold(
-                      storeFailure =>
-                        IngestReport(0, (0, storeFailure.message) :: Nil),
-                      _ => IngestReport(completedRecords.size, Nil)
+                    storeFailure =>
+                      IngestReport(0, (0, storeFailure.message) :: Nil),
+                    _ => IngestReport(completedRecords.size, Nil)
                   )
                 }
               } else {
@@ -161,9 +166,10 @@ final class JSONIngestProcessing(
         accumulate(state, Vector.empty[JValue], stream)
       }
 
-      def ingestUnbuffered(state: JSONParseState,
-                           stream: StreamT[Future, Array[Byte]],
-                           streamRef: StreamRef): Future[JSONParseState] = {
+      def ingestUnbuffered(
+          state: JSONParseState,
+          stream: StreamT[Future, Array[Byte]],
+          streamRef: StreamRef): Future[JSONParseState] = {
         stream.uncons.flatMap {
           case Some((bytes, rest)) =>
             // Dup and rewind to ensure we have something to parse
@@ -185,10 +191,11 @@ final class JSONIngestProcessing(
         }
       }
 
-      def ingestFinalBlock(parsed: AsyncParse,
-                           updatedParser: AsyncParser,
-                           state: JSONParseState,
-                           streamRef: StreamRef) = {
+      def ingestFinalBlock(
+          parsed: AsyncParse,
+          updatedParser: AsyncParser,
+          state: JSONParseState,
+          streamRef: StreamRef) = {
         ingestBlock(parsed, updatedParser, state, streamRef.terminate) {
           (_: JSONParseState).point[Future]
         }
@@ -207,10 +214,11 @@ final class JSONIngestProcessing(
         (ok, ko)
       }
 
-      def ingestBlock(parsed: AsyncParse,
-                      updatedParser: AsyncParser,
-                      state: JSONParseState,
-                      streamRef: StreamRef)(
+      def ingestBlock(
+          parsed: AsyncParse,
+          updatedParser: AsyncParser,
+          state: JSONParseState,
+          streamRef: StreamRef)(
           continue: => JSONParseState => Future[JSONParseState])
         : Future[JSONParseState] = {
         (errorHandling: @unchecked) match {
@@ -221,23 +229,17 @@ final class JSONIngestProcessing(
               }
             val ingestSize = toIngest.size
 
-            storage.store(apiKey,
-                          path,
-                          authorities,
-                          toIngest,
-                          jobId,
-                          streamRef) flatMap {
+            storage.store(apiKey, path, authorities, toIngest, jobId, streamRef) flatMap {
               _.fold(
-                  storeFailure =>
-                    sys.error(
-                        "Do something useful with %s" format storeFailure.message),
-                  _ =>
-                    {
-                      val errors =
-                        parsed.errors.map(pe => (pe.line, pe.msg)) ++ overLarge
-                          .map(i => (i, overLargeMsg))
-                      continue(state.update(updatedParser, ingestSize, errors))
-                  }
+                storeFailure =>
+                  sys.error(
+                    "Do something useful with %s" format storeFailure.message),
+                _ => {
+                  val errors =
+                    parsed.errors.map(pe => (pe.line, pe.msg)) ++ overLarge
+                      .map(i => (i, overLargeMsg))
+                  continue(state.update(updatedParser, ingestSize, errors))
+                }
               )
             }
 
@@ -249,39 +251,42 @@ final class JSONIngestProcessing(
             val ingestSize = toIngest.size
 
             if (overLarge.isEmpty && parsed.errors.isEmpty) {
-              storage.store(apiKey,
-                            path,
-                            authorities,
-                            toIngest,
-                            jobId,
-                            streamRef) flatMap {
+              storage.store(
+                apiKey,
+                path,
+                authorities,
+                toIngest,
+                jobId,
+                streamRef) flatMap {
                 _.fold(
-                    storeFailure =>
-                      sys.error(
-                          "Do something useful with %s" format storeFailure.message),
-                    _ => continue(state.update(updatedParser, ingestSize, Nil))
+                  storeFailure =>
+                    sys.error(
+                      "Do something useful with %s" format storeFailure.message),
+                  _ => continue(state.update(updatedParser, ingestSize, Nil))
                 )
               }
             } else {
-              storage.store(apiKey,
-                            path,
-                            authorities,
-                            toIngest,
-                            jobId,
-                            streamRef.terminate) map {
+              storage.store(
+                apiKey,
+                path,
+                authorities,
+                toIngest,
+                jobId,
+                streamRef.terminate) map {
                 _.fold(
-                    storeFailure =>
-                      sys.error(
-                          "Do something useful with%s" format storeFailure.message),
-                    _ =>
-                      {
-                        val errors =
-                          parsed.errors.map(pe => (pe.line, pe.msg)) ++ (overLarge.nonEmpty)
-                            .option(state.report.ingested +
-                              toIngest.size -> overLargeMsg)
+                  storeFailure =>
+                    sys.error(
+                      "Do something useful with%s" format storeFailure.message),
+                  _ => {
+                    val errors =
+                      parsed.errors
+                        .map(pe => (pe.line, pe.msg)) ++ (overLarge.nonEmpty)
+                        .option(
+                          state.report.ingested +
+                            toIngest.size -> overLargeMsg)
 
-                        state.update(updatedParser, ingestSize, errors)
-                    }
+                    state.update(updatedParser, ingestSize, errors)
+                  }
                 )
               }
             }
@@ -290,28 +295,32 @@ final class JSONIngestProcessing(
 
       errorHandling match {
         case StopOnFirstError =>
-          ingestUnbuffered(JSONParseState.empty(true),
-                           stream,
-                           StreamRef.forWriteMode(storeMode, false)) map {
+          ingestUnbuffered(
+            JSONParseState.empty(true),
+            stream,
+            StreamRef.forWriteMode(storeMode, false)) map {
             _.report
           }
         case IngestAllPossible =>
-          ingestUnbuffered(JSONParseState.empty(false),
-                           stream,
-                           StreamRef.forWriteMode(storeMode, false)) map {
+          ingestUnbuffered(
+            JSONParseState.empty(false),
+            stream,
+            StreamRef.forWriteMode(storeMode, false)) map {
             _.report
           }
         case AllOrNothing =>
-          ingestAllOrNothing(JSONParseState.empty(true),
-                             stream,
-                             StreamRef.forWriteMode(storeMode, false))
+          ingestAllOrNothing(
+            JSONParseState.empty(true),
+            stream,
+            StreamRef.forWriteMode(storeMode, false))
       }
     }
 
-    def ingest(durability: Durability,
-               errorHandling: ErrorHandling,
-               storeMode: WriteMode,
-               data: ByteChunk): Future[IngestResult] = {
+    def ingest(
+        durability: Durability,
+        errorHandling: ErrorHandling,
+        storeMode: WriteMode,
+        data: ByteChunk): Future[IngestResult] = {
       val dataStream =
         data.fold(_ :: StreamT.empty[Future, Array[Byte]], identity)
 
@@ -325,7 +334,9 @@ final class JSONIngestProcessing(
 
                 case IngestAllPossible =>
                   BatchResult(
-                      ingested + errors.size, ingested, Vector(errors: _*))
+                    ingested + errors.size,
+                    ingested,
+                    Vector(errors: _*))
               }
           }
 

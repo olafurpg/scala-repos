@@ -45,14 +45,18 @@ class MultilabelMetricsSuite extends SparkFunSuite with MLlibTestSparkContext {
      *
      */
     val scoreAndLabels: RDD[(Array[Double], Array[Double])] =
-      sc.parallelize(Seq((Array(0.0, 1.0), Array(0.0, 2.0)),
-                         (Array(0.0, 2.0), Array(0.0, 1.0)),
-                         (Array(), Array(0.0)),
-                         (Array(2.0), Array(2.0)),
-                         (Array(2.0, 0.0), Array(2.0, 0.0)),
-                         (Array(0.0, 1.0, 2.0), Array(0.0, 1.0)),
-                         (Array(1.0), Array(1.0, 2.0))),
-                     2)
+      sc.parallelize(
+        Seq(
+          (Array(0.0, 1.0), Array(0.0, 2.0)),
+          (Array(0.0, 2.0), Array(0.0, 1.0)),
+          (Array(), Array(0.0)),
+          (Array(2.0), Array(2.0)),
+          (Array(2.0, 0.0), Array(2.0, 0.0)),
+          (Array(0.0, 1.0, 2.0), Array(0.0, 1.0)),
+          (Array(1.0), Array(1.0, 2.0))
+        ),
+        2
+      )
     val metrics = new MultilabelMetrics(scoreAndLabels)
     val delta = 0.00001
     val precision0 = 4.0 / (4 + 0)
@@ -72,13 +76,13 @@ class MultilabelMetricsSuite extends SparkFunSuite with MLlibTestSparkContext {
       2.0 * sumTp.toDouble / (2 * sumTp.toDouble + (1 + 1 + 2) + (0 + 1 + 2))
     val macroPrecisionDoc =
       1.0 / 7 *
-      (1.0 / 2 + 1.0 / 2 + 0 + 1.0 / 1 + 2.0 / 2 + 2.0 / 3 + 1.0 / 1.0)
+        (1.0 / 2 + 1.0 / 2 + 0 + 1.0 / 1 + 2.0 / 2 + 2.0 / 3 + 1.0 / 1.0)
     val macroRecallDoc =
       1.0 / 7 *
-      (1.0 / 2 + 1.0 / 2 + 0 / 1 + 1.0 / 1 + 2.0 / 2 + 2.0 / 2 + 1.0 / 2)
+        (1.0 / 2 + 1.0 / 2 + 0 / 1 + 1.0 / 1 + 2.0 / 2 + 2.0 / 2 + 1.0 / 2)
     val macroF1MeasureDoc =
       (1.0 / 7) * 2 *
-      (1.0 / (2 + 2) + 1.0 / (2 + 2) + 0 + 1.0 / (1 + 1) + 2.0 / (2 + 2) +
+        (1.0 / (2 + 2) + 1.0 / (2 + 2) + 0 + 1.0 / (1 + 1) + 2.0 / (2 + 2) +
           2.0 / (3 + 2) + 1.0 / (1 + 2))
     val hammingLoss = (1.0 / (7 * 3)) * (2 + 2 + 1 + 0 + 0 + 1 + 1)
     val strictAccuracy = 2.0 / 7

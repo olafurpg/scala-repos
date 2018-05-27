@@ -16,7 +16,8 @@ import akka.persistence.AtomicWrite
   * In-memory journal for testing purposes only.
   */
 private[persistence] class InmemJournal
-    extends AsyncWriteJournal with InmemMessages {
+    extends AsyncWriteJournal
+    with InmemMessages {
   override def asyncWriteMessages(messages: immutable.Seq[AtomicWrite])
     : Future[immutable.Seq[Try[Unit]]] = {
     for (w ← messages; p ← w.payload) add(p)
@@ -24,15 +25,16 @@ private[persistence] class InmemJournal
   }
 
   override def asyncReadHighestSequenceNr(
-      persistenceId: String, fromSequenceNr: Long): Future[Long] = {
+      persistenceId: String,
+      fromSequenceNr: Long): Future[Long] = {
     Future.successful(highestSequenceNr(persistenceId))
   }
 
-  override def asyncReplayMessages(persistenceId: String,
-                                   fromSequenceNr: Long,
-                                   toSequenceNr: Long,
-                                   max: Long)(
-      recoveryCallback: PersistentRepr ⇒ Unit): Future[Unit] = {
+  override def asyncReplayMessages(
+      persistenceId: String,
+      fromSequenceNr: Long,
+      toSequenceNr: Long,
+      max: Long)(recoveryCallback: PersistentRepr ⇒ Unit): Future[Unit] = {
     val highest = highestSequenceNr(persistenceId)
     if (highest != 0L && max != 0L)
       read(persistenceId, fromSequenceNr, math.min(toSequenceNr, highest), max)
@@ -41,7 +43,8 @@ private[persistence] class InmemJournal
   }
 
   def asyncDeleteMessagesTo(
-      persistenceId: String, toSequenceNr: Long): Future[Unit] = {
+      persistenceId: String,
+      toSequenceNr: Long): Future[Unit] = {
     val toSeqNr = math.min(toSequenceNr, highestSequenceNr(persistenceId))
     var snr = 1L
     while (snr <= toSeqNr) {
@@ -61,17 +64,16 @@ private[persistence] trait InmemMessages {
 
   def add(p: PersistentRepr): Unit =
     messages = messages +
-    (messages.get(p.persistenceId) match {
-          case Some(ms) ⇒ p.persistenceId -> (ms :+ p)
-          case None ⇒ p.persistenceId -> Vector(p)
-        })
+      (messages.get(p.persistenceId) match {
+        case Some(ms) ⇒ p.persistenceId -> (ms :+ p)
+        case None ⇒ p.persistenceId -> Vector(p)
+      })
 
-  def update(pid: String, snr: Long)(
-      f: PersistentRepr ⇒ PersistentRepr): Unit =
+  def update(pid: String, snr: Long)(f: PersistentRepr ⇒ PersistentRepr): Unit =
     messages = messages.get(pid) match {
       case Some(ms) ⇒
         messages +
-        (pid -> ms.map(sp ⇒ if (sp.sequenceNr == snr) f(sp) else sp))
+          (pid -> ms.map(sp ⇒ if (sp.sequenceNr == snr) f(sp) else sp))
       case None ⇒ messages
     }
 

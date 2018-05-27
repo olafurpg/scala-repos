@@ -31,9 +31,10 @@ import scala.collection.mutable
   * @author Alexander Podkhalyuzin
   */
 class ScalaCodeFragmentFactory extends CodeFragmentFactory {
-  def createCodeFragment(item: TextWithImports,
-                         context: PsiElement,
-                         project: Project): JavaCodeFragment = {
+  def createCodeFragment(
+      item: TextWithImports,
+      context: PsiElement,
+      project: Project): JavaCodeFragment = {
     val fragment = createCodeFragmentInner(item, context, project)
     fragment.setContext(wrapContext(project, context), null)
 
@@ -46,14 +47,14 @@ class ScalaCodeFragmentFactory extends CodeFragmentFactory {
         semaphore.down()
         val nameRef = new AtomicReference[PsiClass]
         val worker = new ScalaRuntimeTypeEvaluator(
-            null,
-            expr,
-            debuggerContext,
-            ProgressManager.getInstance.getProgressIndicator) {
+          null,
+          expr,
+          debuggerContext,
+          ProgressManager.getInstance.getProgressIndicator) {
           override def typeCalculationFinished(psiType: PsiType): Unit = {
             val psiClass = psiType match {
               case tp: PsiClassType => tp.resolve()
-              case _ => null
+              case _                => null
             }
             nameRef.set(psiClass)
             semaphore.up()
@@ -73,32 +74,36 @@ class ScalaCodeFragmentFactory extends CodeFragmentFactory {
       null
     }
     fragment.putCopyableUserData(
-        ScalaRuntimeTypeEvaluator.KEY, evaluateType: (ScExpression) => ScType)
+      ScalaRuntimeTypeEvaluator.KEY,
+      evaluateType: (ScExpression) => ScType)
     fragment
   }
 
-  private def createCodeFragmentInner(item: TextWithImports,
-                                      context: PsiElement,
-                                      project: Project): ScalaCodeFragment = {
+  private def createCodeFragmentInner(
+      item: TextWithImports,
+      context: PsiElement,
+      project: Project): ScalaCodeFragment = {
     val fragment = new ScalaCodeFragment(project, item.getText)
     fragment.setContext(context, null)
     fragment.addImportsFromString(item.getImports)
-    fragment.putUserData(DebuggerExpressionComboBox.KEY,
-                         "DebuggerComboBoxEditor.IS_DEBUGGER_EDITOR")
+    fragment.putUserData(
+      DebuggerExpressionComboBox.KEY,
+      "DebuggerComboBoxEditor.IS_DEBUGGER_EDITOR")
     fragment
   }
 
-  def createPresentationCodeFragment(item: TextWithImports,
-                                     context: PsiElement,
-                                     project: Project): JavaCodeFragment = {
+  def createPresentationCodeFragment(
+      item: TextWithImports,
+      context: PsiElement,
+      project: Project): JavaCodeFragment = {
     createCodeFragment(item, context, project)
   }
 
   def isContextAccepted(contextElement: PsiElement): Boolean = {
     if (contextElement.isInstanceOf[PsiCodeBlock]) {
       return contextElement.getContext != null &&
-      contextElement.getContext.getContext != null &&
-      contextElement.getContext.getContext.getLanguage == ScalaFileType.SCALA_LANGUAGE
+        contextElement.getContext.getContext != null &&
+        contextElement.getContext.getContext.getLanguage == ScalaFileType.SCALA_LANGUAGE
     }
     if (contextElement == null) return false
     contextElement.getLanguage == ScalaFileType.SCALA_LANGUAGE
@@ -109,7 +114,8 @@ class ScalaCodeFragmentFactory extends CodeFragmentFactory {
   def getEvaluatorBuilder: EvaluatorBuilder = ScalaEvaluatorBuilder
 
   private def wrapContext(
-      project: Project, originalContext: PsiElement): PsiElement = {
+      project: Project,
+      originalContext: PsiElement): PsiElement = {
     if (project.isDefault) return originalContext
     var context: PsiElement = originalContext
     val session: XDebugSession =
@@ -124,16 +130,20 @@ class ScalaCodeFragmentFactory extends CodeFragmentFactory {
           markupVariablesText(markupMap)
         val offset: Int = variablesText.length - 1
         val textWithImports: TextWithImportsImpl = new TextWithImportsImpl(
-            CodeFragmentKind.CODE_BLOCK, variablesText, "", getFileType)
-        val codeFragment: JavaCodeFragment = createCodeFragmentInner(
-            textWithImports, context, project)
+          CodeFragmentKind.CODE_BLOCK,
+          variablesText,
+          "",
+          getFileType)
+        val codeFragment: JavaCodeFragment =
+          createCodeFragmentInner(textWithImports, context, project)
         codeFragment.accept(new ScalaRecursiveElementVisitor() {
-          override def visitPatternDefinition(pat: ScPatternDefinition): Unit = {
+          override def visitPatternDefinition(
+              pat: ScPatternDefinition): Unit = {
             val bindingPattern = pat.bindings.head
             val name: String = bindingPattern.name
             bindingPattern.putUserData(
-                CodeFragmentFactoryContextWrapper.LABEL_VARIABLE_VALUE_KEY,
-                reverseMap.getOrElse(name, null))
+              CodeFragmentFactoryContextWrapper.LABEL_VARIABLE_VALUE_KEY,
+              reverseMap.getOrElse(name, null))
           }
         })
         val newContext: PsiElement = codeFragment.findElementAt(offset)
@@ -159,6 +169,6 @@ class ScalaCodeFragmentFactory extends CodeFragmentFactory {
     val text = names
       .map(n => s"val $n: AnyRef = _")
       .mkString("\n")
-      (text, reverseMap.toMap)
+    (text, reverseMap.toMap)
   }
 }

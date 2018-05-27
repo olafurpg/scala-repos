@@ -145,7 +145,9 @@ class JavaDoubleRDD(val srdd: RDD[scala.Double])
     * Return a sampled subset of this RDD.
     */
   def sample(
-      withReplacement: Boolean, fraction: JDouble, seed: Long): JavaDoubleRDD =
+      withReplacement: Boolean,
+      fraction: JDouble,
+      seed: Long): JavaDoubleRDD =
     fromRDD(srdd.sample(withReplacement, fraction, seed))
 
   /**
@@ -212,7 +214,8 @@ class JavaDoubleRDD(val srdd: RDD[scala.Double])
 
   /** Return the approximate mean of the elements in this RDD. */
   def meanApprox(
-      timeout: Long, confidence: JDouble): PartialResult[BoundedDouble] =
+      timeout: Long,
+      confidence: JDouble): PartialResult[BoundedDouble] =
     srdd.meanApprox(timeout, confidence)
 
   /**
@@ -225,7 +228,8 @@ class JavaDoubleRDD(val srdd: RDD[scala.Double])
     * Approximate operation to return the sum within a timeout.
     */
   def sumApprox(
-      timeout: Long, confidence: JDouble): PartialResult[BoundedDouble] =
+      timeout: Long,
+      confidence: JDouble): PartialResult[BoundedDouble] =
     srdd.sumApprox(timeout, confidence)
 
   /**

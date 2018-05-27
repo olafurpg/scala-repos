@@ -14,8 +14,10 @@ import annotation.tailrec
   * @param backing - the backing Queue
   */
 class BoundedBlockingQueue[E <: AnyRef](
-    val maxCapacity: Int, private val backing: Queue[E])
-    extends AbstractQueue[E] with BlockingQueue[E] {
+    val maxCapacity: Int,
+    private val backing: Queue[E])
+    extends AbstractQueue[E]
+    with BlockingQueue[E] {
 
   backing match {
     case null ⇒
@@ -112,9 +114,9 @@ class BoundedBlockingQueue[E <: AnyRef](
           case null if remainingNanos <= 0 ⇒ null.asInstanceOf[E]
           case null ⇒ pollElement(notEmpty.awaitNanos(remainingNanos))
           case e ⇒ {
-              notFull.signal()
-              e
-            }
+            notFull.signal()
+            e
+          }
         }
       }
       pollElement(unit.toNanos(timeout))
@@ -149,7 +151,8 @@ class BoundedBlockingQueue[E <: AnyRef](
   override def contains(e: AnyRef): Boolean = {
     if (e eq null) throw new NullPointerException
     lock.lock()
-    try backing.contains(e) finally lock.unlock()
+    try backing.contains(e)
+    finally lock.unlock()
   }
 
   override def clear() {
@@ -169,12 +172,14 @@ class BoundedBlockingQueue[E <: AnyRef](
 
   def size(): Int = {
     lock.lock()
-    try backing.size() finally lock.unlock()
+    try backing.size()
+    finally lock.unlock()
   }
 
   def peek(): E = {
     lock.lock()
-    try backing.peek() finally lock.unlock()
+    try backing.peek()
+    finally lock.unlock()
   }
 
   def drainTo(c: Collection[_ >: E]): Int = drainTo(c, Int.MaxValue)
@@ -204,7 +209,8 @@ class BoundedBlockingQueue[E <: AnyRef](
 
   override def containsAll(c: Collection[_]): Boolean = {
     lock.lock()
-    try backing.containsAll(c) finally lock.unlock()
+    try backing.containsAll(c)
+    finally lock.unlock()
   }
 
   override def removeAll(c: Collection[_]): Boolean = {
@@ -254,8 +260,8 @@ class BoundedBlockingQueue[E <: AnyRef](
           last = -1 //To avoid 2 subsequent removes without a next in between
           lock.lock()
           try {
-            @tailrec def removeTarget(i: Iterator[E] = backing.iterator())
-              : Unit =
+            @tailrec def removeTarget(
+                i: Iterator[E] = backing.iterator()): Unit =
               if (i.hasNext) {
                 if (i.next eq target) {
                   i.remove()
@@ -272,16 +278,19 @@ class BoundedBlockingQueue[E <: AnyRef](
 
   override def toArray(): Array[AnyRef] = {
     lock.lock()
-    try backing.toArray finally lock.unlock()
+    try backing.toArray
+    finally lock.unlock()
   }
 
   override def isEmpty(): Boolean = {
     lock.lock()
-    try backing.isEmpty() finally lock.unlock()
+    try backing.isEmpty()
+    finally lock.unlock()
   }
 
   override def toArray[X](a: Array[X with AnyRef]) = {
     lock.lock()
-    try backing.toArray[X](a) finally lock.unlock()
+    try backing.toArray[X](a)
+    finally lock.unlock()
   }
 }

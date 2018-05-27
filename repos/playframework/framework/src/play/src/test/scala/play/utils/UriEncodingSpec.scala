@@ -19,7 +19,8 @@ object UriEncodingSpec extends Specification {
   case class NotEncodedButDecodeDifferent(decodedEncoded: String)
       extends EncodingResult
   case class PercentEncodedButDecodeDifferent(
-      encoded: String, decodedEncoded: String)
+      encoded: String,
+      decodedEncoded: String)
       extends EncodingResult
   case class PercentEncodedButDecodedInvalid(encoded: String)
       extends EncodingResult
@@ -170,7 +171,7 @@ RFC 3986 - Uniform Resource Identifier (URI): Generic Syntax
    differ only in the case of hexadecimal digits used in percent-encoded
    octets, they are equivalent.  For consistency, URI producers and
    normalizers should use uppercase hexadecimal digits for all percent-
-   encodings.    
+   encodings.
      */
     "percent-encode to triplets with upper-case hex" in {
       encodingFor("\u0000", "ISO-8859-1") must_== PercentEncoded("%00")
@@ -250,7 +251,7 @@ RFC 3986 - Uniform Resource Identifier (URI): Generic Syntax
     "not decode badly encoded paths" in {
       decodePath("/a|b/", "utf-8") must throwA[InvalidUriEncodingException]
       decodePath("/hello world", "utf-8") must throwA[
-          InvalidUriEncodingException]
+        InvalidUriEncodingException]
     }
 
     "not perform normalization of dot-segments" in {

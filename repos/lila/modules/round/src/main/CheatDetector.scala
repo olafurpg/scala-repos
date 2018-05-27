@@ -18,11 +18,11 @@ private[round] final class CheatDetector(reporter: ActorSelection) {
               lila
                 .log("cheat")
                 .info(
-                    s"${cheater.color} ($userId) @ ${game.id} uses ${mirror.id}")
+                  s"${cheater.color} ($userId) @ ${game.id} uses ${mirror.id}")
               if (createReport)
                 reporter ! lila.hub.actorApi.report.Cheater(
-                    userId,
-                    s"Cheat detected on ${gameUrl(game.id)}, using lichess AI: ${gameUrl(mirror.id)}")
+                  userId,
+                  s"Cheat detected on ${gameUrl(game.id)}, using lichess AI: ${gameUrl(mirror.id)}")
               cheater.color
             }
         } flatten

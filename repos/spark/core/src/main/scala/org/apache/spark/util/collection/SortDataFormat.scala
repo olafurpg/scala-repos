@@ -65,7 +65,11 @@ private[spark] abstract class SortDataFormat[K, Buffer] {
     * Overlapping ranges are allowed.
     */
   def copyRange(
-      src: Buffer, srcPos: Int, dst: Buffer, dstPos: Int, length: Int): Unit
+      src: Buffer,
+      srcPos: Int,
+      dst: Buffer,
+      dstPos: Int,
+      length: Int): Unit
 
   /**
     * Allocates a Buffer that can hold up to 'length' elements.
@@ -82,7 +86,7 @@ private[spark] abstract class SortDataFormat[K, Buffer] {
   * @tparam T Type of the Array we're sorting. Typically this must extend AnyRef, to support cases
   *           when the keys and values are not the same type.
   */
-private[spark] class KVArraySortDataFormat[K, T <: AnyRef : ClassTag]
+private[spark] class KVArraySortDataFormat[K, T <: AnyRef: ClassTag]
     extends SortDataFormat[K, Array[T]] {
 
   override def getKey(data: Array[T], pos: Int): K =
@@ -98,13 +102,20 @@ private[spark] class KVArraySortDataFormat[K, T <: AnyRef : ClassTag]
   }
 
   override def copyElement(
-      src: Array[T], srcPos: Int, dst: Array[T], dstPos: Int) {
+      src: Array[T],
+      srcPos: Int,
+      dst: Array[T],
+      dstPos: Int) {
     dst(2 * dstPos) = src(2 * srcPos)
     dst(2 * dstPos + 1) = src(2 * srcPos + 1)
   }
 
   override def copyRange(
-      src: Array[T], srcPos: Int, dst: Array[T], dstPos: Int, length: Int) {
+      src: Array[T],
+      srcPos: Int,
+      dst: Array[T],
+      dstPos: Int,
+      length: Int) {
     System.arraycopy(src, 2 * srcPos, dst, 2 * dstPos, 2 * length)
   }
 

@@ -36,10 +36,11 @@ private[streaming] trait RateEstimator extends Serializable {
     * @param processingDelay The time in ms that took for the job to complete
     * @param schedulingDelay The time in ms that the job spent in the scheduling queue
     */
-  def compute(time: Long,
-              elements: Long,
-              processingDelay: Long,
-              schedulingDelay: Long): Option[Double]
+  def compute(
+      time: Long,
+      elements: Long,
+      processingDelay: Long,
+      schedulingDelay: Long): Option[Double]
 }
 
 object RateEstimator {
@@ -64,14 +65,14 @@ object RateEstimator {
           conf.getDouble("spark.streaming.backpressure.pid.derived", 0.0)
         val minRate =
           conf.getDouble("spark.streaming.backpressure.pid.minRate", 100)
-        new PIDRateEstimator(batchInterval.milliseconds,
-                             proportional,
-                             integral,
-                             derived,
-                             minRate)
+        new PIDRateEstimator(
+          batchInterval.milliseconds,
+          proportional,
+          integral,
+          derived,
+          minRate)
 
       case estimator =>
-        throw new IllegalArgumentException(
-            s"Unkown rate estimator: $estimator")
+        throw new IllegalArgumentException(s"Unkown rate estimator: $estimator")
     }
 }

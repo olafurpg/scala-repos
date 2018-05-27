@@ -16,7 +16,9 @@ trait DensePolynomial {
     }
     implicit object denseVectorImpl
         extends Impl2[
-            PolyDenseUFuncWrapper, DenseVector[Double], DenseVector[Double]] {
+          PolyDenseUFuncWrapper,
+          DenseVector[Double],
+          DenseVector[Double]] {
       /* This implementation uses Horner's Algorithm:
        *  http://en.wikipedia.org/wiki/Horner's_method
        *
@@ -31,9 +33,8 @@ trait DensePolynomial {
         while (i > 0) {
           i -= 1
           val c = coeffs(i)
-          cfor(0)(j => j < result.size, j => j + 1)(j =>
-                {
-              result(j) = result(j) * v(j) + c
+          cfor(0)(j => j < result.size, j => j + 1)(j => {
+            result(j) = result(j) * v(j) + c
           })
         }
         result
@@ -41,7 +42,9 @@ trait DensePolynomial {
     }
     implicit object denseMatrixImpl
         extends Impl2[
-            PolyDenseUFuncWrapper, DenseMatrix[Double], DenseMatrix[Double]] {
+          PolyDenseUFuncWrapper,
+          DenseMatrix[Double],
+          DenseMatrix[Double]] {
       /* This implementation uses Horner's Algorithm:
        *  http://en.wikipedia.org/wiki/Horner's_method
        *
@@ -52,7 +55,7 @@ trait DensePolynomial {
       def apply(k: PolyDenseUFuncWrapper, v: DenseMatrix[Double]) = {
         if (v.rows != v.cols) {
           throw new IllegalArgumentException(
-              "Can only apply polynomial to square matrix.")
+            "Can only apply polynomial to square matrix.")
         }
         val n = v.rows
         val coeffs: Array[Double] = k.p.coeffs
@@ -62,9 +65,8 @@ trait DensePolynomial {
           i -= 1
           result = result * v //WILDLY INEFFICIENT, FIGURE OUT IN PLACE MULTIPLY
           val c = coeffs(i)
-          cfor(0)(i => i < n, i => i + 1)(i =>
-                {
-              result.update(i, i, result(i, i) + c)
+          cfor(0)(i => i < n, i => i + 1)(i => {
+            result.update(i, i, result(i, i) + c)
           })
         }
         result

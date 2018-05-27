@@ -23,13 +23,14 @@ class SurroundWithWikiSyntaxTest
 
     for (surrounder <- surrounders) {
       checkAfterSurroundWith(
+        actualText,
+        getAssumedText(
           actualText,
-          getAssumedText(actualText,
-                         surrounder
-                           .asInstanceOf[ScalaDocWithSyntaxSurrounder]
-                           .getSyntaxTag),
-          surrounder,
-          canSurround = true)
+          surrounder
+            .asInstanceOf[ScalaDocWithSyntaxSurrounder]
+            .getSyntaxTag),
+        surrounder,
+        canSurround = true)
     }
   }
 

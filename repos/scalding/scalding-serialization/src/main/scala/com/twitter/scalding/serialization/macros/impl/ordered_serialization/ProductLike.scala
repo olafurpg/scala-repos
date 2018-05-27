@@ -23,8 +23,9 @@ import com.twitter.scalding._
 object ProductLike {
   def compareBinary(
       c: Context)(inputStreamA: c.TermName, inputStreamB: c.TermName)(
-      elementData: List[(c.universe.Type, c.universe.TermName, TreeOrderedBuf[
-              c.type])]): c.Tree = {
+      elementData: List[
+        (c.universe.Type, c.universe.TermName, TreeOrderedBuf[c.type])])
+    : c.Tree = {
     import c.universe._
     def freshT(id: String) = newTermName(c.fresh(id))
 
@@ -50,8 +51,9 @@ object ProductLike {
   }
 
   def hash(c: Context)(element: c.TermName)(
-      elementData: List[(c.universe.Type, c.universe.TermName, TreeOrderedBuf[
-              c.type])]): c.Tree = {
+      elementData: List[
+        (c.universe.Type, c.universe.TermName, TreeOrderedBuf[c.type])])
+    : c.Tree = {
     import c.universe._
     def freshT(id: String) = newTermName(c.fresh(id))
 
@@ -75,8 +77,9 @@ object ProductLike {
   }
 
   def put(c: Context)(inputStream: c.TermName, element: c.TermName)(
-      elementData: List[(c.universe.Type, c.universe.TermName, TreeOrderedBuf[
-              c.type])]): c.Tree = {
+      elementData: List[
+        (c.universe.Type, c.universe.TermName, TreeOrderedBuf[c.type])])
+    : c.Tree = {
     import c.universe._
     def freshT(id: String) = newTermName(c.fresh(id))
     val innerElement = freshT("innerElement")
@@ -92,33 +95,38 @@ object ProductLike {
   }
 
   def length(c: Context)(element: c.Tree)(
-      elementData: List[(c.universe.Type, c.universe.TermName, TreeOrderedBuf[
-              c.type])]): CompileTimeLengthTypes[c.type] = {
+      elementData: List[
+        (c.universe.Type, c.universe.TermName, TreeOrderedBuf[c.type])])
+    : CompileTimeLengthTypes[c.type] = {
     import c.universe._
     import CompileTimeLengthTypes._
     val (constSize, dynamicFunctions, maybeLength, noLength) =
       elementData.foldLeft((0, Vector[c.Tree](), Vector[c.Tree](), 0)) {
-        case ((constantLength, dynamicLength, maybeLength, noLength),
-              (tpe, accessorSymbol, tBuf)) =>
+        case (
+            (constantLength, dynamicLength, maybeLength, noLength),
+            (tpe, accessorSymbol, tBuf)) =>
           tBuf.length(q"$element.$accessorSymbol") match {
             case const: ConstantLengthCalculation[_] =>
-              (constantLength +
-               const.asInstanceOf[ConstantLengthCalculation[c.type]].toInt,
-               dynamicLength,
-               maybeLength,
-               noLength)
+              (
+                constantLength +
+                  const.asInstanceOf[ConstantLengthCalculation[c.type]].toInt,
+                dynamicLength,
+                maybeLength,
+                noLength)
             case f: FastLengthCalculation[_] =>
-              (constantLength,
-               dynamicLength :+ f
-                 .asInstanceOf[FastLengthCalculation[c.type]]
-                 .t,
-               maybeLength,
-               noLength)
+              (
+                constantLength,
+                dynamicLength :+ f
+                  .asInstanceOf[FastLengthCalculation[c.type]]
+                  .t,
+                maybeLength,
+                noLength)
             case m: MaybeLengthCalculation[_] =>
-              (constantLength,
-               dynamicLength,
-               maybeLength :+ m.asInstanceOf[MaybeLengthCalculation[c.type]].t,
-               noLength)
+              (
+                constantLength,
+                dynamicLength,
+                maybeLength :+ m.asInstanceOf[MaybeLengthCalculation[c.type]].t,
+                noLength)
             case _: NoLengthCalculationAvailable[_] =>
               (constantLength, dynamicLength, maybeLength, noLength + 1)
           }
@@ -166,8 +174,9 @@ object ProductLike {
   }
 
   def compare(c: Context)(elementA: c.TermName, elementB: c.TermName)(
-      elementData: List[(c.universe.Type, c.universe.TermName, TreeOrderedBuf[
-              c.type])]): c.Tree = {
+      elementData: List[
+        (c.universe.Type, c.universe.TermName, TreeOrderedBuf[c.type])])
+    : c.Tree = {
     import c.universe._
 
     def freshT(id: String) = newTermName(c.fresh(id))
@@ -175,18 +184,20 @@ object ProductLike {
     val innerElementA = freshT("innerElementA")
     val innerElementB = freshT("innerElementB")
 
-    elementData.map {
-      case (tpe, accessorSymbol, tBuf) =>
-        val curCmp = freshT("curCmp")
-        val cmpTree = q"""
+    elementData
+      .map {
+        case (tpe, accessorSymbol, tBuf) =>
+          val curCmp = freshT("curCmp")
+          val cmpTree = q"""
             val $curCmp: Int = {
               val $innerElementA = $elementA.$accessorSymbol
               val $innerElementB = $elementB.$accessorSymbol
               ${tBuf.compare(innerElementA, innerElementB)}
             }
           """
-        (cmpTree, curCmp)
-    }.reverse // go through last to first
+          (cmpTree, curCmp)
+      }
+      .reverse // go through last to first
       .foldLeft(None: Option[Tree]) {
         case (Some(rest), (tree, valname)) =>
           Some(q"""$tree;

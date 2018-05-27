@@ -42,7 +42,8 @@ object Scale {
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/scene/transform/Scale.html]]
   */
 class Scale(override val delegate: jfxst.Scale = new jfxst.Scale)
-    extends Transform(delegate) with PositionDelegate[jfxst.Scale]
+    extends Transform(delegate)
+    with PositionDelegate[jfxst.Scale]
     with SFXDelegate[jfxst.Scale] {
 
   /**
@@ -64,12 +65,13 @@ class Scale(override val delegate: jfxst.Scale = new jfxst.Scale)
   /**
     * Creates a three-dimensional Scale with pivot.
     */
-  def this(x: Double,
-           y: Double,
-           z: Double,
-           pivotX: Double,
-           pivotY: Double,
-           pivotZ: Double) =
+  def this(
+      x: Double,
+      y: Double,
+      z: Double,
+      pivotX: Double,
+      pivotY: Double,
+      pivotZ: Double) =
     this(new jfxst.Scale(x, y, z, pivotX, pivotY, pivotZ))
 
   /**

@@ -42,18 +42,20 @@ object StackedBarChart {
   def apply[X, Y](xAxis: Axis[X], yAxis: Axis[Y]) =
     new StackedBarChart[X, Y](new jfxsc.StackedBarChart[X, Y](xAxis, yAxis))
 
-  def apply[X, Y](xAxis: Axis[X],
-                  yAxis: Axis[Y],
-                  data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) =
+  def apply[X, Y](
+      xAxis: Axis[X],
+      yAxis: Axis[Y],
+      data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) =
     new StackedBarChart[X, Y](
-        new jfxsc.StackedBarChart[X, Y](xAxis, yAxis, data))
+      new jfxsc.StackedBarChart[X, Y](xAxis, yAxis, data))
 
-  def apply[X, Y](xAxis: Axis[X],
-                  yAxis: Axis[Y],
-                  data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]],
-                  categoryGap: Double) =
+  def apply[X, Y](
+      xAxis: Axis[X],
+      yAxis: Axis[Y],
+      data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]],
+      categoryGap: Double) =
     new StackedBarChart[X, Y](
-        new jfxsc.StackedBarChart[X, Y](xAxis, yAxis, data, categoryGap))
+      new jfxsc.StackedBarChart[X, Y](xAxis, yAxis, data, categoryGap))
 }
 
 class StackedBarChart[X, Y](override val delegate: jfxsc.StackedBarChart[X, Y])
@@ -64,16 +66,18 @@ class StackedBarChart[X, Y](override val delegate: jfxsc.StackedBarChart[X, Y])
     this(new jfxsc.StackedBarChart[X, Y](xAxis, yAxis))
   }
 
-  def this(xAxis: Axis[X],
-           yAxis: Axis[Y],
-           data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) {
+  def this(
+      xAxis: Axis[X],
+      yAxis: Axis[Y],
+      data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) {
     this(new jfxsc.StackedBarChart[X, Y](xAxis, yAxis, data))
   }
 
-  def this(xAxis: Axis[X],
-           yAxis: Axis[Y],
-           data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]],
-           categoryGap: Double) {
+  def this(
+      xAxis: Axis[X],
+      yAxis: Axis[Y],
+      data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]],
+      categoryGap: Double) {
     this(new jfxsc.StackedBarChart[X, Y](xAxis, yAxis, data, categoryGap))
   }
 

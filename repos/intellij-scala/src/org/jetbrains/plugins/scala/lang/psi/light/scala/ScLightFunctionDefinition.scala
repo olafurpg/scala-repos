@@ -6,7 +6,10 @@ import com.intellij.psi.impl.light.LightElement
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiElement
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScModifierList
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScTypeElement
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScAnnotation, ScExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScAnnotation,
+  ScExpression
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params._
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
@@ -17,10 +20,11 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult}
   * @author Alefas
   * @since 03/04/14.
   */
-class ScLightFunctionDefinition(pTypes: List[List[ScType]],
-                                tParams: List[TypeParameter],
-                                rt: ScType,
-                                val fun: ScFunctionDefinition)
+class ScLightFunctionDefinition(
+    pTypes: List[List[ScType]],
+    tParams: List[TypeParameter],
+    rt: ScType,
+    val fun: ScFunctionDefinition)
     extends LightElement(fun.getManager, fun.getLanguage)
     with ScFunctionDefinition {
   setNavigationElement(fun)
@@ -92,8 +96,8 @@ class ScLightFunctionDefinition(pTypes: List[List[ScType]],
 
   override def canNavigateToSource: Boolean = fun.canNavigateToSource
 
-  override protected def findChildrenByClassScala[
-      T >: Null <: ScalaPsiElement](clazz: Class[T]): Array[T] =
+  override protected def findChildrenByClassScala[T >: Null <: ScalaPsiElement](
+      clazz: Class[T]): Array[T] =
     throw new UnsupportedOperationException("Operation on light function")
 
   override protected def findChildByClassScala[T >: Null <: ScalaPsiElement](

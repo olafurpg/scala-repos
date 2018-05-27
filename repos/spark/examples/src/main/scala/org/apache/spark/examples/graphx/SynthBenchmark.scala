@@ -67,22 +67,22 @@ object SynthBenchmark {
     var seed: Int = -1
 
     options.foreach {
-      case ("app", v) => app = v
-      case ("niters", v) => niter = v.toInt
-      case ("nverts", v) => numVertices = v.toInt
+      case ("app", v)      => app = v
+      case ("niters", v)   => niter = v.toInt
+      case ("nverts", v)   => numVertices = v.toInt
       case ("numEPart", v) => numEPart = Some(v.toInt)
       case ("partStrategy", v) =>
         partitionStrategy = Some(PartitionStrategy.fromString(v))
-      case ("mu", v) => mu = v.toDouble
-      case ("sigma", v) => sigma = v.toDouble
+      case ("mu", v)      => mu = v.toDouble
+      case ("sigma", v)   => sigma = v.toDouble
       case ("degFile", v) => degFile = v
-      case ("seed", v) => seed = v.toInt
+      case ("seed", v)    => seed = v.toInt
       case (opt, _) =>
         throw new IllegalArgumentException("Invalid option: " + opt)
     }
 
-    val conf = new SparkConf().setAppName(
-        s"GraphX Synth Benchmark (nverts = $numVertices, app = $app)")
+    val conf = new SparkConf()
+      .setAppName(s"GraphX Synth Benchmark (nverts = $numVertices, app = $app)")
     GraphXUtils.registerKryoClasses(conf)
 
     val sc = new SparkContext(conf)
@@ -90,12 +90,12 @@ object SynthBenchmark {
     // Create the graph
     println(s"Creating graph...")
     val unpartitionedGraph = GraphGenerators.logNormalGraph(
-        sc,
-        numVertices,
-        numEPart.getOrElse(sc.defaultParallelism),
-        mu,
-        sigma,
-        seed)
+      sc,
+      numVertices,
+      numEPart.getOrElse(sc.defaultParallelism),
+      mu,
+      sigma,
+      seed)
     // Repartition the graph
     val graph =
       partitionStrategy.foldLeft(unpartitionedGraph)(_.partitionBy(_)).cache()
@@ -103,7 +103,7 @@ object SynthBenchmark {
     var startTime = System.currentTimeMillis()
     val numEdges = graph.edges.count()
     println(
-        s"Done creating graph. Num Vertices = $numVertices, Num Edges = $numEdges")
+      s"Done creating graph. Num Vertices = $numVertices, Num Edges = $numEdges")
     val loadTime = System.currentTimeMillis() - startTime
 
     // Collect the degree distribution (if desired)

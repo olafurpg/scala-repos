@@ -18,8 +18,7 @@ class DurationConverterSpec extends WordSpec with Matchers {
   }
 
   "DurationTypeConverter must do the roundtrip" in {
-    convertTo(classOf[Duration], (10 seconds).toString()) should ===(
-        10 seconds)
+    convertTo(classOf[Duration], (10 seconds).toString()) should ===(10 seconds)
   }
 
   "DurationTypeConverter must throw if invalid format" in {

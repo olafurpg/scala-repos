@@ -39,6 +39,6 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class BorderRepeatSpec
     extends SFXEnumDelegateSpec[jfxsl.BorderRepeat, BorderRepeat](
-        javaClass = classOf[jfxsl.BorderRepeat],
-        scalaClass = classOf[BorderRepeat],
-        companion = BorderRepeat)
+      javaClass = classOf[jfxsl.BorderRepeat],
+      scalaClass = classOf[BorderRepeat],
+      companion = BorderRepeat)

@@ -16,8 +16,8 @@ abstract class M { self =>
 
   // compiles successfully
   def all3: Stream[M { type T <: self.T }] = all3Impl(self: actualSelfType)
-  private def all3Impl(
-      first: M { type T <: self.T }): Stream[M { type T <: self.T }] =
+  private def all3Impl(first: M { type T <: self.T })
+    : Stream[M { type T <: self.T }] =
     Stream.cons(first, all3Impl(first.next))
 
   def all4: Stream[M { type T <: self.T }] =

@@ -7,7 +7,9 @@ import org.scalatest._
 import prop._
 
 class RationalCheck
-    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+    extends PropSpec
+    with Matchers
+    with GeneratorDrivenPropertyChecks {
   type Q = Rational
 
   def rat1(name: String)(f: Q => Unit) =

@@ -6,12 +6,13 @@ trait WebHookComponent extends TemplateComponent { self: Profile =>
   lazy val WebHooks = TableQuery[WebHooks]
 
   class WebHooks(tag: Tag)
-      extends Table[WebHook](tag, "WEB_HOOK") with BasicTemplate {
+      extends Table[WebHook](tag, "WEB_HOOK")
+      with BasicTemplate {
     val url = column[String]("URL")
     val token = column[Option[String]]("TOKEN", O.Nullable)
     def * =
       (userName, repositoryName, url, token) <>
-      ((WebHook.apply _).tupled, WebHook.unapply)
+        ((WebHook.apply _).tupled, WebHook.unapply)
 
     def byPrimaryKey(owner: String, repository: String, url: String) =
       byRepository(owner, repository) && (this.url === url.bind)
@@ -48,25 +49,27 @@ object WebHook {
   case object TeamAdd extends Event("team_add")
   case object Watch extends Event("watch")
   object Event {
-    val values = List(CommitComment,
-                      Create,
-                      Delete,
-                      Deployment,
-                      DeploymentStatus,
-                      Fork,
-                      Gollum,
-                      IssueComment,
-                      Issues,
-                      Member,
-                      PageBuild,
-                      Public,
-                      PullRequest,
-                      PullRequestReviewComment,
-                      Push,
-                      Release,
-                      Status,
-                      TeamAdd,
-                      Watch)
+    val values = List(
+      CommitComment,
+      Create,
+      Delete,
+      Deployment,
+      DeploymentStatus,
+      Fork,
+      Gollum,
+      IssueComment,
+      Issues,
+      Member,
+      PageBuild,
+      Public,
+      PullRequest,
+      PullRequestReviewComment,
+      Push,
+      Release,
+      Status,
+      TeamAdd,
+      Watch
+    )
     private val map: Map[String, Event] = values.map(e => e.name -> e).toMap
     def valueOf(name: String): Event = map(name)
     def valueOpt(name: String): Option[Event] = map.get(name)

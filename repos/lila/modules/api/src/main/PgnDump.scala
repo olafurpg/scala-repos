@@ -7,9 +7,10 @@ import lila.game.Game
 import lila.game.{GameRepo, Query}
 import play.api.libs.iteratee._
 
-final class PgnDump(dumper: lila.game.PgnDump,
-                    simulName: String => Option[String],
-                    tournamentName: String => Option[String]) {
+final class PgnDump(
+    dumper: lila.game.PgnDump,
+    simulName: String => Option[String],
+    tournamentName: String => Option[String]) {
 
   def apply(game: Game, initialFen: Option[String]): Pgn = {
     val pgn = dumper(game, initialFen)

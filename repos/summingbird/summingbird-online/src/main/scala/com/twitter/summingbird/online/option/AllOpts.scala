@@ -84,7 +84,7 @@ case class ValueCombinerCacheSize(get: Int)
   * This is the same trait for both map side and reduce side aggregation.
   */
 trait SummerBuilder extends Serializable {
-  def getSummer[K, V : Semigroup]: AsyncSummer[(K, V), Map[K, V]]
+  def getSummer[K, V: Semigroup]: AsyncSummer[(K, V), Map[K, V]]
 }
 
 /**

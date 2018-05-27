@@ -33,8 +33,8 @@ class PhantomJSEnv(
     addEnv: Map[String, String] = Map.empty,
     val autoExit: Boolean = true,
     jettyClassLoader: ClassLoader = null
-)
-    extends ExternalJSEnv(addArgs, addEnv) with ComJSEnv {
+) extends ExternalJSEnv(addArgs, addEnv)
+    with ComJSEnv {
 
   import PhantomJSEnv._
 
@@ -42,31 +42,40 @@ class PhantomJSEnv(
   protected def executable: String = phantomjsPath
 
   override def jsRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile): JSRunner = {
+      libs: Seq[ResolvedJSDependency],
+      code: VirtualJSFile): JSRunner = {
     new PhantomRunner(libs, code)
   }
 
   override def asyncRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile): AsyncJSRunner = {
+      libs: Seq[ResolvedJSDependency],
+      code: VirtualJSFile): AsyncJSRunner = {
     new AsyncPhantomRunner(libs, code)
   }
 
   override def comRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile): ComJSRunner = {
+      libs: Seq[ResolvedJSDependency],
+      code: VirtualJSFile): ComJSRunner = {
     new ComPhantomRunner(libs, code)
   }
 
   protected class PhantomRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile)
-      extends ExtRunner(libs, code) with AbstractPhantomRunner
+      libs: Seq[ResolvedJSDependency],
+      code: VirtualJSFile)
+      extends ExtRunner(libs, code)
+      with AbstractPhantomRunner
 
   protected class AsyncPhantomRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile)
-      extends AsyncExtRunner(libs, code) with AbstractPhantomRunner
+      libs: Seq[ResolvedJSDependency],
+      code: VirtualJSFile)
+      extends AsyncExtRunner(libs, code)
+      with AbstractPhantomRunner
 
   protected class ComPhantomRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile)
-      extends AsyncPhantomRunner(libs, code) with ComJSRunner {
+      libs: Seq[ResolvedJSDependency],
+      code: VirtualJSFile)
+      extends AsyncPhantomRunner(libs, code)
+      with ComJSRunner {
 
     private var mgrIsRunning: Boolean = false
 
@@ -130,12 +139,13 @@ class PhantomJSEnv(
         while (!mgrIsRunning) wait(10000)
         if (!mgrIsRunning)
           throw new TimeoutException(
-              "The PhantomJS WebSocket server startup timed out")
+            "The PhantomJS WebSocket server startup timed out")
       }
 
       val serverPort = mgr.localPort
-      assert(serverPort > 0,
-             s"Manager running with a non-positive port number: $serverPort")
+      assert(
+        serverPort > 0,
+        s"Manager running with a non-positive port number: $serverPort")
 
       val code = s"""
         |(function() {
@@ -288,7 +298,7 @@ class PhantomJSEnv(
 
     private def receiveFrag(deadline: OptDeadline): String = {
       while (recvBuf.isEmpty && !mgr.isClosed && !deadline.isOverdue) wait(
-          deadline.millisLeft)
+        deadline.millisLeft)
 
       if (recvBuf.isEmpty) {
         if (mgr.isClosed) throw new ComJSEnv.ComClosedException
@@ -307,7 +317,7 @@ class PhantomJSEnv(
       while (!mgr.isConnected && !mgr.isClosed && isRunning) wait(10000)
       if (!mgr.isConnected && !mgr.isClosed && isRunning)
         throw new TimeoutException(
-            "The PhantomJS WebSocket client took too long to connect")
+          "The PhantomJS WebSocket client took too long to connect")
 
       mgr.isConnected
     }
@@ -328,7 +338,7 @@ class PhantomJSEnv(
         case file: FileVirtualJSFile =>
           val fname = htmlEscape(fixFileURI(file.file.toURI).toASCIIString)
           writer.write(
-              s"""<script type="text/javascript" src="$fname"></script>""" +
+            s"""<script type="text/javascript" src="$fname"></script>""" +
               "\n")
         case _ =>
           writer.write("""<script type="text/javascript">""" + "\n")
@@ -343,9 +353,9 @@ class PhantomJSEnv(
       * https://github.com/ariya/phantomjs/issues/10522
       */
     override protected def initFiles(): Seq[VirtualJSFile] = Seq(
-        // scalastyle:off line.size.limit
-        new MemVirtualJSFile("bindPolyfill.js").withContent(
-            """
+      // scalastyle:off line.size.limit
+      new MemVirtualJSFile("bindPolyfill.js").withContent(
+        """
             |// Polyfill for Function.bind from Facebook react:
             |// https://github.com/facebook/react/blob/3dc10749080a460e48bee46d769763ec7191ac76/src/test/phantomjs-shims.js
             |// Originally licensed under Apache 2.0
@@ -385,9 +395,9 @@ class PhantomJSEnv(
             |
             |})();
             |""".stripMargin
-        ),
-        new MemVirtualJSFile("scalaJSEnvInfo.js").withContent(
-            """
+      ),
+      new MemVirtualJSFile("scalaJSEnvInfo.js").withContent(
+        """
             |__ScalaJSEnv = {
             |  exitFunction: function(status) {
             |    window.callPhantom({
@@ -397,8 +407,8 @@ class PhantomJSEnv(
             |  }
             |};
             """.stripMargin
-        )
-        // scalastyle:on line.size.limit
+      )
+      // scalastyle:on line.size.limit
     )
 
     protected def writeWebpageLauncher(out: Writer): Unit = {
@@ -464,7 +474,7 @@ class PhantomJSEnv(
       }
 
       logger.debug(
-          "PhantomJS using launcher at: " + launcherTmpF.getAbsolutePath())
+        "PhantomJS using launcher at: " + launcherTmpF.getAbsolutePath())
 
       launcherTmpF
     }
@@ -474,7 +484,7 @@ class PhantomJSEnv(
       webTmpF.deleteOnExit()
 
       val out = new BufferedWriter(
-          new OutputStreamWriter(new FileOutputStream(webTmpF), "UTF-8"))
+        new OutputStreamWriter(new FileOutputStream(webTmpF), "UTF-8"))
 
       try {
         writeWebpageLauncher(out)
@@ -483,7 +493,7 @@ class PhantomJSEnv(
       }
 
       logger.debug(
-          "PhantomJS using webpage launcher at: " + webTmpF.getAbsolutePath())
+        "PhantomJS using webpage launcher at: " + webTmpF.getAbsolutePath())
 
       webTmpF
     }
@@ -504,7 +514,7 @@ class PhantomJSEnv(
     case '>' => "&gt;"
     case '"' => "&quot;"
     case '&' => "&amp;"
-    case c => c :: Nil
+    case c   => c :: Nil
   }
 }
 

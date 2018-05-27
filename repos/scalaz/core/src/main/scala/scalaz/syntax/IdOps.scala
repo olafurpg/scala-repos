@@ -23,9 +23,9 @@ final class IdOps[A](val self: A) extends AnyVal {
   /**
     * @return the result of pf(value) if defined, otherwise the the Zero element of type B.
     */
-  def matchOrZero[B : Monoid](pf: PartialFunction[A, B]): B =
+  def matchOrZero[B: Monoid](pf: PartialFunction[A, B]): B =
     pf.lift(self) match {
-      case None => Monoid[B].zero
+      case None    => Monoid[B].zero
       case Some(x) => x
     }
 

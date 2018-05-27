@@ -42,7 +42,8 @@ object ActorFlow {
       .run()
 
     Flow.fromSinkAndSource(
-        Sink.actorRef(factory.actorOf(Props(new Actor {
+      Sink.actorRef(
+        factory.actorOf(Props(new Actor {
           val flowActor =
             context.watch(context.actorOf(props(outActor), "flowActor"))
 
@@ -60,8 +61,10 @@ object ActorFlow {
               println("Stopping actor due to exception")
               SupervisorStrategy.Stop
           }
-        })), Status.Success(())),
-        Source.fromPublisher(publisher)
+        })),
+        Status.Success(())
+      ),
+      Source.fromPublisher(publisher)
     )
   }
 }

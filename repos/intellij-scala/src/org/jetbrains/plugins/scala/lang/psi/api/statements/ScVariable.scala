@@ -10,19 +10,30 @@ import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.icons.Icons
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScTypeElement
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlock, ScBlockStatement, ScModifiableTypedDeclaration}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScBlock,
+  ScBlockStatement,
+  ScModifiableTypedDeclaration
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScExtendsBlock
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
-import org.jetbrains.plugins.scala.lang.psi.types.result.{TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  TypeResult,
+  TypingContext
+}
 
 /**
   * @author Alexander Podkhalyuzin
   */
 trait ScVariable
-    extends ScBlockStatement with ScMember with ScDocCommentOwner
-    with ScDeclaredElementsHolder with ScAnnotationsHolder with ScCommentOwner
+    extends ScBlockStatement
+    with ScMember
+    with ScDocCommentOwner
+    with ScDeclaredElementsHolder
+    with ScAnnotationsHolder
+    with ScCommentOwner
     with ScModifiableTypedDeclaration {
   self =>
   def varKeyword = findChildrenByType(ScalaTokenTypes.kVAR).apply(0)
@@ -39,7 +50,8 @@ trait ScVariable
   def getType(ctx: TypingContext): TypeResult[ScType]
 
   override protected def isSimilarMemberForNavigation(
-      m: ScMember, isStrict: Boolean): Boolean = m match {
+      m: ScMember,
+      isStrict: Boolean): Boolean = m match {
     case other: ScVariable =>
       for (elem <- self.declaredElements) {
         if (other.declaredElements.exists(_.name == elem.name)) return true
@@ -52,8 +64,8 @@ trait ScVariable
     while (parent != null) {
       parent match {
         case _: ScExtendsBlock => return Icons.FIELD_VAR
-        case _: ScBlock => return Icons.VAR
-        case _ => parent = parent.getParent
+        case _: ScBlock        => return Icons.VAR
+        case _                 => parent = parent.getParent
       }
     }
     null
@@ -63,7 +75,7 @@ trait ScVariable
 
   override def isDeprecated =
     hasAnnotation("scala.deprecated") != None ||
-    hasAnnotation("java.lang.Deprecated") != None
+      hasAnnotation("java.lang.Deprecated") != None
 
   override def modifiableReturnType: Option[ScType] =
     getType(TypingContext.empty).toOption

@@ -53,7 +53,7 @@ class LogConfigTest {
   @Test
   def testFromPropsInvalid() {
     LogConfig.configNames.foreach(name =>
-          name match {
+      name match {
         case LogConfig.UncleanLeaderElectionEnableProp =>
           assertPropertyInvalid(name, "not a boolean")
         case LogConfig.RetentionBytesProp =>
@@ -74,14 +74,12 @@ class LogConfigTest {
   }
 
   private def assertPropertyInvalid(name: String, values: AnyRef*) {
-    values.foreach(
-        (value) =>
-          {
-        val props = new Properties
-        props.setProperty(name, value.toString)
-        intercept[Exception] {
-          LogConfig(props)
-        }
+    values.foreach((value) => {
+      val props = new Properties
+      props.setProperty(name, value.toString)
+      intercept[Exception] {
+        LogConfig(props)
+      }
     })
   }
 

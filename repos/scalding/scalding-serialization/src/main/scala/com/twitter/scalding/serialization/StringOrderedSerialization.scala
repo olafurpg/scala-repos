@@ -23,10 +23,11 @@ import scala.util.control.NonFatal
 import JavaStreamEnrichments._
 
 object StringOrderedSerialization {
-  final def binaryIntCompare(leftSize: Int,
-                             seekingLeft: InputStream,
-                             rightSize: Int,
-                             seekingRight: InputStream): Int = {
+  final def binaryIntCompare(
+      leftSize: Int,
+      seekingLeft: InputStream,
+      rightSize: Int,
+      seekingRight: InputStream): Int = {
     /*
      * This algorithm only works if count in {0, 1, 2, 3}. Since we only
      * call it that way below it is safe.
@@ -37,18 +38,21 @@ object StringOrderedSerialization {
       if ((count & 2) == 2) {
         // there are 2 or 3 bytes to read
         val cmp = Integer.compare(
-            seekingLeft.readUnsignedShort, seekingRight.readUnsignedShort)
+          seekingLeft.readUnsignedShort,
+          seekingRight.readUnsignedShort)
         if (cmp != 0) cmp
         else if (count == 3)
           Integer.compare(
-              seekingLeft.readUnsignedByte, seekingRight.readUnsignedByte)
+            seekingLeft.readUnsignedByte,
+            seekingRight.readUnsignedByte)
         else 0
       } else {
         // there are 0 or 1 bytes to read
         if (count == 0) 0
         else
           Integer.compare(
-              seekingLeft.readUnsignedByte, seekingRight.readUnsignedByte)
+            seekingLeft.readUnsignedByte,
+            seekingRight.readUnsignedByte)
       }
 
     /**
@@ -58,11 +62,12 @@ object StringOrderedSerialization {
     val ints = toCheck / 4
     var counter = ints
     var ic = 0
-    while ( (counter > 0) && (ic == 0)) {
+    while ((counter > 0) && (ic == 0)) {
       // Unsigned compare of ints is cheaper than longs, because we can do it
       // by upcasting to Long
       ic = UnsignedComparisons.unsignedIntCompare(
-          seekingLeft.readInt, seekingRight.readInt)
+        seekingLeft.readInt,
+        seekingRight.readInt)
       counter = counter - 1
     }
     if (ic != 0) ic
@@ -108,7 +113,7 @@ class StringOrderedSerialization extends OrderedSerialization[String] {
       val rightStart = seekingRight.position
 
       val res = OrderedSerialization.resultFrom(
-          binaryIntCompare(leftSize, seekingLeft, rightSize, seekingRight))
+        binaryIntCompare(leftSize, seekingLeft, rightSize, seekingRight))
       seekingLeft.seekToPosition(leftStart + leftSize)
       seekingRight.seekToPosition(rightStart + rightSize)
       res

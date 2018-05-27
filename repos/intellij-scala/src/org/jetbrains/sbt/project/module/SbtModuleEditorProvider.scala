@@ -14,11 +14,11 @@ class SbtModuleEditorProvider extends ModuleConfigurationEditorProvider {
     ModuleType.get(module) match {
       case _: SbtModuleType =>
         Array(
-            new ContentEntriesEditor(module.getName, state),
-            new DefaultModuleConfigurationEditorFactoryImpl()
-              .createOutputEditor(state),
-            new ClasspathEditor(state),
-            new SbtModuleSettingsEditor(state)
+          new ContentEntriesEditor(module.getName, state),
+          new DefaultModuleConfigurationEditorFactoryImpl()
+            .createOutputEditor(state),
+          new ClasspathEditor(state),
+          new SbtModuleSettingsEditor(state)
         )
       case _ =>
         ModuleConfigurationEditor.EMPTY

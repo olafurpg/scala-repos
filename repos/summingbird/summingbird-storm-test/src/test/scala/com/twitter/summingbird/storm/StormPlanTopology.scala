@@ -44,31 +44,31 @@ object StormPlanTopology extends Properties("StormDag") {
 
   implicit def testStore: Storm#Store[Int, Int] = MergeableStoreFactory.from {
     MergeableStore.fromStore[(Int, BatchID), Int](
-        new JMapStore[(Int, BatchID), Int]())
+      new JMapStore[(Int, BatchID), Int]())
   }
 
   implicit def arbSource1: Arbitrary[Producer[Storm, Int]] =
     Arbitrary(
-        Gen
-          .listOfN(5000, Arbitrary.arbitrary[Int])
-          .map { x: List[Int] =>
-        Storm.source(TraversableSpout(x))
-      })
+      Gen
+        .listOfN(5000, Arbitrary.arbitrary[Int])
+        .map { x: List[Int] =>
+          Storm.source(TraversableSpout(x))
+        })
   implicit def arbSource2: Arbitrary[KeyedProducer[Storm, Int, Int]] =
     Arbitrary(
-        Gen
-          .listOfN(5000, Arbitrary.arbitrary[(Int, Int)])
-          .map { x: List[(Int, Int)] =>
-        IdentityKeyedProducer(Storm.source(TraversableSpout(x)))
-      })
+      Gen
+        .listOfN(5000, Arbitrary.arbitrary[(Int, Int)])
+        .map { x: List[(Int, Int)] =>
+          IdentityKeyedProducer(Storm.source(TraversableSpout(x)))
+        })
 
   implicit def arbService2: Arbitrary[Storm#Service[Int, Int]] =
     Arbitrary(
-        Arbitrary
-          .arbitrary[Int => Option[Int]]
-          .map { fn =>
-        ReadableServiceFactory[Int, Int](() => ReadableStore.fromFn(fn))
-      })
+      Arbitrary
+        .arbitrary[Int => Option[Int]]
+        .map { fn =>
+          ReadableServiceFactory[Int, Int](() => ReadableStore.fromFn(fn))
+        })
 
   lazy val genDag: Gen[TailProducer[Storm, Any]] = for {
     tail <- oneOf(summed, written)
@@ -81,14 +81,14 @@ object StormPlanTopology extends Properties("StormDag") {
     List((i -> i))
   }
 
-  def sample[T : Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
+  def sample[T: Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
 
   var dumpNumber = 1
   def dumpGraph(dag: StormDag) = {
     import java.io._
     import com.twitter.summingbird.viz.VizGraph
     val writer2 = new PrintWriter(
-        new File("/tmp/failingGraph" + dumpNumber + ".dot"))
+      new File("/tmp/failingGraph" + dumpNumber + ".dot"))
     VizGraph(dag, writer2)
     writer2.close()
     dumpNumber = dumpNumber + 1
@@ -98,7 +98,7 @@ object StormPlanTopology extends Properties("StormDag") {
     import java.io._
     import com.twitter.summingbird.viz.VizGraph
     val writer2 = new PrintWriter(
-        new File("/tmp/failingProducerGraph" + dumpNumber + ".dot"))
+      new File("/tmp/failingProducerGraph" + dumpNumber + ".dot"))
     VizGraph(tail, writer2)
     writer2.close()
     dumpNumber = dumpNumber + 1

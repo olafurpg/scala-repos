@@ -12,5 +12,4 @@ package scala
   * Annotation for specifying the `static SerialVersionUID` field
   * of a serializable class.
   */
-class SerialVersionUID(value: Long)
-    extends scala.annotation.ClassfileAnnotation
+class SerialVersionUID(value: Long) extends scala.annotation.ClassfileAnnotation

@@ -82,20 +82,21 @@ sealed class AnnotatingTracingFilter[Req, Rep](
     afterFailure: String => Annotation,
     finagleVersion: () => String = () => Init.finagleVersion,
     traceMetaData: Boolean = true
-)
-    extends SimpleFilter[Req, Rep] {
-  def this(label: String,
-           before: Annotation,
-           after: Annotation,
-           afterFailure: String => Annotation) =
+) extends SimpleFilter[Req, Rep] {
+  def this(
+      label: String,
+      before: Annotation,
+      after: Annotation,
+      afterFailure: String => Annotation) =
     this(label, "unknown", before, after, afterFailure)
 
   def this(label: String, before: Annotation, after: Annotation) = {
-    this(label,
-         "unknown",
-         before,
-         after,
-         AnnotatingTracingFilter.defaultAfterFailureTracer)
+    this(
+      label,
+      "unknown",
+      before,
+      after,
+      AnnotatingTracingFilter.defaultAfterFailureTracer)
   }
 
   private[this] val finagleVersionKey = s"$prefix/finagle.version"
@@ -116,8 +117,8 @@ sealed class AnnotatingTracingFilter[Req, Rep](
         resp match {
           case Return(_) =>
           case Throw(error) =>
-            Trace.record(afterFailure("%s: %s".format(
-                        error.getClass().getName(), error.getMessage())))
+            Trace.record(afterFailure(
+              "%s: %s".format(error.getClass().getName(), error.getMessage())))
         }
         Trace.record(after)
       }
@@ -142,13 +143,13 @@ object ServerTracingFilter {
   case class TracingFilter[Req, Rep](
       label: String,
       finagleVersion: () => String = () => Init.finagleVersion
-  )
-      extends AnnotatingTracingFilter[Req, Rep](label,
-                                                "srv",
-                                                Annotation.ServerRecv(),
-                                                Annotation.ServerSend(),
-                                                Annotation.ServerSendError(_),
-                                                finagleVersion)
+  ) extends AnnotatingTracingFilter[Req, Rep](
+        label,
+        "srv",
+        Annotation.ServerRecv(),
+        Annotation.ServerSend(),
+        Annotation.ServerSendError(_),
+        finagleVersion)
 
   def module[Req, Rep]: Stackable[ServiceFactory[Req, Rep]] =
     new Stack.Module1[param.Label, ServiceFactory[Req, Rep]] {
@@ -171,13 +172,13 @@ object ClientTracingFilter {
   case class TracingFilter[Req, Rep](
       label: String,
       finagleVersion: () => String = () => Init.finagleVersion
-  )
-      extends AnnotatingTracingFilter[Req, Rep](label,
-                                                "clnt",
-                                                Annotation.ClientSend(),
-                                                Annotation.ClientRecv(),
-                                                Annotation.ClientRecvError(_),
-                                                finagleVersion)
+  ) extends AnnotatingTracingFilter[Req, Rep](
+        label,
+        "clnt",
+        Annotation.ClientSend(),
+        Annotation.ClientRecv(),
+        Annotation.ClientRecvError(_),
+        finagleVersion)
 
   def module[Req, Rep]: Stackable[ServiceFactory[Req, Rep]] =
     new Stack.Module1[param.Label, ServiceFactory[Req, Rep]] {
@@ -200,14 +201,14 @@ private[finagle] object WireTracingFilter {
   case class TracingFilter[Req, Rep](
       label: String,
       finagleVersion: () => String = () => Init.finagleVersion
-  )
-      extends AnnotatingTracingFilter[Req, Rep](label,
-                                                "clnt",
-                                                Annotation.WireSend,
-                                                Annotation.WireRecv,
-                                                Annotation.WireRecvError(_),
-                                                finagleVersion,
-                                                false)
+  ) extends AnnotatingTracingFilter[Req, Rep](
+        label,
+        "clnt",
+        Annotation.WireSend,
+        Annotation.WireRecv,
+        Annotation.WireRecvError(_),
+        finagleVersion,
+        false)
 
   def module[Req, Rep]: Stackable[ServiceFactory[Req, Rep]] =
     new Stack.Module1[param.Label, ServiceFactory[Req, Rep]] {

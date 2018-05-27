@@ -12,7 +12,8 @@ import org.scalatest.{OneInstancePerTest, FunSuite}
 
 @RunWith(classOf[JUnitRunner])
 class ByteBufAsBufTest
-    extends FunSuite with GeneratorDrivenPropertyChecks
+    extends FunSuite
+    with GeneratorDrivenPropertyChecks
     with OneInstancePerTest {
 
   val bytes = Array[Byte](1, 2, 3, 4)
@@ -35,7 +36,7 @@ class ByteBufAsBufTest
   }
 
   test(
-      "writes to slices of the underlying ByteBuf are reflected in ByteBufAsBuf") {
+    "writes to slices of the underlying ByteBuf are reflected in ByteBufAsBuf") {
     val bbSlice = underlying.slice(1, 2)
     bbSlice.writerIndex(0)
     bbSlice.writeByte(99)

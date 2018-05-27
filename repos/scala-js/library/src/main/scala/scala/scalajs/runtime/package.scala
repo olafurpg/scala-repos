@@ -13,12 +13,12 @@ package object runtime {
 
   def wrapJavaScriptException(e: Any): Throwable = e match {
     case e: Throwable => e
-    case _ => js.JavaScriptException(e)
+    case _            => js.JavaScriptException(e)
   }
 
   def unwrapJavaScriptException(th: Throwable): Any = th match {
     case js.JavaScriptException(e) => e
-    case _ => th
+    case _                         => th
   }
 
   def cloneObject(from: js.Object): js.Object = {
@@ -33,7 +33,7 @@ package object runtime {
   @inline final def genTraversableOnce2jsArray[A](
       col: GenTraversableOnce[A]): js.Array[A] = {
     col match {
-      case col: js.ArrayOps[A] => col.result()
+      case col: js.ArrayOps[A]     => col.result()
       case col: js.WrappedArray[A] => col.array
       case _ =>
         val result = new js.Array[A]

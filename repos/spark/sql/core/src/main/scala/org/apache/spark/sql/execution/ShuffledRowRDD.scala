@@ -56,7 +56,8 @@ private class PartitionIdPassthrough(override val numPartitions: Int)
   *   partitions, corresponding to partition ranges [0, 1], [2, 3] and [4] of the parent partitioner.
   */
 class CoalescedPartitioner(
-    val parent: Partitioner, val partitionStartIndices: Array[Int])
+    val parent: Partitioner,
+    val partitionStartIndices: Array[Int])
     extends Partitioner {
 
   @transient private lazy val parentPartitionMapping: Array[Int] = {
@@ -83,7 +84,7 @@ class CoalescedPartitioner(
   override def equals(other: Any): Boolean = other match {
     case c: CoalescedPartitioner =>
       c.parent == parent &&
-      Arrays.equals(c.partitionStartIndices, partitionStartIndices)
+        Arrays.equals(c.partitionStartIndices, partitionStartIndices)
     case _ =>
       false
   }
@@ -129,14 +130,14 @@ class ShuffledRowRDD(
   private[this] val partitionStartIndices: Array[Int] =
     specifiedPartitionStartIndices match {
       case Some(indices) => indices
-      case None =>
+      case None          =>
         // When specifiedPartitionStartIndices is not defined, every post-shuffle partition
         // corresponds to a pre-shuffle partition.
         (0 until numPreShufflePartitions).toArray
     }
 
-  private[this] val part: Partitioner = new CoalescedPartitioner(
-      dependency.partitioner, partitionStartIndices)
+  private[this] val part: Partitioner =
+    new CoalescedPartitioner(dependency.partitioner, partitionStartIndices)
 
   override def getDependencies: Seq[Dependency[_]] = List(dependency)
 
@@ -164,15 +165,16 @@ class ShuffledRowRDD(
   }
 
   override def compute(
-      split: Partition, context: TaskContext): Iterator[InternalRow] = {
+      split: Partition,
+      context: TaskContext): Iterator[InternalRow] = {
     val shuffledRowPartition = split.asInstanceOf[ShuffledRowRDDPartition]
     // The range of pre-shuffle partitions that we are fetching at here is
     // [startPreShufflePartitionIndex, endPreShufflePartitionIndex - 1].
     val reader = SparkEnv.get.shuffleManager.getReader(
-        dependency.shuffleHandle,
-        shuffledRowPartition.startPreShufflePartitionIndex,
-        shuffledRowPartition.endPreShufflePartitionIndex,
-        context)
+      dependency.shuffleHandle,
+      shuffledRowPartition.startPreShufflePartitionIndex,
+      shuffledRowPartition.endPreShufflePartitionIndex,
+      context)
     reader.read().asInstanceOf[Iterator[Product2[Int, InternalRow]]].map(_._2)
   }
 

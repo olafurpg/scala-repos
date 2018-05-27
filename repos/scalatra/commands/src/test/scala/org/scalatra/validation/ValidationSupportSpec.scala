@@ -49,9 +49,11 @@ class ValidationSupportSpec extends Specification {
       }
 
       ageValidatedForm.legalAge.validation aka "the validation result" must_==
-        Failure(ValidationError("Age must be greater than or equal to 18",
-                                FieldName("age"),
-                                ValidationFail))
+        Failure(
+          ValidationError(
+            "Age must be greater than or equal to 18",
+            FieldName("age"),
+            ValidationFail))
     }
 
     "evaluate non-exhaustive validation as 'accepted'" in {

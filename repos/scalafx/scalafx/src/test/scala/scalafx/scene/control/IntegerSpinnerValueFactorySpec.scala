@@ -41,10 +41,10 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class IntegerSpinnerValueFactorySpec
     extends SimpleSFXDelegateSpec[
-        jfxsc.SpinnerValueFactory.IntegerSpinnerValueFactory,
-        SpinnerValueFactory.IntegerSpinnerValueFactory](
-        classOf[jfxsc.SpinnerValueFactory.IntegerSpinnerValueFactory],
-        classOf[SpinnerValueFactory.IntegerSpinnerValueFactory])
+      jfxsc.SpinnerValueFactory.IntegerSpinnerValueFactory,
+      SpinnerValueFactory.IntegerSpinnerValueFactory](
+      classOf[jfxsc.SpinnerValueFactory.IntegerSpinnerValueFactory],
+      classOf[SpinnerValueFactory.IntegerSpinnerValueFactory])
     with RunOnApplicationThread {
 
   override protected def getScalaClassInstance =

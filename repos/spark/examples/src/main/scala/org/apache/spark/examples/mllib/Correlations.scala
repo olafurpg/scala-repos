@@ -46,9 +46,10 @@ object Correlations {
       head("Correlations: an example app for computing correlations")
       opt[String]("input")
         .text(
-            s"Input path to labeled examples in LIBSVM format, default: ${defaultParams.input}")
+          s"Input path to labeled examples in LIBSVM format, default: ${defaultParams.input}")
         .action((x, c) => c.copy(input = x))
-      note("""
+      note(
+        """
         |For example, the following command runs this app on a synthetic dataset:
         |
         | bin/spark-submit --class org.apache.spark.examples.mllib.Correlations \

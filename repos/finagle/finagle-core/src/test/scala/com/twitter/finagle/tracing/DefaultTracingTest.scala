@@ -36,8 +36,7 @@ class DefaultTracingTest extends FunSuite with StringClient with StringServer {
   }
 
   def assertAnnotationsInOrder(tracer: Seq[Record], annos: Seq[Annotation]) {
-    assert(
-        tracer.collect {
+    assert(tracer.collect {
       case Record(_, _, ann, _) if annos.contains(ann) => ann
     } == annos)
   }
@@ -62,13 +61,17 @@ class DefaultTracingTest extends FunSuite with StringClient with StringServer {
     assert(serverTracer.map(_.traceId).toSet.size == 1)
     assert(clientTracer.map(_.traceId).toSet.size == 1)
 
-    assertAnnotationsInOrder(combinedTracer.toSeq,
-                             Seq(Annotation.ServiceName("theClient"),
-                                 Annotation.ClientSend(),
-                                 Annotation.ServiceName("theServer"),
-                                 Annotation.ServerRecv(),
-                                 Annotation.ServerSend(),
-                                 Annotation.ClientRecv()))
+    assertAnnotationsInOrder(
+      combinedTracer.toSeq,
+      Seq(
+        Annotation.ServiceName("theClient"),
+        Annotation.ClientSend(),
+        Annotation.ServiceName("theServer"),
+        Annotation.ServerRecv(),
+        Annotation.ServerSend(),
+        Annotation.ClientRecv()
+      )
+    )
   }
 
   test("core events are traced in the stack client/server") {
@@ -88,17 +91,18 @@ class DefaultTracingTest extends FunSuite with StringClient with StringServer {
   test("core events are traced in the DefaultClient/DefaultServer") {
     testCoreTraces { (serverTracer, clientTracer) =>
       val server = DefaultServer[String, String, String, String](
-          name = "theServer",
-          listener = Netty3Listener("theServer", StringServerPipeline),
-          serviceTransport = new SerialServerDispatcher(_, _),
-          tracer = serverTracer)
+        name = "theServer",
+        listener = Netty3Listener("theServer", StringServerPipeline),
+        serviceTransport = new SerialServerDispatcher(_, _),
+        tracer = serverTracer)
 
       val client = DefaultClient[String, String](
-          name = "theClient",
-          endpointer = Bridge[String, String, String, String](
-                Netty3Transporter("theClient", StringClientPipeline),
-                new SerialClientDispatcher(_)),
-          tracer = clientTracer)
+        name = "theClient",
+        endpointer = Bridge[String, String, String, String](
+          Netty3Transporter("theClient", StringClientPipeline),
+          new SerialClientDispatcher(_)),
+        tracer = clientTracer
+      )
 
       val svc = server.serve("localhost:*", Svc)
       client.newService(svc)

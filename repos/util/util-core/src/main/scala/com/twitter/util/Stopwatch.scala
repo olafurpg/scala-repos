@@ -53,8 +53,7 @@ object Stopwatch extends Stopwatch {
     */
   val systemMicros: () => Long =
     // we use nanos instead of current time millis because it increases monotonically
-    () =>
-      TimeUnit.MICROSECONDS.convert(System.nanoTime(), TimeUnit.NANOSECONDS)
+    () => TimeUnit.MICROSECONDS.convert(System.nanoTime(), TimeUnit.NANOSECONDS)
 
   /**
     * A function that returns a Long that can be used for measuring elapsed time
@@ -74,8 +73,7 @@ object Stopwatch extends Stopwatch {
     */
   val systemMillis: () => Long =
     // we use nanos instead of current time millis because it increases monotonically
-    () =>
-      TimeUnit.MILLISECONDS.convert(System.nanoTime(), TimeUnit.NANOSECONDS)
+    () => TimeUnit.MILLISECONDS.convert(System.nanoTime(), TimeUnit.NANOSECONDS)
 
   /**
     * A function that returns a Long that can be used for measuring elapsed time
@@ -92,7 +90,7 @@ object Stopwatch extends Stopwatch {
       val startAt: Time = local()
       () =>
         local() - startAt
-      case None =>
+    case None =>
       val startAt: Long = systemNanos()
       () =>
         Duration.fromNanoseconds(systemNanos() - startAt)

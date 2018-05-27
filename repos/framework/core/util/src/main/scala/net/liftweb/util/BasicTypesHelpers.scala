@@ -17,7 +17,15 @@
 package net.liftweb
 package util
 
-import java.io.{InputStream, ByteArrayOutputStream, ByteArrayInputStream, Reader, File, FileInputStream, BufferedReader}
+import java.io.{
+  InputStream,
+  ByteArrayOutputStream,
+  ByteArrayInputStream,
+  Reader,
+  File,
+  FileInputStream,
+  BufferedReader
+}
 import scala.util.Try
 import scala.xml._
 import common._
@@ -47,7 +55,9 @@ object AvoidTypeErasureIssues1 {
   * This object adds functionality to Scala standard types.
   */
 object BasicTypesHelpers
-    extends BasicTypesHelpers with StringHelpers with ControlHelpers
+    extends BasicTypesHelpers
+    with StringHelpers
+    with ControlHelpers
 
 /**
   * This trait adds functionality to Scala standard types
@@ -113,12 +123,13 @@ trait BasicTypesHelpers { self: StringHelpers with ControlHelpers =>
     */
   def compareElem(left: Elem, right: Elem): Boolean =
     compareXml(left.child, right.child) && left.label == right.label &&
-    (((null eq left.prefix) && (null eq right.prefix)) ||
+      (((null eq left.prefix) && (null eq right.prefix)) ||
         left.prefix == right.prefix) && left.scope == right.scope &&
-    compareMetaData(left.attributes.toList, right.attributes.toList)
+      compareMetaData(left.attributes.toList, right.attributes.toList)
 
   private def findFilter(
-      m: MetaData, lst: List[MetaData]): Box[List[MetaData]] = {
+      m: MetaData,
+      lst: List[MetaData]): Box[List[MetaData]] = {
     var found = false
     val ret = lst.filter {
       case PrefixedAttribute(pre, label, value, _) if !found =>
@@ -148,12 +159,12 @@ trait BasicTypesHelpers { self: StringHelpers with ControlHelpers =>
   def compareMetaData(left: List[MetaData], right: List[MetaData]): Boolean =
     (left, right) match {
       case (Nil, Nil) => true
-      case (_, Nil) => false
-      case (Nil, _) => false
+      case (_, Nil)   => false
+      case (Nil, _)   => false
       case (attr :: rl, right) =>
         findFilter(attr, right) match {
           case Full(rr) => compareMetaData(rl, rr)
-          case _ => false
+          case _        => false
         }
       case _ => false
     }
@@ -163,16 +174,16 @@ trait BasicTypesHelpers { self: StringHelpers with ControlHelpers =>
     */
   def compareNode(left: Node, right: Node): Boolean = {
     (left, right) match {
-      case (Group(gl), Group(gr)) => compareXml(gl, gr)
-      case (el: Elem, er: Elem) => compareElem(el, er)
+      case (Group(gl), Group(gr))       => compareXml(gl, gr)
+      case (el: Elem, er: Elem)         => compareElem(el, er)
       case (Unparsed(tl), Unparsed(tr)) => tl == tr
-      case (Text(tl), Text(tr)) => tl == tr
+      case (Text(tl), Text(tr))         => tl == tr
 
       case (el: EntityRef, er: EntityRef) => el === er
-      case (Comment(cl), Comment(cr)) => cl == cr
-      case (PCData(dl), PCData(dr)) => dl == dr
+      case (Comment(cl), Comment(cr))     => cl == cr
+      case (PCData(dl), PCData(dr))       => dl == dr
       case (pl: ProcInstr, pr: ProcInstr) => pl === pr
-      case (a, b) => a.toString == b.toString
+      case (a, b)                         => a.toString == b.toString
     }
   }
 
@@ -193,8 +204,8 @@ trait BasicTypesHelpers { self: StringHelpers with ControlHelpers =>
     * A helper class that facilitates wrapping of one PartialFunction
     * around another
     */
-  final implicit class PartialFunctionWrapper[
-      A](around: PartialFunction[A, _]) {
+  final implicit class PartialFunctionWrapper[A](
+      around: PartialFunction[A, _]) {
 
     /**
       * Allows you to put a guard around a partial function
@@ -211,13 +222,13 @@ trait BasicTypesHelpers { self: StringHelpers with ControlHelpers =>
   implicit class OptionExtension[T](option: Option[T]) {
     def toBox: Box[T] = option match {
       case Some(x) => Full(x)
-      case None => Empty
+      case None    => Empty
     }
   }
 
   implicit class TryExtension[T](tryy: Try[T]) {
     def toBox: Box[T] = tryy match {
-      case scala.util.Success(x) => Full(x)
+      case scala.util.Success(x)  => Full(x)
       case scala.util.Failure(ex) => Failure(ex.getMessage, Full(ex), Empty)
     }
   }
@@ -227,18 +238,18 @@ trait BasicTypesHelpers { self: StringHelpers with ControlHelpers =>
     */
   def toBoolean(in: Any): Boolean = {
     in match {
-      case null => false
-      case b: Boolean => b
-      case i: Int => i != 0
-      case lo: Long => lo != 0
-      case n: Number => n.intValue != 0
-      case s: String => asBoolean(s) openOr false
-      case None => false
+      case null                     => false
+      case b: Boolean               => b
+      case i: Int                   => i != 0
+      case lo: Long                 => lo != 0
+      case n: Number                => n.intValue != 0
+      case s: String                => asBoolean(s) openOr false
+      case None                     => false
       case Empty | Failure(_, _, _) => false
-      case Full(n) => toBoolean(n)
-      case Some(n) => toBoolean(n)
-      case x :: xs => toBoolean(x)
-      case o => toBoolean(o.toString)
+      case Full(n)                  => toBoolean(n)
+      case Some(n)                  => toBoolean(n)
+      case x :: xs                  => toBoolean(x)
+      case o                        => toBoolean(o.toString)
     }
   }
 
@@ -256,9 +267,9 @@ trait BasicTypesHelpers { self: StringHelpers with ControlHelpers =>
       if (null eq in) None
       else
         in.toLowerCase match {
-          case "t" | "true" | "yes" | "1" | "on" => Full(true)
+          case "t" | "true" | "yes" | "1" | "on"  => Full(true)
           case "f" | "false" | "no" | "0" | "off" => Full(false)
-          case _ => None
+          case _                                  => None
         }
   }
 
@@ -303,18 +314,18 @@ trait BasicTypesHelpers { self: StringHelpers with ControlHelpers =>
     */
   def asLong(in: Any): Box[Long] = {
     in match {
-      case null => Empty
-      case i: Int => Full(i.toLong)
-      case n: Long => Full(n)
-      case d: java.util.Date => Full(d.getTime)
-      case n: Number => Full(n.longValue)
-      case (n: Number) :: _ => Full(n.longValue)
-      case Some(n) => asLong(n)
-      case Full(n) => asLong(n)
+      case null                            => Empty
+      case i: Int                          => Full(i.toLong)
+      case n: Long                         => Full(n)
+      case d: java.util.Date               => Full(d.getTime)
+      case n: Number                       => Full(n.longValue)
+      case (n: Number) :: _                => Full(n.longValue)
+      case Some(n)                         => asLong(n)
+      case Full(n)                         => asLong(n)
       case None | Empty | Failure(_, _, _) => Empty
-      case s: String => asLong(s)
-      case x :: xs => asLong(x)
-      case o => asLong(o.toString)
+      case s: String                       => asLong(s)
+      case x :: xs                         => asLong(x)
+      case o                               => asLong(o.toString)
     }
   }
 
@@ -323,18 +334,18 @@ trait BasicTypesHelpers { self: StringHelpers with ControlHelpers =>
     */
   def toInt(in: Any): Int = {
     in match {
-      case null => 0
-      case n: Int => n
-      case lo: Long => lo.toInt
-      case n: Number => n.intValue
-      case (n: Number) :: _ => n.intValue
-      case Some(n) => toInt(n)
-      case Full(n) => toInt(n)
+      case null                            => 0
+      case n: Int                          => n
+      case lo: Long                        => lo.toInt
+      case n: Number                       => n.intValue
+      case (n: Number) :: _                => n.intValue
+      case Some(n)                         => toInt(n)
+      case Full(n)                         => toInt(n)
       case None | Empty | Failure(_, _, _) => 0
-      case s: String => parseNumber(s).toInt
-      case d: java.util.Date => (d.getTime / 1000L).toInt
-      case x :: xs => toInt(x)
-      case o => toInt(o.toString)
+      case s: String                       => parseNumber(s).toInt
+      case d: java.util.Date               => (d.getTime / 1000L).toInt
+      case x :: xs                         => toInt(x)
+      case o                               => toInt(o.toString)
     }
   }
 
@@ -343,18 +354,18 @@ trait BasicTypesHelpers { self: StringHelpers with ControlHelpers =>
     */
   def toLong(in: Any): Long = {
     in match {
-      case null => 0L
-      case i: Int => i
-      case n: Long => n
-      case d: java.util.Date => d.getTime
-      case n: Number => n.longValue
-      case (n: Number) :: _ => n.longValue
-      case Some(n) => toLong(n)
-      case Full(n) => toLong(n)
+      case null                            => 0L
+      case i: Int                          => i
+      case n: Long                         => n
+      case d: java.util.Date               => d.getTime
+      case n: Number                       => n.longValue
+      case (n: Number) :: _                => n.longValue
+      case Some(n)                         => toLong(n)
+      case Full(n)                         => toLong(n)
       case None | Empty | Failure(_, _, _) => 0L
-      case s: String => parseNumber(s)
-      case x :: xs => toLong(x)
-      case o => toLong(o.toString)
+      case s: String                       => parseNumber(s)
+      case x :: xs                         => toLong(x)
+      case o                               => toLong(o.toString)
     }
   }
 

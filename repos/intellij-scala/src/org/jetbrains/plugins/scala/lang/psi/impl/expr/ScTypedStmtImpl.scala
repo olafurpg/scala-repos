@@ -9,23 +9,29 @@ import com.intellij.psi.PsiElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure,
+  TypeResult,
+  TypingContext
+}
 
 /**
   * @author Alexander Podkhalyuzin
   * Date: 06.03.2008
   */
 class ScTypedStmtImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScTypedStmt {
+    extends ScalaPsiElementImpl(node)
+    with ScTypedStmt {
   override def toString: String = "TypedStatement"
 
   protected override def innerType(ctx: TypingContext): TypeResult[ScType] = {
     typeElement match {
-      case Some(te) => te.getType(ctx)
+      case Some(te)                                        => te.getType(ctx)
       case None if !expr.isInstanceOf[ScUnderscoreSection] => expr.getType(ctx)
       case _ =>
-        Failure("Typed statement is not complete for underscore section",
-                Some(this))
+        Failure(
+          "Typed statement is not complete for underscore section",
+          Some(this))
     }
   }
 
@@ -36,7 +42,7 @@ class ScTypedStmtImpl(node: ASTNode)
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case visitor: ScalaElementVisitor => visitor.visitTypedStmt(this)
-      case _ => super.accept(visitor)
+      case _                            => super.accept(visitor)
     }
   }
 }

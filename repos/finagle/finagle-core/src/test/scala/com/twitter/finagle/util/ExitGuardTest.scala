@@ -8,7 +8,10 @@ import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
 class ExitGuardTest
-    extends FunSuite with MockitoSugar with AssertionsForJUnit with Eventually
+    extends FunSuite
+    with MockitoSugar
+    with AssertionsForJUnit
+    with Eventually
     with IntegrationPatience {
 
   test("guard creates thread, unguard removes") {

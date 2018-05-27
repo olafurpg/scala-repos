@@ -39,10 +39,11 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
   */
 @RunWith(classOf[JUnitRunner])
 class TableViewTableViewFocusModelSpec[S]
-    extends SimpleSFXDelegateSpec[jfxsc.TableView.TableViewFocusModel[S],
-                                  TableView.TableViewFocusModel[S]](
-        classOf[jfxsc.TableView.TableViewFocusModel[S]],
-        classOf[TableView.TableViewFocusModel[S]])
+    extends SimpleSFXDelegateSpec[
+      jfxsc.TableView.TableViewFocusModel[S],
+      TableView.TableViewFocusModel[S]](
+      classOf[jfxsc.TableView.TableViewFocusModel[S]],
+      classOf[TableView.TableViewFocusModel[S]])
     with RunOnApplicationThread {
 
   override def getJavaClassInstance =

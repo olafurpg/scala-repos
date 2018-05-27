@@ -69,12 +69,14 @@ trait CacheConditionDirectives {
     * must be on a deeper level in your route structure in order to function correctly.
     */
   def conditional(
-      eTag: Option[EntityTag], lastModified: Option[DateTime]): Directive0 = {
+      eTag: Option[EntityTag],
+      lastModified: Option[DateTime]): Directive0 = {
     def addResponseHeaders: Directive0 =
       mapResponse(
-          _.withDefaultHeaders(eTag.map(ETag(_)).toList ++ lastModified
-                .map(`Last-Modified`(_))
-                .toList))
+        _.withDefaultHeaders(
+          eTag.map(ETag(_)).toList ++ lastModified
+            .map(`Last-Modified`(_))
+            .toList))
 
     // TODO: also handle Cache-Control and Vary
     def complete304(): Route =
@@ -86,12 +88,12 @@ trait CacheConditionDirectives {
       mapInnerRoute { route ⇒
         def innerRouteWithRangeHeaderFilteredOut: Route =
           (mapRequest(_.mapHeaders(_.filterNot(_.isInstanceOf[Range]))) & addResponseHeaders)(
-              route)
+            route)
 
         def isGetOrHead = method == HEAD || method == GET
         def unmodified(ifModifiedSince: DateTime) =
           lastModified.get <= ifModifiedSince &&
-          ifModifiedSince.clicks < System.currentTimeMillis()
+            ifModifiedSince.clicks < System.currentTimeMillis()
 
         def step1(): Route =
           header[`If-Match`] match {
@@ -111,7 +113,8 @@ trait CacheConditionDirectives {
           header[`If-None-Match`] match {
             case Some(`If-None-Match`(inm)) if eTag.isDefined ⇒
               if (!matchesRange(eTag.get, inm, weakComparison = true)) step5()
-              else if (isGetOrHead) complete304() else complete412()
+              else if (isGetOrHead) complete304()
+              else complete412()
             case None ⇒ step4()
           }
         def step4(): Route =
@@ -128,7 +131,7 @@ trait CacheConditionDirectives {
             header[`If-Range`] match {
               case Some(`If-Range`(Left(tag)))
                   if eTag.isDefined &&
-                  !matches(eTag.get, tag, weakComparison = false) ⇒
+                    !matches(eTag.get, tag, weakComparison = false) ⇒
                 innerRouteWithRangeHeaderFilteredOut
               case Some(`If-Range`(Right(ims)))
                   if lastModified.isDefined && !unmodified(ims) ⇒

@@ -2,7 +2,10 @@ package com.twitter.finagle.netty4
 
 import com.twitter.concurrent.NamedPoolThreadFactory
 import com.twitter.finagle._
-import com.twitter.finagle.netty4.channel.{ServerBridge, Netty4ChannelInitializer}
+import com.twitter.finagle.netty4.channel.{
+  ServerBridge,
+  Netty4ChannelInitializer
+}
 import com.twitter.finagle.netty4.transport.ChannelTransport
 import com.twitter.finagle.server.Listener
 import com.twitter.finagle.ssl.Engine
@@ -50,10 +53,9 @@ private[netty4] object PipelineInit {
   */
 private[finagle] case class Netty4Listener[In, Out](
     params: Stack.Params,
-    transportFactory: SocketChannel => Transport[In, Out] = new ChannelTransport[
-          In, Out](_)
-)
-    extends Listener[In, Out] {
+    transportFactory: SocketChannel => Transport[In, Out] =
+      new ChannelTransport[In, Out](_)
+) extends Listener[In, Out] {
 
   private[this] val PipelineInit(pipelineInit) = params[PipelineInit]
 
@@ -82,13 +84,13 @@ private[finagle] case class Netty4Listener[In, Out](
 
       val newBridge = () =>
         new ServerBridge(
-            transportFactory,
-            serveTransport
+          transportFactory,
+          serveTransport
       )
 
       val bossLoop: EventLoopGroup = new NioEventLoopGroup(
-          1 /*nThreads*/,
-          new NamedPoolThreadFactory("finagle/netty4/boss", makeDaemons = true)
+        1 /*nThreads*/,
+        new NamedPoolThreadFactory("finagle/netty4/boss", makeDaemons = true)
       )
 
       val bootstrap = new ServerBootstrap()
@@ -98,25 +100,27 @@ private[finagle] case class Netty4Listener[In, Out](
 
       //todo: investigate pooled allocator CSL-2089
       bootstrap.option(
-          ChannelOption.ALLOCATOR, UnpooledByteBufAllocator.DEFAULT)
+        ChannelOption.ALLOCATOR,
+        UnpooledByteBufAllocator.DEFAULT)
       bootstrap.childOption(
-          ChannelOption.ALLOCATOR, UnpooledByteBufAllocator.DEFAULT)
+        ChannelOption.ALLOCATOR,
+        UnpooledByteBufAllocator.DEFAULT)
       bootstrap.option[JBool](ChannelOption.SO_REUSEADDR, reuseAddr)
       bootstrap.option[JInt](ChannelOption.SO_LINGER, 0)
       backlog.foreach(bootstrap.option[JInt](ChannelOption.SO_BACKLOG, _))
       sendBufSize.foreach(
-          bootstrap.childOption[JInt](ChannelOption.SO_SNDBUF, _))
+        bootstrap.childOption[JInt](ChannelOption.SO_SNDBUF, _))
       recvBufSize.foreach(
-          bootstrap.childOption[JInt](ChannelOption.SO_RCVBUF, _))
+        bootstrap.childOption[JInt](ChannelOption.SO_RCVBUF, _))
       keepAlive.foreach(
-          bootstrap.childOption[JBool](ChannelOption.SO_KEEPALIVE, _))
+        bootstrap.childOption[JBool](ChannelOption.SO_KEEPALIVE, _))
       params[Listener.TrafficClass].value.foreach { tc =>
         bootstrap.option[JInt](Netty4Listener.TrafficClass, tc)
         bootstrap.childOption[JInt](Netty4Listener.TrafficClass, tc)
       }
 
-      val initializer = new Netty4ChannelInitializer(
-          pipelineInit, params, newBridge)
+      val initializer =
+        new Netty4ChannelInitializer(pipelineInit, params, newBridge)
       bootstrap.childHandler(initializer)
 
       // Block until listening socket is bound. `ListeningServer`
@@ -140,9 +144,10 @@ private[finagle] case class Netty4Listener[In, Out](
         // The boss loop immediately starts refusing new work.
         // Existing tasks have ``deadline`` time to finish executing.
         bossLoop
-          .shutdownGracefully(0 /* quietPeriod */,
-                              deadline.inMillis /* timeout */,
-                              TimeUnit.MILLISECONDS)
+          .shutdownGracefully(
+            0 /* quietPeriod */,
+            deadline.inMillis /* timeout */,
+            TimeUnit.MILLISECONDS)
           .addListener(new GenericFutureListener[Nothing] {
             def operationComplete(future: Nothing): Unit = p.setDone()
           })

@@ -66,7 +66,7 @@ class IndexIntRange(val length: Int, val from: Int = 0) extends Index[Int] {
   private def guardLoc(loc: Int): Int =
     if (loc < 0 || loc >= length)
       throw new ArrayIndexOutOfBoundsException(
-          "Location %d is out of bounds" format loc)
+        "Location %d is out of bounds" format loc)
     else loc
 
   def raw(loc: Int) = from + guardLoc(loc)
@@ -75,14 +75,16 @@ class IndexIntRange(val length: Int, val from: Int = 0) extends Index[Int] {
 
   // take values of index at certain locations
   def take(locs: Array[Int]) =
-    Index(new VecInt(locs).map(
-            i => if (i == -1) IndexImpl.sentinelErr else guardLoc(i) + from))
+    Index(new VecInt(locs).map(i =>
+      if (i == -1) IndexImpl.sentinelErr else guardLoc(i) + from))
 
   def without(locs: Array[Int]): Index[Int] =
     array.remove(asArr, locs)
 
   def concat[B, C](x: Index[B])(
-      implicit wd: Promoter[Int, B, C], mc: ST[C], oc: ORD[C]): Index[C] =
+      implicit wd: Promoter[Int, B, C],
+      mc: ST[C],
+      oc: ORD[C]): Index[C] =
     Index(util.Concat.append[Int, B, C](toArray, x.toArray))
 
   // find the first location whereby an insertion would maintain a sorted index
@@ -94,8 +96,9 @@ class IndexIntRange(val length: Int, val from: Int = 0) extends Index[Int] {
   // slice at array locations, [from, until)
   def slice(from: Int, until: Int, stride: Int) =
     if (stride == 1)
-      new IndexIntRange(math.min(length, until - from),
-                        math.max(this.from + math.max(from, 0), 0))
+      new IndexIntRange(
+        math.min(length, until - from),
+        math.max(this.from + math.max(from, 0), 0))
     else genIdx.slice(from, until, stride)
 
   def getAll(keys: Array[Int]) =
@@ -116,7 +119,7 @@ class IndexIntRange(val length: Int, val from: Int = 0) extends Index[Int] {
   def join(other: Index[Int], how: JoinType = LeftJoin): ReIndexer[Int] =
     JoinerImpl.join(this, other, how)
 
-  def map[@spec(Boolean, Int, Long, Double) B : ST : ORD](
+  def map[@spec(Boolean, Int, Long, Double) B: ST: ORD](
       f: (Int) => B): Index[B] =
     genIdx map f
 

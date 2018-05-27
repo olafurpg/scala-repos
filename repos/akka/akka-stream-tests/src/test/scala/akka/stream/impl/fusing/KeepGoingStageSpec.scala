@@ -6,7 +6,12 @@ package akka.stream.impl.fusing
 import akka.actor.{NoSerializationVerificationNeeded, ActorRef}
 import akka.stream.scaladsl.{Keep, Source}
 import akka.stream.{Attributes, Inlet, SinkShape, ActorMaterializer}
-import akka.stream.stage.{InHandler, AsyncCallback, GraphStageLogic, GraphStageWithMaterializedValue}
+import akka.stream.stage.{
+  InHandler,
+  AsyncCallback,
+  GraphStageLogic,
+  GraphStageWithMaterializedValue
+}
 import akka.testkit.AkkaSpec
 import akka.stream.testkit.Utils._
 
@@ -43,8 +48,7 @@ class KeepGoingStageSpec extends AkkaSpec {
     val shape = SinkShape[Int](Inlet("ping.in"))
 
     override def createLogicAndMaterializedValue(
-        inheritedAttributes: Attributes)
-      : (GraphStageLogic, Future[PingRef]) = {
+        inheritedAttributes: Attributes): (GraphStageLogic, Future[PingRef]) = {
       val promise = Promise[PingRef]()
 
       val logic = new GraphStageLogic(shape) {
@@ -70,13 +74,16 @@ class KeepGoingStageSpec extends AkkaSpec {
             } finally listener.foreach(_ ! EndOfEventHandler)
         }
 
-        setHandler(shape.in, new InHandler {
-          override def onPush(): Unit = pull(shape.in)
+        setHandler(
+          shape.in,
+          new InHandler {
+            override def onPush(): Unit = pull(shape.in)
 
-          // Ignore finish
-          override def onUpstreamFinish(): Unit =
-            listener.foreach(_ ! UpstreamCompleted)
-        })
+            // Ignore finish
+            override def onUpstreamFinish(): Unit =
+              listener.foreach(_ ! UpstreamCompleted)
+          }
+        )
 
         override def postStop(): Unit = listener.foreach(_ ! PostStop)
       }

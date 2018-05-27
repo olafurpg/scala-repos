@@ -36,8 +36,8 @@ import akka.stream.scaladsl.Sink
   *
   * @param config a client configuration object
   */
-case class AhcWSClient(
-    config: AsyncHttpClientConfig)(implicit materializer: Materializer)
+case class AhcWSClient(config: AsyncHttpClientConfig)(
+    implicit materializer: Materializer)
     extends WSClient {
 
   private val asyncHttpClient = new DefaultAsyncHttpClient(config)
@@ -45,25 +45,27 @@ case class AhcWSClient(
   def underlying[T]: T = asyncHttpClient.asInstanceOf[T]
 
   private[libs] def executeRequest[T](
-      request: Request, handler: AsyncHandler[T]): ListenableFuture[T] =
+      request: Request,
+      handler: AsyncHandler[T]): ListenableFuture[T] =
     asyncHttpClient.executeRequest(request, handler)
 
   def close(): Unit = asyncHttpClient.close()
 
   def url(url: String): WSRequest =
-    AhcWSRequest(this,
-                 url,
-                 "GET",
-                 EmptyBody,
-                 Map(),
-                 Map(),
-                 None,
-                 None,
-                 None,
-                 None,
-                 None,
-                 None,
-                 None)
+    AhcWSRequest(
+      this,
+      url,
+      "GET",
+      EmptyBody,
+      Map(),
+      Map(),
+      None,
+      None,
+      None,
+      None,
+      None,
+      None,
+      None)
 }
 
 object AhcWSClient {
@@ -127,19 +129,21 @@ case class AhcWSRequest(
   def sign(calc: WSSignatureCalculator): WSRequest = copy(calc = Some(calc))
 
   def withAuth(
-      username: String, password: String, scheme: WSAuthScheme): WSRequest =
+      username: String,
+      password: String,
+      scheme: WSAuthScheme): WSRequest =
     copy(auth = Some((username, password, scheme)))
 
   def withHeaders(hdrs: (String, String)*): WSRequest = {
-    val headers = hdrs.foldLeft(this.headers)((m, hdr) =>
-          if (m.contains(hdr._1)) m.updated(hdr._1, m(hdr._1) :+ hdr._2)
-          else m + (hdr._1 -> Seq(hdr._2)))
+    val headers = hdrs.foldLeft(this.headers)(
+      (m, hdr) =>
+        if (m.contains(hdr._1)) m.updated(hdr._1, m(hdr._1) :+ hdr._2)
+        else m + (hdr._1 -> Seq(hdr._2)))
     copy(headers = headers)
   }
 
   def withQueryString(parameters: (String, String)*): WSRequest =
-    copy(
-        queryString = parameters.foldLeft(this.queryString) {
+    copy(queryString = parameters.foldLeft(this.queryString) {
       case (m, (k, v)) => m + (k -> (v +: m.getOrElse(k, Nil)))
     })
 
@@ -156,8 +160,8 @@ case class AhcWSRequest(
       case d =>
         val millis = d.toMillis
         require(
-            millis >= 0 && millis <= Int.MaxValue,
-            s"Request timeout must be between 0 and ${Int.MaxValue} milliseconds")
+          millis >= 0 && millis <= Int.MaxValue,
+          s"Request timeout must be between 0 and ${Int.MaxValue} milliseconds")
         copy(requestTimeout = Some(millis.toInt))
     }
   }
@@ -172,8 +176,7 @@ case class AhcWSRequest(
   def withMethod(method: String): WSRequest = copy(method = method)
 
   def execute(): Future[WSResponse] = {
-    val executor = filterWSRequestExecutor(
-        new WSRequestExecutor {
+    val executor = filterWSRequestExecutor(new WSRequestExecutor {
       override def execute(request: WSRequest): Future[WSResponse] =
         request.asInstanceOf[AhcWSRequest].execute(buildRequest())
     })
@@ -228,18 +231,18 @@ case class AhcWSRequest(
   def getBody: Option[ByteString] = {
     body match {
       case InMemoryBody(bytes) => Some(bytes)
-      case _ => None
+      case _                   => None
     }
   }
 
   private[libs] def authScheme(scheme: WSAuthScheme): Realm.AuthScheme =
     scheme match {
-      case WSAuthScheme.DIGEST => Realm.AuthScheme.DIGEST
-      case WSAuthScheme.BASIC => Realm.AuthScheme.BASIC
-      case WSAuthScheme.NTLM => Realm.AuthScheme.NTLM
-      case WSAuthScheme.SPNEGO => Realm.AuthScheme.SPNEGO
+      case WSAuthScheme.DIGEST   => Realm.AuthScheme.DIGEST
+      case WSAuthScheme.BASIC    => Realm.AuthScheme.BASIC
+      case WSAuthScheme.NTLM     => Realm.AuthScheme.NTLM
+      case WSAuthScheme.SPNEGO   => Realm.AuthScheme.SPNEGO
       case WSAuthScheme.KERBEROS => Realm.AuthScheme.KERBEROS
-      case _ => throw new RuntimeException("Unknown scheme " + scheme)
+      case _                     => throw new RuntimeException("Unknown scheme " + scheme)
     }
 
   /**
@@ -269,11 +272,13 @@ case class AhcWSRequest(
     // The builder has a bunch of mutable state and is VERY fiddly, so
     // should not be exposed to the outside world.
 
-    val builder = disableUrlEncoding.map { disableEncodingFlag =>
-      new RequestBuilder(method, disableEncodingFlag)
-    }.getOrElse {
-      new RequestBuilder(method)
-    }
+    val builder = disableUrlEncoding
+      .map { disableEncodingFlag =>
+        new RequestBuilder(method, disableEncodingFlag)
+      }
+      .getOrElse {
+        new RequestBuilder(method)
+      }
 
     // Set the URL.
     builder.setUrl(url)
@@ -319,9 +324,11 @@ case class AhcWSRequest(
 
             // extract the content type and the charset
             val charsetOption = Option(HttpUtils.parseCharset(ct))
-            val charset = charsetOption.getOrElse {
-              StandardCharsets.UTF_8
-            }.name()
+            val charset = charsetOption
+              .getOrElse {
+                StandardCharsets.UTF_8
+              }
+              .name()
 
             // Get the string body given the given charset...
             val stringBody = bytes.decodeString(charset)
@@ -345,9 +352,10 @@ case class AhcWSRequest(
 
         (builder, h)
       case StreamedBody(source) =>
-        (builder.setBody(
-             source.map(_.toByteBuffer).runWith(Sink.asPublisher(false))),
-         this.headers)
+        (
+          builder.setBody(
+            source.map(_.toByteBuffer).runWith(Sink.asPublisher(false))),
+          this.headers)
     }
 
     // headers
@@ -362,7 +370,7 @@ case class AhcWSRequest(
         builderWithBody.setSignatureCalculator(signatureCalculator)
       case _ =>
         throw new IllegalStateException(
-            "Unknown signature calculator found: use a class that implements SignatureCalculator")
+          "Unknown signature calculator found: use a class that implements SignatureCalculator")
     }
 
     builderWithBody.build()
@@ -372,37 +380,42 @@ case class AhcWSRequest(
     import org.asynchttpclient.AsyncCompletionHandler
     val result = Promise[AhcWSResponse]()
 
-    client.executeRequest(request, new AsyncCompletionHandler[AHCResponse]() {
-      override def onCompleted(response: AHCResponse) = {
-        result.success(AhcWSResponse(response))
-        response
-      }
+    client.executeRequest(
+      request,
+      new AsyncCompletionHandler[AHCResponse]() {
+        override def onCompleted(response: AHCResponse) = {
+          result.success(AhcWSResponse(response))
+          response
+        }
 
-      override def onThrowable(t: Throwable) = {
-        result.failure(t)
+        override def onThrowable(t: Throwable) = {
+          result.failure(t)
+        }
       }
-    })
+    )
     result.future
   }
 
-  private[libs] def createProxy(wsProxyServer: WSProxyServer): AHCProxyServer = {
+  private[libs] def createProxy(
+      wsProxyServer: WSProxyServer): AHCProxyServer = {
     val proxyBuilder =
       new AHCProxyServer.Builder(wsProxyServer.host, wsProxyServer.port)
     if (wsProxyServer.principal.isDefined) {
       val realmBuilder = new Realm.Builder(
-          wsProxyServer.principal.orNull, wsProxyServer.password.orNull)
+        wsProxyServer.principal.orNull,
+        wsProxyServer.password.orNull)
       val scheme: Realm.AuthScheme = wsProxyServer.protocol
         .getOrElse("http")
         .toLowerCase(java.util.Locale.ENGLISH) match {
         case "http" | "https" => Realm.AuthScheme.BASIC
-        case "kerberos" => Realm.AuthScheme.KERBEROS
-        case "ntlm" => Realm.AuthScheme.NTLM
-        case "spnego" => Realm.AuthScheme.SPNEGO
-        case _ => scala.sys.error("Unrecognized protocol!")
+        case "kerberos"       => Realm.AuthScheme.KERBEROS
+        case "ntlm"           => Realm.AuthScheme.NTLM
+        case "spnego"         => Realm.AuthScheme.SPNEGO
+        case _                => scala.sys.error("Unrecognized protocol!")
       }
       realmBuilder.setScheme(scheme)
-      wsProxyServer.encoding.foreach(
-          enc => realmBuilder.setCharset(Charset.forName(enc)))
+      wsProxyServer.encoding.foreach(enc =>
+        realmBuilder.setCharset(Charset.forName(enc)))
       wsProxyServer.ntlmDomain.foreach(realmBuilder.setNtlmDomain)
       proxyBuilder.setRealm(realmBuilder)
     }
@@ -418,12 +431,12 @@ case class AhcWSRequest(
 class AhcWSModule extends Module {
   def bindings(environment: Environment, configuration: Configuration) = {
     Seq(
-        bind[WSAPI].to[AhcWSAPI],
-        bind[AhcWSClientConfig]
-          .toProvider[AhcWSClientConfigParser]
-          .in[Singleton],
-        bind[WSClientConfig].toProvider[WSConfigParser].in[Singleton],
-        bind[WSClient].toProvider[WSClientProvider].in[Singleton]
+      bind[WSAPI].to[AhcWSAPI],
+      bind[AhcWSClientConfig]
+        .toProvider[AhcWSClientConfigParser]
+        .in[Singleton],
+      bind[WSClientConfig].toProvider[WSConfigParser].in[Singleton],
+      bind[WSClient].toProvider[WSClientProvider].in[Singleton]
     )
   }
 }
@@ -433,10 +446,10 @@ class WSClientProvider @Inject()(wsApi: WSAPI) extends Provider[WSClient] {
 }
 
 @Singleton
-class AhcWSAPI @Inject()(environment: Environment,
-                         clientConfig: AhcWSClientConfig,
-                         lifecycle: ApplicationLifecycle)(
-    implicit materializer: Materializer)
+class AhcWSAPI @Inject()(
+    environment: Environment,
+    clientConfig: AhcWSClientConfig,
+    lifecycle: ApplicationLifecycle)(implicit materializer: Materializer)
     extends WSAPI {
 
   private val logger = Logger(classOf[AhcWSAPI])
@@ -446,7 +459,7 @@ class AhcWSAPI @Inject()(environment: Environment,
       environment.mode match {
         case Mode.Prod =>
           logger.warn(
-              "AhcWSAPI: ws.ssl.debug settings enabled in production mode!")
+            "AhcWSAPI: ws.ssl.debug settings enabled in production mode!")
         case _ => // do nothing
       }
       new DebugConfiguration().configure(clientConfig.wsClientConfig.ssl.debug)
@@ -617,9 +630,11 @@ trait AhcWSComponents {
 
   lazy val wsClientConfig: WSClientConfig =
     new WSConfigParser(configuration, environment).parse()
-  lazy val ahcWsClientConfig: AhcWSClientConfig = new AhcWSClientConfigParser(
-      wsClientConfig, configuration, environment).parse()
-  lazy val wsApi: WSAPI = new AhcWSAPI(
-      environment, ahcWsClientConfig, applicationLifecycle)(materializer)
+  lazy val ahcWsClientConfig: AhcWSClientConfig =
+    new AhcWSClientConfigParser(wsClientConfig, configuration, environment)
+      .parse()
+  lazy val wsApi: WSAPI =
+    new AhcWSAPI(environment, ahcWsClientConfig, applicationLifecycle)(
+      materializer)
   lazy val wsClient: WSClient = wsApi.client
 }

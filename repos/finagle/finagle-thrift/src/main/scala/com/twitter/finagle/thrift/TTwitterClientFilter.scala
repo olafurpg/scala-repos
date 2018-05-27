@@ -21,10 +21,11 @@ import org.apache.thrift.protocol.TProtocolFactory
   * @param isUpgraded Whether this connection is with a server that
   * has been upgraded to TTwitter
   */
-private[thrift] class TTwitterClientFilter(serviceName: String,
-                                           isUpgraded: Boolean,
-                                           clientId: Option[ClientId],
-                                           protocolFactory: TProtocolFactory)
+private[thrift] class TTwitterClientFilter(
+    serviceName: String,
+    isUpgraded: Boolean,
+    clientId: Option[ClientId],
+    protocolFactory: TProtocolFactory)
     extends SimpleFilter[ThriftClientRequest, Array[Byte]] {
   private[this] val clientIdBuf =
     clientId map { id =>
@@ -55,7 +56,7 @@ private[thrift] class TTwitterClientFilter(serviceName: String,
 
     traceId.sampled match {
       case Some(s) => header.setSampled(s)
-      case None => header.unsetSampled()
+      case None    => header.unsetSampled()
     }
 
     val contexts = Contexts.broadcast.marshal().iterator
@@ -70,8 +71,9 @@ private[thrift] class TTwitterClientFilter(serviceName: String,
         // however if the ClientIdContext handler failed to load for
         // some reason, a pass-through context would be used instead.
         if (k != ClientId.clientIdCtx.marshalId) {
-          val c = new thrift.RequestContext(Buf.ByteBuffer.Owned.extract(k),
-                                            Buf.ByteBuffer.Owned.extract(buf))
+          val c = new thrift.RequestContext(
+            Buf.ByteBuffer.Owned.extract(k),
+            Buf.ByteBuffer.Owned.extract(buf))
           ctxs.add(c)
         }
       }
@@ -79,8 +81,8 @@ private[thrift] class TTwitterClientFilter(serviceName: String,
     clientIdBuf match {
       case Some(buf) =>
         val ctx = new thrift.RequestContext(
-            Buf.ByteBuffer.Owned.extract(ClientId.clientIdCtx.marshalId),
-            Buf.ByteBuffer.Owned.extract(buf))
+          Buf.ByteBuffer.Owned.extract(ClientId.clientIdCtx.marshalId),
+          Buf.ByteBuffer.Owned.extract(buf))
         ctxs.add(ctx)
       case None => // skip
     }
@@ -90,23 +92,24 @@ private[thrift] class TTwitterClientFilter(serviceName: String,
     val dtab = Dtab.local
     if (dtab.nonEmpty) {
       val delegations = new ArrayList[thrift.Delegation](dtab.size)
-      for (Dentry(src, dst) <- dtab) delegations.add(
-          new thrift.Delegation(src.show, dst.show))
+      for (Dentry(src, dst) <- dtab)
+        delegations.add(new thrift.Delegation(src.show, dst.show))
 
       header.setDelegations(delegations)
     }
 
     new ThriftClientRequest(
-        ByteArrays.concat(
-            OutputBuffer.messageToArray(header, protocolFactory),
-            baseRequest.message
-        ),
-        baseRequest.oneway
+      ByteArrays.concat(
+        OutputBuffer.messageToArray(header, protocolFactory),
+        baseRequest.message
+      ),
+      baseRequest.oneway
     )
   }
 
-  def apply(request: ThriftClientRequest,
-            service: Service[ThriftClientRequest, Array[Byte]])
+  def apply(
+      request: ThriftClientRequest,
+      service: Service[ThriftClientRequest, Array[Byte]])
     : Future[Array[Byte]] = {
     // Create a new span identifier for this request.
     val msg =
@@ -127,7 +130,9 @@ private[thrift] class TTwitterClientFilter(serviceName: String,
         if (isUpgraded) {
           // Peel off the ResponseHeader.
           InputBuffer.peelMessage(
-              response, new thrift.ResponseHeader, protocolFactory)
+            response,
+            new thrift.ResponseHeader,
+            protocolFactory)
         } else response
       }
     }

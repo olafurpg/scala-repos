@@ -39,7 +39,8 @@ private[spark] case class TimeStampedValue[V](value: V, timestamp: Long)
   */
 private[spark] class TimeStampedHashMap[A, B](
     updateTimeStampOnGet: Boolean = false)
-    extends mutable.Map[A, B]() with Logging {
+    extends mutable.Map[A, B]()
+    with Logging {
 
   private val internalMap = new ConcurrentHashMap[A, TimeStampedValue[B]]()
 
@@ -47,7 +48,9 @@ private[spark] class TimeStampedHashMap[A, B](
     val value = internalMap.get(key)
     if (value != null && updateTimeStampOnGet) {
       internalMap.replace(
-          key, value, TimeStampedValue(value.value, currentTime))
+        key,
+        value,
+        TimeStampedValue(value.value, currentTime))
     }
     Option(value).map(_.value)
   }
@@ -98,7 +101,8 @@ private[spark] class TimeStampedHashMap[A, B](
   }
 
   override def filter(p: ((A, B)) => Boolean): mutable.Map[A, B] = {
-    internalMap.asScala.map { case (k, TimeStampedValue(v, t)) => (k, v) }
+    internalMap.asScala
+      .map { case (k, TimeStampedValue(v, t)) => (k, v) }
       .filter(p)
   }
 

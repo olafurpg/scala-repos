@@ -20,10 +20,11 @@ trait Reifiers { self: Context =>
     result
   }
 
-  def reifyType(universe: Tree,
-                mirror: Tree,
-                tpe: Type,
-                concrete: Boolean = false): Tree = {
+  def reifyType(
+      universe: Tree,
+      mirror: Tree,
+      tpe: Type,
+      concrete: Boolean = false): Tree = {
     assert(TypeTagsClass != NoSymbol)
     val result = scala.reflect.reify.`package`
       .reifyType(self.universe)(callsiteTyper, universe, mirror, tpe, concrete)
@@ -69,11 +70,13 @@ trait Reifiers { self: Context =>
         case FreeTermDef(_, _, binding, _, origin)
             if universe.settings.logFreeTerms && binding.tpe == null =>
           reporter.echo(
-              position, "free term: %s %s".format(showRaw(binding), origin))
+            position,
+            "free term: %s %s".format(showRaw(binding), origin))
         case FreeTypeDef(_, _, binding, _, origin)
             if universe.settings.logFreeTypes && binding.tpe == null =>
           reporter.echo(
-              position, "free type: %s %s".format(showRaw(binding), origin))
+            position,
+            "free type: %s %s".format(showRaw(binding), origin))
         case _ =>
         // do nothing
       }
@@ -81,7 +84,7 @@ trait Reifiers { self: Context =>
     if (universe.settings.logFreeTerms || universe.settings.logFreeTypes)
       reification match {
         case ReifiedTree(_, _, symtab, _, _, _, _) => logFreeVars(symtab)
-        case ReifiedType(_, _, symtab, _, _, _) => logFreeVars(symtab)
+        case ReifiedType(_, _, symtab, _, _, _)    => logFreeVars(symtab)
       }
   }
 }

@@ -36,8 +36,7 @@ object TupleSetterImpl {
       implicit T: c.WeakTypeTag[T]): c.Expr[TupleSetter[T]] =
     caseClassTupleSetterCommonImpl(c, true)
 
-  def caseClassTupleSetterCommonImpl[T](
-      c: Context, allowUnknownTypes: Boolean)(
+  def caseClassTupleSetterCommonImpl[T](c: Context, allowUnknownTypes: Boolean)(
       implicit T: c.WeakTypeTag[T]): c.Expr[TupleSetter[T]] = {
     import c.universe._
 

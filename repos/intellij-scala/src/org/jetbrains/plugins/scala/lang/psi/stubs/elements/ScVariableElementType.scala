@@ -5,9 +5,18 @@ package stubs
 package elements
 
 import com.intellij.psi.PsiElement
-import com.intellij.psi.stubs.{IndexSink, StubElement, StubInputStream, StubOutputStream}
+import com.intellij.psi.stubs.{
+  IndexSink,
+  StubElement,
+  StubInputStream,
+  StubOutputStream
+}
 import com.intellij.util.io.StringRef
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScVariable, ScVariableDeclaration, ScVariableDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScVariable,
+  ScVariableDeclaration,
+  ScVariableDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.stubs.impl.ScVariableStubImpl
 import org.jetbrains.plugins.scala.lang.psi.stubs.index.ScalaIndexKeys
 
@@ -18,11 +27,12 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.index.ScalaIndexKeys
 abstract class ScVariableElementType[Variable <: ScVariable](debugName: String)
     extends ScStubElementType[ScVariableStub, ScVariable](debugName) {
   def createStubImpl[ParentPsi <: PsiElement](
-      psi: ScVariable, parentStub: StubElement[ParentPsi]): ScVariableStub = {
+      psi: ScVariable,
+      parentStub: StubElement[ParentPsi]): ScVariableStub = {
     val isDecl = psi.isInstanceOf[ScVariableDeclaration]
     val typeText = psi.typeElement match {
       case Some(te) => te.getText
-      case None => ""
+      case None     => ""
     }
     val bodyText =
       if (!isDecl)
@@ -30,19 +40,20 @@ abstract class ScVariableElementType[Variable <: ScVariable](debugName: String)
           .asInstanceOf[ScVariableDefinition]
           .expr
           .map(_.getText)
-          .getOrElse("") else ""
+          .getOrElse("")
+      else ""
     val containerText =
       if (isDecl) psi.asInstanceOf[ScVariableDeclaration].getIdList.getText
       else psi.asInstanceOf[ScVariableDefinition].pList.getText
     new ScVariableStubImpl[ParentPsi](
-        parentStub,
-        this,
-        (for (elem <- psi.declaredElements) yield elem.name).toArray,
-        isDecl,
-        typeText,
-        bodyText,
-        containerText,
-        psi.containingClass == null)
+      parentStub,
+      this,
+      (for (elem <- psi.declaredElements) yield elem.name).toArray,
+      isDecl,
+      typeText,
+      bodyText,
+      containerText,
+      psi.containingClass == null)
   }
 
   def serialize(stub: ScVariableStub, dataStream: StubOutputStream) {
@@ -57,19 +68,27 @@ abstract class ScVariableElementType[Variable <: ScVariable](debugName: String)
   }
 
   def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScVariableStub = {
+      dataStream: StubInputStream,
+      parentStub: Any): ScVariableStub = {
     val isDecl = dataStream.readBoolean
     val namesLength = dataStream.readInt
     val names = new Array[String](namesLength)
-    for (i <- 0 to (namesLength - 1)) names(i) = StringRef.toString(
-        dataStream.readName)
+    for (i <- 0 to (namesLength - 1))
+      names(i) = StringRef.toString(dataStream.readName)
     val parent = parentStub.asInstanceOf[StubElement[PsiElement]]
     val typeText = StringRef.toString(dataStream.readName)
     val bodyText = StringRef.toString(dataStream.readName)
     val bindingsText = StringRef.toString(dataStream.readName)
     val isLocal = dataStream.readBoolean()
     new ScVariableStubImpl(
-        parent, this, names, isDecl, typeText, bodyText, bindingsText, isLocal)
+      parent,
+      this,
+      names,
+      isDecl,
+      typeText,
+      bodyText,
+      bindingsText,
+      isLocal)
   }
 
   def indexStub(stub: ScVariableStub, sink: IndexSink) {

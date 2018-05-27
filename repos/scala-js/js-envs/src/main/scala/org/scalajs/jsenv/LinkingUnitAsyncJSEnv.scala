@@ -13,10 +13,11 @@ import org.scalajs.core.tools.jsdep.ResolvedJSDependency
 import org.scalajs.core.tools.linker.LinkingUnit
 
 trait LinkingUnitAsyncJSEnv extends LinkingUnitJSEnv with AsyncJSEnv {
-  def asyncRunner(preLibs: Seq[ResolvedJSDependency],
-                  linkingUnit: LinkingUnit,
-                  postLibs: Seq[ResolvedJSDependency],
-                  code: VirtualJSFile): AsyncJSRunner
+  def asyncRunner(
+      preLibs: Seq[ResolvedJSDependency],
+      linkingUnit: LinkingUnit,
+      postLibs: Seq[ResolvedJSDependency],
+      code: VirtualJSFile): AsyncJSRunner
 
   override def loadLibs(
       libs: Seq[ResolvedJSDependency]): LinkingUnitAsyncJSEnv =
@@ -26,20 +27,26 @@ trait LinkingUnitAsyncJSEnv extends LinkingUnitJSEnv with AsyncJSEnv {
     new AsyncLoadedUnit { val loadedUnit = linkingUnit }
 
   private[jsenv] trait LinkingUnitAsyncLoadedLibs
-      extends LinkingUnitLoadedLibs with AsyncLoadedLibs
+      extends LinkingUnitLoadedLibs
+      with AsyncLoadedLibs
       with LinkingUnitAsyncJSEnv {
-    def asyncRunner(preLibs: Seq[ResolvedJSDependency],
-                    linkingUnit: LinkingUnit,
-                    postLibs: Seq[ResolvedJSDependency],
-                    code: VirtualJSFile): AsyncJSRunner = {
+    def asyncRunner(
+        preLibs: Seq[ResolvedJSDependency],
+        linkingUnit: LinkingUnit,
+        postLibs: Seq[ResolvedJSDependency],
+        code: VirtualJSFile): AsyncJSRunner = {
       LinkingUnitAsyncJSEnv.this.asyncRunner(
-          loadedLibs ++ preLibs, linkingUnit, postLibs, code)
+        loadedLibs ++ preLibs,
+        linkingUnit,
+        postLibs,
+        code)
     }
   }
 
   private[jsenv] trait AsyncLoadedUnit extends LoadedUnit with AsyncJSEnv {
-    def asyncRunner(libs: Seq[ResolvedJSDependency],
-                    code: VirtualJSFile): AsyncJSRunner = {
+    def asyncRunner(
+        libs: Seq[ResolvedJSDependency],
+        code: VirtualJSFile): AsyncJSRunner = {
       LinkingUnitAsyncJSEnv.this.asyncRunner(Nil, loadedUnit, libs, code)
     }
   }

@@ -68,9 +68,10 @@ object ParallelTransition extends AnimationStatics {
   * @define ANS [[scalafx.animation.Animation]]s
   * @define ANSARG The child $ANS of this $PT.
   */
-class ParallelTransition(
-    override val delegate: jfxa.ParallelTransition = new jfxa.ParallelTransition)
-    extends Transition(delegate) with SFXDelegate[jfxa.ParallelTransition] {
+class ParallelTransition(override val delegate: jfxa.ParallelTransition =
+  new jfxa.ParallelTransition)
+    extends Transition(delegate)
+    with SFXDelegate[jfxa.ParallelTransition] {
 
   // CONSTRUCTORS
 

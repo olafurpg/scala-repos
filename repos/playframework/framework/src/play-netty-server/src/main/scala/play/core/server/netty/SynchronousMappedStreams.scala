@@ -8,7 +8,8 @@ import org.reactivestreams.{Processor, Publisher, Subscription, Subscriber}
 object SynchronousMappedStreams {
 
   private class SynchronousContramappedSubscriber[A, B](
-      subscriber: Subscriber[_ >: B], f: A => B)
+      subscriber: Subscriber[_ >: B],
+      f: A => B)
       extends Subscriber[A] {
     override def onError(t: Throwable): Unit = subscriber.onError(t)
     override def onSubscribe(s: Subscription): Unit = subscriber.onSubscribe(s)
@@ -18,7 +19,8 @@ object SynchronousMappedStreams {
   }
 
   private class SynchronousMappedPublisher[A, B](
-      publisher: Publisher[A], f: A => B)
+      publisher: Publisher[A],
+      f: A => B)
       extends Publisher[B] {
     override def subscribe(s: Subscriber[_ >: B]): Unit =
       publisher.subscribe(new SynchronousContramappedSubscriber[A, B](s, f))
@@ -26,7 +28,8 @@ object SynchronousMappedStreams {
   }
 
   private class JoinedProcessor[A, B](
-      subscriber: Subscriber[A], publisher: Publisher[B])
+      subscriber: Subscriber[A],
+      publisher: Publisher[B])
       extends Processor[A, B] {
     override def onError(t: Throwable): Unit = subscriber.onError(t)
     override def onSubscribe(s: Subscription): Unit = subscriber.onSubscribe(s)
@@ -66,8 +69,9 @@ object SynchronousMappedStreams {
     *
     * @see [[map()]] and [[contramap()]].
     */
-  def transform[A1, B1, A2, B2](processor: Processor[B1, A2],
-                                f: A1 => B1,
-                                g: A2 => B2): Processor[A1, B2] =
+  def transform[A1, B1, A2, B2](
+      processor: Processor[B1, A2],
+      f: A1 => B1,
+      g: A2 => B2): Processor[A1, B2] =
     new JoinedProcessor[A1, B2](contramap(processor, f), map(processor, g))
 }

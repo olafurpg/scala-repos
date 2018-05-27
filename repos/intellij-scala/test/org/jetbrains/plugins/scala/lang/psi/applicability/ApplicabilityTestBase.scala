@@ -5,7 +5,10 @@ import org.jetbrains.plugins.scala.base.SimpleTestCase
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScReferenceElement
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScAssignStmt, ScExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScAssignStmt,
+  ScExpression
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScClass
 import org.jetbrains.plugins.scala.lang.psi.types._
 import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.Parameter
@@ -49,10 +52,10 @@ abstract class ApplicabilityTestBase extends SimpleTestCase {
   //  def f(implicit p: Int, a: Int) {}
   //  def f(p: Int*, a: Int) {}
 
-  // no args for method with def or impl args: def f(); f 
+  // no args for method with def or impl args: def f(); f
   // * must be last
   // positional then by name
-  // by name duplicates  
+  // by name duplicates
 
   // return signature
   // multiple *, expanding
@@ -64,7 +67,7 @@ abstract class ApplicabilityTestBase extends SimpleTestCase {
   // named
   // implicits
   // nfix
-  // constructor 
+  // constructor
   // inside block expression
   // java interop
   // syntetic methods (apply, unapply)
@@ -78,29 +81,35 @@ abstract class ApplicabilityTestBase extends SimpleTestCase {
   }
 
   def assertProblems(
-      auxiliary: String, definition: String, application: String)(
+      auxiliary: String,
+      definition: String,
+      application: String)(
       pattern: PartialFunction[List[ApplicabilityProblem], Unit]) {
     assertProblemsFunction(auxiliary, definition, application)(pattern)
     assertProblemsConstructor(auxiliary, definition, application)(pattern)
   }
 
   def assertProblemsFunction(
-      auxiliary: String, definition: String, application: String)(
+      auxiliary: String,
+      definition: String,
+      application: String)(
       pattern: PartialFunction[scala.List[ApplicabilityProblem], Unit]) {
     val typified = typify(definition, application)
 
     assertProblemsAre(auxiliary, formatFunction(definition, application))(
-        pattern)
+      pattern)
     assertProblemsAre(auxiliary, formatFunction(typified._1, typified._2))(
-        pattern)
+      pattern)
   }
 
   def assertProblemsConstructor(
-      auxiliary: String, definition: String, application: String)(
+      auxiliary: String,
+      definition: String,
+      application: String)(
       pattern: PartialFunction[scala.List[ApplicabilityProblem], Unit]) {
     val typified = typify(definition, application)
     assertProblemsAre(auxiliary, formatConstructor(definition, application))(
-        pattern)
+      pattern)
     // TODO Uncomment and solve problems with primary constructors substitutors
     //    assertProblemsAre(auxiliary, formatConstructor(typified._1, typified._2))((pattern))
   }
@@ -113,7 +122,7 @@ abstract class ApplicabilityTestBase extends SimpleTestCase {
     try {
       val message =
         "\n\n             code: " + line + "\n  actual problems: " +
-        problemsIn(file).toString + "\n"
+          problemsIn(file).toString + "\n"
       Assert.assertTrue(message, pattern.isDefinedAt(problemsIn(file)))
     } finally {
       Compatibility.seqClass = None
@@ -122,10 +131,11 @@ abstract class ApplicabilityTestBase extends SimpleTestCase {
 
   private def problemsIn(file: ScalaFile): List[ApplicabilityProblem] = {
     for (ref <- file.depthFirst
-      .filterByType(classOf[ScReferenceElement])
-      .toList;
-    result <- ref.advancedResolve.toList;
-    problem <- result.problems.filter(_ != ExpectedTypeMismatch)) yield problem
+           .filterByType(classOf[ScReferenceElement])
+           .toList;
+         result <- ref.advancedResolve.toList;
+         problem <- result.problems.filter(_ != ExpectedTypeMismatch))
+      yield problem
   }
 
   private def formatFunction(definition: String, application: String) =

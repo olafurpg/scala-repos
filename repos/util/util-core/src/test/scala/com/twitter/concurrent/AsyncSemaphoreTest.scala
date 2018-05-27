@@ -10,12 +10,14 @@ import scala.collection.mutable
 
 @RunWith(classOf[JUnitRunner])
 class AsyncSemaphoreTest extends FunSpec {
-  class AsyncSemaphoreHelper(val sem: AsyncSemaphore,
-                             var count: Int,
-                             val permits: ConcurrentLinkedQueue[Permit]) {
-    def copy(sem: AsyncSemaphore = this.sem,
-             count: Int = this.count,
-             permits: ConcurrentLinkedQueue[Permit] = this.permits) =
+  class AsyncSemaphoreHelper(
+      val sem: AsyncSemaphore,
+      var count: Int,
+      val permits: ConcurrentLinkedQueue[Permit]) {
+    def copy(
+        sem: AsyncSemaphore = this.sem,
+        count: Int = this.count,
+        permits: ConcurrentLinkedQueue[Permit] = this.permits) =
       new AsyncSemaphoreHelper(sem, count, permits)
   }
 
@@ -23,8 +25,8 @@ class AsyncSemaphoreTest extends FunSpec {
 
   override def withFixture(test: OneArgTest) = {
     val sem = new AsyncSemaphore(2)
-    val helper = new AsyncSemaphoreHelper(
-        sem, 0, new ConcurrentLinkedQueue[Permit])
+    val helper =
+      new AsyncSemaphoreHelper(sem, 0, new ConcurrentLinkedQueue[Permit])
     withFixture(test.toNoArgTest(helper))
   }
 

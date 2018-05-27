@@ -40,11 +40,12 @@ class BytecodeTest extends ClearAfterClass {
 
     val List(c) = compileClasses(compiler)(code)
 
-    assertTrue(getSingleMethod(c, "f").instructions
-          .count(_.isInstanceOf[TableSwitch]) == 1)
     assertTrue(
-        getSingleMethod(c, "g").instructions
-          .count(_.isInstanceOf[LookupSwitch]) == 1)
+      getSingleMethod(c, "f").instructions
+        .count(_.isInstanceOf[TableSwitch]) == 1)
+    assertTrue(
+      getSingleMethod(c, "g").instructions
+        .count(_.isInstanceOf[LookupSwitch]) == 1)
   }
 
   @Test
@@ -68,17 +69,18 @@ class BytecodeTest extends ClearAfterClass {
 
     val run = new compiler.Run()
     run.compileSources(
-        List(new BatchSourceFile("AnnotA.java", annotA),
-             new BatchSourceFile("AnnotB.java", annotB),
-             new BatchSourceFile("Test.scala", scalaSrc)))
+      List(
+        new BatchSourceFile("AnnotA.java", annotA),
+        new BatchSourceFile("AnnotB.java", annotB),
+        new BatchSourceFile("Test.scala", scalaSrc)))
     val outDir = compiler.settings.outputDirs.getSingleOutput.get
-    val outfiles = (for (f <- outDir.iterator if !f.isDirectory) yield
-      (f.name, f.toByteArray)).toList
+    val outfiles = (for (f <- outDir.iterator if !f.isDirectory)
+      yield (f.name, f.toByteArray)).toList
 
     def check(classfile: String, annotName: String) = {
       val f = (outfiles collect {
-            case (`classfile`, bytes) => AsmUtils.readClass(bytes)
-          }).head
+        case (`classfile`, bytes) => AsmUtils.readClass(bytes)
+      }).head
       val descs = f.visibleAnnotations.asScala.map(_.desc).toList
       assertTrue(descs.toString, descs exists (_ contains annotName))
     }
@@ -110,41 +112,45 @@ class BytecodeTest extends ClearAfterClass {
 
     val unapplyLineNumbers = getSingleMethod(module, "unapply").instructions
       .filter(_.isInstanceOf[LineNumber])
-    assert(unapplyLineNumbers == List(LineNumber(2, Label(0))),
-           unapplyLineNumbers)
+    assert(
+      unapplyLineNumbers == List(LineNumber(2, Label(0))),
+      unapplyLineNumbers)
 
     val expected = List(
-        LineNumber(4, Label(0)),
-        LineNumber(5, Label(5)),
-        Jump(IFEQ, Label(20)),
-        LineNumber(6, Label(11)),
-        Invoke(INVOKEVIRTUAL,
-               "scala/Predef$",
-               "println",
-               "(Ljava/lang/Object;)V",
-               false),
-        Jump(GOTO, Label(33)),
-        LineNumber(5, Label(20)),
-        Jump(GOTO, Label(24)),
-        LineNumber(8, Label(24)),
-        Invoke(INVOKEVIRTUAL,
-               "scala/Predef$",
-               "println",
-               "(Ljava/lang/Object;)V",
-               false),
-        Jump(GOTO, Label(33)),
-        LineNumber(10, Label(33)),
-        Invoke(INVOKEVIRTUAL,
-               "scala/Predef$",
-               "println",
-               "(Ljava/lang/Object;)V",
-               false)
+      LineNumber(4, Label(0)),
+      LineNumber(5, Label(5)),
+      Jump(IFEQ, Label(20)),
+      LineNumber(6, Label(11)),
+      Invoke(
+        INVOKEVIRTUAL,
+        "scala/Predef$",
+        "println",
+        "(Ljava/lang/Object;)V",
+        false),
+      Jump(GOTO, Label(33)),
+      LineNumber(5, Label(20)),
+      Jump(GOTO, Label(24)),
+      LineNumber(8, Label(24)),
+      Invoke(
+        INVOKEVIRTUAL,
+        "scala/Predef$",
+        "println",
+        "(Ljava/lang/Object;)V",
+        false),
+      Jump(GOTO, Label(33)),
+      LineNumber(10, Label(33)),
+      Invoke(
+        INVOKEVIRTUAL,
+        "scala/Predef$",
+        "println",
+        "(Ljava/lang/Object;)V",
+        false)
     )
 
     val mainIns =
       getSingleMethod(module, "main").instructions filter {
         case _: LineNumber | _: Invoke | _: Jump => true
-        case _ => false
+        case _                                   => false
       }
     assertSameCode(mainIns, expected)
   }
@@ -167,72 +173,83 @@ class BytecodeTest extends ClearAfterClass {
     val List(c) = compileClasses(compiler)(code)
 
     // t1: no unnecessary GOTOs
-    assertSameCode(getSingleMethod(c, "t1"),
-                   List(VarOp(ILOAD, 1),
-                        Jump(IFEQ, Label(6)),
-                        Op(ICONST_1),
-                        Jump(GOTO, Label(9)),
-                        Label(6),
-                        Op(ICONST_2),
-                        Label(9),
-                        Op(IRETURN)))
+    assertSameCode(
+      getSingleMethod(c, "t1"),
+      List(
+        VarOp(ILOAD, 1),
+        Jump(IFEQ, Label(6)),
+        Op(ICONST_1),
+        Jump(GOTO, Label(9)),
+        Label(6),
+        Op(ICONST_2),
+        Label(9),
+        Op(IRETURN)))
 
     // t2: no unnecessary GOTOs
-    assertSameCode(getSingleMethod(c, "t2"),
-                   List(VarOp(ILOAD, 1),
-                        IntOp(SIPUSH, 393),
-                        Jump(IF_ICMPNE, Label(7)),
-                        Op(ICONST_1),
-                        Jump(GOTO, Label(10)),
-                        Label(7),
-                        Op(ICONST_2),
-                        Label(10),
-                        Op(IRETURN)))
+    assertSameCode(
+      getSingleMethod(c, "t2"),
+      List(
+        VarOp(ILOAD, 1),
+        IntOp(SIPUSH, 393),
+        Jump(IF_ICMPNE, Label(7)),
+        Op(ICONST_1),
+        Jump(GOTO, Label(10)),
+        Label(7),
+        Op(ICONST_2),
+        Label(10),
+        Op(IRETURN))
+    )
 
     // t3: Array == is translated to reference equality, AnyRef == to null checks and equals
-    assertSameCode(getSingleMethod(c, "t3"),
-                   List(
-                        // Array ==
-                        VarOp(ALOAD, 1),
-                        VarOp(ALOAD, 2),
-                        Jump(IF_ACMPEQ, Label(23)),
-                        // AnyRef ==
-                        VarOp(ALOAD, 2),
-                        VarOp(ALOAD, 1),
-                        VarOp(ASTORE, 3),
-                        Op(DUP),
-                        Jump(IFNONNULL, Label(14)),
-                        Op(POP),
-                        VarOp(ALOAD, 3),
-                        Jump(IFNULL, Label(19)),
-                        Jump(GOTO, Label(23)),
-                        Label(14),
-                        VarOp(ALOAD, 3),
-                        Invoke(INVOKEVIRTUAL,
-                               "java/lang/Object",
-                               "equals",
-                               "(Ljava/lang/Object;)Z",
-                               false),
-                        Jump(IFEQ, Label(23)),
-                        Label(19),
-                        Op(ICONST_1),
-                        Jump(GOTO, Label(26)),
-                        Label(23),
-                        Op(ICONST_0),
-                        Label(26),
-                        Op(IRETURN)))
+    assertSameCode(
+      getSingleMethod(c, "t3"),
+      List(
+        // Array ==
+        VarOp(ALOAD, 1),
+        VarOp(ALOAD, 2),
+        Jump(IF_ACMPEQ, Label(23)),
+        // AnyRef ==
+        VarOp(ALOAD, 2),
+        VarOp(ALOAD, 1),
+        VarOp(ASTORE, 3),
+        Op(DUP),
+        Jump(IFNONNULL, Label(14)),
+        Op(POP),
+        VarOp(ALOAD, 3),
+        Jump(IFNULL, Label(19)),
+        Jump(GOTO, Label(23)),
+        Label(14),
+        VarOp(ALOAD, 3),
+        Invoke(
+          INVOKEVIRTUAL,
+          "java/lang/Object",
+          "equals",
+          "(Ljava/lang/Object;)Z",
+          false),
+        Jump(IFEQ, Label(23)),
+        Label(19),
+        Op(ICONST_1),
+        Jump(GOTO, Label(26)),
+        Label(23),
+        Op(ICONST_0),
+        Label(26),
+        Op(IRETURN)
+      )
+    )
 
-    val t4t5 = List(VarOp(ALOAD, 1),
-                    Jump(IFNULL, Label(6)),
-                    VarOp(ALOAD, 1),
-                    Jump(IFNULL, Label(10)),
-                    Label(6),
-                    Op(ICONST_1),
-                    Jump(GOTO, Label(13)),
-                    Label(10),
-                    Op(ICONST_0),
-                    Label(13),
-                    Op(IRETURN))
+    val t4t5 = List(
+      VarOp(ALOAD, 1),
+      Jump(IFNULL, Label(6)),
+      VarOp(ALOAD, 1),
+      Jump(IFNULL, Label(10)),
+      Label(6),
+      Op(ICONST_1),
+      Jump(GOTO, Label(13)),
+      Label(10),
+      Op(ICONST_0),
+      Label(13),
+      Op(IRETURN)
+    )
 
     // t4: one side is known null, so just a null check on the other
     assertSameCode(getSingleMethod(c, "t4"), t4t5)
@@ -241,55 +258,68 @@ class BytecodeTest extends ClearAfterClass {
     assertSameCode(getSingleMethod(c, "t5"), t4t5)
 
     // t6: no unnecessary GOTOs
-    assertSameCode(getSingleMethod(c, "t6"),
-                   List(VarOp(ILOAD, 1),
-                        IntOp(BIPUSH, 10),
-                        Jump(IF_ICMPNE, Label(7)),
-                        VarOp(ILOAD, 2),
-                        Jump(IFNE, Label(12)),
-                        Label(7),
-                        VarOp(ILOAD, 1),
-                        Op(ICONST_1),
-                        Jump(IF_ICMPEQ, Label(16)),
-                        Label(12),
-                        Op(ICONST_1),
-                        Jump(GOTO, Label(19)),
-                        Label(16),
-                        Op(ICONST_2),
-                        Label(19),
-                        Op(IRETURN)))
+    assertSameCode(
+      getSingleMethod(c, "t6"),
+      List(
+        VarOp(ILOAD, 1),
+        IntOp(BIPUSH, 10),
+        Jump(IF_ICMPNE, Label(7)),
+        VarOp(ILOAD, 2),
+        Jump(IFNE, Label(12)),
+        Label(7),
+        VarOp(ILOAD, 1),
+        Op(ICONST_1),
+        Jump(IF_ICMPEQ, Label(16)),
+        Label(12),
+        Op(ICONST_1),
+        Jump(GOTO, Label(19)),
+        Label(16),
+        Op(ICONST_2),
+        Label(19),
+        Op(IRETURN)
+      )
+    )
 
     // t7: universal equality
     assertInvoke(
-        getSingleMethod(c, "t7"), "scala/runtime/BoxesRunTime", "equals")
+      getSingleMethod(c, "t7"),
+      "scala/runtime/BoxesRunTime",
+      "equals")
 
     // t8: no null checks invoking equals on modules and constants
-    assertSameCode(getSingleMethod(c, "t8"),
-                   List(Field(GETSTATIC,
-                              "scala/collection/immutable/Nil$",
-                              "MODULE$",
-                              "Lscala/collection/immutable/Nil$;"),
-                        VarOp(ALOAD, 1),
-                        Invoke(INVOKEVIRTUAL,
-                               "java/lang/Object",
-                               "equals",
-                               "(Ljava/lang/Object;)Z",
-                               false),
-                        Jump(IFNE, Label(10)),
-                        Ldc(LDC, ""),
-                        VarOp(ALOAD, 1),
-                        Invoke(INVOKEVIRTUAL,
-                               "java/lang/Object",
-                               "equals",
-                               "(Ljava/lang/Object;)Z",
-                               false),
-                        Jump(IFNE, Label(14)),
-                        Label(10),
-                        Op(ICONST_1),
-                        Jump(GOTO, Label(17)),
-                        Label(14),
-                        Op(ICONST_0),
-                        Label(17),
-                        Op(IRETURN)))
+    assertSameCode(
+      getSingleMethod(c, "t8"),
+      List(
+        Field(
+          GETSTATIC,
+          "scala/collection/immutable/Nil$",
+          "MODULE$",
+          "Lscala/collection/immutable/Nil$;"),
+        VarOp(ALOAD, 1),
+        Invoke(
+          INVOKEVIRTUAL,
+          "java/lang/Object",
+          "equals",
+          "(Ljava/lang/Object;)Z",
+          false),
+        Jump(IFNE, Label(10)),
+        Ldc(LDC, ""),
+        VarOp(ALOAD, 1),
+        Invoke(
+          INVOKEVIRTUAL,
+          "java/lang/Object",
+          "equals",
+          "(Ljava/lang/Object;)Z",
+          false),
+        Jump(IFNE, Label(14)),
+        Label(10),
+        Op(ICONST_1),
+        Jump(GOTO, Label(17)),
+        Label(14),
+        Op(ICONST_0),
+        Label(17),
+        Op(IRETURN)
+      )
+    )
   }
 }

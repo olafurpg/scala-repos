@@ -15,9 +15,10 @@ import org.scalajs.core.tools.io._
 package object rhino {
 
   private[rhino] implicit class ContextOps(val self: Context) extends AnyVal {
-    def evaluateFile(scope: Scriptable,
-                     file: VirtualJSFile,
-                     securityDomain: AnyRef = null): Any = {
+    def evaluateFile(
+        scope: Scriptable,
+        file: VirtualJSFile,
+        securityDomain: AnyRef = null): Any = {
       self.evaluateString(scope, file.content, file.path, 1, securityDomain)
     }
   }
@@ -26,13 +27,14 @@ package object rhino {
     def addFunction(name: String, function: Array[AnyRef] => Any): Unit = {
       val rhinoFunction = new BaseFunction {
         ScriptRuntime.setFunctionProtoAndParent(this, self)
-        override def call(context: Context,
-                          scope: Scriptable,
-                          thisObj: Scriptable,
-                          args: Array[AnyRef]): AnyRef = {
+        override def call(
+            context: Context,
+            scope: Scriptable,
+            thisObj: Scriptable,
+            args: Array[AnyRef]): AnyRef = {
           function(args) match {
             case () => Undefined.instance
-            case r => r.asInstanceOf[AnyRef]
+            case r  => r.asInstanceOf[AnyRef]
           }
         }
       }

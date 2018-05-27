@@ -35,18 +35,22 @@ import play.api.mvc.{Filter, RequestHeader, Result}
   */
 class CORSFilter(
     override protected val corsConfig: CORSConfig = CORSConfig(),
-    override protected val errorHandler: HttpErrorHandler = DefaultHttpErrorHandler,
+    override protected val errorHandler: HttpErrorHandler =
+      DefaultHttpErrorHandler,
     private val pathPrefixes: Seq[String] = Seq("/"))(
     override implicit val mat: Materializer)
-    extends Filter with AbstractCORSPolicy {
+    extends Filter
+    with AbstractCORSPolicy {
 
   // Java constructor
-  def this(corsConfig: CORSConfig,
-           errorHandler: play.http.HttpErrorHandler,
-           pathPrefixes: java.util.List[String])(mat: Materializer) = {
-    this(corsConfig,
-         new JavaHttpErrorHandlerAdapter(errorHandler),
-         Seq(pathPrefixes.toArray.asInstanceOf[Array[String]]: _*))(mat)
+  def this(
+      corsConfig: CORSConfig,
+      errorHandler: play.http.HttpErrorHandler,
+      pathPrefixes: java.util.List[String])(mat: Materializer) = {
+    this(
+      corsConfig,
+      new JavaHttpErrorHandlerAdapter(errorHandler),
+      Seq(pathPrefixes.toArray.asInstanceOf[Array[String]]: _*))(mat)
   }
 
   override protected val logger = Logger(classOf[CORSFilter])
@@ -65,8 +69,9 @@ object CORSFilter {
 
   val RequestTag = "CORS_REQUEST"
 
-  def apply(corsConfig: CORSConfig = CORSConfig(),
-            errorHandler: HttpErrorHandler = DefaultHttpErrorHandler,
-            pathPrefixes: Seq[String] = Seq("/"))(implicit mat: Materializer) =
+  def apply(
+      corsConfig: CORSConfig = CORSConfig(),
+      errorHandler: HttpErrorHandler = DefaultHttpErrorHandler,
+      pathPrefixes: Seq[String] = Seq("/"))(implicit mat: Materializer) =
     new CORSFilter(corsConfig, errorHandler, pathPrefixes)
 }

@@ -7,19 +7,18 @@ class Query(
     val gender: String,
     val age: Int,
     val education: String
-)
-    extends Serializable
+) extends Serializable
 
 class PredictedResult(
     val label: Double
-)
-    extends Serializable
+) extends Serializable
 
 object ClassificationEngine extends IEngineFactory {
   def apply() = {
-    new Engine(classOf[DataSource],
-               classOf[Preparator],
-               Map("randomforest" -> classOf[RandomForestAlgorithm]),
-               classOf[Serving])
+    new Engine(
+      classOf[DataSource],
+      classOf[Preparator],
+      Map("randomforest" -> classOf[RandomForestAlgorithm]),
+      classOf[Serving])
   }
 }

@@ -16,7 +16,8 @@ private[security] final class Cli extends lila.common.Cli {
 
     case "security" :: "grant" :: uid :: roles =>
       perform(
-          uid, user => UserRepo.setRoles(user.id, roles map (_.toUpperCase)))
+        uid,
+        user => UserRepo.setRoles(user.id, roles map (_.toUpperCase)))
   }
 
   private def perform(username: String, op: User => Funit): Fu[String] =

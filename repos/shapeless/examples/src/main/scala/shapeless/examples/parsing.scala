@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 Miles Sabin 
+ * Copyright (c) 2012 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,10 +50,11 @@ object CombinatorTesting extends App {
   }
 
   /**
-    * Flatten instance for `A ~ B`. Requires Flatten instances for `A` and `B`. 
+    * Flatten instance for `A ~ B`. Requires Flatten instances for `A` and `B`.
     */
   implicit def flattenPattern[A, B](
-      implicit flattenA: Flatten[A], flattenB: Flatten[B]) =
+      implicit flattenA: Flatten[A],
+      flattenB: Flatten[B]) =
     new Flatten[A ~ B] {
       def apply(m: A ~ B) = m match {
         case a ~ b => flattenA(a) ::: flattenB(b)

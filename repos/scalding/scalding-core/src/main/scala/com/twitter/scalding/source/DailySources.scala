@@ -20,32 +20,38 @@ import Dsl._
 import cascading.tuple.Fields
 
 abstract class DailyPrefixSuffixSource(
-    prefixTemplate: String, suffixTemplate: String, dateRange: DateRange)
-    extends TimePathedSource(prefixTemplate + TimePathedSource.YEAR_MONTH_DAY +
-                             suffixTemplate + "/*",
-                             dateRange,
-                             DateOps.UTC)
+    prefixTemplate: String,
+    suffixTemplate: String,
+    dateRange: DateRange)
+    extends TimePathedSource(
+      prefixTemplate + TimePathedSource.YEAR_MONTH_DAY +
+        suffixTemplate + "/*",
+      dateRange,
+      DateOps.UTC)
 
 abstract class DailyPrefixSuffixMostRecentSource(
-    prefixTemplate: String, suffixTemplate: String, dateRange: DateRange)
+    prefixTemplate: String,
+    suffixTemplate: String,
+    dateRange: DateRange)
     extends MostRecentGoodSource(
-        prefixTemplate +
+      prefixTemplate +
         TimePathedSource.YEAR_MONTH_DAY + suffixTemplate + "/*",
-        dateRange,
-        DateOps.UTC)
+      dateRange,
+      DateOps.UTC)
 
 abstract class DailySuffixSource(prefixTemplate: String, dateRange: DateRange)
     extends TimePathedSource(
-        prefixTemplate + TimePathedSource.YEAR_MONTH_DAY + "/*",
-        dateRange,
-        DateOps.UTC)
+      prefixTemplate + TimePathedSource.YEAR_MONTH_DAY + "/*",
+      dateRange,
+      DateOps.UTC)
 
 abstract class DailySuffixMostRecentSource(
-    prefixTemplate: String, dateRange: DateRange)
+    prefixTemplate: String,
+    dateRange: DateRange)
     extends MostRecentGoodSource(
-        prefixTemplate + TimePathedSource.YEAR_MONTH_DAY + "/*",
-        dateRange,
-        DateOps.UTC)
+      prefixTemplate + TimePathedSource.YEAR_MONTH_DAY + "/*",
+      dateRange,
+      DateOps.UTC)
 
 object DailySuffixTsv {
   def apply(prefix: String, fs: Fields = Fields.ALL)(
@@ -54,15 +60,17 @@ object DailySuffixTsv {
 
 class DailySuffixTsv(prefix: String, fs: Fields = Fields.ALL)(
     override implicit val dateRange: DateRange)
-    extends DailySuffixSource(prefix, dateRange) with DelimitedScheme {
+    extends DailySuffixSource(prefix, dateRange)
+    with DelimitedScheme {
   override val fields = fs
 }
 
 object DailySuffixTypedTsv {
-  def apply[T](prefix: String)(implicit dateRange: DateRange,
-                               mf: Manifest[T],
-                               conv: TupleConverter[T],
-                               tset: TupleSetter[T]) =
+  def apply[T](prefix: String)(
+      implicit dateRange: DateRange,
+      mf: Manifest[T],
+      conv: TupleConverter[T],
+      tset: TupleSetter[T]) =
     new DailySuffixTypedTsv[T](prefix)
 }
 
@@ -71,7 +79,8 @@ class DailySuffixTypedTsv[T](prefix: String)(
     override val mf: Manifest[T],
     override val conv: TupleConverter[T],
     override val tset: TupleSetter[T])
-    extends DailySuffixSource(prefix, dateRange) with TypedDelimited[T]
+    extends DailySuffixSource(prefix, dateRange)
+    with TypedDelimited[T]
 
 object DailySuffixCsv {
   def apply(prefix: String, fs: Fields = Fields.ALL)(
@@ -80,7 +89,8 @@ object DailySuffixCsv {
 
 class DailySuffixCsv(prefix: String, fs: Fields = Fields.ALL)(
     override implicit val dateRange: DateRange)
-    extends DailySuffixSource(prefix, dateRange) with DelimitedScheme {
+    extends DailySuffixSource(prefix, dateRange)
+    with DelimitedScheme {
   override val fields = fs
   override val separator = ","
 }

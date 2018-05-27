@@ -11,7 +11,9 @@ import rx.lang.scala.Observer
   */
 private[bus] class InternalTaskStatusEventStream
     extends SubchannelEventBus[
-        TaskStatusUpdate, Observer[TaskStatusUpdate], PathId] {
+      TaskStatusUpdate,
+      Observer[TaskStatusUpdate],
+      PathId] {
 
   override val subclassification: Subclassification[PathId] =
     new Subclassification[PathId] {
@@ -24,7 +26,8 @@ private[bus] class InternalTaskStatusEventStream
     }
 
   override protected def publish(
-      event: TaskStatusUpdate, subscriber: Observer[TaskStatusUpdate]): Unit =
+      event: TaskStatusUpdate,
+      subscriber: Observer[TaskStatusUpdate]): Unit =
     subscriber.onNext(event)
   override protected def classify(event: TaskStatusUpdate): PathId =
     event.appId

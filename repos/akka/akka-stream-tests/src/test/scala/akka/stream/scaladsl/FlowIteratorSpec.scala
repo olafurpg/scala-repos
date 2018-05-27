@@ -29,8 +29,8 @@ class FlowIterableSpec extends AbstractFlowIteratorSpec {
   "produce onError when iterator throws" in {
     val iterable = new immutable.Iterable[Int] {
       override def iterator: Iterator[Int] =
-        (1 to 3).iterator.map(
-            x ⇒ if (x == 2) throw new IllegalStateException("not two") else x)
+        (1 to 3).iterator.map(x ⇒
+          if (x == 2) throw new IllegalStateException("not two") else x)
     }
     val p = Source(iterable).runWith(Sink.asPublisher(false))
     val c = TestSubscriber.manualProbe[Int]()
@@ -39,9 +39,10 @@ class FlowIterableSpec extends AbstractFlowIteratorSpec {
     sub.request(1)
     c.expectNext(1)
     c.expectNoMsg(100.millis)
-    EventFilter[IllegalStateException](message = "not two", occurrences = 1).intercept {
-      sub.request(2)
-    }
+    EventFilter[IllegalStateException](message = "not two", occurrences = 1)
+      .intercept {
+        sub.request(2)
+      }
     c.expectError().getMessage should be("not two")
     sub.request(2)
     c.expectNoMsg(100.millis)
@@ -77,8 +78,8 @@ class FlowIterableSpec extends AbstractFlowIteratorSpec {
 
 abstract class AbstractFlowIteratorSpec extends AkkaSpec {
 
-  val settings = ActorMaterializerSettings(system).withInputBuffer(
-      initialSize = 2, maxSize = 2)
+  val settings = ActorMaterializerSettings(system)
+    .withInputBuffer(initialSize = 2, maxSize = 2)
 
   private val m = ActorMaterializer(settings)
   implicit final def materializer = m

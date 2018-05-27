@@ -40,10 +40,14 @@ trait TypeDiagnostics { self: Analyzer =>
     *  indicate that the restriction may be lifted in the future.
     */
   def restrictionWarning(
-      pos: Position, unit: CompilationUnit, msg: String): Unit =
+      pos: Position,
+      unit: CompilationUnit,
+      msg: String): Unit =
     reporter.warning(pos, "Implementation restriction: " + msg)
   def restrictionError(
-      pos: Position, unit: CompilationUnit, msg: String): Unit =
+      pos: Position,
+      unit: CompilationUnit,
+      msg: String): Unit =
     reporter.error(pos, "Implementation restriction: " + msg)
 
   /** A map of Positions to addendums - if an error involves a position in
@@ -60,7 +64,8 @@ trait TypeDiagnostics { self: Analyzer =>
   def typingInPattern[T](body: => T): T = {
     val saved = isTyperInPattern
     isTyperInPattern = true
-    try body finally isTyperInPattern = saved
+    try body
+    finally isTyperInPattern = saved
   }
 
   def setAddendum(pos: Position, msg: () => String) =
@@ -117,25 +122,24 @@ trait TypeDiagnostics { self: Analyzer =>
     */
   final def exampleTuplePattern(names: List[Name]): String = {
     val arity = names.length
-    val varPatterNames: Option[List[String]] = sequence(
-        names map {
+    val varPatterNames: Option[List[String]] = sequence(names map {
       case name if nme.isVariableName(name) => Some(name.decode)
-      case _ => None
+      case _                                => None
     })
     def parenthesize(a: String) = s"($a)"
     def genericParams =
       (Seq("param1") ++ (if (arity > 2) Seq("...") else Nil) ++ Seq(
-              s"param$arity"))
+        s"param$arity"))
     parenthesize(varPatterNames.getOrElse(genericParams).mkString(", "))
   }
 
   def alternatives(tree: Tree): List[Type] = tree.tpe match {
     case OverloadedType(pre, alternatives) => alternatives map pre.memberType
-    case _ => Nil
+    case _                                 => Nil
   }
   def alternativesString(tree: Tree) =
     alternatives(tree) map (x => "  " + methodTypeErrorString(x)) mkString
-    ("", " <and>\n", "\n")
+      ("", " <and>\n", "\n")
 
   /** The symbol which the given accessor represents (possibly in part).
     *  This is used for error messages, where we want to speak in terms
@@ -150,7 +154,8 @@ trait TypeDiagnostics { self: Analyzer =>
         if (member.isSetter) member.getterIn(member.owner) else member
       val flags =
         if (getter.setterIn(member.owner) != NoSymbol)
-          DEFERRED.toLong | MUTABLE else DEFERRED
+          DEFERRED.toLong | MUTABLE
+        else DEFERRED
 
       getter.owner.newValue(getter.name.toTermName, getter.pos, flags) setInfo getter.tpe.resultType
     }
@@ -231,41 +236,46 @@ trait TypeDiagnostics { self: Analyzer =>
                   def isScala = reqsym hasTransOwner ScalaPackageClass
 
                   val explainFound = "%s %s %s%s, but ".format(
-                      arg,
-                      op,
-                      reqArg,
-                      // If the message involves a type from the base type sequence rather than the
-                      // actual found type, we need to explain why we're talking about it.  Less brute
-                      // force measures than comparing normalized Strings were producing error messages
-                      // like "and java.util.ArrayList[String] <: java.util.ArrayList[String]" but there
-                      // should be a cleaner way to do this.
-                      if (found.dealiasWiden.toString == tp.dealiasWiden.toString)
-                        ""
-                      else " (and %s <: %s)".format(found, tp)
+                    arg,
+                    op,
+                    reqArg,
+                    // If the message involves a type from the base type sequence rather than the
+                    // actual found type, we need to explain why we're talking about it.  Less brute
+                    // force measures than comparing normalized Strings were producing error messages
+                    // like "and java.util.ArrayList[String] <: java.util.ArrayList[String]" but there
+                    // should be a cleaner way to do this.
+                    if (found.dealiasWiden.toString == tp.dealiasWiden.toString)
+                      ""
+                    else " (and %s <: %s)".format(found, tp)
                   )
                   val explainDef = {
                     val prepend = if (isJava) "Java-defined " else ""
                     "%s%s is %s in %s.".format(
-                        prepend, reqsym, param.variance, param)
+                      prepend,
+                      reqsym,
+                      param.variance,
+                      param)
                   }
                   // Don't suggest they change the class declaration if it's somewhere
                   // under scala.* or defined in a java class, because attempting either
                   // would be fruitless.
                   val suggestChange =
                     "\nYou may wish to " +
-                    (if (isScala || isJava)
-                       "investigate a wildcard type such as `_ %s %s`. (SLS 3.2.10)"
-                         .format(op, reqArg)
-                     else
-                       "define %s as %s%s instead. (SLS 4.5)".format(
-                           param.name, suggest, param.name))
+                      (if (isScala || isJava)
+                         "investigate a wildcard type such as `_ %s %s`. (SLS 3.2.10)"
+                           .format(op, reqArg)
+                       else
+                         "define %s as %s%s instead. (SLS 4.5)".format(
+                           param.name,
+                           suggest,
+                           param.name))
 
                   Some("Note: " + explainFound + explainDef + suggestChange)
                 }
                 // In these cases the arg is OK and needs no explanation.
                 val conforms =
                   ((arg =:= reqArg) || ((arg <:< reqArg) && param.isCovariant) ||
-                      ((reqArg <:< arg) && param.isContravariant))
+                    ((reqArg <:< arg) && param.isContravariant))
                 val invariant = param.variance.isInvariant
 
                 if (conforms) Some("")
@@ -297,11 +307,13 @@ trait TypeDiagnostics { self: Analyzer =>
   // being false would do that, but if I return "<suppressed>" under
   // that condition, I see it.
   def foundReqMsg(found: Type, req: Type): String = {
-    def baseMessage = (";\n found   : " + found.toLongString +
+    def baseMessage =
+      (";\n found   : " + found.toLongString +
         existentialContext(found) + explainAlias(found) + "\n required: " +
         req + existentialContext(req) + explainAlias(req))
     (withDisambiguation(Nil, found, req)(baseMessage) + explainVariance(
-            found, req) + explainAnyVsAnyRef(found, req))
+      found,
+      req) + explainAnyVsAnyRef(found, req))
   }
 
   def typePatternAdvice(sym: Symbol, ptSym: Symbol) = {
@@ -309,14 +321,14 @@ trait TypeDiagnostics { self: Analyzer =>
     val caseString =
       if (clazz.isCaseClass && (clazz isSubClass ptSym))
         (clazz.caseFieldAccessors map (_ => "_") // could use the actual param names here
-            mkString (s"`case ${clazz.name}(", ",", ")`"))
+          mkString (s"`case ${clazz.name}(", ",", ")`"))
       else
         "`case _: " +
-        (clazz.typeParams match {
-              case Nil => "" + clazz.name
-              case xs =>
-                xs map (_ => "_") mkString (clazz.name + "[", ",", "]")
-            }) + "`"
+          (clazz.typeParams match {
+            case Nil => "" + clazz.name
+            case xs =>
+              xs map (_ => "_") mkString (clazz.name + "[", ",", "]")
+          }) + "`"
 
     if (!clazz.exists) ""
     else
@@ -371,11 +383,11 @@ trait TypeDiagnostics { self: Analyzer =>
       |tp.typeSymbolDirect = %s
       |tp.typeSymbolDirect.owner = %s
       """.stripMargin.format(
-          tp,
-          tp.typeSymbol,
-          tp.typeSymbol.owner,
-          tp.typeSymbolDirect,
-          tp.typeSymbolDirect.owner
+        tp,
+        tp.typeSymbol,
+        tp.typeSymbol.owner,
+        tp.typeSymbolDirect,
+        tp.typeSymbolDirect.owner
       )
     }
   }
@@ -406,9 +418,9 @@ trait TypeDiagnostics { self: Analyzer =>
     }
     for (tpe <- types; t <- tpe) {
       t match {
-        case ConstantType(_) => record(t, t.underlying.typeSymbol)
+        case ConstantType(_)    => record(t, t.underlying.typeSymbol)
         case TypeRef(_, sym, _) => record(t, sym)
-        case _ => ()
+        case _                  => ()
       }
     }
 
@@ -461,15 +473,16 @@ trait TypeDiagnostics { self: Analyzer =>
 
     def permanentlyHiddenWarning(pos: Position, hidden: Name, defn: Symbol) =
       context.warning(
-          pos,
-          "imported `%s' is permanently hidden by definition of %s".format(
-              hidden, defn.fullLocationString))
+        pos,
+        "imported `%s' is permanently hidden by definition of %s"
+          .format(hidden, defn.fullLocationString))
 
     object checkUnused {
-      val ignoreNames: Set[TermName] = Set(TermName("readResolve"),
-                                           TermName("readObject"),
-                                           TermName("writeObject"),
-                                           TermName("writeReplace"))
+      val ignoreNames: Set[TermName] = Set(
+        TermName("readResolve"),
+        TermName("readObject"),
+        TermName("writeObject"),
+        TermName("writeReplace"))
 
       class UnusedPrivates extends Traverser {
         val defnTrees = ListBuffer[MemberDef]()
@@ -480,34 +493,36 @@ trait TypeDiagnostics { self: Analyzer =>
         def defnSymbols = defnTrees.toList map (_.symbol)
         def localVars = defnSymbols filter (t => t.isLocalToBlock && t.isVar)
 
-        def qualifiesTerm(sym: Symbol) = ((sym.isModule ||
-                sym.isMethod || sym.isPrivateLocal || sym.isLocalToBlock) &&
+        def qualifiesTerm(sym: Symbol) =
+          ((sym.isModule ||
+            sym.isMethod || sym.isPrivateLocal || sym.isLocalToBlock) &&
             !nme.isLocalName(sym.name) && !sym.isParameter &&
             !sym.isParamAccessor // could improve this, but it's a pain
             &&
-            !sym.isEarlyInitialized // lots of false positives in the way these are encoded
+              !sym.isEarlyInitialized // lots of false positives in the way these are encoded
             && !(sym.isGetter && sym.accessed.isEarlyInitialized))
         def qualifiesType(sym: Symbol) = !sym.isDefinedInPackage
-        def qualifies(sym: Symbol) = ((sym ne null) &&
+        def qualifies(sym: Symbol) =
+          ((sym ne null) &&
             (sym.isTerm && qualifiesTerm(sym) || sym.isType &&
-                qualifiesType(sym)))
+              qualifiesType(sym)))
 
         override def traverse(t: Tree): Unit = {
           t match {
-            case t: MemberDef if qualifies(t.symbol) => defnTrees += t
-            case t: RefTree if t.symbol ne null => targets += t.symbol
+            case t: MemberDef if qualifies(t.symbol)  => defnTrees += t
+            case t: RefTree if t.symbol ne null       => targets += t.symbol
             case Assign(lhs, _) if lhs.symbol != null => setVars += lhs.symbol
-            case _ =>
+            case _                                    =>
           }
           // Only record type references which don't originate within the
           // definition of the class being referenced.
           if (t.tpe ne null) {
             for (tp <- t.tpe; if !treeTypes(tp) &&
-                      !currentOwner.ownerChain.contains(tp.typeSymbol)) {
+                   !currentOwner.ownerChain.contains(tp.typeSymbol)) {
               tp match {
-                case NoType | NoPrefix =>
+                case NoType | NoPrefix    =>
                 case NullaryMethodType(_) =>
-                case MethodType(_, _) =>
+                case MethodType(_, _)     =>
                 case _ =>
                   log(s"$tp referenced from $currentOwner")
                   treeTypes += tp
@@ -516,24 +531,26 @@ trait TypeDiagnostics { self: Analyzer =>
             // e.g. val a = new Foo ; new a.Bar ; don't let a be reported as unused.
             t.tpe.prefix foreach {
               case SingleType(_, sym) => targets += sym
-              case _ =>
+              case _                  =>
             }
           }
           super.traverse(t)
         }
-        def isUnusedType(m: Symbol): Boolean = (m.isType &&
+        def isUnusedType(m: Symbol): Boolean =
+          (m.isType &&
             !m.isTypeParameterOrSkolem // would be nice to improve this
-            && (m.isPrivate || m.isLocalToBlock) && !(treeTypes.exists(
-                tp => tp exists (t => t.typeSymbolDirect == m))))
-        def isUnusedTerm(m: Symbol): Boolean = ((m.isTerm) &&
+            && (m.isPrivate || m.isLocalToBlock) && !(treeTypes.exists(tp =>
+            tp exists (t => t.typeSymbolDirect == m))))
+        def isUnusedTerm(m: Symbol): Boolean =
+          ((m.isTerm) &&
             (m.isPrivate || m.isLocalToBlock) && !targets(m) &&
             !(m.name == nme.WILDCARD) // e.g. val _ = foo
             && !ignoreNames(m.name.toTermName) // serialization methods
             &&
-            !isConstantType(m.info.resultType) // subject to constant inlining
+              !isConstantType(m.info.resultType) // subject to constant inlining
             &&
-            !treeTypes.exists(_ contains m) // e.g. val a = new Foo ; new a.Bar
-            )
+              !treeTypes.exists(_ contains m) // e.g. val a = new Foo ; new a.Bar
+          )
         def unusedTypes = defnTrees.toList filter (t => isUnusedType(t.symbol))
         def unusedTerms = defnTrees.toList filter (v => isUnusedTerm(v.symbol))
         // local vars which are never set, except those already returned in unused
@@ -552,7 +569,7 @@ trait TypeDiagnostics { self: Analyzer =>
              else
                sym match {
                  case sym: TermSymbol => sym.referenced.pos
-                 case _ => NoPosition
+                 case _               => NoPosition
                })
           val why = if (sym.isPrivate) "private" else "local"
           val what =
@@ -569,14 +586,15 @@ trait TypeDiagnostics { self: Analyzer =>
         }
         p.unsetVars foreach { v =>
           reporter.warning(
-              v.pos,
-              s"local var ${v.name} in ${v.owner} is never set - it could be a val")
+            v.pos,
+            s"local var ${v.name} in ${v.owner} is never set - it could be a val")
         }
         p.unusedTypes foreach { t =>
           val sym = t.symbol
           val why = if (sym.isPrivate) "private" else "local"
           reporter.warning(
-              t.pos, s"$why ${sym.fullLocationString} is never used")
+            t.pos,
+            s"$why ${sym.fullLocationString} is never used")
         }
       }
     }
@@ -588,7 +606,7 @@ trait TypeDiagnostics { self: Analyzer =>
 
       private def exprOK =
         (expr != Object_synchronized) && !(expr.isLabel && treeInfo
-              .isSynthCaseSymbol(expr)) // it's okay to jump to matchEnd (or another case) with an argument of type nothing
+          .isSynthCaseSymbol(expr)) // it's okay to jump to matchEnd (or another case) with an argument of type nothing
 
       private def treeOK(tree: Tree) = {
         val isLabelDef = tree match {
@@ -601,7 +619,8 @@ trait TypeDiagnostics { self: Analyzer =>
         if (fn.symbol != null && fn.symbol.isMethod &&
             !fn.symbol.isConstructor) {
           exprStack push fn.symbol
-          try f finally exprStack.pop()
+          try f
+          finally exprStack.pop()
         } else f
       }
       def apply(tree: Tree): Tree = {
@@ -634,8 +653,8 @@ trait TypeDiagnostics { self: Analyzer =>
         List(cyclicAdjective(sym), sym, "needs result type") mkString " "
       case Import(expr, selectors) =>
         ("encountered unrecoverable cycle resolving import." +
-            "\nNote: this is often due in part to a class depending on a definition nested within its companion." +
-            "\nIf applicable, you may wish to try moving some members into another object.")
+          "\nNote: this is often due in part to a class depending on a definition nested within its companion." +
+          "\nIf applicable, you may wish to try moving some members into another object.")
     }
 
     // warn about class/method/type-members' type parameters that shadow types already in scope
@@ -650,12 +669,13 @@ trait TypeDiagnostics { self: Analyzer =>
         tparams.filter(_.name != typeNames.WILDCARD).foreach { tp =>
           // we don't care about type params shadowing other type params in the same declaration
           enclClassOrMethodOrTypeMember(context).outer.lookupSymbol(
-              tp.name,
-              s => s != tp.symbol && s.hasRawInfo && reallyExists(s)) match {
+            tp.name,
+            s => s != tp.symbol && s.hasRawInfo && reallyExists(s)) match {
             case LookupSucceeded(_, sym2) =>
               context.warning(
-                  tp.pos,
-                  s"type parameter ${tp.name} defined in $sym shadows $sym2 defined in ${sym2.owner}. You may want to rename your type parameter, or possibly remove it.")
+                tp.pos,
+                s"type parameter ${tp.name} defined in $sym shadows $sym2 defined in ${sym2.owner}. You may want to rename your type parameter, or possibly remove it."
+              )
             case _ =>
           }
         }
@@ -682,12 +702,12 @@ trait TypeDiagnostics { self: Analyzer =>
           } else {
             val pos = info.tree match {
               case Import(expr, _) => expr.pos
-              case _ => ex.pos
+              case _               => ex.pos
             }
             context0.error(
-                pos,
-                cyclicReferenceMessage(sym, info.tree) getOrElse ex.getMessage(
-                    ))
+              pos,
+              cyclicReferenceMessage(sym, info.tree) getOrElse ex.getMessage(
+                ))
 
             if (sym == ObjectClass)
               throw new FatalError("cannot redefine root " + sym)

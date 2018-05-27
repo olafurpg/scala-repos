@@ -21,16 +21,16 @@ object Implicits {
   implicit def sbtLevel2ToolsLevel(level: SbtLevel.Value): Level =
     level match {
       case SbtLevel.Error => Level.Error
-      case SbtLevel.Warn => Level.Warn
-      case SbtLevel.Info => Level.Info
+      case SbtLevel.Warn  => Level.Warn
+      case SbtLevel.Info  => Level.Info
       case SbtLevel.Debug => Level.Debug
     }
 
   implicit def toolsLevel2sbtLevel(level: Level): SbtLevel.Value =
     level match {
       case Level.Error => SbtLevel.Error
-      case Level.Warn => SbtLevel.Warn
-      case Level.Info => SbtLevel.Info
+      case Level.Warn  => SbtLevel.Warn
+      case Level.Info  => SbtLevel.Info
       case Level.Debug => SbtLevel.Debug
     }
 }

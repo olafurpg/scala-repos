@@ -31,8 +31,11 @@ import scala.concurrent.Future
 
 /** JDBC implementation of [[LEvents]] */
 class JDBCLEvents(
-    client: String, config: StorageClientConfig, namespace: String)
-    extends LEvents with Logging {
+    client: String,
+    config: StorageClientConfig,
+    namespace: String)
+    extends LEvents
+    with Logging {
   implicit private val formats = org.json4s.DefaultFormats
 
   def init(appId: Int, channelId: Option[Int] = None): Boolean = {
@@ -40,7 +43,7 @@ class JDBCLEvents(
     // To use index, it must be varchar less than 255 characters on a VARCHAR column
     val useIndex =
       config.properties.contains("INDEX") &&
-      config.properties("INDEX").equalsIgnoreCase("enabled")
+        config.properties("INDEX").equalsIgnoreCase("enabled")
 
     val tableName = JDBCUtils.eventTableName(namespace, appId, channelId)
     val entityIdIndexName = s"idx_${tableName}_ei"
@@ -106,7 +109,7 @@ class JDBCLEvents(
     DB localTx { implicit session =>
       val id = event.eventId.getOrElse(JDBCUtils.generateId)
       val tableName = sqls.createUnsafely(
-          JDBCUtils.eventTableName(namespace, appId, channelId))
+        JDBCUtils.eventTableName(namespace, appId, channelId))
       sql"""
       insert into $tableName values(
         $id,
@@ -132,7 +135,7 @@ class JDBCLEvents(
       implicit ec: ExecutionContext): Future[Option[Event]] = Future {
     DB readOnly { implicit session =>
       val tableName = sqls.createUnsafely(
-          JDBCUtils.eventTableName(namespace, appId, channelId))
+        JDBCUtils.eventTableName(namespace, appId, channelId))
       sql"""
       select
         id,
@@ -158,7 +161,7 @@ class JDBCLEvents(
       implicit ec: ExecutionContext): Future[Boolean] = Future {
     DB localTx { implicit session =>
       val tableName = sqls.createUnsafely(
-          JDBCUtils.eventTableName(namespace, appId, channelId))
+        JDBCUtils.eventTableName(namespace, appId, channelId))
       sql"""
       delete from $tableName where id = $eventId
       """.update().apply()
@@ -181,27 +184,31 @@ class JDBCLEvents(
   )(implicit ec: ExecutionContext): Future[Iterator[Event]] = Future {
     DB readOnly { implicit session =>
       val tableName = sqls.createUnsafely(
-          JDBCUtils.eventTableName(namespace, appId, channelId))
+        JDBCUtils.eventTableName(namespace, appId, channelId))
       val whereClause =
         sqls
           .toAndConditionOpt(
-              startTime.map(x => sqls"eventTime >= $x"),
-              untilTime.map(x => sqls"eventTime < $x"),
-              entityType.map(x => sqls"entityType = $x"),
-              entityId.map(x => sqls"entityId = $x"),
-              eventNames
-                .map(x =>
-                      sqls
-                        .toOrConditionOpt(
-                          x.map(y => Some(sqls"event = $y")): _*))
-                .getOrElse(None),
-              targetEntityType.map(x =>
-                    x.map(y => sqls"targetEntityType = $y")
-                      .getOrElse(sqls"targetEntityType IS NULL")),
-              targetEntityId
-                .map(x => x.map(y => sqls"targetEntityId = $y")
-            .getOrElse(sqls"targetEntityId IS NULL"))
-      ).map(sqls.where(_)).getOrElse(sqls"")
+            startTime.map(x => sqls"eventTime >= $x"),
+            untilTime.map(x => sqls"eventTime < $x"),
+            entityType.map(x => sqls"entityType = $x"),
+            entityId.map(x => sqls"entityId = $x"),
+            eventNames
+              .map(x =>
+                sqls
+                  .toOrConditionOpt(x.map(y => Some(sqls"event = $y")): _*))
+              .getOrElse(None),
+            targetEntityType.map(
+              x =>
+                x.map(y => sqls"targetEntityType = $y")
+                  .getOrElse(sqls"targetEntityType IS NULL")),
+            targetEntityId
+              .map(
+                x =>
+                  x.map(y => sqls"targetEntityId = $y")
+                    .getOrElse(sqls"targetEntityId IS NULL"))
+          )
+          .map(sqls.where(_))
+          .getOrElse(sqls"")
       val orderByClause = reversed
         .map(x => if (x) sqls"eventTime desc" else sqls"eventTime asc")
         .getOrElse(sqls"eventTime asc")
@@ -233,27 +240,27 @@ class JDBCLEvents(
 
   private[prediction] def resultToEvent(rs: WrappedResultSet): Event = {
     Event(
-        eventId = rs.stringOpt("id"),
-        event = rs.string("event"),
-        entityType = rs.string("entityType"),
-        entityId = rs.string("entityId"),
-        targetEntityType = rs.stringOpt("targetEntityType"),
-        targetEntityId = rs.stringOpt("targetEntityId"),
-        properties = rs
-            .stringOpt("properties")
-            .map(p => DataMap(read[JObject](p)))
-            .getOrElse(DataMap()),
-        eventTime = new DateTime(
-              rs.jodaDateTime("eventTime"),
-              DateTimeZone.forID(rs.string("eventTimeZone"))),
-        tags = rs
-            .stringOpt("tags")
-            .map(t => t.split(",").toList)
-            .getOrElse(Nil),
-        prId = rs.stringOpt("prId"),
-        creationTime = new DateTime(
-              rs.jodaDateTime("creationTime"),
-              DateTimeZone.forID(rs.string("creationTimeZone")))
+      eventId = rs.stringOpt("id"),
+      event = rs.string("event"),
+      entityType = rs.string("entityType"),
+      entityId = rs.string("entityId"),
+      targetEntityType = rs.stringOpt("targetEntityType"),
+      targetEntityId = rs.stringOpt("targetEntityId"),
+      properties = rs
+        .stringOpt("properties")
+        .map(p => DataMap(read[JObject](p)))
+        .getOrElse(DataMap()),
+      eventTime = new DateTime(
+        rs.jodaDateTime("eventTime"),
+        DateTimeZone.forID(rs.string("eventTimeZone"))),
+      tags = rs
+        .stringOpt("tags")
+        .map(t => t.split(",").toList)
+        .getOrElse(Nil),
+      prId = rs.stringOpt("prId"),
+      creationTime = new DateTime(
+        rs.jodaDateTime("creationTime"),
+        DateTimeZone.forID(rs.string("creationTimeZone")))
     )
   }
 }

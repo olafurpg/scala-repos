@@ -11,21 +11,21 @@ private[serverset2] object Selector {
   case class Host(host: String, port: Int) extends Selector {
     def matches(e: Entry) = e match {
       case Endpoint(_, host2, port2, _, _, _) => host2 == host && port2 == port
-      case _ => false
+      case _                                  => false
     }
   }
 
   case class Member(which: String) extends Selector {
     def matches(e: Entry) = e match {
       case Endpoint(_, _, _, _, _, id) => which == id
-      case _ => false
+      case _                           => false
     }
   }
 
   case class Shard(which: Int) extends Selector {
     def matches(e: Entry) = e match {
       case Endpoint(_, _, _, id, _, _) => which == id
-      case _ => false
+      case _                           => false
     }
   }
 
@@ -39,7 +39,8 @@ private[serverset2] object Selector {
       }
     case Array("member", which) => Some(Member(which))
     case Array("shard", which) =>
-      try Some(Shard(which.toInt)) catch {
+      try Some(Shard(which.toInt))
+      catch {
         case NonFatal(_) => None
       }
     case _ => None
@@ -70,7 +71,7 @@ private[serverset2] case class Vector(vector: Seq[Descriptor]) {
   def weightOf(entry: Entry) =
     vector.foldLeft(1.0) {
       case (w, d) if d matches entry => w * d.weight
-      case (w, _) => w
+      case (w, _)                    => w
     }
 }
 

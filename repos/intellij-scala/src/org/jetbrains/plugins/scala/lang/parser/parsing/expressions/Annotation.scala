@@ -16,8 +16,9 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
  */
 
 object Annotation {
-  def parse(builder: ScalaPsiBuilder,
-            countLinesAfterAnnotation: Boolean = true): Boolean = {
+  def parse(
+      builder: ScalaPsiBuilder,
+      countLinesAfterAnnotation: Boolean = true): Boolean = {
     val rollbackMarker = builder.mark()
     val annotMarker = builder.mark
     builder.getTokenType match {

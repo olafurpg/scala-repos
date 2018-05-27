@@ -18,8 +18,9 @@ class JavaHttpRequestHandlerAdapter @Inject()(underlying: JHttpRequestHandler)
   override def handlerForRequest(request: RequestHeader) = {
     val handlerForRequest =
       underlying.handlerForRequest(new RequestHeaderImpl(request))
-    (handlerForRequest.getRequest._underlyingHeader(),
-     handlerForRequest.getHandler)
+    (
+      handlerForRequest.getRequest._underlyingHeader(),
+      handlerForRequest.getHandler)
   }
 }
 

@@ -1,7 +1,12 @@
 package com.twitter.finagle.thrift
 
 import com.google.common.base.Charsets
-import com.twitter.finagle.stats.{NullStatsReceiver, Counter, DefaultStatsReceiver, StatsReceiver}
+import com.twitter.finagle.stats.{
+  NullStatsReceiver,
+  Counter,
+  DefaultStatsReceiver,
+  StatsReceiver
+}
 import com.twitter.logging.Logger
 import com.twitter.util.NonFatal
 import java.nio.{ByteBuffer, CharBuffer}
@@ -20,25 +25,24 @@ object Protocols {
       case NonFatal(_) => // try reflection instead
         try {
           AccessController.doPrivileged(
-              new PrivilegedExceptionAction[sun.misc.Unsafe]() {
-            def run(): sun.misc.Unsafe = {
-              val k = classOf[sun.misc.Unsafe]
-              for (f <- k.getDeclaredFields) {
-                f.setAccessible(true)
-                val x = f.get(null)
-                if (k.isInstance(x)) {
-                  return k.cast(x)
+            new PrivilegedExceptionAction[sun.misc.Unsafe]() {
+              def run(): sun.misc.Unsafe = {
+                val k = classOf[sun.misc.Unsafe]
+                for (f <- k.getDeclaredFields) {
+                  f.setAccessible(true)
+                  val x = f.get(null)
+                  if (k.isInstance(x)) {
+                    return k.cast(x)
+                  }
                 }
+                throw new NoSuchFieldException("the Unsafe") // fall through to the catch block below
               }
-              throw new NoSuchFieldException("the Unsafe") // fall through to the catch block below
-            }
-          })
+            })
         } catch {
           case NonFatal(t) =>
             Logger
               .get()
-              .info(
-                  "%s unable to initialize sun.misc.Unsafe", getClass.getName)
+              .info("%s unable to initialize sun.misc.Unsafe", getClass.getName)
             null
         }
     }
@@ -68,11 +72,12 @@ object Protocols {
         statsReceiver.counter("larger_than_threadlocal_out_buffer")
       new TProtocolFactory {
         override def getProtocol(trans: TTransport): TProtocol = {
-          val proto = new TFinagleBinaryProtocol(trans,
-                                                 fastEncodeFailed,
-                                                 largerThanTlOutBuffer,
-                                                 strictRead,
-                                                 strictWrite)
+          val proto = new TFinagleBinaryProtocol(
+            trans,
+            fastEncodeFailed,
+            largerThanTlOutBuffer,
+            strictRead,
+            strictWrite)
           if (readLength != 0) {
             proto.setReadLength(readLength)
           }
@@ -82,8 +87,8 @@ object Protocols {
     }
   }
 
-  def factory(statsReceiver: StatsReceiver = DefaultStatsReceiver)
-    : TProtocolFactory = {
+  def factory(
+      statsReceiver: StatsReceiver = DefaultStatsReceiver): TProtocolFactory = {
     binaryFactory(statsReceiver = statsReceiver)
   }
 
@@ -96,33 +101,39 @@ object Protocols {
     private val MultiByteMultiplierEstimate = 1.3f
 
     /** Only valid if unsafe is defined */
-    private val StringValueOffset: Long = unsafe.map {
-      _.objectFieldOffset(classOf[String].getDeclaredField("value"))
-    }.getOrElse(Long.MinValue)
+    private val StringValueOffset: Long = unsafe
+      .map {
+        _.objectFieldOffset(classOf[String].getDeclaredField("value"))
+      }
+      .getOrElse(Long.MinValue)
 
     /**
       * Note, some versions of the JDK's define `String.offset`,
       * while others do not and always use 0.
       */
-    private val OffsetValueOffset: Long = unsafe.map { u =>
-      try {
-        u.objectFieldOffset(classOf[String].getDeclaredField("offset"))
-      } catch {
-        case NonFatal(_) => Long.MinValue
+    private val OffsetValueOffset: Long = unsafe
+      .map { u =>
+        try {
+          u.objectFieldOffset(classOf[String].getDeclaredField("offset"))
+        } catch {
+          case NonFatal(_) => Long.MinValue
+        }
       }
-    }.getOrElse(Long.MinValue)
+      .getOrElse(Long.MinValue)
 
     /**
       * Note, some versions of the JDK's define `String.count`,
       * while others do not and always use `value.length`.
       */
-    private val CountValueOffset: Long = unsafe.map { u =>
-      try {
-        u.objectFieldOffset(classOf[String].getDeclaredField("count"))
-      } catch {
-        case NonFatal(_) => Long.MinValue
+    private val CountValueOffset: Long = unsafe
+      .map { u =>
+        try {
+          u.objectFieldOffset(classOf[String].getDeclaredField("count"))
+        } catch {
+          case NonFatal(_) => Long.MinValue
+        }
       }
-    }.getOrElse(Long.MinValue)
+      .getOrElse(Long.MinValue)
 
     private val charsetEncoder = new ThreadLocal[CharsetEncoder] {
       override def initialValue() = Charsets.UTF_8.newEncoder()
@@ -145,11 +156,12 @@ object Protocols {
     *
     * Visible for testing purposes.
     */
-  private[thrift] class TFinagleBinaryProtocol(trans: TTransport,
-                                               fastEncodeFailed: Counter,
-                                               largerThanTlOutBuffer: Counter,
-                                               strictRead: Boolean = false,
-                                               strictWrite: Boolean = true)
+  private[thrift] class TFinagleBinaryProtocol(
+      trans: TTransport,
+      fastEncodeFailed: Counter,
+      largerThanTlOutBuffer: Counter,
+      strictRead: Boolean = false,
+      strictWrite: Boolean = true)
       extends TBinaryProtocol(trans, strictRead, strictWrite) {
     import TFinagleBinaryProtocol._
 

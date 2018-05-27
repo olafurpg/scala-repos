@@ -22,8 +22,7 @@ class TableConstraintsTest {
     }
     var bars = TableQuery[Bar]
 
-    class T(tag: Tag)
-        extends Table[(Int, String, Long, Long)](tag, "t_table") {
+    class T(tag: Tag) extends Table[(Int, String, Long, Long)](tag, "t_table") {
       def id = column[Int]("id")
       def idIndex = index("idx_id", id)
 
@@ -46,16 +45,18 @@ class TableConstraintsTest {
     val ts = TableQuery[T]
 
     val foreignKeys = ts.baseTableRow.foreignKeys.map(_.name)
-    assertTrue("foreignKeys should be sorted by name",
-               foreignKeys == Seq("fk_bar", "fk_foo"))
+    assertTrue(
+      "foreignKeys should be sorted by name",
+      foreignKeys == Seq("fk_bar", "fk_foo"))
 
     val primaryKeys = ts.baseTableRow.primaryKeys.map(_.name)
-    assertTrue("primaryKeys should be sorted by name",
-               primaryKeys == Seq("pk1_t", "pk2_t"))
+    assertTrue(
+      "primaryKeys should be sorted by name",
+      primaryKeys == Seq("pk1_t", "pk2_t"))
 
     val indexes = ts.baseTableRow.indexes.map(_.name)
     assertTrue(
-        "indexes should be sorted by name",
-        indexes == Seq("idx_bar_id", "idx_code", "idx_foo_id", "idx_id"))
+      "indexes should be sorted by name",
+      indexes == Seq("idx_bar_id", "idx_code", "idx_foo_id", "idx_id"))
   }
 }

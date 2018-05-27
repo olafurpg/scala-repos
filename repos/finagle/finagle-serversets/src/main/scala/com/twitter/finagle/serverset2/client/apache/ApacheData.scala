@@ -21,29 +21,32 @@ private[serverset2] object ApacheData {
 
   object Stat {
     def apply(st: org.apache.zookeeper.data.Stat): Data.Stat =
-      Data.Stat(czxid = st.getCzxid,
-                mzxid = st.getMzxid,
-                ctime = st.getCtime,
-                mtime = st.getMtime,
-                version = st.getVersion,
-                cversion = st.getCversion,
-                aversion = st.getAversion,
-                ephemeralOwner = st.getEphemeralOwner,
-                dataLength = st.getDataLength,
-                numChildren = st.getNumChildren,
-                pzxid = st.getPzxid)
+      Data.Stat(
+        czxid = st.getCzxid,
+        mzxid = st.getMzxid,
+        ctime = st.getCtime,
+        mtime = st.getMtime,
+        version = st.getVersion,
+        cversion = st.getCversion,
+        aversion = st.getAversion,
+        ephemeralOwner = st.getEphemeralOwner,
+        dataLength = st.getDataLength,
+        numChildren = st.getNumChildren,
+        pzxid = st.getPzxid
+      )
 
     def zk(st: Data.Stat): org.apache.zookeeper.data.Stat =
-      new org.apache.zookeeper.data.Stat(st.czxid,
-                                         st.mzxid,
-                                         st.ctime,
-                                         st.mtime,
-                                         st.version,
-                                         st.cversion,
-                                         st.aversion,
-                                         st.ephemeralOwner,
-                                         st.dataLength,
-                                         st.numChildren,
-                                         st.pzxid)
+      new org.apache.zookeeper.data.Stat(
+        st.czxid,
+        st.mzxid,
+        st.ctime,
+        st.mtime,
+        st.version,
+        st.cversion,
+        st.aversion,
+        st.ephemeralOwner,
+        st.dataLength,
+        st.numChildren,
+        st.pzxid)
   }
 }

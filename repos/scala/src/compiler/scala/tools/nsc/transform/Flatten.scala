@@ -57,8 +57,9 @@ abstract class Flatten extends InfoTransform {
   private val flattened = new TypeMap {
     def apply(tp: Type): Type = tp match {
       case TypeRef(pre, sym, args) if isFlattenablePrefix(pre) =>
-        assert(args.isEmpty && sym.enclosingTopLevelClass != NoSymbol,
-               sym.ownerChain)
+        assert(
+          args.isEmpty && sym.enclosingTopLevelClass != NoSymbol,
+          sym.ownerChain)
         typeRef(sym.enclosingTopLevelClass.owner.thisType, sym, Nil)
       case ClassInfoType(parents, decls, clazz) =>
         var parents1 = parents
@@ -154,7 +155,8 @@ abstract class Flatten extends InfoTransform {
               val ref = gen.mkAttributedRef(sym)
               if (isQualifierSafeToElide(qual)) ref
               else
-                Block(List(qual), ref).setType(tree.tpe) // need to execute the qualifier but refer directly to the lifted module.
+                Block(List(qual), ref)
+                  .setType(tree.tpe) // need to execute the qualifier but refer directly to the lifted module.
             }
           }
         case _ =>
@@ -165,7 +167,8 @@ abstract class Flatten extends InfoTransform {
 
     /** Transform statements and add lifted definitions to them. */
     override def transformStats(
-        stats: List[Tree], exprOwner: Symbol): List[Tree] = {
+        stats: List[Tree],
+        exprOwner: Symbol): List[Tree] = {
       val stats1 = super.transformStats(stats, exprOwner)
       if (currentOwner.isPackageClass) {
         val lifted = liftedDefs.remove(currentOwner).toList.flatten

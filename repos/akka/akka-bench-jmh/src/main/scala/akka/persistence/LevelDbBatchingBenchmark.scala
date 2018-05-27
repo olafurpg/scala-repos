@@ -9,7 +9,10 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import akka.actor._
 import akka.persistence.journal.AsyncWriteTarget._
-import akka.persistence.journal.leveldb.{SharedLeveldbJournal, SharedLeveldbStore}
+import akka.persistence.journal.leveldb.{
+  SharedLeveldbJournal,
+  SharedLeveldbStore
+}
 import akka.testkit.TestProbe
 import org.apache.commons.io.FileUtils
 import org.openjdk.jmh.annotations._
@@ -105,10 +108,11 @@ class LevelDbBatchingBenchmark {
 
   private def deleteStorage(sys: ActorSystem) {
     val storageLocations =
-      List("akka.persistence.journal.leveldb.dir",
-           "akka.persistence.journal.leveldb-shared.store.dir",
-           "akka.persistence.snapshot-store.local.dir").map(
-          s ⇒ new File(sys.settings.config.getString(s)))
+      List(
+        "akka.persistence.journal.leveldb.dir",
+        "akka.persistence.journal.leveldb-shared.store.dir",
+        "akka.persistence.snapshot-store.local.dir").map(s ⇒
+        new File(sys.settings.config.getString(s)))
 
     storageLocations.foreach(FileUtils.deleteDirectory)
   }

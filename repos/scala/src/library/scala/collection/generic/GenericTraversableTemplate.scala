@@ -207,8 +207,8 @@ trait GenericTraversableTemplate[+A, +CC[X] <: GenTraversable[X]]
     *          are not of the same size.
     */
   @migration(
-      "`transpose` throws an `IllegalArgumentException` if collections are not uniformly sized.",
-      "2.9.0")
+    "`transpose` throws an `IllegalArgumentException` if collections are not uniformly sized.",
+    "2.9.0")
   def transpose[B](
       implicit asTraversable: A => /*<:<!!!*/ GenTraversableOnce[B])
     : CC[CC[B] @uncheckedVariance] = {
@@ -216,7 +216,7 @@ trait GenericTraversableTemplate[+A, +CC[X] <: GenTraversable[X]]
 
     def fail =
       throw new IllegalArgumentException(
-          "transpose requires all collections have the same size")
+        "transpose requires all collections have the same size")
 
     val headSize = asTraversable(head).size
     val bs: IndexedSeq[Builder[B, CC[B]]] =

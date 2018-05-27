@@ -25,7 +25,9 @@ import scala.collection.immutable.HashMap
 import scala.language.reflectiveCalls
 
 class BinaryVectorizerTest
-    extends FlatSpec with Matchers with SharedSparkContext
+    extends FlatSpec
+    with Matchers
+    with SharedSparkContext
     with BinaryVectorizerFixture {
 
   "toBinary" should "produce the following summed values:" in {

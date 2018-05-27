@@ -20,9 +20,10 @@ trait Authorizer extends Plugin {
     * @tparam Resource the type of the resource for action and resource.
     * @return true if the user is authorized to access the resource to do the defined action.
     */
-  def isAuthorized[Resource](principal: Identity,
-                             action: AuthorizedAction[Resource],
-                             resource: Resource): Boolean
+  def isAuthorized[Resource](
+      principal: Identity,
+      action: AuthorizedAction[Resource],
+      resource: Resource): Boolean
 
   /**
     * This method is called in the case that the identity is not authorized to access the resource.

@@ -9,11 +9,10 @@ import java.util.logging.{Level, Logger}
 case class MonitorException(
     handlingExc: Throwable,
     monitorExc: Throwable
-)
-    extends Exception(monitorExc) {
+) extends Exception(monitorExc) {
   override def getMessage =
     "threw exception \"" + monitorExc + "\" while handling " +
-    "another exception \"" + handlingExc + "\""
+      "another exception \"" + handlingExc + "\""
 }
 
 /**
@@ -37,7 +36,8 @@ trait Monitor { self =>
     * monitor.
     */
   def apply(f: => Unit): Unit = Monitor.using(this) {
-    try f catch { case exc: Throwable => if (!handle(exc)) throw exc }
+    try f
+    catch { case exc: Throwable => if (!handle(exc)) throw exc }
   }
 
   /**
@@ -100,7 +100,7 @@ object Monitor extends Monitor {
     */
   def get: Monitor = local() match {
     case Some(m) => m
-    case None => NullMonitor
+    case None    => NullMonitor
   }
 
   /** Set the [[Local]] monitor */
@@ -120,7 +120,8 @@ object Monitor extends Monitor {
   @inline
   def restoring[T](f: => T): T = {
     val saved = local()
-    try f finally local.set(saved)
+    try f
+    finally local.set(saved)
   }
 
   /**
@@ -137,7 +138,8 @@ object Monitor extends Monitor {
     * monitor.
     */
   override def apply(f: => Unit): Unit =
-    try f catch catcher
+    try f
+    catch catcher
 
   /**
     * Handle `exc` with the current [[Local]] monitor. If the
@@ -194,8 +196,8 @@ object RootMonitor extends Monitor {
       true /*NOTREACHED*/
 
     case e: Throwable =>
-      log.log(
-          Level.SEVERE, "Fatal exception propagated to the root monitor!", e)
+      log
+        .log(Level.SEVERE, "Fatal exception propagated to the root monitor!", e)
       false
   }
 

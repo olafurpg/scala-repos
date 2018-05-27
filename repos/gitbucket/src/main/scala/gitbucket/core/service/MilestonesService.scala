@@ -15,25 +15,28 @@ trait MilestonesService {
       description: Option[String],
       dueDate: Option[java.util.Date])(implicit s: Session): Unit =
     Milestones insert Milestone(
-        userName = owner,
-        repositoryName = repository,
-        title = title,
-        description = description,
-        dueDate = dueDate,
-        closedDate = None
+      userName = owner,
+      repositoryName = repository,
+      title = title,
+      description = description,
+      dueDate = dueDate,
+      closedDate = None
     )
 
   def updateMilestone(milestone: Milestone)(implicit s: Session): Unit =
     Milestones
-      .filter(t =>
-            t.byPrimaryKey(milestone.userName,
-                           milestone.repositoryName,
-                           milestone.milestoneId))
+      .filter(
+        t =>
+          t.byPrimaryKey(
+            milestone.userName,
+            milestone.repositoryName,
+            milestone.milestoneId))
       .map(t => (t.title, t.description.?, t.dueDate.?, t.closedDate.?))
-      .update(milestone.title,
-              milestone.description,
-              milestone.dueDate,
-              milestone.closedDate)
+      .update(
+        milestone.title,
+        milestone.description,
+        milestone.dueDate,
+        milestone.closedDate)
 
   def openMilestone(milestone: Milestone)(implicit s: Session): Unit =
     updateMilestone(milestone.copy(closedDate = None))
@@ -58,16 +61,21 @@ trait MilestonesService {
 
   def getMilestonesWithIssueCount(owner: String, repository: String)(
       implicit s: Session): List[(Milestone, Int, Int)] = {
-    val counts = Issues.filter { t =>
-      (t.byRepository(owner, repository)) && (t.milestoneId.? isDefined)
-    }.groupBy { t =>
-      t.milestoneId -> t.closed
-    }.map { case (t1, t2) => t1._1 -> t1._2 -> t2.length }.toMap
+    val counts = Issues
+      .filter { t =>
+        (t.byRepository(owner, repository)) && (t.milestoneId.? isDefined)
+      }
+      .groupBy { t =>
+        t.milestoneId -> t.closed
+      }
+      .map { case (t1, t2) => t1._1 -> t1._2 -> t2.length }
+      .toMap
 
     getMilestones(owner, repository).map { milestone =>
-      (milestone,
-       counts.getOrElse((milestone.milestoneId, false), 0),
-       counts.getOrElse((milestone.milestoneId, true), 0))
+      (
+        milestone,
+        counts.getOrElse((milestone.milestoneId, false), 0),
+        counts.getOrElse((milestone.milestoneId, true), 0))
     }
   }
 

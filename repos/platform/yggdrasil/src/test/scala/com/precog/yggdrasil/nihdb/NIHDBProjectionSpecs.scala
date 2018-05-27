@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -50,16 +50,20 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.ScheduledThreadPoolExecutor
 
 class NIHDBProjectionSpecs
-    extends Specification with ScalaCheck with FutureMatchers {
+    extends Specification
+    with ScalaCheck
+    with FutureMatchers {
   val actorSystem = ActorSystem("NIHDBActorSystem")
 
   val chef = actorSystem.actorOf(
-      Props(new Chef(VersionedCookedBlockFormat(Map(1 -> V1CookedBlockFormat)),
-                     VersionedSegmentFormat(Map(1 -> V1SegmentFormat)))))
+    Props(
+      new Chef(
+        VersionedCookedBlockFormat(Map(1 -> V1CookedBlockFormat)),
+        VersionedSegmentFormat(Map(1 -> V1SegmentFormat)))))
 
   val txLogScheduler = new ScheduledThreadPoolExecutor(
-      10,
-      (new ThreadFactoryBuilder()).setNameFormat("HOWL-sched-%03d").build())
+    10,
+    (new ThreadFactoryBuilder()).setNameFormat("HOWL-sched-%03d").build())
 
   implicit val M = new FutureMonad(actorSystem.dispatcher)
 
@@ -67,12 +71,13 @@ class NIHDBProjectionSpecs
 
   def newNihdb(workDir: File, threshold: Int = 1000): NIHDB =
     NIHDB
-      .create(chef,
-              authorities,
-              workDir,
-              threshold,
-              Duration(60, "seconds"),
-              txLogScheduler)(actorSystem)
+      .create(
+        chef,
+        authorities,
+        workDir,
+        threshold,
+        Duration(60, "seconds"),
+        txLogScheduler)(actorSystem)
       .unsafePerformIO
       .valueOr { e =>
         throw new Exception(e.message)
@@ -89,8 +94,8 @@ class NIHDBProjectionSpecs
   assert(baseDir.isDirectory && baseDir.canWrite)
 
   trait TempContext {
-    val workDir = new File(
-        baseDir, "nihdbspec%03d".format(dirSeq.getAndIncrement))
+    val workDir =
+      new File(baseDir, "nihdbspec%03d".format(dirSeq.getAndIncrement))
 
     if (!workDir.mkdirs) {
       throw new Exception("Failed to create work directory! " + workDir)
@@ -148,7 +153,8 @@ class NIHDBProjectionSpecs
             min mustEqual 0L
             max mustEqual 0L
             data.size mustEqual 3
-            data.toJsonElements.map(_ ("value")) must containAllOf(expected).only.inOrder
+            data.toJsonElements
+              .map(_("value")) must containAllOf(expected).only.inOrder
         })
     }
 
@@ -164,9 +170,9 @@ class NIHDBProjectionSpecs
           nihdb.insert((0L to 2L).toSeq.map { i =>
             NIHDB.Batch(i, Seq(JNum(i)))
           }) >> // Ensure we handle skips/overlap properly. First tests a complete skip, second tests partial
-          nihdb.insert((0L to 2L).toSeq.map { i =>
-            NIHDB.Batch(i, Seq(JNum(i)))
-          }) >> nihdb.insert((0L to 4L).toSeq.map { i =>
+            nihdb.insert((0L to 2L).toSeq.map { i =>
+              NIHDB.Batch(i, Seq(JNum(i)))
+            }) >> nihdb.insert((0L to 4L).toSeq.map { i =>
             NIHDB.Batch(i, Seq(JNum(i)))
           })
 
@@ -186,7 +192,7 @@ class NIHDBProjectionSpecs
               min mustEqual 0L
               max mustEqual 0L
               data.size mustEqual 5
-              data.toJsonElements.map(_ ("value")) must containAllOf(expected).only.inOrder
+              data.toJsonElements.map(_("value")) must containAllOf(expected).only.inOrder
           }
         }
     }
@@ -201,7 +207,7 @@ class NIHDBProjectionSpecs
         .map(JNum(_))
         .toSeq
 
-        (0L to 1950L).map(JNum(_)).grouped(400).zipWithIndex foreach {
+      (0L to 1950L).map(JNum(_)).grouped(400).zipWithIndex foreach {
         case (values, id) =>
           nihdb.insert(Seq(NIHDB.Batch(id.toLong, values))).unsafePerformIO
       }
@@ -228,19 +234,20 @@ class NIHDBProjectionSpecs
       }
 
       result must awaited(maxDuration)(beLike {
-        case (Some(BlockProjectionData(min1, max1, data1)),
-              Some(BlockProjectionData(min2, max2, data2))) =>
+        case (
+            Some(BlockProjectionData(min1, max1, data1)),
+            Some(BlockProjectionData(min2, max2, data2))) =>
           min1 mustEqual 0L
           max1 mustEqual 0L
           data1.size mustEqual 1200
-          data1.toJsonElements.map(_ ("value")) must containAllOf(
-              expected.take(1200)).only.inOrder
+          data1.toJsonElements.map(_("value")) must containAllOf(
+            expected.take(1200)).only.inOrder
 
           min2 mustEqual 1L
           max2 mustEqual 1L
           data2.size mustEqual 751
-          data2.toJsonElements.map(_ ("value")) must containAllOf(
-              expected.drop(1200)).only.inOrder
+          data2.toJsonElements.map(_("value")) must containAllOf(
+            expected.drop(1200)).only.inOrder
       })
     }
   }

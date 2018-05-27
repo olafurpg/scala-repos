@@ -9,7 +9,7 @@ import org.junit.runner.RunWith
 class CloseNotifierTest extends FunSuite {
 
   test(
-      "CloseNotifier should invoke onClose handlers in reverse order of adding") {
+    "CloseNotifier should invoke onClose handlers in reverse order of adding") {
     val closing = new Promise[Unit]
     val notifier = CloseNotifier.makeLifo(closing)
     var invocations: List[Int] = Nil
@@ -25,7 +25,7 @@ class CloseNotifierTest extends FunSuite {
   }
 
   test(
-      "CloseNotifier should invoke onClose handler immediately if close event already happened") {
+    "CloseNotifier should invoke onClose handler immediately if close event already happened") {
     val closing = new Promise[Unit]
     val notifier = CloseNotifier.makeLifo(closing)
 

@@ -23,7 +23,10 @@ import scala.xml.Node
 
 import org.json4s.JValue
 
-import org.apache.spark.deploy.DeployMessages.{RequestWorkerState, WorkerStateResponse}
+import org.apache.spark.deploy.DeployMessages.{
+  RequestWorkerState,
+  WorkerStateResponse
+}
 import org.apache.spark.deploy.JsonProtocol
 import org.apache.spark.deploy.master.DriverState
 import org.apache.spark.deploy.worker.{DriverRunner, ExecutorRunner}
@@ -43,8 +46,8 @@ private[ui] class WorkerPage(parent: WorkerWebUI) extends WebUIPage("") {
     val workerState =
       workerEndpoint.askWithRetry[WorkerStateResponse](RequestWorkerState)
 
-    val executorHeaders = Seq(
-        "ExecutorID", "Cores", "State", "Memory", "Job Details", "Logs")
+    val executorHeaders =
+      Seq("ExecutorID", "Cores", "State", "Memory", "Job Details", "Logs")
     val runningExecutors = workerState.executors
     val runningExecutorTable =
       UIUtils.listingTable(executorHeaders, executorRow, runningExecutors)
@@ -52,8 +55,8 @@ private[ui] class WorkerPage(parent: WorkerWebUI) extends WebUIPage("") {
     val finishedExecutorTable =
       UIUtils.listingTable(executorHeaders, executorRow, finishedExecutors)
 
-    val driverHeaders = Seq(
-        "DriverID", "Main Class", "State", "Cores", "Memory", "Logs", "Notes")
+    val driverHeaders =
+      Seq("DriverID", "Main Class", "State", "Cores", "Memory", "Logs", "Notes")
     val runningDrivers = workerState.drivers.sortBy(_.driverId).reverse
     val runningDriverTable =
       UIUtils.listingTable(driverHeaders, driverRow, runningDrivers)
@@ -104,8 +107,8 @@ private[ui] class WorkerPage(parent: WorkerWebUI) extends WebUIPage("") {
         </div>
       </div>;
     UIUtils.basicSparkPage(
-        content,
-        "Spark Worker at %s:%s".format(workerState.host, workerState.port))
+      content,
+      "Spark Worker at %s:%s".format(workerState.host, workerState.port))
   }
 
   def executorRow(executor: ExecutorRunner): Seq[Node] = {

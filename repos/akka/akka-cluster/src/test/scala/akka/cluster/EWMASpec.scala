@@ -12,7 +12,8 @@ import java.util.concurrent.ThreadLocalRandom
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class EWMASpec
-    extends AkkaSpec(MetricsEnabledSpec.config) with MetricsCollectorFactory {
+    extends AkkaSpec(MetricsEnabledSpec.config)
+    with MetricsCollectorFactory {
 
   val collector = createMetricsCollector
 
@@ -59,7 +60,7 @@ class EWMASpec
       val collectInterval = 1.second
       val halfLifeDuration = (halfLife * 1000).millis
       EWMA.alpha(halfLifeDuration, collectInterval) should ===(
-          expectedAlpha +- 0.001)
+        expectedAlpha +- 0.001)
     }
 
     "calculate sane alpha from short half-life" in {
@@ -83,7 +84,7 @@ class EWMASpec
         // wait a while between each message to give the metrics a chance to change
         Thread.sleep(100)
         usedMemory = usedMemory ++ Array.fill(1024)(
-            ThreadLocalRandom.current.nextInt(127).toByte)
+          ThreadLocalRandom.current.nextInt(127).toByte)
         val changes = collector.sample.metrics.flatMap { latest ⇒
           streamingDataSet.get(latest.name) match {
             case None ⇒ Some(latest)

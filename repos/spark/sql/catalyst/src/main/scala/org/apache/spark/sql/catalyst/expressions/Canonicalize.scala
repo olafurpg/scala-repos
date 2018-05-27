@@ -49,7 +49,7 @@ object Canonicalize extends {
       f: PartialFunction[Expression, Seq[Expression]]): Seq[Expression] =
     e match {
       case c if f.isDefinedAt(c) => f(c).flatMap(gatherCommutative(_, f))
-      case other => other :: Nil
+      case other                 => other :: Nil
     }
 
   /** Orders a set of commutative operations by their hash code. */
@@ -71,7 +71,7 @@ object Canonicalize extends {
       EqualNullSafe(r, l)
 
     case GreaterThan(l, r) if l.hashCode() > r.hashCode() => LessThan(r, l)
-    case LessThan(l, r) if l.hashCode() > r.hashCode() => GreaterThan(r, l)
+    case LessThan(l, r) if l.hashCode() > r.hashCode()    => GreaterThan(r, l)
 
     case GreaterThanOrEqual(l, r) if l.hashCode() > r.hashCode() =>
       LessThanOrEqual(r, l)

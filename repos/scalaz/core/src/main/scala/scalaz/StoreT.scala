@@ -23,15 +23,15 @@ final case class IndexedStoreT[F[_], +I, A, B](run: (F[A => B], I)) {
   def contramap[X](g: X => A)(implicit F: Functor[F]) =
     indexedStoreT((F.map(set)(_ compose g), pos))
 
-  def bimap[X, Y](f: I => X)(
-      g: B => Y)(implicit F: Functor[F]): IndexedStoreT[F, X, A, Y] =
+  def bimap[X, Y](f: I => X)(g: B => Y)(
+      implicit F: Functor[F]): IndexedStoreT[F, X, A, Y] =
     indexedStoreT((F.map(set)(g compose _), f(pos)))
 
   def leftMap[X](f: I => X): IndexedStoreT[F, X, A, B] =
     imap(f)
 
   def put(a: A)(implicit F: Functor[F]): F[B] =
-    F.map(run._1)(_ (a))
+    F.map(run._1)(_(a))
 
   def puts(f: I => A)(implicit F: Functor[F]): F[B] =
     put(f(pos))
@@ -54,8 +54,8 @@ final case class IndexedStoreT[F[_], +I, A, B](run: (F[A => B], I)) {
   def seeks[J](f: I => J): IndexedStoreT[F, J, A, B] =
     indexedStoreT((set, f(pos)))
 
-  def experiment[G[_]](f: I => G[A])(
-      implicit F: Comonad[F], G: Functor[G]): G[B] =
+  def experiment[G[_]](
+      f: I => G[A])(implicit F: Comonad[F], G: Functor[G]): G[B] =
     G.map(f(pos))(F.copoint(set))
 
   def copoint(implicit F: Comonad[F], ev: I <:< A): B =
@@ -67,23 +67,21 @@ final case class IndexedStoreT[F[_], +I, A, B](run: (F[A => B], I)) {
   def duplicate[J](implicit F: Comonad[F])
     : IndexedStoreT[F, I, J, IndexedStoreT[F, J, A, B]] =
     indexedStoreT(
-        (F.cobind(run._1)(ff => (a: J) => indexedStoreT((ff, a))), pos))
+      (F.cobind(run._1)(ff => (a: J) => indexedStoreT((ff, a))), pos))
 
   def cobind[K, C](f: IndexedStoreT[F, K, A, B] => C)(
       implicit F: Cobind[F]): IndexedStoreT[F, I, K, C] =
     indexedStoreT(
-        (F.cobind(run._1)(ff => (a: K) => f(indexedStoreT((ff, a)))), pos))
+      (F.cobind(run._1)(ff => (a: K) => f(indexedStoreT((ff, a)))), pos))
 
   /** Two disjoint lenses can be paired */
   def product[J, C, D](that: IndexedStoreT[F, J, C, D])(
       implicit M: Bind[F]): IndexedStoreT[F, (I, J), (A, C), (B, D)] =
     IndexedStoreT(M.bind(set) { s =>
-                    M.map(that.set)(t =>
-                          { (ac: (A, C)) =>
-                        (s(ac._1), t(ac._2))
-                    })
-                  },
-                  (pos, that.pos))
+      M.map(that.set)(t => { (ac: (A, C)) =>
+        (s(ac._1), t(ac._2))
+      })
+    }, (pos, that.pos))
 
   /** alias for `product` */
   def ***[J, C, D](that: IndexedStoreT[F, J, C, D])(
@@ -121,8 +119,8 @@ sealed abstract class IndexedStoreTInstances2 {
     }
 }
 sealed abstract class IndexedStoreTInstances1 extends IndexedStoreTInstances2 {
-  implicit def indexedStoreTFunctorLeft[F[_], A, B]: Functor[IndexedStoreT[
-          F, ?, A, B]] =
+  implicit def indexedStoreTFunctorLeft[F[_], A, B]
+    : Functor[IndexedStoreT[F, ?, A, B]] =
     new IndexedStoreTFunctorLeft[F, A, B] {}
 }
 sealed abstract class IndexedStoreTInstances0 extends IndexedStoreTInstances1 {
@@ -189,7 +187,8 @@ private trait IndexedStoreTBifunctor[F[_], A0]
     extends Bifunctor[IndexedStoreT[F, ?, A0, ?]] {
   implicit def F: Functor[F]
   override def bimap[A, B, C, D](fab: IndexedStoreT[F, A, A0, B])(
-      f: A => C, g: B => D): IndexedStoreT[F, C, A0, D] = (fab bimap f)(g)
+      f: A => C,
+      g: B => D): IndexedStoreT[F, C, A0, D] = (fab bimap f)(g)
 }
 
 private trait StoreTCobind[F[_], A0]
@@ -201,14 +200,16 @@ private trait StoreTCobind[F[_], A0]
 }
 
 private trait StoreTComonad[F[_], A0]
-    extends Comonad[StoreT[F, A0, ?]] with StoreTCobind[F, A0] {
+    extends Comonad[StoreT[F, A0, ?]]
+    with StoreTCobind[F, A0] {
   implicit def F: Comonad[F]
   override def cojoin[A](a: StoreT[F, A0, A]) = a.duplicate
   def copoint[A](p: StoreT[F, A0, A]) = p.copoint
 }
 
 private trait StoreTComonadStore[F[_], S]
-    extends ComonadStore[StoreT[F, S, ?], S] with StoreTComonad[F, S] {
+    extends ComonadStore[StoreT[F, S, ?], S]
+    with StoreTComonad[F, S] {
   def pos[A](w: StoreT[F, S, A]): S = w.pos
   def peek[A](s: S, w: StoreT[F, S, A]): A = w peek s
   override def peeks[A](s: S => S, w: StoreT[F, S, A]): A = w peeks s

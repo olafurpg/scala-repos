@@ -20,7 +20,7 @@ private[pickling] sealed trait AlgorithmResult {
     : AlgorithmResult =
     this match {
       case AlgorithmSucccess(i) => AlgorithmSucccess(f(i))
-      case x => x
+      case x                    => x
     }
 }
 private[pickling] final case class AlgorithmSucccess(
@@ -59,7 +59,7 @@ private[pickling] object PicklingAlgorithm {
       case AlgorithmFailure(failures) =>
         val fString = failures.mkString("\n - ", "\n - ", "\n")
         logger.error(
-            s"Unable to generate pickling/unpickling implementation for $tpe.\n$fString")
+          s"Unable to generate pickling/unpickling implementation for $tpe.\n$fString")
         None
     }
   }
@@ -78,12 +78,13 @@ private[pickling] object PicklingAlgorithm {
         * Attempts to construct pickling logic for a given type.
         */
       override def generate(
-          tpe: IrClass, logger: AlgorithmLogger): AlgorithmResult =
+          tpe: IrClass,
+          logger: AlgorithmLogger): AlgorithmResult =
         algs.foldLeft(AlgorithmFailure(List()): AlgorithmResult) {
           (prev, next) =>
             prev match {
               case x: AlgorithmSucccess => x
-              case y: AlgorithmFailure =>
+              case y: AlgorithmFailure  =>
                 //logger.debug(s"Trying algorithm: $next on $tpe")
                 y join next.generate(tpe, logger)
             }

@@ -11,7 +11,7 @@ object FileUtil {
   def getMimeType(name: String): String =
     defining(new Tika()) { tika =>
       tika.detect(name) match {
-        case null => "application/octet-stream"
+        case null     => "application/octet-stream"
         case mimeType => mimeType
       }
     }
@@ -41,7 +41,7 @@ object FileUtil {
   def getExtension(name: String): String =
     name.lastIndexOf('.') match {
       case i if (i >= 0) => name.substring(i + 1)
-      case _ => ""
+      case _             => ""
     }
 
   def withTmpDir[A](dir: File)(action: File => A): A = {
@@ -56,12 +56,13 @@ object FileUtil {
   }
 
   val mimeTypeWhiteList: Array[String] = Array(
-      "application/pdf",
-      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      "image/gif",
-      "image/jpeg",
-      "image/png",
-      "text/plain")
+    "application/pdf",
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "image/gif",
+    "image/jpeg",
+    "image/png",
+    "text/plain"
+  )
 }

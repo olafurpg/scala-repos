@@ -4,7 +4,7 @@ object test3 {
   case object StringType extends Type[String];
 
   def f[T](t: Type[T]): T = t match {
-    case IntType => 10;
+    case IntType    => 10;
     case StringType => "hello";
   }
 }

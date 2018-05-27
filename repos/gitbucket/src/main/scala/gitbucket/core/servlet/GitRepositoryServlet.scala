@@ -24,7 +24,7 @@ import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 
 /**
   * Provides Git repository via HTTP.
-  * 
+  *
   * This servlet provides only Git repository functionality.
   * Authentication is provided by [[BasicAuthenticationFilter]].
   */
@@ -36,21 +36,23 @@ class GitRepositoryServlet extends GitServlet with SystemSettingsService {
     setReceivePackFactory(new GitBucketReceivePackFactory())
 
     val root: File = new File(Directory.RepositoryHome)
-    setRepositoryResolver(new GitBucketRepositoryResolver(
-            new FileResolver[HttpServletRequest](root, true)))
+    setRepositoryResolver(
+      new GitBucketRepositoryResolver(
+        new FileResolver[HttpServletRequest](root, true)))
 
     super.init(config)
   }
 
   override def service(
-      req: HttpServletRequest, res: HttpServletResponse): Unit = {
+      req: HttpServletRequest,
+      res: HttpServletResponse): Unit = {
     val agent = req.getHeader("USER-AGENT")
     val index = req.getRequestURI.indexOf(".git")
     if (index >= 0 && (agent == null || agent.toLowerCase.indexOf("git/") < 0)) {
       // redirect for browsers
       val paths = req.getRequestURI.substring(0, index).split("/")
       res.sendRedirect(
-          baseUrl(req) + "/" + paths.dropRight(1).last + "/" + paths.last)
+        baseUrl(req) + "/" + paths.dropRight(1).last + "/" + paths.last)
     } else {
       // response for git client
       super.service(req, res)
@@ -62,7 +64,8 @@ class GitBucketRepositoryResolver(parent: FileResolver[HttpServletRequest])
     extends RepositoryResolver[HttpServletRequest] {
 
   private val resolver = new FileResolver[HttpServletRequest](
-      new File(Directory.GitBucketHome), true)
+    new File(Directory.GitBucketHome),
+    true)
 
   override def open(req: HttpServletRequest, name: String): Repository = {
     // Rewrite repository path if routing is marched
@@ -80,13 +83,15 @@ class GitBucketRepositoryResolver(parent: FileResolver[HttpServletRequest])
 }
 
 class GitBucketReceivePackFactory
-    extends ReceivePackFactory[HttpServletRequest] with SystemSettingsService {
+    extends ReceivePackFactory[HttpServletRequest]
+    with SystemSettingsService {
 
   private val logger =
     LoggerFactory.getLogger(classOf[GitBucketReceivePackFactory])
 
   override def create(
-      request: HttpServletRequest, db: Repository): ReceivePack = {
+      request: HttpServletRequest,
+      db: Repository): ReceivePack = {
     val receivePack = new ReceivePack(db)
 
     if (PluginRegistry()
@@ -121,28 +126,38 @@ class GitBucketReceivePackFactory
 import scala.collection.JavaConverters._
 
 class CommitLogHook(
-    owner: String, repository: String, pusher: String, baseUrl: String)(
-    implicit session: Session)
-    extends PostReceiveHook with PreReceiveHook with RepositoryService
-    with AccountService with IssuesService with ActivityService
-    with PullRequestService with WebHookService with WebHookPullRequestService
+    owner: String,
+    repository: String,
+    pusher: String,
+    baseUrl: String)(implicit session: Session)
+    extends PostReceiveHook
+    with PreReceiveHook
+    with RepositoryService
+    with AccountService
+    with IssuesService
+    with ActivityService
+    with PullRequestService
+    with WebHookService
+    with WebHookPullRequestService
     with ProtectedBranchService {
 
   private val logger = LoggerFactory.getLogger(classOf[CommitLogHook])
   private var existIds: Seq[String] = Nil
 
-  def onPreReceive(receivePack: ReceivePack,
-                   commands: java.util.Collection[ReceiveCommand]): Unit = {
+  def onPreReceive(
+      receivePack: ReceivePack,
+      commands: java.util.Collection[ReceiveCommand]): Unit = {
     try {
       commands.asScala.foreach { command =>
         // call pre-commit hook
         PluginRegistry().getReceiveHooks
           .flatMap(
-              _.preReceive(owner, repository, receivePack, command, pusher))
+            _.preReceive(owner, repository, receivePack, command, pusher))
           .headOption
           .foreach { error =>
-            command.setResult(ReceiveCommand.Result.REJECTED_OTHER_REASON,
-                              error)
+            command.setResult(
+              ReceiveCommand.Result.REJECTED_OTHER_REASON,
+              error)
           }
       }
       using(Git.open(Directory.getRepositoryDir(owner, repository))) { git =>
@@ -150,20 +165,21 @@ class CommitLogHook(
       }
     } catch {
       case ex: Exception => {
-          logger.error(ex.toString, ex)
-          throw ex
-        }
+        logger.error(ex.toString, ex)
+        throw ex
+      }
     }
   }
 
-  def onPostReceive(receivePack: ReceivePack,
-                    commands: java.util.Collection[ReceiveCommand]): Unit = {
+  def onPostReceive(
+      receivePack: ReceivePack,
+      commands: java.util.Collection[ReceiveCommand]): Unit = {
     try {
       using(Git.open(Directory.getRepositoryDir(owner, repository))) { git =>
         val pushedIds = scala.collection.mutable.Set[String]()
         commands.asScala.foreach { command =>
           logger.debug(
-              s"commandType: ${command.getType}, refName: ${command.getRefName}")
+            s"commandType: ${command.getType}, refName: ${command.getRefName}")
           implicit val apiContext = api.JsonFormat.Context(baseUrl)
           val refName = command.getRefName.split("/")
           val branchName = refName.drop(2).mkString("/")
@@ -175,18 +191,22 @@ class CommitLogHook(
                 case ReceiveCommand.Type.DELETE => Nil
                 case _ =>
                   JGitUtil.getCommitLog(
-                      git, command.getOldId.name, command.getNewId.name)
+                    git,
+                    command.getOldId.name,
+                    command.getNewId.name)
               }
             }
 
           // Retrieve all issue count in the repository
           val issueCount =
-            countIssue(IssueSearchCondition(state = "open"),
-                       false,
-                       owner -> repository) +
-            countIssue(IssueSearchCondition(state = "closed"),
-                       false,
-                       owner -> repository)
+            countIssue(
+              IssueSearchCondition(state = "open"),
+              false,
+              owner -> repository) +
+              countIssue(
+                IssueSearchCondition(state = "closed"),
+                false,
+                owner -> repository)
 
           val repositoryInfo = getRepository(owner, repository).get
 
@@ -202,7 +222,10 @@ class CommitLogHook(
                 if (refName(1) == "heads" && branchName == defaultBranch &&
                     command.getType == ReceiveCommand.Type.UPDATE) {
                   closeIssuesFromMessage(
-                      commit.fullMessage, pusher, owner, repository)
+                    commit.fullMessage,
+                    pusher,
+                    owner,
+                    repository)
                 }
               }
               Some(commit)
@@ -214,23 +237,41 @@ class CommitLogHook(
             command.getType match {
               case ReceiveCommand.Type.CREATE =>
                 recordCreateBranchActivity(
-                    owner, repository, pusher, branchName)
+                  owner,
+                  repository,
+                  pusher,
+                  branchName)
               case ReceiveCommand.Type.UPDATE =>
                 recordPushActivity(
-                    owner, repository, pusher, branchName, newCommits)
+                  owner,
+                  repository,
+                  pusher,
+                  branchName,
+                  newCommits)
               case ReceiveCommand.Type.DELETE =>
                 recordDeleteBranchActivity(
-                    owner, repository, pusher, branchName)
+                  owner,
+                  repository,
+                  pusher,
+                  branchName)
               case _ =>
             }
           } else if (refName(1) == "tags") {
             command.getType match {
               case ReceiveCommand.Type.CREATE =>
                 recordCreateTagActivity(
-                    owner, repository, pusher, branchName, newCommits)
+                  owner,
+                  repository,
+                  pusher,
+                  branchName,
+                  newCommits)
               case ReceiveCommand.Type.DELETE =>
                 recordDeleteTagActivity(
-                    owner, repository, pusher, branchName, newCommits)
+                  owner,
+                  repository,
+                  pusher,
+                  branchName,
+                  newCommits)
               case _ =>
             }
           }
@@ -241,11 +282,12 @@ class CommitLogHook(
                   ReceiveCommand.Type.UPDATE_NONFASTFORWARD =>
                 updatePullRequests(owner, repository, branchName)
                 getAccountByUserName(pusher).map { pusherAccount =>
-                  callPullRequestWebHookByRequestBranch("synchronize",
-                                                        repositoryInfo,
-                                                        branchName,
-                                                        baseUrl,
-                                                        pusherAccount)
+                  callPullRequestWebHookByRequestBranch(
+                    "synchronize",
+                    repositoryInfo,
+                    branchName,
+                    baseUrl,
+                    pusherAccount)
                 }
               case _ =>
             }
@@ -254,30 +296,31 @@ class CommitLogHook(
           // call web hook
           callWebHookOf(owner, repository, WebHook.Push) {
             for (pusherAccount <- getAccountByUserName(pusher);
-            ownerAccount <- getAccountByUserName(owner)) yield {
-              WebHookPushPayload(git,
-                                 pusherAccount,
-                                 command.getRefName,
-                                 repositoryInfo,
-                                 newCommits,
-                                 ownerAccount,
-                                 newId = command.getNewId(),
-                                 oldId = command.getOldId())
+                 ownerAccount <- getAccountByUserName(owner)) yield {
+              WebHookPushPayload(
+                git,
+                pusherAccount,
+                command.getRefName,
+                repositoryInfo,
+                newCommits,
+                ownerAccount,
+                newId = command.getNewId(),
+                oldId = command.getOldId())
             }
           }
 
           // call post-commit hook
           PluginRegistry().getReceiveHooks.foreach(
-              _.postReceive(owner, repository, receivePack, command, pusher))
+            _.postReceive(owner, repository, receivePack, command, pusher))
         }
       }
       // update repository last modified time.
       updateLastActivityDate(owner, repository)
     } catch {
       case ex: Exception => {
-          logger.error(ex.toString, ex)
-          throw ex
-        }
+        logger.error(ex.toString, ex)
+        throw ex
+      }
     }
   }
 }

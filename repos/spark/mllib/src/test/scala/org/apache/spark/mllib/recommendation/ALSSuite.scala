@@ -29,32 +29,35 @@ import org.apache.spark.storage.StorageLevel
 
 object ALSSuite {
 
-  def generateRatingsAsJava(users: Int,
-                            products: Int,
-                            features: Int,
-                            samplingRate: Double,
-                            implicitPrefs: Boolean,
-                            negativeWeights: Boolean)
+  def generateRatingsAsJava(
+      users: Int,
+      products: Int,
+      features: Int,
+      samplingRate: Double,
+      implicitPrefs: Boolean,
+      negativeWeights: Boolean)
     : (java.util.List[Rating], Array[Double], Array[Double]) = {
     val (sampledRatings, trueRatings, truePrefs) = generateRatings(
-        users,
-        products,
-        features,
-        samplingRate,
-        implicitPrefs,
-        negativeWeights)
-    (sampledRatings.asJava,
-     trueRatings.toArray,
-     if (truePrefs == null) null else truePrefs.toArray)
+      users,
+      products,
+      features,
+      samplingRate,
+      implicitPrefs,
+      negativeWeights)
+    (
+      sampledRatings.asJava,
+      trueRatings.toArray,
+      if (truePrefs == null) null else truePrefs.toArray)
   }
 
-  def generateRatings(users: Int,
-                      products: Int,
-                      features: Int,
-                      samplingRate: Double,
-                      implicitPrefs: Boolean = false,
-                      negativeWeights: Boolean = false,
-                      negativeFactors: Boolean = true)
+  def generateRatings(
+      users: Int,
+      products: Int,
+      features: Int,
+      samplingRate: Double,
+      implicitPrefs: Boolean = false,
+      negativeWeights: Boolean = false,
+      negativeFactors: Boolean = true)
     : (Seq[Rating], BDM[Double], BDM[Double]) = {
     val rand = new Random(42)
 
@@ -73,12 +76,12 @@ object ALSSuite {
       if (implicitPrefs) {
         // Generate raw values from [0,9], or if negativeWeights, from [-2,7]
         val raw = new BDM(
-            users,
-            products,
-            Array.fill(users * products)(
-                (if (negativeWeights) -2 else 0) + rand.nextInt(10).toDouble))
-        val prefs = new BDM(
-            users, products, raw.data.map(v => if (v > 0) 1.0 else 0.0))
+          users,
+          products,
+          Array.fill(users * products)(
+            (if (negativeWeights) -2 else 0) + rand.nextInt(10).toDouble))
+        val prefs =
+          new BDM(users, products, raw.data.map(v => if (v > 0) 1.0 else 0.0))
         (raw, prefs)
       } else {
         (userMatrix * productMatrix, null)
@@ -86,8 +89,8 @@ object ALSSuite {
 
     val sampledRatings = {
       for (u <- 0 until users; p <- 0 until products
-                                       if rand.nextDouble() < samplingRate) yield
-        Rating(u, p, trueRatings(u, p))
+           if rand.nextDouble() < samplingRate)
+        yield Rating(u, p, trueRatings(u, p))
     }
 
     (sampledRatings, trueRatings, truePrefs)
@@ -138,7 +141,8 @@ class ALSSuite extends SparkFunSuite with MLlibTestSparkContext {
 
   test("pseudorandomness") {
     val ratings = sc.parallelize(
-        ALSSuite.generateRatings(10, 20, 5, 0.5, false, false)._1, 2)
+      ALSSuite.generateRatings(10, 20, 5, 0.5, false, false)._1,
+      2)
     val model11 = ALS.train(ratings, 5, 1, 1.0, 2, 1)
     val model12 = ALS.train(ratings, 5, 1, 1.0, 2, 1)
     val u11 = model11.userFeatures.values.flatMap(_.toList).collect().toList
@@ -151,7 +155,8 @@ class ALSSuite extends SparkFunSuite with MLlibTestSparkContext {
 
   test("Storage Level for RDDs in model") {
     val ratings = sc.parallelize(
-        ALSSuite.generateRatings(10, 20, 5, 0.5, false, false)._1, 2)
+      ALSSuite.generateRatings(10, 20, 5, 0.5, false, false)._1,
+      2)
     var storageLevel = StorageLevel.MEMORY_ONLY
     var model = new ALS()
       .setRank(5)
@@ -217,28 +222,29 @@ class ALSSuite extends SparkFunSuite with MLlibTestSparkContext {
     * @param negativeFactors whether the generated user/product factors can have negative entries
     */
   // scalastyle:off
-  def testALS(users: Int,
-              products: Int,
-              features: Int,
-              iterations: Int,
-              samplingRate: Double,
-              matchThreshold: Double,
-              implicitPrefs: Boolean = false,
-              bulkPredict: Boolean = false,
-              negativeWeights: Boolean = false,
-              numUserBlocks: Int = -1,
-              numProductBlocks: Int = -1,
-              negativeFactors: Boolean = true) {
+  def testALS(
+      users: Int,
+      products: Int,
+      features: Int,
+      iterations: Int,
+      samplingRate: Double,
+      matchThreshold: Double,
+      implicitPrefs: Boolean = false,
+      bulkPredict: Boolean = false,
+      negativeWeights: Boolean = false,
+      numUserBlocks: Int = -1,
+      numProductBlocks: Int = -1,
+      negativeFactors: Boolean = true) {
     // scalastyle:on
 
     val (sampledRatings, trueRatings, truePrefs) = ALSSuite.generateRatings(
-        users,
-        products,
-        features,
-        samplingRate,
-        implicitPrefs,
-        negativeWeights,
-        negativeFactors)
+      users,
+      products,
+      features,
+      samplingRate,
+      implicitPrefs,
+      negativeWeights,
+      negativeFactors)
 
     val model = new ALS()
       .setUserBlocks(numUserBlocks)
@@ -263,8 +269,8 @@ class ALSSuite extends SparkFunSuite with MLlibTestSparkContext {
     val predictedRatings =
       if (bulkPredict) {
         val allRatings = new BDM[Double](users, products)
-        val usersProducts = for (u <- 0 until users; p <- 0 until products) yield
-          (u, p)
+        val usersProducts = for (u <- 0 until users; p <- 0 until products)
+          yield (u, p)
         val userProductsRDD = sc.parallelize(usersProducts)
         model.predict(userProductsRDD).collect().foreach { elem =>
           allRatings(elem.user, elem.product) = elem.rating
@@ -280,15 +286,16 @@ class ALSSuite extends SparkFunSuite with MLlibTestSparkContext {
         val correct = trueRatings(u, p)
         if (math.abs(prediction - correct) > matchThreshold) {
           fail(
-              ("Model failed to predict (%d, %d): %f vs %f\ncorr: %s\npred: %s\nU: %s\n P: %s")
-                .format(u,
-                        p,
-                        correct,
-                        prediction,
-                        trueRatings,
-                        predictedRatings,
-                        predictedU,
-                        predictedP))
+            ("Model failed to predict (%d, %d): %f vs %f\ncorr: %s\npred: %s\nU: %s\n P: %s")
+              .format(
+                u,
+                p,
+                correct,
+                prediction,
+                trueRatings,
+                predictedRatings,
+                predictedU,
+                predictedP))
         }
       }
     } else {
@@ -307,9 +314,8 @@ class ALSSuite extends SparkFunSuite with MLlibTestSparkContext {
       val rmse = math.sqrt(sqErr / denom)
       if (rmse > matchThreshold) {
         fail(
-            "Model failed to predict RMSE: %f\ncorr: %s\npred: %s\nU: %s\n P: %s"
-              .format(
-                rmse, truePrefs, predictedRatings, predictedU, predictedP))
+          "Model failed to predict RMSE: %f\ncorr: %s\npred: %s\nU: %s\n P: %s"
+            .format(rmse, truePrefs, predictedRatings, predictedU, predictedP))
       }
     }
   }

@@ -65,7 +65,8 @@ class FutureDirectivesSpec extends RoutingSpec {
       }
     }
     "propagate the exception in the failure case" in EventFilter[Exception](
-        occurrences = 1, message = "XXX").intercept {
+      occurrences = 1,
+      message = "XXX").intercept {
       Get() ~> onSuccess(Future.failed(TestException)) { echoComplete } ~> check {
         status shouldEqual StatusCodes.InternalServerError
       }
@@ -79,7 +80,8 @@ class FutureDirectivesSpec extends RoutingSpec {
       }
     }
     "catch an exception in the failure case" in EventFilter[Exception](
-        occurrences = 1, message = "XXX").intercept {
+      occurrences = 1,
+      message = "XXX").intercept {
       Get() ~> onSuccess(Future.failed(TestException)) {
         throwTestException("EX when ")
       } ~> check {

@@ -46,26 +46,29 @@ object ScalaDSL {
     * Behavior’s type hierarchy. Signals are not transformed.
     */
   final case class Widened[T, U >: T](
-      behavior: Behavior[T], matcher: PartialFunction[U, T])
+      behavior: Behavior[T],
+      matcher: PartialFunction[U, T])
       extends Behavior[U] {
     private def postProcess(
-        ctx: ActorContext[U], behv: Behavior[T]): Behavior[U] =
+        ctx: ActorContext[U],
+        behv: Behavior[T]): Behavior[U] =
       if (isUnhandled(behv)) Unhandled
       else if (isAlive(behv)) {
-        val next = canonicalize(
-            ctx.asInstanceOf[ActorContext[T]], behv, behavior)
+        val next =
+          canonicalize(ctx.asInstanceOf[ActorContext[T]], behv, behavior)
         if (next eq behavior) Same else Widened(next, matcher)
       } else Stopped
 
     override def management(ctx: ActorContext[U], msg: Signal): Behavior[U] =
       postProcess(
-          ctx, behavior.management(ctx.asInstanceOf[ActorContext[T]], msg))
+        ctx,
+        behavior.management(ctx.asInstanceOf[ActorContext[T]], msg))
 
     override def message(ctx: ActorContext[U], msg: U): Behavior[U] =
       if (matcher.isDefinedAt(msg))
         postProcess(
-            ctx,
-            behavior.message(ctx.asInstanceOf[ActorContext[T]], matcher(msg)))
+          ctx,
+          behavior.message(ctx.asInstanceOf[ActorContext[T]], matcher(msg)))
       else Unhandled
 
     override def toString: String =
@@ -234,7 +237,8 @@ object ScalaDSL {
     * for logging or tracing what a certain Actor does.
     */
   final case class Tap[T](
-      f: PartialFunction[MessageOrSignal[T], Unit], behavior: Behavior[T])
+      f: PartialFunction[MessageOrSignal[T], Unit],
+      behavior: Behavior[T])
       extends Behavior[T] {
     private def canonical(behv: Behavior[T]): Behavior[T] =
       if (isUnhandled(behv)) Unhandled
@@ -294,7 +298,8 @@ object ScalaDSL {
 
     // FIXME should we protect against infinite loops?
     @tailrec private def run(
-        ctx: ActorContext[T], next: Behavior[T]): Behavior[T] = {
+        ctx: ActorContext[T],
+        next: Behavior[T]): Behavior[T] = {
       setBehavior(ctx, next)
       if (inbox.hasMessages)
         run(ctx, behavior.message(ctx, inbox.receiveMsg()))

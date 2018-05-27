@@ -46,7 +46,7 @@ class ServerAdmissionControlParams[A <: Stack.Parameterized[A]](
     */
   def deadlineTolerance(tolerance: Duration): A =
     self.configured(
-        self.params[DeadlineFilter.Param].copy(tolerance = tolerance))
+      self.params[DeadlineFilter.Param].copy(tolerance = tolerance))
 
   /**
     * Configures the request deadline rejected `percentage` (the maximum percentage
@@ -56,7 +56,8 @@ class ServerAdmissionControlParams[A <: Stack.Parameterized[A]](
     * @see [[https://twitter.github.io/finagle/guide/Servers.html#request-deadline]]
     */
   def deadlineMaxRejectedPercentage(percentage: Double): A =
-    self.configured(self
-          .params[DeadlineFilter.Param]
-          .copy(maxRejectPercentage = percentage))
+    self.configured(
+      self
+        .params[DeadlineFilter.Param]
+        .copy(maxRejectPercentage = percentage))
 }

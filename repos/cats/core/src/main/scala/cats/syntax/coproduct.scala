@@ -19,7 +19,7 @@ final class CoproductOps[F[_], A](val fa: F[A]) extends AnyVal {
     * {{{
     * scala> import cats.data.Coproduct
     * scala> import cats.Eval
-    * scala> import cats.syntax.coproduct._ 
+    * scala> import cats.syntax.coproduct._
     * scala> List(1, 2, 3).leftc[Eval]
     * res0: Coproduct[List, Eval, Int] = Coproduct(Left(List(1, 2, 3)))
     * }}}
@@ -35,7 +35,7 @@ final class CoproductOps[F[_], A](val fa: F[A]) extends AnyVal {
     * {{{
     * scala> import cats.data.Coproduct
     * scala> import cats.Eval
-    * scala> import cats.syntax.coproduct._ 
+    * scala> import cats.syntax.coproduct._
     * scala> List(1, 2, 3).rightc[Eval]
     * res0: Coproduct[Eval, List, Int] = Coproduct(Right(List(1, 2, 3)))
     * }}}

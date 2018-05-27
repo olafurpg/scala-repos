@@ -6,10 +6,20 @@ import com.intellij.psi.{PsiElement, PsiReference}
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.{ScalaPsiUtil, ScalaPsiElement}
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScInterpolationPattern
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlockExpr, ScExpression, ScReferenceExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScBlockExpr,
+  ScExpression,
+  ScReferenceExpression
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
-import org.jetbrains.plugins.scala.lang.psi.impl.expr.{ScInterpolatedPrefixReference, ScInterpolatedStringPartReference}
-import org.jetbrains.plugins.scala.macroAnnotations.{ModCount, CachedInsidePsiElement}
+import org.jetbrains.plugins.scala.lang.psi.impl.expr.{
+  ScInterpolatedPrefixReference,
+  ScInterpolatedStringPartReference
+}
+import org.jetbrains.plugins.scala.macroAnnotations.{
+  ModCount,
+  CachedInsidePsiElement
+}
 
 import scala.collection.mutable.ListBuffer
 
@@ -21,8 +31,9 @@ trait ScInterpolated extends ScalaPsiElement {
   def isMultiLineString: Boolean
 
   def getReferencesToStringParts: Array[PsiReference] = {
-    val accepted = List(ScalaTokenTypes.tINTERPOLATED_STRING,
-                        ScalaTokenTypes.tINTERPOLATED_MULTILINE_STRING)
+    val accepted = List(
+      ScalaTokenTypes.tINTERPOLATED_STRING,
+      ScalaTokenTypes.tINTERPOLATED_MULTILINE_STRING)
     val res = ListBuffer[PsiReference]()
     val children: Array[PsiElement] = this match {
       case ip: ScInterpolationPattern => ip.args.children.toArray
@@ -40,25 +51,26 @@ trait ScInterpolated extends ScalaPsiElement {
   def getStringContextExpression: Option[ScExpression] = {
     val quote = if (isMultiLineString) "\"\"\"" else "\""
     val parts =
-      getStringParts(this).mkString(quote, s"$quote, $quote", quote) //making list of string literals
+      getStringParts(this)
+        .mkString(quote, s"$quote, $quote", quote) //making list of string literals
     val params = getInjections.map(_.getText).mkString("(", ",", ")")
     if (getContext == null) None
     else
       Option(
-          ScalaPsiElementFactory.createExpressionWithContextFromText(
-              s"_root_.scala.StringContext($parts).${getFirstChild.getText}$params",
-              getContext,
-              this))
+        ScalaPsiElementFactory.createExpressionWithContextFromText(
+          s"_root_.scala.StringContext($parts).${getFirstChild.getText}$params",
+          getContext,
+          this))
   }
 
   def getInjections: Array[ScExpression] = {
     getNode.getChildren(null).flatMap {
       _.getPsi match {
-        case a: ScBlockExpr => Array[ScExpression](a)
+        case a: ScBlockExpr                       => Array[ScExpression](a)
         case _: ScInterpolatedStringPartReference => Array[ScExpression]()
-        case _: ScInterpolatedPrefixReference => Array[ScExpression]()
-        case b: ScReferenceExpression => Array[ScExpression](b)
-        case _ => Array[ScExpression]()
+        case _: ScInterpolatedPrefixReference     => Array[ScExpression]()
+        case b: ScReferenceExpression             => Array[ScExpression](b)
+        case _                                    => Array[ScExpression]()
       }
     }
   }
@@ -74,14 +86,14 @@ trait ScInterpolated extends ScalaPsiElement {
         case ScalaTokenTypes.tINTERPOLATED_STRING =>
           child.getText.headOption match {
             case Some('"') => result += child.getText.substring(1)
-            case Some(_) => result += child.getText
-            case None => result += emptyString
+            case Some(_)   => result += child.getText
+            case None      => result += emptyString
           }
         case ScalaTokenTypes.tINTERPOLATED_MULTILINE_STRING =>
           child.getText match {
             case s if s.startsWith("\"\"\"") => result += s.substring(3)
-            case s: String => result += s
-            case _ => result += emptyString
+            case s: String                   => result += s
+            case _                           => result += emptyString
           }
         case ScalaTokenTypes.tINTERPOLATED_STRING_INJECTION |
             ScalaTokenTypes.tINTERPOLATED_STRING_END =>

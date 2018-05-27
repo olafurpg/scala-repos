@@ -43,7 +43,7 @@ trait CaseClassPackers extends LowPriorityTuplePackers {
 }
 
 trait LowPriorityTuplePackers extends java.io.Serializable {
-  implicit def genericTuplePacker[T : Manifest] = new ReflectionTuplePacker[T]
+  implicit def genericTuplePacker[T: Manifest] = new ReflectionTuplePacker[T]
 }
 
 /**
@@ -54,8 +54,7 @@ trait LowPriorityTuplePackers extends java.io.Serializable {
   * @author Argyris Zymnis
   * @author Oscar Boykin
   */
-class ReflectionTuplePacker[T](implicit m: Manifest[T])
-    extends TuplePacker[T] {
+class ReflectionTuplePacker[T](implicit m: Manifest[T]) extends TuplePacker[T] {
   override def newConverter(fields: Fields) =
     new ReflectionTupleConverter[T](fields)(m)
 }
@@ -81,14 +80,18 @@ class ReflectionTupleConverter[T](fields: Fields)(implicit m: Manifest[T])
     }
 
     assert(
-        missing.isEmpty, "Field: " + missing.get.toString + " not in setters")
+      missing.isEmpty,
+      "Field: " + missing.get.toString + " not in setters")
   }
   validate
 
   def getSetters =
-    m.runtimeClass.getDeclaredMethods.filter { _.getName.startsWith("set") }.groupBy {
-      setterToFieldName(_)
-    }.mapValues { _.head }
+    m.runtimeClass.getDeclaredMethods
+      .filter { _.getName.startsWith("set") }
+      .groupBy {
+        setterToFieldName(_)
+      }
+      .mapValues { _.head }
 
   // Do all the reflection for the setters we need:
   // This needs to be lazy because Method is not serializable
@@ -121,9 +124,12 @@ class OrderedConstructorConverter[T](fields: Fields)(implicit mf: Manifest[T])
   // Keep this as a method, so we can validate by calling, but don't serialize it, and keep it lazy
   // below
   def getConstructor =
-    mf.runtimeClass.getConstructors.filter {
-      _.getParameterTypes.size == fields.size
-    }.head.asInstanceOf[Constructor[T]]
+    mf.runtimeClass.getConstructors
+      .filter {
+        _.getParameterTypes.size == fields.size
+      }
+      .head
+      .asInstanceOf[Constructor[T]]
 
   //Make sure we can actually get a constructor:
   getConstructor

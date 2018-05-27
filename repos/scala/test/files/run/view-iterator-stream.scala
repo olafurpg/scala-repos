@@ -16,7 +16,9 @@ object Test {
       val failed = (rest take 100).size == 100
 
       "%-45s %-30s %s".format(
-          toString, resString, if (failed) "<failed>" else rest.mkString(" "))
+        toString,
+        resString,
+        if (failed) "<failed>" else rest.mkString(" "))
     }
     def and(g: Perturber): Perturber =
       new Perturber(this.labels ++ g.labels, f andThen g.f)
@@ -40,8 +42,8 @@ object Test {
   def take(n: Int): Perturber = Perturber("take " + n, _.toIterator take n)
   def slice(from: Int, until: Int): Perturber =
     Perturber(
-        "slice(%d, %d)".format(from, until),
-        _.toTraversable.slice(from, until)
+      "slice(%d, %d)".format(from, until),
+      _.toTraversable.slice(from, until)
     )
 
   val fns = List[Perturber](toV, toI, toS, toIS)
@@ -51,7 +53,8 @@ object Test {
   def sdt(n: Int): Perturber = p(slice(n, n * 2), drop(n / 2), take(n / 4))
   def std(n: Int): Perturber = p(slice(n, n * 2), take(n / 2), drop(n / 4))
 
-  val transforms = (fns.permutations map (xs => p(xs take 3: _*))).toList.distinct
+  val transforms =
+    (fns.permutations map (xs => p(xs take 3: _*))).toList.distinct
   def mkOps(n: Int) = List[Perturber](tds(n), dts(n), sdt(n), std(n))
   def runOps(n: Int) = {
     val xs: List[(String, List[String])] =

@@ -15,26 +15,29 @@ import sbt.io.Path
 import sbt.util.Logger
 
 trait ScalaRun {
-  def run(mainClass: String,
-          classpath: Seq[File],
-          options: Seq[String],
-          log: Logger): Option[String]
+  def run(
+      mainClass: String,
+      classpath: Seq[File],
+      options: Seq[String],
+      log: Logger): Option[String]
 }
 class ForkRun(config: ForkOptions) extends ScalaRun {
   @deprecated("Use the `ForkRun(ForkOptions) constructor`", "0.13.0")
   def this(options: ForkScalaRun) =
     this(
-        ForkOptions(options.javaHome,
-                    options.outputStrategy,
-                    options.scalaJars.toSeq,
-                    options.workingDirectory,
-                    options.runJVMOptions,
-                    options.connectInput))
+      ForkOptions(
+        options.javaHome,
+        options.outputStrategy,
+        options.scalaJars.toSeq,
+        options.workingDirectory,
+        options.runJVMOptions,
+        options.connectInput))
 
-  def run(mainClass: String,
-          classpath: Seq[File],
-          options: Seq[String],
-          log: Logger): Option[String] = {
+  def run(
+      mainClass: String,
+      classpath: Seq[File],
+      options: Seq[String],
+      log: Logger): Option[String] = {
     log.info("Running " + mainClass + " " + options.mkString(" "))
 
     val scalaOptions =
@@ -49,7 +52,8 @@ class ForkRun(config: ForkOptions) extends ScalaRun {
       process.destroy()
       1
     }
-    val exitCode = try process.exitValue() catch {
+    val exitCode = try process.exitValue()
+    catch {
       case e: InterruptedException => cancel()
     }
     processExitCode(exitCode, "runner")
@@ -65,10 +69,11 @@ class Run(instance: ScalaInstance, trapExit: Boolean, nativeTmp: File)
     extends ScalaRun {
 
   /** Runs the class 'mainClass' using the given classpath and options using the scala runner.*/
-  def run(mainClass: String,
-          classpath: Seq[File],
-          options: Seq[String],
-          log: Logger) = {
+  def run(
+      mainClass: String,
+      classpath: Seq[File],
+      options: Seq[String],
+      log: Logger) = {
     log.info("Running " + mainClass + " " + options.mkString(" "))
 
     def execute() =
@@ -81,17 +86,20 @@ class Run(instance: ScalaInstance, trapExit: Boolean, nativeTmp: File)
 
     if (trapExit) Run.executeTrapExit(execute(), log) else directExecute()
   }
-  private def run0(mainClassName: String,
-                   classpath: Seq[File],
-                   options: Seq[String],
-                   log: Logger): Unit = {
+  private def run0(
+      mainClassName: String,
+      classpath: Seq[File],
+      options: Seq[String],
+      log: Logger): Unit = {
     log.debug("  Classpath:\n\t" + classpath.mkString("\n\t"))
     val loader = ClasspathUtilities.makeLoader(classpath, instance, nativeTmp)
     val main = getMainMethod(mainClassName, loader)
     invokeMain(loader, main, options)
   }
   private def invokeMain(
-      loader: ClassLoader, main: Method, options: Seq[String]): Unit = {
+      loader: ClassLoader,
+      main: Method,
+      options: Seq[String]): Unit = {
     val currentThread = Thread.currentThread
     val oldLoader = Thread.currentThread.getContextClassLoader
     currentThread.setContextClassLoader(loader)
@@ -116,10 +124,11 @@ class Run(instance: ScalaInstance, trapExit: Boolean, nativeTmp: File)
 
 /** This module is an interface to starting the scala interpreter or runner.*/
 object Run {
-  def run(mainClass: String,
-          classpath: Seq[File],
-          options: Seq[String],
-          log: Logger)(implicit runner: ScalaRun) =
+  def run(
+      mainClass: String,
+      classpath: Seq[File],
+      options: Seq[String],
+      log: Logger)(implicit runner: ScalaRun) =
     runner.run(mainClass, classpath, options, log)
 
   /** Executes the given function, trapping calls to System.exit. */

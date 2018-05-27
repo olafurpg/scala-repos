@@ -63,13 +63,14 @@ class CodegenContext {
     * Returns the name of class member.
     */
   def addReferenceObj(
-      name: String, obj: Any, className: String = null): String = {
+      name: String,
+      obj: Any,
+      className: String = null): String = {
     val term = freshName(name)
     val idx = references.length
     references += obj
     val clsName = Option(className).getOrElse(obj.getClass.getName)
-    addMutableState(
-        clsName, term, s"this.$term = ($clsName) references[$idx];")
+    addMutableState(clsName, term, s"this.$term = ($clsName) references[$idx];")
     term
   }
 
@@ -108,15 +109,19 @@ class CodegenContext {
     mutable.ArrayBuffer.empty[(String, String, String)]
 
   def addMutableState(
-      javaType: String, variableName: String, initCode: String): Unit = {
+      javaType: String,
+      variableName: String,
+      initCode: String): Unit = {
     mutableStates += ((javaType, variableName, initCode))
   }
 
   def declareMutableStates(): String = {
-    mutableStates.map {
-      case (javaType, variableName, _) =>
-        s"private $javaType $variableName;"
-    }.mkString("\n")
+    mutableStates
+      .map {
+        case (javaType, variableName, _) =>
+          s"private $javaType $variableName;"
+      }
+      .mkString("\n")
   }
 
   def initMutableStates(): String = {
@@ -214,15 +219,15 @@ class CodegenContext {
         s"$input.get${primitiveTypeName(jt)}($ordinal)"
       case t: DecimalType =>
         s"$input.getDecimal($ordinal, ${t.precision}, ${t.scale})"
-      case StringType => s"$input.getUTF8String($ordinal)"
-      case BinaryType => s"$input.getBinary($ordinal)"
-      case CalendarIntervalType => s"$input.getInterval($ordinal)"
-      case t: StructType => s"$input.getStruct($ordinal, ${t.size})"
-      case _: ArrayType => s"$input.getArray($ordinal)"
-      case _: MapType => s"$input.getMap($ordinal)"
-      case NullType => "null"
+      case StringType              => s"$input.getUTF8String($ordinal)"
+      case BinaryType              => s"$input.getBinary($ordinal)"
+      case CalendarIntervalType    => s"$input.getInterval($ordinal)"
+      case t: StructType           => s"$input.getStruct($ordinal, ${t.size})"
+      case _: ArrayType            => s"$input.getArray($ordinal)"
+      case _: MapType              => s"$input.getMap($ordinal)"
+      case NullType                => "null"
       case udt: UserDefinedType[_] => getValue(input, udt.sqlType, ordinal)
-      case _ => s"($jt)$input.get($ordinal, null)"
+      case _                       => s"($jt)$input.get($ordinal, null)"
     }
   }
 
@@ -230,7 +235,10 @@ class CodegenContext {
     * Returns the code to update a column in Row for a given DataType.
     */
   def setColumn(
-      row: String, dataType: DataType, ordinal: Int, value: String): String = {
+      row: String,
+      dataType: DataType,
+      ordinal: Int,
+      value: String): String = {
     val jt = javaType(dataType)
     dataType match {
       case _ if isPrimitiveType(jt) =>
@@ -248,11 +256,12 @@ class CodegenContext {
   /**
     * Update a column in MutableRow from ExprCode.
     */
-  def updateColumn(row: String,
-                   dataType: DataType,
-                   ordinal: Int,
-                   ev: ExprCode,
-                   nullable: Boolean): String = {
+  def updateColumn(
+      row: String,
+      dataType: DataType,
+      ordinal: Int,
+      ev: ExprCode,
+      nullable: Boolean): String = {
     if (nullable) {
       // Can't call setNullAt on DecimalType, because we need to keep the offset
       if (dataType.isInstanceOf[DecimalType]) {
@@ -282,7 +291,7 @@ class CodegenContext {
     */
   def primitiveTypeName(jt: String): String = jt match {
     case JAVA_INT => "Int"
-    case _ => boxedType(jt)
+    case _        => boxedType(jt)
   }
 
   def primitiveTypeName(dt: DataType): String = primitiveTypeName(javaType(dt))
@@ -291,25 +300,25 @@ class CodegenContext {
     * Returns the Java type for a DataType.
     */
   def javaType(dt: DataType): String = dt match {
-    case BooleanType => JAVA_BOOLEAN
-    case ByteType => JAVA_BYTE
-    case ShortType => JAVA_SHORT
-    case IntegerType | DateType => JAVA_INT
+    case BooleanType              => JAVA_BOOLEAN
+    case ByteType                 => JAVA_BYTE
+    case ShortType                => JAVA_SHORT
+    case IntegerType | DateType   => JAVA_INT
     case LongType | TimestampType => JAVA_LONG
-    case FloatType => JAVA_FLOAT
-    case DoubleType => JAVA_DOUBLE
-    case dt: DecimalType => "Decimal"
-    case BinaryType => "byte[]"
-    case StringType => "UTF8String"
-    case CalendarIntervalType => "CalendarInterval"
-    case _: StructType => "InternalRow"
-    case _: ArrayType => "ArrayData"
-    case _: MapType => "MapData"
-    case udt: UserDefinedType[_] => javaType(udt.sqlType)
+    case FloatType                => JAVA_FLOAT
+    case DoubleType               => JAVA_DOUBLE
+    case dt: DecimalType          => "Decimal"
+    case BinaryType               => "byte[]"
+    case StringType               => "UTF8String"
+    case CalendarIntervalType     => "CalendarInterval"
+    case _: StructType            => "InternalRow"
+    case _: ArrayType             => "ArrayData"
+    case _: MapType               => "MapData"
+    case udt: UserDefinedType[_]  => javaType(udt.sqlType)
     case ObjectType(cls) if cls.isArray =>
       s"${javaType(ObjectType(cls.getComponentType))}[]"
     case ObjectType(cls) => cls.getName
-    case _ => "Object"
+    case _               => "Object"
   }
 
   /**
@@ -317,13 +326,13 @@ class CodegenContext {
     */
   def boxedType(jt: String): String = jt match {
     case JAVA_BOOLEAN => "Boolean"
-    case JAVA_BYTE => "Byte"
-    case JAVA_SHORT => "Short"
-    case JAVA_INT => "Integer"
-    case JAVA_LONG => "Long"
-    case JAVA_FLOAT => "Float"
-    case JAVA_DOUBLE => "Double"
-    case other => other
+    case JAVA_BYTE    => "Byte"
+    case JAVA_SHORT   => "Short"
+    case JAVA_INT     => "Integer"
+    case JAVA_LONG    => "Long"
+    case JAVA_FLOAT   => "Float"
+    case JAVA_DOUBLE  => "Double"
+    case other        => other
   }
 
   def boxedType(dt: DataType): String = boxedType(javaType(dt))
@@ -333,13 +342,13 @@ class CodegenContext {
     */
   def defaultValue(jt: String): String = jt match {
     case JAVA_BOOLEAN => "false"
-    case JAVA_BYTE => "(byte)-1"
-    case JAVA_SHORT => "(short)-1"
-    case JAVA_INT => "-1"
-    case JAVA_LONG => "-1L"
-    case JAVA_FLOAT => "-1.0f"
-    case JAVA_DOUBLE => "-1.0"
-    case _ => "null"
+    case JAVA_BYTE    => "(byte)-1"
+    case JAVA_SHORT   => "(short)-1"
+    case JAVA_INT     => "-1"
+    case JAVA_LONG    => "-1L"
+    case JAVA_FLOAT   => "-1.0f"
+    case JAVA_DOUBLE  => "-1.0"
+    case _            => "null"
   }
 
   def defaultValue(dt: DataType): String = defaultValue(javaType(dt))
@@ -355,8 +364,8 @@ class CodegenContext {
       case DoubleType =>
         s"(java.lang.Double.isNaN($c1) && java.lang.Double.isNaN($c2)) || $c1 == $c2"
       case dt: DataType if isPrimitiveType(dt) => s"$c1 == $c2"
-      case udt: UserDefinedType[_] => genEqual(udt.sqlType, c1, c2)
-      case other => s"$c1.equals($c2)"
+      case udt: UserDefinedType[_]             => genEqual(udt.sqlType, c1, c2)
+      case other                               => s"$c1.equals($c2)"
     }
 
   /**
@@ -404,9 +413,13 @@ class CodegenContext {
                 return 1;
               } else {
                 ${javaType(elementType)} $elementA = ${getValue(
-            "a", elementType, "i")};
+          "a",
+          elementType,
+          "i")};
                 ${javaType(elementType)} $elementB = ${getValue(
-            "b", elementType, "i")};
+          "b",
+          elementType,
+          "i")};
                 int comp = ${genComp(elementType, elementA, elementB)};
                 if (comp != 0) {
                   return comp;
@@ -437,10 +450,10 @@ class CodegenContext {
         addNewFunction(compareFunc, funcCode)
         s"this.$compareFunc($c1, $c2)"
       case other if other.isInstanceOf[AtomicType] => s"$c1.compare($c2)"
-      case udt: UserDefinedType[_] => genComp(udt.sqlType, c1, c2)
+      case udt: UserDefinedType[_]                 => genComp(udt.sqlType, c1, c2)
       case _ =>
         throw new IllegalArgumentException(
-            "cannot generate compare code for un-comparable type")
+          "cannot generate compare code for un-comparable type")
     }
 
   /**
@@ -453,7 +466,7 @@ class CodegenContext {
   def genGreater(dataType: DataType, c1: String, c2: String): String =
     javaType(dataType) match {
       case JAVA_BYTE | JAVA_SHORT | JAVA_INT | JAVA_LONG => s"$c1 > $c2"
-      case _ => s"(${genComp(dataType, c1, c2)}) > 0"
+      case _                                             => s"(${genComp(dataType, c1, c2)}) > 0"
     }
 
   /**
@@ -480,13 +493,14 @@ class CodegenContext {
   /**
     * List of java data types that have special accessors and setters in [[InternalRow]].
     */
-  val primitiveTypes = Seq(JAVA_BOOLEAN,
-                           JAVA_BYTE,
-                           JAVA_SHORT,
-                           JAVA_INT,
-                           JAVA_LONG,
-                           JAVA_FLOAT,
-                           JAVA_DOUBLE)
+  val primitiveTypes = Seq(
+    JAVA_BOOLEAN,
+    JAVA_BYTE,
+    JAVA_SHORT,
+    JAVA_INT,
+    JAVA_LONG,
+    JAVA_FLOAT,
+    JAVA_DOUBLE)
 
   /**
     * Returns true if the Java type has a special accessor and setter in [[InternalRow]].
@@ -549,17 +563,15 @@ class CodegenContext {
     // elimination.
     val commonExprs =
       equivalentExpressions.getAllEquivalentExprs.filter(_.size > 1)
-    commonExprs.foreach(
-        e =>
-          {
-        val expr = e.head
-        val fnName = freshName("evalExpr")
-        val isNull = s"${fnName}IsNull"
-        val value = s"${fnName}Value"
+    commonExprs.foreach(e => {
+      val expr = e.head
+      val fnName = freshName("evalExpr")
+      val isNull = s"${fnName}IsNull"
+      val value = s"${fnName}Value"
 
-        // Generate the code for this expression tree and wrap it in a function.
-        val code = expr.gen(this)
-        val fn = s"""
+      // Generate the code for this expression tree and wrap it in a function.
+      val code = expr.gen(this)
+      val fn = s"""
            |private void $fnName(InternalRow $INPUT_ROW) {
            |  ${code.code.trim}
            |  $isNull = ${code.isNull};
@@ -567,32 +579,33 @@ class CodegenContext {
            |}
            """.stripMargin
 
-        addNewFunction(fnName, fn)
+      addNewFunction(fnName, fn)
 
-        // Add a state and a mapping of the common subexpressions that are associate with this
-        // state. Adding this expression to subExprEliminationExprMap means it will call `fn`
-        // when it is code generated. This decision should be a cost based one.
-        //
-        // The cost of doing subexpression elimination is:
-        //   1. Extra function call, although this is probably *good* as the JIT can decide to
-        //      inline or not.
-        //   2. Extra branch to check isLoaded. This branch is likely to be predicted correctly
-        //      very often. The reason it is not loaded is because of a prior branch.
-        //   3. Extra store into isLoaded.
-        // The benefit doing subexpression elimination is:
-        //   1. Running the expression logic. Even for a simple expression, it is likely more than 3
-        //      above.
-        //   2. Less code.
-        // Currently, we will do this for all non-leaf only expression trees (i.e. expr trees with
-        // at least two nodes) as the cost of doing it is expected to be low.
-        addMutableState("boolean", isNull, s"$isNull = false;")
-        addMutableState(javaType(expr.dataType),
-                        value,
-                        s"$value = ${defaultValue(expr.dataType)};")
+      // Add a state and a mapping of the common subexpressions that are associate with this
+      // state. Adding this expression to subExprEliminationExprMap means it will call `fn`
+      // when it is code generated. This decision should be a cost based one.
+      //
+      // The cost of doing subexpression elimination is:
+      //   1. Extra function call, although this is probably *good* as the JIT can decide to
+      //      inline or not.
+      //   2. Extra branch to check isLoaded. This branch is likely to be predicted correctly
+      //      very often. The reason it is not loaded is because of a prior branch.
+      //   3. Extra store into isLoaded.
+      // The benefit doing subexpression elimination is:
+      //   1. Running the expression logic. Even for a simple expression, it is likely more than 3
+      //      above.
+      //   2. Less code.
+      // Currently, we will do this for all non-leaf only expression trees (i.e. expr trees with
+      // at least two nodes) as the cost of doing it is expected to be low.
+      addMutableState("boolean", isNull, s"$isNull = false;")
+      addMutableState(
+        javaType(expr.dataType),
+        value,
+        s"$value = ${defaultValue(expr.dataType)};")
 
-        subexprFunctions += s"$fnName($INPUT_ROW);"
-        val state = SubExprEliminationState(isNull, value)
-        e.foreach(subExprEliminationExprs.put(_, state))
+      subexprFunctions += s"$fnName($INPUT_ROW);"
+      val state = SubExprEliminationState(isNull, value)
+      e.foreach(subExprEliminationExprs.put(_, state))
     })
   }
 
@@ -677,22 +690,22 @@ object CodeGenerator extends Logging {
     evaluator.setParentClassLoader(Utils.getContextOrSparkClassLoader)
     // Cannot be under package codegen, or fail with java.lang.InstantiationException
     evaluator.setClassName(
-        "org.apache.spark.sql.catalyst.expressions.GeneratedClass")
+      "org.apache.spark.sql.catalyst.expressions.GeneratedClass")
     evaluator.setDefaultImports(
-        Array(
-            classOf[Platform].getName,
-            classOf[InternalRow].getName,
-            classOf[UnsafeRow].getName,
-            classOf[UTF8String].getName,
-            classOf[Decimal].getName,
-            classOf[CalendarInterval].getName,
-            classOf[ArrayData].getName,
-            classOf[UnsafeArrayData].getName,
-            classOf[MapData].getName,
-            classOf[UnsafeMapData].getName,
-            classOf[MutableRow].getName,
-            classOf[Expression].getName
-        ))
+      Array(
+        classOf[Platform].getName,
+        classOf[InternalRow].getName,
+        classOf[UnsafeRow].getName,
+        classOf[UTF8String].getName,
+        classOf[Decimal].getName,
+        classOf[CalendarInterval].getName,
+        classOf[ArrayData].getName,
+        classOf[UnsafeArrayData].getName,
+        classOf[MapData].getName,
+        classOf[UnsafeMapData].getName,
+        classOf[MutableRow].getName,
+        classOf[Expression].getName
+      ))
     evaluator.setExtendedClass(classOf[GeneratedClass])
 
     def formatted = CodeFormatter.format(code)

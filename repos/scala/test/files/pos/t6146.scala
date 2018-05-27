@@ -49,9 +49,9 @@ class Test1 {
   def test(f: Format) = {
     val ff: f.type = f
     ff match {
-      case FI => "Int"
+      case FI             => "Int"
       case Format.Decimal => "Dec"
-      case Shorty => "Sho"
+      case Shorty         => "Sho"
     }
   }
 }

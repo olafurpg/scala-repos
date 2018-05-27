@@ -26,16 +26,17 @@ object inv extends UFunc {
         val work = Array.ofDim[Double](lwork)
         val info = new intW(0)
         lapack.dgetri(
-            N,
-            m.data,
-            scala.math.max(1, N) /* LDA */,
-            ipiv,
-            work /* workspace */,
-            lwork /* workspace size */,
-            info
+          N,
+          m.data,
+          scala.math.max(1, N) /* LDA */,
+          ipiv,
+          work /* workspace */,
+          lwork /* workspace size */,
+          info
         )
-        assert(info.`val` >= 0,
-               "Malformed argument %d (LAPACK)".format(-info.`val`))
+        assert(
+          info.`val` >= 0,
+          "Malformed argument %d (LAPACK)".format(-info.`val`))
 
         if (info.`val` > 0) throw new MatrixSingularException
 
@@ -56,16 +57,17 @@ object inv extends UFunc {
         val work = Array.ofDim[Float](lwork)
         val info = new intW(0)
         lapack.sgetri(
-            N,
-            m.data,
-            scala.math.max(1, N) /* LDA */,
-            ipiv,
-            work /* workspace */,
-            lwork /* workspace size */,
-            info
+          N,
+          m.data,
+          scala.math.max(1, N) /* LDA */,
+          ipiv,
+          work /* workspace */,
+          lwork /* workspace size */,
+          info
         )
-        assert(info.`val` >= 0,
-               "Malformed argument %d (LAPACK)".format(-info.`val`))
+        assert(
+          info.`val` >= 0,
+          "Malformed argument %d (LAPACK)".format(-info.`val`))
 
         if (info.`val` > 0) throw new MatrixSingularException
 
@@ -89,8 +91,8 @@ object pinv extends UFunc with pinvLowPrio {
 
   @expand
   @expand.valify
-  implicit def pinvFromSVD[@expand.args(Float, Double) T]: Impl[
-      DenseMatrix[T], DenseMatrix[T]] = {
+  implicit def pinvFromSVD[@expand.args(Float, Double) T]
+    : Impl[DenseMatrix[T], DenseMatrix[T]] = {
     new Impl[DenseMatrix[T], DenseMatrix[T]] {
       // http://en.wikipedia.org/wiki/Singular_value_decomposition#Applications_of_the_SVD
       override def apply(v: DenseMatrix[T]): DenseMatrix[T] = {
@@ -134,8 +136,7 @@ trait pinvLowPrio {
       numericTrans: TransT => NumericOps[TransT],
       mul: OpMulMatrix.Impl2[TransT, T, MulRes],
       numericMulRes: MulRes => NumericOps[MulRes],
-      solve: OpSolveMatrixBy.Impl2[MulRes, TransT, Result])
-    : Impl[T, Result] = {
+      solve: OpSolveMatrixBy.Impl2[MulRes, TransT, Result]): Impl[T, Result] = {
     new Impl[T, Result] {
       def apply(X: T): Result = {
         (X.t * X) \ X.t

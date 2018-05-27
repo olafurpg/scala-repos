@@ -27,7 +27,8 @@ import org.apache.spark.sql.{DataFrame, SQLContext}
 private[clustering] case class TestRow(features: Vector)
 
 class KMeansSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   final val k = 5
@@ -115,13 +116,19 @@ class KMeansSuite
     }
     val kmeans = new KMeans()
     testEstimatorAndModelReadWrite(
-        kmeans, dataset, KMeansSuite.allParamSettings, checkModelData)
+      kmeans,
+      dataset,
+      KMeansSuite.allParamSettings,
+      checkModelData)
   }
 }
 
 object KMeansSuite {
   def generateKMeansData(
-      sql: SQLContext, rows: Int, dim: Int, k: Int): DataFrame = {
+      sql: SQLContext,
+      rows: Int,
+      dim: Int,
+      k: Int): DataFrame = {
     val sc = sql.sparkContext
     val rdd = sc
       .parallelize(1 to rows)
@@ -136,9 +143,9 @@ object KMeansSuite {
     * This excludes input columns to simplify some tests.
     */
   val allParamSettings: Map[String, Any] = Map(
-      "predictionCol" -> "myPrediction",
-      "k" -> 3,
-      "maxIter" -> 2,
-      "tol" -> 0.01
+    "predictionCol" -> "myPrediction",
+    "k" -> 3,
+    "maxIter" -> 2,
+    "tol" -> 0.01
   )
 }

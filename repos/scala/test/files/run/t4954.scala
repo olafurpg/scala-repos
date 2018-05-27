@@ -4,7 +4,11 @@ object Test {
 
   def main(args: Array[String]) {
     val m = scala.collection.mutable.LinkedHashMap(
-        "one" -> 1, "two" -> 2, "three" -> 3, "four" -> 4, "five" -> 5)
+      "one" -> 1,
+      "two" -> 2,
+      "three" -> 3,
+      "four" -> 4,
+      "five" -> 5)
     val expected = List("one", "two", "three", "four", "five")
     assert(m.keys.iterator.toList == expected)
     assert(m.keys.drop(0).iterator.toList == expected)

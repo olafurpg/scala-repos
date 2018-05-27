@@ -23,10 +23,13 @@ trait MemberLookupBase {
 
   private def isRoot(s: Symbol) =
     (s eq NoSymbol) || s.isRootSymbol || s.isEmptyPackage ||
-    s.isEmptyPackageClass
+      s.isEmptyPackageClass
 
   def makeEntityLink(
-      title: Inline, pos: Position, query: String, site: Symbol) =
+      title: Inline,
+      pos: Position,
+      query: String,
+      site: Symbol) =
     new EntityLink(title) { lazy val link = memberLookup(pos, query, site) }
 
   private var showExplanation = true
@@ -57,7 +60,7 @@ trait MemberLookupBase {
     // (2) Or recursively go into each containing template.
     val fromParents =
       Stream.iterate(site)(_.owner) takeWhile (!isRoot(_)) map
-      (lookupInTemplate(pos, members, _))
+        (lookupInTemplate(pos, members, _))
 
     val syms = (fromRoot +: fromParents) find (!_.isEmpty) getOrElse Nil
 
@@ -70,8 +73,8 @@ trait MemberLookupBase {
             def linkName(sym: Symbol) = {
               def nameString(s: Symbol) =
                 s.nameString +
-                (if ((s.isModule || s.isModuleClass) && !s.hasPackageFlag) "$"
-                 else "")
+                  (if ((s.isModule || s.isModuleClass) && !s.hasPackageFlag) "$"
+                   else "")
               val packageSuffix = if (sym.hasPackageFlag) ".package" else ""
 
               sym.ownerChain.reverse
@@ -85,7 +88,8 @@ trait MemberLookupBase {
             else if (owner.isClass || owner.isModule || owner.isTrait ||
                      owner.hasPackageFlag)
               findExternalLink(
-                  sym, linkName(owner) + "@" + externalSignature(sym))
+                sym,
+                linkName(owner) + "@" + externalSignature(sym))
             else None
         }
       case links => links
@@ -94,7 +98,8 @@ trait MemberLookupBase {
       case Nil =>
         if (warnNoLink)
           reporter.warning(
-              pos, "Could not find any member to link for \"" + query + "\".")
+            pos,
+            "Could not find any member to link for \"" + query + "\".")
         // (4) if we still haven't found anything, create a tooltip
         Tooltip(query)
       case List(l) => l
@@ -107,8 +112,8 @@ trait MemberLookupBase {
         if (warnNoLink) {
           val allLinks = links.map(linkToString).mkString
           reporter.warning(
-              pos,
-              s"""The link target \"$query\" is ambiguous. Several members fit the target:
+            pos,
+            s"""The link target \"$query\" is ambiguous. Several members fit the target:
             |$allLinks
             |$explanation""".stripMargin)
         }
@@ -123,11 +128,14 @@ trait MemberLookupBase {
 
   private def lookupInRootPackage(pos: Position, members: List[String]) =
     lookupInTemplate(pos, members, EmptyPackage) ::: lookupInTemplate(
-        pos, members, RootPackage)
+      pos,
+      members,
+      RootPackage)
 
-  private def lookupInTemplate(pos: Position,
-                               members: List[String],
-                               container: Symbol): List[(Symbol, Symbol)] = {
+  private def lookupInTemplate(
+      pos: Position,
+      members: List[String],
+      container: Symbol): List[(Symbol, Symbol)] = {
     // Maintaining compatibility with previous links is a bit tricky here:
     // we have a preference for term names for all terms except for the last, where we prefer a class:
     // How to do this:
@@ -140,10 +148,10 @@ trait MemberLookupBase {
       case mbrName :: Nil =>
         var syms =
           lookupInTemplate(pos, mbrName, container, OnlyType) map
-          ((_, container))
+            ((_, container))
         if (syms.isEmpty)
           syms = lookupInTemplate(pos, mbrName, container, OnlyTerm) map
-          ((_, container))
+            ((_, container))
         syms
 
       case tplName :: rest =>
@@ -160,10 +168,11 @@ trait MemberLookupBase {
     result
   }
 
-  private def lookupInTemplate(pos: Position,
-                               member: String,
-                               container: Symbol,
-                               strategy: SearchStrategy): List[Symbol] = {
+  private def lookupInTemplate(
+      pos: Position,
+      member: String,
+      container: Symbol,
+      strategy: SearchStrategy): List[Symbol] = {
     val name = member.stripSuffix("$").stripSuffix("!").stripSuffix("*")
     def signatureMatch(sym: Symbol): Boolean =
       externalSignature(sym).startsWith(name)
@@ -188,8 +197,8 @@ trait MemberLookupBase {
       else
         strategy match {
           case BothTypeAndTerm => termSyms ::: typeSyms
-          case OnlyType => typeSyms
-          case OnlyTerm => termSyms
+          case OnlyType        => typeSyms
+          case OnlyTerm        => termSyms
         }
 
     //println("lookupInTemplate(" + member + ", " + container + ") => " + result)

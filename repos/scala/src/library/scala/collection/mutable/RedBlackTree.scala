@@ -26,17 +26,18 @@ private[collection] object RedBlackTree {
       extends Serializable
 
   @SerialVersionUID(1950599696441054720L)
-  final class Node[A, B](var key: A,
-                         var value: B,
-                         var red: Boolean,
-                         var left: Node[A, B],
-                         var right: Node[A, B],
-                         var parent: Node[A, B])
+  final class Node[A, B](
+      var key: A,
+      var value: B,
+      var red: Boolean,
+      var left: Node[A, B],
+      var right: Node[A, B],
+      var parent: Node[A, B])
       extends Serializable {
 
     override def toString: String =
       "Node(" + key + ", " + value + ", " + red + ", " + left + ", " + right +
-      ")"
+        ")"
   }
 
   object Tree {
@@ -46,17 +47,21 @@ private[collection] object RedBlackTree {
   object Node {
 
     @inline
-    def apply[A, B](key: A,
-                    value: B,
-                    red: Boolean,
-                    left: Node[A, B],
-                    right: Node[A, B],
-                    parent: Node[A, B]): Node[A, B] =
+    def apply[A, B](
+        key: A,
+        value: B,
+        red: Boolean,
+        left: Node[A, B],
+        right: Node[A, B],
+        parent: Node[A, B]): Node[A, B] =
       new Node(key, value, red, left, right, parent)
 
     @inline
     def leaf[A, B](
-        key: A, value: B, red: Boolean, parent: Node[A, B]): Node[A, B] =
+        key: A,
+        value: B,
+        red: Boolean,
+        parent: Node[A, B]): Node[A, B] =
       new Node(key, value, red, null, null, parent)
 
     def unapply[A, B](t: Node[A, B]) =
@@ -78,14 +83,14 @@ private[collection] object RedBlackTree {
 
   // ---- search ----
 
-  def get[A : Ordering, B](tree: Tree[A, B], key: A): Option[B] =
+  def get[A: Ordering, B](tree: Tree[A, B], key: A): Option[B] =
     getNode(tree.root, key) match {
       case null => None
       case node => Some(node.value)
     }
 
-  @tailrec private[this] def getNode[A, B](
-      node: Node[A, B], key: A)(implicit ord: Ordering[A]): Node[A, B] =
+  @tailrec private[this] def getNode[A, B](node: Node[A, B], key: A)(
+      implicit ord: Ordering[A]): Node[A, B] =
     if (node eq null) null
     else {
       val cmp = ord.compare(key, node.key)
@@ -94,7 +99,7 @@ private[collection] object RedBlackTree {
       else node
     }
 
-  def contains[A : Ordering](tree: Tree[A, _], key: A) =
+  def contains[A: Ordering](tree: Tree[A, _], key: A) =
     getNode(tree.root, key) ne null
 
   def min[A, B](tree: Tree[A, B]): Option[(A, B)] = minNode(tree.root) match {
@@ -133,15 +138,15 @@ private[collection] object RedBlackTree {
     * Returns the first (lowest) map entry with a key equal or greater than `key`. Returns `None` if there is no such
     * node.
     */
-  def minAfter[A, B](
-      tree: Tree[A, B], key: A)(implicit ord: Ordering[A]): Option[(A, B)] =
+  def minAfter[A, B](tree: Tree[A, B], key: A)(
+      implicit ord: Ordering[A]): Option[(A, B)] =
     minNodeAfter(tree.root, key) match {
       case null => None
       case node => Some((node.key, node.value))
     }
 
-  def minKeyAfter[A](
-      tree: Tree[A, _], key: A)(implicit ord: Ordering[A]): Option[A] =
+  def minKeyAfter[A](tree: Tree[A, _], key: A)(
+      implicit ord: Ordering[A]): Option[A] =
     minNodeAfter(tree.root, key) match {
       case null => None
       case node => Some(node.key)
@@ -154,7 +159,7 @@ private[collection] object RedBlackTree {
       var y: Node[A, B] = null
       var x = node
       var cmp = 1
-      while ( (x ne null) && cmp != 0) {
+      while ((x ne null) && cmp != 0) {
         y = x
         cmp = ord.compare(key, x.key)
         x = if (cmp < 0) x.left else x.right
@@ -166,15 +171,15 @@ private[collection] object RedBlackTree {
   /**
     * Returns the last (highest) map entry with a key smaller than `key`. Returns `None` if there is no such node.
     */
-  def maxBefore[A, B](
-      tree: Tree[A, B], key: A)(implicit ord: Ordering[A]): Option[(A, B)] =
+  def maxBefore[A, B](tree: Tree[A, B], key: A)(
+      implicit ord: Ordering[A]): Option[(A, B)] =
     maxNodeBefore(tree.root, key) match {
       case null => None
       case node => Some((node.key, node.value))
     }
 
-  def maxKeyBefore[A](
-      tree: Tree[A, _], key: A)(implicit ord: Ordering[A]): Option[A] =
+  def maxKeyBefore[A](tree: Tree[A, _], key: A)(
+      implicit ord: Ordering[A]): Option[A] =
     maxNodeBefore(tree.root, key) match {
       case null => None
       case node => Some(node.key)
@@ -187,7 +192,7 @@ private[collection] object RedBlackTree {
       var y: Node[A, B] = null
       var x = node
       var cmp = 1
-      while ( (x ne null) && cmp != 0) {
+      while ((x ne null) && cmp != 0) {
         y = x
         cmp = ord.compare(key, x.key)
         x = if (cmp < 0) x.left else x.right
@@ -203,7 +208,7 @@ private[collection] object RedBlackTree {
     var y: Node[A, B] = null
     var x = tree.root
     var cmp = 1
-    while ( (x ne null) && cmp != 0) {
+    while ((x ne null) && cmp != 0) {
       y = x
       cmp = ord.compare(key, x.key)
       x = if (cmp < 0) x.left else x.right
@@ -223,7 +228,8 @@ private[collection] object RedBlackTree {
   }
 
   private[this] def fixAfterInsert[A, B](
-      tree: Tree[A, B], node: Node[A, B]): Unit = {
+      tree: Tree[A, B],
+      node: Node[A, B]): Unit = {
     var z = node
     while (isRed(z.parent)) {
       if (z.parent eq z.parent.parent.left) {
@@ -266,7 +272,8 @@ private[collection] object RedBlackTree {
 
   // ---- deletion ----
 
-  def delete[A, B](tree: Tree[A, B], key: A)(implicit ord: Ordering[A]): Unit = {
+  def delete[A, B](tree: Tree[A, B], key: A)(
+      implicit ord: Ordering[A]): Unit = {
     val z = getNode(tree.root, key)
     if (z ne null) {
       var y = z
@@ -306,10 +313,12 @@ private[collection] object RedBlackTree {
   }
 
   private[this] def fixAfterDelete[A, B](
-      tree: Tree[A, B], node: Node[A, B], parent: Node[A, B]): Unit = {
+      tree: Tree[A, B],
+      node: Node[A, B],
+      parent: Node[A, B]): Unit = {
     var x = node
     var xParent = parent
-    while ( (x ne tree.root) && isBlack(x)) {
+    while ((x ne tree.root) && isBlack(x)) {
       if (x eq xParent.left) {
         var w = xParent.right
         // assert(w ne null)
@@ -380,7 +389,7 @@ private[collection] object RedBlackTree {
     else {
       var x = node
       var y = x.parent
-      while ( (y ne null) && (x eq y.right)) {
+      while ((y ne null) && (x eq y.right)) {
         x = y
         y = y.parent
       }
@@ -397,7 +406,7 @@ private[collection] object RedBlackTree {
     else {
       var x = node
       var y = x.parent
-      while ( (y ne null) && (x eq y.left)) {
+      while ((y ne null) && (x eq y.left)) {
         x = y
         y = y.parent
       }
@@ -444,7 +453,9 @@ private[collection] object RedBlackTree {
     * parent and setting `from`'s parent to the `to`'s previous parent. The children of `from` are left unchanged.
     */
   private[this] def transplant[A, B](
-      tree: Tree[A, B], to: Node[A, B], from: Node[A, B]): Unit = {
+      tree: Tree[A, B],
+      to: Node[A, B],
+      from: Node[A, B]): Unit = {
     if (to.parent eq null) tree.root = from
     else if (to eq to.parent.left) to.parent.left = from
     else to.parent.right = from
@@ -458,11 +469,13 @@ private[collection] object RedBlackTree {
     foreachNode(tree.root, f)
 
   private[this] def foreachNode[A, B, U](
-      node: Node[A, B], f: ((A, B)) => U): Unit =
+      node: Node[A, B],
+      f: ((A, B)) => U): Unit =
     if (node ne null) foreachNodeNonNull(node, f)
 
   private[this] def foreachNodeNonNull[A, B, U](
-      node: Node[A, B], f: ((A, B)) => U): Unit = {
+      node: Node[A, B],
+      f: ((A, B)) => U): Unit = {
     if (node.left ne null) foreachNodeNonNull(node.left, f)
     f((node.key, node.value))
     if (node.right ne null) foreachNodeNonNull(node.right, f)
@@ -475,7 +488,8 @@ private[collection] object RedBlackTree {
     if (node ne null) foreachNodeKeyNonNull(node, f)
 
   private[this] def foreachNodeKeyNonNull[A, U](
-      node: Node[A, _], f: A => U): Unit = {
+      node: Node[A, _],
+      f: A => U): Unit = {
     if (node.left ne null) foreachNodeKeyNonNull(node.left, f)
     f(node.key)
     if (node.right ne null) foreachNodeKeyNonNull(node.right, f)
@@ -485,34 +499,40 @@ private[collection] object RedBlackTree {
     transformNode(tree.root, f)
 
   private[this] def transformNode[A, B, U](
-      node: Node[A, B], f: (A, B) => B): Unit =
+      node: Node[A, B],
+      f: (A, B) => B): Unit =
     if (node ne null) transformNodeNonNull(node, f)
 
   private[this] def transformNodeNonNull[A, B, U](
-      node: Node[A, B], f: (A, B) => B): Unit = {
+      node: Node[A, B],
+      f: (A, B) => B): Unit = {
     if (node.left ne null) transformNodeNonNull(node.left, f)
     node.value = f(node.key, node.value)
     if (node.right ne null) transformNodeNonNull(node.right, f)
   }
 
-  def iterator[A : Ordering, B](tree: Tree[A, B],
-                                start: Option[A] = None,
-                                end: Option[A] = None): Iterator[(A, B)] =
+  def iterator[A: Ordering, B](
+      tree: Tree[A, B],
+      start: Option[A] = None,
+      end: Option[A] = None): Iterator[(A, B)] =
     new EntriesIterator(tree, start, end)
 
-  def keysIterator[A : Ordering](tree: Tree[A, _],
-                                 start: Option[A] = None,
-                                 end: Option[A] = None): Iterator[A] =
+  def keysIterator[A: Ordering](
+      tree: Tree[A, _],
+      start: Option[A] = None,
+      end: Option[A] = None): Iterator[A] =
     new KeysIterator(tree, start, end)
 
-  def valuesIterator[A : Ordering, B](tree: Tree[A, B],
-                                      start: Option[A] = None,
-                                      end: Option[A] = None): Iterator[B] =
+  def valuesIterator[A: Ordering, B](
+      tree: Tree[A, B],
+      start: Option[A] = None,
+      end: Option[A] = None): Iterator[B] =
     new ValuesIterator(tree, start, end)
 
   private[this] abstract class TreeIterator[A, B, R](
-      tree: Tree[A, B], start: Option[A], end: Option[A])(
-      implicit ord: Ordering[A])
+      tree: Tree[A, B],
+      start: Option[A],
+      end: Option[A])(implicit ord: Ordering[A])
       extends Iterator[R] {
 
     protected[this] def nextResult(node: Node[A, B]): R
@@ -528,7 +548,7 @@ private[collection] object RedBlackTree {
     }
 
     private[this] var nextNode: Node[A, B] = start match {
-      case None => minNode(tree.root)
+      case None       => minNode(tree.root)
       case Some(from) => minNodeAfter(tree.root, from)
     }
 
@@ -539,22 +559,28 @@ private[collection] object RedBlackTree {
     setNullIfAfterEnd()
   }
 
-  private[this] final class EntriesIterator[A : Ordering, B](
-      tree: Tree[A, B], start: Option[A], end: Option[A])
+  private[this] final class EntriesIterator[A: Ordering, B](
+      tree: Tree[A, B],
+      start: Option[A],
+      end: Option[A])
       extends TreeIterator[A, B, (A, B)](tree, start, end) {
 
     def nextResult(node: Node[A, B]) = (node.key, node.value)
   }
 
-  private[this] final class KeysIterator[A : Ordering, B](
-      tree: Tree[A, B], start: Option[A], end: Option[A])
+  private[this] final class KeysIterator[A: Ordering, B](
+      tree: Tree[A, B],
+      start: Option[A],
+      end: Option[A])
       extends TreeIterator[A, B, A](tree, start, end) {
 
     def nextResult(node: Node[A, B]) = node.key
   }
 
-  private[this] final class ValuesIterator[A : Ordering, B](
-      tree: Tree[A, B], start: Option[A], end: Option[A])
+  private[this] final class ValuesIterator[A: Ordering, B](
+      tree: Tree[A, B],
+      start: Option[A],
+      end: Option[A])
       extends TreeIterator[A, B, B](tree, start, end) {
 
     def nextResult(node: Node[A, B]) = node.value
@@ -569,9 +595,9 @@ private[collection] object RedBlackTree {
     * - All non-null nodes have their `parent` reference correct;
     * - The size variable in `tree` corresponds to the actual size of the tree.
     */
-  def isValid[A : Ordering, B](tree: Tree[A, B]): Boolean =
+  def isValid[A: Ordering, B](tree: Tree[A, B]): Boolean =
     isValidBST(tree.root) && hasProperParentRefs(tree) &&
-    isValidRedBlackTree(tree) && size(tree.root) == tree.size
+      isValidRedBlackTree(tree) && size(tree.root) == tree.size
 
   /**
     * Returns true if all non-null nodes have their `parent` reference correct.

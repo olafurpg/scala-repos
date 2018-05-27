@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -81,8 +81,11 @@ trait Lifecycle {
 }
 
 class REPLConfig(dataDir: Option[String])
-    extends BaseConfig with IdSourceConfig with EvaluatorConfig
-    with ColumnarTableModuleConfig with BlockStoreColumnarTableModuleConfig {
+    extends BaseConfig
+    with IdSourceConfig
+    with EvaluatorConfig
+    with ColumnarTableModuleConfig
+    with BlockStoreColumnarTableModuleConfig {
   val defaultConfig =
     Configuration.loadResource("/default_ingest.conf", BlockFormat)
   val config =
@@ -110,20 +113,27 @@ class REPLConfig(dataDir: Option[String])
 }
 
 trait REPL
-    extends ParseEvalStack[Future] with ActorVFSModule
-    with SecureVFSModule[Future, Slice] with VFSColumnarTableModule
+    extends ParseEvalStack[Future]
+    with ActorVFSModule
+    with SecureVFSModule[Future, Slice]
+    with VFSColumnarTableModule
     with XLightWebHttpClientModule[Future]
     with LongIdMemoryDatasetConsumer[Future] {
 
-  val dummyAccount = AccountDetails("dummyAccount",
-                                    "nobody@precog.com",
-                                    new DateTime,
-                                    "dummyAPIKey",
-                                    Path.Root,
-                                    AccountPlan.Free)
+  val dummyAccount = AccountDetails(
+    "dummyAccount",
+    "nobody@precog.com",
+    new DateTime,
+    "dummyAPIKey",
+    Path.Root,
+    AccountPlan.Free)
   def dummyEvaluationContext =
     EvaluationContext(
-        "dummyAPIKey", dummyAccount, Path.Root, Path.Root, new DateTime)
+      "dummyAPIKey",
+      dummyAccount,
+      Path.Root,
+      Path.Root,
+      new DateTime)
 
   val Prompt = "quirrel> "
   val Follow = "       | "
@@ -154,72 +164,73 @@ trait REPL
 
     def handle(c: Command) = c match {
       case Eval(tree) => {
-          val optTree = compile(tree)
+        val optTree = compile(tree)
 
-          for (tree <- optTree) {
-            val bytecode = emit(tree)
-            val eitherGraph = decorate(bytecode)
+        for (tree <- optTree) {
+          val bytecode = emit(tree)
+          val eitherGraph = decorate(bytecode)
 
-            // TODO decoration errors
+          // TODO decoration errors
 
-            for (graph <- eitherGraph.right) {
-              val result = {
-                consumeEval(graph, dummyEvaluationContext) fold
+          for (graph <- eitherGraph.right) {
+            val result = {
+              consumeEval(graph, dummyEvaluationContext) fold
                 (error =>
-                      "An error occurred processing your query: " +
-                      error.getMessage, results =>
-                      JArray(results.toList.map(_._2.toJValue)).renderPretty)
-              }
-
-              out.println()
-              out.println(color.cyan(result))
+                  "An error occurred processing your query: " +
+                    error.getMessage, results =>
+                  JArray(results.toList.map(_._2.toJValue)).renderPretty)
             }
-          }
 
-          true
+            out.println()
+            out.println(color.cyan(result))
+          }
         }
+
+        true
+      }
 
       case PrintTree(tree) => {
-          bindRoot(tree, tree)
-          val tree2 = shakeTree(tree)
+        bindRoot(tree, tree)
+        val tree2 = shakeTree(tree)
 
-          out.println()
-          out.println(prettyPrint(tree2))
+        out.println()
+        out.println(prettyPrint(tree2))
 
-          true
-        }
+        true
+      }
 
       case Help => {
-          printHelp(out)
-          true
-        }
+        printHelp(out)
+        true
+      }
 
       case Quit => {
-          terminal.restore()
-          false
-        }
+        terminal.restore()
+        false
+      }
     }
 
     def loop() {
       val results = prompt(readNext(reader, color))
       val successes = results collect { case Success(tree, _) => tree }
-      val failures = results collect { case f: Failure => f }
+      val failures = results collect { case f: Failure        => f }
 
       if (successes.isEmpty) {
         try {
           handleFailures(failures)
         } catch {
           case pe: ParseException => {
-              out.println()
-              out.println(color.red(pe.mkString))
-            }
+            out.println()
+            out.println(color.red(pe.mkString))
+          }
         }
         println()
         loop()
       } else {
         val command =
           if ((successes lengthCompare 1) > 0)
-            throw new AssertionError("Fatal error: ambiguous parse results: " +
+            throw new AssertionError(
+              "Fatal error: ambiguous parse results: " +
                 results.mkString(", "))
           else successes.head
 
@@ -271,10 +282,10 @@ trait REPL
 
   lazy val prompt: Parser[Command] =
     (expr ^^ { t =>
-          Eval(t)
-        } | ":tree" ~ expr ^^ { (_, t) =>
-          PrintTree(t)
-        } | ":help" ^^^ Help | ":quit" ^^^ Quit)
+      Eval(t)
+    } | ":tree" ~ expr ^^ { (_, t) =>
+      PrintTree(t)
+    } | ":help" ^^^ Help | ":quit" ^^^ Quit)
 
   sealed trait Command
 
@@ -289,81 +300,91 @@ object Console extends App {
     new REPLConfig(dataDir)
   }
 
-  val repl: IO[scalaz.Validation[
-          blueeyes.json.serialization.Extractor.Error, Lifecycle]] = for {
-    replConfig <- loadConfig(args.headOption)
-  } yield {
-    scalaz.Success[blueeyes.json.serialization.Extractor.Error, Lifecycle] {
-      new REPL with Lifecycle { self =>
-        val storageTimeout = yggConfig.storageTimeout
+  val repl: IO[
+    scalaz.Validation[blueeyes.json.serialization.Extractor.Error, Lifecycle]] =
+    for {
+      replConfig <- loadConfig(args.headOption)
+    } yield {
+      scalaz.Success[blueeyes.json.serialization.Extractor.Error, Lifecycle] {
+        new REPL with Lifecycle { self =>
+          val storageTimeout = yggConfig.storageTimeout
 
-        implicit val actorSystem = ActorSystem("replActorSystem")
-        implicit val asyncContext =
-          ExecutionContext.defaultExecutionContext(actorSystem)
-        implicit val M = new blueeyes.bkka.UnsafeFutureComonad(
-            asyncContext, yggConfig.maxEvalDuration)
+          implicit val actorSystem = ActorSystem("replActorSystem")
+          implicit val asyncContext =
+            ExecutionContext.defaultExecutionContext(actorSystem)
+          implicit val M = new blueeyes.bkka.UnsafeFutureComonad(
+            asyncContext,
+            yggConfig.maxEvalDuration)
 
-        type YggConfig = REPLConfig
-        val yggConfig = replConfig
+          type YggConfig = REPLConfig
+          val yggConfig = replConfig
 
-        val accountFinder = None
-        val apiKeyManager = new InMemoryAPIKeyManager[Future](yggConfig.clock)
+          val accountFinder = None
+          val apiKeyManager = new InMemoryAPIKeyManager[Future](yggConfig.clock)
 
-        val accessControl = new DirectAPIKeyFinder(apiKeyManager)
+          val accessControl = new DirectAPIKeyFinder(apiKeyManager)
 
-        val masterChef = actorSystem.actorOf(Props(
-                Chef(VersionedCookedBlockFormat(Map(1 -> V1CookedBlockFormat)),
-                     VersionedSegmentFormat(Map(1 -> V1SegmentFormat)))))
+          val masterChef = actorSystem.actorOf(
+            Props(
+              Chef(
+                VersionedCookedBlockFormat(Map(1 -> V1CookedBlockFormat)),
+                VersionedSegmentFormat(Map(1 -> V1SegmentFormat)))))
 
-        val jobManager = new InMemoryJobManager[Future]
-        val permissionsFinder =
-          new PermissionsFinder(accessControl,
-                                new StaticAccountFinder[Future]("", ""),
-                                new org.joda.time.Instant())
-        val resourceBuilder = new ResourceBuilder(actorSystem,
-                                                  yggConfig.clock,
-                                                  masterChef,
-                                                  yggConfig.cookThreshold,
-                                                  storageTimeout)
+          val jobManager = new InMemoryJobManager[Future]
+          val permissionsFinder =
+            new PermissionsFinder(
+              accessControl,
+              new StaticAccountFinder[Future]("", ""),
+              new org.joda.time.Instant())
+          val resourceBuilder = new ResourceBuilder(
+            actorSystem,
+            yggConfig.clock,
+            masterChef,
+            yggConfig.cookThreshold,
+            storageTimeout)
 
-        val projectionsActor = actorSystem.actorOf(
-            Props(new PathRoutingActor(yggConfig.dataDir,
-                                       Duration(300, "seconds"),
-                                       Duration(300, "seconds"),
-                                       100,
-                                       yggConfig.clock)))
+          val projectionsActor = actorSystem.actorOf(
+            Props(
+              new PathRoutingActor(
+                yggConfig.dataDir,
+                Duration(300, "seconds"),
+                Duration(300, "seconds"),
+                100,
+                yggConfig.clock)))
 
-        val actorVFS = new ActorVFS(projectionsActor,
-                                    yggConfig.storageTimeout,
-                                    yggConfig.storageTimeout)
-        val vfs =
-          new SecureVFS(actorVFS, permissionsFinder, jobManager, Clock.System)
+          val actorVFS = new ActorVFS(
+            projectionsActor,
+            yggConfig.storageTimeout,
+            yggConfig.storageTimeout)
+          val vfs =
+            new SecureVFS(actorVFS, permissionsFinder, jobManager, Clock.System)
 
-        trait TableCompanion extends VFSColumnarTableCompanion
+          trait TableCompanion extends VFSColumnarTableCompanion
 
-        object Table extends TableCompanion
+          object Table extends TableCompanion
 
-        def Evaluator[N[+ _]](N0: Monad[N])(
-            implicit mn: Future ~> N, nm: N ~> Future): EvaluatorLike[N] =
-          new Evaluator[N](N0) {
-            type YggConfig = REPLConfig
-            val yggConfig = replConfig
-            val report = LoggingQueryLogger[N](N0)
-            def freshIdScanner = self.freshIdScanner
-          }
+          def Evaluator[N[+ _]](N0: Monad[N])(
+              implicit mn: Future ~> N,
+              nm: N ~> Future): EvaluatorLike[N] =
+            new Evaluator[N](N0) {
+              type YggConfig = REPLConfig
+              val yggConfig = replConfig
+              val report = LoggingQueryLogger[N](N0)
+              def freshIdScanner = self.freshIdScanner
+            }
 
-        def startup = IO { PrecogUnit }
+          def startup = IO { PrecogUnit }
 
-        def shutdown = IO {
-          Await.result(
+          def shutdown = IO {
+            Await.result(
               gracefulStop(projectionsActor, yggConfig.controlTimeout),
               yggConfig.controlTimeout)
-          actorSystem.shutdown()
-          PrecogUnit
+            actorSystem.shutdown()
+            PrecogUnit
+          }
         }
       }
     }
-  }
 
   val run = repl.flatMap[PrecogUnit] {
     case scalaz.Success(lifecycle) =>
@@ -374,8 +395,9 @@ object Console extends App {
       } yield PrecogUnit
 
     case scalaz.Failure(error) =>
-      IO(sys.error("An error occurred deserializing a database descriptor: " +
-              error))
+      IO(
+        sys.error("An error occurred deserializing a database descriptor: " +
+          error))
   }
 
   run.unsafePerformIO

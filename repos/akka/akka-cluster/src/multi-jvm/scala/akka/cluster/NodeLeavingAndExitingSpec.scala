@@ -19,8 +19,9 @@ object NodeLeavingAndExitingMultiJvmSpec extends MultiNodeConfig {
   val second = role("second")
   val third = role("third")
 
-  commonConfig(debugConfig(on = false).withFallback(
-          MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet))
+  commonConfig(
+    debugConfig(on = false).withFallback(
+      MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet))
 }
 
 class NodeLeavingAndExitingMultiJvmNode1 extends NodeLeavingAndExitingSpec
@@ -43,17 +44,20 @@ abstract class NodeLeavingAndExitingSpec
       runOn(first, third) {
         val secondAddess = address(second)
         val exitingLatch = TestLatch()
-        cluster.subscribe(system.actorOf(Props(new Actor {
-          def receive = {
-            case state: CurrentClusterState ⇒
-              if (state.members.exists(
+        cluster.subscribe(
+          system.actorOf(Props(new Actor {
+            def receive = {
+              case state: CurrentClusterState ⇒
+                if (state.members.exists(
                       m ⇒ m.address == secondAddess && m.status == Exiting))
+                  exitingLatch.countDown()
+              case MemberExited(m) if m.address == secondAddess ⇒
                 exitingLatch.countDown()
-            case MemberExited(m) if m.address == secondAddess ⇒
-              exitingLatch.countDown()
-            case _: MemberRemoved ⇒ // not tested here
-          }
-        }).withDeploy(Deploy.local)), classOf[MemberEvent])
+              case _: MemberRemoved ⇒ // not tested here
+            }
+          }).withDeploy(Deploy.local)),
+          classOf[MemberEvent]
+        )
         enterBarrier("registered-listener")
 
         runOn(third) {

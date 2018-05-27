@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -26,7 +26,11 @@ import blueeyes.json._
 import blueeyes.json.serialization.{Extractor, Decomposer}
 import blueeyes.json.serialization.Extractor.Error
 import blueeyes.json.serialization.Extractor.Invalid
-import blueeyes.json.serialization.DefaultSerialization.{DateTimeDecomposer => _, DateTimeExtractor => _, _}
+import blueeyes.json.serialization.DefaultSerialization.{
+  DateTimeDecomposer => _,
+  DateTimeExtractor => _,
+  _
+}
 import blueeyes.json.serialization.Versioned._
 
 import com.weiglewilczek.slf4s.Logging
@@ -80,7 +84,8 @@ case class WritePermission(path: Path, writeAs: WriteAs) extends Permission {
 }
 
 case class ExecutePermission(path: Path, writtenBy: WrittenBy)
-    extends Permission with WrittenByPermission {
+    extends Permission
+    with WrittenByPermission {
   def implies(other: Permission): Boolean = other match {
     case p @ ExecutePermission(path0, w0) =>
       path.isEqualOrParentOf(path0) && WrittenBy.implies(this, p)
@@ -89,9 +94,10 @@ case class ExecutePermission(path: Path, writtenBy: WrittenBy)
 }
 
 case class ReadPermission(path: Path, writtenBy: WrittenBy)
-    extends Permission with WrittenByPermission {
+    extends Permission
+    with WrittenByPermission {
   def implies(other: Permission): Boolean = other match {
-    case p: ReadPermission => WrittenBy.implies(this, p)
+    case p: ReadPermission   => WrittenBy.implies(this, p)
     case p: ReducePermission => WrittenBy.implies(this, p)
     case p @ ExecutePermission(path0, w0) =>
       path.isEqualOrParentOf(path0) && WrittenBy.implies(this, p)
@@ -100,25 +106,27 @@ case class ReadPermission(path: Path, writtenBy: WrittenBy)
 }
 
 case class ReducePermission(path: Path, writtenBy: WrittenBy)
-    extends Permission with WrittenByPermission {
+    extends Permission
+    with WrittenByPermission {
   def implies(other: Permission): Boolean = other match {
     case p: ReducePermission => WrittenBy.implies(this, p)
-    case _ => false
+    case _                   => false
   }
 }
 
 case class DeletePermission(path: Path, writtenBy: WrittenBy)
-    extends Permission with WrittenByPermission {
+    extends Permission
+    with WrittenByPermission {
   def implies(other: Permission): Boolean = other match {
     case p: DeletePermission => WrittenBy.implies(this, p)
-    case _ => false
+    case _                   => false
   }
 }
 
 object Permission {
   sealed trait WriteAs
   case object WriteAsAny extends WriteAs
-  case class WriteAsAll private[Permission](accountIds: Set[AccountId])
+  case class WriteAsAll private[Permission] (accountIds: Set[AccountId])
       extends WriteAs
 
   object WriteAs {
@@ -140,48 +148,50 @@ object Permission {
     val any: WrittenBy = WrittenByAny
     def apply(accountId: AccountId): WrittenBy = WrittenByAccount(accountId)
 
-    def implies(permission: WrittenByPermission,
-                candidate: WrittenByPermission): Boolean = {
+    def implies(
+        permission: WrittenByPermission,
+        candidate: WrittenByPermission): Boolean = {
       permission.path.isEqualOrParentOf(candidate.path) &&
       (permission.writtenBy match {
-            case WrittenByAny => true
-            case WrittenByAccount(accountId) =>
-              candidate.writtenBy match {
-                case WrittenByAny => false
-                case WrittenByAccount(cid) => cid == accountId
-              }
-          })
+        case WrittenByAny => true
+        case WrittenByAccount(accountId) =>
+          candidate.writtenBy match {
+            case WrittenByAny          => false
+            case WrittenByAccount(cid) => cid == accountId
+          }
+      })
     }
   }
 
   def accessType(p: Permission) = p match {
     case _: ExecutePermission => "execute"
-    case _: ReadPermission => "read"
-    case _: ReducePermission => "reduce"
-    case _: WritePermission => "write"
-    case _: DeletePermission => "delete"
+    case _: ReadPermission    => "read"
+    case _: ReducePermission  => "reduce"
+    case _: WritePermission   => "write"
+    case _: DeletePermission  => "delete"
   }
 
   def ownerAccountIds(p: Permission): Set[AccountId] = p match {
-    case WritePermission(_, WriteAsAll(ids)) => ids
-    case WritePermission(_, WriteAsAny) => Set()
+    case WritePermission(_, WriteAsAll(ids))          => ids
+    case WritePermission(_, WriteAsAny)               => Set()
     case WrittenByPermission(_, WrittenByAccount(id)) => Set(id)
-    case WrittenByPermission(_, WrittenByAny) => Set()
+    case WrittenByPermission(_, WrittenByAny)         => Set()
   }
 
   val decomposerV1Base: Decomposer[Permission] = new Decomposer[Permission] {
     override def decompose(p: Permission): JValue = {
       JObject(
-          "accessType" -> accessType(p).serialize,
-          "path" -> p.path.serialize,
-          "ownerAccountIds" -> ownerAccountIds(p).serialize
+        "accessType" -> accessType(p).serialize,
+        "path" -> p.path.serialize,
+        "ownerAccountIds" -> ownerAccountIds(p).serialize
       )
     }
   }
 
   val extractorV1Base: Extractor[Permission] = new Extractor[Permission] {
     private def writtenByPermission(
-        obj: JValue, pathV: Validation[Error, Path])(
+        obj: JValue,
+        pathV: Validation[Error, Path])(
         f: (Path, WrittenBy) => Permission): Validation[Error, Permission] = {
       (obj \? "ownerAccountIds") map { ids =>
         Apply[({ type l[a] = Validation[Error, a] })#l].zip
@@ -192,7 +202,7 @@ object Permission {
               success(f(path, WrittenByAccount(accountIds.head)))
             else
               failure(Invalid(
-                      "Cannot extract read permission for more than one account ID."))
+                "Cannot extract read permission for more than one account ID."))
         }
       } getOrElse {
         pathV map { f(_: Path, WrittenByAny) }
@@ -225,7 +235,8 @@ object Permission {
 
   val extractorV0: Extractor[Permission] = new Extractor[Permission] {
     private def writtenByPermission(
-        obj: JValue, pathV: Validation[Error, Path])(
+        obj: JValue,
+        pathV: Validation[Error, Path])(
         f: (Path, WrittenBy) => Permission): Validation[Error, Permission] = {
       obj.validated[Option[String]]("ownerAccountId") flatMap { opt =>
         opt map { id =>

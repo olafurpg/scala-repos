@@ -10,20 +10,24 @@ import java.security.{PrivilegedAction, AccessController, Provider}
   */
 object AkkaProvider
     extends Provider(
-        "Akka",
-        1.0,
-        "Akka provider 1.0 that implements a secure AES random number generator") {
+      "Akka",
+      1.0,
+      "Akka provider 1.0 that implements a secure AES random number generator") {
   AccessController.doPrivileged(new PrivilegedAction[this.type] {
     def run = {
       //SecureRandom
-      put("SecureRandom.AES128CounterSecureRNG",
-          classOf[AES128CounterSecureRNG].getName)
-      put("SecureRandom.AES256CounterSecureRNG",
-          classOf[AES256CounterSecureRNG].getName)
-      put("SecureRandom.AES128CounterInetRNG",
-          classOf[AES128CounterInetRNG].getName)
-      put("SecureRandom.AES256CounterInetRNG",
-          classOf[AES256CounterInetRNG].getName)
+      put(
+        "SecureRandom.AES128CounterSecureRNG",
+        classOf[AES128CounterSecureRNG].getName)
+      put(
+        "SecureRandom.AES256CounterSecureRNG",
+        classOf[AES256CounterSecureRNG].getName)
+      put(
+        "SecureRandom.AES128CounterInetRNG",
+        classOf[AES128CounterInetRNG].getName)
+      put(
+        "SecureRandom.AES256CounterInetRNG",
+        classOf[AES256CounterInetRNG].getName)
 
       //Implementation type: software or hardware
       put("SecureRandom.AES128CounterSecureRNG ImplementedIn", "Software")

@@ -38,13 +38,14 @@ object Opening extends LilaController {
       win: Option[Boolean])(implicit ctx: Context): Fu[Result] =
     identify(opening) map { identified =>
       Ok(
-          JsData(opening,
-                 identified,
-                 infos,
-                 play = play,
-                 attempt = attempt,
-                 win = win,
-                 animationDuration = env.AnimationDuration)) as JSON
+        JsData(
+          opening,
+          identified,
+          infos,
+          play = play,
+          attempt = attempt,
+          win = win,
+          animationDuration = env.AnimationDuration)) as JSON
     }
 
   def home = Open { implicit ctx =>
@@ -70,48 +71,43 @@ object Opening extends LilaController {
   }
 
   private val attemptForm = Form(
-      mapping(
-          "found" -> number,
-          "failed" -> number
-      )(Tuple2.apply)(Tuple2.unapply))
+    mapping(
+      "found" -> number,
+      "failed" -> number
+    )(Tuple2.apply)(Tuple2.unapply))
 
   def attempt(id: OpeningModel.ID) = OpenBody { implicit ctx =>
     implicit val req = ctx.body
     OptionFuResult(env.api.opening find id) { opening =>
       attemptForm.bindFromRequest.fold(
-          err => fuccess(BadRequest(errorsAsJson(err)) as JSON),
-          data =>
-            {
-              val (found, failed) = data
-              val win = found == opening.goal && failed == 0
-              ctx.me match {
-                case Some(me) =>
-                  env.finisher(opening, me, win) flatMap {
-                    case (newAttempt, None) =>
-                      UserRepo byId me.id map (_ | me) flatMap {
-                        me2 =>
-                          (env.api.opening find id) zip
-                          (env userInfos me2.some) flatMap {
-                            case (o2, infos) =>
-                              makeData(o2 | opening,
-                                       infos,
-                                       false,
-                                       newAttempt.some,
-                                       none)
-                          }
-                      }
-                    case (oldAttempt, Some(win)) =>
-                      env userInfos me.some flatMap { infos =>
-                        makeData(opening,
-                                 infos,
-                                 false,
-                                 oldAttempt.some,
-                                 win.some)
-                      }
+        err => fuccess(BadRequest(errorsAsJson(err)) as JSON),
+        data => {
+          val (found, failed) = data
+          val win = found == opening.goal && failed == 0
+          ctx.me match {
+            case Some(me) =>
+              env.finisher(opening, me, win) flatMap {
+                case (newAttempt, None) =>
+                  UserRepo byId me.id map (_ | me) flatMap { me2 =>
+                    (env.api.opening find id) zip
+                      (env userInfos me2.some) flatMap {
+                      case (o2, infos) =>
+                        makeData(
+                          o2 | opening,
+                          infos,
+                          false,
+                          newAttempt.some,
+                          none)
+                    }
                   }
-                case None => makeData(opening, none, false, none, win.some)
+                case (oldAttempt, Some(win)) =>
+                  env userInfos me.some flatMap { infos =>
+                    makeData(opening, infos, false, oldAttempt.some, win.some)
+                  }
               }
+            case None => makeData(opening, none, false, none, win.some)
           }
+        }
       )
     }
   }

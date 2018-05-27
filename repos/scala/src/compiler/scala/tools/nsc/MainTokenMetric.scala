@@ -22,7 +22,7 @@ object MainTokenMetric {
     var totale = 0
     for (source <- fnames) {
       val s = new UnitScanner(
-          new CompilationUnit(compiler.getSourceFile(source)))
+        new CompilationUnit(compiler.getSourceFile(source)))
       s.nextToken()
       var i = 0
       while (s.token != EOF) {

@@ -67,8 +67,9 @@ object IntroduceImplicitParameterIntention {
       }
     }
 
-    val result = expr.result.getOrElse(return Right(
-            InspectionBundle.message("introduce.implicit.not.allowed.here")))
+    val result = expr.result.getOrElse(
+      return Right(
+        InspectionBundle.message("introduce.implicit.not.allowed.here")))
 
     val buf = new StringBuilder
     buf.append(result.getText)
@@ -81,13 +82,13 @@ object IntroduceImplicitParameterIntention {
 
     if (occurrences.isEmpty || occurrences.size != expr.parameters.size)
       return Right(
-          InspectionBundle.message("introduce.implicit.incorrect.count"))
+        InspectionBundle.message("introduce.implicit.incorrect.count"))
 
     for (p <- expr.parameters) {
       if (!occurrences.keySet.contains(p.name) ||
           occurrences(p.name) < previousOffset)
         return Right(
-            InspectionBundle.message("introduce.implicit.incorrect.order"))
+          InspectionBundle.message("introduce.implicit.incorrect.order"))
       previousOffset = occurrences(p.name)
     }
 
@@ -95,7 +96,7 @@ object IntroduceImplicitParameterIntention {
       val expectedType = p.expectedParamType
       val declaredType = p.typeElement
       val newParam = declaredType match {
-        case None => "_"
+        case None                       => "_"
         case _ if withoutParameterTypes => "_"
         case Some(t) if expectedType.exists(_.equiv(t.getType().getOrAny)) =>
           "_"
@@ -107,11 +108,12 @@ object IntroduceImplicitParameterIntention {
     }
 
     val newExpr = ScalaPsiElementFactory.createExpressionFromText(
-        buf.toString(), expr.getManager)
+      buf.toString(),
+      expr.getManager)
 
     if (!isValidExpr(newExpr, expr.parameters.length))
       return Right(
-          InspectionBundle.message("introduce.implicit.not.allowed.here"))
+        InspectionBundle.message("introduce.implicit.not.allowed.here"))
 
     Left(newExpr)
   }
@@ -124,7 +126,9 @@ class IntroduceImplicitParameterIntention
   override def getText: String = getFamilyName
 
   def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+      project: Project,
+      editor: Editor,
+      element: PsiElement): Boolean = {
     val expr: ScFunctionExpr =
       PsiTreeUtil.getParentOfType(element, classOf[ScFunctionExpr], false)
     if (expr == null) return false

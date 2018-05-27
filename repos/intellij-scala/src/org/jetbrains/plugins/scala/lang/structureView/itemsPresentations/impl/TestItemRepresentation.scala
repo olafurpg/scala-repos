@@ -11,7 +11,9 @@ import org.jetbrains.plugins.scala.lang.structureView.itemsPresentations.ScalaIt
   * @since 14.04.2015.
   */
 class TestItemRepresentation(
-    private val element: PsiElement, val testName: String, val testStatus: Int)
+    private val element: PsiElement,
+    val testName: String,
+    val testStatus: Int)
     extends ScalaItemPresentation(element) {
 
   override def getPresentableText: String = testName
@@ -19,6 +21,6 @@ class TestItemRepresentation(
   override def getIcon(open: Boolean) = testStatus match {
     case TestStructureViewElement.ignoredStatusId => IGNORED_ICON
     case TestStructureViewElement.pendingStatusId => NOT_RAN
-    case _ => Icons.SCALA_TEST_NODE
+    case _                                        => Icons.SCALA_TEST_NODE
   }
 }

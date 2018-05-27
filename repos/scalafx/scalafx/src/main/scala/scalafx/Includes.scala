@@ -58,10 +58,23 @@ import scalafx.util.converter.ConverterIncludes
 object Includes extends Includes
 
 trait Includes
-    extends AnimationIncludes with DelegateIncludes with CollectionIncludes
-    with EventIncludes with SceneIncludes with BeanIncludes with UtilIncludes
-    with GeometryIncludes with TransformIncludes with InputIncludes
-    with StageIncludes with WebIncludes with MediaIncludes
-    with ConverterIncludes with ConcurrentIncludes with CanvasIncludes
-    with ApplicationIncludes with CssIncludes with PrintIncludes
+    extends AnimationIncludes
+    with DelegateIncludes
+    with CollectionIncludes
+    with EventIncludes
+    with SceneIncludes
+    with BeanIncludes
+    with UtilIncludes
+    with GeometryIncludes
+    with TransformIncludes
+    with InputIncludes
+    with StageIncludes
+    with WebIncludes
+    with MediaIncludes
+    with ConverterIncludes
+    with ConcurrentIncludes
+    with CanvasIncludes
+    with ApplicationIncludes
+    with CssIncludes
+    with PrintIncludes
     with SwingIncludes

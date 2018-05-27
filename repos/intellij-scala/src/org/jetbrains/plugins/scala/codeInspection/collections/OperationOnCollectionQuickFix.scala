@@ -16,7 +16,8 @@ class OperationOnCollectionQuickFix(expr: ScExpression, simpl: Simplification)
     val toReplace = simpl.exprToReplace.getElement
     if (!toReplace.isValid) return
     val newExpr = ScalaPsiElementFactory.createExpressionFromText(
-        simpl.replacementText, toReplace.getManager)
+      simpl.replacementText,
+      toReplace.getManager)
     toReplace.replaceExpression(newExpr, removeParenthesis = true)
   }
 }

@@ -43,8 +43,12 @@ import scala.collection.mutable.ListBuffer
   *  @author Mirco Dotta
   */
 abstract class InteractiveTest
-    extends AskParse with AskShutdown with AskReload with AskLoadedTyped
-    with PresentationCompilerInstance with CoreTestDefs
+    extends AskParse
+    with AskShutdown
+    with AskReload
+    with AskLoadedTyped
+    with PresentationCompilerInstance
+    with CoreTestDefs
     with InteractiveTestSettings {
   self =>
 
@@ -58,10 +62,11 @@ abstract class InteractiveTest
     *  Override this member if you need to change the default set of executed test actions.
     */
   protected lazy val testActions: ListBuffer[PresentationCompilerTestDef] = {
-    ListBuffer(new TypeCompletionAction(compiler),
-               new ScopeCompletionAction(compiler),
-               new TypeAction(compiler),
-               new HyperlinkAction(compiler))
+    ListBuffer(
+      new TypeCompletionAction(compiler),
+      new ScopeCompletionAction(compiler),
+      new TypeAction(compiler),
+      new HyperlinkAction(compiler))
   }
 
   /** Add new presentation compiler actions to test. Presentation compiler's test
@@ -73,7 +78,8 @@ abstract class InteractiveTest
 
   /** Test's entry point */
   def main(args: Array[String]) {
-    try execute() finally askShutdown()
+    try execute()
+    finally askShutdown()
   }
 
   protected def execute(): Unit = {

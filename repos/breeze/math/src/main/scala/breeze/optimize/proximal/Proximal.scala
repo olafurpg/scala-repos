@@ -31,13 +31,12 @@ case class ProjectIdentity() extends Proximal {
 //2. Implement randomized O(n) algorithm from Duchi et al's paper Efficient Projections onto the l1-Ball for Learning in High Dimensions
 case class ProjectProbabilitySimplex(s: Double) extends Proximal {
   require(
-      s > 0,
-      s"Proximal:ProjectProbabilitySimplex Radius s must be strictly positive")
+    s > 0,
+    s"Proximal:ProjectProbabilitySimplex Radius s must be strictly positive")
   def prox(x: DenseVector[Double], rho: Double = 1.0) = {
     val sorted = x.data.sorted(Ordering[Double].reverse)
     val cum = sorted.scanLeft(0.0)(_ + _).slice(1, x.length + 1)
-    val cs = DenseVector(
-        cum.zipWithIndex.map { elem =>
+    val cs = DenseVector(cum.zipWithIndex.map { elem =>
       (elem._1 - s) / (elem._2 + 1)
     })
     val ndx =
@@ -187,12 +186,13 @@ case class ProximalLogBarrier() extends Proximal {
 
 // f = huber = x^2 if |x|<=1, 2|x| - 1 otherwise
 case class ProximalHuber() extends Proximal {
-  def proxScalar(v: Double,
-                 rho: Double,
-                 oracle: Double => Double,
-                 l: Double,
-                 u: Double,
-                 x0: Double): Double = {
+  def proxScalar(
+      v: Double,
+      rho: Double,
+      oracle: Double => Double,
+      l: Double,
+      u: Double,
+      x0: Double): Double = {
     val MAX_ITER = 1000
     val tol = 1e-8
 
@@ -219,11 +219,12 @@ case class ProximalHuber() extends Proximal {
     x
   }
 
-  def proxSeparable(x: DenseVector[Double],
-                    rho: Double,
-                    oracle: Double => Double,
-                    l: Double,
-                    u: Double) = {
+  def proxSeparable(
+      x: DenseVector[Double],
+      rho: Double,
+      oracle: Double => Double,
+      l: Double,
+      u: Double) = {
     x.map(proxScalar(_, rho, oracle, l, u, 0))
     cforRange(0 until x.length) { i =>
       x.update(i, proxScalar(x(i), rho, oracle, l, u, 0))

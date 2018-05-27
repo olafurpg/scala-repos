@@ -6,7 +6,8 @@ class Defaults(someArg: String = "a default String") {
     println()
   }
   def methWithDefaults2(arg1: String, arg2: Int = 42)(
-      barg1: String, barg2: Int = arg2 + 1) = {}
+      barg1: String,
+      barg2: Int = arg2 + 1) = {}
 }
 
 trait BaseTrait {
@@ -20,7 +21,10 @@ trait BaseTrait {
   private def private_concreteTraitMethod3(x: Int, y: Long, z: String): Long =
     y
   private def private_concreteTraitMethod4(
-      x: Int, y: Double, z: String, t: Object): Unit = ()
+      x: Int,
+      y: Double,
+      z: String,
+      t: Object): Unit = ()
 
   def concreteTraitMethodWithDefault(
       someArg2: String = "yet another default String") = {
@@ -68,28 +72,8 @@ class MethodClassifiers {
     c.abstractMethodWithDefault()
     c.concreteTraitMethod4(42, 42.0, "42", new Object)
     val maxArgs = new MaxArgsC
-    maxArgs.manyArgs(42.0,
-                     42.0,
-                     42.0,
-                     42.0,
-                     42.0,
-                     42.0,
-                     42.0,
-                     42.0,
-                     42.0,
-                     42.0,
-                     42.0,
-                     42.0,
-                     42.0,
-                     42.0,
-                     42.0,
-                     42.0,
-                     42.0,
-                     42.0,
-                     42.0,
-                     42.0,
-                     42.0,
-                     42.0)
+    maxArgs.manyArgs(42.0, 42.0, 42.0, 42.0, 42.0, 42.0, 42.0, 42.0, 42.0, 42.0,
+      42.0, 42.0, 42.0, 42.0, 42.0, 42.0, 42.0, 42.0, 42.0, 42.0, 42.0, 42.0)
   }
 }
 

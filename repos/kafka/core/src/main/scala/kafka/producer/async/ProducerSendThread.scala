@@ -24,19 +24,24 @@ import kafka.metrics.KafkaMetricsGroup
 import com.yammer.metrics.core.Gauge
 
 @deprecated(
-    "This class has been deprecated and will be removed in a future release.",
-    "0.10.0.0")
-class ProducerSendThread[K, V](val threadName: String,
-                               val queue: BlockingQueue[KeyedMessage[K, V]],
-                               val handler: EventHandler[K, V],
-                               val queueTime: Long,
-                               val batchSize: Int,
-                               val clientId: String)
-    extends Thread(threadName) with Logging with KafkaMetricsGroup {
+  "This class has been deprecated and will be removed in a future release.",
+  "0.10.0.0")
+class ProducerSendThread[K, V](
+    val threadName: String,
+    val queue: BlockingQueue[KeyedMessage[K, V]],
+    val handler: EventHandler[K, V],
+    val queueTime: Long,
+    val batchSize: Int,
+    val clientId: String)
+    extends Thread(threadName)
+    with Logging
+    with KafkaMetricsGroup {
 
   private val shutdownLatch = new CountDownLatch(1)
   private val shutdownCommand = new KeyedMessage[K, V](
-      "shutdown", null.asInstanceOf[K], null.asInstanceOf[V])
+    "shutdown",
+    null.asInstanceOf[K],
+    null.asInstanceOf[V])
 
   newGauge("ProducerQueueSize", new Gauge[Int] {
     def value = queue.size
@@ -67,9 +72,9 @@ class ProducerSendThread[K, V](val threadName: String,
     // drain the queue until you get a shutdown command
     Iterator
       .continually(
-          queue.poll(scala.math.max(
-                         0, (lastSend + queueTime) - SystemTime.milliseconds),
-                     TimeUnit.MILLISECONDS))
+        queue.poll(
+          scala.math.max(0, (lastSend + queueTime) - SystemTime.milliseconds),
+          TimeUnit.MILLISECONDS))
       .takeWhile(item => if (item != null) item ne shutdownCommand else true)
       .foreach { currentQueueItem =>
         val elapsed = (SystemTime.milliseconds - lastSend)
@@ -78,10 +83,10 @@ class ProducerSendThread[K, V](val threadName: String,
         val expired = currentQueueItem == null
         if (currentQueueItem != null) {
           trace(
-              "Dequeued item for topic %s, partition key: %s, data: %s".format(
-                  currentQueueItem.topic,
-                  currentQueueItem.key,
-                  currentQueueItem.message))
+            "Dequeued item for topic %s, partition key: %s, data: %s".format(
+              currentQueueItem.topic,
+              currentQueueItem.key,
+              currentQueueItem.message))
           events += currentQueueItem
         }
 
@@ -102,8 +107,8 @@ class ProducerSendThread[K, V](val threadName: String,
     tryToHandle(events)
     if (queue.size > 0)
       throw new IllegalQueueStateException(
-          "Invalid queue state! After queue shutdown, %d remaining items in the queue"
-            .format(queue.size))
+        "Invalid queue state! After queue shutdown, %d remaining items in the queue"
+          .format(queue.size))
   }
 
   def tryToHandle(events: Seq[KeyedMessage[K, V]]) {

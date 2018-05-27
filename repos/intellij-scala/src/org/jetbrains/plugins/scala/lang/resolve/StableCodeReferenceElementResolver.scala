@@ -4,8 +4,15 @@ package resolve
 
 import com.intellij.psi.impl.source.resolve.ResolveCache
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScStableCodeReferenceElement
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScConstructorPattern, ScInfixPattern, ScInterpolationPattern}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.{ScImportExpr, ScImportSelector}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScConstructorPattern,
+  ScInfixPattern,
+  ScInterpolationPattern
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.{
+  ScImportExpr,
+  ScImportSelector
+}
 import org.jetbrains.plugins.scala.lang.psi.types.Compatibility.Expression
 import org.jetbrains.plugins.scala.lang.resolve.processor._
 
@@ -25,15 +32,16 @@ class StableCodeReferenceElementResolver(
         val effectiveArgs =
           constr.arguments.toList.map(_.exprs.map(new Expression(_))) match {
             case List() => List(List())
-            case x => x
+            case x      => x
           }
-        new ConstructorResolveProcessor(ref,
-                                        ref.refName,
-                                        effectiveArgs,
-                                        typeArgs,
-                                        kinds,
-                                        shapeResolve,
-                                        allConstructorResults)
+        new ConstructorResolveProcessor(
+          ref,
+          ref.refName,
+          effectiveArgs,
+          typeArgs,
+          kinds,
+          shapeResolve,
+          allConstructorResults)
       } else
         ref.getContext match {
           //last ref may import many elements with the same name
@@ -45,13 +53,22 @@ class StableCodeReferenceElementResolver(
             new CollectAllForImportProcessor(kinds, ref, reference.refName)
           case constr: ScInterpolationPattern =>
             new ExtractorResolveProcessor(
-                ref, reference.refName, kinds, constr.expectedType)
+              ref,
+              reference.refName,
+              kinds,
+              constr.expectedType)
           case constr: ScConstructorPattern =>
             new ExtractorResolveProcessor(
-                ref, reference.refName, kinds, constr.expectedType)
+              ref,
+              reference.refName,
+              kinds,
+              constr.expectedType)
           case infix: ScInfixPattern =>
             new ExtractorResolveProcessor(
-                ref, reference.refName, kinds, infix.expectedType)
+              ref,
+              reference.refName,
+              kinds,
+              infix.expectedType)
           case _ => new ResolveProcessor(kinds, ref, reference.refName)
         }
 

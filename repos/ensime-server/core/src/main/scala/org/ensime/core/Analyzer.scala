@@ -49,8 +49,10 @@ class Analyzer(
     search: SearchService,
     implicit val config: EnsimeConfig,
     implicit val vfs: EnsimeVFS
-)
-    extends Actor with Stash with ActorLogging with RefactoringHandler {
+) extends Actor
+    with Stash
+    with ActorLogging
+    with RefactoringHandler {
 
   import FileUtils._
 
@@ -75,8 +77,8 @@ class Analyzer(
       case None =>
         log.warning("scala-library.jar not present, enabling Odersky mode")
     }
-    settings.classpath.value = config.compileClasspath.mkString(
-        JFile.pathSeparator)
+    settings.classpath.value =
+      config.compileClasspath.mkString(JFile.pathSeparator)
     settings.processArguments(config.compilerArgs, processAll = false)
     presCompLog.debug("Presentation Compiler settings:\n" + settings)
 
@@ -96,19 +98,19 @@ class Analyzer(
     scalaCompiler = makeScalaCompiler()
 
     broadcaster ! SendBackgroundMessageEvent(
-        "Initializing Analyzer. Please wait...")
+      "Initializing Analyzer. Please wait...")
 
     scalaCompiler.askNotifyWhenReady()
     if (config.sourceMode) scalaCompiler.askReloadAllFiles()
   }
 
   protected def makeScalaCompiler() = new RichPresentationCompiler(
-      config,
-      settings,
-      reporter,
-      self,
-      indexer,
-      search
+    config,
+    settings,
+    reporter,
+    self,
+    indexer,
+    search
   )
 
   protected def restartCompiler(keepLoaded: Boolean): Unit = {
@@ -201,7 +203,9 @@ class Analyzer(
       sender ! withExisting(fileInfo) {
         reporter.disable()
         scalaCompiler.askCompletionsAt(
-            pos(fileInfo, point), maxResults, caseSens)
+          pos(fileInfo, point),
+          maxResults,
+          caseSens)
       }
     case UsesOfSymbolAtPointReq(file, point) =>
       sender ! withExisting(file) {
@@ -229,9 +233,10 @@ class Analyzer(
         scalaCompiler.askLoadedTyped(p.source)
         scalaCompiler.askSymbolInfoAt(p).getOrElse(FalseResponse)
       }
-    case SymbolByNameReq(typeFullName: String,
-                         memberName: Option[String],
-                         signatureString: Option[String]) =>
+    case SymbolByNameReq(
+        typeFullName: String,
+        memberName: Option[String],
+        signatureString: Option[String]) =>
       sender ! scalaCompiler
         .askSymbolByName(typeFullName, memberName, signatureString)
         .getOrElse(FalseResponse)
@@ -239,11 +244,14 @@ class Analyzer(
       val p = pos(file, range)
       scalaCompiler.askLoadedTyped(p.source)
       sender() ! scalaCompiler.askDocSignatureAtPoint(p)
-    case DocUriForSymbolReq(typeFullName: String,
-                            memberName: Option[String],
-                            signatureString: Option[String]) =>
+    case DocUriForSymbolReq(
+        typeFullName: String,
+        memberName: Option[String],
+        signatureString: Option[String]) =>
       sender() ! scalaCompiler.askDocSignatureForSymbol(
-          typeFullName, memberName, signatureString)
+        typeFullName,
+        memberName,
+        signatureString)
     case InspectPackageByPathReq(path: String) =>
       sender ! scalaCompiler.askPackageByPath(path).getOrElse(FalseResponse)
     case TypeAtPointReq(file, range: OffsetRange) =>
@@ -293,9 +301,11 @@ class Analyzer(
   def handleReloadFiles(files: List[SourceFileInfo]): RpcResponse = {
     val (existing, missingFiles) = files.partition(FileUtils.exists)
     if (missingFiles.nonEmpty) {
-      val missingFilePaths = missingFiles.map { f =>
-        "\"" + f.file + "\""
-      }.mkString(",")
+      val missingFilePaths = missingFiles
+        .map { f =>
+          "\"" + f.file + "\""
+        }
+        .mkString(",")
       EnsimeServerError(s"file(s): $missingFilePaths do not exist")
     } else {
       val (javas, scalas) =

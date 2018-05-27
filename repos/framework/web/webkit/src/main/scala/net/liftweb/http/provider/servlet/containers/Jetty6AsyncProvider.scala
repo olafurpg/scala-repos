@@ -33,18 +33,21 @@ object Jetty6AsyncProvider extends AsyncProviderMeta {
   // contSupport below gets inferred as a Class[?0] existential.
   import scala.language.existentials
 
-  private lazy val (hasContinuations_?,
-                    contSupport,
-                    getContinuation,
-                    getObject,
-                    setObject,
-                    suspendMeth,
-                    resumeMeth,
-                    isPending) = {
+  private lazy val (
+    hasContinuations_?,
+    contSupport,
+    getContinuation,
+    getObject,
+    setObject,
+    suspendMeth,
+    resumeMeth,
+    isPending) = {
     try {
       val cc = Class.forName("org.mortbay.util.ajax.ContinuationSupport")
       val meth = cc.getMethod(
-          "getContinuation", classOf[HttpServletRequest], classOf[AnyRef])
+        "getContinuation",
+        classOf[HttpServletRequest],
+        classOf[AnyRef])
       val cci = Class.forName("org.mortbay.util.ajax.Continuation")
       val getObj = cci.getMethod("getObject")
       val setObj = cci.getMethod("setObject", classOf[AnyRef])
@@ -74,7 +77,8 @@ object Jetty6AsyncProvider extends AsyncProviderMeta {
   *
   */
 class Jetty6AsyncProvider(req: HTTPRequest)
-    extends ServletAsyncProvider with Loggable {
+    extends ServletAsyncProvider
+    with Loggable {
 
   import Jetty6AsyncProvider._
 
@@ -92,7 +96,7 @@ class Jetty6AsyncProvider(req: HTTPRequest)
         setObject.invoke(cont, null)
         ret match {
           case (r: Req, lr: LiftResponse) => Some(r -> lr)
-          case _ => None
+          case _                          => None
         }
       } catch {
         case e: Exception => None

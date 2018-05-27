@@ -21,7 +21,10 @@ import java.util.concurrent.atomic.AtomicLong
 
 import org.apache.spark.SparkContext
 import org.apache.spark.sql.SQLContext
-import org.apache.spark.sql.execution.ui.{SparkListenerSQLExecutionEnd, SparkListenerSQLExecutionStart}
+import org.apache.spark.sql.execution.ui.{
+  SparkListenerSQLExecutionEnd,
+  SparkListenerSQLExecutionStart
+}
 import org.apache.spark.util.Utils
 
 private[sql] object SQLExecution {
@@ -36,8 +39,9 @@ private[sql] object SQLExecution {
     * Wrap an action that will execute "queryExecution" to track all Spark jobs in the body so that
     * we can connect them with an execution.
     */
-  def withNewExecutionId[T](sqlContext: SQLContext,
-                            queryExecution: QueryExecution)(body: => T): T = {
+  def withNewExecutionId[T](
+      sqlContext: SQLContext,
+      queryExecution: QueryExecution)(body: => T): T = {
     val sc = sqlContext.sparkContext
     val oldExecutionId = sc.getLocalProperty(EXECUTION_ID_KEY)
     if (oldExecutionId == null) {
@@ -46,19 +50,21 @@ private[sql] object SQLExecution {
       val r = try {
         val callSite = Utils.getCallSite()
         sqlContext.sparkContext.listenerBus.post(
-            SparkListenerSQLExecutionStart(
-                executionId,
-                callSite.shortForm,
-                callSite.longForm,
-                queryExecution.toString,
-                SparkPlanInfo.fromSparkPlan(queryExecution.executedPlan),
-                System.currentTimeMillis()))
+          SparkListenerSQLExecutionStart(
+            executionId,
+            callSite.shortForm,
+            callSite.longForm,
+            queryExecution.toString,
+            SparkPlanInfo.fromSparkPlan(queryExecution.executedPlan),
+            System.currentTimeMillis()
+          ))
         try {
           body
         } finally {
           sqlContext.sparkContext.listenerBus.post(
-              SparkListenerSQLExecutionEnd(
-                  executionId, System.currentTimeMillis()))
+            SparkListenerSQLExecutionEnd(
+              executionId,
+              System.currentTimeMillis()))
         }
       } finally {
         sc.setLocalProperty(EXECUTION_ID_KEY, null)

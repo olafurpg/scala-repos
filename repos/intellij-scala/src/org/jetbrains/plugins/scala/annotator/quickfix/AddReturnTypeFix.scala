@@ -27,6 +27,8 @@ class AddReturnTypeFix(fun: ScFunctionDefinition, tp: ScType)
   override def startInWriteAction(): Boolean = true
 
   override def isAvailable(
-      project: Project, editor: Editor, file: PsiFile): Boolean =
+      project: Project,
+      editor: Editor,
+      file: PsiFile): Boolean =
     fun.returnTypeElement.isEmpty
 }

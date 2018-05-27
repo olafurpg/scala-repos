@@ -10,7 +10,10 @@ import com.twitter.util.{Duration, Time, Timer}
   * the rate estimated by `estimator`.
   */
 class GcPredictor(
-    pool: Pool, period: Duration, timer: Timer, estimator: Estimator[Double]) {
+    pool: Pool,
+    period: Duration,
+    timer: Timer,
+    estimator: Estimator[Double]) {
   private[this] def loop() {
     for (bps <- pool.estimateAllocRate(period, timer)) {
       synchronized { estimator.measure(bps.toDouble) }

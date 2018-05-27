@@ -62,7 +62,8 @@ private[netty4] class Netty4ClientChannelInitializer[In, Out](
   * Base initializer which installs read / write timeouts and a connection handler
   */
 private[netty4] abstract class AbstractNetty4ClientChannelInitializer[In, Out](
-    transportP: Promise[Transport[In, Out]], params: Stack.Params)
+    transportP: Promise[Transport[In, Out]],
+    params: Stack.Params)
     extends ChannelInitializer[SocketChannel] {
   import Netty4ClientChannelInitializer._
   private[this] val Timer(timer) = params[Timer]
@@ -74,13 +75,15 @@ private[netty4] abstract class AbstractNetty4ClientChannelInitializer[In, Out](
 
     if (readTimeout.isFinite) {
       val (timeoutValue, timeoutUnit) = readTimeout.inTimeUnit
-      pipe.addFirst(ReadTimeoutHandlerKey,
-                    new ReadTimeoutHandler(timeoutValue, timeoutUnit))
+      pipe.addFirst(
+        ReadTimeoutHandlerKey,
+        new ReadTimeoutHandler(timeoutValue, timeoutUnit))
     }
 
     if (writeTimeout.isFinite)
-      pipe.addLast(WriteTimeoutHandlerKey,
-                   new WriteCompletionTimeoutHandler(timer, writeTimeout))
+      pipe.addLast(
+        WriteTimeoutHandlerKey,
+        new WriteCompletionTimeoutHandler(timer, writeTimeout))
 
     pipe.addLast(ConnectionHandlerKey, new ConnectionHandler(transportP))
   }
@@ -106,8 +109,7 @@ private[netty4] class RawNetty4ClientChannelInitializer[In, Out](
   }
 }
 
-private[netty4] class ConnectionHandler[In, Out](
-    p: Promise[Transport[In, Out]])
+private[netty4] class ConnectionHandler[In, Out](p: Promise[Transport[In, Out]])
     extends ChannelInboundHandlerAdapter {
 
   override def channelActive(ctx: ChannelHandlerContext): Unit = {

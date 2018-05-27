@@ -15,9 +15,10 @@ object WSConfigParserSpec extends Specification {
   "WSConfigParser" should {
 
     def parseThis(input: String)(implicit app: play.api.Application) = {
-      val config = play.api.Configuration(ConfigFactory
-            .parseString(input)
-            .withFallback(ConfigFactory.defaultReference()))
+      val config = play.api.Configuration(
+        ConfigFactory
+          .parseString(input)
+          .withFallback(ConfigFactory.defaultReference()))
       val parser =
         new WSConfigParser(config, app.injector.instanceOf[Environment])
       parser.parse()

@@ -20,8 +20,9 @@ class WebSocketDirectivesExamplesSpec extends RoutingSpec {
     def greeter: Flow[Message, Message, Any] =
       Flow[Message].mapConcat {
         case tm: TextMessage ⇒
-          TextMessage(Source.single("Hello ") ++ tm.textStream ++ Source
-                .single("!")) :: Nil
+          TextMessage(
+            Source.single("Hello ") ++ tm.textStream ++ Source
+              .single("!")) :: Nil
         case bm: BinaryMessage ⇒
           // ignore binary messages but drain content to avoid the stream being clogged
           bm.dataStream.runWith(Sink.ignore)
@@ -59,8 +60,9 @@ class WebSocketDirectivesExamplesSpec extends RoutingSpec {
     def greeterService: Flow[Message, Message, Any] =
       Flow[Message].mapConcat {
         case tm: TextMessage ⇒
-          TextMessage(Source.single("Hello ") ++ tm.textStream ++ Source
-                .single("!")) :: Nil
+          TextMessage(
+            Source.single("Hello ") ++ tm.textStream ++ Source
+              .single("!")) :: Nil
         case bm: BinaryMessage ⇒
           // ignore binary messages but drain content to avoid the stream being clogged
           bm.dataStream.runWith(Sink.ignore)
@@ -75,7 +77,8 @@ class WebSocketDirectivesExamplesSpec extends RoutingSpec {
     def websocketMultipleProtocolRoute =
       path("services") {
         handleWebSocketMessagesForProtocol(greeterService, "greeter") ~ handleWebSocketMessagesForProtocol(
-            echoService, "echo")
+          echoService,
+          "echo")
       }
 
     // tests:

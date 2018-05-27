@@ -44,7 +44,9 @@ import org.apache.spark.sql.types.{DoubleType, NumericType, StructType}
   */
 @Experimental
 class OneHotEncoder(override val uid: String)
-    extends Transformer with HasInputCol with HasOutputCol
+    extends Transformer
+    with HasInputCol
+    with HasOutputCol
     with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("oneHot"))
@@ -53,8 +55,8 @@ class OneHotEncoder(override val uid: String)
     * Whether to drop the last category in the encoded vector (default: true)
     * @group param
     */
-  final val dropLast: BooleanParam = new BooleanParam(
-      this, "dropLast", "whether to drop the last category")
+  final val dropLast: BooleanParam =
+    new BooleanParam(this, "dropLast", "whether to drop the last category")
   setDefault(dropLast -> true)
 
   /** @group setParam */
@@ -71,11 +73,12 @@ class OneHotEncoder(override val uid: String)
     val outputColName = $(outputCol)
 
     require(
-        schema(inputColName).dataType.isInstanceOf[NumericType],
-        s"Input column must be of type NumericType but got ${schema(inputColName).dataType}")
+      schema(inputColName).dataType.isInstanceOf[NumericType],
+      s"Input column must be of type NumericType but got ${schema(inputColName).dataType}")
     val inputFields = schema.fields
-    require(!inputFields.exists(_.name == outputColName),
-            s"Output column $outputColName already exists.")
+    require(
+      !inputFields.exists(_.name == outputColName),
+      s"Output column $outputColName already exists.")
 
     val inputAttr = Attribute.fromStructField(schema(inputColName))
     val outputAttrNames: Option[Array[String]] = inputAttr match {
@@ -95,7 +98,7 @@ class OneHotEncoder(override val uid: String)
         }
       case _: NumericAttribute =>
         throw new RuntimeException(
-            s"The input column $inputColName cannot be numeric.")
+          s"The input column $inputColName cannot be numeric.")
       case _ =>
         None // optimistic about unknown attributes
     }
@@ -103,8 +106,8 @@ class OneHotEncoder(override val uid: String)
     val filteredOutputAttrNames = outputAttrNames.map { names =>
       if ($(dropLast)) {
         require(
-            names.length > 1,
-            s"The input column $inputColName should have at least two distinct values.")
+          names.length > 1,
+          s"The input column $inputColName should have at least two distinct values.")
         names.dropRight(1)
       } else {
         names
@@ -131,7 +134,7 @@ class OneHotEncoder(override val uid: String)
     val outputColName = $(outputCol)
     val shouldDropLast = $(dropLast)
     var outputAttrGroup = AttributeGroup.fromStructField(
-        transformSchema(dataset.schema)(outputColName))
+      transformSchema(dataset.schema)(outputColName))
     if (outputAttrGroup.size < 0) {
       // If the number of attributes is unknown, we check the values from the input column.
       val numAttrs =
@@ -140,20 +143,18 @@ class OneHotEncoder(override val uid: String)
           .rdd
           .map(_.getDouble(0))
           .aggregate(0.0)(
-              (m, x) =>
-                {
-                  assert(
-                      x <= Int.MaxValue,
-                      s"OneHotEncoder only supports up to ${Int.MaxValue} indices, but got $x")
-                  assert(
-                      x >= 0.0 && x == x.toInt,
-                      s"Values from column $inputColName must be indices, but got $x.")
-                  math.max(m, x)
-              },
-              (m0, m1) =>
-                {
-                  math.max(m0, m1)
-              }
+            (m, x) => {
+              assert(
+                x <= Int.MaxValue,
+                s"OneHotEncoder only supports up to ${Int.MaxValue} indices, but got $x")
+              assert(
+                x >= 0.0 && x == x.toInt,
+                s"Values from column $inputColName must be indices, but got $x.")
+              math.max(m, x)
+            },
+            (m0, m1) => {
+              math.max(m0, m1)
+            }
           )
           .toInt + 1
       val outputAttrNames = Array.tabulate(numAttrs)(_.toString)
@@ -179,8 +180,8 @@ class OneHotEncoder(override val uid: String)
     }
 
     dataset.select(
-        col("*"),
-        encode(col(inputColName).cast(DoubleType)).as(outputColName, metadata))
+      col("*"),
+      encode(col(inputColName).cast(DoubleType)).as(outputColName, metadata))
   }
 
   override def copy(extra: ParamMap): OneHotEncoder = defaultCopy(extra)

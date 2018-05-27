@@ -42,14 +42,14 @@ class MetricsTest extends MarathonSpec with MockitoSugar {
     metrics = new Metrics(new MetricRegistry())
   }
 
-  test(
-      "Metrics#className should strip 'EnhancerByGuice' from the metric names") {
+  test("Metrics#className should strip 'EnhancerByGuice' from the metric names") {
     val instance =
       Guice.createInjector(new TestModule).getInstance(classOf[FooBar])
     assert(instance.getClass.getName.contains("EnhancerByGuice"))
 
     assert(
-        metrics.className(instance.getClass) == "mesosphere.marathon.metrics.FooBar")
+      metrics
+        .className(instance.getClass) == "mesosphere.marathon.metrics.FooBar")
   }
 
   test("Metrics caches the class names") {
@@ -64,7 +64,7 @@ class MetricsTest extends MarathonSpec with MockitoSugar {
   }
 
   test(
-      "Metrics#name should use a dot to separate the class name and the method name") {
+    "Metrics#name should use a dot to separate the class name and the method name") {
     val expectedName =
       "service.mesosphere.marathon.core.task.tracker.TaskTracker.write-request-time"
     val actualName =
@@ -96,7 +96,7 @@ class MetricsTest extends MarathonSpec with MockitoSugar {
   }
 
   test(
-      "The Timer wrapper should properly time method calls and proxy the updates") {
+    "The Timer wrapper should properly time method calls and proxy the updates") {
     val origTimer = mock[com.codahale.metrics.Timer]
     val timer = new Timer(origTimer)
 
@@ -104,8 +104,9 @@ class MetricsTest extends MarathonSpec with MockitoSugar {
 
     val durationCaptor = ArgumentCaptor.forClass(classOf[Long])
 
-    verify(origTimer).update(durationCaptor.capture(),
-                             org.mockito.Matchers.eq(TimeUnit.NANOSECONDS))
+    verify(origTimer).update(
+      durationCaptor.capture(),
+      org.mockito.Matchers.eq(TimeUnit.NANOSECONDS))
 
     assert(durationCaptor.getValue > 0)
   }

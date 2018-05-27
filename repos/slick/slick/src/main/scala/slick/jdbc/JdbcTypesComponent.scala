@@ -1,6 +1,14 @@
 package slick.jdbc
 
-import java.sql.{Blob, Clob, Date, Time, Timestamp, ResultSet, PreparedStatement}
+import java.sql.{
+  Blob,
+  Clob,
+  Date,
+  Time,
+  Timestamp,
+  ResultSet,
+  PreparedStatement
+}
 import java.util.UUID
 
 import scala.reflect.ClassTag
@@ -13,7 +21,8 @@ trait JdbcTypesComponent extends RelationalTypesComponent {
   self: JdbcProfile =>
 
   abstract class MappedJdbcType[T, U](
-      implicit val tmd: JdbcType[U], val classTag: ClassTag[T])
+      implicit val tmd: JdbcType[U],
+      val classTag: ClassTag[T])
       extends JdbcType[T] {
     def map(t: T): U
     def comap(u: U): T
@@ -47,13 +56,14 @@ trait JdbcTypesComponent extends RelationalTypesComponent {
     override def hashCode = tmd.hashCode() + classTag.hashCode()
     override def equals(o: Any) = o match {
       case o: MappedJdbcType[_, _] => tmd == o.tmd && classTag == o.classTag
-      case _ => false
+      case _                       => false
     }
   }
 
   object MappedJdbcType extends MappedColumnTypeFactory {
-    def base[T : ClassTag, U : BaseColumnType](
-        tmap: T => U, tcomap: U => T): BaseColumnType[T] = {
+    def base[T: ClassTag, U: BaseColumnType](
+        tmap: T => U,
+        tcomap: U => T): BaseColumnType[T] = {
       assertNonNullType(implicitly[BaseColumnType[U]])
       new MappedJdbcType[T, U] with BaseTypedType[T] {
         def map(t: T) = tmap(t)
@@ -68,19 +78,19 @@ trait JdbcTypesComponent extends RelationalTypesComponent {
 
   def jdbcTypeFor(t: Type): JdbcType[Any] =
     ((t.structural match {
-      case tmd: JdbcType[_] => tmd
-      case ScalaBaseType.booleanType => columnTypes.booleanJdbcType
+      case tmd: JdbcType[_]             => tmd
+      case ScalaBaseType.booleanType    => columnTypes.booleanJdbcType
       case ScalaBaseType.bigDecimalType => columnTypes.bigDecimalJdbcType
-      case ScalaBaseType.byteType => columnTypes.byteJdbcType
-      case ScalaBaseType.charType => columnTypes.charJdbcType
-      case ScalaBaseType.doubleType => columnTypes.doubleJdbcType
-      case ScalaBaseType.floatType => columnTypes.floatJdbcType
-      case ScalaBaseType.intType => columnTypes.intJdbcType
-      case ScalaBaseType.longType => columnTypes.longJdbcType
-      case ScalaBaseType.nullType => columnTypes.nullJdbcType
-      case ScalaBaseType.shortType => columnTypes.shortJdbcType
-      case ScalaBaseType.stringType => columnTypes.stringJdbcType
-      case t: OptionType => jdbcTypeFor(t.elementType)
+      case ScalaBaseType.byteType       => columnTypes.byteJdbcType
+      case ScalaBaseType.charType       => columnTypes.charJdbcType
+      case ScalaBaseType.doubleType     => columnTypes.doubleJdbcType
+      case ScalaBaseType.floatType      => columnTypes.floatJdbcType
+      case ScalaBaseType.intType        => columnTypes.intJdbcType
+      case ScalaBaseType.longType       => columnTypes.longJdbcType
+      case ScalaBaseType.nullType       => columnTypes.nullJdbcType
+      case ScalaBaseType.shortType      => columnTypes.shortJdbcType
+      case ScalaBaseType.stringType     => columnTypes.stringJdbcType
+      case t: OptionType                => jdbcTypeFor(t.elementType)
       case t: ErasedScalaBaseType[_, _] => jdbcTypeFor(t.erasure)
       case t =>
         throw new SlickException("JdbcProfile has no JdbcType for type " + t)
@@ -89,16 +99,16 @@ trait JdbcTypesComponent extends RelationalTypesComponent {
   def defaultSqlTypeName(tmd: JdbcType[_], sym: Option[FieldSymbol]): String =
     tmd.sqlType match {
       case java.sql.Types.VARCHAR =>
-        val size = sym.flatMap(
-            _.findColumnOption[RelationalProfile.ColumnOption.Length])
+        val size =
+          sym.flatMap(_.findColumnOption[RelationalProfile.ColumnOption.Length])
         size.fold("VARCHAR(254)")(l =>
-              if (l.varying) s"VARCHAR(${l.length})" else s"CHAR(${l.length})")
+          if (l.varying) s"VARCHAR(${l.length})" else s"CHAR(${l.length})")
       case java.sql.Types.DECIMAL => "DECIMAL(21,2)"
       case t =>
         JdbcTypesComponent.typeNames.getOrElse(
-            t,
-            throw new SlickException(
-                "No SQL type name found in java.sql.Types for code " + t))
+          t,
+          throw new SlickException(
+            "No SQL type name found in java.sql.Types for code " + t))
     }
 
   abstract class DriverJdbcType[@specialized T](
@@ -111,7 +121,7 @@ trait JdbcTypesComponent extends RelationalTypesComponent {
       if (hasLiteralForm) value.toString
       else
         throw new SlickException(
-            sqlTypeName(None) + " does not have a literal representation")
+          sqlTypeName(None) + " does not have a literal representation")
     def hasLiteralForm = true
     def wasNull(r: ResultSet, idx: Int) = r.wasNull()
     def setNull(p: PreparedStatement, idx: Int): Unit = p.setNull(idx, sqlType)
@@ -257,7 +267,7 @@ trait JdbcTypesComponent extends RelationalTypesComponent {
           sb append '\''
           for (c <- value) c match {
             case '\'' => sb append "''"
-            case _ => sb append c
+            case _    => sb append c
           }
           sb append '\''
           sb.toString
@@ -320,7 +330,8 @@ trait JdbcTypesComponent extends RelationalTypesComponent {
     }
 
     class BigDecimalJdbcType
-        extends DriverJdbcType[BigDecimal] with NumericTypedType {
+        extends DriverJdbcType[BigDecimal]
+        with NumericTypedType {
       def sqlType = java.sql.Types.DECIMAL
       def setValue(v: BigDecimal, p: PreparedStatement, idx: Int) =
         p.setBigDecimal(idx, v.bigDecimal)
@@ -368,6 +379,6 @@ trait JdbcTypesComponent extends RelationalTypesComponent {
 object JdbcTypesComponent {
   private[slick] lazy val typeNames =
     Map() ++
-    (for (f <- classOf[java.sql.Types].getFields) yield
-          f.get(null).asInstanceOf[Int] -> f.getName)
+      (for (f <- classOf[java.sql.Types].getFields)
+        yield f.get(null).asInstanceOf[Int] -> f.getName)
 }

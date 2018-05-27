@@ -39,21 +39,22 @@ import org.json4s._
   * @group Meta Data
   */
 @DeveloperApi
-case class EngineInstance(id: String,
-                          status: String,
-                          startTime: DateTime,
-                          endTime: DateTime,
-                          engineId: String,
-                          engineVersion: String,
-                          engineVariant: String,
-                          engineFactory: String,
-                          batch: String,
-                          env: Map[String, String],
-                          sparkConf: Map[String, String],
-                          dataSourceParams: String,
-                          preparatorParams: String,
-                          algorithmsParams: String,
-                          servingParams: String)
+case class EngineInstance(
+    id: String,
+    status: String,
+    startTime: DateTime,
+    endTime: DateTime,
+    engineId: String,
+    engineVersion: String,
+    engineVariant: String,
+    engineFactory: String,
+    batch: String,
+    env: Map[String, String],
+    sparkConf: Map[String, String],
+    dataSourceParams: String,
+    preparatorParams: String,
+    algorithmsParams: String,
+    servingParams: String)
 
 /** :: DeveloperApi ::
   * Base trait of the [[EngineInstance]] data access object
@@ -75,14 +76,16 @@ trait EngineInstances {
   /** Get an instance that has started training the latest and has trained to
     * completion
     */
-  def getLatestCompleted(engineId: String,
-                         engineVersion: String,
-                         engineVariant: String): Option[EngineInstance]
+  def getLatestCompleted(
+      engineId: String,
+      engineVersion: String,
+      engineVariant: String): Option[EngineInstance]
 
   /** Get all instances that has trained to completion */
-  def getCompleted(engineId: String,
-                   engineVersion: String,
-                   engineVariant: String): Seq[EngineInstance]
+  def getCompleted(
+      engineId: String,
+      engineVersion: String,
+      engineVariant: String): Seq[EngineInstance]
 
   /** Update an [[EngineInstance]] */
   def update(i: EngineInstance): Unit
@@ -99,24 +102,26 @@ trait EngineInstances {
 @DeveloperApi
 class EngineInstanceSerializer
     extends CustomSerializer[EngineInstance](format =>
-          ({
+      ({
         case JObject(fields) =>
           implicit val formats = DefaultFormats
-          val seed = EngineInstance(id = "",
-                                    status = "",
-                                    startTime = DateTime.now,
-                                    endTime = DateTime.now,
-                                    engineId = "",
-                                    engineVersion = "",
-                                    engineVariant = "",
-                                    engineFactory = "",
-                                    batch = "",
-                                    env = Map(),
-                                    sparkConf = Map(),
-                                    dataSourceParams = "",
-                                    preparatorParams = "",
-                                    algorithmsParams = "",
-                                    servingParams = "")
+          val seed = EngineInstance(
+            id = "",
+            status = "",
+            startTime = DateTime.now,
+            endTime = DateTime.now,
+            engineId = "",
+            engineVersion = "",
+            engineVariant = "",
+            engineFactory = "",
+            batch = "",
+            env = Map(),
+            sparkConf = Map(),
+            dataSourceParams = "",
+            preparatorParams = "",
+            algorithmsParams = "",
+            servingParams = ""
+          )
           fields.foldLeft(seed) {
             case (i, field) =>
               field match {
@@ -139,8 +144,9 @@ class EngineInstanceSerializer
                 case JField("env", env) =>
                   i.copy(env = Extraction.extract[Map[String, String]](env))
                 case JField("sparkConf", sparkConf) =>
-                  i.copy(sparkConf = Extraction.extract[Map[String, String]](
-                            sparkConf))
+                  i.copy(
+                    sparkConf =
+                      Extraction.extract[Map[String, String]](sparkConf))
                 case JField("dataSourceParams", JString(dataSourceParams)) =>
                   i.copy(dataSourceParams = dataSourceParams)
                 case JField("preparatorParams", JString(preparatorParams)) =>
@@ -155,23 +161,30 @@ class EngineInstanceSerializer
       }, {
         case i: EngineInstance =>
           JObject(JField("id", JString(i.id)) :: JField(
-                  "status", JString(i.status)) :: JField(
-                  "startTime",
-                  JString(i.startTime.toString)) :: JField(
-                  "endTime",
-                  JString(i.endTime.toString)) :: JField(
-                  "engineId", JString(i.engineId)) :: JField(
-                  "engineVersion",
-                  JString(i.engineVersion)) :: JField(
-                  "engineVariant", JString(i.engineVariant)) :: JField(
-                  "engineFactory", JString(i.engineFactory)) :: JField(
-                  "batch", JString(i.batch)) :: JField(
-                  "env",
-                  Extraction.decompose(i.env)(DefaultFormats)) :: JField(
-                  "sparkConf",
-                  Extraction.decompose(i.sparkConf)(DefaultFormats)) :: JField(
-                  "dataSourceParams", JString(i.dataSourceParams)) :: JField(
-                  "preparatorParams", JString(i.preparatorParams)) :: JField(
-                  "algorithmsParams", JString(i.algorithmsParams)) :: JField(
-                  "servingParams", JString(i.servingParams)) :: Nil)
+            "status",
+            JString(i.status)) :: JField(
+            "startTime",
+            JString(i.startTime.toString)) :: JField(
+            "endTime",
+            JString(i.endTime.toString)) :: JField(
+            "engineId",
+            JString(i.engineId)) :: JField(
+            "engineVersion",
+            JString(i.engineVersion)) :: JField(
+            "engineVariant",
+            JString(i.engineVariant)) :: JField(
+            "engineFactory",
+            JString(i.engineFactory)) :: JField("batch", JString(i.batch)) :: JField(
+            "env",
+            Extraction.decompose(i.env)(DefaultFormats)) :: JField(
+            "sparkConf",
+            Extraction.decompose(i.sparkConf)(DefaultFormats)) :: JField(
+            "dataSourceParams",
+            JString(i.dataSourceParams)) :: JField(
+            "preparatorParams",
+            JString(i.preparatorParams)) :: JField(
+            "algorithmsParams",
+            JString(i.algorithmsParams)) :: JField(
+            "servingParams",
+            JString(i.servingParams)) :: Nil)
       }))

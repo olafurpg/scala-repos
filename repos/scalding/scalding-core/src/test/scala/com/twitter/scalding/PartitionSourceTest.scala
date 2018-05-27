@@ -39,7 +39,7 @@ object PartitionSourceTestHelpers {
 
     def toPartition(tupleEntry: TupleEntry): String =
       "{" + Util.join(tupleEntry.asIterableOf(classOf[String]), "}->{", true) +
-      "}"
+        "}"
 
     def toTuple(partition: String, tupleEntry: TupleEntry): Unit =
       throw new RuntimeException("toTuple for reading not implemented")
@@ -48,13 +48,13 @@ object PartitionSourceTestHelpers {
   // Define once, here, otherwise testMode.getWritePathFor() won't work
   val DelimitedPartitionedTsv = StandardPartitionedTsv("base", "/", 'col1)
   val CustomPartitionedTsv = StandardPartitionedTsv(
-      "base",
-      new CustomPartition('col1, 'col2),
-      false,
-      Fields.ALL,
-      SinkMode.REPLACE)
-  val PartialPartitionedTsv = StandardPartitionedTsv(
-      "base", "/", ('col1, 'col2), false, ('col1, 'col3))
+    "base",
+    new CustomPartition('col1, 'col2),
+    false,
+    Fields.ALL,
+    SinkMode.REPLACE)
+  val PartialPartitionedTsv =
+    StandardPartitionedTsv("base", "/", ('col1, 'col2), false, ('col1, 'col3))
 }
 
 class DelimitedPartitionTestJob(args: Args) extends Job(args) {
@@ -145,8 +145,9 @@ class CustomPartitionSourceTest extends WordSpec with Matchers {
 
       val directory = new File(testMode.getWritePathFor(CustomPartitionedTsv))
 
-      directory.listFiles().map({ _.getName() }).toSet shouldBe Set("{A}->{x}",
-                                                                    "{B}->{y}")
+      directory.listFiles().map({ _.getName() }).toSet shouldBe Set(
+        "{A}->{x}",
+        "{B}->{y}")
 
       val aSource =
         ScalaSource.fromFile(new File(directory, "{A}->{x}/part-00000-00000"))

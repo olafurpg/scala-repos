@@ -29,26 +29,26 @@ class IndexScript(universe: doc.Universe) extends Page {
     val pairs = allPackagesWithTemplates.toIterable
       .map(_ match {
         case (pack, templates) => {
-            val merged = mergeByQualifiedName(templates)
+          val merged = mergeByQualifiedName(templates)
 
-            val ary = merged.keys.toList
-              .sortBy(_.toLowerCase)
-              .map(key =>
-                    {
-                  val pairs = merged(key).flatMap {
-                    t: DocTemplateEntity =>
-                      Seq(kindToString(t) -> relativeLinkTo(t),
-                          "kind" -> kindToString(t),
-                          "members" -> membersToJSON(t.members.filter(
-                                  !_.isShadowedOrAmbiguousImplicit)),
-                          "shortDescription" -> shortDesc(t))
-                  }
+          val ary = merged.keys.toList
+            .sortBy(_.toLowerCase)
+            .map(key => {
+              val pairs = merged(key).flatMap { t: DocTemplateEntity =>
+                Seq(
+                  kindToString(t) -> relativeLinkTo(t),
+                  "kind" -> kindToString(t),
+                  "members" -> membersToJSON(
+                    t.members.filter(!_.isShadowedOrAmbiguousImplicit)),
+                  "shortDescription" -> shortDesc(t)
+                )
+              }
 
-                  JSONObject(Map(pairs: _*) + ("name" -> key))
-              })
+              JSONObject(Map(pairs: _*) + ("name" -> key))
+            })
 
-            pack.qualifiedName -> JSONArray(ary)
-          }
+          pack.qualifiedName -> JSONArray(ary)
+        }
       })
       .toSeq
 
@@ -69,23 +69,20 @@ class IndexScript(universe: doc.Universe) extends Page {
   def allPackages = {
     def f(parent: Package): List[Package] = {
       parent.packages.flatMap(
-          p => f(p) :+ p
+        p => f(p) :+ p
       )
     }
     f(universe.rootPackage).sortBy(_.toString)
   }
 
   def allPackagesWithTemplates = {
-    Map(
-        allPackages.map(
-            (key) =>
-              {
-        key -> key.templates.collect {
-          case t: DocTemplateEntity
-              if !t.isPackage &&
+    Map(allPackages.map((key) => {
+      key -> key.templates.collect {
+        case t: DocTemplateEntity
+            if !t.isPackage &&
               !universe.settings.hardcoded.isExcluded(t.qualifiedName) =>
-            t
-        }
+          t
+      }
     }): _*)
   }
 
@@ -108,9 +105,10 @@ class IndexScript(universe: doc.Universe) extends Page {
     def memberTail: MemberEntity => String = {
       case d: Def =>
         d.valueParams //List[List[ValueParam]]
-        .map { params =>
-          params.map(p => p.name + ": " + p.resultType.name).mkString(", ")
-        }.mkString("(", ")(", "): " + d.resultType.name)
+          .map { params =>
+            params.map(p => p.name + ": " + p.resultType.name).mkString(", ")
+          }
+          .mkString("(", ")(", "): " + d.resultType.name)
       case v: Val => ": " + v.resultType.name
     }
 
@@ -131,18 +129,21 @@ class IndexScript(universe: doc.Universe) extends Page {
       */
     def jsonObject(m: MemberEntity): JSONObject =
       JSONObject(
-          Map("label" -> m.definitionName.replaceAll(".*#", ""), // member name
-              "member" -> m.definitionName.replaceFirst("#", "."), // full member name
-              "tail" -> memberTail(m),
-              "kind" -> memberKindToString(m), // modifiers i.e. "abstract def"
-              "link" -> memberToUrl(m))) // permalink to the member
+        Map(
+          "label" -> m.definitionName.replaceAll(".*#", ""), // member name
+          "member" -> m.definitionName
+            .replaceFirst("#", "."), // full member name
+          "tail" -> memberTail(m),
+          "kind" -> memberKindToString(m), // modifiers i.e. "abstract def"
+          "link" -> memberToUrl(m)
+        )) // permalink to the member
 
     mbr match {
       case d: Def => jsonObject(d)
       case v: Val => jsonObject(v)
       case m: MemberEntity =>
         JSONObject(
-            Map("member" -> m.definitionName, "error" -> "unsupported entity"))
+          Map("member" -> m.definitionName, "error" -> "unsupported entity"))
     }
   }
 

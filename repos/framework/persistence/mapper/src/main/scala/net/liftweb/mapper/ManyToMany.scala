@@ -196,11 +196,11 @@ trait ManyToMany extends BaseKeyedMapper {
       */
     def refresh = {
       val by = new Cmp[O, TheKeyType](
-          thisField,
-          OprEnum.Eql,
-          Full(primaryKeyField.get.asInstanceOf[K]),
-          Empty,
-          Empty)
+        thisField,
+        OprEnum.Eql,
+        Full(primaryKeyField.get.asInstanceOf[K]),
+        Empty,
+        Empty)
 
       _joins = joinMeta.findAll((by :: qp.toList): _*)
       all
@@ -223,14 +223,15 @@ trait ManyToMany extends BaseKeyedMapper {
       _joins foreach {
         thisField
           .actualField(_)
-          .asInstanceOf[
-              MappedForeignKey[K, O, X] forSome { type X <: KeyedMapper[K, X] }] set ManyToMany.this.primaryKeyField.get
+          .asInstanceOf[MappedForeignKey[K, O, X] forSome {
+            type X <: KeyedMapper[K, X]
+          }] set ManyToMany.this.primaryKeyField.get
           .asInstanceOf[K]
       }
 
       removedJoins.forall { _.delete_! } &
-      (// continue saving even if deleting fails
-          children.forall(_.save) && joins.forall(_.save))
+        (// continue saving even if deleting fails
+        children.forall(_.save) && joins.forall(_.save))
     }
 
     /**

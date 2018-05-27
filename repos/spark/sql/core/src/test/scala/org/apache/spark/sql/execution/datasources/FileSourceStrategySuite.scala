@@ -26,7 +26,11 @@ import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql._
 import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.catalyst.expressions.{Expression, ExpressionSet, PredicateHelper}
+import org.apache.spark.sql.catalyst.expressions.{
+  Expression,
+  ExpressionSet,
+  PredicateHelper
+}
 import org.apache.spark.sql.catalyst.util
 import org.apache.spark.sql.execution.{DataSourceScan, PhysicalRDD}
 import org.apache.spark.sql.functions._
@@ -38,21 +42,24 @@ import org.apache.spark.util.{SerializableConfiguration, Utils}
 import org.apache.spark.util.collection.BitSet
 
 class FileSourceStrategySuite
-    extends QueryTest with SharedSQLContext with PredicateHelper {
+    extends QueryTest
+    with SharedSQLContext
+    with PredicateHelper {
   import testImplicits._
 
   test("unpartitioned table, single partition") {
     val table = createTable(
-        files = Seq("file1" -> 1,
-                    "file2" -> 1,
-                    "file3" -> 1,
-                    "file4" -> 1,
-                    "file5" -> 1,
-                    "file6" -> 1,
-                    "file7" -> 1,
-                    "file8" -> 1,
-                    "file9" -> 1,
-                    "file10" -> 1))
+      files = Seq(
+        "file1" -> 1,
+        "file2" -> 1,
+        "file3" -> 1,
+        "file4" -> 1,
+        "file5" -> 1,
+        "file6" -> 1,
+        "file7" -> 1,
+        "file8" -> 1,
+        "file9" -> 1,
+        "file10" -> 1))
 
     checkScan(table.select('c1)) { partitions =>
       // 10 one byte files should fit in a single partition with 10 files.
@@ -128,10 +135,12 @@ class FileSourceStrategySuite
     checkScan(table.where("p1 = 1 AND c1 = 1 AND (p1 + c1) = 1")) {
       partitions =>
         assert(partitions.size == 1, "when checking partitions")
-        assert(partitions.head.files.size == 1,
-               "when checking files in partition 1")
-        assert(partitions.head.files.head.partitionValues.getInt(0) == 1,
-               "when checking partition values")
+        assert(
+          partitions.head.files.size == 1,
+          "when checking files in partition 1")
+        assert(
+          partitions.head.files.head.partitionValues.getInt(0) == 1,
+          "when checking partition values")
     }
     // Only the filters that do not contain the partition column should be pushed down
     checkDataFilters(Set(IsNotNull("c1"), EqualTo("c1", 1)))
@@ -151,14 +160,17 @@ class FileSourceStrategySuite
   }
 
   test("bucketed table") {
-    val table = createTable(files = Seq("p1=1/file1_0000" -> 1,
-                                        "p1=1/file2_0000" -> 1,
-                                        "p1=1/file3_0002" -> 1,
-                                        "p1=2/file4_0002" -> 1,
-                                        "p1=2/file5_0000" -> 1,
-                                        "p1=2/file6_0000" -> 1,
-                                        "p1=2/file7_0000" -> 1),
-                            buckets = 3)
+    val table = createTable(
+      files = Seq(
+        "p1=1/file1_0000" -> 1,
+        "p1=1/file2_0000" -> 1,
+        "p1=1/file3_0002" -> 1,
+        "p1=2/file4_0002" -> 1,
+        "p1=2/file5_0000" -> 1,
+        "p1=2/file6_0000" -> 1,
+        "p1=2/file7_0000" -> 1),
+      buckets = 3
+    )
 
     // No partition pruning
     checkScan(table) { partitions =>
@@ -179,16 +191,18 @@ class FileSourceStrategySuite
 
   // Helpers for checking the arguments passed to the FileFormat.
 
-  protected val checkPartitionSchema = checkArgument(
-      "partition schema", _.partitionSchema, _: StructType)
-  protected val checkDataSchema = checkArgument(
-      "data schema", _.dataSchema, _: StructType)
-  protected val checkDataFilters = checkArgument(
-      "data filters", _.filters.toSet, _: Set[Filter])
+  protected val checkPartitionSchema =
+    checkArgument("partition schema", _.partitionSchema, _: StructType)
+  protected val checkDataSchema =
+    checkArgument("data schema", _.dataSchema, _: StructType)
+  protected val checkDataFilters =
+    checkArgument("data filters", _.filters.toSet, _: Set[Filter])
 
   /** Helper for building checks on the arguments passed to the reader. */
   protected def checkArgument[T](
-      name: String, arg: LastArguments.type => T, expected: T): Unit = {
+      name: String,
+      arg: LastArguments.type => T,
+      expected: T): Unit = {
     if (arg(LastArguments) != expected) {
       fail(s"""
            |Wrong $name
@@ -205,19 +219,21 @@ class FileSourceStrategySuite
 
   /** Returns a set with all the filters present in the physical plan. */
   def getPhysicalFilters(df: DataFrame): ExpressionSet = {
-    ExpressionSet(
-        df.queryExecution.executedPlan.collect {
+    ExpressionSet(df.queryExecution.executedPlan.collect {
       case execution.Filter(f, _) => splitConjunctivePredicates(f)
     }.flatten)
   }
 
   /** Plans the query and calls the provided validation function with the planned partitioning. */
   def checkScan(df: DataFrame)(func: Seq[FilePartition] => Unit): Unit = {
-    val fileScan = df.queryExecution.executedPlan.collect {
-      case DataSourceScan(_, scan: FileScanRDD, _, _) => scan
-    }.headOption.getOrElse {
-      fail(s"No FileScan in query\n${df.queryExecution}")
-    }
+    val fileScan = df.queryExecution.executedPlan
+      .collect {
+        case DataSourceScan(_, scan: FileScanRDD, _, _) => scan
+      }
+      .headOption
+      .getOrElse {
+        fail(s"No FileScan in query\n${df.queryExecution}")
+      }
 
     func(fileScan.filePartitions)
   }
@@ -248,10 +264,9 @@ class FileSourceStrategySuite
       val bucketed =
         df.queryExecution.analyzed transform {
           case l @ LogicalRelation(r: HadoopFsRelation, _, _) =>
-            l.copy(relation = r.copy(bucketSpec = Some(
-                            BucketSpec(numBuckets = buckets,
-                                       "c1" :: Nil,
-                                       Nil))))
+            l.copy(
+              relation = r.copy(bucketSpec =
+                Some(BucketSpec(numBuckets = buckets, "c1" :: Nil, Nil))))
         }
       Dataset.newDataFrame(sqlContext, bucketed)
     } else {
@@ -278,9 +293,10 @@ class TestFileFormat extends FileFormat {
     * does not support inference, or no valid files are given should return None.  In these cases
     * Spark will require that user specify the schema manually.
     */
-  override def inferSchema(sqlContext: SQLContext,
-                           options: Map[String, String],
-                           files: Seq[FileStatus]): Option[StructType] =
+  override def inferSchema(
+      sqlContext: SQLContext,
+      options: Map[String, String],
+      files: Seq[FileStatus]): Option[StructType] =
     Some(StructType(Nil).add("c1", IntegerType).add("c2", IntegerType))
 
   /**
@@ -288,10 +304,11 @@ class TestFileFormat extends FileFormat {
     * be put here.  For example, user defined output committer can be configured here
     * by setting the output committer class in the conf of spark.sql.sources.outputCommitterClass.
     */
-  override def prepareWrite(sqlContext: SQLContext,
-                            job: Job,
-                            options: Map[String, String],
-                            dataSchema: StructType): OutputWriterFactory = {
+  override def prepareWrite(
+      sqlContext: SQLContext,
+      job: Job,
+      options: Map[String, String],
+      dataSchema: StructType): OutputWriterFactory = {
     throw new NotImplementedError("JUST FOR TESTING")
   }
 
@@ -307,11 +324,12 @@ class TestFileFormat extends FileFormat {
     throw new NotImplementedError("JUST FOR TESTING")
   }
 
-  override def buildReader(sqlContext: SQLContext,
-                           partitionSchema: StructType,
-                           dataSchema: StructType,
-                           filters: Seq[Filter],
-                           options: Map[String, String])
+  override def buildReader(
+      sqlContext: SQLContext,
+      partitionSchema: StructType,
+      dataSchema: StructType,
+      filters: Seq[Filter],
+      options: Map[String, String])
     : PartitionedFile => Iterator[InternalRow] = {
 
     // Record the arguments so they can be checked in the test case.

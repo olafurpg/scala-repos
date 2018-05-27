@@ -25,21 +25,26 @@ class AclTest extends JUnitSuite {
 
   val AclJson =
     "{\"version\": 1, \"acls\": [{\"host\": \"host1\",\"permissionType\": \"Deny\",\"operation\": \"READ\", \"principal\": \"User:alice\"  },  " +
-    "{  \"host\":  \"*\" ,  \"permissionType\": \"Allow\",  \"operation\":  \"Read\", \"principal\": \"User:bob\"  },  " +
-    "{  \"host\": \"host1\",  \"permissionType\": \"Deny\",  \"operation\":   \"Read\" ,  \"principal\": \"User:bob\"}  ]}"
+      "{  \"host\":  \"*\" ,  \"permissionType\": \"Allow\",  \"operation\":  \"Read\", \"principal\": \"User:bob\"  },  " +
+      "{  \"host\": \"host1\",  \"permissionType\": \"Deny\",  \"operation\":   \"Read\" ,  \"principal\": \"User:bob\"}  ]}"
 
   @Test
   def testAclJsonConversion(): Unit = {
-    val acl1 = new Acl(new KafkaPrincipal(KafkaPrincipal.USER_TYPE, "alice"),
-                       Deny,
-                       "host1",
-                       Read)
+    val acl1 = new Acl(
+      new KafkaPrincipal(KafkaPrincipal.USER_TYPE, "alice"),
+      Deny,
+      "host1",
+      Read)
     val acl2 = new Acl(
-        new KafkaPrincipal(KafkaPrincipal.USER_TYPE, "bob"), Allow, "*", Read)
-    val acl3 = new Acl(new KafkaPrincipal(KafkaPrincipal.USER_TYPE, "bob"),
-                       Deny,
-                       "host1",
-                       Read)
+      new KafkaPrincipal(KafkaPrincipal.USER_TYPE, "bob"),
+      Allow,
+      "*",
+      Read)
+    val acl3 = new Acl(
+      new KafkaPrincipal(KafkaPrincipal.USER_TYPE, "bob"),
+      Deny,
+      "host1",
+      Read)
 
     val acls = Set[Acl](acl1, acl2, acl3)
     val jsonAcls = Json.encode(Acl.toJsonCompatibleMap(acls))

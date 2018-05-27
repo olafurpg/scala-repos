@@ -12,12 +12,12 @@ object Test extends App {
   }
 
   FooSeq(2, "3", true, false, true) match {
-    case FooSeq(x, y) => println("nope")
+    case FooSeq(x, y)                    => println("nope")
     case FooSeq(x, y, true, false, true) => println((x, y))
   }
 
   FooSeq(1, "a", true, false, true) match {
-    case FooSeq(1, "a") => println("nope")
-    case FooSeq(1, "a", x @ _ *) => println(x.toList)
+    case FooSeq(1, "a")         => println("nope")
+    case FooSeq(1, "a", x @ _*) => println(x.toList)
   }
 }

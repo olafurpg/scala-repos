@@ -36,7 +36,7 @@ trait TextareaTypedField extends StringTypedField {
   override def toForm: Box[NodeSeq] =
     uniqueFieldId match {
       case Full(id) => Full(elem % ("id" -> id))
-      case _ => Full(elem)
+      case _        => Full(elem)
     }
 
   override def toString = valueBox match {
@@ -51,9 +51,13 @@ trait TextareaTypedField extends StringTypedField {
 }
 
 class TextareaField[OwnerType <: Record[OwnerType]](
-    rec: OwnerType, maxLength: Int)
-    extends StringField(rec, maxLength) with TextareaTypedField
+    rec: OwnerType,
+    maxLength: Int)
+    extends StringField(rec, maxLength)
+    with TextareaTypedField
 
 class OptionalTextareaField[OwnerType <: Record[OwnerType]](
-    rec: OwnerType, maxLength: Int)
-    extends OptionalStringField(rec, maxLength) with TextareaTypedField
+    rec: OwnerType,
+    maxLength: Int)
+    extends OptionalStringField(rec, maxLength)
+    with TextareaTypedField

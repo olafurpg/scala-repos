@@ -180,10 +180,10 @@ object M5 {
     private def next: Unit = agenda match {
       case List() => ()
       case (time, action) :: ag1 => {
-          agenda = ag1;
-          curtime = time;
-          action();
-        }
+        agenda = ag1;
+        curtime = time;
+        action();
+      }
     }
 
     def run: Unit = {
@@ -237,7 +237,7 @@ object M5 {
     def probe(name: String, wire: Wire): Unit = {
       wire addAction { () =>
         Console.println(
-            name + " " + currentTime + " new-value = " + wire.getSignal);
+          name + " " + currentTime + " new-value = " + wire.getSignal);
       }
     }
   }
@@ -436,10 +436,10 @@ class Simulator() {
   def next: Unit = agenda match {
     case List() => ()
     case (time, action) :: rest => {
-        agenda = rest;
-        curtime = time;
-        action();
-      }
+      agenda = rest;
+      curtime = time;
+      action();
+    }
   }
 
   protected def currentTime: Int = curtime;
@@ -472,7 +472,7 @@ abstract class BasicCircuitSimulator() extends Simulator() {
   def probe(name: String, wire: Wire): Unit = {
     wire addAction { () =>
       Console.println(
-          name + " " + currentTime + " new-value = " + wire.getSignal);
+        name + " " + currentTime + " new-value = " + wire.getSignal);
     }
   }
 

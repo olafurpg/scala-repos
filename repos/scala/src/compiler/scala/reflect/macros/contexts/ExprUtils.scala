@@ -30,7 +30,7 @@ trait ExprUtils { self: Context =>
 
   def literal(x: String) =
     Expr[String](Literal(Constant(x)))(
-        TypeTag[String](definitions.StringClass.toTypeConstructor))
+      TypeTag[String](definitions.StringClass.toTypeConstructor))
 
   def literal(x: Char) = Expr[Char](Literal(Constant(x)))(TypeTag.Char)
 }

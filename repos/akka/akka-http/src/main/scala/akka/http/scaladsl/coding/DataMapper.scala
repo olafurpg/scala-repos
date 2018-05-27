@@ -4,7 +4,12 @@
 
 package akka.http.scaladsl.coding
 
-import akka.http.scaladsl.model.{HttpRequest, HttpResponse, ResponseEntity, RequestEntity}
+import akka.http.scaladsl.model.{
+  HttpRequest,
+  HttpResponse,
+  ResponseEntity,
+  RequestEntity
+}
 import akka.util.ByteString
 import akka.stream.scaladsl.Flow
 
@@ -33,11 +38,12 @@ object DataMapper {
   implicit val mapResponse: DataMapper[HttpResponse] =
     mapMessage(mapResponseEntity)((m, f) ⇒ m.withEntity(f(m.entity)))
 
-  def mapMessage[T, E](
-      entityMapper: DataMapper[E])(mapEntity: (T, E ⇒ E) ⇒ T): DataMapper[T] =
+  def mapMessage[T, E](entityMapper: DataMapper[E])(
+      mapEntity: (T, E ⇒ E) ⇒ T): DataMapper[T] =
     new DataMapper[T] {
       def transformDataBytes(
-          t: T, transformer: Flow[ByteString, ByteString, _]): T =
+          t: T,
+          transformer: Flow[ByteString, ByteString, _]): T =
         mapEntity(t, entityMapper.transformDataBytes(_, transformer))
     }
 }

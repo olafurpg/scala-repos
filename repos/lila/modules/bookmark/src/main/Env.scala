@@ -23,7 +23,7 @@ final class Env(config: Config, system: ActorSystem, db: lila.db.Env) {
   system.actorOf(Props(new Actor {
     def receive = {
       case Toggle(gameId, userId) => api.toggle(gameId, userId)
-      case Remove(gameId) => api removeByGameId gameId
+      case Remove(gameId)         => api removeByGameId gameId
     }
   }), name = ActorName)
 }
@@ -31,7 +31,8 @@ final class Env(config: Config, system: ActorSystem, db: lila.db.Env) {
 object Env {
 
   lazy val current =
-    "bookmark" boot new Env(config = lila.common.PlayApp loadConfig "bookmark",
-                            system = lila.common.PlayApp.system,
-                            db = lila.db.Env.current)
+    "bookmark" boot new Env(
+      config = lila.common.PlayApp loadConfig "bookmark",
+      system = lila.common.PlayApp.system,
+      db = lila.db.Env.current)
 }

@@ -19,21 +19,23 @@ class TimeoutsSpec extends AkkaSpec {
   "InitialTimeout" must {
 
     "pass through elements unmodified" in assertAllStagesStopped {
-      Await.result(Source(1 to 100)
-                     .initialTimeout(2.seconds)
-                     .grouped(200)
-                     .runWith(Sink.head),
-                   3.seconds) should ===(1 to 100)
+      Await.result(
+        Source(1 to 100)
+          .initialTimeout(2.seconds)
+          .grouped(200)
+          .runWith(Sink.head),
+        3.seconds) should ===(1 to 100)
     }
 
     "pass through error unmodified" in assertAllStagesStopped {
       a[TE] shouldBe thrownBy {
-        Await.result(Source(1 to 100)
-                       .concat(Source.failed(TE("test")))
-                       .initialTimeout(2.seconds)
-                       .grouped(200)
-                       .runWith(Sink.head),
-                     3.seconds)
+        Await.result(
+          Source(1 to 100)
+            .concat(Source.failed(TE("test")))
+            .initialTimeout(2.seconds)
+            .grouped(200)
+            .runWith(Sink.head),
+          3.seconds)
       }
     }
 
@@ -49,28 +51,30 @@ class TimeoutsSpec extends AkkaSpec {
 
       val ex = downstreamProbe.expectError()
       ex.getMessage should ===(
-          "The first element has not yet passed through in 1 second.")
+        "The first element has not yet passed through in 1 second.")
     }
   }
 
   "CompletionTimeout" must {
 
     "pass through elements unmodified" in assertAllStagesStopped {
-      Await.result(Source(1 to 100)
-                     .completionTimeout(2.seconds)
-                     .grouped(200)
-                     .runWith(Sink.head),
-                   3.seconds) should ===(1 to 100)
+      Await.result(
+        Source(1 to 100)
+          .completionTimeout(2.seconds)
+          .grouped(200)
+          .runWith(Sink.head),
+        3.seconds) should ===(1 to 100)
     }
 
     "pass through error unmodified" in assertAllStagesStopped {
       a[TE] shouldBe thrownBy {
-        Await.result(Source(1 to 100)
-                       .concat(Source.failed(TE("test")))
-                       .completionTimeout(2.seconds)
-                       .grouped(200)
-                       .runWith(Sink.head),
-                     3.seconds)
+        Await.result(
+          Source(1 to 100)
+            .concat(Source.failed(TE("test")))
+            .completionTimeout(2.seconds)
+            .grouped(200)
+            .runWith(Sink.head),
+          3.seconds)
       }
     }
 
@@ -92,28 +96,30 @@ class TimeoutsSpec extends AkkaSpec {
 
       val ex = downstreamProbe.expectError()
       ex.getMessage should ===(
-          "The stream has not been completed in 2 seconds.")
+        "The stream has not been completed in 2 seconds.")
     }
   }
 
   "IdleTimeout" must {
 
     "pass through elements unmodified" in assertAllStagesStopped {
-      Await.result(Source(1 to 100)
-                     .idleTimeout(2.seconds)
-                     .grouped(200)
-                     .runWith(Sink.head),
-                   3.seconds) should ===(1 to 100)
+      Await.result(
+        Source(1 to 100)
+          .idleTimeout(2.seconds)
+          .grouped(200)
+          .runWith(Sink.head),
+        3.seconds) should ===(1 to 100)
     }
 
     "pass through error unmodified" in assertAllStagesStopped {
       a[TE] shouldBe thrownBy {
-        Await.result(Source(1 to 100)
-                       .concat(Source.failed(TE("test")))
-                       .idleTimeout(2.seconds)
-                       .grouped(200)
-                       .runWith(Sink.head),
-                     3.seconds)
+        Await.result(
+          Source(1 to 100)
+            .concat(Source.failed(TE("test")))
+            .idleTimeout(2.seconds)
+            .grouped(200)
+            .runWith(Sink.head),
+          3.seconds)
       }
     }
 
@@ -144,11 +150,12 @@ class TimeoutsSpec extends AkkaSpec {
       val timeoutIdentity =
         BidiFlow.bidirectionalIdleTimeout[Int, Int](2.seconds).join(Flow[Int])
 
-      Await.result(Source(1 to 100)
-                     .via(timeoutIdentity)
-                     .grouped(200)
-                     .runWith(Sink.head),
-                   3.seconds) should ===(1 to 100)
+      Await.result(
+        Source(1 to 100)
+          .via(timeoutIdentity)
+          .grouped(200)
+          .runWith(Sink.head),
+        3.seconds) should ===(1 to 100)
     }
 
     "not signal error if traffic is one-way" in assertAllStagesStopped {
@@ -156,13 +163,15 @@ class TimeoutsSpec extends AkkaSpec {
       val downstreamWriter = TestPublisher.probe[String]()
 
       val upstream = Flow.fromSinkAndSourceMat(
-          Sink.ignore, Source.fromPublisher(upstreamWriter))(Keep.left)
+        Sink.ignore,
+        Source.fromPublisher(upstreamWriter))(Keep.left)
       val downstream = Flow.fromSinkAndSourceMat(
-          Sink.ignore, Source.fromPublisher(downstreamWriter))(Keep.left)
+        Sink.ignore,
+        Source.fromPublisher(downstreamWriter))(Keep.left)
 
       val assembly: RunnableGraph[(Future[Done], Future[Done])] = upstream
         .joinMat(BidiFlow.bidirectionalIdleTimeout[Int, String](2.seconds))(
-            Keep.left)
+          Keep.left)
         .joinMat(downstream)(Keep.both)
 
       val (upFinished, downFinished) = assembly.run()
@@ -189,8 +198,7 @@ class TimeoutsSpec extends AkkaSpec {
       val downRead = TestSubscriber.probe[String]()
 
       RunnableGraph
-        .fromGraph(
-            GraphDSL.create() { implicit b ⇒
+        .fromGraph(GraphDSL.create() { implicit b ⇒
           import GraphDSL.Implicits._
           val timeoutStage =
             b.add(BidiFlow.bidirectionalIdleTimeout[String, Int](2.seconds))
@@ -241,8 +249,7 @@ class TimeoutsSpec extends AkkaSpec {
       val downRead = TestSubscriber.probe[String]()
 
       RunnableGraph
-        .fromGraph(
-            GraphDSL.create() { implicit b ⇒
+        .fromGraph(GraphDSL.create() { implicit b ⇒
           import GraphDSL.Implicits._
           val timeoutStage =
             b.add(BidiFlow.bidirectionalIdleTimeout[String, Int](2.seconds))

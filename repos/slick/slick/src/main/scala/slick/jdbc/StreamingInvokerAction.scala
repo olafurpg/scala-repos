@@ -26,9 +26,10 @@ trait StreamingInvokerAction[R, T, -E <: Effect]
     b.result()
   }
 
-  override final def emitStream(ctx: JdbcBackend#StreamingContext,
-                                limit: Long,
-                                state: StreamState): StreamState = {
+  override final def emitStream(
+      ctx: JdbcBackend#StreamingContext,
+      limit: Long,
+      state: StreamState): StreamState = {
     val bufferNext = ctx.bufferNext
     val it =
       if (state ne null) state
@@ -36,20 +37,22 @@ trait StreamingInvokerAction[R, T, -E <: Effect]
     var count = 0L
     try {
       while (if (bufferNext) it.hasNext && count < limit
-      else count < limit && it.hasNext) {
+             else count < limit && it.hasNext) {
         count += 1
         ctx.emit(it.next())
       }
     } catch {
       case NonFatal(ex) =>
-        try it.close() catch ignoreFollowOnError
+        try it.close()
+        catch ignoreFollowOnError
         throw ex
     }
     if (if (bufferNext) it.hasNext else count == limit) it else null
   }
 
   override final def cancelStream(
-      ctx: JdbcBackend#StreamingContext, state: StreamState): Unit =
+      ctx: JdbcBackend#StreamingContext,
+      state: StreamState): Unit =
     state.close()
 
   override def getDumpInfo =

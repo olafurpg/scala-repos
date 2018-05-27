@@ -61,7 +61,9 @@ abstract class RuleExecutor[TreeType <: TreeNode[_]] extends Logging {
 
   /** A batch of rules. */
   protected case class Batch(
-      name: String, strategy: Strategy, rules: Rule[TreeType]*)
+      name: String,
+      strategy: Strategy,
+      rules: Rule[TreeType]*)
 
   /** Defines a sequence of rule batches, to be overridden by the implementation. */
   protected def batches: Seq[Batch]
@@ -92,7 +94,7 @@ abstract class RuleExecutor[TreeType <: TreeNode[_]] extends Logging {
               logTrace(s"""
                   |=== Applying Rule ${rule.ruleName} ===
                   |${sideBySide(plan.treeString, result.treeString).mkString(
-                          "\n")}
+                            "\n")}
                 """.stripMargin)
             }
 
@@ -103,14 +105,14 @@ abstract class RuleExecutor[TreeType <: TreeNode[_]] extends Logging {
           // Only log if this is a rule that is supposed to run more than once.
           if (iteration != 2) {
             logInfo(
-                s"Max iterations (${iteration - 1}) reached for batch ${batch.name}")
+              s"Max iterations (${iteration - 1}) reached for batch ${batch.name}")
           }
           continue = false
         }
 
         if (curPlan.fastEquals(lastPlan)) {
           logTrace(
-              s"Fixed point reached for batch ${batch.name} after ${iteration - 1} iterations.")
+            s"Fixed point reached for batch ${batch.name} after ${iteration - 1} iterations.")
           continue = false
         }
         lastPlan = curPlan

@@ -128,18 +128,30 @@ trait CachedFacet extends ProductISOFacet {
 }
 
 trait CachedCaseClassDefns
-    extends LogFacet with CachedFacet with ProductFacet
-    with PolymorphicEqualityFacet with CopyFacet with ToStringFacet {
+    extends LogFacet
+    with CachedFacet
+    with ProductFacet
+    with PolymorphicEqualityFacet
+    with CopyFacet
+    with ToStringFacet {
 
   trait CaseClassOps
-      extends LogOps with CachedOps with ProductOps with PolymorphicEqualityOps
-      with CopyOps with ToStringOps
+      extends LogOps
+      with CachedOps
+      with ProductOps
+      with PolymorphicEqualityOps
+      with CopyOps
+      with ToStringOps
 
   trait CaseClassCompanion extends CachedCompanion
 
   trait CaseClass
-      extends LogMethods with CachedMethods with ProductMethods
-      with PolymorphicEqualityMethods with CopyMethods with ToStringMethods {
+      extends LogMethods
+      with CachedMethods
+      with ProductMethods
+      with PolymorphicEqualityMethods
+      with CopyMethods
+      with ToStringMethods {
     self: C =>
   }
 
@@ -182,7 +194,7 @@ object ALaCacheDemo extends App {
     val ops = Ops
     object Foo extends CaseClassCompanion
     // keep the constructor private so everybody has to go through .apply
-    class Foo private[FooDefns](val i: Int, val s: String) extends CaseClass {
+    class Foo private[FooDefns] (val i: Int, val s: String) extends CaseClass {
       def stuff = log.info("hello")
     }
   }

@@ -14,15 +14,17 @@ import scala.concurrent.duration._
 /**
   * Used to report `com.codahale.metrics.Metric` types that the original `com.codahale.metrics.graphite.GraphiteReporter` is unaware of (cannot re-use directly because of private constructor).
   */
-class AkkaGraphiteReporter(registry: AkkaMetricRegistry,
-                           prefix: String,
-                           graphite: GraphiteClient,
-                           verbose: Boolean = false)
-    extends ScheduledReporter(registry.asInstanceOf[MetricRegistry],
-                              "akka-graphite-reporter",
-                              MetricFilter.ALL,
-                              TimeUnit.SECONDS,
-                              TimeUnit.NANOSECONDS) {
+class AkkaGraphiteReporter(
+    registry: AkkaMetricRegistry,
+    prefix: String,
+    graphite: GraphiteClient,
+    verbose: Boolean = false)
+    extends ScheduledReporter(
+      registry.asInstanceOf[MetricRegistry],
+      "akka-graphite-reporter",
+      MetricFilter.ALL,
+      TimeUnit.SECONDS,
+      TimeUnit.NANOSECONDS) {
 
   // todo get rid of ScheduledReporter (would mean removing codahale metrics)?
 
@@ -33,11 +35,12 @@ class AkkaGraphiteReporter(registry: AkkaMetricRegistry,
     DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM, locale)
   val clock = Clock.defaultClock()
 
-  override def report(gauges: util.SortedMap[String, Gauge[_]],
-                      counters: util.SortedMap[String, Counter],
-                      histograms: util.SortedMap[String, Histogram],
-                      meters: util.SortedMap[String, Meter],
-                      timers: util.SortedMap[String, Timer]) {
+  override def report(
+      gauges: util.SortedMap[String, Gauge[_]],
+      counters: util.SortedMap[String, Counter],
+      histograms: util.SortedMap[String, Histogram],
+      meters: util.SortedMap[String, Meter],
+      timers: util.SortedMap[String, Timer]) {
     val dateTime = dateFormat.format(new Date(clock.getTime))
 
     // akka-custom metrics
@@ -47,10 +50,11 @@ class AkkaGraphiteReporter(registry: AkkaMetricRegistry,
 
     val metricsCount =
       List(gauges, counters, histograms, meters, timers).map(_.size).sum +
-      List(knownOpsInTimespanCounters, hdrHistograms).map(_.size).sum
-    sendWithBanner("== AkkaGraphiteReporter @ " + dateTime + " == (" +
-                   metricsCount + " metrics)",
-                   '=')
+        List(knownOpsInTimespanCounters, hdrHistograms).map(_.size).sum
+    sendWithBanner(
+      "== AkkaGraphiteReporter @ " + dateTime + " == (" +
+        metricsCount + " metrics)",
+      '=')
 
     try {
       // graphite takes timestamps in seconds
@@ -65,7 +69,9 @@ class AkkaGraphiteReporter(registry: AkkaMetricRegistry,
       sendMetrics(now, timers.asScala, sendTimer)
 
       sendMetrics(
-          now, knownOpsInTimespanCounters, sendKnownOpsInTimespanCounter)
+        now,
+        knownOpsInTimespanCounters,
+        sendKnownOpsInTimespanCounter)
       sendMetrics(now, hdrHistograms, sendHdrHistogram)
       sendMetrics(now, averagingGauges, sendAveragingGauge)
     } catch {
@@ -74,9 +80,10 @@ class AkkaGraphiteReporter(registry: AkkaMetricRegistry,
     }
   }
 
-  def sendMetrics[T <: Metric](now: Long,
-                               metrics: Iterable[(String, T)],
-                               send: (Long, String, T) ⇒ Unit) {
+  def sendMetrics[T <: Metric](
+      now: Long,
+      metrics: Iterable[(String, T)],
+      send: (Long, String, T) ⇒ Unit) {
     for ((key, metric) ← metrics) {
       if (verbose) println("  " + key)
       send(now, key, metric)
@@ -130,7 +137,9 @@ class AkkaGraphiteReporter(registry: AkkaMetricRegistry,
   }
 
   private def sendKnownOpsInTimespanCounter(
-      now: Long, key: String, counter: KnownOpsInTimespanTimer) {
+      now: Long,
+      key: String,
+      counter: KnownOpsInTimespanTimer) {
     send(key + ".ops", counter.getCount, now)
     send(key + ".time", counter.elapsedTime, now)
     send(key + ".opsPerSec", counter.opsPerSecond, now)
@@ -151,7 +160,9 @@ class AkkaGraphiteReporter(registry: AkkaMetricRegistry,
   }
 
   private def sendAveragingGauge(
-      now: Long, key: String, gauge: AveragingGauge) {
+      now: Long,
+      key: String,
+      gauge: AveragingGauge) {
     sendNumericOrIgnore(key + ".avg-gauge", gauge.getValue, now)
   }
 
@@ -162,7 +173,7 @@ class AkkaGraphiteReporter(registry: AkkaMetricRegistry,
     } catch {
       case ex: Exception ⇒
         System.err.println(
-            "Was unable to close Graphite connection: " + ex.getMessage)
+          "Was unable to close Graphite connection: " + ex.getMessage)
     }
 
   private def sendNumericOrIgnore(key: String, value: Any, now: Long) {

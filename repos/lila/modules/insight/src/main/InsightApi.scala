@@ -8,10 +8,11 @@ import lila.db.Implicits._
 import lila.game.{Game, GameRepo, Pov}
 import lila.user.User
 
-final class InsightApi(storage: Storage,
-                       userCacheApi: UserCacheApi,
-                       pipeline: AggregationPipeline,
-                       indexer: Indexer) {
+final class InsightApi(
+    storage: Storage,
+    userCacheApi: UserCacheApi,
+    pipeline: AggregationPipeline,
+    indexer: Indexer) {
 
   import lila.insight.{Dimension => D, Metric => M}
   import InsightApi._
@@ -54,19 +55,24 @@ final class InsightApi(storage: Storage,
     }
 
   def indexAll(user: User) =
-    indexer.all(user).mon(_.insight.index.time) >> userCacheApi.remove(user.id) >>- lila.mon.insight.index
+    indexer
+      .all(user)
+      .mon(_.insight.index.time) >> userCacheApi.remove(user.id) >>- lila.mon.insight.index
       .count()
 
   def updateGame(g: Game) =
-    Pov(g).map { pov =>
-      pov.player.userId ?? { userId =>
-        storage find Entry.povToId(pov) flatMap {
-          _ ?? { old =>
-            indexer.update(g, userId, old)
+    Pov(g)
+      .map { pov =>
+        pov.player.userId ?? { userId =>
+          storage find Entry.povToId(pov) flatMap {
+            _ ?? { old =>
+              indexer.update(g, userId, old)
+            }
           }
         }
       }
-    }.sequenceFu.void
+      .sequenceFu
+      .void
 }
 
 object InsightApi {

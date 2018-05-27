@@ -53,7 +53,8 @@ object ScalaFX_Properties_And_Binding_01 {
   def main(args: Array[String]) {
     val bill = new Bill(new DoubleProperty(null, "Bill"))
     bill.amountDue onChange { (_, oldAmountDue, newAmountDue) =>
-      println("bill amount due changes from " + oldAmountDue + " to " +
+      println(
+        "bill amount due changes from " + oldAmountDue + " to " +
           newAmountDue)
     }
     println("before change: bill amount due = " + bill.amountDue())

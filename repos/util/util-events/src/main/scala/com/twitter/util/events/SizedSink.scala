@@ -11,8 +11,8 @@ object SizedSink {
   // eg: http://psy-lob-saw.blogspot.com/2014/11/the-mythical-modulo-mask.html
   private def nextPowOf2(n: Int): Int =
     math.min(
-        1 << 30,
-        math.max(1, Integer.highestOneBit(n - 1) * 2)
+      1 << 30,
+      math.max(1, Integer.highestOneBit(n - 1) * 2)
     )
 
   /**
@@ -32,23 +32,25 @@ object SizedSink {
     new SizedSink(nextPowOf2(approxSize), milliTime)
   }
 
-  private class MutableEvent(var etype: Type,
-                             var whenMillis: Long,
-                             var longVal: Long,
-                             var objectVal: Object,
-                             var doubleVal: Double,
-                             var traceIdVal: Long,
-                             var spanIdVal: Long) {
+  private class MutableEvent(
+      var etype: Type,
+      var whenMillis: Long,
+      var longVal: Long,
+      var objectVal: Object,
+      var doubleVal: Double,
+      var traceIdVal: Long,
+      var spanIdVal: Long) {
     def isDefined: Boolean = etype != null
 
     def toEvent: Event =
-      Event(etype,
-            Time.fromMilliseconds(whenMillis),
-            longVal,
-            objectVal,
-            doubleVal,
-            traceIdVal,
-            spanIdVal)
+      Event(
+        etype,
+        Time.fromMilliseconds(whenMillis),
+        longVal,
+        objectVal,
+        doubleVal,
+        traceIdVal,
+        spanIdVal)
   }
 }
 
@@ -65,7 +67,7 @@ object SizedSink {
   * @param milliTime gets the current time in millis from the epoch.
   *          This is exposed to allow for more control in tests.
   */
-class SizedSink private[events](capacity: Int, milliTime: () => Long)
+class SizedSink private[events] (capacity: Int, milliTime: () => Long)
     extends Sink {
   import SizedSink._
 
@@ -79,20 +81,21 @@ class SizedSink private[events](capacity: Int, milliTime: () => Long)
 
   // require capacity be a power of 2:
   // http://en.wikipedia.org/wiki/Power_of_two#Fast_algorithm_to_check_if_a_positive_number_is_a_power_of_two
-  require((capacity & (capacity - 1)) == 0,
-          s"capacity must be power of 2: $capacity")
+  require(
+    (capacity & (capacity - 1)) == 0,
+    s"capacity must be power of 2: $capacity")
 
   private[this] val pos = new AtomicLong(0)
 
   private[this] val evs = Array.fill(capacity) {
     new MutableEvent(
-        etype = null,
-        whenMillis = -1L,
-        longVal = Event.NoLong,
-        objectVal = Event.NoObject,
-        doubleVal = Event.NoDouble,
-        traceIdVal = Event.NoTraceId,
-        spanIdVal = Event.NoSpanId
+      etype = null,
+      whenMillis = -1L,
+      longVal = Event.NoLong,
+      objectVal = Event.NoObject,
+      doubleVal = Event.NoDouble,
+      traceIdVal = Event.NoTraceId,
+      spanIdVal = Event.NoSpanId
     )
   }
 

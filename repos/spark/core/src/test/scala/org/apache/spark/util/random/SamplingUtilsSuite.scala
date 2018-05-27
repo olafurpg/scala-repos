@@ -19,7 +19,10 @@ package org.apache.spark.util.random
 
 import scala.util.Random
 
-import org.apache.commons.math3.distribution.{BinomialDistribution, PoissonDistribution}
+import org.apache.commons.math3.distribution.{
+  BinomialDistribution,
+  PoissonDistribution
+}
 
 import org.apache.spark.SparkFunSuite
 
@@ -55,20 +58,23 @@ class SamplingUtilsSuite extends SparkFunSuite {
     for (s <- 1 to 15) {
       val frac = SamplingUtils.computeFractionForSampleSize(s, n, true)
       val poisson = new PoissonDistribution(frac * n)
-      assert(poisson.inverseCumulativeProbability(0.0001) >= s,
-             "Computed fraction is too low")
+      assert(
+        poisson.inverseCumulativeProbability(0.0001) >= s,
+        "Computed fraction is too low")
     }
     for (s <- List(20, 100, 1000)) {
       val frac = SamplingUtils.computeFractionForSampleSize(s, n, true)
       val poisson = new PoissonDistribution(frac * n)
-      assert(poisson.inverseCumulativeProbability(0.0001) >= s,
-             "Computed fraction is too low")
+      assert(
+        poisson.inverseCumulativeProbability(0.0001) >= s,
+        "Computed fraction is too low")
     }
     for (s <- List(1, 10, 100, 1000)) {
       val frac = SamplingUtils.computeFractionForSampleSize(s, n, false)
       val binomial = new BinomialDistribution(n, frac)
-      assert(binomial.inverseCumulativeProbability(0.0001) * n >= s,
-             "Computed fraction is too low")
+      assert(
+        binomial.inverseCumulativeProbability(0.0001) * n >= s,
+        "Computed fraction is too low")
     }
   }
 }

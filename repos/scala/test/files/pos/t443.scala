@@ -7,7 +7,7 @@ object Test {
         else
           lookup() match {
             case Some(_) => Some(null)
-            case None => None
+            case None    => None
           }
     }
 }

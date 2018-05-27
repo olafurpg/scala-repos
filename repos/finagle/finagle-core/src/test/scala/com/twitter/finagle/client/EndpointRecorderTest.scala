@@ -26,16 +26,17 @@ class EndpointRecorderTest extends FunSuite {
     def apply(req: Int) = Future.never
   })
 
-  def getEndpoints(registry: EndpointRegistry,
-                   name: String,
-                   dtab: Dtab,
-                   path: String): Option[Addr] = {
+  def getEndpoints(
+      registry: EndpointRegistry,
+      name: String,
+      dtab: Dtab,
+      path: String): Option[Addr] = {
     registry.endpoints(name).get(dtab).flatMap(_.get(path))
   }
 
   test("EndpointRecorder is disabled if BindingFactory.Dest is not bound") {
     val stk: StackBuilder[ServiceFactory[Int, Int]] = new StackBuilder(
-        Stack.Leaf(Stack.Role("never"), neverFactory)
+      Stack.Leaf(Stack.Role("never"), neverFactory)
     )
 
     stk.push(EndpointRecorder.module[Int, Int])

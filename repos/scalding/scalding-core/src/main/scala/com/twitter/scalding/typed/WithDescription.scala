@@ -34,6 +34,6 @@ trait WithDescription[+This <: WithDescription[This]] extends HasDescription {
   def withDescription(descriptionOpt: Option[String]): This =
     descriptionOpt match {
       case Some(description) => withDescription(description)
-      case None => self
+      case None              => self
     }
 }

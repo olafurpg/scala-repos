@@ -42,20 +42,22 @@ object eig extends UFunc {
       val worksize = Array.ofDim[Double](1)
       val info = new intW(0)
 
-      lapack.dgeev("N",
-                   "V",
-                   n,
-                   Array.empty[Double],
-                   scala.math.max(1, n),
-                   Array.empty[Double],
-                   Array.empty[Double],
-                   Array.empty[Double],
-                   scala.math.max(1, n),
-                   Array.empty[Double],
-                   scala.math.max(1, n),
-                   worksize,
-                   -1,
-                   info)
+      lapack.dgeev(
+        "N",
+        "V",
+        n,
+        Array.empty[Double],
+        scala.math.max(1, n),
+        Array.empty[Double],
+        Array.empty[Double],
+        Array.empty[Double],
+        scala.math.max(1, n),
+        Array.empty[Double],
+        scala.math.max(1, n),
+        worksize,
+        -1,
+        info
+      )
 
       // Allocate the workspace
       val lwork: Int =
@@ -68,20 +70,21 @@ object eig extends UFunc {
 
       val A = DenseMatrix.zeros[Double](n, n)
       A := m
-      lapack.dgeev("N",
-                   "V",
-                   n,
-                   A.data,
-                   scala.math.max(1, n),
-                   Wr.data,
-                   Wi.data,
-                   Array.empty[Double],
-                   scala.math.max(1, n),
-                   Vr.data,
-                   scala.math.max(1, n),
-                   work,
-                   work.length,
-                   info)
+      lapack.dgeev(
+        "N",
+        "V",
+        n,
+        A.data,
+        scala.math.max(1, n),
+        Wr.data,
+        Wi.data,
+        Array.empty[Double],
+        scala.math.max(1, n),
+        Vr.data,
+        scala.math.max(1, n),
+        work,
+        work.length,
+        info)
 
       if (info.`val` > 0)
         throw new NotConvergedException(NotConvergedException.Iterations)
@@ -104,7 +107,7 @@ object eigSym extends UFunc {
     def apply(X: DenseMatrix[Double]): DenseEigSym = {
       doEigSym(X, true) match {
         case (ev, Some(rev)) => EigSym(ev, rev)
-        case _ => throw new RuntimeException("Shouldn't be here!")
+        case _               => throw new RuntimeException("Shouldn't be here!")
       }
     }
   }
@@ -138,16 +141,17 @@ object eigSym extends UFunc {
     val work = Array.ofDim[Double](lwork)
     val info = new intW(0)
     lapack.dsyev(
-        if (rightEigenvectors)
-          "V" else "N" /* eigenvalues N, eigenvalues & eigenvectors "V" */,
-        "L" /* lower triangular */,
-        N /* number of rows */,
-        A.data,
-        scala.math.max(1, N) /* LDA */,
-        evs.data,
-        work /* workspace */,
-        lwork /* workspace size */,
-        info
+      if (rightEigenvectors)
+        "V"
+      else "N" /* eigenvalues N, eigenvalues & eigenvectors "V" */,
+      "L" /* lower triangular */,
+      N /* number of rows */,
+      A.data,
+      scala.math.max(1, N) /* LDA */,
+      evs.data,
+      work /* workspace */,
+      lwork /* workspace size */,
+      info
     )
     // A value of info.`val` < 0 would tell us that the i-th argument
     // of the call to dsyev was erroneous (where i == |info.`val`|).

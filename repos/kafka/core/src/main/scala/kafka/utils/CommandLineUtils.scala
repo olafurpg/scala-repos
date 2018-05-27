@@ -5,7 +5,7 @@
   * The ASF licenses this file to You under the Apache License, Version 2.0
   * (the "License"); you may not use this file except in compliance with
   * the License.  You may obtain a copy of the License at
-  * 
+  *
   *    http://www.apache.org/licenses/LICENSE-2.0
   *
   * Unless required by applicable law or agreed to in writing, software
@@ -29,7 +29,9 @@ object CommandLineUtils extends Logging {
     * Check that all the listed options are present
     */
   def checkRequiredArgs(
-      parser: OptionParser, options: OptionSet, required: OptionSpec[_]*) {
+      parser: OptionParser,
+      options: OptionSet,
+      required: OptionSpec[_]*) {
     for (arg <- required) {
       if (!options.has(arg))
         printUsageAndDie(parser, "Missing required argument \"" + arg + "\"")
@@ -39,16 +41,18 @@ object CommandLineUtils extends Logging {
   /**
     * Check that none of the listed options are present
     */
-  def checkInvalidArgs(parser: OptionParser,
-                       options: OptionSet,
-                       usedOption: OptionSpec[_],
-                       invalidOptions: Set[OptionSpec[_]]) {
+  def checkInvalidArgs(
+      parser: OptionParser,
+      options: OptionSet,
+      usedOption: OptionSpec[_],
+      invalidOptions: Set[OptionSpec[_]]) {
     if (options.has(usedOption)) {
       for (arg <- invalidOptions) {
         if (options.has(arg))
-          printUsageAndDie(parser,
-                           "Option \"" + usedOption +
-                           "\" can't be used with option\"" + arg + "\"")
+          printUsageAndDie(
+            parser,
+            "Option \"" + usedOption +
+              "\" can't be used with option\"" + arg + "\"")
       }
     }
   }
@@ -65,8 +69,9 @@ object CommandLineUtils extends Logging {
   /**
     * Parse key-value pairs in the form key=value
     */
-  def parseKeyValueArgs(args: Iterable[String],
-                        acceptMissingValue: Boolean = true): Properties = {
+  def parseKeyValueArgs(
+      args: Iterable[String],
+      acceptMissingValue: Boolean = true): Properties = {
     val splits = args.map(_ split "=").filterNot(_.length == 0)
 
     val props = new Properties
@@ -78,7 +83,7 @@ object CommandLineUtils extends Logging {
       } else if (a.length == 2) props.put(a(0), a(1))
       else {
         System.err.println(
-            "Invalid command line properties: " + args.mkString(" "))
+          "Invalid command line properties: " + args.mkString(" "))
         System.exit(1)
       }
     }

@@ -16,7 +16,9 @@ package distributions
  limitations under the License.
  */
 
-import org.apache.commons.math3.distribution.{HypergeometricDistribution => ApacheHypergeometricDistribution}
+import org.apache.commons.math3.distribution.{
+  HypergeometricDistribution => ApacheHypergeometricDistribution
+}
 
 /**
   * The Hypergeometric-distribution - ratio of two scaled chi^2 variables
@@ -24,10 +26,14 @@ import org.apache.commons.math3.distribution.{HypergeometricDistribution => Apac
   * @author stucchio
   */
 class HypergeometricDistribution(
-    populationSize: Int, numberOfSuccesses: Int, sampleSize: Int)
+    populationSize: Int,
+    numberOfSuccesses: Int,
+    sampleSize: Int)
     extends ApacheDiscreteDistribution {
   protected final val inner = new ApacheHypergeometricDistribution(
-      populationSize, numberOfSuccesses, sampleSize)
+    populationSize,
+    numberOfSuccesses,
+    sampleSize)
 }
 
 object HypergeometricDistribution

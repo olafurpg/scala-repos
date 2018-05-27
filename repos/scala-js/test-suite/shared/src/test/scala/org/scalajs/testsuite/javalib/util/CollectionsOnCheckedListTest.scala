@@ -32,7 +32,8 @@ trait CollectionsCheckedListTest extends CollectionsOnListTest {
 
       override def empty[E](implicit ct: ClassTag[E]): ju.List[E] = {
         ju.Collections.checkedList(
-            originalFactory.empty[E], ct.runtimeClass.asInstanceOf[Class[E]])
+          originalFactory.empty[E],
+          ct.runtimeClass.asInstanceOf[Class[E]])
       }
 
       override def allowsMutationThroughIterator: Boolean =
@@ -47,25 +48,28 @@ trait CollectionsCheckedListTest extends CollectionsOnListTest {
     superList().add(0, new C)
     assertTrue(superList().addAll(0, Seq(new C)))
     testOnFirstPositionOfIterator[ju.ListIterator[A]](
-        superList().listIterator, _.add(new C), None)
+      superList().listIterator,
+      _.add(new C),
+      None)
     testOnFirstPositionOfIterator[ju.ListIterator[A]](
-        superList().listIterator, _.set(new C), None)
+      superList().listIterator,
+      _.set(new C),
+      None)
   }
 
   @Test def testCheckedListBadInputs(): Unit = {
     assumeTrue("Needs compliant asInstanceOf", hasCompliantAsInstanceOfs)
 
     expectThrows(classOf[ClassCastException], superList().add(0, new A))
-    expectThrows(
-        classOf[ClassCastException], superList().addAll(0, Seq(new A)))
+    expectThrows(classOf[ClassCastException], superList().addAll(0, Seq(new A)))
     testOnFirstPositionOfIterator[ju.ListIterator[A]](
-        superList().listIterator,
-        _.add(new A),
-        Some(classOf[ClassCastException]))
+      superList().listIterator,
+      _.add(new A),
+      Some(classOf[ClassCastException]))
     testOnFirstPositionOfIterator[ju.ListIterator[A]](
-        superList().listIterator,
-        _.set(new A),
-        Some(classOf[ClassCastException]))
+      superList().listIterator,
+      _.set(new A),
+      Some(classOf[ClassCastException]))
   }
 
   private def superList(): ju.List[A] =
@@ -77,8 +81,7 @@ class CollectionsOnCheckedListAbstractListTest
   def originalFactory: ListFactory = new AbstractListFactory
 }
 
-class CollectionsOnCheckedListArrayListTest
-    extends CollectionsCheckedListTest {
+class CollectionsOnCheckedListArrayListTest extends CollectionsCheckedListTest {
   def originalFactory: ListFactory = new ArrayListFactory
 }
 

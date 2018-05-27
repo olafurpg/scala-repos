@@ -3,12 +3,25 @@ package lang.dependency
 
 import com.intellij.psi._
 import org.jetbrains.plugins.scala.extensions._
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScConstructorPattern, ScReferencePattern}
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScPrimaryConstructor, ScReferenceElement}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScInfixExpr, ScPostfixExpr}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScConstructorPattern,
+  ScReferencePattern
+}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScPrimaryConstructor,
+  ScReferenceElement
+}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScInfixExpr,
+  ScPostfixExpr
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScNamedElement
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScMember, ScObject}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass,
+  ScMember,
+  ScObject
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.ScSyntheticClass
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 
@@ -16,7 +29,10 @@ import org.jetbrains.plugins.scala.lang.psi.types.ScType
   * Pavel Fatin
   */
 case class Dependency(
-    kind: DependencyKind, source: PsiElement, target: PsiElement, path: Path) {
+    kind: DependencyKind,
+    source: PsiElement,
+    target: PsiElement,
+    path: Path) {
   def isExternal = source.getContainingFile != target.getContainingFile
 
   // It's better to re-bind references rather than to add imports
@@ -51,23 +67,29 @@ object Dependency {
 
   private def isPrimary(ref: ScReferenceElement) = ref match {
     case it @ Parent(postfix: ScPostfixExpr) => it == postfix.operand
-    case it @ Parent(infix: ScInfixExpr) => it == infix.lOp
-    case it => it.qualifier.isEmpty
+    case it @ Parent(infix: ScInfixExpr)     => it == infix.lOp
+    case it                                  => it.qualifier.isEmpty
   }
 
-  private def dependencyFor(reference: ScReferenceElement,
-                            target: PsiElement,
-                            fromType: Option[ScType]): Option[Dependency] = {
+  private def dependencyFor(
+      reference: ScReferenceElement,
+      target: PsiElement,
+      fromType: Option[ScType]): Option[Dependency] = {
     def withEntity(entity: String) =
-      Some(new Dependency(
-              DependencyKind.Reference, reference, target, Path(entity)))
+      Some(
+        new Dependency(
+          DependencyKind.Reference,
+          reference,
+          target,
+          Path(entity)))
 
     def withMember(entity: String, member: String) =
       Some(
-          new Dependency(DependencyKind.Reference,
-                         reference,
-                         target,
-                         Path(entity, Some(member))))
+        new Dependency(
+          DependencyKind.Reference,
+          reference,
+          target,
+          Path(entity, Some(member))))
 
     reference match {
       case Parent(_: ScConstructorPattern) =>
@@ -75,7 +97,7 @@ object Dependency {
           case ContainingClass(aClass) =>
             withEntity(aClass.qualifiedName)
           case aClass: ScSyntheticClass => None
-          case _ => None
+          case _                        => None
         }
       case _ =>
         target match {
@@ -88,21 +110,21 @@ object Dependency {
           case (_: ScPrimaryConstructor) && Parent(e: ScClass) =>
             withEntity(e.qualifiedName)
           case (function: ScFunctionDefinition) && ContainingClass(
-              obj: ScObject)
+                obj: ScObject)
               if function.isSynthetic || function.name == "apply" ||
-              function.name == "unapply" =>
+                function.name == "unapply" =>
             withEntity(obj.qualifiedName)
           case (member: ScMember) && ContainingClass(obj: ScObject) =>
             val memberName = member match {
               case named: ScNamedElement => named.name
-              case _ => member.getName
+              case _                     => member.getName
             }
             withMember(obj.qualifiedName, memberName)
           case (pattern: ScReferencePattern) && Parent(
-              Parent(ContainingClass(obj: ScObject))) =>
+                Parent(ContainingClass(obj: ScObject))) =>
             withMember(obj.qualifiedName, pattern.name)
-          case (function: ScFunctionDefinition) && ContainingClass(
-              obj: ScClass) if function.isConstructor =>
+          case (function: ScFunctionDefinition) && ContainingClass(obj: ScClass)
+              if function.isConstructor =>
             withEntity(obj.qualifiedName)
           case (method: PsiMethod) && ContainingClass(e: PsiClass)
               if method.isConstructor =>
@@ -115,7 +137,7 @@ object Dependency {
               case Some(entity: ScObject) =>
                 val memberName = member match {
                   case named: ScNamedElement => named.name
-                  case _ => member.getName
+                  case _                     => member.getName
                 }
                 withMember(entity.qualifiedName, memberName)
               case _ => None

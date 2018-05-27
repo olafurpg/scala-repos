@@ -46,15 +46,18 @@ final class FlattenMerge[T, M](breadth: Int)
       else removeSource(src)
     }
 
-    setHandler(in, new InHandler {
-      override def onPush(): Unit = {
-        val source = grab(in)
-        addSource(source)
-        if (activeSources < breadth) tryPull(in)
+    setHandler(
+      in,
+      new InHandler {
+        override def onPush(): Unit = {
+          val source = grab(in)
+          addSource(source)
+          if (activeSources < breadth) tryPull(in)
+        }
+        override def onUpstreamFinish(): Unit =
+          if (activeSources == 0) completeStage()
       }
-      override def onUpstreamFinish(): Unit =
-        if (activeSources == 0) completeStage()
-    })
+    )
 
     setHandler(out, new OutHandler {
       override def onPull(): Unit = {
@@ -110,14 +113,16 @@ final class PrefixAndTail[T](n: Int)
     extends GraphStage[FlowShape[T, (immutable.Seq[T], Source[T, NotUsed])]] {
   val in: Inlet[T] = Inlet("PrefixAndTail.in")
   val out: Outlet[(immutable.Seq[T], Source[T, NotUsed])] = Outlet(
-      "PrefixAndTail.out")
+    "PrefixAndTail.out")
   override val shape: FlowShape[T, (immutable.Seq[T], Source[T, NotUsed])] =
     FlowShape(in, out)
 
   override def initialAttributes = DefaultAttributes.prefixAndTail
 
   private final class PrefixAndTailLogic(_shape: Shape)
-      extends TimerGraphStageLogic(_shape) with OutHandler with InHandler {
+      extends TimerGraphStageLogic(_shape)
+      with OutHandler
+      with InHandler {
 
     private var left = if (n < 0) 0 else n
     private var builder = Vector.newBuilder[T]
@@ -140,9 +145,9 @@ final class PrefixAndTail[T](n: Int)
         // do nothing
         case StreamSubscriptionTimeoutTerminationMode.WarnTermination ⇒
           materializer.logger.warning(
-              "Substream subscription timeout triggered after {} in prefixAndTail({}).",
-              timeout,
-              n)
+            "Substream subscription timeout triggered after {} in prefixAndTail({}).",
+            timeout,
+            n)
       }
     }
 
@@ -153,8 +158,7 @@ final class PrefixAndTail[T](n: Int)
         setKeepGoing(false)
         cancelTimer(SubscriptionTimer)
         pull(in)
-        tailSource.setHandler(
-            new OutHandler {
+        tailSource.setHandler(new OutHandler {
           override def onPull(): Unit = pull(in)
         })
       }
@@ -241,8 +245,7 @@ object Split {
     : Graph[FlowShape[T, Source[T, NotUsed]], NotUsed] =
     new Split(Split.SplitBefore, p, substreamCancelStrategy)
 
-  def after[T](
-      p: T ⇒ Boolean, substreamCancelStrategy: SubstreamCancelStrategy)
+  def after[T](p: T ⇒ Boolean, substreamCancelStrategy: SubstreamCancelStrategy)
     : Graph[FlowShape[T, Source[T, NotUsed]], NotUsed] =
     new Split(Split.SplitAfter, p, substreamCancelStrategy)
 }
@@ -250,9 +253,10 @@ object Split {
 /**
   * INTERNAL API
   */
-final class Split[T](decision: Split.SplitDecision,
-                     p: T ⇒ Boolean,
-                     substreamCancelStrategy: SubstreamCancelStrategy)
+final class Split[T](
+    decision: Split.SplitDecision,
+    p: T ⇒ Boolean,
+    substreamCancelStrategy: SubstreamCancelStrategy)
     extends GraphStage[FlowShape[T, Source[T, NotUsed]]] {
   val in: Inlet[T] = Inlet("Split.in")
   val out: Outlet[Source[T, NotUsed]] = Outlet("Split.out")
@@ -282,40 +286,46 @@ final class Split[T](decision: Split.SplitDecision,
           .timeout
       }
 
-      setHandler(out, new OutHandler {
-        override def onPull(): Unit = {
-          if (substreamSource eq null) pull(in)
-          else if (!substreamPushed) {
-            push(out, Source.fromGraph(substreamSource.source))
-            scheduleOnce(SubscriptionTimer, timeout)
-            substreamPushed = true
+      setHandler(
+        out,
+        new OutHandler {
+          override def onPull(): Unit = {
+            if (substreamSource eq null) pull(in)
+            else if (!substreamPushed) {
+              push(out, Source.fromGraph(substreamSource.source))
+              scheduleOnce(SubscriptionTimer, timeout)
+              substreamPushed = true
+            }
+          }
+
+          override def onDownstreamFinish(): Unit = {
+            // If the substream is already cancelled or it has not been handed out, we can go away
+            if (!substreamPushed || substreamCancelled) completeStage()
           }
         }
-
-        override def onDownstreamFinish(): Unit = {
-          // If the substream is already cancelled or it has not been handed out, we can go away
-          if (!substreamPushed || substreamCancelled) completeStage()
-        }
-      })
+      )
 
       // initial input handler
-      setHandler(in, new InHandler {
-        override def onPush(): Unit = {
-          val handler = new SubstreamHandler
-          val elem = grab(in)
+      setHandler(
+        in,
+        new InHandler {
+          override def onPush(): Unit = {
+            val handler = new SubstreamHandler
+            val elem = grab(in)
 
-          decision match {
-            case SplitAfter if p(elem) ⇒
-              push(out, Source.single(elem))
-            // Next pull will come from the next substream that we will open
-            case _ ⇒
-              handler.firstElem = elem
+            decision match {
+              case SplitAfter if p(elem) ⇒
+                push(out, Source.single(elem))
+              // Next pull will come from the next substream that we will open
+              case _ ⇒
+                handler.firstElem = elem
+            }
+
+            handOver(handler)
           }
-
-          handOver(handler)
+          override def onUpstreamFinish(): Unit = completeStage()
         }
-        override def onUpstreamFinish(): Unit = completeStage()
-      })
+      )
 
       private def handOver(handler: SubstreamHandler): Unit = {
         if (isClosed(out)) completeStage()
@@ -346,7 +356,8 @@ final class Split[T](decision: Split.SplitDecision,
 
         // Substreams are always assumed to be pushable position when we enter this method
         private def closeThis(
-            handler: SubstreamHandler, currentElem: T): Unit = {
+            handler: SubstreamHandler,
+            currentElem: T): Unit = {
           decision match {
             case SplitAfter ⇒
               if (!substreamCancelled) {
@@ -426,7 +437,8 @@ object SubSink {
   * INTERNAL API
   */
 final class SubSink[T](
-    name: String, externalCallback: ActorSubscriberMessage ⇒ Unit)
+    name: String,
+    externalCallback: ActorSubscriberMessage ⇒ Unit)
     extends GraphStage[SinkShape[T]] {
   import SubSink._
 
@@ -473,8 +485,9 @@ final class SubSink[T](
             completeStage()
             if (!status.compareAndSet(Cancel, cb)) setCB(cb)
           case _: AsyncCallback[_] ⇒
-            failStage(new IllegalStateException(
-                    "Substream Source cannot be materialized more than once"))
+            failStage(
+              new IllegalStateException(
+                "Substream Source cannot be materialized more than once"))
         }
       }
 
@@ -510,7 +523,7 @@ object SubSource {
         GraphInterpreter.currentInterpreterOrNull match {
           case null ⇒
             throw new UnsupportedOperationException(
-                s"cannot drop Source of type ${m.getClass.getName}")
+              s"cannot drop Source of type ${m.getClass.getName}")
           case intp ⇒ s.runWith(Sink.ignore)(intp.subFusingMaterializer)
         }
     }
@@ -560,9 +573,10 @@ final class SubSource[T](
 
   def timeout(d: FiniteDuration): Boolean =
     status.compareAndSet(
-        null,
-        ActorSubscriberMessage.OnError(new SubscriptionTimeoutException(
-                s"Substream Source has not been materialized in $d")))
+      null,
+      ActorSubscriberMessage.OnError(
+        new SubscriptionTimeoutException(
+          s"Substream Source has not been materialized in $d")))
 
   override def createLogic(inheritedAttributes: Attributes) =
     new GraphStageLogic(shape) with OutHandler {
@@ -575,8 +589,9 @@ final class SubSource[T](
           case ActorSubscriberMessage.OnComplete ⇒ completeStage()
           case ActorSubscriberMessage.OnError(ex) ⇒ failStage(ex)
           case _: AsyncCallback[_] ⇒
-            failStage(new IllegalStateException(
-                    "Substream Source cannot be materialized more than once"))
+            failStage(
+              new IllegalStateException(
+                "Substream Source cannot be materialized more than once"))
         }
       }
 

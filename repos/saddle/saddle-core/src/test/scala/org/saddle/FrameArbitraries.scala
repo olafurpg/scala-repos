@@ -27,7 +27,7 @@ object FrameArbitraries {
       n <- Gen.choose(0, 20)
       m <- Gen.choose(0, 10)
       lst <- Gen.listOfN(
-          n * m,
-          Gen.frequency((9, Gen.chooseNum(-1e3, 1e3)), (1, na.to[Double])))
+        n * m,
+        Gen.frequency((9, Gen.chooseNum(-1e3, 1e3)), (1, na.to[Double])))
     } yield Frame(Mat(n, m, lst.toArray))
 }

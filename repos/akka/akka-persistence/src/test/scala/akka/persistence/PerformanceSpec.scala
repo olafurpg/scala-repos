@@ -106,10 +106,10 @@ object PerformanceSpec {
 
     val receiveCommand: Receive =
       printProgress andThen
-      (controlBehavior orElse {
-            case "a" ⇒ persist("a")(_ ⇒ context.become(processC))
-            case "b" ⇒ persist("b")(_ ⇒ ())
-          })
+        (controlBehavior orElse {
+          case "a" ⇒ persist("a")(_ ⇒ context.become(processC))
+          case "b" ⇒ persist("b")(_ ⇒ ())
+        })
 
     val processC: Receive =
       printProgress andThen {
@@ -123,18 +123,19 @@ object PerformanceSpec {
 
 class PerformanceSpec
     extends PersistenceSpec(
-        PersistenceSpec
-          .config("leveldb", "PerformanceSpec", serialization = "off")
-          .withFallback(ConfigFactory.parseString(PerformanceSpec.config)))
+      PersistenceSpec
+        .config("leveldb", "PerformanceSpec", serialization = "off")
+        .withFallback(ConfigFactory.parseString(PerformanceSpec.config)))
     with ImplicitSender {
   import PerformanceSpec._
 
   val loadCycles =
     system.settings.config.getInt("akka.persistence.performance.cycles.load")
 
-  def stressPersistentActor(persistentActor: ActorRef,
-                            failAt: Option[Long],
-                            description: String): Unit = {
+  def stressPersistentActor(
+      persistentActor: ActorRef,
+      failAt: Option[Long],
+      description: String): Unit = {
     failAt foreach { persistentActor ! FailAt(_) }
     val m = new Measure(loadCycles)
     m.startMeasure()
@@ -160,7 +161,9 @@ class PerformanceSpec
   def stressMixedPersistentActor(failAt: Option[Long]): Unit = {
     val persistentActor = namedPersistentActor[MixedTestPersistentActor]
     stressPersistentActor(
-        persistentActor, failAt, "persistent events & commands")
+      persistentActor,
+      failAt,
+      "persistent events & commands")
   }
 
   def stressStashingPersistentActor(): Unit = {
@@ -173,7 +176,7 @@ class PerformanceSpec
     persistentActor ! StopMeasure
     expectMsg(100.seconds, StopMeasure)
     println(
-        f"\nthroughput = ${m.stopMeasure()}%.2f persistent events per second")
+      f"\nthroughput = ${m.stopMeasure()}%.2f persistent events per second")
   }
 
   "Warmup persistent actor" should {

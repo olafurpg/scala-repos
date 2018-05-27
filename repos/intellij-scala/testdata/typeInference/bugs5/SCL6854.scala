@@ -8,7 +8,7 @@ object SCL6854 {
   case class FooAny[T](value: T) extends Foo[T]
 
   // LEVEL 2
-  case class FooNumberAny[T : Numeric](value: T) extends Foo[T]
+  case class FooNumberAny[T: Numeric](value: T) extends Foo[T]
 
   // Constructor
   object Foo {

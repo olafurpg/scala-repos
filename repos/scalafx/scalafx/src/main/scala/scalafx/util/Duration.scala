@@ -48,8 +48,9 @@ object Duration {
   }
 
   def Indefinite = new Duration(jfxu.Duration.INDEFINITE)
-  @deprecated("Use Indefinite; INDEFINITE will be removed in a future release",
-              "8.0.60-R10")
+  @deprecated(
+    "Use Indefinite; INDEFINITE will be removed in a future release",
+    "8.0.60-R10")
   def INDEFINITE = Indefinite
 
   def One = new Duration(jfxu.Duration.ONE)
@@ -58,12 +59,14 @@ object Duration {
 
   def Unknown = new Duration(jfxu.Duration.UNKNOWN)
   @deprecated(
-      "Use Unknown; UNKNOWN will be removed in a future release", "8.0.60-R10")
+    "Use Unknown; UNKNOWN will be removed in a future release",
+    "8.0.60-R10")
   def UNKNOWN = Unknown
 
   def Zero = new Duration(jfxu.Duration.ZERO)
   @deprecated(
-      "Use Zero; ZERO will be removed in a future release", "8.0.60-R10")
+    "Use Zero; ZERO will be removed in a future release",
+    "8.0.60-R10")
   def ZERO = Zero
 }
 
@@ -76,7 +79,8 @@ object Duration {
   * @define D `Duration`
   */
 class Duration(override val delegate: jfxu.Duration)
-    extends SFXDelegate[jfxu.Duration] with Ordered[Duration] {
+    extends SFXDelegate[jfxu.Duration]
+    with Ordered[Duration] {
 
   /**
     * The constructor of $D

@@ -24,8 +24,8 @@ object CommandLineParser {
         val (quoted, next) =
           (in substring 1) span {
             case `quote` if !escaped => false
-            case '\\' if !escaped => escaped = true; true
-            case _ => escaped = false; true
+            case '\\' if !escaped    => escaped = true; true
+            case _                   => escaped = false; true
           }
         // the only way to get out of the above loop is with an empty next or !escaped
         // require(next.isEmpty || !escaped)
@@ -44,8 +44,8 @@ object CommandLineParser {
     in match {
       case DoubleQuoted(arg, rest) => Right((arg, rest))
       case SingleQuoted(arg, rest) => Right((arg, rest))
-      case Word(arg, rest) => Right((arg, rest))
-      case _ => Left(s"Illegal argument: $in")
+      case Word(arg, rest)         => Right((arg, rest))
+      case _                       => Left(s"Illegal argument: $in")
     }
 
   // parse a list of whitespace-separated arguments (ignoring whitespace in quoted arguments)
@@ -73,7 +73,7 @@ object CommandLineParser {
   def tokenize(line: String, errorFn: String => Unit): List[String] = {
     commandLine(line) match {
       case Right((args, _)) => args
-      case Left(msg) => errorFn(msg); Nil
+      case Left(msg)        => errorFn(msg); Nil
     }
   }
 }

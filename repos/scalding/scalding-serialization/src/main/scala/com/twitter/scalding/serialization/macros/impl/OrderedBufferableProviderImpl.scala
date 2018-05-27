@@ -28,9 +28,8 @@ object OrderedSerializationProviderImpl {
       buildDispatcher: => PartialFunction[c.Type, TreeOrderedBuf[c.type]])
     : PartialFunction[c.Type, TreeOrderedBuf[c.type]] = {
     case tpe
-        if
-        (!tpe.toString.contains(ImplicitOrderedBuf.macroMarker) &&
-            !(tpe.normalize == tpe)) =>
+        if (!tpe.toString.contains(ImplicitOrderedBuf.macroMarker) &&
+          !(tpe.normalize == tpe)) =>
       buildDispatcher(tpe.normalize)
   }
 
@@ -81,8 +80,9 @@ object OrderedSerializationProviderImpl {
       .orElse(fallbackImplicitDispatcher(c))
       .orElse {
         case tpe: Type =>
-          c.abort(c.enclosingPosition,
-                  s"""Unable to find OrderedSerialization for type ${tpe}""")
+          c.abort(
+            c.enclosingPosition,
+            s"""Unable to find OrderedSerialization for type ${tpe}""")
       }
   }
 

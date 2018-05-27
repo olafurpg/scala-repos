@@ -14,9 +14,10 @@ import org.jetbrains.plugins.scala.finder.ScalaSourceFilterScope
   */
 class ScFullClassNameIndex extends IntStubIndexExtension[PsiClass] {
 
-  override def get(int: java.lang.Integer,
-                   project: Project,
-                   scope: GlobalSearchScope): java.util.Collection[PsiClass] =
+  override def get(
+      int: java.lang.Integer,
+      project: Project,
+      scope: GlobalSearchScope): java.util.Collection[PsiClass] =
     super.get(int, project, new ScalaSourceFilterScope(scope, project))
 
   def getKey = ScFullClassNameIndex.KEY

@@ -1,7 +1,10 @@
 package akka.remote.transport
 
 import akka.testkit.AkkaSpec
-import akka.remote.transport.ThrottlerTransportAdapter.{TokenBucket, Unthrottled}
+import akka.remote.transport.ThrottlerTransportAdapter.{
+  TokenBucket,
+  Unthrottled
+}
 import java.util.concurrent.TimeUnit
 
 class ThrottleModeSpec extends AkkaSpec {
@@ -18,10 +21,11 @@ class ThrottleModeSpec extends AkkaSpec {
     }
 
     "in tokenbucket mode allow consuming tokens up to capacity" in {
-      val bucket = TokenBucket(capacity = 100,
-                               tokensPerSecond = 100,
-                               nanoTimeOfLastSend = 0L,
-                               availableTokens = 100)
+      val bucket = TokenBucket(
+        capacity = 100,
+        tokensPerSecond = 100,
+        nanoTimeOfLastSend = 0L,
+        availableTokens = 100)
       val (bucket1, success1) =
         bucket.tryConsumeTokens(nanoTimeOfSend = 0L, 10)
       bucket1 should ===(TokenBucket(100, 100, 0, 90))
@@ -43,10 +47,11 @@ class ThrottleModeSpec extends AkkaSpec {
     }
 
     "accurately replenish tokens" in {
-      val bucket = TokenBucket(capacity = 100,
-                               tokensPerSecond = 100,
-                               nanoTimeOfLastSend = 0L,
-                               availableTokens = 0)
+      val bucket = TokenBucket(
+        capacity = 100,
+        tokensPerSecond = 100,
+        nanoTimeOfLastSend = 0L,
+        availableTokens = 0)
       val (bucket1, success1) = bucket.tryConsumeTokens(nanoTimeOfSend = 0L, 0)
       bucket1 should ===(TokenBucket(100, 100, 0, 0))
       success1 should ===(true)
@@ -68,10 +73,11 @@ class ThrottleModeSpec extends AkkaSpec {
     }
 
     "accurately interleave replenish and consume" in {
-      val bucket = TokenBucket(capacity = 100,
-                               tokensPerSecond = 100,
-                               nanoTimeOfLastSend = 0L,
-                               availableTokens = 20)
+      val bucket = TokenBucket(
+        capacity = 100,
+        tokensPerSecond = 100,
+        nanoTimeOfLastSend = 0L,
+        availableTokens = 20)
       val (bucket1, success1) =
         bucket.tryConsumeTokens(nanoTimeOfSend = 0L, 10)
       bucket1 should ===(TokenBucket(100, 100, 0, 10))
@@ -94,10 +100,11 @@ class ThrottleModeSpec extends AkkaSpec {
     }
 
     "allow oversized packets through by loaning" in {
-      val bucket = TokenBucket(capacity = 100,
-                               tokensPerSecond = 100,
-                               nanoTimeOfLastSend = 0L,
-                               availableTokens = 20)
+      val bucket = TokenBucket(
+        capacity = 100,
+        tokensPerSecond = 100,
+        nanoTimeOfLastSend = 0L,
+        availableTokens = 20)
       val (bucket1, success1) =
         bucket.tryConsumeTokens(nanoTimeOfSend = 0L, 30)
       bucket1 should ===(TokenBucket(100, 100, 0, 20))

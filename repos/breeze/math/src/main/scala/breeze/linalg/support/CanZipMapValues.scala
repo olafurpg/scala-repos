@@ -23,10 +23,11 @@ import scala.reflect.ClassTag
   *
   * @author dlwh
   */
-trait CanZipMapValues[From,
-                      @spec(Double, Int, Float, Long) V,
-                      @spec(Double, Int, Float, Long) RV,
-                      +To] {
+trait CanZipMapValues[
+    From,
+    @spec(Double, Int, Float, Long) V,
+    @spec(Double, Int, Float, Long) RV,
+    +To] {
 
   /** Maps all corresponding values from the two collections. */
   def map(from: From, from2: From, fn: (V, V) => RV): To
@@ -47,8 +48,9 @@ object CanZipMapValues {
   // Arrays
   //
 
-  class OpArray[@spec(Double, Int, Float, Long) V,
-                @spec(Double, Int, Float, Long) RV : ClassTag]
+  class OpArray[
+      @spec(Double, Int, Float, Long) V,
+      @spec(Double, Int, Float, Long) RV: ClassTag]
       extends Op[Array[V], V, RV, Array[RV]] {
 
     /**Maps all values from the given collection. */
@@ -64,7 +66,7 @@ object CanZipMapValues {
 
   // <editor-fold defaultstate="collapsed" desc=" implicit CanZipMapValues[V, RV] implementations ">
 
-  implicit def opArray[@spec V, @spec RV : ClassTag] = new OpArray[V, RV]
+  implicit def opArray[@spec V, @spec RV: ClassTag] = new OpArray[V, RV]
 
   implicit object OpArrayII extends OpArray[Int, Int]
 

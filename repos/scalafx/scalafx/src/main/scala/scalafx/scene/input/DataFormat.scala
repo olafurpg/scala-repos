@@ -90,8 +90,7 @@ object DataFormat {
   * @define JFX JavaFX
   * @define ORIGINALDOC Original Documentation]].
   */
-class DataFormat(
-    override val delegate: jfxsi.DataFormat = new jfxsi.DataFormat)
+class DataFormat(override val delegate: jfxsi.DataFormat = new jfxsi.DataFormat)
     extends SFXDelegate[jfxsi.DataFormat] {
 
   /**

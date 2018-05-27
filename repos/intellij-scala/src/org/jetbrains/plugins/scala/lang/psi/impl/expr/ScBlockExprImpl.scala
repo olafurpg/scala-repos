@@ -24,7 +24,7 @@ class ScBlockExprImpl(text: CharSequence)
   override def getContext: PsiElement = {
     context match {
       case null => super.getContext
-      case _ => context
+      case _    => context
     }
   }
 
@@ -40,9 +40,10 @@ class ScBlockExprImpl(text: CharSequence)
       if (aClass.isInstance(cur)) result.add(cur.asInstanceOf[T])
       cur = cur.getNextSibling
     }
-    result.toArray[T](java.lang.reflect.Array
-          .newInstance(aClass, result.size)
-          .asInstanceOf[Array[T]])
+    result.toArray[T](
+      java.lang.reflect.Array
+        .newInstance(aClass, result.size)
+        .asInstanceOf[Array[T]])
   }
 
   protected def findChildByClassScala[T >: Null <: ScalaPsiElement](
@@ -62,7 +63,7 @@ class ScBlockExprImpl(text: CharSequence)
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case s: ScalaElementVisitor => accept(s)
-      case _ => super.accept(visitor)
+      case _                      => super.accept(visitor)
     }
   }
 }

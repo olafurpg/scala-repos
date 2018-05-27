@@ -1,7 +1,18 @@
 package scalaz.concurrent
 
-import java.util.concurrent.{Callable, ConcurrentLinkedQueue, ExecutorService, TimeoutException, ScheduledExecutorService, TimeUnit}
-import java.util.concurrent.atomic.{AtomicInteger, AtomicBoolean, AtomicReference}
+import java.util.concurrent.{
+  Callable,
+  ConcurrentLinkedQueue,
+  ExecutorService,
+  TimeoutException,
+  ScheduledExecutorService,
+  TimeUnit
+}
+import java.util.concurrent.atomic.{
+  AtomicInteger,
+  AtomicBoolean,
+  AtomicReference
+}
 
 import collection.JavaConversions._
 import scalaz.Tags.Parallel
@@ -55,9 +66,9 @@ sealed abstract class Future[+A] {
   import Future._
 
   def flatMap[B](f: A => Future[B]): Future[B] = this match {
-    case Now(a) => Suspend(() => f(a))
+    case Now(a)         => Suspend(() => f(a))
     case Suspend(thunk) => BindSuspend(thunk, f)
-    case Async(listen) => BindAsync(listen, f)
+    case Async(listen)  => BindAsync(listen, f)
     case BindSuspend(thunk, g) =>
       Suspend(() => BindSuspend(thunk, g andThen (_ flatMap f)))
     case BindAsync(listen, g) =>
@@ -73,7 +84,7 @@ sealed abstract class Future[+A] {
     */
   def unsafePerformListen(cb: A => Trampoline[Unit]): Unit =
     (this.step: @unchecked) match {
-      case Now(a) => cb(a).run
+      case Now(a)          => cb(a).run
       case Async(onFinish) => onFinish(cb)
       case BindAsync(onFinish, g) =>
         onFinish(x => Trampoline.delay(g(x)) map (_ unsafePerformListen cb))
@@ -90,27 +101,29 @@ sealed abstract class Future[+A] {
     * robust means of cancellation.
     */
   def unsafePerformListenInterruptibly(
-      cb: A => Trampoline[Unit], cancel: AtomicBoolean): Unit =
+      cb: A => Trampoline[Unit],
+      cancel: AtomicBoolean): Unit =
     this.stepInterruptibly(cancel) match {
       case Now(a) if !cancel.get => cb(a).run
       case Async(onFinish) if !cancel.get =>
         onFinish(
-            a =>
-              if (!cancel.get) cb(a)
-              else Trampoline.done(()))
+          a =>
+            if (!cancel.get) cb(a)
+            else Trampoline.done(()))
       case BindAsync(onFinish, g) if !cancel.get =>
         onFinish(
-            x =>
-              if (!cancel.get)
-                Trampoline.delay(g(x)) map
+          x =>
+            if (!cancel.get)
+              Trampoline.delay(g(x)) map
                 (_ unsafePerformListenInterruptibly (cb, cancel))
-              else Trampoline.done(()))
+            else Trampoline.done(()))
       case _ if cancel.get => ()
     }
 
   @deprecated("use unsafePerformListenInterruptibly", "7.2")
   def listenInterruptibly(
-      cb: A => Trampoline[Unit], cancel: AtomicBoolean): Unit =
+      cb: A => Trampoline[Unit],
+      cancel: AtomicBoolean): Unit =
     unsafePerformListenInterruptibly(cb, cancel)
 
   /**
@@ -120,9 +133,9 @@ sealed abstract class Future[+A] {
     */
   @annotation.tailrec
   final def step: Future[A] = this match {
-    case Suspend(thunk) => thunk().step
+    case Suspend(thunk)        => thunk().step
     case BindSuspend(thunk, f) => (thunk() flatMap f).step
-    case _ => this
+    case _                     => this
   }
 
   /** Like `step`, but may be interrupted by setting `cancel` to true. */
@@ -138,10 +151,10 @@ sealed abstract class Future[+A] {
 
   /**
     * Begins running this `Future` and returns a new future that blocks
-    * waiting for the result. Note that this will start executing side effects 
-    * immediately, and is thus morally equivalent to `unsafePerformIO`. The 
+    * waiting for the result. Note that this will start executing side effects
+    * immediately, and is thus morally equivalent to `unsafePerformIO`. The
     * resulting `Future` cannot be rerun to repeat the effects.
-    * 
+    *
     * Use with care.
     */
   def unsafeStart: Future[A] = {
@@ -177,7 +190,8 @@ sealed abstract class Future[+A] {
     * robust means of cancellation.
     */
   def unsafePerformAsyncInterruptibly(
-      cb: A => Unit, cancel: AtomicBoolean): Unit =
+      cb: A => Unit,
+      cancel: AtomicBoolean): Unit =
     unsafePerformListenInterruptibly(a => Trampoline.done(cb(a)), cancel)
 
   @deprecated("use unsafePerformAsyncInterruptibly", "7.2")
@@ -188,14 +202,14 @@ sealed abstract class Future[+A] {
   def unsafePerformSync: A = this match {
     case Now(a) => a
     case _ => {
-        val latch = new java.util.concurrent.CountDownLatch(1)
-        @volatile var result: Option[A] = None
-        unsafePerformAsync { a =>
-          result = Some(a); latch.countDown
-        }
-        latch.await
-        result.get
+      val latch = new java.util.concurrent.CountDownLatch(1)
+      @volatile var result: Option[A] = None
+      unsafePerformAsync { a =>
+        result = Some(a); latch.countDown
       }
+      latch.await
+      result.get
+    }
   }
 
   @deprecated("use unsafePerformSync", "7.2")
@@ -224,7 +238,7 @@ sealed abstract class Future[+A] {
   def runFor(timeout: Duration): A =
     unsafePerformSyncFor(timeout)
 
-  /** Like `unsafePerformSyncFor`, but returns `TimeoutException` as left value. 
+  /** Like `unsafePerformSyncFor`, but returns `TimeoutException` as left value.
     * Will not report any other exceptions that may be raised during computation of `A`*/
   def unsafePerformSyncAttemptFor(timeoutInMillis: Long): Throwable \/ A = {
     val sync = new SyncVar[Throwable \/ A]
@@ -232,8 +246,8 @@ sealed abstract class Future[+A] {
     unsafePerformAsyncInterruptibly(a => sync.put(\/-(a)), interrupt)
     sync.get(timeoutInMillis).getOrElse {
       interrupt.set(true)
-      -\/(new TimeoutException(
-              s"Timed out after $timeoutInMillis milliseconds"))
+      -\/(
+        new TimeoutException(s"Timed out after $timeoutInMillis milliseconds"))
     }
   }
 
@@ -255,28 +269,34 @@ sealed abstract class Future[+A] {
     */
   def unsafePerformTimed(timeoutInMillis: Long)(
       implicit scheduler: ScheduledExecutorService): Future[Throwable \/ A] =
-    //instead of run this though chooseAny, it is run through simple primitive, 
+    //instead of run this though chooseAny, it is run through simple primitive,
     //as we are never interested in results of timeout callback, and this is more resource savvy
     async[Throwable \/ A] { cb =>
       val cancel = new AtomicBoolean(false)
       val done = new AtomicBoolean(false)
-      scheduler.schedule(new Runnable {
-        def run() {
-          if (done.compareAndSet(false, true)) {
-            cancel.set(true)
-            cb(-\/(new TimeoutException(
-                        s"Timed out after $timeoutInMillis milliseconds")))
+      scheduler.schedule(
+        new Runnable {
+          def run() {
+            if (done.compareAndSet(false, true)) {
+              cancel.set(true)
+              cb(
+                -\/(new TimeoutException(
+                  s"Timed out after $timeoutInMillis milliseconds")))
+            }
           }
-        }
-      }, timeoutInMillis, TimeUnit.MILLISECONDS)
+        },
+        timeoutInMillis,
+        TimeUnit.MILLISECONDS
+      )
 
       unsafePerformAsyncInterruptibly(
-          a => if (done.compareAndSet(false, true)) cb(\/-(a)), cancel)
+        a => if (done.compareAndSet(false, true)) cb(\/-(a)),
+        cancel)
     }
 
   def unsafePerformTimed(timeout: Duration)(
-      implicit scheduler: ScheduledExecutorService = Strategy.DefaultTimeoutScheduler)
-    : Future[Throwable \/ A] =
+      implicit scheduler: ScheduledExecutorService =
+        Strategy.DefaultTimeoutScheduler): Future[Throwable \/ A] =
     unsafePerformTimed(timeout.toMillis)
 
   @deprecated("use unsafePerformTimed", "7.2")
@@ -286,8 +306,8 @@ sealed abstract class Future[+A] {
 
   @deprecated("use unsafePerformTimed", "7.2")
   def timed(timeout: Duration)(
-      implicit scheduler: ScheduledExecutorService = Strategy.DefaultTimeoutScheduler)
-    : Future[Throwable \/ A] =
+      implicit scheduler: ScheduledExecutorService =
+        Strategy.DefaultTimeoutScheduler): Future[Throwable \/ A] =
     unsafePerformTimed(timeout)
 
   /**
@@ -307,8 +327,9 @@ object Future {
   case class Suspend[+A](thunk: () => Future[A]) extends Future[A]
   case class BindSuspend[A, B](thunk: () => Future[A], f: A => Future[B])
       extends Future[B]
-  case class BindAsync[A, B](onFinish: (A => Trampoline[Unit]) => Unit,
-                             f: A => Future[B])
+  case class BindAsync[A, B](
+      onFinish: (A => Trampoline[Unit]) => Unit,
+      f: A => Future[B])
       extends Future[B]
 
   // NB: considered implementing Traverse and Comonad, but these would have
@@ -321,7 +342,8 @@ object Future {
       def point[A](a: => A): Future[A] = delay(a)
 
       def chooseAny[A](
-          h: Future[A], t: Seq[Future[A]]): Future[(A, Seq[Future[A]])] = {
+          h: Future[A],
+          t: Seq[Future[A]]): Future[(A, Seq[Future[A]])] = {
         Async { cb =>
           // The details of this implementation are a bit tricky, but the general
           // idea is to run all futures in parallel, returning whichever result
@@ -378,15 +400,14 @@ object Future {
       }
 
       private val finishedCallback: Any => Trampoline[Unit] = _ =>
-        sys.error(
-            "impossible, since there can only be one runner of chooseAny")
+        sys.error("impossible, since there can only be one runner of chooseAny")
 
       // implementation runs all threads, dumping to a shared queue
       // last thread to finish invokes the callback with the results
-      override def reduceUnordered[A, M](
-          fs: Seq[Future[A]])(implicit R: Reducer[A, M]): Future[M] =
+      override def reduceUnordered[A, M](fs: Seq[Future[A]])(
+          implicit R: Reducer[A, M]): Future[M] =
         fs match {
-          case Seq() => Future.now(R.zero)
+          case Seq()  => Future.now(R.zero)
           case Seq(f) => f.map(R.unit)
           case other =>
             Async { cb =>
@@ -402,8 +423,8 @@ object Future {
 
                   // only last completed f will hit the 0 here.
                   if (c.decrementAndGet() == 0)
-                    cb(results.toList.foldLeft(R.zero)((a,
-                            b) => R.append(a, b)))
+                    cb(
+                      results.toList.foldLeft(R.zero)((a, b) => R.append(a, b)))
                   else Trampoline.done(())
                 }
               }
@@ -459,9 +480,8 @@ object Future {
     * exceptions.
     */
   def async[A](listen: (A => Unit) => Unit): Future[A] =
-    Async(
-        (cb: A => Trampoline[Unit]) =>
-          listen { a =>
+    Async((cb: A => Trampoline[Unit]) =>
+      listen { a =>
         cb(a).run
     })
 

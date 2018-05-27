@@ -52,9 +52,10 @@ final class ProcessIO(
     val processError: InputStream => Unit,
     val daemonizeThreads: Boolean
 ) {
-  def this(in: OutputStream => Unit,
-           out: InputStream => Unit,
-           err: InputStream => Unit) = this(in, out, err, false)
+  def this(
+      in: OutputStream => Unit,
+      out: InputStream => Unit,
+      err: InputStream => Unit) = this(in, out, err, false)
 
   /** Creates a new `ProcessIO` with a different handler for the process input. */
   def withInput(write: OutputStream => Unit): ProcessIO =

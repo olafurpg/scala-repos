@@ -23,9 +23,10 @@ class CaseClassParameterInspectionTest
 
   def testDefault(): Unit = {
     check(s"case class A(${START}val x: Int = 1$END)")
-    testFix(s"case class A(${START}val x: Int = 1$END)",
-            "case class A(x: Int = 1)",
-            ScalaBundle.message("remove.val"))
+    testFix(
+      s"case class A(${START}val x: Int = 1$END)",
+      "case class A(x: Int = 1)",
+      ScalaBundle.message("remove.val"))
   }
 
   def testWithModifier(): Unit =

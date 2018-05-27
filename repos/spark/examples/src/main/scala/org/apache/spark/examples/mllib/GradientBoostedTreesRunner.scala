@@ -38,13 +38,14 @@ import org.apache.spark.util.Utils
   */
 object GradientBoostedTreesRunner {
 
-  case class Params(input: String = null,
-                    testInput: String = "",
-                    dataFormat: String = "libsvm",
-                    algo: String = "Classification",
-                    maxDepth: Int = 5,
-                    numIterations: Int = 10,
-                    fracTest: Double = 0.2)
+  case class Params(
+      input: String = null,
+      testInput: String = "",
+      dataFormat: String = "libsvm",
+      algo: String = "Classification",
+      maxDepth: Int = 5,
+      numIterations: Int = 10,
+      fracTest: Double = 0.2)
       extends AbstractParams[Params]
 
   def main(args: Array[String]) {
@@ -54,26 +55,27 @@ object GradientBoostedTreesRunner {
       head("GradientBoostedTrees: an example decision tree app.")
       opt[String]("algo")
         .text(
-            s"algorithm (${Algo.values.mkString(",")}), default: ${defaultParams.algo}")
+          s"algorithm (${Algo.values.mkString(",")}), default: ${defaultParams.algo}")
         .action((x, c) => c.copy(algo = x))
       opt[Int]("maxDepth")
         .text(s"max depth of the tree, default: ${defaultParams.maxDepth}")
         .action((x, c) => c.copy(maxDepth = x))
       opt[Int]("numIterations")
         .text(s"number of iterations of boosting," +
-            s" default: ${defaultParams.numIterations}")
+          s" default: ${defaultParams.numIterations}")
         .action((x, c) => c.copy(numIterations = x))
       opt[Double]("fracTest")
-        .text(s"fraction of data to hold out for testing.  If given option testInput, " +
+        .text(
+          s"fraction of data to hold out for testing.  If given option testInput, " +
             s"this option is ignored. default: ${defaultParams.fracTest}")
         .action((x, c) => c.copy(fracTest = x))
       opt[String]("testInput")
-        .text(s"input path to test dataset.  If given, option fracTest is ignored." +
+        .text(
+          s"input path to test dataset.  If given, option fracTest is ignored." +
             s" default: ${defaultParams.testInput}")
         .action((x, c) => c.copy(testInput = x))
       opt[String]("dataFormat")
-        .text(
-            "data format: libsvm (default), dense (deprecated in Spark v1.1)")
+        .text("data format: libsvm (default), dense (deprecated in Spark v1.1)")
         .action((x, c) => c.copy(dataFormat = x))
       arg[String]("<input>")
         .text("input path to labeled examples")
@@ -82,7 +84,7 @@ object GradientBoostedTreesRunner {
       checkConfig { params =>
         if (params.fracTest < 0 || params.fracTest > 1) {
           failure(
-              s"fracTest ${params.fracTest} value incorrect; should be in [0,1].")
+            s"fracTest ${params.fracTest} value incorrect; should be in [0,1].")
         } else {
           success
         }
@@ -109,12 +111,12 @@ object GradientBoostedTreesRunner {
 
     // Load training and test data and cache it.
     val (training, test, numClasses) = DecisionTreeRunner.loadDatasets(
-        sc,
-        params.input,
-        params.dataFormat,
-        params.testInput,
-        Algo.withName(params.algo),
-        params.fracTest)
+      sc,
+      params.input,
+      params.dataFormat,
+      params.testInput,
+      Algo.withName(params.algo),
+      params.fracTest)
 
     val boostingStrategy = BoostingStrategy.defaultParams(params.algo)
     boostingStrategy.treeStrategy.numClasses = numClasses
@@ -133,10 +135,10 @@ object GradientBoostedTreesRunner {
         println(model) // Print model summary.
       }
       val trainAccuracy = new MulticlassMetrics(
-          training.map(lp => (model.predict(lp.features), lp.label))).precision
+        training.map(lp => (model.predict(lp.features), lp.label))).precision
       println(s"Train accuracy = $trainAccuracy")
       val testAccuracy = new MulticlassMetrics(
-          test.map(lp => (model.predict(lp.features), lp.label))).precision
+        test.map(lp => (model.predict(lp.features), lp.label))).precision
       println(s"Test accuracy = $testAccuracy")
     } else if (params.algo == "Regression") {
       val startTime = System.nanoTime()

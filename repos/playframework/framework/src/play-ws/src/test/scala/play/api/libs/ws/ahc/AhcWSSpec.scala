@@ -7,7 +7,13 @@ import akka.util.{ByteString, Timeout}
 import io.netty.handler.codec.http.{DefaultHttpHeaders, HttpHeaders}
 import org.asynchttpclient.Realm.AuthScheme
 import org.asynchttpclient.cookie.{Cookie => AHCCookie}
-import org.asynchttpclient.{AsyncHttpClient, DefaultAsyncHttpClientConfig, Param, Response => AHCResponse, Request => AHCRequest}
+import org.asynchttpclient.{
+  AsyncHttpClient,
+  DefaultAsyncHttpClientConfig,
+  Param,
+  Response => AHCResponse,
+  Request => AHCRequest
+}
 import org.specs2.mock.Mockito
 import play.api.inject.guice.GuiceApplicationBuilder
 import scala.concurrent.Await
@@ -53,8 +59,8 @@ object AhcWSSpec extends PlaySpecification with Mockito {
         .setShutdownTimeout(0)
       implicit val sslClient =
         new play.api.libs.ws.ahc.AhcWSClient(sslBuilder.build())
-      try WS.clientUrl("http://example.com/feed") must beAnInstanceOf[
-          WSRequest] finally sslClient.close()
+      try WS.clientUrl("http://example.com/feed") must beAnInstanceOf[WSRequest]
+      finally sslClient.close()
     }
 
     "AhcWSClient.underlying" in new WithApplication {
@@ -115,7 +121,7 @@ object AhcWSSpec extends PlaySpecification with Mockito {
         .asInstanceOf[AhcWSRequest]
         .buildRequest()
       req.getHeaders.getAll("key").asScala must containTheSameElementsAs(
-          Seq("value1", "value2"))
+        Seq("value1", "value2"))
     }
 
     "not make Content-Type header if there is Content-Type in headers already" in new WithApplication {
@@ -127,7 +133,7 @@ object AhcWSSpec extends PlaySpecification with Mockito {
         .asInstanceOf[AhcWSRequest]
         .buildRequest()
       req.getHeaders.get("Content-Type") must_==
-      ("fake/contenttype; charset=utf-8")
+        ("fake/contenttype; charset=utf-8")
     }
 
     "Have form params on POST of content type application/x-www-form-urlencoded" in new WithApplication {
@@ -136,7 +142,7 @@ object AhcWSSpec extends PlaySpecification with Mockito {
         .withBody(Map("param1" -> Seq("value1")))
         .asInstanceOf[AhcWSRequest]
         .buildRequest()
-        (new String(req.getByteData, "UTF-8")) must_== ("param1=value1")
+      (new String(req.getByteData, "UTF-8")) must_== ("param1=value1")
     }
 
     "Have form body on POST of content type text/plain" in new WithApplication {
@@ -148,7 +154,7 @@ object AhcWSSpec extends PlaySpecification with Mockito {
         .asInstanceOf[AhcWSRequest]
         .buildRequest()
 
-        (new String(req.getByteData, "UTF-8")) must be_==("HELLO WORLD")
+      (new String(req.getByteData, "UTF-8")) must be_==("HELLO WORLD")
       val headers = req.getHeaders
       headers.get("Content-Length") must beNull
     }
@@ -161,7 +167,7 @@ object AhcWSSpec extends PlaySpecification with Mockito {
         .withBody("HELLO WORLD") // and body is set to string (see #5221)
         .asInstanceOf[AhcWSRequest]
         .buildRequest()
-        (new String(req.getByteData, "UTF-8")) must be_==("HELLO WORLD") // should result in byte data.
+      (new String(req.getByteData, "UTF-8")) must be_==("HELLO WORLD") // should result in byte data.
     }
 
     "Have form params on POST of content type application/x-www-form-urlencoded when signed" in new WithApplication {
@@ -177,7 +183,7 @@ object AhcWSSpec extends PlaySpecification with Mockito {
         .buildRequest()
       // Note we use getFormParams instead of getByteData here.
       req.getFormParams.asScala must containTheSameElementsAs(
-          List(new org.asynchttpclient.Param("param1", "value1")))
+        List(new org.asynchttpclient.Param("param1", "value1")))
       req.getByteData must beNull // should NOT result in byte data.
 
       val headers = req.getHeaders
@@ -196,7 +202,7 @@ object AhcWSSpec extends PlaySpecification with Mockito {
         .asInstanceOf[AhcWSRequest]
         .buildRequest()
 
-        (new String(req.getByteData, "UTF-8")) must be_==("param1=value1") // should result in byte data.
+      (new String(req.getByteData, "UTF-8")) must be_==("param1=value1") // should result in byte data.
 
       val headers = req.getHeaders
       headers.get("Content-Length") must_== ("9001")
@@ -218,7 +224,7 @@ object AhcWSSpec extends PlaySpecification with Mockito {
       val headers = req.getHeaders
       req.getByteData must beNull // should NOT result in byte data.
       req.getFormParams.asScala must containTheSameElementsAs(
-          List(new org.asynchttpclient.Param("param1", "value1")))
+        List(new org.asynchttpclient.Param("param1", "value1")))
       headers.get("Content-Length") must beNull // no content length!
     }
 
@@ -231,7 +237,7 @@ object AhcWSSpec extends PlaySpecification with Mockito {
         .asInstanceOf[AhcWSRequest]
         .buildRequest()
       req.getHeaders.get("Content-Type") must_==
-      ("text/plain; charset=US-ASCII")
+        ("text/plain; charset=US-ASCII")
     }
 
     "Only send first content type header if two are sent" in new WithApplication {
@@ -295,22 +301,23 @@ object AhcWSSpec extends PlaySpecification with Mockito {
     }
 
     "not support negative timeout" in new WithApplication {
-      WS.url("http://playframework.com/").withRequestTimeout(-1.millis) should throwAn[
-          IllegalArgumentException]
+      WS.url("http://playframework.com/")
+        .withRequestTimeout(-1.millis) should throwAn[IllegalArgumentException]
     }
 
     "not support a timeout greater than Int.MaxValue" in new WithApplication {
       WS.url("http://playframework.com/")
         .withRequestTimeout((Int.MaxValue.toLong + 1).millis) should throwAn[
-          IllegalArgumentException]
+        IllegalArgumentException]
     }
 
     "support a proxy server with basic" in new WithApplication {
-      val proxy = DefaultWSProxyServer(protocol = Some("https"),
-                                       host = "localhost",
-                                       port = 8080,
-                                       principal = Some("principal"),
-                                       password = Some("password"))
+      val proxy = DefaultWSProxyServer(
+        protocol = Some("https"),
+        host = "localhost",
+        port = 8080,
+        principal = Some("principal"),
+        password = Some("password"))
       val req: AHCRequest = WS
         .url("http://playframework.com/")
         .withProxyServer(proxy)
@@ -326,12 +333,13 @@ object AhcWSSpec extends PlaySpecification with Mockito {
     }
 
     "support a proxy server with NTLM" in new WithApplication {
-      val proxy = DefaultWSProxyServer(protocol = Some("ntlm"),
-                                       host = "localhost",
-                                       port = 8080,
-                                       principal = Some("principal"),
-                                       password = Some("password"),
-                                       ntlmDomain = Some("somentlmdomain"))
+      val proxy = DefaultWSProxyServer(
+        protocol = Some("ntlm"),
+        host = "localhost",
+        port = 8080,
+        principal = Some("principal"),
+        password = Some("password"),
+        ntlmDomain = Some("somentlmdomain"))
       val req: AHCRequest = WS
         .url("http://playframework.com/")
         .withProxyServer(proxy)
@@ -361,15 +369,17 @@ object AhcWSSpec extends PlaySpecification with Mockito {
       actual.getRealm must beNull
     }
 
-    val patchFakeApp = GuiceApplicationBuilder().routes {
-      case ("PATCH", "/") =>
-        Action {
-          Results.Ok(play.api.libs.json.Json.parse("""{
+    val patchFakeApp = GuiceApplicationBuilder()
+      .routes {
+        case ("PATCH", "/") =>
+          Action {
+            Results.Ok(play.api.libs.json.Json.parse("""{
             |  "data": "body"
             |}
           """.stripMargin))
-        }
-    }.build()
+          }
+      }
+      .build()
 
     "support patch method" in new WithServer(patchFakeApp) {
       // NOTE: if you are using a client proxy like Privoxy or Polipo, your proxy may not support PATCH & return 400.
@@ -424,17 +434,10 @@ object AhcWSSpec extends PlaySpecification with Mockito {
 
       val ahcResponse: AHCResponse = mock[AHCResponse]
       val (name, value, wrap, domain, path, maxAge, secure, httpOnly) =
-        ("someName",
-         "someValue",
-         true,
-         "example.com",
-         "/",
-         1000L,
-         false,
-         false)
+        ("someName", "someValue", true, "example.com", "/", 1000L, false, false)
 
-      val ahcCookie: AHCCookie = new AHCCookie(
-          name, value, wrap, domain, path, maxAge, secure, httpOnly)
+      val ahcCookie: AHCCookie =
+        new AHCCookie(name, value, wrap, domain, path, maxAge, secure, httpOnly)
       ahcResponse.getCookies returns util.Arrays.asList(ahcCookie)
 
       val response = AhcWSResponse(ahcResponse)
@@ -453,17 +456,10 @@ object AhcWSSpec extends PlaySpecification with Mockito {
     "get a single cookie from an AHC response" in {
       val ahcResponse: AHCResponse = mock[AHCResponse]
       val (name, value, wrap, domain, path, maxAge, secure, httpOnly) =
-        ("someName",
-         "someValue",
-         true,
-         "example.com",
-         "/",
-         1000L,
-         false,
-         false)
+        ("someName", "someValue", true, "example.com", "/", 1000L, false, false)
 
-      val ahcCookie: AHCCookie = new AHCCookie(
-          name, value, wrap, domain, path, maxAge, secure, httpOnly)
+      val ahcCookie: AHCCookie =
+        new AHCCookie(name, value, wrap, domain, path, maxAge, secure, httpOnly)
       ahcResponse.getCookies returns util.Arrays.asList(ahcCookie)
 
       val response = AhcWSResponse(ahcResponse)
@@ -483,7 +479,14 @@ object AhcWSSpec extends PlaySpecification with Mockito {
       val ahcResponse: AHCResponse = mock[AHCResponse]
 
       val ahcCookie: AHCCookie = new AHCCookie(
-          "someName", "value", true, "domain", "path", -1L, false, false)
+        "someName",
+        "value",
+        true,
+        "domain",
+        "path",
+        -1L,
+        false,
+        false)
       ahcResponse.getCookies returns util.Arrays.asList(ahcCookie)
 
       val response = AhcWSResponse(ahcResponse)
@@ -496,22 +499,8 @@ object AhcWSSpec extends PlaySpecification with Mockito {
 
     "get the body as bytes from the AHC response" in {
       val ahcResponse: AHCResponse = mock[AHCResponse]
-      val bytes = ByteString(-87,
-                             -72,
-                             96,
-                             -63,
-                             -32,
-                             46,
-                             -117,
-                             -40,
-                             -128,
-                             -7,
-                             61,
-                             109,
-                             80,
-                             45,
-                             44,
-                             30)
+      val bytes = ByteString(-87, -72, 96, -63, -32, 46, -117, -40, -128, -7,
+        61, 109, 80, 45, 44, 30)
       ahcResponse.getResponseBodyAsBytes returns bytes.toArray
       val response = AhcWSResponse(ahcResponse)
       response.bodyAsBytes must_== bytes
@@ -527,7 +516,7 @@ object AhcWSSpec extends PlaySpecification with Mockito {
       val response = AhcWSResponse(ahcResponse)
       val headers = response.allHeaders
       headers must beEqualTo(
-          Map("Foo" -> Seq("bar", "baz"), "Bar" -> Seq("baz")))
+        Map("Foo" -> Seq("bar", "baz"), "Bar" -> Seq("baz")))
       headers.contains("foo") must beTrue
       headers.contains("Foo") must beTrue
       headers.contains("BAR") must beTrue
@@ -538,7 +527,8 @@ object AhcWSSpec extends PlaySpecification with Mockito {
   "withRequestFilter" should {
 
     class CallbackRequestFilter(
-        callList: scala.collection.mutable.Buffer[Int], value: Int)
+        callList: scala.collection.mutable.Buffer[Int],
+        value: Int)
         extends WSRequestFilter {
       override def apply(executor: WSRequestExecutor): WSRequestExecutor = {
         callList.append(value)
@@ -571,10 +561,12 @@ object AhcWSSpec extends PlaySpecification with Mockito {
 
   "Ahc WS Config" should {
     "support overriding secure default values" in {
-      val ahcConfig = new AhcConfigBuilder().modifyUnderlying { builder =>
-        builder.setCompressionEnforced(false)
-        builder.setFollowRedirect(false)
-      }.build()
+      val ahcConfig = new AhcConfigBuilder()
+        .modifyUnderlying { builder =>
+          builder.setCompressionEnforced(false)
+          builder.setFollowRedirect(false)
+        }
+        .build()
       ahcConfig.isCompressionEnforced must beFalse
       ahcConfig.isFollowRedirect must beFalse
       ahcConfig.getConnectTimeout must_== 120000

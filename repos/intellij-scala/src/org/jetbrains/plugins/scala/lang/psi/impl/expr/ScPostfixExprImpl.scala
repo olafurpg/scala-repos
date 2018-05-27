@@ -11,12 +11,13 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr._
 
 import scala.collection.Seq
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 06.03.2008
   */
 class ScPostfixExprImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScPostfixExpr {
+    extends ScalaPsiElementImpl(node)
+    with ScPostfixExpr {
   override def toString: String = "PostfixExpression"
 
   def argumentExpressions: Seq[ScExpression] = Seq.empty
@@ -32,7 +33,7 @@ class ScPostfixExprImpl(node: ASTNode)
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case visitor: ScalaElementVisitor => visitor.visitPostfixExpression(this)
-      case _ => super.accept(visitor)
+      case _                            => super.accept(visitor)
     }
   }
 }

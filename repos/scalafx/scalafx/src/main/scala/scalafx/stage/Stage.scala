@@ -31,7 +31,12 @@ import javafx.{stage => jfxs}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, ObjectProperty, ReadOnlyBooleanProperty, StringProperty}
+import scalafx.beans.property.{
+  BooleanProperty,
+  ObjectProperty,
+  ReadOnlyBooleanProperty,
+  StringProperty
+}
 import scalafx.delegate.SFXDelegate
 import scalafx.scene.Scene
 import scalafx.scene.input.KeyCombination
@@ -52,7 +57,8 @@ object Stage {
   * Any further stage would be simply instantiated by the no-arg constructor.
   */
 class Stage(override val delegate: jfxs.Stage = new jfxs.Stage)
-    extends Window(delegate) with SFXDelegate[jfxs.Stage] {
+    extends Window(delegate)
+    with SFXDelegate[jfxs.Stage] {
 
   /**
     * Creates a new instance of Stage.
@@ -176,7 +182,7 @@ class Stage(override val delegate: jfxs.Stage = new jfxs.Stage)
     */
   def showing_=(v: Boolean) {
     v match {
-      case true => delegate.show()
+      case true  => delegate.show()
       case false => delegate.hide()
     }
   }

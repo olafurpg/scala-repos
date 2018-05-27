@@ -28,9 +28,10 @@ import org.apache.spark.storage.StorageLevel
   * A more compact class to represent a rating than Tuple3[Int, Int, Double].
   */
 @Since("0.8.0")
-case class Rating @Since("0.8.0")(@Since("0.8.0") user: Int,
-                                  @Since("0.8.0") product: Int,
-                                  @Since("0.8.0") rating: Double)
+case class Rating @Since("0.8.0")(
+    @Since("0.8.0") user: Int,
+    @Since("0.8.0") product: Int,
+    @Since("0.8.0") rating: Double)
 
 /**
   * Alternating Least Squares matrix factorization.
@@ -71,8 +72,8 @@ class ALS private (
     private var implicitPrefs: Boolean,
     private var alpha: Double,
     private var seed: Long = System.nanoTime()
-)
-    extends Serializable with Logging {
+) extends Serializable
+    with Logging {
 
   /**
     * Constructs an ALS instance with default parameters: {numBlocks: -1, rank: 10, iterations: 10,
@@ -184,8 +185,9 @@ class ALS private (
   @DeveloperApi
   @Since("1.1.0")
   def setIntermediateRDDStorageLevel(storageLevel: StorageLevel): this.type = {
-    require(storageLevel != StorageLevel.NONE,
-            "ALS is not designed to run without persisting intermediate RDDs.")
+    require(
+      storageLevel != StorageLevel.NONE,
+      "ALS is not designed to run without persisting intermediate RDDs.")
     this.intermediateRDDStorageLevel = storageLevel
     this
   }
@@ -240,20 +242,21 @@ class ALS private (
       }
 
     val (floatUserFactors, floatProdFactors) = NewALS.train[Int](
-        ratings = ratings.map(
-              r => NewALS.Rating(r.user, r.product, r.rating.toFloat)),
-        rank = rank,
-        numUserBlocks = numUserBlocks,
-        numItemBlocks = numProductBlocks,
-        maxIter = iterations,
-        regParam = lambda,
-        implicitPrefs = implicitPrefs,
-        alpha = alpha,
-        nonnegative = nonnegative,
-        intermediateRDDStorageLevel = intermediateRDDStorageLevel,
-        finalRDDStorageLevel = StorageLevel.NONE,
-        checkpointInterval = checkpointInterval,
-        seed = seed)
+      ratings =
+        ratings.map(r => NewALS.Rating(r.user, r.product, r.rating.toFloat)),
+      rank = rank,
+      numUserBlocks = numUserBlocks,
+      numItemBlocks = numProductBlocks,
+      maxIter = iterations,
+      regParam = lambda,
+      implicitPrefs = implicitPrefs,
+      alpha = alpha,
+      nonnegative = nonnegative,
+      intermediateRDDStorageLevel = intermediateRDDStorageLevel,
+      finalRDDStorageLevel = StorageLevel.NONE,
+      checkpointInterval = checkpointInterval,
+      seed = seed
+    )
 
     val userFactors = floatUserFactors
       .mapValues(_.map(_.toDouble))
@@ -345,10 +348,11 @@ object ALS {
     * @param lambda     regularization parameter
     */
   @Since("0.8.0")
-  def train(ratings: RDD[Rating],
-            rank: Int,
-            iterations: Int,
-            lambda: Double): MatrixFactorizationModel = {
+  def train(
+      ratings: RDD[Rating],
+      rank: Int,
+      iterations: Int,
+      lambda: Double): MatrixFactorizationModel = {
     train(ratings, rank, iterations, lambda, -1)
   }
 
@@ -363,9 +367,10 @@ object ALS {
     * @param iterations number of iterations of ALS
     */
   @Since("0.8.0")
-  def train(ratings: RDD[Rating],
-            rank: Int,
-            iterations: Int): MatrixFactorizationModel = {
+  def train(
+      ratings: RDD[Rating],
+      rank: Int,
+      iterations: Int): MatrixFactorizationModel = {
     train(ratings, rank, iterations, 0.01, -1)
   }
 
@@ -437,11 +442,12 @@ object ALS {
     * @param alpha      confidence parameter
     */
   @Since("0.8.1")
-  def trainImplicit(ratings: RDD[Rating],
-                    rank: Int,
-                    iterations: Int,
-                    lambda: Double,
-                    alpha: Double): MatrixFactorizationModel = {
+  def trainImplicit(
+      ratings: RDD[Rating],
+      rank: Int,
+      iterations: Int,
+      lambda: Double,
+      alpha: Double): MatrixFactorizationModel = {
     trainImplicit(ratings, rank, iterations, lambda, -1, alpha)
   }
 
@@ -457,9 +463,10 @@ object ALS {
     * @param iterations number of iterations of ALS
     */
   @Since("0.8.1")
-  def trainImplicit(ratings: RDD[Rating],
-                    rank: Int,
-                    iterations: Int): MatrixFactorizationModel = {
+  def trainImplicit(
+      ratings: RDD[Rating],
+      rank: Int,
+      iterations: Int): MatrixFactorizationModel = {
     trainImplicit(ratings, rank, iterations, 0.01, -1, 1.0)
   }
 }

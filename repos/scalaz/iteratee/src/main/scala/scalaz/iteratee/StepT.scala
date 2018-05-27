@@ -27,8 +27,8 @@ sealed abstract class StepT[E, F[_], A] {
 
   def cont: Option[Input[E] => IterateeT[E, F, A]] =
     fold(
-        Some(_),
-        (_, _) => None
+      Some(_),
+      (_, _) => None
     )
 
   def contOr(
@@ -37,8 +37,8 @@ sealed abstract class StepT[E, F[_], A] {
 
   def mapContOr[Z](k: (Input[E] => IterateeT[E, F, A]) => Z, z: => Z): Z =
     fold(
-        k(_),
-        (_, _) => z
+      k(_),
+      (_, _) => z
     )
 
   def mapCont(k: (Input[E] => IterateeT[E, F, A]) => IterateeT[E, F, A])(
@@ -47,8 +47,8 @@ sealed abstract class StepT[E, F[_], A] {
 
   def doneValue: LazyOption[A] =
     fold(
-        _ => LazyOption.lazyNone,
-        (a, _) => LazyOption.lazySome(a)
+      _ => LazyOption.lazyNone,
+      (a, _) => LazyOption.lazySome(a)
     )
 
   def doneValueOr(a: => A): A =
@@ -56,14 +56,14 @@ sealed abstract class StepT[E, F[_], A] {
 
   def mapDoneValueOr[Z](k: (=> A) => Z, z: => Z) =
     fold(
-        _ => z,
-        (a, _) => k(a)
+      _ => z,
+      (a, _) => k(a)
     )
 
   def doneInput: LazyOption[Input[E]] =
     fold(
-        _ => LazyOption.lazyNone,
-        (_, i) => LazyOption.lazySome(i)
+      _ => LazyOption.lazyNone,
+      (_, i) => LazyOption.lazySome(i)
     )
 
   def doneInputOr(a: => Input[E]): Input[E] =
@@ -71,8 +71,8 @@ sealed abstract class StepT[E, F[_], A] {
 
   def mapDoneInputOr[Z](k: (=> Input[E]) => Z, z: => Z) =
     fold(
-        _ => z,
-        (_, i) => k(i)
+      _ => z,
+      (_, i) => k(i)
     )
 
   def >-[Z](cont: => Z, done: => Z): Z =

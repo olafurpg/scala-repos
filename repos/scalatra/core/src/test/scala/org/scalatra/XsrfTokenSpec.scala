@@ -50,8 +50,9 @@ object XsrfTokenSpec extends MutableScalatraSpec {
         token = tokenFromCookie
         body must beMatching("GO")
       }
-      post("/renderForm",
-           headers = Map(XsrfTokenSupport.HeaderNames.head -> token)) {
+      post(
+        "/renderForm",
+        headers = Map(XsrfTokenSupport.HeaderNames.head -> token)) {
         body must be_==("SUCCESS")
       }
     }
@@ -62,9 +63,9 @@ object XsrfTokenSpec extends MutableScalatraSpec {
       get("/renderForm") {
         body must beMatching("GO")
       }
-      post("/renderForm",
-           headers = Map(
-                 XsrfTokenSupport.HeaderNames.head -> "Hey I'm different")) {
+      post(
+        "/renderForm",
+        headers = Map(XsrfTokenSupport.HeaderNames.head -> "Hey I'm different")) {
         status must be_==(403)
         body must not be_== ("SUCCESS")
       }
@@ -81,12 +82,14 @@ object XsrfTokenSpec extends MutableScalatraSpec {
       get("/renderForm") {
         body must beMatching("GO")
       }
-      post("/renderForm",
-           headers = Map(XsrfTokenSupport.HeaderNames.head -> token)) {
+      post(
+        "/renderForm",
+        headers = Map(XsrfTokenSupport.HeaderNames.head -> token)) {
         body must be_==("SUCCESS")
       }
-      post("/renderForm",
-           headers = Map(XsrfTokenSupport.HeaderNames.head -> token)) {
+      post(
+        "/renderForm",
+        headers = Map(XsrfTokenSupport.HeaderNames.head -> token)) {
         body must be_==("SUCCESS")
       }
     }

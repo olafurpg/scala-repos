@@ -40,10 +40,10 @@ abstract class BaseReplicaFetchTest extends ZooKeeperTestHarness {
   override def setUp() {
     super.setUp()
     val props = createBrokerConfigs(
-        2,
-        zkConnect,
-        interBrokerSecurityProtocol = Some(securityProtocol),
-        trustStoreFile = trustStoreFile)
+      2,
+      zkConnect,
+      interBrokerSecurityProtocol = Some(securityProtocol),
+      trustStoreFile = trustStoreFile)
     brokers = props.map(KafkaConfig.fromProps).map(TestUtils.createServer(_))
   }
 
@@ -61,19 +61,20 @@ abstract class BaseReplicaFetchTest extends ZooKeeperTestHarness {
 
     // create a topic and partition and await leadership
     for (topic <- List(topic1, topic2)) {
-      createTopic(zkUtils,
-                  topic,
-                  numPartitions = 1,
-                  replicationFactor = 2,
-                  servers = brokers)
+      createTopic(
+        zkUtils,
+        topic,
+        numPartitions = 1,
+        replicationFactor = 2,
+        servers = brokers)
     }
 
     // send test messages to leader
     val producer = TestUtils.createNewProducer(
-        TestUtils.getBrokerListStrFromServers(brokers),
-        retries = 5,
-        keySerializer = new StringSerializer,
-        valueSerializer = new StringSerializer)
+      TestUtils.getBrokerListStrFromServers(brokers),
+      retries = 5,
+      keySerializer = new StringSerializer,
+      valueSerializer = new StringSerializer)
     val records =
       testMessageList1.map(m => new ProducerRecord(topic1, m, m)) ++ testMessageList2
         .map(m => new ProducerRecord(topic2, m, m))
@@ -88,10 +89,10 @@ abstract class BaseReplicaFetchTest extends ZooKeeperTestHarness {
           brokers.head.getLogManager().getLog(topicAndPart).get.logEndOffset
         result = result && expectedOffset > 0 && brokers.forall { item =>
           (expectedOffset == item
-                .getLogManager()
-                .getLog(topicAndPart)
-                .get
-                .logEndOffset)
+            .getLogManager()
+            .getLog(topicAndPart)
+            .get
+            .logEndOffset)
         }
       }
       result

@@ -32,7 +32,9 @@ abstract class Handler(val formatter: Formatter, val level: Option[Level])
 
   override def toString = {
     "<%s level=%s formatter=%s>".format(
-        getClass.getName, getLevel, formatter.toString)
+      getClass.getName,
+      getLevel,
+      formatter.toString)
   }
 }
 
@@ -103,7 +105,8 @@ object StringHandler {
   * Mostly useful for unit tests: logging goes directly into a string buffer.
   */
 class StringHandler(
-    formatter: Formatter = new Formatter(), level: Option[Level] = None)
+    formatter: Formatter = new Formatter(),
+    level: Option[Level] = None)
     extends Handler(formatter, level) {
 
   // thread-safe logging
@@ -147,7 +150,8 @@ object ConsoleHandler {
   * Log things to the console.
   */
 class ConsoleHandler(
-    formatter: Formatter = new Formatter(), level: Option[Level] = None)
+    formatter: Formatter = new Formatter(),
+    level: Option[Level] = None)
     extends Handler(formatter, level) {
 
   def publish(record: javalog.LogRecord) = {

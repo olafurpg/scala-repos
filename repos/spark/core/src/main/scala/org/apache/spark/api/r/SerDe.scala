@@ -183,8 +183,7 @@ private[spark] object SerDe {
           (0 until len).map { _ =>
             val obj = (sqlSerDe._1)(dis, arrType)
             if (obj == null) {
-              throw new IllegalArgumentException(
-                  s"Invalid array type $arrType")
+              throw new IllegalArgumentException(s"Invalid array type $arrType")
             } else {
               obj
             }
@@ -234,31 +233,33 @@ private[spark] object SerDe {
 
   def writeType(dos: DataOutputStream, typeStr: String): Unit = {
     typeStr match {
-      case "void" => dos.writeByte('n')
+      case "void"      => dos.writeByte('n')
       case "character" => dos.writeByte('c')
-      case "double" => dos.writeByte('d')
-      case "integer" => dos.writeByte('i')
-      case "logical" => dos.writeByte('b')
-      case "date" => dos.writeByte('D')
-      case "time" => dos.writeByte('t')
-      case "raw" => dos.writeByte('r')
+      case "double"    => dos.writeByte('d')
+      case "integer"   => dos.writeByte('i')
+      case "logical"   => dos.writeByte('b')
+      case "date"      => dos.writeByte('D')
+      case "time"      => dos.writeByte('t')
+      case "raw"       => dos.writeByte('r')
       // Array of primitive types
       case "array" => dos.writeByte('a')
       // Array of objects
       case "list" => dos.writeByte('l')
-      case "map" => dos.writeByte('e')
+      case "map"  => dos.writeByte('e')
       case "jobj" => dos.writeByte('j')
-      case _ => throw new IllegalArgumentException(s"Invalid type $typeStr")
+      case _      => throw new IllegalArgumentException(s"Invalid type $typeStr")
     }
   }
 
   private def writeKeyValue(
-      dos: DataOutputStream, key: Object, value: Object): Unit = {
+      dos: DataOutputStream,
+      key: Object,
+      value: Object): Unit = {
     if (key == null) {
       throw new IllegalArgumentException("Key in map can't be null.")
     } else if (!key.isInstanceOf[String]) {
       throw new IllegalArgumentException(
-          s"Invalid map key type: ${key.getClass.getName}")
+        s"Invalid map key type: ${key.getClass.getName}")
     }
 
     writeString(dos, key.asInstanceOf[String])
@@ -368,7 +369,9 @@ private[spark] object SerDe {
             val value = entry.getValue
 
             writeKeyValue(
-                dos, key.asInstanceOf[Object], value.asInstanceOf[Object])
+              dos,
+              key.asInstanceOf[Object],
+              value.asInstanceOf[Object])
           }
         case v: scala.collection.Map[_, _] =>
           writeType(dos, "map")
@@ -376,7 +379,9 @@ private[spark] object SerDe {
           v.foreach {
             case (key, value) =>
               writeKeyValue(
-                  dos, key.asInstanceOf[Object], value.asInstanceOf[Object])
+                dos,
+                key.asInstanceOf[Object],
+                value.asInstanceOf[Object])
           }
 
         case _ =>
@@ -412,7 +417,7 @@ private[spark] object SerDe {
 
   def writeTime(out: DataOutputStream, value: Timestamp): Unit = {
     out.writeDouble(
-        (value.getTime / 1000).toDouble + value.getNanos.toDouble / 1e9)
+      (value.getTime / 1000).toDouble + value.getNanos.toDouble / 1e9)
   }
 
   def writeString(out: DataOutputStream, value: String): Unit = {

@@ -42,31 +42,44 @@ object Transform {
   /**
     * Returns a new Affine object from 12 number values representing the 6 specifiable entries of the 3x4 Affine transformation matrix.
     */
-  def affine(mxx: Double,
-             myx: Double,
-             mxy: Double,
-             myy: Double,
-             tx: Double,
-             ty: Double): Affine =
+  def affine(
+      mxx: Double,
+      myx: Double,
+      mxy: Double,
+      myy: Double,
+      tx: Double,
+      ty: Double): Affine =
     jfxst.Transform.affine(mxx, myx, mxy, myy, tx, ty)
 
   /**
     * Returns a new Affine object from 12 number values representing the 6 specifiable entries of the 3x4 Affine transformation matrix.
     */
-  def affine(mxx: Double,
-             mxy: Double,
-             mxz: Double,
-             tx: Double,
-             myx: Double,
-             myy: Double,
-             myz: Double,
-             ty: Double,
-             mzx: Double,
-             mzy: Double,
-             mzz: Double,
-             tz: Double): Affine =
+  def affine(
+      mxx: Double,
+      mxy: Double,
+      mxz: Double,
+      tx: Double,
+      myx: Double,
+      myy: Double,
+      myz: Double,
+      ty: Double,
+      mzx: Double,
+      mzy: Double,
+      mzz: Double,
+      tz: Double): Affine =
     jfxst.Transform.affine(
-        mxx, mxy, mxz, tx, myx, myy, myz, ty, mzx, mzy, mzz, tz)
+      mxx,
+      mxy,
+      mxz,
+      tx,
+      myx,
+      myy,
+      myz,
+      ty,
+      mzx,
+      mzy,
+      mzz,
+      tz)
 
   /**
     * Returns a Rotate object that rotates coordinates around a pivot point.
@@ -115,14 +128,15 @@ abstract class Transform(override val delegate: jfxst.Transform)
   def identity: ReadOnlyBooleanProperty = delegate.identityProperty
 
   /** The onTransformChanged event handler is called whenever the transform changes any of its parameters. */
-  def onTransformChanged: ObjectProperty[
-      jfxe.EventHandler[_ >: jfxst.TransformChangedEvent]] =
+  def onTransformChanged
+    : ObjectProperty[jfxe.EventHandler[_ >: jfxst.TransformChangedEvent]] =
     delegate.onTransformChangedProperty
   def onTransformChanged_=(
       v: jfxe.EventHandler[_ >: jfxst.TransformChangedEvent]) {
     ObjectProperty
       .fillProperty[jfxe.EventHandler[_ >: jfxst.TransformChangedEvent]](
-        this.onTransformChanged, v)
+        this.onTransformChanged,
+        v)
   }
 
   /** Determines if this is currently a 2D transform. */

@@ -33,7 +33,7 @@ object Test {
     val strs = Array("abcde", "fghjij")
 
     println(
-        len(Array(1, 2, 3)) + len(Array(4.0, 5.0f)) + len(Array("abc", 5)) +
+      len(Array(1, 2, 3)) + len(Array(4.0, 5.0f)) + len(Array("abc", 5)) +
         len("bop"))
     println(f1(longs) + f2(bytes) + f3(strs))
 

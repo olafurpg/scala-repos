@@ -58,7 +58,7 @@ abstract class Behavior[T] {
 
 /*
  * FIXME
- * 
+ *
  * Closing over ActorContext makes a Behavior immobile: it cannot be moved to
  * another context and executed there, and therefore it cannot be replicated or
  * forked either.
@@ -214,7 +214,8 @@ object Behavior {
   @SerialVersionUID(1L)
   private[akka] object emptyBehavior extends Behavior[Any] {
     override def management(
-        ctx: ActorContext[Any], msg: Signal): Behavior[Any] =
+        ctx: ActorContext[Any],
+        msg: Signal): Behavior[Any] =
       ScalaDSL.Unhandled
     override def message(ctx: ActorContext[Any], msg: Any): Behavior[Any] =
       ScalaDSL.Unhandled
@@ -227,7 +228,8 @@ object Behavior {
   @SerialVersionUID(1L)
   private[akka] object ignoreBehavior extends Behavior[Any] {
     override def management(
-        ctx: ActorContext[Any], msg: Signal): Behavior[Any] = ScalaDSL.Same
+        ctx: ActorContext[Any],
+        msg: Signal): Behavior[Any] = ScalaDSL.Same
     override def message(ctx: ActorContext[Any], msg: Any): Behavior[Any] =
       ScalaDSL.Same
     override def toString = "Ignore"
@@ -239,10 +241,12 @@ object Behavior {
   @SerialVersionUID(1L)
   private[akka] object unhandledBehavior extends Behavior[Nothing] {
     override def management(
-        ctx: ActorContext[Nothing], msg: Signal): Behavior[Nothing] =
+        ctx: ActorContext[Nothing],
+        msg: Signal): Behavior[Nothing] =
       throw new UnsupportedOperationException("Not Implemented")
     override def message(
-        ctx: ActorContext[Nothing], msg: Nothing): Behavior[Nothing] =
+        ctx: ActorContext[Nothing],
+        msg: Nothing): Behavior[Nothing] =
       throw new UnsupportedOperationException("Not Implemented")
     override def toString = "Unhandled"
   }
@@ -253,10 +257,12 @@ object Behavior {
   @SerialVersionUID(1L)
   private[akka] object sameBehavior extends Behavior[Nothing] {
     override def management(
-        ctx: ActorContext[Nothing], msg: Signal): Behavior[Nothing] =
+        ctx: ActorContext[Nothing],
+        msg: Signal): Behavior[Nothing] =
       throw new UnsupportedOperationException("Not Implemented")
     override def message(
-        ctx: ActorContext[Nothing], msg: Nothing): Behavior[Nothing] =
+        ctx: ActorContext[Nothing],
+        msg: Nothing): Behavior[Nothing] =
       throw new UnsupportedOperationException("Not Implemented")
     override def toString = "Same"
   }
@@ -267,13 +273,16 @@ object Behavior {
   @SerialVersionUID(1L)
   private[akka] object stoppedBehavior extends Behavior[Nothing] {
     override def management(
-        ctx: ActorContext[Nothing], msg: Signal): Behavior[Nothing] = {
-      assert(msg == PostStop,
-             s"stoppedBehavior received $msg (only PostStop is expected)")
+        ctx: ActorContext[Nothing],
+        msg: Signal): Behavior[Nothing] = {
+      assert(
+        msg == PostStop,
+        s"stoppedBehavior received $msg (only PostStop is expected)")
       this
     }
     override def message(
-        ctx: ActorContext[Nothing], msg: Nothing): Behavior[Nothing] =
+        ctx: ActorContext[Nothing],
+        msg: Nothing): Behavior[Nothing] =
       throw new UnsupportedOperationException("Not Implemented")
     override def toString = "Stopped"
   }
@@ -284,9 +293,10 @@ object Behavior {
     * behavior) this method unwraps the behavior such that the innermost behavior
     * is returned, i.e. it removes the decorations.
     */
-  def canonicalize[T](ctx: ActorContext[T],
-                      behavior: Behavior[T],
-                      current: Behavior[T]): Behavior[T] =
+  def canonicalize[T](
+      ctx: ActorContext[T],
+      behavior: Behavior[T],
+      current: Behavior[T]): Behavior[T] =
     behavior match {
       case `sameBehavior` ⇒ current
       case `unhandledBehavior` ⇒ current

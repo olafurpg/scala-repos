@@ -14,7 +14,8 @@ trait SecurityHelper {
     ctx.me ?? Granter(permission)
 
   def isGranted(
-      permission: Permission.type => Permission, user: User): Boolean =
+      permission: Permission.type => Permission,
+      user: User): Boolean =
     isGranted(permission(Permission), user)
 
   def isGranted(permission: Permission, user: User): Boolean =

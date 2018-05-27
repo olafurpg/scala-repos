@@ -31,7 +31,9 @@ class SameResultSuite extends SparkFunSuite {
   val testRelation2 = LocalRelation('a.int, 'b.int, 'c.int)
 
   def assertSameResult(
-      a: LogicalPlan, b: LogicalPlan, result: Boolean = true): Unit = {
+      a: LogicalPlan,
+      b: LogicalPlan,
+      result: Boolean = true): Unit = {
     val aAnalyzed = a.analyze
     val bAnalyzed = b.analyze
 
@@ -53,18 +55,21 @@ class SameResultSuite extends SparkFunSuite {
     assertSameResult(testRelation.select('b, 'a), testRelation2.select('b, 'a))
 
     assertSameResult(testRelation, testRelation2.select('a), result = false)
-    assertSameResult(testRelation.select('b, 'a),
-                     testRelation2.select('a, 'b),
-                     result = false)
+    assertSameResult(
+      testRelation.select('b, 'a),
+      testRelation2.select('a, 'b),
+      result = false)
   }
 
   test("filters") {
     assertSameResult(
-        testRelation.where('a === 'b), testRelation2.where('a === 'b))
+      testRelation.where('a === 'b),
+      testRelation2.where('a === 'b))
   }
 
   test("sorts") {
     assertSameResult(
-        testRelation.orderBy('a.asc), testRelation2.orderBy('a.asc))
+      testRelation.orderBy('a.asc),
+      testRelation2.orderBy('a.asc))
   }
 }

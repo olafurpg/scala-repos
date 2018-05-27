@@ -85,7 +85,9 @@ object PopupControl {
   */
 class PopupControl(
     override val delegate: jfxsc.PopupControl = new jfxsc.PopupControl)
-    extends PopupWindow(delegate) with Styleable with Skinnable
+    extends PopupWindow(delegate)
+    with Styleable
+    with Skinnable
     with SFXDelegate[jfxsc.PopupControl] {
 
   /**

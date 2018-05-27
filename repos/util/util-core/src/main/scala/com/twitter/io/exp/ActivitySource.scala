@@ -53,12 +53,13 @@ object ActivitySource {
     new CachingActivitySource(new ClassLoaderActivitySource(cl))
 
   private[ActivitySource] class OrElse[T, U >: T](
-      primary: ActivitySource[T], failover: ActivitySource[U])
+      primary: ActivitySource[T],
+      failover: ActivitySource[U])
       extends ActivitySource[U] {
     def get(name: String): Activity[U] = {
       primary.get(name) transform {
         case Activity.Failed(_) => failover.get(name)
-        case state => Activity(Var.value(state))
+        case state              => Activity(Var.value(state))
       }
     }
   }
@@ -112,7 +113,7 @@ class CachingActivitySource[T](underlying: ActivitySource[T])
 /**
   * An ActivitySource for observing the contents of a file with periodic polling.
   */
-class FilePollingActivitySource private[exp](
+class FilePollingActivitySource private[exp] (
     period: Duration,
     pool: FuturePool
 )(implicit timer: Timer)
@@ -131,9 +132,10 @@ class FilePollingActivitySource private[exp](
         if (file.exists()) {
           pool {
             val reader =
-              new InputStreamReader(new FileInputStream(file),
-                                    InputStreamReader.DefaultMaxBufferSize,
-                                    pool)
+              new InputStreamReader(
+                new FileInputStream(file),
+                InputStreamReader.DefaultMaxBufferSize,
+                pool)
             Reader.readAll(reader) respond {
               case Return(buf) =>
                 value() = Activity.Ok(buf)
@@ -161,8 +163,9 @@ class FilePollingActivitySource private[exp](
 /**
   * An ActivitySource for ClassLoader resources.
   */
-class ClassLoaderActivitySource private[exp](
-    classLoader: ClassLoader, pool: FuturePool)
+class ClassLoaderActivitySource private[exp] (
+    classLoader: ClassLoader,
+    pool: FuturePool)
     extends ActivitySource[Buf] {
 
   import com.twitter.io.exp.ActivitySource._
@@ -184,7 +187,9 @@ class ClassLoaderActivitySource private[exp](
             case null => p.setValue(Activity.Failed(NotFound))
             case stream =>
               val reader = new InputStreamReader(
-                  stream, InputStreamReader.DefaultMaxBufferSize, pool)
+                stream,
+                InputStreamReader.DefaultMaxBufferSize,
+                pool)
               Reader.readAll(reader) respond {
                 case Return(buf) =>
                   p.setValue(Activity.Ok(buf))

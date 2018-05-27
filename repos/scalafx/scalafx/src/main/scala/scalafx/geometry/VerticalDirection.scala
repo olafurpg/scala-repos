@@ -38,7 +38,8 @@ object VerticalDirection
   /** The down direction. */
   val Down = new VerticalDirection(jfxg.VerticalDirection.DOWN)
   @deprecated(
-      "Use Down; DOWN will be removed in a future release", "8.0.60-R10")
+    "Use Down; DOWN will be removed in a future release",
+    "8.0.60-R10")
   val DOWN = Down
 
   /** The up direction. */

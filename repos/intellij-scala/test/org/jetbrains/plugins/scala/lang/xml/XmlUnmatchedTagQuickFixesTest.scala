@@ -15,10 +15,11 @@ class XmlUnmatchedTagQuickFixesTest
   val deleteUnmatchedTagHint = ScalaBundle.message("xml.delete.unmatched.tag")
 
   private def check(text: String, assumedStub: String, hint: String) {
-    testQuickFix(text.replace("\r", ""),
-                 assumedStub.replace("\r", ""),
-                 hint,
-                 classOf[ScalaXmlUnmatchedTagInspection])
+    testQuickFix(
+      text.replace("\r", ""),
+      assumedStub.replace("\r", ""),
+      hint,
+      classOf[ScalaXmlUnmatchedTagInspection])
   }
 
   def testSimple() {

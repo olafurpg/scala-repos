@@ -47,12 +47,16 @@ object SessionVar {
     task.copy(info = task.info.postTransform(g))
   }
 
-  def resolveContext[T](key: ScopedKey[Task[T]],
-                        context: Scope,
-                        state: State): ScopedKey[Task[T]] = {
+  def resolveContext[T](
+      key: ScopedKey[Task[T]],
+      context: Scope,
+      state: State): ScopedKey[Task[T]] = {
     val subScope = Scope.replaceThis(context)(key.scope)
     val scope =
-      Project.structure(state).data.definingScope(subScope, key.key) getOrElse subScope
+      Project
+        .structure(state)
+        .data
+        .definingScope(subScope, key.key) getOrElse subScope
     ScopedKey(scope, key.key)
   }
 
@@ -69,8 +73,9 @@ object SessionVar {
     get(key, state) orElse read(key, state)(f)
 
   def loadAndSet[T](
-      key: ScopedKey[Task[T]], state: State, setIfUnset: Boolean = true)(
-      implicit f: Format[T]): (State, Option[T]) =
+      key: ScopedKey[Task[T]],
+      state: State,
+      setIfUnset: Boolean = true)(implicit f: Format[T]): (State, Option[T]) =
     get(key, state) match {
       case s: Some[T] => (state, s)
       case None =>

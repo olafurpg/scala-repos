@@ -2,7 +2,13 @@ package slick.jdbc
 
 import scala.language.reflectiveCalls
 
-import java.sql.{PreparedStatement, Connection, SQLWarning, ResultSet, Statement}
+import java.sql.{
+  PreparedStatement,
+  Connection,
+  SQLWarning,
+  ResultSet,
+  Statement
+}
 
 /** A wrapper for `java.sql.Statement` that logs statements and benchmark results
   * to the appropriate [[JdbcBackend]] loggers. */
@@ -11,14 +17,15 @@ class LoggingStatement(st: Statement) extends Statement {
   private[this] val doBenchmark = JdbcBackend.benchmarkLogger.isDebugEnabled
 
   @inline protected[this] def logged[T](
-      sql: String, what: String = "statement")(f: => T) = {
+      sql: String,
+      what: String = "statement")(f: => T) = {
     if (doStatement && (sql ne null))
       JdbcBackend.statementLogger.debug("Executing " + what + ": " + sql)
     val t0 = if (doBenchmark) System.nanoTime() else 0L
     val res = f
     if (doBenchmark)
       JdbcBackend.benchmarkLogger.debug(
-          "Execution of " + what + " took " + formatNS(System.nanoTime() - t0))
+        "Execution of " + what + " took " + formatNS(System.nanoTime() - t0))
     res
   }
 
@@ -90,16 +97,17 @@ class LoggingStatement(st: Statement) extends Statement {
   def getConnection: Connection = st.getConnection
   def getMaxFieldSize: Int = st.getMaxFieldSize
   def closeOnCompletion(): Unit =
-    st.asInstanceOf[ { def closeOnCompletion(): Unit }].closeOnCompletion()
+    st.asInstanceOf[{ def closeOnCompletion(): Unit }].closeOnCompletion()
   def isCloseOnCompletion(): Boolean =
-    st.asInstanceOf[ { def isCloseOnCompletion(): Boolean }]
+    st.asInstanceOf[{ def isCloseOnCompletion(): Boolean }]
       .isCloseOnCompletion()
 }
 
 /** A wrapper for `java.sql.PreparedStatement` that logs statements and benchmark results
   * to the appropriate [[JdbcBackend]] loggers. */
 class LoggingPreparedStatement(st: PreparedStatement)
-    extends LoggingStatement(st) with PreparedStatement {
+    extends LoggingStatement(st)
+    with PreparedStatement {
   def execute(): Boolean = logged(null, "prepared statement") { st.execute() }
   def executeQuery(): java.sql.ResultSet = logged(null, "prepared query") {
     st.executeQuery()
@@ -180,7 +188,9 @@ class LoggingPreparedStatement(st: PreparedStatement)
     st.setTime(idx, value, cal)
   def setTime(idx: Int, value: java.sql.Time): Unit = st.setTime(idx, value)
   def setTimestamp(
-      idx: Int, value: java.sql.Timestamp, cal: java.util.Calendar): Unit =
+      idx: Int,
+      value: java.sql.Timestamp,
+      cal: java.util.Calendar): Unit =
     st.setTimestamp(idx, value, cal)
   def setTimestamp(idx: Int, value: java.sql.Timestamp): Unit =
     st.setTimestamp(idx, value)

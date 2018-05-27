@@ -8,7 +8,11 @@ import com.intellij.openapi.externalSystem.importing.ImportSpecBuilder
 import com.intellij.openapi.externalSystem.service.execution.ProgressExecutionMode
 import com.intellij.openapi.externalSystem.util.ExternalSystemUtil
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.vfs.{VirtualFile, VirtualFileAdapter, VirtualFileEvent}
+import com.intellij.openapi.vfs.{
+  VirtualFile,
+  VirtualFileAdapter,
+  VirtualFileEvent
+}
 import org.jetbrains.sbt.project.SbtProjectSystem
 import org.jetbrains.sbt.settings.SbtSystemSettings
 
@@ -25,18 +29,18 @@ class SbtAutoImportListener(project: Project) extends VirtualFileAdapter {
 
   private def reimportIfNeeded(file: VirtualFile): Unit = {
     val settings = Option(
-        SbtSystemSettings
-          .getInstance(project)
-          .getLinkedProjectSettings(project.getBasePath))
+      SbtSystemSettings
+        .getInstance(project)
+        .getLinkedProjectSettings(project.getBasePath))
 
     if (settings.fold(false)(_.useOurOwnAutoImport) && isBuildFile(file)) {
       ApplicationManager.getApplication.invokeLater(new Runnable() {
         override def run(): Unit =
           ExternalSystemUtil.refreshProjects(
-              new ImportSpecBuilder(project, SbtProjectSystem.Id)
-                .forceWhenUptodate()
-                .use(ProgressExecutionMode.IN_BACKGROUND_ASYNC)
-            )
+            new ImportSpecBuilder(project, SbtProjectSystem.Id)
+              .forceWhenUptodate()
+              .use(ProgressExecutionMode.IN_BACKGROUND_ASYNC)
+          )
       })
     }
   }

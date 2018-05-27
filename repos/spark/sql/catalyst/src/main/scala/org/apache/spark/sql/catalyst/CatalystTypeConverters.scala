@@ -42,13 +42,13 @@ object CatalystTypeConverters {
   private def isPrimitive(dataType: DataType): Boolean = {
     dataType match {
       case BooleanType => true
-      case ByteType => true
-      case ShortType => true
+      case ByteType    => true
+      case ShortType   => true
       case IntegerType => true
-      case LongType => true
-      case FloatType => true
-      case DoubleType => true
-      case _ => false
+      case LongType    => true
+      case FloatType   => true
+      case DoubleType  => true
+      case _           => false
     }
   }
 
@@ -56,21 +56,21 @@ object CatalystTypeConverters {
       dataType: DataType): CatalystTypeConverter[Any, Any, Any] = {
     val converter = dataType match {
       case udt: UserDefinedType[_] => UDTConverter(udt)
-      case arrayType: ArrayType => ArrayConverter(arrayType.elementType)
-      case mapType: MapType => MapConverter(mapType.keyType, mapType.valueType)
-      case structType: StructType => StructConverter(structType)
-      case StringType => StringConverter
-      case DateType => DateConverter
-      case TimestampType => TimestampConverter
-      case dt: DecimalType => new DecimalConverter(dt)
-      case BooleanType => BooleanConverter
-      case ByteType => ByteConverter
-      case ShortType => ShortConverter
-      case IntegerType => IntConverter
-      case LongType => LongConverter
-      case FloatType => FloatConverter
-      case DoubleType => DoubleConverter
-      case dataType: DataType => IdentityConverter(dataType)
+      case arrayType: ArrayType    => ArrayConverter(arrayType.elementType)
+      case mapType: MapType        => MapConverter(mapType.keyType, mapType.valueType)
+      case structType: StructType  => StructConverter(structType)
+      case StringType              => StringConverter
+      case DateType                => DateConverter
+      case TimestampType           => TimestampConverter
+      case dt: DecimalType         => new DecimalConverter(dt)
+      case BooleanType             => BooleanConverter
+      case ByteType                => ByteConverter
+      case ShortType               => ShortConverter
+      case IntegerType             => IntConverter
+      case LongType                => LongConverter
+      case FloatType               => FloatConverter
+      case DoubleType              => DoubleConverter
+      case dataType: DataType      => IdentityConverter(dataType)
     }
     converter.asInstanceOf[CatalystTypeConverter[Any, Any, Any]]
   }
@@ -184,11 +184,9 @@ object CatalystTypeConverters {
         catalystValue.toArray[Any](elementType)
       } else {
         val result = new Array[Any](catalystValue.numElements())
-        catalystValue.foreach(elementType,
-                              (i, e) =>
-                                {
-                                  result(i) = elementConverter.toScala(e)
-                              })
+        catalystValue.foreach(elementType, (i, e) => {
+          result(i) = elementConverter.toScala(e)
+        })
         result
       }
     }
@@ -304,7 +302,7 @@ object CatalystTypeConverters {
       extends CatalystTypeConverter[Any, String, UTF8String] {
     override def toCatalystImpl(scalaValue: Any): UTF8String =
       scalaValue match {
-        case str: String => UTF8String.fromString(str)
+        case str: String      => UTF8String.fromString(str)
         case utf8: UTF8String => utf8
       }
     override def toScala(catalystValue: UTF8String): String =
@@ -338,9 +336,9 @@ object CatalystTypeConverters {
       extends CatalystTypeConverter[Any, JavaBigDecimal, Decimal] {
     override def toCatalystImpl(scalaValue: Any): Decimal = {
       val decimal = scalaValue match {
-        case d: BigDecimal => Decimal(d)
+        case d: BigDecimal     => Decimal(d)
         case d: JavaBigDecimal => Decimal(d)
-        case d: Decimal => d
+        case d: Decimal        => d
       }
       if (decimal.changePrecision(dataType.precision, dataType.scale)) {
         decimal
@@ -447,8 +445,8 @@ object CatalystTypeConverters {
     *  This is used to create an RDD or test results with correct types for Catalyst.
     */
   def convertToCatalyst(a: Any): Any = a match {
-    case s: String => StringConverter.toCatalyst(s)
-    case d: Date => DateConverter.toCatalyst(d)
+    case s: String    => StringConverter.toCatalyst(s)
+    case d: Date      => DateConverter.toCatalyst(d)
     case t: Timestamp => TimestampConverter.toCatalyst(t)
     case d: BigDecimal =>
       new DecimalConverter(DecimalType(d.precision, d.scale)).toCatalyst(d)
@@ -456,7 +454,7 @@ object CatalystTypeConverters {
       new DecimalConverter(DecimalType(d.precision, d.scale)).toCatalyst(d)
     case seq: Seq[Any] =>
       new GenericArrayData(seq.map(convertToCatalyst).toArray)
-    case r: Row => InternalRow(r.toSeq.map(convertToCatalyst): _*)
+    case r: Row          => InternalRow(r.toSeq.map(convertToCatalyst): _*)
     case arr: Array[Any] => new GenericArrayData(arr.map(convertToCatalyst))
     case m: Map[_, _] =>
       val length = m.size

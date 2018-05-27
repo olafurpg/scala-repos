@@ -19,7 +19,8 @@ import scala.util.hashing.MurmurHash3
   */
 class HashVector[@spec(Double, Int, Float, Long) E](
     val array: OpenAddressHashArray[E])
-    extends Vector[E] with VectorLike[E, HashVector[E]] {
+    extends Vector[E]
+    with VectorLike[E, HashVector[E]] {
 
   // don't delete
   HashVector.init()
@@ -80,13 +81,15 @@ class HashVector[@spec(Double, Int, Float, Long) E](
 }
 
 object HashVector
-    extends HashVectorOps with DenseVector_HashVector_Ops
-    with HashVector_DenseVector_Ops with HashVector_SparseVector_Ops
+    extends HashVectorOps
+    with DenseVector_HashVector_Ops
+    with HashVector_DenseVector_Ops
+    with HashVector_SparseVector_Ops
     with SparseVector_HashVector_Ops {
-  def zeros[@spec(Double, Int, Float, Long) V : ClassTag : Zero](size: Int) = {
+  def zeros[@spec(Double, Int, Float, Long) V: ClassTag: Zero](size: Int) = {
     new HashVector(new OpenAddressHashArray[V](size))
   }
-  def apply[@spec(Double, Int, Float, Long) V : Zero](values: Array[V]) = {
+  def apply[@spec(Double, Int, Float, Long) V: Zero](values: Array[V]) = {
     implicit val man =
       ClassTag[V](values.getClass.getComponentType.asInstanceOf[Class[V]])
     val oah = new OpenAddressHashArray[V](values.length)
@@ -94,15 +97,15 @@ object HashVector
     new HashVector(oah)
   }
 
-  def apply[V : ClassTag : Zero](values: V*): HashVector[V] = {
+  def apply[V: ClassTag: Zero](values: V*): HashVector[V] = {
     apply(values.toArray)
   }
-  def fill[@spec(Double, Int, Float, Long) V : ClassTag : Zero](size: Int)(
+  def fill[@spec(Double, Int, Float, Long) V: ClassTag: Zero](size: Int)(
       v: => V): HashVector[V] = apply(Array.fill(size)(v))
-  def tabulate[@spec(Double, Int, Float, Long) V : ClassTag : Zero](size: Int)(
+  def tabulate[@spec(Double, Int, Float, Long) V: ClassTag: Zero](size: Int)(
       f: Int => V): HashVector[V] = apply(Array.tabulate(size)(f))
 
-  def apply[V : ClassTag : Zero](length: Int)(values: (Int, V)*) = {
+  def apply[V: ClassTag: Zero](length: Int)(values: (Int, V)*) = {
     val r = zeros[V](length)
     for ((i, v) <- values) {
       r(i) = v
@@ -112,8 +115,8 @@ object HashVector
 
   // implicits
 
-  implicit def canCreateZeros[V : ClassTag : Zero]: CanCreateZeros[
-      HashVector[V], Int] =
+  implicit def canCreateZeros[V: ClassTag: Zero]
+    : CanCreateZeros[HashVector[V], Int] =
     new CanCreateZeros[HashVector[V], Int] {
       def apply(d: Int): HashVector[V] = {
         zeros[V](d)
@@ -121,19 +124,18 @@ object HashVector
     }
 
   // implicits
-  class CanCopyHashVector[@specialized(Int, Float, Double) V : ClassTag : Zero]
+  class CanCopyHashVector[@specialized(Int, Float, Double) V: ClassTag: Zero]
       extends CanCopy[HashVector[V]] {
     def apply(v1: HashVector[V]) = {
       v1.copy
     }
   }
 
-  implicit def canCopyHash[
-      @specialized(Int, Float, Double) V : ClassTag : Zero]: CanCopyHashVector[
-      V] = new CanCopyHashVector[V]
+  implicit def canCopyHash[@specialized(Int, Float, Double) V: ClassTag: Zero]
+    : CanCopyHashVector[V] = new CanCopyHashVector[V]
 
-  implicit def canMapValues[V, V2 : ClassTag : Zero]: CanMapValues[
-      HashVector[V], V, V2, HashVector[V2]] = {
+  implicit def canMapValues[V, V2: ClassTag: Zero]
+    : CanMapValues[HashVector[V], V, V2, HashVector[V2]] = {
     new CanMapValues[HashVector[V], V, V2, HashVector[V2]] {
       def apply(from: HashVector[V], fn: (V) => V2) = {
         HashVector.tabulate(from.length)(i => fn(from(i)))
@@ -141,8 +143,8 @@ object HashVector
     }
   }
 
-  implicit def canMapActiveValues[V, V2 : ClassTag : Zero]: CanMapActiveValues[
-      HashVector[V], V, V2, HashVector[V2]] = {
+  implicit def canMapActiveValues[V, V2: ClassTag: Zero]
+    : CanMapActiveValues[HashVector[V], V, V2, HashVector[V2]] = {
     new CanMapActiveValues[HashVector[V], V, V2, HashVector[V2]] {
       def apply(from: HashVector[V], fn: (V) => V2) = {
         val out = new OpenAddressHashArray[V2](from.length)
@@ -174,15 +176,17 @@ object HashVector
     }
   }
 
-  implicit def canTraverseKeyValuePairs[V]: CanTraverseKeyValuePairs[
-      HashVector[V], Int, V] = {
+  implicit def canTraverseKeyValuePairs[V]
+    : CanTraverseKeyValuePairs[HashVector[V], Int, V] = {
     new CanTraverseKeyValuePairs[HashVector[V], Int, V] {
 
       def traverse(
-          from: HashVector[V], fn: KeyValuePairsVisitor[Int, V]): Unit = {
-        fn.zeros(from.size - from.activeSize,
-                 Iterator.range(0, from.size).filterNot(from.index contains _),
-                 from.default)
+          from: HashVector[V],
+          fn: KeyValuePairsVisitor[Int, V]): Unit = {
+        fn.zeros(
+          from.size - from.activeSize,
+          Iterator.range(0, from.size).filterNot(from.index contains _),
+          from.default)
         var i = 0
         while (i < from.iterableSize) {
           if (from.isActive(i)) fn.visit(from.index(i), from.data(i))
@@ -196,8 +200,8 @@ object HashVector
     }
   }
 
-  implicit def canMapPairs[V, V2 : ClassTag : Zero]: CanMapKeyValuePairs[
-      HashVector[V], Int, V, V2, HashVector[V2]] = {
+  implicit def canMapPairs[V, V2: ClassTag: Zero]
+    : CanMapKeyValuePairs[HashVector[V], Int, V, V2, HashVector[V2]] = {
     new CanMapKeyValuePairs[HashVector[V], Int, V, V2, HashVector[V2]] {
 
       /**Maps all key-value pairs from the given collection. */
@@ -219,14 +223,14 @@ object HashVector
     }
   }
 
-  implicit def canTabulate[E : ClassTag : Zero]: CanTabulate[
-      Int, HashVector[E], E] = new CanTabulate[Int, HashVector[E], E] {
-    def apply(d: Int, f: (Int) => E): HashVector[E] = tabulate[E](d)(f)
-  }
+  implicit def canTabulate[E: ClassTag: Zero]
+    : CanTabulate[Int, HashVector[E], E] =
+    new CanTabulate[Int, HashVector[E], E] {
+      def apply(d: Int, f: (Int) => E): HashVector[E] = tabulate[E](d)(f)
+    }
 
-  implicit def space[
-      E : Field : ClassTag : Zero]: MutableFiniteCoordinateField[
-      HashVector[E], Int, E] = {
+  implicit def space[E: Field: ClassTag: Zero]
+    : MutableFiniteCoordinateField[HashVector[E], Int, E] = {
     implicit val _dim = dim.implVDim[E, HashVector[E]]
     MutableFiniteCoordinateField.make[HashVector[E], Int, E]
   }
@@ -235,10 +239,11 @@ object HashVector
 
   @expand
   implicit def dv_hv_UpdateOp[
-      @expand.args(Int, Double, Float, Long) T, @expand.args(OpMulScalar, OpDiv, OpSet, OpMod, OpPow) Op <: OpType](
+      @expand.args(Int, Double, Float, Long) T,
+      @expand.args(OpMulScalar, OpDiv, OpSet, OpMod, OpPow) Op <: OpType](
       implicit @expand.sequence[Op]({ _ * _ }, { _ / _ }, { (a, b) =>
-    b
-  }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T])
+        b
+      }, { _ % _ }, { _ pow _ }) op: Op.Impl2[T, T, T])
     : Op.InPlaceImpl2[DenseVector[T], HashVector[T]] =
     new Op.InPlaceImpl2[DenseVector[T], HashVector[T]] {
       def apply(a: DenseVector[T], b: HashVector[T]): Unit = {
@@ -258,16 +263,11 @@ object HashVector
 
   // this shouldn't be necessary but it is:
   @expand
-  implicit def dv_hv_op[@expand.args(Int, Double, Float, Long) T,
-                        @expand.args(OpAdd,
-                                     OpSub,
-                                     OpMulScalar,
-                                     OpDiv,
-                                     OpSet,
-                                     OpMod,
-                                     OpPow) Op <: OpType] = {
+  implicit def dv_hv_op[
+      @expand.args(Int, Double, Float, Long) T,
+      @expand.args(OpAdd, OpSub, OpMulScalar, OpDiv, OpSet, OpMod, OpPow) Op <: OpType] = {
     DenseVector.pureFromUpdate(
-        implicitly[Op.InPlaceImpl2[DenseVector[T], HashVector[T]]])
+      implicitly[Op.InPlaceImpl2[DenseVector[T], HashVector[T]]])
   }
 
   @noinline

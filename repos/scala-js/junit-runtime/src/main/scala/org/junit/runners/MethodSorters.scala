@@ -5,8 +5,7 @@ package org.junit.runners
 
 object MethodSorters {
 
-  private lazy val _NAME_ASCENDING = new MethodSorters(
-      (x, y) => x.compareTo(y))
+  private lazy val _NAME_ASCENDING = new MethodSorters((x, y) => x.compareTo(y))
   private lazy val _JVM = new MethodSorters((x, y) => 0)
   private lazy val _DEFAULT = new MethodSorters((x, y) => 0)
 

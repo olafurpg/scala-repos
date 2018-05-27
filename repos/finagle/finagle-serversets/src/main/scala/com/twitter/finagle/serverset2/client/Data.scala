@@ -37,15 +37,16 @@ private[serverset2] object Data {
 
   case class Id(scheme: String, id: String)
 
-  case class Stat(czxid: Long, // ZXID that created this node
-                  mzxid: Long, // ZXID that last modified this node
-                  ctime: Long, // Creation time
-                  mtime: Long, // Modification time
-                  version: Int, // Znode version
-                  cversion: Int, // Child version
-                  aversion: Int, // ACL version
-                  ephemeralOwner: Long, // Owner ID if ephemeral, 0 otherwise
-                  dataLength: Int, // Length of the data field in bytes
-                  numChildren: Int, // Number of children of this node
-                  pzxid: Long) // ZXID that last modified children of this node
+  case class Stat(
+      czxid: Long, // ZXID that created this node
+      mzxid: Long, // ZXID that last modified this node
+      ctime: Long, // Creation time
+      mtime: Long, // Modification time
+      version: Int, // Znode version
+      cversion: Int, // Child version
+      aversion: Int, // ACL version
+      ephemeralOwner: Long, // Owner ID if ephemeral, 0 otherwise
+      dataLength: Int, // Length of the data field in bytes
+      numChildren: Int, // Number of children of this node
+      pzxid: Long) // ZXID that last modified children of this node
 }

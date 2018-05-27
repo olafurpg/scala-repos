@@ -15,7 +15,7 @@ trait Diff[CC[_], T] {
   def patch(coll: CC[T]): CC[T]
 
   /**
-    * Map the values present in the diff. The following 
+    * Map the values present in the diff. The following
     * invariant must hold:
     *
     * {{{
@@ -37,7 +37,7 @@ trait Diffable[CC[_]] {
   /**
     * Compute a [[Diff]] that may later be used to bring two
     * versions of a data structure into agreement; that is:
-    * 
+    *
     * {{{
     * Diffable.diff(a, b).patch(a) == b
     * }}}
@@ -100,16 +100,17 @@ object Diffable {
     def diff[T](left: Seq[T], right: Seq[T]): SeqDiff[T] =
       if (left.length < right.length) {
         val SeqDiff(_, insert) = diff(left, right.take(left.length))
-        SeqDiff(right.length,
-                insert ++
-                ((left.length until right.length) map { i =>
-                      (i -> right(i))
-                    }))
+        SeqDiff(
+          right.length,
+          insert ++
+            ((left.length until right.length) map { i =>
+              (i -> right(i))
+            }))
       } else if (left.length > right.length) {
         diff(left.take(right.length), right)
       } else {
         val insert = for (((x, y), i) <- left.zip(right).zipWithIndex
-                                            if x != y) yield (i -> y)
+                          if x != y) yield (i -> y)
         SeqDiff(left.length, insert.toMap)
       }
 
@@ -119,7 +120,7 @@ object Diffable {
   /**
     * Compute a [[Diff]] that may later be used to bring two
     * versions of a data structure into agreement; that is:
-    * 
+    *
     * {{{
     * Diffable.diff(left, right).patch(left) == right
     * }}}

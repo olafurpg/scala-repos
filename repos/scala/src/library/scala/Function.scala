@@ -113,9 +113,8 @@ object Function {
   /** Un-tupling for functions of arity 2. This transforms a function taking
     *  a pair of arguments into a binary function which takes each argument separately.
     */
-  def untupled[a1, a2, b](f: Tuple2[a1, a2] => b): (a1, a2) => b = {
-    (x1, x2) =>
-      f(Tuple2(x1, x2))
+  def untupled[a1, a2, b](f: Tuple2[a1, a2] => b): (a1, a2) => b = { (x1, x2) =>
+    f(Tuple2(x1, x2))
   }
 
   /** Un-tupling for functions of arity 3. This transforms a function taking

@@ -23,7 +23,11 @@ class KryoSerializer {
 
   // registering some basic types to try to serialize
   val toRegister = Seq(
-      Array(1.0), Array(1), (1, 1), Some(1), Array(new Object) /*, 1 :: Nil*/ )
+    Array(1.0),
+    Array(1),
+    (1, 1),
+    Some(1),
+    Array(new Object) /*, 1 :: Nil*/ )
   for (obj <- toRegister) kryo.register(obj.getClass)
 
   // kryo.addDefaultSerializer(mf.erasure, new TraversableSerializer(List.newBuilder[Any]))
@@ -45,7 +49,8 @@ class KryoSerializer {
   }
 
   class TraversableSerializer[T, C <: Traversable[T]](
-      builder: Builder[T, C], override val isImmutable: Boolean = true)
+      builder: Builder[T, C],
+      override val isImmutable: Boolean = true)
       extends KSerializer[C] {
 
     def write(kser: Kryo, out: Output, obj: C) {
@@ -77,9 +82,11 @@ class KryoSerializer {
     }
   }
   kryo.register(
-      List(1).getClass, new TraversableSerializer(List.newBuilder[Int]))
+    List(1).getClass,
+    new TraversableSerializer(List.newBuilder[Int]))
   kryo.register(
-      Vector(1).getClass, new TraversableSerializer(Vector.newBuilder[Int]))
+    Vector(1).getClass,
+    new TraversableSerializer(Vector.newBuilder[Int]))
 
   class SingletonSerializer[T](obj: T) extends KSerializer[T] {
     override def write(kryo: Kryo, output: Output, obj: T) {}

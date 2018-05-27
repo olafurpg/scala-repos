@@ -7,7 +7,11 @@ import com.intellij.openapi.util.TextRange
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiDocumentManager, PsiElement}
 import org.jetbrains.plugins.scala.extensions._
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScIfStmt, ScInfixExpr}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression,
+  ScIfStmt,
+  ScInfixExpr
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
 /**
@@ -24,7 +28,9 @@ class SplitIfIntention extends PsiElementBaseIntentionAction {
   override def getText: String = "Split into 2 'if's"
 
   def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+      project: Project,
+      editor: Editor,
+      element: PsiElement): Boolean = {
     val ifStmt: ScIfStmt =
       PsiTreeUtil.getParentOfType(element, classOf[ScIfStmt], false)
     if (ifStmt == null) return false
@@ -85,7 +91,8 @@ class SplitIfIntention extends PsiElementBaseIntentionAction {
 
     val newIfStmt: ScExpression =
       ScalaPsiElementFactory.createExpressionFromText(
-          expr.toString(), element.getManager)
+        expr.toString(),
+        element.getManager)
     val diff =
       newIfStmt
         .asInstanceOf[ScIfStmt]
@@ -93,7 +100,7 @@ class SplitIfIntention extends PsiElementBaseIntentionAction {
         .get
         .getTextRange
         .getStartOffset -
-      newIfStmt.asInstanceOf[ScIfStmt].getTextRange.getStartOffset
+        newIfStmt.asInstanceOf[ScIfStmt].getTextRange.getStartOffset
 
     inWriteAction {
       ifStmt.replaceExpression(newIfStmt, removeParenthesis = true)

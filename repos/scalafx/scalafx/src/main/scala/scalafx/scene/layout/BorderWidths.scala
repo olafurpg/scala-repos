@@ -79,23 +79,25 @@ class BorderWidths(override val delegate: jfxsl.BorderWidths)
   /**
     * Creates a new BorderWidths.
     */
-  def this(top: Double,
-           right: Double,
-           bottom: Double,
-           left: Double,
-           topAsPercentage: Boolean,
-           rightAsPercentage: Boolean,
-           bottomAsPercentage: Boolean,
-           leftAsPercentage: Boolean) =
+  def this(
+      top: Double,
+      right: Double,
+      bottom: Double,
+      left: Double,
+      topAsPercentage: Boolean,
+      rightAsPercentage: Boolean,
+      bottomAsPercentage: Boolean,
+      leftAsPercentage: Boolean) =
     this(
-        new jfxsl.BorderWidths(top,
-                               right,
-                               bottom,
-                               left,
-                               topAsPercentage,
-                               rightAsPercentage,
-                               bottomAsPercentage,
-                               leftAsPercentage))
+      new jfxsl.BorderWidths(
+        top,
+        right,
+        bottom,
+        left,
+        topAsPercentage,
+        rightAsPercentage,
+        bottomAsPercentage,
+        leftAsPercentage))
 
   /**
     * The non-negative value (with the exception of AUTO) indicating the border thickness on

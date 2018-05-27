@@ -21,7 +21,7 @@ class FlowCompileSpec extends AkkaSpec {
   import scala.concurrent.ExecutionContext.Implicits.global
   val intFut = Source.fromFuture(Future { 3 })
   implicit val materializer = ActorMaterializer(
-      ActorMaterializerSettings(system))
+    ActorMaterializerSettings(system))
 
   "Flow" should {
     "not run" in {

@@ -21,16 +21,18 @@ import scala.collection.mutable
 import collection.JavaConversions
 import java.nio.ByteBuffer
 
-class OffsetFetchRequest(groupId: String,
-                         requestInfo: java.util.List[TopicAndPartition],
-                         versionId: Short,
-                         correlationId: Int,
-                         clientId: String) {
+class OffsetFetchRequest(
+    groupId: String,
+    requestInfo: java.util.List[TopicAndPartition],
+    versionId: Short,
+    correlationId: Int,
+    clientId: String) {
 
-  def this(groupId: String,
-           requestInfo: java.util.List[TopicAndPartition],
-           correlationId: Int,
-           clientId: String) {
+  def this(
+      groupId: String,
+      requestInfo: java.util.List[TopicAndPartition],
+      correlationId: Int,
+      clientId: String) {
     // by default bind to version 0 so that it fetches from ZooKeeper
     this(groupId, requestInfo, 0, correlationId, clientId)
   }
@@ -41,11 +43,11 @@ class OffsetFetchRequest(groupId: String,
       requestInfo: mutable.Buffer[TopicAndPartition]
     }
     kafka.api.OffsetFetchRequest(
-        groupId = groupId,
-        requestInfo = scalaSeq,
-        versionId = versionId,
-        correlationId = correlationId,
-        clientId = clientId
+      groupId = groupId,
+      requestInfo = scalaSeq,
+      versionId = versionId,
+      correlationId = correlationId,
+      clientId = clientId
     )
   }
 

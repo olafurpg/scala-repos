@@ -29,7 +29,7 @@ object CommonHelperFunctions {
     * @tparam Q Input query class.
     * @tparam A Actual value class.
     */
-  def splitData[D : ClassTag, TD, EI, Q, A](
+  def splitData[D: ClassTag, TD, EI, Q, A](
       evalK: Int,
       dataset: RDD[D],
       evaluatorInfo: EI,
@@ -39,11 +39,12 @@ object CommonHelperFunctions {
 
     val indexedPoints = dataset.zipWithIndex
 
-    def selectPoint(foldIdx: Int,
-                    pt: D,
-                    idx: Long,
-                    k: Int,
-                    isTraining: Boolean): Option[D] = {
+    def selectPoint(
+        foldIdx: Int,
+        pt: D,
+        idx: Long,
+        k: Int,
+        isTraining: Boolean): Option[D] = {
       if ((idx % k == foldIdx) ^ isTraining) Some(pt)
       else None
     }
@@ -59,11 +60,11 @@ object CommonHelperFunctions {
       }
 
       (
-          trainingDataCreator(trainingPoints),
-          evaluatorInfo,
-          testingPoints.map { d =>
-            (queryCreator(d), actualCreator(d))
-          }
+        trainingDataCreator(trainingPoints),
+        evaluatorInfo,
+        testingPoints.map { d =>
+          (queryCreator(d), actualCreator(d))
+        }
       )
     }
   }

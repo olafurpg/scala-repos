@@ -12,8 +12,9 @@ object PngExport {
     val fen = (Forsyth >> game.toChess).split(' ').head
     val color = game.firstColor.letter.toString
     val lastMove = ~game.castleLastMoveTime.lastMoveString
-    val exec = Process(Seq("php", "board-creator.php", fen, color, lastMove),
-                       new File(execPath))
+    val exec = Process(
+      Seq("php", "board-creator.php", fen, color, lastMove),
+      new File(execPath))
     exec #> out ! logger
   }
 }

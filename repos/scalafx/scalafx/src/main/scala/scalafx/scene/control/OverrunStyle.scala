@@ -36,47 +36,48 @@ object OverrunStyle
 
   val CenterEllipsis = new OverrunStyle(jfxsc.OverrunStyle.CENTER_ELLIPSIS)
   @deprecated(
-      "Use CenterEllipsis; CENTER_ELLIPSIS will be removed in a future release",
-      "2.2.60")
+    "Use CenterEllipsis; CENTER_ELLIPSIS will be removed in a future release",
+    "2.2.60")
   val CENTER_ELLIPSIS = CenterEllipsis
   val CenterWordEllipsis = new OverrunStyle(
-      jfxsc.OverrunStyle.CENTER_WORD_ELLIPSIS)
+    jfxsc.OverrunStyle.CENTER_WORD_ELLIPSIS)
   @deprecated(
-      "Use CenterWordEllipsis; CENTER_WORD_ELLIPSIS will be removed in a future release",
-      "2.2.60")
+    "Use CenterWordEllipsis; CENTER_WORD_ELLIPSIS will be removed in a future release",
+    "2.2.60")
   val CENTER_WORD_ELLIPSIS = CenterWordEllipsis
   val Clip = new OverrunStyle(jfxsc.OverrunStyle.CLIP)
   @deprecated("Use Clip; CLIP will be removed in a future release", "2.2.60")
   val CLIP = Clip
   val Ellipsis = new OverrunStyle(jfxsc.OverrunStyle.ELLIPSIS)
   @deprecated(
-      "Use Ellipsis; ELLIPSIS will be removed in a future release", "2.2.60")
+    "Use Ellipsis; ELLIPSIS will be removed in a future release",
+    "2.2.60")
   val ELLIPSIS = Ellipsis
   val LeadingEllipsis = new OverrunStyle(jfxsc.OverrunStyle.LEADING_ELLIPSIS)
   @deprecated(
-      "Use LeadingEllipsis; LEADING_ELLIPSIS will be removed in a future release",
-      "2.2.60")
+    "Use LeadingEllipsis; LEADING_ELLIPSIS will be removed in a future release",
+    "2.2.60")
   val LEADING_ELLIPSIS = LeadingEllipsis
   val LeadingWordEllipsis = new OverrunStyle(
-      jfxsc.OverrunStyle.LEADING_WORD_ELLIPSIS)
+    jfxsc.OverrunStyle.LEADING_WORD_ELLIPSIS)
   @deprecated(
-      "Use LeadingWordEllipsis; LEADING_WORD_ELLIPSIS will be removed in a future release",
-      "2.2.60")
+    "Use LeadingWordEllipsis; LEADING_WORD_ELLIPSIS will be removed in a future release",
+    "2.2.60")
   val LEADING_WORD_ELLIPSIS = LeadingWordEllipsis
   val WordEllipsis = new OverrunStyle(jfxsc.OverrunStyle.WORD_ELLIPSIS)
   @deprecated(
-      "Use WordEllipsis; WORD_ELLIPSIS will be removed in a future release",
-      "2.2.60")
+    "Use WordEllipsis; WORD_ELLIPSIS will be removed in a future release",
+    "2.2.60")
   val WORD_ELLIPSIS = WordEllipsis
 
   protected override def unsortedValues: Array[OverrunStyle] = Array(
-      Clip,
-      Ellipsis,
-      WordEllipsis,
-      CenterEllipsis,
-      CenterWordEllipsis,
-      LeadingEllipsis,
-      LeadingWordEllipsis
+    Clip,
+    Ellipsis,
+    WordEllipsis,
+    CenterEllipsis,
+    CenterWordEllipsis,
+    LeadingEllipsis,
+    LeadingWordEllipsis
   )
 }
 

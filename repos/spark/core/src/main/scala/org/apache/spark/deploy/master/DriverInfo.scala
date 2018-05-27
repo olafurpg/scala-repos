@@ -22,10 +22,11 @@ import java.util.Date
 import org.apache.spark.deploy.DriverDescription
 import org.apache.spark.util.Utils
 
-private[deploy] class DriverInfo(val startTime: Long,
-                                 val id: String,
-                                 val desc: DriverDescription,
-                                 val submitDate: Date)
+private[deploy] class DriverInfo(
+    val startTime: Long,
+    val id: String,
+    val desc: DriverDescription,
+    val submitDate: Date)
     extends Serializable {
 
   @transient var state: DriverState.Value = DriverState.SUBMITTED

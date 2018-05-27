@@ -12,9 +12,10 @@ import lila.socket.actorApi.StartWatching
 
 private[site] final class SocketHandler(socket: ActorRef, hub: lila.hub.Env) {
 
-  def apply(uid: String,
-            userId: Option[String],
-            flag: Option[String]): Fu[JsSocketHandler] = {
+  def apply(
+      uid: String,
+      userId: Option[String],
+      flag: Option[String]): Fu[JsSocketHandler] = {
 
     Handler(hub, socket, uid, Join(uid, userId, flag), userId) {
       case Connected(enum, member) => (Handler.emptyController, enum, member)

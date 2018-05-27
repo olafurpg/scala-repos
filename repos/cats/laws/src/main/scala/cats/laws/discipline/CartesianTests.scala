@@ -10,17 +10,17 @@ import org.typelevel.discipline.Laws
 trait CartesianTests[F[_]] extends Laws {
   def laws: CartesianLaws[F]
 
-  def cartesian[A : Arbitrary, B : Arbitrary, C : Arbitrary](
+  def cartesian[A: Arbitrary, B: Arbitrary, C: Arbitrary](
       implicit iso: CartesianTests.Isomorphisms[F],
       ArbFA: Arbitrary[F[A]],
       ArbFB: Arbitrary[F[B]],
       ArbFC: Arbitrary[F[C]],
       EqFABC: Eq[F[(A, B, C)]]): RuleSet = {
     new DefaultRuleSet(
-        name = "cartesian",
-        parent = None,
-        "cartesian associativity" -> forAll((fa: F[A], fb: F[B], fc: F[C]) =>
-              iso.associativity(laws.cartesianAssociativity(fa, fb, fc)))
+      name = "cartesian",
+      parent = None,
+      "cartesian associativity" -> forAll((fa: F[A], fb: F[B], fc: F[C]) =>
+        iso.associativity(laws.cartesianAssociativity(fa, fb, fc)))
     )
   }
 }
@@ -32,8 +32,7 @@ object CartesianTests {
   trait Isomorphisms[F[_]] {
     def associativity[A, B, C](fs: (F[(A, (B, C))], F[((A, B), C)]))(
         implicit EqFABC: Eq[F[(A, B, C)]]): Prop
-    def leftIdentity[A](fs: (F[(Unit, A)], F[A]))(
-        implicit EqFA: Eq[F[A]]): Prop
+    def leftIdentity[A](fs: (F[(Unit, A)], F[A]))(implicit EqFA: Eq[F[A]]): Prop
     def rightIdentity[A](fs: (F[(A, Unit)], F[A]))(
         implicit EqFA: Eq[F[A]]): Prop
   }

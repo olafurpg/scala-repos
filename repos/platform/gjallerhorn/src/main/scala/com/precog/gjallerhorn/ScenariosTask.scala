@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -31,7 +31,8 @@ import specs2._
 import scalaz._
 
 class ScenariosTask(settings: Settings)
-    extends Task(settings: Settings) with Specification {
+    extends Task(settings: Settings)
+    with Specification {
   val dummyEvents = """
 { "data": "Hello world" }
 { "data": "Goodbye cruel world" }
@@ -41,12 +42,13 @@ class ScenariosTask(settings: Settings)
     "create account, ingest data, query" in {
       val account = createAccount
       val res = ingestString(account, dummyEvents, "application/json")(
-          _ / account.bareRootPath / "foo")
+        _ / account.bareRootPath / "foo")
 
       EventuallyResults.eventually(10, 1.second) {
         val res =
           (analytics / "fs" / account.bareRootPath) <<? List(
-              "apiKey" -> account.apiKey, "q" -> "count(//foo)")
+            "apiKey" -> account.apiKey,
+            "q" -> "count(//foo)")
         val str = Http(res OK as.String)()
         val json =
           JParser.parseFromString(Http(res OK as.String)()).valueOr(throw _)
@@ -60,9 +62,9 @@ class ScenariosTask(settings: Settings)
 
       val res =
         ingestString(account.apiKey, account, dummyEvents, "application/json")(
-            _ / account.bareRootPath / "foo") match {
+          _ / account.bareRootPath / "foo") match {
           case Left(thr) => Failure(thr)
-          case Right(s) => JParser.parseFromString(s)
+          case Right(s)  => JParser.parseFromString(s)
         }
 
       res must beLike {
@@ -75,10 +77,12 @@ class ScenariosTask(settings: Settings)
       val account2 = createAccount
 
       val res = ingestString(
-          account1.apiKey, account2, dummyEvents, "application/json")(
-          _ / account1.bareRootPath / "foo") match {
+        account1.apiKey,
+        account2,
+        dummyEvents,
+        "application/json")(_ / account1.bareRootPath / "foo") match {
         case Left(thr) => Failure(thr)
-        case Right(s) => JParser.parseFromString(s)
+        case Right(s)  => JParser.parseFromString(s)
       }
 
       res must beLike {
@@ -91,9 +95,9 @@ class ScenariosTask(settings: Settings)
 
       val res =
         ingestString(account.apiKey, account, dummyEvents, "application/json")(
-            _ / account.bareRootPath / "foo") match {
+          _ / account.bareRootPath / "foo") match {
           case Left(thr) => Failure(thr)
-          case Right(s) => JParser.parseFromString(s)
+          case Right(s)  => JParser.parseFromString(s)
         }
 
       EventuallyResults.eventually(10, 1.second) {
@@ -108,9 +112,9 @@ class ScenariosTask(settings: Settings)
 
       val res =
         ingestString(account.apiKey, account, dummyEvents, "application/json")(
-            _ / ("not-" + account.bareRootPath) / "foo") match {
+          _ / ("not-" + account.bareRootPath) / "foo") match {
           case Left(thr) => Failure(thr)
-          case Right(s) => JParser.parseFromString(s)
+          case Right(s)  => JParser.parseFromString(s)
         }
 
       res must beLike {
@@ -123,10 +127,12 @@ class ScenariosTask(settings: Settings)
       val account2 = createAccount
 
       val res = ingestString(
-          account1.apiKey, account2, dummyEvents, "application/json")(
-          _ / account1.bareRootPath / "foo") match {
+        account1.apiKey,
+        account2,
+        dummyEvents,
+        "application/json")(_ / account1.bareRootPath / "foo") match {
         case Left(thr) => Failure(thr)
-        case Right(s) => JParser.parseFromString(s)
+        case Right(s)  => JParser.parseFromString(s)
       }
 
       EventuallyResults.eventually(10, 1.second) {
@@ -141,10 +147,12 @@ class ScenariosTask(settings: Settings)
       val account2 = createAccount
 
       val res = ingestString(
-          account1.apiKey, account2, dummyEvents, "application/json")(
-          _ / account1.bareRootPath / "foo") match {
+        account1.apiKey,
+        account2,
+        dummyEvents,
+        "application/json")(_ / account1.bareRootPath / "foo") match {
         case Left(thr) => Failure(thr)
-        case Right(s) => JParser.parseFromString(s)
+        case Right(s)  => JParser.parseFromString(s)
       }
 
       EventuallyResults.eventually(10, 1.second) {
@@ -160,7 +168,7 @@ class ScenariosTask(settings: Settings)
 
       val req =
         (security / "").addQueryParameter("apiKey", account1.apiKey) <<
-        ("""{"grants":[{"permissions":[{"accessType":"write", "path":"%s", "ownerAccountIds":["%s"]}]}]}""" format
+          ("""{"grants":[{"permissions":[{"accessType":"write", "path":"%s", "ownerAccountIds":["%s"]}]}]}""" format
             (account1.rootPath + "/foo", account1.accountId))
 
       val result = Http(req OK as.String)
@@ -170,12 +178,12 @@ class ScenariosTask(settings: Settings)
       delegateAPIKey must_!= account1.apiKey
       delegateAPIKey must_!= account2.apiKey
 
-      val res = ingestString(
-          delegateAPIKey, account1, dummyEvents, "application/json")(
+      val res =
+        ingestString(delegateAPIKey, account1, dummyEvents, "application/json")(
           _ / account1.bareRootPath / "foo") match {
-        case Left(thr) => Failure(thr)
-        case Right(s) => JParser.parseFromString(s)
-      }
+          case Left(thr) => Failure(thr)
+          case Right(s)  => JParser.parseFromString(s)
+        }
 
       res must beLike {
         case Success(jobj) => ok

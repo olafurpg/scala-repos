@@ -146,7 +146,7 @@ object Path {
     }
 
     def unapplySeq(path: Path): Option[Seq[String]] = {
-      val Path(elems @ _ *) = path
+      val Path(elems @ _*) = path
 
       val n = elems.size
       val elemss = new Array[String](n)

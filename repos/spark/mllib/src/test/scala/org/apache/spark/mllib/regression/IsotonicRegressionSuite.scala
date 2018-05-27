@@ -25,7 +25,9 @@ import org.apache.spark.mllib.util.TestingUtils._
 import org.apache.spark.util.Utils
 
 class IsotonicRegressionSuite
-    extends SparkFunSuite with MLlibTestSparkContext with Matchers {
+    extends SparkFunSuite
+    with MLlibTestSparkContext
+    with Matchers {
 
   private def round(d: Double) = {
     math.round(d * 100).toDouble / 100
@@ -52,7 +54,8 @@ class IsotonicRegressionSuite
   }
 
   private def runIsotonicRegression(
-      labels: Seq[Double], isotonic: Boolean): IsotonicRegressionModel = {
+      labels: Seq[Double],
+      isotonic: Boolean): IsotonicRegressionModel = {
     runIsotonicRegression(labels, Array.fill(labels.size)(1d), isotonic)
   }
 
@@ -70,8 +73,9 @@ class IsotonicRegressionSuite
      */
     val model = runIsotonicRegression(Seq(1, 2, 3, 1, 6, 17, 16, 17, 18), true)
 
-    assert(Array.tabulate(9)(x => model.predict(x)) === Array(
-            1, 2, 2, 2, 6, 16.5, 16.5, 17, 18))
+    assert(
+      Array.tabulate(9)(x => model.predict(x)) === Array(1, 2, 2, 2, 6, 16.5,
+        16.5, 17, 18))
 
     assert(model.boundaries === Array(0, 1, 3, 4, 5, 6, 7, 8))
     assert(model.predictions === Array(1, 2, 2, 6, 16.5, 16.5, 17.0, 18.0))
@@ -179,7 +183,9 @@ class IsotonicRegressionSuite
 
   test("weighted isotonic regression with zero weights") {
     val model = runIsotonicRegression(
-        Seq[Double](1, 2, 3, 2, 1), Seq[Double](0, 0, 0, 1, 0), true)
+      Seq[Double](1, 2, 3, 2, 1),
+      Seq[Double](0, 0, 0, 1, 0),
+      true)
 
     assert(model.boundaries === Array(0.0, 1.0, 4.0))
     assert(model.predictions === Array(1, 2, 2))
@@ -199,13 +205,15 @@ class IsotonicRegressionSuite
 
   test("isotonic regression prediction with duplicate features") {
     val trainRDD = sc
-      .parallelize(Seq[(Double, Double, Double)]((2, 1, 1),
-                                                 (1, 1, 1),
-                                                 (4, 2, 1),
-                                                 (2, 2, 1),
-                                                 (6, 3, 1),
-                                                 (5, 3, 1)),
-                   2)
+      .parallelize(
+        Seq[(Double, Double, Double)](
+          (2, 1, 1),
+          (1, 1, 1),
+          (4, 2, 1),
+          (2, 2, 1),
+          (6, 3, 1),
+          (5, 3, 1)),
+        2)
       .cache()
     val model = new IsotonicRegression().run(trainRDD)
 
@@ -217,13 +225,15 @@ class IsotonicRegressionSuite
 
   test("antitonic regression prediction with duplicate features") {
     val trainRDD = sc
-      .parallelize(Seq[(Double, Double, Double)]((5, 1, 1),
-                                                 (6, 1, 1),
-                                                 (2, 2, 1),
-                                                 (4, 2, 1),
-                                                 (1, 3, 1),
-                                                 (2, 3, 1)),
-                   2)
+      .parallelize(
+        Seq[(Double, Double, Double)](
+          (5, 1, 1),
+          (6, 1, 1),
+          (2, 2, 1),
+          (4, 2, 1),
+          (1, 3, 1),
+          (2, 3, 1)),
+        2)
       .cache()
     val model = new IsotonicRegression().setIsotonic(false).run(trainRDD)
 
@@ -257,7 +267,9 @@ class IsotonicRegressionSuite
 
   test("model construction") {
     val model = new IsotonicRegressionModel(
-        Array(0.0, 1.0), Array(1.0, 2.0), isotonic = true)
+      Array(0.0, 1.0),
+      Array(1.0, 2.0),
+      isotonic = true)
     assert(model.predict(-0.5) === 1.0)
     assert(model.predict(0.0) === 1.0)
     assert(model.predict(0.5) ~== 1.5 absTol 1e-14)
@@ -272,19 +284,25 @@ class IsotonicRegressionSuite
     intercept[IllegalArgumentException] {
       // unordered boundaries
       new IsotonicRegressionModel(
-          Array(1.0, 0.0), Array(1.0, 2.0), isotonic = true)
+        Array(1.0, 0.0),
+        Array(1.0, 2.0),
+        isotonic = true)
     }
 
     intercept[IllegalArgumentException] {
       // unordered predictions (isotonic)
       new IsotonicRegressionModel(
-          Array(0.0, 1.0), Array(2.0, 1.0), isotonic = true)
+        Array(0.0, 1.0),
+        Array(2.0, 1.0),
+        isotonic = true)
     }
 
     intercept[IllegalArgumentException] {
       // unordered predictions (antitonic)
       new IsotonicRegressionModel(
-          Array(0.0, 1.0), Array(1.0, 2.0), isotonic = false)
+        Array(0.0, 1.0),
+        Array(1.0, 2.0),
+        isotonic = false)
     }
   }
 }

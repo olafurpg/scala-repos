@@ -47,28 +47,32 @@ object Templates {
   }
 
   private def checkForFunc(
-      whole: List[String], what: LiftRules.ViewDispatchPF): Box[NodeSeq] =
+      whole: List[String],
+      what: LiftRules.ViewDispatchPF): Box[NodeSeq] =
     if (what.isDefinedAt(whole))
       what(whole) match {
         case Left(func) => func()
-        case _ => Empty
+        case _          => Empty
       } else Empty
 
-  private def findInViews(whole: List[String],
-                          part: List[String],
-                          last: String,
-                          what: List[LiftRules.ViewDispatchPF]): Box[NodeSeq] =
+  private def findInViews(
+      whole: List[String],
+      part: List[String],
+      last: String,
+      what: List[LiftRules.ViewDispatchPF]): Box[NodeSeq] =
     what match {
       case Nil => Empty
       case x :: xs =>
         (checkForLiftView(part, last, x) or checkForFunc(whole, x)) match {
           case Full(ret) => Full(ret)
-          case _ => findInViews(whole, part, last, xs)
+          case _         => findInViews(whole, part, last, xs)
         }
     }
 
   private[http] def findTopLevelTemplate(
-      places: List[String], locale: Locale, needAutoSurround: Boolean) = {
+      places: List[String],
+      locale: Locale,
+      needAutoSurround: Boolean) = {
     findRawTemplate0(places, locale, needAutoSurround).map(checkForContentId)
   }
 
@@ -111,15 +115,20 @@ object Templates {
     }
 
     in.flatMap {
-      case e: Elem if e.label == "html" => df(e.attributes)
-      case _ => None
-    }.flatMap { md =>
-      Helpers.findId(in, md.value.text)
-    }.headOption orElse in.flatMap {
-      case e: Elem if e.label == "html" =>
-        e.child.flatMap {
-          case e: Elem if e.label == "body" => {
-              e.attribute("data-lift-content-id").headOption.map(_.text) orElse e
+        case e: Elem if e.label == "html" => df(e.attributes)
+        case _                            => None
+      }
+      .flatMap { md =>
+        Helpers.findId(in, md.value.text)
+      }
+      .headOption orElse in
+      .flatMap {
+        case e: Elem if e.label == "html" =>
+          e.child.flatMap {
+            case e: Elem if e.label == "body" => {
+              e.attribute("data-lift-content-id")
+                .headOption
+                .map(_.text) orElse e
                 .attribute("class")
                 .flatMap { ns =>
                   {
@@ -133,12 +142,14 @@ object Templates {
                 }
             }
 
-          case _ => None
-        }
-      case _ => None
-    }.flatMap { id =>
-      Helpers.findId(in, id)
-    }.headOption getOrElse in
+            case _ => None
+          }
+        case _ => None
+      }
+      .flatMap { id =>
+        Helpers.findId(in, id)
+      }
+      .headOption getOrElse in
   }
 
   /**
@@ -153,9 +164,10 @@ object Templates {
     findRawTemplate0(places, locale, false)
   }
 
-  private def findRawTemplate0(places: List[String],
-                               locale: Locale,
-                               needAutoSurround: Boolean): Box[NodeSeq] = {
+  private def findRawTemplate0(
+      places: List[String],
+      locale: Locale,
+      needAutoSurround: Boolean): Box[NodeSeq] = {
     /*
      From a Scala coding standpoint, this method is ugly.  It's also a performance
      hotspot that needed some tuning.  I've made the code very imperative and
@@ -207,13 +219,13 @@ object Templates {
                 val xmlb = try {
                   LiftRules.doWithResource(name)(parser.parse) match {
                     case Full(seq) => seq
-                    case _ => Empty
+                    case _         => Empty
                   }
                 } catch {
                   case e: ValidationException
                       if Props.devMode | Props.testMode =>
                     return Helpers.errorDiv(
-                        <div>Error locating template: <b>{name}</b><br/>
+                      <div>Error locating template: <b>{name}</b><br/>
                       Message: <b>{e.getMessage}</b><br/>
                       {
                       <pre>{e.toString}{e.getStackTrace.map(_.toString).mkString("\n")}</pre>
@@ -234,7 +246,7 @@ object Templates {
                   val msg = xmlb.asInstanceOf[Failure].msg
                   val e = xmlb.asInstanceOf[Failure].exception
                   return Helpers.errorDiv(
-                      <div>Error locating template: <b>{name}</b><br/>Message: <b>{msg}</b><br/>{
+                    <div>Error locating template: <b>{name}</b><br/>Message: <b>{msg}</b><br/>{
                   {
                     e match {
                       case Full(e) =>
@@ -257,37 +269,38 @@ object Templates {
   private def lookForClasses(places: List[String]): Box[NodeSeq] = {
     val (controller, action) = places match {
       case ctl :: act :: _ => (ctl, act)
-      case ctl :: _ => (ctl, "index")
-      case Nil => ("default_template", "index")
+      case ctl :: _        => (ctl, "index")
+      case Nil             => ("default_template", "index")
     }
     val trans = List[String => String](n => n, n => camelify(n))
-    val toTry = trans.flatMap(f =>
-          (LiftRules.buildPackage("view") ::: ("lift.app.view" :: Nil))
-            .map(_ + "." + f(controller)))
+    val toTry = trans.flatMap(
+      f =>
+        (LiftRules.buildPackage("view") ::: ("lift.app.view" :: Nil))
+          .map(_ + "." + f(controller)))
 
     first(toTry) { clsName =>
       try {
         tryo(List(classOf[ClassNotFoundException]), Empty)(
-            Class.forName(clsName).asInstanceOf[Class[AnyRef]]).flatMap { c =>
+          Class.forName(clsName).asInstanceOf[Class[AnyRef]]).flatMap { c =>
           (c.newInstance match {
             case inst: InsecureLiftView => c.getMethod(action).invoke(inst)
             case inst: LiftView if inst.dispatch.isDefinedAt(action) =>
               inst.dispatch(action)()
             case _ => Empty
           }) match {
-            case null | Empty | None => Empty
-            case n: Group => Full(n)
-            case n: Elem => Full(n)
-            case s: NodeSeq => Full(s)
-            case Some(n: Group) => Full(n)
-            case Some(n: Elem) => Full(n)
-            case Some(n: NodeSeq) => Full(n)
+            case null | Empty | None  => Empty
+            case n: Group             => Full(n)
+            case n: Elem              => Full(n)
+            case s: NodeSeq           => Full(s)
+            case Some(n: Group)       => Full(n)
+            case Some(n: Elem)        => Full(n)
+            case Some(n: NodeSeq)     => Full(n)
             case Some(SafeNodeSeq(n)) => Full(n)
-            case Full(n: Group) => Full(n)
-            case Full(n: Elem) => Full(n)
-            case Full(n: NodeSeq) => Full(n)
+            case Full(n: Group)       => Full(n)
+            case Full(n: Elem)        => Full(n)
+            case Full(n: NodeSeq)     => Full(n)
             case Full(SafeNodeSeq(n)) => Full(n)
-            case _ => Empty
+            case _                    => Empty
           }
         }
       } catch {
@@ -318,21 +331,26 @@ abstract class SnippetFailureException(msg: String)
   def snippetFailure: LiftRules.SnippetFailures.Value
 
   def buildStackTrace: NodeSeq =
-    getStackTrace.toList.dropWhile { e =>
-      {
-        val cn = e.getClassName
-        cn.startsWith("net.liftweb.http") ||
-        cn.startsWith("net.liftweb.common") ||
-        cn.startsWith("net.liftweb.util")
+    getStackTrace.toList
+      .dropWhile { e =>
+        {
+          val cn = e.getClassName
+          cn.startsWith("net.liftweb.http") ||
+          cn.startsWith("net.liftweb.common") ||
+          cn.startsWith("net.liftweb.util")
+        }
       }
-    }.filter { e =>
-      {
-        val cn = e.getClassName
-        !cn.startsWith("java.lang") && !cn.startsWith("sun.")
+      .filter { e =>
+        {
+          val cn = e.getClassName
+          !cn.startsWith("java.lang") && !cn.startsWith("sun.")
+        }
       }
-    }.take(10).toList.map { e =>
-      <code><span><br/>{e.toString}</span></code>
-    }
+      .take(10)
+      .toList
+      .map { e =>
+        <code><span><br/>{e.toString}</span></code>
+      }
 }
 
 class StateInStatelessException(msg: String)

@@ -16,7 +16,7 @@ import akka.event.DefaultLoggingFilter
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class ConfigSpec
     extends AkkaSpec(
-        ConfigFactory.defaultReference(ActorSystem.findClassLoader())) {
+      ConfigFactory.defaultReference(ActorSystem.findClassLoader())) {
 
   "The default configuration file (i.e. reference.conf)" must {
     "contain all configuration properties for akka-actor that are used in code with their correct defaults" in {
@@ -39,9 +39,9 @@ class ConfigSpec
 
         getInt("akka.scheduler.ticks-per-wheel") should ===(512)
         getDuration("akka.scheduler.tick-duration", TimeUnit.MILLISECONDS) should ===(
-            10)
+          10)
         getString("akka.scheduler.implementation") should ===(
-            "akka.actor.LightArrayRevolverScheduler")
+          "akka.actor.LightArrayRevolverScheduler")
 
         getBoolean("akka.daemonic") should ===(false)
         settings.Daemonicity should ===(false)
@@ -50,24 +50,24 @@ class ConfigSpec
         settings.JvmExitOnFatalError should ===(true)
 
         getInt("akka.actor.deployment.default.virtual-nodes-factor") should ===(
-            10)
+          10)
         settings.DefaultVirtualNodesFactor should ===(10)
 
         getDuration("akka.actor.unstarted-push-timeout", TimeUnit.MILLISECONDS) should ===(
-            10.seconds.toMillis)
+          10.seconds.toMillis)
         settings.UnstartedPushTimeout.duration should ===(10.seconds)
 
         settings.Loggers.size should ===(1)
         settings.Loggers.head should ===(classOf[DefaultLogger].getName)
         getStringList("akka.loggers").get(0) should ===(
-            classOf[DefaultLogger].getName)
+          classOf[DefaultLogger].getName)
 
         getDuration("akka.logger-startup-timeout", TimeUnit.MILLISECONDS) should ===(
-            5.seconds.toMillis)
+          5.seconds.toMillis)
         settings.LoggerStartTimeout.duration should ===(5.seconds)
 
         getString("akka.logging-filter") should ===(
-            classOf[DefaultLoggingFilter].getName)
+          classOf[DefaultLoggingFilter].getName)
 
         getInt("akka.log-dead-letters") should ===(10)
         settings.LogDeadLetters should ===(10)
@@ -85,10 +85,10 @@ class ConfigSpec
           c.getString("type") should ===("Dispatcher")
           c.getString("executor") should ===("default-executor")
           c.getDuration("shutdown-timeout", TimeUnit.MILLISECONDS) should ===(
-              1 * 1000)
+            1 * 1000)
           c.getInt("throughput") should ===(5)
           c.getDuration("throughput-deadline-time", TimeUnit.MILLISECONDS) should ===(
-              0)
+            0)
           c.getBoolean("attempt-teamwork") should ===(true)
         }
 
@@ -114,7 +114,7 @@ class ConfigSpec
           val pool = c.getConfig("thread-pool-executor")
           import pool._
           getDuration("keep-alive-time", TimeUnit.MILLISECONDS) should ===(
-              60 * 1000)
+            60 * 1000)
           getDouble("core-pool-size-factor") should ===(3.0)
           getDouble("max-pool-size-factor") should ===(3.0)
           getInt("task-queue-size") should ===(-1)
@@ -158,9 +158,9 @@ class ConfigSpec
         {
           c.getInt("mailbox-capacity") should ===(1000)
           c.getDuration("mailbox-push-timeout-time", TimeUnit.MILLISECONDS) should ===(
-              10 * 1000)
+            10 * 1000)
           c.getString("mailbox-type") should ===(
-              "akka.dispatch.UnboundedMailbox")
+            "akka.dispatch.UnboundedMailbox")
         }
       }
     }

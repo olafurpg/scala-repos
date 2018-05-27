@@ -30,7 +30,8 @@ object FileCharset {
     } catch {
       case t: Throwable =>
         logger.warn(
-            "Failed to detect charset for file: " + file.getPath + ".", t)
+          "Failed to detect charset for file: " + file.getPath + ".",
+          t)
         Codec.defaultCharsetCodec.charSet
     } finally {
       detector.reset()
@@ -38,7 +39,8 @@ object FileCharset {
   }
 
   private[this] def getCharset(
-      detector: UniversalDetector, default: Codec): Charset = {
+      detector: UniversalDetector,
+      default: Codec): Charset = {
     val cs = detector.getDetectedCharset
     if (cs == null || cs.trim().isEmpty) {
       default.charSet

@@ -38,13 +38,14 @@ trait ClassfileIndexer {
     DescriptorParser.parse(desc) match {
       case Descriptor(params, ret) =>
         (ret :: params).map {
-          case c: ClassName => c
+          case c: ClassName       => c
           case a: ArrayDescriptor => a.reifier
         }
     }
 
   private class AsmCallback
-      extends ClassVisitor(ASM5) with ReferenceInClassHunter {
+      extends ClassVisitor(ASM5)
+      with ReferenceInClassHunter {
     // updated every time we get more info
     var clazz: RawClassfile = _
 
@@ -58,15 +59,15 @@ trait ClassfileIndexer {
     ): Unit = {
 
       clazz = RawClassfile(
-          ClassName.fromInternal(name),
-          Option(signature),
-          Option(superName).map(ClassName.fromInternal),
-          interfaces.toList.map(ClassName.fromInternal),
-          Access(access),
-          (ACC_DEPRECATED & access) > 0,
-          Queue.empty,
-          Queue.empty,
-          RawSource(None, None)
+        ClassName.fromInternal(name),
+        Option(signature),
+        Option(superName).map(ClassName.fromInternal),
+        interfaces.toList.map(ClassName.fromInternal),
+        Access(access),
+        (ACC_DEPRECATED & access) > 0,
+        Queue.empty,
+        Queue.empty,
+        RawSource(None, None)
       )
     }
 
@@ -74,26 +75,28 @@ trait ClassfileIndexer {
       clazz = clazz.copy(source = RawSource(Option(filename), None))
     }
 
-    override def visitField(access: Int,
-                            name: String,
-                            desc: String,
-                            signature: String,
-                            value: AnyRef): FieldVisitor = {
+    override def visitField(
+        access: Int,
+        name: String,
+        desc: String,
+        signature: String,
+        value: AnyRef): FieldVisitor = {
       val field = RawField(
-          MemberName(clazz.name, name),
-          ClassName.fromDescriptor(desc),
-          Option(signature),
-          Access(access)
+        MemberName(clazz.name, name),
+        ClassName.fromDescriptor(desc),
+        Option(signature),
+        Access(access)
       )
       clazz = clazz.copy(fields = clazz.fields :+ field)
       super.visitField(access, name, desc, signature, value)
     }
 
-    override def visitMethod(access: Int,
-                             region: String,
-                             desc: String,
-                             signature: String,
-                             exceptions: Array[String]): MethodVisitor = {
+    override def visitMethod(
+        access: Int,
+        region: String,
+        desc: String,
+        signature: String,
+        exceptions: Array[String]): MethodVisitor = {
       super.visitMethod(access, region, desc, signature, exceptions)
       new MethodVisitor(ASM5) with ReferenceInMethodHunter {
         var firstLine: Option[Int] = None
@@ -108,20 +111,21 @@ trait ClassfileIndexer {
           region match {
             case "<init>" | "<clinit>" =>
               (clazz.source.line, firstLine) match {
-                case (_, None) =>
+                case (_, None)                                            =>
                 case (Some(existing), Some(latest)) if existing <= latest =>
                 case _ =>
-                  clazz = clazz.copy(
-                      source = clazz.source.copy(line = firstLine))
+                  clazz =
+                    clazz.copy(source = clazz.source.copy(line = firstLine))
               }
 
             case name =>
               val descriptor = DescriptorParser.parse(desc)
-              val method = RawMethod(MemberName(clazz.name, name),
-                                     Access(access),
-                                     descriptor,
-                                     Option(signature),
-                                     firstLine)
+              val method = RawMethod(
+                MemberName(clazz.name, name),
+                Access(access),
+                descriptor,
+                Option(signature),
+                firstLine)
               clazz = clazz.copy(methods = clazz.methods :+ method)
           }
         }
@@ -155,34 +159,39 @@ trait ClassfileIndexer {
       ) = handleAnn(desc)
     }
 
-    override def visitField(access: Int,
-                            name: String,
-                            desc: String,
-                            signature: String,
-                            value: AnyRef): FieldVisitor = {
+    override def visitField(
+        access: Int,
+        name: String,
+        desc: String,
+        signature: String,
+        value: AnyRef): FieldVisitor = {
       addRef(ClassName.fromDescriptor(desc))
       fieldVisitor
     }
 
-    override def visitMethod(access: Int,
-                             region: String,
-                             desc: String,
-                             signature: String,
-                             exceptions: Array[String]): MethodVisitor = {
+    override def visitMethod(
+        access: Int,
+        region: String,
+        desc: String,
+        signature: String,
+        exceptions: Array[String]): MethodVisitor = {
       addRefs(classesInDescriptor(desc))
       if (exceptions != null) addRefs(exceptions.map(ClassName.fromInternal))
       null
     }
 
-    override def visitInnerClass(name: String,
-                                 outerName: String,
-                                 innerName: String,
-                                 access: Int): Unit = {
+    override def visitInnerClass(
+        name: String,
+        outerName: String,
+        innerName: String,
+        access: Int): Unit = {
       addRef(ClassName.fromInternal(name))
     }
 
     override def visitOuterClass(
-        owner: String, name: String, desc: String): Unit = {
+        owner: String,
+        name: String,
+        desc: String): Unit = {
       addRef(ClassName.fromInternal(owner))
     }
 
@@ -217,7 +226,7 @@ trait ClassfileIndexer {
     private def memberOrInit(owner: String, name: String): FullyQualifiedName =
       name match {
         case "<init>" | "<clinit>" => ClassName.fromInternal(owner)
-        case member => MemberName(ClassName.fromInternal(owner), member)
+        case member                => MemberName(ClassName.fromInternal(owner), member)
       }
 
     override def visitLocalVariable(
@@ -261,7 +270,10 @@ trait ClassfileIndexer {
     }
 
     override def visitInvokeDynamicInsn(
-        name: String, desc: String, bsm: Handle, bsmArgs: AnyRef*): Unit = {
+        name: String,
+        desc: String,
+        bsm: Handle,
+        bsmArgs: AnyRef*): Unit = {
       internalRefs :+= memberOrInit(bsm.getOwner, bsm.getName)
       internalRefs = internalRefs.enqueue(classesInDescriptor(bsm.getDesc))
     }

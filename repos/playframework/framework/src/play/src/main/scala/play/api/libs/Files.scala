@@ -4,7 +4,13 @@
 package play.api.libs
 
 import java.io._
-import java.nio.file.{FileAlreadyExistsException, StandardCopyOption, SimpleFileVisitor, Path, FileVisitResult}
+import java.nio.file.{
+  FileAlreadyExistsException,
+  StandardCopyOption,
+  SimpleFileVisitor,
+  Path,
+  FileVisitResult
+}
 import java.nio.file.attribute.BasicFileAttributes
 
 import javax.inject.{Inject, Singleton}
@@ -44,16 +50,19 @@ object Files {
       */
     applicationLifecycle.addStopHook { () =>
       Future.successful(
-          JFiles.walkFileTree(playTempFolder, new SimpleFileVisitor[Path] {
-        override def visitFile(file: Path, attrs: BasicFileAttributes) = {
-          JFiles.deleteIfExists(file)
-          FileVisitResult.CONTINUE
-        }
-        override def postVisitDirectory(dir: Path, exc: IOException) = {
-          JFiles.deleteIfExists(dir)
-          FileVisitResult.CONTINUE
-        }
-      }))
+        JFiles.walkFileTree(
+          playTempFolder,
+          new SimpleFileVisitor[Path] {
+            override def visitFile(file: Path, attrs: BasicFileAttributes) = {
+              JFiles.deleteIfExists(file)
+              FileVisitResult.CONTINUE
+            }
+            override def postVisitDirectory(dir: Path, exc: IOException) = {
+              JFiles.deleteIfExists(dir)
+              FileVisitResult.CONTINUE
+            }
+          }
+        ))
     }
 
     def create(prefix: String, suffix: String): File = {
@@ -92,7 +101,9 @@ object Files {
       try {
         if (replace)
           JFiles.move(
-              file.toPath, to.toPath, StandardCopyOption.REPLACE_EXISTING)
+            file.toPath,
+            to.toPath,
+            StandardCopyOption.REPLACE_EXISTING)
         else JFiles.move(file.toPath, to.toPath)
       } catch {
         case ex: FileAlreadyExistsException => to
@@ -125,8 +136,8 @@ object Files {
       * is currently running.
       */
     private def currentCreator: TemporaryFileCreator =
-      Play.privateMaybeApplication.fold[TemporaryFileCreator](
-          SingletonTemporaryFileCreator)(creatorCache)
+      Play.privateMaybeApplication
+        .fold[TemporaryFileCreator](SingletonTemporaryFileCreator)(creatorCache)
 
     /**
       * Create a new temporary file.

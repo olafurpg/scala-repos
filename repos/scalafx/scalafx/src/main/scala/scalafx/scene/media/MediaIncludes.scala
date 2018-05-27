@@ -81,8 +81,7 @@ trait MediaIncludes {
     * @param ae $JFX $AUEQ
     * @return $SFX $AUEQ
     */
-  implicit def jfxAudioEqualizer2sfx(
-      ae: jfxsm.AudioEqualizer): AudioEqualizer =
+  implicit def jfxAudioEqualizer2sfx(ae: jfxsm.AudioEqualizer): AudioEqualizer =
     if (ae != null) new AudioEqualizer(ae) else null
 
   /**
@@ -128,8 +127,7 @@ trait MediaIncludes {
     * @param me $JFX $MDEX
     * @return $SFX $MDEX
     */
-  implicit def jfxMediaException2sfx(
-      me: jfxsm.MediaException): MediaException =
+  implicit def jfxMediaException2sfx(me: jfxsm.MediaException): MediaException =
     if (me != null) new MediaException(me) else null
 
   /**

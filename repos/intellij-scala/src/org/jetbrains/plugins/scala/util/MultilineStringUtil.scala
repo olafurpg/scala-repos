@@ -11,7 +11,11 @@ import com.intellij.psi.{PsiDocumentManager, PsiElement}
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.formatting.settings.ScalaCodeStyleSettings
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScInterpolatedStringLiteral, ScLiteral, ScReferenceElement}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScInterpolatedStringLiteral,
+  ScLiteral,
+  ScReferenceElement
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
 import org.jetbrains.plugins.scala.lang.psi.types.StdType
@@ -43,14 +47,15 @@ object MultilineStringUtil {
           ScalaTokenTypes.tINTERPOLATED_STRING_ESCAPE =>
         element.getParent match {
           case lit: ScLiteral if lit.isMultiLineString => true
-          case _ => false
+          case _                                       => false
         }
       case _ => false
     }
   }
 
   def needAddMethodCallToMLString(
-      stringElement: PsiElement, methodName: String): Boolean = {
+      stringElement: PsiElement,
+      methodName: String): Boolean = {
     var parent = stringElement.getParent
 
     do {
@@ -67,7 +72,7 @@ object MultilineStringUtil {
                 case _ => false
               }) return false
         case _: ScParenthesisedExpr =>
-        case _ => return true
+        case _                      => return true
       }
 
       parent = parent.getParent
@@ -95,8 +100,9 @@ object MultilineStringUtil {
           ref.resolve() match {
             case funDef: ScFunction =>
               val tpe = funDef.returnType
-              tpe.exists(scType =>
-                    scType.canonicalText.endsWith("java.lang.String") ||
+              tpe.exists(
+                scType =>
+                  scType.canonicalText.endsWith("java.lang.String") ||
                     scType.canonicalText.endsWith("scala.Predef.String"))
             case _ => true
           }
@@ -106,11 +112,14 @@ object MultilineStringUtil {
   }
 
   def insertStripMargin(
-      document: Document, literal: ScLiteral, marginChar: Char) {
+      document: Document,
+      literal: ScLiteral,
+      marginChar: Char) {
     if (needAddStripMargin(literal, "" + marginChar)) {
-      document.insertString(literal.getTextRange.getEndOffset,
-                            if (marginChar == '|') ".stripMargin"
-                            else ".stripMargin(\'" + marginChar + "\')")
+      document.insertString(
+        literal.getTextRange.getEndOffset,
+        if (marginChar == '|') ".stripMargin"
+        else ".stripMargin(\'" + marginChar + "\')")
     }
   }
 
@@ -126,7 +135,7 @@ object MultilineStringUtil {
 
     calls.apply(0).headOption match {
       case Some(ScLiteral(c: Character)) => c
-      case _ => defaultMargin
+      case _                             => defaultMargin
     }
   }
 
@@ -159,7 +168,7 @@ object MultilineStringUtil {
             calls += Array[ScExpression]()
           }
         case _: ScParenthesisedExpr =>
-        case _ => return callsArray
+        case _                      => return callsArray
       }
 
       prevParent = parent
@@ -170,14 +179,17 @@ object MultilineStringUtil {
   }
 
   def findParentMLString(element: PsiElement): Option[ScLiteral] = {
-    (Iterator(element) ++ element.parentsInFile).collect {
-      case lit: ScLiteral if lit.isMultiLineString => lit
-    }.toStream.headOption
+    (Iterator(element) ++ element.parentsInFile)
+      .collect {
+        case lit: ScLiteral if lit.isMultiLineString => lit
+      }
+      .toStream
+      .headOption
   }
 
   def isMLString(element: PsiElement): Boolean = element match {
     case lit: ScLiteral if lit.isMultiLineString => true
-    case _ => false
+    case _                                       => false
   }
 
   def interpolatorPrefixLength(literal: ScLiteral) =
@@ -189,8 +201,9 @@ object MultilineStringUtil {
     case _ => ""
   }
 
-  def containsArgs(currentArgs: Array[Array[ScExpression]],
-                   argsToFind: String*): Boolean = {
+  def containsArgs(
+      currentArgs: Array[Array[ScExpression]],
+      argsToFind: String*): Boolean = {
     val myArgs = argsToFind.sorted
 
     for (arg <- currentArgs) {
@@ -211,8 +224,8 @@ object MultilineStringUtil {
     def insertIndent(lineNumber: Int, indent: Int, marginChar: Option[Char]) {
       val lineStart = document.getLineStartOffset(lineNumber)
       document.insertString(
-          lineStart,
-          settings.getSmartSpaces(indent) + marginChar.getOrElse(""))
+        lineStart,
+        settings.getSmartSpaces(indent) + marginChar.getOrElse(""))
     }
 
     PsiDocumentManager
@@ -222,14 +235,16 @@ object MultilineStringUtil {
     element match {
       case literal: ScLiteral if literal.isMultiLineString =>
         val firstMLQuote = interpolatorPrefix(literal) + multilineQuotes
-        val literalOffsets = Seq(literal.getTextRange.getStartOffset,
-                                 literal.getTextRange.getEndOffset)
+        val literalOffsets = Seq(
+          literal.getTextRange.getStartOffset,
+          literal.getTextRange.getEndOffset)
         val Seq(startLineNumber, endLineNumber) =
           literalOffsets.map(document.getLineNumber)
         val literalStart = literalOffsets(0)
         val (startLineOffset, startLineEndOffset) =
-          (document.getLineStartOffset(startLineNumber),
-           document.getLineEndOffset(startLineNumber))
+          (
+            document.getLineStartOffset(startLineNumber),
+            document.getLineEndOffset(startLineNumber))
 
         val startsOnNewLine = document.getText
           .substring(startLineOffset, startLineEndOffset)
@@ -244,20 +259,20 @@ object MultilineStringUtil {
           if (multipleLines) insertStripMargin(document, literal, marginChar)
           if (!needNewLineBefore) {
             val quotesIndent = settings.getSmartLength(
-                document.getText.substring(startLineOffset, literalStart))
+              document.getText.substring(startLineOffset, literalStart))
             val marginIndent =
               quotesIndent + interpolatorPrefixLength(literal) +
-              settings.marginIndent
+                settings.marginIndent
             for (lineNumber <- startLineNumber + 1 to endLineNumber) {
               insertIndent(lineNumber, marginIndent, Some(marginChar))
             }
           } else {
             val oldIndent = settings.prefixLength(
-                document.getText.substring(startLineOffset, literalStart))
+              document.getText.substring(startLineOffset, literalStart))
             val quotesIndent = oldIndent + settings.regularIndent
             val marginIndent =
               quotesIndent + interpolatorPrefixLength(literal) +
-              settings.marginIndent
+                settings.marginIndent
             for (lineNumber <- startLineNumber + 1 to endLineNumber) {
               insertIndent(lineNumber, marginIndent, Some(marginChar))
             }
@@ -267,7 +282,7 @@ object MultilineStringUtil {
         }
       case something =>
         throw new IllegalStateException(
-            s"Need multiline string literal, but get: ${something.getText}")
+          s"Need multiline string literal, but get: ${something.getText}")
     }
   }
 }
@@ -299,7 +314,8 @@ class MultilineStringSettings(project: Project) {
   def getSmartSpaces(count: Int) =
     if (useTabs) {
       StringUtil.repeat("\t", count / tabSize) + StringUtil.repeat(
-          " ", count % tabSize)
+        " ",
+        count % tabSize)
     } else {
       StringUtil.repeat(" ", count)
     }

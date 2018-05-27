@@ -9,10 +9,16 @@ import com.intellij.psi.{PsiElementVisitor, PsiField, ResolveState}
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScClassParameter
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScVariable}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction,
+  ScVariable
+}
 import org.jetbrains.plugins.scala.lang.psi.types.Compatibility.Expression
 import org.jetbrains.plugins.scala.lang.psi.types.Unit
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypingContext
+}
 import org.jetbrains.plugins.scala.lang.resolve.processor.MethodResolveProcessor
 import org.jetbrains.plugins.scala.lang.resolve.{ScalaResolveResult, StdKinds}
 import org.jetbrains.plugins.scala.macroAnnotations.{Cached, ModCount}
@@ -21,7 +27,8 @@ import org.jetbrains.plugins.scala.macroAnnotations.{Cached, ModCount}
   * @author Alexander Podkhalyuzin
   */
 class ScAssignStmtImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScAssignStmt {
+    extends ScalaPsiElementImpl(node)
+    with ScAssignStmt {
   override def toString: String = "AssignStatement"
 
   protected override def innerType(ctx: TypingContext) = {
@@ -32,7 +39,7 @@ class ScAssignStmtImpl(node: ASTNode)
           case Some(resolveResult) =>
             mirrorMethodCall match {
               case Some(call) => call.getType(TypingContext.empty)
-              case None => Success(Unit, Some(this))
+              case None       => Success(Unit, Some(this))
             }
           case _ => Success(Unit, Some(this))
         }
@@ -42,7 +49,7 @@ class ScAssignStmtImpl(node: ASTNode)
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case visitor: ScalaElementVisitor => super.accept(visitor)
-      case _ => super.accept(visitor)
+      case _                            => super.accept(visitor)
     }
   }
 
@@ -62,14 +69,16 @@ class ScAssignStmtImpl(node: ASTNode)
           s"${ref.refName}_=(${getRExpression.map(_.getText).getOrElse("")})"
         val mirrorExpr =
           ScalaPsiElementFactory.createExpressionWithContextFromText(
-              text, getContext, this)
+            text,
+            getContext,
+            this)
         mirrorExpr match {
           case call: ScMethodCall =>
             call.getInvokedExpr
               .asInstanceOf[ScReferenceExpression]
               .setupResolveFunctions(
-                  () => resolveAssignment.toArray,
-                  () => shapeResolveAssignment.toArray
+                () => resolveAssignment.toArray,
+                () => shapeResolveAssignment.toArray
               )
             Some(call)
           case _ => None
@@ -78,14 +87,16 @@ class ScAssignStmtImpl(node: ASTNode)
         val invokedExpr = methodCall.getInvokedExpr
         val text =
           s"${invokedExpr.getText}.update(${methodCall.args.exprs.map(_.getText).mkString(",")}," +
-          s" ${getRExpression.map(_.getText).getOrElse("")}"
+            s" ${getRExpression.map(_.getText).getOrElse("")}"
         val mirrorExpr =
           ScalaPsiElementFactory.createExpressionWithContextFromText(
-              text, getContext, this)
+            text,
+            getContext,
+            this)
         //todo: improve performance: do not re-evaluate resolve to "update" method
         mirrorExpr match {
           case call: ScMethodCall => Some(call)
-          case _ => None
+          case _                  => None
         }
       case _ => None
     }
@@ -98,28 +109,32 @@ class ScAssignStmtImpl(node: ASTNode)
         ref.bind() match {
           case Some(r: ScalaResolveResult) =>
             ScalaPsiUtil.nameContext(r.element) match {
-              case v: ScVariable => None
+              case v: ScVariable                  => None
               case c: ScClassParameter if c.isVar => None
-              case f: PsiField => None
+              case f: PsiField                    => None
               case fun: ScFunction
                   if ScalaPsiUtil.isViableForAssignmentFunction(fun) =>
                 val processor = new MethodResolveProcessor(
-                    ref,
-                    fun.name + "_=",
-                    getRExpression
-                      .map(expr => List(Seq(new Expression(expr))))
-                      .getOrElse(Nil),
-                    Nil,
-                    ref.getPrevTypeInfoParams,
-                    isShapeResolve = shapeResolve,
-                    kinds = StdKinds.methodsOnly)
+                  ref,
+                  fun.name + "_=",
+                  getRExpression
+                    .map(expr => List(Seq(new Expression(expr))))
+                    .getOrElse(Nil),
+                  Nil,
+                  ref.getPrevTypeInfoParams,
+                  isShapeResolve = shapeResolve,
+                  kinds = StdKinds.methodsOnly
+                )
                 r.fromType match {
                   case Some(tp) => processor.processType(tp, ref)
                   case None =>
                     fun.getContext match {
                       case d: ScDeclarationSequenceHolder =>
                         d.processDeclarations(
-                            processor, ResolveState.initial(), fun, ref)
+                          processor,
+                          ResolveState.initial(),
+                          fun,
+                          ref)
                       case _ =>
                     }
                 }

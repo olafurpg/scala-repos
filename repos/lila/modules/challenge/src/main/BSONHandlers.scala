@@ -22,10 +22,9 @@ private object BSONHandlers {
         case _ => ColorChoice.Random
       }
       def write(c: ColorChoice) =
-        BSONInteger(
-            c match {
-          case ColorChoice.White => 1
-          case ColorChoice.Black => 2
+        BSONInteger(c match {
+          case ColorChoice.White  => 1
+          case ColorChoice.Black  => 2
           case ColorChoice.Random => 0
         })
     }
@@ -41,9 +40,9 @@ private object BSONHandlers {
         r intO "d" map TimeControl.Correspondence.apply
       } getOrElse TimeControl.Unlimited
     def writes(w: Writer, t: TimeControl) = t match {
-      case TimeControl.Clock(l, i) => BSONDocument("l" -> l, "i" -> i)
+      case TimeControl.Clock(l, i)       => BSONDocument("l" -> l, "i" -> i)
       case TimeControl.Correspondence(d) => BSONDocument("d" -> d)
-      case TimeControl.Unlimited => BSONDocument()
+      case TimeControl.Unlimited         => BSONDocument()
     }
   }
   implicit val VariantBSONHandler = new BSONHandler[BSONInteger, Variant] {
@@ -79,8 +78,9 @@ private object BSONHandlers {
       if (r contains "id") Right(RegisteredBSONHandler reads r)
       else Left(AnonymousBSONHandler reads r)
     def writes(w: Writer, c: EitherChallenger) =
-      c.fold(a => AnonymousBSONHandler.writes(w, a),
-             r => RegisteredBSONHandler.writes(w, r))
+      c.fold(
+        a => AnonymousBSONHandler.writes(w, a),
+        r => RegisteredBSONHandler.writes(w, r))
   }
 
   implicit val ChallengeBSONHandler = Macros.handler[Challenge]

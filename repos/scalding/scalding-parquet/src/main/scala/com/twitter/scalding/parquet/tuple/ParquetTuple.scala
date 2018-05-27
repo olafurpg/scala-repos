@@ -38,7 +38,7 @@ trait ParquetTupleSource extends FileSource with HasFilterPredicate {
 
     val scheme = withFilter match {
       case Some(fp) => new ParquetTupleScheme(fp, fields)
-      case None => new ParquetTupleScheme(fields)
+      case None     => new ParquetTupleScheme(fields)
     }
 
     HadoopSchemeInstance(scheme.asInstanceOf[Scheme[_, _, _, _, _]])
@@ -50,12 +50,19 @@ trait ParquetTupleSource extends FileSource with HasFilterPredicate {
   * how to specify filter predicates for these sources.
   */
 class DailySuffixParquetTuple(
-    path: String, dateRange: DateRange, override val fields: Fields)
-    extends DailySuffixSource(path, dateRange) with ParquetTupleSource
+    path: String,
+    dateRange: DateRange,
+    override val fields: Fields)
+    extends DailySuffixSource(path, dateRange)
+    with ParquetTupleSource
 
 class HourlySuffixParquetTuple(
-    path: String, dateRange: DateRange, override val fields: Fields)
-    extends HourlySuffixSource(path, dateRange) with ParquetTupleSource
+    path: String,
+    dateRange: DateRange,
+    override val fields: Fields)
+    extends HourlySuffixSource(path, dateRange)
+    with ParquetTupleSource
 
 class FixedPathParquetTuple(override val fields: Fields, paths: String*)
-    extends FixedPathSource(paths: _*) with ParquetTupleSource
+    extends FixedPathSource(paths: _*)
+    with ParquetTupleSource

@@ -53,19 +53,28 @@ class SbtModuleDataServiceTest extends ProjectDataServiceTestCase {
 
   def testNonEmptyResolvers(): Unit =
     doTest(
-        Seq.empty,
-        Set(SbtResolver(
-                SbtResolver.Kind.Maven, "maven resolver", "http:///nothing"),
-            SbtResolver(
-                SbtResolver.Kind.Ivy, "ivy resolver", getProject.getBasePath)))
+      Seq.empty,
+      Set(
+        SbtResolver(
+          SbtResolver.Kind.Maven,
+          "maven resolver",
+          "http:///nothing"),
+        SbtResolver(
+          SbtResolver.Kind.Ivy,
+          "ivy resolver",
+          getProject.getBasePath))
+    )
 
   def testNonEmptyImportsAndResolvers(): Unit =
-    doTest(Seq("first import", "second import"),
-           Set(SbtResolver(
-                   SbtResolver.Kind.Maven, "maven resolver", "http://nothing"),
-               SbtResolver(SbtResolver.Kind.Ivy,
-                           "ivy resolver",
-                           getProject.getBasePath)))
+    doTest(
+      Seq("first import", "second import"),
+      Set(
+        SbtResolver(SbtResolver.Kind.Maven, "maven resolver", "http://nothing"),
+        SbtResolver(
+          SbtResolver.Kind.Ivy,
+          "ivy resolver",
+          getProject.getBasePath))
+    )
 
   def testModuleIsNull(): Unit = {
     val testProject = new project {

@@ -5,7 +5,12 @@ package stubs
 package elements
 
 import com.intellij.psi.PsiElement
-import com.intellij.psi.stubs.{IndexSink, StubElement, StubInputStream, StubOutputStream}
+import com.intellij.psi.stubs.{
+  IndexSink,
+  StubElement,
+  StubInputStream,
+  StubOutputStream
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.ScImportStmt
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.imports.ScImportStmtImpl
 import org.jetbrains.plugins.scala.lang.psi.stubs.impl.ScImportStmtStubImpl
@@ -16,7 +21,7 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.impl.ScImportStmtStubImpl
   */
 class ScImportStmtElementType[Func <: ScImportStmt]
     extends ScStubElementType[ScImportStmtStub, ScImportStmt](
-        "import statement") {
+      "import statement") {
   def serialize(stub: ScImportStmtStub, dataStream: StubOutputStream): Unit = {
     dataStream.writeName(stub.getImportText)
   }
@@ -28,10 +33,13 @@ class ScImportStmtElementType[Func <: ScImportStmt]
   }
 
   def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScImportStmtStub = {
+      dataStream: StubInputStream,
+      parentStub: Any): ScImportStmtStub = {
     val text = dataStream.readName.toString
     new ScImportStmtStubImpl(
-        parentStub.asInstanceOf[StubElement[PsiElement]], this, text)
+      parentStub.asInstanceOf[StubElement[PsiElement]],
+      this,
+      text)
   }
 
   def indexStub(stub: ScImportStmtStub, sink: IndexSink): Unit = {}

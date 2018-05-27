@@ -5,11 +5,12 @@ import scala.pickling._, scala.pickling.Defaults._
 import java.io.{Externalizable, IOException, ObjectInput, ObjectOutput}
 import java.nio.ByteBuffer
 
-class StorageLevel private (private var useDisk_ : Boolean,
-                            private var useMemory_ : Boolean,
-                            private var deserialized_ : Boolean,
-                            @transient private var buf: ByteBuffer,
-                            private var replication_ : Int)
+class StorageLevel private (
+    private var useDisk_ : Boolean,
+    private var useMemory_ : Boolean,
+    private var deserialized_ : Boolean,
+    @transient private var buf: ByteBuffer,
+    private var replication_ : Int)
     extends Externalizable {
 
   private def this(x: Boolean, y: Boolean, z: Boolean, r: Int = 1) = {
@@ -30,19 +31,25 @@ class StorageLevel private (private var useDisk_ : Boolean,
 
   override def clone(): StorageLevel =
     new StorageLevel(
-        this.useDisk, this.useMemory, this.deserialized, this.replication)
+      this.useDisk,
+      this.useMemory,
+      this.deserialized,
+      this.replication)
 
   override def equals(other: Any): Boolean = other match {
     case s: StorageLevel =>
       s.useDisk == useDisk && s.useMemory == useMemory &&
-      s.deserialized == deserialized && s.replication == replication
+        s.deserialized == deserialized && s.replication == replication
     case _ =>
       false
   }
 
   override def toString: String =
     "StorageLevel(%b, %b, %b, %d)".format(
-        useDisk, useMemory, deserialized, replication)
+      useDisk,
+      useMemory,
+      deserialized,
+      replication)
 
   def toInt: Int = {
     var ret = 0
@@ -86,12 +93,13 @@ object StorageLevel {
   val MEMORY_AND_DISK_SER_2 = new StorageLevel(true, true, false, 2)
 
   /** Create a new StorageLevel object */
-  def apply(useDisk: Boolean,
-            useMemory: Boolean,
-            deserialized: Boolean,
-            replication: Int = 1) =
+  def apply(
+      useDisk: Boolean,
+      useMemory: Boolean,
+      deserialized: Boolean,
+      replication: Int = 1) =
     getCachedStorageLevel(
-        new StorageLevel(useDisk, useMemory, deserialized, replication))
+      new StorageLevel(useDisk, useMemory, deserialized, replication))
 
   /** Create a new StorageLevel object from its integer representation */
   def apply(flags: Int, replication: Int) =
@@ -113,10 +121,11 @@ object StorageLevel {
   }
 }
 
-class StorageLevel2(private var useDisk_ : Boolean,
-                    private var useMemory_ : Boolean,
-                    private var deserialized_ : Boolean,
-                    private var replication_ : Int)
+class StorageLevel2(
+    private var useDisk_ : Boolean,
+    private var useMemory_ : Boolean,
+    private var deserialized_ : Boolean,
+    private var replication_ : Int)
     extends Externalizable {
 
   def toInt: Int = {

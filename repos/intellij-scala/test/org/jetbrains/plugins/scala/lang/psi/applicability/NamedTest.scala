@@ -26,7 +26,7 @@ class NamedTest extends ApplicabilityTestBase {
     assertProblems("(a: A, b: B)", "(A, b = B)") {
       case Nil =>
     }
-    //TODO compiler allows such calls, they seem to be OK 
+    //TODO compiler allows such calls, they seem to be OK
     //    assertProblems("(a: A, b: B)", "(a = A, b)") {
     //      case Nil =>
     //    }
@@ -38,11 +38,11 @@ class NamedTest extends ApplicabilityTestBase {
     }
     assertProblems("(a: A, b: B, c: C)", "(c = C, A, B)") {
       case PositionalAfterNamedArgument(Expression("A")) :: PositionalAfterNamedArgument(
-          Expression("B")) :: Nil =>
+            Expression("B")) :: Nil =>
     }
     assertProblems("(a: A, b: B, c: C)", "(c = C, A, B)") {
       case PositionalAfterNamedArgument(Expression("A")) :: PositionalAfterNamedArgument(
-          Expression("B")) :: Nil =>
+            Expression("B")) :: Nil =>
     }
     assertProblems("(a: A, b: B, c: C)", "(A, c = C, B)") {
       case PositionalAfterNamedArgument(Expression("B")) :: Nil =>
@@ -52,22 +52,22 @@ class NamedTest extends ApplicabilityTestBase {
   def testNamedDuplicates() {
     assertProblems("(a: A)", "(a = A, a = null)") {
       case ParameterSpecifiedMultipleTimes(Assignment("a = A")) :: ParameterSpecifiedMultipleTimes(
-          Assignment("a = null")) :: Nil =>
+            Assignment("a = null")) :: Nil =>
     }
     assertProblems("(a: A)", "(a = A, a = A, a = A)") {
       case ParameterSpecifiedMultipleTimes(Assignment("a = A")) :: ParameterSpecifiedMultipleTimes(
-          Assignment("a = A")) :: ParameterSpecifiedMultipleTimes(
-          Assignment("a = A")) :: Nil =>
+            Assignment("a = A")) :: ParameterSpecifiedMultipleTimes(
+            Assignment("a = A")) :: Nil =>
     }
     assertProblems("(a: A, b: B)", "(a = A, a = null, b = B, b = null)") {
       case ParameterSpecifiedMultipleTimes(Assignment("a = A")) :: ParameterSpecifiedMultipleTimes(
-          Assignment("a = null")) :: ParameterSpecifiedMultipleTimes(
-          Assignment("b = B")) :: ParameterSpecifiedMultipleTimes(
-          Assignment("b = null")) :: Nil =>
+            Assignment("a = null")) :: ParameterSpecifiedMultipleTimes(
+            Assignment("b = B")) :: ParameterSpecifiedMultipleTimes(
+            Assignment("b = null")) :: Nil =>
     }
     assertProblems("(a: A, b: B)", "(A, b = B, b = null)") {
       case ParameterSpecifiedMultipleTimes(Assignment("b = B")) :: ParameterSpecifiedMultipleTimes(
-          Assignment("b = null")) :: Nil =>
+            Assignment("b = null")) :: Nil =>
     }
   }
 
@@ -77,7 +77,7 @@ class NamedTest extends ApplicabilityTestBase {
     }
     assertProblems("()", "(a = A, b = B)") {
       case ExcessArgument(Assignment("a = A")) :: ExcessArgument(
-          Assignment("b = B")) :: Nil =>
+            Assignment("b = B")) :: Nil =>
     }
     assertProblems("(a: A)", "(a = A, b = B)") {
       case ExcessArgument(Assignment("b = B")) :: Nil =>
@@ -87,7 +87,7 @@ class NamedTest extends ApplicabilityTestBase {
   def testNamedUnresolvedDuplicates() {
     assertProblems("(a: A)", "(b = A, b = null)") {
       case ParameterSpecifiedMultipleTimes(Assignment("b = A")) :: ParameterSpecifiedMultipleTimes(
-          Assignment("b = null")) :: Nil =>
+            Assignment("b = null")) :: Nil =>
     }
   }
 
@@ -112,7 +112,7 @@ class NamedTest extends ApplicabilityTestBase {
     }
     assertProblems("(a: A, b: B)", "(A, B, a = A, b = B)") {
       case ExcessArgument(Expression("a = A")) :: ExcessArgument(
-          Expression("b = B")) :: Nil =>
+            Expression("b = B")) :: Nil =>
     }
   }
 
@@ -122,7 +122,8 @@ class NamedTest extends ApplicabilityTestBase {
     }
     assertProblems("(a: A, b: B)", "(a = B, b = A)") {
       case TypeMismatch(Expression("B"), Type("A")) :: TypeMismatch(
-          Expression("A"), Type("B")) :: Nil =>
+            Expression("A"),
+            Type("B")) :: Nil =>
     }
   }
 }

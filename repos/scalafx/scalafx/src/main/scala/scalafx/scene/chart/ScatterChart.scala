@@ -40,9 +40,10 @@ object ScatterChart {
   def apply[X, Y](xAxis: Axis[X], yAxis: Axis[Y]) =
     new ScatterChart[X, Y](new jfxsc.ScatterChart[X, Y](xAxis, yAxis))
 
-  def apply[X, Y](xAxis: Axis[X],
-                  yAxis: Axis[Y],
-                  data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) =
+  def apply[X, Y](
+      xAxis: Axis[X],
+      yAxis: Axis[Y],
+      data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) =
     new ScatterChart[X, Y](new jfxsc.ScatterChart[X, Y](xAxis, yAxis, data))
 }
 
@@ -54,9 +55,10 @@ class ScatterChart[X, Y](override val delegate: jfxsc.ScatterChart[X, Y])
     this(new jfxsc.ScatterChart[X, Y](xAxis, yAxis))
   }
 
-  def this(xAxis: Axis[X],
-           yAxis: Axis[Y],
-           data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) {
+  def this(
+      xAxis: Axis[X],
+      yAxis: Axis[Y],
+      data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) {
     this(new jfxsc.ScatterChart[X, Y](xAxis, yAxis, data))
   }
 }

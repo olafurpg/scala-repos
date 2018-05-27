@@ -33,11 +33,13 @@ object TlsSpec {
 
     val keyStore = KeyStore.getInstance(KeyStore.getDefaultType)
     keyStore.load(
-        getClass.getResourceAsStream("/keystore"), password.toCharArray)
+      getClass.getResourceAsStream("/keystore"),
+      password.toCharArray)
 
     val trustStore = KeyStore.getInstance(KeyStore.getDefaultType)
     trustStore.load(
-        getClass.getResourceAsStream(trustPath), password.toCharArray)
+      getClass.getResourceAsStream(trustPath),
+      password.toCharArray)
 
     val keyManagerFactory =
       KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm)
@@ -48,9 +50,10 @@ object TlsSpec {
     trustManagerFactory.init(trustStore)
 
     val context = SSLContext.getInstance("TLS")
-    context.init(keyManagerFactory.getKeyManagers,
-                 trustManagerFactory.getTrustManagers,
-                 new SecureRandom)
+    context.init(
+      keyManagerFactory.getKeyManagers,
+      trustManagerFactory.getTrustManagers,
+      new SecureRandom)
     context
   }
 
@@ -84,7 +87,7 @@ object TlsSpec {
         })
         override def onTimer(x: Any): Unit = {
           failStage(
-              new TimeoutException(s"timeout expired, last element was $last"))
+            new TimeoutException(s"timeout expired, last element was $last"))
         }
       }
   }
@@ -107,14 +110,14 @@ class TlsSpec
       x match {
         case SessionTruncated ⇒ system.log.debug(s" ----------- truncated ")
         case SessionBytes(_, b) ⇒
-          system.log.debug(
-              s" ----------- (${b.size}) ${b.take(32).utf8String}")
+          system.log.debug(s" ----------- (${b.size}) ${b.take(32).utf8String}")
       }
       x
     }
 
     val cipherSuites = NegotiateNewSession.withCipherSuites(
-        "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA", "TLS_RSA_WITH_AES_128_CBC_SHA")
+      "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
+      "TLS_RSA_WITH_AES_128_CBC_SHA")
     def clientTls(closing: TLSClosing) =
       TLS(sslContext, cipherSuites, Client, closing)
     def badClientTls(closing: TLSClosing) =
@@ -131,24 +134,27 @@ class TlsSpec
     }
 
     trait CommunicationSetup extends Named {
-      def decorateFlow(leftClosing: TLSClosing,
-                       rightClosing: TLSClosing,
-                       rhs: Flow[SslTlsInbound, SslTlsOutbound, Any])
+      def decorateFlow(
+          leftClosing: TLSClosing,
+          rightClosing: TLSClosing,
+          rhs: Flow[SslTlsInbound, SslTlsOutbound, Any])
         : Flow[SslTlsOutbound, SslTlsInbound, NotUsed]
       def cleanup(): Unit = ()
     }
 
     object ClientInitiates extends CommunicationSetup {
-      def decorateFlow(leftClosing: TLSClosing,
-                       rightClosing: TLSClosing,
-                       rhs: Flow[SslTlsInbound, SslTlsOutbound, Any]) =
+      def decorateFlow(
+          leftClosing: TLSClosing,
+          rightClosing: TLSClosing,
+          rhs: Flow[SslTlsInbound, SslTlsOutbound, Any]) =
         clientTls(leftClosing) atop serverTls(rightClosing).reversed join rhs
     }
 
     object ServerInitiates extends CommunicationSetup {
-      def decorateFlow(leftClosing: TLSClosing,
-                       rightClosing: TLSClosing,
-                       rhs: Flow[SslTlsInbound, SslTlsOutbound, Any]) =
+      def decorateFlow(
+          leftClosing: TLSClosing,
+          rightClosing: TLSClosing,
+          rhs: Flow[SslTlsInbound, SslTlsOutbound, Any]) =
         serverTls(leftClosing) atop clientTls(rightClosing).reversed join rhs
     }
 
@@ -162,32 +168,35 @@ class TlsSpec
 
     object ClientInitiatesViaTcp extends CommunicationSetup {
       var binding: Tcp.ServerBinding = null
-      def decorateFlow(leftClosing: TLSClosing,
-                       rightClosing: TLSClosing,
-                       rhs: Flow[SslTlsInbound, SslTlsOutbound, Any]) = {
+      def decorateFlow(
+          leftClosing: TLSClosing,
+          rightClosing: TLSClosing,
+          rhs: Flow[SslTlsInbound, SslTlsOutbound, Any]) = {
         binding = server(serverTls(rightClosing).reversed join rhs)
         clientTls(leftClosing) join Tcp().outgoingConnection(
-            binding.localAddress)
+          binding.localAddress)
       }
       override def cleanup(): Unit = binding.unbind()
     }
 
     object ServerInitiatesViaTcp extends CommunicationSetup {
       var binding: Tcp.ServerBinding = null
-      def decorateFlow(leftClosing: TLSClosing,
-                       rightClosing: TLSClosing,
-                       rhs: Flow[SslTlsInbound, SslTlsOutbound, Any]) = {
+      def decorateFlow(
+          leftClosing: TLSClosing,
+          rightClosing: TLSClosing,
+          rhs: Flow[SslTlsInbound, SslTlsOutbound, Any]) = {
         binding = server(clientTls(rightClosing).reversed join rhs)
         serverTls(leftClosing) join Tcp().outgoingConnection(
-            binding.localAddress)
+          binding.localAddress)
       }
       override def cleanup(): Unit = binding.unbind()
     }
 
-    val communicationPatterns = Seq(ClientInitiates,
-                                    ServerInitiates,
-                                    ClientInitiatesViaTcp,
-                                    ServerInitiatesViaTcp)
+    val communicationPatterns = Seq(
+      ClientInitiates,
+      ServerInitiates,
+      ClientInitiatesViaTcp,
+      ServerInitiatesViaTcp)
 
     trait PayloadScenario extends Named {
       def flow: Flow[SslTlsInbound, SslTlsOutbound, Any] =
@@ -196,7 +205,7 @@ class TlsSpec
           def setSession(s: SSLSession) = {
             session = s
             system.log.debug(
-                s"new session: $session (${session.getId mkString ","})")
+              s"new session: $session (${session.getId mkString ","})")
           }
 
           {
@@ -260,13 +269,15 @@ class TlsSpec
     // this demonstrates that cancellation is ignored so that the five results make it back
     object CancellingRHS extends PayloadScenario {
       override def flow =
-        Flow[SslTlsInbound].mapConcat {
-          case SessionTruncated ⇒ SessionTruncated :: Nil
-          case SessionBytes(s, bytes) ⇒
-            bytes.map(b ⇒ SessionBytes(s, ByteString(b)))
-        }.take(5)
+        Flow[SslTlsInbound]
+          .mapConcat {
+            case SessionTruncated ⇒ SessionTruncated :: Nil
+            case SessionBytes(s, bytes) ⇒
+              bytes.map(b ⇒ SessionBytes(s, ByteString(b)))
+          }
+          .take(5)
           .mapAsync(5)(x ⇒
-                later(500.millis, system.scheduler)(Future.successful(x)))
+            later(500.millis, system.scheduler)(Future.successful(x)))
           .via(super.flow)
       override def rightClosing = IgnoreCancel
 
@@ -277,13 +288,15 @@ class TlsSpec
 
     object CancellingRHSIgnoresBoth extends PayloadScenario {
       override def flow =
-        Flow[SslTlsInbound].mapConcat {
-          case SessionTruncated ⇒ SessionTruncated :: Nil
-          case SessionBytes(s, bytes) ⇒
-            bytes.map(b ⇒ SessionBytes(s, ByteString(b)))
-        }.take(5)
+        Flow[SslTlsInbound]
+          .mapConcat {
+            case SessionTruncated ⇒ SessionTruncated :: Nil
+            case SessionBytes(s, bytes) ⇒
+              bytes.map(b ⇒ SessionBytes(s, ByteString(b)))
+          }
+          .take(5)
           .mapAsync(5)(x ⇒
-                later(500.millis, system.scheduler)(Future.successful(x)))
+            later(500.millis, system.scheduler)(Future.successful(x)))
           .via(super.flow)
       override def rightClosing = IgnoreBoth
 
@@ -325,7 +338,7 @@ class TlsSpec
       def setSession(s: SSLSession) = {
         session = s
         system.log.debug(
-            s"new session: $session (${session.getId mkString ","})")
+          s"new session: $session (${session.getId mkString ","})")
       }
 
       {
@@ -341,7 +354,7 @@ class TlsSpec
       override def flow = logCipherSuite
       def inputs =
         NegotiateNewSession.withCipherSuites("TLS_RSA_WITH_AES_128_CBC_SHA") :: send(
-            "hello") :: Nil
+          "hello") :: Nil
       def output = ByteString("TLS_RSA_WITH_AES_128_CBC_SHAhello")
     }
 
@@ -349,21 +362,23 @@ class TlsSpec
       override def flow = logCipherSuite
       def inputs =
         NegotiateNewSession.withCipherSuites(
-            "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA") :: send("hello") :: Nil
+          "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA") :: send("hello") :: Nil
       def output = ByteString("TLS_ECDHE_RSA_WITH_AES_128_CBC_SHAhello")
     }
 
-    val scenarios = Seq(SingleBytes,
-                        MediumMessages,
-                        LargeMessages,
-                        EmptyBytesFirst,
-                        EmptyBytesInTheMiddle,
-                        EmptyBytesLast,
-                        CancellingRHS,
-                        SessionRenegotiationBySender,
-                        SessionRenegotiationByReceiver,
-                        SessionRenegotiationFirstOne,
-                        SessionRenegotiationFirstTwo)
+    val scenarios = Seq(
+      SingleBytes,
+      MediumMessages,
+      LargeMessages,
+      EmptyBytesFirst,
+      EmptyBytesInTheMiddle,
+      EmptyBytesLast,
+      CancellingRHS,
+      SessionRenegotiationBySender,
+      SessionRenegotiationByReceiver,
+      SessionRenegotiationFirstOne,
+      SessionRenegotiationFirstTwo
+    )
 
     for {
       commPattern ← communicationPatterns
@@ -372,13 +387,13 @@ class TlsSpec
       s"work in mode ${commPattern.name} while sending ${scenario.name}" in assertAllStagesStopped {
         val onRHS = debug.via(scenario.flow)
         val f = Source(scenario.inputs)
-          .via(commPattern.decorateFlow(scenario.leftClosing,
-                                        scenario.rightClosing,
-                                        onRHS))
+          .via(commPattern
+            .decorateFlow(scenario.leftClosing, scenario.rightClosing, onRHS))
           .transform(() ⇒
-                new PushStage[SslTlsInbound, SslTlsInbound] {
-              override def onPush(elem: SslTlsInbound,
-                                  ctx: Context[SslTlsInbound]) =
+            new PushStage[SslTlsInbound, SslTlsInbound] {
+              override def onPush(
+                  elem: SslTlsInbound,
+                  ctx: Context[SslTlsInbound]) =
                 ctx.push(elem)
               override def onDownstreamFinish(ctx: Context[SslTlsInbound]) = {
                 system.log.debug("me cancelled")
@@ -393,7 +408,7 @@ class TlsSpec
           .runWith(Sink.head)
 
         Await.result(f, 8.seconds).utf8String should be(
-            scenario.output.utf8String)
+          scenario.output.utf8String)
 
         commPattern.cleanup()
 
@@ -412,48 +427,49 @@ class TlsSpec
         .collect { case Right(e) ⇒ e }
         .toMat(Sink.head)(Keep.right)
 
-      val simple = Flow.fromSinkAndSourceMat(
-          getError, Source.maybe[SslTlsOutbound])(Keep.left)
+      val simple =
+        Flow.fromSinkAndSourceMat(getError, Source.maybe[SslTlsOutbound])(
+          Keep.left)
 
       // The creation of actual TCP connections is necessary. It is the easiest way to decouple the client and server
       // under error conditions, and has the bonus of matching most actual SSL deployments.
       val (server, serverErr) = Tcp()
         .bind("localhost", 0)
-        .map(c ⇒
-              {
-            c.flow
-              .joinMat(serverTls(IgnoreBoth).reversed.joinMat(simple)(
-                      Keep.right))(Keep.right)
-              .run()
+        .map(c ⇒ {
+          c.flow
+            .joinMat(serverTls(IgnoreBoth).reversed.joinMat(simple)(
+              Keep.right))(Keep.right)
+            .run()
         })
         .toMat(Sink.head)(Keep.both)
         .run()
 
       val clientErr = simple
         .join(badClientTls(IgnoreBoth))
-        .join(Tcp().outgoingConnection(
-                Await.result(server, 1.second).localAddress))
+        .join(
+          Tcp().outgoingConnection(Await.result(server, 1.second).localAddress))
         .run()
 
-      Await.result(serverErr.flatMap(identity), 1.second).getMessage should include(
-          "certificate_unknown")
+      Await
+        .result(serverErr.flatMap(identity), 1.second)
+        .getMessage should include("certificate_unknown")
       Await.result(clientErr, 1.second).getMessage should equal(
-          "General SSLEngine problem")
+        "General SSLEngine problem")
     }
 
     "reliably cancel subscriptions when TransportIn fails early" in assertAllStagesStopped {
       val ex = new Exception("hello")
       val (sub, out1, out2) = RunnableGraph
         .fromGraph(
-            GraphDSL.create(Source.asSubscriber[SslTlsOutbound],
-                            Sink.head[ByteString],
-                            Sink.head[SslTlsInbound])((_, _, _)) {
-          implicit b ⇒ (s, o1, o2) ⇒
+          GraphDSL.create(
+            Source.asSubscriber[SslTlsOutbound],
+            Sink.head[ByteString],
+            Sink.head[SslTlsInbound])((_, _, _)) { implicit b ⇒ (s, o1, o2) ⇒
             val tls = b.add(clientTls(EagerClose))
             s ~> tls.in1; tls.out1 ~> o1
             o2 <~ tls.out2; tls.in2 <~ Source.failed(ex)
             ClosedShape
-        })
+          })
         .run()
       the[Exception] thrownBy Await.result(out1, 1.second) should be(ex)
       the[Exception] thrownBy Await.result(out2, 1.second) should be(ex)
@@ -467,15 +483,15 @@ class TlsSpec
       val ex = new Exception("hello")
       val (sub, out1, out2) = RunnableGraph
         .fromGraph(
-            GraphDSL.create(Source.asSubscriber[ByteString],
-                            Sink.head[ByteString],
-                            Sink.head[SslTlsInbound])((_, _, _)) {
-          implicit b ⇒ (s, o1, o2) ⇒
+          GraphDSL.create(
+            Source.asSubscriber[ByteString],
+            Sink.head[ByteString],
+            Sink.head[SslTlsInbound])((_, _, _)) { implicit b ⇒ (s, o1, o2) ⇒
             val tls = b.add(clientTls(EagerClose))
             Source.failed[SslTlsOutbound](ex) ~> tls.in1; tls.out1 ~> o1
             o2 <~ tls.out2; tls.in2 <~ s
             ClosedShape
-        })
+          })
         .run()
       the[Exception] thrownBy Await.result(out1, 1.second) should be(ex)
       the[Exception] thrownBy Await.result(out2, 1.second) should be(ex)

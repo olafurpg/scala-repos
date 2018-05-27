@@ -34,7 +34,7 @@ private[mllib] trait PMMLModelExport {
     val version = getClass.getPackage.getImplementationVersion
     val app = new Application("Apache Spark MLlib").setVersion(version)
     val timestamp = new Timestamp().addContent(
-        new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()))
+      new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(new Date()))
     val header = new Header().setApplication(app).setTimestamp(timestamp)
     new PMML("4.2", header, null)
   }

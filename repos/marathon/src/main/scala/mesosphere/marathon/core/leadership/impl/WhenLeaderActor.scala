@@ -1,8 +1,20 @@
 package mesosphere.marathon.core.leadership.impl
 
-import akka.actor.{Actor, ActorLogging, ActorRef, PoisonPill, Props, Stash, Status, Terminated}
+import akka.actor.{
+  Actor,
+  ActorLogging,
+  ActorRef,
+  PoisonPill,
+  Props,
+  Stash,
+  Status,
+  Terminated
+}
 import akka.event.LoggingReceive
-import mesosphere.marathon.core.leadership.PreparationMessages.{PrepareForStart, Prepared}
+import mesosphere.marathon.core.leadership.PreparationMessages.{
+  PrepareForStart,
+  Prepared
+}
 import mesosphere.marathon.core.leadership.impl.WhenLeaderActor.{Stop, Stopped}
 
 private[leadership] object WhenLeaderActor {
@@ -18,7 +30,9 @@ private[leadership] object WhenLeaderActor {
   * Wraps an actor which is only started when we are currently the leader.
   */
 private class WhenLeaderActor(childProps: => Props)
-    extends Actor with ActorLogging with Stash {
+    extends Actor
+    with ActorLogging
+    with Stash {
 
   private[this] var leadershipCycle = 1
 
@@ -37,11 +51,12 @@ private class WhenLeaderActor(childProps: => Props)
       case unhandled: Any =>
         log.debug("unhandled message in suspend: {}", unhandled)
         sender() ! Status.Failure(
-            new IllegalStateException(s"not currently active ($self)"))
+          new IllegalStateException(s"not currently active ($self)"))
     }
 
   private[impl] def starting(
-      coordinatorRef: ActorRef, childRef: ActorRef): Receive =
+      coordinatorRef: ActorRef,
+      childRef: ActorRef): Receive =
     LoggingReceive.withLabel("starting") {
       case Prepared(`childRef`) =>
         coordinatorRef ! Prepared(self)
@@ -50,7 +65,7 @@ private class WhenLeaderActor(childProps: => Props)
 
       case Stop =>
         coordinatorRef ! Status.Failure(
-            new IllegalStateException(s"starting aborted due to stop ($self)"))
+          new IllegalStateException(s"starting aborted due to stop ($self)"))
         stop(childRef)
 
       case unhandled: Any =>
@@ -61,8 +76,8 @@ private class WhenLeaderActor(childProps: => Props)
   private[impl] def active(childRef: ActorRef): Receive =
     LoggingReceive.withLabel("active") {
       case PrepareForStart => sender() ! Prepared(self)
-      case Stop => stop(childRef)
-      case unhandled: Any => childRef.forward(unhandled)
+      case Stop            => stop(childRef)
+      case unhandled: Any  => childRef.forward(unhandled)
     }
 
   private[impl] def dying(stopAckRef: ActorRef, childRef: ActorRef): Receive =

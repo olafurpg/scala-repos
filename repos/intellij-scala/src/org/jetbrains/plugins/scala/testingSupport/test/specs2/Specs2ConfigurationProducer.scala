@@ -12,7 +12,11 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinitio
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
 import org.jetbrains.plugins.scala.testingSupport.test.TestRunConfigurationForm.TestKind
 import org.jetbrains.plugins.scala.testingSupport.test.structureView.TestNodeProvider
-import org.jetbrains.plugins.scala.testingSupport.test.{AbstractTestConfigurationProducer, TestConfigurationProducer, TestConfigurationUtil}
+import org.jetbrains.plugins.scala.testingSupport.test.{
+  AbstractTestConfigurationProducer,
+  TestConfigurationProducer,
+  TestConfigurationUtil
+}
 
 /**
   * User: Alexander Podkhalyuzin
@@ -25,8 +29,9 @@ class Specs2ConfigurationProducer extends {
 with AbstractTestConfigurationProducer {
 
   override def suitePaths =
-    List("org.specs2.specification.SpecificationStructure",
-         "org.specs2.specification.core.SpecificationStructure")
+    List(
+      "org.specs2.specification.SpecificationStructure",
+      "org.specs2.specification.core.SpecificationStructure")
 
   override def findExistingByElement(
       location: Location[_ <: PsiElement],
@@ -44,17 +49,18 @@ with AbstractTestConfigurationProducer {
     if (element.isInstanceOf[PsiPackage] ||
         element.isInstanceOf[PsiDirectory]) {
       val name = element match {
-        case p: PsiPackage => p.getName
+        case p: PsiPackage   => p.getName
         case d: PsiDirectory => d.getName
       }
       return Some(
-          (element,
-           TestConfigurationUtil.packageSettings(
-               element,
-               location,
-               confFactory,
-               ScalaBundle.message("test.in.scope.specs2.presentable.text",
-                                   name))))
+        (
+          element,
+          TestConfigurationUtil.packageSettings(
+            element,
+            location,
+            confFactory,
+            ScalaBundle
+              .message("test.in.scope.specs2.presentable.text", name))))
     }
 
     val parent: ScTypeDefinition =
@@ -107,18 +113,21 @@ with AbstractTestConfigurationProducer {
         element.isInstanceOf[PsiDirectory]) {
       if (!configuration.isInstanceOf[Specs2RunConfiguration]) return false
       return TestConfigurationUtil.isPackageConfiguration(
-          element, configuration)
+        element,
+        configuration)
     }
     val parent: ScTypeDefinition =
       PsiTreeUtil.getParentOfType(element, classOf[ScTypeDefinition], false)
     if (parent == null) return false
     val suiteClasses = suitePaths
-      .map(suite =>
-            ScalaPsiManager
-              .instance(parent.getProject)
-              .getCachedClass(suite,
-                              element.getResolveScope,
-                              ScalaPsiManager.ClassCategory.TYPE))
+      .map(
+        suite =>
+          ScalaPsiManager
+            .instance(parent.getProject)
+            .getCachedClass(
+              suite,
+              element.getResolveScope,
+              ScalaPsiManager.ClassCategory.TYPE))
       .filter(_ != null)
     if (suiteClasses.isEmpty) return false
     val suiteClazz = suiteClasses.head
@@ -136,12 +145,13 @@ with AbstractTestConfigurationProducer {
       case configuration: Specs2RunConfiguration
           if configuration.getTestKind == TestKind.TEST_NAME =>
         testClassPath == configuration.getTestClassPath && testName != null &&
-        testName == configuration.getTestName
+          testName == configuration.getTestName
       case _ => false
     }
   }
 
-  private def extractStaticTestName(testDefExpr: ScInfixExpr): Option[String] = {
+  private def extractStaticTestName(
+      testDefExpr: ScInfixExpr): Option[String] = {
     testDefExpr.getChildren
       .filter(_.isInstanceOf[ScExpression])
       .map(_.asInstanceOf[ScExpression])
@@ -158,10 +168,12 @@ with AbstractTestConfigurationProducer {
 
     val psiManager = ScalaPsiManager.instance(testClassDef.getProject)
     val suiteClasses = suitePaths
-      .map(suite =>
-            psiManager.getCachedClass(suite,
-                                      element.getResolveScope,
-                                      ScalaPsiManager.ClassCategory.TYPE))
+      .map(
+        suite =>
+          psiManager.getCachedClass(
+            suite,
+            element.getResolveScope,
+            ScalaPsiManager.ClassCategory.TYPE))
       .filter(_ != null)
     if (suiteClasses.isEmpty) return (null, null)
     val suiteClazz = suiteClasses.head
@@ -170,9 +182,9 @@ with AbstractTestConfigurationProducer {
     val testClassPath = testClassDef.qualifiedName
 
     ScalaPsiUtil.getParentWithProperty(
-        element,
-        strict = false,
-        e => TestNodeProvider.isSpecs2TestExpr(e)) match {
+      element,
+      strict = false,
+      e => TestNodeProvider.isSpecs2TestExpr(e)) match {
       case Some(infixExpr: ScInfixExpr) =>
         (testClassDef, extractStaticTestName(infixExpr).orNull)
       case _ => (testClassDef, null)

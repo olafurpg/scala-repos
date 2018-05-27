@@ -82,8 +82,8 @@ object CABRunLengthEncoder {
   import Token._
   import Free.Trampoline
 
-  type RunLength[A] = ReaderWriterStateT[
-      Trampoline, RunLengthConfig, Cord, RunLengthState, A]
+  type RunLength[A] =
+    ReaderWriterStateT[Trampoline, RunLengthConfig, Cord, RunLengthState, A]
 
   // At its essence the RWST monad transformer is a wrap around a function with the following shape:
   // (ReaderType, StateType) => Monad[WriterType, Result, StateType]
@@ -109,7 +109,7 @@ object CABRunLengthEncoder {
     .rwstMonad[Trampoline, RunLengthConfig, Cord, RunLengthState]
   import rle._
 
-  /** 
+  /**
     * with the above syntax imported, we can perform the same
     * computation as above, but use a for comprehension
     */
@@ -149,8 +149,8 @@ object CABRunLengthEncoder {
       state <- get
       config <- ask
       _ <- state.lastToken.cata(
-          none = point(()), // nothing to emit
-          some = writeOutput(_, state.length, config.minRun))
+        none = point(()), // nothing to emit
+        some = writeOutput(_, state.length, config.minRun))
     } yield ()
 
   /**
@@ -162,7 +162,7 @@ object CABRunLengthEncoder {
       next <- readToken
       _ <- {
         if (state.lastToken.map(_ == next) getOrElse (false))
-          // Same token as last, so we just increment our counter 
+          // Same token as last, so we just increment our counter
           modify(_.incLength)
         else
           // its a new token, so emit the previous, then change

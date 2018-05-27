@@ -45,10 +45,11 @@ case class BaseConsumerRecord(
     key: Array[Byte],
     value: Array[Byte])
 
-class NewShinyConsumer(topic: Option[String],
-                       whitelist: Option[String],
-                       consumerProps: Properties,
-                       val timeoutMs: Long = Long.MaxValue)
+class NewShinyConsumer(
+    topic: Option[String],
+    whitelist: Option[String],
+    consumerProps: Properties,
+    val timeoutMs: Long = Long.MaxValue)
     extends BaseConsumer {
   import org.apache.kafka.clients.consumer.KafkaConsumer
 
@@ -58,10 +59,11 @@ class NewShinyConsumer(topic: Option[String],
   if (topic.isDefined) consumer.subscribe(List(topic.get))
   else if (whitelist.isDefined)
     consumer.subscribe(
-        Pattern.compile(whitelist.get), new NoOpConsumerRebalanceListener())
+      Pattern.compile(whitelist.get),
+      new NoOpConsumerRebalanceListener())
   else
     throw new IllegalArgumentException(
-        "Exactly one of topic or whitelist has to be provided.")
+      "Exactly one of topic or whitelist has to be provided.")
 
   var recordIter = consumer.poll(0).iterator
 
@@ -72,13 +74,14 @@ class NewShinyConsumer(topic: Option[String],
     }
 
     val record = recordIter.next
-    BaseConsumerRecord(record.topic,
-                       record.partition,
-                       record.offset,
-                       record.timestamp,
-                       record.timestampType,
-                       record.key,
-                       record.value)
+    BaseConsumerRecord(
+      record.topic,
+      record.partition,
+      record.offset,
+      record.timestamp,
+      record.timestampType,
+      record.key,
+      record.value)
   }
 
   override def stop() {
@@ -101,7 +104,10 @@ class OldConsumer(topicFilter: TopicFilter, consumerProps: Properties)
   val consumerConnector = Consumer.create(new ConsumerConfig(consumerProps))
   val stream: KafkaStream[Array[Byte], Array[Byte]] = consumerConnector
     .createMessageStreamsByFilter(
-        topicFilter, 1, new DefaultDecoder(), new DefaultDecoder())
+      topicFilter,
+      1,
+      new DefaultDecoder(),
+      new DefaultDecoder())
     .head
   val iter = stream.iterator
 
@@ -109,13 +115,15 @@ class OldConsumer(topicFilter: TopicFilter, consumerProps: Properties)
     if (!iter.hasNext()) throw new StreamEndException
 
     val messageAndMetadata = iter.next
-    BaseConsumerRecord(messageAndMetadata.topic,
-                       messageAndMetadata.partition,
-                       messageAndMetadata.offset,
-                       messageAndMetadata.timestamp,
-                       messageAndMetadata.timestampType,
-                       messageAndMetadata.key,
-                       messageAndMetadata.message)
+    BaseConsumerRecord(
+      messageAndMetadata.topic,
+      messageAndMetadata.partition,
+      messageAndMetadata.offset,
+      messageAndMetadata.timestamp,
+      messageAndMetadata.timestampType,
+      messageAndMetadata.key,
+      messageAndMetadata.message
+    )
   }
 
   override def stop() {

@@ -13,7 +13,8 @@ import annotation.implicitNotFound
   * Handles field binding and unbinding.
   */
 @implicitNotFound(
-    msg = "Cannot find Formatter type class for ${T}. Perhaps you will need to import play.api.data.format.Formats._ "
+  msg =
+    "Cannot find Formatter type class for ${T}. Perhaps you will need to import play.api.data.format.Formats._ "
 )
 trait Formatter[T] {
 
@@ -73,7 +74,7 @@ object Formats {
         .filter(s => s.length == 1 && s != " ")
         .map(s => Right(s.charAt(0)))
         .getOrElse(
-            Left(Seq(FormError(key, "error.required", Nil)))
+          Left(Seq(FormError(key, "error.required", Nil)))
         )
     def unbind(key: String, value: Char) = Map(key -> value.toString)
   }
@@ -85,9 +86,9 @@ object Formats {
     * @param key Key name of the field to parse
     * @param data Field data
     */
-  private def parsing[T](
-      parse: String => T, errMsg: String, errArgs: Seq[Any])(
-      key: String, data: Map[String, String]): Either[Seq[FormError], T] = {
+  private def parsing[T](parse: String => T, errMsg: String, errArgs: Seq[Any])(
+      key: String,
+      data: Map[String, String]): Either[Seq[FormError], T] = {
     stringFormat.bind(key, data).right.flatMap { s =>
       scala.util.control.Exception
         .allCatch[T]
@@ -98,7 +99,8 @@ object Formats {
   }
 
   private def numberFormatter[T](
-      convert: String => T, real: Boolean = false): Formatter[T] = {
+      convert: String => T,
+      real: Boolean = false): Formatter[T] = {
     val (formatString, errorString) =
       if (real) ("format.real", "error.real")
       else ("format.numeric", "error.number")
@@ -161,7 +163,7 @@ object Formats {
                   case (p, s) =>
                     if (bd.precision - bd.scale > p - s) {
                       throw new java.lang.ArithmeticException(
-                          "Invalid precision")
+                        "Invalid precision")
                     }
                     bd.setScale(s)
                 })
@@ -170,11 +172,11 @@ object Formats {
             .left
             .map { e =>
               Seq(
-                  precision match {
-                    case Some((p, s)) =>
-                      FormError(key, "error.real.precision", Seq(p, s))
-                    case None => FormError(key, "error.real", Nil)
-                  }
+                precision match {
+                  case Some((p, s)) =>
+                    FormError(key, "error.real.precision", Seq(p, s))
+                  case None => FormError(key, "error.real", Nil)
+                }
               )
             }
         }
@@ -182,12 +184,12 @@ object Formats {
 
       def unbind(key: String, value: BigDecimal) =
         Map(
-            key -> precision
-              .map({ p =>
-            value.setScale(p._2)
-          })
-              .getOrElse(value)
-              .toString)
+          key -> precision
+            .map({ p =>
+              value.setScale(p._2)
+            })
+            .getOrElse(value)
+            .toString)
     }
 
   /**
@@ -204,9 +206,9 @@ object Formats {
 
     def bind(key: String, data: Map[String, String]) = {
       Right(data.get(key).getOrElse("false")).right.flatMap {
-        case "true" => Right(true)
+        case "true"  => Right(true)
         case "false" => Right(false)
-        case _ => Left(Seq(FormError(key, "error.boolean", Nil)))
+        case _       => Left(Seq(FormError(key, "error.boolean", Nil)))
       }
     }
 
@@ -221,8 +223,9 @@ object Formats {
     * @param pattern a date pattern, as specified in `org.joda.time.format.DateTimeFormat`.
     * @param timeZone the `java.util.TimeZone` to use for parsing and formatting
     */
-  def dateFormat(pattern: String,
-                 timeZone: TimeZone = TimeZone.getDefault): Formatter[Date] =
+  def dateFormat(
+      pattern: String,
+      timeZone: TimeZone = TimeZone.getDefault): Formatter[Date] =
     new Formatter[Date] {
 
       val jodaTimeZone = org.joda.time.DateTimeZone.forTimeZone(timeZone)
@@ -237,8 +240,9 @@ object Formats {
         parsing(dateParse, "error.date", Nil)(key, data)
 
       def unbind(key: String, value: Date) =
-        Map(key -> formatter.print(
-                new org.joda.time.DateTime(value).withZone(jodaTimeZone)))
+        Map(
+          key -> formatter.print(
+            new org.joda.time.DateTime(value).withZone(jodaTimeZone)))
     }
 
   /**
@@ -276,7 +280,7 @@ object Formats {
     * Default formatter for `java.sql.Date` type with pattern `yyyy-MM-dd`.
     */
   implicit val sqlDateFormat: Formatter[java.sql.Date] = sqlDateFormat(
-      "yyyy-MM-dd")
+    "yyyy-MM-dd")
 
   /**
     * Formatter for the `org.joda.time.DateTime` type.
@@ -286,7 +290,8 @@ object Formats {
     */
   def jodaDateTimeFormat(
       pattern: String,
-      timeZone: org.joda.time.DateTimeZone = org.joda.time.DateTimeZone.getDefault)
+      timeZone: org.joda.time.DateTimeZone =
+        org.joda.time.DateTimeZone.getDefault)
     : Formatter[org.joda.time.DateTime] =
     new Formatter[org.joda.time.DateTime] {
 
@@ -314,8 +319,7 @@ object Formats {
     *
     * @param pattern a date pattern as specified in `org.joda.time.format.DateTimeFormat`.
     */
-  def jodaLocalDateFormat(
-      pattern: String): Formatter[org.joda.time.LocalDate] =
+  def jodaLocalDateFormat(pattern: String): Formatter[org.joda.time.LocalDate] =
     new Formatter[org.joda.time.LocalDate] {
 
       import org.joda.time.LocalDate

@@ -25,7 +25,8 @@ object AbstractMap {
   }
 
   class SimpleEntry[K, V](private var key: K, private var value: V)
-      extends Map.Entry[K, V] with Serializable {
+      extends Map.Entry[K, V]
+      with Serializable {
 
     def this(entry: Map.Entry[_ <: K, _ <: V]) =
       this(entry.getKey, entry.getValue)
@@ -51,7 +52,8 @@ object AbstractMap {
   }
 
   class SimpleImmutableEntry[K, V](key: K, value: V)
-      extends Map.Entry[K, V] with Serializable {
+      extends Map.Entry[K, V]
+      with Serializable {
 
     def this(entry: Map.Entry[_ <: K, _ <: V]) =
       this(entry.getKey, entry.getValue)
@@ -164,7 +166,7 @@ abstract class AbstractMap[K, V] protected () extends java.util.Map[K, V] {
       o match {
         case m: Map[_, _] =>
           (self.size == m.size &&
-              entrySet.forall(item => m.get(item.getKey) === item.getValue))
+            entrySet.forall(item => m.get(item.getKey) === item.getValue))
         case _ => false
       }
     }
@@ -176,7 +178,7 @@ abstract class AbstractMap[K, V] protected () extends java.util.Map[K, V] {
   override def toString(): String = {
     entrySet.iterator
       .map(
-          e => s"${e.getKey}=${e.getValue}"
+        e => s"${e.getKey}=${e.getValue}"
       )
       .mkString("{", ", ", "}")
   }

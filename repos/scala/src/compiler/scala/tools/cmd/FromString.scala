@@ -44,7 +44,7 @@ object FromString {
       if (isDefinedAt(s)) resolve(s)
       else
         cmd.runAndExit(
-            println("'%s' is not an existing directory." format resolve(s)))
+          println("'%s' is not an existing directory." format resolve(s)))
   }
 
   /** Argument expander, i.e. turns single argument "foo bar baz" into argument
@@ -67,7 +67,8 @@ object FromString {
     override def isDefinedAt(s: String) = safeToInt(s).isDefined
     def apply(s: String) = safeToInt(s).get
     def safeToInt(s: String): Option[Int] =
-      try Some(java.lang.Integer.parseInt(s)) catch {
+      try Some(java.lang.Integer.parseInt(s))
+      catch {
         case _: NumberFormatException => None
       }
   }

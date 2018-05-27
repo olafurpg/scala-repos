@@ -15,23 +15,26 @@ import org.{HdrHistogram ⇒ hdr}
   *                                       maintain value resolution and separation. Must be a non-negative
   *                                       integer between 0 and 5.
   */
-private[akka] class HdrHistogram(highestTrackableValue: Long,
-                                 numberOfSignificantValueDigits: Int,
-                                 val unit: String = "")
+private[akka] class HdrHistogram(
+    highestTrackableValue: Long,
+    numberOfSignificantValueDigits: Int,
+    val unit: String = "")
     extends Metric {
 
   private val hist =
     new hdr.Histogram(highestTrackableValue, numberOfSignificantValueDigits)
 
   def update(value: Long) {
-    try hist.recordValue(value) catch {
+    try hist.recordValue(value)
+    catch {
       case ex: ArrayIndexOutOfBoundsException ⇒
         throw wrapHistogramOutOfBoundsException(value, ex)
     }
   }
 
   def updateWithCount(value: Long, count: Long) {
-    try hist.recordValueWithCount(value, count) catch {
+    try hist.recordValueWithCount(value, count)
+    catch {
       case ex: ArrayIndexOutOfBoundsException ⇒
         throw wrapHistogramOutOfBoundsException(value, ex)
     }
@@ -41,9 +44,9 @@ private[akka] class HdrHistogram(highestTrackableValue: Long,
       value: Long,
       ex: ArrayIndexOutOfBoundsException): IllegalArgumentException =
     new IllegalArgumentException(
-        s"Given value $value can not be stored in this histogram " +
+      s"Given value $value can not be stored in this histogram " +
         s"(min: ${hist.getLowestTrackableValue}, max: ${hist.getHighestTrackableValue}})",
-        ex)
+      ex)
 
   def getData = hist.copy().getHistogramData
 }

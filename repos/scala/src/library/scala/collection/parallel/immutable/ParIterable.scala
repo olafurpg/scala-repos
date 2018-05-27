@@ -28,11 +28,15 @@ import scala.collection.parallel.Combiner
 trait ParIterable[+T]
     extends scala.collection.GenIterable[T]
     with scala.collection.parallel.ParIterable[T]
-    with GenericParTemplate[T, ParIterable] with ParIterableLike[
-        T, ParIterable[T], scala.collection.immutable.Iterable[T]]
+    with GenericParTemplate[T, ParIterable]
+    with ParIterableLike[
+      T,
+      ParIterable[T],
+      scala.collection.immutable.Iterable[T]]
     with Immutable {
-  override def companion: GenericCompanion[ParIterable] with GenericParCompanion[
-      ParIterable] = ParIterable
+  override def companion
+    : GenericCompanion[ParIterable] with GenericParCompanion[ParIterable] =
+    ParIterable
   // if `immutable.ParIterableLike` is introduced, please move these 4 methods there
   override def toIterable: ParIterable[T] = this
   override def toSeq: ParSeq[T] =

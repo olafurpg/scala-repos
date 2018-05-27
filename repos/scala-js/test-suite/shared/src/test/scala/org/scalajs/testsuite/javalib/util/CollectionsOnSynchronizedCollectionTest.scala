@@ -23,7 +23,7 @@ trait CollectionsSynchronizedCollectionTest
       override def implementationName: String =
         s"synchronizedCollection(${originalFactory.implementationName})"
 
-      override def empty[E : ClassTag]: ju.Collection[E] =
+      override def empty[E: ClassTag]: ju.Collection[E] =
         ju.Collections.synchronizedCollection(originalFactory.empty[E])
     }
   }

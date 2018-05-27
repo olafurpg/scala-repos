@@ -28,16 +28,17 @@ abstract class ResolveTestBase extends ScalaResolveTestCase {
   val Applicable = "applicable" // default: true
   val Accessible = "accessible" // default: true
 
-  val Parameters = List(Resolved,
-                        Name,
-                        File,
-                        Line,
-                        Offset,
-                        Length,
-                        Type,
-                        Path,
-                        Applicable,
-                        Accessible)
+  val Parameters = List(
+    Resolved,
+    Name,
+    File,
+    Line,
+    Offset,
+    Length,
+    Type,
+    Path,
+    Applicable,
+    Accessible)
 
   var options: List[Parameters] = List()
   var references: List[PsiReference] = List()
@@ -76,7 +77,8 @@ abstract class ResolveTestBase extends ScalaResolveTestCase {
     references = references.reverse
 
     Assert.assertFalse(
-        "At least one expectation must be specified", references.isEmpty)
+      "At least one expectation must be specified",
+      references.isEmpty)
     Assert.assertEquals("Options number", references.size, options.size)
 
     null
@@ -84,17 +86,17 @@ abstract class ResolveTestBase extends ScalaResolveTestCase {
 
   def assertKnown(parameters: Parameters) {
     for ((key, value) <- parameters) {
-      Assert.assertTrue("Unknown parameter: " + key +
-                        "\nAllowed: " + Parameters.mkString(", "),
-                        Parameters.contains(key))
+      Assert.assertTrue(
+        "Unknown parameter: " + key +
+          "\nAllowed: " + Parameters.mkString(", "),
+        Parameters.contains(key))
     }
   }
 
   def parseParameters(s: String): Parameters = {
     if (s.isEmpty) Map()
     else
-      Map(
-          s.split("""\s*,\s*""").map(_.trim).map { it: String =>
+      Map(s.split("""\s*,\s*""").map(_.trim).map { it: String =>
         val parts = it.split("""\s*:\s*""")
         (parts(0), parts(1))
       }: _*)
@@ -107,26 +109,27 @@ abstract class ResolveTestBase extends ScalaResolveTestCase {
   def doTest(file: String) {
     references
       .zip(options)
-      .foreach(it =>
-            {
-          it._1 match {
-            case ref: ScReferenceElement =>
-              doEachTest(it._1.asInstanceOf[ScReferenceElement], it._2)
-            case ref: PsiMultiReference =>
-              val hostReferences = ref.getReferences
-              if (hostReferences.length == 2) {
-                hostReferences.find(_.isInstanceOf[ScReferenceElement]) match {
-                  case Some(r: ScReferenceElement) =>
-                    doEachTest(r, it._2)
-                  case _ =>
-                    assert(assertion = false,
-                           message = "Multihost references are not supported")
-                }
-              } else {
-                assert(assertion = false,
-                       message = "Multihost references are not supported")
+      .foreach(it => {
+        it._1 match {
+          case ref: ScReferenceElement =>
+            doEachTest(it._1.asInstanceOf[ScReferenceElement], it._2)
+          case ref: PsiMultiReference =>
+            val hostReferences = ref.getReferences
+            if (hostReferences.length == 2) {
+              hostReferences.find(_.isInstanceOf[ScReferenceElement]) match {
+                case Some(r: ScReferenceElement) =>
+                  doEachTest(r, it._2)
+                case _ =>
+                  assert(
+                    assertion = false,
+                    message = "Multihost references are not supported")
               }
-          }
+            } else {
+              assert(
+                assertion = false,
+                message = "Multihost references are not supported")
+            }
+        }
       })
   }
 
@@ -135,9 +138,8 @@ abstract class ResolveTestBase extends ScalaResolveTestCase {
     val result = reference.advancedResolve
     val (target, accessible, applicable) =
       if (result.isDefined)
-        (result.get.element,
-         result.get.isAccessible,
-         result.get.isApplicable()) else (null, true, true)
+        (result.get.element, result.get.isAccessible, result.get.isApplicable())
+      else (null, true, true)
 
     def message = format(getFileAdapter.getText, _: String, lineOf(reference))
 
@@ -148,32 +150,40 @@ abstract class ResolveTestBase extends ScalaResolveTestCase {
 
     if (options.contains(Resolved) && options(Resolved) == "false") {
       Assert.assertNull(
-          message(referenceName + " must NOT be resolved!"), target)
+        message(referenceName + " must NOT be resolved!"),
+        target)
     } else {
       Assert.assertNotNull(
-          message(referenceName + " must BE resolved!"), target)
+        message(referenceName + " must BE resolved!"),
+        target)
 
       if (options.contains(Accessible) && options(Accessible) == "false") {
         Assert.assertFalse(
-            message(referenceName + " must NOT be accessible!"), accessible)
+          message(referenceName + " must NOT be accessible!"),
+          accessible)
       } else {
         Assert.assertTrue(
-            message(referenceName + " must BE accessible!"), accessible)
+          message(referenceName + " must BE accessible!"),
+          accessible)
       }
 
       if (options.contains(Applicable) && options(Applicable) == "false") {
         Assert.assertFalse(
-            message(referenceName + " must NOT be applicable!"), applicable)
+          message(referenceName + " must NOT be applicable!"),
+          applicable)
       } else {
-        Assert.assertTrue(message(referenceName + " must BE applicable! " +
-                              result.get.problems.mkString("(", ",", ")")),
-                          applicable)
+        Assert.assertTrue(
+          message(
+            referenceName + " must BE applicable! " +
+              result.get.problems.mkString("(", ",", ")")),
+          applicable)
       }
 
       if (options.contains(Path)) {
-        assertEquals(Path,
-                     options(Path),
-                     target.asInstanceOf[ScTypeDefinition].qualifiedName)
+        assertEquals(
+          Path,
+          options(Path),
+          target.asInstanceOf[ScTypeDefinition].qualifiedName)
       }
 
       if (options.contains(File) || options.contains(Offset) ||
@@ -208,9 +218,10 @@ abstract class ResolveTestBase extends ScalaResolveTestCase {
         val targetClass = target.getClass
         val text =
           Type + " - expected: " + expectedClass.getSimpleName + ", actual: " +
-          targetClass.getSimpleName
+            targetClass.getSimpleName
         Assert.assertTrue(
-            message(text), expectedClass.isAssignableFrom(targetClass))
+          message(text),
+          expectedClass.isAssignableFrom(targetClass))
       }
     }
   }

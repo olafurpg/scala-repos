@@ -61,7 +61,7 @@ object LoginDialogDemo extends JFXApp {
       title = "Login Dialog"
       headerText = "Look, a Custom Login Dialog"
       graphic = new ImageView(
-          this.getClass.getResource("login_icon.png").toString)
+        this.getClass.getResource("login_icon.png").toString)
     }
 
     // Set the button types.
@@ -111,7 +111,7 @@ object LoginDialogDemo extends JFXApp {
 
     result match {
       case Some(Result(u, p)) => println("Username=" + u + ", Password=" + p)
-      case None => println("Dialog returned: None")
+      case None               => println("Dialog returned: None")
     }
   }
 }

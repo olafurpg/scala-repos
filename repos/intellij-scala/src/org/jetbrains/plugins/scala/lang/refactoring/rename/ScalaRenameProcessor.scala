@@ -13,8 +13,10 @@ trait ScalaRenameProcessor {
   this: RenamePsiElementProcessor =>
 
   override def setToSearchForTextOccurrences(
-      element: PsiElement, enabled: Boolean): Unit = {
-    ScalaApplicationSettings.getInstance().RENAME_SEARCH_IN_NON_CODE_FILES = enabled
+      element: PsiElement,
+      enabled: Boolean): Unit = {
+    ScalaApplicationSettings.getInstance().RENAME_SEARCH_IN_NON_CODE_FILES =
+      enabled
   }
 
   override def isToSearchForTextOccurrences(element: PsiElement): Boolean = {
@@ -22,7 +24,8 @@ trait ScalaRenameProcessor {
   }
 
   override def setToSearchInComments(
-      element: PsiElement, enabled: Boolean): Unit = {
+      element: PsiElement,
+      enabled: Boolean): Unit = {
     ScalaApplicationSettings
       .getInstance()
       .RENAME_SEARCH_IN_COMMENTS_AND_STRINGS = enabled

@@ -109,8 +109,7 @@ object TypedArrayBufferOps {
       buffer: IntBuffer): TypedArrayBufferOps[Int32Array] =
     new TypedArrayBufferOps(buffer)
 
-  implicit def longBufferOps(
-      buffer: LongBuffer): TypedArrayBufferOps[Nothing] =
+  implicit def longBufferOps(buffer: LongBuffer): TypedArrayBufferOps[Nothing] =
     new TypedArrayBufferOps(buffer)
 
   implicit def floatBufferOps(

@@ -45,7 +45,8 @@ import com.gravity.goose.network.HtmlFetcher
   */
 object ImageSaver extends Logging {
   private def getFileExtension(
-      config: Configuration, fileName: String): String = {
+      config: Configuration,
+      fileName: String): String = {
     var fileExtension: String = ""
     var mimeType: String = null
     try {
@@ -64,29 +65,31 @@ object ImageSaver extends Logging {
         fileExtension = ".png"
       } else {
         throw new IOException(
-            "BAD MIME TYPE: " + mimeType + " FILENAME:" + fileName)
+          "BAD MIME TYPE: " + mimeType + " FILENAME:" + fileName)
       }
     } catch {
       case e: SecretGifException => {
-          throw e
-        }
+        throw e
+      }
       case e: FileNotFoundException => {
-          logger.error(e.getMessage)
-        }
+        logger.error(e.getMessage)
+      }
       case e: IOException => {
-          logger.error(e.getMessage)
-          throw e
-        }
+        logger.error(e.getMessage)
+        throw e
+      }
     } finally {}
     fileExtension
   }
 
   def fetchEntity(
-      httpClient: HttpClient, imageSrc: String): Option[HttpEntity] = {
+      httpClient: HttpClient,
+      imageSrc: String): Option[HttpEntity] = {
 
     val localContext: HttpContext = new BasicHttpContext
     localContext.setAttribute(
-        ClientContext.COOKIE_STORE, HtmlFetcher.emptyCookieStore)
+      ClientContext.COOKIE_STORE,
+      HtmlFetcher.emptyCookieStore)
     val httpget = new HttpGet(imageSrc)
     val response = httpClient.execute(httpget, localContext)
     val respStatus: String = response.getStatusLine.toString
@@ -104,7 +107,9 @@ object ImageSaver extends Logging {
   }
 
   def copyInputStreamToLocalImage(
-      entity: HttpEntity, linkhash: String, config: Configuration): String = {
+      entity: HttpEntity,
+      linkhash: String,
+      config: Configuration): String = {
     val generator: Random = new Random
     val randInt: Int = generator.nextInt
     val localSrcPath = config.localStoragePath + "/" + linkhash + "_" + randInt
@@ -122,7 +127,7 @@ object ImageSaver extends Logging {
       if (f.length < config.minBytesForImages) {
         if (logger.isDebugEnabled) {
           logger.debug(
-              "TOO SMALL AN IMAGE: " + localSrcPath + " bytes: " + f.length)
+            "TOO SMALL AN IMAGE: " + localSrcPath + " bytes: " + f.length)
         }
         return null
       }
@@ -134,8 +139,8 @@ object ImageSaver extends Logging {
       newFilename
     } catch {
       case e: Exception => {
-          throw e
-        }
+        throw e
+      }
     } finally {
       //            entity.consumeContent
       instream.close()
@@ -149,10 +154,11 @@ object ImageSaver extends Logging {
     * @param imageSrc
     * @return
     */
-  def storeTempImage(httpClient: HttpClient,
-                     linkhash: String,
-                     imageSrcMaster: String,
-                     config: Configuration): String = {
+  def storeTempImage(
+      httpClient: HttpClient,
+      linkhash: String,
+      imageSrcMaster: String,
+      config: Configuration): String = {
     var imageSrc = imageSrcMaster
 
     try {
@@ -162,37 +168,37 @@ object ImageSaver extends Logging {
       fetchEntity(httpClient, imageSrc) match {
         case Some(entity) => {
 
-            try {
-              return copyInputStreamToLocalImage(entity, linkhash, config)
-            } catch {
-              case e: SecretGifException => {
-                  throw e
-                }
-              case e: Exception => {
-                  logger.error(e.getMessage); null
-                }
+          try {
+            return copyInputStreamToLocalImage(entity, linkhash, config)
+          } catch {
+            case e: SecretGifException => {
+              throw e
+            }
+            case e: Exception => {
+              logger.error(e.getMessage); null
             }
           }
+        }
         case None => trace("Unable to get entity for: " + imageSrc); null
       }
     } catch {
       case e: IllegalArgumentException => {
-          logger.warn(e.getMessage)
-        }
+        logger.warn(e.getMessage)
+      }
       case e: SecretGifException => {
-          raise(e)
-        }
+        raise(e)
+      }
       case e: ClientProtocolException => {
-          logger.error(e.toString)
-        }
+        logger.error(e.toString)
+      }
       case e: IOException => {
-          logger.error(e.toString)
-        }
+        logger.error(e.toString)
+      }
       case e: Exception => {
-          e.printStackTrace()
-          logger.error(e.toString)
-          e.printStackTrace()
-        }
+        e.printStackTrace()
+        logger.error(e.toString)
+        e.printStackTrace()
+      }
     } finally {}
     null
   }

@@ -68,18 +68,21 @@ object CustomRuntime {
           } catch {
             case PicklingException(msg, cause) =>
               throw PicklingException(
-                  s"""error in unpickle of 'mkRuntimeTravPickler':
+                s"""error in unpickle of 'mkRuntimeTravPickler':
                                        |collTag: '${collTag.key}'
                                        |elemTag: '${elemTag.key}'
                                        |message:
-                                       |$msg""".stripMargin, cause)
+                                       |$msg""".stripMargin,
+                cause
+              )
             case e: Exception =>
               e.printStackTrace()
               throw PicklingException(
-                  s"""exception in unpickle of 'mkRuntimeTravPickler':
+                s"""exception in unpickle of 'mkRuntimeTravPickler':
                                        |collTag: '${collTag.key}'
                                        |elemTag: '${elemTag.key}'""".stripMargin,
-                  Some(e))
+                Some(e)
+              )
           }
         }
 
@@ -93,7 +96,9 @@ object CustomRuntime {
 class Tuple2RTKnownTagUnpickler[L, R](lhs: Unpickler[L], rhs: Unpickler[R])
     extends AbstractUnpickler[(L, R)] {
   def unpickleField[T](
-      name: String, reader: PReader, unpickler: Unpickler[T]): T = {
+      name: String,
+      reader: PReader,
+      unpickler: Unpickler[T]): T = {
     val reader1 = reader.readField(name)
     // TODO - Always elide tags?
     if (unpickler.tag.isEffectivelyPrimitive)
@@ -116,8 +121,9 @@ class Tuple2RTPickler() extends AbstractPicklerUnpickler[(Any, Any)] {
   def pickleField(name: String, value: Any, builder: PBuilder): Unit = {
     val (tag1, pickler1) =
       if (value == null) {
-        (FastTypeTag.Null.asInstanceOf[FastTypeTag[Any]],
-         Defaults.nullPickler.asInstanceOf[Pickler[Any]])
+        (
+          FastTypeTag.Null.asInstanceOf[FastTypeTag[Any]],
+          Defaults.nullPickler.asInstanceOf[Pickler[Any]])
       } else {
         val clazz = value.getClass
         val tag = FastTypeTag
@@ -126,14 +132,12 @@ class Tuple2RTPickler() extends AbstractPicklerUnpickler[(Any, Any)] {
         val pickler = scala.pickling.internal.currentRuntime.picklers
           .genPickler(clazz.getClassLoader, clazz, tag)
           .asInstanceOf[Pickler[Any]]
-          (tag, pickler)
+        (tag, pickler)
       }
 
-    builder.putField(name,
-                     b =>
-                       {
-                         pickler1.pickle(value, b)
-                     })
+    builder.putField(name, b => {
+      pickler1.pickle(value, b)
+    })
   }
 
   def pickle(picklee: (Any, Any), builder: PBuilder): Unit = {
@@ -168,11 +172,13 @@ class Tuple2RTPickler() extends AbstractPicklerUnpickler[(Any, Any)] {
         } catch {
           case PicklingException(msg, cause) =>
             throw PicklingException(
-                s"""error in unpickle of '${this.getClass.getName}':
+              s"""error in unpickle of '${this.getClass.getName}':
                                        |field name: '$name'
                                        |field tag: '${tag1}'
                                        |message:
-                                       |$msg""".stripMargin, cause)
+                                       |$msg""".stripMargin,
+              cause
+            )
         }
       }
     }

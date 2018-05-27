@@ -19,10 +19,11 @@ abstract class OperationsOnCollectionInspectionTest
   }
 
   protected def testFix(text: String, result: String, hint: String) {
-    testQuickFix(text.replace("\r", ""),
-                 result.replace("\r", ""),
-                 hint,
-                 inspectionClass)
+    testQuickFix(
+      text.replace("\r", ""),
+      result.replace("\r", ""),
+      hint,
+      inspectionClass)
   }
 
   def doTest(selected: String, text: String, result: String) = {

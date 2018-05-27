@@ -28,8 +28,7 @@ class ServiceFactoryCacheTest extends FunSuite with MockitoSugar {
     news += (i -> (1 + news.getOrElse(i, 0)))
 
     def apply(conn: ClientConnection) =
-      Future.value(
-          new Service[String, String] {
+      Future.value(new Service[String, String] {
         factories = factories + (i -> (factories(i) + 1))
         def apply(req: String) = Future.value(i.toString)
         override def close(deadline: Time) = {
@@ -50,13 +49,12 @@ class ServiceFactoryCacheTest extends FunSuite with MockitoSugar {
     def close(deadline: Time) = Future.Done
   }
 
-  test("cache, evict")(
-      Time.withCurrentTimeFrozen { tc =>
+  test("cache, evict")(Time.withCurrentTimeFrozen { tc =>
     val newFactory: Int => ServiceFactory[String, String] = { i =>
       SF(i)
     }
-    val cache = new ServiceFactoryCache[Int, String, String](
-        newFactory, maxCacheSize = 2)
+    val cache =
+      new ServiceFactoryCache[Int, String, String](newFactory, maxCacheSize = 2)
 
     assert(factories.isEmpty)
 

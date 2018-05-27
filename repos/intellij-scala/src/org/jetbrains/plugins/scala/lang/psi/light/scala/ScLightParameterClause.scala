@@ -6,7 +6,10 @@ import com.intellij.psi.impl.light.LightElement
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScPrimaryConstructor
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScFunctionExpr
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScParameter, ScParameterClause}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScParameter,
+  ScParameterClause
+}
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.lang.psi.{ScalaPsiElement, ScalaPsiUtil}
 
@@ -31,8 +34,8 @@ class ScLightParameterClause(types: List[ScType], clause: ScParameterClause)
   override def addParameter(param: ScParameter): ScParameterClause =
     throw new UnsupportedOperationException("Operation on light element")
 
-  override protected def findChildrenByClassScala[
-      T >: Null <: ScalaPsiElement](clazz: Class[T]): Array[T] =
+  override protected def findChildrenByClassScala[T >: Null <: ScalaPsiElement](
+      clazz: Class[T]): Array[T] =
     throw new UnsupportedOperationException("Operation on light element")
 
   override protected def findChildByClassScala[T >: Null <: ScalaPsiElement](
@@ -40,10 +43,11 @@ class ScLightParameterClause(types: List[ScType], clause: ScParameterClause)
     throw new UnsupportedOperationException("Operation on light element")
 
   override def owner: PsiElement = {
-    ScalaPsiUtil.getContextOfType(this,
-                                  true,
-                                  classOf[ScFunctionExpr],
-                                  classOf[ScFunction],
-                                  classOf[ScPrimaryConstructor])
+    ScalaPsiUtil.getContextOfType(
+      this,
+      true,
+      classOf[ScFunctionExpr],
+      classOf[ScFunction],
+      classOf[ScPrimaryConstructor])
   }
 }

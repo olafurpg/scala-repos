@@ -7,12 +7,24 @@ import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.ScalaBundle
 import org.jetbrains.plugins.scala.codeInsight.intention.IntentionUtil
 import org.jetbrains.plugins.scala.lang.psi.TypeAdjuster
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScBindingPattern, ScTypedPattern, ScWildcardPattern}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScBindingPattern,
+  ScTypedPattern,
+  ScWildcardPattern
+}
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScTypeElement
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameter
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunctionDefinition, ScPatternDefinition, ScVariableDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunctionDefinition,
+  ScPatternDefinition,
+  ScVariableDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
-import org.jetbrains.plugins.scala.lang.psi.types.{BaseTypes, ScType, ScTypeText}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  BaseTypes,
+  ScType,
+  ScTypeText
+}
 import org.jetbrains.plugins.scala.util.IntentionAvailabilityChecker
 
 /**
@@ -21,13 +33,18 @@ import org.jetbrains.plugins.scala.util.IntentionAvailabilityChecker
   */
 class MakeTypeMoreSpecificIntention extends PsiElementBaseIntentionAction {
   override def invoke(
-      project: Project, editor: Editor, element: PsiElement): Unit = {
+      project: Project,
+      editor: Editor,
+      element: PsiElement): Unit = {
     ToggleTypeAnnotation.complete(
-        new MakeTypeMoreSpecificStrategy(Option(editor)), element)
+      new MakeTypeMoreSpecificStrategy(Option(editor)),
+      element)
   }
 
   override def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+      project: Project,
+      editor: Editor,
+      element: PsiElement): Boolean = {
     if (element == null ||
         !IntentionAvailabilityChecker.checkIntention(this, element)) false
     else {
@@ -37,13 +54,14 @@ class MakeTypeMoreSpecificIntention extends PsiElementBaseIntentionAction {
         isAvailable = true
       }
       val desc = new StrategyAdapter {
-        override def removeFromVariable(variable: ScVariableDefinition): Unit = {
+        override def removeFromVariable(
+            variable: ScVariableDefinition): Unit = {
           for {
             declared <- variable.declaredType
             expr <- variable.expr
             tp <- expr.getType() if MakeTypeMoreSpecificStrategy
-                   .computeBaseTypes(declared, tp)
-                   .nonEmpty
+              .computeBaseTypes(declared, tp)
+              .nonEmpty
           } text(ScalaBundle.message("make.type.more.specific"))
         }
 
@@ -52,18 +70,19 @@ class MakeTypeMoreSpecificIntention extends PsiElementBaseIntentionAction {
             declared <- value.declaredType
             expr <- value.expr
             tp <- expr.getType() if MakeTypeMoreSpecificStrategy
-                   .computeBaseTypes(declared, tp)
-                   .nonEmpty
+              .computeBaseTypes(declared, tp)
+              .nonEmpty
           } text(ScalaBundle.message("make.type.more.specific"))
         }
 
-        override def removeFromFunction(function: ScFunctionDefinition): Unit = {
+        override def removeFromFunction(
+            function: ScFunctionDefinition): Unit = {
           for {
             declared <- function.returnType
             expr <- function.body
             tp <- expr.getType() if MakeTypeMoreSpecificStrategy
-                   .computeBaseTypes(declared, tp)
-                   .nonEmpty
+              .computeBaseTypes(declared, tp)
+              .nonEmpty
           } text(ScalaBundle.message("make.type.more.specific.fun"))
         }
       }
@@ -80,17 +99,17 @@ class MakeTypeMoreSpecificIntention extends PsiElementBaseIntentionAction {
 class MakeTypeMoreSpecificStrategy(editor: Option[Editor]) extends Strategy {
   import MakeTypeMoreSpecificStrategy._
 
-  def doTemplate(te: ScTypeElement,
-                 declaredType: ScType,
-                 dynamicType: ScType,
-                 context: PsiElement,
-                 editor: Editor): Unit = {
-    val types = computeBaseTypes(declaredType, dynamicType).sortWith(
-        (t1, t2) => t1.conforms(t2))
+  def doTemplate(
+      te: ScTypeElement,
+      declaredType: ScType,
+      dynamicType: ScType,
+      context: PsiElement,
+      editor: Editor): Unit = {
+    val types = computeBaseTypes(declaredType, dynamicType).sortWith((t1, t2) =>
+      t1.conforms(t2))
     if (types.size == 1) {
-      val replaced = te.replace(
-          ScalaPsiElementFactory.createTypeElementFromText(
-              types.head.canonicalText, te.getContext, te))
+      val replaced = te.replace(ScalaPsiElementFactory
+        .createTypeElementFromText(types.head.canonicalText, te.getContext, te))
       TypeAdjuster.markToAdjust(replaced)
     } else {
       val texts = types.map(ScTypeText)
@@ -148,7 +167,8 @@ class MakeTypeMoreSpecificStrategy(editor: Option[Editor]) extends Strategy {
 
 object MakeTypeMoreSpecificStrategy {
   def computeBaseTypes(
-      declaredType: ScType, dynamicType: ScType): Seq[ScType] = {
+      declaredType: ScType,
+      dynamicType: ScType): Seq[ScType] = {
     val baseTypes = dynamicType +: BaseTypes.get(dynamicType)
     baseTypes.filter(t => t.conforms(declaredType) && !t.equiv(declaredType))
   }

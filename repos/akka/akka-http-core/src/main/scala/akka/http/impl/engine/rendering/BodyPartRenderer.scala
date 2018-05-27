@@ -24,10 +24,11 @@ import scala.concurrent.forkjoin.ThreadLocalRandom
   */
 private[http] object BodyPartRenderer {
 
-  def streamed(boundary: String,
-               nioCharset: Charset,
-               partHeadersSizeHint: Int,
-               log: LoggingAdapter)
+  def streamed(
+      boundary: String,
+      nioCharset: Charset,
+      partHeadersSizeHint: Int,
+      log: LoggingAdapter)
     : PushPullStage[Multipart.BodyPart, Source[ChunkStreamPart, Any]] =
     new PushPullStage[Multipart.BodyPart, Source[ChunkStreamPart, Any]] {
       var firstBoundaryRendered = false
@@ -35,8 +36,8 @@ private[http] object BodyPartRenderer {
       override def onPush(
           bodyPart: Multipart.BodyPart,
           ctx: Context[Source[ChunkStreamPart, Any]]): SyncDirective = {
-        val r = new CustomCharsetByteStringRendering(
-            nioCharset, partHeadersSizeHint)
+        val r =
+          new CustomCharsetByteStringRendering(nioCharset, partHeadersSizeHint)
 
         def bodyPartChunks(
             data: Source[ByteString, Any]): Source[ChunkStreamPart, Any] = {
@@ -53,7 +54,9 @@ private[http] object BodyPartRenderer {
           }
 
         renderBoundary(
-            r, boundary, suppressInitialCrLf = !firstBoundaryRendered)
+          r,
+          boundary,
+          suppressInitialCrLf = !firstBoundaryRendered)
         firstBoundaryRendered = true
         renderEntityContentType(r, bodyPart.entity)
         renderHeaders(r, bodyPart.headers, log)
@@ -80,13 +83,14 @@ private[http] object BodyPartRenderer {
         Source.single(Chunk(byteString))
     }
 
-  def strict(parts: immutable.Seq[Multipart.BodyPart.Strict],
-             boundary: String,
-             nioCharset: Charset,
-             partHeadersSizeHint: Int,
-             log: LoggingAdapter): ByteString = {
-    val r = new CustomCharsetByteStringRendering(
-        nioCharset, partHeadersSizeHint)
+  def strict(
+      parts: immutable.Seq[Multipart.BodyPart.Strict],
+      boundary: String,
+      nioCharset: Charset,
+      partHeadersSizeHint: Int,
+      log: LoggingAdapter): ByteString = {
+    val r =
+      new CustomCharsetByteStringRendering(nioCharset, partHeadersSizeHint)
     if (parts.nonEmpty) {
       for (part ← parts) {
         renderBoundary(r, boundary, suppressInitialCrLf = part eq parts.head)
@@ -100,7 +104,9 @@ private[http] object BodyPartRenderer {
   }
 
   private def renderBoundary(
-      r: Rendering, boundary: String, suppressInitialCrLf: Boolean): Unit = {
+      r: Rendering,
+      boundary: String,
+      suppressInitialCrLf: Boolean): Unit = {
     if (!suppressInitialCrLf) r ~~ CrLf
     r ~~ '-' ~~ '-' ~~ boundary ~~ CrLf
   }
@@ -108,26 +114,28 @@ private[http] object BodyPartRenderer {
   private def renderFinalBoundary(r: Rendering, boundary: String): Unit =
     r ~~ CrLf ~~ '-' ~~ '-' ~~ boundary ~~ '-' ~~ '-'
 
-  private def renderHeaders(r: Rendering,
-                            headers: immutable.Seq[HttpHeader],
-                            log: LoggingAdapter): Unit = {
+  private def renderHeaders(
+      r: Rendering,
+      headers: immutable.Seq[HttpHeader],
+      log: LoggingAdapter): Unit = {
     headers foreach renderHeader(r, log)
     r ~~ CrLf
   }
 
   private def renderHeader(
-      r: Rendering, log: LoggingAdapter): HttpHeader ⇒ Unit = {
+      r: Rendering,
+      log: LoggingAdapter): HttpHeader ⇒ Unit = {
     case x: `Content-Length` ⇒
       suppressionWarning(
-          log,
-          x,
-          "explicit `Content-Length` header is not allowed. Use the appropriate HttpEntity subtype.")
+        log,
+        x,
+        "explicit `Content-Length` header is not allowed. Use the appropriate HttpEntity subtype.")
 
     case x: `Content-Type` ⇒
       suppressionWarning(
-          log,
-          x,
-          "explicit `Content-Type` header is not allowed. Set `HttpRequest.entity.contentType` instead.")
+        log,
+        x,
+        "explicit `Content-Type` header is not allowed. Set `HttpRequest.entity.contentType` instead.")
 
     case x: RawHeader if (x is "content-type") || (x is "content-length") ⇒
       suppressionWarning(log, x, "illegal RawHeader")

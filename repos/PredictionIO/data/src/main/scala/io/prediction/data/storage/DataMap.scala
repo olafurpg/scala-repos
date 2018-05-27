@@ -39,8 +39,7 @@ case class DataMapException(msg: String, cause: Exception)
   */
 class DataMap(
     val fields: Map[String, JValue]
-)
-    extends Serializable {
+) extends Serializable {
   @transient lazy implicit private val formats =
     DefaultFormats + new DateTimeJson4sSupport.Serializer
 
@@ -71,7 +70,7 @@ class DataMap(
     * @param name The property name
     * @return Return the property value of type T
     */
-  def get[T : Manifest](name: String): T = {
+  def get[T: Manifest](name: String): T = {
     require(name)
     fields(name) match {
       case JNull =>
@@ -87,7 +86,7 @@ class DataMap(
     * @param name The property name
     * @return Return the property value of type Option[T]
     */
-  def getOpt[T : Manifest](name: String): Option[T] = {
+  def getOpt[T: Manifest](name: String): Option[T] = {
     // either the field doesn't exist or its value is null
     fields.get(name).flatMap(_.extract[Option[T]])
   }
@@ -100,7 +99,7 @@ class DataMap(
     * @param default The default property value of type T
     * @return Return the property value of type T
     */
-  def getOrElse[T : Manifest](name: String, default: T): T = {
+  def getOrElse[T: Manifest](name: String, default: T): T = {
     getOpt[T](name).getOrElse(default)
   }
 
@@ -119,9 +118,9 @@ class DataMap(
     }
 
     fields.get(name) match {
-      case None => null.asInstanceOf[T]
+      case None        => null.asInstanceOf[T]
       case Some(JNull) => null.asInstanceOf[T]
-      case Some(x) => x.extract[T](formats, manifest)
+      case Some(x)     => x.extract[T](formats, manifest)
     }
   }
 
@@ -133,11 +132,11 @@ class DataMap(
     */
   def getStringList(name: String): java.util.List[String] = {
     fields.get(name) match {
-      case None => null
+      case None        => null
       case Some(JNull) => null
       case Some(x) =>
         JavaConversions.seqAsJavaList(
-            x.extract[List[String]](formats, manifest[List[String]]))
+          x.extract[List[String]](formats, manifest[List[String]]))
     }
   }
 
@@ -186,7 +185,7 @@ class DataMap(
     *
     * @return the object of type T.
     */
-  def extract[T : Manifest]: T = {
+  def extract[T: Manifest]: T = {
     toJObject().extract[T]
   }
 

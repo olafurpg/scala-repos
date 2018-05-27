@@ -18,7 +18,7 @@ object RedisClient {
     val getResult = Await.result(client.get(StringToChannelBuffer("foo")))
     getResult match {
       case Some(n) => println("Got result: " + new String(n.array))
-      case None => println("Didn't get the value!")
+      case None    => println("Didn't get the value!")
     }
 
     println("Closing client...")

@@ -23,18 +23,20 @@ object SbtModule {
     Option(module.setOption(ImportsKey, imports.mkString(Delimiter)))
 
   def getResolversFrom(module: Module): Set[SbtResolver] =
-    Option(module.getOptionValue(ResolversKey)).map { str =>
-      str
-        .split(Delimiter)
-        .map(SbtResolver.fromString)
-        .collect {
-          case Some(r) => r
-        }
-        .toSet
-    }.getOrElse(Set.empty)
+    Option(module.getOptionValue(ResolversKey))
+      .map { str =>
+        str
+          .split(Delimiter)
+          .map(SbtResolver.fromString)
+          .collect {
+            case Some(r) => r
+          }
+          .toSet
+      }
+      .getOrElse(Set.empty)
 
   def setResolversTo(module: Module, resolvers: Set[SbtResolver]) =
     Option(
-        module.setOption(
-            ResolversKey, resolvers.map(_.toString).mkString(Delimiter)))
+      module
+        .setOption(ResolversKey, resolvers.map(_.toString).mkString(Delimiter)))
 }

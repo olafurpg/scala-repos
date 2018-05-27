@@ -25,7 +25,9 @@ private[scala] trait MarkupParserCommon {
 
   def mkAttributes(name: String, pscope: NamespaceType): AttributesType
   def mkProcInstr(
-      position: PositionType, name: String, text: String): ElementType
+      position: PositionType,
+      name: String,
+      text: String): ElementType
 
   /** parse a start or empty tag.
     *  [40] STag         ::= '<' Name { S Attribute } [S]
@@ -87,7 +89,8 @@ private[scala] trait MarkupParserCommon {
     if (ch == SU) truncatedError("")
     else if (!isNameStart(ch))
       return errorAndResult(
-          "name expected, but char '%s' cannot start a name" format ch, "")
+        "name expected, but char '%s' cannot start a name" format ch,
+        "")
 
     val buf = new StringBuilder
 
@@ -109,10 +112,11 @@ private[scala] trait MarkupParserCommon {
 
   def xCharRef(it: Iterator[Char]): String = {
     var c = it.next()
-    Utility.parseCharRef(() => c,
-                         () => { c = it.next() },
-                         reportSyntaxError _,
-                         truncatedError _)
+    Utility.parseCharRef(
+      () => c,
+      () => { c = it.next() },
+      reportSyntaxError _,
+      truncatedError _)
   }
 
   def xCharRef: String = xCharRef(() => ch, () => nextch())
@@ -170,16 +174,18 @@ private[scala] trait MarkupParserCommon {
   /** Execute body with a variable saved and restored after execution */
   def saving[A, B](getter: A, setter: A => Unit)(body: => B): B = {
     val saved = getter
-    try body finally setter(saved)
+    try body
+    finally setter(saved)
   }
 
   /** Take characters from input stream until given String "until"
     *  is seen.  Once seen, the accumulated characters are passed
     *  along with the current Position to the supplied handler function.
     */
-  protected def xTakeUntil[T](handler: (PositionType, String) => T,
-                              positioner: () => PositionType,
-                              until: String): T = {
+  protected def xTakeUntil[T](
+      handler: (PositionType, String) => T,
+      positioner: () => PositionType,
+      until: String): T = {
     val sb = new StringBuilder
     val head = until.head
     val rest = until.tail

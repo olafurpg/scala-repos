@@ -128,18 +128,18 @@ class ChannelStatsHandlerTest extends FunSuite with MockitoSugar {
   }
 
   channelLifeCycleTest(
-      "closes",
-      (handler, ctx) => handler.close(ctx, mock[ChannelPromise])
+    "closes",
+    (handler, ctx) => handler.close(ctx, mock[ChannelPromise])
   )
 
   channelLifeCycleTest(
-      "closechans",
-      (handler, ctx) => handler.channelInactive(ctx)
+    "closechans",
+    (handler, ctx) => handler.channelInactive(ctx)
   )
 
   channelLifeCycleTest(
-      "connects",
-      (handler, ctx) => handler.channelActive(ctx)
+    "connects",
+    (handler, ctx) => handler.channelActive(ctx)
   )
 
   test("ChannelStatsHandler records connection duration") {
@@ -167,7 +167,7 @@ class ChannelStatsHandlerTest extends FunSuite with MockitoSugar {
     assert(sr.counters(Seq("exn", "java.lang.RuntimeException")) == 1)
     assert(sr.counters(Seq("exn", "java.lang.Exception")) == 1)
     assert(
-        sr.counters(Seq("exn", "java.util.concurrent.TimeoutException")) == 1)
+      sr.counters(Seq("exn", "java.util.concurrent.TimeoutException")) == 1)
   }
 
   test("ChannelStatsHandler counts sent and received bytes") {
@@ -176,7 +176,9 @@ class ChannelStatsHandlerTest extends FunSuite with MockitoSugar {
 
     handler.channelActive(ctx)
     handler.write(
-        ctx, wrappedBuffer(Array.fill(42)(0.toByte)), mock[ChannelPromise])
+      ctx,
+      wrappedBuffer(Array.fill(42)(0.toByte)),
+      mock[ChannelPromise])
     handler.channelInactive(ctx)
 
     assert(sr.counter("sent_bytes")() == 42)

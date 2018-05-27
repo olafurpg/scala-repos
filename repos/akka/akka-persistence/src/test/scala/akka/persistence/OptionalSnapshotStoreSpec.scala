@@ -33,23 +33,23 @@ object OptionalSnapshotStoreSpec {
 }
 
 class OptionalSnapshotStoreSpec
-    extends PersistenceSpec(
-        ConfigFactory.parseString(s"""
+    extends PersistenceSpec(ConfigFactory.parseString(s"""
     akka.persistence.publish-plugin-commands = on
     akka.persistence.journal.plugin = "akka.persistence.journal.inmem"
     akka.persistence.journal.leveldb.dir = "target/journal-${classOf[
-        OptionalSnapshotStoreSpec].getName}"
+      OptionalSnapshotStoreSpec].getName}"
 
     akka.actor.warn-about-java-serializer-usage = off
 
     # snapshot store plugin is NOT defined, things should still work
     akka.persistence.snapshot-store.local.dir = "target/snapshots-${classOf[
-        OptionalSnapshotStoreSpec].getName}/"
-  """)) with ImplicitSender {
+      OptionalSnapshotStoreSpec].getName}/"
+  """))
+    with ImplicitSender {
   import OptionalSnapshotStoreSpec._
 
   system.eventStream.publish(
-      TestEvent.Mute(EventFilter[akka.pattern.AskTimeoutException]()))
+    TestEvent.Mute(EventFilter[akka.pattern.AskTimeoutException]()))
 
   "Persistence extension" must {
     "initialize properly even in absence of configured snapshot store" in {
@@ -64,12 +64,12 @@ class OptionalSnapshotStoreSpec
         system.actorOf(Props(classOf[AnyPersistentActor], name))
       persistentActor ! "snap"
       expectMsgType[SaveSnapshotFailure].cause.getMessage should include(
-          "No snapshot store configured")
+        "No snapshot store configured")
     }
 
     "successfully save a snapshot when no default snapshot-store configured, yet PersistentActor picked one explicitly" in {
-      val persistentActor = system.actorOf(
-          Props(classOf[PickedSnapshotStorePersistentActor], name))
+      val persistentActor =
+        system.actorOf(Props(classOf[PickedSnapshotStorePersistentActor], name))
       persistentActor ! "snap"
       expectMsgType[SaveSnapshotSuccess]
     }

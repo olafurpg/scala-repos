@@ -46,7 +46,7 @@ private[spark] object SignalLogger {
         }
       }
       log.info(
-          "Registered signal handlers for [" + signals.mkString(", ") + "]")
+        "Registered signal handlers for [" + signals.mkString(", ") + "]")
     }
   }
 }
@@ -58,7 +58,7 @@ private sealed class SignalLoggerHandler(name: String, log: Logger)
 
   override def handle(signal: Signal): Unit = {
     log.error(
-        "RECEIVED SIGNAL " + signal.getNumber() + ": SIG" + signal.getName())
+      "RECEIVED SIGNAL " + signal.getNumber() + ": SIG" + signal.getName())
     prevHandler.handle(signal)
   }
 }

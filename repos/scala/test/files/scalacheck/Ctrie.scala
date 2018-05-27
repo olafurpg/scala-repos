@@ -26,18 +26,19 @@ object Test extends Properties("concurrent.TrieMap") {
   /* helpers */
 
   def inParallel[T](totalThreads: Int)(body: Int => T): Seq[T] = {
-    val threads = for (idx <- 0 until totalThreads) yield
-      new Thread {
-        setName("ParThread-" + idx)
-        private var res: T = _
-        override def run() {
-          res = body(idx)
+    val threads = for (idx <- 0 until totalThreads)
+      yield
+        new Thread {
+          setName("ParThread-" + idx)
+          private var res: T = _
+          override def run() {
+            res = body(idx)
+          }
+          def result = {
+            this.join()
+            res
+          }
         }
-        def result = {
-          this.join()
-          res
-        }
-      }
 
     threads foreach (_.start())
     threads map (_.result)
@@ -61,7 +62,10 @@ object Test extends Properties("concurrent.TrieMap") {
     }
   }
 
-  def elementRange(threadIdx: Int, totalThreads: Int, totalElems: Int): Range = {
+  def elementRange(
+      threadIdx: Int,
+      totalThreads: Int,
+      totalElems: Int): Range = {
     val sz = totalElems
     val idx = threadIdx
     val p = totalThreads
@@ -119,9 +123,9 @@ object Test extends Properties("concurrent.TrieMap") {
 
       val ok =
         growing &&
-        ((0 until sz) forall {
-              case i => ct.get(Wrap(i)) == Some(i)
-            })
+          ((0 until sz) forall {
+            case i => ct.get(Wrap(i)) == Some(i)
+          })
 
       ok
   }
@@ -169,8 +173,8 @@ object Test extends Properties("concurrent.TrieMap") {
 
     (results forall (_ == None)) &&
     ((0 until sz) forall {
-          case i => ct.get(Wrap(i)) == Some(i)
-        })
+      case i => ct.get(Wrap(i)) == Some(i)
+    })
   }
 
   property("concurrent getOrElseUpdate") = forAll(threadCounts, sizes) {
@@ -187,7 +191,7 @@ object Test extends Properties("concurrent.TrieMap") {
 
       (totalInserts.get == sz) &&
       ((0 until sz) forall {
-            case i => ct(Wrap(i)).split(":")(1).toInt == i
-          })
+        case i => ct(Wrap(i)).split(":")(1).toInt == i
+      })
   }
 }

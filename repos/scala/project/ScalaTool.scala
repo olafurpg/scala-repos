@@ -7,11 +7,12 @@ import org.apache.commons.lang3.StringUtils.replaceEach
   *
   * This is a simplified copy of Ant task (see scala.tools.ant.ScalaTool).
   */
-case class ScalaTool(mainClass: String,
-                     classpath: List[String],
-                     properties: Map[String, String],
-                     javaOpts: String,
-                     toolFlags: String) {
+case class ScalaTool(
+    mainClass: String,
+    classpath: List[String],
+    properties: Map[String, String],
+    javaOpts: String,
+    toolFlags: String) {
   //  For classpath, the platform specific
   //  demarcation of any script variables (e.g. `${SCALA_HOME}` or
   //  `%SCALA_HOME%`) can be specified in a platform independent way (e.g.
@@ -36,13 +37,13 @@ case class ScalaTool(mainClass: String,
           .replaceAll(varRegex, """\${$1}""")
 
     val variables = Map(
-        ("@@" -> "@"), // for backwards compatibility
-        ("@class@" -> mainClass),
-        ("@properties@" ->
-            (properties map { case (k, v) => s"""-D$k="$v"""" } mkString " ")),
-        ("@javaflags@" -> javaOpts),
-        ("@toolflags@" -> toolFlags),
-        ("@classpath@" -> platformClasspath)
+      ("@@" -> "@"), // for backwards compatibility
+      ("@class@" -> mainClass),
+      ("@properties@" ->
+        (properties map { case (k, v) => s"""-D$k="$v"""" } mkString " ")),
+      ("@javaflags@" -> javaOpts),
+      ("@toolflags@" -> toolFlags),
+      ("@classpath@" -> platformClasspath)
     )
 
     val (from, to) = variables.unzip
@@ -50,18 +51,23 @@ case class ScalaTool(mainClass: String,
   }
 
   def writeScript(
-      file: String, platform: String, rootDir: File, outDir: File): File = {
+      file: String,
+      platform: String,
+      rootDir: File,
+      outDir: File): File = {
     val forWindows = platform match {
       case "windows" => true
-      case _ => false
+      case _         => false
     }
     val templatePath = s"scala/tools/ant/templates/tool-$platform.tmpl"
     val suffix = if (forWindows) ".bat" else ""
     val scriptFile = outDir / s"$file$suffix"
     val patched = patchedToolScript(
-        IO.read(rootDir / templatePath).replace("\r", ""), forWindows)
+      IO.read(rootDir / templatePath).replace("\r", ""),
+      forWindows)
     IO.write(
-        scriptFile, if (forWindows) patched.replace("\n", "\r\n") else patched)
+      scriptFile,
+      if (forWindows) patched.replace("\n", "\r\n") else patched)
     scriptFile
   }
 }

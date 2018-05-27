@@ -44,8 +44,8 @@ case object Empty extends FlatMapFn[Nothing] {
   def apply(te: TupleEntry) = Iterator.empty
 
   override def filter(fn2: Nothing => Boolean): FlatMapFn[Nothing] = this
-  override def flatMap[R1](
-      fn2: Nothing => TraversableOnce[R1]): FlatMapFn[R1] = this
+  override def flatMap[R1](fn2: Nothing => TraversableOnce[R1]): FlatMapFn[R1] =
+    this
   override def map[R1](fn2: Nothing => R1): FlatMapFn[R1] = this
 }
 case class MapFn[T, R](fmap: FlatMapFn[T], fn: T => R) extends FlatMapFn[R] {

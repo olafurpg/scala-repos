@@ -19,7 +19,8 @@ class Is[T](matcher: Matcher[T]) extends BaseMatcher[T] {
     description.appendText("is ").appendDescriptionOf(matcher)
 
   override def describeMismatch(
-      item: AnyRef, mismatchDescription: Description): Unit = {
+      item: AnyRef,
+      mismatchDescription: Description): Unit = {
     matcher.describeMismatch(item, mismatchDescription)
   }
 }

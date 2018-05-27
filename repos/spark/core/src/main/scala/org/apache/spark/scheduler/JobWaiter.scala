@@ -27,11 +27,13 @@ import org.apache.spark.internal.Logging
   * An object that waits for a DAGScheduler job to complete. As tasks finish, it passes their
   * results to the given handler function.
   */
-private[spark] class JobWaiter[T](dagScheduler: DAGScheduler,
-                                  val jobId: Int,
-                                  totalTasks: Int,
-                                  resultHandler: (Int, T) => Unit)
-    extends JobListener with Logging {
+private[spark] class JobWaiter[T](
+    dagScheduler: DAGScheduler,
+    val jobId: Int,
+    totalTasks: Int,
+    resultHandler: (Int, T) => Unit)
+    extends JobListener
+    with Logging {
 
   private val finishedTasks = new AtomicInteger(0)
   // If the job is finished, this will be its result. In the case of 0 task jobs (e.g. zero

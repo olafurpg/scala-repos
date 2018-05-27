@@ -48,26 +48,29 @@ private[hive] object SparkSQLEnv extends Logging {
 
       sparkConf
         .setAppName(
-            maybeAppName.getOrElse(s"SparkSQL::${Utils.localHostName()}"))
-        .set("spark.serializer",
-             maybeSerializer.getOrElse(
-                 "org.apache.spark.serializer.KryoSerializer"))
-        .set("spark.kryo.referenceTracking",
-             maybeKryoReferenceTracking.getOrElse("false"))
+          maybeAppName.getOrElse(s"SparkSQL::${Utils.localHostName()}"))
+        .set(
+          "spark.serializer",
+          maybeSerializer.getOrElse(
+            "org.apache.spark.serializer.KryoSerializer"))
+        .set(
+          "spark.kryo.referenceTracking",
+          maybeKryoReferenceTracking.getOrElse("false"))
 
       sparkContext = new SparkContext(sparkConf)
       sparkContext.addSparkListener(new StatsReportListener())
       hiveContext = new HiveContext(sparkContext)
 
       hiveContext.metadataHive.setOut(
-          new PrintStream(System.out, true, "UTF-8"))
+        new PrintStream(System.out, true, "UTF-8"))
       hiveContext.metadataHive.setInfo(
-          new PrintStream(System.err, true, "UTF-8"))
+        new PrintStream(System.err, true, "UTF-8"))
       hiveContext.metadataHive.setError(
-          new PrintStream(System.err, true, "UTF-8"))
+        new PrintStream(System.err, true, "UTF-8"))
 
       hiveContext.setConf(
-          "spark.sql.hive.version", HiveContext.hiveExecutionVersion)
+        "spark.sql.hive.version",
+        HiveContext.hiveExecutionVersion)
 
       if (log.isDebugEnabled) {
         hiveContext.hiveconf.getAllProperties.asScala.toSeq.sorted.foreach {

@@ -73,8 +73,10 @@ object Test extends App {
   // println(scalamap)
   // println(scalaparmap)
 
-  assert(scalamap < (javamap * 10),
-         "scalamap: " + scalamap + " vs. javamap: " + javamap)
-  assert(scalaparmap < (javamap * 10),
-         "scalaparmap: " + scalaparmap + " vs. javamap: " + javamap)
+  assert(
+    scalamap < (javamap * 10),
+    "scalamap: " + scalamap + " vs. javamap: " + javamap)
+  assert(
+    scalaparmap < (javamap * 10),
+    "scalaparmap: " + scalaparmap + " vs. javamap: " + javamap)
 }

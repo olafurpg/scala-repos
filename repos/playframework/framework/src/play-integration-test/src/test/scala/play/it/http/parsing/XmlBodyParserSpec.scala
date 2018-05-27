@@ -16,118 +16,134 @@ object XmlBodyParserSpec extends PlaySpecification {
 
   "The XML body parser" should {
 
-    def parse(xml: String,
-              contentType: Option[String],
-              encoding: String,
-              bodyParser: BodyParser[NodeSeq] = BodyParsers.parse.tolerantXml(
-                    1048576))(implicit mat: Materializer) = {
+    def parse(
+        xml: String,
+        contentType: Option[String],
+        encoding: String,
+        bodyParser: BodyParser[NodeSeq] = BodyParsers.parse.tolerantXml(1048576))(
+        implicit mat: Materializer) = {
       await(
-          bodyParser(FakeRequest().withHeaders(
-                  contentType.map(CONTENT_TYPE -> _).toSeq: _*))
-            .run(Source.single(ByteString(xml, encoding)))
+        bodyParser(
+          FakeRequest().withHeaders(
+            contentType.map(CONTENT_TYPE -> _).toSeq: _*))
+          .run(Source.single(ByteString(xml, encoding)))
       )
     }
 
     "parse XML bodies" in new WithApplication() {
-      parse("<foo>bar</foo>", Some("application/xml; charset=utf-8"), "utf-8") must beRight.like {
-        case xml => xml.text must_== "bar"
-      }
+      parse("<foo>bar</foo>", Some("application/xml; charset=utf-8"), "utf-8") must beRight
+        .like {
+          case xml => xml.text must_== "bar"
+        }
     }
 
     "honour the external charset for application sub types" in new WithApplication() {
-      parse("<foo>bär</foo>",
-            Some("application/xml; charset=iso-8859-1"),
-            "iso-8859-1") must beRight.like {
+      parse(
+        "<foo>bär</foo>",
+        Some("application/xml; charset=iso-8859-1"),
+        "iso-8859-1") must beRight.like {
         case xml => xml.text must_== "bär"
       }
-      parse("<foo>bär</foo>",
-            Some("application/xml; charset=utf-16"),
-            "utf-16") must beRight.like {
-        case xml => xml.text must_== "bär"
-      }
+      parse("<foo>bär</foo>", Some("application/xml; charset=utf-16"), "utf-16") must beRight
+        .like {
+          case xml => xml.text must_== "bär"
+        }
     }
 
     "honour the external charset for text sub types" in new WithApplication() {
-      parse("<foo>bär</foo>",
-            Some("text/xml; charset=iso-8859-1"),
-            "iso-8859-1") must beRight.like {
+      parse(
+        "<foo>bär</foo>",
+        Some("text/xml; charset=iso-8859-1"),
+        "iso-8859-1") must beRight.like {
         case xml => xml.text must_== "bär"
       }
-      parse("<foo>bär</foo>", Some("text/xml; charset=utf-16"), "utf-16") must beRight.like {
-        case xml => xml.text must_== "bär"
-      }
+      parse("<foo>bär</foo>", Some("text/xml; charset=utf-16"), "utf-16") must beRight
+        .like {
+          case xml => xml.text must_== "bär"
+        }
     }
 
     "default to iso-8859-1 for text sub types" in new WithApplication() {
-      parse("<foo>bär</foo>", Some("text/xml"), "iso-8859-1") must beRight.like {
-        case xml => xml.text must_== "bär"
-      }
+      parse("<foo>bär</foo>", Some("text/xml"), "iso-8859-1") must beRight
+        .like {
+          case xml => xml.text must_== "bär"
+        }
     }
 
     "default to reading the encoding from the prolog for application sub types" in new WithApplication() {
-      parse("""<?xml version="1.0" encoding="utf-16"?><foo>bär</foo>""",
-            Some("application/xml"),
-            "utf-16") must beRight.like {
+      parse(
+        """<?xml version="1.0" encoding="utf-16"?><foo>bär</foo>""",
+        Some("application/xml"),
+        "utf-16") must beRight.like {
         case xml => xml.text must_== "bär"
       }
-      parse("""<?xml version="1.0" encoding="iso-8859-1"?><foo>bär</foo>""",
-            Some("application/xml"),
-            "iso-8859-1") must beRight.like {
+      parse(
+        """<?xml version="1.0" encoding="iso-8859-1"?><foo>bär</foo>""",
+        Some("application/xml"),
+        "iso-8859-1") must beRight.like {
         case xml => xml.text must_== "bär"
       }
     }
 
     "default to reading the encoding from the prolog for no content type" in new WithApplication() {
-      parse("""<?xml version="1.0" encoding="utf-16"?><foo>bär</foo>""",
-            None,
-            "utf-16") must beRight.like {
+      parse(
+        """<?xml version="1.0" encoding="utf-16"?><foo>bär</foo>""",
+        None,
+        "utf-16") must beRight.like {
         case xml => xml.text must_== "bär"
       }
-      parse("""<?xml version="1.0" encoding="iso-8859-1"?><foo>bär</foo>""",
-            None,
-            "iso-8859-1") must beRight.like {
+      parse(
+        """<?xml version="1.0" encoding="iso-8859-1"?><foo>bär</foo>""",
+        None,
+        "iso-8859-1") must beRight.like {
         case xml => xml.text must_== "bär"
       }
     }
 
     "accept all common xml content types" in new WithApplication() {
-      parse("<foo>bar</foo>",
-            Some("application/xml; charset=utf-8"),
-            "utf-8",
-            BodyParsers.parse.xml) must beRight.like {
+      parse(
+        "<foo>bar</foo>",
+        Some("application/xml; charset=utf-8"),
+        "utf-8",
+        BodyParsers.parse.xml) must beRight.like {
         case xml => xml.text must_== "bar"
       }
-      parse("<foo>bar</foo>",
-            Some("text/xml; charset=utf-8"),
-            "utf-8",
-            BodyParsers.parse.xml) must beRight.like {
+      parse(
+        "<foo>bar</foo>",
+        Some("text/xml; charset=utf-8"),
+        "utf-8",
+        BodyParsers.parse.xml) must beRight.like {
         case xml => xml.text must_== "bar"
       }
-      parse("<foo>bar</foo>",
-            Some("application/xml+rdf; charset=utf-8"),
-            "utf-8",
-            BodyParsers.parse.xml) must beRight.like {
+      parse(
+        "<foo>bar</foo>",
+        Some("application/xml+rdf; charset=utf-8"),
+        "utf-8",
+        BodyParsers.parse.xml) must beRight.like {
         case xml => xml.text must_== "bar"
       }
     }
 
     "reject non XML content types" in new WithApplication() {
-      parse("<foo>bar</foo>",
-            Some("text/plain; charset=utf-8"),
-            "utf-8",
-            BodyParsers.parse.xml) must beLeft
-      parse("<foo>bar</foo>",
-            Some("xml/xml; charset=utf-8"),
-            "utf-8",
-            BodyParsers.parse.xml) must beLeft
+      parse(
+        "<foo>bar</foo>",
+        Some("text/plain; charset=utf-8"),
+        "utf-8",
+        BodyParsers.parse.xml) must beLeft
+      parse(
+        "<foo>bar</foo>",
+        Some("xml/xml; charset=utf-8"),
+        "utf-8",
+        BodyParsers.parse.xml) must beLeft
       parse("<foo>bar</foo>", None, "utf-8", BodyParsers.parse.xml) must beLeft
     }
 
     "gracefully handle invalid xml" in new WithApplication() {
-      parse("<foo",
-            Some("text/xml; charset=utf-8"),
-            "utf-8",
-            BodyParsers.parse.xml) must beLeft
+      parse(
+        "<foo",
+        Some("text/xml; charset=utf-8"),
+        "utf-8",
+        BodyParsers.parse.xml) must beLeft
     }
 
     "parse XML bodies without loading in a related schema" in new WithApplication() {
@@ -145,12 +161,14 @@ object XmlBodyParserSpec extends PlaySpecification {
     "parse XML bodies without loading in a related schema from a parameter" in new WithApplication() {
       val externalParameterEntity = File.createTempFile("xep", ".dtd")
       val externalGeneralEntity = File.createTempFile("xxe", ".txt")
-      FileUtils.writeStringToFile(externalParameterEntity, s"""
+      FileUtils.writeStringToFile(
+        externalParameterEntity,
+        s"""
           |<!ENTITY % xge SYSTEM "${externalGeneralEntity.toURI}">
           |<!ENTITY % pe "<!ENTITY xxe '%xge;'>">
-        """.stripMargin)
-      FileUtils.writeStringToFile(externalGeneralEntity,
-                                  "I shouldnt be there!")
+        """.stripMargin
+      )
+      FileUtils.writeStringToFile(externalGeneralEntity, "I shouldnt be there!")
       externalGeneralEntity.deleteOnExit()
       externalParameterEntity.deleteOnExit()
       val xml = s"""<?xml version="1.0" encoding="ISO-8859-1"?>
@@ -164,9 +182,10 @@ object XmlBodyParserSpec extends PlaySpecification {
     }
 
     "gracefully fail when there are too many nested entities" in new WithApplication() {
-      val nested = for (x <- 1 to 30) yield
-        "<!ENTITY laugh" + x + " \"&laugh" + (x - 1) + ";&laugh" + (x - 1) +
-        ";\">"
+      val nested = for (x <- 1 to 30)
+        yield
+          "<!ENTITY laugh" + x + " \"&laugh" + (x - 1) + ";&laugh" + (x - 1) +
+            ";\">"
       val xml = s"""<?xml version="1.0"?>
                   | <!DOCTYPE billion [
                   | <!ELEMENT billion (#PCDATA)>

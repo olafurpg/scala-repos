@@ -46,7 +46,7 @@ class SideEffectsInMonadicTransformationTest
 
   def testIteratorNext(): Unit = {
     check(
-        s"""
+      s"""
         |val it = Iterator(1, 2)
         |Seq(1, 2) map {x =>
         |  if (it.hasNext) x + ${START}it.next$END
@@ -58,7 +58,7 @@ class SideEffectsInMonadicTransformationTest
 
   def testCollectionMethods(): Unit = {
     check(
-        s"""
+      s"""
          |import scala.collection.mutable.ArrayBuffer
          |
          |val buf = ArrayBuffer(1, 2)
@@ -70,7 +70,7 @@ class SideEffectsInMonadicTransformationTest
     )
 
     check(
-        s"""
+      s"""
          |import scala.collection.mutable.ArrayBuffer
          |
          |val buf = ArrayBuffer(1, 2)
@@ -82,7 +82,7 @@ class SideEffectsInMonadicTransformationTest
     )
 
     check(
-        s"""
+      s"""
          |import scala.collection.mutable.ArrayBuffer
          |
          |val buf = ArrayBuffer(1, 2)
@@ -94,7 +94,7 @@ class SideEffectsInMonadicTransformationTest
     )
 
     check(
-        s"""
+      s"""
          |import scala.collection.mutable.ArrayBuffer
          |
          |val buf = ArrayBuffer(1, 2)
@@ -106,7 +106,7 @@ class SideEffectsInMonadicTransformationTest
     )
 
     check(
-        s"""
+      s"""
          |import scala.collection.mutable.Stack
          |
          |val st = Stack(1, 2)
@@ -131,7 +131,7 @@ class SideEffectsInMonadicTransformationTest
       """.stripMargin)
 
     checkTextHasNoErrors(
-        s"""
+      s"""
          |import scala.collection.mutable.ArrayBuffer
          |Seq(1, 2).zipWithIndex.map{
          |  case (x, i) =>
@@ -169,7 +169,7 @@ class SideEffectsInMonadicTransformationTest
 
   def testScalaSetter(): Unit = {
     check(
-        s"""
+      s"""
         |class A {
         |  var z = 1
         |}
@@ -178,7 +178,7 @@ class SideEffectsInMonadicTransformationTest
       """.stripMargin
     )
     check(
-        s"""
+      s"""
        |class A {
        |  var z = 1
        |}
@@ -190,7 +190,7 @@ class SideEffectsInMonadicTransformationTest
 
   def testJavaSetter(): Unit = {
     check(
-        s"""
+      s"""
        |class A {
        |  @BeanProperty
        |  var z = 1
@@ -201,7 +201,7 @@ class SideEffectsInMonadicTransformationTest
     )
 
     checkTextHasNoErrors(
-        s"""
+      s"""
          |class A {
          |  var z = 1
          |

@@ -225,7 +225,7 @@ trait Symbols { self: Universe =>
     def asMethod: MethodSymbol = {
       def overloadedMsg =
         "encapsulates multiple overloaded alternatives and cannot be treated as a method. " +
-        "Consider invoking `<offending symbol>.asTerm.alternatives` and manually picking the required method"
+          "Consider invoking `<offending symbol>.asTerm.alternatives` and manually picking the required method"
       def vanillaMsg = "is not a method"
       val msg = if (isOverloadedMethod) overloadedMsg else vanillaMsg
       throw new ScalaReflectionException(s"$this $msg")
@@ -307,8 +307,8 @@ trait Symbols { self: Universe =>
       *  @group Basics
       */
     @deprecated(
-        "Use `companion` instead, but beware of possible changes in behavior",
-        "2.11.0")
+      "Use `companion` instead, but beware of possible changes in behavior",
+      "2.11.0")
     def companionSymbol: Symbol
 
     /** For a class: its companion object if exists.

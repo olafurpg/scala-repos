@@ -11,7 +11,8 @@ class Test1 extends FlatSpec {
     val end = Counter.get
     println(s"Test 1 done ($end)")
 
-    assert(end == start,
-           s"Expected Counter to stay at $start, but it changed to $end")
+    assert(
+      end == start,
+      s"Expected Counter to stay at $start, but it changed to $end")
   }
 }

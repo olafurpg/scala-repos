@@ -47,28 +47,29 @@ object MockWebSpec extends Specification {
     // Global LiftRules setup
     LiftRules.statelessRewrite.append {
       case RewriteRequest(
-          ParsePath(List("test", "stateless"), _, _, _), _, _) => {
-          RewriteResponse(List("stateless", "works"))
-        }
+          ParsePath(List("test", "stateless"), _, _, _),
+          _,
+          _) => {
+        RewriteResponse(List("stateless", "works"))
+      }
     }
 
     LiftRules.statefulRewrite.append {
-      case RewriteRequest(
-          ParsePath(List("test", "stateful"), _, _, _), _, _) => {
-          RewriteResponse(List("stateful", "works"))
-        }
+      case RewriteRequest(ParsePath(List("test", "stateful"), _, _, _), _, _) => {
+        RewriteResponse(List("stateful", "works"))
+      }
     }
 
     LiftRules.early.append { req =>
       req match {
         case httpReq: HTTPRequestServlet => {
-            httpReq.req match {
-              case mocked: MockHttpServletRequest => {
-                  mocked.remoteAddr = "1.2.3.4"
-                }
-              case _ => println("Not a mocked request?")
+          httpReq.req match {
+            case mocked: MockHttpServletRequest => {
+              mocked.remoteAddr = "1.2.3.4"
             }
+            case _ => println("Not a mocked request?")
           }
+        }
         case _ => println("Not a servlet request?")
       }
     }
@@ -139,7 +140,7 @@ object MockWebSpec extends Specification {
         useLiftRules.doWith(true) {
           testS("http://foo.com/test/stateless") {
             S.request.foreach(_.path.partPath must_==
-                  List("stateless", "works"))
+              List("stateless", "works"))
           }
         }
       }
@@ -150,8 +151,7 @@ object MockWebSpec extends Specification {
       LiftRulesMocker.devTestLiftRulesInstance.doWith(mockLiftRules) {
         useLiftRules.doWith(true) {
           testS("http://foo.com/test/stateful") {
-            S.request.foreach(
-                _.path.partPath must_== List("stateful", "works"))
+            S.request.foreach(_.path.partPath must_== List("stateful", "works"))
           }
         }
       }
@@ -160,8 +160,9 @@ object MockWebSpec extends Specification {
 
     "emulate a snippet invocation" in {
       testS("http://foo.com/test/stateful") {
-        withSnippet("MyWidget.foo",
-                    new UnprefixedAttribute("bar", Text("bat"), Null)) {
+        withSnippet(
+          "MyWidget.foo",
+          new UnprefixedAttribute("bar", Text("bat"), Null)) {
           S.currentSnippet must_== Full("MyWidget.foo")
           S.attr("bar") must_== Full("bat")
         }

@@ -38,7 +38,7 @@ object ForwarderService {
   class LeaderInfoModule(elected: Boolean, leaderHostPort: Option[String])
       extends AbstractModule {
     log.info(
-        s"Leader configuration: elected=$elected leaderHostPort=$leaderHostPort")
+      s"Leader configuration: elected=$elected leaderHostPort=$leaderHostPort")
 
     override def configure(): Unit = {
       val electedAlias = elected
@@ -55,7 +55,9 @@ object ForwarderService {
   }
 
   class ForwarderAppModule(
-      myHostPort: String, httpConf: HttpConf, leaderProxyConf: LeaderProxyConf)
+      myHostPort: String,
+      httpConf: HttpConf,
+      leaderProxyConf: LeaderProxyConf)
       extends BaseRestModule {
     @Named(ModuleNames.HOST_PORT)
     @Provides
@@ -74,28 +76,32 @@ object ForwarderService {
   }
 
   class ForwarderConf(args: Seq[String])
-      extends ScallopConf(args) with HttpConf with LeaderProxyConf
+      extends ScallopConf(args)
+      with HttpConf
+      with LeaderProxyConf
 
   def startHelloAppProcess(args: String*): Unit = {
     val conf = createConf(args: _*)
 
     ProcessKeeper.startJavaProcess(
-        s"app_${conf.httpPort()}",
-        heapInMegs = 128,
-        arguments = List(ForwarderService.className, "helloApp") ++ args,
-        upWhen = _.contains("Started ServerConnector"))
+      s"app_${conf.httpPort()}",
+      heapInMegs = 128,
+      arguments = List(ForwarderService.className, "helloApp") ++ args,
+      upWhen = _.contains("Started ServerConnector"))
   }
 
   def startForwarderProcess(forwardToPort: Int, args: String*): Unit = {
     val conf = createConf(args: _*)
 
     ProcessKeeper.startJavaProcess(
-        s"forwarder_${conf.httpPort()}",
-        heapInMegs = 128,
-        arguments = List(ForwarderService.className,
-                         "forwarder",
-                         forwardToPort.toString) ++ args,
-        upWhen = _.contains("ServerConnector@"))
+      s"forwarder_${conf.httpPort()}",
+      heapInMegs = 128,
+      arguments = List(
+        ForwarderService.className,
+        "forwarder",
+        forwardToPort.toString) ++ args,
+      upWhen = _.contains("ServerConnector@")
+    )
   }
 
   def main(args: Array[String]) {
@@ -112,39 +118,42 @@ object ForwarderService {
   def createHelloApp(args: String*): Service = {
     val conf = createConf(args: _*)
     log.info(s"Start hello app at ${conf.httpPort()}")
-    startImpl(
-        conf, new LeaderInfoModule(elected = true, leaderHostPort = None))
+    startImpl(conf, new LeaderInfoModule(elected = true, leaderHostPort = None))
   }
 
   def createForwarder(forwardToPort: Int, args: String*): Service = {
     val conf = createConf(args: _*)
     log.info(
-        s"Start forwarder on port  ${conf.httpPort()}, forwarding to $forwardToPort")
-    startImpl(conf,
-              new LeaderInfoModule(
-                  elected = false,
-                  leaderHostPort = Some(s"localhost:$forwardToPort")))
+      s"Start forwarder on port  ${conf.httpPort()}, forwarding to $forwardToPort")
+    startImpl(
+      conf,
+      new LeaderInfoModule(
+        elected = false,
+        leaderHostPort = Some(s"localhost:$forwardToPort")))
   }
 
   private[this] def createConf(args: String*): ForwarderConf = {
     val conf = new ForwarderConf(
-        Array[String]("--assets_path", "/tmp") ++ args.map(_.toString))
+      Array[String]("--assets_path", "/tmp") ++ args.map(_.toString))
     conf.afterInit()
     conf
   }
 
-  private def startImpl(conf: ForwarderConf,
-                        leaderModule: Module,
-                        assetPath: String = "/tmp"): Service = {
+  private def startImpl(
+      conf: ForwarderConf,
+      leaderModule: Module,
+      assetPath: String = "/tmp"): Service = {
     val injector = Guice.createInjector(
-        new MetricsModule,
-        new HttpModule(conf),
-        new ForwarderAppModule(myHostPort = if (conf.disableHttp())
-                                   s"localhost:${conf.httpsPort()}"
-                                 else s"localhost:${conf.httpPort()}",
-                               conf,
-                               conf),
-        leaderModule
+      new MetricsModule,
+      new HttpModule(conf),
+      new ForwarderAppModule(
+        myHostPort =
+          if (conf.disableHttp())
+            s"localhost:${conf.httpsPort()}"
+          else s"localhost:${conf.httpPort()}",
+        conf,
+        conf),
+      leaderModule
     )
     val http = injector.getInstance(classOf[HttpService])
     http

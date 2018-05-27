@@ -19,7 +19,7 @@ abstract class ClientResponse {
   def mediaType: Option[String] = {
     header.get("Content-Type") match {
       case Some(contentType) => contentType.split(";").map(_.trim).headOption
-      case _ => None
+      case _                 => None
     }
   }
 
@@ -29,14 +29,14 @@ abstract class ClientResponse {
     def get(key: String) = {
       headers.get(key) match {
         case Some(values) => Some(values.head)
-        case _ => None
+        case _            => None
       }
     }
 
     override def apply(key: String) = {
       get(key) match {
         case Some(value) => value
-        case _ => null
+        case _           => null
       }
     }
 
@@ -52,7 +52,7 @@ abstract class ClientResponse {
       .map(_.trim)
       .find(_.startsWith("charset=")) match {
       case Some(attr) => Some(attr.split("=")(1))
-      case _ => None
+      case _          => None
     }
   }
 

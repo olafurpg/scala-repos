@@ -11,7 +11,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
   */
 class ScalaCommentContextType
     extends TemplateContextType(
-        "SCALA_COMMENT", "Comment", classOf[ScalaLiveTemplateContextType]) {
+      "SCALA_COMMENT",
+      "Comment",
+      classOf[ScalaLiveTemplateContextType]) {
   override def isInContext(file: PsiFile, offset: Int): Boolean =
     ScalaCommentContextType.isInContext(file, offset)
 }
@@ -21,7 +23,7 @@ object ScalaCommentContextType {
     if (!file.isInstanceOf[ScalaFile]) return false
     val element = file.findElementAt(offset) match {
       case elem: PsiWhiteSpace if offset > 0 => file.findElementAt(offset - 1)
-      case elem => elem
+      case elem                              => elem
     }
     val comment =
       PsiTreeUtil.getParentOfType(element, classOf[PsiComment], false)

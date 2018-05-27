@@ -20,10 +20,13 @@ object GroupVersioningUtil {
     * @return the updated group with updated app versions
     */
   def updateVersionInfoForChangedApps(
-      version: Timestamp, from: Group, to: Group): Group = {
+      version: Timestamp,
+      from: Group,
+      to: Group): Group = {
 
-    def updateAppVersionInfo(maybeOldApp: Option[AppDefinition],
-                             newApp: AppDefinition): AppDefinition = {
+    def updateAppVersionInfo(
+        maybeOldApp: Option[AppDefinition],
+        newApp: AppDefinition): AppDefinition = {
       val newVersionInfo = maybeOldApp match {
         case None =>
           log.info(s"[${newApp.id}]: new app detected")
@@ -31,16 +34,16 @@ object GroupVersioningUtil {
         case Some(oldApp) =>
           if (oldApp.isUpgrade(newApp)) {
             log.info(
-                s"[${newApp.id}]: upgrade detected for app (oldVersion ${oldApp.versionInfo})")
+              s"[${newApp.id}]: upgrade detected for app (oldVersion ${oldApp.versionInfo})")
             oldApp.versionInfo.withConfigChange(newVersion = version)
           } else if (oldApp.isOnlyScaleChange(newApp)) {
             log.info(
-                s"[${newApp.id}]: scaling op detected for app (oldVersion ${oldApp.versionInfo})")
+              s"[${newApp.id}]: scaling op detected for app (oldVersion ${oldApp.versionInfo})")
             oldApp.versionInfo.withScaleOrRestartChange(newVersion = version)
           } else if (oldApp.versionInfo != newApp.versionInfo &&
                      newApp.versionInfo == VersionInfo.NoVersion) {
             log.info(
-                s"[${newApp.id}]: restart detected for app (oldVersion ${oldApp.versionInfo})")
+              s"[${newApp.id}]: restart detected for app (oldVersion ${oldApp.versionInfo})")
             oldApp.versionInfo.withScaleOrRestartChange(newVersion = version)
           } else {
             oldApp.versionInfo

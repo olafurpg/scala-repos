@@ -37,7 +37,8 @@ import org.apache.spark.sql.types.DataType
   */
 @Experimental
 class DCT(override val uid: String)
-    extends UnaryTransformer[Vector, Vector, DCT] with DefaultParamsWritable {
+    extends UnaryTransformer[Vector, Vector, DCT]
+    with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("dct"))
 
@@ -66,8 +67,9 @@ class DCT(override val uid: String)
   }
 
   override protected def validateInputType(inputType: DataType): Unit = {
-    require(inputType.isInstanceOf[VectorUDT],
-            s"Input type must be VectorUDT but got $inputType.")
+    require(
+      inputType.isInstanceOf[VectorUDT],
+      s"Input type must be VectorUDT but got $inputType.")
   }
 
   override protected def outputDataType: DataType = new VectorUDT

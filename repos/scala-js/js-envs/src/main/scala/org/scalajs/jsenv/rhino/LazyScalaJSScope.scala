@@ -24,10 +24,11 @@ import org.mozilla.javascript.{Scriptable, Context}
   *  It is immensely useful, because it allows to load lazily only the scripts
   *  that are actually needed.
   */
-private[rhino] class LazyScalaJSScope(coreLib: ScalaJSCoreLib,
-                                      globalScope: Scriptable,
-                                      base: Scriptable,
-                                      isStatics: Boolean)
+private[rhino] class LazyScalaJSScope(
+    coreLib: ScalaJSCoreLib,
+    globalScope: Scriptable,
+    base: Scriptable,
+    isStatics: Boolean)
     extends Scriptable {
 
   private val fields = mutable.HashMap.empty[String, Any]
@@ -39,7 +40,7 @@ private[rhino] class LazyScalaJSScope(coreLib: ScalaJSCoreLib,
     for (id <- base.getIds()) {
       (id.asInstanceOf[Any]: @unchecked) match {
         case name: String => put(name, this, base.get(name, base))
-        case index: Int => put(index, this, base.get(index, base))
+        case index: Int   => put(index, this, base.get(index, base))
       }
     }
   }
@@ -65,17 +66,19 @@ private[rhino] class LazyScalaJSScope(coreLib: ScalaJSCoreLib,
       Scriptable.NOT_FOUND
     } else {
       fields
-        .getOrElse(name, {
-          try {
-            load(name)
-            fields.getOrElse(name, Scriptable.NOT_FOUND)
-          } catch {
-            // We need to re-throw the exception if `load` fails, otherwise the
-            // JavaScript runtime will not catch it.
-            case t: RhinoJSEnv.ClassNotFoundException =>
-              throw Context.throwAsScriptRuntimeEx(t)
+        .getOrElse(
+          name, {
+            try {
+              load(name)
+              fields.getOrElse(name, Scriptable.NOT_FOUND)
+            } catch {
+              // We need to re-throw the exception if `load` fails, otherwise the
+              // JavaScript runtime will not catch it.
+              case t: RhinoJSEnv.ClassNotFoundException =>
+                throw Context.throwAsScriptRuntimeEx(t)
+            }
           }
-        })
+        )
         .asInstanceOf[AnyRef]
     }
   }

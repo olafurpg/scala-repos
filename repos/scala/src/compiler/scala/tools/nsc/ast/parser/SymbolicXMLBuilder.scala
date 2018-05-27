@@ -57,9 +57,33 @@ abstract class SymbolicXMLBuilder(p: Parsers#Parser, preserveWS: Boolean) {
     val _xml: NameType = "xml"
   }
 
-  import xmltypes.{_Comment, _Elem, _EntityRef, _Group, _MetaData, _NamespaceBinding, _NodeBuffer, _PCData, _PrefixedAttribute, _ProcInstr, _Text, _Unparsed, _UnprefixedAttribute}
+  import xmltypes.{
+    _Comment,
+    _Elem,
+    _EntityRef,
+    _Group,
+    _MetaData,
+    _NamespaceBinding,
+    _NodeBuffer,
+    _PCData,
+    _PrefixedAttribute,
+    _ProcInstr,
+    _Text,
+    _Unparsed,
+    _UnprefixedAttribute
+  }
 
-  import xmlterms.{_Null, __Elem, __Text, _buf, _md, _plus, _scope, _tmpscope, _xml}
+  import xmlterms.{
+    _Null,
+    __Elem,
+    __Text,
+    _buf,
+    _md,
+    _plus,
+    _scope,
+    _tmpscope,
+    _xml
+  }
 
   /** Attachment for trees deriving from text nodes (Text, CData, entities). Used for coalescing. */
   case class TextAttache(pos: Position, text: String)
@@ -90,30 +114,34 @@ abstract class SymbolicXMLBuilder(p: Parsers#Parser, preserveWS: Boolean) {
   private def _scala_xml__Text = _scala_xml(__Text)
 
   /** Wildly wrong documentation deleted in favor of "self-documenting code." */
-  protected def mkXML(pos: Position,
-                      isPattern: Boolean,
-                      pre: Tree,
-                      label: Tree,
-                      attrs: Tree,
-                      scope: Tree,
-                      empty: Boolean,
-                      children: Seq[Tree]): Tree = {
+  protected def mkXML(
+      pos: Position,
+      isPattern: Boolean,
+      pre: Tree,
+      label: Tree,
+      attrs: Tree,
+      scope: Tree,
+      empty: Boolean,
+      children: Seq[Tree]): Tree = {
     def starArgs =
       if (children.isEmpty) Nil
       else List(Typed(makeXMLseq(pos, children), wildStar))
 
     def pat =
-      Apply(_scala_xml__Elem,
-            List(pre, label, wild, wild) ::: convertToTextPat(children))
+      Apply(
+        _scala_xml__Elem,
+        List(pre, label, wild, wild) ::: convertToTextPat(children))
     def nonpat =
-      New(_scala_xml_Elem,
+      New(
+        _scala_xml_Elem,
+        List(
           List(
-              List(pre,
-                   label,
-                   attrs,
-                   scope,
-                   if (empty) Literal(Constant(true))
-                   else Literal(Constant(false))) ::: starArgs))
+            pre,
+            label,
+            attrs,
+            scope,
+            if (empty) Literal(Constant(true))
+            else Literal(Constant(false))) ::: starArgs))
 
     atPos(pos) { if (isPattern) pat else nonpat }
   }
@@ -151,15 +179,22 @@ abstract class SymbolicXMLBuilder(p: Parsers#Parser, preserveWS: Boolean) {
   def makeXMLpat(pos: Position, n: String, args: Seq[Tree]): Tree = {
     val (prepat, labpat) = splitPrefix(n) match {
       case (Some(pre), rest) => (const(pre), const(rest))
-      case _ => (wild, const(n))
+      case _                 => (wild, const(n))
     }
     mkXML(
-        pos, isPattern = true, prepat, labpat, null, null, empty = false, args)
+      pos,
+      isPattern = true,
+      prepat,
+      labpat,
+      null,
+      null,
+      empty = false,
+      args)
   }
 
   protected def convertToTextPat(t: Tree): Tree = t match {
     case _: Literal => makeTextPat(t)
-    case _ => t
+    case _          => t
   }
   protected def convertToTextPat(buf: Seq[Tree]): List[Tree] =
     (buf map convertToTextPat).toList
@@ -168,24 +203,24 @@ abstract class SymbolicXMLBuilder(p: Parsers#Parser, preserveWS: Boolean) {
     import xml.Utility.parseAttributeValue
 
     parseAttributeValue(s, text(pos, _), entityRef(pos, _)) match {
-      case Nil => gen.mkNil
+      case Nil      => gen.mkNil
       case t :: Nil => t
-      case ts => makeXMLseq(pos, ts.toList)
+      case ts       => makeXMLseq(pos, ts.toList)
     }
   }
 
   def isEmptyText(t: Tree) = t match {
     case Literal(Constant("")) => true
-    case _ => false
+    case _                     => false
   }
 
   /** could optimize if args.length == 0, args.length == 1 AND args(0) is <: Node. */
   def makeXMLseq(pos: Position, args: Seq[Tree]) = {
-    val buffer = ValDef(
-        NoMods, _buf, TypeTree(), New(_scala_xml_NodeBuffer, ListOfNil))
+    val buffer =
+      ValDef(NoMods, _buf, TypeTree(), New(_scala_xml_NodeBuffer, ListOfNil))
     val applies =
       args filterNot isEmptyText map
-      (t => Apply(Select(Ident(_buf), _plus), List(t)))
+        (t => Apply(Select(Ident(_buf), _plus), List(t)))
 
     atPos(pos)(Block(buffer :: applies.toList, Ident(_buf)))
   }
@@ -194,7 +229,7 @@ abstract class SymbolicXMLBuilder(p: Parsers#Parser, preserveWS: Boolean) {
   def splitPrefix(name: String): (Option[String], String) =
     splitWhere(name, _ == ':', doDropIndex = true) match {
       case Some((pre, rest)) => (Some(pre), rest)
-      case _ => (None, name)
+      case _                 => (None, name)
     }
 
   /** Various node constructions. */
@@ -204,24 +239,26 @@ abstract class SymbolicXMLBuilder(p: Parsers#Parser, preserveWS: Boolean) {
   def unparsed(pos: Position, str: String): Tree =
     atPos(pos)(New(_scala_xml_Unparsed, LL(const(str))))
 
-  def element(pos: Position,
-              qname: String,
-              attrMap: mutable.Map[String, Tree],
-              empty: Boolean,
-              args: Seq[Tree]): Tree = {
+  def element(
+      pos: Position,
+      qname: String,
+      attrMap: mutable.Map[String, Tree],
+      empty: Boolean,
+      args: Seq[Tree]): Tree = {
     def handleNamespaceBinding(pre: String, z: String): Tree = {
       def mkAssign(t: Tree): Tree = Assign(
-          Ident(_tmpscope),
-          New(_scala_xml_NamespaceBinding, LL(const(pre), t, Ident(_tmpscope)))
+        Ident(_tmpscope),
+        New(_scala_xml_NamespaceBinding, LL(const(pre), t, Ident(_tmpscope)))
       )
 
       val uri1 = attrMap(z) match {
         case Apply(
             Select(
-            New(
-            Select(Select(Select(Ident(nme.ROOTPKG), nme.scala_), nme.xml),
-                   tpnme.Text)),
-            nme.CONSTRUCTOR),
+              New(
+                Select(
+                  Select(Select(Ident(nme.ROOTPKG), nme.scala_), nme.xml),
+                  tpnme.Text)),
+              nme.CONSTRUCTOR),
             List(uri @ Literal(Constant(_)))) =>
           mkAssign(uri)
         case Select(_, nme.Nil) =>
@@ -237,14 +274,14 @@ abstract class SymbolicXMLBuilder(p: Parsers#Parser, preserveWS: Boolean) {
       for (z <- attrMap.keys.toList; if z startsWith "xmlns") yield {
         val ns = splitPrefix(z) match {
           case (Some(_), rest) => rest
-          case _ => null
+          case _               => null
         }
         handleNamespaceBinding(ns, z)
       }
 
     val (pre, newlabel) = splitPrefix(qname) match {
       case (Some(p), x) => (p, x)
-      case (None, x) => (null, x)
+      case (None, x)    => (null, x)
     }
 
     def mkAttributeTree(pre: String, key: String, value: Tree) =
@@ -264,26 +301,28 @@ abstract class SymbolicXMLBuilder(p: Parsers#Parser, preserveWS: Boolean) {
     def handleUnprefixedAttribute(key: String, value: Tree) =
       mkAttributeTree(null, key, value)
 
-    val attributes: List[Tree] = for ((k, v) <- attrMap.toList.reverse) yield
-      splitPrefix(k) match {
-        case (Some(pre), rest) => handlePrefixedAttribute(pre, rest, v)
-        case _ => handleUnprefixedAttribute(k, v)
-      }
+    val attributes: List[Tree] = for ((k, v) <- attrMap.toList.reverse)
+      yield
+        splitPrefix(k) match {
+          case (Some(pre), rest) => handlePrefixedAttribute(pre, rest, v)
+          case _                 => handleUnprefixedAttribute(k, v)
+        }
 
-    lazy val scopeDef = ValDef(
-        NoMods, _scope, _scala_xml_NamespaceBinding, Ident(_tmpscope))
-    lazy val tmpScopeDef = ValDef(Modifiers(MUTABLE),
-                                  _tmpscope,
-                                  _scala_xml_NamespaceBinding,
-                                  Ident(_scope))
-    lazy val metadataDef = ValDef(
-        Modifiers(MUTABLE), _md, _scala_xml_MetaData, _scala_xml_Null)
+    lazy val scopeDef =
+      ValDef(NoMods, _scope, _scala_xml_NamespaceBinding, Ident(_tmpscope))
+    lazy val tmpScopeDef = ValDef(
+      Modifiers(MUTABLE),
+      _tmpscope,
+      _scala_xml_NamespaceBinding,
+      Ident(_scope))
+    lazy val metadataDef =
+      ValDef(Modifiers(MUTABLE), _md, _scala_xml_MetaData, _scala_xml_Null)
     val makeSymbolicAttrs =
       if (!attributes.isEmpty) Ident(_md) else _scala_xml_Null
 
     val (attrResult, nsResult) =
       (attributes.isEmpty, namespaces.isEmpty) match {
-        case (true, true) => (Nil, Nil)
+        case (true, true)  => (Nil, Nil)
         case (true, false) => (scopeDef :: Nil, tmpScopeDef :: namespaces)
         case (false, true) => (metadataDef :: attributes, Nil)
         case (false, false) =>
@@ -291,14 +330,14 @@ abstract class SymbolicXMLBuilder(p: Parsers#Parser, preserveWS: Boolean) {
       }
 
     val body = mkXML(
-        pos.makeTransparent,
-        isPattern = false,
-        const(pre),
-        const(newlabel),
-        makeSymbolicAttrs,
-        Ident(_scope),
-        empty,
-        args
+      pos.makeTransparent,
+      isPattern = false,
+      const(pre),
+      const(newlabel),
+      makeSymbolicAttrs,
+      Ident(_scope),
+      empty,
+      args
     )
 
     atPos(pos.makeTransparent)(Block(nsResult, Block(attrResult, body)))

@@ -28,71 +28,73 @@ private[routing] object RouterBuilderHelper {
     play.api.routing.Router
       .from(Function.unlift { requestHeader =>
         // Find the first route that matches
-        routes.collectFirst(Function.unlift(route =>
-                  // First check method
-                  if (requestHeader.method == route.method) {
+        routes.collectFirst(
+          Function.unlift(route =>
+            // First check method
+            if (requestHeader.method == route.method) {
 
-            // Now match against the path pattern
-            val matcher = route.pathPattern.matcher(requestHeader.path)
-            if (matcher.matches()) {
+              // Now match against the path pattern
+              val matcher = route.pathPattern.matcher(requestHeader.path)
+              if (matcher.matches()) {
 
-              // Extract groups into a Seq
-              val groups = for (i <- 1 to matcher.groupCount()) yield {
-                matcher.group(i)
-              }
-
-              // Bind params if required
-              val params = groups.zip(route.params).map {
-                case (param, routeParam) =>
-                  val rawParam =
-                    if (routeParam.decode) {
-                      UriEncoding.decodePathSegment(param, "utf-8")
-                    } else {
-                      param
-                    }
-                  routeParam.pathBindable.bind(routeParam.name, rawParam)
-              }
-
-              val maybeParams =
-                params.foldLeft[Either[String, Seq[AnyRef]]](Right(Nil)) {
-                  case (error @ Left(_), _) => error
-                  case (_, Left(error)) => Left(error)
-                  case (Right(values), Right(value: AnyRef)) =>
-                    Right(values :+ value)
-                  case (values, _) => values
+                // Extract groups into a Seq
+                val groups = for (i <- 1 to matcher.groupCount()) yield {
+                  matcher.group(i)
                 }
 
-              val action = maybeParams match {
-                case Left(error) => Action(Results.BadRequest(error))
-                case Right(params) =>
-                  // Convert to a Scala action
-                  val parser = HandlerInvokerFactory.javaBodyParserToScala {
-                    // If testing an embedded application we may not have a Guice injector, therefore we can't rely on
-                    // it to instantiate the default body parser, we have to instantiate it ourselves.
-                    val app = Play.privateMaybeApplication.get // throw exception if no current app
-                    new play.mvc.BodyParser.Default(
+                // Bind params if required
+                val params = groups.zip(route.params).map {
+                  case (param, routeParam) =>
+                    val rawParam =
+                      if (routeParam.decode) {
+                        UriEncoding.decodePathSegment(param, "utf-8")
+                      } else {
+                        param
+                      }
+                    routeParam.pathBindable.bind(routeParam.name, rawParam)
+                }
+
+                val maybeParams =
+                  params.foldLeft[Either[String, Seq[AnyRef]]](Right(Nil)) {
+                    case (error @ Left(_), _) => error
+                    case (_, Left(error))     => Left(error)
+                    case (Right(values), Right(value: AnyRef)) =>
+                      Right(values :+ value)
+                    case (values, _) => values
+                  }
+
+                val action = maybeParams match {
+                  case Left(error)   => Action(Results.BadRequest(error))
+                  case Right(params) =>
+                    // Convert to a Scala action
+                    val parser = HandlerInvokerFactory.javaBodyParserToScala {
+                      // If testing an embedded application we may not have a Guice injector, therefore we can't rely on
+                      // it to instantiate the default body parser, we have to instantiate it ourselves.
+                      val app = Play.privateMaybeApplication.get // throw exception if no current app
+                      new play.mvc.BodyParser.Default(
                         new JavaHttpErrorHandlerDelegate(app.errorHandler),
                         app.injector.instanceOf[HttpConfiguration])
-                  }
-                  Action.async(parser) { request =>
-                    val ctx = JavaHelpers.createJavaContext(request)
-                    try {
-                      Context.current.set(ctx)
-                      route.actionMethod.invoke(route.action, params: _*) match {
-                        case result: Result =>
-                          Future.successful(result.asScala)
-                        case promise: CompletionStage[Result] =>
-                          FutureConverters.toScala(promise).map(_.asScala)
-                      }
-                    } finally {
-                      Context.current.remove()
                     }
-                  }
-              }
+                    Action.async(parser) { request =>
+                      val ctx = JavaHelpers.createJavaContext(request)
+                      try {
+                        Context.current.set(ctx)
+                        route.actionMethod
+                          .invoke(route.action, params: _*) match {
+                          case result: Result =>
+                            Future.successful(result.asScala)
+                          case promise: CompletionStage[Result] =>
+                            FutureConverters.toScala(promise).map(_.asScala)
+                        }
+                      } finally {
+                        Context.current.remove()
+                      }
+                    }
+                }
 
-              Some(action)
-            } else None
-          } else None))
+                Some(action)
+              } else None
+            } else None))
       })
       .asJava
   }

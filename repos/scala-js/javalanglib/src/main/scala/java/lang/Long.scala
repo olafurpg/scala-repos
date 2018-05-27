@@ -22,7 +22,7 @@ final class Long private () extends Number with Comparable[Long] {
 
   @inline override def equals(that: Any): scala.Boolean = that match {
     case that: Long => longValue == that.longValue
-    case _ => false
+    case _          => false
   }
 
   @inline override def hashCode(): Int =
@@ -46,10 +46,11 @@ object Long {
 
   private final val SignBit = scala.Long.MinValue
 
-  private final class StringRadixInfo(val chunkLength: Int,
-                                      val radixPowLength: scala.Long,
-                                      val paddingZeros: String,
-                                      val overflowBarrier: scala.Long)
+  private final class StringRadixInfo(
+      val chunkLength: Int,
+      val radixPowLength: scala.Long,
+      val paddingZeros: String,
+      val overflowBarrier: scala.Long)
 
   /** Precomputed table for toUnsignedStringInternalLarge and
     *  parseUnsignedLongInternal.
@@ -81,7 +82,10 @@ object Long {
       val radixPowLengthLong = radixPowLength.toLong
       val overflowBarrier = Long.divideUnsigned(-1L, radixPowLengthLong)
       r += new StringRadixInfo(
-          chunkLength, radixPowLengthLong, paddingZeros, overflowBarrier)
+        chunkLength,
+        radixPowLengthLong,
+        paddingZeros,
+        overflowBarrier)
     }
 
     r
@@ -97,8 +101,8 @@ object Long {
   @inline // because radix is almost certainly constant at call site
   def toUnsignedString(i: scala.Long, radix: Int): String = {
     (radix: @switch) match {
-      case 2 => toBinaryString(i)
-      case 8 => toOctalString(i)
+      case 2  => toBinaryString(i)
+      case 8  => toOctalString(i)
       case 16 => toHexString(i)
       case _ =>
         val radix1 =
@@ -143,7 +147,8 @@ object Long {
 
   // Must be called only with valid radix
   private def toUnsignedStringInternalLarge(
-      i: scala.Long, radix: Int): String = {
+      i: scala.Long,
+      radix: Int): String = {
     import js.JSNumberOps._
     import js.JSStringOps._
 
@@ -155,7 +160,7 @@ object Long {
 
     var res = ""
     var value = i
-    while ( (value ^ SignBit) >= divisorXorSignBit) {
+    while ((value ^ SignBit) >= divisorXorSignBit) {
       // unsigned comparison
       val div = divideUnsigned(value, divisor)
       val rem = value - div * divisor // == remainderUnsigned(value, divisor)
@@ -211,7 +216,9 @@ object Long {
     parseUnsignedLong(s, 10)
 
   def parseUnsignedLongInternal(
-      s: String, radix: Int, start: Int): scala.Long = {
+      s: String,
+      radix: Int,
+      start: Int): scala.Long = {
     import js.JSStringOps._
 
     val length = s.length
@@ -228,7 +235,7 @@ object Long {
        */
       var firstChunkStart = start
       while (firstChunkStart < length &&
-      s.charAt(firstChunkStart) == '0') firstChunkStart += 1
+             s.charAt(firstChunkStart) == '0') firstChunkStart += 1
 
       /* After that, if more than 3 chunks are necessary, it means the value
        * is too large, and does not fit in an unsigned Long.
@@ -316,12 +323,13 @@ object Long {
     divModUnsigned(dividend, divisor, isDivide = true)
 
   // Intrinsic
-  def remainderUnsigned(
-      dividend: scala.Long, divisor: scala.Long): scala.Long =
+  def remainderUnsigned(dividend: scala.Long, divisor: scala.Long): scala.Long =
     divModUnsigned(dividend, divisor, isDivide = false)
 
   private def divModUnsigned(
-      a: scala.Long, b: scala.Long, isDivide: scala.Boolean): scala.Long = {
+      a: scala.Long,
+      b: scala.Long,
+      isDivide: scala.Boolean): scala.Long = {
     /* This is a much simplified (and slow) version of
      * RuntimeLong.unsignedDivModHelper.
      */

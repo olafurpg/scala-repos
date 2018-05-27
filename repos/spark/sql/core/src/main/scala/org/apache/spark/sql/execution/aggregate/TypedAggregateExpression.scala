@@ -22,23 +22,28 @@ import scala.language.existentials
 import org.apache.spark.internal.Logging
 import org.apache.spark.sql.Encoder
 import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.catalyst.encoders.{encoderFor, ExpressionEncoder, OuterScopes}
+import org.apache.spark.sql.catalyst.encoders.{
+  encoderFor,
+  ExpressionEncoder,
+  OuterScopes
+}
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.expressions.aggregate.ImperativeAggregate
 import org.apache.spark.sql.expressions.Aggregator
 import org.apache.spark.sql.types._
 
 object TypedAggregateExpression {
-  def apply[A, B : Encoder, C : Encoder](
+  def apply[A, B: Encoder, C: Encoder](
       aggregator: Aggregator[A, B, C]): TypedAggregateExpression = {
     new TypedAggregateExpression(
-        aggregator.asInstanceOf[Aggregator[Any, Any, Any]],
-        None,
-        encoderFor[B].asInstanceOf[ExpressionEncoder[Any]],
-        encoderFor[C].asInstanceOf[ExpressionEncoder[Any]],
-        Nil,
-        0,
-        0)
+      aggregator.asInstanceOf[Aggregator[Any, Any, Any]],
+      None,
+      encoderFor[B].asInstanceOf[ExpressionEncoder[Any]],
+      encoderFor[C].asInstanceOf[ExpressionEncoder[Any]],
+      Nil,
+      0,
+      0
+    )
   }
 }
 
@@ -55,7 +60,8 @@ case class TypedAggregateExpression(
     children: Seq[Attribute],
     mutableAggBufferOffset: Int,
     inputAggBufferOffset: Int)
-    extends ImperativeAggregate with Logging {
+    extends ImperativeAggregate
+    with Logging {
 
   override def withNewMutableAggBufferOffset(
       newMutableAggBufferOffset: Int): ImperativeAggregate =
@@ -103,13 +109,13 @@ case class TypedAggregateExpression(
       val offset = mutableAggBufferOffset + i
       aggBufferSchema(i).dataType match {
         case BooleanType => buffer.setBoolean(offset, value.getBoolean(i))
-        case ByteType => buffer.setByte(offset, value.getByte(i))
-        case ShortType => buffer.setShort(offset, value.getShort(i))
+        case ByteType    => buffer.setByte(offset, value.getByte(i))
+        case ShortType   => buffer.setShort(offset, value.getShort(i))
         case IntegerType => buffer.setInt(offset, value.getInt(i))
-        case LongType => buffer.setLong(offset, value.getLong(i))
-        case FloatType => buffer.setFloat(offset, value.getFloat(i))
-        case DoubleType => buffer.setDouble(offset, value.getDouble(i))
-        case other => buffer.update(offset, value.get(i, other))
+        case LongType    => buffer.setLong(offset, value.getLong(i))
+        case FloatType   => buffer.setFloat(offset, value.getFloat(i))
+        case DoubleType  => buffer.setDouble(offset, value.getDouble(i))
+        case other       => buffer.update(offset, value.get(i, other))
       }
       i += 1
     }
@@ -143,7 +149,7 @@ case class TypedAggregateExpression(
     val result = cEncoder.toRow(aggregator.finish(b))
     dataType match {
       case _: StructType => result
-      case _ => result.get(0, dataType)
+      case _             => result.get(0, dataType)
     }
   }
 

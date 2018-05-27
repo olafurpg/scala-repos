@@ -35,7 +35,7 @@ class TransformationBackend extends Actor {
   def register(member: Member): Unit =
     if (member.hasRole("frontend"))
       context.actorSelection(
-          RootActorPath(member.address) / "user" / "frontend") ! BackendRegistration
+        RootActorPath(member.address) / "user" / "frontend") ! BackendRegistration
 }
 //#backend
 
@@ -45,8 +45,7 @@ object TransformationBackend {
     val port = if (args.isEmpty) "0" else args(0)
     val config = ConfigFactory
       .parseString(s"akka.remote.netty.tcp.port=$port")
-      .withFallback(
-          ConfigFactory.parseString("akka.cluster.roles = [backend]"))
+      .withFallback(ConfigFactory.parseString("akka.cluster.roles = [backend]"))
       .withFallback(ConfigFactory.load())
 
     val system = ActorSystem("ClusterSystem", config)

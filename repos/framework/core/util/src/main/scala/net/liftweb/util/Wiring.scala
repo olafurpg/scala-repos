@@ -37,9 +37,9 @@ trait Dependent {
   def youDependOnMe(who: Cell[_]): Unit = synchronized {
     _iDependOn = new WeakReference(who.asInstanceOf[Object]) :: _iDependOn
       .filter(_.get match {
-      case null => false
-      case x => x ne who
-    })
+        case null => false
+        case x    => x ne who
+      })
   }
 
   /**
@@ -48,7 +48,7 @@ trait Dependent {
   def youDontDependOnMe(who: Cell[_]): Unit = synchronized {
     val tList = _iDependOn.filter(_.get match {
       case null => false
-      case x => x ne who
+      case x    => x ne who
     })
 
     _iDependOn = tList
@@ -61,7 +61,7 @@ trait Dependent {
     _iDependOn
       .flatMap(_.get match {
         case null => Nil
-        case x => List(x)
+        case x    => List(x)
       })
       .asInstanceOf[List[Cell[_]]]
   }
@@ -115,7 +115,7 @@ trait Cell[T] extends Dependent {
     synchronized {
       val tList = _dependentCells.filter(_.get match {
         case null => false
-        case x => x ne dep
+        case x    => x ne dep
       })
 
       _dependentCells = new WeakReference(dep: Dependent) :: tList
@@ -131,10 +131,9 @@ trait Cell[T] extends Dependent {
     */
   def removeDependent[T <: Dependent](dep: T): T = {
     synchronized {
-      _dependentCells = _dependentCells.filter(
-          _.get match {
+      _dependentCells = _dependentCells.filter(_.get match {
         case null => false
-        case x => x ne dep
+        case x    => x ne dep
       })
     }
 
@@ -149,17 +148,17 @@ trait Cell[T] extends Dependent {
     */
   def notifyDependents(): Unit = {
     Schedule.schedule(
-        () => dependents.foreach(_.predicateChanged(this)), TimeSpan(0))
+      () => dependents.foreach(_.predicateChanged(this)),
+      TimeSpan(0))
   }
 
   /**
     * Get a List of the Dependents
     */
   def dependents: Seq[Dependent] = synchronized {
-    _dependentCells.flatMap(
-        _.get match {
+    _dependentCells.flatMap(_.get match {
       case null => Nil
-      case x => List(x)
+      case x    => List(x)
     })
   }
 }
@@ -246,7 +245,7 @@ final class ValueCell[A](initialValue: A) extends Cell[A] with LiftValue[A] {
   override def equals(other: Any): Boolean = synchronized {
     other match {
       case vc: ValueCell[_] => value == vc.get
-      case _ => false
+      case _                => false
     }
   }
 }
@@ -263,8 +262,7 @@ final case class SeqCell[T](cells: Cell[T]*) extends Cell[Seq[T]] {
     */
   def currentValue: (Seq[T], Long) = {
     val tcv = cells.map(_.currentValue)
-    tcv.map(_._1) -> tcv.foldLeft(0L)(
-        (max, c) => if (max > c._2) max else c._2)
+    tcv.map(_._1) -> tcv.foldLeft(0L)((max, c) => if (max > c._2) max else c._2)
   }
 
   /**
@@ -305,8 +303,12 @@ object FuncCell {
     * Construct a function cell based on five parameters
     */
   def apply[A, B, C, D, E, Z](
-      a: Cell[A], b: Cell[B], c: Cell[C], d: Cell[D], e: Cell[E])(
-      f: (A, B, C, D, E) => Z): Cell[Z] = FuncCell5(a, b, c, d, e, f)
+      a: Cell[A],
+      b: Cell[B],
+      c: Cell[C],
+      d: Cell[D],
+      e: Cell[E])(f: (A, B, C, D, E) => Z): Cell[Z] =
+    FuncCell5(a, b, c, d, e, f)
 }
 
 final case class FuncCell1[A, Z](a: Cell[A], f: A => Z) extends Cell[Z] {
@@ -358,7 +360,10 @@ final case class FuncCell2[A, B, Z](a: Cell[A], b: Cell[B], f: (A, B) => Z)
 }
 
 final case class FuncCell3[A, B, C, Z](
-    a: Cell[A], b: Cell[B], c: Cell[C], f: (A, B, C) => Z)
+    a: Cell[A],
+    b: Cell[B],
+    c: Cell[C],
+    f: (A, B, C) => Z)
     extends Cell[Z] {
   private var value: Z = _
   private var ct: Long = 0
@@ -386,7 +391,11 @@ final case class FuncCell3[A, B, C, Z](
 }
 
 final case class FuncCell4[A, B, C, D, Z](
-    a: Cell[A], b: Cell[B], c: Cell[C], d: Cell[D], f: (A, B, C, D) => Z)
+    a: Cell[A],
+    b: Cell[B],
+    c: Cell[C],
+    d: Cell[D],
+    f: (A, B, C, D) => Z)
     extends Cell[Z] {
   private var value: Z = _
   private var ct: Long = 0
@@ -417,12 +426,13 @@ final case class FuncCell4[A, B, C, D, Z](
   }
 }
 
-final case class FuncCell5[A, B, C, D, E, Z](a: Cell[A],
-                                             b: Cell[B],
-                                             c: Cell[C],
-                                             d: Cell[D],
-                                             e: Cell[E],
-                                             f: (A, B, C, D, E) => Z)
+final case class FuncCell5[A, B, C, D, E, Z](
+    a: Cell[A],
+    b: Cell[B],
+    c: Cell[C],
+    d: Cell[D],
+    e: Cell[E],
+    f: (A, B, C, D, E) => Z)
     extends Cell[Z] {
   private var value: Z = _
   private var ct: Long = 0

@@ -3,7 +3,13 @@ package tests
 
 import cats.data.{NonEmptyList, Validated, ValidatedNel, Xor, XorT}
 import cats.data.Validated.{Valid, Invalid}
-import cats.laws.discipline.{BifunctorTests, TraverseTests, ApplicativeErrorTests, SerializableTests, CartesianTests}
+import cats.laws.discipline.{
+  BifunctorTests,
+  TraverseTests,
+  ApplicativeErrorTests,
+  SerializableTests,
+  CartesianTests
+}
 import org.scalacheck.Arbitrary._
 import cats.laws.discipline.arbitrary._
 import cats.laws.discipline.eq.tuple3Eq
@@ -14,58 +20,70 @@ import scala.util.Try
 class ValidatedTests extends CatsSuite {
   implicit val iso =
     CartesianTests.Isomorphisms.invariant[Validated[String, ?]]
-  checkAll("Validated[String, Int]",
-           CartesianTests[Validated[String, ?]].cartesian[Int, Int, Int])
-  checkAll("Cartesian[Validated[String,?]]",
-           SerializableTests.serializable(Cartesian[Validated[String, ?]]))
+  checkAll(
+    "Validated[String, Int]",
+    CartesianTests[Validated[String, ?]].cartesian[Int, Int, Int])
+  checkAll(
+    "Cartesian[Validated[String,?]]",
+    SerializableTests.serializable(Cartesian[Validated[String, ?]]))
 
-  checkAll("Validated[?, ?]",
-           BifunctorTests[Validated].bifunctor[Int, Int, Int, Int, Int, Int])
+  checkAll(
+    "Validated[?, ?]",
+    BifunctorTests[Validated].bifunctor[Int, Int, Int, Int, Int, Int])
 
   implicit val eq0 = XorT.xorTEq[Validated[String, ?], String, Int]
 
-  checkAll("Validated[String, Int]",
-           ApplicativeErrorTests[Validated[String, ?], String]
-             .applicativeError[Int, Int, Int])
-  checkAll("ApplicativeError[Xor, String]",
-           SerializableTests.serializable(
-               ApplicativeError[Validated[String, ?], String]))
+  checkAll(
+    "Validated[String, Int]",
+    ApplicativeErrorTests[Validated[String, ?], String]
+      .applicativeError[Int, Int, Int])
+  checkAll(
+    "ApplicativeError[Xor, String]",
+    SerializableTests.serializable(
+      ApplicativeError[Validated[String, ?], String]))
 
-  checkAll("Validated[String, Int] with Option",
-           TraverseTests[Validated[String, ?]]
-             .traverse[Int, Int, Int, Int, Option, Option])
-  checkAll("Traverse[Validated[String, ?]]",
-           SerializableTests.serializable(Traverse[Validated[String, ?]]))
+  checkAll(
+    "Validated[String, Int] with Option",
+    TraverseTests[Validated[String, ?]]
+      .traverse[Int, Int, Int, Int, Option, Option])
+  checkAll(
+    "Traverse[Validated[String, ?]]",
+    SerializableTests.serializable(Traverse[Validated[String, ?]]))
 
   checkAll("Validated[String, Int]", OrderLaws[Validated[String, Int]].order)
-  checkAll("Order[Validated[String, Int]]",
-           SerializableTests.serializable(Order[Validated[String, Int]]))
+  checkAll(
+    "Order[Validated[String, Int]]",
+    SerializableTests.serializable(Order[Validated[String, Int]]))
 
   checkAll("Validated[String, Int]", GroupLaws[Validated[String, Int]].monoid)
 
-  checkAll("Validated[String, NonEmptyList[Int]]",
-           GroupLaws[Validated[String, NonEmptyList[Int]]].semigroup)
+  checkAll(
+    "Validated[String, NonEmptyList[Int]]",
+    GroupLaws[Validated[String, NonEmptyList[Int]]].semigroup)
 
   {
     implicit val S = ListWrapper.partialOrder[String]
     implicit val I = ListWrapper.partialOrder[Int]
     checkAll(
-        "Validated[ListWrapper[String], ListWrapper[Int]]",
-        OrderLaws[Validated[ListWrapper[String], ListWrapper[Int]]].partialOrder)
+      "Validated[ListWrapper[String], ListWrapper[Int]]",
+      OrderLaws[Validated[ListWrapper[String], ListWrapper[Int]]].partialOrder)
     checkAll(
-        "PartialOrder[Validated[ListWrapper[String], ListWrapper[Int]]]",
-        SerializableTests.serializable(
-            PartialOrder[Validated[ListWrapper[String], ListWrapper[Int]]]))
+      "PartialOrder[Validated[ListWrapper[String], ListWrapper[Int]]]",
+      SerializableTests.serializable(
+        PartialOrder[Validated[ListWrapper[String], ListWrapper[Int]]])
+    )
   }
 
   {
     implicit val S = ListWrapper.eqv[String]
     implicit val I = ListWrapper.eqv[Int]
-    checkAll("Validated[ListWrapper[String], ListWrapper[Int]]",
-             OrderLaws[Validated[ListWrapper[String], ListWrapper[Int]]].eqv)
-    checkAll("Eq[Validated[ListWrapper[String], ListWrapper[Int]]]",
-             SerializableTests.serializable(
-                 Eq[Validated[ListWrapper[String], ListWrapper[Int]]]))
+    checkAll(
+      "Validated[ListWrapper[String], ListWrapper[Int]]",
+      OrderLaws[Validated[ListWrapper[String], ListWrapper[Int]]].eqv)
+    checkAll(
+      "Eq[Validated[ListWrapper[String], ListWrapper[Int]]]",
+      SerializableTests.serializable(
+        Eq[Validated[ListWrapper[String], ListWrapper[Int]]]))
   }
 
   test("ap2 combines failures in order") {
@@ -75,9 +93,10 @@ class ValidatedTests extends CatsSuite {
   }
 
   test("catchOnly catches matching exceptions") {
-    assert(Validated
-          .catchOnly[NumberFormatException] { "foo".toInt }
-          .isInstanceOf[Invalid[NumberFormatException]])
+    assert(
+      Validated
+        .catchOnly[NumberFormatException] { "foo".toInt }
+        .isInstanceOf[Invalid[NumberFormatException]])
   }
 
   test("catchOnly lets non-matching exceptions escape") {
@@ -164,10 +183,9 @@ class ValidatedTests extends CatsSuite {
       else Validated.invalid(s"$i is not even")
 
     (Validated.valid(3) andThen even) should ===(
-        Validated.invalid("3 is not even"))
+      Validated.invalid("3 is not even"))
     (Validated.valid(4) andThen even) should ===(Validated.valid(4))
-    (Validated.invalid("foo") andThen even) should ===(
-        Validated.invalid("foo"))
+    (Validated.invalid("foo") andThen even) should ===(Validated.invalid("foo"))
   }
 
   test("fromOption consistent with Xor.fromOption") {

@@ -68,14 +68,14 @@ class GZIPStringEncoderTest extends WordSpec {
 
       testCodec("a")
       testCodec(
-          "\n\t\n\t\n\n\n\n\t\n\nt\n\t\n\t\n\tn\t\nt\nt\nt\nt\nt\nt\tn\nt\nt\n\t\nt\n")
+        "\n\t\n\t\n\n\n\n\t\n\nt\n\t\n\t\n\tn\t\nt\nt\nt\nt\nt\nt\tn\nt\nt\n\t\nt\n")
       testCodec("aosnetuhsaontehusaonethsoantehusaonethusonethusnaotehu")
 
       // build a huge string
       val sb = new StringBuilder
       for (_ <- 1 to 10000) {
         sb.append(
-            "oasnuthoesntihosnteidosentidosentauhsnoetidosentihsoneitdsnuthsin\n")
+          "oasnuthoesntihosnteidosentidosentauhsnoetidosentihsoneitdsnuthsin\n")
       }
       testCodec(sb.toString)
     }

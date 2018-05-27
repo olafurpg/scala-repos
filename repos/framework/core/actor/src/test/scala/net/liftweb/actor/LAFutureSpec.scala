@@ -72,8 +72,9 @@ class LAFutureSpec extends Specification {
       val givenTwoResult = 234
       val one = LAFuture(() => givenOneResult)
       val two = LAFuture(() => givenTwoResult)
-      LAFuture.collect(one, two).get(timeout) shouldEqual List(givenOneResult,
-                                                               givenTwoResult)
+      LAFuture.collect(one, two).get(timeout) shouldEqual List(
+        givenOneResult,
+        givenTwoResult)
     }
 
     "collect empty list immediately" in {

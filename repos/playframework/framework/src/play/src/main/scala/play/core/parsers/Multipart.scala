@@ -5,7 +5,12 @@ package play.core.parsers
 
 import akka.stream.Materializer
 import akka.stream.scaladsl._
-import akka.stream.stage.{TerminationDirective, SyncDirective, Context, PushPullStage}
+import akka.stream.stage.{
+  TerminationDirective,
+  SyncDirective,
+  Context,
+  PushPullStage
+}
 import akka.util.ByteString
 import play.api.Play
 import play.api.libs.Files.TemporaryFile
@@ -33,9 +38,8 @@ object Multipart {
     * @param maxMemoryBufferSize The maximum amount of data to parse into memory.
     * @param partHandler The accumulator to handle the parts.
     */
-  def partParser[A](maxMemoryBufferSize: Int)(partHandler: Accumulator[
-                                                  Part[Source[ByteString, _]],
-                                                  Either[Result, A]])(
+  def partParser[A](maxMemoryBufferSize: Int)(
+      partHandler: Accumulator[Part[Source[ByteString, _]], Either[Result, A]])(
       implicit mat: Materializer): BodyParser[A] = BodyParser { request =>
     val maybeBoundary = for {
       mt <- request.mediaType
@@ -43,30 +47,31 @@ object Multipart {
       boundary <- value
     } yield boundary
 
-    maybeBoundary.map { boundary =>
-      val multipartFlow = Flow[ByteString]
-        .transform(() =>
-              new BodyPartParser(
-                  boundary, maxMemoryBufferSize, maxHeaderBuffer))
-        .splitWhen(_.isLeft)
-        .prefixAndTail(1)
-        .map {
-          case (Seq(Left(part: FilePart[_])), body) =>
-            part.copy[Source[ByteString, _]](ref = body.collect {
-              case Right(bytes) => bytes
-            })
-          case (Seq(Left(other)), ignored) =>
-            // If we don't run the source, it takes Akka streams 5 seconds to wake up and realise the source is empty
-            // before it progresses onto the next element
-            ignored.runWith(Sink.cancelled)
-            other.asInstanceOf[Part[Nothing]]
-        }
-        .concatSubstreams
+    maybeBoundary
+      .map { boundary =>
+        val multipartFlow = Flow[ByteString]
+          .transform(() =>
+            new BodyPartParser(boundary, maxMemoryBufferSize, maxHeaderBuffer))
+          .splitWhen(_.isLeft)
+          .prefixAndTail(1)
+          .map {
+            case (Seq(Left(part: FilePart[_])), body) =>
+              part.copy[Source[ByteString, _]](ref = body.collect {
+                case Right(bytes) => bytes
+              })
+            case (Seq(Left(other)), ignored) =>
+              // If we don't run the source, it takes Akka streams 5 seconds to wake up and realise the source is empty
+              // before it progresses onto the next element
+              ignored.runWith(Sink.cancelled)
+              other.asInstanceOf[Part[Nothing]]
+          }
+          .concatSubstreams
 
-      partHandler.through(multipartFlow)
-    }.getOrElse {
-      Accumulator.done(createBadResult("Missing boundary header")(request))
-    }
+        partHandler.through(multipartFlow)
+      }
+      .getOrElse {
+        Accumulator.done(createBadResult("Missing boundary header")(request))
+      }
   }
 
   /**
@@ -76,20 +81,21 @@ object Multipart {
     * @param filePartHandler The accumulator to handle the file parts.
     */
   def multipartParser[A](
-      maxMemoryBufferSize: Int, filePartHandler: FilePartHandler[A])(
+      maxMemoryBufferSize: Int,
+      filePartHandler: FilePartHandler[A])(
       implicit mat: Materializer): BodyParser[MultipartFormData[A]] =
     BodyParser { request =>
       partParser(maxMemoryBufferSize) {
         val handleFileParts = Flow[Part[Source[ByteString, _]]].mapAsync(1) {
           case filePart: FilePart[Source[ByteString, _]] =>
-            filePartHandler(FileInfo(filePart.key,
-                                     filePart.filename,
-                                     filePart.contentType)).run(filePart.ref)
+            filePartHandler(
+              FileInfo(filePart.key, filePart.filename, filePart.contentType))
+              .run(filePart.ref)
           case other: Part[Nothing] => Future.successful(other)
         }
 
         val multipartAccumulator = Accumulator(
-            Sink.fold[Seq[Part[A]], Part[A]](Vector.empty)(_ :+ _)).mapFuture {
+          Sink.fold[Seq[Part[A]], Part[A]](Vector.empty)(_ :+ _)).mapFuture {
           parts =>
             def parseError = parts.collectFirst {
               case ParseError(msg) => createBadResult(msg)(request)
@@ -101,22 +107,22 @@ object Multipart {
             }
 
             parseError orElse bufferExceededError getOrElse {
-              Future.successful(
-                  Right(
-                      MultipartFormData(
-                          parts.collect {
+              Future.successful(Right(MultipartFormData(
+                parts
+                  .collect {
                     case dp: DataPart => dp
-                  }.groupBy(_.key)
-                            .map {
-                      case (key, partValues) => key -> partValues.map(_.value)
-                    },
-                          parts.collect {
-                    case fp: FilePart[A] => fp
-                  },
-                          parts.collect {
-                    case bad: BadPart => bad
                   }
-                      )))
+                  .groupBy(_.key)
+                  .map {
+                    case (key, partValues) => key -> partValues.map(_.value)
+                  },
+                parts.collect {
+                  case fp: FilePart[A] => fp
+                },
+                parts.collect {
+                  case bad: BadPart => bad
+                }
+              )))
             }
         }
 
@@ -129,19 +135,19 @@ object Multipart {
   def handleFilePartAsTemporaryFile: FilePartHandler[TemporaryFile] = {
     case FileInfo(partName, filename, contentType) =>
       val tempFile = TemporaryFile("multipartBody", "asTemporaryFile")
-      Accumulator(StreamConverters.fromOutputStream(
-              () => new java.io.FileOutputStream(tempFile.file))).map { _ =>
+      Accumulator(StreamConverters.fromOutputStream(() =>
+        new java.io.FileOutputStream(tempFile.file))).map { _ =>
         FilePart(partName, filename, contentType, tempFile)
       }
   }
 
   case class FileInfo(
-                      /** Name of the part in HTTP request (e.g. field name) */
-                      partName: String,
-                      /** Name of the file */
-                      fileName: String,
-                      /** Type of content (e.g. "application/pdf"), or `None` if unspecified. */
-                      contentType: Option[String])
+      /** Name of the part in HTTP request (e.g. field name) */
+      partName: String,
+      /** Name of the file */
+      fileName: String,
+      /** Type of content (e.g. "application/pdf"), or `None` if unspecified. */
+      contentType: Option[String])
 
   private[play] object FileInfoMatcher {
 
@@ -189,15 +195,15 @@ object Multipart {
         values <- headers
           .get("content-disposition")
           .map(
-              split(_)
-                .map(_.trim)
-                .map {
-              // unescape escaped quotes
-              case KeyValue(key, v) =>
-                (key.trim, v.trim.replaceAll("""\\"""", "\""))
-              case key => (key.trim, "")
-            }
-                .toMap)
+            split(_)
+              .map(_.trim)
+              .map {
+                // unescape escaped quotes
+                case KeyValue(key, v) =>
+                  (key.trim, v.trim.replaceAll("""\\"""", "\""))
+                case key => (key.trim, "")
+              }
+              .toMap)
 
         _ <- values.get("form-data")
         partName <- values.get("name")
@@ -215,24 +221,27 @@ object Multipart {
       for {
         values <- headers
           .get("content-disposition")
-          .map(_.split(";")
-                .map(_.trim)
-                .map {
-              case KeyValue(key, v) => (key.trim, v.trim)
-              case key => (key.trim, "")
-            }
-                .toMap)
+          .map(
+            _.split(";")
+              .map(_.trim)
+              .map {
+                case KeyValue(key, v) => (key.trim, v.trim)
+                case key              => (key.trim, "")
+              }
+              .toMap)
         _ <- values.get("form-data")
         partName <- values.get("name")
       } yield partName
     }
   }
 
-  private def createBadResult[A](msg: String, status: Int = BAD_REQUEST)
-    : RequestHeader => Future[Either[Result, A]] = { request =>
-    Play.privateMaybeApplication
-      .fold(Future.successful(Left(Results.Status(status): Result)))(
-        _.errorHandler.onClientError(request, status, msg).map(Left(_)))
+  private def createBadResult[A](
+      msg: String,
+      status: Int = BAD_REQUEST): RequestHeader => Future[Either[Result, A]] = {
+    request =>
+      Play.privateMaybeApplication
+        .fold(Future.successful(Left(Results.Status(status): Result)))(
+          _.errorHandler.onClientError(request, status, msg).map(Left(_)))
   }
 
   private type RawPart = Either[Part[Unit], ByteString]
@@ -258,14 +267,17 @@ object Multipart {
     * see: http://tools.ietf.org/html/rfc2046#section-5.1.1
     */
   private final class BodyPartParser(
-      boundary: String, maxMemoryBufferSize: Int, maxHeaderSize: Int)
+      boundary: String,
+      maxMemoryBufferSize: Int,
+      maxHeaderSize: Int)
       extends PushPullStage[ByteString, RawPart] {
 
-    require(boundary.nonEmpty,
-            "'boundary' parameter of multipart Content-Type must be non-empty")
     require(
-        boundary.charAt(boundary.length - 1) != ' ',
-        "'boundary' parameter of multipart Content-Type must not end with a space char")
+      boundary.nonEmpty,
+      "'boundary' parameter of multipart Content-Type must be non-empty")
+    require(
+      boundary.charAt(boundary.length - 1) != ' ',
+      "'boundary' parameter of multipart Content-Type must not end with a space char")
 
     // phantom type for ensuring soundness of our parsing method setup
     sealed trait StateResult
@@ -277,7 +289,11 @@ object Multipart {
       array(2) = '-'.toByte
       array(3) = '-'.toByte
       System.arraycopy(
-          boundary.getBytes("US-ASCII"), 0, array, 4, boundary.length)
+        boundary.getBytes("US-ASCII"),
+        0,
+        array,
+        4,
+        boundary.length)
       array
     }
 
@@ -290,7 +306,8 @@ object Multipart {
     private var terminated = false
 
     override def onPush(
-        input: ByteString, ctx: Context[RawPart]): SyncDirective =
+        input: ByteString,
+        ctx: Context[RawPart]): SyncDirective =
       if (!terminated) {
         state(input)
         if (output.nonEmpty) ctx.push(dequeue())
@@ -306,8 +323,7 @@ object Multipart {
       } else ctx.pull()
     }
 
-    override def onUpstreamFinish(
-        ctx: Context[RawPart]): TerminationDirective =
+    override def onUpstreamFinish(ctx: Context[RawPart]): TerminationDirective =
       ctx.absorbTermination()
 
     def tryParseInitialBoundary(input: ByteString): StateResult =
@@ -344,62 +360,72 @@ object Multipart {
       *
       * Then, the resulting ByteString is converted to a String, split into lines, and then split into keys and values.
       */
-    def parseHeader(input: ByteString,
-                    headerStart: Int,
-                    memoryBufferSize: Int): StateResult = {
+    def parseHeader(
+        input: ByteString,
+        headerStart: Int,
+        memoryBufferSize: Int): StateResult = {
       input.indexOfSlice(crlfcrlf, headerStart) match {
         case -1 if input.length - headerStart >= maxHeaderSize =>
           bufferExceeded(
-              "Header length exceeded buffer size of " + memoryBufferSize)
+            "Header length exceeded buffer size of " + memoryBufferSize)
         case -1 =>
           continue(input, headerStart)(parseHeader(_, _, memoryBufferSize))
         case headerEnd if headerEnd - headerStart >= maxHeaderSize =>
           bufferExceeded(
-              "Header length exceeded buffer size of " + memoryBufferSize)
+            "Header length exceeded buffer size of " + memoryBufferSize)
         case headerEnd =>
           val headerString = input.slice(headerStart, headerEnd).utf8String
           val headers = headerString.lines.map { header =>
             val key :: value = header.trim
               .split(":")
               .toList
-              (key.trim.toLowerCase(java.util.Locale.ENGLISH),
-               value.mkString(":").trim)
+            (
+              key.trim.toLowerCase(java.util.Locale.ENGLISH),
+              value.mkString(":").trim)
           }.toMap
 
           val partStart = headerEnd + 4
 
           // The amount of memory taken by the headers
           def headersSize =
-            headers.foldLeft(0)(
-                (total, value) => total + value._1.length + value._2.length)
+            headers.foldLeft(0)((total, value) =>
+              total + value._1.length + value._2.length)
 
           headers match {
             case FileInfoMatcher(partName, fileName, contentType) =>
-              handleFilePart(input,
-                             partStart,
-                             memoryBufferSize + headersSize,
-                             partName,
-                             fileName,
-                             contentType)
+              handleFilePart(
+                input,
+                partStart,
+                memoryBufferSize + headersSize,
+                partName,
+                fileName,
+                contentType)
             case PartInfoMatcher(name) =>
               handleDataPart(
-                  input, partStart, memoryBufferSize + name.length, name)
+                input,
+                partStart,
+                memoryBufferSize + name.length,
+                name)
             case _ =>
               handleBadPart(
-                  input, partStart, memoryBufferSize + headersSize, headers)
+                input,
+                partStart,
+                memoryBufferSize + headersSize,
+                headers)
           }
       }
     }
 
-    def handleFilePart(input: ByteString,
-                       partStart: Int,
-                       memoryBufferSize: Int,
-                       partName: String,
-                       fileName: String,
-                       contentType: Option[String]): StateResult = {
+    def handleFilePart(
+        input: ByteString,
+        partStart: Int,
+        memoryBufferSize: Int,
+        partName: String,
+        fileName: String,
+        contentType: Option[String]): StateResult = {
       if (memoryBufferSize > maxMemoryBufferSize) {
         bufferExceeded(
-            s"Memory buffer full ($maxMemoryBufferSize) on part $partName")
+          s"Memory buffer full ($maxMemoryBufferSize) on part $partName")
       } else {
         emit(FilePart(partName, fileName, contentType, ()))
         handleFileData(input, partStart, memoryBufferSize)
@@ -407,7 +433,9 @@ object Multipart {
     }
 
     def handleFileData(
-        input: ByteString, offset: Int, memoryBufferSize: Int): StateResult = {
+        input: ByteString,
+        offset: Int,
+        memoryBufferSize: Int): StateResult = {
       try {
         val currentPartEnd = boyerMoore.nextIndex(input, offset)
         val needleEnd = currentPartEnd + needle.length
@@ -427,17 +455,18 @@ object Multipart {
           if (emitEnd > offset) {
             emit(input.slice(offset, emitEnd))
             continue(input.drop(emitEnd), 0)(
-                handleFileData(_, _, memoryBufferSize))
+              handleFileData(_, _, memoryBufferSize))
           } else {
             continue(input, offset)(handleFileData(_, _, memoryBufferSize))
           }
       }
     }
 
-    def handleDataPart(input: ByteString,
-                       partStart: Int,
-                       memoryBufferSize: Int,
-                       partName: String): StateResult = {
+    def handleDataPart(
+        input: ByteString,
+        partStart: Int,
+        memoryBufferSize: Int,
+        partName: String): StateResult = {
       try {
         val currentPartEnd = boyerMoore.nextIndex(input, partStart)
         val needleEnd = currentPartEnd + needle.length
@@ -446,12 +475,16 @@ object Multipart {
         if (newMemoryBufferSize > maxMemoryBufferSize) {
           bufferExceeded("Memory buffer full on part " + partName)
         } else if (crlf(input, needleEnd)) {
-          emit(DataPart(
-                  partName, input.slice(partStart, currentPartEnd).utf8String))
+          emit(
+            DataPart(
+              partName,
+              input.slice(partStart, currentPartEnd).utf8String))
           parseHeader(input, needleEnd + 2, newMemoryBufferSize)
         } else if (doubleDash(input, needleEnd)) {
-          emit(DataPart(
-                  partName, input.slice(partStart, currentPartEnd).utf8String))
+          emit(
+            DataPart(
+              partName,
+              input.slice(partStart, currentPartEnd).utf8String))
           terminate()
         } else {
           fail("Unexpected boundary")
@@ -462,14 +495,15 @@ object Multipart {
             bufferExceeded("Memory buffer full on part " + partName)
           }
           continue(input, partStart)(
-              handleDataPart(_, _, memoryBufferSize, partName))
+            handleDataPart(_, _, memoryBufferSize, partName))
       }
     }
 
-    def handleBadPart(input: ByteString,
-                      partStart: Int,
-                      memoryBufferSize: Int,
-                      headers: Map[String, String]): StateResult = {
+    def handleBadPart(
+        input: ByteString,
+        partStart: Int,
+        memoryBufferSize: Int,
+        headers: Map[String, String]): StateResult = {
       try {
         val currentPartEnd = boyerMoore.nextIndex(input, partStart)
         val needleEnd = currentPartEnd + needle.length
@@ -485,7 +519,7 @@ object Multipart {
       } catch {
         case NotEnoughDataException =>
           continue(input, partStart)(
-              handleBadPart(_, _, memoryBufferSize, headers))
+            handleBadPart(_, _, memoryBufferSize, headers))
       }
     }
 
@@ -509,7 +543,7 @@ object Multipart {
         case -1 ⇒
           more ⇒
             next(input ++ more, offset)
-          case 0 ⇒ next(_, 0)
+        case 0 ⇒ next(_, 0)
         case 1 ⇒ throw new IllegalStateException
       }
       done()
@@ -540,10 +574,12 @@ object Multipart {
     // the length of the needle without the preceding CRLF
     def boundaryLength = needle.length - 2
 
-    @tailrec def boundary(input: ByteString, offset: Int, ix: Int = 2)
-      : Boolean =
+    @tailrec def boundary(
+        input: ByteString,
+        offset: Int,
+        ix: Int = 2): Boolean =
       (ix == needle.length) || (byteAt(input, offset + ix - 2) == needle(ix)) &&
-      boundary(input, offset, ix + 1)
+        boundary(input, offset, ix + 1)
 
     def crlf(input: ByteString, offset: Int): Boolean =
       byteChar(input, offset) == '\r' && byteChar(input, offset + 1) == '\n'
@@ -589,7 +625,8 @@ object Multipart {
 
       @tailrec def suffixLength(i: Int, j: Int, result: Int): Int =
         if (i >= 0 && needle(i) == needle(j))
-          suffixLength(i - 1, j - 1, result + 1) else result
+          suffixLength(i - 1, j - 1, result + 1)
+        else result
       @tailrec def loop2(i: Int): Unit =
         if (i < nl1) {
           val sl = suffixLength(i, nl1, 0)

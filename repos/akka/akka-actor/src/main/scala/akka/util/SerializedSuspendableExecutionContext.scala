@@ -16,8 +16,7 @@ private[akka] object SerializedSuspendableExecutionContext {
 
   def apply(throughput: Int)(implicit context: ExecutionContext)
     : SerializedSuspendableExecutionContext =
-    new SerializedSuspendableExecutionContext(throughput)(
-        context match {
+    new SerializedSuspendableExecutionContext(throughput)(context match {
       case s: SerializedSuspendableExecutionContext ⇒ s.context
       case other ⇒ other
     })
@@ -32,13 +31,15 @@ private[akka] object SerializedSuspendableExecutionContext {
   * @param throughput maximum number of tasks to be executed in serial before relinquishing the executing thread.
   * @param context the underlying context which will be used to actually execute the submitted tasks
   */
-private[akka] final class SerializedSuspendableExecutionContext(
-    throughput: Int)(val context: ExecutionContext)
-    extends AbstractNodeQueue[Runnable] with Runnable with ExecutionContext {
+private[akka] final class SerializedSuspendableExecutionContext(throughput: Int)(
+    val context: ExecutionContext)
+    extends AbstractNodeQueue[Runnable]
+    with Runnable
+    with ExecutionContext {
   import SerializedSuspendableExecutionContext._
   require(
-      throughput > 0,
-      s"SerializedSuspendableExecutionContext.throughput must be greater than 0 but was $throughput")
+    throughput > 0,
+    s"SerializedSuspendableExecutionContext.throughput must be greater than 0 but was $throughput")
 
   private final val state = new AtomicInteger(Off)
   @tailrec private final def addState(newState: Int): Boolean = {
@@ -69,17 +70,20 @@ private[akka] final class SerializedSuspendableExecutionContext(
         poll() match {
           case null ⇒ ()
           case some ⇒
-            try some.run() catch { case NonFatal(t) ⇒ context reportFailure t }
+            try some.run()
+            catch { case NonFatal(t) ⇒ context reportFailure t }
             run(done + 1)
         }
       }
-    try run(0) finally remState(On)
+    try run(0)
+    finally remState(On)
   }
 
   final def attach(): Unit =
     if (!isEmpty() && state.compareAndSet(Off, On)) context execute this
   override final def execute(task: Runnable): Unit =
-    try add(task) finally attach()
+    try add(task)
+    finally attach()
   override final def reportFailure(t: Throwable): Unit =
     context reportFailure t
 

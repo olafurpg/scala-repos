@@ -29,18 +29,19 @@ import org.jetbrains.plugins.scala.settings.ScalaApplicationSettings
   * Nikolay.Tropin
   * 12/25/13
   */
-class ScalaGenerationInfo(classMember: ClassMember)
-    extends GenerationInfoBase {
+class ScalaGenerationInfo(classMember: ClassMember) extends GenerationInfoBase {
 
   private var myMember: PsiMember = classMember.getElement
 
   override def getPsiMember: PsiMember = myMember
 
   override def insert(
-      aClass: PsiClass, anchor: PsiElement, before: Boolean): Unit = {
+      aClass: PsiClass,
+      anchor: PsiElement,
+      before: Boolean): Unit = {
     val templDef = aClass match {
       case td: ScTemplateDefinition => td
-      case _ => return
+      case _                        => return
     }
 
     classMember match {
@@ -51,31 +52,34 @@ class ScalaGenerationInfo(classMember: ClassMember)
         val substitutor = member.substitutor
         val needsOverride = member.isOverride || toAddOverrideToImplemented
         val m = ScalaPsiElementFactory.createOverrideImplementType(
-            alias, substitutor, alias.getManager, needsOverride)
+          alias,
+          substitutor,
+          alias.getManager,
+          needsOverride)
         val added = templDef.addMember(m, Option(anchor))
         myMember = added
         TypeAdjuster.markToAdjust(added)
       case _: ScValueMember | _: ScVariableMember =>
         val isVal = classMember match {
-          case _: ScValueMember => true
+          case _: ScValueMember    => true
           case _: ScVariableMember => false
         }
         val value = classMember match {
-          case x: ScValueMember => x.element
+          case x: ScValueMember    => x.element
           case x: ScVariableMember => x.element
         }
         val (substitutor, needsOverride) = classMember match {
-          case x: ScValueMember => (x.substitutor, x.isOverride)
+          case x: ScValueMember    => (x.substitutor, x.isOverride)
           case x: ScVariableMember => (x.substitutor, x.isOverride)
         }
         val addOverride = needsOverride || toAddOverrideToImplemented
         val m = ScalaPsiElementFactory.createOverrideImplementVariable(
-            value,
-            substitutor,
-            value.getManager,
-            addOverride,
-            isVal,
-            needsInferType)
+          value,
+          substitutor,
+          value.getManager,
+          addOverride,
+          isVal,
+          needsInferType)
         val added = templDef.addMember(m, Option(anchor))
         myMember = added
         TypeAdjuster.markToAdjust(added)
@@ -84,7 +88,8 @@ class ScalaGenerationInfo(classMember: ClassMember)
   }
 
   override def findInsertionAnchor(
-      aClass: PsiClass, leaf: PsiElement): PsiElement = {
+      aClass: PsiClass,
+      leaf: PsiElement): PsiElement = {
     aClass match {
       case td: ScTemplateDefinition =>
         ScalaOIUtil.getAnchor(leaf.getTextRange.getStartOffset, td).orNull
@@ -92,7 +97,9 @@ class ScalaGenerationInfo(classMember: ClassMember)
     }
   }
 
-  override def positionCaret(editor: Editor, toEditMethodBody: Boolean): Unit = {
+  override def positionCaret(
+      editor: Editor,
+      toEditMethodBody: Boolean): Unit = {
     val element = getPsiMember
     ScalaGenerationInfo.positionCaret(editor, element)
   }
@@ -112,13 +119,13 @@ object ScalaGenerationInfo {
       CodeStyleManager.getInstance(element.getProject).reformat(element)
     //Setting selection
     val body: PsiElement = member match {
-      case ta: ScTypeAliasDefinition => ta.aliasedTypeElement
-      case ScPatternDefinition.expr(expr) => expr
+      case ta: ScTypeAliasDefinition       => ta.aliasedTypeElement
+      case ScPatternDefinition.expr(expr)  => expr
       case ScVariableDefinition.expr(expr) => expr
       case method: ScFunctionDefinition =>
         method.body match {
           case Some(x) => x
-          case None => return
+          case None    => return
         }
       case _ => return
     }
@@ -129,7 +136,7 @@ object ScalaGenerationInfo {
     if (!editor.getScrollingModel.getVisibleArea.contains(point)) {
       member match {
         case n: Navigatable => n.navigate(true)
-        case _ =>
+        case _              =>
       }
     }
 
@@ -138,25 +145,26 @@ object ScalaGenerationInfo {
         val statements = e.statements
         if (statements.length == 0) {
           editor.getCaretModel.moveToOffset(
-              body.getTextRange.getStartOffset + 1)
+            body.getTextRange.getStartOffset + 1)
         } else {
           val range = new TextRange(
-              statements(0).getTextRange.getStartOffset,
-              statements(statements.length - 1).getTextRange.getEndOffset)
+            statements(0).getTextRange.getStartOffset,
+            statements(statements.length - 1).getTextRange.getEndOffset)
           editor.getCaretModel.moveToOffset(range.getStartOffset)
-          editor.getSelectionModel.setSelection(
-              range.getStartOffset, range.getEndOffset)
+          editor.getSelectionModel
+            .setSelection(range.getStartOffset, range.getEndOffset)
         }
       case _ =>
         val range = body.getTextRange
         editor.getCaretModel.moveToOffset(range.getStartOffset)
-        editor.getSelectionModel.setSelection(
-            range.getStartOffset, range.getEndOffset)
+        editor.getSelectionModel
+          .setSelection(range.getStartOffset, range.getEndOffset)
     }
   }
 
   private def callSuperText(
-      td: ScTemplateDefinition, method: PsiMethod): String = {
+      td: ScTemplateDefinition,
+      method: PsiMethod): String = {
     val superOrSelfQual: String = td.selfType match {
       case None => "super."
       case Some(st: ScType) =>
@@ -199,9 +207,10 @@ object ScalaGenerationInfo {
     superOrSelfQual + methodName + parametersText
   }
 
-  def getMethodBody(member: ScMethodMember,
-                    td: ScTemplateDefinition,
-                    isImplement: Boolean): String = {
+  def getMethodBody(
+      member: ScMethodMember,
+      td: ScTemplateDefinition,
+      isImplement: Boolean): String = {
     val templateName =
       if (isImplement) ScalaFileTemplateUtil.SCALA_IMPLEMENTED_METHOD_TEMPLATE
       else ScalaFileTemplateUtil.SCALA_OVERRIDDEN_METHOD_TEMPLATE
@@ -218,24 +227,30 @@ object ScalaGenerationInfo {
     val method = member.getElement
 
     properties.setProperty(
-        FileTemplate.ATTRIBUTE_RETURN_TYPE, ScType.presentableText(returnType))
+      FileTemplate.ATTRIBUTE_RETURN_TYPE,
+      ScType.presentableText(returnType))
     properties.setProperty(
-        FileTemplate.ATTRIBUTE_DEFAULT_RETURN_VALUE, standardValue)
+      FileTemplate.ATTRIBUTE_DEFAULT_RETURN_VALUE,
+      standardValue)
     properties.setProperty(
-        FileTemplate.ATTRIBUTE_CALL_SUPER, callSuperText(td, method))
+      FileTemplate.ATTRIBUTE_CALL_SUPER,
+      callSuperText(td, method))
     properties.setProperty(
-        "Q_MARK",
-        ScalaGenerationInfo.defaultValue(returnType, td.getContainingFile))
+      "Q_MARK",
+      ScalaGenerationInfo.defaultValue(returnType, td.getContainingFile))
 
     ScalaFileTemplateUtil.setClassAndMethodNameProperties(
-        properties, method.containingClass, method)
+      properties,
+      method.containingClass,
+      method)
 
     template.getText(properties)
   }
 
-  def insertMethod(member: ScMethodMember,
-                   td: ScTemplateDefinition,
-                   anchor: PsiElement): ScFunction = {
+  def insertMethod(
+      member: ScMethodMember,
+      td: ScTemplateDefinition,
+      anchor: PsiElement): ScFunction = {
     val method: PsiMethod = member.getElement
     val sign = member.sign
 
@@ -245,7 +260,11 @@ object ScalaGenerationInfo {
 
     val needsOverride = !isImplement || toAddOverrideToImplemented
     val m = ScalaPsiElementFactory.createOverrideImplementMethod(
-        sign, method.getManager, needsOverride, needsInferType, body)
+      sign,
+      method.getManager,
+      needsOverride,
+      needsInferType,
+      body)
     val added = td.addMember(m, Option(anchor))
     TypeAdjuster.markToAdjust(added)
     added.asInstanceOf[ScFunction]

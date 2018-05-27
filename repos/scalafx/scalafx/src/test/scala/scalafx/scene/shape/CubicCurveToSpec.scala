@@ -41,7 +41,8 @@ import scalafx.testutil.{PositionDelegateSpec, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class CubicCurveToSpec
     extends SimpleSFXDelegateSpec[jfxss.CubicCurveTo, CubicCurveTo](
-        classOf[jfxss.CubicCurveTo], classOf[CubicCurveTo])
+      classOf[jfxss.CubicCurveTo],
+      classOf[CubicCurveTo])
     with PositionDelegateSpec[CubicCurveTo] {
 
   val positionDelegate = getScalaClassInstance

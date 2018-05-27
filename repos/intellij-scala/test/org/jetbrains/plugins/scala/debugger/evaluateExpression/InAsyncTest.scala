@@ -1,6 +1,9 @@
 package org.jetbrains.plugins.scala.debugger.evaluateExpression
 
-import org.jetbrains.plugins.scala.debugger.{ScalaDebuggerTestCase, ScalaVersion_2_11}
+import org.jetbrains.plugins.scala.debugger.{
+  ScalaDebuggerTestCase,
+  ScalaVersion_2_11
+}
 
 /**
   * @author Nikolay.Tropin
@@ -10,13 +13,15 @@ class InAsyncTest extends InAsyncTestBase with ScalaVersion_2_11
 abstract class InAsyncTestBase extends ScalaDebuggerTestCase {
 
   override protected def addOtherLibraries(): Unit = {
-    addIvyCacheLibrary("scala-async",
-                       "/org.scala-lang.modules/scala-async_2.11/bundles/",
-                       "scala-async_2.11-0.9.5.jar")
+    addIvyCacheLibrary(
+      "scala-async",
+      "/org.scala-lang.modules/scala-async_2.11/bundles/",
+      "scala-async_2.11-0.9.5.jar")
   }
 
-  addFileWithBreakpoints("InAsync.scala",
-                         s"""
+  addFileWithBreakpoints(
+    "InAsync.scala",
+    s"""
       |import scala.async.Async._
       |import scala.concurrent.Await
       |import scala.concurrent.duration.Duration
@@ -50,7 +55,8 @@ abstract class InAsyncTestBase extends ScalaDebuggerTestCase {
       |    println(Await.result(future, Duration.Inf))
       |  }
       |}
-    """.stripMargin)
+    """.stripMargin
+  )
 
   def testInAsync(): Unit = {
     runDebugger() {

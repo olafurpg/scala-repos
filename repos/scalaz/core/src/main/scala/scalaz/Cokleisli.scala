@@ -19,16 +19,14 @@ final case class Cokleisli[F[_], A, B](run: F[A] => B) { self =>
   def <<=(a: F[A])(implicit F: Cobind[F]): F[B] =
     F.extend(a)(run)
 
-  def =>=[C](c: Cokleisli[F, B, C])(
-      implicit F: Cobind[F]): Cokleisli[F, A, C] =
+  def =>=[C](c: Cokleisli[F, B, C])(implicit F: Cobind[F]): Cokleisli[F, A, C] =
     Cokleisli(fa => c run (<<=(fa)))
 
   def compose[C](c: Cokleisli[F, C, A])(
       implicit F: Cobind[F]): Cokleisli[F, C, B] =
     c =>= this
 
-  def =<=[C](c: Cokleisli[F, C, A])(
-      implicit F: Cobind[F]): Cokleisli[F, C, B] =
+  def =<=[C](c: Cokleisli[F, C, A])(implicit F: Cobind[F]): Cokleisli[F, C, B] =
     compose(c)
 
   import Leibniz.===
@@ -44,16 +42,16 @@ sealed abstract class CokleisliInstances0 {
     new CokleisliCompose[F] {
       override implicit def F = F0
     }
-  implicit def cokleisliProfunctor[F[_]: Functor]: Profunctor[Cokleisli[
-          F, ?, ?]] =
+  implicit def cokleisliProfunctor[F[_]: Functor]
+    : Profunctor[Cokleisli[F, ?, ?]] =
     new CokleisliProfunctor[F] {
       def F = implicitly
     }
 }
 
 sealed abstract class CokleisliInstances extends CokleisliInstances0 {
-  implicit def cokleisliMonad[F[_], R]: Monad[Cokleisli[F, R, ?]] with BindRec[
-      Cokleisli[F, R, ?]] =
+  implicit def cokleisliMonad[F[_], R]
+    : Monad[Cokleisli[F, R, ?]] with BindRec[Cokleisli[F, R, ?]] =
     new CokleisliMonad[F, R] {}
 
   implicit def cokleisliArrow[F[_]](implicit F0: Comonad[F])
@@ -64,7 +62,8 @@ sealed abstract class CokleisliInstances extends CokleisliInstances0 {
 }
 
 private trait CokleisliMonad[F[_], R]
-    extends Monad[Cokleisli[F, R, ?]] with BindRec[Cokleisli[F, R, ?]] {
+    extends Monad[Cokleisli[F, R, ?]]
+    with BindRec[Cokleisli[F, R, ?]] {
   override def map[A, B](fa: Cokleisli[F, R, A])(f: A => B) = fa map f
   override def ap[A, B](fa: => Cokleisli[F, R, A])(
       f: => Cokleisli[F, R, A => B]) = f flatMap (fa map _)
@@ -77,7 +76,7 @@ private trait CokleisliMonad[F[_], R]
     def go(a0: A)(r: F[R]): B =
       f(a0).run(r) match {
         case -\/(a1) => go(a1)(r)
-        case \/-(b) => b
+        case \/-(b)  => b
       }
 
     Cokleisli(go(a))
@@ -91,8 +90,7 @@ private trait CokleisliCompose[F[_]] extends Compose[Cokleisli[F, ?, ?]] {
     f compose g
 }
 
-private trait CokleisliProfunctor[F[_]]
-    extends Profunctor[Cokleisli[F, ?, ?]] {
+private trait CokleisliProfunctor[F[_]] extends Profunctor[Cokleisli[F, ?, ?]] {
   implicit def F: Functor[F]
 
   override def dimap[A, B, C, D](fab: Cokleisli[F, A, B])(f: C => A)(
@@ -107,8 +105,10 @@ private trait CokleisliProfunctor[F[_]]
 }
 
 private trait CokleisliArrow[F[_]]
-    extends Arrow[Cokleisli[F, ?, ?]] with ProChoice[Cokleisli[F, ?, ?]]
-    with CokleisliProfunctor[F] with CokleisliCompose[F] {
+    extends Arrow[Cokleisli[F, ?, ?]]
+    with ProChoice[Cokleisli[F, ?, ?]]
+    with CokleisliProfunctor[F]
+    with CokleisliCompose[F] {
 
   implicit def F: Comonad[F]
 
@@ -132,6 +132,6 @@ private trait CokleisliArrow[F[_]]
   def id[A] = Cokleisli[F, A, A](F.copoint)
 
   def first[A, B, C](f: Cokleisli[F, A, B]) =
-    Cokleisli[F, (A, C), (B, C)](
-        w => (f.run(F.map(w)(ac => ac._1)), F.copoint(w)._2))
+    Cokleisli[F, (A, C), (B, C)](w =>
+      (f.run(F.map(w)(ac => ac._1)), F.copoint(w)._2))
 }

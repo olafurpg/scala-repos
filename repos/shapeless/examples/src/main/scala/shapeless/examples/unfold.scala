@@ -59,7 +59,15 @@ object UnfoldExamples extends App {
     // shrink at the same time as the term S (read: seed) grows. The only structure assumed
     // for the (co-)sequence of seeds is that implied by the cases of F.
     implicit def unfold2[
-        F <: Poly, E, S, CoS, SS, OutH, OutT <: HList, PCoS, PCoSV](
+        F <: Poly,
+        E,
+        S,
+        CoS,
+        SS,
+        OutH,
+        OutT <: HList,
+        PCoS,
+        PCoSV](
         implicit shrink: Case1.Aux[F, PCoS, (PCoSV, CoS)],
         f: Case1.Aux[F, S, (OutH, SS)],
         ut: UnfoldAux[F, E, SS, PCoS, OutT])

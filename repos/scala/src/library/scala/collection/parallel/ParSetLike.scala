@@ -26,10 +26,12 @@ import scala.collection.Set
   *  @author Aleksandar Prokopec
   *  @since 2.9
   */
-trait ParSetLike[T,
-                 +Repr <: ParSetLike[T, Repr, Sequential] with ParSet[T],
-                 +Sequential <: Set[T] with SetLike[T, Sequential]]
-    extends GenSetLike[T, Repr] with ParIterableLike[T, Repr, Sequential] {
+trait ParSetLike[
+    T,
+    +Repr <: ParSetLike[T, Repr, Sequential] with ParSet[T],
+    +Sequential <: Set[T] with SetLike[T, Sequential]]
+    extends GenSetLike[T, Repr]
+    with ParIterableLike[T, Repr, Sequential] {
   self =>
 
   def empty: Repr

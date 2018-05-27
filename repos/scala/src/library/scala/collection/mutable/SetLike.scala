@@ -55,9 +55,13 @@ import parallel.mutable.ParSet
   *  @define Coll mutable.Set
   */
 trait SetLike[A, +This <: SetLike[A, This] with Set[A]]
-    extends scala.collection.SetLike[A, This] with Scriptable[A]
-    with Builder[A, This] with Growable[A] with Shrinkable[A]
-    with Cloneable[mutable.Set[A]] with Parallelizable[A, ParSet[A]] {
+    extends scala.collection.SetLike[A, This]
+    with Scriptable[A]
+    with Builder[A, This]
+    with Growable[A]
+    with Shrinkable[A]
+    with Cloneable[mutable.Set[A]]
+    with Parallelizable[A, ParSet[A]] {
   self =>
 
   /** A common implementation of `newBuilder` for all mutable sets
@@ -131,7 +135,7 @@ trait SetLike[A, +This <: SetLike[A, This] with Set[A]]
     */
   def retain(p: A => Boolean): Unit =
     for (elem <- this.toList) // SI-7269 toList avoids ConcurrentModificationException
-    if (!p(elem)) this -= elem
+      if (!p(elem)) this -= elem
 
   /** Removes all elements from the set. After this operation is completed,
     *  the set will be empty.
@@ -154,8 +158,8 @@ trait SetLike[A, +This <: SetLike[A, This] with Set[A]]
     *  @return      a new set consisting of elements of this set and `elem`.
     */
   @migration(
-      "`+` creates a new set. Use `+=` to add an element to this set and return that set itself.",
-      "2.8.0")
+    "`+` creates a new set. Use `+=` to add an element to this set and return that set itself.",
+    "2.8.0")
   override def +(elem: A): This = clone() += elem
 
   /** Creates a new set consisting of all the elements of this set and two or more
@@ -170,8 +174,8 @@ trait SetLike[A, +This <: SetLike[A, This] with Set[A]]
     *               `elem2` and those in `elems`.
     */
   @migration(
-      "`+` creates a new set. Use `+=` to add an element to this set and return that set itself.",
-      "2.8.0")
+    "`+` creates a new set. Use `+=` to add an element to this set and return that set itself.",
+    "2.8.0")
   override def +(elem1: A, elem2: A, elems: A*): This =
     clone() += elem1 += elem2 ++= elems
 
@@ -184,8 +188,8 @@ trait SetLike[A, +This <: SetLike[A, This] with Set[A]]
     *  @return          a new set consisting of elements of this set and those in `xs`.
     */
   @migration(
-      "`++` creates a new set. Use `++=` to add elements to this set and return that set itself.",
-      "2.8.0")
+    "`++` creates a new set. Use `++=` to add elements to this set and return that set itself.",
+    "2.8.0")
   override def ++(xs: GenTraversableOnce[A]): This = clone() ++= xs.seq
 
   /** Creates a new set consisting of all the elements of this set except `elem`.
@@ -194,8 +198,8 @@ trait SetLike[A, +This <: SetLike[A, This] with Set[A]]
     *  @return      a new set consisting of all the elements of this set except `elem`.
     */
   @migration(
-      "`-` creates a new set. Use `-=` to remove an element from this set and return that set itself.",
-      "2.8.0")
+    "`-` creates a new set. Use `-=` to remove an element from this set and return that set itself.",
+    "2.8.0")
   override def -(elem: A): This = clone() -= elem
 
   /** Creates a new set consisting of all the elements of this set except the two
@@ -208,8 +212,8 @@ trait SetLike[A, +This <: SetLike[A, This] with Set[A]]
     *               `elem1`, `elem2` and `elems`.
     */
   @migration(
-      "`-` creates a new set. Use `-=` to remove an element from this set and return that set itself.",
-      "2.8.0")
+    "`-` creates a new set. Use `-=` to remove an element from this set and return that set itself.",
+    "2.8.0")
   override def -(elem1: A, elem2: A, elems: A*): This =
     clone() -= elem1 -= elem2 --= elems
 
@@ -221,8 +225,8 @@ trait SetLike[A, +This <: SetLike[A, This] with Set[A]]
     *                  elements from `xs`.
     */
   @migration(
-      "`--` creates a new set. Use `--=` to remove elements from this set and return that set itself.",
-      "2.8.0")
+    "`--` creates a new set. Use `--=` to remove elements from this set and return that set itself.",
+    "2.8.0")
   override def --(xs: GenTraversableOnce[A]): This = clone() --= xs.seq
 
   /** Send a message to this scriptable object.
@@ -234,11 +238,11 @@ trait SetLike[A, +This <: SetLike[A, This] with Set[A]]
   @deprecated("Scripting is deprecated.", "2.11.0")
   def <<(cmd: Message[A]): Unit = cmd match {
     case Include(_, x) => this += x
-    case Remove(_, x) => this -= x
-    case Reset() => clear()
-    case s: Script[_] => s.iterator foreach <<
+    case Remove(_, x)  => this -= x
+    case Reset()       => clear()
+    case s: Script[_]  => s.iterator foreach <<
     case _ =>
       throw new UnsupportedOperationException(
-          "message " + cmd + " not understood")
+        "message " + cmd + " not understood")
   }
 }

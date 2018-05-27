@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-14 Miles Sabin 
+ * Copyright (c) 2013-14 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -144,5 +144,6 @@ object Coproduct extends Dynamic {
     * type TwoTrueStr = Coproduct.`2, true, "str"`.T
     * }}}
     */
-  def selectDynamic(tpeSelector: String): Any = macro LabelledMacros.coproductTypeImpl
+  def selectDynamic(tpeSelector: String): Any =
+    macro LabelledMacros.coproductTypeImpl
 }

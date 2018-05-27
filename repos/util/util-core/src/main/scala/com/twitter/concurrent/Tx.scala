@@ -92,7 +92,7 @@ object Tx {
           case Idle =>
             val p = new Promise[Result[U]]
             state = Ackd(this, {
-              case true => p.setValue(Commit(msg))
+              case true  => p.setValue(Commit(msg))
               case false => p.setValue(Abort)
             })
             p
@@ -120,7 +120,7 @@ object Tx {
       def nack() {
         lock.synchronized {
           state match {
-            case Idle => state = Nackd(this)
+            case Idle                      => state = Nackd(this)
             case Nackd(who) if who ne this => state = Done
             case Ackd(who, confirm) if who ne this =>
               confirm(false)

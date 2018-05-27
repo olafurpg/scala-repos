@@ -26,12 +26,13 @@ import org.apache.spark.sql.execution.metric.SQLMetrics
   * Physical plan node for scanning data from a local collection.
   */
 private[sql] case class LocalTableScan(
-    output: Seq[Attribute], rows: Seq[InternalRow])
+    output: Seq[Attribute],
+    rows: Seq[InternalRow])
     extends LeafNode {
 
   private[sql] override lazy val metrics = Map(
-      "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext,
-                                                     "number of output rows"))
+    "numOutputRows" -> SQLMetrics
+      .createLongMetric(sparkContext, "number of output rows"))
 
   private val unsafeRows: Array[InternalRow] = {
     val proj = UnsafeProjection.create(output, output)

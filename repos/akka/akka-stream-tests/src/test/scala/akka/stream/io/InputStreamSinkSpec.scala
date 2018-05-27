@@ -27,7 +27,7 @@ class InputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
   import system.dispatcher
 
   val settings = ActorMaterializerSettings(system).withDispatcher(
-      "akka.actor.default-dispatcher")
+    "akka.actor.default-dispatcher")
   implicit val materializer = ActorMaterializer(settings)
 
   val timeout = 300.milliseconds
@@ -53,7 +53,7 @@ class InputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
       val inputStream =
         Source.single(byteString).runWith(StreamConverters.asInputStream())
       readN(inputStream, byteString.size) should ===(
-          (byteString.size, byteString))
+        (byteString.size, byteString))
       inputStream.close()
     }
 
@@ -63,12 +63,11 @@ class InputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
       val inputStream =
         Source(byteString :: byteString2 :: Nil).runWith(testSink(sinkProbe))
 
-      sinkProbe.expectMsgAllOf(GraphStageMessages.Push,
-                               GraphStageMessages.Push)
+      sinkProbe.expectMsgAllOf(GraphStageMessages.Push, GraphStageMessages.Push)
 
       readN(inputStream, 2) should ===((2, byteString.take(2)))
       readN(inputStream, 2) should ===(
-          (2, byteString.drop(2) ++ byteString2.take(1)))
+        (2, byteString.drop(2) ++ byteString2.take(1)))
       readN(inputStream, 2) should ===((2, byteString2.drop(1)))
 
       inputStream.close()
@@ -93,7 +92,7 @@ class InputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
       val f = Future(inputStream.read(new Array[Byte](byteString.size)))
 
       the[Exception] thrownBy Await.result(f, timeout) shouldBe a[
-          TimeoutException]
+        TimeoutException]
       probe.sendNext(byteString)
       Await.result(f, timeout) should ===(byteString.size)
 
@@ -146,8 +145,8 @@ class InputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
       val inputStream =
         Source.single(bytes).runWith(StreamConverters.asInputStream())
 
-      for (expect ← bytes.sliding(3, 3)) readN(inputStream, 3) should ===(
-          (expect.size, expect))
+      for (expect ← bytes.sliding(3, 3))
+        readN(inputStream, 3) should ===((expect.size, expect))
 
       inputStream.close()
     }
@@ -157,13 +156,13 @@ class InputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
         Source.single(byteString).runWith(StreamConverters.asInputStream())
       val buf = new Array[Byte](3)
       an[IllegalArgumentException] shouldBe thrownBy(
-          inputStream.read(buf, -1, 2))
+        inputStream.read(buf, -1, 2))
       an[IllegalArgumentException] shouldBe thrownBy(
-          inputStream.read(buf, 0, 5))
+        inputStream.read(buf, 0, 5))
       an[IllegalArgumentException] shouldBe thrownBy(
-          inputStream.read(new Array[Byte](0), 0, 1))
+        inputStream.read(new Array[Byte](0), 0, 1))
       an[IllegalArgumentException] shouldBe thrownBy(
-          inputStream.read(buf, 0, 0))
+        inputStream.read(buf, 0, 0))
       inputStream.close()
     }
 
@@ -177,8 +176,8 @@ class InputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
         sinkProbe.expectMsg(GraphStageMessages.Push)
       }
 
-      for (i ← 0 to 1) readN(inputStream, 8) should ===(
-          (8, bytes(i * 2) ++ bytes(i * 2 + 1)))
+      for (i ← 0 to 1)
+        readN(inputStream, 8) should ===((8, bytes(i * 2) ++ bytes(i * 2 + 1)))
 
       inputStream.close()
     }
@@ -191,8 +190,7 @@ class InputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
         Source(bytes1 :: bytes2 :: Nil).runWith(testSink(sinkProbe))
 
       //need to wait while both elements arrive to sink
-      sinkProbe.expectMsgAllOf(GraphStageMessages.Push,
-                               GraphStageMessages.Push)
+      sinkProbe.expectMsgAllOf(GraphStageMessages.Push, GraphStageMessages.Push)
 
       readN(inputStream, 15) should ===((15, bytes1 ++ bytes2.take(5)))
       readN(inputStream, 15) should ===((5, bytes2.drop(5)))
@@ -205,7 +203,7 @@ class InputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
         Source.single(byteString).runWith(StreamConverters.asInputStream())
 
       readN(inputStream, byteString.size) should ===(
-          (byteString.size, byteString))
+        (byteString.size, byteString))
       inputStream.read() should ===(-1)
 
       inputStream.close()
@@ -223,7 +221,7 @@ class InputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
       sinkProbe.expectMsg(GraphStageMessages.Push)
 
       readN(inputStream, byteString.size) should ===(
-          (byteString.size, byteString))
+        (byteString.size, byteString))
 
       probe.sendError(ex)
       sinkProbe.expectMsg(GraphStageMessages.Failure(ex))
@@ -256,7 +254,7 @@ class InputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
         Source.single(byteString).runWith(StreamConverters.asInputStream())
 
       readN(inputStream, byteString.size * 2) should ===(
-          (byteString.size, byteString))
+        (byteString.size, byteString))
       inputStream.read() should ===(-1)
 
       inputStream.close()
@@ -267,9 +265,10 @@ class InputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
     an[IllegalArgumentException] shouldBe thrownBy {
       Source
         .single(byteString)
-        .runWith(StreamConverters
-              .asInputStream(timeout)
-              .withAttributes(inputBuffer(0, 0)))
+        .runWith(
+          StreamConverters
+            .asInputStream(timeout)
+            .withAttributes(inputBuffer(0, 0)))
       /*
        With Source.single we test the code path in which the sink
        itself throws an exception when being materialized. If

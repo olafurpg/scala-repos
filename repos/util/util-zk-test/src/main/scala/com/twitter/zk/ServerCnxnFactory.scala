@@ -51,8 +51,9 @@ object ServerCnxnFactory {
     *
     * @return ServerCnxnFactory
     */
-  def apply(sockAddr: InetSocketAddress,
-            maxClients: java.lang.Integer): ServerCnxnFactory = {
+  def apply(
+      sockAddr: InetSocketAddress,
+      maxClients: java.lang.Integer): ServerCnxnFactory = {
     val factory = {
       try {
         val inst = java.lang.Class

@@ -11,15 +11,18 @@ import org.apache.mesos.SchedulerDriver
 import scala.concurrent.Promise
 import scala.util.control.NonFatal
 
-class AppStartActor(val driver: SchedulerDriver,
-                    val scheduler: SchedulerActions,
-                    val taskQueue: LaunchQueue,
-                    val taskTracker: TaskTracker,
-                    val eventBus: EventStream,
-                    val app: AppDefinition,
-                    val scaleTo: Int,
-                    promise: Promise[Unit])
-    extends Actor with ActorLogging with StartingBehavior {
+class AppStartActor(
+    val driver: SchedulerDriver,
+    val scheduler: SchedulerActions,
+    val taskQueue: LaunchQueue,
+    val taskTracker: TaskTracker,
+    val eventBus: EventStream,
+    val app: AppDefinition,
+    val scaleTo: Int,
+    promise: Promise[Unit])
+    extends Actor
+    with ActorLogging
+    with StartingBehavior {
 
   val nrToStart: Int = scaleTo
 
@@ -31,7 +34,7 @@ class AppStartActor(val driver: SchedulerDriver,
     eventBus.unsubscribe(self)
     if (!promise.isCompleted) {
       if (promise.tryFailure(new AppStartCanceledException(
-                  "The app start has been cancelled"))) {
+            "The app start has been cancelled"))) {
         scheduler
           .stopApp(driver, app)
           .onFailure {

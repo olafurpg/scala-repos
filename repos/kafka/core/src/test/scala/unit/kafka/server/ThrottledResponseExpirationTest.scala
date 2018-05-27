@@ -27,9 +27,9 @@ class ThrottledResponseExpirationTest {
   private val time = new MockTime
   private var numCallbacks: Int = 0
   private val metrics = new org.apache.kafka.common.metrics.Metrics(
-      new MetricConfig(),
-      Collections.emptyList(),
-      time)
+    new MetricConfig(),
+    Collections.emptyList(),
+    time)
 
   def callback(delayTimeMs: Int) {
     numCallbacks += 1
@@ -43,7 +43,10 @@ class ThrottledResponseExpirationTest {
   @Test
   def testExpire() {
     val clientMetrics = new ClientQuotaManager(
-        ClientQuotaManagerConfig(), metrics, "producer", time)
+      ClientQuotaManagerConfig(),
+      metrics,
+      "producer",
+      time)
 
     val delayQueue = new DelayQueue[ThrottledResponse]()
     val reaper = new clientMetrics.ThrottledRequestReaper(delayQueue)

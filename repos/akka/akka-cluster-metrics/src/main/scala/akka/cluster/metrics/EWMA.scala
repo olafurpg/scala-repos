@@ -59,7 +59,8 @@ object EWMA {
     * 1 – 0.5 ^ (collect-interval / half-life).
     */
   def alpha(
-      halfLife: FiniteDuration, collectInterval: FiniteDuration): Double = {
+      halfLife: FiniteDuration,
+      collectInterval: FiniteDuration): Double = {
     val halfLifeMillis = halfLife.toMillis
     require(halfLife.toMillis > 0, "halfLife must be > 0 s")
     val decayRate = LogOf2 / halfLifeMillis

@@ -32,9 +32,10 @@ import org.apache.spark.rdd.RDD
 private[prediction] case class PropTime(val d: JValue, val t: Long)
     extends Serializable
 
-private[prediction] case class SetProp(val fields: Map[String, PropTime],
-                                       // last set time. Note: fields could be empty with valid set time
-                                       val t: Long)
+private[prediction] case class SetProp(
+    val fields: Map[String, PropTime],
+    // last set time. Note: fields could be empty with valid set time
+    val t: Long)
     extends Serializable {
 
   def ++(that: SetProp): SetProp = {
@@ -55,8 +56,8 @@ private[prediction] case class SetProp(val fields: Map[String, PropTime],
     val combinedT = if (this.t > that.t) this.t else that.t
 
     SetProp(
-        fields = combinedFields,
-        t = combinedT
+      fields = combinedFields,
+      t = combinedT
     )
   }
 }
@@ -78,7 +79,7 @@ private[prediction] case class UnsetProp(fields: Map[String, Long])
       common ++ (this.fields -- commonKeys) ++ (that.fields -- commonKeys)
 
     UnsetProp(
-        fields = combinedFields
+      fields = combinedFields
     )
   }
 }
@@ -93,14 +94,13 @@ private[prediction] case class EventOp(
     val setProp: Option[SetProp] = None,
     val unsetProp: Option[UnsetProp] = None,
     val deleteEntity: Option[DeleteEntity] = None
-)
-    extends Serializable {
+) extends Serializable {
 
   def ++(that: EventOp): EventOp = {
     EventOp(
-        setProp = (setProp ++ that.setProp).reduceOption(_ ++ _),
-        unsetProp = (unsetProp ++ that.unsetProp).reduceOption(_ ++ _),
-        deleteEntity = (deleteEntity ++ that.deleteEntity).reduceOption(_ ++ _)
+      setProp = (setProp ++ that.setProp).reduceOption(_ ++ _),
+      unsetProp = (unsetProp ++ that.unsetProp).reduceOption(_ ++ _),
+      deleteEntity = (deleteEntity ++ that.deleteEntity).reduceOption(_ ++ _)
     )
   }
 
@@ -108,22 +108,24 @@ private[prediction] case class EventOp(
     setProp.flatMap { set =>
       val unsetKeys: Set[String] = unsetProp
         .map(unset =>
-              unset.fields.filter { case (k, v) => (v >= set.fields(k).t) }.keySet)
+          unset.fields.filter { case (k, v) => (v >= set.fields(k).t) }.keySet)
         .getOrElse(Set())
 
-      val combinedFields = deleteEntity.map { delete =>
-        if (delete.t >= set.t) {
-          None
-        } else {
-          val deleteKeys: Set[String] = set.fields.filter {
-            case (k, PropTime(kv, t)) =>
-              (delete.t >= t)
-          }.keySet
-          Some(set.fields -- unsetKeys -- deleteKeys)
+      val combinedFields = deleteEntity
+        .map { delete =>
+          if (delete.t >= set.t) {
+            None
+          } else {
+            val deleteKeys: Set[String] = set.fields.filter {
+              case (k, PropTime(kv, t)) =>
+                (delete.t >= t)
+            }.keySet
+            Some(set.fields -- unsetKeys -- deleteKeys)
+          }
         }
-      }.getOrElse {
-        Some(set.fields -- unsetKeys)
-      }
+        .getOrElse {
+          Some(set.fields -- unsetKeys)
+        }
 
       // Note: mapValues() doesn't return concrete Map and causes
       // NotSerializableException issue. Use map(identity) to work around this.
@@ -138,46 +140,48 @@ private[prediction] object EventOp {
     val t = e.eventTime.getMillis
     e.event match {
       case "$set" => {
-          val fields =
-            e.properties.fields.mapValues(jv => PropTime(jv, t)).map(identity)
+        val fields =
+          e.properties.fields.mapValues(jv => PropTime(jv, t)).map(identity)
 
-          EventOp(
-              setProp = Some(SetProp(fields = fields, t = t))
-          )
-        }
+        EventOp(
+          setProp = Some(SetProp(fields = fields, t = t))
+        )
+      }
       case "$unset" => {
-          val fields = e.properties.fields.mapValues(jv => t).map(identity)
-          EventOp(
-              unsetProp = Some(UnsetProp(fields = fields))
-          )
-        }
+        val fields = e.properties.fields.mapValues(jv => t).map(identity)
+        EventOp(
+          unsetProp = Some(UnsetProp(fields = fields))
+        )
+      }
       case "$delete" => {
-          EventOp(
-              deleteEntity = Some(DeleteEntity(t))
-          )
-        }
+        EventOp(
+          deleteEntity = Some(DeleteEntity(t))
+        )
+      }
       case _ => {
-          EventOp()
-        }
+        EventOp()
+      }
     }
   }
 }
 
 @deprecated("Use PEvents or PEventStore instead.", "0.9.2")
-class PBatchView(val appId: Int,
-                 val startTime: Option[DateTime],
-                 val untilTime: Option[DateTime],
-                 val sc: SparkContext) {
+class PBatchView(
+    val appId: Int,
+    val startTime: Option[DateTime],
+    val untilTime: Option[DateTime],
+    val sc: SparkContext) {
 
   // NOTE: parallel Events DB interface
   @transient lazy val eventsDb = Storage.getPEvents()
 
   @transient lazy val _events: RDD[Event] =
-    eventsDb.getByAppIdAndTimeAndEntity(appId = appId,
-                                        startTime = startTime,
-                                        untilTime = untilTime,
-                                        entityType = None,
-                                        entityId = None)(sc)
+    eventsDb.getByAppIdAndTimeAndEntity(
+      appId = appId,
+      startTime = startTime,
+      untilTime = untilTime,
+      entityType = None,
+      entityId = None)(sc)
 
   // TODO: change to use EventSeq?
   @transient lazy val events: RDD[Event] = _events
@@ -190,14 +194,14 @@ class PBatchView(val appId: Int,
 
     _events
       .filter(e =>
-            ((e.entityType == entityType) &&
-                (EventValidation.isSpecialEvents(e.event))))
+        ((e.entityType == entityType) &&
+          (EventValidation.isSpecialEvents(e.event))))
       .map(e => (e.entityId, EventOp(e)))
       .aggregateByKey[EventOp](EventOp())(
-          // within same partition
-          seqOp = { case (u, v) => u ++ v },
-          // across partition
-          combOp = { case (accu, u) => accu ++ u }
+        // within same partition
+        seqOp = { case (u, v) => u ++ v },
+        // across partition
+        combOp = { case (accu, u) => accu ++ u }
       )
       .mapValues(_.toDataMap)
       .filter { case (k, v) => v.isDefined }

@@ -6,8 +6,7 @@ trait IStringPair[T] {
   override def toString = a + b
 }
 
-class StringPair(val a: String, val b: String)
-    extends IStringPair[StringPair] {
+class StringPair(val a: String, val b: String) extends IStringPair[StringPair] {
   def build(a: String, b: String) = new StringPair(a, b)
   def len = a.length + b.length
 }

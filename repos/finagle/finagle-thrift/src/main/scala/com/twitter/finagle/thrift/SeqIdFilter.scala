@@ -38,7 +38,7 @@ class SeqIdFilter extends SimpleFilter[ThriftClientRequest, Array[Byte]] {
 
   private[this] def get32(buf: Array[Byte], off: Int) =
     ((buf(off + 0) & 0xff) << 24) | ((buf(off + 1) & 0xff) << 16) |
-    ((buf(off + 2) & 0xff) << 8) | (buf(off + 3) & 0xff)
+      ((buf(off + 2) & 0xff) << 8) | (buf(off + 3) & 0xff)
 
   private[this] def put32(buf: Array[Byte], off: Int, x: Int) {
     buf(off) = (x >> 24 & 0xff).toByte
@@ -78,9 +78,9 @@ class SeqIdFilter extends SimpleFilter[ThriftClientRequest, Array[Byte]] {
     Return(currentId)
   }
 
-  def apply(req: ThriftClientRequest,
-            service: Service[ThriftClientRequest, Array[Byte]])
-    : Future[Array[Byte]] =
+  def apply(
+      req: ThriftClientRequest,
+      service: Service[ThriftClientRequest, Array[Byte]]): Future[Array[Byte]] =
     if (req.oneway) service(req)
     else {
       val reqBuf = req.message.clone()

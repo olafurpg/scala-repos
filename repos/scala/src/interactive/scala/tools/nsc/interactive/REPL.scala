@@ -16,15 +16,16 @@ object REPL {
 
   val versionMsg =
     "Scala compiler " + Properties.versionString + " -- " +
-    Properties.copyrightString
+      Properties.copyrightString
 
   val prompt = "> "
 
   var reporter: ConsoleReporter = _
 
   private def replError(msg: String) {
-    reporter.error( /*new Position */ FakePos("scalac"),
-                   msg + "\n  scalac -help  gives more information")
+    reporter.error(
+      /*new Position */ FakePos("scalac"),
+      msg + "\n  scalac -help  gives more information")
   }
 
   def process(args: Array[String]) {
@@ -103,7 +104,9 @@ object REPL {
 
     def doStructure(file: String) {
       comp.askParsedEntered(
-          toSourceFile(file), keepLoaded = false, structureResult)
+        toSourceFile(file),
+        keepLoaded = false,
+        structureResult)
       show(structureResult)
     }
 
@@ -117,7 +120,9 @@ object REPL {
           Thread.sleep(millis.toLong)
           println("ask type now")
           comp.askLoadedTyped(
-              toSourceFile(file), keepLoaded = true, typedResult)
+            toSourceFile(file),
+            keepLoaded = true,
+            typedResult)
           typedResult.get
         case List("typeat", file, off1, off2) =>
           doTypeAt(makePos(file, off1, off2))
@@ -154,7 +159,7 @@ object REPL {
   def using[T, U](svar: Response[T])(op: T => U): Option[U] = {
     val res = svar.get match {
       case Left(result) => Some(op(result))
-      case Right(exc) => exc.printStackTrace; println("ERROR: " + exc); None
+      case Right(exc)   => exc.printStackTrace; println("ERROR: " + exc); None
     }
     svar.clear()
     res

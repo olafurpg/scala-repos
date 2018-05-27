@@ -5,7 +5,15 @@ import com.twitter.finagle.context.Contexts
 import com.twitter.finagle.{Stack, Status}
 import com.twitter.finagle.ssl
 import com.twitter.io.{Buf, Reader, Writer}
-import com.twitter.util.{Closable, Future, Promise, Time, Throw, Return, Duration}
+import com.twitter.util.{
+  Closable,
+  Future,
+  Promise,
+  Time,
+  Throw,
+  Return,
+  Duration
+}
 import java.net.SocketAddress
 import java.security.cert.Certificate
 
@@ -219,7 +227,7 @@ object Transport {
   private[finagle] def copyToWriter[A](trans: Transport[_, A], w: Writer)(
       f: A => Future[Option[Buf]]): Future[Unit] = {
     trans.read().flatMap(f).flatMap {
-      case None => Future.Done
+      case None      => Future.Done
       case Some(buf) => w.write(buf) before copyToWriter(trans, w)(f)
     }
   }
@@ -243,10 +251,9 @@ object Transport {
       chunkOfA: A => Future[Option[Buf]]): Reader with Future[Unit] =
     new Promise[Unit] with Reader {
       private[this] val rw = Reader.writable()
-      become(
-          Transport.copyToWriter(trans, rw)(chunkOfA) respond {
+      become(Transport.copyToWriter(trans, rw)(chunkOfA) respond {
         case Throw(exc) => rw.fail(exc)
-        case Return(_) => rw.close()
+        case Return(_)  => rw.close()
       })
 
       def read(n: Int) = rw.read(n)
@@ -310,8 +317,7 @@ class QueueTransport[In, Out](writeq: AsyncQueue[In], readq: AsyncQueue[Out])
 
   def status = if (closep.isDefined) Status.Closed else Status.Open
   def close(deadline: Time) = {
-    val ex = new IllegalStateException(
-        "close() is undefined on QueueTransport")
+    val ex = new IllegalStateException("close() is undefined on QueueTransport")
     closep.updateIfEmpty(Return(ex))
     Future.exception(ex)
   }

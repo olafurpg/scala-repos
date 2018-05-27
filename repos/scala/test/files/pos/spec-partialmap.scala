@@ -3,7 +3,8 @@ import scala.collection.{Traversable, TraversableLike};
 import scala.collection.generic.CanBuildFrom;
 
 trait PartialMap[@specialized A, @specialized B]
-    extends PartialFunction[A, B] with Iterable[(A, B)] {
+    extends PartialFunction[A, B]
+    with Iterable[(A, B)] {
 
   // commenting out this declaration gives a different exception.
   /** Getter for all values for which the given key function returns true. */

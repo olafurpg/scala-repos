@@ -12,10 +12,11 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
   * Pavel.Fatin, 21.07.2010
   */
 class StringLiteralProcessor extends CopyPastePreProcessor {
-  def preprocessOnCopy(file: PsiFile,
-                       startOffsets: Array[Int],
-                       endOffsets: Array[Int],
-                       text: String) = {
+  def preprocessOnCopy(
+      file: PsiFile,
+      startOffsets: Array[Int],
+      endOffsets: Array[Int],
+      text: String) = {
     val literal = startOffsets.zip(endOffsets).forall {
       case (a, b) =>
         val e = file.findElementAt(a);
@@ -27,11 +28,12 @@ class StringLiteralProcessor extends CopyPastePreProcessor {
     if (literal) StringUtil.unescapeStringCharacters(text) else null
   }
 
-  def preprocessOnPaste(project: Project,
-                        file: PsiFile,
-                        editor: Editor,
-                        text: String,
-                        rawText: RawText): String = {
+  def preprocessOnPaste(
+      project: Project,
+      file: PsiFile,
+      editor: Editor,
+      text: String,
+      rawText: RawText): String = {
     PsiDocumentManager.getInstance(project).commitDocument(editor.getDocument)
 
     val offset = editor.getSelectionModel.getSelectionStart
@@ -43,7 +45,7 @@ class StringLiteralProcessor extends CopyPastePreProcessor {
       val elementType =
         if (e.getNode == null) null else e.getNode.getElementType
       if ((elementType == ScalaTokenTypes.tSTRING ||
-              elementType == ScalaTokenTypes.tCHAR) && rawText != null &&
+          elementType == ScalaTokenTypes.tCHAR) && rawText != null &&
           rawText.rawText != null) {
         rawText.rawText
       } else if (elementType == ScalaTokenTypes.tSTRING) {

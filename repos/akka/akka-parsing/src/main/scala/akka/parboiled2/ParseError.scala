@@ -19,12 +19,14 @@ package akka.parboiled2
 import scala.annotation.tailrec
 import scala.collection.immutable
 
-case class ParseError(position: Position,
-                      principalPosition: Position,
-                      traces: immutable.Seq[RuleTrace])
+case class ParseError(
+    position: Position,
+    principalPosition: Position,
+    traces: immutable.Seq[RuleTrace])
     extends RuntimeException {
-  require(principalPosition.index >= position.index,
-          "principalPosition must be > position")
+  require(
+    principalPosition.index >= position.index,
+    "principalPosition must be > position")
   def format(parser: Parser): String = format(parser.input)
   def format(parser: Parser, formatter: ErrorFormatter): String =
     format(parser.input, formatter)
@@ -39,8 +41,7 @@ case class ParseError(position: Position,
     traces map {
       val commonPrefixLen = RuleTrace.commonNonAtomicPrefixLength(traces)
       if (commonPrefixLen > 0)
-        t ⇒
-          t.copy(prefix = t.prefix.drop(commonPrefixLen)).dropUnreportedPrefix
+        t ⇒ t.copy(prefix = t.prefix.drop(commonPrefixLen)).dropUnreportedPrefix
       else _.dropUnreportedPrefix
     }
 }
@@ -66,7 +67,8 @@ object Position {
 }
 
 case class RuleTrace(
-    prefix: List[RuleTrace.NonTerminal], terminal: RuleTrace.Terminal) {
+    prefix: List[RuleTrace.NonTerminal],
+    terminal: RuleTrace.Terminal) {
   import RuleTrace._
 
   /**
@@ -76,8 +78,9 @@ case class RuleTrace(
     */
   def dropUnreportedPrefix: RuleTrace = {
     @tailrec
-    def rec(current: List[NonTerminal],
-            named: List[NonTerminal]): List[NonTerminal] =
+    def rec(
+        current: List[NonTerminal],
+        named: List[NonTerminal]): List[NonTerminal] =
       current match {
         case NonTerminal(Named(_), _) :: tail ⇒
           rec(tail, if (named.isEmpty) current else named)
@@ -97,8 +100,8 @@ case class RuleTrace(
     * Wraps this trace with a [[RuleTrace.Named]] wrapper if the given name is non-empty.
     */
   def named(name: String): RuleTrace = {
-    val newHead = NonTerminal(
-        Named(name), if (prefix.isEmpty) 0 else prefix.head.offset)
+    val newHead =
+      NonTerminal(Named(name), if (prefix.isEmpty) 0 else prefix.head.offset)
     if (name.isEmpty) this else copy(prefix = newHead :: prefix)
   }
 }
@@ -160,8 +163,7 @@ object RuleTrace {
   case object ANY extends Terminal
   final case class AnyOf(string: String) extends Terminal
   final case class CharMatch(char: Char) extends Terminal
-  final case class CharPredicateMatch(predicate: CharPredicate)
-      extends Terminal
+  final case class CharPredicateMatch(predicate: CharPredicate) extends Terminal
   final case class CharRange(from: Char, to: Char) extends Terminal
   final case class Fail(expected: String) extends Terminal
   final case class IgnoreCaseChar(char: Char) extends Terminal

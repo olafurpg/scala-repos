@@ -35,10 +35,20 @@ import scala.reflect.internal.util.Position
   *  - recover exhaustivity/unreachability of user-defined extractors by partitioning the types they match on using an HList or similar type-level structure
   */
 trait PatternMatching
-    extends Transform with TypingTransformers with Debugging with Interface
-    with MatchTranslation with MatchTreeMaking with MatchCodeGen with MatchCps
-    with ScalaLogic with Solving with MatchAnalysis with MatchOptimization
-    with MatchWarnings with ScalacPatternExpanders {
+    extends Transform
+    with TypingTransformers
+    with Debugging
+    with Interface
+    with MatchTranslation
+    with MatchTreeMaking
+    with MatchCodeGen
+    with MatchCps
+    with ScalaLogic
+    with Solving
+    with MatchAnalysis
+    with MatchOptimization
+    with MatchWarnings
+    with ScalacPatternExpanders {
   import global._
 
   val phaseName: String = "patmat"
@@ -53,28 +63,30 @@ trait PatternMatching
         val origTp = tree.tpe
         // setType origTp intended for CPS -- TODO: is it necessary?
         val translated = translator.translateMatch(
-            treeCopy.Match(tree,
-                           transform(sel),
-                           transformTrees(cases).asInstanceOf[List[CaseDef]]))
+          treeCopy.Match(
+            tree,
+            transform(sel),
+            transformTrees(cases).asInstanceOf[List[CaseDef]]))
         try {
           localTyper.typed(translated) setType origTp
         } catch {
           case x: (Types#TypeError) =>
             // TODO: this should never happen; error should've been reported during type checking
             reporter.error(
-                tree.pos,
-                "error during expansion of this match (this is a scalac bug).\nThe underlying error was: " +
+              tree.pos,
+              "error during expansion of this match (this is a scalac bug).\nThe underlying error was: " +
                 x.msg)
             translated
         }
       case Try(block, catches, finalizer) =>
-        treeCopy.Try(tree,
-                     transform(block),
-                     translator.translateTry(
-                         transformTrees(catches).asInstanceOf[List[CaseDef]],
-                         tree.tpe,
-                         tree.pos),
-                     transform(finalizer))
+        treeCopy.Try(
+          tree,
+          transform(block),
+          translator.translateTry(
+            transformTrees(catches).asInstanceOf[List[CaseDef]],
+            tree.tpe,
+            tree.pos),
+          transform(finalizer))
       case _ => super.transform(tree)
     }
 
@@ -87,18 +99,24 @@ trait PatternMatching
   }
 
   class PureMatchTranslator(val typer: analyzer.Typer, val matchStrategy: Tree)
-      extends MatchTranslator with PureCodegen {
+      extends MatchTranslator
+      with PureCodegen {
     def optimizeCases(
-        prevBinder: Symbol, cases: List[List[TreeMaker]], pt: Type) =
+        prevBinder: Symbol,
+        cases: List[List[TreeMaker]],
+        pt: Type) =
       (cases, Nil)
-    def analyzeCases(prevBinder: Symbol,
-                     cases: List[List[TreeMaker]],
-                     pt: Type,
-                     suppression: Suppression): Unit = {}
+    def analyzeCases(
+        prevBinder: Symbol,
+        cases: List[List[TreeMaker]],
+        pt: Type,
+        suppression: Suppression): Unit = {}
   }
 
   class OptimizingMatchTranslator(val typer: analyzer.Typer)
-      extends MatchTranslator with MatchOptimizer with MatchAnalyzer
+      extends MatchTranslator
+      with MatchOptimizer
+      with MatchAnalyzer
       with Solver
 }
 
@@ -196,8 +214,8 @@ trait Interface extends ast.TreeDSL {
         else "inputs: " + counterExamples.mkString(", ")
 
       reporter.warning(
-          pos,
-          "match may not be exhaustive.\nIt would fail on the following " +
+        pos,
+        "match may not be exhaustive.\nIt would fail on the following " +
           ceString)
     }
   }
@@ -231,7 +249,7 @@ trait Interface extends ast.TreeDSL {
                 (from contains sym) && {
                   if (!toIdents)
                     global.devWarning(
-                        s"Unexpected substitution of non-Ident into TypeTree `$tt`, subst= $this")
+                      s"Unexpected substitution of non-Ident into TypeTree `$tt`, subst= $this")
                   true
                 }
               case _ => false
@@ -248,7 +266,8 @@ trait Interface extends ast.TreeDSL {
 
           def typedStable(t: Tree) =
             typer.typed(
-                t.shallowDuplicate, Mode.MonoQualifierModes | Mode.TYPEPATmode)
+              t.shallowDuplicate,
+              Mode.MonoQualifierModes | Mode.TYPEPATmode)
           lazy val toTypes: List[Type] = to map (tree => typedStable(tree).tpe)
 
           override def transform(tree: Tree): Tree = {
@@ -256,12 +275,13 @@ trait Interface extends ast.TreeDSL {
               if (from.isEmpty) tree
               else if (tree.symbol == from.head)
                 typedIfOrigTyped(
-                    typedStable(to.head).setPos(tree.pos), tree.tpe)
+                  typedStable(to.head).setPos(tree.pos),
+                  tree.tpe)
               else subst(from.tail, to.tail)
 
             val tree1 = tree match {
               case Ident(_) => subst(from, to)
-              case _ => super.transform(tree)
+              case _        => super.transform(tree)
             }
             tree1 match {
               case _: DefTree =>
@@ -273,7 +293,8 @@ trait Interface extends ast.TreeDSL {
         }
         if (containsSym) {
           if (to.forall(_.isInstanceOf[Ident]))
-            tree.duplicate.substituteSymbols(from, to.map(_.symbol)) // SI-7459 catches `case t => new t.Foo`
+            tree.duplicate
+              .substituteSymbols(from, to.map(_.symbol)) // SI-7459 catches `case t => new t.Foo`
           else substIdentsForTrees.transform(tree)
         } else tree
       }
@@ -286,8 +307,9 @@ trait Interface extends ast.TreeDSL {
             !other.from.contains(f)
           }
         new Substitution(
-            other.from ++ fromFiltered,
-            other.to.map(apply) ++ toFiltered) // a quick benchmarking run indicates the `.map(apply)` is not too costly
+          other.from ++ fromFiltered,
+          other.to
+            .map(apply) ++ toFiltered) // a quick benchmarking run indicates the `.map(apply)` is not too costly
       }
       override def toString =
         (from.map(_.name) zip to) mkString ("Substitution(", ", ", ")")
@@ -306,7 +328,8 @@ object PatternMatchingStats {
   val patmatCNF =
     Statistics.newSubTimer("  of which in CNF conversion", patmatNanos)
   val patmatCNFSizes = Statistics.newQuantMap[Int, Statistics.Counter](
-      "  CNF size counts", "patmat")(Statistics.newCounter(""))
+    "  CNF size counts",
+    "patmat")(Statistics.newCounter(""))
   val patmatAnaVarEq =
     Statistics.newSubTimer("  of which variable equality", patmatNanos)
   val patmatAnaExhaust =

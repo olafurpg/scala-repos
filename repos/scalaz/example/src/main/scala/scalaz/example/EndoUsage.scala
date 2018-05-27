@@ -43,13 +43,13 @@ object EndoUsage extends App {
   case class Person(first: String, last: String, age: Int)
 
   val lowercaseFirst: Endo[Person] = Endo(
-      p ⇒ p.copy(first = p.first.toLowerCase))
+    p ⇒ p.copy(first = p.first.toLowerCase))
   val lowercaseLast: Endo[Person] = Endo(p ⇒ p.copy(last = p.last.toLowerCase))
   val trimFirst: Endo[Person] = Endo(p ⇒ p.copy(first = p.first.trim))
   val trimLast: Endo[Person] = Endo(p ⇒ p.copy(last = p.last.trim))
   val birthday: Endo[Person] = Endo(p ⇒ p.copy(age = p.age + 1))
-  val endos: IList[Endo[Person]] = IList(
-      lowercaseFirst, lowercaseLast, trimFirst, trimLast, birthday)
+  val endos: IList[Endo[Person]] =
+    IList(lowercaseFirst, lowercaseLast, trimFirst, trimLast, birthday)
 
   val stewBefore = Person(" Stew ", "O'Connor", 70)
   assert(endos.suml.apply(stewBefore) == Person("stew", "o'connor", 71))

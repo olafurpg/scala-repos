@@ -35,8 +35,8 @@ trait Semigroup[F] { self =>
     @scala.annotation.tailrec
     def go(x: F, y: Int, z: F): F = y match {
       case y if (y & 1) == 0 => go(append(x, x), y >>> 1, z)
-      case y if (y == 1) => append(x, z)
-      case _ => go(append(x, x), (y - 1) >>> 1, append(x, z))
+      case y if (y == 1)     => append(x, z)
+      case _                 => go(append(x, x), (y - 1) >>> 1, append(x, z))
     }
     if (n <= 0) value else go(value, n, value)
   }
@@ -119,7 +119,7 @@ object Semigroup {
         Tags.MinVal(o.min(Tag.unwrap(f1), Tag.unwrap(f2)))
     }
 
-  @inline implicit def minTaggedSemigroup[A : Order] = minSemigroup[A]
+  @inline implicit def minTaggedSemigroup[A: Order] = minSemigroup[A]
 
   def maxSemigroup[A](implicit o: Order[A]): Semigroup[A @@ Tags.MaxVal] =
     new Semigroup[A @@ Tags.MaxVal] {
@@ -127,7 +127,7 @@ object Semigroup {
         Tags.MaxVal(o.max(Tag.unwrap(f1), Tag.unwrap(f2)))
     }
 
-  @inline implicit def maxTaggedSemigroup[A : Order] = maxSemigroup[A]
+  @inline implicit def maxTaggedSemigroup[A: Order] = maxSemigroup[A]
 
   private[scalaz] trait ApplySemigroup[F[_], M] extends Semigroup[F[M]] {
     implicit def F: Apply[F]
@@ -138,20 +138,21 @@ object Semigroup {
 
   /**A semigroup for sequencing Apply effects. */
   def liftSemigroup[F[_], M](
-      implicit F0: Apply[F], M0: Semigroup[M]): Semigroup[F[M]] =
+      implicit F0: Apply[F],
+      M0: Semigroup[M]): Semigroup[F[M]] =
     new ApplySemigroup[F, M] {
       implicit def F: Apply[F] = F0
       implicit def M: Semigroup[M] = M0
     }
 
   /** `point(a) append (point(a) append (point(a)...` */
-  def repeat[F[_], A](a: A)(
-      implicit F: Applicative[F], m: Semigroup[F[A]]): F[A] =
+  def repeat[F[_], A](
+      a: A)(implicit F: Applicative[F], m: Semigroup[F[A]]): F[A] =
     m.append(F.point(a), repeat[F, A](a))
 
   /** `point(a) append (point(f(a)) append (point(f(f(a)))...` */
-  def iterate[F[_], A](a: A)(f: A => A)(
-      implicit F: Applicative[F], m: Semigroup[F[A]]): F[A] =
+  def iterate[F[_], A](a: A)(
+      f: A => A)(implicit F: Applicative[F], m: Semigroup[F[A]]): F[A] =
     m.append(F.point(a), iterate[F, A](f(a))(f))
 
   /** Semigroup is an invariant functor. */

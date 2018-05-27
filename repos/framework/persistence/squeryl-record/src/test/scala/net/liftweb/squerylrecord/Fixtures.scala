@@ -38,9 +38,9 @@ object DBHelper {
       // TODO: Use mapper.StandardDBVendor
       Class.forName("org.h2.Driver")
       val session = Session.create(
-          DriverManager.getConnection(
-              "jdbc:h2:mem:testSquerylRecordDB;DB_CLOSE_DELAY=-1;LOCK_TIMEOUT=3000"),
-          new H2Adapter)
+        DriverManager.getConnection(
+          "jdbc:h2:mem:testSquerylRecordDB;DB_CLOSE_DELAY=-1;LOCK_TIMEOUT=3000"),
+        new H2Adapter)
       //session.setLogger(statement => println(statement))
       session
     }
@@ -69,7 +69,9 @@ object DBHelper {
   * Test Record: Company. It has many different field types for test purposes.
   */
 class Company private ()
-    extends Record[Company] with KeyedRecord[Long] with Optimistic {
+    extends Record[Company]
+    with KeyedRecord[Long]
+    with Optimistic {
 
   override def meta = Company
 
@@ -81,13 +83,15 @@ class Company private ()
   val country = new CountryField(this)
   val postCode = new PostalCodeField(this, country)
   val created = new DateTimeField(this)
-  val employeeSatisfaction = new OptionalDecimalField(
-      this, new MathContext(10), 5)
+  val employeeSatisfaction =
+    new OptionalDecimalField(this, new MathContext(10), 5)
 
   lazy val employees = MySchema.companyToEmployees.left(this)
 }
 object Company
-    extends Company with MetaRecord[Company] with CRUDify[Long, Company] {
+    extends Company
+    with MetaRecord[Company]
+    with CRUDify[Long, Company] {
 
   def table = MySchema.companies
 
@@ -107,8 +111,10 @@ object EmployeeRole extends Enumeration {
   * TypedField are also supported.
   */
 class SpecialField[OwnerType <: Record[OwnerType]](rec: OwnerType)
-    extends Field[String, OwnerType] with TypedField[String]
-    with SquerylRecordField with MandatoryTypedField[String] {
+    extends Field[String, OwnerType]
+    with TypedField[String]
+    with SquerylRecordField
+    with MandatoryTypedField[String] {
 
   override def owner = rec
   override def classOfPersistentField = classOf[String]
@@ -116,8 +122,8 @@ class SpecialField[OwnerType <: Record[OwnerType]](rec: OwnerType)
   override def setFromString(s: String) = setBox(Full(s))
   override def setFromAny(c: Any) = c match {
     case Full(v) => setBox(Full(v.toString))
-    case None => setBox(None)
-    case v => setBox(Full(v.toString))
+    case None    => setBox(None)
+    case v       => setBox(Full(v.toString))
   }
   override def setFromJValue(jValue: JValue) = setBox(Full(jValue.toString))
   override def asJValue: JValue = JString(get)
@@ -190,13 +196,17 @@ object MySchema extends Schema {
     oneToManyRelation(companies, employees).via((c, e) => c.id === e.companyId)
 
   val roomAssignments = manyToManyRelation(employees, rooms)
-    .via[RoomAssignment]((employee, room, roomAssignment) =>
-        (roomAssignment.employeeId === employee.idField,
-         roomAssignment.roomId === room.idField))
+    .via[RoomAssignment](
+      (employee, room, roomAssignment) =>
+        (
+          roomAssignment.employeeId === employee.idField,
+          roomAssignment.roomId === room.idField))
 
-  on(employees)(e =>
-        declare(e.companyId defineAs (indexed("idx_employee_companyId")),
-                e.email defineAs indexed("idx_employee_email")))
+  on(employees)(
+    e =>
+      declare(
+        e.companyId defineAs (indexed("idx_employee_companyId")),
+        e.email defineAs indexed("idx_employee_email")))
 
   /**
     * Drops an old schema if exists and then creates

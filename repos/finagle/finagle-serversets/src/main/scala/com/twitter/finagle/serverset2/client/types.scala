@@ -25,16 +25,19 @@ private[serverset2] sealed trait Node {
 }
 
 private[serverset2] object Node {
-  case class ACL(acl: Seq[com.twitter.finagle.serverset2.client.Data.ACL],
-                 stat: com.twitter.finagle.serverset2.client.Data.Stat)
+  case class ACL(
+      acl: Seq[com.twitter.finagle.serverset2.client.Data.ACL],
+      stat: com.twitter.finagle.serverset2.client.Data.Stat)
       extends Node
 
-  case class Children(children: Seq[String],
-                      stat: com.twitter.finagle.serverset2.client.Data.Stat)
+  case class Children(
+      children: Seq[String],
+      stat: com.twitter.finagle.serverset2.client.Data.Stat)
       extends Node
 
   case class Data(
-      data: Option[Buf], stat: com.twitter.finagle.serverset2.client.Data.Stat)
+      data: Option[Buf],
+      stat: com.twitter.finagle.serverset2.client.Data.Stat)
       extends Node
 }
 
@@ -52,10 +55,11 @@ private[serverset2] object NodeEvent {
 private[serverset2] sealed trait Op
 
 private[serverset2] object Op {
-  case class Create(path: String,
-                    data: Option[Buf],
-                    acl: Seq[Data.ACL],
-                    createMode: CreateMode)
+  case class Create(
+      path: String,
+      data: Option[Buf],
+      acl: Seq[Data.ACL],
+      createMode: CreateMode)
       extends Op
   case class SetData(path: String, data: Option[Buf], version: Option[Int])
       extends Op

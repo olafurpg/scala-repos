@@ -42,7 +42,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class LightDistantSpec
     extends SimpleSFXDelegateSpec[jfxse.Light.Distant, Light.Distant](
-        classOf[jfxse.Light.Distant], classOf[Light.Distant])
+      classOf[jfxse.Light.Distant],
+      classOf[Light.Distant])
     with ColorDelegateSpec[Light.Distant] {
 
   val colorDelegate = getScalaClassInstance

@@ -25,7 +25,8 @@ object CharEncoding {
     protected def empty: From
 
     protected def code(
-        data: From, last: Boolean): Either[CoderResult, (To, From)]
+        data: From,
+        last: Boolean): Either[CoderResult, (To, From)]
 
     protected def concat(a: From, b: From): From
 
@@ -47,15 +48,17 @@ object CharEncoding {
         val newIt = Iteratee.flatten(it.feed(in))
         Cont(step(initial)(newIt))
       case in @ Input.EOF =>
-        code(initial, true).fold({ result =>
-          Error(s"coding error: $result", in)
-        }, {
-          case (string, remaining) =>
-            val newIt = Iteratee.flatten(it
-                  .feed(Input.El(string))
+        code(initial, true).fold(
+          { result =>
+            Error(s"coding error: $result", in)
+          }, {
+            case (string, remaining) =>
+              val newIt = Iteratee.flatten(
+                it.feed(Input.El(string))
                   .flatMap(_.feed(in))(defaultExecutionContext))
-            Done(newIt)
-        })
+              Done(newIt)
+          }
+        )
     }
 
     def applyOn[A](inner: Inner[A]) = Cont(step()(inner))
@@ -73,7 +76,7 @@ object CharEncoding {
         val byteBuffer = ByteBuffer.wrap(bytes)
         // at least 2, for UTF-32
         val charBuffer = CharBuffer.allocate(
-            2 max math.ceil(bytes.length * decoder.averageCharsPerByte).toInt)
+          2 max math.ceil(bytes.length * decoder.averageCharsPerByte).toInt)
         val out = new StringWriter
 
         @tailrec
@@ -123,7 +126,7 @@ object CharEncoding {
         val charBuffer = CharBuffer.wrap(chars)
         // at least 6, for UTF-8
         val byteBuffer = ByteBuffer.allocate(
-            6 max math.ceil(chars.length * encoder.averageBytesPerChar).toInt)
+          6 max math.ceil(chars.length * encoder.averageBytesPerChar).toInt)
         val out = new ByteArrayOutputStream
         @tailrec
         def process(byteBuffer: ByteBuffer): CoderResult = {

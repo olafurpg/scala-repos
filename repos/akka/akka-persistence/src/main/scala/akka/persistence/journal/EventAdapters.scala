@@ -19,9 +19,10 @@ import scala.util.Try
 /**
   * `EventAdapters` serves as a per-journal collection of bound event adapters.
   */
-class EventAdapters(map: ConcurrentHashMap[Class[_], EventAdapter],
-                    bindings: immutable.Seq[(Class[_], EventAdapter)],
-                    log: LoggingAdapter) {
+class EventAdapters(
+    map: ConcurrentHashMap[Class[_], EventAdapter],
+    bindings: immutable.Seq[(Class[_], EventAdapter)],
+    log: LoggingAdapter) {
 
   /**
     * Finds the "most specific" matching adapter for the given class (i.e. it may return an adapter that can work on a
@@ -40,9 +41,10 @@ class EventAdapters(map: ConcurrentHashMap[Class[_], EventAdapter],
         }
         map.putIfAbsent(clazz, value) match {
           case null ⇒
-            log.debug(s"Using EventAdapter: {} for event [{}]",
-                      value.getClass.getName,
-                      clazz.getName)
+            log.debug(
+              s"Using EventAdapter: {} for event [{}]",
+              value.getClass.getName,
+              clazz.getName)
             value
           case some ⇒ some
         }
@@ -78,24 +80,27 @@ private[akka] object EventAdapters {
       (fqn, boundToAdapters) ← adapterBindings
       boundAdapter ← boundToAdapters
     } require(
-        adapterNames(boundAdapter.toString),
-        s"$fqn was bound to undefined event-adapter: $boundAdapter (bindings: ${boundToAdapters
-          .mkString("[", ", ", "]")}, known adapters: ${adapters.keys.mkString})")
+      adapterNames(boundAdapter.toString),
+      s"$fqn was bound to undefined event-adapter: $boundAdapter (bindings: ${boundToAdapters
+        .mkString("[", ", ", "]")}, known adapters: ${adapters.keys.mkString})"
+    )
 
     // A Map of handler from alias to implementation (i.e. class implementing akka.serialization.Serializer)
     // For example this defines a handler named 'country': `"country" -> com.example.comain.CountryTagsAdapter`
-    val handlers = for ((k: String, v: String) ← adapters) yield
-      k -> instantiateAdapter(v, system).get
+    val handlers = for ((k: String, v: String) ← adapters)
+      yield k -> instantiateAdapter(v, system).get
 
     // bindings is a Seq of tuple representing the mapping from Class to handler.
     // It is primarily ordered by the most specific classes first, and secondly in the configured order.
     val bindings: immutable.Seq[ClassHandler] = {
-      val bs = for ((k: FQN, as: BoundAdapters) ← adapterBindings) yield
-        if (as.size == 1)
-          (system.dynamicAccess.getClassFor[Any](k).get, handlers(as.head))
-        else
-          (system.dynamicAccess.getClassFor[Any](k).get,
-           CombinedReadEventAdapter(as.map(handlers)))
+      val bs = for ((k: FQN, as: BoundAdapters) ← adapterBindings)
+        yield
+          if (as.size == 1)
+            (system.dynamicAccess.getClassFor[Any](k).get, handlers(as.head))
+          else
+            (
+              system.dynamicAccess.getClassFor[Any](k).get,
+              CombinedReadEventAdapter(as.map(handlers)))
 
       sort(bs)
     }
@@ -108,7 +113,8 @@ private[akka] object EventAdapters {
   }
 
   def instantiateAdapter(
-      adapterFQN: String, system: ExtendedActorSystem): Try[EventAdapter] = {
+      adapterFQN: String,
+      system: ExtendedActorSystem): Try[EventAdapter] = {
     val clazz = system.dynamicAccess.getClassFor[Any](adapterFQN).get
     if (classOf[EventAdapter] isAssignableFrom clazz)
       instantiate[EventAdapter](adapterFQN, system)
@@ -120,7 +126,7 @@ private[akka] object EventAdapters {
         .map(NoopWriteEventAdapter)
     else
       throw new IllegalArgumentException(
-          s"Configured $adapterFQN does not implement any EventAdapter interface!")
+        s"Configured $adapterFQN does not implement any EventAdapter interface!")
   }
 
   /** INTERNAL API */
@@ -129,7 +135,7 @@ private[akka] object EventAdapters {
       extends EventAdapter {
     private def onlyReadSideException =
       new IllegalStateException(
-          "CombinedReadEventAdapter must not be used when writing (creating manifests) events!")
+        "CombinedReadEventAdapter must not be used when writing (creating manifests) events!")
     override def manifest(event: Any): String = throw onlyReadSideException
     override def toJournal(event: Any): Any = throw onlyReadSideException
 
@@ -144,10 +150,12 @@ private[akka] object EventAdapters {
     * Tries to load the specified Serializer by the fully-qualified name; the actual
     * loading is performed by the system’s [[akka.actor.DynamicAccess]].
     */
-  private def instantiate[T : ClassTag](
-      fqn: FQN, system: ExtendedActorSystem): Try[T] =
+  private def instantiate[T: ClassTag](
+      fqn: FQN,
+      system: ExtendedActorSystem): Try[T] =
     system.dynamicAccess.createInstanceFor[T](
-        fqn, List(classOf[ExtendedActorSystem] -> system)) recoverWith {
+      fqn,
+      List(classOf[ExtendedActorSystem] -> system)) recoverWith {
       case _: NoSuchMethodException ⇒
         system.dynamicAccess.createInstanceFor[T](fqn, Nil)
     }
@@ -167,7 +175,8 @@ private[akka] object EventAdapters {
     }.to[immutable.Seq]
 
   private final def configToMap(
-      config: Config, path: String): Map[String, String] = {
+      config: Config,
+      path: String): Map[String, String] = {
     import scala.collection.JavaConverters._
     if (config.hasPath(path)) {
       config.getConfig(path).root.unwrapped.asScala.toMap map {
@@ -177,7 +186,8 @@ private[akka] object EventAdapters {
   }
 
   private final def configToListMap(
-      config: Config, path: String): Map[String, immutable.Seq[String]] = {
+      config: Config,
+      path: String): Map[String, immutable.Seq[String]] = {
     import scala.collection.JavaConverters._
     if (config.hasPath(path)) {
       config.getConfig(path).root.unwrapped.asScala.toMap map {

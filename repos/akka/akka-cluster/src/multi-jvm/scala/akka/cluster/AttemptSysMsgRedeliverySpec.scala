@@ -21,7 +21,7 @@ object AttemptSysMsgRedeliveryMultiJvmSpec extends MultiNodeConfig {
   val third = role("third")
 
   commonConfig(
-      debugConfig(on = false).withFallback(MultiNodeClusterSpec.clusterConfig))
+    debugConfig(on = false).withFallback(MultiNodeClusterSpec.clusterConfig))
 
   testTransport(on = true)
 
@@ -38,7 +38,9 @@ class AttemptSysMsgRedeliveryMultiJvmNode3 extends AttemptSysMsgRedeliverySpec
 
 class AttemptSysMsgRedeliverySpec
     extends MultiNodeSpec(AttemptSysMsgRedeliveryMultiJvmSpec)
-    with MultiNodeClusterSpec with ImplicitSender with DefaultTimeout {
+    with MultiNodeClusterSpec
+    with ImplicitSender
+    with DefaultTimeout {
   import AttemptSysMsgRedeliveryMultiJvmSpec._
 
   "AttemptSysMsgRedelivery" must {

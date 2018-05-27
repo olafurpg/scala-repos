@@ -22,8 +22,8 @@ trait Listener[In, Out] {
   * An empty Listener that can be used as a placeholder.
   */
 object NullListener extends Listener[Any, Any] {
-  def listen(addr: SocketAddress)(
-      serveTransport: Transport[Any, Any] => Unit) = NullServer
+  def listen(addr: SocketAddress)(serveTransport: Transport[Any, Any] => Unit) =
+    NullServer
 }
 
 /**

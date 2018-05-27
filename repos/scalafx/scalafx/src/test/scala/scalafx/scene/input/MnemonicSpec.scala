@@ -42,7 +42,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class MnemonicSpec
     extends SimpleSFXDelegateSpec[jfxsi.Mnemonic, Mnemonic](
-        classOf[jfxsi.Mnemonic], classOf[Mnemonic]) {
+      classOf[jfxsi.Mnemonic],
+      classOf[Mnemonic]) {
 
   override protected def getJavaClassInstance = new jfxsi.Mnemonic(null, null)
 }

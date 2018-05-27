@@ -42,4 +42,5 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class BlendSpec
     extends SimpleSFXDelegateSpec[jfxse.Blend, Blend](
-        classOf[jfxse.Blend], classOf[Blend])
+      classOf[jfxse.Blend],
+      classOf[Blend])

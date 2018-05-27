@@ -95,7 +95,7 @@ case class FetchFailed(
   override def toErrorString: String = {
     val bmAddressString = if (bmAddress == null) "null" else bmAddress.toString
     s"FetchFailed($bmAddressString, shuffleId=$shuffleId, mapId=$mapId, reduceId=$reduceId, " +
-    s"message=\n$message\n)"
+      s"message=\n$message\n)"
   }
 }
 
@@ -139,16 +139,19 @@ case class ExceptionFailure(
     * driver. This may be set to `false` in the event that the exception is not in fact
     * serializable.
     */
-  private[spark] def this(e: Throwable,
-                          accumUpdates: Seq[AccumulableInfo],
-                          preserveCause: Boolean) {
-    this(e.getClass.getName,
-         e.getMessage,
-         e.getStackTrace,
-         Utils.exceptionString(e),
-         if (preserveCause) Some(new ThrowableSerializationWrapper(e))
-         else None,
-         accumUpdates)
+  private[spark] def this(
+      e: Throwable,
+      accumUpdates: Seq[AccumulableInfo],
+      preserveCause: Boolean) {
+    this(
+      e.getClass.getName,
+      e.getMessage,
+      e.getStackTrace,
+      Utils.exceptionString(e),
+      if (preserveCause) Some(new ThrowableSerializationWrapper(e))
+      else None,
+      accumUpdates
+    )
   }
 
   private[spark] def this(e: Throwable, accumUpdates: Seq[AccumulableInfo]) {
@@ -173,9 +176,10 @@ case class ExceptionFailure(
     * Return a nice string representation of the exception, including the stack trace.
     * Note: It does not include the exception's causes, and is only used for backward compatibility.
     */
-  private def exceptionString(className: String,
-                              description: String,
-                              stackTrace: Array[StackTraceElement]): String = {
+  private def exceptionString(
+      className: String,
+      description: String,
+      stackTrace: Array[StackTraceElement]): String = {
     val desc = if (description == null) "" else description
     val st =
       if (stackTrace == null) ""
@@ -190,7 +194,8 @@ case class ExceptionFailure(
   * but the stacktrace and message will be preserved correctly in SparkException.
   */
 private[spark] class ThrowableSerializationWrapper(var exception: Throwable)
-    extends Serializable with Logging {
+    extends Serializable
+    with Logging {
   private def writeObject(out: ObjectOutputStream): Unit = {
     out.writeObject(exception)
   }
@@ -233,7 +238,7 @@ case class TaskCommitDenied(jobID: Int, partitionID: Int, attemptNumber: Int)
     extends TaskFailedReason {
   override def toErrorString: String =
     s"TaskCommitDenied (Driver denied task commit)" +
-    s" for job: $jobID, partition: $partitionID, attemptNumber: $attemptNumber"
+      s" for job: $jobID, partition: $partitionID, attemptNumber: $attemptNumber"
 
   /**
     * If a task failed because its attempt to commit was denied, do not count this failure
@@ -249,9 +254,10 @@ case class TaskCommitDenied(jobID: Int, partitionID: Int, attemptNumber: Int)
   * the task crashed the JVM.
   */
 @DeveloperApi
-case class ExecutorLostFailure(execId: String,
-                               exitCausedByApp: Boolean = true,
-                               reason: Option[String])
+case class ExecutorLostFailure(
+    execId: String,
+    exitCausedByApp: Boolean = true,
+    reason: Option[String])
     extends TaskFailedReason {
   override def toErrorString: String = {
     val exitBehavior =
@@ -261,9 +267,11 @@ case class ExecutorLostFailure(execId: String,
         "unrelated to the running tasks"
       }
     s"ExecutorLostFailure (executor ${execId} exited ${exitBehavior})" +
-    reason.map { r =>
-      s" Reason: $r"
-    }.getOrElse("")
+      reason
+        .map { r =>
+          s" Reason: $r"
+        }
+        .getOrElse("")
   }
 
   override def countTowardsTaskFailures: Boolean = exitCausedByApp

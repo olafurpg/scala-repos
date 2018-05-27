@@ -7,7 +7,8 @@ trait RepositoryComponent extends TemplateComponent { self: Profile =>
   lazy val Repositories = TableQuery[Repositories]
 
   class Repositories(tag: Tag)
-      extends Table[Repository](tag, "REPOSITORY") with BasicTemplate {
+      extends Table[Repository](tag, "REPOSITORY")
+      with BasicTemplate {
     val isPrivate = column[Boolean]("PRIVATE")
     val description = column[String]("DESCRIPTION")
     val defaultBranch = column[String]("DEFAULT_BRANCH")
@@ -19,18 +20,19 @@ trait RepositoryComponent extends TemplateComponent { self: Profile =>
     val parentUserName = column[String]("PARENT_USER_NAME")
     val parentRepositoryName = column[String]("PARENT_REPOSITORY_NAME")
     def * =
-      (userName,
-       repositoryName,
-       isPrivate,
-       description.?,
-       defaultBranch,
-       registeredDate,
-       updatedDate,
-       lastActivityDate,
-       originUserName.?,
-       originRepositoryName.?,
-       parentUserName.?,
-       parentRepositoryName.?) <> (Repository.tupled, Repository.unapply)
+      (
+        userName,
+        repositoryName,
+        isPrivate,
+        description.?,
+        defaultBranch,
+        registeredDate,
+        updatedDate,
+        lastActivityDate,
+        originUserName.?,
+        originRepositoryName.?,
+        parentUserName.?,
+        parentRepositoryName.?) <> (Repository.tupled, Repository.unapply)
 
     def byPrimaryKey(owner: String, repository: String) =
       byRepository(owner, repository)

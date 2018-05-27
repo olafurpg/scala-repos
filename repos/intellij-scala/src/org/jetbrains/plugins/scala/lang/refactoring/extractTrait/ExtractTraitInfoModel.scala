@@ -1,7 +1,10 @@
 package org.jetbrains.plugins.scala
 package lang.refactoring.extractTrait
 
-import com.intellij.refactoring.classMembers.{AbstractMemberInfoModel, MemberInfoChange}
+import com.intellij.refactoring.classMembers.{
+  AbstractMemberInfoModel,
+  MemberInfoChange
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScDeclaration
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScMember
 
@@ -14,7 +17,7 @@ object ExtractTraitInfoModel
   override def isAbstractEnabled(member: ScalaExtractMemberInfo) = {
     member.getMember match {
       case decl: ScDeclaration => false
-      case _ => true
+      case _                   => true
     }
   }
 
@@ -25,12 +28,12 @@ object ExtractTraitInfoModel
   override def isFixedAbstract(member: ScalaExtractMemberInfo) =
     member.getMember match {
       case decl: ScDeclaration => true
-      case _ => null
+      case _                   => null
     }
 
   override def isAbstractWhenDisabled(member: ScalaExtractMemberInfo) =
     member.getMember match {
       case decl: ScDeclaration => true
-      case _ => false
+      case _                   => false
     }
 }

@@ -10,7 +10,9 @@ import controllers.{routes => R}
 
 // returns String urls, not Call objects
 private[app] final class Router(
-    baseUrl: String, protocol: String, domain: String)
+    baseUrl: String,
+    protocol: String,
+    domain: String)
     extends Actor {
 
   import makeTimeout.large
@@ -28,8 +30,8 @@ private[app] final class Router(
       } pipeTo sender
 
     case TeamShow(id) => sender ! R.Team.show(id).url
-    case Pgn(gameId) => sender ! R.Export.pgn(gameId).url
-    case Puzzle(id) => sender ! R.Puzzle.show(id).url
+    case Pgn(gameId)  => sender ! R.Export.pgn(gameId).url
+    case Puzzle(id)   => sender ! R.Puzzle.show(id).url
 
     case msg => sender ! Status.Failure(new Exception(s"No route for $msg"))
   }

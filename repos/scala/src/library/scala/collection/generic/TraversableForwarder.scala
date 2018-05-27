@@ -28,8 +28,8 @@ import scala.reflect.ClassTag
   *  @since   2.8
   */
 @deprecated(
-    "Forwarding is inherently unreliable since it is not automated and new methods can be forgotten.",
-    "2.11.0")
+  "Forwarding is inherently unreliable since it is not automated and new methods can be forgotten.",
+  "2.11.0")
 trait TraversableForwarder[+A] extends Traversable[A] {
 
   /** The traversable object to which calls are forwarded. */
@@ -74,7 +74,7 @@ trait TraversableForwarder[+A] extends Traversable[A] {
   override def copyToArray[B >: A](xs: Array[B], start: Int) =
     underlying.copyToArray(xs, start)
   override def copyToArray[B >: A](xs: Array[B]) = underlying.copyToArray(xs)
-  override def toArray[B >: A : ClassTag]: Array[B] = underlying.toArray
+  override def toArray[B >: A: ClassTag]: Array[B] = underlying.toArray
   override def toList: List[A] = underlying.toList
   override def toIterable: Iterable[A] = underlying.toIterable
   override def toSeq: Seq[A] = underlying.toSeq
@@ -88,10 +88,11 @@ trait TraversableForwarder[+A] extends Traversable[A] {
     underlying.mkString(start, sep, end)
   override def mkString(sep: String): String = underlying.mkString(sep)
   override def mkString: String = underlying.mkString
-  override def addString(b: StringBuilder,
-                         start: String,
-                         sep: String,
-                         end: String): StringBuilder =
+  override def addString(
+      b: StringBuilder,
+      start: String,
+      sep: String,
+      end: String): StringBuilder =
     underlying.addString(b, start, sep, end)
   override def addString(b: StringBuilder, sep: String): StringBuilder =
     underlying.addString(b, sep)

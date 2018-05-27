@@ -78,7 +78,7 @@ private[play] final class NonBlockingMutex {
     op.apply()
     val nextOp = dequeueNextOpToExecute()
     nextOp match {
-      case None => ()
+      case None     => ()
       case Some(op) => executeAll(op)
     }
   }
@@ -89,9 +89,9 @@ private[play] final class NonBlockingMutex {
     val (newState, nextOp) = prevState match {
       case null =>
         throw new IllegalStateException(
-            "When executing, must have a queue of pending elements")
+          "When executing, must have a queue of pending elements")
       case pending if pending.isEmpty => (null, None)
-      case pending => (pending.tail, Some(pending.head))
+      case pending                    => (pending.tail, Some(pending.head))
     }
     if (state.compareAndSet(prevState, newState)) nextOp
     else dequeueNextOpToExecute()

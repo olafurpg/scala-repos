@@ -6,12 +6,13 @@ import com.typesafe.config.Config
 import lila.common.PimpedConfig._
 import lila.memo.{ExpireSetMemo, MongoCache}
 
-final class Env(config: Config,
-                db: lila.db.Env,
-                mongoCache: MongoCache.Builder,
-                scheduler: lila.common.Scheduler,
-                timeline: ActorSelection,
-                system: ActorSystem) {
+final class Env(
+    config: Config,
+    db: lila.db.Env,
+    mongoCache: MongoCache.Builder,
+    scheduler: lila.common.Scheduler,
+    timeline: ActorSelection,
+    system: ActorSystem) {
 
   private val settings = new {
     val PaginatorMaxPerPage = config getInt "paginator.max_per_page"
@@ -34,8 +35,8 @@ final class Env(config: Config,
 
   lazy val trophyApi = new TrophyApi(db(CollectionTrophy))
 
-  lazy val rankingApi = new RankingApi(
-      db(CollectionRanking), mongoCache, lightUser)
+  lazy val rankingApi =
+    new RankingApi(db(CollectionRanking), mongoCache, lightUser)
 
   lazy val jsonView = new JsonView(isOnline)
 
@@ -81,19 +82,22 @@ final class Env(config: Config,
     }
   }
 
-  lazy val cached = new Cached(nbTtl = CachedNbTtl,
-                               onlineUserIdMemo = onlineUserIdMemo,
-                               mongoCache = mongoCache,
-                               rankingApi = rankingApi)
+  lazy val cached = new Cached(
+    nbTtl = CachedNbTtl,
+    onlineUserIdMemo = onlineUserIdMemo,
+    mongoCache = mongoCache,
+    rankingApi = rankingApi)
 }
 
 object Env {
 
   lazy val current: Env =
-    "user" boot new Env(config = lila.common.PlayApp loadConfig "user",
-                        db = lila.db.Env.current,
-                        mongoCache = lila.memo.Env.current.mongoCache,
-                        scheduler = lila.common.PlayApp.scheduler,
-                        timeline = lila.hub.Env.current.actor.timeline,
-                        system = lila.common.PlayApp.system)
+    "user" boot new Env(
+      config = lila.common.PlayApp loadConfig "user",
+      db = lila.db.Env.current,
+      mongoCache = lila.memo.Env.current.mongoCache,
+      scheduler = lila.common.PlayApp.scheduler,
+      timeline = lila.hub.Env.current.actor.timeline,
+      system = lila.common.PlayApp.system
+    )
 }

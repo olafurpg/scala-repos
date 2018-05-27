@@ -20,10 +20,11 @@ class MkJvmFilter(jvm: Jvm) {
         service(req) ensure {
           buffer(begin) foreach { gc =>
             Trace.record {
-              Record(Trace.id,
-                     gc.timestamp,
-                     Annotation.Message(gc.toString),
-                     Some(gc.duration))
+              Record(
+                Trace.id,
+                gc.timestamp,
+                Annotation.Message(gc.toString),
+                Some(gc.duration))
             }
           }
         }

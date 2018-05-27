@@ -24,20 +24,21 @@ object Ciphers {
 
   def recommendedCiphers: Seq[String] =
     foldVersion(
-        run16 = java16RecommendedCiphers, runHigher = java17RecommendedCiphers)
+      run16 = java16RecommendedCiphers,
+      runHigher = java17RecommendedCiphers)
 
   lazy val java17RecommendedCiphers: Seq[String] = {
     SSLContext.getDefault.getDefaultSSLParameters.getCipherSuites
   }.filterNot(deprecatedCiphers.contains(_))
 
   val java16RecommendedCiphers: Seq[String] = Seq(
-      "TLS_DHE_RSA_WITH_AES_128_CBC_SHA",
-      "TLS_DHE_RSA_WITH_AES_256_CBC_SHA",
-      "TLS_DHE_DSS_WITH_AES_128_CBC_SHA",
-      "TLS_RSA_WITH_AES_256_CBC_SHA",
-      "TLS_RSA_WITH_AES_128_CBC_SHA",
-      "SSL_RSA_WITH_3DES_EDE_CBC_SHA",
-      "TLS_EMPTY_RENEGOTIATION_INFO_SCSV" // per RFC 5746
+    "TLS_DHE_RSA_WITH_AES_128_CBC_SHA",
+    "TLS_DHE_RSA_WITH_AES_256_CBC_SHA",
+    "TLS_DHE_DSS_WITH_AES_128_CBC_SHA",
+    "TLS_RSA_WITH_AES_256_CBC_SHA",
+    "TLS_RSA_WITH_AES_128_CBC_SHA",
+    "SSL_RSA_WITH_3DES_EDE_CBC_SHA",
+    "TLS_EMPTY_RENEGOTIATION_INFO_SCSV" // per RFC 5746
   )
 
   // Suite B profile for TLS (requires 1.2): http://tools.ietf.org/html/rfc6460
@@ -65,16 +66,16 @@ object Ciphers {
   // From http://op-co.de/blog/posts/android_ssl_downgrade/
   // Caveat: https://news.ycombinator.com/item?id=6548545
   val recommendedSmithCiphers = Seq(
-      "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
-      "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA",
-      "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA",
-      "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA",
-      "TLS_DHE_RSA_WITH_AES_128_CBC_SHA",
-      "TLS_DHE_RSA_WITH_AES_256_CBC_SHA",
-      "TLS_DHE_DSS_WITH_AES_128_CBC_SHA",
-      "TLS_RSA_WITH_AES_128_CBC_SHA",
-      "TLS_RSA_WITH_AES_256_CBC_SHA",
-      "SSL_RSA_WITH_3DES_EDE_CBC_SHA"
+    "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA",
+    "TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA",
+    "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA",
+    "TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA",
+    "TLS_DHE_RSA_WITH_AES_128_CBC_SHA",
+    "TLS_DHE_RSA_WITH_AES_256_CBC_SHA",
+    "TLS_DHE_DSS_WITH_AES_128_CBC_SHA",
+    "TLS_RSA_WITH_AES_128_CBC_SHA",
+    "TLS_RSA_WITH_AES_256_CBC_SHA",
+    "SSL_RSA_WITH_3DES_EDE_CBC_SHA"
   )
 
   val exportCiphers = """SSL_RSA_EXPORT_WITH_RC4_40_MD5

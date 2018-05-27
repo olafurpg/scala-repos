@@ -13,8 +13,9 @@ import com.twitter.util.Future
 class ValidateRequestFilter[REQUEST <: Request]
     extends SimpleFilter[REQUEST, Response] {
 
-  def apply(request: REQUEST,
-            service: Service[REQUEST, Response]): Future[Response] = {
+  def apply(
+      request: REQUEST,
+      service: Service[REQUEST, Response]): Future[Response] = {
     if (request.uri != "/bad-http-request" && request.params.isValid) {
       service(request)
     } else {

@@ -7,15 +7,16 @@ import scala.concurrent.Future
 import scala.util.control.NonFatal
 
 object StateMetrics {
-  private[state] class MetricTemplate(metrics: Metrics,
-                                      prefix: String,
-                                      metricsClass: Class[_],
-                                      nanoTime: () => Long = () =>
-                                          System.nanoTime) {
+  private[state] class MetricTemplate(
+      metrics: Metrics,
+      prefix: String,
+      metricsClass: Class[_],
+      nanoTime: () => Long = () => System.nanoTime) {
     def timedFuture[T](f: => Future[T]): Future[T] = {
       requestMeter.mark()
       val t0 = nanoTime()
-      val result: Future[T] = try f catch {
+      val result: Future[T] = try f
+      catch {
         case NonFatal(t) =>
           // if the function did not even manage to return the Future
           val t1 = nanoTime()

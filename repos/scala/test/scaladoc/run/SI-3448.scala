@@ -33,7 +33,7 @@ object Test extends ScaladocModelTest {
 
     // just need to check the member exists, access methods will throw an error if there's a problem
     assert(
-        rootPackage._class("D")._method("foo").resultType.name == "D[U, T]",
-        rootPackage._class("D")._method("foo").resultType.name + " == D[U, T]")
+      rootPackage._class("D")._method("foo").resultType.name == "D[U, T]",
+      rootPackage._class("D")._method("foo").resultType.name + " == D[U, T]")
   }
 }

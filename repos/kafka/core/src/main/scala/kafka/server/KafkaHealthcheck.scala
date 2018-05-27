@@ -26,10 +26,10 @@ import org.apache.kafka.common.protocol.SecurityProtocol
 import org.apache.zookeeper.Watcher.Event.KeeperState
 
 /**
-  * This class registers the broker in zookeeper to allow 
+  * This class registers the broker in zookeeper to allow
   * other brokers and consumers to detect failures. It uses an ephemeral znode with the path:
   *   /brokers/[0...N] --> advertisedHost:advertisedPort
-  *   
+  *
   * Right now our definition of health is fairly naive. If we register in zk we are healthy, otherwise
   * we are dead.
   */
@@ -56,25 +56,28 @@ class KafkaHealthcheck(
     val jmxPort =
       System.getProperty("com.sun.management.jmxremote.port", "-1").toInt
     val updatedEndpoints = advertisedEndpoints.mapValues(
-        endpoint =>
-          if (endpoint.host == null || endpoint.host.trim.isEmpty)
-            EndPoint(InetAddress.getLocalHost.getCanonicalHostName,
-                     endpoint.port,
-                     endpoint.protocolType)
-          else endpoint)
+      endpoint =>
+        if (endpoint.host == null || endpoint.host.trim.isEmpty)
+          EndPoint(
+            InetAddress.getLocalHost.getCanonicalHostName,
+            endpoint.port,
+            endpoint.protocolType)
+        else endpoint)
 
     // the default host and port are here for compatibility with older client
     // only PLAINTEXT is supported as default
     // if the broker doesn't listen on PLAINTEXT protocol, an empty endpoint will be registered and older clients will be unable to connect
     val plaintextEndpoint = updatedEndpoints.getOrElse(
-        SecurityProtocol.PLAINTEXT, new EndPoint(null, -1, null))
-    zkUtils.registerBrokerInZk(brokerId,
-                               plaintextEndpoint.host,
-                               plaintextEndpoint.port,
-                               updatedEndpoints,
-                               jmxPort,
-                               rack,
-                               interBrokerProtocolVersion)
+      SecurityProtocol.PLAINTEXT,
+      new EndPoint(null, -1, null))
+    zkUtils.registerBrokerInZk(
+      brokerId,
+      plaintextEndpoint.host,
+      plaintextEndpoint.port,
+      updatedEndpoints,
+      jmxPort,
+      rack,
+      interBrokerProtocolVersion)
   }
 
   /**
@@ -98,8 +101,8 @@ class KafkaHealthcheck(
       register()
       info("done re-registering broker")
       info(
-          "Subscribing to %s path to watch for new topics".format(
-              ZkUtils.BrokerTopicsPath))
+        "Subscribing to %s path to watch for new topics".format(
+          ZkUtils.BrokerTopicsPath))
     }
 
     override def handleSessionEstablishmentError(error: Throwable): Unit = {

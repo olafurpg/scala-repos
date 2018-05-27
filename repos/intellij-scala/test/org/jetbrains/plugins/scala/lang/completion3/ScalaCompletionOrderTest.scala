@@ -8,7 +8,8 @@ import com.intellij.codeInsight.completion.CompletionType
   */
 class ScalaCompletionOrderTest
     extends ScalaCompletionSortingTestCase(
-        CompletionType.BASIC, "/completion3/order/") {
+      CompletionType.BASIC,
+      "/completion3/order/") {
   def testCaseClasuseParamAsLocal(): Unit = {
     checkPreferredItems(0, "retparam", "retField")
   }

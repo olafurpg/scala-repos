@@ -9,7 +9,8 @@ object Test {
 
   def main(args: Array[String]): Unit = {
     expectMatchError("I hereby refute null!")(for ((x, y) <- xs) yield x)
-    expectMatchError("I denounce null as unListLike!")(
-        (null: Any) match { case List(_ *) => true })
+    expectMatchError("I denounce null as unListLike!")((null: Any) match {
+      case List(_*) => true
+    })
   }
 }

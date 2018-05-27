@@ -27,7 +27,8 @@ class HashCodeUsesVarInspection extends AbstractInspection {
               field.nameContext match {
                 case variable: ScVariable if !variable.isLocal =>
                   holder.registerProblem(
-                      exp, "Non-value field is accessed in 'hashCode()'")
+                    exp,
+                    "Non-value field is accessed in 'hashCode()'")
                 case _ =>
               }
             case _ =>

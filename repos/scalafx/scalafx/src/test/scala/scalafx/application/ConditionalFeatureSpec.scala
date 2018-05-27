@@ -39,6 +39,6 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class ConditionalFeatureSpec
     extends SFXEnumDelegateSpec[jfxa.ConditionalFeature, ConditionalFeature](
-        javaClass = classOf[jfxa.ConditionalFeature],
-        scalaClass = classOf[ConditionalFeature],
-        companion = ConditionalFeature)
+      javaClass = classOf[jfxa.ConditionalFeature],
+      scalaClass = classOf[ConditionalFeature],
+      companion = ConditionalFeature)

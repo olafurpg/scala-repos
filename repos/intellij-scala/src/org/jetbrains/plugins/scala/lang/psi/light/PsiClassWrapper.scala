@@ -20,7 +20,12 @@ import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject, ScTemplateDefinition, ScTrait}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass,
+  ScObject,
+  ScTemplateDefinition,
+  ScTrait
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.TypeDefinitionMembers
 import org.jetbrains.plugins.scala.lang.psi.light.PsiTypedDefinitionWrapper.DefinitionRole._
 import org.jetbrains.plugins.scala.lang.resolve.processor.BaseProcessor
@@ -32,9 +37,10 @@ import _root_.scala.collection.mutable.ArrayBuffer
   * @author Alefas
   * @since 10.02.12
   */
-class PsiClassWrapper(val definition: ScTemplateDefinition,
-                      private var qualName: String,
-                      private var name: String)
+class PsiClassWrapper(
+    val definition: ScTemplateDefinition,
+    private var qualName: String,
+    private var name: String)
     extends LightElement(definition.getManager, definition.getLanguage)
     with PsiClass /*with SyntheticElement*/ {
   override def hashCode(): Int = definition.hashCode()
@@ -43,7 +49,7 @@ class PsiClassWrapper(val definition: ScTemplateDefinition,
     obj match {
       case wrapper: PsiClassWrapper =>
         definition.equals(wrapper.definition) &&
-        qualName == wrapper.qualName && name == wrapper.name
+          qualName == wrapper.qualName && name == wrapper.name
       case _ => false
     }
   }
@@ -75,7 +81,7 @@ class PsiClassWrapper(val definition: ScTemplateDefinition,
   def getFields: Array[PsiField] = {
     definition match {
       case o: ScObject => Array.empty
-      case _ => definition.getFields //todo:
+      case _           => definition.getFields //todo:
     }
   }
 
@@ -83,10 +89,11 @@ class PsiClassWrapper(val definition: ScTemplateDefinition,
     definition match {
       case obj: ScObject =>
         val res = new ArrayBuffer[PsiMethod]()
-        TypeDefinitionMembers.SignatureNodes.forAllSignatureNodes(obj) {
-          node =>
-            this.processPsiMethodsForNode(
-                node, isStatic = true, isInterface = false)(res += _)
+        TypeDefinitionMembers.SignatureNodes.forAllSignatureNodes(obj) { node =>
+          this.processPsiMethodsForNode(
+            node,
+            isStatic = true,
+            isInterface = false)(res += _)
         }
         res.toArray
 
@@ -145,11 +152,11 @@ class PsiClassWrapper(val definition: ScTemplateDefinition,
           case o: ScObject =>
             o.fakeCompanionClass match {
               case Some(clazz) => Seq(o, clazz)
-              case None => Seq(o)
+              case None        => Seq(o)
             }
           case t: ScTrait => Seq(t, t.fakeCompanionClass)
           case c: ScClass => Seq(c)
-          case _ => Seq.empty
+          case _          => Seq.empty
         }.toArray
       case _ => definition.getInnerClasses //todo:
     }
@@ -174,12 +181,14 @@ class PsiClassWrapper(val definition: ScTemplateDefinition,
   }
 
   def findMethodBySignature(
-      patternMethod: PsiMethod, checkBases: Boolean): PsiMethod = {
+      patternMethod: PsiMethod,
+      checkBases: Boolean): PsiMethod = {
     PsiClassImplUtil.findMethodBySignature(this, patternMethod, checkBases)
   }
 
   def findMethodsBySignature(
-      patternMethod: PsiMethod, checkBases: Boolean): Array[PsiMethod] = {
+      patternMethod: PsiMethod,
+      checkBases: Boolean): Array[PsiMethod] = {
     PsiClassImplUtil.findMethodsBySignature(this, patternMethod, checkBases)
   }
 
@@ -191,11 +200,13 @@ class PsiClassWrapper(val definition: ScTemplateDefinition,
       name: String,
       checkBases: Boolean): util.List[Pair[PsiMethod, PsiSubstitutor]] = {
     PsiClassImplUtil.findMethodsAndTheirSubstitutorsByName(
-        this, name, checkBases)
+      this,
+      name,
+      checkBases)
   }
 
-  def getAllMethodsAndTheirSubstitutors: util.List[Pair[
-          PsiMethod, PsiSubstitutor]] = {
+  def getAllMethodsAndTheirSubstitutors
+    : util.List[Pair[PsiMethod, PsiSubstitutor]] = {
     PsiClassImplUtil.getAllWithSubstitutorsByMap(this, MemberType.METHOD)
   }
 
@@ -223,7 +234,7 @@ class PsiClassWrapper(val definition: ScTemplateDefinition,
     definition match {
       case o: ScObject =>
         baseClass.getQualifiedName == "java.lang.Object" ||
-        (baseClass.getQualifiedName == "scala.ScalaObject" &&
+          (baseClass.getQualifiedName == "scala.ScalaObject" &&
             !baseClass.isDeprecated)
       case _ => false
     }
@@ -233,7 +244,7 @@ class PsiClassWrapper(val definition: ScTemplateDefinition,
     definition match {
       case o: ScObject =>
         baseClass.getQualifiedName == "java.lang.Object" ||
-        (baseClass.getQualifiedName == "scala.ScalaObject" &&
+          (baseClass.getQualifiedName == "scala.ScalaObject" &&
             !baseClass.isDeprecated)
       case _ => false
     }
@@ -258,27 +269,31 @@ class PsiClassWrapper(val definition: ScTemplateDefinition,
 
   override def copy: PsiElement = {
     new PsiClassWrapper(
-        definition.copy.asInstanceOf[ScTemplateDefinition], qualName, name)
+      definition.copy.asInstanceOf[ScTemplateDefinition],
+      qualName,
+      name)
   }
 
-  override def processDeclarations(processor: PsiScopeProcessor,
-                                   state: ResolveState,
-                                   lastParent: PsiElement,
-                                   place: PsiElement): Boolean = {
+  override def processDeclarations(
+      processor: PsiScopeProcessor,
+      state: ResolveState,
+      lastParent: PsiElement,
+      place: PsiElement): Boolean = {
     if (!processor.isInstanceOf[BaseProcessor]) {
       val languageLevel: LanguageLevel = processor match {
         case methodProcessor: MethodsProcessor =>
           methodProcessor.getLanguageLevel
         case _ => PsiUtil.getLanguageLevel(place)
       }
-      return PsiClassImplUtil.processDeclarationsInClass(this,
-                                                         processor,
-                                                         state,
-                                                         null,
-                                                         lastParent,
-                                                         place,
-                                                         languageLevel,
-                                                         false)
+      return PsiClassImplUtil.processDeclarationsInClass(
+        this,
+        processor,
+        state,
+        null,
+        lastParent,
+        place,
+        languageLevel,
+        false)
     }
     true
   }

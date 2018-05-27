@@ -127,9 +127,9 @@ object CoreUtils extends Logging {
       }
     } catch {
       case e: Exception => {
-          error("Failed to register Mbean " + name, e)
-          false
-        }
+        error("Failed to register Mbean " + name, e)
+        false
+      }
     }
   }
 
@@ -173,7 +173,7 @@ object CoreUtils extends Logging {
     channel.read(buffer) match {
       case -1 =>
         throw new EOFException(
-            "Received -1 when reading from channel, socket has likely been closed.")
+          "Received -1 when reading from channel, socket has likely been closed.")
       case n: Int => n
     }
   }
@@ -189,10 +189,9 @@ object CoreUtils extends Logging {
     if ("".equals(str)) return map
     val keyVals = str
       .split("\\s*,\\s*")
-      .map(s =>
-            {
-          val lio = s.lastIndexOf(":")
-          (s.substring(0, lio).trim, s.substring(lio + 1).trim)
+      .map(s => {
+        val lio = s.lastIndexOf(":")
+        (s.substring(0, lio).trim, s.substring(lio + 1).trim)
       })
     keyVals.toMap
   }
@@ -233,8 +232,8 @@ object CoreUtils extends Logging {
   def replaceSuffix(s: String, oldSuffix: String, newSuffix: String): String = {
     if (!s.endsWith(oldSuffix))
       throw new IllegalArgumentException(
-          "Expected string to end with '%s' but string is '%s'".format(
-              oldSuffix, s))
+        "Expected string to end with '%s' but string is '%s'"
+          .format(oldSuffix, s))
     s.substring(0, s.length - oldSuffix.length) + newSuffix
   }
 
@@ -243,7 +242,7 @@ object CoreUtils extends Logging {
     */
   def readInt(bytes: Array[Byte], offset: Int): Int = {
     ((bytes(offset) & 0xFF) << 24) | ((bytes(offset + 1) & 0xFF) << 16) |
-    ((bytes(offset + 2) & 0xFF) << 8) | (bytes(offset + 3) & 0xFF)
+      ((bytes(offset + 2) & 0xFF) << 8) | (bytes(offset + 3) & 0xFF)
   }
 
   /**
@@ -267,9 +266,9 @@ object CoreUtils extends Logging {
   //JSON strings need to be escaped based on ECMA-404 standard http://json.org
   def JSONEscapeString(s: String): String = {
     s.map {
-      case '"' => "\\\""
+      case '"'  => "\\\""
       case '\\' => "\\\\"
-      case '/' => "\\/"
+      case '/'  => "\\/"
       case '\b' => "\\b"
       case '\f' => "\\f"
       case '\n' => "\\n"
@@ -284,8 +283,7 @@ object CoreUtils extends Logging {
        * encode the C1 codes, but we do to be safe.
        */
       case c
-          if
-          ((c >= '\u0000' && c <= '\u001f') || (c >= '\u007f' && c <= '\u009f')) =>
+          if ((c >= '\u0000' && c <= '\u001f') || (c >= '\u007f' && c <= '\u009f')) =>
         "\\u%04x".format(c: Int)
       case c => c
     }.mkString

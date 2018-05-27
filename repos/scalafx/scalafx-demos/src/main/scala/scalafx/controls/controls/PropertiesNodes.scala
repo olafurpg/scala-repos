@@ -44,8 +44,7 @@ import scalafx.scene.text.{FontWeight, TextAlignment}
   * @param target Node to be manipulated
   * @param title TitledPane titled
   */
-abstract class PropertiesNodes[T](target: T, title: String)
-    extends TitledPane {
+abstract class PropertiesNodes[T](target: T, title: String) extends TitledPane {
 
   private var index = 0
 
@@ -102,10 +101,11 @@ abstract class PropertiesNodes[T](target: T, title: String)
     index += 1
   }
 
-  protected def fillDoublePropertyFromText(property: DoubleProperty,
-                                           field: TextField,
-                                           cleanAfterAction: Boolean = true,
-                                           onError: () => Unit = () => ()) {
+  protected def fillDoublePropertyFromText(
+      property: DoubleProperty,
+      field: TextField,
+      cleanAfterAction: Boolean = true,
+      onError: () => Unit = () => ()) {
     try {
       val txt = field.text.get
       property.value = txt.toDouble
@@ -118,10 +118,11 @@ abstract class PropertiesNodes[T](target: T, title: String)
     }
   }
 
-  protected def fillIntPropertyFromText(property: IntegerProperty,
-                                        field: TextField,
-                                        cleanAfterAction: Boolean = true,
-                                        onError: () => Unit = () => ()) {
+  protected def fillIntPropertyFromText(
+      property: IntegerProperty,
+      field: TextField,
+      cleanAfterAction: Boolean = true,
+      onError: () => Unit = () => ()) {
     try {
       val txt = field.text.get
       property.value = txt.toInt

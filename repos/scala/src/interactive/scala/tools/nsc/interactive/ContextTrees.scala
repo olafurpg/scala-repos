@@ -24,9 +24,10 @@ trait ContextTrees { self: Global =>
     *  4. Children of a context have non-overlapping increasing positions.
     *  5. No context in the tree has a transparent position.
     */
-  class ContextTree(val pos: Position,
-                    val context: Context,
-                    val children: ArrayBuffer[ContextTree]) {
+  class ContextTree(
+      val pos: Position,
+      val context: Context,
+      val children: ArrayBuffer[ContextTree]) {
     def this(pos: Position, context: Context) =
       this(pos, context, new ArrayBuffer[ContextTree])
     override def toString = "ContextTree(" + pos + ", " + children + ")"
@@ -64,21 +65,23 @@ trait ContextTrees { self: Global =>
         c
       }
       locateContextTree(contexts, pos) map locateFinestContextTree map
-      (ct => sanitizeContext(ct.context))
+        (ct => sanitizeContext(ct.context))
     }
 
   /** Returns the ContextTree containing `pos`, or the ContextTree positioned just before `pos`,
     *  or None if `pos` is located before all ContextTrees.
     */
   def locateContextTree(
-      contexts: Contexts, pos: Position): Option[ContextTree] = {
+      contexts: Contexts,
+      pos: Position): Option[ContextTree] = {
     if (contexts.isEmpty) None
     else {
       // binary search on contexts, loop invar: lo <= hi, recursion metric: `hi - lo`
       @tailrec
-      def loop(lo: Int,
-               hi: Int,
-               previousSibling: Option[ContextTree]): Option[ContextTree] = {
+      def loop(
+          lo: Int,
+          hi: Int,
+          previousSibling: Option[ContextTree]): Option[ContextTree] = {
         // [SI-8239] enforce loop invariant & ensure recursion metric decreases monotonically on every recursion
         if (lo > hi) previousSibling
         else if (pos properlyPrecedes contexts(lo).pos) previousSibling
@@ -113,8 +116,8 @@ trait ContextTrees { self: Global =>
   def addContext(contexts: Contexts, context: Context): Unit = {
     val cpos = context.tree.pos
     if (cpos.isTransparent)
-      for (t <- context.tree.children flatMap solidDescendants) addContext(
-          contexts, context, t.pos)
+      for (t <- context.tree.children flatMap solidDescendants)
+        addContext(contexts, context, t.pos)
     else addContext(contexts, context, cpos)
   }
 
@@ -138,8 +141,8 @@ trait ContextTrees { self: Global =>
             def insertAt(idx: Int): Boolean = {
               val oldpos = contexts(idx).pos
               if (oldpos sameRange cpos) {
-                contexts(idx) = new ContextTree(
-                    cpos, context, contexts(idx).children)
+                contexts(idx) =
+                  new ContextTree(cpos, context, contexts(idx).children)
                 true
               } else if (oldpos includes cpos) {
                 addContext(contexts(idx).children, context, cpos)
@@ -148,7 +151,9 @@ trait ContextTrees { self: Global =>
                 val start = contexts.indexWhere(cpos includes _.pos)
                 val last = contexts.lastIndexWhere(cpos includes _.pos)
                 contexts(start) = new ContextTree(
-                    cpos, context, contexts.slice(start, last + 1))
+                  cpos,
+                  context,
+                  contexts.slice(start, last + 1))
                 contexts.remove(start + 1, last - start)
                 true
               } else false
@@ -166,7 +171,8 @@ trait ContextTrees { self: Global =>
                 if ((lopos precedes cpos) && (cpos precedes hipos))
                   contexts.insert(hi, new ContextTree(cpos, context))
                 else
-                  inform("internal error? skewed positions: " + lopos +
+                  inform(
+                    "internal error? skewed positions: " + lopos +
                       " !< " + cpos + " !< " + hipos)
               }
             }
@@ -177,7 +183,8 @@ trait ContextTrees { self: Global =>
         case ex: Throwable =>
           println(ex)
           ex.printStackTrace()
-          println("failure inserting " + cpos + " into " +
+          println(
+            "failure inserting " + cpos + " into " +
               contexts + "/" + contexts(contexts.length - 1).pos + "/" +
               (contexts(contexts.length - 1).pos includes cpos))
           throw ex

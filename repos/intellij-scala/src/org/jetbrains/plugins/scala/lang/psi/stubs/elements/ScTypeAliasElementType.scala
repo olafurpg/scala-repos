@@ -5,9 +5,18 @@ package stubs
 package elements
 
 import com.intellij.psi.PsiElement
-import com.intellij.psi.stubs.{IndexSink, StubElement, StubInputStream, StubOutputStream}
+import com.intellij.psi.stubs.{
+  IndexSink,
+  StubElement,
+  StubInputStream,
+  StubOutputStream
+}
 import com.intellij.util.io.StringRef
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScTypeAlias, ScTypeAliasDeclaration, ScTypeAliasDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScTypeAlias,
+  ScTypeAliasDeclaration,
+  ScTypeAliasDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScObject
 import org.jetbrains.plugins.scala.lang.psi.stubs.impl.ScTypeAliasStubImpl
 import org.jetbrains.plugins.scala.lang.psi.stubs.index.ScalaIndexKeys
@@ -49,15 +58,16 @@ abstract class ScTypeAliasElementType[Func <: ScTypeAlias](debugName: String)
     val containingClass = psi.containingClass
     val isStableQualifier =
       ScalaPsiUtil.hasStablePath(psi) && containingClass.isInstanceOf[ScObject]
-    new ScTypeAliasStubImpl[ParentPsi](parentStub,
-                                       this,
-                                       psi.name,
-                                       isDeclaration,
-                                       typeElementText,
-                                       lower,
-                                       upper,
-                                       containingClass == null,
-                                       isStableQualifier)
+    new ScTypeAliasStubImpl[ParentPsi](
+      parentStub,
+      this,
+      psi.name,
+      isDeclaration,
+      typeElementText,
+      lower,
+      upper,
+      containingClass == null,
+      isStableQualifier)
   }
 
   def serialize(stub: ScTypeAliasStub, dataStream: StubOutputStream) {
@@ -71,7 +81,8 @@ abstract class ScTypeAliasElementType[Func <: ScTypeAlias](debugName: String)
   }
 
   def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScTypeAliasStub = {
+      dataStream: StubInputStream,
+      parentStub: Any): ScTypeAliasStub = {
     val name = StringRef.toString(dataStream.readName)
     val isDecl = dataStream.readBoolean
     val parent = parentStub.asInstanceOf[StubElement[PsiElement]]
@@ -80,15 +91,16 @@ abstract class ScTypeAliasElementType[Func <: ScTypeAlias](debugName: String)
     val upper = dataStream.readName.toString
     val isLocal = dataStream.readBoolean()
     val isStable = dataStream.readBoolean()
-    new ScTypeAliasStubImpl(parent,
-                            this,
-                            name,
-                            isDecl,
-                            typeElementText,
-                            lower,
-                            upper,
-                            isLocal,
-                            isStable)
+    new ScTypeAliasStubImpl(
+      parent,
+      this,
+      name,
+      isDecl,
+      typeElementText,
+      lower,
+      upper,
+      isLocal,
+      isStable)
   }
 
   def indexStub(stub: ScTypeAliasStub, sink: IndexSink) {

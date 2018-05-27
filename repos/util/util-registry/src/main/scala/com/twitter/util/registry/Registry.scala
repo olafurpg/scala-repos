@@ -108,7 +108,7 @@ object GlobalRegistry {
     * registry, useful for writing isolated tests.
     */
   def get: Registry = localRegistry() match {
-    case None => registry
+    case None        => registry
     case Some(local) => local
   }
 

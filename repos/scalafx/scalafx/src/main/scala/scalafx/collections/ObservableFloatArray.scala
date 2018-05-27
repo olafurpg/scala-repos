@@ -33,7 +33,9 @@ import javafx.{collections => jfxc}
   */
 object ObservableFloatArray
     extends ObservableArrayCompanionBase[
-        Float, ObservableFloatArray, jfxc.ObservableFloatArray] {
+      Float,
+      ObservableFloatArray,
+      jfxc.ObservableFloatArray] {
 
   /**
     * @inheritdoc
@@ -53,9 +55,11 @@ object ObservableFloatArray
   */
 class ObservableFloatArray(
     delegate: jfxc.ObservableFloatArray = jfxc.FXCollections
-        .observableFloatArray())
+      .observableFloatArray())
     extends ObservableArray[
-        Float, ObservableFloatArray, jfxc.ObservableFloatArray](delegate) {
+      Float,
+      ObservableFloatArray,
+      jfxc.ObservableFloatArray](delegate) {
 
   /**
     * Create $OFA with specified capacity.
@@ -75,7 +79,10 @@ class ObservableFloatArray(
     * @inheritdoc
     */
   override def copyTo(
-      srcIdx: Int, dest: Array[Float], destIdx: Int, length: Int) {
+      srcIdx: Int,
+      dest: Array[Float],
+      destIdx: Int,
+      length: Int) {
     delegate.copyTo(srcIdx, dest, destIdx, length)
   }
 
@@ -83,7 +90,10 @@ class ObservableFloatArray(
     * @inheritdoc
     */
   override def copyTo(
-      srcIdx: Int, dest: ObservableFloatArray, destIdx: Int, length: Int) {
+      srcIdx: Int,
+      dest: ObservableFloatArray,
+      destIdx: Int,
+      length: Int) {
     delegate.copyTo(srcIdx, dest.delegate, destIdx, length)
   }
 
@@ -166,7 +176,10 @@ class ObservableFloatArray(
     * @inheritdoc
     */
   override def set(
-      destIdx: Int, src: ObservableFloatArray, srcIdx: Int, length: Int) {
+      destIdx: Int,
+      src: ObservableFloatArray,
+      srcIdx: Int,
+      length: Int) {
     delegate.set(destIdx, src.delegate, srcIdx, length)
   }
 

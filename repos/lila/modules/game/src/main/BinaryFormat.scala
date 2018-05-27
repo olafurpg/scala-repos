@@ -27,22 +27,8 @@ object BinaryFormat {
 
     private type MT = Int // tenths of seconds
     private val size = 16
-    private val encodeList: List[(MT, Int)] = List(1,
-                                                   5,
-                                                   10,
-                                                   15,
-                                                   20,
-                                                   30,
-                                                   40,
-                                                   50,
-                                                   60,
-                                                   80,
-                                                   100,
-                                                   150,
-                                                   200,
-                                                   300,
-                                                   400,
-                                                   600).zipWithIndex
+    private val encodeList: List[(MT, Int)] = List(1, 5, 10, 15, 20, 30, 40, 50,
+      60, 80, 100, 150, 200, 300, 400, 600).zipWithIndex
     private val encodeMap: Map[MT, Int] = encodeList.toMap
     private val decodeList: List[(Int, MT)] = encodeList.map(x => x._2 -> x._1)
     private val decodeMap: Map[Int, MT] = decodeList.toMap
@@ -52,16 +38,16 @@ object BinaryFormat {
         if (math.abs(a - v) <= math.abs(c - v)) Some(b)
         else findClose(v, (c, d) :: rest)
       case (a, b) :: rest => Some(b)
-      case _ => None
+      case _              => None
     }
 
     def write(mts: Vector[MT]): ByteArray = ByteArray {
       def enc(mt: MT) =
         encodeMap get mt orElse findClose(mt, encodeList) getOrElse (size - 1)
       (mts grouped 2 map {
-            case Vector(a, b) => (enc(a) << 4) + enc(b)
-            case Vector(a) => enc(a) << 4
-          }).map(_.toByte).toArray
+        case Vector(a, b) => (enc(a) << 4) + enc(b)
+        case Vector(a)    => enc(a) << 4
+      }).map(_.toByte).toArray
     }
 
     def read(ba: ByteArray): Vector[MT] = {
@@ -78,47 +64,52 @@ object BinaryFormat {
       def time(t: Float) = writeSignedInt24((t * 100).toInt)
       def timer(seconds: Double) = writeTimer((seconds * 100).toLong)
       Array(writeClockLimit(clock.limit), writeInt8(clock.increment)) ++ time(
-          clock.whiteTime) ++ time(clock.blackTime) ++ timer(
-          clock.timerOption getOrElse 0d) map (_.toByte)
+        clock.whiteTime) ++ time(clock.blackTime) ++ timer(
+        clock.timerOption getOrElse 0d) map (_.toByte)
     }
 
-    def read(ba: ByteArray,
-             whiteBerserk: Boolean,
-             blackBerserk: Boolean): Color => Clock =
+    def read(
+        ba: ByteArray,
+        whiteBerserk: Boolean,
+        blackBerserk: Boolean): Color => Clock =
       color =>
         ba.value map toInt match {
           case Array(b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, b12) =>
             readTimer(b9, b10, b11, b12) match {
               case 0 =>
                 PausedClock(
-                    color = color,
-                    limit = readClockLimit(b1),
-                    increment = b2,
-                    whiteTime = readSignedInt24(b3, b4, b5).toFloat / 100,
-                    blackTime = readSignedInt24(b6, b7, b8).toFloat / 100,
-                    whiteBerserk = whiteBerserk,
-                    blackBerserk = blackBerserk)
+                  color = color,
+                  limit = readClockLimit(b1),
+                  increment = b2,
+                  whiteTime = readSignedInt24(b3, b4, b5).toFloat / 100,
+                  blackTime = readSignedInt24(b6, b7, b8).toFloat / 100,
+                  whiteBerserk = whiteBerserk,
+                  blackBerserk = blackBerserk
+                )
               case timer =>
                 RunningClock(
-                    color = color,
-                    limit = readClockLimit(b1),
-                    increment = b2,
-                    whiteTime = readSignedInt24(b3, b4, b5).toFloat / 100,
-                    blackTime = readSignedInt24(b6, b7, b8).toFloat / 100,
-                    whiteBerserk = whiteBerserk,
-                    blackBerserk = blackBerserk,
-                    timer = timer.toDouble / 100)
+                  color = color,
+                  limit = readClockLimit(b1),
+                  increment = b2,
+                  whiteTime = readSignedInt24(b3, b4, b5).toFloat / 100,
+                  blackTime = readSignedInt24(b6, b7, b8).toFloat / 100,
+                  whiteBerserk = whiteBerserk,
+                  blackBerserk = blackBerserk,
+                  timer = timer.toDouble / 100
+                )
             }
           // compatibility with 5 bytes timers
           // #TODO remove me! But fix the DB first!
           case Array(b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, b12, _) =>
-            PausedClock(color = color,
-                        limit = readClockLimit(b1),
-                        increment = b2,
-                        whiteTime = readSignedInt24(b3, b4, b5).toFloat / 100,
-                        blackTime = readSignedInt24(b6, b7, b8).toFloat / 100,
-                        whiteBerserk = whiteBerserk,
-                        blackBerserk = blackBerserk)
+            PausedClock(
+              color = color,
+              limit = readClockLimit(b1),
+              increment = b2,
+              whiteTime = readSignedInt24(b3, b4, b5).toFloat / 100,
+              blackTime = readSignedInt24(b6, b7, b8).toFloat / 100,
+              whiteBerserk = whiteBerserk,
+              blackBerserk = blackBerserk
+            )
           case x =>
             sys error s"BinaryFormat.clock.read invalid bytes: ${ba.showBytes}"
       }
@@ -156,7 +147,7 @@ object BinaryFormat {
 
       val castleInt = clmt.castles.toList.zipWithIndex.foldLeft(0) {
         case (acc, (false, _)) => acc
-        case (acc, (true, p)) => acc + (1 << (3 - p))
+        case (acc, (true, p))  => acc + (1 << (3 - p))
       }
 
       def posInt(pos: Pos): Int = ((pos.x - 1) << 3) + pos.y - 1
@@ -167,8 +158,8 @@ object BinaryFormat {
 
       val ints =
         Array(
-            (castleInt << 4) + (lastMoveInt >> 8),
-            (lastMoveInt & 255)
+          (castleInt << 4) + (lastMoveInt >> 8),
+          (lastMoveInt & 255)
         ) ++ writeInt24(time) ++ clmt.check.map(posInt)
 
       ByteArray(ints.map(_.toByte))
@@ -187,18 +178,24 @@ object BinaryFormat {
     private def posAt(x: Int, y: Int) = Pos.posAt(x + 1, y + 1)
 
     private def doRead(
-        b1: Int, b2: Int, b3: Int, b4: Int, b5: Int, b6: Option[Int]) =
+        b1: Int,
+        b2: Int,
+        b3: Int,
+        b4: Int,
+        b5: Int,
+        b6: Option[Int]) =
       CastleLastMoveTime(
-          castles = Castles(
-                b1 > 127, (b1 & 64) != 0, (b1 & 32) != 0, (b1 & 16) != 0),
-          lastMove = for {
-            from ← posAt((b1 & 15) >> 1, ((b1 & 1) << 2) + (b2 >> 6))
-            to ← posAt((b2 & 63) >> 3, b2 & 7) if from != to
-          } yield from -> to,
-          lastMoveTime = readInt24(b3, b4, b5).some filter (0 !=),
-          check = b6 flatMap { x =>
-            posAt(x >> 3, x & 7)
-          })
+        castles =
+          Castles(b1 > 127, (b1 & 64) != 0, (b1 & 32) != 0, (b1 & 16) != 0),
+        lastMove = for {
+          from ← posAt((b1 & 15) >> 1, ((b1 & 1) << 2) + (b2 >> 6))
+          to ← posAt((b2 & 63) >> 3, b2 & 7) if from != to
+        } yield from -> to,
+        lastMoveTime = readInt24(b3, b4, b5).some filter (0 !=),
+        check = b6 flatMap { x =>
+          posAt(x >> 3, x & 7)
+        }
+      )
   }
 
   object piece {
@@ -211,8 +208,7 @@ object BinaryFormat {
       def posInt(pos: Pos): Int = (pieces get pos).fold(0) { piece =>
         piece.color.fold(0, 8) + roleToInt(piece.role)
       }
-      ByteArray(
-          groupedPos map {
+      ByteArray(groupedPos map {
         case (p1, p2) => ((posInt(p1) << 4) + posInt(p2)).toByte
       })
     }
@@ -228,8 +224,8 @@ object BinaryFormat {
         }
       val pieceInts = ba.value flatMap splitInts
       (Pos.all zip pieceInts flatMap {
-            case (pos, int) => intPiece(int) map (pos -> _)
-          }).toMap
+        case (pos, int) => intPiece(int) map (pos -> _)
+      }).toMap
     }
 
     // cache standard start position
@@ -245,13 +241,13 @@ object BinaryFormat {
         case 5 => Some(Bishop)
         // Legacy from when we used to have an 'Antiking' piece
         case 7 if variant.antichess => Some(King)
-        case _ => None
+        case _                      => None
       }
     private def roleToInt(role: Role): Int = role match {
-      case Pawn => 6
-      case King => 1
-      case Queen => 2
-      case Rook => 3
+      case Pawn   => 6
+      case King   => 1
+      case Queen  => 2
+      case Rook   => 3
       case Knight => 4
       case Bishop => 5
     }

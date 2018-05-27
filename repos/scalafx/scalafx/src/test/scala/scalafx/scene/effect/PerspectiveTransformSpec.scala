@@ -42,8 +42,10 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class PerspectiveTransformSpec
     extends SimpleSFXDelegateSpec[
-        jfxse.PerspectiveTransform, PerspectiveTransform](
-        classOf[jfxse.PerspectiveTransform], classOf[PerspectiveTransform])
+      jfxse.PerspectiveTransform,
+      PerspectiveTransform](
+      classOf[jfxse.PerspectiveTransform],
+      classOf[PerspectiveTransform])
     with InputDelegateSpec[PerspectiveTransform] {
 
   val inputDelegate = getScalaClassInstance

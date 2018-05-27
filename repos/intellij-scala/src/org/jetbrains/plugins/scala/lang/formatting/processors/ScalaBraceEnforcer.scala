@@ -1,9 +1,16 @@
 package org.jetbrains.plugins.scala.lang.formatting.processors
 
 import com.intellij.openapi.util.TextRange
-import com.intellij.psi.codeStyle.{CodeStyleManager, CodeStyleSettings, CommonCodeStyleSettings}
+import com.intellij.psi.codeStyle.{
+  CodeStyleManager,
+  CodeStyleSettings,
+  CommonCodeStyleSettings
+}
 import com.intellij.psi.impl.source.SourceTreeToPsiMap
-import com.intellij.psi.impl.source.codeStyle.{CodeEditUtil, PostFormatProcessorHelper}
+import com.intellij.psi.impl.source.codeStyle.{
+  CodeEditUtil,
+  PostFormatProcessorHelper
+}
 import com.intellij.psi.{PsiElement, PsiFile, PsiWhiteSpace}
 import org.jetbrains.plugins.scala.ScalaFileType
 import org.jetbrains.plugins.scala.lang.formatting.settings.ScalaCodeStyleSettings
@@ -11,7 +18,10 @@ import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaRecursiveElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScCaseClause
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScFunctionDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction,
+  ScFunctionDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
 /**
@@ -104,7 +114,9 @@ class ScalaBraceEnforcer(settings: CodeStyleSettings)
           fin.expression match {
             case Some(expr) =>
               processExpression(
-                  expr, tryStmt, scalaSettings.FINALLY_BRACE_FORCE)
+                expr,
+                tryStmt,
+                scalaSettings.FINALLY_BRACE_FORCE)
             case _ =>
           }
         case _ =>
@@ -135,13 +147,15 @@ class ScalaBraceEnforcer(settings: CodeStyleSettings)
   }
 
   private def processExpression(
-      expr: ScExpression, stmt: PsiElement, option: Int) {
+      expr: ScExpression,
+      stmt: PsiElement,
+      option: Int) {
     expr match {
       case b: ScBlockExpr =>
       case _ =>
         if (option == CommonCodeStyleSettings.FORCE_BRACES_ALWAYS ||
             (option == CommonCodeStyleSettings.FORCE_BRACES_IF_MULTILINE &&
-                PostFormatProcessorHelper.isMultiline(stmt))) {
+            PostFormatProcessorHelper.isMultiline(stmt))) {
           replaceExprWithBlock(expr)
         }
     }
@@ -156,16 +170,19 @@ class ScalaBraceEnforcer(settings: CodeStyleSettings)
     try {
       val project = expr.getProject
       val newExpr = ScalaPsiElementFactory.createExpressionFromText(
-          "{\n" + expr.getText + "\n}", expr.getManager)
+        "{\n" + expr.getText + "\n}",
+        expr.getManager)
       val prev = expr.getPrevSibling
       if (ScalaPsiUtil.isLineTerminator(prev) ||
           prev.isInstanceOf[PsiWhiteSpace]) {
-        CodeEditUtil.removeChild(SourceTreeToPsiMap.psiElementToTree(parent),
-                                 SourceTreeToPsiMap.psiElementToTree(prev))
+        CodeEditUtil.removeChild(
+          SourceTreeToPsiMap.psiElementToTree(parent),
+          SourceTreeToPsiMap.psiElementToTree(prev))
       }
-      CodeEditUtil.replaceChild(SourceTreeToPsiMap.psiElementToTree(parent),
-                                SourceTreeToPsiMap.psiElementToTree(expr),
-                                SourceTreeToPsiMap.psiElementToTree(newExpr))
+      CodeEditUtil.replaceChild(
+        SourceTreeToPsiMap.psiElementToTree(parent),
+        SourceTreeToPsiMap.psiElementToTree(expr),
+        SourceTreeToPsiMap.psiElementToTree(newExpr))
       CodeStyleManager.getInstance(project).reformat(parent, true)
     } finally {
       updateResultRange(oldTextLength, parent.getTextLength)

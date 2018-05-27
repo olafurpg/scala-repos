@@ -11,7 +11,8 @@ object BasicAuthExample {
   case class MyUser(id: String)
 
   class OurBasicAuthStrategy(
-      protected override val app: ScalatraBase, realm: String)
+      protected override val app: ScalatraBase,
+      realm: String)
       extends BasicAuthStrategy[MyUser](app, realm) {
 
     protected def validate(userName: String, password: String)(
@@ -28,13 +29,14 @@ object BasicAuthExample {
   }
 
   trait AuthenticationSupport
-      extends ScentrySupport[MyUser] with BasicAuthSupport[MyUser] {
+      extends ScentrySupport[MyUser]
+      with BasicAuthSupport[MyUser] {
     self: ScalatraBase =>
 
     val realm = "Scalatra Basic Auth Example"
 
     protected def fromSession = { case id: String => MyUser(id) }
-    protected def toSession = { case usr: MyUser => usr.id }
+    protected def toSession = { case usr: MyUser  => usr.id }
 
     protected val scentryConfig =
       (new ScentryConfig {}).asInstanceOf[ScentryConfiguration]
@@ -55,22 +57,26 @@ class BasicAuthExample extends ScalatraServlet with AuthenticationSupport {
   get("/?") {
     basicAuth
     val nodes = Seq(
-        <h1>Hello from Scalatra</h1>,
-        <p><a href="/auth/linked">click</a></p>
+      <h1>Hello from Scalatra</h1>,
+      <p><a href="/auth/linked">click</a></p>
     )
 
     Template.page(
-        "Basic Auth Example", nodes, url(_, includeServletPath = false))
+      "Basic Auth Example",
+      nodes,
+      url(_, includeServletPath = false))
   }
 
   get("/linked") {
     basicAuth
     val nodes = Seq(
-        <h1>Hello from Scalatra</h1>,
-        <p><a href="/">back</a></p>
+      <h1>Hello from Scalatra</h1>,
+      <p><a href="/">back</a></p>
     )
 
     Template.page(
-        "Basic Auth Example", nodes, url(_, includeServletPath = false))
+      "Basic Auth Example",
+      nodes,
+      url(_, includeServletPath = false))
   }
 }

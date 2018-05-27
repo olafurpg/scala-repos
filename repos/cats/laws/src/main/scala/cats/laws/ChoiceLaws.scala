@@ -12,9 +12,12 @@ trait ChoiceLaws[F[_, _]] extends CategoryLaws[F] {
   implicit override def F: Choice[F]
 
   def choiceCompositionDistributivity[A, B, C, D](
-      fac: F[A, C], fbc: F[B, C], fcd: F[C, D]): IsEq[F[Xor[A, B], D]] =
+      fac: F[A, C],
+      fbc: F[B, C],
+      fcd: F[C, D]): IsEq[F[Xor[A, B], D]] =
     (F.choice(fac, fbc) andThen fcd) <-> F.choice(
-        fac andThen fcd, fbc andThen fcd)
+      fac andThen fcd,
+      fbc andThen fcd)
 }
 
 object ChoiceLaws {

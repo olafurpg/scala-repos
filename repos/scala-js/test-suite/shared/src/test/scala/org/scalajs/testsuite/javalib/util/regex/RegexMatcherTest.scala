@@ -45,12 +45,13 @@ class RegexMatcherTest {
     def checkGroup3(start: Int, end: Int, group: String): Unit =
       checkGroup(start, -1, end, -1, group, null)
 
-    def checkGroup(start: Int,
-                   startExpected: Int,
-                   end: Int,
-                   endExpected: Int,
-                   group: String,
-                   groupExpected: String): Unit = {
+    def checkGroup(
+        start: Int,
+        startExpected: Int,
+        end: Int,
+        endExpected: Int,
+        group: String,
+        groupExpected: String): Unit = {
       assertEquals(startExpected, start)
       assertEquals(endExpected, end)
       assertEquals(groupExpected, group)
@@ -241,7 +242,8 @@ class RegexMatcherTest {
       }
 
       assertEquals(
-          "java.lang.IllegalStateException", exception.getClass.getName)
+        "java.lang.IllegalStateException",
+        exception.getClass.getName)
       if (!executingInJVM) // On JVM the message is "No match found"
         assertEquals("No match available", exception.getMessage)
     }

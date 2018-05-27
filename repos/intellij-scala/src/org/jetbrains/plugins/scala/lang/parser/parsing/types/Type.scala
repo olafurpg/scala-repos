@@ -19,9 +19,10 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
  */
 
 object Type {
-  def parse(builder: ScalaPsiBuilder,
-            star: Boolean = false,
-            isPattern: Boolean = false): Boolean = {
+  def parse(
+      builder: ScalaPsiBuilder,
+      star: Boolean = false,
+      isPattern: Boolean = false): Boolean = {
     val typeMarker = builder.mark
     if (!InfixType.parse(builder, star, isPattern)) {
       builder.getTokenType match {

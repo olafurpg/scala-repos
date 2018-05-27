@@ -24,7 +24,9 @@ sealed trait PaintScale[T] extends (T => Paint)
   * @author dramage
   */
 case class GradientPaintScale[T](
-    lower: T, upper: T, gradient: Array[Color] = PaintScale.WhiteToBlack)(
+    lower: T,
+    upper: T,
+    gradient: Array[Color] = PaintScale.WhiteToBlack)(
     implicit view: T => Double)
     extends PaintScale[T] {
   def apply(value: T): Paint = {
@@ -55,7 +57,7 @@ case class CategoricalPaintScale[T](categories: Function1[T, Paint])
 
   private def ida(v: T) = categories match {
     case f: PartialFunction[T, Paint] => f.isDefinedAt(v)
-    case _ => true
+    case _                            => true
   }
 }
 
@@ -70,19 +72,22 @@ object PaintScale {
     */
   def convertToColor(colorcode: String): java.awt.Color = {
     val rgbcsv = "(.*),(.*),(.*)".r
-    colorcode.toLowerCase.replace(" ", "").replace("[", "").replace("]", "") match {
-      case "y" | "yellow" => yellow
+    colorcode.toLowerCase
+      .replace(" ", "")
+      .replace("[", "")
+      .replace("]", "") match {
+      case "y" | "yellow"  => yellow
       case "m" | "magenta" => magenta
-      case "c" | "cyan" => cyan
-      case "r" | "red" => red
-      case "g" | "green" => green
-      case "b" | "blue" => blue
-      case "w" | "white" => white
-      case "k" | "black" => black
+      case "c" | "cyan"    => cyan
+      case "r" | "red"     => red
+      case "g" | "green"   => green
+      case "b" | "blue"    => blue
+      case "w" | "white"   => white
+      case "k" | "black"   => black
       case rgbcsv(r, g, b) => new java.awt.Color(r.toInt, g.toInt, b.toInt)
       case uninterpretable: String =>
         throw new IllegalArgumentException(
-            "Expected color code to be either y m c r g b w k OR R,G,B or " +
+          "Expected color code to be either y m c r g b w k OR R,G,B or " +
             "[R,G,B] where R,G,B are numbers such that 0<=R,G,B<=255, but got '" +
             uninterpretable + "' instead.")
     }
@@ -117,16 +122,16 @@ object PaintScale {
   /** The Category10 palette from Protovis http://vis.stanford.edu/protovis/docs/color.html */
   object Category10 {
     val values: Array[Color] = Array(
-        "#1f77b4",
-        "#ff7f0e",
-        "#2ca02c",
-        "#d62728",
-        "#9467bd",
-        "#8c564b",
-        "#e377c2",
-        "#7f7f7f",
-        "#bcbd22",
-        "#17becf"
+      "#1f77b4",
+      "#ff7f0e",
+      "#2ca02c",
+      "#d62728",
+      "#9467bd",
+      "#8c564b",
+      "#e377c2",
+      "#7f7f7f",
+      "#bcbd22",
+      "#17becf"
     ).map(Color.decode)
 
     val blue = values(0)
@@ -147,16 +152,16 @@ object PaintScale {
   object Category20 {
     val values: Array[Color] =
       Category10.values ++ Array(
-          "#aec7e8",
-          "#ffbb78",
-          "#98df8a",
-          "#ff9896",
-          "#c5b0d5",
-          "#c49c94",
-          "#f7b6d2",
-          "#c7c7c7",
-          "#dbdb8d",
-          "#9edae5"
+        "#aec7e8",
+        "#ffbb78",
+        "#98df8a",
+        "#ff9896",
+        "#c5b0d5",
+        "#c49c94",
+        "#f7b6d2",
+        "#c7c7c7",
+        "#dbdb8d",
+        "#9edae5"
       ).map(Color.decode)
 
     val lightblue = values(10)
@@ -327,7 +332,9 @@ object PaintScale {
 
   /** Produces a gradient using the University of Minnesota's school colors, from maroon (low) to gold (high) */
   lazy val MaroonToGold = createGradient(
-      new Color(0xA0, 0x00, 0x00), new Color(0xFF, 0xFF, 0x00), 256)
+    new Color(0xA0, 0x00, 0x00),
+    new Color(0xFF, 0xFF, 0x00),
+    256)
 
   /** Produces a gradient from blue (low) to red (high) */
   lazy val BlueToRed = createGradient(Color.BLUE, Color.RED, 500)
@@ -343,37 +350,44 @@ object PaintScale {
 
   /** Produces a gradient through green, yellow, orange, red */
   lazy val GreenYelloOrangeRed = createMultiGradient(
-      Array(Color.green, Color.yellow, Color.orange, Color.red), 500)
+    Array(Color.green, Color.yellow, Color.orange, Color.red),
+    500)
 
   /** Produces a gradient through the rainbow: violet, blue, green, yellow, orange, red */
-  lazy val Rainbow = createMultiGradient(Array(new Color(181, 32, 255),
-                                               Color.blue,
-                                               Color.green,
-                                               Color.yellow,
-                                               Color.orange,
-                                               Color.red),
-                                         500)
+  lazy val Rainbow = createMultiGradient(
+    Array(
+      new Color(181, 32, 255),
+      Color.blue,
+      Color.green,
+      Color.yellow,
+      Color.orange,
+      Color.red),
+    500)
 
   /** Produces a gradient for hot things (black, red, orange, yellow, white) */
-  lazy val Hot = createMultiGradient(Array(Color.black,
-                                           new Color(87, 0, 0),
-                                           Color.red,
-                                           Color.orange,
-                                           Color.yellow,
-                                           Color.white),
-                                     500)
+  lazy val Hot = createMultiGradient(
+    Array(
+      Color.black,
+      new Color(87, 0, 0),
+      Color.red,
+      Color.orange,
+      Color.yellow,
+      Color.white),
+    500)
 
   /** Produces a different gradient for hot things (black, brown, orange, white) */
-  lazy val Heat = createMultiGradient(Array(Color.black,
-                                            new Color(105, 0, 0),
-                                            new Color(192, 23, 0),
-                                            new Color(255, 150, 38),
-                                            Color.white),
-                                      500)
+  lazy val Heat = createMultiGradient(
+    Array(
+      Color.black,
+      new Color(105, 0, 0),
+      new Color(192, 23, 0),
+      new Color(255, 150, 38),
+      Color.white),
+    500)
 
   /** Produces a gradient through red, orange, yellow */
-  lazy val RedOrangeYellow = createMultiGradient(
-      Array(Color.red, Color.orange, Color.yellow), 500)
+  lazy val RedOrangeYellow =
+    createMultiGradient(Array(Color.red, Color.orange, Color.yellow), 500)
 
   /**
     * Creates an array of Color objects for use as a gradient, using a linear
@@ -431,7 +445,9 @@ object PaintScale {
     for (section <- 0 until numSections) {
       //we divide the gradient into (n - 1) sections, and do a regular gradient for each
       val temp = createGradient(
-          colors(section), colors(section + 1), numSteps / numSections)
+        colors(section),
+        colors(section + 1),
+        numSteps / numSections)
       for (i <- 0 until temp.length) {
         //copy the sub-gradient into the overall gradient
         gradient(gradientIndex) = temp(i)

@@ -16,15 +16,16 @@ object Util {
         def readServerConfig(key: String) =
           (settings \\ "settings" \\ "servers" \\ "server" \\ key).head.text
         List(
-            Credentials(
-                "Sonatype Nexus Repository Manager",
-                "oss.sonatype.org",
-                readServerConfig("username"),
-                readServerConfig("password")
-            ))
+          Credentials(
+            "Sonatype Nexus Repository Manager",
+            "oss.sonatype.org",
+            readServerConfig("username"),
+            readServerConfig("password")
+          ))
       } catch {
         case ex: Exception =>
-          println("Failed to load Maven settings from " + mavenSettingsFile +
+          println(
+            "Failed to load Maven settings from " + mavenSettingsFile +
               ": " + ex)
           Nil
       }

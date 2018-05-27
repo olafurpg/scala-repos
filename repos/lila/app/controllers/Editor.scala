@@ -23,19 +23,21 @@ object Editor extends LilaController {
     val fenStr =
       Some(urlFen.trim.replace("_", " ")).filter(_.nonEmpty) orElse get("fen")
     fuccess {
-      val decodedFen = fenStr.map {
-        java.net.URLDecoder.decode(_, "UTF-8").trim
-      }.filter(_.nonEmpty)
+      val decodedFen = fenStr
+        .map {
+          java.net.URLDecoder.decode(_, "UTF-8").trim
+        }
+        .filter(_.nonEmpty)
       val situation =
         (decodedFen flatMap Forsyth.<<< map (_.situation)) | Situation(
-            chess.variant.Standard)
+          chess.variant.Standard)
       val fen = Forsyth >> situation
       Ok(
-          html.board.editor(
-              situation,
-              fen,
-              positionsJson,
-              animationDuration = Env.api.EditorAnimationDuration))
+        html.board.editor(
+          situation,
+          fen,
+          positionsJson,
+          animationDuration = Env.api.EditorAnimationDuration))
     }
   }
 
@@ -45,7 +47,7 @@ object Editor extends LilaController {
         if (game.playable) routes.Round.watcher(game.id, "white")
         else
           routes.Editor.load(
-              get("fen") | (chess.format.Forsyth >> game.toChess))
+            get("fen") | (chess.format.Forsyth >> game.toChess))
       }
     }
   }

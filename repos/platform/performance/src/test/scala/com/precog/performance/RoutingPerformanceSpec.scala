@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -77,28 +77,35 @@ trait RoutingPerformanceSpec extends Specification with PerformanceSpec {
         system.actorOf(Props(new MockProjectionActor), "mock_projection_actor")
 
       val projectionActors: ActorRef =
-        system.actorOf(Props(new MockProjectionActors(projectionActor)),
-                       "mock_projections_actor")
+        system.actorOf(
+          Props(new MockProjectionActors(projectionActor)),
+          "mock_projections_actor")
 
       val routingTable: RoutingTable = new SingleColumnProjectionRoutingTable
 
       val ingestActor: ActorRef =
-        system.actorOf(Props(new MockIngestActor(inserts / batchSize, batch)),
-                       "mock_shard_ingest")
+        system.actorOf(
+          Props(new MockIngestActor(inserts / batchSize, batch)),
+          "mock_shard_ingest")
 
       val routingActor: ActorRef = {
         val routingTable = new SingleColumnProjectionRoutingTable
         val eventStore =
-          new EventStore(routingTable,
-                         projectionActors,
-                         metadataActor,
-                         Duration(60, "seconds"),
-                         new Timeout(60000),
-                         ExecutionContext.defaultExecutionContext(system))
+          new EventStore(
+            routingTable,
+            projectionActors,
+            metadataActor,
+            Duration(60, "seconds"),
+            new Timeout(60000),
+            ExecutionContext.defaultExecutionContext(system))
         system.actorOf(
-            Props(new BatchStoreActor(
-                    eventStore, 1000, Some(ingestActor), system.scheduler)),
-            "router")
+          Props(
+            new BatchStoreActor(
+              eventStore,
+              1000,
+              Some(ingestActor),
+              system.scheduler)),
+          "router")
       }
 
       def testIngest() = {
@@ -136,7 +143,7 @@ case class MockIngestReset(barrier: CountDownLatch)
 class MockMetadataActor extends Actor {
   def receive = {
     case UpdateMetadata(_) => sender ! ()
-    case _ => println("Unplanned metadata actor action")
+    case _                 => println("Unplanned metadata actor action")
   }
 }
 
@@ -158,7 +165,7 @@ class MockIngestActor(toSend: Int, messageBatch: Seq[IngestMessage])
         replyTo ! NoIngestData
       }
     case () =>
-    case x => println("Unplanned ingest actor action: " + x.getClass.getName)
+    case x  => println("Unplanned ingest actor action: " + x.getClass.getName)
   }
 }
 
@@ -173,9 +180,9 @@ class MockProjectionActors(projectionActor: ActorRef) extends Actor {
         map += (descItr.next -> projectionActor)
       }
       sender ! ProjectionBatchAcquired(map)
-    case ReleaseProjection(_) =>
+    case ReleaseProjection(_)      =>
     case ReleaseProjectionBatch(_) => sender ! ()
-    case _ => println("Unplanned projection actors action")
+    case _                         => println("Unplanned projection actors action")
   }
 }
 

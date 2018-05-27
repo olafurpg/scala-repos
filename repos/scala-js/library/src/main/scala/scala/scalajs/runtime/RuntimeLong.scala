@@ -45,7 +45,8 @@ import js.JSStringOps._
 
 /** Emulates a Long on the JavaScript platform. */
 final class RuntimeLong(val lo: Int, val hi: Int)
-    extends java.lang.Number with java.io.Serializable
+    extends java.lang.Number
+    with java.io.Serializable
     with java.lang.Comparable[java.lang.Long] {
   a =>
 
@@ -74,7 +75,7 @@ final class RuntimeLong(val lo: Int, val hi: Int)
 
   override def equals(that: Any): Boolean = that match {
     case b: RuntimeLong => inline_equals(b)
-    case _ => false
+    case _              => false
   }
 
   override def hashCode(): Int =
@@ -408,7 +409,11 @@ final class RuntimeLong(val lo: Int, val hi: Int)
     }
   }
 
-  private def unsigned_/(alo: Int, ahi: Int, blo: Int, bhi: Int): RuntimeLong = {
+  private def unsigned_/(
+      alo: Int,
+      ahi: Int,
+      blo: Int,
+      bhi: Int): RuntimeLong = {
     // This method is not called if isInt32(alo, ahi) nor if isZero(blo, bhi)
     if (isUnsignedSafeDouble(ahi)) {
       if (isUnsignedSafeDouble(bhi)) {
@@ -483,7 +488,11 @@ final class RuntimeLong(val lo: Int, val hi: Int)
     }
   }
 
-  private def unsigned_%(alo: Int, ahi: Int, blo: Int, bhi: Int): RuntimeLong = {
+  private def unsigned_%(
+      alo: Int,
+      ahi: Int,
+      blo: Int,
+      bhi: Int): RuntimeLong = {
     // This method is not called if isInt32(alo, ahi) nor if isZero(blo, bhi)
     if (isUnsignedSafeDouble(ahi)) {
       if (isUnsignedSafeDouble(bhi)) {
@@ -515,7 +524,8 @@ final class RuntimeLong(val lo: Int, val hi: Int)
 
     var shift =
       inlineNumberOfLeadingZeros(blo, bhi) - inlineNumberOfLeadingZeros(
-          alo, ahi)
+        alo,
+        ahi)
     val initialBShift = inline_<<(blo, bhi, shift)
     var bShiftLo = initialBShift._1
     var bShiftHi = initialBShift._2
@@ -558,10 +568,11 @@ final class RuntimeLong(val lo: Int, val hi: Int)
 
       if (ask != AskRemainder) {
         val rem_div_bDouble = remDouble / bDouble
-        val newQuot = inline_+(quotLo,
-                               quotHi,
-                               unsignedSafeDoubleLo(rem_div_bDouble),
-                               unsignedSafeDoubleHi(rem_div_bDouble))
+        val newQuot = inline_+(
+          quotLo,
+          quotHi,
+          unsignedSafeDoubleLo(rem_div_bDouble),
+          unsignedSafeDoubleHi(rem_div_bDouble))
         quotLo = newQuot._1
         quotHi = newQuot._2
       }

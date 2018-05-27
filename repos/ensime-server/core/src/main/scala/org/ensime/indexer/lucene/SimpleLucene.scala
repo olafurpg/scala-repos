@@ -51,15 +51,16 @@ class SimpleLucene(path: File, analyzers: Map[String, Analyzer])
   // our fallback analyzer
   class LowercaseAnalyzer extends Analyzer {
     override protected def createComponents(
-        fieldName: String, reader: Reader) = {
+        fieldName: String,
+        reader: Reader) = {
       val source = new KeywordTokenizer(reader)
       val filtered = new LowerCaseFilter(SimpleLucene.LuceneVersion, source)
       new Analyzer.TokenStreamComponents(source, filtered)
     }
   }
   private val analyzer = new PerFieldAnalyzerWrapper(
-      new LowercaseAnalyzer,
-      analyzers.asJava
+    new LowercaseAnalyzer,
+    analyzers.asJava
   )
   private val config = new IndexWriterConfig(LuceneVersion, analyzer)
   //  config.setRAMBufferSizeMB(512)
@@ -111,9 +112,10 @@ class SimpleLucene(path: File, analyzers: Map[String, Analyzer])
     * 10,000 deletes to take about 1 second and inserts about 100ms.
     * Each call to this method constitutes a batch UPDATE operation.
     */
-  def update(delete: Seq[Query],
-             create: Seq[Document],
-             commit: Boolean = true): Unit = this.synchronized {
+  def update(
+      delete: Seq[Query],
+      create: Seq[Document],
+      commit: Boolean = true): Unit = this.synchronized {
     // Lucene 4.7.2 concurrency bugs: best to synchronise writes
     // https://issues.apache.org/jira/browse/LUCENE-5923
 

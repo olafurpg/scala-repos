@@ -9,33 +9,30 @@ import scala.collection.immutable.HashMap
 class MyTrainingData(
     // list of (day, temperature) tuples
     val temperatures: List[(String, Double)]
-)
-    extends Serializable
+) extends Serializable
 
 class MyQuery(
     val day: String
-)
-    extends Serializable
+) extends Serializable
 
 class MyModel(
     val temperatures: HashMap[String, Double]
-)
-    extends Serializable {
+) extends Serializable {
   override def toString = temperatures.toString
 }
 
 class MyPredictedResult(
     val temperature: Double
-)
-    extends Serializable
+) extends Serializable
 
 // controller components
 class MyDataSource
-    extends LDataSource[EmptyDataSourceParams,
-                        EmptyDataParams,
-                        MyTrainingData,
-                        MyQuery,
-                        EmptyActualResult] {
+    extends LDataSource[
+      EmptyDataSourceParams,
+      EmptyDataParams,
+      MyTrainingData,
+      MyQuery,
+      EmptyActualResult] {
 
   /* override this to return Training Data only */
   override def readTraining(): MyTrainingData = {
@@ -51,11 +48,12 @@ class MyDataSource
 }
 
 class MyAlgorithm
-    extends LAlgorithm[EmptyAlgorithmParams,
-                       MyTrainingData,
-                       MyModel,
-                       MyQuery,
-                       MyPredictedResult] {
+    extends LAlgorithm[
+      EmptyAlgorithmParams,
+      MyTrainingData,
+      MyModel,
+      MyQuery,
+      MyPredictedResult] {
 
   override def train(pd: MyTrainingData): MyModel = {
     // calculate average value of each day
@@ -81,8 +79,8 @@ object MyEngineFactory extends IEngineFactory {
   override def apply() = {
     /* SimpleEngine only requires one DataSouce and one Algorithm */
     new SimpleEngine(
-        classOf[MyDataSource],
-        classOf[MyAlgorithm]
+      classOf[MyDataSource],
+      classOf[MyAlgorithm]
     )
   }
 }

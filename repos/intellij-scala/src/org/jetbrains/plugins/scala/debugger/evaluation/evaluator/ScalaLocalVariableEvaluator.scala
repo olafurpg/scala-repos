@@ -2,9 +2,15 @@ package org.jetbrains.plugins.scala.debugger.evaluation.evaluator
 
 import com.intellij.debugger.DebuggerBundle
 import com.intellij.debugger.engine.evaluation.expression.{Evaluator, Modifier}
-import com.intellij.debugger.engine.evaluation.{EvaluateException, EvaluationContextImpl}
+import com.intellij.debugger.engine.evaluation.{
+  EvaluateException,
+  EvaluationContextImpl
+}
 import com.intellij.debugger.jdi.{LocalVariableProxyImpl, StackFrameProxyImpl}
-import com.intellij.debugger.ui.impl.watch.{LocalVariableDescriptorImpl, NodeDescriptorImpl}
+import com.intellij.debugger.ui.impl.watch.{
+  LocalVariableDescriptorImpl,
+  NodeDescriptorImpl
+}
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.sun.jdi._
@@ -36,14 +42,16 @@ class ScalaLocalVariableEvaluator(name: String, sourceName: String)
   }
 
   private def sourceName(frameProxy: StackFrameProxyImpl) =
-    try frameProxy.location().sourceName() catch {
+    try frameProxy.location().sourceName()
+    catch {
       case e: AbsentInformationException => ""
     }
 
   def evaluate(context: EvaluationContextImpl): AnyRef = {
 
     def saveContextAndGetValue(
-        framePr: StackFrameProxyImpl, local: LocalVariableProxyImpl) = {
+        framePr: StackFrameProxyImpl,
+        local: LocalVariableProxyImpl) = {
       myEvaluatedVariable = local
       myContext = context
       Some(framePr.getValue(local))
@@ -64,7 +72,7 @@ class ScalaLocalVariableEvaluator(name: String, sourceName: String)
           try {
             evaluationStrategy(frameProxy) match {
               case Some(x) => return Some(x)
-              case _ =>
+              case _       =>
             }
           } catch {
             case e: EvaluateException =>
@@ -117,7 +125,7 @@ class ScalaLocalVariableEvaluator(name: String, sourceName: String)
 
     if (context.getFrameProxy == null) {
       throw EvaluationException(
-          DebuggerBundle.message("evaluation.error.no.stackframe"))
+        DebuggerBundle.message("evaluation.error.no.stackframe"))
     }
 
     val result = evaluateWithFrames(withSimpleName)
@@ -130,8 +138,8 @@ class ScalaLocalVariableEvaluator(name: String, sourceName: String)
         myEvaluatedVariable = null
         myContext = null
         throw EvaluationException(
-            DebuggerBundle.message(
-                "evaluation.error.local.variable.missing", myName))
+          DebuggerBundle
+            .message("evaluation.error.local.variable.missing", myName))
     }
   }
 
@@ -145,7 +153,7 @@ class ScalaLocalVariableEvaluator(name: String, sourceName: String)
           val frameProxy: StackFrameProxyImpl = myContext.getFrameProxy
           try {
             if (DebuggerUtil.isScalaRuntimeRef(
-                    myEvaluatedVariable.getType.name())) {
+                  myEvaluatedVariable.getType.name())) {
               frameProxy.getValue(myEvaluatedVariable) match {
                 case objRef: ObjectReference =>
                   val field = objRef.referenceType().fieldByName("elem")
@@ -181,5 +189,5 @@ class ScalaLocalVariableEvaluator(name: String, sourceName: String)
 
 object ScalaLocalVariableEvaluator {
   private val LOG: Logger = Logger.getInstance(
-      "#org.jetbrains.plugins.scala.debugger.evaluation.evaluator.ScalaLocalVariableEvaluator")
+    "#org.jetbrains.plugins.scala.debugger.evaluation.evaluator.ScalaLocalVariableEvaluator")
 }

@@ -1,26 +1,33 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
 package com.precog
 package mimir
 
-import bytecode.{BinaryOperationType, JNumberT, JBooleanT, JTextT, Library, Instructions}
+import bytecode.{
+  BinaryOperationType,
+  JNumberT,
+  JBooleanT,
+  JTextT,
+  Library,
+  Instructions
+}
 
 import yggdrasil._
 import yggdrasil.table._
@@ -29,7 +36,16 @@ import com.precog.util.NumericComparisons
 
 trait InfixLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
   trait InfixLib extends ColumnarTableLib {
-    import StdLib.{BoolFrom, DoubleFrom, LongFrom, NumFrom, StrFrom, doubleIsDefined, StrAndDateT, dateToStrCol}
+    import StdLib.{
+      BoolFrom,
+      DoubleFrom,
+      LongFrom,
+      NumFrom,
+      StrFrom,
+      doubleIsDefined,
+      StrAndDateT,
+      dateToStrCol
+    }
 
     def PrimitiveEqualsF2 = yggdrasil.table.cf.std.Eq
 
@@ -44,10 +60,11 @@ trait InfixLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
       final def doubleNeZero(x: Double, y: Double) = y != 0.0
       final def numNeZero(x: BigDecimal, y: BigDecimal) = y != 0
 
-      class InfixOp2(name: String,
-                     longf: (Long, Long) => Long,
-                     doublef: (Double, Double) => Double,
-                     numf: (BigDecimal, BigDecimal) => BigDecimal)
+      class InfixOp2(
+          name: String,
+          longf: (Long, Long) => Long,
+          doublef: (Double, Double) => Double,
+          numf: (BigDecimal, BigDecimal) => BigDecimal)
           extends Op2F2(InfixNamespace, name) {
         val tpe = BinaryOperationType(JNumberT, JNumberT, JNumberT)
         def f2(ctx: MorphContext): F2 = CF2P("builtin::infix::op2::" + name) {
@@ -238,7 +255,10 @@ trait InfixLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
 
           case (c1: DateColumn, c2: DateColumn) =>
             new BoolFrom.DtDt(
-                c1, c2, (x, y) => true, (x, y) => f(compare(x, y)))
+              c1,
+              c2,
+              (x, y) => true,
+              (x, y) => f(compare(x, y)))
         }
       }
 
@@ -266,7 +286,7 @@ trait InfixLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
           new StrFrom.SS(c1, c2, _ != null && _ != null, _ + _)
 
         def f2(ctx: MorphContext): F2 = CF2P("builtin::infix:concatString") {
-          case (c1: StrColumn, c2: StrColumn) => build(c1, c2)
+          case (c1: StrColumn, c2: StrColumn)  => build(c1, c2)
           case (c1: DateColumn, c2: StrColumn) => build(dateToStrCol(c1), c2)
           case (c1: StrColumn, c2: DateColumn) => build(c1, dateToStrCol(c2))
           case (c1: DateColumn, c2: DateColumn) =>

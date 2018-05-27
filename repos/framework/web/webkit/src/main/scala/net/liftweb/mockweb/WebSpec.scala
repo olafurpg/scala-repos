@@ -44,7 +44,8 @@ import mocks.MockHttpServletRequest
   * is to just point this at your Boostrap.boot method.
   */
 abstract class WebSpec(boot: () => Any = () => {})
-    extends Specification with XmlMatchers {
+    extends Specification
+    with XmlMatchers {
 
   /**
     * This is our private spec instance of Liftrules. Everything we run will
@@ -65,9 +66,10 @@ abstract class WebSpec(boot: () => Any = () => {})
     * creation of a new Session.
     */
   class WebSpecBridge(description: String) {
-    def withSFor(url: String,
-                 session: Box[LiftSession] = Empty,
-                 contextPath: String = "") =
+    def withSFor(
+        url: String,
+        session: Box[LiftSession] = Empty,
+        contextPath: String = "") =
       new SessionSpecification(description, url, session, contextPath)
 
     def withSFor(url: String, session: LiftSession): SessionSpecification =
@@ -88,9 +90,10 @@ abstract class WebSpec(boot: () => Any = () => {})
     def withReqFor(req: HttpServletRequest) =
       new ReqSpecification(description, req)
 
-    def withTemplateFor(url: String,
-                        session: Box[LiftSession] = Empty,
-                        contextPath: String = "") =
+    def withTemplateFor(
+        url: String,
+        session: Box[LiftSession] = Empty,
+        contextPath: String = "") =
       new TemplateSpecification(description, url, session, contextPath)
 
     def withTemplateFor(url: String, session: LiftSession) =
@@ -185,7 +188,7 @@ abstract class WebSpec(boot: () => Any = () => {})
       case r: MockHttpServletRequest => f(r); this
       case _ =>
         throw new IllegalArgumentException(
-            "We can only mutate MockHttpServletRequest instances")
+          "We can only mutate MockHttpServletRequest instances")
     }
   }
 
@@ -193,28 +196,30 @@ abstract class WebSpec(boot: () => Any = () => {})
     * This class provides a wrapper to test methods that require an
     * initialized S.
     */
-  class SessionSpecification(description: String,
-                             val req: HttpServletRequest,
-                             session: Box[LiftSession])
+  class SessionSpecification(
+      description: String,
+      val req: HttpServletRequest,
+      session: Box[LiftSession])
       extends ModifiableRequest[SessionSpecification] {
-    def this(description: String,
-             url: String,
-             session: Box[LiftSession],
-             contextPath: String) = {
+    def this(
+        description: String,
+        url: String,
+        session: Box[LiftSession],
+        contextPath: String) = {
       this(description, new MockHttpServletRequest(url, contextPath), session)
     }
 
     def in(expectations: => Result) = {
       addFragments(
-          fragmentFactory.example(description, {
-            LiftRulesMocker.devTestLiftRulesInstance.doWith(liftRules) {
-              MockWeb.useLiftRules.doWith(true) {
-                MockWeb.testS(req, session) {
-                  expectations
-                }
+        fragmentFactory.example(description, {
+          LiftRulesMocker.devTestLiftRulesInstance.doWith(liftRules) {
+            MockWeb.useLiftRules.doWith(true) {
+              MockWeb.testS(req, session) {
+                expectations
               }
             }
-          }) ^ fragmentFactory.break
+          }
+        }) ^ fragmentFactory.break
       )
     }
   }
@@ -230,13 +235,13 @@ abstract class WebSpec(boot: () => Any = () => {})
 
     def in(expectations: Req => Result) = {
       addFragments(
-          fragmentFactory.example(description, {
-            LiftRulesMocker.devTestLiftRulesInstance.doWith(liftRules) {
-              MockWeb.useLiftRules.doWith(true) {
-                MockWeb.testReq(req)(expectations)
-              }
+        fragmentFactory.example(description, {
+          LiftRulesMocker.devTestLiftRulesInstance.doWith(liftRules) {
+            MockWeb.useLiftRules.doWith(true) {
+              MockWeb.testReq(req)(expectations)
             }
-          }) ^ fragmentFactory.break
+          }
+        }) ^ fragmentFactory.break
       )
     }
   }
@@ -245,19 +250,22 @@ abstract class WebSpec(boot: () => Any = () => {})
     * This class provides a wrapper to test methods that require
     * a processed template.
     */
-  class TemplateSpecification(description: String,
-                              val req: HttpServletRequest,
-                              session: Box[LiftSession])
+  class TemplateSpecification(
+      description: String,
+      val req: HttpServletRequest,
+      session: Box[LiftSession])
       extends ModifiableRequest[TemplateSpecification] {
-    def this(description: String,
-             url: String,
-             session: Box[LiftSession],
-             contextPath: String) =
+    def this(
+        description: String,
+        url: String,
+        session: Box[LiftSession],
+        contextPath: String) =
       this(description, new MockHttpServletRequest(url, contextPath), session)
 
     def in(expectations: Box[NodeSeq] => Result) = {
       addFragments(
-          fragmentFactory.example(description, {
+        fragmentFactory.example(
+          description, {
             LiftRulesMocker.devTestLiftRulesInstance.doWith(liftRules) {
               MockWeb.useLiftRules.doWith(true) {
                 MockWeb.testS(req, session) {
@@ -265,14 +273,14 @@ abstract class WebSpec(boot: () => Any = () => {})
                     case Full(sReq) =>
                       expectations(S.runTemplate(sReq.path.partPath))
                     case other =>
-                      failure(
-                          "Error: withTemplateFor call did not result in " +
-                          "request initialization (S.request = " + other + ")")
+                      failure("Error: withTemplateFor call did not result in " +
+                        "request initialization (S.request = " + other + ")")
                   }
                 }
               }
             }
-          }) ^ fragmentFactory.break
+          }
+        ) ^ fragmentFactory.break
       )
     }
   }

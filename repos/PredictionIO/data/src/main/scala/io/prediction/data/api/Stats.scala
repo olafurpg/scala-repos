@@ -23,9 +23,10 @@ import scala.collection.mutable
 
 import com.github.nscala_time.time.Imports.DateTime
 
-case class EntityTypesEvent(val entityType: String,
-                            val targetEntityType: Option[String],
-                            val event: String) {
+case class EntityTypesEvent(
+    val entityType: String,
+    val targetEntityType: Option[String],
+    val event: String) {
 
   def this(e: Event) = this(e.entityType, e.targetEntityType, e.event)
 }
@@ -55,7 +56,8 @@ class Stats(val startTime: DateTime) {
   }
 
   def extractByAppId[K, V](
-      appId: Int, m: mutable.Map[(Int, K), V]): Seq[KV[K, V]] = {
+      appId: Int,
+      m: mutable.Map[(Int, K), V]): Seq[KV[K, V]] = {
     m.toSeq.flatMap {
       case (k, v) =>
         if (k._1 == appId) { Seq(KV(k._2, v)) } else { Seq() }
@@ -64,10 +66,10 @@ class Stats(val startTime: DateTime) {
 
   def get(appId: Int): StatsSnapshot = {
     StatsSnapshot(
-        startTime,
-        _endTime,
-        extractByAppId(appId, eteCount),
-        extractByAppId(appId, statusCodeCount)
+      startTime,
+      _endTime,
+      extractByAppId(appId, eteCount),
+      extractByAppId(appId, statusCodeCount)
     )
   }
 }

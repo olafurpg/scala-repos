@@ -18,45 +18,44 @@ final class UserGameApi(bookmarkApi: lila.bookmark.BookmarkApi) {
       write(g, bookmarkedIds(g.id))
     }
     Json.obj(
-        "filter" -> filterName,
-        "paginator" -> lila.common.paginator.PaginatorJson(pag)
+      "filter" -> filterName,
+      "paginator" -> lila.common.paginator.PaginatorJson(pag)
     )
   }
 
   private def write(g: Game, bookmarked: Boolean) =
     Json
       .obj(
-          "id" -> g.id,
-          "rated" -> g.rated,
-          "variant" -> g.variant,
-          "speed" -> g.speed.key,
-          "perf" -> PerfPicker.key(g),
-          "timestamp" -> g.createdAt.getDate,
-          "turns" -> g.turns,
-          "status" -> g.status,
-          "clock" -> g.clock,
-          "correspondence" -> g.daysPerTurn.map { d =>
-            Json.obj("daysPerTurn" -> d)
-          },
-          "opening" -> g.opening,
-          "players" -> JsObject(
-              g.players map { p =>
-            p.color.name -> Json
-              .obj(
-                  "userId" -> p.userId,
-                  "name" -> p.name,
-                  "aiLevel" -> p.aiLevel,
-                  "rating" -> p.rating,
-                  "ratingDiff" -> p.ratingDiff
-              )
-              .noNull
-          }),
-          "fen" -> Forsyth.exportBoard(g.toChess.board),
-          "lastMove" -> g.castleLastMoveTime.lastMoveString,
-          "opening" -> g.opening,
-          "winner" -> g.winnerColor.map(_.name),
-          "bookmarks" -> g.bookmarks,
-          "bookmarked" -> bookmarked.option(true)
+        "id" -> g.id,
+        "rated" -> g.rated,
+        "variant" -> g.variant,
+        "speed" -> g.speed.key,
+        "perf" -> PerfPicker.key(g),
+        "timestamp" -> g.createdAt.getDate,
+        "turns" -> g.turns,
+        "status" -> g.status,
+        "clock" -> g.clock,
+        "correspondence" -> g.daysPerTurn.map { d =>
+          Json.obj("daysPerTurn" -> d)
+        },
+        "opening" -> g.opening,
+        "players" -> JsObject(g.players map { p =>
+          p.color.name -> Json
+            .obj(
+              "userId" -> p.userId,
+              "name" -> p.name,
+              "aiLevel" -> p.aiLevel,
+              "rating" -> p.rating,
+              "ratingDiff" -> p.ratingDiff
+            )
+            .noNull
+        }),
+        "fen" -> Forsyth.exportBoard(g.toChess.board),
+        "lastMove" -> g.castleLastMoveTime.lastMoveString,
+        "opening" -> g.opening,
+        "winner" -> g.winnerColor.map(_.name),
+        "bookmarks" -> g.bookmarks,
+        "bookmarked" -> bookmarked.option(true)
       )
       .noNull
 }

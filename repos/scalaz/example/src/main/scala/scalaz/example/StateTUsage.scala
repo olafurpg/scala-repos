@@ -81,16 +81,15 @@ object LaunchburyInterpreter extends App {
   // \x.x
   val example1 = Lambda("x", Var("x"))
   // let z = \y.y in (\x.x) z
-  val example2 = Let(HashMap("z" -> Lambda("y", Var("y"))),
-                     Apply(example1, "z"))
+  val example2 =
+    Let(HashMap("z" -> Lambda("y", Var("y"))), Apply(example1, "z"))
 
-  case class ReduceState(heap: Map[String, Expr],
-                         freshVars: Stream[String])
+  case class ReduceState(heap: Map[String, Expr], freshVars: Stream[String])
 
   private val initialState = ReduceState(
-      HashMap(),
-      Stream.from(1).map(x => "$" + x) // i.e. $1, $2, $3, ...
-      )
+    HashMap(),
+    Stream.from(1).map(x => "$" + x) // i.e. $1, $2, $3, ...
+  )
   // Substitute new variable names in
   // e.g. sub(map("x" -> "y"), Var("x")) => Var("y")
   private def sub(m: Map[String, String])(e: Expr): Expr = {
@@ -98,9 +97,9 @@ object LaunchburyInterpreter extends App {
     def subName(n: String) = if (m contains n) m(n) else n
     e match {
       case Lambda(z, e2) => Lambda(subName(z), subExpr(e2))
-      case Apply(e2, z) => Apply(subExpr(e2), subName(z))
-      case Var(z) => Var(subName(z))
-      case Let(bs, e2) => Let(bs.map(subName _ *** subExpr), subExpr(e2))
+      case Apply(e2, z)  => Apply(subExpr(e2), subName(z))
+      case Var(z)        => Var(subName(z))
+      case Let(bs, e2)   => Let(bs.map(subName _ *** subExpr), subExpr(e2))
     }
   }
 
@@ -121,7 +120,7 @@ object LaunchburyInterpreter extends App {
           e3 <- freshen(sub(HashMap(x -> y))(e2))
         } yield Lambda(y, e3)
       case Apply(e2, x) => freshen(e2) >>= (e3 => pure(Apply(e3, x)))
-      case Var(_) => pure(e)
+      case Var(_)       => pure(e)
       case Let(bs, e2) =>
         for {
           fs <- getFreshVar.replicateM(bs.size)
@@ -134,9 +133,11 @@ object LaunchburyInterpreter extends App {
             .map(tpl => tpl.copy(_2 = tpl._1._2, _1 = tpl._2))
             .toList
           e3 <- freshen(subs(e2))
-          freshendBs <- bs2.traverseS {
-            case (x, e) => freshen(subs(e)).map((x, _))
-          }.map(_.toMap)
+          freshendBs <- bs2
+            .traverseS {
+              case (x, e) => freshen(subs(e)).map((x, _))
+            }
+            .map(_.toMap)
         } yield Let(freshendBs, e3)
     }
   }
@@ -154,7 +155,7 @@ object LaunchburyInterpreter extends App {
       case Apply(e2, x) =>
         reduce(e2) >>= {
           case Lambda(y, e3) => reduce(sub(HashMap(y -> x))(e3))
-          case _ => sys.error("Ill-typed lambda term")
+          case _             => sys.error("Ill-typed lambda term")
         }
       case Var(x) =>
         for {
@@ -166,10 +167,10 @@ object LaunchburyInterpreter extends App {
           freshendE <- freshen(e3)
         } yield freshendE
       case Let(bs, e2) => {
-          val heapAdd = ((binding: (String, Expr)) =>
-            modify((s: ReduceState) => s.copy(heap = s.heap + binding)))
-          bs.toList.traverseS(heapAdd) >> reduce(e2)
-        }
+        val heapAdd = ((binding: (String, Expr)) =>
+          modify((s: ReduceState) => s.copy(heap = s.heap + binding)))
+        bs.toList.traverseS(heapAdd) >> reduce(e2)
+      }
     }
   }
 

@@ -24,11 +24,12 @@ trait BtreeSortedSetCommands { self: BaseClient =>
     * @param key, field
     * @return Value if field exists
     */
-  def bGet(key: ChannelBuffer,
-           field: ChannelBuffer): Future[Option[ChannelBuffer]] =
+  def bGet(
+      key: ChannelBuffer,
+      field: ChannelBuffer): Future[Option[ChannelBuffer]] =
     doRequest(BGet(key, field)) {
       case BulkReply(message) => Future.value(Some(message))
-      case EmptyBulkReply() => Future.value(None)
+      case EmptyBulkReply()   => Future.value(None)
     }
 
   /**
@@ -36,9 +37,10 @@ trait BtreeSortedSetCommands { self: BaseClient =>
     * @param key, field, value
     * @return 1 if field is new, 0 if field was updated
     */
-  def bAdd(key: ChannelBuffer,
-           field: ChannelBuffer,
-           value: ChannelBuffer): Future[JLong] =
+  def bAdd(
+      key: ChannelBuffer,
+      field: ChannelBuffer,
+      value: ChannelBuffer): Future[JLong] =
     doRequest(BAdd(key, field, value)) {
       case IntegerReply(n) => Future.value(n)
     }
@@ -59,9 +61,10 @@ trait BtreeSortedSetCommands { self: BaseClient =>
     * @param key
     * @return Sequence of field/value pairs
     */
-  def bRange(key: ChannelBuffer,
-             startField: Option[ChannelBuffer],
-             endField: Option[ChannelBuffer])
+  def bRange(
+      key: ChannelBuffer,
+      startField: Option[ChannelBuffer],
+      endField: Option[ChannelBuffer])
     : Future[Seq[(ChannelBuffer, ChannelBuffer)]] = {
     doRequest(BRange(key, startField, endField)) {
       case MBulkReply(messages) =>

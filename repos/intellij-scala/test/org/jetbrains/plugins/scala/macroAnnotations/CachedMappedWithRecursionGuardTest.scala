@@ -12,10 +12,12 @@ class CachedMappedWithRecursionGuardTest
   def testRecursionGuard(): Unit = {
     object Elem extends CachedMockPsiElement {
       @CachedMappedWithRecursionGuard(
-          this, "Failure", PsiModificationTracker.MODIFICATION_COUNT)
+        this,
+        "Failure",
+        PsiModificationTracker.MODIFICATION_COUNT)
       def recursiveFunction(d: Option[Int], depth: Int = 0): String = {
         d match {
-          case Some(l) => l.toString
+          case Some(l)        => l.toString
           case _ if depth > 2 => "Blargle"
           case _ =>
             val res = recursiveFunction(None, depth)

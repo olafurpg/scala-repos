@@ -13,13 +13,15 @@ import spire.math.Rational
 import scala.util.Try
 
 class FixedPointCheck
-    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+    extends PropSpec
+    with Matchers
+    with GeneratorDrivenPropertyChecks {
 
   implicit val arbFixedScale: Arbitrary[FixedScale] = Arbitrary(
-      arbitrary[Int].map(_.abs).filter(_ > 0).map(FixedScale))
+    arbitrary[Int].map(_.abs).filter(_ > 0).map(FixedScale))
 
   implicit val arbFixedPoint: Arbitrary[FixedPoint] = Arbitrary(
-      arbitrary[Long].map(new FixedPoint(_)))
+    arbitrary[Long].map(new FixedPoint(_)))
 
   property("FixedScale(r).toRational ~= r") {
     forAll { (s: FixedScale, r: Rational) =>
@@ -56,7 +58,10 @@ class FixedPointCheck
 
   import scala.util.{Success, Try}
   def testBinop2(
-      name: String, noZero: Boolean, f: S2[FixedPoint], g: F2[Rational]) =
+      name: String,
+      noZero: Boolean,
+      f: S2[FixedPoint],
+      g: F2[Rational]) =
     property(name) {
       forAll { (x: Long, y: Long, s: FixedScale) =>
         implicit val scale = s
@@ -69,14 +74,17 @@ class FixedPointCheck
               BigInt(fz.long) shouldBe (az * s.denom).toBigInt
             case _ =>
               (az * s.denom < Long.MinValue ||
-                  Long.MaxValue < az * s.denom) shouldBe true
+                Long.MaxValue < az * s.denom) shouldBe true
           }
         }
       }
     }
 
   def testBinop(
-      name: String, noZero: Boolean, f: S2[FixedPoint], g: F2[Rational]) =
+      name: String,
+      noZero: Boolean,
+      f: S2[FixedPoint],
+      g: F2[Rational]) =
     property(name) {
       forAll { (x: Long, y: Long, z: Byte) =>
         val (_, denom, fx, fy, ax, ay) = build(x, y, z, noZero)
@@ -94,7 +102,7 @@ class FixedPointCheck
             BigInt(fz.long) shouldBe (az * denom).toBigInt
           case None =>
             (az * denom < Long.MinValue ||
-                Long.MaxValue < az * denom) shouldBe true
+              Long.MaxValue < az * denom) shouldBe true
         }
       }
     }
@@ -121,7 +129,10 @@ class FixedPointCheck
   type FH2[A] = (A, Long) => A
 
   def testHalfop(
-      name: String, noZero: Boolean, f: SH2[FixedPoint], g: FH2[Rational]) =
+      name: String,
+      noZero: Boolean,
+      f: SH2[FixedPoint],
+      g: FH2[Rational]) =
     property(name) {
       forAll { (x: Long, y0: Long, z: Byte) =>
         val y = if (noZero && y0 == 0) 1L else y0
@@ -140,7 +151,7 @@ class FixedPointCheck
             BigInt(fz.long) shouldBe (az * denom).toBigInt
           case None =>
             (az * denom < Long.MinValue ||
-                Long.MaxValue < az * denom) shouldBe true
+              Long.MaxValue < az * denom) shouldBe true
         }
       }
     }
@@ -174,7 +185,7 @@ class FixedPointCheck
           BigInt(fz.long) shouldBe (az * denom).toBigInt
         case None =>
           (az * denom < Long.MinValue ||
-              Long.MaxValue < az * denom) shouldBe true
+            Long.MaxValue < az * denom) shouldBe true
       }
     }
   }

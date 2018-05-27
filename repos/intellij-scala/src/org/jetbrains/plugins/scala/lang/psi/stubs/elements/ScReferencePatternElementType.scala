@@ -16,7 +16,7 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.impl.ScReferencePatternStubImp
   */
 class ScReferencePatternElementType[Func <: ScReferencePattern]
     extends ScStubElementType[ScReferencePatternStub, ScReferencePattern](
-        "reference pattern") {
+      "reference pattern") {
   def createStubImpl[ParentPsi <: PsiElement](
       psi: ScReferencePattern,
       parentStub: StubElement[ParentPsi]): ScReferencePatternStub = {
@@ -24,7 +24,8 @@ class ScReferencePatternElementType[Func <: ScReferencePattern]
   }
 
   def serialize(
-      stub: ScReferencePatternStub, dataStream: StubOutputStream): Unit = {
+      stub: ScReferencePatternStub,
+      dataStream: StubOutputStream): Unit = {
     dataStream.writeName(stub.getName)
   }
 
@@ -33,10 +34,13 @@ class ScReferencePatternElementType[Func <: ScReferencePattern]
   }
 
   def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScReferencePatternStub = {
+      dataStream: StubInputStream,
+      parentStub: Any): ScReferencePatternStub = {
     val name = dataStream.readName
     new ScReferencePatternStubImpl(
-        parentStub.asInstanceOf[StubElement[_ <: PsiElement]], this, name)
+      parentStub.asInstanceOf[StubElement[_ <: PsiElement]],
+      this,
+      name)
   }
 
   def indexStub(stub: ScReferencePatternStub, sink: IndexSink): Unit = {}

@@ -21,7 +21,7 @@ Literal ::= ['-']integerLiteral
             | true
             | false
             | null
-            | javaId"StringLiteral" 
+            | javaId"StringLiteral"
  */
 object Literal {
   def parse(builder: ScalaPsiBuilder): Boolean = {
@@ -32,14 +32,14 @@ object Literal {
           builder.advanceLexer() //Ate -
           builder.getTokenType match {
             case ScalaTokenTypes.tINTEGER | ScalaTokenTypes.tFLOAT => {
-                builder.advanceLexer() //Ate literal
-                marker.done(ScalaElementTypes.LITERAL)
-                true
-              }
+              builder.advanceLexer() //Ate literal
+              marker.done(ScalaElementTypes.LITERAL)
+              true
+            }
             case _ => {
-                marker.rollbackTo()
-                false
-              }
+              marker.rollbackTo()
+              false
+            }
           }
         } else {
           marker.rollbackTo()

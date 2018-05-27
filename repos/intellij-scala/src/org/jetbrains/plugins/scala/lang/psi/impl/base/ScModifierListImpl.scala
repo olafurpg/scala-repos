@@ -22,7 +22,9 @@ import scala.collection.mutable.ArrayBuffer
   * Date: 22.02.2008
   */
 class ScModifierListImpl private (
-    stub: StubElement[ScModifierList], nodeType: IElementType, node: ASTNode)
+    stub: StubElement[ScModifierList],
+    nodeType: IElementType,
+    node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
     with ScModifierList {
   def this(node: ASTNode) = { this(null, null, node) }
@@ -41,33 +43,33 @@ class ScModifierListImpl private (
       return stub.asInstanceOf[ScModifiersStub].getModifiers.contains(name)
     }
     name match {
-      case "override" => has(ScalaTokenTypes.kOVERRIDE)
-      case "private" => has(ScalaTokenTypes.kPRIVATE)
+      case "override"  => has(ScalaTokenTypes.kOVERRIDE)
+      case "private"   => has(ScalaTokenTypes.kPRIVATE)
       case "protected" => has(ScalaTokenTypes.kPROTECTED)
       case "public" =>
         !(has(ScalaTokenTypes.kPROTECTED) || has(ScalaTokenTypes.kPRIVATE))
-      case "final" => has(ScalaTokenTypes.kFINAL)
+      case "final"    => has(ScalaTokenTypes.kFINAL)
       case "implicit" => has(ScalaTokenTypes.kIMPLICIT)
       case "abstract" => has(ScalaTokenTypes.kABSTRACT)
-      case "sealed" => has(ScalaTokenTypes.kSEALED)
-      case "lazy" => has(ScalaTokenTypes.kLAZY)
-      case "case" => has(ScalaTokenTypes.kCASE)
-      case _ => false
+      case "sealed"   => has(ScalaTokenTypes.kSEALED)
+      case "lazy"     => has(ScalaTokenTypes.kLAZY)
+      case "case"     => has(ScalaTokenTypes.kCASE)
+      case _          => false
     }
   }
 
   private def prop2String(prop: IElementType): String = {
     prop match {
-      case ScalaTokenTypes.kOVERRIDE => "override"
-      case ScalaTokenTypes.kPRIVATE => "private"
+      case ScalaTokenTypes.kOVERRIDE  => "override"
+      case ScalaTokenTypes.kPRIVATE   => "private"
       case ScalaTokenTypes.kPROTECTED => "protected"
-      case ScalaTokenTypes.kFINAL => "final"
-      case ScalaTokenTypes.kIMPLICIT => "implicit"
-      case ScalaTokenTypes.kABSTRACT => "abstract"
-      case ScalaTokenTypes.kSEALED => "sealed"
-      case ScalaTokenTypes.kLAZY => "lazy"
-      case ScalaTokenTypes.kCASE => "case"
-      case _ => ""
+      case ScalaTokenTypes.kFINAL     => "final"
+      case ScalaTokenTypes.kIMPLICIT  => "implicit"
+      case ScalaTokenTypes.kABSTRACT  => "abstract"
+      case ScalaTokenTypes.kSEALED    => "sealed"
+      case ScalaTokenTypes.kLAZY      => "lazy"
+      case ScalaTokenTypes.kCASE      => "case"
+      case _                          => ""
     }
   }
 
@@ -113,7 +115,7 @@ class ScModifierListImpl private (
         val buf = new ArrayBuffer[ASTNode]()
         var nextSibling = getNextSibling
         while (ScalaTokenTypes.WHITES_SPACES_AND_COMMENTS_TOKEN_SET.contains(
-            nextSibling.getNode.getElementType)) {
+                 nextSibling.getNode.getElementType)) {
           buf += nextSibling.getNode
           nextSibling = nextSibling.getNextSibling
         }
@@ -134,19 +136,20 @@ class ScModifierListImpl private (
       case "override" =>
         if (value) {
           val node = ScalaPsiElementFactory.createModifierFromText(
-              "override", getManager)
+            "override",
+            getManager)
           addBefore(node)
         } else
           getNode.removeChild(
-              findChildByType[PsiElement](ScalaTokenTypes.kOVERRIDE).getNode)
+            findChildByType[PsiElement](ScalaTokenTypes.kOVERRIDE).getNode)
       case "private" =>
         if (value) {
-          val node = ScalaPsiElementFactory.createModifierFromText(
-              "private", getManager)
+          val node =
+            ScalaPsiElementFactory.createModifierFromText("private", getManager)
           addBefore(node)
         } else {
           for (child <- getChildren if child.isInstanceOf[ScAccessModifier] &&
-                       child.asInstanceOf[ScAccessModifier].isPrivate) {
+                 child.asInstanceOf[ScAccessModifier].isPrivate) {
             getNode.removeChild(child.getNode)
             return
           }
@@ -154,11 +157,12 @@ class ScModifierListImpl private (
       case "protected" =>
         if (value) {
           val node = ScalaPsiElementFactory.createModifierFromText(
-              "protected", getManager)
+            "protected",
+            getManager)
           addBefore(node)
         } else {
           for (child <- getChildren if child.isInstanceOf[ScAccessModifier] &&
-                       child.asInstanceOf[ScAccessModifier].isProtected) {
+                 child.asInstanceOf[ScAccessModifier].isProtected) {
             getNode.removeChild(child.getNode)
             return
           }
@@ -170,23 +174,25 @@ class ScModifierListImpl private (
           addBefore(node)
         } else
           getNode.removeChild(
-              findChildByType[PsiElement](ScalaTokenTypes.kFINAL).getNode)
+            findChildByType[PsiElement](ScalaTokenTypes.kFINAL).getNode)
       case "implicit" =>
         if (value) {
           val node = ScalaPsiElementFactory.createModifierFromText(
-              "implicit", getManager)
+            "implicit",
+            getManager)
           addBefore(node)
         } else
           getNode.removeChild(
-              findChildByType[PsiElement](ScalaTokenTypes.kIMPLICIT).getNode)
+            findChildByType[PsiElement](ScalaTokenTypes.kIMPLICIT).getNode)
       case "abstract" =>
         if (value) {
           val node = ScalaPsiElementFactory.createModifierFromText(
-              "abstract", getManager)
+            "abstract",
+            getManager)
           addBefore(node)
         } else
           getNode.removeChild(
-              findChildByType[PsiElement](ScalaTokenTypes.kABSTRACT).getNode)
+            findChildByType[PsiElement](ScalaTokenTypes.kABSTRACT).getNode)
       case "sealed" =>
         if (value) {
           val node =
@@ -194,7 +200,7 @@ class ScModifierListImpl private (
           addBefore(node)
         } else
           getNode.removeChild(
-              findChildByType[PsiElement](ScalaTokenTypes.kSEALED).getNode)
+            findChildByType[PsiElement](ScalaTokenTypes.kSEALED).getNode)
       case "lazy" =>
         if (value) {
           val node =
@@ -202,7 +208,7 @@ class ScModifierListImpl private (
           addBefore(node)
         } else
           getNode.removeChild(
-              findChildByType[PsiElement](ScalaTokenTypes.kLAZY).getNode)
+            findChildByType[PsiElement](ScalaTokenTypes.kLAZY).getNode)
       case "case" =>
         if (value) {
           val node =
@@ -210,7 +216,7 @@ class ScModifierListImpl private (
           addAfter(node)
         } else
           getNode.removeChild(
-              findChildByType[PsiElement](ScalaTokenTypes.kCASE).getNode)
+            findChildByType[PsiElement](ScalaTokenTypes.kCASE).getNode)
       case _ =>
     }
   }
@@ -224,8 +230,8 @@ class ScModifierListImpl private (
     if (stub != null) {
       val annotations: Array[ScAnnotations] =
         stub.getParentStub.getChildrenByType(
-            ScalaElementTypes.ANNOTATIONS,
-            JavaArrayFactoryUtil.ScAnnotationsFactory)
+          ScalaElementTypes.ANNOTATIONS,
+          JavaArrayFactoryUtil.ScAnnotationsFactory)
       if (annotations.length > 0) {
         return annotations
           .apply(0)
@@ -247,8 +253,8 @@ class ScModifierListImpl private (
     getAnnotations.find(_.getQualifiedName == name) match {
       case None if name == "java.lang.Override" =>
         val factory = JavaPsiFacade.getInstance(getProject).getElementFactory
-        factory.createAnnotationFromText("@" + name, this); // hack to disable AddOverrideAnnotationAction, 
-      case None => null
+        factory.createAnnotationFromText("@" + name, this); // hack to disable AddOverrideAnnotationAction,
+      case None    => null
       case Some(x) => x
     }
   }
@@ -292,20 +298,21 @@ class ScModifierListImpl private (
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case s: ScalaElementVisitor => s.visitModifierList(this)
-      case _ => super.accept(visitor)
+      case _                      => super.accept(visitor)
     }
   }
 }
 
 object ScModifierListImpl {
-  private val AllModifiers: Array[String] = Array("override",
-                                                  "private",
-                                                  "protected",
-                                                  "public",
-                                                  "final",
-                                                  "implicit",
-                                                  "abstract",
-                                                  "sealed",
-                                                  "lazy",
-                                                  "case")
+  private val AllModifiers: Array[String] = Array(
+    "override",
+    "private",
+    "protected",
+    "public",
+    "final",
+    "implicit",
+    "abstract",
+    "sealed",
+    "lazy",
+    "case")
 }

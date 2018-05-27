@@ -15,7 +15,9 @@ import org.jetbrains.plugins.scala.util.MultilineStringUtil
 class AddReplaceSlashRToMLStringIntention
     extends PsiElementBaseIntentionAction {
   def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+      project: Project,
+      editor: Editor,
+      element: PsiElement): Boolean = {
     if (element == null || element.getNode == null ||
         element.getText == null ||
         element.getNode.getElementType != ScalaTokenTypes.tMULTILINE_STRING ||
@@ -33,7 +35,8 @@ class AddReplaceSlashRToMLStringIntention
   override def invoke(project: Project, editor: Editor, element: PsiElement) {
     extensions.inWriteAction {
       editor.getDocument.insertString(
-          element.getTextRange.getEndOffset, ".replace(\"\\r\", \"\")")
+        element.getTextRange.getEndOffset,
+        ".replace(\"\\r\", \"\")")
     }
   }
 }

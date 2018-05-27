@@ -65,9 +65,8 @@ trait SHtml extends Loggable {
 
     type EnumerationTypeWorkaround = Enumeration#Value
 
-    implicit def enumToStrValPromo[
-        EnumerationTypeWorkaround]: SHtml.PairStringPromoter[
-        EnumerationTypeWorkaround] =
+    implicit def enumToStrValPromo[EnumerationTypeWorkaround]
+      : SHtml.PairStringPromoter[EnumerationTypeWorkaround] =
       new SHtml.PairStringPromoter[EnumerationTypeWorkaround] {
         def apply(in: EnumerationTypeWorkaround): String =
           in.toString
@@ -122,8 +121,7 @@ trait SHtml extends Loggable {
     * but rather use "name" -> "value" and let the implicit conversion
     * take care of making a BasicElemAttr.
     */
-  final case class BasicElemAttr(name: String, value: String)
-      extends ElemAttr {
+  final case class BasicElemAttr(name: String, value: String) extends ElemAttr {
 
     /**
       * Apply the attribute to the element
@@ -147,8 +145,8 @@ trait SHtml extends Loggable {
   def makeAjaxCall(in: JsExp, context: AjaxContext): JsExp = new JsExp {
     def toJsCmd =
       "lift.ajax(" + in.toJsCmd + ", " + (context.success openOr "null") +
-      ", " + (context.failure openOr "null") + ", " +
-      context.responseType.toString.encJs + ")"
+        ", " + (context.failure openOr "null") + ", " +
+        context.responseType.toString.encJs + ")"
   }
 
   /**
@@ -171,9 +169,10 @@ trait SHtml extends Loggable {
     *
     * @return the function ID and JavaScript that makes the call
     */
-  def ajaxCall(jsCalcValue: JsExp,
-               jsContext: JsContext,
-               func: String => JsCmd): GUIDJsExp =
+  def ajaxCall(
+      jsCalcValue: JsExp,
+      jsContext: JsContext,
+      func: String => JsCmd): GUIDJsExp =
     ajaxCall_*(jsCalcValue, jsContext, SFuncHolder(func))
 
   /**
@@ -184,7 +183,7 @@ trait SHtml extends Loggable {
     parseOpt(rawJsonText) match {
       case None =>
         logger.error(
-            s"Browser sent back something that wasn't JSON to a jsonCall function: $rawJsonText")
+          s"Browser sent back something that wasn't JSON to a jsonCall function: $rawJsonText")
         None
 
       case anythingElse =>
@@ -203,8 +202,9 @@ trait SHtml extends Loggable {
     * @return the function ID and JavaScript that makes the call
     */
   def jsonCall(jsCalcValue: JsExp, func: JsonAST.JValue => JsCmd): GUIDJsExp =
-    jsonCall_*(jsCalcValue,
-               SFuncHolder(s => parseOptOrLog(s).map(func) getOrElse Noop))
+    jsonCall_*(
+      jsCalcValue,
+      SFuncHolder(s => parseOptOrLog(s).map(func) getOrElse Noop))
 
   /**
     * Build a JavaScript function that will perform a JSON call based on a value calculated in JavaScript.
@@ -217,12 +217,14 @@ trait SHtml extends Loggable {
     *
     * @return the function ID and JavaScript that makes the call
     */
-  def jsonCall(jsCalcValue: JsExp,
-               jsContext: JsContext,
-               func: JsonAST.JValue => JsCmd): GUIDJsExp =
-    jsonCall_*(jsCalcValue,
-               jsContext,
-               SFuncHolder(s => parseOptOrLog(s).map(func) getOrElse Noop))
+  def jsonCall(
+      jsCalcValue: JsExp,
+      jsContext: JsContext,
+      func: JsonAST.JValue => JsCmd): GUIDJsExp =
+    jsonCall_*(
+      jsCalcValue,
+      jsContext,
+      SFuncHolder(s => parseOptOrLog(s).map(func) getOrElse Noop))
 
   /**
     * Build a JavaScript function that will perform a JSON call based on a value calculated in JavaScript.
@@ -236,13 +238,14 @@ trait SHtml extends Loggable {
     *
     * @return the function ID and JavaScript that makes the call
     */
-  def jsonCall(jsCalcValue: JsExp,
-               jsonContext: JsonContext,
-               func: JsonAST.JValue => JsonAST.JValue): GUIDJsExp =
-    jsonCall_*(jsCalcValue,
-               jsonContext,
-               S.SFuncHolder(
-                   s => parseOptOrLog(s).map(func) getOrElse JsonAST.JNothing))
+  def jsonCall(
+      jsCalcValue: JsExp,
+      jsonContext: JsonContext,
+      func: JsonAST.JValue => JsonAST.JValue): GUIDJsExp =
+    jsonCall_*(
+      jsCalcValue,
+      jsonContext,
+      S.SFuncHolder(s => parseOptOrLog(s).map(func) getOrElse JsonAST.JNothing))
 
   /**
     * Build a JavaScript function that will perform an AJAX call based on a value calculated in JavaScript
@@ -251,14 +254,16 @@ trait SHtml extends Loggable {
     *
     * @return the function ID and JavaScript that makes the call
     */
-  private def jsonCall_*(jsCalcValue: JsExp,
-                         func: AFuncHolder): (String, JsExp) =
-    fmapFunc((func))(name =>
-          (name,
-           makeAjaxCall(
-               JsRaw(
-                   "'" + name + "=' + encodeURIComponent(JSON.stringify(" +
-                   jsCalcValue.toJsCmd + "))"))))
+  private def jsonCall_*(
+      jsCalcValue: JsExp,
+      func: AFuncHolder): (String, JsExp) =
+    fmapFunc((func))(
+      name =>
+        (
+          name,
+          makeAjaxCall(
+            JsRaw("'" + name + "=' + encodeURIComponent(JSON.stringify(" +
+              jsCalcValue.toJsCmd + "))"))))
 
   /**
     * Build a JavaScript function that will perform an AJAX call based on a value calculated in JavaScript
@@ -268,16 +273,18 @@ trait SHtml extends Loggable {
     *
     * @return the function ID and JavaScript that makes the call
     */
-  private def jsonCall_*(jsCalcValue: JsExp,
-                         ajaxContext: AjaxContext,
-                         func: AFuncHolder): (String, JsExp) =
+  private def jsonCall_*(
+      jsCalcValue: JsExp,
+      ajaxContext: AjaxContext,
+      func: AFuncHolder): (String, JsExp) =
     fmapFunc((func))(
-        name =>
-          (name,
-           makeAjaxCall(
-               JsRaw("'" + name + "=' + encodeURIComponent(JSON.stringify(" +
-                   jsCalcValue.toJsCmd + "))"),
-               ajaxContext)))
+      name =>
+        (
+          name,
+          makeAjaxCall(
+            JsRaw("'" + name + "=' + encodeURIComponent(JSON.stringify(" +
+              jsCalcValue.toJsCmd + "))"),
+            ajaxContext)))
 
   def fajaxCall[T](jsCalcValue: JsExp, func: String => JsCmd)(
       f: (String, JsExp) => T): T = {
@@ -293,12 +300,15 @@ trait SHtml extends Loggable {
     * @return the JavaScript that makes the call
     */
   private def ajaxCall_*(
-      jsCalcValue: JsExp, func: AFuncHolder): (String, JsExp) =
+      jsCalcValue: JsExp,
+      func: AFuncHolder): (String, JsExp) =
     fmapFunc((func))(
-        name =>
-          (name,
-           makeAjaxCall(JsRaw("'" + name + "=' + encodeURIComponent(" +
-                   jsCalcValue.toJsCmd + ")"))))
+      name =>
+        (
+          name,
+          makeAjaxCall(
+            JsRaw("'" + name + "=' + encodeURIComponent(" +
+              jsCalcValue.toJsCmd + ")"))))
 
   /**
     * Build a JavaScript function that will perform an AJAX call based on a value calculated in JavaScript
@@ -308,19 +318,23 @@ trait SHtml extends Loggable {
     *
     * @return the JavaScript that makes the call
     */
-  private def ajaxCall_*(jsCalcValue: JsExp,
-                         ajaxContext: AjaxContext,
-                         func: AFuncHolder): (String, JsExp) =
+  private def ajaxCall_*(
+      jsCalcValue: JsExp,
+      ajaxContext: AjaxContext,
+      func: AFuncHolder): (String, JsExp) =
     fmapFunc((func))(
-        name =>
-          (name,
-           makeAjaxCall(JsRaw("'" + name + "=' + encodeURIComponent(" +
-                            jsCalcValue.toJsCmd + ")"),
-                        ajaxContext)))
+      name =>
+        (
+          name,
+          makeAjaxCall(
+            JsRaw("'" + name + "=' + encodeURIComponent(" +
+              jsCalcValue.toJsCmd + ")"),
+            ajaxContext)))
 
   private def deferCall(data: JsExp, jsFunc: Call): Call =
-    Call(jsFunc.function,
-         (jsFunc.params ++ List(AnonFunc(makeAjaxCall(data)))): _*)
+    Call(
+      jsFunc.function,
+      (jsFunc.params ++ List(AnonFunc(makeAjaxCall(data)))): _*)
 
   /**
     * Create an Ajax button. When it's pressed, the function is executed
@@ -333,7 +347,7 @@ trait SHtml extends Loggable {
     */
   def ajaxButton(text: NodeSeq, func: () => JsCmd, attrs: ElemAttr*): Elem = {
     attrs.foldLeft(fmapFunc((func))(name =>
-              <button onclick={makeAjaxCall(Str(name + "=true")).toJsCmd +
+      <button onclick={makeAjaxCall(Str(name + "=true")).toJsCmd +
                     "; return false;"}>{text}</button>))((e, f) => f(e))
   }
 
@@ -372,7 +386,7 @@ trait SHtml extends Loggable {
       private def fixElem(e: Elem): Elem = {
         e.attribute("id") match {
           case Some(id) => latestId = id.text; e
-          case None => e % ("id" -> latestId)
+          case None     => e % ("id" -> latestId)
         }
       }
 
@@ -404,12 +418,13 @@ trait SHtml extends Loggable {
     * @return a button to put on your page
     *
     */
-  def jsonButton(text: NodeSeq,
-                 func: () => JsObj,
-                 ajaxContext: JsonContext,
-                 attrs: ElemAttr*): Elem = {
-    attrs.foldLeft(fmapFunc((func))(
-            name => <button onclick={makeAjaxCall(Str(name + "=true"), ajaxContext).toJsCmd +
+  def jsonButton(
+      text: NodeSeq,
+      func: () => JsObj,
+      ajaxContext: JsonContext,
+      attrs: ElemAttr*): Elem = {
+    attrs.foldLeft(fmapFunc((func))(name =>
+      <button onclick={makeAjaxCall(Str(name + "=true"), ajaxContext).toJsCmd +
                     "; return false;"}>{text}</button>))((e, f) => f(e))
   }
 
@@ -422,12 +437,13 @@ trait SHtml extends Loggable {
     *
     * @return a button to put on your page
     */
-  def ajaxButton(text: NodeSeq,
-                 jsExp: JsExp,
-                 func: String => JsCmd,
-                 attrs: ElemAttr*): Elem = {
+  def ajaxButton(
+      text: NodeSeq,
+      jsExp: JsExp,
+      func: String => JsCmd,
+      attrs: ElemAttr*): Elem = {
     attrs.foldLeft(fmapFunc((SFuncHolder(func)))(name =>
-              <button onclick={makeAjaxCall(JsRaw(name.encJs + "+'='+encodeURIComponent(" + jsExp.toJsCmd + ")")).toJsCmd +
+      <button onclick={makeAjaxCall(JsRaw(name.encJs + "+'='+encodeURIComponent(" + jsExp.toJsCmd + ")")).toJsCmd +
                     "; return false;"}>{text}</button>))((e, f) => f(e))
   }
 
@@ -443,14 +459,14 @@ trait SHtml extends Loggable {
     * @return a button to put on your page
     *
     */
-  def jsonButton(text: NodeSeq,
-                 jsExp: JsExp,
-                 func: JValue => JsCmd,
-                 ajaxContext: JsonContext,
-                 attrs: ElemAttr*)(
-      implicit dummy: AvoidTypeErasureIssues1): Elem = {
-    attrs.foldLeft(jsonFmapFunc(func)(
-            name => <button onclick={makeAjaxCall(JsRaw(name.encJs + "+'='+ encodeURIComponent(JSON.stringify(" + jsExp.toJsCmd + "))"), ajaxContext).toJsCmd +
+  def jsonButton(
+      text: NodeSeq,
+      jsExp: JsExp,
+      func: JValue => JsCmd,
+      ajaxContext: JsonContext,
+      attrs: ElemAttr*)(implicit dummy: AvoidTypeErasureIssues1): Elem = {
+    attrs.foldLeft(jsonFmapFunc(func)(name =>
+      <button onclick={makeAjaxCall(JsRaw(name.encJs + "+'='+ encodeURIComponent(JSON.stringify(" + jsExp.toJsCmd + "))"), ajaxContext).toJsCmd +
                     "; return false;"}>{text}</button>))(_ % _)
   }
 
@@ -465,13 +481,14 @@ trait SHtml extends Loggable {
     *
     * @return a button to put on your pagejsFunc.params ++ List(AnonFunc(makeAjaxCall(Str(name+"=true"))))
     */
-  def ajaxButton(text: NodeSeq,
-                 jsFunc: Call,
-                 func: () => JsCmd,
-                 attrs: ElemAttr*): Elem = {
+  def ajaxButton(
+      text: NodeSeq,
+      jsFunc: Call,
+      func: () => JsCmd,
+      attrs: ElemAttr*): Elem = {
     attrs.foldLeft(fmapFunc((func))(name =>
-              <button onclick={deferCall(Str(name + "=true"), jsFunc).toJsCmd + "; return false;"}>{text}</button>))(
-        _ % _)
+      <button onclick={deferCall(Str(name + "=true"), jsFunc).toJsCmd + "; return false;"}>{text}</button>))(
+      _ % _)
   }
 
   /**
@@ -497,7 +514,10 @@ trait SHtml extends Loggable {
     * @return a button to put on your page
     */
   def ajaxButton(
-      text: String, jsFunc: Call, func: () => JsCmd, attrs: ElemAttr*): Elem =
+      text: String,
+      jsFunc: Call,
+      func: () => JsCmd,
+      attrs: ElemAttr*): Elem =
     ajaxButton(Text(text), jsFunc, func, attrs: _*)
 
   /**
@@ -519,9 +539,10 @@ trait SHtml extends Loggable {
     *              () => { println("submitted"); Noop })
     * </pre>
     */
-  def ajaxEditable(displayContents: => NodeSeq,
-                   editForm: => NodeSeq,
-                   onSubmit: () => JsCmd): NodeSeq = {
+  def ajaxEditable(
+      displayContents: => NodeSeq,
+      editForm: => NodeSeq,
+      onSubmit: () => JsCmd): NodeSeq = {
     import net.liftweb.http.js
     import js.{jquery, JsCmd, JsCmds, JE}
     import jquery.JqJsCmds
@@ -536,12 +557,15 @@ trait SHtml extends Loggable {
     def swapJsCmd(show: String, hide: String): JsCmd = Show(show) & Hide(hide)
 
     def setAndSwap(
-        show: String, showContents: => NodeSeq, hide: String): JsCmd =
-      (SHtml.ajaxCall(Str("ignore"), { ignore: String =>
-              SetHtml(show, showContents)
-            })
-            ._2
-            .cmd & swapJsCmd(show, hide))
+        show: String,
+        showContents: => NodeSeq,
+        hide: String): JsCmd =
+      (SHtml
+        .ajaxCall(Str("ignore"), { ignore: String =>
+          SetHtml(show, showContents)
+        })
+        ._2
+        .cmd & swapJsCmd(show, hide))
 
     def displayMarkup: NodeSeq =
       displayContents ++ Text(" ") ++ <input value={S.?("edit")} type="button" onclick={setAndSwap(editName, editMarkup, dispName).toJsCmd + " return false;"} />
@@ -549,11 +573,9 @@ trait SHtml extends Loggable {
     def editMarkup: NodeSeq = {
       val formData: NodeSeq =
         editForm ++ <input type="submit" value={S.?("ok")} /> ++ hidden(
-            onSubmit) ++ <input type="button" onclick={swapJsCmd(dispName,editName).toJsCmd + " return false;"} value={S.?("cancel")} />
+          onSubmit) ++ <input type="button" onclick={swapJsCmd(dispName,editName).toJsCmd + " return false;"} value={S.?("cancel")} />
 
-      ajaxForm(formData,
-               Noop,
-               setAndSwap(dispName, displayMarkup, editName))
+      ajaxForm(formData, Noop, setAndSwap(dispName, displayMarkup, editName))
     }
 
     <div>
@@ -575,8 +597,8 @@ trait SHtml extends Loggable {
     */
   def a(func: () => JsCmd, body: NodeSeq, attrs: ElemAttr*): Elem = {
     attrs.foldLeft(fmapFunc((func))(name =>
-              <a href="javascript://" onclick={makeAjaxCall(Str(name + "=true")).toJsCmd + "; return false;"}>{body}</a>))(
-        _ % _)
+      <a href="javascript://" onclick={makeAjaxCall(Str(name + "=true")).toJsCmd + "; return false;"}>{body}</a>))(
+      _ % _)
   }
 
   /**
@@ -589,23 +611,25 @@ trait SHtml extends Loggable {
     * @param body - the NodeSeq to wrap in the anchor tag
     * @param attrs - the anchor node attributes
     */
-  def a(jsFunc: Call,
-        func: () => JsCmd,
-        body: NodeSeq,
-        attrs: ElemAttr*): Elem = {
+  def a(
+      jsFunc: Call,
+      func: () => JsCmd,
+      body: NodeSeq,
+      attrs: ElemAttr*): Elem = {
     attrs.foldLeft(fmapFunc((func))(name =>
-              <a href="javascript://" onclick={deferCall(Str(name + "=true"), jsFunc).toJsCmd + "; return false;"}>{body}</a>))(
-        _ % _)
+      <a href="javascript://" onclick={deferCall(Str(name + "=true"), jsFunc).toJsCmd + "; return false;"}>{body}</a>))(
+      _ % _)
   }
 
-  def a(func: () => JsObj,
-        jsonContext: JsonContext,
-        body: NodeSeq,
-        attrs: ElemAttr*): Elem = {
+  def a(
+      func: () => JsObj,
+      jsonContext: JsonContext,
+      body: NodeSeq,
+      attrs: ElemAttr*): Elem = {
 
     attrs.foldLeft(fmapFunc((func))(name =>
-              <a href="javascript://" onclick={makeAjaxCall(Str(name + "=true"), jsonContext).toJsCmd + "; return false;"}>{body}</a>))(
-        _ % _)
+      <a href="javascript://" onclick={makeAjaxCall(Str(name + "=true"), jsonContext).toJsCmd + "; return false;"}>{body}</a>))(
+      _ % _)
   }
 
   /**
@@ -639,15 +663,18 @@ trait SHtml extends Loggable {
     attrs.foldLeft(<span onclick={cmd.toJsCmd}>{body}</span>)(_ % _)
 
   def toggleKids(
-      head: Elem, visible: Boolean, func: () => JsCmd, kids: Elem): NodeSeq = {
+      head: Elem,
+      visible: Boolean,
+      func: () => JsCmd,
+      kids: Elem): NodeSeq = {
     fmapFunc((func)) { funcName =>
       val (nk, id) = findOrAddId(kids)
       val rnk = if (visible) nk else nk % ("style" -> "display: none")
       val nh =
         head %
-        ("onclick" ->
+          ("onclick" ->
             (LiftRules.jsArtifacts.toggle(id).cmd & makeAjaxCall(
-                    JsRaw("'" + funcName + "=true'")).cmd))
+              JsRaw("'" + funcName + "=true'")).cmd))
       nh ++ rnk
     }
   }
@@ -665,14 +692,15 @@ trait SHtml extends Loggable {
     *
     * @return a text field
     */
-  def jsonText(value: String,
-               ignoreBlur: Boolean,
-               json: JsExp => JsCmd,
-               attrs: ElemAttr*): Elem =
+  def jsonText(
+      value: String,
+      ignoreBlur: Boolean,
+      json: JsExp => JsCmd,
+      attrs: ElemAttr*): Elem =
     (attrs.foldLeft(
-        <input type="text" value={value match {case null => "" case s => s}}/>)(
-        _ % _)) % ("onkeypress" -> """liftUtils.lift_blurIfReturn(event)""") %
-    (if (ignoreBlur) Null else ("onblur" -> (json(JE.JsRaw("this.value")))))
+      <input type="text" value={value match {case null => "" case s => s}}/>)(
+      _ % _)) % ("onkeypress" -> """liftUtils.lift_blurIfReturn(event)""") %
+      (if (ignoreBlur) Null else ("onblur" -> (json(JE.JsRaw("this.value")))))
 
   /**
     * This function does not really submit a JSON request to the server. Instead, json is a function
@@ -699,40 +727,47 @@ trait SHtml extends Loggable {
     * @return a text field
     */
   def jsonText(
-      value: String, cmd: String, json: JsonCall, attrs: ElemAttr*): Elem =
+      value: String,
+      cmd: String,
+      json: JsonCall,
+      attrs: ElemAttr*): Elem =
     jsonText(value, exp => json(cmd, exp), attrs: _*)
 
-  def ajaxTextElem(
-      settable: Settable { type ValueType = String }, attrs: ElemAttr*): Elem =
+  def ajaxTextElem(settable: Settable { type ValueType = String }, attrs: ElemAttr*)
+    : Elem =
     ajaxText(settable.get, (b: String) => { settable.set(b); Noop }, attrs: _*)
 
   def ajaxText(value: String, func: String => JsCmd, attrs: ElemAttr*): Elem =
     ajaxText_*(value, false, Empty, SFuncHolder(func), attrs: _*)
 
-  def ajaxText(value: String,
-               jsFunc: Call,
-               func: String => JsCmd,
-               attrs: ElemAttr*): Elem =
+  def ajaxText(
+      value: String,
+      jsFunc: Call,
+      func: String => JsCmd,
+      attrs: ElemAttr*): Elem =
     ajaxText_*(value, false, Full(jsFunc), SFuncHolder(func), attrs: _*)
 
-  def ajaxText(value: String,
-               ignoreBlur: Boolean,
-               func: String => JsCmd,
-               attrs: ElemAttr*): Elem =
+  def ajaxText(
+      value: String,
+      ignoreBlur: Boolean,
+      func: String => JsCmd,
+      attrs: ElemAttr*): Elem =
     ajaxText_*(value, ignoreBlur, Empty, SFuncHolder(func), attrs: _*)
 
-  def ajaxText(value: String,
-               ignoreBlur: Boolean,
-               jsFunc: Call,
-               func: String => JsCmd,
-               attrs: ElemAttr*): Elem =
+  def ajaxText(
+      value: String,
+      ignoreBlur: Boolean,
+      jsFunc: Call,
+      func: String => JsCmd,
+      attrs: ElemAttr*): Elem =
     ajaxText_*(value, ignoreBlur, Full(jsFunc), SFuncHolder(func), attrs: _*)
 
-  private def ajaxText_*(valuePreNull: String,
-                         ignoreBlur: Boolean,
-                         jsFunc: Box[Call],
-                         func: AFuncHolder,
-                         attrs: ElemAttr*): Elem = {
+  private def ajaxText_*(
+      valuePreNull: String,
+      ignoreBlur: Boolean,
+      jsFunc: Box[Call],
+      func: AFuncHolder,
+      attrs: ElemAttr*): Elem = {
     val value = (Box !! valuePreNull).openOr("")
 
     val raw = (funcName: String, value: String) =>
@@ -741,16 +776,15 @@ trait SHtml extends Loggable {
 
     fmapFunc((func)) { funcName =>
       (attrs.foldLeft(<input type="text" value={value}/>)(_ % _)) %
-      ("onkeypress" -> """liftUtils.lift_blurIfReturn(event)""") %
-      (if (ignoreBlur) Null
-       else
-         ("onblur" ->
+        ("onkeypress" -> """liftUtils.lift_blurIfReturn(event)""") %
+        (if (ignoreBlur) Null
+         else
+           ("onblur" ->
              (jsFunc match {
-                   case Full(f) =>
-                     JsCrVar(key, JsRaw("this")) & deferCall(
-                         raw(funcName, key), f)
-                   case _ => makeAjaxCall(raw(funcName, "this"))
-                 })))
+               case Full(f) =>
+                 JsCrVar(key, JsRaw("this")) & deferCall(raw(funcName, key), f)
+               case _ => makeAjaxCall(raw(funcName, "this"))
+             })))
     }
   }
 
@@ -767,9 +801,11 @@ trait SHtml extends Loggable {
     * @return a text area field
     */
   def jsonTextarea(
-      value: String, json: JsExp => JsCmd, attrs: ElemAttr*): Elem =
+      value: String,
+      json: JsExp => JsCmd,
+      attrs: ElemAttr*): Elem =
     (attrs.foldLeft(<textarea>{value}</textarea>)(_ % _)) %
-    ("onblur" -> (json(JE.JsRaw("this.value"))))
+      ("onblur" -> (json(JE.JsRaw("this.value"))))
 
   /**
     * Create a JSON text area widget that makes a JSON call on blur
@@ -781,36 +817,42 @@ trait SHtml extends Loggable {
     * @return a text field
     */
   def jsonTextarea(
-      value: String, cmd: String, json: JsonCall, attrs: ElemAttr*): Elem =
+      value: String,
+      cmd: String,
+      json: JsonCall,
+      attrs: ElemAttr*): Elem =
     jsonTextarea(value, exp => json(cmd, exp), attrs: _*)
 
   def ajaxTextarea(
-      value: String, func: String => JsCmd, attrs: ElemAttr*): Elem =
+      value: String,
+      func: String => JsCmd,
+      attrs: ElemAttr*): Elem =
     ajaxTextarea_*(value, Empty, SFuncHolder(func), attrs: _*)
 
-  def ajaxTextarea(value: String,
-                   jsFunc: Call,
-                   func: String => JsCmd,
-                   attrs: ElemAttr*): Elem =
+  def ajaxTextarea(
+      value: String,
+      jsFunc: Call,
+      func: String => JsCmd,
+      attrs: ElemAttr*): Elem =
     ajaxTextarea_*(value, Full(jsFunc), SFuncHolder(func), attrs: _*)
 
-  private def ajaxTextarea_*(value: String,
-                             jsFunc: Box[Call],
-                             func: AFuncHolder,
-                             attrs: ElemAttr*): Elem = {
+  private def ajaxTextarea_*(
+      value: String,
+      jsFunc: Box[Call],
+      func: AFuncHolder,
+      attrs: ElemAttr*): Elem = {
     val raw = (funcName: String, value: String) =>
       JsRaw("'" + funcName + "=' + encodeURIComponent(" + value + ".value)")
     val key = formFuncName
 
     fmapFunc((func)) { funcName =>
       (attrs.foldLeft(<textarea>{value}</textarea>)(_ % _)) %
-      ("onblur" ->
+        ("onblur" ->
           (jsFunc match {
-                case Full(f) =>
-                  JsCrVar(key, JsRaw("this")) & deferCall(raw(funcName, key),
-                                                          f)
-                case _ => makeAjaxCall(raw(funcName, "this"))
-              }))
+            case Full(f) =>
+              JsCrVar(key, JsRaw("this")) & deferCall(raw(funcName, key), f)
+            case _ => makeAjaxCall(raw(funcName, "this"))
+          }))
     }
   }
 
@@ -849,7 +891,7 @@ trait SHtml extends Loggable {
     */
   def area(shape: AreaShape, alt: String, attrs: ElemAttr*): Elem =
     attrs.foldLeft(
-        <area alt={alt} shape={shape.shape} coords={shape.coords} />)(_ % _)
+      <area alt={alt} shape={shape.shape} coords={shape.coords} />)(_ % _)
 
   /**
     * Generate an Area tag
@@ -860,10 +902,14 @@ trait SHtml extends Loggable {
     * @param attrs - the balance of the attributes for the tag
     */
   def area(
-      shape: AreaShape, jsCmd: JsCmd, alt: String, attrs: ElemAttr*): Elem =
-    area(shape,
-         alt,
-         ( ("onclick" -> jsCmd.toJsCmd): ElemAttr) :: attrs.toList: _*)
+      shape: AreaShape,
+      jsCmd: JsCmd,
+      alt: String,
+      attrs: ElemAttr*): Elem =
+    area(
+      shape,
+      alt,
+      (("onclick" -> jsCmd.toJsCmd): ElemAttr) :: attrs.toList: _*)
 
   /**
     * Generate an Area tag
@@ -873,72 +919,73 @@ trait SHtml extends Loggable {
     * @param alt - the contents of the alt attribute
     * @param attrs - the balance of the attributes for the tag
     */
-  def area(shape: AreaShape,
-           func: () => JsCmd,
-           alt: String,
-           attrs: ElemAttr*): Elem = {
+  def area(
+      shape: AreaShape,
+      func: () => JsCmd,
+      alt: String,
+      attrs: ElemAttr*): Elem = {
     fmapFunc((func)) { funcName =>
-      area(shape,
-           alt,
-           (
-           ("onclick" ->
-               (makeAjaxCall(Str(funcName + "=true")).toJsCmd +
-                   "; return false;")): ElemAttr) :: attrs.toList: _*)
+      area(
+        shape,
+        alt,
+        (("onclick" ->
+          (makeAjaxCall(Str(funcName + "=true")).toJsCmd +
+            "; return false;")): ElemAttr) :: attrs.toList: _*)
     }
   }
 
-  def ajaxCheckboxElem(
-      settable: Settable { type ValueType = Boolean }, attrs: ElemAttr*)
+  def ajaxCheckboxElem(settable: Settable { type ValueType = Boolean }, attrs: ElemAttr*)
     : Elem =
     ajaxCheckbox(
-        settable.get, (b: Boolean) => { settable.set(b); Noop }, attrs: _*)
+      settable.get,
+      (b: Boolean) => { settable.set(b); Noop },
+      attrs: _*)
 
   def ajaxCheckbox(
-      value: Boolean, func: Boolean => JsCmd, attrs: ElemAttr*): Elem =
-    ajaxCheckbox_*(value,
-                   Empty,
-                   LFuncHolder(in => func(in.exists(toBoolean(_)))),
-                   attrs: _*)
+      value: Boolean,
+      func: Boolean => JsCmd,
+      attrs: ElemAttr*): Elem =
+    ajaxCheckbox_*(
+      value,
+      Empty,
+      LFuncHolder(in => func(in.exists(toBoolean(_)))),
+      attrs: _*)
 
-  def ajaxCheckboxElem(
-      settable: Settable { type ValueType = Boolean }, jsFunc: Call, attrs: ElemAttr*)
+  def ajaxCheckboxElem(settable: Settable { type ValueType = Boolean }, jsFunc: Call, attrs: ElemAttr*)
     : Elem =
-    ajaxCheckbox_*(settable.get,
-                   Full(jsFunc),
-                   LFuncHolder(
-                       in =>
-                         {
-                       settable.set(in.exists(toBoolean(_)));
-                       Noop
-                   }),
-                   attrs: _*)
+    ajaxCheckbox_*(settable.get, Full(jsFunc), LFuncHolder(in => {
+      settable.set(in.exists(toBoolean(_)));
+      Noop
+    }), attrs: _*)
 
-  def ajaxCheckbox(value: Boolean,
-                   jsFunc: Call,
-                   func: Boolean => JsCmd,
-                   attrs: ElemAttr*): Elem =
-    ajaxCheckbox_*(value,
-                   Full(jsFunc),
-                   LFuncHolder(in => func(in.exists(toBoolean(_)))),
-                   attrs: _*)
+  def ajaxCheckbox(
+      value: Boolean,
+      jsFunc: Call,
+      func: Boolean => JsCmd,
+      attrs: ElemAttr*): Elem =
+    ajaxCheckbox_*(
+      value,
+      Full(jsFunc),
+      LFuncHolder(in => func(in.exists(toBoolean(_)))),
+      attrs: _*)
 
-  private def ajaxCheckbox_*(value: Boolean,
-                             jsFunc: Box[Call],
-                             func: AFuncHolder,
-                             attrs: ElemAttr*): Elem = {
+  private def ajaxCheckbox_*(
+      value: Boolean,
+      jsFunc: Box[Call],
+      func: AFuncHolder,
+      attrs: ElemAttr*): Elem = {
     val raw = (funcName: String, value: String) =>
       JsRaw("'" + funcName + "=' + " + value + ".checked")
     val key = formFuncName
 
     fmapFunc((func)) { funcName =>
       (attrs.foldLeft(<input type="checkbox"/>)(_ % _)) % checked(value) %
-      ("onclick" ->
+        ("onclick" ->
           (jsFunc match {
-                case Full(f) =>
-                  JsCrVar(key, JsRaw("this")) & deferCall(raw(funcName, key),
-                                                          f)
-                case _ => makeAjaxCall(raw(funcName, "this"))
-              }))
+            case Full(f) =>
+              JsCrVar(key, JsRaw("this")) & deferCall(raw(funcName, key), f)
+            case _ => makeAjaxCall(raw(funcName, "this"))
+          }))
     }
   }
 
@@ -950,19 +997,21 @@ trait SHtml extends Loggable {
     * @param deflt -- the default button
     * @param ajaxFunc -- the function to invoke when the button is pressed
     */
-  def ajaxRadio[T](opts: Seq[T],
-                   deflt: Box[T],
-                   ajaxFunc: T => JsCmd,
-                   attrs: ElemAttr*): ChoiceHolder[T] = {
+  def ajaxRadio[T](
+      opts: Seq[T],
+      deflt: Box[T],
+      ajaxFunc: T => JsCmd,
+      attrs: ElemAttr*): ChoiceHolder[T] = {
     val groupName = Helpers.nextFuncName
     val itemList = opts.map { v =>
       {
         ChoiceItem(
-            v,
-            attrs.foldLeft(<input type="radio" name={groupName}
+          v,
+          attrs.foldLeft(<input type="radio" name={groupName}
                                      value={Helpers.nextFuncName}/>)(_ % _) % checked(
-                deflt == Full(v)) %
-            ("onclick" -> ajaxCall(Str(""), ignore => ajaxFunc(v))._2.toJsCmd))
+            deflt == Full(v)) %
+            ("onclick" -> ajaxCall(Str(""), ignore => ajaxFunc(v))._2.toJsCmd)
+        )
       }
     }
     ChoiceHolder(itemList)
@@ -979,7 +1028,10 @@ trait SHtml extends Loggable {
   def ajaxSelectElem[T](options: Seq[T], default: Box[T], attrs: ElemAttr*)(
       onSubmit: T => JsCmd)(implicit f: PairStringPromoter[T]): Elem = {
     ajaxSelectObj[T](
-        options.map(v => (v -> f(v))), default, onSubmit, attrs: _*)
+      options.map(v => (v -> f(v))),
+      default,
+      onSubmit,
+      attrs: _*)
   }
 
   /**
@@ -990,16 +1042,18 @@ trait SHtml extends Loggable {
     * @param default -- the default value (or Empty if no default value)
     * @param onSubmit -- the function to execute on form submission
     */
-  def ajaxSelectObj[T](options: Seq[SelectableOption[T]],
-                       default: Box[T],
-                       onSubmit: T => JsCmd,
-                       attrs: ElemAttr*): Elem = {
+  def ajaxSelectObj[T](
+      options: Seq[SelectableOption[T]],
+      default: Box[T],
+      onSubmit: T => JsCmd,
+      attrs: ElemAttr*): Elem = {
 
     val secure = options.map { selectableOption =>
-      SelectableOptionWithNonce(selectableOption.value,
-                                randomString(20),
-                                selectableOption.label,
-                                selectableOption.attrs: _*)
+      SelectableOptionWithNonce(
+        selectableOption.value,
+        randomString(20),
+        selectableOption.label,
+        selectableOption.attrs: _*)
     }
 
     val defaultNonce = default.flatMap { d =>
@@ -1007,20 +1061,17 @@ trait SHtml extends Loggable {
     }
 
     val nonces = secure.map { selectableOptionWithNonce =>
-      SelectableOption(selectableOptionWithNonce.nonce,
-                       selectableOptionWithNonce.label,
-                       selectableOptionWithNonce.attrs: _*)
+      SelectableOption(
+        selectableOptionWithNonce.nonce,
+        selectableOptionWithNonce.label,
+        selectableOptionWithNonce.attrs: _*)
     }
 
     def process(nonce: String): JsCmd =
       secure.find(_.nonce == nonce).map(x => onSubmit(x.value)) getOrElse Noop
     //  (nonces, defaultNonce, SFuncHolder(process))
 
-    ajaxSelect_*(nonces,
-                 defaultNonce,
-                 Empty,
-                 SFuncHolder(process _),
-                 attrs: _*)
+    ajaxSelect_*(nonces, defaultNonce, Empty, SFuncHolder(process _), attrs: _*)
   }
 
   /**
@@ -1031,10 +1082,11 @@ trait SHtml extends Loggable {
     * @param default -- the default value (or Empty if no default value)
     * @param onSubmit -- the function to execute on form submission
     */
-  def ajaxSelectElem[T](options: Seq[T],
-                        default: Box[T],
-                        jsFunc: Call,
-                        attrs: ElemAttr*)(onSubmit: T => JsCmd)(
+  def ajaxSelectElem[T](
+      options: Seq[T],
+      default: Box[T],
+      jsFunc: Call,
+      attrs: ElemAttr*)(onSubmit: T => JsCmd)(
       implicit f: PairStringPromoter[T]): Elem = {
     ajaxSelectObj[T](options.map(v => (v, f(v))), default, jsFunc, onSubmit)
   }
@@ -1047,17 +1099,19 @@ trait SHtml extends Loggable {
     * @param default -- the default value (or Empty if no default value)
     * @param onSubmit -- the function to execute on form submission
     */
-  def ajaxSelectObj[T](options: Seq[SelectableOption[T]],
-                       default: Box[T],
-                       jsFunc: Call,
-                       onSubmit: T => JsCmd,
-                       attrs: ElemAttr*): Elem = {
+  def ajaxSelectObj[T](
+      options: Seq[SelectableOption[T]],
+      default: Box[T],
+      jsFunc: Call,
+      onSubmit: T => JsCmd,
+      attrs: ElemAttr*): Elem = {
 
     val secure = options.map { selectableOption =>
-      SelectableOptionWithNonce(selectableOption.value,
-                                randomString(20),
-                                selectableOption.label,
-                                selectableOption.attrs: _*)
+      SelectableOptionWithNonce(
+        selectableOption.value,
+        randomString(20),
+        selectableOption.label,
+        selectableOption.attrs: _*)
     }
 
     val defaultNonce = default.flatMap { d =>
@@ -1065,20 +1119,22 @@ trait SHtml extends Loggable {
     }
 
     val nonces = secure.map { selectableOptionWithNonce =>
-      SelectableOption(selectableOptionWithNonce.nonce,
-                       selectableOptionWithNonce.label,
-                       selectableOptionWithNonce.attrs: _*)
+      SelectableOption(
+        selectableOptionWithNonce.nonce,
+        selectableOptionWithNonce.label,
+        selectableOptionWithNonce.attrs: _*)
     }
 
     def process(nonce: String): JsCmd =
       secure.find(_.nonce == nonce).map(x => onSubmit(x.value)) getOrElse Noop
     //  (nonces, defaultNonce, SFuncHolder(process))
 
-    ajaxSelect_*(nonces,
-                 defaultNonce,
-                 Full(jsFunc),
-                 SFuncHolder(process _),
-                 attrs: _*)
+    ajaxSelect_*(
+      nonces,
+      defaultNonce,
+      Full(jsFunc),
+      SFuncHolder(process _),
+      attrs: _*)
   }
 
   /**
@@ -1090,10 +1146,11 @@ trait SHtml extends Loggable {
     * @param default -- the default value (or Empty if no default value)
     * @param func -- the function to execute when a new selection is made
     */
-  def ajaxEditableSelect(opts: Seq[SelectableOption[String]],
-                         deflt: Box[String],
-                         f: String => JsCmd,
-                         attrs: ElemAttr*): Elem = {
+  def ajaxEditableSelect(
+      opts: Seq[SelectableOption[String]],
+      deflt: Box[String],
+      f: String => JsCmd,
+      attrs: ElemAttr*): Elem = {
 
     val id =
       attrs.collectFirst {
@@ -1106,62 +1163,65 @@ trait SHtml extends Loggable {
     val options = opts :+ SelectableOption(textOpt, "New Element")
     var _options = options
 
-    lazy val func: (String) => JsCmd = (select: String) =>
-      {
-        def text(in: String): JsCmd = {
-          _options = SelectableOption(in, in) +: _options
-          Replace(id, ajaxSelect(_options, Some(in), func, attributes: _*))
-        }
-        if (select == textOpt)
-          Replace(id, ajaxText("", text(_), attributes: _*)) & Focus(id)
-        else f(select)
+    lazy val func: (String) => JsCmd = (select: String) => {
+      def text(in: String): JsCmd = {
+        _options = SelectableOption(in, in) +: _options
+        Replace(id, ajaxSelect(_options, Some(in), func, attributes: _*))
+      }
+      if (select == textOpt)
+        Replace(id, ajaxText("", text(_), attributes: _*)) & Focus(id)
+      else f(select)
     }
 
     ajaxSelect(options, deflt, func, attributes: _*)
   }
 
-  def ajaxSelect(opts: Seq[SelectableOption[String]],
-                 deflt: Box[String],
-                 func: String => JsCmd,
-                 attrs: ElemAttr*): Elem =
+  def ajaxSelect(
+      opts: Seq[SelectableOption[String]],
+      deflt: Box[String],
+      func: String => JsCmd,
+      attrs: ElemAttr*): Elem =
     ajaxSelect_*(opts, deflt, Empty, SFuncHolder(func), attrs: _*)
 
-  def ajaxSelect(opts: Seq[SelectableOption[String]],
-                 deflt: Box[String],
-                 jsFunc: Call,
-                 func: String => JsCmd,
-                 attrs: ElemAttr*): Elem =
+  def ajaxSelect(
+      opts: Seq[SelectableOption[String]],
+      deflt: Box[String],
+      jsFunc: Call,
+      func: String => JsCmd,
+      attrs: ElemAttr*): Elem =
     ajaxSelect_*(opts, deflt, Full(jsFunc), SFuncHolder(func), attrs: _*)
 
-  private def ajaxSelect_*(opts: Seq[SelectableOption[String]],
-                           deflt: Box[String],
-                           jsFunc: Box[Call],
-                           func: AFuncHolder,
-                           attrs: ElemAttr*): Elem = {
+  private def ajaxSelect_*(
+      opts: Seq[SelectableOption[String]],
+      deflt: Box[String],
+      jsFunc: Box[Call],
+      func: AFuncHolder,
+      attrs: ElemAttr*): Elem = {
     val raw = (funcName: String, value: String) =>
-      JsRaw("'" + funcName + "=' + encodeURIComponent(" + value + ".options[" +
+      JsRaw(
+        "'" + funcName + "=' + encodeURIComponent(" + value + ".options[" +
           value + ".selectedIndex].value)")
     val key = formFuncName
 
     val vals = opts.map(_.value)
-    val testFunc = LFuncHolder(in =>
-                                 in.filter(v => vals.contains(v)) match {
-                                   case Nil => false
-                                   case xs => func(xs)
-                               },
-                               func.owner)
+    val testFunc = LFuncHolder(
+      in =>
+        in.filter(v => vals.contains(v)) match {
+          case Nil => false
+          case xs  => func(xs)
+      },
+      func.owner)
     fmapFunc((testFunc)) { funcName =>
       (attrs.foldLeft(<select>{opts.flatMap {
         case option =>
           optionToElem(option) % selected(deflt.exists(_ == option.value))
       }}</select>)(_ % _)) %
-      ("onchange" ->
+        ("onchange" ->
           (jsFunc match {
-                case Full(f) =>
-                  JsCrVar(key, JsRaw("this")) & deferCall(raw(funcName, key),
-                                                          f)
-                case _ => makeAjaxCall(raw(funcName, "this"))
-              }))
+            case Full(f) =>
+              JsCrVar(key, JsRaw("this")) & deferCall(raw(funcName, key), f)
+            case _ => makeAjaxCall(raw(funcName, "this"))
+          }))
     }
   }
 
@@ -1176,7 +1236,7 @@ trait SHtml extends Loggable {
     val (rs, sid) = findOrAddId(shown)
     val (rh, hid) = findOrAddId(hidden)
     val ui = LiftRules.jsArtifacts
-    ( <span>{rs % ("onclick" -> (ui.hide(sid).cmd &
+    (<span>{rs % ("onclick" -> (ui.hide(sid).cmd &
             ui.showAndFocus(hid).cmd & JsRaw("return false;")))}{dealWithBlur(rh % ("style" -> "display: none"), (ui.show(sid).cmd & ui.hide(hid).cmd))}</span>)
   }
 
@@ -1187,7 +1247,7 @@ trait SHtml extends Loggable {
 
     val rh =
       <span id={hid}>{hidden(ui.show(sid).toJsCmd + ";" + ui.hide(hid).toJsCmd + ";")}</span>
-    ( <span>{rs % ("onclick" -> (ui.hide(sid).toJsCmd + ";" + ui.show(hid).toJsCmd + "; return false;"))}{(rh % ("style" -> "display: none"))}</span>)
+    (<span>{rs % ("onclick" -> (ui.hide(sid).toJsCmd + ";" + ui.show(hid).toJsCmd + "; return false;"))}{(rh % ("style" -> "display: none"))}</span>)
   }
 
   private def dealWithBlur(elem: Elem, blurCmd: String): Elem = {
@@ -1195,8 +1255,9 @@ trait SHtml extends Loggable {
       case Nil => elem % ("onblur" -> blurCmd)
       case x :: xs =>
         val attrs = elem.attributes.filter(_.key != "onblur")
-        elem.copy(attributes = new UnprefixedAttribute(
-                  "onblur", Text(blurCmd + x.text), attrs))
+        elem.copy(
+          attributes =
+            new UnprefixedAttribute("onblur", Text(blurCmd + x.text), attrs))
     }
   }
 
@@ -1209,50 +1270,62 @@ trait SHtml extends Loggable {
     * @attrs - the (optional) attributes for the HTML element
     */
   def link(
-      to: String, func: () => Any, body: NodeSeq, attrs: ElemAttr*): Elem = {
-    fmapFunc((a: List[String]) => { func(); true })(key =>
-          attrs.foldLeft(
-              <a href={Helpers.appendFuncToURL(to, key + "=_")}>{body}</a>)(
-              _ % _))
+      to: String,
+      func: () => Any,
+      body: NodeSeq,
+      attrs: ElemAttr*): Elem = {
+    fmapFunc((a: List[String]) => { func(); true })(
+      key =>
+        attrs.foldLeft(
+          <a href={Helpers.appendFuncToURL(to, key + "=_")}>{body}</a>)(_ % _))
   }
 
   private def makeFormElement(
-      name: String, func: AFuncHolder, attrs: ElemAttr*): Elem =
+      name: String,
+      func: AFuncHolder,
+      attrs: ElemAttr*): Elem =
     fmapFunc(func)(funcName =>
-          attrs.foldLeft(<input type={name} name={funcName}/>)(_ % _))
+      attrs.foldLeft(<input type={name} name={funcName}/>)(_ % _))
 
   def text_*(value: String, func: AFuncHolder, attrs: ElemAttr*): Elem =
     text_*(value, func, Empty, attrs: _*)
 
-  def text_*(value: String,
-             func: AFuncHolder,
-             ajaxTest: String => JsCmd,
-             attrs: ElemAttr*): Elem =
+  def text_*(
+      value: String,
+      func: AFuncHolder,
+      ajaxTest: String => JsCmd,
+      attrs: ElemAttr*): Elem =
     text_*(value, func, Full(ajaxTest), attrs: _*)
 
   private def buildOnBlur(bf: Box[String => JsCmd]): MetaData = bf match {
     case Full(func) =>
       new UnprefixedAttribute(
-          "onblur", Text(ajaxCall(JsRaw("this.value"), func)._2.toJsCmd), Null)
+        "onblur",
+        Text(ajaxCall(JsRaw("this.value"), func)._2.toJsCmd),
+        Null)
 
     case _ => Null
   }
 
-  def text_*(value: String,
-             ignoreBlur: Boolean,
-             func: AFuncHolder,
-             ajaxTest: Box[String => JsCmd],
-             attrs: ElemAttr*): Elem =
+  def text_*(
+      value: String,
+      ignoreBlur: Boolean,
+      func: AFuncHolder,
+      ajaxTest: Box[String => JsCmd],
+      attrs: ElemAttr*): Elem =
     makeFormElement("text", func, attrs: _*) % new UnprefixedAttribute(
-        "value", Text(value match {
-      case null => ""
-      case s => s
-    }), Null) % (if (ignoreBlur) Null else buildOnBlur(ajaxTest))
+      "value",
+      Text(value match {
+        case null => ""
+        case s    => s
+      }),
+      Null) % (if (ignoreBlur) Null else buildOnBlur(ajaxTest))
 
-  def text_*(value: String,
-             func: AFuncHolder,
-             ajaxTest: Box[String => JsCmd],
-             attrs: ElemAttr*): Elem =
+  def text_*(
+      value: String,
+      func: AFuncHolder,
+      ajaxTest: Box[String => JsCmd],
+      attrs: ElemAttr*): Elem =
     text_*(value, false, func, ajaxTest, attrs: _*)
 
   def password_*(value: String, func: AFuncHolder, attrs: ElemAttr*): Elem =
@@ -1266,18 +1339,18 @@ trait SHtml extends Loggable {
 
     _formGroup.is match {
       case Empty => formGroup(1)(doit)
-      case _ => doit
+      case _     => doit
     }
   }
 
   private def dupWithName(elem: Elem, name: String): Elem = {
     elem.copy(
-        attributes = new UnprefixedAttribute(
-              "name", name, elem.attributes.filter {
-      case up: UnprefixedAttribute =>
-        up.key != "name"
-      case _ => true
-    }))
+      attributes =
+        new UnprefixedAttribute("name", name, elem.attributes.filter {
+          case up: UnprefixedAttribute =>
+            up.key != "name"
+          case _ => true
+        }))
   }
 
   private def isRadio(in: MetaData): Boolean =
@@ -1305,25 +1378,26 @@ trait SHtml extends Loggable {
             case Group(g) => runNodes(g)
             // button
             case e: Elem => {
-                val oldAttr: Map[String, String] = Map(allEvent.flatMap(
-                        a => e.attribute(a).map(v => a -> (v.text))): _*)
+              val oldAttr: Map[String, String] = Map(allEvent.flatMap(a =>
+                e.attribute(a).map(v => a -> (v.text))): _*)
 
-                val newAttr = e.attributes.filter {
-                  case up: UnprefixedAttribute => !oldAttr.contains(up.key)
-                  case _ => true
-                }
-
-                fmapFunc(func) { funcName =>
-                  e.copy(attributes = allEvent.foldLeft(newAttr) {
-                    case (meta, attr) =>
-                      new UnprefixedAttribute(
-                          attr,
-                          Helpers.appendFuncToURL(oldAttr.getOrElse(attr, ""),
-                                                  funcName + "=_"),
-                          meta)
-                  })
-                }
+              val newAttr = e.attributes.filter {
+                case up: UnprefixedAttribute => !oldAttr.contains(up.key)
+                case _                       => true
               }
+
+              fmapFunc(func) { funcName =>
+                e.copy(attributes = allEvent.foldLeft(newAttr) {
+                  case (meta, attr) =>
+                    new UnprefixedAttribute(
+                      attr,
+                      Helpers.appendFuncToURL(
+                        oldAttr.getOrElse(attr, ""),
+                        funcName + "=_"),
+                      meta)
+                })
+              }
+            }
 
             case x => x
           }
@@ -1355,8 +1429,7 @@ trait SHtml extends Loggable {
   def onEventIf(question: String, fn: (String) => JsCmd): GUIDJsExp = {
     val eventExp = onEvent(fn)
 
-    new GUIDJsExp(
-        eventExp.guid, JsRaw(Confirm(question, eventExp.exp).toJsCmd))
+    new GUIDJsExp(eventExp.guid, JsRaw(Confirm(question, eventExp.exp).toJsCmd))
   }
 
   /**
@@ -1378,24 +1451,24 @@ trait SHtml extends Loggable {
             case Group(g) => runNodes(g)
             // button
             case e: Elem => {
-                val oldAttr: Map[String, String] = Map(allEvent.flatMap(a =>
-                          e.attribute(a).map(v => a -> (v.text + "; "))): _*)
+              val oldAttr: Map[String, String] = Map(allEvent.flatMap(a =>
+                e.attribute(a).map(v => a -> (v.text + "; "))): _*)
 
-                val newAttr = e.attributes.filter {
-                  case up: UnprefixedAttribute => !oldAttr.contains(up.key)
-                  case _ => true
-                }
-
-                val cmd = ajaxCall(JsRaw("this.value"), func)._2.toJsCmd
-
-                e.copy(
-                    attributes = allEvent.foldLeft(newAttr) {
-                  case (meta, attr) =>
-                    new UnprefixedAttribute(attr,
-                                            oldAttr.getOrElse(attr, "") + cmd,
-                                            meta)
-                })
+              val newAttr = e.attributes.filter {
+                case up: UnprefixedAttribute => !oldAttr.contains(up.key)
+                case _                       => true
               }
+
+              val cmd = ajaxCall(JsRaw("this.value"), func)._2.toJsCmd
+
+              e.copy(attributes = allEvent.foldLeft(newAttr) {
+                case (meta, attr) =>
+                  new UnprefixedAttribute(
+                    attr,
+                    oldAttr.getOrElse(attr, "") + cmd,
+                    meta)
+              })
+            }
 
             case x => x
           }
@@ -1507,7 +1580,7 @@ trait SHtml extends Loggable {
             // submit
             case e: Elem
                 if e.label == "input" &&
-                e.attribute("type").map(_.text) == Some("submit") =>
+                  e.attribute("type").map(_.text) == Some("submit") =>
               _formGroup.is match {
                 case Empty =>
                   formGroup(1)(fmapFunc(func) { dupWithName(e, _) })
@@ -1526,8 +1599,8 @@ trait SHtml extends Loggable {
         checkBoxName match {
           // if we've got a single checkbox, add a hidden false checkbox
           case Full(name) if checkBoxCnt == 1 => {
-              ret ++ <input type="hidden" name={name} value="false"/>
-            }
+            ret ++ <input type="hidden" name={name} value="false"/>
+          }
 
           case _ => ret
         }
@@ -1540,8 +1613,8 @@ trait SHtml extends Loggable {
   /**
     * Generate an input element for the Settable
     */
-  def textElem(
-      settable: Settable { type ValueType = String }, attrs: ElemAttr*): Elem =
+  def textElem(settable: Settable { type ValueType = String }, attrs: ElemAttr*)
+    : Elem =
     text_*(settable.get, SFuncHolder(s => settable.set(s)), attrs: _*)
 
   /**
@@ -1555,14 +1628,18 @@ trait SHtml extends Loggable {
     * Generate an email input element for the Settable. At some point
     * there will be graceful fallback for non-HTML5 browsers. FIXME
     */
-  def email(
-      settable: Settable { type ValueType = String }, attrs: ElemAttr*): Elem =
+  def email(settable: Settable { type ValueType = String }, attrs: ElemAttr*)
+    : Elem =
     email_*(settable.get, SFuncHolder(s => settable.set(s)), attrs: _*)
 
   private def email_*(
-      value: String, func: AFuncHolder, attrs: ElemAttr*): Elem =
+      value: String,
+      func: AFuncHolder,
+      attrs: ElemAttr*): Elem =
     makeFormElement("email", func, attrs: _*) % new UnprefixedAttribute(
-        "value", Text(value), Null)
+      "value",
+      Text(value),
+      Null)
 
   /**
     * Generate an input field with type url.  At some point,
@@ -1575,51 +1652,56 @@ trait SHtml extends Loggable {
     * Generate a url input element for the Settable. At some point
     * there will be graceful fallback for non-HTML5 browsers. FIXME
     */
-  def url(
-      settable: Settable { type ValueType = String }, attrs: ElemAttr*): Elem =
+  def url(settable: Settable { type ValueType = String }, attrs: ElemAttr*)
+    : Elem =
     url_*(settable.get, SFuncHolder(s => settable.set(s)), attrs: _*)
 
   private def url_*(value: String, func: AFuncHolder, attrs: ElemAttr*): Elem =
     makeFormElement("url", func, attrs: _*) % new UnprefixedAttribute(
-        "value", Text(value), Null)
+      "value",
+      Text(value),
+      Null)
 
   /**
     * Generate an input field with type number.  At some point,
     * there will be graceful fallback for non-HTML5 browsers.  FIXME
     */
-  def number(value: Int,
-             func: Int => Any,
-             min: Int,
-             max: Int,
-             attrs: ElemAttr*): Elem =
-    number_*(value,
-             min,
-             max,
-             SFuncHolder(s => Helpers.asInt(s).map(func)),
-             attrs: _*)
+  def number(
+      value: Int,
+      func: Int => Any,
+      min: Int,
+      max: Int,
+      attrs: ElemAttr*): Elem =
+    number_*(
+      value,
+      min,
+      max,
+      SFuncHolder(s => Helpers.asInt(s).map(func)),
+      attrs: _*)
 
   /**
     * Generate a number input element for the Settable. At some point
     * there will be graceful fallback for non-HTML5 browsers. FIXME
     */
-  def number(
-      settable: Settable { type ValueType = Int }, min: Int, max: Int, attrs: ElemAttr*)
+  def number(settable: Settable { type ValueType = Int }, min: Int, max: Int, attrs: ElemAttr*)
     : Elem =
-    number_*(settable.get,
-             min,
-             max,
-             SFuncHolder(s => Helpers.asInt(s).map(s => settable.set(s))),
-             attrs: _*)
+    number_*(
+      settable.get,
+      min,
+      max,
+      SFuncHolder(s => Helpers.asInt(s).map(s => settable.set(s))),
+      attrs: _*)
 
-  private def number_*(value: Int,
-                       min: Int,
-                       max: Int,
-                       func: AFuncHolder,
-                       attrs: ElemAttr*): Elem = {
+  private def number_*(
+      value: Int,
+      min: Int,
+      max: Int,
+      func: AFuncHolder,
+      attrs: ElemAttr*): Elem = {
     import Helpers._
 
     makeFormElement("number", func, attrs: _*) % ("value" -> value.toString) %
-    ("min" -> min.toString) % ("max" -> max.toString)
+      ("min" -> min.toString) % ("max" -> max.toString)
   }
 
   /**
@@ -1628,18 +1710,20 @@ trait SHtml extends Loggable {
     * At some point,
     * there will be graceful fallback for non-HTML5 browsers.  FIXME
     */
-  def number(value: Double,
-             func: Double => Any,
-             min: Double,
-             max: Double,
-             step: Double,
-             attrs: ElemAttr*): Elem =
-    number_double_*(value,
-                    min,
-                    max,
-                    step,
-                    SFuncHolder(s => Helpers.asDouble(s).map(func)),
-                    attrs: _*)
+  def number(
+      value: Double,
+      func: Double => Any,
+      min: Double,
+      max: Double,
+      step: Double,
+      attrs: ElemAttr*): Elem =
+    number_double_*(
+      value,
+      min,
+      max,
+      step,
+      SFuncHolder(s => Helpers.asDouble(s).map(func)),
+      attrs: _*)
 
   /**
     * Generate a number input element for the Settable. It allows for Double if your step is
@@ -1647,99 +1731,110 @@ trait SHtml extends Loggable {
     * At some point
     * there will be graceful fallback for non-HTML5 browsers. FIXME
     */
-  def number(
-      settable: Settable { type ValueType = Double }, min: Double, max: Double, step: Double, attrs: ElemAttr*)
+  def number(settable: Settable { type ValueType = Double }, min: Double, max: Double, step: Double, attrs: ElemAttr*)
     : Elem =
     number_double_*(
-        settable.get,
-        min,
-        max,
-        step: Double,
-        SFuncHolder(s => Helpers.asDouble(s).map(s => settable.set(s))),
-        attrs: _*)
+      settable.get,
+      min,
+      max,
+      step: Double,
+      SFuncHolder(s => Helpers.asDouble(s).map(s => settable.set(s))),
+      attrs: _*)
 
-  private def number_double_*(value: Double,
-                              min: Double,
-                              max: Double,
-                              step: Double,
-                              func: AFuncHolder,
-                              attrs: ElemAttr*): Elem = {
+  private def number_double_*(
+      value: Double,
+      min: Double,
+      max: Double,
+      step: Double,
+      func: AFuncHolder,
+      attrs: ElemAttr*): Elem = {
     import Helpers._
     import common.Full
 
     makeFormElement("number", func, attrs: _*) % ("value" -> value.toString) %
-    ("min" -> min.toString) % ("min" -> min.toString) %
-    ("step" -> step.toString)
+      ("min" -> min.toString) % ("min" -> min.toString) %
+      ("step" -> step.toString)
   }
 
   /**
     * Generate an input field with type range.  At some point,
     * there will be graceful fallback for non-HTML5 browsers.  FIXME
     */
-  def range(value: Int,
-            func: Int => Any,
-            min: Int,
-            max: Int,
-            attrs: ElemAttr*): Elem =
-    range_*(value,
-            min,
-            max,
-            SFuncHolder(s => Helpers.asInt(s).map(func)),
-            attrs: _*)
+  def range(
+      value: Int,
+      func: Int => Any,
+      min: Int,
+      max: Int,
+      attrs: ElemAttr*): Elem =
+    range_*(
+      value,
+      min,
+      max,
+      SFuncHolder(s => Helpers.asInt(s).map(func)),
+      attrs: _*)
 
   /**
     * Generate a range input element for the Settable. At some point
     * there will be graceful fallback for non-HTML5 browsers. FIXME
     */
-  def range(
-      settable: Settable { type ValueType = Int }, min: Int, max: Int, attrs: ElemAttr*)
+  def range(settable: Settable { type ValueType = Int }, min: Int, max: Int, attrs: ElemAttr*)
     : Elem =
-    range_*(settable.get,
-            min,
-            max,
-            SFuncHolder(s => Helpers.asInt(s).map(s => settable.set(s))),
-            attrs: _*)
+    range_*(
+      settable.get,
+      min,
+      max,
+      SFuncHolder(s => Helpers.asInt(s).map(s => settable.set(s))),
+      attrs: _*)
 
-  private def range_*(value: Int,
-                      min: Int,
-                      max: Int,
-                      func: AFuncHolder,
-                      attrs: ElemAttr*): Elem = {
+  private def range_*(
+      value: Int,
+      min: Int,
+      max: Int,
+      func: AFuncHolder,
+      attrs: ElemAttr*): Elem = {
     import Helpers._
 
     makeFormElement("range", func, attrs: _*) % ("value" -> value.toString) %
-    ("min" -> min.toString) % ("max" -> max.toString)
+      ("min" -> min.toString) % ("max" -> max.toString)
   }
 
-  def textAjaxTest(value: String,
-                   func: String => Any,
-                   ajaxTest: String => JsCmd,
-                   attrs: ElemAttr*): Elem =
+  def textAjaxTest(
+      value: String,
+      func: String => Any,
+      ajaxTest: String => JsCmd,
+      attrs: ElemAttr*): Elem =
     text_*(value, SFuncHolder(func), ajaxTest, attrs: _*)
 
-  def textAjaxTest(value: String,
-                   func: String => Any,
-                   ajaxTest: Box[String => JsCmd],
-                   attrs: ElemAttr*): Elem =
+  def textAjaxTest(
+      value: String,
+      func: String => Any,
+      ajaxTest: Box[String => JsCmd],
+      attrs: ElemAttr*): Elem =
     text_*(value, SFuncHolder(func), ajaxTest, attrs: _*)
 
   def password(value: String, func: String => Any, attrs: ElemAttr*): Elem =
     makeFormElement("password", SFuncHolder(func), attrs: _*) % new UnprefixedAttribute(
-        "value", Text(value), Null)
+      "value",
+      Text(value),
+      Null)
 
-  def passwordElem(
-      settable: Settable { type ValueType = String }, attrs: ElemAttr*): Elem =
+  def passwordElem(settable: Settable { type ValueType = String }, attrs: ElemAttr*)
+    : Elem =
     makeFormElement("password", SFuncHolder(s => settable.set(s)), attrs: _*) % new UnprefixedAttribute(
-        "value", Text(settable.get), Null)
+      "value",
+      Text(settable.get),
+      Null)
 
   def hidden(func: () => Any, attrs: ElemAttr*): Elem =
     makeFormElement("hidden", NFuncHolder(func), attrs: _*) %
-    ("value" -> "true")
+      ("value" -> "true")
 
   def hidden(
-      func: (String) => Any, defaultlValue: String, attrs: ElemAttr*): Elem =
+      func: (String) => Any,
+      defaultlValue: String,
+      attrs: ElemAttr*): Elem =
     makeFormElement("hidden", SFuncHolder(func), attrs: _*) %
-    ("value" -> defaultlValue)
+      ("value" -> defaultlValue)
 
   /**
     * Create an HTML button with strOrNodeSeq as the body.  The
@@ -1752,18 +1847,19 @@ trait SHtml extends Loggable {
     * @param attrs -- the attributes to append to the button
     * @return a button HTML Element b
     */
-  def button(strOrNodeSeq: StringOrNodeSeq,
-             func: () => Any,
-             attrs: ElemAttr*): Elem = {
+  def button(
+      strOrNodeSeq: StringOrNodeSeq,
+      func: () => Any,
+      attrs: ElemAttr*): Elem = {
     def doit: Elem = {
-      attrs.foldLeft(fmapFunc((func))(
-              name => <button type="submit" name={name} value="_">{
+      attrs.foldLeft(
+        fmapFunc((func))(name => <button type="submit" name={name} value="_">{
           strOrNodeSeq.nodeSeq}</button>))(_ % _)
     }
 
     _formGroup.is match {
       case Empty => formGroup(1)(doit)
-      case _ => doit
+      case _     => doit
     }
   }
 
@@ -1778,12 +1874,14 @@ trait SHtml extends Loggable {
 
     def doit = {
       makeFormElement("submit", NFuncHolder(func), attrs: _*) % new UnprefixedAttribute(
-          "value", Text(value), Null)
+        "value",
+        Text(value),
+        Null)
     }
 
     _formGroup.is match {
       case Empty => formGroup(1)(doit)
-      case _ => doit
+      case _     => doit
     }
   }
 
@@ -1800,9 +1898,12 @@ trait SHtml extends Loggable {
     val funcName = "z" + Helpers.nextFuncName
     addFunctionMap(funcName, (func))
 
-    (attrs.foldLeft(<input type="submit" name={funcName}/>)(_ % _)) % new UnprefixedAttribute(
-        "value", Text(value), Null) %
-    ("onclick" -> ("lift.setUriSuffix('" + funcName + "=_'); return true;"))
+    (attrs
+      .foldLeft(<input type="submit" name={funcName}/>)(_ % _)) % new UnprefixedAttribute(
+      "value",
+      Text(value),
+      Null) %
+      ("onclick" -> ("lift.setUriSuffix('" + funcName + "=_'); return true;"))
   }
 
   /**
@@ -1838,7 +1939,7 @@ trait SHtml extends Loggable {
 
             case e: Elem
                 if (e.label == "button") ||
-                (e.label == "input" &&
+                  (e.label == "input" &&
                     e.attribute("type").map(_.text) == Some("submit")) =>
               addAttributes(e, functionId)
           }
@@ -1862,7 +1963,7 @@ trait SHtml extends Loggable {
     *
     * @param body The form body. This should not include the &lt;form&gt; tag.
     */
-  def ajaxForm(body: NodeSeq) = ( <lift:form>{body}</lift:form>)
+  def ajaxForm(body: NodeSeq) = (<lift:form>{body}</lift:form>)
 
   /**
     * Takes a form and wraps it so that it will be submitted via AJAX.
@@ -1871,7 +1972,7 @@ trait SHtml extends Loggable {
     * @param onSubmit JavaScript code to execute on the client prior to submission
     */
   def ajaxForm(body: NodeSeq, onSubmit: JsCmd) =
-    ( <lift:form onsubmit={onSubmit.toJsCmd}>{body}</lift:form>)
+    (<lift:form onsubmit={onSubmit.toJsCmd}>{body}</lift:form>)
 
   /**
     * Takes a form and wraps it so that it will be submitted via AJAX. This also
@@ -1881,7 +1982,7 @@ trait SHtml extends Loggable {
     * @param postSubmit Code that should be executed after a successful submission
     */
   def ajaxForm(body: NodeSeq, onSubmit: JsCmd, postSubmit: JsCmd) =
-    ( <lift:form onsubmit={onSubmit.toJsCmd} postsubmit={postSubmit.toJsCmd}>{body}</lift:form>)
+    (<lift:form onsubmit={onSubmit.toJsCmd} postsubmit={postSubmit.toJsCmd}>{body}</lift:form>)
 
   /**
     * Having a regular form, this method can be used to send the serialized content of the form.
@@ -1897,32 +1998,33 @@ trait SHtml extends Loggable {
     */
   def makeFormsAjax: NodeSeq => NodeSeq =
     "form" #>
-    ((ns: NodeSeq) =>
-          (ns match {
-            case e: Elem => {
-                val id: String =
-                  e.attribute("id").map(_.text) getOrElse Helpers.nextFuncName
+      ((ns: NodeSeq) =>
+        (ns match {
+          case e: Elem => {
+            val id: String =
+              e.attribute("id").map(_.text) getOrElse Helpers.nextFuncName
 
-                val newMeta = e.attributes.filter {
-                  case up: UnprefixedAttribute =>
-                    up.key match {
-                      case "id" => false
-                      case "action" => false
-                      case "onsubmit" => false
-                      case "method" => false
-                      case _ => true
-                    }
-                  case _ => true
+            val newMeta = e.attributes.filter {
+              case up: UnprefixedAttribute =>
+                up.key match {
+                  case "id"       => false
+                  case "action"   => false
+                  case "onsubmit" => false
+                  case "method"   => false
+                  case _          => true
                 }
+              case _ => true
+            }
 
-                e.copy(attributes = newMeta) % ("id" -> id) %
-                ("action" -> "javascript://") %
-                ("onsubmit" ->
-                    (SHtml.makeAjaxCall(LiftRules.jsArtifacts.serialize(id))
-                          .toJsCmd + "; return false;"))
-              }
-            case x => x
-          }): NodeSeq)
+            e.copy(attributes = newMeta) % ("id" -> id) %
+              ("action" -> "javascript://") %
+              ("onsubmit" ->
+                (SHtml
+                  .makeAjaxCall(LiftRules.jsArtifacts.serialize(id))
+                  .toJsCmd + "; return false;"))
+          }
+          case x => x
+        }): NodeSeq)
 
   /**
     * Submits a form denominated by a formId and execute the func function
@@ -1933,8 +2035,9 @@ trait SHtml extends Loggable {
     addFunctionMap(funcName, (func))
 
     makeAjaxCall(
-        JsRaw(LiftRules.jsArtifacts.serialize(formId).toJsCmd + " + " +
-            Str("&" + funcName + "=true").toJsCmd))
+      JsRaw(
+        LiftRules.jsArtifacts.serialize(formId).toJsCmd + " + " +
+          Str("&" + funcName + "=true").toJsCmd))
   }
 
   /**
@@ -1944,18 +2047,21 @@ trait SHtml extends Loggable {
     * @param postSubmit - the function that needs to be called after a successfull request
     */
   def submitAjaxForm(formId: String, postSubmit: Call): JsCmd =
-    SHtml.makeAjaxCall(LiftRules.jsArtifacts.serialize(formId),
-                       AjaxContext.js(Full(postSubmit.toJsCmd)))
+    SHtml.makeAjaxCall(
+      LiftRules.jsArtifacts.serialize(formId),
+      AjaxContext.js(Full(postSubmit.toJsCmd)))
 
-  private def secureOptions[T](options: Seq[SelectableOption[T]],
-                               default: Box[T],
-                               onSubmit: T => Any)
+  private def secureOptions[T](
+      options: Seq[SelectableOption[T]],
+      default: Box[T],
+      onSubmit: T => Any)
     : (Seq[SelectableOption[String]], Box[String], AFuncHolder) = {
     val secure = options.map { selectableOption =>
-      SelectableOptionWithNonce(selectableOption.value,
-                                randomString(20),
-                                selectableOption.label,
-                                selectableOption.attrs: _*)
+      SelectableOptionWithNonce(
+        selectableOption.value,
+        randomString(20),
+        selectableOption.label,
+        selectableOption.attrs: _*)
     }
 
     val defaultNonce = default.flatMap { default =>
@@ -1963,9 +2069,10 @@ trait SHtml extends Loggable {
     }
 
     val nonces = secure.map { selectableOptionWithNonce =>
-      SelectableOption(selectableOptionWithNonce.nonce,
-                       selectableOptionWithNonce.label,
-                       selectableOptionWithNonce.attrs: _*)
+      SelectableOption(
+        selectableOptionWithNonce.nonce,
+        selectableOptionWithNonce.label,
+        selectableOptionWithNonce.attrs: _*)
     }
 
     def process(nonce: String): Unit =
@@ -1973,11 +2080,13 @@ trait SHtml extends Loggable {
         .find(_.nonce == nonce)
         .map(x => onSubmit(x.value))
 
-      (nonces, defaultNonce, SFuncHolder(process))
+    (nonces, defaultNonce, SFuncHolder(process))
   }
 
   final case class SelectableOption[+T](
-      value: T, label: String, attrs: ElemAttr*)
+      value: T,
+      label: String,
+      attrs: ElemAttr*)
   object SelectableOption {
     implicit def tupleSeqToSelectableOptionSeq[T](
         seq: Seq[(T, String)]): Seq[SelectableOption[T]] =
@@ -1990,11 +2099,14 @@ trait SHtml extends Loggable {
   }
 
   private def optionToElem(option: SelectableOption[String]): Elem =
-    option.attrs.foldLeft(
-        <option value={option.value}>{option.label}</option>)(_ % _)
+    option.attrs.foldLeft(<option value={option.value}>{option.label}</option>)(
+      _ % _)
 
   private final case class SelectableOptionWithNonce[+T](
-      value: T, nonce: String, label: String, attrs: ElemAttr*)
+      value: T,
+      nonce: String,
+      label: String,
+      attrs: ElemAttr*)
 
   /**
     * Create a select box based on the list with a default value and the function to be executed on
@@ -2004,10 +2116,11 @@ trait SHtml extends Loggable {
     * @param deflt -- the default value (or Empty if no default value)
     * @param func -- the function to execute on form submission
     */
-  def select(opts: Seq[SelectableOption[String]],
-             deflt: Box[String],
-             func: String => Any,
-             attrs: ElemAttr*): Elem =
+  def select(
+      opts: Seq[SelectableOption[String]],
+      deflt: Box[String],
+      func: String => Any,
+      attrs: ElemAttr*): Elem =
     select_*(opts, deflt, SFuncHolder(func), attrs: _*)
 
   /**
@@ -2024,10 +2137,11 @@ trait SHtml extends Loggable {
     */
   def selectElem[T](options: Seq[T], default: Box[T], attrs: ElemAttr*)(
       onSubmit: T => Any)(implicit f: PairStringPromoter[T]): Elem = {
-    selectObj[T](options.map(v => SelectableOption(v, f(v))),
-                 default,
-                 onSubmit,
-                 attrs: _*)
+    selectObj[T](
+      options.map(v => SelectableOption(v, f(v))),
+      default,
+      onSubmit,
+      attrs: _*)
   }
 
   /**
@@ -2042,14 +2156,13 @@ trait SHtml extends Loggable {
     * @param onSubmit -- the function to execute on form submission
     * @param f -- the function that converts a T to a Display String.
     */
-  def selectElem[T](options: Seq[T],
-                    settable: LiftValue[T],
-                    attrs: ElemAttr*)(
+  def selectElem[T](options: Seq[T], settable: LiftValue[T], attrs: ElemAttr*)(
       implicit f: PairStringPromoter[T]): Elem = {
-    selectObj[T](options.map(v => SelectableOption(v, f(v))),
-                 Full(settable.get),
-                 s => settable.set(s),
-                 attrs: _*)
+    selectObj[T](
+      options.map(v => SelectableOption(v, f(v))),
+      Full(settable.get),
+      s => settable.set(s),
+      attrs: _*)
   }
 
   /**
@@ -2060,12 +2173,13 @@ trait SHtml extends Loggable {
     * @param default -- the default value (or Empty if no default value)
     * @param onSubmit -- the function to execute on form submission
     */
-  def selectObj[T](options: Seq[SelectableOption[T]],
-                   default: Box[T],
-                   onSubmit: T => Any,
-                   attrs: ElemAttr*): Elem = {
-    val (nonces, defaultNonce, secureOnSubmit) = secureOptions(
-        options, default, onSubmit)
+  def selectObj[T](
+      options: Seq[SelectableOption[T]],
+      default: Box[T],
+      onSubmit: T => Any,
+      attrs: ElemAttr*): Elem = {
+    val (nonces, defaultNonce, secureOnSubmit) =
+      secureOptions(options, default, onSubmit)
 
     select_*(nonces, defaultNonce, secureOnSubmit, attrs: _*)
   }
@@ -2078,17 +2192,19 @@ trait SHtml extends Loggable {
     * @param deflt -- the default value (or Empty if no default value)
     * @param func -- the function to execute on form submission
     */
-  def select_*(opts: Seq[SelectableOption[String]],
-               deflt: Box[String],
-               func: AFuncHolder,
-               attrs: ElemAttr*): Elem = {
+  def select_*(
+      opts: Seq[SelectableOption[String]],
+      deflt: Box[String],
+      func: AFuncHolder,
+      attrs: ElemAttr*): Elem = {
     val vals = opts.map(_.value)
-    val testFunc = LFuncHolder(in =>
-                                 in.filter(v => vals.contains(v)) match {
-                                   case Nil => false
-                                   case xs => func(xs)
-                               },
-                               func.owner)
+    val testFunc = LFuncHolder(
+      in =>
+        in.filter(v => vals.contains(v)) match {
+          case Nil => false
+          case xs  => func(xs)
+      },
+      func.owner)
 
     attrs.foldLeft(fmapFunc(testFunc) { fn =>
       <select name={fn}>{opts.flatMap {
@@ -2107,10 +2223,11 @@ trait SHtml extends Loggable {
     * @param deflt -- the default value (or Empty if no default value)
     * @param func -- the function to execute on form submission
     */
-  def untrustedSelect(opts: Seq[SelectableOption[String]],
-                      deflt: Box[String],
-                      func: String => Any,
-                      attrs: ElemAttr*): Elem =
+  def untrustedSelect(
+      opts: Seq[SelectableOption[String]],
+      deflt: Box[String],
+      func: String => Any,
+      attrs: ElemAttr*): Elem =
     untrustedSelect_*(opts, deflt, SFuncHolder(func), attrs: _*)
 
   /**
@@ -2122,10 +2239,11 @@ trait SHtml extends Loggable {
     * @param deflt -- the default value (or Empty if no default value)
     * @param func -- the function to execute on form submission
     */
-  def untrustedSelect_*(opts: Seq[SelectableOption[String]],
-                        deflt: Box[String],
-                        func: AFuncHolder,
-                        attrs: ElemAttr*): Elem =
+  def untrustedSelect_*(
+      opts: Seq[SelectableOption[String]],
+      deflt: Box[String],
+      func: AFuncHolder,
+      attrs: ElemAttr*): Elem =
     fmapFunc(func) { funcName =>
       attrs.foldLeft(<select name={funcName}>{opts.flatMap {
         case option =>
@@ -2142,10 +2260,11 @@ trait SHtml extends Loggable {
     * @param deflt -- the default value (or Empty if no default value)
     * @param func -- the function to execute on form submission
     */
-  def untrustedMultiSelect(opts: Seq[SelectableOption[String]],
-                           deflt: Seq[String],
-                           func: List[String] => Any,
-                           attrs: ElemAttr*): NodeSeq =
+  def untrustedMultiSelect(
+      opts: Seq[SelectableOption[String]],
+      deflt: Seq[String],
+      func: List[String] => Any,
+      attrs: ElemAttr*): NodeSeq =
     untrustedMultiSelect_*(opts, deflt, LFuncHolder(func), attrs: _*)
 
   /**
@@ -2157,21 +2276,21 @@ trait SHtml extends Loggable {
     * @param deflt -- the default value (or Empty if no default value)
     * @param func -- the function to execute on form submission
     */
-  def untrustedMultiSelect_*(opts: Seq[SelectableOption[String]],
-                             deflt: Seq[String],
-                             lf: AFuncHolder,
-                             attrs: ElemAttr*): NodeSeq = {
+  def untrustedMultiSelect_*(
+      opts: Seq[SelectableOption[String]],
+      deflt: Seq[String],
+      lf: AFuncHolder,
+      attrs: ElemAttr*): NodeSeq = {
     val hiddenId = Helpers.nextFuncName
     fmapFunc(LFuncHolder(l => lf(l.filter(_ != hiddenId)))) { funcName =>
       NodeSeq.fromSeq(
-          List(
-              attrs.foldLeft(
-                  <select multiple="true" name={funcName}>{opts.flatMap {
+        List(
+          attrs.foldLeft(<select multiple="true" name={funcName}>{opts.flatMap {
             case option =>
               optionToElem(option) % selected(deflt.contains(option.value))
           }}</select>)(_ % _),
-              <input type="hidden" value={hiddenId} name={funcName}/>
-          )
+          <input type="hidden" value={hiddenId} name={funcName}/>
+        )
       )
     }
   }
@@ -2186,10 +2305,11 @@ trait SHtml extends Loggable {
     * @param func -- the function to execute on form submission
     * @param attrs -- select box attributes
     */
-  def ajaxUntrustedSelect(opts: Seq[SelectableOption[String]],
-                          deflt: Box[String],
-                          func: String => JsCmd,
-                          attrs: (String, String)*): Elem =
+  def ajaxUntrustedSelect(
+      opts: Seq[SelectableOption[String]],
+      deflt: Box[String],
+      func: String => JsCmd,
+      attrs: (String, String)*): Elem =
     ajaxUntrustedSelect_*(opts, deflt, Empty, SFuncHolder(func), attrs: _*)
 
   /**
@@ -2203,13 +2323,18 @@ trait SHtml extends Loggable {
     * @param func -- the function to execute on form submission
     * @param attrs -- select box attributes
     */
-  def ajaxUntrustedSelect(opts: Seq[SelectableOption[String]],
-                          deflt: Box[String],
-                          jsFunc: Call,
-                          func: String => JsCmd,
-                          attrs: (String, String)*): Elem =
+  def ajaxUntrustedSelect(
+      opts: Seq[SelectableOption[String]],
+      deflt: Box[String],
+      jsFunc: Call,
+      func: String => JsCmd,
+      attrs: (String, String)*): Elem =
     ajaxUntrustedSelect_*(
-        opts, deflt, Full(jsFunc), SFuncHolder(func), attrs: _*)
+      opts,
+      deflt,
+      Full(jsFunc),
+      SFuncHolder(func),
+      attrs: _*)
 
   /**
     * Create a select box based on the list with a default value and the function to be executed on
@@ -2222,25 +2347,27 @@ trait SHtml extends Loggable {
     * @param func -- the function to execute on form submission
     * @param attrs -- select box attributes
     */
-  private def ajaxUntrustedSelect_*(opts: Seq[SelectableOption[String]],
-                                    deflt: Box[String],
-                                    jsFunc: Box[Call],
-                                    func: AFuncHolder,
-                                    attrs: (String, String)*): Elem = {
+  private def ajaxUntrustedSelect_*(
+      opts: Seq[SelectableOption[String]],
+      deflt: Box[String],
+      jsFunc: Box[Call],
+      func: AFuncHolder,
+      attrs: (String, String)*): Elem = {
     val raw = (funcName: String, value: String) =>
       JsRaw(
-          "'" + funcName + "=' + this.options[" + value +
+        "'" + funcName + "=' + this.options[" + value +
           ".selectedIndex].value")
     val key = formFuncName
 
     val vals = opts.map(_.value)
 
-    val testFunc = LFuncHolder(in =>
-                                 in match {
-                                   case Nil => false
-                                   case xs => func(xs)
-                               },
-                               func.owner)
+    val testFunc = LFuncHolder(
+      in =>
+        in match {
+          case Nil => false
+          case xs  => func(xs)
+      },
+      func.owner)
     fmapFunc(contextFuncBuilder(testFunc)) {
       import net.liftweb.http.js.JsCmds.JsCrVar
       funcName =>
@@ -2248,23 +2375,23 @@ trait SHtml extends Loggable {
             case option =>
               optionToElem(option) % selected(deflt.exists(_ == option.value))
           } }</select>)(_ % _)) %
-        ("onchange" ->
+          ("onchange" ->
             (jsFunc match {
-                  case Full(f) =>
-                    JsCrVar(key, JsRaw("this")) & deferCall(raw(funcName, key),
-                                                            f)
-                  case _ => makeAjaxCall(raw(funcName, "this"))
-                }))
+              case Full(f) =>
+                JsCrVar(key, JsRaw("this")) & deferCall(raw(funcName, key), f)
+              case _ => makeAjaxCall(raw(funcName, "this"))
+            }))
     }
   }
 
   private def selected(in: Boolean) =
     if (in) new UnprefixedAttribute("selected", "selected", Null) else Null
 
-  def multiSelect(opts: Seq[SelectableOption[String]],
-                  deflt: Seq[String],
-                  func: List[String] => Any,
-                  attrs: ElemAttr*): Elem =
+  def multiSelect(
+      opts: Seq[SelectableOption[String]],
+      deflt: Seq[String],
+      func: List[String] => Any,
+      attrs: ElemAttr*): Elem =
     multiSelect_*(opts, deflt, LFuncHolder(func), attrs: _*)
 
   /**
@@ -2277,10 +2404,11 @@ trait SHtml extends Loggable {
     */
   def multiSelectElem[T](options: Seq[T], default: Seq[T], attrs: ElemAttr*)(
       onSubmit: List[T] => Any)(implicit f: PairStringPromoter[T]): Elem = {
-    multiSelectObj[T](options.map(v => SelectableOption(v, f(v))),
-                      default,
-                      onSubmit,
-                      attrs: _*)
+    multiSelectObj[T](
+      options.map(v => SelectableOption(v, f(v))),
+      default,
+      onSubmit,
+      attrs: _*)
   }
 
   /**
@@ -2291,28 +2419,31 @@ trait SHtml extends Loggable {
     * @param default -- the default value (or Empty if no default value)
     * @param onSubmit -- the function to execute on form submission
     */
-  def multiSelectObj[T](options: Seq[SelectableOption[T]],
-                        default: Seq[T],
-                        onSubmit: List[T] => Any,
-                        attrs: ElemAttr*): Elem = {
-    val (nonces, defaultNonce, secureOnSubmit) = secureMultiOptions(
-        options, default, onSubmit)
+  def multiSelectObj[T](
+      options: Seq[SelectableOption[T]],
+      default: Seq[T],
+      onSubmit: List[T] => Any,
+      attrs: ElemAttr*): Elem = {
+    val (nonces, defaultNonce, secureOnSubmit) =
+      secureMultiOptions(options, default, onSubmit)
 
     multiSelect_*(nonces, defaultNonce, secureOnSubmit, attrs: _*)
   }
 
-  private[http] def secureMultiOptions[T](options: Seq[SelectableOption[T]],
-                                          default: Seq[T],
-                                          onSubmit: List[T] => Any)
+  private[http] def secureMultiOptions[T](
+      options: Seq[SelectableOption[T]],
+      default: Seq[T],
+      onSubmit: List[T] => Any)
     : (Seq[SelectableOption[String]], Seq[String], AFuncHolder) = {
     val o2 = options.toList
 
     val secure: List[SelectableOptionWithNonce[T]] = o2.map {
       selectableOption =>
-        SelectableOptionWithNonce(selectableOption.value,
-                                  randomString(20),
-                                  selectableOption.label,
-                                  selectableOption.attrs: _*)
+        SelectableOptionWithNonce(
+          selectableOption.value,
+          randomString(20),
+          selectableOption.label,
+          selectableOption.attrs: _*)
     }
 
     val sm: Map[String, T] = Map(secure.map(v => (v.nonce, v.value)): _*)
@@ -2323,9 +2454,10 @@ trait SHtml extends Loggable {
 
     val nonces: List[SelectableOption[String]] = secure.map {
       selectableOptionWithNonce =>
-        SelectableOption(selectableOptionWithNonce.nonce,
-                         selectableOptionWithNonce.label,
-                         selectableOptionWithNonce.attrs: _*)
+        SelectableOption(
+          selectableOptionWithNonce.nonce,
+          selectableOptionWithNonce.label,
+          selectableOptionWithNonce.attrs: _*)
     }.toList
 
     def process(info: List[String]): Unit = onSubmit(info.flatMap(sm.get))
@@ -2333,34 +2465,36 @@ trait SHtml extends Loggable {
     (nonces, defaultNonce, LFuncHolder(process))
   }
 
-  def multiSelect_*(opts: Seq[SelectableOption[String]],
-                    deflt: Seq[String],
-                    func: AFuncHolder,
-                    attrs: ElemAttr*): Elem =
+  def multiSelect_*(
+      opts: Seq[SelectableOption[String]],
+      deflt: Seq[String],
+      func: AFuncHolder,
+      attrs: ElemAttr*): Elem =
     fmapFunc(func)(
-        funcName =>
-          attrs.foldLeft(
-              <select multiple="true" name={funcName}>{opts.flatMap(o => optionToElem(o) % selected(deflt.contains(o.value)))}</select>)(
-              _ % _))
+      funcName =>
+        attrs.foldLeft(
+          <select multiple="true" name={funcName}>{opts.flatMap(o => optionToElem(o) % selected(deflt.contains(o.value)))}</select>)(
+          _ % _))
 
   def textarea(value: String, func: String => Any, attrs: ElemAttr*): Elem =
     textarea_*(value, SFuncHolder(func), attrs: _*)
 
-  def textareaElem(
-      settable: Settable { type ValueType = String }, attrs: ElemAttr*): Elem =
+  def textareaElem(settable: Settable { type ValueType = String }, attrs: ElemAttr*)
+    : Elem =
     textarea_*(settable.get, SFuncHolder(s => settable.set(s)), attrs: _*)
 
   def textarea_*(value: String, func: AFuncHolder, attrs: ElemAttr*): Elem =
     fmapFunc(func)(
-        funcName =>
-          attrs.foldLeft(
-              <textarea name={funcName}>{value match {case null => "" case s => s}}</textarea>)(
-              _ % _))
+      funcName =>
+        attrs.foldLeft(
+          <textarea name={funcName}>{value match {case null => "" case s => s}}</textarea>)(
+          _ % _))
 
-  def radio(opts: Seq[String],
-            deflt: Box[String],
-            func: String => Any,
-            attrs: ElemAttr*): ChoiceHolder[String] =
+  def radio(
+      opts: Seq[String],
+      deflt: Box[String],
+      func: String => Any,
+      attrs: ElemAttr*): ChoiceHolder[String] =
     radio_*(opts, deflt, SFuncHolder(func), attrs: _*)
 
   /**
@@ -2373,9 +2507,8 @@ trait SHtml extends Loggable {
 
     val hiddenId = Helpers.nextFuncName
 
-    fmapFunc(
-        LFuncHolder(lst =>
-              lst.filter(_ != hiddenId) match {
+    fmapFunc(LFuncHolder(lst =>
+      lst.filter(_ != hiddenId) match {
         case Nil => onSubmit(Empty)
         case x :: _ =>
           onSubmit(possible.filter(_._1 == x).headOption.map(_._2))
@@ -2383,20 +2516,20 @@ trait SHtml extends Loggable {
       {
         val items = possible.zipWithIndex.map {
           case ((id, value), idx) => {
-              val radio =
-                attrs.foldLeft(<input type="radio"
+            val radio =
+              attrs.foldLeft(<input type="radio"
                              name={name} value={id}/>)(_ % _) % checked(
-                    deflt.filter(_ == value).isDefined)
+                deflt.filter(_ == value).isDefined)
 
-              val elem =
-                if (idx == 0) {
-                  radio ++ <input type="hidden" value={hiddenId} name={name}/>
-                } else {
-                  radio
-                }
+            val elem =
+              if (idx == 0) {
+                radio ++ <input type="hidden" value={hiddenId} name={name}/>
+              } else {
+                radio
+              }
 
-              ChoiceItem(value, elem)
-            }
+            ChoiceItem(value, elem)
+          }
         }
 
         ChoiceHolder(items)
@@ -2404,18 +2537,18 @@ trait SHtml extends Loggable {
     }
   }
 
-  def radio_*(opts: Seq[String],
-              deflt: Box[String],
-              func: AFuncHolder,
-              attrs: ElemAttr*): ChoiceHolder[String] = {
+  def radio_*(
+      opts: Seq[String],
+      deflt: Box[String],
+      func: AFuncHolder,
+      attrs: ElemAttr*): ChoiceHolder[String] = {
     fmapFunc(func) { name =>
       val itemList = opts.map(
-          v =>
-            ChoiceItem(
-                v,
-                attrs.foldLeft(<input type="radio" name={name} value={v}/>)(
-                    _ % _) % checked(
-                    deflt.filter((s: String) => s == v).isDefined)))
+        v =>
+          ChoiceItem(
+            v,
+            attrs.foldLeft(<input type="radio" name={name} value={v}/>)(_ % _) % checked(
+              deflt.filter((s: String) => s == v).isDefined)))
       ChoiceHolder(itemList)
     }
   }
@@ -2448,7 +2581,7 @@ trait SHtml extends Loggable {
     *     "#some-emails" -> "Some emails"
     *   )
     * }
-    * 
+    *
     * val submitHandler:Box[String] => Unit = { box =>
     *   println("We got a box!! "+box)
     * }
@@ -2466,16 +2599,17 @@ trait SHtml extends Loggable {
       onSubmit(radioOptions.find(_._2 == selection).map(_._1))
     }
 
-    S.fmapFunc(selectionHandler _)(funcName =>
-          {
-        cssSelToValue.map {
+    S.fmapFunc(selectionHandler _)(funcName => {
+      cssSelToValue
+        .map {
           case (cssSel, value) =>
             s"$cssSel [name]" #> funcName & s"$cssSel [value]" #> radioOptions(
-                value) & s"$cssSel [checked]" #> {
+              value) & s"$cssSel [checked]" #> {
               if (initialValue === value) Some("true")
               else None
             }
-        }.reduceLeft(_ & _)
+        }
+        .reduceLeft(_ & _)
     })
   }
 
@@ -2528,7 +2662,7 @@ trait SHtml extends Loggable {
 
     /** Convert a ChoiceItem into a span containing the control and the toString of the key */
     var htmlize: ChoiceItem[_] => NodeSeq = c =>
-      ( <span>{c.xhtml}&nbsp;{c.key.toString}<br/> </span>)
+      (<span>{c.xhtml}&nbsp;{c.key.toString}<br/> </span>)
   }
 
   private def checked(in: Boolean) =
@@ -2536,7 +2670,7 @@ trait SHtml extends Loggable {
 
   private def setId(in: Box[String]) = in match {
     case Full(id) => new UnprefixedAttribute("id", Text(id), Null);
-    case _ => Null
+    case _        => Null
   }
 
   /**
@@ -2548,33 +2682,31 @@ trait SHtml extends Loggable {
     * @param attrs sequence of attributes to apply to each checkbox input element
     * @return ChoiceHolder containing the checkboxes and values in order
     */
-  def checkbox[T](possible: Seq[T],
-                  actual: Seq[T],
-                  func: Seq[T] => Any,
-                  attrs: ElemAttr*): ChoiceHolder[T] = {
+  def checkbox[T](
+      possible: Seq[T],
+      actual: Seq[T],
+      func: Seq[T] => Any,
+      attrs: ElemAttr*): ChoiceHolder[T] = {
     fmapFunc {
-      LFuncHolder(
-          (selectedChoiceValues: List[String]) =>
-            {
-          val validSelectedIndicies =
-            selectedChoiceValues.map(_.toInt).filter(possible.isDefinedAt(_))
-          val selectedValues = validSelectedIndicies.map(possible(_))
+      LFuncHolder((selectedChoiceValues: List[String]) => {
+        val validSelectedIndicies =
+          selectedChoiceValues.map(_.toInt).filter(possible.isDefinedAt(_))
+        val selectedValues = validSelectedIndicies.map(possible(_))
 
-          func(selectedValues)
-          true
+        func(selectedValues)
+        true
       })
     } { name =>
-      ChoiceHolder(
-          possible.toList.zipWithIndex.map { possibleChoice =>
+      ChoiceHolder(possible.toList.zipWithIndex.map { possibleChoice =>
         ChoiceItem(
-            possibleChoice._1,
-            attrs.foldLeft(
-                <input type="checkbox" name={name} value={possibleChoice._2.toString}/>)(
-                _ % _) % checked(actual.contains(possibleChoice._1)) ++ {
-              if (possibleChoice._2 == 0)
-                <input type="hidden" name={name} value="-1"/>
-              else Nil
-            }
+          possibleChoice._1,
+          attrs.foldLeft(
+            <input type="checkbox" name={name} value={possibleChoice._2.toString}/>)(
+            _ % _) % checked(actual.contains(possibleChoice._1)) ++ {
+            if (possibleChoice._2 == 0)
+              <input type="hidden" name={name} value="-1"/>
+            else Nil
+          }
         )
       })
     }
@@ -2583,8 +2715,7 @@ trait SHtml extends Loggable {
   /**
     * Defines a new checkbox for the Settable
     */
-  def checkboxElem(
-      settable: Settable { type ValueType = Boolean }, attrs: ElemAttr*)
+  def checkboxElem(settable: Settable { type ValueType = Boolean }, attrs: ElemAttr*)
     : NodeSeq = {
     checkbox_id(settable.get, s => settable.set(s), Empty, attrs: _*)
   }
@@ -2594,51 +2725,55 @@ trait SHtml extends Loggable {
     * checkbox is submitted.
     */
   def checkbox(
-      value: Boolean, func: Boolean => Any, attrs: ElemAttr*): NodeSeq = {
+      value: Boolean,
+      func: Boolean => Any,
+      attrs: ElemAttr*): NodeSeq = {
     checkbox_id(value, func, Empty, attrs: _*)
   }
 
   /**
     * Defines a new checkbox for the Settable
     */
-  def checkbox_id(
-      settable: Settable { type ValueType = Boolean }, id: Box[String], attrs: ElemAttr*)
+  def checkbox_id(settable: Settable { type ValueType = Boolean }, id: Box[String], attrs: ElemAttr*)
     : NodeSeq = {
     def from(f: Boolean => Any): List[String] => Boolean =
-      (in: List[String]) =>
-        {
-          f(in.exists(toBoolean(_)))
-          true
+      (in: List[String]) => {
+        f(in.exists(toBoolean(_)))
+        true
       }
     checkbox_*(
-        settable.get, LFuncHolder(from(s => settable.set(s))), id, attrs: _*)
+      settable.get,
+      LFuncHolder(from(s => settable.set(s))),
+      id,
+      attrs: _*)
   }
 
   /**
     * Defines a new checkbox set to  { @code value } and running  { @code func } when the
     * checkbox is submitted. Has an id of  { @code id }.
     */
-  def checkbox_id(value: Boolean,
-                  func: Boolean => Any,
-                  id: Box[String],
-                  attrs: ElemAttr*): NodeSeq = {
+  def checkbox_id(
+      value: Boolean,
+      func: Boolean => Any,
+      id: Box[String],
+      attrs: ElemAttr*): NodeSeq = {
     def from(f: Boolean => Any): List[String] => Boolean =
-      (in: List[String]) =>
-        {
-          f(in.exists(toBoolean(_)))
-          true
+      (in: List[String]) => {
+        f(in.exists(toBoolean(_)))
+        true
       }
     checkbox_*(value, LFuncHolder(from(func)), id, attrs: _*)
   }
 
-  def checkbox_*(value: Boolean,
-                 func: AFuncHolder,
-                 id: Box[String],
-                 attrs: ElemAttr*): NodeSeq = {
+  def checkbox_*(
+      value: Boolean,
+      func: AFuncHolder,
+      id: Box[String],
+      attrs: ElemAttr*): NodeSeq = {
     fmapFunc(func)(
-        name =>
-          (attrs.foldLeft(<input type="checkbox" name={name} value="true"/>)(
-                  _ % _) % checked(value) % setId(id)) ++
+      name =>
+        (attrs.foldLeft(<input type="checkbox" name={name} value="true"/>)(
+          _ % _) % checked(value) % setId(id)) ++
           (<input type="hidden" name={name} value="false"/>))
   }
 }
@@ -2661,14 +2796,18 @@ object AjaxContext {
 }
 
 case class AjaxContext(
-    success: Box[String], failure: Box[String], responseType: AjaxType.Value)
+    success: Box[String],
+    failure: Box[String],
+    responseType: AjaxType.Value)
 
 class JsContext(
-    override val success: Box[String], override val failure: Box[String])
+    override val success: Box[String],
+    override val failure: Box[String])
     extends AjaxContext(success, failure, AjaxType.JavaScript)
 
 class JsonContext(
-    override val success: Box[String], override val failure: Box[String])
+    override val success: Box[String],
+    override val failure: Box[String])
     extends AjaxContext(success, failure, AjaxType.JSON)
 
 object Html5ElemAttr {
@@ -2767,7 +2906,7 @@ final case class NodeSeqFunc(f: NodeSeq => NodeSeq)
 
 final case class SeqNodeSeqFunc(f: Seq[NodeSeq => NodeSeq])
     extends NodeSeqFuncOrSeqNodeSeqFunc {
-  def apply(ns: NodeSeq): NodeSeq = f.flatMap(_ (ns))
+  def apply(ns: NodeSeq): NodeSeq = f.flatMap(_(ns))
 }
 
 /**

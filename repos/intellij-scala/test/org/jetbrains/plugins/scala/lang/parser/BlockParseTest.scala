@@ -22,12 +22,12 @@ class BlockParseTest extends SimpleTestCase {
       .createHolder(context.getManager, context)
       .getTreeElement
     val builder: ScalaPsiBuilderImpl = new ScalaPsiBuilderImpl(
-        PsiBuilderFactory.getInstance.createBuilder(
-            context.getProject,
-            holder,
-            new ScalaLexer,
-            ScalaFileType.SCALA_LANGUAGE,
-            s)
+      PsiBuilderFactory.getInstance.createBuilder(
+        context.getProject,
+        holder,
+        new ScalaLexer,
+        ScalaFileType.SCALA_LANGUAGE,
+        s)
     )
     BlockExpr.parse(builder)
     val node = builder.getTreeBuilt
@@ -42,7 +42,7 @@ class BlockParseTest extends SimpleTestCase {
 
   def testBlock() {
     doTest(
-        """{
+      """{
   val a = new df
   val agaga =  agadg+"/"+aa
   val agd = try {
@@ -59,7 +59,7 @@ class BlockParseTest extends SimpleTestCase {
 
   def testBlock2() {
     doTest(
-        """{
+      """{
     PsiDocumentManager.getInstance(project).commitAllDocuments()
     if (!CodeInsightUtilBase.prepareFileForWrite(file)) return
     IdeDocumentHistory.getInstance(project).includeCurrentPlaceAsChangePlace()
@@ -103,7 +103,7 @@ class BlockParseTest extends SimpleTestCase {
 
   def testBlock3() {
     doTest(
-        """{
+      """{
       var asdga = adf
       val adf = """"" + """"
         gads P { fasdf A, B; }
@@ -135,7 +135,7 @@ class BlockParseTest extends SimpleTestCase {
 
   def testBlock4() {
     doTest(
-        """{
+      """{
     val asdfadf = fadfad.:
     fadfa {
       dafsdfa {

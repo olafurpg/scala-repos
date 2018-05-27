@@ -26,14 +26,16 @@ import scala.util.parsing.input.CharArrayReader.EofCh
 import org.apache.spark.sql.catalyst.plans.logical._
 
 private[sql] abstract class AbstractSparkSQLParser
-    extends StandardTokenParsers with PackratParsers with ParserInterface {
+    extends StandardTokenParsers
+    with PackratParsers
+    with ParserInterface {
 
   def parsePlan(input: String): LogicalPlan = synchronized {
     // Initialize the Keywords.
     initLexical
     phrase(start)(new lexical.Scanner(input)) match {
       case Success(plan, _) => plan
-      case failureOrError => sys.error(failureOrError.toString)
+      case failureOrError   => sys.error(failureOrError.toString)
     }
   }
   /* One time initialization of lexical.This avoid reinitialization of  lexical in parse method */
@@ -68,8 +70,9 @@ private[sql] abstract class AbstractSparkSQLParser
   // Returns the rest of the input string that are not parsed yet
   protected lazy val restInput: Parser[String] = new Parser[String] {
     def apply(in: Input): ParseResult[String] =
-      Success(in.source.subSequence(in.offset, in.source.length()).toString,
-              in.drop(in.source.length()))
+      Success(
+        in.source.subSequence(in.offset, in.source.length()).toString,
+        in.drop(in.source.length()))
   }
 }
 
@@ -88,8 +91,8 @@ class SqlLexical extends StdLexical {
   def normalizeKeyword(str: String): String = str.toLowerCase
 
   delimiters +=
-  ("@", "*", "+", "-", "<", "=", "<>", "!=", "<=", ">=", ">", "/", "(", ")",
-      ",", ";", "%", "{", "}", ":", "[", "]", ".", "&", "|", "^", "~", "<=>")
+    ("@", "*", "+", "-", "<", "=", "<>", "!=", "<=", ">=", ">", "/", "(", ")",
+    ",", ";", "%", "{", "}", ":", "[", "]", ".", "&", "|", "^", "~", "<=>")
 
   protected override def processIdent(name: String) = {
     val token = normalizeKeyword(name)
@@ -98,25 +101,25 @@ class SqlLexical extends StdLexical {
 
   override lazy val token: Parser[Token] =
     (rep1(digit) ~ scientificNotation ^^ {
-          case i ~ s => DecimalLit(i.mkString + s)
-        } | '.' ~> (rep1(digit) ~ scientificNotation) ^^ {
-          case i ~ s => DecimalLit("0." + i.mkString + s)
-        } | rep1(digit) ~ ('.' ~> digit.*) ~ scientificNotation ^^ {
-          case i1 ~ i2 ~ s => DecimalLit(i1.mkString + "." + i2.mkString + s)
-        } | digit.* ~ identChar ~ (identChar | digit).* ^^ {
-          case first ~ middle ~ rest =>
-            processIdent((first ++ (middle :: rest)).mkString)
-        } | rep1(digit) ~ ('.' ~> digit.*).? ^^ {
-          case i ~ None => NumericLit(i.mkString)
-          case i ~ Some(d) => DecimalLit(i.mkString + "." + d.mkString)
-        } | '\'' ~> chrExcept('\'', '\n', EofCh).* <~ '\'' ^^ {
-          case chars => StringLit(chars mkString "")
-        } | '"' ~> chrExcept('"', '\n', EofCh).* <~ '"' ^^ {
-          case chars => StringLit(chars mkString "")
-        } | '`' ~> chrExcept('`', '\n', EofCh).* <~ '`' ^^ {
-          case chars => Identifier(chars mkString "")
-        } | EofCh ^^^ EOF | '\'' ~> failure("unclosed string literal") | '"' ~> failure(
-            "unclosed string literal") | delim | failure("illegal character"))
+      case i ~ s => DecimalLit(i.mkString + s)
+    } | '.' ~> (rep1(digit) ~ scientificNotation) ^^ {
+      case i ~ s => DecimalLit("0." + i.mkString + s)
+    } | rep1(digit) ~ ('.' ~> digit.*) ~ scientificNotation ^^ {
+      case i1 ~ i2 ~ s => DecimalLit(i1.mkString + "." + i2.mkString + s)
+    } | digit.* ~ identChar ~ (identChar | digit).* ^^ {
+      case first ~ middle ~ rest =>
+        processIdent((first ++ (middle :: rest)).mkString)
+    } | rep1(digit) ~ ('.' ~> digit.*).? ^^ {
+      case i ~ None    => NumericLit(i.mkString)
+      case i ~ Some(d) => DecimalLit(i.mkString + "." + d.mkString)
+    } | '\'' ~> chrExcept('\'', '\n', EofCh).* <~ '\'' ^^ {
+      case chars => StringLit(chars mkString "")
+    } | '"' ~> chrExcept('"', '\n', EofCh).* <~ '"' ^^ {
+      case chars => StringLit(chars mkString "")
+    } | '`' ~> chrExcept('`', '\n', EofCh).* <~ '`' ^^ {
+      case chars => Identifier(chars mkString "")
+    } | EofCh ^^^ EOF | '\'' ~> failure("unclosed string literal") | '"' ~> failure(
+      "unclosed string literal") | delim | failure("illegal character"))
 
   override def identChar: Parser[Elem] = letter | elem('_')
 
@@ -127,7 +130,7 @@ class SqlLexical extends StdLexical {
 
   override def whitespace: Parser[Any] =
     (whitespaceChar | '/' ~ '*' ~ comment | '/' ~ '/' ~ chrExcept(EofCh, '\n').* | '#' ~ chrExcept(
-            EofCh,
-            '\n').* | '-' ~ '-' ~ chrExcept(EofCh, '\n').* | '/' ~ '*' ~ failure(
-            "unclosed comment")).*
+      EofCh,
+      '\n').* | '-' ~ '-' ~ chrExcept(EofCh, '\n').* | '/' ~ '*' ~ failure(
+      "unclosed comment")).*
 }

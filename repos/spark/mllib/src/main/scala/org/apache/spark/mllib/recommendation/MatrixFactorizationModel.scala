@@ -57,7 +57,9 @@ class MatrixFactorizationModel @Since("0.8.0")(
     @Since("0.8.0") val rank: Int,
     @Since("0.8.0") val userFeatures: RDD[(Int, Array[Double])],
     @Since("0.8.0") val productFeatures: RDD[(Int, Array[Double])])
-    extends Saveable with Serializable with Logging {
+    extends Saveable
+    with Serializable
+    with Logging {
 
   require(rank > 0)
   validateFeatures("User", userFeatures)
@@ -65,11 +67,14 @@ class MatrixFactorizationModel @Since("0.8.0")(
 
   /** Validates factors and warns users if there are performance concerns. */
   private def validateFeatures(
-      name: String, features: RDD[(Int, Array[Double])]): Unit = {
-    require(features.first()._2.length == rank,
-            s"$name feature dimension does not match the rank $rank.")
+      name: String,
+      features: RDD[(Int, Array[Double])]): Unit = {
+    require(
+      features.first()._2.length == rank,
+      s"$name feature dimension does not match the rank $rank.")
     if (features.partitioner.isEmpty) {
-      logWarning(s"$name factor does not have a partitioner. " +
+      logWarning(
+        s"$name factor does not have a partitioner. " +
           "Prediction on individual records could be slow.")
     }
     if (features.getStorageLevel == StorageLevel.NONE) {
@@ -98,19 +103,19 @@ class MatrixFactorizationModel @Since("0.8.0")(
     val zeroCounterProduct = new HyperLogLogPlus(4, 0)
     val aggregated =
       usersProducts.aggregate((zeroCounterUser, zeroCounterProduct))(
-          (hllTuple: (HyperLogLogPlus, HyperLogLogPlus), v: (Int, Int)) =>
-            {
-              hllTuple._1.offer(v._1)
-              hllTuple._2.offer(v._2)
-              hllTuple
-          },
-          (h1: (HyperLogLogPlus,
-          HyperLogLogPlus), h2: (HyperLogLogPlus, HyperLogLogPlus)) =>
-            {
-              h1._1.addAll(h2._1)
-              h1._2.addAll(h2._2)
-              h1
-          })
+        (hllTuple: (HyperLogLogPlus, HyperLogLogPlus), v: (Int, Int)) => {
+          hllTuple._1.offer(v._1)
+          hllTuple._2.offer(v._2)
+          hllTuple
+        },
+        (
+            h1: (HyperLogLogPlus, HyperLogLogPlus),
+            h2: (HyperLogLogPlus, HyperLogLogPlus)) => {
+          h1._1.addAll(h2._1)
+          h1._2.addAll(h2._2)
+          h1
+        }
+      )
     (aggregated._1.cardinality(), aggregated._2.cardinality())
   }
 
@@ -131,7 +136,7 @@ class MatrixFactorizationModel @Since("0.8.0")(
     // Here we calculate approximate numbers of users and products. Then we decide the
     // partitions should be based on users or products.
     val (usersCount, productsCount) = countApproxDistinctUserProduct(
-        usersProducts)
+      usersProducts)
 
     if (usersCount < productsCount) {
       val users = userFeatures.join(usersProducts).map {
@@ -139,9 +144,10 @@ class MatrixFactorizationModel @Since("0.8.0")(
       }
       users.join(productFeatures).map {
         case (product, ((user, uFeatures), pFeatures)) =>
-          Rating(user,
-                 product,
-                 blas.ddot(uFeatures.length, uFeatures, 1, pFeatures, 1))
+          Rating(
+            user,
+            product,
+            blas.ddot(uFeatures.length, uFeatures, 1, pFeatures, 1))
       }
     } else {
       val products = productFeatures.join(usersProducts.map(_.swap)).map {
@@ -149,9 +155,10 @@ class MatrixFactorizationModel @Since("0.8.0")(
       }
       products.join(userFeatures).map {
         case (user, ((product, pFeatures), uFeatures)) =>
-          Rating(user,
-                 product,
-                 blas.ddot(uFeatures.length, uFeatures, 1, pFeatures, 1))
+          Rating(
+            user,
+            product,
+            blas.ddot(uFeatures.length, uFeatures, 1, pFeatures, 1))
       }
     }
   }
@@ -160,8 +167,8 @@ class MatrixFactorizationModel @Since("0.8.0")(
     * Java-friendly version of [[MatrixFactorizationModel.predict]].
     */
   @Since("1.2.0")
-  def predict(usersProducts: JavaPairRDD[JavaInteger, JavaInteger])
-    : JavaRDD[Rating] = {
+  def predict(
+      usersProducts: JavaPairRDD[JavaInteger, JavaInteger]): JavaRDD[Rating] = {
     predict(usersProducts.rdd.asInstanceOf[RDD[(Int, Int)]]).toJavaRDD()
   }
 
@@ -271,9 +278,10 @@ object MatrixFactorizationModel extends Loader[MatrixFactorizationModel] {
   /**
     * Makes recommendations for a single user (or product).
     */
-  private def recommend(recommendToFeatures: Array[Double],
-                        recommendableFeatures: RDD[(Int, Array[Double])],
-                        num: Int): Array[(Int, Double)] = {
+  private def recommend(
+      recommendToFeatures: Array[Double],
+      recommendableFeatures: RDD[(Int, Array[Double])],
+      num: Int): Array[(Int, Double)] = {
     val scored = recommendableFeatures.map {
       case (id, features) =>
         (id, blas.ddot(features.length, recommendToFeatures, 1, features, 1))
@@ -290,10 +298,11 @@ object MatrixFactorizationModel extends Loader[MatrixFactorizationModel] {
     * @return an RDD of (srcId: Int, recommendations), where recommendations are stored as an array
     *         of (dstId, rating) pairs.
     */
-  private def recommendForAll(rank: Int,
-                              srcFeatures: RDD[(Int, Array[Double])],
-                              dstFeatures: RDD[(Int, Array[Double])],
-                              num: Int): RDD[(Int, Array[(Int, Double)])] = {
+  private def recommendForAll(
+      rank: Int,
+      srcFeatures: RDD[(Int, Array[Double])],
+      dstFeatures: RDD[(Int, Array[Double])],
+      num: Int): RDD[(Int, Array[(Int, Double)])] = {
     val srcBlocks = blockify(rank, srcFeatures)
     val dstBlocks = blockify(rank, dstFeatures)
     val ratings = srcBlocks.cartesian(dstBlocks).flatMap {
@@ -348,7 +357,9 @@ object MatrixFactorizationModel extends Loader[MatrixFactorizationModel] {
     * @return  Model instance
     */
   @Since("1.3.0")
-  override def load(sc: SparkContext, path: String): MatrixFactorizationModel = {
+  override def load(
+      sc: SparkContext,
+      path: String): MatrixFactorizationModel = {
     val (loadedClassName, formatVersion, _) = loadMetadata(sc, path)
     val classNameV1_0 = SaveLoadV1_0.thisClassName
     (loadedClassName, formatVersion) match {
@@ -356,7 +367,7 @@ object MatrixFactorizationModel extends Loader[MatrixFactorizationModel] {
         SaveLoadV1_0.load(sc, path)
       case _ =>
         throw new IOException(
-            "MatrixFactorizationModel.load did not recognize model with" +
+          "MatrixFactorizationModel.load did not recognize model with" +
             s"(class: $loadedClassName, version: $formatVersion). Supported:\n" +
             s"  ($classNameV1_0, 1.0)")
     }
@@ -377,8 +388,10 @@ object MatrixFactorizationModel extends Loader[MatrixFactorizationModel] {
       val sc = model.userFeatures.sparkContext
       val sqlContext = SQLContext.getOrCreate(sc)
       import sqlContext.implicits._
-      val metadata = compact(render(("class" -> thisClassName) ~
-              ("version" -> thisFormatVersion) ~ ("rank" -> model.rank)))
+      val metadata = compact(
+        render(
+          ("class" -> thisClassName) ~
+            ("version" -> thisFormatVersion) ~ ("rank" -> model.rank)))
       sc.parallelize(Seq(metadata), 1).saveAsTextFile(metadataPath(path))
       model.userFeatures.toDF("id", "features").write.parquet(userPath(path))
       model.productFeatures

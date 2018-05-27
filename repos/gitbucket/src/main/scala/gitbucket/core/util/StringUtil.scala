@@ -40,8 +40,8 @@ object StringUtil {
     */
   def convertFromByteArray(content: Array[Byte]): String =
     IOUtils.toString(
-        new BOMInputStream(new java.io.ByteArrayInputStream(content)),
-        detectEncoding(content))
+      new BOMInputStream(new java.io.ByteArrayInputStream(content)),
+      detectEncoding(content))
 
   def detectEncoding(content: Array[Byte]): String =
     defining(new UniversalDetector(null)) { detector =>
@@ -49,7 +49,7 @@ object StringUtil {
       detector.dataEnd()
       detector.getDetectedCharset match {
         case null => "UTF-8"
-        case e => e
+        case e    => e
       }
     }
 

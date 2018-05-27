@@ -38,6 +38,6 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class PixelFormatTypeSpec
     extends SFXEnumDelegateSpec[jfxsi.PixelFormat.Type, PixelFormat.Type](
-        classOf[jfxsi.PixelFormat.Type],
-        classOf[PixelFormat.Type],
-        PixelFormat.Type)
+      classOf[jfxsi.PixelFormat.Type],
+      classOf[PixelFormat.Type],
+      PixelFormat.Type)

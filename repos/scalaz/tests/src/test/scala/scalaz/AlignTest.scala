@@ -14,12 +14,12 @@ object AlignTest extends SpecLite {
     val min = xs.size min ys.size
     xys.length must_=== (max)
     xys.takeWhile { case (x, y) => x.isDefined && y.isDefined }.size must_===
-    (min)
+      (min)
     val dropped: List[(Option[Int], Option[Int])] = xys.dropWhile {
       case (x, y) => x.isDefined && y.isDefined
     }
     if (xs.size > ys.size)
-      dropped.foreach(_ mustMatch { case (Some(_), None) => true })
+      dropped.foreach(_ mustMatch { case (Some(_), None)    => true })
     else dropped.foreach(_ mustMatch { case (None, Some(_)) => true })
   }
 

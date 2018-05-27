@@ -50,21 +50,23 @@ case class HealthCheck(
 
   def mergeFromProto(proto: Protos.HealthCheckDefinition): HealthCheck =
     HealthCheck(
-        path = if (proto.hasPath) Some(proto.getPath) else None,
-        protocol = proto.getProtocol,
-        portIndex = if (proto.hasPortIndex) Some(proto.getPortIndex)
-          else if (!proto.hasPort && proto.getProtocol != Protocol.COMMAND)
-            Some(0) // backward compatibility, this used to be the default value in marathon.proto
-          else None,
-        command = if (proto.hasCommand)
-            Some(Command("").mergeFromProto(proto.getCommand))
-          else None,
-        gracePeriod = proto.getGracePeriodSeconds.seconds,
-        timeout = proto.getTimeoutSeconds.seconds,
-        interval = proto.getIntervalSeconds.seconds,
-        maxConsecutiveFailures = proto.getMaxConsecutiveFailures,
-        ignoreHttp1xx = proto.getIgnoreHttp1Xx,
-        port = if (proto.hasPort) Some(proto.getPort) else None
+      path = if (proto.hasPath) Some(proto.getPath) else None,
+      protocol = proto.getProtocol,
+      portIndex =
+        if (proto.hasPortIndex) Some(proto.getPortIndex)
+        else if (!proto.hasPort && proto.getProtocol != Protocol.COMMAND)
+          Some(0) // backward compatibility, this used to be the default value in marathon.proto
+        else None,
+      command =
+        if (proto.hasCommand)
+          Some(Command("").mergeFromProto(proto.getCommand))
+        else None,
+      gracePeriod = proto.getGracePeriodSeconds.seconds,
+      timeout = proto.getTimeoutSeconds.seconds,
+      interval = proto.getIntervalSeconds.seconds,
+      maxConsecutiveFailures = proto.getMaxConsecutiveFailures,
+      ignoreHttp1xx = proto.getIgnoreHttp1Xx,
+      port = if (proto.hasPort) Some(proto.getPort) else None
     )
 
   def mergeFromProto(bytes: Array[Byte]): HealthCheck =
@@ -75,18 +77,18 @@ case class HealthCheck(
     val builder = this.protocol match {
       case Protocol.COMMAND =>
         assert(
-            command.isDefined,
-            "A command is required when using the COMMAND health check protocol."
+          command.isDefined,
+          "A command is required when using the COMMAND health check protocol."
         )
         MesosProtos.HealthCheck.newBuilder.setCommand(this.command.get.toProto)
 
       case Protocol.HTTP =>
         throw new UnsupportedOperationException(
-            s"Mesos does not support health checks of type [$protocol]")
+          s"Mesos does not support health checks of type [$protocol]")
 
       case _ =>
         throw new UnsupportedOperationException(
-            s"Mesos does not support health checks of type [$protocol]")
+          s"Mesos does not support health checks of type [$protocol]")
     }
 
     builder
@@ -143,10 +145,11 @@ object HealthCheck {
             }) Success
         else
           Failure(
-              Set(RuleViolation(
-                      hc,
-                      s"HealthCheck is having parameters violation ${hc.protocol} protocol.",
-                      None)))
+            Set(
+              RuleViolation(
+                hc,
+                s"HealthCheck is having parameters violation ${hc.protocol} protocol.",
+                None)))
       }
     }
   }

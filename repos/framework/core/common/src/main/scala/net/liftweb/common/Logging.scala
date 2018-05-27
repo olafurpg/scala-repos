@@ -53,27 +53,27 @@ import org.slf4j.{MDC => SLF4JMDC, Marker, Logger => SLF4JLogger, LoggerFactory}
   */
 object Logger {
   private[common] lazy val ranSetup: Boolean = {
-    setup.foreach { _ () }
+    setup.foreach { _() }
     true
   }
 
   /**
     * This function, if set, will be called before any loggers are created.
-    * 
+    *
     * Useful for initializing the logging backend with a non-default configuration.
-    * 
+    *
     * Helpers exists for [[Log4j log4j]] and [[Logback logback]]:
-    * 
+    *
     * {{{
     * Logger.setup = Full(Log4j.withFile(url)
     * }}}
-    * 
+    *
     * or
     *
     * {{{
     * Logger.setup = Full(Logback.withFile(url))
     * }}}
-    * 
+    *
     */
   var setup: Box[() => Unit] = Empty
 
@@ -85,7 +85,8 @@ object Logger {
 
   def apply(cls: Class[_]): Logger =
     if (ranSetup)
-      new WrappedLogger(LoggerFactory.getLogger(loggerNameFor(cls))) else null
+      new WrappedLogger(LoggerFactory.getLogger(loggerNameFor(cls)))
+    else null
   def apply(name: String): Logger =
     if (ranSetup) new WrappedLogger(LoggerFactory.getLogger(name)) else null
 
@@ -144,12 +145,12 @@ object MDC {
   * `Logger` is a thin wrapper on top of an SLF4J Logger.
   *
   * The main purpose is to utilize Scala features for logging.
-  * 
+  *
   * Note that the dynamic type of "this" is used when this trait is mixed in.
-  * 
+  *
   * This may not always be what you want. If you need the static type, you have
   * to declare your own `Logger`:
-  * 
+  *
   * {{{
   * class MyClass {
   *   val logger = Logger(classOf[MyClass])
@@ -161,7 +162,8 @@ trait Logger {
 
   protected def _logger =
     if (Logger.ranSetup)
-      LoggerFactory.getLogger(Logger.loggerNameFor(this.getClass)) else null
+      LoggerFactory.getLogger(Logger.loggerNameFor(this.getClass))
+    else null
 
   def assertLog(assertion: Boolean, msg: => String) = if (assertion) info(msg)
 
@@ -182,10 +184,9 @@ trait Logger {
     if (logger.isTraceEnabled) {
       box match {
         case Failure(fmsg, Full(e), _) =>
-          trace(String.valueOf(msg) + ": " + fmsg: AnyRef,
-                e: Throwable)
+          trace(String.valueOf(msg) + ": " + fmsg: AnyRef, e: Throwable)
         case Failure(fmsg, _, _) => trace(String.valueOf(msg) + ": " + fmsg)
-        case _ =>
+        case _                   =>
       }
     }
   }
@@ -211,7 +212,7 @@ trait Logger {
         case Failure(fmsg, Full(e), _) =>
           debug(String.valueOf(msg) + ": " + fmsg, e)
         case Failure(fmsg, _, _) => debug(String.valueOf(msg) + ": " + fmsg)
-        case _ =>
+        case _                   =>
       }
     }
   }
@@ -237,7 +238,7 @@ trait Logger {
         case Failure(fmsg, Full(e), _) =>
           info(String.valueOf(msg) + ": " + fmsg, e)
         case Failure(fmsg, _, _) => info(String.valueOf(msg) + ": " + fmsg)
-        case _ =>
+        case _                   =>
       }
     }
   }
@@ -262,7 +263,7 @@ trait Logger {
         case Failure(fmsg, Full(e), _) =>
           warn(String.valueOf(msg) + ": " + fmsg, e)
         case Failure(fmsg, _, _) => warn(String.valueOf(msg) + ": " + fmsg)
-        case _ =>
+        case _                   =>
       }
     }
   }
@@ -287,7 +288,7 @@ trait Logger {
         case Failure(fmsg, Full(e), _) =>
           error(String.valueOf(msg) + ": " + fmsg, e)
         case Failure(fmsg, _, _) => error(String.valueOf(msg) + ": " + fmsg)
-        case _ =>
+        case _                   =>
       }
     }
   }
@@ -321,7 +322,7 @@ trait Loggable {
 /**
   * If you mix this into your class, you will get a protected `logger` instance
   * `lazy val` that will be a `[[Logger]]` instance.
-  * 
+  *
   * Useful for mixing into objects that are created before Lift has booted (and
   * thus Logging is not yet configured).
   */

@@ -23,7 +23,12 @@ import kafka.cluster.EndPoint
 import kafka.consumer.ConsumerConfig
 import kafka.coordinator.OffsetConfig
 import kafka.log.LogConfig
-import kafka.message.{BrokerCompressionCodec, CompressionCodec, Message, MessageSet}
+import kafka.message.{
+  BrokerCompressionCodec,
+  CompressionCodec,
+  Message,
+  MessageSet
+}
 import kafka.utils.CoreUtils
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.common.config.SaslConfigs
@@ -393,7 +398,7 @@ object KafkaConfig {
   val ZkSessionTimeoutMsDoc = "Zookeeper session timeout"
   val ZkConnectionTimeoutMsDoc =
     "The max time that the client waits to establish a connection to zookeeper. If not set, the value in " +
-    ZkSessionTimeoutMsProp + " is used"
+      ZkSessionTimeoutMsProp + " is used"
   val ZkSyncTimeMsDoc = "How far a ZK follower can be behind a ZK leader"
   val ZkEnableSecureAclsDoc = "Set client to use secure ACLs"
 
@@ -403,8 +408,8 @@ object KafkaConfig {
   val MaxReservedBrokerIdDoc = "Max number that can be used for a broker.id"
   val BrokerIdDoc =
     "The broker id for this server. If unset, a unique broker id will be generated." +
-    "To avoid conflicts between zookeeper generated broker id's and user configured broker id's, generated broker ids" +
-    "start from " + MaxReservedBrokerIdProp + " + 1."
+      "To avoid conflicts between zookeeper generated broker id's and user configured broker id's, generated broker ids" +
+      "start from " + MaxReservedBrokerIdProp + " + 1."
   val MessageMaxBytesDoc =
     "The maximum size of message that the server can receive"
   val NumNetworkThreadsDoc =
@@ -427,24 +432,24 @@ object KafkaConfig {
     "hostname of broker. If this is set, it will only bind to this address. If this is not set, it will bind to all interfaces"
   val ListenersDoc =
     "Listener List - Comma-separated list of URIs we will listen on and their protocols.\n" +
-    " Specify hostname as 0.0.0.0 to bind to all interfaces.\n" +
-    " Leave hostname empty to bind to default interface.\n" +
-    " Examples of legal listener lists:\n" +
-    " PLAINTEXT://myhost:9092,TRACE://:9091\n" +
-    " PLAINTEXT://0.0.0.0:9092, TRACE://localhost:9093\n"
+      " Specify hostname as 0.0.0.0 to bind to all interfaces.\n" +
+      " Leave hostname empty to bind to default interface.\n" +
+      " Examples of legal listener lists:\n" +
+      " PLAINTEXT://myhost:9092,TRACE://:9091\n" +
+      " PLAINTEXT://0.0.0.0:9092, TRACE://localhost:9093\n"
   val AdvertisedHostNameDoc =
     "Hostname to publish to ZooKeeper for clients to use. In IaaS environments, this may " +
-    "need to be different from the interface to which the broker binds. If this is not set, " +
-    "it will use the value for \"host.name\" if configured. Otherwise " +
-    "it will use the value returned from java.net.InetAddress.getCanonicalHostName()."
+      "need to be different from the interface to which the broker binds. If this is not set, " +
+      "it will use the value for \"host.name\" if configured. Otherwise " +
+      "it will use the value returned from java.net.InetAddress.getCanonicalHostName()."
   val AdvertisedPortDoc =
     "The port to publish to ZooKeeper for clients to use. In IaaS environments, this may " +
-    "need to be different from the port to which the broker binds. If this is not set, " +
-    "it will publish the same port that the broker binds to."
+      "need to be different from the port to which the broker binds. If this is not set, " +
+      "it will publish the same port that the broker binds to."
   val AdvertisedListenersDoc =
     "Listeners to publish to ZooKeeper for clients to use, if different than the listeners above." +
-    " In IaaS environments, this may need to be different from the interface to which the broker binds." +
-    " If this is not set, the value for \"listeners\" will be used."
+      " In IaaS environments, this may need to be different from the interface to which the broker binds." +
+      " If this is not set, the value for \"listeners\" will be used."
   val SocketSendBufferBytesDoc =
     "The SO_SNDBUF buffer of the socket sever sockets"
   val SocketReceiveBufferBytesDoc =
@@ -466,35 +471,35 @@ object KafkaConfig {
   val NumPartitionsDoc = "The default number of log partitions per topic"
   val LogDirDoc =
     "The directory in which the log data is kept (supplemental for " +
-    LogDirsProp + " property)"
+      LogDirsProp + " property)"
   val LogDirsDoc =
     "The directories in which the log data is kept. If not set, the value in " +
-    LogDirProp + " is used"
+      LogDirProp + " is used"
   val LogSegmentBytesDoc = "The maximum size of a single log file"
   val LogRollTimeMillisDoc =
     "The maximum time before a new log segment is rolled out (in milliseconds). If not set, the value in " +
-    LogRollTimeHoursProp + " is used"
+      LogRollTimeHoursProp + " is used"
   val LogRollTimeHoursDoc =
     "The maximum time before a new log segment is rolled out (in hours), secondary to " +
-    LogRollTimeMillisProp + " property"
+      LogRollTimeMillisProp + " property"
 
   val LogRollTimeJitterMillisDoc =
     "The maximum jitter to subtract from logRollTimeMillis (in milliseconds). If not set, the value in " +
-    LogRollTimeJitterHoursProp + " is used"
+      LogRollTimeJitterHoursProp + " is used"
   val LogRollTimeJitterHoursDoc =
     "The maximum jitter to subtract from logRollTimeMillis (in hours), secondary to " +
-    LogRollTimeJitterMillisProp + " property"
+      LogRollTimeJitterMillisProp + " property"
 
   val LogRetentionTimeMillisDoc =
     "The number of milliseconds to keep a log file before deleting it (in milliseconds), If not set, the value in " +
-    LogRetentionTimeMinutesProp + " is used"
+      LogRetentionTimeMinutesProp + " is used"
   val LogRetentionTimeMinsDoc =
     "The number of minutes to keep a log file before deleting it (in minutes), secondary to " +
-    LogRetentionTimeMillisProp + " property. If not set, the value in " +
-    LogRetentionTimeHoursProp + " is used"
+      LogRetentionTimeMillisProp + " property. If not set, the value in " +
+      LogRetentionTimeHoursProp + " is used"
   val LogRetentionTimeHoursDoc =
     "The number of hours to keep a log file before deleting it (in hours), tertiary to " +
-    LogRetentionTimeMillisProp + " property"
+      LogRetentionTimeMillisProp + " property"
 
   val LogRetentionBytesDoc = "The maximum size of the log before deleting it"
   val LogCleanupIntervalMsDoc =
@@ -511,7 +516,7 @@ object KafkaConfig {
     "The total memory used for log cleaner I/O buffers across all cleaner threads"
   val LogCleanerDedupeBufferLoadFactorDoc =
     "Log cleaner dedupe buffer load factor. The percentage full the dedupe buffer can become. A higher value " +
-    "will allow more log to be cleaned at once but will lead to more hash collisions"
+      "will allow more log to be cleaned at once but will lead to more hash collisions"
   val LogCleanerBackoffMsDoc =
     "The amount of time to sleep when there are no logs to clean"
   val LogCleanerMinCleanRatioDoc =
@@ -530,23 +535,23 @@ object KafkaConfig {
     "The frequency in ms that the log flusher checks whether any log needs to be flushed to disk"
   val LogFlushIntervalMsDoc =
     "The maximum time in ms that a message in any topic is kept in memory before flushed to disk. If not set, the value in " +
-    LogFlushSchedulerIntervalMsProp + " is used"
+      LogFlushSchedulerIntervalMsProp + " is used"
   val LogFlushOffsetCheckpointIntervalMsDoc =
     "The frequency with which we update the persistent record of the last flush which acts as the log recovery point"
   val LogPreAllocateEnableDoc =
     "Should pre allocate file when create new segment? If you are using Kafka on Windows, you probably need to set it to true."
   val LogMessageFormatVersionDoc =
     "Specify the message format version the broker will use to append messages to the logs. The value should be a valid ApiVersion. " +
-    "Some examples are: 0.8.2, 0.9.0.0, 0.10.0, check ApiVersion for more details. By setting a particular message format version, the " +
-    "user is certifying that all the existing messages on disk are smaller or equal than the specified version. Setting this value incorrectly " +
-    "will cause consumers with older versions to break as they will receive messages with a format that they don't understand."
+      "Some examples are: 0.8.2, 0.9.0.0, 0.10.0, check ApiVersion for more details. By setting a particular message format version, the " +
+      "user is certifying that all the existing messages on disk are smaller or equal than the specified version. Setting this value incorrectly " +
+      "will cause consumers with older versions to break as they will receive messages with a format that they don't understand."
   val LogMessageTimestampTypeDoc =
     "Define whether the timestamp in the message is message create time or log append time. The value should be either " +
-    "`CreateTime` or `LogAppendTime`"
+      "`CreateTime` or `LogAppendTime`"
   val LogMessageTimestampDifferenceMaxMsDoc =
     "The maximum difference allowed between the timestamp when a broker receives " +
-    "a message and the timestamp specified in the message. If message.timestamp.type=CreateTime, a message will be rejected " +
-    "if the difference in timestamp exceeds this threshold. This configuration is ignored if message.timestamp.type=LogAppendTime."
+      "a message and the timestamp specified in the message. If message.timestamp.type=CreateTime, a message will be rejected " +
+      "if the difference in timestamp exceeds this threshold. This configuration is ignored if message.timestamp.type=LogAppendTime."
   val NumRecoveryThreadsPerDataDirDoc =
     "The number of threads per data directory to be used for log recovery at startup and flushing at shutdown"
   val AutoCreateTopicsEnableDoc = "Enable auto creation of topic on the server"
@@ -562,7 +567,7 @@ object KafkaConfig {
     "default replication factors for automatically created topics"
   val ReplicaLagTimeMaxMsDoc =
     "If a follower hasn't sent any fetch requests or hasn't consumed up to the leaders log end offset for at least this time," +
-    " the leader will remove the follower from isr"
+      " the leader will remove the follower from isr"
   val ReplicaSocketTimeoutMsDoc =
     "The socket timeout for network requests. Its value should be at least replica.fetch.wait.max.ms"
   val ReplicaSocketReceiveBufferBytesDoc =
@@ -571,12 +576,12 @@ object KafkaConfig {
     "The number of byes of messages to attempt to fetch"
   val ReplicaFetchWaitMaxMsDoc =
     "max wait time for each fetcher request issued by follower replicas. This value should always be less than the " +
-    "replica.lag.time.max.ms at all times to prevent frequent shrinking of ISR for low throughput topics"
+      "replica.lag.time.max.ms at all times to prevent frequent shrinking of ISR for low throughput topics"
   val ReplicaFetchMinBytesDoc =
     "Minimum bytes expected for each fetch response. If not enough bytes, wait up to replicaMaxWaitTimeMs"
   val NumReplicaFetchersDoc =
     "Number of fetcher threads used to replicate messages from a source broker. " +
-    "Increasing this value can increase the degree of I/O parallelism in the follower broker."
+      "Increasing this value can increase the degree of I/O parallelism in the follower broker."
   val ReplicaFetchBackoffMsDoc =
     "The amount of time to sleep when fetch partition error occurs."
   val ReplicaHighWatermarkCheckpointIntervalMsDoc =
@@ -595,11 +600,11 @@ object KafkaConfig {
     "Indicates whether to enable replicas not in the ISR set to be elected as leader as a last resort, even though doing so may result in data loss"
   val InterBrokerSecurityProtocolDoc =
     "Security protocol used to communicate between brokers. Valid values are: " +
-    s"${SecurityProtocol.nonTestingValues.asScala.toSeq.map(_.name).mkString(", ")}."
+      s"${SecurityProtocol.nonTestingValues.asScala.toSeq.map(_.name).mkString(", ")}."
   val InterBrokerProtocolVersionDoc =
     "Specify which version of the inter-broker protocol will be used.\n" +
-    " This is typically bumped after all brokers were upgraded to a new version.\n" +
-    " Example of some valid values are: 0.8.0, 0.8.1, 0.8.1.1, 0.8.2, 0.8.2.0, 0.8.2.1, 0.9.0.0, 0.9.0.1 Check ApiVersion for the full list."
+      " This is typically bumped after all brokers were upgraded to a new version.\n" +
+      " Example of some valid values are: 0.8.0, 0.8.1, 0.8.1.1, 0.8.2, 0.8.2.0, 0.8.2.1, 0.9.0.0, 0.9.0.1 Check ApiVersion for the full list."
 
   /** ********* Controlled shutdown configuration ***********/
   val ControlledShutdownMaxRetriesDoc =
@@ -621,10 +626,10 @@ object KafkaConfig {
     "Batch size for reading from the offsets segments when loading offsets into the cache."
   val OffsetsTopicReplicationFactorDoc =
     "The replication factor for the offsets topic (set higher to ensure availability). " +
-    "To ensure that the effective replication factor of the offsets topic is the configured value, " +
-    "the number of alive brokers has to be at least the replication factor at the time of the " +
-    "first request for the offsets topic. If not, either the offsets topic creation will fail or " +
-    "it will get a replication factor of min(alive brokers, configured replication factor)"
+      "To ensure that the effective replication factor of the offsets topic is the configured value, " +
+      "the number of alive brokers has to be at least the replication factor at the time of the " +
+      "first request for the offsets topic. If not, either the offsets topic creation will fail or " +
+      "it will get a replication factor of min(alive brokers, configured replication factor)"
   val OffsetsTopicPartitionsDoc =
     "The number of partitions for the offset commit topic (should not change after deployment)"
   val OffsetsTopicSegmentBytesDoc =
@@ -637,7 +642,7 @@ object KafkaConfig {
     "Frequency at which to check for stale offsets"
   val OffsetCommitTimeoutMsDoc =
     "Offset commit will be delayed until all replicas for the offsets topic receive the commit " +
-    "or this timeout is reached. This is similar to the producer request timeout."
+      "or this timeout is reached. This is similar to the producer request timeout."
   val OffsetCommitRequiredAcksDoc =
     "The required acks before the commit can be accepted. In general, the default (-1) should not be overridden"
 
@@ -653,8 +658,8 @@ object KafkaConfig {
     "Enables delete topic. Delete topic through the admin tool will have no effect if this config is turned off"
   val CompressionTypeDoc =
     "Specify the final compression type for a given topic. This configuration accepts the standard compression codecs " +
-    "('gzip', 'snappy', 'lz4'). It additionally accepts 'uncompressed' which is equivalent to no compression; and " +
-    "'producer' which means retain the original compression codec set by the producer."
+      "('gzip', 'snappy', 'lz4'). It additionally accepts 'uncompressed' which is equivalent to no compression; and " +
+      "'producer' which means retain the original compression codec set by the producer."
 
   /** ********* Kafka Metrics Configuration ***********/
   val MetricSampleWindowMsDoc =
@@ -704,667 +709,780 @@ object KafkaConfig {
 
     /** ********* Zookeeper Configuration ***********/
       .define(ZkConnectProp, STRING, HIGH, ZkConnectDoc)
-      .define(ZkSessionTimeoutMsProp,
-              INT,
-              Defaults.ZkSessionTimeoutMs,
-              HIGH,
-              ZkSessionTimeoutMsDoc)
-      .define(ZkConnectionTimeoutMsProp,
-              INT,
-              null,
-              HIGH,
-              ZkConnectionTimeoutMsDoc)
-      .define(ZkSyncTimeMsProp,
-              INT,
-              Defaults.ZkSyncTimeMs,
-              LOW,
-              ZkSyncTimeMsDoc)
-      .define(ZkEnableSecureAclsProp,
-              BOOLEAN,
-              Defaults.ZkEnableSecureAcls,
-              HIGH,
-              ZkEnableSecureAclsDoc)
+      .define(
+        ZkSessionTimeoutMsProp,
+        INT,
+        Defaults.ZkSessionTimeoutMs,
+        HIGH,
+        ZkSessionTimeoutMsDoc)
+      .define(
+        ZkConnectionTimeoutMsProp,
+        INT,
+        null,
+        HIGH,
+        ZkConnectionTimeoutMsDoc)
+      .define(
+        ZkSyncTimeMsProp,
+        INT,
+        Defaults.ZkSyncTimeMs,
+        LOW,
+        ZkSyncTimeMsDoc)
+      .define(
+        ZkEnableSecureAclsProp,
+        BOOLEAN,
+        Defaults.ZkEnableSecureAcls,
+        HIGH,
+        ZkEnableSecureAclsDoc)
 
       /** ********* General Configuration ***********/
-      .define(BrokerIdGenerationEnableProp,
-              BOOLEAN,
-              Defaults.BrokerIdGenerationEnable,
-              MEDIUM,
-              BrokerIdGenerationEnableDoc)
-      .define(MaxReservedBrokerIdProp,
-              INT,
-              Defaults.MaxReservedBrokerId,
-              atLeast(0),
-              MEDIUM,
-              MaxReservedBrokerIdDoc)
+      .define(
+        BrokerIdGenerationEnableProp,
+        BOOLEAN,
+        Defaults.BrokerIdGenerationEnable,
+        MEDIUM,
+        BrokerIdGenerationEnableDoc)
+      .define(
+        MaxReservedBrokerIdProp,
+        INT,
+        Defaults.MaxReservedBrokerId,
+        atLeast(0),
+        MEDIUM,
+        MaxReservedBrokerIdDoc)
       .define(BrokerIdProp, INT, Defaults.BrokerId, HIGH, BrokerIdDoc)
-      .define(MessageMaxBytesProp,
-              INT,
-              Defaults.MessageMaxBytes,
-              atLeast(0),
-              HIGH,
-              MessageMaxBytesDoc)
-      .define(NumNetworkThreadsProp,
-              INT,
-              Defaults.NumNetworkThreads,
-              atLeast(1),
-              HIGH,
-              NumNetworkThreadsDoc)
-      .define(NumIoThreadsProp,
-              INT,
-              Defaults.NumIoThreads,
-              atLeast(1),
-              HIGH,
-              NumIoThreadsDoc)
-      .define(BackgroundThreadsProp,
-              INT,
-              Defaults.BackgroundThreads,
-              atLeast(1),
-              HIGH,
-              BackgroundThreadsDoc)
-      .define(QueuedMaxRequestsProp,
-              INT,
-              Defaults.QueuedMaxRequests,
-              atLeast(1),
-              HIGH,
-              QueuedMaxRequestsDoc)
-      .define(RequestTimeoutMsProp,
-              INT,
-              Defaults.RequestTimeoutMs,
-              HIGH,
-              RequestTimeoutMsDoc)
+      .define(
+        MessageMaxBytesProp,
+        INT,
+        Defaults.MessageMaxBytes,
+        atLeast(0),
+        HIGH,
+        MessageMaxBytesDoc)
+      .define(
+        NumNetworkThreadsProp,
+        INT,
+        Defaults.NumNetworkThreads,
+        atLeast(1),
+        HIGH,
+        NumNetworkThreadsDoc)
+      .define(
+        NumIoThreadsProp,
+        INT,
+        Defaults.NumIoThreads,
+        atLeast(1),
+        HIGH,
+        NumIoThreadsDoc)
+      .define(
+        BackgroundThreadsProp,
+        INT,
+        Defaults.BackgroundThreads,
+        atLeast(1),
+        HIGH,
+        BackgroundThreadsDoc)
+      .define(
+        QueuedMaxRequestsProp,
+        INT,
+        Defaults.QueuedMaxRequests,
+        atLeast(1),
+        HIGH,
+        QueuedMaxRequestsDoc)
+      .define(
+        RequestTimeoutMsProp,
+        INT,
+        Defaults.RequestTimeoutMs,
+        HIGH,
+        RequestTimeoutMsDoc)
 
       /************* Authorizer Configuration ***********/
-      .define(AuthorizerClassNameProp,
-              STRING,
-              Defaults.AuthorizerClassName,
-              LOW,
-              AuthorizerClassNameDoc)
+      .define(
+        AuthorizerClassNameProp,
+        STRING,
+        Defaults.AuthorizerClassName,
+        LOW,
+        AuthorizerClassNameDoc)
 
       /** ********* Socket Server Configuration ***********/
       .define(PortProp, INT, Defaults.Port, HIGH, PortDoc)
       .define(HostNameProp, STRING, Defaults.HostName, HIGH, HostNameDoc)
       .define(ListenersProp, STRING, null, HIGH, ListenersDoc)
-      .define(AdvertisedHostNameProp,
-              STRING,
-              null,
-              HIGH,
-              AdvertisedHostNameDoc)
+      .define(AdvertisedHostNameProp, STRING, null, HIGH, AdvertisedHostNameDoc)
       .define(AdvertisedPortProp, INT, null, HIGH, AdvertisedPortDoc)
-      .define(AdvertisedListenersProp,
-              STRING,
-              null,
-              HIGH,
-              AdvertisedListenersDoc)
-      .define(SocketSendBufferBytesProp,
-              INT,
-              Defaults.SocketSendBufferBytes,
-              HIGH,
-              SocketSendBufferBytesDoc)
-      .define(SocketReceiveBufferBytesProp,
-              INT,
-              Defaults.SocketReceiveBufferBytes,
-              HIGH,
-              SocketReceiveBufferBytesDoc)
-      .define(SocketRequestMaxBytesProp,
-              INT,
-              Defaults.SocketRequestMaxBytes,
-              atLeast(1),
-              HIGH,
-              SocketRequestMaxBytesDoc)
-      .define(MaxConnectionsPerIpProp,
-              INT,
-              Defaults.MaxConnectionsPerIp,
-              atLeast(1),
-              MEDIUM,
-              MaxConnectionsPerIpDoc)
-      .define(MaxConnectionsPerIpOverridesProp,
-              STRING,
-              Defaults.MaxConnectionsPerIpOverrides,
-              MEDIUM,
-              MaxConnectionsPerIpOverridesDoc)
-      .define(ConnectionsMaxIdleMsProp,
-              LONG,
-              Defaults.ConnectionsMaxIdleMs,
-              MEDIUM,
-              ConnectionsMaxIdleMsDoc)
+      .define(
+        AdvertisedListenersProp,
+        STRING,
+        null,
+        HIGH,
+        AdvertisedListenersDoc)
+      .define(
+        SocketSendBufferBytesProp,
+        INT,
+        Defaults.SocketSendBufferBytes,
+        HIGH,
+        SocketSendBufferBytesDoc)
+      .define(
+        SocketReceiveBufferBytesProp,
+        INT,
+        Defaults.SocketReceiveBufferBytes,
+        HIGH,
+        SocketReceiveBufferBytesDoc)
+      .define(
+        SocketRequestMaxBytesProp,
+        INT,
+        Defaults.SocketRequestMaxBytes,
+        atLeast(1),
+        HIGH,
+        SocketRequestMaxBytesDoc)
+      .define(
+        MaxConnectionsPerIpProp,
+        INT,
+        Defaults.MaxConnectionsPerIp,
+        atLeast(1),
+        MEDIUM,
+        MaxConnectionsPerIpDoc)
+      .define(
+        MaxConnectionsPerIpOverridesProp,
+        STRING,
+        Defaults.MaxConnectionsPerIpOverrides,
+        MEDIUM,
+        MaxConnectionsPerIpOverridesDoc)
+      .define(
+        ConnectionsMaxIdleMsProp,
+        LONG,
+        Defaults.ConnectionsMaxIdleMs,
+        MEDIUM,
+        ConnectionsMaxIdleMsDoc)
 
       /************ Rack Configuration ******************/
       .define(RackProp, STRING, null, MEDIUM, RackDoc)
 
       /** ********* Log Configuration ***********/
-      .define(NumPartitionsProp,
-              INT,
-              Defaults.NumPartitions,
-              atLeast(1),
-              MEDIUM,
-              NumPartitionsDoc)
+      .define(
+        NumPartitionsProp,
+        INT,
+        Defaults.NumPartitions,
+        atLeast(1),
+        MEDIUM,
+        NumPartitionsDoc)
       .define(LogDirProp, STRING, Defaults.LogDir, HIGH, LogDirDoc)
       .define(LogDirsProp, STRING, null, HIGH, LogDirsDoc)
-      .define(LogSegmentBytesProp,
-              INT,
-              Defaults.LogSegmentBytes,
-              atLeast(Message.MinMessageOverhead),
-              HIGH,
-              LogSegmentBytesDoc)
+      .define(
+        LogSegmentBytesProp,
+        INT,
+        Defaults.LogSegmentBytes,
+        atLeast(Message.MinMessageOverhead),
+        HIGH,
+        LogSegmentBytesDoc)
       .define(LogRollTimeMillisProp, LONG, null, HIGH, LogRollTimeMillisDoc)
-      .define(LogRollTimeHoursProp,
-              INT,
-              Defaults.LogRollHours,
-              atLeast(1),
-              HIGH,
-              LogRollTimeHoursDoc)
-      .define(LogRollTimeJitterMillisProp,
-              LONG,
-              null,
-              HIGH,
-              LogRollTimeJitterMillisDoc)
-      .define(LogRollTimeJitterHoursProp,
-              INT,
-              Defaults.LogRollJitterHours,
-              atLeast(0),
-              HIGH,
-              LogRollTimeJitterHoursDoc)
-      .define(LogRetentionTimeMillisProp,
-              LONG,
-              null,
-              HIGH,
-              LogRetentionTimeMillisDoc)
-      .define(LogRetentionTimeMinutesProp,
-              INT,
-              null,
-              HIGH,
-              LogRetentionTimeMinsDoc)
-      .define(LogRetentionTimeHoursProp,
-              INT,
-              Defaults.LogRetentionHours,
-              HIGH,
-              LogRetentionTimeHoursDoc)
-      .define(LogRetentionBytesProp,
-              LONG,
-              Defaults.LogRetentionBytes,
-              HIGH,
-              LogRetentionBytesDoc)
-      .define(LogCleanupIntervalMsProp,
-              LONG,
-              Defaults.LogCleanupIntervalMs,
-              atLeast(1),
-              MEDIUM,
-              LogCleanupIntervalMsDoc)
-      .define(LogCleanupPolicyProp,
-              STRING,
-              Defaults.LogCleanupPolicy,
-              in(Defaults.Compact, Defaults.Delete),
-              MEDIUM,
-              LogCleanupPolicyDoc)
-      .define(LogCleanerThreadsProp,
-              INT,
-              Defaults.LogCleanerThreads,
-              atLeast(0),
-              MEDIUM,
-              LogCleanerThreadsDoc)
-      .define(LogCleanerIoMaxBytesPerSecondProp,
-              DOUBLE,
-              Defaults.LogCleanerIoMaxBytesPerSecond,
-              MEDIUM,
-              LogCleanerIoMaxBytesPerSecondDoc)
-      .define(LogCleanerDedupeBufferSizeProp,
-              LONG,
-              Defaults.LogCleanerDedupeBufferSize,
-              MEDIUM,
-              LogCleanerDedupeBufferSizeDoc)
-      .define(LogCleanerIoBufferSizeProp,
-              INT,
-              Defaults.LogCleanerIoBufferSize,
-              atLeast(0),
-              MEDIUM,
-              LogCleanerIoBufferSizeDoc)
-      .define(LogCleanerDedupeBufferLoadFactorProp,
-              DOUBLE,
-              Defaults.LogCleanerDedupeBufferLoadFactor,
-              MEDIUM,
-              LogCleanerDedupeBufferLoadFactorDoc)
-      .define(LogCleanerBackoffMsProp,
-              LONG,
-              Defaults.LogCleanerBackoffMs,
-              atLeast(0),
-              MEDIUM,
-              LogCleanerBackoffMsDoc)
-      .define(LogCleanerMinCleanRatioProp,
-              DOUBLE,
-              Defaults.LogCleanerMinCleanRatio,
-              MEDIUM,
-              LogCleanerMinCleanRatioDoc)
-      .define(LogCleanerEnableProp,
-              BOOLEAN,
-              Defaults.LogCleanerEnable,
-              MEDIUM,
-              LogCleanerEnableDoc)
-      .define(LogCleanerDeleteRetentionMsProp,
-              LONG,
-              Defaults.LogCleanerDeleteRetentionMs,
-              MEDIUM,
-              LogCleanerDeleteRetentionMsDoc)
-      .define(LogIndexSizeMaxBytesProp,
-              INT,
-              Defaults.LogIndexSizeMaxBytes,
-              atLeast(4),
-              MEDIUM,
-              LogIndexSizeMaxBytesDoc)
-      .define(LogIndexIntervalBytesProp,
-              INT,
-              Defaults.LogIndexIntervalBytes,
-              atLeast(0),
-              MEDIUM,
-              LogIndexIntervalBytesDoc)
-      .define(LogFlushIntervalMessagesProp,
-              LONG,
-              Defaults.LogFlushIntervalMessages,
-              atLeast(1),
-              HIGH,
-              LogFlushIntervalMessagesDoc)
-      .define(LogDeleteDelayMsProp,
-              LONG,
-              Defaults.LogDeleteDelayMs,
-              atLeast(0),
-              HIGH,
-              LogDeleteDelayMsDoc)
-      .define(LogFlushSchedulerIntervalMsProp,
-              LONG,
-              Defaults.LogFlushSchedulerIntervalMs,
-              HIGH,
-              LogFlushSchedulerIntervalMsDoc)
+      .define(
+        LogRollTimeHoursProp,
+        INT,
+        Defaults.LogRollHours,
+        atLeast(1),
+        HIGH,
+        LogRollTimeHoursDoc)
+      .define(
+        LogRollTimeJitterMillisProp,
+        LONG,
+        null,
+        HIGH,
+        LogRollTimeJitterMillisDoc)
+      .define(
+        LogRollTimeJitterHoursProp,
+        INT,
+        Defaults.LogRollJitterHours,
+        atLeast(0),
+        HIGH,
+        LogRollTimeJitterHoursDoc)
+      .define(
+        LogRetentionTimeMillisProp,
+        LONG,
+        null,
+        HIGH,
+        LogRetentionTimeMillisDoc)
+      .define(
+        LogRetentionTimeMinutesProp,
+        INT,
+        null,
+        HIGH,
+        LogRetentionTimeMinsDoc)
+      .define(
+        LogRetentionTimeHoursProp,
+        INT,
+        Defaults.LogRetentionHours,
+        HIGH,
+        LogRetentionTimeHoursDoc)
+      .define(
+        LogRetentionBytesProp,
+        LONG,
+        Defaults.LogRetentionBytes,
+        HIGH,
+        LogRetentionBytesDoc)
+      .define(
+        LogCleanupIntervalMsProp,
+        LONG,
+        Defaults.LogCleanupIntervalMs,
+        atLeast(1),
+        MEDIUM,
+        LogCleanupIntervalMsDoc)
+      .define(
+        LogCleanupPolicyProp,
+        STRING,
+        Defaults.LogCleanupPolicy,
+        in(Defaults.Compact, Defaults.Delete),
+        MEDIUM,
+        LogCleanupPolicyDoc)
+      .define(
+        LogCleanerThreadsProp,
+        INT,
+        Defaults.LogCleanerThreads,
+        atLeast(0),
+        MEDIUM,
+        LogCleanerThreadsDoc)
+      .define(
+        LogCleanerIoMaxBytesPerSecondProp,
+        DOUBLE,
+        Defaults.LogCleanerIoMaxBytesPerSecond,
+        MEDIUM,
+        LogCleanerIoMaxBytesPerSecondDoc)
+      .define(
+        LogCleanerDedupeBufferSizeProp,
+        LONG,
+        Defaults.LogCleanerDedupeBufferSize,
+        MEDIUM,
+        LogCleanerDedupeBufferSizeDoc)
+      .define(
+        LogCleanerIoBufferSizeProp,
+        INT,
+        Defaults.LogCleanerIoBufferSize,
+        atLeast(0),
+        MEDIUM,
+        LogCleanerIoBufferSizeDoc)
+      .define(
+        LogCleanerDedupeBufferLoadFactorProp,
+        DOUBLE,
+        Defaults.LogCleanerDedupeBufferLoadFactor,
+        MEDIUM,
+        LogCleanerDedupeBufferLoadFactorDoc)
+      .define(
+        LogCleanerBackoffMsProp,
+        LONG,
+        Defaults.LogCleanerBackoffMs,
+        atLeast(0),
+        MEDIUM,
+        LogCleanerBackoffMsDoc)
+      .define(
+        LogCleanerMinCleanRatioProp,
+        DOUBLE,
+        Defaults.LogCleanerMinCleanRatio,
+        MEDIUM,
+        LogCleanerMinCleanRatioDoc)
+      .define(
+        LogCleanerEnableProp,
+        BOOLEAN,
+        Defaults.LogCleanerEnable,
+        MEDIUM,
+        LogCleanerEnableDoc)
+      .define(
+        LogCleanerDeleteRetentionMsProp,
+        LONG,
+        Defaults.LogCleanerDeleteRetentionMs,
+        MEDIUM,
+        LogCleanerDeleteRetentionMsDoc)
+      .define(
+        LogIndexSizeMaxBytesProp,
+        INT,
+        Defaults.LogIndexSizeMaxBytes,
+        atLeast(4),
+        MEDIUM,
+        LogIndexSizeMaxBytesDoc)
+      .define(
+        LogIndexIntervalBytesProp,
+        INT,
+        Defaults.LogIndexIntervalBytes,
+        atLeast(0),
+        MEDIUM,
+        LogIndexIntervalBytesDoc)
+      .define(
+        LogFlushIntervalMessagesProp,
+        LONG,
+        Defaults.LogFlushIntervalMessages,
+        atLeast(1),
+        HIGH,
+        LogFlushIntervalMessagesDoc)
+      .define(
+        LogDeleteDelayMsProp,
+        LONG,
+        Defaults.LogDeleteDelayMs,
+        atLeast(0),
+        HIGH,
+        LogDeleteDelayMsDoc)
+      .define(
+        LogFlushSchedulerIntervalMsProp,
+        LONG,
+        Defaults.LogFlushSchedulerIntervalMs,
+        HIGH,
+        LogFlushSchedulerIntervalMsDoc)
       .define(LogFlushIntervalMsProp, LONG, null, HIGH, LogFlushIntervalMsDoc)
-      .define(LogFlushOffsetCheckpointIntervalMsProp,
-              INT,
-              Defaults.LogFlushOffsetCheckpointIntervalMs,
-              atLeast(0),
-              HIGH,
-              LogFlushOffsetCheckpointIntervalMsDoc)
-      .define(LogPreAllocateProp,
-              BOOLEAN,
-              Defaults.LogPreAllocateEnable,
-              MEDIUM,
-              LogPreAllocateEnableDoc)
-      .define(NumRecoveryThreadsPerDataDirProp,
-              INT,
-              Defaults.NumRecoveryThreadsPerDataDir,
-              atLeast(1),
-              HIGH,
-              NumRecoveryThreadsPerDataDirDoc)
-      .define(AutoCreateTopicsEnableProp,
-              BOOLEAN,
-              Defaults.AutoCreateTopicsEnable,
-              HIGH,
-              AutoCreateTopicsEnableDoc)
-      .define(MinInSyncReplicasProp,
-              INT,
-              Defaults.MinInSyncReplicas,
-              atLeast(1),
-              HIGH,
-              MinInSyncReplicasDoc)
-      .define(LogMessageFormatVersionProp,
-              STRING,
-              Defaults.LogMessageFormatVersion,
-              MEDIUM,
-              LogMessageFormatVersionDoc)
-      .define(LogMessageTimestampTypeProp,
-              STRING,
-              Defaults.LogMessageTimestampType,
-              in("CreateTime", "LogAppendTime"),
-              MEDIUM,
-              LogMessageTimestampTypeDoc)
-      .define(LogMessageTimestampDifferenceMaxMsProp,
-              LONG,
-              Defaults.LogMessageTimestampDifferenceMaxMs,
-              atLeast(0),
-              MEDIUM,
-              LogMessageTimestampDifferenceMaxMsDoc)
+      .define(
+        LogFlushOffsetCheckpointIntervalMsProp,
+        INT,
+        Defaults.LogFlushOffsetCheckpointIntervalMs,
+        atLeast(0),
+        HIGH,
+        LogFlushOffsetCheckpointIntervalMsDoc)
+      .define(
+        LogPreAllocateProp,
+        BOOLEAN,
+        Defaults.LogPreAllocateEnable,
+        MEDIUM,
+        LogPreAllocateEnableDoc)
+      .define(
+        NumRecoveryThreadsPerDataDirProp,
+        INT,
+        Defaults.NumRecoveryThreadsPerDataDir,
+        atLeast(1),
+        HIGH,
+        NumRecoveryThreadsPerDataDirDoc)
+      .define(
+        AutoCreateTopicsEnableProp,
+        BOOLEAN,
+        Defaults.AutoCreateTopicsEnable,
+        HIGH,
+        AutoCreateTopicsEnableDoc)
+      .define(
+        MinInSyncReplicasProp,
+        INT,
+        Defaults.MinInSyncReplicas,
+        atLeast(1),
+        HIGH,
+        MinInSyncReplicasDoc)
+      .define(
+        LogMessageFormatVersionProp,
+        STRING,
+        Defaults.LogMessageFormatVersion,
+        MEDIUM,
+        LogMessageFormatVersionDoc)
+      .define(
+        LogMessageTimestampTypeProp,
+        STRING,
+        Defaults.LogMessageTimestampType,
+        in("CreateTime", "LogAppendTime"),
+        MEDIUM,
+        LogMessageTimestampTypeDoc)
+      .define(
+        LogMessageTimestampDifferenceMaxMsProp,
+        LONG,
+        Defaults.LogMessageTimestampDifferenceMaxMs,
+        atLeast(0),
+        MEDIUM,
+        LogMessageTimestampDifferenceMaxMsDoc)
 
       /** ********* Replication configuration ***********/
-      .define(ControllerSocketTimeoutMsProp,
-              INT,
-              Defaults.ControllerSocketTimeoutMs,
-              MEDIUM,
-              ControllerSocketTimeoutMsDoc)
-      .define(DefaultReplicationFactorProp,
-              INT,
-              Defaults.DefaultReplicationFactor,
-              MEDIUM,
-              DefaultReplicationFactorDoc)
-      .define(ReplicaLagTimeMaxMsProp,
-              LONG,
-              Defaults.ReplicaLagTimeMaxMs,
-              HIGH,
-              ReplicaLagTimeMaxMsDoc)
-      .define(ReplicaSocketTimeoutMsProp,
-              INT,
-              Defaults.ReplicaSocketTimeoutMs,
-              HIGH,
-              ReplicaSocketTimeoutMsDoc)
-      .define(ReplicaSocketReceiveBufferBytesProp,
-              INT,
-              Defaults.ReplicaSocketReceiveBufferBytes,
-              HIGH,
-              ReplicaSocketReceiveBufferBytesDoc)
-      .define(ReplicaFetchMaxBytesProp,
-              INT,
-              Defaults.ReplicaFetchMaxBytes,
-              HIGH,
-              ReplicaFetchMaxBytesDoc)
-      .define(ReplicaFetchWaitMaxMsProp,
-              INT,
-              Defaults.ReplicaFetchWaitMaxMs,
-              HIGH,
-              ReplicaFetchWaitMaxMsDoc)
-      .define(ReplicaFetchBackoffMsProp,
-              INT,
-              Defaults.ReplicaFetchBackoffMs,
-              atLeast(0),
-              MEDIUM,
-              ReplicaFetchBackoffMsDoc)
-      .define(ReplicaFetchMinBytesProp,
-              INT,
-              Defaults.ReplicaFetchMinBytes,
-              HIGH,
-              ReplicaFetchMinBytesDoc)
-      .define(NumReplicaFetchersProp,
-              INT,
-              Defaults.NumReplicaFetchers,
-              HIGH,
-              NumReplicaFetchersDoc)
-      .define(ReplicaHighWatermarkCheckpointIntervalMsProp,
-              LONG,
-              Defaults.ReplicaHighWatermarkCheckpointIntervalMs,
-              HIGH,
-              ReplicaHighWatermarkCheckpointIntervalMsDoc)
-      .define(FetchPurgatoryPurgeIntervalRequestsProp,
-              INT,
-              Defaults.FetchPurgatoryPurgeIntervalRequests,
-              MEDIUM,
-              FetchPurgatoryPurgeIntervalRequestsDoc)
-      .define(ProducerPurgatoryPurgeIntervalRequestsProp,
-              INT,
-              Defaults.ProducerPurgatoryPurgeIntervalRequests,
-              MEDIUM,
-              ProducerPurgatoryPurgeIntervalRequestsDoc)
-      .define(AutoLeaderRebalanceEnableProp,
-              BOOLEAN,
-              Defaults.AutoLeaderRebalanceEnable,
-              HIGH,
-              AutoLeaderRebalanceEnableDoc)
-      .define(LeaderImbalancePerBrokerPercentageProp,
-              INT,
-              Defaults.LeaderImbalancePerBrokerPercentage,
-              HIGH,
-              LeaderImbalancePerBrokerPercentageDoc)
-      .define(LeaderImbalanceCheckIntervalSecondsProp,
-              LONG,
-              Defaults.LeaderImbalanceCheckIntervalSeconds,
-              HIGH,
-              LeaderImbalanceCheckIntervalSecondsDoc)
-      .define(UncleanLeaderElectionEnableProp,
-              BOOLEAN,
-              Defaults.UncleanLeaderElectionEnable,
-              HIGH,
-              UncleanLeaderElectionEnableDoc)
-      .define(InterBrokerSecurityProtocolProp,
-              STRING,
-              Defaults.InterBrokerSecurityProtocol,
-              MEDIUM,
-              InterBrokerSecurityProtocolDoc)
-      .define(InterBrokerProtocolVersionProp,
-              STRING,
-              Defaults.InterBrokerProtocolVersion,
-              MEDIUM,
-              InterBrokerProtocolVersionDoc)
+      .define(
+        ControllerSocketTimeoutMsProp,
+        INT,
+        Defaults.ControllerSocketTimeoutMs,
+        MEDIUM,
+        ControllerSocketTimeoutMsDoc)
+      .define(
+        DefaultReplicationFactorProp,
+        INT,
+        Defaults.DefaultReplicationFactor,
+        MEDIUM,
+        DefaultReplicationFactorDoc)
+      .define(
+        ReplicaLagTimeMaxMsProp,
+        LONG,
+        Defaults.ReplicaLagTimeMaxMs,
+        HIGH,
+        ReplicaLagTimeMaxMsDoc)
+      .define(
+        ReplicaSocketTimeoutMsProp,
+        INT,
+        Defaults.ReplicaSocketTimeoutMs,
+        HIGH,
+        ReplicaSocketTimeoutMsDoc)
+      .define(
+        ReplicaSocketReceiveBufferBytesProp,
+        INT,
+        Defaults.ReplicaSocketReceiveBufferBytes,
+        HIGH,
+        ReplicaSocketReceiveBufferBytesDoc)
+      .define(
+        ReplicaFetchMaxBytesProp,
+        INT,
+        Defaults.ReplicaFetchMaxBytes,
+        HIGH,
+        ReplicaFetchMaxBytesDoc)
+      .define(
+        ReplicaFetchWaitMaxMsProp,
+        INT,
+        Defaults.ReplicaFetchWaitMaxMs,
+        HIGH,
+        ReplicaFetchWaitMaxMsDoc)
+      .define(
+        ReplicaFetchBackoffMsProp,
+        INT,
+        Defaults.ReplicaFetchBackoffMs,
+        atLeast(0),
+        MEDIUM,
+        ReplicaFetchBackoffMsDoc)
+      .define(
+        ReplicaFetchMinBytesProp,
+        INT,
+        Defaults.ReplicaFetchMinBytes,
+        HIGH,
+        ReplicaFetchMinBytesDoc)
+      .define(
+        NumReplicaFetchersProp,
+        INT,
+        Defaults.NumReplicaFetchers,
+        HIGH,
+        NumReplicaFetchersDoc)
+      .define(
+        ReplicaHighWatermarkCheckpointIntervalMsProp,
+        LONG,
+        Defaults.ReplicaHighWatermarkCheckpointIntervalMs,
+        HIGH,
+        ReplicaHighWatermarkCheckpointIntervalMsDoc)
+      .define(
+        FetchPurgatoryPurgeIntervalRequestsProp,
+        INT,
+        Defaults.FetchPurgatoryPurgeIntervalRequests,
+        MEDIUM,
+        FetchPurgatoryPurgeIntervalRequestsDoc)
+      .define(
+        ProducerPurgatoryPurgeIntervalRequestsProp,
+        INT,
+        Defaults.ProducerPurgatoryPurgeIntervalRequests,
+        MEDIUM,
+        ProducerPurgatoryPurgeIntervalRequestsDoc)
+      .define(
+        AutoLeaderRebalanceEnableProp,
+        BOOLEAN,
+        Defaults.AutoLeaderRebalanceEnable,
+        HIGH,
+        AutoLeaderRebalanceEnableDoc)
+      .define(
+        LeaderImbalancePerBrokerPercentageProp,
+        INT,
+        Defaults.LeaderImbalancePerBrokerPercentage,
+        HIGH,
+        LeaderImbalancePerBrokerPercentageDoc)
+      .define(
+        LeaderImbalanceCheckIntervalSecondsProp,
+        LONG,
+        Defaults.LeaderImbalanceCheckIntervalSeconds,
+        HIGH,
+        LeaderImbalanceCheckIntervalSecondsDoc)
+      .define(
+        UncleanLeaderElectionEnableProp,
+        BOOLEAN,
+        Defaults.UncleanLeaderElectionEnable,
+        HIGH,
+        UncleanLeaderElectionEnableDoc)
+      .define(
+        InterBrokerSecurityProtocolProp,
+        STRING,
+        Defaults.InterBrokerSecurityProtocol,
+        MEDIUM,
+        InterBrokerSecurityProtocolDoc)
+      .define(
+        InterBrokerProtocolVersionProp,
+        STRING,
+        Defaults.InterBrokerProtocolVersion,
+        MEDIUM,
+        InterBrokerProtocolVersionDoc)
 
       /** ********* Controlled shutdown configuration ***********/
-      .define(ControlledShutdownMaxRetriesProp,
-              INT,
-              Defaults.ControlledShutdownMaxRetries,
-              MEDIUM,
-              ControlledShutdownMaxRetriesDoc)
-      .define(ControlledShutdownRetryBackoffMsProp,
-              LONG,
-              Defaults.ControlledShutdownRetryBackoffMs,
-              MEDIUM,
-              ControlledShutdownRetryBackoffMsDoc)
-      .define(ControlledShutdownEnableProp,
-              BOOLEAN,
-              Defaults.ControlledShutdownEnable,
-              MEDIUM,
-              ControlledShutdownEnableDoc)
+      .define(
+        ControlledShutdownMaxRetriesProp,
+        INT,
+        Defaults.ControlledShutdownMaxRetries,
+        MEDIUM,
+        ControlledShutdownMaxRetriesDoc)
+      .define(
+        ControlledShutdownRetryBackoffMsProp,
+        LONG,
+        Defaults.ControlledShutdownRetryBackoffMs,
+        MEDIUM,
+        ControlledShutdownRetryBackoffMsDoc)
+      .define(
+        ControlledShutdownEnableProp,
+        BOOLEAN,
+        Defaults.ControlledShutdownEnable,
+        MEDIUM,
+        ControlledShutdownEnableDoc)
 
       /** ********* Consumer coordinator configuration ***********/
-      .define(GroupMinSessionTimeoutMsProp,
-              INT,
-              Defaults.ConsumerMinSessionTimeoutMs,
-              MEDIUM,
-              ConsumerMinSessionTimeoutMsDoc)
-      .define(GroupMaxSessionTimeoutMsProp,
-              INT,
-              Defaults.ConsumerMaxSessionTimeoutMs,
-              MEDIUM,
-              ConsumerMaxSessionTimeoutMsDoc)
+      .define(
+        GroupMinSessionTimeoutMsProp,
+        INT,
+        Defaults.ConsumerMinSessionTimeoutMs,
+        MEDIUM,
+        ConsumerMinSessionTimeoutMsDoc)
+      .define(
+        GroupMaxSessionTimeoutMsProp,
+        INT,
+        Defaults.ConsumerMaxSessionTimeoutMs,
+        MEDIUM,
+        ConsumerMaxSessionTimeoutMsDoc)
 
       /** ********* Offset management configuration ***********/
-      .define(OffsetMetadataMaxSizeProp,
-              INT,
-              Defaults.OffsetMetadataMaxSize,
-              HIGH,
-              OffsetMetadataMaxSizeDoc)
-      .define(OffsetsLoadBufferSizeProp,
-              INT,
-              Defaults.OffsetsLoadBufferSize,
-              atLeast(1),
-              HIGH,
-              OffsetsLoadBufferSizeDoc)
-      .define(OffsetsTopicReplicationFactorProp,
-              SHORT,
-              Defaults.OffsetsTopicReplicationFactor,
-              atLeast(1),
-              HIGH,
-              OffsetsTopicReplicationFactorDoc)
-      .define(OffsetsTopicPartitionsProp,
-              INT,
-              Defaults.OffsetsTopicPartitions,
-              atLeast(1),
-              HIGH,
-              OffsetsTopicPartitionsDoc)
-      .define(OffsetsTopicSegmentBytesProp,
-              INT,
-              Defaults.OffsetsTopicSegmentBytes,
-              atLeast(1),
-              HIGH,
-              OffsetsTopicSegmentBytesDoc)
-      .define(OffsetsTopicCompressionCodecProp,
-              INT,
-              Defaults.OffsetsTopicCompressionCodec,
-              HIGH,
-              OffsetsTopicCompressionCodecDoc)
-      .define(OffsetsRetentionMinutesProp,
-              INT,
-              Defaults.OffsetsRetentionMinutes,
-              atLeast(1),
-              HIGH,
-              OffsetsRetentionMinutesDoc)
-      .define(OffsetsRetentionCheckIntervalMsProp,
-              LONG,
-              Defaults.OffsetsRetentionCheckIntervalMs,
-              atLeast(1),
-              HIGH,
-              OffsetsRetentionCheckIntervalMsDoc)
-      .define(OffsetCommitTimeoutMsProp,
-              INT,
-              Defaults.OffsetCommitTimeoutMs,
-              atLeast(1),
-              HIGH,
-              OffsetCommitTimeoutMsDoc)
-      .define(OffsetCommitRequiredAcksProp,
-              SHORT,
-              Defaults.OffsetCommitRequiredAcks,
-              HIGH,
-              OffsetCommitRequiredAcksDoc)
-      .define(DeleteTopicEnableProp,
-              BOOLEAN,
-              Defaults.DeleteTopicEnable,
-              HIGH,
-              DeleteTopicEnableDoc)
-      .define(CompressionTypeProp,
-              STRING,
-              Defaults.CompressionType,
-              HIGH,
-              CompressionTypeDoc)
+      .define(
+        OffsetMetadataMaxSizeProp,
+        INT,
+        Defaults.OffsetMetadataMaxSize,
+        HIGH,
+        OffsetMetadataMaxSizeDoc)
+      .define(
+        OffsetsLoadBufferSizeProp,
+        INT,
+        Defaults.OffsetsLoadBufferSize,
+        atLeast(1),
+        HIGH,
+        OffsetsLoadBufferSizeDoc)
+      .define(
+        OffsetsTopicReplicationFactorProp,
+        SHORT,
+        Defaults.OffsetsTopicReplicationFactor,
+        atLeast(1),
+        HIGH,
+        OffsetsTopicReplicationFactorDoc)
+      .define(
+        OffsetsTopicPartitionsProp,
+        INT,
+        Defaults.OffsetsTopicPartitions,
+        atLeast(1),
+        HIGH,
+        OffsetsTopicPartitionsDoc)
+      .define(
+        OffsetsTopicSegmentBytesProp,
+        INT,
+        Defaults.OffsetsTopicSegmentBytes,
+        atLeast(1),
+        HIGH,
+        OffsetsTopicSegmentBytesDoc)
+      .define(
+        OffsetsTopicCompressionCodecProp,
+        INT,
+        Defaults.OffsetsTopicCompressionCodec,
+        HIGH,
+        OffsetsTopicCompressionCodecDoc)
+      .define(
+        OffsetsRetentionMinutesProp,
+        INT,
+        Defaults.OffsetsRetentionMinutes,
+        atLeast(1),
+        HIGH,
+        OffsetsRetentionMinutesDoc)
+      .define(
+        OffsetsRetentionCheckIntervalMsProp,
+        LONG,
+        Defaults.OffsetsRetentionCheckIntervalMs,
+        atLeast(1),
+        HIGH,
+        OffsetsRetentionCheckIntervalMsDoc)
+      .define(
+        OffsetCommitTimeoutMsProp,
+        INT,
+        Defaults.OffsetCommitTimeoutMs,
+        atLeast(1),
+        HIGH,
+        OffsetCommitTimeoutMsDoc)
+      .define(
+        OffsetCommitRequiredAcksProp,
+        SHORT,
+        Defaults.OffsetCommitRequiredAcks,
+        HIGH,
+        OffsetCommitRequiredAcksDoc)
+      .define(
+        DeleteTopicEnableProp,
+        BOOLEAN,
+        Defaults.DeleteTopicEnable,
+        HIGH,
+        DeleteTopicEnableDoc)
+      .define(
+        CompressionTypeProp,
+        STRING,
+        Defaults.CompressionType,
+        HIGH,
+        CompressionTypeDoc)
 
       /** ********* Kafka Metrics Configuration ***********/
-      .define(MetricNumSamplesProp,
-              INT,
-              Defaults.MetricNumSamples,
-              atLeast(1),
-              LOW,
-              MetricNumSamplesDoc)
-      .define(MetricSampleWindowMsProp,
-              LONG,
-              Defaults.MetricSampleWindowMs,
-              atLeast(1),
-              LOW,
-              MetricSampleWindowMsDoc)
-      .define(MetricReporterClassesProp,
-              LIST,
-              Defaults.MetricReporterClasses,
-              LOW,
-              MetricReporterClassesDoc)
+      .define(
+        MetricNumSamplesProp,
+        INT,
+        Defaults.MetricNumSamples,
+        atLeast(1),
+        LOW,
+        MetricNumSamplesDoc)
+      .define(
+        MetricSampleWindowMsProp,
+        LONG,
+        Defaults.MetricSampleWindowMs,
+        atLeast(1),
+        LOW,
+        MetricSampleWindowMsDoc)
+      .define(
+        MetricReporterClassesProp,
+        LIST,
+        Defaults.MetricReporterClasses,
+        LOW,
+        MetricReporterClassesDoc)
 
       /** ********* Quota configuration ***********/
-      .define(ProducerQuotaBytesPerSecondDefaultProp,
-              LONG,
-              Defaults.ProducerQuotaBytesPerSecondDefault,
-              atLeast(1),
-              HIGH,
-              ProducerQuotaBytesPerSecondDefaultDoc)
-      .define(ConsumerQuotaBytesPerSecondDefaultProp,
-              LONG,
-              Defaults.ConsumerQuotaBytesPerSecondDefault,
-              atLeast(1),
-              HIGH,
-              ConsumerQuotaBytesPerSecondDefaultDoc)
-      .define(NumQuotaSamplesProp,
-              INT,
-              Defaults.NumQuotaSamples,
-              atLeast(1),
-              LOW,
-              NumQuotaSamplesDoc)
-      .define(QuotaWindowSizeSecondsProp,
-              INT,
-              Defaults.QuotaWindowSizeSeconds,
-              atLeast(1),
-              LOW,
-              QuotaWindowSizeSecondsDoc)
+      .define(
+        ProducerQuotaBytesPerSecondDefaultProp,
+        LONG,
+        Defaults.ProducerQuotaBytesPerSecondDefault,
+        atLeast(1),
+        HIGH,
+        ProducerQuotaBytesPerSecondDefaultDoc)
+      .define(
+        ConsumerQuotaBytesPerSecondDefaultProp,
+        LONG,
+        Defaults.ConsumerQuotaBytesPerSecondDefault,
+        atLeast(1),
+        HIGH,
+        ConsumerQuotaBytesPerSecondDefaultDoc)
+      .define(
+        NumQuotaSamplesProp,
+        INT,
+        Defaults.NumQuotaSamples,
+        atLeast(1),
+        LOW,
+        NumQuotaSamplesDoc)
+      .define(
+        QuotaWindowSizeSecondsProp,
+        INT,
+        Defaults.QuotaWindowSizeSeconds,
+        atLeast(1),
+        LOW,
+        QuotaWindowSizeSecondsDoc)
       /** ********* SSL Configuration ****************/
-      .define(PrincipalBuilderClassProp,
-              CLASS,
-              Defaults.PrincipalBuilderClass,
-              MEDIUM,
-              PrincipalBuilderClassDoc)
-      .define(SslProtocolProp,
-              STRING,
-              Defaults.SslProtocol,
-              MEDIUM,
-              SslProtocolDoc)
+      .define(
+        PrincipalBuilderClassProp,
+        CLASS,
+        Defaults.PrincipalBuilderClass,
+        MEDIUM,
+        PrincipalBuilderClassDoc)
+      .define(
+        SslProtocolProp,
+        STRING,
+        Defaults.SslProtocol,
+        MEDIUM,
+        SslProtocolDoc)
       .define(SslProviderProp, STRING, null, MEDIUM, SslProviderDoc)
-      .define(SslEnabledProtocolsProp,
-              LIST,
-              Defaults.SslEnabledProtocols,
-              MEDIUM,
-              SslEnabledProtocolsDoc)
-      .define(SslKeystoreTypeProp,
-              STRING,
-              Defaults.SslKeystoreType,
-              MEDIUM,
-              SslKeystoreTypeDoc)
-      .define(SslKeystoreLocationProp,
-              STRING,
-              null,
-              MEDIUM,
-              SslKeystoreLocationDoc)
-      .define(SslKeystorePasswordProp,
-              PASSWORD,
-              null,
-              MEDIUM,
-              SslKeystorePasswordDoc)
+      .define(
+        SslEnabledProtocolsProp,
+        LIST,
+        Defaults.SslEnabledProtocols,
+        MEDIUM,
+        SslEnabledProtocolsDoc)
+      .define(
+        SslKeystoreTypeProp,
+        STRING,
+        Defaults.SslKeystoreType,
+        MEDIUM,
+        SslKeystoreTypeDoc)
+      .define(
+        SslKeystoreLocationProp,
+        STRING,
+        null,
+        MEDIUM,
+        SslKeystoreLocationDoc)
+      .define(
+        SslKeystorePasswordProp,
+        PASSWORD,
+        null,
+        MEDIUM,
+        SslKeystorePasswordDoc)
       .define(SslKeyPasswordProp, PASSWORD, null, MEDIUM, SslKeyPasswordDoc)
-      .define(SslTruststoreTypeProp,
-              STRING,
-              Defaults.SslTruststoreType,
-              MEDIUM,
-              SslTruststoreTypeDoc)
-      .define(SslTruststoreLocationProp,
-              STRING,
-              null,
-              MEDIUM,
-              SslTruststoreLocationDoc)
-      .define(SslTruststorePasswordProp,
-              PASSWORD,
-              null,
-              MEDIUM,
-              SslTruststorePasswordDoc)
-      .define(SslKeyManagerAlgorithmProp,
-              STRING,
-              Defaults.SslKeyManagerAlgorithm,
-              MEDIUM,
-              SslKeyManagerAlgorithmDoc)
-      .define(SslTrustManagerAlgorithmProp,
-              STRING,
-              Defaults.SslTrustManagerAlgorithm,
-              MEDIUM,
-              SslTrustManagerAlgorithmDoc)
-      .define(SslEndpointIdentificationAlgorithmProp,
-              STRING,
-              null,
-              LOW,
-              SslEndpointIdentificationAlgorithmDoc)
-      .define(SslClientAuthProp,
-              STRING,
-              Defaults.SslClientAuth,
-              in(Defaults.SslClientAuthRequired,
-                 Defaults.SslClientAuthRequested,
-                 Defaults.SslClientAuthNone),
-              MEDIUM,
-              SslClientAuthDoc)
+      .define(
+        SslTruststoreTypeProp,
+        STRING,
+        Defaults.SslTruststoreType,
+        MEDIUM,
+        SslTruststoreTypeDoc)
+      .define(
+        SslTruststoreLocationProp,
+        STRING,
+        null,
+        MEDIUM,
+        SslTruststoreLocationDoc)
+      .define(
+        SslTruststorePasswordProp,
+        PASSWORD,
+        null,
+        MEDIUM,
+        SslTruststorePasswordDoc)
+      .define(
+        SslKeyManagerAlgorithmProp,
+        STRING,
+        Defaults.SslKeyManagerAlgorithm,
+        MEDIUM,
+        SslKeyManagerAlgorithmDoc)
+      .define(
+        SslTrustManagerAlgorithmProp,
+        STRING,
+        Defaults.SslTrustManagerAlgorithm,
+        MEDIUM,
+        SslTrustManagerAlgorithmDoc)
+      .define(
+        SslEndpointIdentificationAlgorithmProp,
+        STRING,
+        null,
+        LOW,
+        SslEndpointIdentificationAlgorithmDoc)
+      .define(
+        SslClientAuthProp,
+        STRING,
+        Defaults.SslClientAuth,
+        in(
+          Defaults.SslClientAuthRequired,
+          Defaults.SslClientAuthRequested,
+          Defaults.SslClientAuthNone),
+        MEDIUM,
+        SslClientAuthDoc
+      )
       .define(SslCipherSuitesProp, LIST, null, MEDIUM, SslCipherSuitesDoc)
 
       /** ********* Sasl Configuration ****************/
-      .define(SaslKerberosServiceNameProp,
-              STRING,
-              null,
-              MEDIUM,
-              SaslKerberosServiceNameDoc)
-      .define(SaslKerberosKinitCmdProp,
-              STRING,
-              Defaults.SaslKerberosKinitCmd,
-              MEDIUM,
-              SaslKerberosKinitCmdDoc)
-      .define(SaslKerberosTicketRenewWindowFactorProp,
-              DOUBLE,
-              Defaults.SaslKerberosTicketRenewWindowFactor,
-              MEDIUM,
-              SaslKerberosTicketRenewWindowFactorDoc)
-      .define(SaslKerberosTicketRenewJitterProp,
-              DOUBLE,
-              Defaults.SaslKerberosTicketRenewJitter,
-              MEDIUM,
-              SaslKerberosTicketRenewJitterDoc)
-      .define(SaslKerberosMinTimeBeforeReloginProp,
-              LONG,
-              Defaults.SaslKerberosMinTimeBeforeRelogin,
-              MEDIUM,
-              SaslKerberosMinTimeBeforeReloginDoc)
-      .define(SaslKerberosPrincipalToLocalRulesProp,
-              LIST,
-              Defaults.SaslKerberosPrincipalToLocalRules,
-              MEDIUM,
-              SaslKerberosPrincipalToLocalRulesDoc)
+      .define(
+        SaslKerberosServiceNameProp,
+        STRING,
+        null,
+        MEDIUM,
+        SaslKerberosServiceNameDoc)
+      .define(
+        SaslKerberosKinitCmdProp,
+        STRING,
+        Defaults.SaslKerberosKinitCmd,
+        MEDIUM,
+        SaslKerberosKinitCmdDoc)
+      .define(
+        SaslKerberosTicketRenewWindowFactorProp,
+        DOUBLE,
+        Defaults.SaslKerberosTicketRenewWindowFactor,
+        MEDIUM,
+        SaslKerberosTicketRenewWindowFactorDoc)
+      .define(
+        SaslKerberosTicketRenewJitterProp,
+        DOUBLE,
+        Defaults.SaslKerberosTicketRenewJitter,
+        MEDIUM,
+        SaslKerberosTicketRenewJitterDoc)
+      .define(
+        SaslKerberosMinTimeBeforeReloginProp,
+        LONG,
+        Defaults.SaslKerberosMinTimeBeforeRelogin,
+        MEDIUM,
+        SaslKerberosMinTimeBeforeReloginDoc)
+      .define(
+        SaslKerberosPrincipalToLocalRulesProp,
+        LIST,
+        Defaults.SaslKerberosPrincipalToLocalRules,
+        MEDIUM,
+        SaslKerberosPrincipalToLocalRulesDoc)
   }
 
   def configNames() = {
@@ -1378,8 +1496,10 @@ object KafkaConfig {
   def validateNames(props: Properties) {
     import scala.collection.JavaConversions._
     val names = configDef.names()
-    for (name <- props.keys) require(
-        names.contains(name), "Unknown configuration \"%s\".".format(name))
+    for (name <- props.keys)
+      require(
+        names.contains(name),
+        "Unknown configuration \"%s\".".format(name))
   }
 
   def fromProps(props: Properties): KafkaConfig =
@@ -1391,9 +1511,10 @@ object KafkaConfig {
   def fromProps(defaults: Properties, overrides: Properties): KafkaConfig =
     fromProps(defaults, overrides, true)
 
-  def fromProps(defaults: Properties,
-                overrides: Properties,
-                doLog: Boolean): KafkaConfig = {
+  def fromProps(
+      defaults: Properties,
+      overrides: Properties,
+      doLog: Boolean): KafkaConfig = {
     val props = new Properties()
     props.putAll(defaults)
     props.putAll(overrides)
@@ -1416,11 +1537,11 @@ class KafkaConfig(val props: java.util.Map[_, _], doLog: Boolean)
       .getOrElse(getInt(KafkaConfig.ZkSessionTimeoutMsProp))
   val zkSyncTimeMs: Int = getInt(KafkaConfig.ZkSyncTimeMsProp)
   val zkEnableSecureAcls: Boolean = getBoolean(
-      KafkaConfig.ZkEnableSecureAclsProp)
+    KafkaConfig.ZkEnableSecureAclsProp)
 
   /** ********* General Configuration ***********/
   val brokerIdGenerationEnable: Boolean = getBoolean(
-      KafkaConfig.BrokerIdGenerationEnableProp)
+    KafkaConfig.BrokerIdGenerationEnableProp)
   val maxReservedBrokerId: Int = getInt(KafkaConfig.MaxReservedBrokerIdProp)
   var brokerId: Int = getInt(KafkaConfig.BrokerIdProp)
   val numNetworkThreads = getInt(KafkaConfig.NumNetworkThreadsProp)
@@ -1432,7 +1553,7 @@ class KafkaConfig(val props: java.util.Map[_, _], doLog: Boolean)
 
   /************* Authorizer Configuration ***********/
   val authorizerClassName: String = getString(
-      KafkaConfig.AuthorizerClassNameProp)
+    KafkaConfig.AuthorizerClassNameProp)
 
   /** ********* Socket Server Configuration ***********/
   val hostName = getString(KafkaConfig.HostNameProp)
@@ -1444,12 +1565,13 @@ class KafkaConfig(val props: java.util.Map[_, _], doLog: Boolean)
 
   val socketSendBufferBytes = getInt(KafkaConfig.SocketSendBufferBytesProp)
   val socketReceiveBufferBytes = getInt(
-      KafkaConfig.SocketReceiveBufferBytesProp)
+    KafkaConfig.SocketReceiveBufferBytesProp)
   val socketRequestMaxBytes = getInt(KafkaConfig.SocketRequestMaxBytesProp)
   val maxConnectionsPerIp = getInt(KafkaConfig.MaxConnectionsPerIpProp)
   val maxConnectionsPerIpOverrides: Map[String, Int] =
-    getMap(KafkaConfig.MaxConnectionsPerIpOverridesProp,
-           getString(KafkaConfig.MaxConnectionsPerIpOverridesProp)).map {
+    getMap(
+      KafkaConfig.MaxConnectionsPerIpOverridesProp,
+      getString(KafkaConfig.MaxConnectionsPerIpOverridesProp)).map {
       case (k, v) => (k, v.toInt)
     }
   val connectionsMaxIdleMs = getLong(KafkaConfig.ConnectionsMaxIdleMsProp)
@@ -1459,39 +1581,39 @@ class KafkaConfig(val props: java.util.Map[_, _], doLog: Boolean)
 
   /** ********* Log Configuration ***********/
   val autoCreateTopicsEnable = getBoolean(
-      KafkaConfig.AutoCreateTopicsEnableProp)
+    KafkaConfig.AutoCreateTopicsEnableProp)
   val numPartitions = getInt(KafkaConfig.NumPartitionsProp)
   val logDirs = CoreUtils.parseCsvList(
-      Option(getString(KafkaConfig.LogDirsProp))
-        .getOrElse(getString(KafkaConfig.LogDirProp)))
+    Option(getString(KafkaConfig.LogDirsProp))
+      .getOrElse(getString(KafkaConfig.LogDirProp)))
   val logSegmentBytes = getInt(KafkaConfig.LogSegmentBytesProp)
   val logFlushIntervalMessages = getLong(
-      KafkaConfig.LogFlushIntervalMessagesProp)
+    KafkaConfig.LogFlushIntervalMessagesProp)
   val logCleanerThreads = getInt(KafkaConfig.LogCleanerThreadsProp)
   val numRecoveryThreadsPerDataDir = getInt(
-      KafkaConfig.NumRecoveryThreadsPerDataDirProp)
+    KafkaConfig.NumRecoveryThreadsPerDataDirProp)
   val logFlushSchedulerIntervalMs = getLong(
-      KafkaConfig.LogFlushSchedulerIntervalMsProp)
+    KafkaConfig.LogFlushSchedulerIntervalMsProp)
   val logFlushOffsetCheckpointIntervalMs = getInt(
-      KafkaConfig.LogFlushOffsetCheckpointIntervalMsProp).toLong
+    KafkaConfig.LogFlushOffsetCheckpointIntervalMsProp).toLong
   val logCleanupIntervalMs = getLong(KafkaConfig.LogCleanupIntervalMsProp)
   val logCleanupPolicy = getString(KafkaConfig.LogCleanupPolicyProp)
   val offsetsRetentionMinutes = getInt(KafkaConfig.OffsetsRetentionMinutesProp)
   val offsetsRetentionCheckIntervalMs = getLong(
-      KafkaConfig.OffsetsRetentionCheckIntervalMsProp)
+    KafkaConfig.OffsetsRetentionCheckIntervalMsProp)
   val logRetentionBytes = getLong(KafkaConfig.LogRetentionBytesProp)
   val logCleanerDedupeBufferSize = getLong(
-      KafkaConfig.LogCleanerDedupeBufferSizeProp)
+    KafkaConfig.LogCleanerDedupeBufferSizeProp)
   val logCleanerDedupeBufferLoadFactor = getDouble(
-      KafkaConfig.LogCleanerDedupeBufferLoadFactorProp)
+    KafkaConfig.LogCleanerDedupeBufferLoadFactorProp)
   val logCleanerIoBufferSize = getInt(KafkaConfig.LogCleanerIoBufferSizeProp)
   val logCleanerIoMaxBytesPerSecond = getDouble(
-      KafkaConfig.LogCleanerIoMaxBytesPerSecondProp)
+    KafkaConfig.LogCleanerIoMaxBytesPerSecondProp)
   val logCleanerDeleteRetentionMs = getLong(
-      KafkaConfig.LogCleanerDeleteRetentionMsProp)
+    KafkaConfig.LogCleanerDeleteRetentionMsProp)
   val logCleanerBackoffMs = getLong(KafkaConfig.LogCleanerBackoffMsProp)
   val logCleanerMinCleanRatio = getDouble(
-      KafkaConfig.LogCleanerMinCleanRatioProp)
+    KafkaConfig.LogCleanerMinCleanRatioProp)
   val logCleanerEnable = getBoolean(KafkaConfig.LogCleanerEnableProp)
   val logIndexSizeMaxBytes = getInt(KafkaConfig.LogIndexSizeMaxBytesProp)
   val logIndexIntervalBytes = getInt(KafkaConfig.LogIndexIntervalBytesProp)
@@ -1501,85 +1623,85 @@ class KafkaConfig(val props: java.util.Map[_, _], doLog: Boolean)
       .getOrElse(60 * 60 * 1000L * getInt(KafkaConfig.LogRollTimeHoursProp))
   val logRollTimeJitterMillis: java.lang.Long =
     Option(getLong(KafkaConfig.LogRollTimeJitterMillisProp)).getOrElse(
-        60 * 60 * 1000L * getInt(KafkaConfig.LogRollTimeJitterHoursProp))
+      60 * 60 * 1000L * getInt(KafkaConfig.LogRollTimeJitterHoursProp))
   val logFlushIntervalMs: java.lang.Long =
     Option(getLong(KafkaConfig.LogFlushIntervalMsProp))
       .getOrElse(getLong(KafkaConfig.LogFlushSchedulerIntervalMsProp))
   val logRetentionTimeMillis = getLogRetentionTimeMillis
   val minInSyncReplicas = getInt(KafkaConfig.MinInSyncReplicasProp)
   val logPreAllocateEnable: java.lang.Boolean = getBoolean(
-      KafkaConfig.LogPreAllocateProp)
+    KafkaConfig.LogPreAllocateProp)
   // We keep the user-provided String as `ApiVersion.apply` can choose a slightly different version (eg if `0.10.0`
   // is passed, `0.10.0-IV0` may be picked)
   val logMessageFormatVersionString = getString(
-      KafkaConfig.LogMessageFormatVersionProp)
+    KafkaConfig.LogMessageFormatVersionProp)
   val logMessageFormatVersion = ApiVersion(logMessageFormatVersionString)
   val logMessageTimestampType =
     TimestampType.forName(getString(KafkaConfig.LogMessageTimestampTypeProp))
   val logMessageTimestampDifferenceMaxMs = getLong(
-      KafkaConfig.LogMessageTimestampDifferenceMaxMsProp)
+    KafkaConfig.LogMessageTimestampDifferenceMaxMsProp)
 
   /** ********* Replication configuration ***********/
   val controllerSocketTimeoutMs: Int = getInt(
-      KafkaConfig.ControllerSocketTimeoutMsProp)
+    KafkaConfig.ControllerSocketTimeoutMsProp)
   val defaultReplicationFactor: Int = getInt(
-      KafkaConfig.DefaultReplicationFactorProp)
+    KafkaConfig.DefaultReplicationFactorProp)
   val replicaLagTimeMaxMs = getLong(KafkaConfig.ReplicaLagTimeMaxMsProp)
   val replicaSocketTimeoutMs = getInt(KafkaConfig.ReplicaSocketTimeoutMsProp)
   val replicaSocketReceiveBufferBytes = getInt(
-      KafkaConfig.ReplicaSocketReceiveBufferBytesProp)
+    KafkaConfig.ReplicaSocketReceiveBufferBytesProp)
   val replicaFetchMaxBytes = getInt(KafkaConfig.ReplicaFetchMaxBytesProp)
   val replicaFetchWaitMaxMs = getInt(KafkaConfig.ReplicaFetchWaitMaxMsProp)
   val replicaFetchMinBytes = getInt(KafkaConfig.ReplicaFetchMinBytesProp)
   val replicaFetchBackoffMs = getInt(KafkaConfig.ReplicaFetchBackoffMsProp)
   val numReplicaFetchers = getInt(KafkaConfig.NumReplicaFetchersProp)
   val replicaHighWatermarkCheckpointIntervalMs = getLong(
-      KafkaConfig.ReplicaHighWatermarkCheckpointIntervalMsProp)
+    KafkaConfig.ReplicaHighWatermarkCheckpointIntervalMsProp)
   val fetchPurgatoryPurgeIntervalRequests = getInt(
-      KafkaConfig.FetchPurgatoryPurgeIntervalRequestsProp)
+    KafkaConfig.FetchPurgatoryPurgeIntervalRequestsProp)
   val producerPurgatoryPurgeIntervalRequests = getInt(
-      KafkaConfig.ProducerPurgatoryPurgeIntervalRequestsProp)
+    KafkaConfig.ProducerPurgatoryPurgeIntervalRequestsProp)
   val autoLeaderRebalanceEnable = getBoolean(
-      KafkaConfig.AutoLeaderRebalanceEnableProp)
+    KafkaConfig.AutoLeaderRebalanceEnableProp)
   val leaderImbalancePerBrokerPercentage = getInt(
-      KafkaConfig.LeaderImbalancePerBrokerPercentageProp)
+    KafkaConfig.LeaderImbalancePerBrokerPercentageProp)
   val leaderImbalanceCheckIntervalSeconds = getLong(
-      KafkaConfig.LeaderImbalanceCheckIntervalSecondsProp)
+    KafkaConfig.LeaderImbalanceCheckIntervalSecondsProp)
   val uncleanLeaderElectionEnable: java.lang.Boolean = getBoolean(
-      KafkaConfig.UncleanLeaderElectionEnableProp)
+    KafkaConfig.UncleanLeaderElectionEnableProp)
   val interBrokerSecurityProtocol = SecurityProtocol.forName(
-      getString(KafkaConfig.InterBrokerSecurityProtocolProp))
+    getString(KafkaConfig.InterBrokerSecurityProtocolProp))
   // We keep the user-provided String as `ApiVersion.apply` can choose a slightly different version (eg if `0.10.0`
   // is passed, `0.10.0-IV0` may be picked)
   val interBrokerProtocolVersionString = getString(
-      KafkaConfig.InterBrokerProtocolVersionProp)
+    KafkaConfig.InterBrokerProtocolVersionProp)
   val interBrokerProtocolVersion = ApiVersion(interBrokerProtocolVersionString)
 
   /** ********* Controlled shutdown configuration ***********/
   val controlledShutdownMaxRetries = getInt(
-      KafkaConfig.ControlledShutdownMaxRetriesProp)
+    KafkaConfig.ControlledShutdownMaxRetriesProp)
   val controlledShutdownRetryBackoffMs = getLong(
-      KafkaConfig.ControlledShutdownRetryBackoffMsProp)
+    KafkaConfig.ControlledShutdownRetryBackoffMsProp)
   val controlledShutdownEnable = getBoolean(
-      KafkaConfig.ControlledShutdownEnableProp)
+    KafkaConfig.ControlledShutdownEnableProp)
 
   /** ********* Group coordinator configuration ***********/
   val groupMinSessionTimeoutMs = getInt(
-      KafkaConfig.GroupMinSessionTimeoutMsProp)
+    KafkaConfig.GroupMinSessionTimeoutMsProp)
   val groupMaxSessionTimeoutMs = getInt(
-      KafkaConfig.GroupMaxSessionTimeoutMsProp)
+    KafkaConfig.GroupMaxSessionTimeoutMsProp)
 
   /** ********* Offset management configuration ***********/
   val offsetMetadataMaxSize = getInt(KafkaConfig.OffsetMetadataMaxSizeProp)
   val offsetsLoadBufferSize = getInt(KafkaConfig.OffsetsLoadBufferSizeProp)
   val offsetsTopicReplicationFactor = getShort(
-      KafkaConfig.OffsetsTopicReplicationFactorProp)
+    KafkaConfig.OffsetsTopicReplicationFactorProp)
   val offsetsTopicPartitions = getInt(KafkaConfig.OffsetsTopicPartitionsProp)
   val offsetCommitTimeoutMs = getInt(KafkaConfig.OffsetCommitTimeoutMsProp)
   val offsetCommitRequiredAcks = getShort(
-      KafkaConfig.OffsetCommitRequiredAcksProp)
+    KafkaConfig.OffsetCommitRequiredAcksProp)
   val offsetsTopicSegmentBytes = getInt(
-      KafkaConfig.OffsetsTopicSegmentBytesProp)
+    KafkaConfig.OffsetsTopicSegmentBytesProp)
   val offsetsTopicCompressionCodec =
     Option(getInt(KafkaConfig.OffsetsTopicCompressionCodecProp))
       .map(value => CompressionCodec.getCompressionCodec(value))
@@ -1590,7 +1712,8 @@ class KafkaConfig(val props: java.util.Map[_, _], doLog: Boolean)
   val metricSampleWindowMs = getLong(KafkaConfig.MetricSampleWindowMsProp)
   val metricReporterClasses: java.util.List[MetricsReporter] =
     getConfiguredInstances(
-        KafkaConfig.MetricReporterClassesProp, classOf[MetricsReporter])
+      KafkaConfig.MetricReporterClassesProp,
+      classOf[MetricsReporter])
 
   /** ********* SSL Configuration **************/
   val principalBuilderClass = getClass(KafkaConfig.PrincipalBuilderClassProp)
@@ -1603,33 +1726,31 @@ class KafkaConfig(val props: java.util.Map[_, _], doLog: Boolean)
   val sslKeyPassword = getPassword(KafkaConfig.SslKeyPasswordProp)
   val sslTruststoreType = getString(KafkaConfig.SslTruststoreTypeProp)
   val sslTruststoreLocation = getString(KafkaConfig.SslTruststoreLocationProp)
-  val sslTruststorePassword = getPassword(
-      KafkaConfig.SslTruststorePasswordProp)
-  val sslKeyManagerAlgorithm = getString(
-      KafkaConfig.SslKeyManagerAlgorithmProp)
+  val sslTruststorePassword = getPassword(KafkaConfig.SslTruststorePasswordProp)
+  val sslKeyManagerAlgorithm = getString(KafkaConfig.SslKeyManagerAlgorithmProp)
   val sslTrustManagerAlgorithm = getString(
-      KafkaConfig.SslTrustManagerAlgorithmProp)
+    KafkaConfig.SslTrustManagerAlgorithmProp)
   val sslClientAuth = getString(KafkaConfig.SslClientAuthProp)
   val sslCipher = getList(KafkaConfig.SslCipherSuitesProp)
 
   /** ********* Sasl Configuration **************/
   val saslKerberosServiceName = getString(
-      KafkaConfig.SaslKerberosServiceNameProp)
+    KafkaConfig.SaslKerberosServiceNameProp)
   val saslKerberosKinitCmd = getString(KafkaConfig.SaslKerberosKinitCmdProp)
   val saslKerberosTicketRenewWindowFactor = getDouble(
-      KafkaConfig.SaslKerberosTicketRenewWindowFactorProp)
+    KafkaConfig.SaslKerberosTicketRenewWindowFactorProp)
   val saslKerberosTicketRenewJitter = getDouble(
-      KafkaConfig.SaslKerberosTicketRenewJitterProp)
+    KafkaConfig.SaslKerberosTicketRenewJitterProp)
   val saslKerberosMinTimeBeforeRelogin = getLong(
-      KafkaConfig.SaslKerberosMinTimeBeforeReloginProp)
+    KafkaConfig.SaslKerberosMinTimeBeforeReloginProp)
   val saslKerberosPrincipalToLocalRules = getList(
-      KafkaConfig.SaslKerberosPrincipalToLocalRulesProp)
+    KafkaConfig.SaslKerberosPrincipalToLocalRulesProp)
 
   /** ********* Quota Configuration **************/
   val producerQuotaBytesPerSecondDefault = getLong(
-      KafkaConfig.ProducerQuotaBytesPerSecondDefaultProp)
+    KafkaConfig.ProducerQuotaBytesPerSecondDefaultProp)
   val consumerQuotaBytesPerSecondDefault = getLong(
-      KafkaConfig.ConsumerQuotaBytesPerSecondDefaultProp)
+    KafkaConfig.ConsumerQuotaBytesPerSecondDefaultProp)
   val numQuotaSamples = getInt(KafkaConfig.NumQuotaSamplesProp)
   val quotaWindowSizeSeconds = getInt(KafkaConfig.QuotaWindowSizeSecondsProp)
 
@@ -1644,25 +1765,27 @@ class KafkaConfig(val props: java.util.Map[_, _], doLog: Boolean)
     val millisInHour = 60L * millisInMinute
 
     val millis: java.lang.Long = Option(
-        getLong(KafkaConfig.LogRetentionTimeMillisProp)).getOrElse(
-        Option(getInt(KafkaConfig.LogRetentionTimeMinutesProp)) match {
-      case Some(mins) => millisInMinute * mins
-      case None => getInt(KafkaConfig.LogRetentionTimeHoursProp) * millisInHour
-    })
+      getLong(KafkaConfig.LogRetentionTimeMillisProp))
+      .getOrElse(Option(getInt(KafkaConfig.LogRetentionTimeMinutesProp)) match {
+        case Some(mins) => millisInMinute * mins
+        case None =>
+          getInt(KafkaConfig.LogRetentionTimeHoursProp) * millisInHour
+      })
 
     if (millis < 0) return -1
     millis
   }
 
   private def getMap(
-      propName: String, propValue: String): Map[String, String] = {
+      propName: String,
+      propValue: String): Map[String, String] = {
     try {
       CoreUtils.parseCsvMap(propValue)
     } catch {
       case e: Exception =>
         throw new IllegalArgumentException(
-            "Error parsing configuration property '%s': %s".format(
-                propName, e.getMessage))
+          "Error parsing configuration property '%s': %s"
+            .format(propName, e.getMessage))
     }
   }
 
@@ -1674,18 +1797,20 @@ class KafkaConfig(val props: java.util.Map[_, _], doLog: Boolean)
     } catch {
       case e: Exception =>
         throw new IllegalArgumentException(
-            "Error creating broker listeners from '%s': %s".format(
-                listeners, e.getMessage))
+          "Error creating broker listeners from '%s': %s"
+            .format(listeners, e.getMessage))
     }
     // filter port 0 for unit tests
     val endpointsWithoutZeroPort = endpoints.map(ep => ep.port).filter(_ != 0)
     val distinctPorts = endpointsWithoutZeroPort.distinct
     val distinctProtocols = endpoints.map(ep => ep.protocolType).distinct
 
-    require(distinctPorts.size == endpointsWithoutZeroPort.size,
-            "Each listener must have a different port")
-    require(distinctProtocols.size == endpoints.size,
-            "Each listener must have a different protocol")
+    require(
+      distinctPorts.size == endpointsWithoutZeroPort.size,
+      "Each listener must have a different port")
+    require(
+      distinctProtocols.size == endpoints.size,
+      "Each listener must have a different protocol")
   }
 
   // If the user did not define listeners but did define host or port, let's use them in backward compatible way
@@ -1706,13 +1831,13 @@ class KafkaConfig(val props: java.util.Map[_, _], doLog: Boolean)
       ): immutable.Map[SecurityProtocol, EndPoint] = {
     if (getString(KafkaConfig.AdvertisedListenersProp) != null) {
       validateUniquePortAndProtocol(
-          getString(KafkaConfig.AdvertisedListenersProp))
+        getString(KafkaConfig.AdvertisedListenersProp))
       CoreUtils.listenerListToEndPoints(
-          getString(KafkaConfig.AdvertisedListenersProp))
+        getString(KafkaConfig.AdvertisedListenersProp))
     } else if (getString(KafkaConfig.AdvertisedHostNameProp) != null ||
                getInt(KafkaConfig.AdvertisedPortProp) != null) {
       CoreUtils.listenerListToEndPoints(
-          "PLAINTEXT://" + advertisedHostName + ":" + advertisedPort)
+        "PLAINTEXT://" + advertisedHostName + ":" + advertisedPort)
     } else {
       getListeners()
     }
@@ -1723,51 +1848,61 @@ class KafkaConfig(val props: java.util.Map[_, _], doLog: Boolean)
   private def validateValues() {
     if (brokerIdGenerationEnable) {
       require(
-          brokerId >= -1 && brokerId <= maxReservedBrokerId,
-          "broker.id must be equal or greater than -1 and not greater than reserved.broker.max.id")
+        brokerId >= -1 && brokerId <= maxReservedBrokerId,
+        "broker.id must be equal or greater than -1 and not greater than reserved.broker.max.id")
     } else {
       require(brokerId >= 0, "broker.id must be equal or greater than 0")
     }
     require(
-        logRollTimeMillis >= 1, "log.roll.ms must be equal or greater than 1")
-    require(logRollTimeJitterMillis >= 0,
-            "log.roll.jitter.ms must be equal or greater than 0")
+      logRollTimeMillis >= 1,
+      "log.roll.ms must be equal or greater than 1")
     require(
-        logRetentionTimeMillis >= 1 || logRetentionTimeMillis == -1,
-        "log.retention.ms must be unlimited (-1) or, equal or greater than 1")
+      logRollTimeJitterMillis >= 0,
+      "log.roll.jitter.ms must be equal or greater than 0")
+    require(
+      logRetentionTimeMillis >= 1 || logRetentionTimeMillis == -1,
+      "log.retention.ms must be unlimited (-1) or, equal or greater than 1")
     require(logDirs.size > 0)
     require(
-        logCleanerDedupeBufferSize / logCleanerThreads > 1024 * 1024,
-        "log.cleaner.dedupe.buffer.size must be at least 1MB per cleaner thread.")
+      logCleanerDedupeBufferSize / logCleanerThreads > 1024 * 1024,
+      "log.cleaner.dedupe.buffer.size must be at least 1MB per cleaner thread.")
     require(
-        replicaFetchWaitMaxMs <= replicaSocketTimeoutMs,
-        "replica.socket.timeout.ms should always be at least replica.fetch.wait.max.ms" +
-        " to prevent unnecessary socket timeouts")
+      replicaFetchWaitMaxMs <= replicaSocketTimeoutMs,
+      "replica.socket.timeout.ms should always be at least replica.fetch.wait.max.ms" +
+        " to prevent unnecessary socket timeouts"
+    )
     require(
-        replicaFetchMaxBytes >= messageMaxBytes,
-        "replica.fetch.max.bytes should be equal or greater than message.max.bytes")
+      replicaFetchMaxBytes >= messageMaxBytes,
+      "replica.fetch.max.bytes should be equal or greater than message.max.bytes")
     require(
-        replicaFetchWaitMaxMs <= replicaLagTimeMaxMs,
-        "replica.fetch.wait.max.ms should always be at least replica.lag.time.max.ms" +
-        " to prevent frequent changes in ISR")
+      replicaFetchWaitMaxMs <= replicaLagTimeMaxMs,
+      "replica.fetch.wait.max.ms should always be at least replica.lag.time.max.ms" +
+        " to prevent frequent changes in ISR"
+    )
     require(
-        offsetCommitRequiredAcks >= -1 &&
+      offsetCommitRequiredAcks >= -1 &&
         offsetCommitRequiredAcks <= offsetsTopicReplicationFactor,
-        "offsets.commit.required.acks must be greater or equal -1 and less or equal to offsets.topic.replication.factor")
-    require(BrokerCompressionCodec.isValid(compressionType),
-            "compression.type : " + compressionType + " is not valid." +
-            " Valid options are " +
-            BrokerCompressionCodec.brokerCompressionOptions.mkString(","))
+      "offsets.commit.required.acks must be greater or equal -1 and less or equal to offsets.topic.replication.factor"
+    )
     require(
-        advertisedListeners.keySet.contains(interBrokerSecurityProtocol),
-        s"${KafkaConfig.InterBrokerSecurityProtocolProp} must be a protocol in the configured set of ${KafkaConfig.AdvertisedListenersProp}. " +
-        s"The valid options based on currently configured protocols are ${advertisedListeners.keySet}")
+      BrokerCompressionCodec.isValid(compressionType),
+      "compression.type : " + compressionType + " is not valid." +
+        " Valid options are " +
+        BrokerCompressionCodec.brokerCompressionOptions.mkString(",")
+    )
     require(
-        advertisedListeners.keySet.subsetOf(listeners.keySet),
-        s"${KafkaConfig.AdvertisedListenersProp} protocols must be equal to or a subset of ${KafkaConfig.ListenersProp} protocols. " +
-        s"Found ${advertisedListeners.keySet}. The valid options based on currently configured protocols are ${listeners.keySet}")
+      advertisedListeners.keySet.contains(interBrokerSecurityProtocol),
+      s"${KafkaConfig.InterBrokerSecurityProtocolProp} must be a protocol in the configured set of ${KafkaConfig.AdvertisedListenersProp}. " +
+        s"The valid options based on currently configured protocols are ${advertisedListeners.keySet}"
+    )
     require(
-        interBrokerProtocolVersion >= logMessageFormatVersion,
-        s"log.message.format.version $logMessageFormatVersionString cannot be used when inter.broker.protocol.version is set to $interBrokerProtocolVersionString")
+      advertisedListeners.keySet.subsetOf(listeners.keySet),
+      s"${KafkaConfig.AdvertisedListenersProp} protocols must be equal to or a subset of ${KafkaConfig.ListenersProp} protocols. " +
+        s"Found ${advertisedListeners.keySet}. The valid options based on currently configured protocols are ${listeners.keySet}"
+    )
+    require(
+      interBrokerProtocolVersion >= logMessageFormatVersion,
+      s"log.message.format.version $logMessageFormatVersionString cannot be used when inter.broker.protocol.version is set to $interBrokerProtocolVersionString"
+    )
   }
 }

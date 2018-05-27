@@ -38,7 +38,8 @@ object DateOps extends java.io.Serializable {
   val DATETIME_HMSM_WITH_DASH = "yyyy-MM-dd HH:mm:ss.SSS"
 
   private[scalding] sealed abstract class Format(
-      val pattern: String, val validator: Regex) {
+      val pattern: String,
+      val validator: Regex) {
     def matches(s: String): Boolean = validator.findFirstIn(s).isDefined
   }
 
@@ -49,37 +50,43 @@ object DateOps extends java.io.Serializable {
     private val emptyEnd = """\s*$"""
 
     case object DATE_WITHOUT_DASH
-        extends Format(DateOps.DATE_WITHOUT_DASH,
-                       new Regex(emptyBegin + """\d{8}""" + emptyEnd))
+        extends Format(
+          DateOps.DATE_WITHOUT_DASH,
+          new Regex(emptyBegin + """\d{8}""" + emptyEnd))
     case object DATE_WITH_DASH
         extends Format(
-            DateOps.DATE_WITH_DASH, new Regex(emptyBegin + date + emptyEnd))
+          DateOps.DATE_WITH_DASH,
+          new Regex(emptyBegin + date + emptyEnd))
     case object DATEHOUR_WITHOUT_DASH
-        extends Format(DateOps.DATEHOUR_WITHOUT_DASH,
-                       new Regex(emptyBegin + """\d{10}""" + emptyEnd))
+        extends Format(
+          DateOps.DATEHOUR_WITHOUT_DASH,
+          new Regex(emptyBegin + """\d{10}""" + emptyEnd))
     case object DATEHOUR_WITH_DASH
         extends Format(
-            DateOps.DATEHOUR_WITH_DASH,
-            new Regex(emptyBegin + date + sep + """\d\d""" + emptyEnd))
+          DateOps.DATEHOUR_WITH_DASH,
+          new Regex(emptyBegin + date + sep + """\d\d""" + emptyEnd))
     case object DATETIME_WITHOUT_DASH
-        extends Format(DateOps.DATETIME_WITHOUT_DASH,
-                       new Regex(emptyBegin + """\d{12}""" + emptyEnd))
+        extends Format(
+          DateOps.DATETIME_WITHOUT_DASH,
+          new Regex(emptyBegin + """\d{12}""" + emptyEnd))
     case object DATETIME_WITH_DASH
         extends Format(
-            DateOps.DATETIME_WITH_DASH,
-            new Regex(emptyBegin + date + sep + """\d\d:\d\d""" + emptyEnd))
+          DateOps.DATETIME_WITH_DASH,
+          new Regex(emptyBegin + date + sep + """\d\d:\d\d""" + emptyEnd))
     case object DATETIME_HMS_WITHOUT_DASH
-        extends Format(DateOps.DATETIME_HMS_WITHOUT_DASH,
-                       new Regex(emptyBegin + """\d{14}""" + emptyEnd))
+        extends Format(
+          DateOps.DATETIME_HMS_WITHOUT_DASH,
+          new Regex(emptyBegin + """\d{14}""" + emptyEnd))
     case object DATETIME_HMS_WITH_DASH
         extends Format(
-            DateOps.DATETIME_HMS_WITH_DASH,
-            new Regex(
-                emptyBegin + date + sep + """\d\d:\d\d:\d\d""" + emptyEnd))
+          DateOps.DATETIME_HMS_WITH_DASH,
+          new Regex(emptyBegin + date + sep + """\d\d:\d\d:\d\d""" + emptyEnd))
     case object DATETIME_HMSM_WITH_DASH
-        extends Format(DateOps.DATETIME_HMSM_WITH_DASH,
-                       new Regex(emptyBegin + date + sep +
-                           """\d\d:\d\d:\d\d\.\d{1,3}""" + emptyEnd))
+        extends Format(
+          DateOps.DATETIME_HMSM_WITH_DASH,
+          new Regex(
+            emptyBegin + date + sep +
+              """\d\d:\d\d:\d\d\.\d{1,3}""" + emptyEnd))
   }
 
   private val prepare: String => String = { (str: String) =>
@@ -92,15 +99,17 @@ object DateOps extends java.io.Serializable {
     * Return the guessed format for this datestring
     */
   private[scalding] def getFormatObject(s: String): Option[Format] = {
-    val formats: List[Format] = List(Format.DATE_WITH_DASH,
-                                     Format.DATEHOUR_WITH_DASH,
-                                     Format.DATETIME_WITH_DASH,
-                                     Format.DATETIME_HMS_WITH_DASH,
-                                     Format.DATETIME_HMSM_WITH_DASH,
-                                     Format.DATE_WITHOUT_DASH,
-                                     Format.DATEHOUR_WITHOUT_DASH,
-                                     Format.DATETIME_WITHOUT_DASH,
-                                     Format.DATETIME_HMS_WITHOUT_DASH)
+    val formats: List[Format] = List(
+      Format.DATE_WITH_DASH,
+      Format.DATEHOUR_WITH_DASH,
+      Format.DATETIME_WITH_DASH,
+      Format.DATETIME_HMS_WITH_DASH,
+      Format.DATETIME_HMSM_WITH_DASH,
+      Format.DATE_WITHOUT_DASH,
+      Format.DATEHOUR_WITHOUT_DASH,
+      Format.DATETIME_WITHOUT_DASH,
+      Format.DATETIME_HMS_WITHOUT_DASH
+    )
 
     formats.find { _.matches(prepare(s)) }
   }

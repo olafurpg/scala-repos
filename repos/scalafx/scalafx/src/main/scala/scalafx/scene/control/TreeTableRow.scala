@@ -69,7 +69,8 @@ object TreeTableRow {
   */
 class TreeTableRow[T](
     override val delegate: jfxsc.TreeTableRow[T] = new jfxsc.TreeTableRow[T])
-    extends IndexedCell[T](delegate) with SFXDelegate[jfxsc.TreeTableRow[T]] {
+    extends IndexedCell[T](delegate)
+    with SFXDelegate[jfxsc.TreeTableRow[T]] {
 
   // protected  createDefaultSkin: Skin[_]
 

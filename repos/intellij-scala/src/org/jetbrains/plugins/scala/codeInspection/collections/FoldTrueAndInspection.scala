@@ -24,9 +24,9 @@ object FoldTrueAnd extends SimplificationType() {
         None
       case qual `.fold` (literal("true"), andCondition(cond)) =>
         Some(
-            replace(expr)
-              .withText(invocationText(qual, "forall", cond))
-              .highlightFrom(qual))
+          replace(expr)
+            .withText(invocationText(qual, "forall", cond))
+            .highlightFrom(qual))
       case _ => None
     }
   }

@@ -22,16 +22,20 @@ object AttributesSpec {
 
   object AttributesSink {
     def apply(): Sink[Nothing, Future[Attributes]] =
-      new Sink(new AttributesSink(
-              Attributes.name("attributesSink"), Sink.shape("attributesSink")))
+      new Sink(
+        new AttributesSink(
+          Attributes.name("attributesSink"),
+          Sink.shape("attributesSink")))
   }
 
   final class AttributesSink(
-      val attributes: Attributes, shape: SinkShape[Nothing])
+      val attributes: Attributes,
+      shape: SinkShape[Nothing])
       extends SinkModule[Nothing, Future[Attributes]](shape) {
     override def create(context: MaterializationContext) =
-      (new SinkholeSubscriber(Promise()),
-       Future.successful(context.effectiveAttributes))
+      (
+        new SinkholeSubscriber(Promise()),
+        Future.successful(context.effectiveAttributes))
 
     override protected def newInstance(
         shape: SinkShape[Nothing]): SinkModule[Nothing, Future[Attributes]] =
@@ -45,8 +49,8 @@ object AttributesSpec {
 class AttributesSpec extends AkkaSpec {
   import AttributesSpec._
 
-  val settings = ActorMaterializerSettings(system).withInputBuffer(
-      initialSize = 2, maxSize = 16)
+  val settings = ActorMaterializerSettings(system)
+    .withInputBuffer(initialSize = 2, maxSize = 16)
 
   implicit val materializer = ActorMaterializer(settings)
 
@@ -54,8 +58,8 @@ class AttributesSpec extends AkkaSpec {
 
     "be overridable on a module basis" in {
       val runnable = Source.empty.toMat(
-          AttributesSink().withAttributes(Attributes.name("new-name")))(
-          Keep.right)
+        AttributesSink().withAttributes(Attributes.name("new-name")))(
+        Keep.right)
       whenReady(runnable.run()) { attributes ⇒
         attributes.get[Name] should contain(Name("new-name"))
       }
@@ -72,7 +76,8 @@ class AttributesSpec extends AkkaSpec {
 
     val attributes =
       Attributes.name("a") and Attributes.name("b") and Attributes.inputBuffer(
-          1, 2)
+        1,
+        2)
 
     "give access to first attribute" in {
       attributes.getFirst[Name] should ===(Some(Attributes.Name("a")))

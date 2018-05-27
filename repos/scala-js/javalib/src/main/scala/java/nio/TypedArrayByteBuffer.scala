@@ -10,8 +10,8 @@ private[nio] final class TypedArrayByteBuffer private (
     _readOnly: Boolean)
     extends ByteBuffer(_typedArray.length, null, -1) {
 
-  override private[nio] lazy val _dataView: DataView = new DataView(
-      _typedArray.buffer, _typedArray.byteOffset, capacity)
+  override private[nio] lazy val _dataView: DataView =
+    new DataView(_typedArray.buffer, _typedArray.byteOffset, capacity)
 
   position(_initialPosition)
   limit(_initialLimit)
@@ -200,12 +200,18 @@ private[nio] final class TypedArrayByteBuffer private (
 
   @inline
   override private[nio] def load(
-      startIndex: Int, dst: Array[Byte], offset: Int, length: Int): Unit =
+      startIndex: Int,
+      dst: Array[Byte],
+      offset: Int,
+      length: Int): Unit =
     GenBuffer(this).generic_load(startIndex, dst, offset, length)
 
   @inline
   override private[nio] def store(
-      startIndex: Int, src: Array[Byte], offset: Int, length: Int): Unit =
+      startIndex: Int,
+      src: Array[Byte],
+      offset: Int,
+      length: Int): Unit =
     GenBuffer(this).generic_store(startIndex, src, offset, length)
 }
 
@@ -214,17 +220,23 @@ private[nio] object TypedArrayByteBuffer {
       extends GenTypedArrayBuffer.NewTypedArrayBuffer[ByteBuffer] {
     def bytesPerElem: Int = 1
 
-    def apply(typedArray: Int8Array,
-              initialPosition: Int,
-              initialLimit: Int,
-              readOnly: Boolean): TypedArrayByteBuffer = {
+    def apply(
+        typedArray: Int8Array,
+        initialPosition: Int,
+        initialLimit: Int,
+        readOnly: Boolean): TypedArrayByteBuffer = {
       new TypedArrayByteBuffer(
-          typedArray, initialPosition, initialLimit, readOnly)
+        typedArray,
+        initialPosition,
+        initialLimit,
+        readOnly)
     }
 
     @inline
     def newTypedArray(
-        buffer: ArrayBuffer, byteOffset: Int, length: Int): Int8Array = {
+        buffer: ArrayBuffer,
+        byteOffset: Int,
+        length: Int): Int8Array = {
       new Int8Array(buffer, byteOffset, length)
     }
   }

@@ -14,17 +14,17 @@ object Publish extends AutoPlugin {
   override def trigger = allRequirements
 
   override lazy val projectSettings = Seq(
-      crossPaths := false,
-      pomExtra := akkaPomExtra,
-      publishTo := akkaPublishTo.value,
-      credentials ++= akkaCredentials,
-      organizationName := "Lightbend Inc.",
-      organizationHomepage := Some(url("http://www.lightbend.com")),
-      publishMavenStyle := true,
-      pomIncludeRepository := { x =>
-        false
-      },
-      defaultPublishTo := crossTarget.value / "repository"
+    crossPaths := false,
+    pomExtra := akkaPomExtra,
+    publishTo := akkaPublishTo.value,
+    credentials ++= akkaCredentials,
+    organizationName := "Lightbend Inc.",
+    organizationHomepage := Some(url("http://www.lightbend.com")),
+    publishMavenStyle := true,
+    pomIncludeRepository := { x =>
+      false
+    },
+    defaultPublishTo := crossTarget.value / "repository"
   )
 
   def akkaPomExtra = {

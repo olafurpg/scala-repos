@@ -31,15 +31,20 @@ class HiveOperatorQueryableSuite extends QueryTest with TestHiveSingleton {
 
     // register a describe command to be a temp table
     sql("desc src").registerTempTable("mydesc")
-    checkAnswer(sql("desc mydesc"),
-                Seq(Row("col_name", "string", "name of the column"),
-                    Row("data_type", "string", "data type of the column"),
-                    Row("comment", "string", "comment of the column")))
+    checkAnswer(
+      sql("desc mydesc"),
+      Seq(
+        Row("col_name", "string", "name of the column"),
+        Row("data_type", "string", "data type of the column"),
+        Row("comment", "string", "comment of the column"))
+    )
 
-    checkAnswer(sql("select * from mydesc"),
-                Seq(Row("key", "int", null), Row("value", "string", null)))
+    checkAnswer(
+      sql("select * from mydesc"),
+      Seq(Row("key", "int", null), Row("value", "string", null)))
 
-    checkAnswer(sql("select col_name, data_type, comment from mydesc"),
-                Seq(Row("key", "int", null), Row("value", "string", null)))
+    checkAnswer(
+      sql("select col_name, data_type, comment from mydesc"),
+      Seq(Row("key", "int", null), Row("value", "string", null)))
   }
 }

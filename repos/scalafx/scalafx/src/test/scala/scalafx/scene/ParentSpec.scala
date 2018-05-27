@@ -43,7 +43,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class ParentSpec
     extends SimpleSFXDelegateSpec[jfxs.Parent, Parent](
-        classOf[jfxs.Parent], classOf[Parent]) {
+      classOf[jfxs.Parent],
+      classOf[Parent]) {
 
   override protected def getScalaClassInstance =
     new Parent(getJavaClassInstance) {}

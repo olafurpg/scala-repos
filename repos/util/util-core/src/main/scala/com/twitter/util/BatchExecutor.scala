@@ -32,8 +32,7 @@ private[util] class BatchExecutor[In, Out](
     f: Seq[In] => Future[Seq[Out]]
 )(
     implicit timer: Timer
-)
-    extends Function1[In, Future[Out]] { batcher =>
+) extends Function1[In, Future[Out]] { batcher =>
   import java.util.logging.Level.WARNING
 
   class ScheduledFlush(after: Duration, timer: Timer) {
@@ -63,16 +62,17 @@ private[util] class BatchExecutor[In, Out](
 
   def currentBufPercentile = sizePercentile match {
     case tooHigh if tooHigh > 1.0f =>
-      log.log(WARNING,
-              "value returned for sizePercentile (%f) was > 1.0f, using 1.0",
-              tooHigh)
+      log.log(
+        WARNING,
+        "value returned for sizePercentile (%f) was > 1.0f, using 1.0",
+        tooHigh)
       1.0f
 
     case tooLow if tooLow < 0.0f =>
       log.log(
-          WARNING,
-          "value returned for sizePercentile (%f) was negative, using 0.0f",
-          tooLow)
+        WARNING,
+        "value returned for sizePercentile (%f) was negative, using 0.0f",
+        tooLow)
       0.0f
 
     case p => p
@@ -81,7 +81,7 @@ private[util] class BatchExecutor[In, Out](
   def newBufThreshold =
     math.round(currentBufPercentile * sizeThreshold) match {
       case tooLow if tooLow < 1 => 1
-      case size => math.min(size, sizeThreshold)
+      case size                 => math.min(size, sizeThreshold)
     }
 
   def apply(t: In): Future[Out] = enqueue(t)
@@ -131,10 +131,11 @@ private[util] class BatchExecutor[In, Out](
         executeBatch(prevBatch)
       } catch {
         case e: Throwable =>
-          log.log(WARNING,
-                  "unhandled exception caught in Future.batched: %s".format(
-                      e.toString),
-                  e)
+          log.log(
+            WARNING,
+            "unhandled exception caught in Future.batched: %s".format(
+              e.toString),
+            e)
       }
   }
 
@@ -166,7 +167,7 @@ private[util] class BatchExecutor[In, Out](
 
       case Throw(e) =>
         val t = Throw(e)
-        promises foreach { _ () = t }
+        promises foreach { _() = t }
     }
   }
 }

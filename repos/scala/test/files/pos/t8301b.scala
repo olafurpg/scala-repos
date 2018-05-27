@@ -25,7 +25,7 @@ object Test extends App {
     import ScalaName._
 
     // both the pattern and import led to
-    // stable identifier required, but SN found. Note that value SN 
+    // stable identifier required, but SN found. Note that value SN
     // is not stable because its type, Test.u.TermName, is volatile.
     val SN = ScalaName
     ??? match {

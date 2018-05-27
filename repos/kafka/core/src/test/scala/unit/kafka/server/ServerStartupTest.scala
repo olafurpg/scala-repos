@@ -63,8 +63,9 @@ class ServerStartupTest extends ZooKeeperTestHarness {
     }
 
     // broker registration shouldn't change
-    assertEquals(brokerRegistration,
-                 zkUtils.readData(ZkUtils.BrokerIdsPath + "/" + brokerId)._1)
+    assertEquals(
+      brokerRegistration,
+      zkUtils.readData(ZkUtils.BrokerIdsPath + "/" + brokerId)._1)
 
     server1.shutdown()
     CoreUtils.rm(server1.config.logDirs)
@@ -77,8 +78,8 @@ class ServerStartupTest extends ZooKeeperTestHarness {
     val server = TestUtils.createServer(KafkaConfig.fromProps(props))
 
     TestUtils.waitUntilTrue(
-        () => server.metadataCache.getAliveBrokers.nonEmpty,
-        "Wait for cache to update")
+      () => server.metadataCache.getAliveBrokers.nonEmpty,
+      "Wait for cache to update")
     assertEquals(1, server.metadataCache.getAliveBrokers.size)
     assertEquals(brokerId, server.metadataCache.getAliveBrokers.head.id)
 

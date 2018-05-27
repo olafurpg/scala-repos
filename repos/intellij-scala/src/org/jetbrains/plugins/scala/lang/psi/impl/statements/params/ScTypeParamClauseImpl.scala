@@ -21,9 +21,10 @@ import scala.collection.mutable.ArrayBuffer
   * @author Alexander Podkhalyuzin
   * @since 22.02.2008
   */
-class ScTypeParamClauseImpl private (stub: StubElement[ScTypeParamClause],
-                                     nodeType: IElementType,
-                                     node: ASTNode)
+class ScTypeParamClauseImpl private (
+    stub: StubElement[ScTypeParamClause],
+    nodeType: IElementType,
+    node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
     with ScTypeParamClause {
   def this(node: ASTNode) = { this(null, null, node) }
@@ -45,8 +46,9 @@ class ScTypeParamClauseImpl private (stub: StubElement[ScTypeParamClause],
     val stub = getStub
     if (stub != null) {
       stub
-        .getChildrenByType(ScalaElementTypes.TYPE_PARAM,
-                           JavaArrayFactoryUtil.ScTypeParamFactory)
+        .getChildrenByType(
+          ScalaElementTypes.TYPE_PARAM,
+          JavaArrayFactoryUtil.ScTypeParamFactory)
         .toSeq
     } else {
       val buffer = new ArrayBuffer[ScTypeParam]
@@ -54,7 +56,7 @@ class ScTypeParamClauseImpl private (stub: StubElement[ScTypeParamClause],
       while (curr != null) {
         curr match {
           case param: ScTypeParam => buffer += param
-          case _ =>
+          case _                  =>
         }
         curr = curr.getNextSibling
       }
@@ -62,10 +64,11 @@ class ScTypeParamClauseImpl private (stub: StubElement[ScTypeParamClause],
     }
   }
 
-  override def processDeclarations(processor: PsiScopeProcessor,
-                                   state: ResolveState,
-                                   lastParent: PsiElement,
-                                   place: PsiElement): Boolean = {
+  override def processDeclarations(
+      processor: PsiScopeProcessor,
+      state: ResolveState,
+      lastParent: PsiElement,
+      place: PsiElement): Boolean = {
     if (!processor.isInstanceOf[BaseProcessor]) {
       for (param <- typeParameters) {
         if (!processor.execute(param, state)) return false

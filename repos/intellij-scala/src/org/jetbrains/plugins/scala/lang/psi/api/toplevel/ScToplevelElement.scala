@@ -36,33 +36,34 @@ trait ScToplevelElement extends ScalaPsiElement {
 
   def immediateTypeDefinitions: Seq[ScTypeDefinition] = {
     val stub: StubElement[_ <: PsiElement] = this match {
-      case file: PsiFileImpl => file.getStub
+      case file: PsiFileImpl   => file.getStub
       case st: ScPackagingImpl => st.getStub
-      case _ => null
+      case _                   => null
     }
     if (stub != null) {
       stub.getChildrenByType[ScTypeDefinition](
-          TokenSets.TMPL_DEF_BIT_SET,
-          JavaArrayFactoryUtil.ScTypeDefinitionFactory)
+        TokenSets.TMPL_DEF_BIT_SET,
+        JavaArrayFactoryUtil.ScTypeDefinitionFactory)
     } else findChildrenByClassScala(classOf[ScTypeDefinition]).toSeq
   }
 
   def packagings: Seq[ScPackaging] = {
     val stub: StubElement[_ <: PsiElement] = this match {
-      case file: PsiFileImpl => file.getStub
+      case file: PsiFileImpl   => file.getStub
       case st: ScPackagingImpl => st.getStub
-      case _ => null
+      case _                   => null
     }
     if (stub != null) {
       stub.getChildrenByType[ScPackaging](
-          ScalaElementTypes.PACKAGING, JavaArrayFactoryUtil.ScPackagingFactory)
+        ScalaElementTypes.PACKAGING,
+        JavaArrayFactoryUtil.ScPackagingFactory)
     } else {
       val buffer = new ArrayBuffer[ScPackaging]
       var curr = getFirstChild
       while (curr != null) {
         curr match {
           case packaging: ScPackaging => buffer += packaging
-          case _ =>
+          case _                      =>
         }
         curr = curr.getNextSibling
       }

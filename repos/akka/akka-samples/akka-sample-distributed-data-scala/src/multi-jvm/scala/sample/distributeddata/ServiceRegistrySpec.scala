@@ -19,7 +19,9 @@ object ServiceRegistrySpec extends MultiNodeConfig {
   val node2 = role("node-2")
   val node3 = role("node-3")
 
-  commonConfig(ConfigFactory.parseString("""
+  commonConfig(
+    ConfigFactory.parseString(
+      """
     akka.loglevel = INFO
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
     akka.log-dead-letters-during-shutdown = off
@@ -37,7 +39,8 @@ class ServiceRegistrySpecMultiJvmNode2 extends ServiceRegistrySpec
 class ServiceRegistrySpecMultiJvmNode3 extends ServiceRegistrySpec
 
 class ServiceRegistrySpec
-    extends MultiNodeSpec(ServiceRegistrySpec) with STMultiNodeSpec
+    extends MultiNodeSpec(ServiceRegistrySpec)
+    with STMultiNodeSpec
     with ImplicitSender {
   import ServiceRegistrySpec._
   import ServiceRegistry._
@@ -77,7 +80,7 @@ class ServiceRegistrySpec
         val probe = TestProbe()
         registry.tell(Lookup("a"), probe.ref)
         probe.expectMsgType[Bindings].services.map(_.path.name) should be(
-            Set("a1"))
+          Set("a1"))
       }
 
       enterBarrier("after-2")
@@ -94,10 +97,10 @@ class ServiceRegistrySpec
 
       probe.within(10.seconds) {
         probe.expectMsgType[BindingChanged].services.map(_.path.name) should be(
-            Set("a1", "a2"))
+          Set("a1", "a2"))
         registry.tell(Lookup("a"), probe.ref)
         probe.expectMsgType[Bindings].services.map(_.path.name) should be(
-            Set("a1", "a2"))
+          Set("a1", "a2"))
       }
 
       enterBarrier("after-4")
@@ -116,10 +119,10 @@ class ServiceRegistrySpec
 
       probe.within(10.seconds) {
         probe.expectMsgType[BindingChanged].services.map(_.path.name) should be(
-            Set("a1"))
+          Set("a1"))
         registry.tell(Lookup("a"), probe.ref)
         probe.expectMsgType[Bindings].services.map(_.path.name) should be(
-            Set("a1"))
+          Set("a1"))
       }
 
       enterBarrier("after-5")
@@ -137,7 +140,7 @@ class ServiceRegistrySpec
         for (i ← 100 until 200) {
           registry.tell(Lookup("a" + i), probe.ref)
           probe.expectMsgType[Bindings].services.map(_.path.name) should be(
-              roles.map(_.name + "_" + i).toSet)
+            roles.map(_.name + "_" + i).toSet)
         }
       }
 

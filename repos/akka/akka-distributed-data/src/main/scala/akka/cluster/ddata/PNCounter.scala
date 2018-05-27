@@ -38,9 +38,11 @@ object PNCounter {
   * This class is immutable, i.e. "modifying" methods return a new instance.
   */
 @SerialVersionUID(1L)
-final class PNCounter private[akka](private[akka] val increments: GCounter,
-                                    private[akka] val decrements: GCounter)
-    extends ReplicatedData with ReplicatedDataSerialization
+final class PNCounter private[akka] (
+    private[akka] val increments: GCounter,
+    private[akka] val decrements: GCounter)
+    extends ReplicatedData
+    with ReplicatedDataSerialization
     with RemovedNodePruning {
 
   type T = PNCounter
@@ -98,24 +100,29 @@ final class PNCounter private[akka](private[akka] val increments: GCounter,
     else this
 
   override def merge(that: PNCounter): PNCounter =
-    copy(increments = that.increments.merge(this.increments),
-         decrements = that.decrements.merge(this.decrements))
+    copy(
+      increments = that.increments.merge(this.increments),
+      decrements = that.decrements.merge(this.decrements))
 
   override def needPruningFrom(removedNode: UniqueAddress): Boolean =
     increments.needPruningFrom(removedNode) ||
-    decrements.needPruningFrom(removedNode)
+      decrements.needPruningFrom(removedNode)
 
   override def prune(
-      removedNode: UniqueAddress, collapseInto: UniqueAddress): PNCounter =
-    copy(increments = increments.prune(removedNode, collapseInto),
-         decrements = decrements.prune(removedNode, collapseInto))
+      removedNode: UniqueAddress,
+      collapseInto: UniqueAddress): PNCounter =
+    copy(
+      increments = increments.prune(removedNode, collapseInto),
+      decrements = decrements.prune(removedNode, collapseInto))
 
   override def pruningCleanup(removedNode: UniqueAddress): PNCounter =
-    copy(increments = increments.pruningCleanup(removedNode),
-         decrements = decrements.pruningCleanup(removedNode))
+    copy(
+      increments = increments.pruningCleanup(removedNode),
+      decrements = decrements.pruningCleanup(removedNode))
 
-  private def copy(increments: GCounter = this.increments,
-                   decrements: GCounter = this.decrements): PNCounter =
+  private def copy(
+      increments: GCounter = this.increments,
+      decrements: GCounter = this.decrements): PNCounter =
     new PNCounter(increments, decrements)
 
   // this class cannot be a `case class` because we need different `unapply`
@@ -142,4 +149,5 @@ object PNCounterKey {
 
 @SerialVersionUID(1L)
 final case class PNCounterKey(_id: String)
-    extends Key[PNCounter](_id) with ReplicatedDataSerialization
+    extends Key[PNCounter](_id)
+    with ReplicatedDataSerialization

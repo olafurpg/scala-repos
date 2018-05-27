@@ -14,7 +14,11 @@ import com.intellij.psi.util.PsiUtil
 import com.intellij.util.{Processor, QueryExecutor}
 import org.jetbrains.plugins.scala.extensions.{PsiElementExt, inReadAction}
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScNewTemplateDefinition
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTemplateDefinition, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject,
+  ScTemplateDefinition,
+  ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.stubs.util.ScalaStubsUtil
 
 import scala.collection.mutable
@@ -26,9 +30,11 @@ import scala.collection.mutable.ArrayBuffer
   */
 class ScalaDirectClassInheritorsSearcher
     extends QueryExecutor[
-        PsiClass, DirectClassInheritorsSearch.SearchParameters] {
-  def execute(queryParameters: DirectClassInheritorsSearch.SearchParameters,
-              consumer: Processor[PsiClass]): Boolean = {
+      PsiClass,
+      DirectClassInheritorsSearch.SearchParameters] {
+  def execute(
+      queryParameters: DirectClassInheritorsSearch.SearchParameters,
+      consumer: Processor[PsiClass]): Boolean = {
     val clazz = queryParameters.getClassToProcess
 
     val scope = inReadAction {
@@ -38,14 +44,14 @@ class ScalaDirectClassInheritorsSearcher
             case Some(f) if f.getVirtualFile != null =>
               clazz.containingScalaFile.map(GlobalSearchScope.fileScope)
             case Some(f) => Some(GlobalSearchScope.allScope(f.getProject))
-            case None => None
+            case None    => None
           }
         case global: GlobalSearchScope => Some(global)
-        case _ => None
+        case _                         => None
       }
       ScalaPsiUtil.intersectScopes(queryParameters.getScope, useScope) match {
         case x: GlobalSearchScope => x
-        case _ => return true
+        case _                    => return true
       }
     }
 
@@ -54,7 +60,7 @@ class ScalaDirectClassInheritorsSearcher
     def add(clazz: PsiClass): Unit = {
       val id = inReadAction {
         clazz match {
-          case o: ScObject => s"object:${o.qualifiedName}"
+          case o: ScObject         => s"object:${o.qualifiedName}"
           case c: ScTypeDefinition => s"class:${c.qualifiedName}"
           case n: ScNewTemplateDefinition =>
             anonymousClasses += n
@@ -106,7 +112,8 @@ class ScalaDirectClassInheritorsSearcher
               if (jarFile == null) 0
               else
                 StringUtil.commonPrefixLength(
-                    jarFile.getCanonicalPath, clazzJar.getCanonicalPath)
+                  jarFile.getCanonicalPath,
+                  clazzJar.getCanonicalPath)
             }
             if (!consumer.process(closestClass)) return false
         }

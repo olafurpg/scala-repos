@@ -1,6 +1,6 @@
 import scala.tools.nsc.interactive.tests.core.IdempotencyTest
 
-// At the time of writing this test, removing any part of `enterExistingSym` 
+// At the time of writing this test, removing any part of `enterExistingSym`
 // leads to a failure.
 object Test {
   def main(args: Array[String]) {

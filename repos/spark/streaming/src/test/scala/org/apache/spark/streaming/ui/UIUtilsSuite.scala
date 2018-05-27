@@ -45,7 +45,9 @@ class UIUtilsSuite extends SparkFunSuite with Matchers {
   }
 
   private def verifyNormalizedTime(
-      expectedTime: Double, expectedUnit: TimeUnit, input: Long): Unit = {
+      expectedTime: Double,
+      expectedUnit: TimeUnit,
+      input: Long): Unit = {
     val (time, unit) = UIUtils.normalizeDuration(input)
     time should be(expectedTime +- 1E-6)
     unit should be(expectedUnit)
@@ -53,9 +55,13 @@ class UIUtilsSuite extends SparkFunSuite with Matchers {
 
   test("convertToTimeUnit") {
     verifyConvertToTimeUnit(
-        60.0 * 1000 * 1000 * 1000, 60 * 1000, TimeUnit.NANOSECONDS)
+      60.0 * 1000 * 1000 * 1000,
+      60 * 1000,
+      TimeUnit.NANOSECONDS)
     verifyConvertToTimeUnit(
-        60.0 * 1000 * 1000, 60 * 1000, TimeUnit.MICROSECONDS)
+      60.0 * 1000 * 1000,
+      60 * 1000,
+      TimeUnit.MICROSECONDS)
     verifyConvertToTimeUnit(60 * 1000, 60 * 1000, TimeUnit.MILLISECONDS)
     verifyConvertToTimeUnit(60, 60 * 1000, TimeUnit.SECONDS)
     verifyConvertToTimeUnit(1, 60 * 1000, TimeUnit.MINUTES)
@@ -64,7 +70,9 @@ class UIUtilsSuite extends SparkFunSuite with Matchers {
   }
 
   private def verifyConvertToTimeUnit(
-      expectedTime: Double, milliseconds: Long, unit: TimeUnit): Unit = {
+      expectedTime: Double,
+      milliseconds: Long,
+      unit: TimeUnit): Unit = {
     val convertedTime = UIUtils.convertToTimeUnit(milliseconds, unit)
     convertedTime should be(expectedTime +- 1E-6)
   }
@@ -72,13 +80,17 @@ class UIUtilsSuite extends SparkFunSuite with Matchers {
   test("formatBatchTime") {
     val tzForTest = TimeZone.getTimeZone("America/Los_Angeles")
     val batchTime = 1431637480452L // Thu May 14 14:04:40 PDT 2015
-    assert("2015/05/14 14:04:40" === UIUtils.formatBatchTime(
-            batchTime, 1000, timezone = tzForTest))
-    assert("2015/05/14 14:04:40.452" === UIUtils.formatBatchTime(
-            batchTime, 999, timezone = tzForTest))
-    assert("14:04:40" === UIUtils.formatBatchTime(
-            batchTime, 1000, false, timezone = tzForTest))
-    assert("14:04:40.452" === UIUtils.formatBatchTime(
-            batchTime, 999, false, timezone = tzForTest))
+    assert(
+      "2015/05/14 14:04:40" === UIUtils
+        .formatBatchTime(batchTime, 1000, timezone = tzForTest))
+    assert(
+      "2015/05/14 14:04:40.452" === UIUtils
+        .formatBatchTime(batchTime, 999, timezone = tzForTest))
+    assert(
+      "14:04:40" === UIUtils
+        .formatBatchTime(batchTime, 1000, false, timezone = tzForTest))
+    assert(
+      "14:04:40.452" === UIUtils
+        .formatBatchTime(batchTime, 999, false, timezone = tzForTest))
   }
 }

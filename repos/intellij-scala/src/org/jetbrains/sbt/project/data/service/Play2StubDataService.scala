@@ -13,15 +13,17 @@ import org.jetbrains.sbt.project.data.Play2ProjectData
   * Date: 14.11.14.
   */
 class Play2StubDataService
-    extends AbstractDataService[Play2ProjectData, Project](
-        Play2ProjectData.Key) {
-  override def createImporter(toImport: Seq[DataNode[Play2ProjectData]],
-                              projectData: ProjectData,
-                              project: Project,
-                              modelsProvider: IdeModifiableModelsProvider)
-    : Importer[Play2ProjectData] =
+    extends AbstractDataService[Play2ProjectData, Project](Play2ProjectData.Key) {
+  override def createImporter(
+      toImport: Seq[DataNode[Play2ProjectData]],
+      projectData: ProjectData,
+      project: Project,
+      modelsProvider: IdeModifiableModelsProvider): Importer[Play2ProjectData] =
     new AbstractImporter[Play2ProjectData](
-        toImport, projectData, project, modelsProvider) {
+      toImport,
+      projectData,
+      project,
+      modelsProvider) {
       override def importData(): Unit = {}
     }
 }

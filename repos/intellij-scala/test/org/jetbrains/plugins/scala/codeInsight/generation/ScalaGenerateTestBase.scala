@@ -14,9 +14,12 @@ abstract class ScalaGenerateTestBase
   val handler: LanguageCodeInsightActionHandler
 
   def testInvoke(
-      text: String, assumedText: String, checkCaret: Boolean): Unit = {
-    val (nText, nResult) = (text.stripMargin.replace("\r", "").trim,
-                            assumedText.stripMargin.replace("\r", "").trim)
+      text: String,
+      assumedText: String,
+      checkCaret: Boolean): Unit = {
+    val (nText, nResult) = (
+      text.stripMargin.replace("\r", "").trim,
+      assumedText.stripMargin.replace("\r", "").trim)
     val caretIndex = nText.indexOf(CARET_MARKER)
     myFixture.configureByText("dummy.scala", nText.replace(CARET_MARKER, ""))
     val caretModel = myFixture.getEditor.getCaretModel
@@ -28,8 +31,9 @@ abstract class ScalaGenerateTestBase
     if (checkCaret) {
       val resultCaretIndex = nResult.indexOf(CARET_MARKER)
       val actualCaretIndex = caretModel.getOffset
-      assert(resultCaretIndex == actualCaretIndex,
-             "Wrong caret position after generating")
+      assert(
+        resultCaretIndex == actualCaretIndex,
+        "Wrong caret position after generating")
     }
     myFixture.checkResult(nResult.replace(CARET_MARKER, ""), true)
   }
@@ -43,8 +47,9 @@ abstract class ScalaGenerateTestBase
     val file: PsiFile = myFixture.getFile
     val message =
       s"Generate action is${if (assumedResult) " not" else ""} available"
-    assert(handler.isValidFor(myFixture.getEditor, file) == assumedResult,
-           message)
+    assert(
+      handler.isValidFor(myFixture.getEditor, file) == assumedResult,
+      message)
   }
 
   def checkIsNotAvailable(text: String) =

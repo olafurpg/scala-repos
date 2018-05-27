@@ -25,7 +25,8 @@ package scala
   *  @param  _11   Element 11 of this Tuple11
   */
 @deprecatedInheritance(
-    "Tuples will be made final in a future version.", "2.11.0")
+  "Tuples will be made final in a future version.",
+  "2.11.0")
 case class Tuple11[+T1, +T2, +T3, +T4, +T5, +T6, +T7, +T8, +T9, +T10, +T11](
     _1: T1,
     _2: T2,
@@ -41,5 +42,5 @@ case class Tuple11[+T1, +T2, +T3, +T4, +T5, +T6, +T7, +T8, +T9, +T10, +T11](
     extends Product11[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11] {
   override def toString() =
     "(" + _1 + "," + _2 + "," + _3 + "," + _4 + "," + _5 + "," + _6 + "," +
-    _7 + "," + _8 + "," + _9 + "," + _10 + "," + _11 + ")"
+      _7 + "," + _8 + "," + _9 + "," + _10 + "," + _11 + ")"
 }

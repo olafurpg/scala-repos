@@ -6,10 +6,16 @@ import akka.actor.Address
 import akka.remote.transport.Transport._
 import akka.remote.transport.TestTransport._
 import akka.util.ByteString
-import akka.remote.transport.AssociationHandle.{ActorHandleEventListener, Disassociated, InboundPayload}
+import akka.remote.transport.AssociationHandle.{
+  ActorHandleEventListener,
+  Disassociated,
+  InboundPayload
+}
 
 class TestTransportSpec
-    extends AkkaSpec with DefaultTimeout with ImplicitSender {
+    extends AkkaSpec
+    with DefaultTimeout
+    with ImplicitSender {
 
   val addressA: Address = Address("test", "testsytemA", "testhostA", 4321)
   val addressB: Address = Address("test", "testsytemB", "testhostB", 5432)
@@ -55,7 +61,7 @@ class TestTransportSpec
       }
 
       registry.logSnapshot.contains(AssociateAttempt(addressA, addressB)) should ===(
-          true)
+        true)
     }
 
     "fail to associate with nonexisting address" in {
@@ -69,8 +75,7 @@ class TestTransportSpec
 
       // TestTransport throws IllegalAssociationException when trying to associate with non-existing system
       intercept[InvalidAssociationException] {
-        Await.result(transportA.associate(nonExistingAddress),
-                     timeout.duration)
+        Await.result(transportA.associate(nonExistingAddress), timeout.duration)
       }
     }
 

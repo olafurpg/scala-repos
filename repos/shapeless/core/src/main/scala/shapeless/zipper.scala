@@ -24,7 +24,9 @@ import ops.hlist.{IsHCons, ReversePrepend, Split, SplitLeft}
   * @author Miles Sabin
   */
 case class Zipper[C, L <: HList, R <: HList, P](
-    prefix: L, suffix: R, parent: P) {
+    prefix: L,
+    suffix: R,
+    parent: P) {
   import ops.zipper._
 
   type Self = Zipper[C, L, R, P]

@@ -53,7 +53,8 @@ trait CRUDify[KeyType, CrudType <: KeyedMapper[KeyType, CrudType]]
     * Given a field pointer and an instance, get the field on that instance
     */
   protected def computeFieldFromPointer(
-      instance: TheCrudType, pointer: FieldPointerType): Box[BaseField] =
+      instance: TheCrudType,
+      pointer: FieldPointerType): Box[BaseField] =
     Full(getActualField(instance, pointer))
 
   /**
@@ -67,7 +68,7 @@ trait CRUDify[KeyType, CrudType <: KeyedMapper[KeyType, CrudType]]
     */
   def findForList(start: Long, count: Int): List[TheCrudType] =
     findAll(
-        StartAt[CrudType](start) :: MaxRows[CrudType](count) :: findForListParams: _*)
+      StartAt[CrudType](start) :: MaxRows[CrudType](count) :: findForListParams: _*)
 
   /**
     * What are the query parameters?  Default to ascending on primary key

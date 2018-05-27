@@ -18,10 +18,15 @@ object CircuitBreakerStressSpec {
   case object JobDone
   case object GetResult
   case class Result(
-      doneCount: Int, timeoutCount: Int, failCount: Int, circCount: Int)
+      doneCount: Int,
+      timeoutCount: Int,
+      failCount: Int,
+      circCount: Int)
 
   class StressActor(breaker: CircuitBreaker)
-      extends Actor with ActorLogging with PipeToSupport {
+      extends Actor
+      with ActorLogging
+      with PipeToSupport {
     import context.dispatcher
 
     private var doneCount = 0
@@ -34,8 +39,8 @@ object CircuitBreakerStressSpec {
 
       context.system.scheduler
         .scheduleOnce(ThreadLocalRandom.current.nextInt(300).millisecond) {
-        promise.success(JobDone)
-      }
+          promise.success(JobDone)
+        }
 
       promise.future
     }

@@ -16,7 +16,9 @@ import org.junit.Test
 import org.scalajs.testsuite.utils.JSAssert._
 
 class ScalaJSDefinedTest {
-  import org.scalajs.testsuite.jsinterop.{ScalaJSDefinedTestSeparateRun => SepRun}
+  import org.scalajs.testsuite.jsinterop.{
+    ScalaJSDefinedTestSeparateRun => SepRun
+  }
   import ScalaJSDefinedTest._
 
   @Test def minimal_definition(): Unit = {
@@ -610,13 +612,16 @@ class ScalaJSDefinedTest {
     assertEquals(1, new OverloadedConstructorWithRepeatedParameters(1).sum)
     assertEquals(3, new OverloadedConstructorWithRepeatedParameters(1, 2).sum)
     assertEquals(
-        7, new OverloadedConstructorWithRepeatedParameters(1, 2, 4).sum)
+      7,
+      new OverloadedConstructorWithRepeatedParameters(1, 2, 4).sum)
 
     assertEquals(3, new OverloadedConstructorWithRepeatedParameters("abc").sum)
     assertEquals(
-        3, new OverloadedConstructorWithRepeatedParameters("ab", "c").sum)
+      3,
+      new OverloadedConstructorWithRepeatedParameters("ab", "c").sum)
     assertEquals(
-        3, new OverloadedConstructorWithRepeatedParameters("a", "b", "c").sum)
+      3,
+      new OverloadedConstructorWithRepeatedParameters("a", "b", "c").sum)
   }
 
   @Test def overloaded_constructors_complex_resolution(): Unit = {
@@ -783,7 +788,8 @@ class ScalaJSDefinedTest {
     assertEquals(-1, dyn.dependent(8))
   }
 
-  @Test def `constructors_with_default_parameters_(ScalaJSDefined/-)`(): Unit = {
+  @Test def `constructors_with_default_parameters_(ScalaJSDefined/-)`()
+    : Unit = {
     assertEquals(-1, new ConstructorDefaultParamJSNonNativeNone().foo)
     assertEquals(1, new ConstructorDefaultParamJSNonNativeNone(1).foo)
     assertEquals(5, new ConstructorDefaultParamJSNonNativeNone(5).foo)
@@ -1209,8 +1215,7 @@ class ScalaJSDefinedTest {
 
   @Test def implement_a_simple_trait_under_separate_compilation(): Unit = {
     @ScalaJSDefined
-    class ImplementSimpleTraitSepRun
-        extends js.Object with SepRun.SimpleTrait {
+    class ImplementSimpleTraitSepRun extends js.Object with SepRun.SimpleTrait {
       def foo(x: Int): Int = x + 1
     }
 
@@ -1270,7 +1275,8 @@ class ScalaJSDefinedTest {
 
     @ScalaJSDefined
     class ImplExtendsJSClassAndTrait
-        extends NativeParentClass(5) with TraitExtendsJSClass {
+        extends NativeParentClass(5)
+        with TraitExtendsJSClass {
       def foobar(x: Int): Int = x * 3
     }
 
@@ -1332,8 +1338,7 @@ object ScalaJSDefinedTest {
   // Defined in test-suite/src/test/resources/ScalaJSDefinedTestNatives.js
   @JSName("ScalaJSDefinedTestNativeParentClassWithDeferred")
   @js.native
-  abstract class NativeParentClassWithDeferred
-      extends NativeTraitWithDeferred {
+  abstract class NativeParentClassWithDeferred extends NativeTraitWithDeferred {
     def foo(y: Int): Int = js.native // = bar(y + 4) + x
 
     def bar(y: Int): Int
@@ -1428,8 +1433,7 @@ object ScalaJSDefinedTest {
 
   @js.native
   @JSName("ConstructorDefaultParam")
-  class ConstructorDefaultParamJSNativeNone(val foo: Int = -1)
-      extends js.Object
+  class ConstructorDefaultParamJSNativeNone(val foo: Int = -1) extends js.Object
 
   @js.native
   @JSName("ConstructorDefaultParam")

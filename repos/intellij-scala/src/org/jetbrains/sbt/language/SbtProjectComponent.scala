@@ -27,7 +27,7 @@ class SbtProjectComponent(project: Project)
     override def childrenChanged(event: PsiTreeChangeEvent) {
       event.getFile match {
         case file: SbtFileImpl => analyzer.restart(file)
-        case _ =>
+        case _                 =>
       }
     }
   }

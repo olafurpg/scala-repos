@@ -4,18 +4,25 @@ import akka.actor.{Actor, ActorLogging, Cancellable, Props}
 import mesosphere.marathon.core.flow.LaunchTokenConfig
 import mesosphere.marathon.core.matcher.manager.OfferMatcherManager
 import mesosphere.marathon.core.task.bus.TaskStatusObservables.TaskStatusUpdate
-import mesosphere.marathon.core.task.bus.{MarathonTaskStatus, TaskStatusObservables}
+import mesosphere.marathon.core.task.bus.{
+  MarathonTaskStatus,
+  TaskStatusObservables
+}
 import org.apache.mesos.Protos.TaskStatus
 import rx.lang.scala.{Observable, Subscription}
 
 import scala.concurrent.duration._
 
 private[flow] object OfferMatcherLaunchTokensActor {
-  def props(conf: LaunchTokenConfig,
-            taskStatusObservables: TaskStatusObservables,
-            offerMatcherManager: OfferMatcherManager): Props = {
-    Props(new OfferMatcherLaunchTokensActor(
-            conf, taskStatusObservables, offerMatcherManager))
+  def props(
+      conf: LaunchTokenConfig,
+      taskStatusObservables: TaskStatusObservables,
+      offerMatcherManager: OfferMatcherManager): Props = {
+    Props(
+      new OfferMatcherLaunchTokensActor(
+        conf,
+        taskStatusObservables,
+        offerMatcherManager))
   }
 }
 
@@ -31,7 +38,8 @@ private class OfferMatcherLaunchTokensActor(
     conf: LaunchTokenConfig,
     taskStatusObservables: TaskStatusObservables,
     offerMatcherManager: OfferMatcherManager)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
   var taskStatusUpdateSubscription: Subscription = _
   var periodicSetToken: Cancellable = _
 
@@ -43,7 +51,7 @@ private class OfferMatcherLaunchTokensActor(
     periodicSetToken = context.system.scheduler
       .schedule(0.seconds, conf.launchTokenRefreshInterval().millis)(
         offerMatcherManager.setLaunchTokens(conf.launchTokens())
-    )
+      )
   }
 
   override def postStop(): Unit = {

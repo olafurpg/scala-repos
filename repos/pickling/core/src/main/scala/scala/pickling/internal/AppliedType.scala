@@ -30,8 +30,9 @@ object AppliedType {
         remaining = rem
       }
 
-      (AppliedType(typename, typeArgs),
-       if (remaining.startsWith("]")) remaining.substring(1) else remaining)
+      (
+        AppliedType(typename, typeArgs),
+        if (remaining.startsWith("]")) remaining.substring(1) else remaining)
     }
   }
 

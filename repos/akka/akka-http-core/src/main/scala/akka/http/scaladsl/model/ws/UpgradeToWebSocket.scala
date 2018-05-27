@@ -35,8 +35,9 @@ trait UpgradeToWebSocket extends jm.ws.UpgradeToWebSocket {
     *
     * Optionally, a subprotocol out of the ones requested by the client can be chosen.
     */
-  def handleMessages(handlerFlow: Graph[FlowShape[Message, Message], Any],
-                     subprotocol: Option[String] = None): HttpResponse
+  def handleMessages(
+      handlerFlow: Graph[FlowShape[Message, Message], Any],
+      subprotocol: Option[String] = None): HttpResponse
 
   /**
     * The high-level interface to create a WebSocket server based on "messages".
@@ -53,7 +54,8 @@ trait UpgradeToWebSocket extends jm.ws.UpgradeToWebSocket {
       outSource: Graph[SourceShape[Message], Any],
       subprotocol: Option[String] = None): HttpResponse =
     handleMessages(
-        scaladsl.Flow.fromSinkAndSource(inSink, outSource), subprotocol)
+      scaladsl.Flow.fromSinkAndSource(inSink, outSource),
+      subprotocol)
 
   import scala.collection.JavaConverters._
 
@@ -77,7 +79,8 @@ trait UpgradeToWebSocket extends jm.ws.UpgradeToWebSocket {
       handlerFlow: Graph[FlowShape[jm.ws.Message, jm.ws.Message], _ <: Any],
       subprotocol: String): HttpResponse =
     handleMessages(
-        JavaMapping.toScala(handlerFlow), subprotocol = Some(subprotocol))
+      JavaMapping.toScala(handlerFlow),
+      subprotocol = Some(subprotocol))
 
   /**
     * Java API
@@ -95,13 +98,16 @@ trait UpgradeToWebSocket extends jm.ws.UpgradeToWebSocket {
       outSource: Graph[SourceShape[jm.ws.Message], _ <: Any],
       subprotocol: String): HttpResponse =
     handleMessages(
-        createScalaFlow(inSink, outSource), subprotocol = Some(subprotocol))
+      createScalaFlow(inSink, outSource),
+      subprotocol = Some(subprotocol))
 
   private[this] def createScalaFlow(
       inSink: Graph[SinkShape[jm.ws.Message], _ <: Any],
       outSource: Graph[SourceShape[jm.ws.Message], _ <: Any])
     : Graph[FlowShape[Message, Message], NotUsed] =
-    JavaMapping.toScala(scaladsl.Flow.fromSinkAndSourceMat(inSink, outSource)(
-            scaladsl.Keep.none): Graph[
-            FlowShape[jm.ws.Message, jm.ws.Message], NotUsed])
+    JavaMapping.toScala(
+      scaladsl.Flow
+        .fromSinkAndSourceMat(inSink, outSource)(scaladsl.Keep.none): Graph[
+        FlowShape[jm.ws.Message, jm.ws.Message],
+        NotUsed])
 }

@@ -62,7 +62,7 @@ class AssignmentAnnotatorTest extends SimpleTestCase {
     assertMatches(messages("class C(var p: A) { p = A }")) {
       case Nil =>
     }
-    // TODO right expression "B" must have expected type    
+    // TODO right expression "B" must have expected type
 //    assertMatches(messages("class C(var p: A) { p = B }")) {
 //      case Error("B", TypeMismatch()) :: Nil =>
 //    }
@@ -131,7 +131,7 @@ class AssignmentAnnotatorTest extends SimpleTestCase {
 
   def testUpdateOkay() {
     assertMatches(
-        messages("val a = new { def update(x: Int): Unit = () }; a() = 1")) {
+      messages("val a = new { def update(x: Int): Unit = () }; a() = 1")) {
       case Nil =>
     }
   }
@@ -155,8 +155,7 @@ class AssignmentAnnotatorTest extends SimpleTestCase {
     assertMatches(messages("def a = A; def a_=(x: A) {}; a = A")) {
       case Nil =>
     }
-    assertMatches(
-        messages("def a(implicit b: B) = A; def a_=(x: A) {}; a = A")) {
+    assertMatches(messages("def a(implicit b: B) = A; def a_=(x: A) {}; a = A")) {
       case Nil =>
     }
     assertMatches(messages("def a() = A; def a_=(x: A) {}; a = A")) {

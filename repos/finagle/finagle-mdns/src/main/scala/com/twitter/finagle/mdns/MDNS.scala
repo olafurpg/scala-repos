@@ -10,7 +10,9 @@ class MDNSAddressException(addr: String)
     extends Exception("Invalid MDNS address \"%s\"".format(addr))
 
 private case class MdnsAddrMetadata(
-    name: String, regType: String, domain: String)
+    name: String,
+    regType: String,
+    domain: String)
 
 private object MdnsAddrMetadata {
   private val key = "mdns_addr_metadata"
@@ -32,10 +34,11 @@ private object MdnsAddrMetadata {
 }
 
 private trait MDNSAnnouncerIface {
-  def announce(addr: InetSocketAddress,
-               name: String,
-               regType: String,
-               domain: String): Future[Announcement]
+  def announce(
+      addr: InetSocketAddress,
+      name: String,
+      regType: String,
+      domain: String): Future[Announcement]
 }
 
 private trait MDNSResolverIface {
@@ -45,7 +48,7 @@ private trait MDNSResolverIface {
 private[mdns] object MDNS {
   lazy val pid = ManagementFactory.getRuntimeMXBean.getName.split("@") match {
     case Array(pid, _) => pid
-    case _ => "unknown"
+    case _             => "unknown"
   }
 
   def mkName(ps: Any*) = ps.mkString("/")

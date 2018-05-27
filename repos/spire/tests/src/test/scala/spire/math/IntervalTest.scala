@@ -104,21 +104,24 @@ class RingIntervalTest extends FunSuite {
   import interval.{Open, Unbound, Closed}
   val c = 4.0
   test("-(c, ∞) =  (-∞, -c)") {
-    assert(-Interval.fromBounds(Open(c), Unbound()) === Interval.fromBounds(
-            Unbound(), Open(-c)))
+    assert(
+      -Interval.fromBounds(Open(c), Unbound()) === Interval
+        .fromBounds(Unbound(), Open(-c)))
   }
   test("-(-∞, c] =  [-c, ∞)") {
-    assert(-Interval.fromBounds(Unbound(), Closed(c)) === Interval.fromBounds(
-            Closed(-c), Unbound()))
+    assert(
+      -Interval.fromBounds(Unbound(), Closed(c)) === Interval
+        .fromBounds(Closed(-c), Unbound()))
   }
   test("(c, ∞) * (-c) =  (-∞, -c * c), c > 0") {
     assert(
-        Interval.fromBounds(Open(c), Unbound()) * (-c) === Interval.fromBounds(
-            Unbound(), Open(-c * c)))
+      Interval.fromBounds(Open(c), Unbound()) * (-c) === Interval
+        .fromBounds(Unbound(), Open(-c * c)))
   }
   test("(-∞, c] * (-c) =  [-c * c, ∞), c > 0") {
-    assert(Interval.fromBounds(Unbound(), Closed(c)) * (-c) === Interval
-          .fromBounds(Closed(-c * c), Unbound()))
+    assert(
+      Interval.fromBounds(Unbound(), Closed(c)) * (-c) === Interval
+        .fromBounds(Closed(-c * c), Unbound()))
   }
   test("Interval multiplication bug #372") {
     val a = Interval(-1, 1)
@@ -196,7 +199,7 @@ class IntervalSubsetPartialOrderTest extends FunSuite {
   import Interval.{openUpper, openLower, closed, open, point}
 
   test(
-      "Minimal and maximal elements of {[1, 3], [3], [2], [1]} by subset partial order") {
+    "Minimal and maximal elements of {[1, 3], [3], [2], [1]} by subset partial order") {
     val intervals = Seq(closed(1, 3), point(3), point(2), point(1))
     assert(intervals.pmin.toSet == Set(point(1), point(2), point(3)))
     assert(intervals.pmax.toSet == Set(closed(1, 3)))
@@ -299,7 +302,9 @@ class IntervalReciprocalTest extends FunSuite {
 }
 
 class IntervalCheck
-    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+    extends PropSpec
+    with Matchers
+    with GeneratorDrivenPropertyChecks {
 
   property("x ⊆ x") {
     forAll { (x: Interval[Rational]) =>
@@ -368,19 +373,19 @@ class IntervalCheck
                 case 9 => y
                 case _ => x + Rational(rng.nextDouble) * (y - x)
               }
-            case (ValueBound(x), _) =>
+          case (ValueBound(x), _) =>
             () =>
               rng.nextInt(5) match {
                 case 0 => x
                 case _ => x + (Rational(rng.nextGaussian).abs * Long.MaxValue)
               }
-            case (_, ValueBound(y)) =>
+          case (_, ValueBound(y)) =>
             () =>
               rng.nextInt(5) match {
                 case 4 => y
                 case _ => y - (Rational(rng.nextGaussian).abs * Long.MaxValue)
               }
-            case (_, _) =>
+          case (_, _) =>
             () =>
               Rational(rng.nextGaussian) * Long.MaxValue
         }
@@ -418,7 +423,8 @@ class IntervalCheck
           if (!b.contains(y)) println("%s does not contain %s" format (b, y))
           val ok = c.contains(g(x, y))
           if (!ok)
-            println("(%s, %s) failed on (%s, %s)" format
+            println(
+              "(%s, %s) failed on (%s, %s)" format
                 (a, b, x.toString, y.toString))
           ok shouldBe true
       }
@@ -449,8 +455,9 @@ class IntervalCheck
     forAll { (x: Rational, y: Rational) =>
       val a = Interval.point(x)
       val b = Interval.point(y)
-      PartialOrder[Interval[Rational]].tryCompare(a, b).get shouldBe Order[
-          Rational].compare(x, y)
+      PartialOrder[Interval[Rational]]
+        .tryCompare(a, b)
+        .get shouldBe Order[Rational].compare(x, y)
       val Some(Point(vmin)) = a.pmin(b)
       vmin shouldBe x.min(y)
       val Some(Point(vmax)) = a.pmax(b)
@@ -524,7 +531,9 @@ class IntervalCheck
 }
 
 class IntervalIteratorCheck
-    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+    extends PropSpec
+    with Matchers
+    with GeneratorDrivenPropertyChecks {
 
   property("bounded intervals are ok") {
     forAll { (n1: Rational, n2: Rational, num0: Byte) =>
@@ -532,10 +541,11 @@ class IntervalIteratorCheck
 
       val num = ((num0 & 255) % 13) + 1
 
-      def testEndpoints(interval: Interval[Rational],
-                        step: Rational,
-                        hasLower: Boolean,
-                        hasUpper: Boolean): Unit = {
+      def testEndpoints(
+          interval: Interval[Rational],
+          step: Rational,
+          hasLower: Boolean,
+          hasUpper: Boolean): Unit = {
         val ns = interval.iterator(step).toSet
         ns(x) shouldBe hasLower
         ns(y) shouldBe hasUpper
@@ -556,10 +566,11 @@ class IntervalIteratorCheck
           Try(xs.iterator(0)).isFailure shouldBe true
         }
       } else {
-        val triples = List((cc, true, true),
-                           (oo, false, false),
-                           (oc, false, true),
-                           (co, true, false))
+        val triples = List(
+          (cc, true, true),
+          (oo, false, false),
+          (oc, false, true),
+          (co, true, false))
         triples.foreach {
           case (interval, hasLower, hasUpper) =>
             testEndpoints(interval, step, hasLower, hasUpper)

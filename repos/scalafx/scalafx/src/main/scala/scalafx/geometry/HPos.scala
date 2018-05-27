@@ -37,7 +37,8 @@ object HPos extends SFXEnumDelegateCompanion[jfxg.HPos, HPos] {
   /** Indicates centered horizontal position. */
   val Center = new HPos(jfxg.HPos.CENTER)
   @deprecated(
-      "Use Center; CENTER will be removed in a future release", "2.2.60")
+    "Use Center; CENTER will be removed in a future release",
+    "2.2.60")
   val CENTER = Center
 
   /** Indicates left horizontal position. */

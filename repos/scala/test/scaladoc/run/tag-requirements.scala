@@ -50,11 +50,8 @@ object Test extends ScaladocModelTest {
      * avoid static code analysis noise about unused values.
      */
     assert(extractCommentText(test.comment.get) == "object comment")
-    assert(
-        extractCommentText(test._method("foo").comment.get) == "foo comment")
-    assert(
-        extractCommentText(test._method("bar").comment.get) == "bar comment")
-    assert(
-        extractCommentText(test._method("baz").comment.get) == "baz comment")
+    assert(extractCommentText(test._method("foo").comment.get) == "foo comment")
+    assert(extractCommentText(test._method("bar").comment.get) == "bar comment")
+    assert(extractCommentText(test._method("baz").comment.get) == "baz comment")
   }
 }

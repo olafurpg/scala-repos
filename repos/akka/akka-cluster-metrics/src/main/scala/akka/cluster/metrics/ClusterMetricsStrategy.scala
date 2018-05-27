@@ -13,10 +13,10 @@ import akka.util.Helpers.ConfigOps
   */
 class ClusterMetricsStrategy(config: Config)
     extends OneForOneStrategy(
-        maxNrOfRetries = config.getInt("maxNrOfRetries"),
-        withinTimeRange = config.getMillisDuration("withinTimeRange"),
-        loggingEnabled = config.getBoolean("loggingEnabled"))(
-        ClusterMetricsStrategy.metricsDecider)
+      maxNrOfRetries = config.getInt("maxNrOfRetries"),
+      withinTimeRange = config.getMillisDuration("withinTimeRange"),
+      loggingEnabled = config.getBoolean("loggingEnabled")
+    )(ClusterMetricsStrategy.metricsDecider)
 
 /**
   * Provide custom metrics strategy resources.

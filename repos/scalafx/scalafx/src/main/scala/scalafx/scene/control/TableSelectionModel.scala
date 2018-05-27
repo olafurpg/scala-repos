@@ -140,10 +140,11 @@ class TableSelectionModel[T](
   /**
     * Selects the cells in the range (minRow, minColumn) to (maxRow, maxColumn), inclusive.
     */
-  def selectRange(minRow: Int,
-                  minColumn: TableColumnBase[T, _],
-                  maxRow: Int,
-                  maxColumn: TableColumnBase[T, _]) {
+  def selectRange(
+      minRow: Int,
+      minColumn: TableColumnBase[T, _],
+      maxRow: Int,
+      maxColumn: TableColumnBase[T, _]) {
     delegate.selectRange(minRow, minColumn, maxRow, maxColumn)
   }
 }

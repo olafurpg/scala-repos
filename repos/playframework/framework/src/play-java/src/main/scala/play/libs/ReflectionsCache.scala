@@ -19,8 +19,8 @@ object ReflectionsCache {
   // A soft reference is used so that we don't force the classloader or reflections to be live after a test run,
   // but we don't use weak reference as this is the only reference to the tuple, and it will just always get collected
   // on each eden space collection if it was weak.
-  @volatile private var reflectionsMapRef: Option[SoftReference[
-          (ClassLoader, Map[String, Reflections])]] = None
+  @volatile private var reflectionsMapRef
+    : Option[SoftReference[(ClassLoader, Map[String, Reflections])]] = None
 
   def getReflections(classLoader: ClassLoader, pkg: String) = {
     // Detect if the classloader is different from last time, if it is, create a new cache and replace the old
@@ -35,8 +35,8 @@ object ReflectionsCache {
       }
     reflectionsMap.get(pkg).getOrElse {
 
-      val reflections = new Reflections(
-          Classpath.getReflectionsConfiguration(pkg, classLoader))
+      val reflections =
+        new Reflections(Classpath.getReflectionsConfiguration(pkg, classLoader))
 
       reflectionsMap.putIfAbsent(pkg, reflections).getOrElse(reflections)
     }

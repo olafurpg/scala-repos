@@ -54,7 +54,7 @@ class DurationTest extends { val ops = Duration } with TimeLikeSpec[Duration] {
         val d = a.nanoseconds * b
 
         assert(
-            (c >= Long.MaxValue && d == Duration.Top) ||
+          (c >= Long.MaxValue && d == Duration.Top) ||
             (c <= Long.MinValue && d == Duration.Bottom) ||
             (d == c.toLong.nanoseconds)
         )
@@ -95,7 +95,7 @@ class DurationTest extends { val ops = Duration } with TimeLikeSpec[Duration] {
 
     "unary_-" in {
       assert(-((10.seconds).inSeconds) == -10)
-      assert(-( (Long.MinValue + 1).nanoseconds) == Long.MaxValue.nanoseconds)
+      assert(-((Long.MinValue + 1).nanoseconds) == Long.MaxValue.nanoseconds)
       assert(-(Long.MinValue.nanoseconds) == Duration.Top)
     }
 
@@ -155,7 +155,7 @@ class DurationTest extends { val ops = Duration } with TimeLikeSpec[Duration] {
         val d = a.nanoseconds + b.nanosecond
 
         assert(
-            (c >= Long.MaxValue && d == Duration.Top) ||
+          (c >= Long.MaxValue && d == Duration.Top) ||
             (c <= Long.MinValue && d == Duration.Bottom) ||
             (d == c.toLong.nanoseconds)
         )
@@ -208,26 +208,26 @@ class DurationTest extends { val ops = Duration } with TimeLikeSpec[Duration] {
 
     "toString should display as sums" in {
       assert(
-          (9999999.seconds).toString == "115.days+17.hours+46.minutes+39.seconds")
+        (9999999.seconds).toString == "115.days+17.hours+46.minutes+39.seconds")
     }
 
     "toString should handle negative durations" in {
       assert(
-          (-9999999.seconds).toString == "-115.days-17.hours-46.minutes-39.seconds")
+        (-9999999.seconds).toString == "-115.days-17.hours-46.minutes-39.seconds")
     }
 
     "parse the format from toString" in {
       Seq(
-          -10.minutes,
-          -9999999.seconds,
-          1.day + 3.hours,
-          1.day,
-          1.nanosecond,
-          42.milliseconds,
-          9999999.seconds,
-          Duration.Bottom,
-          Duration.Top,
-          Duration.Undefined
+        -10.minutes,
+        -9999999.seconds,
+        1.day + 3.hours,
+        1.day,
+        1.nanosecond,
+        42.milliseconds,
+        9999999.seconds,
+        Duration.Bottom,
+        Duration.Top,
+        Duration.Undefined
       ) foreach { d =>
         assert(Duration.parse(d.toString) == d)
       }
@@ -235,27 +235,27 @@ class DurationTest extends { val ops = Duration } with TimeLikeSpec[Duration] {
 
     "parse" in {
       Seq(
-          " 1.second" -> 1.second,
-          "+1.second" -> 1.second,
-          "-1.second" -> -1.second,
-          "1.SECOND" -> 1.second,
-          "1.day - 1.second" -> (1.day - 1.second),
-          "1.day" -> 1.day,
-          "1.microsecond" -> 1.microsecond,
-          "1.millisecond" -> 1.millisecond,
-          "1.second" -> 1.second,
-          "1.second+1.minute  +  1.day" -> (1.second + 1.minute + 1.day),
-          "1.second+1.second" -> 2.seconds,
-          "2.hours" -> 2.hours,
-          "3.days" -> 3.days,
-          "321.nanoseconds" -> 321.nanoseconds,
-          "65.minutes" -> 65.minutes,
-          "876.milliseconds" -> 876.milliseconds,
-          "98.seconds" -> 98.seconds,
-          "Duration.Bottom" -> Duration.Bottom,
-          "Duration.Top" -> Duration.Top,
-          "Duration.Undefined" -> Duration.Undefined,
-          "duration.TOP" -> Duration.Top
+        " 1.second" -> 1.second,
+        "+1.second" -> 1.second,
+        "-1.second" -> -1.second,
+        "1.SECOND" -> 1.second,
+        "1.day - 1.second" -> (1.day - 1.second),
+        "1.day" -> 1.day,
+        "1.microsecond" -> 1.microsecond,
+        "1.millisecond" -> 1.millisecond,
+        "1.second" -> 1.second,
+        "1.second+1.minute  +  1.day" -> (1.second + 1.minute + 1.day),
+        "1.second+1.second" -> 2.seconds,
+        "2.hours" -> 2.hours,
+        "3.days" -> 3.days,
+        "321.nanoseconds" -> 321.nanoseconds,
+        "65.minutes" -> 65.minutes,
+        "876.milliseconds" -> 876.milliseconds,
+        "98.seconds" -> 98.seconds,
+        "Duration.Bottom" -> Duration.Bottom,
+        "Duration.Top" -> Duration.Top,
+        "Duration.Undefined" -> Duration.Undefined,
+        "duration.TOP" -> Duration.Top
       ) foreach {
         case (s, d) =>
           assert(Duration.parse(s) == d)
@@ -265,16 +265,16 @@ class DurationTest extends { val ops = Duration } with TimeLikeSpec[Duration] {
     "reject obvious human impostors" in {
       intercept[NumberFormatException] {
         Seq(
-            "",
-            "++1.second",
-            "1. second",
-            "1.milli",
-            "1.s",
-            "10.stardates",
-            "2.minutes 1.second",
-            "98 milliseconds",
-            "98 millisecons",
-            "99.minutes +"
+          "",
+          "++1.second",
+          "1. second",
+          "1.milli",
+          "1.s",
+          "10.stardates",
+          "2.minutes 1.second",
+          "98 milliseconds",
+          "98 millisecons",
+          "99.minutes +"
         ) foreach { s =>
           Duration.parse(s)
         }

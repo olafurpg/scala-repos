@@ -42,7 +42,7 @@ class BloomFilterSuite extends FunSuite {
     assert(filter == deserialized)
   }
 
-  def testAccuracy[T : ClassTag](typeName: String, numItems: Int)(
+  def testAccuracy[T: ClassTag](typeName: String, numItems: Int)(
       itemGen: Random => T): Unit = {
     test(s"accuracy - $typeName") {
       // use a fixed seed to make the test predictable.
@@ -74,7 +74,7 @@ class BloomFilterSuite extends FunSuite {
     }
   }
 
-  def testMergeInPlace[T : ClassTag](typeName: String, numItems: Int)(
+  def testMergeInPlace[T: ClassTag](typeName: String, numItems: Int)(
       itemGen: Random => T): Unit = {
     test(s"mergeInPlace - $typeName") {
       // use a fixed seed to make the test predictable.
@@ -102,7 +102,7 @@ class BloomFilterSuite extends FunSuite {
     }
   }
 
-  def testItemType[T : ClassTag](typeName: String, numItems: Int)(
+  def testItemType[T: ClassTag](typeName: String, numItems: Int)(
       itemGen: Random => T): Unit = {
     testAccuracy[T](typeName, numItems)(itemGen)
     testMergeInPlace[T](typeName, numItems)(itemGen)

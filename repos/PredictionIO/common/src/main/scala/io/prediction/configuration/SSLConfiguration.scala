@@ -40,7 +40,7 @@ trait SSLConfiguration {
     // Loading keystore from specified file
     val clientStore = KeyStore.getInstance("JKS")
     val inputStream = new FileInputStream(
-        getClass().getClassLoader().getResource(keyStoreResource).getFile())
+      getClass().getClassLoader().getResource(keyStoreResource).getFile())
     clientStore.load(inputStream, password.toCharArray)
     inputStream.close()
     clientStore
@@ -62,9 +62,11 @@ trait SSLConfiguration {
   // provide implicit SSLEngine with some protocols
   implicit def sslEngineProvider: ServerSSLEngineProvider = {
     ServerSSLEngineProvider { engine =>
-      engine.setEnabledCipherSuites(Array("TLS_RSA_WITH_AES_256_CBC_SHA",
-                                          "TLS_ECDH_ECDSA_WITH_RC4_128_SHA",
-                                          "TLS_RSA_WITH_AES_128_CBC_SHA"))
+      engine.setEnabledCipherSuites(
+        Array(
+          "TLS_RSA_WITH_AES_256_CBC_SHA",
+          "TLS_ECDH_ECDSA_WITH_RC4_128_SHA",
+          "TLS_RSA_WITH_AES_128_CBC_SHA"))
       engine.setEnabledProtocols(Array("TLSv1", "TLSv1.2", "TLSv1.1"))
       engine
     }

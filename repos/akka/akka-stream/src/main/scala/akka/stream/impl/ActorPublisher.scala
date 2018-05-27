@@ -36,8 +36,7 @@ private[akka] object ActorPublisher {
   * When you instantiate this class, or its subclasses, you MUST send an ExposedPublisher message to the wrapped
   * ActorRef! If you don't need to subclass, prefer the apply() method on the companion object which takes care of this.
   */
-private[akka] class ActorPublisher[T](val impl: ActorRef)
-    extends Publisher[T] {
+private[akka] class ActorPublisher[T](val impl: ActorRef) extends Publisher[T] {
   import ReactiveStreamsCompliance._
 
   // The subscriber of an subscription attempt is first placed in this list of pending subscribers.
@@ -98,7 +97,8 @@ private[akka] class ActorPublisher[T](val impl: ActorRef)
   * INTERNAL API
   */
 private[akka] class ActorSubscription[T](
-    final val impl: ActorRef, final val subscriber: Subscriber[_ >: T])
+    final val impl: ActorRef,
+    final val subscriber: Subscriber[_ >: T])
     extends Subscription {
   override def request(elements: Long): Unit =
     impl ! RequestMore(this, elements)
@@ -109,7 +109,8 @@ private[akka] class ActorSubscription[T](
   * INTERNAL API
   */
 private[akka] class ActorSubscriptionWithCursor[T](
-    _impl: ActorRef, _subscriber: Subscriber[_ >: T])
+    _impl: ActorRef,
+    _subscriber: Subscriber[_ >: T])
     extends ActorSubscription[T](_impl, _subscriber)
     with SubscriptionWithCursor[T]
 

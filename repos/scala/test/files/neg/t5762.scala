@@ -4,7 +4,7 @@ object Test {
   var bippy: Boolean = true
   def f1(x: D[Int with String]) = x match {
     case _: D[Int] if bippy => 1
-    case _: D[String] => 2
+    case _: D[String]       => 2
   }
   // Correctly warns:
   //
@@ -18,7 +18,7 @@ object Test {
 
   def f2(x: D[D[Int] with D[String]]) = x match {
     case _: D[D[Int]] if bippy => 1
-    case _: D[D[String]] => 2
+    case _: D[D[String]]       => 2
   }
   // No warnings!
 }

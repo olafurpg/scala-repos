@@ -14,7 +14,7 @@ trait CacheSupport { self: ScalatraBase =>
   def cache[A](key: String, ttl: Option[Duration])(value: => A): A = {
     cacheBackend.get[A](key) match {
       case Some(v) => v
-      case None => cacheBackend.put(key, value, ttl)
+      case None    => cacheBackend.put(key, value, ttl)
     }
   }
 

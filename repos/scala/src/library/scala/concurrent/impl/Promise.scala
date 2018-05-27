@@ -8,7 +8,13 @@
 
 package scala.concurrent.impl
 
-import scala.concurrent.{ExecutionContext, CanAwait, OnCompleteRunnable, TimeoutException, ExecutionException}
+import scala.concurrent.{
+  ExecutionContext,
+  CanAwait,
+  OnCompleteRunnable,
+  TimeoutException,
+  ExecutionException
+}
 import scala.concurrent.Future.InternalCallbackExecutor
 import scala.concurrent.duration.{Duration, FiniteDuration}
 import scala.annotation.tailrec
@@ -19,7 +25,8 @@ import java.util.concurrent.locks.AbstractQueuedSynchronizer
 import java.util.concurrent.atomic.AtomicReference
 
 private[concurrent] trait Promise[T]
-    extends scala.concurrent.Promise[T] with scala.concurrent.Future[T] {
+    extends scala.concurrent.Promise[T]
+    with scala.concurrent.Future[T] {
   def future: this.type = this
 
   import scala.concurrent.Future
@@ -29,7 +36,9 @@ private[concurrent] trait Promise[T]
       implicit executor: ExecutionContext): Future[S] = {
     val p = new DefaultPromise[S]()
     onComplete { result =>
-      p.complete(try f(result) catch { case NonFatal(t) => Failure(t) })
+      p.complete(
+        try f(result)
+        catch { case NonFatal(t) => Failure(t) })
     }
     p.future
   }
@@ -51,21 +60,24 @@ private[concurrent] trait Promise[T]
 
   override def toString: String = value match {
     case Some(result) => "Future(" + result + ")"
-    case None => "Future(<not completed>)"
+    case None         => "Future(<not completed>)"
   }
 }
 
 /* Precondition: `executor` is prepared, i.e., `executor` has been returned from invocation of `prepare` on some other `ExecutionContext`.
  */
 private final class CallbackRunnable[T](
-    val executor: ExecutionContext, val onComplete: Try[T] => Any)
-    extends Runnable with OnCompleteRunnable {
+    val executor: ExecutionContext,
+    val onComplete: Try[T] => Any)
+    extends Runnable
+    with OnCompleteRunnable {
   // must be filled in before running it
   var value: Try[T] = null
 
   override def run() = {
     require(value ne null) // must set value to non-null before running!
-    try onComplete(value) catch {
+    try onComplete(value)
+    catch {
       case NonFatal(e) => executor reportFailure e
     }
   }
@@ -75,7 +87,8 @@ private final class CallbackRunnable[T](
     value = v
     // Note that we cannot prepare the ExecutionContext at this point, since we might
     // already be running on a different thread!
-    try executor.execute(this) catch {
+    try executor.execute(this)
+    catch {
       case NonFatal(t) => executor reportFailure t
     }
   }
@@ -85,7 +98,7 @@ private[concurrent] object Promise {
 
   private def resolveTry[T](source: Try[T]): Try[T] = source match {
     case Failure(t) => resolver(t)
-    case _ => source
+    case _          => source
   }
 
   private def resolver[T](throwable: Throwable): Try[T] = throwable match {
@@ -96,7 +109,7 @@ private[concurrent] object Promise {
     case t: InterruptedException =>
       Failure(new ExecutionException("Boxed InterruptedException", t))
     case e: Error => Failure(new ExecutionException("Boxed Error", e))
-    case t => Failure(t)
+    case t        => Failure(t)
   }
 
   /**
@@ -108,7 +121,8 @@ private[concurrent] object Promise {
     * http://creativecommons.org/publicdomain/zero/1.0/
     */
   private final class CompletionLatch[T]
-      extends AbstractQueuedSynchronizer with (Try[T] => Unit) {
+      extends AbstractQueuedSynchronizer
+      with (Try[T] => Unit) {
     override protected def tryAcquireShared(ignored: Int): Int =
       if (getState != 0) 1 else -1
     override protected def tryReleaseShared(ignore: Int): Boolean = {
@@ -196,8 +210,7 @@ private[concurrent] object Promise {
     */
   // Left non-final to enable addition of extra fields by Java/Scala converters
   // in scala-java8-compat.
-  class DefaultPromise[T]
-      extends AtomicReference[AnyRef](Nil) with Promise[T] {
+  class DefaultPromise[T] extends AtomicReference[AnyRef](Nil) with Promise[T] {
 
     /** Get the root promise for this promise, compressing the link chain to that
       *  promise if necessary.
@@ -216,7 +229,7 @@ private[concurrent] object Promise {
     private def compressedRoot(): DefaultPromise[T] =
       get() match {
         case linked: DefaultPromise[_] => compressedRoot(linked)
-        case _ => this
+        case _                         => this
       }
 
     @tailrec
@@ -228,7 +241,7 @@ private[concurrent] object Promise {
       else {
         get() match {
           case newLinked: DefaultPromise[_] => compressedRoot(newLinked)
-          case _ => this
+          case _                            => this
         }
       }
     }
@@ -253,7 +266,7 @@ private[concurrent] object Promise {
         atMost match {
           case e if e eq Undefined =>
             throw new IllegalArgumentException(
-                "cannot wait for Undefined period")
+              "cannot wait for Undefined period")
           case Duration.Inf =>
             val l = new CompletionLatch[T]()
             onComplete(l)(InternalCallbackExecutor)
@@ -285,26 +298,26 @@ private[concurrent] object Promise {
 
     @tailrec
     private def value0: Option[Try[T]] = get() match {
-      case c: Try[_] => Some(c.asInstanceOf[Try[T]])
+      case c: Try[_]             => Some(c.asInstanceOf[Try[T]])
       case dp: DefaultPromise[_] => compressedRoot(dp).value0
-      case _ => None
+      case _                     => None
     }
 
     override final def isCompleted: Boolean = isCompleted0
 
     @tailrec
     private def isCompleted0: Boolean = get() match {
-      case _: Try[_] => true
+      case _: Try[_]             => true
       case dp: DefaultPromise[_] => compressedRoot(dp).isCompleted0
-      case _ => false
+      case _                     => false
     }
 
     final def tryComplete(value: Try[T]): Boolean = {
       val resolved = resolveTry(value)
       tryCompleteAndGetListeners(resolved) match {
-        case null => false
+        case null             => false
         case rs if rs.isEmpty => true
-        case rs => rs.foreach(r => r.executeWithValue(resolved)); true
+        case rs               => rs.foreach(r => r.executeWithValue(resolved)); true
       }
     }
 
@@ -365,7 +378,7 @@ private[concurrent] object Promise {
         case r: Try[_] =>
           if (!target.tryComplete(r.asInstanceOf[Try[T]]))
             throw new IllegalStateException(
-                "Cannot link completed promises together")
+              "Cannot link completed promises together")
         case dp: DefaultPromise[_] =>
           compressedRoot(dp).link(target)
         case listeners: List[_] if compareAndSet(listeners, target) =>
@@ -413,8 +426,10 @@ private[concurrent] object Promise {
       override def onFailure[U](pf: PartialFunction[Throwable, U])(
           implicit executor: ExecutionContext): Unit = ()
       override def failed: Future[Throwable] =
-        KeptPromise(Failure(new NoSuchElementException(
-                    "Future.failed not completed with a throwable."))).future
+        KeptPromise(
+          Failure(
+            new NoSuchElementException(
+              "Future.failed not completed with a throwable."))).future
       override def recover[U >: T](pf: PartialFunction[Throwable, U])(
           implicit executor: ExecutionContext): Future[U] = this
       override def recoverWith[U >: T](

@@ -23,8 +23,9 @@ object Implicits {
     /**
       * Measures time from receiving the first element and completion events - one for each subscriber of this `Flow`.
       */
-    def timed[O, Mat2](measuredOps: Source[I, Mat] ⇒ Source[O, Mat2],
-                       onComplete: FiniteDuration ⇒ Unit): Source[O, Mat2] =
+    def timed[O, Mat2](
+        measuredOps: Source[I, Mat] ⇒ Source[O, Mat2],
+        onComplete: FiniteDuration ⇒ Unit): Source[O, Mat2] =
       Timed.timed[I, O, Mat, Mat2](source, measuredOps, onComplete)
 
     /**

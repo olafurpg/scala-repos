@@ -55,7 +55,8 @@ abstract class Module {
     * @return A sequence of bindings
     */
   def bindings(
-      environment: Environment, configuration: Configuration): Seq[Binding[_]]
+      environment: Environment,
+      configuration: Configuration): Seq[Binding[_]]
 
   /**
     * Create a binding key for the given class.
@@ -66,7 +67,7 @@ abstract class Module {
   /**
     * Create a binding key for the given class.
     */
-  final def bind[T : ClassTag]: BindingKey[T] = play.api.inject.bind[T]
+  final def bind[T: ClassTag]: BindingKey[T] = play.api.inject.bind[T]
 
   /**
     * Create a seq.
@@ -97,7 +98,8 @@ object Modules {
     *         allowing ApplicationLoader implementations to reuse the same mechanism to load modules specific to them.
     */
   def locate(
-      environment: Environment, configuration: Configuration): Seq[Any] = {
+      environment: Environment,
+      configuration: Configuration): Seq[Any] = {
 
     val includes =
       configuration.getStringSeq("play.modules.enabled").getOrElse(Seq.empty)
@@ -116,29 +118,32 @@ object Modules {
             .loadClass(DefaultModuleName)
             .asInstanceOf[Class[Any]]
           Some(
-              constructModule(environment,
-                              configuration,
-                              DefaultModuleName,
-                              () => defaultModuleClass))
+            constructModule(
+              environment,
+              configuration,
+              DefaultModuleName,
+              () => defaultModuleClass))
         } catch {
           case e: ClassNotFoundException => None
         }
 
     moduleClassNames.map { className =>
-      constructModule(environment,
-                      configuration,
-                      className,
-                      () =>
-                        environment.classLoader
-                          .loadClass(className)
-                          .asInstanceOf[Class[Any]])
+      constructModule(
+        environment,
+        configuration,
+        className,
+        () =>
+          environment.classLoader
+            .loadClass(className)
+            .asInstanceOf[Class[Any]])
     }.toSeq ++ defaultModule
   }
 
-  private def constructModule[T](environment: Environment,
-                                 configuration: Configuration,
-                                 className: String,
-                                 loadModuleClass: () => Class[T]): T = {
+  private def constructModule[T](
+      environment: Environment,
+      configuration: Configuration,
+      className: String,
+      loadModuleClass: () => Class[T]): T = {
     try {
       val moduleClass = loadModuleClass()
 
@@ -148,7 +153,7 @@ object Modules {
           Some(moduleClass.getConstructor(argTypes: _*))
         } catch {
           case _: NoSuchMethodException => None
-          case _: SecurityException => None
+          case _: SecurityException     => None
         }
         ctor.map(_.newInstance(args: _*))
       }
@@ -156,24 +161,25 @@ object Modules {
       {
         tryConstruct(environment, configuration)
       } orElse {
-        tryConstruct(new JavaEnvironment(environment),
-                     new JavaConfiguration(configuration))
+        tryConstruct(
+          new JavaEnvironment(environment),
+          new JavaConfiguration(configuration))
       } orElse {
         tryConstruct()
       } getOrElse {
         throw new PlayException(
-            "No valid constructors",
-            "Module [" + className + "] cannot be instantiated.")
+          "No valid constructors",
+          "Module [" + className + "] cannot be instantiated.")
       }
     } catch {
-      case e: PlayException => throw e
+      case e: PlayException       => throw e
       case e: VirtualMachineError => throw e
-      case e: ThreadDeath => throw e
+      case e: ThreadDeath         => throw e
       case e: Throwable =>
         throw new PlayException(
-            "Cannot load module",
-            "Module [" + className + "] cannot be instantiated.",
-            e)
+          "Cannot load module",
+          "Module [" + className + "] cannot be instantiated.",
+          e)
     }
   }
 }

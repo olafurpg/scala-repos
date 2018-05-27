@@ -11,10 +11,12 @@ import com.twitter.util.{Return, Throw, Future, Var}
   *
   * @param probability [0,1], where 1 is 100% blackhole mode
   */
-case class Blackholeter[Req, Rep](probability: Var[Double],
-                                  seed: Long = Failter.DefaultSeed,
-                                  stats: StatsReceiver = NullStatsReceiver)
-    extends SimpleFilter[Req, Rep] with Failter {
+case class Blackholeter[Req, Rep](
+    probability: Var[Double],
+    seed: Long = Failter.DefaultSeed,
+    stats: StatsReceiver = NullStatsReceiver)
+    extends SimpleFilter[Req, Rep]
+    with Failter {
 
   def apply(req: Req, service: Service[Req, Rep]): Future[Rep] = {
     if (prob == 0.0 || rand.nextDouble() >= prob) {
@@ -39,7 +41,8 @@ case class ByzantineBlackholeter[Req, Rep](
     probability: Var[Double],
     seed: Long = Failter.DefaultSeed,
     stats: StatsReceiver = NullStatsReceiver)
-    extends SimpleFilter[Req, Rep] with Failter {
+    extends SimpleFilter[Req, Rep]
+    with Failter {
 
   def apply(req: Req, service: Service[Req, Rep]): Future[Rep] = {
     service(req).transform { result =>

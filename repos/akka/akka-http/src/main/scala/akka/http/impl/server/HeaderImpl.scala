@@ -21,11 +21,11 @@ import scala.reflect.ClassTag
   * Internal API
   */
 private[http] object HeaderImpl {
-  def apply[T <: HttpHeader](name: String,
-                             optionalDirective: ClassTag[
-                                 T with scaladsl.model.HttpHeader] ⇒ Directive1[
-                                 Option[T with scaladsl.model.HttpHeader]],
-                             tClassTag: ClassTag[T]): Header[T] = {
+  def apply[T <: HttpHeader](
+      name: String,
+      optionalDirective: ClassTag[T with scaladsl.model.HttpHeader] ⇒ Directive1[
+        Option[T with scaladsl.model.HttpHeader]],
+      tClassTag: ClassTag[T]): Header[T] = {
     type U = T with scaladsl.model.HttpHeader
 
     // cast is safe because creation of javadsl.model.HttpHeader that are not <: scaladsl.model.HttpHeader is forbidden

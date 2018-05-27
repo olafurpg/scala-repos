@@ -20,7 +20,11 @@ import scala.reflect.macros.Context
 import java.io.InputStream
 
 import com.twitter.scalding._
-import com.twitter.scalding.serialization.macros.impl.ordered_serialization.{CompileTimeLengthTypes, ProductLike, TreeOrderedBuf}
+import com.twitter.scalding.serialization.macros.impl.ordered_serialization.{
+  CompileTimeLengthTypes,
+  ProductLike,
+  TreeOrderedBuf
+}
 import CompileTimeLengthTypes._
 import com.twitter.scalding.serialization.OrderedSerialization
 import scala.reflect.ClassTag
@@ -110,8 +114,9 @@ object TraversablesOrderedBuf {
     // it would correspond to if we .toList the Map.
     val innerType =
       if (outerType.asInstanceOf[TypeRefApi].args.size == 2) {
-        val (tpe1, tpe2) = (outerType.asInstanceOf[TypeRefApi].args(0),
-                            outerType.asInstanceOf[TypeRefApi].args(1))
+        val (tpe1, tpe2) = (
+          outerType.asInstanceOf[TypeRefApi].args(0),
+          outerType.asInstanceOf[TypeRefApi].args(1))
         val containerType = typeOf[Tuple2[Any, Any]].asInstanceOf[TypeRef]
         import compat._
         TypeRef.apply(containerType.pre, containerType.sym, List(tpe1, tpe2))
@@ -140,7 +145,8 @@ object TraversablesOrderedBuf {
       override val ctx: c.type = c
       override val tpe = outerType
       override def compareBinary(
-          inputStreamA: ctx.TermName, inputStreamB: ctx.TermName) = {
+          inputStreamA: ctx.TermName,
+          inputStreamB: ctx.TermName) = {
         val innerCompareFn = freshT("innerCompareFn")
         val a = freshT("a")
         val b = freshT("b")
@@ -268,7 +274,8 @@ object TraversablesOrderedBuf {
       }
 
       override def compare(
-          elementA: ctx.TermName, elementB: ctx.TermName): ctx.Tree = {
+          elementA: ctx.TermName,
+          elementB: ctx.TermName): ctx.Tree = {
 
         val a = freshT("a")
         val b = freshT("b")

@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -41,15 +41,17 @@ sealed trait CPathTraversal { self =>
     * 2 column sets for the 1st and 2nd paramters of the Order. This order will
     * not allocate any objects or arrays, but it is also not threadsafe.
     */
-  def rowOrder(cpaths: List[CPath],
-               left: Map[CPath, Set[Column]],
-               optRight: Option[Map[CPath, Set[Column]]] = None)
+  def rowOrder(
+      cpaths: List[CPath],
+      left: Map[CPath, Set[Column]],
+      optRight: Option[Map[CPath, Set[Column]]] = None)
     : spire.math.Order[Int] = {
     val right = optRight getOrElse left
 
-    def plan0(t: CPathTraversal,
-              paths: List[(List[CPathNode], List[CPathNode])],
-              idx: Int): CPathComparator = t match {
+    def plan0(
+        t: CPathTraversal,
+        paths: List[(List[CPathNode], List[CPathNode])],
+        idx: Int): CPathComparator = t match {
       case Done =>
         val validPaths = paths map { case (_, nodes) => CPath(nodes.reverse) }
 
@@ -64,14 +66,16 @@ sealed trait CPathTraversal { self =>
         val rCols = makeCols(right)
 
         val comparators: Array[CPathComparator] = (for ((lPath, lCol) <- lCols;
-        (rPath, rCol) <- rCols) yield {
-          CPathComparator(lPath, lCol, rPath, rCol)
-        })(collection.breakOut)
+                                                        (rPath, rCol) <- rCols)
+          yield {
+            CPathComparator(lPath, lCol, rPath, rCol)
+          })(collection.breakOut)
 
         // Return the first column in the array defined at the row, or -1 if none are defined for that row
         @inline
         def firstDefinedIndexFor(
-            columns: Array[(CPath, Column)], row: Int): Int = {
+            columns: Array[(CPath, Column)],
+            row: Int): Int = {
           var i = 0
           while (i < columns.length && !columns(i)._2.isDefinedAt(row)) {
             i += 1
@@ -105,8 +109,8 @@ sealed trait CPathTraversal { self =>
           def compare(r1: Int, r2: Int, indices: Array[Int]): MaybeOrdering = {
             var i = 0
             var result: MaybeOrdering = NoComp
-            while ( (result == Eq || result == NoComp) &&
-            i < comparators.length) {
+            while ((result == Eq || result == NoComp) &&
+                   i < comparators.length) {
               val iResult = comparators(i).compare(r1, r2, indices)
               if (iResult != NoComp) {
                 result = iResult
@@ -124,7 +128,7 @@ sealed trait CPathTraversal { self =>
       case Select(CPathIndex(i), t) =>
         val matches =
           paths collect {
-            case (CPathArray :: ns, p) => (ns, CPathArray :: p)
+            case (CPathArray :: ns, p)      => (ns, CPathArray :: p)
             case (CPathIndex(`i`) :: ns, p) => (ns, CPathIndex(i) :: p)
           }
         val tailComp = plan0(t, matches, idx + 1)
@@ -183,12 +187,12 @@ sealed trait CPathTraversal { self =>
     * Returns the maximum array depth of this traversal.
     */
   def arrayDepth: Int = this match {
-    case Done => 0
-    case Select(CPathArray, tail) => 1 + tail.arrayDepth
+    case Done                        => 0
+    case Select(CPathArray, tail)    => 1 + tail.arrayDepth
     case Select(CPathIndex(_), tail) => 1 + tail.arrayDepth
-    case Select(_, tail) => tail.arrayDepth
-    case Sequence(ts) => ts.map(_.arrayDepth).max
-    case Loop(_, _, tail) => 1 + tail.arrayDepth
+    case Select(_, tail)             => tail.arrayDepth
+    case Sequence(ts)                => ts.map(_.arrayDepth).max
+    case Loop(_, _, tail)            => 1 + tail.arrayDepth
   }
 }
 
@@ -217,7 +221,7 @@ object CPathTraversal {
       def loop(left: List[B], right: List[A]): (List[B], List[A]) =
         right match {
           case x :: right if f.isDefinedAt(x) => loop(f(x) :: left, right)
-          case _ => (left.reverse, right)
+          case _                              => (left.reverse, right)
         }
 
       loop(Nil, xs)
@@ -225,7 +229,8 @@ object CPathTraversal {
 
     // Joins (merges) a list of sorted traversals into a single traversal.
     def join(
-        os: List[CPathTraversal], seq: List[CPathTraversal]): CPathTraversal =
+        os: List[CPathTraversal],
+        seq: List[CPathTraversal]): CPathTraversal =
       os match {
         case Select(n, t) :: os =>
           val (ts, os2) = collectWhile(os) { case Select(`n`, t2) => t2 }
@@ -240,9 +245,9 @@ object CPathTraversal {
 
         case Nil =>
           seq match {
-            case Nil => Done
+            case Nil      => Done
             case x :: Nil => x
-            case xs => Sequence(xs.reverse)
+            case xs       => Sequence(xs.reverse)
           }
       }
 
@@ -256,7 +261,7 @@ object CPathTraversal {
     @tailrec
     def loop(ps: List[CPathPosition], tail: CPathTraversal): CPathTraversal =
       ps match {
-        case CPathPoint(n) :: ps => loop(ps, Select(n, tail))
+        case CPathPoint(n) :: ps          => loop(ps, Select(n, tail))
         case CPathRange(_, 0, None) :: ps => loop(ps, Select(CPathArray, tail))
         case CPathRange(_, i, Some(j)) :: ps if i == j =>
           loop(ps, Select(CPathIndex(i), tail))
@@ -271,7 +276,9 @@ object CPathTraversal {
   private sealed trait CPathPosition
   private case class CPathPoint(node: CPathNode) extends CPathPosition
   private case class CPathRange(
-      nodes: Set[CPathNode], start: Int, end: Option[Int])
+      nodes: Set[CPathNode],
+      start: Int,
+      end: Option[Int])
       extends CPathPosition
 
   private object CPathPosition {
@@ -285,7 +292,7 @@ object CPathTraversal {
           case (CPathRange(ms, _, _) :: ps, n :: ns) if ms contains n =>
             loop(ps, ns)
           case (Nil, Nil) => true
-          case _ => false
+          case _          => false
         }
 
       loop(ps, path.nodes)
@@ -311,8 +318,8 @@ object CPathTraversal {
                 case (Some(r1), Some(r2)) =>
                   implicitly[scalaz.Order[Int]].order(r1, r2)
                 case (None, None) => EQ
-                case (_, None) => LT
-                case (None, _) => GT
+                case (_, None)    => LT
+                case (None, _)    => GT
               }
             }
           case (CPathPoint(a), CPathPoint(b)) => nodeOrder.order(a, b)
@@ -325,11 +332,11 @@ object CPathTraversal {
 
     def pretty(ps: List[CPathPosition]): String = {
       ps map {
-        case CPathRange(_, 0, None) => "[*]"
-        case CPathRange(_, i, None) => "[%d+]" format i
+        case CPathRange(_, 0, None)              => "[*]"
+        case CPathRange(_, i, None)              => "[%d+]" format i
         case CPathRange(_, i, Some(j)) if i == j => "[%d]" format i
-        case CPathRange(_, i, Some(j)) => "[%d..%d]" format (i, j)
-        case CPathPoint(a) => a.toString
+        case CPathRange(_, i, Some(j))           => "[%d..%d]" format (i, j)
+        case CPathPoint(a)                       => a.toString
       } mkString ""
     }
 
@@ -338,11 +345,14 @@ object CPathTraversal {
       */
     def position(p: CPath): List[CPathPosition] = p.nodes map {
       case CPathArray => CPathRange(Set(CPathArray), 0, None)
-      case node => CPathPoint(node)
+      case node       => CPathPoint(node)
     }
 
     private def overlaps(
-        l1: Int, r1: Option[Int], l2: Int, r2: Option[Int]): Boolean = {
+        l1: Int,
+        r1: Option[Int],
+        l2: Int,
+        r2: Option[Int]): Boolean = {
       (l2 >= l1 && l2 <= r1.getOrElse(l2)) ||
       (l1 >= l2 && l1 <= r2.getOrElse(l1))
     }
@@ -350,18 +360,20 @@ object CPathTraversal {
     /**
       * This splits 2 positioned CPaths into a list of completely disjoint positioned CPaths.
       */
-    def disjoint(c1: List[CPathPosition],
-                 c2: List[CPathPosition]): List[List[CPathPosition]] = {
+    def disjoint(
+        c1: List[CPathPosition],
+        c2: List[CPathPosition]): List[List[CPathPosition]] = {
       import scalaz.syntax.apply._
       import scalaz.std.option._
 
       // case 1: c1 and c2 are disjoint, just return List(c1, c2)
       // case 2: c1 and c2 overlap, return non-overlapping regions of c1 & c2 and the intersection of c1 & c2.
       @tailrec
-      def loop(ps: List[CPathPosition],
-               qs: List[CPathPosition],
-               is: List[CPathPosition],
-               rss: List[List[CPathPosition]]): List[List[CPathPosition]] =
+      def loop(
+          ps: List[CPathPosition],
+          qs: List[CPathPosition],
+          is: List[CPathPosition],
+          rss: List[List[CPathPosition]]): List[List[CPathPosition]] =
         (ps, qs) match {
           case (Nil, Nil) =>
             is.reverse :: rss
@@ -369,8 +381,7 @@ object CPathTraversal {
           case (p :: ps, q :: qs) if p == q =>
             loop(ps, qs, p :: is, rss)
 
-          case (
-              CPathPoint(n @ CPathIndex(i)) :: ps, CPathRange(ns, j, k) :: qs)
+          case (CPathPoint(n @ CPathIndex(i)) :: ps, CPathRange(ns, j, k) :: qs)
               if i >= j && i <= k.getOrElse(i) =>
             val rss0 =
               if (j < i) {
@@ -384,8 +395,7 @@ object CPathTraversal {
 
             loop(ps, qs, CPathRange(ns + n, i, Some(i)) :: is, rss1)
 
-          case (
-              CPathRange(ns, j, k) :: ps, CPathPoint(n @ CPathIndex(i)) :: qs)
+          case (CPathRange(ns, j, k) :: ps, CPathPoint(n @ CPathIndex(i)) :: qs)
               if i >= j && i <= k.getOrElse(i) =>
             val rss0 =
               if (j < i) {
@@ -419,13 +429,14 @@ object CPathTraversal {
                 rss0
             }
 
-            loop(ps,
-                 qs,
-                 CPathRange(
-                     ns1 ++ ns2,
-                     math.max(l1, l2),
-                     ^(r1, r2)(math.min(_, _)) orElse r1 orElse r2) :: is,
-                 rss1)
+            loop(
+              ps,
+              qs,
+              CPathRange(
+                ns1 ++ ns2,
+                math.max(l1, l2),
+                ^(r1, r2)(math.min(_, _)) orElse r1 orElse r2) :: is,
+              rss1)
 
           case (ps, qs) =>
             List(is reverse_::: ps, is reverse_::: qs)
@@ -450,7 +461,7 @@ object CPathTraversal {
               if overlaps(l1, r1, l2, r2) =>
             loop(as, bs)
           case (Nil, Nil) => true
-          case _ => false
+          case _          => false
         }
 
       loop(as, bs)
@@ -464,13 +475,14 @@ object CPathTraversal {
       import scalaz.std.list._
 
       val pq = mutable.PriorityQueue[List[CPathPosition]](
-          paths map (position(_)): _*) {
+        paths map (position(_)): _*) {
         implicitly[scalaz.Order[List[CPathPosition]]].reverseOrder.toScalaOrdering
       }
 
       @tailrec
-      def rec(a: List[CPathPosition],
-              ts: List[List[CPathPosition]]): List[List[CPathPosition]] = {
+      def rec(
+          a: List[CPathPosition],
+          ts: List[List[CPathPosition]]): List[List[CPathPosition]] = {
         if (!pq.isEmpty) {
           val b = pq.dequeue()
           if (intersect(a, b)) {

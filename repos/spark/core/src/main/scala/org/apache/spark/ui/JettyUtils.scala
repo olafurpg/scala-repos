@@ -47,30 +47,34 @@ private[spark] object JettyUtils extends Logging {
   // implicit conversion from many types of functions to jetty Handlers.
   type Responder[T] = HttpServletRequest => T
 
-  class ServletParams[T <% AnyRef](val responder: Responder[T],
-                                   val contentType: String,
-                                   val extractFn: T => String = (in: Any) =>
-                                       in.toString) {}
+  class ServletParams[T <% AnyRef](
+      val responder: Responder[T],
+      val contentType: String,
+      val extractFn: T => String = (in: Any) => in.toString) {}
 
   // Conversions from various types of Responder's to appropriate servlet parameters
   implicit def jsonResponderToServlet(
       responder: Responder[JValue]): ServletParams[JValue] =
     new ServletParams(
-        responder, "text/json", (in: JValue) => pretty(render(in)))
+      responder,
+      "text/json",
+      (in: JValue) => pretty(render(in)))
 
   implicit def htmlResponderToServlet(
       responder: Responder[Seq[Node]]): ServletParams[Seq[Node]] =
-    new ServletParams(responder,
-                      "text/html",
-                      (in: Seq[Node]) => "<!DOCTYPE html>" + in.toString)
+    new ServletParams(
+      responder,
+      "text/html",
+      (in: Seq[Node]) => "<!DOCTYPE html>" + in.toString)
 
   implicit def textResponderToServlet(
       responder: Responder[String]): ServletParams[String] =
     new ServletParams(responder, "text/plain")
 
-  def createServlet[T <% AnyRef](servletParams: ServletParams[T],
-                                 securityMgr: SecurityManager,
-                                 conf: SparkConf): HttpServlet = {
+  def createServlet[T <% AnyRef](
+      servletParams: ServletParams[T],
+      securityMgr: SecurityManager,
+      conf: SparkConf): HttpServlet = {
 
     // SPARK-10589 avoid frame-related click-jacking vulnerability, using X-Frame-Options
     // (see http://tools.ietf.org/html/rfc7034). By default allow framing only from the
@@ -82,15 +86,17 @@ private[spark] object JettyUtils extends Logging {
 
     new HttpServlet {
       override def doGet(
-          request: HttpServletRequest, response: HttpServletResponse) {
+          request: HttpServletRequest,
+          response: HttpServletResponse) {
         try {
           if (securityMgr.checkUIViewPermissions(request.getRemoteUser)) {
             response.setContentType(
-                "%s;charset=utf-8".format(servletParams.contentType))
+              "%s;charset=utf-8".format(servletParams.contentType))
             response.setStatus(HttpServletResponse.SC_OK)
             val result = servletParams.responder(request)
             response.setHeader(
-                "Cache-Control", "no-cache, no-store, must-revalidate")
+              "Cache-Control",
+              "no-cache, no-store, must-revalidate")
             response.setHeader("X-Frame-Options", xFrameOptionsValue)
             // scalastyle:off println
             response.getWriter.println(servletParams.extractFn(result))
@@ -98,14 +104,15 @@ private[spark] object JettyUtils extends Logging {
           } else {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED)
             response.setHeader(
-                "Cache-Control", "no-cache, no-store, must-revalidate")
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-                               "User is not authorized to access this page.")
+              "Cache-Control",
+              "no-cache, no-store, must-revalidate")
+            response.sendError(
+              HttpServletResponse.SC_UNAUTHORIZED,
+              "User is not authorized to access this page.")
           }
         } catch {
           case e: IllegalArgumentException =>
-            response.sendError(
-                HttpServletResponse.SC_BAD_REQUEST, e.getMessage)
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage)
           case e: Exception =>
             logWarning(s"GET ${request.getRequestURI} failed: $e", e)
             throw e
@@ -113,7 +120,8 @@ private[spark] object JettyUtils extends Logging {
       }
       // SPARK-5983 ensure TRACE is not supported
       protected override def doTrace(
-          req: HttpServletRequest, res: HttpServletResponse): Unit = {
+          req: HttpServletRequest,
+          res: HttpServletResponse): Unit = {
         res.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED)
       }
     }
@@ -127,13 +135,16 @@ private[spark] object JettyUtils extends Logging {
       conf: SparkConf,
       basePath: String = ""): ServletContextHandler = {
     createServletHandler(
-        path, createServlet(servletParams, securityMgr, conf), basePath)
+      path,
+      createServlet(servletParams, securityMgr, conf),
+      basePath)
   }
 
   /** Create a context handler that responds to a request with the given path prefix */
-  def createServletHandler(path: String,
-                           servlet: HttpServlet,
-                           basePath: String): ServletContextHandler = {
+  def createServletHandler(
+      path: String,
+      servlet: HttpServlet,
+      basePath: String): ServletContextHandler = {
     val prefixedPath =
       if (basePath == "" && path == "/") {
         path
@@ -157,7 +168,8 @@ private[spark] object JettyUtils extends Logging {
     val prefixedDestPath = basePath + destPath
     val servlet = new HttpServlet {
       override def doGet(
-          request: HttpServletRequest, response: HttpServletResponse): Unit = {
+          request: HttpServletRequest,
+          response: HttpServletResponse): Unit = {
         if (httpMethods.contains("GET")) {
           doRequest(request, response)
         } else {
@@ -165,7 +177,8 @@ private[spark] object JettyUtils extends Logging {
         }
       }
       override def doPost(
-          request: HttpServletRequest, response: HttpServletResponse): Unit = {
+          request: HttpServletRequest,
+          response: HttpServletResponse): Unit = {
         if (httpMethods.contains("POST")) {
           doRequest(request, response)
         } else {
@@ -173,16 +186,19 @@ private[spark] object JettyUtils extends Logging {
         }
       }
       private def doRequest(
-          request: HttpServletRequest, response: HttpServletResponse): Unit = {
+          request: HttpServletRequest,
+          response: HttpServletResponse): Unit = {
         beforeRedirect(request)
         // Make sure we don't end up with "//" in the middle
         val newUrl = new URL(
-            new URL(request.getRequestURL.toString), prefixedDestPath).toString
+          new URL(request.getRequestURL.toString),
+          prefixedDestPath).toString
         response.sendRedirect(newUrl)
       }
       // SPARK-5983 ensure TRACE is not supported
       protected override def doTrace(
-          req: HttpServletRequest, res: HttpServletResponse): Unit = {
+          req: HttpServletRequest,
+          res: HttpServletResponse): Unit = {
         res.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED)
       }
     }
@@ -191,10 +207,12 @@ private[spark] object JettyUtils extends Logging {
 
   /** Create a handler for serving files from a static directory */
   def createStaticHandler(
-      resourceBase: String, path: String): ServletContextHandler = {
+      resourceBase: String,
+      path: String): ServletContextHandler = {
     val contextHandler = new ServletContextHandler
     contextHandler.setInitParameter(
-        "org.eclipse.jetty.servlet.Default.gzip", "false")
+      "org.eclipse.jetty.servlet.Default.gzip",
+      "false")
     val staticHandler = new DefaultServlet
     val holder = new ServletHolder(staticHandler)
     Option(Utils.getSparkClassLoader.getResource(resourceBase)) match {
@@ -202,7 +220,7 @@ private[spark] object JettyUtils extends Logging {
         holder.setInitParameter("resourceBase", res.toString)
       case None =>
         throw new Exception(
-            "Could not find resource path for Web UI: " + resourceBase)
+          "Could not find resource path for Web UI: " + resourceBase)
     }
     contextHandler.setContextPath(path)
     contextHandler.addServlet(holder, "/")
@@ -234,18 +252,22 @@ private[spark] object JettyUtils extends Logging {
             }
 
           val prefix = s"spark.$filter.param."
-          conf.getAll.filter {
-            case (k, v) => k.length() > prefix.length() && k.startsWith(prefix)
-          }.foreach {
-            case (k, v) =>
-              holder.setInitParameter(k.substring(prefix.length()), v)
-          }
+          conf.getAll
+            .filter {
+              case (k, v) =>
+                k.length() > prefix.length() && k.startsWith(prefix)
+            }
+            .foreach {
+              case (k, v) =>
+                holder.setInitParameter(k.substring(prefix.length()), v)
+            }
 
-          val enumDispatcher = java.util.EnumSet.of(DispatcherType.ASYNC,
-                                                    DispatcherType.ERROR,
-                                                    DispatcherType.FORWARD,
-                                                    DispatcherType.INCLUDE,
-                                                    DispatcherType.REQUEST)
+          val enumDispatcher = java.util.EnumSet.of(
+            DispatcherType.ASYNC,
+            DispatcherType.ERROR,
+            DispatcherType.FORWARD,
+            DispatcherType.INCLUDE,
+            DispatcherType.REQUEST)
           handlers.foreach {
             case (handler) => handler.addFilter(holder, "/*", enumDispatcher)
           }
@@ -260,12 +282,13 @@ private[spark] object JettyUtils extends Logging {
     * If the desired port number is contended, continues incrementing ports until a free port is
     * found. Return the jetty Server object, the chosen port, and a mutable collection of handlers.
     */
-  def startJettyServer(hostName: String,
-                       port: Int,
-                       sslOptions: SSLOptions,
-                       handlers: Seq[ServletContextHandler],
-                       conf: SparkConf,
-                       serverName: String = ""): ServerInfo = {
+  def startJettyServer(
+      hostName: String,
+      port: Int,
+      sslOptions: SSLOptions,
+      handlers: Seq[ServletContextHandler],
+      conf: SparkConf,
+      serverName: String = ""): ServerInfo = {
 
     val collection = new ContextHandlerCollection
     addFilters(handlers, conf)
@@ -346,22 +369,25 @@ private[spark] object JettyUtils extends Logging {
   }
 
   private def createRedirectHttpsHandler(
-      securePort: Int, scheme: String): ContextHandler = {
+      securePort: Int,
+      scheme: String): ContextHandler = {
     val redirectHandler: ContextHandler = new ContextHandler
     redirectHandler.setContextPath("/")
     redirectHandler.setHandler(new AbstractHandler {
-      override def handle(target: String,
-                          baseRequest: Request,
-                          request: HttpServletRequest,
-                          response: HttpServletResponse): Unit = {
+      override def handle(
+          target: String,
+          baseRequest: Request,
+          request: HttpServletRequest,
+          response: HttpServletResponse): Unit = {
         if (baseRequest.isSecure) {
           return
         }
-        val httpsURI = createRedirectURI(scheme,
-                                         baseRequest.getServerName,
-                                         securePort,
-                                         baseRequest.getRequestURI,
-                                         baseRequest.getQueryString)
+        val httpsURI = createRedirectURI(
+          scheme,
+          baseRequest.getServerName,
+          securePort,
+          baseRequest.getRequestURI,
+          baseRequest.getQueryString)
         response.setContentLength(0)
         response.encodeRedirectURL(httpsURI)
         response.sendRedirect(httpsURI)
@@ -372,11 +398,12 @@ private[spark] object JettyUtils extends Logging {
   }
 
   // Create a new URI from the arguments, handling IPv6 host encoding and default ports.
-  private def createRedirectURI(scheme: String,
-                                server: String,
-                                port: Int,
-                                path: String,
-                                query: String) = {
+  private def createRedirectURI(
+      scheme: String,
+      server: String,
+      port: Int,
+      path: String,
+      query: String) = {
     val redirectServer =
       if (server.contains(":") && !server.startsWith("[")) {
         s"[${server}]"
@@ -389,4 +416,6 @@ private[spark] object JettyUtils extends Logging {
 }
 
 private[spark] case class ServerInfo(
-    server: Server, boundPort: Int, rootHandler: ContextHandlerCollection)
+    server: Server,
+    boundPort: Int,
+    rootHandler: ContextHandlerCollection)

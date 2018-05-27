@@ -25,10 +25,8 @@ object Implicits extends DoubleImplicits with IteratorImplicits {
     }
   }
 
-  implicit class scEnrichArray[A, B](val __this: Array[(A, B)])
-      extends AnyVal {
-    def toMultiMap[Result](
-        implicit cbf: CanBuildFrom[Array[(A, B)], B, Result])
+  implicit class scEnrichArray[A, B](val __this: Array[(A, B)]) extends AnyVal {
+    def toMultiMap[Result](implicit cbf: CanBuildFrom[Array[(A, B)], B, Result])
       : Map[A, Result] = {
       var result = collection.mutable.Map[A, mutable.Builder[B, Result]]()
       result = result.withDefault { a =>

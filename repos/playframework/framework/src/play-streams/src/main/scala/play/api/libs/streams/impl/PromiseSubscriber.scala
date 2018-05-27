@@ -69,8 +69,9 @@ private[streams] class PromiseSubscriber[T](prom: Promise[T])
 
   override def onComplete(): Unit = exclusive {
     case AwaitingSubscription | Subscribed =>
-      prom.failure(new IllegalStateException(
-              "Can't handle onComplete until an element has been received"))
+      prom.failure(
+        new IllegalStateException(
+          "Can't handle onComplete until an element has been received"))
       state = Completed
     case Completed =>
       ()
@@ -80,7 +81,7 @@ private[streams] class PromiseSubscriber[T](prom: Promise[T])
     case AwaitingSubscription =>
       state = Completed
       throw new IllegalStateException(
-          "Can't handle onNext until at least one subscription has occurred")
+        "Can't handle onNext until at least one subscription has occurred")
     case Subscribed =>
       state = Completed
       prom.success(element) // we assume any Future.onComplete handlers run asynchronously

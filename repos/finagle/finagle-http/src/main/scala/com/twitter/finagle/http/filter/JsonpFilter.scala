@@ -24,17 +24,18 @@ class JsonpFilter[Req <: Request] extends SimpleFilter[Req, Response] {
     }
   }
 
-  def addCallback(callback: String,
-                  request: Req,
-                  service: Service[Req, Response]): Future[Response] =
+  def addCallback(
+      callback: String,
+      request: Req,
+      service: Service[Req, Response]): Future[Response] =
     service(request) map { response =>
       if (response.mediaType == Some(MediaType.Json)) {
         response.content = Seq(
-            JsonpFilter.Comment,
-            Buf.Utf8(callback),
-            JsonpFilter.LeftParen,
-            response.content,
-            JsonpFilter.RightParenSemicolon
+          JsonpFilter.Comment,
+          Buf.Utf8(callback),
+          JsonpFilter.LeftParen,
+          response.content,
+          JsonpFilter.RightParenSemicolon
         ).foldLeft(Buf.Empty) { (acc, buf) =>
           acc.concat(buf)
         }

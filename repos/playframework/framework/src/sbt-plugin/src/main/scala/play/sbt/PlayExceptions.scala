@@ -14,27 +14,28 @@ object PlayExceptions {
     message match {
       case overloaded(method, _, signature) =>
         "Overloaded method value [" + method + "] cannot be applied to " +
-        signature
+          signature
       case msg => msg
     }
   }
 
   case class UnexpectedException(
-      message: Option[String] = None, unexpected: Option[Throwable] = None)
+      message: Option[String] = None,
+      unexpected: Option[Throwable] = None)
       extends PlayException(
-          "Unexpected exception",
-          message.getOrElse {
-            unexpected
-              .map(
-                  t => "%s: %s".format(t.getClass.getSimpleName, t.getMessage))
-              .getOrElse("")
-          },
-          unexpected.orNull
+        "Unexpected exception",
+        message.getOrElse {
+          unexpected
+            .map(t => "%s: %s".format(t.getClass.getSimpleName, t.getMessage))
+            .getOrElse("")
+        },
+        unexpected.orNull
       )
 
   case class CompilationException(problem: xsbti.Problem)
       extends PlayException.ExceptionSource(
-          "Compilation error", filterAnnoyingErrorMessages(problem.message)) {
+        "Compilation error",
+        filterAnnoyingErrorMessages(problem.message)) {
     def line =
       problem.position.line.map(m => m.asInstanceOf[java.lang.Integer]).orNull
     def position =

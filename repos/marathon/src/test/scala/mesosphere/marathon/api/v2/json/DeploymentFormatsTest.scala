@@ -45,8 +45,9 @@ class DeploymentFormatsTest extends MarathonSpec {
 
   test("Can write/read GroupUpdate") {
     marshalUnmarshal(genGroupUpdate())
-    marshalUnmarshal(genGroupUpdate(
-            Set(genGroupUpdate(), genGroupUpdate(Set(genGroupUpdate())))))
+    marshalUnmarshal(
+      genGroupUpdate(
+        Set(genGroupUpdate(), genGroupUpdate(Set(genGroupUpdate())))))
   }
 
   test("Will read from no given value") {
@@ -95,16 +96,16 @@ class DeploymentFormatsTest extends MarathonSpec {
 
   test("DeploymentPlan can be serialized") {
     val plan = DeploymentPlan(
-        genId.toString,
-        genGroup(),
-        genGroup(Set(genGroup(), genGroup())),
-        Seq(genStep),
-        Timestamp.now()
+      genId.toString,
+      genGroup(),
+      genGroup(Set(genGroup(), genGroup())),
+      Seq(genStep),
+      Timestamp.now()
     )
     val json = Json.toJson(plan)
     val fieldMap = json.as[JsObject].fields.toMap
     fieldMap.keySet should be(
-        Set("version", "id", "target", "original", "steps"))
+      Set("version", "id", "target", "original", "steps"))
   }
 
   // regression test for #1176
@@ -130,24 +131,24 @@ class DeploymentFormatsTest extends MarathonSpec {
 
   def genStep =
     DeploymentStep(
-        actions = Seq(
-              StartApplication(genApp, genInt),
-              ScaleApplication(genApp, genInt),
-              StopApplication(genApp),
-              RestartApplication(genApp),
-              ResolveArtifacts(genApp, Map.empty)
-          ))
+      actions = Seq(
+        StartApplication(genApp, genInt),
+        ScaleApplication(genApp, genInt),
+        StopApplication(genApp),
+        RestartApplication(genApp),
+        ResolveArtifacts(genApp, Map.empty)
+      ))
 
   def genGroup(children: Set[Group] = Set.empty) =
     Group(genId, Set(genApp, genApp), children, Set(genId), genTimestamp)
 
   def genGroupUpdate(children: Set[GroupUpdate] = Set.empty) =
     GroupUpdate(
-        Some(genId),
-        Some(Set(genApp, genApp)),
-        Some(children),
-        Some(Set(genId)),
-        Some(23),
-        Some(genTimestamp)
+      Some(genId),
+      Some(Set(genApp, genApp)),
+      Some(children),
+      Some(Set(genId)),
+      Some(23),
+      Some(genTimestamp)
     )
 }

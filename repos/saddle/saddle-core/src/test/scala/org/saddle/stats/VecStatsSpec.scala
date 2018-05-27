@@ -127,14 +127,15 @@ class VecStatsSpec extends Specification {
 
     Vec(1d).percentile(0) must_== Vec(1d).percentile(100)
 
-    val tst = Vec[Double](NA,
-                          -1000.0000,
-                          0.0000,
-                          -946.7879,
-                          -256.7953,
-                          1000.0000,
-                          -307.5079,
-                          -832.8867)
+    val tst = Vec[Double](
+      NA,
+      -1000.0000,
+      0.0000,
+      -946.7879,
+      -256.7953,
+      1000.0000,
+      -307.5079,
+      -832.8867)
     areClose(tst.percentile(50), -307.5079, 1e-4)
 
     val tst2 = Vec[Double](1, 0)

@@ -45,10 +45,11 @@ class DescriptiveStatsTest extends WordSpec with Matchers {
     }
 
     "covmat should produce correct values for seq of vectors" in {
-      val d = Seq(DenseVector(1.0, 2.0),
-                  DenseVector(2.0, -3.0),
-                  DenseVector(3.0, 4.0),
-                  DenseVector(4.0, 5.0))
+      val d = Seq(
+        DenseVector(1.0, 2.0),
+        DenseVector(2.0, -3.0),
+        DenseVector(3.0, 4.0),
+        DenseVector(4.0, 5.0))
       val result: DenseMatrix[Double] = covmat(d)
       assert(math.abs(result(0, 1) - 2.66666667) < 1e-7)
       assert(math.abs(result(1, 0) - 2.66666667) < 1e-7)
@@ -65,10 +66,11 @@ class DescriptiveStatsTest extends WordSpec with Matchers {
       assert(math.abs(result(1, 1) - 1.0) < 1e-7)
     }
     "corrcoeff should produce correct values for list of vectors" in {
-      val d = Seq(DenseVector(1.0, 2.0),
-                  DenseVector(2.0, -3.0),
-                  DenseVector(3.0, 4.0),
-                  DenseVector(4.0, 5.0))
+      val d = Seq(
+        DenseVector(1.0, 2.0),
+        DenseVector(2.0, -3.0),
+        DenseVector(3.0, 4.0),
+        DenseVector(4.0, 5.0))
       val result: DenseMatrix[Double] = corrcoeff(d)
       assert(math.abs(result(0, 1) - 0.580381) < 1e-7)
       assert(math.abs(result(1, 0) - 0.580381) < 1e-7)
@@ -118,14 +120,18 @@ class DescriptiveStatsTest extends WordSpec with Matchers {
     "bincountSparse should compute bins for DenseVector" in {
       val x = DenseVector[Int](0, 10, 20, 300, 10)
       val result = new SparseVector[Int](
-          Array[Int](0, 10, 20, 300), Array[Int](1, 2, 1, 1), 301)
+        Array[Int](0, 10, 20, 300),
+        Array[Int](1, 2, 1, 1),
+        301)
       assert(result == bincount.sparse(x))
     }
 
     "bincountSparse should compute bins for other container with CanTraverseValues" in {
       val x = List[Int](0, 10, 20, 300, 10)
       val result = new SparseVector[Int](
-          Array[Int](0, 10, 20, 300), Array[Int](1, 2, 1, 1), 301)
+        Array[Int](0, 10, 20, 300),
+        Array[Int](1, 2, 1, 1),
+        301)
       assert(result == bincount.sparse(x))
     }
 
@@ -133,7 +139,9 @@ class DescriptiveStatsTest extends WordSpec with Matchers {
       val x = DenseVector[Int](0, 10, 20, 300, 10)
       val weights = DenseVector[Double](1.0, 3.0, 1.0, 7.0, 1.0)
       val result = new SparseVector[Double](
-          Array[Int](0, 10, 20, 300), Array[Double](1.0, 4.0, 1.0, 7.0), 301)
+        Array[Int](0, 10, 20, 300),
+        Array[Double](1.0, 4.0, 1.0, 7.0),
+        301)
       assert(result == bincount.sparse(x, weights))
     }
   }
@@ -146,7 +154,9 @@ class DescriptiveStatsTest2 extends FunSuite {
     import breeze.{math => bmath}
     import breeze.math.Complex
     val data = DenseVector[Complex](
-        (0.0 + 1.0 * bmath.i), (1.0 + 0.0 * bmath.i), (2.0 + 2.0 * bmath.i))
+      (0.0 + 1.0 * bmath.i),
+      (1.0 + 0.0 * bmath.i),
+      (2.0 + 2.0 * bmath.i))
     assert(mean(data) === (1.0 + 1.0 * bmath.i))
   }
 
@@ -155,10 +165,12 @@ class DescriptiveStatsTest2 extends FunSuite {
     val data = Array.fill(100000)(r.nextGaussian)
     val mav = meanAndVariance(data)
     val mav2 = meanAndVariance(data.iterator)
-    assert(breeze.numerics.closeTo(mav.mean, 0.0, 1E-2),
-           mav.mean + " should be 0")
-    assert(breeze.numerics.closeTo(mav.variance, 1.0, 1E-2),
-           mav.variance + " should be 1")
+    assert(
+      breeze.numerics.closeTo(mav.mean, 0.0, 1E-2),
+      mav.mean + " should be 0")
+    assert(
+      breeze.numerics.closeTo(mav.variance, 1.0, 1E-2),
+      mav.variance + " should be 1")
     assert(mav == mav2)
   }
 
@@ -190,34 +202,43 @@ class DescriptiveStatsTest2 extends FunSuite {
     val dataEvenDuplicate2Seq =
       Seq(200, 250, 400, 300, 100, 500, 550, 550, 550, 550)
 
-    assert(median(dataOdd) == 2,
-           "median (odd length) should be 2 instead of " + median(dataOdd))
-    assert(median(dataOddDuplicate) == 2,
-           "median (odd length with duplicate) should be 2 instead of " +
-           median(dataOddDuplicate))
     assert(
-        median(dataEven) == 1.5f,
-        "median (even length) should be 1.5f instead of " + median(dataEven))
-    assert(median(dataEvenDuplicate) == 250,
-           "median (even length with duplicate) should be 250 instead of " +
-           median(dataEvenDuplicate))
-    assert(median(dataEvenDuplicate2) == 450,
-           "median (even length with duplicate) should be 450 instead of " +
-           median(dataEvenDuplicate2))
+      median(dataOdd) == 2,
+      "median (odd length) should be 2 instead of " + median(dataOdd))
+    assert(
+      median(dataOddDuplicate) == 2,
+      "median (odd length with duplicate) should be 2 instead of " +
+        median(dataOddDuplicate))
+    assert(
+      median(dataEven) == 1.5f,
+      "median (even length) should be 1.5f instead of " + median(dataEven))
+    assert(
+      median(dataEvenDuplicate) == 250,
+      "median (even length with duplicate) should be 250 instead of " +
+        median(dataEvenDuplicate))
+    assert(
+      median(dataEvenDuplicate2) == 450,
+      "median (even length with duplicate) should be 450 instead of " +
+        median(dataEvenDuplicate2))
 
-    assert(median(dataOddSeq) == 2,
-           "median (odd length) should be 2 instead of " + median(dataOddSeq))
-    assert(median(dataOddDuplicateSeq) == 2,
-           "median (odd length with duplicate) should be 2 instead of " +
-           median(dataOddDuplicateSeq))
-    assert(median(dataEvenSeq) == 1.5f,
-           "median (even length) should be 1.5f instead of " +
-           median(dataEvenSeq))
-    assert(median(dataEvenDuplicateSeq) == 250,
-           "median (even length with duplicate) should be 250 instead of " +
-           median(dataEvenDuplicate))
-    assert(median(dataEvenDuplicate2Seq) == 450,
-           "median (even length with duplicate) should be 450 instead of " +
-           median(dataEvenDuplicate2))
+    assert(
+      median(dataOddSeq) == 2,
+      "median (odd length) should be 2 instead of " + median(dataOddSeq))
+    assert(
+      median(dataOddDuplicateSeq) == 2,
+      "median (odd length with duplicate) should be 2 instead of " +
+        median(dataOddDuplicateSeq))
+    assert(
+      median(dataEvenSeq) == 1.5f,
+      "median (even length) should be 1.5f instead of " +
+        median(dataEvenSeq))
+    assert(
+      median(dataEvenDuplicateSeq) == 250,
+      "median (even length with duplicate) should be 250 instead of " +
+        median(dataEvenDuplicate))
+    assert(
+      median(dataEvenDuplicate2Seq) == 450,
+      "median (even length with duplicate) should be 450 instead of " +
+        median(dataEvenDuplicate2))
   }
 }

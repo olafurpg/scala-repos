@@ -18,12 +18,13 @@ import org.jetbrains.plugins.scala.extensions._
   * [[HoconCommenter]] and so I need this custom enter handler for the other one.
   */
 class EnterInHashCommentHandler extends EnterHandlerDelegateAdapter {
-  override def preprocessEnter(file: PsiFile,
-                               editor: Editor,
-                               caretOffsetRef: Ref[Integer],
-                               caretAdvance: Ref[Integer],
-                               dataContext: DataContext,
-                               originalHandler: EditorActionHandler): Result =
+  override def preprocessEnter(
+      file: PsiFile,
+      editor: Editor,
+      caretOffsetRef: Ref[Integer],
+      caretAdvance: Ref[Integer],
+      dataContext: DataContext,
+      originalHandler: EditorActionHandler): Result =
     file match {
       case _: HoconPsiFile =>
         // This code is copied from com.intellij.codeInsight.editorActions.enter.EnterInLineCommentHandler
@@ -61,7 +62,9 @@ class EnterInHashCommentHandler extends EnterHandlerDelegateAdapter {
     }
 
   override def postProcessEnter(
-      file: PsiFile, editor: Editor, dataContext: DataContext): Result =
+      file: PsiFile,
+      editor: Editor,
+      dataContext: DataContext): Result =
     file match {
       case _: HoconPsiFile =>
         val caretModel = editor.getCaretModel
@@ -73,7 +76,7 @@ class EnterInHashCommentHandler extends EnterHandlerDelegateAdapter {
           editor.getDocument.getLineNumber(psi.getTextRange.getStartOffset)
         def isHashComment(psi: PsiElement) =
           psi != null &&
-          psi.getNode.getElementType == HoconTokenType.HashComment
+            psi.getNode.getElementType == HoconTokenType.HashComment
 
         if (isHashComment(psiAtOffset) && isHashComment(prevPsi) &&
             lineNumber(psiAtOffset) == lineNumber(prevPsi) + 1 &&

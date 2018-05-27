@@ -36,13 +36,13 @@ class PEventAggregatorSpec extends Specification with TestEvents {
 
       val userMap = users.collectAsMap.toMap
       val expectedDM = Map(
-          "u1" -> DataMap(u1),
-          "u2" -> DataMap(u2)
+        "u1" -> DataMap(u1),
+        "u2" -> DataMap(u2)
       )
 
       val expectedPM = Map(
-          "u1" -> PropertyMap(u1, u1BaseTime, u1LastTime),
-          "u2" -> PropertyMap(u2, u2BaseTime, u2LastTime)
+        "u1" -> PropertyMap(u1, u1BaseTime, u1LastTime),
+        "u2" -> PropertyMap(u2, u2BaseTime, u2LastTime)
       )
 
       userMap must beEqualTo(expectedDM)
@@ -52,13 +52,13 @@ class PEventAggregatorSpec extends Specification with TestEvents {
     "aggregate deleted entity correctly" in {
       // put the delete event in middle
       val events = sc.parallelize(
-          Seq(u1e5, u2e2, u1e3, u1ed, u1e1, u2e3, u2e1, u1e4, u1e2))
+        Seq(u1e5, u2e2, u1e3, u1ed, u1e1, u2e3, u2e1, u1e4, u1e2))
 
       val users = PEventAggregator.aggregateProperties(events)
 
       val userMap = users.collectAsMap.toMap
       val expectedPM = Map(
-          "u2" -> PropertyMap(u2, u2BaseTime, u2LastTime)
+        "u2" -> PropertyMap(u2, u2BaseTime, u2LastTime)
       )
 
       userMap must beEqualTo(expectedPM)

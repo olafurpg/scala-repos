@@ -50,16 +50,23 @@ class BorderImage(override val delegate: jfxsl.BorderImage)
     * Creates a new BackgroundImage.Defines properties describing how to render an image as
     * the border of some Region.
     */
-  def this(image: Image,
-           widths: BorderWidths,
-           insets: Insets,
-           slices: BorderWidths,
-           filled: Boolean,
-           repeatX: BorderRepeat,
-           repeatY: BorderRepeat) =
+  def this(
+      image: Image,
+      widths: BorderWidths,
+      insets: Insets,
+      slices: BorderWidths,
+      filled: Boolean,
+      repeatX: BorderRepeat,
+      repeatY: BorderRepeat) =
     this(
-        new jfxsl.BorderImage(
-            image, widths, insets, slices, filled, repeatX, repeatY))
+      new jfxsl.BorderImage(
+        image,
+        widths,
+        insets,
+        slices,
+        filled,
+        repeatX,
+        repeatY))
 
   /**
     * The image to be used.

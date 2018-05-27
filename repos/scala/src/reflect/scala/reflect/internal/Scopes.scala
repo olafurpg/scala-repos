@@ -52,7 +52,7 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
     *  This is necessary because when run from reflection every scope needs to have a
     *  SynchronizedScope as mixin.
     */
-  class Scope protected[Scopes]() extends ScopeApi with MemberScopeApi {
+  class Scope protected[Scopes] () extends ScopeApi with MemberScopeApi {
 
     private[scala] var elems: ScopeEntry = _
 
@@ -129,8 +129,9 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
     /** enter a symbol, asserting that no symbol with same name exists in scope
       */
     def enterUnique(sym: Symbol) {
-      assert(lookup(sym.name) == NoSymbol,
-             (sym.fullLocationString, lookup(sym.name).fullLocationString))
+      assert(
+        lookup(sym.name) == NoSymbol,
+        (sym.fullLocationString, lookup(sym.name).fullLocationString))
       enter(sym)
     }
 
@@ -270,14 +271,18 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
     def lookupAll(name: Name): Iterator[Symbol] = new Iterator[Symbol] {
       var e = lookupEntry(name)
       def hasNext: Boolean = e ne null
-      def next(): Symbol = try e.sym finally e = lookupNextEntry(e)
+      def next(): Symbol =
+        try e.sym
+        finally e = lookupNextEntry(e)
     }
 
     def lookupAllEntries(name: Name): Iterator[ScopeEntry] =
       new Iterator[ScopeEntry] {
         var e = lookupEntry(name)
         def hasNext: Boolean = e ne null
-        def next(): ScopeEntry = try e finally e = lookupNextEntry(e)
+        def next(): ScopeEntry =
+          try e
+          finally e = lookupNextEntry(e)
       }
 
     def lookupUnshadowedEntries(name: Name): Iterator[ScopeEntry] = {
@@ -285,7 +290,7 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
         case null => Iterator.empty
         case e =>
           lookupAllEntries(name) filter
-          (e1 => (e eq e1) || (e.depth == e1.depth && e.sym != e1.sym))
+            (e1 => (e eq e1) || (e.depth == e1.depth && e.sym != e1.sym))
       }
     }
 
@@ -298,12 +303,12 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
       var e: ScopeEntry = null
       if (hashtable ne null) {
         e = hashtable(name.start & HASHMASK)
-        while ( (e ne null) && e.sym.name != name) {
+        while ((e ne null) && e.sym.name != name) {
           e = e.tail
         }
       } else {
         e = elems
-        while ( (e ne null) && e.sym.name != name) {
+        while ((e ne null) && e.sym.name != name) {
           e = e.next
         }
       }
@@ -318,9 +323,9 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
     def lookupNextEntry(entry: ScopeEntry): ScopeEntry = {
       var e = entry
       if (hashtable ne null)
-        do { e = e.tail } while ( (e ne null) && e.sym.name != entry.sym.name)
+        do { e = e.tail } while ((e ne null) && e.sym.name != entry.sym.name)
       else
-        do { e = e.next } while ( (e ne null) && e.sym.name != entry.sym.name)
+        do { e = e.next } while ((e ne null) && e.sym.name != entry.sym.name)
       e
     }
 
@@ -330,7 +335,7 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
       */
     def isSameScope(other: Scope) =
       ((size == other.size) // optimization - size is cached
-          && (this isSubScope other) && (other isSubScope this))
+        && (this isSubScope other) && (other isSubScope this))
 
     def isSubScope(other: Scope) = {
       def scopeContainsSym(sym: Symbol): Boolean = {
@@ -353,7 +358,7 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
         var symbols: List[Symbol] = Nil
         var count = 0
         var e = elems
-        while ( (e ne null) && e.owner == this) {
+        while ((e ne null) && e.owner == this) {
           count += 1
           symbols ::= e.sym
           e = e.next

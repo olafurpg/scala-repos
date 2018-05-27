@@ -46,7 +46,7 @@ class ChannelBufferUsageTracker(
   def increase(size: Long) = synchronized {
     if (state.currentUsage + size > state.usageLimit.inBytes) {
       throw new ChannelBufferUsageException(
-          "Channel buffer usage exceeded limit (" + currentUsage + ", " +
+        "Channel buffer usage exceeded limit (" + currentUsage + ", " +
           size + " vs. " + usageLimit + ")")
     } else {
       state.currentUsage += size
@@ -57,7 +57,7 @@ class ChannelBufferUsageTracker(
   def decrease(size: Long) = synchronized {
     if (state.currentUsage < size) {
       throw new ChannelBufferUsageException(
-          "invalid ChannelBufferUsageTracker decrease operation (" + size +
+        "invalid ChannelBufferUsageTracker decrease operation (" + size +
           " vs. " + currentUsage + ")")
     } else {
       state.currentUsage -= size
@@ -73,21 +73,21 @@ private[http] class ChannelBufferManager(
   override def messageReceived(ctx: ChannelHandlerContext, e: MessageEvent) {
     e.getMessage match {
       case buffer: ChannelBuffer => increaseBufferUsage(buffer.capacity())
-      case _ => ()
+      case _                     => ()
     }
 
     super.messageReceived(ctx, e)
   }
 
   override def writeComplete(
-      ctx: ChannelHandlerContext, e: WriteCompletionEvent) {
+      ctx: ChannelHandlerContext,
+      e: WriteCompletionEvent) {
     clearBufferUsage()
 
     super.writeComplete(ctx, e)
   }
 
-  override def channelClosed(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent) {
+  override def channelClosed(ctx: ChannelHandlerContext, e: ChannelStateEvent) {
     clearBufferUsage()
 
     super.channelClosed(ctx, e)

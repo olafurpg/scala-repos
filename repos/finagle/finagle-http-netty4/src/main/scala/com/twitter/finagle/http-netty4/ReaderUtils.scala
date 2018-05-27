@@ -20,8 +20,7 @@ private[http4] object ReaderUtils {
 
     case invalid =>
       Future.exception(
-          new IllegalArgumentException(
-              "invalid message \"%s\"".format(invalid))
+        new IllegalArgumentException("invalid message \"%s\"".format(invalid))
       )
   }
 
@@ -47,7 +46,7 @@ private[http4] object ReaderUtils {
       case Some(buf) =>
         trans.write(chunkOfBuf(buf)).transform {
           case Return(_) => streamChunks(trans, r, bufSize)
-          case _ => Future(r.discard())
+          case _         => Future(r.discard())
         }
     }
   }

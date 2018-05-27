@@ -11,14 +11,19 @@ import org.eclipse.jgit.lib.{FileMode, Constants}
 import profile.simple._
 
 trait RepositoryCreationService {
-  self: AccountService with RepositoryService with LabelsService with WikiService with ActivityService =>
+  self: AccountService
+    with RepositoryService
+    with LabelsService
+    with WikiService
+    with ActivityService =>
 
-  def createRepository(loginAccount: Account,
-                       owner: String,
-                       name: String,
-                       description: Option[String],
-                       isPrivate: Boolean,
-                       createReadme: Boolean)(implicit s: Session) {
+  def createRepository(
+      loginAccount: Account,
+      owner: String,
+      name: String,
+      description: Option[String],
+      isPrivate: Boolean,
+      createReadme: Boolean)(implicit s: Session) {
     val ownerAccount = getAccountByUserName(owner).get
     val loginUserName = loginAccount.userName
 
@@ -52,21 +57,21 @@ trait RepositoryCreationService {
           }
 
         builder.add(
-            JGitUtil.createDirCacheEntry(
-                "README.md",
-                FileMode.REGULAR_FILE,
-                inserter.insert(Constants.OBJ_BLOB,
-                                content.getBytes("UTF-8"))))
+          JGitUtil.createDirCacheEntry(
+            "README.md",
+            FileMode.REGULAR_FILE,
+            inserter.insert(Constants.OBJ_BLOB, content.getBytes("UTF-8"))))
         builder.finish()
 
-        JGitUtil.createNewCommit(git,
-                                 inserter,
-                                 headId,
-                                 builder.getDirCache.writeTree(inserter),
-                                 Constants.HEAD,
-                                 loginAccount.fullName,
-                                 loginAccount.mailAddress,
-                                 "Initial commit")
+        JGitUtil.createNewCommit(
+          git,
+          inserter,
+          headId,
+          builder.getDirCache.writeTree(inserter),
+          Constants.HEAD,
+          loginAccount.fullName,
+          loginAccount.mailAddress,
+          "Initial commit")
       }
     }
 

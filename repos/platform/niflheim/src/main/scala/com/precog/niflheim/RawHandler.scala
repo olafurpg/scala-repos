@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -49,7 +49,7 @@ object RawHandler {
   }
 }
 
-class RawReader private[niflheim](val id: Long, val log: File, rs: Seq[JValue])
+class RawReader private[niflheim] (val id: Long, val log: File, rs: Seq[JValue])
     extends StorageReader {
   // TODO: weakrefs?
   @volatile protected[this] var rows = mutable.ArrayBuffer.empty[JValue] ++ rs
@@ -82,11 +82,13 @@ class RawReader private[niflheim](val id: Long, val log: File, rs: Seq[JValue])
   def snapshot(pathConstraint: Option[Set[CPath]]): Block = {
     handleNonempty
 
-    val segs = pathConstraint.map { cpaths =>
-      segments.a.filter { seg =>
-        cpaths(seg.cpath)
+    val segs = pathConstraint
+      .map { cpaths =>
+        segments.a.filter { seg =>
+          cpaths(seg.cpath)
+        }
       }
-    }.getOrElse(segments.a.clone)
+      .getOrElse(segments.a.clone)
 
     Block(id, segs, isStable)
   }
@@ -94,18 +96,23 @@ class RawReader private[niflheim](val id: Long, val log: File, rs: Seq[JValue])
   def snapshotRef(refConstraints: Option[Set[ColumnRef]]): Block = {
     handleNonempty
 
-    val segs = refConstraints.map { refs =>
-      segments.a.filter { seg =>
-        refs(ColumnRef(seg.cpath, seg.ctype))
+    val segs = refConstraints
+      .map { refs =>
+        segments.a.filter { seg =>
+          refs(ColumnRef(seg.cpath, seg.ctype))
+        }
       }
-    }.getOrElse(segments.a.clone)
+      .getOrElse(segments.a.clone)
 
     Block(id, segs, isStable)
   }
 }
 
-class RawHandler private[niflheim](
-    id: Long, log: File, rs: Seq[JValue], private var os: OutputStream)
+class RawHandler private[niflheim] (
+    id: Long,
+    log: File,
+    rs: Seq[JValue],
+    private var os: OutputStream)
     extends RawReader(id, log, rs) {
   def write(eventid: Long, values: Seq[JValue]) {
     if (!values.isEmpty) {

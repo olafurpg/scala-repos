@@ -1,6 +1,9 @@
 package org.jetbrains.plugins.hocon.highlight
 
-import com.intellij.codeInsight.highlighting.{HighlightUsagesHandlerBase, HighlightUsagesHandlerFactoryBase}
+import com.intellij.codeInsight.highlighting.{
+  HighlightUsagesHandlerBase,
+  HighlightUsagesHandlerFactoryBase
+}
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.{PsiElement, PsiFile}
 import com.intellij.util.Consumer
@@ -12,12 +15,14 @@ import scala.annotation.tailrec
 class HoconHighlightUsagesHandlerFactory
     extends HighlightUsagesHandlerFactoryBase {
   def createHighlightUsagesHandler(
-      editor: Editor, file: PsiFile, target: PsiElement) =
+      editor: Editor,
+      file: PsiFile,
+      target: PsiElement) =
     Iterator
       .iterate(target)(_.getParent)
       .takeWhile {
         case null | _: PsiFile => false
-        case _ => true
+        case _                 => true
       }
       .collectFirst {
         case hkey: HKey =>
@@ -27,13 +32,15 @@ class HoconHighlightUsagesHandlerFactory
 }
 
 class HoconHighlightKeyUsagesHandler(
-    editor: Editor, psiFile: PsiFile, hkey: HKey)
+    editor: Editor,
+    psiFile: PsiFile,
+    hkey: HKey)
     extends HighlightUsagesHandlerBase[HKey](editor, psiFile) {
 
   def computeUsages(targets: JList[HKey]): Unit = {
     def findPaths(el: PsiElement): Iterator[HPath] = el match {
-      case path: HPath => Iterator(path)
-      case hoconFile: HoconPsiFile => findPaths(hoconFile.toplevelEntries)
+      case path: HPath                    => Iterator(path)
+      case hoconFile: HoconPsiFile        => findPaths(hoconFile.toplevelEntries)
       case _: HInclude | _: HLiteralValue => Iterator.empty
       case hoconElement: HoconPsiElement =>
         hoconElement.nonWhitespaceChildren.flatMap(findPaths)
@@ -46,8 +53,9 @@ class HoconHighlightKeyUsagesHandler(
       targets.iterator.asScala.flatMap(_.allKeysFromToplevel).flatMap {
         case keys @ (firstKey :: _) =>
           @tailrec
-          def fromFields(scopes: Iterator[HScope],
-                         keys: List[HKey]): Iterator[HKey] = keys match {
+          def fromFields(
+              scopes: Iterator[HScope],
+              keys: List[HKey]): Iterator[HKey] = keys match {
             case Nil => Iterator.empty
             case List(lastKey) =>
               scopes
@@ -56,8 +64,8 @@ class HoconHighlightKeyUsagesHandler(
                 .filter(_.stringValue == lastKey.stringValue)
             case nextKey :: restOfKeys =>
               fromFields(
-                  scopes.flatMap(_.directSubScopes(nextKey.stringValue)),
-                  restOfKeys)
+                scopes.flatMap(_.directSubScopes(nextKey.stringValue)),
+                restOfKeys)
           }
           @tailrec
           def fromPath(keys: List[HKey], pathKeys: List[HKey]): Option[HKey] =
@@ -72,8 +80,8 @@ class HoconHighlightKeyUsagesHandler(
             }
           def fromPaths =
             if (firstKey.enclosingEntries eq firstKey.getContainingFile.toplevelEntries)
-              allValidPathsInFile.iterator.flatMap(
-                  pathKeys => fromPath(keys, pathKeys))
+              allValidPathsInFile.iterator.flatMap(pathKeys =>
+                fromPath(keys, pathKeys))
             else Iterator.empty
 
           fromFields(Iterator(firstKey.enclosingEntries), keys) ++ fromPaths
@@ -81,10 +89,10 @@ class HoconHighlightKeyUsagesHandler(
           Iterator.empty
       }
     foundKeys.foreach(
-        key =>
-          key
-            .forParent(path => myReadUsages, field => myWriteUsages)
-            .add(key.getTextRange))
+      key =>
+        key
+          .forParent(path => myReadUsages, field => myWriteUsages)
+          .add(key.getTextRange))
 
     // don't highlight if there is only one occurrence
     if (myReadUsages.size + myWriteUsages.size == 1) {
@@ -96,6 +104,7 @@ class HoconHighlightKeyUsagesHandler(
   def getTargets = JList(hkey)
 
   def selectTargets(
-      targets: JList[HKey], selectionConsumer: Consumer[JList[HKey]]) =
+      targets: JList[HKey],
+      selectionConsumer: Consumer[JList[HKey]]) =
     selectionConsumer.consume(targets)
 }

@@ -16,32 +16,39 @@ final class Console(compiler: AnalyzingCompiler) {
   def apply(classpath: Seq[File], log: Logger): Option[String] =
     apply(classpath, Nil, "", "", log)
 
-  def apply(classpath: Seq[File],
-            options: Seq[String],
-            initialCommands: String,
-            cleanupCommands: String,
-            log: Logger): Option[String] =
+  def apply(
+      classpath: Seq[File],
+      options: Seq[String],
+      initialCommands: String,
+      cleanupCommands: String,
+      log: Logger): Option[String] =
     apply(classpath, options, initialCommands, cleanupCommands)(None, Nil)(log)
 
-  def apply(classpath: Seq[File],
-            options: Seq[String],
-            loader: ClassLoader,
-            initialCommands: String,
-            cleanupCommands: String)(
-      bindings: (String, Any)*)(implicit log: Logger): Option[String] =
+  def apply(
+      classpath: Seq[File],
+      options: Seq[String],
+      loader: ClassLoader,
+      initialCommands: String,
+      cleanupCommands: String)(bindings: (String, Any)*)(
+      implicit log: Logger): Option[String] =
     apply(classpath, options, initialCommands, cleanupCommands)(
-        Some(loader), bindings)
+      Some(loader),
+      bindings)
 
-  def apply(classpath: Seq[File],
-            options: Seq[String],
-            initialCommands: String,
-            cleanupCommands: String)(
-      loader: Option[ClassLoader], bindings: Seq[(String, Any)])(
-      implicit log: Logger): Option[String] = {
+  def apply(
+      classpath: Seq[File],
+      options: Seq[String],
+      initialCommands: String,
+      cleanupCommands: String)(
+      loader: Option[ClassLoader],
+      bindings: Seq[(String, Any)])(implicit log: Logger): Option[String] = {
     def console0() =
       compiler.console(
-          classpath, options, initialCommands, cleanupCommands, log)(
-          loader, bindings)
+        classpath,
+        options,
+        initialCommands,
+        cleanupCommands,
+        log)(loader, bindings)
     // TODO: Fix JLine
     //JLine.withJLine(Run.executeTrapExit(console0, log))
     Run.executeTrapExit(console0, log)

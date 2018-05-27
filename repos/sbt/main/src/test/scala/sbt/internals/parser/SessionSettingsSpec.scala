@@ -42,7 +42,8 @@ abstract class AbstractSessionSettingsSpec(folder: String)
       foreach(expectedResultAndMap(file)) {
         case (expectedResultList, commands) =>
           val resultList = SbtRefactorings.applySessionSettings(
-              (file, originalLines), commands)
+            (file, originalLines),
+            commands)
           val expected = SbtParser(file, expectedResultList)
           val result = SbtParser(file, resultList._2)
           result.settings must_== expected.settings
@@ -52,8 +53,7 @@ abstract class AbstractSessionSettingsSpec(folder: String)
 
   protected def replace(f: File) = {
     val dirs = rootDir
-      .listFiles(
-          new FilenameFilter() {
+      .listFiles(new FilenameFilter() {
         def accept(dir: File, name: String) = {
           val startsWith = f.getName + "_"
           name.startsWith(startsWith)

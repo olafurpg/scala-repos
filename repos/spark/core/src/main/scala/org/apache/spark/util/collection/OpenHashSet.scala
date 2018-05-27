@@ -41,13 +41,14 @@ import org.apache.spark.annotation.Private
   * to explore all spaces for each key (see http://en.wikipedia.org/wiki/Quadratic_probing).
   */
 @Private
-class OpenHashSet[@specialized(Long, Int) T : ClassTag](
-    initialCapacity: Int, loadFactor: Double)
+class OpenHashSet[@specialized(Long, Int) T: ClassTag](
+    initialCapacity: Int,
+    loadFactor: Double)
     extends Serializable {
 
   require(
-      initialCapacity <= OpenHashSet.MAX_CAPACITY,
-      s"Can't make capacity bigger than ${OpenHashSet.MAX_CAPACITY} elements")
+    initialCapacity <= OpenHashSet.MAX_CAPACITY,
+    s"Can't make capacity bigger than ${OpenHashSet.MAX_CAPACITY} elements")
   require(initialCapacity >= 1, "Invalid initial capacity")
   require(loadFactor < 1.0, "Load factor must be less than 1.0")
   require(loadFactor > 0.0, "Load factor must be greater than 0.0")
@@ -163,7 +164,9 @@ class OpenHashSet[@specialized(Long, Int) T : ClassTag](
     *                 to a new position (in the new data array).
     */
   def rehashIfNeeded(
-      k: T, allocateFunc: (Int) => Unit, moveFunc: (Int, Int) => Unit) {
+      k: T,
+      allocateFunc: (Int) => Unit,
+      moveFunc: (Int, Int) => Unit) {
     if (_size > _growThreshold) {
       rehash(k, allocateFunc, moveFunc)
     }
@@ -225,11 +228,13 @@ class OpenHashSet[@specialized(Long, Int) T : ClassTag](
     *                 to a new position (in the new data array).
     */
   private def rehash(
-      k: T, allocateFunc: (Int) => Unit, moveFunc: (Int, Int) => Unit) {
+      k: T,
+      allocateFunc: (Int) => Unit,
+      moveFunc: (Int, Int) => Unit) {
     val newCapacity = _capacity * 2
     require(
-        newCapacity > 0 && newCapacity <= OpenHashSet.MAX_CAPACITY,
-        s"Can't contain more than ${(loadFactor * OpenHashSet.MAX_CAPACITY).toInt} elements")
+      newCapacity > 0 && newCapacity <= OpenHashSet.MAX_CAPACITY,
+      s"Can't contain more than ${(loadFactor * OpenHashSet.MAX_CAPACITY).toInt} elements")
     allocateFunc(newCapacity)
     val newBitset = new BitSet(newCapacity)
     val newData = new Array[T](newCapacity)

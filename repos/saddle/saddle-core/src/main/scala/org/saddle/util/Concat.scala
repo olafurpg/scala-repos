@@ -54,10 +54,12 @@ object Concat extends LowPriorityConcatImplicits {
     * @tparam B The second type to promote
     * @tparam C The joint promotion type
     */
-  case class Promoter[@spec(Boolean, Byte, Int, Long, Double) -A,
-                      @spec(Boolean, Byte, Int, Long, Double) -B,
-                      @spec(Boolean, Byte, Int, Long, Double) +C](
-      promoteA: A => C, promoteB: B => C)
+  case class Promoter[
+      @spec(Boolean, Byte, Int, Long, Double) -A,
+      @spec(Boolean, Byte, Int, Long, Double) -B,
+      @spec(Boolean, Byte, Int, Long, Double) +C](
+      promoteA: A => C,
+      promoteB: B => C)
 
   implicit def id[T](a: T): T = a
 
@@ -281,11 +283,12 @@ object Concat extends LowPriorityConcatImplicits {
     * @tparam B Second array type
     * @tparam C Result array type
     */
-  def append[@spec(Boolean, Byte, Int, Long, Double) A,
-             @spec(Boolean, Byte, Int, Long, Double) B,
-             @spec(Boolean, Byte, Int, Long, Double) C](
-      a1: Array[A], a2: Array[B])(
-      implicit wd: Promoter[A, B, C], mc: ST[C]): Array[C] = {
+  def append[
+      @spec(Boolean, Byte, Int, Long, Double) A,
+      @spec(Boolean, Byte, Int, Long, Double) B,
+      @spec(Boolean, Byte, Int, Long, Double) C](a1: Array[A], a2: Array[B])(
+      implicit wd: Promoter[A, B, C],
+      mc: ST[C]): Array[C] = {
     val result = array.empty[C](a1.length + a2.length)
     var i = 0
     while (i < a1.length) {

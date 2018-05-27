@@ -34,11 +34,14 @@ trait MarshallingDirectives {
         case Failure(x: IllegalArgumentException) ⇒
           reject(ValidationRejection(x.getMessage.nullAsEmpty, Some(x)))
         case Failure(x) ⇒
-          reject(MalformedRequestContentRejection(x.getMessage.nullAsEmpty,
-                                                  Option(x.getCause)))
+          reject(
+            MalformedRequestContentRejection(
+              x.getMessage.nullAsEmpty,
+              Option(x.getCause)))
       }
-    } & cancelRejections(RequestEntityExpectedRejection.getClass,
-                         classOf[UnsupportedRequestContentTypeRejection])
+    } & cancelRejections(
+      RequestEntityExpectedRejection.getClass,
+      classOf[UnsupportedRequestContentTypeRejection])
 
   /**
     * Returns the in-scope [[FromRequestUnmarshaller]] for the given type.
@@ -70,8 +73,9 @@ trait MarshallingDirectives {
     * Completes the request using the given function. The input to the function is produced with the in-scope
     * entity unmarshaller and the result value of the function is marshalled with the in-scope marshaller.
     */
-  def handleWith[A, B](f: A ⇒ B)(implicit um: FromRequestUnmarshaller[A],
-                                 m: ToResponseMarshaller[B]): Route =
+  def handleWith[A, B](f: A ⇒ B)(
+      implicit um: FromRequestUnmarshaller[A],
+      m: ToResponseMarshaller[B]): Route =
     entity(um) { a ⇒
       complete(f(a))
     }

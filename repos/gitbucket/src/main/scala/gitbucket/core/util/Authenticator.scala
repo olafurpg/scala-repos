@@ -18,9 +18,9 @@ trait OneselfAuthenticator { self: ControllerBase =>
     {
       defining(request.paths) { paths =>
         context.loginAccount match {
-          case Some(x) if (x.isAdmin) => action
+          case Some(x) if (x.isAdmin)              => action
           case Some(x) if (paths(0) == x.userName) => action
-          case _ => Unauthorized()
+          case _                                   => Unauthorized()
         }
       }
     }
@@ -46,9 +46,9 @@ trait OwnerAuthenticator {
             case Some(x) if (x.isAdmin) => action(repository)
             case Some(x) if (repository.owner == x.userName) =>
               action(repository)
-            case Some(x)
-                if (getGroupMembers(repository.owner).exists { member =>
-                  member.userName == x.userName && member.isManager == true
+            case Some(x) if (getGroupMembers(repository.owner).exists {
+                  member =>
+                    member.userName == x.userName && member.isManager == true
                 }) =>
               action(repository)
             case _ => Unauthorized()
@@ -71,7 +71,7 @@ trait UsersAuthenticator { self: ControllerBase =>
     {
       context.loginAccount match {
         case Some(x) => action
-        case None => Unauthorized()
+        case None    => Unauthorized()
       }
     }
   }
@@ -89,7 +89,7 @@ trait AdminAuthenticator { self: ControllerBase =>
     {
       context.loginAccount match {
         case Some(x) if (x.isAdmin) => action
-        case _ => Unauthorized()
+        case _                      => Unauthorized()
       }
     }
   }
@@ -111,7 +111,7 @@ trait CollaboratorsAuthenticator {
       defining(request.paths) { paths =>
         getRepository(paths(0), paths(1)).map { repository =>
           context.loginAccount match {
-            case Some(x) if (x.isAdmin) => action(repository)
+            case Some(x) if (x.isAdmin)              => action(repository)
             case Some(x) if (paths(0) == x.userName) => action(repository)
             case Some(x)
                 if (getCollaborators(paths(0), paths(1))
@@ -143,7 +143,7 @@ trait ReferrerAuthenticator { self: ControllerBase with RepositoryService =>
             action(repository)
           } else {
             context.loginAccount match {
-              case Some(x) if (x.isAdmin) => action(repository)
+              case Some(x) if (x.isAdmin)              => action(repository)
               case Some(x) if (paths(0) == x.userName) => action(repository)
               case Some(x)
                   if (getCollaborators(paths(0), paths(1))

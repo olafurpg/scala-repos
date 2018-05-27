@@ -38,7 +38,7 @@ object MonadIO {
     def liftIO[A](ioa: IO[A]) = FLO.liftIO(ioa)
   }
 
-  private[scalaz] def fromLiftIO[F[_]: LiftIO : Monad]: MonadIO[F] =
+  private[scalaz] def fromLiftIO[F[_]: LiftIO: Monad]: MonadIO[F] =
     new FromLiftIO[F] {
       def FM = Monad[F]
       def FLO = LiftIO[F]
@@ -52,12 +52,12 @@ object MonadIO {
 
   implicit def eitherTMonadIO[F[_]: MonadIO, E] = fromLiftIO[EitherT[F, E, ?]]
 
-  implicit def streamTMonadIO[F[_]: MonadIO : Applicative] =
+  implicit def streamTMonadIO[F[_]: MonadIO: Applicative] =
     fromLiftIO[StreamT[F, ?]]
 
   implicit def kleisliMonadIO[F[_]: MonadIO, E] = fromLiftIO[Kleisli[F, E, ?]]
 
-  implicit def writerTMonadIO[F[_]: MonadIO, W : Monoid] =
+  implicit def writerTMonadIO[F[_]: MonadIO, W: Monoid] =
     fromLiftIO[WriterT[F, W, ?]]
 
   implicit def stateTMonadIO[F[_]: MonadIO, S] = fromLiftIO[StateT[F, S, ?]]

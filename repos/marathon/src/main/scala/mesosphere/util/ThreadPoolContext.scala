@@ -14,5 +14,5 @@ object ThreadPoolContext {
     * if you do blocking IO operations.
     */
   implicit lazy val ioContext = ExecutionContext.fromExecutorService(
-      Executors.newFixedThreadPool(numberOfThreads))
+    Executors.newFixedThreadPool(numberOfThreads))
 }

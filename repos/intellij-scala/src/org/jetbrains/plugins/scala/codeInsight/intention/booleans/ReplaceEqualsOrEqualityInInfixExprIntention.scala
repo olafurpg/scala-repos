@@ -24,7 +24,9 @@ class ReplaceEqualsOrEqualityInInfixExprIntention
   def getFamilyName = ReplaceEqualsOrEqualityInInfixExprIntention.familyName
 
   def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+      project: Project,
+      editor: Editor,
+      element: PsiElement): Boolean = {
     val infixExpr: ScInfixExpr =
       PsiTreeUtil.getParentOfType(element, classOf[ScInfixExpr], false)
     if (infixExpr == null) return false
@@ -61,7 +63,8 @@ class ReplaceEqualsOrEqualityInInfixExprIntention
       .append(infixExpr.getArgExpr.getText)
 
     val newInfixExpr = ScalaPsiElementFactory.createExpressionFromText(
-        expr.toString(), element.getManager)
+      expr.toString(),
+      element.getManager)
 
     val size =
       newInfixExpr

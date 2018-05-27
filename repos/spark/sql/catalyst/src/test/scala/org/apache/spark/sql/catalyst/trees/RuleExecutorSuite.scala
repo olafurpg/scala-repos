@@ -18,7 +18,11 @@
 package org.apache.spark.sql.catalyst.trees
 
 import org.apache.spark.SparkFunSuite
-import org.apache.spark.sql.catalyst.expressions.{Expression, IntegerLiteral, Literal}
+import org.apache.spark.sql.catalyst.expressions.{
+  Expression,
+  IntegerLiteral,
+  Literal
+}
 import org.apache.spark.sql.catalyst.rules.{Rule, RuleExecutor}
 
 class RuleExecutorSuite extends SparkFunSuite {

@@ -25,13 +25,15 @@ object ServerResultUtilsSpec extends Specification with IterateeSpecification {
     def remoteAddress = ""
     def secure = false
     override def clientCertificateChain = None
-    val headers = new Headers(
-        cookie.map { case (name, value) => "Cookie" -> s"$name=$value" }.toSeq)
+    val headers = new Headers(cookie.map {
+      case (name, value) => "Cookie" -> s"$name=$value"
+    }.toSeq)
   }
 
   "ServerResultUtils.cleanFlashCookie" should {
-    def flashCookieResult(cookie: Option[(String, String)],
-                          result: Result): Option[Seq[Cookie]] = {
+    def flashCookieResult(
+        cookie: Option[(String, String)],
+        result: Result): Option[Seq[Cookie]] = {
       val rh = CookieRequestHeader(cookie)
       ServerResultUtils
         .cleanFlashCookie(rh, result)
@@ -64,8 +66,8 @@ object ServerResultUtilsSpec extends Specification with IterateeSpecification {
     }
     "leave other cookies untouched when clearing" in {
       flashCookieResult(
-          Some("PLAY_FLASH" -> "\"a=b\"; Path=/"),
-          Ok.withCookies(Cookie("cookie", "value"))) must beSome {
+        Some("PLAY_FLASH" -> "\"a=b\"; Path=/"),
+        Ok.withCookies(Cookie("cookie", "value"))) must beSome {
         cookies: Seq[Cookie] =>
           cookies.length must_== 2
           cookies.find(_.name == "PLAY_FLASH") must beSome.like {
@@ -77,13 +79,13 @@ object ServerResultUtilsSpec extends Specification with IterateeSpecification {
       }
     }
     "clear old flash value when different value sent" in {
-      flashCookieResult(Some("PLAY_FLASH" -> "\"a=b\"; Path=/"),
-                        Ok.flashing("c" -> "d")) must beSome {
-        cookies: Seq[Cookie] =>
-          cookies.length must_== 1
-          val cookie = cookies(0)
-          cookie.name must_== "PLAY_FLASH"
-          cookie.value must_== "c=d"
+      flashCookieResult(
+        Some("PLAY_FLASH" -> "\"a=b\"; Path=/"),
+        Ok.flashing("c" -> "d")) must beSome { cookies: Seq[Cookie] =>
+        cookies.length must_== 1
+        val cookie = cookies(0)
+        cookie.name must_== "PLAY_FLASH"
+        cookie.value must_== "c=d"
       }
     }
   }

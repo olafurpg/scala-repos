@@ -22,9 +22,10 @@ import java.util.concurrent.{TimeUnit, LinkedBlockingQueue}
 /**
   * A blocking queue that have size limits on both number of elements and number of bytes.
   */
-class ByteBoundedBlockingQueue[E](val queueNumMessageCapacity: Int,
-                                  val queueByteCapacity: Int,
-                                  sizeFunction: Option[(E) => Int])
+class ByteBoundedBlockingQueue[E](
+    val queueNumMessageCapacity: Int,
+    val queueByteCapacity: Int,
+    sizeFunction: Option[(E) => Int])
     extends Iterable[E] {
   private val queue = new LinkedBlockingQueue[E](queueNumMessageCapacity)
   private var currentByteSize = new AtomicInteger()
@@ -43,7 +44,9 @@ class ByteBoundedBlockingQueue[E](val queueNumMessageCapacity: Int,
     * @throws InterruptedException if interrupted during waiting
     */
   def offer(
-      e: E, timeout: Long, unit: TimeUnit = TimeUnit.MICROSECONDS): Boolean = {
+      e: E,
+      timeout: Long,
+      unit: TimeUnit = TimeUnit.MICROSECONDS): Boolean = {
     if (e == null)
       throw new NullPointerException("Putting null element into queue.")
     val startTime = SystemTime.nanoseconds
@@ -179,9 +182,10 @@ class ByteBoundedBlockingQueue[E](val queueNumMessageCapacity: Int,
     def remove() {
       if (curr == null)
         throw new IllegalStateException(
-            "Iterator does not have a current element.")
+          "Iterator does not have a current element.")
       iter.remove()
-      if (currentByteSize.addAndGet(-sizeFunction.get(curr)) < queueByteCapacity)
+      if (currentByteSize
+            .addAndGet(-sizeFunction.get(curr)) < queueByteCapacity)
         putLock.synchronized(putLock.notify())
     }
   }

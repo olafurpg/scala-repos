@@ -25,7 +25,7 @@ object Main {
   def main(args: Array[String]): Unit = {
     if (args.length != 1) {
       println(
-          "you need to provide exactly one argument: the class of the application supervisor actor")
+        "you need to provide exactly one argument: the class of the application supervisor actor")
     } else {
       val system = ActorSystem("Main")
       try {

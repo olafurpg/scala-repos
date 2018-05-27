@@ -29,11 +29,11 @@ class PackageTest extends FunSuite {
     // 485165146.8932734862594040580748685386577025894303647601088074911328839160579383035755177941692746135770688529810692...
 
     assert(
-        pow(BigDecimal("1.00000001"), BigDecimal("2000000000")) === BigDecimal(
-            "485165146.8932734862594042197965646"))
+      pow(BigDecimal("1.00000001"), BigDecimal("2000000000")) === BigDecimal(
+        "485165146.8932734862594042197965646"))
     assert(
-        pow(BigDecimal(Double.MaxValue) * 100, BigDecimal("0.00001")) === BigDecimal(
-            "1.007169457206495657176075115660221"))
+      pow(BigDecimal(Double.MaxValue) * 100, BigDecimal("0.00001")) === BigDecimal(
+        "1.007169457206495657176075115660221"))
   }
 
   test("hypot") {

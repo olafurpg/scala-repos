@@ -18,7 +18,15 @@ package net.liftweb
 package json
 
 import java.lang.reflect.{Constructor => JConstructor, Type}
-import java.lang.{Integer => JavaInteger, Long => JavaLong, Short => JavaShort, Byte => JavaByte, Boolean => JavaBoolean, Double => JavaDouble, Float => JavaFloat}
+import java.lang.{
+  Integer => JavaInteger,
+  Long => JavaLong,
+  Short => JavaShort,
+  Byte => JavaByte,
+  Boolean => JavaBoolean,
+  Double => JavaDouble,
+  Float => JavaFloat
+}
 import java.util.Date
 import java.sql.Timestamp
 import scala.reflect.Manifest
@@ -35,7 +43,8 @@ object Extraction {
     * @see net.liftweb.json.JsonAST.JValue#extract
     * @throws MappingException is thrown if extraction fails
     */
-  def extract[A](json: JValue)(implicit formats: Formats, mf: Manifest[A]): A = {
+  def extract[A](
+      json: JValue)(implicit formats: Formats, mf: Manifest[A]): A = {
     def allTypes(mf: Manifest[_]): List[Class[_]] =
       mf.runtimeClass :: (mf.typeArguments flatMap allTypes)
 
@@ -44,7 +53,7 @@ object Extraction {
       extract0(json, types.head, types.tail).asInstanceOf[A]
     } catch {
       case e: MappingException => throw e
-      case e: Exception => throw new MappingException("unknown error", e)
+      case e: Exception        => throw new MappingException("unknown error", e)
     }
   }
 
@@ -68,12 +77,13 @@ object Extraction {
   def decompose(a: Any)(implicit formats: Formats): JValue = {
     def prependTypeHint(clazz: Class[_], o: JObject) =
       JObject(
-          JField(formats.typeHintFieldName,
-                 JString(formats.typeHints.hintFor(clazz))) :: o.obj)
+        JField(
+          formats.typeHintFieldName,
+          JString(formats.typeHints.hintFor(clazz))) :: o.obj)
 
     def mkObject(clazz: Class[_], fields: List[JField]) =
       formats.typeHints.containsHint_?(clazz) match {
-        case true => prependTypeHint(clazz, JObject(fields))
+        case true  => prependTypeHint(clazz, JObject(fields))
         case false => JObject(fields)
       }
 
@@ -83,12 +93,12 @@ object Extraction {
       formats.customSerializer(formats)(a)
     } else if (!serializer.isDefinedAt(a)) {
       any match {
-        case null => JNull
-        case x: JValue => x
+        case null                         => JNull
+        case x: JValue                    => x
         case x if primitive_?(x.getClass) => primitive2jvalue(x)(formats)
         case x: Map[_, _] =>
           JObject(
-              (x map { case (k: String, v) => JField(k, decompose(v)) }).toList)
+            (x map { case (k: String, v) => JField(k, decompose(v)) }).toList)
         case x: Iterable[_] => JArray(x.toList map decompose)
         case x if (x.getClass.isArray) =>
           JArray(x.asInstanceOf[Array[_]].toList map decompose)
@@ -116,10 +126,12 @@ object Extraction {
                       val fieldVal = Reflection.getField(x, mangledName)
                       val s =
                         serializer.serializer orElse Map(
-                            (n, fieldVal) -> Some(n, fieldVal))
-                      s((n, fieldVal)).map {
-                        case (name, value) => JField(name, decompose(value))
-                      }.getOrElse(JField(n, JNothing))
+                          (n, fieldVal) -> Some(n, fieldVal))
+                      s((n, fieldVal))
+                        .map {
+                          case (name, value) => JField(name, decompose(value))
+                        }
+                        .getOrElse(JField(n, JNothing))
                   }
                 } getOrElse Nil
               val uniqueFields =
@@ -138,10 +150,10 @@ object Extraction {
     def flatten0(path: String, json: JValue): Map[String, String] = {
       json match {
         case JNothing | JNull => Map()
-        case JString(s) => Map(path -> ("\"" + JsonAST.quote(s) + "\""))
-        case JDouble(num) => Map(path -> num.toString)
-        case JInt(num) => Map(path -> num.toString)
-        case JBool(value) => Map(path -> value.toString)
+        case JString(s)       => Map(path -> ("\"" + JsonAST.quote(s) + "\""))
+        case JDouble(num)     => Map(path -> num.toString)
+        case JInt(num)        => Map(path -> num.toString)
+        case JBool(value)     => Map(path -> value.toString)
         case JObject(obj) =>
           obj.foldLeft(Map[String, String]()) {
             case (map, JField(name, value)) =>
@@ -153,8 +165,9 @@ object Extraction {
             case _ =>
               arr
                 .foldLeft((Map[String, String](), 0)) { (tuple, value) =>
-                  (tuple._1 ++ flatten0(path + "[" + tuple._2 + "]", value),
-                   tuple._2 + 1)
+                  (
+                    tuple._1 ++ flatten0(path + "[" + tuple._2 + "]", value),
+                    tuple._2 + 1)
                 }
                 ._1
           }
@@ -170,11 +183,11 @@ object Extraction {
     import scala.util.matching.Regex
 
     def extractValue(value: String): JValue = value.toLowerCase match {
-      case "" => JNothing
-      case "null" => JNull
-      case "true" => JBool(true)
+      case ""      => JNothing
+      case "null"  => JNull
+      case "true"  => JBool(true)
       case "false" => JBool(false)
-      case "[]" => JArray(Nil)
+      case "[]"    => JArray(Nil)
       case x @ _ =>
         if (value.charAt(0).isDigit) {
           if (value.indexOf('.') == -1) JInt(BigInt(value))
@@ -184,15 +197,16 @@ object Extraction {
 
     def submap(prefix: String): Map[String, String] =
       Map(
-          map
-            .filter(t =>
-                  t._1 == prefix || t._1.startsWith(prefix + ".") ||
-                  t._1.startsWith(prefix + "["))
-            .map(
-                t => (t._1.substring(prefix.length), t._2)
-            )
-            .toList
-            .toArray: _*
+        map
+          .filter(
+            t =>
+              t._1 == prefix || t._1.startsWith(prefix + ".") ||
+                t._1.startsWith(prefix + "["))
+          .map(
+            t => (t._1.substring(prefix.length), t._2)
+          )
+          .toList
+          .toArray: _*
       )
 
     val ArrayProp = new Regex("""^(\.([^\.\[]+))\[(\d+)\].*$""")
@@ -203,9 +217,9 @@ object Extraction {
       .foldLeft[Set[String]](Set()) { (set, key) =>
         key match {
           case ArrayProp(p, f, i) => set + p
-          case OtherProp(p, f) => set + p
-          case ArrayElem(p, i) => set + p
-          case x @ _ => set + x
+          case OtherProp(p, f)    => set + p
+          case ArrayElem(p, i)    => set + p
+          case x @ _              => set + x
         }
       }
       .toList
@@ -252,12 +266,13 @@ object Extraction {
         else {
           val argNames = json match {
             case JObject(fs) => fs.map(_.name)
-            case x => Nil
+            case x           => Nil
           }
           constructor
             .bestMatching(argNames)
-            .getOrElse(fail("No constructor for type " +
-                    constructor.targetType.clazz + ", " + json))
+            .getOrElse(
+              fail("No constructor for type " +
+                constructor.targetType.clazz + ", " + json))
         }
       }
 
@@ -267,7 +282,10 @@ object Extraction {
             formats.fieldSerializer(a.getClass).map { serializer =>
               val constructorArgNames = Reflection
                 .constructorArgs(
-                    a.getClass, constructor, formats.parameterNameReader, None)
+                  a.getClass,
+                  constructor,
+                  formats.parameterNameReader,
+                  None)
                 .map(_._1)
                 .toSet
               val jsonFields = o.obj.map { f =>
@@ -285,16 +303,16 @@ object Extraction {
                   jsonFields.get(name).foreach {
                     case (n, v) =>
                       val typeArgs = typeInfo.parameterizedType.map(
-                          _.getActualTypeArguments
-                            .map(_.asInstanceOf[Class[_]])
-                            .toList
-                            .zipWithIndex
-                            .map {
-                          case (t, idx) =>
-                            if (t == classOf[java.lang.Object])
-                              ScalaSigReader.readField(name, a.getClass, idx)
-                            else t
-                        })
+                        _.getActualTypeArguments
+                          .map(_.asInstanceOf[Class[_]])
+                          .toList
+                          .zipWithIndex
+                          .map {
+                            case (t, idx) =>
+                              if (t == classOf[java.lang.Object])
+                                ScalaSigReader.readField(name, a.getClass, idx)
+                              else t
+                          })
                       val value =
                         extract0(v, typeInfo.clazz, typeArgs.getOrElse(Nil))
                       Reflection.setField(a, n, value)
@@ -314,29 +332,31 @@ object Extraction {
             fail("No information known about type")
 
           val instance = jconstructor.newInstance(
-              args.map(_.asInstanceOf[AnyRef]).toArray: _*)
+            args.map(_.asInstanceOf[AnyRef]).toArray: _*)
           setFields(instance.asInstanceOf[AnyRef], json, jconstructor)
         } catch {
           case e @ (_: IllegalArgumentException | _: InstantiationException) =>
             fail(
-                "Parsed JSON values do not match with class constructor\nargs=" +
+              "Parsed JSON values do not match with class constructor\nargs=" +
                 args.mkString(",") + "\narg types=" + args
-                  .map(a =>
-                        if (a != null) a.asInstanceOf[AnyRef].getClass.getName
-                        else "null")
-                  .mkString(",") + "\nconstructor=" + jconstructor)
+                .map(a =>
+                  if (a != null) a.asInstanceOf[AnyRef].getClass.getName
+                  else "null")
+                .mkString(",") + "\nconstructor=" + jconstructor)
         }
       }
 
       def mkWithTypeHint(
-          typeHint: String, fields: List[JField], typeInfo: TypeInfo) = {
+          typeHint: String,
+          fields: List[JField],
+          typeInfo: TypeInfo) = {
         val obj = JObject(
-            fields filterNot (_.name == formats.typeHintFieldName))
+          fields filterNot (_.name == formats.typeHintFieldName))
         val deserializer = formats.typeHints.deserialize
         if (!deserializer.isDefinedAt(typeHint, obj)) {
           val concreteClass =
             formats.typeHints.classFor(typeHint) getOrElse fail(
-                "Do not know how to deserialize '" + typeHint + "'")
+              "Do not know how to deserialize '" + typeHint + "'")
           val typeArgs = typeInfo.parameterizedType
             .map(_.getActualTypeArguments.toList.map(Meta.rawClassOf))
             .getOrElse(Nil)
@@ -364,8 +384,9 @@ object Extraction {
           val grouped = fs groupBy (_.name == formats.typeHintFieldName)
           if (grouped.isDefinedAt(true))
             Some(
-                (grouped(true).head.value.values.toString,
-                 grouped.get(false).getOrElse(Nil)))
+              (
+                grouped(true).head.value.values.toString,
+                grouped.get(false).getOrElse(Nil)))
           else None
         }
     }
@@ -373,12 +394,16 @@ object Extraction {
     def newPrimitive(elementType: Class[_], elem: JValue) =
       convert(elem, elementType, formats)
 
-    def newCollection(root: JValue, m: Mapping, constructor: Array[_] => Any) = {
+    def newCollection(
+        root: JValue,
+        m: Mapping,
+        constructor: Array[_] => Any) = {
       val array: Array[_] = root match {
-        case JArray(arr) => arr.map(build(_, m)).toArray
+        case JArray(arr)      => arr.map(build(_, m)).toArray
         case JNothing | JNull => Array[AnyRef]()
         case x =>
-          fail("Expected collection but got " + x + " for root " + root +
+          fail(
+            "Expected collection but got " + x + " for root " + root +
               " and mapping " + m)
       }
 
@@ -388,14 +413,14 @@ object Extraction {
     def newOption(root: JValue, m: Mapping) = {
       root match {
         case JNothing | JNull => None
-        case x => Option(build(x, m))
+        case x                => Option(build(x, m))
       }
     }
 
     def build(root: JValue, mapping: Mapping): Any = mapping match {
-      case Value(targetType) => convert(root, targetType, formats)
-      case c: Constructor => newInstance(c, root)
-      case Cycle(targetType) => build(root, mappingOf(targetType))
+      case Value(targetType)      => convert(root, targetType, formats)
+      case c: Constructor         => newInstance(c, root)
+      case Cycle(targetType)      => build(root, mappingOf(targetType))
       case Arg(path, m, optional) => mkValue(root, m, path, optional)
       case Col(targetType, m) =>
         val custom = formats.customDeserializer(formats)
@@ -412,7 +437,7 @@ object Extraction {
       case Dict(m) =>
         root match {
           case JObject(xs) => Map(xs.map(x => (x.name, build(x.value, m))): _*)
-          case x => fail("Expected object but got " + x)
+          case x           => fail("Expected object but got " + x)
         }
     }
 
@@ -429,13 +454,16 @@ object Extraction {
     }
 
     def mkList(root: JValue, m: Mapping) = root match {
-      case JArray(arr) => arr.map(build(_, m))
+      case JArray(arr)      => arr.map(build(_, m))
       case JNothing | JNull => Nil
-      case x => fail("Expected array but got " + x)
+      case x                => fail("Expected array but got " + x)
     }
 
     def mkValue(
-        root: JValue, mapping: Mapping, path: String, optional: Boolean) = {
+        root: JValue,
+        mapping: Mapping,
+        path: String,
+        optional: Boolean) = {
       if (optional && root == JNothing) {
         None
       } else {
@@ -457,12 +485,14 @@ object Extraction {
   }
 
   private def convert(
-      json: JValue, targetType: Class[_], formats: Formats): Any = json match {
+      json: JValue,
+      targetType: Class[_],
+      formats: Formats): Any = json match {
     case JInt(x) if (targetType == classOf[Int]) => x.intValue
     case JInt(x) if (targetType == classOf[JavaInteger]) =>
       new JavaInteger(x.intValue)
     case JInt(x) if (targetType == classOf[BigInt]) => x
-    case JInt(x) if (targetType == classOf[Long]) => x.longValue
+    case JInt(x) if (targetType == classOf[Long])   => x.longValue
     case JInt(x) if (targetType == classOf[JavaLong]) =>
       new JavaLong(x.longValue)
     case JInt(x) if (targetType == classOf[Double]) => x.doubleValue
@@ -477,16 +507,16 @@ object Extraction {
     case JInt(x) if (targetType == classOf[Byte]) => x.byteValue
     case JInt(x) if (targetType == classOf[JavaByte]) =>
       new JavaByte(x.byteValue)
-    case JInt(x) if (targetType == classOf[String]) => x.toString
-    case JInt(x) if (targetType == classOf[Number]) => x.longValue
-    case JDouble(x) if (targetType == classOf[Double]) => x
+    case JInt(x) if (targetType == classOf[String])        => x.toString
+    case JInt(x) if (targetType == classOf[Number])        => x.longValue
+    case JDouble(x) if (targetType == classOf[Double])     => x
     case JDouble(x) if (targetType == classOf[JavaDouble]) => new JavaDouble(x)
-    case JDouble(x) if (targetType == classOf[Float]) => x.floatValue
+    case JDouble(x) if (targetType == classOf[Float])      => x.floatValue
     case JDouble(x) if (targetType == classOf[JavaFloat]) =>
       new JavaFloat(x.floatValue)
     case JDouble(x) if (targetType == classOf[String]) => x.toString
-    case JDouble(x) if (targetType == classOf[Int]) => x.intValue
-    case JDouble(x) if (targetType == classOf[Long]) => x.longValue
+    case JDouble(x) if (targetType == classOf[Int])    => x.intValue
+    case JDouble(x) if (targetType == classOf[Long])   => x.longValue
     case JDouble(x) if (targetType == classOf[Number]) => x
     case JString(s) if (targetType == classOf[String]) => s
     case JString(s) if (targetType == classOf[Symbol]) => Symbol(s)
@@ -494,19 +524,19 @@ object Extraction {
       formats.dateFormat.parse(s).getOrElse(fail("Invalid date '" + s + "'"))
     case JString(s) if (targetType == classOf[Timestamp]) =>
       new Timestamp(
-          formats.dateFormat
-            .parse(s)
-            .getOrElse(fail("Invalid date '" + s + "'"))
-            .getTime)
-    case JBool(x) if (targetType == classOf[Boolean]) => x
+        formats.dateFormat
+          .parse(s)
+          .getOrElse(fail("Invalid date '" + s + "'"))
+          .getTime)
+    case JBool(x) if (targetType == classOf[Boolean])     => x
     case JBool(x) if (targetType == classOf[JavaBoolean]) => new JavaBoolean(x)
-    case j: JValue if (targetType == classOf[JValue]) => j
-    case j: JObject if (targetType == classOf[JObject]) => j
-    case j: JArray if (targetType == classOf[JArray]) => j
-    case JNull => null
+    case j: JValue if (targetType == classOf[JValue])     => j
+    case j: JObject if (targetType == classOf[JObject])   => j
+    case j: JArray if (targetType == classOf[JArray])     => j
+    case JNull                                            => null
     case JNothing =>
       fail(
-          "Did not find value which can be converted into " +
+        "Did not find value which can be converted into " +
           targetType.getName)
     case _ =>
       val custom = formats.customDeserializer(formats)

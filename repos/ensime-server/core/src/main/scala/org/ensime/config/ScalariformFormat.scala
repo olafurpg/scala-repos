@@ -22,9 +22,9 @@ trait ScalariformFormat {
     ): Option[Any] =
       data.get(key(descriptor)).map { sexp =>
         descriptor.preferenceType match {
-          case BooleanPreference => sexp.convertTo[Boolean]
+          case BooleanPreference       => sexp.convertTo[Boolean]
           case IntegerPreference(_, _) => sexp.convertTo[Int]
-          case IntentPreference => sexp.convertTo[String]
+          case IntentPreference        => sexp.convertTo[String]
         }
       }
 
@@ -46,7 +46,7 @@ trait ScalariformFormat {
         descriptor: PreferenceDescriptor[_],
         value: Any
     ): Sexp = descriptor.preferenceType match {
-      case BooleanPreference => value.asInstanceOf[Boolean].toSexp
+      case BooleanPreference       => value.asInstanceOf[Boolean].toSexp
       case IntegerPreference(_, _) => value.asInstanceOf[Int].toSexp
       case IntentPreference =>
         value.asInstanceOf[Intent].getClass.getSimpleName.toSexp

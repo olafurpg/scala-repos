@@ -29,19 +29,19 @@ class UDFSuite extends QueryTest with TestHiveSingleton {
     hiveContext.udf.register("RANDOM1", () => { Math.random() })
     hiveContext.udf.register("strlenScala", (_: String).length + (_: Int))
     assert(
-        hiveContext
-          .sql("SELECT RANDOM0() FROM src LIMIT 1")
-          .head()
-          .getDouble(0) >= 0.0)
+      hiveContext
+        .sql("SELECT RANDOM0() FROM src LIMIT 1")
+        .head()
+        .getDouble(0) >= 0.0)
     assert(
-        hiveContext
-          .sql("SELECT RANDOm1() FROM src LIMIT 1")
-          .head()
-          .getDouble(0) >= 0.0)
+      hiveContext
+        .sql("SELECT RANDOm1() FROM src LIMIT 1")
+        .head()
+        .getDouble(0) >= 0.0)
     assert(
-        hiveContext
-          .sql("SELECT strlenscala('test', 1) FROM src LIMIT 1")
-          .head()
-          .getInt(0) === 5)
+      hiveContext
+        .sql("SELECT strlenscala('test', 1) FROM src LIMIT 1")
+        .head()
+        .getInt(0) === 5)
   }
 }

@@ -23,9 +23,10 @@ object ScopeFilter {
     * If a task filter is not supplied, global is selected.
     * Generally, always specify the project axis.
     */
-  def apply(projects: ProjectFilter = inProjects(ThisProject),
-            configurations: ConfigurationFilter = globalAxis,
-            tasks: TaskFilter = globalAxis): ScopeFilter =
+  def apply(
+      projects: ProjectFilter = inProjects(ThisProject),
+      configurations: ConfigurationFilter = globalAxis,
+      tasks: TaskFilter = globalAxis): ScopeFilter =
     new ScopeFilter {
       private[sbt] def apply(data: Data): Scope => Boolean = {
         val pf = projects(data)
@@ -49,7 +50,7 @@ object ScopeFilter {
       }
     }
 
-  final class SettingKeyAll[T] private[sbt](i: Initialize[T]) {
+  final class SettingKeyAll[T] private[sbt] (i: Initialize[T]) {
 
     /**
       * Evaluates the initialization in all scopes selected by the filter.  These are dynamic dependencies, so
@@ -63,7 +64,7 @@ object ScopeFilter {
           .join
     }
   }
-  final class TaskKeyAll[T] private[sbt](i: Initialize[Task[T]]) {
+  final class TaskKeyAll[T] private[sbt] (i: Initialize[Task[T]]) {
 
     /**
       * Evaluates the task in all scopes selected by the filter.  These are dynamic dependencies, so
@@ -108,27 +109,31 @@ object ScopeFilter {
       * Selects Scopes that have a project axis that is aggregated by `ref`, transitively if `transitive` is true.
       * If `includeRoot` is true, Scopes with `ref` itself as the project axis value are also selected.
       */
-    def inAggregates(ref: ProjectReference,
-                     transitive: Boolean = true,
-                     includeRoot: Boolean = true): ProjectFilter =
-      byDeps(ref,
-             transitive = transitive,
-             includeRoot = includeRoot,
-             aggregate = true,
-             classpath = false)
+    def inAggregates(
+        ref: ProjectReference,
+        transitive: Boolean = true,
+        includeRoot: Boolean = true): ProjectFilter =
+      byDeps(
+        ref,
+        transitive = transitive,
+        includeRoot = includeRoot,
+        aggregate = true,
+        classpath = false)
 
     /**
       * Selects Scopes that have a project axis that is a dependency of `ref`, transitively if `transitive` is true.
       * If `includeRoot` is true, Scopes with `ref` itself as the project axis value are also selected.
       */
-    def inDependencies(ref: ProjectReference,
-                       transitive: Boolean = true,
-                       includeRoot: Boolean = true): ProjectFilter =
-      byDeps(ref,
-             transitive = transitive,
-             includeRoot = includeRoot,
-             aggregate = false,
-             classpath = true)
+    def inDependencies(
+        ref: ProjectReference,
+        transitive: Boolean = true,
+        includeRoot: Boolean = true): ProjectFilter =
+      byDeps(
+        ref,
+        transitive = transitive,
+        includeRoot = includeRoot,
+        aggregate = false,
+        classpath = true)
 
     /** Selects Scopes that have a project axis with one of the provided values.*/
     def inProjects(projects: ProjectReference*): ProjectFilter =
@@ -156,9 +161,10 @@ object ScopeFilter {
     * Information provided to Scope filters.  These provide project relationships,
     * project reference resolution, and the list of all static Scopes.
     */
-  private final class Data(val units: Map[URI, LoadedBuildUnit],
-                           val resolve: ProjectReference => ProjectRef,
-                           val allScopes: Set[Scope])
+  private final class Data(
+      val units: Map[URI, LoadedBuildUnit],
+      val resolve: ProjectReference => ProjectRef,
+      val allScopes: Set[Scope])
 
   /** Constructs a Data instance from the list of static scopes and the project relationships.*/
   private[this] val getData: Initialize[Data] = Def.setting {
@@ -167,13 +173,13 @@ object ScopeFilter {
     val thisRef = Keys.thisProjectRef.?.value
     val current = thisRef match {
       case Some(ProjectRef(uri, _)) => uri
-      case None => build.root
+      case None                     => build.root
     }
     val rootProject = Load.getRootProject(build.units)
     val resolve: ProjectReference => ProjectRef = p =>
       (p, thisRef) match {
         case (ThisProject, Some(pref)) => pref
-        case _ => Scope.resolveProjectRef(current, rootProject, p)
+        case _                         => Scope.resolveProjectRef(current, rootProject, p)
     }
     new Data(build.units, resolve, scopes)
   }
@@ -185,18 +191,21 @@ object ScopeFilter {
     ref =>
       Project.getProject(ref, structure).toList flatMap { p =>
         (if (classpath) p.dependencies.map(_.project) else Nil) ++
-        (if (aggregate) p.aggregate else Nil)
+          (if (aggregate) p.aggregate else Nil)
     }
 
-  private[this] def byDeps(ref: ProjectReference,
-                           transitive: Boolean,
-                           includeRoot: Boolean,
-                           aggregate: Boolean,
-                           classpath: Boolean): ProjectFilter =
+  private[this] def byDeps(
+      ref: ProjectReference,
+      transitive: Boolean,
+      includeRoot: Boolean,
+      aggregate: Boolean,
+      classpath: Boolean): ProjectFilter =
     inResolvedProjects { data =>
       val resolvedRef = data.resolve(ref)
       val direct = getDependencies(
-          data.units, classpath = classpath, aggregate = aggregate)
+        data.units,
+        classpath = classpath,
+        aggregate = aggregate)
       if (transitive) {
         val full = Dag.topologicalSort(resolvedRef)(direct)
         if (includeRoot) full else full dropRight 1
@@ -226,7 +235,7 @@ object ScopeFilter {
         s =>
           s match {
             case Select(t) => g(t)
-            case _ => false
+            case _         => false
           }
       }
     }

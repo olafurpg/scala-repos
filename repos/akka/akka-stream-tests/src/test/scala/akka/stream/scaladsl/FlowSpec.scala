@@ -32,12 +32,13 @@ object FlowSpec {
 }
 
 class FlowSpec
-    extends AkkaSpec(ConfigFactory.parseString(
-            "akka.actor.debug.receive=off\nakka.loglevel=INFO")) {
+    extends AkkaSpec(
+      ConfigFactory.parseString(
+        "akka.actor.debug.receive=off\nakka.loglevel=INFO")) {
   import FlowSpec._
 
-  val settings = ActorMaterializerSettings(system).withInputBuffer(
-      initialSize = 2, maxSize = 2)
+  val settings = ActorMaterializerSettings(system)
+    .withInputBuffer(initialSize = 2, maxSize = 2)
 
   implicit val materializer = ActorMaterializer(settings)
 
@@ -47,7 +48,8 @@ class FlowSpec
     identity(in)
 
   class BrokenActorInterpreter(
-      _shell: GraphInterpreterShell, brokenMessage: Any)
+      _shell: GraphInterpreterShell,
+      brokenMessage: Any)
       extends ActorGraphInterpreter(_shell) {
 
     override protected[akka] def aroundReceive(receive: Receive, msg: Any) = {
@@ -61,33 +63,36 @@ class FlowSpec
 
   val faultyFlow: Flow[Any, Any, NotUsed] ⇒ Flow[Any, Any, NotUsed] = in ⇒
     in.via({
-      val stage = new PushPullGraphStage((_) ⇒
-                                           fusing.Map({ x: Any ⇒
-                                             x
-                                           }, stoppingDecider),
-                                         Attributes.none)
+      val stage = new PushPullGraphStage(
+        (_) ⇒
+          fusing.Map({ x: Any ⇒
+            x
+          }, stoppingDecider),
+        Attributes.none)
 
-      val assembly = new GraphAssembly(Array(stage),
-                                       Array(Attributes.none),
-                                       Array(stage.shape.in, null),
-                                       Array(0, -1),
-                                       Array(null, stage.shape.out),
-                                       Array(-1, 0))
+      val assembly = new GraphAssembly(
+        Array(stage),
+        Array(Attributes.none),
+        Array(stage.shape.in, null),
+        Array(0, -1),
+        Array(null, stage.shape.out),
+        Array(-1, 0))
 
       val (inHandlers, outHandlers, logics) =
-        assembly.materialize(Attributes.none,
-                             assembly.stages.map(_.module),
-                             new java.util.HashMap,
-                             _ ⇒ ())
+        assembly.materialize(
+          Attributes.none,
+          assembly.stages.map(_.module),
+          new java.util.HashMap,
+          _ ⇒ ())
 
       val shell = new GraphInterpreterShell(
-          assembly,
-          inHandlers,
-          outHandlers,
-          logics,
-          stage.shape,
-          settings,
-          materializer.asInstanceOf[ActorMaterializerImpl])
+        assembly,
+        inHandlers,
+        outHandlers,
+        logics,
+        stage.shape,
+        settings,
+        materializer.asInstanceOf[ActorMaterializerImpl])
 
       val props = Props(new BrokenActorInterpreter(shell, "a3"))
         .withDispatcher("akka.test.stream-dispatcher")
@@ -104,18 +109,20 @@ class FlowSpec
       impl ! ActorGraphInterpreter.ExposedPublisher(shell, 0, publisher)
 
       Flow.fromSinkAndSource(
-          Sink.fromSubscriber(subscriber), Source.fromPublisher(publisher))
+        Sink.fromSubscriber(subscriber),
+        Source.fromPublisher(publisher))
     })
 
-  val toPublisher: (Source[Any, _], ActorMaterializer) ⇒ Publisher[Any] = (f,
-  m) ⇒ f.runWith(Sink.asPublisher(false))(m)
+  val toPublisher: (Source[Any, _], ActorMaterializer) ⇒ Publisher[Any] =
+    (f, m) ⇒ f.runWith(Sink.asPublisher(false))(m)
 
   def toFanoutPublisher[In, Out](
       elasticity: Int): (Source[Out, _], ActorMaterializer) ⇒ Publisher[Out] =
     (f, m) ⇒
-      f.runWith(Sink
-            .asPublisher(true)
-            .withAttributes(Attributes.inputBuffer(elasticity, elasticity)))(m)
+      f.runWith(
+        Sink
+          .asPublisher(true)
+          .withAttributes(Attributes.inputBuffer(elasticity, elasticity)))(m)
 
   def materializeIntoSubscriberAndPublisher[In, Out](
       flow: Flow[In, Out, _]): (Subscriber[In], Publisher[Out]) = {
@@ -125,21 +132,24 @@ class FlowSpec
   "A Flow" must {
 
     for ((name, op) ← List("identity" -> identity, "identity2" -> identity2);
-    n ← List(1, 2, 4)) {
+         n ← List(1, 2, 4)) {
       s"request initial elements from upstream ($name, $n)" in {
-        new ChainSetup(op,
-                       settings.withInputBuffer(initialSize = n, maxSize = n),
-                       toPublisher) {
-          upstream.expectRequest(upstreamSubscription,
-                                 settings.maxInputBufferSize)
+        new ChainSetup(
+          op,
+          settings.withInputBuffer(initialSize = n, maxSize = n),
+          toPublisher) {
+          upstream.expectRequest(
+            upstreamSubscription,
+            settings.maxInputBufferSize)
         }
       }
     }
 
     "request more elements from upstream when downstream requests more elements" in {
       new ChainSetup(identity, settings, toPublisher) {
-        upstream.expectRequest(upstreamSubscription,
-                               settings.maxInputBufferSize)
+        upstream.expectRequest(
+          upstreamSubscription,
+          settings.maxInputBufferSize)
         downstreamSubscription.request(1)
         upstream.expectNoMsg(100.millis)
         downstreamSubscription.request(2)
@@ -182,9 +192,10 @@ class FlowSpec
     }
 
     "cancel upstream when single subscriber cancels subscription while receiving data" in {
-      new ChainSetup(identity,
-                     settings.withInputBuffer(initialSize = 1, maxSize = 1),
-                     toPublisher) {
+      new ChainSetup(
+        identity,
+        settings.withInputBuffer(initialSize = 1, maxSize = 1),
+        toPublisher) {
         downstreamSubscription.request(5)
         upstreamSubscription.expectRequest(1)
         upstreamSubscription.sendNext("test")
@@ -358,20 +369,23 @@ class FlowSpec
     "be possible to convert to a processor, and should be able to take a Processor" in {
       val identity1 = Flow[Int].toProcessor
       val identity2 = Flow.fromProcessor(() ⇒ identity1.run())
-      Await.result(Source(1 to 10).via(identity2).limit(100).runWith(Sink.seq),
-                   3.seconds) should ===(1 to 10)
+      Await.result(
+        Source(1 to 10).via(identity2).limit(100).runWith(Sink.seq),
+        3.seconds) should ===(1 to 10)
 
       // Reusable:
-      Await.result(Source(1 to 10).via(identity2).limit(100).runWith(Sink.seq),
-                   3.seconds) should ===(1 to 10)
+      Await.result(
+        Source(1 to 10).via(identity2).limit(100).runWith(Sink.seq),
+        3.seconds) should ===(1 to 10)
     }
   }
 
   "A Flow with multiple subscribers (FanOutBox)" must {
     "adapt speed to the currently slowest subscriber" in {
-      new ChainSetup(identity,
-                     settings.withInputBuffer(initialSize = 1, maxSize = 1),
-                     toFanoutPublisher(1)) {
+      new ChainSetup(
+        identity,
+        settings.withInputBuffer(initialSize = 1, maxSize = 1),
+        toFanoutPublisher(1)) {
         val downstream2 = TestSubscriber.manualProbe[Any]()
         publisher.subscribe(downstream2)
         val downstream2Subscription = downstream2.expectSubscription()
@@ -397,9 +411,10 @@ class FlowSpec
     }
 
     "support slow subscriber with fan-out 2" in {
-      new ChainSetup(identity,
-                     settings.withInputBuffer(initialSize = 1, maxSize = 1),
-                     toFanoutPublisher(2)) {
+      new ChainSetup(
+        identity,
+        settings.withInputBuffer(initialSize = 1, maxSize = 1),
+        toFanoutPublisher(2)) {
         val downstream2 = TestSubscriber.manualProbe[Any]()
         publisher.subscribe(downstream2)
         val downstream2Subscription = downstream2.expectSubscription()
@@ -438,9 +453,10 @@ class FlowSpec
     }
 
     "support incoming subscriber while elements were requested before" in {
-      new ChainSetup(identity,
-                     settings.withInputBuffer(initialSize = 1, maxSize = 1),
-                     toFanoutPublisher(1)) {
+      new ChainSetup(
+        identity,
+        settings.withInputBuffer(initialSize = 1, maxSize = 1),
+        toFanoutPublisher(1)) {
         downstreamSubscription.request(5)
         upstream.expectRequest(upstreamSubscription, 1)
         upstreamSubscription.sendNext("a1")
@@ -477,9 +493,10 @@ class FlowSpec
     }
 
     "be unblocked when blocking subscriber cancels subscription" in {
-      new ChainSetup(identity,
-                     settings.withInputBuffer(initialSize = 1, maxSize = 1),
-                     toFanoutPublisher(1)) {
+      new ChainSetup(
+        identity,
+        settings.withInputBuffer(initialSize = 1, maxSize = 1),
+        toFanoutPublisher(1)) {
         val downstream2 = TestSubscriber.manualProbe[Any]()
         publisher.subscribe(downstream2)
         val downstream2Subscription = downstream2.expectSubscription()
@@ -515,9 +532,10 @@ class FlowSpec
     }
 
     "call future subscribers' onError after onSubscribe if initial upstream was completed" in {
-      new ChainSetup(identity,
-                     settings.withInputBuffer(initialSize = 1, maxSize = 1),
-                     toFanoutPublisher(1)) {
+      new ChainSetup(
+        identity,
+        settings.withInputBuffer(initialSize = 1, maxSize = 1),
+        toFanoutPublisher(1)) {
         val downstream2 = TestSubscriber.manualProbe[Any]()
         // don't link it just yet
 
@@ -551,15 +569,15 @@ class FlowSpec
         publisher.subscribe(downstream3)
         downstream3.expectSubscription()
         downstream3.expectError() should ===(
-            ActorPublisher.NormalShutdownReason)
+          ActorPublisher.NormalShutdownReason)
       }
     }
 
     "call future subscribers' onError should be called instead of onSubscribed after initial upstream reported an error" in {
       new ChainSetup[Int, String, NotUsed](
-          _.map(_ ⇒ throw TestException),
-          settings.withInputBuffer(initialSize = 1, maxSize = 1),
-          toFanoutPublisher(1)) {
+        _.map(_ ⇒ throw TestException),
+        settings.withInputBuffer(initialSize = 1, maxSize = 1),
+        toFanoutPublisher(1)) {
         downstreamSubscription.request(1)
         upstreamSubscription.expectRequest(1)
 
@@ -575,9 +593,10 @@ class FlowSpec
     }
 
     "call future subscribers' onError when all subscriptions were cancelled" in {
-      new ChainSetup(identity,
-                     settings.withInputBuffer(initialSize = 1, maxSize = 1),
-                     toFanoutPublisher(16)) {
+      new ChainSetup(
+        identity,
+        settings.withInputBuffer(initialSize = 1, maxSize = 1),
+        toFanoutPublisher(16)) {
         upstreamSubscription.expectRequest(1)
         downstreamSubscription.cancel()
         upstreamSubscription.expectCancellation()
@@ -601,9 +620,10 @@ class FlowSpec
 
   "A broken Flow" must {
     "cancel upstream and call onError on current and future downstream subscribers if an internal error occurs" in {
-      new ChainSetup(faultyFlow,
-                     settings.withInputBuffer(initialSize = 1, maxSize = 1),
-                     toFanoutPublisher(16)) {
+      new ChainSetup(
+        faultyFlow,
+        settings.withInputBuffer(initialSize = 1, maxSize = 1),
+        toFanoutPublisher(16)) {
 
         def checkError(sprobe: TestSubscriber.ManualProbe[Any]): Unit = {
           val error = sprobe.expectError()
@@ -628,9 +648,9 @@ class FlowSpec
         downstream2.expectNext("a2")
 
         val filters = immutable.Seq(
-            EventFilter[NullPointerException](),
-            EventFilter[IllegalStateException](),
-            EventFilter[PostRestartException]()) // This is thrown because we attach the dummy failing actor to toplevel
+          EventFilter[NullPointerException](),
+          EventFilter[IllegalStateException](),
+          EventFilter[PostRestartException]()) // This is thrown because we attach the dummy failing actor to toplevel
         try {
           system.eventStream.publish(Mute(filters))
 

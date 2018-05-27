@@ -39,8 +39,8 @@ class Word2VecSuite extends SparkFunSuite with MLlibTestSparkContext {
     // and a Word2VecMap give the same values.
     val word2VecMap = model.getVectors
     val newModel = new Word2VecModel(word2VecMap)
-    assert(newModel.getVectors.mapValues(_.toSeq) === word2VecMap.mapValues(
-            _.toSeq))
+    assert(
+      newModel.getVectors.mapValues(_.toSeq) === word2VecMap.mapValues(_.toSeq))
   }
 
   test("Word2Vec throws exception when vocabulary is empty") {
@@ -55,10 +55,10 @@ class Word2VecSuite extends SparkFunSuite with MLlibTestSparkContext {
   test("Word2VecModel") {
     val num = 2
     val word2VecMap = Map(
-        ("china", Array(0.50f, 0.50f, 0.50f, 0.50f)),
-        ("japan", Array(0.40f, 0.50f, 0.50f, 0.50f)),
-        ("taiwan", Array(0.60f, 0.50f, 0.50f, 0.50f)),
-        ("korea", Array(0.45f, 0.60f, 0.60f, 0.60f))
+      ("china", Array(0.50f, 0.50f, 0.50f, 0.50f)),
+      ("japan", Array(0.40f, 0.50f, 0.50f, 0.50f)),
+      ("taiwan", Array(0.60f, 0.50f, 0.50f, 0.50f)),
+      ("korea", Array(0.45f, 0.60f, 0.60f, 0.60f))
     )
     val model = new Word2VecModel(word2VecMap)
     val syms = model.findSynonyms("china", num)
@@ -70,10 +70,10 @@ class Word2VecSuite extends SparkFunSuite with MLlibTestSparkContext {
   test("model load / save") {
 
     val word2VecMap = Map(
-        ("china", Array(0.50f, 0.50f, 0.50f, 0.50f)),
-        ("japan", Array(0.40f, 0.50f, 0.50f, 0.50f)),
-        ("taiwan", Array(0.60f, 0.50f, 0.50f, 0.50f)),
-        ("korea", Array(0.45f, 0.60f, 0.60f, 0.60f))
+      ("china", Array(0.50f, 0.50f, 0.50f, 0.50f)),
+      ("japan", Array(0.40f, 0.50f, 0.50f, 0.50f)),
+      ("taiwan", Array(0.60f, 0.50f, 0.50f, 0.50f)),
+      ("korea", Array(0.45f, 0.60f, 0.60f, 0.60f))
     )
     val model = new Word2VecModel(word2VecMap)
 
@@ -83,8 +83,9 @@ class Word2VecSuite extends SparkFunSuite with MLlibTestSparkContext {
     try {
       model.save(sc, path)
       val sameModel = Word2VecModel.load(sc, path)
-      assert(sameModel.getVectors.mapValues(_.toSeq) === model.getVectors
-            .mapValues(_.toSeq))
+      assert(
+        sameModel.getVectors.mapValues(_.toSeq) === model.getVectors
+          .mapValues(_.toSeq))
     } finally {
       Utils.deleteRecursively(tempDir)
     }
@@ -102,8 +103,9 @@ class Word2VecSuite extends SparkFunSuite with MLlibTestSparkContext {
     try {
       model.save(sc, path)
       val sameModel = Word2VecModel.load(sc, path)
-      assert(sameModel.getVectors.mapValues(_.toSeq) === model.getVectors
-            .mapValues(_.toSeq))
+      assert(
+        sameModel.getVectors.mapValues(_.toSeq) === model.getVectors
+          .mapValues(_.toSeq))
     } finally {
       Utils.deleteRecursively(tempDir)
     }

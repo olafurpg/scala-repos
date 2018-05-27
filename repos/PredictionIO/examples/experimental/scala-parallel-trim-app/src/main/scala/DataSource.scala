@@ -19,12 +19,14 @@ case class DataSourceParams(
     dstAppId: Int,
     startTime: Option[DateTime],
     untilTime: Option[DateTime]
-)
-    extends Params
+) extends Params
 
 class DataSource(val dsp: DataSourceParams)
     extends PDataSource[
-        TrainingData, EmptyEvaluationInfo, Query, EmptyActualResult] {
+      TrainingData,
+      EmptyEvaluationInfo,
+      Query,
+      EmptyActualResult] {
 
   @transient lazy val logger = Logger[this.type]
 
@@ -34,9 +36,9 @@ class DataSource(val dsp: DataSourceParams)
 
     logger.info(s"Read events from appId ${dsp.srcAppId}")
     val srcEvents: RDD[Event] = eventsDb.find(
-        appId = dsp.srcAppId,
-        startTime = dsp.startTime,
-        untilTime = dsp.untilTime
+      appId = dsp.srcAppId,
+      startTime = dsp.startTime,
+      untilTime = dsp.untilTime
     )(sc)
 
     val dstEvents: Array[Event] =

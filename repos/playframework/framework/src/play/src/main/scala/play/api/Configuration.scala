@@ -67,12 +67,12 @@ object Configuration {
             .get(key)
             .orElse(Option(properties.getProperty(key)))
 
-          {
-            setting("config.resource").map(resource =>
-                  ConfigFactory.parseResources(classLoader, resource.toString))
-          } orElse {
+        {
+          setting("config.resource").map(resource =>
+            ConfigFactory.parseResources(classLoader, resource.toString))
+        } orElse {
           setting("config.file").map(fileName =>
-                ConfigFactory.parseFileAnySyntax(new File(fileName.toString)))
+            ConfigFactory.parseFileAnySyntax(new File(fileName.toString)))
         } getOrElse {
           val parseOptions = ConfigParseOptions.defaults
             .setClassLoader(classLoader)
@@ -85,7 +85,8 @@ object Configuration {
       // reference.conf, but still make it possible for users to override
       // Play's values in their application.conf.
       val playOverridesConfig: Config = ConfigFactory.parseResources(
-          classLoader, "play/reference-overrides.conf")
+        classLoader,
+        "play/reference-overrides.conf")
 
       // Resolve reference.conf ourselves because ConfigFactory.defaultReference resolves
       // values, and we won't have a value for `play.server.dir` until all our config is combined.
@@ -94,11 +95,11 @@ object Configuration {
 
       // Combine all the config together into one big config
       val combinedConfig: Config = Seq(
-          systemPropertyConfig,
-          directConfig,
-          applicationConfig,
-          playOverridesConfig,
-          referenceConfig
+        systemPropertyConfig,
+        directConfig,
+        applicationConfig,
+        playOverridesConfig,
+        referenceConfig
       ).reduceLeft(_ withFallback _)
 
       // Resolve settings. Among other things, the `play.server.dir` setting defined in directConfig will
@@ -115,12 +116,14 @@ object Configuration {
   /**
     * Load a new Configuration from the Environment.
     */
-  def load(environment: Environment,
-           devSettings: Map[String, AnyRef]): Configuration = {
-    load(environment.classLoader,
-         System.getProperties,
-         devSettings,
-         allowMissingApplicationConf = environment.mode == Mode.Test)
+  def load(
+      environment: Environment,
+      devSettings: Map[String, AnyRef]): Configuration = {
+    load(
+      environment.classLoader,
+      System.getProperties,
+      devSettings,
+      allowMissingApplicationConf = environment.mode == Mode.Test)
   }
 
   /**
@@ -145,14 +148,14 @@ object Configuration {
   def from(data: Map[String, Any]): Configuration = {
 
     def toJava(data: Any): Any = data match {
-      case map: Map[_, _] => map.mapValues(toJava).asJava
+      case map: Map[_, _]        => map.mapValues(toJava).asJava
       case iterable: Iterable[_] => iterable.map(toJava).asJava
-      case v => v
+      case v                     => v
     }
 
     Configuration(
-        ConfigFactory.parseMap(
-            toJava(data).asInstanceOf[java.util.Map[String, AnyRef]]))
+      ConfigFactory.parseMap(
+        toJava(data).asInstanceOf[java.util.Map[String, AnyRef]]))
   }
 
   /**
@@ -160,9 +163,10 @@ object Configuration {
     */
   def apply(data: (String, Any)*): Configuration = from(data.toMap)
 
-  private[api] def configError(origin: ConfigOrigin,
-                               message: String,
-                               e: Option[Throwable] = None): PlayException = {
+  private[api] def configError(
+      origin: ConfigOrigin,
+      message: String,
+      e: Option[Throwable] = None): PlayException = {
     /*
       The stable values here help us from putting a reference to a ConfigOrigin inside the anonymous ExceptionSource.
       This is necessary to keep the Exception serialisable, because ConfigOrigin is not serialisable.
@@ -230,16 +234,18 @@ case class Configuration(underlying: Config) {
     * @return a configuration value
     */
   def getString(
-      path: String, validValues: Option[Set[String]] = None): Option[String] =
+      path: String,
+      validValues: Option[Set[String]] = None): Option[String] =
     readValue(path, underlying.getString(path)).map { value =>
       validValues match {
         case Some(values) if values.contains(value) => value
-        case Some(values) if values.isEmpty => value
+        case Some(values) if values.isEmpty         => value
         case Some(values) =>
-          throw reportError(path,
-                            "Incorrect value, one of " +
-                            (values.reduceLeft(_ + ", " + _)) +
-                            " was expected.")
+          throw reportError(
+            path,
+            "Incorrect value, one of " +
+              (values.reduceLeft(_ + ", " + _)) +
+              " was expected.")
         case None => value
       }
     }
@@ -491,10 +497,10 @@ case class Configuration(underlying: Config) {
     * The root key of this new configuration will be "engine", and you can access any sub-keys relatively.
     */
   def getConfigList(path: String): Option[java.util.List[Configuration]] =
-    readValue[java.util.List[_ <: Config]](
-        path, underlying.getConfigList(path)).map { configs =>
-      configs.asScala.map(Configuration(_)).asJava
-    }
+    readValue[java.util.List[_ <: Config]](path, underlying.getConfigList(path))
+      .map { configs =>
+        configs.asScala.map(Configuration(_)).asJava
+      }
 
   /**
     * Retrieves a Seq of sub-configurations, i.e. a configuration instance for each key that matches the path.
@@ -688,8 +694,7 @@ case class Configuration(underlying: Config) {
     * engine.timeouts = [1 second, 1 second]
     * }}}
     */
-  def getNanosecondsList(
-      path: String): Option[java.util.List[java.lang.Long]] =
+  def getNanosecondsList(path: String): Option[java.util.List[java.lang.Long]] =
     readValue(path, underlying.getDurationList(path, TimeUnit.NANOSECONDS))
 
   /**
@@ -763,7 +768,8 @@ case class Configuration(underlying: Config) {
     */
   def getObjectList(path: String): Option[java.util.List[_ <: ConfigObject]] =
     readValue[java.util.List[_ <: ConfigObject]](
-        path, underlying.getObjectList(path))
+      path,
+      underlying.getObjectList(path))
 
   /**
     * Retrieves a configuration value as a List of `String`.
@@ -866,14 +872,15 @@ case class Configuration(underlying: Config) {
     * @param e the related exception
     * @return a configuration exception
     */
-  def reportError(path: String,
-                  message: String,
-                  e: Option[Throwable] = None): PlayException = {
+  def reportError(
+      path: String,
+      message: String,
+      e: Option[Throwable] = None): PlayException = {
     Configuration.configError(
-        if (underlying.hasPath(path)) underlying.getValue(path).origin
-        else underlying.root.origin,
-        message,
-        e)
+      if (underlying.hasPath(path)) underlying.getValue(path).origin
+      else underlying.root.origin,
+      message,
+      e)
   }
 
   /**
@@ -890,7 +897,8 @@ case class Configuration(underlying: Config) {
     * @return a configuration exception
     */
   def globalError(
-      message: String, e: Option[Throwable] = None): PlayException = {
+      message: String,
+      e: Option[Throwable] = None): PlayException = {
     Configuration.configError(underlying.root.origin, message, e)
   }
 
@@ -899,7 +907,8 @@ case class Configuration(underlying: Config) {
     * otherwise loading the new key.
     */
   private[play] def getDeprecatedString(
-      key: String, deprecatedKey: String): String = {
+      key: String,
+      deprecatedKey: String): String = {
     getString(deprecatedKey).fold(underlying.getString(key)) { value =>
       Logger.warn(s"$deprecatedKey is deprecated, use $key instead")
       value
@@ -911,11 +920,15 @@ case class Configuration(underlying: Config) {
     * otherwise loading the new key.
     */
   private[play] def getDeprecatedStringOpt(
-      key: String, deprecatedKey: String): Option[String] = {
-    getString(deprecatedKey).map { value =>
-      Logger.warn(s"$deprecatedKey is deprecated, use $key instead")
-      value
-    }.orElse(getString(key)).filter(_.nonEmpty)
+      key: String,
+      deprecatedKey: String): Option[String] = {
+    getString(deprecatedKey)
+      .map { value =>
+        Logger.warn(s"$deprecatedKey is deprecated, use $key instead")
+        value
+      }
+      .orElse(getString(key))
+      .filter(_.nonEmpty)
   }
 
   /**
@@ -923,7 +936,8 @@ case class Configuration(underlying: Config) {
     * otherwise loading the new key.
     */
   private[play] def getDeprecatedBoolean(
-      key: String, deprecatedKey: String): Boolean = {
+      key: String,
+      deprecatedKey: String): Boolean = {
     getBoolean(deprecatedKey).fold(underlying.getBoolean(key)) { value =>
       Logger.warn(s"$deprecatedKey is deprecated, use $key instead")
       value
@@ -935,14 +949,16 @@ case class Configuration(underlying: Config) {
     * otherwise loading the new key.
     */
   private[play] def getDeprecatedDuration(
-      key: String, deprecatedKey: String): FiniteDuration = {
+      key: String,
+      deprecatedKey: String): FiniteDuration = {
     new FiniteDuration(
-        getNanoseconds(deprecatedKey).fold(
-            underlying.getDuration(key, TimeUnit.NANOSECONDS)) { value =>
-          Logger.warn(s"$deprecatedKey is deprecated, use $key instead")
-          value
-        },
-        TimeUnit.NANOSECONDS)
+      getNanoseconds(deprecatedKey).fold(
+        underlying.getDuration(key, TimeUnit.NANOSECONDS)) { value =>
+        Logger.warn(s"$deprecatedKey is deprecated, use $key instead")
+        value
+      },
+      TimeUnit.NANOSECONDS
+    )
   }
 
   /**
@@ -950,13 +966,17 @@ case class Configuration(underlying: Config) {
     * it's defined, otherwise loading the new key.
     */
   private[play] def getDeprecatedDurationOpt(
-      key: String, deprecatedKey: String): Option[FiniteDuration] = {
-    getNanoseconds(deprecatedKey).map { value =>
-      Logger.warn(s"$deprecatedKey is deprecated, use $key instead")
-      value
-    }.orElse(getNanoseconds(key)).map { value =>
-      new FiniteDuration(value, TimeUnit.NANOSECONDS)
-    }
+      key: String,
+      deprecatedKey: String): Option[FiniteDuration] = {
+    getNanoseconds(deprecatedKey)
+      .map { value =>
+        Logger.warn(s"$deprecatedKey is deprecated, use $key instead")
+        value
+      }
+      .orElse(getNanoseconds(key))
+      .map { value =>
+        new FiniteDuration(value, TimeUnit.NANOSECONDS)
+      }
   }
 }
 
@@ -1035,15 +1055,18 @@ private[play] class PlayConfig(val underlying: Config) {
     *
     * Otherwise, the configuration from path will be looked up.
     */
-  def getDeprecated[A : ConfigLoader](
-      path: String, deprecatedPaths: String*): A = {
-    deprecatedPaths.collectFirst {
-      case deprecated if underlying.hasPath(deprecated) =>
-        reportDeprecation(path, deprecated)
-        get[A](deprecated)
-    }.getOrElse {
-      get[A](path)
-    }
+  def getDeprecated[A: ConfigLoader](
+      path: String,
+      deprecatedPaths: String*): A = {
+    deprecatedPaths
+      .collectFirst {
+        case deprecated if underlying.hasPath(deprecated) =>
+          reportDeprecation(path, deprecated)
+          get[A](deprecated)
+      }
+      .getOrElse {
+        get[A](path)
+      }
   }
 
   /**
@@ -1055,7 +1078,9 @@ private[play] class PlayConfig(val underlying: Config) {
     * Otherwise, the configuration from path will be looked up and used as is.
     */
   def getDeprecatedWithFallback(
-      path: String, deprecated: String, parent: String = ""): PlayConfig = {
+      path: String,
+      deprecated: String,
+      parent: String = ""): PlayConfig = {
     val config = get[Config](path)
     val merged =
       if (underlying.hasPath(deprecated)) {
@@ -1079,14 +1104,15 @@ private[play] class PlayConfig(val underlying: Config) {
     * @param e the related exception
     * @return a configuration exception
     */
-  def reportError(path: String,
-                  message: String,
-                  e: Option[Throwable] = None): PlayException = {
+  def reportError(
+      path: String,
+      message: String,
+      e: Option[Throwable] = None): PlayException = {
     Configuration.configError(
-        if (underlying.hasPath(path)) underlying.getValue(path).origin
-        else underlying.root.origin,
-        message,
-        e)
+      if (underlying.hasPath(path)) underlying.getValue(path).origin
+      else underlying.root.origin,
+      message,
+      e)
   }
 
   /**
@@ -1094,10 +1120,12 @@ private[play] class PlayConfig(val underlying: Config) {
     */
   def subKeys: Set[String] = underlying.root().keySet().asScala.toSet
 
-  private[play] def reportDeprecation(path: String, deprecated: String): Unit = {
+  private[play] def reportDeprecation(
+      path: String,
+      deprecated: String): Unit = {
     val origin = underlying.getValue(deprecated).origin
     Logger.warn(
-        s"${origin.description}: $deprecated is deprecated, use $path instead")
+      s"${origin.description}: $deprecated is deprecated, use $path instead")
   }
 }
 
@@ -1142,19 +1170,21 @@ private[play] object ConfigLoader {
     ConfigLoader(_.getBooleanList).map(toScala(_).map(_.booleanValue()))
 
   implicit val durationLoader: ConfigLoader[Duration] = ConfigLoader(
-      config =>
-        path =>
-          if (!config.getIsNull(path))
-            FiniteDuration(config.getDuration(path, TimeUnit.MILLISECONDS),
-                           TimeUnit.MILLISECONDS) else Duration.Inf)
+    config =>
+      path =>
+        if (!config.getIsNull(path))
+          FiniteDuration(
+            config.getDuration(path, TimeUnit.MILLISECONDS),
+            TimeUnit.MILLISECONDS)
+        else Duration.Inf)
 
   implicit val finiteDurationLoader: ConfigLoader[FiniteDuration] =
     ConfigLoader(config => config.getDuration(_, TimeUnit.MILLISECONDS))
       .map(millis => FiniteDuration(millis, TimeUnit.MILLISECONDS))
   implicit val seqFiniteDurationLoader: ConfigLoader[Seq[FiniteDuration]] =
     ConfigLoader(config => config.getDurationList(_, TimeUnit.MILLISECONDS))
-      .map(toScala(_).map(
-            millis => FiniteDuration(millis, TimeUnit.MILLISECONDS)))
+      .map(toScala(_).map(millis =>
+        FiniteDuration(millis, TimeUnit.MILLISECONDS)))
 
   implicit val doubleLoader = ConfigLoader(_.getDouble)
   implicit val seqDoubleLoader = ConfigLoader(_.getDoubleList).map(toScala)

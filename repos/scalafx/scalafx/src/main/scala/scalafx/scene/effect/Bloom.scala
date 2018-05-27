@@ -39,7 +39,8 @@ object Bloom {
 }
 
 class Bloom(override val delegate: jfxse.Bloom = new jfxse.Bloom)
-    extends Effect(delegate) with InputDelegate[jfxse.Bloom]
+    extends Effect(delegate)
+    with InputDelegate[jfxse.Bloom]
     with SFXDelegate[jfxse.Bloom] {
 
   /**

@@ -46,16 +46,16 @@ object KeyHasher {
     */
   def byName(name: String): KeyHasher = {
     name match {
-      case "fnv" => FNV1_32
-      case "fnv1" => FNV1_32
-      case "fnv1-32" => FNV1_32
-      case "fnv1a-32" => FNV1A_32
-      case "fnv1-64" => FNV1_64
-      case "fnv1a-64" => FNV1A_64
-      case "ketama" => KETAMA
+      case "fnv"       => FNV1_32
+      case "fnv1"      => FNV1_32
+      case "fnv1-32"   => FNV1_32
+      case "fnv1a-32"  => FNV1A_32
+      case "fnv1-64"   => FNV1_64
+      case "fnv1a-64"  => FNV1A_64
+      case "ketama"    => KETAMA
       case "crc32-itu" => CRC32_ITU
-      case "hsieh" => HSIEH
-      case _ => throw new NoSuchElementException(name)
+      case "hsieh"     => HSIEH
+      case _           => throw new NoSuchElementException(name)
     }
   }
 }

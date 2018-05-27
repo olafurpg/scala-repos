@@ -24,12 +24,15 @@ import org.scalajs.core.tools.linker.backend.{LinkerBackend, BasicLinkerBackend}
 final class Linker(frontend: LinkerFrontend, backend: LinkerBackend)
     extends GenLinker {
 
-  require(!backend.withSourceMap || frontend.withSourceMap,
-          "Frontend must have source maps enabled if backend has them enabled")
-  require(frontend.semantics == backend.semantics,
-          "Frontend and backend must agree on semantics")
-  require(frontend.esLevel == backend.esLevel,
-          "Frontend and backend must agree on ESLevel")
+  require(
+    !backend.withSourceMap || frontend.withSourceMap,
+    "Frontend must have source maps enabled if backend has them enabled")
+  require(
+    frontend.semantics == backend.semantics,
+    "Frontend and backend must agree on semantics")
+  require(
+    frontend.esLevel == backend.esLevel,
+    "Frontend and backend must agree on ESLevel")
 
   val semantics: Semantics = frontend.semantics
   val esLevel: ESLevel = backend.esLevel
@@ -37,14 +40,16 @@ final class Linker(frontend: LinkerFrontend, backend: LinkerBackend)
   private[this] var _valid = true
   private[this] val _linking = new AtomicBoolean(false)
 
-  def linkUnit(irFiles: Seq[VirtualScalaJSIRFile],
-               symbolRequirements: SymbolRequirement,
-               logger: Logger): LinkingUnit =
+  def linkUnit(
+      irFiles: Seq[VirtualScalaJSIRFile],
+      symbolRequirements: SymbolRequirement,
+      logger: Logger): LinkingUnit =
     guard(frontend.link(irFiles, symbolRequirements, logger))
 
-  def link(irFiles: Seq[VirtualScalaJSIRFile],
-           output: WritableVirtualJSFile,
-           logger: Logger): Unit = {
+  def link(
+      irFiles: Seq[VirtualScalaJSIRFile],
+      output: WritableVirtualJSFile,
+      logger: Logger): Unit = {
     guard {
       val unit = frontend.link(irFiles, backend.symbolRequirements, logger)
       backend.emit(unit, output, logger)
@@ -59,7 +64,7 @@ final class Linker(frontend: LinkerFrontend, backend: LinkerBackend)
 
     if (!_valid) {
       throw new IllegalStateException(
-          "Linker is invalid due to a previous exception in a component")
+        "Linker is invalid due to a previous exception in a component")
     }
 
     try {

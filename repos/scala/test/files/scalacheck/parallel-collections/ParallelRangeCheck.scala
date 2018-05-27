@@ -48,7 +48,7 @@ class ParallelRangeCheck(val tasksupport: TaskSupport)
 
   override def traversable2Seq(t: Traversable[Int]): Seq[Int] = t match {
     case r: Range => r
-    case _ => t.toSeq
+    case _        => t.toSeq
   }
 
   def values = Seq(choose(-100, 100))

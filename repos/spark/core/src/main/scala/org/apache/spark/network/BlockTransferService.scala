@@ -29,7 +29,9 @@ import org.apache.spark.network.shuffle.{BlockFetchingListener, ShuffleClient}
 import org.apache.spark.storage.{BlockId, StorageLevel}
 
 private[spark] abstract class BlockTransferService
-    extends ShuffleClient with Closeable with Logging {
+    extends ShuffleClient
+    with Closeable
+    with Logging {
 
   /**
     * Initialize the transfer service by giving it the BlockDataManager that can be used to fetch
@@ -60,46 +62,57 @@ private[spark] abstract class BlockTransferService
     * return a future so the underlying implementation can invoke onBlockFetchSuccess as soon as
     * the data of a block is fetched, rather than waiting for all blocks to be fetched.
     */
-  override def fetchBlocks(host: String,
-                           port: Int,
-                           execId: String,
-                           blockIds: Array[String],
-                           listener: BlockFetchingListener): Unit
+  override def fetchBlocks(
+      host: String,
+      port: Int,
+      execId: String,
+      blockIds: Array[String],
+      listener: BlockFetchingListener): Unit
 
   /**
     * Upload a single block to a remote node, available only after [[init]] is invoked.
     */
-  def uploadBlock(hostname: String,
-                  port: Int,
-                  execId: String,
-                  blockId: BlockId,
-                  blockData: ManagedBuffer,
-                  level: StorageLevel): Future[Unit]
+  def uploadBlock(
+      hostname: String,
+      port: Int,
+      execId: String,
+      blockId: BlockId,
+      blockData: ManagedBuffer,
+      level: StorageLevel): Future[Unit]
 
   /**
     * A special case of [[fetchBlocks]], as it fetches only one block and is blocking.
     *
     * It is also only available after [[init]] is invoked.
     */
-  def fetchBlockSync(host: String,
-                     port: Int,
-                     execId: String,
-                     blockId: String): ManagedBuffer = {
+  def fetchBlockSync(
+      host: String,
+      port: Int,
+      execId: String,
+      blockId: String): ManagedBuffer = {
     // A monitor for the thread to wait on.
     val result = Promise[ManagedBuffer]()
-    fetchBlocks(host, port, execId, Array(blockId), new BlockFetchingListener {
-      override def onBlockFetchFailure(
-          blockId: String, exception: Throwable): Unit = {
-        result.failure(exception)
+    fetchBlocks(
+      host,
+      port,
+      execId,
+      Array(blockId),
+      new BlockFetchingListener {
+        override def onBlockFetchFailure(
+            blockId: String,
+            exception: Throwable): Unit = {
+          result.failure(exception)
+        }
+        override def onBlockFetchSuccess(
+            blockId: String,
+            data: ManagedBuffer): Unit = {
+          val ret = ByteBuffer.allocate(data.size.toInt)
+          ret.put(data.nioByteBuffer())
+          ret.flip()
+          result.success(new NioManagedBuffer(ret))
+        }
       }
-      override def onBlockFetchSuccess(
-          blockId: String, data: ManagedBuffer): Unit = {
-        val ret = ByteBuffer.allocate(data.size.toInt)
-        ret.put(data.nioByteBuffer())
-        ret.flip()
-        result.success(new NioManagedBuffer(ret))
-      }
-    })
+    )
 
     Await.result(result.future, Duration.Inf)
   }
@@ -110,14 +123,15 @@ private[spark] abstract class BlockTransferService
     * This method is similar to [[uploadBlock]], except this one blocks the thread
     * until the upload finishes.
     */
-  def uploadBlockSync(hostname: String,
-                      port: Int,
-                      execId: String,
-                      blockId: BlockId,
-                      blockData: ManagedBuffer,
-                      level: StorageLevel): Unit = {
+  def uploadBlockSync(
+      hostname: String,
+      port: Int,
+      execId: String,
+      blockId: BlockId,
+      blockData: ManagedBuffer,
+      level: StorageLevel): Unit = {
     Await.result(
-        uploadBlock(hostname, port, execId, blockId, blockData, level),
-        Duration.Inf)
+      uploadBlock(hostname, port, execId, blockId, blockData, level),
+      Duration.Inf)
   }
 }

@@ -32,7 +32,9 @@ object AtLeastOnceDeliveryCrashSpec {
   }
 
   class CrashingActor(testProbe: ActorRef)
-      extends PersistentActor with AtLeastOnceDelivery with ActorLogging {
+      extends PersistentActor
+      with AtLeastOnceDelivery
+      with ActorLogging {
     import CrashingActor._
 
     override def persistenceId = self.path.name
@@ -50,7 +52,7 @@ object AtLeastOnceDeliveryCrashSpec {
       case Message ⇒ persist(Message)(_ ⇒ send())
       case CrashMessage ⇒
         persist(CrashMessage) { evt ⇒
-        }
+          }
     }
 
     def send() = {
@@ -62,16 +64,18 @@ object AtLeastOnceDeliveryCrashSpec {
 }
 
 class AtLeastOnceDeliveryCrashSpec
-    extends AkkaSpec(PersistenceSpec.config(
-            "inmem", "AtLeastOnceDeliveryCrashSpec", serialization = "off"))
+    extends AkkaSpec(
+      PersistenceSpec
+        .config("inmem", "AtLeastOnceDeliveryCrashSpec", serialization = "off"))
     with ImplicitSender {
   import AtLeastOnceDeliveryCrashSpec._
   "At least once delivery" should {
     "not send when actor crashes" in {
       val testProbe = TestProbe()
       def createCrashActorUnderSupervisor() =
-        system.actorOf(Props(new StoppingStrategySupervisor(testProbe.ref)),
-                       "supervisor")
+        system.actorOf(
+          Props(new StoppingStrategySupervisor(testProbe.ref)),
+          "supervisor")
       val superVisor = createCrashActorUnderSupervisor()
       superVisor ! CrashingActor.Message
       testProbe.expectMsgType[CrashingActor.SendingMessage]

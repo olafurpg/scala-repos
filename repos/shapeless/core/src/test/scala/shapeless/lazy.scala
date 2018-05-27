@@ -175,7 +175,8 @@ class LazyStrictTests {
 
   object LazyShows extends CommonShows {
     implicit def showCons[T](
-        implicit st: Lazy[Show[T]], sl: Lazy[Show[List[T]]]): Show[Cons[T]] =
+        implicit st: Lazy[Show[T]],
+        sl: Lazy[Show[List[T]]]): Show[Cons[T]] =
       new Show[Cons[T]] {
         def apply(t: Cons[T]) =
           s"Cons(${show(t.hd)(st.value)}, ${show(t.tl)(sl.value)})"
@@ -184,7 +185,7 @@ class LazyStrictTests {
     implicit def showList[T](implicit sc: Lazy[Show[Cons[T]]]): Show[List[T]] =
       new Show[List[T]] {
         def apply(t: List[T]) = t match {
-          case n: Nil => show(n)
+          case n: Nil     => show(n)
           case c: Cons[T] => show(c)(sc.value)
         }
       }
@@ -201,7 +202,7 @@ class LazyStrictTests {
     implicit def showList[T](implicit sc: Lazy[Show[Cons[T]]]): Show[List[T]] =
       new Show[List[T]] {
         def apply(t: List[T]) = t match {
-          case n: Nil => show(n)
+          case n: Nil     => show(n)
           case c: Cons[T] => show(c)(sc.value)
         }
       }
@@ -315,18 +316,18 @@ class LazyStrictTests {
     trait W[X, Y]
 
     illTyped(
-        "lazily[U[String]]",
-        "No U\\[String]"
+      "lazily[U[String]]",
+      "No U\\[String]"
     )
 
     illTyped(
-        "lazily[V]",
-        "could not find Lazy implicit value of type V"
+      "lazily[V]",
+      "could not find Lazy implicit value of type V"
     )
 
     illTyped(
-        "lazily[W[String, Int]]",
-        "No W\\[String, Int]"
+      "lazily[W[String, Int]]",
+      "No W\\[String, Int]"
     )
   }
 }

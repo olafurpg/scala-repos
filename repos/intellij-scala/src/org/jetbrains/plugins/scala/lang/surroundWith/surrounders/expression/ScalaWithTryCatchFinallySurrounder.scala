@@ -20,7 +20,7 @@ class ScalaWithTryCatchFinallySurrounder extends ScalaExpressionSurrounder {
       if (elements.length == 0) "=>"
       else ScalaPsiUtil.functionArrow(elements(0).getProject)
     "try {\n" + super.getTemplateAsString(elements) +
-    s"\n} catch {\n case _ $arrow \n} finally {}"
+      s"\n} catch {\n case _ $arrow \n} finally {}"
   }
 
   override def getTemplateDescription = "try / catch / finally"
@@ -31,7 +31,7 @@ class ScalaWithTryCatchFinallySurrounder extends ScalaExpressionSurrounder {
       case x: ScParenthesisedExpr =>
         x.expr match {
           case Some(y) => y
-          case _ => return x.getTextRange
+          case _       => return x.getTextRange
         }
       case x => x
     }

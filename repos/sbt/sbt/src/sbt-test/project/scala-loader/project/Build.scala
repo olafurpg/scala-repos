@@ -8,8 +8,9 @@ object Build extends Build {
 
   def checkTask =
     subs.map(sub => scalaInstance in LocalProject(sub.id)).join.map { sis =>
-      assert(sis.sliding(2).forall { case Seq(x, y) => x.loader == y.loader },
-             "Not all ScalaInstances had the same class loader.")
+      assert(
+        sis.sliding(2).forall { case Seq(x, y) => x.loader == y.loader },
+        "Not all ScalaInstances had the same class loader.")
     }
 
   override def projects = root +: subs
@@ -20,6 +21,6 @@ object Build extends Build {
 
   def newProject(i: Int): Project =
     Project("x" + i.toString, file(i.toString)).settings(
-        scalaVersion := "2.9.2" // this should be a Scala version different from the one sbt uses
+      scalaVersion := "2.9.2" // this should be a Scala version different from the one sbt uses
     )
 }

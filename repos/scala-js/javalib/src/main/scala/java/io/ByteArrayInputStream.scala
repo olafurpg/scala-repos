@@ -1,7 +1,9 @@
 package java.io
 
 class ByteArrayInputStream(
-    protected val buf: Array[Byte], offset: Int, length: Int)
+    protected val buf: Array[Byte],
+    offset: Int,
+    length: Int)
     extends InputStream {
 
   protected val count: Int = offset + length

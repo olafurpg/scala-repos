@@ -21,9 +21,10 @@ trait RestResource {
   protected val config: MarathonConf
 
   protected def unknownGroup(
-      id: PathId, version: Option[Timestamp] = None): Response = {
+      id: PathId,
+      version: Option[Timestamp] = None): Response = {
     notFound(
-        s"Group '$id' does not exist" +
+      s"Group '$id' does not exist" +
         version.fold("")(v => s" in version $v"))
   }
 
@@ -31,9 +32,10 @@ trait RestResource {
     notFound(s"Task '$id' does not exist")
 
   protected def unknownApp(
-      id: PathId, version: Option[Timestamp] = None): Response = {
+      id: PathId,
+      version: Option[Timestamp] = None): Response = {
     notFound(
-        s"App '$id' does not exist" + version.fold("")(v => s" in version $v"))
+      s"App '$id' does not exist" + version.fold("")(v => s" in version $v"))
   }
 
   protected def notFound(message: String): Response = {
@@ -44,7 +46,8 @@ trait RestResource {
   }
 
   protected def deploymentResult(
-      d: DeploymentPlan, response: ResponseBuilder = Response.ok()) = {
+      d: DeploymentPlan,
+      response: ResponseBuilder = Response.ok()) = {
     response
       .entity(jsonObjString("version" -> d.version, "deploymentId" -> d.id))
       .build()

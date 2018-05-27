@@ -12,8 +12,9 @@ object Macro {
     */
   def compilePattern(s: String): Pattern = macro Macro.impl
   def impl(c: Context)(s: c.Tree): c.Tree = {
-    def Indy(bootstrapMethod: c.Symbol,
-             bootstrapArgs: List[c.universe.Literal]): c.Tree = {
+    def Indy(
+        bootstrapMethod: c.Symbol,
+        bootstrapArgs: List[c.universe.Literal]): c.Tree = {
       val symtab = c.universe.asInstanceOf[SymbolTable]
       import symtab._
       val dummySymbol = NoSymbol
@@ -22,8 +23,8 @@ object Macro {
       val args: List[Tree] =
         Literal(Constant(bootstrapMethod)).setType(NoType) :: bootstrapArgs
           .asInstanceOf[List[Tree]]
-      val result = ApplyDynamic(
-          Ident(dummySymbol).setType(dummySymbol.info), args)
+      val result =
+        ApplyDynamic(Ident(dummySymbol).setType(dummySymbol.info), args)
       result.setType(dummySymbol.info.resultType)
       result.asInstanceOf[c.Tree]
     }

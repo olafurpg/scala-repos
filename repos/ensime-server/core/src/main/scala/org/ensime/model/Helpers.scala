@@ -34,39 +34,39 @@ trait Helpers { self: Global =>
   def isArrowType(tpe: Type): Boolean = {
     tpe match {
       case _: MethodType => true
-      case _: PolyType => true
-      case _ => false
+      case _: PolyType   => true
+      case _             => false
     }
   }
 
   def isNoParamArrowType(tpe: Type): Boolean = {
     tpe match {
       case t: MethodType => t.paramss.flatten.isEmpty
-      case t: PolyType => t.paramss.flatten.isEmpty
-      case t: Type => false
+      case t: PolyType   => t.paramss.flatten.isEmpty
+      case t: Type       => false
     }
   }
 
   def typeOrArrowTypeResult(tpe: Type): Type = {
     tpe match {
       case t: MethodType => t.finalResultType
-      case t: PolyType => t.finalResultType
-      case t: Type => t
+      case t: PolyType   => t.finalResultType
+      case t: Type       => t
     }
   }
 
   def completionSignatureForType(tpe: Type): CompletionSignature = {
     if (isArrowType(tpe)) {
       CompletionSignature(
-          tpe.paramss.map { sect =>
-            sect.map { p =>
-              (p.name.toString, typeFullName(p.tpe, true))
-            }
-          },
-          typeFullName(tpe.finalResultType, true),
-          tpe.paramss.exists { sect =>
-            sect.exists(_.isImplicit)
+        tpe.paramss.map { sect =>
+          sect.map { p =>
+            (p.name.toString, typeFullName(p.tpe, true))
           }
+        },
+        typeFullName(tpe.finalResultType, true),
+        tpe.paramss.exists { sect =>
+          sect.exists(_.isImplicit)
+        }
       )
     } else CompletionSignature(List.empty, typeFullName(tpe, true), false)
   }
@@ -127,9 +127,9 @@ trait Helpers { self: Global =>
       }
     if (withTpeArgs) {
       withoutArgs +
-      (if (tpe.typeArgs.size > 0) {
-         "[" + tpe.typeArgs.map(typeFullName(_, true)).mkString(", ") + "]"
-       } else { "" })
+        (if (tpe.typeArgs.size > 0) {
+           "[" + tpe.typeArgs.map(typeFullName(_, true)).mkString(", ") + "]"
+         } else { "" })
     } else withoutArgs
   }
 
@@ -147,7 +147,8 @@ trait Helpers { self: Global =>
     * Returns the type, object, or package symbol uniquely identified by name.
     */
   protected def symbolByName(
-      name: String, rootSymbol: Symbol = RootClass): Option[Symbol] = {
+      name: String,
+      rootSymbol: Symbol = RootClass): Option[Symbol] = {
     def segments(name: String): List[Name] = {
       val len = name.length
       if (len == 0) {
@@ -156,7 +157,7 @@ trait Helpers { self: Global =>
 
       val idx = name.indexWhere(ch => ch == '.' || ch == '$')
       idx match {
-        case 0 => throw new IllegalArgumentException("Empty symbol part")
+        case 0  => throw new IllegalArgumentException("Empty symbol part")
         case -1 =>
           // Last part of symbol, no '$' -> a class
           return List(newTypeName(name))
@@ -168,7 +169,7 @@ trait Helpers { self: Global =>
       if (div == '.') {
         if (rest == "") {
           throw new IllegalArgumentException(
-              "Unexpected period at end of symbol name")
+            "Unexpected period at end of symbol name")
         } else {
           // part ends with '.' : a package
           newTermName(cur) :: segments(rest)
@@ -194,9 +195,9 @@ trait Helpers { self: Global =>
     }
     try {
       sym match {
-        case NoSymbol => None
+        case NoSymbol    => None
         case sym: Symbol => Some(sym)
-        case _ => None
+        case _           => None
       }
     } catch {
       case e: Throwable => None
@@ -240,8 +241,8 @@ trait Helpers { self: Global =>
     */
   def packageSymFromPath(path: String): Option[Symbol] = {
     symbolByName(
-        if (path.endsWith("$")) path else path + "$",
-        RootPackage
+      if (path.endsWith("$")) path else path + "$",
+      RootPackage
     ).find { s =>
       s.hasPackageFlag
     }
@@ -259,7 +260,7 @@ trait Helpers { self: Global =>
         s != EmptyPackage && !isRoot(s) &&
         // This check is necessary to prevent infinite looping..
         ((isRoot(s.owner) && isRoot(parent)) ||
-            (s.owner.fullName == parent.fullName))
+        (s.owner.fullName == parent.fullName))
       }
 
       // the nameString operation is depressingly expensive - mapping to tuples first reduces the overhead.

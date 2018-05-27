@@ -22,8 +22,8 @@ import kafka.utils.{Pool, threadsafe}
 import java.util.concurrent.TimeUnit
 
 @deprecated(
-    "This class has been deprecated and will be removed in a future release.",
-    "0.10.0.0")
+  "This class has been deprecated and will be removed in a future release.",
+  "0.10.0.0")
 @threadsafe
 class ProducerTopicMetrics(metricId: ClientIdTopic) extends KafkaMetricsGroup {
   val tags = metricId match {
@@ -32,11 +32,11 @@ class ProducerTopicMetrics(metricId: ClientIdTopic) extends KafkaMetricsGroup {
     case ClientIdAllTopics(clientId) => Map("clientId" -> clientId)
   }
 
-  val messageRate = newMeter(
-      "MessagesPerSec", "messages", TimeUnit.SECONDS, tags)
+  val messageRate =
+    newMeter("MessagesPerSec", "messages", TimeUnit.SECONDS, tags)
   val byteRate = newMeter("BytesPerSec", "bytes", TimeUnit.SECONDS, tags)
-  val droppedMessageRate = newMeter(
-      "DroppedMessagesPerSec", "drops", TimeUnit.SECONDS, tags)
+  val droppedMessageRate =
+    newMeter("DroppedMessagesPerSec", "drops", TimeUnit.SECONDS, tags)
 }
 
 /**
@@ -44,14 +44,14 @@ class ProducerTopicMetrics(metricId: ClientIdTopic) extends KafkaMetricsGroup {
   * @param clientId The clientId of the given producer client.
   */
 @deprecated(
-    "This class has been deprecated and will be removed in a future release.",
-    "0.10.0.0")
+  "This class has been deprecated and will be removed in a future release.",
+  "0.10.0.0")
 class ProducerTopicStats(clientId: String) {
   private val valueFactory = (k: ClientIdTopic) => new ProducerTopicMetrics(k)
   private val stats =
     new Pool[ClientIdTopic, ProducerTopicMetrics](Some(valueFactory))
   private val allTopicsStats = new ProducerTopicMetrics(new ClientIdAllTopics(
-          clientId)) // to differentiate from a topic named AllTopics
+    clientId)) // to differentiate from a topic named AllTopics
 
   def getProducerAllTopicsStats(): ProducerTopicMetrics = allTopicsStats
 
@@ -64,8 +64,8 @@ class ProducerTopicStats(clientId: String) {
   * Stores the topic stats information of each producer client in a (clientId -> ProducerTopicStats) map.
   */
 @deprecated(
-    "This object has been deprecated and will be removed in a future release.",
-    "0.10.0.0")
+  "This object has been deprecated and will be removed in a future release.",
+  "0.10.0.0")
 object ProducerTopicStatsRegistry {
   private val valueFactory = (k: String) => new ProducerTopicStats(k)
   private val globalStats =

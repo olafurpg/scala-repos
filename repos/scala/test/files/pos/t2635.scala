@@ -7,7 +7,7 @@ object Test {
     val sc: Option[Class[_ <: Base]] = Some(classOf[Base])
     sc match {
       case Some(c) => run(c)
-      case None =>
+      case None    =>
     }
   }
 }

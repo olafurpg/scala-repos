@@ -13,7 +13,8 @@ package math
   *  extend ScalaNumber (which excludes value classes.)
   */
 trait ScalaNumericConversions
-    extends ScalaNumber with ScalaNumericAnyConversions {
+    extends ScalaNumber
+    with ScalaNumericAnyConversions {
   def underlying(): Object
 }
 
@@ -110,13 +111,13 @@ trait ScalaNumericAnyConversions extends Any {
     *  interface available here to prevent this error.
     */
   protected def unifiedPrimitiveEquals(x: Any) = x match {
-    case x: Char => isValidChar && (toInt == x.toInt)
-    case x: Byte => isValidByte && (toByte == x)
-    case x: Short => isValidShort && (toShort == x)
-    case x: Int => isValidInt && (toInt == x)
-    case x: Long => toLong == x
-    case x: Float => toFloat == x
+    case x: Char   => isValidChar && (toInt == x.toInt)
+    case x: Byte   => isValidByte && (toByte == x)
+    case x: Short  => isValidShort && (toShort == x)
+    case x: Int    => isValidInt && (toInt == x)
+    case x: Long   => toLong == x
+    case x: Float  => toFloat == x
     case x: Double => toDouble == x
-    case _ => false
+    case _         => false
   }
 }

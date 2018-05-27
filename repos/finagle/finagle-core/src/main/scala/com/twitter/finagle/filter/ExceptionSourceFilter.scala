@@ -1,6 +1,15 @@
 package com.twitter.finagle.filter
 
-import com.twitter.finagle.{param, SimpleFilter, Service, ServiceFactory, SourcedException, Stack, Stackable, Failure}
+import com.twitter.finagle.{
+  param,
+  SimpleFilter,
+  Service,
+  ServiceFactory,
+  SourcedException,
+  Stack,
+  Stackable,
+  Failure
+}
 import com.twitter.util.Future
 
 private[finagle] object ExceptionSourceFilter {
@@ -30,7 +39,8 @@ private[finagle] object ExceptionSourceFilter {
 class ExceptionSourceFilter[Req, Rep](serviceName: String)
     extends SimpleFilter[Req, Rep] {
 
-  private[this] val addExceptionSource: PartialFunction[Throwable, Future[Rep]] = {
+  private[this] val addExceptionSource
+    : PartialFunction[Throwable, Future[Rep]] = {
     case f: Failure =>
       Future.exception(f.withSource(Failure.Source.Service, serviceName))
     case e: SourcedException =>

@@ -9,8 +9,26 @@ import java.lang.ref.WeakReference
 import java.util.concurrent.locks.ReentrantLock
 import scala.annotation.tailrec
 import com.typesafe.config.Config
-import akka.actor.{ActorInitializationException, ExtensionIdProvider, ExtensionId, Extension, ExtendedActorSystem, ActorRef, ActorCell}
-import akka.dispatch.{MessageQueue, MailboxType, TaskInvocation, MessageDispatcherConfigurator, MessageDispatcher, Mailbox, Envelope, DispatcherPrerequisites, DefaultSystemMessageQueue}
+import akka.actor.{
+  ActorInitializationException,
+  ExtensionIdProvider,
+  ExtensionId,
+  Extension,
+  ExtendedActorSystem,
+  ActorRef,
+  ActorCell
+}
+import akka.dispatch.{
+  MessageQueue,
+  MailboxType,
+  TaskInvocation,
+  MessageDispatcherConfigurator,
+  MessageDispatcher,
+  Mailbox,
+  Envelope,
+  DispatcherPrerequisites,
+  DefaultSystemMessageQueue
+}
 import akka.dispatch.sysmsg.{SystemMessage, Suspend, Resume}
 import scala.concurrent.duration._
 import akka.util.Switch
@@ -54,8 +72,9 @@ private[testkit] class CallingThreadDispatcherQueues extends Extension {
 
   // we have to forget about long-gone threads sometime
   private def gc(): Unit = {
-    queues =
-    (Map.newBuilder[CallingThreadMailbox, Set[WeakReference[MessageQueue]]] /: queues) {
+    queues = (Map.newBuilder[
+      CallingThreadMailbox,
+      Set[WeakReference[MessageQueue]]] /: queues) {
       case (m, (k, v)) ⇒
         val nv = v filter (_.get ne null)
         if (nv.isEmpty) m else m += (k -> nv)
@@ -63,7 +82,8 @@ private[testkit] class CallingThreadDispatcherQueues extends Extension {
   }
 
   protected[akka] def registerQueue(
-      mbox: CallingThreadMailbox, q: MessageQueue): Unit = synchronized {
+      mbox: CallingThreadMailbox,
+      q: MessageQueue): Unit = synchronized {
     if (queues contains mbox) {
       val newSet = queues(mbox) + new WeakReference(q)
       queues += mbox -> newSet
@@ -88,7 +108,8 @@ private[testkit] class CallingThreadDispatcherQueues extends Extension {
    * (active).
    */
   protected[akka] def gatherFromAllOtherQueues(
-      mbox: CallingThreadMailbox, own: MessageQueue): Unit = synchronized {
+      mbox: CallingThreadMailbox,
+      own: MessageQueue): Unit = synchronized {
     if (queues contains mbox) {
       for {
         ref ← queues(mbox)
@@ -143,7 +164,8 @@ class CallingThreadDispatcher(_configurator: MessageDispatcherConfigurator)
   override def id: String = Id
 
   protected[akka] override def createMailbox(
-      actor: akka.actor.Cell, mailboxType: MailboxType) =
+      actor: akka.actor.Cell,
+      mailboxType: MailboxType) =
     new CallingThreadMailbox(actor, mailboxType)
 
   protected[akka] override def shutdown() {}
@@ -165,7 +187,7 @@ class CallingThreadDispatcher(_configurator: MessageDispatcherConfigurator)
         runQueue(mbox, queue)
       case x ⇒
         throw ActorInitializationException(
-            "expected CallingThreadMailbox, got " + x.getClass)
+          "expected CallingThreadMailbox, got " + x.getClass)
     }
   }
 
@@ -200,7 +222,8 @@ class CallingThreadDispatcher(_configurator: MessageDispatcherConfigurator)
   }
 
   protected[akka] override def systemDispatch(
-      receiver: ActorCell, message: SystemMessage) {
+      receiver: ActorCell,
+      message: SystemMessage) {
     receiver.mailbox match {
       case mbox: CallingThreadMailbox ⇒
         mbox.systemEnqueue(receiver.self, message)
@@ -209,8 +232,7 @@ class CallingThreadDispatcher(_configurator: MessageDispatcherConfigurator)
     }
   }
 
-  protected[akka] override def dispatch(
-      receiver: ActorCell, handle: Envelope) {
+  protected[akka] override def dispatch(receiver: ActorCell, handle: Envelope) {
     receiver.mailbox match {
       case mbox: CallingThreadMailbox ⇒
         val queue = mbox.queue
@@ -238,15 +260,16 @@ class CallingThreadDispatcher(_configurator: MessageDispatcherConfigurator)
    * it is suspendSwitch and resumed.
    */
   @tailrec
-  private def runQueue(mbox: CallingThreadMailbox,
-                       queue: MessageQueue,
-                       interruptedEx: InterruptedException = null) {
+  private def runQueue(
+      mbox: CallingThreadMailbox,
+      queue: MessageQueue,
+      interruptedEx: InterruptedException = null) {
     def checkThreadInterruption(
         intEx: InterruptedException): InterruptedException = {
       if (Thread.interrupted()) {
         // clear interrupted flag before we continue, exception will be thrown later
         val ie = new InterruptedException(
-            "Interrupted during message processing")
+          "Interrupted during message processing")
         log.error(ie, "Interrupted during message processing")
         ie
       } else intEx
@@ -255,7 +278,8 @@ class CallingThreadDispatcher(_configurator: MessageDispatcherConfigurator)
     def throwInterruptionIfExistsOrSet(intEx: InterruptedException): Unit = {
       val ie = checkThreadInterruption(intEx)
       if (ie ne null) {
-        Thread.interrupted() // clear interrupted flag before throwing according to java convention
+        Thread
+          .interrupted() // clear interrupted flag before throwing according to java convention
         throw ie
       }
     }
@@ -278,7 +302,8 @@ class CallingThreadDispatcher(_configurator: MessageDispatcherConfigurator)
           } catch {
             case ie: InterruptedException ⇒
               log.error(ie, "Interrupted during message processing")
-              Thread.interrupted() // clear interrupted flag before we continue, exception will be thrown later
+              Thread
+                .interrupted() // clear interrupted flag before we continue, exception will be thrown later
               intex = ie
               true
             case NonFatal(e) ⇒
@@ -299,7 +324,8 @@ class CallingThreadDispatcher(_configurator: MessageDispatcherConfigurator)
         mbox.ctdLock.tryLock(50, TimeUnit.MILLISECONDS)
       } catch {
         case ie: InterruptedException ⇒
-          Thread.interrupted() // clear interrupted flag before we continue, exception will be thrown later
+          Thread
+            .interrupted() // clear interrupted flag before we continue, exception will be thrown later
           intex = ie
           false
       }
@@ -323,7 +349,8 @@ class CallingThreadDispatcher(_configurator: MessageDispatcherConfigurator)
 }
 
 class CallingThreadDispatcherConfigurator(
-    config: Config, prerequisites: DispatcherPrerequisites)
+    config: Config,
+    prerequisites: DispatcherPrerequisites)
     extends MessageDispatcherConfigurator(config, prerequisites) {
 
   private val instance = new CallingThreadDispatcher(this)
@@ -332,8 +359,10 @@ class CallingThreadDispatcherConfigurator(
 }
 
 class CallingThreadMailbox(
-    _receiver: akka.actor.Cell, val mailboxType: MailboxType)
-    extends Mailbox(null) with DefaultSystemMessageQueue {
+    _receiver: akka.actor.Cell,
+    val mailboxType: MailboxType)
+    extends Mailbox(null)
+    with DefaultSystemMessageQueue {
 
   val system = _receiver.system
   val self = _receiver.self
@@ -341,8 +370,8 @@ class CallingThreadMailbox(
   private val q = new ThreadLocal[MessageQueue]() {
     override def initialValue = {
       val queue = mailboxType.create(Some(self), Some(system))
-      CallingThreadDispatcherQueues(system).registerQueue(
-          CallingThreadMailbox.this, queue)
+      CallingThreadDispatcherQueues(system)
+        .registerQueue(CallingThreadMailbox.this, queue)
       queue
     }
   }
@@ -357,7 +386,7 @@ class CallingThreadMailbox(
     q.get.enqueue(receiver, msg)
   override def dequeue(): Envelope =
     throw new UnsupportedOperationException(
-        "CallingThreadMailbox cannot dequeue normally")
+      "CallingThreadMailbox cannot dequeue normally")
   override def hasMessages: Boolean = q.get.hasMessages
   override def numberOfMessages: Int = 0
 
@@ -377,8 +406,9 @@ class CallingThreadMailbox(
       CallingThreadDispatcherQueues(actor.system)
         .gatherFromAllOtherQueues(this, qq)
       super.cleanUp()
-      qq.cleanUp(actor.self,
-                 actor.dispatcher.mailboxes.deadLetterMailbox.messageQueue)
+      qq.cleanUp(
+        actor.self,
+        actor.dispatcher.mailboxes.deadLetterMailbox.messageQueue)
       q.remove()
     }
   }

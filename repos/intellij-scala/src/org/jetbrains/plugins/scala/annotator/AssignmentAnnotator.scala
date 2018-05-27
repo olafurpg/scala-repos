@@ -9,7 +9,11 @@ import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScClassParameter
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScValue, ScVariable}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction,
+  ScValue,
+  ScVariable
+}
 import org.jetbrains.plugins.scala.lang.psi.types._
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 import org.jetbrains.plugins.scala.lang.resolve.ResolvableReferenceExpression
@@ -18,9 +22,10 @@ import org.jetbrains.plugins.scala.lang.resolve.ResolvableReferenceExpression
   * Pavel.Fatin, 31.05.2010
   */
 trait AssignmentAnnotator {
-  def annotateAssignment(assignment: ScAssignStmt,
-                         holder: AnnotationHolder,
-                         advancedHighlighting: Boolean) {
+  def annotateAssignment(
+      assignment: ScAssignStmt,
+      holder: AnnotationHolder,
+      advancedHighlighting: Boolean) {
     val left = assignment.getLExpression
     val right = assignment.getRExpression
 
@@ -30,7 +35,7 @@ trait AssignmentAnnotator {
         ref.bind() match {
           case Some(r)
               if r.isDynamic &&
-              r.name == ResolvableReferenceExpression.UPDATE_DYNAMIC =>
+                r.name == ResolvableReferenceExpression.UPDATE_DYNAMIC =>
           //ignore
           case Some(r) if !r.isNamedParameter =>
             def checkVariable() {
@@ -42,9 +47,10 @@ trait AssignmentAnnotator {
                         val (expectedText, actualText) =
                           ScTypePresentation.different(lType, rType)
                         val message =
-                          ScalaBundle.message("type.mismatch.expected.actual",
-                                              expectedText,
-                                              actualText)
+                          ScalaBundle.message(
+                            "type.mismatch.expected.actual",
+                            expectedText,
+                            actualText)
                         val annotation =
                           holder.createErrorAnnotation(expression, message)
                         annotation.registerFix(ReportHighlightingErrorQuickFix)
@@ -76,13 +82,13 @@ trait AssignmentAnnotator {
                             val (expectedText, actualText) =
                               ScTypePresentation.different(expectedType, t)
                             val message = ScalaBundle.message(
-                                "type.mismatch.expected.actual",
-                                expectedText,
-                                actualText)
+                              "type.mismatch.expected.actual",
+                              expectedText,
+                              actualText)
                             val annotation =
                               holder.createErrorAnnotation(expression, message)
                             annotation.registerFix(
-                                ReportHighlightingErrorQuickFix)
+                              ReportHighlightingErrorQuickFix)
                           } else {
                           //TODO investigate case when expression is null. It's possible when new Expression(ScType)
                         }
@@ -91,14 +97,16 @@ trait AssignmentAnnotator {
                       case UnresolvedParameter(_) =>
                       // don't show function inapplicability, unresolved
                       case WrongTypeParameterInferred => //todo: ?
-                      case ExpectedTypeMismatch => // will be reported later
+                      case ExpectedTypeMismatch       => // will be reported later
                       case _ =>
                         holder.createErrorAnnotation(
-                            assignment, "Wrong right assignment side")
+                          assignment,
+                          "Wrong right assignment side")
                     }
                   case _ =>
                     holder.createErrorAnnotation(
-                        assignment, "Reassignment to val")
+                      assignment,
+                      "Reassignment to val")
                 }
               case f: ScFunction =>
                 holder.createErrorAnnotation(assignment, "Reassignment to val")
@@ -108,15 +116,18 @@ trait AssignmentAnnotator {
                   case c: PsiClass if c.isAnnotationType => //do nothing
                   case _ =>
                     holder.createErrorAnnotation(
-                        assignment, "Reassignment to val")
+                      assignment,
+                      "Reassignment to val")
                 }
               case v: ScValue =>
                 val annotation = holder.createErrorAnnotation(
-                    assignment, "Reassignment to val")
+                  assignment,
+                  "Reassignment to val")
                 annotation.registerFix(
-                    new ValToVarQuickFix(ScalaPsiUtil
-                          .nameContext(r.element)
-                          .asInstanceOf[ScValue]))
+                  new ValToVarQuickFix(
+                    ScalaPsiUtil
+                      .nameContext(r.element)
+                      .asInstanceOf[ScValue]))
               case _ =>
                 holder.createErrorAnnotation(assignment, "Reassignment to val")
             }

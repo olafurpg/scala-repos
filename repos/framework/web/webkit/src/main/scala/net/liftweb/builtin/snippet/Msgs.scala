@@ -70,35 +70,36 @@ object Msgs extends DispatchSnippet {
     ShowAll(toBoolean(S.attr("showAll") or S.attr("showall")))
 
     // Extract user-specified titles and CSS classes for later use
-    List((NoticeType.Error, MsgsErrorMeta),
-         (NoticeType.Warning, MsgsWarningMeta),
-         (NoticeType.Notice, MsgsNoticeMeta)).foreach {
+    List(
+      (NoticeType.Error, MsgsErrorMeta),
+      (NoticeType.Warning, MsgsWarningMeta),
+      (NoticeType.Notice, MsgsNoticeMeta)).foreach {
       case (noticeType, ajaxStorage) => {
-          // Extract the title if provided, or default to none. Allow for XML nodes
-          // so that people can localize, etc.
-          val title: NodeSeq = (styles \\ noticeType.titleTag)
-            .filter(_.prefix == "lift")
-            .flatMap(_.child)
+        // Extract the title if provided, or default to none. Allow for XML nodes
+        // so that people can localize, etc.
+        val title: NodeSeq = (styles \\ noticeType.titleTag)
+          .filter(_.prefix == "lift")
+          .flatMap(_.child)
 
-          // Extract any provided classes for the messages
-          val cssClasses = ((styles \\ noticeType.styleTag) ++
-              (styles \\ noticeType.titleTag \\ "@class")).toList
-            .map(_.text.trim) match {
-            case Nil => Empty
-            case classes => Full(classes.mkString(" "))
-          }
-
-          // Save the settings for AJAX usage
-          ajaxStorage(Full(AjaxMessageMeta(title, cssClasses)))
+        // Extract any provided classes for the messages
+        val cssClasses = ((styles \\ noticeType.styleTag) ++
+          (styles \\ noticeType.titleTag \\ "@class")).toList
+          .map(_.text.trim) match {
+          case Nil     => Empty
+          case classes => Full(classes.mkString(" "))
         }
+
+        // Save the settings for AJAX usage
+        ajaxStorage(Full(AjaxMessageMeta(title, cssClasses)))
+      }
     }
 
     // Delegate the actual rendering to a shared method so that we don't
     // duplicate code for the AJAX pipeline
     (<div>{renderNotices()}</div> % ("id" -> LiftRules.noticesContainerId)) ++ noticesFadeOut(
-        NoticeType.Notice) ++ noticesFadeOut(NoticeType.Warning) ++ noticesFadeOut(
-        NoticeType.Error) ++ effects(NoticeType.Notice) ++ effects(
-        NoticeType.Warning) ++ effects(NoticeType.Error)
+      NoticeType.Notice) ++ noticesFadeOut(NoticeType.Warning) ++ noticesFadeOut(
+      NoticeType.Error) ++ effects(NoticeType.Notice) ++ effects(
+      NoticeType.Warning) ++ effects(NoticeType.Error)
   }
 
   /**
@@ -116,33 +117,36 @@ object Msgs extends DispatchSnippet {
 
     // Compute the formatted set of messages for a given input
     def computeMessageDiv(
-        args: (List[(NodeSeq, Box[String])], NoticeType.Value,
-        SessionVar[Box[AjaxMessageMeta]])): NodeSeq = args match {
+        args: (
+            List[(NodeSeq, Box[String])],
+            NoticeType.Value,
+            SessionVar[Box[AjaxMessageMeta]])): NodeSeq = args match {
       case (messages, noticeType, ajaxStorage) =>
         // get current settings
         val title = ajaxStorage.get.map(_.title) openOr Text("")
         val styles = ajaxStorage.get.flatMap(_.cssClasses)
 
         // Compute the resulting div
-        f(messages).toList.map(e => ( <li>{e}</li>)) match {
+        f(messages).toList.map(e => (<li>{e}</li>)) match {
           case Nil => Nil
           case msgList => {
-              val ret = <div id={noticeType.id}>{title}<ul>{msgList}</ul></div>
-              styles.foldLeft(ret)((xml, style) =>
-                    xml % new UnprefixedAttribute("class", Text(style), Null))
-            }
+            val ret = <div id={noticeType.id}>{title}<ul>{msgList}</ul></div>
+            styles.foldLeft(ret)((xml, style) =>
+              xml % new UnprefixedAttribute("class", Text(style), Null))
+          }
         }
     }
 
     // Render all three types together
-    List((S.errors, NoticeType.Error, MsgsErrorMeta),
-         (S.warnings, NoticeType.Warning, MsgsWarningMeta),
-         (S.notices, NoticeType.Notice, MsgsNoticeMeta))
+    List(
+      (S.errors, NoticeType.Error, MsgsErrorMeta),
+      (S.warnings, NoticeType.Warning, MsgsWarningMeta),
+      (S.notices, NoticeType.Notice, MsgsNoticeMeta))
       .flatMap(computeMessageDiv)
   }
 
   /**
-    *  This method wraps the JavaScript fade and effect scripts into lift's page 
+    *  This method wraps the JavaScript fade and effect scripts into lift's page
     *  script that runs onLoad.
     */
   private[snippet] def appendScript(script: JsCmd): NodeSeq = {
@@ -159,17 +163,18 @@ object Msgs extends DispatchSnippet {
     * @see net.liftweb.http.LiftRules.noticesAutoFadeOut
     */
   def noticesFadeOut[T](
-      noticeType: NoticeType.Value, default: T, wrap: JsCmd => T): T =
+      noticeType: NoticeType.Value,
+      default: T,
+      wrap: JsCmd => T): T =
     LiftRules.noticesAutoFadeOut()(noticeType) map {
       case (duration, fadeTime) => {
-          wrap(
-              LiftRules.jsArtifacts.fadeOut(noticeType.id, duration, fadeTime))
-        }
+        wrap(LiftRules.jsArtifacts.fadeOut(noticeType.id, duration, fadeTime))
+      }
     } openOr default
 
   /**
     * This method produces and appends a script element to lift's page script
-    * to fade out the given notice type. 
+    * to fade out the given notice type.
     *
     * @see net.liftweb.http.LiftRules.noticesAutoFadeOut
     */
@@ -184,13 +189,14 @@ object Msgs extends DispatchSnippet {
     *
     * @see net.liftweb.http.LiftRules.noticesEffects
     */
-  def effects[T](noticeType: Box[NoticeType.Value],
-                 id: String,
-                 default: T,
-                 wrap: JsCmd => T): T =
+  def effects[T](
+      noticeType: Box[NoticeType.Value],
+      id: String,
+      default: T,
+      wrap: JsCmd => T): T =
     LiftRules.noticesEffects()(noticeType, id) match {
       case Full(jsCmd) => wrap(jsCmd)
-      case _ => default
+      case _           => default
     }
 
   /**

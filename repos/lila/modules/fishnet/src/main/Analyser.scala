@@ -7,10 +7,11 @@ import chess.format.{FEN, Forsyth}
 import lila.game.{Game, GameRepo, UciMemo}
 import lila.analyse.AnalysisRepo
 
-final class Analyser(repo: FishnetRepo,
-                     uciMemo: UciMemo,
-                     sequencer: lila.hub.FutureSequencer,
-                     limiter: Limiter) {
+final class Analyser(
+    repo: FishnetRepo,
+    uciMemo: UciMemo,
+    sequencer: lila.hub.FutureSequencer,
+    limiter: Limiter) {
 
   val maxPlies = 200
 
@@ -51,16 +52,18 @@ final class Analyser(repo: FishnetRepo,
     GameRepo.initialFen(game) zip uciMemo.get(game) map {
       case (initialFen, moves) =>
         Work.Analysis(
-            _id = Work.makeId,
-            sender = sender,
-            game = Work.Game(id = game.id,
-                             initialFen = initialFen map FEN.apply,
-                             variant = game.variant,
-                             moves = moves.take(maxPlies) mkString " "),
-            startPly = game.startedAtTurn,
-            nbPly = game.turns,
-            tries = 0,
-            acquired = None,
-            createdAt = DateTime.now)
+          _id = Work.makeId,
+          sender = sender,
+          game = Work.Game(
+            id = game.id,
+            initialFen = initialFen map FEN.apply,
+            variant = game.variant,
+            moves = moves.take(maxPlies) mkString " "),
+          startPly = game.startedAtTurn,
+          nbPly = game.turns,
+          tries = 0,
+          acquired = None,
+          createdAt = DateTime.now
+        )
     }
 }

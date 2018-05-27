@@ -152,8 +152,7 @@ trait CellIncludes {
     * @return $SFX $XOTTC
     */
   implicit def jfxChoiceBoxTreeTableCell2sfx[S, T](
-      cell: jfxscc.ChoiceBoxTreeTableCell[S, T])
-    : ChoiceBoxTreeTableCell[S, T] =
+      cell: jfxscc.ChoiceBoxTreeTableCell[S, T]): ChoiceBoxTreeTableCell[S, T] =
     if (cell != null) new ChoiceBoxTreeTableCell[S, T](cell) else null
 
   /**
@@ -254,7 +253,6 @@ trait CellIncludes {
     * @return $SFX $TXTTC
     */
   implicit def jfxTextFieldTreeTableCell2sfx[S, T](
-      cell: jfxscc.TextFieldTreeTableCell[S, T])
-    : TextFieldTreeTableCell[S, T] =
+      cell: jfxscc.TextFieldTreeTableCell[S, T]): TextFieldTreeTableCell[S, T] =
     if (cell != null) new TextFieldTreeTableCell[S, T](cell) else null
 }

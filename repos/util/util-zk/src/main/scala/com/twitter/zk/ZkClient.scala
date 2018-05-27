@@ -88,17 +88,18 @@ object ZkClient {
   }
 
   /** Build a ZkClient with a NativeConnector */
-  def apply(connectString: String,
-            connectTimeout: Option[Duration],
-            sessionTimeout: Duration)(implicit timer: Timer): ZkClient = {
-    apply(
-        NativeConnector(connectString, connectTimeout, sessionTimeout, timer))
+  def apply(
+      connectString: String,
+      connectTimeout: Option[Duration],
+      sessionTimeout: Duration)(implicit timer: Timer): ZkClient = {
+    apply(NativeConnector(connectString, connectTimeout, sessionTimeout, timer))
   }
 
   /** Build a ZkClient with a NativeConnector */
-  def apply(connectString: String,
-            connectTimeout: Duration,
-            sessionTimeout: Duration)(implicit timer: Timer): ZkClient = {
+  def apply(
+      connectString: String,
+      connectTimeout: Duration,
+      sessionTimeout: Duration)(implicit timer: Timer): ZkClient = {
     apply(connectString, Some(connectTimeout), sessionTimeout)(timer)
   }
 

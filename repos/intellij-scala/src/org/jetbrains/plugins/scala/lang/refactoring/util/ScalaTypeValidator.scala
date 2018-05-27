@@ -19,35 +19,40 @@ import scala.collection.mutable.ArrayBuffer
   * on 8/3/15
   */
 object ScalaTypeValidator {
-  def apply(conflictsReporter: ConflictsReporter,
-            project: Project,
-            element: PsiElement,
-            container: PsiElement,
-            noOccurrences: Boolean): ScalaTypeValidator = {
-    new ScalaTypeValidator(conflictsReporter,
-                           project,
-                           element,
-                           noOccurrences,
-                           container,
-                           container)
+  def apply(
+      conflictsReporter: ConflictsReporter,
+      project: Project,
+      element: PsiElement,
+      container: PsiElement,
+      noOccurrences: Boolean): ScalaTypeValidator = {
+    new ScalaTypeValidator(
+      conflictsReporter,
+      project,
+      element,
+      noOccurrences,
+      container,
+      container)
   }
 }
 
-class ScalaTypeValidator(val conflictsReporter: ConflictsReporter,
-                         val myProject: Project,
-                         val selectedElement: PsiElement,
-                         val noOccurrences: Boolean,
-                         val enclosingContainerAll: PsiElement,
-                         val enclosingOne: PsiElement)
-    extends ScalaValidator(conflictsReporter,
-                           myProject,
-                           selectedElement,
-                           noOccurrences,
-                           enclosingContainerAll,
-                           enclosingOne) {
+class ScalaTypeValidator(
+    val conflictsReporter: ConflictsReporter,
+    val myProject: Project,
+    val selectedElement: PsiElement,
+    val noOccurrences: Boolean,
+    val enclosingContainerAll: PsiElement,
+    val enclosingOne: PsiElement)
+    extends ScalaValidator(
+      conflictsReporter,
+      myProject,
+      selectedElement,
+      noOccurrences,
+      enclosingContainerAll,
+      enclosingOne) {
 
   override def findConflicts(
-      name: String, allOcc: Boolean): Array[(PsiNamedElement, String)] = {
+      name: String,
+      allOcc: Boolean): Array[(PsiNamedElement, String)] = {
     //returns declaration and message
     val container = enclosingContainer(allOcc)
     if (container == null) return Array()
@@ -67,7 +72,9 @@ class ScalaTypeValidator(val conflictsReporter: ConflictsReporter,
         extends BaseProcessor(ValueSet(ResolveTargets.CLASS)) {
       val buf = new ArrayBuffer[(PsiNamedElement, String)]
 
-      override def execute(element: PsiElement, state: ResolveState): Boolean = {
+      override def execute(
+          element: PsiElement,
+          state: ResolveState): Boolean = {
         element match {
           case typeAlias: ScTypeAlias if typeAlias.getName == name =>
             buf += ((typeAlias, messageForTypeAliasMember(name)))
@@ -104,7 +111,8 @@ class ScalaTypeValidator(val conflictsReporter: ConflictsReporter,
       case typeDefinition: ScTypeDefinition =>
         if ((typeDefinition.getName == name) &&
             (PsiTreeUtil.getParentOfType(
-                    typeDefinition, classOf[ScFunctionDefinition]) == null)) {
+              typeDefinition,
+              classOf[ScFunctionDefinition]) == null)) {
           buf += ((typeDefinition, messageForClassMember(name)))
         }
         true
@@ -120,9 +128,11 @@ class ScalaTypeValidator(val conflictsReporter: ConflictsReporter,
 
   private def messageForTypeAliasMember(name: String) =
     ScalaBundle.message(
-        "introduced.typealias.will.conflict.with.type.name", name)
+      "introduced.typealias.will.conflict.with.type.name",
+      name)
 
   private def messageForClassMember(name: String) =
     ScalaBundle.message(
-        "introduced.typealias.will.conflict.with.class.name", name)
+      "introduced.typealias.will.conflict.with.class.name",
+      name)
 }

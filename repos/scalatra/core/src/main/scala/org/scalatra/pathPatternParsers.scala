@@ -28,8 +28,8 @@ case class PathPattern(regex: Regex, captureGroupNames: List[String] = Nil) {
   }
 
   def +(pathPattern: PathPattern): PathPattern = PathPattern(
-      new Regex(this.regex.toString + pathPattern.regex.toString),
-      this.captureGroupNames ::: pathPattern.captureGroupNames
+    new Regex(this.regex.toString + pathPattern.regex.toString),
+    this.captureGroupNames ::: pathPattern.captureGroupNames
   )
 }
 
@@ -53,13 +53,14 @@ trait RegexPathPatternParser extends PathPatternParser with RegexParsers {
     * strings are not valid regexes, so we wait to compile until the end.
     */
   protected case class PartialPathPattern(
-      regex: String, captureGroupNames: List[String] = Nil) {
+      regex: String,
+      captureGroupNames: List[String] = Nil) {
 
     def toPathPattern: PathPattern = PathPattern(regex.r, captureGroupNames)
 
     def +(other: PartialPathPattern): PartialPathPattern = PartialPathPattern(
-        this.regex + other.regex,
-        this.captureGroupNames ::: other.captureGroupNames
+      this.regex + other.regex,
+      this.captureGroupNames ::: other.captureGroupNames
     )
   }
 }
@@ -73,7 +74,7 @@ class SinatraPathPatternParser extends RegexPathPatternParser {
     parseAll(pathPattern, pattern) match {
       case Success(pathPattern, _) =>
         (PartialPathPattern("^") + pathPattern +
-            PartialPathPattern("$")).toPathPattern
+          PartialPathPattern("$")).toPathPattern
       case _ =>
         throw new IllegalArgumentException("Invalid path pattern: " + pattern)
     }

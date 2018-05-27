@@ -26,27 +26,35 @@ import org.apache.spark.annotation.DeveloperApi
   * Operations are not thread-safe.
   */
 @DeveloperApi
-class ShuffleReadMetrics private (_remoteBlocksFetched: Accumulator[Int],
-                                  _localBlocksFetched: Accumulator[Int],
-                                  _remoteBytesRead: Accumulator[Long],
-                                  _localBytesRead: Accumulator[Long],
-                                  _fetchWaitTime: Accumulator[Long],
-                                  _recordsRead: Accumulator[Long])
+class ShuffleReadMetrics private (
+    _remoteBlocksFetched: Accumulator[Int],
+    _localBlocksFetched: Accumulator[Int],
+    _remoteBytesRead: Accumulator[Long],
+    _localBytesRead: Accumulator[Long],
+    _fetchWaitTime: Accumulator[Long],
+    _recordsRead: Accumulator[Long])
     extends Serializable {
 
   private[executor] def this(accumMap: Map[String, Accumulator[_]]) {
-    this(TaskMetrics.getAccum[Int](
-             accumMap, InternalAccumulator.shuffleRead.REMOTE_BLOCKS_FETCHED),
-         TaskMetrics.getAccum[Int](
-             accumMap, InternalAccumulator.shuffleRead.LOCAL_BLOCKS_FETCHED),
-         TaskMetrics.getAccum[Long](
-             accumMap, InternalAccumulator.shuffleRead.REMOTE_BYTES_READ),
-         TaskMetrics.getAccum[Long](
-             accumMap, InternalAccumulator.shuffleRead.LOCAL_BYTES_READ),
-         TaskMetrics.getAccum[Long](
-             accumMap, InternalAccumulator.shuffleRead.FETCH_WAIT_TIME),
-         TaskMetrics.getAccum[Long](
-             accumMap, InternalAccumulator.shuffleRead.RECORDS_READ))
+    this(
+      TaskMetrics.getAccum[Int](
+        accumMap,
+        InternalAccumulator.shuffleRead.REMOTE_BLOCKS_FETCHED),
+      TaskMetrics.getAccum[Int](
+        accumMap,
+        InternalAccumulator.shuffleRead.LOCAL_BLOCKS_FETCHED),
+      TaskMetrics.getAccum[Long](
+        accumMap,
+        InternalAccumulator.shuffleRead.REMOTE_BYTES_READ),
+      TaskMetrics.getAccum[Long](
+        accumMap,
+        InternalAccumulator.shuffleRead.LOCAL_BYTES_READ),
+      TaskMetrics.getAccum[Long](
+        accumMap,
+        InternalAccumulator.shuffleRead.FETCH_WAIT_TIME),
+      TaskMetrics
+        .getAccum[Long](accumMap, InternalAccumulator.shuffleRead.RECORDS_READ)
+    )
   }
 
   /**
@@ -61,12 +69,12 @@ class ShuffleReadMetrics private (_remoteBlocksFetched: Accumulator[Int],
     */
   private[spark] def this() {
     this(
-        InternalAccumulator
-          .createShuffleReadAccums()
-          .map { a =>
-        (a.name.get, a)
-      }
-          .toMap)
+      InternalAccumulator
+        .createShuffleReadAccums()
+        .map { a =>
+          (a.name.get, a)
+        }
+        .toMap)
   }
 
   /**

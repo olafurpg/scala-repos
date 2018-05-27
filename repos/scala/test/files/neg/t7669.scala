@@ -8,6 +8,6 @@ object Test {
 
   def exhausto(expr: Expr): Unit = expr match {
     case Op(Op(_)) =>
-    case Op(_) =>
+    case Op(_)     =>
   }
 }

@@ -47,8 +47,9 @@ object Default {
 
   type Aux[T, Out0 <: HList] = Default[T] { type Out = Out0 }
 
-  implicit def materialize[T, L <: HList]: Aux[T, L] = macro DefaultMacros
-    .materialize[T, L]
+  implicit def materialize[T, L <: HList]: Aux[T, L] =
+    macro DefaultMacros
+      .materialize[T, L]
 
   /**
     * Provides default values of case class-like types, as a record.
@@ -81,7 +82,8 @@ object Default {
     type Aux[T, Out0 <: HList] = AsRecord[T] { type Out = Out0 }
 
     trait Helper[L <: HList, Labels <: HList]
-        extends DepFn1[L] with Serializable {
+        extends DepFn1[L]
+        with Serializable {
       type Out <: HList
     }
 
@@ -101,8 +103,11 @@ object Default {
         }
 
       implicit def hconsSomeHelper[
-          K <: Symbol, H, T <: HList, LabT <: HList, OutT <: HList](
-          implicit tailHelper: Aux[T, LabT, OutT])
+          K <: Symbol,
+          H,
+          T <: HList,
+          LabT <: HList,
+          OutT <: HList](implicit tailHelper: Aux[T, LabT, OutT])
         : Aux[Some[H] :: T, K :: LabT, FieldType[K, H] :: OutT] =
         new Helper[Some[H] :: T, K :: LabT] {
           type Out = FieldType[K, H] :: OutT
@@ -110,8 +115,10 @@ object Default {
         }
 
       implicit def hconsNoneHelper[
-          K <: Symbol, T <: HList, LabT <: HList, OutT <: HList](
-          implicit tailHelper: Aux[T, LabT, OutT])
+          K <: Symbol,
+          T <: HList,
+          LabT <: HList,
+          OutT <: HList](implicit tailHelper: Aux[T, LabT, OutT])
         : Aux[None.type :: T, K :: LabT, OutT] =
         new Helper[None.type :: T, K :: LabT] {
           type Out = OutT
@@ -164,7 +171,8 @@ object Default {
     type Aux[T, Out0 <: HList] = AsOptions[T] { type Out = Out0 }
 
     trait Helper[L <: HList, Repr <: HList]
-        extends DepFn1[L] with Serializable {
+        extends DepFn1[L]
+        with Serializable {
       type Out <: HList
     }
 
@@ -183,8 +191,10 @@ object Default {
         }
 
       implicit def hconsSomeHelper[
-          H, T <: HList, ReprT <: HList, OutT <: HList](
-          implicit tailHelper: Aux[T, ReprT, OutT])
+          H,
+          T <: HList,
+          ReprT <: HList,
+          OutT <: HList](implicit tailHelper: Aux[T, ReprT, OutT])
         : Aux[Some[H] :: T, H :: ReprT, Option[H] :: OutT] =
         new Helper[Some[H] :: T, H :: ReprT] {
           type Out = Option[H] :: OutT
@@ -192,8 +202,10 @@ object Default {
         }
 
       implicit def hconsNoneHelper[
-          H, T <: HList, ReprT <: HList, OutT <: HList](
-          implicit tailHelper: Aux[T, ReprT, OutT])
+          H,
+          T <: HList,
+          ReprT <: HList,
+          OutT <: HList](implicit tailHelper: Aux[T, ReprT, OutT])
         : Aux[None.type :: T, H :: ReprT, Option[H] :: OutT] =
         new Helper[None.type :: T, H :: ReprT] {
           type Out = Option[H] :: OutT
@@ -219,7 +231,7 @@ class DefaultMacros(val c: whitebox.Context) extends CaseClassMacros {
   def someTpe = typeOf[Some[_]].typeConstructor
   def noneTpe = typeOf[None.type]
 
-  def materialize[T : WeakTypeTag, L : WeakTypeTag]: Tree = {
+  def materialize[T: WeakTypeTag, L: WeakTypeTag]: Tree = {
     val tpe = weakTypeOf[T]
 
     if (!isCaseClassLike(classSym(tpe)))
@@ -236,12 +248,14 @@ class DefaultMacros(val c: whitebox.Context) extends CaseClassMacros {
       else Some(m)
     }
 
-    val primaryConstructor = tpe.decls.collectFirst {
-      case m if m.isMethod && m.asMethod.isPrimaryConstructor =>
-        m.asMethod
-    }.getOrElse {
-      c.abort(c.enclosingPosition, s"Cannot get primary constructor of $tpe")
-    }
+    val primaryConstructor = tpe.decls
+      .collectFirst {
+        case m if m.isMethod && m.asMethod.isPrimaryConstructor =>
+          m.asMethod
+      }
+      .getOrElse {
+        c.abort(c.enclosingPosition, s"Cannot get primary constructor of $tpe")
+      }
 
     def methodHasDefaults(m: MethodSymbol): Boolean =
       m.asMethod.paramLists.flatten.exists(_.asTerm.isParamWithDefault)
@@ -255,14 +269,13 @@ class DefaultMacros(val c: whitebox.Context) extends CaseClassMacros {
       m.isMethod && m.name.toString == "apply" && methodHasDefaults(m.asMethod)
     }
 
-    val mainOverloadsWithDefaultCount = overloadsWithDefaultCount(
-        tpe.companion)
+    val mainOverloadsWithDefaultCount = overloadsWithDefaultCount(tpe.companion)
     val secondOverloadsWithDefaultCount = overloadsWithDefaultCount(
-        companion.symbol.info)
+      companion.symbol.info)
 
     val oneOverloadWithDefaults =
       mainOverloadsWithDefaultCount == 1 ||
-      (mainOverloadsWithDefaultCount == 0 &&
+        (mainOverloadsWithDefaultCount == 0 &&
           secondOverloadsWithDefaultCount == 1)
 
     // Checking if the primary constructor has default parameters, and returning
@@ -276,13 +289,16 @@ class DefaultMacros(val c: whitebox.Context) extends CaseClassMacros {
       if (hasDefaults) {
         val methodOpt =
           methodFrom(tpe.companion, s"apply$$default$$${idx + 1}")
-            .orElse(methodFrom(companion.symbol.info,
-                               s"$$lessinit$$greater$$default$$${idx + 1}"))
+            .orElse(
+              methodFrom(
+                companion.symbol.info,
+                s"$$lessinit$$greater$$default$$${idx + 1}"))
 
         methodOpt match {
           case Some(method) =>
-            (appliedType(someTpe, argTpe),
-             q"_root_.scala.Some($companion.$method)")
+            (
+              appliedType(someTpe, argTpe),
+              q"_root_.scala.Some($companion.$method)")
           case None =>
             (noneTpe, q"_root_.scala.None")
         }
@@ -295,7 +311,7 @@ class DefaultMacros(val c: whitebox.Context) extends CaseClassMacros {
     }
 
     val resultTpe = mkHListTpe(
-        wrapTpeTrees.map { case (wrapTpe, _) => wrapTpe })
+      wrapTpeTrees.map { case (wrapTpe, _) => wrapTpe })
 
     val resultTree = wrapTpeTrees.foldRight(q"_root_.shapeless.HNil": Tree) {
       case ((_, value), acc) =>

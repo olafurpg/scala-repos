@@ -22,7 +22,8 @@ import scalikejdbc._
 
 /** JDBC implementation of [[BaseStorageClient]] */
 class StorageClient(val config: StorageClientConfig)
-    extends BaseStorageClient with Logging {
+    extends BaseStorageClient
+    with Logging {
   override val prefix = "JDBC"
 
   if (!config.properties.contains("URL")) {
@@ -39,10 +40,11 @@ class StorageClient(val config: StorageClientConfig)
   val maxSize: Int = config.properties.getOrElse("CONNECTIONS", "8").toInt
   val settings = ConnectionPoolSettings(maxSize = maxSize)
 
-  ConnectionPool.singleton(config.properties("URL"),
-                           config.properties("USERNAME"),
-                           config.properties("PASSWORD"),
-                           settings)
+  ConnectionPool.singleton(
+    config.properties("URL"),
+    config.properties("USERNAME"),
+    config.properties("PASSWORD"),
+    settings)
 
   /** JDBC connection URL. Connections are managed by ScalikeJDBC. */
   val client = config.properties("URL")

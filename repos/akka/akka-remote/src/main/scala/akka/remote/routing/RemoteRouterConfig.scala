@@ -53,20 +53,22 @@ final case class RemoteRouterConfig(local: Pool, nodes: Iterable[Address])
 
   override def newRoutee(routeeProps: Props, context: ActorContext): Routee = {
     val name = "c" + childNameCounter.incrementAndGet
-    val deploy = Deploy(config = ConfigFactory.empty(),
-                        routerConfig = routeeProps.routerConfig,
-                        scope = RemoteScope(nodeAddressIter.next))
+    val deploy = Deploy(
+      config = ConfigFactory.empty(),
+      routerConfig = routeeProps.routerConfig,
+      scope = RemoteScope(nodeAddressIter.next))
 
     // attachChild means that the provider will treat this call as if possibly done out of the wrong
     // context and use RepointableActorRef instead of LocalActorRef. Seems like a slightly sub-optimal
     // choice in a corner case (and hence not worth fixing).
     val ref = context
       .asInstanceOf[ActorCell]
-      .attachChild(local
-                     .enrichWithPoolDispatcher(routeeProps, context)
-                     .withDeploy(deploy),
-                   name,
-                   systemService = false)
+      .attachChild(
+        local
+          .enrichWithPoolDispatcher(routeeProps, context)
+          .withDeploy(deploy),
+        name,
+        systemService = false)
     ActorRefRoutee(ref)
   }
 
@@ -82,7 +84,7 @@ final case class RemoteRouterConfig(local: Pool, nodes: Iterable[Address])
   override def withFallback(other: RouterConfig): RouterConfig = other match {
     case RemoteRouterConfig(local: RemoteRouterConfig, nodes) ⇒
       throw new IllegalStateException(
-          "RemoteRouterConfig is not allowed to wrap a RemoteRouterConfig")
+        "RemoteRouterConfig is not allowed to wrap a RemoteRouterConfig")
     case RemoteRouterConfig(local: Pool, nodes) ⇒
       copy(local = this.local.withFallback(local).asInstanceOf[Pool])
     case _ ⇒ copy(local = this.local.withFallback(other).asInstanceOf[Pool])

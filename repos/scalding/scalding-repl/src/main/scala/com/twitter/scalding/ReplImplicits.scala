@@ -63,7 +63,7 @@ trait BaseReplState {
       case Some(hdfsMode) => mode = hdfsMode
       case None =>
         println(
-            "To use HDFS/Hadoop mode, you must *start* the repl in hadoop mode to get the hadoop configuration from the hadoop command.")
+          "To use HDFS/Hadoop mode, you must *start* the repl in hadoop mode to get the hadoop configuration from the hadoop command.")
     }
   }
 
@@ -84,18 +84,18 @@ trait BaseReplState {
   private[scalding] def printModeBanner(): Unit = {
     val (modeString, homeDir) = mode match {
       case localMode: Local => {
-          (localMode.toString, System.getProperty("user.dir"))
-        }
+        (localMode.toString, System.getProperty("user.dir"))
+      }
       case hdfsMode: Hdfs => {
-          val defaultFs = FileSystem.get(hdfsMode.jobConf)
-          val m = customConfig.get(mr2Key) match {
-            case Some("local") =>
-              s"${hdfsMode.getClass.getSimpleName}Local(${hdfsMode.strict})"
-            case _ =>
-              s"${hdfsMode.getClass.getSimpleName}(${hdfsMode.strict})"
-          }
-          (m, defaultFs.getWorkingDirectory.toString)
+        val defaultFs = FileSystem.get(hdfsMode.jobConf)
+        val m = customConfig.get(mr2Key) match {
+          case Some("local") =>
+            s"${hdfsMode.getClass.getSimpleName}Local(${hdfsMode.strict})"
+          case _ =>
+            s"${hdfsMode.getClass.getSimpleName}(${hdfsMode.strict})"
         }
+        (m, defaultFs.getWorkingDirectory.toString)
+      }
     }
     println(s"${Console.GREEN}#### Scalding mode: ${modeString}")
     println(s"#### User home: ${homeDir}${Console.RESET}")
@@ -104,7 +104,7 @@ trait BaseReplState {
   private def modeHadoopConf: Configuration = {
     mode match {
       case hdfsMode: Hdfs => hdfsMode.jobConf
-      case _ => new Configuration(false)
+      case _              => new Configuration(false)
     }
   }
 
@@ -239,8 +239,8 @@ object ReplImplicits extends FieldConversions {
     * @param source to convert to a RichPipe.
     * @return a RichPipe wrapping the result of reading the specified Source.
     */
-  implicit def sourceToRichPipe(source: Source)(
-      implicit flowDef: FlowDef, mode: Mode): RichPipe =
+  implicit def sourceToRichPipe(
+      source: Source)(implicit flowDef: FlowDef, mode: Mode): RichPipe =
     RichPipe(source.read(flowDef, mode))
 
   /**
@@ -295,7 +295,9 @@ object ReplImplicits extends FieldConversions {
     * (e.g. allows .snapshot to be called on Grouped, CoGrouped, etc)
     */
   implicit def keyedListLikeToShellTypedPipe[
-      K, V, T[K, +V] <: KeyedListLike[K, V, T]](kll: KeyedListLike[K, V, T])(
+      K,
+      V,
+      T[K, +V] <: KeyedListLike[K, V, T]](kll: KeyedListLike[K, V, T])(
       implicit state: BaseReplState) =
     new ShellTypedPipe(kll.toTypedPipe)(state)
 

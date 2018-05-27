@@ -41,8 +41,10 @@ import org.apache.spark.util.Utils
 // Note: Changes to the format in this file should be kept in sync with
 // org.apache.spark.network.shuffle.ExternalShuffleBlockResolver#getSortBasedShuffleBlockData().
 private[spark] class IndexShuffleBlockResolver(
-    conf: SparkConf, _blockManager: BlockManager = null)
-    extends ShuffleBlockResolver with Logging {
+    conf: SparkConf,
+    _blockManager: BlockManager = null)
+    extends ShuffleBlockResolver
+    with Logging {
 
   private lazy val blockManager =
     Option(_blockManager).getOrElse(SparkEnv.get.blockManager)
@@ -51,12 +53,12 @@ private[spark] class IndexShuffleBlockResolver(
 
   def getDataFile(shuffleId: Int, mapId: Int): File = {
     blockManager.diskBlockManager.getFile(
-        ShuffleDataBlockId(shuffleId, mapId, NOOP_REDUCE_ID))
+      ShuffleDataBlockId(shuffleId, mapId, NOOP_REDUCE_ID))
   }
 
   private def getIndexFile(shuffleId: Int, mapId: Int): File = {
     blockManager.diskBlockManager.getFile(
-        ShuffleIndexBlockId(shuffleId, mapId, NOOP_REDUCE_ID))
+      ShuffleIndexBlockId(shuffleId, mapId, NOOP_REDUCE_ID))
   }
 
   /**
@@ -83,7 +85,9 @@ private[spark] class IndexShuffleBlockResolver(
     * If so, return the partition lengths in the data file. Otherwise return null.
     */
   private def checkIndexAndDataFile(
-      index: File, data: File, blocks: Int): Array[Long] = {
+      index: File,
+      data: File,
+      blocks: Int): Array[Long] = {
     // the index file should have `block + 1` longs as offset.
     if (index.length() != (blocks + 1) * 8) {
       return null
@@ -134,14 +138,15 @@ private[spark] class IndexShuffleBlockResolver(
     *
     * Note: the `lengths` will be updated to match the existing index file if use the existing ones.
     * */
-  def writeIndexFileAndCommit(shuffleId: Int,
-                              mapId: Int,
-                              lengths: Array[Long],
-                              dataTmp: File): Unit = {
+  def writeIndexFileAndCommit(
+      shuffleId: Int,
+      mapId: Int,
+      lengths: Array[Long],
+      dataTmp: File): Unit = {
     val indexFile = getIndexFile(shuffleId, mapId)
     val indexTmp = Utils.tempFileWith(indexFile)
     val out = new DataOutputStream(
-        new BufferedOutputStream(new FileOutputStream(indexTmp)))
+      new BufferedOutputStream(new FileOutputStream(indexTmp)))
     Utils.tryWithSafeFinally {
       // We take in lengths of each block, need to convert it to offsets.
       var offset = 0L
@@ -179,12 +184,12 @@ private[spark] class IndexShuffleBlockResolver(
         }
         if (!indexTmp.renameTo(indexFile)) {
           throw new IOException(
-              "fail to rename file " + indexTmp + " to " + indexFile)
+            "fail to rename file " + indexTmp + " to " + indexFile)
         }
         if (dataTmp != null && dataTmp.exists() &&
             !dataTmp.renameTo(dataFile)) {
           throw new IOException(
-              "fail to rename file " + dataTmp + " to " + dataFile)
+            "fail to rename file " + dataTmp + " to " + dataFile)
         }
       }
     }
@@ -201,10 +206,10 @@ private[spark] class IndexShuffleBlockResolver(
       val offset = in.readLong()
       val nextOffset = in.readLong()
       new FileSegmentManagedBuffer(
-          transportConf,
-          getDataFile(blockId.shuffleId, blockId.mapId),
-          offset,
-          nextOffset - offset)
+        transportConf,
+        getDataFile(blockId.shuffleId, blockId.mapId),
+        offset,
+        nextOffset - offset)
     } finally {
       in.close()
     }

@@ -2,9 +2,17 @@ package mesosphere.marathon.core.launcher.impl
 
 import akka.pattern.AskTimeoutException
 import mesosphere.marathon.core.base.Clock
-import mesosphere.marathon.core.launcher.{TaskOp, OfferProcessor, OfferProcessorConfig, TaskLauncher}
+import mesosphere.marathon.core.launcher.{
+  TaskOp,
+  OfferProcessor,
+  OfferProcessorConfig,
+  TaskLauncher
+}
 import mesosphere.marathon.core.matcher.base.OfferMatcher
-import mesosphere.marathon.core.matcher.base.OfferMatcher.{MatchedTaskOps, TaskOpWithSource}
+import mesosphere.marathon.core.matcher.base.OfferMatcher.{
+  MatchedTaskOps,
+  TaskOpWithSource
+}
 import mesosphere.marathon.core.task.tracker.TaskCreationHandler
 import mesosphere.marathon.metrics.{MetricPrefixes, Metrics}
 import mesosphere.marathon.state.Timestamp
@@ -34,17 +42,17 @@ private[launcher] class OfferProcessorImpl(
     conf.saveTasksToLaunchTimeout().millis
 
   private[this] val incomingOffersMeter = metrics.meter(
-      metrics.name(MetricPrefixes.SERVICE, getClass, "incomingOffers"))
+    metrics.name(MetricPrefixes.SERVICE, getClass, "incomingOffers"))
   private[this] val matchTimeMeter =
     metrics.timer(metrics.name(MetricPrefixes.SERVICE, getClass, "matchTime"))
-  private[this] val matchErrorsMeter = metrics.meter(
-      metrics.name(MetricPrefixes.SERVICE, getClass, "matchErrors"))
-  private[this] val savingTasksTimeMeter = metrics.timer(
-      metrics.name(MetricPrefixes.SERVICE, getClass, "savingTasks"))
+  private[this] val matchErrorsMeter =
+    metrics.meter(metrics.name(MetricPrefixes.SERVICE, getClass, "matchErrors"))
+  private[this] val savingTasksTimeMeter =
+    metrics.timer(metrics.name(MetricPrefixes.SERVICE, getClass, "savingTasks"))
   private[this] val savingTasksTimeoutMeter = metrics.meter(
-      metrics.name(MetricPrefixes.SERVICE, getClass, "savingTasksTimeouts"))
+    metrics.name(MetricPrefixes.SERVICE, getClass, "savingTasksTimeouts"))
   private[this] val savingTasksErrorMeter = metrics.meter(
-      metrics.name(MetricPrefixes.SERVICE, getClass, "savingTasksErrors"))
+    metrics.name(MetricPrefixes.SERVICE, getClass, "savingTasksErrors"))
 
   override def processOffer(offer: Offer): Future[Unit] = {
     incomingOffersMeter.mark()
@@ -56,33 +64,40 @@ private[launcher] class OfferProcessorImpl(
       offerMatcher.matchOffer(matchingDeadline, offer)
     }
 
-    matchFuture.recover {
-      case e: AskTimeoutException =>
-        matchErrorsMeter.mark()
-        log.warn(
+    matchFuture
+      .recover {
+        case e: AskTimeoutException =>
+          matchErrorsMeter.mark()
+          log.warn(
             s"Could not process offer '${offer.getId.getValue}' in time. (See --max_offer_matching_timeout)")
-        MatchedTaskOps(offer.getId, Seq.empty, resendThisOffer = true)
-      case NonFatal(e) =>
-        matchErrorsMeter.mark()
-        log.error(s"Could not process offer '${offer.getId.getValue}'", e)
-        MatchedTaskOps(offer.getId, Seq.empty, resendThisOffer = true)
-    }.flatMap {
-      case MatchedTaskOps(offerId, tasks, resendThisOffer) =>
-        savingTasksTimeMeter.timeFuture {
-          saveTasks(tasks, savingDeadline).map { savedTasks =>
-            def notAllSaved: Boolean = savedTasks.size != tasks.size
-            MatchedTaskOps(offerId, savedTasks, resendThisOffer || notAllSaved)
+          MatchedTaskOps(offer.getId, Seq.empty, resendThisOffer = true)
+        case NonFatal(e) =>
+          matchErrorsMeter.mark()
+          log.error(s"Could not process offer '${offer.getId.getValue}'", e)
+          MatchedTaskOps(offer.getId, Seq.empty, resendThisOffer = true)
+      }
+      .flatMap {
+        case MatchedTaskOps(offerId, tasks, resendThisOffer) =>
+          savingTasksTimeMeter.timeFuture {
+            saveTasks(tasks, savingDeadline).map { savedTasks =>
+              def notAllSaved: Boolean = savedTasks.size != tasks.size
+              MatchedTaskOps(
+                offerId,
+                savedTasks,
+                resendThisOffer || notAllSaved)
+            }
           }
-        }
-    }.flatMap {
-      case MatchedTaskOps(offerId, Nil, resendThisOffer) =>
-        declineOffer(offerId, resendThisOffer)
-      case MatchedTaskOps(offerId, tasks, _) => acceptOffer(offerId, tasks)
-    }
+      }
+      .flatMap {
+        case MatchedTaskOps(offerId, Nil, resendThisOffer) =>
+          declineOffer(offerId, resendThisOffer)
+        case MatchedTaskOps(offerId, tasks, _) => acceptOffer(offerId, tasks)
+      }
   }
 
   private[this] def declineOffer(
-      offerId: OfferID, resendThisOffer: Boolean): Future[Unit] = {
+      offerId: OfferID,
+      resendThisOffer: Boolean): Future[Unit] = {
     //if the offer should be resent, than we ignore the configured decline offer duration
     val duration: Option[Long] =
       if (resendThisOffer) None else conf.declineOfferDuration.get
@@ -137,13 +152,13 @@ private[launcher] class OfferProcessorImpl(
       val persistedOp = taskOpWithSource.op.maybeNewTask match {
         case Some(newTask) =>
           log.info(
-              s"Save ${taskOpWithSource.taskId} " +
+            s"Save ${taskOpWithSource.taskId} " +
               s"after applying the effects of ${taskOpWithSource.op.getClass.getSimpleName}"
           )
           taskCreationHandler.created(newTask)
         case None =>
           log.info(
-              s"Remove ${taskOpWithSource.taskId} because of ${taskOpWithSource.op.getClass.getSimpleName}")
+            s"Remove ${taskOpWithSource.taskId} because of ${taskOpWithSource.op.getClass.getSimpleName}")
           taskCreationHandler.terminated(taskId)
       }
 
@@ -154,13 +169,13 @@ private[launcher] class OfferProcessorImpl(
             savingTasksErrorMeter.mark()
             taskOpWithSource.reject(s"storage error: $e")
             log.warn(
-                s"error while storing task $taskId for app [${taskId.appId}]",
-                e)
+              s"error while storing task $taskId for app [${taskId.appId}]",
+              e)
             revertTaskOps(Some(taskOpWithSource.op))
         }
         .map {
           case Some(savedTask) => Some(taskOpWithSource)
-          case None => None
+          case None            => None
         }
     }
 
@@ -171,7 +186,7 @@ private[launcher] class OfferProcessorImpl(
             savingTasksTimeoutMeter.mark(savedTasks.size.toLong)
             nextTask.reject("saving timeout reached")
             log.info(
-                s"Timeout reached, skipping launch and save for ${nextTask.op.taskId}. " +
+              s"Timeout reached, skipping launch and save for ${nextTask.op.taskId}. " +
                 s"You can reconfigure this with --${conf.saveTasksToLaunchTimeout.name}.")
             Future.successful(savedTasks)
           } else {

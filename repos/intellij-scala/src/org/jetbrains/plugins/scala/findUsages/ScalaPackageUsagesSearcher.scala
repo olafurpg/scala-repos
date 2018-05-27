@@ -13,14 +13,15 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScPackageImpl
 
 class ScalaPackageUsagesSearcher
     extends QueryExecutorBase[PsiReference, ReferencesSearch.SearchParameters](
-        true) {
+      true) {
 
-  def processQuery(@NotNull parameters: ReferencesSearch.SearchParameters,
-                   @NotNull consumer: Processor[PsiReference]) {
+  def processQuery(
+      @NotNull parameters: ReferencesSearch.SearchParameters,
+      @NotNull consumer: Processor[PsiReference]) {
     val target: PsiElement = parameters.getElementToSearch
     val scPack = target match {
       case pack: PsiPackage => ScPackageImpl(pack)
-      case _ => return
+      case _                => return
     }
     val name = scPack.name
     if (name == null || StringUtil.isEmptyOrSpaces(name)) return
@@ -28,15 +29,18 @@ class ScalaPackageUsagesSearcher
       inReadAction(parameters.getEffectiveSearchScope) // TODO PsiUtil.restrictScopeToGroovyFiles(parameters.getEffectiveSearchScope)
     val collector: SearchRequestCollector = parameters.getOptimizer
     val session: SearchSession = collector.getSearchSession
-    collector.searchWord(name,
-                         scope,
-                         UsageSearchContext.IN_CODE,
-                         true,
-                         new MyProcessor(scPack, null, session))
+    collector.searchWord(
+      name,
+      scope,
+      UsageSearchContext.IN_CODE,
+      true,
+      new MyProcessor(scPack, null, session))
   }
 
   private class MyProcessor(
-      myTarget: PsiElement, @Nullable prefix: String, mySession: SearchSession)
+      myTarget: PsiElement,
+      @Nullable prefix: String,
+      mySession: SearchSession)
       extends RequestResultProcessor(myTarget, prefix) {
     def processTextOccurrence(
         element: PsiElement,

@@ -9,16 +9,18 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
 @RunWith(classOf[JUnitRunner])
 class FailureTest
-    extends FunSuite with AssertionsForJUnit
+    extends FunSuite
+    with AssertionsForJUnit
     with GeneratorDrivenPropertyChecks {
   val exc =
     Gen.oneOf[Throwable](null, new Exception("first"), new Exception("second"))
 
-  val flag = Gen.oneOf(0L,
-                       Failure.Restartable,
-                       Failure.Interrupted,
-                       Failure.Wrapped,
-                       Failure.Naming)
+  val flag = Gen.oneOf(
+    0L,
+    Failure.Restartable,
+    Failure.Interrupted,
+    Failure.Wrapped,
+    Failure.Naming)
 
   val flag2 = for (f1 <- flag; f2 <- flag if f1 != f2) yield f1 | f2
 
@@ -75,8 +77,9 @@ class FailureTest
 
   test("Failure.show") {
     assert(
-        Failure("ok", Failure.Restartable | Failure.Interrupted).show == Failure(
-            "ok", Failure.Interrupted))
+      Failure("ok", Failure.Restartable | Failure.Interrupted).show == Failure(
+        "ok",
+        Failure.Interrupted))
     val inner = new Exception
     assert(Failure.wrap(inner).show == inner)
     assert(Failure.wrap(Failure.wrap(inner)).show == inner)
@@ -101,9 +104,11 @@ class FailureTest
 
     assertFail(Failure("ok"), Failure("ok"))
     assertFail(
-        Failure("ok", Failure.Interrupted), Failure("ok", Failure.Interrupted))
-    assertFail(Failure("ok", Failure.Interrupted | Failure.Restartable),
-               Failure("ok", Failure.Interrupted))
+      Failure("ok", Failure.Interrupted),
+      Failure("ok", Failure.Interrupted))
+    assertFail(
+      Failure("ok", Failure.Interrupted | Failure.Restartable),
+      Failure("ok", Failure.Interrupted))
 
     val inner = new Exception
     assertFail(Failure.wrap(inner), inner)
@@ -111,17 +116,17 @@ class FailureTest
 
   test("Failure.flagsOf") {
     val failures = Seq(
-        Failure(
-            "abc",
-            new Exception,
-            Failure.Interrupted | Failure.Restartable | Failure.Naming | Failure.Wrapped),
-        Failure("abc"),
-        new Exception
+      Failure(
+        "abc",
+        new Exception,
+        Failure.Interrupted | Failure.Restartable | Failure.Naming | Failure.Wrapped),
+      Failure("abc"),
+      new Exception
     )
     val categories = Seq(
-        Set("interrupted", "restartable", "wrapped", "naming"),
-        Set(),
-        Set()
+      Set("interrupted", "restartable", "wrapped", "naming"),
+      Set(),
+      Set()
     )
     for ((f, c) <- failures.zip(categories)) {
       assert(Failure.flagsOf(f) == c)

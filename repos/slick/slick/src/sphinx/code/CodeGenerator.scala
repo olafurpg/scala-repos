@@ -14,15 +14,16 @@ object CodeGenerator extends App {
   val password = ""
   if (false) {
     val db = Database.forURL(
-        "jdbc:h2:mem:test1;DB_CLOSE_DELAY=-1", driver = "org.h2.Driver")
+      "jdbc:h2:mem:test1;DB_CLOSE_DELAY=-1",
+      driver = "org.h2.Driver")
     //#default-runner
     slick.codegen.SourceCodeGenerator.main(
-        Array(profile, jdbcDriver, url, outputFolder, pkg)
+      Array(profile, jdbcDriver, url, outputFolder, pkg)
     )
     //#default-runner
     //#default-runner-with-auth
     slick.codegen.SourceCodeGenerator.main(
-        Array(profile, jdbcDriver, url, outputFolder, pkg, user, password)
+      Array(profile, jdbcDriver, url, outputFolder, pkg, user, password)
     )
     //#default-runner-with-auth
     //#customization
@@ -32,9 +33,8 @@ object CodeGenerator extends App {
       H2Profile.createModel(Some(H2Profile.defaultTables)) // you can filter specific tables here
     val modelFuture = db.run(modelAction)
     // customize code generator
-    val codegenFuture = modelFuture.map(
-        model =>
-          new SourceCodeGenerator(model) {
+    val codegenFuture = modelFuture.map(model =>
+      new SourceCodeGenerator(model) {
         // override mapped table and class name
         override def entityName =
           dbTableName => dbTableName.dropRight(1).toLowerCase.toCamelCase
@@ -65,11 +65,11 @@ object CodeGenerator extends App {
     codegenFuture.onSuccess {
       case codegen =>
         codegen.writeToFile(
-            "slick.jdbc.H2Profile",
-            "some/folder/",
-            "some.packag",
-            "Tables",
-            "Tables.scala"
+          "slick.jdbc.H2Profile",
+          "some/folder/",
+          "some.packag",
+          "Tables",
+          "Tables.scala"
         )
     }
     //#customization

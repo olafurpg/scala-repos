@@ -32,8 +32,9 @@ object AsmNode {
   implicit class ClassNodeOps(val node: ClassNode) {
     def fieldsAndMethods: List[AsmMember] = {
       val xs: List[AsmMember] =
-        (node.methods.asScala.toList.map(x => (x: AsmMethod)) ++ node.fields.asScala.toList
-              .map(x => (x: AsmField)))
+        (node.methods.asScala.toList
+          .map(x => (x: AsmMethod)) ++ node.fields.asScala.toList
+          .map(x => (x: AsmField)))
       xs sortBy (_.characteristics)
     }
   }

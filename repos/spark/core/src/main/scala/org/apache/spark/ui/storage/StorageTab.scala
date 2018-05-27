@@ -55,7 +55,8 @@ class StorageListener(storageStatusListener: StorageStatusListener)
   }
 
   /** Update the storage info of the RDDs whose blocks are among the given updated blocks */
-  private def updateRDDInfo(updatedBlocks: Seq[(BlockId, BlockStatus)]): Unit = {
+  private def updateRDDInfo(
+      updatedBlocks: Seq[(BlockId, BlockStatus)]): Unit = {
     val rddIdsToUpdate = updatedBlocks.flatMap {
       case (bid, _) => bid.asRDDId.map(_.rddId)
     }.toSet

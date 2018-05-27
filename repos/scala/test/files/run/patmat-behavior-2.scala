@@ -6,27 +6,27 @@ case class Foo(x: Int, ys: Int*) {
 object Test {
   def f1(x: Any) = x match {
     case Foo(x) => true
-    case _ => false
+    case _      => false
   }
   def f2(x: Any) = x match {
     case Foo(x, y) => true
-    case _ => false
+    case _         => false
   }
   def f3(x: Any) = x match {
     case Foo(x, y, z) => true
-    case _ => false
+    case _            => false
   }
   def f1seq(x: Any) = x match {
-    case Foo(x, ys @ _ *) => true
-    case _ => false
+    case Foo(x, ys @ _*) => true
+    case _               => false
   }
   def f2seq(x: Any) = x match {
-    case Foo(x, y, zs @ _ *) => true
-    case _ => false
+    case Foo(x, y, zs @ _*) => true
+    case _                  => false
   }
   def f3seq(x: Any) = x match {
-    case Foo(x, y, z, qs @ _ *) => true
-    case _ => false
+    case Foo(x, y, z, qs @ _*) => true
+    case _                     => false
   }
 
   val x1 = Foo(1)

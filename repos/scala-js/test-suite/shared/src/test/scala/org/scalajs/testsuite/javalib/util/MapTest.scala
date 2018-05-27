@@ -254,16 +254,16 @@ trait MapTest {
       assertEquals("y", mp.get(null))
       assertEquals("y", mp.get("X"))
     } else {
-      expectThrows(classOf[NullPointerException],
-                   mp.putAll(mutableMapAsJavaMap(nullMap)))
+      expectThrows(
+        classOf[NullPointerException],
+        mp.putAll(mutableMapAsJavaMap(nullMap)))
     }
   }
 
   class SimpleQueryableMap[K, V](inner: mu.HashMap[K, V])
       extends ju.AbstractMap[K, V] {
     def entrySet(): java.util.Set[java.util.Map.Entry[K, V]] = {
-      setAsJavaSet(
-          inner.map {
+      setAsJavaSet(inner.map {
         case (k, v) => new ju.AbstractMap.SimpleImmutableEntry(k, v)
       }.toSet)
     }
@@ -573,7 +573,7 @@ object MapFactory {
 trait MapFactory {
   def implementationName: String
 
-  def empty[K : ClassTag, V : ClassTag]: ju.Map[K, V]
+  def empty[K: ClassTag, V: ClassTag]: ju.Map[K, V]
 
   def allowsNullKeys: Boolean
 

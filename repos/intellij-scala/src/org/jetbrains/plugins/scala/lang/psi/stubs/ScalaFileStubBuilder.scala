@@ -17,10 +17,11 @@ class ScalaFileStubBuilder extends DefaultStubBuilder {
     val s: ScalaFile = file.getViewProvider
       .getPsi(ScalaLanguage.Instance)
       .asInstanceOf[ScalaFile]
-    new ScFileStubImpl(s,
-                       StringRef.fromString(s.packageName),
-                       StringRef.fromString(s.sourceName),
-                       s.isCompiled,
-                       s.isScriptFile(withCaching = false))
+    new ScFileStubImpl(
+      s,
+      StringRef.fromString(s.packageName),
+      StringRef.fromString(s.sourceName),
+      s.isCompiled,
+      s.isScriptFile(withCaching = false))
   }
 }

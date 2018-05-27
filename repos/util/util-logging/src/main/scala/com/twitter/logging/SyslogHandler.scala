@@ -85,10 +85,11 @@ object SyslogHandler {
   ) = () => new SyslogHandler(server, port, formatter, level)
 }
 
-class SyslogHandler(val server: String,
-                    val port: Int,
-                    formatter: Formatter,
-                    level: Option[Level])
+class SyslogHandler(
+    val server: String,
+    val port: Int,
+    formatter: Formatter,
+    level: Option[Level])
     extends Handler(formatter, level) {
 
   private val socket = new DatagramSocket
@@ -142,11 +143,12 @@ class SyslogFormatter(
     timezone: Option[String] = None,
     truncateAt: Int = 0,
     truncateStackTracesAt: Int = Formatter.DefaultStackTraceSizeLimit)
-    extends Formatter(timezone,
-                      truncateAt,
-                      truncateStackTracesAt,
-                      useFullPackageNames = false,
-                      prefix = "") {
+    extends Formatter(
+      timezone,
+      truncateAt,
+      truncateStackTracesAt,
+      useFullPackageNames = false,
+      prefix = "") {
 
   override def dateFormat =
     if (useIsoDateFormat) {
@@ -158,9 +160,11 @@ class SyslogFormatter(
   override def lineTerminator = ""
 
   override def formatPrefix(
-      level: javalog.Level, date: String, name: String): String = {
+      level: javalog.Level,
+      date: String,
+      name: String): String = {
     val syslogLevel = level match {
-      case x: Level => SyslogHandler.severityForLogLevel(x.value)
+      case x: Level         => SyslogHandler.severityForLogLevel(x.value)
       case x: javalog.Level => SyslogHandler.severityForLogLevel(x.intValue)
     }
     serverName match {
@@ -168,19 +172,22 @@ class SyslogFormatter(
         "<%d>%s %s %s: ".format(priority | syslogLevel, date, hostname, name)
       case Some(serverName) =>
         "<%d>%s %s [%s] %s: ".format(
-            priority | syslogLevel, date, hostname, serverName, name)
+          priority | syslogLevel,
+          date,
+          hostname,
+          serverName,
+          name)
     }
   }
 }
 
 object SyslogFuture {
   private val executor = Executors.newSingleThreadExecutor(
-      new NamedPoolThreadFactory("TWITTER-UTIL-SYSLOG", true /*daemon*/ ))
+    new NamedPoolThreadFactory("TWITTER-UTIL-SYSLOG", true /*daemon*/ ))
   private val noop = new Runnable { def run() {} }
 
   def apply(action: => Unit) =
-    executor.submit(
-        new Runnable {
+    executor.submit(new Runnable {
       def run() { action }
     })
 

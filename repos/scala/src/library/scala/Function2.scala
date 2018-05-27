@@ -10,7 +10,7 @@
 package scala
 
 /** A function of 2 parameters.
-  *  
+  *
   *  In the following example, the definition of max is a
   *  shorthand for the anonymous class definition anonfun2:
   *
@@ -25,14 +25,16 @@ package scala
   * }
   *  }}}
   */
-trait Function2[@specialized(scala.Int, scala.Long, scala.Double) -T1,
-                @specialized(scala.Int, scala.Long, scala.Double) -T2,
-                @specialized(scala.Unit,
-                             scala.Boolean,
-                             scala.Int,
-                             scala.Float,
-                             scala.Long,
-                             scala.Double) +R]
+trait Function2[
+    @specialized(scala.Int, scala.Long, scala.Double) -T1,
+    @specialized(scala.Int, scala.Long, scala.Double) -T2,
+    @specialized(
+      scala.Unit,
+      scala.Boolean,
+      scala.Int,
+      scala.Float,
+      scala.Long,
+      scala.Double) +R]
     extends AnyRef { self =>
 
   /** Apply the body of this function to the arguments.

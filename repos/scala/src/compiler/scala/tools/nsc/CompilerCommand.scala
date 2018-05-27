@@ -11,8 +11,7 @@ import io.File
 class CompilerCommand(arguments: List[String], val settings: Settings) {
   def this(arguments: List[String], error: String => Unit) =
     this(arguments, new Settings(error))
-  def this(
-      arguments: List[String], settings: Settings, error: String => Unit) =
+  def this(arguments: List[String], settings: Settings, error: String => Unit) =
     this(arguments, settings withErrorFn error)
 
   type Setting = Settings#Setting
@@ -31,7 +30,7 @@ class CompilerCommand(arguments: List[String], val settings: Settings) {
 
   private def explainAdvanced =
     "\n" +
-    """
+      """
     |-- Notes on option parsing --
     |Boolean settings are always false unless set.
     |Where multiple values are accepted, they should be comma-separated.
@@ -56,7 +55,7 @@ class CompilerCommand(arguments: List[String], val settings: Settings) {
       val str = format(s.helpSyntax) + "  " + s.helpDescription
       val suffix = s.deprecationMessage match {
         case Some(msg) => "\n" + format("") + "      deprecated: " + msg
-        case _ => ""
+        case _         => ""
       }
       str + suffix
     }
@@ -68,20 +67,21 @@ class CompilerCommand(arguments: List[String], val settings: Settings) {
       if (xs.isEmpty) None else Some(msg :: xs.map(helpStr) mkString "\n  ")
 
     List(
-        sstring("", theRest),
-        sstring("\nAdditional debug settings:", debugs),
-        sstring("\nDeprecated settings:", deprecateds)
+      sstring("", theRest),
+      sstring("\nAdditional debug settings:", debugs),
+      sstring("\nDeprecated settings:", deprecateds)
     ).flatten mkString "\n"
   }
 
-  def createUsageMsg(label: String,
-                     shouldExplain: Boolean,
-                     cond: Setting => Boolean): String = {
+  def createUsageMsg(
+      label: String,
+      shouldExplain: Boolean,
+      cond: Setting => Boolean): String = {
     val prefix =
       List(
-          Some(shortUsage),
-          Some(explainAdvanced) filter (_ => shouldExplain),
-          Some(label + " options include:")
+        Some(shortUsage),
+        Some(explainAdvanced) filter (_ => shouldExplain),
+        Some(label + " options include:")
       ).flatten mkString "\n"
 
     prefix + createUsageMsg(cond)
@@ -90,7 +90,9 @@ class CompilerCommand(arguments: List[String], val settings: Settings) {
   /** Messages explaining usage and options */
   def usageMsg =
     createUsageMsg(
-        "where possible standard", shouldExplain = false, _.isStandard)
+      "where possible standard",
+      shouldExplain = false,
+      _.isStandard)
   def xusageMsg =
     createUsageMsg("Possible advanced", shouldExplain = true, _.isAdvanced)
   def yusageMsg =
@@ -112,7 +114,7 @@ class CompilerCommand(arguments: List[String], val settings: Settings) {
     else if (showPlugins) global.pluginDescriptions
     else if (showPhases)
       global.phaseDescriptions +
-      (if (debug) "\n" + global.phaseFlagDescriptions else "")
+        (if (debug) "\n" + global.phaseFlagDescriptions else "")
     else if (genPhaseGraph.isSetByUser) {
       val components =
         global.phaseNames // global.phaseDescriptors // one initializes
@@ -123,7 +125,7 @@ class CompilerCommand(arguments: List[String], val settings: Settings) {
       val sb = new StringBuilder
       allSettings foreach {
         case s: MultiChoiceSetting[_] if s.isHelping => sb append s.help
-        case _ =>
+        case _                                       =>
       }
       sb.toString
     }
@@ -138,7 +140,7 @@ class CompilerCommand(arguments: List[String], val settings: Settings) {
     val file = File(arg stripPrefix "@")
     if (!file.exists)
       throw new java.io.FileNotFoundException(
-          "argument file %s could not be found" format file.name)
+        "argument file %s could not be found" format file.name)
 
     settings splitParams (file.lines() map stripComment mkString " ")
   }
@@ -151,7 +153,7 @@ class CompilerCommand(arguments: List[String], val settings: Settings) {
     val expandedArguments =
       arguments flatMap {
         case x if x startsWith "@" => expandArg(x)
-        case x => List(x)
+        case x                     => List(x)
       }
 
     settings.processArguments(expandedArguments, processAll = true)

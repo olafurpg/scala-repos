@@ -28,7 +28,7 @@ import scala.reflect.ClassTag
   * @param dimension: The size of the array
   */
 @SerialVersionUID(1L)
-final class TriangularArray[T : ClassTag](val dimension: Int)
+final class TriangularArray[T: ClassTag](val dimension: Int)
     extends Serializable { outer =>
   import TriangularArray._
 
@@ -53,7 +53,7 @@ final class TriangularArray[T : ClassTag](val dimension: Int)
   def iterator = Iterator.range(0, numElems) map slice
   def foreach(f: T => Unit) { data foreach f }
 
-  def map[U : ClassTag](f: T => U) =
+  def map[U: ClassTag](f: T => U) =
     tabulate(dimension)((i, j) => f(apply(i, j)))
 
   override def toString = {
@@ -71,7 +71,7 @@ final class TriangularArray[T : ClassTag](val dimension: Int)
 
 object TriangularArray {
 
-  def tabulate[T : ClassTag](dim: Int)(fill: (Int, Int) => T) = {
+  def tabulate[T: ClassTag](dim: Int)(fill: (Int, Int) => T) = {
     val array = new TriangularArray[T](dim)
     for (c <- 0 until dim; r <- 0 to c) {
       array.data(index(r, c)) = fill(r, c)
@@ -79,7 +79,7 @@ object TriangularArray {
     array
   }
 
-  def fill[T : ClassTag](dim: Int)(fill: => T) = {
+  def fill[T: ClassTag](dim: Int)(fill: => T) = {
     val array = new TriangularArray[T](dim)
     for (c <- 0 until dim; r <- 0 to c) {
       array.data(index(r, c)) = fill
@@ -93,7 +93,7 @@ object TriangularArray {
     (c * (c + 1) / 2 + r)
   }
 
-  def raw[T : ClassTag](dim: Int, fill: => T) = {
+  def raw[T: ClassTag](dim: Int, fill: => T) = {
     val numElems = arraySize(dim)
     val data = Array.fill[T](numElems)(fill)
     data

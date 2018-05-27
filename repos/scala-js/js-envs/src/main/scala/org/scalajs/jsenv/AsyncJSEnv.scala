@@ -13,7 +13,8 @@ import org.scalajs.core.tools.jsdep.ResolvedJSDependency
 
 trait AsyncJSEnv extends JSEnv {
   def asyncRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile): AsyncJSRunner
+      libs: Seq[ResolvedJSDependency],
+      code: VirtualJSFile): AsyncJSRunner
 
   final def asyncRunner(code: VirtualJSFile): AsyncJSRunner =
     asyncRunner(Nil, code)
@@ -22,8 +23,9 @@ trait AsyncJSEnv extends JSEnv {
     new AsyncLoadedLibs { val loadedLibs = libs }
 
   private[jsenv] trait AsyncLoadedLibs extends LoadedLibs with AsyncJSEnv {
-    def asyncRunner(libs: Seq[ResolvedJSDependency],
-                    code: VirtualJSFile): AsyncJSRunner = {
+    def asyncRunner(
+        libs: Seq[ResolvedJSDependency],
+        code: VirtualJSFile): AsyncJSRunner = {
       AsyncJSEnv.this.asyncRunner(loadedLibs ++ libs, code)
     }
   }

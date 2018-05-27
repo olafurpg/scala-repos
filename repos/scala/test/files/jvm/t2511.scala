@@ -28,7 +28,8 @@ object Test {
   def main(args: Array[String]) {
     val m = unserialize(serialize)
     // Xcheckinit freaks out here but its nullness is what we're testing
-    try println(m.message) catch {
+    try println(m.message)
+    catch {
       case _: UninitializedFieldError => println("null")
     }
     println(m.message2)

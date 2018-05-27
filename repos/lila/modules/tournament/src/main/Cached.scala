@@ -5,16 +5,17 @@ import scala.concurrent.duration._
 import lila.memo._
 
 private[tournament] final class Cached(
-    createdTtl: FiniteDuration, rankingTtl: FiniteDuration) {
+    createdTtl: FiniteDuration,
+    rankingTtl: FiniteDuration) {
 
   private val nameCache = MixedCache[String, Option[String]](
-      ((id: String) =>
-        TournamentRepo byId id map2 { (tour: Tournament) =>
-          tour.fullName
-        }),
-      timeToLive = 6 hours,
-      default = _ => none,
-      logger = logger)
+    ((id: String) =>
+      TournamentRepo byId id map2 { (tour: Tournament) =>
+        tour.fullName
+      }),
+    timeToLive = 6 hours,
+    default = _ => none,
+    logger = logger)
 
   def name(id: String): Option[String] = nameCache get id
 
@@ -27,9 +28,11 @@ private[tournament] final class Cached(
 
   // only applies to ongoing tournaments
   private val ongoingRanking = AsyncCache[String, Ranking](
-      PlayerRepo.computeRanking, timeToLive = 3.seconds)
+    PlayerRepo.computeRanking,
+    timeToLive = 3.seconds)
 
   // only applies to finished tournaments
   private val finishedRanking = AsyncCache[String, Ranking](
-      PlayerRepo.computeRanking, timeToLive = rankingTtl)
+    PlayerRepo.computeRanking,
+    timeToLive = rankingTtl)
 }

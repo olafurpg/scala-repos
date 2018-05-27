@@ -17,7 +17,7 @@ class TracingLogHandlerTest extends FunSuite with BeforeAndAfter {
 
       tracer.iterator.next().annotation match {
         case Message(s) => assert(s.trim == msg1)
-        case _ => fail("Message does not match")
+        case _          => fail("Message does not match")
       }
     }
   }

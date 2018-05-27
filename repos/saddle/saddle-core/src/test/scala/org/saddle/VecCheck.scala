@@ -238,8 +238,8 @@ class VecCheck extends Specification with ScalaCheck {
 
     "foldLeftWhile works" in {
       forAll { (v: Vec[Double]) =>
-        val res = v.foldLeftWhile(0)((c: Int, x: Double) => c + 1)((c: Int,
-            x: Double) => c < 3)
+        val res = v.foldLeftWhile(0)((c: Int, x: Double) => c + 1)(
+          (c: Int, x: Double) => c < 3)
         var c = 0
         val exp = v.contents.takeWhile { (v: Double) =>
           v.isNaN || { c += 1; c <= 3 }
@@ -261,7 +261,7 @@ class VecCheck extends Specification with ScalaCheck {
         val res = v.filterScanLeft(_ > 0.5)(0)((c: Int, x: Double) => c + 1)
         res.length must_== v.length
         (res.last.isNA must beTrue) or
-        (res.last must_== Value(v.filter(_ > 0.5).count))
+          (res.last must_== Value(v.filter(_ > 0.5).count))
       }
     }
 

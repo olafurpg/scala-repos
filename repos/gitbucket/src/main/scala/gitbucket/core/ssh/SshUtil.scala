@@ -32,6 +32,6 @@ object SshUtil {
 
   def fingerPrint(key: String): Option[String] = str2PublicKey(key) match {
     case Some(publicKey) => Some(KeyUtils.getFingerPrint(publicKey))
-    case None => None
+    case None            => None
   }
 }

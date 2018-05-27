@@ -48,9 +48,10 @@ object Framing {
     * @param maximumFrameLength The maximum length of allowed frames while decoding. If the maximum length is
     *                           exceeded this Flow will fail the stream.
     */
-  def delimiter(delimiter: ByteString,
-                maximumFrameLength: Int,
-                allowTruncation: FramingTruncation)
+  def delimiter(
+      delimiter: ByteString,
+      maximumFrameLength: Int,
+      allowTruncation: FramingTruncation)
     : Flow[ByteString, ByteString, NotUsed] = {
     val truncationAllowed = allowTruncation == FramingTruncation.ALLOW
     scaladsl.Framing

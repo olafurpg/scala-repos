@@ -38,6 +38,6 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class PrintQualitySpec
     extends SFXEnumDelegateSpec[jfxp.PrintQuality, PrintQuality](
-        javaClass = classOf[jfxp.PrintQuality],
-        scalaClass = classOf[PrintQuality],
-        companion = PrintQuality)
+      javaClass = classOf[jfxp.PrintQuality],
+      scalaClass = classOf[PrintQuality],
+      companion = PrintQuality)

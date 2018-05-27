@@ -49,7 +49,8 @@ class StorageStatusListener(conf: SparkConf) extends SparkListener {
 
   /** Update storage status list to reflect updated block statuses */
   private def updateStorageStatus(
-      execId: String, updatedBlocks: Seq[(BlockId, BlockStatus)]) {
+      execId: String,
+      updatedBlocks: Seq[(BlockId, BlockStatus)]) {
     executorIdToStorageStatus.get(execId).foreach { storageStatus =>
       updatedBlocks.foreach {
         case (blockId, updatedStatus) =>

@@ -49,14 +49,15 @@ package test {
           case GET(p"/repositories") =>
             Action {
               Results.Ok(
-                  Json.arr(Json.obj("full_name" -> "octocat/Hello-World")))
+                Json.arr(Json.obj("full_name" -> "octocat/Hello-World")))
             }
         } { implicit port =>
           implicit val materializer = Play.current.materializer
           WsTestClient.withClient { client =>
             val result =
-              Await.result(new GitHubClient(client, "").repositories(),
-                           10.seconds)
+              Await.result(
+                new GitHubClient(client, "").repositories(),
+                10.seconds)
             result must_== Seq("octocat/Hello-World")
           }
         }
@@ -73,7 +74,8 @@ import org.specs2.mutable.Specification
 import org.specs2.time.NoTimeConversions
 
 object ScalaTestingWebServiceClients
-    extends Specification with NoTimeConversions {
+    extends Specification
+    with NoTimeConversions {
 
   "webservice testing" should {
     "allow mocking a service" in {
@@ -87,8 +89,7 @@ object ScalaTestingWebServiceClients
       Server.withRouter() {
         case GET(p"/repositories") =>
           Action {
-            Results.Ok(
-                Json.arr(Json.obj("full_name" -> "octocat/Hello-World")))
+            Results.Ok(Json.arr(Json.obj("full_name" -> "octocat/Hello-World")))
           }
       } { implicit port =>
         //#mock-service

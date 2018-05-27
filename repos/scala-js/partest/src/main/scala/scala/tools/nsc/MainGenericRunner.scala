@@ -50,13 +50,13 @@ class MainGenericRunner {
   }
 
   def process(args: Array[String]): Boolean = {
-    val command = new GenericRunnerCommand(
-        args.toList, (x: String) => errorFn(x))
+    val command =
+      new GenericRunnerCommand(args.toList, (x: String) => errorFn(x))
 
     if (!command.ok) return errorFn("\n" + command.shortUsageMsg)
     else if (command.settings.version)
       return errorFn(
-          "Scala code runner %s -- %s".format(versionString, copyrightString))
+        "Scala code runner %s -- %s".format(versionString, copyrightString))
     else if (command.shouldStopWithInfo) return errorFn("shouldStopWithInfo")
 
     if (command.howToRun != AsObject)
@@ -67,14 +67,16 @@ class MainGenericRunner {
     val semantics = readSemantics()
     val ir =
       (loadIR(command.settings.classpathURLs) :+ runnerIR(
-              command.thingToRun, command.arguments))
+        command.thingToRun,
+        command.arguments))
 
     val jsRunner = new MemVirtualJSFile("launcher.js")
       .withContent(s"PartestLauncher().launch();")
 
-    val linker = Linker(semantics,
-                        withSourceMap = false,
-                        useClosureCompiler = optMode == FullOpt)
+    val linker = Linker(
+      semantics,
+      withSourceMap = false,
+      useClosureCompiler = optMode == FullOpt)
 
     val libJSEnv = {
       /* Historically, we used Rhino in NoOpt and NodeJS in FastOpt and FullOpt.
@@ -117,28 +119,29 @@ class MainGenericRunner {
     val definition = {
       implicit val DummyPos = ir.Position.NoPosition
       ClassDef(
-          Ident(encodedClassName, Some(className)),
-          ClassKind.ModuleClass,
-          Some(Ident("O", Some("java.lang.Object"))),
-          Nil,
-          None,
-          List(
-              MethodDef(
-                  static = false,
-                  StringLiteral("launch"),
-                  Nil,
-                  AnyType,
-                  Block(
-                      Apply(LoadModule(ClassType(mainModuleClassName)),
-                            Ident("main__AT__V"),
-                            List(ArrayValue(ArrayType("T", 1),
-                                            args.map(StringLiteral(_)))))(
-                          NoType),
-                      Undefined()
-                  )
-              )(OptimizerHints.empty, None),
-              ModuleExportDef(exportName)
-          )
+        Ident(encodedClassName, Some(className)),
+        ClassKind.ModuleClass,
+        Some(Ident("O", Some("java.lang.Object"))),
+        Nil,
+        None,
+        List(
+          MethodDef(
+            static = false,
+            StringLiteral("launch"),
+            Nil,
+            AnyType,
+            Block(
+              Apply(
+                LoadModule(ClassType(mainModuleClassName)),
+                Ident("main__AT__V"),
+                List(
+                  ArrayValue(ArrayType("T", 1), args.map(StringLiteral(_)))))(
+                NoType),
+              Undefined()
+            )
+          )(OptimizerHints.empty, None),
+          ModuleExportDef(exportName)
+        )
       )(OptimizerHints.empty)
     }
 

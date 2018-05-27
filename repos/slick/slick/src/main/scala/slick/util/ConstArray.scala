@@ -10,7 +10,7 @@ import scala.util.hashing.MurmurHash3
 /** An efficient immutable array implementation which is used in the AST. Semantics are generally
   * the same as for Scala collections but for performance reasons it does not implement any
   * standard collection traits. */
-final class ConstArray[+T] private[util](a: Array[Any], val length: Int)
+final class ConstArray[+T] private[util] (a: Array[Any], val length: Int)
     extends Product { self =>
   private def this(a: Array[Any]) = this(a, a.length)
 
@@ -298,14 +298,17 @@ final class ConstArray[+T] private[util](a: Array[Any], val length: Int)
     b.result()
   }
 
-  def toArray[R >: T : ClassTag]: Array[R] = {
+  def toArray[R >: T: ClassTag]: Array[R] = {
     val ar = new Array[R](length)
     System.arraycopy(a, 0, ar, 0, length)
     ar
   }
 
   private[util] def copySliceTo(
-      dest: Array[Any], srcPos: Int, destPos: Int, len: Int): Unit = {
+      dest: Array[Any],
+      srcPos: Int,
+      destPos: Int,
+      len: Int): Unit = {
     if (len + srcPos > length) throw new IndexOutOfBoundsException
     System.arraycopy(a, srcPos, dest, destPos, len)
   }
@@ -354,9 +357,9 @@ final class ConstArray[+T] private[util](a: Array[Any], val length: Int)
       else new ConstArray(a, until)
     } else
       new ConstArray(
-          Arrays
-            .copyOfRange[AnyRef](a.asInstanceOf[Array[AnyRef]], from, until)
-            .asInstanceOf[Array[Any]])
+        Arrays
+          .copyOfRange[AnyRef](a.asInstanceOf[Array[AnyRef]], from, until)
+          .asInstanceOf[Array[Any]])
   }
 
   def tail = slice(1, length)
@@ -449,8 +452,9 @@ object ConstArray {
   //def unapplySeq[T](a: ConstArray[T]) = new ConstArrayExtract[T](a) // Requires Scala 2.11
   def unapplySeq[T](a: ConstArray[T]): Some[IndexedSeq[T]] = Some(a.toSeq)
 
-  def newBuilder[T](initialCapacity: Int = 16,
-                    growFactor: Double = 2.0): ConstArrayBuilder[T] =
+  def newBuilder[T](
+      initialCapacity: Int = 16,
+      growFactor: Double = 2.0): ConstArrayBuilder[T] =
     new ConstArrayBuilder[T](initialCapacity, growFactor)
 }
 
@@ -489,7 +493,8 @@ final class RangeConstArrayOp(val r: Range) extends ConstArrayOp[Int] {
 
 /** A mutable builder for ConstArrays. */
 final class ConstArrayBuilder[T](
-    initialCapacity: Int = 16, growFactor: Double = 2.0) { self =>
+    initialCapacity: Int = 16,
+    growFactor: Double = 2.0) { self =>
   private[this] var a: Array[Any] = new Array[Any](initialCapacity)
   private[this] var len: Int = 0
 
@@ -524,8 +529,9 @@ final class ConstArrayBuilder[T](
     val total = len + i
     if (a.length < total)
       a = Arrays
-        .copyOf[Any](a.asInstanceOf[Array[AnyRef]],
-                     math.max((a.length * growFactor).toInt, total))
+        .copyOf[Any](
+          a.asInstanceOf[Array[AnyRef]],
+          math.max((a.length * growFactor).toInt, total))
         .asInstanceOf[Array[Any]]
   }
 

@@ -34,7 +34,9 @@ import org.specs2.time.NoTimeConversions
   * Systems under specification for TimeHelpers.
   */
 object TimeHelpersSpec
-    extends Specification with ScalaCheck with TimeAmountsGen
+    extends Specification
+    with ScalaCheck
+    with TimeAmountsGen
     with NoTimeConversions {
   "TimeHelpers Specification".title
 
@@ -107,24 +109,21 @@ object TimeHelpersSpec
       3.seconds.ago.getMillis must beCloseTo(expectedTime, 1000L)
     }
     "have a toString method returning the relevant number of weeks, days, hours, minutes, seconds, millis" in forAllTimeZones {
-      val conversionIsOk = forAll(timeAmounts)(
-          (t: TimeAmounts) =>
-            {
-          val (timeSpanToString, timeSpanAmounts) = t
-          timeSpanAmounts forall {
-            case (amount, unit) =>
-              amount >= 1 && timeSpanToString.contains(amount.toString) || true
-          }
+      val conversionIsOk = forAll(timeAmounts)((t: TimeAmounts) => {
+        val (timeSpanToString, timeSpanAmounts) = t
+        timeSpanAmounts forall {
+          case (amount, unit) =>
+            amount >= 1 && timeSpanToString.contains(amount.toString) || true
+        }
       })
-      val timeSpanStringIsPluralized = forAll(timeAmounts)((t: TimeAmounts) =>
-            {
-          val (timeSpanToString, timeSpanAmounts) = t
-          timeSpanAmounts forall {
-            case (amount, unit) =>
-              amount > 1 && timeSpanToString.contains(unit + "s") ||
+      val timeSpanStringIsPluralized = forAll(timeAmounts)((t: TimeAmounts) => {
+        val (timeSpanToString, timeSpanAmounts) = t
+        timeSpanAmounts forall {
+          case (amount, unit) =>
+            amount > 1 && timeSpanToString.contains(unit + "s") ||
               amount == 1 && timeSpanToString.contains(unit) ||
               amount == 0 && !timeSpanToString.contains(unit)
-          }
+        }
       })
       conversionIsOk && timeSpanStringIsPluralized
     }
@@ -171,13 +170,13 @@ object TimeHelpersSpec
       millisToDays(today.setYear(1970).setMonth(0).setDay(1).getTime.getTime) must_== 0 // the epoch time
       // on the 3rd day after the epoch time, 2 days are passed
       millisToDays(
-          today
-            .setTimezone(utc)
-            .setYear(1970)
-            .setMonth(0)
-            .setDay(3)
-            .getTime
-            .getTime) must_== 2
+        today
+          .setTimezone(utc)
+          .setYear(1970)
+          .setMonth(0)
+          .setDay(3)
+          .getTime
+          .getTime) must_== 2
     }
     "provide a daysSinceEpoch function returning the number of days since the epoch time" in forAllTimeZones {
       daysSinceEpoch must_== millisToDays(now.getTime)
@@ -209,14 +208,15 @@ object TimeHelpersSpec
 
     "provide a parseInternetDate function to parse a string formatted using the internet format" in forAllTimeZones {
       parseInternetDate(internetDateFormatter.format(now)).getTime.toLong must beCloseTo(
-          now.getTime.toLong, 1000L)
+        now.getTime.toLong,
+        1000L)
     }
     "provide a parseInternetDate function returning new Date(0) if the input date cant be parsed" in forAllTimeZones {
       parseInternetDate("unparsable") must_== new Date(0)
     }
     "provide a toInternetDate function formatting a date to the internet format" in forAllTimeZones {
       toInternetDate(now) must beMatching(
-          "..., \\d* ... \\d\\d\\d\\d \\d\\d:\\d\\d:\\d\\d .*")
+        "..., \\d* ... \\d\\d\\d\\d \\d\\d:\\d\\d:\\d\\d .*")
     }
     "provide a toDate returning a Full(date) from many kinds of objects" in forAllTimeZones {
       val d = now
@@ -254,17 +254,17 @@ object TimeHelpersSpec
 object forAllTimeZones extends Around {
   import MatchersImplicits._
 
-  override def around[T : AsResult](f: => T) = synchronized {
+  override def around[T: AsResult](f: => T) = synchronized {
     // setDefault is on static context so tests should be sequenced
     import collection.convert.wrapAsScala._
     // some timezones for java (used in formatters) and for Joda (other computations) has other offset
     val commonJavaAndJodaTimeZones =
-      (TimeZone.getAvailableIDs.toSet & DateTimeZone.getAvailableIDs.toSet).filter {
-        timeZoneId =>
+      (TimeZone.getAvailableIDs.toSet & DateTimeZone.getAvailableIDs.toSet)
+        .filter { timeZoneId =>
           TimeZone.getTimeZone(timeZoneId).getOffset(millis) == DateTimeZone
             .forID(timeZoneId)
             .getOffset(millis)
-      }
+        }
     val tzBefore = TimeZone.getDefault
     val dtzBefore = DateTimeZone.getDefault
     try {
@@ -293,8 +293,9 @@ trait TimeAmountsGen {
     ml <- choose(0, 999)
   } yield
     (
-        TimeSpan(weeks(w) + days(d) + hours(h) + minutes(m) + seconds(s) + ml).toString,
-        (w, "week") :: (d, "day") :: (h, "hour") :: (m, "minute") :: (
-            s, "second") :: (ml, "milli") :: Nil
+      TimeSpan(weeks(w) + days(d) + hours(h) + minutes(m) + seconds(s) + ml).toString,
+      (w, "week") :: (d, "day") :: (h, "hour") :: (m, "minute") :: (s, "second") :: (
+        ml,
+        "milli") :: Nil
     )
 }

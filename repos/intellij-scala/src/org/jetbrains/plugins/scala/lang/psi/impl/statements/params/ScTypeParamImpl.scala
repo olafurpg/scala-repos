@@ -30,9 +30,13 @@ import org.jetbrains.plugins.scala.lang.psi.types.{ScParameterizedType, ScType}
   * Date: 22.02.2008
   */
 class ScTypeParamImpl private (
-    stub: StubElement[ScTypeParam], nodeType: IElementType, node: ASTNode)
+    stub: StubElement[ScTypeParam],
+    nodeType: IElementType,
+    node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
-    with ScTypeBoundsOwnerImpl with ScTypeParam with PsiClassFake {
+    with ScTypeBoundsOwnerImpl
+    with ScTypeParam
+    with PsiClassFake {
   def this(node: ASTNode) = { this(null, null, node) }
   def this(stub: ScTypeParamStub) = {
     this(stub, ScalaElementTypes.TYPE_PARAM, null)
@@ -63,7 +67,7 @@ class ScTypeParamImpl private (
   def getIndex: Int = 0
   def getOwner: PsiTypeParameterListOwner = getContext.getContext match {
     case c: PsiTypeParameterListOwner => c
-    case _ => null
+    case _                            => null
   }
 
   override def getContainingClass: ScTemplateDefinition = null
@@ -75,7 +79,7 @@ class ScTypeParamImpl private (
     }
     findChildByType[PsiElement](ScalaTokenTypes.tIDENTIFIER) match {
       case null => false
-      case x => x.getText == "+"
+      case x    => x.getText == "+"
     }
   }
 
@@ -86,7 +90,7 @@ class ScTypeParamImpl private (
     }
     findChildByType[PsiElement](ScalaTokenTypes.tIDENTIFIER) match {
       case null => false
-      case x => x.getText == "-"
+      case x    => x.getText == "-"
     }
   }
 
@@ -156,7 +160,7 @@ class ScTypeParamImpl private (
           }
         psiType match {
           case x: PsiClassType => Array(x)
-          case _ => Array() // TODO
+          case _               => Array() // TODO
         }
       case Failure(_, _) => Array()
     }

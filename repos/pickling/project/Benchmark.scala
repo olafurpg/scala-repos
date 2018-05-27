@@ -20,17 +20,19 @@ object Benchmark {
         if (javaVersion.startsWith("1.8")) Seq("-XX:+UseParallelGC")
         else Seq("-XX:MaxPermSize=512M", "-XX:+UseParallelGC")
       var shellCommand =
-        Seq("java",
-            "-Dsize=" + len,
-            "-cp",
-            toolCP,
-            "-Xms1536M",
-            "-Xmx4096M",
-            "-Xss2M") ++ jdkOptions ++ Seq("scala.tools.nsc.MainGenericRunner",
-                                           "-cp",
-                                           libraryCP,
-                                           benchClass,
-                                           "10")
+        Seq(
+          "java",
+          "-Dsize=" + len,
+          "-cp",
+          toolCP,
+          "-Xms1536M",
+          "-Xmx4096M",
+          "-Xss2M") ++ jdkOptions ++ Seq(
+          "scala.tools.nsc.MainGenericRunner",
+          "-cp",
+          libraryCP,
+          benchClass,
+          "10")
       shellCommand.!
     }
   }
@@ -66,61 +68,73 @@ object Benchmark {
 
   def benchmarkSettings =
     Seq(
-        // MISC
-        listInt :=
-          benchTask("ListIntBench", 100000 to 1000000 by 100000).evaluated,
-        vectorKryo :=
-          benchTask("KryoVectorBench", 100000 to 1000000 by 100000).evaluated,
-        arrayInt :=
-          benchTask("ArrayIntBench", 500000 to 5000000 by 500000).evaluated,
-        // PAPER
-        travIntPick := benchTask(
-            "TraversableIntBench", 100000 to 1000000 by 100000).evaluated,
-        travIntJava := benchTask(
-            "TraversableJavaIntBench", 100000 to 1000000 by 100000).evaluated,
-        travIntKryo := benchTask(
-            "TraversableKryoIntBench", 100000 to 1000000 by 100000).evaluated,
-        travIntPickFreeMem := benchTask("TraversableIntBenchFreeMem",
-                                        100000 to 1000000 by 100000).evaluated,
-        travIntJavaFreeMem := benchTask("TraversableJavaIntBenchFreeMem",
-                                        100000 to 1000000 by 100000).evaluated,
-        travIntKryoFreeMem := benchTask("TraversableKryoIntBenchFreeMem",
-                                        100000 to 1000000 by 100000).evaluated,
-        travIntPickSize := benchTask("TraversableIntBenchSize",
-                                     100000 to 1000000 by 100000).evaluated,
-        travIntJavaSize := benchTask("TraversableJavaIntBenchSize",
-                                     100000 to 1000000 by 100000).evaluated,
-        travIntKryoSize := benchTask("TraversableKryoIntBenchSize",
-                                     100000 to 1000000 by 100000).evaluated,
-        geoTrellisPick := benchTask("GeoTrellisPicklingBench",
-                                    5000000 to 50000000 by 5000000).evaluated,
-        geoTrellisJava := benchTask("GeoTrellisJavaBench",
-                                    5000000 to 50000000 by 5000000).evaluated,
-        geoTrellisKryo := benchTask(
-            "GeoTrellisKryoBench", 5000000 to 50000000 by 5000000).evaluated,
-        evactor1Pick :=
-          benchTask("EvactorPicklingBench", 1000 to 10000 by 1000).evaluated,
-        evactor1Java :=
-          benchTask("EvactorJavaBench", 1000 to 10000 by 1000).evaluated,
-        evactor1Kryo :=
-          benchTask("EvactorKryoBench", 1000 to 10000 by 1000).evaluated,
-        evactor2Pick :=
-          benchTask("EvactorPicklingBench", 20000 to 40000 by 2000).evaluated,
-        evactor2Java :=
-          benchTask("EvactorJavaBench", 20000 to 40000 by 2000).evaluated,
-        evactor2Kryo :=
-          benchTask("EvactorKryoBench", 20000 to 40000 by 2000).evaluated,
-        sparklrPick :=
-          benchTask("SparkLRPicklingBench", 20000 to 40000 by 2000).evaluated,
-        sparklrJava :=
-          benchTask("SparkLRJavaBench", 20000 to 40000 by 2000).evaluated,
-        sparklrKryo :=
-          benchTask("SparkLRKryoBench", 20000 to 40000 by 2000).evaluated,
-        graphPick :=
-          benchTask("WikiGraphPicklingBench", 5000 to 14000 by 1000).evaluated,
-        graphJava :=
-          benchTask("WikiGraphJavaBench", 5000 to 14000 by 1000).evaluated,
-        graphKryo :=
-          benchTask("WikiGraphKryoBench", 5000 to 14000 by 1000).evaluated
+      // MISC
+      listInt :=
+        benchTask("ListIntBench", 100000 to 1000000 by 100000).evaluated,
+      vectorKryo :=
+        benchTask("KryoVectorBench", 100000 to 1000000 by 100000).evaluated,
+      arrayInt :=
+        benchTask("ArrayIntBench", 500000 to 5000000 by 500000).evaluated,
+      // PAPER
+      travIntPick := benchTask(
+        "TraversableIntBench",
+        100000 to 1000000 by 100000).evaluated,
+      travIntJava := benchTask(
+        "TraversableJavaIntBench",
+        100000 to 1000000 by 100000).evaluated,
+      travIntKryo := benchTask(
+        "TraversableKryoIntBench",
+        100000 to 1000000 by 100000).evaluated,
+      travIntPickFreeMem := benchTask(
+        "TraversableIntBenchFreeMem",
+        100000 to 1000000 by 100000).evaluated,
+      travIntJavaFreeMem := benchTask(
+        "TraversableJavaIntBenchFreeMem",
+        100000 to 1000000 by 100000).evaluated,
+      travIntKryoFreeMem := benchTask(
+        "TraversableKryoIntBenchFreeMem",
+        100000 to 1000000 by 100000).evaluated,
+      travIntPickSize := benchTask(
+        "TraversableIntBenchSize",
+        100000 to 1000000 by 100000).evaluated,
+      travIntJavaSize := benchTask(
+        "TraversableJavaIntBenchSize",
+        100000 to 1000000 by 100000).evaluated,
+      travIntKryoSize := benchTask(
+        "TraversableKryoIntBenchSize",
+        100000 to 1000000 by 100000).evaluated,
+      geoTrellisPick := benchTask(
+        "GeoTrellisPicklingBench",
+        5000000 to 50000000 by 5000000).evaluated,
+      geoTrellisJava := benchTask(
+        "GeoTrellisJavaBench",
+        5000000 to 50000000 by 5000000).evaluated,
+      geoTrellisKryo := benchTask(
+        "GeoTrellisKryoBench",
+        5000000 to 50000000 by 5000000).evaluated,
+      evactor1Pick :=
+        benchTask("EvactorPicklingBench", 1000 to 10000 by 1000).evaluated,
+      evactor1Java :=
+        benchTask("EvactorJavaBench", 1000 to 10000 by 1000).evaluated,
+      evactor1Kryo :=
+        benchTask("EvactorKryoBench", 1000 to 10000 by 1000).evaluated,
+      evactor2Pick :=
+        benchTask("EvactorPicklingBench", 20000 to 40000 by 2000).evaluated,
+      evactor2Java :=
+        benchTask("EvactorJavaBench", 20000 to 40000 by 2000).evaluated,
+      evactor2Kryo :=
+        benchTask("EvactorKryoBench", 20000 to 40000 by 2000).evaluated,
+      sparklrPick :=
+        benchTask("SparkLRPicklingBench", 20000 to 40000 by 2000).evaluated,
+      sparklrJava :=
+        benchTask("SparkLRJavaBench", 20000 to 40000 by 2000).evaluated,
+      sparklrKryo :=
+        benchTask("SparkLRKryoBench", 20000 to 40000 by 2000).evaluated,
+      graphPick :=
+        benchTask("WikiGraphPicklingBench", 5000 to 14000 by 1000).evaluated,
+      graphJava :=
+        benchTask("WikiGraphJavaBench", 5000 to 14000 by 1000).evaluated,
+      graphKryo :=
+        benchTask("WikiGraphKryoBench", 5000 to 14000 by 1000).evaluated
     )
 }

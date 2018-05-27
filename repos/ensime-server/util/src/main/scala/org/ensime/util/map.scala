@@ -18,8 +18,7 @@ package object map {
   }
 
   // I'm sure CanBuildFrom could make this general to all value containers
-  implicit class RichMultiMapSet[K, V](val map: Map[K, Set[V]])
-      extends AnyVal {
+  implicit class RichMultiMapSet[K, V](val map: Map[K, Set[V]]) extends AnyVal {
 
     /**
       * Treating `map` as a multimap, merge with another similarly

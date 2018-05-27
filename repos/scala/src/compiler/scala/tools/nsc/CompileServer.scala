@@ -49,8 +49,8 @@ class StandardCompileServer(fixPort: Int = 0) extends SocketServer(fixPort) {
   def printMemoryStats() {
     def mb(bytes: Long) = "%dMB".format(bytes / 1000000)
     info(
-        "New session: total memory = %s, max memory = %s, free memory = %s"
-          .format(mb(totalMemory), mb(maxMemory), mb(freeMemory)))
+      "New session: total memory = %s, max memory = %s, free memory = %s"
+        .format(mb(totalMemory), mb(maxMemory), mb(freeMemory)))
   }
 
   def isMemoryFullEnough() = {
@@ -69,7 +69,7 @@ class StandardCompileServer(fixPort: Int = 0) extends SocketServer(fixPort) {
     val ignoreSettings = Set("-d", "-encoding", "-currentDir")
     def trim(s: Settings): Set[Settings#Setting] =
       (s.userSetSettings.toSet[Settings#Setting] filterNot
-          (ss => ignoreSettings exists (ss respondsTo _)))
+        (ss => ignoreSettings exists (ss respondsTo _)))
     val ss1 = trim(s1)
     val ss2 = trim(s2)
 
@@ -83,7 +83,7 @@ class StandardCompileServer(fixPort: Int = 0) extends SocketServer(fixPort) {
 
     def fscError(msg: String): Unit =
       out println
-      (FakePos("fsc") + msg + "\n  fsc -help  gives more information")
+        (FakePos("fsc") + msg + "\n  fsc -help  gives more information")
     if (input == null || password != guessedPassword) return
 
     val args = input.split("\u0000", -1).toList
@@ -93,7 +93,8 @@ class StandardCompileServer(fixPort: Int = 0) extends SocketServer(fixPort) {
 
     info("Settings after normalizing paths: " + newSettings)
     if (!command.files.isEmpty)
-      info("Input files after normalizing paths: " +
+      info(
+        "Input files after normalizing paths: " +
           (command.files mkString ","))
     printMemoryStats()
 
@@ -128,7 +129,7 @@ class StandardCompileServer(fixPort: Int = 0) extends SocketServer(fixPort) {
       val unequal = unequalSettings(newSettings, compiler.settings)
       if (unequal.nonEmpty) {
         info(
-            "[Replacing compiler with new instance because settings are unequal.]")
+          "[Replacing compiler with new instance because settings are unequal.]")
         info("[Asymmetric settings: " + unequal.mkString(", ") + "]")
       }
       unequal.isEmpty
@@ -146,15 +147,16 @@ class StandardCompileServer(fixPort: Int = 0) extends SocketServer(fixPort) {
         compiler = newGlobal(newSettings, reporter)
       }
       val c = compiler
-      try new c.Run() compile command.files catch {
+      try new c.Run() compile command.files
+      catch {
         case ex @ FatalError(msg) =>
           reporter.error(null, "fatal error: " + msg)
           clearCompiler()
         case ex: Throwable =>
           warn("Compile server encountered fatal condition: " + ex)
           reporter.error(
-              null,
-              "Compile server encountered fatal condition: " + ex.getMessage)
+            null,
+            "Compile server encountered fatal condition: " + ex.getMessage)
           shutdown = true
           throw ex
       }
@@ -208,12 +210,11 @@ object CompileServer {
       server.echo("Redirect dir is " + redirectDir)
     }
 
-    Console.withErr(
-        createRedirect(redirectDir, "scala-compile-server-err.log")) {
+    Console.withErr(createRedirect(redirectDir, "scala-compile-server-err.log")) {
       Console.withOut(
-          createRedirect(redirectDir, "scala-compile-server-out.log")) {
+        createRedirect(redirectDir, "scala-compile-server-out.log")) {
         Console.err.println(
-            "...starting server on socket " + server.port + "...")
+          "...starting server on socket " + server.port + "...")
         Console.err.flush()
         server.compileSocket setPort server.port
         startupCallback()

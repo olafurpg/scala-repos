@@ -49,7 +49,7 @@ class BrokerChannelHandler extends SimpleChannelHandler {
     def unapply(e: UpstreamEvent): Option[(Any, ChannelHandlerContext)] =
       e match {
         case Message(e, ctx) => Some((e.getMessage, ctx))
-        case _ => None
+        case _               => None
       }
   }
 
@@ -78,7 +78,7 @@ class BrokerChannelHandler extends SimpleChannelHandler {
     def unapply(e: DownstreamEvent): Option[(Any, ChannelHandlerContext)] =
       e match {
         case Write(e, ctx) => Some((e.getMessage, ctx))
-        case _ => None
+        case _             => None
       }
   }
 
@@ -139,42 +139,48 @@ class BrokerChannelHandler extends SimpleChannelHandler {
   }
 
   override def channelConnected(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent) {
+      ctx: ChannelHandlerContext,
+      e: ChannelStateEvent) {
     upstreamBroker ! Connected(e, ctx)
   }
 
   override def channelInterestChanged(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent) {
+      ctx: ChannelHandlerContext,
+      e: ChannelStateEvent) {
     upstreamBroker ! InterestChanged(e, ctx)
   }
 
   override def channelDisconnected(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent) {
+      ctx: ChannelHandlerContext,
+      e: ChannelStateEvent) {
     upstreamBroker ! Disconnected(e, ctx)
   }
 
   override def channelUnbound(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent) {
+      ctx: ChannelHandlerContext,
+      e: ChannelStateEvent) {
     upstreamBroker ! Unbound(e, ctx)
   }
 
-  override def channelClosed(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent) {
+  override def channelClosed(ctx: ChannelHandlerContext, e: ChannelStateEvent) {
     upstreamBroker ! Closed(e, ctx)
   }
 
   override def writeComplete(
-      ctx: ChannelHandlerContext, e: WriteCompletionEvent) {
+      ctx: ChannelHandlerContext,
+      e: WriteCompletionEvent) {
     upstreamBroker ! WriteComplete(e, ctx)
   }
 
   override def childChannelOpen(
-      ctx: ChannelHandlerContext, e: ChildChannelStateEvent) {
+      ctx: ChannelHandlerContext,
+      e: ChildChannelStateEvent) {
     upstreamBroker ! ChildOpen(e, ctx)
   }
 
   override def childChannelClosed(
-      ctx: ChannelHandlerContext, e: ChildChannelStateEvent) {
+      ctx: ChannelHandlerContext,
+      e: ChildChannelStateEvent) {
     upstreamBroker ! ChildClosed(e, ctx)
   }
 
@@ -184,33 +190,37 @@ class BrokerChannelHandler extends SimpleChannelHandler {
     downstreamBroker ! Write(e, ctx)
   }
 
-  override def bindRequested(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent) {
+  override def bindRequested(ctx: ChannelHandlerContext, e: ChannelStateEvent) {
     downstreamBroker ! Bind(e, ctx)
   }
 
   override def connectRequested(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent) {
+      ctx: ChannelHandlerContext,
+      e: ChannelStateEvent) {
     downstreamBroker ! Connect(e, ctx)
   }
 
   override def setInterestOpsRequested(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent) {
+      ctx: ChannelHandlerContext,
+      e: ChannelStateEvent) {
     downstreamBroker ! InterestOps(e, ctx)
   }
 
   override def disconnectRequested(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent) {
+      ctx: ChannelHandlerContext,
+      e: ChannelStateEvent) {
     downstreamBroker ! Disconnect(e, ctx)
   }
 
   override def unbindRequested(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent) {
+      ctx: ChannelHandlerContext,
+      e: ChannelStateEvent) {
     downstreamBroker ! Unbind(e, ctx)
   }
 
   override def closeRequested(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent) {
+      ctx: ChannelHandlerContext,
+      e: ChannelStateEvent) {
     downstreamBroker ! Close(e, ctx)
   }
 }

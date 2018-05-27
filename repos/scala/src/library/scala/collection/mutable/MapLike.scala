@@ -44,9 +44,12 @@ import scala.collection.parallel.mutable.ParMap
   *    `size` for efficiency.
   */
 trait MapLike[A, B, +This <: MapLike[A, B, This] with Map[A, B]]
-    extends scala.collection.MapLike[A, B, This] with Builder[(A, B), This]
-    with Growable[(A, B)] with Shrinkable[A]
-    with Cloneable[This] with Parallelizable[(A, B), ParMap[A, B]] {
+    extends scala.collection.MapLike[A, B, This]
+    with Builder[(A, B), This]
+    with Growable[(A, B)]
+    with Shrinkable[A]
+    with Cloneable[This]
+    with Parallelizable[(A, B), ParMap[A, B]] {
   self =>
 
   /** A common implementation of `newBuilder` for all mutable maps
@@ -122,8 +125,8 @@ trait MapLike[A, B, +This <: MapLike[A, B, This] with Map[A, B]]
     *  @return      a new map containing mappings of this map and the mapping `kv`.
     */
   @migration(
-      "`+` creates a new map. Use `+=` to add an element to this map and return that map itself.",
-      "2.8.0")
+    "`+` creates a new map. Use `+=` to add an element to this map and return that map itself.",
+    "2.8.0")
   def +[B1 >: B](kv: (A, B1)): Map[A, B1] =
     clone().asInstanceOf[Map[A, B1]] += kv
 
@@ -138,10 +141,12 @@ trait MapLike[A, B, +This <: MapLike[A, B, This] with Map[A, B]]
     *  @return      a new map containing mappings of this map and two or more specified mappings.
     */
   @migration(
-      "`+` creates a new map. Use `+=` to add an element to this map and return that map itself.",
-      "2.8.0")
+    "`+` creates a new map. Use `+=` to add an element to this map and return that map itself.",
+    "2.8.0")
   override def +[B1 >: B](
-      elem1: (A, B1), elem2: (A, B1), elems: (A, B1)*): Map[A, B1] =
+      elem1: (A, B1),
+      elem2: (A, B1),
+      elems: (A, B1)*): Map[A, B1] =
     clone().asInstanceOf[Map[A, B1]] += elem1 += elem2 ++= elems
 
   /** Creates a new map containing the key/value mappings provided by the specified traversable object
@@ -153,8 +158,8 @@ trait MapLike[A, B, +This <: MapLike[A, B, This] with Map[A, B]]
     *  @return       a new map containing mappings of this map and those provided by `xs`.
     */
   @migration(
-      "`++` creates a new map. Use `++=` to add an element to this map and return that map itself.",
-      "2.8.0")
+    "`++` creates a new map. Use `++=` to add an element to this map and return that map itself.",
+    "2.8.0")
   override def ++[B1 >: B](xs: GenTraversableOnce[(A, B1)]): Map[A, B1] =
     clone().asInstanceOf[Map[A, B1]] ++= xs.seq
 
@@ -183,8 +188,8 @@ trait MapLike[A, B, +This <: MapLike[A, B, This] with Map[A, B]]
     *  @return   a new map with all the mappings of this map except that with a key `key`.
     */
   @migration(
-      "`-` creates a new map. Use `-=` to remove an element from this map and return that map itself.",
-      "2.8.0")
+    "`-` creates a new map. Use `-=` to remove an element from this map and return that map itself.",
+    "2.8.0")
   override def -(key: A): This = clone() -= key
 
   /** Removes all bindings from the map. After this operation has completed,
@@ -199,7 +204,7 @@ trait MapLike[A, B, +This <: MapLike[A, B, This] with Map[A, B]]
     *
     *  Concurrent map implementations may evaluate the expression `op`
     *  multiple times, or may evaluate `op` without inserting the result.
-    *  
+    *
     *  @param  key the key to test
     *  @param  op  the computation yielding the value to associate with `key`, if
     *              `key` is previously unbound.
@@ -209,7 +214,7 @@ trait MapLike[A, B, +This <: MapLike[A, B, This] with Map[A, B]]
   def getOrElseUpdate(key: A, op: => B): B =
     get(key) match {
       case Some(v) => v
-      case None => val d = op; this(key) = d; d
+      case None    => val d = op; this(key) = d; d
     }
 
   /** Applies a transformation function to all values contained in this map.
@@ -233,7 +238,7 @@ trait MapLike[A, B, +This <: MapLike[A, B, This] with Map[A, B]]
     */
   def retain(p: (A, B) => Boolean): this.type = {
     for ((k, v) <- this.toList) // SI-7269 toList avoids ConcurrentModificationException
-    if (!p(k, v)) this -= k
+      if (!p(k, v)) this -= k
 
     this
   }
@@ -255,8 +260,8 @@ trait MapLike[A, B, +This <: MapLike[A, B, This] with Map[A, B]]
     *               with a key equal to `elem1`, `elem2` or any of `elems`.
     */
   @migration(
-      "`-` creates a new map. Use `-=` to remove an element from this map and return that map itself.",
-      "2.8.0")
+    "`-` creates a new map. Use `-=` to remove an element from this map and return that map itself.",
+    "2.8.0")
   override def -(elem1: A, elem2: A, elems: A*): This =
     clone() -= elem1 -= elem2 --= elems
 
@@ -268,7 +273,7 @@ trait MapLike[A, B, +This <: MapLike[A, B, This] with Map[A, B]]
     *                  with a key equal to a key from `xs`.
     */
   @migration(
-      "`--` creates a new map. Use `--=` to remove an element from this map and return that map itself.",
-      "2.8.0")
+    "`--` creates a new map. Use `--=` to remove an element from this map and return that map itself.",
+    "2.8.0")
   override def --(xs: GenTraversableOnce[A]): This = clone() --= xs.seq
 }

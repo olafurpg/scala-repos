@@ -31,7 +31,7 @@ object ThrottledHandler {
     * Generates a HandlerFactory that returns a ThrottledHandler
     * NOTE: ThrottledHandler emits plain-text messages regarding any throttling it does.
     * This means that using it to wrap any logger which you expect to produce easily parseable,
-    * well-structured logs (as opposed to just plain text logs) will break your format. 
+    * well-structured logs (as opposed to just plain text logs) will break your format.
     * Specifically, wrapping ScribeHandler with ThrottledHandler is usually a bug.
     *
     * @param handler
@@ -54,7 +54,7 @@ object ThrottledHandler {
 /**
   * NOTE: ThrottledHandler emits plain-text messages regarding any throttling it does.
   * This means that using it to wrap any logger which you expect to produce easily parseable,
-  * well-structured logs (as opposed to just plain text logs) will break your format. 
+  * well-structured logs (as opposed to just plain text logs) will break your format.
   * Specifically, DO NOT wrap Thrift Scribing loggers with ThrottledHandler.
   * @param handler
   * Wrapped handler.
@@ -70,8 +70,7 @@ class ThrottledHandler(
     handler: Handler,
     val duration: Duration,
     val maxToDisplay: Int
-)
-    extends ProxyHandler(handler) {
+) extends ProxyHandler(handler) {
 
   private class Throttle(startTime: Time, name: String, level: javalog.Level) {
     private[this] var expired = false
@@ -107,8 +106,8 @@ class ThrottledHandler(
 
     private[this] def publishSwallowed() {
       val throttledRecord = new javalog.LogRecord(
-          level,
-          "(swallowed %d repeating messages)".format(count - maxToDisplay))
+        level,
+        "(swallowed %d repeating messages)".format(count - maxToDisplay))
       throttledRecord.setLoggerName(name)
       doPublish(throttledRecord)
     }
@@ -148,14 +147,14 @@ class ThrottledHandler(
 
     val key = record match {
       case r: LazyLogRecordUnformatted => r.preformatted
-      case _ => record.getMessage
+      case _                           => record.getMessage
     }
     @tailrec
     def tryPublish() {
       val throttle = synchronized {
         throttleMap.getOrElseUpdate(
-            key,
-            new Throttle(now, record.getLoggerName(), record.getLevel())
+          key,
+          new Throttle(now, record.getLoggerName(), record.getLevel())
         )
       }
 

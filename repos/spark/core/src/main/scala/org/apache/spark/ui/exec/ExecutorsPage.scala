@@ -27,24 +27,26 @@ import org.apache.spark.ui.{ToolTips, UIUtils, WebUIPage}
 import org.apache.spark.util.Utils
 
 // This isn't even used anymore -- but we need to keep it b/c of a MiMa false positive
-private[ui] case class ExecutorSummaryInfo(id: String,
-                                           hostPort: String,
-                                           rddBlocks: Int,
-                                           memoryUsed: Long,
-                                           diskUsed: Long,
-                                           activeTasks: Int,
-                                           failedTasks: Int,
-                                           completedTasks: Int,
-                                           totalTasks: Int,
-                                           totalDuration: Long,
-                                           totalInputBytes: Long,
-                                           totalShuffleRead: Long,
-                                           totalShuffleWrite: Long,
-                                           maxMemory: Long,
-                                           executorLogs: Map[String, String])
+private[ui] case class ExecutorSummaryInfo(
+    id: String,
+    hostPort: String,
+    rddBlocks: Int,
+    memoryUsed: Long,
+    diskUsed: Long,
+    activeTasks: Int,
+    failedTasks: Int,
+    completedTasks: Int,
+    totalTasks: Int,
+    totalDuration: Long,
+    totalInputBytes: Long,
+    totalShuffleRead: Long,
+    totalShuffleWrite: Long,
+    maxMemory: Long,
+    executorLogs: Map[String, String])
 
 private[ui] class ExecutorsPage(
-    parent: ExecutorsTab, threadDumpEnabled: Boolean)
+    parent: ExecutorsTab,
+    threadDumpEnabled: Boolean)
     extends WebUIPage("") {
   private val listener = parent.listener
   // When GCTimePercent is edited change ToolTips.TASK_TIME to match
@@ -55,12 +57,12 @@ private[ui] class ExecutorsPage(
       // The follow codes should be protected by `listener` to make sure no executors will be
       // removed before we query their status. See SPARK-12784.
       val _activeExecutorInfo = {
-        for (statusId <- 0 until listener.activeStorageStatusList.size) yield
-          ExecutorsPage.getExecInfo(listener, statusId, isActive = true)
+        for (statusId <- 0 until listener.activeStorageStatusList.size)
+          yield ExecutorsPage.getExecInfo(listener, statusId, isActive = true)
       }
       val _deadExecutorInfo = {
-        for (statusId <- 0 until listener.deadStorageStatusList.size) yield
-          ExecutorsPage.getExecInfo(listener, statusId, isActive = false)
+        for (statusId <- 0 until listener.deadStorageStatusList.size)
+          yield ExecutorsPage.getExecInfo(listener, statusId, isActive = false)
       }
       (_activeExecutorInfo, _deadExecutorInfo)
     }
@@ -190,7 +192,8 @@ private[ui] class ExecutorsPage(
   }
 
   private def execSummaryRow(
-      execInfo: Seq[ExecutorSummary], rowName: String): Seq[Node] = {
+      execInfo: Seq[ExecutorSummary],
+      rowName: String): Seq[Node] = {
     val maximumMemory = execInfo.map(_.maxMemory).sum
     val memoryUsed = execInfo.map(_.memoryUsed).sum
     val diskUsed = execInfo.map(_.diskUsed).sum
@@ -229,8 +232,9 @@ private[ui] class ExecutorsPage(
     </tr>
   }
 
-  private def execSummary(activeExecInfo: Seq[ExecutorSummary],
-                          deadExecInfo: Seq[ExecutorSummary]): Seq[Node] = {
+  private def execSummary(
+      activeExecInfo: Seq[ExecutorSummary],
+      deadExecInfo: Seq[ExecutorSummary]): Seq[Node] = {
     val totalExecInfo = activeExecInfo ++ deadExecInfo
     val activeRow = execSummaryRow(activeExecInfo, "Active");
     val deadRow = execSummaryRow(deadExecInfo, "Dead");
@@ -264,13 +268,14 @@ private[ui] class ExecutorsPage(
     </table>
   }
 
-  private def taskData(maxTasks: Int,
-                       activeTasks: Int,
-                       failedTasks: Int,
-                       completedTasks: Int,
-                       totalTasks: Int,
-                       totalDuration: Long,
-                       totalGCTime: Long): Seq[Node] = {
+  private def taskData(
+      maxTasks: Int,
+      activeTasks: Int,
+      failedTasks: Int,
+      completedTasks: Int,
+      totalTasks: Int,
+      totalDuration: Long,
+      totalGCTime: Long): Seq[Node] = {
     // Determine Color Opacity from 0.5-1
     // activeTasks range from 0 to maxTasks
     val activeTasksAlpha =
@@ -329,9 +334,10 @@ private[ui] class ExecutorsPage(
 private[spark] object ExecutorsPage {
 
   /** Represent an executor's info as a map given a storage status index */
-  def getExecInfo(listener: ExecutorsListener,
-                  statusId: Int,
-                  isActive: Boolean): ExecutorSummary = {
+  def getExecInfo(
+      listener: ExecutorsListener,
+      statusId: Int,
+      isActive: Boolean): ExecutorSummary = {
     val status =
       if (isActive) {
         listener.activeStorageStatusList(statusId)
@@ -359,25 +365,25 @@ private[spark] object ExecutorsPage {
     val executorLogs = listener.executorToLogUrls.getOrElse(execId, Map.empty)
 
     new ExecutorSummary(
-        execId,
-        hostPort,
-        isActive,
-        rddBlocks,
-        memUsed,
-        diskUsed,
-        totalCores,
-        maxTasks,
-        activeTasks,
-        failedTasks,
-        completedTasks,
-        totalTasks,
-        totalDuration,
-        totalGCTime,
-        totalInputBytes,
-        totalShuffleRead,
-        totalShuffleWrite,
-        maxMem,
-        executorLogs
+      execId,
+      hostPort,
+      isActive,
+      rddBlocks,
+      memUsed,
+      diskUsed,
+      totalCores,
+      maxTasks,
+      activeTasks,
+      failedTasks,
+      completedTasks,
+      totalTasks,
+      totalDuration,
+      totalGCTime,
+      totalInputBytes,
+      totalShuffleRead,
+      totalShuffleWrite,
+      maxMem,
+      executorLogs
     )
   }
 }

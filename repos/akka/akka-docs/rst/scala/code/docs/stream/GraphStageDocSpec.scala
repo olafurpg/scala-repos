@@ -130,8 +130,7 @@ class GraphStageDocSpec extends AkkaSpec {
 
     val shape = FlowShape.of(in, out)
 
-    override def createLogic(
-        inheritedAttributes: Attributes): GraphStageLogic =
+    override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
       new GraphStageLogic(shape) {
         setHandler(in, new InHandler {
           override def onPush(): Unit = {
@@ -169,25 +168,27 @@ class GraphStageDocSpec extends AkkaSpec {
 
     val shape = FlowShape.of(in, out)
 
-    override def createLogic(
-        inheritedAttributes: Attributes): GraphStageLogic =
+    override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
       new GraphStageLogic(shape) {
         // Again: note that all mutable state
         // MUST be inside the GraphStageLogic
         var lastElem: Option[A] = None
 
-        setHandler(in, new InHandler {
-          override def onPush(): Unit = {
-            val elem = grab(in)
-            lastElem = Some(elem)
-            push(out, elem)
-          }
+        setHandler(
+          in,
+          new InHandler {
+            override def onPush(): Unit = {
+              val elem = grab(in)
+              lastElem = Some(elem)
+              push(out, elem)
+            }
 
-          override def onUpstreamFinish(): Unit = {
-            if (lastElem.isDefined) emit(out, lastElem.get)
-            complete(out)
+            override def onUpstreamFinish(): Unit = {
+              if (lastElem.isDefined) emit(out, lastElem.get)
+              complete(out)
+            }
           }
-        })
+        )
         setHandler(out, new OutHandler {
           override def onPull(): Unit = {
             if (lastElem.isDefined) {
@@ -226,14 +227,17 @@ class GraphStageDocSpec extends AkkaSpec {
           inheritedAttributes: Attributes): GraphStageLogic =
         new GraphStageLogic(shape) {
 
-          setHandler(in, new InHandler {
-            override def onPush(): Unit = {
-              val elem = grab(in)
-              // this will temporarily suspend this handler until the two elems
-              // are emitted and then reinstates it
-              emitMultiple(out, Iterable(elem, elem))
+          setHandler(
+            in,
+            new InHandler {
+              override def onPush(): Unit = {
+                val elem = grab(in)
+                // this will temporarily suspend this handler until the two elems
+                // are emitted and then reinstates it
+                emitMultiple(out, Iterable(elem, elem))
+              }
             }
-          })
+          )
           setHandler(out, new OutHandler {
             override def onPull(): Unit = {
               pull(in)
@@ -396,20 +400,23 @@ class GraphStageDocSpec extends AkkaSpec {
         val promise = Promise[A]()
         val logic = new GraphStageLogic(shape) {
 
-          setHandler(in, new InHandler {
-            override def onPush(): Unit = {
-              val elem = grab(in)
-              promise.success(elem)
-              push(out, elem)
+          setHandler(
+            in,
+            new InHandler {
+              override def onPush(): Unit = {
+                val elem = grab(in)
+                promise.success(elem)
+                push(out, elem)
 
-              // replace handler with one just forwarding
-              setHandler(in, new InHandler {
-                override def onPush(): Unit = {
-                  push(out, grab(in))
-                }
-              })
+                // replace handler with one just forwarding
+                setHandler(in, new InHandler {
+                  override def onPush(): Unit = {
+                    push(out, grab(in))
+                  }
+                })
+              }
             }
-          })
+          )
 
           setHandler(out, new OutHandler {
             override def onPull(): Unit = {
@@ -457,42 +464,48 @@ class GraphStageDocSpec extends AkkaSpec {
             pull(in)
           }
 
-          setHandler(in, new InHandler {
-            override def onPush(): Unit = {
-              val elem = grab(in)
-              buffer.enqueue(elem)
-              if (downstreamWaiting) {
-                downstreamWaiting = false
-                val bufferedElem = buffer.dequeue()
-                push(out, bufferedElem)
+          setHandler(
+            in,
+            new InHandler {
+              override def onPush(): Unit = {
+                val elem = grab(in)
+                buffer.enqueue(elem)
+                if (downstreamWaiting) {
+                  downstreamWaiting = false
+                  val bufferedElem = buffer.dequeue()
+                  push(out, bufferedElem)
+                }
+                if (!bufferFull) {
+                  pull(in)
+                }
               }
-              if (!bufferFull) {
-                pull(in)
-              }
-            }
 
-            override def onUpstreamFinish(): Unit = {
-              if (buffer.nonEmpty) {
-                // emit the rest if possible
-                emitMultiple(out, buffer.toIterator)
+              override def onUpstreamFinish(): Unit = {
+                if (buffer.nonEmpty) {
+                  // emit the rest if possible
+                  emitMultiple(out, buffer.toIterator)
+                }
+                completeStage()
               }
-              completeStage()
             }
-          })
+          )
 
-          setHandler(out, new OutHandler {
-            override def onPull(): Unit = {
-              if (buffer.isEmpty) {
-                downstreamWaiting = true
-              } else {
-                val elem = buffer.dequeue
-                push(out, elem)
-              }
-              if (!bufferFull && !hasBeenPulled(in)) {
-                pull(in)
+          setHandler(
+            out,
+            new OutHandler {
+              override def onPull(): Unit = {
+                if (buffer.isEmpty) {
+                  downstreamWaiting = true
+                } else {
+                  val elem = buffer.dequeue
+                  push(out, elem)
+                }
+                if (!bufferFull && !hasBeenPulled(in)) {
+                  pull(in)
+                }
               }
             }
-          })
+          )
         }
     }
     //#detached

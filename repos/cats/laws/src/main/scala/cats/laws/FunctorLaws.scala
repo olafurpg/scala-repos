@@ -13,7 +13,9 @@ trait FunctorLaws[F[_]] extends InvariantLaws[F] {
     fa.map(identity) <-> fa
 
   def covariantComposition[A, B, C](
-      fa: F[A], f: A => B, g: B => C): IsEq[F[C]] =
+      fa: F[A],
+      f: A => B,
+      g: B => C): IsEq[F[C]] =
     fa.map(f).map(g) <-> fa.map(f andThen g)
 }
 

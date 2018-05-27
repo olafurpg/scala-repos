@@ -1,7 +1,12 @@
 package breeze.linalg
 
 import breeze.generic.UFunc
-import breeze.linalg.support.{ScalarOf, CanTransformValues, CanMapValues, CanTraverseValues}
+import breeze.linalg.support.{
+  ScalarOf,
+  CanTransformValues,
+  CanMapValues,
+  CanTraverseValues
+}
 import breeze.linalg.support.CanTraverseValues.ValuesVisitor
 import breeze.macros.expand
 import spire.syntax.cfor._
@@ -12,16 +17,16 @@ object max
 
   @expand
   @expand.valify
-  implicit def maxImpl2[@expand.args(Int, Double, Float, Long) T]: Impl2[
-      T, T, T] =
+  implicit def maxImpl2[@expand.args(Int, Double, Float, Long) T]
+    : Impl2[T, T, T] =
     new Impl2[T, T, T] {
       def apply(t1: T, t2: T): T = scala.math.max(t1, t2)
     }
 
   @expand
   @expand.valify
-  implicit def maxImpl3[@expand.args(Int, Double, Float, Long) T]: Impl3[
-      T, T, T, T] =
+  implicit def maxImpl3[@expand.args(Int, Double, Float, Long) T]
+    : Impl3[T, T, T, T] =
     new Impl3[T, T, T, T] {
       def apply(t1: T, t2: T, t3: T): T =
         scala.math.max(scala.math.max(t1, t2), t3)
@@ -31,10 +36,10 @@ object max
   implicit def reduce[T, @expand.args(Int, Double, Float, Long) S](
       implicit iter: CanTraverseValues[T, S],
       @expand.sequence[S](
-          Int.MinValue,
-          Double.NegativeInfinity,
-          Float.NegativeInfinity,
-          Long.MinValue) init: S): Impl[T, S] = new Impl[T, S] {
+        Int.MinValue,
+        Double.NegativeInfinity,
+        Float.NegativeInfinity,
+        Long.MinValue) init: S): Impl[T, S] = new Impl[T, S] {
 
     def apply(v: T): S = {
       class SumVisitor extends ValuesVisitor[S] {
@@ -53,7 +58,10 @@ object max
         }
 
         override def visitArray(
-            arr: Array[S], offset: Int, length: Int, stride: Int): Unit = {
+            arr: Array[S],
+            offset: Int,
+            length: Int,
+            stride: Int): Unit = {
           if (length >= 0) {
             visitedOne = true
           }
@@ -136,16 +144,16 @@ object min extends UFunc {
 
   @expand
   @expand.valify
-  implicit def minImpl2[@expand.args(Int, Double, Float, Long) T]: Impl2[
-      T, T, T] =
+  implicit def minImpl2[@expand.args(Int, Double, Float, Long) T]
+    : Impl2[T, T, T] =
     new Impl2[T, T, T] {
       def apply(t1: T, t2: T): T = scala.math.min(t1, t2)
     }
 
   @expand
   @expand.valify
-  implicit def minImpl3[@expand.args(Int, Double, Float, Long) T]: Impl3[
-      T, T, T, T] =
+  implicit def minImpl3[@expand.args(Int, Double, Float, Long) T]
+    : Impl3[T, T, T, T] =
     new Impl3[T, T, T, T] {
       def apply(t1: T, t2: T, t3: T): T =
         scala.math.min(scala.math.min(t1, t2), t3)
@@ -155,10 +163,10 @@ object min extends UFunc {
   implicit def reduce[T, @expand.args(Int, Double, Float, Long) S](
       implicit iter: CanTraverseValues[T, S],
       @expand.sequence[S](
-          Int.MaxValue,
-          Double.PositiveInfinity,
-          Float.PositiveInfinity,
-          Long.MaxValue) init: S): Impl[T, S] = new Impl[T, S] {
+        Int.MaxValue,
+        Double.PositiveInfinity,
+        Float.PositiveInfinity,
+        Long.MaxValue) init: S): Impl[T, S] = new Impl[T, S] {
 
     def apply(v: T): S = {
       class MinVisitor extends ValuesVisitor[S] {
@@ -178,7 +186,10 @@ object min extends UFunc {
         }
 
         override def visitArray(
-            arr: Array[S], offset: Int, length: Int, stride: Int): Unit = {
+            arr: Array[S],
+            offset: Int,
+            length: Int,
+            stride: Int): Unit = {
           var i = 0
           var off = offset
           while (i < length) {
@@ -254,10 +265,10 @@ object ptp extends UFunc {
   implicit def reduce[T, @expand.args(Int, Double, Float, Long) S](
       implicit iter: CanTraverseValues[T, S],
       @expand.sequence[S](
-          Int.MaxValue,
-          Double.PositiveInfinity,
-          Float.PositiveInfinity,
-          Long.MaxValue) init: S): Impl[T, S] = new Impl[T, S] {
+        Int.MaxValue,
+        Double.PositiveInfinity,
+        Float.PositiveInfinity,
+        Long.MaxValue) init: S): Impl[T, S] = new Impl[T, S] {
 
     def apply(v: T): S = {
       class SumVisitor extends ValuesVisitor[S] {
@@ -280,7 +291,10 @@ object ptp extends UFunc {
         }
 
         override def visitArray(
-            arr: Array[S], offset: Int, length: Int, stride: Int): Unit = {
+            arr: Array[S],
+            offset: Int,
+            length: Int,
+            stride: Int): Unit = {
           var i = 0
           var off = offset
           while (i < length) {
@@ -311,10 +325,10 @@ object minMax extends UFunc {
   implicit def reduce[T, @expand.args(Int, Double, Float, Long) S](
       implicit iter: CanTraverseValues[T, S],
       @expand.sequence[S](
-          Int.MaxValue,
-          Double.PositiveInfinity,
-          Float.PositiveInfinity,
-          Long.MaxValue) init: S): Impl[T, (S, S)] = new Impl[T, (S, S)] {
+        Int.MaxValue,
+        Double.PositiveInfinity,
+        Float.PositiveInfinity,
+        Long.MaxValue) init: S): Impl[T, (S, S)] = new Impl[T, (S, S)] {
 
     def apply(v: T): (S, S) = {
       //the next 30 lines are common with "object ptp extends UFunc"
@@ -337,7 +351,10 @@ object minMax extends UFunc {
         }
 
         override def visitArray(
-            arr: Array[S], offset: Int, length: Int, stride: Int): Unit = {
+            arr: Array[S],
+            offset: Int,
+            length: Int,
+            stride: Int): Unit = {
           var i = 0
           var off = offset
           while (i < length) {

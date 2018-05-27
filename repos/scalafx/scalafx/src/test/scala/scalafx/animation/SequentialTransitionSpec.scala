@@ -42,5 +42,7 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class SequentialTransitionSpec
     extends SimpleSFXDelegateSpec[
-        jfxa.SequentialTransition, SequentialTransition](
-        classOf[jfxa.SequentialTransition], classOf[SequentialTransition])
+      jfxa.SequentialTransition,
+      SequentialTransition](
+      classOf[jfxa.SequentialTransition],
+      classOf[SequentialTransition])

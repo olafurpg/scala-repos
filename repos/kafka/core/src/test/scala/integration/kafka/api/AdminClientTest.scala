@@ -44,12 +44,14 @@ class AdminClientTest extends IntegrationTestHarness with Logging {
 
   // configure the servers and clients
   this.serverConfig.setProperty(
-      KafkaConfig.ControlledShutdownEnableProp, "false") // speed up shutdown
-  this.serverConfig.setProperty(KafkaConfig.OffsetsTopicReplicationFactorProp,
-                                "3") // don't want to lose offset
+    KafkaConfig.ControlledShutdownEnableProp,
+    "false") // speed up shutdown
+  this.serverConfig.setProperty(
+    KafkaConfig.OffsetsTopicReplicationFactorProp,
+    "3") // don't want to lose offset
   this.serverConfig.setProperty(KafkaConfig.OffsetsTopicPartitionsProp, "1")
-  this.serverConfig.setProperty(KafkaConfig.GroupMinSessionTimeoutMsProp,
-                                "100") // set small enough session timeout
+  this.serverConfig
+    .setProperty(KafkaConfig.GroupMinSessionTimeoutMsProp, "100") // set small enough session timeout
   this.producerConfig.setProperty(ProducerConfig.ACKS_CONFIG, "all")
   this.consumerConfig.setProperty(ConsumerConfig.GROUP_ID_CONFIG, groupId)
   this.consumerConfig.setProperty(ConsumerConfig.CLIENT_ID_CONFIG, clientId)
@@ -70,12 +72,10 @@ class AdminClientTest extends IntegrationTestHarness with Logging {
   @Test
   def testListGroups() {
     consumers(0).subscribe(List(topic))
-    TestUtils.waitUntilTrue(() =>
-                              {
-                                consumers(0).poll(0)
-                                !consumers(0).assignment().isEmpty
-                            },
-                            "Expected non-empty assignment")
+    TestUtils.waitUntilTrue(() => {
+      consumers(0).poll(0)
+      !consumers(0).assignment().isEmpty
+    }, "Expected non-empty assignment")
 
     val groups = client.listAllGroupsFlattened
     assertFalse(groups.isEmpty)
@@ -87,12 +87,10 @@ class AdminClientTest extends IntegrationTestHarness with Logging {
   @Test
   def testDescribeGroup() {
     consumers(0).subscribe(List(topic))
-    TestUtils.waitUntilTrue(() =>
-                              {
-                                consumers(0).poll(0)
-                                !consumers(0).assignment().isEmpty
-                            },
-                            "Expected non-empty assignment")
+    TestUtils.waitUntilTrue(() => {
+      consumers(0).poll(0)
+      !consumers(0).assignment().isEmpty
+    }, "Expected non-empty assignment")
 
     val group = client.describeGroup(groupId)
     assertEquals("consumer", group.protocolType)
@@ -109,12 +107,10 @@ class AdminClientTest extends IntegrationTestHarness with Logging {
   @Test
   def testDescribeConsumerGroup() {
     consumers(0).subscribe(List(topic))
-    TestUtils.waitUntilTrue(() =>
-                              {
-                                consumers(0).poll(0)
-                                !consumers(0).assignment().isEmpty
-                            },
-                            "Expected non-empty assignment")
+    TestUtils.waitUntilTrue(() => {
+      consumers(0).poll(0)
+      !consumers(0).assignment().isEmpty
+    }, "Expected non-empty assignment")
 
     val consumerSummaries = client.describeConsumerGroup(groupId)
     assertEquals(1, consumerSummaries.size)
@@ -124,7 +120,8 @@ class AdminClientTest extends IntegrationTestHarness with Logging {
   @Test
   def testDescribeConsumerGroupForNonExistentGroup() {
     val nonExistentGroup = "non" + groupId
-    assertTrue("Expected empty ConsumerSummary list",
-               client.describeConsumerGroup(nonExistentGroup).isEmpty)
+    assertTrue(
+      "Expected empty ConsumerSummary list",
+      client.describeConsumerGroup(nonExistentGroup).isEmpty)
   }
 }

@@ -29,10 +29,11 @@ object Pattern2 {
     def testForId = {
       val m = builder.mark
       builder.advanceLexer()
-      val s = Set(ScalaTokenTypes.tAT,
-                  ScalaTokenTypes.tIDENTIFIER,
-                  ScalaTokenTypes.tDOT,
-                  ScalaTokenTypes.tLPARENTHESIS)
+      val s = Set(
+        ScalaTokenTypes.tAT,
+        ScalaTokenTypes.tIDENTIFIER,
+        ScalaTokenTypes.tDOT,
+        ScalaTokenTypes.tLPARENTHESIS)
       val b = !s.contains(builder.getTokenType)
       m.rollbackTo()
       b

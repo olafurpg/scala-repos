@@ -26,38 +26,47 @@ private[http] class RequestContextImpl(
     val parserSettings: ParserSettings)
     extends RequestContext {
 
-  def this(request: HttpRequest,
-           log: LoggingAdapter,
-           settings: RoutingSettings,
-           parserSettings: ParserSettings)(
-      implicit ec: ExecutionContextExecutor, materializer: Materializer) =
-    this(request,
-         request.uri.path,
-         ec,
-         materializer,
-         log,
-         settings,
-         parserSettings)
+  def this(
+      request: HttpRequest,
+      log: LoggingAdapter,
+      settings: RoutingSettings,
+      parserSettings: ParserSettings)(
+      implicit ec: ExecutionContextExecutor,
+      materializer: Materializer) =
+    this(
+      request,
+      request.uri.path,
+      ec,
+      materializer,
+      log,
+      settings,
+      parserSettings)
 
   def this(
-      request: HttpRequest, log: LoggingAdapter, settings: RoutingSettings)(
-      implicit ec: ExecutionContextExecutor, materializer: Materializer) =
-    this(request,
-         request.uri.path,
-         ec,
-         materializer,
-         log,
-         settings,
-         ParserSettings(ActorMaterializer.downcast(materializer).system))
+      request: HttpRequest,
+      log: LoggingAdapter,
+      settings: RoutingSettings)(
+      implicit ec: ExecutionContextExecutor,
+      materializer: Materializer) =
+    this(
+      request,
+      request.uri.path,
+      ec,
+      materializer,
+      log,
+      settings,
+      ParserSettings(ActorMaterializer.downcast(materializer).system))
 
-  def reconfigure(executionContext: ExecutionContextExecutor,
-                  materializer: Materializer,
-                  log: LoggingAdapter,
-                  settings: RoutingSettings): RequestContext =
-    copy(executionContext = executionContext,
-         materializer = materializer,
-         log = log,
-         routingSettings = settings)
+  def reconfigure(
+      executionContext: ExecutionContextExecutor,
+      materializer: Materializer,
+      log: LoggingAdapter,
+      settings: RoutingSettings): RequestContext =
+    copy(
+      executionContext = executionContext,
+      materializer = materializer,
+      log = log,
+      routingSettings = settings)
 
   override def complete(trm: ToResponseMarshallable): Future[RouteResult] =
     trm(request)(executionContext).fast
@@ -66,7 +75,8 @@ private[http] class RequestContextImpl(
       .recoverWith {
         case Marshal.UnacceptableResponseContentTypeException(supported) ⇒
           attemptRecoveryFromUnacceptableResponseContentTypeException(
-              trm, supported)
+            trm,
+            supported)
         case RejectionError(rej) ⇒
           Future.successful(RouteResult.Rejected(rej :: Nil))
       }(executionContext)
@@ -83,7 +93,8 @@ private[http] class RequestContextImpl(
   override def withExecutionContext(
       executionContext: ExecutionContextExecutor): RequestContext =
     if (executionContext != this.executionContext)
-      copy(executionContext = executionContext) else this
+      copy(executionContext = executionContext)
+    else this
 
   override def withMaterializer(materializer: Materializer): RequestContext =
     if (materializer != this.materializer) copy(materializer = materializer)
@@ -95,12 +106,14 @@ private[http] class RequestContextImpl(
   override def withRoutingSettings(
       routingSettings: RoutingSettings): RequestContext =
     if (routingSettings != this.settings)
-      copy(routingSettings = routingSettings) else this
+      copy(routingSettings = routingSettings)
+    else this
 
   override def withParserSettings(
       parserSettings: ParserSettings): RequestContext =
     if (parserSettings != this.parserSettings)
-      copy(parserSettings = parserSettings) else this
+      copy(parserSettings = parserSettings)
+    else this
 
   override def mapRequest(f: HttpRequest ⇒ HttpRequest): RequestContext =
     copy(request = f(request))
@@ -118,8 +131,7 @@ private[http] class RequestContextImpl(
           case `accept` ⇒
             val acceptAll =
               if (ranges.exists(_.isWildcard))
-                ranges.map(
-                    r ⇒ if (r.isWildcard) MediaRanges.`*/*;q=MIN` else r)
+                ranges.map(r ⇒ if (r.isWildcard) MediaRanges.`*/*;q=MIN` else r)
               else ranges :+ MediaRanges.`*/*;q=MIN`
             accept.copy(mediaRanges = acceptAll)
           case x ⇒ x
@@ -135,8 +147,9 @@ private[http] class RequestContextImpl(
       case (status: StatusCode, value) if !status.isSuccess ⇒
         this.withAcceptAll.complete(trm) // retry giving up content negotiation
       case _ ⇒
-        Future.successful(RouteResult.Rejected(
-                UnacceptedResponseContentTypeRejection(supported) :: Nil))
+        Future.successful(
+          RouteResult.Rejected(
+            UnacceptedResponseContentTypeRejection(supported) :: Nil))
     }
 
   private def copy(
@@ -147,11 +160,12 @@ private[http] class RequestContextImpl(
       log: LoggingAdapter = log,
       routingSettings: RoutingSettings = settings,
       parserSettings: ParserSettings = parserSettings) =
-    new RequestContextImpl(request,
-                           unmatchedPath,
-                           executionContext,
-                           materializer,
-                           log,
-                           routingSettings,
-                           parserSettings)
+    new RequestContextImpl(
+      request,
+      unmatchedPath,
+      executionContext,
+      materializer,
+      log,
+      routingSettings,
+      parserSettings)
 }

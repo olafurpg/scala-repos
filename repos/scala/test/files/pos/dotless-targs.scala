@@ -6,5 +6,5 @@ class A {
   def g2: Char = "g2" apply 1
 
   def h1 =
-    List apply [List[Int]] (List(1), List(2)) mapConserve [List[Any]] (x => x)
+    List apply [List[Int]] (List(1), List(2)) mapConserve [List[Any]](x => x)
 }

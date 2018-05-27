@@ -37,7 +37,8 @@ final class JettyTestServer(baseUrlBox: Box[URL]) {
     context.setServer(server)
     context.setContextPath("/")
     val dir = System.getProperty(
-        "net.liftweb.webapptest.src.test.webapp", "src/test/webapp")
+      "net.liftweb.webapptest.src.test.webapp",
+      "src/test/webapp")
     context.setWar(dir)
     //val context = new Context(_server, "/", Context.SESSIONS)
     //context.addFilter(new FilterHolder(new LiftFilter()), "/");
@@ -69,9 +70,9 @@ final class JettyTestServer(baseUrlBox: Box[URL]) {
       f(wc)
     } catch {
       case exc: AssertionFailedError => {
-          System.err.println("server response: ", wc.getServerResponse)
-          throw exc
-        }
+        System.err.println("server response: ", wc.getServerResponse)
+        throw exc
+      }
     } finally {
       wc.closeBrowser()
     }

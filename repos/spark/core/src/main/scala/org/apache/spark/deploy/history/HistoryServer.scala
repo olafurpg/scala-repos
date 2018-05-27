@@ -28,7 +28,12 @@ import org.eclipse.jetty.servlet.{ServletContextHandler, ServletHolder}
 import org.apache.spark.{SecurityManager, SparkConf}
 import org.apache.spark.deploy.SparkHadoopUtil
 import org.apache.spark.internal.Logging
-import org.apache.spark.status.api.v1.{ApiRootResource, ApplicationInfo, ApplicationsListResource, UIRoot}
+import org.apache.spark.status.api.v1.{
+  ApiRootResource,
+  ApplicationInfo,
+  ApplicationsListResource,
+  UIRoot
+}
 import org.apache.spark.ui.{SparkUI, UIUtils, WebUI}
 import org.apache.spark.ui.JettyUtils._
 import org.apache.spark.util.{ShutdownHookManager, SystemClock, Utils}
@@ -44,14 +49,18 @@ import org.apache.spark.util.{ShutdownHookManager, SystemClock, Utils}
   * is the same structure as maintained in the event log write code path in
   * EventLoggingListener.
   */
-class HistoryServer(conf: SparkConf,
-                    provider: ApplicationHistoryProvider,
-                    securityManager: SecurityManager,
-                    port: Int)
-    extends WebUI(securityManager,
-                  securityManager.getSSLOptions("historyServer"),
-                  port,
-                  conf) with Logging with UIRoot
+class HistoryServer(
+    conf: SparkConf,
+    provider: ApplicationHistoryProvider,
+    securityManager: SecurityManager,
+    port: Int)
+    extends WebUI(
+      securityManager,
+      securityManager.getSSLOptions("historyServer"),
+      port,
+      conf)
+    with Logging
+    with UIRoot
     with ApplicationCacheOperations {
 
   // How many applications to retain
@@ -59,22 +68,23 @@ class HistoryServer(conf: SparkConf,
     conf.getInt("spark.history.retainedApplications", 50)
 
   // application
-  private val appCache = new ApplicationCache(
-      this, retainedApplications, new SystemClock())
+  private val appCache =
+    new ApplicationCache(this, retainedApplications, new SystemClock())
 
   // and its metrics, for testing as well as monitoring
   val cacheMetrics = appCache.metrics
 
   private val loaderServlet = new HttpServlet {
     protected override def doGet(
-        req: HttpServletRequest, res: HttpServletResponse): Unit = {
+        req: HttpServletRequest,
+        res: HttpServletResponse): Unit = {
       // Parse the URI created by getAttemptURI(). It contains an app ID and an optional
       // attempt ID (separated by a slash).
       val parts = Option(req.getPathInfo()).getOrElse("").split("/")
       if (parts.length < 2) {
         res.sendError(
-            HttpServletResponse.SC_BAD_REQUEST,
-            s"Unexpected path info in request (URI = ${req.getRequestURI()}")
+          HttpServletResponse.SC_BAD_REQUEST,
+          s"Unexpected path info in request (URI = ${req.getRequestURI()}")
         return
       }
 
@@ -100,13 +110,14 @@ class HistoryServer(conf: SparkConf,
       // Also, make sure that the redirect url contains the query string present in the request.
       val requestURI =
         req.getRequestURI +
-        Option(req.getQueryString).map("?" + _).getOrElse("")
+          Option(req.getQueryString).map("?" + _).getOrElse("")
       res.sendRedirect(res.encodeRedirectURL(requestURI))
     }
 
     // SPARK-5983 ensure TRACE is not supported
     protected override def doTrace(
-        req: HttpServletRequest, res: HttpServletResponse): Unit = {
+        req: HttpServletRequest,
+        res: HttpServletResponse): Unit = {
       res.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED)
     }
   }
@@ -149,21 +160,26 @@ class HistoryServer(conf: SparkConf,
   }
 
   /** Attach a reconstructed UI to this server. Only valid after bind(). */
-  override def attachSparkUI(appId: String,
-                             attemptId: Option[String],
-                             ui: SparkUI,
-                             completed: Boolean) {
-    assert(serverInfo.isDefined,
-           "HistoryServer must be bound before attaching SparkUIs")
+  override def attachSparkUI(
+      appId: String,
+      attemptId: Option[String],
+      ui: SparkUI,
+      completed: Boolean) {
+    assert(
+      serverInfo.isDefined,
+      "HistoryServer must be bound before attaching SparkUIs")
     ui.getHandlers.foreach(attachHandler)
     addFilters(ui.getHandlers, conf)
   }
 
   /** Detach a reconstructed UI from this server. Only valid after bind(). */
   override def detachSparkUI(
-      appId: String, attemptId: Option[String], ui: SparkUI): Unit = {
-    assert(serverInfo.isDefined,
-           "HistoryServer must be bound before detaching SparkUIs")
+      appId: String,
+      attemptId: Option[String],
+      ui: SparkUI): Unit = {
+    assert(
+      serverInfo.isDefined,
+      "HistoryServer must be bound before detaching SparkUIs")
     ui.getHandlers.foreach(detachHandler)
   }
 
@@ -174,7 +190,8 @@ class HistoryServer(conf: SparkConf,
     * @return If found, the Spark UI and any history information to be used in the cache
     */
   override def getAppUI(
-      appId: String, attemptId: Option[String]): Option[LoadedAppUI] = {
+      appId: String,
+      attemptId: Option[String]): Option[LoadedAppUI] = {
     provider.getAppUI(appId, attemptId)
   }
 
@@ -192,9 +209,10 @@ class HistoryServer(conf: SparkConf,
       .map(ApplicationsListResource.appHistoryInfoToPublicAppInfo)
   }
 
-  override def writeEventLogs(appId: String,
-                              attemptId: Option[String],
-                              zipStream: ZipOutputStream): Unit = {
+  override def writeEventLogs(
+      appId: String,
+      attemptId: Option[String],
+      zipStream: ZipOutputStream): Unit = {
     provider.writeEventLogs(appId, attemptId, zipStream)
   }
 
@@ -297,10 +315,13 @@ object HistoryServer extends Logging {
   }
 
   private[history] def getAttemptURI(
-      appId: String, attemptId: Option[String]): String = {
-    val attemptSuffix = attemptId.map { id =>
-      s"/$id"
-    }.getOrElse("")
+      appId: String,
+      attemptId: Option[String]): String = {
+    val attemptSuffix = attemptId
+      .map { id =>
+        s"/$id"
+      }
+      .getOrElse("")
     s"${HistoryServer.UI_PATH_PREFIX}/${appId}${attemptSuffix}"
   }
 }

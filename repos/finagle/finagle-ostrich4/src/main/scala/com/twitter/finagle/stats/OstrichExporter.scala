@@ -2,7 +2,12 @@ package com.twitter.finagle.stats
 
 import com.twitter.app.GlobalFlag
 import com.twitter.conversions.time._
-import com.twitter.finagle.http.{RequestParamMap, Response, Request, HttpMuxHandler}
+import com.twitter.finagle.http.{
+  RequestParamMap,
+  Response,
+  Request,
+  HttpMuxHandler
+}
 import com.twitter.io.Buf
 import com.twitter.ostrich.stats.{StatsListener, Stats}
 import com.twitter.util.Future
@@ -30,9 +35,10 @@ class OstrichExporter extends HttpMuxHandler {
     Future.value(response)
   }
 
-  def json(period: Option[String],
-           namespace: Option[String],
-           filtered: Boolean): String = {
+  def json(
+      period: Option[String],
+      namespace: Option[String],
+      filtered: Boolean): String = {
 
     // TODO: read command line args (minPeriod, filterRegex)?
     val summary = (period, namespace) match {

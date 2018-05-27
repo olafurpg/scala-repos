@@ -6,12 +6,13 @@ import lila.security.{Firewall, UserSpy, Store => SecurityStore}
 import lila.user.tube.userTube
 import lila.user.{User, UserRepo, LightUserApi}
 
-final class ModApi(logApi: ModlogApi,
-                   userSpy: String => Fu[UserSpy],
-                   firewall: Firewall,
-                   reporter: akka.actor.ActorSelection,
-                   lightUserApi: LightUserApi,
-                   lilaBus: lila.common.Bus) {
+final class ModApi(
+    logApi: ModlogApi,
+    userSpy: String => Fu[UserSpy],
+    firewall: Firewall,
+    reporter: akka.actor.ActorSelection,
+    lightUserApi: LightUserApi,
+    lilaBus: lila.common.Bus) {
 
   def toggleEngine(mod: String, username: String): Funit = withUser(username) {
     user =>
@@ -23,8 +24,9 @@ final class ModApi(logApi: ModlogApi,
       (user.engine != v) ?? {
         logApi.engine(mod, user.id, v) zip UserRepo.setEngine(user.id, v) >>- {
           if (v)
-            lilaBus.publish(lila.hub.actorApi.mod.MarkCheater(user.id),
-                            'adjustCheater)
+            lilaBus.publish(
+              lila.hub.actorApi.mod.MarkCheater(user.id),
+              'adjustCheater)
           reporter ! lila.hub.actorApi.report.MarkCheater(user.id, mod)
         } void
       }
@@ -48,8 +50,9 @@ final class ModApi(logApi: ModlogApi,
       (user.booster != v) ?? {
         logApi.booster(mod, user.id, v) zip UserRepo.setBooster(user.id, v) >>- {
           if (v)
-            lilaBus.publish(lila.hub.actorApi.mod.MarkBooster(user.id),
-                            'adjustBooster)
+            lilaBus.publish(
+              lila.hub.actorApi.mod.MarkBooster(user.id),
+              'adjustBooster)
         } void
       }
     }
@@ -67,17 +70,19 @@ final class ModApi(logApi: ModlogApi,
       val user = u.copy(troll = value)
       changed ?? {
         UserRepo.updateTroll(user) >>- logApi.troll(mod, user.id, user.troll)
-      } >>- (reporter ! lila.hub.actorApi.report.MarkTroll(user.id, mod)) inject user.troll
+      } >>- (reporter ! lila.hub.actorApi.report
+        .MarkTroll(user.id, mod)) inject user.troll
     }
 
   def ban(mod: String, username: String): Funit = withUser(username) { user =>
     userSpy(user.id) flatMap { spy =>
-      UserRepo.toggleIpBan(user.id) zip logApi.ban(mod, user.id, !user.ipBan) zip user.ipBan
+      UserRepo.toggleIpBan(user.id) zip logApi
+        .ban(mod, user.id, !user.ipBan) zip user.ipBan
         .fold(
           firewall unblockIps spy.ipStrings,
           (spy.ipStrings map firewall.blockIp).sequenceFu >>
-          (SecurityStore disconnect user.id)
-      ) void
+            (SecurityStore disconnect user.id)
+        ) void
     }
   }
 

@@ -22,13 +22,14 @@ import scala.collection.mutable
 import org.apache.spark.rpc.RpcEndpointRef
 import org.apache.spark.util.Utils
 
-private[spark] class WorkerInfo(val id: String,
-                                val host: String,
-                                val port: Int,
-                                val cores: Int,
-                                val memory: Int,
-                                val endpoint: RpcEndpointRef,
-                                val webUiAddress: String)
+private[spark] class WorkerInfo(
+    val id: String,
+    val host: String,
+    val port: Int,
+    val cores: Int,
+    val memory: Int,
+    val endpoint: RpcEndpointRef,
+    val webUiAddress: String)
     extends Serializable {
 
   Utils.checkHost(host, "Expected hostname")

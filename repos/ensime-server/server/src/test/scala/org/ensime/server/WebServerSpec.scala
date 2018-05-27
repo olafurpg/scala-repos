@@ -107,12 +107,17 @@ class WebServerSpec extends HttpFlatSpec with WebServer {
   * http://doc.akka.io/docs/akka-stream-and-http-experimental/1.0/scala/http/routing-dsl/testkit.html
   */
 abstract class HttpFlatSpec
-    extends FlatSpecLike with BeforeAndAfterAll with ScalatestRouteTest
-    with TestKitBase with DefaultTimeout with ImplicitSender with Matchers
+    extends FlatSpecLike
+    with BeforeAndAfterAll
+    with ScalatestRouteTest
+    with TestKitBase
+    with DefaultTimeout
+    with ImplicitSender
+    with Matchers
     with SLF4JLogging {
   def actorRefFactory = system
   implicit val routeTimeout: RouteTestTimeout = RouteTestTimeout(
-      timeout.duration.dilated)
+    timeout.duration.dilated)
   implicit val mat = ActorMaterializer()
 
   override protected def beforeAll(): Unit = {

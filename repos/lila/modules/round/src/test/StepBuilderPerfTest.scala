@@ -18,12 +18,13 @@ class StepBuilderPerfTest extends Specification {
   // val iterations = 1
 
   def runOne(withOpening: Boolean)(moves: List[String]) =
-    StepBuilder("abcd1234",
-                moves,
-                chess.variant.Standard,
-                None,
-                format.Forsyth.initial,
-                withOpening = withOpening)
+    StepBuilder(
+      "abcd1234",
+      moves,
+      chess.variant.Standard,
+      None,
+      format.Forsyth.initial,
+      withOpening = withOpening)
   def run(withOpening: Boolean) { gameMoves foreach runOne(withOpening) }
 
   def runTests(withOpening: Boolean) = {

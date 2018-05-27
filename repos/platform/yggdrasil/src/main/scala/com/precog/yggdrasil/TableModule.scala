@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -54,33 +54,33 @@ case class ExactSize(minSize: Long) extends TableSize {
   val maxSize = minSize
 
   def +(other: TableSize) = other match {
-    case ExactSize(n) => ExactSize(minSize + n)
+    case ExactSize(n)         => ExactSize(minSize + n)
     case EstimateSize(n1, n2) => EstimateSize(minSize + n1, minSize + n2)
-    case UnknownSize => UnknownSize
-    case InfiniteSize => InfiniteSize
+    case UnknownSize          => UnknownSize
+    case InfiniteSize         => InfiniteSize
   }
 
   def *(other: TableSize) = other match {
-    case ExactSize(n) => ExactSize(minSize * n)
+    case ExactSize(n)         => ExactSize(minSize * n)
     case EstimateSize(n1, n2) => EstimateSize(minSize * n1, minSize * n2)
-    case UnknownSize => UnknownSize
-    case InfiniteSize => InfiniteSize
+    case UnknownSize          => UnknownSize
+    case InfiniteSize         => InfiniteSize
   }
 }
 
 case class EstimateSize(minSize: Long, maxSize: Long) extends TableSize {
   def +(other: TableSize) = other match {
-    case ExactSize(n) => EstimateSize(minSize + n, maxSize + n)
+    case ExactSize(n)         => EstimateSize(minSize + n, maxSize + n)
     case EstimateSize(n1, n2) => EstimateSize(minSize + n1, maxSize + n2)
-    case UnknownSize => UnknownSize
-    case InfiniteSize => InfiniteSize
+    case UnknownSize          => UnknownSize
+    case InfiniteSize         => InfiniteSize
   }
 
   def *(other: TableSize) = other match {
-    case ExactSize(n) => EstimateSize(minSize * n, maxSize * n)
+    case ExactSize(n)         => EstimateSize(minSize * n, maxSize * n)
     case EstimateSize(n1, n2) => EstimateSize(minSize * n1, maxSize * n2)
-    case UnknownSize => UnknownSize
-    case InfiniteSize => InfiniteSize
+    case UnknownSize          => UnknownSize
+    case InfiniteSize         => InfiniteSize
   }
 }
 
@@ -131,7 +131,7 @@ trait TableModule[M[+ _]] extends TransSpecModule {
 
   implicit def M: Monad[M]
 
-  type Reducer [α]
+  type Reducer[α]
   type TableMetrics
 
   type Table <: TableLike
@@ -158,15 +158,17 @@ trait TableModule[M[+ _]] extends TransSpecModule {
     def constEmptyArray: Table
 
     def fromRValues(
-        values: Stream[RValue], maxSliceSize: Option[Int] = None): Table
+        values: Stream[RValue],
+        maxSliceSize: Option[Int] = None): Table
 
     def merge[N[+ _]](grouping: GroupingSpec)(
         body: (RValue, GroupId => M[Table]) => N[Table])(
         implicit nt: N ~> M): M[Table]
-    def align(sourceLeft: Table,
-              alignOnL: TransSpec1,
-              sourceRight: Table,
-              alignOnR: TransSpec1): M[(Table, Table)]
+    def align(
+        sourceLeft: Table,
+        alignOnL: TransSpec1,
+        sourceRight: Table,
+        alignOnR: TransSpec1): M[(Table, Table)]
 
     /**
       * Joins `left` and `right` together using their left/right key specs. The
@@ -208,7 +210,7 @@ trait TableModule[M[+ _]] extends TransSpecModule {
     /**
       * Folds over the table to produce a single value (stored in a singleton table).
       */
-    def reduce[A : Monoid](reducer: Reducer[A]): M[A]
+    def reduce[A: Monoid](reducer: Reducer[A]): M[A]
 
     /**
       * Removes all rows in the table for which definedness is satisfied
@@ -228,7 +230,9 @@ trait TableModule[M[+ _]] extends TransSpecModule {
       * transformation on rows of the table.
       */
     def cogroup(leftKey: TransSpec1, rightKey: TransSpec1, that: Table)(
-        left: TransSpec1, right: TransSpec1, both: TransSpec2): Table
+        left: TransSpec1,
+        right: TransSpec1,
+        both: TransSpec2): Table
 
     /**
       * Performs a full cartesian cross on this table with the specified table,
@@ -248,16 +252,17 @@ trait TableModule[M[+ _]] extends TransSpecModule {
     /**
       * Sorts the KV table by ascending or descending order of a transformation
       * applied to the rows.
-      * 
+      *
       * @param sortKey The transspec to use to obtain the values to sort on
       * @param sortOrder Whether to sort ascending or descending
       * @param unique If true, the same key values will sort into a single row, otherwise
       * we assign a unique row ID as part of the key so that multiple equal values are
       * preserved
       */
-    def sort(sortKey: TransSpec1,
-             sortOrder: DesiredSortOrder = SortAscending,
-             unique: Boolean = false): M[Table]
+    def sort(
+        sortKey: TransSpec1,
+        sortOrder: DesiredSortOrder = SortAscending,
+        unique: Boolean = false): M[Table]
 
     def distinct(spec: TransSpec1): Table
 
@@ -270,7 +275,7 @@ trait TableModule[M[+ _]] extends TransSpecModule {
     /**
       * Sorts the KV table by ascending or descending order based on a seq of transformations
       * applied to the rows.
-      * 
+      *
       * @param groupKeys The transspecs to use to obtain the values to sort on
       * @param valueSpec The transspec to use to obtain the non-sorting values
       * @param sortOrder Whether to sort ascending or descending
@@ -278,10 +283,11 @@ trait TableModule[M[+ _]] extends TransSpecModule {
       * we assign a unique row ID as part of the key so that multiple equal values are
       * preserved
       */
-    def groupByN(groupKeys: Seq[TransSpec1],
-                 valueSpec: TransSpec1,
-                 sortOrder: DesiredSortOrder = SortAscending,
-                 unique: Boolean = false): M[Seq[Table]]
+    def groupByN(
+        groupKeys: Seq[TransSpec1],
+        valueSpec: TransSpec1,
+        sortOrder: DesiredSortOrder = SortAscending,
+        unique: Boolean = false): M[Seq[Table]]
 
     def partitionMerge(partitionBy: TransSpec1)(f: Table => M[Table]): M[Table]
 
@@ -291,9 +297,10 @@ trait TableModule[M[+ _]] extends TransSpecModule {
 
     def schemas: M[Set[JType]]
 
-    def renderJson(prefix: String = "",
-                   delimiter: String = "\n",
-                   suffix: String = ""): StreamT[M, CharBuffer]
+    def renderJson(
+        prefix: String = "",
+        delimiter: String = "\n",
+        suffix: String = ""): StreamT[M, CharBuffer]
 
     def renderCsv(): StreamT[M, CharBuffer]
 
@@ -323,33 +330,39 @@ trait TableModule[M[+ _]] extends TransSpecModule {
     * @param targetTrans The key which will be used by `merge` to access a particular subset of the target
     * @param groupKeySpec A composite union/intersect overlay on top of transspec indicating the composite key for this target set
     */
-  final case class GroupingSource(table: Table,
-                                  idTrans: trans.TransSpec1,
-                                  targetTrans: Option[trans.TransSpec1],
-                                  groupId: GroupId,
-                                  groupKeySpec: trans.GroupKeySpec)
+  final case class GroupingSource(
+      table: Table,
+      idTrans: trans.TransSpec1,
+      targetTrans: Option[trans.TransSpec1],
+      groupId: GroupId,
+      groupKeySpec: trans.GroupKeySpec)
       extends GroupingSpec {
     def sources: Vector[GroupingSource] = Vector(this)
     def sorted: M[GroupingSource] =
       for {
-        t <- table.sort(trans.DerefObjectStatic(
-                trans.Leaf(trans.Source), CPathField("key")))
+        t <- table.sort(
+          trans.DerefObjectStatic(trans.Leaf(trans.Source), CPathField("key")))
       } yield {
         GroupingSource(t, idTrans, targetTrans, groupId, groupKeySpec)
       }
   }
 
-  final case class GroupingAlignment(groupKeyLeftTrans: trans.TransSpec1,
-                                     groupKeyRightTrans: trans.TransSpec1,
-                                     left: GroupingSpec,
-                                     right: GroupingSpec,
-                                     alignment: GroupingSpec.Alignment)
+  final case class GroupingAlignment(
+      groupKeyLeftTrans: trans.TransSpec1,
+      groupKeyRightTrans: trans.TransSpec1,
+      left: GroupingSpec,
+      right: GroupingSpec,
+      alignment: GroupingSpec.Alignment)
       extends GroupingSpec {
     def sources: Vector[GroupingSource] = left.sources ++ right.sources
     def sorted: M[GroupingAlignment] = (left.sorted |@| right.sorted) {
       (t1, t2) =>
         GroupingAlignment(
-            groupKeyLeftTrans, groupKeyRightTrans, t1, t2, alignment)
+          groupKeyLeftTrans,
+          groupKeyRightTrans,
+          t1,
+          t2,
+          alignment)
     }
   }
 }

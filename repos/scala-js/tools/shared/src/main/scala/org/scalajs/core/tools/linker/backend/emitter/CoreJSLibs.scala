@@ -29,22 +29,25 @@ private[scalajs] object CoreJSLibs {
   private val ScalaJSEnvLines = ScalaJSEnvHolder.scalajsenv.split("\n|\r\n?")
 
   private val gitHubBaseURI = new URI(
-      "https://raw.githubusercontent.com/scala-js/scala-js/")
+    "https://raw.githubusercontent.com/scala-js/scala-js/")
 
   def lib(semantics: Semantics, outputMode: OutputMode): VirtualJSFile = {
     synchronized {
       cachedLibByConfig.getOrElseUpdate(
-          (semantics, outputMode), makeLib(semantics, outputMode))
+        (semantics, outputMode),
+        makeLib(semantics, outputMode))
     }
   }
 
   private def makeLib(
-      semantics: Semantics, outputMode: OutputMode): VirtualJSFile = {
+      semantics: Semantics,
+      outputMode: OutputMode): VirtualJSFile = {
     new ScalaJSEnvVirtualJSFile(makeContent(semantics, outputMode))
   }
 
   private def makeContent(
-      semantics: Semantics, outputMode: OutputMode): String = {
+      semantics: Semantics,
+      outputMode: OutputMode): String = {
     // This is a basic sort-of-C-style preprocessor
 
     def getOption(name: String): String = name match {

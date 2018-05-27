@@ -59,8 +59,8 @@ object CubeSampleDemo extends JFXApp {
     title = "Graphics 3D Cubes Sample Demo in ScalaFX"
   }
 
-  root.getTransforms.addAll(
-      new Translate(400 / 2, 150 / 2), new Rotate(180, Rotate.XAxis))
+  root.getTransforms
+    .addAll(new Translate(400 / 2, 150 / 2), new Rotate(180, Rotate.XAxis))
 
   stage.getScene.setCamera(new PerspectiveCamera())
 
@@ -82,12 +82,12 @@ object CubeSampleDemo extends JFXApp {
     animation = new Timeline {
       cycleCount = Timeline.Indefinite
       keyFrames = Seq(
-          at(0 s) { c.ry.angle -> 0d },
-          at(0 s) { c2.rx.angle -> 0d },
-          at(0 s) { c3.rz.angle -> 0d },
-          at(1 s) { c.ry.angle -> 360d },
-          at(1 s) { c2.rx.angle -> 360d },
-          at(1 s) { c3.rz.angle -> 360d }
+        at(0 s) { c.ry.angle -> 0d },
+        at(0 s) { c2.rx.angle -> 0d },
+        at(0 s) { c3.rz.angle -> 0d },
+        at(1 s) { c.ry.angle -> 360d },
+        at(1 s) { c2.rx.angle -> 360d },
+        at(1 s) { c3.rz.angle -> 360d }
       )
     }
 
@@ -113,63 +113,63 @@ class Cube(size: Double, color: Color, shade: Double) extends Group {
   transforms = Seq(rz, ry, rx)
 
   children = Seq(
-      new Rectangle {
-        // back face
-        width = size
-        height = size
-        fill = color.deriveColor(0.0, 1.0, (1 - 0.5 * shade), 1.0)
-        translateX = -0.5 * size
-        translateY = -0.5 * size
-        translateZ = 0.5 * size
-      },
-      new Rectangle {
-        // bottom face
-        width = size;
-        height = size
-        fill = color.deriveColor(0.0, 1.0, (1 - 0.4 * shade), 1.0)
-        translateX = -0.5 * size
-        translateY = 0
-        rotationAxis = Rotate.XAxis
-        rotate = 90
-      },
-      new Rectangle {
-        // right face
-        width = size;
-        height = size
-        fill = color.deriveColor(0.0, 1.0, (1 - 0.3 * shade), 1.0)
-        translateX = -1 * size
-        translateY = -0.5 * size
-        rotationAxis = Rotate.YAxis
-        rotate = 90
-      },
-      new Rectangle {
-        // left face
-        width = size;
-        height = size
-        fill = color.deriveColor(0.0, 1.0, (1 - 0.2 * shade), 1.0)
-        translateX = 0
-        translateY = -0.5 * size
-        rotationAxis = Rotate.YAxis
-        rotate = 90
-      },
-      new Rectangle {
-        // top face
-        width = size;
-        height = size
-        fill = color.deriveColor(0.0, 1.0, (1 - 0.1 * shade), 1.0)
-        translateX = -0.5 * size
-        translateY = -1 * size
-        rotationAxis = Rotate.XAxis
-        rotate = 90
-      },
-      new Rectangle {
-        // top face
-        width = size;
-        height = size
-        fill = color
-        translateX = -0.5 * size
-        translateY = -0.5 * size
-        translateZ = -0.5 * size
-      }
+    new Rectangle {
+      // back face
+      width = size
+      height = size
+      fill = color.deriveColor(0.0, 1.0, (1 - 0.5 * shade), 1.0)
+      translateX = -0.5 * size
+      translateY = -0.5 * size
+      translateZ = 0.5 * size
+    },
+    new Rectangle {
+      // bottom face
+      width = size;
+      height = size
+      fill = color.deriveColor(0.0, 1.0, (1 - 0.4 * shade), 1.0)
+      translateX = -0.5 * size
+      translateY = 0
+      rotationAxis = Rotate.XAxis
+      rotate = 90
+    },
+    new Rectangle {
+      // right face
+      width = size;
+      height = size
+      fill = color.deriveColor(0.0, 1.0, (1 - 0.3 * shade), 1.0)
+      translateX = -1 * size
+      translateY = -0.5 * size
+      rotationAxis = Rotate.YAxis
+      rotate = 90
+    },
+    new Rectangle {
+      // left face
+      width = size;
+      height = size
+      fill = color.deriveColor(0.0, 1.0, (1 - 0.2 * shade), 1.0)
+      translateX = 0
+      translateY = -0.5 * size
+      rotationAxis = Rotate.YAxis
+      rotate = 90
+    },
+    new Rectangle {
+      // top face
+      width = size;
+      height = size
+      fill = color.deriveColor(0.0, 1.0, (1 - 0.1 * shade), 1.0)
+      translateX = -0.5 * size
+      translateY = -1 * size
+      rotationAxis = Rotate.XAxis
+      rotate = 90
+    },
+    new Rectangle {
+      // top face
+      width = size;
+      height = size
+      fill = color
+      translateX = -0.5 * size
+      translateY = -0.5 * size
+      translateZ = -0.5 * size
+    }
   )
 }

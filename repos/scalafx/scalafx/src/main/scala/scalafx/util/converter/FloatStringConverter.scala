@@ -39,4 +39,6 @@ object FloatStringConverter {
 class FloatStringConverter(
     delegate: jfxuc.FloatStringConverter = new jfxuc.FloatStringConverter)
     extends StringConverterDelegate[
-        java.lang.Float, Float, jfxuc.FloatStringConverter](delegate)
+      java.lang.Float,
+      Float,
+      jfxuc.FloatStringConverter](delegate)

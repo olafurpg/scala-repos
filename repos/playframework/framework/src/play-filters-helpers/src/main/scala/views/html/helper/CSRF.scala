@@ -18,8 +18,8 @@ object CSRF {
     val token = play.filters.csrf.CSRF.getToken
       .getOrElse(sys.error("No CSRF token present!"))
     new Call(
-        call.method,
-        s"${call.url}${if (call.url.contains("?")) "&" else "?"}${token.name}=${token.value}"
+      call.method,
+      s"${call.url}${if (call.url.contains("?")) "&" else "?"}${token.name}=${token.value}"
     )
   }
 
@@ -30,8 +30,7 @@ object CSRF {
     val token = play.filters.csrf.CSRF.getToken
       .getOrElse(sys.error("No CSRF token present!"))
     // probably not possible for an attacker to XSS with a CSRF token, but just to be on the safe side...
-    Html(
-        s"""<input type="hidden" name="${token.name}" value="${HtmlFormat
+    Html(s"""<input type="hidden" name="${token.name}" value="${HtmlFormat
       .escape(token.value)}"/>""")
   }
 }

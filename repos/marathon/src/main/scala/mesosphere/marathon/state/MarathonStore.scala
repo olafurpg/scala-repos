@@ -11,11 +11,11 @@ import scala.concurrent.Future
 import scala.reflect.ClassTag
 import scala.util.control.NonFatal
 
-class MarathonStore[S <: MarathonState[_, S]](store: PersistentStore,
-                                              metrics: Metrics,
-                                              newState: () => S,
-                                              prefix: String)(
-    implicit ct: ClassTag[S])
+class MarathonStore[S <: MarathonState[_, S]](
+    store: PersistentStore,
+    metrics: Metrics,
+    newState: () => S,
+    prefix: String)(implicit ct: ClassTag[S])
     extends EntityStore[S] {
 
   import scala.concurrent.ExecutionContext.Implicits.global
@@ -24,13 +24,15 @@ class MarathonStore[S <: MarathonState[_, S]](store: PersistentStore,
   private[this] lazy val lockManager = LockManager.create()
   protected[this] def metricsPrefix = MetricPrefixes.SERVICE
   protected[this] val bytesRead: Histogram = metrics.histogram(
-      metrics.name(metricsPrefix,
-                   getClass,
-                   s"${ct.runtimeClass.getSimpleName}.read-data-size"))
+    metrics.name(
+      metricsPrefix,
+      getClass,
+      s"${ct.runtimeClass.getSimpleName}.read-data-size"))
   protected[this] val bytesWritten: Histogram = metrics.histogram(
-      metrics.name(metricsPrefix,
-                   getClass,
-                   s"${ct.runtimeClass.getSimpleName}.write-data-size"))
+    metrics.name(
+      metricsPrefix,
+      getClass,
+      s"${ct.runtimeClass.getSimpleName}.write-data-size"))
 
   def fetch(key: String): Future[Option[S]] = {
     log.debug(s"Fetch $prefix$key")
@@ -43,7 +45,7 @@ class MarathonStore[S <: MarathonState[_, S]](store: PersistentStore,
         }
       }
       .recover(exceptionTransform(
-              s"Could not fetch ${ct.runtimeClass.getSimpleName} with key: $key"))
+        s"Could not fetch ${ct.runtimeClass.getSimpleName} with key: $key"))
   }
 
   def modify(key: String, onSuccess: (S) => Unit = _ => ())(
@@ -62,12 +64,14 @@ class MarathonStore[S <: MarathonState[_, S]](store: PersistentStore,
           bytesWritten.update(created.length)
           store.create(prefix + key, created)
       }
-      res.map { entity =>
-        val result = stateFromBytes(entity.bytes.toArray)
-        onSuccess(result)
-        result
-      }.recover(exceptionTransform(
-              s"Could not modify ${ct.runtimeClass.getSimpleName} with key: $key"))
+      res
+        .map { entity =>
+          val result = stateFromBytes(entity.bytes.toArray)
+          onSuccess(result)
+          result
+        }
+        .recover(exceptionTransform(
+          s"Could not modify ${ct.runtimeClass.getSimpleName} with key: $key"))
     }
   }
 
@@ -81,7 +85,7 @@ class MarathonStore[S <: MarathonState[_, S]](store: PersistentStore,
           result
         }
         .recover(exceptionTransform(
-                s"Could not expunge ${ct.runtimeClass.getSimpleName} with key: $key"))
+          s"Could not expunge ${ct.runtimeClass.getSimpleName} with key: $key"))
     }
 
   def names(): Future[Seq[String]] = {
@@ -94,7 +98,7 @@ class MarathonStore[S <: MarathonState[_, S]](store: PersistentStore,
         }
       }
       .recover(exceptionTransform(
-              s"Could not list names for ${ct.runtimeClass.getSimpleName}"))
+        s"Could not list names for ${ct.runtimeClass.getSimpleName}"))
   }
 
   private[this] def exceptionTransform[T](

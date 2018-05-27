@@ -28,9 +28,11 @@ class JavaCompiler(
     val indexer: ActorRef,
     val search: SearchService,
     val vfs: EnsimeVFS
-)
-    extends JavaDocFinding with JavaCompletion with JavaSourceFinding
-    with Helpers with SLF4JLogging {
+) extends JavaDocFinding
+    with JavaCompletion
+    with JavaSourceFinding
+    with Helpers
+    with SLF4JLogging {
 
   private val listener = new JavaDiagnosticListener()
   private val silencer = new SilencedDiagnosticListener()
@@ -58,7 +60,7 @@ class JavaCompiler(
     // see comments on ensime-server/pull/1108
     val fileManager = sharedFileManager match {
       case Some(fm) => fm
-      case _ =>
+      case _        =>
         // TODO: take a charset for each invocation
         val fm =
           compiler.getStandardFileManager(listener, null, DefaultCharset)
@@ -67,17 +69,18 @@ class JavaCompiler(
     }
 
     compiler
-      .getTask(null,
-               fileManager,
-               listener,
-               List(
-                   "-cp",
-                   cp,
-                   "-Xlint:" + lint,
-                   "-proc:none"
-               ).asJava,
-               null,
-               files)
+      .getTask(
+        null,
+        fileManager,
+        listener,
+        List(
+          "-cp",
+          cp,
+          "-Xlint:" + lint,
+          "-proc:none"
+        ).asJava,
+        null,
+        files)
       .asInstanceOf[JavacTask]
   }
 
@@ -109,34 +112,42 @@ class JavaCompiler(
     }
   }
 
-  def askSymbolAtPoint(file: SourceFileInfo, offset: Int): Option[SymbolInfo] = {
+  def askSymbolAtPoint(
+      file: SourceFileInfo,
+      offset: Int): Option[SymbolInfo] = {
     pathToPoint(file, offset) flatMap {
       case (info: CompilationInfo, path: TreePath) =>
         def withName(name: String): Option[SymbolInfo] = {
           val tpeMirror = Option(info.getTrees().getTypeMirror(path))
           val nullTpe = new BasicTypeInfo(
-              "NA", DeclaredAs.Nil, "NA", List.empty, List.empty, None)
+            "NA",
+            DeclaredAs.Nil,
+            "NA",
+            List.empty,
+            List.empty,
+            None)
           Some(
-              SymbolInfo(
-                  fqn(info, path).map(_.toFqnString).getOrElse(name),
-                  name,
-                  findDeclPos(info, path),
-                  tpeMirror.map(typeMirrorToTypeInfo).getOrElse(nullTpe),
-                  tpeMirror
-                    .map(_.getKind == TypeKind.EXECUTABLE)
-                    .getOrElse(false)
-                ))
+            SymbolInfo(
+              fqn(info, path).map(_.toFqnString).getOrElse(name),
+              name,
+              findDeclPos(info, path),
+              tpeMirror.map(typeMirrorToTypeInfo).getOrElse(nullTpe),
+              tpeMirror
+                .map(_.getKind == TypeKind.EXECUTABLE)
+                .getOrElse(false)
+            ))
         }
         path.getLeaf match {
-          case t: IdentifierTree => withName(t.getName.toString)
+          case t: IdentifierTree   => withName(t.getName.toString)
           case t: MemberSelectTree => withName(t.getIdentifier.toString)
-          case _ => None
+          case _                   => None
         }
     }
   }
 
   def askDocSignatureAtPoint(
-      file: SourceFileInfo, offset: Int): Option[DocSigPair] = {
+      file: SourceFileInfo,
+      offset: Int): Option[DocSigPair] = {
     pathToPoint(file, offset) flatMap {
       case (info: CompilationInfo, path: TreePath) =>
         docSignature(info, path)
@@ -165,7 +176,8 @@ class JavaCompiler(
   }
 
   protected def scopeForPoint(
-      file: SourceFileInfo, offset: Int): Option[(CompilationInfo, Scope)] = {
+      file: SourceFileInfo,
+      offset: Int): Option[(CompilationInfo, Scope)] = {
     val infos = typecheckForUnits(List(file))
     infos.headOption.flatMap { info =>
       val path = Option(new TreeUtilities(info).scopeFor(offset))
@@ -176,16 +188,18 @@ class JavaCompiler(
   }
 
   private def typeMirrorToTypeInfo(tm: TypeMirror): TypeInfo = {
-    BasicTypeInfo(tm.toString,
-                  DeclaredAs.Class,
-                  tm.toString,
-                  List(),
-                  List(),
-                  Some(EmptySourcePosition()))
+    BasicTypeInfo(
+      tm.toString,
+      DeclaredAs.Class,
+      tm.toString,
+      List(),
+      List(),
+      Some(EmptySourcePosition()))
   }
 
   private def getTypeMirror(
-      info: CompilationInfo, offset: Int): Option[TypeMirror] = {
+      info: CompilationInfo,
+      offset: Int): Option[TypeMirror] = {
     val path = Option(new TreeUtilities(info).pathFor(offset))
     // Uncomment to debug the AST path.
     //for (p <- path) { for (t <- p) { System.err.println(t.toString()) } }
@@ -201,7 +215,7 @@ class JavaCompiler(
       task.parse()
       task.analyze()
       log.info(
-          "Parsed and analyzed: " + (System.currentTimeMillis() - t) + "ms")
+        "Parsed and analyzed: " + (System.currentTimeMillis() - t) + "ms")
     } catch {
       case e @ (_: Abort | _: ArrayIndexOutOfBoundsException |
           _: AssertionError) =>
@@ -228,7 +242,8 @@ class JavaCompiler(
         .map(new CompilationInfo(task, _))
         .toVector
       task.analyze()
-      log.info("Parsed and analyzed for trees: " +
+      log.info(
+        "Parsed and analyzed for trees: " +
           (System.currentTimeMillis() - t) + "ms")
       units
     } catch {
@@ -262,33 +277,35 @@ class JavaCompiler(
     }
 
   private class JavaDiagnosticListener
-      extends DiagnosticListener[JavaFileObject] with ReportHandler {
+      extends DiagnosticListener[JavaFileObject]
+      with ReportHandler {
     def report(diag: Diagnostic[_ <: JavaFileObject]): Unit = {
       reportHandler.reportJavaNotes(
-          List(
-              Note(
-                  diag.getSource().getName(),
-                  diag.getMessage(Locale.ENGLISH),
-                  diag.getKind() match {
-                case Diagnostic.Kind.ERROR => NoteError
-                case Diagnostic.Kind.WARNING => NoteWarn
-                case Diagnostic.Kind.MANDATORY_WARNING => NoteWarn
-                case _ => NoteInfo
-              },
-                  diag.getStartPosition() match {
-                case x if x > -1 => x.toInt
-                case _ => diag.getPosition().toInt
-              },
-                  diag.getEndPosition().toInt,
-                  diag.getLineNumber().toInt,
-                  diag.getColumnNumber().toInt
-              )
-          ))
+        List(
+          Note(
+            diag.getSource().getName(),
+            diag.getMessage(Locale.ENGLISH),
+            diag.getKind() match {
+              case Diagnostic.Kind.ERROR             => NoteError
+              case Diagnostic.Kind.WARNING           => NoteWarn
+              case Diagnostic.Kind.MANDATORY_WARNING => NoteWarn
+              case _                                 => NoteInfo
+            },
+            diag.getStartPosition() match {
+              case x if x > -1 => x.toInt
+              case _           => diag.getPosition().toInt
+            },
+            diag.getEndPosition().toInt,
+            diag.getLineNumber().toInt,
+            diag.getColumnNumber().toInt
+          )
+        ))
     }
   }
 
   private class SilencedDiagnosticListener
-      extends DiagnosticListener[JavaFileObject] with ReportHandler {
+      extends DiagnosticListener[JavaFileObject]
+      with ReportHandler {
     def report(diag: Diagnostic[_ <: JavaFileObject]): Unit = {}
   }
 }

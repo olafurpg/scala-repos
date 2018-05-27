@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -32,7 +32,8 @@ import scalaz.std.list._
 import com.precog.util.IdGen
 
 trait StringLibSpecs[M[+ _]]
-    extends Specification with EvaluatorTestSupport[M]
+    extends Specification
+    with EvaluatorTestSupport[M]
     with LongIdMemoryDatasetConsumer[M] {
   self =>
 
@@ -51,7 +52,7 @@ trait StringLibSpecs[M[+ _]]
   def testEval(graph: DepGraph): Set[SEvent] = {
     consumeEval(graph, defaultEvaluationContext) match {
       case Success(results) => results
-      case Failure(error) => throw error
+      case Failure(error)   => throw error
     }
   }
 
@@ -60,10 +61,11 @@ trait StringLibSpecs[M[+ _]]
   }
 
   def op2Input(op: Op2, const: RValue, loadFrom: Line => dag.AbsoluteLoad) = {
-    Join(BuiltInFunction2Op(op),
-         Cross(None),
-         loadFrom(line),
-         Const(const)(line))(line)
+    Join(
+      BuiltInFunction2Op(op),
+      Cross(None),
+      loadFrom(line),
+      Const(const)(line))(line)
   }
 
   "for homogeneous sets, the appropriate string function" should {
@@ -92,12 +94,13 @@ trait StringLibSpecs[M[+ _]]
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
-      result2 must contain("quirky",
-                           "solstice + 7",
-                           "Monkey: [Brains]",
-                           """("alpha", "beta", "gamma")""",
-                           "Whitespace       is   awesome  !!!1!!",
-                           "")
+      result2 must contain(
+        "quirky",
+        "solstice + 7",
+        "Monkey: [Brains]",
+        """("alpha", "beta", "gamma")""",
+        "Whitespace       is   awesome  !!!1!!",
+        "")
     }
     "determine toUpperCase" in {
       val input = op1Input(toUpperCase, homStrings)
@@ -111,12 +114,13 @@ trait StringLibSpecs[M[+ _]]
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
-      result2 must contain("QUIRKY",
-                           "SOLSTICE + 7",
-                           "MONKEY: [BRAINS]",
-                           """("ALPHA", "BETA", "GAMMA")""",
-                           "  WHITESPACE       IS   AWESOME  !!!1!!   ",
-                           "")
+      result2 must contain(
+        "QUIRKY",
+        "SOLSTICE + 7",
+        "MONKEY: [BRAINS]",
+        """("ALPHA", "BETA", "GAMMA")""",
+        "  WHITESPACE       IS   AWESOME  !!!1!!   ",
+        "")
     }
     "determine toLowerCase" in {
       val input = op1Input(toLowerCase, homStrings)
@@ -130,12 +134,13 @@ trait StringLibSpecs[M[+ _]]
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
-      result2 must contain("quirky",
-                           "solstice + 7",
-                           "monkey: [brains]",
-                           """("alpha", "beta", "gamma")""",
-                           "  whitespace       is   awesome  !!!1!!   ",
-                           "")
+      result2 must contain(
+        "quirky",
+        "solstice + 7",
+        "monkey: [brains]",
+        """("alpha", "beta", "gamma")""",
+        "  whitespace       is   awesome  !!!1!!   ",
+        "")
     }
     "determine isEmpty" in {
       val input = op1Input(isEmpty, homStrings)
@@ -163,12 +168,13 @@ trait StringLibSpecs[M[+ _]]
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
-      result2 must contain("quirky",
-                           "solstice + 7",
-                           "Monkey: [Brains]",
-                           """("alpha", "beta", "gamma")""",
-                           "  Whitespace       is   awesome  !!!1!!   ",
-                           "")
+      result2 must contain(
+        "quirky",
+        "solstice + 7",
+        "Monkey: [Brains]",
+        """("alpha", "beta", "gamma")""",
+        "  Whitespace       is   awesome  !!!1!!   ",
+        "")
     }
 
     "determine codePointAt with valid integer" in {
@@ -239,12 +245,13 @@ trait StringLibSpecs[M[+ _]]
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
-      result2 must contain("quirky7",
-                           "solstice + 77",
-                           "Monkey: [Brains]7",
-                           """("alpha", "beta", "gamma")7""",
-                           "  Whitespace       is   awesome  !!!1!!   7",
-                           "7")
+      result2 must contain(
+        "quirky7",
+        "solstice + 77",
+        "Monkey: [Brains]7",
+        """("alpha", "beta", "gamma")7""",
+        "  Whitespace       is   awesome  !!!1!!   7",
+        "7")
     }
     "determine endsWith" in {
       val input = op2Input(endsWith, CString("y"), homStrings)
@@ -300,7 +307,12 @@ trait StringLibSpecs[M[+ _]]
         }
 
       result2 must contain(
-          "", "quirky", "solstice", "Monkey: ", "(\"alpha\"", "  Whites").only
+        "",
+        "quirky",
+        "solstice",
+        "Monkey: ",
+        "(\"alpha\"",
+        "  Whites").only
     }
     "determine takeRight with valid integer" in {
       val input = op2Input(takeRight, CLong(8), homStrings)
@@ -314,7 +326,12 @@ trait StringLibSpecs[M[+ _]]
         }
 
       result2 must contain(
-          "", "quirky", "tice + 7", "[Brains]", "\"gamma\")", "!!1!!   ").only
+        "",
+        "quirky",
+        "tice + 7",
+        "[Brains]",
+        "\"gamma\")",
+        "!!1!!   ").only
     }
     "determine dropLeft with valid integer" in {
       val input = op2Input(dropLeft, CLong(8), homStrings)
@@ -327,11 +344,12 @@ trait StringLibSpecs[M[+ _]]
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
-      result2 must contain("",
-                           " + 7",
-                           "[Brains]",
-                           ", \"beta\", \"gamma\")",
-                           "pace       is   awesome  !!!1!!   ").only
+      result2 must contain(
+        "",
+        " + 7",
+        "[Brains]",
+        ", \"beta\", \"gamma\")",
+        "pace       is   awesome  !!!1!!   ").only
     }
     "determine dropRight with valid integer" in {
       val input = op2Input(dropRight, CLong(8), homStrings)
@@ -343,11 +361,12 @@ trait StringLibSpecs[M[+ _]]
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
-      result2 must contain("",
-                           "sols",
-                           "Monkey: ",
-                           "(\"alpha\", \"beta\", ",
-                           "  Whitespace       is   awesome  !").only
+      result2 must contain(
+        "",
+        "sols",
+        "Monkey: ",
+        "(\"alpha\", \"beta\", ",
+        "  Whitespace       is   awesome  !").only
     }
     "determine takeLeft with invalid integer" in {
       val input = op2Input(takeLeft, CNum(7.5), homStrings)
@@ -392,8 +411,9 @@ trait StringLibSpecs[M[+ _]]
           case (ids, SArray(vec)) if ids.length == 1 => vec
         }
 
-      result2 must contain(Vector(SString("e"), SString("a")),
-                           Vector(SString("e"), SString("")))
+      result2 must contain(
+        Vector(SString("e"), SString("a")),
+        Vector(SString("e"), SString("")))
     }
     "determine compareTo" in {
       val input =
@@ -412,10 +432,11 @@ trait StringLibSpecs[M[+ _]]
     }
     "determine compareToIgnoreCase" in {
       val input =
-        Join(BuiltInFunction2Op(compareToIgnoreCase),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/hom/strings"))(line))(line),
-             Const(CString("QUIRKY"))(line))(line)
+        Join(
+          BuiltInFunction2Op(compareToIgnoreCase),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/hom/strings"))(line))(line),
+          Const(CString("QUIRKY"))(line))(line)
 
       val result = testEval(input)
 
@@ -445,10 +466,11 @@ trait StringLibSpecs[M[+ _]]
     }
     "determine compareIgnoreCase" in {
       val input =
-        Join(BuiltInFunction2Op(compareIgnoreCase),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/hom/strings"))(line))(line),
-             Const(CString("QUIRKY"))(line))(line)
+        Join(
+          BuiltInFunction2Op(compareIgnoreCase),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/hom/strings"))(line))(line),
+          Const(CString("QUIRKY"))(line))(line)
 
       val result = testEval(input)
 
@@ -463,10 +485,11 @@ trait StringLibSpecs[M[+ _]]
     }
     "determine equals" in {
       val input =
-        Join(BuiltInFunction2Op(library.equals),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/hom/strings"))(line))(line),
-             Const(CString("quirky"))(line))(line)
+        Join(
+          BuiltInFunction2Op(library.equals),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/hom/strings"))(line))(line),
+          Const(CString("quirky"))(line))(line)
 
       val result = testEval(input)
 
@@ -481,10 +504,11 @@ trait StringLibSpecs[M[+ _]]
     }
     "determine indexOf" in {
       val input =
-        Join(BuiltInFunction2Op(indexOf),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/hom/strings"))(line))(line),
-             Const(CString("e"))(line))(line)
+        Join(
+          BuiltInFunction2Op(indexOf),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/hom/strings"))(line))(line),
+          Const(CString("e"))(line))(line)
 
       val result = testEval(input)
 
@@ -499,10 +523,11 @@ trait StringLibSpecs[M[+ _]]
     }
     "determine equalsIgnoreCase" in {
       val input =
-        Join(BuiltInFunction2Op(equalsIgnoreCase),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/hom/strings"))(line))(line),
-             Const(CString("QUIRKY"))(line))(line)
+        Join(
+          BuiltInFunction2Op(equalsIgnoreCase),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/hom/strings"))(line))(line),
+          Const(CString("QUIRKY"))(line))(line)
 
       val result = testEval(input)
 
@@ -520,8 +545,8 @@ trait StringLibSpecs[M[+ _]]
   "for heterogeneous sets, the appropriate string function" should {
     "determine length" in {
       val input = dag.Operate(
-          BuiltInFunction1Op(library.length),
-          dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line))(line)
+        BuiltInFunction1Op(library.length),
+        dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line))(line)
 
       val result = testEval(input)
 
@@ -536,8 +561,8 @@ trait StringLibSpecs[M[+ _]]
     }
     "determine trim" in {
       val input = dag.Operate(
-          BuiltInFunction1Op(trim),
-          dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line))(line)
+        BuiltInFunction1Op(trim),
+        dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line))(line)
 
       val result = testEval(input)
 
@@ -548,17 +573,18 @@ trait StringLibSpecs[M[+ _]]
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
-      result2 must contain("quirky",
-                           "solstice + 7",
-                           "Monkey: [Brains]",
-                           """("alpha", "beta", "gamma")""",
-                           "Whitespace       is   awesome  !!!1!!",
-                           "")
+      result2 must contain(
+        "quirky",
+        "solstice + 7",
+        "Monkey: [Brains]",
+        """("alpha", "beta", "gamma")""",
+        "Whitespace       is   awesome  !!!1!!",
+        "")
     }
     "determine toUpperCase" in {
       val input = dag.Operate(
-          BuiltInFunction1Op(toUpperCase),
-          dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line))(line)
+        BuiltInFunction1Op(toUpperCase),
+        dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line))(line)
 
       val result = testEval(input)
 
@@ -569,17 +595,18 @@ trait StringLibSpecs[M[+ _]]
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
-      result2 must contain("QUIRKY",
-                           "SOLSTICE + 7",
-                           "MONKEY: [BRAINS]",
-                           """("ALPHA", "BETA", "GAMMA")""",
-                           "  WHITESPACE       IS   AWESOME  !!!1!!   ",
-                           "")
+      result2 must contain(
+        "QUIRKY",
+        "SOLSTICE + 7",
+        "MONKEY: [BRAINS]",
+        """("ALPHA", "BETA", "GAMMA")""",
+        "  WHITESPACE       IS   AWESOME  !!!1!!   ",
+        "")
     }
     "determine toLowerCase" in {
       val input = dag.Operate(
-          BuiltInFunction1Op(toLowerCase),
-          dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line))(line)
+        BuiltInFunction1Op(toLowerCase),
+        dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line))(line)
 
       val result = testEval(input)
 
@@ -590,17 +617,18 @@ trait StringLibSpecs[M[+ _]]
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
-      result2 must contain("quirky",
-                           "solstice + 7",
-                           "monkey: [brains]",
-                           """("alpha", "beta", "gamma")""",
-                           "  whitespace       is   awesome  !!!1!!   ",
-                           "")
+      result2 must contain(
+        "quirky",
+        "solstice + 7",
+        "monkey: [brains]",
+        """("alpha", "beta", "gamma")""",
+        "  whitespace       is   awesome  !!!1!!   ",
+        "")
     }
     "determine isEmpty" in {
       val input = dag.Operate(
-          BuiltInFunction1Op(isEmpty),
-          dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line))(line)
+        BuiltInFunction1Op(isEmpty),
+        dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line))(line)
 
       val result = testEval(input)
 
@@ -615,8 +643,8 @@ trait StringLibSpecs[M[+ _]]
     }
     "determine intern" in {
       val input = dag.Operate(
-          BuiltInFunction1Op(intern),
-          dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line))(line)
+        BuiltInFunction1Op(intern),
+        dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line))(line)
 
       val result = testEval(input)
 
@@ -627,20 +655,22 @@ trait StringLibSpecs[M[+ _]]
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
-      result2 must contain("quirky",
-                           "solstice + 7",
-                           "Monkey: [Brains]",
-                           """("alpha", "beta", "gamma")""",
-                           "  Whitespace       is   awesome  !!!1!!   ",
-                           "")
+      result2 must contain(
+        "quirky",
+        "solstice + 7",
+        "Monkey: [Brains]",
+        """("alpha", "beta", "gamma")""",
+        "  Whitespace       is   awesome  !!!1!!   ",
+        "")
     }
 
     "determine codePointAt with valid integer" in {
       val input =
-        Join(BuiltInFunction2Op(codePointAt),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line),
-             Const(CLong(7))(line))(line)
+        Join(
+          BuiltInFunction2Op(codePointAt),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line),
+          Const(CLong(7))(line))(line)
 
       val result = testEval(input)
 
@@ -655,10 +685,11 @@ trait StringLibSpecs[M[+ _]]
     }
     "determine codePointAt with invalid integer" in {
       val input =
-        Join(BuiltInFunction2Op(codePointAt),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line),
-             Const(CNum(7.5))(line))(line)
+        Join(
+          BuiltInFunction2Op(codePointAt),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line),
+          Const(CNum(7.5))(line))(line)
 
       val result = testEval(input)
 
@@ -673,10 +704,11 @@ trait StringLibSpecs[M[+ _]]
     }
     "determine startsWith" in {
       val input =
-        Join(BuiltInFunction2Op(startsWith),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line),
-             Const(CString("s"))(line))(line)
+        Join(
+          BuiltInFunction2Op(startsWith),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line),
+          Const(CString("s"))(line))(line)
 
       val result = testEval(input)
 
@@ -691,10 +723,11 @@ trait StringLibSpecs[M[+ _]]
     }
     "determine lastIndexOf" in {
       val input =
-        Join(BuiltInFunction2Op(lastIndexOf),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line),
-             Const(CString("s"))(line))(line)
+        Join(
+          BuiltInFunction2Op(lastIndexOf),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line),
+          Const(CString("s"))(line))(line)
 
       val result = testEval(input)
 
@@ -709,10 +742,11 @@ trait StringLibSpecs[M[+ _]]
     }
     "determine concat" in {
       val input =
-        Join(BuiltInFunction2Op(concat),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line),
-             Const(CString("7"))(line))(line)
+        Join(
+          BuiltInFunction2Op(concat),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line),
+          Const(CString("7"))(line))(line)
 
       val result = testEval(input)
 
@@ -723,19 +757,21 @@ trait StringLibSpecs[M[+ _]]
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
-      result2 must contain("quirky7",
-                           "solstice + 77",
-                           "Monkey: [Brains]7",
-                           """("alpha", "beta", "gamma")7""",
-                           "  Whitespace       is   awesome  !!!1!!   7",
-                           "7")
+      result2 must contain(
+        "quirky7",
+        "solstice + 77",
+        "Monkey: [Brains]7",
+        """("alpha", "beta", "gamma")7""",
+        "  Whitespace       is   awesome  !!!1!!   7",
+        "7")
     }
     "determine endsWith" in {
       val input =
-        Join(BuiltInFunction2Op(endsWith),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line),
-             Const(CString("y"))(line))(line)
+        Join(
+          BuiltInFunction2Op(endsWith),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line),
+          Const(CString("y"))(line))(line)
 
       val result = testEval(input)
 
@@ -750,10 +786,11 @@ trait StringLibSpecs[M[+ _]]
     }
     "determine codePointBefore with valid integer" in {
       val input =
-        Join(BuiltInFunction2Op(codePointBefore),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line),
-             Const(CLong(7))(line))(line)
+        Join(
+          BuiltInFunction2Op(codePointBefore),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line),
+          Const(CLong(7))(line))(line)
 
       val result = testEval(input)
 
@@ -768,10 +805,11 @@ trait StringLibSpecs[M[+ _]]
     }
     "determine codePointBefore with invalid integer" in {
       val input =
-        Join(BuiltInFunction2Op(codePointBefore),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line),
-             Const(CNum(7.5))(line))(line)
+        Join(
+          BuiltInFunction2Op(codePointBefore),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line),
+          Const(CNum(7.5))(line))(line)
 
       val result = testEval(input)
 
@@ -786,10 +824,11 @@ trait StringLibSpecs[M[+ _]]
     }
     "determine takeLeft with valid integer" in {
       val input =
-        Join(BuiltInFunction2Op(takeLeft),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line),
-             Const(CLong(8))(line))(line)
+        Join(
+          BuiltInFunction2Op(takeLeft),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line),
+          Const(CLong(8))(line))(line)
 
       val result = testEval(input)
 
@@ -800,14 +839,20 @@ trait StringLibSpecs[M[+ _]]
         }
 
       result2 must contain(
-          "", "quirky", "solstice", "Monkey: ", "(\"alpha\"", "  Whites").only
+        "",
+        "quirky",
+        "solstice",
+        "Monkey: ",
+        "(\"alpha\"",
+        "  Whites").only
     }
     "determine takeRight with valid integer" in {
       val input =
-        Join(BuiltInFunction2Op(takeRight),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line),
-             Const(CLong(8))(line))(line)
+        Join(
+          BuiltInFunction2Op(takeRight),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line),
+          Const(CLong(8))(line))(line)
 
       val result = testEval(input)
 
@@ -818,14 +863,20 @@ trait StringLibSpecs[M[+ _]]
         }
 
       result2 must contain(
-          "", "quirky", "tice + 7", "[Brains]", "\"gamma\")", "!!1!!   ").only
+        "",
+        "quirky",
+        "tice + 7",
+        "[Brains]",
+        "\"gamma\")",
+        "!!1!!   ").only
     }
     "determine dropLeft with valid integer" in {
       val input =
-        Join(BuiltInFunction2Op(dropLeft),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line),
-             Const(CLong(8))(line))(line)
+        Join(
+          BuiltInFunction2Op(dropLeft),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line),
+          Const(CLong(8))(line))(line)
 
       val result = testEval(input)
 
@@ -835,18 +886,20 @@ trait StringLibSpecs[M[+ _]]
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
-      result2 must contain("",
-                           " + 7",
-                           "[Brains]",
-                           ", \"beta\", \"gamma\")",
-                           "pace       is   awesome  !!!1!!   ").only
+      result2 must contain(
+        "",
+        " + 7",
+        "[Brains]",
+        ", \"beta\", \"gamma\")",
+        "pace       is   awesome  !!!1!!   ").only
     }
     "determine dropRight with valid integer" in {
       val input =
-        Join(BuiltInFunction2Op(dropRight),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line),
-             Const(CLong(8))(line))(line)
+        Join(
+          BuiltInFunction2Op(dropRight),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line),
+          Const(CLong(8))(line))(line)
 
       val result = testEval(input)
 
@@ -856,11 +909,12 @@ trait StringLibSpecs[M[+ _]]
           case (ids, SString(d)) if ids.length == 1 => d
         }
 
-      result2 must contain("",
-                           "sols",
-                           "Monkey: ",
-                           "(\"alpha\", \"beta\", ",
-                           "  Whitespace       is   awesome  !").only
+      result2 must contain(
+        "",
+        "sols",
+        "Monkey: ",
+        "(\"alpha\", \"beta\", ",
+        "  Whitespace       is   awesome  !").only
     }
     "determine takeLeft with invalid integer" in {
       val input = op2Input(takeLeft, CNum(7.5), hetStrings)
@@ -959,10 +1013,11 @@ trait StringLibSpecs[M[+ _]]
     }
     "determine indexOf" in {
       val input =
-        Join(BuiltInFunction2Op(indexOf),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line),
-             Const(CString("e"))(line))(line)
+        Join(
+          BuiltInFunction2Op(indexOf),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line),
+          Const(CString("e"))(line))(line)
 
       val result = testEval(input)
 
@@ -977,10 +1032,11 @@ trait StringLibSpecs[M[+ _]]
     }
     "determine equalsIgnoreCase" in {
       val input =
-        Join(BuiltInFunction2Op(equalsIgnoreCase),
-             Cross(None),
-             dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line),
-             Const(CString("QUIRKY"))(line))(line)
+        Join(
+          BuiltInFunction2Op(equalsIgnoreCase),
+          Cross(None),
+          dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line),
+          Const(CString("QUIRKY"))(line))(line)
 
       val result = testEval(input)
 
@@ -998,9 +1054,9 @@ trait StringLibSpecs[M[+ _]]
   "parseNum" should {
     "handle valid and invalid inputs" in {
       val input =
-        dag.Operate(BuiltInFunction1Op(parseNum),
-                    dag.AbsoluteLoad(Const(CString("/het/stringNums"))(line))(
-                        line))(line)
+        dag.Operate(
+          BuiltInFunction1Op(parseNum),
+          dag.AbsoluteLoad(Const(CString("/het/stringNums"))(line))(line))(line)
 
       val result = testEval(input)
 
@@ -1011,14 +1067,14 @@ trait StringLibSpecs[M[+ _]]
       }
 
       ns must contain(
-          BigDecimal("42"),
-          BigDecimal("42.0"),
-          BigDecimal("42.123"),
-          BigDecimal("-666"),
-          BigDecimal("2e3"),
-          BigDecimal("0e9"),
-          BigDecimal("2.23532235235235353252352343636953295923"),
-          BigDecimal("1.2e3")
+        BigDecimal("42"),
+        BigDecimal("42.0"),
+        BigDecimal("42.123"),
+        BigDecimal("-666"),
+        BigDecimal("2e3"),
+        BigDecimal("0e9"),
+        BigDecimal("2.23532235235235353252352343636953295923"),
+        BigDecimal("1.2e3")
       ).only
     }
   }
@@ -1026,8 +1082,8 @@ trait StringLibSpecs[M[+ _]]
   "toString" should {
     "convert values to strings" in {
       val input = dag.Operate(
-          BuiltInFunction1Op(numToString),
-          dag.AbsoluteLoad(Const(CString("/het/random"))(line))(line))(line)
+        BuiltInFunction1Op(numToString),
+        dag.AbsoluteLoad(Const(CString("/het/random"))(line))(line))(line)
 
       val result = testEval(input)
 
@@ -1038,20 +1094,21 @@ trait StringLibSpecs[M[+ _]]
       }
 
       ss must contain(
-          "4",
-          "3",
-          "4",
-          "4",
-          "3",
-          "4"
+        "4",
+        "3",
+        "4",
+        "4",
+        "3",
+        "4"
       ).only
     }
 
     "trim the trailing '.0' in round double conversion" in {
       val input =
-        dag.Operate(BuiltInFunction1Op(numToString),
-                    dag.Operate(BuiltInFunction1Op(round),
-                                Const(CDouble(3.14))(line))(line))(line)
+        dag.Operate(
+          BuiltInFunction1Op(numToString),
+          dag.Operate(BuiltInFunction1Op(round), Const(CDouble(3.14))(line))(
+            line))(line)
 
       val resultE = testEval(input)
       resultE must haveSize(1)
@@ -1069,38 +1126,43 @@ trait StringLibSpecs[M[+ _]]
     val o = scala.math.Ordering.by[(SValue, _), SValue](_._1)
 
     def mogrify(result: Set[(Vector[SValue], SValue)]): List[Vector[String]] =
-      result.toList.map {
-        case (Vector(n), SArray(elems)) => (n, elems)
-      }.sorted(o).map(_._2.map { case SString(s) => s })
+      result.toList
+        .map {
+          case (Vector(n), SArray(elems)) => (n, elems)
+        }
+        .sorted(o)
+        .map(_._2.map { case SString(s) => s })
 
     def mktree(f: Op2, path: String, sep: String) =
-      Join(BuiltInFunction2Op(f),
-           Cross(None),
-           dag.AbsoluteLoad(Const(CString(path))(line))(line),
-           Const(CString(sep))(line))(line)
+      Join(
+        BuiltInFunction2Op(f),
+        Cross(None),
+        dag.AbsoluteLoad(Const(CString(path))(line))(line),
+        Const(CString(sep))(line))(line)
 
     def tester(f: Op2, path: String, sep: String) =
       mogrify(testEval(mktree(f, path, sep)))
 
     val commaSplitString2 = List(
-        Vector("this", "is", "delimited"),
-        Vector("this is a string"),
-        Vector(""),
-        Vector("also", "delmited"),
-        Vector("", "starts", "with", "comma"),
-        Vector("ends", "with", "comma", ""),
-        Vector("lots", "", "", "", "of", "", "", "", "commas"),
-        Vector("", "", "", "", "", "", "", ""),
-        Vector("", ""),
-        Vector("", "", "crazy", "", ""),
-        Vector("something", "basically", "reasonable")
+      Vector("this", "is", "delimited"),
+      Vector("this is a string"),
+      Vector(""),
+      Vector("also", "delmited"),
+      Vector("", "starts", "with", "comma"),
+      Vector("ends", "with", "comma", ""),
+      Vector("lots", "", "", "", "of", "", "", "", "commas"),
+      Vector("", "", "", "", "", "", "", ""),
+      Vector("", ""),
+      Vector("", "", "crazy", "", ""),
+      Vector("something", "basically", "reasonable")
     )
 
     "quote a regular expression in a split" in {
-      val input = Join(BuiltInFunction2Op(split),
-                       Cross(None),
-                       Const(CString("foo{bar"))(line),
-                       Const(CString("{"))(line))(line)
+      val input = Join(
+        BuiltInFunction2Op(split),
+        Cross(None),
+        Const(CString("foo{bar"))(line),
+        Const(CString("{"))(line))(line)
 
       testEval(input) collect {
         case (_, SArray(vec)) => vec collect { case SString(str) => str }
@@ -1117,17 +1179,17 @@ trait StringLibSpecs[M[+ _]]
 
     "splitRegex heterogenous data on ,,+" in {
       tester(splitRegex, "/het/strings2", ",,+") must_== List(
-          Vector("this,is,delimited"),
-          Vector("this is a string"),
-          Vector(""),
-          Vector("also,delmited"),
-          Vector(",starts,with,comma"),
-          Vector("ends,with,comma,"),
-          Vector("lots", "of", "commas"),
-          Vector("", ""),
-          Vector(","),
-          Vector("", "crazy", ""),
-          Vector("something,basically,reasonable")
+        Vector("this,is,delimited"),
+        Vector("this is a string"),
+        Vector(""),
+        Vector("also,delmited"),
+        Vector(",starts,with,comma"),
+        Vector("ends,with,comma,"),
+        Vector("lots", "of", "commas"),
+        Vector("", ""),
+        Vector(","),
+        Vector("", "crazy", ""),
+        Vector("something,basically,reasonable")
       )
     }
 

@@ -13,7 +13,9 @@ abstract class LibraryTestCase extends LightCodeInsightFixtureTestCase {
     super.setUp()
 
     val loader = ScalaLibraryLoader.withMockJdk(
-        myFixture.getProject, myFixture.getModule, rootPath = null)
+      myFixture.getProject,
+      myFixture.getModule,
+      rootPath = null)
     libraryLoader = Some(loader)
 
     loader.loadScala(TestUtils.DEFAULT_SCALA_SDK_VERSION)

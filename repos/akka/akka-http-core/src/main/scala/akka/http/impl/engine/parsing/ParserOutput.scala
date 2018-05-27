@@ -32,7 +32,8 @@ private[http] object ParserOutput {
       createEntity: EntityCreator[RequestOutput, RequestEntity],
       expect100Continue: Boolean,
       closeRequested: Boolean)
-      extends MessageStart with RequestOutput
+      extends MessageStart
+      with RequestOutput
 
   final case class ResponseStart(
       statusCode: StatusCode,
@@ -40,7 +41,8 @@ private[http] object ParserOutput {
       headers: List[HttpHeader],
       createEntity: EntityCreator[ResponseOutput, ResponseEntity],
       closeRequested: Boolean)
-      extends MessageStart with ResponseOutput
+      extends MessageStart
+      with ResponseOutput
 
   case object MessageEnd extends MessageOutput
 
@@ -50,7 +52,8 @@ private[http] object ParserOutput {
       extends MessageOutput
 
   final case class MessageStartError(status: StatusCode, info: ErrorInfo)
-      extends MessageStart with ErrorOutput
+      extends MessageStart
+      with ErrorOutput
 
   final case class EntityStreamError(info: ErrorInfo) extends ErrorOutput
 
@@ -78,9 +81,8 @@ private[http] object ParserOutput {
       entity
     }
   }
-  final case class StreamedEntityCreator[
-      -A <: ParserOutput, +B >: HttpEntity.Strict <: HttpEntity](
-      creator: Source[A, NotUsed] ⇒ B)
+  final case class StreamedEntityCreator[-A <: ParserOutput,
+  +B >: HttpEntity.Strict <: HttpEntity](creator: Source[A, NotUsed] ⇒ B)
       extends EntityCreator[A, B] {
     def apply(parts: Source[A, NotUsed]) = creator(parts)
   }

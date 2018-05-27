@@ -38,9 +38,12 @@ object BigDecimalStringConverter {
 }
 
 class BigDecimalStringConverter(
-    delegate: jfxuc.BigDecimalStringConverter = new jfxuc.BigDecimalStringConverter)
+    delegate: jfxuc.BigDecimalStringConverter =
+      new jfxuc.BigDecimalStringConverter)
     extends StringConverterDelegate[
-        jm.BigDecimal, BigDecimal, jfxuc.BigDecimalStringConverter](delegate) {
+      jm.BigDecimal,
+      BigDecimal,
+      jfxuc.BigDecimalStringConverter](delegate) {
 
   override def toString(b: BigDecimal): String =
     delegate.toString(b.bigDecimal)

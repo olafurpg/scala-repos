@@ -39,6 +39,6 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class StrokeTypeSpec
     extends SFXEnumDelegateSpec[jfxss.StrokeType, StrokeType](
-        javaClass = classOf[jfxss.StrokeType],
-        scalaClass = classOf[StrokeType],
-        companion = StrokeType)
+      javaClass = classOf[jfxss.StrokeType],
+      scalaClass = classOf[StrokeType],
+      companion = StrokeType)

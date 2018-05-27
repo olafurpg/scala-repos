@@ -48,14 +48,15 @@ private[orc] object OrcFileOperator extends Logging {
     *       create the result reader from that file.  If no such file is found, it returns `None`.
     * @todo Needs to consider all files when schema evolution is taken into account.
     */
-  def getFileReader(basePath: String,
-                    config: Option[Configuration] = None): Option[Reader] = {
+  def getFileReader(
+      basePath: String,
+      config: Option[Configuration] = None): Option[Reader] = {
     def isWithNonEmptySchema(path: Path, reader: Reader): Boolean = {
       reader.getObjectInspector match {
         case oi: StructObjectInspector
             if oi.getAllStructFieldRefs.size() == 0 =>
           logInfo(
-              s"ORC file $path has empty schema, it probably contains no rows. " +
+            s"ORC file $path has empty schema, it probably contains no rows. " +
               "Trying to read another ORC file to figure out the schema.")
           false
         case _ => true
@@ -68,15 +69,18 @@ private[orc] object OrcFileOperator extends Logging {
       hdfsPath.getFileSystem(conf)
     }
 
-    listOrcFiles(basePath, conf).iterator.map { path =>
-      path -> OrcFile.createReader(fs, path)
-    }.collectFirst {
-      case (path, reader) if isWithNonEmptySchema(path, reader) => reader
-    }
+    listOrcFiles(basePath, conf).iterator
+      .map { path =>
+        path -> OrcFile.createReader(fs, path)
+      }
+      .collectFirst {
+        case (path, reader) if isWithNonEmptySchema(path, reader) => reader
+      }
   }
 
   def readSchema(
-      paths: Seq[String], conf: Option[Configuration]): Option[StructType] = {
+      paths: Seq[String],
+      conf: Option[Configuration]): Option[StructType] = {
     // Take the first file where we can open a valid reader if we can find one.  Otherwise just
     // return None to indicate we can't infer the schema.
     paths.flatMap(getFileReader(_, conf)).headOption.map { reader =>
@@ -84,7 +88,7 @@ private[orc] object OrcFileOperator extends Logging {
         reader.getObjectInspector.asInstanceOf[StructObjectInspector]
       val schema = readerInspector.getTypeName
       logDebug(
-          s"Reading schema from file $paths, got Hive schema string: $schema")
+        s"Reading schema from file $paths, got Hive schema string: $schema")
       HiveMetastoreTypes.toDataType(schema).asInstanceOf[StructType]
     }
   }
@@ -93,7 +97,7 @@ private[orc] object OrcFileOperator extends Logging {
       path: String,
       conf: Option[Configuration]): Option[StructObjectInspector] = {
     getFileReader(path, conf).map(
-        _.getObjectInspector.asInstanceOf[StructObjectInspector])
+      _.getObjectInspector.asInstanceOf[StructObjectInspector])
   }
 
   def listOrcFiles(pathStr: String, conf: Configuration): Seq[Path] = {

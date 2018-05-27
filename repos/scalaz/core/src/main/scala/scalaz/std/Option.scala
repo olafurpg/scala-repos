@@ -9,9 +9,16 @@ sealed trait OptionInstances0 {
 }
 
 trait OptionInstances extends OptionInstances0 {
-  implicit val optionInstance: Traverse[Option] with MonadPlus[Option] with BindRec[
-      Option] with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[
-      Option] with IsEmpty[Option] with Cobind[Option] with Optional[Option] =
+  implicit val optionInstance: Traverse[Option]
+    with MonadPlus[Option]
+    with BindRec[Option]
+    with Cozip[Option]
+    with Zip[Option]
+    with Unzip[Option]
+    with Align[Option]
+    with IsEmpty[Option]
+    with Cobind[Option]
+    with Optional[Option] =
     new Traverse[Option] with MonadPlus[Option] with BindRec[Option]
     with Cozip[Option] with Zip[Option] with Unzip[Option] with Align[Option]
     with IsEmpty[Option] with Cobind[Option] with Optional[Option] {
@@ -22,7 +29,7 @@ trait OptionInstances extends OptionInstances0 {
         case Some(f) =>
           fa match {
             case Some(x) => Some(f(x))
-            case None => None
+            case None    => None
           }
         case None => None
       }
@@ -36,7 +43,7 @@ trait OptionInstances extends OptionInstances0 {
       override def foldRight[A, B](fa: Option[A], z: => B)(f: (A, => B) => B) =
         fa match {
           case Some(a) => f(a, z)
-          case None => z
+          case None    => z
         }
       def cozip[A, B](a: Option[A \/ B]) =
         a match {
@@ -54,7 +61,7 @@ trait OptionInstances extends OptionInstances0 {
         } yield (x, y)
       def unzip[A, B](a: Option[(A, B)]) =
         a match {
-          case None => (None, None)
+          case None         => (None, None)
           case Some((a, b)) => (Some(a), Some(b))
         }
 
@@ -84,19 +91,19 @@ trait OptionInstances extends OptionInstances0 {
       @scala.annotation.tailrec
       def tailrecM[A, B](f: A => Option[A \/ B])(a: A): Option[B] =
         f(a) match {
-          case None => None
+          case None         => None
           case Some(-\/(a)) => tailrecM(f)(a)
           case Some(\/-(b)) => Some(b)
         }
     }
 
-  implicit def optionMonoid[A : Semigroup]: Monoid[Option[A]] =
+  implicit def optionMonoid[A: Semigroup]: Monoid[Option[A]] =
     new Monoid[Option[A]] {
       def append(f1: Option[A], f2: => Option[A]) = (f1, f2) match {
-        case (Some(a1), Some(a2)) => Some(Semigroup[A].append(a1, a2))
-        case (Some(a1), None) => f1
+        case (Some(a1), Some(a2))   => Some(Semigroup[A].append(a1, a2))
+        case (Some(a1), None)       => f1
         case (None, sa2 @ Some(a2)) => sa2
-        case (None, None) => None
+        case (None, None)           => None
       }
 
       def zero: Option[A] = None
@@ -108,10 +115,10 @@ trait OptionInstances extends OptionInstances0 {
       implicit def A = A0
     }
 
-  implicit def optionShow[A : Show]: Show[Option[A]] = new Show[Option[A]] {
+  implicit def optionShow[A: Show]: Show[Option[A]] = new Show[Option[A]] {
     override def show(o1: Option[A]) = o1 match {
       case Some(a1) => Cord("Some(", Show[A].show(a1), ")")
-      case None => "None"
+      case None     => "None"
     }
   }
 
@@ -122,10 +129,10 @@ trait OptionInstances extends OptionInstances0 {
       Tag(Tag.unwrap(f1).orElse(Tag.unwrap(f2)))
   }
 
-  implicit def optionFirstShow[A : Show]: Show[FirstOption[A]] =
+  implicit def optionFirstShow[A: Show]: Show[FirstOption[A]] =
     Tag.subst(Show[Option[A]])
 
-  implicit def optionFirstOrder[A : Order]: Order[FirstOption[A]] =
+  implicit def optionFirstOrder[A: Order]: Order[FirstOption[A]] =
     Tag.subst(Order[Option[A]])
 
   implicit def optionFirstMonad: Monad[FirstOption] =
@@ -138,10 +145,10 @@ trait OptionInstances extends OptionInstances0 {
       Tag(Tag.unwrap(f2).orElse(Tag.unwrap(f1)))
   }
 
-  implicit def optionLastShow[A : Show]: Show[LastOption[A]] =
+  implicit def optionLastShow[A: Show]: Show[LastOption[A]] =
     Tag.subst(Show[Option[A]])
 
-  implicit def optionLastOrder[A : Order]: Order[LastOption[A]] =
+  implicit def optionLastOrder[A: Order]: Order[LastOption[A]] =
     Tag.subst(Order[Option[A]])
 
   implicit def optionLastMonad: Monad[LastOption] =
@@ -151,19 +158,18 @@ trait OptionInstances extends OptionInstances0 {
     def zero: MinOption[A] = Tag(None)
 
     def append(f1: MinOption[A], f2: => MinOption[A]) =
-      Tag(
-          (Tag unwrap f1, Tag unwrap f2) match {
-        case (Some(v1), Some(v2)) => Some(Order[A].min(v1, v2))
+      Tag((Tag unwrap f1, Tag unwrap f2) match {
+        case (Some(v1), Some(v2))  => Some(Order[A].min(v1, v2))
         case (_f1 @ Some(_), None) => _f1
         case (None, _f2 @ Some(_)) => _f2
-        case (None, None) => None
+        case (None, None)          => None
       })
   }
 
-  implicit def optionMinShow[A : Show]: Show[MinOption[A]] =
+  implicit def optionMinShow[A: Show]: Show[MinOption[A]] =
     Tag.subst(Show[Option[A]])
 
-  implicit def optionMinOrder[A : Order]: Order[MinOption[A]] =
+  implicit def optionMinOrder[A: Order]: Order[MinOption[A]] =
     Tag.subst(Order[Option[A]])
 
   implicit def optionMinMonad: Monad[MinOption] =
@@ -173,19 +179,18 @@ trait OptionInstances extends OptionInstances0 {
     def zero: MaxOption[A] = Tag(None)
 
     def append(f1: MaxOption[A], f2: => MaxOption[A]) =
-      Tag(
-          (Tag unwrap f1, Tag unwrap f2) match {
-        case (Some(v1), Some(v2)) => Some(Order[A].max(v1, v2))
+      Tag((Tag unwrap f1, Tag unwrap f2) match {
+        case (Some(v1), Some(v2))  => Some(Order[A].max(v1, v2))
         case (_f1 @ Some(_), None) => _f1
         case (None, _f2 @ Some(_)) => _f2
-        case (None, None) => None
+        case (None, None)          => None
       })
   }
 
-  implicit def optionMaxShow[A : Show]: Show[MaxOption[A]] =
+  implicit def optionMaxShow[A: Show]: Show[MaxOption[A]] =
     Tag.subst(Show[Option[A]])
 
-  implicit def optionMaxOrder[A : Order]: Order[MaxOption[A]] =
+  implicit def optionMaxOrder[A: Order]: Order[MaxOption[A]] =
     Tag.subst(Order[Option[A]])
 
   implicit def optionMaxMonad: Monad[MaxOption] =
@@ -205,7 +210,7 @@ trait OptionFunctions {
     * if it is defined, otherwise, the provided value `none`.
     */
   final def cata[A, X](oa: Option[A])(some: A => X, none: => X): X = oa match {
-    case None => none
+    case None    => none
     case Some(a) => some(a)
   }
 
@@ -216,58 +221,58 @@ trait OptionFunctions {
   final def toSuccess[A, E](oa: Option[A])(e: => E): Validation[E, A] =
     oa match {
       case Some(a) => Success(a)
-      case None => Failure(e)
+      case None    => Failure(e)
     }
 
   final def toFailure[A, B](oa: Option[A])(b: => B): Validation[A, B] =
     oa match {
       case Some(e) => Failure(e)
-      case None => Success(b)
+      case None    => Success(b)
     }
 
   final def toSuccessNel[A, E](oa: Option[A])(e: => E): ValidationNel[E, A] =
     oa match {
       case Some(a) => Success(a)
-      case None => Failure(NonEmptyList(e))
+      case None    => Failure(NonEmptyList(e))
     }
 
   final def toFailureNel[A, B](oa: Option[A])(b: => B): ValidationNel[A, B] =
     oa match {
       case Some(a) => Failure(NonEmptyList(a))
-      case None => Success(b)
+      case None    => Success(b)
     }
 
   final def toRight[A, E](oa: Option[A])(e: => E): E \/ A = oa match {
     case Some(a) => \/-(a)
-    case None => -\/(e)
+    case None    => -\/(e)
   }
 
   final def toLeft[A, B](oa: Option[A])(b: => B): A \/ B = oa match {
     case Some(a) => -\/(a)
-    case None => \/-(b)
+    case None    => \/-(b)
   }
 
   final def toMaybe[A](oa: Option[A]): Maybe[A] = oa match {
     case Some(a) => Maybe.just(a)
-    case None => Maybe.empty
+    case None    => Maybe.empty
   }
 
   /**
     * Returns the item contained in the Option wrapped in type M if the Option is defined,
     * otherwise, the empty value for type M.
     */
-  final def orEmpty[A, M[_]: Applicative : PlusEmpty](oa: Option[A]): M[A] =
+  final def orEmpty[A, M[_]: Applicative: PlusEmpty](oa: Option[A]): M[A] =
     oa match {
       case Some(a) => Applicative[M].point(a)
-      case None => PlusEmpty[M].empty
+      case None    => PlusEmpty[M].empty
     }
 
   /**
     * Returns the given value if None, otherwise lifts the Some value and passes it to the given function.
     */
-  final def foldLift[F[_], A, B](oa: Option[A])(
-      b: => B, k: F[A] => B)(implicit p: Applicative[F]): B = oa match {
-    case None => b
+  final def foldLift[F[_], A, B](oa: Option[A])(b: => B, k: F[A] => B)(
+      implicit p: Applicative[F]): B = oa match {
+    case None    => b
     case Some(a) => k(Applicative[F].point(a))
   }
 
@@ -297,9 +302,9 @@ private trait OptionEqual[A] extends Equal[Option[A]] {
 
   override def equal(o1: Option[A], o2: Option[A]): Boolean = (o1, o2) match {
     case (Some(a1), Some(a2)) => A.equal(a1, a2)
-    case (None, None) => true
-    case (None, Some(_)) => false
-    case (Some(_), None) => false
+    case (None, None)         => true
+    case (None, Some(_))      => false
+    case (Some(_), None)      => false
   }
 }
 
@@ -310,8 +315,8 @@ private trait OptionOrder[A] extends Order[Option[A]] with OptionEqual[A] {
 
   def order(f1: Option[A], f2: Option[A]) = (f1, f2) match {
     case (Some(a1), Some(a2)) => Order[A].order(a1, a2)
-    case (None, Some(_)) => LT
-    case (Some(_), None) => GT
-    case (None, None) => EQ
+    case (None, Some(_))      => LT
+    case (Some(_), None)      => GT
+    case (None, None)         => EQ
   }
 }

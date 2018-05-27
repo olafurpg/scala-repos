@@ -2,7 +2,10 @@ package org.jetbrains.plugins.scala
 package debugger.evaluation
 
 import com.intellij.codeInsight.PsiEquivalenceUtil
-import com.intellij.debugger.engine.evaluation.expression.{Evaluator, ExpressionEvaluator}
+import com.intellij.debugger.engine.evaluation.expression.{
+  Evaluator,
+  ExpressionEvaluator
+}
 import com.intellij.debugger.impl.{DebuggerManagerAdapter, DebuggerSession}
 import com.intellij.debugger.{DebuggerManagerEx, SourcePosition}
 import com.intellij.openapi.components.AbstractProjectComponent
@@ -71,9 +74,10 @@ class ScalaEvaluatorCache(project: Project)
     }
   }
 
-  def add(position: SourcePosition,
-          element: PsiElement,
-          evaluator: Evaluator): Evaluator = {
+  def add(
+      position: SourcePosition,
+      element: PsiElement,
+      evaluator: Evaluator): Evaluator = {
     if (position != null) {
       val file = position.getFile
       val offset = position.getOffset
@@ -81,7 +85,7 @@ class ScalaEvaluatorCache(project: Project)
         case Some(map) => map += (element -> evaluator)
         case None =>
           cachedEvaluators +=
-          ((file, offset) -> mutable.HashMap(element -> evaluator))
+            ((file, offset) -> mutable.HashMap(element -> evaluator))
       }
     }
     evaluator

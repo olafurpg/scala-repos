@@ -24,7 +24,7 @@ import scala.reflect.runtime.universe._
   * This overrides the [[toString]] method to print all case class fields by name and value.
   * @tparam T  Concrete parameter class.
   */
-abstract class AbstractParams[T : TypeTag] {
+abstract class AbstractParams[T: TypeTag] {
 
   private def tag: TypeTag[T] = typeTag[T]
 
@@ -43,11 +43,13 @@ abstract class AbstractParams[T : TypeTag] {
     }
     val mirror = runtimeMirror(getClass.getClassLoader)
     val instanceMirror = mirror.reflect(this)
-    allAccessors.map { f =>
-      val paramName = f.name.toString
-      val fieldMirror = instanceMirror.reflectField(f)
-      val paramValue = fieldMirror.get
-      s"  $paramName:\t$paramValue"
-    }.mkString("{\n", ",\n", "\n}")
+    allAccessors
+      .map { f =>
+        val paramName = f.name.toString
+        val fieldMirror = instanceMirror.reflectField(f)
+        val paramValue = fieldMirror.get
+        s"  $paramName:\t$paramValue"
+      }
+      .mkString("{\n", ",\n", "\n}")
   }
 }

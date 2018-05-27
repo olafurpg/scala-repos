@@ -17,16 +17,17 @@ object Test extends ScaladocModelTest {
       rootPackage._package("scala")._package("test")._package("scaladoc")
 
     val diagrams = base._package("diagrams")
-    val templates = List(diagrams._trait("WeekDayTraitWithDiagram"),
-                         diagrams._class("WeekDayClassWithDiagram"),
-                         diagrams._object("WeekDayObjectWithDiagram"))
+    val templates = List(
+      diagrams._trait("WeekDayTraitWithDiagram"),
+      diagrams._class("WeekDayClassWithDiagram"),
+      diagrams._object("WeekDayObjectWithDiagram"))
 
     for (template <- templates) {
       testDiagram(template, template.contentDiagram, 8, 7)
       val subtemplates = List("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
         .map(template._object(_))
-      for (subtemplate <- subtemplates) testDiagram(
-          subtemplate, subtemplate.inheritanceDiagram, 2, 1)
+      for (subtemplate <- subtemplates)
+        testDiagram(subtemplate, subtemplate.inheritanceDiagram, 2, 1)
     }
   }
 }

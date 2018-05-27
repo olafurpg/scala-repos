@@ -92,10 +92,10 @@ object NetUtil {
       case inetAddress: Inet4Address =>
         val addr = inetAddress.getAddress
         ((addr(0) & 0xff) << 24) | ((addr(1) & 0xff) << 16) |
-        ((addr(2) & 0xff) << 8) | (addr(3) & 0xff)
+          ((addr(2) & 0xff) << 8) | (addr(3) & 0xff)
       case _ =>
         throw new IllegalArgumentException(
-            "non-Inet4Address cannot be converted to an Int")
+          "non-Inet4Address cannot be converted to an Int")
     }
   }
 
@@ -107,7 +107,7 @@ object NetUtil {
     val arr = ip.split('.')
     val pLen = prefixLen match {
       case None if arr.length != 4 => arr.length * 8
-      case t => t.getOrElse(32)
+      case t                       => t.getOrElse(32)
     }
 
     val netIp = ipToInt(arr.padTo(4, "0").mkString("."))
@@ -118,7 +118,7 @@ object NetUtil {
   // Get the ip block from CIDR notation, returned as (subnet, subnetMask)
   def cidrToIpBlock(cidr: String): (Int, Int) = cidr.split('/') match {
     case Array(ip, prefixLen) => ipToIpBlock(ip, Some(prefixLen.toInt))
-    case Array(ip) => ipToIpBlock(ip, None)
+    case Array(ip)            => ipToIpBlock(ip, None)
   }
 
   def isIpInBlock(ip: Int, ipBlock: (Int, Int)): Boolean = ipBlock match {
@@ -126,7 +126,8 @@ object NetUtil {
   }
 
   def isInetAddressInBlock(
-      inetAddress: InetAddress, ipBlock: (Int, Int)): Boolean =
+      inetAddress: InetAddress,
+      ipBlock: (Int, Int)): Boolean =
     isIpInBlock(inetAddressToInt(inetAddress), ipBlock)
 
   def isIpInBlocks(ip: Int, ipBlocks: Iterable[(Int, Int)]): Boolean = {
@@ -140,7 +141,8 @@ object NetUtil {
   }
 
   def isInetAddressInBlocks(
-      inetAddress: InetAddress, ipBlocks: Iterable[(Int, Int)]): Boolean =
+      inetAddress: InetAddress,
+      ipBlocks: Iterable[(Int, Int)]): Boolean =
     isIpInBlocks(inetAddressToInt(inetAddress), ipBlocks)
 
   def getLocalHostName(): String = {
@@ -152,7 +154,7 @@ object NetUtil {
           case Some(host) =>
             host.split(":") match {
               case Array(hostName, _) => hostName
-              case _ => "unknown_host"
+              case _                  => "unknown_host"
             }
           case None => "unknown_host"
         }

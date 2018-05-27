@@ -59,22 +59,26 @@ object Dashboard extends Logging with SSLConfiguration {
       system.actorOf(Props(classOf[DashboardActor], dc), "dashboard")
     implicit val timeout = Timeout(5.seconds)
     val settings = ServerSettings(system)
-    IO(Http) ? Http.Bind(service,
-                         interface = dc.ip,
-                         port = dc.port,
-                         settings = Some(settings.copy(sslEncryption = true)))
+    IO(Http) ? Http.Bind(
+      service,
+      interface = dc.ip,
+      port = dc.port,
+      settings = Some(settings.copy(sslEncryption = true)))
     system.awaitTermination
   }
 }
 
 class DashboardActor(val dc: DashboardConfig)
-    extends Actor with DashboardService {
+    extends Actor
+    with DashboardService {
   def actorRefFactory: ActorContext = context
   def receive: Actor.Receive = runRoute(dashboardRoute)
 }
 
 trait DashboardService
-    extends HttpService with KeyAuthentication with CORSSupport {
+    extends HttpService
+    with KeyAuthentication
+    with CORSSupport {
 
   implicit def executionContext: ExecutionContext = actorRefFactory.dispatcher
   val dc: DashboardConfig
@@ -89,10 +93,7 @@ trait DashboardService
             complete {
               val completedInstances = evaluationInstances.getCompleted
               html
-                .index(dc,
-                       serverStartTime,
-                       pioEnvVars,
-                       completedInstances)
+                .index(dc, serverStartTime, pioEnvVars, completedInstances)
                 .toString
             }
           }

@@ -15,7 +15,8 @@ private[reflect] trait SymbolLoaders { self: SymbolTable =>
     *  is found, a package is created instead.
     */
   class TopClassCompleter(clazz: Symbol, module: Symbol)
-      extends SymLoader with FlagAssigningCompleter {
+      extends SymLoader
+      with FlagAssigningCompleter {
     markFlagsCompleted(clazz, module)(mask = ~TopLevelPickledFlags)
     override def complete(sym: Symbol) = {
       debugInfo("completing " + sym + "/" + clazz.fullName)
@@ -37,10 +38,10 @@ private[reflect] trait SymbolLoaders { self: SymbolTable =>
     *  @param name    The simple name of the newly created class
     *  @param completer  The completer to be used to set the info of the class and the module
     */
-  protected def initAndEnterClassAndModule(owner: Symbol,
-                                           name: TypeName,
-                                           completer: (Symbol,
-                                           Symbol) => LazyType) = {
+  protected def initAndEnterClassAndModule(
+      owner: Symbol,
+      name: TypeName,
+      completer: (Symbol, Symbol) => LazyType) = {
     assert(!(name.toString endsWith "[]"), name)
     val clazz = owner.newClass(name)
     val module = owner.newModule(name.toTermName)
@@ -59,7 +60,9 @@ private[reflect] trait SymbolLoaders { self: SymbolTable =>
   }
 
   protected def initClassAndModule(
-      clazz: Symbol, module: Symbol, completer: LazyType) =
+      clazz: Symbol,
+      module: Symbol,
+      completer: LazyType) =
     setAllInfos(clazz, module, completer)
 
   /** The type completer for packages.
@@ -109,8 +112,9 @@ private[reflect] trait SymbolLoaders { self: SymbolTable =>
         val existing = super.lookupEntry(sym.name)
         def eitherIsMethod(sym1: Symbol, sym2: Symbol) =
           sym1.isMethod || sym2.isMethod
-        assert(existing == null || eitherIsMethod(existing.sym, sym),
-               s"pkgClass = $pkgClass, sym = $sym, existing = $existing")
+        assert(
+          existing == null || eitherIsMethod(existing.sym, sym),
+          s"pkgClass = $pkgClass, sym = $sym, existing = $existing")
         super.enter(sym)
       }
     }
@@ -140,7 +144,9 @@ private[reflect] trait SymbolLoaders { self: SymbolTable =>
             val (_, module) =
               if (loadingMirror eq currentMirror) {
                 initAndEnterClassAndModule(
-                    pkgClass, name.toTypeName, new TopClassCompleter(_, _))
+                  pkgClass,
+                  name.toTypeName,
+                  new TopClassCompleter(_, _))
               } else {
                 val origOwner =
                   loadingMirror.packageNameToScala(pkgClass.fullName)
@@ -178,8 +184,7 @@ private[reflect] trait SymbolLoaders { self: SymbolTable =>
 
   /** Assert that packages have package scopes */
   override def validateClassInfo(tp: ClassInfoType) {
-    assert(
-        !tp.typeSymbol.isPackageClass || tp.decls.isInstanceOf[PackageScope])
+    assert(!tp.typeSymbol.isPackageClass || tp.decls.isInstanceOf[PackageScope])
   }
 
   override def newPackageScope(pkgClass: Symbol) = new PackageScope(pkgClass)

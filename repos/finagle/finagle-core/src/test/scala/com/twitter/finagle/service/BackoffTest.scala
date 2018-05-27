@@ -14,7 +14,7 @@ class BackoffTest extends FunSuite with GeneratorDrivenPropertyChecks {
   test("exponential") {
     val backoffs = Backoff.exponential(1.seconds, 2) take 10
     assert(
-        backoffs.force.toSeq ==
+      backoffs.force.toSeq ==
         (0 until 10 map { i =>
           (1 << i).seconds
         }))
@@ -24,7 +24,7 @@ class BackoffTest extends FunSuite with GeneratorDrivenPropertyChecks {
     val backoffs =
       (Backoff.exponential(1.seconds, 2) take 5) ++ Backoff.const(32.seconds)
     assert(
-        (backoffs take 10).force.toSeq ==
+      (backoffs take 10).force.toSeq ==
         (0 until 10 map { i =>
           math.min(1 << i, 32).seconds
         }))
@@ -100,15 +100,16 @@ class BackoffTest extends FunSuite with GeneratorDrivenPropertyChecks {
 
       assert(5 == backoffs.head)
 
-      val ranges = Seq((5, 10),
-                       (10, 20),
-                       (20, 40),
-                       (40, 80),
-                       (80, 120),
-                       (80, 120),
-                       (80, 120),
-                       (80, 120),
-                       (80, 120))
+      val ranges = Seq(
+        (5, 10),
+        (10, 20),
+        (20, 40),
+        (40, 80),
+        (80, 120),
+        (80, 120),
+        (80, 120),
+        (80, 120),
+        (80, 120))
       backoffs.tail.zip(ranges).foreach {
         case (b, (min, max)) =>
           assert(b >= min)
@@ -125,7 +126,7 @@ class BackoffTest extends FunSuite with GeneratorDrivenPropertyChecks {
     val backoffs = Backoff.linear(2.seconds, 10.seconds) take 10
     assert(backoffs.head == 2.seconds)
     assert(
-        backoffs.tail.force.toSeq ==
+      backoffs.tail.force.toSeq ==
         (1 until 10 map { i =>
           2.seconds + 10.seconds * i
         }))
@@ -139,7 +140,7 @@ class BackoffTest extends FunSuite with GeneratorDrivenPropertyChecks {
   test("const") {
     val backoffs = Backoff.const(10.seconds) take 10
     assert(
-        backoffs.force.toSeq ==
+      backoffs.force.toSeq ==
         (0 until 10 map { _ =>
           10.seconds
         }))
@@ -148,9 +149,8 @@ class BackoffTest extends FunSuite with GeneratorDrivenPropertyChecks {
   test("from function") {
     forAll { seed: Long =>
       val fRng, rng = Rng(seed)
-      val f: () => Duration = () =>
-        {
-          Duration.fromNanoseconds(fRng.nextLong(10))
+      val f: () => Duration = () => {
+        Duration.fromNanoseconds(fRng.nextLong(10))
       }
       val backoffs =
         Backoff.fromFunction(f).take(10).force.toSeq.map(_.inNanoseconds)

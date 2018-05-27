@@ -38,14 +38,14 @@ object AdaptiveLoadBalancingRouterConfig extends MultiNodeConfig {
         // getMax can be undefined (-1)
         val max = math.max(heap.getMax, heap.getCommitted)
         val used = heap.getUsed
-        log.info(
-            "used heap before: [{}] bytes, of max [{}]", used, heap.getMax)
+        log.info("used heap before: [{}] bytes, of max [{}]", used, heap.getMax)
         // allocate 70% of free space
         val allocateBytes = (0.7 * (max - used)).toInt
         val numberOfArrays = allocateBytes / 1024
         usedMemory = Array.ofDim(numberOfArrays, 248) // each 248 element Int array will use ~ 1 kB
-        log.info("used heap after: [{}] bytes",
-                 ManagementFactory.getMemoryMXBean.getHeapMemoryUsage.getUsed)
+        log.info(
+          "used heap after: [{}] bytes",
+          ManagementFactory.getMemoryMXBean.getHeapMemoryUsage.getUsed)
         sender() ! "done"
     }
   }
@@ -63,14 +63,15 @@ object AdaptiveLoadBalancingRouterConfig extends MultiNodeConfig {
   nodeList foreach { role ⇒
     nodeConfig(role) {
       ConfigFactory.parseString(
-          "akka.cluster.metrics.native-library-extract-folder=${user.dir}/target/native/" +
+        "akka.cluster.metrics.native-library-extract-folder=${user.dir}/target/native/" +
           role.name)
     }
   }
 
   commonConfig(
-      debugConfig(on = false)
-        .withFallback(ConfigFactory.parseString("""
+    debugConfig(on = false)
+      .withFallback(ConfigFactory.parseString(
+        """
 
       # Disable legacy metrics.
       akka.cluster.metrics.enabled=off
@@ -107,7 +108,7 @@ object AdaptiveLoadBalancingRouterConfig extends MultiNodeConfig {
         }
       }
     """))
-        .withFallback(MultiNodeClusterSpec.clusterConfig))
+      .withFallback(MultiNodeClusterSpec.clusterConfig))
 }
 
 class TestCustomMetricsSelector(config: Config) extends MetricsSelector {
@@ -124,7 +125,9 @@ class AdaptiveLoadBalancingRouterMultiJvmNode3
 
 abstract class AdaptiveLoadBalancingRouterSpec
     extends MultiNodeSpec(AdaptiveLoadBalancingRouterConfig)
-    with MultiNodeClusterSpec with RedirectLogging with ImplicitSender
+    with MultiNodeClusterSpec
+    with RedirectLogging
+    with ImplicitSender
     with DefaultTimeout {
   import AdaptiveLoadBalancingRouterConfig._
 
@@ -154,19 +157,21 @@ abstract class AdaptiveLoadBalancingRouterSpec
 
   def startRouter(name: String): ActorRef = {
     val router = system.actorOf(
-        ClusterRouterPool(
-            local = AdaptiveLoadBalancingPool(HeapMetricsSelector),
-            settings = ClusterRouterPoolSettings(totalInstances = 10,
-                                                 maxInstancesPerNode = 1,
-                                                 allowLocalRoutees = true,
-                                                 useRole = None))
-          .props(Props[Echo]),
-        name)
+      ClusterRouterPool(
+        local = AdaptiveLoadBalancingPool(HeapMetricsSelector),
+        settings = ClusterRouterPoolSettings(
+          totalInstances = 10,
+          maxInstancesPerNode = 1,
+          allowLocalRoutees = true,
+          useRole = None)
+      ).props(Props[Echo]),
+      name
+    )
     // it may take some time until router receives cluster member events
     awaitAssert { currentRoutees(router).size should ===(roles.size) }
     val routees = currentRoutees(router)
     routees.map { case ActorRefRoutee(ref) ⇒ fullAddress(ref) }.toSet should ===(
-        roles.map(address).toSet)
+      roles.map(address).toSet)
     router
   }
 
@@ -246,7 +251,7 @@ abstract class AdaptiveLoadBalancingRouterSpec
         awaitAssert { currentRoutees(router3).size should ===(9) }
         val routees = currentRoutees(router3)
         routees.map { case ActorRefRoutee(ref) ⇒ fullAddress(ref) }.toSet should ===(
-            Set(address(node1)))
+          Set(address(node1)))
       }
       enterBarrier("after-4")
     }
@@ -259,7 +264,7 @@ abstract class AdaptiveLoadBalancingRouterSpec
         awaitAssert { currentRoutees(router4).size should ===(6) }
         val routees = currentRoutees(router4)
         routees.map { case ActorRefRoutee(ref) ⇒ fullAddress(ref) }.toSet should ===(
-            Set(address(node1), address(node2), address(node3)))
+          Set(address(node1), address(node2), address(node3)))
       }
       enterBarrier("after-5")
     }

@@ -6,10 +6,10 @@ trait LegacyLiftable[T] {
 }
 
 object LegacyLiftable {
-  implicit def liftCaseClass[T <: Product]: LegacyLiftable[T] = macro liftCaseClassImpl[
-      T]
+  implicit def liftCaseClass[T <: Product]: LegacyLiftable[T] =
+    macro liftCaseClassImpl[T]
 
-  def liftCaseClassImpl[T : c.WeakTypeTag](
+  def liftCaseClassImpl[T: c.WeakTypeTag](
       c: Context): c.Expr[LegacyLiftable[T]] = {
     import c.universe._
     val tpe = weakTypeOf[T]

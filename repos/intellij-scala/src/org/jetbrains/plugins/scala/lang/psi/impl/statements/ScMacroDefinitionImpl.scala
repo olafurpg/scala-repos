@@ -16,27 +16,38 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameter
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.stubs.ScFunctionStub
 import org.jetbrains.plugins.scala.lang.psi.types.{Any, ScType}
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypeResult,
+  TypingContext
+}
 
 /**
   * @author Jason Zaugg
   */
 class ScMacroDefinitionImpl private (
-    stub: StubElement[ScFunction], nodeType: IElementType, node: ASTNode)
-    extends ScFunctionImpl(stub, nodeType, node) with ScMacroDefinition {
+    stub: StubElement[ScFunction],
+    nodeType: IElementType,
+    node: ASTNode)
+    extends ScFunctionImpl(stub, nodeType, node)
+    with ScMacroDefinition {
   def this(node: ASTNode) = { this(null, null, node) }
 
   def this(stub: ScFunctionStub) = {
     this(stub, ScalaElementTypes.MACRO_DEFINITION, null)
   }
 
-  override def processDeclarations(processor: PsiScopeProcessor,
-                                   state: ResolveState,
-                                   lastParent: PsiElement,
-                                   place: PsiElement): Boolean = {
+  override def processDeclarations(
+      processor: PsiScopeProcessor,
+      state: ResolveState,
+      lastParent: PsiElement,
+      place: PsiElement): Boolean = {
     //process function's parameters for dependent method types, and process type parameters
-    if (!super [ScFunctionImpl].processDeclarations(
-            processor, state, lastParent, place)) return false
+    if (!super[ScFunctionImpl].processDeclarations(
+          processor,
+          state,
+          lastParent,
+          place)) return false
 
     //do not process parameters for default parameters, only for function body
     //processing parameters for default parameters in ScParameters
@@ -46,7 +57,7 @@ class ScMacroDefinitionImpl private (
       body match {
         case Some(x)
             if lastParent != null &&
-            (!needCheckProcessingDeclarationsForBody ||
+              (!needCheckProcessingDeclarationsForBody ||
                 x.startOffsetInParent == lastParent.startOffsetInParent) =>
           for (p <- parameterIncludingSynthetic) {
             ProgressManager.checkCanceled()
@@ -105,7 +116,7 @@ class ScMacroDefinitionImpl private (
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case s: ScalaElementVisitor => s.visitMacroDefinition(this)
-      case _ => super.accept(visitor)
+      case _                      => super.accept(visitor)
     }
   }
 }

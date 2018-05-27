@@ -34,8 +34,8 @@ trait BinaryTypedField extends TypedField[Array[Byte]] {
 
   def setFromString(s: String): Box[Array[Byte]] = s match {
     case null | "" if optional_? => setBox(Empty)
-    case null | "" => setBox(Failure(notOptionalErrorMessage))
-    case _ => setBox(tryo(s.getBytes("UTF-8")))
+    case null | ""               => setBox(Failure(notOptionalErrorMessage))
+    case _                       => setBox(tryo(s.getBytes("UTF-8")))
   }
 
   def toForm: Box[NodeSeq] = Empty
@@ -48,7 +48,8 @@ trait BinaryTypedField extends TypedField[Array[Byte]] {
 }
 
 class BinaryField[OwnerType <: Record[OwnerType]](rec: OwnerType)
-    extends Field[Array[Byte], OwnerType] with MandatoryTypedField[Array[Byte]]
+    extends Field[Array[Byte], OwnerType]
+    with MandatoryTypedField[Array[Byte]]
     with BinaryTypedField {
 
   def owner = rec
@@ -62,7 +63,8 @@ class BinaryField[OwnerType <: Record[OwnerType]](rec: OwnerType)
 }
 
 class OptionalBinaryField[OwnerType <: Record[OwnerType]](rec: OwnerType)
-    extends Field[Array[Byte], OwnerType] with OptionalTypedField[Array[Byte]]
+    extends Field[Array[Byte], OwnerType]
+    with OptionalTypedField[Array[Byte]]
     with BinaryTypedField {
 
   def owner = rec

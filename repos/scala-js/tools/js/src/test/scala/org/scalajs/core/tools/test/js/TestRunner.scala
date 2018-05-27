@@ -16,9 +16,10 @@ object TestRunner {
   @JSExport
   def runTests(): Unit = {
     val framework = new JasmineFramework()
-    val runner = framework.runner(Array("-ttypedarray"),
-                                  Array(),
-                                  new ScalaJSClassLoader(js.Dynamic.global))
+    val runner = framework.runner(
+      Array("-ttypedarray"),
+      Array(),
+      new ScalaJSClassLoader(js.Dynamic.global))
 
     val tasks = runner.tasks(taskDefs(framework.fingerprints.head).toArray)
 
@@ -27,9 +28,10 @@ object TestRunner {
 
     def taskLoop(tasks: Iterable[Task]): Unit = {
       if (tasks.nonEmpty)
-        tasks.head.execute(eventHandler,
-                           loggers,
-                           newTasks => taskLoop(tasks.tail ++ newTasks))
+        tasks.head.execute(
+          eventHandler,
+          loggers,
+          newTasks => taskLoop(tasks.tail ++ newTasks))
       else if (eventHandler.hasFailed) sys.error("Some tests have failed")
     }
 

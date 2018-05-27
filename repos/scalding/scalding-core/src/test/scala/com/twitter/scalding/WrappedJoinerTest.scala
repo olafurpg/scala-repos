@@ -64,8 +64,7 @@ class WrappedJoinerTest extends WordSpec with Matchers {
         fail("The test Job without WrappedJoiner should fail.")
       } catch {
         case ex: FlowException =>
-          ex.getCause.getMessage should include(
-              "the FlowProcess for unique id")
+          ex.getCause.getMessage should include("the FlowProcess for unique id")
       }
     }
   }

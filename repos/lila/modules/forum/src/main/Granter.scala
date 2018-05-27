@@ -13,17 +13,17 @@ trait Granter {
   protected def userOwnsTeam(teamId: String, userId: String): Fu[Boolean]
 
   def isGrantedRead(categSlug: String)(implicit ctx: UserContext): Boolean =
-    (categSlug == StaffSlug).fold(
-        ctx.me exists Master(Permission.StaffForum), true)
+    (categSlug == StaffSlug)
+      .fold(ctx.me exists Master(Permission.StaffForum), true)
 
   def isGrantedWrite(categSlug: String)(implicit ctx: UserContext): Boolean =
     isOldEnoughToForum && {
       ctx.me ?? { me =>
         Master(Permission.StaffForum)(me) || {
           categSlug match {
-            case StaffSlug => false
+            case StaffSlug               => false
             case TeamSlugPattern(teamId) => userBelongsToTeam(teamId, me.id)
-            case _ => true
+            case _                       => true
           }
         }
       }

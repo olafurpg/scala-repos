@@ -16,8 +16,7 @@ object WSSpec extends PlaySpecification {
 
   "WS.url().post(InputStream)" should {
 
-    val uploadApp = FakeApplication(
-        withRoutes = {
+    val uploadApp = FakeApplication(withRoutes = {
       case ("POST", "/") =>
         Action { request =>
           request.body.asRaw.fold[Result](BadRequest) { raw =>
@@ -46,7 +45,8 @@ object WSSpec extends PlaySpecification {
   "withRequestFilter" should {
 
     class CallbackRequestFilter(
-        callList: scala.collection.mutable.Buffer[Int], value: Int)
+        callList: scala.collection.mutable.Buffer[Int],
+        value: Int)
         extends WSRequestFilter {
       override def apply(executor: WSRequestExecutor): WSRequestExecutor = {
         callList.append(value)

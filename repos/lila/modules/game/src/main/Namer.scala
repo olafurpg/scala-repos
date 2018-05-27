@@ -10,14 +10,14 @@ object Namer {
   def players(game: Game, withRatings: Boolean = true)(
       implicit lightUser: String => Option[LightUser]): (Html, Html) =
     player(game.firstPlayer, withRatings) -> player(
-        game.secondPlayer, withRatings)
+      game.secondPlayer,
+      withRatings)
 
   def player(p: Player, withRating: Boolean = true, withTitle: Boolean = true)(
       implicit lightUser: String => Option[LightUser]) = Html {
-    p.aiLevel.fold(
-        p.userId
-          .flatMap(lightUser)
-          .fold(lila.user.User.anonymous) { user =>
+    p.aiLevel.fold(p.userId
+      .flatMap(lightUser)
+      .fold(lila.user.User.anonymous) { user =>
         if (withRating)
           s"${withTitle.fold(user.titleNameHtml, user.name)}&nbsp;(${ratingString(p)})"
         else withTitle.fold(user.titleName, user.name)
@@ -28,11 +28,13 @@ object Namer {
 
   private def ratingString(p: Player) = p.rating match {
     case Some(rating) => s"$rating${if (p.provisional) "?" else ""}"
-    case _ => "?"
+    case _            => "?"
   }
 
   def playerString(
-      p: Player, withRating: Boolean = true, withTitle: Boolean = true)(
+      p: Player,
+      withRating: Boolean = true,
+      withTitle: Boolean = true)(
       implicit lightUser: String => Option[LightUser]) =
     player(p, withRating, withTitle)(lightUser).body.replace("&nbsp;", " ")
 }

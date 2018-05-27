@@ -36,22 +36,23 @@ import org.apache.spark.util.logging.FileAppender
   * Manages the execution of one executor process.
   * This is currently only used in standalone mode.
   */
-private[deploy] class ExecutorRunner(val appId: String,
-                                     val execId: Int,
-                                     val appDesc: ApplicationDescription,
-                                     val cores: Int,
-                                     val memory: Int,
-                                     val worker: RpcEndpointRef,
-                                     val workerId: String,
-                                     val host: String,
-                                     val webUiPort: Int,
-                                     val publicAddress: String,
-                                     val sparkHome: File,
-                                     val executorDir: File,
-                                     val workerUrl: String,
-                                     conf: SparkConf,
-                                     val appLocalDirs: Seq[String],
-                                     @volatile var state: ExecutorState.Value)
+private[deploy] class ExecutorRunner(
+    val appId: String,
+    val execId: Int,
+    val appDesc: ApplicationDescription,
+    val cores: Int,
+    val memory: Int,
+    val worker: RpcEndpointRef,
+    val workerId: String,
+    val host: String,
+    val webUiPort: Int,
+    val publicAddress: String,
+    val sparkHome: File,
+    val executorDir: File,
+    val workerUrl: String,
+    conf: SparkConf,
+    val appLocalDirs: Seq[String],
+    @volatile var state: ExecutorState.Value)
     extends Logging {
 
   private val fullId = appId + "/" + execId
@@ -100,13 +101,13 @@ private[deploy] class ExecutorRunner(val appId: String,
       }
       exitCode = Utils.terminateProcess(process, EXECUTOR_TERMINATE_TIMEOUT_MS)
       if (exitCode.isEmpty) {
-        logWarning("Failed to terminate process: " + process +
+        logWarning(
+          "Failed to terminate process: " + process +
             ". This process will likely be orphaned.")
       }
     }
     try {
-      worker.send(
-          ExecutorStateChanged(appId, execId, state, message, exitCode))
+      worker.send(ExecutorStateChanged(appId, execId, state, message, exitCode))
     } catch {
       case e: IllegalStateException => logWarning(e.getMessage(), e)
     }
@@ -130,12 +131,12 @@ private[deploy] class ExecutorRunner(val appId: String,
   /** Replace variables such as {{EXECUTOR_ID}} and {{CORES}} in a command argument passed to us */
   private[worker] def substituteVariables(argument: String): String =
     argument match {
-      case "{{WORKER_URL}}" => workerUrl
+      case "{{WORKER_URL}}"  => workerUrl
       case "{{EXECUTOR_ID}}" => execId.toString
-      case "{{HOSTNAME}}" => host
-      case "{{CORES}}" => cores.toString
-      case "{{APP_ID}}" => appId
-      case other => other
+      case "{{HOSTNAME}}"    => host
+      case "{{CORES}}"       => cores.toString
+      case "{{APP_ID}}"      => appId
+      case other             => other
     }
 
   /**
@@ -144,18 +145,19 @@ private[deploy] class ExecutorRunner(val appId: String,
   private def fetchAndRunExecutor() {
     try {
       // Launch the process
-      val builder = CommandUtils.buildProcessBuilder(appDesc.command,
-                                                     new SecurityManager(conf),
-                                                     memory,
-                                                     sparkHome.getAbsolutePath,
-                                                     substituteVariables)
+      val builder = CommandUtils.buildProcessBuilder(
+        appDesc.command,
+        new SecurityManager(conf),
+        memory,
+        sparkHome.getAbsolutePath,
+        substituteVariables)
       val command = builder.command()
       val formattedCommand = command.asScala.mkString("\"", "\" \"", "\"")
       logInfo(s"Launch command: $formattedCommand")
 
       builder.directory(executorDir)
-      builder.environment.put(
-          "SPARK_EXECUTOR_DIRS", appLocalDirs.mkString(File.pathSeparator))
+      builder.environment
+        .put("SPARK_EXECUTOR_DIRS", appLocalDirs.mkString(File.pathSeparator))
       // In case we are running this from within the Spark Shell, avoid creating a "scala"
       // parent process for the executor command
       builder.environment.put("SPARK_LAUNCH_WITH_SCALA", "0")
@@ -183,19 +185,24 @@ private[deploy] class ExecutorRunner(val appId: String,
       val exitCode = process.waitFor()
       state = ExecutorState.EXITED
       val message = "Command exited with code " + exitCode
-      worker.send(ExecutorStateChanged(
-              appId, execId, state, Some(message), Some(exitCode)))
+      worker.send(
+        ExecutorStateChanged(
+          appId,
+          execId,
+          state,
+          Some(message),
+          Some(exitCode)))
     } catch {
       case interrupted: InterruptedException => {
-          logInfo("Runner thread for executor " + fullId + " interrupted")
-          state = ExecutorState.KILLED
-          killProcess(None)
-        }
+        logInfo("Runner thread for executor " + fullId + " interrupted")
+        state = ExecutorState.KILLED
+        killProcess(None)
+      }
       case e: Exception => {
-          logError("Error running executor", e)
-          state = ExecutorState.FAILED
-          killProcess(Some(e.toString))
-        }
+        logError("Error running executor", e)
+        state = ExecutorState.FAILED
+        killProcess(Some(e.toString))
+      }
     }
   }
 }

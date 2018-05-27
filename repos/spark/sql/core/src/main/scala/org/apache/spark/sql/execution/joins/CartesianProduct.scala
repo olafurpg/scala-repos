@@ -33,7 +33,9 @@ import org.apache.spark.util.collection.unsafe.sort.UnsafeExternalSorter
   * materialize the right RDD (in case of the right RDD is nondeterministic).
   */
 private[spark] class UnsafeCartesianRDD(
-    left: RDD[UnsafeRow], right: RDD[UnsafeRow], numFieldsOfRight: Int)
+    left: RDD[UnsafeRow],
+    right: RDD[UnsafeRow],
+    numFieldsOfRight: Int)
     extends CartesianRDD[UnsafeRow, UnsafeRow](left.sparkContext, left, right) {
 
   override def compute(
@@ -41,18 +43,17 @@ private[spark] class UnsafeCartesianRDD(
       context: TaskContext): Iterator[(UnsafeRow, UnsafeRow)] = {
     // We will not sort the rows, so prefixComparator and recordComparator are null.
     val sorter = UnsafeExternalSorter.create(
-        context.taskMemoryManager(),
-        SparkEnv.get.blockManager,
-        context,
-        null,
-        null,
-        1024,
-        SparkEnv.get.memoryManager.pageSizeBytes)
+      context.taskMemoryManager(),
+      SparkEnv.get.blockManager,
+      context,
+      null,
+      null,
+      1024,
+      SparkEnv.get.memoryManager.pageSizeBytes)
 
     val partition = split.asInstanceOf[CartesianPartition]
     for (y <- rdd2.iterator(partition.s2, context)) {
-      sorter.insertRecord(
-          y.getBaseObject, y.getBaseOffset, y.getSizeInBytes, 0)
+      sorter.insertRecord(y.getBaseObject, y.getBaseOffset, y.getSizeInBytes, 0)
     }
 
     // Create an iterator from sorter and wrapper it as Iterator[UnsafeRow]
@@ -66,17 +67,19 @@ private[spark] class UnsafeCartesianRDD(
         override def next(): UnsafeRow = {
           iter.loadNext()
           unsafeRow.pointTo(
-              iter.getBaseObject, iter.getBaseOffset, iter.getRecordLength)
+            iter.getBaseObject,
+            iter.getBaseOffset,
+            iter.getRecordLength)
           unsafeRow
         }
       }
     }
 
     val resultIter = for (x <- rdd1.iterator(partition.s1, context);
-    y <- createIter()) yield (x, y)
+                          y <- createIter()) yield (x, y)
     CompletionIterator[
-        (UnsafeRow, UnsafeRow), Iterator[(UnsafeRow, UnsafeRow)]](
-        resultIter, sorter.cleanupResources)
+      (UnsafeRow, UnsafeRow),
+      Iterator[(UnsafeRow, UnsafeRow)]](resultIter, sorter.cleanupResources)
   }
 }
 
@@ -85,8 +88,8 @@ case class CartesianProduct(left: SparkPlan, right: SparkPlan)
   override def output: Seq[Attribute] = left.output ++ right.output
 
   override private[sql] lazy val metrics = Map(
-      "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext,
-                                                     "number of output rows"))
+    "numOutputRows" -> SQLMetrics
+      .createLongMetric(sparkContext, "number of output rows"))
 
   protected override def doExecute(): RDD[InternalRow] = {
     val numOutputRows = longMetric("numOutputRows")
@@ -94,8 +97,8 @@ case class CartesianProduct(left: SparkPlan, right: SparkPlan)
     val leftResults = left.execute().asInstanceOf[RDD[UnsafeRow]]
     val rightResults = right.execute().asInstanceOf[RDD[UnsafeRow]]
 
-    val pair = new UnsafeCartesianRDD(
-        leftResults, rightResults, right.output.size)
+    val pair =
+      new UnsafeCartesianRDD(leftResults, rightResults, right.output.size)
     pair.mapPartitionsInternal { iter =>
       val joiner = GenerateUnsafeRowJoiner.create(left.schema, right.schema)
       iter.map { r =>

@@ -12,7 +12,7 @@ trait Blox { self: MyCodes =>
     var foo: Instru = null
 
     def bar = foo match {
-      case SWITCH(i) => i
+      case SWITCH(i)  => i
       case EmptyInstr => 0
     }
   }

@@ -26,7 +26,9 @@ class HListTest {
 
     val x1 = null: l1.type#Tail#Tail#Tail#Head
     val x2 = null: Nat._3#Fold[
-        HList, ({ type L[X <: HList] = X#Tail })#L, l1.type#Self]#Head
+      HList,
+      ({ type L[X <: HList] = X#Tail })#L,
+      l1.type#Self]#Head
     val x3: Option[Double] = null: l1.type#Drop[Nat._2]#Head
 
     implicitly[l1.Length =:= Nat._4]

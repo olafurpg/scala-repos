@@ -17,7 +17,7 @@
 package net.liftweb
 package json
 
-/** Use fundep encoding to improve return type of merge function 
+/** Use fundep encoding to improve return type of merge function
   *  (see: http://www.chuusai.com/2011/07/16/fundeps-in-scala/)
   *
   *  JObject merge JObject = JObject
@@ -35,10 +35,10 @@ private[json] trait LowPriorityMergeDep {
     private def merge(val1: JValue, val2: JValue): JValue =
       (val1, val2) match {
         case (JObject(xs), JObject(ys)) => JObject(Merge.mergeFields(xs, ys))
-        case (JArray(xs), JArray(ys)) => JArray(Merge.mergeVals(xs, ys))
-        case (JNothing, x) => x
-        case (x, JNothing) => x
-        case (_, y) => y
+        case (JArray(xs), JArray(ys))   => JArray(Merge.mergeVals(xs, ys))
+        case (JNothing, x)              => x
+        case (x, JNothing)              => x
+        case (_, y)                     => y
       }
   }
 }
@@ -70,7 +70,8 @@ object Merge {
       implicit instance: MergeDep[A, B, R]): R = instance(val1, val2)
 
   private[json] def mergeFields(
-      vs1: List[JField], vs2: List[JField]): List[JField] = {
+      vs1: List[JField],
+      vs2: List[JField]): List[JField] = {
     def mergeRec(xleft: List[JField], yleft: List[JField]): List[JField] =
       xleft match {
         case Nil => yleft
@@ -78,7 +79,8 @@ object Merge {
           yleft find (_.name == xn) match {
             case Some(y @ JField(yn, yv)) =>
               JField(xn, merge(xv, yv)) :: mergeRec(
-                  xs, yleft filterNot (_ == y))
+                xs,
+                yleft filterNot (_ == y))
             case None => JField(xn, xv) :: mergeRec(xs, yleft)
           }
       }
@@ -87,7 +89,8 @@ object Merge {
   }
 
   private[json] def mergeVals(
-      vs1: List[JValue], vs2: List[JValue]): List[JValue] = {
+      vs1: List[JValue],
+      vs2: List[JValue]): List[JValue] = {
     def mergeRec(xleft: List[JValue], yleft: List[JValue]): List[JValue] =
       xleft match {
         case Nil => yleft

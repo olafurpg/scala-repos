@@ -4,5 +4,5 @@ trait AbsM {
     def newTag: Int
   }
 
-  type AM [_] // to trigger the bug, this must be an abstract type member that comes after the reference to it
+  type AM[_] // to trigger the bug, this must be an abstract type member that comes after the reference to it
 }

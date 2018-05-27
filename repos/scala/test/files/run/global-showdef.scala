@@ -35,11 +35,12 @@ object Bippy {
   """
 
   override def show(): Unit = {
-    val classes = List("Bippy",
-                       "Bippy#BippyType",
-                       "Bippy.BippyType",
-                       "Bippy#Boppity",
-                       "Bippy#Boppity#Boo")
+    val classes = List(
+      "Bippy",
+      "Bippy#BippyType",
+      "Bippy.BippyType",
+      "Bippy#Boppity",
+      "Bippy#Boppity#Boo")
     val objects = List("Bippy", "Bippy#Boppity#Boo")
 
     def interesting(line: String) =
@@ -50,7 +51,7 @@ object Bippy {
 
     classes.zipAll(objects, "", "") foreach {
       case (c, "") => run("-Xshow-class", c)
-      case (c, o) => run("-Xshow-class", c, "-Xshow-object", o)
+      case (c, o)  => run("-Xshow-class", c, "-Xshow-object", o)
     }
   }
 

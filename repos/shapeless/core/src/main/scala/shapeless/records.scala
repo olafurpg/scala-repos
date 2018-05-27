@@ -56,10 +56,13 @@ object record {
     * }}}
     */
   object Record extends Dynamic {
-    def applyDynamic(method: String)(rec: Any*): HList = macro RecordMacros.mkRecordEmptyImpl
-    def applyDynamicNamed(method: String)(rec: Any*): HList = macro RecordMacros.mkRecordNamedImpl
+    def applyDynamic(method: String)(rec: Any*): HList =
+      macro RecordMacros.mkRecordEmptyImpl
+    def applyDynamicNamed(method: String)(rec: Any*): HList =
+      macro RecordMacros.mkRecordNamedImpl
 
-    def selectDynamic(tpeSelector: String): Any = macro LabelledMacros.recordTypeImpl
+    def selectDynamic(tpeSelector: String): Any =
+      macro LabelledMacros.recordTypeImpl
   }
 }
 
@@ -85,7 +88,8 @@ object record {
   */
 trait RecordArgs extends Dynamic {
   def applyDynamic(method: String)(): Any = macro RecordMacros.forwardImpl
-  def applyDynamicNamed(method: String)(rec: Any*): Any = macro RecordMacros.forwardNamedImpl
+  def applyDynamicNamed(method: String)(rec: Any*): Any =
+    macro RecordMacros.forwardNamedImpl
 }
 
 @macrocompat.bundle
@@ -102,17 +106,19 @@ class RecordMacros(val c: whitebox.Context) {
 
   def mkRecordEmptyImpl(method: Tree)(rec: Tree*): Tree = {
     if (rec.nonEmpty)
-      c.abort(c.enclosingPosition,
-              "this method must be called with named arguments")
+      c.abort(
+        c.enclosingPosition,
+        "this method must be called with named arguments")
 
     q"_root_.shapeless.HNil"
   }
 
   def mkRecordNamedImpl(method: Tree)(rec: Tree*): Tree = {
-    val q"${ methodString: String }" = method
+    val q"${methodString: String}" = method
     if (methodString != "apply")
-      c.abort(c.enclosingPosition,
-              s"this method must be called as 'apply' not '$methodString'")
+      c.abort(
+        c.enclosingPosition,
+        s"this method must be called as 'apply' not '$methodString'")
 
     mkRecordImpl(rec: _*)
   }
@@ -123,7 +129,7 @@ class RecordMacros(val c: whitebox.Context) {
     val lhs = c.prefix.tree
     val lhsTpe = lhs.tpe
 
-    val q"${ methodString: String }" = method
+    val q"${methodString: String}" = method
     val methodName = TermName(methodString + "Record")
 
     if (lhsTpe.member(methodName) == NoSymbol)
@@ -145,11 +151,12 @@ class RecordMacros(val c: whitebox.Context) {
       q"$value.asInstanceOf[${mkFieldTpe(keyTpe, value.tpe)}]"
 
     def promoteElem(elem: Tree): Tree = elem match {
-      case q""" $prefix(${ Literal(k: Constant) }, $v) """ =>
+      case q""" $prefix(${Literal(k: Constant)}, $v) """ =>
         mkElem(mkSingletonSymbolType(k), v)
       case _ =>
-        c.abort(c.enclosingPosition,
-                s"$elem has the wrong shape for a record field")
+        c.abort(
+          c.enclosingPosition,
+          s"$elem has the wrong shape for a record field")
     }
 
     rec.foldRight(hnilValueTree) {

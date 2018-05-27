@@ -42,5 +42,6 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class ListViewSpec[T]
     extends SimpleSFXDelegateSpec[jfxsc.ListView[T], ListView[T]](
-        classOf[jfxsc.ListView[T]], classOf[ListView[T]])
+      classOf[jfxsc.ListView[T]],
+      classOf[ListView[T]])
     with RunOnApplicationThread

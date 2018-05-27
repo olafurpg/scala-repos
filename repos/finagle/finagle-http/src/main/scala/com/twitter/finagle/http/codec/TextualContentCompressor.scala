@@ -2,7 +2,11 @@ package com.twitter.finagle.http.codec
 
 import org.jboss.netty.buffer.ChannelBuffer
 import org.jboss.netty.handler.codec.embedder.EncoderEmbedder
-import org.jboss.netty.handler.codec.http.{HttpContentCompressor, HttpHeaders, HttpMessage}
+import org.jboss.netty.handler.codec.http.{
+  HttpContentCompressor,
+  HttpHeaders,
+  HttpMessage
+}
 
 /**
   * Custom compressor that only handles text-like content-types with the default
@@ -27,7 +31,7 @@ private[http] class TextualContentCompressor extends HttpContentCompressor {
   private[this] def isTextual(contentType: String) = {
     val contentTypeWithoutCharset = contentType.split(";", 2) match {
       case Array(charsetContentType, _) => charsetContentType
-      case _ => contentType
+      case _                            => contentType
     }
     val lowerCased = contentTypeWithoutCharset.toLowerCase.trim()
     lowerCased.startsWith("text/") || TextLike.contains(lowerCased)
@@ -35,12 +39,14 @@ private[http] class TextualContentCompressor extends HttpContentCompressor {
 }
 
 private object TextualContentCompressor {
-  val TextLike = Set("image/svg+xml",
-                     "application/atom+xml",
-                     "application/javascript",
-                     "application/json",
-                     "application/rss+xml",
-                     "application/x-javascript",
-                     "application/xhtml+xml",
-                     "application/xml")
+  val TextLike = Set(
+    "image/svg+xml",
+    "application/atom+xml",
+    "application/javascript",
+    "application/json",
+    "application/rss+xml",
+    "application/x-javascript",
+    "application/xhtml+xml",
+    "application/xml"
+  )
 }

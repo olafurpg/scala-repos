@@ -35,30 +35,33 @@ abstract class ScalaSigSymbol extends Symbol {
 }
 
 case class ExternalSymbol(
-    name: String, parent: Option[Symbol], entry: ScalaSig#Entry)
+    name: String,
+    parent: Option[Symbol],
+    entry: ScalaSig#Entry)
     extends ScalaSigSymbol {
   override def toString = path
   def hasFlag(flag: Long) = false
 }
 
-case class SymbolInfo(name: String,
-                      owner: Symbol,
-                      flags: Int,
-                      privateWithin: Option[AnyRef],
-                      info: Int,
-                      entry: ScalaSig#Entry) {
+case class SymbolInfo(
+    name: String,
+    owner: Symbol,
+    flags: Int,
+    privateWithin: Option[AnyRef],
+    info: Int,
+    entry: ScalaSig#Entry) {
   def symbolString(any: AnyRef) = any match {
     case sym: SymbolInfoSymbol => sym.index.toString
-    case other => other.toString
+    case other                 => other.toString
   }
 
   override def toString =
     name + ", owner=" + symbolString(owner) + ", flags=" + flags.toHexString +
-    ", info=" + info +
-    (privateWithin match {
-          case Some(any) => ", privateWithin=" + symbolString(any)
-          case None => " "
-        })
+      ", info=" + info +
+      (privateWithin match {
+        case Some(any) => ", privateWithin=" + symbolString(any)
+        case None      => " "
+      })
 }
 
 abstract class SymbolInfoSymbol extends ScalaSigSymbol {

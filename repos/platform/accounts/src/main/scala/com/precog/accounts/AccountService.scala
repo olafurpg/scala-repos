@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -61,12 +61,11 @@ trait AuthenticationCombinators extends HttpRequestHandlerCombinators {
   def auth[A](accountManager: AccountManager[Future])(
       service: HttpService[A, Account => Future[HttpResponse[JValue]]])(
       implicit ctx: ExecutionContext) = {
-    new AuthenticationService[A, HttpResponse[JValue]](
-        accountManager, service)({
+    new AuthenticationService[A, HttpResponse[JValue]](accountManager, service)({
       case NotProvided =>
         HttpResponse(
-            Unauthorized,
-            headers = HttpHeaders(List(("WWW-Authenticate", "Basic"))))
+          Unauthorized,
+          headers = HttpHeaders(List(("WWW-Authenticate", "Basic"))))
       case AuthMismatch(message) =>
         HttpResponse(Unauthorized, content = Some(message.serialize))
     })
@@ -83,36 +82,35 @@ trait AuthenticationCombinators extends HttpRequestHandlerCombinators {
       extends DelegatingService[A, Future[B], A, Account => Future[B]]
       with Logging {
     private implicit val M = new FutureMonad(executor)
-    val service = (request: HttpRequest[A]) =>
-      {
-        logger.info("Got authentication request " + request)
-        delegate.service(request) map { (f: Account => Future[B]) =>
-          request.headers.header[Authorization] flatMap {
-            _.basic map {
-              case BasicAuthCredentials(email, password) =>
-                accountManager.authAccount(email, password) flatMap {
-                  case Success(account) => f(account)
-                  case Failure(error) =>
-                    logger.warn(
-                        "Authentication failure from %s for %s: %s".format(
-                            NetUtils.remoteIpFrom(request), email, error))
-                    Future(err(AuthMismatch(
-                                "Credentials provided were formatted correctly, but did not match a known account.")))
-                }
-            }
-          } getOrElse {
-            Future(err(NotProvided))
+    val service = (request: HttpRequest[A]) => {
+      logger.info("Got authentication request " + request)
+      delegate.service(request) map { (f: Account => Future[B]) =>
+        request.headers.header[Authorization] flatMap {
+          _.basic map {
+            case BasicAuthCredentials(email, password) =>
+              accountManager.authAccount(email, password) flatMap {
+                case Success(account) => f(account)
+                case Failure(error) =>
+                  logger.warn("Authentication failure from %s for %s: %s"
+                    .format(NetUtils.remoteIpFrom(request), email, error))
+                  Future(err(AuthMismatch(
+                    "Credentials provided were formatted correctly, but did not match a known account.")))
+              }
           }
+        } getOrElse {
+          Future(err(NotProvided))
         }
+      }
     }
 
     val metadata = DescriptionMetadata(
-        "HTTP Basic authentication is required for use of this service.")
+      "HTTP Basic authentication is required for use of this service.")
   }
 }
 
 trait AccountService
-    extends BlueEyesServiceBuilder with AuthenticationCombinators
+    extends BlueEyesServiceBuilder
+    with AuthenticationCombinators
     with Logging {
   self =>
   case class State(handlers: AccountServiceHandlers, stop: Stoppable)
@@ -122,8 +120,7 @@ trait AccountService
   implicit def executionContext: ExecutionContext
   implicit def M: Monad[Future]
 
-  def AccountManager(
-      config: Configuration): (AccountManager[Future], Stoppable)
+  def AccountManager(config: Configuration): (AccountManager[Future], Stoppable)
   def APIKeyFinder(config: Configuration): APIKeyFinder[Future]
   def RootKey(config: Configuration): APIKey
   def Emailer(config: Configuration): TemplateEmailer
@@ -145,12 +142,13 @@ trait AccountService
             val rootAPIKey = RootKey(config.detach("security"))
             val emailer = Emailer(config.detach("email"))
 
-            val handlers = new AccountServiceHandlers(accountManager,
-                                                      apiKeyFinder,
-                                                      clock,
-                                                      rootAccountId,
-                                                      rootAPIKey,
-                                                      emailer)
+            val handlers = new AccountServiceHandlers(
+              accountManager,
+              apiKeyFinder,
+              clock,
+              rootAccountId,
+              rootAPIKey,
+              emailer)
 
             State(handlers, stoppable)
           }
@@ -162,8 +160,7 @@ trait AccountService
               jsonp {
                 jvalue[ByteChunk] {
                   path("/accounts/") {
-                    post(PostAccountHandler) ~ path(
-                        "'accountId/password/reset") {
+                    post(PostAccountHandler) ~ path("'accountId/password/reset") {
                       post(GenerateResetTokenHandler) ~ path("/'resetToken") {
                         post(PasswordResetHandler)
                       }
@@ -174,12 +171,12 @@ trait AccountService
                     } ~ auth(handlers.accountManager) {
                       get(ListAccountsHandler) ~ path("'accountId") {
                         get(GetAccountDetailsHandler) ~ delete(
-                            DeleteAccountHandler) ~ path("/password") {
+                          DeleteAccountHandler) ~ path("/password") {
                           put(PutAccountPasswordHandler)
                         } ~ path("/plan") {
                           get(GetAccountPlanHandler) ~ put(
-                              PutAccountPlanHandler) ~ delete(
-                              DeleteAccountPlanHandler)
+                            PutAccountPlanHandler) ~ delete(
+                            DeleteAccountPlanHandler)
                         }
                       }
                     }
@@ -188,8 +185,9 @@ trait AccountService
               }
             } ~ orFail { req: HttpRequest[ByteChunk] =>
               self.logger.error("Request " + req + " could not be serviced.")
-              (HttpStatusCodes.NotFound,
-               "Request " + req + " could not be serviced.")
+              (
+                HttpStatusCodes.NotFound,
+                "Request " + req + " could not be serviced.")
             }
         } -> stop { s: State =>
           s.stop

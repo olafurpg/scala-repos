@@ -19,7 +19,12 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.params._
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.JavaIdentifier
 import org.jetbrains.plugins.scala.lang.psi.stubs._
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure,
+  Success,
+  TypeResult,
+  TypingContext
+}
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -27,8 +32,11 @@ import scala.collection.mutable.ArrayBuffer
   * @author Alexander Podkhalyuzin
   */
 class ScParameterImpl protected (
-    stub: StubElement[ScParameter], nodeType: IElementType, node: ASTNode)
-    extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScParameter {
+    stub: StubElement[ScParameter],
+    nodeType: IElementType,
+    node: ASTNode)
+    extends ScalaStubBasedElementImpl(stub, nodeType, node)
+    with ScParameter {
   def this(node: ASTNode) = { this(null, null, node) }
 
   def this(stub: ScParameterStub) = {
@@ -66,7 +74,7 @@ class ScParameterImpl protected (
               exprs(0) match {
                 case literal: ScLiteral
                     if literal.getNode.getFirstChildNode != null &&
-                    literal.getNode.getFirstChildNode.getElementType == ScalaTokenTypes.tSYMBOL =>
+                      literal.getNode.getFirstChildNode.getElementType == ScalaTokenTypes.tSYMBOL =>
                   val literalText = literal.getText
                   if (literalText.length < 2) None
                   else Some(literalText.substring(1))
@@ -92,7 +100,7 @@ class ScParameterImpl protected (
     }
     paramType match {
       case Some(x) if x.typeElement != null => Some(x.typeElement)
-      case _ => None
+      case _                                => None
     }
   }
 
@@ -104,16 +112,16 @@ class ScParameterImpl protected (
         stub.asInstanceOf[ScParameterStub].getTypeText match {
           case ""
               if stub.getParentStub != null &&
-              stub.getParentStub.getParentStub != null &&
-              stub.getParentStub.getParentStub.getParentStub
-                .isInstanceOf[ScFunctionStub] =>
+                stub.getParentStub.getParentStub != null &&
+                stub.getParentStub.getParentStub.getParentStub
+                  .isInstanceOf[ScFunctionStub] =>
             return Failure("Cannot infer type", Some(this))
           case "" =>
             return Failure("Wrong Stub problem", Some(this)) //shouldn't be
           case str: String =>
             stub.asInstanceOf[ScParameterStub].getTypeElement match {
               case Some(te) => return te.getType(TypingContext.empty)
-              case None => return Failure("Wrong type element", Some(this))
+              case None     => return Failure("Wrong type element", Some(this))
             }
         }
       } else {
@@ -121,12 +129,12 @@ class ScParameterImpl protected (
           case None if baseDefaultParam =>
             getActualDefaultExpression match {
               case Some(t) => t.getType(TypingContext.empty).getOrNothing
-              case None => lang.psi.types.Nothing
+              case None    => lang.psi.types.Nothing
             }
           case None =>
             expectedParamType.map(_.unpackedType) match {
               case Some(t) => t
-              case None => lang.psi.types.Nothing
+              case None    => lang.psi.types.Nothing
             }
           case Some(e) => e.getType(TypingContext.empty).getOrAny
         }
@@ -150,7 +158,7 @@ class ScParameterImpl protected (
     }
     paramType match {
       case Some(p: ScParameterType) => p.isRepeatedParameter
-      case None => false
+      case None                     => false
     }
   }
 
@@ -173,16 +181,16 @@ class ScParameterImpl protected (
           if (index != length) {
             var n = node.getTreeNext
             while (n != null &&
-            n.getElementType != ScalaTokenTypes.tRPARENTHESIS &&
-            !n.getPsi.isInstanceOf[ScParameter]) {
+                   n.getElementType != ScalaTokenTypes.tRPARENTHESIS &&
+                   !n.getPsi.isInstanceOf[ScParameter]) {
               toRemove += n
               n = n.getTreeNext
             }
           } else {
             var n = node.getTreePrev
             while (n != null &&
-            n.getElementType != ScalaTokenTypes.tLPARENTHESIS &&
-            !n.getPsi.isInstanceOf[ScParameter]) {
+                   n.getElementType != ScalaTokenTypes.tLPARENTHESIS &&
+                   !n.getPsi.isInstanceOf[ScParameter]) {
               toRemove += n
               n = n.getTreePrev
             }
@@ -202,7 +210,7 @@ class ScParameterImpl protected (
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case s: ScalaElementVisitor => s.visitParameter(this)
-      case _ => super.accept(visitor)
+      case _                      => super.accept(visitor)
     }
   }
 }

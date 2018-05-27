@@ -55,8 +55,8 @@ case class Dependants[P <: Platform[P]](tail: Producer[P, Any])
   def dependantsAfterMerge(inp: Producer[P, Any]): List[Producer[P, Any]] =
     dependantsOf(inp).getOrElse(Nil).flatMap {
       case m @ MergedProducer(_, _) => dependantsAfterMerge(m)
-      case a @ AlsoProducer(_, _) => dependantsAfterMerge(a)
-      case prod => List(prod)
+      case a @ AlsoProducer(_, _)   => dependantsAfterMerge(a)
+      case prod                     => List(prod)
     }
 
   def namesOf(inp: Producer[P, Any]): List[NamedProducer[P, Any]] =

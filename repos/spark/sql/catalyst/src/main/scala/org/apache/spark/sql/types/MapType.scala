@@ -31,16 +31,20 @@ import org.json4s.JsonDSL._
   * @param valueContainsNull Indicates if map values have `null` values.
   */
 case class MapType(
-    keyType: DataType, valueType: DataType, valueContainsNull: Boolean)
+    keyType: DataType,
+    valueType: DataType,
+    valueContainsNull: Boolean)
     extends DataType {
 
   /** No-arg constructor for kryo. */
   def this() = this(null, null, false)
 
   private[sql] def buildFormattedString(
-      prefix: String, builder: StringBuilder): Unit = {
+      prefix: String,
+      builder: StringBuilder): Unit = {
     builder.append(s"$prefix-- key: ${keyType.typeName}\n")
-    builder.append(s"$prefix-- value: ${valueType.typeName} " +
+    builder.append(
+      s"$prefix-- value: ${valueType.typeName} " +
         s"(valueContainsNull = $valueContainsNull)\n")
     DataType.buildFormattedString(keyType, s"$prefix    |", builder)
     DataType.buildFormattedString(valueType, s"$prefix    |", builder)
@@ -48,8 +52,8 @@ case class MapType(
 
   override private[sql] def jsonValue: JValue =
     ("type" -> typeName) ~ ("keyType" -> keyType.jsonValue) ~
-    ("valueType" -> valueType.jsonValue) ~
-    ("valueContainsNull" -> valueContainsNull)
+      ("valueType" -> valueType.jsonValue) ~
+      ("valueContainsNull" -> valueContainsNull)
 
   /**
     * The default size of a value of the MapType is

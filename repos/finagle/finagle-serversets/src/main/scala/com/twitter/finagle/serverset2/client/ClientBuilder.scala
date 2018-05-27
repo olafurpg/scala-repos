@@ -18,26 +18,26 @@ private[serverset2] trait ClientFactory[T <: ZooKeeperClient] {
   def newClient(config: ClientConfig): Watched[T]
 }
 
-private[client] case class ClientConfig(val hosts: String,
-                                        val sessionTimeout: Duration,
-                                        val statsReceiver: StatsReceiver,
-                                        val readOnlyOK: Boolean,
-                                        val sessionId: Option[Long],
-                                        val password: Option[Buf],
-                                        val timer: Timer) {
+private[client] case class ClientConfig(
+    val hosts: String,
+    val sessionTimeout: Duration,
+    val statsReceiver: StatsReceiver,
+    val readOnlyOK: Boolean,
+    val sessionId: Option[Long],
+    val password: Option[Buf],
+    val timer: Timer) {
   def toMap: Map[String, Any] = Map(
-      "hosts" -> hosts,
-      "sessionTimeout" -> sessionTimeout,
-      "statsReceiver" -> statsReceiver,
-      "readOnlyOK" -> readOnlyOK,
-      "sessionId" -> sessionId,
-      "password" -> password,
-      "timer" -> timer
+    "hosts" -> hosts,
+    "sessionTimeout" -> sessionTimeout,
+    "statsReceiver" -> statsReceiver,
+    "readOnlyOK" -> readOnlyOK,
+    "sessionId" -> sessionId,
+    "password" -> password,
+    "timer" -> timer
   )
 
   override def toString = {
-    "ClientConfig(%s)".format(
-        toMap flatMap {
+    "ClientConfig(%s)".format(toMap flatMap {
       case (k, Some(v)) =>
         Some("%s=%s".format(k, v))
       case _ =>
@@ -67,13 +67,13 @@ private[client] case class ClientConfig(val hosts: String,
   */
 private[serverset2] object ClientBuilder {
   private val DefaultConfig: ClientConfig = ClientConfig(
-      hosts = "localhost:2181",
-      sessionTimeout = 10.seconds,
-      statsReceiver = DefaultStatsReceiver.scope("zkclient"),
-      readOnlyOK = false,
-      sessionId = None,
-      password = None,
-      timer = DefaultTimer.twitter
+    hosts = "localhost:2181",
+    sessionTimeout = 10.seconds,
+    statsReceiver = DefaultStatsReceiver.scope("zkclient"),
+    readOnlyOK = false,
+    sessionId = None,
+    password = None,
+    timer = DefaultTimer.twitter
   )
 
   def apply() = new ClientBuilder(DefaultConfig)
@@ -91,7 +91,7 @@ private[client] class ClientBuilder(config: ClientConfig) {
       .sortBy(_.priority) match {
       case Seq() =>
         throw new RuntimeException("No ZooKeeper ClientFactory Found")
-      case Seq(f, _ *) => f
+      case Seq(f, _*) => f
     }
 
   override def toString() = "ClientBuilder(%s)".format(config.toString)
@@ -145,8 +145,7 @@ private[client] class ClientBuilder(config: ClientConfig) {
     * @return configured ClientBuilder
     */
   def hosts(zkHosts: Seq[InetSocketAddress]): ClientBuilder =
-    hosts(
-        zkHosts.map { h =>
+    hosts(zkHosts.map { h =>
       "%s:%d,".format(h.getHostName, h.getPort)
     }.mkString)
 

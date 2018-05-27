@@ -41,12 +41,12 @@ case class DecimalType(precision: Int, scale: Int) extends FractionalType {
 
   if (scale > precision) {
     throw new AnalysisException(
-        s"Decimal scale ($scale) cannot be greater than precision ($precision).")
+      s"Decimal scale ($scale) cannot be greater than precision ($precision).")
   }
 
   if (precision > DecimalType.MAX_PRECISION) {
     throw new AnalysisException(
-        s"DecimalType can only support precision up to 38")
+      s"DecimalType can only support precision up to 38")
   }
 
   // default constructor for Java
@@ -121,12 +121,12 @@ object DecimalType extends AbstractDataType {
   private[sql] val DoubleDecimal = DecimalType(30, 15)
 
   private[sql] def forType(dataType: DataType): DecimalType = dataType match {
-    case ByteType => ByteDecimal
-    case ShortType => ShortDecimal
+    case ByteType    => ByteDecimal
+    case ShortType   => ShortDecimal
     case IntegerType => IntDecimal
-    case LongType => LongDecimal
-    case FloatType => FloatDecimal
-    case DoubleType => DoubleDecimal
+    case LongType    => LongDecimal
+    case FloatType   => FloatDecimal
+    case DoubleType  => DoubleDecimal
   }
 
   private[sql] def bounded(precision: Int, scale: Int): DecimalType = {
@@ -149,7 +149,7 @@ object DecimalType extends AbstractDataType {
   private[sql] object Expression {
     def unapply(e: Expression): Option[(Int, Int)] = e.dataType match {
       case t: DecimalType => Some((t.precision, t.scale))
-      case _ => None
+      case _              => None
     }
   }
 

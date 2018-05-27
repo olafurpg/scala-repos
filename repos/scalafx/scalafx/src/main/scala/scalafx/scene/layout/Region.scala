@@ -31,7 +31,12 @@ import javafx.{geometry => jfxg}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, DoubleProperty, ObjectProperty, ReadOnlyDoubleProperty}
+import scalafx.beans.property.{
+  BooleanProperty,
+  DoubleProperty,
+  ObjectProperty,
+  ReadOnlyDoubleProperty
+}
 import scalafx.delegate.SFXDelegate
 import scalafx.geometry.Insets
 import scalafx.scene.Parent
@@ -58,59 +63,64 @@ object Region {
 
   /** Utility method which lays out the child within an area of it's parent defined by areaX, areaY,
     * areaWidth x areaHeight, with a baseline offset relative to that area. */
-  def layoutInArea(child: javafx.scene.Node,
-                   areaX: Double,
-                   areaY: Double,
-                   areaWidth: Double,
-                   areaHeight: Double,
-                   areaBaselineOffset: Double,
-                   margin: jfxg.Insets,
-                   fillWidth: Boolean,
-                   fillHeight: Boolean,
-                   halignment: jfxg.HPos,
-                   valignment: jfxg.VPos,
-                   isSnapToPixel: Boolean) {
-    jfxsl.Region.layoutInArea(child,
-                              areaX,
-                              areaY,
-                              areaWidth,
-                              areaHeight,
-                              areaBaselineOffset,
-                              margin,
-                              fillWidth,
-                              fillHeight,
-                              halignment,
-                              valignment,
-                              isSnapToPixel)
+  def layoutInArea(
+      child: javafx.scene.Node,
+      areaX: Double,
+      areaY: Double,
+      areaWidth: Double,
+      areaHeight: Double,
+      areaBaselineOffset: Double,
+      margin: jfxg.Insets,
+      fillWidth: Boolean,
+      fillHeight: Boolean,
+      halignment: jfxg.HPos,
+      valignment: jfxg.VPos,
+      isSnapToPixel: Boolean) {
+    jfxsl.Region.layoutInArea(
+      child,
+      areaX,
+      areaY,
+      areaWidth,
+      areaHeight,
+      areaBaselineOffset,
+      margin,
+      fillWidth,
+      fillHeight,
+      halignment,
+      valignment,
+      isSnapToPixel)
   }
 
   /** Utility method which positions the child within an area of this region defined by areaX, areaY,
     * areaWidth x areaHeight, with a baseline offset relative to that area. */
-  def positionInArea(child: javafx.scene.Node,
-                     areaX: Double,
-                     areaY: Double,
-                     areaWidth: Double,
-                     areaHeight: Double,
-                     areaBaselineOffset: Double,
-                     margin: jfxg.Insets,
-                     halignment: jfxg.HPos,
-                     valignment: jfxg.VPos,
-                     isSnapToPixel: Boolean) {
-    jfxsl.Region.positionInArea(child,
-                                areaX,
-                                areaY,
-                                areaWidth,
-                                areaHeight,
-                                areaBaselineOffset,
-                                margin,
-                                halignment,
-                                valignment,
-                                isSnapToPixel)
+  def positionInArea(
+      child: javafx.scene.Node,
+      areaX: Double,
+      areaY: Double,
+      areaWidth: Double,
+      areaHeight: Double,
+      areaBaselineOffset: Double,
+      margin: jfxg.Insets,
+      halignment: jfxg.HPos,
+      valignment: jfxg.VPos,
+      isSnapToPixel: Boolean) {
+    jfxsl.Region.positionInArea(
+      child,
+      areaX,
+      areaY,
+      areaWidth,
+      areaHeight,
+      areaBaselineOffset,
+      margin,
+      halignment,
+      valignment,
+      isSnapToPixel)
   }
 }
 
 class Region(override val delegate: jfxsl.Region = new jfxsl.Region())
-    extends Parent(delegate) with SFXDelegate[jfxsl.Region] {
+    extends Parent(delegate)
+    with SFXDelegate[jfxsl.Region] {
 
   /** The background of the Region, which is made up of zero or more BackgroundFills,
     * and zero or more BackgroundImages.

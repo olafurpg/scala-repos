@@ -45,7 +45,8 @@ object BinaryPickle {
 }
 
 class BinaryPickleBuilder(format: BinaryPickleFormat, out: BinaryOutput)
-    extends BinaryPBuilder with PickleTools {
+    extends BinaryPBuilder
+    with PickleTools {
   import format._
 
   private var output: BinaryOutput = out
@@ -53,8 +54,9 @@ class BinaryPickleBuilder(format: BinaryPickleFormat, out: BinaryOutput)
 
   @inline private[this] def mkOutput(knownSize: Int): Unit = {
     if (output == null)
-      output = if (knownSize != -1) new FixedByteArrayOutput(knownSize)
-      else new ByteArrayOutput
+      output =
+        if (knownSize != -1) new FixedByteArrayOutput(knownSize)
+        else new ByteArrayOutput
     else output.ensureCapacity(knownSize)
   }
 
@@ -171,7 +173,9 @@ abstract class AbstractBinaryReader() {
 }
 
 class BinaryPickleReader(in: BinaryInput, format: BinaryPickleFormat)
-    extends AbstractBinaryReader() with PReader with PickleTools {
+    extends AbstractBinaryReader()
+    with PReader
+    with PickleTools {
   import format._
 
   def beginEntry: String = {
@@ -182,8 +186,8 @@ class BinaryPickleReader(in: BinaryInput, format: BinaryPickleFormat)
         lookahead match {
           case UNIT_TAG => FastTypeTag.Unit
           case NULL_TAG => FastTypeTag.Null
-          case REF_TAG => FastTypeTag.Ref
-          case _ => in.setLookahead(lookahead); hints.elidedType.get
+          case REF_TAG  => FastTypeTag.Ref
+          case _        => in.setLookahead(lookahead); hints.elidedType.get
         }
       } else if (hints.isElidedType &&
                  primitives.contains(hints.elidedType.get.key)) {
@@ -195,7 +199,7 @@ class BinaryPickleReader(in: BinaryInput, format: BinaryPickleFormat)
             FastTypeTag.Null
           case ELIDED_TAG =>
             hints.elidedType.getOrElse(throw new PicklingException(
-                    s"Type is elided in pickle, but no elide hint was provided by unpickler!"))
+              s"Type is elided in pickle, but no elide hint was provided by unpickler!"))
           case REF_TAG =>
             FastTypeTag.Ref
           case _ =>
@@ -205,7 +209,7 @@ class BinaryPickleReader(in: BinaryInput, format: BinaryPickleFormat)
             } catch {
               case PicklingException(msg, cause) =>
                 throw PicklingException(
-                    s"error decoding type string. debug info: $hints\ncause:$msg")
+                  s"error decoding type string. debug info: $hints\ncause:$msg")
             }
             res
         }
@@ -229,27 +233,27 @@ class BinaryPickleReader(in: BinaryInput, format: BinaryPickleFormat)
 
   def readPrimitive(): Any = {
     val res = lastTagRead match {
-      case KEY_NULL => null
-      case KEY_REF => lookupUnpicklee(in.getInt)
-      case KEY_BYTE => in.getByte
-      case KEY_SHORT => in.getShort
-      case KEY_CHAR => in.getChar
-      case KEY_INT => in.getInt
-      case KEY_LONG => in.getLong
+      case KEY_NULL    => null
+      case KEY_REF     => lookupUnpicklee(in.getInt)
+      case KEY_BYTE    => in.getByte
+      case KEY_SHORT   => in.getShort
+      case KEY_CHAR    => in.getChar
+      case KEY_INT     => in.getInt
+      case KEY_LONG    => in.getLong
       case KEY_BOOLEAN => in.getBoolean
-      case KEY_FLOAT => in.getFloat
-      case KEY_DOUBLE => in.getDouble
+      case KEY_FLOAT   => in.getFloat
+      case KEY_DOUBLE  => in.getDouble
 
       case KEY_STRING => in.getString
 
-      case KEY_ARRAY_BYTE => in.getByteArray
-      case KEY_ARRAY_SHORT => in.getShortArray
-      case KEY_ARRAY_CHAR => in.getCharArray
-      case KEY_ARRAY_INT => in.getIntArray
-      case KEY_ARRAY_LONG => in.getLongArray
+      case KEY_ARRAY_BYTE    => in.getByteArray
+      case KEY_ARRAY_SHORT   => in.getShortArray
+      case KEY_ARRAY_CHAR    => in.getCharArray
+      case KEY_ARRAY_INT     => in.getIntArray
+      case KEY_ARRAY_LONG    => in.getLongArray
       case KEY_ARRAY_BOOLEAN => in.getBooleanArray
-      case KEY_ARRAY_FLOAT => in.getFloatArray
-      case KEY_ARRAY_DOUBLE => in.getDoubleArray
+      case KEY_ARRAY_FLOAT   => in.getFloatArray
+      case KEY_ARRAY_DOUBLE  => in.getDoubleArray
     }
     res
   }

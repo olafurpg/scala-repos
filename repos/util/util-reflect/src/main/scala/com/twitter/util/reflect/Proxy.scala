@@ -11,11 +11,11 @@ class NonexistentTargetException
     extends Exception("MethodCall was invoked without a valid target.")
 
 object Proxy {
-  def apply[I <: AnyRef : Manifest](f: MethodCall[I] => AnyRef) = {
+  def apply[I <: AnyRef: Manifest](f: MethodCall[I] => AnyRef) = {
     new ProxyFactory[I](f).apply()
   }
 
-  def apply[I <: AnyRef : Manifest](target: I, f: MethodCall[I] => AnyRef) = {
+  def apply[I <: AnyRef: Manifest](target: I, f: MethodCall[I] => AnyRef) = {
     new ProxyFactory[I](f).apply(target)
   }
 }
@@ -28,15 +28,15 @@ object ProxyFactory {
     def accept(m: Method) = {
       m.getName match {
         case "hashCode" => 1
-        case "equals" => 1
+        case "equals"   => 1
         case "toString" => 1
-        case _ => 0
+        case _          => 0
       }
     }
   }
 }
 
-class AbstractProxyFactory[I <: AnyRef : Manifest] {
+class AbstractProxyFactory[I <: AnyRef: Manifest] {
   import ProxyFactory._
 
   final val interface = implicitly[Manifest[I]].runtimeClass
@@ -56,35 +56,41 @@ class AbstractProxyFactory[I <: AnyRef : Manifest] {
   }
 
   protected final def newWithCallback[T <: I](
-      target: T, f: MethodCall[I] => AnyRef) = {
+      target: T,
+      f: MethodCall[I] => AnyRef) = {
     proto
-      .newInstance(
-          Array(new MethodInterceptor(Some(target), f), NoOp.INSTANCE))
+      .newInstance(Array(new MethodInterceptor(Some(target), f), NoOp.INSTANCE))
       .asInstanceOf[I]
   }
 }
 
-class ProxyFactory[I <: AnyRef : Manifest](f: MethodCall[I] => AnyRef)
+class ProxyFactory[I <: AnyRef: Manifest](f: MethodCall[I] => AnyRef)
     extends AbstractProxyFactory[I] {
   def apply[T <: I](target: T) = newWithCallback(target, f)
   def apply() = newWithCallback(f)
 }
 
 private[reflect] class MethodInterceptor[I <: AnyRef](
-    target: Option[I], callback: MethodCall[I] => AnyRef)
-    extends CGMethodInterceptor with Serializable {
+    target: Option[I],
+    callback: MethodCall[I] => AnyRef)
+    extends CGMethodInterceptor
+    with Serializable {
   val targetRef = target.getOrElse(null).asInstanceOf[I]
 
   final def intercept(
-      p: AnyRef, m: Method, args: Array[AnyRef], methodProxy: MethodProxy) = {
+      p: AnyRef,
+      m: Method,
+      args: Array[AnyRef],
+      methodProxy: MethodProxy) = {
     callback(new MethodCall(targetRef, m, args, methodProxy))
   }
 }
 
-final class MethodCall[T <: AnyRef] private[reflect](targetRef: T,
-                                                     val method: Method,
-                                                     val args: Array[AnyRef],
-                                                     methodProxy: MethodProxy)
+final class MethodCall[T <: AnyRef] private[reflect] (
+    targetRef: T,
+    val method: Method,
+    val args: Array[AnyRef],
+    methodProxy: MethodProxy)
     extends (() => AnyRef) {
 
   lazy val target = if (targetRef ne null) Some(targetRef) else None

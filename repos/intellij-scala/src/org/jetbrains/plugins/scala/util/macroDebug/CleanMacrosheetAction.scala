@@ -13,7 +13,10 @@ import worksheet.runconfiguration.WorksheetViewerInfo
 import java.awt.BorderLayout
 import com.intellij.ui.JBSplitter
 import com.intellij.openapi.fileEditor.FileEditorManager
-import org.jetbrains.plugins.scala.worksheet.actions.{CleanWorksheetAction, TopComponentAction}
+import org.jetbrains.plugins.scala.worksheet.actions.{
+  CleanWorksheetAction,
+  TopComponentAction
+}
 import com.intellij.openapi.editor.impl.EditorImpl
 import javax.swing.DefaultBoundedRangeModel
 import com.intellij.lang.ASTNode
@@ -24,7 +27,7 @@ import com.intellij.openapi.application.ApplicationManager
 
 /**
   * @author Ksenia.Sautina
-  * @author Dmitry Naydanov        
+  * @author Dmitry Naydanov
   * @since 11/12/12
   */
 class CleanMacrosheetAction() extends AnAction with TopComponentAction {
@@ -53,7 +56,10 @@ class CleanMacrosheetAction() extends AnAction with TopComponentAction {
         CleanWorksheetAction.resetScrollModel(viewer)
 
         CleanWorksheetAction.cleanWorksheet(
-            psiFile.getNode, editor, viewer, e.getProject)
+          psiFile.getNode,
+          editor,
+          viewer,
+          e.getProject)
 
         parent.remove(splitPane)
         parent.add(editor.getComponent, BorderLayout.CENTER)

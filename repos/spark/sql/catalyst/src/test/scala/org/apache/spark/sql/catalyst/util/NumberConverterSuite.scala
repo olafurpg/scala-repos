@@ -24,10 +24,13 @@ import org.apache.spark.unsafe.types.UTF8String
 class NumberConverterSuite extends SparkFunSuite {
 
   private[this] def checkConv(
-      n: String, fromBase: Int, toBase: Int, expected: String): Unit = {
+      n: String,
+      fromBase: Int,
+      toBase: Int,
+      expected: String): Unit = {
     assert(
-        convert(UTF8String.fromString(n).getBytes, fromBase, toBase) === UTF8String
-          .fromString(expected))
+      convert(UTF8String.fromString(n).getBytes, fromBase, toBase) === UTF8String
+        .fromString(expected))
   }
 
   test("convert") {

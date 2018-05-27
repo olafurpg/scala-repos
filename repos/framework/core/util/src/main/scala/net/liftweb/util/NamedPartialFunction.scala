@@ -57,7 +57,8 @@ object NamedPF {
     * or Empty othewise.
     */
   def find[A, B](
-      value: A, lst: Seq[PartialFunction[A, B]]): Box[PartialFunction[A, B]] =
+      value: A,
+      lst: Seq[PartialFunction[A, B]]): Box[PartialFunction[A, B]] =
     lst.find(_.isDefinedAt(value))
 
   /**
@@ -84,7 +85,7 @@ object NamedPF {
   def apply[A, B](value: A, lst: Seq[PartialFunction[A, B]]): B =
     find(value, lst) match {
       case Full(pf) => pf.apply(value)
-      case _ => throw new MatchError(value)
+      case _        => throw new MatchError(value)
     }
 
   /**

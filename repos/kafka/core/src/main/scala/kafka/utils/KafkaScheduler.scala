@@ -5,7 +5,7 @@
   * The ASF licenses this file to You under the Apache License, Version 2.0
   * (the "License"); you may not use this file except in compliance with
   * the License.  You may obtain a copy of the License at
-  * 
+  *
   *    http://www.apache.org/licenses/LICENSE-2.0
   *
   * Unless required by applicable law or agreed to in writing, software
@@ -22,8 +22,8 @@ import org.apache.kafka.common.utils.Utils
 
 /**
   * A scheduler for running jobs
-  * 
-  * This interface controls a job scheduler that allows scheduling either repeating background jobs 
+  *
+  * This interface controls a job scheduler that allows scheduling either repeating background jobs
   * that execute periodically or delayed one-time actions that are scheduled in the future.
   */
 trait Scheduler {
@@ -34,7 +34,7 @@ trait Scheduler {
   def startup()
 
   /**
-    * Shutdown this scheduler. When this method is complete no more executions of background tasks will occur. 
+    * Shutdown this scheduler. When this method is complete no more executions of background tasks will occur.
     * This includes tasks scheduled with a delayed execution.
     */
   def shutdown()
@@ -51,27 +51,30 @@ trait Scheduler {
     * @param period The period with which to execute the task. If < 0 the task will execute only once.
     * @param unit The unit for the preceding times.
     */
-  def schedule(name: String,
-               fun: () => Unit,
-               delay: Long = 0,
-               period: Long = -1,
-               unit: TimeUnit = TimeUnit.MILLISECONDS)
+  def schedule(
+      name: String,
+      fun: () => Unit,
+      delay: Long = 0,
+      period: Long = -1,
+      unit: TimeUnit = TimeUnit.MILLISECONDS)
 }
 
 /**
   * A scheduler based on java.util.concurrent.ScheduledThreadPoolExecutor
-  * 
+  *
   * It has a pool of kafka-scheduler- threads that do the actual work.
-  * 
+  *
   * @param threads The number of threads in the thread pool
   * @param threadNamePrefix The name to use for scheduler threads. This prefix will have a number appended to it.
   * @param daemon If true the scheduler threads will be "daemon" threads and will not block jvm shutdown.
   */
 @threadsafe
-class KafkaScheduler(val threads: Int,
-                     val threadNamePrefix: String = "kafka-scheduler-",
-                     daemon: Boolean = true)
-    extends Scheduler with Logging {
+class KafkaScheduler(
+    val threads: Int,
+    val threadNamePrefix: String = "kafka-scheduler-",
+    daemon: Boolean = true)
+    extends Scheduler
+    with Logging {
   private var executor: ScheduledThreadPoolExecutor = null
   private val schedulerThreadId = new AtomicInteger(0)
 
@@ -80,17 +83,16 @@ class KafkaScheduler(val threads: Int,
     this synchronized {
       if (isStarted)
         throw new IllegalStateException(
-            "This scheduler has already been started!")
+          "This scheduler has already been started!")
       executor = new ScheduledThreadPoolExecutor(threads)
       executor.setContinueExistingPeriodicTasksAfterShutdownPolicy(false)
       executor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false)
-      executor.setThreadFactory(
-          new ThreadFactory() {
+      executor.setThreadFactory(new ThreadFactory() {
         def newThread(runnable: Runnable): Thread =
           Utils.newThread(
-              threadNamePrefix + schedulerThreadId.getAndIncrement(),
-              runnable,
-              daemon)
+            threadNamePrefix + schedulerThreadId.getAndIncrement(),
+            runnable,
+            daemon)
       })
     }
   }
@@ -108,16 +110,17 @@ class KafkaScheduler(val threads: Int,
     }
   }
 
-  def schedule(name: String,
-               fun: () => Unit,
-               delay: Long,
-               period: Long,
-               unit: TimeUnit) = {
+  def schedule(
+      name: String,
+      fun: () => Unit,
+      delay: Long,
+      period: Long,
+      unit: TimeUnit) = {
     debug(
-        "Scheduling task %s with initial delay %d ms and period %d ms.".format(
-            name,
-            TimeUnit.MILLISECONDS.convert(delay, unit),
-            TimeUnit.MILLISECONDS.convert(period, unit)))
+      "Scheduling task %s with initial delay %d ms and period %d ms.".format(
+        name,
+        TimeUnit.MILLISECONDS.convert(delay, unit),
+        TimeUnit.MILLISECONDS.convert(period, unit)))
     this synchronized {
       ensureRunning
       val runnable = CoreUtils.runnable {

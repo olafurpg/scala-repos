@@ -29,7 +29,8 @@ case class MacroContext(place: PsiElement, expectedType: Option[ScType])
 
 trait ScalaMacroExpandable {
   def expandMacro(
-      macros: ScFunction, context: MacroContext): Option[ScalaPsiElement]
+      macros: ScFunction,
+      context: MacroContext): Option[ScalaPsiElement]
 }
 
 trait ScalaMacroTypeable {

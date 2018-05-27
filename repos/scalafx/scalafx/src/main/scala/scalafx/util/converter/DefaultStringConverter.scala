@@ -39,4 +39,6 @@ object DefaultStringConverter {
 class DefaultStringConverter(
     delegate: jfxuc.DefaultStringConverter = new jfxuc.DefaultStringConverter)
     extends StringConverterDelegate[
-        java.lang.String, String, jfxuc.DefaultStringConverter](delegate)
+      java.lang.String,
+      String,
+      jfxuc.DefaultStringConverter](delegate)

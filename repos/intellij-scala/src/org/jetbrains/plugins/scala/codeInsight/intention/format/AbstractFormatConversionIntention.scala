@@ -6,7 +6,11 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.extensions._
-import org.jetbrains.plugins.scala.format.{StringFormatter, StringParser, StringPart}
+import org.jetbrains.plugins.scala.format.{
+  StringFormatter,
+  StringParser,
+  StringPart
+}
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScLiteral
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.util.MultilineStringUtil
@@ -14,10 +18,11 @@ import org.jetbrains.plugins.scala.util.MultilineStringUtil
 /**
   * Pavel Fatin
   */
-abstract class AbstractFormatConversionIntention(name: String,
-                                                 parser: StringParser,
-                                                 formatter: StringFormatter,
-                                                 eager: Boolean = false)
+abstract class AbstractFormatConversionIntention(
+    name: String,
+    parser: StringParser,
+    formatter: StringFormatter,
+    eager: Boolean = false)
     extends PsiElementBaseIntentionAction {
   setText(name)
 
@@ -36,7 +41,9 @@ abstract class AbstractFormatConversionIntention(name: String,
   }
 
   override def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+      project: Project,
+      editor: Editor,
+      element: PsiElement): Boolean = {
     findTargetIn(element).isDefined
   }
 
@@ -50,8 +57,7 @@ abstract class AbstractFormatConversionIntention(name: String,
 
     target.replace(result) match {
       case lit: ScLiteral if lit.isMultiLineString =>
-        MultilineStringUtil.addMarginsAndFormatMLString(
-            lit, editor.getDocument)
+        MultilineStringUtil.addMarginsAndFormatMLString(lit, editor.getDocument)
       case _ =>
     }
   }

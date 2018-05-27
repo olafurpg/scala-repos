@@ -57,14 +57,15 @@ object ReplicationClient {
     val underlyingClients =
       pools map { pool =>
         Await.result(pool.ready)
-        KetamaClientBuilder(Group.fromCluster(pool),
-                            hashName,
-                            clientBuilder,
-                            failureAccrualParams).build()
+        KetamaClientBuilder(
+          Group.fromCluster(pool),
+          hashName,
+          clientBuilder,
+          failureAccrualParams).build()
       }
     val repStatsReceiver =
       clientBuilder map { _.statsReceiver.scope("cache_replication") } getOrElse
-      (NullStatsReceiver)
+        (NullStatsReceiver)
     new BaseReplicationClient(underlyingClients, repStatsReceiver)
   }
 
@@ -74,8 +75,12 @@ object ReplicationClient {
       hashName: Option[String] = None,
       failureAccrualParams: (Int, () => Duration) = (5, () => 30.seconds)
   ) = {
-    new SimpleReplicationClient(newBaseReplicationClient(
-            pools, clientBuilder, hashName, failureAccrualParams))
+    new SimpleReplicationClient(
+      newBaseReplicationClient(
+        pools,
+        clientBuilder,
+        hashName,
+        failureAccrualParams))
   }
 }
 
@@ -87,7 +92,8 @@ object ReplicationClient {
   * @param statsReceiver
   */
 class BaseReplicationClient(
-    clients: Seq[Client], statsReceiver: StatsReceiver = NullStatsReceiver) {
+    clients: Seq[Client],
+    statsReceiver: StatsReceiver = NullStatsReceiver) {
   private[this] val inconsistentContentCounter =
     statsReceiver.counter("inconsistent_content_count")
   private[this] val failedCounter =
@@ -103,17 +109,19 @@ class BaseReplicationClient(
     * TODO: introducing BackupRequestFilter to shorten the waiting period for secondary requests
     */
   private[memcached] def getResult(
-      keys: Iterable[String], useRandomOrder: Boolean): Future[GetResult] = {
+      keys: Iterable[String],
+      useRandomOrder: Boolean): Future[GetResult] = {
     val clientsInOrder =
       if (useRandomOrder) Random.shuffle(clients) else clients
 
     def loopGet(
-        clients: Seq[Client], currentRes: GetResult): Future[GetResult] =
+        clients: Seq[Client],
+        currentRes: GetResult): Future[GetResult] =
       clients match {
         case _ if currentRes.misses.isEmpty && currentRes.failures.isEmpty =>
           Future.value(currentRes)
         case Seq() => Future.value(currentRes)
-        case Seq(c, tail @ _ *) =>
+        case Seq(c, tail @ _*) =>
           val missing = currentRes.misses ++ currentRes.failures.keySet
           c.getResult(missing) flatMap {
             case res =>
@@ -132,11 +140,13 @@ class BaseReplicationClient(
     * first hit result, or return the last replica's result.
     */
   def getOne(
-      key: String, useRandomOrder: Boolean = false): Future[Option[Buf]] =
+      key: String,
+      useRandomOrder: Boolean = false): Future[Option[Buf]] =
     getOne(Seq(key), useRandomOrder) map { _.values.headOption }
 
-  def getOne(keys: Iterable[String],
-             useRandomOrder: Boolean): Future[Map[String, Buf]] =
+  def getOne(
+      keys: Iterable[String],
+      useRandomOrder: Boolean): Future[Map[String, Buf]] =
     getResult(keys, useRandomOrder) flatMap { result =>
       if (result.failures.nonEmpty)
         Future.exception(result.failures.values.head)
@@ -181,12 +191,12 @@ class BaseReplicationClient(
     *
     * - FailedReplication, indicating failures from all replicas;
     */
-  def getsAll(key: String)
-    : Future[ReplicationStatus[Option[(Buf, ReplicaCasUnique)]]] =
+  def getsAll(
+      key: String): Future[ReplicationStatus[Option[(Buf, ReplicaCasUnique)]]] =
     getsAll(Seq(key)) map { _.values.head }
 
-  def getsAll(keys: Iterable[String]): Future[Map[
-          String, ReplicationStatus[Option[(Buf, ReplicaCasUnique)]]]] = {
+  def getsAll(keys: Iterable[String]): Future[
+    Map[String, ReplicationStatus[Option[(Buf, ReplicaCasUnique)]]]] = {
     val keySet = keys.toSet
     Future.collect(clients map { _.getsResult(keySet) }) map {
       results: Seq[GetsResult] =>
@@ -226,12 +236,11 @@ class BaseReplicationClient(
               val singleReplicaCas = r.hits.get(key).get.casUnique.get
               Return(Some((v, SCasUnique(singleReplicaCas))))
             case (Return(None), _) => Return(None)
-            case (Throw(e), _) => Throw(e)
+            case (Throw(e), _)     => Throw(e)
           }
         InconsistentReplication(transformed)
       case FailedReplication(fs) =>
-        FailedReplication(
-            fs map { t =>
+        FailedReplication(fs map { t =>
           Throw(t.e)
         })
     }
@@ -242,18 +251,20 @@ class BaseReplicationClient(
   def set(key: String, value: Buf): Future[ReplicationStatus[Unit]] =
     set(key, 0, Time.epoch, value)
 
-  def set(key: String,
-          flags: Int,
-          expiry: Time,
-          value: Buf): Future[ReplicationStatus[Unit]] =
+  def set(
+      key: String,
+      flags: Int,
+      expiry: Time,
+      value: Buf): Future[ReplicationStatus[Unit]] =
     collectAndResolve[Unit](_.set(key, flags, expiry, value))
 
   /**
     * Attempts to perform a CAS operation on all replicas, and returns the aggregated replication status.
     */
-  def checkAndSet(key: String,
-                  value: Buf,
-                  casUniques: Seq[Buf]): Future[ReplicationStatus[CasResult]] =
+  def checkAndSet(
+      key: String,
+      value: Buf,
+      casUniques: Seq[Buf]): Future[ReplicationStatus[CasResult]] =
     checkAndSet(key, 0, Time.epoch, value, casUniques)
 
   def checkAndSet(
@@ -284,10 +295,11 @@ class BaseReplicationClient(
   def add(key: String, value: Buf): Future[ReplicationStatus[JBoolean]] =
     add(key, 0, Time.epoch, value)
 
-  def add(key: String,
-          flags: Int,
-          expiry: Time,
-          value: Buf): Future[ReplicationStatus[JBoolean]] =
+  def add(
+      key: String,
+      flags: Int,
+      expiry: Time,
+      value: Buf): Future[ReplicationStatus[JBoolean]] =
     collectAndResolve[JBoolean](_.add(key, flags, expiry, value))
 
   /**
@@ -296,10 +308,11 @@ class BaseReplicationClient(
   def replace(key: String, value: Buf): Future[ReplicationStatus[JBoolean]] =
     replace(key, 0, Time.epoch, value)
 
-  def replace(key: String,
-              flags: Int,
-              expiry: Time,
-              value: Buf): Future[ReplicationStatus[JBoolean]] =
+  def replace(
+      key: String,
+      flags: Int,
+      expiry: Time,
+      value: Buf): Future[ReplicationStatus[JBoolean]] =
     collectAndResolve[JBoolean](_.replace(key, flags, expiry, value))
 
   /**
@@ -308,8 +321,7 @@ class BaseReplicationClient(
   def incr(key: String): Future[ReplicationStatus[Option[JLong]]] =
     incr(key, 1L)
 
-  def incr(
-      key: String, delta: Long): Future[ReplicationStatus[Option[JLong]]] =
+  def incr(key: String, delta: Long): Future[ReplicationStatus[Option[JLong]]] =
     collectAndResolve[Option[JLong]](_.incr(key, delta))
 
   /**
@@ -318,8 +330,7 @@ class BaseReplicationClient(
   def decr(key: String): Future[ReplicationStatus[Option[JLong]]] =
     decr(key, 1L)
 
-  def decr(
-      key: String, delta: Long): Future[ReplicationStatus[Option[JLong]]] =
+  def decr(key: String, delta: Long): Future[ReplicationStatus[Option[JLong]]] =
     collectAndResolve[Option[JLong]](_.decr(key, delta))
 
   /**
@@ -327,31 +338,33 @@ class BaseReplicationClient(
     */
   def append(key: String, value: Buf): Future[ReplicationStatus[JBoolean]] =
     append(key, 0, Time.epoch, value)
-  def append(key: String,
-             flags: Int,
-             expiry: Time,
-             value: Buf): Future[ReplicationStatus[JBoolean]] =
+  def append(
+      key: String,
+      flags: Int,
+      expiry: Time,
+      value: Buf): Future[ReplicationStatus[JBoolean]] =
     throw new UnsupportedOperationException(
-        "append is not supported for cache replication client.")
+      "append is not supported for cache replication client.")
 
   /**
     * Unsupported operation yet
     */
   def prepend(key: String, value: Buf): Future[ReplicationStatus[JBoolean]] =
     prepend(key, 0, Time.epoch, value)
-  def prepend(key: String,
-              flags: Int,
-              expiry: Time,
-              value: Buf): Future[ReplicationStatus[JBoolean]] =
+  def prepend(
+      key: String,
+      flags: Int,
+      expiry: Time,
+      value: Buf): Future[ReplicationStatus[JBoolean]] =
     throw new UnsupportedOperationException(
-        "prepend is not supported for cache replication client.")
+      "prepend is not supported for cache replication client.")
 
   /**
     * Unsupported operation yet
     */
   def stats(args: Option[String]): Future[Seq[String]] =
     throw new UnsupportedOperationException(
-        "stats is not supported for cache replication client.")
+      "stats is not supported for cache replication client.")
 
   def release() {
     clients foreach { _.release() }
@@ -407,7 +420,8 @@ case class SimpleReplicationFailure(msg: String) extends Throwable(msg)
 class SimpleReplicationClient(underlying: BaseReplicationClient)
     extends Client {
   def this(
-      clients: Seq[Client], statsReceiver: StatsReceiver = NullStatsReceiver) =
+      clients: Seq[Client],
+      statsReceiver: StatsReceiver = NullStatsReceiver) =
     this(new BaseReplicationClient(clients, statsReceiver))
 
   private[this] val underlyingClient = underlying
@@ -427,8 +441,9 @@ class SimpleReplicationClient(underlying: BaseReplicationClient)
     underlyingClient.getsAll(keys) map { resultsMap =>
       val getsResultSeq =
         resultsMap map {
-          case (key,
-                ConsistentReplication(Some((value, RCasUnique(uniques))))) =>
+          case (
+              key,
+              ConsistentReplication(Some((value, RCasUnique(uniques))))) =>
             val newCas = uniques map { case Buf.Utf8(s) => s } mkString ("|")
             val newValue = Value(Buf.Utf8(key), value, Some(Buf.Utf8(newCas)))
             GetsResult(GetResult(hits = Map(key -> newValue)))
@@ -439,8 +454,8 @@ class SimpleReplicationClient(underlying: BaseReplicationClient)
             GetsResult(GetResult(misses = Set(key)))
           case (key, _) =>
             GetsResult(
-                GetResult(failures = Map(key -> SimpleReplicationFailure(
-                              "One or more underlying replica failed gets"))))
+              GetResult(failures = Map(key -> SimpleReplicationFailure(
+                "One or more underlying replica failed gets"))))
         }
       GetResult.merged(getsResultSeq.toSeq)
     }
@@ -454,16 +469,18 @@ class SimpleReplicationClient(underlying: BaseReplicationClient)
   /**
     * Check and set a key, succeed only if all replicas succeed.
     */
-  def checkAndSet(key: String,
-                  flags: Int,
-                  expiry: Time,
-                  value: Buf,
-                  casUnique: Buf): Future[CasResult] = {
+  def checkAndSet(
+      key: String,
+      flags: Int,
+      expiry: Time,
+      value: Buf,
+      casUnique: Buf): Future[CasResult] = {
     val Buf.Utf8(casUniqueStr) = casUnique
     val casUniqueBufs = casUniqueStr.split('|') map { Buf.Utf8(_) }
-    resolve[CasResult]("checkAndSet",
-                       _.checkAndSet(key, flags, expiry, value, casUniqueBufs),
-                       CasResult.Stored)
+    resolve[CasResult](
+      "checkAndSet",
+      _.checkAndSet(key, flags, expiry, value, casUniqueBufs),
+      CasResult.Stored)
   }
 
   /**
@@ -510,23 +527,30 @@ class SimpleReplicationClient(underlying: BaseReplicationClient)
           if resultsSeq.forall(_.isReturn) =>
         Future.value(default)
       case _ =>
-        Future.exception(SimpleReplicationFailure(
-                "One or more underlying replica failed op: " + name))
+        Future.exception(
+          SimpleReplicationFailure(
+            "One or more underlying replica failed op: " + name))
     }
 
   def append(
-      key: String, flags: Int, expiry: Time, value: Buf): Future[JBoolean] =
+      key: String,
+      flags: Int,
+      expiry: Time,
+      value: Buf): Future[JBoolean] =
     throw new UnsupportedOperationException(
-        "append is not supported for replication cache client yet.")
+      "append is not supported for replication cache client yet.")
 
   def prepend(
-      key: String, flags: Int, expiry: Time, value: Buf): Future[JBoolean] =
+      key: String,
+      flags: Int,
+      expiry: Time,
+      value: Buf): Future[JBoolean] =
     throw new UnsupportedOperationException(
-        "prepend is not supported for replication cache client yet.")
+      "prepend is not supported for replication cache client yet.")
 
   def stats(args: Option[String]): Future[Seq[String]] =
     throw new UnsupportedOperationException(
-        "No logical way to perform stats without a key")
+      "No logical way to perform stats without a key")
 
   def release() {
     underlyingClient.release()

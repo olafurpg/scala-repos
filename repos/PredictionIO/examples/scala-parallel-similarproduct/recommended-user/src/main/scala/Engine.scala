@@ -8,25 +8,23 @@ case class Query(
     num: Int,
     whiteList: Option[Set[String]],
     blackList: Option[Set[String]]
-)
-    extends Serializable
+) extends Serializable
 
 case class PredictedResult(
     similarUserScores: Array[similarUserScore]
-)
-    extends Serializable
+) extends Serializable
 
 case class similarUserScore(
     user: String,
     score: Double
-)
-    extends Serializable
+) extends Serializable
 
 object RecommendedUserEngine extends IEngineFactory {
   def apply() = {
-    new Engine(classOf[DataSource],
-               classOf[Preparator],
-               Map("als" -> classOf[ALSAlgorithm]),
-               classOf[Serving])
+    new Engine(
+      classOf[DataSource],
+      classOf[Preparator],
+      Map("als" -> classOf[ALSAlgorithm]),
+      classOf[Serving])
   }
 }

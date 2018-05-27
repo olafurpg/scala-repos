@@ -21,14 +21,16 @@ import org.apache.spark.sql.test.SharedSQLContext
 // TODO: this needs a lot more testing but it's currently not easy to test with the parquet
 // writer abstractions. Revisit.
 class ParquetEncodingSuite
-    extends ParquetCompatibilityTest with SharedSQLContext {
+    extends ParquetCompatibilityTest
+    with SharedSQLContext {
   import testImplicits._
 
   val ROW = ((1).toByte, 2, 3L, "abc")
-  val NULL_ROW = (null.asInstanceOf[java.lang.Byte],
-                  null.asInstanceOf[Integer],
-                  null.asInstanceOf[java.lang.Long],
-                  null.asInstanceOf[String])
+  val NULL_ROW = (
+    null.asInstanceOf[java.lang.Byte],
+    null.asInstanceOf[Integer],
+    null.asInstanceOf[java.lang.Long],
+    null.asInstanceOf[String])
 
   test("All Types Dictionary") {
     (1 :: 1000 :: Nil).foreach { n =>

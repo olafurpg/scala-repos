@@ -129,8 +129,8 @@ class SingleAbstractMethodTest
       """.stripMargin
     assertMatches(messages(code)) {
       case Error("((j: Int) => j)", typeMismatch()) :: Error(
-          "((j: Int) => j)",
-          doesNotConform()) :: Error("j", doesNotConform()) :: Nil =>
+            "((j: Int) => j)",
+            doesNotConform()) :: Error("j", doesNotConform()) :: Nil =>
     }
   }
 
@@ -143,7 +143,8 @@ class SingleAbstractMethodTest
       """.stripMargin
     assertMatches(messages(code)) {
       case Error("((i: Int) => \"aaa\")", typeMismatch()) :: Error(
-          "((i: Int) => \"aaa\")", doesNotConform()) :: Nil =>
+            "((i: Int) => \"aaa\")",
+            doesNotConform()) :: Nil =>
     }
   }
 
@@ -156,7 +157,8 @@ class SingleAbstractMethodTest
       """.stripMargin
     assertMatches(messages(code)) {
       case Error("((i: Int, j: Int) => \"aaa\")", typeMismatch()) :: Error(
-          "((i: Int, j: Int) => \"aaa\")", doesNotConform()) :: Nil =>
+            "((i: Int, j: Int) => \"aaa\")",
+            doesNotConform()) :: Nil =>
     }
   }
 
@@ -169,8 +171,8 @@ class SingleAbstractMethodTest
       """.stripMargin
     assertMatches(messages(code)) {
       case Error("(j => j)", typeMismatch()) :: Error(
-          "(j => j)",
-          doesNotConform()) :: Error("j", doesNotConform()) :: Nil =>
+            "(j => j)",
+            doesNotConform()) :: Error("j", doesNotConform()) :: Nil =>
     }
   }
 
@@ -206,7 +208,8 @@ class SingleAbstractMethodTest
       """.stripMargin
     assertMatches(messages(code)) {
       case Error("() => 3", typeMismatch()) :: Error(
-          "wantString", cannotResolveReference()) :: Nil =>
+            "wantString",
+            cannotResolveReference()) :: Nil =>
     }
   }
 
@@ -582,18 +585,18 @@ class SingleAbstractMethodTest
     checkCodeHasNoErrors(code)
   }
 
-  def checkCodeHasNoErrors(
-      scalaCode: String, javaCode: Option[String] = None) {
+  def checkCodeHasNoErrors(scalaCode: String, javaCode: Option[String] = None) {
     assertMatches(messages(scalaCode, javaCode)) {
       case Nil =>
     }
   }
 
-  def messages(@Language("Scala") scalaCode: String,
-               javaCode: Option[String] = None): List[Message] = {
+  def messages(
+      @Language("Scala") scalaCode: String,
+      javaCode: Option[String] = None): List[Message] = {
     javaCode match {
       case Some(s) => configureFromFileTextAdapter("dummy.java", s)
-      case _ =>
+      case _       =>
     }
 
     val annotator = new ScalaAnnotator() {}
@@ -605,21 +608,21 @@ class SingleAbstractMethodTest
 
     mock.errorAnnotations.filter {
       case Error(_, null) => false
-      case _ => true
+      case _              => true
     }
   }
 
   def assertMatches[T](actual: T)(pattern: PartialFunction[T, Unit]) {
-    Assert.assertTrue(
-        "actual: " + actual.toString, pattern.isDefinedAt(actual))
+    Assert.assertTrue("actual: " + actual.toString, pattern.isDefinedAt(actual))
   }
 
   def parseText(@Language("Scala") s: String): ScalaFile = {
     PsiFileFactory
       .getInstance(getProjectAdapter)
-      .createFileFromText("foo" + ScalaFileType.DEFAULT_EXTENSION,
-                          ScalaFileType.SCALA_FILE_TYPE,
-                          s)
+      .createFileFromText(
+        "foo" + ScalaFileType.DEFAULT_EXTENSION,
+        ScalaFileType.SCALA_FILE_TYPE,
+        s)
       .asInstanceOf[ScalaFile]
   }
 

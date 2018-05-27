@@ -57,7 +57,7 @@ object JoinTestHelper {
       rng
         .nextInt(max)
         .toString
-      (0 to size).map { i =>
+    (0 to size).map { i =>
       (next, next, next)
     }.toList
   }
@@ -89,7 +89,7 @@ object JoinTestHelper {
       .run
       //.runHadoop //this takes MUCH longer to run. Commented out by default, but tests pass on my machine
       .finish
-      (skewResult.toList.sorted, innerResult.toList.sorted)
+    (skewResult.toList.sorted, innerResult.toList.sorted)
   }
 }
 
@@ -99,55 +99,69 @@ class SkewJoinPipeTest extends WordSpec with Matchers {
   "A SkewInnerProductJob" should {
     "compute skew join with sampleRate = 0.001, using strategy A" in {
       val (sk, inner) = runJobWithArguments(
-          new SkewJoinJob(_), sampleRate = 0.001, replicator = "a")
+        new SkewJoinJob(_),
+        sampleRate = 0.001,
+        replicator = "a")
       sk shouldBe inner
     }
 
     "compute skew join with sampleRate = 0.001, using strategy B" in {
       val (sk, inner) = runJobWithArguments(
-          new SkewJoinJob(_), sampleRate = 0.001, replicator = "b")
+        new SkewJoinJob(_),
+        sampleRate = 0.001,
+        replicator = "b")
       sk shouldBe inner
     }
 
     "compute skew join with sampleRate = 0.1, using strategy A" in {
       val (sk, inner) = runJobWithArguments(
-          new SkewJoinJob(_), sampleRate = 0.1, replicator = "a")
+        new SkewJoinJob(_),
+        sampleRate = 0.1,
+        replicator = "a")
       sk shouldBe inner
     }
 
     "compute skew join with sampleRate = 0.1, using strategy B" in {
       val (sk, inner) = runJobWithArguments(
-          new SkewJoinJob(_), sampleRate = 0.1, replicator = "b")
+        new SkewJoinJob(_),
+        sampleRate = 0.1,
+        replicator = "b")
       sk shouldBe inner
     }
 
     "compute skew join with sampleRate = 0.9, using strategy A" in {
       val (sk, inner) = runJobWithArguments(
-          new SkewJoinJob(_), sampleRate = 0.9, replicator = "a")
+        new SkewJoinJob(_),
+        sampleRate = 0.9,
+        replicator = "a")
       sk shouldBe inner
     }
 
     "compute skew join with sampleRate = 0.9, using strategy B" in {
       val (sk, inner) = runJobWithArguments(
-          new SkewJoinJob(_), sampleRate = 0.9, replicator = "b")
+        new SkewJoinJob(_),
+        sampleRate = 0.9,
+        replicator = "b")
       sk shouldBe inner
     }
 
     "compute skew join with replication factor 5, using strategy A" in {
       val (sk, inner) = runJobWithArguments(
-          new SkewJoinJob(_), replicationFactor = 5, replicator = "a")
+        new SkewJoinJob(_),
+        replicationFactor = 5,
+        replicator = "a")
       sk shouldBe inner
     }
 
     "compute skew join with reducers = 10, using strategy A" in {
-      val (sk, inner) = runJobWithArguments(
-          new SkewJoinJob(_), reducers = 10, replicator = "a")
+      val (sk, inner) =
+        runJobWithArguments(new SkewJoinJob(_), reducers = 10, replicator = "a")
       sk shouldBe inner
     }
 
     "compute skew join with reducers = 10, using strategy B" in {
-      val (sk, inner) = runJobWithArguments(
-          new SkewJoinJob(_), reducers = 10, replicator = "b")
+      val (sk, inner) =
+        runJobWithArguments(new SkewJoinJob(_), reducers = 10, replicator = "b")
       sk shouldBe inner
     }
   }

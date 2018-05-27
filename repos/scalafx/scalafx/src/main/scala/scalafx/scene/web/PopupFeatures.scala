@@ -64,7 +64,10 @@ class PopupFeatures(override val delegate: jfxsw.PopupFeatures)
     * @param resizable whether popup window should be resizable
     */
   def this(
-      menu: Boolean, status: Boolean, toolbar: Boolean, resizable: Boolean) =
+      menu: Boolean,
+      status: Boolean,
+      toolbar: Boolean,
+      resizable: Boolean) =
     this(new jfxsw.PopupFeatures(menu, status, toolbar, resizable))
 
   /**

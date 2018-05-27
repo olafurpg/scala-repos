@@ -13,17 +13,24 @@ import scala.concurrent.duration._
 import scala.concurrent.{Future, Promise}
 
 class CapConcurrentExecutionsTest
-    extends MarathonActorSupport with MarathonSpec with Matchers
-    with GivenWhenThen with ScalaFutures {
+    extends MarathonActorSupport
+    with MarathonSpec
+    with Matchers
+    with GivenWhenThen
+    with ScalaFutures {
   def capMetrics: CapConcurrentExecutionsMetrics =
     new CapConcurrentExecutionsMetrics(
-        new Metrics(new MetricRegistry),
-        classOf[CapConcurrentExecutionsTest]
+      new Metrics(new MetricRegistry),
+      classOf[CapConcurrentExecutionsTest]
     )
 
   test("submit successful futures after each other") {
     val serialize = CapConcurrentExecutions(
-        capMetrics, system, "serialize1", maxParallel = 1, maxQueued = 10)
+      capMetrics,
+      system,
+      "serialize1",
+      maxParallel = 1,
+      maxQueued = 10)
     try {
       val result1 = serialize(Future.successful(1)).futureValue
       result1 should be(1)
@@ -38,10 +45,14 @@ class CapConcurrentExecutionsTest
 
   test("submit successful futures after a failure") {
     val serialize = CapConcurrentExecutions(
-        capMetrics, system, "serialize2", maxParallel = 1, maxQueued = 10)
+      capMetrics,
+      system,
+      "serialize2",
+      maxParallel = 1,
+      maxQueued = 10)
     try {
       serialize(Future.failed(new IllegalStateException())).failed.futureValue.getClass should be(
-          classOf[IllegalStateException])
+        classOf[IllegalStateException])
       val result2 = serialize(Future.successful(2)).futureValue
       result2 should be(2)
       val result3 = serialize(Future.successful(3)).futureValue
@@ -53,10 +64,14 @@ class CapConcurrentExecutionsTest
 
   test("submit successful futures after a failure to return future") {
     val serialize = CapConcurrentExecutions(
-        capMetrics, system, "serialize3", maxParallel = 1, maxQueued = 10)
+      capMetrics,
+      system,
+      "serialize3",
+      maxParallel = 1,
+      maxQueued = 10)
     try {
       serialize(throw new IllegalStateException()).failed.futureValue.getClass should be(
-          classOf[IllegalStateException])
+        classOf[IllegalStateException])
 
       val result2 = serialize(Future.successful(2)).futureValue
       result2 should be(2)
@@ -70,7 +85,11 @@ class CapConcurrentExecutionsTest
   test("concurrent executions are serialized if maxParallel has been reached") {
     val metrics = capMetrics
     val serialize = CapConcurrentExecutions(
-        metrics, system, "serialize4", maxParallel = 2, maxQueued = 10)
+      metrics,
+      system,
+      "serialize4",
+      maxParallel = 2,
+      maxQueued = 10)
     def submitPromise(): (Promise[Unit], Future[Unit]) = {
       val promise = Promise[Unit]()
       val result = serialize.apply(promise.future)
@@ -85,7 +104,7 @@ class CapConcurrentExecutionsTest
 
       Then("we have two promises executing and one queued")
       WaitTestSupport.waitUntil("messages have been processed", 1.second)(
-          metrics.queued.getValue == 1)
+        metrics.queued.getValue == 1)
 
       metrics.processing.getValue should be(2)
       metrics.queued.getValue should be(1)
@@ -95,7 +114,7 @@ class CapConcurrentExecutionsTest
 
       Then("we have two promises executing and none queued")
       WaitTestSupport.waitUntil("messages have been processed", 1.second)(
-          metrics.queued.getValue == 0)
+        metrics.queued.getValue == 0)
 
       metrics.processing.getValue should be(2)
       metrics.queued.getValue should be(0)
@@ -113,7 +132,7 @@ class CapConcurrentExecutionsTest
 
       And("the gauges are zero again")
       WaitTestSupport.waitUntil("messages have been processed", 1.second)(
-          metrics.processing.getValue == 0)
+        metrics.processing.getValue == 0)
       metrics.queued.getValue should be(0)
       metrics.processing.getValue should be(0)
 
@@ -125,10 +144,14 @@ class CapConcurrentExecutionsTest
   }
 
   test(
-      "queued executions are failed on stop, results of already executing futures are left untouched") {
+    "queued executions are failed on stop, results of already executing futures are left untouched") {
     val metrics = capMetrics
     val serialize = CapConcurrentExecutions(
-        metrics, system, "serialize5", maxParallel = 2, maxQueued = 10)
+      metrics,
+      system,
+      "serialize5",
+      maxParallel = 2,
+      maxQueued = 10)
     def submitPromise(): (Promise[Unit], Future[Unit]) = {
       val promise = Promise[Unit]()
       val result = serialize.apply(promise.future)
@@ -143,7 +166,7 @@ class CapConcurrentExecutionsTest
 
       Then("we have two promises executing and one queued")
       WaitTestSupport.waitUntil("messages have been processed", 1.second)(
-          metrics.queued.getValue == 1)
+        metrics.queued.getValue == 1)
 
       metrics.processing.getValue should be(2)
       metrics.queued.getValue should be(1)
@@ -152,11 +175,11 @@ class CapConcurrentExecutionsTest
       watch(serialize.serializeExecutionActorRef)
       serialize.close()
       expectMsgClass(classOf[Terminated]).getActor should equal(
-          serialize.serializeExecutionActorRef)
+        serialize.serializeExecutionActorRef)
 
       Then("the queued futures is failed immediately")
       result3.failed.futureValue.getClass should be(
-          classOf[IllegalStateException])
+        classOf[IllegalStateException])
 
       And("the executing futures normally terminated")
       result1.isCompleted should be(false)

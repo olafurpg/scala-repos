@@ -46,8 +46,7 @@ object WeightedAddress {
       case Address.Inet(ia, metadata) =>
         (Address.Inet(ia, metadata - weightKey), weight(metadata))
       case exp.Address.ServiceFactory(sf: ServiceFactory[_, _], metadata) =>
-        (exp.Address.ServiceFactory(sf, metadata - weightKey),
-         weight(metadata))
+        (exp.Address.ServiceFactory(sf, metadata - weightKey), weight(metadata))
       case addr =>
         (addr, defaultWeight)
     }
@@ -55,6 +54,6 @@ object WeightedAddress {
   private def weight(metadata: Addr.Metadata): Double =
     metadata.get(weightKey) match {
       case Some(weight: Double) => weight
-      case _ => defaultWeight
+      case _                    => defaultWeight
     }
 }

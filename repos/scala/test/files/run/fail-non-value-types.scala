@@ -17,7 +17,7 @@ object Test {
   }
 
   /** Attempt to use a method type as a type argument - expect failure. */
-  def tcon[T : TypeTag](args: Type*) =
+  def tcon[T: TypeTag](args: Type*) =
     appliedType(typeOf[T].typeConstructor, args.toList)
 
   def cil = typeOf[CompletelyIndependentList[Int]]

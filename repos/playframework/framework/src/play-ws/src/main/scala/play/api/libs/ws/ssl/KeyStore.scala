@@ -66,7 +66,9 @@ class StringBasedKeyStoreBuilder(data: String) extends KeyStoreBuilder {
   * @see java.security.cert.CertificateFactory
   */
 class FileBasedKeyStoreBuilder(
-    keyStoreType: String, filePath: String, password: Option[Array[Char]])
+    keyStoreType: String,
+    filePath: String,
+    password: Option[Array[Char]])
     extends KeyStoreBuilder {
 
   val logger = org.slf4j.LoggerFactory.getLogger(getClass)

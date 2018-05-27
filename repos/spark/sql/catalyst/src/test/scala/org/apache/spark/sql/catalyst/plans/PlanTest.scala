@@ -19,7 +19,11 @@ package org.apache.spark.sql.catalyst.plans
 
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.sql.catalyst.expressions._
-import org.apache.spark.sql.catalyst.plans.logical.{Filter, LogicalPlan, OneRowRelation}
+import org.apache.spark.sql.catalyst.plans.logical.{
+  Filter,
+  LogicalPlan,
+  OneRowRelation
+}
 import org.apache.spark.sql.catalyst.util._
 
 /**
@@ -48,10 +52,11 @@ abstract class PlanTest extends SparkFunSuite with PredicateHelper {
   private def normalizeFilters(plan: LogicalPlan) = {
     plan transform {
       case filter @ Filter(condition: Expression, child: LogicalPlan) =>
-        Filter(splitConjunctivePredicates(condition)
-                 .sortBy(_.hashCode())
-                 .reduce(And),
-               child)
+        Filter(
+          splitConjunctivePredicates(condition)
+            .sortBy(_.hashCode())
+            .reduce(And),
+          child)
     }
   }
 
@@ -60,11 +65,10 @@ abstract class PlanTest extends SparkFunSuite with PredicateHelper {
     val normalized1 = normalizeFilters(normalizeExprIds(plan1))
     val normalized2 = normalizeFilters(normalizeExprIds(plan2))
     if (normalized1 != normalized2) {
-      fail(
-          s"""
+      fail(s"""
           |== FAIL: Plans do not match ===
           |${sideBySide(normalized1.treeString, normalized2.treeString)
-           .mkString("\n")}
+                .mkString("\n")}
          """.stripMargin)
     }
   }

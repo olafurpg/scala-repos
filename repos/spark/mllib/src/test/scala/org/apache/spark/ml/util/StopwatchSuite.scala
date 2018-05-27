@@ -84,7 +84,7 @@ class StopwatchSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(localElapsed === localDuration)
     assert(sparkElapsed === sparkDuration)
     assert(
-        sw.toString === s"{\n  local: ${localElapsed}ms,\n  spark: ${sparkElapsed}ms\n}")
+      sw.toString === s"{\n  local: ${localElapsed}ms,\n  spark: ${sparkElapsed}ms\n}")
     val rdd = sc.parallelize(0 until 4, 4)
     val acc = sc.accumulator(0L)
     rdd.foreach { i =>

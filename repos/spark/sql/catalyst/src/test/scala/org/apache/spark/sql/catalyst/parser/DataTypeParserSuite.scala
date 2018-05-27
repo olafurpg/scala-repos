@@ -22,7 +22,9 @@ import org.apache.spark.sql.types._
 
 class DataTypeParserSuite extends SparkFunSuite {
 
-  def checkDataType(dataTypeString: String, expectedDataType: DataType): Unit = {
+  def checkDataType(
+      dataTypeString: String,
+      expectedDataType: DataType): Unit = {
     test(s"parse ${dataTypeString.replace("\n", "")}") {
       assert(DataTypeParser.parse(dataTypeString) === expectedDataType)
     }
@@ -55,67 +57,79 @@ class DataTypeParserSuite extends SparkFunSuite {
   checkDataType("BINARY", BinaryType)
 
   checkDataType("array<doublE>", ArrayType(DoubleType, true))
-  checkDataType("Array<map<int, tinYint>>",
-                ArrayType(MapType(IntegerType, ByteType, true), true))
   checkDataType(
-      "array<struct<tinYint:tinyint>>",
-      ArrayType(
-          StructType(StructField("tinYint", ByteType, true) :: Nil), true)
+    "Array<map<int, tinYint>>",
+    ArrayType(MapType(IntegerType, ByteType, true), true))
+  checkDataType(
+    "array<struct<tinYint:tinyint>>",
+    ArrayType(StructType(StructField("tinYint", ByteType, true) :: Nil), true)
   )
   checkDataType("MAP<int, STRING>", MapType(IntegerType, StringType, true))
-  checkDataType("MAp<int, ARRAY<double>>",
-                MapType(IntegerType, ArrayType(DoubleType), true))
   checkDataType(
-      "MAP<int, struct<varchar:string>>",
-      MapType(IntegerType,
-              StructType(StructField("varchar", StringType, true) :: Nil),
-              true)
+    "MAp<int, ARRAY<double>>",
+    MapType(IntegerType, ArrayType(DoubleType), true))
+  checkDataType(
+    "MAP<int, struct<varchar:string>>",
+    MapType(
+      IntegerType,
+      StructType(StructField("varchar", StringType, true) :: Nil),
+      true)
   )
 
   checkDataType(
-      "struct<intType: int, ts:timestamp>",
-      StructType(StructField("intType", IntegerType, true) :: StructField(
-              "ts", TimestampType, true) :: Nil)
+    "struct<intType: int, ts:timestamp>",
+    StructType(
+      StructField("intType", IntegerType, true) :: StructField(
+        "ts",
+        TimestampType,
+        true) :: Nil)
   )
   // It is fine to use the data type string as the column name.
   checkDataType(
-      "Struct<int: int, timestamp:timestamp>",
-      StructType(StructField("int", IntegerType, true) :: StructField(
-              "timestamp", TimestampType, true) :: Nil)
+    "Struct<int: int, timestamp:timestamp>",
+    StructType(
+      StructField("int", IntegerType, true) :: StructField(
+        "timestamp",
+        TimestampType,
+        true) :: Nil)
   )
   checkDataType(
-      """
+    """
       |struct<
       |  struct:struct<deciMal:DECimal, anotherDecimal:decimAL(5,2)>,
       |  MAP:Map<timestamp, varchar(10)>,
       |  arrAy:Array<double>,
       |  anotherArray:Array<char(9)>>
     """.stripMargin,
+    StructType(StructField(
+      "struct",
       StructType(
-          StructField("struct",
-                      StructType(
-                          StructField("deciMal",
-                                      DecimalType.USER_DEFAULT,
-                                      true) :: StructField("anotherDecimal",
-                                                           DecimalType(5, 2),
-                                                           true) :: Nil),
-                      true) :: StructField(
-              "MAP", MapType(TimestampType, StringType), true) :: StructField(
-              "arrAy", ArrayType(DoubleType, true), true) :: StructField(
-              "anotherArray", ArrayType(StringType, true), true) :: Nil)
+        StructField("deciMal", DecimalType.USER_DEFAULT, true) :: StructField(
+          "anotherDecimal",
+          DecimalType(5, 2),
+          true) :: Nil),
+      true) :: StructField("MAP", MapType(TimestampType, StringType), true) :: StructField(
+      "arrAy",
+      ArrayType(DoubleType, true),
+      true) :: StructField("anotherArray", ArrayType(StringType, true), true) :: Nil)
   )
   // A column name can be a reserved word in our DDL parser and SqlParser.
   checkDataType(
-      "Struct<TABLE: string, CASE:boolean>",
-      StructType(StructField("TABLE", StringType, true) :: StructField(
-              "CASE", BooleanType, true) :: Nil)
+    "Struct<TABLE: string, CASE:boolean>",
+    StructType(
+      StructField("TABLE", StringType, true) :: StructField(
+        "CASE",
+        BooleanType,
+        true) :: Nil)
   )
   // Use backticks to quote column names having special characters.
   checkDataType(
-      "struct<`x+y`:int, `!@#$%^&*()`:string, `1_2.345<>:\"`:varchar(20)>",
-      StructType(StructField("x+y", IntegerType, true) :: StructField(
-              "!@#$%^&*()", StringType, true) :: StructField(
-              "1_2.345<>:\"", StringType, true) :: Nil)
+    "struct<`x+y`:int, `!@#$%^&*()`:string, `1_2.345<>:\"`:varchar(20)>",
+    StructType(
+      StructField("x+y", IntegerType, true) :: StructField(
+        "!@#$%^&*()",
+        StringType,
+        true) :: StructField("1_2.345<>:\"", StringType, true) :: Nil)
   )
   // Empty struct.
   checkDataType("strUCt<>", StructType(Nil))

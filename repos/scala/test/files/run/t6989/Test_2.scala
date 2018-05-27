@@ -26,11 +26,11 @@ package object foo {
   def printSymbolDetails(sym: Symbol): Unit = {
     def stableSignature(sym: Symbol) = sym.info match {
       case ClassInfoType(_, _, _) => "ClassInfoType(...)"
-      case tpe => tpe.toString
+      case tpe                    => tpe.toString
     }
     println("============")
     println(
-        s"sym = $sym, signature = ${stableSignature(sym)}, owner = ${sym.owner}")
+      s"sym = $sym, signature = ${stableSignature(sym)}, owner = ${sym.owner}")
     println(s"isPrivate = ${sym.isPrivate}")
     println(s"isProtected = ${sym.isProtected}")
     println(s"isPublic = ${sym.isPublic}")

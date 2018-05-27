@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -42,7 +42,9 @@ import scalaz.syntax.monad._
 import scalaz.syntax.comonad._
 
 trait FSLibSpecs[M[+ _]]
-    extends Specification with FSLibModule[M] with TestColumnarTableModule[M] {
+    extends Specification
+    with FSLibModule[M]
+    with TestColumnarTableModule[M] {
   self =>
   import trans._
   import constants._
@@ -59,14 +61,14 @@ trait FSLibSpecs[M[+ _]]
   lazy val yggConfig = new YggConfig
 
   lazy val projectionMetadata: Map[Path, Map[ColumnRef, Long]] = Map(
-      Path("/foo/bar1/baz/quux1") -> Map(
-          ColumnRef(CPath.Identity, CString) -> 10L),
-      Path("/foo/bar2/baz/quux1") -> Map(
-          ColumnRef(CPath.Identity, CString) -> 20L),
-      Path("/foo/bar2/baz/quux2") -> Map(
-          ColumnRef(CPath.Identity, CString) -> 30L),
-      Path("/foo2/bar1/baz/quux1") -> Map(
-          ColumnRef(CPath.Identity, CString) -> 40L)
+    Path("/foo/bar1/baz/quux1") -> Map(
+      ColumnRef(CPath.Identity, CString) -> 10L),
+    Path("/foo/bar2/baz/quux1") -> Map(
+      ColumnRef(CPath.Identity, CString) -> 20L),
+    Path("/foo/bar2/baz/quux2") -> Map(
+      ColumnRef(CPath.Identity, CString) -> 30L),
+    Path("/foo2/bar1/baz/quux1") -> Map(
+      ColumnRef(CPath.Identity, CString) -> 40L)
   )
 
   val vfs = new StubVFSMetadata[M](projectionMetadata)
@@ -79,21 +81,28 @@ trait FSLibSpecs[M[+ _]]
 
   val testAPIKey = "testAPIKey"
   def testAccount =
-    AccountDetails("00001",
-                   "test@email.com",
-                   new DateTime,
-                   "testAPIKey",
-                   Path.Root,
-                   AccountPlan.Free)
+    AccountDetails(
+      "00001",
+      "test@email.com",
+      new DateTime,
+      "testAPIKey",
+      Path.Root,
+      AccountPlan.Free)
   val defaultEvaluationContext = EvaluationContext(
-      testAPIKey, testAccount, Path.Root, Path.Root, new DateTime)
+    testAPIKey,
+    testAccount,
+    Path.Root,
+    Path.Root,
+    new DateTime)
   val defaultMorphContext = MorphContext(
-      defaultEvaluationContext, new MorphLogger {
-    def info(msg: String): M[Unit] = M.point(())
-    def warn(msg: String): M[Unit] = M.point(())
-    def error(msg: String): M[Unit] = M.point(())
-    def die(): M[Unit] = M.point(sys.error("MorphContext#die()"))
-  })
+    defaultEvaluationContext,
+    new MorphLogger {
+      def info(msg: String): M[Unit] = M.point(())
+      def warn(msg: String): M[Unit] = M.point(())
+      def error(msg: String): M[Unit] = M.point(())
+      def die(): M[Unit] = M.point(sys.error("MorphContext#die()"))
+    }
+  )
 
   def runExpansion(table: Table): List[JValue] = {
     expandGlob(table, defaultMorphContext)
@@ -139,9 +148,10 @@ trait FSLibSpecs[M[+ _]]
 
     "expand multiple globbed segments" in {
       val table = pathTable("/foo/*/baz/*")
-      val expected: List[JValue] = List(JString("/foo/bar1/baz/quux1/"),
-                                        JString("/foo/bar2/baz/quux1/"),
-                                        JString("/foo/bar2/baz/quux2/"))
+      val expected: List[JValue] = List(
+        JString("/foo/bar1/baz/quux1/"),
+        JString("/foo/bar2/baz/quux1/"),
+        JString("/foo/bar2/baz/quux2/"))
       runExpansion(table) must_== expected
     }
   }

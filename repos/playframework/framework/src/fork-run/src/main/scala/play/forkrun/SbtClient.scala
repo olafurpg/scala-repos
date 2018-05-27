@@ -41,7 +41,8 @@ class SbtClient(baseDirectory: File, log: Logger, logEvents: Boolean)
   }
 
   def awaitingDaemon(
-      client: ActorRef, pending: Seq[SbtRequest] = Seq.empty): Receive = {
+      client: ActorRef,
+      pending: Seq[SbtRequest] = Seq.empty): Receive = {
     case Terminated(`client`) => shutdownWithClient(client)
     case SbtClientProxy.DaemonSet =>
       if (logEvents) {
@@ -72,12 +73,15 @@ class SbtClient(baseDirectory: File, log: Logger, logEvents: Boolean)
     case Terminated(`client`) => shutdownWithClient(client)
     case Execute(input) =>
       client ! SbtClientProxy.RequestExecution.ByCommandOrTask(
-          input, interaction = None, sendTo = self)
+        input,
+        interaction = None,
+        sendTo = self)
     case request @ Request(key, sendTo) =>
       val name = java.net.URLEncoder.encode(key, "utf-8")
       val task =
         context.child(name) getOrElse context.actorOf(
-            SbtTask.props(key, client), name)
+          SbtTask.props(key, client),
+          name)
       task ! request
     case Shutdown => shutdownWithClient(client)
   }
@@ -86,7 +90,7 @@ class SbtClient(baseDirectory: File, log: Logger, logEvents: Boolean)
     requests foreach { request =>
       request match {
         case Request(_, sendTo) => sendTo ! Failed(error)
-        case _ => // ignore
+        case _                  => // ignore
       }
     }
     context become broken(error)
@@ -94,7 +98,7 @@ class SbtClient(baseDirectory: File, log: Logger, logEvents: Boolean)
 
   def broken(error: Throwable): Receive = {
     case request: Request => request.sendTo ! Failed(error)
-    case Shutdown => shutdown()
+    case Shutdown         => shutdown()
   }
 
   def shutdownWithClient(client: ActorRef): Unit = {
@@ -169,7 +173,9 @@ class SbtTask(name: String, client: ActorRef) extends Actor {
     case request: Request =>
       if (requests.isEmpty)
         client ! SbtClientProxy.RequestExecution.ByScopedKey(
-            key, interaction = None, sendTo = self)
+          key,
+          interaction = None,
+          sendTo = self)
       context become active(key, requests :+ request)
     case SbtClientProxy.ExecutionId(Success(tid), _) => // ignore
     case SbtClientProxy.ExecutionId(Failure(error), _) =>

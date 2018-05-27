@@ -25,12 +25,15 @@ class SliceMatrixTest extends FunSuite {
 
     val tempDM = DenseMatrix.tabulate(5, 5)((x: Int, y: Int) => x + y * 10)
 
-    assert(tempDM(0 to 1, 3) == DenseVector(30, 31),
-           "Failed> tempDM( 0 to 1, 3 ) = " + tempDM(0 to 1, 3))
-    assert(tempDM(3 to -1, 3) == DenseVector(33, 34),
-           "Failed> tempDM( 3 to -1, 3 ) =  " + tempDM(3 to -1, 3))
-    assert(tempDM(-2 to -1, 3) == DenseVector(33, 34),
-           "Failed> tempDM( -2 to -1, 3 ) =  " + tempDM(-2 to -1, 3))
+    assert(
+      tempDM(0 to 1, 3) == DenseVector(30, 31),
+      "Failed> tempDM( 0 to 1, 3 ) = " + tempDM(0 to 1, 3))
+    assert(
+      tempDM(3 to -1, 3) == DenseVector(33, 34),
+      "Failed> tempDM( 3 to -1, 3 ) =  " + tempDM(3 to -1, 3))
+    assert(
+      tempDM(-2 to -1, 3) == DenseVector(33, 34),
+      "Failed> tempDM( -2 to -1, 3 ) =  " + tempDM(-2 to -1, 3))
     intercept[IllegalArgumentException] { tempDM(-2 until 5, 3) }
     assert(tempDM(-2, 3) == 33, "Failed> tempDM( -2, 3 ) =  " + tempDM(-2, 3))
     assert(tempDM(0, -5) == 0, "Failed> tempDM( 0, -5 ) =  " + tempDM(0, -5))

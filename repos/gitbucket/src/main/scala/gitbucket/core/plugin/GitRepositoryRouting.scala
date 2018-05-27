@@ -11,16 +11,23 @@ import gitbucket.core.service.SystemSettingsService.SystemSettings
   * @param filter the filter for request to the Git repository which is defined by this routing
   */
 case class GitRepositoryRouting(
-    urlPattern: String, localPath: String, filter: GitRepositoryFilter) {
+    urlPattern: String,
+    localPath: String,
+    filter: GitRepositoryFilter) {
 
   def this(urlPattern: String, localPath: String) = {
-    this(urlPattern, localPath, new GitRepositoryFilter() {
-      def filter(repositoryName: String,
-                 userName: Option[String],
-                 settings: SystemSettings,
-                 isUpdating: Boolean)(implicit session: Session): Boolean =
-        true
-    })
+    this(
+      urlPattern,
+      localPath,
+      new GitRepositoryFilter() {
+        def filter(
+            repositoryName: String,
+            userName: Option[String],
+            settings: SystemSettings,
+            isUpdating: Boolean)(implicit session: Session): Boolean =
+          true
+      }
+    )
   }
 }
 
@@ -39,8 +46,9 @@ trait GitRepositoryFilter {
     * @param session the database session
     * @return true if allow accessing to repository, otherwise false.
     */
-  def filter(path: String,
-             userName: Option[String],
-             settings: SystemSettings,
-             isUpdating: Boolean)(implicit session: Session): Boolean
+  def filter(
+      path: String,
+      userName: Option[String],
+      settings: SystemSettings,
+      isUpdating: Boolean)(implicit session: Session): Boolean
 }

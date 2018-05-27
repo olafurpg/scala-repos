@@ -1,7 +1,10 @@
 package breeze.integrate
 
 import breeze.linalg._
-import org.apache.commons.math3.ode.{AbstractIntegrator, FirstOrderDifferentialEquations}
+import org.apache.commons.math3.ode.{
+  AbstractIntegrator,
+  FirstOrderDifferentialEquations
+}
 
 trait ApacheOdeIntegrator extends OdeIntegrator {
 
@@ -21,7 +24,9 @@ trait ApacheOdeIntegrator extends OdeIntegrator {
       override val getDimension = y0.length
 
       override def computeDerivatives(
-          t: Double, y: Array[Double], yDot: Array[Double]): Unit =
+          t: Double,
+          y: Array[Double],
+          yDot: Array[Double]): Unit =
         f(DenseVector(y), t).toArray.copyToArray(yDot)
     }
 
@@ -30,7 +35,11 @@ trait ApacheOdeIntegrator extends OdeIntegrator {
     for (i <- 1 until t.length) {
       val result: Array[Double] = new Array(y0.length)
       inner.integrate(
-          equations, t(i - 1), finalStates(i - 1).toArray, t(i), result)
+        equations,
+        t(i - 1),
+        finalStates(i - 1).toArray,
+        t(i),
+        result)
       finalStates(i) = DenseVector(result)
     }
 

@@ -5,13 +5,20 @@ import java.io._
 import java.security.MessageDigest
 import java.util
 
-import com.intellij.execution.application.{ApplicationConfiguration, ApplicationConfigurationType}
+import com.intellij.execution.application.{
+  ApplicationConfiguration,
+  ApplicationConfigurationType
+}
 import com.intellij.ide.highlighter.{ModuleFileType, ProjectFileType}
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.newvfs.impl.VfsRootAccess
 import com.intellij.openapi.vfs.{LocalFileSystem, VfsUtil}
-import com.intellij.testFramework.{PlatformTestCase, PsiTestUtil, UsefulTestCase}
+import com.intellij.testFramework.{
+  PlatformTestCase,
+  PsiTestUtil,
+  UsefulTestCase
+}
 import org.jetbrains.plugins.scala.extensions.inWriteAction
 import org.jetbrains.plugins.scala.util.TestUtils
 import org.junit.Assert
@@ -42,11 +49,10 @@ abstract class ScalaDebuggerTestBase extends ScalaCompilerTestBase {
       if (testDataProjectPath.exists()) FileUtil.delete(testDataProjectPath)
     }
 
-    UsefulTestCase.edt(
-        new Runnable {
+    UsefulTestCase.edt(new Runnable {
 
       def run() {
-        ScalaDebuggerTestBase. super.setUp()
+        ScalaDebuggerTestBase.super.setUp()
         checkOrAddAllSourceFiles()
         addScalaSdk()
         addOtherLibraries()
@@ -60,7 +66,9 @@ abstract class ScalaDebuggerTestBase extends ScalaCompilerTestBase {
   protected def addOtherLibraries()
 
   protected def addIvyCacheLibrary(
-      libraryName: String, libraryPath: String, jarNames: String*) {
+      libraryName: String,
+      libraryPath: String,
+      jarNames: String*) {
     val libsPath = TestUtils.getIvyCachePath
     val pathExtended = s"$libsPath/$libraryPath/"
     VfsRootAccess.allowRootAccess(pathExtended)
@@ -75,8 +83,9 @@ abstract class ScalaDebuggerTestBase extends ScalaCompilerTestBase {
   }
 
   override def getIprFile: File = {
-    val file = new File(testDataBasePath,
-                        testClassName + ProjectFileType.DOT_DEFAULT_EXTENSION)
+    val file = new File(
+      testDataBasePath,
+      testClassName + ProjectFileType.DOT_DEFAULT_EXTENSION)
     FileUtil.createIfDoesntExist(file)
     file
   }
@@ -98,7 +107,9 @@ abstract class ScalaDebuggerTestBase extends ScalaCompilerTestBase {
 
   protected def getRunProfile(module: Module, className: String) = {
     val configuration: ApplicationConfiguration = new ApplicationConfiguration(
-        "app", module.getProject, ApplicationConfigurationType.getInstance)
+      "app",
+      module.getProject,
+      ApplicationConfigurationType.getInstance)
     configuration.setModule(module)
     configuration.setMainClassName(className)
     configuration
@@ -133,8 +144,9 @@ abstract class ScalaDebuggerTestBase extends ScalaCompilerTestBase {
   }
 
   protected def addFileToProject(fileText: String) {
-    Assert.assertTrue(s"File should start with `object $mainClassName`",
-                      fileText.startsWith(s"object $mainClassName"))
+    Assert.assertTrue(
+      s"File should start with `object $mainClassName`",
+      fileText.startsWith(s"object $mainClassName"))
     addFileToProject(mainFileName, fileText)
   }
 
@@ -186,7 +198,7 @@ abstract class ScalaDebuggerTestBase extends ScalaCompilerTestBase {
           if (f.isDirectory) computeForDir(f)
           else {
             result +=
-            (testDataBasePath.toURI.relativize(f.toURI).toString -> md5(f))
+              (testDataBasePath.toURI.relativize(f.toURI).toString -> md5(f))
           }
         }
     }
@@ -236,7 +248,7 @@ abstract class ScalaDebuggerTestBase extends ScalaCompilerTestBase {
   private def sameSourceFiles(): Boolean = {
     def numberOfFiles(dir: File): Int = dir match {
       case d: File if d.isDirectory => d.listFiles().map(numberOfFiles).sum
-      case f => 1
+      case f                        => 1
     }
     val existingFilesNumber = numberOfFiles(srcDir)
     sourceFiles.size == existingFilesNumber && sourceFiles.forall {

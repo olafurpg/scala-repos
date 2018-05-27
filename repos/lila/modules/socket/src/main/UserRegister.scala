@@ -28,7 +28,7 @@ private final class UserRegister extends Actor {
     case SocketEnter(uid, member) =>
       member.userId foreach { userId =>
         users get userId match {
-          case None => users += (userId -> mutable.Map(uid -> member))
+          case None          => users += (userId -> mutable.Map(uid -> member))
           case Some(members) => members += (uid -> member)
         }
       }

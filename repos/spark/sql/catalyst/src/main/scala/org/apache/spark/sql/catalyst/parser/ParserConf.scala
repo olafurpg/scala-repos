@@ -21,6 +21,7 @@ trait ParserConf {
   def supportSQL11ReservedKeywords: Boolean
 }
 
-case class SimpleParserConf(supportQuotedId: Boolean = true,
-                            supportSQL11ReservedKeywords: Boolean = false)
+case class SimpleParserConf(
+    supportQuotedId: Boolean = true,
+    supportSQL11ReservedKeywords: Boolean = false)
     extends ParserConf

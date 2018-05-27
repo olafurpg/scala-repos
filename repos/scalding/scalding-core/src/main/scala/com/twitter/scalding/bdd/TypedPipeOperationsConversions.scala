@@ -10,10 +10,11 @@ trait TypedPipeOperationsConversions {
   trait TypedPipeOperation[TypeOut] {
     def assertPipeSize(pipes: List[TypedPipe[_]], expectedSize: Int) =
       require(
-          pipes.size == expectedSize,
-          "Cannot apply an operation for " + expectedSize + "pipes to " +
+        pipes.size == expectedSize,
+        "Cannot apply an operation for " + expectedSize + "pipes to " +
           pipes.size + " pipes. " +
-          "Verify matching of given and when clauses in test case definition")
+          "Verify matching of given and when clauses in test case definition"
+      )
 
     def apply(pipes: List[TypedPipe[_]]): TypedPipe[TypeOut]
   }
@@ -32,20 +33,24 @@ trait TypedPipeOperationsConversions {
       extends TypedPipeOperation[TypeOut] {
     override def apply(pipes: List[TypedPipe[_]]): TypedPipe[TypeOut] = {
       assertPipeSize(pipes, 2)
-      op(pipes(0).asInstanceOf[TypedPipe[TypeIn1]],
-         pipes(1).asInstanceOf[TypedPipe[TypeIn2]])
+      op(
+        pipes(0).asInstanceOf[TypedPipe[TypeIn1]],
+        pipes(1).asInstanceOf[TypedPipe[TypeIn2]])
     }
   }
 
   class ThreeTypedPipesOperation[TypeIn1, TypeIn2, TypeIn3, TypeOut](
-      op: (TypedPipe[TypeIn1], TypedPipe[TypeIn2],
-      TypedPipe[TypeIn3]) => TypedPipe[TypeOut])
+      op: (
+          TypedPipe[TypeIn1],
+          TypedPipe[TypeIn2],
+          TypedPipe[TypeIn3]) => TypedPipe[TypeOut])
       extends TypedPipeOperation[TypeOut] {
     override def apply(pipes: List[TypedPipe[_]]): TypedPipe[TypeOut] = {
       assertPipeSize(pipes, 3)
-      op(pipes(0).asInstanceOf[TypedPipe[TypeIn1]],
-         pipes(1).asInstanceOf[TypedPipe[TypeIn2]],
-         pipes(2).asInstanceOf[TypedPipe[TypeIn3]])
+      op(
+        pipes(0).asInstanceOf[TypedPipe[TypeIn1]],
+        pipes(1).asInstanceOf[TypedPipe[TypeIn2]],
+        pipes(2).asInstanceOf[TypedPipe[TypeIn3]])
     }
   }
 
@@ -65,9 +70,14 @@ trait TypedPipeOperationsConversions {
     new TwoTypedPipesOperation[TypeIn1, TypeIn2, TypeOut](op)
 
   implicit def fromThreeTypedPipesFunctionToOperation[
-      TypeIn1, TypeIn2, TypeIn3, TypeOut](
-      op: (TypedPipe[TypeIn1], TypedPipe[TypeIn2],
-      TypedPipe[TypeIn3]) => TypedPipe[TypeOut]) =
+      TypeIn1,
+      TypeIn2,
+      TypeIn3,
+      TypeOut](
+      op: (
+          TypedPipe[TypeIn1],
+          TypedPipe[TypeIn2],
+          TypedPipe[TypeIn3]) => TypedPipe[TypeOut]) =
     new ThreeTypedPipesOperation[TypeIn1, TypeIn2, TypeIn3, TypeOut](op)
 
   implicit def fromListOfTypedPipesFunctionToOperation[TypeOut](

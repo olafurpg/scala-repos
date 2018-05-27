@@ -25,10 +25,9 @@ private[jsenv] object Utils {
 
   object OptDeadline {
     def apply(timeout: Duration): OptDeadline = {
-      new OptDeadline(
-          timeout match {
+      new OptDeadline(timeout match {
         case timeout: FiniteDuration => timeout.fromNow
-        case _ => null
+        case _                       => null
       })
     }
   }

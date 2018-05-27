@@ -28,44 +28,46 @@ object CategoricalNaiveBayes {
     * @param points training data points
     */
   def train(points: RDD[LabeledPoint]): CategoricalNaiveBayesModel = {
-    val labelCountFeatureLikelihoods = points.map { p =>
-      (p.label, p.features)
-    }.combineByKey[(Long, Array[Map[String, Long]])](
-          createCombiner = (features: Array[String]) =>
-              {
-              val featureCounts = features.map { feature =>
-                Map[String, Long]().withDefaultValue(0L).updated(feature, 1L)
-              }
-
-              (1L, featureCounts)
-          },
-          mergeValue = (c: (Long, Array[Map[String, Long]]),
-            features: Array[String]) =>
-              {
-              (c._1 + 1L,
-               c._2
-                 .zip(features)
-                 .map {
-                   case (m, feature) =>
-                     m.updated(feature, m(feature) + 1L)
-                 })
-          },
-          mergeCombiners = (c1: (Long, Array[Map[String, Long]]), c2: (Long,
-            Array[Map[String, Long]])) =>
-              {
-              val labelCount1 = c1._1
-              val labelCount2 = c2._1
-              val featureCounts1 = c1._2
-              val featureCounts2 = c2._2
-
-              (labelCount1 + labelCount2,
-               featureCounts1
-                 .zip(featureCounts2)
-                 .map {
-                   case (m1, m2) =>
-                     m2 ++ m2.map { case (k, v) => k -> (v + m2(k)) }
-                 })
+    val labelCountFeatureLikelihoods = points
+      .map { p =>
+        (p.label, p.features)
+      }
+      .combineByKey[(Long, Array[Map[String, Long]])](
+        createCombiner = (features: Array[String]) => {
+          val featureCounts = features.map { feature =>
+            Map[String, Long]().withDefaultValue(0L).updated(feature, 1L)
           }
+
+          (1L, featureCounts)
+        },
+        mergeValue =
+          (c: (Long, Array[Map[String, Long]]), features: Array[String]) => {
+            (
+              c._1 + 1L,
+              c._2
+                .zip(features)
+                .map {
+                  case (m, feature) =>
+                    m.updated(feature, m(feature) + 1L)
+                })
+          },
+        mergeCombiners = (
+            c1: (Long, Array[Map[String, Long]]),
+            c2: (Long, Array[Map[String, Long]])) => {
+          val labelCount1 = c1._1
+          val labelCount2 = c2._1
+          val featureCounts1 = c1._2
+          val featureCounts2 = c2._2
+
+          (
+            labelCount1 + labelCount2,
+            featureCounts1
+              .zip(featureCounts2)
+              .map {
+                case (m1, m2) =>
+                  m2 ++ m2.map { case (k, v) => k -> (v + m2(k)) }
+              })
+        }
       )
       .mapValues {
         case (labelCount, featureCounts) =>
@@ -116,8 +118,7 @@ case class CategoricalNaiveBayesModel(
     */
   def logScore(
       point: LabeledPoint,
-      defaultLikelihood: (Seq[Double]) => Double = ls =>
-          Double.NegativeInfinity
+      defaultLikelihood: (Seq[Double]) => Double = ls => Double.NegativeInfinity
   ): Option[Double] = {
     val label = point.label
     val features = point.features
@@ -132,8 +133,7 @@ case class CategoricalNaiveBayesModel(
   private def logScoreInternal(
       label: String,
       features: Array[String],
-      defaultLikelihood: (Seq[Double]) => Double = ls =>
-          Double.NegativeInfinity
+      defaultLikelihood: (Seq[Double]) => Double = ls => Double.NegativeInfinity
   ): Double = {
 
     val prior = priors(label)
@@ -142,8 +142,8 @@ case class CategoricalNaiveBayesModel(
     val likelihoodScores = features.zip(likelihood).map {
       case (feature, featureLikelihoods) =>
         featureLikelihoods.getOrElse(
-            feature,
-            defaultLikelihood(featureLikelihoods.values.toSeq)
+          feature,
+          defaultLikelihood(featureLikelihoods.values.toSeq)
         )
     }
 
@@ -157,9 +157,15 @@ case class CategoricalNaiveBayesModel(
     *
     */
   def predict(features: Array[String]): String = {
-    priors.keySet.map { label =>
-      (label, logScoreInternal(label, features))
-    }.toSeq.sortBy(_._2)(Ordering.Double.reverse).take(1).head._1
+    priors.keySet
+      .map { label =>
+        (label, logScoreInternal(label, features))
+      }
+      .toSeq
+      .sortBy(_._2)(Ordering.Double.reverse)
+      .take(1)
+      .head
+      ._1
   }
 }
 
@@ -178,7 +184,7 @@ case class LabeledPoint(label: String, features: Array[String]) {
 
   override def equals(other: Any): Boolean = other match {
     case that: LabeledPoint => that.toString == this.toString
-    case _ => false
+    case _                  => false
   }
 
   override def hashCode(): Int = {

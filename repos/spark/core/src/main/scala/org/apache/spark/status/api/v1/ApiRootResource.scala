@@ -53,8 +53,9 @@ private[v1] class ApiRootResource extends UIRootFromServletContext {
   }
 
   @Path("applications/{appId}/{attemptId}/jobs")
-  def getJobs(@PathParam("appId") appId: String,
-              @PathParam("attemptId") attemptId: String): AllJobsResource = {
+  def getJobs(
+      @PathParam("appId") appId: String,
+      @PathParam("attemptId") attemptId: String): AllJobsResource = {
     uiRoot.withSparkUI(appId, Some(attemptId)) { ui =>
       new AllJobsResource(ui)
     }
@@ -75,8 +76,9 @@ private[v1] class ApiRootResource extends UIRootFromServletContext {
   }
 
   @Path("applications/{appId}/{attemptId}/jobs/{jobId: \\d+}")
-  def getJob(@PathParam("appId") appId: String,
-             @PathParam("attemptId") attemptId: String): OneJobResource = {
+  def getJob(
+      @PathParam("appId") appId: String,
+      @PathParam("attemptId") attemptId: String): OneJobResource = {
     uiRoot.withSparkUI(appId, Some(attemptId)) { ui =>
       new OneJobResource(ui)
     }
@@ -122,8 +124,9 @@ private[v1] class ApiRootResource extends UIRootFromServletContext {
   }
 
   @Path("applications/{appId}/{attemptId}/stages/{stageId: \\d+}")
-  def getStage(@PathParam("appId") appId: String,
-               @PathParam("attemptId") attemptId: String): OneStageResource = {
+  def getStage(
+      @PathParam("appId") appId: String,
+      @PathParam("attemptId") attemptId: String): OneStageResource = {
     uiRoot.withSparkUI(appId, Some(attemptId)) { ui =>
       new OneStageResource(ui)
     }
@@ -137,8 +140,9 @@ private[v1] class ApiRootResource extends UIRootFromServletContext {
   }
 
   @Path("applications/{appId}/{attemptId}/storage/rdd")
-  def getRdds(@PathParam("appId") appId: String,
-              @PathParam("attemptId") attemptId: String): AllRDDResource = {
+  def getRdds(
+      @PathParam("appId") appId: String,
+      @PathParam("attemptId") attemptId: String): AllRDDResource = {
     uiRoot.withSparkUI(appId, Some(attemptId)) { ui =>
       new AllRDDResource(ui)
     }
@@ -152,8 +156,9 @@ private[v1] class ApiRootResource extends UIRootFromServletContext {
   }
 
   @Path("applications/{appId}/{attemptId}/storage/rdd/{rddId: \\d+}")
-  def getRdd(@PathParam("appId") appId: String,
-             @PathParam("attemptId") attemptId: String): OneRDDResource = {
+  def getRdd(
+      @PathParam("appId") appId: String,
+      @PathParam("attemptId") attemptId: String): OneRDDResource = {
     uiRoot.withSparkUI(appId, Some(attemptId)) { ui =>
       new OneRDDResource(ui)
     }
@@ -177,16 +182,18 @@ private[spark] object ApiRootResource {
 
   def getServletHandler(uiRoot: UIRoot): ServletContextHandler = {
     val jerseyContext = new ServletContextHandler(
-        ServletContextHandler.NO_SESSIONS)
+      ServletContextHandler.NO_SESSIONS)
     jerseyContext.setContextPath("/api")
     val holder: ServletHolder = new ServletHolder(classOf[ServletContainer])
     holder.setInitParameter(
-        "com.sun.jersey.config.property.resourceConfigClass",
-        "com.sun.jersey.api.core.PackagesResourceConfig")
-    holder.setInitParameter("com.sun.jersey.config.property.packages",
-                            "org.apache.spark.status.api.v1")
-    holder.setInitParameter(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
-                            classOf[SecurityFilter].getCanonicalName)
+      "com.sun.jersey.config.property.resourceConfigClass",
+      "com.sun.jersey.api.core.PackagesResourceConfig")
+    holder.setInitParameter(
+      "com.sun.jersey.config.property.packages",
+      "org.apache.spark.status.api.v1")
+    holder.setInitParameter(
+      ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+      classOf[SecurityFilter].getCanonicalName)
     UIRootFromServletContext.setUiRoot(jerseyContext, uiRoot)
     jerseyContext.addServlet(holder, "/*")
     jerseyContext
@@ -206,9 +213,10 @@ private[spark] trait UIRoot {
     * Write the event logs for the given app to the [[ZipOutputStream]] instance. If attemptId is
     * [[None]], event logs for all attempts of this application will be written out.
     */
-  def writeEventLogs(appId: String,
-                     attemptId: Option[String],
-                     zipStream: ZipOutputStream): Unit = {
+  def writeEventLogs(
+      appId: String,
+      attemptId: Option[String],
+      zipStream: ZipOutputStream): Unit = {
     Response
       .serverError()
       .entity("Event logs are only available through the history server.")
@@ -254,24 +262,24 @@ private[v1] trait UIRootFromServletContext {
 
 private[v1] class NotFoundException(msg: String)
     extends WebApplicationException(
-        new NoSuchElementException(msg),
-        Response
-          .status(Response.Status.NOT_FOUND)
-          .entity(ErrorWrapper(msg))
-          .build()
-      )
+      new NoSuchElementException(msg),
+      Response
+        .status(Response.Status.NOT_FOUND)
+        .entity(ErrorWrapper(msg))
+        .build()
+    )
 
 private[v1] class BadParameterException(msg: String)
     extends WebApplicationException(
-        new IllegalArgumentException(msg),
-        Response
-          .status(Response.Status.BAD_REQUEST)
-          .entity(ErrorWrapper(msg))
-          .build()
-      ) {
+      new IllegalArgumentException(msg),
+      Response
+        .status(Response.Status.BAD_REQUEST)
+        .entity(ErrorWrapper(msg))
+        .build()
+    ) {
   def this(param: String, exp: String, actual: String) = {
     this(
-        raw"""Bad value for parameter "$param".  Expected a $exp, got "$actual"""")
+      raw"""Bad value for parameter "$param".  Expected a $exp, got "$actual"""")
   }
 }
 

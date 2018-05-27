@@ -16,7 +16,9 @@ import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
 class MonitorFilterTest
-    extends FunSuite with MockitoSugar with IntegrationBase {
+    extends FunSuite
+    with MockitoSugar
+    with IntegrationBase {
 
   class MockMonitor extends Monitor {
     def handle(cause: Throwable) = false
@@ -56,7 +58,8 @@ class MonitorFilterTest
   }
 
   class MockSourcedException(underlying: Throwable, name: String)
-      extends RuntimeException(underlying) with SourcedException {
+      extends RuntimeException(underlying)
+      with SourcedException {
     def this(name: String) = this(null, name)
     serviceName = name
   }
@@ -64,8 +67,8 @@ class MonitorFilterTest
   class Helper {
     val monitor = Mockito.spy(new MockMonitor)
     val inner = new MockSourcedException("FakeService1")
-    val outer = new MockSourcedException(
-        inner, SourcedException.UnspecifiedServiceName)
+    val outer =
+      new MockSourcedException(inner, SourcedException.UnspecifiedServiceName)
 
     val mockLogger = Mockito.spy(Logger.getLogger("MockServer"))
     // add handler to redirect and mute output, so that it doesn't show up in the console during a test run.
@@ -74,7 +77,7 @@ class MonitorFilterTest
   }
 
   test(
-      "MonitorFilter should when attached to a server, report source for sourced exceptions") {
+    "MonitorFilter should when attached to a server, report source for sourced exceptions") {
     val h = new Helper
     import h._
 
@@ -109,14 +112,14 @@ class MonitorFilterTest
     verify(monitor, times(0)).handle(inner)
     verify(monitor).handle(outer)
     verify(mockLogger).log(
-        Matchers.eq(Level.SEVERE),
-        Matchers.eq(
-            "The 'FakeService2' service FakeService2 on behalf of FakeService1 threw an exception"),
-        Matchers.eq(outer))
+      Matchers.eq(Level.SEVERE),
+      Matchers.eq(
+        "The 'FakeService2' service FakeService2 on behalf of FakeService1 threw an exception"),
+      Matchers.eq(outer))
   }
 
   test(
-      "MonitorFilter should when attached to a client, report source for sourced exceptions") {
+    "MonitorFilter should when attached to a client, report source for sourced exceptions") {
     val h = new Helper
     import h._
 
@@ -130,9 +133,10 @@ class MonitorFilterTest
     when(preparedFactory.status) thenReturn (Status.Open)
 
     val m = new MockChannel
-    when(m.codec.prepareConnFactory(
-            any[ServiceFactory[String, String]],
-            any[Stack.Params])) thenReturn preparedFactory
+    when(
+      m.codec.prepareConnFactory(
+        any[ServiceFactory[String, String]],
+        any[Stack.Params])) thenReturn preparedFactory
 
     val client =
       m.clientBuilder.monitor(_ => monitor).logger(mockLogger).build()

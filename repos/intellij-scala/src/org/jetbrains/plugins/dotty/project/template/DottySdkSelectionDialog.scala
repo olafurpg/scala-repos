@@ -4,7 +4,11 @@ import javax.swing.JComponent
 
 import com.intellij.util.ui.ListTableModel
 import org.jetbrains.plugins.dotty.project.DottyVersions
-import org.jetbrains.plugins.scala.project.template.{SdkTableModel, SdkChoice, SdkSelectionDialog}
+import org.jetbrains.plugins.scala.project.template.{
+  SdkTableModel,
+  SdkChoice,
+  SdkSelectionDialog
+}
 
 import scala.runtime.BoxedUnit
 
@@ -12,7 +16,8 @@ import scala.runtime.BoxedUnit
   * @author adkozlov
   */
 class DottySdkSelectionDialog(
-    parent: JComponent, provider: () => java.util.List[SdkChoice])
+    parent: JComponent,
+    provider: () => java.util.List[SdkChoice])
     extends SdkSelectionDialog(parent, provider, false) {
 
   setDownloadButtonText("Download latest snapshot")

@@ -12,16 +12,18 @@ import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.Parameter
   * Nikolay.Tropin
   * 2014-04-10
   */
-class ScalaVariableData(val element: ScTypedDefinition,
-                        val isInsideOfElements: Boolean,
-                        val scType: ScType)
+class ScalaVariableData(
+    val element: ScTypedDefinition,
+    val isInsideOfElements: Boolean,
+    val scType: ScType)
     extends {
-  private val parameter = new Parameter(
-      "", None, scType, false, false, false, -1)
-  private val fakeParam = new FakePsiParameter(element.getManager,
-                                               ScalaFileType.SCALA_LANGUAGE,
-                                               parameter,
-                                               element.name)
+  private val parameter =
+    new Parameter("", None, scType, false, false, false, -1)
+  private val fakeParam = new FakePsiParameter(
+    element.getManager,
+    ScalaFileType.SCALA_LANGUAGE,
+    parameter,
+    element.name)
 } with VariableData(fakeParam, new FakePsiType(scType)) {
 
   passAsParameter = true

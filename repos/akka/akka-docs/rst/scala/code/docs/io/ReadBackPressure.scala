@@ -22,7 +22,9 @@ object PullReadingExample {
     override def preStart: Unit =
       //#pull-mode-bind
       IO(Tcp) ! Bind(
-          self, new InetSocketAddress("localhost", 0), pullMode = true)
+        self,
+        new InetSocketAddress("localhost", 0),
+        pullMode = true)
     //#pull-mode-bind
 
     def receive = {
@@ -54,7 +56,7 @@ object PullReadingExample {
 
     def receive = {
       case Received(data) => connection ! Write(data, Ack)
-      case Ack => connection ! ResumeReading
+      case Ack            => connection ! ResumeReading
     }
     //#pull-reading-echo
   }
@@ -65,7 +67,8 @@ class PullReadingSpec extends AkkaSpec with ImplicitSender {
   "demonstrate pull reading" in {
     val probe = TestProbe()
     system.actorOf(
-        Props(classOf[PullReadingExample.Listener], probe.ref), "server")
+      Props(classOf[PullReadingExample.Listener], probe.ref),
+      "server")
     val listenAddress = probe.expectMsgType[InetSocketAddress]
 
     //#pull-mode-connect

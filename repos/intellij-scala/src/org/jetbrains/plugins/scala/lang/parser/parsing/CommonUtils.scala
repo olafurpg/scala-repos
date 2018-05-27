@@ -17,11 +17,11 @@ object CommonUtils {
     val prefixMarker = builder.mark()
     builder.advanceLexer()
     prefixMarker.done(
-        if (isPattern) ScalaElementTypes.INTERPOLATED_PREFIX_PATTERN_REFERENCE
-        else ScalaElementTypes.INTERPOLATED_PREFIX_LITERAL_REFERENCE)
+      if (isPattern) ScalaElementTypes.INTERPOLATED_PREFIX_PATTERN_REFERENCE
+      else ScalaElementTypes.INTERPOLATED_PREFIX_LITERAL_REFERENCE)
     val patternArgsMarker = builder.mark()
     while (!builder.eof() &&
-    builder.getTokenType != ScalaTokenTypes.tINTERPOLATED_STRING_END) {
+           builder.getTokenType != ScalaTokenTypes.tINTERPOLATED_STRING_END) {
       if (builder.getTokenType == ScalaTokenTypes.tINTERPOLATED_STRING_INJECTION) {
         builder.advanceLexer()
         if (isPattern) {
@@ -35,7 +35,9 @@ object CommonUtils {
             else if (builder.getTokenType != ScalaTokenTypes.tRBRACE) {
               builder.error("'}' is expected")
               ParserUtils.parseLoopUntilRBrace(
-                  builder, () => (), braceReported = true)
+                builder,
+                () => (),
+                braceReported = true)
             } else builder.advanceLexer()
           }
         } else if (!BlockExpr.parse(builder)) {

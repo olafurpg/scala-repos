@@ -25,12 +25,13 @@ object RestartFirstSeedNodeMultiJvmSpec extends MultiNodeConfig {
   val seed3 = role("seed3")
 
   commonConfig(
-      debugConfig(on = false)
-        .withFallback(ConfigFactory.parseString("""
+    debugConfig(on = false)
+      .withFallback(ConfigFactory.parseString(
+        """
       akka.cluster.auto-down-unreachable-after = off
       akka.cluster.retry-unsuccessful-join-after = 3s
       """))
-        .withFallback(MultiNodeClusterSpec.clusterConfig))
+      .withFallback(MultiNodeClusterSpec.clusterConfig))
 }
 
 class RestartFirstSeedNodeMultiJvmNode1 extends RestartFirstSeedNodeSpec
@@ -39,7 +40,8 @@ class RestartFirstSeedNodeMultiJvmNode3 extends RestartFirstSeedNodeSpec
 
 abstract class RestartFirstSeedNodeSpec
     extends MultiNodeSpec(RestartFirstSeedNodeMultiJvmSpec)
-    with MultiNodeClusterSpec with ImplicitSender {
+    with MultiNodeClusterSpec
+    with ImplicitSender {
 
   import RestartFirstSeedNodeMultiJvmSpec._
 
@@ -53,22 +55,23 @@ abstract class RestartFirstSeedNodeSpec
     Vector(seedNode1Address, seed2, seed3, missingSeed)
 
   lazy val restartedSeed1System = ActorSystem(
-      system.name,
-      ConfigFactory
-        .parseString("akka.remote.netty.tcp.port=" + seedNodes.head.port.get)
-        .withFallback(system.settings.config))
+    system.name,
+    ConfigFactory
+      .parseString("akka.remote.netty.tcp.port=" + seedNodes.head.port.get)
+      .withFallback(system.settings.config))
 
   override def afterAll(): Unit = {
     runOn(seed1) {
-      shutdown(if (seed1System.whenTerminated.isCompleted) restartedSeed1System
-          else seed1System)
+      shutdown(
+        if (seed1System.whenTerminated.isCompleted) restartedSeed1System
+        else seed1System)
     }
     super.afterAll()
   }
 
   "Cluster seed nodes" must {
     "be able to restart first seed node and join other seed nodes" taggedAs LongRunningTest in within(
-        40 seconds) {
+      40 seconds) {
       // seed1System is a separate ActorSystem, to be able to simulate restart
       // we must transfer its address to seed2 and seed3
       runOn(seed2, seed3) {
@@ -97,8 +100,8 @@ abstract class RestartFirstSeedNodeSpec
         Cluster(seed1System).joinSeedNodes(seedNodes)
         awaitAssert(Cluster(seed1System).readView.members.size should ===(3))
         awaitAssert(
-            Cluster(seed1System).readView.members.map(_.status) should ===(
-                Set(Up)))
+          Cluster(seed1System).readView.members.map(_.status) should ===(
+            Set(Up)))
       }
       runOn(seed2, seed3) {
         cluster.joinSeedNodes(seedNodes)
@@ -117,10 +120,10 @@ abstract class RestartFirstSeedNodeSpec
         Cluster(restartedSeed1System).joinSeedNodes(seedNodes)
         within(20.seconds) {
           awaitAssert(
-              Cluster(restartedSeed1System).readView.members.size should ===(
-                  3))
-          awaitAssert(Cluster(restartedSeed1System).readView.members
-                .map(_.status) should ===(Set(Up)))
+            Cluster(restartedSeed1System).readView.members.size should ===(3))
+          awaitAssert(
+            Cluster(restartedSeed1System).readView.members
+              .map(_.status) should ===(Set(Up)))
         }
       }
       runOn(seed2, seed3) {

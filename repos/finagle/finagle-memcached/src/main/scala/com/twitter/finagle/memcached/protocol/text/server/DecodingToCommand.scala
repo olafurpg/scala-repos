@@ -87,12 +87,12 @@ class DecodingToCommand extends AbstractDecodingToCommand[Command] {
     val commandName = tokens.head
     val args = tokens.tail
     commandName match {
-      case SET => tupled(Set)(validateStorageCommand(args, data))
-      case ADD => tupled(Add)(validateStorageCommand(args, data))
+      case SET     => tupled(Set)(validateStorageCommand(args, data))
+      case ADD     => tupled(Add)(validateStorageCommand(args, data))
       case REPLACE => tupled(Replace)(validateStorageCommand(args, data))
-      case APPEND => tupled(Append)(validateStorageCommand(args, data))
+      case APPEND  => tupled(Append)(validateStorageCommand(args, data))
       case PREPEND => tupled(Prepend)(validateStorageCommand(args, data))
-      case _ => throw new NonexistentCommand(Buf.slowHexString(commandName))
+      case _       => throw new NonexistentCommand(Buf.slowHexString(commandName))
     }
   }
 
@@ -101,14 +101,14 @@ class DecodingToCommand extends AbstractDecodingToCommand[Command] {
     val commandName = tokens.head
     val args = tokens.tail
     commandName match {
-      case GET => Get(args)
-      case GETS => Gets(args)
+      case GET    => Get(args)
+      case GETS   => Gets(args)
       case DELETE => Delete(validateDeleteCommand(args))
-      case INCR => tupled(Incr)(validateArithmeticCommand(args))
-      case DECR => tupled(Decr)(validateArithmeticCommand(args))
-      case QUIT => Quit()
-      case STATS => Stats(args)
-      case _ => throw new NonexistentCommand(Buf.slowHexString(commandName))
+      case INCR   => tupled(Incr)(validateArithmeticCommand(args))
+      case DECR   => tupled(Decr)(validateArithmeticCommand(args))
+      case QUIT   => Quit()
+      case STATS  => Stats(args)
+      case _      => throw new NonexistentCommand(Buf.slowHexString(commandName))
     }
   }
 }

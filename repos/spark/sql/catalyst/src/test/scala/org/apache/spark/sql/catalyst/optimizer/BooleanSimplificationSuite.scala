@@ -31,12 +31,12 @@ class BooleanSimplificationSuite extends PlanTest with PredicateHelper {
   object Optimize extends RuleExecutor[LogicalPlan] {
     val batches =
       Batch("AnalysisNodes", Once, EliminateSubqueryAliases) :: Batch(
-          "Constant Folding",
-          FixedPoint(50),
-          NullPropagation,
-          ConstantFolding,
-          BooleanSimplification,
-          PruneFilters) :: Nil
+        "Constant Folding",
+        FixedPoint(50),
+        NullPropagation,
+        ConstantFolding,
+        BooleanSimplification,
+        PruneFilters) :: Nil
   }
 
   val testRelation = LocalRelation('a.int, 'b.int, 'c.int, 'd.string)
@@ -51,17 +51,19 @@ class BooleanSimplificationSuite extends PlanTest with PredicateHelper {
   test("a && a => a") {
     checkCondition(Literal(1) < 'a && Literal(1) < 'a, Literal(1) < 'a)
     checkCondition(
-        Literal(1) < 'a && Literal(1) < 'a && Literal(1) < 'a, Literal(1) < 'a)
+      Literal(1) < 'a && Literal(1) < 'a && Literal(1) < 'a,
+      Literal(1) < 'a)
   }
 
   test("a || a => a") {
     checkCondition(Literal(1) < 'a || Literal(1) < 'a, Literal(1) < 'a)
     checkCondition(
-        Literal(1) < 'a || Literal(1) < 'a || Literal(1) < 'a, Literal(1) < 'a)
+      Literal(1) < 'a || Literal(1) < 'a || Literal(1) < 'a,
+      Literal(1) < 'a)
   }
 
   test(
-      "(a && b && c && ...) || (a && b && d && ...) || (a && b && e && ...) ...") {
+    "(a && b && c && ...) || (a && b && d && ...) || (a && b && e && ...) ...") {
     checkCondition('b > 3 || 'c > 5, 'b > 3 || 'c > 5)
 
     checkCondition(('a < 2 && 'a > 3 && 'b > 5) || 'a < 2, 'a < 2)
@@ -70,17 +72,17 @@ class BooleanSimplificationSuite extends PlanTest with PredicateHelper {
 
     val input =
       ('a === 'b && 'b > 3 && 'c > 2) || ('a === 'b && 'c < 1 && 'a === 5) ||
-      ('a === 'b && 'b < 5 && 'a > 1)
+        ('a === 'b && 'b < 5 && 'a > 1)
 
     val expected =
       'a === 'b &&
-      (('b > 3 && 'c > 2) || ('c < 1 && 'a === 5) || ('b < 5 && 'a > 1))
+        (('b > 3 && 'c > 2) || ('c < 1 && 'a === 5) || ('b < 5 && 'a > 1))
 
     checkCondition(input, expected)
   }
 
   test(
-      "(a || b || c || ...) && (a || b || d || ...) && (a || b || e || ...) ...") {
+    "(a || b || c || ...) && (a || b || d || ...) && (a || b || e || ...) ...") {
     checkCondition('b > 3 && 'c > 5, 'b > 3 && 'c > 5)
 
     checkCondition(('a < 2 || 'a > 3 || 'b > 5) && 'a < 2, 'a < 2)
@@ -88,11 +90,13 @@ class BooleanSimplificationSuite extends PlanTest with PredicateHelper {
     checkCondition('a < 2 && ('a < 2 || 'a > 3 || 'b > 5), 'a < 2)
 
     checkCondition(
-        ('a < 2 || 'b > 3) && ('a < 2 || 'c > 5), 'a < 2 || ('b > 3 && 'c > 5))
+      ('a < 2 || 'b > 3) && ('a < 2 || 'c > 5),
+      'a < 2 || ('b > 3 && 'c > 5))
 
-    checkCondition(('a === 'b || 'b > 3) && ('a === 'b || 'a > 3) &&
-                   ('a === 'b || 'a < 5),
-                   'a === 'b || 'b > 3 && 'a > 3 && 'a < 5)
+    checkCondition(
+      ('a === 'b || 'b > 3) && ('a === 'b || 'a > 3) &&
+        ('a === 'b || 'a < 5),
+      'a === 'b || 'b > 3 && 'a > 3 && 'a < 5)
   }
 
   test("a && (!a || b)") {
@@ -116,25 +120,25 @@ class BooleanSimplificationSuite extends PlanTest with PredicateHelper {
   }
 
   private val caseInsensitiveAnalyzer = new Analyzer(
-      EmptyCatalog,
-      EmptyFunctionRegistry,
-      new SimpleCatalystConf(caseSensitiveAnalysis = false))
+    EmptyCatalog,
+    EmptyFunctionRegistry,
+    new SimpleCatalystConf(caseSensitiveAnalysis = false))
 
   test("(a && b) || (a && c) => a && (b || c) when case insensitive") {
     val plan = caseInsensitiveAnalyzer.execute(
-        testRelation.where(('a > 2 && 'b > 3) || ('A > 2 && 'b < 5)))
+      testRelation.where(('a > 2 && 'b > 3) || ('A > 2 && 'b < 5)))
     val actual = Optimize.execute(plan)
     val expected = caseInsensitiveAnalyzer.execute(
-        testRelation.where('a > 2 && ('b > 3 || 'b < 5)))
+      testRelation.where('a > 2 && ('b > 3 || 'b < 5)))
     comparePlans(actual, expected)
   }
 
   test("(a || b) && (a || c) => a || (b && c) when case insensitive") {
     val plan = caseInsensitiveAnalyzer.execute(
-        testRelation.where(('a > 2 || 'b > 3) && ('A > 2 || 'b < 5)))
+      testRelation.where(('a > 2 || 'b > 3) && ('A > 2 || 'b < 5)))
     val actual = Optimize.execute(plan)
     val expected = caseInsensitiveAnalyzer.execute(
-        testRelation.where('a > 2 || ('b > 3 && 'b < 5)))
+      testRelation.where('a > 2 || ('b > 3 && 'b < 5)))
     comparePlans(actual, expected)
   }
 }

@@ -26,13 +26,13 @@ object O {
   implicit def view1(x: String): Ordered[String] = new Ordered[String] {
     def compareTo[b >: String <% Ordered[b]](y: b): Int = y match {
       case y1: String => x compareTo y1
-      case _ => -(y compareTo x)
+      case _          => -(y compareTo x)
     }
   }
   implicit def view2(x: Char): Ordered[Char] = new Ordered[Char] {
     def compareTo[b >: Char <% Ordered[b]](y: b): Int = y match {
       case y1: Char => x - y1
-      case _ => -(y compareTo x)
+      case _        => -(y compareTo x)
     }
   }
 
@@ -40,7 +40,7 @@ object O {
     new Ordered[List[a]] {
       def compareTo[b >: List[a] <% Ordered[b]](y: b): Int = y match {
         case y1: List[a] => compareLists(x, y1)
-        case _ => -(y compareTo x)
+        case _           => -(y compareTo x)
       }
       private def compareLists(xs: List[a], ys: List[a]): Int = {
         if (xs.isEmpty && ys.isEmpty) 0
@@ -79,7 +79,7 @@ class Node[a <% Ordered[a]](elem: a, l: Tree[a], r: Tree[a]) extends Tree[a] {
 case class Str(elem: String) extends Ordered[Str] {
   def compareTo[b >: Str <% Ordered[b]](that: b): Int = that match {
     case that1: Str => this.elem compareTo that1.elem
-    case _ => -(that compareTo this)
+    case _          => -(that compareTo this)
   }
 }
 

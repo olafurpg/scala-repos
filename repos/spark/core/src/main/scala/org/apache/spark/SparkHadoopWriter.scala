@@ -39,7 +39,8 @@ import org.apache.spark.util.SerializableJobConf
   * a filename to write to, etc, exactly like in a Hadoop MapReduce job.
   */
 private[spark] class SparkHadoopWriter(jobConf: JobConf)
-    extends Logging with Serializable {
+    extends Logging
+    with Serializable {
 
   private val now = new Date()
   private val conf = new SerializableJobConf(jobConf)
@@ -67,11 +68,11 @@ private[spark] class SparkHadoopWriter(jobConf: JobConf)
   def setup(jobid: Int, splitid: Int, attemptid: Int) {
     setIDs(jobid, splitid, attemptid)
     HadoopRDD.addLocalConfiguration(
-        new SimpleDateFormat("yyyyMMddHHmm").format(now),
-        jobid,
-        splitID,
-        attemptID,
-        conf.value)
+      new SimpleDateFormat("yyyyMMddHHmm").format(now),
+      jobid,
+      splitID,
+      attemptID,
+      conf.value)
   }
 
   def open() {
@@ -91,7 +92,10 @@ private[spark] class SparkHadoopWriter(jobConf: JobConf)
 
     getOutputCommitter().setupTask(getTaskContext())
     writer = getOutputFormat().getRecordWriter(
-        fs, conf.value, outputName, Reporter.NULL)
+      fs,
+      conf.value,
+      outputName,
+      Reporter.NULL)
   }
 
   def write(key: AnyRef, value: AnyRef) {
@@ -108,7 +112,10 @@ private[spark] class SparkHadoopWriter(jobConf: JobConf)
 
   def commit() {
     SparkHadoopMapRedUtil.commitTask(
-        getOutputCommitter(), getTaskContext(), jobID, splitID)
+      getOutputCommitter(),
+      getTaskContext(),
+      jobID,
+      splitID)
   }
 
   def commitJob() {
@@ -149,7 +156,8 @@ private[spark] class SparkHadoopWriter(jobConf: JobConf)
   }
 
   protected def newTaskAttemptContext(
-      conf: JobConf, attemptId: TaskAttemptID): TaskAttemptContext = {
+      conf: JobConf,
+      attemptId: TaskAttemptID): TaskAttemptContext = {
     new TaskAttemptContextImpl(conf, attemptId)
   }
 
@@ -158,10 +166,12 @@ private[spark] class SparkHadoopWriter(jobConf: JobConf)
     splitID = splitid
     attemptID = attemptid
 
-    jID = new SerializableWritable[JobID](
-        SparkHadoopWriter.createJobID(now, jobid))
-    taID = new SerializableWritable[TaskAttemptID](new TaskAttemptID(
-            new TaskID(jID.value, TaskType.MAP, splitID), attemptID))
+    jID =
+      new SerializableWritable[JobID](SparkHadoopWriter.createJobID(now, jobid))
+    taID = new SerializableWritable[TaskAttemptID](
+      new TaskAttemptID(
+        new TaskID(jID.value, TaskType.MAP, splitID),
+        attemptID))
   }
 }
 

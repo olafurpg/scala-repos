@@ -101,8 +101,8 @@ abstract class TailCalls extends Transform {
       val failPos = failPositions(ctx)
 
       reporter.error(
-          failPos,
-          s"could not optimize @tailrec annotated $method: $failReason")
+        failPos,
+        s"could not optimize @tailrec annotated $method: $failReason")
     }
 
     /** Has the label been accessed? Then its symbol is in this set. */
@@ -132,9 +132,10 @@ abstract class TailCalls extends Transform {
             .format(
               method.ownerChain.mkString(" -> "),
               currentClass.ownerChain.mkString(" -> ")
-          )
+            )
         logResult(msg)(
-            method.newValue(nme.THIS, pos, SYNTHETIC) setInfo currentClass.typeOfThis)
+          method
+            .newValue(nme.THIS, pos, SYNTHETIC) setInfo currentClass.typeOfThis)
       }
       override def toString =
         s"${method.name} tparams=$tparams tailPos=$tailPos label=$label label info=${label.info}"
@@ -177,7 +178,8 @@ abstract class TailCalls extends Transform {
         val label = method.newLabel(newTermName("_" + method.name), method.pos)
         val thisParam = method.newSyntheticValueParam(currentClass.typeOfThis)
         label setInfo MethodType(
-            thisParam :: method.tpe.params, method.tpe_*.finalResultType)
+          thisParam :: method.tpe.params,
+          method.tpe_*.finalResultType)
         if (isEligible) label substInfo (method.tpe.typeParams, tparams)
 
         label
@@ -186,13 +188,14 @@ abstract class TailCalls extends Transform {
         val receiver = t.symbol
 
         ((receiver != null) && receiver.isMethod &&
-            (method.name == receiver.name) &&
-            (method.enclClass isSubClass receiver.enclClass))
+        (method.name == receiver.name) &&
+        (method.enclClass isSubClass receiver.enclClass))
       }
       def containsRecursiveCall(t: Tree) = t exists isRecursiveCall
     }
     class ClonedTailContext(
-        val that: TailContext, override val tailPos: Boolean)
+        val that: TailContext,
+        override val tailPos: Boolean)
         extends TailContext {
       def method = that.method
       def tparams = that.tparams
@@ -218,7 +221,8 @@ abstract class TailCalls extends Transform {
     def transform(tree: Tree, nctx: TailContext): Tree = {
       val saved = ctx
       ctx = nctx
-      try transform(tree) finally this.ctx = saved
+      try transform(tree)
+      finally this.ctx = saved
     }
 
     def yesTailTransform(tree: Tree): Tree =
@@ -232,14 +236,15 @@ abstract class TailCalls extends Transform {
 
     override def transform(tree: Tree): Tree = {
       /* A possibly polymorphic apply to be considered for tail call transformation. */
-      def rewriteApply(target: Tree,
-                       fun: Tree,
-                       targs: List[Tree],
-                       args: List[Tree],
-                       mustTransformArgs: Boolean = true) = {
+      def rewriteApply(
+          target: Tree,
+          fun: Tree,
+          targs: List[Tree],
+          args: List[Tree],
+          mustTransformArgs: Boolean = true) = {
         val receiver: Tree = fun match {
           case Select(qual, _) => qual
-          case _ => EmptyTree
+          case _               => EmptyTree
         }
         def receiverIsSame = ctx.enclosingType.widen =:= receiver.tpe.widen
         def receiverIsSuper = ctx.enclosingType.widen <:< receiver.tpe.widen
@@ -254,7 +259,7 @@ abstract class TailCalls extends Transform {
          */
         def fail(reason: String) = {
           debuglog(
-              "Cannot rewrite recursive call at: " + fun.pos + " because: " +
+            "Cannot rewrite recursive call at: " + fun.pos + " because: " +
               reason)
           if (ctx.isMandatory) failReasons(ctx) = reason
           treeCopy.Apply(tree, noTailTransform(target), transformArgs)
@@ -266,11 +271,11 @@ abstract class TailCalls extends Transform {
         }
         def rewriteTailCall(recv: Tree): Tree = {
           debuglog(
-              "Rewriting tail recursive call:  " + fun.pos.lineContent.trim)
+            "Rewriting tail recursive call:  " + fun.pos.lineContent.trim)
           accessed += ctx.label
           typedPos(fun.pos) {
             val args = mapWithIndex(transformArgs)((arg, i) =>
-                  mkAttributedCastHack(arg, ctx.label.info.params(i + 1).tpe))
+              mkAttributedCastHack(arg, ctx.label.info.params(i + 1).tpe))
             Apply(Ident(ctx.label), noTailTransform(recv) :: args)
           }
         }
@@ -310,11 +315,11 @@ abstract class TailCalls extends Transform {
           val newCtx = new DefDefTailContext(dd)
           if (newCtx.isMandatory && !(newCtx containsRecursiveCall rhs0))
             reporter.error(
-                tree.pos,
-                "@tailrec annotated method contains no recursive calls")
+              tree.pos,
+              "@tailrec annotated method contains no recursive calls")
 
           debuglog(
-              s"Considering $name for tailcalls, with labels in tailpos: ${newCtx.tailLabels}")
+            s"Considering $name for tailcalls, with labels in tailpos: ${newCtx.tailLabels}")
           val newRHS = transform(rhs0, newCtx)
 
           deriveDefDef(tree) { rhs =>
@@ -324,22 +329,22 @@ abstract class TailCalls extends Transform {
                */
               if (newCtx.isMandatory) {
                 for (t @ Apply(fn, _) <- newRHS;
-                                            if fn.symbol == newCtx.method) {
-                      failPositions(newCtx) = t.pos
-                      tailrecFailure(newCtx)
-                    }
+                     if fn.symbol == newCtx.method) {
+                  failPositions(newCtx) = t.pos
+                  tailrecFailure(newCtx)
+                }
               }
               val newThis = newCtx.newThis(tree.pos)
               val vpSyms = vparamss0.flatten map (_.symbol)
 
               typedPos(tree.pos)(
-                  Block(
-                      List(ValDef(newThis, This(currentClass))),
-                      LabelDef(newCtx.label,
-                               newThis :: vpSyms,
-                               mkAttributedCastHack(
-                                   newRHS, newCtx.label.tpe.resultType))
-                  ))
+                Block(
+                  List(ValDef(newThis, This(currentClass))),
+                  LabelDef(
+                    newCtx.label,
+                    newThis :: vpSyms,
+                    mkAttributedCastHack(newRHS, newCtx.label.tpe.resultType))
+                ))
             } else {
               if (newCtx.isMandatory && (newCtx containsRecursiveCall newRHS))
                 tailrecFailure(newCtx)
@@ -376,29 +381,33 @@ abstract class TailCalls extends Transform {
           deriveCaseDef(tree)(transform)
 
         case If(cond, thenp, elsep) =>
-          treeCopy.If(tree,
-                      noTailTransform(cond),
-                      transform(thenp),
-                      transform(elsep))
+          treeCopy.If(
+            tree,
+            noTailTransform(cond),
+            transform(thenp),
+            transform(elsep))
 
         case Match(selector, cases) =>
-          treeCopy.Match(tree,
-                         noTailTransform(selector),
-                         transformTrees(cases).asInstanceOf[List[CaseDef]])
+          treeCopy.Match(
+            tree,
+            noTailTransform(selector),
+            transformTrees(cases).asInstanceOf[List[CaseDef]])
 
         case Try(block, catches, finalizer @ EmptyTree) =>
           // SI-1672 Catches are in tail position when there is no finalizer
-          treeCopy.Try(tree,
-                       noTailTransform(block),
-                       transformTrees(catches).asInstanceOf[List[CaseDef]],
-                       EmptyTree)
+          treeCopy.Try(
+            tree,
+            noTailTransform(block),
+            transformTrees(catches).asInstanceOf[List[CaseDef]],
+            EmptyTree)
 
         case Try(block, catches, finalizer) =>
           // no calls inside a try are in tail position if there is a finalizer, but keep recursing for nested functions
-          treeCopy.Try(tree,
-                       noTailTransform(block),
-                       noTailTransforms(catches).asInstanceOf[List[CaseDef]],
-                       noTailTransform(finalizer))
+          treeCopy.Try(
+            tree,
+            noTailTransform(block),
+            noTailTransforms(catches).asInstanceOf[List[CaseDef]],
+            noTailTransform(finalizer))
 
         case Apply(tapply @ TypeApply(fun, targs), vargs) =>
           rewriteApply(tapply, fun, targs, vargs)
@@ -454,7 +463,8 @@ abstract class TailCalls extends Transform {
     def traverse(tree: Tree, maybeTailNew: Boolean): Unit = {
       val saved = maybeTail
       maybeTail = maybeTailNew
-      try traverse(tree) finally maybeTail = saved
+      try traverse(tree)
+      finally maybeTail = saved
     }
 
     def traverseNoTail(tree: Tree) = traverse(tree, maybeTailNew = false)
@@ -517,7 +527,7 @@ abstract class TailCalls extends Transform {
 
       case Apply(_, _) | EmptyTree | Super(_, _) | This(_) | Select(_, _) |
           Ident(_) | Literal(_) | Function(_, _) | TypeTree() =>
-      case _ => super.traverse(tree)
+      case _                                                  => super.traverse(tree)
     }
   }
 }

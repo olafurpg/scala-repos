@@ -21,20 +21,23 @@ object TypeCheckerWithExplicitTypes {
   // the real type check function, which works with the type environment.
   def typeCheck(expr: Exp, env: TypeEnv = predef): Type = expr match {
     case Lit(v) => success(litToTy(v))
-    case Id(x) => find(x, env)
+    case Id(x)  => find(x, env)
     // make sure the first branch is a boolean and then
     // make sure the second and third branches have the same type
     case If(tst, texp, fexp) =>
       val t = typeCheck(tst, env)
       val _ = compare(
-          t,
-          boolT,
-          boolT,
-          "error: if required bool in test position, but got: " + t)
+        t,
+        boolT,
+        boolT,
+        "error: if required bool in test position, but got: " + t)
       val lt = typeCheck(texp, env)
       val rt = typeCheck(fexp, env)
       val res = compare(
-          lt, rt, lt, "error: if branches not the same type, got: " + (lt, rt))
+        lt,
+        rt,
+        lt,
+        "error: if branches not the same type, got: " + (lt, rt))
       res
     case Fun(arg, argType, body) =>
       val t = typeCheck(body, env + (arg -> argType))
@@ -46,11 +49,12 @@ object TypeCheckerWithExplicitTypes {
       val operandType = typeCheck(operand, env)
       val res = operatorType match {
         case TyLam(argType, resultType) =>
-          compare(argType,
-                  operandType,
-                  resultType,
-                  "function expected arg of type: " + argType + ", but got: " +
-                  operandType)
+          compare(
+            argType,
+            operandType,
+            resultType,
+            "function expected arg of type: " + argType + ", but got: " +
+              operandType)
         case t =>
           typeError("function application expected function, but got: " + t)
       }

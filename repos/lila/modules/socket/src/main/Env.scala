@@ -8,7 +8,9 @@ import actorApi._
 import makeTimeout.short
 
 final class Env(
-    config: Config, system: ActorSystem, scheduler: lila.common.Scheduler) {
+    config: Config,
+    system: ActorSystem,
+    scheduler: lila.common.Scheduler) {
 
   import scala.concurrent.duration._
 
@@ -35,7 +37,8 @@ final class Env(
 object Env {
 
   lazy val current =
-    "socket" boot new Env(config = lila.common.PlayApp loadConfig "socket",
-                          system = lila.common.PlayApp.system,
-                          scheduler = lila.common.PlayApp.scheduler)
+    "socket" boot new Env(
+      config = lila.common.PlayApp loadConfig "socket",
+      system = lila.common.PlayApp.system,
+      scheduler = lila.common.PlayApp.scheduler)
 }

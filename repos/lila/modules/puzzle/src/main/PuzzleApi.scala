@@ -5,13 +5,21 @@ import scala.util.{Try, Success, Failure}
 import org.joda.time.DateTime
 import play.api.libs.json.JsValue
 import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework._
-import reactivemongo.bson.{BSONDocument, BSONInteger, BSONRegex, BSONArray, BSONBoolean}
+import reactivemongo.bson.{
+  BSONDocument,
+  BSONInteger,
+  BSONRegex,
+  BSONArray,
+  BSONBoolean
+}
 
 import lila.db.Types.Coll
 import lila.user.{User, UserRepo}
 
 private[puzzle] final class PuzzleApi(
-    puzzleColl: Coll, attemptColl: Coll, apiToken: String) {
+    puzzleColl: Coll,
+    attemptColl: Coll,
+    apiToken: String) {
 
   import Puzzle.puzzleBSONHandler
 
@@ -46,35 +54,39 @@ private[puzzle] final class PuzzleApi(
           lila.db.Util findNextId puzzleColl flatMap { id =>
             val p = puzzle(id)
             val fenStart = p.fen.split(' ').take(2).mkString(" ")
-            puzzleColl.count(BSONDocument(
-                    "fen" -> BSONRegex(fenStart.replace("/", "\\/"), "")
-                ).some) flatMap {
+            puzzleColl.count(
+              BSONDocument(
+                "fen" -> BSONRegex(fenStart.replace("/", "\\/"), "")
+              ).some) flatMap {
               case 0 =>
                 (puzzleColl insert p) >> {
                   insertPuzzles(rest) map (Success(id) :: _)
                 }
               case _ =>
                 insertPuzzles(rest) map
-                (Failure(new Exception("Duplicate puzzle")) :: _)
+                  (Failure(new Exception("Duplicate puzzle")) :: _)
             }
           }
       }
 
     def export(nb: Int): Fu[List[Puzzle]] =
-      List(true, false).map { mate =>
-        puzzleColl
-          .find(BSONDocument("mate" -> mate))
-          .sort(BSONDocument(Puzzle.BSONFields.voteSum -> -1))
-          .cursor[Puzzle]()
-          .collect[List](nb / 2)
-      }.sequenceFu.map(_.flatten)
+      List(true, false)
+        .map { mate =>
+          puzzleColl
+            .find(BSONDocument("mate" -> mate))
+            .sort(BSONDocument(Puzzle.BSONFields.voteSum -> -1))
+            .cursor[Puzzle]()
+            .collect[List](nb / 2)
+        }
+        .sequenceFu
+        .map(_.flatten)
 
     def disable(id: PuzzleId): Funit =
       puzzleColl
         .update(
-            BSONDocument("_id" -> id),
-            BSONDocument(
-                "$set" -> BSONDocument(Puzzle.BSONFields.vote -> Vote.disable))
+          BSONDocument("_id" -> id),
+          BSONDocument(
+            "$set" -> BSONDocument(Puzzle.BSONFields.vote -> Vote.disable))
         )
         .void
   }
@@ -83,9 +95,10 @@ private[puzzle] final class PuzzleApi(
 
     def find(puzzleId: PuzzleId, userId: String): Fu[Option[Attempt]] =
       attemptColl
-        .find(BSONDocument(
-                Attempt.BSONFields.id -> Attempt.makeId(puzzleId, userId)
-            ))
+        .find(
+          BSONDocument(
+            Attempt.BSONFields.id -> Attempt.makeId(puzzleId, userId)
+          ))
         .one[Attempt]
 
     def vote(a1: Attempt, v: Boolean): Fu[(Puzzle, Attempt)] =
@@ -95,16 +108,16 @@ private[puzzle] final class PuzzleApi(
         case Some(p1) =>
           val p2 = a1.vote match {
             case Some(from) => p1 withVote (_.change(from, v))
-            case None => p1 withVote (_ add v)
+            case None       => p1 withVote (_ add v)
           }
           val a2 = a1.copy(vote = v.some)
           attemptColl.update(
-              BSONDocument("_id" -> a2.id),
-              BSONDocument("$set" -> BSONDocument(
-                      Attempt.BSONFields.vote -> v))) zip puzzleColl.update(
+            BSONDocument("_id" -> a2.id),
+            BSONDocument("$set" -> BSONDocument(Attempt.BSONFields.vote -> v))) zip puzzleColl
+            .update(
               BSONDocument("_id" -> p2.id),
               BSONDocument("$set" -> BSONDocument(
-                      Puzzle.BSONFields.vote -> p2.vote))) map {
+                Puzzle.BSONFields.vote -> p2.vote))) map {
             case _ => p2 -> a2
           }
       }
@@ -112,22 +125,24 @@ private[puzzle] final class PuzzleApi(
     def add(a: Attempt) = attemptColl insert a void
 
     def hasPlayed(user: User, puzzle: Puzzle): Fu[Boolean] =
-      attemptColl.count(BSONDocument(
-              Attempt.BSONFields.id -> Attempt.makeId(puzzle.id, user.id)
-          ).some) map (0 !=)
+      attemptColl.count(
+        BSONDocument(
+          Attempt.BSONFields.id -> Attempt.makeId(puzzle.id, user.id)
+        ).some) map (0 !=)
 
     def playedIds(user: User, max: Int): Fu[BSONArray] =
       attemptColl.distinct(
-          Attempt.BSONFields.puzzleId,
-          BSONDocument(Attempt.BSONFields.userId -> user.id).some) map BSONArray.apply
+        Attempt.BSONFields.puzzleId,
+        BSONDocument(Attempt.BSONFields.userId -> user.id).some) map BSONArray.apply
 
     def hasVoted(user: User): Fu[Boolean] =
       attemptColl
-        .find(BSONDocument(Attempt.BSONFields.userId -> user.id),
-              BSONDocument(
-                  Attempt.BSONFields.vote -> true,
-                  Attempt.BSONFields.id -> false
-              ))
+        .find(
+          BSONDocument(Attempt.BSONFields.userId -> user.id),
+          BSONDocument(
+            Attempt.BSONFields.vote -> true,
+            Attempt.BSONFields.id -> false
+          ))
         .sort(BSONDocument(Attempt.BSONFields.date -> -1))
         .cursor[BSONDocument]()
         .collect[List](5) map {

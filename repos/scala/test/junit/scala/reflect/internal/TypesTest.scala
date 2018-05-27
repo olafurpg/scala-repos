@@ -29,10 +29,8 @@ class TypesTest {
     // Two narrowings of the same refinement end up =:=. This was the root
     // cause of SI-8611. See `narrowUniquely` in `Logic` for the workaround.
     assert(boolWithString1narrow1 =:= boolWithString1narrow2)
-    val uniquelyNarrowed1 = refinedType(
-        boolWithString1narrow1 :: Nil, NoSymbol)
-    val uniquelyNarrowed2 = refinedType(
-        boolWithString1narrow2 :: Nil, NoSymbol)
+    val uniquelyNarrowed1 = refinedType(boolWithString1narrow1 :: Nil, NoSymbol)
+    val uniquelyNarrowed2 = refinedType(boolWithString1narrow2 :: Nil, NoSymbol)
     assert(uniquelyNarrowed1 =:= uniquelyNarrowed2)
   }
 

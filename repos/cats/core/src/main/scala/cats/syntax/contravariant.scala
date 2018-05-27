@@ -13,4 +13,5 @@ trait ContravariantSyntax1 {
 }
 
 trait ContravariantSyntax
-    extends Contravariant.ToContravariantOps with ContravariantSyntax1
+    extends Contravariant.ToContravariantOps
+    with ContravariantSyntax1

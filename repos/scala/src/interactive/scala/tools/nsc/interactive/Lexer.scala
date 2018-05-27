@@ -80,7 +80,7 @@ object Lexer {
 
   private def addToStr(buf: StringBuilder, ch: Char) {
     ch match {
-      case '"' => buf ++= "\\\""
+      case '"'  => buf ++= "\\\""
       case '\b' => buf ++= "\\b"
       case '\f' => buf ++= "\\f"
       case '\n' => buf ++= "\\n"
@@ -225,14 +225,14 @@ class Lexer(rd: Reader) {
         nextChar()
         ch match {
           case '\'' => sb += '\''
-          case '"' => sb += '"'
+          case '"'  => sb += '"'
           case '\\' => sb += '\\'
-          case '/' => sb += '/'
-          case 'b' => sb += '\b'
-          case 'f' => sb += '\f'
-          case 'n' => sb += '\n'
-          case 'r' => sb += '\r'
-          case 't' => sb += '\t'
+          case '/'  => sb += '/'
+          case 'b'  => sb += '\b'
+          case 'f'  => sb += '\f'
+          case 'n'  => sb += '\n'
+          case 'r'  => sb += '\r'
+          case 't'  => sb += '\t'
           case 'u' =>
             sb += (udigit() << 12 | udigit() << 8 | udigit() << 4 | udigit()).toChar
           case _ => error("illegal escape character: '" + ch + "'")
@@ -292,7 +292,7 @@ class Lexer(rd: Reader) {
   def accept(ch: Char) {
     token match {
       case Delim(`ch`) => nextToken()
-      case _ => accept(Delim(ch))
+      case _           => accept(Delim(ch))
     }
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 Miles Sabin 
+ * Copyright (c) 2011 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package shapeless.examples
 
 /**
   * Record examples.
-  * 
+  *
   * @author Miles Sabin
   */
 object RecordExamples extends App {
@@ -41,8 +41,8 @@ object RecordExamples extends App {
 
   val book =
     ("author" ->> "Benjamin Pierce") ::
-    ("title" ->> "Types and Programming Languages") :: ("id" ->> 262162091) ::
-    ("price" ->> 44.11) :: HNil
+      ("title" ->> "Types and Programming Languages") :: ("id" ->> 262162091) ::
+      ("price" ->> 44.11) :: HNil
 
   printBook(book)
 

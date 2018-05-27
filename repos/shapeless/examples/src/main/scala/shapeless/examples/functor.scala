@@ -52,22 +52,22 @@ object FunctorDemo extends App {
 
   // Any ADT has a Functor ... even with recursion
   val tree = Node(
-      Leaf("quux"),
-      Node(
-          Leaf("foo"),
-          Leaf("wibble")
-      )
+    Leaf("quux"),
+    Node(
+      Leaf("foo"),
+      Leaf("wibble")
+    )
   )
 
   val t0 = transform(tree)(_.length)
   val t1 = tree.map(_.length) // they also have Functor syntax ...
 
   val expectedTree = Node(
-      Leaf(4),
-      Node(
-          Leaf(3),
-          Leaf(6)
-      )
+    Leaf(4),
+    Node(
+      Leaf(3),
+      Leaf(6)
+    )
   )
   assert(t0 == expectedTree)
   assert(t1 == expectedTree)
@@ -102,11 +102,9 @@ object Functor extends Functor0 {
       implicit icc: IsCCons1[F, Functor, Functor]): Functor[F] =
     new Functor[F] {
       def map[A, B](fa: F[A])(f: A => B): F[B] =
-        icc.pack(
-            icc
-              .unpack(fa)
-              .fold(hd => Left(icc.fh.map(hd)(f)),
-                    tl => Right(icc.ft.map(tl)(f))))
+        icc.pack(icc
+          .unpack(fa)
+          .fold(hd => Left(icc.fh.map(hd)(f)), tl => Right(icc.ft.map(tl)(f))))
     }
 
   implicit def generic[F[_]](implicit gen: Generic1[F, Functor]): Functor[F] =

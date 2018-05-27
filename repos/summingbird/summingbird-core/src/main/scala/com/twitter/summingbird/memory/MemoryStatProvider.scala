@@ -46,8 +46,7 @@ class MemoryCounter {
   * Incrementor for Memory Counters
   * Returned to the Summingbird Counter object to call incrBy function in job code
   */
-private[summingbird] case class MemoryCounterIncrementor(
-    counter: MemoryCounter)
+private[summingbird] case class MemoryCounterIncrementor(counter: MemoryCounter)
     extends CounterIncrementor {
   def incrBy(by: Long): Unit = counter.incr(by)
 }
@@ -69,13 +68,15 @@ private[summingbird] object MemoryStatProvider extends PlatformStatProvider {
   /**
     * Memory counter incrementor, used by the Counter object in Summingbird job
     */
-  def counterIncrementor(jobID: JobId,
-                         group: Group,
-                         name: Name): Option[MemoryCounterIncrementor] =
+  def counterIncrementor(
+      jobID: JobId,
+      group: Group,
+      name: Name): Option[MemoryCounterIncrementor] =
     Option(countersForJob.get(jobID)).map { m =>
       MemoryCounterIncrementor(m.getOrElse(
-              group.getString + "/" + name.getString,
-              sys.error("It is only valid to create counter objects during job submission")))
+        group.getString + "/" + name.getString,
+        sys.error(
+          "It is only valid to create counter objects during job submission")))
     }
 
   /**
@@ -92,7 +93,7 @@ private[summingbird] object MemoryStatProvider extends PlatformStatProvider {
     @annotation.tailrec
     def put(m: Map[String, MemoryCounter]): Unit =
       countersForJob.putIfAbsent(jobID, memoryCounters) match {
-        case null => () // The jobID was not present
+        case null                                              => () // The jobID was not present
         case previous if (previous.keySet & m.keySet).nonEmpty =>
           // Key intersection nonempty
           // prefer the old values

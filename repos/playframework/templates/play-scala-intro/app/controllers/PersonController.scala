@@ -15,17 +15,18 @@ import scala.concurrent.{ExecutionContext, Future}
 import javax.inject._
 
 class PersonController @Inject()(
-    repo: PersonRepository, val messagesApi: MessagesApi)(
-    implicit ec: ExecutionContext)
-    extends Controller with I18nSupport {
+    repo: PersonRepository,
+    val messagesApi: MessagesApi)(implicit ec: ExecutionContext)
+    extends Controller
+    with I18nSupport {
 
   /**
     * The mapping for the person form.
     */
   val personForm: Form[CreatePersonForm] = Form {
     mapping(
-        "name" -> nonEmptyText,
-        "age" -> number.verifying(min(0), max(140))
+      "name" -> nonEmptyText,
+      "age" -> number.verifying(min(0), max(140))
     )(CreatePersonForm.apply)(CreatePersonForm.unapply)
   }
 
@@ -44,21 +45,19 @@ class PersonController @Inject()(
   def addPerson = Action.async { implicit request =>
     // Bind the form first, then fold the result, passing a function to handle errors, and a function to handle succes.
     personForm.bindFromRequest.fold(
-        // The error function. We return the index page with the error form, which will render the errors.
-        // We also wrap the result in a successful future, since this action is synchronous, but we're required to return
-        // a future because the person creation function returns a future.
-        errorForm =>
-          {
-            Future.successful(Ok(views.html.index(errorForm)))
-        },
-        // There were no errors in the from, so create the person.
-        person =>
-          {
-            repo.create(person.name, person.age).map { _ =>
-              // If successful, we simply redirect to the index page.
-              Redirect(routes.PersonController.index)
-            }
+      // The error function. We return the index page with the error form, which will render the errors.
+      // We also wrap the result in a successful future, since this action is synchronous, but we're required to return
+      // a future because the person creation function returns a future.
+      errorForm => {
+        Future.successful(Ok(views.html.index(errorForm)))
+      },
+      // There were no errors in the from, so create the person.
+      person => {
+        repo.create(person.name, person.age).map { _ =>
+          // If successful, we simply redirect to the index page.
+          Redirect(routes.PersonController.index)
         }
+      }
     )
   }
 

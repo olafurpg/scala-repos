@@ -10,7 +10,9 @@ import breeze.optimize.DiffFunction
   * @author dlwh
   */
 case class Exponential(rate: Double)(implicit basis: RandBasis = Rand)
-    extends ContinuousDistr[Double] with HasCdf with HasInverseCdf {
+    extends ContinuousDistr[Double]
+    with HasCdf
+    with HasInverseCdf {
   override def toString() = ScalaRunTime._toString(this)
   require(rate > 0)
 
@@ -40,7 +42,7 @@ object Exponential
   type Parameter = Double
   case class SufficientStatistic(n: Double, v: Double)
       extends breeze.stats.distributions.SufficientStatistic[
-          SufficientStatistic] {
+        SufficientStatistic] {
     def +(t: SufficientStatistic) = copy(n + t.n, v + t.v)
 
     def *(weight: Double) = copy(n * weight, v * weight)

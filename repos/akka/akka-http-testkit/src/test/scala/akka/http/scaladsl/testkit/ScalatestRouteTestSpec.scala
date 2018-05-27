@@ -18,7 +18,9 @@ import HttpMethods._
 import Directives._
 
 class ScalatestRouteTestSpec
-    extends FreeSpec with Matchers with ScalatestRouteTest {
+    extends FreeSpec
+    with Matchers
+    with ScalatestRouteTest {
 
   "The ScalatestRouteTest should support" - {
 
@@ -36,8 +38,9 @@ class ScalatestRouteTestSpec
         }
       } ~> check {
         status shouldEqual OK
-        responseEntity shouldEqual HttpEntity(ContentTypes.`text/plain(UTF-8)`,
-                                              "abc")
+        responseEntity shouldEqual HttpEntity(
+          ContentTypes.`text/plain(UTF-8)`,
+          "abc")
         header("Fancy") shouldEqual Some(pinkHeader)
       }
     }
@@ -73,8 +76,9 @@ class ScalatestRouteTestSpec
 
       check {
         status shouldEqual OK
-        responseEntity shouldEqual HttpEntity(ContentTypes.`text/plain(UTF-8)`,
-                                              "abc")
+        responseEntity shouldEqual HttpEntity(
+          ContentTypes.`text/plain(UTF-8)`,
+          "abc")
         header("Fancy") shouldEqual Some(pinkHeader)
       }(result)
     }

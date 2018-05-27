@@ -65,16 +65,20 @@ class ScalaVsSpireBenchmarks extends MyBenchmark {
     while (i < len) { cs(i) = as(i) + bs(i); i += 1 }
   }
 
-  def doPairwiseGeneric[A : ScalaN](
-      as: Array[A], bs: Array[A], cs: Array[A]): Unit = {
+  def doPairwiseGeneric[A: ScalaN](
+      as: Array[A],
+      bs: Array[A],
+      cs: Array[A]): Unit = {
     import ScalaN.Implicits._
     var i = 0
     val len = as.length
     while (i < len) { cs(i) = as(i) + bs(i); i += 1 }
   }
 
-  def doPairwiseSpire[@sp(Int) A : Ring](
-      as: Array[A], bs: Array[A], cs: Array[A]): Unit = {
+  def doPairwiseSpire[@sp(Int) A: Ring](
+      as: Array[A],
+      bs: Array[A],
+      cs: Array[A]): Unit = {
     import spire.implicits._
     var i = 0
     val len = as.length
@@ -91,7 +95,7 @@ class ScalaVsSpireBenchmarks extends MyBenchmark {
     t
   }
 
-  def doIncrementGeneric[A : ScalaN](start: A, n: A) = {
+  def doIncrementGeneric[A: ScalaN](start: A, n: A) = {
     import ScalaN.Implicits._
     val ev = implicitly[ScalaN[A]]
     import ev.mkOrderingOps
@@ -101,7 +105,7 @@ class ScalaVsSpireBenchmarks extends MyBenchmark {
     t
   }
 
-  def doIncrementSpire[@sp(Int) A : Ring : Order](start: A, n: A) = {
+  def doIncrementSpire[@sp(Int) A: Ring: Order](start: A, n: A) = {
     import spire.implicits._
     val ev = Ring[A]
     var t = start
@@ -127,7 +131,7 @@ class ScalaVsSpireBenchmarks extends MyBenchmark {
     (zmin, zmax)
   }
 
-  def doMinMaxGeneric[A : ScalaN](ns: Array[A]) = {
+  def doMinMaxGeneric[A: ScalaN](ns: Array[A]) = {
     val ev = implicitly[ScalaN[A]]
     import ev.mkOrderingOps
 
@@ -144,7 +148,7 @@ class ScalaVsSpireBenchmarks extends MyBenchmark {
     (zmin, zmax)
   }
 
-  def doMinMaxSpire[@sp(Int) A : Ring : Order](ns: Array[A]) = {
+  def doMinMaxSpire[@sp(Int) A: Ring: Order](ns: Array[A]) = {
     import spire.implicits._
 
     var zmin = ns(0)
@@ -178,20 +182,23 @@ class ScalaVsSpireBenchmarks extends MyBenchmark {
     if (a % b == ev.zero) b else gcdGeneric(b, a % b)
   }
 
-  def doGcdGeneric[A : ScalaI](as: Array[A], bs: Array[A], cs: Array[A]) = {
+  def doGcdGeneric[A: ScalaI](as: Array[A], bs: Array[A], cs: Array[A]) = {
     var i = 0
     val len = as.length
     while (i < len) { cs(i) = gcdGeneric(as(i), bs(i)); i += 1 }
   }
 
   @tailrec final def gcdSpire[@sp(Int) A](a: A, b: A)(
-      implicit ev1: EuclideanRing[A], ev2: Eq[A]): A = {
+      implicit ev1: EuclideanRing[A],
+      ev2: Eq[A]): A = {
     import spire.implicits._
     if (a % b === ev1.zero) b else gcdSpire(b, a % b)
   }
 
-  def doGcdSpire[@sp(Int) A : EuclideanRing : Eq](
-      as: Array[A], bs: Array[A], cs: Array[A]) = {
+  def doGcdSpire[@sp(Int) A: EuclideanRing: Eq](
+      as: Array[A],
+      bs: Array[A],
+      cs: Array[A]) = {
     var i = 0
     val len = as.length
     while (i < len) { cs(i) = gcdSpire(as(i), bs(i)); i += 1 }
@@ -206,15 +213,18 @@ class ScalaVsSpireBenchmarks extends MyBenchmark {
     while (i < len) { cs(i) = as(i) * n / d; i += 1 }
   }
 
-  def doScaleGeneric[A : ScalaI](as: Array[A], n: A, d: A, cs: Array[A]) = {
+  def doScaleGeneric[A: ScalaI](as: Array[A], n: A, d: A, cs: Array[A]) = {
     import ScalaI.Implicits._
     var i = 0
     val len = as.length
     while (i < len) { cs(i) = as(i) * n / d; i += 1 }
   }
 
-  def doScaleSpire[@sp(Int) A : EuclideanRing](
-      as: Array[A], n: A, d: A, cs: Array[A]) = {
+  def doScaleSpire[@sp(Int) A: EuclideanRing](
+      as: Array[A],
+      n: A,
+      d: A,
+      cs: Array[A]) = {
     import spire.implicits._
     var i = 0
     val len = as.length

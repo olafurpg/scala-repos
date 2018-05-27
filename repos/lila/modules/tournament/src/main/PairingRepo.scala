@@ -19,9 +19,9 @@ object PairingRepo {
   private def selectTourUser(tourId: String, userId: String) =
     BSONDocument("tid" -> tourId, "u" -> userId)
   private val selectPlaying = BSONDocument(
-      "s" -> BSONDocument("$lt" -> chess.Status.Mate.id))
+    "s" -> BSONDocument("$lt" -> chess.Status.Mate.id))
   private val selectFinished = BSONDocument(
-      "s" -> BSONDocument("$gte" -> chess.Status.Mate.id))
+    "s" -> BSONDocument("$gte" -> chess.Status.Mate.id))
   private val recentSort = BSONDocument("d" -> -1)
   private val chronoSort = BSONDocument("d" -> 1)
 
@@ -35,19 +35,20 @@ object PairingRepo {
       .cursor[Pairing]()
       .collect[List](nb)
 
-  def lastOpponents(tourId: String,
-                    userIds: Iterable[String],
-                    nb: Int): Fu[Pairing.LastOpponents] =
+  def lastOpponents(
+      tourId: String,
+      userIds: Iterable[String],
+      nb: Int): Fu[Pairing.LastOpponents] =
     coll
       .find(
-          selectTour(tourId) ++ BSONDocument(
-              "u" -> BSONDocument("$in" -> userIds)),
-          BSONDocument("_id" -> false, "u" -> true)
+        selectTour(tourId) ++ BSONDocument(
+          "u" -> BSONDocument("$in" -> userIds)),
+        BSONDocument("_id" -> false, "u" -> true)
       )
       .sort(recentSort)
       .cursor[BSONDocument]()
       .enumerate(nb) |>>> Iteratee.fold(
-        scala.collection.immutable.Map.empty[String, String]) { (acc, doc) =>
+      scala.collection.immutable.Map.empty[String, String]) { (acc, doc) =>
       ~doc.getAs[List[String]]("u") match {
         case List(u1, u2) =>
           val acc1 = acc.contains(u1).fold(acc, acc.updated(u1, u2))
@@ -58,8 +59,8 @@ object PairingRepo {
   def opponentsOf(tourId: String, userId: String): Fu[Set[String]] =
     coll
       .find(
-          selectTourUser(tourId, userId),
-          BSONDocument("_id" -> false, "u" -> true)
+        selectTourUser(tourId, userId),
+        BSONDocument("_id" -> false, "u" -> true)
       )
       .cursor[BSONDocument]()
       .collect[List]()
@@ -70,11 +71,13 @@ object PairingRepo {
       }
 
   def recentIdsByTourAndUserId(
-      tourId: String, userId: String, nb: Int): Fu[List[String]] =
+      tourId: String,
+      userId: String,
+      nb: Int): Fu[List[String]] =
     coll
       .find(
-          selectTourUser(tourId, userId),
-          BSONDocument("_id" -> true)
+        selectTourUser(tourId, userId),
+        BSONDocument("_id" -> true)
       )
       .sort(recentSort)
       .cursor[BSONDocument]()
@@ -84,10 +87,12 @@ object PairingRepo {
       }
 
   def byTourUserNb(
-      tourId: String, userId: String, nb: Int): Fu[Option[Pairing]] =
+      tourId: String,
+      userId: String,
+      nb: Int): Fu[Option[Pairing]] =
     (nb > 0) ?? coll
       .find(
-          selectTourUser(tourId, userId)
+        selectTourUser(tourId, userId)
       )
       .sort(chronoSort)
       .skip(nb - 1)
@@ -104,12 +109,13 @@ object PairingRepo {
   def countByTourIdAndUserIds(tourId: String): Fu[Map[String, Int]] = {
     import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework._
     coll
-      .aggregate(Match(selectTour(tourId)),
-                 List(
-                     Project(BSONDocument("u" -> true, "_id" -> false)),
-                     Unwind("u"),
-                     GroupField("u")("nb" -> SumValue(1))
-                 ))
+      .aggregate(
+        Match(selectTour(tourId)),
+        List(
+          Project(BSONDocument("u" -> true, "_id" -> false)),
+          Unwind("u"),
+          GroupField("u")("nb" -> SumValue(1))
+        ))
       .map {
         _.documents.flatMap { doc =>
           doc.getAs[String]("_id") flatMap { uid =>
@@ -132,10 +138,11 @@ object PairingRepo {
     coll.find(selectTourUser(tourId, userId) ++ selectPlaying).one[Pairing]
 
   def finishedByPlayerChronological(
-      tourId: String, userId: String): Fu[Pairings] =
+      tourId: String,
+      userId: String): Fu[Pairings] =
     coll
       .find(
-          selectTourUser(tourId, userId) ++ selectFinished
+        selectTourUser(tourId, userId) ++ selectFinished
       )
       .sort(chronoSort)
       .cursor[Pairing]()
@@ -148,22 +155,25 @@ object PairingRepo {
 
   def finish(g: lila.game.Game) =
     coll
-      .update(selectId(g.id),
-              BSONDocument(
-                  "$set" -> BSONDocument("s" -> g.status.id,
-                                         "w" -> g.winnerColor.map(_.white),
-                                         "t" -> g.turns)))
+      .update(
+        selectId(g.id),
+        BSONDocument(
+          "$set" -> BSONDocument(
+            "s" -> g.status.id,
+            "w" -> g.winnerColor.map(_.white),
+            "t" -> g.turns)))
       .void
 
   def setBerserk(pairing: Pairing, userId: String, value: Int) =
     (userId match {
       case uid if pairing.user1 == uid => "b1".some
       case uid if pairing.user2 == uid => "b2".some
-      case _ => none
+      case _                           => none
     }) ?? { field =>
       coll
-        .update(selectId(pairing.id),
-                BSONDocument("$set" -> BSONDocument(field -> value)))
+        .update(
+          selectId(pairing.id),
+          BSONDocument("$set" -> BSONDocument(field -> value)))
         .void
     }
 
@@ -172,20 +182,28 @@ object PairingRepo {
 
   def playingUserIds(tour: Tournament): Fu[Set[String]] =
     coll
-      .aggregate(Match(selectTour(tour.id) ++ selectPlaying),
-                 List(Project(BSONDocument("u" -> BSONBoolean(true),
-                                           "_id" -> BSONBoolean(false))),
-                      Unwind("u"),
-                      Group(BSONBoolean(true))("ids" -> AddToSet("u"))))
-      .map(_.documents.headOption
-            .flatMap(_.getAs[Set[String]]("ids"))
-            .getOrElse(Set.empty[String]))
+      .aggregate(
+        Match(selectTour(tour.id) ++ selectPlaying),
+        List(
+          Project(
+            BSONDocument(
+              "u" -> BSONBoolean(true),
+              "_id" -> BSONBoolean(false))),
+          Unwind("u"),
+          Group(BSONBoolean(true))("ids" -> AddToSet("u")))
+      )
+      .map(
+        _.documents.headOption
+          .flatMap(_.getAs[Set[String]]("ids"))
+          .getOrElse(Set.empty[String]))
 
   def playingGameIds(tourId: String): Fu[List[String]] =
     coll
-      .aggregate(Match(selectTour(tourId) ++ selectPlaying),
-                 List(Group(BSONBoolean(true))("ids" -> Push("_id"))))
-      .map(_.documents.headOption
-            .flatMap(_.getAs[List[String]]("ids"))
-            .getOrElse(List.empty[String]))
+      .aggregate(
+        Match(selectTour(tourId) ++ selectPlaying),
+        List(Group(BSONBoolean(true))("ids" -> Push("_id"))))
+      .map(
+        _.documents.headOption
+          .flatMap(_.getAs[List[String]]("ids"))
+          .getOrElse(List.empty[String]))
 }

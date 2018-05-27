@@ -37,19 +37,24 @@ object TupleConverterImpl {
     caseClassTupleConverterCommonImpl(c, true)
 
   def caseClassTupleConverterCommonImpl[T](
-      c: Context, allowUnknownTypes: Boolean)(
+      c: Context,
+      allowUnknownTypes: Boolean)(
       implicit T: c.WeakTypeTag[T]): c.Expr[TupleConverter[T]] = {
     import c.universe._
 
     import TypeDescriptorProviderImpl.{optionInner, evidentColumn}
 
     def membersOf(outerTpe: Type): Vector[Type] =
-      outerTpe.declarations.collect {
-        case m: MethodSymbol if m.isCaseAccessor => m
-      }.map { accessorMethod =>
-        accessorMethod.returnType.asSeenFrom(
-            outerTpe, outerTpe.typeSymbol.asClass)
-      }.toVector
+      outerTpe.declarations
+        .collect {
+          case m: MethodSymbol if m.isCaseAccessor => m
+        }
+        .map { accessorMethod =>
+          accessorMethod.returnType.asSeenFrom(
+            outerTpe,
+            outerTpe.typeSymbol.asClass)
+        }
+        .toVector
 
     sealed trait ConverterBuilder {
       def columns: Int
@@ -95,8 +100,7 @@ object TupleConverterImpl {
         case tpe if tpe =:= typeOf[String] =>
           // In this case, null is identical to empty, and we always return non-null
           PrimitiveBuilder(
-              idx =>
-                q"""{val s = t.getString($idx); if (s == null) "" else s}""")
+            idx => q"""{val s = t.getString($idx); if (s == null) "" else s}""")
         case tpe if tpe =:= typeOf[Boolean] =>
           PrimitiveBuilder(idx => q"""t.getBoolean($idx)""")
         case tpe if tpe =:= typeOf[Short] =>
@@ -114,8 +118,8 @@ object TupleConverterImpl {
           evidentColumn(c, allowUnknownTypes)(innerType) match {
             case None => // there is no evident column, not supported.
               c.abort(
-                  c.enclosingPosition,
-                  s"$tpe has unsupported nesting of Options at: $innerType")
+                c.enclosingPosition,
+                s"$tpe has unsupported nesting of Options at: $innerType")
             case Some(ev) => // we can recurse here
               OptionBuilder(ev, matchField(innerType))
           }
@@ -123,19 +127,18 @@ object TupleConverterImpl {
             if (tpe.typeSymbol.isClass && tpe.typeSymbol.asClass.isCaseClass) =>
           CaseClassBuilder(tpe, membersOf(tpe).map(matchField))
         case tpe if allowUnknownTypes =>
-          PrimitiveBuilder(
-              idx => q"""t.getObject(${idx}).asInstanceOf[$tpe]""")
+          PrimitiveBuilder(idx => q"""t.getObject(${idx}).asInstanceOf[$tpe]""")
         case tpe =>
           c.abort(
-              c.enclosingPosition,
-              s"${T.tpe} is not pure primitives, Option of a primitive, nested case classes when looking at type ${tpe}")
+            c.enclosingPosition,
+            s"${T.tpe} is not pure primitives, Option of a primitive, nested case classes when looking at type ${tpe}")
       }
 
     val builder = matchField(T.tpe)
     if (builder.columns == 0)
       c.abort(
-          c.enclosingPosition,
-          "Didn't consume any elements in the tuple, possibly empty case class?")
+        c.enclosingPosition,
+        "Didn't consume any elements in the tuple, possibly empty case class?")
 
     val res = q"""
   new _root_.com.twitter.scalding.TupleConverter[$T] with _root_.com.twitter.bijection.macros.MacroGenerated {

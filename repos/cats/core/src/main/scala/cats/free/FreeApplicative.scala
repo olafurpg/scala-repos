@@ -6,7 +6,8 @@ import cats.data.Const
 
 /** Applicative Functor for Free */
 sealed abstract class FreeApplicative[F[_], A]
-    extends Product with Serializable { self =>
+    extends Product
+    with Serializable { self =>
   // ap => apply alias needed so we can refer to both
   // FreeApplicative.ap and FreeApplicative#ap
   import FreeApplicative.{FA, Pure, Ap, ap => apply, lift}
@@ -21,7 +22,7 @@ sealed abstract class FreeApplicative[F[_], A]
 
   final def map[B](f: A => B): FA[F, B] =
     this match {
-      case Pure(a) => Pure(f(a))
+      case Pure(a)       => Pure(f(a))
       case Ap(pivot, fn) => apply(pivot)(fn.map(f compose _))
     }
 
@@ -30,7 +31,7 @@ sealed abstract class FreeApplicative[F[_], A]
     */
   final def foldMap[G[_]](f: F ~> G)(implicit G: Applicative[G]): G[A] =
     this match {
-      case Pure(a) => G.pure(a)
+      case Pure(a)       => G.pure(a)
       case Ap(pivot, fn) => G.map2(f(pivot), fn.foldMap(f))((a, g) => g(a))
     }
 
@@ -49,7 +50,7 @@ sealed abstract class FreeApplicative[F[_], A]
     }
 
   /** Interpret this algebra into a Monoid */
-  final def analyze[M : Monoid](f: F ~> λ[α => M]): M =
+  final def analyze[M: Monoid](f: F ~> λ[α => M]): M =
     foldMap[Const[M, ?]](new (F ~> Const[M, ?]) {
       def apply[X](x: F[X]): Const[M, X] = Const(f(x))
     }).getConst

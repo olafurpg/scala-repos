@@ -36,11 +36,13 @@ object TreeMap extends MutableSortedMapFactory[TreeMap] {
   * @define coll mutable tree map
   */
 @SerialVersionUID(-2558985573956740112L)
-sealed class TreeMap[A, B] private (
-    tree: RB.Tree[A, B])(implicit val ordering: Ordering[A])
+sealed class TreeMap[A, B] private (tree: RB.Tree[A, B])(
+    implicit val ordering: Ordering[A])
     extends AbstractSortedMap[A, B]
-    with SortedMap[A, B] with MapLike[A, B, TreeMap[A, B]]
-    with SortedMapLike[A, B, TreeMap[A, B]] with Serializable {
+    with SortedMap[A, B]
+    with MapLike[A, B, TreeMap[A, B]]
+    with SortedMapLike[A, B, TreeMap[A, B]]
+    with Serializable {
 
   /**
     * Creates an empty `TreeMap`.
@@ -120,8 +122,8 @@ sealed class TreeMap[A, B] private (
     private[this] def pickLowerBound(newFrom: Option[A]): Option[A] =
       (from, newFrom) match {
         case (Some(fr), Some(newFr)) => Some(ordering.max(fr, newFr))
-        case (None, _) => newFrom
-        case _ => from
+        case (None, _)               => newFrom
+        case _                       => from
       }
 
     /**
@@ -130,8 +132,8 @@ sealed class TreeMap[A, B] private (
     private[this] def pickUpperBound(newUntil: Option[A]): Option[A] =
       (until, newUntil) match {
         case (Some(unt), Some(newUnt)) => Some(ordering.min(unt, newUnt))
-        case (None, _) => newUntil
-        case _ => until
+        case (None, _)                 => newUntil
+        case _                         => until
       }
 
     /**
@@ -168,7 +170,7 @@ sealed class TreeMap[A, B] private (
         if (from.isDefined) RB.minAfter(tree, from.get) else RB.min(tree)
       (entry, until) match {
         case (Some(e), Some(unt)) if ordering.compare(e._1, unt) >= 0 => None
-        case _ => entry
+        case _                                                        => entry
       }
     }
 
@@ -178,7 +180,7 @@ sealed class TreeMap[A, B] private (
         if (until.isDefined) RB.maxBefore(tree, until.get) else RB.max(tree)
       (entry, from) match {
         case (Some(e), Some(fr)) if ordering.compare(e._1, fr) < 0 => None
-        case _ => entry
+        case _                                                     => entry
       }
     }
 

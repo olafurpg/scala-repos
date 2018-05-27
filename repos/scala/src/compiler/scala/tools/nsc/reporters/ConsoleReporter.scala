@@ -14,7 +14,9 @@ import StringOps._
 /** This class implements a Reporter that displays messages on a text console.
   */
 class ConsoleReporter(
-    val settings: Settings, reader: BufferedReader, writer: PrintWriter)
+    val settings: Settings,
+    reader: BufferedReader,
+    writer: PrintWriter)
     extends AbstractReporter {
   def this(settings: Settings) =
     this(settings, Console.in, new PrintWriter(Console.err, true))
@@ -26,9 +28,9 @@ class ConsoleReporter(
   final val ERROR_LIMIT = 100
 
   private def label(severity: Severity): String = severity match {
-    case ERROR => "error"
+    case ERROR   => "error"
     case WARNING => "warning"
-    case INFO => null
+    case INFO    => null
   }
 
   protected def clabel(severity: Severity): String = {

@@ -31,7 +31,13 @@ import javafx.{util => jfxu}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, DoubleProperty, IntegerProperty, ObjectProperty, ReadOnlyDoubleProperty}
+import scalafx.beans.property.{
+  BooleanProperty,
+  DoubleProperty,
+  IntegerProperty,
+  ObjectProperty,
+  ReadOnlyDoubleProperty
+}
 import scalafx.delegate.SFXDelegate
 import scalafx.util.StringConverter
 
@@ -41,9 +47,9 @@ object ValueAxis {
     if (v != null) v.delegate else null
 }
 
-abstract class ValueAxis[T <: Number](
-    override val delegate: jfxsc.ValueAxis[T])
-    extends Axis[T](delegate) with SFXDelegate[jfxsc.ValueAxis[T]] {
+abstract class ValueAxis[T <: Number](override val delegate: jfxsc.ValueAxis[T])
+    extends Axis[T](delegate)
+    with SFXDelegate[jfxsc.ValueAxis[T]] {
 
   def lowerBound: DoubleProperty = delegate.lowerBoundProperty
   def lowerBound_=(v: Double) {

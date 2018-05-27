@@ -7,11 +7,12 @@ import com.novocode.junit.RichLogger
 import org.junit._
 import sbt.testing._
 
-final class JUnitExecuteTest(taskDef: TaskDef,
-                             runner: JUnitBaseRunner,
-                             classMetadata: JUnitTestBootstrapper,
-                             richLogger: RichLogger,
-                             eventHandler: EventHandler) {
+final class JUnitExecuteTest(
+    taskDef: TaskDef,
+    runner: JUnitBaseRunner,
+    classMetadata: JUnitTestBootstrapper,
+    richLogger: RichLogger,
+    eventHandler: EventHandler) {
 
   lazy val packageName = fullyQualifiedName.split('.').init.mkString(".")
   lazy val className = fullyQualifiedName.split('.').last
@@ -22,8 +23,8 @@ final class JUnitExecuteTest(taskDef: TaskDef,
     val jUnitMetadata = classMetadata.metadata()
 
     val assumptionViolated = try {
-      for (method <- jUnitMetadata.beforeClassMethod) classMetadata.invoke(
-          method.name)
+      for (method <- jUnitMetadata.beforeClassMethod)
+        classMetadata.invoke(method.name)
       false
     } catch {
       case _: AssumptionViolatedException |
@@ -58,13 +59,14 @@ final class JUnitExecuteTest(taskDef: TaskDef,
         }
       }
 
-      for (method <- jUnitMetadata.afterClassMethod) classMetadata.invoke(
-          method.name)
+      for (method <- jUnitMetadata.afterClassMethod)
+        classMetadata.invoke(method.name)
     }
   }
 
   private[this] def executeTestMethod(
-      classMetadata: JUnitTestBootstrapper, method: JUnitMethodMetadata) = {
+      classMetadata: JUnitTestBootstrapper,
+      method: JUnitMethodMetadata) = {
     val jUnitMetadata = classMetadata.metadata()
     val testClassInstance = classMetadata.newInstance()
 
@@ -73,8 +75,8 @@ final class JUnitExecuteTest(taskDef: TaskDef,
 
     val beforeMethodsAssertionFaild = {
       try {
-        for (method <- jUnitMetadata.beforeMethod) classMetadata.invoke(
-            testClassInstance, method.name)
+        for (method <- jUnitMetadata.beforeMethod)
+          classMetadata.invoke(testClassInstance, method.name)
         false
       } catch {
         case ex: AssumptionViolatedException =>
@@ -95,50 +97,58 @@ final class JUnitExecuteTest(taskDef: TaskDef,
         try {
           classMetadata.invoke(testClassInstance, method.name)
           executedWithoutExceptions(
-              method.name, testAnnotation, timeInSeconds())
+            method.name,
+            testAnnotation,
+            timeInSeconds())
           false
         } catch {
           case ex: Throwable =>
             executedWithExceptions(
-                method.name, testAnnotation, timeInSeconds(), ex)
+              method.name,
+              testAnnotation,
+              timeInSeconds(),
+              ex)
             true
         }
       }
 
       if (!testMethodFailed) {
         try {
-          for (method <- jUnitMetadata.afterMethod) classMetadata.invoke(
-              testClassInstance, method.name)
+          for (method <- jUnitMetadata.afterMethod)
+            classMetadata.invoke(testClassInstance, method.name)
 
           if (testAnnotation.timeout != 0 &&
               testAnnotation.timeout <= timeInSeconds) {
             richLogger.warn(
-                "Timeout: took " + timeInSeconds + " sec, expected " +
+              "Timeout: took " + timeInSeconds + " sec, expected " +
                 (testAnnotation.timeout.toDouble / 1000) + " sec")
           }
         } catch {
           case ex: Throwable =>
             logFormattedError(
-                method.name, "failed: on @AfterClass method", Some(ex))
-            val selector = new NestedTestSelector(
-                fullyQualifiedName, method.name)
+              method.name,
+              "failed: on @AfterClass method",
+              Some(ex))
+            val selector =
+              new NestedTestSelector(fullyQualifiedName, method.name)
             eventHandler.handle(
-                new JUnitEvent(taskDef, Status.Failure, selector))
+              new JUnitEvent(taskDef, Status.Failure, selector))
         }
       }
     }
   }
 
-  private[this] def executedWithoutExceptions(methodName: String,
-                                              testAnnotation: org.junit.Test,
-                                              timeInSeconds: Double) = {
+  private[this] def executedWithoutExceptions(
+      methodName: String,
+      testAnnotation: org.junit.Test,
+      timeInSeconds: Double) = {
     if (testAnnotation.expected == classOf[org.junit.Test.None]) {
       if (runner.runSettings.verbose) logFormattedInfo(methodName, "started")
       taskPassed(methodName)
     } else {
       val msg = {
         s"failed: Expected exception: ${testAnnotation.expected} " +
-        s"took $timeInSeconds sec"
+          s"took $timeInSeconds sec"
       }
       logFormattedError(methodName, msg, None)
       taskFailed(methodName)
@@ -146,10 +156,11 @@ final class JUnitExecuteTest(taskDef: TaskDef,
     runner.taskRegisterTotal()
   }
 
-  private[this] def executedWithExceptions(methodName: String,
-                                           testAnnotation: org.junit.Test,
-                                           timeInSeconds: Double,
-                                           ex: Throwable) = {
+  private[this] def executedWithExceptions(
+      methodName: String,
+      testAnnotation: org.junit.Test,
+      timeInSeconds: Double,
+      ex: Throwable) = {
     if (classOf[AssumptionViolatedException].isInstance(ex) ||
         classOf[internal.AssumptionViolatedException].isInstance(ex)) {
       logFormattedInfo(methodName, "started")
@@ -214,10 +225,12 @@ final class JUnitExecuteTest(taskDef: TaskDef,
   }
 
   private[this] def logAssertionWarning(
-      methodName: String, ex: Throwable, timeInSeconds: Double): Unit = {
+      methodName: String,
+      ex: Throwable,
+      timeInSeconds: Double): Unit = {
     val msg = {
       "failed: org.junit." + c("AssumptionViolatedException", ERRMSG) + ": " +
-      ex.getMessage + ", took " + timeInSeconds + " sec"
+        ex.getMessage + ", took " + timeInSeconds + " sec"
     }
     logFormattedWarn("Test assumption in test ", methodName, msg)
   }
@@ -225,32 +238,37 @@ final class JUnitExecuteTest(taskDef: TaskDef,
   private[this] def logFormattedInfo(method: String, msg: String): Unit = {
     val fMethod = if (method != null) c(method, NNAME2) else null
     richLogger.info(
-        formatLayout("Test ", packageName, c(className, NNAME1), fMethod, msg))
+      formatLayout("Test ", packageName, c(className, NNAME1), fMethod, msg))
   }
 
   private[this] def logFormattedWarn(
-      prefix: String, method: String, msg: String): Unit = {
+      prefix: String,
+      method: String,
+      msg: String): Unit = {
     val fMethod = if (method != null) c(method, ERRMSG) else null
     richLogger.warn(
-        formatLayout(prefix, packageName, c(className, NNAME1), fMethod, msg))
+      formatLayout(prefix, packageName, c(className, NNAME1), fMethod, msg))
   }
 
   private[this] def logFormattedError(
-      method: String, msg: String, exOpt: Option[Throwable]): Unit = {
+      method: String,
+      msg: String,
+      exOpt: Option[Throwable]): Unit = {
     val fMethod = if (method != null) c(method, ERRMSG) else null
-    val formattedMsg = formatLayout(
-        "Test ", packageName, c(className, NNAME1), fMethod, msg)
+    val formattedMsg =
+      formatLayout("Test ", packageName, c(className, NNAME1), fMethod, msg)
     exOpt match {
       case Some(ex) => richLogger.error(formattedMsg, ex)
-      case None => richLogger.error(formattedMsg)
+      case None     => richLogger.error(formattedMsg)
     }
   }
 
-  private[this] def formatLayout(prefix: String,
-                                 packageName: String,
-                                 className: String,
-                                 method: String,
-                                 msg: String): String = {
+  private[this] def formatLayout(
+      prefix: String,
+      packageName: String,
+      className: String,
+      method: String,
+      msg: String): String = {
     if (method != null) s"$prefix$packageName.$className.$method $msg"
     else s"$prefix$packageName.$className $msg"
   }

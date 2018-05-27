@@ -18,8 +18,7 @@ class RoutingServiceTest extends FunSuite {
     }
 
     assert(Await.result(service(Request("/test.json"))).status == Status.Ok)
-    assert(
-        Await.result(service(Request("/unknown"))).status == Status.NotFound)
+    assert(Await.result(service(Request("/unknown"))).status == Status.NotFound)
   }
 
   test("RoutingService.byPathObject") {
@@ -28,8 +27,7 @@ class RoutingServiceTest extends FunSuite {
     }
 
     assert(Await.result(service(Request("/test.json"))).status == Status.Ok)
-    assert(
-        Await.result(service(Request("/unknown"))).status == Status.NotFound)
+    assert(Await.result(service(Request("/unknown"))).status == Status.NotFound)
   }
 
   test("RoutingService.byMethodAndPath") {
@@ -39,7 +37,9 @@ class RoutingServiceTest extends FunSuite {
 
     assert(Await.result(service(Request("/test.json"))).status == Status.Ok)
     assert(
-        Await.result(service(Request(Post, "/test.json"))).status == Status.NotFound)
+      Await
+        .result(service(Request(Post, "/test.json")))
+        .status == Status.NotFound)
   }
 
   test("RoutingService.byMethodAndPathObject") {
@@ -49,6 +49,8 @@ class RoutingServiceTest extends FunSuite {
 
     assert(Await.result(service(Request("/test.json"))).status == Status.Ok)
     assert(
-        Await.result(service(Request(Post, "/test.json"))).status == Status.NotFound)
+      Await
+        .result(service(Request(Post, "/test.json")))
+        .status == Status.NotFound)
   }
 }

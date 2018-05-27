@@ -120,31 +120,32 @@ object JsonAST {
       */
     def \(nameToFind: String): JValue = {
       findDirectByName(List(this), nameToFind) match {
-        case Nil => JNothing
+        case Nil      => JNothing
         case x :: Nil => x
-        case x => JArray(x)
+        case x        => JArray(x)
       }
     }
 
-    private def findDirectByName(
-        xs: List[JValue], name: String): List[JValue] = xs.flatMap {
-      case JObject(l) =>
-        l.collect {
-          case JField(n, value) if n == name => value
-        }
-      case JArray(l) => findDirectByName(l, name)
-      case _ => Nil
-    }
+    private def findDirectByName(xs: List[JValue], name: String): List[JValue] =
+      xs.flatMap {
+        case JObject(l) =>
+          l.collect {
+            case JField(n, value) if n == name => value
+          }
+        case JArray(l) => findDirectByName(l, name)
+        case _         => Nil
+      }
 
     private def findDirect(
-        xs: List[JValue], p: JValue => Boolean): List[JValue] = xs.flatMap {
+        xs: List[JValue],
+        p: JValue => Boolean): List[JValue] = xs.flatMap {
       case JObject(l) =>
         l.collect {
           case JField(n, x) if p(x) => x
         }
       case JArray(l) => findDirect(l, p)
       case x if p(x) => x :: Nil
-      case _ => Nil
+      case _         => Nil
     }
 
     /**
@@ -272,7 +273,7 @@ object JsonAST {
     private def typePredicate[A <: JValue](clazz: Class[A])(json: JValue) =
       json match {
         case x if x.getClass == clazz => true
-        case _ => false
+        case _                        => false
       }
 
     /**
@@ -323,8 +324,8 @@ object JsonAST {
       */
     def children: List[JValue] = this match {
       case JObject(l) => l map (_.value)
-      case JArray(l) => l
-      case _ => Nil
+      case JArray(l)  => l
+      case _          => Nil
     }
 
     /**
@@ -367,7 +368,7 @@ object JsonAST {
                 value.foldField(f(a, field))(f)
             }
           case JArray(l) => l.foldLeft(acc)((a, e) => e.foldField(a)(f))
-          case _ => acc
+          case _         => acc
         }
       }
       rec(z, this)
@@ -393,12 +394,11 @@ object JsonAST {
     def map(f: JValue => JValue): JValue = {
       def rec(v: JValue): JValue = v match {
         case JObject(l) =>
-          f(
-              JObject(l.map { field =>
+          f(JObject(l.map { field =>
             field.copy(value = rec(field.value))
           }))
         case JArray(l) => f(JArray(l.map(rec)))
-        case x => f(x)
+        case x         => f(x)
       }
       rec(this)
     }
@@ -421,12 +421,11 @@ object JsonAST {
     def mapField(f: JField => JField): JValue = {
       def rec(v: JValue): JValue = v match {
         case JObject(l) =>
-          JObject(
-              l.map { field =>
+          JObject(l.map { field =>
             f(field.copy(value = rec(field.value)))
           })
         case JArray(l) => JArray(l.map(rec))
-        case x => x
+        case x         => x
       }
       rec(this)
     }
@@ -512,12 +511,11 @@ object JsonAST {
             in match {
               case JObject(fields) =>
                 JObject(
-                    fields.map {
-                      case JField(`x`, value) =>
-                        JField(x,
-                               if (xs == Nil) replacement else rep(xs, value))
-                      case field => field
-                    }
+                  fields.map {
+                    case JField(`x`, value) =>
+                      JField(x, if (xs == Nil) replacement else rep(xs, value))
+                    case field => field
+                  }
                 )
               case other => other
             }
@@ -553,7 +551,7 @@ object JsonAST {
         case JObject(fs) =>
           fs.flatMap { case JField(n, v) => find(v) }.headOption
         case JArray(l) => l.flatMap(find _).headOption
-        case _ => None
+        case _         => None
       }
       find(this)
     }
@@ -575,7 +573,7 @@ object JsonAST {
           case JObject(fs) =>
             fs.flatMap { case JField(n, v) => find(v) }.headOption
           case JArray(l) => l.flatMap(find _).headOption
-          case _ => None
+          case _         => None
         }
       }
 
@@ -666,12 +664,12 @@ object JsonAST {
     def ++(other: JValue) = {
       def append(value1: JValue, value2: JValue): JValue =
         (value1, value2) match {
-          case (JNothing, x) => x
-          case (x, JNothing) => x
+          case (JNothing, x)            => x
+          case (x, JNothing)            => x
           case (JArray(xs), JArray(ys)) => JArray(xs ::: ys)
-          case (JArray(xs), v: JValue) => JArray(xs ::: List(v))
-          case (v: JValue, JArray(xs)) => JArray(v :: xs)
-          case (x, y) => JArray(x :: y :: Nil)
+          case (JArray(xs), v: JValue)  => JArray(xs ::: List(v))
+          case (v: JValue, JArray(xs))  => JArray(v :: xs)
+          case (x, y)                   => JArray(x :: y :: Nil)
         }
       append(this, other)
     }
@@ -690,7 +688,7 @@ object JsonAST {
       */
     def removeField(p: JField => Boolean): JValue = this mapField {
       case x if p(x) => JField(x.name, JNothing)
-      case x => x
+      case x         => x
     }
 
     /**
@@ -705,7 +703,7 @@ object JsonAST {
       */
     def remove(p: JValue => Boolean): JValue = this map {
       case x if p(x) => JNothing
-      case x => x
+      case x         => x
     }
 
     /**
@@ -726,7 +724,8 @@ object JsonAST {
       * }}}
       */
     def extract[A](
-        implicit formats: Formats, mf: scala.reflect.Manifest[A]): A =
+        implicit formats: Formats,
+        mf: scala.reflect.Manifest[A]): A =
       Extraction.extract(this)(formats, mf)
 
     /**
@@ -755,7 +754,8 @@ object JsonAST {
       * }}}
       */
     def extractOpt[A](
-        implicit formats: Formats, mf: scala.reflect.Manifest[A]): Option[A] =
+        implicit formats: Formats,
+        mf: scala.reflect.Manifest[A]): Option[A] =
       Extraction.extractOpt(this)(formats, mf)
 
     /**
@@ -777,12 +777,13 @@ object JsonAST {
       * }}}
       */
     def extractOrElse[A](default: => A)(
-        implicit formats: Formats, mf: scala.reflect.Manifest[A]): A =
+        implicit formats: Formats,
+        mf: scala.reflect.Manifest[A]): A =
       Extraction.extractOpt(this)(formats, mf).getOrElse(default)
 
     def toOpt: Option[JValue] = this match {
       case JNothing => None
-      case json => Some(json)
+      case json     => Some(json)
     }
   }
 
@@ -822,7 +823,7 @@ object JsonAST {
 
     override def equals(that: Any): Boolean = that match {
       case o: JObject => obj.toSet == o.obj.toSet
-      case _ => false
+      case _          => false
     }
 
     override def hashCode = obj.toSet[JField].hashCode
@@ -846,11 +847,13 @@ object JsonAST {
   }
 
   private def appendEscapedString(
-      buf: Appendable, s: String, settings: RenderSettings) {
+      buf: Appendable,
+      s: String,
+      settings: RenderSettings) {
     for (i <- 0 until s.length) {
       val c = s.charAt(i)
       val strReplacement = c match {
-        case '"' => "\\\""
+        case '"'  => "\\\""
         case '\\' => "\\\\"
         case '\b' => "\\b"
         case '\f' => "\\f"
@@ -859,7 +862,7 @@ object JsonAST {
         case '\t' => "\\t"
         case c
             if ((c >= '\u0000' && c < '\u0020')) ||
-            settings.escapeChars.contains(c) =>
+              settings.escapeChars.contains(c) =>
           "\\u%04x".format(c: Int)
 
         case _ => ""
@@ -890,15 +893,17 @@ object JsonAST {
       * Ranges of chars that should be escaped if this JSON is to be evaluated
       * directly as JavaScript (rather than by a valid JSON parser).
       */
-    val jsEscapeChars = List(('\u00ad', '\u00ad'),
-                             ('\u0600', '\u0604'),
-                             ('\u070f', '\u070f'),
-                             ('\u17b4', '\u17b5'),
-                             ('\u200c', '\u200f'),
-                             ('\u2028', '\u202f'),
-                             ('\u2060', '\u206f'),
-                             ('\ufeff', '\ufeff'),
-                             ('\ufff0', '\uffff')).foldLeft(Set[Char]()) {
+    val jsEscapeChars = List(
+      ('\u00ad', '\u00ad'),
+      ('\u0600', '\u0604'),
+      ('\u070f', '\u070f'),
+      ('\u17b4', '\u17b5'),
+      ('\u200c', '\u200f'),
+      ('\u2028', '\u202f'),
+      ('\u2060', '\u206f'),
+      ('\ufeff', '\ufeff'),
+      ('\ufff0', '\uffff')
+    ).foldLeft(Set[Char]()) {
       case (set, (start, end)) =>
         set ++ (start to end).toSet
     }
@@ -964,9 +969,10 @@ object JsonAST {
     * using the given `settings`. The appendable's `toString` will be called and
     * the result will be returned.
     */
-  def render(value: JValue,
-             settings: RenderSettings,
-             appendable: Appendable = new StringBuilder()): String = {
+  def render(
+      value: JValue,
+      settings: RenderSettings,
+      appendable: Appendable = new StringBuilder()): String = {
     bufRender(value, appendable, settings).toString()
   }
 
@@ -978,28 +984,30 @@ object JsonAST {
     * @param value the JSON to render
     * @param buf the buffer to render the JSON into. may not be empty
     */
-  private def bufRender(value: JValue,
-                        buf: Appendable,
-                        settings: RenderSettings,
-                        indentLevel: Int = 0): Appendable = value match {
-    case null => buf.append("null")
-    case JBool(true) => buf.append("true")
-    case JBool(false) => buf.append("false")
-    case JDouble(n) => buf.append(n.toString)
-    case JInt(n) => buf.append(n.toString)
-    case JNull => buf.append("null")
+  private def bufRender(
+      value: JValue,
+      buf: Appendable,
+      settings: RenderSettings,
+      indentLevel: Int = 0): Appendable = value match {
+    case null          => buf.append("null")
+    case JBool(true)   => buf.append("true")
+    case JBool(false)  => buf.append("false")
+    case JDouble(n)    => buf.append(n.toString)
+    case JInt(n)       => buf.append(n.toString)
+    case JNull         => buf.append("null")
     case JString(null) => buf.append("null")
-    case JString(s) => bufQuote(s, buf, settings)
-    case JArray(arr) => bufRenderArr(arr, buf, settings, indentLevel)
-    case JObject(obj) => bufRenderObj(obj, buf, settings, indentLevel)
+    case JString(s)    => bufQuote(s, buf, settings)
+    case JArray(arr)   => bufRenderArr(arr, buf, settings, indentLevel)
+    case JObject(obj)  => bufRenderObj(obj, buf, settings, indentLevel)
     case JNothing =>
       sys.error("can't render 'nothing'") //TODO: this should not throw an exception
   }
 
-  private def bufRenderArr(values: List[JValue],
-                           buf: Appendable,
-                           settings: RenderSettings,
-                           indentLevel: Int): Appendable = {
+  private def bufRenderArr(
+      values: List[JValue],
+      buf: Appendable,
+      settings: RenderSettings,
+      indentLevel: Int): Appendable = {
     var firstEntry = true
     val currentIndent = indentLevel + settings.indent
 
@@ -1038,10 +1046,11 @@ object JsonAST {
     buf
   }
 
-  private def bufRenderObj(fields: List[JField],
-                           buf: Appendable,
-                           settings: RenderSettings,
-                           indentLevel: Int): Appendable = {
+  private def bufRenderObj(
+      fields: List[JField],
+      buf: Appendable,
+      settings: RenderSettings,
+      indentLevel: Int): Appendable = {
     var firstEntry = true
     val currentIndent = indentLevel + settings.indent
 
@@ -1088,7 +1097,9 @@ object JsonAST {
   }
 
   private def bufQuote(
-      s: String, buf: Appendable, settings: RenderSettings): Appendable = {
+      s: String,
+      buf: Appendable,
+      settings: RenderSettings): Appendable = {
     buf.append('"') //open quote
     appendEscapedString(buf, s, settings)
     buf.append('"') //close quote
@@ -1123,8 +1134,7 @@ trait Implicits {
 object JsonDSL extends JsonDSL
 trait JsonDSL extends Implicits {
   implicit def seq2jvalue[A <% JValue](s: Traversable[A]) =
-    JArray(
-        s.toList.map { a =>
+    JArray(s.toList.map { a =>
       val v: JValue = a; v
     })
 
@@ -1133,7 +1143,7 @@ trait JsonDSL extends Implicits {
 
   implicit def option2jvalue[A <% JValue](opt: Option[A]): JValue = opt match {
     case Some(x) => x
-    case None => JNothing
+    case None    => JNothing
   }
 
   implicit def symbol2jvalue(x: Symbol) = JString(x.name)
@@ -1171,12 +1181,12 @@ trait JsonDSL extends Implicits {
   * </pre>
   */
 @deprecated(
-    "Please switch using JsonAST's render methods instead of relying on Printer.",
-    "3.0")
+  "Please switch using JsonAST's render methods instead of relying on Printer.",
+  "3.0")
 object Printer extends Printer
 @deprecated(
-    "Please switch using JsonAST's render methods instead of relying on Printer.",
-    "3.0")
+  "Please switch using JsonAST's render methods instead of relying on Printer.",
+  "3.0")
 trait Printer {
 
   /** Compact printing (no whitespace etc.)

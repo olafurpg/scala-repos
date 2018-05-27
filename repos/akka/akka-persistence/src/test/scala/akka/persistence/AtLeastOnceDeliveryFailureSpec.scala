@@ -63,7 +63,9 @@ object AtLeastOnceDeliveryFailureSpec {
   }
 
   class ChaosSender(destination: ActorRef, val probe: ActorRef)
-      extends PersistentActor with ChaosSupport with ActorLogging
+      extends PersistentActor
+      with ChaosSupport
+      with ActorLogging
       with AtLeastOnceDelivery {
     val config =
       context.system.settings.config.getConfig("akka.persistence.sender.chaos")
@@ -116,18 +118,23 @@ object AtLeastOnceDeliveryFailureSpec {
       s"[sender] ${msg} (mode = ${if (recoveryRunning) "replay" else "live"} snr = ${lastSequenceNr} state = ${state.sorted})"
 
     override protected def onRecoveryFailure(
-        cause: Throwable, event: Option[Any]): Unit = {
+        cause: Throwable,
+        event: Option[Any]): Unit = {
       // mute logging
     }
 
     override protected def onPersistFailure(
-        cause: Throwable, event: Any, seqNr: Long): Unit = {
+        cause: Throwable,
+        event: Any,
+        seqNr: Long): Unit = {
       // mute logging
     }
   }
 
   class ChaosDestination(val probe: ActorRef)
-      extends Actor with ChaosSupport with ActorLogging {
+      extends Actor
+      with ChaosSupport
+      with ActorLogging {
     val config = context.system.settings.config
       .getConfig("akka.persistence.destination.chaos")
     val confirmFailureRate = config.getDouble("confirm-failure-rate")
@@ -157,8 +164,9 @@ object AtLeastOnceDeliveryFailureSpec {
     var acks = Set.empty[Int]
 
     def createSender(): ActorRef =
-      context.watch(context.actorOf(
-              Props(classOf[ChaosSender], destination, probe), "sender"))
+      context.watch(
+        context
+          .actorOf(Props(classOf[ChaosSender], destination, probe), "sender"))
 
     def receive = {
       case Start ⇒ 1 to numMessages foreach (snd ! _)
@@ -173,7 +181,8 @@ object AtLeastOnceDeliveryFailureSpec {
 }
 
 class AtLeastOnceDeliveryFailureSpec
-    extends AkkaSpec(AtLeastOnceDeliveryFailureSpec.config) with Cleanup
+    extends AkkaSpec(AtLeastOnceDeliveryFailureSpec.config)
+    with Cleanup
     with ImplicitSender {
   import AtLeastOnceDeliveryFailureSpec._
 

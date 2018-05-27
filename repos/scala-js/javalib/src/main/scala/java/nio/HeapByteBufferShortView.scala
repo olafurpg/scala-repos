@@ -80,25 +80,26 @@ private[nio] object HeapByteBufferShortView {
       extends GenHeapBufferView.NewHeapBufferView[ShortBuffer] {
     def bytesPerElem: Int = 2
 
-    def apply(capacity: Int,
-              byteArray: Array[Byte],
-              byteArrayOffset: Int,
-              initialPosition: Int,
-              initialLimit: Int,
-              readOnly: Boolean,
-              isBigEndian: Boolean): ShortBuffer = {
-      new HeapByteBufferShortView(capacity,
-                                  byteArray,
-                                  byteArrayOffset,
-                                  initialPosition,
-                                  initialLimit,
-                                  readOnly,
-                                  isBigEndian)
+    def apply(
+        capacity: Int,
+        byteArray: Array[Byte],
+        byteArrayOffset: Int,
+        initialPosition: Int,
+        initialLimit: Int,
+        readOnly: Boolean,
+        isBigEndian: Boolean): ShortBuffer = {
+      new HeapByteBufferShortView(
+        capacity,
+        byteArray,
+        byteArrayOffset,
+        initialPosition,
+        initialLimit,
+        readOnly,
+        isBigEndian)
     }
   }
 
   @inline
-  private[nio] def fromHeapByteBuffer(
-      byteBuffer: HeapByteBuffer): ShortBuffer =
+  private[nio] def fromHeapByteBuffer(byteBuffer: HeapByteBuffer): ShortBuffer =
     GenHeapBufferView.generic_fromHeapByteBuffer(byteBuffer)
 }

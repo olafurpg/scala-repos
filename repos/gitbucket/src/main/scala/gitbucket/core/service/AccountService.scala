@@ -15,8 +15,9 @@ trait AccountService {
   private val logger = LoggerFactory.getLogger(classOf[AccountService])
 
   def authenticate(
-      settings: SystemSettings, userName: String, password: String)(
-      implicit s: Session): Option[Account] =
+      settings: SystemSettings,
+      userName: String,
+      password: String)(implicit s: Session): Option[Account] =
     if (settings.ldapAuthentication) {
       ldapAuthentication(settings, userName, password)
     } else {
@@ -39,67 +40,71 @@ trait AccountService {
     * Authenticate by LDAP.
     */
   private def ldapAuthentication(
-      settings: SystemSettings, userName: String, password: String)(
-      implicit s: Session): Option[Account] = {
+      settings: SystemSettings,
+      userName: String,
+      password: String)(implicit s: Session): Option[Account] = {
     LDAPUtil.authenticate(settings.ldap.get, userName, password) match {
       case Right(ldapUserInfo) => {
-          // Create or update account by LDAP information
-          getAccountByUserName(ldapUserInfo.userName, true) match {
-            case Some(x) if (!x.isRemoved) => {
-                if (settings.ldap.get.mailAttribute.getOrElse("").isEmpty) {
-                  updateAccount(x.copy(fullName = ldapUserInfo.fullName))
-                } else {
-                  updateAccount(
-                      x.copy(mailAddress = ldapUserInfo.mailAddress,
-                             fullName = ldapUserInfo.fullName))
-                }
+        // Create or update account by LDAP information
+        getAccountByUserName(ldapUserInfo.userName, true) match {
+          case Some(x) if (!x.isRemoved) => {
+            if (settings.ldap.get.mailAttribute.getOrElse("").isEmpty) {
+              updateAccount(x.copy(fullName = ldapUserInfo.fullName))
+            } else {
+              updateAccount(
+                x.copy(
+                  mailAddress = ldapUserInfo.mailAddress,
+                  fullName = ldapUserInfo.fullName))
+            }
+            getAccountByUserName(ldapUserInfo.userName)
+          }
+          case Some(x) if (x.isRemoved) => {
+            logger.info(
+              "LDAP Authentication Failed: Account is already registered but disabled.")
+            defaultAuthentication(userName, password)
+          }
+          case None =>
+            getAccountByMailAddress(ldapUserInfo.mailAddress, true) match {
+              case Some(x) if (!x.isRemoved) => {
+                updateAccount(x.copy(fullName = ldapUserInfo.fullName))
                 getAccountByUserName(ldapUserInfo.userName)
               }
-            case Some(x) if (x.isRemoved) => {
+              case Some(x) if (x.isRemoved) => {
                 logger.info(
-                    "LDAP Authentication Failed: Account is already registered but disabled.")
+                  "LDAP Authentication Failed: Account is already registered but disabled.")
                 defaultAuthentication(userName, password)
               }
-            case None =>
-              getAccountByMailAddress(ldapUserInfo.mailAddress, true) match {
-                case Some(x) if (!x.isRemoved) => {
-                    updateAccount(x.copy(fullName = ldapUserInfo.fullName))
-                    getAccountByUserName(ldapUserInfo.userName)
-                  }
-                case Some(x) if (x.isRemoved) => {
-                    logger.info(
-                        "LDAP Authentication Failed: Account is already registered but disabled.")
-                    defaultAuthentication(userName, password)
-                  }
-                case None => {
-                    createAccount(ldapUserInfo.userName,
-                                  "",
-                                  ldapUserInfo.fullName,
-                                  ldapUserInfo.mailAddress,
-                                  false,
-                                  None)
-                    getAccountByUserName(ldapUserInfo.userName)
-                  }
+              case None => {
+                createAccount(
+                  ldapUserInfo.userName,
+                  "",
+                  ldapUserInfo.fullName,
+                  ldapUserInfo.mailAddress,
+                  false,
+                  None)
+                getAccountByUserName(ldapUserInfo.userName)
               }
-          }
+            }
         }
+      }
       case Left(errorMessage) => {
-          logger.info(s"LDAP Authentication Failed: ${errorMessage}")
-          defaultAuthentication(userName, password)
-        }
+        logger.info(s"LDAP Authentication Failed: ${errorMessage}")
+        defaultAuthentication(userName, password)
+      }
     }
   }
 
   def getAccountByUserName(userName: String, includeRemoved: Boolean = false)(
       implicit s: Session): Option[Account] =
     Accounts filter
-    (t =>
-          (t.userName === userName.bind) &&
+      (t =>
+        (t.userName === userName.bind) &&
           (t.removed === false.bind, !includeRemoved)) firstOption
 
-  def getAccountsByUserNames(userNames: Set[String],
-                             knowns: Set[Account],
-                             includeRemoved: Boolean = false)(
+  def getAccountsByUserNames(
+      userNames: Set[String],
+      knowns: Set[Account],
+      includeRemoved: Boolean = false)(
       implicit s: Session): Map[String, Account] = {
     val map = knowns.map(a => a.userName -> a).toMap
     val needs = userNames -- map.keySet
@@ -107,8 +112,9 @@ trait AccountService {
       map
     } else {
       map ++ Accounts
-        .filter(t =>
-              (t.userName inSetBind needs) &&
+        .filter(
+          t =>
+            (t.userName inSetBind needs) &&
               (t.removed === false.bind, !includeRemoved))
         .list
         .map(a => a.userName -> a)
@@ -117,62 +123,71 @@ trait AccountService {
   }
 
   def getAccountByMailAddress(
-      mailAddress: String, includeRemoved: Boolean = false)(
-      implicit s: Session): Option[Account] =
+      mailAddress: String,
+      includeRemoved: Boolean = false)(implicit s: Session): Option[Account] =
     Accounts filter
-    (t =>
-          (t.mailAddress.toLowerCase === mailAddress.toLowerCase.bind) &&
+      (t =>
+        (t.mailAddress.toLowerCase === mailAddress.toLowerCase.bind) &&
           (t.removed === false.bind, !includeRemoved)) firstOption
 
-  def getAllUsers(
-      includeRemoved: Boolean = true)(implicit s: Session): List[Account] =
+  def getAllUsers(includeRemoved: Boolean = true)(
+      implicit s: Session): List[Account] =
     if (includeRemoved) {
       Accounts sortBy (_.userName) list
     } else {
       Accounts filter (_.removed === false.bind) sortBy (_.userName) list
     }
 
-  def createAccount(userName: String,
-                    password: String,
-                    fullName: String,
-                    mailAddress: String,
-                    isAdmin: Boolean,
-                    url: Option[String])(implicit s: Session): Unit =
-    Accounts insert Account(userName = userName,
-                            password = password,
-                            fullName = fullName,
-                            mailAddress = mailAddress,
-                            isAdmin = isAdmin,
-                            url = url,
-                            registeredDate = currentDate,
-                            updatedDate = currentDate,
-                            lastLoginDate = None,
-                            image = None,
-                            isGroupAccount = false,
-                            isRemoved = false)
+  def createAccount(
+      userName: String,
+      password: String,
+      fullName: String,
+      mailAddress: String,
+      isAdmin: Boolean,
+      url: Option[String])(implicit s: Session): Unit =
+    Accounts insert Account(
+      userName = userName,
+      password = password,
+      fullName = fullName,
+      mailAddress = mailAddress,
+      isAdmin = isAdmin,
+      url = url,
+      registeredDate = currentDate,
+      updatedDate = currentDate,
+      lastLoginDate = None,
+      image = None,
+      isGroupAccount = false,
+      isRemoved = false
+    )
 
   def updateAccount(account: Account)(implicit s: Session): Unit =
-    Accounts.filter { a =>
-      a.userName === account.userName.bind
-    }.map { a =>
-      (a.password,
-       a.fullName,
-       a.mailAddress,
-       a.isAdmin,
-       a.url.?,
-       a.registeredDate,
-       a.updatedDate,
-       a.lastLoginDate.?,
-       a.removed)
-    }.update(account.password,
-             account.fullName,
-             account.mailAddress,
-             account.isAdmin,
-             account.url,
-             account.registeredDate,
-             currentDate,
-             account.lastLoginDate,
-             account.isRemoved)
+    Accounts
+      .filter { a =>
+        a.userName === account.userName.bind
+      }
+      .map { a =>
+        (
+          a.password,
+          a.fullName,
+          a.mailAddress,
+          a.isAdmin,
+          a.url.?,
+          a.registeredDate,
+          a.updatedDate,
+          a.lastLoginDate.?,
+          a.removed)
+      }
+      .update(
+        account.password,
+        account.fullName,
+        account.mailAddress,
+        account.isAdmin,
+        account.url,
+        account.registeredDate,
+        currentDate,
+        account.lastLoginDate,
+        account.isRemoved
+      )
 
   def updateAvatarImage(userName: String, image: Option[String])(
       implicit s: Session): Unit =
@@ -184,20 +199,22 @@ trait AccountService {
       .map(_.lastLoginDate)
       .update(currentDate)
 
-  def createGroup(
-      groupName: String, url: Option[String])(implicit s: Session): Unit =
-    Accounts insert Account(userName = groupName,
-                            password = "",
-                            fullName = groupName,
-                            mailAddress = groupName + "@devnull",
-                            isAdmin = false,
-                            url = url,
-                            registeredDate = currentDate,
-                            updatedDate = currentDate,
-                            lastLoginDate = None,
-                            image = None,
-                            isGroupAccount = true,
-                            isRemoved = false)
+  def createGroup(groupName: String, url: Option[String])(
+      implicit s: Session): Unit =
+    Accounts insert Account(
+      userName = groupName,
+      password = "",
+      fullName = groupName,
+      mailAddress = groupName + "@devnull",
+      isAdmin = false,
+      url = url,
+      registeredDate = currentDate,
+      updatedDate = currentDate,
+      lastLoginDate = None,
+      image = None,
+      isGroupAccount = true,
+      isRemoved = false
+    )
 
   def updateGroup(groupName: String, url: Option[String], removed: Boolean)(
       implicit s: Session): Unit =
@@ -219,8 +236,7 @@ trait AccountService {
       implicit s: Session): List[GroupMember] =
     GroupMembers.filter(_.groupName === groupName.bind).sortBy(_.userName).list
 
-  def getGroupsByUserName(
-      userName: String)(implicit s: Session): List[String] =
+  def getGroupsByUserName(userName: String)(implicit s: Session): List[String] =
     GroupMembers
       .filter(_.userName === userName.bind)
       .sortBy(_.groupName)

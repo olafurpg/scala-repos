@@ -76,7 +76,8 @@ object ComboBoxTableCell {
     * $FTCINITDEPREC
     */
   @deprecated(
-      message = "Use forTableColumn[S, T](ObservableBuffer[T])", since = "1.0")
+    message = "Use forTableColumn[S, T](ObservableBuffer[T])",
+    since = "1.0")
   def forTableColumn[S, T](items: jfxc.ObservableList[T]) =
     jfxscc.ComboBoxTableCell.forTableColumn[S, T](items)
 
@@ -100,10 +101,12 @@ object ComboBoxTableCell {
     * $FTCINITDEPREC
     */
   @deprecated(
-      message = "Use forTableColumn[S, T](StringConverter[T], ObservableBuffer[T])",
-      since = "1.0")
+    message =
+      "Use forTableColumn[S, T](StringConverter[T], ObservableBuffer[T])",
+    since = "1.0")
   def forTableColumn[S, T](
-      converter: jfxu.StringConverter[T], items: jfxc.ObservableList[T]) =
+      converter: jfxu.StringConverter[T],
+      items: jfxc.ObservableList[T]) =
     jfxscc.ComboBoxTableCell.forTableColumn[S, T](converter, items)
 
   /**
@@ -114,8 +117,9 @@ object ComboBoxTableCell {
     * @param items $ITEMSPARAM
     * @return $RET
     */
-  def forTableColumn[S, T](converter: StringConverter[T],
-                           items: T*): (TableColumn[S, T] => TableCell[S, T]) =
+  def forTableColumn[S, T](
+      converter: StringConverter[T],
+      items: T*): (TableColumn[S, T] => TableCell[S, T]) =
     (view: TableColumn[S, T]) =>
       jfxscc.ComboBoxTableCell
         .forTableColumn[S, T](converter, items: _*)
@@ -124,8 +128,9 @@ object ComboBoxTableCell {
   /**
     * $FTCINITDEPREC
     */
-  @deprecated(message = "Use forTableColumn[S, T](StringConverter[T], T*)",
-              since = "1.0")
+  @deprecated(
+    message = "Use forTableColumn[S, T](StringConverter[T], T*)",
+    since = "1.0")
   def forTableColumn[S, T](converter: jfxu.StringConverter[T], items: T*) =
     jfxscc.ComboBoxTableCell.forTableColumn[S, T](converter, items: _*)
 
@@ -164,8 +169,9 @@ object ComboBoxTableCell {
   * @define CONVPARAM A $STCV that can convert an item of type T into a user-readable string so that it may then be shown in the $CMBX popup menu.
   * @define ITEMSPARAM The items to show in the $CMBX popup menu when selected by the user.
   */
-class ComboBoxTableCell[S, T](override val delegate: jfxscc.ComboBoxTableCell[
-        S, T] = new jfxscc.ComboBoxTableCell[S, T])
+class ComboBoxTableCell[S, T](
+    override val delegate: jfxscc.ComboBoxTableCell[S, T] =
+      new jfxscc.ComboBoxTableCell[S, T])
     extends TableCell[S, T](delegate)
     with ConvertableCell[jfxscc.ComboBoxTableCell[S, T], T, T]
     with ComboBoxEditableCell[jfxscc.ComboBoxTableCell[S, T], T]

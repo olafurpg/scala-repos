@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-14 Miles Sabin 
+ * Copyright (c) 2011-14 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,8 +122,8 @@ class ZipperTests {
   case class Address(street: String, city: String, postcode: String)
   case class Person(name: String, age: Int, address: Address)
 
-  val p1 = Person(
-      "Joe Grey", 37, Address("Southover Street", "Brighton", "BN2 9UA"))
+  val p1 =
+    Person("Joe Grey", 37, Address("Southover Street", "Brighton", "BN2 9UA"))
 
   case class Dept[E <: HList](manager: Employee, employees: E)
   case class Employee(name: String, salary: Int)
@@ -131,9 +131,10 @@ class ZipperTests {
   type D = Dept[Employee :: Employee :: Employee :: HNil]
 
   val dept = Dept(
-      Employee("Agamemnon", 5000),
-      Employee("Menelaus", 3000) :: Employee("Achilles", 2000) :: Employee(
-          "Odysseus", 2000) :: HNil
+    Employee("Agamemnon", 5000),
+    Employee("Menelaus", 3000) :: Employee("Achilles", 2000) :: Employee(
+      "Odysseus",
+      2000) :: HNil
   )
 
   @Test
@@ -166,34 +167,37 @@ class ZipperTests {
 
     val updatedName = z.put("Fred Bloggs").reify
     typed[Person](updatedName)
-    assertEquals(Person("Fred Bloggs",
-                        37,
-                        Address("Southover Street", "Brighton", "BN2 9UA")),
-                 updatedName)
+    assertEquals(
+      Person(
+        "Fred Bloggs",
+        37,
+        Address("Southover Street", "Brighton", "BN2 9UA")),
+      updatedName)
 
     val updatedCity = z.right.right.down.right.put("London")
     typed[Address](updatedCity.reify)
     assertEquals(
-        Address("Southover Street", "London", "BN2 9UA"), updatedCity.reify)
+      Address("Southover Street", "London", "BN2 9UA"),
+      updatedCity.reify)
 
     typed[Person](updatedCity.up.reify)
     assertEquals(
-        Person(
-            "Joe Grey", 37, Address("Southover Street", "London", "BN2 9UA")),
-        updatedCity.up.reify)
+      Person("Joe Grey", 37, Address("Southover Street", "London", "BN2 9UA")),
+      updatedCity.up.reify)
 
     typed[Person](updatedCity.root.reify)
     assertEquals(
-        Person(
-            "Joe Grey", 37, Address("Southover Street", "London", "BN2 9UA")),
-        updatedCity.up.reify)
+      Person("Joe Grey", 37, Address("Southover Street", "London", "BN2 9UA")),
+      updatedCity.up.reify)
 
     val agedPerson = z.right.modify(_ + 1).reify
     typed[Person](agedPerson)
-    assertEquals(Person("Joe Grey",
-                        38,
-                        Address("Southover Street", "Brighton", "BN2 9UA")),
-                 agedPerson)
+    assertEquals(
+      Person(
+        "Joe Grey",
+        38,
+        Address("Southover Street", "Brighton", "BN2 9UA")),
+      agedPerson)
 
     val reifiedAddress = z.right.right.down.reify
     typed[Address](reifiedAddress)
@@ -233,10 +237,11 @@ class ZipperTests {
       .reify
     typed[D](z3)
     assertEquals(
-        Dept(
-            Employee("King Agamemnon", 8000),
-            Employee("Menelaus", 3000) :: Employee("Achilles", 3000) :: Employee(
-                "Odysseus", 4000) :: HNil),
-        z3)
+      Dept(
+        Employee("King Agamemnon", 8000),
+        Employee("Menelaus", 3000) :: Employee("Achilles", 3000) :: Employee(
+          "Odysseus",
+          4000) :: HNil),
+      z3)
   }
 }

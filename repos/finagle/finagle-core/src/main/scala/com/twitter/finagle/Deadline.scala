@@ -17,8 +17,7 @@ import com.twitter.util.{Try, Return, Throw, Time, Duration}
   *
   * @param deadline the time by which the action must complete.
   */
-case class Deadline(timestamp: Time, deadline: Time)
-    extends Ordered[Deadline] {
+case class Deadline(timestamp: Time, deadline: Time) extends Ordered[Deadline] {
   def compare(that: Deadline): Int = this.deadline.compare(that.deadline)
   def expired: Boolean = Time.now > deadline
   def remaining: Duration = deadline - Time.now
@@ -62,14 +61,15 @@ object Deadline
 
   def tryUnmarshal(body: Buf): Try[Deadline] = {
     if (body.length != 16)
-      return Throw(new IllegalArgumentException(
-              s"Invalid body. Length ${body.length} but required 16"))
+      return Throw(
+        new IllegalArgumentException(
+          s"Invalid body. Length ${body.length} but required 16"))
 
     val bytes = Buf.ByteArray.Owned.extract(body)
     val timestamp = ByteArrays.get64be(bytes, 0)
     val deadline = ByteArrays.get64be(bytes, 8)
 
-    Return(Deadline(
-            Time.fromNanoseconds(timestamp), Time.fromNanoseconds(deadline)))
+    Return(
+      Deadline(Time.fromNanoseconds(timestamp), Time.fromNanoseconds(deadline)))
   }
 }

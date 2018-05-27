@@ -36,7 +36,7 @@ class ReplTest extends WordSpec {
 
     val suffix = mode match {
       case _: CascadingLocal => "local"
-      case _: HadoopMode => "hadoop"
+      case _: HadoopMode     => "hadoop"
     }
     val testPath = "/tmp/scalding-repl/test/" + suffix + "/"
     val helloRef = List("Hello world", "Goodbye world")
@@ -57,12 +57,13 @@ class ReplTest extends WordSpec {
         // shallow verification that the snapshot was created correctly without
         // actually running a new flow to check the contents (just check that
         // it's a TypedPipe from a MemorySink or SequenceFile)
-        assert(s.toString.contains("IterablePipe") ||
+        assert(
+          s.toString.contains("IterablePipe") ||
             s.toString.contains("TypedPipeFactory"))
 
         val pipeName = mode match {
           case m: HadoopMode => m.jobConf.get("hadoop.tmp.dir")
-          case _ => "IterableSource"
+          case _             => "IterableSource"
         }
         assert(s.toPipe(Fields.ALL).toString.contains(pipeName))
       }
@@ -88,9 +89,10 @@ class ReplTest extends WordSpec {
           .snapshot
 
         val output = s.toList
-        assert(output === helloRef
-              .flatMap(_.split("\\s+"))
-              .map(w => (w.toLowerCase, w.length)))
+        assert(
+          output === helloRef
+            .flatMap(_.split("\\s+"))
+            .map(w => (w.toLowerCase, w.length)))
       }
 
       "grouped -- Grouped[String,String]" which {
@@ -167,8 +169,7 @@ class ReplTest extends WordSpec {
       val hello = TypedPipe.from(TextLine(helloPath))
       "support toIterator" in {
         hello.toIterator.foreach { line: String =>
-          assert(
-              line.contains("Hello world") || line.contains("Goodbye world"))
+          assert(line.contains("Hello world") || line.contains("Goodbye world"))
         }
       }
       "support toList" in {
@@ -183,8 +184,8 @@ class ReplTest extends WordSpec {
         assert(out === helloRef.flatMap(_.split("\\s+")))
       }
       "tuple" in {
-        assert(hello.map(l => (l, l.length)).toList === helloRef.map(
-                l => (l, l.length)))
+        assert(hello.map(l => (l, l.length)).toList === helloRef.map(l =>
+          (l, l.length)))
       }
     }
   }
@@ -213,7 +214,7 @@ class ReplTest extends WordSpec {
       root.setReadable(true)
 
       val actual = ScaldingILoop.findAllUpPath(
-          currentDirectory.getAbsolutePath)("this_matches")
+        currentDirectory.getAbsolutePath)("this_matches")
       assert(actual === List(matchingFile))
     }
 
@@ -221,7 +222,7 @@ class ReplTest extends WordSpec {
       root.setReadable(false)
 
       val actual = ScaldingILoop.findAllUpPath(
-          currentDirectory.getAbsolutePath)("this_matches")
+        currentDirectory.getAbsolutePath)("this_matches")
       assert(actual === List.empty)
     }
   }

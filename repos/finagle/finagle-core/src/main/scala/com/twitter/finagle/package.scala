@@ -71,8 +71,9 @@ package object finagle {
       * Creates a [[com.twitter.finagle.Stack.Leaf]] which always fails.
       */
     def nilStack[Req, Rep]: Stack[ServiceFactory[Req, Rep]] =
-      Stack.Leaf(Endpoint,
-                 new com.twitter.finagle.service.FailingFactory[Req, Rep](
-                     new IllegalArgumentException("Unterminated stack")))
+      Stack.Leaf(
+        Endpoint,
+        new com.twitter.finagle.service.FailingFactory[Req, Rep](
+          new IllegalArgumentException("Unterminated stack")))
   }
 }

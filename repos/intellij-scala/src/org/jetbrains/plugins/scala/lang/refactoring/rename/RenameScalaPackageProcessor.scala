@@ -12,10 +12,12 @@ import org.jetbrains.plugins.scala.caches.ScalaShortNamesCacheManager
   * @since 06.11.12
   */
 class RenameScalaPackageProcessor
-    extends RenamePsiPackageProcessor with ScalaRenameProcessor {
-  override def prepareRenaming(element: PsiElement,
-                               newName: String,
-                               allRenames: util.Map[PsiElement, String]) {
+    extends RenamePsiPackageProcessor
+    with ScalaRenameProcessor {
+  override def prepareRenaming(
+      element: PsiElement,
+      newName: String,
+      allRenames: util.Map[PsiElement, String]) {
     element match {
       case p: PsiPackage =>
         val po = ScalaShortNamesCacheManager

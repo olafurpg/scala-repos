@@ -21,16 +21,21 @@ object where extends UFunc {
     new Impl[T, IndexedSeq[K]] {
       override def apply(v: T): IndexedSeq[K] = {
         val result = new ArrayBuffer[K]()
-        trav.traverse(v, new KeyValuePairsVisitor[K, V] {
-          override def visit(k: K, a: V): Unit = {
-            if (a != semi.zero) result += k
-          }
+        trav.traverse(
+          v,
+          new KeyValuePairsVisitor[K, V] {
+            override def visit(k: K, a: V): Unit = {
+              if (a != semi.zero) result += k
+            }
 
-          override def zeros(
-              numZero: Int, zeroKeys: Iterator[K], zeroValue: V): Unit = {
-            if (zeroValue != semi.zero) result ++= zeroKeys
+            override def zeros(
+                numZero: Int,
+                zeroKeys: Iterator[K],
+                zeroValue: V): Unit = {
+              if (zeroValue != semi.zero) result ++= zeroKeys
+            }
           }
-        })
+        )
 
         result
       }

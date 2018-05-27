@@ -22,9 +22,10 @@ trait LeadershipModule {
 }
 
 object LeadershipModule {
-  def apply(actorRefFactory: ActorRefFactory,
-            zk: ZooKeeperClient,
-            leader: LeadershipAbdication): LeadershipModule = {
+  def apply(
+      actorRefFactory: ActorRefFactory,
+      zk: ZooKeeperClient,
+      leader: LeadershipAbdication): LeadershipModule = {
     new LeadershipModuleImpl(actorRefFactory, zk, leader)
   }
 }
@@ -67,6 +68,7 @@ private[leadership] class LeadershipModuleImpl(
   /**
     * Register this actor by default.
     */
-  startWhenLeader(AbdicateOnConnectionLossActor.props(zk, leader),
-                  "AbdicateOnConnectionLoss")
+  startWhenLeader(
+    AbdicateOnConnectionLossActor.props(zk, leader),
+    "AbdicateOnConnectionLoss")
 }

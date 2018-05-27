@@ -39,6 +39,6 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class TextAlignmentSpec
     extends SFXEnumDelegateSpec[jfxst.TextAlignment, TextAlignment](
-        javaClass = classOf[jfxst.TextAlignment],
-        scalaClass = classOf[TextAlignment],
-        companion = TextAlignment)
+      javaClass = classOf[jfxst.TextAlignment],
+      scalaClass = classOf[TextAlignment],
+      companion = TextAlignment)

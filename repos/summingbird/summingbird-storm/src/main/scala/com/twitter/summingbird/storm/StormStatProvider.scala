@@ -2,7 +2,12 @@ package com.twitter.summingbird.storm
 
 import backtype.storm.metric.api.CountMetric
 import backtype.storm.task.TopologyContext
-import com.twitter.summingbird.{CounterIncrementor, Group, Name, PlatformStatProvider}
+import com.twitter.summingbird.{
+  CounterIncrementor,
+  Group,
+  Name,
+  PlatformStatProvider
+}
 import com.twitter.summingbird.option.JobId
 import com.twitter.util.{Promise, Await}
 import java.util.concurrent.ConcurrentHashMap
@@ -27,10 +32,11 @@ private[summingbird] object StormStatProvider extends PlatformStatProvider {
     new ConcurrentHashMap[JobId, ConcurrentHashMap[String, CountMetric]]
 
   def registerMetrics(
-      jobID: JobId, context: TopologyContext, metrics: Seq[(Group, Name)]) {
+      jobID: JobId,
+      context: TopologyContext,
+      metrics: Seq[(Group, Name)]) {
 
-    metricsForJob.putIfAbsent(
-        jobID, new ConcurrentHashMap[String, CountMetric])
+    metricsForJob.putIfAbsent(jobID, new ConcurrentHashMap[String, CountMetric])
     val jobMap = metricsForJob.get(jobID)
 
     metrics.foreach {
@@ -46,15 +52,18 @@ private[summingbird] object StormStatProvider extends PlatformStatProvider {
   }
 
   // returns Storm counter incrementor to the Counter object in Summingbird job
-  def counterIncrementor(jobID: JobId,
-                         group: Group,
-                         name: Name): Option[StormCounterIncrementor] =
+  def counterIncrementor(
+      jobID: JobId,
+      group: Group,
+      name: Name): Option[StormCounterIncrementor] =
     Option(metricsForJob.get(jobID)).map { m =>
-      StormCounterIncrementor(m.asScala.getOrElse(
-              group.getString +
-              "/" +
-              name.getString,
-              sys.error(
-                  s"It is only valid to create counter objects during job submission, tried to find $jobID -> $group/$name ")))
+      StormCounterIncrementor(
+        m.asScala.getOrElse(
+          group.getString +
+            "/" +
+            name.getString,
+          sys.error(
+            s"It is only valid to create counter objects during job submission, tried to find $jobID -> $group/$name ")
+        ))
     }
 }

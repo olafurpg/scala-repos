@@ -95,7 +95,7 @@ class FixedBufferSpec extends AkkaSpec {
         import language.reflectiveCalls
         val buf = FixedSizeBuffer[Int](size)
 
-        val cheat = buf.asInstanceOf[ {
+        val cheat = buf.asInstanceOf[{
           def readIdx_=(l: Long): Unit; def writeIdx_=(l: Long): Unit
         }]
         cheat.readIdx_=(Int.MaxValue)
@@ -125,10 +125,9 @@ class FixedBufferSpec extends AkkaSpec {
     }
 
     "produce FixedSizeBuffers when capacity < max-fixed-buffer-size" in {
-      Buffer(1000, default) shouldBe a[
-          FixedSizeBuffer.ModuloFixedSizeBuffer[_]]
+      Buffer(1000, default) shouldBe a[FixedSizeBuffer.ModuloFixedSizeBuffer[_]]
       Buffer(1024, default) shouldBe a[
-          FixedSizeBuffer.PowerOfTwoFixedSizeBuffer[_]]
+        FixedSizeBuffer.PowerOfTwoFixedSizeBuffer[_]]
     }
 
     "produce FixedSizeBuffers when max-fixed-buffer-size < BoundedBufferSize" in {
@@ -136,7 +135,7 @@ class FixedBufferSpec extends AkkaSpec {
       Buffer(5, default) shouldBe a[FixedSizeBuffer.ModuloFixedSizeBuffer[_]]
       Buffer(10, default) shouldBe a[FixedSizeBuffer.ModuloFixedSizeBuffer[_]]
       Buffer(16, default) shouldBe a[
-          FixedSizeBuffer.PowerOfTwoFixedSizeBuffer[_]]
+        FixedSizeBuffer.PowerOfTwoFixedSizeBuffer[_]]
     }
   }
 }

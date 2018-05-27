@@ -27,7 +27,8 @@ import scala.collection.JavaConverters._
   * URL class loader that exposes the `addURL` and `getURLs` methods in URLClassLoader.
   */
 private[spark] class MutableURLClassLoader(
-    urls: Array[URL], parent: ClassLoader)
+    urls: Array[URL],
+    parent: ClassLoader)
     extends URLClassLoader(urls, parent) {
 
   override def addURL(url: URL): Unit = {
@@ -44,7 +45,8 @@ private[spark] class MutableURLClassLoader(
   * when loading classes and resources.
   */
 private[spark] class ChildFirstURLClassLoader(
-    urls: Array[URL], parent: ClassLoader)
+    urls: Array[URL],
+    parent: ClassLoader)
     extends MutableURLClassLoader(urls, null) {
 
   private val parentClassLoader = new ParentClassLoader(parent)
@@ -89,7 +91,7 @@ private[spark] class ChildFirstURLClassLoader(
     val parentUrls = parentClassLoader
       .getResources(name)
       .asScala
-      (childUrls ++ parentUrls).asJavaEnumeration
+    (childUrls ++ parentUrls).asJavaEnumeration
   }
 
   override def addURL(url: URL) {

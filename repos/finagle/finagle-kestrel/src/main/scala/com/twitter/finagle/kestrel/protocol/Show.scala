@@ -3,7 +3,12 @@ package com.twitter.finagle.kestrel.protocol
 import org.jboss.netty.channel._
 import org.jboss.netty.handler.codec.oneone.OneToOneEncoder
 
-import com.twitter.finagle.memcached.protocol.text.{Decoding, Tokens, TokensWithData, ValueLines}
+import com.twitter.finagle.memcached.protocol.text.{
+  Decoding,
+  Tokens,
+  TokensWithData,
+  ValueLines
+}
 import com.twitter.io.Buf
 import com.twitter.util.{Time, Duration}
 
@@ -28,12 +33,14 @@ private[kestrel] class ResponseToEncoding extends OneToOneEncoder {
   import ResponseToEncoding._
 
   def encode(
-      ctx: ChannelHandlerContext, ch: Channel, message: AnyRef): Decoding = {
+      ctx: ChannelHandlerContext,
+      ch: Channel,
+      message: AnyRef): Decoding = {
     message match {
-      case Stored() => StoredTokens
-      case Deleted() => DeletedTokens
+      case Stored()   => StoredTokens
+      case Deleted()  => DeletedTokens
       case NotFound() => NotFoundTokens
-      case Error() => ErrorTokens
+      case Error()    => ErrorTokens
       case Values(values) =>
         val tokensWithData =
           values map {
@@ -78,20 +85,23 @@ private[kestrel] class CommandToEncoding extends OneToOneEncoder {
   ): Buf = {
     timeout match {
       case Some(t) => queueName.concat(suffix).concat(encodeTimeout(t))
-      case None => queueName.concat(suffix)
+      case None    => queueName.concat(suffix)
     }
   }
 
   def encode(
-      ctx: ChannelHandlerContext, ch: Channel, message: AnyRef): Decoding = {
+      ctx: ChannelHandlerContext,
+      ch: Channel,
+      message: AnyRef): Decoding = {
     message match {
       case Set(key, expiry, value) =>
         TokensWithData(
-            Seq(SET, key, ZERO, Buf.Utf8(expiry.inSeconds.toString)), value)
+          Seq(SET, key, ZERO, Buf.Utf8(expiry.inSeconds.toString)),
+          value)
       case Get(queueName, timeout) =>
         val key = timeout match {
           case Some(t) => queueName.concat(encodeTimeout(t))
-          case None => queueName
+          case None    => queueName
         }
         Tokens(Seq(GET, key))
       case Open(queueName, timeout) =>

@@ -36,17 +36,21 @@ object StressTestLog {
     val time = new MockTime
     val logProprties = new Properties()
     logProprties.put(
-        LogConfig.SegmentBytesProp, 64 * 1024 * 1024: java.lang.Integer)
+      LogConfig.SegmentBytesProp,
+      64 * 1024 * 1024: java.lang.Integer)
     logProprties.put(
-        LogConfig.MaxMessageBytesProp, Int.MaxValue: java.lang.Integer)
+      LogConfig.MaxMessageBytesProp,
+      Int.MaxValue: java.lang.Integer)
     logProprties.put(
-        LogConfig.SegmentIndexBytesProp, 1024 * 1024: java.lang.Integer)
+      LogConfig.SegmentIndexBytesProp,
+      1024 * 1024: java.lang.Integer)
 
-    val log = new Log(dir = dir,
-                      config = LogConfig(logProprties),
-                      recoveryPoint = 0L,
-                      scheduler = time.scheduler,
-                      time = time)
+    val log = new Log(
+      dir = dir,
+      config = LogConfig(logProprties),
+      recoveryPoint = 0L,
+      scheduler = time.scheduler,
+      time = time)
     val writer = new WriterThread(log)
     writer.start()
     val reader = new ReaderThread(log)
@@ -54,8 +58,7 @@ object StressTestLog {
 
     Runtime
       .getRuntime()
-      .addShutdownHook(
-          new Thread() {
+      .addShutdownHook(new Thread() {
         override def run() = {
           running.set(false)
           writer.join()
@@ -66,8 +69,8 @@ object StressTestLog {
 
     while (running.get) {
       println(
-          "Reader offset = %d, writer offset = %d".format(
-              reader.offset, writer.offset))
+        "Reader offset = %d, writer offset = %d"
+          .format(reader.offset, writer.offset))
       Thread.sleep(1000)
     }
   }
@@ -93,7 +96,7 @@ object StressTestLog {
       val logAppendInfo =
         log.append(TestUtils.singleMessageSet(offset.toString.getBytes))
       require(
-          logAppendInfo.firstOffset == offset &&
+        logAppendInfo.firstOffset == offset &&
           logAppendInfo.lastOffset == offset)
       offset += 1
       if (offset % 1000 == 0) Thread.sleep(500)
@@ -106,16 +109,16 @@ object StressTestLog {
       try {
         log.read(offset, 1024, Some(offset + 1)).messageSet match {
           case read: FileMessageSet if read.sizeInBytes > 0 => {
-              val first = read.head
-              require(
-                  first.offset == offset,
-                  "We should either read nothing or the message we asked for.")
-              require(
-                  MessageSet.entrySize(first.message) == read.sizeInBytes,
-                  "Expected %d but got %d.".format(
-                      MessageSet.entrySize(first.message), read.sizeInBytes))
-              offset += 1
-            }
+            val first = read.head
+            require(
+              first.offset == offset,
+              "We should either read nothing or the message we asked for.")
+            require(
+              MessageSet.entrySize(first.message) == read.sizeInBytes,
+              "Expected %d but got %d."
+                .format(MessageSet.entrySize(first.message), read.sizeInBytes))
+            offset += 1
+          }
           case _ =>
         }
       } catch {

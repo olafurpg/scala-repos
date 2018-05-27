@@ -1,7 +1,7 @@
 object O {
   def d(t: Top) = t match {
     case s: Sub => true
-    case _ => false
+    case _      => false
   }
 
   def main(args: Array[String]): Unit = {

@@ -19,8 +19,10 @@ class FlowSplitWhenSpec extends AkkaSpec {
 
   val settings = ActorMaterializerSettings(system)
     .withInputBuffer(initialSize = 2, maxSize = 2)
-    .withSubscriptionTimeoutSettings(StreamSubscriptionTimeoutSettings(
-            StreamSubscriptionTimeoutTerminationMode.cancel, 1.second))
+    .withSubscriptionTimeoutSettings(
+      StreamSubscriptionTimeoutSettings(
+        StreamSubscriptionTimeoutTerminationMode.cancel,
+        1.second))
 
   implicit val materializer = ActorMaterializer(settings)
 
@@ -40,7 +42,8 @@ class FlowSplitWhenSpec extends AkkaSpec {
   class SubstreamsSupport(
       splitWhen: Int = 3,
       elementCount: Int = 6,
-      substreamCancelStrategy: SubstreamCancelStrategy = SubstreamCancelStrategy.drain) {
+      substreamCancelStrategy: SubstreamCancelStrategy =
+        SubstreamCancelStrategy.drain) {
 
     val source = Source(1 to elementCount)
     val groupStream = source
@@ -95,14 +98,14 @@ class FlowSplitWhenSpec extends AkkaSpec {
     "not emit substreams if the parent stream is empty" in assertAllStagesStopped {
 
       Await.result(
-          Source
-            .empty[Int]
-            .splitWhen(_ ⇒ true)
-            .lift
-            .mapAsync(1)(_.runWith(Sink.headOption))
-            .grouped(10)
-            .runWith(Sink.headOption),
-          3.seconds) should ===(None) // rather tricky way of saying that no empty substream should be emitted (vs.  Some(None))
+        Source
+          .empty[Int]
+          .splitWhen(_ ⇒ true)
+          .lift
+          .mapAsync(1)(_.runWith(Sink.headOption))
+          .grouped(10)
+          .runWith(Sink.headOption),
+        3.seconds) should ===(None) // rather tricky way of saying that no empty substream should be emitted (vs.  Some(None))
     }
 
     "work when first element is split-by" in assertAllStagesStopped {
@@ -261,45 +264,49 @@ class FlowSplitWhenSpec extends AkkaSpec {
 
     "work with single elem splits" in assertAllStagesStopped {
       Await.result(
-          Source(1 to 100)
-            .splitWhen(_ ⇒ true)
-            .lift
-            .mapAsync(1)(_.runWith(Sink.head)) // Please note that this line *also* implicitly asserts nonempty substreams
-            .grouped(200)
-            .runWith(Sink.head),
-          3.second) should ===(1 to 100)
+        Source(1 to 100)
+          .splitWhen(_ ⇒ true)
+          .lift
+          .mapAsync(1)(_.runWith(Sink.head)) // Please note that this line *also* implicitly asserts nonempty substreams
+          .grouped(200)
+          .runWith(Sink.head),
+        3.second
+      ) should ===(1 to 100)
     }
 
     "fail substream if materialized twice" in assertAllStagesStopped {
       an[IllegalStateException] mustBe thrownBy {
-        Await.result(Source
-                       .single(1)
-                       .splitWhen(_ ⇒ true)
-                       .lift
-                       .mapAsync(1) { src ⇒
-                         src.runWith(Sink.ignore); src.runWith(Sink.ignore)
-                       } // Sink.ignore+mapAsync pipes error back
-                       .runWith(Sink.ignore),
-                     3.seconds)
+        Await.result(
+          Source
+            .single(1)
+            .splitWhen(_ ⇒ true)
+            .lift
+            .mapAsync(1) { src ⇒
+              src.runWith(Sink.ignore); src.runWith(Sink.ignore)
+            } // Sink.ignore+mapAsync pipes error back
+            .runWith(Sink.ignore),
+          3.seconds
+        )
       }
     }
 
     "fail stream if substream not materialized in time" in assertAllStagesStopped {
       val tightTimeoutMaterializer = ActorMaterializer(
-          ActorMaterializerSettings(system).withSubscriptionTimeoutSettings(
-              StreamSubscriptionTimeoutSettings(
-                  StreamSubscriptionTimeoutTerminationMode.cancel,
-                  500.millisecond)))
+        ActorMaterializerSettings(system).withSubscriptionTimeoutSettings(
+          StreamSubscriptionTimeoutSettings(
+            StreamSubscriptionTimeoutTerminationMode.cancel,
+            500.millisecond)))
 
       val testSource =
         Source.single(1).concat(Source.maybe).splitWhen(_ ⇒ true)
 
       a[SubscriptionTimeoutException] mustBe thrownBy {
-        Await.result(testSource.lift
-                       .delay(1.second)
-                       .flatMapConcat(identity)
-                       .runWith(Sink.ignore)(tightTimeoutMaterializer),
-                     3.seconds)
+        Await.result(
+          testSource.lift
+            .delay(1.second)
+            .flatMapConcat(identity)
+            .runWith(Sink.ignore)(tightTimeoutMaterializer),
+          3.seconds)
       }
     }
 
@@ -374,9 +381,10 @@ class FlowSplitWhenSpec extends AkkaSpec {
     }
 
     "support eager cancellation of master stream on cancelling substreams" in assertAllStagesStopped {
-      new SubstreamsSupport(splitWhen = 5,
-                            elementCount = 8,
-                            SubstreamCancelStrategy.propagate) {
+      new SubstreamsSupport(
+        splitWhen = 5,
+        elementCount = 8,
+        SubstreamCancelStrategy.propagate) {
         val s1 = StreamPuppet(getSubFlow().runWith(Sink.asPublisher(false)))
         s1.cancel()
         masterSubscriber.expectComplete()

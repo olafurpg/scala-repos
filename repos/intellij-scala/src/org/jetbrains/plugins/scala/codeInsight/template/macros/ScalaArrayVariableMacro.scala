@@ -20,27 +20,35 @@ class ScalaArrayVariableMacro extends ScalaVariableOfTypeMacro {
 
   override def getPresentableName =
     MacroUtil.scalaPresentablePrefix + CodeInsightBundle.message(
-        "macro.array.variable")
+      "macro.array.variable")
 
-  override def addLookupItems(exprs: Array[String],
-                              context: ExpressionContext,
-                              variant: ScalaResolveResult,
-                              scType: ScType,
-                              project: Project,
-                              array: ArrayBuffer[LookupElement]) =
+  override def addLookupItems(
+      exprs: Array[String],
+      context: ExpressionContext,
+      variant: ScalaResolveResult,
+      scType: ScType,
+      project: Project,
+      array: ArrayBuffer[LookupElement]) =
     super.addLookupItems(
-        Array("scala.Array"), context, variant, scType, project, array)
+      Array("scala.Array"),
+      context,
+      variant,
+      scType,
+      project,
+      array)
 
-  override def getResult(exprs: Array[Expression],
-                         context: ExpressionContext,
-                         variant: ScalaResolveResult,
-                         scType: ScType,
-                         project: Project): Option[Result] =
-    super.getResult(Array(new TextExpression("scala.Array")),
-                    context,
-                    variant,
-                    scType,
-                    project)
+  override def getResult(
+      exprs: Array[Expression],
+      context: ExpressionContext,
+      variant: ScalaResolveResult,
+      scType: ScType,
+      project: Project): Option[Result] =
+    super.getResult(
+      Array(new TextExpression("scala.Array")),
+      context,
+      variant,
+      scType,
+      project)
 
   override def validExprsCount(exprsCount: Int): Boolean = exprsCount == 0
 }

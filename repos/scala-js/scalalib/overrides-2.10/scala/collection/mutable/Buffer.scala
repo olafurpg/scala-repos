@@ -29,8 +29,10 @@ import scala.scalajs.js
   *  @define coll buffer
   */
 trait Buffer[A]
-    extends Seq[A] with GenericTraversableTemplate[A, Buffer]
-    with BufferLike[A, Buffer[A]] with scala.Cloneable {
+    extends Seq[A]
+    with GenericTraversableTemplate[A, Buffer]
+    with BufferLike[A, Buffer[A]]
+    with scala.Cloneable {
   override def companion: GenericCompanion[Buffer] = Buffer
 }
 
@@ -46,4 +48,5 @@ object Buffer extends SeqFactory[Buffer] {
 
 /** Explicit instantiation of the `Buffer` trait to reduce class file size in subclasses. */
 private[scala] abstract class AbstractBuffer[A]
-    extends AbstractSeq[A] with Buffer[A]
+    extends AbstractSeq[A]
+    with Buffer[A]

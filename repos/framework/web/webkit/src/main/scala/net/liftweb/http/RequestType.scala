@@ -64,13 +64,13 @@ case class UnknownRequest(method: String) extends RequestType
 object RequestType {
   def apply(req: HTTPRequest): RequestType = {
     req.method.toUpperCase match {
-      case "GET" => GetRequest
-      case "POST" => PostRequest
-      case "HEAD" => HeadRequest
-      case "PUT" => PutRequest
-      case "DELETE" => DeleteRequest
+      case "GET"     => GetRequest
+      case "POST"    => PostRequest
+      case "HEAD"    => HeadRequest
+      case "PUT"     => PutRequest
+      case "DELETE"  => DeleteRequest
       case "OPTIONS" => OptionsRequest
-      case meth => UnknownRequest(meth)
+      case meth      => UnknownRequest(meth)
     }
   }
 }

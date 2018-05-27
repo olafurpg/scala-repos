@@ -42,7 +42,8 @@ object FileStreams {
     try {
       if (path.getName.endsWith(".gz")) {
         new BufferedInputStream(
-            new GZIPInputStream(fis, BUFFER_SIZE), BUFFER_SIZE);
+          new GZIPInputStream(fis, BUFFER_SIZE),
+          BUFFER_SIZE);
       } else {
         new BufferedInputStream(fis, BUFFER_SIZE);
       }
@@ -62,7 +63,8 @@ object FileStreams {
     try {
       if (path.getName.endsWith(".gz")) {
         new BufferedOutputStream(
-            new GZIPOutputStream(fos, BUFFER_SIZE), BUFFER_SIZE);
+          new GZIPOutputStream(fos, BUFFER_SIZE),
+          BUFFER_SIZE);
       } else {
         new BufferedOutputStream(fos, BUFFER_SIZE);
       }

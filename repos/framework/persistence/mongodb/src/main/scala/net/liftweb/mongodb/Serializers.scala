@@ -87,7 +87,7 @@ class DateSerializer extends Serializer[Date] {
     case (TypeInfo(DateClass, _), json) =>
       json match {
         case JsonDate(dt) => dt
-        case x => throw new MappingException("Can't convert " + x + " to Date")
+        case x            => throw new MappingException("Can't convert " + x + " to Date")
       }
   }
 
@@ -110,7 +110,7 @@ class DateTimeSerializer extends Serializer[DateTime] {
     case (TypeInfo(DateTimeClass, _), json) =>
       json match {
         case JsonDateTime(dt) => dt
-        case x => throw new MappingException("Can't convert " + x + " to Date")
+        case x                => throw new MappingException("Can't convert " + x + " to Date")
       }
   }
 
@@ -133,7 +133,7 @@ class UUIDSerializer extends Serializer[UUID] {
     case (TypeInfo(UUIDClass, _), json) =>
       json match {
         case JsonUUID(uuid) => uuid
-        case x => throw new MappingException("Can't convert " + x + " to UUID")
+        case x              => throw new MappingException("Can't convert " + x + " to UUID")
       }
   }
 

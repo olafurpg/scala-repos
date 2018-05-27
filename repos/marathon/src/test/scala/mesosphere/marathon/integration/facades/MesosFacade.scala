@@ -15,14 +15,17 @@ object MesosFacade {
     * Corresponds to parts of `state.json`.
     */
   case class ITMesosState(
-      version: String, gitTag: String, agents: Iterable[ITAgent])
+      version: String,
+      gitTag: String,
+      agents: Iterable[ITAgent])
 
-  case class ITAgent(id: String,
-                     resources: ITResources,
-                     usedResources: ITResources,
-                     offeredResources: ITResources,
-                     reservedResourcesByRole: Map[String, ITResources],
-                     unreservedResources: ITResources)
+  case class ITAgent(
+      id: String,
+      resources: ITResources,
+      usedResources: ITResources,
+      offeredResources: ITResources,
+      reservedResourcesByRole: Map[String, ITResources],
+      unreservedResources: ITResources)
 
   case class ITResources(resources: Map[String, ITResourceValue]) {
     def isEmpty: Boolean =
@@ -41,7 +44,7 @@ object MesosFacade {
     def empty: ITResources = new ITResources(Map.empty)
     def apply(vals: (String, Any)*): ITResources = {
       val resources = vals.toMap.mapValues {
-        case value: Double => ITResourceScalarValue(value)
+        case value: Double       => ITResourceScalarValue(value)
         case portsString: String => ITResourcePortValue(portsString)
       }
       ITResources(resources)

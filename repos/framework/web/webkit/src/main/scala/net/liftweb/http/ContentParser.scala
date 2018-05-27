@@ -98,9 +98,10 @@ object ContentParser {
     * A fully-specified `ContentParser` which handles multiple filename suffixes, operates on an `InputStream`, and
     * surrounds the top-level templates with the default surround
     */
-  def apply(templateSuffixesSeq: Seq[String],
-            parseF: InputStream => Box[NodeSeq],
-            surroundF: NodeSeq => NodeSeq): ContentParser =
+  def apply(
+      templateSuffixesSeq: Seq[String],
+      parseF: InputStream => Box[NodeSeq],
+      surroundF: NodeSeq => NodeSeq): ContentParser =
     new ContentParser {
       override def templateSuffixes: Seq[String] = templateSuffixesSeq
       override def parse(content: InputStream): Box[NodeSeq] = parseF(content)

@@ -60,11 +60,15 @@ object TreeTableColumn {
       * @param value The value for a row in the TreeTableView.
       * @return
       */
-    def this(treeTableView: TreeTableView[S],
-             treeTableColumn: TreeTableColumn[S, T],
-             value: S) =
-      this(new jfxsc.TreeTableColumn.CellDataFeatures[S, T](
-              treeTableView, treeTableColumn, new TreeItem[S](value)))
+    def this(
+        treeTableView: TreeTableView[S],
+        treeTableColumn: TreeTableColumn[S, T],
+        value: S) =
+      this(
+        new jfxsc.TreeTableColumn.CellDataFeatures[S, T](
+          treeTableView,
+          treeTableColumn,
+          new TreeItem[S](value)))
 
     /**
       * Returns the TreeTableColumn passed in to the constructor.
@@ -123,8 +127,12 @@ object TreeTableColumn {
         pos: TreeTablePosition[S, T],
         eventType: jfxe.EventType[jfxsc.TreeTableColumn.CellEditEvent[S, T]],
         newValue: T) =
-      this(new jfxsc.TreeTableColumn.CellEditEvent(
-              table, pos, eventType, newValue))
+      this(
+        new jfxsc.TreeTableColumn.CellEditEvent(
+          table,
+          pos,
+          eventType,
+          newValue))
 
     /**
       * Returns the TreeTableView upon which this event occurred.
@@ -160,8 +168,7 @@ object TreeTableColumn {
   }
 
   object SortType
-      extends SFXEnumDelegateCompanion[
-          jfxsc.TreeTableColumn.SortType, SortType] {
+      extends SFXEnumDelegateCompanion[jfxsc.TreeTableColumn.SortType, SortType] {
 
     /** Column will be sorted in an ascending order. */
     val Ascending = new SortType(jfxsc.TreeTableColumn.SortType.ASCENDING)
@@ -225,8 +232,8 @@ object TreeTableColumn {
   *
   */
 class TreeTableColumn[S, T](
-    override val delegate: jfxsc.TreeTableColumn[S, T] = new jfxsc.TreeTableColumn[
-          S, T]())
+    override val delegate: jfxsc.TreeTableColumn[S, T] =
+      new jfxsc.TreeTableColumn[S, T]())
     extends TableColumnBase[jfxsc.TreeItem[S], T](delegate)
     with SFXDelegate[jfxsc.TreeTableColumn[S, T]] {
 
@@ -248,16 +255,15 @@ class TreeTableColumn[S, T](
     *
     * Finally, there are a number of pre-built cell factories available in the javafx.scene.control.cell package.
     */
-  def cellFactory: ObjectProperty[TreeTableColumn[S, T] => TreeTableCell[S, T]] =
-    ObjectProperty(
-        (column: TreeTableColumn[S, T]) =>
-          new TreeTableCell(
-              delegate.cellFactoryProperty.getValue.call(column)))
+  def cellFactory
+    : ObjectProperty[TreeTableColumn[S, T] => TreeTableCell[S, T]] =
+    ObjectProperty((column: TreeTableColumn[S, T]) =>
+      new TreeTableCell(delegate.cellFactoryProperty.getValue.call(column)))
 
   def cellFactory_=(f: TreeTableColumn[S, T] => TreeTableCell[S, T]) {
-    delegate.cellFactoryProperty.setValue(
-        new jfxu.Callback[
-            jfxsc.TreeTableColumn[S, T], jfxsc.TreeTableCell[S, T]] {
+    delegate.cellFactoryProperty.setValue(new jfxu.Callback[
+      jfxsc.TreeTableColumn[S, T],
+      jfxsc.TreeTableCell[S, T]] {
       def call(v: jfxsc.TreeTableColumn[S, T]): jfxsc.TreeTableCell[S, T] = {
         f(v)
       }
@@ -291,22 +297,23 @@ class TreeTableColumn[S, T](
     * firstNameCol.cellValueFactory = new TreeItemPropertyValueFactory[Person,String]("firstName"))
     */
   def cellValueFactory: ObjectProperty[
-      TreeTableColumn.CellDataFeatures[S, T] => ObservableValue[T, T]] =
+    TreeTableColumn.CellDataFeatures[S, T] => ObservableValue[T, T]] =
     ObjectProperty(
-        (features: TreeTableColumn.CellDataFeatures[S, T]) =>
-          jfxObservableValue2sfx[T](
-              delegate.cellValueFactoryProperty.getValue.call(features)))
+      (features: TreeTableColumn.CellDataFeatures[S, T]) =>
+        jfxObservableValue2sfx[T](
+          delegate.cellValueFactoryProperty.getValue.call(features)))
 
   def cellValueFactory_=(
       f: TreeTableColumn.CellDataFeatures[S, T] => ObservableValue[T, T]) {
     delegate.cellValueFactoryProperty.setValue(
-        new jfxu.Callback[jfxsc.TreeTableColumn.CellDataFeatures[S, T],
-                          jfxbv.ObservableValue[T]] {
-      def call(v: jfxsc.TreeTableColumn.CellDataFeatures[S, T])
-        : jfxbv.ObservableValue[T] = {
-        f(v).delegate
-      }
-    })
+      new jfxu.Callback[
+        jfxsc.TreeTableColumn.CellDataFeatures[S, T],
+        jfxbv.ObservableValue[T]] {
+        def call(v: jfxsc.TreeTableColumn.CellDataFeatures[S, T])
+          : jfxbv.ObservableValue[T] = {
+          f(v).delegate
+        }
+      })
   }
 
   /**

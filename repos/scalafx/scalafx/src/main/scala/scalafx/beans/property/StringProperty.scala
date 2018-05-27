@@ -32,8 +32,7 @@ import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
 object StringProperty {
-  implicit def sfxStringProperty2jfx(
-      sp: StringProperty): jfxbp.StringProperty =
+  implicit def sfxStringProperty2jfx(sp: StringProperty): jfxbp.StringProperty =
     if (sp != null) sp.delegate else null
 
   /**
@@ -45,9 +44,10 @@ object StringProperty {
   def apply(value: String) = new StringProperty(value)
 }
 
-class StringProperty(
-    override val delegate: jfxbp.StringProperty = new jfxbp.SimpleStringProperty)
-    extends ReadOnlyStringProperty(delegate) with Property[String, String]
+class StringProperty(override val delegate: jfxbp.StringProperty =
+  new jfxbp.SimpleStringProperty)
+    extends ReadOnlyStringProperty(delegate)
+    with Property[String, String]
     with SFXDelegate[jfxbp.StringProperty] {
 
   def this(initialValue: String) =

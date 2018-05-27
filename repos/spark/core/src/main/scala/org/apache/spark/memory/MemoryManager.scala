@@ -33,10 +33,11 @@ import org.apache.spark.unsafe.memory.MemoryAllocator
   * sorts and aggregations, while storage memory refers to that used for caching and propagating
   * internal data across the cluster. There exists one MemoryManager per JVM.
   */
-private[spark] abstract class MemoryManager(conf: SparkConf,
-                                            numCores: Int,
-                                            storageMemory: Long,
-                                            onHeapExecutionMemory: Long)
+private[spark] abstract class MemoryManager(
+    conf: SparkConf,
+    numCores: Int,
+    storageMemory: Long,
+    onHeapExecutionMemory: Long)
     extends Logging {
 
   // -- Methods related to memory allocation policies and bookkeeping ------------------------------
@@ -44,16 +45,16 @@ private[spark] abstract class MemoryManager(conf: SparkConf,
   @GuardedBy("this")
   protected val storageMemoryPool = new StorageMemoryPool(this)
   @GuardedBy("this")
-  protected val onHeapExecutionMemoryPool = new ExecutionMemoryPool(
-      this, "on-heap execution")
+  protected val onHeapExecutionMemoryPool =
+    new ExecutionMemoryPool(this, "on-heap execution")
   @GuardedBy("this")
-  protected val offHeapExecutionMemoryPool = new ExecutionMemoryPool(
-      this, "off-heap execution")
+  protected val offHeapExecutionMemoryPool =
+    new ExecutionMemoryPool(this, "off-heap execution")
 
   storageMemoryPool.incrementPoolSize(storageMemory)
   onHeapExecutionMemoryPool.incrementPoolSize(onHeapExecutionMemory)
   offHeapExecutionMemoryPool.incrementPoolSize(
-      conf.getSizeAsBytes("spark.memory.offHeap.size", 0))
+    conf.getSizeAsBytes("spark.memory.offHeap.size", 0))
 
   /**
     * Total available memory for storage, in bytes. This amount can vary over time, depending on
@@ -97,13 +98,17 @@ private[spark] abstract class MemoryManager(conf: SparkConf,
     * but an older task had a lot of memory already.
     */
   private[memory] def acquireExecutionMemory(
-      numBytes: Long, taskAttemptId: Long, memoryMode: MemoryMode): Long
+      numBytes: Long,
+      taskAttemptId: Long,
+      memoryMode: MemoryMode): Long
 
   /**
     * Release numBytes of execution memory belonging to the given task.
     */
   private[memory] def releaseExecutionMemory(
-      numBytes: Long, taskAttemptId: Long, memoryMode: MemoryMode): Unit =
+      numBytes: Long,
+      taskAttemptId: Long,
+      memoryMode: MemoryMode): Unit =
     synchronized {
       memoryMode match {
         case MemoryMode.ON_HEAP =>
@@ -121,7 +126,7 @@ private[spark] abstract class MemoryManager(conf: SparkConf,
   private[memory] def releaseAllExecutionMemoryForTask(
       taskAttemptId: Long): Long = synchronized {
     onHeapExecutionMemoryPool.releaseAllMemoryForTask(taskAttemptId) +
-    offHeapExecutionMemoryPool.releaseAllMemoryForTask(taskAttemptId)
+      offHeapExecutionMemoryPool.releaseAllMemoryForTask(taskAttemptId)
   }
 
   /**
@@ -150,7 +155,7 @@ private[spark] abstract class MemoryManager(conf: SparkConf,
     */
   final def executionMemoryUsed: Long = synchronized {
     onHeapExecutionMemoryPool.memoryUsed +
-    offHeapExecutionMemoryPool.memoryUsed
+      offHeapExecutionMemoryPool.memoryUsed
   }
 
   /**
@@ -166,7 +171,7 @@ private[spark] abstract class MemoryManager(conf: SparkConf,
   private[memory] def getExecutionMemoryUsageForTask(
       taskAttemptId: Long): Long = synchronized {
     onHeapExecutionMemoryPool.getMemoryUsageForTask(taskAttemptId) +
-    offHeapExecutionMemoryPool.getMemoryUsageForTask(taskAttemptId)
+      offHeapExecutionMemoryPool.getMemoryUsageForTask(taskAttemptId)
   }
 
   // -- Fields related to Tungsten managed memory -------------------------------------------------
@@ -178,8 +183,8 @@ private[spark] abstract class MemoryManager(conf: SparkConf,
   final val tungstenMemoryMode: MemoryMode = {
     if (conf.getBoolean("spark.memory.offHeap.enabled", false)) {
       require(
-          conf.getSizeAsBytes("spark.memory.offHeap.size", 0) > 0,
-          "spark.memory.offHeap.size must be > 0 when spark.memory.offHeap.enabled == true")
+        conf.getSizeAsBytes("spark.memory.offHeap.size", 0) > 0,
+        "spark.memory.offHeap.size must be > 0 when spark.memory.offHeap.enabled == true")
       MemoryMode.OFF_HEAP
     } else {
       MemoryMode.ON_HEAP
@@ -201,7 +206,7 @@ private[spark] abstract class MemoryManager(conf: SparkConf,
     // Because of rounding to next power of 2, we may have safetyFactor as 8 in worst case
     val safetyFactor = 16
     val maxTungstenMemory: Long = tungstenMemoryMode match {
-      case MemoryMode.ON_HEAP => onHeapExecutionMemoryPool.poolSize
+      case MemoryMode.ON_HEAP  => onHeapExecutionMemoryPool.poolSize
       case MemoryMode.OFF_HEAP => offHeapExecutionMemoryPool.poolSize
     }
     val size =
@@ -215,7 +220,7 @@ private[spark] abstract class MemoryManager(conf: SparkConf,
     */
   private[memory] final val tungstenMemoryAllocator: MemoryAllocator = {
     tungstenMemoryMode match {
-      case MemoryMode.ON_HEAP => MemoryAllocator.HEAP
+      case MemoryMode.ON_HEAP  => MemoryAllocator.HEAP
       case MemoryMode.OFF_HEAP => MemoryAllocator.UNSAFE
     }
   }

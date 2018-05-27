@@ -25,17 +25,20 @@ import org.apache.spark.{LocalSparkContext, SparkContext, SparkFunSuite}
 import org.apache.spark.util.Utils
 
 class JdbcRDDSuite
-    extends SparkFunSuite with BeforeAndAfter with LocalSparkContext {
+    extends SparkFunSuite
+    with BeforeAndAfter
+    with LocalSparkContext {
 
   before {
     Utils.classForName("org.apache.derby.jdbc.EmbeddedDriver")
     val conn = DriverManager.getConnection(
-        "jdbc:derby:target/JdbcRDDSuiteDb;create=true")
+      "jdbc:derby:target/JdbcRDDSuiteDb;create=true")
     try {
 
       try {
         val create = conn.createStatement
-        create.execute("""
+        create.execute(
+          """
           CREATE TABLE FOO(
             ID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),
             DATA INTEGER
@@ -55,7 +58,7 @@ class JdbcRDDSuite
       try {
         val create = conn.createStatement
         create.execute(
-            "CREATE TABLE BIGINT_TEST(ID BIGINT NOT NULL, DATA INTEGER)")
+          "CREATE TABLE BIGINT_TEST(ID BIGINT NOT NULL, DATA INTEGER)")
         create.close()
         val insert =
           conn.prepareStatement("INSERT INTO BIGINT_TEST VALUES(?,?)")
@@ -77,14 +80,14 @@ class JdbcRDDSuite
   test("basic functionality") {
     sc = new SparkContext("local", "test")
     val rdd = new JdbcRDD(
-        sc,
-        () =>
-          { DriverManager.getConnection("jdbc:derby:target/JdbcRDDSuiteDb") },
-        "SELECT DATA FROM FOO WHERE ? <= ID AND ID <= ?",
-        1,
-        100,
-        3,
-        (r: ResultSet) => { r.getInt(1) }).cache()
+      sc,
+      () => { DriverManager.getConnection("jdbc:derby:target/JdbcRDDSuiteDb") },
+      "SELECT DATA FROM FOO WHERE ? <= ID AND ID <= ?",
+      1,
+      100,
+      3,
+      (r: ResultSet) => { r.getInt(1) }
+    ).cache()
 
     assert(rdd.count === 100)
     assert(rdd.reduce(_ + _) === 10100)
@@ -93,14 +96,14 @@ class JdbcRDDSuite
   test("large id overflow") {
     sc = new SparkContext("local", "test")
     val rdd = new JdbcRDD(
-        sc,
-        () =>
-          { DriverManager.getConnection("jdbc:derby:target/JdbcRDDSuiteDb") },
-        "SELECT DATA FROM BIGINT_TEST WHERE ? <= ID AND ID <= ?",
-        1131544775L,
-        567279358897692673L,
-        20,
-        (r: ResultSet) => { r.getInt(1) }).cache()
+      sc,
+      () => { DriverManager.getConnection("jdbc:derby:target/JdbcRDDSuiteDb") },
+      "SELECT DATA FROM BIGINT_TEST WHERE ? <= ID AND ID <= ?",
+      1131544775L,
+      567279358897692673L,
+      20,
+      (r: ResultSet) => { r.getInt(1) }
+    ).cache()
     assert(rdd.count === 100)
     assert(rdd.reduce(_ + _) === 5050)
   }
@@ -108,7 +111,7 @@ class JdbcRDDSuite
   after {
     try {
       DriverManager.getConnection(
-          "jdbc:derby:target/JdbcRDDSuiteDb;shutdown=true")
+        "jdbc:derby:target/JdbcRDDSuiteDb;shutdown=true")
     } catch {
       case se: SQLException if se.getSQLState == "08006" =>
       // Normal single database shutdown

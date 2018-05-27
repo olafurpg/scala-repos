@@ -46,8 +46,8 @@ case class RichServletContext(sc: ServletContext) extends AttributesMap {
   private[this] def pathMapping(urlPattern: String): String =
     urlPattern match {
       case s if s.endsWith("/*") => s
-      case s if s.endsWith("/") => s + "*"
-      case s => s + "/*"
+      case s if s.endsWith("/")  => s + "*"
+      case s                     => s + "/*"
     }
 
   /**
@@ -78,10 +78,11 @@ case class RichServletContext(sc: ServletContext) extends AttributesMap {
     *
     * @param name the name of the handler
     */
-  def mount(handler: Handler,
-            urlPattern: String,
-            name: String,
-            loadOnStartup: Int): Unit = {
+  def mount(
+      handler: Handler,
+      urlPattern: String,
+      name: String,
+      loadOnStartup: Int): Unit = {
     val pathMap = pathMapping(urlPattern)
 
     handler match {
@@ -90,7 +91,7 @@ case class RichServletContext(sc: ServletContext) extends AttributesMap {
       case filter: Filter => mountFilter(filter, pathMap, name)
       case _ =>
         sys.error(
-            "Don't know how to mount this service to a servletContext: " +
+          "Don't know how to mount this service to a servletContext: " +
             handler.getClass)
     }
   }
@@ -102,25 +103,28 @@ case class RichServletContext(sc: ServletContext) extends AttributesMap {
     mount(handler, urlPattern, handler.getClass.getName, loadOnStartup)
   }
 
-  def mount[T](handlerClass: Class[T],
-               urlPattern: String,
-               name: String,
-               loadOnStartup: Int = 1): Unit = {
+  def mount[T](
+      handlerClass: Class[T],
+      urlPattern: String,
+      name: String,
+      loadOnStartup: Int = 1): Unit = {
     val pathMap = urlPattern match {
       case s if s.endsWith("/*") => s
-      case s if s.endsWith("/") => s + "*"
-      case s => s + "/*"
+      case s if s.endsWith("/")  => s + "*"
+      case s                     => s + "/*"
     }
 
     if (classOf[HttpServlet].isAssignableFrom(handlerClass)) {
-      mountServlet(handlerClass.asInstanceOf[Class[HttpServlet]],
-                   pathMap,
-                   name,
-                   loadOnStartup)
+      mountServlet(
+        handlerClass.asInstanceOf[Class[HttpServlet]],
+        pathMap,
+        name,
+        loadOnStartup)
     } else if (classOf[Filter].isAssignableFrom(handlerClass)) {
       mountFilter(handlerClass.asInstanceOf[Class[Filter]], pathMap, name)
     } else {
-      sys.error("Don't know how to mount this service to a servletContext: " +
+      sys.error(
+        "Don't know how to mount this service to a servletContext: " +
           handlerClass)
     }
   }
@@ -129,14 +133,17 @@ case class RichServletContext(sc: ServletContext) extends AttributesMap {
     mount[T](handlerClass, urlPattern, 1)
 
   def mount[T](
-      handlerClass: Class[T], urlPattern: String, loadOnStartup: Int): Unit = {
+      handlerClass: Class[T],
+      urlPattern: String,
+      loadOnStartup: Int): Unit = {
     mount(handlerClass, urlPattern, handlerClass.getName, loadOnStartup)
   }
 
-  private def mountServlet(servlet: HttpServlet,
-                           urlPattern: String,
-                           name: String,
-                           loadOnStartup: Int): Unit = {
+  private def mountServlet(
+      servlet: HttpServlet,
+      urlPattern: String,
+      name: String,
+      loadOnStartup: Int): Unit = {
     val reg =
       Option(sc.getServletRegistration(name)) getOrElse {
         val r = sc.addServlet(name, servlet)
@@ -154,10 +161,11 @@ case class RichServletContext(sc: ServletContext) extends AttributesMap {
     reg.addMapping(urlPattern)
   }
 
-  private def mountServlet(servletClass: Class[HttpServlet],
-                           urlPattern: String,
-                           name: String,
-                           loadOnStartup: Int): Unit = {
+  private def mountServlet(
+      servletClass: Class[HttpServlet],
+      urlPattern: String,
+      name: String,
+      loadOnStartup: Int): Unit = {
     val reg =
       Option(sc.getServletRegistration(name)) getOrElse {
         val r = sc.addServlet(name, servletClass)
@@ -173,7 +181,9 @@ case class RichServletContext(sc: ServletContext) extends AttributesMap {
   }
 
   private def mountFilter(
-      filter: Filter, urlPattern: String, name: String): Unit = {
+      filter: Filter,
+      urlPattern: String,
+      name: String): Unit = {
     val reg =
       Option(sc.getFilterRegistration(name)) getOrElse {
         val r = sc.addFilter(name, filter)
@@ -188,7 +198,9 @@ case class RichServletContext(sc: ServletContext) extends AttributesMap {
   }
 
   private def mountFilter(
-      filterClass: Class[Filter], urlPattern: String, name: String): Unit = {
+      filterClass: Class[Filter],
+      urlPattern: String,
+      name: String): Unit = {
     val reg =
       Option(sc.getFilterRegistration(name)) getOrElse {
         val r = sc.addFilter(name, filterClass)
@@ -210,7 +222,7 @@ case class RichServletContext(sc: ServletContext) extends AttributesMap {
     */
   def environment: String = {
     sys.props.get(EnvironmentKey) orElse initParameters.get(EnvironmentKey) getOrElse
-    ("DEVELOPMENT")
+      ("DEVELOPMENT")
   }
 
   object initParameters extends mutable.Map[String, String] {

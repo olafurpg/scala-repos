@@ -42,6 +42,7 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class XYChartSeriesSpec
     extends SimpleSFXDelegateSpec[
-        jfxsc.XYChart.Series[Int, Int], XYChart.Series[Int, Int]](
-        classOf[jfxsc.XYChart.Series[Int, Int]],
-        classOf[XYChart.Series[Int, Int]])
+      jfxsc.XYChart.Series[Int, Int],
+      XYChart.Series[Int, Int]](
+      classOf[jfxsc.XYChart.Series[Int, Int]],
+      classOf[XYChart.Series[Int, Int]])

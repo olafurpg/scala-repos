@@ -18,8 +18,8 @@ private[pickling] class UnclosedSubclassesException(errors: Seq[String])
   *        Java's privates.
   */
 private[pickling] class IrScalaSymbols[
-    U <: Universe with Singleton, C <: Context](
-    override val u: U, tools: Tools[C])
+    U <: Universe with Singleton,
+    C <: Context](override val u: U, tools: Tools[C])
     extends IrSymbolLoader[U](u) {
   import u._
   import compat._
@@ -43,9 +43,8 @@ private[pickling] class IrScalaSymbols[
       if (tools.treatAsSealed(classSym)) {
         tools.directSubclasses(classSym).flatMap(cl => whyNotClosed(cl.asType))
       } else {
-        List(
-            s"'${sym.fullName}' allows unknown subclasses (it is not sealed or final isCaseClass=${isCaseClass(
-            sym.asInstanceOf[u.TypeSymbol])} isEffectivelyFinal=${sym.isEffectivelyFinal} isSealed=${classSym.isSealed} directSubclasses=${tools
+        List(s"'${sym.fullName}' allows unknown subclasses (it is not sealed or final isCaseClass=${isCaseClass(
+          sym.asInstanceOf[u.TypeSymbol])} isEffectivelyFinal=${sym.isEffectivelyFinal} isSealed=${classSym.isSealed} directSubclasses=${tools
           .directSubclasses(classSym)})")
       }
     } else {
@@ -57,19 +56,18 @@ private[pickling] class IrScalaSymbols[
     if (tpe.typeSymbol.isClass) {
       val (quantified, rawTpe) = tpe match {
         case ExistentialType(quantified, rtpe) => (quantified, rtpe);
-        case rtpe => (Nil, rtpe)
+        case rtpe                              => (Nil, rtpe)
       }
       new ScalaIrClass(tpe, quantified, rawTpe)
     } else sys.error(s"Don't know how to handle $tpe, ${tpe.typeSymbol.owner}")
 
   // Implementation of IrClass symbol using a scala Type.
-  private class ScalaIrClass(private[generator] val tpe: Type)
-      extends IrClass {
+  private class ScalaIrClass(private[generator] val tpe: Type) extends IrClass {
     //System.err.println(s"New class: $tpe")
     def this(tpe: Type, quantified: List[Symbol], rawType: Type) = this(tpe)
     private[generator] val (quantified, rawType) = tpe match {
       case ExistentialType(quantified, rtpe) => (quantified, rtpe);
-      case rtpe => (Nil, rtpe)
+      case rtpe                              => (Nil, rtpe)
     }
     private def classSymbol = tpe.typeSymbol.asClass
 
@@ -86,8 +84,8 @@ private[pickling] class IrScalaSymbols[
       tpe.declaration(nme.CONSTRUCTOR) match {
         // NOTE: primary ctor is always the first in the list
         case overloaded: TermSymbol =>
-          Some(new ScalaIrConstructor(
-                  overloaded.alternatives.head.asMethod, this))
+          Some(
+            new ScalaIrConstructor(overloaded.alternatives.head.asMethod, this))
         case primaryCtor: MethodSymbol =>
           Some(new ScalaIrConstructor(primaryCtor, this))
         case NoSymbol => None
@@ -96,12 +94,16 @@ private[pickling] class IrScalaSymbols[
 
     // TODO - Should we iterate down ALL of the hierarchy here for members, or make the algorithms do it later...
     private val allMethods = {
-      val constructorArgs = tpe.members.collect {
-        case meth: MethodSymbol => meth
-      }.toList.filter { x =>
-        //System.err.println(s"$x - param: ${x.isParamAccessor}, var: ${x.isVar}, val: ${x.isVal}, owner: ${x.owner}, owner-constructor: ${x.owner.isConstructor}")
-        (x.owner == tpe.typeSymbol) && (x.isParamAccessor)
-      }.toList
+      val constructorArgs = tpe.members
+        .collect {
+          case meth: MethodSymbol => meth
+        }
+        .toList
+        .filter { x =>
+          //System.err.println(s"$x - param: ${x.isParamAccessor}, var: ${x.isVar}, val: ${x.isVal}, owner: ${x.owner}, owner-constructor: ${x.owner.isConstructor}")
+          (x.owner == tpe.typeSymbol) && (x.isParamAccessor)
+        }
+        .toList
       //System.err.println(s"$tpe has constructor args:\n - ${constructorArgs.mkString("\n - ")}")
       // NOTE - This will only collect memeber vals/vals.  It's possible some things come from the constructor.
       val declaredVars = (tpe.declarations).collect {
@@ -116,8 +118,8 @@ private[pickling] class IrScalaSymbols[
     // Here we only return "accessor" methods.
     override val methods: Seq[IrMethod] = {
       (allMethods map { mth =>
-            new ScalaIrMethod(mth, this)
-          })(collection.breakOut)
+        new ScalaIrMethod(mth, this)
+      })(collection.breakOut)
     }
     override def fields: Seq[IrField] = {
       // TODO - It's possible some terms come from the constructor.  We don't really know if they are available at runtime
@@ -163,18 +165,17 @@ private[pickling] class IrScalaSymbols[
       */
     override def closedSubclasses: scala.util.Try[Seq[IrClass]] = {
       val closedError = whyNotClosed(
-          tpe.typeSymbol.asType.asInstanceOf[tools.u.TypeSymbol])
+        tpe.typeSymbol.asType.asInstanceOf[tools.u.TypeSymbol])
       closedError match {
         case Nil =>
           scala.util.Success({
             val dispatchees = tools.compileTimeDispatchees(
-                tpe.asInstanceOf[tools.c.universe.Type],
-                tools.u.rootMirror,
-                false)
+              tpe.asInstanceOf[tools.c.universe.Type],
+              tools.u.rootMirror,
+              false)
             dispatchees.map(t =>
-                  new ScalaIrClass(t.asInstanceOf[u.Type],
-                                   quantified,
-                                   rawType))(collection.breakOut)
+              new ScalaIrClass(t.asInstanceOf[u.Type], quantified, rawType))(
+              collection.breakOut)
           })
         case errors =>
           scala.util.Failure(new UnclosedSubclassesException(errors))
@@ -221,15 +222,16 @@ private[pickling] class IrScalaSymbols[
   }
 
   private class ScalaIrField(
-      field: TermSymbol, override val owner: ScalaIrClass)
+      field: TermSymbol,
+      override val owner: ScalaIrClass)
       extends IrField {
 
     override def isMarkedTransient: Boolean = {
       val tr = scala.util.Try {
         ((field.accessed != NoSymbol) && field.accessed.annotations
-              .exists(_.tpe =:= typeOf[scala.transient])) ||
+          .exists(_.tpe =:= typeOf[scala.transient])) ||
         ((field.getter != NoSymbol) && field.getter.annotations
-              .exists(_.tpe =:= typeOf[scala.transient])) ||
+          .exists(_.tpe =:= typeOf[scala.transient])) ||
         (field.annotations.exists(_.tpe =:= typeOf[scala.transient]))
       }
       // TODO - Here we wrokaround a scala symbol issue where the field is never annotated with transient.
@@ -269,7 +271,8 @@ private[pickling] class IrScalaSymbols[
   }
 
   private class ScalaIrMethod(
-      mthd: MethodSymbol, override val owner: ScalaIrClass)
+      mthd: MethodSymbol,
+      override val owner: ScalaIrClass)
       extends IrMethod {
     import owner.fillParameters
     override def parameterNames: List[List[String]] =
@@ -277,18 +280,19 @@ private[pickling] class IrScalaSymbols[
 
     override def parameterTypes[U <: Universe with Singleton](
         u: U): List[List[u.Type]] = {
-      mthd.paramss.map(_.map(x =>
-                fillParameters(x).asSeenFrom(owner.tpe, owner.tpe.typeSymbol))
-            .map(_.asInstanceOf[u.Type]))
+      mthd.paramss.map(
+        _.map(x =>
+          fillParameters(x).asSeenFrom(owner.tpe, owner.tpe.typeSymbol))
+          .map(_.asInstanceOf[u.Type]))
     }
 
     override def isMarkedTransient: Boolean = {
       // TODO - is this correct?
       val tr = scala.util.Try {
         ((mthd.accessed != NoSymbol) && mthd.accessed.annotations
-              .exists(_.tpe =:= typeOf[scala.transient])) ||
+          .exists(_.tpe =:= typeOf[scala.transient])) ||
         ((mthd.getter != NoSymbol) && mthd.getter.annotations
-              .exists(_.tpe =:= typeOf[scala.transient])) ||
+          .exists(_.tpe =:= typeOf[scala.transient])) ||
         (mthd.annotations.exists(_.tpe =:= typeOf[scala.transient]))
       }
       tr.getOrElse(false)
@@ -299,7 +303,7 @@ private[pickling] class IrScalaSymbols[
       mthd.name.toString match {
         // TODO - Why do we need this random fix, is this a bug?
         case x if x endsWith " " => x.dropRight(1).toString
-        case x => x
+        case x                   => x
       }
     }
     override def javaReflectionName: String = {
@@ -311,9 +315,10 @@ private[pickling] class IrScalaSymbols[
       if (mthd.isParamAccessor && (mthd.isPrivate || isPrivateThis)) {
         // Here we check to see if we need to encode the funky name that scala gives private fields to avoid conflicts
         // with fields in the parent class.
-        def makeEncodedJvmName(names: List[String],
-                               buf: StringBuilder,
-                               isStart: Boolean = false): String =
+        def makeEncodedJvmName(
+            names: List[String],
+            buf: StringBuilder,
+            isStart: Boolean = false): String =
           names match {
             case Nil => buf.toString
             case next :: rest if isStart =>
@@ -334,7 +339,7 @@ private[pickling] class IrScalaSymbols[
           // Note: Not available in Scala 2.10.x
           //case TermName(n) => n
           case x: TermName => x.toString
-          case _ => mthd.name.encodedName.toString
+          case _           => mthd.name.encodedName.toString
         }
     }
     // TODO - Figure out if the method is JVM public or not.
@@ -348,9 +353,8 @@ private[pickling] class IrScalaSymbols[
     override def isVal: Boolean = mthd.isVal
     override def isVar: Boolean =
       (mthd.getter != NoSymbol) && (mthd.setter != NoSymbol) &&
-      (mthd.setter != mthd) // THis is  hack so the setter doesn't show up in our list of vars.
-    override def returnType[U <: Universe with Singleton](
-        u: Universe): u.Type =
+        (mthd.setter != mthd) // THis is  hack so the setter doesn't show up in our list of vars.
+    override def returnType[U <: Universe with Singleton](u: Universe): u.Type =
       // TODO - We need to fill in generic parameters of our owner class so that this actually works.  If we fail to do so,
       //        We wind up delegating to runtime picklers when we DO know the static types.
       //fillParameters(mthd.returnType.typeSymbol).asInstanceOf[u.Type]
@@ -361,16 +365,17 @@ private[pickling] class IrScalaSymbols[
     override def setter: Option[IrMethod] = {
       mthd.setter match {
         case NoSymbol => None
-        case x => Some(new ScalaIrMethod(x.asMethod, owner))
+        case x        => Some(new ScalaIrMethod(x.asMethod, owner))
       }
     }
   }
 
   private class ScalaIrConstructor(mthd: MethodSymbol, owner: ScalaIrClass)
-      extends ScalaIrMethod(mthd, owner) with IrConstructor {
+      extends ScalaIrMethod(mthd, owner)
+      with IrConstructor {
 
-    override def returnType[U <: Universe with Singleton](
-        u: Universe): u.Type = owner.tpe[u.type](u)
+    override def returnType[U <: Universe with Singleton](u: Universe): u.Type =
+      owner.tpe[u.type](u)
     override def toString =
       s"CONSTRUCTOR ${owner} (${parameterNames.mkString(",")}}): ${mthd.typeSignature}"
   }

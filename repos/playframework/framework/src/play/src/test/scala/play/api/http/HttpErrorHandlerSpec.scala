@@ -35,29 +35,27 @@ object HttpErrorHandlerSpec extends Specification {
       }
       "refuse to render something that isn't a client error" in {
         await(errorHandler.onClientError(FakeRequest(), 500)).header.status must throwAn[
-            IllegalArgumentException]
+          IllegalArgumentException]
         await(errorHandler.onClientError(FakeRequest(), 399)).header.status must throwAn[
-            IllegalArgumentException]
+          IllegalArgumentException]
       }
       "render a server error" in {
-        await(errorHandler.onServerError(
-                FakeRequest(),
-                new RuntimeException())).header.status must_== 500
+        await(errorHandler.onServerError(FakeRequest(), new RuntimeException())).header.status must_== 500
       }
     }
 
     "work if a scala handler is defined" in {
       "in dev mode" in sharedSpecs(
-          handler(classOf[DefaultHttpErrorHandler].getName, Mode.Dev))
+        handler(classOf[DefaultHttpErrorHandler].getName, Mode.Dev))
       "in prod mode" in sharedSpecs(
-          handler(classOf[DefaultHttpErrorHandler].getName, Mode.Prod))
+        handler(classOf[DefaultHttpErrorHandler].getName, Mode.Prod))
     }
 
     "work if a java handler is defined" in {
-      "in dev mode" in sharedSpecs(handler(
-              classOf[play.http.DefaultHttpErrorHandler].getName, Mode.Dev))
-      "in prod mode" in sharedSpecs(handler(
-              classOf[play.http.DefaultHttpErrorHandler].getName, Mode.Prod))
+      "in dev mode" in sharedSpecs(
+        handler(classOf[play.http.DefaultHttpErrorHandler].getName, Mode.Dev))
+      "in prod mode" in sharedSpecs(
+        handler(classOf[play.http.DefaultHttpErrorHandler].getName, Mode.Prod))
     }
 
     "work with a custom scala handler" in {
@@ -79,19 +77,21 @@ object HttpErrorHandlerSpec extends Specification {
     val env = Environment.simple(mode = mode)
     Fakes
       .injectorFromBindings(
-          HttpErrorHandler.bindingsFromConfiguration(env, config) ++ Seq(
-              BindingKey(classOf[Router]).to(Router.empty),
-              BindingKey(classOf[OptionalSourceMapper]).to(
-                  new OptionalSourceMapper(None)),
-              BindingKey(classOf[Configuration]).to(config),
-              BindingKey(classOf[Environment]).to(env)
-          ))
+        HttpErrorHandler.bindingsFromConfiguration(env, config) ++ Seq(
+          BindingKey(classOf[Router]).to(Router.empty),
+          BindingKey(classOf[OptionalSourceMapper]).to(
+            new OptionalSourceMapper(None)),
+          BindingKey(classOf[Configuration]).to(config),
+          BindingKey(classOf[Environment]).to(env)
+        ))
       .instanceOf[HttpErrorHandler]
   }
 
   class CustomScalaErrorHandler extends HttpErrorHandler {
     def onClientError(
-        request: RequestHeader, statusCode: Int, message: String) =
+        request: RequestHeader,
+        statusCode: Int,
+        message: String) =
       Future.successful(Results.Ok)
     def onServerError(request: RequestHeader, exception: Throwable) =
       Future.successful(Results.Ok)
@@ -99,7 +99,9 @@ object HttpErrorHandlerSpec extends Specification {
 
   class CustomJavaErrorHandler extends play.http.HttpErrorHandler {
     def onClientError(
-        req: play.mvc.Http.RequestHeader, status: Int, msg: String) =
+        req: play.mvc.Http.RequestHeader,
+        status: Int,
+        msg: String) =
       CompletableFuture.completedFuture(play.mvc.Results.ok())
     def onServerError(req: play.mvc.Http.RequestHeader, exception: Throwable) =
       CompletableFuture.completedFuture(play.mvc.Results.ok())

@@ -28,10 +28,10 @@ class OuterJoinEliminationSuite extends PlanTest {
   object Optimize extends RuleExecutor[LogicalPlan] {
     val batches =
       Batch("Subqueries", Once, EliminateSubqueryAliases) :: Batch(
-          "Outer Join Elimination",
-          Once,
-          OuterJoinElimination,
-          PushPredicateThroughJoin) :: Nil
+        "Outer Join Elimination",
+        Once,
+        OuterJoinElimination,
+        PushPredicateThroughJoin) :: Nil
   }
 
   val testRelation = LocalRelation('a.int, 'b.int, 'c.int)
@@ -170,7 +170,7 @@ class OuterJoinEliminationSuite extends PlanTest {
     val optimized = Optimize.execute(originalQuery.analyze)
     val left = testRelation
     val right = testRelation1.where(
-        (!'e.isNull || ('d.isNotNull && 'f.isNull)) && 'e.isNull)
+      (!'e.isNull || ('d.isNotNull && 'f.isNull)) && 'e.isNull)
     val correctAnswer =
       left.join(right, Inner, Option("a".attr === "d".attr)).analyze
 
@@ -192,9 +192,10 @@ class OuterJoinEliminationSuite extends PlanTest {
     val left = testRelation
     val right = testRelation1
     val correctAnswer = left
-      .join(right,
-            Inner,
-            Option("b".attr + 3 === "e".attr && "a".attr === "d".attr))
+      .join(
+        right,
+        Inner,
+        Option("b".attr + 3 === "e".attr && "a".attr === "d".attr))
       .analyze
 
     comparePlans(optimized, correctAnswer)

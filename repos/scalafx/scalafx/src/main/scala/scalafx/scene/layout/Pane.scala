@@ -43,7 +43,8 @@ object Pane {
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/layout/Pane.html]].
   */
 class Pane(override val delegate: jfxsl.Pane = new jfxsl.Pane)
-    extends Region(delegate) with SFXDelegate[jfxsl.Pane] {
+    extends Region(delegate)
+    with SFXDelegate[jfxsl.Pane] {
 
   /**
     * Gets the list of children of this Parent.

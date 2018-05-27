@@ -9,7 +9,10 @@ import com.intellij.psi._
 import com.intellij.psi.search.GlobalSearchScope
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScSimpleTypeElement
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypingContext
+}
 import org.jetbrains.plugins.scala.lang.psi.types.{ScParameterizedType, ScType}
 
 /**
@@ -19,12 +22,12 @@ import org.jetbrains.plugins.scala.lang.psi.types.{ScParameterizedType, ScType}
 trait ScAnnotations extends ScalaPsiElement with PsiReferenceList {
   def getReferenceElements = Array[PsiJavaCodeReferenceElement]()
 
-  def foldFuns(initial: Any)(fail: Any)(
-      l: List[PartialFunction[Any, _]]): Any = l match {
-    case h :: t =>
-      if (h.isDefinedAt(initial)) foldFuns(h(initial))(fail)(t) else fail
-    case Nil => initial
-  }
+  def foldFuns(initial: Any)(fail: Any)(l: List[PartialFunction[Any, _]]): Any =
+    l match {
+      case h :: t =>
+        if (h.isDefinedAt(initial)) foldFuns(h(initial))(fail)(t) else fail
+      case Nil => initial
+    }
 
   // todo rewrite via continuations
   private def getExceptionTypes: Array[PsiClassType] = {
@@ -40,7 +43,8 @@ trait ScAnnotations extends ScalaPsiElement with PsiReferenceList {
           case Some(ref) =>
             ref.bind() match {
               case Some(r: ScalaResolveResult)
-                  if r.getActualElement.isInstanceOf[PsiClass] && r.getActualElement
+                  if r.getActualElement
+                    .isInstanceOf[PsiClass] && r.getActualElement
                     .asInstanceOf[PsiClass]
                     .qualifiedName == "scala.throws" =>
                 constr.args match {
@@ -57,8 +61,8 @@ trait ScAnnotations extends ScalaPsiElement with PsiReferenceList {
                                   .getInstance(getProject)
                                   .getElementFactory
                                   .createTypeByFQClassName(
-                                      p.qualifiedName,
-                                      GlobalSearchScope.allScope(getProject))
+                                    p.qualifiedName,
+                                    GlobalSearchScope.allScope(getProject))
                               case _ => null
                             }
                           case _ => null

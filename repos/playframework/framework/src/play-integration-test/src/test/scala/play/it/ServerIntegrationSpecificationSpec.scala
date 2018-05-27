@@ -26,7 +26,8 @@ object AkkaHttpServerIntegrationSpecificationSpec
   * server backends, works properly.
   */
 trait ServerIntegrationSpecificationSpec
-    extends PlaySpecification with WsTestClient
+    extends PlaySpecification
+    with WsTestClient
     with ServerIntegrationSpecification {
 
   def isAkkaHttpServer: Boolean
@@ -44,9 +45,10 @@ trait ServerIntegrationSpecificationSpec
     }
 
     "run the right HTTP server when using TestServer constructor" in {
-      running(TestServer(
-              testServerPort,
-              GuiceApplicationBuilder().routes(httpServerTagRoutes).build())) {
+      running(
+        TestServer(
+          testServerPort,
+          GuiceApplicationBuilder().routes(httpServerTagRoutes).build())) {
         val plainRequest = wsUrl("/httpServerTag")(testServerPort)
         val responseFuture = plainRequest.get()
         val response = await(responseFuture)
@@ -56,7 +58,7 @@ trait ServerIntegrationSpecificationSpec
     }
 
     "run the right server when using WithServer trait" in new WithServer(
-        app = GuiceApplicationBuilder().routes(httpServerTagRoutes).build()) {
+      app = GuiceApplicationBuilder().routes(httpServerTagRoutes).build()) {
       val response = await(wsUrl("/httpServerTag").get())
       response.status must equalTo(OK)
       response.body must_== expectedServerTag.toString

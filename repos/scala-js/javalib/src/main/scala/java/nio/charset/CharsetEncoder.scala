@@ -13,7 +13,9 @@ abstract class CharsetEncoder protected (
   import CharsetEncoder._
 
   protected def this(
-      cs: Charset, _averageBytesPerChar: Float, _maxBytesPerChar: Float) =
+      cs: Charset,
+      _averageBytesPerChar: Float,
+      _maxBytesPerChar: Float) =
     this(cs, _averageBytesPerChar, _averageBytesPerChar, Array('?'.toByte))
 
   // Config
@@ -95,7 +97,9 @@ abstract class CharsetEncoder protected (
   final def maxBytesPerChar(): Float = _maxBytesPerChar
 
   final def encode(
-      in: CharBuffer, out: ByteBuffer, endOfInput: Boolean): CoderResult = {
+      in: CharBuffer,
+      out: ByteBuffer,
+      endOfInput: Boolean): CoderResult = {
 
     if (status == FLUSHED || (!endOfInput && status == END))
       throw new IllegalStateException

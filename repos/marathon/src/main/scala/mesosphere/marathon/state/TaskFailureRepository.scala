@@ -7,9 +7,10 @@ import scala.concurrent.Future
 /**
   * Stores the last TaskFailure per app id.
   */
-class TaskFailureRepository(protected val store: EntityStore[TaskFailure],
-                            protected val maxVersions: Option[Int] = Some(1),
-                            protected val metrics: Metrics)
+class TaskFailureRepository(
+    protected val store: EntityStore[TaskFailure],
+    protected val maxVersions: Option[Int] = Some(1),
+    protected val metrics: Metrics)
     extends EntityRepository[TaskFailure] {
 
   def store(id: PathId, value: TaskFailure): Future[TaskFailure] =

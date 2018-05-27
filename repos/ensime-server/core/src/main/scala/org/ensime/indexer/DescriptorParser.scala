@@ -65,7 +65,7 @@ class DescriptorParser(val input: ParserInput) extends Parser {
         case 'D' => Double
         case 'V' => Void
         case '[' => Array
-        case _ => MISMATCH
+        case _   => MISMATCH
       }
     }
   }

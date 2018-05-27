@@ -35,7 +35,7 @@ import java.util
   * @author <a href="mailto:dusan.kysel@gmail.com">Dušan Kysel</a>
   *
   */
-final class Well1024a protected[random](state: Array[Int], i0: Int)
+final class Well1024a protected[random] (state: Array[Int], i0: Int)
     extends IntBasedGenerator {
 
   import Well1024a.{R, R_1, BYTES, M1, M2, M3, mat0pos, mat0neg}

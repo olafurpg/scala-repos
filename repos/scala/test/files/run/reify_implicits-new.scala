@@ -5,7 +5,7 @@ import scala.tools.reflect.Eval
 
 object Test extends App {
   reify {
-    implicit def arrayWrapper[A : ClassTag](x: Array[A]) =
+    implicit def arrayWrapper[A: ClassTag](x: Array[A]) =
       new {
         def sort(p: (A, A) => Boolean) = {
           util.Sorting.stableSort(x, p); x

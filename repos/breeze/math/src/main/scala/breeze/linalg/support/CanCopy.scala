@@ -36,7 +36,8 @@ object CanCopy {
   }
 
   class OpMapValues[From, V](
-      implicit op: CanCopy[V], map: CanMapValues[From, V, V, From])
+      implicit op: CanCopy[V],
+      map: CanMapValues[From, V, V, From])
       extends CanCopy[From] {
     def apply(v: From) = map(v, op.apply(_))
   }
@@ -48,14 +49,14 @@ object CanCopy {
       op: CanCopy[V]): CanCopy[From] =
     new OpMapValues[From, V]()(op, map)
 
-  implicit def opArrayAny[V : ClassTag : Field]: OpArray[V] = new OpArray[V]
+  implicit def opArrayAny[V: ClassTag: Field]: OpArray[V] = new OpArray[V]
   implicit object OpArrayI extends OpArray[Int]
   implicit object OpArrayS extends OpArray[Short]
   implicit object OpArrayL extends OpArray[Long]
   implicit object OpArrayF extends OpArray[Float]
   implicit object OpArrayD extends OpArray[Double]
 
-  implicit def canCopyField[V : Field]: CanCopy[V] = new CanCopy[V] {
+  implicit def canCopyField[V: Field]: CanCopy[V] = new CanCopy[V] {
     def apply(v1: V) = v1
   }
 

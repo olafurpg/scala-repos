@@ -8,11 +8,12 @@ import org.jboss.netty.buffer.ChannelBuffer
 
 /** Log events on channels */
 trait ChannelSnooper
-    extends ChannelDownstreamHandler with ChannelUpstreamHandler {
+    extends ChannelDownstreamHandler
+    with ChannelUpstreamHandler {
   val name: String
 
-  private[this] lazy val printStream = new PrintStream(
-      System.out, true, "UTF-8")
+  private[this] lazy val printStream =
+    new PrintStream(System.out, true, "UTF-8")
 
   def printer(message: String, exc: Throwable = null) {
     printStream.println(message)
@@ -66,9 +67,11 @@ class ChannelBufferSnooper(val name: String) extends ChannelSnooper {
   }
 
   def dump(
-      printer: (Channel, String) => Unit, ch: Channel, buf: ChannelBuffer) {
-    val rawStr = buf.toString(
-        buf.readerIndex, buf.readableBytes, Charset.forName("UTF-8"))
+      printer: (Channel, String) => Unit,
+      ch: Channel,
+      buf: ChannelBuffer) {
+    val rawStr =
+      buf.toString(buf.readerIndex, buf.readableBytes, Charset.forName("UTF-8"))
     val str = rawStr.replaceAll("\r", "\\\\r").replaceAll("\n", "\\\\n")
     val asciiStr =
       str map { c =>
@@ -76,8 +79,8 @@ class ChannelBufferSnooper(val name: String) extends ChannelSnooper {
         else '?'
       }
 
-    for (i <- 0 until asciiStr.length by 60) printer(
-        ch, asciiStr.slice(i, i + 60).lines.mkString("\\n"))
+    for (i <- 0 until asciiStr.length by 60)
+      printer(ch, asciiStr.slice(i, i + 60).lines.mkString("\\n"))
   }
 }
 

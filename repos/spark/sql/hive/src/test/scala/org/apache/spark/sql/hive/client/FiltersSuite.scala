@@ -42,37 +42,46 @@ class FiltersSuite extends SparkFunSuite with Logging {
   varCharCol.setType(serdeConstants.VARCHAR_TYPE_NAME)
   testTable.setPartCols(Collections.singletonList(varCharCol))
 
-  filterTest("string filter",
-             (a("stringcol", StringType) > Literal("test")) :: Nil,
-             "stringcol > \"test\"")
-
-  filterTest("string filter backwards",
-             (Literal("test") > a("stringcol", StringType)) :: Nil,
-             "\"test\" > stringcol")
-
-  filterTest("int filter",
-             (a("intcol", IntegerType) === Literal(1)) :: Nil,
-             "intcol = 1")
-
-  filterTest("int filter backwards",
-             (Literal(1) === a("intcol", IntegerType)) :: Nil,
-             "1 = intcol")
-
-  filterTest("int and string filter",
-             (Literal(1) === a("intcol", IntegerType)) ::
-             (Literal("a") === a("strcol", IntegerType)) :: Nil,
-             "1 = intcol and \"a\" = strcol")
+  filterTest(
+    "string filter",
+    (a("stringcol", StringType) > Literal("test")) :: Nil,
+    "stringcol > \"test\"")
 
   filterTest(
-      "skip varchar", (Literal("") === a("varchar", StringType)) :: Nil, "")
+    "string filter backwards",
+    (Literal("test") > a("stringcol", StringType)) :: Nil,
+    "\"test\" > stringcol")
+
+  filterTest(
+    "int filter",
+    (a("intcol", IntegerType) === Literal(1)) :: Nil,
+    "intcol = 1")
+
+  filterTest(
+    "int filter backwards",
+    (Literal(1) === a("intcol", IntegerType)) :: Nil,
+    "1 = intcol")
+
+  filterTest(
+    "int and string filter",
+    (Literal(1) === a("intcol", IntegerType)) ::
+      (Literal("a") === a("strcol", IntegerType)) :: Nil,
+    "1 = intcol and \"a\" = strcol")
+
+  filterTest(
+    "skip varchar",
+    (Literal("") === a("varchar", StringType)) :: Nil,
+    "")
 
   private def filterTest(
-      name: String, filters: Seq[Expression], result: String) = {
+      name: String,
+      filters: Seq[Expression],
+      result: String) = {
     test(name) {
       val converted = shim.convertFilters(testTable, filters)
       if (converted != result) {
         fail(
-            s"Expected filters ${filters.mkString(",")} to convert to '$result' but got '$converted'")
+          s"Expected filters ${filters.mkString(",")} to convert to '$result' but got '$converted'")
       }
     }
   }

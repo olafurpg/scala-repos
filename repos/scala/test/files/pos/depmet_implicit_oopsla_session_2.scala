@@ -18,7 +18,7 @@ object Sessions {
   }
 
   // friendly interface to the theory
-  def runSession[S, D : Session[S]#HasDual](session: S, dual: D) =
+  def runSession[S, D: Session[S]#HasDual](session: S, dual: D) =
     ?[Session[S]#HasDual[D]].run(session, dual)
 
   // facts in the theory:

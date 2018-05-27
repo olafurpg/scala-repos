@@ -32,6 +32,7 @@ object ScopedVar {
 
   def withScopedVars[T](ass: Assignment[_]*)(body: => T): T = {
     val stack = ass.map(_.push())
-    try body finally stack.reverse.foreach(_.pop())
+    try body
+    finally stack.reverse.foreach(_.pop())
   }
 }

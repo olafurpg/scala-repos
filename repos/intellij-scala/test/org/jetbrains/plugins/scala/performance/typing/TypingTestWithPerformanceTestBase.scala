@@ -24,13 +24,14 @@ abstract class TypingTestWithPerformanceTestBase extends ScalaFixtureTestCase {
     val (input, _) = separateText(fileText)
     myFixture.configureByText(fileName, input)
     PlatformTestUtil
-      .startPerformanceTest("TypingTest" + getTestName(false),
-                            timeoutInMillis,
-                            new ThrowableRunnable[Nothing] {
-                              override def run(): Unit = {
-                                stringsToType.foreach(myFixture.`type`)
-                              }
-                            })
+      .startPerformanceTest(
+        "TypingTest" + getTestName(false),
+        timeoutInMillis,
+        new ThrowableRunnable[Nothing] {
+          override def run(): Unit = {
+            stringsToType.foreach(myFixture.`type`)
+          }
+        })
       .ioBound()
       .assertTiming()
   }

@@ -83,8 +83,7 @@ class EventLoopSuite extends SparkFunSuite with Timeouts {
     eventLoop.stop()
   }
 
-  test(
-      "EventLoop: error thrown from onError should not crash the event thread") {
+  test("EventLoop: error thrown from onError should not crash the event thread") {
     val e = new RuntimeException("Oops")
     @volatile var receivedError: Throwable = null
     val eventLoop = new EventLoop[Int]("test") {

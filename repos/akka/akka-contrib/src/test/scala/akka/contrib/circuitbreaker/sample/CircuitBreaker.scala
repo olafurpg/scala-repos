@@ -4,7 +4,10 @@
 package akka.contrib.circuitbreaker.sample
 
 import akka.actor.{Actor, ActorLogging, ActorRef}
-import akka.contrib.circuitbreaker.CircuitBreakerProxy.{CircuitBreakerPropsBuilder, CircuitOpenFailure}
+import akka.contrib.circuitbreaker.CircuitBreakerProxy.{
+  CircuitBreakerPropsBuilder,
+  CircuitOpenFailure
+}
 import akka.contrib.circuitbreaker.sample.CircuitBreaker.AskFor
 import akka.util.Timeout
 
@@ -56,21 +59,24 @@ object CircuitBreaker {
 
 //#basic-sample
 class CircuitBreaker(potentiallyFailingService: ActorRef)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
   import SimpleService._
 
   val serviceCircuitBreaker = context.actorOf(
-      CircuitBreakerPropsBuilder(maxFailures = 3,
-                                 callTimeout = 2.seconds,
-                                 resetTimeout = 30.seconds)
-        .copy(failureDetector = {
-          _ match {
-            case Response(Left(_)) ⇒ true
-            case _ ⇒ false
-          }
-        })
-        .props(potentiallyFailingService),
-      "serviceCircuitBreaker")
+    CircuitBreakerPropsBuilder(
+      maxFailures = 3,
+      callTimeout = 2.seconds,
+      resetTimeout = 30.seconds)
+      .copy(failureDetector = {
+        _ match {
+          case Response(Left(_)) ⇒ true
+          case _ ⇒ false
+        }
+      })
+      .props(potentiallyFailingService),
+    "serviceCircuitBreaker"
+  )
 
   override def receive: Receive = {
     case AskFor(requestToForward) ⇒
@@ -96,27 +102,30 @@ class CircuitBreaker(potentiallyFailingService: ActorRef)
 
 //#ask-sample
 class CircuitBreakerAsk(potentiallyFailingService: ActorRef)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
   import SimpleService._
   import akka.pattern._
 
   implicit val askTimeout: Timeout = 2.seconds
 
   val serviceCircuitBreaker = context.actorOf(
-      CircuitBreakerPropsBuilder(maxFailures = 3,
-                                 callTimeout = askTimeout,
-                                 resetTimeout = 30.seconds)
-        .copy(failureDetector = {
-          _ match {
-            case Response(Left(_)) ⇒ true
-            case _ ⇒ false
-          }
-        })
-        .copy(openCircuitFailureConverter = { failure ⇒
-          Left(s"Circuit open when processing ${failure.failedMsg}")
-        })
-        .props(potentiallyFailingService),
-      "serviceCircuitBreaker")
+    CircuitBreakerPropsBuilder(
+      maxFailures = 3,
+      callTimeout = askTimeout,
+      resetTimeout = 30.seconds)
+      .copy(failureDetector = {
+        _ match {
+          case Response(Left(_)) ⇒ true
+          case _ ⇒ false
+        }
+      })
+      .copy(openCircuitFailureConverter = { failure ⇒
+        Left(s"Circuit open when processing ${failure.failedMsg}")
+      })
+      .props(potentiallyFailingService),
+    "serviceCircuitBreaker"
+  )
 
   import context.dispatcher
 
@@ -143,7 +152,8 @@ class CircuitBreakerAsk(potentiallyFailingService: ActorRef)
 
 //#ask-with-failure-sample
 class CircuitBreakerAskWithFailure(potentiallyFailingService: ActorRef)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
   import SimpleService._
   import akka.pattern._
   import akka.contrib.circuitbreaker.Implicits.futureExtensions
@@ -151,11 +161,12 @@ class CircuitBreakerAskWithFailure(potentiallyFailingService: ActorRef)
   implicit val askTimeout: Timeout = 2.seconds
 
   val serviceCircuitBreaker = context.actorOf(
-      CircuitBreakerPropsBuilder(
-          maxFailures = 3,
-          callTimeout = askTimeout,
-          resetTimeout = 30.seconds).props(target = potentiallyFailingService),
-      "serviceCircuitBreaker")
+    CircuitBreakerPropsBuilder(
+      maxFailures = 3,
+      callTimeout = askTimeout,
+      resetTimeout = 30.seconds).props(target = potentiallyFailingService),
+    "serviceCircuitBreaker"
+  )
 
   import context.dispatcher
 
@@ -178,18 +189,20 @@ class CircuitBreakerAskWithFailure(potentiallyFailingService: ActorRef)
 
 //#ask-with-circuit-breaker-sample
 class CircuitBreakerAskWithCircuitBreaker(potentiallyFailingService: ActorRef)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
   import SimpleService._
   import akka.contrib.circuitbreaker.Implicits.askWithCircuitBreaker
 
   implicit val askTimeout: Timeout = 2.seconds
 
   val serviceCircuitBreaker = context.actorOf(
-      CircuitBreakerPropsBuilder(
-          maxFailures = 3,
-          callTimeout = askTimeout,
-          resetTimeout = 30.seconds).props(target = potentiallyFailingService),
-      "serviceCircuitBreaker")
+    CircuitBreakerPropsBuilder(
+      maxFailures = 3,
+      callTimeout = askTimeout,
+      resetTimeout = 30.seconds).props(target = potentiallyFailingService),
+    "serviceCircuitBreaker"
+  )
 
   import context.dispatcher
 

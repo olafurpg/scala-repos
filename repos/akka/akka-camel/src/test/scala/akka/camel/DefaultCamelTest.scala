@@ -16,7 +16,10 @@ import org.apache.camel.impl.DefaultCamelContext
 import akka.actor.{ExtendedActorSystem}
 
 class DefaultCamelTest
-    extends WordSpec with SharedCamelSystem with Matchers with MockitoSugar {
+    extends WordSpec
+    with SharedCamelSystem
+    with Matchers
+    with MockitoSugar {
 
   import org.mockito.Mockito.{when, verify}
   val sys = mock[ExtendedActorSystem]
@@ -25,7 +28,7 @@ class DefaultCamelTest
     .asInstanceOf[ExtendedActorSystem]
     .dynamicAccess
   when(sys.settings) thenReturn
-  (new Settings(this.getClass.getClassLoader, config, "mocksystem"))
+    (new Settings(this.getClass.getClassLoader, config, "mocksystem"))
   when(sys.name) thenReturn ("mocksystem")
 
   def camelWithMocks = new DefaultCamel(sys) {

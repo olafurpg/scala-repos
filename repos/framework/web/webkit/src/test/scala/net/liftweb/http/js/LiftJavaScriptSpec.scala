@@ -46,7 +46,7 @@ object LiftJavaScriptSpec extends Specification {
       S.initIfUninitted(session) {
         val settings = LiftJavaScript.settings
         settings.toJsCmd must_== formatjs(
-            """{"liftPath": "/lift",
+          """{"liftPath": "/lift",
             |"ajaxRetryCount": 3,
             |"ajaxPostTimeout": 5000,
             |"gcPollingInterval": 75000,
@@ -67,7 +67,7 @@ object LiftJavaScriptSpec extends Specification {
         val internationalizedMessage =
           "Nie mo\\u017cna skontaktowa\\u0107 si\\u0119 z serwerem"
         settings.toJsCmd must_== formatjs(
-            s"""{"liftPath": "/lift",
+          s"""{"liftPath": "/lift",
               |"ajaxRetryCount": 3,
               |"ajaxPostTimeout": 5000,
               |"gcPollingInterval": 75000,
@@ -87,7 +87,7 @@ object LiftJavaScriptSpec extends Specification {
         LiftRules.ajaxRetryCount = Full(4)
         val settings = LiftJavaScript.settings
         settings.toJsCmd must_== formatjs(
-            """{"liftPath": "/lift",
+          """{"liftPath": "/lift",
             |"ajaxRetryCount": 4,
             |"ajaxPostTimeout": 5000,
             |"gcPollingInterval": 75000,
@@ -107,7 +107,7 @@ object LiftJavaScriptSpec extends Specification {
         LiftRules.cometServer = () => Some("srvr1")
         val settings = LiftJavaScript.settings
         settings.toJsCmd must_== formatjs(
-            """{"liftPath": "/lift",
+          """{"liftPath": "/lift",
             |"ajaxRetryCount": 4,
             |"ajaxPostTimeout": 5000,
             |"gcPollingInterval": 75000,
@@ -127,7 +127,7 @@ object LiftJavaScriptSpec extends Specification {
         LiftRules.jsLogFunc = Full(v => JE.Call("lift.logError", v))
         val settings = LiftJavaScript.settings
         settings.toJsCmd must_== formatjs(
-            """{"liftPath": "/lift",
+          """{"liftPath": "/lift",
             |"ajaxRetryCount": 4,
             |"ajaxPostTimeout": 5000,
             |"gcPollingInterval": 75000,
@@ -148,10 +148,11 @@ object LiftJavaScriptSpec extends Specification {
           .vend()
           .map(_.apply(session))
           .map(LiftJavaScript.initCmd(_).toJsCmd)
-        init must_== Full(formatjs(List(
-                    "var lift_settings = {};",
-                    "window.lift.extend(lift_settings,window.liftJQuery);",
-                    """window.lift.extend(lift_settings,{"liftPath": "/lift",
+        init must_== Full(
+          formatjs(List(
+            "var lift_settings = {};",
+            "window.lift.extend(lift_settings,window.liftJQuery);",
+            """window.lift.extend(lift_settings,{"liftPath": "/lift",
             |"ajaxRetryCount": 4,
             |"ajaxPostTimeout": 5000,
             |"gcPollingInterval": 75000,
@@ -163,8 +164,8 @@ object LiftJavaScriptSpec extends Specification {
             |"ajaxOnFailure": function() {alert("The server cannot be contacted at this time");},
             |"ajaxOnStart": function() {},
             |"ajaxOnEnd": function() {}});""",
-                    "window.lift.init(lift_settings);"
-                )))
+            "window.lift.init(lift_settings);"
+          )))
       }
     }
     "create init command with VanillaJS" in withEnglishLocale {
@@ -174,10 +175,11 @@ object LiftJavaScriptSpec extends Specification {
           .vend()
           .map(_.apply(session))
           .map(LiftJavaScript.initCmd(_).toJsCmd)
-        init must_== Full(formatjs(List(
-                    "var lift_settings = {};",
-                    "window.lift.extend(lift_settings,window.liftVanilla);",
-                    """window.lift.extend(lift_settings,{"liftPath": "/lift",
+        init must_== Full(
+          formatjs(List(
+            "var lift_settings = {};",
+            "window.lift.extend(lift_settings,window.liftVanilla);",
+            """window.lift.extend(lift_settings,{"liftPath": "/lift",
             |"ajaxRetryCount": 4,
             |"ajaxPostTimeout": 5000,
             |"gcPollingInterval": 75000,
@@ -189,20 +191,21 @@ object LiftJavaScriptSpec extends Specification {
             |"ajaxOnFailure": function() {alert("The server cannot be contacted at this time");},
             |"ajaxOnStart": function() {},
             |"ajaxOnEnd": function() {}});""",
-                    "window.lift.init(lift_settings);"
-                )))
+            "window.lift.init(lift_settings);"
+          )))
       }
     }
     "create init command with custom setting" in withEnglishLocale {
       S.initIfUninitted(session) {
         LiftRules.jsArtifacts = JQueryArtifacts
         val settings = LiftJavaScript.settings.extend(
-            JsObj("liftPath" -> "liftyStuff", "mysetting" -> 99))
+          JsObj("liftPath" -> "liftyStuff", "mysetting" -> 99))
         val init = LiftJavaScript.initCmd(settings)
-        init.toJsCmd must_== formatjs(List(
-                "var lift_settings = {};",
-                "window.lift.extend(lift_settings,window.liftJQuery);",
-                """window.lift.extend(lift_settings,{"liftPath": "liftyStuff",
+        init.toJsCmd must_== formatjs(
+          List(
+            "var lift_settings = {};",
+            "window.lift.extend(lift_settings,window.liftJQuery);",
+            """window.lift.extend(lift_settings,{"liftPath": "liftyStuff",
             |"ajaxRetryCount": 4,
             |"ajaxPostTimeout": 5000,
             |"gcPollingInterval": 75000,
@@ -215,27 +218,29 @@ object LiftJavaScriptSpec extends Specification {
             |"ajaxOnStart": function() {},
             |"ajaxOnEnd": function() {},
             |"mysetting": 99});""",
-                "window.lift.init(lift_settings);"
-            ))
+            "window.lift.init(lift_settings);"
+          ))
       }
     }
   }
 
   def formatjs(line: String): String = formatjs(line :: Nil)
   def formatjs(lines: List[String]): String =
-    lines.map {
-      _.stripMargin.lines.toList match {
-        case init :+ last => (init.map(_ + " ") :+ last).mkString
-        case Nil => ""
+    lines
+      .map {
+        _.stripMargin.lines.toList match {
+          case init :+ last => (init.map(_ + " ") :+ last).mkString
+          case Nil          => ""
+        }
       }
-    }.mkString("\n")
+      .mkString("\n")
 
   object withEnglishLocale extends WithLocale(Locale.ENGLISH)
 
   object withPolishLocale extends WithLocale(Locale.forLanguageTag("pl-PL"))
 
   class WithLocale(locale: Locale) extends Around {
-    override def around[T : AsResult](test: => T): Result = {
+    override def around[T: AsResult](test: => T): Result = {
       val savedDefaultLocale = Locale.getDefault
       Locale.setDefault(locale)
       try {

@@ -37,18 +37,18 @@ private[sql] object JacksonGenerator {
       row: InternalRow): Unit = {
     def valWriter: (DataType, Any) => Unit = {
       case (_, null) | (NullType, _) => gen.writeNull()
-      case (StringType, v) => gen.writeString(v.toString)
+      case (StringType, v)           => gen.writeString(v.toString)
       case (TimestampType, v: Long) =>
         gen.writeString(DateTimeUtils.toJavaTimestamp(v).toString)
-      case (IntegerType, v: Int) => gen.writeNumber(v)
-      case (ShortType, v: Short) => gen.writeNumber(v)
-      case (FloatType, v: Float) => gen.writeNumber(v)
-      case (DoubleType, v: Double) => gen.writeNumber(v)
-      case (LongType, v: Long) => gen.writeNumber(v)
-      case (DecimalType(), v: Decimal) => gen.writeNumber(v.toJavaBigDecimal)
-      case (ByteType, v: Byte) => gen.writeNumber(v.toInt)
+      case (IntegerType, v: Int)        => gen.writeNumber(v)
+      case (ShortType, v: Short)        => gen.writeNumber(v)
+      case (FloatType, v: Float)        => gen.writeNumber(v)
+      case (DoubleType, v: Double)      => gen.writeNumber(v)
+      case (LongType, v: Long)          => gen.writeNumber(v)
+      case (DecimalType(), v: Decimal)  => gen.writeNumber(v.toJavaBigDecimal)
+      case (ByteType, v: Byte)          => gen.writeNumber(v.toInt)
       case (BinaryType, v: Array[Byte]) => gen.writeBinary(v)
-      case (BooleanType, v: Boolean) => gen.writeBoolean(v)
+      case (BooleanType, v: Boolean)    => gen.writeBoolean(v)
       case (DateType, v: Int) =>
         gen.writeString(DateTimeUtils.toJavaDate(v).toString)
       // For UDT values, they should be in the SQL type's corresponding value type.
@@ -86,7 +86,7 @@ private[sql] object JacksonGenerator {
 
       case (dt, v) =>
         sys.error(
-            s"Failed to convert value $v (class of ${v.getClass}}) with the type of $dt to JSON.")
+          s"Failed to convert value $v (class of ${v.getClass}}) with the type of $dt to JSON.")
     }
 
     valWriter(rowSchema, row)

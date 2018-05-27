@@ -1,6 +1,10 @@
 package org.jetbrains.sbt.settings
 
-import com.intellij.openapi.externalSystem.util.{ExternalSystemSettingsControl, ExternalSystemUiUtil, PaintAwarePanel}
+import com.intellij.openapi.externalSystem.util.{
+  ExternalSystemSettingsControl,
+  ExternalSystemUiUtil,
+  PaintAwarePanel
+}
 
 /**
   * @author Pavel Fatin
@@ -23,8 +27,9 @@ class SbtSystemSettingsControl(settings: SbtSystemSettings)
     pane.getContentPanel.setVisible(show)
 
   def fillUi(canvas: PaintAwarePanel, indentLevel: Int): Unit =
-    canvas.add(pane.getContentPanel,
-               ExternalSystemUiUtil.getFillLineConstraints(indentLevel))
+    canvas.add(
+      pane.getContentPanel,
+      ExternalSystemUiUtil.getFillLineConstraints(indentLevel))
 
   def disposeUIResources() {}
 

@@ -10,7 +10,7 @@ class NeedsToBeAbstractBugsTest extends AnnotatorTestBase(NeedsToBeAbstract) {
 
   def testSCL2981(): Unit = {
     assertMatches(messages(
-            "trait A { type T; def t(p: T)}; class B extends A { type T = Int; def t(p: T) = ()}")) {
+      "trait A { type T; def t(p: T)}; class B extends A { type T = Int; def t(p: T) = ()}")) {
       case Nil =>
     }
   }
@@ -54,8 +54,8 @@ class B extends A {
   }
 
   def testSCL9446(): Unit = {
-    val extensionPoint = Extensions.getRootArea.getExtensionPoint(
-        SyntheticMembersInjector.EP_NAME)
+    val extensionPoint =
+      Extensions.getRootArea.getExtensionPoint(SyntheticMembersInjector.EP_NAME)
     val injector = new SCL9446Injector
     extensionPoint.registerExtension(injector)
     try {

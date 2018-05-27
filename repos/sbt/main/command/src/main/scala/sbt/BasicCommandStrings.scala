@@ -20,8 +20,9 @@ object BasicCommandStrings {
   val TerminateAction: String = Exit
 
   def helpBrief =
-    (HelpCommand,
-     s"Displays this help message or prints detailed help on requested commands (run '$HelpCommand <command>').")
+    (
+      HelpCommand,
+      s"Displays this help message or prints detailed help on requested commands (run '$HelpCommand <command>').")
   def helpDetailed =
     HelpCommand + """
 
@@ -32,7 +33,7 @@ object BasicCommandStrings {
 	Prints detailed help for command <command>.
 
 """ + HelpCommand +
-    """ <regular expression>
+      """ <regular expression>
 
 	Searches the help according to the provided regular expression.
 """
@@ -44,9 +45,10 @@ object BasicCommandStrings {
   def HistoryHelpBrief =
     (HistoryCommands.Start -> "History command help.  Lists and describes all history commands.")
   def historyHelp =
-    Help(Nil,
-         (HistoryHelpBrief +: HistoryCommands.descriptions).toMap,
-         Set(HistoryCommands.Start))
+    Help(
+      Nil,
+      (HistoryHelpBrief +: HistoryCommands.descriptions).toMap,
+      Set(HistoryCommands.Start))
 
   def exitBrief = "Terminates the build."
 
@@ -54,8 +56,9 @@ object BasicCommandStrings {
     val levels = Level.values.toSeq
     val levelList = levels.mkString(", ")
     val brief =
-      ("<log-level>",
-       "Sets the logging level to 'log-level'.  Valid levels: " + levelList)
+      (
+        "<log-level>",
+        "Sets the logging level to 'log-level'.  Valid levels: " + levelList)
     val detailed = levels.map(l => (l.toString, logLevelDetail(l))).toMap
     Help(brief, detailed)
   }
@@ -86,8 +89,9 @@ ${runEarly(level.toString)}
 
   val EarlyCommand = "--"
   val EarlyCommandBrief =
-    (s"$EarlyCommand<command>",
-     "Schedules a command to run before other commands on startup.")
+    (
+      s"$EarlyCommand<command>",
+      "Schedules a command to run before other commands on startup.")
   val EarlyCommandDetailed = s"""$EarlyCommand<command>
 
 	Schedules an early command, which will be run before other commands on the command line.
@@ -98,7 +102,7 @@ ${runEarly(level.toString)}
   def ReadFiles = " file1 file2 ..."
   def ReadDetailed =
     ReadCommand + ReadFiles +
-    """
+      """
 
 	Reads the lines from the given files and inserts them as commands.
 	All empty lines and lines that start with '#' are ignored.
@@ -113,7 +117,7 @@ ${runEarly(level.toString)}
   def ApplyCommand = "apply"
   def ApplyDetailed =
     ApplyCommand +
-    """ [-cp|-classpath <classpath>] <module-name>*
+      """ [-cp|-classpath <classpath>] <module-name>*
 	Transforms the current State by calling <module-name>.apply(currentState) for each listed module name.
 	Here, currentState is of type sbt.State.
    If a classpath is provided, modules are loaded from a new class loader for this classpath.
@@ -122,7 +126,7 @@ ${runEarly(level.toString)}
   def RebootCommand = "reboot"
   def RebootDetailed =
     RebootCommand +
-    """ [full]
+      """ [full]
 
 	This command is equivalent to exiting sbt, restarting, and running the
 	  remaining commands with the exception that the JVM is not shut down.
@@ -133,8 +137,9 @@ ${runEarly(level.toString)}
 
   def Multi = ";"
   def MultiBrief =
-    (Multi + " <command> (" + Multi + " <command>)*",
-     "Runs the provided semicolon-separated commands.")
+    (
+      Multi + " <command> (" + Multi + " <command>)*",
+      "Runs the provided semicolon-separated commands.")
   def MultiDetailed =
     Multi + " command1 " + Multi + """ command2 ...
 
@@ -157,7 +162,7 @@ ${runEarly(level.toString)}
 	Prints the alias defined for `name`.
 
 """ + AliasCommand +
-    """ name=value
+      """ name=value
 
 	Sets the alias `name` to `value`, replacing any existing alias with that name.
 	Whenever `name` is entered, the corresponding `value` is run.
@@ -187,7 +192,8 @@ ${runEarly(level.toString)}
     def FailureWallDeprecated =
       deprecatedAlias(FailureWall, BasicCommandStrings.FailureWall)
     private[this] def deprecatedAlias(
-        oldName: String, newName: String): String =
+        oldName: String,
+        newName: String): String =
       s"The `$oldName` command is deprecated in favor of `$newName` and will be removed in 0.14.0"
   }
 
@@ -197,7 +203,7 @@ ${runEarly(level.toString)}
   def OnFailure = "onFailure"
   def OnFailureDetailed =
     OnFailure +
-    """ command
+      """ command
 
 	Registers 'command' to run when a command fails to complete normally.
 

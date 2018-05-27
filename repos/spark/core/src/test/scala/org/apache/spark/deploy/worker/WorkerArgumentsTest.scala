@@ -31,7 +31,7 @@ class WorkerArgumentsTest extends SparkFunSuite {
   }
 
   test(
-      "Memory can't be set to 0 when SPARK_WORKER_MEMORY env property leaves off M or G") {
+    "Memory can't be set to 0 when SPARK_WORKER_MEMORY env property leaves off M or G") {
     val args = Array("spark://localhost:0000  ")
     val conf = new SparkConfWithEnv(Map("SPARK_WORKER_MEMORY" -> "50000"))
     intercept[IllegalStateException] {

@@ -7,7 +7,10 @@ package akka.http.impl.engine.ws
 import java.util.Random
 
 import akka.NotUsed
-import akka.http.scaladsl.model.ws.{InvalidUpgradeResponse, WebSocketUpgradeResponse}
+import akka.http.scaladsl.model.ws.{
+  InvalidUpgradeResponse,
+  WebSocketUpgradeResponse
+}
 import akka.stream.ClosedShape
 import akka.stream.TLSProtocol._
 
@@ -26,7 +29,9 @@ import org.scalatest.{Matchers, FreeSpec}
 import akka.http.impl.util._
 
 class WebSocketClientSpec
-    extends FreeSpec with Matchers with WithMaterializerSpec {
+    extends FreeSpec
+    with Matchers
+    with WithMaterializerSpec {
   "The client-side WebSocket implementation should" - {
     "establish a websocket connection when the user requests it" in new EstablishedConnectionSetup
     with ClientEchoes
@@ -44,7 +49,9 @@ class WebSocketClientSpec
 
       sendWSFrame(Protocol.Opcode.Text, ByteString("Message 1"), fin = true)
       expectMaskedFrameOnNetwork(
-          Protocol.Opcode.Text, ByteString("Message 1"), fin = true)
+        Protocol.Opcode.Text,
+        ByteString("Message 1"),
+        fin = true)
     }
     "reject invalid handshakes" - {
       "other status code" in new TestSetup with ClientEchoes {
@@ -58,7 +65,7 @@ class WebSocketClientSpec
 
         expectNetworkAbort()
         expectInvalidUpgradeResponseCause(
-            "WebSocket server at ws://example.org/ws returned unexpected status code: 404 Not Found")
+          "WebSocket server at ws://example.org/ws returned unexpected status code: 404 Not Found")
       }
       "missing Sec-WebSocket-Accept hash" in new TestSetup with ClientEchoes {
         expectWireData(UpgradeRequestBytes)
@@ -73,7 +80,7 @@ class WebSocketClientSpec
 
         expectNetworkAbort()
         expectInvalidUpgradeResponseCause(
-            "WebSocket server at ws://example.org/ws returned response that was missing required `Sec-WebSocket-Accept` header.")
+          "WebSocket server at ws://example.org/ws returned response that was missing required `Sec-WebSocket-Accept` header.")
       }
       "wrong Sec-WebSocket-Accept hash" in new TestSetup with ClientEchoes {
         expectWireData(UpgradeRequestBytes)
@@ -89,7 +96,7 @@ class WebSocketClientSpec
 
         expectNetworkAbort()
         expectInvalidUpgradeResponseCause(
-            "WebSocket server at ws://example.org/ws returned response with invalid `Sec-WebSocket-Accept` header.")
+          "WebSocket server at ws://example.org/ws returned response with invalid `Sec-WebSocket-Accept` header.")
       }
       "missing `Upgrade` header" in new TestSetup with ClientEchoes {
         expectWireData(UpgradeRequestBytes)
@@ -104,7 +111,7 @@ class WebSocketClientSpec
 
         expectNetworkAbort()
         expectInvalidUpgradeResponseCause(
-            "WebSocket server at ws://example.org/ws returned response that was missing required `Upgrade` header.")
+          "WebSocket server at ws://example.org/ws returned response that was missing required `Upgrade` header.")
       }
       "missing `Connection: upgrade` header" in new TestSetup
       with ClientEchoes {
@@ -120,21 +127,24 @@ class WebSocketClientSpec
 
         expectNetworkAbort()
         expectInvalidUpgradeResponseCause(
-            "WebSocket server at ws://example.org/ws returned response that was missing required `Connection` header.")
+          "WebSocket server at ws://example.org/ws returned response that was missing required `Connection` header.")
       }
     }
 
     "don't send out frames before handshake was finished successfully" in new TestSetup {
       def clientImplementation: Flow[Message, Message, NotUsed] =
         Flow.fromSinkAndSourceMat(
-            Sink.ignore, Source.single(TextMessage("fast message")))(Keep.none)
+          Sink.ignore,
+          Source.single(TextMessage("fast message")))(Keep.none)
 
       expectWireData(UpgradeRequestBytes)
       expectNoWireData()
 
       sendWireData(UpgradeResponseBytes)
       expectMaskedFrameOnNetwork(
-          Protocol.Opcode.Text, ByteString("fast message"), fin = true)
+        Protocol.Opcode.Text,
+        ByteString("fast message"),
+        fin = true)
 
       expectMaskedCloseFrame(Protocol.CloseCodes.Regular)
       sendWSCloseFrame(Protocol.CloseCodes.Regular)
@@ -147,7 +157,10 @@ class WebSocketClientSpec
       expectWireData(UpgradeRequestBytes)
 
       val firstFrame = WSTestUtils.frame(
-          Protocol.Opcode.Text, ByteString("fast"), fin = true, mask = false)
+        Protocol.Opcode.Text,
+        ByteString("fast"),
+        fin = true,
+        mask = false)
       sendWireData(UpgradeResponseBytes ++ firstFrame)
 
       messagesIn.requestNext(TextMessage("fast"))
@@ -158,12 +171,15 @@ class WebSocketClientSpec
       messagesOut.sendNext(TextMessage("Message 1"))
 
       expectMaskedFrameOnNetwork(
-          Protocol.Opcode.Text, ByteString("Message 1"), fin = true)
+        Protocol.Opcode.Text,
+        ByteString("Message 1"),
+        fin = true)
 
-      sendWSFrame(Protocol.Opcode.Binary,
-                  ByteString("Response"),
-                  fin = true,
-                  mask = false)
+      sendWSFrame(
+        Protocol.Opcode.Binary,
+        ByteString("Response"),
+        fin = true,
+        mask = false)
 
       messagesIn.requestNext(BinaryMessage(ByteString("Response")))
     }
@@ -171,19 +187,29 @@ class WebSocketClientSpec
     with ClientEchoes {
       sendWSFrame(Protocol.Opcode.Text, ByteString("Message 1"), fin = true)
       expectMaskedFrameOnNetwork(
-          Protocol.Opcode.Text, ByteString("Message 1"), fin = true)
+        Protocol.Opcode.Text,
+        ByteString("Message 1"),
+        fin = true)
       sendWSFrame(Protocol.Opcode.Text, ByteString("Message 2"), fin = true)
       expectMaskedFrameOnNetwork(
-          Protocol.Opcode.Text, ByteString("Message 2"), fin = true)
+        Protocol.Opcode.Text,
+        ByteString("Message 2"),
+        fin = true)
       sendWSFrame(Protocol.Opcode.Text, ByteString("Message 3"), fin = true)
       expectMaskedFrameOnNetwork(
-          Protocol.Opcode.Text, ByteString("Message 3"), fin = true)
+        Protocol.Opcode.Text,
+        ByteString("Message 3"),
+        fin = true)
       sendWSFrame(Protocol.Opcode.Text, ByteString("Message 4"), fin = true)
       expectMaskedFrameOnNetwork(
-          Protocol.Opcode.Text, ByteString("Message 4"), fin = true)
+        Protocol.Opcode.Text,
+        ByteString("Message 4"),
+        fin = true)
       sendWSFrame(Protocol.Opcode.Text, ByteString("Message 5"), fin = true)
       expectMaskedFrameOnNetwork(
-          Protocol.Opcode.Text, ByteString("Message 5"), fin = true)
+        Protocol.Opcode.Text,
+        ByteString("Message 5"),
+        fin = true)
 
       sendWSCloseFrame(Protocol.CloseCodes.Regular)
       expectMaskedCloseFrame(Protocol.CloseCodes.Regular)
@@ -218,9 +244,10 @@ class WebSocketClientSpec
             |""")
 
         sendWSFrame(Protocol.Opcode.Text, ByteString("Message 1"), fin = true)
-        expectMaskedFrameOnNetwork(Protocol.Opcode.Text,
-                                   ByteString("Message 1"),
-                                   fin = true)
+        expectMaskedFrameOnNetwork(
+          Protocol.Opcode.Text,
+          ByteString("Message 1"),
+          fin = true)
       }
       "send error on user flow if server doesn't support subprotocol" - {
         "if no protocol was selected" in new TestSetup with ClientProbes {
@@ -248,7 +275,7 @@ class WebSocketClientSpec
 
           expectNetworkAbort()
           expectInvalidUpgradeResponseCause(
-              "WebSocket server at ws://example.org/ws returned response that indicated that the given subprotocol was not supported. (client supported: v2, server supported: None)")
+            "WebSocket server at ws://example.org/ws returned response that indicated that the given subprotocol was not supported. (client supported: v2, server supported: None)")
         }
         "if different protocol was selected" in new TestSetup
         with ClientProbes {
@@ -277,7 +304,7 @@ class WebSocketClientSpec
 
           expectNetworkAbort()
           expectInvalidUpgradeResponseCause(
-              "WebSocket server at ws://example.org/ws returned response that indicated that the given subprotocol was not supported. (client supported: v2, server supported: Some(v3))")
+            "WebSocket server at ws://example.org/ws returned response that indicated that the given subprotocol was not supported. (client supported: v2, server supported: Some(v3))")
         }
       }
     }
@@ -320,15 +347,15 @@ class WebSocketClientSpec
     def settings =
       ClientConnectionSettings(system)
         .withUserAgentHeader(
-            Some(`User-Agent`(List(ProductVersion("akka-http", "test")))))
+          Some(`User-Agent`(List(ProductVersion("akka-http", "test")))))
         .withWebsocketRandomFactory(() ⇒ random)
 
     def targetUri: Uri = "ws://example.org/ws"
 
     def clientLayer: Http.WebSocketClientLayer =
       Http(system).webSocketClientLayer(
-          WebSocketRequest(targetUri, subprotocol = requestedSubProtocol),
-          settings = settings)
+        WebSocketRequest(targetUri, subprotocol = requestedSubProtocol),
+        settings = settings)
 
     val (netOut, netIn, response) = {
       val netOut = ByteStringSinkProbe()
@@ -401,7 +428,8 @@ class WebSocketClientSpec
     lazy val messagesIn = TestSubscriber.probe[Message]()
 
     override def clientImplementation: Flow[Message, Message, NotUsed] =
-      Flow.fromSinkAndSourceMat(Sink.fromSubscriber(messagesIn),
-                                Source.fromPublisher(messagesOut))(Keep.none)
+      Flow.fromSinkAndSourceMat(
+        Sink.fromSubscriber(messagesIn),
+        Source.fromPublisher(messagesOut))(Keep.none)
   }
 }

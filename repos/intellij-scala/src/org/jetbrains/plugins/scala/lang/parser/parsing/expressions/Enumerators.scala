@@ -30,8 +30,8 @@ object Enumerators {
           builder.advanceLexer()
           false
         case _ if builder.newlineBeforeCurrentToken => false
-        case _ if Guard.parse(builder) => true
-        case _ => exit = false; true
+        case _ if Guard.parse(builder)              => true
+        case _                                      => exit = false; true
       }
       if (!guard && !Enumerator.parse(builder)) exit = false
     }

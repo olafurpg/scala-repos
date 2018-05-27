@@ -9,8 +9,9 @@ import akka.event.{Logging, LoggingAdapter}
 
 trait TransformerPipelineSupport {
 
-  def logValue[T](log: LoggingAdapter,
-                  level: Logging.LogLevel = Logging.DebugLevel): T ⇒ T =
+  def logValue[T](
+      log: LoggingAdapter,
+      level: Logging.LogLevel = Logging.DebugLevel): T ⇒ T =
     logValue { value ⇒
       log.log(level, value.toString)
     }

@@ -17,10 +17,11 @@ import org.jetbrains.plugins.scala.extensions._
 class NotImplementedCodeInspection extends AbstractInspection {
   def actionFor(holder: ProblemsHolder) = {
     case reference @ ReferenceTarget(Member("???", "scala.Predef")) =>
-      holder.registerProblem(reference,
-                             "Not implemented",
-                             ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
-                             new ImplementQuickFix(reference))
+      holder.registerProblem(
+        reference,
+        "Not implemented",
+        ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
+        new ImplementQuickFix(reference))
   }
 
   private class ImplementQuickFix(e: PsiElement)
@@ -39,11 +40,13 @@ class NotImplementedCodeInspection extends AbstractInspection {
   }
 
   private def positionCursor(
-      project: Project, targetFile: PsiFile, element: PsiElement): Editor = {
+      project: Project,
+      targetFile: PsiFile,
+      element: PsiElement): Editor = {
     val range = element.getTextRange
     val textOffset = range.getStartOffset
-    val descriptor = new OpenFileDescriptor(
-        project, targetFile.getVirtualFile, textOffset)
+    val descriptor =
+      new OpenFileDescriptor(project, targetFile.getVirtualFile, textOffset)
     FileEditorManager.getInstance(project).openTextEditor(descriptor, true)
   }
 }

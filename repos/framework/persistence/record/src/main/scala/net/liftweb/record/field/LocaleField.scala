@@ -39,26 +39,28 @@ trait LocaleTypedField extends TypedField[String] {
   def buildDisplayList: List[(String, String)]
 
   private def elem =
-    SHtml.select(buildDisplayList,
-                 Full(valueBox.map(_.toString) openOr ""),
-                 locale => setBox(Full(locale))) %
-    ("tabindex" -> tabIndex.toString)
+    SHtml.select(
+      buildDisplayList,
+      Full(valueBox.map(_.toString) openOr ""),
+      locale => setBox(Full(locale))) %
+      ("tabindex" -> tabIndex.toString)
 
   override def toForm: Box[NodeSeq] =
     uniqueFieldId match {
       case Full(id) => Full(elem % ("id" -> id))
-      case _ => Full(elem)
+      case _        => Full(elem)
     }
 }
 
 class LocaleField[OwnerType <: Record[OwnerType]](rec: OwnerType)
-    extends StringField(rec, 16) with LocaleTypedField {
+    extends StringField(rec, 16)
+    with LocaleTypedField {
 
   override def defaultValue = Locale.getDefault.toString
 
   def isAsLocale: Locale =
     Locale.getAvailableLocales.filter(_.toString == value).toList match {
-      case Nil => Locale.getDefault
+      case Nil     => Locale.getDefault
       case x :: xs => x
     }
 
@@ -66,7 +68,8 @@ class LocaleField[OwnerType <: Record[OwnerType]](rec: OwnerType)
 }
 
 class OptionalLocaleField[OwnerType <: Record[OwnerType]](rec: OwnerType)
-    extends OptionalStringField(rec, 16) with LocaleTypedField {
+    extends OptionalStringField(rec, 16)
+    with LocaleTypedField {
 
   /** Label for the selection item representing Empty, show when this field is optional. Defaults to the empty string. */
   def emptyOptionLabel: String = ""

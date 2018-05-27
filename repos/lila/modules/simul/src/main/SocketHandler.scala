@@ -15,15 +15,17 @@ import lila.socket.Handler
 import lila.user.User
 import makeTimeout.short
 
-private[simul] final class SocketHandler(hub: lila.hub.Env,
-                                         socketHub: ActorRef,
-                                         chat: ActorSelection,
-                                         flood: Flood,
-                                         exists: Simul.ID => Fu[Boolean]) {
+private[simul] final class SocketHandler(
+    hub: lila.hub.Env,
+    socketHub: ActorRef,
+    chat: ActorSelection,
+    flood: Flood,
+    exists: Simul.ID => Fu[Boolean]) {
 
-  def join(simId: String,
-           uid: String,
-           user: Option[User]): Fu[Option[JsSocketHandler]] =
+  def join(
+      simId: String,
+      uid: String,
+      user: Option[User]): Fu[Option[JsSocketHandler]] =
     exists(simId) flatMap {
       _ ?? {
         for {
@@ -37,10 +39,11 @@ private[simul] final class SocketHandler(hub: lila.hub.Env,
       }
     }
 
-  private def controller(socket: ActorRef,
-                         simId: String,
-                         uid: String,
-                         member: Member): Handler.Controller = {
+  private def controller(
+      socket: ActorRef,
+      simId: String,
+      uid: String,
+      member: Member): Handler.Controller = {
     case ("p", o) =>
       o int "v" foreach { v =>
         socket ! PingVersion(uid, v)

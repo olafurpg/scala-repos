@@ -29,14 +29,18 @@ trait ParHashTable[K, Entry >: Null <: HashEntry[K, Entry]]
       private val until: Int,
       private val totalsize: Int,
       private var es: Entry)
-      extends IterableSplitter[T] with SizeMapUtils {
+      extends IterableSplitter[T]
+      with SizeMapUtils {
     private val itertable = table
     private var traversed = 0
     scan()
 
     def entry2item(e: Entry): T
     def newIterator(
-        idxFrom: Int, idxUntil: Int, totalSize: Int, es: Entry): IterRepr
+        idxFrom: Int,
+        idxUntil: Int,
+        totalSize: Int,
+        es: Entry): IterRepr
 
     def hasNext = {
       es ne null
@@ -71,10 +75,10 @@ trait ParHashTable[K, Entry >: Null <: HashEntry[K, Entry]]
         append("current entry: " + es)
         append("underlying from " + idx + " until " + until)
         append(
-            itertable
-              .slice(idx, until)
-              .map(x => if (x != null) x.toString else "n/a")
-              .mkString(" | "))
+          itertable
+            .slice(idx, until)
+            .map(x => if (x != null) x.toString else "n/a")
+            .mkString(" | "))
         append("\\--------------------/")
       }
     }
@@ -92,9 +96,10 @@ trait ParHashTable[K, Entry >: Null <: HashEntry[K, Entry]]
           val sidx = idx + divsz + 1 // + 1 preserves iteration invariant
           val suntil = until
           val ses =
-            itertable(sidx - 1).asInstanceOf[Entry] // sidx - 1 ensures counting from the right spot
-          val stotal = calcNumElems(
-              sidx - 1, suntil, table.length, sizeMapBucketSize)
+            itertable(sidx - 1)
+              .asInstanceOf[Entry] // sidx - 1 ensures counting from the right spot
+          val stotal =
+            calcNumElems(sidx - 1, suntil, table.length, sizeMapBucketSize)
 
           // first iterator params
           val fidx = idx
@@ -103,15 +108,18 @@ trait ParHashTable[K, Entry >: Null <: HashEntry[K, Entry]]
           val ftotal = totalsize - stotal
 
           Seq(
-              newIterator(fidx, funtil, ftotal, fes),
-              newIterator(sidx, suntil, stotal, ses)
+            newIterator(fidx, funtil, ftotal, fes),
+            newIterator(sidx, suntil, stotal, ses)
           )
         } else {
           // otherwise, this is the last entry in the table - all what remains is the chain
           // so split the rest of the chain
           val arr = convertToArrayBuffer(es)
           val arrpit = new scala.collection.parallel.BufferSplitter[T](
-              arr, 0, arr.length, signalDelegate)
+            arr,
+            0,
+            arr.length,
+            signalDelegate)
           arrpit.split
         }
       } else Seq(this.asInstanceOf[IterRepr])

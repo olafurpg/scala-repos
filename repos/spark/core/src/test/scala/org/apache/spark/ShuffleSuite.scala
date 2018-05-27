@@ -17,21 +17,39 @@
 
 package org.apache.spark
 
-import java.util.concurrent.{Callable, CyclicBarrier, Executors, ExecutorService}
+import java.util.concurrent.{
+  Callable,
+  CyclicBarrier,
+  Executors,
+  ExecutorService
+}
 
 import org.scalatest.Matchers
 
 import org.apache.spark.ShuffleSuite.NonJavaSerializableClass
 import org.apache.spark.memory.TaskMemoryManager
-import org.apache.spark.rdd.{CoGroupedRDD, OrderedRDDFunctions, RDD, ShuffledRDD, SubtractedRDD}
-import org.apache.spark.scheduler.{MapStatus, MyRDD, SparkListener, SparkListenerTaskEnd}
+import org.apache.spark.rdd.{
+  CoGroupedRDD,
+  OrderedRDDFunctions,
+  RDD,
+  ShuffledRDD,
+  SubtractedRDD
+}
+import org.apache.spark.scheduler.{
+  MapStatus,
+  MyRDD,
+  SparkListener,
+  SparkListenerTaskEnd
+}
 import org.apache.spark.serializer.KryoSerializer
 import org.apache.spark.shuffle.ShuffleWriter
 import org.apache.spark.storage.{ShuffleBlockId, ShuffleDataBlockId}
 import org.apache.spark.util.MutablePair
 
 abstract class ShuffleSuite
-    extends SparkFunSuite with Matchers with LocalSparkContext {
+    extends SparkFunSuite
+    with Matchers
+    with LocalSparkContext {
 
   val conf = new SparkConf(loadDefaults = false)
 
@@ -63,7 +81,8 @@ abstract class ShuffleSuite
     // default Java serializer cannot handle the non serializable class.
     val c =
       new ShuffledRDD[Int, NonJavaSerializableClass, NonJavaSerializableClass](
-          b, new HashPartitioner(NUM_BLOCKS))
+        b,
+        new HashPartitioner(NUM_BLOCKS))
     c.setSerializer(new KryoSerializer(conf))
     val shuffleId =
       c.dependencies.head.asInstanceOf[ShuffleDependency[_, _, _]].shuffleId
@@ -74,8 +93,8 @@ abstract class ShuffleSuite
     (0 until NUM_BLOCKS).foreach { id =>
       val statuses =
         SparkEnv.get.mapOutputTracker.getMapSizesByExecutorId(shuffleId, id)
-      assert(statuses.forall(
-              _._2.forall(blockIdSizePair => blockIdSizePair._2 > 0)))
+      assert(
+        statuses.forall(_._2.forall(blockIdSizePair => blockIdSizePair._2 > 0)))
     }
   }
 
@@ -90,7 +109,8 @@ abstract class ShuffleSuite
     // default Java serializer cannot handle the non serializable class.
     val c =
       new ShuffledRDD[Int, NonJavaSerializableClass, NonJavaSerializableClass](
-          b, new HashPartitioner(3))
+        b,
+        new HashPartitioner(3))
     c.setSerializer(new KryoSerializer(conf))
     assert(c.count === 10)
   }
@@ -173,7 +193,7 @@ abstract class ShuffleSuite
     val data = Array(p(1, 11), p(3, 33), p(100, 100), p(2, 22))
     val pairs: RDD[MutablePair[Int, Int]] = sc.parallelize(data, 2)
     val results = new OrderedRDDFunctions[Int, Int, MutablePair[Int, Int]](
-        pairs).sortByKey().collect()
+      pairs).sortByKey().collect()
     results(0) should be((1, 11))
     results(1) should be((2, 22))
     results(2) should be((3, 33))
@@ -257,7 +277,7 @@ abstract class ShuffleSuite
 
   test("shuffle with different compression settings (SPARK-3426)") {
     for (shuffleSpillCompress <- Set(true, false);
-    shuffleCompress <- Set(true, false)) {
+         shuffleCompress <- Set(true, false)) {
       val myConf = conf
         .clone()
         .setAppName("test")
@@ -275,14 +295,14 @@ abstract class ShuffleSuite
         case e: Exception =>
           val errMsg =
             s"Failed with spark.shuffle.spill.compress=$shuffleSpillCompress," +
-            s" spark.shuffle.compress=$shuffleCompress"
+              s" spark.shuffle.compress=$shuffleCompress"
           throw new Exception(errMsg, e)
       }
     }
   }
 
   test(
-      "[SPARK-4085] rerun map stage if reduce stage cannot find its local shuffle file") {
+    "[SPARK-4085] rerun map stage if reduce stage cannot find its local shuffle file") {
     val myConf = conf.clone().set("spark.test.noStageRetry", "false")
     sc = new SparkContext("local", "test", myConf)
     val rdd = sc.parallelize(1 to 10, 2).map((_, 1)).reduceByKey(_ + _)
@@ -354,15 +374,16 @@ abstract class ShuffleSuite
 
     // first attempt -- its successful
     val writer1 = manager.getWriter[Int, Int](
-        shuffleHandle,
+      shuffleHandle,
+      0,
+      new TaskContextImpl(
         0,
-        new TaskContextImpl(0,
-                            0,
-                            0L,
-                            0,
-                            taskMemoryManager,
-                            metricsSystem,
-                            InternalAccumulator.create(sc)))
+        0,
+        0L,
+        0,
+        taskMemoryManager,
+        metricsSystem,
+        InternalAccumulator.create(sc)))
     val data1 = (1 to 10).map { x =>
       x -> x
     }
@@ -371,15 +392,16 @@ abstract class ShuffleSuite
     // just to simulate the fact that the records may get written differently
     // depending on what gets spilled, what gets combined, etc.
     val writer2 = manager.getWriter[Int, Int](
-        shuffleHandle,
+      shuffleHandle,
+      0,
+      new TaskContextImpl(
         0,
-        new TaskContextImpl(0,
-                            0,
-                            1L,
-                            0,
-                            taskMemoryManager,
-                            metricsSystem,
-                            InternalAccumulator.create(sc)))
+        0,
+        1L,
+        0,
+        taskMemoryManager,
+        metricsSystem,
+        InternalAccumulator.create(sc)))
     val data2 = (11 to 20).map { x =>
       x -> x
     }
@@ -393,15 +415,19 @@ abstract class ShuffleSuite
       writer.stop(true)
     }
     val interleaver = new InterleaveIterators(
-        data1, writeAndClose(writer1), data2, writeAndClose(writer2))
+      data1,
+      writeAndClose(writer1),
+      data2,
+      writeAndClose(writer2))
     val (mapOutput1, mapOutput2) = interleaver.run()
 
     // check that we can read the map output and it has the right data
     assert(mapOutput1.isDefined)
     assert(mapOutput2.isDefined)
     assert(mapOutput1.get.location === mapOutput2.get.location)
-    assert(mapOutput1.get.getSizeForBlock(0) === mapOutput1.get
-          .getSizeForBlock(0))
+    assert(
+      mapOutput1.get.getSizeForBlock(0) === mapOutput1.get
+        .getSizeForBlock(0))
 
     // register one of the map outputs -- doesn't matter which one
     mapOutput1.foreach {
@@ -410,16 +436,17 @@ abstract class ShuffleSuite
     }
 
     val reader = manager.getReader[Int, Int](
-        shuffleHandle,
-        0,
+      shuffleHandle,
+      0,
+      1,
+      new TaskContextImpl(
         1,
-        new TaskContextImpl(1,
-                            0,
-                            2L,
-                            0,
-                            taskMemoryManager,
-                            metricsSystem,
-                            InternalAccumulator.create(sc)))
+        0,
+        2L,
+        0,
+        taskMemoryManager,
+        metricsSystem,
+        InternalAccumulator.create(sc)))
     val readData = reader.read().toIndexedSeq
     assert(readData === data1.toIndexedSeq || readData === data2.toIndexedSeq)
 
@@ -434,7 +461,10 @@ abstract class ShuffleSuite
   * process one element, before pausing to wait for the other function to "catch up".
   */
 class InterleaveIterators[T, R](
-    data1: Seq[T], f1: Iterator[T] => R, data2: Seq[T], f2: Iterator[T] => R) {
+    data1: Seq[T],
+    f1: Iterator[T] => R,
+    data2: Seq[T],
+    f2: Iterator[T] => R) {
 
   require(data1.size == data2.size)
 
@@ -480,10 +510,11 @@ object ShuffleSuite {
     }
   }
 
-  case class AggregatedShuffleMetrics(recordsWritten: Long,
-                                      recordsRead: Long,
-                                      bytesWritten: Long,
-                                      byresRead: Long)
+  case class AggregatedShuffleMetrics(
+      recordsWritten: Long,
+      recordsRead: Long,
+      bytesWritten: Long,
+      byresRead: Long)
 
   def runAndReturnMetrics(sc: SparkContext)(
       job: => Unit): AggregatedShuffleMetrics = {
@@ -509,6 +540,9 @@ object ShuffleSuite {
 
     sc.listenerBus.waitUntilEmpty(500)
     AggregatedShuffleMetrics(
-        recordsWritten, recordsRead, bytesWritten, bytesRead)
+      recordsWritten,
+      recordsRead,
+      bytesWritten,
+      bytesRead)
   }
 }

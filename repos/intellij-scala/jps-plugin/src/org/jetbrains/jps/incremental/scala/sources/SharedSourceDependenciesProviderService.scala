@@ -20,7 +20,7 @@ class SharedSourceDependenciesProviderService
     dependencies.collect {
       case it: JpsModuleDependency
           if it.getModule != null &&
-          it.getModule.getModuleType == SharedSourcesModuleType.INSTANCE =>
+            it.getModule.getModuleType == SharedSourcesModuleType.INSTANCE =>
         it.getModule
     }
   }

@@ -14,10 +14,11 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.ScImportSelecto
 
 class ScalaAliasedImportedElementSearcher
     extends QueryExecutorBase[PsiReference, ReferencesSearch.SearchParameters](
-        true) {
+      true) {
 
-  def processQuery(parameters: ReferencesSearch.SearchParameters,
-                   consumer: Processor[PsiReference]) {
+  def processQuery(
+      parameters: ReferencesSearch.SearchParameters,
+      consumer: Processor[PsiReference]) {
     val target: Option[PsiNamedElement] = inReadAction {
       parameters.getElementToSearch match {
         case named: PsiNamedElement =>
@@ -37,17 +38,19 @@ class ScalaAliasedImportedElementSearcher
         inReadAction(parameters.getEffectiveSearchScope) // TODO PsiUtil.restrictScopeToGroovyFiles(parameters.getEffectiveSearchScope)
       val collector: SearchRequestCollector = parameters.getOptimizer
       val session: SearchSession = collector.getSearchSession
-      collector.searchWord(name,
-                           scope,
-                           UsageSearchContext.IN_CODE,
-                           true,
-                           new MyProcessor(named, null, session))
+      collector.searchWord(
+        name,
+        scope,
+        UsageSearchContext.IN_CODE,
+        true,
+        new MyProcessor(named, null, session))
     }
   }
 
-  private class MyProcessor(myTarget: PsiElement,
-                            prefix: String,
-                            mySession: SearchSession)
+  private class MyProcessor(
+      myTarget: PsiElement,
+      prefix: String,
+      mySession: SearchSession)
       extends RequestResultProcessor(myTarget, prefix) {
     private def getAlias(element: PsiElement): String = {
       if (!element.getParent.isInstanceOf[ScImportSelector]) return null
@@ -74,7 +77,11 @@ class ScalaAliasedImportedElementSearcher
       val fileScope: SearchScope =
         new LocalSearchScope(element.getContainingFile)
       collector.searchWord(
-          alias, fileScope, UsageSearchContext.IN_CODE, true, myTarget)
+        alias,
+        fileScope,
+        UsageSearchContext.IN_CODE,
+        true,
+        myTarget)
       PsiSearchHelper.SERVICE
         .getInstance(element.getProject)
         .processRequests(collector, consumer)

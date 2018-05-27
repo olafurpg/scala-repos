@@ -10,17 +10,19 @@ import org.junit.runner.RunWith
 class SpanTest extends FunSuite {
   test("Span should serialize properly") {
     val ann = ZipkinAnnotation(Time.now, "value", Endpoint(1, 2))
-    val traceId = TraceId(Some(SpanId(123)),
-                          Some(SpanId(123)),
-                          SpanId(123),
-                          None,
-                          Flags().setDebug)
-    val span = Span(traceId,
-                    Some("service"),
-                    Some("name"),
-                    Seq(ann),
-                    Seq(),
-                    Endpoint(123, 123))
+    val traceId = TraceId(
+      Some(SpanId(123)),
+      Some(SpanId(123)),
+      SpanId(123),
+      None,
+      Flags().setDebug)
+    val span = Span(
+      traceId,
+      Some("service"),
+      Some("name"),
+      Seq(ann),
+      Seq(),
+      Endpoint(123, 123))
 
     val tspan = span.toThrift
     assert(tspan.isSetAnnotations)

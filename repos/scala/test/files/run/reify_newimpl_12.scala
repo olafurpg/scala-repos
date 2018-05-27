@@ -3,7 +3,7 @@ import scala.tools.reflect.ToolBox
 import scala.tools.reflect.Eval
 
 object Test extends App {
-  class C[T : TypeTag] {
+  class C[T: TypeTag] {
     val code = reify {
       List[T](2.asInstanceOf[T])
     }

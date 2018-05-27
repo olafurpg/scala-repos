@@ -27,7 +27,9 @@ import org.scalatest.mock.MockitoSugar
 import org.apache.spark.{SparkConf, SparkContext, SparkFunSuite}
 
 class MesosSchedulerUtilsSuite
-    extends SparkFunSuite with Matchers with MockitoSugar {
+    extends SparkFunSuite
+    with Matchers
+    with MockitoSugar {
 
   // scalastyle:off structural.type
   // this is the documented way of generating fixtures in scalatest
@@ -61,11 +63,11 @@ class MesosSchedulerUtilsSuite
 
   test("parse a non-empty constraint string correctly") {
     val expectedMap = Map(
-        "tachyon" -> Set("true"),
-        "zone" -> Set("us-east-1a", "us-east-1b")
+      "tachyon" -> Set("true"),
+      "zone" -> Set("us-east-1a", "us-east-1b")
     )
     utils.parseConstraintString("tachyon:true;zone:us-east-1a,us-east-1b") should be(
-        expectedMap)
+      expectedMap)
   }
 
   test("parse an empty constraint string correctly") {
@@ -101,13 +103,15 @@ class MesosSchedulerUtilsSuite
 
   test("subset match is performed for set attributes") {
     val supersetConstraint =
-      Map("tachyon" -> Value.Text.newBuilder().setValue("true").build(),
-          "zone" -> Value.Set
-            .newBuilder()
-            .addItem("us-east-1a")
-            .addItem("us-east-1b")
-            .addItem("us-east-1c")
-            .build())
+      Map(
+        "tachyon" -> Value.Text.newBuilder().setValue("true").build(),
+        "zone" -> Value.Set
+          .newBuilder()
+          .addItem("us-east-1a")
+          .addItem("us-east-1b")
+          .addItem("us-east-1c")
+          .build()
+      )
 
     val zoneConstraintStr = "tachyon:;zone:us-east-1a,us-east-1c"
     val parsedConstraints = utils.parseConstraintString(zoneConstraintStr)
@@ -130,11 +134,11 @@ class MesosSchedulerUtilsSuite
 
   test("contains match is performed for range attributes") {
     val offerAttribs = Map(
-        "ports" -> Value.Range
-          .newBuilder()
-          .setBegin(7000)
-          .setEnd(8000)
-          .build())
+      "ports" -> Value.Range
+        .newBuilder()
+        .setBegin(7000)
+        .setEnd(8000)
+        .build())
     val ltConstraint = utils.parseConstraintString("ports:6000")
     val eqConstraint = utils.parseConstraintString("ports:7500")
     val gtConstraint = utils.parseConstraintString("ports:8002")

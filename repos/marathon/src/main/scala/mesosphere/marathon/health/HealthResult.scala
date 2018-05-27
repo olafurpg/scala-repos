@@ -10,11 +10,14 @@ sealed trait HealthResult {
 }
 
 case class Healthy(
-    taskId: Task.Id, version: Timestamp, time: Timestamp = Timestamp.now())
+    taskId: Task.Id,
+    version: Timestamp,
+    time: Timestamp = Timestamp.now())
     extends HealthResult
 
-case class Unhealthy(taskId: Task.Id,
-                     version: Timestamp,
-                     cause: String,
-                     time: Timestamp = Timestamp.now())
+case class Unhealthy(
+    taskId: Task.Id,
+    version: Timestamp,
+    cause: String,
+    time: Timestamp = Timestamp.now())
     extends HealthResult

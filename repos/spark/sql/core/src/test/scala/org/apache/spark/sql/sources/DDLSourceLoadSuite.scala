@@ -31,8 +31,11 @@ class DDLSourceLoadSuite extends DataSourceTest with SharedSQLContext {
   }
 
   test("load data source from format alias") {
-    caseInsensitiveContext.read.format("gathering quorum").load().schema == StructType(
-        Seq(StructField("stringType", StringType, nullable = false)))
+    caseInsensitiveContext.read
+      .format("gathering quorum")
+      .load()
+      .schema == StructType(
+      Seq(StructField("stringType", StringType, nullable = false)))
   }
 
   test("specify full classname with duplicate formats") {
@@ -40,7 +43,7 @@ class DDLSourceLoadSuite extends DataSourceTest with SharedSQLContext {
       .format("org.apache.spark.sql.sources.FakeSourceOne")
       .load()
       .schema == StructType(
-        Seq(StructField("stringType", StringType, nullable = false)))
+      Seq(StructField("stringType", StringType, nullable = false)))
   }
 
   test("should fail to load ORC without HiveContext") {
@@ -55,13 +58,13 @@ class FakeSourceOne extends RelationProvider with DataSourceRegister {
   def shortName(): String = "Fluet da Bomb"
 
   override def createRelation(
-      cont: SQLContext, param: Map[String, String]): BaseRelation =
+      cont: SQLContext,
+      param: Map[String, String]): BaseRelation =
     new BaseRelation {
       override def sqlContext: SQLContext = cont
 
       override def schema: StructType =
-        StructType(
-            Seq(StructField("stringType", StringType, nullable = false)))
+        StructType(Seq(StructField("stringType", StringType, nullable = false)))
     }
 }
 
@@ -70,13 +73,13 @@ class FakeSourceTwo extends RelationProvider with DataSourceRegister {
   def shortName(): String = "Fluet da Bomb"
 
   override def createRelation(
-      cont: SQLContext, param: Map[String, String]): BaseRelation =
+      cont: SQLContext,
+      param: Map[String, String]): BaseRelation =
     new BaseRelation {
       override def sqlContext: SQLContext = cont
 
       override def schema: StructType =
-        StructType(
-            Seq(StructField("stringType", StringType, nullable = false)))
+        StructType(Seq(StructField("stringType", StringType, nullable = false)))
     }
 }
 
@@ -85,12 +88,12 @@ class FakeSourceThree extends RelationProvider with DataSourceRegister {
   def shortName(): String = "gathering quorum"
 
   override def createRelation(
-      cont: SQLContext, param: Map[String, String]): BaseRelation =
+      cont: SQLContext,
+      param: Map[String, String]): BaseRelation =
     new BaseRelation {
       override def sqlContext: SQLContext = cont
 
       override def schema: StructType =
-        StructType(
-            Seq(StructField("stringType", StringType, nullable = false)))
+        StructType(Seq(StructField("stringType", StringType, nullable = false)))
     }
 }

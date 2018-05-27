@@ -16,9 +16,10 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScClassParamet
   * Date: 17.10.2008
   */
 class ScValueNameIndex extends StringStubIndexExtension[ScValue] {
-  override def get(key: String,
-                   project: Project,
-                   scope: GlobalSearchScope): java.util.Collection[ScValue] =
+  override def get(
+      key: String,
+      project: Project,
+      scope: GlobalSearchScope): java.util.Collection[ScValue] =
     super.get(key, project, new ScalaSourceFilterScope(scope, project))
 
   def getKey: StubIndexKey[String, ScValue] = ScValueNameIndex.KEY

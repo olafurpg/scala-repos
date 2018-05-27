@@ -20,7 +20,9 @@ import com.twitter.algebird.monad._
 import com.twitter.summingbird.batch._
 
 import com.twitter.scalding.{Source => ScaldingSource, Test => TestMode, _}
-import com.twitter.summingbird.scalding.batch.{BatchedService => BBatchedService}
+import com.twitter.summingbird.scalding.batch.{
+  BatchedService => BBatchedService
+}
 import scala.collection.mutable.Buffer
 import cascading.tuple.Tuple
 import cascading.flow.FlowDef
@@ -53,8 +55,8 @@ class TestService[K, V](
   val reducers = None
   // Needed to init the Test mode:
   val sourceToBuffer: Map[ScaldingSource, Buffer[Tuple]] = (lasts.map {
-        case (b, it) => lastMappable(b) -> toBuffer(it)
-      } ++ streams.map { case (b, it) => streamMappable(b) -> toBuffer(it) }).toMap
+    case (b, it)                  => lastMappable(b) -> toBuffer(it)
+  } ++ streams.map { case (b, it) => streamMappable(b) -> toBuffer(it) }).toMap
 
   /** The lasts are computed from the streams */
   lazy val lasts: Map[BatchID, Iterable[(Timestamp, (K, V))]] = {
@@ -65,10 +67,10 @@ class TestService[K, V](
             map,
             (batch: BatchID, writes: Iterable[(Timestamp, (K, Option[V]))])) =>
           val thisBatch = writes.foldLeft(
-              map.get(batch).getOrElse(Map.empty[K, (Timestamp, V)])) {
+            map.get(batch).getOrElse(Map.empty[K, (Timestamp, V)])) {
             case (innerMap, (time, (k, v))) =>
               v match {
-                case None => innerMap - k
+                case None    => innerMap - k
                 case Some(v) => innerMap + (k -> (time -> v))
               }
           }
@@ -84,14 +86,14 @@ class TestService[K, V](
 
   def streamMappable(b: BatchID): Mappable[(Timestamp, (K, Option[V]))] =
     new MockMappable[(Timestamp, (K, Option[V]))](
-        service + "/stream/" + b.toString)
+      service + "/stream/" + b.toString)
 
-  def toBuffer[T](it: Iterable[T])(
-      implicit ts: TupleSetter[T]): Buffer[Tuple] =
+  def toBuffer[T](it: Iterable[T])(implicit ts: TupleSetter[T]): Buffer[Tuple] =
     it.map { ts(_) }.toBuffer
 
   override def readStream(
-      batchID: BatchID, mode: Mode): Option[FlowToPipe[(K, Option[V])]] = {
+      batchID: BatchID,
+      mode: Mode): Option[FlowToPipe[(K, Option[V])]] = {
     streams.get(batchID).map { iter =>
       val mappable = streamMappable(batchID)
       Reader { (fd: (FlowDef, Mode)) =>

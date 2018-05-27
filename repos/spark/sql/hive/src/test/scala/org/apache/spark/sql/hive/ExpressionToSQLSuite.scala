@@ -55,10 +55,11 @@ class ExpressionToSQLSuite extends SQLBuilderTest with SQLTestUtils {
   private def checkSqlGeneration(hiveQl: String): Unit = {
     val df = sql(hiveQl)
 
-    val convertedSQL = try new SQLBuilder(df).toSQL catch {
+    val convertedSQL = try new SQLBuilder(df).toSQL
+    catch {
       case NonFatal(e) =>
         fail(
-            s"""Cannot convert the following HiveQL query plan back to SQL query string:
+          s"""Cannot convert the following HiveQL query plan back to SQL query string:
             |
             |# Original HiveQL query string:
             |$hiveQl
@@ -72,7 +73,8 @@ class ExpressionToSQLSuite extends SQLBuilderTest with SQLTestUtils {
       checkAnswer(sql(convertedSQL), df)
     } catch {
       case cause: Throwable =>
-        fail(s"""Failed to execute converted SQL string or got wrong answer:
+        fail(
+          s"""Failed to execute converted SQL string or got wrong answer:
           |
           |# Converted SQL query string:
           |$convertedSQL
@@ -82,7 +84,9 @@ class ExpressionToSQLSuite extends SQLBuilderTest with SQLTestUtils {
           |
           |# Resolved query plan:
           |${df.queryExecution.analyzed.treeString}
-         """.stripMargin, cause)
+         """.stripMargin,
+          cause
+        )
     }
   }
 
@@ -154,7 +158,7 @@ class ExpressionToSQLSuite extends SQLBuilderTest with SQLTestUtils {
 
   test("aggregate functions") {
     checkSqlGeneration(
-        "SELECT approx_count_distinct(value) FROM t1 GROUP BY key")
+      "SELECT approx_count_distinct(value) FROM t1 GROUP BY key")
     checkSqlGeneration("SELECT avg(value) FROM t1 GROUP BY key")
     checkSqlGeneration("SELECT corr(value, key) FROM t1 GROUP BY key")
     checkSqlGeneration("SELECT count(value) FROM t1 GROUP BY key")
@@ -235,20 +239,20 @@ class ExpressionToSQLSuite extends SQLBuilderTest with SQLTestUtils {
     checkSqlGeneration("SELECT dayofmonth('2001-05-02')")
     checkSqlGeneration("SELECT from_unixtime(1000, 'yyyy-MM-dd HH:mm:ss')")
     checkSqlGeneration(
-        "SELECT from_utc_timestamp('2015-07-24 00:00:00', 'PST')")
+      "SELECT from_utc_timestamp('2015-07-24 00:00:00', 'PST')")
     checkSqlGeneration("SELECT hour('11:35:55')")
     checkSqlGeneration("SELECT last_day('2001-01-01')")
     checkSqlGeneration("SELECT minute('11:35:55')")
     checkSqlGeneration("SELECT month('2001-05-02')")
     checkSqlGeneration(
-        "SELECT months_between('2001-10-30 10:30:00', '1996-10-30')")
+      "SELECT months_between('2001-10-30 10:30:00', '1996-10-30')")
     checkSqlGeneration("SELECT next_day('2001-05-02', 'TU')")
     checkSqlGeneration("SELECT count(now())")
     checkSqlGeneration("SELECT quarter('2001-05-02')")
     checkSqlGeneration("SELECT second('11:35:55')")
     checkSqlGeneration("SELECT to_date('2001-10-30 10:30:00')")
     checkSqlGeneration(
-        "SELECT to_unix_timestamp('2015-07-24 00:00:00', 'yyyy-MM-dd HH:mm:ss')")
+      "SELECT to_unix_timestamp('2015-07-24 00:00:00', 'yyyy-MM-dd HH:mm:ss')")
     checkSqlGeneration("SELECT to_utc_timestamp('2015-07-24 00:00:00', 'PST')")
     checkSqlGeneration("SELECT trunc('2001-10-30 10:30:00', 'YEAR')")
     checkSqlGeneration("SELECT unix_timestamp('2001-10-30 10:30:00')")
@@ -256,7 +260,7 @@ class ExpressionToSQLSuite extends SQLBuilderTest with SQLTestUtils {
     checkSqlGeneration("SELECT year('2001-05-02')")
 
     checkSqlGeneration(
-        "SELECT interval 3 years - 3 month 7 week 123 microseconds as i")
+      "SELECT interval 3 years - 3 month 7 week 123 microseconds as i")
   }
 
   test("collection functions") {

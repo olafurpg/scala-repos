@@ -86,7 +86,7 @@ private[runtime] object RuntimeString {
   def compareTo(thiz: String, anotherString: String): Int = {
     if (thiz.equals(anotherString)) 0
     else if ((thiz.asInstanceOf[js.Dynamic] < anotherString
-                   .asInstanceOf[js.Dynamic]).asInstanceOf[Boolean]) -1
+               .asInstanceOf[js.Dynamic]).asInstanceOf[Boolean]) -1
     else 1
   }
 
@@ -121,11 +121,12 @@ private[runtime] object RuntimeString {
     res
   }
 
-  def getChars(thiz: String,
-               srcBegin: Int,
-               srcEnd: Int,
-               dst: Array[Char],
-               dstBegin: Int): Unit = {
+  def getChars(
+      thiz: String,
+      srcBegin: Int,
+      srcEnd: Int,
+      dst: Array[Char],
+      dstBegin: Int): Unit = {
     if (srcEnd > thiz.length || // first test uses thiz
         srcBegin < 0 || srcEnd < 0 || srcBegin > srcEnd) {
       throw new StringIndexOutOfBoundsException("Index out of Bound")
@@ -194,12 +195,13 @@ private[runtime] object RuntimeString {
   /* Both regionMatches ported from
    * https://github.com/gwtproject/gwt/blob/master/user/super/com/google/gwt/emul/java/lang/String.java
    */
-  def regionMatches(thiz: String,
-                    ignoreCase: Boolean,
-                    toffset: Int,
-                    other: String,
-                    ooffset: Int,
-                    len: Int): Boolean = {
+  def regionMatches(
+      thiz: String,
+      ignoreCase: Boolean,
+      toffset: Int,
+      other: String,
+      ooffset: Int,
+      len: Int): Boolean = {
     checkNull(thiz)
     if (other == null) {
       throw new NullPointerException()
@@ -216,11 +218,12 @@ private[runtime] object RuntimeString {
   }
 
   @inline
-  def regionMatches(thiz: String,
-                    toffset: Int,
-                    other: String,
-                    ooffset: Int,
-                    len: Int): Boolean = {
+  def regionMatches(
+      thiz: String,
+      toffset: Int,
+      other: String,
+      ooffset: Int,
+      len: Int): Boolean = {
     regionMatches(thiz, false, toffset, other, ooffset, len)
   }
 
@@ -230,7 +233,9 @@ private[runtime] object RuntimeString {
 
   @inline
   def replace(
-      thiz: String, target: CharSequence, replacement: CharSequence): String =
+      thiz: String,
+      target: CharSequence,
+      replacement: CharSequence): String =
     thiz.jsSplit(target.toString).join(replacement.toString)
 
   def replaceAll(thiz: String, regex: String, replacement: String): String = {
@@ -259,7 +264,7 @@ private[runtime] object RuntimeString {
   @inline
   def startsWith(thiz: String, prefix: String, toffset: Int): Boolean = {
     (toffset <= thiz.length && toffset >= 0 &&
-        thiz.jsSubstring(toffset, toffset + prefix.length) == prefix)
+    thiz.jsSubstring(toffset, toffset + prefix.length) == prefix)
   }
 
   @inline
@@ -330,14 +335,18 @@ private[runtime] object RuntimeString {
   def newString(bytes: Array[Byte], offset: Int, length: Int): String =
     newString(bytes, offset, length, Charset.defaultCharset)
 
-  def newString(bytes: Array[Byte],
-                offset: Int,
-                length: Int,
-                charsetName: String): String =
+  def newString(
+      bytes: Array[Byte],
+      offset: Int,
+      length: Int,
+      charsetName: String): String =
     newString(bytes, offset, length, Charset.forName(charsetName))
 
   def newString(
-      bytes: Array[Byte], offset: Int, length: Int, charset: Charset): String =
+      bytes: Array[Byte],
+      offset: Int,
+      length: Int,
+      charset: Charset): String =
     charset.decode(ByteBuffer.wrap(bytes, offset, length)).toString()
 
   def newString(codePoints: Array[Int], offset: Int, count: Int): String = {

@@ -41,23 +41,25 @@ private[mongodb] object Meta {
     /*
      * These don't require a conversion and can be put directly into a DBObject
      */
-    val primitives = Set[Class[_]](classOf[String],
-                                   classOf[Int],
-                                   classOf[Long],
-                                   classOf[Double],
-                                   classOf[Float],
-                                   classOf[Byte],
-                                   classOf[BigInt],
-                                   classOf[Boolean],
-                                   classOf[Short],
-                                   classOf[java.lang.Integer],
-                                   classOf[java.lang.Long],
-                                   classOf[java.lang.Double],
-                                   classOf[java.lang.Float],
-                                   classOf[java.lang.Byte],
-                                   classOf[java.lang.Boolean],
-                                   classOf[java.lang.Short],
-                                   classOf[scala.Array[Byte]])
+    val primitives = Set[Class[_]](
+      classOf[String],
+      classOf[Int],
+      classOf[Long],
+      classOf[Double],
+      classOf[Float],
+      classOf[Byte],
+      classOf[BigInt],
+      classOf[Boolean],
+      classOf[Short],
+      classOf[java.lang.Integer],
+      classOf[java.lang.Long],
+      classOf[java.lang.Double],
+      classOf[java.lang.Float],
+      classOf[java.lang.Byte],
+      classOf[java.lang.Boolean],
+      classOf[java.lang.Short],
+      classOf[scala.Array[Byte]]
+    )
 
     def primitive_?(clazz: Class[_]) = primitives contains clazz
 
@@ -65,44 +67,45 @@ private[mongodb] object Meta {
      * This is used to convert DBObjects into JObjects
      */
     def primitive2jvalue(a: Any) = a match {
-      case x: String => JString(x)
-      case x: Int => JInt(x)
-      case x: Long => JInt(x)
-      case x: Double => JDouble(x)
-      case x: Float => JDouble(x)
-      case x: Byte => JInt(BigInt(x))
-      case x: BigInt => JInt(x)
-      case x: Boolean => JBool(x)
-      case x: Short => JInt(BigInt(x))
+      case x: String            => JString(x)
+      case x: Int               => JInt(x)
+      case x: Long              => JInt(x)
+      case x: Double            => JDouble(x)
+      case x: Float             => JDouble(x)
+      case x: Byte              => JInt(BigInt(x))
+      case x: BigInt            => JInt(x)
+      case x: Boolean           => JBool(x)
+      case x: Short             => JInt(BigInt(x))
       case x: java.lang.Integer => JInt(BigInt(x.asInstanceOf[Int]))
-      case x: java.lang.Long => JInt(BigInt(x.asInstanceOf[Long]))
-      case x: java.lang.Double => JDouble(x.asInstanceOf[Double])
-      case x: java.lang.Float => JDouble(x.asInstanceOf[Float])
-      case x: java.lang.Byte => JInt(BigInt(x.asInstanceOf[Byte]))
+      case x: java.lang.Long    => JInt(BigInt(x.asInstanceOf[Long]))
+      case x: java.lang.Double  => JDouble(x.asInstanceOf[Double])
+      case x: java.lang.Float   => JDouble(x.asInstanceOf[Float])
+      case x: java.lang.Byte    => JInt(BigInt(x.asInstanceOf[Byte]))
       case x: java.lang.Boolean => JBool(x.asInstanceOf[Boolean])
-      case x: java.lang.Short => JInt(BigInt(x.asInstanceOf[Short]))
-      case _ => sys.error("not a primitive " + a.asInstanceOf[AnyRef].getClass)
+      case x: java.lang.Short   => JInt(BigInt(x.asInstanceOf[Short]))
+      case _                    => sys.error("not a primitive " + a.asInstanceOf[AnyRef].getClass)
     }
 
     /*
      * Date types require formatting
      */
-    val datetypes = Set[Class[_]](classOf[Calendar],
-                                  classOf[Date],
-                                  classOf[GregorianCalendar],
-                                  classOf[DateTime])
+    val datetypes = Set[Class[_]](
+      classOf[Calendar],
+      classOf[Date],
+      classOf[GregorianCalendar],
+      classOf[DateTime])
 
     def datetype_?(clazz: Class[_]) = datetypes contains clazz
 
     def datetype2jvalue(a: Any)(implicit formats: Formats) = a match {
       case x: Calendar => JsonDate(x.getTime)(formats)
-      case x: Date => JsonDate(x)(formats)
+      case x: Date     => JsonDate(x)(formats)
       case x: DateTime => JsonDateTime(x)(formats)
     }
 
     def datetype2dbovalue(a: Any) = a match {
       case x: Calendar => x.getTime
-      case x: Date => x
+      case x: Date     => x
       case x: DateTime => x.toDate
     }
 
@@ -110,7 +113,10 @@ private[mongodb] object Meta {
      * Extended Mongo types.
      */
     val mongotypes = Set[Class[_]](
-        classOf[DBRef], classOf[ObjectId], classOf[Pattern], classOf[UUID])
+      classOf[DBRef],
+      classOf[ObjectId],
+      classOf[Pattern],
+      classOf[UUID])
 
     def mongotype_?(clazz: Class[_]) = mongotypes contains clazz
 
@@ -119,10 +125,10 @@ private[mongodb] object Meta {
      */
     def mongotype2jvalue(a: Any)(implicit formats: Formats) = a match {
       case x: ObjectId => JsonObjectId.asJValue(x, formats)
-      case x: Pattern => JsonRegex(x)
-      case x: UUID => JsonUUID(x)
-      case x: DBRef => sys.error("DBRefs are not supported.")
-      case _ => sys.error("not a mongotype " + a.asInstanceOf[AnyRef].getClass)
+      case x: Pattern  => JsonRegex(x)
+      case x: UUID     => JsonUUID(x)
+      case x: DBRef    => sys.error("DBRefs are not supported.")
+      case _           => sys.error("not a mongotype " + a.asInstanceOf[AnyRef].getClass)
     }
   }
 

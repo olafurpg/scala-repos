@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -53,10 +53,10 @@ object GridFSFileStorage {
 
     val mongo = servers match {
       case x :: Nil => new com.mongodb.Mongo(x)
-      case x :: xs => new com.mongodb.Mongo(servers.asJava)
+      case x :: xs  => new com.mongodb.Mongo(servers.asJava)
       case Nil =>
         sys.error(
-            """MongoServers are not configured. Configure the value 'servers'. Format is '["host1:port1", "host2:port2", ...]'""")
+          """MongoServers are not configured. Configure the value 'servers'. Format is '["host1:port1", "host2:port2", ...]'""")
     }
 
     apply(mongo.getDB(config[String]("database")))
@@ -117,8 +117,9 @@ trait GridFSFileStorage[M[+ _]] extends FileStorage[M] {
         }
       val in0 = file.getInputStream()
 
-      FileData(mimeType, StreamT.unfoldM[M, Array[Byte], InputStream](in0) {
-        in =>
+      FileData(
+        mimeType,
+        StreamT.unfoldM[M, Array[Byte], InputStream](in0) { in =>
           M.point {
             val buffer = new Array[Byte](chunkSize)
             val len = in.read(buffer)
@@ -130,7 +131,8 @@ trait GridFSFileStorage[M[+ _]] extends FileStorage[M] {
               Some((buffer, in))
             }
           }
-      })
+        }
+      )
     }
   }
 

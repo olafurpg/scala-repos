@@ -21,23 +21,27 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
   * 2014-09-28
   */
 object ScalaEvaluatorBuilder extends EvaluatorBuilder {
-  def build(codeFragment: PsiElement,
-            position: SourcePosition): ExpressionEvaluator = {
+  def build(
+      codeFragment: PsiElement,
+      position: SourcePosition): ExpressionEvaluator = {
     if (codeFragment.getLanguage.isInstanceOf[JavaLanguage])
-      return EvaluatorBuilderImpl.getInstance().build(codeFragment, position) //java builder (e.g. SCL-6117)
+      return EvaluatorBuilderImpl
+        .getInstance()
+        .build(codeFragment, position) //java builder (e.g. SCL-6117)
 
     val scalaFragment = codeFragment match {
       case sf: ScalaCodeFragment => sf
       case _ =>
         throw EvaluationException(
-            ScalaBundle.message("non-scala.code.fragment"))
+          ScalaBundle.message("non-scala.code.fragment"))
     }
 
     val project = codeFragment.getProject
 
     val cache = ScalaEvaluatorCache.getInstance(project)
     val cached: Option[Evaluator] = {
-      try cache.get(position, codeFragment) catch {
+      try cache.get(position, codeFragment)
+      catch {
         case e: Exception =>
           cache.clear()
           None
@@ -53,8 +57,8 @@ object ScalaEvaluatorBuilder extends EvaluatorBuilder {
     }
 
     def buildCompilingEvaluator: ScalaCompilingEvaluator = {
-      val compilingEvaluator = new ScalaCompilingEvaluator(
-          position.getElementAt, scalaFragment)
+      val compilingEvaluator =
+        new ScalaCompilingEvaluator(position.getElementAt, scalaFragment)
       cache
         .add(position, scalaFragment, compilingEvaluator)
         .asInstanceOf[ScalaCompilingEvaluator]
@@ -74,8 +78,10 @@ private[evaluation] class NeedCompilationException(message: String)
     extends EvaluateException(message)
 
 private[evaluation] class ScalaEvaluatorBuilder(
-    val codeFragment: ScalaCodeFragment, val position: SourcePosition)
-    extends ScalaEvaluatorBuilderUtil with SyntheticVariablesHelper {
+    val codeFragment: ScalaCodeFragment,
+    val position: SourcePosition)
+    extends ScalaEvaluatorBuilderUtil
+    with SyntheticVariablesHelper {
 
   import org.jetbrains.plugins.scala.debugger.evaluation.ScalaEvaluatorBuilderUtil._
 
@@ -94,8 +100,8 @@ private[evaluation] class ScalaEvaluatorBuilder(
         throw new NeedCompilationException(message)
       case expr: ScExpression =>
         val innerEval = expr match {
-          case lit: ScLiteral => literalEvaluator(lit)
-          case mc: ScMethodCall => scMethodCallEvaluator(mc)
+          case lit: ScLiteral             => literalEvaluator(lit)
+          case mc: ScMethodCall           => scMethodCallEvaluator(mc)
           case ref: ScReferenceExpression => refExpressionEvaluator(ref)
           case t: ScThisReference =>
             thisOrSuperEvaluator(t.reference, isSuper = false)
@@ -104,27 +110,27 @@ private[evaluation] class ScalaEvaluatorBuilder(
           case tuple: ScTuple => tupleEvaluator(tuple)
           case newTd: ScNewTemplateDefinition =>
             newTemplateDefinitionEvaluator(newTd)
-          case inf: ScInfixExpr => infixExpressionEvaluator(inf)
+          case inf: ScInfixExpr           => infixExpressionEvaluator(inf)
           case ScParenthesisedExpr(inner) => evaluatorFor(inner)
-          case p: ScPrefixExpr => prefixExprEvaluator(p)
-          case p: ScPostfixExpr => postfixExprEvaluator(p)
-          case stmt: ScIfStmt => ifStmtEvaluator(stmt)
-          case ws: ScWhileStmt => whileStmtEvaluator(ws)
-          case doSt: ScDoStmt => doStmtEvaluator(doSt)
-          case block: ScBlock => blockExprEvaluator(block)
-          case call: ScGenericCall => methodCallEvaluator(call, Nil, Map.empty)
-          case stmt: ScAssignStmt => assignmentEvaluator(stmt)
-          case stmt: ScTypedStmt => evaluatorFor(stmt.expr)
+          case p: ScPrefixExpr            => prefixExprEvaluator(p)
+          case p: ScPostfixExpr           => postfixExprEvaluator(p)
+          case stmt: ScIfStmt             => ifStmtEvaluator(stmt)
+          case ws: ScWhileStmt            => whileStmtEvaluator(ws)
+          case doSt: ScDoStmt             => doStmtEvaluator(doSt)
+          case block: ScBlock             => blockExprEvaluator(block)
+          case call: ScGenericCall        => methodCallEvaluator(call, Nil, Map.empty)
+          case stmt: ScAssignStmt         => assignmentEvaluator(stmt)
+          case stmt: ScTypedStmt          => evaluatorFor(stmt.expr)
           case e =>
             throw EvaluationException(
-                s"This type of expression is not supported: ${e.getText}")
+              s"This type of expression is not supported: ${e.getText}")
         }
         postProcessExpressionEvaluator(expr, innerEval)
-      case pd: ScPatternDefinition => patternDefinitionEvaluator(pd)
+      case pd: ScPatternDefinition  => patternDefinitionEvaluator(pd)
       case vd: ScVariableDefinition => variableDefinitionEvaluator(vd)
       case e =>
         throw EvaluationException(
-            s"This type of element is not supported: ${e.getText}")
+          s"This type of element is not supported: ${e.getText}")
     }
   }
 
@@ -169,28 +175,28 @@ private object needsCompilation {
         case td: ScTemplateDefinition =>
           td match {
             case o: ScObject => message("object")
-            case c: ScClass => message("class")
-            case t: ScTrait => message("trait")
+            case c: ScClass  => message("class")
+            case t: ScTrait  => message("trait")
             case newTd: ScNewTemplateDefinition
                 if DebuggerUtil.generatesAnonClass(newTd) =>
               message("anonymous class")
             case _ => None
           }
         case t: ScTypeAlias => message("type alias")
-        case f: ScFunction => message("function definition")
+        case f: ScFunction  => message("function definition")
         case v @ (_: ScVariableDeclaration | _: ScValueDeclaration) =>
           message("variable declaration")
         case LazyVal(_) => message("lazy val definition")
-        case _ => None
+        case _          => None
       }
     case expr if ScalaEvaluatorBuilderUtil.isGenerateAnonfun(expr) =>
       message("anonymous function")
-    case forSt: ScForStatement => message("for expression")
-    case tryStmt: ScTryStmt => message("try statement")
-    case ret: ScReturnStmt => message("return statement")
-    case ms: ScMatchStmt => message("match statement")
+    case forSt: ScForStatement  => message("for expression")
+    case tryStmt: ScTryStmt     => message("try statement")
+    case ret: ScReturnStmt      => message("return statement")
+    case ms: ScMatchStmt        => message("match statement")
     case throwStmt: ScThrowStmt => message("throw statement")
-    case xml: ScXmlExpr => message("xml expression")
+    case xml: ScXmlExpr         => message("xml expression")
     case interpolated: ScInterpolatedStringLiteral
         if interpolated.getType != InterpolatedStringType.STANDART =>
       message("interpolated string")

@@ -5,7 +5,7 @@
   * The ASF licenses this file to You under the Apache License, Version 2.0
   * (the "License"); you may not use this file except in compliance with
   * the License.  You may obtain a copy of the License at
-  * 
+  *
   *    http://www.apache.org/licenses/LICENSE-2.0
   *
   * Unless required by applicable law or agreed to in writing, software
@@ -43,24 +43,27 @@ private[kafka] object TopicCount extends Logging {
   def makeThreadId(consumerIdString: String, threadId: Int) =
     consumerIdString + "-" + threadId
 
-  def makeConsumerThreadIdsPerTopic(consumerIdString: String,
-                                    topicCountMap: Map[String, Int]) = {
+  def makeConsumerThreadIdsPerTopic(
+      consumerIdString: String,
+      topicCountMap: Map[String, Int]) = {
     val consumerThreadIdsPerTopicMap =
       new mutable.HashMap[String, Set[ConsumerThreadId]]()
     for ((topic, nConsumers) <- topicCountMap) {
       val consumerSet = new mutable.HashSet[ConsumerThreadId]
       assert(nConsumers >= 1)
-      for (i <- 0 until nConsumers) consumerSet +=
-        ConsumerThreadId(consumerIdString, i)
+      for (i <- 0 until nConsumers)
+        consumerSet +=
+          ConsumerThreadId(consumerIdString, i)
       consumerThreadIdsPerTopicMap.put(topic, consumerSet)
     }
     consumerThreadIdsPerTopicMap
   }
 
-  def constructTopicCount(group: String,
-                          consumerId: String,
-                          zkUtils: ZkUtils,
-                          excludeInternalTopics: Boolean): TopicCount = {
+  def constructTopicCount(
+      group: String,
+      consumerId: String,
+      zkUtils: ZkUtils,
+      excludeInternalTopics: Boolean): TopicCount = {
     val dirs = new ZKGroupDirs(group)
     val topicCountString =
       zkUtils.readData(dirs.consumerRegistryDir + "/" + consumerId)._1
@@ -75,17 +78,17 @@ private[kafka] object TopicCount extends Logging {
               subscriptionPattern = pattern.asInstanceOf[String]
             case None =>
               throw new KafkaException(
-                  "error constructing TopicCount : " + topicCountString)
+                "error constructing TopicCount : " + topicCountString)
           }
           consumerRegistrationMap.get("subscription") match {
             case Some(sub) => topMap = sub.asInstanceOf[Map[String, Int]]
             case None =>
               throw new KafkaException(
-                  "error constructing TopicCount : " + topicCountString)
+                "error constructing TopicCount : " + topicCountString)
           }
         case None =>
           throw new KafkaException(
-              "error constructing TopicCount : " + topicCountString)
+            "error constructing TopicCount : " + topicCountString)
       }
     } catch {
       case e: Throwable =>
@@ -105,25 +108,36 @@ private[kafka] object TopicCount extends Logging {
         if (hasWhiteList) new Whitelist(regex)
         else new Blacklist(regex)
       new WildcardTopicCount(
-          zkUtils, consumerId, filter, numStreams, excludeInternalTopics)
+        zkUtils,
+        consumerId,
+        filter,
+        numStreams,
+        excludeInternalTopics)
     }
   }
 
   def constructTopicCount(
-      consumerIdString: String, topicCount: Map[String, Int]) =
+      consumerIdString: String,
+      topicCount: Map[String, Int]) =
     new StaticTopicCount(consumerIdString, topicCount)
 
-  def constructTopicCount(consumerIdString: String,
-                          filter: TopicFilter,
-                          numStreams: Int,
-                          zkUtils: ZkUtils,
-                          excludeInternalTopics: Boolean) =
+  def constructTopicCount(
+      consumerIdString: String,
+      filter: TopicFilter,
+      numStreams: Int,
+      zkUtils: ZkUtils,
+      excludeInternalTopics: Boolean) =
     new WildcardTopicCount(
-        zkUtils, consumerIdString, filter, numStreams, excludeInternalTopics)
+      zkUtils,
+      consumerIdString,
+      filter,
+      numStreams,
+      excludeInternalTopics)
 }
 
-private[kafka] class StaticTopicCount(val consumerIdString: String,
-                                      val topicCountMap: Map[String, Int])
+private[kafka] class StaticTopicCount(
+    val consumerIdString: String,
+    val topicCountMap: Map[String, Int])
     extends TopicCount {
 
   def getConsumerThreadIdsPerTopic =
@@ -134,7 +148,7 @@ private[kafka] class StaticTopicCount(val consumerIdString: String,
       case null => false
       case n: StaticTopicCount =>
         consumerIdString == n.consumerIdString &&
-        topicCountMap == n.topicCountMap
+          topicCountMap == n.topicCountMap
       case _ => false
     }
   }
@@ -144,19 +158,20 @@ private[kafka] class StaticTopicCount(val consumerIdString: String,
   def pattern = TopicCount.staticPattern
 }
 
-private[kafka] class WildcardTopicCount(zkUtils: ZkUtils,
-                                        consumerIdString: String,
-                                        topicFilter: TopicFilter,
-                                        numStreams: Int,
-                                        excludeInternalTopics: Boolean)
+private[kafka] class WildcardTopicCount(
+    zkUtils: ZkUtils,
+    consumerIdString: String,
+    topicFilter: TopicFilter,
+    numStreams: Int,
+    excludeInternalTopics: Boolean)
     extends TopicCount {
   def getConsumerThreadIdsPerTopic = {
     val wildcardTopics = zkUtils
       .getChildrenParentMayNotExist(ZkUtils.BrokerTopicsPath)
-      .filter(
-          topic => topicFilter.isTopicAllowed(topic, excludeInternalTopics))
+      .filter(topic => topicFilter.isTopicAllowed(topic, excludeInternalTopics))
     TopicCount.makeConsumerThreadIdsPerTopic(
-        consumerIdString, Map(wildcardTopics.map((_, numStreams)): _*))
+      consumerIdString,
+      Map(wildcardTopics.map((_, numStreams)): _*))
   }
 
   def getTopicCountMap =

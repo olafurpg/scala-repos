@@ -3,7 +3,11 @@ package mesosphere.marathon.core.matcher.reconcile.impl
 import mesosphere.marathon.core.launcher.TaskOp
 import mesosphere.marathon.core.launcher.impl.TaskLabels
 import mesosphere.marathon.core.matcher.base.OfferMatcher
-import mesosphere.marathon.core.matcher.base.OfferMatcher.{MatchedTaskOps, TaskOpSource, TaskOpWithSource}
+import mesosphere.marathon.core.matcher.base.OfferMatcher.{
+  MatchedTaskOps,
+  TaskOpSource,
+  TaskOpWithSource
+}
 import mesosphere.marathon.core.task.Task
 import mesosphere.marathon.core.task.Task.Id
 import mesosphere.marathon.core.task.tracker.TaskTracker
@@ -28,7 +32,8 @@ import scala.concurrent.Future
   * * and creating unreserved/destroy operations for tasks in state "garbage" only
   */
 private[reconcile] class OfferMatcherReconciler(
-    taskTracker: TaskTracker, groupRepository: GroupRepository)
+    taskTracker: TaskTracker,
+    groupRepository: GroupRepository)
     extends OfferMatcher {
 
   private val log = LoggerFactory.getLogger(getClass)
@@ -36,7 +41,8 @@ private[reconcile] class OfferMatcherReconciler(
   import scala.concurrent.ExecutionContext.Implicits.global
 
   override def matchOffer(
-      deadline: Timestamp, offer: Offer): Future[MatchedTaskOps] = {
+      deadline: Timestamp,
+      offer: Offer): Future[MatchedTaskOps] = {
 
     val frameworkId = FrameworkId("").mergeFromProto(offer.getFrameworkId)
 
@@ -53,27 +59,31 @@ private[reconcile] class OfferMatcherReconciler(
   }
 
   private[this] def processResourcesByTaskId(
-      offer: Offer, resourcesByTaskId: Map[Id, Iterable[Resource]])
+      offer: Offer,
+      resourcesByTaskId: Map[Id, Iterable[Resource]])
     : Future[MatchedTaskOps] = {
     // do not query taskTracker in the common case
     if (resourcesByTaskId.isEmpty)
       Future.successful(MatchedTaskOps.noMatch(offer.getId))
     else {
       def createTaskOps(
-          tasksByApp: TasksByApp, rootGroup: Group): MatchedTaskOps = {
+          tasksByApp: TasksByApp,
+          rootGroup: Group): MatchedTaskOps = {
         def spurious(taskId: Id): Boolean =
           tasksByApp.task(taskId).isEmpty ||
-          rootGroup.app(taskId.appId).isEmpty
+            rootGroup.app(taskId.appId).isEmpty
 
-        val taskOps = resourcesByTaskId.iterator.collect {
-          case (taskId, spuriousResources) if spurious(taskId) =>
-            val unreserveAndDestroy = TaskOp.UnreserveAndDestroyVolumes(
+        val taskOps = resourcesByTaskId.iterator
+          .collect {
+            case (taskId, spuriousResources) if spurious(taskId) =>
+              val unreserveAndDestroy = TaskOp.UnreserveAndDestroyVolumes(
                 taskId = taskId,
                 oldTask = tasksByApp.task(taskId),
                 resources = spuriousResources.to[Seq]
-            )
-            TaskOpWithSource(source(offer.getId), unreserveAndDestroy)
-        }.to[Seq]
+              )
+              TaskOpWithSource(source(offer.getId), unreserveAndDestroy)
+          }
+          .to[Seq]
 
         MatchedTaskOps(offer.getId, taskOps, resendThisOffer = true)
       }
@@ -90,11 +100,12 @@ private[reconcile] class OfferMatcherReconciler(
   private[this] def source(offerId: OfferID) = new TaskOpSource {
     override def taskOpAccepted(taskOp: TaskOp): Unit =
       log.info(
-          s"accepted unreserveAndDestroy for ${taskOp.taskId} in offer [${offerId.getValue}]")
+        s"accepted unreserveAndDestroy for ${taskOp.taskId} in offer [${offerId.getValue}]")
     override def taskOpRejected(taskOp: TaskOp, reason: String): Unit =
-      log.info("rejected unreserveAndDestroy for {} in offer [{}]: {}",
-               taskOp.taskId,
-               offerId.getValue,
-               reason)
+      log.info(
+        "rejected unreserveAndDestroy for {} in offer [{}]: {}",
+        taskOp.taskId,
+        offerId.getValue,
+        reason)
   }
 }

@@ -32,23 +32,23 @@ abstract class InlineRefactoringTestBase
     import _root_.junit.framework.Assert._
     val filePath = folderPath + getTestName(false) + ".scala"
     val file = LocalFileSystem.getInstance.findFileByPath(
-        filePath.replace(File.separatorChar, '/'))
+      filePath.replace(File.separatorChar, '/'))
     assert(file != null, "file " + filePath + " not found")
-    val fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(
-            new File(file.getCanonicalPath), CharsetToolkit.UTF8))
+    val fileText = StringUtil.convertLineSeparators(
+      FileUtil.loadFile(new File(file.getCanonicalPath), CharsetToolkit.UTF8))
     configureFromFileTextAdapter(getTestName(false) + ".scala", fileText)
 
     val offset = fileText.indexOf(caretMarker) + caretMarker.length
     assert(
-        offset != -1,
-        "Not specified caret marker in test case. Use /*caret*/ in scala file for this.")
+      offset != -1,
+      "Not specified caret marker in test case. Use /*caret*/ in scala file for this.")
     val editor = CommonDataKeys.EDITOR.getData(
-        DataManager.getInstance().getDataContextFromFocus.getResult)
+      DataManager.getInstance().getDataContextFromFocus.getResult)
     editor.getCaretModel.moveToOffset(offset)
 
     val scalaFile = getFileAdapter.asInstanceOf[ScalaFile]
     var element = CommonDataKeys.PSI_ELEMENT.getData(
-        DataManager.getInstance().getDataContextFromFocus.getResult)
+      DataManager.getInstance().getDataContextFromFocus.getResult)
     if (element == null) {
       element = BaseRefactoringAction.getElementAtCaret(editor, scalaFile)
     }
@@ -71,12 +71,14 @@ abstract class InlineRefactoringTestBase
       res = scalaFile.getText.substring(0, lastPsi.getTextOffset).trim //getImportStatements.map(_.getText()).mkString("\n")
     } catch {
       case e: RefactoringErrorHintException =>
-        assert(e.getMessage == warning,
-               s"Warning should be: $warning, but is: ${e.getMessage}")
+        assert(
+          e.getMessage == warning,
+          s"Warning should be: $warning, but is: ${e.getMessage}")
         return
       case e: Exception =>
         assert(
-            assertion = false, message = e.getMessage + "\n" + e.getStackTrace)
+          assertion = false,
+          message = e.getMessage + "\n" + e.getStackTrace)
     }
 
     val text = lastPsi.getText

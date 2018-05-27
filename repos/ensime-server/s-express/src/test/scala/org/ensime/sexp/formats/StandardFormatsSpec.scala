@@ -10,7 +10,9 @@ import java.util.UUID
 import org.ensime.sexp._
 
 class StandardFormatsSpec
-    extends FormatSpec with StandardFormats with BasicFormats {
+    extends FormatSpec
+    with StandardFormats
+    with BasicFormats {
 
   "StandardFormats" should "support Option" in {
     val some = Some("thing")
@@ -22,12 +24,12 @@ class StandardFormatsSpec
     val left = Left(13)
     val right = Right("thirteen")
     assertFormat(
-        left: Either[Int, String],
-        SexpNumber(13)
+      left: Either[Int, String],
+      SexpNumber(13)
     )
     assertFormat(
-        right: Either[Int, String],
-        SexpString("thirteen")
+      right: Either[Int, String],
+      SexpString("thirteen")
     )
   }
 

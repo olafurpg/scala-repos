@@ -12,11 +12,12 @@ import org.ensime.util.file._
 import scala.collection.mutable.ListBuffer
 import scala.collection.{Iterable, mutable}
 
-class VM(val mode: VmMode,
-         vmOptions: List[String],
-         debugManager: ActorRef,
-         broadcaster: ActorRef,
-         sourceMap: SourceMap) {
+class VM(
+    val mode: VmMode,
+    vmOptions: List[String],
+    debugManager: ActorRef,
+    broadcaster: ActorRef,
+    sourceMap: SourceMap) {
   val log = LoggerFactory.getLogger("DebugVM")
 
   import scala.collection.JavaConversions._
@@ -35,7 +36,8 @@ class VM(val mode: VmMode,
         // breakpoints (see vm start  event), otherwise we have a race condition.
         arguments.get("suspend").setValue("true")
 
-        log.info("Using Connector: " + connector.name + " : " +
+        log.info(
+          "Using Connector: " + connector.name + " : " +
             connector.description())
         log.info("Connector class: " + connector.getClass.getName)
         log.info("Debugger VM args: " + allVMOpts)
@@ -51,7 +53,8 @@ class VM(val mode: VmMode,
         env.get("port").setValue(port)
         env.get("hostname").setValue(hostname)
 
-        log.info("Using Connector: " + connector.name + " : " +
+        log.info(
+          "Using Connector: " + connector.name + " : " +
             connector.description())
         log.info("Debugger arguments: " + env)
         log.info("Attach to VM")
@@ -96,8 +99,8 @@ class VM(val mode: VmMode,
     case VmAttach(_, _) => Nil
     case VmStart(_) =>
       List(
-          new MonitorOutput(process.getErrorStream, broadcaster),
-          new MonitorOutput(process.getInputStream, broadcaster)
+        new MonitorOutput(process.getErrorStream, broadcaster),
+        new MonitorOutput(process.getInputStream, broadcaster)
       )
   }
   private val savedObjects =
@@ -124,7 +127,7 @@ class VM(val mode: VmMode,
   def remember(value: Value): Value = {
     value match {
       case v: ObjectReference => remember(v)
-      case _ => value
+      case _                  => value
     }
   }
 
@@ -140,9 +143,9 @@ class VM(val mode: VmMode,
   def newStepRequest(thread: ThreadReference, stride: Int, depth: Int): Unit = {
     erm.deleteEventRequests(erm.stepRequests)
     val request = erm.createStepRequest(
-        thread,
-        stride,
-        depth
+      thread,
+      stride,
+      depth
     )
     request.addCountFilter(1)
     request.enable()
@@ -176,7 +179,7 @@ class VM(val mode: VmMode,
   def clearBreakpoints(bps: Iterable[Breakpoint]): Unit = {
     for (bp <- bps) {
       for (req <- erm.breakpointRequests();
-      pos <- sourceMap.locToPos(req.location())) {
+           pos <- sourceMap.locToPos(req.location())) {
         if (pos.file == bp.file && pos.line == bp.line) {
           req.disable()
         }
@@ -209,8 +212,8 @@ class VM(val mode: VmMode,
       override def equals(that: Any): Boolean = that match {
         case that: Location =>
           loc.sourcePath == that.sourcePath &&
-          loc.sourceName == that.sourceName &&
-          loc.lineNumber == that.lineNumber
+            loc.sourceName == that.sourceName &&
+            loc.lineNumber == that.lineNumber
         case _ => false
       }
       override def hashCode: Int =
@@ -242,21 +245,21 @@ class VM(val mode: VmMode,
   // us what we want...
   def valueSummary(value: Value): String = {
     value match {
-      case v: BooleanValue => v.value().toString
-      case v: ByteValue => v.value().toString
-      case v: CharValue => "'" + v.value().toString + "'"
-      case v: DoubleValue => v.value().toString
-      case v: FloatValue => v.value().toString
-      case v: IntegerValue => v.value().toString
-      case v: LongValue => v.value().toString
-      case v: ShortValue => v.value().toString
-      case v: VoidValue => "void"
+      case v: BooleanValue    => v.value().toString
+      case v: ByteValue       => v.value().toString
+      case v: CharValue       => "'" + v.value().toString + "'"
+      case v: DoubleValue     => v.value().toString
+      case v: FloatValue      => v.value().toString
+      case v: IntegerValue    => v.value().toString
+      case v: LongValue       => v.value().toString
+      case v: ShortValue      => v.value().toString
+      case v: VoidValue       => "void"
       case v: StringReference => "\"" + v.value() + "\""
       case v: ArrayReference =>
         val length = v.length()
         if (length > 3)
           "Array[" + v.getValues(0, 3).map(valueSummary).mkString(", ") +
-          ",...]"
+            ",...]"
         else "Array[" + v.getValues.map(valueSummary).mkString(", ") + "]"
       case v: ObjectReference =>
         val tpe = v.referenceType()
@@ -271,7 +274,7 @@ class VM(val mode: VmMode,
   private def lastNameComponent(s: String): String = {
     "^.*?\\.([^\\.]+)$".r.findFirstMatchIn(s) match {
       case Some(m) => m.group(1)
-      case None => s
+      case None    => s
     }
   }
 
@@ -291,10 +294,10 @@ class VM(val mode: VmMode,
               i += 1
               val value = obj.getValue(f)
               DebugClassField(
-                  i,
-                  f.name(),
-                  f.typeName(),
-                  valueSummary(value)
+                i,
+                f.name(),
+                f.typeName(),
+                valueSummary(value)
               )
             }
             .toList ++ fields
@@ -324,35 +327,35 @@ class VM(val mode: VmMode,
 
   private def makeDebugObj(value: ObjectReference): DebugObjectInstance = {
     DebugObjectInstance(
-        valueSummary(value),
-        makeFields(value.referenceType(), value),
-        value.referenceType().name(),
-        DebugObjectId(value.uniqueID())
+      valueSummary(value),
+      makeFields(value.referenceType(), value),
+      value.referenceType().name(),
+      DebugObjectId(value.uniqueID())
     )
   }
 
   private def makeDebugStr(value: StringReference): DebugStringInstance = {
     DebugStringInstance(
-        valueSummary(value),
-        makeFields(value.referenceType(), value),
-        value.referenceType().name(),
-        DebugObjectId(value.uniqueID())
+      valueSummary(value),
+      makeFields(value.referenceType(), value),
+      value.referenceType().name(),
+      DebugObjectId(value.uniqueID())
     )
   }
 
   private def makeDebugArr(value: ArrayReference): DebugArrayInstance = {
     DebugArrayInstance(
-        value.length,
-        value.referenceType().name,
-        value.referenceType().asInstanceOf[ArrayType].componentTypeName(),
-        DebugObjectId(value.uniqueID)
+      value.length,
+      value.referenceType().name,
+      value.referenceType().asInstanceOf[ArrayType].componentTypeName(),
+      DebugObjectId(value.uniqueID)
     )
   }
 
   private def makeDebugPrim(value: PrimitiveValue): DebugPrimitiveValue =
     DebugPrimitiveValue(
-        valueSummary(value),
-        value.`type`().name()
+      valueSummary(value),
+      value.`type`().name()
     )
 
   private def makeDebugNull(): DebugNullValue = DebugNullValue("Null")
@@ -361,16 +364,17 @@ class VM(val mode: VmMode,
     if (value == null) makeDebugNull()
     else {
       value match {
-        case v: ArrayReference => makeDebugArr(v)
+        case v: ArrayReference  => makeDebugArr(v)
         case v: StringReference => makeDebugStr(v)
         case v: ObjectReference => makeDebugObj(v)
-        case v: PrimitiveValue => makeDebugPrim(v)
+        case v: PrimitiveValue  => makeDebugPrim(v)
       }
     }
   }
 
   def locationForName(
-      thread: ThreadReference, name: String): Option[DebugLocation] = {
+      thread: ThreadReference,
+      name: String): Option[DebugLocation] = {
     val stackFrame = thread.frame(0)
     val objRef = stackFrame.thisObject()
     if (name == "this") {
@@ -379,12 +383,14 @@ class VM(val mode: VmMode,
       stackSlotForName(thread, name)
         .map({ slot =>
           DebugStackSlot(
-              DebugThreadId(thread.uniqueID), slot.frame, slot.offset)
+            DebugThreadId(thread.uniqueID),
+            slot.frame,
+            slot.offset)
         })
         .orElse(
-            fieldByName(objRef, name).flatMap { f =>
-              Some(DebugObjectField(DebugObjectId(objRef.uniqueID), f.name))
-            }
+          fieldByName(objRef, name).flatMap { f =>
+            Some(DebugObjectField(DebugObjectId(objRef.uniqueID), f.name))
+          }
         )
     }
   }
@@ -410,16 +416,18 @@ class VM(val mode: VmMode,
     valueAtLocation(location).map(makeDebugValue)
   }
 
-  private def callMethod(thread: ThreadReference,
-                         obj: ObjectReference,
-                         name: String,
-                         signature: String,
-                         args: java.util.List[Value]): Option[Value] = {
+  private def callMethod(
+      thread: ThreadReference,
+      obj: ObjectReference,
+      name: String,
+      signature: String,
+      args: java.util.List[Value]): Option[Value] = {
     if (!vm.canBeModified) {
       log.info("Sorry, this debug VM is read-only.")
       None
     } else {
-      log.info("DebugManager.callMethod(obj = " + obj + " of type " +
+      log.info(
+        "DebugManager.callMethod(obj = " + obj + " of type " +
           obj.referenceType + ", name = " + name + ", signature = " +
           signature + ", args = " + args)
       obj.referenceType
@@ -428,8 +436,11 @@ class VM(val mode: VmMode,
         case Some(m) =>
           log.info("Invoking: " + m)
           Some(
-              obj.invokeMethod(
-                  thread, m, args, ObjectReference.INVOKE_SINGLE_THREADED))
+            obj.invokeMethod(
+              thread,
+              m,
+              args,
+              ObjectReference.INVOKE_SINGLE_THREADED))
         case other =>
           log.error("toString method not found: " + other)
           None
@@ -438,7 +449,8 @@ class VM(val mode: VmMode,
   }
 
   def debugValueAtLocationToString(
-      threadId: DebugThreadId, location: DebugLocation): Option[String] = {
+      threadId: DebugThreadId,
+      location: DebugLocation): Option[String] = {
     valueAtLocation(location) match {
       case Some(arr: ArrayReference) =>
         val quantifier = if (arr.length == 1) "element" else "elements"
@@ -447,15 +459,16 @@ class VM(val mode: VmMode,
         Some(str.value)
       case Some(obj: ObjectReference) =>
         threadById(threadId) flatMap { thread =>
-          callMethod(thread,
-                     obj,
-                     "toString",
-                     "()Ljava/lang/String;",
-                     new java.util.Vector()) match {
+          callMethod(
+            thread,
+            obj,
+            "toString",
+            "()Ljava/lang/String;",
+            new java.util.Vector()) match {
             case Some(v: StringReference) =>
               Some(v.value)
             case Some(null) => Some("null")
-            case _ => None
+            case _          => None
           }
         }
       case Some(value) => Some(valueSummary(value))
@@ -470,23 +483,27 @@ class VM(val mode: VmMode,
   }
 
   private def valueForField(
-      objectId: DebugObjectId, name: String): Option[Value] = {
+      objectId: DebugObjectId,
+      name: String): Option[Value] = {
     for (obj <- savedObjects.get(objectId);
-    f <- fieldByName(obj, name)) yield {
+         f <- fieldByName(obj, name)) yield {
       remember(obj.getValue(f))
     }
   }
 
   private def valueForIndex(
-      objectId: DebugObjectId, index: Int): Option[Value] = {
+      objectId: DebugObjectId,
+      index: Int): Option[Value] = {
     savedObjects.get(objectId) match {
       case Some(arr: ArrayReference) => Some(remember(arr.getValue(index)))
-      case _ => None
+      case _                         => None
     }
   }
 
   private def valueForStackVar(
-      thread: ThreadReference, frame: Int, offset: Int): Option[Value] = {
+      thread: ThreadReference,
+      frame: Int,
+      offset: Int): Option[Value] = {
     if (thread.frameCount > frame &&
         thread.frame(frame).visibleVariables.length > offset) {
       val stackFrame = thread.frame(frame)
@@ -498,7 +515,8 @@ class VM(val mode: VmMode,
   case class StackSlot(frame: Int, offset: Int)
 
   private def stackSlotForName(
-      thread: ThreadReference, name: String): Option[StackSlot] = {
+      thread: ThreadReference,
+      name: String): Option[StackSlot] = {
     var result: Option[StackSlot] = None
     var frame = 0
     while (result.isEmpty && frame < thread.frameCount) {
@@ -525,7 +543,10 @@ class VM(val mode: VmMode,
       frame.visibleVariables.zipWithIndex.map {
         case (v, i) =>
           DebugStackLocal(
-              i, v.name, valueSummary(frame.getValue(v)), v.typeName())
+            i,
+            v.name,
+            valueSummary(frame.getValue(v)),
+            v.typeName())
       }.toList
     }, List.empty)
 
@@ -535,23 +556,26 @@ class VM(val mode: VmMode,
     val pcLocation = sourceMap
       .locToPos(frame.location)
       .getOrElse(
-          LineSourcePosition(
-              File(frame.location.sourcePath()).canon,
-              frame.location.lineNumber
-          )
+        LineSourcePosition(
+          File(frame.location.sourcePath()).canon,
+          frame.location.lineNumber
+        )
       )
     val thisObjId = ignoreErr(remember(frame.thisObject()).uniqueID, -1L)
-    DebugStackFrame(index,
-                    locals,
-                    numArgs,
-                    className,
-                    methodName,
-                    pcLocation,
-                    DebugObjectId(thisObjId))
+    DebugStackFrame(
+      index,
+      locals,
+      numArgs,
+      className,
+      methodName,
+      pcLocation,
+      DebugObjectId(thisObjId))
   }
 
   def backtrace(
-      thread: ThreadReference, index: Int, count: Int): DebugBacktrace = {
+      thread: ThreadReference,
+      index: Int,
+      count: Int): DebugBacktrace = {
     val frames = ListBuffer[DebugStackFrame]()
     var i = index
     while (i < thread.frameCount && (count == -1 || i < count)) {
@@ -560,7 +584,9 @@ class VM(val mode: VmMode,
       i += 1
     }
     DebugBacktrace(
-        frames.toList, DebugThreadId(thread.uniqueID()), thread.name())
+      frames.toList,
+      DebugThreadId(thread.uniqueID()),
+      thread.name())
   }
 
   private def mirrorFromString(tpe: Type, toMirror: String): Option[Value] = {
@@ -568,13 +594,13 @@ class VM(val mode: VmMode,
     if (s.length > 0) {
       tpe match {
         case tpe: BooleanType => Some(vm.mirrorOf(s.toBoolean))
-        case tpe: ByteType => Some(vm.mirrorOf(s.toByte))
-        case tpe: CharType => Some(vm.mirrorOf(s(0)))
-        case tpe: DoubleType => Some(vm.mirrorOf(s.toDouble))
-        case tpe: FloatType => Some(vm.mirrorOf(s.toFloat))
+        case tpe: ByteType    => Some(vm.mirrorOf(s.toByte))
+        case tpe: CharType    => Some(vm.mirrorOf(s(0)))
+        case tpe: DoubleType  => Some(vm.mirrorOf(s.toDouble))
+        case tpe: FloatType   => Some(vm.mirrorOf(s.toFloat))
         case tpe: IntegerType => Some(vm.mirrorOf(s.toInt))
-        case tpe: LongType => Some(vm.mirrorOf(s.toLong))
-        case tpe: ShortType => Some(vm.mirrorOf(s.toShort))
+        case tpe: LongType    => Some(vm.mirrorOf(s.toLong))
+        case tpe: ShortType   => Some(vm.mirrorOf(s.toShort))
         case tpe: ReferenceType if tpe.name == "java.lang.String" =>
           if (s.startsWith("\"") && s.endsWith("\"")) {
             Some(vm.mirrorOf(s.substring(1, s.length - 1)))
@@ -584,10 +610,11 @@ class VM(val mode: VmMode,
     } else None
   }
 
-  def setStackVar(thread: ThreadReference,
-                  frame: Int,
-                  offset: Int,
-                  newValue: String): Boolean = {
+  def setStackVar(
+      thread: ThreadReference,
+      frame: Int,
+      offset: Int,
+      newValue: String): Boolean = {
     if (thread.frameCount > frame &&
         thread.frame(frame).visibleVariables.length > offset) {
       val stackFrame = thread.frame(frame)

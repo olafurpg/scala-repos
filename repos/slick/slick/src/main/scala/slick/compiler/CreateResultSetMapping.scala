@@ -27,20 +27,20 @@ class CreateResultSetMapping extends Phase {
         (tpe match {
           case CollectionType(cons, el) =>
             ResultSetMapping(
-                gen,
-                collectionCast(ch, cons).infer(),
-                createResult(
-                    Ref(gen) :@ ch.nodeType.asCollectionType.elementType,
-                    el,
-                    syms))
+              gen,
+              collectionCast(ch, cons).infer(),
+              createResult(
+                Ref(gen) :@ ch.nodeType.asCollectionType.elementType,
+                el,
+                syms))
           case t =>
             ResultSetMapping(
-                gen,
-                ch,
-                createResult(
-                    Ref(gen) :@ ch.nodeType.asCollectionType.elementType,
-                    t,
-                    syms))
+              gen,
+              ch,
+              createResult(
+                Ref(gen) :@ ch.nodeType.asCollectionType.elementType,
+                t,
+                syms))
         })
       }
       .infer()
@@ -49,7 +49,7 @@ class CreateResultSetMapping extends Phase {
   def collectionCast(ch: Node, cons: CollectionTypeConstructor): Node =
     ch.nodeType match {
       case CollectionType(c, _) if c == cons => ch
-      case _ => CollectionCast(ch, cons).infer()
+      case _                                 => CollectionCast(ch, cons).infer()
     }
 
   /** Create a structured return value for the client side, based on the
@@ -97,7 +97,7 @@ class RemoveMappedTypes extends Phase {
           .map(_.typeMapping)
           .getOrElse(true))
       state.withNode(removeTypeMapping(state.tree)) +
-      (this -> state.tree.nodeType)
+        (this -> state.tree.nodeType)
     else state + (this -> state.tree.nodeType)
 
   /** Remove TypeMapping nodes and MappedTypes */
@@ -111,6 +111,6 @@ class RemoveMappedTypes extends Phase {
   /** Remove MappedTypes from a Type */
   def removeMappedType(tpe: Type): Type = tpe match {
     case m: MappedScalaType => removeMappedType(m.baseType)
-    case t => t.mapChildren(removeMappedType)
+    case t                  => t.mapChildren(removeMappedType)
   }
 }

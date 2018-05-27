@@ -31,7 +31,9 @@ private[spark] trait SchedulerBackend {
   def defaultParallelism(): Int
 
   def killTask(
-      taskId: Long, executorId: String, interruptThread: Boolean): Unit =
+      taskId: Long,
+      executorId: String,
+      interruptThread: Boolean): Unit =
     throw new UnsupportedOperationException
   def isReady(): Boolean = true
 

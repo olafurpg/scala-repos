@@ -10,7 +10,8 @@ import core.Reporter
 import core.TestSettings
 
 trait InteractiveTestSettings
-    extends TestSettings with PresentationCompilerInstance {
+    extends TestSettings
+    with PresentationCompilerInstance {
 
   /** Character delimiter for comments in .opts file */
   private final val CommentStartDelimiter = "#"
@@ -31,7 +32,7 @@ trait InteractiveTestSettings
       for (p <- paths if argsString.contains(p.name)) p.value = p.value.map {
         case '/' => separatorChar
         case ':' => pathSeparatorChar
-        case c => c
+        case c   => c
       }
     }
 
@@ -48,20 +49,24 @@ trait InteractiveTestSettings
 
     // Make the --sourcepath path provided in the .flags file (if any) relative to the test's base directory
     if (settings.sourcepath.isSetByUser)
-      settings.sourcepath.value = (baseDir / Path(settings.sourcepath.value)).path
+      settings.sourcepath.value =
+        (baseDir / Path(settings.sourcepath.value)).path
 
-    adjustPaths(settings.bootclasspath,
-                settings.classpath,
-                settings.javabootclasspath,
-                settings.sourcepath)
+    adjustPaths(
+      settings.bootclasspath,
+      settings.classpath,
+      settings.javabootclasspath,
+      settings.sourcepath)
   }
 
   /** If there's a file ending in .opts, read it and parse it for cmd line arguments. */
   protected val argsString = {
     val optsFile =
       outDir / "%s.%s".format(
-          System.getProperty("partest.testname"), TestOptionsFileExtension)
-    val str = try File(optsFile).slurp() catch {
+        System.getProperty("partest.testname"),
+        TestOptionsFileExtension)
+    val str = try File(optsFile).slurp()
+    catch {
       case e: java.io.IOException => ""
     }
     str.lines.filter(!_.startsWith(CommentStartDelimiter)).mkString(" ")

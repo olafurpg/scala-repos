@@ -8,7 +8,8 @@ trait ComposeT[F[_], G[_]] {
 
 case class Compose[F[_], G[_]]() {
   def Functor(
-      implicit f: Functor[F], g: Functor[G]): Functor[ComposeT[F, G]#Apply] =
+      implicit f: Functor[F],
+      g: Functor[G]): Functor[ComposeT[F, G]#Apply] =
     new Functor[ComposeT[F, G]#Apply] {
       def map[A, B](c: ComposeT[F, G]#Apply[A], h: A => B) =
         f.map(c, (x: G[A]) => g.map(x, h))

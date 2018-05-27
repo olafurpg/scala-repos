@@ -30,7 +30,7 @@ trait JsonFormats {
 
   lazy val allFormats =
     DefaultFormats.lossless + new ObjectIdSerializer + new DateSerializer +
-    new DateTimeSerializer + new PatternSerializer + new UUIDSerializer
+      new DateTimeSerializer + new PatternSerializer + new UUIDSerializer
 }
 
 /*
@@ -115,10 +115,9 @@ trait MongoMeta[BaseDocument] extends JsonFormats {
 
   // delete a document
   def delete(k: String, v: Any) {
-    delete(
-        new BasicDBObject(k, v match {
+    delete(new BasicDBObject(k, v match {
       case s: String if (ObjectId.isValid(s)) => new ObjectId(s)
-      case _ => v
+      case _                                  => v
     }))
   }
 
@@ -182,10 +181,10 @@ trait MongoMeta[BaseDocument] extends JsonFormats {
     val dboOpts = opts.toList
     db.getCollection(collectionName)
       .update(
-          qry,
-          newobj,
-          dboOpts.find(_ == Upsert).map(x => true).getOrElse(false),
-          dboOpts.find(_ == Multi).map(x => true).getOrElse(false)
+        qry,
+        newobj,
+        dboOpts.find(_ == Upsert).map(x => true).getOrElse(false),
+        dboOpts.find(_ == Multi).map(x => true).getOrElse(false)
       )
   }
 
@@ -194,10 +193,10 @@ trait MongoMeta[BaseDocument] extends JsonFormats {
    */
   def update(qry: JObject, newobj: JObject, db: DB, opts: UpdateOption*) {
     update(
-        JObjectParser.parse(qry),
-        JObjectParser.parse(newobj),
-        db,
-        opts: _*
+      JObjectParser.parse(qry),
+      JObjectParser.parse(newobj),
+      db,
+      opts: _*
     )
   }
 

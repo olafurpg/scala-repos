@@ -29,15 +29,15 @@ abstract class ScalaExpressionSurrounder extends Surrounder {
     element match {
       case _: ScExpression | _: PsiWhiteSpace | _: ScValue | _: ScVariable |
           _: ScFunction | _: ScTypeAlias => {
-          true
-        }
+        true
+      }
       case e => {
-          if (ScalaPsiUtil.isLineTerminator(e)) true
-          else if (e.getNode.getElementType == ScalaTokenTypes.tSEMICOLON) true
-          else if (ScalaTokenTypes.COMMENTS_TOKEN_SET contains e.getNode.getElementType)
-            true
-          else false
-        }
+        if (ScalaPsiUtil.isLineTerminator(e)) true
+        else if (e.getNode.getElementType == ScalaTokenTypes.tSEMICOLON) true
+        else if (ScalaTokenTypes.COMMENTS_TOKEN_SET contains e.getNode.getElementType)
+          true
+        else false
+      }
     }
   }
 
@@ -46,11 +46,11 @@ abstract class ScalaExpressionSurrounder extends Surrounder {
     val element = elements(0)
     val parent = element.getParent
     parent match {
-      case _: ScInfixExpr => true
+      case _: ScInfixExpr           => true
       case _: ScReferenceExpression => true
-      case _: ScPrefixExpr => true
-      case _: ScPostfixExpr => true
-      case _ => false
+      case _: ScPrefixExpr          => true
+      case _: ScPostfixExpr         => true
+      case _                        => false
     }
   }
 
@@ -59,9 +59,10 @@ abstract class ScalaExpressionSurrounder extends Surrounder {
     true
   }
 
-  override def surroundElements(project: Project,
-                                editor: Editor,
-                                elements: Array[PsiElement]): TextRange = {
+  override def surroundElements(
+      project: Project,
+      editor: Editor,
+      elements: Array[PsiElement]): TextRange = {
     val newNode = surroundPsi(elements).getNode
     var childNode: ASTNode = null
 
@@ -79,10 +80,10 @@ abstract class ScalaExpressionSurrounder extends Surrounder {
 
   def surroundPsi(elements: Array[PsiElement]): PsiElement =
     ScalaPsiElementFactory.createExpressionFromText(
-        if (needParenthesis(elements))
-          "(" + getTemplateAsString(elements) + ")"
-        else getTemplateAsString(elements),
-        elements(0).getManager
+      if (needParenthesis(elements))
+        "(" + getTemplateAsString(elements) + ")"
+      else getTemplateAsString(elements),
+      elements(0).getManager
     )
 
   def getTemplateAsString(elements: Array[PsiElement]): String = {

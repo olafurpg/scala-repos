@@ -17,8 +17,7 @@ import com.twitter.util.Duration
   *
   * @see [[SessionPoolingParams]] for pooling related configuration
   */
-class SessionParams[
-    A <: Stack.Parameterized[A]](self: Stack.Parameterized[A]) {
+class SessionParams[A <: Stack.Parameterized[A]](self: Stack.Parameterized[A]) {
 
   /**
     * Configures the session acquisition `timeout` of this client (default: unbounded).
@@ -44,8 +43,7 @@ class SessionParams[
     * @see [[https://twitter.github.io/finagle/guide/Clients.html#timeouts-expiration]]
     */
   def maxIdleTime(timeout: Duration): A =
-    self.configured(
-        self.params[ExpiringService.Param].copy(idleTime = timeout))
+    self.configured(self.params[ExpiringService.Param].copy(idleTime = timeout))
 
   /**
     * Configures the session lifetime `timeout` - the maximum amount of time a given
@@ -54,6 +52,5 @@ class SessionParams[
     * @see [[https://twitter.github.io/finagle/guide/Clients.html#timeouts-expiration]]
     */
   def maxLifeTime(timeout: Duration): A =
-    self.configured(
-        self.params[ExpiringService.Param].copy(lifeTime = timeout))
+    self.configured(self.params[ExpiringService.Param].copy(lifeTime = timeout))
 }

@@ -10,7 +10,9 @@ class JUnitAssumptionsTest {
 
   private val ShallNotPass = false
 
-  def testIfAssumePass(assumption: => Unit, shouldPass: Boolean = true): Unit = {
+  def testIfAssumePass(
+      assumption: => Unit,
+      shouldPass: Boolean = true): Unit = {
     try {
       assumption
       if (!shouldPass) fail("Assumption should have failed")
@@ -25,13 +27,15 @@ class JUnitAssumptionsTest {
     testIfAssumePass(assumeTrue("true be assumed to be true", true))
     testIfAssumePass(assumeTrue(true))
     testIfAssumePass(
-        assumeTrue("false be assumed to be true", false), ShallNotPass)
+      assumeTrue("false be assumed to be true", false),
+      ShallNotPass)
     testIfAssumePass(assumeTrue(false), ShallNotPass)
 
     testIfAssumePass(assumeFalse("false be assumed to be false", false))
     testIfAssumePass(assumeFalse(false))
     testIfAssumePass(
-        assumeFalse("true be assumed to be false", true), ShallNotPass)
+      assumeFalse("true be assumed to be false", true),
+      ShallNotPass)
     testIfAssumePass(assumeFalse(true), ShallNotPass)
   }
 
@@ -72,13 +76,14 @@ class JUnitAssumptionsTest {
   @Test
   def testAssumesNoException(): Unit = {
     testIfAssumePass(
-        assumeNoException("assumeNoException(null) should succeed", null))
+      assumeNoException("assumeNoException(null) should succeed", null))
     testIfAssumePass(assumeNoException(null))
 
     testIfAssumePass(
-        assumeNoException(
-            "assumeNoException(new Throwable) should succeed", new Throwable),
-        ShallNotPass)
+      assumeNoException(
+        "assumeNoException(new Throwable) should succeed",
+        new Throwable),
+      ShallNotPass)
     testIfAssumePass(assumeNoException(new Throwable), ShallNotPass)
   }
 }

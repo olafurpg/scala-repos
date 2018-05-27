@@ -34,16 +34,21 @@ object MimeTypes {
     * Mimetypes defined in the current application, as declared in application.conf
     */
   def applicationTypes: Map[String, String] =
-    play.api.Play.privateMaybeApplication.flatMap { application =>
-      application.configuration.getConfig("mimetype").map { config =>
-        config.subKeys.map { key =>
-          (key, config.getString(key))
-        }.collect {
-          case ((key, Some(value))) =>
-            (key, value)
-        }.toMap
+    play.api.Play.privateMaybeApplication
+      .flatMap { application =>
+        application.configuration.getConfig("mimetype").map { config =>
+          config.subKeys
+            .map { key =>
+              (key, config.getString(key))
+            }
+            .collect {
+              case ((key, Some(value))) =>
+                (key, value)
+            }
+            .toMap
+        }
       }
-    }.getOrElse(Map.empty)
+      .getOrElse(Map.empty)
 
   /**
     * tells you if mimeType is text or not.
@@ -53,9 +58,9 @@ object MimeTypes {
     */
   def isText(mimeType: String): Boolean = {
     mimeType.trim match {
-      case text if text.startsWith("text/") => true
+      case text if text.startsWith("text/")      => true
       case text if additionalText.contains(text) => true
-      case _ => false
+      case _                                     => false
     }
   }
 
@@ -619,7 +624,7 @@ object MimeTypes {
       .split('\n')
       .map(_.trim)
       .filter(_.size > 0)
-      .filter(_ (0) != '#')
+      .filter(_(0) != '#')
       .map(_.split('='))
       .map(parts => parts(0) -> parts.drop(1).mkString)
       .toMap
@@ -627,5 +632,5 @@ object MimeTypes {
   lazy val additionalText = """
         application/json
         application/javascript
-    """.split('\n').map(_.trim).filter(_.size > 0).filter(_ (0) != '#')
+    """.split('\n').map(_.trim).filter(_.size > 0).filter(_(0) != '#')
 }

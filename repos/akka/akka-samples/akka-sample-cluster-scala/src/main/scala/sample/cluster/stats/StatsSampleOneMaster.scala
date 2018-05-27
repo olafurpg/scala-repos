@@ -25,26 +25,30 @@ object StatsSampleOneMaster {
       val config = ConfigFactory
         .parseString(s"akka.remote.netty.tcp.port=" + port)
         .withFallback(
-            ConfigFactory.parseString("akka.cluster.roles = [compute]"))
+          ConfigFactory.parseString("akka.cluster.roles = [compute]"))
         .withFallback(ConfigFactory.load("stats2"))
 
       val system = ActorSystem("ClusterSystem", config)
 
       //#create-singleton-manager
-      system.actorOf(ClusterSingletonManager.props(
-                         singletonProps = Props[StatsService],
-                         terminationMessage = PoisonPill,
-                         settings = ClusterSingletonManagerSettings(system)
-                             .withRole("compute")),
-                     name = "statsService")
+      system.actorOf(
+        ClusterSingletonManager.props(
+          singletonProps = Props[StatsService],
+          terminationMessage = PoisonPill,
+          settings = ClusterSingletonManagerSettings(system)
+            .withRole("compute")),
+        name = "statsService"
+      )
       //#create-singleton-manager
 
       //#singleton-proxy
-      system.actorOf(ClusterSingletonProxy.props(
-                         singletonManagerPath = "/user/statsService",
-                         settings = ClusterSingletonProxySettings(system)
-                             .withRole("compute")),
-                     name = "statsServiceProxy")
+      system.actorOf(
+        ClusterSingletonProxy.props(
+          singletonManagerPath = "/user/statsService",
+          settings = ClusterSingletonProxySettings(system)
+            .withRole("compute")),
+        name = "statsServiceProxy"
+      )
       //#singleton-proxy
     }
   }
@@ -55,6 +59,7 @@ object StatsSampleOneMasterClient {
     // note that client is not a compute node, role not defined
     val system = ActorSystem("ClusterSystem")
     system.actorOf(
-        Props(classOf[StatsSampleClient], "/user/statsServiceProxy"), "client")
+      Props(classOf[StatsSampleClient], "/user/statsServiceProxy"),
+      "client")
   }
 }

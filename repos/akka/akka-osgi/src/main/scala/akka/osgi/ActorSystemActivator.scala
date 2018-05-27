@@ -40,8 +40,8 @@ abstract class ActorSystemActivator extends BundleActivator {
     */
   def start(context: BundleContext): Unit = {
     system = Some(
-        OsgiActorSystemFactory(context, getActorSystemConfiguration(context))
-          .createActorSystem(Option(getActorSystemName(context))))
+      OsgiActorSystemFactory(context, getActorSystemConfiguration(context))
+        .createActorSystem(Option(getActorSystemName(context))))
     system foreach (addLogServiceListener(context, _))
     system foreach (configure(context, _))
   }
@@ -57,8 +57,10 @@ abstract class ActorSystemActivator extends BundleActivator {
       def serviceChanged(event: ServiceEvent) {
         event.getType match {
           case ServiceEvent.REGISTERED ⇒
-            system.eventStream.publish(serviceForReference[LogService](
-                    context, event.getServiceReference))
+            system.eventStream.publish(
+              serviceForReference[LogService](
+                context,
+                event.getServiceReference))
           case ServiceEvent.UNREGISTERING ⇒
             system.eventStream.publish(UnregisteringLogService)
         }
@@ -68,19 +70,19 @@ abstract class ActorSystemActivator extends BundleActivator {
     context.addServiceListener(logServiceListner, filter)
 
     //Small trick to create an event if the service is registered before this start listing for
-    Option(context.getServiceReference(classOf[LogService].getName)).foreach(
-        x ⇒
-          {
+    Option(context.getServiceReference(classOf[LogService].getName))
+      .foreach(x ⇒ {
         logServiceListner.serviceChanged(
-            new ServiceEvent(ServiceEvent.REGISTERED, x))
-    })
+          new ServiceEvent(ServiceEvent.REGISTERED, x))
+      })
   }
 
   /**
     * Convenience method to find a service by its reference.
     */
   def serviceForReference[T](
-      context: BundleContext, reference: ServiceReference[_]): T =
+      context: BundleContext,
+      reference: ServiceReference[_]): T =
     context.getService(reference).asInstanceOf[T]
 
   /**
@@ -107,10 +109,10 @@ abstract class ActorSystemActivator extends BundleActivator {
     val properties = new Properties()
     properties.put("name", system.name)
     registration = Some(
-        context.registerService(
-            classOf[ActorSystem].getName,
-            system,
-            properties.asInstanceOf[Dictionary[String, Any]]))
+      context.registerService(
+        classOf[ActorSystem].getName,
+        system,
+        properties.asInstanceOf[Dictionary[String, Any]]))
   }
 
   /**

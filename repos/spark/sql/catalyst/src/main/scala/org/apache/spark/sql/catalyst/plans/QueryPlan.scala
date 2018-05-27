@@ -36,8 +36,8 @@ abstract class QueryPlan[PlanType <: QueryPlan[PlanType]]
       .union(inferAdditionalConstraints(constraints))
       .union(constructIsNotNullConstraints(constraints))
       .filter(constraint =>
-            constraint.references.nonEmpty &&
-            constraint.references.subsetOf(outputSet))
+        constraint.references.nonEmpty &&
+          constraint.references.subsetOf(outputSet))
   }
 
   /**
@@ -49,22 +49,24 @@ abstract class QueryPlan[PlanType <: QueryPlan[PlanType]]
       constraints: Set[Expression]): Set[Expression] = {
     // Currently we only propagate constraints if the condition consists of equality
     // and ranges. For all other cases, we return an empty set of constraints
-    constraints.map {
-      case EqualTo(l, r) =>
-        Set(IsNotNull(l), IsNotNull(r))
-      case GreaterThan(l, r) =>
-        Set(IsNotNull(l), IsNotNull(r))
-      case GreaterThanOrEqual(l, r) =>
-        Set(IsNotNull(l), IsNotNull(r))
-      case LessThan(l, r) =>
-        Set(IsNotNull(l), IsNotNull(r))
-      case LessThanOrEqual(l, r) =>
-        Set(IsNotNull(l), IsNotNull(r))
-      case Not(EqualTo(l, r)) =>
-        Set(IsNotNull(l), IsNotNull(r))
-      case _ =>
-        Set.empty[Expression]
-    }.foldLeft(Set.empty[Expression])(_ union _.toSet)
+    constraints
+      .map {
+        case EqualTo(l, r) =>
+          Set(IsNotNull(l), IsNotNull(r))
+        case GreaterThan(l, r) =>
+          Set(IsNotNull(l), IsNotNull(r))
+        case GreaterThanOrEqual(l, r) =>
+          Set(IsNotNull(l), IsNotNull(r))
+        case LessThan(l, r) =>
+          Set(IsNotNull(l), IsNotNull(r))
+        case LessThanOrEqual(l, r) =>
+          Set(IsNotNull(l), IsNotNull(r))
+        case Not(EqualTo(l, r)) =>
+          Set(IsNotNull(l), IsNotNull(r))
+        case _ =>
+          Set.empty[Expression]
+      }
+      .foldLeft(Set.empty[Expression])(_ union _.toSet)
   }
 
   /**
@@ -94,7 +96,7 @@ abstract class QueryPlan[PlanType <: QueryPlan[PlanType]]
     * evaluate to `true` for all rows produced.
     */
   lazy val constraints: ExpressionSet = ExpressionSet(
-      getRelevantConstraints(validConstraints))
+    getRelevantConstraints(validConstraints))
 
   /**
     * This method can be overridden by any child class of QueryPlan to specify a set of constraints
@@ -168,13 +170,13 @@ abstract class QueryPlan[PlanType <: QueryPlan[PlanType]]
     }
 
     def recursiveTransform(arg: Any): AnyRef = arg match {
-      case e: Expression => transformExpressionDown(e)
+      case e: Expression       => transformExpressionDown(e)
       case Some(e: Expression) => Some(transformExpressionDown(e))
-      case m: Map[_, _] => m
-      case d: DataType => d // Avoid unpacking Structs
+      case m: Map[_, _]        => m
+      case d: DataType         => d // Avoid unpacking Structs
       case seq: Traversable[_] => seq.map(recursiveTransform)
-      case other: AnyRef => other
-      case null => null
+      case other: AnyRef       => other
+      case null                => null
     }
 
     val newArgs = productIterator.map(recursiveTransform).toArray
@@ -203,13 +205,13 @@ abstract class QueryPlan[PlanType <: QueryPlan[PlanType]]
     }
 
     def recursiveTransform(arg: Any): AnyRef = arg match {
-      case e: Expression => transformExpressionUp(e)
+      case e: Expression       => transformExpressionUp(e)
       case Some(e: Expression) => Some(transformExpressionUp(e))
-      case m: Map[_, _] => m
-      case d: DataType => d // Avoid unpacking Structs
+      case m: Map[_, _]        => m
+      case d: DataType         => d // Avoid unpacking Structs
       case seq: Traversable[_] => seq.map(recursiveTransform)
-      case other: AnyRef => other
-      case null => null
+      case other: AnyRef       => other
+      case null                => null
     }
 
     val newArgs = productIterator.map(recursiveTransform).toArray
@@ -232,16 +234,16 @@ abstract class QueryPlan[PlanType <: QueryPlan[PlanType]]
     // Recursively find all expressions from a traversable.
     def seqToExpressions(seq: Traversable[Any]): Traversable[Expression] =
       seq.flatMap {
-        case e: Expression => e :: Nil
+        case e: Expression     => e :: Nil
         case s: Traversable[_] => seqToExpressions(s)
-        case other => Nil
+        case other             => Nil
       }
 
     productIterator.flatMap {
-      case e: Expression => e :: Nil
+      case e: Expression       => e :: Nil
       case Some(e: Expression) => e :: Nil
       case seq: Traversable[_] => seqToExpressions(seq)
-      case other => Nil
+      case other               => Nil
     }.toSeq
   }
 
@@ -269,8 +271,7 @@ abstract class QueryPlan[PlanType <: QueryPlan[PlanType]]
     * All the subqueries of current plan.
     */
   def subqueries: Seq[PlanType] = {
-    expressions.flatMap(
-        _.collect {
+    expressions.flatMap(_.collect {
       case e: SubqueryExpression => e.plan.asInstanceOf[PlanType]
     })
   }
@@ -314,9 +315,11 @@ abstract class QueryPlan[PlanType <: QueryPlan[PlanType]]
       // As the root of the expression, Alias will always take an arbitrary exprId, we need
       // to erase that for equality testing.
       val cleanedExprId = Alias(a.child, a.name)(
-          ExprId(-1), a.qualifiers, isGenerated = a.isGenerated)
-      BindReferences.bindReference(
-          cleanedExprId, allAttributes, allowFailures = true)
+        ExprId(-1),
+        a.qualifiers,
+        isGenerated = a.isGenerated)
+      BindReferences
+        .bindReference(cleanedExprId, allAttributes, allowFailures = true)
     case other =>
       BindReferences.bindReference(other, allAttributes, allowFailures = true)
   }
@@ -325,17 +328,17 @@ abstract class QueryPlan[PlanType <: QueryPlan[PlanType]]
   protected lazy val cleanArgs: Seq[Any] = {
     def cleanArg(arg: Any): Any = arg match {
       case e: Expression => cleanExpression(e).canonicalized
-      case other => other
+      case other         => other
     }
 
     productIterator.map {
       // Children are checked using sameResult above.
       case tn: TreeNode[_] if containsChild(tn) => null
-      case e: Expression => cleanArg(e)
-      case s: Option[_] => s.map(cleanArg)
-      case s: Seq[_] => s.map(cleanArg)
-      case m: Map[_, _] => m.mapValues(cleanArg)
-      case other => other
+      case e: Expression                        => cleanArg(e)
+      case s: Option[_]                         => s.map(cleanArg)
+      case s: Seq[_]                            => s.map(cleanArg)
+      case m: Map[_, _]                         => m.mapValues(cleanArg)
+      case other                                => other
     }.toSeq
   }
 }

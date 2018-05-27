@@ -34,11 +34,14 @@ import parallel.immutable.ParHashMap
   */
 @SerialVersionUID(2L)
 @deprecatedInheritance(
-    "The implementation details of immutable hash maps make inheriting from them unwise.",
-    "2.11.0")
+  "The implementation details of immutable hash maps make inheriting from them unwise.",
+  "2.11.0")
 class HashMap[A, +B]
-    extends AbstractMap[A, B] with Map[A, B] with MapLike[A, B, HashMap[A, B]]
-    with Serializable with CustomParallelizable[(A, B), ParHashMap[A, B]] {
+    extends AbstractMap[A, B]
+    with Map[A, B]
+    with MapLike[A, B, HashMap[A, B]]
+    with Serializable
+    with CustomParallelizable[(A, B), ParHashMap[A, B]] {
   import HashMap.{nullToEmpty, bufferSize}
 
   override def size: Int = 0
@@ -59,7 +62,9 @@ class HashMap[A, +B]
     updated0(kv._1, computeHash(kv._1), 0, kv._2, kv, null)
 
   override def +[B1 >: B](
-      elem1: (A, B1), elem2: (A, B1), elems: (A, B1)*): HashMap[A, B1] =
+      elem1: (A, B1),
+      elem2: (A, B1),
+      elems: (A, B1)*): HashMap[A, B1] =
     this + elem1 + elem2 ++ elems
 
   def -(key: A): HashMap[A, B] =
@@ -77,11 +82,12 @@ class HashMap[A, +B]
     nullToEmpty(filter0(p, true, 0, buffer, 0))
   }
 
-  protected def filter0(p: ((A, B)) => Boolean,
-                        negate: Boolean,
-                        level: Int,
-                        buffer: Array[HashMap[A, B @uV]],
-                        offset0: Int): HashMap[A, B] = null
+  protected def filter0(
+      p: ((A, B)) => Boolean,
+      negate: Boolean,
+      level: Int,
+      buffer: Array[HashMap[A, B @uV]],
+      offset0: Int): HashMap[A, B] = null
 
   protected def elemHashCode(key: A) = key.##
 
@@ -130,9 +136,10 @@ class HashMap[A, +B]
       mergef: MergeFunction[A, B1]): HashMap[A, B1] =
     merge0(that, 0, liftMerger(mergef))
 
-  protected def merge0[B1 >: B](that: HashMap[A, B1],
-                                level: Int,
-                                merger: Merger[A, B1]): HashMap[A, B1] = that
+  protected def merge0[B1 >: B](
+      that: HashMap[A, B1],
+      level: Int,
+      merger: Merger[A, B1]): HashMap[A, B1] = that
 
   override def par = ParHashMap.fromTrie(this)
 }
@@ -183,12 +190,13 @@ object HashMap extends ImmutableMapFactory[HashMap] with BitOperations.Int {
   }
 
   // utility method to create a HashTrieMap from two leaf HashMaps (HashMap1 or HashMapCollision1) with non-colliding hash code)
-  private def makeHashTrieMap[A, B](hash0: Int,
-                                    elem0: HashMap[A, B],
-                                    hash1: Int,
-                                    elem1: HashMap[A, B],
-                                    level: Int,
-                                    size: Int): HashTrieMap[A, B] = {
+  private def makeHashTrieMap[A, B](
+      hash0: Int,
+      elem0: HashMap[A, B],
+      hash1: Int,
+      elem1: HashMap[A, B],
+      level: Int,
+      size: Int): HashTrieMap[A, B] = {
     val index0 = (hash0 >>> level) & 0x1f
     val index1 = (hash1 >>> level) & 0x1f
     if (index0 != index1) {
@@ -210,10 +218,11 @@ object HashMap extends ImmutableMapFactory[HashMap] with BitOperations.Int {
     }
   }
 
-  class HashMap1[A, +B](private[collection] val key: A,
-                        private[collection] val hash: Int,
-                        private[collection] val value: (B @uV),
-                        private[collection] var kv: (A, B @uV))
+  class HashMap1[A, +B](
+      private[collection] val key: A,
+      private[collection] val hash: Int,
+      private[collection] val value: (B @uV),
+      private[collection] var kv: (A, B @uV))
       extends HashMap[A, B] {
     override def size = 1
 
@@ -248,19 +257,20 @@ object HashMap extends ImmutableMapFactory[HashMap] with BitOperations.Int {
         } else {
           // 32-bit hash collision (rare, but not impossible)
           new HashMapCollision1(
-              hash,
-              ListMap.empty.updated(this.key, this.value).updated(key, value))
+            hash,
+            ListMap.empty.updated(this.key, this.value).updated(key, value))
         }
       }
 
     override def removed0(key: A, hash: Int, level: Int): HashMap[A, B] =
       if (hash == this.hash && key == this.key) HashMap.empty[A, B] else this
 
-    override protected def filter0(p: ((A, B)) => Boolean,
-                                   negate: Boolean,
-                                   level: Int,
-                                   buffer: Array[HashMap[A, B @uV]],
-                                   offset0: Int): HashMap[A, B] =
+    override protected def filter0(
+        p: ((A, B)) => Boolean,
+        negate: Boolean,
+        level: Int,
+        buffer: Array[HashMap[A, B @uV]],
+        offset0: Int): HashMap[A, B] =
       if (negate ^ p(ensurePair)) this else null
 
     override def iterator: Iterator[(A, B)] = Iterator(ensurePair)
@@ -277,7 +287,8 @@ object HashMap extends ImmutableMapFactory[HashMap] with BitOperations.Int {
   }
 
   private[collection] class HashMapCollision1[A, +B](
-      private[collection] val hash: Int, val kvs: ListMap[A, B @uV])
+      private[collection] val hash: Int,
+      val kvs: ListMap[A, B @uV])
       extends HashMap[A, B @uV] {
     // assert(kvs.size > 1)
 
@@ -318,11 +329,12 @@ object HashMap extends ImmutableMapFactory[HashMap] with BitOperations.Int {
         }
       } else this
 
-    override protected def filter0(p: ((A, B)) => Boolean,
-                                   negate: Boolean,
-                                   level: Int,
-                                   buffer: Array[HashMap[A, B @uV]],
-                                   offset0: Int): HashMap[A, B] = {
+    override protected def filter0(
+        p: ((A, B)) => Boolean,
+        negate: Boolean,
+        level: Int,
+        buffer: Array[HashMap[A, B @uV]],
+        offset0: Int): HashMap[A, B] = {
       val kvs1 = if (negate) kvs.filterNot(p) else kvs.filter(p)
       kvs1.size match {
         case 0 =>
@@ -359,8 +371,7 @@ object HashMap extends ImmutableMapFactory[HashMap] with BitOperations.Int {
       private[collection] val bitmap: Int,
       private[collection] val elems: Array[HashMap[A, B @uV]],
       private[collection] val size0: Int
-  )
-      extends HashMap[A, B @uV] {
+  ) extends HashMap[A, B @uV] {
 
     // assert(Integer.bitCount(bitmap) == elems.length)
     // assert(elems.length > 1 || (elems.length == 1 && elems(0).isInstanceOf[HashTrieMap[_,_]]))
@@ -421,7 +432,11 @@ object HashMap extends ImmutableMapFactory[HashMap] with BitOperations.Int {
             val elemsNew = new Array[HashMap[A, B]](elems.length - 1)
             Array.copy(elems, 0, elemsNew, 0, offset)
             Array.copy(
-                elems, offset + 1, elemsNew, offset, elems.length - offset - 1)
+              elems,
+              offset + 1,
+              elemsNew,
+              offset,
+              elems.length - offset - 1)
             val sizeNew = size - sub.size
             // if we have only one child, which is not a HashTrieSet but a self-contained set like
             // HashSet1 or HashSetCollision1, return the child instead
@@ -444,11 +459,12 @@ object HashMap extends ImmutableMapFactory[HashMap] with BitOperations.Int {
       }
     }
 
-    override protected def filter0(p: ((A, B)) => Boolean,
-                                   negate: Boolean,
-                                   level: Int,
-                                   buffer: Array[HashMap[A, B @uV]],
-                                   offset0: Int): HashMap[A, B] = {
+    override protected def filter0(
+        p: ((A, B)) => Boolean,
+        negate: Boolean,
+        level: Int,
+        buffer: Array[HashMap[A, B @uV]],
+        offset0: Int): HashMap[A, B] = {
       // current offset
       var offset = offset0
       // result size
@@ -546,7 +562,12 @@ object HashMap extends ImmutableMapFactory[HashMap] with BitOperations.Int {
         merger: Merger[A, B1]): HashMap[A, B1] = that match {
       case hm: HashMap1[_, _] =>
         this.updated0(
-            hm.key, hm.hash, level, hm.value.asInstanceOf[B1], hm.kv, merger)
+          hm.key,
+          hm.hash,
+          level,
+          hm.value.asInstanceOf[B1],
+          hm.kv,
+          merger)
       case hm: HashTrieMap[_, _] =>
         val that = hm.asInstanceOf[HashTrieMap[A, B1]]
         val thiselems = this.elems
@@ -604,7 +625,7 @@ object HashMap extends ImmutableMapFactory[HashMap] with BitOperations.Int {
       case hm: HashMapCollision1[_, _] =>
         that.merge0(this, level, merger.invert)
       case hm: HashMap[_, _] => this
-      case _ => sys.error("section supposed to be unreachable.")
+      case _                 => sys.error("section supposed to be unreachable.")
     }
   }
 

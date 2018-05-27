@@ -10,18 +10,23 @@ import com.intellij.psi._
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns._
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypeResult,
+  TypingContext
+}
 
 /**
   * @author Alexander Podkhalyuzin
   * Date: 28.02.2008
   */
 class ScCompositePatternImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScCompositePattern {
+    extends ScalaPsiElementImpl(node)
+    with ScCompositePattern {
   override def accept(visitor: PsiElementVisitor): Unit = {
     visitor match {
       case visitor: ScalaElementVisitor => super.accept(visitor)
-      case _ => super.accept(visitor)
+      case _                            => super.accept(visitor)
     }
   }
 
@@ -30,7 +35,7 @@ class ScCompositePatternImpl(node: ASTNode)
   override def getType(ctx: TypingContext): TypeResult[ScType] = {
     expectedType match {
       case Some(expected) => Success(expected, Some(this))
-      case _ => super.getType(ctx) //Failure
+      case _              => super.getType(ctx) //Failure
     }
   }
 }

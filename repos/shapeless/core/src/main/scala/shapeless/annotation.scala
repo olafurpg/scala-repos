@@ -30,7 +30,7 @@ import scala.reflect.macros.whitebox
   *   case class First(i: Int)
   *
   *   @First(3) trait Something
-  *   
+  *
   *
   *   val somethingFirst = Annotation[First, Something].apply()
   *   assert(somethingFirst == First(3))
@@ -54,8 +54,9 @@ object Annotation {
       def apply() = annotation
     }
 
-  implicit def materialize[A, T]: Annotation[A, T] = macro AnnotationMacros
-    .materializeAnnotation[A, T]
+  implicit def materialize[A, T]: Annotation[A, T] =
+    macro AnnotationMacros
+      .materializeAnnotation[A, T]
 }
 
 /**
@@ -119,8 +120,9 @@ object Annotations {
       def apply() = annotations
     }
 
-  implicit def materialize[A, T, Out <: HList]: Aux[A, T, Out] = macro AnnotationMacros
-    .materializeAnnotations[A, T, Out]
+  implicit def materialize[A, T, Out <: HList]: Aux[A, T, Out] =
+    macro AnnotationMacros
+      .materializeAnnotations[A, T, Out]
 }
 
 @macrocompat.bundle
@@ -145,7 +147,7 @@ class AnnotationMacros(val c: whitebox.Context) extends CaseClassMacros {
     else args => q"new $tpe(..$args)"
   }
 
-  def materializeAnnotation[A : WeakTypeTag, T : WeakTypeTag]: Tree = {
+  def materializeAnnotation[A: WeakTypeTag, T: WeakTypeTag]: Tree = {
     val annTpe = weakTypeOf[A]
 
     if (!isProduct(annTpe)) abort(s"$annTpe is not a case class-like type")
@@ -166,8 +168,8 @@ class AnnotationMacros(val c: whitebox.Context) extends CaseClassMacros {
     }
   }
 
-  def materializeAnnotations[
-      A : WeakTypeTag, T : WeakTypeTag, Out : WeakTypeTag]: Tree = {
+  def materializeAnnotations[A: WeakTypeTag, T: WeakTypeTag, Out: WeakTypeTag]
+    : Tree = {
     val annTpe = weakTypeOf[A]
 
     if (!isProduct(annTpe)) abort(s"$annTpe is not a case class-like type")
@@ -205,7 +207,7 @@ class AnnotationMacros(val c: whitebox.Context) extends CaseClassMacros {
           }
         } else
         abort(
-            s"$tpe is not case class like or the root of a sealed family of types")
+          s"$tpe is not case class like or the root of a sealed family of types")
 
     val wrapTpeTrees = annTreeOpts.map {
       case Some(annTree) =>

@@ -42,14 +42,14 @@ class HTTPServletContext(val ctx: ServletContext) extends HTTPContext {
 
   def initParams: List[(String, String)] =
     enumToList[String](
-        ctx.getInitParameterNames.asInstanceOf[java.util.Enumeration[String]])
+      ctx.getInitParameterNames.asInstanceOf[java.util.Enumeration[String]])
       .map(n => (n, initParam(n) openOr ""))
 
   def attribute(name: String): Box[Any] = Box !! ctx.getAttribute(name)
 
   def attributes: List[(String, Any)] =
     enumToList[String](
-        ctx.getAttributeNames.asInstanceOf[java.util.Enumeration[String]])
+      ctx.getAttributeNames.asInstanceOf[java.util.Enumeration[String]])
       .map(n => (n, attribute(n) openOr ""))
 
   def setAttribute(name: String, value: Any) {

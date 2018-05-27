@@ -19,24 +19,26 @@ sealed abstract class Diagram {
 }
 
 case class ContentDiagram(
-    nodes: List[ /*Class*/ Node], edges: List[(Node, List[Node])])
+    nodes: List[ /*Class*/ Node],
+    edges: List[(Node, List[Node])])
     extends Diagram {
   override def isContentDiagram = true
   lazy val depthInfo = new ContentDiagramDepth(this)
 }
 
 /** A class diagram */
-case class InheritanceDiagram(thisNode: ThisNode,
-                              superClasses: List[ /*Class*/ Node],
-                              subClasses: List[ /*Class*/ Node],
-                              incomingImplicits: List[ImplicitNode],
-                              outgoingImplicits: List[ImplicitNode])
+case class InheritanceDiagram(
+    thisNode: ThisNode,
+    superClasses: List[ /*Class*/ Node],
+    subClasses: List[ /*Class*/ Node],
+    incomingImplicits: List[ImplicitNode],
+    outgoingImplicits: List[ImplicitNode])
     extends Diagram {
   def nodes =
     thisNode :: superClasses ::: subClasses ::: incomingImplicits ::: outgoingImplicits
   def edges =
     (thisNode -> (superClasses ::: outgoingImplicits)) ::
-    (subClasses ::: incomingImplicits).map(_ -> List(thisNode))
+      (subClasses ::: incomingImplicits).map(_ -> List(thisNode))
 
   override def isInheritanceDiagram = true
   lazy val depthInfo = new DepthInfo {
@@ -60,7 +62,7 @@ sealed abstract class Node {
     case Some(tpl) =>
       tpl match {
         case d: DocTemplateEntity => Some(d)
-        case _ => None
+        case _                    => None
       }
     case _ => None
   }
@@ -69,7 +71,8 @@ sealed abstract class Node {
   def isNormalNode = false
   def isClassNode =
     if (tpl.isDefined)
-      (tpl.get.isClass || tpl.get.qualifiedName == "scala.AnyRef") else false
+      (tpl.get.isClass || tpl.get.qualifiedName == "scala.AnyRef")
+    else false
   def isTraitNode = if (tpl.isDefined) tpl.get.isTrait else false
   def isObjectNode = if (tpl.isDefined) tpl.get.isObject else false
   def isTypeNode =

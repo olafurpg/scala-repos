@@ -5,7 +5,8 @@ import mesosphere.marathon.upgrade.DeploymentActor.Cancel
 import scala.concurrent.Promise
 
 class StopActor(toStop: ActorRef, promise: Promise[Boolean], reason: Throwable)
-    extends Actor with ActorLogging {
+    extends Actor
+    with ActorLogging {
 
   override def preStart(): Unit = {
     context.watch(toStop)

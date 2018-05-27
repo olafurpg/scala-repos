@@ -4,42 +4,46 @@ import scala.annotation.tailrec
 import org.json4s.scalap.scalasig._
 
 private[reflect] object ScalaSigReader {
-  def readConstructor(argName: String,
-                      clazz: Class[_],
-                      typeArgIndex: Int,
-                      argNames: List[String]): Class[_] = {
+  def readConstructor(
+      argName: String,
+      clazz: Class[_],
+      typeArgIndex: Int,
+      argNames: List[String]): Class[_] = {
     val cl = findClass(clazz)
     val cstr = findConstructor(cl, argNames).getOrElse(
-        fail("Can't find constructor for " + clazz))
+      fail("Can't find constructor for " + clazz))
     findArgType(cstr, argNames.indexOf(argName), typeArgIndex)
   }
-  def readConstructor(argName: String,
-                      clazz: Class[_],
-                      typeArgIndexes: List[Int],
-                      argNames: List[String]): Class[_] = {
+  def readConstructor(
+      argName: String,
+      clazz: Class[_],
+      typeArgIndexes: List[Int],
+      argNames: List[String]): Class[_] = {
     val cl = findClass(clazz)
     val cstr = findConstructor(cl, argNames).getOrElse(
-        fail("Can't find constructor for " + clazz))
+      fail("Can't find constructor for " + clazz))
     findArgType(cstr, argNames.indexOf(argName), typeArgIndexes)
   }
 
-  def readConstructor(argName: String,
-                      clazz: ScalaType,
-                      typeArgIndex: Int,
-                      argNames: List[String]): Class[_] = {
+  def readConstructor(
+      argName: String,
+      clazz: ScalaType,
+      typeArgIndex: Int,
+      argNames: List[String]): Class[_] = {
     val cl = findClass(clazz.erasure)
     val cstr = findConstructor(cl, argNames).getOrElse(
-        fail("Can't find constructor for " + clazz))
+      fail("Can't find constructor for " + clazz))
     findArgType(cstr, argNames.indexOf(argName), typeArgIndex)
   }
 
-  def readConstructor(argName: String,
-                      clazz: ScalaType,
-                      typeArgIndexes: List[Int],
-                      argNames: List[String]): Class[_] = {
+  def readConstructor(
+      argName: String,
+      clazz: ScalaType,
+      typeArgIndexes: List[Int],
+      argNames: List[String]): Class[_] = {
     val cl = findClass(clazz.erasure)
     val cstr = findConstructor(cl, argNames).getOrElse(
-        fail("Can't find constructor for " + clazz))
+      fail("Can't find constructor for " + clazz))
     findArgType(cstr, argNames.indexOf(argName), typeArgIndexes)
   }
 
@@ -57,11 +61,12 @@ private[reflect] object ScalaSigReader {
     val sig =
       findScalaSig(clazz).getOrElse(fail("Can't find ScalaSig for " + clazz))
     findClass(sig, clazz).getOrElse(
-        fail("Can't find " + clazz + " from parsed ScalaSig"))
+      fail("Can't find " + clazz + " from parsed ScalaSig"))
   }
 
   def findClass(sig: ScalaSig, clazz: Class[_]): Option[ClassSymbol] = {
-    sig.symbols.collect { case c: ClassSymbol if !c.isModule => c }
+    sig.symbols
+      .collect { case c: ClassSymbol if !c.isModule => c }
       .find(_.name == clazz.getSimpleName)
       .orElse {
         sig.topLevelClasses
@@ -70,14 +75,15 @@ private[reflect] object ScalaSigReader {
             sig.topLevelObjects.map { obj =>
               val t = obj.infoType.asInstanceOf[TypeRefType]
               t.symbol.children collect { case c: ClassSymbol => c } find
-              (_.symbolInfo.name == clazz.getSimpleName)
+                (_.symbolInfo.name == clazz.getSimpleName)
             }.head
           }
       }
   }
 
   def findConstructor(
-      c: ClassSymbol, argNames: List[String]): Option[MethodSymbol] = {
+      c: ClassSymbol,
+      argNames: List[String]): Option[MethodSymbol] = {
     val ms =
       c.children collect {
         case m: MethodSymbol if m.name == "<init>" => m
@@ -102,18 +108,19 @@ private[reflect] object ScalaSigReader {
           val ta = args(typeArgIndex)
           ta match {
             case ref @ TypeRefType(_, _, _) => findPrimitive(ref)
-            case x => fail("Unexpected type info " + x)
+            case x                          => fail("Unexpected type info " + x)
           }
         case x => fail("Unexpected type info " + x)
       }
     }
     toClass(
-        findPrimitive(
-            s.children(argIdx).asInstanceOf[SymbolInfoSymbol].infoType))
+      findPrimitive(s.children(argIdx).asInstanceOf[SymbolInfoSymbol].infoType))
   }
 
   def findArgType(
-      s: MethodSymbol, argIdx: Int, typeArgIndexes: List[Int]): Class[_] = {
+      s: MethodSymbol,
+      argIdx: Int,
+      typeArgIndexes: List[Int]): Class[_] = {
     @tailrec def findPrimitive(t: Type, curr: Int): Symbol = {
       val ii = (typeArgIndexes.length - 1) min curr
       t match {
@@ -126,44 +133,48 @@ private[reflect] object ScalaSigReader {
           val ta = args(typeArgIndexes(ii))
           ta match {
             case ref @ TypeRefType(_, _, _) => findPrimitive(ref, curr + 1)
-            case x => fail("Unexpected type info " + x)
+            case x                          => fail("Unexpected type info " + x)
           }
         case x => fail("Unexpected type info " + x)
       }
     }
-    toClass(findPrimitive(
-            s.children(argIdx).asInstanceOf[SymbolInfoSymbol].infoType, 0))
+    toClass(
+      findPrimitive(
+        s.children(argIdx).asInstanceOf[SymbolInfoSymbol].infoType,
+        0))
   }
 
-  private def findArgTypeForField(s: MethodSymbol, typeArgIdx: Int): Class[_] = {
+  private def findArgTypeForField(
+      s: MethodSymbol,
+      typeArgIdx: Int): Class[_] = {
     val t = s.infoType match {
       case NullaryMethodType(TypeRefType(_, _, args)) => args(typeArgIdx)
     }
 
     def findPrimitive(t: Type): Symbol = t match {
       case TypeRefType(ThisType(_), symbol, _) => symbol
-      case ref @ TypeRefType(_, _, _) => findPrimitive(ref)
-      case x => fail("Unexpected type info " + x)
+      case ref @ TypeRefType(_, _, _)          => findPrimitive(ref)
+      case x                                   => fail("Unexpected type info " + x)
     }
     toClass(findPrimitive(t))
   }
 
   private def toClass(s: Symbol) = s.path match {
-    case "scala.Short" => classOf[Short]
-    case "scala.Int" => classOf[Int]
-    case "scala.Long" => classOf[Long]
+    case "scala.Short"   => classOf[Short]
+    case "scala.Int"     => classOf[Int]
+    case "scala.Long"    => classOf[Long]
     case "scala.Boolean" => classOf[Boolean]
-    case "scala.Float" => classOf[Float]
-    case "scala.Double" => classOf[Double]
-    case "scala.Byte" => classOf[Byte]
-    case _ => classOf[AnyRef]
+    case "scala.Float"   => classOf[Float]
+    case "scala.Double"  => classOf[Double]
+    case "scala.Byte"    => classOf[Byte]
+    case _               => classOf[AnyRef]
   }
 
   private[this] def isPrimitive(s: Symbol) = toClass(s) != classOf[AnyRef]
 
   def findScalaSig(clazz: Class[_]): Option[ScalaSig] =
     parseClassFileFromByteCode(clazz).orElse(
-        findScalaSig(clazz.getDeclaringClass))
+      findScalaSig(clazz.getDeclaringClass))
 
   private[this] def parseClassFileFromByteCode(
       clazz: Class[_]): Option[ScalaSig] =
@@ -204,29 +215,30 @@ private[reflect] object ScalaSigReader {
   }
 
   def resolveClass[X <: AnyRef](
-      c: String, classLoaders: Iterable[ClassLoader]): Option[Class[X]] =
+      c: String,
+      classLoaders: Iterable[ClassLoader]): Option[Class[X]] =
     classLoaders match {
       case Nil =>
         sys.error(
-            "resolveClass: expected 1+ classloaders but received empty list")
+          "resolveClass: expected 1+ classloaders but received empty list")
       case List(cl) => Some(Class.forName(c, true, cl).asInstanceOf[Class[X]])
       case many => {
-          try {
-            var clazz: Class[_] = null
-            val iter = many.iterator
-            while (clazz == null && iter.hasNext) {
-              try {
-                clazz = Class.forName(c, true, iter.next())
-              } catch {
-                case e: ClassNotFoundException =>
-                // keep going, maybe it's in the next one
-              }
+        try {
+          var clazz: Class[_] = null
+          val iter = many.iterator
+          while (clazz == null && iter.hasNext) {
+            try {
+              clazz = Class.forName(c, true, iter.next())
+            } catch {
+              case e: ClassNotFoundException =>
+              // keep going, maybe it's in the next one
             }
-
-            if (clazz != null) Some(clazz.asInstanceOf[Class[X]]) else None
-          } catch {
-            case _: Throwable => None
           }
+
+          if (clazz != null) Some(clazz.asInstanceOf[Class[X]]) else None
+        } catch {
+          case _: Throwable => None
         }
+      }
     }
 }

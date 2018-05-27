@@ -17,7 +17,8 @@ object UnwriterTTest extends SpecLite {
   checkAll(bitraverse.laws[UnwriterTOpt])
 
   implicit def UnwriterArb[F[_], W, A](
-      implicit W: Arbitrary[W], A: Arbitrary[A]): Arbitrary[Unwriter[W, A]] =
+      implicit W: Arbitrary[W],
+      A: Arbitrary[A]): Arbitrary[Unwriter[W, A]] =
     Applicative[Arbitrary].apply2(W, A)(Unwriter(_, _))
 
   checkAll(comonad.laws[Unwriter[Int, ?]])

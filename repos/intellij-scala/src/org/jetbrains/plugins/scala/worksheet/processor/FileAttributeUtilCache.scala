@@ -30,7 +30,7 @@ object FileAttributeUtilCache {
       case other =>
         lightKeys get other match {
           case Some(e) => e.put(attribute, data)
-          case _ => lightKeys.put(other, mutable.HashMap(attribute -> data))
+          case _       => lightKeys.put(other, mutable.HashMap(attribute -> data))
         }
     }
   }

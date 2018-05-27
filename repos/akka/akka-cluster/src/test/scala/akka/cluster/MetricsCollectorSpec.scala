@@ -27,7 +27,8 @@ object MetricsEnabledSpec {
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class MetricsCollectorSpec
-    extends AkkaSpec(MetricsEnabledSpec.config) with ImplicitSender
+    extends AkkaSpec(MetricsEnabledSpec.config)
+    with ImplicitSender
     with MetricsCollectorFactory {
 
   val collector = createMetricsCollector
@@ -40,26 +41,26 @@ class MetricsCollectorSpec
         val sample2 = collector.sample.metrics
         val merged12 =
           sample2 flatMap
-          (latest ⇒
-                sample1 collect {
-                  case peer if latest sameAs peer ⇒
-                    val m = peer :+ latest
-                    m.value should ===(latest.value)
-                    m.isSmooth should ===(peer.isSmooth || latest.isSmooth)
-                    m
+            (latest ⇒
+              sample1 collect {
+                case peer if latest sameAs peer ⇒
+                  val m = peer :+ latest
+                  m.value should ===(latest.value)
+                  m.isSmooth should ===(peer.isSmooth || latest.isSmooth)
+                  m
               })
 
         val sample3 = collector.sample.metrics
         val sample4 = collector.sample.metrics
         val merged34 =
           sample4 flatMap
-          (latest ⇒
-                sample3 collect {
-                  case peer if latest sameAs peer ⇒
-                    val m = peer :+ latest
-                    m.value should ===(latest.value)
-                    m.isSmooth should ===(peer.isSmooth || latest.isSmooth)
-                    m
+            (latest ⇒
+              sample3 collect {
+                case peer if latest sameAs peer ⇒
+                  val m = peer :+ latest
+                  m.value should ===(latest.value)
+                  m.isSmooth should ===(peer.isSmooth || latest.isSmooth)
+                  m
               })
       }
     }
@@ -104,7 +105,7 @@ class MetricsCollectorSpec
     }
 
     "collect 50 node metrics samples in an acceptable duration" taggedAs LongRunningTest in within(
-        10 seconds) {
+      10 seconds) {
       (1 to 50) foreach { _ ⇒
         val sample = collector.sample
         sample.metrics.size should be >= (3)
@@ -128,14 +129,14 @@ trait MetricsCollectorFactory {
 
   def createMetricsCollector: MetricsCollector =
     Try(
-        new SigarMetricsCollector(
-            selfAddress,
-            defaultDecayFactor,
-            extendedActorSystem.dynamicAccess.createInstanceFor[AnyRef](
-                "org.hyperic.sigar.Sigar", Nil))).recover {
+      new SigarMetricsCollector(
+        selfAddress,
+        defaultDecayFactor,
+        extendedActorSystem.dynamicAccess
+          .createInstanceFor[AnyRef]("org.hyperic.sigar.Sigar", Nil))).recover {
       case e ⇒
         log.debug(
-            "Metrics will be retreived from MBeans, Sigar failed to load. Reason: " +
+          "Metrics will be retreived from MBeans, Sigar failed to load. Reason: " +
             e)
         new JmxMetricsCollector(selfAddress, defaultDecayFactor)
     }.get

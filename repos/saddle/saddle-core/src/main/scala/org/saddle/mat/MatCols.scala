@@ -22,10 +22,12 @@ import org.saddle.scalar._
   * An IndexedSeq of Vecs which must all have the same length; a container for
   * 2D data for a Frame.
   */
-class MatCols[A : ST](cols: IndexedSeq[Vec[A]])
-    extends IndexedSeq[Vec[A]] with Serializable {
-  require(cols.length < 2 || cols.forall(_.length == cols(0).length),
-          "Vecs must all be the same length")
+class MatCols[A: ST](cols: IndexedSeq[Vec[A]])
+    extends IndexedSeq[Vec[A]]
+    with Serializable {
+  require(
+    cols.length < 2 || cols.forall(_.length == cols(0).length),
+    "Vecs must all be the same length")
 
   def scalarTag = implicitly[ST[A]]
 
@@ -67,13 +69,13 @@ class MatCols[A : ST](cols: IndexedSeq[Vec[A]])
     MatCols(array.remove(this.toArray, locs))
 
   // take all vecs that match provided type, along with their locations
-  private[saddle] def takeType[B : ST]: (IndexedSeq[Vec[B]], Array[Int]) = {
+  private[saddle] def takeType[B: ST]: (IndexedSeq[Vec[B]], Array[Int]) = {
     val bSt = implicitly[ST[B]]
     val filt = cols.zipWithIndex.filter {
       case (col, ix) =>
         col.scalarTag.runtimeClass.isPrimitive && (bSt.isAny || bSt.isAnyVal) ||
-        !bSt.isAnyVal &&
-        bSt.runtimeClass.isAssignableFrom(col.scalarTag.runtimeClass)
+          !bSt.isAnyVal &&
+            bSt.runtimeClass.isAssignableFrom(col.scalarTag.runtimeClass)
     }
     val (vecs, locs) = filt.unzip
     (vecs.asInstanceOf[IndexedSeq[Vec[B]]], locs.toArray)
@@ -81,22 +83,24 @@ class MatCols[A : ST](cols: IndexedSeq[Vec[A]])
 }
 
 object MatCols {
-  def empty[A : ST]: MatCols[A] = apply(Array.empty[Vec[A]])
+  def empty[A: ST]: MatCols[A] = apply(Array.empty[Vec[A]])
 
-  def apply[A : ST](cols: Vec[A]*): MatCols[A] =
+  def apply[A: ST](cols: Vec[A]*): MatCols[A] =
     new MatCols[A](cols.toIndexedSeq)
 
-  def apply[A : ST](cols: Array[Vec[A]]): MatCols[A] = new MatCols[A](cols)
+  def apply[A: ST](cols: Array[Vec[A]]): MatCols[A] = new MatCols[A](cols)
 
-  def apply[A : ST](mat: Mat[A]): MatCols[A] = new MatCols[A](mat.cols())
+  def apply[A: ST](mat: Mat[A]): MatCols[A] = new MatCols[A](mat.cols())
 
   // implicit lifting to of Seq[Vec[_]] to VecSeq
-  implicit def Seq2VecSeq[A : ST](cols: Seq[Vec[A]]): MatCols[A] =
+  implicit def Seq2VecSeq[A: ST](cols: Seq[Vec[A]]): MatCols[A] =
     new MatCols[A](cols.toIndexedSeq)
 
   // Logic to get string widths of columns in a sequence of vectors
-  private[saddle] def colLens[A : ST](
-      cols: MatCols[A], numCols: Int, len: Int): Map[Int, Int] = {
+  private[saddle] def colLens[A: ST](
+      cols: MatCols[A],
+      numCols: Int,
+      len: Int): Map[Int, Int] = {
     val half = len / 2
     val maxf = (a: Int, b: String) => a.max(b.length)
 

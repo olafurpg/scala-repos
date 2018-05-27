@@ -11,7 +11,13 @@ import akka.japi.{Option ⇒ JOption}
 import akka.pattern.ask
 import akka.routing.RoundRobinGroup
 import akka.serialization.JavaSerializer
-import akka.testkit.{AkkaSpec, DefaultTimeout, EventFilter, TimingTest, filterEvents}
+import akka.testkit.{
+  AkkaSpec,
+  DefaultTimeout,
+  EventFilter,
+  TimingTest,
+  filterEvents
+}
 import akka.util.Timeout
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach}
 
@@ -179,8 +185,12 @@ object TypedActorSpec {
   }
 
   class LifeCyclesImpl(val latch: CountDownLatch)
-      extends PreStart with PostStop with PreRestart with PostRestart
-      with LifeCycles with Receiver {
+      extends PreStart
+      with PostStop
+      with PreRestart
+      with PostRestart
+      with LifeCycles
+      with Receiver {
 
     private def ensureContextAvailable[T](f: ⇒ T): T =
       TypedActor.context match {
@@ -203,8 +213,7 @@ object TypedActorSpec {
       ensureContextAvailable(for (i ← 1 to 7) latch.countDown())
 
     override def onReceive(msg: Any, sender: ActorRef): Unit = {
-      ensureContextAvailable(
-          msg match {
+      ensureContextAvailable(msg match {
         case "pigdog" ⇒ sender ! "dogpig"
       })
     }
@@ -219,8 +228,10 @@ object TypedActorSpec {
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class TypedActorSpec
-    extends AkkaSpec(TypedActorSpec.config) with BeforeAndAfterEach
-    with BeforeAndAfterAll with DefaultTimeout {
+    extends AkkaSpec(TypedActorSpec.config)
+    with BeforeAndAfterEach
+    with BeforeAndAfterAll
+    with DefaultTimeout {
 
   import akka.actor.TypedActorSpec._
 
@@ -228,16 +239,18 @@ class TypedActorSpec
 
   def newFooBar(d: FiniteDuration): Foo =
     TypedActor(system).typedActorOf(
-        TypedProps[Bar](classOf[Foo], classOf[Bar]).withTimeout(Timeout(d)))
+      TypedProps[Bar](classOf[Foo], classOf[Bar]).withTimeout(Timeout(d)))
 
   def newFooBar(dispatcher: String, d: FiniteDuration): Foo =
-    TypedActor(system).typedActorOf(TypedProps[Bar](classOf[Foo], classOf[Bar])
-          .withTimeout(Timeout(d))
-          .withDispatcher(dispatcher))
+    TypedActor(system).typedActorOf(
+      TypedProps[Bar](classOf[Foo], classOf[Bar])
+        .withTimeout(Timeout(d))
+        .withDispatcher(dispatcher))
 
   def newStacked(): Stacked =
-    TypedActor(system).typedActorOf(TypedProps[StackedImpl](
-            classOf[Stacked], classOf[StackedImpl]).withTimeout(timeout))
+    TypedActor(system).typedActorOf(
+      TypedProps[StackedImpl](classOf[Stacked], classOf[StackedImpl])
+        .withTimeout(timeout))
 
   def mustStop(typedActor: AnyRef) =
     TypedActor(system).stop(typedActor) should ===(true)
@@ -264,7 +277,7 @@ class TypedActorSpec
         (intercept[IllegalStateException] {
           TypedActor.self[Foo]
         }).getMessage should ===(
-            "Calling TypedActor.self outside of a TypedActor implementation method!")
+          "Calling TypedActor.self outside of a TypedActor implementation method!")
       }
     }
 
@@ -326,7 +339,7 @@ class TypedActorSpec
     }
 
     "be able to call multiple Future-returning methods non-blockingly" in within(
-        timeout.duration) {
+      timeout.duration) {
       val t = newFooBar
       val futures = for (i ← 1 to 20) yield (i, t.futurePigdog(20 millis, i))
       for ((i, f) ← futures) {
@@ -377,9 +390,10 @@ class TypedActorSpec
           }
         }))
         val t =
-          Await.result((boss ? TypedProps[Bar](classOf[Foo], classOf[Bar])
-                             .withTimeout(2 seconds)).mapTo[Foo],
-                       timeout.duration)
+          Await.result(
+            (boss ? TypedProps[Bar](classOf[Foo], classOf[Bar])
+              .withTimeout(2 seconds)).mapTo[Foo],
+            timeout.duration)
 
         t.incr()
         t.failingPigdog()
@@ -391,11 +405,11 @@ class TypedActorSpec
         t.read() should ===(1) //Make sure state is not reset after failure
 
         (intercept[IllegalStateException] { t.failingJOptionPigdog }).getMessage should ===(
-            "expected")
+          "expected")
         t.read() should ===(1) //Make sure state is not reset after failure
 
         (intercept[IllegalStateException] { t.failingOptionPigdog }).getMessage should ===(
-            "expected")
+          "expected")
 
         t.read() should ===(1) //Make sure state is not reset after failure
 
@@ -407,13 +421,13 @@ class TypedActorSpec
       filterEvents(EventFilter[IllegalStateException]("expected")) {
         val t = newFooBar(Duration(2, "s"))
         intercept[IllegalStateException] { t.failingOptionPigdog() }.getMessage should ===(
-            "expected")
+          "expected")
         t.optionPigdog() should ===(Some("Pigdog"))
         mustStop(t)
 
         val ta: F = TypedActor(system).typedActorOf(TypedProps[FI]())
         intercept[IllegalStateException] { ta.f(true) }.getMessage should ===(
-            "expected")
+          "expected")
         ta.f(false) should ===(1)
 
         mustStop(ta)
@@ -428,7 +442,7 @@ class TypedActorSpec
     }
 
     "be able to support implementation only typed actors" in within(
-        timeout.duration) {
+      timeout.duration) {
       val t: Foo = TypedActor(system).typedActorOf(TypedProps[Bar]())
       val f = t.futurePigdog(200 millis)
       val f2 = t.futurePigdog(Duration.Zero)
@@ -447,15 +461,14 @@ class TypedActorSpec
     }
 
     "be able to use balancing dispatcher" in within(timeout.duration) {
-      val thais = for (i ← 1 to 60) yield
-        newFooBar("pooled-dispatcher", 6 seconds)
+      val thais = for (i ← 1 to 60)
+        yield newFooBar("pooled-dispatcher", 6 seconds)
       val iterator = new CyclicIterator(thais)
 
-      val results = for (i ← 1 to 120) yield
-        (i, iterator.next.futurePigdog(200 millis, i))
+      val results = for (i ← 1 to 120)
+        yield (i, iterator.next.futurePigdog(200 millis, i))
 
-      for ((i, r) ← results) Await.result(r, remaining) should ===(
-          "Pigdog" + i)
+      for ((i, r) ← results) Await.result(r, remaining) should ===("Pigdog" + i)
 
       for (t ← thais) mustStop(t)
     }
@@ -463,9 +476,10 @@ class TypedActorSpec
     "be able to serialize and deserialize invocations" in {
       import java.io._
       JavaSerializer.currentSystem.withValue(
-          system.asInstanceOf[ExtendedActorSystem]) {
-        val m = TypedActor.MethodCall(classOf[Foo].getDeclaredMethod("pigdog"),
-                                      Array[AnyRef]())
+        system.asInstanceOf[ExtendedActorSystem]) {
+        val m = TypedActor.MethodCall(
+          classOf[Foo].getDeclaredMethod("pigdog"),
+          Array[AnyRef]())
         val baos = new ByteArrayOutputStream(8192 * 4)
         val out = new ObjectOutputStream(baos)
 
@@ -485,13 +499,13 @@ class TypedActorSpec
       import java.io._
       val someFoo: Foo = new Bar
       JavaSerializer.currentSystem.withValue(
-          system.asInstanceOf[ExtendedActorSystem]) {
+        system.asInstanceOf[ExtendedActorSystem]) {
         val m = TypedActor.MethodCall(
-            classOf[Foo].getDeclaredMethod("testMethodCallSerialization",
-                                           Array[Class[_]](classOf[Foo],
-                                                           classOf[String],
-                                                           classOf[Int]): _*),
-            Array[AnyRef](someFoo, null, 1.asInstanceOf[AnyRef]))
+          classOf[Foo].getDeclaredMethod(
+            "testMethodCallSerialization",
+            Array[Class[_]](classOf[Foo], classOf[String], classOf[Int]): _*),
+          Array[AnyRef](someFoo, null, 1.asInstanceOf[AnyRef])
+        )
         val baos = new ByteArrayOutputStream(8192 * 4)
         val out = new ObjectOutputStream(baos)
 
@@ -516,7 +530,7 @@ class TypedActorSpec
     "be able to serialize and deserialize proxies" in {
       import java.io._
       JavaSerializer.currentSystem.withValue(
-          system.asInstanceOf[ExtendedActorSystem]) {
+        system.asInstanceOf[ExtendedActorSystem]) {
         val t = newFooBar(Duration(2, "s"))
 
         t.optionPigdog() should ===(Some("Pigdog"))
@@ -544,8 +558,10 @@ class TypedActorSpec
       val latch = new CountDownLatch(16)
       val ta = TypedActor(system)
       val t: LifeCycles =
-        ta.typedActorOf(TypedProps[LifeCyclesImpl](classOf[LifeCycles],
-                                                   new LifeCyclesImpl(latch)))
+        ta.typedActorOf(
+          TypedProps[LifeCyclesImpl](
+            classOf[LifeCycles],
+            new LifeCyclesImpl(latch)))
       EventFilter[IllegalStateException]("Crash!", occurrences = 1) intercept {
         t.crash()
       }
@@ -567,8 +583,10 @@ class TypedActorSpec
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class TypedActorRouterSpec
-    extends AkkaSpec(TypedActorSpec.config) with BeforeAndAfterEach
-    with BeforeAndAfterAll with DefaultTimeout {
+    extends AkkaSpec(TypedActorSpec.config)
+    with BeforeAndAfterEach
+    with BeforeAndAfterAll
+    with DefaultTimeout {
 
   import akka.actor.TypedActorSpec._
 
@@ -576,7 +594,7 @@ class TypedActorRouterSpec
 
   def newFooBar(d: FiniteDuration): Foo =
     TypedActor(system).typedActorOf(
-        TypedProps[Bar](classOf[Foo], classOf[Bar]).withTimeout(Timeout(d)))
+      TypedProps[Bar](classOf[Foo], classOf[Bar]).withTimeout(Timeout(d)))
 
   def mustStop(typedActor: AnyRef) =
     TypedActor(system).stop(typedActor) should ===(true)

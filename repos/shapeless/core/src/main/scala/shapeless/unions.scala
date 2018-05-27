@@ -51,10 +51,12 @@ object union {
     * }}}
     */
   object Union extends Dynamic {
-    def applyDynamicNamed[U <: Coproduct](method: String)(elems: Any*): U = macro UnionMacros
-      .mkUnionNamedImpl[U]
+    def applyDynamicNamed[U <: Coproduct](method: String)(elems: Any*): U =
+      macro UnionMacros
+        .mkUnionNamedImpl[U]
 
-    def selectDynamic(tpeSelector: String): Any = macro LabelledMacros.unionTypeImpl
+    def selectDynamic(tpeSelector: String): Any =
+      macro LabelledMacros.unionTypeImpl
   }
 }
 
@@ -68,7 +70,7 @@ class UnionMacros(val c: whitebox.Context) {
   val SymTpe = typeOf[scala.Symbol]
   val atatTpe = typeOf[tag.@@[_, _]].typeConstructor
 
-  def mkUnionNamedImpl[U <: Coproduct : WeakTypeTag](method: Tree)(
+  def mkUnionNamedImpl[U <: Coproduct: WeakTypeTag](method: Tree)(
       elems: Tree*): Tree = {
     def mkSingletonSymbolType(c: Constant): Type =
       appliedType(atatTpe, List(SymTpe, constantType(c)))
@@ -80,23 +82,26 @@ class UnionMacros(val c: whitebox.Context) {
       q"$value.asInstanceOf[${mkFieldTpe(keyTpe, value.tpe)}]"
 
     def promoteElem(elem: Tree): Tree = elem match {
-      case q""" $prefix(${ Literal(k: Constant) }, $v) """ =>
+      case q""" $prefix(${Literal(k: Constant)}, $v) """ =>
         mkElem(mkSingletonSymbolType(k), v)
       case _ =>
-        c.abort(c.enclosingPosition,
-                s"$elem has the wrong shape for a record field")
+        c.abort(
+          c.enclosingPosition,
+          s"$elem has the wrong shape for a record field")
     }
 
-    val q"${ methodString: String }" = method
+    val q"${methodString: String}" = method
     if (methodString != "apply")
-      c.abort(c.enclosingPosition,
-              s"this method must be called as 'apply' not '$methodString'")
+      c.abort(
+        c.enclosingPosition,
+        s"this method must be called as 'apply' not '$methodString'")
 
     val elem = elems match {
       case Seq(e) => e
       case _ =>
-        c.abort(c.enclosingPosition,
-                s"only one branch of a union may be inhabited")
+        c.abort(
+          c.enclosingPosition,
+          s"only one branch of a union may be inhabited")
     }
 
     q""" _root_.shapeless.Coproduct[${weakTypeOf[U]}](${promoteElem(elem)}) """

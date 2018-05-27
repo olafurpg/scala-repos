@@ -40,8 +40,8 @@ abstract class Covariance(x: Expression, y: Expression)
     AttributeReference("yAvg", DoubleType, nullable = false)()
   protected val ck = AttributeReference("ck", DoubleType, nullable = false)()
 
-  override val aggBufferAttributes: Seq[AttributeReference] = Seq(
-      n, xAvg, yAvg, ck)
+  override val aggBufferAttributes: Seq[AttributeReference] =
+    Seq(n, xAvg, yAvg, ck)
 
   override val initialValues: Seq[Expression] = Array.fill(4)(Literal(0.0))
 
@@ -56,10 +56,10 @@ abstract class Covariance(x: Expression, y: Expression)
 
     val isNull = IsNull(x) || IsNull(y)
     Seq(
-        If(isNull, n, newN),
-        If(isNull, xAvg, newXAvg),
-        If(isNull, yAvg, newYAvg),
-        If(isNull, ck, newCk)
+      If(isNull, n, newN),
+      If(isNull, xAvg, newXAvg),
+      If(isNull, yAvg, newYAvg),
+      If(isNull, ck, newCk)
     )
   }
 
@@ -91,9 +91,10 @@ case class CovPopulation(left: Expression, right: Expression)
 case class CovSample(left: Expression, right: Expression)
     extends Covariance(left, right) {
   override val evaluateExpression: Expression = {
-    If(n === Literal(0.0),
-       Literal.create(null, DoubleType),
-       If(n === Literal(1.0), Literal(Double.NaN), ck / (n - Literal(1.0))))
+    If(
+      n === Literal(0.0),
+      Literal.create(null, DoubleType),
+      If(n === Literal(1.0), Literal(Double.NaN), ck / (n - Literal(1.0))))
   }
   override def prettyName: String = "covar_samp"
 }

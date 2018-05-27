@@ -57,20 +57,25 @@ private[spark] object ExtractPythonUDFs extends Rule[LogicalPlan] {
                 evaluation
               } else if (udf.references.intersect(child.outputSet).nonEmpty) {
                 sys.error(
-                    s"Invalid PythonUDF $udf, requires attributes from more than one child.")
+                  s"Invalid PythonUDF $udf, requires attributes from more than one child.")
               } else {
                 child
               }
             }
 
-            assert(evaluation != null,
-                   "Unable to evaluate PythonUDF.  Missing input attributes.")
+            assert(
+              evaluation != null,
+              "Unable to evaluate PythonUDF.  Missing input attributes.")
 
             // Trim away the new UDF value if it was only used for filtering or something.
-            logical.Project(plan.output, plan.transformExpressions {
-              case p: PythonUDF if p.fastEquals(udf) =>
-                evaluation.resultAttribute
-            }.withNewChildren(newChildren))
+            logical.Project(
+              plan.output,
+              plan
+                .transformExpressions {
+                  case p: PythonUDF if p.fastEquals(udf) =>
+                    evaluation.resultAttribute
+                }
+                .withNewChildren(newChildren))
 
           case None =>
             // If there is no Python UDF that is resolved, skip this round.

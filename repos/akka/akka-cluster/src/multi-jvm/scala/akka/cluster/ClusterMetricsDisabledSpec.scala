@@ -4,7 +4,7 @@
 
 package akka.cluster
 
-// TODO remove metrics 
+// TODO remove metrics
 
 import akka.remote.testkit.{MultiNodeSpec, MultiNodeConfig}
 import com.typesafe.config.ConfigFactory
@@ -15,10 +15,10 @@ object ClusterMetricsDisabledMultiJvmSpec extends MultiNodeConfig {
   val first = role("first")
   val second = role("second")
   commonConfig(
-      ConfigFactory
-        .parseString("akka.cluster.metrics.enabled = off")
-        .withFallback(
-            MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet))
+    ConfigFactory
+      .parseString("akka.cluster.metrics.enabled = off")
+      .withFallback(
+        MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet))
 }
 
 class ClusterMetricsDisabledMultiJvmNode1 extends ClusterMetricsDisabledSpec

@@ -15,9 +15,10 @@ import org.jetbrains.plugins.scala.lang.psi.types.{ScParameterizedType, ScType}
   * Nikolay.Tropin
   * 6/27/13
   */
-class WrapInOptionQuickFix(expr: ScExpression,
-                           expectedType: TypeResult[ScType],
-                           exprType: TypeResult[ScType])
+class WrapInOptionQuickFix(
+    expr: ScExpression,
+    expectedType: TypeResult[ScType],
+    exprType: TypeResult[ScType])
     extends IntentionAction {
   def getText: String = ScalaBundle.message("wrap.in.option.hint")
 
@@ -31,7 +32,8 @@ class WrapInOptionQuickFix(expr: ScExpression,
     if (expr.isValid) {
       val newText = "Option(" + expr.getText + ")"
       val newExpr = ScalaPsiElementFactory.createExpressionFromText(
-          newText, expr.getManager)
+        newText,
+        expr.getManager)
       expr.replaceExpression(newExpr, removeParenthesis = true)
     }
   }
@@ -40,9 +42,10 @@ class WrapInOptionQuickFix(expr: ScExpression,
 }
 
 object WrapInOptionQuickFix {
-  def isAvailable(expr: ScExpression,
-                  expectedType: TypeResult[ScType],
-                  exprType: TypeResult[ScType]): Boolean = {
+  def isAvailable(
+      expr: ScExpression,
+      expectedType: TypeResult[ScType],
+      exprType: TypeResult[ScType]): Boolean = {
     var result = false
     for {
       scType <- exprType
@@ -53,7 +56,7 @@ object WrapInOptionQuickFix {
           ScType.extractClass(des) match {
             case Some(scClass: ScClass)
                 if scClass.qualifiedName == "scala.Option" &&
-                scType.conforms(typeArg) =>
+                  scType.conforms(typeArg) =>
               result = true
             case _ =>
           }

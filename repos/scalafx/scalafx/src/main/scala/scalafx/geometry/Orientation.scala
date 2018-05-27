@@ -36,13 +36,15 @@ object Orientation
     extends SFXEnumDelegateCompanion[jfxg.Orientation, Orientation] {
 
   val Horizontal = new Orientation(jfxg.Orientation.HORIZONTAL)
-  @deprecated("Use Horizontal; HORIZONTAL will be removed in a future release",
-              "8.0.60-R10")
+  @deprecated(
+    "Use Horizontal; HORIZONTAL will be removed in a future release",
+    "8.0.60-R10")
   val HORIZONTAL = Horizontal
 
   val Vertical = new Orientation(jfxg.Orientation.VERTICAL)
-  @deprecated("Use Vertical; VERTICAL will be removed in a future release",
-              "8.0.60-R10")
+  @deprecated(
+    "Use Vertical; VERTICAL will be removed in a future release",
+    "8.0.60-R10")
   val VERTICAL = Vertical
 
   protected override def unsortedValues: Array[Orientation] =

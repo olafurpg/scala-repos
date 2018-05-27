@@ -9,6 +9,6 @@ object Test {
 
   def main(args: Array[String]): Unit = {
     List[Traversable[Int]](f1, f2, f3, f4, f5, f6, f7) foreach
-    (x => assert(x.isEmpty, x))
+      (x => assert(x.isEmpty, x))
   }
 }

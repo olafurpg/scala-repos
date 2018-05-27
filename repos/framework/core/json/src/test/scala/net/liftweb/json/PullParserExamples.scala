@@ -27,19 +27,18 @@ object PullParserExamples extends Specification {
   import JsonParser._
 
   "Pull parsing example" in {
-    val parser = (p: Parser) =>
-      {
-        def parse: BigInt = p.nextToken match {
-          case FieldStart("postalCode") =>
-            p.nextToken match {
-              case IntVal(code) => code
-              case _ => p.fail("expected int")
-            }
-          case End => p.fail("no field named 'postalCode'")
-          case _ => parse
-        }
+    val parser = (p: Parser) => {
+      def parse: BigInt = p.nextToken match {
+        case FieldStart("postalCode") =>
+          p.nextToken match {
+            case IntVal(code) => code
+            case _            => p.fail("expected int")
+          }
+        case End => p.fail("no field named 'postalCode'")
+        case _   => parse
+      }
 
-        parse
+      parse
     }
 
     val postalCode = parse(json, parser)

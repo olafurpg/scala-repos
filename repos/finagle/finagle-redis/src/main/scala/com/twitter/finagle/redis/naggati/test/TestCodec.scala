@@ -27,7 +27,7 @@ class Counter {
 }
 
 object TestCodec {
-  def apply[A : Manifest](firstStage: Stage, encoder: Encoder[A]) = {
+  def apply[A: Manifest](firstStage: Stage, encoder: Encoder[A]) = {
     val counter = new Counter()
     val codec = new Codec(firstStage, encoder, { n =>
       counter.readBytes += n
@@ -61,7 +61,7 @@ class TestCodec[A](val codec: Codec[A]) {
   private def toStrings(wrapped: Seq[Any]): Seq[String] = wrapped.map { item =>
     item match {
       case x: Array[Byte] => new String(x, "UTF-8")
-      case x => x.toString
+      case x              => x.toString
     }
   }
 
@@ -99,18 +99,20 @@ class TestCodec[A](val codec: Codec[A]) {
   def apply(buffer: ChannelBuffer) = {
     upstreamOutput.clear()
     codec.messageReceived(
-        context, new UpstreamMessageEvent(pipeline.getChannel, buffer, null))
+      context,
+      new UpstreamMessageEvent(pipeline.getChannel, buffer, null))
     upstreamOutput.toList
   }
 
   def send(obj: Any): Seq[String] = {
     downstreamOutput.clear()
     codec.handleDownstream(
-        context,
-        new DownstreamMessageEvent(pipeline.getChannel,
-                                   Channels.future(pipeline.getChannel),
-                                   obj,
-                                   null))
+      context,
+      new DownstreamMessageEvent(
+        pipeline.getChannel,
+        Channels.future(pipeline.getChannel),
+        obj,
+        null))
     getDownstream
   }
 

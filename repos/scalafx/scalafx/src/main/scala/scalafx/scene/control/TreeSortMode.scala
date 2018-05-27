@@ -47,7 +47,7 @@ object TreeSortMode
     * @see $URL0#ALL_DESCENDANTS $ORIGINALDOC
     */
   val AllDescendants: TreeSortMode = new TreeSortMode(
-      jfxsc.TreeSortMode.ALL_DESCENDANTS)
+    jfxsc.TreeSortMode.ALL_DESCENDANTS)
 
   /**
     * Sort first level nodes only regardless of whether the root is actually being shown or not
@@ -55,7 +55,7 @@ object TreeSortMode
     * @see $URL0#ONLY_FIRST_LEVEL $ORIGINALDOC
     */
   val OnlyFirstModel: TreeSortMode = new TreeSortMode(
-      jfxsc.TreeSortMode.ONLY_FIRST_LEVEL)
+    jfxsc.TreeSortMode.ONLY_FIRST_LEVEL)
 
   protected override def unsortedValues: Array[TreeSortMode] =
     Array(AllDescendants, OnlyFirstModel)

@@ -145,7 +145,7 @@ trait MetaRecord[BaseRecord <: Record[BaseRecord]] { self: BaseRecord =>
     val methods = rootClass.getMethods
 
     lifecycleCallbacks = (for (v <- methods if v.getName != "meta" &&
-                                   isLifecycle(v)) yield (v.getName, v)).toList
+                                 isLifecycle(v)) yield (v.getName, v)).toList
 
     introspect(this, methods) {
       case (v, mf) => tArray += FieldHolder(mf.name, v, mf)
@@ -274,7 +274,7 @@ trait MetaRecord[BaseRecord <: Record[BaseRecord]] { self: BaseRecord =>
 
     jvalue match {
       case JObject(jfields) => fromJFields(jfields)
-      case other => expectedA("JObject", other)
+      case other            => expectedA("JObject", other)
     }
   }
 
@@ -296,8 +296,8 @@ trait MetaRecord[BaseRecord <: Record[BaseRecord]] { self: BaseRecord =>
     setFieldsFromJValue(inst, JsonParser.parse(json))
 
   def foreachCallback(inst: BaseRecord, f: LifecycleCallbacks => Any) {
-    lifecycleCallbacks.foreach(
-        m => f(m._2.invoke(inst).asInstanceOf[LifecycleCallbacks]))
+    lifecycleCallbacks.foreach(m =>
+      f(m._2.invoke(inst).asInstanceOf[LifecycleCallbacks]))
   }
 
   /**
@@ -312,7 +312,7 @@ trait MetaRecord[BaseRecord <: Record[BaseRecord]] { self: BaseRecord =>
       case Full(template) => toForm(inst, template)
       case _ =>
         fieldList.flatMap(
-            _.field(inst).toForm.openOr(NodeSeq.Empty) ++ Text("\n"))
+          _.field(inst).toForm.openOr(NodeSeq.Empty) ++ Text("\n"))
     }
   }
 
@@ -357,15 +357,14 @@ trait MetaRecord[BaseRecord <: Record[BaseRecord]] { self: BaseRecord =>
 
       case elem: Elem =>
         elem.copy(
-            child = toForm(inst, elem.child.flatMap(n => toForm(inst, n))))
+          child = toForm(inst, elem.child.flatMap(n => toForm(inst, n))))
 
       case s: Seq[_] =>
-        s.flatMap(
-            e =>
-              e match {
+        s.flatMap(e =>
+          e match {
             case elem: Elem =>
-              elem.copy(child = toForm(
-                        inst, elem.child.flatMap(n => toForm(inst, n))))
+              elem.copy(
+                child = toForm(inst, elem.child.flatMap(n => toForm(inst, n))))
 
             case x => x
         })
@@ -380,7 +379,8 @@ trait MetaRecord[BaseRecord <: Record[BaseRecord]] { self: BaseRecord =>
     * @return Box[The Field] (Empty if the field is not found)
     */
   def fieldByName(
-      fieldName: String, inst: BaseRecord): Box[Field[_, BaseRecord]] = {
+      fieldName: String,
+      inst: BaseRecord): Box[Field[_, BaseRecord]] = {
     Box(fieldMap.get(fieldName).map(_.field(inst)))
   }
 
@@ -491,7 +491,9 @@ trait MetaRecord[BaseRecord <: Record[BaseRecord]] { self: BaseRecord =>
     fieldList.map(_.field(rec))
 
   case class FieldHolder(
-      name: String, method: Method, metaField: Field[_, BaseRecord]) {
+      name: String,
+      method: Method,
+      metaField: Field[_, BaseRecord]) {
     def field(inst: BaseRecord): Field[_, BaseRecord] =
       method.invoke(inst).asInstanceOf[Field[_, BaseRecord]]
   }

@@ -18,7 +18,9 @@ abstract class ScalaFixtureTestCase extends CodeInsightFixtureTestCase {
     super.setUp()
 
     libLoader = ScalaLibraryLoader.withMockJdk(
-        myFixture.getProject, myFixture.getModule, rootPath)
+      myFixture.getProject,
+      myFixture.getModule,
+      rootPath)
     libLoader.loadScala(TestUtils.DEFAULT_SCALA_SDK_VERSION)
   }
 

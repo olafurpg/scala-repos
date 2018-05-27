@@ -22,9 +22,18 @@ import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions._
-import org.apache.spark.sql.catalyst.expressions.codegen.{CodegenContext, ExprCode, GenerateUnsafeProjection}
+import org.apache.spark.sql.catalyst.expressions.codegen.{
+  CodegenContext,
+  ExprCode,
+  GenerateUnsafeProjection
+}
 import org.apache.spark.sql.catalyst.plans._
-import org.apache.spark.sql.catalyst.plans.physical.{BroadcastDistribution, Distribution, Partitioning, UnspecifiedDistribution}
+import org.apache.spark.sql.catalyst.plans.physical.{
+  BroadcastDistribution,
+  Distribution,
+  Partitioning,
+  UnspecifiedDistribution
+}
 import org.apache.spark.sql.execution.{BinaryNode, CodegenSupport, SparkPlan}
 import org.apache.spark.sql.execution.metric.SQLMetrics
 import org.apache.spark.util.collection.CompactBuffer
@@ -35,26 +44,30 @@ import org.apache.spark.util.collection.CompactBuffer
   * broadcasted relation.  This data is then placed in a Spark broadcast variable.  The streamed
   * relation is not shuffled.
   */
-case class BroadcastHashJoin(leftKeys: Seq[Expression],
-                             rightKeys: Seq[Expression],
-                             joinType: JoinType,
-                             buildSide: BuildSide,
-                             condition: Option[Expression],
-                             left: SparkPlan,
-                             right: SparkPlan)
-    extends BinaryNode with HashJoin with CodegenSupport {
+case class BroadcastHashJoin(
+    leftKeys: Seq[Expression],
+    rightKeys: Seq[Expression],
+    joinType: JoinType,
+    buildSide: BuildSide,
+    condition: Option[Expression],
+    left: SparkPlan,
+    right: SparkPlan)
+    extends BinaryNode
+    with HashJoin
+    with CodegenSupport {
 
   override private[sql] lazy val metrics = Map(
-      "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext,
-                                                     "number of output rows"))
+    "numOutputRows" -> SQLMetrics
+      .createLongMetric(sparkContext, "number of output rows"))
 
   override def outputPartitioning: Partitioning =
     streamedPlan.outputPartitioning
 
   override def requiredChildDistribution: Seq[Distribution] = {
-    val mode = HashedRelationBroadcastMode(canJoinKeyFitWithinLong,
-                                           rewriteKeyExpr(buildKeys),
-                                           buildPlan.output)
+    val mode = HashedRelationBroadcastMode(
+      canJoinKeyFitWithinLong,
+      rewriteKeyExpr(buildKeys),
+      buildPlan.output)
     buildSide match {
       case BuildLeft =>
         BroadcastDistribution(mode) :: UnspecifiedDistribution :: Nil
@@ -85,22 +98,24 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
           streamedIter.flatMap { currentRow =>
             val rowKey = keyGenerator(currentRow)
             joinedRow.withLeft(currentRow)
-            leftOuterIterator(rowKey,
-                              joinedRow,
-                              hashTable.get(rowKey),
-                              resultProj,
-                              numOutputRows)
+            leftOuterIterator(
+              rowKey,
+              joinedRow,
+              hashTable.get(rowKey),
+              resultProj,
+              numOutputRows)
           }
 
         case RightOuter =>
           streamedIter.flatMap { currentRow =>
             val rowKey = keyGenerator(currentRow)
             joinedRow.withRight(currentRow)
-            rightOuterIterator(rowKey,
-                               hashTable.get(rowKey),
-                               joinedRow,
-                               resultProj,
-                               numOutputRows)
+            rightOuterIterator(
+              rowKey,
+              hashTable.get(rowKey),
+              joinedRow,
+              resultProj,
+              numOutputRows)
           }
 
         case LeftSemi =>
@@ -108,7 +123,7 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
 
         case x =>
           throw new IllegalArgumentException(
-              s"BroadcastHashJoin should not take $x as the JoinType")
+            s"BroadcastHashJoin should not take $x as the JoinType")
       }
     }
   }
@@ -122,14 +137,16 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
   }
 
   override def doConsume(
-      ctx: CodegenContext, input: Seq[ExprCode], row: String): String = {
+      ctx: CodegenContext,
+      input: Seq[ExprCode],
+      row: String): String = {
     joinType match {
-      case Inner => codegenInner(ctx, input)
+      case Inner                  => codegenInner(ctx, input)
       case LeftOuter | RightOuter => codegenOuter(ctx, input)
-      case LeftSemi => codegenSemi(ctx, input)
+      case LeftSemi               => codegenSemi(ctx, input)
       case x =>
         throw new IllegalArgumentException(
-            s"BroadcastHashJoin should not take $x as the JoinType")
+          s"BroadcastHashJoin should not take $x as the JoinType")
     }
   }
 
@@ -143,12 +160,14 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
     val broadcast = ctx.addReferenceObj("broadcast", broadcastRelation)
     val relationTerm = ctx.freshName("relation")
     val clsName = broadcastRelation.value.getClass.getName
-    ctx.addMutableState(clsName,
-                        relationTerm,
-                        s"""
+    ctx.addMutableState(
+      clsName,
+      relationTerm,
+      s"""
          | $relationTerm = ($clsName) $broadcast.value();
          | incPeakExecutionMemory($relationTerm.getMemorySize());
-       """.stripMargin)
+       """.stripMargin
+    )
     (broadcastRelation, relationTerm)
   }
 
@@ -157,7 +176,8 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
     * has any null in it or not.
     */
   private def genStreamSideJoinKey(
-      ctx: CodegenContext, input: Seq[ExprCode]): (ExprCode, String) = {
+      ctx: CodegenContext,
+      input: Seq[ExprCode]): (ExprCode, String) = {
     ctx.currentVars = input
     if (canJoinKeyFitWithinLong) {
       // generate the join key as Long
@@ -165,7 +185,7 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
       val ev = BindReferences
         .bindReference(expr, streamedPlan.output)
         .gen(ctx)
-        (ev, ev.isNull)
+      (ev, ev.isNull)
     } else {
       // generate the join key as UnsafeRow
       val keyExpr =
@@ -179,7 +199,8 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
     * Generates the code for variable of build side.
     */
   private def genBuildSideVars(
-      ctx: CodegenContext, matched: String): Seq[ExprCode] = {
+      ctx: CodegenContext,
+      matched: String): Seq[ExprCode] = {
     ctx.currentVars = null
     ctx.INPUT_ROW = matched
     buildPlan.output.zipWithIndex.map {
@@ -208,7 +229,9 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
   /**
     * Generates the code for Inner join.
     */
-  private def codegenInner(ctx: CodegenContext, input: Seq[ExprCode]): String = {
+  private def codegenInner(
+      ctx: CodegenContext,
+      input: Seq[ExprCode]): String = {
     val (broadcastRelation, relationTerm) = prepareBroadcast(ctx)
     val (keyEv, anyNull) = genStreamSideJoinKey(ctx, input)
     val matched = ctx.freshName("matched")
@@ -220,7 +243,9 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
         val expr = condition.get
         // evaluate the variables from build side that used by condition
         val eval = evaluateRequiredVariables(
-            buildPlan.output, buildVars, expr.references)
+          buildPlan.output,
+          buildVars,
+          expr.references)
         // filter the output via condition
         ctx.currentVars = input ++ buildVars
         val ev = BindReferences
@@ -236,7 +261,7 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
       }
 
     val resultVars = buildSide match {
-      case BuildLeft => buildVars ++ input
+      case BuildLeft  => buildVars ++ input
       case BuildRight => input ++ buildVars
     }
     if (broadcastRelation.value.isInstanceOf[UniqueHashedRelation]) {
@@ -276,7 +301,9 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
   /**
     * Generates the code for left or right outer join.
     */
-  private def codegenOuter(ctx: CodegenContext, input: Seq[ExprCode]): String = {
+  private def codegenOuter(
+      ctx: CodegenContext,
+      input: Seq[ExprCode]): String = {
     val (broadcastRelation, relationTerm) = prepareBroadcast(ctx)
     val (keyEv, anyNull) = genStreamSideJoinKey(ctx, input)
     val matched = ctx.freshName("matched")
@@ -290,7 +317,9 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
         val expr = condition.get
         // evaluate the variables from build side that used by condition
         val eval = evaluateRequiredVariables(
-            buildPlan.output, buildVars, expr.references)
+          buildPlan.output,
+          buildVars,
+          expr.references)
         ctx.currentVars = input ++ buildVars
         val ev = BindReferences
           .bindReference(expr, streamedPlan.output ++ buildPlan.output)
@@ -308,7 +337,7 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
       }
 
     val resultVars = buildSide match {
-      case BuildLeft => buildVars ++ input
+      case BuildLeft  => buildVars ++ input
       case BuildRight => input ++ buildVars
     }
     if (broadcastRelation.value.isInstanceOf[UniqueHashedRelation]) {
@@ -371,7 +400,9 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
         val expr = condition.get
         // evaluate the variables from build side that used by condition
         val eval = evaluateRequiredVariables(
-            buildPlan.output, buildVars, expr.references)
+          buildPlan.output,
+          buildVars,
+          expr.references)
         // filter the output via condition
         ctx.currentVars = input ++ buildVars
         val ev = BindReferences

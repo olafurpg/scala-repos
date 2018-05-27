@@ -68,7 +68,7 @@ object TempFile {
 
   private[this] def parsePath(path: String) =
     path.split(File.separatorChar).last.split('.').reverse match {
-      case Array(basename) => (basename, "")
-      case Array(ext, base @ _ *) => (base.reverse.mkString("."), ext)
+      case Array(basename)       => (basename, "")
+      case Array(ext, base @ _*) => (base.reverse.mkString("."), ext)
     }
 }

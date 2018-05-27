@@ -29,7 +29,9 @@ import org.apache.spark.internal.Logging
 
 @Produces(Array(MediaType.APPLICATION_OCTET_STREAM))
 private[v1] class EventLogDownloadResource(
-    val uIRoot: UIRoot, val appId: String, val attemptId: Option[String])
+    val uIRoot: UIRoot,
+    val appId: String,
+    val attemptId: Option[String])
     extends Logging {
   val conf = SparkHadoopUtil.get.newConfiguration(new SparkConf)
 
@@ -39,7 +41,7 @@ private[v1] class EventLogDownloadResource(
       val fileName = {
         attemptId match {
           case Some(id) => s"eventLogs-$appId-$id.zip"
-          case None => s"eventLogs-$appId.zip"
+          case None     => s"eventLogs-$appId.zip"
         }
       }
 

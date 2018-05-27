@@ -13,9 +13,9 @@ object Test extends App {
   import X.{c => z}
 
   val expr = reify(
-      X.c,
-      y,
-      z
+    X.c,
+    y,
+    z
   )
 
   println(expr.eval)

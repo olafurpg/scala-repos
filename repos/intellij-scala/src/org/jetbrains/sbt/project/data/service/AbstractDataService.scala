@@ -4,18 +4,30 @@ import java.io.File
 import java.util
 
 import com.intellij.facet.ModifiableFacetModel
-import com.intellij.openapi.externalSystem.model.project.{ModuleData, ProjectData}
+import com.intellij.openapi.externalSystem.model.project.{
+  ModuleData,
+  ProjectData
+}
 import com.intellij.openapi.externalSystem.model.{DataNode, Key, ProjectKeys}
 import com.intellij.openapi.externalSystem.service.project.IdeModifiableModelsProvider
 import com.intellij.openapi.externalSystem.service.project.manage.AbstractProjectDataService
-import com.intellij.openapi.externalSystem.util.{DisposeAwareProjectChange, ExternalSystemApiUtil}
+import com.intellij.openapi.externalSystem.util.{
+  DisposeAwareProjectChange,
+  ExternalSystemApiUtil
+}
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ModifiableRootModel
 import com.intellij.openapi.roots.impl.libraries.LibraryEx
 import com.intellij.openapi.roots.libraries.Library
 import com.intellij.util.CommonProcessors.CollectProcessor
-import org.jetbrains.plugins.scala.project.{ScalaLibraryType, ScalaLanguageLevel, ScalaSdk, ScalaLibraryProperties, ScalaLibraryName}
+import org.jetbrains.plugins.scala.project.{
+  ScalaLibraryType,
+  ScalaLanguageLevel,
+  ScalaSdk,
+  ScalaLibraryProperties,
+  ScalaLibraryName
+}
 
 import scala.collection.JavaConversions._
 
@@ -25,10 +37,11 @@ import scala.collection.JavaConversions._
 abstract class AbstractDataService[E, I](key: Key[E])
     extends AbstractProjectDataService[E, I] {
 
-  def createImporter(toImport: Seq[DataNode[E]],
-                     projectData: ProjectData,
-                     project: Project,
-                     modelsProvider: IdeModifiableModelsProvider): Importer[E]
+  def createImporter(
+      toImport: Seq[DataNode[E]],
+      projectData: ProjectData,
+      project: Project,
+      modelsProvider: IdeModifiableModelsProvider): Importer[E]
 
   def getTargetDataKey = key
 
@@ -109,13 +122,14 @@ trait Importer[E] {
 
   def executeProjectChangeAction(action: => Unit): Unit =
     ExternalSystemApiUtil.executeProjectChangeAction(
-        new DisposeAwareProjectChange(project) {
-      override def execute(): Unit = action
-    })
+      new DisposeAwareProjectChange(project) {
+        override def execute(): Unit = action
+      })
 
-  def convertToScalaSdk(library: Library,
-                        languageLevel: ScalaLanguageLevel,
-                        compilerClasspath: Seq[File]): ScalaSdk = {
+  def convertToScalaSdk(
+      library: Library,
+      languageLevel: ScalaLanguageLevel,
+      compilerClasspath: Seq[File]): ScalaSdk = {
     val properties = new ScalaLibraryProperties()
     properties.languageLevel = languageLevel
     properties.compilerClasspath = compilerClasspath

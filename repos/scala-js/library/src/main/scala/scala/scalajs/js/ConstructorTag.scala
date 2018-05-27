@@ -16,7 +16,7 @@ package scala.scalajs.js
   *  materialized when `T` is statically known to be a JS class, i.e., a valid
   *  type argument to `js.constructorOf`.
   */
-final class ConstructorTag[T <: Any] private[scalajs](val constructor: Dynamic)
+final class ConstructorTag[T <: Any] private[scalajs] (val constructor: Dynamic)
     extends AnyVal {
 
   /** Instantiates the class `T` with the specified arguments.

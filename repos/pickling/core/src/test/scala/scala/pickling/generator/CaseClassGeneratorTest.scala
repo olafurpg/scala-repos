@@ -97,19 +97,19 @@ class CaseClassGeneratorTest extends FunSuite {
   test("extendedCaseClass") {
     implicit val pu = {
       // TODO - We use runtime generation here because we don't have a sufficient algorithm to handle final/serializable but NON-case class classes.
-      implicit val nested: Pickler[OpenCaseClassSub] with Unpickler[
-          OpenCaseClassSub] = {
+      implicit val nested
+        : Pickler[OpenCaseClassSub] with Unpickler[OpenCaseClassSub] = {
         val cls = classOf[OpenCaseClassSub]
         import scala.pickling.internal.currentRuntime
         val key = FastTypeTag[OpenCaseClassSub]
         PicklerUnpickler(
-            currentRuntime.picklers
-              .genPickler(cls.getClassLoader, cls, key)
-              .asInstanceOf[Pickler[OpenCaseClassSub]],
-            currentRuntime.picklers
-              .genUnpickler(currentRuntime.currentMirror, key.key)
-              .asInstanceOf[Unpickler[OpenCaseClassSub]]
-          )
+          currentRuntime.picklers
+            .genPickler(cls.getClassLoader, cls, key)
+            .asInstanceOf[Pickler[OpenCaseClassSub]],
+          currentRuntime.picklers
+            .genUnpickler(currentRuntime.currentMirror, key.key)
+            .asInstanceOf[Unpickler[OpenCaseClassSub]]
+        )
       }
       PicklingMacros.genPicklerUnpickler[OpenCaseClass]
     }
@@ -170,9 +170,9 @@ final case class NestedPrivateVarCaseClass(x: Int) {
   private var y = NestedPrivateVarCaseClass.globalY
   override def equals(x: Any): Boolean =
     x match {
-      case null => false
+      case null                         => false
       case x: NestedPrivateVarCaseClass => (x.y == y) && (x.x == x.x)
-      case _ => false
+      case _                            => false
     }
   override def toString = s"NestedPrivateVarCaseClass($x) { var y = $y }"
 }
@@ -203,7 +203,7 @@ final class OpenCaseClassSub(x: Int, var y: Int) extends OpenCaseClass(x) {
   override def equals(other: Any): Boolean =
     other match {
       case value: OpenCaseClassSub => (value.y == y) && (value.x == x)
-      case _ => false
+      case _                       => false
     }
   override def toString = s"OpenCaseClassSub($x, $y)"
 }

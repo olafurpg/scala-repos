@@ -59,16 +59,19 @@ private[akka] abstract class ByteStringParser[T]
         if (cont) doParse()
       } else pull(bytesIn)
 
-    setHandler(bytesIn, new InHandler {
-      override def onPush(): Unit = {
-        pullOnParserRequest = false
-        buffer ++= grab(bytesIn)
-        doParse()
+    setHandler(
+      bytesIn,
+      new InHandler {
+        override def onPush(): Unit = {
+          pullOnParserRequest = false
+          buffer ++= grab(bytesIn)
+          doParse()
+        }
+        override def onUpstreamFinish(): Unit =
+          if (buffer.isEmpty && acceptUpstreamFinish) completeStage()
+          else current.onTruncation()
       }
-      override def onUpstreamFinish(): Unit =
-        if (buffer.isEmpty && acceptUpstreamFinish) completeStage()
-        else current.onTruncation()
-    })
+    )
   }
 }
 
@@ -83,9 +86,10 @@ private[akka] object ByteStringParser {
     * @param acceptUpstreamFinish - if true - stream will complete when received `onUpstreamFinish`, if "false"
     *                             - onTruncation will be called
     */
-  case class ParseResult[+T](result: Option[T],
-                             nextStep: ParseStep[T],
-                             acceptUpstreamFinish: Boolean = true)
+  case class ParseResult[+T](
+      result: Option[T],
+      nextStep: ParseStep[T],
+      acceptUpstreamFinish: Boolean = true)
 
   trait ParseStep[+T] {
 
@@ -102,7 +106,7 @@ private[akka] object ByteStringParser {
   object FinishedParser extends ParseStep[Nothing] {
     override def parse(reader: ByteReader) =
       throw new IllegalStateException(
-          "no initial parser installed: you must use startWith(...)")
+        "no initial parser installed: you must use startWith(...)")
   }
 
   val NeedMoreData = new Exception with NoStackTrace

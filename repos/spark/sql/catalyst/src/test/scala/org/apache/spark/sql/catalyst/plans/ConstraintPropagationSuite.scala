@@ -26,28 +26,26 @@ import org.apache.spark.sql.catalyst.plans.logical._
 
 class ConstraintPropagationSuite extends SparkFunSuite {
 
-  private def resolveColumn(
-      tr: LocalRelation, columnName: String): Expression =
+  private def resolveColumn(tr: LocalRelation, columnName: String): Expression =
     resolveColumn(tr.analyze, columnName)
 
-  private def resolveColumn(
-      plan: LogicalPlan, columnName: String): Expression =
+  private def resolveColumn(plan: LogicalPlan, columnName: String): Expression =
     plan.resolveQuoted(columnName, caseInsensitiveResolution).get
 
   private def verifyConstraints(
-      found: ExpressionSet, expected: ExpressionSet): Unit = {
+      found: ExpressionSet,
+      expected: ExpressionSet): Unit = {
     val missing = expected -- found
     val extra = found -- expected
     if (missing.nonEmpty || extra.nonEmpty) {
-      fail(
-          s"""
+      fail(s"""
            |== FAIL: Constraints do not match ===
            |Found: ${found.mkString(",")}
            |Expected: ${expected.mkString(",")}
            |== Result ==
            |Missing: ${if (missing.isEmpty) "N/A" else missing.mkString(",")}
            |Found but not expected: ${if (extra.isEmpty) "N/A"
-         else extra.mkString(",")}
+              else extra.mkString(",")}
          """.stripMargin)
     }
   }
@@ -58,26 +56,30 @@ class ConstraintPropagationSuite extends SparkFunSuite {
     assert(tr.analyze.constraints.isEmpty)
 
     assert(
-        tr.where('a.attr > 10)
-          .select('c.attr, 'b.attr)
-          .analyze
-          .constraints
-          .isEmpty)
+      tr.where('a.attr > 10)
+        .select('c.attr, 'b.attr)
+        .analyze
+        .constraints
+        .isEmpty)
 
-    verifyConstraints(tr.where('a.attr > 10).analyze.constraints,
-                      ExpressionSet(Seq(resolveColumn(tr, "a") > 10,
-                                        IsNotNull(resolveColumn(tr, "a")))))
+    verifyConstraints(
+      tr.where('a.attr > 10).analyze.constraints,
+      ExpressionSet(
+        Seq(resolveColumn(tr, "a") > 10, IsNotNull(resolveColumn(tr, "a")))))
 
-    verifyConstraints(tr.where('a.attr > 10)
-                        .select('c.attr, 'a.attr)
-                        .where('c.attr =!= 100)
-                        .analyze
-                        .constraints,
-                      ExpressionSet(
-                          Seq(resolveColumn(tr, "a") > 10,
-                              resolveColumn(tr, "c") =!= 100,
-                              IsNotNull(resolveColumn(tr, "a")),
-                              IsNotNull(resolveColumn(tr, "c")))))
+    verifyConstraints(
+      tr.where('a.attr > 10)
+        .select('c.attr, 'a.attr)
+        .where('c.attr =!= 100)
+        .analyze
+        .constraints,
+      ExpressionSet(
+        Seq(
+          resolveColumn(tr, "a") > 10,
+          resolveColumn(tr, "c") =!= 100,
+          IsNotNull(resolveColumn(tr, "a")),
+          IsNotNull(resolveColumn(tr, "c"))))
+    )
   }
 
   test("propagating constraints in aggregate") {
@@ -92,36 +94,43 @@ class ConstraintPropagationSuite extends SparkFunSuite {
       .analyze
 
     verifyConstraints(
-        aliasedRelation.analyze.constraints,
-        ExpressionSet(
-            Seq(resolveColumn(aliasedRelation.analyze, "c1") > 10,
-                IsNotNull(resolveColumn(aliasedRelation.analyze, "c1")),
-                resolveColumn(aliasedRelation.analyze, "a") < 5,
-                IsNotNull(resolveColumn(aliasedRelation.analyze, "a")))))
+      aliasedRelation.analyze.constraints,
+      ExpressionSet(
+        Seq(
+          resolveColumn(aliasedRelation.analyze, "c1") > 10,
+          IsNotNull(resolveColumn(aliasedRelation.analyze, "c1")),
+          resolveColumn(aliasedRelation.analyze, "a") < 5,
+          IsNotNull(resolveColumn(aliasedRelation.analyze, "a"))
+        ))
+    )
   }
 
   test("propagating constraints in aliases") {
     val tr = LocalRelation('a.int, 'b.string, 'c.int)
 
     assert(
-        tr.where('c.attr > 10)
-          .select('a.as('x), 'b.as('y))
-          .analyze
-          .constraints
-          .isEmpty)
+      tr.where('c.attr > 10)
+        .select('a.as('x), 'b.as('y))
+        .analyze
+        .constraints
+        .isEmpty)
 
     val aliasedRelation =
       tr.where('a.attr > 10).select('a.as('x), 'b, 'b.as('y), 'a.as('z))
 
     verifyConstraints(
-        aliasedRelation.analyze.constraints,
-        ExpressionSet(
-            Seq(resolveColumn(aliasedRelation.analyze, "x") > 10,
-                IsNotNull(resolveColumn(aliasedRelation.analyze, "x")),
-                resolveColumn(aliasedRelation.analyze, "b") <=> resolveColumn(
-                    aliasedRelation.analyze, "y"),
-                resolveColumn(aliasedRelation.analyze, "z") > 10,
-                IsNotNull(resolveColumn(aliasedRelation.analyze, "z")))))
+      aliasedRelation.analyze.constraints,
+      ExpressionSet(
+        Seq(
+          resolveColumn(aliasedRelation.analyze, "x") > 10,
+          IsNotNull(resolveColumn(aliasedRelation.analyze, "x")),
+          resolveColumn(aliasedRelation.analyze, "b") <=> resolveColumn(
+            aliasedRelation.analyze,
+            "y"),
+          resolveColumn(aliasedRelation.analyze, "z") > 10,
+          IsNotNull(resolveColumn(aliasedRelation.analyze, "z"))
+        ))
+    )
   }
 
   test("propagating constraints in union") {
@@ -130,152 +139,169 @@ class ConstraintPropagationSuite extends SparkFunSuite {
     val tr3 = LocalRelation('g.int, 'h.int, 'i.int)
 
     assert(
-        tr1
-          .where('a.attr > 10)
-          .unionAll(tr2.where('e.attr > 10).unionAll(tr3.where('i.attr > 10)))
-          .analyze
-          .constraints
-          .isEmpty)
+      tr1
+        .where('a.attr > 10)
+        .unionAll(tr2.where('e.attr > 10).unionAll(tr3.where('i.attr > 10)))
+        .analyze
+        .constraints
+        .isEmpty)
 
     verifyConstraints(
-        tr1
-          .where('a.attr > 10)
-          .unionAll(tr2.where('d.attr > 10).unionAll(tr3.where('g.attr > 10)))
-          .analyze
-          .constraints,
-        ExpressionSet(Seq(resolveColumn(tr1, "a") > 10,
-                          IsNotNull(resolveColumn(tr1, "a")))))
+      tr1
+        .where('a.attr > 10)
+        .unionAll(tr2.where('d.attr > 10).unionAll(tr3.where('g.attr > 10)))
+        .analyze
+        .constraints,
+      ExpressionSet(
+        Seq(resolveColumn(tr1, "a") > 10, IsNotNull(resolveColumn(tr1, "a"))))
+    )
   }
 
   test("propagating constraints in intersect") {
     val tr1 = LocalRelation('a.int, 'b.int, 'c.int)
     val tr2 = LocalRelation('a.int, 'b.int, 'c.int)
 
-    verifyConstraints(tr1
-                        .where('a.attr > 10)
-                        .intersect(tr2.where('b.attr < 100))
-                        .analyze
-                        .constraints,
-                      ExpressionSet(
-                          Seq(resolveColumn(tr1, "a") > 10,
-                              resolveColumn(tr1, "b") < 100,
-                              IsNotNull(resolveColumn(tr1, "a")),
-                              IsNotNull(resolveColumn(tr1, "b")))))
+    verifyConstraints(
+      tr1
+        .where('a.attr > 10)
+        .intersect(tr2.where('b.attr < 100))
+        .analyze
+        .constraints,
+      ExpressionSet(
+        Seq(
+          resolveColumn(tr1, "a") > 10,
+          resolveColumn(tr1, "b") < 100,
+          IsNotNull(resolveColumn(tr1, "a")),
+          IsNotNull(resolveColumn(tr1, "b"))))
+    )
   }
 
   test("propagating constraints in except") {
     val tr1 = LocalRelation('a.int, 'b.int, 'c.int)
     val tr2 = LocalRelation('a.int, 'b.int, 'c.int)
-    verifyConstraints(tr1
-                        .where('a.attr > 10)
-                        .except(tr2.where('b.attr < 100))
-                        .analyze
-                        .constraints,
-                      ExpressionSet(Seq(resolveColumn(tr1, "a") > 10,
-                                        IsNotNull(resolveColumn(tr1, "a")))))
+    verifyConstraints(
+      tr1
+        .where('a.attr > 10)
+        .except(tr2.where('b.attr < 100))
+        .analyze
+        .constraints,
+      ExpressionSet(
+        Seq(resolveColumn(tr1, "a") > 10, IsNotNull(resolveColumn(tr1, "a"))))
+    )
   }
 
   test("propagating constraints in inner join") {
     val tr1 = LocalRelation('a.int, 'b.int, 'c.int).subquery('tr1)
     val tr2 = LocalRelation('a.int, 'd.int, 'e.int).subquery('tr2)
     verifyConstraints(
-        tr1
-          .where('a.attr > 10)
-          .join(tr2.where('d.attr < 100),
-                Inner,
-                Some("tr1.a".attr === "tr2.a".attr))
-          .analyze
-          .constraints,
-        ExpressionSet(
-            Seq(tr1.resolveQuoted("a", caseInsensitiveResolution).get > 10,
-                tr2.resolveQuoted("d", caseInsensitiveResolution).get < 100,
-                tr1.resolveQuoted("a", caseInsensitiveResolution).get === tr2
-                  .resolveQuoted("a", caseInsensitiveResolution)
-                  .get,
-                tr2.resolveQuoted("a", caseInsensitiveResolution).get > 10,
-                IsNotNull(
-                    tr2.resolveQuoted("a", caseInsensitiveResolution).get),
-                IsNotNull(
-                    tr1.resolveQuoted("a", caseInsensitiveResolution).get),
-                IsNotNull(
-                    tr2.resolveQuoted("d", caseInsensitiveResolution).get))))
+      tr1
+        .where('a.attr > 10)
+        .join(
+          tr2.where('d.attr < 100),
+          Inner,
+          Some("tr1.a".attr === "tr2.a".attr))
+        .analyze
+        .constraints,
+      ExpressionSet(
+        Seq(
+          tr1.resolveQuoted("a", caseInsensitiveResolution).get > 10,
+          tr2.resolveQuoted("d", caseInsensitiveResolution).get < 100,
+          tr1.resolveQuoted("a", caseInsensitiveResolution).get === tr2
+            .resolveQuoted("a", caseInsensitiveResolution)
+            .get,
+          tr2.resolveQuoted("a", caseInsensitiveResolution).get > 10,
+          IsNotNull(tr2.resolveQuoted("a", caseInsensitiveResolution).get),
+          IsNotNull(tr1.resolveQuoted("a", caseInsensitiveResolution).get),
+          IsNotNull(tr2.resolveQuoted("d", caseInsensitiveResolution).get)
+        ))
+    )
   }
 
   test("propagating constraints in left-semi join") {
     val tr1 = LocalRelation('a.int, 'b.int, 'c.int).subquery('tr1)
     val tr2 = LocalRelation('a.int, 'd.int, 'e.int).subquery('tr2)
     verifyConstraints(
-        tr1
-          .where('a.attr > 10)
-          .join(tr2.where('d.attr < 100),
-                LeftSemi,
-                Some("tr1.a".attr === "tr2.a".attr))
-          .analyze
-          .constraints,
-        ExpressionSet(
-            Seq(tr1.resolveQuoted("a", caseInsensitiveResolution).get > 10,
-                IsNotNull(
-                    tr1.resolveQuoted("a", caseInsensitiveResolution).get))))
+      tr1
+        .where('a.attr > 10)
+        .join(
+          tr2.where('d.attr < 100),
+          LeftSemi,
+          Some("tr1.a".attr === "tr2.a".attr))
+        .analyze
+        .constraints,
+      ExpressionSet(
+        Seq(
+          tr1.resolveQuoted("a", caseInsensitiveResolution).get > 10,
+          IsNotNull(tr1.resolveQuoted("a", caseInsensitiveResolution).get)))
+    )
   }
 
   test("propagating constraints in left-outer join") {
     val tr1 = LocalRelation('a.int, 'b.int, 'c.int).subquery('tr1)
     val tr2 = LocalRelation('a.int, 'd.int, 'e.int).subquery('tr2)
     verifyConstraints(
-        tr1
-          .where('a.attr > 10)
-          .join(tr2.where('d.attr < 100),
-                LeftOuter,
-                Some("tr1.a".attr === "tr2.a".attr))
-          .analyze
-          .constraints,
-        ExpressionSet(
-            Seq(tr1.resolveQuoted("a", caseInsensitiveResolution).get > 10,
-                IsNotNull(
-                    tr1.resolveQuoted("a", caseInsensitiveResolution).get))))
+      tr1
+        .where('a.attr > 10)
+        .join(
+          tr2.where('d.attr < 100),
+          LeftOuter,
+          Some("tr1.a".attr === "tr2.a".attr))
+        .analyze
+        .constraints,
+      ExpressionSet(
+        Seq(
+          tr1.resolveQuoted("a", caseInsensitiveResolution).get > 10,
+          IsNotNull(tr1.resolveQuoted("a", caseInsensitiveResolution).get)))
+    )
   }
 
   test("propagating constraints in right-outer join") {
     val tr1 = LocalRelation('a.int, 'b.int, 'c.int).subquery('tr1)
     val tr2 = LocalRelation('a.int, 'd.int, 'e.int).subquery('tr2)
     verifyConstraints(
-        tr1
-          .where('a.attr > 10)
-          .join(tr2.where('d.attr < 100),
-                RightOuter,
-                Some("tr1.a".attr === "tr2.a".attr))
-          .analyze
-          .constraints,
-        ExpressionSet(
-            Seq(tr2.resolveQuoted("d", caseInsensitiveResolution).get < 100,
-                IsNotNull(
-                    tr2.resolveQuoted("d", caseInsensitiveResolution).get))))
+      tr1
+        .where('a.attr > 10)
+        .join(
+          tr2.where('d.attr < 100),
+          RightOuter,
+          Some("tr1.a".attr === "tr2.a".attr))
+        .analyze
+        .constraints,
+      ExpressionSet(
+        Seq(
+          tr2.resolveQuoted("d", caseInsensitiveResolution).get < 100,
+          IsNotNull(tr2.resolveQuoted("d", caseInsensitiveResolution).get)))
+    )
   }
 
   test("propagating constraints in full-outer join") {
     val tr1 = LocalRelation('a.int, 'b.int, 'c.int).subquery('tr1)
     val tr2 = LocalRelation('a.int, 'd.int, 'e.int).subquery('tr2)
     assert(
-        tr1
-          .where('a.attr > 10)
-          .join(tr2.where('d.attr < 100),
-                FullOuter,
-                Some("tr1.a".attr === "tr2.a".attr))
-          .analyze
-          .constraints
-          .isEmpty)
+      tr1
+        .where('a.attr > 10)
+        .join(
+          tr2.where('d.attr < 100),
+          FullOuter,
+          Some("tr1.a".attr === "tr2.a".attr))
+        .analyze
+        .constraints
+        .isEmpty)
   }
 
   test("infer additional constraints in filters") {
     val tr = LocalRelation('a.int, 'b.int, 'c.int)
 
     verifyConstraints(
-        tr.where('a.attr > 10 && 'a.attr === 'b.attr).analyze.constraints,
-        ExpressionSet(
-            Seq(resolveColumn(tr, "a") > 10,
-                resolveColumn(tr, "b") > 10,
-                resolveColumn(tr, "a") === resolveColumn(tr, "b"),
-                IsNotNull(resolveColumn(tr, "a")),
-                IsNotNull(resolveColumn(tr, "b")))))
+      tr.where('a.attr > 10 && 'a.attr === 'b.attr).analyze.constraints,
+      ExpressionSet(
+        Seq(
+          resolveColumn(tr, "a") > 10,
+          resolveColumn(tr, "b") > 10,
+          resolveColumn(tr, "a") === resolveColumn(tr, "b"),
+          IsNotNull(resolveColumn(tr, "a")),
+          IsNotNull(resolveColumn(tr, "b"))
+        ))
+    )
   }
 }

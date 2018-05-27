@@ -9,8 +9,16 @@ import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.formatting.settings.ScalaCodeStyleSettings
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScReferenceElement
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScBindingPattern
-import org.jetbrains.plugins.scala.lang.psi.api.base.types.{ScParameterizedTypeElement, ScSimpleTypeElement, ScTypeElement, ScTypeProjection}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScTypeAlias, ScTypeAliasDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.base.types.{
+  ScParameterizedTypeElement,
+  ScSimpleTypeElement,
+  ScTypeElement,
+  ScTypeProjection
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScTypeAlias,
+  ScTypeAliasDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.types.{ScType, ScTypePresentation}
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
@@ -36,9 +44,10 @@ object TypeAdjuster extends ApplicationAdapter {
     }
   }
 
-  def adjustFor(elements: Seq[PsiElement],
-                addImports: Boolean = true,
-                useTypeAliases: Boolean = true): Unit = {
+  def adjustFor(
+      elements: Seq[PsiElement],
+      addImports: Boolean = true,
+      useTypeAliases: Boolean = true): Unit = {
 
     val typeElements =
       elements.toVector.flatMap(collectAdjustableTypeElements).distinct
@@ -64,7 +73,8 @@ object TypeAdjuster extends ApplicationAdapter {
   }
 
   private def newRef(
-      text: String, position: PsiElement): Option[ScReferenceElement] = {
+      text: String,
+      position: PsiElement): Option[ScReferenceElement] = {
     findRef(newTypeElem(text, position))
   }
 
@@ -74,7 +84,9 @@ object TypeAdjuster extends ApplicationAdapter {
 
   private def newTypeElem(name: String, position: PsiElement) =
     ScalaPsiElementFactory.createTypeElementFromText(
-        name, position.getContext, position)
+      name,
+      position.getContext,
+      position)
 
   private def toReplacementInfos(
       typeElements: Seq[ScTypeElement],
@@ -114,7 +126,7 @@ object TypeAdjuster extends ApplicationAdapter {
           for {
             oldRes <- info.resolve
             newRes <- newResolve
-                         if ScEquivalenceUtil.smartEquivalence(oldRes, newRes)
+            if ScEquivalenceUtil.smartEquivalence(oldRes, newRes)
           } yield {
             info.withNewText(withoutThisType)
           }
@@ -136,14 +148,15 @@ object TypeAdjuster extends ApplicationAdapter {
             collectAdjustableTypeElements(newTypeEl).filter(_ != newTypeEl)
           if (subTypeElems.isEmpty) {
             Some(
-                ReplacementInfo
-                  .initial(newTypeEl)
-                  .copy(origTypeElem = info.origTypeElem))
+              ReplacementInfo
+                .initial(newTypeEl)
+                .copy(origTypeElem = info.origTypeElem))
           } else
             Some(
-                CompoundInfo(info.origTypeElem,
-                             newTypeEl,
-                             subTypeElems.map(ReplacementInfo.initial)))
+              CompoundInfo(
+                info.origTypeElem,
+                newTypeEl,
+                subTypeElems.map(ReplacementInfo.initial)))
         } else None
       }
     }
@@ -156,9 +169,9 @@ object TypeAdjuster extends ApplicationAdapter {
         case cmp: CompoundInfo =>
           Some(cmp.copy(childInfos = cmp.childInfos.flatMap(simplify)))
         case withExpandableTypeAlias(newInfo) => simplify(newInfo)
-        case withThisRef(newInfo) => simplify(newInfo)
-        case `with .type#`(newInfo) => simplify(newInfo)
-        case _ => Some(info)
+        case withThisRef(newInfo)             => simplify(newInfo)
+        case `with .type#`(newInfo)           => simplify(newInfo)
+        case _                                => Some(info)
       }
   }
 
@@ -181,9 +194,9 @@ object TypeAdjuster extends ApplicationAdapter {
 
   private def findRef(elem: PsiElement): Option[ScReferenceElement] =
     elem match {
-      case r: ScReferenceElement => Some(r)
+      case r: ScReferenceElement        => Some(r)
       case ScSimpleTypeElement(Some(r)) => Some(r)
-      case _ => None
+      case _                            => None
     }
 
   private def shortenReference(
@@ -221,10 +234,10 @@ object TypeAdjuster extends ApplicationAdapter {
 
     info match {
       case cmp: CompoundInfo =>
-        cmp.copy(childInfos = cmp.childInfos.map(
-                  shortenReference(_, useTypeAliases)))
+        cmp.copy(
+          childInfos = cmp.childInfos.map(shortenReference(_, useTypeAliases)))
       case hasStableReplacement(rInfo) => rInfo
-      case _ => info
+      case _                           => info
     }
   }
 
@@ -232,9 +245,10 @@ object TypeAdjuster extends ApplicationAdapter {
       rInfos: Set[ReplacementInfo]): Map[ReplacementInfo, ScImportsHolder] = {
     def findMaxHolders(infos: Set[ReplacementInfo])
       : Set[(ReplacementInfo, ScImportsHolder)] = {
-      val infosToHolders = infos.map(info =>
-            info -> ScalaImportTypeFix.getImportHolder(
-                info.origTypeElem, info.origTypeElem.getProject))
+      val infosToHolders = infos.map(
+        info =>
+          info -> ScalaImportTypeFix
+            .getImportHolder(info.origTypeElem, info.origTypeElem.getProject))
       val holders = infosToHolders.map(_._2)
       val maxHolders = holders.filter(h => !holders.exists(_.isAncestorOf(h)))
       infosToHolders.map {
@@ -256,14 +270,16 @@ object TypeAdjuster extends ApplicationAdapter {
   }
 
   private def replaceAndAddImports(
-      rInfos: Seq[ReplacementInfo], addImports: Boolean): Unit = {
-    assert(rInfos.forall(_.origTypeElem.isValid),
-           "Psi shouldn't be modified before this stage!")
+      rInfos: Seq[ReplacementInfo],
+      addImports: Boolean): Unit = {
+    assert(
+      rInfos.forall(_.origTypeElem.isValid),
+      "Psi shouldn't be modified before this stage!")
 
     val replacementsWithSameResolve =
       rInfos.filter(_.checkReplacementResolve).toSet
     val importHolders = collectImportHolders(
-        rInfos.toSet -- replacementsWithSameResolve)
+      rInfos.toSet -- replacementsWithSameResolve)
     val holderToPaths = mutable.Map[ScImportsHolder, Set[String]]()
 
     rInfos.foreach { info =>
@@ -293,11 +309,12 @@ object TypeAdjuster extends ApplicationAdapter {
         var collected: Option[ScTypeAliasDefinition] = None
 
         override def execute(
-            element: PsiElement, state: ResolveState): Boolean = {
+            element: PsiElement,
+            state: ResolveState): Boolean = {
           element match {
             case ta: ScTypeAliasDefinition
                 if ta.isAliasFor(clazz) &&
-                !ScTypePresentation.shouldExpand(ta) =>
+                  !ScTypePresentation.shouldExpand(ta) =>
               collected = Some(ta)
               false
             case _ => true
@@ -313,8 +330,8 @@ object TypeAdjuster extends ApplicationAdapter {
   private def collectAdjustableTypeElements(
       element: PsiElement): Vector[ScTypeElement] = {
     element.depthFirst.collect {
-      case s: ScSimpleTypeElement => s
-      case p: ScTypeProjection => p
+      case s: ScSimpleTypeElement        => s
+      case p: ScTypeProjection           => p
       case p: ScParameterizedTypeElement => p
     }.toVector
   }
@@ -327,10 +344,11 @@ object TypeAdjuster extends ApplicationAdapter {
     def pathsToImport: Seq[String]
   }
 
-  private case class SimpleInfo(origTypeElem: ScTypeElement,
-                                replacement: String,
-                                resolve: Option[PsiElement],
-                                pathsToImport: Seq[String])
+  private case class SimpleInfo(
+      origTypeElem: ScTypeElement,
+      replacement: String,
+      resolve: Option[PsiElement],
+      pathsToImport: Seq[String])
       extends ReplacementInfo {
 
     def withNewText(s: String): SimpleInfo = copy(replacement = s)
@@ -348,17 +366,18 @@ object TypeAdjuster extends ApplicationAdapter {
             val packageName = words
               .dropRight(1)
               .mkString(".")
-              (withPrefix, Some(packageName))
+            (withPrefix, Some(packageName))
           } else (clazz.name, Some(qName))
         case _ => (target.name, ScalaNamesUtil.qualifiedName(target))
       }
       val replacementText = origTypeElem match {
         case s: ScSimpleTypeElement if s.singleton => s"$newText.type"
-        case _ => newText
+        case _                                     => newText
       }
-      val withoutImport = copy(replacement = replacementText,
-                               resolve = Some(target),
-                               pathsToImport = Seq.empty)
+      val withoutImport = copy(
+        replacement = replacementText,
+        resolve = Some(target),
+        pathsToImport = Seq.empty)
 
       if (withoutImport.checkReplacementResolve) withoutImport
       else withoutImport.copy(pathsToImport = pathToImport.toSeq)
@@ -369,14 +388,15 @@ object TypeAdjuster extends ApplicationAdapter {
 
       (newResolve, resolve) match {
         case (Some(e1), Some(e2)) => ScEquivalenceUtil.smartEquivalence(e1, e2)
-        case _ => false
+        case _                    => false
       }
     }
   }
 
-  private case class CompoundInfo(origTypeElem: ScTypeElement,
-                                  tempTypeElem: ScTypeElement,
-                                  childInfos: Seq[ReplacementInfo])
+  private case class CompoundInfo(
+      origTypeElem: ScTypeElement,
+      tempTypeElem: ScTypeElement,
+      childInfos: Seq[ReplacementInfo])
       extends ReplacementInfo {
 
     if (childInfos.isEmpty ||

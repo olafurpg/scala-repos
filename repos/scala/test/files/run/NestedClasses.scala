@@ -56,10 +56,10 @@ class BBB extends AAA {
 class AAA1 extends AAA {
   override def f = 111;
   class BBB1 extends BBB {
-    override def f = AAA1. super.f;
+    override def f = AAA1.super.f;
   }
   class BBB2 extends BBB {
-    override def f = BBB2. super.f;
+    override def f = BBB2.super.f;
   }
   class BBB3 extends BBB {
     override def f = super.f;

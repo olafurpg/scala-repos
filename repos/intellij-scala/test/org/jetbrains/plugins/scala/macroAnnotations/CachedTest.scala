@@ -58,12 +58,10 @@ class CachedTest extends CachedTestBase {
 
     def setUpThreads(): (Thread, Thread) = {
       Foo.allThreadsStartedLock.lock()
-      val thread1 = new Thread(
-          new Runnable {
+      val thread1 = new Thread(new Runnable {
         override def run(): Unit = Foo.runSynchronized()
       })
-      val thread2 = new Thread(
-          new Runnable {
+      val thread2 = new Thread(new Runnable {
         override def run(): Unit = Foo.runSynchronized()
       })
 
@@ -71,7 +69,7 @@ class CachedTest extends CachedTestBase {
         override def uncaughtException(t: Thread, e: Throwable): Unit =
           e match {
             case _: AssertionError => Foo.assertsFailed += 1
-            case _ =>
+            case _                 =>
           }
       }
       thread1.setUncaughtExceptionHandler(eh)
@@ -82,7 +80,7 @@ class CachedTest extends CachedTestBase {
       //NOTE: we are not guaranteed which thread will be waiting where. They might switch, but that's still fine
 
       while (thread1.getState != Thread.State.WAITING &&
-      thread2.getState != Thread.State.WAITING) {
+             thread2.getState != Thread.State.WAITING) {
         //busy waiting is bad, but this is in a test, so it is fine. Should put a timeout here?
         Thread.`yield`()
       }
@@ -98,9 +96,10 @@ class CachedTest extends CachedTestBase {
 
   def testModificationTrackers(): Unit = {
     object Foo extends Managed {
-      @Cached(synchronized = false,
-              modificationCount = ModCount.getModificationCount,
-              this)
+      @Cached(
+        synchronized = false,
+        modificationCount = ModCount.getModificationCount,
+        this)
       def currentTime: Long = System.currentTimeMillis()
 
       def getProject = myFixture.getProject

@@ -28,15 +28,15 @@ object Test extends App {
   def createTempValDef(value: Tree, tpe: Type): (Option[Tree], Tree) = {
     val local = gensym("temp")
     (
-        Some(
-            ValDef(
-                NoMods,
-                local,
-                TypeTree(tpe),
-                value
-            )
-        ),
-        Ident(local)
+      Some(
+        ValDef(
+          NoMods,
+          local,
+          TypeTree(tpe),
+          value
+        )
+      ),
+      Ident(local)
     )
   }
 
@@ -48,26 +48,27 @@ object Test extends App {
         case "%d" => createTempValDef(paramsStack.pop, typeOf[Int])
         case "%s" => createTempValDef(paramsStack.pop, typeOf[String])
         case "%%" => {
-            (None: Option[Tree], Literal(Constant("%")))
-          }
+          (None: Option[Tree], Literal(Constant("%")))
+        }
         case part => {
-            (None: Option[Tree], Literal(Constant(part)))
-          }
+          (None: Option[Tree], Literal(Constant(part)))
+        }
       }
 
-    val evals = for ((Some(eval), _) <- parsed if eval != None) yield
-      (eval: Tree)
-    val prints = for ((_, ref) <- parsed) yield
-      Apply(
+    val evals = for ((Some(eval), _) <- parsed if eval != None)
+      yield (eval: Tree)
+    val prints = for ((_, ref) <- parsed)
+      yield
+        Apply(
           Select(
-              Select(
-                  Ident(TermName("scala")),
-                  TermName("Predef")
-              ),
-              TermName("print")
+            Select(
+              Ident(TermName("scala")),
+              TermName("Predef")
+            ),
+            TermName("print")
           ),
           List(ref)
-      ): Tree
+        ): Tree
     Block((evals ++ prints).toList, Literal(Constant(())))
   }
 }

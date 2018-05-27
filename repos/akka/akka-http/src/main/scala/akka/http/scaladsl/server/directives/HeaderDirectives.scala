@@ -21,18 +21,23 @@ trait HeaderDirectives {
     */
   def headerValue[T](f: HttpHeader ⇒ Option[T]): Directive1[T] = {
     val protectedF: HttpHeader ⇒ Option[Either[Rejection, T]] = header ⇒
-      try f(header).map(Right.apply) catch {
+      try f(header).map(Right.apply)
+      catch {
         case NonFatal(e) ⇒
           Some(
-              Left(MalformedHeaderRejection(
-                      header.name, e.getMessage.nullAsEmpty, Some(e))))
+            Left(
+              MalformedHeaderRejection(
+                header.name,
+                e.getMessage.nullAsEmpty,
+                Some(e))))
     }
 
-    extract(_.request.headers.collectFirst(Function.unlift(protectedF))).flatMap {
-      case Some(Right(a)) ⇒ provide(a)
-      case Some(Left(rejection)) ⇒ reject(rejection)
-      case None ⇒ reject
-    }
+    extract(_.request.headers.collectFirst(Function.unlift(protectedF)))
+      .flatMap {
+        case Some(Right(a)) ⇒ provide(a)
+        case Some(Left(rejection)) ⇒ reject(rejection)
+        case None ⇒ reject
+      }
   }
 
   /**
@@ -55,7 +60,7 @@ trait HeaderDirectives {
     */
   def headerValueByName(headerName: String): Directive1[String] =
     headerValue(optionalValue(headerName.toLowerCase)) | reject(
-        MissingHeaderRejection(headerName))
+      MissingHeaderRejection(headerName))
 
   /**
     * Extracts the first HTTP request header of the given type.
@@ -64,7 +69,7 @@ trait HeaderDirectives {
   def headerValueByType[T <: HttpHeader](
       magnet: ClassMagnet[T]): Directive1[T] =
     headerValuePF(magnet.extractPF) | reject(
-        MissingHeaderRejection(magnet.runtimeClass.getSimpleName))
+      MissingHeaderRejection(magnet.runtimeClass.getSimpleName))
 
   //#optional-header
   /**
@@ -72,8 +77,7 @@ trait HeaderDirectives {
     * If the given function throws an exception the request is rejected
     * with a [[akka.http.scaladsl.server.MalformedHeaderRejection]].
     */
-  def optionalHeaderValue[T](
-      f: HttpHeader ⇒ Option[T]): Directive1[Option[T]] =
+  def optionalHeaderValue[T](f: HttpHeader ⇒ Option[T]): Directive1[Option[T]] =
     headerValue(f).map(Some(_): Option[T]).recoverPF {
       case Nil ⇒ provide(None)
     }
@@ -101,8 +105,7 @@ trait HeaderDirectives {
   def optionalHeaderValueByName(
       headerName: String): Directive1[Option[String]] = {
     val lowerCaseName = headerName.toLowerCase
-    extract(
-        _.request.headers.collectFirst {
+    extract(_.request.headers.collectFirst {
       case HttpHeader(`lowerCaseName`, value) ⇒ value
     })
   }

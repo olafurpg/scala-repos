@@ -10,10 +10,10 @@ object KMeans {
     */
   private def distance(v1: Vector[Double], v2: Vector[Double]): Double =
     math.sqrt(
-        v1.iterator
-          .zip(v2.iterator)
-          .map { case (l, r) => (l - r) * (l - r) }
-          .sum)
+      v1.iterator
+        .zip(v2.iterator)
+        .map { case (l, r) => (l - r) * (l - r) }
+        .sum)
 
   // Just normal vector addition
   private def add(v1: Vector[Double], v2: Vector[Double]): Vector[Double] =
@@ -30,15 +30,15 @@ object KMeans {
       vecs: TraversableOnce[Vector[Double]]): Vector[Double] = {
     val (vec, count) = vecs
     // add a 1 to each value to count the number of vectors in one pass:
-    .map { v =>
-      (v, 1)
-    }
-    // Here we add both the count and the vectors:
-    .reduce { (ll, rr) =>
-      val (l, lc) = ll
-      val (r, rc) = rr
-      (add(l, r), lc + rc)
-    }
+      .map { v =>
+        (v, 1)
+      }
+      // Here we add both the count and the vectors:
+      .reduce { (ll, rr) =>
+        val (l, lc) = ll
+        val (r, rc) = rr
+        (add(l, r), lc + rc)
+      }
     // Now scale to get the pointwise average
     scale(1.0 / count, vec)
   }
@@ -48,11 +48,11 @@ object KMeans {
       centroids: TraversableOnce[(Id, Vector[Double])]): (Id, Vector[Double]) =
     centroids
     // compute the distance to each center
-    .map { case (id, cent) => (distance(from, cent), (id, cent)) }
-    // take the minimum by the distance, ignoring the id and the centroid
-    .minBy { case (dist, _) => dist }
-    // Just keep the id and the centroid
-    ._2
+      .map { case (id, cent) => (distance(from, cent), (id, cent)) }
+      // take the minimum by the distance, ignoring the id and the centroid
+      .minBy { case (dist, _) => dist }
+      // Just keep the id and the centroid
+      ._2
 
   type LabeledVector = (Int, Vector[Double])
 
@@ -62,10 +62,11 @@ object KMeans {
     * the new clusters
     * and the new list of labeled vectors
     */
-  def kmeansStep(k: Int,
-                 s: Stat,
-                 clusters: ValuePipe[List[LabeledVector]],
-                 points: TypedPipe[LabeledVector])
+  def kmeansStep(
+      k: Int,
+      s: Stat,
+      clusters: ValuePipe[List[LabeledVector]],
+      points: TypedPipe[LabeledVector])
     : Execution[(ValuePipe[List[LabeledVector]], TypedPipe[LabeledVector])] = {
 
     // Do a cross product to produce all point, cluster pairs
@@ -85,19 +86,20 @@ object KMeans {
 
     // Now update the clusters:
     next.map { pipe =>
-      (ComputedValue(
-           pipe.group
-           // There is no need to use more than k reducers
-             .withReducers(k)
-             .mapValueStream { vectors =>
-           Iterator(centroidOf(vectors))
-         }
-             // Now collect them all into one big
-             .groupAll
-             .toList
-             // discard the "all" key used to group them together
-             .values),
-       pipe)
+      (
+        ComputedValue(
+          pipe.group
+          // There is no need to use more than k reducers
+            .withReducers(k)
+            .mapValueStream { vectors =>
+              Iterator(centroidOf(vectors))
+            }
+            // Now collect them all into one big
+            .groupAll
+            .toList
+            // discard the "all" key used to group them together
+            .values),
+        pipe)
     }
   }
 
@@ -105,9 +107,11 @@ object KMeans {
     : (ValuePipe[List[LabeledVector]], TypedPipe[LabeledVector]) = {
     val rng = new java.util.Random(123)
     // take a random k vectors:
-    val clusters = points.map { v =>
-      (rng.nextDouble, v)
-    }.groupAll
+    val clusters = points
+      .map { v =>
+        (rng.nextDouble, v)
+      }
+      .groupAll
       .sortedTake(k)(Ordering.by(_._1))
       .mapValues { randk =>
         randk.iterator.zipWithIndex.map { case ((_, v), id) => (id, v) }.toList
@@ -126,18 +130,20 @@ object KMeans {
    * Run the full k-means algorithm by flatMapping the above function into itself
    * while the number of vectors that changed is not zero
    */
-  def kmeans(k: Int,
-             clusters: ValuePipe[List[LabeledVector]],
-             points: TypedPipe[LabeledVector]): Execution[(Int, ValuePipe[List[
-              LabeledVector]], TypedPipe[LabeledVector])] = {
+  def kmeans(
+      k: Int,
+      clusters: ValuePipe[List[LabeledVector]],
+      points: TypedPipe[LabeledVector]): Execution[
+    (Int, ValuePipe[List[LabeledVector]], TypedPipe[LabeledVector])] = {
 
     val key = StatKey("changed", "scalding.kmeans")
 
-    def go(s: Stat,
-           c: ValuePipe[List[LabeledVector]],
-           p: TypedPipe[LabeledVector],
-           step: Int): Execution[
-        (Int, ValuePipe[List[LabeledVector]], TypedPipe[LabeledVector])] =
+    def go(
+        s: Stat,
+        c: ValuePipe[List[LabeledVector]],
+        p: TypedPipe[LabeledVector],
+        step: Int): Execution[
+      (Int, ValuePipe[List[LabeledVector]], TypedPipe[LabeledVector])] =
       kmeansStep(k, s, c, p).getAndResetCounters.flatMap {
         case ((nextC, nextP), counters) =>
           val changed = counters(key)
@@ -151,7 +157,7 @@ object KMeans {
   }
 
   def apply(k: Int, points: TypedPipe[Vector[Double]]): Execution[
-      (Int, ValuePipe[List[LabeledVector]], TypedPipe[LabeledVector])] = {
+    (Int, ValuePipe[List[LabeledVector]], TypedPipe[LabeledVector])] = {
     val (clusters, labeled) = initializeClusters(k, points)
     kmeans(k, clusters, labeled)
   }

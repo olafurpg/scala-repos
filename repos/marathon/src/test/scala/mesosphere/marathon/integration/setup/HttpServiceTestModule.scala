@@ -17,8 +17,9 @@ import scala.concurrent.{Await, Awaitable}
 /**
   * Result of an REST operation.
   */
-case class RestResult[
-    +T](valueGetter: () => T, originalResponse: HttpResponse) {
+case class RestResult[+T](
+    valueGetter: () => T,
+    originalResponse: HttpResponse) {
   def code: Int = originalResponse.status.intValue
   def success: Boolean = code == 200
   lazy val value: T = valueGetter()
@@ -43,8 +44,9 @@ object RestResult {
     new RestResult[HttpResponse](() => response, response)
   }
 
-  def await(responseFuture: Awaitable[HttpResponse],
-            waitTime: Duration): RestResult[HttpResponse] = {
+  def await(
+      responseFuture: Awaitable[HttpResponse],
+      waitTime: Duration): RestResult[HttpResponse] = {
     apply(Await.result(responseFuture, waitTime))
   }
 }
@@ -94,9 +96,10 @@ class ApplicationHealthCheck @Inject()() {
 
   @GET
   @Path("{appId:.+}/{versionId}/{port}")
-  def isApplicationHealthy(@PathParam("appId") path: String,
-                           @PathParam("versionId") versionId: String,
-                           @PathParam("port") port: Int): Response = {
+  def isApplicationHealthy(
+      @PathParam("appId") path: String,
+      @PathParam("versionId") versionId: String,
+      @PathParam("port") port: Int): Response = {
     val appId = path.toRootPath
     def instance = ExternalMarathonIntegrationTest.healthChecks.find { c =>
       c.appId == appId && c.versionId == versionId && c.port == port

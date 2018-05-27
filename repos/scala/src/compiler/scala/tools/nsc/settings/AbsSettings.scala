@@ -33,7 +33,7 @@ trait AbsSettings extends scala.reflect.internal.settings.AbsSettings {
   override def hashCode() = visibleSettings.size // going for cheap
   override def equals(that: Any) = that match {
     case s: AbsSettings => this.userSetSettings == s.userSetSettings
-    case _ => false
+    case _              => false
   }
   override def toString() = {
     val uss = userSetSettings
@@ -44,20 +44,22 @@ trait AbsSettings extends scala.reflect.internal.settings.AbsSettings {
 
   def checkDependencies =
     visibleSettings filterNot (_.isDefault) forall
-    (setting =>
-          setting.dependencies forall {
-            case (dep, value) =>
-              (Option(dep.value) exists (_.toString == value)) || {
-                errorFn("incomplete option %s (requires %s)".format(
-                        setting.name, dep.name))
-                false
-              }
+      (setting =>
+        setting.dependencies forall {
+          case (dep, value) =>
+            (Option(dep.value) exists (_.toString == value)) || {
+              errorFn(
+                "incomplete option %s (requires %s)"
+                  .format(setting.name, dep.name))
+              false
+            }
         })
 
   trait AbsSetting extends Ordered[Setting] with AbsSettingValue {
     def name: String
     def helpDescription: String
-    def unparse: List[String] // A list of Strings which can recreate this setting.
+    def unparse
+      : List[String] // A list of Strings which can recreate this setting.
 
     /* For tools which need to populate lists of available choices */
     def choices: List[String] = Nil
@@ -105,8 +107,7 @@ trait AbsSettings extends scala.reflect.internal.settings.AbsSettings {
       */
     protected[nsc] def tryToSetColon(
         args: List[String]): Option[ResultOfTryToSet] =
-      errorAndValue(
-          "'%s' does not accept multiple arguments" format name, None)
+      errorAndValue("'%s' does not accept multiple arguments" format name, None)
 
     /** Attempt to set from a properties file style property value.
       *  Currently used by Eclipse SDT only.
@@ -136,7 +137,7 @@ trait AbsSettings extends scala.reflect.internal.settings.AbsSettings {
       */
     override def equals(that: Any) = that match {
       case x: AbsSettings#AbsSetting => (name == x.name) && (value == x.value)
-      case _ => false
+      case _                         => false
     }
     override def hashCode() = name.hashCode + value.hashCode
     override def toString() =

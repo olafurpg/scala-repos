@@ -5,8 +5,21 @@ package sbt
 package std
 
 import java.io.{InputStream, IOException, OutputStream, Reader, Writer}
-import java.io.{BufferedInputStream, BufferedOutputStream, BufferedReader, BufferedWriter, PrintWriter}
-import java.io.{Closeable, File, FileInputStream, FileOutputStream, InputStreamReader, OutputStreamWriter}
+import java.io.{
+  BufferedInputStream,
+  BufferedOutputStream,
+  BufferedReader,
+  BufferedWriter,
+  PrintWriter
+}
+import java.io.{
+  Closeable,
+  File,
+  FileInputStream,
+  FileOutputStream,
+  InputStreamReader,
+  OutputStreamWriter
+}
 
 import sbt.internal.io.DeferredWriter
 import sbt.io.IO
@@ -106,29 +119,32 @@ object Streams {
         synchronized { streams.values.foreach(_.close()); streams.clear() }
     }
 
-  def apply[Key](taskDirectory: Key => File,
-                 name: Key => String,
-                 mkLogger: (Key,
-                 PrintWriter) => Logger): Streams[Key] = new Streams[Key] {
+  def apply[Key](
+      taskDirectory: Key => File,
+      name: Key => String,
+      mkLogger: (Key, PrintWriter) => Logger): Streams[Key] = new Streams[Key] {
 
     def apply(a: Key): ManagedStreams[Key] = new ManagedStreams[Key] {
       private[this] var opened: List[Closeable] = Nil
       private[this] var closed = false
 
       def readText(a: Key, sid: String = default): BufferedReader =
-        make(a, sid)(f =>
-              new BufferedReader(new InputStreamReader(new FileInputStream(f),
-                                                       IO.defaultCharset)))
+        make(a, sid)(
+          f =>
+            new BufferedReader(
+              new InputStreamReader(new FileInputStream(f), IO.defaultCharset)))
 
       def readBinary(a: Key, sid: String = default): BufferedInputStream =
         make(a, sid)(f => new BufferedInputStream(new FileInputStream(f)))
 
       def text(sid: String = default): PrintWriter =
         make(a, sid)(
-            f =>
-              new PrintWriter(
-                  new DeferredWriter(new BufferedWriter(new OutputStreamWriter(
-                              new FileOutputStream(f), IO.defaultCharset)))))
+          f =>
+            new PrintWriter(
+              new DeferredWriter(
+                new BufferedWriter(new OutputStreamWriter(
+                  new FileOutputStream(f),
+                  IO.defaultCharset)))))
 
       def binary(sid: String = default): BufferedOutputStream =
         make(a, sid)(f => new BufferedOutputStream(new FileOutputStream(f)))

@@ -10,9 +10,9 @@ import com.twitter.util.Throwables.RootCause
 object MuxCancelledCategorizer {
   def unapply(exc: Throwable): Option[ClientDiscardedRequestException] = {
     exc match {
-      case t: ClientDiscardedRequestException => Some(t)
+      case t: ClientDiscardedRequestException    => Some(t)
       case RootCause(MuxCancelledCategorizer(t)) => Some(t)
-      case _ => None
+      case _                                     => None
     }
   }
 

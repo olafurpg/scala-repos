@@ -5,7 +5,12 @@ package akka.stream.scaladsl
 
 import akka.NotUsed
 import akka.stream.testkit.scaladsl.TestSink
-import akka.stream.{ActorAttributes, ActorMaterializer, ActorMaterializerSettings, Supervision}
+import akka.stream.{
+  ActorAttributes,
+  ActorMaterializer,
+  ActorMaterializerSettings,
+  Supervision
+}
 import akka.testkit.AkkaSpec
 import akka.stream.testkit.Utils._
 
@@ -16,17 +21,19 @@ import scala.concurrent.forkjoin.ThreadLocalRandom.{current ⇒ random}
 
 class FlowScanSpec extends AkkaSpec {
 
-  val settings = ActorMaterializerSettings(system).withInputBuffer(
-      initialSize = 2, maxSize = 16)
+  val settings = ActorMaterializerSettings(system)
+    .withInputBuffer(initialSize = 2, maxSize = 16)
 
   implicit val materializer = ActorMaterializer(settings)
 
   "A Scan" must {
 
-    def scan(s: Source[Int, NotUsed],
-             duration: Duration = 5.seconds): immutable.Seq[Int] =
+    def scan(
+        s: Source[Int, NotUsed],
+        duration: Duration = 5.seconds): immutable.Seq[Int] =
       Await.result(
-          s.scan(0)(_ + _).runFold(immutable.Seq.empty[Int])(_ :+ _), duration)
+        s.scan(0)(_ + _).runFold(immutable.Seq.empty[Int])(_ :+ _),
+        duration)
 
     "Scan" in assertAllStagesStopped {
       val v = Vector.fill(random.nextInt(100, 1000))(random.nextInt())
@@ -36,7 +43,7 @@ class FlowScanSpec extends AkkaSpec {
     "Scan empty failed" in assertAllStagesStopped {
       val e = new Exception("fail!")
       intercept[Exception](scan(Source.failed[Int](e))) should be theSameInstanceAs
-      (e)
+        (e)
     }
 
     "Scan empty" in assertAllStagesStopped {

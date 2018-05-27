@@ -23,7 +23,7 @@ private[akka] trait AbstractProps {
   private[akka] def validate(clazz: Class[_]) =
     if (Modifier.isAbstract(clazz.getModifiers))
       throw new IllegalArgumentException(
-          s"Actor class [${clazz.getName}] must not be abstract")
+        s"Actor class [${clazz.getName}] must not be abstract")
 
   /**
     * Java API: create a Props given a class and its constructor arguments.
@@ -44,7 +44,7 @@ private[akka] trait AbstractProps {
     val cc = creator.getClass
     if ((cc.getEnclosingClass ne null) && (cc.getModifiers & Modifier.STATIC) == 0)
       throw new IllegalArgumentException(
-          "cannot use non-static local Creator to create actors; make it static (e.g. local to a static method) or top-level")
+        "cannot use non-static local Creator to create actors; make it static (e.g. local to a static method) or top-level")
     val ac = classOf[Actor]
     val coc = classOf[Creator[_]]
     val actorClass = Reflect.findMarker(cc, coc) match {
@@ -57,11 +57,11 @@ private[akka] trait AbstractProps {
             } getOrElse ac
           case x ⇒
             throw new IllegalArgumentException(
-                s"unsupported type found in Creator argument [$x]")
+              s"unsupported type found in Creator argument [$x]")
         }
       case c: Class[_] if (c == coc) ⇒
         throw new IllegalArgumentException(
-            s"erased Creator types are unsupported, use Props.create(actorClass, creator) instead")
+          s"erased Creator types are unsupported, use Props.create(actorClass, creator) instead")
     }
     create(classOf[CreatorConsumer], actorClass, creator)
   }

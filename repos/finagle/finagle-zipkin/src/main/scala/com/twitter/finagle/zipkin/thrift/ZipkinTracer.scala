@@ -1,9 +1,16 @@
 package com.twitter.finagle.zipkin.thrift
 
 import com.twitter.finagle.NoStacktrace
-import com.twitter.finagle.stats.{DefaultStatsReceiver, NullStatsReceiver, StatsReceiver}
+import com.twitter.finagle.stats.{
+  DefaultStatsReceiver,
+  NullStatsReceiver,
+  StatsReceiver
+}
 import com.twitter.finagle.tracing.{TraceId, Record, Tracer, Annotation, Trace}
-import com.twitter.finagle.zipkin.{host => Host, initialSampleRate => sampleRateFlag}
+import com.twitter.finagle.zipkin.{
+  host => Host,
+  initialSampleRate => sampleRateFlag
+}
 import com.twitter.io.Buf
 import com.twitter.util.events.{Event, Sink}
 import com.twitter.util.{Time, Throw, Try}
@@ -30,9 +37,9 @@ private object Json {
       // deserialized with a runtime type of int.
       // See: https://github.com/FasterXML/jackson-module-scala/issues/106.
       @JsonDeserialize(contentAs = classOf[java.lang.Long]) traceId: Option[
-          Long],
+        Long],
       @JsonDeserialize(contentAs = classOf[java.lang.Long]) spanId: Option[
-          Long],
+        Long],
       data: Annotation)
 
   val mapper = new ObjectMapper()
@@ -41,25 +48,26 @@ private object Json {
   // Configures the mapper to include class information for Annotation.
   object TypeResolverBuilder
       extends ObjectMapper.DefaultTypeResolverBuilder(
-          ObjectMapper.DefaultTyping.NON_FINAL) {
+        ObjectMapper.DefaultTyping.NON_FINAL) {
     override def useForType(typ: JavaType) =
       // Note: getRawClass would be an Object if not for `Envelope`.
       typ.getRawClass == classOf[Annotation]
   }
 
-  mapper.setDefaultTyping(TypeResolverBuilder
-        .init(JsonTypeInfo.Id.CLASS, null)
-        .inclusion(JsonTypeInfo.As.WRAPPER_ARRAY))
+  mapper.setDefaultTyping(
+    TypeResolverBuilder
+      .init(JsonTypeInfo.Id.CLASS, null)
+      .inclusion(JsonTypeInfo.As.WRAPPER_ARRAY))
 
   def serialize(o: AnyRef): String = mapper.writeValueAsString(o)
 
-  def deserialize[T : Manifest](value: String): T =
+  def deserialize[T: Manifest](value: String): T =
     mapper.readValue(value, typeReference[T])
 
-  def deserialize[T : Manifest](node: JsonNode): T =
+  def deserialize[T: Manifest](node: JsonNode): T =
     mapper.readValue(node.traverse, typeReference[T])
 
-  private[this] def typeReference[T : Manifest] = new TypeReference[T] {
+  private[this] def typeReference[T: Manifest] = new TypeReference[T] {
     override def getType = typeFromManifest(manifest[T])
   }
 
@@ -90,8 +98,8 @@ object ZipkinTracer {
         case Event(etype, _, _, _: Annotation.BinaryAnnotation, _, _, _)
             if etype eq this =>
           Throw(
-              new IllegalArgumentException("unsupported format: " + event)
-              with NoStacktrace)
+            new IllegalArgumentException("unsupported format: " + event)
+            with NoStacktrace)
 
         case Event(etype, when, _, ann: Annotation, _, tid, sid)
             if etype eq this =>
@@ -106,20 +114,21 @@ object ZipkinTracer {
       def deserialize(buf: Buf) =
         for {
           env <- Buf.Utf8.unapply(buf) match {
-                  case None =>
-                    Throw(new IllegalArgumentException("unknown format"))
-                  case Some(str) => Try(Json.deserialize[Json.Envelope](str))
-                } if env.id == id
+            case None =>
+              Throw(new IllegalArgumentException("unknown format"))
+            case Some(str) => Try(Json.deserialize[Json.Envelope](str))
+          } if env.id == id
         } yield {
           val when = Time.fromMilliseconds(env.when)
           // This line fails without the JsonDeserialize annotation in Envelope.
           val tid = env.traceId.getOrElse(Event.NoTraceId)
           val sid = env.spanId.getOrElse(Event.NoSpanId)
-          Event(this,
-                when,
-                objectVal = env.data,
-                traceIdVal = tid,
-                spanIdVal = sid)
+          Event(
+            this,
+            when,
+            objectVal = env.data,
+            traceIdVal = tid,
+            spanIdVal = sid)
         }
     }
   }
@@ -166,10 +175,11 @@ object ZipkinTracer {
     * @param statsReceiver stats receiver to send successes/failures to
     */
   def mk(statsReceiver: StatsReceiver): Tracer =
-    mk(Host().getHostName,
-       Host().getPort,
-       statsReceiver,
-       Sampler.DefaultSampleRate)
+    mk(
+      Host().getHostName,
+      Host().getPort,
+      statsReceiver,
+      Sampler.DefaultSampleRate)
 }
 
 /**
@@ -180,7 +190,9 @@ object ZipkinTracer {
   * @param sink where to send sampled trace events to.
   */
 class SamplingTracer(
-    underlyingTracer: Tracer, initialSampleRate: Float, sink: Sink)
+    underlyingTracer: Tracer,
+    initialSampleRate: Float,
+    sink: Sink)
     extends Tracer {
 
   /**
@@ -196,10 +208,12 @@ class SamplingTracer(
     * Tracer that supports sampling. Will pass through a subset of the records.
     */
   def this() =
-    this(RawZipkinTracer(Host().getHostName,
-                         Host().getPort,
-                         DefaultStatsReceiver.scope("zipkin")),
-         sampleRateFlag())
+    this(
+      RawZipkinTracer(
+        Host().getHostName,
+        Host().getPort,
+        DefaultStatsReceiver.scope("zipkin")),
+      sampleRateFlag())
 
   private[this] val sampler = new Sampler
   setSampleRate(initialSampleRate)
@@ -217,10 +231,11 @@ class SamplingTracer(
       if (sink.recording) {
         if (Trace.hasId) {
           val traceId = Trace.id
-          sink.event(ZipkinTracer.Trace,
-                     objectVal = record.annotation,
-                     traceIdVal = traceId.traceId.self,
-                     spanIdVal = traceId.spanId.self)
+          sink.event(
+            ZipkinTracer.Trace,
+            objectVal = record.annotation,
+            traceIdVal = traceId.traceId.self,
+            spanIdVal = traceId.spanId.self)
         } else {
           sink.event(ZipkinTracer.Trace, objectVal = record.annotation)
         }

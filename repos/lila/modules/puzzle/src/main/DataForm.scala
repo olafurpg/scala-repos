@@ -6,15 +6,15 @@ import play.api.data.Forms._
 object DataForm {
 
   val difficulty = Form(
-      single(
-          "difficulty" -> number(min = 1, max = 3)
-      ))
+    single(
+      "difficulty" -> number(min = 1, max = 3)
+    ))
 
   val attempt = Form(
-      mapping(
-          "win" -> number,
-          "time" -> number
-      )(AttemptData.apply)(AttemptData.unapply))
+    mapping(
+      "win" -> number,
+      "time" -> number
+    )(AttemptData.apply)(AttemptData.unapply))
 
   case class AttemptData(win: Int, time: Int) {
 
@@ -22,7 +22,7 @@ object DataForm {
   }
 
   val vote = Form(
-      single(
-          "vote" -> number
-      ))
+    single(
+      "vote" -> number
+    ))
 }

@@ -15,7 +15,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates._
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 28.05.2008
   */
@@ -27,21 +27,21 @@ class DefTypeFilter extends ElementFilter {
       val parent = leaf.getParent
       parent match {
         case _: ScReferenceExpression =>
-        case _ => return false
+        case _                        => return false
       }
       parent.getParent match {
         case parent @ (_: ScBlock | _: ScCaseClause | _: ScTemplateBody |
             _: ScClassParameter | _: ScalaFile)
             if !parent.isInstanceOf[ScalaFile] ||
-            parent.asInstanceOf[ScalaFile].isScriptFile() =>
+              parent.asInstanceOf[ScalaFile].isScriptFile() =>
           if ((leaf.getPrevSibling == null ||
-                  leaf.getPrevSibling.getPrevSibling == null ||
-                  leaf.getPrevSibling.getPrevSibling.getNode.getElementType != ScalaTokenTypes.kDEF) &&
+              leaf.getPrevSibling.getPrevSibling == null ||
+              leaf.getPrevSibling.getPrevSibling.getNode.getElementType != ScalaTokenTypes.kDEF) &&
               (parent.getPrevSibling == null ||
-                  parent.getPrevSibling.getPrevSibling == null ||
-                  (parent.getPrevSibling.getPrevSibling.getNode.getElementType != ScalaElementTypes.MATCH_STMT ||
-                      !parent.getPrevSibling.getPrevSibling.getLastChild
-                        .isInstanceOf[PsiErrorElement]))) return true
+              parent.getPrevSibling.getPrevSibling == null ||
+              (parent.getPrevSibling.getPrevSibling.getNode.getElementType != ScalaElementTypes.MATCH_STMT ||
+              !parent.getPrevSibling.getPrevSibling.getLastChild
+                .isInstanceOf[PsiErrorElement]))) return true
         case _ =>
       }
     }

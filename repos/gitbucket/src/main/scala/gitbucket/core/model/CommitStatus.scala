@@ -12,7 +12,8 @@ trait CommitStatusComponent extends TemplateComponent { self: Profile =>
 
   lazy val CommitStatuses = TableQuery[CommitStatuses]
   class CommitStatuses(tag: Tag)
-      extends Table[CommitStatus](tag, "COMMIT_STATUS") with CommitTemplate {
+      extends Table[CommitStatus](tag, "COMMIT_STATUS")
+      with CommitTemplate {
     val commitStatusId = column[Int]("COMMIT_STATUS_ID", O AutoInc)
     val context = column[String]("CONTEXT")
     val state = column[CommitState]("STATE")
@@ -22,17 +23,18 @@ trait CommitStatusComponent extends TemplateComponent { self: Profile =>
     val registeredDate = column[java.util.Date]("REGISTERED_DATE")
     val updatedDate = column[java.util.Date]("UPDATED_DATE")
     def * =
-      (commitStatusId,
-       userName,
-       repositoryName,
-       commitId,
-       context,
-       state,
-       targetUrl,
-       description,
-       creator,
-       registeredDate,
-       updatedDate) <> ((CommitStatus.apply _).tupled, CommitStatus.unapply)
+      (
+        commitStatusId,
+        userName,
+        repositoryName,
+        commitId,
+        context,
+        state,
+        targetUrl,
+        description,
+        creator,
+        registeredDate,
+        updatedDate) <> ((CommitStatus.apply _).tupled, CommitStatus.unapply)
     def byPrimaryKey(id: Int) = commitStatusId === id.bind
   }
 }
@@ -52,17 +54,19 @@ case class CommitStatus(
 )
 object CommitStatus {
   def pending(owner: String, repository: String, context: String) =
-    CommitStatus(commitStatusId = 0,
-                 userName = owner,
-                 repositoryName = repository,
-                 commitId = "",
-                 context = context,
-                 state = CommitState.PENDING,
-                 targetUrl = None,
-                 description = Some("Waiting for status to be reported"),
-                 creator = "",
-                 registeredDate = new java.util.Date(),
-                 updatedDate = new java.util.Date())
+    CommitStatus(
+      commitStatusId = 0,
+      userName = owner,
+      repositoryName = repository,
+      commitId = "",
+      context = context,
+      state = CommitState.PENDING,
+      targetUrl = None,
+      description = Some("Waiting for status to be reported"),
+      creator = "",
+      registeredDate = new java.util.Date(),
+      updatedDate = new java.util.Date()
+    )
 }
 
 sealed abstract class CommitState(val name: String)
@@ -104,7 +108,7 @@ object CommitState {
   }
 
   implicit val getResult: GetResult[CommitState] = GetResult(
-      r => CommitState(r.<<))
+    r => CommitState(r.<<))
   implicit val getResultOpt: GetResult[Option[CommitState]] = GetResult(
-      r => r.<<?[String].map(CommitState(_)))
+    r => r.<<?[String].map(CommitState(_)))
 }

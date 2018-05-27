@@ -14,7 +14,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.ScReferenceElement
   * 2014-07-28
   */
 abstract class CreateFromUsageQuickFixBase(
-    ref: ScReferenceElement, description: String)
+    ref: ScReferenceElement,
+    description: String)
     extends IntentionAction {
 
   val getText = s"Create $description '${ref.nameId.getText}'"
@@ -22,7 +23,9 @@ abstract class CreateFromUsageQuickFixBase(
   val getFamilyName = s"Create $description"
 
   override def isAvailable(
-      project: Project, editor: Editor, file: PsiFile): Boolean = {
+      project: Project,
+      editor: Editor,
+      file: PsiFile): Boolean = {
     if (!ref.isValid) return false
     if (file == null || !file.isInstanceOf[ScalaFile]) return false
     if (!ref.getManager.isInProject(file)) return false

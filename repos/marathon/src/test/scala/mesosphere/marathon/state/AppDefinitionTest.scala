@@ -15,14 +15,14 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
 
   test("ToProto") {
     val app1 = AppDefinition(
-        id = "play".toPath,
-        cmd = Some("bash foo-*/start -Dhttp.port=$PORT"),
-        cpus = 4.0,
-        mem = 256.0,
-        instances = 5,
-        portDefinitions = PortDefinitions(8080, 8081),
-        executor = "//cmd",
-        acceptedResourceRoles = Some(Set("a", "b"))
+      id = "play".toPath,
+      cmd = Some("bash foo-*/start -Dhttp.port=$PORT"),
+      cpus = 4.0,
+      mem = 256.0,
+      instances = 5,
+      portDefinitions = PortDefinitions(8080, 8081),
+      executor = "//cmd",
+      acceptedResourceRoles = Some(Set("a", "b"))
     )
 
     val proto1 = app1.toProto
@@ -31,8 +31,9 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
     assert(proto1.getCmd.getShell)
     assert("bash foo-*/start -Dhttp.port=$PORT" == proto1.getCmd.getValue)
     assert(5 == proto1.getInstances)
-    assert(Seq(8080, 8081) == proto1.getPortDefinitionsList.asScala
-          .map(_.getNumber))
+    assert(
+      Seq(8080, 8081) == proto1.getPortDefinitionsList.asScala
+        .map(_.getNumber))
     assert("//cmd" == proto1.getExecutor)
     assert(4 == getScalarResourceValue(proto1, "cpus"), 1e-6)
     assert(256 == getScalarResourceValue(proto1, "mem"), 1e-6)
@@ -42,25 +43,25 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
     assert(1.0 == proto1.getUpgradeStrategy.getMaximumOverCapacity)
     assert(proto1.hasAcceptedResourceRoles)
     assert(
-        proto1.getAcceptedResourceRoles == Protos.ResourceRoles
-          .newBuilder()
-          .addRole("a")
-          .addRole("b")
-          .build())
+      proto1.getAcceptedResourceRoles == Protos.ResourceRoles
+        .newBuilder()
+        .addRole("a")
+        .addRole("b")
+        .build())
 
     val app2 = AppDefinition(
-        id = "play".toPath,
-        cmd = None,
-        args = Some(Seq("a", "b", "c")),
-        container = Some(
-              Container(docker = Some(Container.Docker("group/image")))
-          ),
-        cpus = 4.0,
-        mem = 256.0,
-        instances = 5,
-        portDefinitions = PortDefinitions(8080, 8081),
-        executor = "//cmd",
-        upgradeStrategy = UpgradeStrategy(0.7, 0.4)
+      id = "play".toPath,
+      cmd = None,
+      args = Some(Seq("a", "b", "c")),
+      container = Some(
+        Container(docker = Some(Container.Docker("group/image")))
+      ),
+      cpus = 4.0,
+      mem = 256.0,
+      instances = 5,
+      portDefinitions = PortDefinitions(8080, 8081),
+      executor = "//cmd",
+      upgradeStrategy = UpgradeStrategy(0.7, 0.4)
     )
 
     val proto2 = app2.toProto
@@ -69,8 +70,9 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
     assert(!proto2.getCmd.getShell)
     assert(Seq("a", "b", "c") == proto2.getCmd.getArgumentsList.asScala)
     assert(5 == proto2.getInstances)
-    assert(Seq(8080, 8081) == proto2.getPortDefinitionsList.asScala
-          .map(_.getNumber))
+    assert(
+      Seq(8080, 8081) == proto2.getPortDefinitionsList.asScala
+        .map(_.getNumber))
     assert("//cmd" == proto2.getExecutor)
     assert(4 == getScalarResourceValue(proto2, "cpus"), 1e-6)
     assert(256 == getScalarResourceValue(proto2, "mem"), 1e-6)
@@ -82,9 +84,9 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
 
   test("CMD to proto and back again") {
     val app = AppDefinition(
-        id = "play".toPath,
-        cmd = Some("bash foo-*/start -Dhttp.port=$PORT"),
-        versionInfo = fullVersion
+      id = "play".toPath,
+      cmd = Some("bash foo-*/start -Dhttp.port=$PORT"),
+      versionInfo = fullVersion
     )
 
     val proto = app.toProto
@@ -99,9 +101,9 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
 
   test("ARGS to proto and back again") {
     val app = AppDefinition(
-        id = "play".toPath,
-        args = Some(Seq("bash", "foo-*/start", "-Dhttp.port=$PORT")),
-        versionInfo = fullVersion
+      id = "play".toPath,
+      args = Some(Seq("bash", "foo-*/start", "-Dhttp.port=$PORT")),
+      versionInfo = fullVersion
     )
 
     val proto = app.toProto
@@ -110,7 +112,7 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
     proto.getCmd.getShell should be(false)
     proto.getCmd.getValue should be("bash")
     proto.getCmd.getArgumentsList.asScala should be(
-        Seq("bash", "foo-*/start", "-Dhttp.port=$PORT"))
+      Seq("bash", "foo-*/start", "-Dhttp.port=$PORT"))
 
     val read = AppDefinition().mergeFromProto(proto)
     read should be(app)
@@ -118,18 +120,18 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
 
   test("ipAddress to proto and back again") {
     val app = AppDefinition(
-        id = "app-with-ip-address".toPath,
-        cmd = Some("sleep 30"),
-        portDefinitions = Nil,
-        ipAddress = Some(
-              IpAddress(
-                  groups = Seq("a", "b", "c"),
-                  labels = Map(
-                        "foo" -> "bar",
-                        "baz" -> "buzz"
-                    )
-              )
+      id = "app-with-ip-address".toPath,
+      cmd = Some("sleep 30"),
+      portDefinitions = Nil,
+      ipAddress = Some(
+        IpAddress(
+          groups = Seq("a", "b", "c"),
+          labels = Map(
+            "foo" -> "bar",
+            "baz" -> "buzz"
           )
+        )
+      )
     )
 
     val proto = app.toProto
@@ -142,23 +144,22 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
 
   test("ipAddress discovery to proto and back again") {
     val app = AppDefinition(
-        id = "app-with-ip-address".toPath,
-        cmd = Some("sleep 30"),
-        portDefinitions = Nil,
-        ipAddress = Some(
-              IpAddress(
-                  groups = Seq("a", "b", "c"),
-                  labels = Map(
-                        "foo" -> "bar",
-                        "baz" -> "buzz"
-                    ),
-                  discoveryInfo = DiscoveryInfo(
-                        ports = Vector(DiscoveryInfo.Port(name = "http",
-                                                          number = 80,
-                                                          protocol = "tcp"))
-                    )
-              )
+      id = "app-with-ip-address".toPath,
+      cmd = Some("sleep 30"),
+      portDefinitions = Nil,
+      ipAddress = Some(
+        IpAddress(
+          groups = Seq("a", "b", "c"),
+          labels = Map(
+            "foo" -> "bar",
+            "baz" -> "buzz"
+          ),
+          discoveryInfo = DiscoveryInfo(
+            ports = Vector(
+              DiscoveryInfo.Port(name = "http", number = 80, protocol = "tcp"))
           )
+        )
+      )
     )
 
     val proto = app.toProto
@@ -210,27 +211,27 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
 
   test("ProtoRoundtrip") {
     val app1 = AppDefinition(
-        id = "play".toPath,
-        cmd = Some("bash foo-*/start -Dhttp.port=$PORT"),
-        cpus = 4.0,
-        mem = 256.0,
-        instances = 5,
-        portDefinitions = PortDefinitions(8080, 8081),
-        executor = "//cmd",
-        labels = Map(
-              "one" -> "aaa",
-              "two" -> "bbb",
-              "three" -> "ccc"
-          ),
-        versionInfo = fullVersion
+      id = "play".toPath,
+      cmd = Some("bash foo-*/start -Dhttp.port=$PORT"),
+      cpus = 4.0,
+      mem = 256.0,
+      instances = 5,
+      portDefinitions = PortDefinitions(8080, 8081),
+      executor = "//cmd",
+      labels = Map(
+        "one" -> "aaa",
+        "two" -> "bbb",
+        "three" -> "ccc"
+      ),
+      versionInfo = fullVersion
     )
     val result1 = AppDefinition().mergeFromProto(app1.toProto)
     assert(result1 == app1)
 
     val app2 = AppDefinition(
-        cmd = None,
-        args = Some(Seq("a", "b", "c")),
-        versionInfo = fullVersion
+      cmd = None,
+      args = Some(Seq("a", "b", "c")),
+      versionInfo = fullVersion
     )
     val result2 = AppDefinition().mergeFromProto(app2.toProto)
     assert(result2 == app2)

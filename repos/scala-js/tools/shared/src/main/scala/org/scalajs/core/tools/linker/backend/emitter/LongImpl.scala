@@ -59,38 +59,40 @@ private[linker] object LongImpl {
   final val compareTo = "compareTo__jl_Long__I"
   final val compareToO = "compareTo__O__I"
 
-  private val OperatorMethods = Set(UNARY_-,
-                                    UNARY_~,
-                                    this.+,
-                                    this.-,
-                                    *,
-                                    /,
-                                    %,
-                                    |,
-                                    &,
-                                    ^,
-                                    <<,
-                                    >>>,
-                                    >>,
-                                    ===,
-                                    !==,
-                                    <,
-                                    <=,
-                                    >,
-                                    >=,
-                                    toInt,
-                                    toDouble)
+  private val OperatorMethods = Set(
+    UNARY_-,
+    UNARY_~,
+    this.+,
+    this.-,
+    *,
+    /,
+    %,
+    |,
+    &,
+    ^,
+    <<,
+    >>>,
+    >>,
+    ===,
+    !==,
+    <,
+    <=,
+    >,
+    >=,
+    toInt,
+    toDouble)
 
-  private val BoxedLongMethods = Set(byteValue,
-                                     shortValue,
-                                     intValue,
-                                     longValue,
-                                     floatValue,
-                                     doubleValue,
-                                     equals_,
-                                     hashCode_,
-                                     compareTo,
-                                     compareToO)
+  private val BoxedLongMethods = Set(
+    byteValue,
+    shortValue,
+    intValue,
+    longValue,
+    floatValue,
+    doubleValue,
+    equals_,
+    hashCode_,
+    compareTo,
+    compareToO)
 
   val AllMethods = OperatorMethods ++ BoxedLongMethods
 
@@ -154,7 +156,8 @@ private[linker] object LongImpl {
   private final val MASK_2 = (1 << BITS2) - 1
 
   def extractPartsOld(value: Long): (Int, Int, Int) =
-    (value.toInt & MASK,
-     (value >> BITS).toInt & MASK,
-     (value >> BITS01).toInt & MASK_2)
+    (
+      value.toInt & MASK,
+      (value >> BITS).toInt & MASK,
+      (value >> BITS01).toInt & MASK_2)
 }

@@ -25,7 +25,10 @@ import org.scalatest.{BeforeAndAfterAll, PrivateMethodTester}
 import org.scalatest.concurrent.Eventually._
 
 import org.apache.spark._
-import org.apache.spark.deploy.DeployMessages.{MasterStateResponse, RequestMasterState}
+import org.apache.spark.deploy.DeployMessages.{
+  MasterStateResponse,
+  RequestMasterState
+}
 import org.apache.spark.deploy.master.ApplicationInfo
 import org.apache.spark.deploy.master.Master
 import org.apache.spark.deploy.worker.Worker
@@ -38,7 +41,9 @@ import org.apache.spark.scheduler.cluster.CoarseGrainedClusterMessages.RegisterE
   * End-to-end tests for dynamic allocation in standalone mode.
   */
 class StandaloneDynamicAllocationSuite
-    extends SparkFunSuite with LocalSparkContext with BeforeAndAfterAll
+    extends SparkFunSuite
+    with LocalSparkContext
+    with BeforeAndAfterAll
     with PrivateMethodTester {
 
   private val numWorkers = 2
@@ -56,11 +61,15 @@ class StandaloneDynamicAllocationSuite
     */
   override def beforeAll(): Unit = {
     super.beforeAll()
-    masterRpcEnv = RpcEnv.create(
-        Master.SYSTEM_NAME, "localhost", 0, conf, securityManager)
+    masterRpcEnv =
+      RpcEnv.create(Master.SYSTEM_NAME, "localhost", 0, conf, securityManager)
     workerRpcEnvs = (0 until numWorkers).map { i =>
       RpcEnv.create(
-          Worker.SYSTEM_NAME + i, "localhost", 0, conf, securityManager)
+        Worker.SYSTEM_NAME + i,
+        "localhost",
+        0,
+        conf,
+        securityManager)
     }
     master = makeMaster()
     workers = makeWorkers(10, 2048)
@@ -294,7 +303,7 @@ class StandaloneDynamicAllocationSuite
 
   test("dynamic allocation with cores per executor AND max cores") {
     sc = new SparkContext(
-        appConf.set("spark.executor.cores", "2").set("spark.cores.max", "8"))
+      appConf.set("spark.executor.cores", "2").set("spark.cores.max", "8"))
     val appId = sc.applicationId
     eventually(timeout(10.seconds), interval(10.millis)) {
       val apps = getApplications()
@@ -454,8 +463,9 @@ class StandaloneDynamicAllocationSuite
     val myConf = appConf
       .set("spark.dynamicAllocation.enabled", "true")
       .set("spark.shuffle.service.enabled", "true")
-      .set("spark.dynamicAllocation.initialExecutors",
-           initialExecutorLimit.toString)
+      .set(
+        "spark.dynamicAllocation.initialExecutors",
+        initialExecutorLimit.toString)
     sc = new SparkContext(myConf)
     val appId = sc.applicationId
     eventually(timeout(10.seconds), interval(10.millis)) {
@@ -481,8 +491,8 @@ class StandaloneDynamicAllocationSuite
 
   /** Make a master to which our application will send executor requests. */
   private def makeMaster(): Master = {
-    val master = new Master(
-        masterRpcEnv, masterRpcEnv.address, 0, securityManager, conf)
+    val master =
+      new Master(masterRpcEnv, masterRpcEnv.address, 0, securityManager, conf)
     masterRpcEnv.setupEndpoint(Master.ENDPOINT_NAME, master)
     master
   }
@@ -491,15 +501,16 @@ class StandaloneDynamicAllocationSuite
   private def makeWorkers(cores: Int, memory: Int): Seq[Worker] = {
     (0 until numWorkers).map { i =>
       val rpcEnv = workerRpcEnvs(i)
-      val worker = new Worker(rpcEnv,
-                              0,
-                              cores,
-                              memory,
-                              Array(masterRpcEnv.address),
-                              Worker.ENDPOINT_NAME,
-                              null,
-                              conf,
-                              securityManager)
+      val worker = new Worker(
+        rpcEnv,
+        0,
+        cores,
+        memory,
+        Array(masterRpcEnv.address),
+        Worker.ENDPOINT_NAME,
+        null,
+        conf,
+        securityManager)
       rpcEnv.setupEndpoint(Worker.ENDPOINT_NAME, worker)
       worker
     }
@@ -528,7 +539,9 @@ class StandaloneDynamicAllocationSuite
 
   /** Kill the given executor, specifying whether to force kill it. */
   private def killExecutor(
-      sc: SparkContext, executorId: String, force: Boolean): Boolean = {
+      sc: SparkContext,
+      executorId: String,
+      force: Boolean): Boolean = {
     syncExecutors(sc)
     sc.schedulerBackend match {
       case b: CoarseGrainedSchedulerBackend =>

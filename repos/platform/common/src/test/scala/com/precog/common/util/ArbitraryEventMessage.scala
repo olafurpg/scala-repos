@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -36,14 +36,13 @@ import Arbitrary.arbitrary
 
 trait ArbitraryEventMessage extends ArbitraryJValue {
   def genStreamId: Gen[Option[UUID]] =
-    Gen.oneOf(
-        Gen.resultOf[Int, Option[UUID]](_ => Some(UUID.randomUUID)), None)
+    Gen.oneOf(Gen.resultOf[Int, Option[UUID]](_ => Some(UUID.randomUUID)), None)
 
   def genContentJValue: Gen[JValue] =
     frequency(
-        (1, genSimple),
-        (1, wrap(choose(0, 5) flatMap genArray)),
-        (1, wrap(choose(0, 5) flatMap genObject))
+      (1, genSimple),
+      (1, wrap(choose(0, 5) flatMap genArray)),
+      (1, wrap(choose(0, 5) flatMap genObject))
     )
 
   def genPath: Gen[Path] =
@@ -72,17 +71,18 @@ trait ArbitraryEventMessage extends ArbitraryJValue {
       path <- genPath
       ownerAccountId <- alphaStr
       content <- containerOf[List, JValue](genContentJValue)
-                  .map(l => Vector(l: _*)) if !content.isEmpty
+        .map(l => Vector(l: _*)) if !content.isEmpty
       jobId <- oneOf(identifier.map(Option.apply), None)
       streamRef <- genStreamRef
     } yield
-      Ingest(apiKey,
-             path,
-             Some(Authorities(ownerAccountId)),
-             content,
-             jobId,
-             new Instant(),
-             streamRef)
+      Ingest(
+        apiKey,
+        path,
+        Some(Authorities(ownerAccountId)),
+        content,
+        jobId,
+        new Instant(),
+        streamRef)
 
   def genRandomArchive: Gen[Archive] =
     for {
@@ -101,13 +101,14 @@ trait ArbitraryEventMessage extends ArbitraryJValue {
       //TODO: Replace with IngestMessage.fromIngest when it's usable
       val data =
         (eventIds zip ingest.data) map { Function.tupled(IngestRecord.apply) }
-      IngestMessage(ingest.apiKey,
-                    ingest.path,
-                    ingest.writeAs.get,
-                    data,
-                    ingest.jobId,
-                    new Instant(),
-                    streamRef)
+      IngestMessage(
+        ingest.apiKey,
+        ingest.path,
+        ingest.writeAs.get,
+        data,
+        ingest.jobId,
+        new Instant(),
+        streamRef)
     }
 
   def genRandomArchiveMessage: Gen[ArchiveMessage] =
@@ -115,16 +116,17 @@ trait ArbitraryEventMessage extends ArbitraryJValue {
       eventId <- genEventId
       archive <- genRandomArchive
     } yield
-      ArchiveMessage(archive.apiKey,
-                     archive.path,
-                     archive.jobId,
-                     eventId,
-                     archive.timestamp)
+      ArchiveMessage(
+        archive.apiKey,
+        archive.path,
+        archive.jobId,
+        eventId,
+        archive.timestamp)
 
   def genRandomEventMessage: Gen[EventMessage] =
     frequency(
-        (1, genRandomArchiveMessage),
-        (10, genRandomIngestMessage)
+      (1, genRandomArchiveMessage),
+      (10, genRandomIngestMessage)
     )
 }
 
@@ -155,10 +157,11 @@ trait RealisticEventMessage extends ArbitraryEventMessage {
     if (depth == 0) {
       List(parent)
     } else {
-      parent :: containerOfN[List, String](choose(2, 4).sample.get,
-                                           resize(10, alphaStr))
-        .map(_.filter(_.length > 1).flatMap(
-                child => buildChildPaths(child :: parent, depth - 1)))
+      parent :: containerOfN[List, String](
+        choose(2, 4).sample.get,
+        resize(10, alphaStr))
+        .map(_.filter(_.length > 1).flatMap(child =>
+          buildChildPaths(child :: parent, depth - 1)))
         .sample
         .get
     }
@@ -187,13 +190,14 @@ trait RealisticEventMessage extends ArbitraryEventMessage {
         .map(l => Vector(l: _*))
       streamRef <- genStreamRef
     } yield
-      Ingest(ingestAPIKey,
-             Path(path),
-             Some(ingestOwnerAccountId),
-             ingestData,
-             None,
-             new Instant(),
-             streamRef)
+      Ingest(
+        ingestAPIKey,
+        Path(path),
+        Some(ingestOwnerAccountId),
+        ingestData,
+        None,
+        new Instant(),
+        streamRef)
 
   def genIngestMessage: Gen[IngestMessage] =
     for {
@@ -203,14 +207,16 @@ trait RealisticEventMessage extends ArbitraryEventMessage {
       val records =
         ingest.data map { jv =>
           IngestRecord(
-              EventId(producerId, eventIds(producerId).getAndIncrement), jv)
+            EventId(producerId, eventIds(producerId).getAndIncrement),
+            jv)
         }
-      IngestMessage(ingest.apiKey,
-                    ingest.path,
-                    ingest.writeAs.get,
-                    records,
-                    ingest.jobId,
-                    ingest.timestamp,
-                    ingest.streamRef)
+      IngestMessage(
+        ingest.apiKey,
+        ingest.path,
+        ingest.writeAs.get,
+        records,
+        ingest.jobId,
+        ingest.timestamp,
+        ingest.streamRef)
     }
 }

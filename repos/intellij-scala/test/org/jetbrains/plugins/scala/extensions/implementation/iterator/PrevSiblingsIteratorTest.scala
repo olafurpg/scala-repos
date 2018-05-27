@@ -21,7 +21,8 @@ class PrevSiblingsIteratorTest extends IteratorTestCase {
 
   def testThreeSiblings() = {
     assertIterates(
-        "1.3, 1.2, 1.1", parse("0 (1.1, 1.2, 1.3, 1.4)").getLastChild)
+      "1.3, 1.2, 1.1",
+      parse("0 (1.1, 1.2, 1.3, 1.4)").getLastChild)
   }
 
   def testSubChildren() = {

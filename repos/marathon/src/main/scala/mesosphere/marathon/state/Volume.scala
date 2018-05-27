@@ -13,69 +13,72 @@ sealed trait Volume {
 }
 
 object Volume {
-  def apply(containerPath: String,
-            hostPath: Option[String],
-            mode: Mesos.Volume.Mode,
-            persistent: Option[PersistentVolumeInfo]): Volume =
+  def apply(
+      containerPath: String,
+      hostPath: Option[String],
+      mode: Mesos.Volume.Mode,
+      persistent: Option[PersistentVolumeInfo]): Volume =
     persistent match {
       case Some(persistentVolumeInfo) =>
         PersistentVolume(
-            containerPath = containerPath,
-            persistent = persistentVolumeInfo,
-            mode = mode
+          containerPath = containerPath,
+          persistent = persistentVolumeInfo,
+          mode = mode
         )
       case None =>
         DockerVolume(
-            containerPath = containerPath,
-            hostPath = hostPath.getOrElse(""),
-            mode = mode
+          containerPath = containerPath,
+          hostPath = hostPath.getOrElse(""),
+          mode = mode
         )
     }
 
   def apply(proto: Protos.Volume): Volume = {
     val persistent: Option[PersistentVolumeInfo] =
       if (proto.hasPersistent)
-        Some(PersistentVolumeInfo(proto.getPersistent.getSize)) else None
+        Some(PersistentVolumeInfo(proto.getPersistent.getSize))
+      else None
 
     persistent match {
       case Some(persistentVolumeInfo) =>
         PersistentVolume(
-            containerPath = proto.getContainerPath,
-            persistent = persistentVolumeInfo,
-            mode = proto.getMode
+          containerPath = proto.getContainerPath,
+          persistent = persistentVolumeInfo,
+          mode = proto.getMode
         )
       case None =>
         DockerVolume(
-            containerPath = proto.getContainerPath,
-            hostPath = proto.getHostPath,
-            mode = proto.getMode
+          containerPath = proto.getContainerPath,
+          hostPath = proto.getHostPath,
+          mode = proto.getMode
         )
     }
   }
 
   def apply(proto: Mesos.Volume): Volume =
     DockerVolume(
-        containerPath = proto.getContainerPath,
-        hostPath = proto.getHostPath,
-        mode = proto.getMode
+      containerPath = proto.getContainerPath,
+      hostPath = proto.getHostPath,
+      mode = proto.getMode
     )
 
-  def unapply(volume: Volume)
-    : Option[(String, Option[String], Mesos.Volume.Mode, Option[
-            PersistentVolumeInfo])] =
+  def unapply(volume: Volume): Option[
+    (String, Option[String], Mesos.Volume.Mode, Option[PersistentVolumeInfo])] =
     volume match {
       case persistentVolume: PersistentVolume =>
         Some(
-            (persistentVolume.containerPath,
-             None,
-             persistentVolume.mode,
-             Some(persistentVolume.persistent)))
+          (
+            persistentVolume.containerPath,
+            None,
+            persistentVolume.mode,
+            Some(persistentVolume.persistent)))
       case dockerVolume: DockerVolume =>
         Some(
-            (dockerVolume.containerPath,
-             Some(dockerVolume.hostPath),
-             dockerVolume.mode,
-             None))
+          (
+            dockerVolume.containerPath,
+            Some(dockerVolume.hostPath),
+            dockerVolume.mode,
+            None))
     }
 
   implicit val validVolume: Validator[Volume] = new Validator[Volume] {
@@ -93,7 +96,9 @@ object Volume {
   * absolute.
   */
 case class DockerVolume(
-    containerPath: String, hostPath: String, mode: Mesos.Volume.Mode)
+    containerPath: String,
+    hostPath: String,
+    mode: Mesos.Volume.Mode)
     extends Volume
 
 object DockerVolume {
@@ -114,9 +119,10 @@ object PersistentVolumeInfo {
   }
 }
 
-case class PersistentVolume(containerPath: String,
-                            persistent: PersistentVolumeInfo,
-                            mode: Mesos.Volume.Mode)
+case class PersistentVolume(
+    containerPath: String,
+    persistent: PersistentVolumeInfo,
+    mode: Mesos.Volume.Mode)
     extends Volume
 
 object PersistentVolume {
@@ -126,8 +132,9 @@ object PersistentVolume {
     vol.persistent is valid
     vol.mode is equalTo(Mode.RW)
     //persistent volumes require those CLI parameters provided
-    vol is configValueSet("mesos_authentication_principal",
-                          "mesos_role",
-                          "mesos_authentication_secret_file")
+    vol is configValueSet(
+      "mesos_authentication_principal",
+      "mesos_role",
+      "mesos_authentication_secret_file")
   }
 }

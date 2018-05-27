@@ -23,9 +23,16 @@ import org.apache.spark.sql.catalyst.{SimpleCatalystConf, TableIdentifier}
 import org.apache.spark.sql.catalyst.dsl.expressions._
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.expressions.aggregate._
-import org.apache.spark.sql.catalyst.expressions.Literal.{FalseLiteral, TrueLiteral}
+import org.apache.spark.sql.catalyst.expressions.Literal.{
+  FalseLiteral,
+  TrueLiteral
+}
 import org.apache.spark.sql.catalyst.plans.PlanTest
-import org.apache.spark.sql.catalyst.plans.logical.{LocalRelation, Project, Union}
+import org.apache.spark.sql.catalyst.plans.logical.{
+  LocalRelation,
+  Project,
+  Union
+}
 import org.apache.spark.sql.types._
 
 class DecimalPrecisionSuite extends PlanTest with BeforeAndAfter {
@@ -34,12 +41,12 @@ class DecimalPrecisionSuite extends PlanTest with BeforeAndAfter {
   val analyzer = new Analyzer(catalog, EmptyFunctionRegistry, conf)
 
   val relation = LocalRelation(
-      AttributeReference("i", IntegerType)(),
-      AttributeReference("d1", DecimalType(2, 1))(),
-      AttributeReference("d2", DecimalType(5, 2))(),
-      AttributeReference("u", DecimalType.SYSTEM_DEFAULT)(),
-      AttributeReference("f", FloatType)(),
-      AttributeReference("b", DoubleType)()
+    AttributeReference("i", IntegerType)(),
+    AttributeReference("d1", DecimalType(2, 1))(),
+    AttributeReference("d2", DecimalType(5, 2))(),
+    AttributeReference("u", DecimalType.SYSTEM_DEFAULT)(),
+    AttributeReference("f", FloatType)(),
+    AttributeReference("b", DoubleType)()
   )
 
   val i: Expression = UnresolvedAttribute("i")
@@ -53,13 +60,16 @@ class DecimalPrecisionSuite extends PlanTest with BeforeAndAfter {
     catalog.registerTable(TableIdentifier("table"), relation)
   }
 
-  private def checkType(expression: Expression, expectedType: DataType): Unit = {
+  private def checkType(
+      expression: Expression,
+      expectedType: DataType): Unit = {
     val plan = Project(Seq(Alias(expression, "c")()), relation)
     assert(analyzer.execute(plan).schema.fields(0).dataType === expectedType)
   }
 
   private def checkComparison(
-      expression: Expression, expectedType: DataType): Unit = {
+      expression: Expression,
+      expectedType: DataType): Unit = {
     val plan = Project(Alias(expression, "c")() :: Nil, relation)
     val comparison = analyzer
       .execute(plan)
@@ -72,9 +82,12 @@ class DecimalPrecisionSuite extends PlanTest with BeforeAndAfter {
   }
 
   private def checkUnion(
-      left: Expression, right: Expression, expectedType: DataType): Unit = {
-    val plan = Union(Project(Seq(Alias(left, "l")()), relation),
-                     Project(Seq(Alias(right, "r")()), relation))
+      left: Expression,
+      right: Expression,
+      expectedType: DataType): Unit = {
+    val plan = Union(
+      Project(Seq(Alias(left, "l")()), relation),
+      Project(Seq(Alias(right, "r")()), relation))
     val (l, r) = analyzer
       .execute(plan)
       .collect {
@@ -277,7 +290,7 @@ class DecimalPrecisionSuite extends PlanTest with BeforeAndAfter {
   def ruleTest(initial: Expression, transformed: Expression): Unit = {
     val testRelation = LocalRelation(AttributeReference("a", IntegerType)())
     comparePlans(
-        DecimalPrecision(Project(Seq(Alias(initial, "a")()), testRelation)),
-        Project(Seq(Alias(transformed, "a")()), testRelation))
+      DecimalPrecision(Project(Seq(Alias(initial, "a")()), testRelation)),
+      Project(Seq(Alias(transformed, "a")()), testRelation))
   }
 }

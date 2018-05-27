@@ -18,8 +18,27 @@ package net.liftweb
 package record
 
 import net.liftweb.http.js.{JsExp, JsObj}
-import net.liftweb.http.js.JE.{JsArray, JsFalse, JsNull, JsObj, JsTrue, Num, Str}
-import net.liftweb.json.JsonAST.{JArray, JBool, JInt, JDouble, JField, JNothing, JNull, JObject, JString, JValue}
+import net.liftweb.http.js.JE.{
+  JsArray,
+  JsFalse,
+  JsNull,
+  JsObj,
+  JsTrue,
+  Num,
+  Str
+}
+import net.liftweb.json.JsonAST.{
+  JArray,
+  JBool,
+  JInt,
+  JDouble,
+  JField,
+  JNothing,
+  JNull,
+  JObject,
+  JString,
+  JValue
+}
 
 object RecordHelpers {
 
@@ -27,11 +46,11 @@ object RecordHelpers {
   implicit def jvalueToJsExp(jvalue: JValue): JsExp = {
     jvalue match {
       case JArray(vs) => JsArray(vs.map(jvalueToJsExp): _*)
-      case JBool(b) => if (b) JsTrue else JsFalse
+      case JBool(b)   => if (b) JsTrue else JsFalse
       case JDouble(d) => Num(d)
-      case JInt(i) => Num(i)
-      case JNothing => JsNull
-      case JNull => JsNull
+      case JInt(i)    => Num(i)
+      case JNothing   => JsNull
+      case JNull      => JsNull
       case JObject(fs) =>
         JsObj(fs.map(f => (f.name, jvalueToJsExp(f.value))): _*)
       case JString(s) => Str(s)

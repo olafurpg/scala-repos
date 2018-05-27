@@ -160,8 +160,8 @@ trait NumericOps[+This] { repr: This =>
     * @tparam B type of the other operand
     * @tparam That result type of operation
     */
-  def >>>[B, That](other: B)(
-      implicit op: BinOp[BitUShr, This, B, That]): That = op(repr, other)
+  def >>>[B, That](other: B)(implicit op: BinOp[BitUShr, This, B, That]): That =
+    op(repr, other)
 
   // boolean-result ops
 

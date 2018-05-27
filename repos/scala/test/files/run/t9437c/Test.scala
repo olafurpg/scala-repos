@@ -3,7 +3,14 @@ import java.io.{File, FileOutputStream}
 import scala.tools.nsc.settings.ScalaVersion
 import scala.tools.partest._
 import scala.tools.asm
-import asm.{AnnotationVisitor, ClassWriter, FieldVisitor, Handle, MethodVisitor, Opcodes}
+import asm.{
+  AnnotationVisitor,
+  ClassWriter,
+  FieldVisitor,
+  Handle,
+  MethodVisitor,
+  Opcodes
+}
 import Opcodes._
 
 // This test ensures that we can read JDK 8 (classfile format 52) files with
@@ -20,10 +27,19 @@ object Test extends DirectTest {
 
     val cw = new ClassWriter(0)
     cw.visit(
-        52, ACC_PUBLIC + ACC_SUPER, className, null, "java/lang/Object", null);
+      52,
+      ACC_PUBLIC + ACC_SUPER,
+      className,
+      null,
+      "java/lang/Object",
+      null);
 
     val mvC = cw.visitMethod(
-        ACC_PUBLIC, "<init>", "(ILjava/lang/String;JFD)V", null, null);
+      ACC_PUBLIC,
+      "<init>",
+      "(ILjava/lang/String;JFD)V",
+      null,
+      null);
     mvC.visitParameter("a", ACC_FINAL);
     mvC.visitParameter("_", ACC_FINAL);
     mvC.visitParameter("***", ACC_FINAL);
@@ -32,16 +48,21 @@ object Test extends DirectTest {
     mvC.visitCode();
     mvC.visitVarInsn(ALOAD, 0);
     mvC.visitMethodInsn(
-        INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
+      INVOKESPECIAL,
+      "java/lang/Object",
+      "<init>",
+      "()V",
+      false);
     mvC.visitInsn(RETURN);
     mvC.visitMaxs(1, 8);
     mvC.visitEnd();
 
-    val mvM = cw.visitMethod(ACC_PUBLIC,
-                             "bar",
-                             "(ILjava/lang/String;JFD)Lscala/runtime/Null$;",
-                             null,
-                             null);
+    val mvM = cw.visitMethod(
+      ACC_PUBLIC,
+      "bar",
+      "(ILjava/lang/String;JFD)Lscala/runtime/Null$;",
+      null,
+      null);
     mvM.visitParameter("a", ACC_FINAL);
     mvM.visitParameter("_", ACC_FINAL);
     mvM.visitParameter("***", ACC_FINAL);
@@ -58,8 +79,9 @@ object Test extends DirectTest {
     val bytes = cw.toByteArray()
 
     val fos = new FileOutputStream(
-        new File(s"${testOutput.path}/$className.class"))
-    try fos write bytes finally fos.close()
+      new File(s"${testOutput.path}/$className.class"))
+    try fos write bytes
+    finally fos.close()
   }
 
   def code =

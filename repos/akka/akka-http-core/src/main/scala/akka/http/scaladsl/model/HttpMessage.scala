@@ -65,12 +65,14 @@ sealed trait HttpMessage extends jm.HttpMessage {
 
   /** Returns a sharable and serializable copy of this message with a strict entity. */
   def toStrict(timeout: FiniteDuration)(
-      implicit ec: ExecutionContext, fm: Materializer): Future[Self] =
+      implicit ec: ExecutionContext,
+      fm: Materializer): Future[Self] =
     entity.toStrict(timeout).fast.map(this.withEntity)
 
   /** Returns a copy of this message with the entity and headers set to the given ones. */
   def withHeadersAndEntity(
-      headers: immutable.Seq[HttpHeader], entity: MessageEntity): Self
+      headers: immutable.Seq[HttpHeader],
+      entity: MessageEntity): Self
 
   /** Returns a copy of this message with the list of headers transformed by the given function */
   def mapHeaders(
@@ -87,7 +89,7 @@ sealed trait HttpMessage extends jm.HttpMessage {
   }
 
   /** Returns the first header of the given type if there is one */
-  def header[T <: jm.HttpHeader : ClassTag]: Option[T] = {
+  def header[T <: jm.HttpHeader: ClassTag]: Option[T] = {
     val erasure = classTag[T].runtimeClass
     headers.find(erasure.isInstance).asInstanceOf[Option[T]]
   }
@@ -114,7 +116,7 @@ sealed trait HttpMessage extends jm.HttpMessage {
   def withEntity(bytes: ByteString): Self = withEntity(HttpEntity(bytes))
   def withEntity(contentType: jm.ContentType.NonBinary, string: String): Self =
     withEntity(
-        HttpEntity(contentType.asInstanceOf[ContentType.NonBinary], string))
+      HttpEntity(contentType.asInstanceOf[ContentType.NonBinary], string))
   def withEntity(contentType: jm.ContentType, bytes: Array[Byte]): Self =
     withEntity(HttpEntity(contentType.asInstanceOf[ContentType], bytes))
   def withEntity(contentType: jm.ContentType, bytes: ByteString): Self =
@@ -145,7 +147,8 @@ sealed trait HttpMessage extends jm.HttpMessage {
 
 object HttpMessage {
   private[http] def connectionCloseExpected(
-      protocol: HttpProtocol, connectionHeader: Option[Connection]): Boolean =
+      protocol: HttpProtocol,
+      connectionHeader: Option[Connection]): Boolean =
     protocol match {
       case HttpProtocols.`HTTP/1.1` ⇒
         connectionHeader.isDefined && connectionHeader.get.hasClose
@@ -157,19 +160,23 @@ object HttpMessage {
 /**
   * The immutable model HTTP request model.
   */
-final class HttpRequest(val method: HttpMethod,
-                        val uri: Uri,
-                        val headers: immutable.Seq[HttpHeader],
-                        val entity: RequestEntity,
-                        val protocol: HttpProtocol)
-    extends jm.HttpRequest with HttpMessage {
+final class HttpRequest(
+    val method: HttpMethod,
+    val uri: Uri,
+    val headers: immutable.Seq[HttpHeader],
+    val entity: RequestEntity,
+    val protocol: HttpProtocol)
+    extends jm.HttpRequest
+    with HttpMessage {
 
   HttpRequest.verifyUri(uri)
-  require(entity.isKnownEmpty || method.isEntityAccepted,
-          s"Requests with method '${method.value}' must have an empty entity")
-  require(protocol != HttpProtocols.`HTTP/1.0` ||
-          !entity.isInstanceOf[HttpEntity.Chunked],
-          "HTTP/1.0 requests must not have a chunked entity")
+  require(
+    entity.isKnownEmpty || method.isEntityAccepted,
+    s"Requests with method '${method.value}' must have an empty entity")
+  require(
+    protocol != HttpProtocols.`HTTP/1.0` ||
+      !entity.isInstanceOf[HttpEntity.Chunked],
+    "HTTP/1.0 requests must not have a chunked entity")
 
   type Self = HttpRequest
   def self = this
@@ -185,16 +192,17 @@ final class HttpRequest(val method: HttpMethod,
     * include a valid [[akka.http.scaladsl.model.headers.Host]] header or if URI authority and [[akka.http.scaladsl.model.headers.Host]] header don't match.
     */
   def effectiveUri(
-      securedConnection: Boolean, defaultHostHeader: Host = Host.empty): Uri =
-    HttpRequest.effectiveUri(
-        uri, headers, securedConnection, defaultHostHeader)
+      securedConnection: Boolean,
+      defaultHostHeader: Host = Host.empty): Uri =
+    HttpRequest.effectiveUri(uri, headers, securedConnection, defaultHostHeader)
 
   /**
     * Returns a copy of this request with the URI resolved according to the logic defined at
     * http://tools.ietf.org/html/rfc7230#section-5.5
     */
-  def withEffectiveUri(securedConnection: Boolean,
-                       defaultHostHeader: Host = Host.empty): HttpRequest =
+  def withEffectiveUri(
+      securedConnection: Boolean,
+      defaultHostHeader: Host = Host.empty): HttpRequest =
     copy(uri = effectiveUri(securedConnection, defaultHostHeader))
 
   /**
@@ -212,7 +220,8 @@ final class HttpRequest(val method: HttpMethod,
     if (headers eq this.headers) this else copy(headers = headers)
 
   override def withHeadersAndEntity(
-      headers: immutable.Seq[HttpHeader], entity: RequestEntity): HttpRequest =
+      headers: immutable.Seq[HttpHeader],
+      entity: RequestEntity): HttpRequest =
     copy(headers = headers, entity = entity)
   override def withEntity(entity: jm.RequestEntity): HttpRequest =
     copy(entity = entity.asInstanceOf[RequestEntity])
@@ -241,11 +250,12 @@ final class HttpRequest(val method: HttpMethod,
 
   /* Manual Case Class things, to easen bin-compat */
 
-  def copy(method: HttpMethod = method,
-           uri: Uri = uri,
-           headers: immutable.Seq[HttpHeader] = headers,
-           entity: RequestEntity = entity,
-           protocol: HttpProtocol = protocol) =
+  def copy(
+      method: HttpMethod = method,
+      uri: Uri = uri,
+      headers: immutable.Seq[HttpHeader] = headers,
+      entity: RequestEntity = entity,
+      protocol: HttpProtocol = protocol) =
     new HttpRequest(method, uri, headers, entity, protocol)
 
   override def hashCode(): Int = {
@@ -261,7 +271,7 @@ final class HttpRequest(val method: HttpMethod,
   override def equals(obj: scala.Any): Boolean = obj match {
     case HttpRequest(_method, _uri, _headers, _entity, _protocol) =>
       method == _method && uri == _uri && headers == _headers &&
-      entity == _entity && protocol == _protocol
+        entity == _entity && protocol == _protocol
     case _ => false
   }
 
@@ -284,15 +294,16 @@ object HttpRequest {
     * Throws an [[IllegalUriException]] if the URI is relative and the `headers` don't
     * include a valid [[akka.http.scaladsl.model.headers.Host]] header or if URI authority and [[akka.http.scaladsl.model.headers.Host]] header don't match.
     */
-  def effectiveUri(uri: Uri,
-                   headers: immutable.Seq[HttpHeader],
-                   securedConnection: Boolean,
-                   defaultHostHeader: Host): Uri = {
+  def effectiveUri(
+      uri: Uri,
+      headers: immutable.Seq[HttpHeader],
+      securedConnection: Boolean,
+      defaultHostHeader: Host): Uri = {
     val hostHeader = headers.collectFirst { case x: Host ⇒ x }
     if (uri.isRelative) {
       def fail(detail: String) =
         throw IllegalUriException(
-            s"Cannot establish effective URI of request to `$uri`, request has a relative URI and $detail")
+          s"Cannot establish effective URI of request to `$uri`, request has a relative URI and $detail")
       val Host(host, port) = hostHeader match {
         case None ⇒
           if (defaultHostHeader.isEmpty) fail("is missing a `Host` header")
@@ -310,8 +321,9 @@ object HttpRequest {
         hostHeader.get.port == uri.authority.port) uri
     else
       throw IllegalUriException(
-          s"'Host' header value of request to `$uri` doesn't match request target authority",
-          s"Host header: $hostHeader\nrequest target authority: ${uri.authority}")
+        s"'Host' header value of request to `$uri` doesn't match request target authority",
+        s"Host header: $hostHeader\nrequest target authority: ${uri.authority}"
+      )
   }
 
   /**
@@ -329,20 +341,21 @@ object HttpRequest {
         // ok
         case 5
             if c(0) == 'h' && c(1) == 't' && c(2) == 't' && c(3) == 'p' &&
-            c(4) == 's' ⇒ // ok
+              c(4) == 's' ⇒ // ok
         case _ ⇒
           throw new IllegalArgumentException(
-              """`uri` must have scheme "http", "https" or no scheme""")
+            """`uri` must have scheme "http", "https" or no scheme""")
       }
     }
 
   /* Manual Case Class things, to easen bin-compat */
 
-  def apply(method: HttpMethod = HttpMethods.GET,
-            uri: Uri = Uri./,
-            headers: immutable.Seq[HttpHeader] = Nil,
-            entity: RequestEntity = HttpEntity.Empty,
-            protocol: HttpProtocol = HttpProtocols.`HTTP/1.1`) =
+  def apply(
+      method: HttpMethod = HttpMethods.GET,
+      uri: Uri = Uri./,
+      headers: immutable.Seq[HttpHeader] = Nil,
+      entity: RequestEntity = HttpEntity.Empty,
+      protocol: HttpProtocol = HttpProtocols.`HTTP/1.1`) =
     new HttpRequest(method, uri, headers, entity, protocol)
 
   def unapply(any: HttpRequest) = new OptHttpRequest(any)
@@ -351,17 +364,21 @@ object HttpRequest {
 /**
   * The immutable HTTP response model.
   */
-final class HttpResponse(val status: StatusCode,
-                         val headers: immutable.Seq[HttpHeader],
-                         val entity: ResponseEntity,
-                         val protocol: HttpProtocol)
-    extends jm.HttpResponse with HttpMessage {
+final class HttpResponse(
+    val status: StatusCode,
+    val headers: immutable.Seq[HttpHeader],
+    val entity: ResponseEntity,
+    val protocol: HttpProtocol)
+    extends jm.HttpResponse
+    with HttpMessage {
 
-  require(entity.isKnownEmpty || status.allowsEntity,
-          "Responses with this status code must have an empty entity")
-  require(protocol == HttpProtocols.`HTTP/1.1` ||
-          !entity.isInstanceOf[HttpEntity.Chunked],
-          "HTTP/1.0 responses must not have a chunked entity")
+  require(
+    entity.isKnownEmpty || status.allowsEntity,
+    "Responses with this status code must have an empty entity")
+  require(
+    protocol == HttpProtocols.`HTTP/1.1` ||
+      !entity.isInstanceOf[HttpEntity.Chunked],
+    "HTTP/1.0 responses must not have a chunked entity")
 
   type Self = HttpResponse
   def self = this
@@ -382,11 +399,13 @@ final class HttpResponse(val status: StatusCode,
     : akka.http.javadsl.model.HttpResponse =
     copy(status = statusCode.asInstanceOf[StatusCode])
 
-  override def withHeadersAndEntity(headers: immutable.Seq[HttpHeader],
-                                    entity: MessageEntity): HttpResponse =
+  override def withHeadersAndEntity(
+      headers: immutable.Seq[HttpHeader],
+      entity: MessageEntity): HttpResponse =
     withHeadersAndEntity(headers, entity: ResponseEntity)
-  def withHeadersAndEntity(headers: immutable.Seq[HttpHeader],
-                           entity: ResponseEntity): HttpResponse =
+  def withHeadersAndEntity(
+      headers: immutable.Seq[HttpHeader],
+      entity: ResponseEntity): HttpResponse =
     copy(headers = headers, entity = entity)
   override def withEntity(entity: jm.ResponseEntity): HttpResponse =
     copy(entity = entity.asInstanceOf[ResponseEntity])
@@ -400,16 +419,17 @@ final class HttpResponse(val status: StatusCode,
 
   /* Manual Case Class things, to easen bin-compat */
 
-  def copy(status: StatusCode = status,
-           headers: immutable.Seq[HttpHeader] = headers,
-           entity: ResponseEntity = entity,
-           protocol: HttpProtocol = protocol) =
+  def copy(
+      status: StatusCode = status,
+      headers: immutable.Seq[HttpHeader] = headers,
+      entity: ResponseEntity = entity,
+      protocol: HttpProtocol = protocol) =
     new HttpResponse(status, headers, entity, protocol)
 
   override def equals(obj: scala.Any): Boolean = obj match {
     case HttpResponse(_status, _headers, _entity, _protocol) =>
       status == _status && headers == _headers && entity == _entity &&
-      protocol == _protocol
+        protocol == _protocol
     case _ => false
   }
 
@@ -434,10 +454,11 @@ final class HttpResponse(val status: StatusCode,
 object HttpResponse {
   /* Manual Case Class things, to easen bin-compat */
 
-  def apply(status: StatusCode = StatusCodes.OK,
-            headers: immutable.Seq[HttpHeader] = Nil,
-            entity: ResponseEntity = HttpEntity.Empty,
-            protocol: HttpProtocol = HttpProtocols.`HTTP/1.1`) =
+  def apply(
+      status: StatusCode = StatusCodes.OK,
+      headers: immutable.Seq[HttpHeader] = Nil,
+      entity: ResponseEntity = HttpEntity.Empty,
+      protocol: HttpProtocol = HttpProtocols.`HTTP/1.1`) =
     new HttpResponse(status, headers, entity, protocol)
 
   def unapply(any: HttpResponse): OptHttpResponse = new OptHttpResponse(any)

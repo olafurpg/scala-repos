@@ -35,11 +35,12 @@ class ConsoleConsumerTest extends JUnitSuite {
     val formatter = EasyMock.createNiceMock(classOf[MessageFormatter])
 
     //Stubs
-    val record = new BaseConsumerRecord(topic = "foo",
-                                        partition = 1,
-                                        offset = 1,
-                                        key = Array[Byte](),
-                                        value = Array[Byte]())
+    val record = new BaseConsumerRecord(
+      topic = "foo",
+      partition = 1,
+      offset = 1,
+      key = Array[Byte](),
+      value = Array[Byte]())
 
     //Expectations
     val messageLimit: Int = 10
@@ -58,11 +59,12 @@ class ConsoleConsumerTest extends JUnitSuite {
   @Test
   def shouldParseValidOldConsumerValidConfig() {
     //Given
-    val args: Array[String] = Array("--zookeeper",
-                                    "localhost:2181",
-                                    "--topic",
-                                    "test",
-                                    "--from-beginning")
+    val args: Array[String] = Array(
+      "--zookeeper",
+      "localhost:2181",
+      "--topic",
+      "test",
+      "--from-beginning")
 
     //When
     val config = new ConsoleConsumer.ConsumerConfig(args)
@@ -77,12 +79,13 @@ class ConsoleConsumerTest extends JUnitSuite {
   @Test
   def shouldParseValidNewConsumerValidConfig() {
     //Given
-    val args: Array[String] = Array("--bootstrap-server",
-                                    "localhost:9092",
-                                    "--topic",
-                                    "test",
-                                    "--from-beginning",
-                                    "--new-consumer") //new
+    val args: Array[String] = Array(
+      "--bootstrap-server",
+      "localhost:9092",
+      "--topic",
+      "test",
+      "--from-beginning",
+      "--new-consumer") //new
 
     //When
     val config = new ConsoleConsumer.ConsumerConfig(args)
@@ -101,17 +104,18 @@ class ConsoleConsumerTest extends JUnitSuite {
     propsStream.write("consumer.timeout.ms=1000".getBytes())
     propsStream.close()
     val args: Array[String] = Array(
-        "--zookeeper",
-        "localhost:2181",
-        "--topic",
-        "test",
-        "--consumer.config",
-        propsFile.getAbsolutePath
+      "--zookeeper",
+      "localhost:2181",
+      "--topic",
+      "test",
+      "--consumer.config",
+      propsFile.getAbsolutePath
     )
 
     val config = new ConsoleConsumer.ConsumerConfig(args)
 
     assertEquals(
-        "1000", config.consumerProps.getProperty("consumer.timeout.ms"))
+      "1000",
+      config.consumerProps.getProperty("consumer.timeout.ms"))
   }
 }

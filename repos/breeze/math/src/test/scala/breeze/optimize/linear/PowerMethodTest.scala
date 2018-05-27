@@ -9,33 +9,14 @@ import breeze.linalg._
 @RunWith(classOf[JUnitRunner])
 class PowerMethodTest extends FunSuite {
   val n = 5
-  val gram = new DenseMatrix[Double](n,
-                                     n,
-                                     Array(5.6880,
-                                           -4.5286,
-                                           6.7923,
-                                           0.3049,
-                                           -6.0388,
-                                           -4.5286,
-                                           8.0638,
-                                           -6.9012,
-                                           -2.6776,
-                                           6.1795,
-                                           6.7923,
-                                           -6.9012,
-                                           12.5510,
-                                           -1.1917,
-                                           -8.3500,
-                                           0.3049,
-                                           -2.6776,
-                                           -1.1917,
-                                           4.0684,
-                                           -1.7535,
-                                           -6.0388,
-                                           6.1795,
-                                           -8.3500,
-                                           -1.7535,
-                                           8.2831))
+  val gram = new DenseMatrix[Double](
+    n,
+    n,
+    Array(5.6880, -4.5286, 6.7923, 0.3049, -6.0388, -4.5286, 8.0638, -6.9012,
+      -2.6776, 6.1795, 6.7923, -6.9012, 12.5510, -1.1917, -8.3500, 0.3049,
+      -2.6776, -1.1917, 4.0684, -1.7535, -6.0388, 6.1795, -8.3500, -1.7535,
+      8.2831)
+  )
   val init = DenseVector(0.1770, 0.2505, 1.5957, 0.7204, 0.9246)
   val eigs = eigSym(gram)
 
@@ -55,7 +36,7 @@ class PowerMethodTest extends FunSuite {
   }
 
   test(
-      "min eigen value from inverse power method approximately equal to eigSym min") {
+    "min eigen value from inverse power method approximately equal to eigSym min") {
     val eigenGold = min(eigs.eigenvalues)
     val pmInv = PowerMethod.inverse(10, 1e-5)
     val R = cholesky(gram).t

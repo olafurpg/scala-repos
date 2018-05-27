@@ -43,7 +43,9 @@ object ImageCursor {
     * Creates a custom image cursor from one of the specified images.
     */
   def chooseBestCursor(
-      images: Array[jfxsi.Image], hotspotX: Double, hotspotY: Double) =
+      images: Array[jfxsi.Image],
+      hotspotX: Double,
+      hotspotY: Double) =
     jfxs.ImageCursor.chooseBestCursor(images, hotspotX, hotspotX)
 
   /**
@@ -60,7 +62,8 @@ object ImageCursor {
 
 class ImageCursor(
     override val delegate: jfxs.ImageCursor = new jfxs.ImageCursor)
-    extends Cursor(delegate) with SFXDelegate[jfxs.ImageCursor] {
+    extends Cursor(delegate)
+    with SFXDelegate[jfxs.ImageCursor] {
 
   /**
     * Constructs an ImageCursor from the specified image.

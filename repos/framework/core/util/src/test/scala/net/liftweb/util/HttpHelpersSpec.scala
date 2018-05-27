@@ -26,7 +26,10 @@ import HttpHelpers._
   * Systems under specification for HttpHelpers.
   */
 object HttpHelpersSpec
-    extends Specification with HttpHelpers with ListHelpers with StringHelpers
+    extends Specification
+    with HttpHelpers
+    with ListHelpers
+    with StringHelpers
     with XmlMatchers {
   "HttpHelpers Specification".title
 
@@ -41,13 +44,13 @@ object HttpHelpersSpec
     "an appendParams function to add parameters to a URL query" in {
       "creating the param list with ? if there are no existing params" in {
         appendParams(
-            "www.helloworld.com/params",
-            List(("firstname", "hello"), ("lastname", "world"))) must_== "www.helloworld.com/params?firstname=hello&lastname=world"
+          "www.helloworld.com/params",
+          List(("firstname", "hello"), ("lastname", "world"))) must_== "www.helloworld.com/params?firstname=hello&lastname=world"
       }
       "appending the param list with & if there are some already" in {
         appendParams(
-            "www.helloworld.com/params?firstname=hello",
-            List(("lastname", "world"))) must_== "www.helloworld.com/params?firstname=hello&lastname=world"
+          "www.helloworld.com/params?firstname=hello",
+          List(("lastname", "world"))) must_== "www.helloworld.com/params?firstname=hello&lastname=world"
       }
       "returning the url if no param list is passed" in {
         appendParams("www.helloworld.com/params", Nil) must_== "www.helloworld.com/params"
@@ -77,7 +80,7 @@ object HttpHelpersSpec
     }
     "a toHashMap function transforming a Map to a mutable HashMap" in {
       toHashMap(Map(1 -> 2, 3 -> 4)) must haveClass[
-          scala.collection.mutable.HashMap[Int, Int]]
+        scala.collection.mutable.HashMap[Int, Int]]
     }
     "an insureField function" in {
       "checking that the appropriate fields are in the header" in {

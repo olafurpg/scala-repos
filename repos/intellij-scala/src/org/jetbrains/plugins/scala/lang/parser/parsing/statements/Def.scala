@@ -27,25 +27,28 @@ object Def {
   def parse(builder: ScalaPsiBuilder): Boolean = parse(builder, isMod = true)
   def parse(builder: ScalaPsiBuilder, isMod: Boolean): Boolean =
     parse(builder, isMod, isImplicit = false)
-  def parse(builder: ScalaPsiBuilder,
-            isMod: Boolean,
-            isImplicit: Boolean): Boolean = {
+  def parse(
+      builder: ScalaPsiBuilder,
+      isMod: Boolean,
+      isImplicit: Boolean): Boolean = {
     val defMarker = builder.mark
     defMarker.setCustomEdgeTokenBinders(
-        ScalaTokenBinders.PRECEEDING_COMMENTS_TOKEN, null)
+      ScalaTokenBinders.PRECEEDING_COMMENTS_TOKEN,
+      null)
     if (isMod || isImplicit) {
       val annotationsMarker = builder.mark
       while (Annotation.parse(builder)) {}
       annotationsMarker.done(ScalaElementTypes.ANNOTATIONS)
       annotationsMarker.setCustomEdgeTokenBinders(
-          ScalaTokenBinders.DEFAULT_LEFT_EDGE_BINDER, null)
+        ScalaTokenBinders.DEFAULT_LEFT_EDGE_BINDER,
+        null)
       //parse modifiers
       val modifierMarker = builder.mark
       if (isMod) {
         while (Modifier.parse(builder)) {}
       } else {
         while (builder.getTokenType == ScalaTokenTypes.kIMPLICIT ||
-        builder.getTokenType == ScalaTokenTypes.kLAZY) {
+               builder.getTokenType == ScalaTokenTypes.kLAZY) {
           builder.advanceLexer()
         }
       }

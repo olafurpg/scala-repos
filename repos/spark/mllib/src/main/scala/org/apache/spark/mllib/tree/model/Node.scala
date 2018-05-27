@@ -50,11 +50,12 @@ class Node @Since("1.2.0")(
     @Since("1.0.0") var leftNode: Option[Node],
     @Since("1.0.0") var rightNode: Option[Node],
     @Since("1.0.0") var stats: Option[InformationGainStats])
-    extends Serializable with Logging {
+    extends Serializable
+    with Logging {
 
   override def toString: String = {
     s"id = $id, isLeaf = $isLeaf, predict = $predict, impurity = $impurity, " +
-    s"split = $split, stats = $stats"
+      s"split = $split, stats = $stats"
   }
 
   /**
@@ -63,8 +64,8 @@ class Node @Since("1.2.0")(
     */
   @Since("1.0.0")
   @deprecated(
-      "build should no longer be used since trees are constructed on-the-fly in training",
-      "1.2.0")
+    "build should no longer be used since trees are constructed on-the-fly in training",
+    "1.2.0")
   def build(nodes: Array[Node]): Unit = {
     logDebug("building node " + id + " at level " + Node.indexToLevel(id))
     logDebug("id = " + id + ", split = " + split)
@@ -121,14 +122,15 @@ class Node @Since("1.2.0")(
       } else {
         Some(rightNode.get.deepCopy())
       }
-    new Node(id,
-             predict,
-             impurity,
-             isLeaf,
-             split,
-             leftNodeCopy,
-             rightNodeCopy,
-             stats)
+    new Node(
+      id,
+      predict,
+      impurity,
+      isLeaf,
+      split,
+      leftNodeCopy,
+      rightNodeCopy,
+      stats)
   }
 
   /**
@@ -180,9 +182,9 @@ class Node @Since("1.2.0")(
       prefix + s"Predict: ${predict.predict}\n"
     } else {
       prefix + s"If ${splitToString(split.get, left = true)}\n" +
-      leftNode.get.subtreeToString(indentFactor + 1) + prefix +
-      s"Else ${splitToString(split.get, left = false)}\n" +
-      rightNode.get.subtreeToString(indentFactor + 1)
+        leftNode.get.subtreeToString(indentFactor + 1) + prefix +
+        s"Else ${splitToString(split.get, left = false)}\n" +
+        rightNode.get.subtreeToString(indentFactor + 1)
     }
   }
 
@@ -202,14 +204,15 @@ private[spark] object Node {
     * Return a node with the given node id (but nothing else set).
     */
   def emptyNode(nodeIndex: Int): Node =
-    new Node(nodeIndex,
-             new Predict(Double.MinValue),
-             -1.0,
-             false,
-             None,
-             None,
-             None,
-             None)
+    new Node(
+      nodeIndex,
+      new Predict(Double.MinValue),
+      -1.0,
+      false,
+      None,
+      None,
+      None,
+      None)
 
   /**
     * Construct a node with nodeIndex, predict, impurity and isLeaf parameters.
@@ -222,10 +225,11 @@ private[spark] object Node {
     * @param isLeaf whether the node is a leaf
     * @return new node instance
     */
-  def apply(nodeIndex: Int,
-            predict: Predict,
-            impurity: Double,
-            isLeaf: Boolean): Node = {
+  def apply(
+      nodeIndex: Int,
+      predict: Predict,
+      impurity: Double,
+      isLeaf: Boolean): Node = {
     new Node(nodeIndex, predict, impurity, isLeaf, None, None, None, None)
   }
 

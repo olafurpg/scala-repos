@@ -21,8 +21,9 @@ class TableDump(maxColumnWidth: Int = 20) {
       else s.replace("\r", "\\r").replace("\n", "\\n").replace("\t", "\\t")
     }
 
-  def apply(headers: IndexedSeq[IndexedSeq[String]],
-            data: IndexedSeq[IndexedSeq[Any]]): IndexedSeq[String] = {
+  def apply(
+      headers: IndexedSeq[IndexedSeq[String]],
+      data: IndexedSeq[IndexedSeq[Any]]): IndexedSeq[String] = {
     val columns = headers(0).length
     val texts = headers.map(formatLine) ++ data.map(formatLine)
     val widths = 0.until(columns).map { idx =>
@@ -45,8 +46,7 @@ class TableDump(maxColumnWidth: Int = 20) {
         val color = if (lno % 2 == 0) cYellow else cGreen
         buf += (line, widths).zipped
           .map((s, len) => color + " " + pad(s, len) + " ")
-          .mkString(
-              cBlue + box(10), cBlue + box(10), cBlue + box(10) + cNormal)
+          .mkString(cBlue + box(10), cBlue + box(10), cBlue + box(10) + cNormal)
         if (lno == headers.length - 1)
           buf += cBlue + widths
             .map(l => dashes.substring(0, l + 2))
@@ -54,8 +54,7 @@ class TableDump(maxColumnWidth: Int = 20) {
       } else {
         buf += (line, widths).zipped
           .map((s, len) => cNormal + " " + pad(s, len) + " ")
-          .mkString(
-              cBlue + box(10), cBlue + box(10), cBlue + box(10) + cNormal)
+          .mkString(cBlue + box(10), cBlue + box(10), cBlue + box(10) + cNormal)
       }
     }
     buf += cBlue + widths

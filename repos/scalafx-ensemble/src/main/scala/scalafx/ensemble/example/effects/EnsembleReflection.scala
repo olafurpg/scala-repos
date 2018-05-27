@@ -47,8 +47,8 @@ class EnsembleReflection extends EnsembleExample {
       padding = Insets(20, 20, 170, 20)
       children = new ImageView {
         image = new Image(
-            this.getClass
-              .getResourceAsStream("/scalafx/ensemble/images/boat.jpg"))
+          this.getClass
+            .getResourceAsStream("/scalafx/ensemble/images/boat.jpg"))
         fitHeight = 150
         preserveRatio = true
         effect = new Reflection()

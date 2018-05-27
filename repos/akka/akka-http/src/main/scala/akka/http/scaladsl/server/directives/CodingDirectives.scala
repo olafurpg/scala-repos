@@ -74,16 +74,17 @@ trait CodingDirectives {
               .mapEntity(StreamUtils.mapEntityError {
                 case NonFatal(e) ⇒
                   IllegalRequestException(
-                      StatusCodes.BadRequest,
-                      ErrorInfo("The request's encoding is corrupt",
-                                e.getMessage))
+                    StatusCodes.BadRequest,
+                    ErrorInfo(
+                      "The request's encoding is corrupt",
+                      e.getMessage))
               })
           }
         }
 
     requestEntityEmpty |
-    (requestEncodedWith(decoder.encoding) & applyDecoder & cancelRejections(
-            classOf[UnsupportedRequestEncodingRejection]))
+      (requestEncodedWith(decoder.encoding) & applyDecoder & cancelRejections(
+        classOf[UnsupportedRequestEncodingRejection]))
   }
 
   /**
@@ -122,7 +123,7 @@ trait CodingDirectives {
         response
       else
         response.withDefaultHeaders(
-            headers.`Content-Encoding`(HttpEncodings.gzip))
+          headers.`Content-Encoding`(HttpEncodings.gzip))
     }
 }
 

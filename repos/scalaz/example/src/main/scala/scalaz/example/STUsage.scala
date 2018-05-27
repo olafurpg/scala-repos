@@ -39,15 +39,20 @@ object STUsage extends App {
 
   // Bin-sort a list into an immutable array.
   // Uses a non-observable mutable array in the background.
-  def binSort[A : ClassTag](
-      size: Int, key: A => Int, as: List[A]): ImmutableArray[List[A]] =
-    accumArray(size,
-               (vs: List[A], v: A) => v :: vs,
-               List(),
-               for { a <- as } yield (key(a), a))
+  def binSort[A: ClassTag](
+      size: Int,
+      key: A => Int,
+      as: List[A]): ImmutableArray[List[A]] =
+    accumArray(
+      size,
+      (vs: List[A], v: A) => v :: vs,
+      List(),
+      for { a <- as } yield (key(a), a))
 
   assert(
-      binSort(12, (_: String).length, List("twenty four", "one", "")).toList.flatten === List(
-          "", "one", "twenty four"))
+    binSort(12, (_: String).length, List("twenty four", "one", "")).toList.flatten === List(
+      "",
+      "one",
+      "twenty four"))
   assert(compiles === 1)
 }

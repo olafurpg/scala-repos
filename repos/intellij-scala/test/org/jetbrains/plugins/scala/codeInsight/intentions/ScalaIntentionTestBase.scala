@@ -20,12 +20,16 @@ abstract class ScalaIntentionTestBase
   def familyName: String
 
   def doTest(
-      text: String, resultText: String, familyName: String = this.familyName) {
+      text: String,
+      resultText: String,
+      familyName: String = this.familyName) {
     intentionByFamilyName(text, familyName) match {
       case Some(action) =>
         startCommand(getProject, "Test Intention") {
           action.invoke(
-              myFixture.getProject, myFixture.getEditor, myFixture.getFile)
+            myFixture.getProject,
+            myFixture.getEditor,
+            myFixture.getFile)
         }
       case None => Assert.fail("Intention is not found")
     }
@@ -36,19 +40,24 @@ abstract class ScalaIntentionTestBase
   }
 
   def checkIntentionIsNotAvailable(
-      text: String, familyName: String = this.familyName) {
+      text: String,
+      familyName: String = this.familyName) {
     assert(
-        intentionByFamilyName(text, familyName).isEmpty, "Intention is found")
+      intentionByFamilyName(text, familyName).isEmpty,
+      "Intention is found")
   }
 
   def checkIntentionIsAvailable(
-      text: String, familyName: String = this.familyName) {
-    assert(intentionByFamilyName(text, familyName).isDefined,
-           "Intention is not found")
+      text: String,
+      familyName: String = this.familyName) {
+    assert(
+      intentionByFamilyName(text, familyName).isDefined,
+      "Intention is not found")
   }
 
   def intentionByFamilyName(
-      text: String, familyName: String): Option[IntentionAction] = {
+      text: String,
+      familyName: String): Option[IntentionAction] = {
     myFixture.configureByText(ScalaFileType.SCALA_FILE_TYPE, groom(text))
     val intentions: util.List[IntentionAction] =
       myFixture.getAvailableIntentions

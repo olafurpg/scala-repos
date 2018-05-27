@@ -3,7 +3,8 @@ package java.util
 import scala.collection.mutable
 
 class LinkedHashMap[K, V] private (
-    inner: mutable.LinkedHashMap[Box[K], V], accessOrder: Boolean)
+    inner: mutable.LinkedHashMap[Box[K], V],
+    accessOrder: Boolean)
     extends HashMap[K, V](inner) { self =>
 
   def this() =

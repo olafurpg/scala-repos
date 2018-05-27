@@ -19,17 +19,25 @@ package org.apache.spark.sql.execution.python
 
 import org.apache.spark.api.python.PythonFunction
 import org.apache.spark.internal.Logging
-import org.apache.spark.sql.catalyst.expressions.{Expression, NonSQLExpression, Unevaluable}
+import org.apache.spark.sql.catalyst.expressions.{
+  Expression,
+  NonSQLExpression,
+  Unevaluable
+}
 import org.apache.spark.sql.types.DataType
 
 /**
   * A serialized version of a Python lambda function.
   */
-case class PythonUDF(name: String,
-                     func: PythonFunction,
-                     dataType: DataType,
-                     children: Seq[Expression])
-    extends Expression with Unevaluable with NonSQLExpression with Logging {
+case class PythonUDF(
+    name: String,
+    func: PythonFunction,
+    dataType: DataType,
+    children: Seq[Expression])
+    extends Expression
+    with Unevaluable
+    with NonSQLExpression
+    with Logging {
 
   override def toString: String =
     s"PythonUDF#$name(${children.mkString(", ")})"

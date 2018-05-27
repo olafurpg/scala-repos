@@ -41,14 +41,14 @@ private[akka] class ActorRefBackpressureSinkStage[In](
       private def receive(evt: (ActorRef, Any)): Unit = {
         evt._2 match {
           case `ackMessage` ⇒ {
-              if (buffer.isEmpty) acknowledgementReceived = true
-              else {
-                // onPush might have filled the buffer up and
-                // stopped pulling, so we pull here
-                if (buffer.size() == maxBuffer) tryPull(in)
-                dequeueAndSend()
-              }
+            if (buffer.isEmpty) acknowledgementReceived = true
+            else {
+              // onPush might have filled the buffer up and
+              // stopped pulling, so we pull here
+              if (buffer.size() == maxBuffer) tryPull(in)
+              dequeueAndSend()
             }
+          }
           case Terminated(`ref`) ⇒ completeStage()
           case _ ⇒ //ignore all other messages
         }
@@ -71,24 +71,27 @@ private[akka] class ActorRefBackpressureSinkStage[In](
         completeStage()
       }
 
-      setHandler(in, new InHandler {
-        override def onPush(): Unit = {
-          buffer offer grab(in)
-          if (acknowledgementReceived) {
-            dequeueAndSend()
-            acknowledgementReceived = false
+      setHandler(
+        in,
+        new InHandler {
+          override def onPush(): Unit = {
+            buffer offer grab(in)
+            if (acknowledgementReceived) {
+              dequeueAndSend()
+              acknowledgementReceived = false
+            }
+            if (buffer.size() < maxBuffer) pull(in)
           }
-          if (buffer.size() < maxBuffer) pull(in)
+          override def onUpstreamFinish(): Unit = {
+            if (buffer.isEmpty) finish()
+            else completeReceived = true
+          }
+          override def onUpstreamFailure(ex: Throwable): Unit = {
+            ref ! onFailureMessage(ex)
+            failStage(ex)
+          }
         }
-        override def onUpstreamFinish(): Unit = {
-          if (buffer.isEmpty) finish()
-          else completeReceived = true
-        }
-        override def onUpstreamFailure(ex: Throwable): Unit = {
-          ref ! onFailureMessage(ex)
-          failStage(ex)
-        }
-      })
+      )
     }
 
   override def toString = "ActorRefBackpressureSink"

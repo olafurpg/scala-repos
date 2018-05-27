@@ -39,7 +39,8 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class LineChartSortingPolicySpec
     extends SFXEnumDelegateSpec[
-        jfxsc.LineChart.SortingPolicy, LineChart.SortingPolicy](
-        javaClass = classOf[jfxsc.LineChart.SortingPolicy],
-        scalaClass = classOf[LineChart.SortingPolicy],
-        companion = LineChart.SortingPolicy)
+      jfxsc.LineChart.SortingPolicy,
+      LineChart.SortingPolicy](
+      javaClass = classOf[jfxsc.LineChart.SortingPolicy],
+      scalaClass = classOf[LineChart.SortingPolicy],
+      companion = LineChart.SortingPolicy)

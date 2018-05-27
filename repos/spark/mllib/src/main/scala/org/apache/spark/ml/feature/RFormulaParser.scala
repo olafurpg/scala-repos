@@ -48,13 +48,13 @@ private[ml] case class ParsedRFormula(label: ColumnRef, terms: Seq[Term]) {
             includedTerms = includedTerms.filter(_ != Seq(inner.value))
           case ColumnInteraction(cols) =>
             val fromInteraction = expandInteraction(schema, cols).map(_.toSet)
-            includedTerms = includedTerms.filter(
-                t => !fromInteraction.contains(t.toSet))
+            includedTerms =
+              includedTerms.filter(t => !fromInteraction.contains(t.toSet))
           case Dot =>
             // e.g. "- .", which removes all first-order terms
             includedTerms = includedTerms.filter {
               case Seq(t) => !dotTerms.contains(t)
-              case _ => true
+              case _      => true
             }
           case _: Deletion =>
             throw new RuntimeException("Deletion terms cannot be nested")
@@ -80,7 +80,8 @@ private[ml] case class ParsedRFormula(label: ColumnRef, terms: Seq[Term]) {
 
   // expands the Dot operators in interaction terms
   private def expandInteraction(
-      schema: StructType, terms: Seq[InteractableTerm]): Seq[Seq[String]] = {
+      schema: StructType,
+      terms: Seq[InteractableTerm]): Seq[Seq[String]] = {
     if (terms.isEmpty) {
       return Seq(Nil)
     }
@@ -99,13 +100,15 @@ private[ml] case class ParsedRFormula(label: ColumnRef, terms: Seq[Term]) {
 
     // Deduplicates feature interactions, for example, a:b is the same as b:a.
     var seen = mutable.Set[Set[String]]()
-    validInteractions.flatMap {
-      case t if seen.contains(t.toSet) =>
-        None
-      case t =>
-        seen += t.toSet
-        Some(t)
-    }.sortBy(_.length)
+    validInteractions
+      .flatMap {
+        case t if seen.contains(t.toSet) =>
+          None
+        case t =>
+          seen += t.toSet
+          Some(t)
+      }
+      .sortBy(_.length)
   }
 
   // the dot operator excludes complex column types
@@ -113,7 +116,7 @@ private[ml] case class ParsedRFormula(label: ColumnRef, terms: Seq[Term]) {
     schema.fields
       .filter(_.dataType match {
         case _: NumericType | StringType | BooleanType | _: VectorUDT => true
-        case _ => false
+        case _                                                        => false
       })
       .map(_.name)
       .filter(_ != label.value)
@@ -128,7 +131,9 @@ private[ml] case class ParsedRFormula(label: ColumnRef, terms: Seq[Term]) {
   * @param hasIntercept whether the formula specifies fitting with an intercept.
   */
 private[ml] case class ResolvedRFormula(
-    label: String, terms: Seq[Seq[String]], hasIntercept: Boolean)
+    label: String,
+    terms: Seq[Seq[String]],
+    hasIntercept: Boolean)
 
 /**
   * R formula terms. See the R formula docs here for more information:
@@ -167,8 +172,8 @@ private[ml] object RFormulaParser extends RegexParsers {
 
   private val dot: Parser[InteractableTerm] = "\\.".r ^^ { case _ => Dot }
 
-  private val interaction: Parser[List[InteractableTerm]] = rep1sep(
-      columnRef | dot, ":")
+  private val interaction: Parser[List[InteractableTerm]] =
+    rep1sep(columnRef | dot, ":")
 
   private val term: Parser[Term] =
     intercept | interaction ^^ { case terms => ColumnInteraction(terms) } | dot | columnRef

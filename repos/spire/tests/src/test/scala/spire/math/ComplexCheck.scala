@@ -10,7 +10,9 @@ import spire.implicits._
 import spire.laws.arb.{complex, real}
 
 class ComplexCheck
-    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+    extends PropSpec
+    with Matchers
+    with GeneratorDrivenPropertyChecks {
   type C = Complex[BigDecimal]
 
   val zero = Complex.zero[BigDecimal]
@@ -26,7 +28,8 @@ class ComplexCheck
   def complex2(name: String)(f: (C, C) => Unit) =
     property(name) {
       forAll { (rx: Int, ix: Int, ry: Int, iy: Int) =>
-        f(Complex(BigDecimal(rx), BigDecimal(ix)),
+        f(
+          Complex(BigDecimal(rx), BigDecimal(ix)),
           Complex(BigDecimal(ry), BigDecimal(iy)))
       }
     }
@@ -66,7 +69,9 @@ class ComplexCheck
 }
 
 class ComplexCheck2
-    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+    extends PropSpec
+    with Matchers
+    with GeneratorDrivenPropertyChecks {
   type C = Complex[Real]
 
   val zero = Complex.zero[Real]
@@ -181,7 +186,9 @@ class ComplexCheck2
 }
 
 class FastComplexCheck
-    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+    extends PropSpec
+    with Matchers
+    with GeneratorDrivenPropertyChecks {
   property("encode/decode") {
     forAll { (re: Float, im: Float) =>
       val n: Long = FastComplex.encode(re, im)

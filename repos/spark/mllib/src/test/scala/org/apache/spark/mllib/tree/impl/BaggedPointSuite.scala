@@ -31,7 +31,8 @@ class BaggedPointSuite extends SparkFunSuite with MLlibTestSparkContext {
     val rdd = sc.parallelize(arr)
     val baggedRDD = BaggedPoint.convertToBaggedRDD(rdd, 1.0, 1, false, 42)
     baggedRDD.collect().foreach { baggedPoint =>
-      assert(baggedPoint.subsampleWeights.size == 1 &&
+      assert(
+        baggedPoint.subsampleWeights.size == 1 &&
           baggedPoint.subsampleWeights(0) == 1)
     }
   }
@@ -48,11 +49,12 @@ class BaggedPointSuite extends SparkFunSuite with MLlibTestSparkContext {
         BaggedPoint.convertToBaggedRDD(rdd, 1.0, numSubsamples, true, seed)
       val subsampleCounts: Array[Array[Double]] =
         baggedRDD.map(_.subsampleWeights).collect()
-      EnsembleTestHelper.testRandomArrays(subsampleCounts,
-                                          numSubsamples,
-                                          expectedMean,
-                                          expectedStddev,
-                                          epsilon = 0.01)
+      EnsembleTestHelper.testRandomArrays(
+        subsampleCounts,
+        numSubsamples,
+        expectedMean,
+        expectedStddev,
+        epsilon = 0.01)
     }
   }
 
@@ -66,19 +68,23 @@ class BaggedPointSuite extends SparkFunSuite with MLlibTestSparkContext {
     val rdd = sc.parallelize(arr)
     seeds.foreach { seed =>
       val baggedRDD = BaggedPoint.convertToBaggedRDD(
-          rdd, subsample, numSubsamples, true, seed)
+        rdd,
+        subsample,
+        numSubsamples,
+        true,
+        seed)
       val subsampleCounts: Array[Array[Double]] =
         baggedRDD.map(_.subsampleWeights).collect()
-      EnsembleTestHelper.testRandomArrays(subsampleCounts,
-                                          numSubsamples,
-                                          expectedMean,
-                                          expectedStddev,
-                                          epsilon = 0.01)
+      EnsembleTestHelper.testRandomArrays(
+        subsampleCounts,
+        numSubsamples,
+        expectedMean,
+        expectedStddev,
+        epsilon = 0.01)
     }
   }
 
-  test(
-      "BaggedPoint RDD: with subsampling without replacement (fraction = 1.0)") {
+  test("BaggedPoint RDD: with subsampling without replacement (fraction = 1.0)") {
     val numSubsamples = 100
     val (expectedMean, expectedStddev) = (1.0, 0)
 
@@ -90,16 +96,16 @@ class BaggedPointSuite extends SparkFunSuite with MLlibTestSparkContext {
         BaggedPoint.convertToBaggedRDD(rdd, 1.0, numSubsamples, false, seed)
       val subsampleCounts: Array[Array[Double]] =
         baggedRDD.map(_.subsampleWeights).collect()
-      EnsembleTestHelper.testRandomArrays(subsampleCounts,
-                                          numSubsamples,
-                                          expectedMean,
-                                          expectedStddev,
-                                          epsilon = 0.01)
+      EnsembleTestHelper.testRandomArrays(
+        subsampleCounts,
+        numSubsamples,
+        expectedMean,
+        expectedStddev,
+        epsilon = 0.01)
     }
   }
 
-  test(
-      "BaggedPoint RDD: with subsampling without replacement (fraction = 0.5)") {
+  test("BaggedPoint RDD: with subsampling without replacement (fraction = 0.5)") {
     val numSubsamples = 100
     val subsample = 0.5
     val (expectedMean, expectedStddev) =
@@ -110,14 +116,19 @@ class BaggedPointSuite extends SparkFunSuite with MLlibTestSparkContext {
     val rdd = sc.parallelize(arr)
     seeds.foreach { seed =>
       val baggedRDD = BaggedPoint.convertToBaggedRDD(
-          rdd, subsample, numSubsamples, false, seed)
+        rdd,
+        subsample,
+        numSubsamples,
+        false,
+        seed)
       val subsampleCounts: Array[Array[Double]] =
         baggedRDD.map(_.subsampleWeights).collect()
-      EnsembleTestHelper.testRandomArrays(subsampleCounts,
-                                          numSubsamples,
-                                          expectedMean,
-                                          expectedStddev,
-                                          epsilon = 0.01)
+      EnsembleTestHelper.testRandomArrays(
+        subsampleCounts,
+        numSubsamples,
+        expectedMean,
+        expectedStddev,
+        epsilon = 0.01)
     }
   }
 }

@@ -5,7 +5,7 @@
   * The ASF licenses this file to You under the Apache License, Version 2.0
   * (the "License"); you may not use this file except in compliance with
   * the License.  You may obtain a copy of the License at
-  * 
+  *
   *    http://www.apache.org/licenses/LICENSE-2.0
   *
   * Unless required by applicable law or agreed to in writing, software
@@ -27,7 +27,8 @@ object FAILED extends State
   * override makeNext and call allDone() when there is no more items
   */
 abstract class IteratorTemplate[T]
-    extends Iterator[T] with java.util.Iterator[T] {
+    extends Iterator[T]
+    with java.util.Iterator[T] {
 
   private var state: State = NOT_READY
   private var nextItem = null.asInstanceOf[T]
@@ -49,9 +50,9 @@ abstract class IteratorTemplate[T]
     if (state == FAILED)
       throw new IllegalStateException("Iterator is in failed state")
     state match {
-      case DONE => false
+      case DONE  => false
       case READY => true
-      case _ => maybeComputeNext()
+      case _     => maybeComputeNext()
     }
   }
 

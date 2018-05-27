@@ -1,8 +1,19 @@
 package com.twitter.finagle.netty3.socks
 
-import com.twitter.finagle.{ChannelClosedException, ConnectionFailedException, InconsistentStateException}
-import com.twitter.finagle.netty3.{SocketAddressResolveHandler, SocketAddressResolver}
-import com.twitter.finagle.socks.{AuthenticationSetting, Unauthenticated, UsernamePassAuthenticationSetting}
+import com.twitter.finagle.{
+  ChannelClosedException,
+  ConnectionFailedException,
+  InconsistentStateException
+}
+import com.twitter.finagle.netty3.{
+  SocketAddressResolveHandler,
+  SocketAddressResolver
+}
+import com.twitter.finagle.socks.{
+  AuthenticationSetting,
+  Unauthenticated,
+  UsernamePassAuthenticationSetting
+}
 import com.twitter.io.Charsets
 import java.net.{Inet4Address, Inet6Address, InetSocketAddress, SocketAddress}
 import java.util.concurrent.atomic.AtomicReference
@@ -12,11 +23,11 @@ import org.jboss.netty.channel._
 object SocksConnectHandler {
   // Throwables used as `cause` fields for ConnectionFailedExceptions.
   private[socks] val InvalidInit = new Throwable(
-      "unexpected SOCKS version or authentication " +
+    "unexpected SOCKS version or authentication " +
       "level specified in connect response from proxy")
 
   private[socks] val InvalidResponse = new Throwable(
-      "unexpected SOCKS version or response " +
+    "unexpected SOCKS version or response " +
       "status specified in connect response from proxy")
 
   // Socks Version constants
@@ -39,14 +50,14 @@ object SocksConnectHandler {
       authenticationSettings: Seq[AuthenticationSetting],
       pipeline: ChannelPipeline
   ): SocksConnectHandler = {
-    val handler = new SocksConnectHandler(
-        proxyAddr, addr, authenticationSettings)
+    val handler =
+      new SocksConnectHandler(proxyAddr, addr, authenticationSettings)
     pipeline.addFirst("socksConnect", handler)
     proxyAddr match {
       case proxyInetAddr: InetSocketAddress if proxyInetAddr.isUnresolved =>
-        pipeline.addFirst("socketAddressResolver",
-                          new SocketAddressResolveHandler(
-                              SocketAddressResolver.random, addr))
+        pipeline.addFirst(
+          "socketAddressResolver",
+          new SocketAddressResolveHandler(SocketAddressResolver.random, addr))
       case _ =>
     }
     handler
@@ -139,7 +150,9 @@ class SocksConnectHandler(
   }
 
   private[this] def writeUserNameAndPass(
-      ctx: ChannelHandlerContext, username: String, pass: String) {
+      ctx: ChannelHandlerContext,
+      username: String,
+      pass: String) {
     val buf = ChannelBuffers.buffer(1024)
     buf.writeByte(Version1)
 
@@ -195,7 +208,8 @@ class SocksConnectHandler(
   }
 
   override def connectRequested(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent) {
+      ctx: ChannelHandlerContext,
+      e: ChannelStateEvent) {
     e match {
       case de: DownstreamChannelStateEvent =>
         if (!connectFuture.compareAndSet(null, e.getFuture)) {
@@ -205,16 +219,14 @@ class SocksConnectHandler(
 
         // proxy cancellation
         val wrappedConnectFuture = Channels.future(de.getChannel, true)
-        de.getFuture.addListener(
-            new ChannelFutureListener {
+        de.getFuture.addListener(new ChannelFutureListener {
           def operationComplete(f: ChannelFuture) {
             if (f.isCancelled) wrappedConnectFuture.cancel()
           }
         })
         // Proxy failures here so that if the connect fails, it is
         // propagated to the listener, not just on the channel.
-        wrappedConnectFuture.addListener(
-            new ChannelFutureListener {
+        wrappedConnectFuture.addListener(new ChannelFutureListener {
           def operationComplete(f: ChannelFuture) {
             if (f.isSuccess || f.isCancelled) return
 
@@ -223,7 +235,10 @@ class SocksConnectHandler(
         })
 
         val wrappedEvent = new DownstreamChannelStateEvent(
-            de.getChannel, wrappedConnectFuture, de.getState, proxyAddr)
+          de.getChannel,
+          wrappedConnectFuture,
+          de.getState,
+          proxyAddr)
 
         super.connectRequested(ctx, wrappedEvent)
 
@@ -234,7 +249,8 @@ class SocksConnectHandler(
 
   // we delay propagating connection upstream until we've completed the proxy connection.
   override def channelConnected(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent) {
+      ctx: ChannelHandlerContext,
+      e: ChannelStateEvent) {
     if (connectFuture.get eq null) {
       fail(ctx.getChannel, new InconsistentStateException(addr))
       return
@@ -243,7 +259,7 @@ class SocksConnectHandler(
     // proxy cancellations again.
     connectFuture.get.addListener(new ChannelFutureListener {
       def operationComplete(f: ChannelFuture) {
-        if (f.isSuccess) SocksConnectHandler. super.channelConnected(ctx, e)
+        if (f.isSuccess) SocksConnectHandler.super.channelConnected(ctx, e)
         else if (f.isCancelled)
           fail(ctx.getChannel, new ChannelClosedException(addr))
       }
@@ -273,8 +289,9 @@ class SocksConnectHandler(
               state = Authenticating
               writeUserNameAndPass(ctx, username, pass)
             case None =>
-              fail(e.getChannel,
-                   new ConnectionFailedException(InvalidInit, addr))
+              fail(
+                e.getChannel,
+                new ConnectionFailedException(InvalidInit, addr))
           }
 
         case Authenticating =>
@@ -282,8 +299,9 @@ class SocksConnectHandler(
             state = Requested
             writeRequest(ctx)
           } else {
-            fail(e.getChannel,
-                 new ConnectionFailedException(InvalidResponse, addr))
+            fail(
+              e.getChannel,
+              new ConnectionFailedException(InvalidResponse, addr))
           }
 
         case Requested =>
@@ -291,8 +309,9 @@ class SocksConnectHandler(
             ctx.getPipeline.remove(this)
             connectFuture.get.setSuccess()
           } else {
-            fail(e.getChannel,
-                 new ConnectionFailedException(InvalidResponse, addr))
+            fail(
+              e.getChannel,
+              new ConnectionFailedException(InvalidResponse, addr))
           }
       }
     } catch {

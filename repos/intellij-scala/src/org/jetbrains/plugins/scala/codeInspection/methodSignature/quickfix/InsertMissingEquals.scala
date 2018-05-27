@@ -16,11 +16,12 @@ class InsertMissingEquals(functionDecl: ScFunctionDeclaration)
           if types.nonEmpty =>
         val lastTypeInDecl =
           types.last.getTextRange.getEndOffset -
-          funDef.getTextRange.getStartOffset
+            funDef.getTextRange.getStartOffset
         val defAndReturnType = funDef.getText.substring(0, lastTypeInDecl)
         val methodBody = refinement.getText
         val newMethod = ScalaPsiElementFactory.createMethodFromText(
-            defAndReturnType + " = " + methodBody, funDef.getManager)
+          defAndReturnType + " = " + methodBody,
+          funDef.getManager)
         funDef.replace(newMethod)
       case _ =>
     }

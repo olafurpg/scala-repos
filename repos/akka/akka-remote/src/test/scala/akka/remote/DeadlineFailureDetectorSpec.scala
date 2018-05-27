@@ -14,8 +14,8 @@ class DeadlineFailureDetectorSpec extends AkkaSpec {
 
     def fakeTimeGenerator(timeIntervals: Seq[Long]): Clock = new Clock {
       @volatile var times =
-        timeIntervals.tail.foldLeft(List[Long](timeIntervals.head))(
-            (acc, c) ⇒ acc ::: List[Long](acc.last + c))
+        timeIntervals.tail.foldLeft(List[Long](timeIntervals.head))((acc, c) ⇒
+          acc ::: List[Long](acc.last + c))
       override def apply(): Long = {
         val currentTime = times.head
         times = times.tail
@@ -23,15 +23,18 @@ class DeadlineFailureDetectorSpec extends AkkaSpec {
       }
     }
 
-    def createFailureDetector(acceptableLostDuration: FiniteDuration,
-                              clock: Clock = FailureDetector.defaultClock) =
-      new DeadlineFailureDetector(acceptableLostDuration,
-                                  heartbeatInterval = 1.second)(clock = clock)
+    def createFailureDetector(
+        acceptableLostDuration: FiniteDuration,
+        clock: Clock = FailureDetector.defaultClock) =
+      new DeadlineFailureDetector(
+        acceptableLostDuration,
+        heartbeatInterval = 1.second)(clock = clock)
 
     "mark node as monitored after a series of successful heartbeats" in {
       val timeInterval = List[Long](0, 1000, 100, 100)
-      val fd = createFailureDetector(acceptableLostDuration = 4.seconds,
-                                     clock = fakeTimeGenerator(timeInterval))
+      val fd = createFailureDetector(
+        acceptableLostDuration = 4.seconds,
+        clock = fakeTimeGenerator(timeInterval))
       fd.isMonitoring should ===(false)
 
       fd.heartbeat()
@@ -44,8 +47,9 @@ class DeadlineFailureDetectorSpec extends AkkaSpec {
 
     "mark node as dead if heartbeat are missed" in {
       val timeInterval = List[Long](0, 1000, 100, 100, 7000)
-      val fd = createFailureDetector(acceptableLostDuration = 4.seconds,
-                                     clock = fakeTimeGenerator(timeInterval))
+      val fd = createFailureDetector(
+        acceptableLostDuration = 4.seconds,
+        clock = fakeTimeGenerator(timeInterval))
 
       fd.heartbeat() //0
       fd.heartbeat() //1000
@@ -60,8 +64,9 @@ class DeadlineFailureDetectorSpec extends AkkaSpec {
       val regularIntervals = 0L +: Vector.fill(999)(1000L)
       val timeIntervals =
         regularIntervals :+ (5 * 60 * 1000L) :+ 100L :+ 900L :+ 100L :+ 7000L :+ 100L :+ 900L :+ 100L :+ 900L
-      val fd = createFailureDetector(acceptableLostDuration = 4.seconds,
-                                     clock = fakeTimeGenerator(timeIntervals))
+      val fd = createFailureDetector(
+        acceptableLostDuration = 4.seconds,
+        clock = fakeTimeGenerator(timeIntervals))
 
       for (_ ← 0 until 1000) fd.heartbeat()
       fd.isAvailable should ===(false) // after the long pause
@@ -77,8 +82,9 @@ class DeadlineFailureDetectorSpec extends AkkaSpec {
 
     "accept some configured missing heartbeats" in {
       val timeInterval = List[Long](0, 1000, 1000, 1000, 4000, 1000, 1000)
-      val fd = createFailureDetector(acceptableLostDuration = 4.seconds,
-                                     clock = fakeTimeGenerator(timeInterval))
+      val fd = createFailureDetector(
+        acceptableLostDuration = 4.seconds,
+        clock = fakeTimeGenerator(timeInterval))
 
       fd.heartbeat()
       fd.heartbeat()
@@ -92,8 +98,9 @@ class DeadlineFailureDetectorSpec extends AkkaSpec {
     "fail after configured acceptable missing heartbeats" in {
       val timeInterval =
         List[Long](0, 1000, 1000, 1000, 1000, 1000, 500, 500, 5000)
-      val fd = createFailureDetector(acceptableLostDuration = 4.seconds,
-                                     clock = fakeTimeGenerator(timeInterval))
+      val fd = createFailureDetector(
+        acceptableLostDuration = 4.seconds,
+        clock = fakeTimeGenerator(timeInterval))
 
       fd.heartbeat()
       fd.heartbeat()

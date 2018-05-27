@@ -2,7 +2,11 @@ package org.jetbrains.plugins.scala.codeInspection
 
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.util.CachedValueProvider.Result
-import com.intellij.psi.util.{CachedValueProvider, CachedValuesManager, PsiTreeUtil}
+import com.intellij.psi.util.{
+  CachedValueProvider,
+  CachedValuesManager,
+  PsiTreeUtil
+}
 import com.intellij.psi.{PsiElement, PsiMethod, PsiType}
 import org.jetbrains.plugins.scala.codeInspection.InspectionsUtil.isExpressionOfType
 import org.jetbrains.plugins.scala.debugger.evaluation.ScalaEvaluatorBuilderUtil
@@ -10,16 +14,33 @@ import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.formatting.settings.ScalaCodeStyleSettings.nameFitToPatterns
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScCaseClauses
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScLiteral, ScReferenceElement}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScLiteral,
+  ScReferenceElement
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameter
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScFunctionDefinition, ScValue, ScVariable}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScMember, ScObject}
-import org.jetbrains.plugins.scala.lang.psi.api.{InferUtil, ScalaRecursiveElementVisitor}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction,
+  ScFunctionDefinition,
+  ScValue,
+  ScVariable
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScMember,
+  ScObject
+}
+import org.jetbrains.plugins.scala.lang.psi.api.{
+  InferUtil,
+  ScalaRecursiveElementVisitor
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.types.ScType.ExtractClass
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypingContext
+}
 import org.jetbrains.plugins.scala.lang.resolve.ScalaResolveResult
 import org.jetbrains.plugins.scala.project.ProjectPsiElementExt
 import org.jetbrains.plugins.scala.project.ScalaLanguageLevel.Scala_2_9
@@ -115,8 +136,8 @@ package object collections {
     invocation("corresponds").from(likeCollectionClasses)
 
   private[collections] val `.to` = invocation("to").from(
-      Array("RichInt", "RichChar", "RichLong", "RichDouble", "RichFloat").map(
-          "scala.runtime." + _))
+    Array("RichInt", "RichChar", "RichLong", "RichDouble", "RichFloat").map(
+      "scala.runtime." + _))
 
   private[collections] val `!=` = invocation("!=")
   private[collections] val `==` = invocation(Set("==", "equals"))
@@ -154,8 +175,7 @@ package object collections {
     def unapply(expr: ScExpression): Option[ScExpression] = expr match {
       case MethodRepr(_, _, Some(ref), Seq(e)) if ref.refName == "Some" =>
         ref.resolve() match {
-          case m: ScMember
-              if m.containingClass.qualifiedName == "scala.Some" =>
+          case m: ScMember if m.containingClass.qualifiedName == "scala.Some" =>
             Some(e)
           case _ => None
         }
@@ -178,7 +198,7 @@ package object collections {
     def unapply(expr: ScExpression): Option[String] = {
       expr match {
         case lit: ScLiteral => Some(lit.getText)
-        case _ => None
+        case _              => None
       }
     }
   }
@@ -189,7 +209,7 @@ package object collections {
         case Success(result, _) =>
           result match {
             case ScFunctionType(returnType, _) => returnType.conforms(tp)
-            case _ => false
+            case _                             => false
           }
         case _ => false
       }
@@ -197,7 +217,7 @@ package object collections {
   }
 
   val returnsBoolean = new FunctionExpressionWithReturnTypeTemplate(
-      StdType.BOOLEAN)
+    StdType.BOOLEAN)
 
   object binaryOperation {
     def unapply(expr: ScExpression): Option[String] = {
@@ -205,8 +225,9 @@ package object collections {
         case ScFunctionExpr(Seq(x, y), Some(result)) =>
           def checkResolve(left: ScExpression, right: ScExpression) =
             (stripped(left), stripped(right)) match {
-              case (leftRef: ScReferenceExpression,
-                    rightRef: ScReferenceExpression) =>
+              case (
+                  leftRef: ScReferenceExpression,
+                  rightRef: ScReferenceExpression) =>
                 Set(leftRef.resolve(), rightRef.resolve()) equals Set(x, y)
               case _ => false
             }
@@ -220,7 +241,8 @@ package object collections {
           }
         case ScInfixExpr(underscore(), oper, underscore()) => Some(oper)
         case ScMethodCall(
-            refExpr: ScReferenceExpression, Seq(underscore(), underscore())) =>
+            refExpr: ScReferenceExpression,
+            Seq(underscore(), underscore())) =>
           Some(refExpr)
         case _ => None
       }
@@ -237,11 +259,11 @@ package object collections {
               (stripped(left), stripped(right)) match {
                 case (leftRef: ScReferenceExpression, rightExpr)
                     if leftRef.resolve() == x &&
-                    isIndependentOf(rightExpr, x) =>
+                      isIndependentOf(rightExpr, x) =>
                   Some(rightExpr)
                 case (leftExpr: ScExpression, rightRef: ScReferenceExpression)
                     if rightRef.resolve() == x &&
-                    isIndependentOf(leftExpr, x) =>
+                      isIndependentOf(leftExpr, x) =>
                   Some(leftExpr)
                 case _ => None
               }
@@ -275,9 +297,11 @@ package object collections {
                   val secondArgName = y.getName
                   val funExprText = secondArgName + " => " + right.getText
                   Some(
-                      ScalaPsiElementFactory
-                        .createExpressionWithContextFromText(
-                          funExprText, expr.getContext, expr))
+                    ScalaPsiElementFactory
+                      .createExpressionWithContextFromText(
+                        funExprText,
+                        expr.getContext,
+                        expr))
                 case _ => None
               }
             case _ => None
@@ -308,9 +332,9 @@ package object collections {
   }
 
   private[collections] val `_._1` = new ParameterlessCallOnParameterTemplate(
-      "_1")
+    "_1")
   private[collections] val `_._2` = new ParameterlessCallOnParameterTemplate(
-      "_2")
+    "_2")
 
   object underscore {
     def unapply(expr: ScExpression): Boolean = {
@@ -320,45 +344,48 @@ package object collections {
             if typed.expr.isInstanceOf[ScUnderscoreSection] =>
           true
         case und: ScUnderscoreSection => true
-        case _ => false
+        case _                        => false
       }
     }
   }
 
   def invocationText(
-      qual: ScExpression, methName: String, args: ScExpression*): String = {
+      qual: ScExpression,
+      methName: String,
+      args: ScExpression*): String = {
     val qualText = qual.getText
     val argsText = argListText(args)
     qual match {
       case _ childOf ScInfixExpr(`qual`, _, _) if args.size == 1 =>
         s"${qual.getText} $methName ${args.head.getText}"
       case infix: ScInfixExpr => s"($qualText).$methName$argsText"
-      case _ => s"$qualText.$methName$argsText"
+      case _                  => s"$qualText.$methName$argsText"
     }
   }
 
-  def invocationText(negation: Boolean,
-                     qual: ScExpression,
-                     methName: String,
-                     args: ScExpression*): String = {
+  def invocationText(
+      negation: Boolean,
+      qual: ScExpression,
+      methName: String,
+      args: ScExpression*): String = {
     val baseText = invocationText(qual, methName, args: _*)
     qual match {
-      case _ if !negation => baseText
+      case _ if !negation                      => baseText
       case _ childOf ScInfixExpr(`qual`, _, _) => s"!($baseText)"
-      case _ => s"!$baseText"
+      case _                                   => s"!$baseText"
     }
   }
 
   def argListText(args: Seq[ScExpression]): String = {
     args match {
-      case Seq(p: ScParenthesisedExpr) => p.getText
-      case Seq(b @ ScBlock(fe: ScFunctionExpr)) => b.getText
-      case Seq(ScBlock(stmt: ScBlockStatement)) => s"(${stmt.getText})"
-      case Seq(b: ScBlock) => b.getText
+      case Seq(p: ScParenthesisedExpr)                        => p.getText
+      case Seq(b @ ScBlock(fe: ScFunctionExpr))               => b.getText
+      case Seq(ScBlock(stmt: ScBlockStatement))               => s"(${stmt.getText})"
+      case Seq(b: ScBlock)                                    => b.getText
       case Seq((fe: ScFunctionExpr) childOf (b: ScBlockExpr)) => b.getText
-      case Seq(other) => s"(${other.getText})"
-      case seq if seq.size > 1 => seq.map(_.getText).mkString("(", ", ", ")")
-      case _ => ""
+      case Seq(other)                                         => s"(${other.getText})"
+      case seq if seq.size > 1                                => seq.map(_.getText).mkString("(", ", ", ")")
+      case _                                                  => ""
     }
   }
 
@@ -375,10 +402,13 @@ package object collections {
   }
 
   def implicitParameterExistsFor(
-      methodName: String, baseExpr: ScExpression): Boolean = {
+      methodName: String,
+      baseExpr: ScExpression): Boolean = {
     val expression =
       ScalaPsiElementFactory.createExpressionWithContextFromText(
-          s"${baseExpr.getText}.$methodName", baseExpr.getContext, baseExpr)
+        s"${baseExpr.getText}.$methodName",
+        baseExpr.getContext,
+        baseExpr)
     implicitParameterExistsFor(expression)
   }
 
@@ -387,17 +417,17 @@ package object collections {
       case Some(Seq(srr: ScalaResolveResult))
           if srr.element.name == InferUtil.notFoundParameterName =>
         false
-      case Some(Seq(srr: ScalaResolveResult, _ *)) => true
-      case _ => false
+      case Some(Seq(srr: ScalaResolveResult, _*)) => true
+      case _                                      => false
     }
   }
 
   @tailrec
   def stripped(expr: ScExpression): ScExpression = {
     expr match {
-      case ScParenthesisedExpr(inner) => stripped(inner)
+      case ScParenthesisedExpr(inner)   => stripped(inner)
       case ScBlock(inner: ScExpression) => stripped(inner)
-      case _ => expr
+      case _                            => expr
     }
   }
 
@@ -455,7 +485,7 @@ package object collections {
 
   def isArray(expr: ScExpression): Boolean = expr match {
     case ExpressionType(JavaArrayType(_)) => true
-    case _ => isOfClassFrom(expr, Array("scala.Array"))
+    case _                                => isOfClassFrom(expr, Array("scala.Array"))
   }
 
   def isSet(expr: ScExpression): Boolean =
@@ -479,28 +509,30 @@ package object collections {
   def isIterator(expr: ScExpression) =
     isExpressionOfType("scala.collection.Iterator", expr)
 
-  private val sideEffectsCollectionMethods = Set("append",
-                                                 "appendAll",
-                                                 "clear",
-                                                 "insert",
-                                                 "insertAll",
-                                                 "prepend",
-                                                 "prependAll",
-                                                 "reduceToSize",
-                                                 "remove",
-                                                 "retain",
-                                                 "transform",
-                                                 "trimEnd",
-                                                 "trimStart",
-                                                 "update",
-                                                 "push",
-                                                 "pushAll",
-                                                 "pop",
-                                                 "dequeue",
-                                                 "dequeueAll",
-                                                 "dequeueFirst",
-                                                 "enqueue",
-                                                 "next")
+  private val sideEffectsCollectionMethods = Set(
+    "append",
+    "appendAll",
+    "clear",
+    "insert",
+    "insertAll",
+    "prepend",
+    "prependAll",
+    "reduceToSize",
+    "remove",
+    "retain",
+    "transform",
+    "trimEnd",
+    "trimStart",
+    "update",
+    "push",
+    "pushAll",
+    "pop",
+    "dequeue",
+    "dequeueAll",
+    "dequeueFirst",
+    "enqueue",
+    "next"
+  )
 
   private class SideEffectsProvider(expr: ScExpression)
       extends CachedValueProvider[Seq[ScExpression]] {
@@ -513,9 +545,9 @@ package object collections {
       def isSideEffectCollectionMethod(ref: ScReferenceExpression): Boolean = {
         val refName = ref.refName
         (refName.endsWith("=") || refName.endsWith("=:") ||
-            sideEffectsCollectionMethods.contains(refName)) && checkResolve(
-            ref,
-            Array("scala.collection.mutable._", "scala.collection.Iterator"))
+        sideEffectsCollectionMethods.contains(refName)) && checkResolve(
+          ref,
+          Array("scala.collection.mutable._", "scala.collection.Iterator"))
       }
 
       def isSetter(ref: ScReferenceExpression): Boolean = {
@@ -527,8 +559,8 @@ package object collections {
           case MethodRepr(ExpressionType(ScFunctionType(_, _)), _, _, _) =>
             false
           case ResolvesTo(fun: ScFunction) => fun.hasUnitResultType
-          case ResolvesTo(m: PsiMethod) => m.getReturnType == PsiType.VOID
-          case _ => false
+          case ResolvesTo(m: PsiMethod)    => m.getReturnType == PsiType.VOID
+          case _                           => false
         }
       }
 
@@ -542,7 +574,7 @@ package object collections {
       }
 
       val predicate: (PsiElement) => Boolean = {
-        case `expr` => true
+        case `expr`                                                     => true
         case (ScFunctionExpr(_, _) | (_: ScCaseClauses)) childOf `expr` => true
         case (e: ScExpression) childOf `expr`
             if ScUnderScoreSectionUtil.underscores(e).nonEmpty =>
@@ -556,23 +588,26 @@ package object collections {
 
       sameLevelIterator.collect {
         case assign @ ScAssignStmt(
-            definedOutside(ScalaPsiUtil.inNameContext(_: ScVariable)), _) =>
+              definedOutside(ScalaPsiUtil.inNameContext(_: ScVariable)),
+              _) =>
           assign
         case assign @ ScAssignStmt(mc @ ScMethodCall(definedOutside(_), _), _)
             if mc.isUpdateCall =>
           assign
         case infix @ ScInfixExpr(
-            definedOutside(ScalaPsiUtil.inNameContext(v: ScVariable)), _, _)
-            if infix.isAssignmentOperator =>
+              definedOutside(ScalaPsiUtil.inNameContext(v: ScVariable)),
+              _,
+              _) if infix.isAssignmentOperator =>
           infix
         case MethodRepr(
             itself,
-            Some(definedOutside(
-            ScalaPsiUtil.inNameContext(v @ (_: ScVariable | _: ScValue)))),
+            Some(
+              definedOutside(
+                ScalaPsiUtil.inNameContext(v @ (_: ScVariable | _: ScValue)))),
             Some(ref),
             _)
             if isSideEffectCollectionMethod(ref) || isSetter(ref) ||
-            hasUnitReturnType(ref) =>
+              hasUnitReturnType(ref) =>
           itself
         case MethodRepr(itself, None, Some(ref @ definedOutside(_)), _)
             if hasUnitReturnType(ref) =>
@@ -586,7 +621,9 @@ package object collections {
 
   def hasSideEffects(expr: ScExpression) = exprsWithSideEffects(expr).nonEmpty
 
-  def rightRangeInParent(expr: ScExpression, parent: ScExpression): TextRange = {
+  def rightRangeInParent(
+      expr: ScExpression,
+      parent: ScExpression): TextRange = {
     if (expr == parent) return TextRange.create(0, expr.getTextLength)
 
     val endOffset = parent.getTextRange.getEndOffset
@@ -606,7 +643,7 @@ package object collections {
       case MethodRepr(itself: ScMethodCall, Some(base), None, _) =>
         refNameId(base)
       case MethodRepr(_, _, Some(ref), _) => Some(ref.nameId)
-      case _ => None
+      case _                              => None
     }
 
   implicit class PsiElementRange(val elem: PsiElement) extends AnyVal {

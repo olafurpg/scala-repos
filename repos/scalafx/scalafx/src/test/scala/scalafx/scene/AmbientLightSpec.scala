@@ -40,4 +40,5 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class AmbientLightSpec
     extends SimpleSFXDelegateSpec[jfxs.AmbientLight, AmbientLight](
-        classOf[jfxs.AmbientLight], classOf[AmbientLight])
+      classOf[jfxs.AmbientLight],
+      classOf[AmbientLight])

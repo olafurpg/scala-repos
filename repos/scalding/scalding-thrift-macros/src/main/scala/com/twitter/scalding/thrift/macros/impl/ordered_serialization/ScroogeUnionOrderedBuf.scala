@@ -30,8 +30,8 @@ object ScroogeUnionOrderedBuf {
     val pf: PartialFunction[c.Type, TreeOrderedBuf[c.type]] = {
       case tpe
           if tpe <:< typeOf[ThriftUnion] &&
-          (tpe.typeSymbol.isClass && tpe.typeSymbol.asClass.isTrait) &&
-          !tpe.typeSymbol.asClass.knownDirectSubclasses.isEmpty =>
+            (tpe.typeSymbol.isClass && tpe.typeSymbol.asClass.isTrait) &&
+            !tpe.typeSymbol.asClass.knownDirectSubclasses.isEmpty =>
         ScroogeUnionOrderedBuf(c)(buildDispatcher, tpe)
     }
     pf
@@ -51,13 +51,17 @@ object ScroogeUnionOrderedBuf {
         .toList
 
     val subData: List[(Int, Type, Option[TreeOrderedBuf[c.type]])] =
-      subClasses.map { t =>
-        if (t.typeSymbol.name.toString == "UnknownUnionField") {
-          (t, None)
-        } else {
-          (t, Some(dispatcher(t)))
+      subClasses
+        .map { t =>
+          if (t.typeSymbol.name.toString == "UnknownUnionField") {
+            (t, None)
+          } else {
+            (t, Some(dispatcher(t)))
+          }
         }
-      }.zipWithIndex.map { case ((tpe, tbuf), idx) => (idx, tpe, tbuf) }.toList
+        .zipWithIndex
+        .map { case ((tpe, tbuf), idx) => (idx, tpe, tbuf) }
+        .toList
 
     require(subData.size > 0, "Must have some sub types on a union?")
 
@@ -65,7 +69,8 @@ object ScroogeUnionOrderedBuf {
       override val ctx: c.type = c
       override val tpe = outerType
       override def compareBinary(
-          inputStreamA: ctx.TermName, inputStreamB: ctx.TermName) =
+          inputStreamA: ctx.TermName,
+          inputStreamB: ctx.TermName) =
         UnionLike.compareBinary(c)(inputStreamA, inputStreamB)(subData)
       override def hash(element: ctx.TermName): ctx.Tree =
         UnionLike.hash(c)(element)(subData)
@@ -74,7 +79,8 @@ object ScroogeUnionOrderedBuf {
       override def get(inputStream: ctx.TermName): ctx.Tree =
         UnionLike.get(c)(inputStream)(subData)
       override def compare(
-          elementA: ctx.TermName, elementB: ctx.TermName): ctx.Tree =
+          elementA: ctx.TermName,
+          elementB: ctx.TermName): ctx.Tree =
         UnionLike.compare(c)(outerType, elementA, elementB)(subData)
       override def length(element: Tree): CompileTimeLengthTypes[c.type] =
         UnionLike.length(c)(element)(subData)

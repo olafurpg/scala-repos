@@ -21,11 +21,12 @@ object SigarLoader {
     TaskKey[File]("sigar-artifact", "Location of Sigar java agent jar.")
 
   lazy val sigarOptions = TaskKey[String](
-      "sigar-options", "JVM command line options for Sigar java agent.")
+    "sigar-options",
+    "JVM command line options for Sigar java agent.")
 
   lazy val sigarFolder = SettingKey[File](
-      "sigar-folder",
-      "Location of native library extracted by Sigar java agent.")
+    "sigar-folder",
+    "Location of native library extracted by Sigar java agent.")
 
   /** Sigar agent command line option property. */
   val sigarFolderProperty = "kamon.sigar.folder"
@@ -37,30 +38,32 @@ object SigarLoader {
 
   def locateSigarArtifact = update map { report =>
     val artifactList = report.matching(
-        moduleFilter(organization = sigarLoader.organization,
-                     name = sigarLoader.name)
+      moduleFilter(
+        organization = sigarLoader.organization,
+        name = sigarLoader.name)
     )
-    require(artifactList.size == 1,
-            "Expecting single artifact, while found: " + artifactList)
+    require(
+      artifactList.size == 1,
+      "Expecting single artifact, while found: " + artifactList)
     artifactList(0)
   }
 
   // TODO remove Sigar form test:test* classpath, it is provided by Sigar agent.
   lazy val sigarSettings = {
     Seq(
-        //
-        // Prepare Sigar agent options.
-        sigarArtifact <<= locateSigarArtifact,
-        sigarFolder := target.value / "native",
-        sigarOptions <<= provideSigarOptions,
-        //
-        fork in Test := true
+      //
+      // Prepare Sigar agent options.
+      sigarArtifact <<= locateSigarArtifact,
+      sigarFolder := target.value / "native",
+      sigarOptions <<= provideSigarOptions,
+      //
+      fork in Test := true
     ) ++
-    (// Invoke Sigar agent at JVM init time, to extract and load native Sigar library.
-        if (sigarTestEnabled)
-          Seq(
-              javaOptions in Test += sigarOptions.value
-          )
-        else Seq())
+      (// Invoke Sigar agent at JVM init time, to extract and load native Sigar library.
+      if (sigarTestEnabled)
+        Seq(
+          javaOptions in Test += sigarOptions.value
+        )
+      else Seq())
   }
 }

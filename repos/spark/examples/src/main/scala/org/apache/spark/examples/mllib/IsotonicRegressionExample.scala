@@ -20,7 +20,10 @@ package org.apache.spark.examples.mllib
 
 import org.apache.spark.{SparkConf, SparkContext}
 // $example on$
-import org.apache.spark.mllib.regression.{IsotonicRegression, IsotonicRegressionModel}
+import org.apache.spark.mllib.regression.{
+  IsotonicRegression,
+  IsotonicRegressionModel
+}
 // $example off$
 
 object IsotonicRegressionExample {
@@ -37,7 +40,7 @@ object IsotonicRegressionExample {
       val parts = line
         .split(',')
         .map(_.toDouble)
-        (parts(0), parts(1), 1.0)
+      (parts(0), parts(1), 1.0)
     }
 
     // Split data into training (60%) and test (40%) sets.
@@ -56,9 +59,11 @@ object IsotonicRegressionExample {
     }
 
     // Calculate mean squared error between predicted and real labels.
-    val meanSquaredError = predictionAndLabel.map {
-      case (p, l) => math.pow((p - l), 2)
-    }.mean()
+    val meanSquaredError = predictionAndLabel
+      .map {
+        case (p, l) => math.pow((p - l), 2)
+      }
+      .mean()
     println("Mean Squared Error = " + meanSquaredError)
 
     // Save and load model

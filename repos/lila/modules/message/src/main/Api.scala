@@ -12,19 +12,20 @@ import lila.security.Granter
 import lila.user.{User, UserRepo}
 import tube.threadTube
 
-final class Api(unreadCache: UnreadCache,
-                shutup: akka.actor.ActorSelection,
-                maxPerPage: Int,
-                blocks: (String, String) => Fu[Boolean],
-                bus: lila.common.Bus) {
+final class Api(
+    unreadCache: UnreadCache,
+    shutup: akka.actor.ActorSelection,
+    maxPerPage: Int,
+    blocks: (String, String) => Fu[Boolean],
+    bus: lila.common.Bus) {
 
   def inbox(me: User, page: Int): Fu[Paginator[Thread]] = Paginator(
-      adapter = new Adapter(
-            selector = ThreadRepo visibleByUserQuery me.id,
-            sort = Seq(ThreadRepo.recentSort)
-        ),
-      currentPage = page,
-      maxPerPage = maxPerPage
+    adapter = new Adapter(
+      selector = ThreadRepo visibleByUserQuery me.id,
+      sort = Seq(ThreadRepo.recentSort)
+    ),
+    currentPage = page,
+    maxPerPage = maxPerPage
   )
 
   def preview(userId: String): Fu[List[Thread]] = unreadCache(userId) flatMap {
@@ -46,19 +47,19 @@ final class Api(unreadCache: UnreadCache,
     val fromMod = Granter(_.MessageAnyone)(me)
     UserRepo named data.user.id flatMap {
       _.fold(fufail[Thread]("No such recipient")) { invited =>
-        Thread.make(name = data.subject,
-                    text = data.text,
-                    creatorId = me.id,
-                    invitedId = data.user.id) |> { t =>
+        Thread.make(
+          name = data.subject,
+          text = data.text,
+          creatorId = me.id,
+          invitedId = data.user.id) |> { t =>
           val thread =
             if (me.troll || lila.security.Spam.detect(data.subject, data.text))
               t deleteFor invited
             else t
           sendUnlessBlocked(thread, fromMod) >>- updateUser(invited) >>- {
             val text = s"${data.subject} ${data.text}"
-            shutup ! lila.hub.actorApi.shutup.RecordPrivateMessage(me.id,
-                                                                   invited.id,
-                                                                   text)
+            shutup ! lila.hub.actorApi.shutup
+              .RecordPrivateMessage(me.id, invited.id, text)
           } inject thread
         }
       }
@@ -66,11 +67,13 @@ final class Api(unreadCache: UnreadCache,
   }
 
   def lichessThread(lt: LichessThread): Funit =
-    sendUnlessBlocked(Thread.make(name = lt.subject,
-                                  text = lt.message,
-                                  creatorId = lt.from,
-                                  invitedId = lt.to),
-                      fromMod = false) >> unreadCache.clear(lt.to)
+    sendUnlessBlocked(
+      Thread.make(
+        name = lt.subject,
+        text = lt.message,
+        creatorId = lt.from,
+        invitedId = lt.to),
+      fromMod = false) >> unreadCache.clear(lt.to)
 
   private def sendUnlessBlocked(thread: Thread, fromMod: Boolean): Funit =
     if (fromMod) $insert(thread)
@@ -102,7 +105,7 @@ final class Api(unreadCache: UnreadCache,
   def deleteThread(id: String, me: User): Funit =
     thread(id, me) flatMap { threadOption =>
       (threadOption.map(_.id) ?? (ThreadRepo deleteFor me.id)) >>- updateUser(
-          me)
+        me)
     }
 
   val unreadIds = unreadCache apply _

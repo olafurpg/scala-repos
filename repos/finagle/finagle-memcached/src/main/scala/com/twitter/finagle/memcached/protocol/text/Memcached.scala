@@ -132,7 +132,7 @@ private class MemcachedLoggingFilter(stats: StatsReceiver)
             NoOp() | Info(_, _) | InfoLines(_) | Values(_) | Number(_) =>
           succ.counter(command.name).incr()
         case Error(_) => error.counter(command.name).incr()
-        case _ => error.counter(command.name).incr()
+        case _        => error.counter(command.name).incr()
       }
       response
     }

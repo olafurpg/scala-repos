@@ -23,7 +23,7 @@ import Series.Vec2ExpandingStats
   * These methods scan over the Series and compute values over a specified historical
   * window.
   */
-class SeriesExpandingStats[X : ST : ORD, T : Vec2ExpandingStats : ST](
+class SeriesExpandingStats[X: ST: ORD, T: Vec2ExpandingStats: ST](
     s: Series[X, T]) {
   protected val ev = implicitly[Vec2ExpandingStats[T]]
 
@@ -68,6 +68,6 @@ object SeriesExpandingStats {
     * @tparam X Type of index
     * @tparam T Type of elements
     */
-  def apply[X : ST : ORD, T : Vec2ExpandingStats : ST](s: Series[X, T]) =
+  def apply[X: ST: ORD, T: Vec2ExpandingStats: ST](s: Series[X, T]) =
     new SeriesExpandingStats(s)
 }

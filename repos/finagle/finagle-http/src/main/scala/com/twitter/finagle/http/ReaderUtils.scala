@@ -20,7 +20,7 @@ private[http] object ReaderUtils {
 
     case invalid =>
       val exc = new IllegalArgumentException(
-          "invalid message \"%s\"".format(invalid))
+        "invalid message \"%s\"".format(invalid))
       Future.exception(exc)
   }
 
@@ -46,7 +46,7 @@ private[http] object ReaderUtils {
       case Some(buf) =>
         trans.write(chunkOfBuf(buf)) transform {
           case Return(_) => streamChunks(trans, r, bufSize)
-          case _ => Future(r.discard())
+          case _         => Future(r.discard())
         }
     }
   }

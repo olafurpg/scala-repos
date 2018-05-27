@@ -37,7 +37,9 @@ object NumberExpression {
       ne: NumberExpression): jfxbb.NumberExpression =
     if (ne != null) ne.delegate else null
 
-  case class VariablePrecisionNumber(number: Double, var precision: Double = 0) {
+  case class VariablePrecisionNumber(
+      number: Double,
+      var precision: Double = 0) {
     def +-(p: Double): VariablePrecisionNumber = {
       precision = p
       this

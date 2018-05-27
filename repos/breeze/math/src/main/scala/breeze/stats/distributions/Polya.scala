@@ -22,14 +22,14 @@ import breeze.numerics._
 
 /**
   * Represents a Polya distribution, a.k.a Dirichlet compound Multinomial distribution
-  * see 
+  * see
   * http://en.wikipedia.org/wiki/Multivariate_Polya_distribution
   *
   * @author dlwh
   */
-class Polya[T, @specialized(Int) I](
-    params: T)(implicit space: MutableEnumeratedCoordinateField[T, I, Double],
-               rand: RandBasis = Rand)
+class Polya[T, @specialized(Int) I](params: T)(
+    implicit space: MutableEnumeratedCoordinateField[T, I, Double],
+    rand: RandBasis = Rand)
     extends DiscreteDistr[I] {
   import space._
   private val innerDirichlet = new Dirichlet(params)

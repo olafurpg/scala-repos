@@ -19,15 +19,14 @@ object FTupleSpec extends Specification with ScalaCheck {
   type E = String
 
   implicit val stringParam: Arbitrary[String] = Arbitrary(Gen.oneOf("x", null))
-  implicit val integerParam: Arbitrary[Integer] = Arbitrary(
-      Gen.oneOf(42, null))
+  implicit val integerParam: Arbitrary[Integer] = Arbitrary(Gen.oneOf(42, null))
 
   checkEquality[F.Tuple[A, B]]("Tuple")
   checkEquality[F.Tuple3[A, B, C]]("Tuple3")
   checkEquality[F.Tuple4[A, B, C, D]]("Tuple4")
   checkEquality[F.Tuple5[A, B, C, D, E]]("Tuple5")
 
-  def checkEquality[A : Arbitrary](name: String): Unit = {
+  def checkEquality[A: Arbitrary](name: String): Unit = {
     s"$name equality" should {
 
       "be commutative" in prop { (a1: A, a2: A) =>
@@ -54,33 +53,35 @@ object FTupleSpec extends Specification with ScalaCheck {
   }
 
   object ArbitraryTuples {
-    implicit def arbTuple[A : Arbitrary, B : Arbitrary]: Arbitrary[
-        F.Tuple[A, B]] = Arbitrary {
+    implicit def arbTuple[A: Arbitrary, B: Arbitrary]
+      : Arbitrary[F.Tuple[A, B]] = Arbitrary {
       for (a <- arbitrary[A]; b <- arbitrary[B]) yield F.Tuple(a, b)
     }
 
-    implicit def arbTuple3[
-        A : Arbitrary, B : Arbitrary, C : Arbitrary]: Arbitrary[
-        F.Tuple3[A, B, C]] = Arbitrary {
-      for (a <- arbitrary[A]; b <- arbitrary[B]; c <- arbitrary[C]) yield
-        F.Tuple3(a, b, c)
+    implicit def arbTuple3[A: Arbitrary, B: Arbitrary, C: Arbitrary]
+      : Arbitrary[F.Tuple3[A, B, C]] = Arbitrary {
+      for (a <- arbitrary[A]; b <- arbitrary[B]; c <- arbitrary[C])
+        yield F.Tuple3(a, b, c)
     }
 
     implicit def arbTuple4[
-        A : Arbitrary, B : Arbitrary, C : Arbitrary, D : Arbitrary]: Arbitrary[
-        F.Tuple4[A, B, C, D]] = Arbitrary {
+        A: Arbitrary,
+        B: Arbitrary,
+        C: Arbitrary,
+        D: Arbitrary]: Arbitrary[F.Tuple4[A, B, C, D]] = Arbitrary {
       for (a <- arbitrary[A]; b <- arbitrary[B]; c <- arbitrary[C];
-      d <- arbitrary[D]) yield F.Tuple4(a, b, c, d)
+           d <- arbitrary[D]) yield F.Tuple4(a, b, c, d)
     }
 
-    implicit def arbTuple5[A : Arbitrary,
-                           B : Arbitrary,
-                           C : Arbitrary,
-                           D : Arbitrary,
-                           E : Arbitrary]: Arbitrary[F.Tuple5[A, B, C, D, E]] =
+    implicit def arbTuple5[
+        A: Arbitrary,
+        B: Arbitrary,
+        C: Arbitrary,
+        D: Arbitrary,
+        E: Arbitrary]: Arbitrary[F.Tuple5[A, B, C, D, E]] =
       Arbitrary {
         for (a <- arbitrary[A]; b <- arbitrary[B]; c <- arbitrary[C];
-        d <- arbitrary[D]; e <- arbitrary[E]) yield F.Tuple5(a, b, c, d, e)
+             d <- arbitrary[D]; e <- arbitrary[E]) yield F.Tuple5(a, b, c, d, e)
       }
   }
 }

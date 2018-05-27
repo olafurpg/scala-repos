@@ -4,13 +4,13 @@ object TailrecAfterTryCatch {
   final def good1() {
     1 match {
       case 2 => {
-          try {
-            //  return
-          } catch {
-            case e: ClassNotFoundException =>
-          }
-          good1()
+        try {
+          //  return
+        } catch {
+          case e: ClassNotFoundException =>
         }
+        good1()
+      }
     }
   }
 
@@ -43,13 +43,13 @@ object TailrecAfterTryCatch {
   final def bad() {
     1 match {
       case 2 => {
-          try {
-            return
-          } catch {
-            case e: ClassNotFoundException =>
-          }
-          bad()
+        try {
+          return
+        } catch {
+          case e: ClassNotFoundException =>
         }
+        bad()
+      }
     }
   }
 }

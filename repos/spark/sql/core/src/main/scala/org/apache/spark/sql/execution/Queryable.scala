@@ -68,10 +68,11 @@ private[sql] trait Queryable {
     * @param truncate Whether truncate long strings and align cells right
     *
     */
-  private[sql] def formatString(rows: Seq[Seq[String]],
-                                numRows: Int,
-                                hasMoreData: Boolean,
-                                truncate: Boolean = true): String = {
+  private[sql] def formatString(
+      rows: Seq[Seq[String]],
+      numRows: Int,
+      hasMoreData: Boolean,
+      truncate: Boolean = true): String = {
     val sb = new StringBuilder
     val numCols = schema.fieldNames.length
 
@@ -90,27 +91,31 @@ private[sql] trait Queryable {
       colWidths.map("-" * _).addString(sb, "+", "+", "+\n").toString()
 
     // column names
-    rows.head.zipWithIndex.map {
-      case (cell, i) =>
-        if (truncate) {
-          StringUtils.leftPad(cell, colWidths(i))
-        } else {
-          StringUtils.rightPad(cell, colWidths(i))
-        }
-    }.addString(sb, "|", "|", "|\n")
+    rows.head.zipWithIndex
+      .map {
+        case (cell, i) =>
+          if (truncate) {
+            StringUtils.leftPad(cell, colWidths(i))
+          } else {
+            StringUtils.rightPad(cell, colWidths(i))
+          }
+      }
+      .addString(sb, "|", "|", "|\n")
 
     sb.append(sep)
 
     // data
     rows.tail.map {
-      _.zipWithIndex.map {
-        case (cell, i) =>
-          if (truncate) {
-            StringUtils.leftPad(cell.toString, colWidths(i))
-          } else {
-            StringUtils.rightPad(cell.toString, colWidths(i))
-          }
-      }.addString(sb, "|", "|", "|\n")
+      _.zipWithIndex
+        .map {
+          case (cell, i) =>
+            if (truncate) {
+              StringUtils.leftPad(cell.toString, colWidths(i))
+            } else {
+              StringUtils.rightPad(cell.toString, colWidths(i))
+            }
+        }
+        .addString(sb, "|", "|", "|\n")
     }
 
     sb.append(sep)

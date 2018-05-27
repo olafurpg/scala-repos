@@ -12,9 +12,9 @@ trait SI_5054_q7 {
     * This takes the implicit value in scope.
     *
     * Example: `test1()`
-    * 
+    *
     * @usecase def test2(explicit: Int): Int
-    * 
+    *
     * This takes the explicit value passed.
     *
     * Example: `test2(3)`

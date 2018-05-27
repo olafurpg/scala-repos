@@ -22,7 +22,8 @@ trait TransportAdapterProvider {
     * Create the transport adapter that wraps an underlying transport.
     */
   def create(
-      wrappedTransport: Transport, system: ExtendedActorSystem): Transport
+      wrappedTransport: Transport,
+      system: ExtendedActorSystem): Transport
 }
 
 class TransportAdapters(system: ExtendedActorSystem) extends Extension {
@@ -35,7 +36,8 @@ class TransportAdapters(system: ExtendedActorSystem) extends Extension {
         .recover({
           case e ⇒
             throw new IllegalArgumentException(
-                s"Cannot instantiate transport adapter [${fqn}]", e)
+              s"Cannot instantiate transport adapter [${fqn}]",
+              e)
         })
         .get
     }
@@ -45,16 +47,16 @@ class TransportAdapters(system: ExtendedActorSystem) extends Extension {
       case Some(provider) ⇒ provider
       case None ⇒
         throw new IllegalArgumentException(
-            s"There is no registered transport adapter provider with name: [${name}]")
+          s"There is no registered transport adapter provider with name: [${name}]")
     }
 }
 
 object TransportAdaptersExtension
-    extends ExtensionId[TransportAdapters] with ExtensionIdProvider {
+    extends ExtensionId[TransportAdapters]
+    with ExtensionIdProvider {
   override def get(system: ActorSystem): TransportAdapters = super.get(system)
   override def lookup = TransportAdaptersExtension
-  override def createExtension(
-      system: ExtendedActorSystem): TransportAdapters =
+  override def createExtension(system: ExtendedActorSystem): TransportAdapters =
     new TransportAdapters(system)
 }
 
@@ -82,7 +84,8 @@ trait SchemeAugmenter {
 abstract class AbstractTransportAdapter(
     protected val wrappedTransport: Transport)(
     implicit val ec: ExecutionContext)
-    extends Transport with SchemeAugmenter {
+    extends Transport
+    with SchemeAugmenter {
 
   protected def maximumOverhead: Int
 
@@ -92,7 +95,8 @@ abstract class AbstractTransportAdapter(
     : Future[AssociationEventListener]
 
   protected def interceptAssociate(
-      remoteAddress: Address, statusPromise: Promise[AssociationHandle]): Unit
+      remoteAddress: Address,
+      statusPromise: Promise[AssociationHandle]): Unit
 
   override def schemeIdentifier: String =
     augmentScheme(wrappedTransport.schemeIdentifier)
@@ -112,7 +116,7 @@ abstract class AbstractTransportAdapter(
       // and initialization happening in interceptListen
       _ ← listenerPromise
         .tryCompleteWith(
-            interceptListen(listenAddress, upstreamListenerPromise.future))
+          interceptListen(listenAddress, upstreamListenerPromise.future))
         .future
     } yield (augmentScheme(listenAddress), upstreamListenerPromise)
   }
@@ -147,13 +151,15 @@ abstract class AbstractTransportAdapterHandle(
     val originalRemoteAddress: Address,
     val wrappedHandle: AssociationHandle,
     val addedSchemeIdentifier: String)
-    extends AssociationHandle with SchemeAugmenter {
+    extends AssociationHandle
+    with SchemeAugmenter {
 
   def this(wrappedHandle: AssociationHandle, addedSchemeIdentifier: String) =
-    this(wrappedHandle.localAddress,
-         wrappedHandle.remoteAddress,
-         wrappedHandle,
-         addedSchemeIdentifier)
+    this(
+      wrappedHandle.localAddress,
+      wrappedHandle.remoteAddress,
+      wrappedHandle,
+      addedSchemeIdentifier)
 
   override val localAddress = augmentScheme(originalLocalAddress)
   override val remoteAddress = augmentScheme(originalRemoteAddress)
@@ -165,7 +171,8 @@ object ActorTransportAdapter {
   final case class ListenerRegistered(listener: AssociationEventListener)
       extends TransportOperation
   final case class AssociateUnderlying(
-      remoteAddress: Address, statusPromise: Promise[AssociationHandle])
+      remoteAddress: Address,
+      statusPromise: Promise[AssociationHandle])
       extends TransportOperation
   final case class ListenUnderlying(
       listenAddress: Address,
@@ -173,13 +180,15 @@ object ActorTransportAdapter {
       extends TransportOperation
   final case class DisassociateUnderlying(
       info: DisassociateInfo = AssociationHandle.Unknown)
-      extends TransportOperation with DeadLetterSuppression
+      extends TransportOperation
+      with DeadLetterSuppression
 
   implicit val AskTimeout = Timeout(5.seconds)
 }
 
 abstract class ActorTransportAdapter(
-    wrappedTransport: Transport, system: ActorSystem)
+    wrappedTransport: Transport,
+    system: ActorSystem)
     extends AbstractTransportAdapter(wrappedTransport)(system.dispatcher) {
 
   import ActorTransportAdapter._
@@ -191,7 +200,8 @@ abstract class ActorTransportAdapter(
 
   private def registerManager(): Future[ActorRef] =
     (system.actorSelection("/system/transports") ? RegisterTransportActor(
-            managerProps, managerName)).mapTo[ActorRef]
+      managerProps,
+      managerName)).mapTo[ActorRef]
 
   override def interceptListen(
       listenAddress: Address,
@@ -215,13 +225,15 @@ abstract class ActorTransportAdapter(
   override def shutdown(): Future[Boolean] =
     for {
       stopResult ← gracefulStop(
-          manager, RARP(system).provider.remoteSettings.FlushWait)
+        manager,
+        RARP(system).provider.remoteSettings.FlushWait)
       wrappedStopResult ← wrappedTransport.shutdown()
     } yield stopResult && wrappedStopResult
 }
 
 abstract class ActorTransportAdapterManager
-    extends Actor with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
+    extends Actor
+    with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
   import ActorTransportAdapter.{ListenUnderlying, ListenerRegistered}
 
   private var delayedEvents = immutable.Queue.empty[Any]

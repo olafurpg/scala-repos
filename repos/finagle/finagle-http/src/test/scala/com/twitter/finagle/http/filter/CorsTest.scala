@@ -21,20 +21,20 @@ class CorsTest extends FlatSpec with MustMatchers {
   }
 
   val policy = Cors.Policy(
-      allowsOrigin = {
-        case origin if origin.startsWith("juug") => Some(origin)
-        case origin if origin.endsWith("street") => Some(origin)
-        case _ => None
-      },
-      allowsMethods = { method =>
-        Some(method :: "TRAP" :: Nil)
-      },
-      allowsHeaders = { headers =>
-        Some(headers)
-      },
-      exposedHeaders = "Icey" :: Nil,
-      supportsCredentials = true,
-      maxAge = Some(Duration.Top)
+    allowsOrigin = {
+      case origin if origin.startsWith("juug") => Some(origin)
+      case origin if origin.endsWith("street") => Some(origin)
+      case _                                   => None
+    },
+    allowsMethods = { method =>
+      Some(method :: "TRAP" :: Nil)
+    },
+    allowsHeaders = { headers =>
+      Some(headers)
+    },
+    exposedHeaders = "Icey" :: Nil,
+    supportsCredentials = true,
+    maxAge = Some(Duration.Top)
   )
 
   val corsFilter = new Cors.HttpFilter(policy)
@@ -48,14 +48,14 @@ class CorsTest extends FlatSpec with MustMatchers {
 
     val response = Await result service(request)
     response.headerMap.get("Access-Control-Allow-Origin") must be(
-        Some("thestreet"))
+      Some("thestreet"))
     response.headerMap.get("Access-Control-Allow-Credentials") must be(
-        Some("true"))
+      Some("true"))
     response.headerMap.get("Access-Control-Allow-Methods") must be(
-        Some("BRR, TRAP"))
+      Some("BRR, TRAP"))
     response.headerMap.get("Vary") must be(Some("Origin"))
     response.headerMap.get("Access-Control-Max-Age") must be(
-        Some(Duration.Top.inSeconds.toString))
+      Some(Duration.Top.inSeconds.toString))
     response.contentString must be("")
   }
 
@@ -93,11 +93,11 @@ class CorsTest extends FlatSpec with MustMatchers {
 
     val response = Await result service(request)
     response.headerMap.get("Access-Control-Allow-Origin") must be(
-        Some("juughaus"))
+      Some("juughaus"))
     response.headerMap.get("Access-Control-Allow-Credentials") must be(
-        Some("true"))
+      Some("true"))
     response.headerMap.get("Access-Control-Expose-Headers") must be(
-        Some("Icey"))
+      Some("Icey"))
     response.headerMap.get("Vary") must be(Some("Origin"))
     response.contentString must be("#guwop")
   }

@@ -152,8 +152,7 @@ object AccessibleRole
     * <li> {@link AccessibleAction#FIRE} </li>
     * </ul>
     */
-  val DecrementButton = new AccessibleRole(
-      jfxs.AccessibleRole.DECREMENT_BUTTON)
+  val DecrementButton = new AccessibleRole(jfxs.AccessibleRole.DECREMENT_BUTTON)
 
   /**
     * Hyperlink role.
@@ -181,8 +180,7 @@ object AccessibleRole
     * <li> {@link AccessibleAction#FIRE} </li>
     * </ul>
     */
-  val IncrementButton = new AccessibleRole(
-      jfxs.AccessibleRole.INCREMENT_BUTTON)
+  val IncrementButton = new AccessibleRole(jfxs.AccessibleRole.INCREMENT_BUTTON)
 
   /**
     * Image View role.
@@ -402,7 +400,7 @@ object AccessibleRole
     * </ul>
     */
   val ProgressIndicator = new AccessibleRole(
-      jfxs.AccessibleRole.PROGRESS_INDICATOR)
+    jfxs.AccessibleRole.PROGRESS_INDICATOR)
 
   /**
     * Radio Button role.
@@ -612,7 +610,7 @@ object AccessibleRole
     * </ul>
     */
   val SplitMenuButton = new AccessibleRole(
-      jfxs.AccessibleRole.SPLIT_MENU_BUTTON)
+    jfxs.AccessibleRole.SPLIT_MENU_BUTTON)
 
   /**
     * Tab Item role.
@@ -865,54 +863,56 @@ object AccessibleRole
   val TreeView = new AccessibleRole(jfxs.AccessibleRole.TREE_VIEW)
 
   protected override def unsortedValues: Array[AccessibleRole] =
-    Array(Button,
-          CheckBox,
-          CheckMenuItem,
-          ComboBox,
-          ContextMenu,
-          DatePicker,
-          DecrementButton,
-          Hyperlink,
-          IncrementButton,
-          ImageView,
-          ListView,
-          ListItem,
-          Menu,
-          MenuBar,
-          MenuButton,
-          MenuItem,
-          Node,
-          PageItem,
-          Pagination,
-          Parent,
-          PasswordField,
-          ProgressIndicator,
-          RadioButton,
-          RadioMenuItem,
-          Slider,
-          Spinner,
-          Text,
-          TextArea,
-          TextField,
-          ToggleButton,
-          Tooltip,
-          ScrollBar,
-          ScrollPane,
-          SplitMenuButton,
-          TabItem,
-          TabPane,
-          TableCell,
-          TableColumn,
-          TableRow,
-          TableView,
-          Thumb,
-          TitledPane,
-          ToolBar,
-          TreeItem,
-          TreeTableCell,
-          TreeTableRow,
-          TreeTableView,
-          TreeView)
+    Array(
+      Button,
+      CheckBox,
+      CheckMenuItem,
+      ComboBox,
+      ContextMenu,
+      DatePicker,
+      DecrementButton,
+      Hyperlink,
+      IncrementButton,
+      ImageView,
+      ListView,
+      ListItem,
+      Menu,
+      MenuBar,
+      MenuButton,
+      MenuItem,
+      Node,
+      PageItem,
+      Pagination,
+      Parent,
+      PasswordField,
+      ProgressIndicator,
+      RadioButton,
+      RadioMenuItem,
+      Slider,
+      Spinner,
+      Text,
+      TextArea,
+      TextField,
+      ToggleButton,
+      Tooltip,
+      ScrollBar,
+      ScrollPane,
+      SplitMenuButton,
+      TabItem,
+      TabPane,
+      TableCell,
+      TableColumn,
+      TableRow,
+      TableView,
+      Thumb,
+      TitledPane,
+      ToolBar,
+      TreeItem,
+      TreeTableCell,
+      TreeTableRow,
+      TreeTableView,
+      TreeView
+    )
 }
 
 sealed case class AccessibleRole(override val delegate: jfxs.AccessibleRole)

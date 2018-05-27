@@ -17,14 +17,14 @@ object NoExcep {
       Console.println(t);
     } catch {
       case Node(Leaf(_), Leaf(_)) => a;
-      case Leaf(_) => b;
+      case Leaf(_)                => b;
     }
 
   def method2 =
     try {
       Console.println("Hello, world");
     } catch {
-      case _: Error => Console.println("File error");
+      case _: Error     => Console.println("File error");
       case t: Throwable => Console.println("Unknown error");
     }
 
@@ -34,10 +34,10 @@ object NoExcep {
         Console.println("method3");
       } catch {
         case Node(Leaf(_), Leaf(_)) => Console.println("First one");
-        case Leaf(_) => Console.println("Second one");
+        case Leaf(_)                => Console.println("Second one");
       }
     } catch {
-      case _: Error => Console.println("File error");
+      case _: Error     => Console.println("File error");
       case t: Exception => Console.println("Unknown error");
     }
 
@@ -78,7 +78,7 @@ object Test {
       if (10 > 0) throw Leaf(10);
       Console.println("nooo oneeee can priiiint meee");
     } catch {
-      case Leaf(a) => Console.println(a);
+      case Leaf(a)      => Console.println(a);
       case _: Exception => Console.println("Exception occurred");
     } finally {
       Console.println("Finally!");
@@ -89,7 +89,7 @@ object Test {
       if (10 > 0) throw Leaf(10);
       Console.println("nooo oneeee can priiiint meee");
     } catch {
-      case Leaf(a) => Console.println(a);
+      case Leaf(a)      => Console.println(a);
       case _: Exception => Console.println("Exception occurred");
     }
 
@@ -97,7 +97,7 @@ object Test {
       val a: Leaf = null;
       println(a.x);
     } catch {
-      case Leaf(a) => Console.println(a);
+      case Leaf(a)                 => Console.println(a);
       case _: NullPointerException => Console.println("Exception occurred");
     }
   }
@@ -342,8 +342,7 @@ object Test {
     Console.println("Return inside body and return in finally:");
     execute(returnInBodyAndInFinally);
 
-    Console.println(
-        "Return inside body and return in finally inside finally:");
+    Console.println("Return inside body and return in finally inside finally:");
     execute(returnInBodyAndInFinally2);
 
     Console.println("Throw in catch and finally:");

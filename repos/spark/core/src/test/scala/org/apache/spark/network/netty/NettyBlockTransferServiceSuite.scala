@@ -24,7 +24,9 @@ import org.apache.spark.{SecurityManager, SparkConf, SparkFunSuite}
 import org.apache.spark.network.BlockDataManager
 
 class NettyBlockTransferServiceSuite
-    extends SparkFunSuite with BeforeAndAfterEach with ShouldMatchers {
+    extends SparkFunSuite
+    with BeforeAndAfterEach
+    with ShouldMatchers {
 
   private var service0: NettyBlockTransferService = _
   private var service1: NettyBlockTransferService = _
@@ -78,8 +80,8 @@ class NettyBlockTransferServiceSuite
       .set("spark.blockManager.port", port.toString)
     val securityManager = new SecurityManager(conf)
     val blockDataManager = mock(classOf[BlockDataManager])
-    val service = new NettyBlockTransferService(
-        conf, securityManager, numCores = 1)
+    val service =
+      new NettyBlockTransferService(conf, securityManager, numCores = 1)
     service.init(blockDataManager)
     service
   }

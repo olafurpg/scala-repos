@@ -17,7 +17,12 @@
 
 package org.apache.spark.rpc.netty
 
-import java.util.concurrent.{ConcurrentHashMap, LinkedBlockingQueue, ThreadPoolExecutor, TimeUnit}
+import java.util.concurrent.{
+  ConcurrentHashMap,
+  LinkedBlockingQueue,
+  ThreadPoolExecutor,
+  TimeUnit
+}
 import javax.annotation.concurrent.GuardedBy
 
 import scala.collection.JavaConverters._
@@ -35,9 +40,10 @@ import org.apache.spark.util.ThreadUtils
   */
 private[netty] class Dispatcher(nettyEnv: NettyRpcEnv) extends Logging {
 
-  private class EndpointData(val name: String,
-                             val endpoint: RpcEndpoint,
-                             val ref: NettyRpcEndpointRef) {
+  private class EndpointData(
+      val name: String,
+      val endpoint: RpcEndpoint,
+      val ref: NettyRpcEndpointRef) {
     val inbox = new Inbox(ref, endpoint)
   }
 
@@ -55,7 +61,8 @@ private[netty] class Dispatcher(nettyEnv: NettyRpcEnv) extends Logging {
   private var stopped = false
 
   def registerRpcEndpoint(
-      name: String, endpoint: RpcEndpoint): NettyRpcEndpointRef = {
+      name: String,
+      endpoint: RpcEndpoint): NettyRpcEndpointRef = {
     val addr = RpcEndpointAddress(nettyEnv.address, name)
     val endpointRef = new NettyRpcEndpointRef(nettyEnv.conf, addr, nettyEnv)
     synchronized {
@@ -63,9 +70,10 @@ private[netty] class Dispatcher(nettyEnv: NettyRpcEnv) extends Logging {
         throw new IllegalStateException("RpcEnv has been stopped")
       }
       if (endpoints.putIfAbsent(
-              name, new EndpointData(name, endpoint, endpointRef)) != null) {
+            name,
+            new EndpointData(name, endpoint, endpointRef)) != null) {
         throw new IllegalArgumentException(
-            s"There is already an RpcEndpoint called $name")
+          s"There is already an RpcEndpoint called $name")
       }
       val data = endpoints.get(name)
       endpointRefs.put(data.endpoint, data.ref)
@@ -112,36 +120,37 @@ private[netty] class Dispatcher(nettyEnv: NettyRpcEnv) extends Logging {
     while (iter.hasNext) {
       val name = iter.next
       postMessage(
-          name,
-          message,
-          (e) => logWarning(s"Message $message dropped. ${e.getMessage}"))
+        name,
+        message,
+        (e) => logWarning(s"Message $message dropped. ${e.getMessage}"))
     }
   }
 
   /** Posts a message sent by a remote endpoint. */
   def postRemoteMessage(
-      message: RequestMessage, callback: RpcResponseCallback): Unit = {
-    val rpcCallContext = new RemoteNettyRpcCallContext(
-        nettyEnv, callback, message.senderAddress)
-    val rpcMessage = RpcMessage(
-        message.senderAddress, message.content, rpcCallContext)
-    postMessage(
-        message.receiver.name, rpcMessage, (e) => callback.onFailure(e))
+      message: RequestMessage,
+      callback: RpcResponseCallback): Unit = {
+    val rpcCallContext =
+      new RemoteNettyRpcCallContext(nettyEnv, callback, message.senderAddress)
+    val rpcMessage =
+      RpcMessage(message.senderAddress, message.content, rpcCallContext)
+    postMessage(message.receiver.name, rpcMessage, (e) => callback.onFailure(e))
   }
 
   /** Posts a message sent by a local endpoint. */
   def postLocalMessage(message: RequestMessage, p: Promise[Any]): Unit = {
     val rpcCallContext = new LocalNettyRpcCallContext(message.senderAddress, p)
-    val rpcMessage = RpcMessage(
-        message.senderAddress, message.content, rpcCallContext)
+    val rpcMessage =
+      RpcMessage(message.senderAddress, message.content, rpcCallContext)
     postMessage(message.receiver.name, rpcMessage, (e) => p.tryFailure(e))
   }
 
   /** Posts a one-way message. */
   def postOneWayMessage(message: RequestMessage): Unit = {
-    postMessage(message.receiver.name,
-                OneWayMessage(message.senderAddress, message.content),
-                (e) => throw e)
+    postMessage(
+      message.receiver.name,
+      OneWayMessage(message.senderAddress, message.content),
+      (e) => throw e)
   }
 
   /**
@@ -151,9 +160,10 @@ private[netty] class Dispatcher(nettyEnv: NettyRpcEnv) extends Logging {
     * @param message the message to post
     * @param callbackIfStopped callback function if the endpoint is stopped.
     */
-  private def postMessage(endpointName: String,
-                          message: InboxMessage,
-                          callbackIfStopped: (Exception) => Unit): Unit = {
+  private def postMessage(
+      endpointName: String,
+      message: InboxMessage,
+      callbackIfStopped: (Exception) => Unit): Unit = {
     val shouldCallOnStop = synchronized {
       val data = endpoints.get(endpointName)
       if (stopped || data == null) {
@@ -171,7 +181,7 @@ private[netty] class Dispatcher(nettyEnv: NettyRpcEnv) extends Logging {
           new RpcEnvStoppedException()
         } else {
           new SparkException(
-              s"Could not find $endpointName or it has been stopped.")
+            s"Could not find $endpointName or it has been stopped.")
         }
       callbackIfStopped(error)
     }
@@ -205,8 +215,8 @@ private[netty] class Dispatcher(nettyEnv: NettyRpcEnv) extends Logging {
   /** Thread pool used for dispatching messages. */
   private val threadpool: ThreadPoolExecutor = {
     val numThreads = nettyEnv.conf.getInt(
-        "spark.rpc.netty.dispatcher.numThreads",
-        math.max(2, Runtime.getRuntime.availableProcessors()))
+      "spark.rpc.netty.dispatcher.numThreads",
+      math.max(2, Runtime.getRuntime.availableProcessors()))
     val pool =
       ThreadUtils.newDaemonFixedThreadPool(numThreads, "dispatcher-event-loop")
     for (i <- 0 until numThreads) {

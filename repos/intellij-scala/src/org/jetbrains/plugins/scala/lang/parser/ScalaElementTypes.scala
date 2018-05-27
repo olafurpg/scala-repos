@@ -7,13 +7,31 @@ import com.intellij.lexer.Lexer
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 import com.intellij.psi.stubs.PsiFileStub
-import com.intellij.psi.tree.{ICompositeElementType, IElementType, IErrorCounterReparseableElementType, IStubFileElementType}
+import com.intellij.psi.tree.{
+  ICompositeElementType,
+  IElementType,
+  IErrorCounterReparseableElementType,
+  IStubFileElementType
+}
 import org.jetbrains.annotations.NotNull
-import org.jetbrains.plugins.scala.lang.lexer.{ScalaElementType, ScalaLexer, ScalaTokenTypes}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScValue, ScVariable}
+import org.jetbrains.plugins.scala.lang.lexer.{
+  ScalaElementType,
+  ScalaLexer,
+  ScalaTokenTypes
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction,
+  ScValue,
+  ScVariable
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.expr.ScBlockExprImpl
 import org.jetbrains.plugins.scala.lang.psi.stubs.elements._
-import org.jetbrains.plugins.scala.lang.psi.stubs.elements.signatures.{ScClassParameterElementType, ScParamClauseElementType, ScParamClausesElementType, ScParameterElementType}
+import org.jetbrains.plugins.scala.lang.psi.stubs.elements.signatures.{
+  ScClassParameterElementType,
+  ScParamClauseElementType,
+  ScParamClausesElementType,
+  ScParameterElementType
+}
 
 /**
   * User: Dmitry.Krasilschikov
@@ -171,12 +189,12 @@ object ScalaElementTypes {
   //  String literals
   val STRING_LITERAL = new ScalaElementType("String Literal")
   val INTERPOLATED_STRING_LITERAL = new ScalaElementType(
-      "Interpolated String Literal")
+    "Interpolated String Literal")
   //Not only String, but quasiquote too
   val INTERPOLATED_PREFIX_PATTERN_REFERENCE = new ScalaElementType(
-      "Interpolated Prefix Pattern Reference")
+    "Interpolated Prefix Pattern Reference")
   val INTERPOLATED_PREFIX_LITERAL_REFERENCE = new ScalaElementType(
-      "Interpolated Prefix Literal Reference")
+    "Interpolated Prefix Literal Reference")
   // Boolean literals
   val BOOLEAN_LITERAL = new ScalaElementType("Boolean Literal")
 
@@ -246,7 +264,7 @@ object ScalaElementTypes {
   val INTERPOLATION_PATTERN = new ScalaElementType("interpolation pattern")
   val REFERENCE_PATTERN = new ScReferencePatternElementType
   val STABLE_REFERENCE_PATTERN = new ScalaElementType(
-      "stable reference pattern")
+    "stable reference pattern")
   val PATTERN_IN_PARENTHESIS = new ScalaElementType("pattern in parenthesis")
 
   /************************************** TYPE PATTERNS ********************************/
@@ -275,7 +293,8 @@ object ScalaElementTypes {
 
   class ScCodeBlockElementType()
       extends IErrorCounterReparseableElementType(
-          "block of expressions", ScalaFileType.SCALA_LANGUAGE)
+        "block of expressions",
+        ScalaFileType.SCALA_LANGUAGE)
       with ICompositeElementType {
 
     override def createNode(text: CharSequence): ASTNode = {
@@ -287,7 +306,9 @@ object ScalaElementTypes {
     }
 
     def getErrorsCount(
-        seq: CharSequence, fileLanguage: Language, project: Project): Int = {
+        seq: CharSequence,
+        fileLanguage: Language,
+        project: Project): Int = {
       import com.intellij.psi.tree.IErrorCounterReparseableElementType._
       val lexer: Lexer = new ScalaLexer
       lexer.start(seq)

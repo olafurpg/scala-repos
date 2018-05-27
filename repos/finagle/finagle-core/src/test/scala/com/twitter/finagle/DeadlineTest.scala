@@ -9,13 +9,14 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
 @RunWith(classOf[JUnitRunner])
 class DeadlineTest
-    extends FunSuite with AssertionsForJUnit
+    extends FunSuite
+    with AssertionsForJUnit
     with GeneratorDrivenPropertyChecks {
 
-  val time = for (t <- Gen.choose(0L, Long.MaxValue)) yield
-    Time.fromNanoseconds(t)
-  val dur = for (d <- Gen.choose(0L, Long.MaxValue)) yield
-    Duration.fromNanoseconds(d)
+  val time = for (t <- Gen.choose(0L, Long.MaxValue))
+    yield Time.fromNanoseconds(t)
+  val dur = for (d <- Gen.choose(0L, Long.MaxValue))
+    yield Duration.fromNanoseconds(d)
   val deadline = for (t <- time; d <- dur) yield Deadline(t, t + d)
 
   test("Deadline marshalling") {

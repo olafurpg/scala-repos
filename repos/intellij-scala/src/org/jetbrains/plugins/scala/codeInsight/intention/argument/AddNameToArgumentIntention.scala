@@ -30,7 +30,7 @@ class AddNameToArgumentIntention extends PsiElementBaseIntentionAction {
     if (!element.isValid) return
     IntentionUtils.addNameToArgumentsFix(element, onlyBoolean = false) match {
       case Some(x) => x()
-      case None =>
+      case None    =>
     }
   }
 }

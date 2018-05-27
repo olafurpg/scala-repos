@@ -21,39 +21,42 @@ import play.api.{Configuration, Mode}
   * server.conf file, whereas the application configuration is usually loaded from an
   * application.conf file.
   */
-case class ServerConfig(rootDir: File,
-                        port: Option[Int],
-                        sslPort: Option[Int],
-                        address: String,
-                        mode: Mode.Mode,
-                        properties: Properties,
-                        configuration: Configuration) {
+case class ServerConfig(
+    rootDir: File,
+    port: Option[Int],
+    sslPort: Option[Int],
+    address: String,
+    mode: Mode.Mode,
+    properties: Properties,
+    configuration: Configuration) {
   // Some basic validation of config
   if (!port.isDefined && !sslPort.isDefined)
     throw new IllegalArgumentException(
-        "Must provide either an HTTP port or an HTTPS port")
+      "Must provide either an HTTP port or an HTTPS port")
 }
 
 object ServerConfig {
 
-  def apply(classLoader: ClassLoader = this.getClass.getClassLoader,
-            rootDir: File = new File("."),
-            port: Option[Int] = Some(9000),
-            sslPort: Option[Int] = None,
-            address: String = "0.0.0.0",
-            mode: Mode.Mode = Mode.Prod,
-            properties: Properties = System.getProperties): ServerConfig = {
+  def apply(
+      classLoader: ClassLoader = this.getClass.getClassLoader,
+      rootDir: File = new File("."),
+      port: Option[Int] = Some(9000),
+      sslPort: Option[Int] = None,
+      address: String = "0.0.0.0",
+      mode: Mode.Mode = Mode.Prod,
+      properties: Properties = System.getProperties): ServerConfig = {
     ServerConfig(
-        rootDir = rootDir,
-        port = port,
-        sslPort = sslPort,
-        address = address,
-        mode = mode,
-        properties = properties,
-        configuration = Configuration.load(classLoader,
-                                           properties,
-                                           rootDirConfig(rootDir),
-                                           mode == Mode.Test)
+      rootDir = rootDir,
+      port = port,
+      sslPort = sslPort,
+      address = address,
+      mode = mode,
+      properties = properties,
+      configuration = Configuration.load(
+        classLoader,
+        properties,
+        rootDirConfig(rootDir),
+        mode == Mode.Test)
     )
   }
 

@@ -37,7 +37,7 @@ object Test extends App {
     pipp match {
       case NotWorkingTab.a => ???
       case NotWorkingTab.b =>
-      case _ => ???
+      case _               => ???
     }
   }
 
@@ -46,7 +46,7 @@ object Test extends App {
     stuff match {
       case WorkingTab.a =>
       case WorkingTab.b => ???
-      case _ => ???
+      case _            => ???
     }
   }
 }

@@ -19,10 +19,10 @@ object Test extends App {
   assert(genSig("f") == "public int C.f() throws E")
 
   assert(
-      sig("g") == "public java.lang.Exception C.g() throws java.lang.Exception")
+    sig("g") == "public java.lang.Exception C.g() throws java.lang.Exception")
   assert(genSig("g") == "public E C.g() throws java.lang.Exception")
 
   assert(
-      sig("h") == "public int C.h() throws java.lang.Exception,java.lang.Exception")
+    sig("h") == "public int C.h() throws java.lang.Exception,java.lang.Exception")
   assert(genSig("h") == "public int C.h() throws E,java.lang.Exception")
 }

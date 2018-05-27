@@ -33,7 +33,8 @@ class RandomDataGeneratorSuite extends SparkFunSuite {
     * converting those values into their Catalyst equivalents using CatalystTypeConverters.
     */
   def testRandomDataGeneration(
-      dataType: DataType, nullable: Boolean = true): Unit = {
+      dataType: DataType,
+      nullable: Boolean = true): Unit = {
     val toCatalyst = CatalystTypeConverters.createToCatalystConverter(dataType)
     val generator = RandomDataGenerator
       .forType(dataType, nullable, new Random(33))
@@ -53,30 +54,30 @@ class RandomDataGeneratorSuite extends SparkFunSuite {
 
   // Basic types:
   for (dataType <- DataTypeTestUtils.atomicTypes;
-  nullable <- Seq(true, false) if !dataType.isInstanceOf[DecimalType]) {
+       nullable <- Seq(true, false) if !dataType.isInstanceOf[DecimalType]) {
     test(s"$dataType (nullable=$nullable)") {
       testRandomDataGeneration(dataType)
     }
   }
 
   for (arrayType <- DataTypeTestUtils.atomicArrayTypes if RandomDataGenerator
-                     .forType(arrayType.elementType, arrayType.containsNull)
-                     .isDefined) {
+         .forType(arrayType.elementType, arrayType.containsNull)
+         .isDefined) {
     test(s"$arrayType") {
       testRandomDataGeneration(arrayType)
     }
   }
 
   val atomicTypesWithDataGenerators = DataTypeTestUtils.atomicTypes.filter(
-      RandomDataGenerator.forType(_).isDefined)
+    RandomDataGenerator.forType(_).isDefined)
 
   // Complex types:
   for (keyType <- atomicTypesWithDataGenerators;
-  valueType <- atomicTypesWithDataGenerators
-              // Scala's BigDecimal.hashCode can lead to OutOfMemoryError on Scala 2.10 (see SI-6173) and
-              // Spark can hit NumberFormatException errors when converting certain BigDecimals (SPARK-8802).
-              // For these reasons, we don't support generation of maps with decimal keys.
-              if !keyType.isInstanceOf[DecimalType]) {
+       valueType <- atomicTypesWithDataGenerators
+       // Scala's BigDecimal.hashCode can lead to OutOfMemoryError on Scala 2.10 (see SI-6173) and
+       // Spark can hit NumberFormatException errors when converting certain BigDecimals (SPARK-8802).
+       // For these reasons, we don't support generation of maps with decimal keys.
+       if !keyType.isInstanceOf[DecimalType]) {
     val mapType = MapType(keyType, valueType)
     test(s"$mapType") {
       testRandomDataGeneration(mapType)
@@ -84,9 +85,9 @@ class RandomDataGeneratorSuite extends SparkFunSuite {
   }
 
   for (colOneType <- atomicTypesWithDataGenerators;
-  colTwoType <- atomicTypesWithDataGenerators) {
+       colTwoType <- atomicTypesWithDataGenerators) {
     val structType = StructType(
-        StructField("a", colOneType) :: StructField("b", colTwoType) :: Nil)
+      StructField("a", colOneType) :: StructField("b", colTwoType) :: Nil)
     test(s"$structType") {
       testRandomDataGeneration(structType)
     }

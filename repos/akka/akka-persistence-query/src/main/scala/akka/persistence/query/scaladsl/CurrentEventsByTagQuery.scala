@@ -18,5 +18,6 @@ trait CurrentEventsByTagQuery extends ReadJournal {
     * stored after the query is completed are not included in the event stream.
     */
   def currentEventsByTag(
-      tag: String, offset: Long): Source[EventEnvelope, NotUsed]
+      tag: String,
+      offset: Long): Source[EventEnvelope, NotUsed]
 }

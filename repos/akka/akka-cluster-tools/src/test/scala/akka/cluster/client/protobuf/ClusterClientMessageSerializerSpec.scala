@@ -10,7 +10,7 @@ import akka.cluster.client.ClusterReceptionist.Internal._
 class ClusterClientMessageSerializerSpec extends AkkaSpec {
 
   val serializer = new ClusterClientMessageSerializer(
-      system.asInstanceOf[ExtendedActorSystem])
+    system.asInstanceOf[ExtendedActorSystem])
 
   def checkSerialization(obj: AnyRef): Unit = {
     val blob = serializer.toBinary(obj)
@@ -22,9 +22,11 @@ class ClusterClientMessageSerializerSpec extends AkkaSpec {
 
     "be serializable" in {
       val contactPoints =
-        Vector("akka.tcp://system@node-1:2552/system/receptionist",
-               "akka.tcp://system@node-2:2552/system/receptionist",
-               "akka.tcp://system@node-3:2552/system/receptionist")
+        Vector(
+          "akka.tcp://system@node-1:2552/system/receptionist",
+          "akka.tcp://system@node-2:2552/system/receptionist",
+          "akka.tcp://system@node-3:2552/system/receptionist"
+        )
       checkSerialization(Contacts(contactPoints))
       checkSerialization(GetContacts)
       checkSerialization(Heartbeat)

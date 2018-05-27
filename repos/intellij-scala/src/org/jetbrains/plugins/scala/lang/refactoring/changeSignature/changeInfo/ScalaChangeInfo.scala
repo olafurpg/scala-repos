@@ -6,7 +6,10 @@ import com.intellij.psi._
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.refactoring.util.CanonicalTypes
 import com.intellij.refactoring.util.CanonicalTypes.Type
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScMethodLike, ScPrimaryConstructor}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScMethodLike,
+  ScPrimaryConstructor
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.lang.refactoring.changeSignature.ScalaParameterInfo
@@ -18,14 +21,16 @@ import scala.beans.BeanProperty
   * Nikolay.Tropin
   * 2014-08-28
   */
-case class ScalaChangeInfo(newVisibility: String,
-                           function: ScMethodLike,
-                           @BeanProperty newName: String,
-                           newType: ScType,
-                           newParams: Seq[Seq[ScalaParameterInfo]],
-                           isAddDefaultArgs: Boolean)
+case class ScalaChangeInfo(
+    newVisibility: String,
+    function: ScMethodLike,
+    @BeanProperty newName: String,
+    newType: ScType,
+    newParams: Seq[Seq[ScalaParameterInfo]],
+    isAddDefaultArgs: Boolean)
     extends ScalaChangeInfoBase(newParams.flatten.toArray)
-    with UnsupportedJavaInfo with VisibilityChangeInfo
+    with UnsupportedJavaInfo
+    with VisibilityChangeInfo
     with ParametersChangeInfo {
 
   val project = function.getProject
@@ -40,7 +45,8 @@ case class ScalaChangeInfo(newVisibility: String,
   var introducedParameterData: Option[ScalaIntroduceParameterData] = None
 
   override def getValue(
-      i: Int, callExpression: PsiCallExpression): PsiExpression =
+      i: Int,
+      callExpression: PsiCallExpression): PsiExpression =
     getNewParameters()(i).getValue(callExpression)
 
   override def getNewReturnType: Type =
@@ -51,7 +57,7 @@ case class ScalaChangeInfo(newVisibility: String,
       if (fun.isConstructor) fun.containingClass.name
       else fun.name
     case pc: ScPrimaryConstructor => pc.containingClass.name
-    case _ => newName
+    case _                        => newName
   }
 
   override def getNewNameIdentifier =
@@ -72,7 +78,7 @@ case class ScalaChangeInfo(newVisibility: String,
   override val isReturnTypeChanged: Boolean = function match {
     case f: ScFunction =>
       f.returnType.toOption.map(_.canonicalText) != Option(newType).map(
-          _.canonicalText)
+        _.canonicalText)
     case _ => false
   }
 }

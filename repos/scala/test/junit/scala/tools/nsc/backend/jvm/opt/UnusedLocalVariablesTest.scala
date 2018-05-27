@@ -60,8 +60,7 @@ class UnusedLocalVariablesTest extends ClearAfterClass {
                  |}
                  |""".stripMargin
     val cls = compileClasses(dceCompiler)(code).head
-    val m = convertMethod(
-        cls.methods.asScala.toList.find(_.desc == "(I)V").get)
+    val m = convertMethod(cls.methods.asScala.toList.find(_.desc == "(I)V").get)
     assertTrue(m.localVars.length == 2) // this, a, but not y
 
     val code2 = """class C {
@@ -84,9 +83,9 @@ class UnusedLocalVariablesTest extends ClearAfterClass {
     val companion2 = clss2.find(_.name == "C$").get
 
     val clsConstr = convertMethod(
-        cls2.methods.asScala.toList.find(_.name == "<init>").get)
+      cls2.methods.asScala.toList.find(_.name == "<init>").get)
     val companionConstr = convertMethod(
-        companion2.methods.asScala.toList.find(_.name == "<init>").get)
+      companion2.methods.asScala.toList.find(_.name == "<init>").get)
 
     assertTrue(clsConstr.localVars.length == 1) // this
     assertTrue(companionConstr.localVars.length == 1) // this

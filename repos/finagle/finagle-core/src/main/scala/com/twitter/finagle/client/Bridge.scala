@@ -23,15 +23,15 @@ object Bridge {
     * transport.
     */
   def apply[In, Out, Req, Rep](
-      transporter: (SocketAddress,
-      StatsReceiver) => Future[Transport[In, Out]],
+      transporter: (SocketAddress, StatsReceiver) => Future[Transport[In, Out]],
       newDispatcher: Transport[In, Out] => Service[Req, Rep]
   ): ((Address, StatsReceiver) => ServiceFactory[Req, Rep]) = {
     case (Address.Inet(ia, _), sr) =>
       ServiceFactory(() => transporter(ia, sr) map newDispatcher)
-    case (com.twitter.finagle.exp.Address
-            .ServiceFactory(sf: ServiceFactory[Req, Rep], _),
-          _) =>
+    case (
+        com.twitter.finagle.exp.Address
+          .ServiceFactory(sf: ServiceFactory[Req, Rep], _),
+        _) =>
       sf
     case (Address.Failed(e), _) => new FailingFactory(e)
   }

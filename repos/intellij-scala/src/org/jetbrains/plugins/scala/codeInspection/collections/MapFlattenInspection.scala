@@ -19,9 +19,9 @@ object MapFlatten extends SimplificationType {
     expr match {
       case qual `.map` (f) `.flatten` () if implicitParameterExistsFor(expr) =>
         Some(
-            replace(expr)
-              .withText(invocationText(qual, "flatMap", f))
-              .highlightFrom(qual))
+          replace(expr)
+            .withText(invocationText(qual, "flatMap", f))
+            .highlightFrom(qual))
       case _ => None
     }
   }

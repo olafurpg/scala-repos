@@ -10,9 +10,9 @@ import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
 object InterpolatedStringFormatter extends StringFormatter {
   def format(parts: Seq[StringPart]) = {
     val toMultiline = parts.exists {
-      case Text(s) => s.contains("\n")
+      case Text(s)      => s.contains("\n")
       case i: Injection => i.value == "\n"
-      case _ => false
+      case _            => false
     }
     format(parts, toMultiline)
   }
@@ -22,7 +22,7 @@ object InterpolatedStringFormatter extends StringFormatter {
     val prefix = {
       val formattingRequired = parts.exists {
         case it: Injection => it.isFormattingRequired
-        case _ => false
+        case _             => false
       }
       if (formattingRequired) "f" else "s"
     }
@@ -31,7 +31,8 @@ object InterpolatedStringFormatter extends StringFormatter {
   }
 
   def formatContent(
-      parts: Seq[StringPart], toMultiline: Boolean = false): String = {
+      parts: Seq[StringPart],
+      toMultiline: Boolean = false): String = {
     val strings = parts.collect {
       case Text(s) if toMultiline => s.replace("\r", "")
       case Text(s) =>
@@ -42,8 +43,9 @@ object InterpolatedStringFormatter extends StringFormatter {
         else {
           val presentation =
             if ((it.isComplexBlock ||
-                    (!it.isLiteral && it.isAlphanumericIdentifier)) &&
-                noBraces(parts, it)) "$" + text else "${" + text + "}"
+                (!it.isLiteral && it.isAlphanumericIdentifier)) &&
+                noBraces(parts, it)) "$" + text
+            else "${" + text + "}"
           if (it.isFormattingRequired) presentation + it.format
           else presentation
         }
@@ -57,8 +59,8 @@ object InterpolatedStringFormatter extends StringFormatter {
       parts(ind + 1) match {
         case Text(s) =>
           return s.isEmpty ||
-          !ScalaNamesUtil.isIdentifier(it.text + s.charAt(0)) ||
-          s.startsWith("`") || s.exists(_ == '$')
+            !ScalaNamesUtil.isIdentifier(it.text + s.charAt(0)) ||
+            s.startsWith("`") || s.exists(_ == '$')
         case _ =>
       }
     }

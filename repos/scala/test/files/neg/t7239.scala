@@ -7,6 +7,6 @@ case class Bar(fooBar: Int)
 class Test {
   var fooBar: Foo = null
   def build = Bar(
-      fooBar = foBar.toInt
+    fooBar = foBar.toInt
   )
 }

@@ -53,7 +53,7 @@ class CustomDirectivesExamplesSpec extends RoutingSpec {
 
     val myDirective: Directive1[Int] = intParameter.flatMap {
       case a if a > 0 => provide(2 * a)
-      case _ => reject
+      case _          => reject
     }
 
     // tests:

@@ -31,7 +31,7 @@ final class NullArgument[A, B] private (_apply: Option[A] => B) {
 
   def ***[C, D](x: C ?=> D): (A, C) ?=> (B, D) =
     NullArgument {
-      case None => (apply(None), x(None))
+      case None         => (apply(None), x(None))
       case Some((a, c)) => (apply(Some(a)), x(Some(c)))
     }
 
@@ -40,21 +40,21 @@ final class NullArgument[A, B] private (_apply: Option[A] => B) {
 
   def left[C]: (A \/ C) ?=> (B \/ C) =
     NullArgument {
-      case None => -\/(apply(None))
-      case Some(-\/(a)) => -\/(apply(Some(a)))
+      case None             => -\/(apply(None))
+      case Some(-\/(a))     => -\/(apply(Some(a)))
       case Some(c @ \/-(_)) => c
     }
 
   def right[C]: (C \/ A) ?=> (C \/ B) =
     NullArgument {
-      case None => \/-(apply(None))
-      case Some(\/-(a)) => \/-(apply(Some(a)))
+      case None             => \/-(apply(None))
+      case Some(\/-(a))     => \/-(apply(Some(a)))
       case Some(c @ -\/(_)) => c
     }
 
   def compose[C](f: C ?=> A): C ?=> B =
     NullArgument {
-      case None => apply(None)
+      case None        => apply(None)
       case c @ Some(_) => apply(Some(f(c)))
     }
 
@@ -99,9 +99,8 @@ object NullArgument extends NullArgumentInstances {
     always(M.zero)
 
   def pair[A, B](f: A => B, b: => B): A ?=> B =
-    NullArgument(
-        (_: Option[A]) match {
-      case None => b
+    NullArgument((_: Option[A]) match {
+      case None    => b
       case Some(a) => f(a)
     })
 
@@ -137,22 +136,25 @@ sealed abstract class NullArgumentInstances extends NullArgumentInstances0 {
       implicit val M = M0
     }
 
-  implicit val nullArgumentCategory: Split[NullArgument] with Profunctor[
-      NullArgument] = new Split[NullArgument] with Profunctor[NullArgument] {
-    override def compose[A, B, C](
-        f: NullArgument[B, C], g: NullArgument[A, B]): NullArgument[A, C] =
-      f compose g
-    override def split[A, B, C, D](
-        f: NullArgument[A, B], g: NullArgument[C, D]) =
-      f *** g
-    override def mapfst[A, B, C](r: NullArgument[A, B])(f: C => A) =
-      r contramap f
-    override def mapsnd[A, B, C](r: NullArgument[A, B])(f: B => C) =
-      r map f
-  }
+  implicit val nullArgumentCategory
+    : Split[NullArgument] with Profunctor[NullArgument] =
+    new Split[NullArgument] with Profunctor[NullArgument] {
+      override def compose[A, B, C](
+          f: NullArgument[B, C],
+          g: NullArgument[A, B]): NullArgument[A, C] =
+        f compose g
+      override def split[A, B, C, D](
+          f: NullArgument[A, B],
+          g: NullArgument[C, D]) =
+        f *** g
+      override def mapfst[A, B, C](r: NullArgument[A, B])(f: C => A) =
+        r contramap f
+      override def mapsnd[A, B, C](r: NullArgument[A, B])(f: B => C) =
+        r map f
+    }
 
-  implicit def nullArgumentMonad[X]: Monad[NullArgument[X, ?]] with BindRec[
-      NullArgument[X, ?]] =
+  implicit def nullArgumentMonad[X]
+    : Monad[NullArgument[X, ?]] with BindRec[NullArgument[X, ?]] =
     new Monad[NullArgument[X, ?]] with BindRec[NullArgument[X, ?]] {
       override def ap[A, B](a: => NullArgument[X, A])(
           f: => NullArgument[X, A => B]) =
@@ -169,15 +171,14 @@ sealed abstract class NullArgumentInstances extends NullArgumentInstances0 {
           @annotation.tailrec
           def go(a0: A): B =
             f(a0)(t) match {
-              case \/-(b) => b
+              case \/-(b)  => b
               case -\/(a1) => go(a1)
             }
           go(a)
         }
     }
 
-  implicit def nullArgumentContravariant[
-      X]: Contravariant[NullArgument[?, X]] =
+  implicit def nullArgumentContravariant[X]: Contravariant[NullArgument[?, X]] =
     new Contravariant[NullArgument[?, X]] {
       override def contramap[A, B](a: NullArgument[A, X])(f: B => A) =
         a contramap f
@@ -193,7 +194,8 @@ private trait NullArgumentSemigroup[A, B]
 }
 
 private trait NullArgumentMonoid[A, B]
-    extends Monoid[NullArgument[A, B]] with NullArgumentSemigroup[A, B] {
+    extends Monoid[NullArgument[A, B]]
+    with NullArgumentSemigroup[A, B] {
   implicit val M: Monoid[B]
 
   override def zero =

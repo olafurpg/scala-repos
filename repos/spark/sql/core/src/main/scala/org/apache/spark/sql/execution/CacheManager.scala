@@ -27,7 +27,8 @@ import org.apache.spark.storage.StorageLevel.MEMORY_AND_DISK
 
 /** Holds a cached logical plan and its data */
 private[sql] case class CachedData(
-    plan: LogicalPlan, cachedRepresentation: InMemoryRelation)
+    plan: LogicalPlan,
+    cachedRepresentation: InMemoryRelation)
 
 /**
   * Provides support in a SQLContext for caching query results and automatically using these cached
@@ -49,7 +50,8 @@ private[sql] class CacheManager extends Logging {
   private def readLock[A](f: => A): A = {
     val lock = cacheLock.readLock()
     lock.lock()
-    try f finally {
+    try f
+    finally {
       lock.unlock()
     }
   }
@@ -58,7 +60,8 @@ private[sql] class CacheManager extends Logging {
   private def writeLock[A](f: => A): A = {
     val lock = cacheLock.writeLock()
     lock.lock()
-    try f finally {
+    try f
+    finally {
       lock.unlock()
     }
   }
@@ -89,18 +92,21 @@ private[sql] class CacheManager extends Logging {
     } else {
       val sqlContext = query.sqlContext
       cachedData += CachedData(
-          planToCache,
-          InMemoryRelation(sqlContext.conf.useCompression,
-                           sqlContext.conf.columnBatchSize,
-                           storageLevel,
-                           sqlContext.executePlan(planToCache).executedPlan,
-                           tableName))
+        planToCache,
+        InMemoryRelation(
+          sqlContext.conf.useCompression,
+          sqlContext.conf.columnBatchSize,
+          storageLevel,
+          sqlContext.executePlan(planToCache).executedPlan,
+          tableName)
+      )
     }
   }
 
   /** Removes the data for the given [[Queryable]] from the cache */
   private[sql] def uncacheQuery(
-      query: Queryable, blocking: Boolean = true): Unit = writeLock {
+      query: Queryable,
+      blocking: Boolean = true): Unit = writeLock {
     val planToCache = query.queryExecution.analyzed
     val dataIndex =
       cachedData.indexWhere(cd => planToCache.sameResult(cd.plan))
@@ -113,7 +119,8 @@ private[sql] class CacheManager extends Logging {
     * if it's cached
     */
   private[sql] def tryUncacheQuery(
-      query: Queryable, blocking: Boolean = true): Boolean = writeLock {
+      query: Queryable,
+      blocking: Boolean = true): Boolean = writeLock {
     val planToCache = query.queryExecution.analyzed
     val dataIndex =
       cachedData.indexWhere(cd => planToCache.sameResult(cd.plan))

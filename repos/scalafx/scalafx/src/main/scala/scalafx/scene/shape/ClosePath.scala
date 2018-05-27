@@ -37,4 +37,5 @@ object ClosePath {
 }
 
 class ClosePath(override val delegate: jfxss.ClosePath = new jfxss.ClosePath())
-    extends PathElement(delegate) with SFXDelegate[jfxss.ClosePath]
+    extends PathElement(delegate)
+    with SFXDelegate[jfxss.ClosePath]

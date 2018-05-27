@@ -103,7 +103,7 @@ private[mllib] object Loader {
     * @param loadedSchema  Schema for model data loaded from file.
     * @tparam Data  Expected data type from which an expected schema can be derived.
     */
-  def checkSchema[Data : TypeTag](loadedSchema: StructType): Unit = {
+  def checkSchema[Data: TypeTag](loadedSchema: StructType): Unit = {
     // Check schema explicitly since erasure makes it hard to use match-case for checking.
     val expectedFields: Array[StructField] =
       ScalaReflection.schemaFor[Data].dataType.asInstanceOf[StructType].fields
@@ -111,14 +111,16 @@ private[mllib] object Loader {
       loadedSchema.map(field => field.name -> field.dataType).toMap
     expectedFields.foreach { field =>
       assert(
-          loadedFields.contains(field.name),
-          s"Unable to parse model data." +
+        loadedFields.contains(field.name),
+        s"Unable to parse model data." +
           s"  Expected field with name ${field.name} was missing in loaded schema:" +
-          s" ${loadedFields.mkString(", ")}")
+          s" ${loadedFields.mkString(", ")}"
+      )
       assert(
-          loadedFields(field.name).sameType(field.dataType),
-          s"Unable to parse model data.  Expected field $field but found field" +
-          s" with different type: ${loadedFields(field.name)}")
+        loadedFields(field.name).sameType(field.dataType),
+        s"Unable to parse model data.  Expected field $field but found field" +
+          s" with different type: ${loadedFields(field.name)}"
+      )
     }
   }
 

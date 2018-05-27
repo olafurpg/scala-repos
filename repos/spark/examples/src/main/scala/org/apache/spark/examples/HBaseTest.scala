@@ -53,10 +53,10 @@ object HBaseTest {
     }
 
     val hBaseRDD = sc.newAPIHadoopRDD(
-        conf,
-        classOf[TableInputFormat],
-        classOf[org.apache.hadoop.hbase.io.ImmutableBytesWritable],
-        classOf[org.apache.hadoop.hbase.client.Result])
+      conf,
+      classOf[TableInputFormat],
+      classOf[org.apache.hadoop.hbase.io.ImmutableBytesWritable],
+      classOf[org.apache.hadoop.hbase.client.Result])
 
     hBaseRDD.count()
 

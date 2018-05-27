@@ -12,8 +12,8 @@ object ExecutionUtil {
     * @param fn Function to run a execution given a date range
     * @return Sequence of Executions per Day
     */
-  def executionsFromDates[T](
-      duration: Duration, parallelism: Int = 1)(fn: DateRange => Execution[T])(
+  def executionsFromDates[T](duration: Duration, parallelism: Int = 1)(
+      fn: DateRange => Execution[T])(
       implicit dr: DateRange): Seq[Execution[T]] =
     dr.each(duration).map(fn).toSeq
 
@@ -43,8 +43,8 @@ object ExecutionUtil {
     * @param fn Function to run a execution given a date range
     * @return Execution of Sequences
     */
-  def runDateRangeWithParallelism[T](
-      duration: Duration, parallelism: Int = 1)(fn: DateRange => Execution[T])(
+  def runDateRangeWithParallelism[T](duration: Duration, parallelism: Int = 1)(
+      fn: DateRange => Execution[T])(
       implicit dr: DateRange): Execution[Seq[T]] =
     runDatesWithParallelism(duration, parallelism)(fn)
       .map(_.map { case (_, t) => t })
@@ -66,8 +66,10 @@ object ExecutionUtil {
     * final aggregation of the Monoids computed for each duration.
     */
   def runDateRangeWithParallelismSum[T](
-      duration: Duration, parallelism: Int = 1)(fn: DateRange => Execution[T])(
-      implicit dr: DateRange, semigroup: Semigroup[T]): Execution[T] = {
+      duration: Duration,
+      parallelism: Int = 1)(fn: DateRange => Execution[T])(
+      implicit dr: DateRange,
+      semigroup: Semigroup[T]): Execution[T] = {
     require(dr.each(duration).nonEmpty, s"Date Range can not be empty")
 
     runDateRangeWithParallelism(duration, parallelism)(fn)(dr)

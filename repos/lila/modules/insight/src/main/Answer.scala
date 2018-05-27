@@ -3,13 +3,16 @@ package lila.insight
 import lila.game.{Game, Pov}
 
 case class Answer[X](
-    question: Question[X], clusters: List[Cluster[X]], povs: List[Pov])
+    question: Question[X],
+    clusters: List[Cluster[X]],
+    povs: List[Pov])
 
 // a row per dimension value
-case class Cluster[X](x: X, // dimension value
-                      insight: Insight, // metric values
-                      size: Int, // sample size
-                      insightIds: List[String]) {
+case class Cluster[X](
+    x: X, // dimension value
+    insight: Insight, // metric values
+    size: Int, // sample size
+    insightIds: List[String]) {
 
   def gameIds = insightIds.map(_ take Game.gameIdSize)
 }

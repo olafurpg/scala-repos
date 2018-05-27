@@ -26,7 +26,7 @@ class EdgeRDDSuite extends SparkFunSuite with LocalSparkContext {
     // test to see if getStorageLevel returns correct value after caching
     withSpark { sc =>
       val verts = sc.parallelize(
-          List((0L, 0), (1L, 1), (1L, 2), (2L, 3), (2L, 3), (2L, 3)))
+        List((0L, 0), (1L, 1), (1L, 2), (2L, 3), (2L, 3), (2L, 3)))
       val edges = EdgeRDD.fromEdges(sc.parallelize(List.empty[Edge[Int]]))
       assert(edges.getStorageLevel == StorageLevel.NONE)
       edges.cache()

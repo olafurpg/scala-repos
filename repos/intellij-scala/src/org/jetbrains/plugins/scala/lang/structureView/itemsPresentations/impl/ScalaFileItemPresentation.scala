@@ -14,6 +14,6 @@ class ScalaFileItemPresentation(private val element: ScalaFile)
     extends ScalaItemPresentation(element) {
   def getPresentableText: String = {
     ScalaElementPresentation.getFilePresentableText(
-        myElement.asInstanceOf[ScalaFile])
+      myElement.asInstanceOf[ScalaFile])
   }
 }

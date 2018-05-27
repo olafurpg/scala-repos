@@ -48,11 +48,12 @@ class BackgroundImage(override val delegate: jfxsl.BackgroundImage)
   /**
     * Creates a new BackgroundImage.
     */
-  def this(image: Image,
-           repeatX: BackgroundRepeat,
-           repeatY: BackgroundRepeat,
-           position: BackgroundPosition,
-           size: BackgroundSize) =
+  def this(
+      image: Image,
+      repeatX: BackgroundRepeat,
+      repeatY: BackgroundRepeat,
+      position: BackgroundPosition,
+      size: BackgroundSize) =
     this(new jfxsl.BackgroundImage(image, repeatX, repeatY, position, size))
 
   /**

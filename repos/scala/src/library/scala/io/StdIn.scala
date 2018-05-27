@@ -43,10 +43,10 @@ private[scala] trait StdIn {
     else
       s.toLowerCase() match {
         case "true" => true
-        case "t" => true
-        case "yes" => true
-        case "y" => true
-        case _ => false
+        case "t"    => true
+        case "yes"  => true
+        case "y"    => true
+        case _      => false
       }
   }
 
@@ -202,15 +202,15 @@ private[scala] trait StdIn {
     var res: List[Any] = Nil
     while (i >= 0) {
       res = (a(i) match {
-        case x: java.lang.Boolean => x.booleanValue()
-        case x: java.lang.Byte => x.byteValue()
-        case x: java.lang.Short => x.shortValue()
+        case x: java.lang.Boolean   => x.booleanValue()
+        case x: java.lang.Byte      => x.byteValue()
+        case x: java.lang.Short     => x.shortValue()
         case x: java.lang.Character => x.charValue()
-        case x: java.lang.Integer => x.intValue()
-        case x: java.lang.Long => x.longValue()
-        case x: java.lang.Float => x.floatValue()
-        case x: java.lang.Double => x.doubleValue()
-        case x => x
+        case x: java.lang.Integer   => x.intValue()
+        case x: java.lang.Long      => x.longValue()
+        case x: java.lang.Float     => x.floatValue()
+        case x: java.lang.Double    => x.doubleValue()
+        case x                      => x
       }) :: res
       i -= 1
     }

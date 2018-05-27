@@ -33,7 +33,7 @@ object EmptyElemTagP {
     }
     builder.getTokenType match {
       case XmlTokenType.XML_WHITE_SPACE => builder.advanceLexer()
-      case _ =>
+      case _                            =>
     }
     builder.getTokenType match {
       case ScalaXmlTokenTypes.XML_EMPTY_ELEMENT_END =>

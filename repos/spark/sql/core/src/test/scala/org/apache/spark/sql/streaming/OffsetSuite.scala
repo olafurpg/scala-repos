@@ -18,7 +18,11 @@
 package org.apache.spark.sql.streaming
 
 import org.apache.spark.SparkFunSuite
-import org.apache.spark.sql.execution.streaming.{CompositeOffset, LongOffset, Offset}
+import org.apache.spark.sql.execution.streaming.{
+  CompositeOffset,
+  LongOffset,
+  Offset
+}
 
 trait OffsetSuite extends SparkFunSuite {
 
@@ -72,23 +76,27 @@ class LongOffsetSuite extends OffsetSuite {
 }
 
 class CompositeOffsetSuite extends OffsetSuite {
-  compare(one = CompositeOffset(Some(LongOffset(1)) :: Nil),
-          two = CompositeOffset(Some(LongOffset(2)) :: Nil))
+  compare(
+    one = CompositeOffset(Some(LongOffset(1)) :: Nil),
+    two = CompositeOffset(Some(LongOffset(2)) :: Nil))
 
-  compare(one = CompositeOffset(None :: Nil),
-          two = CompositeOffset(Some(LongOffset(2)) :: Nil))
+  compare(
+    one = CompositeOffset(None :: Nil),
+    two = CompositeOffset(Some(LongOffset(2)) :: Nil))
 
   compareInvalid( // sizes must be same
-                 one = CompositeOffset(Nil),
-                 two = CompositeOffset(Some(LongOffset(2)) :: Nil))
+    one = CompositeOffset(Nil),
+    two = CompositeOffset(Some(LongOffset(2)) :: Nil))
 
-  compare(one = CompositeOffset.fill(LongOffset(0), LongOffset(1)),
-          two = CompositeOffset.fill(LongOffset(1), LongOffset(2)))
+  compare(
+    one = CompositeOffset.fill(LongOffset(0), LongOffset(1)),
+    two = CompositeOffset.fill(LongOffset(1), LongOffset(2)))
 
-  compare(one = CompositeOffset.fill(LongOffset(1), LongOffset(1)),
-          two = CompositeOffset.fill(LongOffset(1), LongOffset(2)))
+  compare(
+    one = CompositeOffset.fill(LongOffset(1), LongOffset(1)),
+    two = CompositeOffset.fill(LongOffset(1), LongOffset(2)))
 
   compareInvalid(
-      one = CompositeOffset.fill(LongOffset(2), LongOffset(1)), // vector time inconsistent
-      two = CompositeOffset.fill(LongOffset(1), LongOffset(2)))
+    one = CompositeOffset.fill(LongOffset(2), LongOffset(1)), // vector time inconsistent
+    two = CompositeOffset.fill(LongOffset(1), LongOffset(2)))
 }

@@ -3,14 +3,14 @@ object Breakdown {
 }
 object Test {
   42 match {
-    case Breakdown("") => // needed to trigger bug
+    case Breakdown("")      => // needed to trigger bug
     case Breakdown("", who) => println("hello " + who)
   }
 }
 object Test2 {
   42 match {
-    case Breakdown("") => // needed to trigger bug
-    case Breakdown("foo") => // needed to trigger bug
+    case Breakdown("")      => // needed to trigger bug
+    case Breakdown("foo")   => // needed to trigger bug
     case Breakdown("", who) => println("hello " + who)
   }
 }

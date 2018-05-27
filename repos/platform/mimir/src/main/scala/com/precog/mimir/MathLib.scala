@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -29,51 +29,54 @@ import yggdrasil.table._
 import TransSpecModule._
 
 trait MathLibModule[M[+ _]]
-    extends ColumnarTableLibModule[M] with InfixLibModule[M] {
+    extends ColumnarTableLibModule[M]
+    with InfixLibModule[M] {
   trait MathLib extends ColumnarTableLib with InfixLib {
     import trans._
 
     val MathNamespace = Vector("std", "math")
 
     override def _lib1 =
-      super._lib1 ++ Set(sinh,
-                         toDegrees,
-                         expm1,
-                         getExponent,
-                         asin,
-                         log10,
-                         cos,
-                         exp,
-                         cbrt,
-                         atan,
-                         ceil,
-                         rint,
-                         log1p,
-                         sqrt,
-                         floor,
-                         toRadians,
-                         tanh,
-                         round,
-                         cosh,
-                         tan,
-                         abs,
-                         sin,
-                         log,
-                         signum,
-                         acos,
-                         ulp)
+      super._lib1 ++ Set(
+        sinh,
+        toDegrees,
+        expm1,
+        getExponent,
+        asin,
+        log10,
+        cos,
+        exp,
+        cbrt,
+        atan,
+        ceil,
+        rint,
+        log1p,
+        sqrt,
+        floor,
+        toRadians,
+        tanh,
+        round,
+        cosh,
+        tan,
+        abs,
+        sin,
+        log,
+        signum,
+        acos,
+        ulp)
 
     override def _lib2 =
-      super._lib2 ++ Set(minOf,
-                         min,
-                         hypot,
-                         pow,
-                         maxOf,
-                         max,
-                         atan2,
-                         copySign,
-                         roundTo,
-                         IEEEremainder)
+      super._lib2 ++ Set(
+        minOf,
+        min,
+        hypot,
+        pow,
+        maxOf,
+        max,
+        atan2,
+        copySign,
+        roundTo,
+        IEEEremainder)
 
     import StdLib.{DoubleFrom, doubleIsDefined}
     import java.lang.Math
@@ -83,27 +86,29 @@ trait MathLibModule[M[+ _]]
     }
 
     abstract class Op1DD(
-        name: String, defined: Double => Boolean, f: Double => Double)
+        name: String,
+        defined: Double => Boolean,
+        f: Double => Double)
         extends Op1F1(MathNamespace, name) {
       val tpe = UnaryOperationType(JNumberT, JNumberT)
       def f1(ctx: MorphContext): F1 = CF1P("builtin::math::op1dd::" + name) {
         case c: DoubleColumn => new DoubleFrom.D(c, defined, f)
-        case c: LongColumn => new DoubleFrom.L(c, defined, f)
-        case c: NumColumn => new DoubleFrom.N(c, defined, f)
+        case c: LongColumn   => new DoubleFrom.L(c, defined, f)
+        case c: NumColumn    => new DoubleFrom.N(c, defined, f)
       }
     }
 
     object sinh extends Op1DD("sinh", doubleIsDefined, Math.sinh)
 
-    object toDegrees
-        extends Op1DD("toDegrees", doubleIsDefined, Math.toDegrees)
+    object toDegrees extends Op1DD("toDegrees", doubleIsDefined, Math.toDegrees)
 
     object expm1 extends Op1DD("expm1", doubleIsDefined, Math.expm1)
 
     object getExponent
-        extends Op1DD("getExponent",
-                      n => doubleIsDefined(n) && n > 0.0,
-                      n => Math.getExponent(n).toDouble)
+        extends Op1DD(
+          "getExponent",
+          n => doubleIsDefined(n) && n > 0.0,
+          n => Math.getExponent(n).toDouble)
 
     object asin extends Op1DD("asin", n => -1.0 <= n && n <= 1.0, Math.asin)
 
@@ -130,8 +135,7 @@ trait MathLibModule[M[+ _]]
 
     object floor extends Op1DD("floor", doubleIsDefined, Math.floor)
 
-    object toRadians
-        extends Op1DD("toRadians", doubleIsDefined, Math.toRadians)
+    object toRadians extends Op1DD("toRadians", doubleIsDefined, Math.toRadians)
 
     object tanh extends Op1DD("tanh", doubleIsDefined, Math.tanh)
 
@@ -140,9 +144,9 @@ trait MathLibModule[M[+ _]]
     // values anymore, so beyond that we just pass the value through
     object round
         extends Op1DD(
-            "round",
-            doubleIsDefined,
-            n => if (Math.abs(n) >= 4503599627370496.0) n else Math.round(n))
+          "round",
+          doubleIsDefined,
+          n => if (Math.abs(n) >= 4503599627370496.0) n else Math.round(n))
 
     object cosh extends Op1DD("cosh", doubleIsDefined, Math.cosh)
 
@@ -158,15 +162,17 @@ trait MathLibModule[M[+ _]]
     object signum extends Op1DD("signum", doubleIsDefined, Math.signum)
 
     object acos
-        extends Op1DD("acos",
-                      n => doubleIsDefined(n) && -1.0 <= n && n <= 1.0,
-                      Math.acos)
+        extends Op1DD(
+          "acos",
+          n => doubleIsDefined(n) && -1.0 <= n && n <= 1.0,
+          Math.acos)
 
     object ulp extends Op1DD("ulp", doubleIsDefined, Math.ulp)
 
-    abstract class Op2DDD(name: String,
-                          defined: (Double, Double) => Boolean,
-                          f: (Double, Double) => Double)
+    abstract class Op2DDD(
+        name: String,
+        defined: (Double, Double) => Boolean,
+        f: (Double, Double) => Double)
         extends Op2F2(MathNamespace, name) {
       val tpe = BinaryOperationType(JNumberT, JNumberT, JNumberT)
       def f2(ctx: MorphContext): F2 = CF2P("builtin::math::op2dd::" + name) {
@@ -224,13 +230,16 @@ trait MathLibModule[M[+ _]]
         extends Op2DDD("IEEEremainder", bothDefined, Math.IEEEremainder)
 
     object roundTo
-        extends Op2DDD("roundTo", bothDefined, { (n, digits) =>
-          val adjusted = n * math.pow(10, digits)
-          val rounded =
-            if (Math.abs(n) >= 4503599627370496.0) adjusted
-            else Math.round(adjusted)
+        extends Op2DDD(
+          "roundTo",
+          bothDefined, { (n, digits) =>
+            val adjusted = n * math.pow(10, digits)
+            val rounded =
+              if (Math.abs(n) >= 4503599627370496.0) adjusted
+              else Math.round(adjusted)
 
-          rounded / math.pow(10, digits)
-        })
+            rounded / math.pow(10, digits)
+          }
+        )
   }
 }

@@ -77,46 +77,46 @@ object TupleTest extends SpecLite {
 
   object instances {
     object tuple1 {
-      def show[A : Show] = Show[Tuple1[A]]
-      def equal[A : Equal] = Equal[Tuple1[A]]
-      def order[A : Order] = Order[Tuple1[A]]
-      def semigroup[A : Semigroup] = Semigroup[Tuple1[A]]
-      def monoid[A : Monoid] = Monoid[Tuple1[A]]
+      def show[A: Show] = Show[Tuple1[A]]
+      def equal[A: Equal] = Equal[Tuple1[A]]
+      def order[A: Order] = Order[Tuple1[A]]
+      def semigroup[A: Semigroup] = Semigroup[Tuple1[A]]
+      def monoid[A: Monoid] = Monoid[Tuple1[A]]
 
       def monad = Monad[Tuple1]
       def comonad = Comonad[Tuple1]
       def cozip = Cozip[Tuple1]
 
       // checking absence of ambiguity
-      def equal[A : Order] = Equal[Tuple1[A]]
-      def semigroup[A : Monoid] = Semigroup[Tuple1[A]]
+      def equal[A: Order] = Equal[Tuple1[A]]
+      def semigroup[A: Monoid] = Semigroup[Tuple1[A]]
     }
     object tuple2 {
-      def show[A : Show, B : Show] = Show[(A, B)]
-      def equal[A : Equal, B : Equal] = Equal[(A, B)]
-      def order[A : Order, B : Order] = Order[(A, B)]
-      def semigroup[A : Semigroup, B : Semigroup] = Semigroup[(A, B)]
-      def monoid[A : Monoid, B : Monoid] = Monoid[(A, B)]
+      def show[A: Show, B: Show] = Show[(A, B)]
+      def equal[A: Equal, B: Equal] = Equal[(A, B)]
+      def order[A: Order, B: Order] = Order[(A, B)]
+      def semigroup[A: Semigroup, B: Semigroup] = Semigroup[(A, B)]
+      def monoid[A: Monoid, B: Monoid] = Monoid[(A, B)]
 
       def associative = Associative[Tuple2]
       def bitraverse = Bitraverse[Tuple2]
       def functor = Functor[(B, ?)]
-      def bindRec[A : Semigroup] = BindRec[(A, ?)]
-      def monad[A : Monoid] = Monad[(A, ?)]
+      def bindRec[A: Semigroup] = BindRec[(A, ?)]
+      def monad[A: Monoid] = Monad[(A, ?)]
       def cozip = Cozip[(A, ?)]
 
       // checking absence of ambiguity
-      def equal[A : Order, B : Order] = Equal[(A, B)]
-      def semigroup[A : Monoid, B : Monoid] = Semigroup[(A, B)]
-      def functor[A : Monoid] = Functor[(A, ?)]
+      def equal[A: Order, B: Order] = Equal[(A, B)]
+      def semigroup[A: Monoid, B: Monoid] = Semigroup[(A, B)]
+      def functor[A: Monoid] = Functor[(A, ?)]
     }
     object tuple3 {
-      def show[A : Show, B : Show, C : Show] = Show[(A, B, C)]
-      def equal[A : Equal, B : Equal, C : Equal] = Equal[(A, B, C)]
-      def order[A : Order, B : Order, C : Order] = Order[(A, B, C)]
-      def semigroup[A : Semigroup, B : Semigroup, C : Semigroup] =
+      def show[A: Show, B: Show, C: Show] = Show[(A, B, C)]
+      def equal[A: Equal, B: Equal, C: Equal] = Equal[(A, B, C)]
+      def order[A: Order, B: Order, C: Order] = Order[(A, B, C)]
+      def semigroup[A: Semigroup, B: Semigroup, C: Semigroup] =
         Semigroup[(A, B, C)]
-      def monoid[A : Monoid, B : Monoid, C : Monoid] = Monoid[(A, B, C)]
+      def monoid[A: Monoid, B: Monoid, C: Monoid] = Monoid[(A, B, C)]
     }
   }
 }

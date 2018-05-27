@@ -21,15 +21,17 @@ import org.scalajs.core.ir.Trees.isValidIdentifier
   *      the JavaScript library will register its exports.
   *  @param minifiedResourceName Resource name for the minified version
   */
-final class JSDependency(val resourceName: String,
-                         val dependencies: List[String] = Nil,
-                         val commonJSName: Option[String] = None,
-                         val minifiedResourceName: Option[String] = None) {
+final class JSDependency(
+    val resourceName: String,
+    val dependencies: List[String] = Nil,
+    val commonJSName: Option[String] = None,
+    val minifiedResourceName: Option[String] = None) {
 
   import JSDependency._
 
-  require(commonJSName.forall(isValidIdentifier),
-          "commonJSName must be a valid JavaScript identifier")
+  require(
+    commonJSName.forall(isValidIdentifier),
+    "commonJSName must be a valid JavaScript identifier")
 
   def dependsOn(names: String*): JSDependency =
     copy(dependencies = dependencies ++ names)
@@ -44,15 +46,18 @@ final class JSDependency(val resourceName: String,
       commonJSName: Option[String] = this.commonJSName,
       minifiedResourceName: Option[String] = this.minifiedResourceName) = {
     new JSDependency(
-        resourceName, dependencies, commonJSName, minifiedResourceName)
+      resourceName,
+      dependencies,
+      commonJSName,
+      minifiedResourceName)
   }
 
   override def equals(that: Any): Boolean = that match {
     case that: JSDependency =>
       this.resourceName == that.resourceName &&
-      this.dependencies == that.dependencies &&
-      this.commonJSName == that.commonJSName &&
-      this.minifiedResourceName == that.minifiedResourceName
+        this.dependencies == that.dependencies &&
+        this.commonJSName == that.commonJSName &&
+        this.minifiedResourceName == that.minifiedResourceName
     case _ =>
       false
   }
@@ -87,22 +92,24 @@ object JSDependency {
     def serialize(x: JSDependency): JSON = {
       new JSONObjBuilder()
         .fld("resourceName", x.resourceName)
-        .opt("dependencies",
-             if (x.dependencies.nonEmpty) Some(x.dependencies) else None)
+        .opt(
+          "dependencies",
+          if (x.dependencies.nonEmpty) Some(x.dependencies) else None)
         .opt("commonJSName", x.commonJSName)
         .opt("minifiedResourceName", x.minifiedResourceName)
         .toJSON
     }
   }
 
-  implicit object JSDepJSONDeserializer
-      extends JSONDeserializer[JSDependency] {
+  implicit object JSDepJSONDeserializer extends JSONDeserializer[JSDependency] {
     def deserialize(x: JSON): JSDependency = {
       val obj = new JSONObjExtractor(x)
-      new JSDependency(obj.fld[String]("resourceName"),
-                       obj.opt[List[String]]("dependencies").getOrElse(Nil),
-                       obj.opt[String]("commonJSName"),
-                       obj.opt[String]("minifiedResourceName"))
+      new JSDependency(
+        obj.fld[String]("resourceName"),
+        obj.opt[List[String]]("dependencies").getOrElse(Nil),
+        obj.opt[String]("commonJSName"),
+        obj.opt[String]("minifiedResourceName")
+      )
     }
   }
 }

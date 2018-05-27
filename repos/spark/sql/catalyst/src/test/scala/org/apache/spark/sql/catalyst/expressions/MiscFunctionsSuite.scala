@@ -29,53 +29,59 @@ import org.apache.spark.sql.types._
 class MiscFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
 
   test("md5") {
-    checkEvaluation(Md5(Literal("ABC".getBytes(StandardCharsets.UTF_8))),
-                    "902fbdd2b1df0c4f70b4a5d23525e932")
     checkEvaluation(
-        Md5(Literal.create(Array[Byte](1, 2, 3, 4, 5, 6), BinaryType)),
-        "6ac1e56bc78f031059be7be854522c4c")
+      Md5(Literal("ABC".getBytes(StandardCharsets.UTF_8))),
+      "902fbdd2b1df0c4f70b4a5d23525e932")
+    checkEvaluation(
+      Md5(Literal.create(Array[Byte](1, 2, 3, 4, 5, 6), BinaryType)),
+      "6ac1e56bc78f031059be7be854522c4c")
     checkEvaluation(Md5(Literal.create(null, BinaryType)), null)
     checkConsistencyBetweenInterpretedAndCodegen(Md5, BinaryType)
   }
 
   test("sha1") {
-    checkEvaluation(Sha1(Literal("ABC".getBytes(StandardCharsets.UTF_8))),
-                    "3c01bdbb26f358bab27f267924aa2c9a03fcfdb8")
     checkEvaluation(
-        Sha1(Literal.create(Array[Byte](1, 2, 3, 4, 5, 6), BinaryType)),
-        "5d211bad8f4ee70e16c7d343a838fc344a1ed961")
+      Sha1(Literal("ABC".getBytes(StandardCharsets.UTF_8))),
+      "3c01bdbb26f358bab27f267924aa2c9a03fcfdb8")
+    checkEvaluation(
+      Sha1(Literal.create(Array[Byte](1, 2, 3, 4, 5, 6), BinaryType)),
+      "5d211bad8f4ee70e16c7d343a838fc344a1ed961")
     checkEvaluation(Sha1(Literal.create(null, BinaryType)), null)
-    checkEvaluation(Sha1(Literal("".getBytes(StandardCharsets.UTF_8))),
-                    "da39a3ee5e6b4b0d3255bfef95601890afd80709")
+    checkEvaluation(
+      Sha1(Literal("".getBytes(StandardCharsets.UTF_8))),
+      "da39a3ee5e6b4b0d3255bfef95601890afd80709")
     checkConsistencyBetweenInterpretedAndCodegen(Sha1, BinaryType)
   }
 
   test("sha2") {
     checkEvaluation(
-        Sha2(Literal("ABC".getBytes(StandardCharsets.UTF_8)), Literal(256)),
-        DigestUtils.sha256Hex("ABC"))
+      Sha2(Literal("ABC".getBytes(StandardCharsets.UTF_8)), Literal(256)),
+      DigestUtils.sha256Hex("ABC"))
     checkEvaluation(
-        Sha2(Literal.create(Array[Byte](1, 2, 3, 4, 5, 6), BinaryType),
-             Literal(384)),
-        DigestUtils.sha384Hex(Array[Byte](1, 2, 3, 4, 5, 6)))
+      Sha2(
+        Literal.create(Array[Byte](1, 2, 3, 4, 5, 6), BinaryType),
+        Literal(384)),
+      DigestUtils.sha384Hex(Array[Byte](1, 2, 3, 4, 5, 6)))
     // unsupported bit length
-    checkEvaluation(
-        Sha2(Literal.create(null, BinaryType), Literal(1024)), null)
+    checkEvaluation(Sha2(Literal.create(null, BinaryType), Literal(1024)), null)
     checkEvaluation(Sha2(Literal.create(null, BinaryType), Literal(512)), null)
-    checkEvaluation(Sha2(Literal("ABC".getBytes(StandardCharsets.UTF_8)),
-                         Literal.create(null, IntegerType)),
-                    null)
-    checkEvaluation(Sha2(Literal.create(null, BinaryType),
-                         Literal.create(null, IntegerType)),
-                    null)
+    checkEvaluation(
+      Sha2(
+        Literal("ABC".getBytes(StandardCharsets.UTF_8)),
+        Literal.create(null, IntegerType)),
+      null)
+    checkEvaluation(
+      Sha2(Literal.create(null, BinaryType), Literal.create(null, IntegerType)),
+      null)
   }
 
   test("crc32") {
     checkEvaluation(
-        Crc32(Literal("ABC".getBytes(StandardCharsets.UTF_8))), 2743272264L)
+      Crc32(Literal("ABC".getBytes(StandardCharsets.UTF_8))),
+      2743272264L)
     checkEvaluation(
-        Crc32(Literal.create(Array[Byte](1, 2, 3, 4, 5, 6), BinaryType)),
-        2180413220L)
+      Crc32(Literal.create(Array[Byte](1, 2, 3, 4, 5, 6), BinaryType)),
+      2180413220L)
     checkEvaluation(Crc32(Literal.create(null, BinaryType)), null)
     checkConsistencyBetweenInterpretedAndCodegen(Crc32, BinaryType)
   }
@@ -89,55 +95,57 @@ class MiscFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
   private val arrayOfUDT = ArrayType(new ExamplePointUDT, false)
 
   testMurmur3Hash(
-      new StructType()
-        .add("null", NullType)
-        .add("boolean", BooleanType)
-        .add("byte", ByteType)
-        .add("short", ShortType)
-        .add("int", IntegerType)
-        .add("long", LongType)
-        .add("float", FloatType)
-        .add("double", DoubleType)
-        .add("bigDecimal", DecimalType.SYSTEM_DEFAULT)
-        .add("smallDecimal", DecimalType.USER_DEFAULT)
-        .add("string", StringType)
-        .add("binary", BinaryType)
-        .add("date", DateType)
-        .add("timestamp", TimestampType)
-        .add("udt", new ExamplePointUDT))
+    new StructType()
+      .add("null", NullType)
+      .add("boolean", BooleanType)
+      .add("byte", ByteType)
+      .add("short", ShortType)
+      .add("int", IntegerType)
+      .add("long", LongType)
+      .add("float", FloatType)
+      .add("double", DoubleType)
+      .add("bigDecimal", DecimalType.SYSTEM_DEFAULT)
+      .add("smallDecimal", DecimalType.USER_DEFAULT)
+      .add("string", StringType)
+      .add("binary", BinaryType)
+      .add("date", DateType)
+      .add("timestamp", TimestampType)
+      .add("udt", new ExamplePointUDT))
 
   testMurmur3Hash(
-      new StructType()
-        .add("arrayOfNull", arrayOfNull)
-        .add("arrayOfString", arrayOfString)
-        .add("arrayOfArrayOfString", ArrayType(arrayOfString))
-        .add("arrayOfArrayOfInt", ArrayType(ArrayType(IntegerType)))
-        .add("arrayOfMap", ArrayType(mapOfString))
-        .add("arrayOfStruct", ArrayType(structOfString))
-        .add("arrayOfUDT", arrayOfUDT))
+    new StructType()
+      .add("arrayOfNull", arrayOfNull)
+      .add("arrayOfString", arrayOfString)
+      .add("arrayOfArrayOfString", ArrayType(arrayOfString))
+      .add("arrayOfArrayOfInt", ArrayType(ArrayType(IntegerType)))
+      .add("arrayOfMap", ArrayType(mapOfString))
+      .add("arrayOfStruct", ArrayType(structOfString))
+      .add("arrayOfUDT", arrayOfUDT))
 
   testMurmur3Hash(
-      new StructType()
-        .add("mapOfIntAndString", MapType(IntegerType, StringType))
-        .add("mapOfStringAndArray", MapType(StringType, arrayOfString))
-        .add("mapOfArrayAndInt", MapType(arrayOfString, IntegerType))
-        .add("mapOfArray", MapType(arrayOfString, arrayOfString))
-        .add("mapOfStringAndStruct", MapType(StringType, structOfString))
-        .add("mapOfStructAndString", MapType(structOfString, StringType))
-        .add("mapOfStruct", MapType(structOfString, structOfString)))
+    new StructType()
+      .add("mapOfIntAndString", MapType(IntegerType, StringType))
+      .add("mapOfStringAndArray", MapType(StringType, arrayOfString))
+      .add("mapOfArrayAndInt", MapType(arrayOfString, IntegerType))
+      .add("mapOfArray", MapType(arrayOfString, arrayOfString))
+      .add("mapOfStringAndStruct", MapType(StringType, structOfString))
+      .add("mapOfStructAndString", MapType(structOfString, StringType))
+      .add("mapOfStruct", MapType(structOfString, structOfString)))
 
   testMurmur3Hash(
-      new StructType()
-        .add("structOfString", structOfString)
-        .add("structOfStructOfString",
-             new StructType().add("struct", structOfString))
-        .add("structOfArray", new StructType().add("array", arrayOfString))
-        .add("structOfMap", new StructType().add("map", mapOfString))
-        .add("structOfArrayAndMap",
-             new StructType()
-               .add("array", arrayOfString)
-               .add("map", mapOfString))
-        .add("structOfUDT", structOfUDT))
+    new StructType()
+      .add("structOfString", structOfString)
+      .add(
+        "structOfStructOfString",
+        new StructType().add("struct", structOfString))
+      .add("structOfArray", new StructType().add("array", arrayOfString))
+      .add("structOfMap", new StructType().add("map", mapOfString))
+      .add(
+        "structOfArrayAndMap",
+        new StructType()
+          .add("array", arrayOfString)
+          .add("map", mapOfString))
+      .add("structOfUDT", structOfUDT))
 
   private def testMurmur3Hash(inputSchema: StructType): Unit = {
     val inputGenerator =
@@ -155,7 +163,8 @@ class MiscFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
           }
         // Only test the interpreted version has same result with codegen version.
         checkEvaluation(
-            Murmur3Hash(literals, seed), Murmur3Hash(literals, seed).eval())
+          Murmur3Hash(literals, seed),
+          Murmur3Hash(literals, seed).eval())
       }
     }
   }

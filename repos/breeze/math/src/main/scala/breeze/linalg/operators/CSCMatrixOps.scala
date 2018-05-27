@@ -31,7 +31,12 @@ trait CSCMatrixOps extends CSCMatrixOps_Ring {
       def apply(v: SparseVector[T], v2: CSCMatrix[T]): CSCMatrix[T] = {
         require(v2.rows == 1)
         val csc = new CSCMatrix[T](
-            v.data, v.length, 1, Array(0, v.activeSize), v.activeSize, v.index)
+          v.data,
+          v.length,
+          1,
+          Array(0, v.activeSize),
+          v.activeSize,
+          v.index)
         op(csc, v2)
       }
     }
@@ -40,11 +45,16 @@ trait CSCMatrixOps extends CSCMatrixOps_Ring {
       implicit op: OpMulMatrix.Impl2[CSCMatrix[T], CSCMatrix[T], CSCMatrix[T]],
       zero: Zero[T],
       ct: ClassTag[T]): OpMulMatrix.Impl2[
-      Transpose[SparseVector[T]], CSCMatrix[T], Transpose[SparseVector[T]]] =
+    Transpose[SparseVector[T]],
+    CSCMatrix[T],
+    Transpose[SparseVector[T]]] =
     new OpMulMatrix.Impl2[
-        Transpose[SparseVector[T]], CSCMatrix[T], Transpose[SparseVector[T]]] {
-      def apply(v: Transpose[SparseVector[T]],
-                v2: CSCMatrix[T]): Transpose[SparseVector[T]] = {
+      Transpose[SparseVector[T]],
+      CSCMatrix[T],
+      Transpose[SparseVector[T]]] {
+      def apply(
+          v: Transpose[SparseVector[T]],
+          v2: CSCMatrix[T]): Transpose[SparseVector[T]] = {
         require(v2.rows == v.inner.length)
         val csc = v.inner.asCscRow
         val cscr = op(csc, v2)
@@ -59,14 +69,14 @@ trait CSCMatrixOps extends CSCMatrixOps_Ring {
           c += 1
         }
         new Transpose[SparseVector[T]](
-            new SparseVector[T](ind, cscr.data, cscr.activeSize, cscr.cols))
+          new SparseVector[T](ind, cscr.data, cscr.activeSize, cscr.cols))
       }
     }
 
   @expand
   @expand.valify
-  implicit def csc_OpNeg[@expand.args(Int, Double, Float, Long) T]: OpNeg.Impl[
-      CSCMatrix[T], CSCMatrix[T]] = {
+  implicit def csc_OpNeg[@expand.args(Int, Double, Float, Long) T]
+    : OpNeg.Impl[CSCMatrix[T], CSCMatrix[T]] = {
     new OpNeg.Impl[CSCMatrix[T], CSCMatrix[T]] {
       def apply(a: CSCMatrix[T]): CSCMatrix[T] = {
         val acp = a.copy
@@ -88,9 +98,8 @@ trait CSCMatrixOps extends CSCMatrixOps_Ring {
 
   @expand
   @expand.valify
-  implicit def cscScaleAdd[
-      @expand.args(Int, Double, Float, Long) T]: scaleAdd.InPlaceImpl3[
-      CSCMatrix[T], T, CSCMatrix[T]] = {
+  implicit def cscScaleAdd[@expand.args(Int, Double, Float, Long) T]
+    : scaleAdd.InPlaceImpl3[CSCMatrix[T], T, CSCMatrix[T]] = {
     new scaleAdd.InPlaceImpl3[CSCMatrix[T], T, CSCMatrix[T]] {
       override def apply(a: CSCMatrix[T], s: T, b: CSCMatrix[T]): Unit = {
         require(a.rows == b.rows, "Matrices must have same number of rows!")
@@ -140,10 +149,13 @@ trait CSCMatrixOps extends CSCMatrixOps_Ring {
 
   @expand
   @expand.valify
-  implicit def csc_csc_BadOps[@expand.args(Int, Double, Float, Long) T,
-                              @expand.args(OpPow, OpDiv, OpMod) Op <: OpType](
+  implicit def csc_csc_BadOps[
+      @expand.args(Int, Double, Float, Long) T,
+      @expand.args(OpPow, OpDiv, OpMod) Op <: OpType](
       implicit @expand.sequence[Op]({ _ pow _ }, { _ / _ }, { _ % _ }) op: Op.Impl2[
-          T, T, T],
+        T,
+        T,
+        T],
       @expand.sequence[T](0, 0.0, 0.0f, 0l) zero: T)
     : Op.Impl2[CSCMatrix[T], CSCMatrix[T], CSCMatrix[T]] = {
     val mZero = implicitly[T](zero)
@@ -227,7 +239,9 @@ trait CSCMatrixOps extends CSCMatrixOps_Ring {
         else if (b.activeSize == 0) a.copy
         else {
           val bldr = new CSCMatrix.Builder[T](
-              rows, cols, math.max(a.activeSize, b.activeSize))
+            rows,
+            cols,
+            math.max(a.activeSize, b.activeSize))
           var ci = 0 // column index [0 ... cols)
           var apStop = a.colPtrs(0) // pointer into row indices and data
           var bpStop = b.colPtrs(0) // pointer into row indices and data
@@ -271,9 +285,8 @@ trait CSCMatrixOps extends CSCMatrixOps_Ring {
 
   @expand
   @expand.valify
-  implicit def dm_csc_InPlace_OpSet[
-      @expand.args(Int, Double, Float, Long) T]: OpSet.InPlaceImpl2[
-      DenseMatrix[T], CSCMatrix[T]] = {
+  implicit def dm_csc_InPlace_OpSet[@expand.args(Int, Double, Float, Long) T]
+    : OpSet.InPlaceImpl2[DenseMatrix[T], CSCMatrix[T]] = {
     new OpSet.InPlaceImpl2[DenseMatrix[T], CSCMatrix[T]] {
       def apply(b: DenseMatrix[T], a: CSCMatrix[T]): Unit = {
         require(a.rows == b.rows, "Matrix dimensions must match")
@@ -304,9 +317,8 @@ trait CSCMatrixOps extends CSCMatrixOps_Ring {
 
   @expand
   @expand.valify
-  implicit def dm_csc_InPlace_OpAdd[
-      @expand.args(Int, Double, Float, Long) T]: OpAdd.InPlaceImpl2[
-      DenseMatrix[T], CSCMatrix[T]] = {
+  implicit def dm_csc_InPlace_OpAdd[@expand.args(Int, Double, Float, Long) T]
+    : OpAdd.InPlaceImpl2[DenseMatrix[T], CSCMatrix[T]] = {
     new OpAdd.InPlaceImpl2[DenseMatrix[T], CSCMatrix[T]] {
       def apply(b: DenseMatrix[T], a: CSCMatrix[T]): Unit = {
         require(a.rows == b.rows, "Matrix dimensions must match")
@@ -335,9 +347,8 @@ trait CSCMatrixOps extends CSCMatrixOps_Ring {
 
   @expand
   @expand.valify
-  implicit def dm_csc_InPlace_OpSub[
-      @expand.args(Int, Double, Float, Long) T]: OpSub.InPlaceImpl2[
-      DenseMatrix[T], CSCMatrix[T]] = {
+  implicit def dm_csc_InPlace_OpSub[@expand.args(Int, Double, Float, Long) T]
+    : OpSub.InPlaceImpl2[DenseMatrix[T], CSCMatrix[T]] = {
     new OpSub.InPlaceImpl2[DenseMatrix[T], CSCMatrix[T]] {
       def apply(b: DenseMatrix[T], a: CSCMatrix[T]): Unit = {
         require(a.rows == b.rows, "Matrix dimensions must match")
@@ -366,9 +377,8 @@ trait CSCMatrixOps extends CSCMatrixOps_Ring {
 
   @expand
   @expand.valify
-  implicit def csc_dm_OpAdd[
-      @expand.args(Int, Double, Float, Long) T]: OpAdd.Impl2[
-      CSCMatrix[T], DenseMatrix[T], DenseMatrix[T]] = {
+  implicit def csc_dm_OpAdd[@expand.args(Int, Double, Float, Long) T]
+    : OpAdd.Impl2[CSCMatrix[T], DenseMatrix[T], DenseMatrix[T]] = {
     new OpAdd.Impl2[CSCMatrix[T], DenseMatrix[T], DenseMatrix[T]] {
       def apply(a: CSCMatrix[T], b: DenseMatrix[T]): DenseMatrix[T] = {
         require(a.rows == b.rows, "Matrix dimensions must match")
@@ -380,9 +390,8 @@ trait CSCMatrixOps extends CSCMatrixOps_Ring {
 
   @expand
   @expand.valify
-  implicit def dm_csc_OpAdd[
-      @expand.args(Int, Double, Float, Long) T]: OpAdd.Impl2[
-      DenseMatrix[T], CSCMatrix[T], DenseMatrix[T]] = {
+  implicit def dm_csc_OpAdd[@expand.args(Int, Double, Float, Long) T]
+    : OpAdd.Impl2[DenseMatrix[T], CSCMatrix[T], DenseMatrix[T]] = {
     new OpAdd.Impl2[DenseMatrix[T], CSCMatrix[T], DenseMatrix[T]] {
       def apply(a: DenseMatrix[T], b: CSCMatrix[T]): DenseMatrix[T] = {
         b + a
@@ -392,9 +401,8 @@ trait CSCMatrixOps extends CSCMatrixOps_Ring {
 
   @expand
   @expand.valify
-  implicit def dm_csc_OpSub[
-      @expand.args(Int, Double, Float, Long) T]: OpSub.Impl2[
-      DenseMatrix[T], CSCMatrix[T], DenseMatrix[T]] = {
+  implicit def dm_csc_OpSub[@expand.args(Int, Double, Float, Long) T]
+    : OpSub.Impl2[DenseMatrix[T], CSCMatrix[T], DenseMatrix[T]] = {
     new OpSub.Impl2[DenseMatrix[T], CSCMatrix[T], DenseMatrix[T]] {
       def apply(b: DenseMatrix[T], a: CSCMatrix[T]): DenseMatrix[T] = {
         b.copy -= a
@@ -404,9 +412,8 @@ trait CSCMatrixOps extends CSCMatrixOps_Ring {
 
   @expand
   @expand.valify
-  implicit def csc_dm_OpSub[
-      @expand.args(Int, Double, Float, Long) T]: OpSub.Impl2[
-      CSCMatrix[T], DenseMatrix[T], DenseMatrix[T]] = {
+  implicit def csc_dm_OpSub[@expand.args(Int, Double, Float, Long) T]
+    : OpSub.Impl2[CSCMatrix[T], DenseMatrix[T], DenseMatrix[T]] = {
     new OpSub.Impl2[CSCMatrix[T], DenseMatrix[T], DenseMatrix[T]] {
       def apply(a: CSCMatrix[T], b: DenseMatrix[T]): DenseMatrix[T] = {
         (-b) += a
@@ -414,8 +421,8 @@ trait CSCMatrixOps extends CSCMatrixOps_Ring {
     }
   }
 
-  implicit def dm_csc_OpAdd_Semi[T : Semiring : ClassTag]: OpAdd.Impl2[
-      DenseMatrix[T], CSCMatrix[T], DenseMatrix[T]] = {
+  implicit def dm_csc_OpAdd_Semi[T: Semiring: ClassTag]
+    : OpAdd.Impl2[DenseMatrix[T], CSCMatrix[T], DenseMatrix[T]] = {
     new OpAdd.Impl2[DenseMatrix[T], CSCMatrix[T], DenseMatrix[T]] {
       def apply(a: DenseMatrix[T], b: CSCMatrix[T]): DenseMatrix[T] = {
         b + a
@@ -423,8 +430,8 @@ trait CSCMatrixOps extends CSCMatrixOps_Ring {
     }
   }
 
-  implicit def csc_dm_Semi[T : Semiring : ClassTag]: OpAdd.Impl2[
-      CSCMatrix[T], DenseMatrix[T], DenseMatrix[T]] = {
+  implicit def csc_dm_Semi[T: Semiring: ClassTag]
+    : OpAdd.Impl2[CSCMatrix[T], DenseMatrix[T], DenseMatrix[T]] = {
     new OpAdd.Impl2[CSCMatrix[T], DenseMatrix[T], DenseMatrix[T]] {
       val semi = implicitly[Semiring[T]]
       def apply(a: CSCMatrix[T], b: DenseMatrix[T]): DenseMatrix[T] = {
@@ -475,7 +482,9 @@ trait CSCMatrixOps extends CSCMatrixOps_Ring {
           CSCMatrix.zeros[T](rows, cols)
         else {
           val res = new CSCMatrix.Builder[T](
-              rows, cols, math.min(a.activeSize, b.activeSize))
+            rows,
+            cols,
+            math.min(a.activeSize, b.activeSize))
           var ci = 0 // column index [0 ... cols)
           var apStop = a.colPtrs(0) // pointer into row indices and data
           var bpStop = b.colPtrs(0) // pointer into row indices and data
@@ -527,7 +536,9 @@ trait CSCMatrixOps extends CSCMatrixOps_Ring {
         else if (b.activeSize == 0) a.copy
         else {
           val bldr = new CSCMatrix.Builder[T](
-              rows, cols, math.max(a.activeSize, b.activeSize))
+            rows,
+            cols,
+            math.max(a.activeSize, b.activeSize))
           var ci = 0 // column index [0 ... cols)
           var apStop = a.colPtrs(0) // pointer into row indices and data
           var bpStop = b.colPtrs(0) // pointer into row indices and data
@@ -570,7 +581,8 @@ trait CSCMatrixOps extends CSCMatrixOps_Ring {
   @expand
   @expand.valify
   implicit def implOps_CSCT_T_eq_CSCT[
-      @expand.args(Int, Double, Float, Long) T, @expand.args(OpMulScalar, OpMulMatrix) Op <: OpType](
+      @expand.args(Int, Double, Float, Long) T,
+      @expand.args(OpMulScalar, OpMulMatrix) Op <: OpType](
       implicit @expand.sequence[T](0, 0.0, 0.0f, 0l) zero: T)
     : Op.Impl2[CSCMatrix[T], T, CSCMatrix[T]] = {
     new Op.Impl2[CSCMatrix[T], T, CSCMatrix[T]] {
@@ -578,12 +590,13 @@ trait CSCMatrixOps extends CSCMatrixOps_Ring {
         if (b == zero) return CSCMatrix.zeros[T](a.rows, a.cols)
         val data: Array[T] =
           Array.tabulate[T](a.data.length)(i => a.data(i) * b)
-        new CSCMatrix[T](data,
-                         a.rows,
-                         a.cols,
-                         util.Arrays.copyOf(a.colPtrs, a.colPtrs.length),
-                         a.activeSize,
-                         util.Arrays.copyOf(a.rowIndices, a.rowIndices.length))
+        new CSCMatrix[T](
+          data,
+          a.rows,
+          a.cols,
+          util.Arrays.copyOf(a.colPtrs, a.colPtrs.length),
+          a.activeSize,
+          util.Arrays.copyOf(a.rowIndices, a.rowIndices.length))
       }
 
       implicitly[BinaryRegistry[Matrix[T], T, Op.type, Matrix[T]]]
@@ -593,9 +606,8 @@ trait CSCMatrixOps extends CSCMatrixOps_Ring {
 
   @expand
   @expand.valify
-  implicit def canMulM_V[
-      @expand.args(Int, Float, Double, Long) T]: BinaryRegistry[
-      CSCMatrix[T], Vector[T], OpMulMatrix.type, Vector[T]] =
+  implicit def canMulM_V[@expand.args(Int, Float, Double, Long) T]
+    : BinaryRegistry[CSCMatrix[T], Vector[T], OpMulMatrix.type, Vector[T]] =
     new BinaryRegistry[CSCMatrix[T], Vector[T], OpMulMatrix.type, Vector[T]] {
       override def bindingMissing(a: CSCMatrix[T], b: Vector[T]) = {
         require(a.cols == b.length, "Dimension Mismatch!")
@@ -616,17 +628,23 @@ trait CSCMatrixOps extends CSCMatrixOps_Ring {
         res
       }
       implicitly[
-          BinaryRegistry[Matrix[T], Vector[T], OpMulMatrix.type, Vector[T]]]
+        BinaryRegistry[Matrix[T], Vector[T], OpMulMatrix.type, Vector[T]]]
         .register(this)
     }
 
   @expand
   @expand.valify
-  implicit def canMulM_DV[
-      @expand.args(Int, Float, Double, Long) T]: BinaryRegistry[
-      CSCMatrix[T], DenseVector[T], OpMulMatrix.type, DenseVector[T]] =
+  implicit def canMulM_DV[@expand.args(Int, Float, Double, Long) T]
+    : BinaryRegistry[
+      CSCMatrix[T],
+      DenseVector[T],
+      OpMulMatrix.type,
+      DenseVector[T]] =
     new BinaryRegistry[
-        CSCMatrix[T], DenseVector[T], OpMulMatrix.type, DenseVector[T]] {
+      CSCMatrix[T],
+      DenseVector[T],
+      OpMulMatrix.type,
+      DenseVector[T]] {
       override def bindingMissing(a: CSCMatrix[T], b: DenseVector[T]) = {
         require(a.cols == b.length, "Dimension Mismatch!")
 
@@ -646,17 +664,23 @@ trait CSCMatrixOps extends CSCMatrixOps_Ring {
         res
       }
       implicitly[
-          BinaryRegistry[Matrix[T], Vector[T], OpMulMatrix.type, Vector[T]]]
+        BinaryRegistry[Matrix[T], Vector[T], OpMulMatrix.type, Vector[T]]]
         .register(this)
     }
 
   @expand
   @expand.valify
-  implicit def canMulM_SV[
-      @expand.args(Int, Float, Double, Long) T]: BinaryRegistry[
-      CSCMatrix[T], SparseVector[T], OpMulMatrix.type, SparseVector[T]] =
+  implicit def canMulM_SV[@expand.args(Int, Float, Double, Long) T]
+    : BinaryRegistry[
+      CSCMatrix[T],
+      SparseVector[T],
+      OpMulMatrix.type,
+      SparseVector[T]] =
     new BinaryRegistry[
-        CSCMatrix[T], SparseVector[T], OpMulMatrix.type, SparseVector[T]] {
+      CSCMatrix[T],
+      SparseVector[T],
+      OpMulMatrix.type,
+      SparseVector[T]] {
       override def bindingMissing(a: CSCMatrix[T], b: SparseVector[T]) = {
         require(a.cols == b.length, "Dimension Mismatch!")
         val res = new VectorBuilder[T](a.rows, b.iterableSize min a.rows)
@@ -667,7 +691,10 @@ trait CSCMatrixOps extends CSCMatrixOps_Ring {
           val rrlast = a.colPtrs(c + 1)
           if (rr < rrlast) {
             val newBOffset = util.Arrays.binarySearch(
-                b.index, lastOffset, math.min(b.activeSize, c + 1), c)
+              b.index,
+              lastOffset,
+              math.min(b.activeSize, c + 1),
+              c)
             if (newBOffset < 0) {
               lastOffset = ~newBOffset
             } else {
@@ -685,17 +712,21 @@ trait CSCMatrixOps extends CSCMatrixOps_Ring {
         res.toSparseVector
       }
       implicitly[
-          BinaryRegistry[Matrix[T], Vector[T], OpMulMatrix.type, Vector[T]]]
+        BinaryRegistry[Matrix[T], Vector[T], OpMulMatrix.type, Vector[T]]]
         .register(this)
     }
 
   @expand
   @expand.valify
-  implicit def canMulM_DM[
-      @expand.args(Int, Float, Double, Long) T]: breeze.linalg.operators.OpMulMatrix.Impl2[
-      CSCMatrix[T], DenseMatrix[T], DenseMatrix[T]] =
+  implicit def canMulM_DM[@expand.args(Int, Float, Double, Long) T]
+    : breeze.linalg.operators.OpMulMatrix.Impl2[
+      CSCMatrix[T],
+      DenseMatrix[T],
+      DenseMatrix[T]] =
     new breeze.linalg.operators.OpMulMatrix.Impl2[
-        CSCMatrix[T], DenseMatrix[T], DenseMatrix[T]] {
+      CSCMatrix[T],
+      DenseMatrix[T],
+      DenseMatrix[T]] {
       def apply(a: CSCMatrix[T], b: DenseMatrix[T]) = {
 
         if (a.cols != b.rows) throw new RuntimeException("Dimension Mismatch!")
@@ -719,17 +750,21 @@ trait CSCMatrixOps extends CSCMatrixOps_Ring {
         res
       }
       implicitly[
-          BinaryRegistry[Matrix[T], Matrix[T], OpMulMatrix.type, Matrix[T]]]
+        BinaryRegistry[Matrix[T], Matrix[T], OpMulMatrix.type, Matrix[T]]]
         .register(this)
     }
 
   @expand
   @expand.valify
-  implicit def canMulDM_M[
-      @expand.args(Int, Float, Double, Long) T]: breeze.linalg.operators.OpMulMatrix.Impl2[
-      DenseMatrix[T], CSCMatrix[T], DenseMatrix[T]] =
+  implicit def canMulDM_M[@expand.args(Int, Float, Double, Long) T]
+    : breeze.linalg.operators.OpMulMatrix.Impl2[
+      DenseMatrix[T],
+      CSCMatrix[T],
+      DenseMatrix[T]] =
     new breeze.linalg.operators.OpMulMatrix.Impl2[
-        DenseMatrix[T], CSCMatrix[T], DenseMatrix[T]] {
+      DenseMatrix[T],
+      CSCMatrix[T],
+      DenseMatrix[T]] {
       def apply(a: DenseMatrix[T], b: CSCMatrix[T]) = {
         if (a.cols != b.rows) throw new RuntimeException("Dimension Mismatch!")
 
@@ -753,20 +788,24 @@ trait CSCMatrixOps extends CSCMatrixOps_Ring {
         res
       }
       implicitly[
-          BinaryRegistry[Matrix[T], Matrix[T], OpMulMatrix.type, Matrix[T]]]
+        BinaryRegistry[Matrix[T], Matrix[T], OpMulMatrix.type, Matrix[T]]]
         .register(this)
-      implicitly[BinaryRegistry[
-              DenseMatrix[T], Matrix[T], OpMulMatrix.type, Matrix[T]]]
+      implicitly[
+        BinaryRegistry[DenseMatrix[T], Matrix[T], OpMulMatrix.type, Matrix[T]]]
         .register(this)
     }
 
   @expand
   @expand.valify
-  implicit def canMulM_M[
-      @expand.args(Int, Float, Double, Long) T]: breeze.linalg.operators.OpMulMatrix.Impl2[
-      CSCMatrix[T], CSCMatrix[T], CSCMatrix[T]] =
+  implicit def canMulM_M[@expand.args(Int, Float, Double, Long) T]
+    : breeze.linalg.operators.OpMulMatrix.Impl2[
+      CSCMatrix[T],
+      CSCMatrix[T],
+      CSCMatrix[T]] =
     new breeze.linalg.operators.OpMulMatrix.Impl2[
-        CSCMatrix[T], CSCMatrix[T], CSCMatrix[T]] {
+      CSCMatrix[T],
+      CSCMatrix[T],
+      CSCMatrix[T]] {
       def apply(a: CSCMatrix[T], b: CSCMatrix[T]) = {
 
         require(a.cols == b.rows, "Dimension Mismatch")
@@ -801,7 +840,7 @@ trait CSCMatrixOps extends CSCMatrixOps_Ring {
         res.result()
       }
       implicitly[
-          BinaryRegistry[Matrix[T], Matrix[T], OpMulMatrix.type, Matrix[T]]]
+        BinaryRegistry[Matrix[T], Matrix[T], OpMulMatrix.type, Matrix[T]]]
         .register(this)
     }
 
@@ -812,49 +851,37 @@ trait CSCMatrixOps extends CSCMatrixOps_Ring {
     new UFunc.InPlaceImpl2[Op, CSCMatrix[T], Other] {
       def apply(a: CSCMatrix[T], b: Other) {
         val result = op(a, b)
-        a.use(
-            result.data, result.colPtrs, result.rowIndices, result.activeSize)
+        a.use(result.data, result.colPtrs, result.rowIndices, result.activeSize)
       }
     }
   }
 
   @expand
   @expand.valify
-  implicit def csc_T_InPlace[@expand.args(Int, Float, Double, Long) T,
-                             @expand.args(
-                                 OpAdd,
-                                 OpSub,
-                                 OpDiv,
-                                 OpPow,
-                                 OpMod,
-                                 OpMulScalar,
-                                 OpMulMatrix) Op <: OpType]: Op.InPlaceImpl2[
-      CSCMatrix[T], T] =
+  implicit def csc_T_InPlace[
+      @expand.args(Int, Float, Double, Long) T,
+      @expand.args(OpAdd, OpSub, OpDiv, OpPow, OpMod, OpMulScalar, OpMulMatrix) Op <: OpType]
+    : Op.InPlaceImpl2[CSCMatrix[T], T] =
     updateFromPure(implicitly[Op.Impl2[CSCMatrix[T], T, CSCMatrix[T]]])
 
   @expand
   @expand.valify
-  implicit def csc_csc_InPlace[@expand.args(Int, Float, Double, Long) T,
-                               @expand.args(
-                                   OpAdd,
-                                   OpSub,
-                                   OpDiv,
-                                   OpPow,
-                                   OpMod,
-                                   OpMulScalar) Op <: OpType]: Op.InPlaceImpl2[
-      CSCMatrix[T], CSCMatrix[T]] =
+  implicit def csc_csc_InPlace[
+      @expand.args(Int, Float, Double, Long) T,
+      @expand.args(OpAdd, OpSub, OpDiv, OpPow, OpMod, OpMulScalar) Op <: OpType]
+    : Op.InPlaceImpl2[CSCMatrix[T], CSCMatrix[T]] =
     updateFromPure(
-        implicitly[Op.Impl2[CSCMatrix[T], CSCMatrix[T], CSCMatrix[T]]])
+      implicitly[Op.Impl2[CSCMatrix[T], CSCMatrix[T], CSCMatrix[T]]])
 
   @expand
   @expand.valify
-  implicit def axpyCSC_DM_DM[
-      @expand.args(Int, Float, Double, Long) T]: scaleAdd.InPlaceImpl3[
-      DenseMatrix[T], CSCMatrix[T], DenseMatrix[T]] = {
+  implicit def axpyCSC_DM_DM[@expand.args(Int, Float, Double, Long) T]
+    : scaleAdd.InPlaceImpl3[DenseMatrix[T], CSCMatrix[T], DenseMatrix[T]] = {
     new scaleAdd.InPlaceImpl3[DenseMatrix[T], CSCMatrix[T], DenseMatrix[T]] {
-      override def apply(sink: DenseMatrix[T],
-                         a: CSCMatrix[T],
-                         x: DenseMatrix[T]): Unit = {
+      override def apply(
+          sink: DenseMatrix[T],
+          a: CSCMatrix[T],
+          x: DenseMatrix[T]): Unit = {
         require(a.rows == sink.rows)
         require(x.cols == sink.cols)
         require(a.cols == x.rows)
@@ -881,8 +908,8 @@ trait CSCMatrixOps extends CSCMatrixOps_Ring {
 trait CSCMatrixOps_Ring extends CSCMatrixOpsLowPrio with SerializableLogging {
   this: CSCMatrixOps =>
 
-  implicit def csc_OpNeg[
-      T : Ring : ClassTag]: OpNeg.Impl[CSCMatrix[T], CSCMatrix[T]] = {
+  implicit def csc_OpNeg[T: Ring: ClassTag]
+    : OpNeg.Impl[CSCMatrix[T], CSCMatrix[T]] = {
     new OpNeg.Impl[CSCMatrix[T], CSCMatrix[T]] {
       val ring = implicitly[Ring[T]]
       def apply(a: CSCMatrix[T]): CSCMatrix[T] = {
@@ -903,8 +930,8 @@ trait CSCMatrixOps_Ring extends CSCMatrixOpsLowPrio with SerializableLogging {
     }
   }
 
-  implicit def cscScaleAdd[T : Semiring : ClassTag]: scaleAdd.InPlaceImpl3[
-      CSCMatrix[T], T, CSCMatrix[T]] = {
+  implicit def cscScaleAdd[T: Semiring: ClassTag]
+    : scaleAdd.InPlaceImpl3[CSCMatrix[T], T, CSCMatrix[T]] = {
     new scaleAdd.InPlaceImpl3[CSCMatrix[T], T, CSCMatrix[T]] {
       override def apply(a: CSCMatrix[T], s: T, b: CSCMatrix[T]): Unit = {
         val ring = implicitly[Semiring[T]]
@@ -953,9 +980,8 @@ trait CSCMatrixOps_Ring extends CSCMatrixOpsLowPrio with SerializableLogging {
     }
   }
 
-  implicit def canMulM_V_Semiring[
-      T : Semiring : Zero : ClassTag]: BinaryRegistry[
-      CSCMatrix[T], Vector[T], OpMulMatrix.type, Vector[T]] =
+  implicit def canMulM_V_Semiring[T: Semiring: Zero: ClassTag]
+    : BinaryRegistry[CSCMatrix[T], Vector[T], OpMulMatrix.type, Vector[T]] =
     new BinaryRegistry[CSCMatrix[T], Vector[T], OpMulMatrix.type, Vector[T]] {
       implicit val ring = implicitly[Semiring[T]]
 
@@ -978,11 +1004,16 @@ trait CSCMatrixOps_Ring extends CSCMatrixOpsLowPrio with SerializableLogging {
       }
     }
 
-  implicit def canMulM_SV_Semiring[
-      T : Semiring : Zero : ClassTag]: BinaryRegistry[
-      CSCMatrix[T], SparseVector[T], OpMulMatrix.type, SparseVector[T]] =
+  implicit def canMulM_SV_Semiring[T: Semiring: Zero: ClassTag]: BinaryRegistry[
+    CSCMatrix[T],
+    SparseVector[T],
+    OpMulMatrix.type,
+    SparseVector[T]] =
     new BinaryRegistry[
-        CSCMatrix[T], SparseVector[T], OpMulMatrix.type, SparseVector[T]] {
+      CSCMatrix[T],
+      SparseVector[T],
+      OpMulMatrix.type,
+      SparseVector[T]] {
       override def bindingMissing(a: CSCMatrix[T], b: SparseVector[T]) = {
         val ring = implicitly[Semiring[T]]
         require(a.cols == b.length, "Dimension Mismatch!")
@@ -994,7 +1025,10 @@ trait CSCMatrixOps_Ring extends CSCMatrixOpsLowPrio with SerializableLogging {
           val rrlast = a.colPtrs(c + 1)
           if (rr < rrlast) {
             val newBOffset = util.Arrays.binarySearch(
-                b.index, lastOffset, math.min(b.activeSize, c + 1), c)
+              b.index,
+              lastOffset,
+              math.min(b.activeSize, c + 1),
+              c)
             if (newBOffset < 0) {
               lastOffset = ~newBOffset
             } else {
@@ -1013,14 +1047,12 @@ trait CSCMatrixOps_Ring extends CSCMatrixOpsLowPrio with SerializableLogging {
       }
     }
 
-  implicit def canMulM_DM_Semiring[
-      T : Semiring : Zero : ClassTag]: OpMulMatrix.Impl2[
-      CSCMatrix[T], DenseMatrix[T], DenseMatrix[T]] =
+  implicit def canMulM_DM_Semiring[T: Semiring: Zero: ClassTag]
+    : OpMulMatrix.Impl2[CSCMatrix[T], DenseMatrix[T], DenseMatrix[T]] =
     new OpMulMatrix.Impl2[CSCMatrix[T], DenseMatrix[T], DenseMatrix[T]] {
       def apply(a: CSCMatrix[T], b: DenseMatrix[T]) = {
         val ring = implicitly[Semiring[T]]
-        require(
-            a.cols == b.rows, "CSCMatrix Multiplication Dimension Mismatch")
+        require(a.cols == b.rows, "CSCMatrix Multiplication Dimension Mismatch")
 
         val res = new DenseMatrix[T](a.rows, b.cols)
         var i = 0
@@ -1030,8 +1062,8 @@ trait CSCMatrixOps_Ring extends CSCMatrixOpsLowPrio with SerializableLogging {
             val v = b(j, i)
             var k = a.colPtrs(j)
             while (k < a.colPtrs(j + 1)) {
-              res(a.rowIndices(k), i) = ring.+(
-                  res(a.rowIndices(k), i), ring.*(v, a.data(k)))
+              res(a.rowIndices(k), i) =
+                ring.+(res(a.rowIndices(k), i), ring.*(v, a.data(k)))
               k += 1
             }
             j += 1
@@ -1043,14 +1075,12 @@ trait CSCMatrixOps_Ring extends CSCMatrixOpsLowPrio with SerializableLogging {
       }
     }
 
-  implicit def canMulDM_M_Semiring[
-      T : Semiring : Zero : ClassTag]: OpMulMatrix.Impl2[
-      DenseMatrix[T], CSCMatrix[T], DenseMatrix[T]] = {
+  implicit def canMulDM_M_Semiring[T: Semiring: Zero: ClassTag]
+    : OpMulMatrix.Impl2[DenseMatrix[T], CSCMatrix[T], DenseMatrix[T]] = {
     new OpMulMatrix.Impl2[DenseMatrix[T], CSCMatrix[T], DenseMatrix[T]] {
       def apply(a: DenseMatrix[T], b: CSCMatrix[T]) = {
         val ring = implicitly[Semiring[T]]
-        require(
-            a.cols == b.rows, "CSCMatrix Multiplication Dimension Mismatch")
+        require(a.cols == b.rows, "CSCMatrix Multiplication Dimension Mismatch")
 
         val res = new DenseMatrix[T](a.rows, b.cols)
         var i = 0
@@ -1074,14 +1104,12 @@ trait CSCMatrixOps_Ring extends CSCMatrixOpsLowPrio with SerializableLogging {
     }
   }
 
-  implicit def canMulM_M_Semiring[
-      T : Semiring : Zero : ClassTag]: OpMulMatrix.Impl2[
-      CSCMatrix[T], CSCMatrix[T], CSCMatrix[T]] =
+  implicit def canMulM_M_Semiring[T: Semiring: Zero: ClassTag]
+    : OpMulMatrix.Impl2[CSCMatrix[T], CSCMatrix[T], CSCMatrix[T]] =
     new OpMulMatrix.Impl2[CSCMatrix[T], CSCMatrix[T], CSCMatrix[T]] {
       def apply(a: CSCMatrix[T], b: CSCMatrix[T]) = {
         val ring = implicitly[Semiring[T]]
-        require(
-            a.cols == b.rows, "CSCMatrix Multiplication Dimension Mismatch")
+        require(a.cols == b.rows, "CSCMatrix Multiplication Dimension Mismatch")
 
         var numnz = 0
         var i = 0
@@ -1113,15 +1141,17 @@ trait CSCMatrixOps_Ring extends CSCMatrixOpsLowPrio with SerializableLogging {
       }
     }
 
-  implicit def zipMapVals[S, R : ClassTag : Semiring : Zero]: CanZipMapValues[
-      CSCMatrix[S], S, R, CSCMatrix[R]] =
+  implicit def zipMapVals[S, R: ClassTag: Semiring: Zero]
+    : CanZipMapValues[CSCMatrix[S], S, R, CSCMatrix[R]] =
     new CanZipMapValues[CSCMatrix[S], S, R, CSCMatrix[R]] {
 
       /** Maps all corresponding values from the two collections. */
       override def map(
-          a: CSCMatrix[S], b: CSCMatrix[S], fn: (S, S) => R): CSCMatrix[R] = {
+          a: CSCMatrix[S],
+          b: CSCMatrix[S],
+          fn: (S, S) => R): CSCMatrix[R] = {
         logger.warn(
-            "Using CSCMatrix.zipMapVals. Note that this implementation currently ZipMaps over active values only, ignoring zeros.")
+          "Using CSCMatrix.zipMapVals. Note that this implementation currently ZipMaps over active values only, ignoring zeros.")
         val rows = a.rows
         val cols = a.cols
         require(rows == b.rows, "Matrices must have same number of rows!")
@@ -1135,12 +1165,12 @@ trait CSCMatrixOps_Ring extends CSCMatrixOpsLowPrio with SerializableLogging {
             i += 1
           }
           new CSCMatrix[R](
-              newData,
-              rows,
-              cols,
-              util.Arrays.copyOf(b.colPtrs, b.colPtrs.length),
-              b.activeSize,
-              util.Arrays.copyOf(b.rowIndices, b.rowIndices.length))
+            newData,
+            rows,
+            cols,
+            util.Arrays.copyOf(b.colPtrs, b.colPtrs.length),
+            b.activeSize,
+            util.Arrays.copyOf(b.rowIndices, b.rowIndices.length))
         } else if (b.activeSize == 0) {
           val newData = Array.ofDim[R](a.data.length)
           var i = 0
@@ -1149,12 +1179,12 @@ trait CSCMatrixOps_Ring extends CSCMatrixOpsLowPrio with SerializableLogging {
             i += 1
           }
           new CSCMatrix[R](
-              newData,
-              rows,
-              cols,
-              util.Arrays.copyOf(a.colPtrs, a.colPtrs.length),
-              a.activeSize,
-              util.Arrays.copyOf(a.rowIndices, a.rowIndices.length))
+            newData,
+            rows,
+            cols,
+            util.Arrays.copyOf(a.colPtrs, a.colPtrs.length),
+            a.activeSize,
+            util.Arrays.copyOf(a.rowIndices, a.rowIndices.length))
         } else {
           val builder = new CSCMatrix.Builder[R](a.rows, a.cols, a.activeSize)
           var ci = 0
@@ -1190,15 +1220,15 @@ trait CSCMatrixOps_Ring extends CSCMatrixOpsLowPrio with SerializableLogging {
       }
     }
 
-  implicit def zipMapKeyVals[
-      S, R : ClassTag : Semiring : Zero]: CanZipMapKeyValues[
-      CSCMatrix[S], (Int, Int), S, R, CSCMatrix[R]] =
+  implicit def zipMapKeyVals[S, R: ClassTag: Semiring: Zero]
+    : CanZipMapKeyValues[CSCMatrix[S], (Int, Int), S, R, CSCMatrix[R]] =
     new CanZipMapKeyValues[CSCMatrix[S], (Int, Int), S, R, CSCMatrix[R]] {
 
       /** Maps all corresponding values from the two collections. */
-      override def map(a: CSCMatrix[S],
-                       b: CSCMatrix[S],
-                       fn: ((Int, Int), S, S) => R): CSCMatrix[R] = {
+      override def map(
+          a: CSCMatrix[S],
+          b: CSCMatrix[S],
+          fn: ((Int, Int), S, S) => R): CSCMatrix[R] = {
         val rows = a.rows
         val cols = a.cols
         require(rows == b.rows, "Matrices must have same number of rows!")
@@ -1212,9 +1242,10 @@ trait CSCMatrixOps_Ring extends CSCMatrixOpsLowPrio with SerializableLogging {
         builder.result(true, true)
       }
 
-      override def mapActive(a: CSCMatrix[S],
-                             b: CSCMatrix[S],
-                             fn: ((Int, Int), S, S) => R): CSCMatrix[R] = {
+      override def mapActive(
+          a: CSCMatrix[S],
+          b: CSCMatrix[S],
+          fn: ((Int, Int), S, S) => R): CSCMatrix[R] = {
         // TODO: sparsify this
         val rows = a.rows
         val cols = a.cols
@@ -1230,8 +1261,8 @@ trait CSCMatrixOps_Ring extends CSCMatrixOpsLowPrio with SerializableLogging {
       }
     }
 
-  implicit def canAddM_S_Semiring[
-      T : Semiring : ClassTag]: OpAdd.Impl2[CSCMatrix[T], T, CSCMatrix[T]] =
+  implicit def canAddM_S_Semiring[T: Semiring: ClassTag]
+    : OpAdd.Impl2[CSCMatrix[T], T, CSCMatrix[T]] =
     new OpAdd.Impl2[CSCMatrix[T], T, CSCMatrix[T]] {
       val s = implicitly[Semiring[T]]
       val zero = s.zero
@@ -1253,13 +1284,12 @@ trait CSCMatrixOps_Ring extends CSCMatrixOpsLowPrio with SerializableLogging {
           Array.tabulate[Int](v.cols + 1)((i: Int) => i * v.rows)
         val rowIndices: Array[Int] =
           Array.tabulate[Int](data.length)((i: Int) => i % v.rows)
-        new CSCMatrix[T](
-            data, v.rows, v.cols, colPtrs, data.length, rowIndices)
+        new CSCMatrix[T](data, v.rows, v.cols, colPtrs, data.length, rowIndices)
       }
     }
 
-  implicit def canSubM_S_Ring[
-      T : Ring : ClassTag]: OpSub.Impl2[CSCMatrix[T], T, CSCMatrix[T]] =
+  implicit def canSubM_S_Ring[T: Ring: ClassTag]
+    : OpSub.Impl2[CSCMatrix[T], T, CSCMatrix[T]] =
     new OpSub.Impl2[CSCMatrix[T], T, CSCMatrix[T]] {
       val s = implicitly[Ring[T]]
       val zero = s.zero
@@ -1281,13 +1311,12 @@ trait CSCMatrixOps_Ring extends CSCMatrixOpsLowPrio with SerializableLogging {
           Array.tabulate[Int](v.cols + 1)((i: Int) => i * v.rows)
         val rowIndices: Array[Int] =
           Array.tabulate[Int](data.length)((i: Int) => i % v.rows)
-        new CSCMatrix[T](
-            data, v.rows, v.cols, colPtrs, data.length, rowIndices)
+        new CSCMatrix[T](data, v.rows, v.cols, colPtrs, data.length, rowIndices)
       }
     }
 
-  implicit def canSetM_S_Semiring[
-      T : Semiring : ClassTag]: OpSet.Impl2[CSCMatrix[T], T, CSCMatrix[T]] =
+  implicit def canSetM_S_Semiring[T: Semiring: ClassTag]
+    : OpSet.Impl2[CSCMatrix[T], T, CSCMatrix[T]] =
     new OpSet.Impl2[CSCMatrix[T], T, CSCMatrix[T]] {
       val r = implicitly[Semiring[T]]
       val zero = r.zero
@@ -1299,33 +1328,38 @@ trait CSCMatrixOps_Ring extends CSCMatrixOpsLowPrio with SerializableLogging {
         val rowIndices: Array[Int] =
           Array.tabulate[Int](data.length)((i: Int) => i % v.rows)
         new CSCMatrix[T](
-            data, v.rows, v.cols, colPtrs, v.rows * v.cols, rowIndices)
+          data,
+          v.rows,
+          v.cols,
+          colPtrs,
+          v.rows * v.cols,
+          rowIndices)
       }
     }
 
   @expand
   implicit def canMulM_S_Ring[
       @expand.args(OpMulMatrix, OpMulScalar) Op <: OpType,
-      T : Ring : ClassTag]: Op.Impl2[CSCMatrix[T], T, CSCMatrix[T]] = {
+      T: Ring: ClassTag]: Op.Impl2[CSCMatrix[T], T, CSCMatrix[T]] = {
     val r = implicitly[Ring[T]]
     new Op.Impl2[CSCMatrix[T], T, CSCMatrix[T]] {
       def apply(v: CSCMatrix[T], v2: T): CSCMatrix[T] = {
         if (v2 == r.zero) return CSCMatrix.zeros[T](v.rows, v.cols)
         val data: Array[T] =
           Array.tabulate[T](v.data.length)(i => r.*(v.data(i), v2))
-        new CSCMatrix[T](data,
-                         v.rows,
-                         v.cols,
-                         util.Arrays.copyOf(v.colPtrs, v.colPtrs.length),
-                         v.activeSize,
-                         util.Arrays.copyOf(v.rowIndices, v.rowIndices.length))
+        new CSCMatrix[T](
+          data,
+          v.rows,
+          v.cols,
+          util.Arrays.copyOf(v.colPtrs, v.colPtrs.length),
+          v.activeSize,
+          util.Arrays.copyOf(v.rowIndices, v.rowIndices.length))
       }
     }
   }
 
-  implicit def CSCMatrixCanMulScalarM_M_Semiring[
-      A : Semiring : ClassTag : Zero]: OpMulScalar.Impl2[
-      CSCMatrix[A], CSCMatrix[A], CSCMatrix[A]] =
+  implicit def CSCMatrixCanMulScalarM_M_Semiring[A: Semiring: ClassTag: Zero]
+    : OpMulScalar.Impl2[CSCMatrix[A], CSCMatrix[A], CSCMatrix[A]] =
     new OpMulScalar.Impl2[CSCMatrix[A], CSCMatrix[A], CSCMatrix[A]] {
       val ring = implicitly[Semiring[A]]
       final def apply(a: CSCMatrix[A], b: CSCMatrix[A]): CSCMatrix[A] = {
@@ -1340,7 +1374,9 @@ trait CSCMatrixOps_Ring extends CSCMatrixOpsLowPrio with SerializableLogging {
           CSCMatrix.zeros[A](rows, cols)
         else {
           val res = new CSCMatrix.Builder[A](
-              rows, cols, math.min(a.activeSize, b.activeSize))
+            rows,
+            cols,
+            math.min(a.activeSize, b.activeSize))
           var ci = 0 // column index [0 ... cols)
           var apStop = a.colPtrs(0) // pointer into row indices and data
           var bpStop = b.colPtrs(0) // pointer into row indices and data
@@ -1375,9 +1411,8 @@ trait CSCMatrixOps_Ring extends CSCMatrixOpsLowPrio with SerializableLogging {
       }
     }
 
-  implicit def CSCMatrixCanAdd_M_M_Semiring[
-      A : Semiring : Zero : ClassTag]: OpAdd.Impl2[
-      CSCMatrix[A], CSCMatrix[A], CSCMatrix[A]] =
+  implicit def CSCMatrixCanAdd_M_M_Semiring[A: Semiring: Zero: ClassTag]
+    : OpAdd.Impl2[CSCMatrix[A], CSCMatrix[A], CSCMatrix[A]] =
     new OpAdd.Impl2[CSCMatrix[A], CSCMatrix[A], CSCMatrix[A]] {
       val ring = implicitly[Semiring[A]]
       def apply(a: CSCMatrix[A], b: CSCMatrix[A]): CSCMatrix[A] = {
@@ -1391,7 +1426,9 @@ trait CSCMatrixOps_Ring extends CSCMatrixOpsLowPrio with SerializableLogging {
         else if (b.activeSize == 0) a.copy
         else {
           val bldr = new CSCMatrix.Builder[A](
-              rows, cols, math.max(a.activeSize, b.activeSize))
+            rows,
+            cols,
+            math.max(a.activeSize, b.activeSize))
           var ci = 0 // column index [0 ... cols)
           var apStop = a.colPtrs(0) // pointer into row indices and data
           var bpStop = b.colPtrs(0) // pointer into row indices and data
@@ -1429,9 +1466,8 @@ trait CSCMatrixOps_Ring extends CSCMatrixOpsLowPrio with SerializableLogging {
       }
     }
 
-  implicit def CSCMatrixCanSubM_M_Ring[
-      A : Ring : Zero : ClassTag]: OpSub.Impl2[
-      CSCMatrix[A], CSCMatrix[A], CSCMatrix[A]] =
+  implicit def CSCMatrixCanSubM_M_Ring[A: Ring: Zero: ClassTag]
+    : OpSub.Impl2[CSCMatrix[A], CSCMatrix[A], CSCMatrix[A]] =
     new OpSub.Impl2[CSCMatrix[A], CSCMatrix[A], CSCMatrix[A]] {
       val ring = implicitly[Ring[A]]
       def apply(a: CSCMatrix[A], b: CSCMatrix[A]): CSCMatrix[A] = {
@@ -1444,7 +1480,9 @@ trait CSCMatrixOps_Ring extends CSCMatrixOpsLowPrio with SerializableLogging {
         else if (b.activeSize == 0) a.copy
         else {
           val bldr = new CSCMatrix.Builder[A](
-              rows, cols, math.max(a.activeSize, b.activeSize))
+            rows,
+            cols,
+            math.max(a.activeSize, b.activeSize))
           var ci = 0 // column index [0 ... cols)
           var apStop = a.colPtrs(0) // pointer into row indices and data
           var bpStop = b.colPtrs(0) // pointer into row indices and data
@@ -1485,8 +1523,10 @@ trait CSCMatrixOps_Ring extends CSCMatrixOpsLowPrio with SerializableLogging {
 
   @expand
   implicit def csc_T_Op[
-      @expand.args(OpDiv, OpMod, OpPow) Op <: OpType, T : Field : ClassTag](
-      implicit @expand.sequence[Op]({ f./(_, _) }, { f.%(_, _) }, {
+      @expand.args(OpDiv, OpMod, OpPow) Op <: OpType,
+      T: Field: ClassTag](implicit @expand.sequence[Op]({ f./(_, _) }, {
+    f.%(_, _)
+  }, {
     f.pow(_, _)
   }) op: Op.Impl2[T, T, T]): Op.Impl2[CSCMatrix[T], T, CSCMatrix[T]] = {
     val f = implicitly[Field[T]]
@@ -1511,7 +1551,12 @@ trait CSCMatrixOps_Ring extends CSCMatrixOpsLowPrio with SerializableLogging {
             c += 1
           }
           new CSCMatrix[T](
-              data, a.rows, a.cols, colPtrs, a.rows * a.cols, rowIndices)
+            data,
+            a.rows,
+            a.cols,
+            colPtrs,
+            a.rows * a.cols,
+            rowIndices)
         } else {
           val bldr = new CSCMatrix.Builder[T](a.rows, a.cols, a.activeSize)
           var c = 0
@@ -1532,8 +1577,10 @@ trait CSCMatrixOps_Ring extends CSCMatrixOpsLowPrio with SerializableLogging {
 
   @expand
   implicit def csc_csc_BadOp[
-      @expand.args(OpDiv, OpMod, OpPow) Op <: OpType, T : Field : ClassTag](
-      implicit @expand.sequence[Op]({ f./(_, _) }, { f.%(_, _) }, {
+      @expand.args(OpDiv, OpMod, OpPow) Op <: OpType,
+      T: Field: ClassTag](implicit @expand.sequence[Op]({ f./(_, _) }, {
+    f.%(_, _)
+  }, {
     f.pow(_, _)
   }) op: Op.Impl2[T, T, T])
     : Op.Impl2[CSCMatrix[T], CSCMatrix[T], CSCMatrix[T]] = {
@@ -1601,9 +1648,8 @@ trait CSCMatrixOps_Ring extends CSCMatrixOpsLowPrio with SerializableLogging {
     }
   }
 
-  implicit def CSCMatrixCanSetM_M_Semiring[
-      T : Semiring : ClassTag]: OpSet.Impl2[
-      CSCMatrix[T], CSCMatrix[T], CSCMatrix[T]] = {
+  implicit def CSCMatrixCanSetM_M_Semiring[T: Semiring: ClassTag]
+    : OpSet.Impl2[CSCMatrix[T], CSCMatrix[T], CSCMatrix[T]] = {
     val f = implicitly[Semiring[T]]
     new OpSet.Impl2[CSCMatrix[T], CSCMatrix[T], CSCMatrix[T]] {
       def apply(a: CSCMatrix[T], b: CSCMatrix[T]): CSCMatrix[T] = {
@@ -1622,8 +1668,7 @@ trait CSCMatrixOps_Ring extends CSCMatrixOpsLowPrio with SerializableLogging {
     new UFunc.InPlaceImpl2[Op, CSCMatrix[T], Other] {
       def apply(a: CSCMatrix[T], b: Other) {
         val result = op(a, b)
-        a.use(
-            result.data, result.colPtrs, result.rowIndices, result.activeSize)
+        a.use(result.data, result.colPtrs, result.rowIndices, result.activeSize)
       }
     }
   }
@@ -1633,24 +1678,17 @@ trait CSCMatrixOps_Ring extends CSCMatrixOpsLowPrio with SerializableLogging {
     new UFunc.InPlaceImpl2[Op, CSCMatrix[T], CSCMatrix[T]] {
       def apply(a: CSCMatrix[T], b: CSCMatrix[T]) {
         val result = op(a, b)
-        a.use(
-            result.data, result.colPtrs, result.rowIndices, result.activeSize)
+        a.use(result.data, result.colPtrs, result.rowIndices, result.activeSize)
       }
     }
   }
 
   @expand
-  implicit def csc_csc_UpdateOp[@expand.args(OpAdd,
-                                             OpSub,
-                                             OpMulScalar,
-                                             OpSet,
-                                             OpDiv,
-                                             OpPow,
-                                             OpMod) Op <: OpType,
-                                T : Field : ClassTag]: Op.InPlaceImpl2[
-      CSCMatrix[T], CSCMatrix[T]] =
+  implicit def csc_csc_UpdateOp[
+      @expand.args(OpAdd, OpSub, OpMulScalar, OpSet, OpDiv, OpPow, OpMod) Op <: OpType,
+      T: Field: ClassTag]: Op.InPlaceImpl2[CSCMatrix[T], CSCMatrix[T]] =
     updateFromPure_CSC_CSC(
-        implicitly[Op.Impl2[CSCMatrix[T], CSCMatrix[T], CSCMatrix[T]]])
+      implicitly[Op.Impl2[CSCMatrix[T], CSCMatrix[T], CSCMatrix[T]]])
 
 //  implicit def canAddInPlaceM_S_Semiring[T: Semiring : ClassTag]: OpAdd.InPlaceImpl2[CSCMatrix[T], T] =
 //    updateFromPure_CSC_T(implicitly[OpAdd.Impl2[CSCMatrix[T], T, CSCMatrix[T]]])
@@ -1664,15 +1702,16 @@ trait CSCMatrixOps_Ring extends CSCMatrixOpsLowPrio with SerializableLogging {
 
   @expand
   implicit def csc_T_UpdateOp[
-      @expand.args(OpMulMatrix,
-                   OpSet,
-                   OpSub,
-                   OpAdd,
-                   OpMulScalar,
-                   OpDiv,
-                   OpMod,
-                   OpPow) Op <: OpType,
-      T : Field : ClassTag]: Op.InPlaceImpl2[CSCMatrix[T], T] = {
+      @expand.args(
+        OpMulMatrix,
+        OpSet,
+        OpSub,
+        OpAdd,
+        OpMulScalar,
+        OpDiv,
+        OpMod,
+        OpPow) Op <: OpType,
+      T: Field: ClassTag]: Op.InPlaceImpl2[CSCMatrix[T], T] = {
     updateFromPure_CSC_T(implicitly[Op.Impl2[CSCMatrix[T], T, CSCMatrix[T]]])
   }
 

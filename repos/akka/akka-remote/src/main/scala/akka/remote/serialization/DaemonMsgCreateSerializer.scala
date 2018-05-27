@@ -73,8 +73,8 @@ private[akka] class DaemonMsgCreateSerializer(val system: ExtendedActorSystem)
 
     case _ ⇒
       throw new IllegalArgumentException(
-          "Can't serialize a non-DaemonMsgCreate message using DaemonMsgCreateSerializer [%s]"
-            .format(obj))
+        "Can't serialize a non-DaemonMsgCreate message using DaemonMsgCreateSerializer [%s]"
+          .format(obj))
   }
 
   def fromBinary(bytes: Array[Byte], clazz: Option[Class[_]]): AnyRef = {
@@ -110,10 +110,10 @@ private[akka] class DaemonMsgCreateSerializer(val system: ExtendedActorSystem)
     }
 
     DaemonMsgCreate(
-        props = props,
-        deploy = deploy(proto.getDeploy),
-        path = proto.getPath,
-        supervisor = deserializeActorRef(system, proto.getSupervisor))
+      props = props,
+      deploy = deploy(proto.getDeploy),
+      path = proto.getPath,
+      supervisor = deserializeActorRef(system, proto.getSupervisor))
   }
 
   protected def serialize(any: Any): ByteString =
@@ -123,14 +123,15 @@ private[akka] class DaemonMsgCreateSerializer(val system: ExtendedActorSystem)
     if (p._1.isEmpty && p._2 == "null") null
     else deserialize(p._1, system.dynamicAccess.getClassFor[AnyRef](p._2).get)
 
-  protected def deserialize[T : ClassTag](
-      data: ByteString, clazz: Class[T]): T = {
+  protected def deserialize[T: ClassTag](
+      data: ByteString,
+      clazz: Class[T]): T = {
     val bytes = data.toByteArray
     serialization.deserialize(bytes, clazz) match {
       case Success(x: T) ⇒ x
       case Success(other) ⇒
         throw new IllegalArgumentException(
-            "Can't deserialize to [%s], got [%s]".format(clazz.getName, other))
+          "Can't deserialize to [%s], got [%s]".format(clazz.getName, other))
       case Failure(e) ⇒
         // Fallback to the java serializer, because some interfaces don't implement java.io.Serializable,
         // but the impl instance does. This could be optimized by adding java serializers in reference.conf:

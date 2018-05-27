@@ -10,8 +10,7 @@ import linalg.{NumericOps, Tensor}
   * Approximates a gradient by finite differences.
   * @author dlwh
   */
-class ApproximateGradientFunction[K, T](
-    f: T => Double, epsilon: Double = 1E-5)(
+class ApproximateGradientFunction[K, T](f: T => Double, epsilon: Double = 1E-5)(
     implicit zeros: CanCreateZerosLike[T, T],
     view: T <:< Tensor[K, Double],
     copy: CanCopy[T])
@@ -39,7 +38,7 @@ class ApproximateGradientFunction[K, T](
       grad(k) = (f(xx) - fx) / epsilon
       xx(k) -= epsilon
       println(
-          "diff : " + epsilon + " val: " + (grad(k) - trueGrad(k)) + " dp: " +
+        "diff : " + epsilon + " val: " + (grad(k) - trueGrad(k)) + " dp: " +
           trueGrad(k) + " empirical: " + grad(k))
     }
     (fx, grad)

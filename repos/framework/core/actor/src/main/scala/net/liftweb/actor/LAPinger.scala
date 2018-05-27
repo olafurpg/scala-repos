@@ -64,9 +64,10 @@ object LAPinger {
     * @return a <code>ScheduledFuture</code> which sends the <code>msg</code> to
     * the <code>to<code> Actor after the specified TimeSpan <code>delay</code>.
     */
-  def schedule[T](to: SpecializedLiftActor[T],
-                  msg: T,
-                  delay: Long): ScheduledFuture[Unit] = {
+  def schedule[T](
+      to: SpecializedLiftActor[T],
+      msg: T,
+      delay: Long): ScheduledFuture[Unit] = {
     val r = new Callable[Unit] {
       def call: Unit = {
         to ! msg

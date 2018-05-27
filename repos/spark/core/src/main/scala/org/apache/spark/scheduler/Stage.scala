@@ -53,12 +53,13 @@ import org.apache.spark.util.CallSite
   * @param callSite Location in the user program associated with this stage: either where the target
   *   RDD was created, for a shuffle map stage, or where the action for a result stage was called.
   */
-private[scheduler] abstract class Stage(val id: Int,
-                                        val rdd: RDD[_],
-                                        val numTasks: Int,
-                                        val parents: List[Stage],
-                                        val firstJobId: Int,
-                                        val callSite: CallSite)
+private[scheduler] abstract class Stage(
+    val id: Int,
+    val rdd: RDD[_],
+    val numTasks: Int,
+    val parents: List[Stage],
+    val firstJobId: Int,
+    val callSite: CallSite)
     extends Logging {
 
   val numPartitions = rdd.partitions.length
@@ -126,10 +127,11 @@ private[scheduler] abstract class Stage(val id: Int,
   def makeNewStageAttempt(
       numPartitionsToCompute: Int,
       taskLocalityPreferences: Seq[Seq[TaskLocation]] = Seq.empty): Unit = {
-    _latestInfo = StageInfo.fromStage(this,
-                                      nextAttemptId,
-                                      Some(numPartitionsToCompute),
-                                      taskLocalityPreferences)
+    _latestInfo = StageInfo.fromStage(
+      this,
+      nextAttemptId,
+      Some(numPartitionsToCompute),
+      taskLocalityPreferences)
     nextAttemptId += 1
   }
 
@@ -140,7 +142,7 @@ private[scheduler] abstract class Stage(val id: Int,
 
   override final def equals(other: Any): Boolean = other match {
     case stage: Stage => stage != null && stage.id == id
-    case _ => false
+    case _            => false
   }
 
   /** Returns the sequence of partition ids that are missing (i.e. needs to be computed). */

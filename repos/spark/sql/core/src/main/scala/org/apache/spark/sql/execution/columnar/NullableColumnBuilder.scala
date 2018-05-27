@@ -40,7 +40,9 @@ private[columnar] trait NullableColumnBuilder extends ColumnBuilder {
   private var pos: Int = _
 
   abstract override def initialize(
-      initialSize: Int, columnName: String, useCompression: Boolean): Unit = {
+      initialSize: Int,
+      columnName: String,
+      useCompression: Boolean): Unit = {
 
     nulls = ByteBuffer.allocate(1024)
     nulls.order(ByteOrder.nativeOrder())

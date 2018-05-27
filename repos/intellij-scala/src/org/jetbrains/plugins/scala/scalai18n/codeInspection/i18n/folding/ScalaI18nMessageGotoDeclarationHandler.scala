@@ -23,7 +23,8 @@ class ScalaI18nMessageGotoDeclarationHandler
     CompositeFoldingBuilder.FOLDING_BUILDER
 
   def getGotoDeclarationTarget(
-      myElement: PsiElement, editor: Editor): PsiElement = {
+      myElement: PsiElement,
+      editor: Editor): PsiElement = {
     var element = myElement
     var i: Int = 4 //some street magic from Konstantin Bulenkov
     var flag = true
@@ -54,7 +55,8 @@ class ScalaI18nMessageGotoDeclarationHandler
           expression match {
             case literal: ScLiteral
                 if ScalaI18nUtil.isI18nProperty(
-                    expression.getProject, literal) =>
+                  expression.getProject,
+                  literal) =>
               return resolve(expression)
             case _ =>
           }

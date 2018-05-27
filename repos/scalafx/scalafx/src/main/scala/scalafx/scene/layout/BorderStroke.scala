@@ -70,38 +70,41 @@ class BorderStroke(override val delegate: jfxsl.BorderStroke)
   /**
     * Creates a new BorderStroke.
     */
-  def this(stroke: Paint,
-           style: BorderStrokeStyle,
-           radii: CornerRadii,
-           widths: BorderWidths) =
+  def this(
+      stroke: Paint,
+      style: BorderStrokeStyle,
+      radii: CornerRadii,
+      widths: BorderWidths) =
     this(new jfxsl.BorderStroke(stroke, style, radii, widths))
 
   /**
     * Create a new BorderStroke, specifying all construction parameters.
     */
-  def this(topStroke: Paint,
-           rightStroke: Paint,
-           bottomStroke: Paint,
-           leftStroke: Paint,
-           topStyle: BorderStrokeStyle,
-           rightStyle: BorderStrokeStyle,
-           bottomStyle: BorderStrokeStyle,
-           leftStyle: BorderStrokeStyle,
-           radii: CornerRadii,
-           widths: BorderWidths,
-           insets: Insets) =
+  def this(
+      topStroke: Paint,
+      rightStroke: Paint,
+      bottomStroke: Paint,
+      leftStroke: Paint,
+      topStyle: BorderStrokeStyle,
+      rightStyle: BorderStrokeStyle,
+      bottomStyle: BorderStrokeStyle,
+      leftStyle: BorderStrokeStyle,
+      radii: CornerRadii,
+      widths: BorderWidths,
+      insets: Insets) =
     this(
-        new jfxsl.BorderStroke(topStroke,
-                               rightStroke,
-                               bottomStroke,
-                               leftStroke,
-                               topStyle,
-                               rightStyle,
-                               bottomStyle,
-                               leftStyle,
-                               radii,
-                               widths,
-                               insets))
+      new jfxsl.BorderStroke(
+        topStroke,
+        rightStroke,
+        bottomStroke,
+        leftStroke,
+        topStyle,
+        rightStyle,
+        bottomStyle,
+        leftStyle,
+        radii,
+        widths,
+        insets))
 
   /**
     * Defines the fill of bottom side of this border.

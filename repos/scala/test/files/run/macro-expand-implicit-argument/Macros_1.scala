@@ -8,7 +8,7 @@ import scala.reflect.ClassTag
 import scala.reflect.macros.blackbox.Context
 
 object Macros {
-  def alloc[@spec A : ClassTag](src: Array[A], s1: Int, len: Int) = {
+  def alloc[@spec A: ClassTag](src: Array[A], s1: Int, len: Int) = {
     val as = Array.ofDim[A](len)
     System.arraycopy(src, s1, as, 0, len)
     as
@@ -35,7 +35,7 @@ object Macros {
     *     arr
     *   }
     */
-  def arrayMacro[A : c.WeakTypeTag](c: Context)(as: c.Expr[A]*)(
+  def arrayMacro[A: c.WeakTypeTag](c: Context)(as: c.Expr[A]*)(
       ct: c.Expr[ClassTag[A]]): c.Expr[Array[A]] = {
     import c.mirror._
     import c.universe._

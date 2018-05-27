@@ -32,8 +32,7 @@ trait DistributedPubSubMediatorRouterSpec {
 
       mediator ! DistributedPubSubMediator.Put(testActor)
 
-      mediator ! DistributedPubSubMediator.Send(
-          path, msg, localAffinity = true)
+      mediator ! DistributedPubSubMediator.Send(path, msg, localAffinity = true)
       expectMsg(msg)
 
       mediator ! DistributedPubSubMediator.Remove(path)
@@ -44,7 +43,9 @@ trait DistributedPubSubMediatorRouterSpec {
       mediator ! DistributedPubSubMediator.Put(testActor)
 
       mediator ! DistributedPubSubMediator.Send(
-          path, msg, localAffinity = false)
+        path,
+        msg,
+        localAffinity = false)
       expectMsg(msg)
 
       mediator ! DistributedPubSubMediator.Remove(path)
@@ -75,11 +76,15 @@ trait DistributedPubSubMediatorRouterSpec {
     "keep the RouterEnvelope when sending to a topic for a group" in {
 
       mediator ! DistributedPubSubMediator.Subscribe(
-          "topic", Some("group"), testActor)
+        "topic",
+        Some("group"),
+        testActor)
       expectMsgClass(classOf[DistributedPubSubMediator.SubscribeAck])
 
       mediator ! DistributedPubSubMediator.Publish(
-          "topic", msg, sendOneMessageToEachGroup = true)
+        "topic",
+        msg,
+        sendOneMessageToEachGroup = true)
       expectMsg(msg)
 
       mediator ! DistributedPubSubMediator.Unsubscribe("topic", testActor)
@@ -90,7 +95,8 @@ trait DistributedPubSubMediatorRouterSpec {
 
 class DistributedPubSubMediatorWithRandomRouterSpec
     extends AkkaSpec(DistributedPubSubMediatorRouterSpec.config("random"))
-    with DistributedPubSubMediatorRouterSpec with DefaultTimeout
+    with DistributedPubSubMediatorRouterSpec
+    with DefaultTimeout
     with ImplicitSender {
 
   val mediator = DistributedPubSub(system).mediator
@@ -108,8 +114,9 @@ class DistributedPubSubMediatorWithRandomRouterSpec
 
 class DistributedPubSubMediatorWithHashRouterSpec
     extends AkkaSpec(
-        DistributedPubSubMediatorRouterSpec.config("consistent-hashing"))
-    with DistributedPubSubMediatorRouterSpec with DefaultTimeout
+      DistributedPubSubMediatorRouterSpec.config("consistent-hashing"))
+    with DistributedPubSubMediatorRouterSpec
+    with DefaultTimeout
     with ImplicitSender {
 
   "DistributedPubSubMediator with Consistent Hash router" must {
@@ -126,7 +133,7 @@ class DistributedPubSubMediatorWithHashRouterSpec
             .withFallback(system.settings.config)
             .getConfig("akka.cluster.pub-sub")
           DistributedPubSubSettings(config).withRoutingLogic(
-              ConsistentHashingRoutingLogic(system))
+            ConsistentHashingRoutingLogic(system))
         }
       }
     }

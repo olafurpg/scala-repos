@@ -17,6 +17,8 @@ trait WorksheetPerFileConfig {
 
   def setEnabled(file: PsiFile, attribute: FileAttribute, e: Boolean) {
     FileAttributeUtilCache.writeAttribute(
-        attribute, file, if (e) enabled else disabled)
+      attribute,
+      file,
+      if (e) enabled else disabled)
   }
 }

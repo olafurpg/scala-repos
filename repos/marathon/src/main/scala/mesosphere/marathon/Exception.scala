@@ -10,7 +10,7 @@ class Exception(msg: String, cause: Throwable = null)
 
 case class UnknownAppException(id: PathId, version: Option[Timestamp] = None)
     extends Exception(
-        s"App '$id' does not exist" + version.fold("")(v => s" in version $v")
+      s"App '$id' does not exist" + version.fold("")(v => s" in version $v")
     )
 
 case class UnknownGroupException(id: PathId)
@@ -23,14 +23,14 @@ class BadRequestException(msg: String) extends Exception(msg)
 
 case class AppLockedException(deploymentIds: Seq[String] = Nil)
     extends Exception(
-        "App is locked by one or more deployments. " +
+      "App is locked by one or more deployments. " +
         "Override with the option '?force=true'. " +
         "View details at '/v2/deployments/<DEPLOYMENT_ID>'."
     )
 
 class PortRangeExhaustedException(val minPort: Int, val maxPort: Int)
     extends Exception(
-        s"All ports in the range $minPort-$maxPort are already in use")
+      s"All ports in the range $minPort-$maxPort are already in use")
 
 case class UpgradeInProgressException(msg: String) extends Exception(msg)
 

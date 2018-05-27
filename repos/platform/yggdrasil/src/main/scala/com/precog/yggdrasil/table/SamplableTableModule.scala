@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -68,12 +68,14 @@ trait SamplableColumnarTableModule[M[+ _]] extends SamplableTableModule[M] {
       * sampling in that runs in O(m lg n) time.
       */
     def sample(sampleSize: Int, specs: Seq[TransSpec1]): M[Seq[Table]] = {
-      case class SampleState(rowInserters: Option[RowInserter],
-                             length: Int,
-                             transform: SliceTransform1[_])
+      case class SampleState(
+          rowInserters: Option[RowInserter],
+          length: Int,
+          transform: SliceTransform1[_])
 
-      def build(states: List[SampleState],
-                slices: StreamT[M, Slice]): M[List[Table]] = {
+      def build(
+          states: List[SampleState],
+          slices: StreamT[M, Slice]): M[List[Table]] = {
         slices.uncons flatMap {
           case Some((origSlice, tail)) =>
             val nextStates =
@@ -81,34 +83,35 @@ trait SamplableColumnarTableModule[M[+ _]] extends SamplableTableModule[M] {
                 case SampleState(maybePrevInserters, len0, transform) =>
                   transform advance origSlice map {
                     case (nextTransform, slice) => {
-                        val inserter =
-                          maybePrevInserters map { _.withSource(slice) } getOrElse RowInserter(
-                              sampleSize, slice)
+                      val inserter =
+                        maybePrevInserters map { _.withSource(slice) } getOrElse RowInserter(
+                          sampleSize,
+                          slice)
 
-                        val defined = slice.definedAt
+                      val defined = slice.definedAt
 
-                        @tailrec
-                        def loop(i: Int, len: Int): Int =
-                          if (i < slice.size) {
-                            // `k` is a number between 0 and number of rows we've seen
-                            if (!defined(i)) {
-                              loop(i + 1, len)
-                            } else if (len < sampleSize) {
-                              inserter.insert(src = i, dest = len)
-                              loop(i + 1, len + 1)
-                            } else {
-                              val k = rng.nextInt(len + 1)
-                              if (k < sampleSize) {
-                                inserter.insert(src = i, dest = k)
-                              }
-                              loop(i + 1, len + 1)
+                      @tailrec
+                      def loop(i: Int, len: Int): Int =
+                        if (i < slice.size) {
+                          // `k` is a number between 0 and number of rows we've seen
+                          if (!defined(i)) {
+                            loop(i + 1, len)
+                          } else if (len < sampleSize) {
+                            inserter.insert(src = i, dest = len)
+                            loop(i + 1, len + 1)
+                          } else {
+                            val k = rng.nextInt(len + 1)
+                            if (k < sampleSize) {
+                              inserter.insert(src = i, dest = k)
                             }
-                          } else len
+                            loop(i + 1, len + 1)
+                          }
+                        } else len
 
-                        val newLength = loop(0, len0)
+                      val newLength = loop(0, len0)
 
-                        SampleState(Some(inserter), newLength, nextTransform)
-                      }
+                      SampleState(Some(inserter), newLength, nextTransform)
+                    }
                   }
               }
 
@@ -163,21 +166,24 @@ trait SamplableColumnarTableModule[M[+ _]] extends SamplableTableModule[M] {
 
     // Creates array columns on demand.
     private def getOrCreateCol(ref: ColumnRef): ArrayColumn[_] = {
-      cols.getOrElseUpdate(ref, ref.ctype match {
-        case CBoolean => ArrayBoolColumn.empty()
-        case CLong => ArrayLongColumn.empty(size)
-        case CDouble => ArrayDoubleColumn.empty(size)
-        case CNum => ArrayNumColumn.empty(size)
-        case CString => ArrayStrColumn.empty(size)
-        case CDate => ArrayDateColumn.empty(size)
-        case CPeriod => ArrayPeriodColumn.empty(size)
-        case CArrayType(elemType) =>
-          ArrayHomogeneousArrayColumn.empty(size)(elemType)
-        case CNull => MutableNullColumn.empty()
-        case CEmptyObject => MutableEmptyObjectColumn.empty()
-        case CEmptyArray => MutableEmptyArrayColumn.empty()
-        case CUndefined => sys.error("this shouldn't exist")
-      })
+      cols.getOrElseUpdate(
+        ref,
+        ref.ctype match {
+          case CBoolean => ArrayBoolColumn.empty()
+          case CLong    => ArrayLongColumn.empty(size)
+          case CDouble  => ArrayDoubleColumn.empty(size)
+          case CNum     => ArrayNumColumn.empty(size)
+          case CString  => ArrayStrColumn.empty(size)
+          case CDate    => ArrayDateColumn.empty(size)
+          case CPeriod  => ArrayPeriodColumn.empty(size)
+          case CArrayType(elemType) =>
+            ArrayHomogeneousArrayColumn.empty(size)(elemType)
+          case CNull        => MutableNullColumn.empty()
+          case CEmptyObject => MutableEmptyObjectColumn.empty()
+          case CEmptyArray  => MutableEmptyArrayColumn.empty()
+          case CUndefined   => sys.error("this shouldn't exist")
+        }
+      )
     }
 
     private def colOpsFor: ((ColumnRef, Column)) => ColumnOps = {
@@ -237,9 +243,9 @@ trait SamplableColumnarTableModule[M[+ _]] extends SamplableTableModule[M] {
                 dest.update(destRow, true)
               def unsafeMove(from: Int, to: Int) = dest.update(to, true)
             }
-          case (src: HomogeneousArrayColumn[a],
-                dest0: ArrayHomogeneousArrayColumn[_])
-              if src.tpe == dest0.tpe =>
+          case (
+              src: HomogeneousArrayColumn[a],
+              dest0: ArrayHomogeneousArrayColumn[_]) if src.tpe == dest0.tpe =>
             val dest = dest0.asInstanceOf[ArrayHomogeneousArrayColumn[a]]
             new ColumnOps(src, dest) {
               def unsafeInsert(srcRow: Int, destRow: Int) =
@@ -248,7 +254,7 @@ trait SamplableColumnarTableModule[M[+ _]] extends SamplableTableModule[M] {
             }
           case (src, dest) =>
             sys.error(
-                "Slice lied about column type. Expected %s, but found %s." format
+              "Slice lied about column type. Expected %s, but found %s." format
                 (ref.ctype, src.tpe))
         }
     }

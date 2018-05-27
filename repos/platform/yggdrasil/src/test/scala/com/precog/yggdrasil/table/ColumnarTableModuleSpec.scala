@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -68,13 +68,15 @@ trait TestColumnarTableModule[M[+ _]]
       extends ColumnarTable(slices, size) {
     import trans._
     def load(apiKey: APIKey, jtpe: JType) = sys.error("todo")
-    def sort(sortKey: TransSpec1,
-             sortOrder: DesiredSortOrder,
-             unique: Boolean = false) = M.point(this)
-    def groupByN(groupKeys: Seq[TransSpec1],
-                 valueSpec: TransSpec1,
-                 sortOrder: DesiredSortOrder = SortAscending,
-                 unique: Boolean = false): M[Seq[Table]] = sys.error("todo")
+    def sort(
+        sortKey: TransSpec1,
+        sortOrder: DesiredSortOrder,
+        unique: Boolean = false) = M.point(this)
+    def groupByN(
+        groupKeys: Seq[TransSpec1],
+        valueSpec: TransSpec1,
+        sortOrder: DesiredSortOrder = SortAscending,
+        unique: Boolean = false): M[Seq[Table]] = sys.error("todo")
   }
 
   trait TableCompanion extends ColumnarTableCompanion {
@@ -84,10 +86,11 @@ trait TestColumnarTableModule[M[+ _]]
     def singleton(slice: Slice) =
       new Table(slice :: StreamT.empty[M, Slice], ExactSize(1))
 
-    def align(sourceLeft: Table,
-              alignOnL: TransSpec1,
-              sourceRight: Table,
-              alignOnR: TransSpec1): M[(Table, Table)] =
+    def align(
+        sourceLeft: Table,
+        alignOnL: TransSpec1,
+        sourceRight: Table,
+        alignOnR: TransSpec1): M[(Table, Table)] =
       sys.error("not implemented here")
   }
 
@@ -95,15 +98,23 @@ trait TestColumnarTableModule[M[+ _]]
 }
 
 trait ColumnarTableModuleSpec[M[+ _]]
-    extends TestColumnarTableModule[M] with TableModuleSpec[M]
-    with CogroupSpec[M] with CrossSpec[M] with TransformSpec[M]
-    with CompactSpec[M] with TakeRangeSpec[M] with CanonicalizeSpec[M]
-    with PartitionMergeSpec[M] with ToArraySpec[M] with ConcatSpec[M]
+    extends TestColumnarTableModule[M]
+    with TableModuleSpec[M]
+    with CogroupSpec[M]
+    with CrossSpec[M]
+    with TransformSpec[M]
+    with CompactSpec[M]
+    with TakeRangeSpec[M]
+    with CanonicalizeSpec[M]
+    with PartitionMergeSpec[M]
+    with ToArraySpec[M]
+    with ConcatSpec[M]
     with SampleSpec[M]
     //with UnionAllSpec[M]
     //with CrossAllSpec[M]
     //with GroupingGraphSpec[M]
-    with DistinctSpec[M] with SchemasSpec[M] {
+    with DistinctSpec[M]
+    with SchemasSpec[M] {
   spec =>
 
   import trans._
@@ -112,7 +123,7 @@ trait ColumnarTableModuleSpec[M[+ _]]
   override val defaultPrettyParams = Pretty.Params(2)
 
   lazy val xlogger = LoggerFactory.getLogger(
-      "com.precog.yggdrasil.table.ColumnarTableModuleSpec")
+    "com.precog.yggdrasil.table.ColumnarTableModuleSpec")
 
   def streamToString(stream: StreamT[M, CharBuffer]): String = {
     def loop(stream: StreamT[M, CharBuffer], sb: StringBuilder): M[String] =
@@ -182,31 +193,35 @@ trait ColumnarTableModuleSpec[M[+ _]]
   "a table dataset" should {
     "verify bijection from static JSON" in {
       val sample: List[JValue] = List(
-          JObject(
-              JField("key", JArray(JNum(-1L), JNum(0L))),
-              JField("value", JNull)
-          ),
-          JObject(
-              JField("key",
-                     JArray(JNum(-3090012080927607325l),
-                            JNum(2875286661755661474l))),
-              JField("value",
-                     JObject(
-                         JField("q8b",
-                                JArray(
-                                    JNum(6.615224799778253E307d),
-                                    JArray(JBool(false),
-                                           JNull,
-                                           JNum(-8.988465674311579E307d),
-                                           JNum(-3.536399224770604E307d))
-                                )),
-                         JField("lwu", JNum(-5.121099465699862E307d))
-                     ))
-          ),
-          JObject(
-              JField("key", JArray(JNum(-3918416808128018609l), JNum(-1L))),
-              JField("value", JNum(-1.0))
+        JObject(
+          JField("key", JArray(JNum(-1L), JNum(0L))),
+          JField("value", JNull)
+        ),
+        JObject(
+          JField(
+            "key",
+            JArray(JNum(-3090012080927607325l), JNum(2875286661755661474l))),
+          JField(
+            "value",
+            JObject(
+              JField(
+                "q8b",
+                JArray(
+                  JNum(6.615224799778253E307d),
+                  JArray(
+                    JBool(false),
+                    JNull,
+                    JNum(-8.988465674311579E307d),
+                    JNum(-3.536399224770604E307d))
+                )),
+              JField("lwu", JNum(-5.121099465699862E307d))
+            )
           )
+        ),
+        JObject(
+          JField("key", JArray(JNum(-3918416808128018609l), JNum(-1L))),
+          JField("value", JNum(-1.0))
+        )
       )
 
       val dataset = fromJson(sample.toStream)
@@ -221,8 +236,9 @@ trait ColumnarTableModuleSpec[M[+ _]]
 
       check { data: SampleData =>
         testRenderJson(data.data)
-      }.set(minTestsOk -> 20000,
-            workers -> Runtime.getRuntime.availableProcessors)
+      }.set(
+        minTestsOk -> 20000,
+        workers -> Runtime.getRuntime.availableProcessors)
     }
 
     "handle special cases of renderJson" >> {
@@ -236,18 +252,23 @@ trait ColumnarTableModuleSpec[M[+ _]]
 
       "fully undefined array" >> {
         testRenderJson(
-            JArray(JUndefined :: JUndefined :: JUndefined :: Nil) :: Nil)
+          JArray(JUndefined :: JUndefined :: JUndefined :: Nil) :: Nil)
       }
 
       "undefined at beginning of object" >> {
-        testRenderJson(JObject(JField("foo", JUndefined) :: JField(
-                    "bar", JNum(1)) :: JField("baz", JNum(2)) :: Nil) :: Nil)
+        testRenderJson(
+          JObject(
+            JField("foo", JUndefined) :: JField("bar", JNum(1)) :: JField(
+              "baz",
+              JNum(2)) :: Nil) :: Nil)
       }
 
       "undefined in middle of object" >> {
-        testRenderJson(JObject(
-                JField("foo", JNum(1)) :: JField("bar", JUndefined) :: JField(
-                    "baz", JNum(2)) :: Nil) :: Nil)
+        testRenderJson(
+          JObject(
+            JField("foo", JNum(1)) :: JField("bar", JUndefined) :: JField(
+              "baz",
+              JNum(2)) :: Nil) :: Nil)
       }
 
       "fully undefined object" >> {
@@ -261,13 +282,15 @@ trait ColumnarTableModuleSpec[M[+ _]]
       "check utf-8 encoding" in check { str: String =>
         val s = str.toList.map((c: Char) => if (c < ' ') ' ' else c).mkString
         testRenderJson(JString(s) :: Nil)
-      }.set(minTestsOk -> 20000,
-            workers -> Runtime.getRuntime.availableProcessors)
+      }.set(
+        minTestsOk -> 20000,
+        workers -> Runtime.getRuntime.availableProcessors)
 
       "check long encoding" in check { ln: Long =>
         testRenderJson(JNum(ln) :: Nil)
-      }.set(minTestsOk -> 20000,
-            workers -> Runtime.getRuntime.availableProcessors)
+      }.set(
+        minTestsOk -> 20000,
+        workers -> Runtime.getRuntime.availableProcessors)
     }
 
     "in cogroup" >> {
@@ -301,45 +324,50 @@ trait ColumnarTableModuleSpec[M[+ _]]
 
       "split a cross that would exceed maxSliceSize boundaries" in {
         val sample: List[JValue] = List(
-            JObject(
-                JField("key", JArray(JNum(-1L) :: JNum(0L) :: Nil)) :: JField(
-                    "value", JNull) :: Nil
-            ),
-            JObject(
+          JObject(
+            JField("key", JArray(JNum(-1L) :: JNum(0L) :: Nil)) :: JField(
+              "value",
+              JNull) :: Nil
+          ),
+          JObject(
+            JField(
+              "key",
+              JArray(
+                JNum(-3090012080927607325l) :: JNum(2875286661755661474l) :: Nil)) :: JField(
+              "value",
+              JObject(List(
                 JField(
-                    "key",
-                    JArray(JNum(-3090012080927607325l) :: JNum(
-                            2875286661755661474l) :: Nil)) :: JField(
-                    "value",
-                    JObject(List(
-                            JField("q8b",
-                                   JArray(List(JNum(6.615224799778253E307d),
-                                               JArray(List(
-                                                       JBool(false),
-                                                       JNull,
-                                                       JNum(-8.988465674311579E307d))),
-                                               JNum(
-                                                   -3.536399224770604E307d)))),
-                            JField("lwu", JNum(-5.121099465699862E307d))))) :: Nil
-            ),
-            JObject(
-                JField(
-                    "key",
-                    JArray(JNum(-3918416808128018609l) :: JNum(-1L) :: Nil)) :: JField(
-                    "value", JNum(-1.0)) :: Nil
-            ),
-            JObject(
-                JField(
-                    "key",
-                    JArray(JNum(-3918416898128018609l) :: JNum(-2L) :: Nil)) :: JField(
-                    "value", JNum(-1.0)) :: Nil
-            ),
-            JObject(
-                JField(
-                    "key",
-                    JArray(JNum(-3918426808128018609l) :: JNum(-3L) :: Nil)) :: JField(
-                    "value", JNum(-1.0)) :: Nil
-            )
+                  "q8b",
+                  JArray(List(
+                    JNum(6.615224799778253E307d),
+                    JArray(
+                      List(JBool(false), JNull, JNum(-8.988465674311579E307d))),
+                    JNum(-3.536399224770604E307d)))),
+                JField("lwu", JNum(-5.121099465699862E307d))
+              ))
+            ) :: Nil
+          ),
+          JObject(
+            JField(
+              "key",
+              JArray(JNum(-3918416808128018609l) :: JNum(-1L) :: Nil)) :: JField(
+              "value",
+              JNum(-1.0)) :: Nil
+          ),
+          JObject(
+            JField(
+              "key",
+              JArray(JNum(-3918416898128018609l) :: JNum(-2L) :: Nil)) :: JField(
+              "value",
+              JNum(-1.0)) :: Nil
+          ),
+          JObject(
+            JField(
+              "key",
+              JArray(JNum(-3918426808128018609l) :: JNum(-3L) :: Nil)) :: JField(
+              "value",
+              JNum(-1.0)) :: Nil
+          )
         )
 
         val dataset1 = fromJson(sample.toStream, Some(3))
@@ -347,7 +375,7 @@ trait ColumnarTableModuleSpec[M[+ _]]
 
         dataset1
           .cross(dataset1)(
-              InnerObjectConcat(Leaf(SourceLeft), Leaf(SourceRight)))
+            InnerObjectConcat(Leaf(SourceLeft), Leaf(SourceRight)))
           .slices
           .uncons
           .copoint must beLike {
@@ -557,9 +585,8 @@ trait ColumnarTableModuleSpec[M[+ _]]
 
   "logging" should {
     "run" in {
-      testSimpleCogroup(
-          t =>
-            t.logged(xlogger, "test-logging", "start stream", "end stream") {
+      testSimpleCogroup(t =>
+        t.logged(xlogger, "test-logging", "start stream", "end stream") {
           slice =>
             "size: " + slice.size
       })
@@ -636,10 +663,10 @@ trait ColumnarTableModuleSpec[M[+ _]]
 
       val expected =
         "" + ".a,.b.bc,.b.bd,.b.be,.b.bf,.b.bg,.c[0],.d\r\n" +
-        "1,999,foooooo,true,null,false,1.999,dog\r\n" +
-        "2,998,fooooo,null,false,true,2.999,dogg\r\n" +
-        "3,997,foooo,false,true,null,3.999,doggg\r\n" +
-        "4,996,fooo,true,null,false,4.999,dogggg\r\n"
+          "1,999,foooooo,true,null,false,1.999,dog\r\n" +
+          "2,998,fooooo,null,false,true,2.999,dogg\r\n" +
+          "3,997,foooo,false,true,null,3.999,doggg\r\n" +
+          "4,996,fooo,true,null,false,4.999,dogggg\r\n"
 
       testRenderCsv(events) must_== expected
     }
@@ -653,11 +680,11 @@ trait ColumnarTableModuleSpec[M[+ _]]
 
     "test string escaping" in {
       val csv = testRenderCsv(
-          "{\"s\":\"a\\\"b\",\"t\":\",\",\"u\":\"aa\\nbb\",\"v\":\"a,b\\\"c\\r\\nd\"}")
+        "{\"s\":\"a\\\"b\",\"t\":\",\",\"u\":\"aa\\nbb\",\"v\":\"a,b\\\"c\\r\\nd\"}")
 
       val expected =
         "" + ".s,.t,.u,.v\r\n" + "\"a\"\"b\",\",\",\"aa\n" +
-        "bb\",\"a,b\"\"c\r\n" + "d\"\r\n"
+          "bb\",\"a,b\"\"c\r\n" + "d\"\r\n"
 
       csv must_== expected
     }
@@ -677,17 +704,17 @@ trait ColumnarTableModuleSpec[M[+ _]]
 
       val expected =
         "" + ".a,.b,.c,.d,.e,.f.aaa,.g\r\n" + "1,,,,,,\r\n" +
-        ",99.1,,,,,\r\n" + "true,,,,,,\r\n" + ",,jgeiwgjewigjewige,,,,\r\n" +
-        ",foo,,999,,,\r\n" + ",,,,null,,\r\n" + ",,,,,9,\r\n" +
-        ",,100,,,,934\r\n"
+          ",99.1,,,,,\r\n" + "true,,,,,,\r\n" + ",,jgeiwgjewigjewige,,,,\r\n" +
+          ",foo,,999,,,\r\n" + ",,,,null,,\r\n" + ",,,,,9,\r\n" +
+          ",,100,,,,934\r\n"
 
       testRenderCsv(input) must_== expected
 
       val expected2 =
         "" + ".a,.b\r\n1,\r\n,99.1\r\n\r\n" +
-        ".a,.c\r\ntrue,\r\n,jgeiwgjewigjewige\r\n\r\n" +
-        ".b,.d,.e\r\nfoo,999,\r\n,,null\r\n\r\n" +
-        ".c,.f.aaa,.g\r\n,9,\r\n100,,934\r\n"
+          ".a,.c\r\ntrue,\r\n,jgeiwgjewigjewige\r\n\r\n" +
+          ".b,.d,.e\r\nfoo,999,\r\n,,null\r\n\r\n" +
+          ".c,.f.aaa,.g\r\n,9,\r\n100,,934\r\n"
 
       testRenderCsv(input, Some(2)) must_== expected2
     }

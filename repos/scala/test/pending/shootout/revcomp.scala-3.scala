@@ -30,7 +30,8 @@ trait FastaByteStream {
 // extend the Java BufferedInputStream class
 
 final class FastaInputStream(in: InputStream)
-    extends BufferedInputStream(in) with FastaByteStream {
+    extends BufferedInputStream(in)
+    with FastaByteStream {
 
   val gt = '>'.toByte
   val sc = ';'.toByte
@@ -87,7 +88,8 @@ final class FastaInputStream(in: InputStream)
 // extend the Java BufferedOutputStream class
 
 final class FastaOutputStream(in: OutputStream)
-    extends BufferedOutputStream(in) with FastaByteStream {
+    extends BufferedOutputStream(in)
+    with FastaByteStream {
 
   private val IUB = IUBCodeComplements
 
@@ -121,27 +123,27 @@ final class FastaOutputStream(in: OutputStream)
     sequence match {
       case (header, lines) => {
 
-          write(header); write(nl)
+        write(header); write(nl)
 
-          val k = if (lines.isEmpty) 0 else lines.top.length
-          val LineLength = 60
-          val isSplitLine = k < LineLength
-          var isFirstLine = true
+        val k = if (lines.isEmpty) 0 else lines.top.length
+        val LineLength = 60
+        val isSplitLine = k < LineLength
+        var isFirstLine = true
 
-          while (!lines.isEmpty) {
-            val line = lines.pop
-            inplaceComplementReverse(line)
+        while (!lines.isEmpty) {
+          val line = lines.pop
+          inplaceComplementReverse(line)
 
-            if (isSplitLine) {
-              if (isFirstLine) { write(line); isFirstLine = false } else {
-                write(line, 0, LineLength - k); write(nl);
-                write(line, LineLength - k, k)
-              }
-            } else { write(line); write(nl) }
-          }
-
-          if (isSplitLine && !isFirstLine) write(nl)
+          if (isSplitLine) {
+            if (isFirstLine) { write(line); isFirstLine = false } else {
+              write(line, 0, LineLength - k); write(nl);
+              write(line, LineLength - k, k)
+            }
+          } else { write(line); write(nl) }
         }
+
+        if (isSplitLine && !isFirstLine) write(nl)
+      }
     }
   }
 }

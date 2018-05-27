@@ -26,15 +26,17 @@ class UTestRunConfiguration(
 
   @tailrec
   private def getClassPath(
-      currentClass: ScTypeDefinition, acc: String = ""): String = {
-    val parentTypeDef = PsiTreeUtil.getParentOfType(
-        currentClass, classOf[ScTypeDefinition], true)
+      currentClass: ScTypeDefinition,
+      acc: String = ""): String = {
+    val parentTypeDef =
+      PsiTreeUtil.getParentOfType(currentClass, classOf[ScTypeDefinition], true)
     if (parentTypeDef == null) {
       currentClass.qualifiedName + acc
     } else {
-      getClassPath(parentTypeDef,
-                   acc + (if (parentTypeDef.isObject) "$" else ".") +
-                   currentClass.getName)
+      getClassPath(
+        parentTypeDef,
+        acc + (if (parentTypeDef.isObject) "$" else ".") +
+          currentClass.getName)
     }
   }
 
@@ -42,7 +44,7 @@ class UTestRunConfiguration(
       classes: scala.collection.mutable.HashSet[PsiClass]): Seq[String] =
     classes.map {
       case typeDef: ScTypeDefinition => getClassPath(typeDef)
-      case aClass => aClass.qualifiedName
+      case aClass                    => aClass.qualifiedName
     }.toSeq
 
   override def reporterClass: String = null

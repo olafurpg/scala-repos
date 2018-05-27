@@ -34,7 +34,10 @@ import org.apache.hadoop.hive.ql.exec.{UDF, Utilities}
 import org.apache.hadoop.hive.ql.plan.{FileSinkDesc, TableDesc}
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFMacro
 import org.apache.hadoop.hive.serde2.ColumnProjectionUtils
-import org.apache.hadoop.hive.serde2.avro.{AvroGenericRecordWritable, AvroSerdeUtils}
+import org.apache.hadoop.hive.serde2.avro.{
+  AvroGenericRecordWritable,
+  AvroSerdeUtils
+}
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.HiveDecimalObjectInspector
 import org.apache.hadoop.io.Writable
 
@@ -74,7 +77,9 @@ private[hive] object HiveShim {
    * Cannot use ColumnProjectionUtils.appendReadColumns directly, if ids is null or empty
    */
   def appendReadColumns(
-      conf: Configuration, ids: Seq[Integer], names: Seq[String]) {
+      conf: Configuration,
+      ids: Seq[Integer],
+      names: Seq[String]) {
     if (ids != null && ids.nonEmpty) {
       ColumnProjectionUtils.appendReadColumns(conf, ids.asJava)
     }
@@ -88,7 +93,8 @@ private[hive] object HiveShim {
    * is needed to initialize before serialization.
    */
   def prepareWritable(
-      w: Writable, serDeProps: Seq[(String, String)]): Writable = {
+      w: Writable,
+      serDeProps: Seq[(String, String)]): Writable = {
     w match {
       case w: AvroGenericRecordWritable =>
         w.setRecordReaderID(new UID())
@@ -96,8 +102,9 @@ private[hive] object HiveShim {
         // be thrown.
         if (w.getFileSchema() == null) {
           serDeProps
-            .find(_._1 == AvroSerdeUtils.AvroTableProperties.SCHEMA_LITERAL
-                  .getPropName())
+            .find(
+              _._1 == AvroSerdeUtils.AvroTableProperties.SCHEMA_LITERAL
+                .getPropName())
             .foreach { kv =>
               w.setFileSchema(new Schema.Parser().parse(kv._2))
             }
@@ -107,18 +114,22 @@ private[hive] object HiveShim {
     w
   }
 
-  def toCatalystDecimal(hdoi: HiveDecimalObjectInspector, data: Any): Decimal = {
+  def toCatalystDecimal(
+      hdoi: HiveDecimalObjectInspector,
+      data: Any): Decimal = {
     if (hdoi.preferWritable()) {
-      Decimal(hdoi
-                .getPrimitiveWritableObject(data)
-                .getHiveDecimal()
-                .bigDecimalValue,
-              hdoi.precision(),
-              hdoi.scale())
+      Decimal(
+        hdoi
+          .getPrimitiveWritableObject(data)
+          .getHiveDecimal()
+          .bigDecimalValue,
+        hdoi.precision(),
+        hdoi.scale())
     } else {
-      Decimal(hdoi.getPrimitiveJavaObject(data).bigDecimalValue(),
-              hdoi.precision(),
-              hdoi.scale())
+      Decimal(
+        hdoi.getPrimitiveJavaObject(data).bigDecimalValue(),
+        hdoi.precision(),
+        hdoi.scale())
     }
   }
 
@@ -132,7 +143,8 @@ private[hive] object HiveShim {
     * @param instance optional UDF instance which contains additional information (for macro)
     */
   private[hive] case class HiveFunctionWrapper(
-      var functionClassName: String, private var instance: AnyRef = null)
+      var functionClassName: String,
+      private var instance: AnyRef = null)
       extends java.io.Externalizable {
 
     // for Serialization
@@ -140,16 +152,16 @@ private[hive] object HiveShim {
 
     override def hashCode(): Int = {
       if (functionClassName == HIVE_GENERIC_UDF_MACRO_CLS) {
-        Objects.hashCode(functionClassName,
-                         instance.asInstanceOf[GenericUDFMacro].getBody())
+        Objects.hashCode(
+          functionClassName,
+          instance.asInstanceOf[GenericUDFMacro].getBody())
       } else {
         functionClassName.hashCode()
       }
     }
 
     override def equals(other: Any): Boolean = other match {
-      case a: HiveFunctionWrapper
-          if functionClassName == a.functionClassName =>
+      case a: HiveFunctionWrapper if functionClassName == a.functionClassName =>
         // In case of udf macro, check to make sure they point to the same underlying UDF
         if (functionClassName == HIVE_GENERIC_UDF_MACRO_CLS) {
           a.instance.asInstanceOf[GenericUDFMacro].getBody() == instance
@@ -162,8 +174,10 @@ private[hive] object HiveShim {
     }
 
     @transient
-    def deserializeObjectByKryo[T : ClassTag](
-        kryo: Kryo, in: InputStream, clazz: Class[_]): T = {
+    def deserializeObjectByKryo[T: ClassTag](
+        kryo: Kryo,
+        in: InputStream,
+        clazz: Class[_]): T = {
       val inp = new Input(in)
       val t: T = kryo.readObject(inp, clazz).asInstanceOf[T]
       inp.close()
@@ -178,15 +192,20 @@ private[hive] object HiveShim {
     }
 
     def deserializePlan[UDFType](
-        is: java.io.InputStream, clazz: Class[_]): UDFType = {
+        is: java.io.InputStream,
+        clazz: Class[_]): UDFType = {
       deserializeObjectByKryo(
-          Utilities.runtimeSerializationKryo.get(), is, clazz)
+        Utilities.runtimeSerializationKryo.get(),
+        is,
+        clazz)
         .asInstanceOf[UDFType]
     }
 
     def serializePlan(function: AnyRef, out: java.io.OutputStream): Unit = {
       serializeObjectByKryo(
-          Utilities.runtimeSerializationKryo.get(), function, out)
+        Utilities.runtimeSerializationKryo.get(),
+        function,
+        out)
     }
 
     def writeExternal(out: java.io.ObjectOutput) {
@@ -221,8 +240,8 @@ private[hive] object HiveShim {
 
         // deserialize the function object via Hive Utilities
         instance = deserializePlan[AnyRef](
-            new java.io.ByteArrayInputStream(functionInBytes),
-            Utils.getContextOrSparkClassLoader.loadClass(functionClassName))
+          new java.io.ByteArrayInputStream(functionInBytes),
+          Utils.getContextOrSparkClassLoader.loadClass(functionClassName))
       }
     }
 
@@ -261,10 +280,12 @@ private[hive] object HiveShim {
    * Bug introduced in hive-0.13. FileSinkDesc is serializable, but its member path is not.
    * Fix it through wrapper.
    */
-  private[hive] class ShimFileSinkDesc(var dir: String,
-                                       var tableInfo: TableDesc,
-                                       var compressed: Boolean)
-      extends Serializable with Logging {
+  private[hive] class ShimFileSinkDesc(
+      var dir: String,
+      var tableInfo: TableDesc,
+      var compressed: Boolean)
+      extends Serializable
+      with Logging {
     var compressCodec: String = _
     var compressType: String = _
     var destTableId: Int = _

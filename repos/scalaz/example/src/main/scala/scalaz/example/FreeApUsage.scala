@@ -24,10 +24,10 @@ object FreeApUsage extends App {
   def parseString(key: String) = FreeAp.lift(ParseString(key))
   def parseBool(key: String) = FreeAp.lift(ParseBool(key))
 
-  def parseOpt[A : ClassTag](a: Any): Option[A] =
+  def parseOpt[A: ClassTag](a: Any): Option[A] =
     a match {
       case a: A => Some(a)
-      case _ => None
+      case _    => None
     }
 
   // Natural transformation to Option[A]
@@ -64,17 +64,16 @@ object FreeApUsage extends App {
 
   // An example that returns a tuple of (String, Int, Boolean) parsed from Map[String, Any]
   val successfulProg: Parse[(String, Int, Boolean)] =
-    (parseString("string") |@| parseInt("int") |@| parseBool("bool"))(
-        (_, _, _))
+    (parseString("string") |@| parseInt("int") |@| parseBool("bool"))((_, _, _))
 
   // An example that returns a tuple of (Boolean, String, Int) parsed from Map[String, Any]
   val failedProg: Parse[(Boolean, String, Int)] =
     (parseBool("string") |@| parseString("list") |@| parseInt("bool"))(
-        (_, _, _))
+      (_, _, _))
 
   // Test input for programs
-  val testInput: Map[String, Any] = Map(
-      "string" -> "foobar", "bool" -> true, "int" -> 4, "list" -> List(1, 2))
+  val testInput: Map[String, Any] =
+    Map("string" -> "foobar", "bool" -> true, "int" -> 4, "list" -> List(1, 2))
 
   // Run that baby
   println(successfulProg.foldMap(toOption(testInput)))

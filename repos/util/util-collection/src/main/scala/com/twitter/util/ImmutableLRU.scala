@@ -12,7 +12,10 @@ object ImmutableLRU {
     */
   def apply[K, V](maxSize: Int): ImmutableLRU[K, V] = {
     new ImmutableLRU(
-        maxSize, 0, Map.empty[K, (Long, V)], SortedMap.empty[Long, K])
+      maxSize,
+      0,
+      Map.empty[K, (Long, V)],
+      SortedMap.empty[Long, K])
   }
 }
 
@@ -25,7 +28,10 @@ object ImmutableLRU {
 // is used to determine the Least-Recently-Used key in "map" by taking
 // the minimum index.
 class ImmutableLRU[K, V] private (
-    maxSize: Int, idx: Long, map: Map[K, (Long, V)], ord: SortedMap[Long, K]) {
+    maxSize: Int,
+    idx: Long,
+    map: Map[K, (Long, V)],
+    ord: SortedMap[Long, K]) {
 
   // Scala's SortedMap requires a key ordering; ImmutableLRU doesn't
   // care about pulling a minimum value out of the SortedMap, so the

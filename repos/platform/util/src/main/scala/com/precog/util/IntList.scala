@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -28,7 +28,8 @@ import scala.annotation.tailrec
 // specialization is just too buggy to get it working (tried).
 
 sealed trait IntList
-    extends LinearSeq[Int] with LinearSeqOptimized[Int, IntList] { self =>
+    extends LinearSeq[Int]
+    with LinearSeqOptimized[Int, IntList] { self =>
   def head: Int
   def tail: IntList
 
@@ -37,7 +38,7 @@ sealed trait IntList
   override def foreach[@specialized B](f: Int => B): Unit = {
     @tailrec def loop(xs: IntList): Unit = xs match {
       case IntCons(h, t) => f(h); loop(t)
-      case _ =>
+      case _             =>
     }
     loop(this)
   }
@@ -55,7 +56,7 @@ sealed trait IntList
   override def length: Int = {
     @tailrec def loop(xs: IntList, len: Int): Int = xs match {
       case IntCons(x, xs0) => loop(xs0, len + 1)
-      case IntNil => len
+      case IntNil          => len
     }
     loop(this, 0)
   }
@@ -73,7 +74,7 @@ sealed trait IntList
   override def reverse: IntList = {
     @tailrec def loop(xs: IntList, ys: IntList): IntList = xs match {
       case IntCons(x, xs0) => loop(xs0, x :: ys)
-      case IntNil => ys
+      case IntNil          => ys
     }
     loop(this, IntNil)
   }

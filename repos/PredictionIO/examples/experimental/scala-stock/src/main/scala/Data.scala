@@ -9,11 +9,12 @@ import org.saddle.index.IndexTime
 import com.github.nscala_time.time.Imports._
 import scala.collection.immutable.HashMap
 
-class RawData(val tickers: Array[String],
-              val mktTicker: String,
-              val timeIndex: Array[DateTime],
-              private[stock] val _price: Array[(String, Array[Double])],
-              private[stock] val _active: Array[(String, Array[Boolean])])
+class RawData(
+    val tickers: Array[String],
+    val mktTicker: String,
+    val timeIndex: Array[DateTime],
+    private[stock] val _price: Array[(String, Array[Double])],
+    private[stock] val _active: Array[(String, Array[Boolean])])
     extends Serializable {
 
   @transient lazy val _priceFrame: Frame[DateTime, String, Double] =
@@ -39,7 +40,10 @@ class RawData(val tickers: Array[String],
 // A data view of RawData from [idx - maxWindowSize + 1 : idx]
 // Notice that the last day is *inclusive*.
 // This clas takes the whole RawData reference, hence should *not* be serialized
-case class DataView(val rawData: RawData, val idx: Int, val maxWindowSize: Int) {
+case class DataView(
+    val rawData: RawData,
+    val idx: Int,
+    val maxWindowSize: Int) {
   def today(): DateTime = rawData.timeIndex(idx)
 
   val tickers = rawData.tickers
@@ -66,9 +70,10 @@ case class DataView(val rawData: RawData, val idx: Int, val maxWindowSize: Int) 
 }
 
 // Training data visible to the user is [untilIdx - windowSize, untilIdx).
-case class TrainingData(val untilIdx: Int,
-                        val maxWindowSize: Int,
-                        val rawDataB: Broadcast[RawData])
+case class TrainingData(
+    val untilIdx: Int,
+    val maxWindowSize: Int,
+    val rawDataB: Broadcast[RawData])
     extends Serializable {
 
   def view(): DataView = DataView(rawDataB.value, untilIdx - 1, maxWindowSize)
@@ -79,10 +84,11 @@ case class DataParams(val rawDataB: Broadcast[RawData]) extends Serializable
 // Date
 case class QueryDate(val idx: Int) extends Serializable {}
 
-case class Query(val idx: Int,
-                 val dataView: DataView,
-                 val tickers: Array[String],
-                 val mktTicker: String)
+case class Query(
+    val idx: Int,
+    val dataView: DataView,
+    val tickers: Array[String],
+    val mktTicker: String)
 
 // Prediction
 case class Prediction(val data: HashMap[String, Double]) extends Serializable {}
@@ -95,9 +101,9 @@ object SaddleWrapper {
     val index = IndexTime(timeIndex: _*)
     val seriesList = tickerPriceSeq.map {
       case (ticker, price) => {
-          val series = Series(Vec(price), index)
-          (ticker, series)
-        }
+        val series = Series(Vec(price), index)
+        (ticker, series)
+      }
     }
     Frame(seriesList: _*)
   }

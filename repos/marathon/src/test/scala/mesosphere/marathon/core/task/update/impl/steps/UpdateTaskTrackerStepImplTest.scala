@@ -14,7 +14,10 @@ import scala.concurrent.Future
 import MarathonTestHelper.Implicits._
 
 class UpdateTaskTrackerStepImplTest
-    extends FunSuite with Matchers with ScalaFutures with Mockito
+    extends FunSuite
+    with Matchers
+    with ScalaFutures
+    with Mockito
     with GivenWhenThen {
   test("name") {
     new Fixture().step.name should equal("updateTaskTracker")
@@ -27,15 +30,17 @@ class UpdateTaskTrackerStepImplTest
     val existingTask = runningMarathonTask
     val status =
       runningTaskStatus.toBuilder.setState(TaskState.TASK_RUNNING).build()
-    f.taskUpdater.statusUpdate(appId, status).asInstanceOf[Future[Unit]] returns Future
+    f.taskUpdater
+      .statusUpdate(appId, status)
+      .asInstanceOf[Future[Unit]] returns Future
       .successful(())
 
     When("processUpdate is called")
     f.step
       .processUpdate(
-          updateTimestamp,
-          existingTask,
-          status
+        updateTimestamp,
+        existingTask,
+        status
       )
       .futureValue
 
@@ -53,15 +58,17 @@ class UpdateTaskTrackerStepImplTest
     val existingTask = stagedMarathonTask
     val status =
       runningTaskStatus.toBuilder.setState(TaskState.TASK_RUNNING).build()
-    f.taskUpdater.statusUpdate(appId, status).asInstanceOf[Future[Unit]] returns Future
+    f.taskUpdater
+      .statusUpdate(appId, status)
+      .asInstanceOf[Future[Unit]] returns Future
       .failed(new RuntimeException("I'm broken"))
 
     When("processUpdate is called")
     val eventualFailure = f.step
       .processUpdate(
-          updateTimestamp,
-          existingTask,
-          status
+        updateTimestamp,
+        existingTask,
+        status
       )
       .failed
       .futureValue

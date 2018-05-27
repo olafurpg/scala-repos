@@ -9,7 +9,8 @@ import org.jetbrains.plugins.scala.codeInsight.template.util.MacroUtil
   */
 class ScalaPrimaryConstructorParamNamesMacro extends Macro {
   override def calculateResult(
-      params: Array[Expression], context: ExpressionContext): Result =
+      params: Array[Expression],
+      context: ExpressionContext): Result =
     Option(params.head.calculateResult(context).toString)
       .map(MacroUtil.paramPairs(_).map(_._1)) match {
       case Some(head :: tail) =>

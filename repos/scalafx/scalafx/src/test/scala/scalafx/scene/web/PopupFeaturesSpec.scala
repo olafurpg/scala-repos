@@ -42,7 +42,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class PopupFeaturesSpec
     extends SimpleSFXDelegateSpec[jfxsw.PopupFeatures, PopupFeatures](
-        classOf[jfxsw.PopupFeatures], classOf[PopupFeatures]) {
+      classOf[jfxsw.PopupFeatures],
+      classOf[PopupFeatures]) {
 
   override protected def getScalaClassInstance =
     new PopupFeatures(true, true, true, true)

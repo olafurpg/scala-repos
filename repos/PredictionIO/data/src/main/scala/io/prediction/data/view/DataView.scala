@@ -55,7 +55,7 @@ object DataView {
     * @return a DataFrame of events
     */
   @Experimental
-  def create[E <: Product : TypeTag : ClassTag](
+  def create[E <: Product: TypeTag: ClassTag](
       appName: String,
       channelName: Option[String] = None,
       startTime: Option[DateTime] = None,
@@ -70,11 +70,11 @@ object DataView {
 
     val beginTime = startTime match {
       case Some(t) => t
-      case None => new DateTime(0L)
+      case None    => new DateTime(0L)
     }
     val endTime = untilTime match {
       case Some(t) => t
-      case None => DateTime.now() // fix the current time
+      case None    => DateTime.now() // fix the current time
     }
     // detect changes to the case class
     val uid = java.io.ObjectStreamClass
@@ -90,10 +90,11 @@ object DataView {
         logger.info("Cached copy not found, reading from DB.")
         // if cached copy is found, use it. If not, grab from Storage
         val result: RDD[E] = PEventStore
-          .find(appName = appName,
-                channelName = channelName,
-                startTime = startTime,
-                untilTime = Some(endTime))(sc)
+          .find(
+            appName = appName,
+            channelName = channelName,
+            startTime = startTime,
+            untilTime = Some(endTime))(sc)
           .flatMap((e) => conversionFunction(e))
         import sqlContext.implicits._ // needed for RDD.toDF()
         val resultDF = result.toDF()
@@ -102,7 +103,8 @@ object DataView {
         sqlContext.parquetFile(fileName)
       case e: java.lang.RuntimeException =>
         if (e.toString.contains("is not a Parquet file")) {
-          logger.error(s"$fileName does not contain a valid Parquet file. " +
+          logger.error(
+            s"$fileName does not contain a valid Parquet file. " +
               "Please delete it and try again.")
         }
         throw e

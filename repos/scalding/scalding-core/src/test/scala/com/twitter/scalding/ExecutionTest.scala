@@ -58,7 +58,7 @@ object ExecutionTestJobs {
       .groupBy(_ % 3)
       .head
 
-      (source.mapValues(_ * 2) ++ (source.mapValues(_ * 3))).toIterableExecution
+    (source.mapValues(_ * 2) ++ (source.mapValues(_ * 3))).toIterableExecution
   }
 }
 
@@ -140,9 +140,12 @@ class ExecutionTest extends WordSpec with Matchers {
     }
     "If either fails, zip fails, else we get success" in {
       val neverHappens = Promise[Int]().future
-      Execution.fromFuture { _ =>
-        neverHappens
-      }.zip(Execution.failed(new Exception("oh no"))).shouldFail()
+      Execution
+        .fromFuture { _ =>
+          neverHappens
+        }
+        .zip(Execution.failed(new Exception("oh no")))
+        .shouldFail()
 
       Execution
         .failed(new Exception("oh no"))
@@ -152,34 +155,36 @@ class ExecutionTest extends WordSpec with Matchers {
         .shouldFail()
       // If both are good, we succeed:
       Execution.from(1).zip(Execution.from("1")).shouldSucceed() shouldBe
-      (1, "1")
+        (1, "1")
     }
 
     "Config transformer will isolate Configs" in {
       def doesNotHaveVariable(message: String) = Execution.getConfig.flatMap {
         cfg =>
           if (cfg.get("test.cfg.variable").isDefined)
-            Execution.failed(new Exception(
-                    s"${message}\n: var: ${cfg.get("test.cfg.variable")}"))
+            Execution.failed(
+              new Exception(
+                s"${message}\n: var: ${cfg.get("test.cfg.variable")}"))
           else Execution.from(())
       }
 
       val hasVariable = Execution.getConfig.flatMap { cfg =>
         if (cfg.get("test.cfg.variable").isEmpty)
           Execution.failed(
-              new Exception("Should see variable inside of transform"))
+            new Exception("Should see variable inside of transform"))
         else Execution.from(())
       }
 
       def addOption(cfg: Config) = cfg.+("test.cfg.variable", "dummyValue")
 
       doesNotHaveVariable(
-          "Should not see variable before we've started transforming").flatMap {
-        _ =>
+        "Should not see variable before we've started transforming")
+        .flatMap { _ =>
           Execution.withConfig(hasVariable)(addOption)
-      }.flatMap(_ =>
-              doesNotHaveVariable(
-                  "Should not see variable in flatMap's after the isolation"))
+        }
+        .flatMap(_ =>
+          doesNotHaveVariable(
+            "Should not see variable in flatMap's after the isolation"))
         .map(_ => true)
         .shouldSucceed() shouldBe true
     }
@@ -197,9 +202,13 @@ class ExecutionTest extends WordSpec with Matchers {
       def addOption(cfg: Config) = cfg.+("test.cfg.variable", "dummyValue")
 
       // Here we run without the option, with the option, and finally without again.
-      incrementor.flatMap { _ =>
-        Execution.withConfig(incrementor)(addOption)
-      }.flatMap(_ => incrementor).map(_ => true).shouldSucceed() shouldBe true
+      incrementor
+        .flatMap { _ =>
+          Execution.withConfig(incrementor)(addOption)
+        }
+        .flatMap(_ => incrementor)
+        .map(_ => true)
+        .shouldSucceed() shouldBe true
 
       assert(incrementIfDefined === 1)
       // We should evaluate once for the default config, and once for the modified config.
@@ -232,16 +241,18 @@ class ExecutionTest extends WordSpec with Matchers {
       def addOption(cfg: Config) = cfg.+("test.cfg.variable", "dummyValue")
 
       // Here we run without the option, with the option, and finally without again.
-      val (oldCounters, newCounters) = operationTP.flatMap { oc =>
-        writeNums(List(1, 2, 3, 4, 5, 6, 7))
-        Execution.withConfig(operationTP)(addOption).map { nc =>
-          (oc, nc)
+      val (oldCounters, newCounters) = operationTP
+        .flatMap { oc =>
+          writeNums(List(1, 2, 3, 4, 5, 6, 7))
+          Execution.withConfig(operationTP)(addOption).map { nc =>
+            (oc, nc)
+          }
         }
-      }.shouldSucceed()
+        .shouldSucceed()
 
       assert(
-          oldCounters != newCounters,
-          "With new configs given the source changed we shouldn't cache so the counters should be different")
+        oldCounters != newCounters,
+        "With new configs given the source changed we shouldn't cache so the counters should be different")
     }
   }
 
@@ -268,7 +279,9 @@ class ExecutionTest extends WordSpec with Matchers {
         .source(TextLine("in"), List((0, "hello world"), (1, "goodbye world")))
         .typedSink(TypedTsv[(String, Long)]("out")) { outBuf =>
           outBuf.toMap shouldBe Map(
-              "hello" -> 1L, "world" -> 2L, "goodbye" -> 1L)
+            "hello" -> 1L,
+            "world" -> 2L,
+            "goodbye" -> 1L)
         }
         .run
         .runHadoop
@@ -337,7 +350,7 @@ class ExecutionTest extends WordSpec with Matchers {
           assert(mos.uniqueId == "com.twitter.scalding.typed.MyCustomType")
         case _ =>
           sys.error(
-              "Ordered serialization should have been the MacroEqualityOrderedSerialization for this test")
+            "Ordered serialization should have been the MacroEqualityOrderedSerialization for this test")
       }
       def executionLoop(idx: Int): Execution[Unit] = {
         if (idx > 0) baseExecution(idx).flatMap(_ => executionLoop(idx - 1))
@@ -345,8 +358,9 @@ class ExecutionTest extends WordSpec with Matchers {
       }
 
       executionLoop(55).shouldSucceed()
-      assert(timesEvaluated == 55 * 1000,
-             "Should run the 55 execution loops for 1000 elements")
+      assert(
+        timesEvaluated == 55 * 1000,
+        "Should run the 55 execution loops for 1000 elements")
     }
 
     "evaluate shared portions just once, writeExecution" in {
@@ -367,8 +381,8 @@ class ExecutionTest extends WordSpec with Matchers {
 
       res.shouldSucceed()
       assert(
-          timesEvaluated == 1000,
-          "Should share the common sub section of the graph when we zip two write Executions")
+        timesEvaluated == 1000,
+        "Should share the common sub section of the graph when we zip two write Executions")
     }
 
     "evaluate shared portions just once, forceToDiskExecution" in {
@@ -389,8 +403,8 @@ class ExecutionTest extends WordSpec with Matchers {
 
       res.shouldSucceed()
       assert(
-          timesEvaluated == 1000,
-          "Should share the common sub section of the graph when we zip two write Executions")
+        timesEvaluated == 1000,
+        "Should share the common sub section of the graph when we zip two write Executions")
     }
 
     "evaluate shared portions just once, forceToDiskExecution with execution cache" in {
@@ -416,19 +430,19 @@ class ExecutionTest extends WordSpec with Matchers {
 
       res.shouldSucceed()
       assert(
-          timesEvaluated == 1000,
-          "Should share the common sub section of the graph when we zip two write Executions and then flatmap")
+        timesEvaluated == 1000,
+        "Should share the common sub section of the graph when we zip two write Executions and then flatmap")
     }
 
     "Ability to do isolated caches so we don't exhaust memory" in {
 
       def memoryWastingExecutionGenerator(id: Int): Execution[Array[Long]] =
         Execution.withNewCache(
-            Execution
-              .from(id)
-              .flatMap { idx =>
-            Execution.from(Array.fill(4000000)(idx.toLong))
-          })
+          Execution
+            .from(id)
+            .flatMap { idx =>
+              Execution.from(Array.fill(4000000)(idx.toLong))
+            })
 
       def writeAll(numExecutions: Int): Execution[Unit] = {
         if (numExecutions > 0) {
@@ -444,7 +458,8 @@ class ExecutionTest extends WordSpec with Matchers {
     }
     "handle failure" in {
       val result = Execution.withParallelism(
-          Seq(Execution.failed(new Exception("failed"))), 1)
+        Seq(Execution.failed(new Exception("failed"))),
+        1)
 
       assert(result.waitFor(Config.default, Local(true)).isFailure)
     }
@@ -492,7 +507,7 @@ class ExecutionTest extends WordSpec with Matchers {
       val result = Execution.withParallelism(executions, 1)
 
       assert(
-          result.waitFor(Config.default, Local(true)).get == 0.to(10).reverse)
+        result.waitFor(Config.default, Local(true)).get == 0.to(10).reverse)
     }
   }
 }

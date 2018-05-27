@@ -55,17 +55,15 @@ object GraphicsContext {
 class GraphicsContext(override val delegate: jfxsc.GraphicsContext)
     extends SFXDelegate[jfxsc.GraphicsContext] {
 
-  private def executeWithPoints(action: (Array[Double], Array[Double],
-                                Int) => Unit,
-                                points: Seq[(Double, Double)]) {
+  private def executeWithPoints(
+      action: (Array[Double], Array[Double], Int) => Unit,
+      points: Seq[(Double, Double)]) {
     val xPoints = new ArrayBuffer[Double](points.size)
     val yPoints = new ArrayBuffer[Double](points.size)
 
-    points.foreach(
-        p =>
-          {
-        xPoints += p._1
-        yPoints += p._2
+    points.foreach(p => {
+      xPoints += p._1
+      yPoints += p._2
     })
 
     action(xPoints.toArray, yPoints.toArray, points.size)
@@ -88,12 +86,13 @@ class GraphicsContext(override val delegate: jfxsc.GraphicsContext)
   /**
     * Adds path elements to the current path to make an arc that uses Euclidean degrees.
     */
-  def arc(centerX: Double,
-          centerY: Double,
-          radiusX: Double,
-          radiusY: Double,
-          startAngle: Double,
-          length: Double) {
+  def arc(
+      centerX: Double,
+      centerY: Double,
+      radiusX: Double,
+      radiusY: Double,
+      startAngle: Double,
+      length: Double) {
     delegate.arc(centerX, centerY, radiusX, radiusY, startAngle, length)
   }
 
@@ -114,12 +113,13 @@ class GraphicsContext(override val delegate: jfxsc.GraphicsContext)
   /**
     * Adds segments to the current path to make a cubic bezier curve.
     */
-  def bezierCurveTo(xc1: Double,
-                    yc1: Double,
-                    xc2: Double,
-                    yc2: Double,
-                    x1: Double,
-                    y1: Double) {
+  def bezierCurveTo(
+      xc1: Double,
+      yc1: Double,
+      xc2: Double,
+      yc2: Double,
+      x1: Double,
+      y1: Double) {
     delegate.bezierCurveTo(xc1, yc1, xc2, yc2, x1, y1)
   }
 
@@ -166,21 +166,22 @@ class GraphicsContext(override val delegate: jfxsc.GraphicsContext)
   /**
     * Draws the current source rectangle of the given image to the given destination rectangle of the Canvas.
     */
-  def drawImage(img: Image,
-                sx: Double,
-                sy: Double,
-                sw: Double,
-                sh: Double,
-                dx: Double,
-                dy: Double,
-                dw: Double,
-                dh: Double) {
+  def drawImage(
+      img: Image,
+      sx: Double,
+      sy: Double,
+      sw: Double,
+      sh: Double,
+      dx: Double,
+      dy: Double,
+      dw: Double,
+      dh: Double) {
     delegate.drawImage(img, sx, sy, sw, sh, dx, dy, dw, dh)
   }
 
   /*
-   * IMPLEMENTATION NOTE ABOUT EFFECT: Although there is a "getter" and a setter for Effect, the getEffect in JavaFX 
-   * class has a parameter (in this case the Effect to be used) I decided not to use the Scala pattern for getters and 
+   * IMPLEMENTATION NOTE ABOUT EFFECT: Although there is a "getter" and a setter for Effect, the getEffect in JavaFX
+   * class has a parameter (in this case the Effect to be used) I decided not to use the Scala pattern for getters and
    * setters.
    */
 
@@ -197,8 +198,8 @@ class GraphicsContext(override val delegate: jfxsc.GraphicsContext)
   }
 
   /*
-   * IMPLEMENTATION NOTE ABOUT FILL: In original JavaFX class there is a getter and setter for fill. However, there 
-   * is a method called fill(). Then, in order to use Scala pattern for getter and setter, the fill() method in JavaFX 
+   * IMPLEMENTATION NOTE ABOUT FILL: In original JavaFX class there is a getter and setter for fill. However, there
+   * is a method called fill(). Then, in order to use Scala pattern for getter and setter, the fill() method in JavaFX
    * class was renamed to fillPath.
    */
 
@@ -221,13 +222,14 @@ class GraphicsContext(override val delegate: jfxsc.GraphicsContext)
   /**
     * Fills an arc using the current fill paint.
     */
-  def fillArc(x: Double,
-              y: Double,
-              w: Double,
-              h: Double,
-              startAngle: Double,
-              arcExtent: Double,
-              closure: ArcType) {
+  def fillArc(
+      x: Double,
+      y: Double,
+      w: Double,
+      h: Double,
+      startAngle: Double,
+      arcExtent: Double,
+      closure: ArcType) {
     delegate.fillArc(x, y, w, h, startAngle, arcExtent, closure)
   }
 
@@ -242,7 +244,9 @@ class GraphicsContext(override val delegate: jfxsc.GraphicsContext)
     * Fills a polygon with the given points using the currently set fill paint.
     */
   def fillPolygon(
-      xPoints: Array[Double], yPoints: Array[Double], nPoints: Int) {
+      xPoints: Array[Double],
+      yPoints: Array[Double],
+      nPoints: Int) {
     delegate.fillPolygon(xPoints, yPoints, nPoints)
   }
 
@@ -263,12 +267,13 @@ class GraphicsContext(override val delegate: jfxsc.GraphicsContext)
   /**
     * Fills a rounded rectangle using the current fill paint.
     */
-  def fillRoundRect(x: Double,
-                    y: Double,
-                    w: Double,
-                    h: Double,
-                    arcWidth: Double,
-                    arcHeight: Double) {
+  def fillRoundRect(
+      x: Double,
+      y: Double,
+      w: Double,
+      h: Double,
+      arcWidth: Double,
+      arcHeight: Double) {
     delegate.fillRoundRect(x, y, w, h, arcWidth, arcHeight)
   }
 
@@ -437,13 +442,14 @@ class GraphicsContext(override val delegate: jfxsc.GraphicsContext)
   /**
     * Strokes an Arc using the current stroke paint.
     */
-  def strokeArc(x: Double,
-                y: Double,
-                w: Double,
-                h: Double,
-                startAngle: Double,
-                arcExtent: Double,
-                closure: ArcType) {
+  def strokeArc(
+      x: Double,
+      y: Double,
+      w: Double,
+      h: Double,
+      startAngle: Double,
+      arcExtent: Double,
+      closure: ArcType) {
     delegate.strokeArc(x, y, w, h, startAngle, arcExtent, closure)
   }
 
@@ -465,7 +471,9 @@ class GraphicsContext(override val delegate: jfxsc.GraphicsContext)
     * Strokes a polygon with the given points using the currently set stroke paint.
     */
   def strokePolygon(
-      xPoints: Array[Double], yPoints: Array[Double], nPoints: Int) {
+      xPoints: Array[Double],
+      yPoints: Array[Double],
+      nPoints: Int) {
     delegate.strokePolygon(xPoints, yPoints, nPoints)
   }
 
@@ -480,7 +488,9 @@ class GraphicsContext(override val delegate: jfxsc.GraphicsContext)
     * Draws a polyline with the given points using the currently set stroke paint attribute.
     */
   def strokePolyline(
-      xPoints: Array[Double], yPoints: Array[Double], nPoints: Int) {
+      xPoints: Array[Double],
+      yPoints: Array[Double],
+      nPoints: Int) {
     delegate.strokePolyline(xPoints, yPoints, nPoints)
   }
 
@@ -501,12 +511,13 @@ class GraphicsContext(override val delegate: jfxsc.GraphicsContext)
   /**
     * Strokes a rounded rectangle using the current stroke paint.
     */
-  def strokeRoundRect(x: Double,
-                      y: Double,
-                      w: Double,
-                      h: Double,
-                      arcWidth: Double,
-                      arcHeight: Double) {
+  def strokeRoundRect(
+      x: Double,
+      y: Double,
+      w: Double,
+      h: Double,
+      arcWidth: Double,
+      arcHeight: Double) {
     delegate.strokeRoundRect(x, y, w, h, arcWidth, arcHeight)
   }
 
@@ -542,8 +553,8 @@ class GraphicsContext(override val delegate: jfxsc.GraphicsContext)
 
   /*
    * IMPLEMENTATION NOTE ABOUT TRANSFORM: Although there is more than a getter and setter for Transform. Besides, one
-   * of getters has parameter (in this case the Effect to be used). Furthermore, there is two transform methods in 
-   * original class. So I decided not to use the Scala pattern for getters and setters. 
+   * of getters has parameter (in this case the Effect to be used). Furthermore, there is two transform methods in
+   * original class. So I decided not to use the Scala pattern for getters and setters.
    */
 
   /**
@@ -566,12 +577,13 @@ class GraphicsContext(override val delegate: jfxsc.GraphicsContext)
   /**
     * Sets the current transform.
     */
-  def setTransform(mxx: Double,
-                   myx: Double,
-                   mxy: Double,
-                   myy: Double,
-                   mxt: Double,
-                   myt: Double) {
+  def setTransform(
+      mxx: Double,
+      myx: Double,
+      mxy: Double,
+      myy: Double,
+      mxt: Double,
+      myt: Double) {
     delegate.setTransform(mxx, myx, mxy, myy, mxt, myt)
   }
 
@@ -585,12 +597,13 @@ class GraphicsContext(override val delegate: jfxsc.GraphicsContext)
   /**
     * Concatenates the input with the current transform.
     */
-  def transform(mxx: Double,
-                myx: Double,
-                mxy: Double,
-                myy: Double,
-                mxt: Double,
-                myt: Double) {
+  def transform(
+      mxx: Double,
+      myx: Double,
+      mxy: Double,
+      myy: Double,
+      mxt: Double,
+      myt: Double) {
     delegate.transform(mxx, myx, mxy, myy, mxt, myt)
   }
 

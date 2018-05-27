@@ -42,17 +42,17 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class ListSpinnerValueFactorySpec[Integer]
     extends SimpleSFXDelegateSpec[
-        jfxsc.SpinnerValueFactory.ListSpinnerValueFactory[Integer],
-        SpinnerValueFactory.ListSpinnerValueFactory[Integer]](
-        classOf[jfxsc.SpinnerValueFactory.ListSpinnerValueFactory[Integer]],
-        classOf[SpinnerValueFactory.ListSpinnerValueFactory[Integer]])
+      jfxsc.SpinnerValueFactory.ListSpinnerValueFactory[Integer],
+      SpinnerValueFactory.ListSpinnerValueFactory[Integer]](
+      classOf[jfxsc.SpinnerValueFactory.ListSpinnerValueFactory[Integer]],
+      classOf[SpinnerValueFactory.ListSpinnerValueFactory[Integer]])
     with RunOnApplicationThread {
 
   override protected def getScalaClassInstance =
     new SpinnerValueFactory.ListSpinnerValueFactory(
-        new ObservableBuffer[Integer]())
+      new ObservableBuffer[Integer]())
 
   override protected def getJavaClassInstance =
     new jfxsc.SpinnerValueFactory.ListSpinnerValueFactory(
-        new ObservableBuffer[Integer]())
+      new ObservableBuffer[Integer]())
 }

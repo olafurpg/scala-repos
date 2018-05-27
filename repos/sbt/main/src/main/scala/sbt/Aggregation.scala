@@ -15,19 +15,24 @@ import std.Transform.{DummyTaskMap, TaskAndValue}
 
 sealed trait Aggregation
 final object Aggregation {
-  final case class ShowConfig(settingValues: Boolean,
-                              taskValues: Boolean,
-                              print: String => Unit,
-                              success: Boolean)
+  final case class ShowConfig(
+      settingValues: Boolean,
+      taskValues: Boolean,
+      print: String => Unit,
+      success: Boolean)
   final case class Complete[T](
-      start: Long, stop: Long, results: Result[Seq[KeyValue[T]]], state: State)
+      start: Long,
+      stop: Long,
+      results: Result[Seq[KeyValue[T]]],
+      state: State)
   final case class KeyValue[+T](key: ScopedKey[_], value: T)
 
   def defaultShow(state: State, showTasks: Boolean): ShowConfig =
-    ShowConfig(settingValues = true,
-               taskValues = showTasks,
-               s => state.log.info(s),
-               success = true)
+    ShowConfig(
+      settingValues = true,
+      taskValues = showTasks,
+      s => state.log.info(s),
+      success = true)
   def printSettings(xs: Seq[KeyValue[_]], print: String => Unit)(
       implicit display: Show[ScopedKey[_]]) =
     xs match {
@@ -43,23 +48,25 @@ final object Aggregation {
   def seqParser[T](ps: Values[Parser[T]]): Parser[Seq[KeyValue[T]]] =
     seq(ps.map { case KeyValue(k, p) => p.map(v => KeyValue(k, v)) })
 
-  def applyTasks[T](s: State,
-                    structure: BuildStructure,
-                    ps: Values[Parser[Task[T]]],
-                    show: ShowConfig)(
+  def applyTasks[T](
+      s: State,
+      structure: BuildStructure,
+      ps: Values[Parser[Task[T]]],
+      show: ShowConfig)(
       implicit display: Show[ScopedKey[_]]): Parser[() => State] =
     Command.applyEffect(seqParser(ps)) { ts =>
       runTasks(s, structure, ts, DummyTaskMap(Nil), show)
     }
 
   @deprecated(
-      "Use `timedRun` and `showRun` directly or use `runTasks`.", "0.13.0")
-  def runTasksWithResult[T](s: State,
-                            structure: BuildStructure,
-                            ts: Values[Task[T]],
-                            extra: DummyTaskMap,
-                            show: ShowConfig)(
-      implicit display: Show[ScopedKey[_]])
+    "Use `timedRun` and `showRun` directly or use `runTasks`.",
+    "0.13.0")
+  def runTasksWithResult[T](
+      s: State,
+      structure: BuildStructure,
+      ts: Values[Task[T]],
+      extra: DummyTaskMap,
+      show: ShowConfig)(implicit display: Show[ScopedKey[_]])
     : (State, Result[Seq[KeyValue[T]]]) = {
     val complete = timedRun[T](s, ts, extra)
     showRun(complete, show)
@@ -77,7 +84,9 @@ final object Aggregation {
     if (show.success) printSuccess(start, stop, extracted, success, log)
   }
   def timedRun[T](
-      s: State, ts: Values[Task[T]], extra: DummyTaskMap): Complete[T] = {
+      s: State,
+      ts: Values[Task[T]],
+      extra: DummyTaskMap): Complete[T] = {
     import EvaluateTask._
     import std.TaskExtra._
 
@@ -96,67 +105,70 @@ final object Aggregation {
     Complete(start, stop, result, newS)
   }
 
-  def runTasks[HL <: HList, T](s: State,
-                               structure: BuildStructure,
-                               ts: Values[Task[T]],
-                               extra: DummyTaskMap,
-                               show: ShowConfig)(
-      implicit display: Show[ScopedKey[_]]): State = {
+  def runTasks[HL <: HList, T](
+      s: State,
+      structure: BuildStructure,
+      ts: Values[Task[T]],
+      extra: DummyTaskMap,
+      show: ShowConfig)(implicit display: Show[ScopedKey[_]]): State = {
     val complete = timedRun[T](s, ts, extra)
     showRun(complete, show)
     complete.results match {
-      case Inc(i) => complete.state.handleError(i)
+      case Inc(i)   => complete.state.handleError(i)
       case Value(_) => complete.state
     }
   }
 
-  def printSuccess(start: Long,
-                   stop: Long,
-                   extracted: Extracted,
-                   success: Boolean,
-                   log: Logger): Unit = {
+  def printSuccess(
+      start: Long,
+      stop: Long,
+      extracted: Extracted,
+      success: Boolean,
+      log: Logger): Unit = {
     import extracted._
     def get(key: SettingKey[Boolean]): Boolean =
       key in currentRef get structure.data getOrElse true
     if (get(showSuccess)) {
       if (get(showTiming)) {
-        val msg = timingString(
-            start, stop, "", structure.data, currentRef, log)
+        val msg = timingString(start, stop, "", structure.data, currentRef, log)
         if (success) log.success(msg) else log.error(msg)
       } else if (success) log.success("")
     }
   }
-  private def timingString(startTime: Long,
-                           endTime: Long,
-                           s: String,
-                           data: Settings[Scope],
-                           currentRef: ProjectRef,
-                           log: Logger): String = {
+  private def timingString(
+      startTime: Long,
+      endTime: Long,
+      s: String,
+      data: Settings[Scope],
+      currentRef: ProjectRef,
+      log: Logger): String = {
     val format = timingFormat in currentRef get data getOrElse defaultFormat
     timing(format, startTime, endTime, "", log)
   }
-  def timing(format: java.text.DateFormat,
-             startTime: Long,
-             endTime: Long,
-             s: String,
-             log: Logger): String = {
+  def timing(
+      format: java.text.DateFormat,
+      startTime: Long,
+      endTime: Long,
+      s: String,
+      log: Logger): String = {
     val ss = if (s.isEmpty) "" else s + " "
     val nowString = format.format(new java.util.Date(endTime))
     "Total " + ss + "time: " + (endTime - startTime + 500) / 1000 +
-    " s, completed " + nowString
+      " s, completed " + nowString
   }
   def defaultFormat = {
     import java.text.DateFormat
     DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM)
   }
 
-  def applyDynamicTasks[I](s: State,
-                           structure: BuildStructure,
-                           inputs: Values[InputTask[I]],
-                           show: ShowConfig)(
+  def applyDynamicTasks[I](
+      s: State,
+      structure: BuildStructure,
+      inputs: Values[InputTask[I]],
+      show: ShowConfig)(
       implicit display: Show[ScopedKey[_]]): Parser[() => State] = {
-    val parsers = for (KeyValue(k, it) <- inputs) yield
-      it.parser(s).map(v => KeyValue(k, v))
+    val parsers = for (KeyValue(k, it) <- inputs)
+      yield it.parser(s).map(v => KeyValue(k, v))
     Command.applyEffect(seq(parsers)) { roots =>
       import EvaluateTask._
       runTasks(s, structure, roots, DummyTaskMap(Nil), show)
@@ -177,11 +189,11 @@ final object Aggregation {
     else {
       val (inputTasks, other) = separate[InputTask[_]](kvs) {
         case KeyValue(k, v: InputTask[_]) => Left(KeyValue(k, v))
-        case kv => Right(kv)
+        case kv                           => Right(kv)
       }
       val (tasks, settings) = separate[Task[_]](other) {
         case KeyValue(k, v: Task[_]) => Left(KeyValue(k, v))
-        case kv => Right(kv)
+        case kv                      => Right(kv)
       }
       // currently, disallow input tasks to be mixed with normal tasks.
       // This occurs in `all` or `show`, which support multiple tasks.
@@ -197,7 +209,7 @@ final object Aggregation {
           val otherStrings =
             other.map(_.key).mkString("Task(s)/setting(s):\n\t", "\n\t", "\n")
           failure(
-              s"Cannot mix input tasks with plain tasks/settings.  $inputStrings $otherStrings")
+            s"Cannot mix input tasks with plain tasks/settings.  $inputStrings $otherStrings")
         } else
           applyDynamicTasks(s, structure, maps(inputTasks)(castToAny), show)
       } else {
@@ -205,7 +217,10 @@ final object Aggregation {
           if (tasks.isEmpty) success(() => s)
           else
             applyTasks(
-                s, structure, maps(tasks)(x => success(castToAny(x))), show)
+              s,
+              structure,
+              maps(tasks)(x => success(castToAny(x))),
+              show)
         base.map { res => () =>
           val newState = res()
           if (show.settingValues && settings.nonEmpty)
@@ -221,19 +236,22 @@ final object Aggregation {
   private[this] def maps[T, S](vs: Values[T])(f: T => S): Values[S] =
     vs map { case KeyValue(k, v) => KeyValue(k, f(v)) }
 
-  def projectAggregates[Proj](proj: Option[Reference],
-                              extra: BuildUtil[Proj],
-                              reverse: Boolean): Seq[ProjectRef] = {
+  def projectAggregates[Proj](
+      proj: Option[Reference],
+      extra: BuildUtil[Proj],
+      reverse: Boolean): Seq[ProjectRef] = {
     val resRef = proj.map(p => extra.projectRefFor(extra.resolveRef(p)))
-    resRef.toList.flatMap(ref =>
-          if (reverse) extra.aggregates.reverse(ref)
-          else extra.aggregates.forward(ref))
+    resRef.toList.flatMap(
+      ref =>
+        if (reverse) extra.aggregates.reverse(ref)
+        else extra.aggregates.forward(ref))
   }
 
-  def aggregate[T, Proj](key: ScopedKey[T],
-                         rawMask: ScopeMask,
-                         extra: BuildUtil[Proj],
-                         reverse: Boolean = false): Seq[ScopedKey[T]] = {
+  def aggregate[T, Proj](
+      key: ScopedKey[T],
+      rawMask: ScopeMask,
+      extra: BuildUtil[Proj],
+      reverse: Boolean = false): Seq[ScopedKey[T]] = {
     val mask = rawMask.copy(project = true)
     Dag.topologicalSort(key) { k =>
       if (reverse) reverseAggregatedKeys(k, extra, mask)
@@ -242,9 +260,10 @@ final object Aggregation {
       else Nil
     }
   }
-  def reverseAggregatedKeys[T](key: ScopedKey[T],
-                               extra: BuildUtil[_],
-                               mask: ScopeMask): Seq[ScopedKey[T]] =
+  def reverseAggregatedKeys[T](
+      key: ScopedKey[T],
+      extra: BuildUtil[_],
+      mask: ScopeMask): Seq[ScopedKey[T]] =
     projectAggregates(key.scope.project.toOption, extra, reverse = true) flatMap {
       ref =>
         val toResolve = key.scope.copy(project = Select(ref))
@@ -253,9 +272,10 @@ final object Aggregation {
         if (aggregationEnabled(skey, extra.data)) skey :: Nil else Nil
     }
 
-  def aggregatedKeys[T](key: ScopedKey[T],
-                        extra: BuildUtil[_],
-                        mask: ScopeMask): Seq[ScopedKey[T]] =
+  def aggregatedKeys[T](
+      key: ScopedKey[T],
+      extra: BuildUtil[_],
+      mask: ScopeMask): Seq[ScopedKey[T]] =
     projectAggregates(key.scope.project.toOption, extra, reverse = false) map {
       ref =>
         val toResolve = key.scope.copy(project = Select(ref))

@@ -22,11 +22,11 @@ object MinMembersBeforeUpMultiJvmSpec extends MultiNodeConfig {
   val third = role("third")
 
   commonConfig(
-      debugConfig(on = false)
-        .withFallback(
-            ConfigFactory.parseString("akka.cluster.min-nr-of-members = 3"))
-        .withFallback(
-            MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet))
+    debugConfig(on = false)
+      .withFallback(
+        ConfigFactory.parseString("akka.cluster.min-nr-of-members = 3"))
+      .withFallback(
+        MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet))
 }
 
 object MinMembersBeforeUpWithWeaklyUpMultiJvmSpec extends MultiNodeConfig {
@@ -35,12 +35,13 @@ object MinMembersBeforeUpWithWeaklyUpMultiJvmSpec extends MultiNodeConfig {
   val third = role("third")
 
   commonConfig(
-      debugConfig(on = false)
-        .withFallback(ConfigFactory.parseString("""
+    debugConfig(on = false)
+      .withFallback(
+        ConfigFactory.parseString("""
       akka.cluster.min-nr-of-members = 3
       akka.cluster.allow-weakly-up-members = on"""))
-        .withFallback(
-            MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet))
+      .withFallback(
+        MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet))
 }
 
 object MinMembersOfRoleBeforeUpMultiJvmSpec extends MultiNodeConfig {
@@ -49,36 +50,29 @@ object MinMembersOfRoleBeforeUpMultiJvmSpec extends MultiNodeConfig {
   val third = role("third")
 
   commonConfig(
-      debugConfig(on = false)
-        .withFallback(ConfigFactory.parseString(
-                "akka.cluster.role.backend.min-nr-of-members = 2"))
-        .withFallback(
-            MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet))
+    debugConfig(on = false)
+      .withFallback(ConfigFactory.parseString(
+        "akka.cluster.role.backend.min-nr-of-members = 2"))
+      .withFallback(
+        MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet))
 
-  nodeConfig(first)(
-      ConfigFactory.parseString("akka.cluster.roles =[frontend]"))
+  nodeConfig(first)(ConfigFactory.parseString("akka.cluster.roles =[frontend]"))
 
   nodeConfig(second, third)(
-      ConfigFactory.parseString("akka.cluster.roles =[backend]"))
+    ConfigFactory.parseString("akka.cluster.roles =[backend]"))
 }
 
 class MinMembersBeforeUpMultiJvmNode1 extends MinMembersBeforeUpSpec
 class MinMembersBeforeUpMultiJvmNode2 extends MinMembersBeforeUpSpec
 class MinMembersBeforeUpMultiJvmNode3 extends MinMembersBeforeUpSpec
 
-class MinMembersBeforeUpWithWeaklyUpMultiJvmNode1
-    extends MinMembersBeforeUpSpec
-class MinMembersBeforeUpWithWeaklyUpMultiJvmNode2
-    extends MinMembersBeforeUpSpec
-class MinMembersBeforeUpWithWeaklyUpMultiJvmNode3
-    extends MinMembersBeforeUpSpec
+class MinMembersBeforeUpWithWeaklyUpMultiJvmNode1 extends MinMembersBeforeUpSpec
+class MinMembersBeforeUpWithWeaklyUpMultiJvmNode2 extends MinMembersBeforeUpSpec
+class MinMembersBeforeUpWithWeaklyUpMultiJvmNode3 extends MinMembersBeforeUpSpec
 
-class MinMembersOfRoleBeforeUpMultiJvmNode1
-    extends MinMembersOfRoleBeforeUpSpec
-class MinMembersOfRoleBeforeUpMultiJvmNode2
-    extends MinMembersOfRoleBeforeUpSpec
-class MinMembersOfRoleBeforeUpMultiJvmNode3
-    extends MinMembersOfRoleBeforeUpSpec
+class MinMembersOfRoleBeforeUpMultiJvmNode1 extends MinMembersOfRoleBeforeUpSpec
+class MinMembersOfRoleBeforeUpMultiJvmNode2 extends MinMembersOfRoleBeforeUpSpec
+class MinMembersOfRoleBeforeUpMultiJvmNode3 extends MinMembersOfRoleBeforeUpSpec
 
 abstract class MinMembersBeforeUpSpec
     extends MinMembersBeforeUpBase(MinMembersBeforeUpMultiJvmSpec) {
@@ -126,7 +120,8 @@ abstract class MinMembersOfRoleBeforeUpSpec
 }
 
 abstract class MinMembersBeforeUpBase(multiNodeConfig: MultiNodeConfig)
-    extends MultiNodeSpec(multiNodeConfig) with MultiNodeClusterSpec {
+    extends MultiNodeSpec(multiNodeConfig)
+    with MultiNodeClusterSpec {
 
   import ClusterEvent._
 

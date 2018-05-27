@@ -286,8 +286,7 @@ trait DecorateAsJava {
     * @return An object with an `asJava` method that returns a Java `Map` view
     *         of the argument.
     */
-  implicit def mapAsJavaMapConverter[A, B](
-      m: Map[A, B]): AsJava[ju.Map[A, B]] =
+  implicit def mapAsJavaMapConverter[A, B](m: Map[A, B]): AsJava[ju.Map[A, B]] =
     new AsJava(mapAsJavaMap(m))
 
   /**

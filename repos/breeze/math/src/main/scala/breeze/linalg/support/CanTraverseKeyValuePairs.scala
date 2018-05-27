@@ -39,11 +39,12 @@ object CanTraverseKeyValuePairs {
     def visitArray(indices: Int => K, arr: Array[A]): Unit =
       visitArray(indices, arr, 0, arr.length, 1)
 
-    def visitArray(indices: Int => K,
-                   arr: Array[A],
-                   offset: Int,
-                   length: Int,
-                   stride: Int): Unit = {
+    def visitArray(
+        indices: Int => K,
+        arr: Array[A],
+        offset: Int,
+        length: Int,
+        stride: Int): Unit = {
       var i = 0
       while (i < length) {
         visit(indices(i * stride + offset), arr(i * stride + offset))

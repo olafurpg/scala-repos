@@ -46,8 +46,9 @@ object CullFace extends SFXEnumDelegateCompanion[jfxss.CullFace, CullFace] {
     *
     * All back-faces, identified by clockwise vertex winding, will be culled.
     */
-  @deprecated("Use Back instead; BACK will be removed in a future release.",
-              "8.0.0-M4")
+  @deprecated(
+    "Use Back instead; BACK will be removed in a future release.",
+    "8.0.0-M4")
   val BACK = Back
 
   /**
@@ -62,8 +63,9 @@ object CullFace extends SFXEnumDelegateCompanion[jfxss.CullFace, CullFace] {
     *
     * All front-faces, identified by counterclockwise vertex winding, will be culled.
     */
-  @deprecated("Use Front instead; FRONT will be removed in a future release.",
-              "8.0.0-M4")
+  @deprecated(
+    "Use Front instead; FRONT will be removed in a future release.",
+    "8.0.0-M4")
   val FRONT = Front
 
   /**
@@ -74,8 +76,9 @@ object CullFace extends SFXEnumDelegateCompanion[jfxss.CullFace, CullFace] {
   /**
     * Perform no face culling.
     */
-  @deprecated("Use None instead; NONE will be removed in a future release.",
-              "8.0.0-M4")
+  @deprecated(
+    "Use None instead; NONE will be removed in a future release.",
+    "8.0.0-M4")
   val NONE = None
 
   protected override def unsortedValues: Array[CullFace] =

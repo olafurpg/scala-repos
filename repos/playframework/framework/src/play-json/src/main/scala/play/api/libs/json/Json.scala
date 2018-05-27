@@ -155,7 +155,7 @@ object Json {
 
   def obj(fields: (String, JsValueWrapper)*): JsObject =
     JsObject(
-        fields.map(f => (f._1, f._2.asInstanceOf[JsValueWrapperImpl].field)))
+      fields.map(f => (f._1, f._2.asInstanceOf[JsValueWrapperImpl].field)))
   def arr(fields: JsValueWrapper*): JsArray =
     JsArray(fields.map(_.asInstanceOf[JsValueWrapperImpl].field))
 
@@ -169,7 +169,7 @@ object Json {
     * }}}
     */
   @deprecated("Use Enumeratee.map[A](Json.toJson(_)) instead", "2.5.0")
-  def toJson[A : Writes]: Enumeratee[A, JsValue] =
+  def toJson[A: Writes]: Enumeratee[A, JsValue] =
     Enumeratee.map[A](Json.toJson(_))
 
   /**
@@ -180,9 +180,10 @@ object Json {
     * }}}
     */
   @deprecated(
-      "Use Enumeratee.map[JsValue]((json: JsValue) => Json.fromJson(json)) ><> Enumeratee.collect[JsResult[A]] { case JsSuccess(value, _) => value } instead",
-      "2.5.0")
-  def fromJson[A : Reads]: Enumeratee[JsValue, A] =
+    "Use Enumeratee.map[JsValue]((json: JsValue) => Json.fromJson(json)) ><> Enumeratee.collect[JsResult[A]] { case JsSuccess(value, _) => value } instead",
+    "2.5.0"
+  )
+  def fromJson[A: Reads]: Enumeratee[JsValue, A] =
     Enumeratee.map[JsValue]((json: JsValue) => Json.fromJson(json)) ><> Enumeratee
       .collect[JsResult[A]] { case JsSuccess(value, _) => value }
 

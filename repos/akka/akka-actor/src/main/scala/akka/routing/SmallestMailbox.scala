@@ -31,7 +31,8 @@ object SmallestMailboxRoutingLogic {
 @SerialVersionUID(1L)
 class SmallestMailboxRoutingLogic extends RoutingLogic {
   override def select(
-      message: Any, routees: immutable.IndexedSeq[Routee]): Routee =
+      message: Any,
+      routees: immutable.IndexedSeq[Routee]): Routee =
     if (routees.isEmpty) NoRoutee
     else selectNext(routees)
 
@@ -46,11 +47,12 @@ class SmallestMailboxRoutingLogic extends RoutingLogic {
   // 4. An ActorRef with unknown mailbox size that isn't processing anything
   // 5. An ActorRef with a known mailbox size
   // 6. An ActorRef without any messages
-  @tailrec private def selectNext(targets: immutable.IndexedSeq[Routee],
-                                  proposedTarget: Routee = NoRoutee,
-                                  currentScore: Long = Long.MaxValue,
-                                  at: Int = 0,
-                                  deep: Boolean = false): Routee = {
+  @tailrec private def selectNext(
+      targets: immutable.IndexedSeq[Routee],
+      proposedTarget: Routee = NoRoutee,
+      currentScore: Long = Long.MaxValue,
+      at: Int = 0,
+      deep: Boolean = false): Routee = {
     if (targets.isEmpty) NoRoutee
     else if (at >= targets.size) {
       if (deep) {
@@ -65,12 +67,12 @@ class SmallestMailboxRoutingLogic extends RoutingLogic {
         else {
           //Just about better than the DeadLetters
           (if (isProcessingMessage(target)) 1l else 0l) +
-          (if (!hasMessages(target)) 0l
-           else {
-             //Race between hasMessages and numberOfMessages here, unfortunate the numberOfMessages returns 0 if unknown
-             val noOfMsgs: Long = if (deep) numberOfMessages(target) else 0
-             if (noOfMsgs > 0) noOfMsgs else Long.MaxValue - 3 //Just better than a suspended actorref
-           })
+            (if (!hasMessages(target)) 0l
+             else {
+               //Race between hasMessages and numberOfMessages here, unfortunate the numberOfMessages returns 0 if unknown
+               val noOfMsgs: Long = if (deep) numberOfMessages(target) else 0
+               if (noOfMsgs > 0) noOfMsgs else Long.MaxValue - 3 //Just better than a suspended actorref
+             })
         }
 
       if (newScore == 0) target
@@ -182,15 +184,18 @@ class SmallestMailboxRoutingLogic extends RoutingLogic {
 final case class SmallestMailboxPool(
     override val nrOfInstances: Int,
     override val resizer: Option[Resizer] = None,
-    override val supervisorStrategy: SupervisorStrategy = Pool.defaultSupervisorStrategy,
+    override val supervisorStrategy: SupervisorStrategy =
+      Pool.defaultSupervisorStrategy,
     override val routerDispatcher: String = Dispatchers.DefaultDispatcherId,
     override val usePoolDispatcher: Boolean = false)
-    extends Pool with PoolOverrideUnsetConfig[SmallestMailboxPool] {
+    extends Pool
+    with PoolOverrideUnsetConfig[SmallestMailboxPool] {
 
   def this(config: Config) =
-    this(nrOfInstances = config.getInt("nr-of-instances"),
-         resizer = Resizer.fromConfig(config),
-         usePoolDispatcher = config.hasPath("pool-dispatcher"))
+    this(
+      nrOfInstances = config.getInt("nr-of-instances"),
+      resizer = Resizer.fromConfig(config),
+      usePoolDispatcher = config.hasPath("pool-dispatcher"))
 
   /**
     * Java API

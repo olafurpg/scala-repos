@@ -50,7 +50,9 @@ import xml.{Text, NodeSeq}
   * @param scale Controls the scale of the underlying BigDecimal
   */
 abstract class MappedDecimal[T <: Mapper[T]](
-    val fieldOwner: T, val context: MathContext, val scale: Int)
+    val fieldOwner: T,
+    val context: MathContext,
+    val scale: Int)
     extends MappedField[BigDecimal, T] {
 
   /**
@@ -101,42 +103,46 @@ abstract class MappedDecimal[T <: Mapper[T]](
     * @return the source field metadata for the field
     */
   def sourceInfoMetadata(): SourceFieldMetadata { type ST = BigDecimal } =
-    SourceFieldMetadataRep(name, manifest, new FieldConverter {
+    SourceFieldMetadataRep(
+      name,
+      manifest,
+      new FieldConverter {
 
-      /**
-        * The type of the field
-        */
-      type T = BigDecimal
+        /**
+          * The type of the field
+          */
+        type T = BigDecimal
 
-      /**
-        * Convert the field to a String
-        * @param v the field value
-        * @return the string representation of the field value
-        */
-      def asString(v: T): String = v.toString()
+        /**
+          * Convert the field to a String
+          * @param v the field value
+          * @return the string representation of the field value
+          */
+        def asString(v: T): String = v.toString()
 
-      /**
-        * Convert the field into NodeSeq, if possible
-        * @param v the field value
-        * @return a NodeSeq if the field can be represented as one
-        */
-      def asNodeSeq(v: T): Box[NodeSeq] = Full(Text(asString(v)))
+        /**
+          * Convert the field into NodeSeq, if possible
+          * @param v the field value
+          * @return a NodeSeq if the field can be represented as one
+          */
+        def asNodeSeq(v: T): Box[NodeSeq] = Full(Text(asString(v)))
 
-      /**
-        * Convert the field into a JSON value
-        * @param v the field value
-        * @return the JSON representation of the field
-        */
-      def asJson(v: T): Box[JValue] = Full(JDouble(v.toDouble))
+        /**
+          * Convert the field into a JSON value
+          * @param v the field value
+          * @return the JSON representation of the field
+          */
+        def asJson(v: T): Box[JValue] = Full(JDouble(v.toDouble))
 
-      /**
-        * If the field can represent a sequence of SourceFields,
-        * get that
-        * @param v the field value
-        * @return the field as a sequence of SourceFields
-        */
-      def asSeq(v: T): Box[Seq[SourceFieldInfo]] = Empty
-    })
+        /**
+          * If the field can represent a sequence of SourceFields,
+          * get that
+          * @param v the field value
+          * @return the field as a sequence of SourceFields
+          */
+        def asSeq(v: T): Box[Seq[SourceFieldInfo]] = Empty
+      }
+    )
 
   protected def i_is_! = data
   protected def i_was_! = orgData
@@ -166,12 +172,12 @@ abstract class MappedDecimal[T <: Mapper[T]](
       // FIXME set for big decimal
       // case JsonAST.JDouble(db) => MappedDecimal.this.setAll(java.math.BigDecimal.valueOf(db))
       // case JsonAST.JInt(bi) => MappedDecimal.this.set(new java.math.BigDecimal(bi.bigInteger))
-      case bd: BigDecimal => setAll(bd)
-      case n :: _ => setFromString(n.toString)
-      case Some(n) => setFromString(n.toString)
-      case Full(n) => setFromString(n.toString)
+      case bd: BigDecimal                         => setAll(bd)
+      case n :: _                                 => setFromString(n.toString)
+      case Some(n)                                => setFromString(n.toString)
+      case Full(n)                                => setFromString(n.toString)
       case None | Empty | Failure(_, _, _) | null => setFromString("0")
-      case n => setFromString(n.toString)
+      case n                                      => setFromString(n.toString)
     }
 
   def setFromString(in: String): BigDecimal = {
@@ -193,20 +199,23 @@ abstract class MappedDecimal[T <: Mapper[T]](
   def real_convertToJDBCFriendly(value: BigDecimal): Object = value.bigDecimal
 
   def buildSetBooleanValue(
-      accessor: Method, columnName: String): (T, Boolean, Boolean) => Unit =
+      accessor: Method,
+      columnName: String): (T, Boolean, Boolean) => Unit =
     null
 
   def buildSetDateValue(
-      accessor: Method, columnName: String): (T, Date) => Unit =
+      accessor: Method,
+      columnName: String): (T, Date) => Unit =
     (inst, v) =>
       doField(inst, accessor, {
         case f: MappedDecimal[T] =>
           f.wholeSet(
-              if (v == null) defaultValue else coerce(BigDecimal(v.getTime)))
+            if (v == null) defaultValue else coerce(BigDecimal(v.getTime)))
       })
 
   def buildSetStringValue(
-      accessor: Method, columnName: String): (T, String) => Unit =
+      accessor: Method,
+      columnName: String): (T, String) => Unit =
     (inst, v) =>
       doField(inst, accessor, {
         case f: MappedDecimal[T] =>
@@ -214,21 +223,23 @@ abstract class MappedDecimal[T <: Mapper[T]](
       })
 
   def buildSetLongValue(
-      accessor: Method, columnName: String): (T, Long, Boolean) => Unit =
+      accessor: Method,
+      columnName: String): (T, Long, Boolean) => Unit =
     (inst, v, isNull) =>
       doField(inst, accessor, {
         case f: MappedDecimal[T] =>
           f.wholeSet(if (isNull) defaultValue else coerce(BigDecimal(v)))
       })
 
-  def buildSetActualValue(accessor: Method,
-                          data: AnyRef,
-                          columnName: String): (T, AnyRef) => Unit =
+  def buildSetActualValue(
+      accessor: Method,
+      data: AnyRef,
+      columnName: String): (T, AnyRef) => Unit =
     (inst, v) =>
       doField(inst, accessor, {
         case f: MappedDecimal[T] =>
           f.wholeSet(
-              if (v == null) defaultValue else coerce(BigDecimal(v.toString)))
+            if (v == null) defaultValue else coerce(BigDecimal(v.toString)))
       })
 
   /**

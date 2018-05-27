@@ -89,7 +89,7 @@ class SprayJsonExampleSpec extends WordSpec with Matchers {
 
               onSuccess(maybeItem) {
                 case Some(item) => complete(item)
-                case None => complete(StatusCodes.NotFound)
+                case None       => complete(StatusCodes.NotFound)
               }
             }
           } ~ post {

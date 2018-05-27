@@ -3,8 +3,9 @@ object Geom {
   case class Point(x: Int, y: Int) extends Shape
   case class Rectangle(ll: Point, ur: Point) extends Shape {
     def inset(delta: Int) =
-      Rectangle(Point(ll.x - delta, ll.y - delta),
-                Point(ur.x + delta, ur.y + delta));
+      Rectangle(
+        Point(ll.x - delta, ll.y - delta),
+        Point(ur.x + delta, ur.y + delta));
   }
 }
 
@@ -57,7 +58,8 @@ object GUI {
   }
 
   abstract class Button(scr: Screen, p: Geom.Point, name: String)
-      extends Glyph with MouseCtl {
+      extends Glyph
+      with MouseCtl {
     var enabled: Boolean = false
     val label = new Label(scr, p, name)
 

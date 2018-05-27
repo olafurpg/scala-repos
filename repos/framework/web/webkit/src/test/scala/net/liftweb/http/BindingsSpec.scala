@@ -35,11 +35,11 @@ object BindingsSpec extends Specification with XmlMatchers {
   /*
   trait MyClassBinding extends DataBinding[MyClass] {
     implicit val otherBinding: DataBinding[MyOtherClass]
-  
+
     override def apply(entity: MyClass) = (xhtml: NodeSeq) => {
       val otherTemplate = chooseTemplate("myclass", "other", xhtml)
       bind(
-        "myclass", xhtml, 
+        "myclass", xhtml,
         "str" -> Text("#" + entity.str + "#"),
         "i" -> Text(entity.i.toString),
         "other" -> entity.other.bind(otherTemplate)
@@ -47,13 +47,13 @@ object BindingsSpec extends Specification with XmlMatchers {
     }
   }
 
-  
+
   object myOtherClassBinding extends DataBinding[MyOtherClass] {
     override def apply(other: MyOtherClass) = (xhtml: NodeSeq) => {
       bind("other", xhtml, "foo" -> Text("%" + other.foo + "%"))
     }
   }
-  
+
   implicit object MyClassConcreteBinding extends MyClassBinding {
     override val otherBinding = myOtherClassBinding
   }

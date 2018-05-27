@@ -39,7 +39,7 @@ trait EitherPicklers {
     new AbstractPickler[Either[L, R]] {
       override def pickle(picklee: Either[L, R], builder: PBuilder): Unit = {
         picklee match {
-          case l: Left[L, R] => lp.pickle(l, builder)
+          case l: Left[L, R]  => lp.pickle(l, builder)
           case r: Right[L, R] => rp.pickle(r, builder)
         }
       }

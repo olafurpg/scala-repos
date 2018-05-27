@@ -45,13 +45,13 @@ package object array {
   /**
     * Create a new initialized empty array
     */
-  def empty[@spec(Boolean, Int, Long, Double) T : ST](len: Int): Array[T] =
+  def empty[@spec(Boolean, Int, Long, Double) T: ST](len: Int): Array[T] =
     Array.ofDim[T](len)
 
   /**
     * Return a uniform random permutation of the array
     */
-  def shuffle[@spec(Boolean, Int, Long, Double) T : ST](
+  def shuffle[@spec(Boolean, Int, Long, Double) T: ST](
       arr: Array[T]): Array[T] = {
     var i = 0
     val sz = arr.length
@@ -71,8 +71,9 @@ package object array {
   /**
     * Repeat elements of the array some number of times
     */
-  def tile[@spec(Boolean, Int, Long, Double) T : ST](
-      arr: Array[T], n: Int): Array[T] = {
+  def tile[@spec(Boolean, Int, Long, Double) T: ST](
+      arr: Array[T],
+      n: Int): Array[T] = {
     require(n >= 0, "n must not be negative")
     val sz = arr.length * n
     val res = empty[T](sz)
@@ -213,8 +214,10 @@ package object array {
     *   take(Array(5,6,7), Array(2,0,1), -1) == Array(7,5,6)
     * }}}
     */
-  def take[@spec(Boolean, Int, Long, Double) T : ST](
-      arr: Array[T], offsets: Array[Int], missing: => T): Array[T] = {
+  def take[@spec(Boolean, Int, Long, Double) T: ST](
+      arr: Array[T],
+      offsets: Array[Int],
+      missing: => T): Array[T] = {
     val res = empty[T](offsets.length)
     var i = 0
     while (i < offsets.length) {
@@ -236,8 +239,10 @@ package object array {
     *   sum(Array(1,2,3,4), Array(0,2,), 0)
     * }}}
     */
-  def sum[@spec(Boolean, Int, Long, Double) T : ST : NUM : ops.AddOp](
-      arr: Array[T], offsets: Array[Int], missing: => T): T = {
+  def sum[@spec(Boolean, Int, Long, Double) T: ST: NUM: ops.AddOp](
+      arr: Array[T],
+      offsets: Array[Int],
+      missing: => T): T = {
     val st = implicitly[ST[T]]
     val nm = implicitly[NUM[T]]
     val op = implicitly[ops.AddOp[T]]
@@ -267,8 +272,9 @@ package object array {
     *   send(Array(5,6,7), Array(2,0,1)) == Array(6,7,5)
     * }}}
     */
-  def send[@spec(Boolean, Int, Long, Double) T : ST](
-      arr: Array[T], offsets: Array[Int]): Array[T] = {
+  def send[@spec(Boolean, Int, Long, Double) T: ST](
+      arr: Array[T],
+      offsets: Array[Int]): Array[T] = {
     val res = empty[T](offsets.length)
     var i = 0
     while (i < offsets.length) {
@@ -282,8 +288,9 @@ package object array {
     * Remove values from array arr at particular offsets so as to
     * produce a new array.
     */
-  def remove[@spec(Boolean, Int, Long, Double) T : ST](
-      arr: Array[T], locs: Array[Int]): Array[T] = {
+  def remove[@spec(Boolean, Int, Long, Double) T: ST](
+      arr: Array[T],
+      locs: Array[Int]): Array[T] = {
     val set = new IntOpenHashSet(locs.length)
 
     var i = 0
@@ -313,7 +320,9 @@ package object array {
     * Put a single value into array arr at particular offsets, so as to produce a new array.
     */
   def put[@spec(Boolean, Int, Long, Double) T](
-      arr: Array[T], offsets: Array[Int], value: T): Array[T] = {
+      arr: Array[T],
+      offsets: Array[Int],
+      value: T): Array[T] = {
     val res = arr.clone()
     var i = 0
     while (i < offsets.length) {
@@ -329,7 +338,9 @@ package object array {
     * are true, so as to produce a new array.
     */
   def put[@spec(Boolean, Int, Long, Double) T](
-      arr: Array[T], offsets: Array[Boolean], value: T): Array[T] = {
+      arr: Array[T],
+      offsets: Array[Boolean],
+      value: T): Array[T] = {
     val res = arr.clone()
     var i = 0
     while (i < offsets.length) {
@@ -344,7 +355,9 @@ package object array {
     * so as to produce a new array.
     */
   def putn[@spec(Boolean, Int, Long, Double) T](
-      arr: Array[T], offsets: Array[Int], values: Array[T]): Array[T] = {
+      arr: Array[T],
+      offsets: Array[Int],
+      values: Array[T]): Array[T] = {
     val res = arr.clone()
     var i = 0
     while (i < offsets.length) {
@@ -358,7 +371,7 @@ package object array {
   /**
     * Fill array with value
     */
-  def fill[@spec(Boolean, Int, Long, Double) T : ST](arr: Array[T], v: T) {
+  def fill[@spec(Boolean, Int, Long, Double) T: ST](arr: Array[T], v: T) {
     var i = 0
     while (i < arr.length) {
       arr(i) = v
@@ -376,10 +389,11 @@ package object array {
     *
     * The endpoint of the interval can optionally be excluded.
     */
-  def linspace(start: Double,
-               stop: Double,
-               num: Int = 50,
-               endpoint: Boolean = true): Array[Double] = {
+  def linspace(
+      start: Double,
+      stop: Double,
+      num: Int = 50,
+      endpoint: Boolean = true): Array[Double] = {
     if (num <= 0) Array.empty[Double]
     else if (num == 1) Array(start)
     else {
@@ -404,7 +418,7 @@ package object array {
     *
     * @param arr Array to sort
     */
-  def argsort[T : ST : ORD](arr: Array[T]): Array[Int] =
+  def argsort[T: ST: ORD](arr: Array[T]): Array[Int] =
     implicitly[ST[T]].makeSorter.argSorted(arr)
 
   /**
@@ -413,13 +427,13 @@ package object array {
     *
     * @param arr Array to sort
     */
-  def sort[T : ST : ORD](arr: Array[T]): Array[T] =
+  def sort[T: ST: ORD](arr: Array[T]): Array[T] =
     implicitly[ST[T]].makeSorter.sorted(arr)
 
   /**
     * Reverse an array
     */
-  def reverse[@spec(Boolean, Int, Long, Double) T : ST](
+  def reverse[@spec(Boolean, Int, Long, Double) T: ST](
       arr: Array[T]): Array[T] = {
     val end = arr.length - 1
     val newArr = new Array[T](end + 1)
@@ -435,7 +449,7 @@ package object array {
   /**
     * Filter an array based on a predicate function, wherever that predicate is true
     */
-  def filter[@spec(Boolean, Int, Long, Double) T : ST](f: T => Boolean)(
+  def filter[@spec(Boolean, Int, Long, Double) T: ST](f: T => Boolean)(
       arr: Array[T]): Array[T] = {
     var i = 0
     var count = 0
@@ -464,7 +478,7 @@ package object array {
   /**
     * Flatten a sequence of arrays into a single array
     */
-  def flatten[@spec(Boolean, Int, Long, Double) T : ST](
+  def flatten[@spec(Boolean, Int, Long, Double) T: ST](
       arrs: Seq[Array[T]]): Array[T] = {
     val size = arrs.map(_.length).sum
     val newArr = new Array[T](size)
@@ -486,7 +500,7 @@ package object array {
   /**
     * Return the integer offset of the minimum element, or -1 for an empty array
     */
-  def argmin[@spec(Int, Long, Double) T : ST : ORD : NUM](arr: Array[T]): Int = {
+  def argmin[@spec(Int, Long, Double) T: ST: ORD: NUM](arr: Array[T]): Int = {
     val sca = implicitly[ST[T]]
     val sz = arr.length
     if (sz == 0) -1
@@ -509,7 +523,7 @@ package object array {
   /**
     * Return the integer offset of the maximum element, or -1 for an empty array
     */
-  def argmax[@spec(Int, Long, Double) T : ST : ORD : NUM](arr: Array[T]): Int = {
+  def argmax[@spec(Int, Long, Double) T: ST: ORD: NUM](arr: Array[T]): Int = {
     val sca = implicitly[ST[T]]
     val sz = arr.length
     if (sz == 0) -1

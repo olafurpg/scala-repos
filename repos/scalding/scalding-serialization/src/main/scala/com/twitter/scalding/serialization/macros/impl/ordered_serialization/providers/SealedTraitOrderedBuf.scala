@@ -28,10 +28,9 @@ object SealedTraitOrderedBuf {
 
     val pf: PartialFunction[c.Type, TreeOrderedBuf[c.type]] = {
       case tpe
-          if
-          (tpe.typeSymbol.isClass &&
-              (tpe.typeSymbol.asClass.isAbstractClass ||
-                  tpe.typeSymbol.asClass.isTrait)) =>
+          if (tpe.typeSymbol.isClass &&
+            (tpe.typeSymbol.asClass.isAbstractClass ||
+              tpe.typeSymbol.asClass.isTrait)) =>
         SealedTraitOrderedBuf(c)(buildDispatcher, tpe)
     }
     pf
@@ -48,8 +47,8 @@ object SealedTraitOrderedBuf {
 
     if (knownDirectSubclasses.isEmpty)
       c.abort(
-          c.enclosingPosition,
-          s"Unable to access any knownDirectSubclasses for $outerType , a bug in scala 2.10/2.11 makes this unreliable.")
+        c.enclosingPosition,
+        s"Unable to access any knownDirectSubclasses for $outerType , a bug in scala 2.10/2.11 makes this unreliable.")
 
     val subClassesValid = knownDirectSubclasses.forall { sc =>
       scala.util.Try(sc.asType.asClass.isCaseClass).getOrElse(false)
@@ -57,28 +56,32 @@ object SealedTraitOrderedBuf {
 
     if (!subClassesValid)
       c.abort(
-          c.enclosingPosition,
-          s"We only support the extension of a sealed trait with case classes.")
+        c.enclosingPosition,
+        s"We only support the extension of a sealed trait with case classes.")
 
     val dispatcher = buildDispatcher
 
     val subClasses: List[Type] =
       knownDirectSubclasses.map(_.asType.toType).toList
 
-    val subData: List[(Int, Type, TreeOrderedBuf[c.type])] = subClasses.map {
-      t =>
+    val subData: List[(Int, Type, TreeOrderedBuf[c.type])] = subClasses
+      .map { t =>
         (t, dispatcher(t))
-    }.zipWithIndex.map { case ((tpe, tbuf), idx) => (idx, tpe, tbuf) }.toList
+      }
+      .zipWithIndex
+      .map { case ((tpe, tbuf), idx) => (idx, tpe, tbuf) }
+      .toList
 
     require(
-        subData.nonEmpty,
-        "Unable to parse any subtypes for the sealed trait, error. This must be an error.")
+      subData.nonEmpty,
+      "Unable to parse any subtypes for the sealed trait, error. This must be an error.")
 
     new TreeOrderedBuf[c.type] {
       override val ctx: c.type = c
       override val tpe = outerType
       override def compareBinary(
-          inputStreamA: ctx.TermName, inputStreamB: ctx.TermName) =
+          inputStreamA: ctx.TermName,
+          inputStreamB: ctx.TermName) =
         SealedTraitLike.compareBinary(c)(inputStreamA, inputStreamB)(subData)
       override def hash(element: ctx.TermName): ctx.Tree =
         SealedTraitLike.hash(c)(element)(subData)
@@ -87,7 +90,8 @@ object SealedTraitOrderedBuf {
       override def get(inputStream: ctx.TermName): ctx.Tree =
         SealedTraitLike.get(c)(inputStream)(subData)
       override def compare(
-          elementA: ctx.TermName, elementB: ctx.TermName): ctx.Tree =
+          elementA: ctx.TermName,
+          elementB: ctx.TermName): ctx.Tree =
         SealedTraitLike.compare(c)(outerType, elementA, elementB)(subData)
       override def length(element: Tree): CompileTimeLengthTypes[c.type] =
         SealedTraitLike.length(c)(element)(subData)

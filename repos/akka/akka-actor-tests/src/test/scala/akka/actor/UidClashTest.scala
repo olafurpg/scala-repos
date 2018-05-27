@@ -13,7 +13,7 @@ object UidClashTest {
 
   class TerminatedForNonWatchedActor
       extends Exception(
-          "Received Terminated for actor that was not actually watched")
+        "Received Terminated for actor that was not actually watched")
       with NoStackTrace
 
   @volatile var oldActor: ActorRef = _
@@ -32,9 +32,10 @@ object UidClashTest {
   }
 
   def createCollidingRef(system: ActorSystem): ActorRef =
-    new EvilCollidingActorRef(system.asInstanceOf[ActorSystemImpl].provider,
-                              oldActor.path,
-                              system.eventStream)
+    new EvilCollidingActorRef(
+      system.asInstanceOf[ActorSystemImpl].provider,
+      oldActor.path,
+      system.eventStream)
 
   case object PleaseRestart
   case object PingMyself

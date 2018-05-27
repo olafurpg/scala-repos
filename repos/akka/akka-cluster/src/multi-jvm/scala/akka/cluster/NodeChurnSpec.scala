@@ -25,18 +25,19 @@ object NodeChurnMultiJvmSpec extends MultiNodeConfig {
   val third = role("third")
 
   commonConfig(
-      debugConfig(on = false)
-        .withFallback(ConfigFactory.parseString("""
+    debugConfig(on = false)
+      .withFallback(
+        ConfigFactory.parseString("""
       akka.cluster.auto-down-unreachable-after = 1s
       akka.remote.log-frame-size-exceeding = 2000b
       """))
-        .withFallback(MultiNodeClusterSpec.clusterConfig))
+      .withFallback(MultiNodeClusterSpec.clusterConfig))
 
   class LogListener(testActor: ActorRef) extends Actor {
     def receive = {
       case Info(_, _, msg: String)
           if msg.startsWith(
-              "New maximum payload size for [akka.cluster.GossipEnvelope]") ⇒
+            "New maximum payload size for [akka.cluster.GossipEnvelope]") ⇒
         testActor ! msg
       case _ ⇒
     }
@@ -48,7 +49,8 @@ class NodeChurnMultiJvmNode2 extends NodeChurnSpec
 class NodeChurnMultiJvmNode3 extends NodeChurnSpec
 
 abstract class NodeChurnSpec
-    extends MultiNodeSpec(NodeChurnMultiJvmSpec) with MultiNodeClusterSpec
+    extends MultiNodeSpec(NodeChurnMultiJvmSpec)
+    with MultiNodeClusterSpec
     with ImplicitSender {
 
   import NodeChurnMultiJvmSpec._

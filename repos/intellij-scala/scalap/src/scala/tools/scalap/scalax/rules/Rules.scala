@@ -23,7 +23,7 @@ trait Name {
 }
 
 /** A factory for rules.
-  * 
+  *
   * @author Andrew Foggin
   *
   * Inspired by the Scala parser combinator.
@@ -85,7 +85,7 @@ trait Rules {
     (in) =>
       rule(in) match {
         case Success(_, a) => a
-        case Failure => throw new ScalaSigParserError("Unexpected failure")
+        case Failure       => throw new ScalaSigParserError("Unexpected failure")
         case Error(x) =>
           throw new ScalaSigParserError("Unexpected error: " + x)
     }
@@ -136,15 +136,16 @@ trait StateRules {
       @param rules the rules to apply in sequence.
     */
   def allOf[A, X](rules: Seq[Rule[A, X]]) = {
-    def rep(in: S,
-            rules: List[Rule[A, X]],
-            results: List[A]): Result[S, List[A], X] = {
+    def rep(
+        in: S,
+        rules: List[Rule[A, X]],
+        results: List[A]): Result[S, List[A], X] = {
       rules match {
         case Nil => Success(in, results.reverse)
         case rule :: tl =>
           rule(in) match {
-            case Failure => Failure
-            case Error(x) => Error(x)
+            case Failure         => Failure
+            case Error(x)        => Error(x)
             case Success(out, v) => rep(out, tl, v :: results)
           }
       }
@@ -169,8 +170,8 @@ trait StateRules {
       else
         rule(in) match {
           case Success(out, f) => rep(out, f(t))
-          case Failure => Failure
-          case Error(x) => Error(x)
+          case Failure         => Failure
+          case Error(x)        => Error(x)
         }
     }
     in =>

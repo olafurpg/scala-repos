@@ -4,14 +4,24 @@ import com.intellij.codeInsight.PsiEquivalenceUtil
 import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScInterpolatedStringLiteral, ScLiteral, ScReferenceElement}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScReferenceExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScInterpolatedStringLiteral,
+  ScLiteral,
+  ScReferenceElement
+}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression,
+  ScReferenceExpression
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.ScSyntheticFunction
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success}
 import org.jetbrains.plugins.scala.lang.refactoring.extractMethod.duplicates.DuplicatesUtil._
-import org.jetbrains.plugins.scala.lang.refactoring.extractMethod.{ExtractMethodOutput, ExtractMethodParameter}
+import org.jetbrains.plugins.scala.lang.refactoring.extractMethod.{
+  ExtractMethodOutput,
+  ExtractMethodParameter
+}
 
 import scala.collection.mutable
 
@@ -20,7 +30,8 @@ import scala.collection.mutable
   * 2014-05-15
   */
 class DuplicateMatch(
-    pattern: DuplicatePattern, val candidates: Seq[PsiElement]) {
+    pattern: DuplicatePattern,
+    val candidates: Seq[PsiElement]) {
   private val parameterValues =
     mutable.Map[ExtractMethodParameter, ScExpression]()
   private val definitionCorrespondence =
@@ -33,37 +44,40 @@ class DuplicateMatch(
       case Some(e) => e.getText
       case None =>
         throw new IllegalStateException(
-            s"Could not find value of the parameter ${param.newName}")
+          s"Could not find value of the parameter ${param.newName}")
     }
 
   def outputName(output: ExtractMethodOutput) =
     definitionCorrespondence.get(output.fromElement) match {
       case Some(td) => td.name
-      case None => output.paramName
+      case None     => output.paramName
     }
 
   def textRange =
     candidates.head.getTextRange.union(candidates.last.getTextRange)
 
-  private def checkElementSeq(subPatterns: Seq[PsiElement],
-                              subCandidates: Seq[PsiElement]): Boolean = {
+  private def checkElementSeq(
+      subPatterns: Seq[PsiElement],
+      subCandidates: Seq[PsiElement]): Boolean = {
     val filteredP = filtered(subPatterns)
     val filteredC = filtered(subCandidates)
     if (filteredC.size != filteredP.size) return false
     if (filteredP.size == 0) return true
     filteredP.zip(filteredC).forall {
       case (e1, e2) => checkElement(e1, e2)
-      case _ => false
+      case _        => false
     }
   }
 
   private def checkChildren(
-      subPattern: PsiElement, subCandidate: PsiElement): Boolean = {
+      subPattern: PsiElement,
+      subCandidate: PsiElement): Boolean = {
     checkElementSeq(subPattern.children.toSeq, subCandidate.children.toSeq)
   }
 
   private def checkElement(
-      subPattern: PsiElement, candidate: PsiElement): Boolean = {
+      subPattern: PsiElement,
+      candidate: PsiElement): Boolean = {
     if (!canBeEquivalent(subPattern, candidate)) return false
 
     (subPattern, candidate) match {
@@ -78,27 +92,32 @@ class DuplicateMatch(
         val paramValue = parameterValues.getOrElseUpdate(p, expr)
         PsiEquivalenceUtil.areElementsEquivalent(paramValue, expr) &&
         typesEquiv(ref, expr)
-      case Both((ref1: ScReferenceExpression, ref2: ScReferenceExpression),
-                (ResolvesTo(td1: ScTypedDefinition),
-                 ResolvesTo(td2: ScTypedDefinition)))
+      case Both(
+          (ref1: ScReferenceExpression, ref2: ScReferenceExpression),
+          (
+            ResolvesTo(td1: ScTypedDefinition),
+            ResolvesTo(td2: ScTypedDefinition)))
           if pattern.definitions.contains(td1) =>
         definitionCorrespondence.get(td1) == Some(td2) &&
-        typesEquiv(ref1, ref2)
-      case Both((ref1: ScReferenceElement, ref2: ScReferenceElement),
-                (ResolvesTo(res1), ResolvesTo(res2))) if res1 != res2 =>
+          typesEquiv(ref1, ref2)
+      case Both(
+          (ref1: ScReferenceElement, ref2: ScReferenceElement),
+          (ResolvesTo(res1), ResolvesTo(res2))) if res1 != res2 =>
         (res1, res2) match {
           case (sf1: ScSyntheticFunction, sf2: ScSyntheticFunction) =>
             sf1.isStringPlusMethod && sf2.isStringPlusMethod
           case _ => false
         }
-      case (intd1: ScInterpolatedStringLiteral,
-            intd2: ScInterpolatedStringLiteral) =>
+      case (
+          intd1: ScInterpolatedStringLiteral,
+          intd2: ScInterpolatedStringLiteral) =>
         checkChildren(intd1, intd2)
-      case (ElementType(ScalaTokenTypes.tINTERPOLATED_STRING),
-            ElementType(ScalaTokenTypes.tINTERPOLATED_STRING)) =>
+      case (
+          ElementType(ScalaTokenTypes.tINTERPOLATED_STRING),
+          ElementType(ScalaTokenTypes.tINTERPOLATED_STRING)) =>
         subPattern.getText == candidate.getText
       case (lit1: ScLiteral, lit2: ScLiteral) => lit1.getValue == lit2.getValue
-      case _ => checkChildren(subPattern, candidate)
+      case _                                  => checkChildren(subPattern, candidate)
     }
   }
 
@@ -114,7 +133,7 @@ class DuplicateMatch(
           case (tp1, tp2) => tp1.equiv(tp2)
         }
       case (Failure(_, _), Failure(_, _)) => true
-      case _ => false
+      case _                              => false
     }
   }
 }

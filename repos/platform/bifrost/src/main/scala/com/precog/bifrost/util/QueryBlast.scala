@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -71,18 +71,19 @@ object QueryBlast extends AkkaDefaults {
 
   var maxCount: Option[Int] = None
 
-  class Stats(var count: Int,
-              var errors: Int,
-              var sum: Long,
-              var min: Long,
-              var max: Long)
+  class Stats(
+      var count: Int,
+      var errors: Int,
+      var sum: Long,
+      var min: Long,
+      var max: Long)
 
   def notifyError(index: Int) {
     notifyLock.synchronized {
       errors += 1
       stats.get(index) match {
         case Some(stats) => stats.errors += 1
-        case None => stats = stats + (index -> new Stats(0, 1, 0, 0, 0))
+        case None        => stats = stats + (index -> new Stats(0, 1, 0, 0, 0))
       }
     }
   }
@@ -104,14 +105,14 @@ object QueryBlast extends AkkaDefaults {
         stats foreach {
           case (key, stats) =>
             println(
-                "%-20d\t%12d\t%f\t%f\t%f\t%f\t(%d)".format(
-                    now,
-                    stats.errors,
-                    intervalDouble / ((now - startTime) / 1000.0d),
-                    stats.min / 1000000.0d,
-                    stats.max / 1000000.0d,
-                    (stats.sum / stats.count) / 1000000.0d,
-                    key))
+              "%-20d\t%12d\t%f\t%f\t%f\t%f\t(%d)".format(
+                now,
+                stats.errors,
+                intervalDouble / ((now - startTime) / 1000.0d),
+                stats.min / 1000000.0d,
+                stats.max / 1000000.0d,
+                (stats.sum / stats.count) / 1000000.0d,
+                key))
         }
         startTime = now
         stats = Map[Int, Stats]()
@@ -197,7 +198,7 @@ verboseErrors - whether to print verbose error messages (default: false)
                   ()
                 case Some(Right(HttpResponse(status, _, _, _))) =>
                   throw new RuntimeException(
-                      "Server returned error code with request")
+                    "Server returned error code with request")
                 case Some(Left(ex)) =>
                   throw ex
                 case _ =>
@@ -226,7 +227,7 @@ verboseErrors - whether to print verbose error messages (default: false)
     startTime = System.currentTimeMillis()
     //println("Starting sample inject")
     println(
-        "time                \ttotal errors\tqueries/s\tmin (ms)\tmax (ms)\tavg (ms)")
+      "time                \ttotal errors\tqueries/s\tmin (ms)\tmax (ms)\tavg (ms)")
     while (true) {
       val sample = sampleSet.next(base, maxQuery)
       workQueue.put(sample)
@@ -236,14 +237,14 @@ verboseErrors - whether to print verbose error messages (default: false)
 
 class QuerySampler {
   val allQueries = List(
-      """
+    """
 count(load(//%scampaigns))
 """,
-      """
+    """
 tests := load(//%scampaigns)
 count(tests where tests.gender = "male")
 """,
-      """
+    """
 tests := load(//%scampaigns)
 histogram('platform) :=
    { platform: 'platform, num: count(tests where tests.platform = 'platform) }
@@ -257,11 +258,12 @@ histogram('platform) :=
 
   def next(base: String, maxQuery: Int): (Int, String) = {
     val index = random.nextInt(maxQuery)
-    (index,
-     testQueries(index)
-       .format(base)
-       .replace("\n", " ")
-       .replace("  ", " ")
-       .trim())
+    (
+      index,
+      testQueries(index)
+        .format(base)
+        .replace("\n", " ")
+        .replace("  ", " ")
+        .trim())
   }
 }

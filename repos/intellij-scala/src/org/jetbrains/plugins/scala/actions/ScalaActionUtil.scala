@@ -5,7 +5,11 @@ import java.awt.Point
 import java.awt.event.{MouseEvent, MouseMotionAdapter}
 
 import com.intellij.codeInsight.hint.{HintManager, HintManagerImpl, HintUtil}
-import com.intellij.openapi.actionSystem.{Presentation, AnActionEvent, CommonDataKeys}
+import com.intellij.openapi.actionSystem.{
+  Presentation,
+  AnActionEvent,
+  CommonDataKeys
+}
 import com.intellij.openapi.editor.Editor
 import com.intellij.ui.LightweightHint
 import com.intellij.util.ui.UIUtil
@@ -34,7 +38,7 @@ object ScalaActionUtil {
       val file = CommonDataKeys.PSI_FILE.getData(dataContext)
       file match {
         case _: ScalaFile => enable()
-        case _ => disable()
+        case _            => disable()
       }
     } catch {
       case e: Exception => disable()
@@ -49,23 +53,22 @@ object ScalaActionUtil {
 
     val hintManager: HintManagerImpl = HintManagerImpl.getInstanceImpl
 
-    label.addMouseMotionListener(
-        new MouseMotionAdapter {
+    label.addMouseMotionListener(new MouseMotionAdapter {
       override def mouseMoved(e: MouseEvent) {
         hintManager.hideAllHints()
       }
     })
 
     val position = editor.getCaretModel.getLogicalPosition
-    val p: Point = HintManagerImpl.getHintPosition(
-        hint, editor, position, HintManager.ABOVE)
+    val p: Point =
+      HintManagerImpl.getHintPosition(hint, editor, position, HintManager.ABOVE)
 
     hintManager.showEditorHint(
-        hint,
-        editor,
-        p,
-        HintManager.HIDE_BY_ANY_KEY | HintManager.HIDE_BY_TEXT_CHANGE | HintManager.HIDE_BY_SCROLLING,
-        0,
-        false)
+      hint,
+      editor,
+      p,
+      HintManager.HIDE_BY_ANY_KEY | HintManager.HIDE_BY_TEXT_CHANGE | HintManager.HIDE_BY_SCROLLING,
+      0,
+      false)
   }
 }

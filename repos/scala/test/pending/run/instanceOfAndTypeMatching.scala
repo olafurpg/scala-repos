@@ -8,7 +8,7 @@ object Summary {
   }
 
   // 1 static issue:
-  // 
+  //
   //   Given method in MethodInner: def g(other: MethodInner) = ()
   //   method1.g(method1) fails to compile with type error.
   //
@@ -20,7 +20,7 @@ object Summary {
   //   traverse a method.
   //
   // 4 runtime issues:
-  // 
+  //
   //   From the outside:     inner1.isInstanceOf[outer2.Inner] is true, should (maybe) be false
   //   From inside inner1:   inner2.isInstanceOf[Outer.this.Inner] is true, should (maybe) be false
   //   From the outside:     inner1 match { case _: outer2.Inner => true ... } is true, should definitely be false
@@ -49,14 +49,14 @@ class Outer {
 
     def compareSimpleWithTypeMatch(other: Any) = other match {
       case _: Inner => true
-      case _ => false
+      case _        => false
     }
     def compareSimpleWithInstanceOf(other: Any) = other.isInstanceOf[Inner]
 
     def compareSharpWithTypeMatch(other: Any) = {
       other match {
         case _: Outer#Inner => true
-        case _ => false
+        case _              => false
       }
     }
     def compareSharpWithInstanceOf(other: Any) =
@@ -64,7 +64,7 @@ class Outer {
 
     def comparePathWithTypeMatch(other: Any) = other match {
       case _: Outer.this.Inner => true
-      case _ => false
+      case _                   => false
     }
     def comparePathWithInstanceOf(other: Any) =
       other.isInstanceOf[Outer.this.Inner]
@@ -86,7 +86,7 @@ class Outer {
       def compareWithInstanceOf(other: Any) = other.isInstanceOf[MethodInner]
       def compareWithTypeMatch(other: Any) = other match {
         case _: MethodInner => true
-        case _ => false
+        case _              => false
       }
     }
 
@@ -121,28 +121,34 @@ object Test {
   def testInnerRuntime = {
     println("testInnerRuntime\n")
 
-    List("These should be true under any scenario: ",
-         inner1.isInstanceOf[outer1.Inner],
-         inner1.isInstanceOf[Outer#Inner],
-         (inner1: Any) match { case _: Outer#Inner => true; case _ => false },
-         (inner1: Any) match { case _: outer1.Inner => true; case _ => false },
-         inner1.compareSharpWithTypeMatch(inner2),
-         inner1.compareSharpWithInstanceOf(inner2)) foreach println
-
-    List("These should be true under current proposal: ",
-         inner1.compareSimpleWithInstanceOf(inner2)) foreach println
-
-    List("These should be false under current proposal: ",
-         inner1.compareSimpleWithTypeMatch(inner2),
-         inner1.comparePathWithTypeMatch(inner2)) foreach println
-
-    List("These return true but I think should return false: ",
-         inner1.isInstanceOf[outer2.Inner], // true
-         inner1.comparePathWithInstanceOf(inner2) // true
+    List(
+      "These should be true under any scenario: ",
+      inner1.isInstanceOf[outer1.Inner],
+      inner1.isInstanceOf[Outer#Inner],
+      (inner1: Any) match { case _: Outer#Inner  => true; case _ => false },
+      (inner1: Any) match { case _: outer1.Inner => true; case _ => false },
+      inner1.compareSharpWithTypeMatch(inner2),
+      inner1.compareSharpWithInstanceOf(inner2)
     ) foreach println
 
-    List("These are doing the wrong thing under current proposal",
-         (inner1: Any) match { case _: outer2.Inner => true; case _ => false } // should be false
+    List(
+      "These should be true under current proposal: ",
+      inner1.compareSimpleWithInstanceOf(inner2)) foreach println
+
+    List(
+      "These should be false under current proposal: ",
+      inner1.compareSimpleWithTypeMatch(inner2),
+      inner1.comparePathWithTypeMatch(inner2)) foreach println
+
+    List(
+      "These return true but I think should return false: ",
+      inner1.isInstanceOf[outer2.Inner], // true
+      inner1.comparePathWithInstanceOf(inner2) // true
+    ) foreach println
+
+    List(
+      "These are doing the wrong thing under current proposal",
+      (inner1: Any) match { case _: outer2.Inner => true; case _ => false } // should be false
     ) foreach println
   }
 
@@ -175,15 +181,18 @@ object Test {
   def testMethodInnerRuntime = {
     println("\ntestMethodInnerRuntime\n")
 
-    List("These should be true under any scenario: ",
-         method1.compareWithInstanceOf(method1),
-         method1.compareWithTypeMatch(method1)) foreach println
+    List(
+      "These should be true under any scenario: ",
+      method1.compareWithInstanceOf(method1),
+      method1.compareWithTypeMatch(method1)) foreach println
 
-    List("These should be true under current proposal: ",
-         method1.compareWithInstanceOf(method2)) foreach println
+    List(
+      "These should be true under current proposal: ",
+      method1.compareWithInstanceOf(method2)) foreach println
 
-    List("These are doing the wrong thing under current proposal",
-         method1.compareWithTypeMatch(method2) // should be false
+    List(
+      "These are doing the wrong thing under current proposal",
+      method1.compareWithTypeMatch(method2) // should be false
     ) foreach println
   }
 

@@ -31,7 +31,7 @@ trait IrreducibleContainer {
 object IrreducibleContainer {
   def flatten(item: Any): Iterable[Any] = item match {
     case (ic: IrreducibleContainer) => ic.irreducibles
-    case _ => Seq(item)
+    case _                          => Seq(item)
   }
 
   def flatten(left: Any, right: Any): Iterable[Any] = (left, right) match {
@@ -39,7 +39,7 @@ object IrreducibleContainer {
       li.irreducibles ++ ri.irreducibles
     case (li: IrreducibleContainer, _) => Seq(right) ++ li.irreducibles
     case (_, ri: IrreducibleContainer) => Seq(left) ++ ri.irreducibles
-    case _ => Seq(left, right)
+    case _                             => Seq(left, right)
   }
 }
 
@@ -51,8 +51,10 @@ object IrreducibleContainer {
   * irreducibiles even after optimization
   */
 case class ComposedFlatMap[A, B, C](
-    first: A => TraversableOnce[B], second: B => TraversableOnce[C])
-    extends (A => TraversableOnce[C]) with IrreducibleContainer {
+    first: A => TraversableOnce[B],
+    second: B => TraversableOnce[C])
+    extends (A => TraversableOnce[C])
+    with IrreducibleContainer {
 
   // Note we don't allocate a new Function in the apply call,
   // we reuse the instances above.
@@ -64,8 +66,10 @@ case class ComposedFlatMap[A, B, C](
   * Composing optionMaps
   */
 case class ComposedOptionMap[A, B, C](
-    first: A => Option[B], second: B => Option[C])
-    extends (A => Option[C]) with IrreducibleContainer {
+    first: A => Option[B],
+    second: B => Option[C])
+    extends (A => Option[C])
+    with IrreducibleContainer {
 
   // Note we don't allocate a new Function in the apply call,
   // we reuse the instances above.
@@ -74,8 +78,10 @@ case class ComposedOptionMap[A, B, C](
 }
 
 case class ComposedOptionFlat[A, B, C](
-    first: A => Option[B], second: B => TraversableOnce[C])
-    extends (A => TraversableOnce[C]) with IrreducibleContainer {
+    first: A => Option[B],
+    second: B => TraversableOnce[C])
+    extends (A => TraversableOnce[C])
+    with IrreducibleContainer {
 
   // Note we don't allocate a new Function in the apply call,
   // we reuse the instances above.
@@ -84,7 +90,8 @@ case class ComposedOptionFlat[A, B, C](
 }
 
 case class OptionToFlat[A, B](optionMap: A => Option[B])
-    extends (A => TraversableOnce[B]) with IrreducibleContainer {
+    extends (A => TraversableOnce[B])
+    with IrreducibleContainer {
   // Note we don't allocate a new Function in the apply call,
   // we reuse the instances above.
   def apply(a: A) = optionMap(a).toIterator
@@ -101,7 +108,8 @@ case class OptionToFlat[A, B](optionMap: A => Option[B])
  * the spouts (or other similar fixed-source parition systems)
  */
 case class FlatAsFilter[A](useAsFilter: A => TraversableOnce[Nothing])
-    extends (A => Option[A]) with IrreducibleContainer {
+    extends (A => Option[A])
+    with IrreducibleContainer {
   def apply(a: A) = if (useAsFilter(a).isEmpty) None else Some(a)
   def irreducibles = IrreducibleContainer.flatten(useAsFilter)
 }
@@ -110,8 +118,10 @@ case class FlatAsFilter[A](useAsFilter: A => TraversableOnce[Nothing])
   * (a.flatMap(f1) ++ a.flatMap(f2)) == a.flatMap { i => f1(i) ++ f2(i) }
   */
 case class MergeResults[A, B](
-    left: A => TraversableOnce[B], right: A => TraversableOnce[B])
-    extends (A => TraversableOnce[B]) with IrreducibleContainer {
+    left: A => TraversableOnce[B],
+    right: A => TraversableOnce[B])
+    extends (A => TraversableOnce[B])
+    with IrreducibleContainer {
   // TODO it is not totally clear the fastest way to merge two TraversableOnce instances
   // If they are iterators or iterables, this should be fast
   def apply(a: A) = (left(a).toIterator) ++ (right(a).toIterator)

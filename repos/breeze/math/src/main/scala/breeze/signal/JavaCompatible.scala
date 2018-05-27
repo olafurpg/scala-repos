@@ -83,7 +83,9 @@ object JavaCompatible {
     * @param shifted whether to return fourierShift'ed frequencies, default=false
     */
   def fourierFreqD(
-      windowLength: Int, fs: Double, shifted: Boolean): Array[Double] =
+      windowLength: Int,
+      fs: Double,
+      shifted: Boolean): Array[Double] =
     dvDToArray(breeze.signal.fourierFreq(windowLength, fs, -1, shifted))
 
   /**See [[fourierFreq]]. shifted = false
@@ -104,28 +106,31 @@ object JavaCompatible {
     * @param taps  number of taps to use, default 512
     * @return
     */
-  def filterBP(data: Array[Double],
-               omegaLow: Double,
-               omegaHigh: Double,
-               sampleRate: Double,
-               taps: Int): Array[Double] =
+  def filterBP(
+      data: Array[Double],
+      omegaLow: Double,
+      omegaHigh: Double,
+      sampleRate: Double,
+      taps: Int): Array[Double] =
     dvDToArray(
-        breeze.signal.filterBP(
-            arrayDToDv(data), (omegaLow, omegaHigh), sampleRate, taps))
+      breeze.signal
+        .filterBP(arrayDToDv(data), (omegaLow, omegaHigh), sampleRate, taps))
 
   /**See [[filterBP]]
     */
-  def filterBP(data: Array[Double],
-               omegaLow: Double,
-               omegaHigh: Double,
-               sampleRate: Double): Array[Double] =
+  def filterBP(
+      data: Array[Double],
+      omegaLow: Double,
+      omegaHigh: Double,
+      sampleRate: Double): Array[Double] =
     filterBP(data, omegaLow, omegaHigh, sampleRate, 512)
 
   /**See [[filterBP]]
     */
-  def filterBP(data: Array[Double],
-               omegaLow: Double,
-               omegaHigh: Double): Array[Double] =
+  def filterBP(
+      data: Array[Double],
+      omegaLow: Double,
+      omegaHigh: Double): Array[Double] =
     filterBP(data, omegaLow, omegaHigh, 2d, 512)
 
   /**Bandstop filter the data using a windowed FIR filter.
@@ -138,28 +143,31 @@ object JavaCompatible {
     * @param taps  number of taps to use, default 512
     * @return
     */
-  def filterBS(data: Array[Double],
-               omegaLow: Double,
-               omegaHigh: Double,
-               sampleRate: Double,
-               taps: Int): Array[Double] =
+  def filterBS(
+      data: Array[Double],
+      omegaLow: Double,
+      omegaHigh: Double,
+      sampleRate: Double,
+      taps: Int): Array[Double] =
     dvDToArray(
-        breeze.signal.filterBS(
-            arrayDToDv(data), (omegaLow, omegaHigh), sampleRate, taps))
+      breeze.signal
+        .filterBS(arrayDToDv(data), (omegaLow, omegaHigh), sampleRate, taps))
 
   /**See [[filterBS]]
     */
-  def filterBS(data: Array[Double],
-               omegaLow: Double,
-               omegaHigh: Double,
-               sampleRate: Double): Array[Double] =
+  def filterBS(
+      data: Array[Double],
+      omegaLow: Double,
+      omegaHigh: Double,
+      sampleRate: Double): Array[Double] =
     filterBS(data, omegaLow, omegaHigh, sampleRate, 512)
 
   /**See [[filterBS]]
     */
-  def filterBS(data: Array[Double],
-               omegaLow: Double,
-               omegaHigh: Double): Array[Double] =
+  def filterBS(
+      data: Array[Double],
+      omegaLow: Double,
+      omegaHigh: Double): Array[Double] =
     filterBS(data, omegaLow, omegaHigh, 2d, 512)
 
   /**Low pass filter the data using a windowed FIR filter.
@@ -171,17 +179,20 @@ object JavaCompatible {
     * @param taps  number of taps to use, default 512
     * @return
     */
-  def filterLP(data: Array[Double],
-               omega: Double,
-               sampleRate: Double,
-               taps: Int): Array[Double] =
+  def filterLP(
+      data: Array[Double],
+      omega: Double,
+      sampleRate: Double,
+      taps: Int): Array[Double] =
     dvDToArray(
-        breeze.signal.filterLP(arrayDToDv(data), omega, sampleRate, taps))
+      breeze.signal.filterLP(arrayDToDv(data), omega, sampleRate, taps))
 
   /**See [[filterLP]]
     */
   def filterLP(
-      data: Array[Double], omega: Double, sampleRate: Double): Array[Double] =
+      data: Array[Double],
+      omega: Double,
+      sampleRate: Double): Array[Double] =
     filterLP(data, omega, sampleRate, 512)
 
   /**See [[filterLP]]
@@ -198,17 +209,20 @@ object JavaCompatible {
     * @param taps  number of taps to use, default 512
     * @return
     */
-  def filterHP(data: Array[Double],
-               omega: Double,
-               sampleRate: Double,
-               taps: Int): Array[Double] =
+  def filterHP(
+      data: Array[Double],
+      omega: Double,
+      sampleRate: Double,
+      taps: Int): Array[Double] =
     dvDToArray(
-        breeze.signal.filterHP(arrayDToDv(data), omega, sampleRate, taps))
+      breeze.signal.filterHP(arrayDToDv(data), omega, sampleRate, taps))
 
   /**See [[filterHP]]
     */
   def filterHP(
-      data: Array[Double], omega: Double, sampleRate: Double): Array[Double] =
+      data: Array[Double],
+      omega: Double,
+      sampleRate: Double): Array[Double] =
     filterHP(data, omega, sampleRate, 512)
 
   /**See [[filterHP]]

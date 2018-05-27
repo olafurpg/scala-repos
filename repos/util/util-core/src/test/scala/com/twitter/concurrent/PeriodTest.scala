@@ -27,19 +27,19 @@ class PeriodTest extends FunSuite {
   }
 
   test(
-      "Period#realInterval should release on MinimumInterval for `interval` == MinimumInterval") {
+    "Period#realInterval should release on MinimumInterval for `interval` == MinimumInterval") {
     val period = new Period(AsyncMeter.MinimumInterval)
     assert(period.realInterval == AsyncMeter.MinimumInterval)
   }
 
   test(
-      "Period#realInterval should release on MinimumInterval for `interval` < MinimumInterval") {
+    "Period#realInterval should release on MinimumInterval for `interval` < MinimumInterval") {
     val period = new Period(AsyncMeter.MinimumInterval / 2)
     assert(period.realInterval == AsyncMeter.MinimumInterval)
   }
 
   test(
-      "Period#realInterval should release on `interval` for `interval` > MinimumInterval") {
+    "Period#realInterval should release on `interval` for `interval` > MinimumInterval") {
     val period = new Period(AsyncMeter.MinimumInterval * 2)
     assert(period.realInterval == AsyncMeter.MinimumInterval * 2)
   }

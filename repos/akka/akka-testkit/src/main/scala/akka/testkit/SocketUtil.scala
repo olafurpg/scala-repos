@@ -24,7 +24,8 @@ object SocketUtil {
   }
 
   def temporaryServerAddress(
-      address: String = "127.0.0.1", udp: Boolean = false): InetSocketAddress =
+      address: String = "127.0.0.1",
+      udp: Boolean = false): InetSocketAddress =
     temporaryServerAddresses(1, address, udp).head
 
   def temporaryServerAddresses(
@@ -37,8 +38,7 @@ object SocketUtil {
         else ServerSocketChannel.open().socket()
 
       serverSocket.bind(new InetSocketAddress(hostname, 0))
-      (serverSocket,
-       new InetSocketAddress(hostname, serverSocket.getLocalPort))
+      (serverSocket, new InetSocketAddress(hostname, serverSocket.getLocalPort))
     } collect { case (socket, address) ⇒ socket.close(); address }
   }
 }

@@ -179,10 +179,10 @@ class CoordinatorTest extends FunSuite with LocalConductors with MockitoSugar {
     Time.withCurrentTimeFrozen { ctl =>
       localThread(conductor) {
         coord.sleepUntilFinishedDraining(
-            space,
-            maxWait,
-            () => npending,
-            log
+          space,
+          maxWait,
+          () => npending,
+          log
         )
       }
 

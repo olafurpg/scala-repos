@@ -2,7 +2,10 @@ package mesosphere.marathon.integration.setup
 
 import java.util.concurrent.ConcurrentLinkedQueue
 
-import mesosphere.marathon.integration.facades.{ITDeploymentResult, MarathonFacade}
+import mesosphere.marathon.integration.facades.{
+  ITDeploymentResult,
+  MarathonFacade
+}
 
 import scala.annotation.tailrec
 import scala.concurrent.duration.{FiniteDuration, _}
@@ -30,24 +33,28 @@ trait MarathonCallbackTestSupport extends ExternalMarathonIntegrationTest {
   override def handleEvent(event: CallbackEvent): Unit = events.add(event)
 
   def waitForEvent(
-      kind: String, maxWait: FiniteDuration = 30.seconds): CallbackEvent =
+      kind: String,
+      maxWait: FiniteDuration = 30.seconds): CallbackEvent =
     waitForEventWith(kind, _ => true, maxWait)
 
   def waitForDeploymentId(
       deploymentId: String,
       maxWait: FiniteDuration = 30.seconds): CallbackEvent = {
-    waitForEventWith("deployment_success",
-                     _.info.getOrElse("id", "") == deploymentId,
-                     maxWait)
+    waitForEventWith(
+      "deployment_success",
+      _.info.getOrElse("id", "") == deploymentId,
+      maxWait)
   }
 
-  def waitForChange(change: RestResult[ITDeploymentResult],
-                    maxWait: FiniteDuration = 30.seconds): CallbackEvent = {
+  def waitForChange(
+      change: RestResult[ITDeploymentResult],
+      maxWait: FiniteDuration = 30.seconds): CallbackEvent = {
     waitForDeploymentId(change.value.deploymentId, maxWait)
   }
 
   def waitForEventMatching(
-      description: String, maxWait: FiniteDuration = 30.seconds)(
+      description: String,
+      maxWait: FiniteDuration = 30.seconds)(
       fn: CallbackEvent => Boolean): CallbackEvent = {
     @tailrec
     def nextEvent: Option[CallbackEvent] =
@@ -59,9 +66,10 @@ trait MarathonCallbackTestSupport extends ExternalMarathonIntegrationTest {
     WaitTestSupport.waitFor(description, maxWait)(nextEvent)
   }
 
-  def waitForEventWith(kind: String,
-                       fn: CallbackEvent => Boolean,
-                       maxWait: FiniteDuration = 30.seconds): CallbackEvent = {
+  def waitForEventWith(
+      kind: String,
+      fn: CallbackEvent => Boolean,
+      maxWait: FiniteDuration = 30.seconds): CallbackEvent = {
     waitForEventMatching(s"event $kind to arrive", maxWait) { event =>
       event.eventType == kind && fn(event)
     }
@@ -74,8 +82,8 @@ trait MarathonCallbackTestSupport extends ExternalMarathonIntegrationTest {
   /**
     * Wait for the events of the given kinds (=types).
     */
-  def waitForEvents(kinds: String*)(maxWait: FiniteDuration = 30.seconds)
-    : Map[String, Seq[CallbackEvent]] = {
+  def waitForEvents(kinds: String*)(
+      maxWait: FiniteDuration = 30.seconds): Map[String, Seq[CallbackEvent]] = {
 
     val deadline = maxWait.fromNow
 
@@ -86,7 +94,8 @@ trait MarathonCallbackTestSupport extends ExternalMarathonIntegrationTest {
 
       while (eventsToWaitFor.nonEmpty) {
         val event = waitForEventMatching(
-            s"event $eventsToWaitFor to arrive", deadline.timeLeft) { event =>
+          s"event $eventsToWaitFor to arrive",
+          deadline.timeLeft) { event =>
           eventsToWaitFor.contains(event.eventType)
         }
         receivedEvents += event

@@ -38,7 +38,8 @@ object M1 {
     val n = s apply 1;
     val np1 = s apply 2;
     Stream.cons(
-        np1 - ((np1 - n) * (np1 - n) / (nm1 - 2 * n + np1)), euler(s.tail))
+      np1 - ((np1 - n) * (np1 - n) / (nm1 - 2 * n + np1)),
+      euler(s.tail))
   };
 
   def better(
@@ -46,8 +47,9 @@ object M1 {
       transform: Stream[Double] => Stream[Double]): Stream[Stream[Double]] =
     Stream.cons(s, better(transform(s), transform));
 
-  def veryGood(s: Stream[Double],
-               transform: Stream[Double] => Stream[Double]): Stream[Double] =
+  def veryGood(
+      s: Stream[Double],
+      transform: Stream[Double] => Stream[Double]): Stream[Double] =
     better(s, transform) map (x => x.head);
 
   def lnSummands(n: Double): Stream[Double] =

@@ -17,7 +17,11 @@
 
 package org.apache.spark.sql.catalyst.expressions.codegen
 
-import org.apache.spark.sql.catalyst.expressions.{Expression, LeafExpression, Nondeterministic}
+import org.apache.spark.sql.catalyst.expressions.{
+  Expression,
+  LeafExpression,
+  Nondeterministic
+}
 import org.apache.spark.sql.catalyst.util.toCommentSafeString
 
 /**
@@ -28,7 +32,7 @@ trait CodegenFallback extends Expression {
   protected def genCode(ctx: CodegenContext, ev: ExprCode): String = {
     foreach {
       case n: Nondeterministic => n.setInitialValues()
-      case _ =>
+      case _                   =>
     }
 
     // LeafNode does not need `input`
@@ -43,7 +47,7 @@ trait CodegenFallback extends Expression {
         Object $objectTerm = ((Expression) references[$idx]).eval($input);
         boolean ${ev.isNull} = $objectTerm == null;
         ${ctx.javaType(this.dataType)} ${ev.value} = ${ctx.defaultValue(
-          this.dataType)};
+        this.dataType)};
         if (!${ev.isNull}) {
           ${ev.value} = (${ctx.boxedType(this.dataType)}) $objectTerm;
         }
@@ -54,7 +58,7 @@ trait CodegenFallback extends Expression {
         /* expression: ${toCommentSafeString(this.toString)} */
         Object $objectTerm = ((Expression) references[$idx]).eval($input);
         ${ctx.javaType(this.dataType)} ${ev.value} = (${ctx.boxedType(
-          this.dataType)}) $objectTerm;
+        this.dataType)}) $objectTerm;
       """
     }
   }

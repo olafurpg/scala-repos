@@ -14,18 +14,32 @@ import com.intellij.refactoring.RefactoringActionHandler
 import org.jetbrains.annotations.Nullable
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScCaseClause
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScPrimaryConstructor, ScReferenceElement}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScPrimaryConstructor,
+  ScReferenceElement
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunctionDefinition, ScPatternDefinition, ScVariableDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunctionDefinition,
+  ScPatternDefinition,
+  ScVariableDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.packaging.ScPackaging
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
-import org.jetbrains.plugins.scala.lang.psi.api.{ScalaFile, ScalaRecursiveElementVisitor}
+import org.jetbrains.plugins.scala.lang.psi.api.{
+  ScalaFile,
+  ScalaRecursiveElementVisitor
+}
 import org.jetbrains.plugins.scala.lang.psi.dataFlow.impl.reachingDefs.ReachingDefintionsCollector
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
-import org.jetbrains.plugins.scala.lang.psi.{ScalaPsiElement, ScalaPsiUtil, TypeAdjuster}
+import org.jetbrains.plugins.scala.lang.psi.{
+  ScalaPsiElement,
+  ScalaPsiUtil,
+  TypeAdjuster
+}
 import org.jetbrains.plugins.scala.lang.refactoring.extractMethod.duplicates.DuplicatesUtil
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaRefactoringUtil
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaRefactoringUtil.showErrorHint
@@ -40,40 +54,43 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
   private val REFACTORING_NAME: String =
     ScalaBundle.message("extract.method.title")
 
-  def invoke(project: Project,
-             elements: Array[PsiElement],
-             dataContext: DataContext) { /*do nothing*/ }
+  def invoke(
+      project: Project,
+      elements: Array[PsiElement],
+      dataContext: DataContext) { /*do nothing*/ }
 
-  def invoke(project: Project,
-             editor: Editor,
-             file: PsiFile,
-             dataContext: DataContext) {
+  def invoke(
+      project: Project,
+      editor: Editor,
+      file: PsiFile,
+      dataContext: DataContext) {
     editor.getScrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE)
     if (!file.isInstanceOf[ScalaFile]) return
 
     UsageTrigger.trigger(ScalaBundle.message("extract.method.id"))
 
     ScalaRefactoringUtil.afterExpressionChoosing(
-        project,
-        editor,
-        file,
-        dataContext,
-        REFACTORING_NAME,
-        ScalaRefactoringUtil.checkCanBeIntroduced(_)) {
-      invokeOnEditor(
-          project, editor, file.asInstanceOf[ScalaFile], dataContext)
+      project,
+      editor,
+      file,
+      dataContext,
+      REFACTORING_NAME,
+      ScalaRefactoringUtil.checkCanBeIntroduced(_)) {
+      invokeOnEditor(project, editor, file.asInstanceOf[ScalaFile], dataContext)
     }
   }
 
-  private def invokeOnEditor(project: Project,
-                             editor: Editor,
-                             file: ScalaFile,
-                             dataContext: DataContext) {
+  private def invokeOnEditor(
+      project: Project,
+      editor: Editor,
+      file: ScalaFile,
+      dataContext: DataContext) {
     if (!ScalaRefactoringUtil.ensureFileWritable(project, file)) {
-      showErrorHint(ScalaBundle.message("file.is.not.writable"),
-                    project,
-                    editor,
-                    REFACTORING_NAME)
+      showErrorHint(
+        ScalaBundle.message("file.is.not.writable"),
+        project,
+        editor,
+        REFACTORING_NAME)
       return
     }
     if (!editor.getSelectionModel.hasSelection) return
@@ -81,7 +98,10 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
       ScalaRefactoringUtil.selectedElements(editor, file, trimComments = false)
 
     val hasWarnings = ScalaRefactoringUtil.showNotPossibleWarnings(
-        elements, project, editor, REFACTORING_NAME)
+      elements,
+      project,
+      editor,
+      REFACTORING_NAME)
     if (hasWarnings) return
 
     def checkLastReturn(elem: PsiElement): Boolean = {
@@ -91,7 +111,7 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
           m.getBranches.forall(checkLastReturn(_))
         case f: ScIfStmt if f.elseBranch.isDefined && f.thenBranch.isDefined =>
           checkLastReturn(f.thenBranch.get) &&
-          checkLastReturn(f.elseBranch.get)
+            checkLastReturn(f.elseBranch.get)
         case block: ScBlock if block.lastExpr.isDefined =>
           checkLastReturn(block.lastExpr.get)
         case _ => false
@@ -100,7 +120,8 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
 
     def returnType: Option[ScType] = {
       val fun = PsiTreeUtil.getParentOfType(
-          elements.head, classOf[ScFunctionDefinition])
+        elements.head,
+        classOf[ScFunctionDefinition])
       if (fun == null) return None
       var result: Option[ScType] = None
       val visitor = new ScalaRecursiveElementVisitor {
@@ -118,59 +139,66 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
       result
     }
 
-    val (lastReturn, lastExprType) = elements.reverse.collectFirst {
-      case expr: ScExpression =>
-        (checkLastReturn(expr),
-         Some(expr.getType(TypingContext.empty).getOrAny))
-    }.getOrElse((false, None))
+    val (lastReturn, lastExprType) = elements.reverse
+      .collectFirst {
+        case expr: ScExpression =>
+          (
+            checkLastReturn(expr),
+            Some(expr.getType(TypingContext.empty).getOrAny))
+      }
+      .getOrElse((false, None))
 
     val hasReturn: Option[ScType] = returnType
     val stopAtScope: PsiElement = findScopeBound(elements).getOrElse(file)
     val siblings: Array[PsiElement] = getSiblings(elements.head, stopAtScope)
     if (siblings.length == 0) {
       showErrorHint(
-          ScalaBundle.message("extract.method.cannot.find.possible.scope"),
-          project,
-          editor,
-          REFACTORING_NAME)
+        ScalaBundle.message("extract.method.cannot.find.possible.scope"),
+        project,
+        editor,
+        REFACTORING_NAME)
       return
     }
     val array = elements.toArray
     if (ApplicationManager.getApplication.isUnitTestMode &&
         siblings.length > 0) {
-      invokeDialog(project,
-                   editor,
-                   array,
-                   hasReturn,
-                   lastReturn,
-                   siblings(0),
-                   siblings.length == 1,
-                   lastExprType)
+      invokeDialog(
+        project,
+        editor,
+        array,
+        hasReturn,
+        lastReturn,
+        siblings(0),
+        siblings.length == 1,
+        lastExprType)
     } else if (siblings.length > 1) {
       ScalaRefactoringUtil.showChooser(
-          editor,
-          siblings, { (selectedValue: PsiElement) =>
-            invokeDialog(project,
-                         editor,
-                         array,
-                         hasReturn,
-                         lastReturn,
-                         selectedValue,
-                         siblings(siblings.length - 1) == selectedValue,
-                         lastExprType)
-          },
-          "Choose level for Extract Method",
-          getTextForElement,
-          (e: PsiElement) => e.getParent)
+        editor,
+        siblings, { (selectedValue: PsiElement) =>
+          invokeDialog(
+            project,
+            editor,
+            array,
+            hasReturn,
+            lastReturn,
+            selectedValue,
+            siblings(siblings.length - 1) == selectedValue,
+            lastExprType)
+        },
+        "Choose level for Extract Method",
+        getTextForElement,
+        (e: PsiElement) => e.getParent
+      )
     } else if (siblings.length == 1) {
-      invokeDialog(project,
-                   editor,
-                   array,
-                   hasReturn,
-                   lastReturn,
-                   siblings(0),
-                   smallestScope = true,
-                   lastExprType)
+      invokeDialog(
+        project,
+        editor,
+        array,
+        hasReturn,
+        lastReturn,
+        siblings(0),
+        smallestScope = true,
+        lastExprType)
     }
   }
 
@@ -180,7 +208,8 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
     def isParentOk(parent: PsiElement): Boolean = {
       if (parent == null) return false
       assert(
-          parent.getTextRange != null, "TextRange is null: " + parent.getText)
+        parent.getTextRange != null,
+        "TextRange is null: " + parent.getText)
       stopAtScope == null ||
       stopAtScope.getTextRange.contains(parent.getTextRange)
     }
@@ -191,9 +220,9 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
     while (isParentOk(parent)) {
       parent match {
         case file: ScalaFile if file.isScriptFile() => res += prev
-        case block: ScBlock => res += prev
-        case templ: ScTemplateBody => res += prev
-        case _ =>
+        case block: ScBlock                         => res += prev
+        case templ: ScTemplateBody                  => res += prev
+        case _                                      =>
       }
       prev = parent
       parent = parent match {
@@ -211,8 +240,8 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
     def scopeBound(ref: ScReferenceElement): Option[PsiElement] = {
       val fromThisRef: Option[ScTemplateDefinition] = ref.qualifier match {
         case Some(thisRef: ScThisReference) => thisRef.refTemplate
-        case Some(_) => return None
-        case None => None
+        case Some(_)                        => return None
+        case None                           => None
       }
       val defScope: Option[PsiElement] = fromThisRef.orElse {
         ref.resolve() match {
@@ -228,10 +257,10 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
           case td: ScTypeDefinition => td.parent
           case ScalaPsiUtil.inNameContext(varDef: ScVariableDefinition)
               if ScalaPsiUtil.isLValue(ref) &&
-              !elements.exists(_.isAncestorOf(varDef)) =>
+                !elements.exists(_.isAncestorOf(varDef)) =>
             varDef.parent
           case member: PsiMember => member.containingClass.toOption
-          case _ => return None
+          case _                 => return None
         }
       }
       defScope match {
@@ -263,19 +292,20 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
     }
     elements.foreach {
       case elem: ScalaPsiElement => elem.accept(visitor)
-      case _ =>
+      case _                     =>
     }
     Option(result)
   }
 
-  private def invokeDialog(project: Project,
-                           editor: Editor,
-                           elements: Array[PsiElement],
-                           hasReturn: Option[ScType],
-                           lastReturn: Boolean,
-                           sibling: PsiElement,
-                           smallestScope: Boolean,
-                           lastExprType: Option[ScType]) {
+  private def invokeDialog(
+      project: Project,
+      editor: Editor,
+      elements: Array[PsiElement],
+      hasReturn: Option[ScType],
+      lastReturn: Boolean,
+      sibling: PsiElement,
+      smallestScope: Boolean,
+      lastExprType: Option[ScType]) {
 
     val info =
       ReachingDefintionsCollector.collectVariableInfo(elements, sibling)
@@ -284,22 +314,23 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
     val output = info.outputVariables
     if (output.exists(_.element.isInstanceOf[ScFunctionDefinition])) {
       showErrorHint(
-          ScalaBundle.message("cannot.extract.used.function.definition"),
-          project,
-          editor,
-          REFACTORING_NAME)
+        ScalaBundle.message("cannot.extract.used.function.definition"),
+        project,
+        editor,
+        REFACTORING_NAME)
       return
     }
     val settings: ScalaExtractMethodSettings =
       if (!ApplicationManager.getApplication.isUnitTestMode) {
-        val dialog = new ScalaExtractMethodDialog(project,
-                                                  elements,
-                                                  hasReturn,
-                                                  lastReturn,
-                                                  sibling,
-                                                  input.toArray,
-                                                  output.toArray,
-                                                  lastExprType)
+        val dialog = new ScalaExtractMethodDialog(
+          project,
+          elements,
+          hasReturn,
+          lastReturn,
+          sibling,
+          input.toArray,
+          output.toArray,
+          lastExprType)
         dialog.show()
         if (!dialog.isOK) return
         dialog.getSettings
@@ -312,20 +343,24 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
             .map(ScalaExtractMethodUtils.convertVariableData(_, elements))
             .map(ExtractMethodOutput.from)
           InnerClassSettings(
-              isCase || isInner, "TestMethodNameResult", out.toArray, isCase)
+            isCase || isInner,
+            "TestMethodNameResult",
+            out.toArray,
+            isCase)
         }
 
         new ScalaExtractMethodSettings(
-            "testMethodName",
-            ScalaExtractMethodUtils.getParameters(input.toArray, elements),
-            ScalaExtractMethodUtils.getReturns(output.toArray, elements),
-            "",
-            sibling,
-            elements,
-            hasReturn,
-            lastReturn,
-            lastExprType,
-            innerClassSettings)
+          "testMethodName",
+          ScalaExtractMethodUtils.getParameters(input.toArray, elements),
+          ScalaExtractMethodUtils.getReturns(output.toArray, elements),
+          "",
+          sibling,
+          elements,
+          hasReturn,
+          lastReturn,
+          lastExprType,
+          innerClassSettings
+        )
       }
     val duplicates = DuplicatesUtil.findDuplicates(settings)
     performRefactoring(settings, editor)
@@ -341,12 +376,12 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
       case tbody: ScTemplateBody =>
         PsiTreeUtil.getParentOfType(tbody, classOf[ScTemplateDefinition]) match {
           case o: ScObject => s"Extract method to object ${o.name}"
-          case c: ScClass => s"Extract method to class ${c.name}"
-          case t: ScTrait => s"Extract method to trait ${t.name}"
+          case c: ScClass  => s"Extract method to class ${c.name}"
+          case t: ScTrait  => s"Extract method to trait ${t.name}"
           case n: ScNewTemplateDefinition =>
             "Extract method to anonymous class"
         }
-      case _: ScTryBlock => local("try block")
+      case _: ScTryBlock    => local("try block")
       case _: ScConstrBlock => local("constructor")
       case b: ScBlock =>
         b.getParent match {
@@ -370,12 +405,13 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
           case _ => local("code block")
         }
       case _: ScalaFile => "Extract file method"
-      case _ => "Unknown extraction"
+      case _            => "Unknown extraction"
     }
   }
 
   private def performRefactoring(
-      settings: ScalaExtractMethodSettings, editor: Editor) {
+      settings: ScalaExtractMethodSettings,
+      editor: Editor) {
     val method = ScalaExtractMethodUtils.createMethodFromSettings(settings)
     if (method == null) return
     val ics = settings.innerClassSettings
@@ -393,7 +429,9 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
 
       val classText = ics.classText(canonTextForTypes = true)
       val clazz = ScalaPsiElementFactory.createTemplateDefinitionFromText(
-          classText, anchorNext.getContext, anchorNext)
+        classText,
+        anchorNext.getContext,
+        anchorNext)
       addElementBefore(clazz, anchorNext)
       addElementBefore(newLine, anchorNext)
     }
@@ -415,10 +453,11 @@ class ScalaExtractMethodHandler extends RefactoringActionHandler {
     }
 
     def insertMethodCall() =
-      ScalaExtractMethodUtils.replaceWithMethodCall(settings,
-                                                    settings.elements,
-                                                    param => param.oldName,
-                                                    output => output.paramName)
+      ScalaExtractMethodUtils.replaceWithMethodCall(
+        settings,
+        settings.elements,
+        param => param.oldName,
+        output => output.paramName)
 
     PsiDocumentManager
       .getInstance(editor.getProject)

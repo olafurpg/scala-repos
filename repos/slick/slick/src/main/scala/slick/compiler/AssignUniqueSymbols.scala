@@ -27,7 +27,7 @@ class AssignUniqueSymbols extends Phase {
     val s2 = state.map { tree =>
       val replace = new HashMap[TermSymbol, AnonSymbol]
       def checkFeatures(n: Node): Unit = n match {
-        case _: Distinct => hasDistinct = true
+        case _: Distinct    => hasDistinct = true
         case _: TypeMapping => hasTypeMapping = true
         case n: Apply =>
           if (n.sym.isInstanceOf[AggregateFunctionSymbol]) hasAggregate = true
@@ -51,10 +51,11 @@ class AssignUniqueSymbols extends Phase {
             val d = g.copy(identity = new AnonTypeSymbol)
             val a = new AnonSymbol
             replace += g.fromGen -> a
-            g.copy(fromGen = a,
-                   tr(g.from),
-                   tr(g.by),
-                   identity = new AnonTypeSymbol)
+            g.copy(
+              fromGen = a,
+              tr(g.from),
+              tr(g.by),
+              identity = new AnonTypeSymbol)
           case n: StructNode => n.mapChildren(tr)
           case d: DefNode =>
             checkFeatures(d)
@@ -70,19 +71,23 @@ class AssignUniqueSymbols extends Phase {
       tr(tree)
     }
     val features = UsedFeatures(
-        hasDistinct, hasTypeMapping, hasAggregate, hasNonPrimitiveOption)
+      hasDistinct,
+      hasTypeMapping,
+      hasAggregate,
+      hasNonPrimitiveOption)
     logger.debug("Detected features: " + features)
     s2 + (this -> features)
   }
 
   def hasNominalType(t: Type): Boolean = t match {
     case _: NominalType => true
-    case _: AtomicType => false
-    case _ => t.children.exists(hasNominalType)
+    case _: AtomicType  => false
+    case _              => t.children.exists(hasNominalType)
   }
 }
 
-case class UsedFeatures(distinct: Boolean,
-                        typeMapping: Boolean,
-                        aggregate: Boolean,
-                        nonPrimitiveOption: Boolean)
+case class UsedFeatures(
+    distinct: Boolean,
+    typeMapping: Boolean,
+    aggregate: Boolean,
+    nonPrimitiveOption: Boolean)

@@ -17,7 +17,15 @@ package com.twitter.scalding
 
 import com.twitter.algebird.monad.Reader
 import com.twitter.algebird.Semigroup
-import cascading.flow.{Flow, FlowDef, FlowListener, FlowStep, FlowStepListener, FlowSkipStrategy, FlowStepStrategy}
+import cascading.flow.{
+  Flow,
+  FlowDef,
+  FlowListener,
+  FlowStep,
+  FlowStepListener,
+  FlowSkipStrategy,
+  FlowStepStrategy
+}
 import cascading.pipe.Pipe
 import cascading.property.AppProps
 import cascading.stats.CascadingStats
@@ -30,7 +38,13 @@ import scala.util.Try
 import java.io.{BufferedWriter, FileOutputStream, OutputStreamWriter}
 import java.util.{List => JList}
 
-import java.util.concurrent.{Executors, TimeUnit, ThreadFactory, Callable, TimeoutException}
+import java.util.concurrent.{
+  Executors,
+  TimeUnit,
+  ThreadFactory,
+  Callable,
+  TimeoutException
+}
 import java.util.concurrent.atomic.AtomicInteger
 
 object Job {
@@ -107,11 +121,13 @@ class Job(val args: Args) extends FieldConversions with java.io.Serializable {
 
   // This converts an Iterable into a Pipe or RichPipe with index (int-based) fields
   implicit def toPipe[T](iter: Iterable[T])(
-      implicit set: TupleSetter[T], conv: TupleConverter[T]): Pipe =
+      implicit set: TupleSetter[T],
+      conv: TupleConverter[T]): Pipe =
     IterableSource[T](iter)(set, conv).read
 
   implicit def iterableToRichPipe[T](iter: Iterable[T])(
-      implicit set: TupleSetter[T], conv: TupleConverter[T]): RichPipe =
+      implicit set: TupleSetter[T],
+      conv: TupleConverter[T]): RichPipe =
     RichPipe(toPipe(iter)(set, conv))
 
   // Provide args as an implicit val for extensions such as the Checkpoint extension.
@@ -186,11 +202,12 @@ class Job(val args: Args) extends FieldConversions with java.io.Serializable {
 
     // This is setting a property for cascading/driven
     AppProps.addApplicationFramework(
-        null, String.format("scalding:%s", scaldingVersion))
+      null,
+      String.format("scalding:%s", scaldingVersion))
 
     val modeConf = mode match {
       case h: HadoopMode => Config.fromHadoop(h.jobConf)
-      case _ => Config.empty
+      case _             => Config.empty
     }
 
     val init = base ++ modeConf
@@ -198,8 +215,9 @@ class Job(val args: Args) extends FieldConversions with java.io.Serializable {
     defaultComparator
       .map(init.setDefaultComparator)
       .getOrElse(init)
-      .setSerialization(Right(classOf[serialization.KryoHadoop]),
-                        ioSerializations)
+      .setSerialization(
+        Right(classOf[serialization.KryoHadoop]),
+        ioSerializations)
       .setScaldingVersion
       .setCascadingAppName(name)
       .setCascadingAppId(name)
@@ -247,8 +265,8 @@ class Job(val args: Args) extends FieldConversions with java.io.Serializable {
             if (existing == null) strategy
             else
               FlowStepStrategies[Any].plus(
-                  existing.asInstanceOf[FlowStepStrategy[Any]],
-                  strategy.asInstanceOf[FlowStepStrategy[Any]])
+                existing.asInstanceOf[FlowStepStrategy[Any]],
+                strategy.asInstanceOf[FlowStepStrategy[Any]])
           flow.setFlowStepStrategy(composed)
         }
         flow
@@ -274,7 +292,7 @@ class Job(val args: Args) extends FieldConversions with java.io.Serializable {
       val statsFilename =
         args.getOrElse("scalding.flowstats", name + "._flowstats.json")
       val br = new BufferedWriter(
-          new OutputStreamWriter(new FileOutputStream(statsFilename), "utf-8"))
+        new OutputStreamWriter(new FileOutputStream(statsFilename), "utf-8"))
       br.write(JobStats(statsData).toJson)
       br.close
     }
@@ -352,7 +370,7 @@ class Job(val args: Args) extends FieldConversions with java.io.Serializable {
    * Need to be lazy to be used within pipes.
    */
   private lazy val timeoutExecutor = Executors.newSingleThreadExecutor(
-      new NamedPoolThreadFactory("job-timer", true))
+    new NamedPoolThreadFactory("job-timer", true))
 
   /*
    * Safely execute some operation within a deadline.
@@ -385,8 +403,8 @@ class NamedPoolThreadFactory(name: String, makeDaemons: Boolean)
   val threadNumber = new AtomicInteger(1)
 
   def newThread(r: Runnable) = {
-    val thread = new Thread(
-        group, r, name + "-" + threadNumber.getAndIncrement())
+    val thread =
+      new Thread(group, r, name + "-" + threadNumber.getAndIncrement())
     thread.setDaemon(makeDaemons)
     if (thread.getPriority != Thread.NORM_PRIORITY) {
       thread.setPriority(Thread.NORM_PRIORITY)
@@ -410,7 +428,7 @@ trait DefaultDateRangeJob extends Job {
   def defaultTimeZone = PACIFIC
   implicit lazy val tz = args.optional("tz") match {
     case Some(tzn) => java.util.TimeZone.getTimeZone(tzn)
-    case None => defaultTimeZone
+    case None      => defaultTimeZone
   }
 
   // Optionally take a --period, which determines how many days each job runs over (rather
@@ -427,8 +445,8 @@ trait DefaultDateRangeJob extends Job {
   }
 
   implicit lazy val dateRange = DateRange(
-      startDate,
-      if (period > 0) startDate + Days(period) - Millisecs(1) else endDate)
+    startDate,
+    if (period > 0) startDate + Days(period) - Millisecs(1) else endDate)
 
   override def next: Option[Job] =
     if (period > 0) {
@@ -437,9 +455,11 @@ trait DefaultDateRangeJob extends Job {
       else
         // return a new job with the new startDate
         Some(
-            clone(args +
-                ("date" -> List(nextStartDate.toString("yyyy-MM-dd"),
-                                endDate.toString("yyyy-MM-dd")))))
+          clone(
+            args +
+              ("date" -> List(
+                nextStartDate.toString("yyyy-MM-dd"),
+                endDate.toString("yyyy-MM-dd")))))
     } else None
 }
 
@@ -473,17 +493,18 @@ abstract class ExecutionJob[+T](args: Args) extends Job(args) {
 
   override def buildFlow: Flow[_] =
     sys.error("ExecutionJobs do not have a single accessible flow. " +
-        "You cannot print the graph as it may be dynamically built or recurrent")
+      "You cannot print the graph as it may be dynamically built or recurrent")
 
   final override def run = {
     val r = Config.tryFrom(config).map { conf =>
-      Await.result(execution.run(conf, mode)(concurrentExecutionContext),
-                   scala.concurrent.duration.Duration.Inf)
+      Await.result(
+        execution.run(conf, mode)(concurrentExecutionContext),
+        scala.concurrent.duration.Duration.Inf)
     }
     if (!resultPromise.tryComplete(r)) {
       // The test framework can call this more than once.
       println(
-          "Warning: run called more than once, should not happen in production")
+        "Warning: run called more than once, should not happen in production")
     }
     // Force an exception if the run failed
     r.get
@@ -501,7 +522,9 @@ class ScriptJob(cmds: Iterable[String]) extends Job(Args("")) {
     try {
       cmds.dropWhile { cmd: String =>
         {
-          new java.lang.ProcessBuilder("bash", "-c", cmd).start().waitFor() match {
+          new java.lang.ProcessBuilder("bash", "-c", cmd)
+            .start()
+            .waitFor() match {
             case x if x != 0 =>
               println(cmd + " failed, exitStatus: " + x)
               false
@@ -511,9 +534,9 @@ class ScriptJob(cmds: Iterable[String]) extends Job(Args("")) {
       }.isEmpty
     } catch {
       case e: Exception => {
-          e.printStackTrace
-          false
-        }
+        e.printStackTrace
+        false
+      }
     }
   }
 }
@@ -549,11 +572,13 @@ private[scalding] case class FlowStepStrategies[A]()
     * Returns a new FlowStepStrategy that runs both strategies in sequence.
     */
   def plus(
-      l: FlowStepStrategy[A], r: FlowStepStrategy[A]): FlowStepStrategy[A] =
+      l: FlowStepStrategy[A],
+      r: FlowStepStrategy[A]): FlowStepStrategy[A] =
     new FlowStepStrategy[A] {
-      override def apply(flow: Flow[A],
-                         predecessorSteps: JList[FlowStep[A]],
-                         flowStep: FlowStep[A]): Unit = {
+      override def apply(
+          flow: Flow[A],
+          predecessorSteps: JList[FlowStep[A]],
+          flowStep: FlowStep[A]): Unit = {
         l.apply(flow, predecessorSteps, flowStep)
         r.apply(flow, predecessorSteps, flowStep)
       }

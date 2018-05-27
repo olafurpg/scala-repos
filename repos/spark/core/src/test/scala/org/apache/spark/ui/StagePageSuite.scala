@@ -50,7 +50,7 @@ class StagePageSuite extends SparkFunSuite with LocalSparkContext {
   }
 
   test(
-      "SPARK-10543: peak execution memory should be per-task rather than cumulative") {
+    "SPARK-10543: peak execution memory should be per-task rather than cumulative") {
     val unsafeConf = "spark.sql.unsafe.enabled"
     val conf = new SparkConf(false).set(unsafeConf, "true")
     val html = renderStagePage(conf).toString().toLowerCase
@@ -77,19 +77,26 @@ class StagePageSuite extends SparkFunSuite with LocalSparkContext {
     val page = new StagePage(tab)
 
     // Simulate a stage in job progress listener
-    val stageInfo = new StageInfo(
-        0, 0, "dummy", 1, Seq.empty, Seq.empty, "details")
+    val stageInfo =
+      new StageInfo(0, 0, "dummy", 1, Seq.empty, Seq.empty, "details")
     // Simulate two tasks to test PEAK_EXECUTION_MEMORY correctness
     (1 to 2).foreach { taskId =>
       val taskInfo = new TaskInfo(
-          taskId, taskId, 0, 0, "0", "localhost", TaskLocality.ANY, false)
+        taskId,
+        taskId,
+        0,
+        0,
+        "0",
+        "localhost",
+        TaskLocality.ANY,
+        false)
       jobListener.onStageSubmitted(SparkListenerStageSubmitted(stageInfo))
       jobListener.onTaskStart(SparkListenerTaskStart(0, 0, taskInfo))
       taskInfo.markSuccessful()
       val taskMetrics = TaskMetrics.empty
       taskMetrics.incPeakExecutionMemory(peakExecutionMemory)
       jobListener.onTaskEnd(
-          SparkListenerTaskEnd(0, 0, "result", Success, taskInfo, taskMetrics))
+        SparkListenerTaskEnd(0, 0, "result", Success, taskInfo, taskMetrics))
     }
     jobListener.onStageCompleted(SparkListenerStageCompleted(stageInfo))
     page.render(request)

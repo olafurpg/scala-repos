@@ -2,7 +2,14 @@ package com.twitter.summingbird.online
 
 import com.twitter.summingbird.memory.Memory
 import com.twitter.summingbird.planner.StripNamedNode
-import com.twitter.summingbird.{Dependants, Producer, OptionMappedProducer, NamedProducer, Source, Summer}
+import com.twitter.summingbird.{
+  Dependants,
+  Producer,
+  OptionMappedProducer,
+  NamedProducer,
+  Source,
+  Summer
+}
 import org.scalatest.FunSuite
 import scala.collection.mutable.{Map => MMap}
 
@@ -25,7 +32,7 @@ class StripNameTest extends FunSuite {
 
     val deps = Dependants(graph)
     assert(
-        deps.namesOf(src).map(_.id).toSet == Set("source", "map", "sumByKey"))
+      deps.namesOf(src).map(_.id).toSet == Set("source", "map", "sumByKey"))
     assert(deps.namesOf(mapped).map(_.id).toSet == Set("map", "sumByKey"))
     assert(deps.namesOf(summed).map(_.id).toSet == Set("sumByKey"))
 
@@ -52,7 +59,7 @@ class StripNameTest extends FunSuite {
 
     // The final stripped has no names:
     assert(
-        strippedDeps.nodes.collect { case NamedProducer(_, _) => 1 }.sum == 0)
+      strippedDeps.nodes.collect { case NamedProducer(_, _) => 1 }.sum == 0)
   }
   test("merge name test") {
     /*
@@ -118,7 +125,7 @@ class StripNameTest extends FunSuite {
 
     // The final stripped has no names:
     assert(
-        strippedDeps.nodes.collect { case NamedProducer(_, _) => 1 }.sum == 0)
+      strippedDeps.nodes.collect { case NamedProducer(_, _) => 1 }.sum == 0)
   }
 
   test("Fan-out name test") {
@@ -179,8 +186,9 @@ class StripNameTest extends FunSuite {
       assert(nodes.size == 1) // Only one node
       val ordering = nameMap(nodes(0)).zipWithIndex.toMap
       val order = Ordering.by(ordering)
-      assert(names.sorted(order) == names,
-             s"not sorted: $names != ${names.sorted(order)}")
+      assert(
+        names.sorted(order) == names,
+        s"not sorted: $names != ${names.sorted(order)}")
     }
     assertName(List("source", "map0", "sumByKey0")) {
       case p @ Source(l) if l == input => p
@@ -202,6 +210,6 @@ class StripNameTest extends FunSuite {
     }
     // The final stripped has no names:
     assert(
-        strippedDeps.nodes.collect { case NamedProducer(_, _) => 1 }.sum == 0)
+      strippedDeps.nodes.collect { case NamedProducer(_, _) => 1 }.sum == 0)
   }
 }

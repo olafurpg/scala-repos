@@ -8,13 +8,14 @@ import lila.common.PimpedConfig._
 import scala.collection.JavaConversions._
 import scala.concurrent.duration._
 
-final class Env(config: Config,
-                db: lila.db.Env,
-                hub: lila.hub.Env,
-                lightUser: String => Option[lila.common.LightUser],
-                system: ActorSystem,
-                scheduler: lila.common.Scheduler,
-                isProd: Boolean) {
+final class Env(
+    config: Config,
+    db: lila.db.Env,
+    hub: lila.hub.Env,
+    lightUser: String => Option[lila.common.LightUser],
+    system: ActorSystem,
+    scheduler: lila.common.Scheduler,
+    isProd: Boolean) {
 
   private val FeaturedSelect = config duration "featured.select"
   private val StreamingSearch = config duration "streaming.search"
@@ -24,14 +25,15 @@ final class Env(config: Config,
   lazy val tv = new Tv(tvActor)
 
   private val tvActor = system.actorOf(
-      Props(classOf[TvActor], hub.actor.renderer, hub.socket.round, lightUser),
-      name = "tv")
+    Props(classOf[TvActor], hub.actor.renderer, hub.socket.round, lightUser),
+    name = "tv")
 
-  private lazy val streaming = new Streaming(system = system,
-                                             renderer = hub.actor.renderer,
-                                             streamerList = streamerList,
-                                             keyword = Keyword,
-                                             googleApiKey = GoogleApiKey)
+  private lazy val streaming = new Streaming(
+    system = system,
+    renderer = hub.actor.renderer,
+    streamerList = streamerList,
+    keyword = Keyword,
+    googleApiKey = GoogleApiKey)
 
   lazy val streamerList = new StreamerList(new {
     import reactivemongo.bson._
@@ -42,18 +44,19 @@ final class Env(config: Config,
       }
     def set(text: String) =
       coll
-        .update(BSONDocument("_id" -> "streamer"),
-                BSONDocument("text" -> text),
-                upsert = true)
+        .update(
+          BSONDocument("_id" -> "streamer"),
+          BSONDocument("text" -> text),
+          upsert = true)
         .void
   })
 
   object isStreamer {
     private val cache = lila.memo.MixedCache.single[Set[String]](
-        f = streamerList.lichessIds,
-        timeToLive = 10 seconds,
-        default = Set.empty,
-        logger = logger)
+      f = streamerList.lichessIds,
+      timeToLive = 10 seconds,
+      default = Set.empty,
+      logger = logger)
     def apply(id: String) = cache get true contains id
   }
 
@@ -82,11 +85,13 @@ final class Env(config: Config,
 object Env {
 
   lazy val current =
-    "tv" boot new Env(config = lila.common.PlayApp loadConfig "tv",
-                      db = lila.db.Env.current,
-                      hub = lila.hub.Env.current,
-                      lightUser = lila.user.Env.current.lightUser,
-                      system = lila.common.PlayApp.system,
-                      scheduler = lila.common.PlayApp.scheduler,
-                      isProd = lila.common.PlayApp.isProd)
+    "tv" boot new Env(
+      config = lila.common.PlayApp loadConfig "tv",
+      db = lila.db.Env.current,
+      hub = lila.hub.Env.current,
+      lightUser = lila.user.Env.current.lightUser,
+      system = lila.common.PlayApp.system,
+      scheduler = lila.common.PlayApp.scheduler,
+      isProd = lila.common.PlayApp.isProd
+    )
 }

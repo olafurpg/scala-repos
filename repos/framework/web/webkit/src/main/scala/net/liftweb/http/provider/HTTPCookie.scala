@@ -31,14 +31,15 @@ object HTTPCookie {
 /**
   * Repersents an immutable representation of an HTTP Cookie
   */
-case class HTTPCookie(name: String,
-                      value: Box[String],
-                      domain: Box[String],
-                      path: Box[String],
-                      maxAge: Box[Int],
-                      version: Box[Int],
-                      secure_? : Box[Boolean],
-                      httpOnly: Box[Boolean] = Empty)
+case class HTTPCookie(
+    name: String,
+    value: Box[String],
+    domain: Box[String],
+    path: Box[String],
+    maxAge: Box[Int],
+    version: Box[Int],
+    secure_? : Box[Boolean],
+    httpOnly: Box[Boolean] = Empty)
     extends java.lang.Cloneable {
   override def clone(): HTTPCookie = {
     super.clone()

@@ -21,12 +21,13 @@ private[http] object HttpContext {
       val values = header.split(' ')
       val timestamp = values(0).toLong
       val deadline = values(1).toLong
-      Some(Deadline(
-              Time.fromNanoseconds(timestamp), Time.fromNanoseconds(deadline)))
+      Some(
+        Deadline(
+          Time.fromNanoseconds(timestamp),
+          Time.fromNanoseconds(deadline)))
     } catch {
       case NonFatal(exc) =>
-        log.debug(
-            s"Could not unmarshall Deadline from header value: ${header}")
+        log.debug(s"Could not unmarshall Deadline from header value: ${header}")
         None
     }
 
@@ -40,7 +41,7 @@ private[http] object HttpContext {
       case Some(str) =>
         unmarshalDeadline(str) match {
           case Some(deadline) => Contexts.broadcast.let(Deadline, deadline)(fn)
-          case None => fn
+          case None           => fn
         }
       case None =>
         fn

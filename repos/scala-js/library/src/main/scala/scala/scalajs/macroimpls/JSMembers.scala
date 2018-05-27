@@ -70,7 +70,7 @@ private[macroimpls] trait JSMembers {
   case class JSGetter(tpe: Type) extends JSMember {
     def conformsTo(that: JSMember): Boolean = that match {
       case JSGetter(thatTpe) => tpe <:< thatTpe
-      case _ => false
+      case _                 => false
     }
 
     def displayStr(name: String): String = s"getter $name: $tpe"
@@ -79,7 +79,7 @@ private[macroimpls] trait JSMembers {
   case class JSSetter(tpe: Type) extends JSMember {
     def conformsTo(that: JSMember): Boolean = that match {
       case JSSetter(thatTpe) => thatTpe <:< tpe
-      case _ => false
+      case _                 => false
     }
 
     def displayStr(name: String): String = s"setter $name: $tpe"

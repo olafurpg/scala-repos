@@ -27,7 +27,9 @@ import org.apache.kafka.common.utils.Time
   * @param callback Callback to trigger after delayTimeMs milliseconds
   */
 private[server] class ThrottledResponse(
-    val time: Time, val throttleTimeMs: Int, callback: Int => Unit)
+    val time: Time,
+    val throttleTimeMs: Int,
+    callback: Int => Unit)
     extends Delayed {
   val endTime = time.milliseconds + throttleTimeMs
 

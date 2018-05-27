@@ -5,7 +5,9 @@ import mesosphere.marathon.core.appinfo.{GroupInfo, AppInfo}
 import org.scalatest.{Matchers, GivenWhenThen}
 
 class InfoEmbedResolverTest
-    extends MarathonSpec with GivenWhenThen with Matchers {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Matchers {
 
   val prefixes = Seq("", "app.", "apps.")
 
@@ -51,9 +53,11 @@ class InfoEmbedResolverTest
       When(s"embed=${prefix}failures")
       val resolved = InfoEmbedResolver.resolveApp(Set(s"${prefix}failures"))
       Then("it should resolve correctly")
-      resolved should be(Set(AppInfo.Embed.Tasks,
-                             AppInfo.Embed.Deployments,
-                             AppInfo.Embed.LastTaskFailure))
+      resolved should be(
+        Set(
+          AppInfo.Embed.Tasks,
+          AppInfo.Embed.Deployments,
+          AppInfo.Embed.LastTaskFailure))
     }
   }
 
@@ -62,23 +66,21 @@ class InfoEmbedResolverTest
     val resolved =
       InfoEmbedResolver.resolveApp(Set("lastTaskFailure", "counts"))
     Then("it should resolve correctly")
-    resolved should be(
-        Set(AppInfo.Embed.LastTaskFailure, AppInfo.Embed.Counts))
+    resolved should be(Set(AppInfo.Embed.LastTaskFailure, AppInfo.Embed.Counts))
   }
 
   test("Unknown embed options are ignored") {
     When(s"embed=lastTaskFailure and embed=counts and embed=something")
     val resolved = InfoEmbedResolver.resolveApp(
-        Set("lastTaskFailure", "counts", "something"))
+      Set("lastTaskFailure", "counts", "something"))
     Then("it should resolve correctly")
-    resolved should be(
-        Set(AppInfo.Embed.LastTaskFailure, AppInfo.Embed.Counts))
+    resolved should be(Set(AppInfo.Embed.LastTaskFailure, AppInfo.Embed.Counts))
   }
 
   test("Group resolving works") {
     When("We resolve group embed infos")
     val resolved = InfoEmbedResolver.resolveGroup(
-        Set("group.groups", "group.apps", "group.unknown", "unknown"))
+      Set("group.groups", "group.apps", "group.unknown", "unknown"))
 
     Then("The embed parameter are resolved correctly")
     resolved should be(Set(GroupInfo.Embed.Apps, GroupInfo.Embed.Groups))
@@ -87,12 +89,13 @@ class InfoEmbedResolverTest
   test("App / Group resolving works") {
     When("We resolve group embed infos")
     val (app, group) = InfoEmbedResolver.resolveAppGroup(
-        Set("group.groups",
-            "group.apps",
-            "group.apps.tasks",
-            "group.apps.unknown",
-            "group.unknown",
-            "unknown"))
+      Set(
+        "group.groups",
+        "group.apps",
+        "group.apps.tasks",
+        "group.apps.unknown",
+        "group.unknown",
+        "unknown"))
 
     Then("The embed parameter are resolved correctly")
     group should be(Set(GroupInfo.Embed.Apps, GroupInfo.Embed.Groups))

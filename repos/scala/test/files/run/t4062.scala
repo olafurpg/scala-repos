@@ -3,7 +3,7 @@ class A(val f: String)
 class B(f: String) extends A(f) {
   def foo(x: String) = x match {
     case `f` => true
-    case _ => false
+    case _   => false
   }
 }
 

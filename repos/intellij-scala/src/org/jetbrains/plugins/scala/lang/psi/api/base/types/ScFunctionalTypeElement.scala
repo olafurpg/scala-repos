@@ -15,6 +15,6 @@ trait ScFunctionalTypeElement extends ScTypeElement {
   def returnTypeElement =
     findChildrenByClassScala(classOf[ScTypeElement]) match {
       case Array(single) => None
-      case many => Some(many(1))
+      case many          => Some(many(1))
     }
 }

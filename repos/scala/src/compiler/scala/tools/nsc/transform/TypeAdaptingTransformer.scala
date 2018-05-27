@@ -18,7 +18,7 @@ trait TypeAdaptingTransformer { self: TreeDSL =>
 
     def isMethodTypeWithEmptyParams(tpe: Type) = tpe match {
       case MethodType(Nil, _) => true
-      case _ => false
+      case _                  => false
     }
 
     private def isSafelyRemovableUnbox(fn: Tree, arg: Tree): Boolean = {
@@ -43,7 +43,8 @@ trait TypeAdaptingTransformer { self: TreeDSL =>
       val result = box1(tree)
       if (tree.tpe =:= UnitTpe) ()
       else
-        log(s"boxing ${tree.summaryString}: ${tree.tpe} into $target: ${result.tpe}")
+        log(
+          s"boxing ${tree.summaryString}: ${tree.tpe} into $target: ${result.tpe}")
       result
     }
 
@@ -78,7 +79,7 @@ trait TypeAdaptingTransformer { self: TreeDSL =>
                     arg
                   case _ =>
                     (REF(currentRun.runDefinitions.boxMethod(x)) APPLY tree) setPos
-                    (tree.pos) setType ObjectTpe
+                      (tree.pos) setType ObjectTpe
                 }
             }
         }
@@ -116,9 +117,11 @@ trait TypeAdaptingTransformer { self: TreeDSL =>
                 // via the unboxed type would yield a NPE (see SI-5866)
                 unbox1(tree, underlying)
               } else
-                Apply(Select(adaptToType(tree, clazz.tpe),
-                             clazz.derivedValueClassUnbox),
-                      List())
+                Apply(
+                  Select(
+                    adaptToType(tree, clazz.tpe),
+                    clazz.derivedValueClassUnbox),
+                  List())
             cast(tree0, pt)
           case _ =>
             pt.typeSymbol match {
@@ -129,7 +132,8 @@ trait TypeAdaptingTransformer { self: TreeDSL =>
                 assert(x != ArrayClass)
                 // don't `setType pt` the Apply tree, as the Apply's fun won't be typechecked if the Apply tree already has a type
                 Apply(
-                    currentRun.runDefinitions.unboxMethod(pt.typeSymbol), tree)
+                  currentRun.runDefinitions.unboxMethod(pt.typeSymbol),
+                  tree)
             }
         }
         typer.typedPos(tree.pos)(tree1)
@@ -140,11 +144,12 @@ trait TypeAdaptingTransformer { self: TreeDSL =>
       */
     def cast(tree: Tree, pt: Type): Tree = {
       if ((tree.tpe ne null) && !(tree.tpe =:= ObjectTpe)) {
-        def word = (if (tree.tpe <:< pt) "upcast"
-                    else if (pt <:< tree.tpe) "downcast"
-                    else if (pt weak_<:< tree.tpe) "coerce"
-                    else if (tree.tpe weak_<:< pt) "widen"
-                    else "cast")
+        def word =
+          (if (tree.tpe <:< pt) "upcast"
+           else if (pt <:< tree.tpe) "downcast"
+           else if (pt weak_<:< tree.tpe) "coerce"
+           else if (tree.tpe weak_<:< pt) "widen"
+           else "cast")
         log(s"erasure ${word}s from ${tree.tpe} to $pt")
       }
       if (pt =:= UnitTpe) {
@@ -156,7 +161,7 @@ trait TypeAdaptingTransformer { self: TreeDSL =>
         // See SI-2386 for one example of when this might be necessary.
         val needsExtraCast =
           isPrimitiveValueType(tree.tpe.typeArgs.head) &&
-          !isPrimitiveValueType(pt.typeArgs.head)
+            !isPrimitiveValueType(pt.typeArgs.head)
         val tree1 =
           if (needsExtraCast) gen.mkRuntimeCall(nme.toObjectArray, List(tree))
           else tree
@@ -172,7 +177,8 @@ trait TypeAdaptingTransformer { self: TreeDSL =>
       */
     def adaptToType(tree: Tree, pt: Type): Tree = {
       if (settings.debug && pt != WildcardType)
-        log("adapting " + tree + ":" + tree.tpe + " : " + tree.tpe.parents +
+        log(
+          "adapting " + tree + ":" + tree.tpe + " : " + tree.tpe.parents +
             " to " + pt) //debug
       if (tree.tpe <:< pt) tree
       else if (isDifferentErasedValueType(tree.tpe, pt))
@@ -185,8 +191,8 @@ trait TypeAdaptingTransformer { self: TreeDSL =>
         // [H] this assert fails when trying to typecheck tree !(SomeClass.this.bitmap) for single lazy val
         //assert(tree.symbol.isStable, "adapt "+tree+":"+tree.tpe+" to "+pt)
         adaptToType(
-            Apply(tree, List()) setPos tree.pos setType tree.tpe.resultType,
-            pt)
+          Apply(tree, List()) setPos tree.pos setType tree.tpe.resultType,
+          pt)
 //      } else if (pt <:< tree.tpe)
 //        cast(tree, pt)
       } else if (isPrimitiveValueType(pt) && !isPrimitiveValueType(tree.tpe))

@@ -39,8 +39,14 @@ import org.apache.spark.sql.types.{DataType, StructType}
   * Params for Generalized Linear Regression.
   */
 private[regression] trait GeneralizedLinearRegressionBase
-    extends PredictorParams with HasFitIntercept with HasMaxIter with HasTol
-    with HasRegParam with HasWeightCol with HasSolver with Logging {
+    extends PredictorParams
+    with HasFitIntercept
+    with HasMaxIter
+    with HasTol
+    with HasRegParam
+    with HasWeightCol
+    with HasSolver
+    with Logging {
 
   /**
     * Param for the name of family which is a description of the error distribution
@@ -51,12 +57,13 @@ private[regression] trait GeneralizedLinearRegressionBase
     */
   @Since("2.0.0")
   final val family: Param[String] = new Param(
-      this,
-      "family",
-      "The name of family which is a description of the error distribution to be used in the " +
+    this,
+    "family",
+    "The name of family which is a description of the error distribution to be used in the " +
       "model. Supported options: gaussian(default), binomial, poisson and gamma.",
-      ParamValidators.inArray[String](
-          GeneralizedLinearRegression.supportedFamilyNames.toArray))
+    ParamValidators.inArray[String](
+      GeneralizedLinearRegression.supportedFamilyNames.toArray)
+  )
 
   /** @group getParam */
   @Since("2.0.0")
@@ -70,14 +77,15 @@ private[regression] trait GeneralizedLinearRegressionBase
     */
   @Since("2.0.0")
   final val link: Param[String] = new Param(
-      this,
-      "link",
-      "The name of link function " +
+    this,
+    "link",
+    "The name of link function " +
       "which provides the relationship between the linear predictor and the mean of the " +
       "distribution function. Supported options: identity, log, inverse, logit, probit, " +
       "cloglog and sqrt.",
-      ParamValidators.inArray[String](
-          GeneralizedLinearRegression.supportedLinkNames.toArray))
+    ParamValidators.inArray[String](
+      GeneralizedLinearRegression.supportedLinkNames.toArray)
+  )
 
   /** @group getParam */
   @Since("2.0.0")
@@ -95,10 +103,11 @@ private[regression] trait GeneralizedLinearRegressionBase
     }
     if (isDefined(link)) {
       require(
-          supportedFamilyAndLinkPairs.contains(
-              Family.fromName($(family)) -> Link.fromName($(link))),
-          "Generalized Linear Regression " +
-          s"with ${$(family)} family does not support ${$(link)} link function.")
+        supportedFamilyAndLinkPairs.contains(
+          Family.fromName($(family)) -> Link.fromName($(link))),
+        "Generalized Linear Regression " +
+          s"with ${$(family)} family does not support ${$(link)} link function."
+      )
     }
     super.validateAndTransformSchema(schema, fitting, featuresDataType)
   }
@@ -123,8 +132,11 @@ private[regression] trait GeneralizedLinearRegressionBase
 class GeneralizedLinearRegression @Since("2.0.0")(
     @Since("2.0.0") override val uid: String)
     extends Regressor[
-        Vector, GeneralizedLinearRegression, GeneralizedLinearRegressionModel]
-    with GeneralizedLinearRegressionBase with DefaultParamsWritable
+      Vector,
+      GeneralizedLinearRegression,
+      GeneralizedLinearRegressionModel]
+    with GeneralizedLinearRegressionBase
+    with DefaultParamsWritable
     with Logging {
 
   import GeneralizedLinearRegression._
@@ -225,7 +237,7 @@ class GeneralizedLinearRegression @Since("2.0.0")(
     if (numFeatures > WeightedLeastSquares.MAX_NUM_FEATURES) {
       val msg =
         "Currently, GeneralizedLinearRegression only supports number of features" +
-        s" <= ${WeightedLeastSquares.MAX_NUM_FEATURES}. Found $numFeatures in the input dataset."
+          s" <= ${WeightedLeastSquares.MAX_NUM_FEATURES}. Found $numFeatures in the input dataset."
       throw new SparkException(msg)
     }
 
@@ -238,23 +250,26 @@ class GeneralizedLinearRegression @Since("2.0.0")(
 
     if (familyObj == Gaussian && linkObj == Identity) {
       // TODO: Make standardizeFeatures and standardizeLabel configurable.
-      val optimizer = new WeightedLeastSquares($(fitIntercept),
-                                               $(regParam),
-                                               standardizeFeatures = true,
-                                               standardizeLabel = true)
+      val optimizer = new WeightedLeastSquares(
+        $(fitIntercept),
+        $(regParam),
+        standardizeFeatures = true,
+        standardizeLabel = true)
       val wlsModel = optimizer.fit(instances)
       val model = copyValues(
-          new GeneralizedLinearRegressionModel(
-              uid, wlsModel.coefficients, wlsModel.intercept).setParent(this))
+        new GeneralizedLinearRegressionModel(
+          uid,
+          wlsModel.coefficients,
+          wlsModel.intercept).setParent(this))
       // Handle possible missing or invalid prediction columns
       val (summaryModel, predictionColName) =
         model.findSummaryModelAndPredictionCol()
       val trainingSummary = new GeneralizedLinearRegressionSummary(
-          summaryModel.transform(dataset),
-          predictionColName,
-          model,
-          wlsModel.diagInvAtWA.toArray,
-          1)
+        summaryModel.transform(dataset),
+        predictionColName,
+        model,
+        wlsModel.diagInvAtWA.toArray,
+        1)
       return model.setSummary(trainingSummary)
     }
 
@@ -262,26 +277,28 @@ class GeneralizedLinearRegression @Since("2.0.0")(
     val initialModel =
       familyAndLink.initialize(instances, $(fitIntercept), $(regParam))
     val optimizer = new IterativelyReweightedLeastSquares(
-        initialModel,
-        familyAndLink.reweightFunc,
-        $(fitIntercept),
-        $(regParam),
-        $(maxIter),
-        $(tol))
+      initialModel,
+      familyAndLink.reweightFunc,
+      $(fitIntercept),
+      $(regParam),
+      $(maxIter),
+      $(tol))
     val irlsModel = optimizer.fit(instances)
 
     val model = copyValues(
-        new GeneralizedLinearRegressionModel(
-            uid, irlsModel.coefficients, irlsModel.intercept).setParent(this))
+      new GeneralizedLinearRegressionModel(
+        uid,
+        irlsModel.coefficients,
+        irlsModel.intercept).setParent(this))
     // Handle possible missing or invalid prediction columns
     val (summaryModel, predictionColName) =
       model.findSummaryModelAndPredictionCol()
     val trainingSummary = new GeneralizedLinearRegressionSummary(
-        summaryModel.transform(dataset),
-        predictionColName,
-        model,
-        irlsModel.diagInvAtWA.toArray,
-        irlsModel.numIterations)
+      summaryModel.transform(dataset),
+      predictionColName,
+      model,
+      irlsModel.diagInvAtWA.toArray,
+      irlsModel.numIterations)
 
     model.setSummary(trainingSummary)
   }
@@ -301,18 +318,18 @@ object GeneralizedLinearRegression
 
   /** Set of family and link pairs that GeneralizedLinearRegression supports. */
   private[ml] lazy val supportedFamilyAndLinkPairs = Set(
-      Gaussian -> Identity,
-      Gaussian -> Log,
-      Gaussian -> Inverse,
-      Binomial -> Logit,
-      Binomial -> Probit,
-      Binomial -> CLogLog,
-      Poisson -> Log,
-      Poisson -> Identity,
-      Poisson -> Sqrt,
-      Gamma -> Inverse,
-      Gamma -> Identity,
-      Gamma -> Log
+    Gaussian -> Identity,
+    Gaussian -> Log,
+    Gaussian -> Inverse,
+    Binomial -> Logit,
+    Binomial -> Probit,
+    Binomial -> CLogLog,
+    Poisson -> Log,
+    Poisson -> Identity,
+    Poisson -> Sqrt,
+    Gamma -> Inverse,
+    Gamma -> Identity,
+    Gamma -> Log
   )
 
   /** Set of family names that GeneralizedLinearRegression supports. */
@@ -340,9 +357,10 @@ object GeneralizedLinearRegression
     /**
       * Get the initial guess model for [[IterativelyReweightedLeastSquares]].
       */
-    def initialize(instances: RDD[Instance],
-                   fitIntercept: Boolean,
-                   regParam: Double): WeightedLeastSquaresModel = {
+    def initialize(
+        instances: RDD[Instance],
+        fitIntercept: Boolean,
+        regParam: Double): WeightedLeastSquaresModel = {
       val newInstances = instances.map { instance =>
         val mu = family.initialize(instance.label, instance.weight)
         val eta = predict(mu)
@@ -350,10 +368,11 @@ object GeneralizedLinearRegression
       }
       // TODO: Make standardizeFeatures and standardizeLabel configurable.
       val initialModel =
-        new WeightedLeastSquares(fitIntercept,
-                                 regParam,
-                                 standardizeFeatures = true,
-                                 standardizeLabel = true).fit(newInstances)
+        new WeightedLeastSquares(
+          fitIntercept,
+          regParam,
+          standardizeFeatures = true,
+          standardizeLabel = true).fit(newInstances)
       initialModel
     }
 
@@ -361,17 +380,18 @@ object GeneralizedLinearRegression
       * The reweight function used to update offsets and weights
       * at each iteration of [[IterativelyReweightedLeastSquares]].
       */
-    val reweightFunc: (Instance, WeightedLeastSquaresModel) => (Double,
-    Double) = { (instance: Instance, model: WeightedLeastSquaresModel) =>
-      {
-        val eta = model.predict(instance.features)
-        val mu = fitted(eta)
-        val offset = eta + (instance.label - mu) * link.deriv(mu)
-        val weight =
-          instance.weight /
-          (math.pow(this.link.deriv(mu), 2.0) * family.variance(mu))
-        (offset, weight)
-      }
+    val reweightFunc
+      : (Instance, WeightedLeastSquaresModel) => (Double, Double) = {
+      (instance: Instance, model: WeightedLeastSquaresModel) =>
+        {
+          val eta = model.predict(instance.features)
+          val mu = fitted(eta)
+          val offset = eta + (instance.label - mu) * link.deriv(mu)
+          val weight =
+            instance.weight /
+              (math.pow(this.link.deriv(mu), 2.0) * family.variance(mu))
+          (offset, weight)
+        }
     }
   }
 
@@ -400,10 +420,11 @@ object GeneralizedLinearRegression
       * @param numInstances number of instances in evaluation dataset
       * @param weightSum weights sum of instances in evaluation dataset
       */
-    def aic(predictions: RDD[(Double, Double, Double)],
-            deviance: Double,
-            numInstances: Double,
-            weightSum: Double): Double
+    def aic(
+        predictions: RDD[(Double, Double, Double)],
+        deviance: Double,
+        numInstances: Double,
+        weightSum: Double): Double
 
     /** Trim the fitted value so that it will be in valid range. */
     def project(mu: Double): Double = mu
@@ -419,8 +440,8 @@ object GeneralizedLinearRegression
       name match {
         case Gaussian.name => Gaussian
         case Binomial.name => Binomial
-        case Poisson.name => Poisson
-        case Gamma.name => Gamma
+        case Poisson.name  => Poisson
+        case Gamma.name    => Gamma
       }
     }
   }
@@ -441,13 +462,14 @@ object GeneralizedLinearRegression
       weight * (y - mu) * (y - mu)
     }
 
-    override def aic(predictions: RDD[(Double, Double, Double)],
-                     deviance: Double,
-                     numInstances: Double,
-                     weightSum: Double): Double = {
+    override def aic(
+        predictions: RDD[(Double, Double, Double)],
+        deviance: Double,
+        numInstances: Double,
+        weightSum: Double): Double = {
       val wt = predictions.map(x => math.log(x._3)).sum()
       numInstances * (math.log(deviance / numInstances * 2.0 * math.Pi) + 1.0) +
-      2.0 - wt
+        2.0 - wt
     }
 
     override def project(mu: Double): Double = {
@@ -471,9 +493,10 @@ object GeneralizedLinearRegression
 
     override def initialize(y: Double, weight: Double): Double = {
       val mu = (weight * y + 0.5) / (weight + 1.0)
-      require(mu > 0.0 && mu < 1.0,
-              "The response variable of Binomial family" +
-              s"should be in range (0, 1), but got $mu")
+      require(
+        mu > 0.0 && mu < 1.0,
+        "The response variable of Binomial family" +
+          s"should be in range (0, 1), but got $mu")
       mu
     }
 
@@ -482,18 +505,21 @@ object GeneralizedLinearRegression
     override def deviance(y: Double, mu: Double, weight: Double): Double = {
       val my = 1.0 - y
       2.0 * weight *
-      (y * math.log(math.max(y, 1.0) / mu) +
+        (y * math.log(math.max(y, 1.0) / mu) +
           my * math.log(math.max(my, 1.0) / (1.0 - mu)))
     }
 
-    override def aic(predictions: RDD[(Double, Double, Double)],
-                     deviance: Double,
-                     numInstances: Double,
-                     weightSum: Double): Double = {
-      -2.0 * predictions.map {
-        case (y: Double, mu: Double, weight: Double) =>
-          weight * dist.Binomial(1, mu).logProbabilityOf(math.round(y).toInt)
-      }.sum()
+    override def aic(
+        predictions: RDD[(Double, Double, Double)],
+        deviance: Double,
+        numInstances: Double,
+        weightSum: Double): Double = {
+      -2.0 * predictions
+        .map {
+          case (y: Double, mu: Double, weight: Double) =>
+            weight * dist.Binomial(1, mu).logProbabilityOf(math.round(y).toInt)
+        }
+        .sum()
     }
 
     override def project(mu: Double): Double = {
@@ -516,9 +542,10 @@ object GeneralizedLinearRegression
     val defaultLink: Link = Log
 
     override def initialize(y: Double, weight: Double): Double = {
-      require(y > 0.0,
-              "The response variable of Poisson family " +
-              s"should be positive, but got $y")
+      require(
+        y > 0.0,
+        "The response variable of Poisson family " +
+          s"should be positive, but got $y")
       y
     }
 
@@ -528,14 +555,17 @@ object GeneralizedLinearRegression
       2.0 * weight * (y * math.log(y / mu) - (y - mu))
     }
 
-    override def aic(predictions: RDD[(Double, Double, Double)],
-                     deviance: Double,
-                     numInstances: Double,
-                     weightSum: Double): Double = {
-      -2.0 * predictions.map {
-        case (y: Double, mu: Double, weight: Double) =>
-          weight * dist.Poisson(mu).logProbabilityOf(y.toInt)
-      }.sum()
+    override def aic(
+        predictions: RDD[(Double, Double, Double)],
+        deviance: Double,
+        numInstances: Double,
+        weightSum: Double): Double = {
+      -2.0 * predictions
+        .map {
+          case (y: Double, mu: Double, weight: Double) =>
+            weight * dist.Poisson(mu).logProbabilityOf(y.toInt)
+        }
+        .sum()
     }
 
     override def project(mu: Double): Double = {
@@ -558,9 +588,10 @@ object GeneralizedLinearRegression
     val defaultLink: Link = Inverse
 
     override def initialize(y: Double, weight: Double): Double = {
-      require(y > 0.0,
-              "The response variable of Gamma family " +
-              s"should be positive, but got $y")
+      require(
+        y > 0.0,
+        "The response variable of Gamma family " +
+          s"should be positive, but got $y")
       y
     }
 
@@ -570,15 +601,18 @@ object GeneralizedLinearRegression
       -2.0 * weight * (math.log(y / mu) - (y - mu) / mu)
     }
 
-    override def aic(predictions: RDD[(Double, Double, Double)],
-                     deviance: Double,
-                     numInstances: Double,
-                     weightSum: Double): Double = {
+    override def aic(
+        predictions: RDD[(Double, Double, Double)],
+        deviance: Double,
+        numInstances: Double,
+        weightSum: Double): Double = {
       val disp = deviance / weightSum
-      -2.0 * predictions.map {
-        case (y: Double, mu: Double, weight: Double) =>
-          weight * dist.Gamma(1.0 / disp, mu * disp).logPdf(y)
-      }.sum() + 2.0
+      -2.0 * predictions
+        .map {
+          case (y: Double, mu: Double, weight: Double) =>
+            weight * dist.Gamma(1.0 / disp, mu * disp).logPdf(y)
+        }
+        .sum() + 2.0
     }
 
     override def project(mu: Double): Double = {
@@ -620,12 +654,12 @@ object GeneralizedLinearRegression
     def fromName(name: String): Link = {
       name match {
         case Identity.name => Identity
-        case Logit.name => Logit
-        case Log.name => Log
-        case Inverse.name => Inverse
-        case Probit.name => Probit
-        case CLogLog.name => CLogLog
-        case Sqrt.name => Sqrt
+        case Logit.name    => Logit
+        case Log.name      => Log
+        case Inverse.name  => Inverse
+        case Probit.name   => Probit
+        case CLogLog.name  => CLogLog
+        case Sqrt.name     => Sqrt
       }
     }
   }
@@ -705,12 +739,13 @@ object GeneralizedLinearRegression
   */
 @Experimental
 @Since("2.0.0")
-class GeneralizedLinearRegressionModel private[ml](
+class GeneralizedLinearRegressionModel private[ml] (
     @Since("2.0.0") override val uid: String,
     @Since("2.0.0") val coefficients: Vector,
     @Since("2.0.0") val intercept: Double)
     extends RegressionModel[Vector, GeneralizedLinearRegressionModel]
-    with GeneralizedLinearRegressionBase with MLWritable {
+    with GeneralizedLinearRegressionBase
+    with MLWritable {
 
   import GeneralizedLinearRegression._
 
@@ -738,7 +773,7 @@ class GeneralizedLinearRegressionModel private[ml](
   @Since("2.0.0")
   def summary: GeneralizedLinearRegressionSummary = trainingSummary.getOrElse {
     throw new SparkException(
-        "No training summary available for this GeneralizedLinearRegressionModel")
+      "No training summary available for this GeneralizedLinearRegressionModel")
   }
 
   private[regression] def setSummary(
@@ -758,8 +793,9 @@ class GeneralizedLinearRegressionModel private[ml](
       case "" =>
         val predictionColName =
           "prediction_" + java.util.UUID.randomUUID.toString()
-        (copy(ParamMap.empty).setPredictionCol(predictionColName),
-         predictionColName)
+        (
+          copy(ParamMap.empty).setPredictionCol(predictionColName),
+          predictionColName)
       case p => (this, p)
     }
   }
@@ -767,14 +803,14 @@ class GeneralizedLinearRegressionModel private[ml](
   @Since("2.0.0")
   override def copy(extra: ParamMap): GeneralizedLinearRegressionModel = {
     copyValues(
-        new GeneralizedLinearRegressionModel(uid, coefficients, intercept),
-        extra).setParent(parent)
+      new GeneralizedLinearRegressionModel(uid, coefficients, intercept),
+      extra).setParent(parent)
   }
 
   @Since("2.0.0")
   override def write: MLWriter =
     new GeneralizedLinearRegressionModel.GeneralizedLinearRegressionModelWriter(
-        this)
+      this)
 }
 
 @Since("2.0.0")
@@ -792,7 +828,8 @@ object GeneralizedLinearRegressionModel
   /** [[MLWriter]] instance for [[GeneralizedLinearRegressionModel]] */
   private[GeneralizedLinearRegressionModel] class GeneralizedLinearRegressionModelWriter(
       instance: GeneralizedLinearRegressionModel)
-      extends MLWriter with Logging {
+      extends MLWriter
+      with Logging {
 
     private case class Data(intercept: Double, coefficients: Vector)
 
@@ -828,7 +865,9 @@ object GeneralizedLinearRegressionModel
       val coefficients = data.getAs[Vector](1)
 
       val model = new GeneralizedLinearRegressionModel(
-          metadata.uid, coefficients, intercept)
+        metadata.uid,
+        coefficients,
+        intercept)
 
       DefaultParamsReader.getAndSetParams(model, metadata)
       model
@@ -848,7 +887,7 @@ object GeneralizedLinearRegressionModel
   */
 @Since("2.0.0")
 @Experimental
-class GeneralizedLinearRegressionSummary private[regression](
+class GeneralizedLinearRegressionSummary private[regression] (
     @Since("2.0.0") @transient val predictions: DataFrame,
     @Since("2.0.0") val predictionCol: String,
     @Since("2.0.0") val model: GeneralizedLinearRegressionModel,
@@ -904,8 +943,9 @@ class GeneralizedLinearRegressionSummary private[regression](
     }
     val w =
       if (model.getWeightCol.isEmpty) lit(1.0) else col(model.getWeightCol)
-    predictions.select(drUDF(col(model.getLabelCol), col(predictionCol), w)
-          .as("devianceResiduals"))
+    predictions.select(
+      drUDF(col(model.getLabelCol), col(predictionCol), w)
+        .as("devianceResiduals"))
   }
 
   private lazy val pearsonResiduals: DataFrame = {
@@ -915,25 +955,27 @@ class GeneralizedLinearRegressionSummary private[regression](
     val w =
       if (model.getWeightCol.isEmpty) lit(1.0) else col(model.getWeightCol)
     predictions.select(
-        col(model.getLabelCol)
-          .minus(col(predictionCol))
-          .multiply(sqrt(w))
-          .divide(sqrt(prUDF(col(predictionCol))))
-          .as("pearsonResiduals"))
+      col(model.getLabelCol)
+        .minus(col(predictionCol))
+        .multiply(sqrt(w))
+        .divide(sqrt(prUDF(col(predictionCol))))
+        .as("pearsonResiduals"))
   }
 
   private lazy val workingResiduals: DataFrame = {
     val wrUDF = udf { (y: Double, mu: Double) =>
       (y - mu) * link.deriv(mu)
     }
-    predictions.select(wrUDF(col(model.getLabelCol), col(predictionCol))
-          .as("workingResiduals"))
+    predictions.select(
+      wrUDF(col(model.getLabelCol), col(predictionCol))
+        .as("workingResiduals"))
   }
 
   private lazy val responseResiduals: DataFrame = {
-    predictions.select(col(model.getLabelCol)
-          .minus(col(predictionCol))
-          .as("responseResiduals"))
+    predictions.select(
+      col(model.getLabelCol)
+        .minus(col(predictionCol))
+        .as("responseResiduals"))
   }
 
   /**
@@ -951,12 +993,12 @@ class GeneralizedLinearRegressionSummary private[regression](
   def residuals(residualsType: String): DataFrame = {
     residualsType match {
       case "deviance" => devianceResiduals
-      case "pearson" => pearsonResiduals
-      case "working" => workingResiduals
+      case "pearson"  => pearsonResiduals
+      case "working"  => workingResiduals
       case "response" => responseResiduals
       case other =>
         throw new UnsupportedOperationException(
-            s"The residuals type $other is not supported by Generalized Linear Regression.")
+          s"The residuals type $other is not supported by Generalized Linear Regression.")
     }
   }
 
@@ -1073,7 +1115,7 @@ class GeneralizedLinearRegressionSummary private[regression](
     } else {
       tValues.map { x =>
         2.0 *
-        (1.0 - dist.StudentsT(degreesOfFreedom.toDouble).cdf(math.abs(x)))
+          (1.0 - dist.StudentsT(degreesOfFreedom.toDouble).cdf(math.abs(x)))
       }
     }
   }

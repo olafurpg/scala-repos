@@ -31,7 +31,7 @@ class InetResolverTest extends FunSuite {
     val f = addr.changes.filter(_ != Addr.Pending).toFuture
     Await.result(f) match {
       case Addr.Failed(_) =>
-      case _ => fail()
+      case _              => fail()
     }
   }
 
@@ -52,7 +52,7 @@ class InetResolverTest extends FunSuite {
     val f = addr.changes.filter(_ != Addr.Pending).toFuture
     Await.result(f) match {
       case Addr.Bound(b, meta) if b.isEmpty =>
-      case _ => fail()
+      case _                                => fail()
     }
   }
 

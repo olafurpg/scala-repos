@@ -10,9 +10,9 @@ class ReviveOffersConfigTest extends MarathonSpec {
 
   test("disable reviveOffersForNewApps") {
     val conf = MarathonTestHelper.makeConfig(
-        "--master",
-        "127.0.0.1:5050",
-        "--disable_revive_offers_for_new_apps"
+      "--master",
+      "127.0.0.1:5050",
+      "--disable_revive_offers_for_new_apps"
     )
     assert(!conf.reviveOffersForNewApps())
   }

@@ -19,17 +19,19 @@ import lila.socket.Handler
 import lila.user.User
 import makeTimeout.short
 
-private[round] final class SocketHandler(roundMap: ActorRef,
-                                         socketHub: ActorRef,
-                                         hub: lila.hub.Env,
-                                         messenger: Messenger,
-                                         bus: lila.common.Bus) {
+private[round] final class SocketHandler(
+    roundMap: ActorRef,
+    socketHub: ActorRef,
+    hub: lila.hub.Env,
+    messenger: Messenger,
+    bus: lila.common.Bus) {
 
-  private def controller(gameId: String,
-                         socket: ActorRef,
-                         uid: String,
-                         ref: PovRef,
-                         member: Member): Handler.Controller = {
+  private def controller(
+      gameId: String,
+      socket: ActorRef,
+      uid: String,
+      ref: PovRef,
+      member: Member): Handler.Controller = {
 
     def send(msg: Any) { roundMap ! Tell(gameId, msg) }
 
@@ -57,13 +59,13 @@ private[round] final class SocketHandler(roundMap: ActorRef,
                 case _: Exception => socket ! Resync(uid)
               }
               send(
-                  HumanPlay(
-                      playerId,
-                      move,
-                      blur,
-                      lag.millis,
-                      promise.some
-                  ))
+                HumanPlay(
+                  playerId,
+                  move,
+                  blur,
+                  lag.millis,
+                  promise.some
+                ))
               member push ackEvent
           }
         case ("drop", o) =>
@@ -75,28 +77,28 @@ private[round] final class SocketHandler(roundMap: ActorRef,
                 case _: Exception => socket ! Resync(uid)
               }
               send(
-                  HumanPlay(
-                      playerId,
-                      drop,
-                      blur,
-                      lag.millis,
-                      promise.some
-                  ))
+                HumanPlay(
+                  playerId,
+                  drop,
+                  blur,
+                  lag.millis,
+                  promise.some
+                ))
           }
-        case ("rematch-yes", _) => send(RematchYes(playerId))
-        case ("rematch-no", _) => send(RematchNo(playerId))
+        case ("rematch-yes", _)  => send(RematchYes(playerId))
+        case ("rematch-no", _)   => send(RematchNo(playerId))
         case ("takeback-yes", _) => send(TakebackYes(playerId))
-        case ("takeback-no", _) => send(TakebackNo(playerId))
-        case ("draw-yes", _) => send(DrawYes(playerId))
-        case ("draw-no", _) => send(DrawNo(playerId))
-        case ("draw-claim", _) => send(DrawClaim(playerId))
-        case ("resign", _) => send(Resign(playerId))
+        case ("takeback-no", _)  => send(TakebackNo(playerId))
+        case ("draw-yes", _)     => send(DrawYes(playerId))
+        case ("draw-no", _)      => send(DrawNo(playerId))
+        case ("draw-claim", _)   => send(DrawClaim(playerId))
+        case ("resign", _)       => send(Resign(playerId))
         case ("resign-force", _) => send(ResignForce(playerId))
-        case ("draw-force", _) => send(DrawForce(playerId))
-        case ("abort", _) => send(Abort(playerId))
-        case ("moretime", _) => send(Moretime(playerId))
-        case ("outoftime", _) => send(Outoftime)
-        case ("bye", _) => socket ! Bye(ref.color)
+        case ("draw-force", _)   => send(DrawForce(playerId))
+        case ("abort", _)        => send(Abort(playerId))
+        case ("moretime", _)     => send(Moretime(playerId))
+        case ("outoftime", _)    => send(Outoftime)
+        case ("bye", _)          => socket ! Bye(ref.color)
         case ("talk", o) =>
           o str "d" foreach { text =>
             messenger.owner(gameId, member, text, socket)
@@ -115,36 +117,40 @@ private[round] final class SocketHandler(roundMap: ActorRef,
     }
   }
 
-  def watcher(gameId: String,
-              colorName: String,
-              uid: String,
-              user: Option[User],
-              ip: String,
-              userTv: Option[String]): Fu[Option[JsSocketHandler]] =
+  def watcher(
+      gameId: String,
+      colorName: String,
+      uid: String,
+      user: Option[User],
+      ip: String,
+      userTv: Option[String]): Fu[Option[JsSocketHandler]] =
     GameRepo.pov(gameId, colorName) flatMap {
       _ ?? { join(_, none, uid, "", user, ip, userTv = userTv) map some }
     }
 
-  def player(pov: Pov,
-             uid: String,
-             token: String,
-             user: Option[User],
-             ip: String): Fu[JsSocketHandler] =
+  def player(
+      pov: Pov,
+      uid: String,
+      token: String,
+      user: Option[User],
+      ip: String): Fu[JsSocketHandler] =
     join(pov, Some(pov.playerId), uid, token, user, ip, userTv = none)
 
-  private def join(pov: Pov,
-                   playerId: Option[String],
-                   uid: String,
-                   token: String,
-                   user: Option[User],
-                   ip: String,
-                   userTv: Option[String]): Fu[JsSocketHandler] = {
-    val join = Join(uid = uid,
-                    user = user,
-                    color = pov.color,
-                    playerId = playerId,
-                    ip = ip,
-                    userTv = userTv)
+  private def join(
+      pov: Pov,
+      playerId: Option[String],
+      uid: String,
+      token: String,
+      user: Option[User],
+      ip: String,
+      userTv: Option[String]): Fu[JsSocketHandler] = {
+    val join = Join(
+      uid = uid,
+      user = user,
+      color = pov.color,
+      playerId = playerId,
+      ip = ip,
+      userTv = userTv)
     socketHub ? Get(pov.gameId) mapTo manifest[ActorRef] flatMap { socket =>
       Handler(hub, socket, uid, join, user map (_.id)) {
         case Connected(enum, member) =>

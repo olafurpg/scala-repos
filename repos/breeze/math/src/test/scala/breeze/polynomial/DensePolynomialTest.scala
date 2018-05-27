@@ -45,13 +45,11 @@ class DensePolynomialTest extends FunSuite {
     val p = Polynomial.dense(Array[Double](1, 2, 4, 1, 2))
     val x = DenseVector.zeros[Double](M)
     val result = DenseVector.zeros[Double](M)
-    cfor(0)(j => j < M, j => j + 1)(
-        j =>
-          {
-        val t = j / M.toDouble
-        x.update(j, t)
-        result.update(
-            j, 1 + 2 * t + 4 * t * t + 1 * t * t * t + 2 * t * t * t * t)
+    cfor(0)(j => j < M, j => j + 1)(j => {
+      val t = j / M.toDouble
+      x.update(j, t)
+      result
+        .update(j, 1 + 2 * t + 4 * t * t + 1 * t * t * t + 2 * t * t * t * t)
     })
     assert(norm(p(x) - result) < 1e-10)
   }
@@ -67,30 +65,24 @@ class DensePolynomialTest extends FunSuite {
     var M = 100
 
     val x = DenseMatrix.zeros[Double](M, M)
-    cfor(0)(i => i < M, i => i + 1)(
-        i =>
-          {
-        //   x is matrix with 1's just below the diagonal
-        cfor(0)(j => j < M, j => j + 1)(j =>
-              {
-            // so x*x is matrix with row of 1's 2 below the diagonal, etc
-            if (j == i - 1) {
-              x.update(i, j, 1.0)
-            }
-        })
+    cfor(0)(i => i < M, i => i + 1)(i => {
+      //   x is matrix with 1's just below the diagonal
+      cfor(0)(j => j < M, j => j + 1)(j => {
+        // so x*x is matrix with row of 1's 2 below the diagonal, etc
+        if (j == i - 1) {
+          x.update(i, j, 1.0)
+        }
+      })
     })
 
     val expectedResult =
       DenseMatrix.zeros[Double](M, M) // expected result easy to compute
-    cfor(0)(i => i < M, i => i + 1)(
-        i =>
-          {
-        cfor(0)(j => j < M, j => j + 1)(j =>
-              {
-            if (j == i) { expectedResult.update(i, j, 1.0) }
-            if (j == i - 1) { expectedResult.update(i, j, 2.0) }
-            if (j == i - 2) { expectedResult.update(i, j, 4.0) }
-        })
+    cfor(0)(i => i < M, i => i + 1)(i => {
+      cfor(0)(j => j < M, j => j + 1)(j => {
+        if (j == i) { expectedResult.update(i, j, 1.0) }
+        if (j == i - 1) { expectedResult.update(i, j, 2.0) }
+        if (j == i - 2) { expectedResult.update(i, j, 4.0) }
+      })
     })
     val diff = p(x) - expectedResult
     assert(norm(diff.toDenseVector) < 1e-10)

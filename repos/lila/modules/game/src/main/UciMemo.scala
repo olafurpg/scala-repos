@@ -27,7 +27,7 @@ final class UciMemo(ttl: Duration) {
       moves.size.min(max) == game.pgnMoves.size.min(max)
     } match {
       case Some(moves) => fuccess(moves)
-      case _ => compute(game, max) addEffect { set(game, _) }
+      case _           => compute(game, max) addEffect { set(game, _) }
     }
 
   def drop(game: Game, nb: Int) {

@@ -31,15 +31,15 @@ trait HeapBackend extends RelationalBackend with Logging {
   def createDatabase(config: Config, path: String): Database =
     Database.apply(ExecutionContext.global)
 
-  class DatabaseDef(
-      protected val synchronousExecutionContext: ExecutionContext)
+  class DatabaseDef(protected val synchronousExecutionContext: ExecutionContext)
       extends super.DatabaseDef {
     protected[this] def createDatabaseActionContext[T](
         _useSameThread: Boolean): Context =
       new BasicActionContext { val useSameThread = _useSameThread }
 
     protected[this] def createStreamingDatabaseActionContext[T](
-        s: Subscriber[_ >: T], useSameThread: Boolean): StreamingContext =
+        s: Subscriber[_ >: T],
+        useSameThread: Boolean): StreamingContext =
       new BasicStreamingActionContext(s, useSameThread, DatabaseDef.this)
 
     protected val tables = new HashMap[String, HeapTable]
@@ -74,15 +74,15 @@ trait HeapBackend extends RelationalBackend with Logging {
   def createEmptyDatabase: Database = {
     def err =
       throw new SlickException("Unsupported operation for empty heap database")
-    new DatabaseDef(
-        new ExecutionContext {
+    new DatabaseDef(new ExecutionContext {
       def reportFailure(t: Throwable) = err
       def execute(runnable: Runnable) = err
     }) {
-      override def createTable(name: String,
-                               columns: IndexedSeq[HeapBackend.Column],
-                               indexes: IndexedSeq[Index],
-                               constraints: IndexedSeq[Constraint]) = err
+      override def createTable(
+          name: String,
+          columns: IndexedSeq[HeapBackend.Column],
+          indexes: IndexedSeq[Index],
+          constraints: IndexedSeq[Constraint]) = err
     }
   }
 
@@ -99,21 +99,22 @@ trait HeapBackend extends RelationalBackend with Logging {
 
     def rollback() =
       throw new SlickException(
-          "HeapBackend does not currently support transactions")
+        "HeapBackend does not currently support transactions")
 
     def force() {}
 
     def withTransaction[T](f: => T) =
       throw new SlickException(
-          "HeapBackend does not currently support transactions")
+        "HeapBackend does not currently support transactions")
   }
 
   type Row = IndexedSeq[Any]
 
-  class HeapTable(val name: String,
-                  val columns: IndexedSeq[HeapBackend.Column],
-                  indexes: IndexedSeq[Index],
-                  constraints: IndexedSeq[Constraint]) {
+  class HeapTable(
+      val name: String,
+      val columns: IndexedSeq[HeapBackend.Column],
+      indexes: IndexedSeq[Index],
+      constraints: IndexedSeq[Constraint]) {
     protected val data: ArrayBuffer[Row] = new ArrayBuffer[Row]
 
     def rows: Iterable[Row] = data
@@ -145,7 +146,8 @@ trait HeapBackend extends RelationalBackend with Logging {
         case (z, c) =>
           if (c.isUnique)
             z andThen createUniquenessVerifier(
-                "<unique column " + c.sym.name + ">", Vector(c.sym))
+              "<unique column " + c.sym.name + ">",
+              Vector(c.sym))
           else z
       }
     }
@@ -166,7 +168,8 @@ trait HeapBackend extends RelationalBackend with Logging {
         })
 
     protected def createUniquenessVerifier(
-        name: String, on: IndexedSeq[FieldSymbol]): Verifier = {
+        name: String,
+        on: IndexedSeq[FieldSymbol]): Verifier = {
       val columns: IndexedSeq[Int] = on.map(columnIndexes)
       val extract: (Row => Any) =
         if (columns.length == 1) (r: Row) => r(columns.head)
@@ -177,7 +180,7 @@ trait HeapBackend extends RelationalBackend with Logging {
           val e = extract(row)
           if (hash contains e)
             throw new SlickException(
-                "Uniqueness constraint " + name +
+              "Uniqueness constraint " + name +
                 " violated. Duplicate data: " + e)
         }
         def inserted(row: Row) { hash += extract(row) }
@@ -218,9 +221,11 @@ object HeapBackend extends HeapBackend {
     private[this] val autoInc = sym.options.collectFirst {
       case ColumnOption.AutoInc => new AtomicLong()
     }
-    val isUnique = sym.options.collectFirst {
-      case ColumnOption.PrimaryKey => true
-    }.getOrElse(false)
+    val isUnique = sym.options
+      .collectFirst {
+        case ColumnOption.PrimaryKey => true
+      }
+      .getOrElse(false)
     def createDefault: Any = autoInc match {
       case Some(a) =>
         val i = a.incrementAndGet()
@@ -228,7 +233,7 @@ object HeapBackend extends HeapBackend {
         else if (tpe == ScalaBaseType.intType) i.toInt
         else
           throw new SlickException(
-              "Only Long and Int types are allowed for AutoInc columns")
+            "Only Long and Int types are allowed for AutoInc columns")
       case None => default.getOrElse(null)
     }
   }

@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -60,13 +60,13 @@ trait NormalizationSpecs extends EvalStackSpecs {
 
     result must haveAllElementsLike {
       case (ids, SObject(model)) => {
-          ids must haveSize(0)
-          model.keySet mustEqual Set("model1")
+        ids must haveSize(0)
+        model.keySet mustEqual Set("model1")
 
-          val SObject(obj) = model("model1")
+        val SObject(obj) = model("model1")
 
-          summaryHeight(obj)
-        }
+        summaryHeight(obj)
+      }
       case _ => ko
     }
   }
@@ -94,15 +94,15 @@ trait NormalizationSpecs extends EvalStackSpecs {
 
     result must haveAllElementsLike {
       case (ids, SObject(obj)) => {
-          ids must haveSize(0)
+        ids must haveSize(0)
 
-          summaryHeight(obj)
+        summaryHeight(obj)
 
-          obj("sqVariance") must beLike {
-            case SDecimal(d) =>
-              d.toDouble mustEqual 17881.13433742673
-          }
+        obj("sqVariance") must beLike {
+          case SDecimal(d) =>
+            d.toDouble mustEqual 17881.13433742673
         }
+      }
       case _ => ko
     }
   }
@@ -150,31 +150,31 @@ trait NormalizationSpecs extends EvalStackSpecs {
 
     result must haveAllElementsLike {
       case (ids, SObject(models)) => {
-          ids must haveSize(0)
-          models.keySet mustEqual Set("model1", "model2", "model3")
+        ids must haveSize(0)
+        models.keySet mustEqual Set("model1", "model2", "model3")
 
-          def testModels(sv: SValue) = sv must beLike {
-            case SObject(model) if model.keySet == Set("height") => {
-                val SObject(summary) = model("height")
-                summary mustEqual heightResult
-              }
-
-            case SObject(summary) =>
-              summary mustEqual ageResult
-
-            case SArray(model) => {
-                model must haveSize(1)
-                val SObject(summary) = model(0)
-                summary mustEqual weightResult
-              }
-
-            case _ => ko
+        def testModels(sv: SValue) = sv must beLike {
+          case SObject(model) if model.keySet == Set("height") => {
+            val SObject(summary) = model("height")
+            summary mustEqual heightResult
           }
 
-          testModels(models("model1"))
-          testModels(models("model2"))
-          testModels(models("model3"))
+          case SObject(summary) =>
+            summary mustEqual ageResult
+
+          case SArray(model) => {
+            model must haveSize(1)
+            val SObject(summary) = model(0)
+            summary mustEqual weightResult
+          }
+
+          case _ => ko
         }
+
+        testModels(models("model1"))
+        testModels(models("model2"))
+        testModels(models("model3"))
+      }
     }
   }
 
@@ -258,14 +258,14 @@ trait NormalizationSpecs extends EvalStackSpecs {
 
     result must haveAllElementsLike {
       case (ids, SObject(models)) => {
-          ids must haveSize(0)
-          models.keySet mustEqual Set("model1", "model2", "model3", "model4")
+        ids must haveSize(0)
+        models.keySet mustEqual Set("model1", "model2", "model3", "model4")
 
-          testModel(models("model1"))
-          testModel(models("model2"))
-          testModel(models("model3"))
-          testModel(models("model4"))
-        }
+        testModel(models("model1"))
+        testModel(models("model2"))
+        testModel(models("model3"))
+        testModel(models("model4"))
+      }
 
       case _ => ko
     }
@@ -551,11 +551,11 @@ trait NormalizationSpecs extends EvalStackSpecs {
 
     result must haveAllElementsLike {
       case (ids, SObject(obj)) => {
-          ids must haveSize(1)
-          obj.keySet mustEqual Set("originalHeight", "HeightIncm")
+        ids must haveSize(1)
+        obj.keySet mustEqual Set("originalHeight", "HeightIncm")
 
-          obj("originalHeight") mustEqual obj("HeightIncm")
-        }
+        obj("originalHeight") mustEqual obj("HeightIncm")
+      }
 
       case _ => ko
     }
@@ -583,10 +583,11 @@ trait NormalizationSpecs extends EvalStackSpecs {
 
     val clusterIds = (1 to 10) map { "cluster" + _.toString }
 
-    def clusterSchema(obj: Map[String, SValue],
-                      clusterId: String): Set[String] = obj(clusterId) match {
+    def clusterSchema(
+        obj: Map[String, SValue],
+        clusterId: String): Set[String] = obj(clusterId) match {
       case SObject(ctr) => ctr.keySet
-      case _ => sys.error("malformed SObject")
+      case _            => sys.error("malformed SObject")
     }
 
     result must haveAllElementsLike {

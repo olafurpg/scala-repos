@@ -68,7 +68,7 @@ package object math {
   def log(x: Double): Double = java.lang.Math.log(x)
 
   /** Returns the square root of a `double` value.
-    * 
+    *
     * @param  x the number to take the square root of
     * @return the value √x
     */
@@ -109,8 +109,8 @@ package object math {
 
   /** There is no reason to round a `Long`, but this method prevents unintended conversion to `Float` followed by rounding to `Int`. */
   @deprecated(
-      "This is an integer type; there is no reason to round it.  Perhaps you meant to call this with a floating-point value?",
-      "2.11.0")
+    "This is an integer type; there is no reason to round it.  Perhaps you meant to call this with a floating-point value?",
+    "2.11.0")
   def round(x: Long): Long = x
 
   /** Returns the closest `Int` to the argument.

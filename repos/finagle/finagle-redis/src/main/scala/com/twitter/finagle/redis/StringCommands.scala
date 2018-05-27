@@ -28,9 +28,10 @@ trait Strings { self: BaseClient =>
     * @return The number of bits set to 1.
     * @see http://redis.io/commands/bitcount
     */
-  def bitCount(key: ChannelBuffer,
-               start: Option[Int] = None,
-               end: Option[Int] = None): Future[JLong] =
+  def bitCount(
+      key: ChannelBuffer,
+      start: Option[Int] = None,
+      end: Option[Int] = None): Future[JLong] =
     doRequest(BitCount(key, start, end)) {
       case IntegerReply(n) => Future.value(n)
     }
@@ -46,9 +47,10 @@ trait Strings { self: BaseClient =>
     *          that is equal to the size of the longest input string.
     * @see http://redis.io/commands/bitop
     */
-  def bitOp(op: ChannelBuffer,
-            dstKey: ChannelBuffer,
-            srcKeys: Seq[ChannelBuffer]): Future[JLong] =
+  def bitOp(
+      op: ChannelBuffer,
+      dstKey: ChannelBuffer,
+      srcKeys: Seq[ChannelBuffer]): Future[JLong] =
     doRequest(BitOp(op, dstKey, srcKeys)) {
       case IntegerReply(n) => Future.value(n)
     }
@@ -84,7 +86,7 @@ trait Strings { self: BaseClient =>
   def get(key: ChannelBuffer): Future[Option[ChannelBuffer]] =
     doRequest(Get(key)) {
       case BulkReply(message) => Future.value(Some(message))
-      case EmptyBulkReply() => Future.value(None)
+      case EmptyBulkReply()   => Future.value(None)
     }
 
   /**
@@ -106,12 +108,13 @@ trait Strings { self: BaseClient =>
     * @param end
     * @return substring, or none if key doesn't exist
     */
-  def getRange(key: ChannelBuffer,
-               start: Long,
-               end: Long): Future[Option[ChannelBuffer]] =
+  def getRange(
+      key: ChannelBuffer,
+      start: Long,
+      end: Long): Future[Option[ChannelBuffer]] =
     doRequest(GetRange(key, start, end)) {
       case BulkReply(message) => Future.value(Some(message))
-      case EmptyBulkReply() => Future.value(None)
+      case EmptyBulkReply()   => Future.value(None)
     }
 
   /**
@@ -123,11 +126,12 @@ trait Strings { self: BaseClient =>
     *          or None when key did not exist.
     * @see http://redis.io/commands/getset
     */
-  def getSet(key: ChannelBuffer,
-             value: ChannelBuffer): Future[Option[ChannelBuffer]] =
+  def getSet(
+      key: ChannelBuffer,
+      value: ChannelBuffer): Future[Option[ChannelBuffer]] =
     doRequest(GetSet(key, value)) {
       case BulkReply(message) => Future.value(Some(message))
-      case EmptyBulkReply() => Future.value(None)
+      case EmptyBulkReply()   => Future.value(None)
     }
 
   /**
@@ -167,8 +171,8 @@ trait Strings { self: BaseClient =>
         Future {
           messages.map {
             case BulkReply(message) => Some(message)
-            case EmptyBulkReply() => None
-            case _ => throw new IllegalStateException()
+            case EmptyBulkReply()   => None
+            case _                  => throw new IllegalStateException()
           }.toSeq
         }
       case EmptyMBulkReply() => Future.Nil
@@ -207,7 +211,9 @@ trait Strings { self: BaseClient =>
     * @see http://redis.io/commands/psetex
     */
   def pSetEx(
-      key: ChannelBuffer, millis: Long, value: ChannelBuffer): Future[Unit] =
+      key: ChannelBuffer,
+      millis: Long,
+      value: ChannelBuffer): Future[Unit] =
     doRequest(PSetEx(key, millis, value)) {
       case StatusReply(message) => Future.Unit
     }
@@ -243,7 +249,9 @@ trait Strings { self: BaseClient =>
     * @see http://redis.io/commands/setex
     */
   def setEx(
-      key: ChannelBuffer, seconds: Long, value: ChannelBuffer): Future[Unit] =
+      key: ChannelBuffer,
+      seconds: Long,
+      value: ChannelBuffer): Future[Unit] =
     doRequest(SetEx(key, seconds, value)) {
       case StatusReply(message) => Future.Unit
     }
@@ -256,11 +264,12 @@ trait Strings { self: BaseClient =>
     * @return true if the key was set, false if condition was not met.
     * @see http://redis.io.commands/set
     */
-  def setExNx(key: ChannelBuffer,
-              seconds: Long,
-              value: ChannelBuffer): Future[JBoolean] =
+  def setExNx(
+      key: ChannelBuffer,
+      seconds: Long,
+      value: ChannelBuffer): Future[JBoolean] =
     doRequest(Set(key, value, Some(InSeconds(seconds)), true, false)) {
-      case StatusReply(_) => Future.value(true)
+      case StatusReply(_)   => Future.value(true)
       case EmptyBulkReply() => Future.value(false)
     }
 
@@ -272,11 +281,12 @@ trait Strings { self: BaseClient =>
     * @return true if the key was set, false if condition was not met.
     * @see http://redis.io.commands/set
     */
-  def setExXx(key: ChannelBuffer,
-              seconds: Long,
-              value: ChannelBuffer): Future[JBoolean] =
+  def setExXx(
+      key: ChannelBuffer,
+      seconds: Long,
+      value: ChannelBuffer): Future[JBoolean] =
     doRequest(Set(key, value, Some(InSeconds(seconds)), false, true)) {
-      case StatusReply(_) => Future.value(true)
+      case StatusReply(_)   => Future.value(true)
       case EmptyBulkReply() => Future.value(false)
     }
 
@@ -300,7 +310,9 @@ trait Strings { self: BaseClient =>
     * @see http://redis.io.commands/set
     */
   def setPx(
-      key: ChannelBuffer, millis: Long, value: ChannelBuffer): Future[Unit] =
+      key: ChannelBuffer,
+      millis: Long,
+      value: ChannelBuffer): Future[Unit] =
     doRequest(Set(key, value, Some(InMilliseconds(millis)))) {
       case StatusReply(_) => Future.Unit
     }
@@ -313,11 +325,12 @@ trait Strings { self: BaseClient =>
     * @return true if the key was set, false if condition was not met.
     * @see http://redis.io.commands/set
     */
-  def setPxNx(key: ChannelBuffer,
-              millis: Long,
-              value: ChannelBuffer): Future[JBoolean] =
+  def setPxNx(
+      key: ChannelBuffer,
+      millis: Long,
+      value: ChannelBuffer): Future[JBoolean] =
     doRequest(Set(key, value, Some(InMilliseconds(millis)), true, false)) {
-      case StatusReply(_) => Future.value(true)
+      case StatusReply(_)   => Future.value(true)
       case EmptyBulkReply() => Future.value(false)
     }
 
@@ -329,11 +342,12 @@ trait Strings { self: BaseClient =>
     * @return true if the key was set, false if condition was not met.
     * @see http://redis.io.commands/set
     */
-  def setPxXx(key: ChannelBuffer,
-              millis: Long,
-              value: ChannelBuffer): Future[JBoolean] =
+  def setPxXx(
+      key: ChannelBuffer,
+      millis: Long,
+      value: ChannelBuffer): Future[JBoolean] =
     doRequest(Set(key, value, Some(InMilliseconds(millis)), false, true)) {
-      case StatusReply(_) => Future.value(true)
+      case StatusReply(_)   => Future.value(true)
       case EmptyBulkReply() => Future.value(false)
     }
 
@@ -346,7 +360,7 @@ trait Strings { self: BaseClient =>
     */
   def setXx(key: ChannelBuffer, value: ChannelBuffer): Future[JBoolean] =
     doRequest(Set(key, value, None, false, true)) {
-      case StatusReply(_) => Future.value(true)
+      case StatusReply(_)   => Future.value(true)
       case EmptyBulkReply() => Future.value(false)
     }
 
@@ -359,7 +373,9 @@ trait Strings { self: BaseClient =>
     * @see http://redis.io/commands/setrange
     */
   def setRange(
-      key: ChannelBuffer, offset: Int, value: ChannelBuffer): Future[JLong] =
+      key: ChannelBuffer,
+      offset: Int,
+      value: ChannelBuffer): Future[JLong] =
     doRequest(SetRange(key, offset, value)) {
       case IntegerReply(n) => Future.value(n)
     }

@@ -53,14 +53,14 @@ final class NullResult[A, B] private (_apply: A => Option[B]) {
 
   def left[C]: (A \/ C) =>? (B \/ C) =
     NullResult {
-      case -\/(a) => apply(a) map (\/.left)
+      case -\/(a)     => apply(a) map (\/.left)
       case c @ \/-(_) => Some(c)
     }
 
   def right[C]: (C \/ A) =>? (C \/ B) =
     NullResult {
       case c @ -\/(_) => Some(c)
-      case \/-(a) => apply(a) map (\/.right)
+      case \/-(a)     => apply(a) map (\/.right)
     }
 
   def |(x: => A =>? B): A =>? B =
@@ -138,7 +138,7 @@ object NullResult extends NullResultInstances {
 
     def tail[A]: List[A] =>? List[A] =
       NullResult {
-        case Nil => None
+        case Nil    => None
         case _ :: t => Some(t)
       }
   }
@@ -172,38 +172,40 @@ sealed abstract class NullResultInstances extends NullResultInstances0 {
       implicit val M = M0
     }
 
-  implicit val nullResultArrow: Arrow[NullResult] with Choice[NullResult] with ProChoice[
-      NullResult] = new Arrow[NullResult] with Choice[NullResult]
-  with ProChoice[NullResult] {
-    def id[A] =
-      NullResult.lift(identity)
-    override def compose[A, B, C](
-        f: NullResult[B, C], g: NullResult[A, B]): NullResult[A, C] =
-      f compose g
-    override def split[A, B, C, D](f: NullResult[A, B], g: NullResult[C, D]) =
-      f *** g
-    override def mapfst[A, B, C](r: NullResult[A, B])(f: C => A) =
-      r contramap f
-    override def mapsnd[A, B, C](r: NullResult[A, B])(f: B => C) =
-      r map f
-    override def arr[A, B](f: A => B) =
-      NullResult.lift(f)
-    override def first[A, B, C](r: NullResult[A, B]) =
-      r.first
-    override def left[A, B, C](fa: NullResult[A, B]) =
-      fa.left
-    override def right[A, B, C](fa: NullResult[A, B]) =
-      fa.right
-    override def choice[A, B, C](
-        f: => NullResult[A, C], g: => NullResult[B, C]) =
-      NullResult {
-        case \/-(a) => g(a)
-        case -\/(a) => f(a)
-      }
-  }
+  implicit val nullResultArrow
+    : Arrow[NullResult] with Choice[NullResult] with ProChoice[NullResult] =
+    new Arrow[NullResult] with Choice[NullResult] with ProChoice[NullResult] {
+      def id[A] =
+        NullResult.lift(identity)
+      override def compose[A, B, C](
+          f: NullResult[B, C],
+          g: NullResult[A, B]): NullResult[A, C] =
+        f compose g
+      override def split[A, B, C, D](f: NullResult[A, B], g: NullResult[C, D]) =
+        f *** g
+      override def mapfst[A, B, C](r: NullResult[A, B])(f: C => A) =
+        r contramap f
+      override def mapsnd[A, B, C](r: NullResult[A, B])(f: B => C) =
+        r map f
+      override def arr[A, B](f: A => B) =
+        NullResult.lift(f)
+      override def first[A, B, C](r: NullResult[A, B]) =
+        r.first
+      override def left[A, B, C](fa: NullResult[A, B]) =
+        fa.left
+      override def right[A, B, C](fa: NullResult[A, B]) =
+        fa.right
+      override def choice[A, B, C](
+          f: => NullResult[A, C],
+          g: => NullResult[B, C]) =
+        NullResult {
+          case \/-(a) => g(a)
+          case -\/(a) => f(a)
+        }
+    }
 
-  implicit def nullResultMonadPlus[
-      X]: MonadPlus[NullResult[X, ?]] with BindRec[NullResult[X, ?]] =
+  implicit def nullResultMonadPlus[X]
+    : MonadPlus[NullResult[X, ?]] with BindRec[NullResult[X, ?]] =
     new MonadPlus[NullResult[X, ?]] with BindRec[NullResult[X, ?]] {
       import std.option._
       override def tailrecM[A, B](f: A => NullResult[X, A \/ B])(a: A) =
@@ -238,7 +240,8 @@ private trait NullResultSemigroup[A, B] extends Semigroup[NullResult[A, B]] {
 }
 
 private trait NullResultMonoid[A, B]
-    extends Monoid[NullResult[A, B]] with NullResultSemigroup[A, B] {
+    extends Monoid[NullResult[A, B]]
+    with NullResultSemigroup[A, B] {
   implicit val M: Monoid[B]
 
   override def zero =

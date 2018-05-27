@@ -23,15 +23,15 @@ trait ScModifierListOwner extends ScalaPsiElement with PsiModifierListOwner {
         val stub: StubElement[_ <: PsiElement] = st.getStub
         if (stub != null) {
           val array = stub.getChildrenByType(
-              ScalaElementTypes.MODIFIERS,
-              JavaArrayFactoryUtil.ScModifierListFactory)
+            ScalaElementTypes.MODIFIERS,
+            JavaArrayFactoryUtil.ScModifierListFactory)
           if (array.isEmpty) {
             val faultyContainer: VirtualFile = PsiUtilCore.getVirtualFile(this)
             if (faultyContainer != null && faultyContainer.isValid) {
               FileBasedIndex.getInstance.requestReindex(faultyContainer)
             }
             throw new Throwable(
-                "Stub hasn't ScModifierList child: " + faultyContainer)
+              "Stub hasn't ScModifierList child: " + faultyContainer)
           } else return array.apply(0)
         }
       case _ =>
@@ -46,7 +46,7 @@ trait ScModifierListOwner extends ScalaPsiElement with PsiModifierListOwner {
   def hasModifierPropertyScala(name: String): Boolean = {
     if (name == PsiModifier.PUBLIC) {
       return !hasModifierPropertyScala("private") &&
-      !hasModifierPropertyScala("protected")
+        !hasModifierPropertyScala("protected")
     }
     hasModifierPropertyInner(name)
   }

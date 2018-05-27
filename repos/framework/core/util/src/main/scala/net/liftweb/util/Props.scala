@@ -47,7 +47,7 @@ private[util] trait Props extends Logger {
 
     val interpolated = for {
       interpolateRegex(before, key, after) <- interpolateRegex.findAllMatchIn(
-          value.toString)
+        value.toString)
     } yield {
       val lookedUp = lookup(key).getOrElse(("${" + key + "}"))
 
@@ -92,7 +92,7 @@ private[util] trait Props extends Logger {
       case Nil =>
       case bad =>
         throw new Exception(
-            "The following required properties are not defined: " +
+          "The following required properties are not defined: " +
             bad.mkString(","))
     }
   }
@@ -181,14 +181,16 @@ private[util] trait Props extends Logger {
     */
   lazy val mode: Props.RunModes.Value = {
     runModeInitialised = true
-    Box.legacyNullTest((System.getProperty("run.mode"))).map(_.toLowerCase) match {
-      case Full("test") => Test
-      case Full("production") => Production
-      case Full("staging") => Staging
-      case Full("pilot") => Pilot
-      case Full("profile") => Profile
+    Box
+      .legacyNullTest((System.getProperty("run.mode")))
+      .map(_.toLowerCase) match {
+      case Full("test")        => Test
+      case Full("production")  => Production
+      case Full("staging")     => Staging
+      case Full("pilot")       => Pilot
+      case Full("profile")     => Profile
       case Full("development") => Development
-      case _ => (autoDetectRunModeFn.get)()
+      case _                   => (autoDetectRunModeFn.get)()
     }
   }
 
@@ -222,7 +224,8 @@ private[util] trait Props extends Logger {
     def allowModification = !runModeInitialised
 
     def onModificationProhibited() {
-      warn("Setting property " + name +
+      warn(
+        "Setting property " + name +
           " has no effect. Run mode already initialised to " + mode + ".")
     }
   }
@@ -236,24 +239,24 @@ private[util] trait Props extends Logger {
     */
   val doesStackTraceContainKnownTestRunner =
     new RunModeProperty[Array[StackTraceElement] => Boolean](
-        "doesStackTraceContainKnownTestRunner",
-        (st: Array[StackTraceElement]) =>
-          {
-            val names = List(
-                "org.apache.maven.surefire.booter.SurefireBooter",
-                "sbt.TestRunner",
-                "org.jetbrains.plugins.scala.testingSupport.scalaTest.ScalaTestRunner",
-                "org.scalatest.tools.Runner",
-                "org.scalatest.tools.ScalaTestFramework$ScalaTestRunner",
-                "org.scalatools.testing.Runner",
-                "org.scalatools.testing.Runner2",
-                "org.specs2.runner.TestInterfaceRunner", // sometimes specs2 runs tests on another thread
-                "org.specs2.runner.TestInterfaceConsoleReporter",
-                "org.specs2.specification.FragmentExecution",
-                "org.specs2.specification.core.Execution"
-            )
-            st.exists(e => names.exists(e.getClassName.startsWith))
-        })
+      "doesStackTraceContainKnownTestRunner",
+      (st: Array[StackTraceElement]) => {
+        val names = List(
+          "org.apache.maven.surefire.booter.SurefireBooter",
+          "sbt.TestRunner",
+          "org.jetbrains.plugins.scala.testingSupport.scalaTest.ScalaTestRunner",
+          "org.scalatest.tools.Runner",
+          "org.scalatest.tools.ScalaTestFramework$ScalaTestRunner",
+          "org.scalatools.testing.Runner",
+          "org.scalatools.testing.Runner2",
+          "org.specs2.runner.TestInterfaceRunner", // sometimes specs2 runs tests on another thread
+          "org.specs2.runner.TestInterfaceConsoleReporter",
+          "org.specs2.specification.FragmentExecution",
+          "org.specs2.specification.core.Execution"
+        )
+        st.exists(e => names.exists(e.getClassName.startsWith))
+      }
+    )
 
   /**
     * When the `run.mode` environment variable isn't set or recognised, this function is invoked to determine the
@@ -264,20 +267,19 @@ private[util] trait Props extends Logger {
     * will have no effect and will instead log a warning.)
     */
   val autoDetectRunModeFn = new RunModeProperty[() => Props.RunModes.Value](
-      "autoDetectRunModeFn",
-      () =>
-        {
-          val st = Thread.currentThread.getStackTrace
-          if ((doesStackTraceContainKnownTestRunner.get)(st)) Test
-          else Development
-      })
+    "autoDetectRunModeFn",
+    () => {
+      val st = Thread.currentThread.getStackTrace
+      if ((doesStackTraceContainKnownTestRunner.get)(st)) Test
+      else Development
+    })
 
   /**
     * Is the system running in production mode (apply full optimizations)
     */
   lazy val productionMode: Boolean =
     mode == Props.RunModes.Production || mode == Props.RunModes.Pilot ||
-    mode == Props.RunModes.Staging
+      mode == Props.RunModes.Staging
 
   /**
     * Is the system running in development mode
@@ -293,19 +295,19 @@ private[util] trait Props extends Logger {
     * The resource path segment corresponding to the current mode.
     */
   lazy val modeName = mode match {
-    case Test => "test"
-    case Staging => "staging"
+    case Test       => "test"
+    case Staging    => "staging"
     case Production => "production"
-    case Pilot => "pilot"
-    case Profile => "profile"
-    case _ => ""
+    case Pilot      => "pilot"
+    case Profile    => "profile"
+    case _          => ""
   }
 
   private lazy val _modeName = dotLen(modeName)
 
   private def dotLen(in: String): String = in match {
     case null | "" => in
-    case x => x + "."
+    case x         => x + "."
   }
 
   /**
@@ -337,14 +339,15 @@ private[util] trait Props extends Logger {
     * in /props
     */
   lazy val toTry: List[() => String] = List(
-      () => "/props/" + _modeName + _userName + _hostName,
-      () => "/props/" + _modeName + _userName,
-      () => "/props/" + _modeName + _hostName,
-      () => "/props/" + _modeName + "default.",
-      () => "/" + _modeName + _userName + _hostName,
-      () => "/" + _modeName + _userName,
-      () => "/" + _modeName + _hostName,
-      () => "/" + _modeName + "default.")
+    () => "/props/" + _modeName + _userName + _hostName,
+    () => "/props/" + _modeName + _userName,
+    () => "/props/" + _modeName + _hostName,
+    () => "/props/" + _modeName + "default.",
+    () => "/" + _modeName + _userName + _hostName,
+    () => "/" + _modeName + _userName,
+    () => "/" + _modeName + _hostName,
+    () => "/" + _modeName + "default."
+  )
 
   /**
     * This is a function that returns the first places to look for a props file.
@@ -367,8 +370,8 @@ private[util] trait Props extends Logger {
     var tried: List[String] = Nil
 
     trace(
-        "Loading properties. Active run.mode is %s".format(
-            if (modeName == "") "(Development)" else modeName))
+      "Loading properties. Active run.mode is %s".format(
+        if (modeName == "") "(Development)" else modeName))
 
     def vendStreams: List[(String, () => Box[InputStream])] =
       whereToLook() ::: toTry.map { f =>
@@ -405,8 +408,7 @@ private[util] trait Props extends Logger {
     } match {
       // if we've got a propety file, create name/value pairs and turn them into a Map
       case Full(prop) =>
-        Map(
-            prop.entrySet.toArray.flatMap {
+        Map(prop.entrySet.toArray.flatMap {
           case s: JMap.Entry[_, _] =>
             List((s.getKey.toString, s.getValue.toString))
           case _ => Nil
@@ -414,7 +416,7 @@ private[util] trait Props extends Logger {
 
       case _ =>
         error(
-            "Failed to find a properties file (but properties were accessed).  Searched: " +
+          "Failed to find a properties file (but properties were accessed).  Searched: " +
             tried.reverse.mkString(", "))
         Map()
     }

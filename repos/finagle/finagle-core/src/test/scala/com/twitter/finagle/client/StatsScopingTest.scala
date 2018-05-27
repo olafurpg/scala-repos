@@ -26,7 +26,8 @@ class StatsScopingTest extends FunSuite with AssertionsForJUnit {
       val description = "Produce a test service that increments stats counters"
       val parameters = Seq(implicitly[Stack.Param[StatsScoping.Scoper]])
       def make(
-          params: Stack.Params, next: Stack[ServiceFactory[String, Unit]]) = {
+          params: Stack.Params,
+          next: Stack[ServiceFactory[String, Unit]]) = {
         val Stats(stats0) = params[Stats]
         Stack.Leaf(this, ServiceFactory.const(mkCounterService(stats0)))
       }
@@ -39,7 +40,7 @@ class StatsScopingTest extends FunSuite with AssertionsForJUnit {
           .push(counterServiceModule)
           .push(StatsScoping.module)
           .make(Stack.Params.empty + Stats(stats) +
-              StatsScoping.Scoper(scoper) + AddrMetadata(metadata))
+            StatsScoping.Scoper(scoper) + AddrMetadata(metadata))
 
       Await.result(factory())
     }
@@ -56,6 +57,6 @@ class StatsScopingTest extends FunSuite with AssertionsForJUnit {
     Await.result(service("baz"))
 
     assert(
-        Map(Seq("foo", "bar") -> 1, Seq("foo", "baz") -> 1) == stats.counters)
+      Map(Seq("foo", "bar") -> 1, Seq("foo", "baz") -> 1) == stats.counters)
   })
 }

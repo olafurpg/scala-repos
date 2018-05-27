@@ -35,9 +35,9 @@ trait ExprTyper {
       interpretSynthetic(code) match {
         case IR.Success =>
           repl.definedSymbolList filterNot old match {
-            case Nil => NoSymbol
+            case Nil        => NoSymbol
             case sym :: Nil => sym
-            case syms => NoSymbol.newOverloaded(NoPrefix, syms)
+            case syms       => NoSymbol.newOverloaded(NoPrefix, syms)
           }
         case _ => NoSymbol
       }
@@ -62,7 +62,7 @@ trait ExprTyper {
     // to induce the error message.
     try beSilentDuring(symbolOfLine(expr).tpe) match {
       case NoType if !silent => symbolOfLine(expr).tpe // generate error
-      case tpe => tpe
+      case tpe               => tpe
     } finally typeOfExpressionDepth -= 1
   }
 

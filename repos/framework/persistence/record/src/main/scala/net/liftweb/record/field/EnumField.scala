@@ -41,15 +41,15 @@ trait EnumTypedField[EnumType <: Enumeration]
   def fromInt(in: Int): Box[EnumType#Value] = tryo(enum(in))
 
   def setFromAny(in: Any): Box[EnumType#Value] = in match {
-    case (value: Int) => setBox(fromInt(value))
-    case Some(value: Int) => setBox(fromInt(value))
-    case Full(value: Int) => setBox(fromInt(value))
-    case (value: Int) :: _ => setBox(fromInt(value))
-    case (value: Number) => setBox(fromInt(value.intValue))
-    case Some(value: Number) => setBox(fromInt(value.intValue))
-    case Full(value: Number) => setBox(fromInt(value.intValue))
+    case (value: Int)         => setBox(fromInt(value))
+    case Some(value: Int)     => setBox(fromInt(value))
+    case Full(value: Int)     => setBox(fromInt(value))
+    case (value: Int) :: _    => setBox(fromInt(value))
+    case (value: Number)      => setBox(fromInt(value.intValue))
+    case Some(value: Number)  => setBox(fromInt(value.intValue))
+    case Full(value: Number)  => setBox(fromInt(value.intValue))
     case (value: Number) :: _ => setBox(fromInt(value.intValue))
-    case _ => genericSetFromAny(in)(valueManifest)
+    case _                    => genericSetFromAny(in)(valueManifest)
   }
 
   def setFromString(s: String): Box[EnumType#Value] =
@@ -74,13 +74,15 @@ trait EnumTypedField[EnumType <: Enumeration]
 
   private def elem =
     SHtml.selectObj[Box[EnumType#Value]](
-        buildDisplayList, Full(valueBox), setBox(_)) %
-    ("tabindex" -> tabIndex.toString)
+      buildDisplayList,
+      Full(valueBox),
+      setBox(_)) %
+      ("tabindex" -> tabIndex.toString)
 
   def toForm: Box[NodeSeq] =
     uniqueFieldId match {
       case Full(id) => Full(elem % ("id" -> id))
-      case _ => Full(elem)
+      case _        => Full(elem)
     }
 
   def defaultValue: EnumType#Value = enum.values.iterator.next
@@ -91,8 +93,8 @@ trait EnumTypedField[EnumType <: Enumeration]
     toInt.map(i => JInt(BigInt(i))) openOr (JNothing: JValue)
   def setFromJIntOrdinal(jvalue: JValue): Box[EnumType#Value] = jvalue match {
     case JNothing | JNull if optional_? => setBox(Empty)
-    case JInt(i) => setBox(fromInt(i.intValue))
-    case other => setBox(FieldHelpers.expectedA("JInt", other))
+    case JInt(i)                        => setBox(fromInt(i.intValue))
+    case other                          => setBox(FieldHelpers.expectedA("JInt", other))
   }
 
   def asJStringName: JValue =
@@ -110,10 +112,11 @@ trait EnumTypedField[EnumType <: Enumeration]
 }
 
 class EnumField[OwnerType <: Record[OwnerType], EnumType <: Enumeration](
-    rec: OwnerType, protected val enum: EnumType)(
-    implicit m: Manifest[EnumType#Value])
+    rec: OwnerType,
+    protected val enum: EnumType)(implicit m: Manifest[EnumType#Value])
     extends Field[EnumType#Value, OwnerType]
-    with MandatoryTypedField[EnumType#Value] with EnumTypedField[EnumType] {
+    with MandatoryTypedField[EnumType#Value]
+    with EnumTypedField[EnumType] {
   def this(rec: OwnerType, enum: EnumType, value: EnumType#Value)(
       implicit m: Manifest[EnumType#Value]) = {
     this(rec, enum)
@@ -124,12 +127,12 @@ class EnumField[OwnerType <: Record[OwnerType], EnumType <: Enumeration](
   protected val valueManifest = m
 }
 
-class OptionalEnumField[
-    OwnerType <: Record[OwnerType], EnumType <: Enumeration](
-    rec: OwnerType, protected val enum: EnumType)(
-    implicit m: Manifest[EnumType#Value])
+class OptionalEnumField[OwnerType <: Record[OwnerType], EnumType <: Enumeration](
+    rec: OwnerType,
+    protected val enum: EnumType)(implicit m: Manifest[EnumType#Value])
     extends Field[EnumType#Value, OwnerType]
-    with OptionalTypedField[EnumType#Value] with EnumTypedField[EnumType] {
+    with OptionalTypedField[EnumType#Value]
+    with EnumTypedField[EnumType] {
   def this(rec: OwnerType, enum: EnumType, value: Box[EnumType#Value])(
       implicit m: Manifest[EnumType#Value]) = {
     this(rec, enum)

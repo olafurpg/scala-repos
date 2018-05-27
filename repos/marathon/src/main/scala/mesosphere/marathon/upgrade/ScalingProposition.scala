@@ -4,13 +4,15 @@ import mesosphere.marathon.core.task.Task
 import mesosphere.marathon.state.Timestamp
 
 case class ScalingProposition(
-    tasksToKill: Option[Seq[Task]], tasksToStart: Option[Int])
+    tasksToKill: Option[Seq[Task]],
+    tasksToStart: Option[Int])
 
 object ScalingProposition {
-  def propose(runningTasks: Iterable[Task],
-              toKill: Option[Iterable[Task]],
-              meetConstraints: ((Iterable[Task], Int) => Iterable[Task]),
-              scaleTo: Int): ScalingProposition = {
+  def propose(
+      runningTasks: Iterable[Task],
+      toKill: Option[Iterable[Task]],
+      meetConstraints: ((Iterable[Task], Int) => Iterable[Task]),
+      scaleTo: Int): ScalingProposition = {
 
     val runningTaskMap = Task.tasksById(runningTasks)
     val toKillMap = Task.tasksById(toKill.getOrElse(Set.empty))
@@ -25,8 +27,8 @@ object ScalingProposition {
       math.max(runningTasks.size - scaleTo, sentencedAndRunningMap.size)
     // tasks that should be killed to meet constraints – pass notSentenced & consider the sentenced 'already killed'
     val killToMeetConstraints = meetConstraints(
-        notSentencedAndRunningMap.values,
-        killCount - sentencedAndRunningMap.size
+      notSentencedAndRunningMap.values,
+      killCount - sentencedAndRunningMap.size
     )
     // rest are tasks that are not sentenced and need not be killed to meet constraints
     val rest = notSentencedAndRunningMap -- killToMeetConstraints.map(_.taskId)
@@ -34,7 +36,7 @@ object ScalingProposition {
     val ordered =
       sentencedAndRunningMap.values.toSeq ++ killToMeetConstraints.toSeq ++ rest.values.toSeq
         .sortBy(
-            _.launched.flatMap(_.status.startedAt).getOrElse(Timestamp.zero))
+          _.launched.flatMap(_.status.startedAt).getOrElse(Timestamp.zero))
         .reverse
 
     val candidatesToKill = ordered.take(killCount)

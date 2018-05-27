@@ -2,10 +2,17 @@ package org.jetbrains.plugins.scala.codeInspection.collections
 
 import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.psi.PsiElement
-import org.jetbrains.plugins.scala.codeInspection.{ChangeReferenceNameQuickFix, InspectionBundle}
+import org.jetbrains.plugins.scala.codeInspection.{
+  ChangeReferenceNameQuickFix,
+  InspectionBundle
+}
 import org.jetbrains.plugins.scala.extensions.ExpressionType
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlock, ScExpression, ScFunctionExpr}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScBlock,
+  ScExpression,
+  ScFunctionExpr
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScEarlyDefinitions
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
 import org.jetbrains.plugins.scala.lang.psi.types.{ScFunctionType, Unit}
@@ -20,7 +27,7 @@ class UnitInMapInspection extends OperationOnCollectionInspection {
       holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
     case MethodRepr(call, _, Some(ref), Seq(arg @ lambdaWithBody(body)))
         if ref.refName == "map" &&
-        checkResolve(ref, getLikeCollectionClasses) =>
+          checkResolve(ref, getLikeCollectionClasses) =>
       val isInBlock = call.getParent match {
         case _: ScBlock | _: ScTemplateBody | _: ScEarlyDefinitions |
             _: ScalaFile =>
@@ -30,10 +37,10 @@ class UnitInMapInspection extends OperationOnCollectionInspection {
       val fixes =
         if (isInBlock)
           Seq(
-              new ChangeReferenceNameQuickFix(
-                  InspectionBundle.message("use.foreach.instead.of.map"),
-                  ref,
-                  "foreach"))
+            new ChangeReferenceNameQuickFix(
+              InspectionBundle.message("use.foreach.instead.of.map"),
+              ref,
+              "foreach"))
         else Seq.empty
       val unitTypeReturns = body
         .calculateReturns()
@@ -48,10 +55,10 @@ class UnitInMapInspection extends OperationOnCollectionInspection {
       unitTypeReturns.foreach { e =>
         if (e.isPhysical)
           holder.registerProblem(
-              e,
-              InspectionBundle.message("expression.unit.return.in.map"),
-              highlightType,
-              fixes: _*)
+            e,
+            InspectionBundle.message("expression.unit.return.in.map"),
+            highlightType,
+            fixes: _*)
       }
   }
 
@@ -59,8 +66,8 @@ class UnitInMapInspection extends OperationOnCollectionInspection {
     def unapply(expr: ScExpression): Option[ScExpression] = {
       expr match {
         case ScBlock(ScFunctionExpr(_, res)) => res
-        case ScFunctionExpr(_, res) => res
-        case e => Some(e)
+        case ScFunctionExpr(_, res)          => res
+        case e                               => Some(e)
       }
     }
   }

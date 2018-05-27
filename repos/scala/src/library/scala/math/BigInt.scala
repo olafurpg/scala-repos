@@ -112,7 +112,9 @@ object BigInt {
   *  @version 1.0, 15/07/2003
   */
 final class BigInt(val bigInteger: BigInteger)
-    extends ScalaNumber with ScalaNumericConversions with Serializable
+    extends ScalaNumber
+    with ScalaNumericConversions
+    with Serializable
     with Ordered[BigInt] {
 
   /** Returns the hash code for this BigInt. */
@@ -123,11 +125,11 @@ final class BigInt(val bigInteger: BigInteger)
   /** Compares this BigInt with the specified value for equality.
     */
   override def equals(that: Any): Boolean = that match {
-    case that: BigInt => this equals that
+    case that: BigInt     => this equals that
     case that: BigDecimal => that equals this
-    case that: Double => isValidDouble && toDouble == that
-    case that: Float => isValidFloat && toFloat == that
-    case x => isValidLong && unifiedPrimitiveEquals(x)
+    case that: Double     => isValidDouble && toDouble == that
+    case that: Float      => isValidFloat && toFloat == that
+    case x                => isValidLong && unifiedPrimitiveEquals(x)
   }
   override def isValidByte = this >= Byte.MinValue && this <= Byte.MaxValue
   override def isValidShort = this >= Short.MinValue && this <= Short.MaxValue
@@ -140,12 +142,12 @@ final class BigInt(val bigInteger: BigInteger)
   def isValidFloat = {
     val bitLen = bitLength
     (bitLen <= 24 || {
-          val lowest = lowestSetBit
-          bitLen <= java.lang.Float.MAX_EXPONENT + 1 &&
-          // exclude this < -2^128 && this >= 2^128
-          lowest >= bitLen - 24 &&
-          lowest < java.lang.Float.MAX_EXPONENT + 1 // exclude this == -2^128
-        }) && !bitLengthOverflow
+      val lowest = lowestSetBit
+      bitLen <= java.lang.Float.MAX_EXPONENT + 1 &&
+      // exclude this < -2^128 && this >= 2^128
+      lowest >= bitLen - 24 &&
+      lowest < java.lang.Float.MAX_EXPONENT + 1 // exclude this == -2^128
+    }) && !bitLengthOverflow
   }
 
   /** Returns `true` iff this can be represented exactly by [[scala.Double]]; otherwise returns `false`.
@@ -153,12 +155,12 @@ final class BigInt(val bigInteger: BigInteger)
   def isValidDouble = {
     val bitLen = bitLength
     (bitLen <= 53 || {
-          val lowest = lowestSetBit
-          bitLen <= java.lang.Double.MAX_EXPONENT + 1 &&
-          // exclude this < -2^1024 && this >= 2^1024
-          lowest >= bitLen - 53 &&
-          lowest < java.lang.Double.MAX_EXPONENT + 1 // exclude this == -2^1024
-        }) && !bitLengthOverflow
+      val lowest = lowestSetBit
+      bitLen <= java.lang.Double.MAX_EXPONENT + 1 &&
+      // exclude this < -2^1024 && this >= 2^1024
+      lowest >= bitLen - 53 &&
+      lowest < java.lang.Double.MAX_EXPONENT + 1 // exclude this == -2^1024
+    }) && !bitLengthOverflow
   }
 
   /** Some implementations of java.math.BigInteger allow huge values with bit length greater than Int.MaxValue .

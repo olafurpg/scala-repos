@@ -48,8 +48,7 @@ private[spark] class CreateSubmissionResponse
 /**
   * A response to a kill request in the REST application submission protocol.
   */
-private[spark] class KillSubmissionResponse
-    extends SubmitRestProtocolResponse {
+private[spark] class KillSubmissionResponse extends SubmitRestProtocolResponse {
   var submissionId: String = null
   protected override def doValidate(): Unit = {
     super.doValidate()

@@ -10,17 +10,18 @@ import akka.util.ByteString
 /**
   * INTERNAL API.
   */
-private[akka] final case class TlsModule(plainIn: Inlet[SslTlsOutbound],
-                                         plainOut: Outlet[SslTlsInbound],
-                                         cipherIn: Inlet[ByteString],
-                                         cipherOut: Outlet[ByteString],
-                                         shape: Shape,
-                                         attributes: Attributes,
-                                         sslContext: SSLContext,
-                                         firstSession: NegotiateNewSession,
-                                         role: TLSRole,
-                                         closing: TLSClosing,
-                                         hostInfo: Option[(String, Int)])
+private[akka] final case class TlsModule(
+    plainIn: Inlet[SslTlsOutbound],
+    plainOut: Outlet[SslTlsInbound],
+    cipherIn: Inlet[ByteString],
+    cipherOut: Outlet[ByteString],
+    shape: Shape,
+    attributes: Attributes,
+    sslContext: SSLContext,
+    firstSession: NegotiateNewSession,
+    role: TLSRole,
+    closing: TLSClosing,
+    hostInfo: Option[(String, Int)])
     extends AtomicModule {
 
   override def withAttributes(att: Attributes): TlsModule =
@@ -42,28 +43,30 @@ private[akka] final case class TlsModule(plainIn: Inlet[SslTlsOutbound],
   * INTERNAL API.
   */
 private[akka] object TlsModule {
-  def apply(attributes: Attributes,
-            sslContext: SSLContext,
-            firstSession: NegotiateNewSession,
-            role: TLSRole,
-            closing: TLSClosing,
-            hostInfo: Option[(String, Int)]): TlsModule = {
+  def apply(
+      attributes: Attributes,
+      sslContext: SSLContext,
+      firstSession: NegotiateNewSession,
+      role: TLSRole,
+      closing: TLSClosing,
+      hostInfo: Option[(String, Int)]): TlsModule = {
     val name = attributes.nameOrDefault(s"StreamTls($role)")
     val cipherIn = Inlet[ByteString](s"$name.cipherIn")
     val cipherOut = Outlet[ByteString](s"$name.cipherOut")
     val plainIn = Inlet[SslTlsOutbound](s"$name.transportIn")
     val plainOut = Outlet[SslTlsInbound](s"$name.transportOut")
     val shape = new BidiShape(plainIn, cipherOut, cipherIn, plainOut)
-    TlsModule(plainIn,
-              plainOut,
-              cipherIn,
-              cipherOut,
-              shape,
-              attributes,
-              sslContext,
-              firstSession,
-              role,
-              closing,
-              hostInfo)
+    TlsModule(
+      plainIn,
+      plainOut,
+      cipherIn,
+      cipherOut,
+      shape,
+      attributes,
+      sslContext,
+      firstSession,
+      role,
+      closing,
+      hostInfo)
   }
 }

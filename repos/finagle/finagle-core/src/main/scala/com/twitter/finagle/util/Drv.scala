@@ -99,8 +99,9 @@ object Drv {
     */
   def apply(dist: Seq[Double]): Drv = {
     val sum = dist.sum
-    assert(dist.size == 0 || (sum < 1 + ε && sum > 1 - ε),
-           "Bad sum %0.001f".format(sum))
+    assert(
+      dist.size == 0 || (sum < 1 + ε && sum > 1 - ε),
+      "Bad sum %0.001f".format(sum))
     newVose(dist)
   }
 

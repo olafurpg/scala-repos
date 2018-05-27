@@ -8,26 +8,28 @@ import scala.util.{Success, Failure}
 import Types._
 
 final class Env(
-    config: Config, lifecycle: play.api.inject.ApplicationLifecycle) {
+    config: Config,
+    lifecycle: play.api.inject.ApplicationLifecycle) {
 
   lazy val db = {
     val parsedUri: MongoConnection.ParsedURI =
       MongoConnection.parseURI(config.getString("uri")) match {
         case Success(parsedURI) => parsedURI
-        case Failure(e) => sys error s"Invalid mongodb.uri"
+        case Failure(e)         => sys error s"Invalid mongodb.uri"
       }
     val driver = new MongoDriver(Some(config))
     val connection = driver.connection(parsedUri)
 
     parsedUri.db.fold[DefaultDB](
-        sys error s"cannot resolve database from URI: $parsedUri") { dbUri =>
+      sys error s"cannot resolve database from URI: $parsedUri") { dbUri =>
       val db = DB(dbUri, connection)
       registerDriverShutdownHook(driver)
       logger.info(
-          s"""ReactiveMongoApi successfully started with DB '$dbUri'! Servers: ${parsedUri.hosts.map {
-        s =>
-          s"[${s._1}:${s._2}]"
-      }.mkString("\n\t\t")}""")
+        s"""ReactiveMongoApi successfully started with DB '$dbUri'! Servers: ${parsedUri.hosts
+          .map { s =>
+            s"[${s._1}:${s._2}]"
+          }
+          .mkString("\n\t\t")}""")
       db
     }
   }
@@ -43,6 +45,7 @@ final class Env(
 object Env {
 
   lazy val current =
-    "db" boot new Env(config = lila.common.PlayApp loadConfig "mongodb",
-                      lifecycle = lila.common.PlayApp.lifecycle)
+    "db" boot new Env(
+      config = lila.common.PlayApp loadConfig "mongodb",
+      lifecycle = lila.common.PlayApp.lifecycle)
 }

@@ -12,10 +12,11 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDefinition
   * User: Alexander Podkhalyuzin
   * Date: 22.12.2009
   */
-class ScalaHighlightExitPointsHandler(fun: ScFunctionDefinition,
-                                      editor: Editor,
-                                      file: PsiFile,
-                                      keyword: PsiElement)
+class ScalaHighlightExitPointsHandler(
+    fun: ScFunctionDefinition,
+    editor: Editor,
+    file: PsiFile,
+    keyword: PsiElement)
     extends HighlightUsagesHandlerBase[PsiElement](editor, file) {
   def computeUsages(targets: util.List[PsiElement]) {
     val iterator = targets.listIterator
@@ -25,8 +26,9 @@ class ScalaHighlightExitPointsHandler(fun: ScFunctionDefinition,
     }
   }
 
-  def selectTargets(targets: util.List[PsiElement],
-                    selectionConsumer: Consumer[util.List[PsiElement]]) {
+  def selectTargets(
+      targets: util.List[PsiElement],
+      selectionConsumer: Consumer[util.List[PsiElement]]) {
     selectionConsumer.consume(targets)
   }
 

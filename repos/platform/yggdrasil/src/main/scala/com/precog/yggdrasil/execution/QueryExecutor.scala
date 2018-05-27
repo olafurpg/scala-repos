@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -60,7 +60,7 @@ object EvaluationError {
           AccumulatedErrors(a0 append b0)
         case (a0, AccumulatedErrors(b0)) => AccumulatedErrors(a0 <:: b0)
         case (AccumulatedErrors(a0), b0) => AccumulatedErrors(b0 <:: a0)
-        case (a0, b0) => AccumulatedErrors(nels(a0, b0))
+        case (a0, b0)                    => AccumulatedErrors(nels(a0, b0))
       }
     }
 }
@@ -74,14 +74,20 @@ case class QueryOptions(
     cacheControl: CacheControl = CacheControl.NoCache
 )
 
-case class CacheControl(maxAge: Option[Long],
-                        recacheAfter: Option[Long],
-                        cacheable: Boolean,
-                        onlyIfCached: Boolean)
+case class CacheControl(
+    maxAge: Option[Long],
+    recacheAfter: Option[Long],
+    cacheable: Boolean,
+    onlyIfCached: Boolean)
 
 object CacheControl {
   import blueeyes.core.http.CacheDirective
-  import blueeyes.core.http.CacheDirectives.{`max-age`, `no-cache`, `only-if-cached`, `max-stale`}
+  import blueeyes.core.http.CacheDirectives.{
+    `max-age`,
+    `no-cache`,
+    `only-if-cached`,
+    `max-stale`
+  }
   import scalaz.syntax.semigroup._
   import scalaz.std.option._
   import scalaz.std.anyVal._
@@ -102,15 +108,17 @@ object CacheControl {
 }
 
 trait QueryExecutor[M[+ _], +A] { self =>
-  def execute(query: String,
-              context: EvaluationContext,
-              opts: QueryOptions): EitherT[M, EvaluationError, A]
+  def execute(
+      query: String,
+      context: EvaluationContext,
+      opts: QueryOptions): EitherT[M, EvaluationError, A]
 
   def map[B](f: A => B)(implicit M: Functor[M]): QueryExecutor[M, B] =
     new QueryExecutor[M, B] {
-      def execute(query: String,
-                  context: EvaluationContext,
-                  opts: QueryOptions): EitherT[M, EvaluationError, B] = {
+      def execute(
+          query: String,
+          context: EvaluationContext,
+          opts: QueryOptions): EitherT[M, EvaluationError, B] = {
         self.execute(query, context, opts) map f
       }
     }

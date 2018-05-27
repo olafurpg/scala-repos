@@ -33,10 +33,11 @@ private[storage] class BlockManagerSlaveEndpoint(
     override val rpcEnv: RpcEnv,
     blockManager: BlockManager,
     mapOutputTracker: MapOutputTracker)
-    extends ThreadSafeRpcEndpoint with Logging {
+    extends ThreadSafeRpcEndpoint
+    with Logging {
 
   private val asyncThreadPool = ThreadUtils.newDaemonCachedThreadPool(
-      "block-manager-slave-async-thread-pool")
+    "block-manager-slave-async-thread-pool")
   private implicit val asyncExecutionContext =
     ExecutionContext.fromExecutorService(asyncThreadPool)
 

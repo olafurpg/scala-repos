@@ -27,9 +27,10 @@ trait CommentFactory extends base.CommentFactoryBase {
   protected val commentCache =
     mutable.HashMap.empty[(Symbol, DocTemplateImpl), Option[Comment]]
 
-  def comment(sym: Symbol,
-              linkTarget: DocTemplateImpl,
-              inTpl: DocTemplateImpl): Option[Comment] =
+  def comment(
+      sym: Symbol,
+      linkTarget: DocTemplateImpl,
+      inTpl: DocTemplateImpl): Option[Comment] =
     commentCache.getOrElseUpdate((sym, inTpl), {
       defineComment(sym, linkTarget, inTpl)
     })
@@ -38,9 +39,10 @@ trait CommentFactory extends base.CommentFactoryBase {
     * cases we have to give some `inTpl` comments (parent class for example)
     * to the comment of the symbol.
     * This function manages some of those cases : Param accessor and Primary constructor */
-  def defineComment(sym: Symbol,
-                    linkTarget: DocTemplateImpl,
-                    inTpl: DocTemplateImpl): Option[Comment] = {
+  def defineComment(
+      sym: Symbol,
+      linkTarget: DocTemplateImpl,
+      inTpl: DocTemplateImpl): Option[Comment] = {
 
     //param accessor case
     // We just need the @param argument, we put it into the body
@@ -61,11 +63,13 @@ trait CommentFactory extends base.CommentFactoryBase {
           tplComment.typeParams != Map.empty ||
           tplComment.deprecated.isDefined)
         Some(
-            createComment(body0 = tplComment.constructor,
-                          throws0 = tplComment.throws,
-                          valueParams0 = tplComment.valueParams,
-                          typeParams0 = tplComment.typeParams,
-                          deprecated0 = tplComment.deprecated))
+          createComment(
+            body0 = tplComment.constructor,
+            throws0 = tplComment.throws,
+            valueParams0 = tplComment.valueParams,
+            typeParams0 = tplComment.typeParams,
+            deprecated0 = tplComment.deprecated
+          ))
       else None
     }
 
@@ -74,19 +78,21 @@ trait CommentFactory extends base.CommentFactoryBase {
     else {
       val rawComment = global.expandedDocComment(sym, inTpl.sym).trim
       if (rawComment != "") {
-        val c = parse(rawComment,
-                      global.rawDocComment(sym),
-                      global.docCommentPos(sym),
-                      linkTarget)
+        val c = parse(
+          rawComment,
+          global.rawDocComment(sym),
+          global.docCommentPos(sym),
+          linkTarget)
         Some(c)
       } else None
     }
   }
 
-  protected def parse(comment: String,
-                      src: String,
-                      pos: Position,
-                      linkTarget: DocTemplateImpl): Comment = {
+  protected def parse(
+      comment: String,
+      src: String,
+      pos: Position,
+      linkTarget: DocTemplateImpl): Comment = {
     val sym = if (linkTarget eq null) NoSymbol else linkTarget.sym
     parseAtSymbol(comment, src, pos, sym)
   }

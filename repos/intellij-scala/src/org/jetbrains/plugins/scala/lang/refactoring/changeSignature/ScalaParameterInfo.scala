@@ -8,7 +8,10 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.refactoring.changeSignature.JavaParameterInfo
 import com.intellij.refactoring.util.CanonicalTypes
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScMethodLike
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScParameter, ScParameterClause}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScParameter,
+  ScParameterClause
+}
 import org.jetbrains.plugins.scala.lang.psi.types._
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 
@@ -18,25 +21,28 @@ import scala.beans.{BeanProperty, BooleanBeanProperty}
   * Nikolay.Tropin
   * 2014-08-10
   */
-class ScalaParameterInfo(@BeanProperty var name: String,
-                         @BeanProperty val oldIndex: Int,
-                         var scType: ScType,
-                         val project: Project,
-                         var isRepeatedParameter: Boolean,
-                         var isByName: Boolean,
-                         @BeanProperty var defaultValue: String = "",
-                         var keywordsAndAnnotations: String = "",
-                         val isIntroducedParameter: Boolean = false)
+class ScalaParameterInfo(
+    @BeanProperty var name: String,
+    @BeanProperty val oldIndex: Int,
+    var scType: ScType,
+    val project: Project,
+    var isRepeatedParameter: Boolean,
+    var isByName: Boolean,
+    @BeanProperty var defaultValue: String = "",
+    var keywordsAndAnnotations: String = "",
+    val isIntroducedParameter: Boolean = false)
     extends JavaParameterInfo {
 
   def this(p: ScParameter) {
-    this(p.name,
-         p.index,
-         p.getType(TypingContext.empty).getOrAny,
-         p.getProject,
-         p.isRepeatedParameter,
-         p.isCallByNameParameter,
-         keywordsAndAnnotations = ScalaParameterInfo.keywordsAndAnnotations(p))
+    this(
+      p.name,
+      p.index,
+      p.getType(TypingContext.empty).getOrAny,
+      p.getProject,
+      p.isRepeatedParameter,
+      p.isCallByNameParameter,
+      keywordsAndAnnotations = ScalaParameterInfo.keywordsAndAnnotations(p)
+    )
   }
 
   var defaultForJava = defaultValue
@@ -46,7 +52,7 @@ class ScalaParameterInfo(@BeanProperty var name: String,
 
   val wasArrayType: Boolean = scType match {
     case JavaArrayType(_) => true
-    case _ => false
+    case _                => false
   }
 
   val isVarargType =
@@ -60,10 +66,9 @@ class ScalaParameterInfo(@BeanProperty var name: String,
       val functionType = ScFunctionType(scType, Seq())(project, allScope)
       ScType.toPsi(functionType, project, allScope)
     } else if (isRepeatedParameter) {
-      val seqType = ScDesignatorType.fromClassFqn(
-          "scala.collection.Seq", project, allScope)
-      ScType.toPsi(
-          ScParameterizedType(seqType, Seq(scType)), project, allScope)
+      val seqType =
+        ScDesignatorType.fromClassFqn("scala.collection.Seq", project, allScope)
+      ScType.toPsi(ScParameterizedType(seqType, Seq(scType)), project, allScope)
     } else ScType.toPsi(scType, project, allScope)
   }
 
@@ -78,8 +83,8 @@ class ScalaParameterInfo(@BeanProperty var name: String,
           case mc: PsiMethodCallExpression =>
             mc.getMethodExpression.getQualifierExpression match {
               case s: PsiSuperExpression => ""
-              case null => ""
-              case q => q.getText + "."
+              case null                  => ""
+              case q                     => q.getText + "."
             }
           case _ => ""
         }

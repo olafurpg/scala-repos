@@ -21,7 +21,7 @@ trait Phased {
   def get = active
   def set(phase: PhaseName): Boolean = phase match {
     case NoPhaseName => false
-    case name => active = name; true
+    case name        => active = name; true
   }
   def setMulti(phases: Seq[PhaseName]): Boolean = {
     if (phases contains NoPhaseName) false
@@ -62,7 +62,8 @@ trait Phased {
     }
   }
   def parse(str: String): PhaseName =
-    try parseInternal(str) catch { case _: Exception => NoPhaseName }
+    try parseInternal(str)
+    catch { case _: Exception => NoPhaseName }
 
   def atCurrent[T](body: => T): T = enteringPhase(get)(body)
   def multi[T](body: => T): Seq[T] = multi map (ph => at(ph)(body))
@@ -70,12 +71,14 @@ trait Phased {
   def at[T](ph: PhaseName)(body: => T): T = {
     val saved = get
     set(ph)
-    try atCurrent(body) finally set(saved)
+    try atCurrent(body)
+    finally set(saved)
   }
   def atMulti[T](phs: Seq[PhaseName])(body: => T): Seq[T] = {
     val saved = multi
     setMulti(phs)
-    try multi(body) finally setMulti(saved)
+    try multi(body)
+    finally setMulti(saved)
   }
 
   def atMap[T](phs: Seq[PhaseName])(body: => T): Seq[(PhaseName, T)] =
@@ -86,27 +89,27 @@ trait Phased {
       Ordering[Int] on (_.id)
 
     lazy val all = List(
-        Parser,
-        Namer,
-        Packageobjects,
-        Typer,
-        Superaccessors,
-        Pickler,
-        Refchecks,
-        Uncurry,
-        Tailcalls,
-        Specialize,
-        Explicitouter,
-        Erasure,
-        Lazyvals,
-        Lambdalift,
-        Constructors,
-        Flatten,
-        Mixin,
-        Cleanup,
-        Delambdafy,
-        Jvm,
-        Terminal
+      Parser,
+      Namer,
+      Packageobjects,
+      Typer,
+      Superaccessors,
+      Pickler,
+      Refchecks,
+      Uncurry,
+      Tailcalls,
+      Specialize,
+      Explicitouter,
+      Erasure,
+      Lazyvals,
+      Lambdalift,
+      Constructors,
+      Flatten,
+      Mixin,
+      Cleanup,
+      Delambdafy,
+      Jvm,
+      Terminal
     )
     lazy val nameMap =
       all.map(x => x.name -> x).toMap withDefaultValue NoPhaseName

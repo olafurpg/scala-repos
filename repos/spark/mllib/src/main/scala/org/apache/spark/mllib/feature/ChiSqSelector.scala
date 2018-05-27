@@ -24,7 +24,12 @@ import org.json4s.JsonDSL._
 import org.json4s.jackson.JsonMethods._
 
 import org.apache.spark.annotation.Since
-import org.apache.spark.mllib.linalg.{DenseVector, SparseVector, Vector, Vectors}
+import org.apache.spark.mllib.linalg.{
+  DenseVector,
+  SparseVector,
+  Vector,
+  Vectors
+}
 import org.apache.spark.mllib.regression.LabeledPoint
 import org.apache.spark.mllib.stat.Statistics
 import org.apache.spark.mllib.util.{Loader, Saveable}
@@ -40,7 +45,8 @@ import org.apache.spark.sql.{Row, SQLContext}
 @Since("1.3.0")
 class ChiSqSelectorModel @Since("1.3.0")(
     @Since("1.3.0") val selectedFeatures: Array[Int])
-    extends VectorTransformer with Saveable {
+    extends VectorTransformer
+    with Saveable {
 
   require(isSorted(selectedFeatures), "Array has to be sorted asc")
 
@@ -105,7 +111,7 @@ class ChiSqSelectorModel @Since("1.3.0")(
         Vectors.dense(filterIndices.map(i => values(i)))
       case other =>
         throw new UnsupportedOperationException(
-            s"Only sparse and dense vectors are supported but got ${other.getClass}.")
+          s"Only sparse and dense vectors are supported but got ${other.getClass}.")
     }
   }
 
@@ -133,12 +139,14 @@ object ChiSqSelectorModel extends Loader[ChiSqSelectorModel] {
     private[feature] val thisClassName =
       "org.apache.spark.mllib.feature.ChiSqSelectorModel"
 
-    def save(sc: SparkContext, model: ChiSqSelectorModel, path: String): Unit = {
+    def save(
+        sc: SparkContext,
+        model: ChiSqSelectorModel,
+        path: String): Unit = {
       val sqlContext = SQLContext.getOrCreate(sc)
       import sqlContext.implicits._
       val metadata = compact(
-          render(
-              ("class" -> thisClassName) ~ ("version" -> thisFormatVersion)))
+        render(("class" -> thisClassName) ~ ("version" -> thisFormatVersion)))
       sc.parallelize(Seq(metadata), 1)
         .saveAsTextFile(Loader.metadataPath(path))
 
@@ -162,9 +170,11 @@ object ChiSqSelectorModel extends Loader[ChiSqSelectorModel] {
       // Check schema explicitly since erasure makes it hard to use match-case for checking.
       Loader.checkSchema[Data](dataFrame.schema)
 
-      val features = dataArray.rdd.map {
-        case Row(feature: Int) => (feature)
-      }.collect()
+      val features = dataArray.rdd
+        .map {
+          case Row(feature: Int) => (feature)
+        }
+        .collect()
 
       return new ChiSqSelectorModel(features)
     }

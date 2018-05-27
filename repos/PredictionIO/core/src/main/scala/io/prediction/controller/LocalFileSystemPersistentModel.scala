@@ -36,8 +36,7 @@ import org.apache.spark.SparkContext
   * @see [[LocalFileSystemPersistentModelLoader]]
   * @group Algorithm
   */
-trait LocalFileSystemPersistentModel[AP <: Params]
-    extends PersistentModel[AP] {
+trait LocalFileSystemPersistentModel[AP <: Params] extends PersistentModel[AP] {
   def save(id: String, params: AP, sc: SparkContext): Boolean = {
     Utils.save(id, this)
     true

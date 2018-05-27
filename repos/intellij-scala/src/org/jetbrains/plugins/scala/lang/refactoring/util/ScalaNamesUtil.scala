@@ -24,7 +24,8 @@ object ScalaNamesUtil {
   }
 
   private def checkGeneric(
-      text: String, predicate: ScalaLexer => Boolean): Boolean = {
+      text: String,
+      predicate: ScalaLexer => Boolean): Boolean = {
 //    ApplicationManager.getApplication.assertReadAccessAllowed() - looks like we don't need it
     if (text == null || text == "") return false
 
@@ -42,13 +43,14 @@ object ScalaNamesUtil {
         true
       case ch =>
         Character.getType(ch) == Character.MATH_SYMBOL.toInt ||
-        Character.getType(ch) == Character.OTHER_SYMBOL.toInt
+          Character.getType(ch) == Character.OTHER_SYMBOL.toInt
     }
   }
 
   def isIdentifier(text: String): Boolean = {
     checkGeneric(
-        text, lexer => lexer.getTokenType == ScalaTokenTypes.tIDENTIFIER)
+      text,
+      lexer => lexer.getTokenType == ScalaTokenTypes.tIDENTIFIER)
   }
 
   def isKeyword(text: String): Boolean = keywordNames.contains(text)
@@ -57,22 +59,22 @@ object ScalaNamesUtil {
     isIdentifier(text) && isOpCharacter(text(0))
 
   def scalaName(element: PsiElement) = element match {
-    case scNamed: ScNamedElement => scNamed.name
+    case scNamed: ScNamedElement   => scNamed.name
     case psiNamed: PsiNamedElement => psiNamed.getName
   }
 
   def qualifiedName(named: PsiNamedElement): Option[String] = {
     ScalaPsiUtil.nameContext(named) match {
       case pack: PsiPackage => Some(pack.getQualifiedName)
-      case clazz: PsiClass => Some(clazz.qualifiedName)
+      case clazz: PsiClass  => Some(clazz.qualifiedName)
       case memb: PsiMember =>
         val containingClass = memb.containingClass
         if (containingClass != null && containingClass.qualifiedName != null &&
             memb.hasModifierProperty(PsiModifier.STATIC)) {
           Some(
-              Seq(containingClass.qualifiedName, named.name)
-                .filter(_ != "")
-                .mkString("."))
+            Seq(containingClass.qualifiedName, named.name)
+              .filter(_ != "")
+              .mkString("."))
         } else None
       case _ => None
     }
@@ -96,7 +98,7 @@ object ScalaNamesUtil {
   def toJavaName(name: String) = {
     val toEncode = name match {
       case ScalaNamesUtil.isBacktickedName(s) => s
-      case _ => name
+      case _                                  => name
     }
     NameTransformer.encode(toEncode)
   }

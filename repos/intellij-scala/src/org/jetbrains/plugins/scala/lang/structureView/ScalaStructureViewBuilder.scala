@@ -2,7 +2,10 @@ package org.jetbrains.plugins.scala
 package lang
 package structureView
 
-import com.intellij.ide.structureView.{StructureViewModel, TreeBasedStructureViewBuilder}
+import com.intellij.ide.structureView.{
+  StructureViewModel,
+  TreeBasedStructureViewBuilder
+}
 import com.intellij.openapi.editor.Editor
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.plugins.scala.console.ScalaLanguageConsole

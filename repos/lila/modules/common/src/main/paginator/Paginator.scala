@@ -3,18 +3,19 @@ package paginator
 
 import scalaz.Success
 
-final class Paginator[A] private[paginator](val currentPage: Int,
-                                            val maxPerPage: Int,
-                                            /**
-                                              * Returns the results for the current page.
-                                              * The result is cached.
-                                              */
-                                            val currentPageResults: Seq[A],
-                                            /**
-                                              * Returns the number of results.
-                                              * The result is cached.
-                                              */
-                                            val nbResults: Int) {
+final class Paginator[A] private[paginator] (
+    val currentPage: Int,
+    val maxPerPage: Int,
+    /**
+      * Returns the results for the current page.
+      * The result is cached.
+      */
+    val currentPageResults: Seq[A],
+    /**
+      * Returns the number of results.
+      * The result is cached.
+      */
+    val nbResults: Int) {
 
   /**
     * Returns the previous page.
@@ -48,10 +49,11 @@ final class Paginator[A] private[paginator](val currentPage: Int,
   def hasNextPage: Boolean = nextPage.isDefined
 
   def withCurrentPageResults[B](newResults: Seq[B]): Paginator[B] =
-    new Paginator(currentPage = currentPage,
-                  maxPerPage = maxPerPage,
-                  currentPageResults = newResults,
-                  nbResults = nbResults)
+    new Paginator(
+      currentPage = currentPage,
+      maxPerPage = maxPerPage,
+      currentPageResults = newResults,
+      nbResults = nbResults)
 
   def mapResults[B](f: A => B): Paginator[B] =
     withCurrentPageResults(currentPageResults map f)
@@ -59,19 +61,20 @@ final class Paginator[A] private[paginator](val currentPage: Int,
 
 object Paginator {
 
-  def apply[A](adapter: AdapterLike[A],
-               currentPage: Int = 1,
-               maxPerPage: Int = 10): Fu[Paginator[A]] =
+  def apply[A](
+      adapter: AdapterLike[A],
+      currentPage: Int = 1,
+      maxPerPage: Int = 10): Fu[Paginator[A]] =
     validate(adapter, currentPage, maxPerPage) | apply(adapter, 1, maxPerPage)
 
-  def validate[A](adapter: AdapterLike[A],
-                  currentPage: Int = 1,
-                  maxPerPage: Int = 10): Valid[Fu[Paginator[A]]] =
+  def validate[A](
+      adapter: AdapterLike[A],
+      currentPage: Int = 1,
+      maxPerPage: Int = 10): Valid[Fu[Paginator[A]]] =
     if (currentPage < 1) !!("Max per page must be greater than zero")
     else if (maxPerPage <= 0) !!("Current page must be greater than zero")
     else
-      Success(
-          for {
+      Success(for {
         results ← adapter.slice((currentPage - 1) * maxPerPage, maxPerPage)
         nbResults ← adapter.nbResults
       } yield new Paginator(currentPage, maxPerPage, results, nbResults))

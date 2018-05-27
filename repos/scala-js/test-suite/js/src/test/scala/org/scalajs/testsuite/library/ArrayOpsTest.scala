@@ -63,23 +63,25 @@ class ArrayOpsTest {
   @Test def reduceLeft(): Unit = {
     val array = js.Array(100, 6, 2, 56, -1)
     assertEquals(37, array.reduceLeft(_ - _))
-    assertThrows(classOf[UnsupportedOperationException],
-                 js.Array[Int]().reduceLeft(_ + _))
+    assertThrows(
+      classOf[UnsupportedOperationException],
+      js.Array[Int]().reduceLeft(_ + _))
   }
 
   @Test def reduceRight(): Unit = {
     val array = js.Array("hello", "world")
     assertEquals("hello, world", array.reduceRight(_ + ", " + _))
-    assertThrows(classOf[UnsupportedOperationException],
-                 js.Array[Int]().reduceRight(_ + _))
+    assertThrows(
+      classOf[UnsupportedOperationException],
+      js.Array[Int]().reduceRight(_ + _))
   }
 
   @Test def ++(): Unit = {
     val left = js.Array("hello", "world")
     val right = js.Array("and", "everyone", "else")
     assertArrayEquals(
-        Array[AnyRef]("hello", "world", "and", "everyone", "else"),
-        (left ++ right).toArray[AnyRef])
+      Array[AnyRef]("hello", "world", "and", "everyone", "else"),
+      (left ++ right).toArray[AnyRef])
 
     val ints = js.Array(4, 3)
     val concat = left ++ ints
@@ -92,7 +94,7 @@ class ArrayOpsTest {
   // Some arbitrary methods to test the builders
 
   @Test def collect(): Unit = {
-    def ct[A : ClassTag](x: A): ClassTag[A] = implicitly[ClassTag[A]]
+    def ct[A: ClassTag](x: A): ClassTag[A] = implicitly[ClassTag[A]]
     val array = js.Array(3, 4, 5, 6, 3, 4)
     val res = array.collect {
       case x if x > 4 => 2 * x

@@ -34,11 +34,13 @@ object ExceptionHandler {
       def apply(error: Throwable) = pf(error)
       def withFallback(that: ExceptionHandler): ExceptionHandler =
         if (!knownToBeSealed)
-          ExceptionHandler(knownToBeSealed = false)(this orElse that) else this
+          ExceptionHandler(knownToBeSealed = false)(this orElse that)
+        else this
       def seal(settings: RoutingSettings): ExceptionHandler =
         if (!knownToBeSealed)
           ExceptionHandler(knownToBeSealed = true)(
-              this orElse default(settings)) else this
+            this orElse default(settings))
+        else this
     }
 
   def default(settings: RoutingSettings): ExceptionHandler =
@@ -47,17 +49,19 @@ object ExceptionHandler {
         ctx ⇒
           {
             ctx.log.warning(
-                "Illegal request {}\n\t{}\n\tCompleting with '{}' response",
-                ctx.request,
-                info.formatPretty,
-                status)
+              "Illegal request {}\n\t{}\n\tCompleting with '{}' response",
+              ctx.request,
+              info.formatPretty,
+              status)
             ctx.complete((status, info.format(settings.verboseErrorMessages)))
           }
-        case NonFatal(e) ⇒
+      case NonFatal(e) ⇒
         ctx ⇒
           {
             ctx.log.error(
-                e, "Error during processing of request {}", ctx.request)
+              e,
+              "Error during processing of request {}",
+              ctx.request)
             ctx.complete(InternalServerError)
           }
     }

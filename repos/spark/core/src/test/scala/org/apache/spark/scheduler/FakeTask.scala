@@ -35,9 +35,10 @@ object FakeTask {
     createTaskSet(numTasks, 0, prefLocs: _*)
   }
 
-  def createTaskSet(numTasks: Int,
-                    stageAttemptId: Int,
-                    prefLocs: Seq[TaskLocation]*): TaskSet = {
+  def createTaskSet(
+      numTasks: Int,
+      stageAttemptId: Int,
+      prefLocs: Seq[TaskLocation]*): TaskSet = {
     if (prefLocs.size != 0 && prefLocs.size != numTasks) {
       throw new IllegalArgumentException("Wrong number of task locations")
     }

@@ -21,10 +21,11 @@ class CORSConfigProvider @Inject()(configuration: Configuration)
 /**
   * Provider for CORSFilter.
   */
-class CORSFilterProvider @Inject()(configuration: Configuration,
-                                   errorHandler: HttpErrorHandler,
-                                   corsConfig: CORSConfig,
-                                   materializer: Materializer)
+class CORSFilterProvider @Inject()(
+    configuration: Configuration,
+    errorHandler: HttpErrorHandler,
+    corsConfig: CORSConfig,
+    materializer: Materializer)
     extends Provider[CORSFilter] {
   lazy val get = {
     val pathPrefixes = PlayConfig(configuration)
@@ -38,8 +39,8 @@ class CORSFilterProvider @Inject()(configuration: Configuration,
   */
 class CORSModule extends Module {
   def bindings(environment: Environment, configuration: Configuration) = Seq(
-      bind[CORSConfig].toProvider[CORSConfigProvider],
-      bind[CORSFilter].toProvider[CORSFilterProvider]
+    bind[CORSConfig].toProvider[CORSConfigProvider],
+    bind[CORSFilter].toProvider[CORSFilterProvider]
   )
 }
 
@@ -52,8 +53,8 @@ trait CORSComponents {
   implicit def materializer: Materializer
 
   lazy val corsConfig: CORSConfig = CORSConfig.fromConfiguration(configuration)
-  lazy val corsFilter: CORSFilter = new CORSFilter(
-      corsConfig, httpErrorHandler, corsPathPrefixes)
+  lazy val corsFilter: CORSFilter =
+    new CORSFilter(corsConfig, httpErrorHandler, corsPathPrefixes)
   lazy val corsPathPrefixes: Seq[String] = PlayConfig(configuration)
     .get[Seq[String]]("play.filters.cors.pathPrefixes")
 }

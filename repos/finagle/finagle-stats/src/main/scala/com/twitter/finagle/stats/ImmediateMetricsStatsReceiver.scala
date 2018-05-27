@@ -50,9 +50,9 @@ object ImmediateMetricsStatsReceiver {
   */
 class ImmediateMetricsStatsReceiver(registry: Metrics)
     extends MetricsStatsReceiver(
-        registry,
-        Sink.default,
-        ImmediateMetricsStatsReceiver.newHistogramInterface) {
+      registry,
+      Sink.default,
+      ImmediateMetricsStatsReceiver.newHistogramInterface) {
 
   def this() = this(MetricsStatsReceiver.defaultRegistry)
 }

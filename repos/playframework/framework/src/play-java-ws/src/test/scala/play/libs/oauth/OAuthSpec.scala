@@ -18,10 +18,10 @@ class OAuthSpec extends PlaySpecification {
 
   sequential
 
-  val javaConsumerKey = new ConsumerKey(
-      "someConsumerKey", "someVerySecretConsumerSecret")
-  val javaRequestToken = new RequestToken(
-      "someRequestToken", "someVerySecretRequestSecret")
+  val javaConsumerKey =
+    new ConsumerKey("someConsumerKey", "someVerySecretConsumerSecret")
+  val javaRequestToken =
+    new RequestToken("someRequestToken", "someVerySecretRequestSecret")
   val oauthCalculator = new OAuthCalculator(javaConsumerKey, javaRequestToken)
 
   val consumerKey = play.api.libs.oauth
@@ -35,7 +35,11 @@ class OAuthSpec extends PlaySpecification {
         client.url(hostUrl + "/foo").sign(oauthCalculator).get()
       }
       OAuthRequestVerifier.verifyRequest(
-          request, body, hostUrl, consumerKey, requestToken)
+        request,
+        body,
+        hostUrl,
+        consumerKey,
+        requestToken)
     }
 
     "sign a get request with query parameters" in {
@@ -47,7 +51,11 @@ class OAuthSpec extends PlaySpecification {
           .get()
       }
       OAuthRequestVerifier.verifyRequest(
-          request, body, hostUrl, consumerKey, requestToken)
+        request,
+        body,
+        hostUrl,
+        consumerKey,
+        requestToken)
     }
 
     "sign a post request with a body" in {
@@ -59,23 +67,29 @@ class OAuthSpec extends PlaySpecification {
           .post("param=paramValue")
       }
       OAuthRequestVerifier.verifyRequest(
-          request, body, hostUrl, consumerKey, requestToken)
+        request,
+        body,
+        hostUrl,
+        consumerKey,
+        requestToken)
     }
   }
 
   def receiveRequest(
-      makeRequest: (play.libs.ws.WSClient,
-      String) => CompletionStage[_]): (RequestHeader, ByteString, String) = {
+      makeRequest: (play.libs.ws.WSClient, String) => CompletionStage[_])
+    : (RequestHeader, ByteString, String) = {
     val hostUrl = "http://localhost:" + testServerPort
     val promise = Promise[(RequestHeader, ByteString)]()
-    val app = GuiceApplicationBuilder().routes {
-      case _ =>
-        Action(BodyParsers.parse.raw) { request =>
-          promise.success(
+    val app = GuiceApplicationBuilder()
+      .routes {
+        case _ =>
+          Action(BodyParsers.parse.raw) { request =>
+            promise.success(
               (request, request.body.asBytes().getOrElse(ByteString.empty)))
-          Results.Ok
-        }
-    }.build()
+            Results.Ok
+          }
+      }
+      .build()
     running(TestServer(testServerPort, app)) {
       val client = app.injector.instanceOf(classOf[play.libs.ws.WSClient])
       makeRequest(client, hostUrl).toCompletableFuture.get()

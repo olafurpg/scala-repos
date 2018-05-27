@@ -12,7 +12,8 @@ class WebJarServlet extends HttpServlet {
 
   //scalastyle:off method.length
   override def doGet(
-      req: HttpServletRequest, resp: HttpServletResponse): Unit = {
+      req: HttpServletRequest,
+      resp: HttpServletResponse): Unit = {
 
     def sendResource(resourceURI: String, mime: String): Unit = {
       //scalastyle:off magic.number
@@ -77,12 +78,13 @@ class WebJarServlet extends HttpServlet {
       case "eot" => "application/vnd.ms-fontobject"
       case "svg" => "image/svg+xml"
       case "ttf" => "application/font-ttf"
-      case _ => "application/octet-stream"
+      case _     => "application/octet-stream"
     }
   }
 
   private[this] def sendRedirect(
-      response: HttpServletResponse, location: String): Unit = {
+      response: HttpServletResponse,
+      location: String): Unit = {
     response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY)
     response.setHeader("Location", location)
   }

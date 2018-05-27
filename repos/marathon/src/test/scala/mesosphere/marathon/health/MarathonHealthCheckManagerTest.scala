@@ -8,9 +8,16 @@ import com.typesafe.config.ConfigFactory
 import mesosphere.marathon.Protos.HealthCheckDefinition.Protocol
 import mesosphere.marathon.Protos.MarathonTask
 import mesosphere.marathon._
-import mesosphere.marathon.core.leadership.{AlwaysElectedLeadershipModule, LeadershipModule}
+import mesosphere.marathon.core.leadership.{
+  AlwaysElectedLeadershipModule,
+  LeadershipModule
+}
 import mesosphere.marathon.core.task.Task
-import mesosphere.marathon.core.task.tracker.{TaskCreationHandler, TaskTracker, TaskUpdater}
+import mesosphere.marathon.core.task.tracker.{
+  TaskCreationHandler,
+  TaskTracker,
+  TaskUpdater
+}
 import mesosphere.marathon.metrics.Metrics
 import mesosphere.marathon.state.PathId.StringPathId
 import mesosphere.marathon.state._
@@ -24,7 +31,9 @@ import org.scalatest.concurrent.ScalaFutures
 import scala.concurrent.duration._
 
 class MarathonHealthCheckManagerTest
-    extends MarathonSpec with ScalaFutures with Logging
+    extends MarathonSpec
+    with ScalaFutures
+    with Logging
     with MarathonShutdownHookSupport {
 
   var hcManager: MarathonHealthCheckManager = _
@@ -43,10 +52,10 @@ class MarathonHealthCheckManagerTest
     val metrics = new Metrics(new MetricRegistry)
 
     system = ActorSystem(
-        "test-system",
-        ConfigFactory.parseString(
-            """akka.loggers = ["akka.testkit.TestEventListener"]"""
-        )
+      "test-system",
+      ConfigFactory.parseString(
+        """akka.loggers = ["akka.testkit.TestEventListener"]"""
+      )
     )
     leadershipModule = AlwaysElectedLeadershipModule(shutdownHooks)
 
@@ -60,21 +69,24 @@ class MarathonHealthCheckManagerTest
     taskUpdater = taskTrackerModule.taskUpdater
 
     appRepository = new AppRepository(
-        new MarathonStore[AppDefinition](
-            new InMemoryStore, metrics, () => AppDefinition(), "app:"),
-        None,
-        metrics)
+      new MarathonStore[AppDefinition](
+        new InMemoryStore,
+        metrics,
+        () => AppDefinition(),
+        "app:"),
+      None,
+      metrics)
 
     eventStream = new EventStream()
 
     hcManager = new MarathonHealthCheckManager(
-        system,
-        mock[MarathonScheduler],
-        new MarathonSchedulerDriverHolder,
-        eventStream,
-        taskTracker,
-        appRepository,
-        config
+      system,
+      mock[MarathonScheduler],
+      new MarathonSchedulerDriverHolder,
+      eventStream,
+      taskTracker,
+      appRepository,
+      config
     )
   }
 
@@ -98,7 +110,9 @@ class MarathonHealthCheckManagerTest
   }
 
   def updateTaskHealth(
-      taskId: Task.Id, version: Timestamp, healthy: Boolean): Unit = {
+      taskId: Task.Id,
+      version: Timestamp,
+      healthy: Boolean): Unit = {
     val taskStatus = mesos.TaskStatus.newBuilder
       .setTaskId(taskId.mesosTaskId)
       .setState(mesos.TaskState.TASK_RUNNING)
@@ -153,8 +167,9 @@ class MarathonHealthCheckManagerTest
     EventFilter
       .info(start = "Received health result for app", occurrences = 1)
       .intercept {
-        hcManager.update(taskStatus.toBuilder.setHealthy(false).build,
-                         app.version)
+        hcManager.update(
+          taskStatus.toBuilder.setHealthy(false).build,
+          app.version)
       }
 
     val Seq(health2) = hcManager.status(appId, taskId).futureValue
@@ -165,8 +180,9 @@ class MarathonHealthCheckManagerTest
     EventFilter
       .info(start = "Received health result for app", occurrences = 1)
       .intercept {
-        hcManager.update(taskStatus.toBuilder.setHealthy(true).build,
-                         app.version)
+        hcManager.update(
+          taskStatus.toBuilder.setHealthy(true).build,
+          app.version)
       }
 
     val Seq(health3) = hcManager.status(appId, taskId).futureValue
@@ -233,8 +249,9 @@ class MarathonHealthCheckManagerTest
   }
 
   test("reconcileWith") {
-    def taskStatus(task: MarathonTask,
-                   state: mesos.TaskState = mesos.TaskState.TASK_RUNNING) =
+    def taskStatus(
+        task: MarathonTask,
+        state: mesos.TaskState = mesos.TaskState.TASK_RUNNING) =
       mesos.TaskStatus.newBuilder
         .setTaskId(mesos.TaskID.newBuilder().setValue(task.getId).build)
         .setState(state)
@@ -242,24 +259,27 @@ class MarathonHealthCheckManagerTest
         .build
     val healthChecks = List(0, 1, 2).map { i =>
       (0 until i).map { j =>
-        HealthCheck(protocol = Protocol.COMMAND,
-                    gracePeriod = (i * 3 + j).seconds)
+        HealthCheck(
+          protocol = Protocol.COMMAND,
+          gracePeriod = (i * 3 + j).seconds)
       }.toSet
     }
     val versions = List(0L, 1L, 2L).map { Timestamp(_) }.toArray
     val tasks = List(0, 1, 2).map { i =>
       MarathonTestHelper.stagedTaskForApp(appId, appVersion = versions(i))
     }
-    def startTask(appId: PathId,
-                  task: Task,
-                  version: Timestamp,
-                  healthChecks: Set[HealthCheck]) = {
+    def startTask(
+        appId: PathId,
+        task: Task,
+        version: Timestamp,
+        healthChecks: Set[HealthCheck]) = {
       appRepository
-        .store(AppDefinition(
-                id = appId,
-                versionInfo = AppDefinition.VersionInfo.forNewConfig(version),
-                healthChecks = healthChecks
-            ))
+        .store(
+          AppDefinition(
+            id = appId,
+            versionInfo = AppDefinition.VersionInfo.forNewConfig(version),
+            healthChecks = healthChecks
+          ))
         .futureValue
       taskCreationHandler.created(task).futureValue
       taskUpdater
@@ -279,7 +299,7 @@ class MarathonHealthCheckManagerTest
       Set(HealthCheck(protocol = Protocol.COMMAND, gracePeriod = 0.seconds))
     startTask(otherAppId, otherTask, Timestamp(42), otherHealthChecks)
     hcManager.addAllFor(
-        appRepository.currentVersion(otherAppId).futureValue.get)
+      appRepository.currentVersion(otherAppId).futureValue.get)
     assert(hcManager.list(otherAppId) == otherHealthChecks)
 
     // start task 0 without running health check
@@ -311,8 +331,10 @@ class MarathonHealthCheckManagerTest
       startTask_i(2)
       hcManager.reconcileWith(appId).futureValue
     }
-    assert(captured3.map(_.eventType) == Vector("add_health_check_event",
-                                                "add_health_check_event"))
+    assert(
+      captured3.map(_.eventType) == Vector(
+        "add_health_check_event",
+        "add_health_check_event"))
     assert(hcManager.list(appId) == healthChecks(1) ++ healthChecks(2))
 
     // reconcileWith stops health checks which are not current and which are without tasks

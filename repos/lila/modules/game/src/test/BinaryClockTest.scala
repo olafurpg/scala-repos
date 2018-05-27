@@ -32,33 +32,36 @@ class BinaryClockTest extends Specification {
       }
       write(clock.giveTime(chess.White, 0.03f)) must_== {
         bits22 ::: List("10000000", "00000000", "00000011") ::: List.fill(7)(
-            _0_)
+          _0_)
       }
       write(clock.giveTime(chess.White, -0.03f)) must_== {
         bits22 ::: List("00000000", "00000000", "00000011") ::: List.fill(7)(
-            _0_)
+          _0_)
       }
       write(Clock(0, 3)) must_== {
-        List("00000000",
-             "00000011",
-             "10000000",
-             "00000001",
-             "00101100",
-             "10000000",
-             "00000001",
-             "00101100") ::: List.fill(4)(_0_)
+        List(
+          "00000000",
+          "00000011",
+          "10000000",
+          "00000001",
+          "00101100",
+          "10000000",
+          "00000001",
+          "00101100") ::: List.fill(4)(_0_)
       }
     }
     "read" in {
       read(bits22 ::: List.fill(11)(_0_)) must_== {
         clock
       }
-      read(bits22 ::: List("10000000", "00000000", "00000011") ::: List.fill(
-              8)(_0_)) must_== {
+      read(
+        bits22 ::: List("10000000", "00000000", "00000011") ::: List.fill(8)(
+          _0_)) must_== {
         clock.giveTime(chess.White, 0.03f)
       }
-      read(bits22 ::: List("00000000", "00000000", "00000011") ::: List.fill(
-              8)(_0_)) must_== {
+      read(
+        bits22 ::: List("00000000", "00000000", "00000011") ::: List.fill(8)(
+          _0_)) must_== {
         clock.giveTime(chess.White, -0.03f)
       }
     }

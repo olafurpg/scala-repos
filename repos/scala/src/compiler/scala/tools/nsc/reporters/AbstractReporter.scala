@@ -35,7 +35,10 @@ abstract class AbstractReporter extends Reporter {
   private def isDebug = settings.debug
 
   protected def info0(
-      pos: Position, msg: String, severity: Severity, force: Boolean) {
+      pos: Position,
+      msg: String,
+      severity: Severity,
+      force: Boolean) {
     if (severity == INFO) {
       if (isVerbose || force) {
         severity.count += 1
@@ -62,7 +65,9 @@ abstract class AbstractReporter extends Reporter {
     *  @note  Two positions are considered identical for logging if they have the same point.
     */
   private def testAndLog(
-      pos: Position, severity: Severity, msg: String): Boolean =
+      pos: Position,
+      severity: Severity,
+      msg: String): Boolean =
     pos != null && pos.isDefined && {
       val fpos = pos.focus
       val suppress = positions(fpos) match {

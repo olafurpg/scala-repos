@@ -11,8 +11,8 @@ import scala.concurrent.duration.FiniteDuration
 
 object BidiFlow {
 
-  private[this] val _identity: BidiFlow[
-      Object, Object, Object, Object, NotUsed] =
+  private[this] val _identity
+    : BidiFlow[Object, Object, Object, Object, NotUsed] =
     BidiFlow.fromFlows(Flow.of(classOf[Object]), Flow.of(classOf[Object]))
 
   def identity[A, B]: BidiFlow[A, A, B, B, NotUsed] =
@@ -53,7 +53,7 @@ object BidiFlow {
       flow2: Graph[FlowShape[I2, O2], M2],
       combine: function.Function2[M1, M2, M]): BidiFlow[I1, O1, I2, O2, M] = {
     new BidiFlow(
-        scaladsl.BidiFlow.fromFlowsMat(flow1, flow2)(combinerToScala(combine)))
+      scaladsl.BidiFlow.fromFlowsMat(flow1, flow2)(combinerToScala(combine)))
   }
 
   /**
@@ -129,8 +129,8 @@ final class BidiFlow[-I1, +O1, -I2, +O2, +Mat](
     * value of the current flow (ignoring the other BidiFlow’s value), use
     * [[BidiFlow#atopMat atopMat]] if a different strategy is needed.
     */
-  def atop[OO1, II2, Mat2](bidi: BidiFlow[O1, OO1, II2, I2, Mat2])
-    : BidiFlow[I1, OO1, II2, O2, Mat] =
+  def atop[OO1, II2, Mat2](
+      bidi: BidiFlow[O1, OO1, II2, I2, Mat2]): BidiFlow[I1, OO1, II2, O2, Mat] =
     new BidiFlow(delegate.atop(bidi.asScala))
 
   /**
@@ -152,8 +152,9 @@ final class BidiFlow[-I1, +O1, -I2, +O2, +Mat](
     * The `combine` function is used to compose the materialized values of this flow and that
     * flow into the materialized value of the resulting BidiFlow.
     */
-  def atop[OO1, II2, Mat2, M](bidi: BidiFlow[O1, OO1, II2, I2, Mat2],
-                              combine: function.Function2[Mat, Mat2, M])
+  def atop[OO1, II2, Mat2, M](
+      bidi: BidiFlow[O1, OO1, II2, I2, Mat2],
+      combine: function.Function2[Mat, Mat2, M])
     : BidiFlow[I1, OO1, II2, O2, M] =
     new BidiFlow(delegate.atopMat(bidi.asScala)(combinerToScala(combine)))
 
@@ -221,8 +222,7 @@ final class BidiFlow[-I1, +O1, -I2, +O2, +Mat](
     * operation has no effect on an empty Flow (because the attributes apply
     * only to the contained processing stages).
     */
-  override def withAttributes(
-      attr: Attributes): BidiFlow[I1, O1, I2, O2, Mat] =
+  override def withAttributes(attr: Attributes): BidiFlow[I1, O1, I2, O2, Mat] =
     new BidiFlow(delegate.withAttributes(attr))
 
   /**

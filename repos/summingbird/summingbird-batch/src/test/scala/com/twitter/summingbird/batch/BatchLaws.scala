@@ -50,16 +50,16 @@ object BatchLaws extends Properties("BatchID") {
     BatchID(b).prev == BatchID(b - 1L)
   }
 
-  property("range, toInterval and toIterable should be equivalent") = forAll(
-      Arbitrary.arbitrary[BatchID], Gen.choose(0L, 1000L)) {
-    (b1: BatchID, diff: Long) =>
-      // We can't enumerate too much:
-      val b2 = b1 + diff
-      val interval = Interval.leftClosedRightOpen(b1, b2.next) match {
-        case Left(i) => i
-        case Right(i) => i
-      }
-      (BatchID.toInterval(BatchID.range(b1, b2)) == Some(interval)) &&
-      BatchID.toIterable(interval).toList == BatchID.range(b1, b2).toList
-  }
+  property("range, toInterval and toIterable should be equivalent") =
+    forAll(Arbitrary.arbitrary[BatchID], Gen.choose(0L, 1000L)) {
+      (b1: BatchID, diff: Long) =>
+        // We can't enumerate too much:
+        val b2 = b1 + diff
+        val interval = Interval.leftClosedRightOpen(b1, b2.next) match {
+          case Left(i)  => i
+          case Right(i) => i
+        }
+        (BatchID.toInterval(BatchID.range(b1, b2)) == Some(interval)) &&
+        BatchID.toIterable(interval).toList == BatchID.range(b1, b2).toList
+    }
 }

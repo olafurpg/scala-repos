@@ -26,9 +26,15 @@ import scopt.OptionParser
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.examples.mllib.AbstractParams
 import org.apache.spark.ml.{Pipeline, PipelineStage, Transformer}
-import org.apache.spark.ml.classification.{DecisionTreeClassificationModel, DecisionTreeClassifier}
+import org.apache.spark.ml.classification.{
+  DecisionTreeClassificationModel,
+  DecisionTreeClassifier
+}
 import org.apache.spark.ml.feature.{StringIndexer, VectorIndexer}
-import org.apache.spark.ml.regression.{DecisionTreeRegressionModel, DecisionTreeRegressor}
+import org.apache.spark.ml.regression.{
+  DecisionTreeRegressionModel,
+  DecisionTreeRegressor
+}
 import org.apache.spark.ml.util.MetadataUtils
 import org.apache.spark.mllib.evaluation.{MulticlassMetrics, RegressionMetrics}
 import org.apache.spark.mllib.linalg.Vector
@@ -51,18 +57,19 @@ import org.apache.spark.sql.{DataFrame, SQLContext}
   */
 object DecisionTreeExample {
 
-  case class Params(input: String = null,
-                    testInput: String = "",
-                    dataFormat: String = "libsvm",
-                    algo: String = "Classification",
-                    maxDepth: Int = 5,
-                    maxBins: Int = 32,
-                    minInstancesPerNode: Int = 1,
-                    minInfoGain: Double = 0.0,
-                    fracTest: Double = 0.2,
-                    cacheNodeIds: Boolean = false,
-                    checkpointDir: Option[String] = None,
-                    checkpointInterval: Int = 10)
+  case class Params(
+      input: String = null,
+      testInput: String = "",
+      dataFormat: String = "libsvm",
+      algo: String = "Classification",
+      maxDepth: Int = 5,
+      maxBins: Int = 32,
+      minInstancesPerNode: Int = 1,
+      minInfoGain: Double = 0.0,
+      fracTest: Double = 0.2,
+      cacheNodeIds: Boolean = false,
+      checkpointDir: Option[String] = None,
+      checkpointInterval: Int = 10)
       extends AbstractParams[Params]
 
   def main(args: Array[String]) {
@@ -72,7 +79,7 @@ object DecisionTreeExample {
       head("DecisionTreeExample: an example decision tree app.")
       opt[String]("algo")
         .text(
-            s"algorithm (classification, regression), default: ${defaultParams.algo}")
+          s"algorithm (classification, regression), default: ${defaultParams.algo}")
         .action((x, c) => c.copy(algo = x))
       opt[Int]("maxDepth")
         .text(s"max depth of the tree, default: ${defaultParams.maxDepth}")
@@ -81,40 +88,42 @@ object DecisionTreeExample {
         .text(s"max number of bins, default: ${defaultParams.maxBins}")
         .action((x, c) => c.copy(maxBins = x))
       opt[Int]("minInstancesPerNode")
-        .text(s"min number of instances required at child nodes to create the parent split," +
+        .text(
+          s"min number of instances required at child nodes to create the parent split," +
             s" default: ${defaultParams.minInstancesPerNode}")
         .action((x, c) => c.copy(minInstancesPerNode = x))
       opt[Double]("minInfoGain")
         .text(
-            s"min info gain required to create a split, default: ${defaultParams.minInfoGain}")
+          s"min info gain required to create a split, default: ${defaultParams.minInfoGain}")
         .action((x, c) => c.copy(minInfoGain = x))
       opt[Double]("fracTest")
-        .text(s"fraction of data to hold out for testing.  If given option testInput, " +
+        .text(
+          s"fraction of data to hold out for testing.  If given option testInput, " +
             s"this option is ignored. default: ${defaultParams.fracTest}")
         .action((x, c) => c.copy(fracTest = x))
       opt[Boolean]("cacheNodeIds")
         .text(s"whether to use node Id cache during training, " +
-            s"default: ${defaultParams.cacheNodeIds}")
+          s"default: ${defaultParams.cacheNodeIds}")
         .action((x, c) => c.copy(cacheNodeIds = x))
       opt[String]("checkpointDir")
         .text(
-            s"checkpoint directory where intermediate node Id caches will be stored, " +
+          s"checkpoint directory where intermediate node Id caches will be stored, " +
             s"default: ${defaultParams.checkpointDir match {
-          case Some(strVal) => strVal
-          case None => "None"
-        }}")
+              case Some(strVal) => strVal
+              case None         => "None"
+            }}")
         .action((x, c) => c.copy(checkpointDir = Some(x)))
       opt[Int]("checkpointInterval")
         .text(s"how often to checkpoint the node Id cache, " +
-            s"default: ${defaultParams.checkpointInterval}")
+          s"default: ${defaultParams.checkpointInterval}")
         .action((x, c) => c.copy(checkpointInterval = x))
       opt[String]("testInput")
-        .text(s"input path to test dataset.  If given, option fracTest is ignored." +
+        .text(
+          s"input path to test dataset.  If given, option fracTest is ignored." +
             s" default: ${defaultParams.testInput}")
         .action((x, c) => c.copy(testInput = x))
       opt[String]("dataFormat")
-        .text(
-            "data format: libsvm (default), dense (deprecated in Spark v1.1)")
+        .text("data format: libsvm (default), dense (deprecated in Spark v1.1)")
         .action((x, c) => c.copy(dataFormat = x))
       arg[String]("<input>")
         .text("input path to labeled examples")
@@ -123,7 +132,7 @@ object DecisionTreeExample {
       checkConfig { params =>
         if (params.fracTest < 0 || params.fracTest >= 1) {
           failure(
-              s"fracTest ${params.fracTest} value incorrect; should be in [0,1).")
+            s"fracTest ${params.fracTest} value incorrect; should be in [0,1).")
         } else {
           success
         }
@@ -173,12 +182,13 @@ object DecisionTreeExample {
     * @param fracTest  Fraction of input data to hold out for testing.  Ignored if testInput given.
     * @return  (training dataset, test dataset)
     */
-  private[ml] def loadDatasets(sc: SparkContext,
-                               input: String,
-                               dataFormat: String,
-                               testInput: String,
-                               algo: String,
-                               fracTest: Double): (DataFrame, DataFrame) = {
+  private[ml] def loadDatasets(
+      sc: SparkContext,
+      input: String,
+      dataFormat: String,
+      testInput: String,
+      algo: String,
+      fracTest: Double): (DataFrame, DataFrame) = {
     val sqlContext = new SQLContext(sc)
 
     // Load training data
@@ -189,8 +199,8 @@ object DecisionTreeExample {
       if (testInput != "") {
         // Load testInput.
         val numFeatures = origExamples.first().getAs[Vector](1).size
-        val origTestExamples: DataFrame = loadData(
-            sqlContext, testInput, dataFormat, Some(numFeatures))
+        val origTestExamples: DataFrame =
+          loadData(sqlContext, testInput, dataFormat, Some(numFeatures))
         Array(origExamples, origTestExamples)
       } else {
         // Split input into training, test.
@@ -220,12 +230,12 @@ object DecisionTreeExample {
 
     // Load training and test data and cache it.
     val (training: DataFrame, test: DataFrame) = loadDatasets(
-        sc,
-        params.input,
-        params.dataFormat,
-        params.testInput,
-        algo,
-        params.fracTest)
+      sc,
+      params.input,
+      params.dataFormat,
+      params.testInput,
+      algo,
+      params.fracTest)
 
     // Set up Pipeline
     val stages = new mutable.ArrayBuffer[PipelineStage]()
@@ -267,8 +277,7 @@ object DecisionTreeExample {
           .setCacheNodeIds(params.cacheNodeIds)
           .setCheckpointInterval(params.checkpointInterval)
       case _ =>
-        throw new IllegalArgumentException(
-            "Algo ${params.algo} not supported.")
+        throw new IllegalArgumentException("Algo ${params.algo} not supported.")
     }
     stages += dt
     val pipeline = new Pipeline().setStages(stages.toArray)
@@ -298,8 +307,7 @@ object DecisionTreeExample {
           println(treeModel) // Print model summary.
         }
       case _ =>
-        throw new IllegalArgumentException(
-            "Algo ${params.algo} not supported.")
+        throw new IllegalArgumentException("Algo ${params.algo} not supported.")
     }
 
     // Evaluate model on training, test data
@@ -315,8 +323,7 @@ object DecisionTreeExample {
         println("Test data results:")
         evaluateRegressionModel(pipelineModel, test, labelColName)
       case _ =>
-        throw new IllegalArgumentException(
-            "Algo ${params.algo} not supported.")
+        throw new IllegalArgumentException("Algo ${params.algo} not supported.")
     }
 
     sc.stop()
@@ -331,7 +338,9 @@ object DecisionTreeExample {
     * TODO: Change model type to ClassificationModel once that API is public. SPARK-5995
     */
   private[ml] def evaluateClassificationModel(
-      model: Transformer, data: DataFrame, labelColName: String): Unit = {
+      model: Transformer,
+      data: DataFrame,
+      labelColName: String): Unit = {
     val fullPredictions = model.transform(data).cache()
     val predictions =
       fullPredictions.select("prediction").rdd.map(_.getDouble(0))
@@ -342,7 +351,7 @@ object DecisionTreeExample {
         case Some(n) => n
         case None =>
           throw new RuntimeException(
-              "Unknown failure when indexing labels for classification.")
+            "Unknown failure when indexing labels for classification.")
       }
     val accuracy = new MulticlassMetrics(predictions.zip(labels)).precision
     println(s"  Accuracy ($numClasses classes): $accuracy")
@@ -357,7 +366,9 @@ object DecisionTreeExample {
     * TODO: Change model type to RegressionModel once that API is public. SPARK-5995
     */
   private[ml] def evaluateRegressionModel(
-      model: Transformer, data: DataFrame, labelColName: String): Unit = {
+      model: Transformer,
+      data: DataFrame,
+      labelColName: String): Unit = {
     val fullPredictions = model.transform(data).cache()
     val predictions =
       fullPredictions.select("prediction").rdd.map(_.getDouble(0))

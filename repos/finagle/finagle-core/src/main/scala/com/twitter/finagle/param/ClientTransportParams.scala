@@ -35,7 +35,7 @@ class ClientTransportParams[A <: Stack.Parameterized[A]](
   def tls(hostname: String): A = {
     val socketAddressToEngine: SocketAddress => Engine = {
       case sa: InetSocketAddress => Ssl.client(hostname, sa.getPort)
-      case _ => Ssl.client()
+      case _                     => Ssl.client()
     }
 
     self
@@ -84,8 +84,8 @@ class ClientTransportParams[A <: Stack.Parameterized[A]](
       credentials: Option[Transporter.Credentials]
   ): A =
     self.configured(
-        Transporter.SocksProxy(
-            Some(socketAddress),
-            credentials.map(c => (c.username, c.password))
-        ))
+      Transporter.SocksProxy(
+        Some(socketAddress),
+        credentials.map(c => (c.username, c.password))
+      ))
 }

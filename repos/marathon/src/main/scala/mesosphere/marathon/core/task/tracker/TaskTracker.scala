@@ -30,8 +30,7 @@ trait TaskTracker {
   def marathonTask(taskId: Task.Id)(
       implicit ec: ExecutionContext): Future[Option[MarathonTask]]
 
-  def task(taskId: Task.Id)(
-      implicit ec: ExecutionContext): Future[Option[Task]]
+  def task(taskId: Task.Id)(implicit ec: ExecutionContext): Future[Option[Task]]
 
   def tasksByAppSync: TaskTracker.TasksByApp
   def tasksByApp()(
@@ -42,8 +41,7 @@ trait TaskTracker {
   def countAppTasks(appId: PathId)(implicit ec: ExecutionContext): Future[Int]
 
   def hasAppTasksSync(appId: PathId): Boolean
-  def hasAppTasks(appId: PathId)(
-      implicit ec: ExecutionContext): Future[Boolean]
+  def hasAppTasks(appId: PathId)(implicit ec: ExecutionContext): Future[Boolean]
 }
 
 object TaskTracker {
@@ -89,7 +87,7 @@ object TaskTracker {
         copy(appTasksMap = appTasksMap - appId)
       } else {
         log.debug(
-            s"Updated app [$appId], currently ${updated.taskMap.size} tasks in total.")
+          s"Updated app [$appId], currently ${updated.taskMap.size} tasks in total.")
         copy(appTasksMap = appTasksMap + (appId -> updated))
       }
     }
@@ -100,21 +98,20 @@ object TaskTracker {
 
     def of(appTasks: collection.immutable.Map[PathId, TaskTracker.AppTasks])
       : TasksByApp = {
-      new TasksByApp(
-          appTasks.withDefault(appId => TaskTracker.AppTasks(appId)))
+      new TasksByApp(appTasks.withDefault(appId => TaskTracker.AppTasks(appId)))
     }
 
     def of(apps: TaskTracker.AppTasks*): TasksByApp =
       of(Map(apps.map(app => app.appId -> app): _*))
 
     def forTasks(tasks: Task*): TasksByApp = of(
-        tasks
-          .groupBy(_.appId)
-          .map {
-            case (appId, appTasks) =>
-              appId -> AppTasks.forTasks(appId, appTasks)
-          }
-      )
+      tasks
+        .groupBy(_.appId)
+        .map {
+          case (appId, appTasks) =>
+            appId -> AppTasks.forTasks(appId, appTasks)
+        }
+    )
 
     def empty: TasksByApp =
       of(collection.immutable.Map.empty[PathId, TaskTracker.AppTasks])
@@ -127,7 +124,8 @@ object TaskTracker {
     * @param taskStateMap The tasks of this app by task ID. FIXME: change keys to Task.TaskID
     */
   case class AppTasks(
-      appId: PathId, taskStateMap: Map[Task.Id, Task] = Map.empty) {
+      appId: PathId,
+      taskStateMap: Map[Task.Id, Task] = Map.empty) {
 
     def isEmpty: Boolean = taskMap.isEmpty
     def contains(taskId: Task.Id): Boolean = taskMap.contains(taskId)
@@ -149,6 +147,7 @@ object TaskTracker {
       AppTasks.forTasks(appId, tasks.map(TaskSerializer.fromProto(_)))
     def forTasks(appId: PathId, tasks: Iterable[Task]): AppTasks =
       AppTasks(
-          appId, tasks.map(taskState => taskState.taskId -> taskState).toMap)
+        appId,
+        tasks.map(taskState => taskState.taskId -> taskState).toMap)
   }
 }

@@ -8,7 +8,10 @@ import java.util.{ArrayList => JArrayList, List => JList}
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Condition
 import com.intellij.psi._
-import com.intellij.refactoring.safeDelete.{JavaSafeDeleteProcessor, NonCodeUsageSearchInfo}
+import com.intellij.refactoring.safeDelete.{
+  JavaSafeDeleteProcessor,
+  NonCodeUsageSearchInfo
+}
 import com.intellij.usageView.UsageInfo
 import org.jetbrains.annotations.Nullable
 import org.jetbrains.plugins.scala.extensions._
@@ -22,9 +25,10 @@ class ScalaSafeDeleteProcessorDelegate extends JavaSafeDeleteProcessor {
     element.containingScalaFile.isDefined && super.handlesElement(element)
 
   @Nullable
-  override def findUsages(element: PsiElement,
-                          allElementsToDelete: Array[PsiElement],
-                          usages: JList[UsageInfo]): NonCodeUsageSearchInfo = {
+  override def findUsages(
+      element: PsiElement,
+      allElementsToDelete: Array[PsiElement],
+      usages: JList[UsageInfo]): NonCodeUsageSearchInfo = {
     var insideDeletedCondition: Condition[PsiElement] =
       getUsageInsideDeletedFilter(allElementsToDelete)
 

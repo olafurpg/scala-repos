@@ -29,7 +29,7 @@ trait ConnectionIdentifier {
 
   override def equals(other: Any): Boolean = other match {
     case ci: ConnectionIdentifier => ci.jndiName == this.jndiName
-    case _ => false
+    case _                        => false
   }
 }
 

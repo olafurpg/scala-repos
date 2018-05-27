@@ -38,7 +38,7 @@ object AnnotationExpr {
           while (NameValuePair.parse(builder)) {
             builder.getTokenType match {
               case ScalaTokenTypes.tCOMMA => builder.advanceLexer()
-              case _ =>
+              case _                      =>
             }
             while (builder.getTokenType == ScalaTokenTypes.tCOMMA) {
               builder.error(ScalaBundle.message("wrong.annotation.expression"))

@@ -15,19 +15,19 @@ object ApplicationBuild extends Build {
   val main = Project(appName, file("."))
     .enablePlugins(PlayScala)
     .settings(
-        version := appVersion,
-        TaskKey[Unit]("checkSecret") := {
-          val file: File = baseDirectory.value / "conf/application.conf"
-          val config: Config = ConfigFactory.parseFileAnySyntax(file)
-          if (!config.hasPath("play.crypto.secret")) {
-            throw new RuntimeException("secret not found!!\n" + file)
-          } else {
-            config.getString("play.crypto.secret") match {
-              case "changeme" =>
-                throw new RuntimeException("secret not changed!!\n" + file)
-              case _ =>
-            }
+      version := appVersion,
+      TaskKey[Unit]("checkSecret") := {
+        val file: File = baseDirectory.value / "conf/application.conf"
+        val config: Config = ConfigFactory.parseFileAnySyntax(file)
+        if (!config.hasPath("play.crypto.secret")) {
+          throw new RuntimeException("secret not found!!\n" + file)
+        } else {
+          config.getString("play.crypto.secret") match {
+            case "changeme" =>
+              throw new RuntimeException("secret not changed!!\n" + file)
+            case _ =>
           }
         }
+      }
     )
 }

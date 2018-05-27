@@ -7,15 +7,27 @@ package search
 import com.intellij.psi._
 import com.intellij.psi.search.SearchScope
 import com.intellij.psi.search.searches.OverridingMethodsSearch.SearchParameters
-import com.intellij.psi.search.searches.{ClassInheritorsSearch, OverridingMethodsSearch}
+import com.intellij.psi.search.searches.{
+  ClassInheritorsSearch,
+  OverridingMethodsSearch
+}
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.util.{Processor, QueryExecutor}
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScClassParameter
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScTypeAlias}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction,
+  ScTypeAlias
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScTemplateDefinition, ScTypeDefinition}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{ScEarlyDefinitions, ScNamedElement}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScTemplateDefinition,
+  ScTypeDefinition
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{
+  ScEarlyDefinitions,
+  ScNamedElement
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.TypeDefinitionMembers
 import org.jetbrains.plugins.scala.lang.psi.stubs.util.ScalaStubsUtil
 import org.jetbrains.plugins.scala.lang.psi.types._
@@ -32,14 +44,15 @@ import scala.collection.mutable.ArrayBuffer
 class MethodImplementationsSearch
     extends QueryExecutor[PsiElement, PsiElement] {
   override def execute(
-      sourceElement: PsiElement, consumer: Processor[PsiElement]): Boolean = {
+      sourceElement: PsiElement,
+      consumer: Processor[PsiElement]): Boolean = {
     sourceElement match {
       case namedElement: ScNamedElement =>
         for (implementation <- ScalaOverridingMemberSearcher
-                                .getOverridingMethods(namedElement)
-                              //to avoid duplicates with ScalaOverridingMemberSearcher
-                              if !namedElement.isInstanceOf[PsiMethod] ||
-                              !implementation.isInstanceOf[PsiMethod]) {
+               .getOverridingMethods(namedElement)
+             //to avoid duplicates with ScalaOverridingMemberSearcher
+             if !namedElement.isInstanceOf[PsiMethod] ||
+               !implementation.isInstanceOf[PsiMethod]) {
           if (!consumer.process(implementation)) {
             return false
           }
@@ -56,14 +69,15 @@ class MethodImplementationsSearch
   */
 class ScalaOverridingMemberSearcher
     extends QueryExecutor[PsiMethod, OverridingMethodsSearch.SearchParameters] {
-  def execute(queryParameters: SearchParameters,
-              consumer: Processor[PsiMethod]): Boolean = {
+  def execute(
+      queryParameters: SearchParameters,
+      consumer: Processor[PsiMethod]): Boolean = {
     val method = queryParameters.getMethod
     method match {
       case namedElement: ScNamedElement =>
         for (implementation <- ScalaOverridingMemberSearcher
-                                .getOverridingMethods(namedElement)
-                                  if implementation.isInstanceOf[PsiMethod]) {
+               .getOverridingMethods(namedElement)
+             if implementation.isInstanceOf[PsiMethod]) {
           if (!consumer.process(implementation.asInstanceOf[PsiMethod])) {
             return false
           }
@@ -79,22 +93,24 @@ object ScalaOverridingMemberSearcher {
     val result = new ArrayBuffer[PsiNamedElement]
     inReadAction {
       for (psiMethod <- ScalaOverridingMemberSearcher.search(
-          method, deep = true)) {
+             method,
+             deep = true)) {
         result += psiMethod
       }
     }
     result.toArray
   }
 
-  def search(member: PsiNamedElement,
-             scopeOption: Option[SearchScope] = None,
-             deep: Boolean = true,
-             withSelfType: Boolean = false): Array[PsiNamedElement] = {
+  def search(
+      member: PsiNamedElement,
+      scopeOption: Option[SearchScope] = None,
+      deep: Boolean = true,
+      withSelfType: Boolean = false): Array[PsiNamedElement] = {
     val scope = scopeOption.getOrElse(member.getUseScope)
     def inTemplateBodyOrEarlyDef(element: PsiElement) =
       element.getParent match {
         case _: ScTemplateBody | _: ScEarlyDefinitions => true
-        case _ => false
+        case _                                         => false
       }
     member match {
       case _: ScFunction | _: ScTypeAlias =>
@@ -125,7 +141,7 @@ object ScalaOverridingMemberSearcher {
               if (!deep) return false
             }
             for (td <- inheritor.typeDefinitions if !td.isObject &&
-                      name == td.name) {
+                   name == td.name) {
               buffer += td
               if (!deep) return false
             }
@@ -150,10 +166,10 @@ object ScalaOverridingMemberSearcher {
             val signsIterator = signatures.forName(member.name)._1.iterator
             while (signsIterator.hasNext) {
               val (
-              t: Signature, node: TypeDefinitionMembers.SignatureNodes.Node) =
+                t: Signature,
+                node: TypeDefinitionMembers.SignatureNodes.Node) =
                 signsIterator.next()
-              if (PsiTreeUtil.getParentOfType(
-                      t.namedElement, classOf[PsiClass]) == inheritor) {
+              if (PsiTreeUtil.getParentOfType(t.namedElement, classOf[PsiClass]) == inheritor) {
                 val supersIterator = node.supers.iterator
                 while (supersIterator.hasNext) {
                   val s = supersIterator.next()
@@ -181,7 +197,8 @@ object ScalaOverridingMemberSearcher {
 
     if (withSelfType) {
       val inheritors = ScalaStubsUtil.getSelfTypeInheritors(
-          parentClass, parentClass.getResolveScope)
+        parentClass,
+        parentClass.getResolveScope)
       break = false
       for (clazz <- inheritors if !break) {
         break = !process(clazz)

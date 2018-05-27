@@ -22,11 +22,12 @@ object InteriorPoint {
     * @see http://www.doc.ic.ac.uk/~br/berc/pdiplin.pdf
     * @see http://www.ee.ucla.edu/ee236a/lectures/mpc.pdf
     */
-  def minimize(A: DenseMatrix[Double],
-               b: DenseVector[Double],
-               c: DenseVector[Double],
-               x0: DenseVector[Double],
-               tol: Double = TOLERANCE): DenseVector[Double] = {
+  def minimize(
+      A: DenseMatrix[Double],
+      b: DenseVector[Double],
+      c: DenseVector[Double],
+      x0: DenseVector[Double],
+      tol: Double = TOLERANCE): DenseVector[Double] = {
     val m = A.rows
     val n = A.cols
     val x = DenseVector.zeros[Double](n)
@@ -49,8 +50,8 @@ object InteriorPoint {
         val scaleZ = lineSearch(z, zAff)
         val sigma =
           math.pow((s + sAff * scaleX).dot(z + zAff * scaleZ) / (s dot z), 3)
-        val (zCC, xCC, sCC) = computeCenteringCorrectorDir(
-            A, b, c, x, s, z, sAff, zAff, sigma)
+        val (zCC, xCC, sCC) =
+          computeCenteringCorrectorDir(A, b, c, x, s, z, sAff, zAff, sigma)
 
         val dz = zAff += zCC
         val dx = xAff += xCC
@@ -79,10 +80,11 @@ object InteriorPoint {
   }
 
   // find a feasible point
-  private def phase1(A: DenseMatrix[Double],
-                     b: DenseVector[Double],
-                     c: DenseVector[Double],
-                     x0: DenseVector[Double]) = {
+  private def phase1(
+      A: DenseMatrix[Double],
+      b: DenseVector[Double],
+      c: DenseVector[Double],
+      x0: DenseVector[Double]) = {
     val s = max(A * x0 - b) + 1E-7
     val newA = DenseMatrix.zeros[Double](A.rows + 1, A.cols + 1)
     newA(0 until A.rows, 0 until A.cols) := A
@@ -105,16 +107,17 @@ object InteriorPoint {
 
   private def lineSearch(x: DenseVector[Double], dx: Vector[Double]): Double = {
     var alpha = 1.0
-    while ( (x + dx * alpha).valuesIterator.exists(_ < 0)) alpha *= .8
+    while ((x + dx * alpha).valuesIterator.exists(_ < 0)) alpha *= .8
     alpha
   }
 
-  private def computeAffineScalingDir(A: DenseMatrix[Double],
-                                      b: DenseVector[Double],
-                                      c: DenseVector[Double],
-                                      x: DenseVector[Double],
-                                      s: DenseVector[Double],
-                                      z: DenseVector[Double])
+  private def computeAffineScalingDir(
+      A: DenseMatrix[Double],
+      b: DenseVector[Double],
+      c: DenseVector[Double],
+      x: DenseVector[Double],
+      s: DenseVector[Double],
+      z: DenseVector[Double])
     : (DenseVector[Double], DenseVector[Double], DenseVector[Double]) = {
     val XiZ = diag(z :/ s)
 
@@ -131,21 +134,23 @@ object InteriorPoint {
     (dz, dx, ds)
   }
 
-  private def computeCenteringCorrectorDir(A: DenseMatrix[Double],
-                                           b: DenseVector[Double],
-                                           c: DenseVector[Double],
-                                           x: DenseVector[Double],
-                                           s: DenseVector[Double],
-                                           z: DenseVector[Double],
-                                           dsaff: DenseVector[Double],
-                                           dzaff: DenseVector[Double],
-                                           sigma: Double) = {
+  private def computeCenteringCorrectorDir(
+      A: DenseMatrix[Double],
+      b: DenseVector[Double],
+      c: DenseVector[Double],
+      x: DenseVector[Double],
+      s: DenseVector[Double],
+      z: DenseVector[Double],
+      dsaff: DenseVector[Double],
+      dzaff: DenseVector[Double],
+      sigma: Double) = {
     val n = A.cols
     val m = A.rows
     import DenseMatrix._
-    val mat = vertcat[Double](horzcat(zeros[Double](m, m), A, eye[Double](m)),
-                              horzcat(A.t, zeros[Double](n, n + m)),
-                              horzcat(diag(s), zeros[Double](m, n), diag(z)))
+    val mat = vertcat[Double](
+      horzcat(zeros[Double](m, m), A, eye[Double](m)),
+      horzcat(A.t, zeros[Double](n, n + m)),
+      horzcat(diag(s), zeros[Double](m, n), diag(z)))
 
     diag(mat) += 1E-20
 

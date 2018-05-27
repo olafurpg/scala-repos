@@ -43,18 +43,18 @@ object callccInterpreter {
   type Environment = List[Tuple2[Name, Value]]
 
   def lookup(x: Name, e: Environment): M[Value] = e match {
-    case List() => unitM(Wrong)
+    case List()       => unitM(Wrong)
     case (y, b) :: e1 => if (x == y) unitM(b) else lookup(x, e1)
   }
 
   def add(a: Value, b: Value) /*?*/ = (a, b) match {
     case (Num(m), Num(n)) => this. /*!*/ unitM(Num(m + n))
-    case _ => unitM(Wrong)
+    case _                => unitM(Wrong)
   }
 
   def apply(a: Value, b: Value): M[Value] = a match {
     case Fun(k) => k(b)
-    case _ => unitM(Wrong)
+    case _      => unitM(Wrong)
   }
 
   def interp(t: Term, e: Environment): M[Value] = t match {

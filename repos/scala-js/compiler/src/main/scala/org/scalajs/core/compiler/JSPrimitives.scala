@@ -74,7 +74,7 @@ abstract class JSPrimitives {
      */
     scalaPrimitives.getPrimitive(sym) match {
       case F2JS | F2JSTHIS => true
-      case _ => false
+      case _               => false
     }
   }
 

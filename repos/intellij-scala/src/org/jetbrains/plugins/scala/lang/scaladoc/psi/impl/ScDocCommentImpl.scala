@@ -17,7 +17,10 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScClass
 import org.jetbrains.plugins.scala.lang.scaladoc.lexer.ScalaDocTokenType
 import org.jetbrains.plugins.scala.lang.scaladoc.parser.ScalaDocElementTypes
-import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.{ScDocComment, ScDocTag}
+import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.{
+  ScDocComment,
+  ScDocTag
+}
 
 import scala.collection.mutable
 
@@ -27,32 +30,35 @@ import scala.collection.mutable
   */
 class ScDocCommentImpl(text: CharSequence)
     extends LazyParseablePsiElement(
-        ScalaDocElementTypes.SCALA_DOC_COMMENT, text) with ScDocComment {
+      ScalaDocElementTypes.SCALA_DOC_COMMENT,
+      text)
+    with ScDocComment {
   def version: Int = {
     val firstLineIsEmpty = getNode
       .getChildren(null)
       .lift(2)
       .exists(
-          _.getElementType == ScalaDocTokenType.DOC_COMMENT_LEADING_ASTERISKS)
+        _.getElementType == ScalaDocTokenType.DOC_COMMENT_LEADING_ASTERISKS)
 
     if (firstLineIsEmpty) 1 else 2
   }
 
   def getOwner: PsiDocCommentOwner = getParent match {
     case owner: PsiDocCommentOwner if owner.getDocComment eq this => owner
-    case _ => null
+    case _                                                        => null
   }
 
-  override def processDeclarations(processor: PsiScopeProcessor,
-                                   state: ResolveState,
-                                   lastParent: PsiElement,
-                                   place: PsiElement): Boolean = {
+  override def processDeclarations(
+      processor: PsiScopeProcessor,
+      state: ResolveState,
+      lastParent: PsiElement,
+      place: PsiElement): Boolean = {
     super.processDeclarations(processor, state, lastParent, place) &&
     !Option(getOwner).exists {
       case owner: ScClass =>
         owner.members.exists {
           case named: PsiNamedElement => !processor.execute(named, state)
-          case _ => false
+          case _                      => false
         }
       case _ => false
     }
@@ -78,11 +84,11 @@ class ScDocCommentImpl(text: CharSequence)
     val answer = mutable.ArrayBuilder.make[PsiDocTag]()
 
     while (currentChild != null &&
-    currentChild.getNode.getElementType != ScalaDocTokenType.DOC_COMMENT_END) {
+           currentChild.getNode.getElementType != ScalaDocTokenType.DOC_COMMENT_END) {
       currentChild match {
         case docTag: ScDocTag
             if docTag.getNode.getElementType == ScalaDocElementTypes.DOC_TAG &&
-            filter(docTag.name) =>
+              filter(docTag.name) =>
           answer += currentChild.asInstanceOf[PsiDocTag]
         case _ =>
       }
@@ -100,9 +106,10 @@ class ScDocCommentImpl(text: CharSequence)
       if (aClass.isInstance(cur)) result.add(cur.asInstanceOf[T])
       cur = cur.getNextSibling
     }
-    result.toArray[T](java.lang.reflect.Array
-          .newInstance(aClass, result.size)
-          .asInstanceOf[Array[T]])
+    result.toArray[T](
+      java.lang.reflect.Array
+        .newInstance(aClass, result.size)
+        .asInstanceOf[Array[T]])
   }
 
   protected def findChildByClassScala[T >: Null <: ScalaPsiElement](
@@ -122,7 +129,7 @@ class ScDocCommentImpl(text: CharSequence)
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case s: ScalaElementVisitor => accept(s)
-      case _ => super.accept(visitor)
+      case _                      => super.accept(visitor)
     }
   }
 }

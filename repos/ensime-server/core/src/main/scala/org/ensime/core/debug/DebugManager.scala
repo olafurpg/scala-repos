@@ -14,7 +14,8 @@ import org.ensime.api._
 import scala.collection.mutable
 
 case class DMClassPrepareEvent(
-    prepareEvent: ClassPrepareEvent, eventSet: EventSet)
+    prepareEvent: ClassPrepareEvent,
+    eventSet: EventSet)
 
 object DebugManager {
   def apply(
@@ -27,8 +28,8 @@ object DebugManager {
 class DebugManager(
     broadcaster: ActorRef,
     config: EnsimeConfig
-)
-    extends Actor with ActorLogging {
+) extends Actor
+    with ActorLogging {
 
   // TODO this is built once on startup - probably makes sense for it to be done each time a debug vm is created
   private var sourceMap = new SourceMap(config)
@@ -113,8 +114,8 @@ class DebugManager(
 
   def vmOptions(): List[String] =
     List(
-        "-classpath",
-        config.runtimeClasspath.mkString("\"", File.pathSeparator, "\"")
+      "-classpath",
+      config.runtimeClasspath.mkString("\"", File.pathSeparator, "\"")
     ) ++ config.debugVMArgs
 
   def withVM[T](action: (VM => T)): Option[T] = {
@@ -196,25 +197,27 @@ class DebugManager(
       disconnectDebugVM()
     case e: StepEvent =>
       (for (pos <- sourceMap.locToPos(e.location())) yield {
-        broadcaster ! DebugStepEvent(DebugThreadId(e.thread().uniqueID()),
-                                     e.thread().name,
-                                     pos.file,
-                                     pos.line)
+        broadcaster ! DebugStepEvent(
+          DebugThreadId(e.thread().uniqueID()),
+          e.thread().name,
+          pos.file,
+          pos.line)
       }) getOrElse {
         val loc = e.location()
         log.warning(
-            s"Step position not found: ${loc.sourceName()} : ${loc.lineNumber()}")
+          s"Step position not found: ${loc.sourceName()} : ${loc.lineNumber()}")
       }
     case e: BreakpointEvent =>
       (for (pos <- sourceMap.locToPos(e.location())) yield {
-        broadcaster ! DebugBreakEvent(DebugThreadId(e.thread().uniqueID()),
-                                      e.thread().name,
-                                      pos.file,
-                                      pos.line)
+        broadcaster ! DebugBreakEvent(
+          DebugThreadId(e.thread().uniqueID()),
+          e.thread().name,
+          pos.file,
+          pos.line)
       }) getOrElse {
         val loc = e.location()
         log.warning(
-            s"Break position not found: ${loc.sourceName()} : ${loc.lineNumber()}")
+          s"Break position not found: ${loc.sourceName()} : ${loc.lineNumber()}")
       }
     case e: ExceptionEvent =>
       withVM { vm =>
@@ -225,11 +228,11 @@ class DebugManager(
         if (e.catchLocation() != null) sourceMap.locToPos(e.catchLocation())
         else None
       broadcaster ! DebugExceptionEvent(
-          e.exception.uniqueID(),
-          DebugThreadId(e.thread().uniqueID()),
-          e.thread().name,
-          pos.map(_.file),
-          pos.map(_.line)
+        e.exception.uniqueID(),
+        DebugThreadId(e.thread().uniqueID()),
+        e.thread().name,
+        pos.map(_.file),
+        pos.map(_.line)
       )
     case e: ThreadDeathEvent =>
       broadcaster ! DebugThreadDeathEvent(DebugThreadId(e.thread().uniqueID()))
@@ -242,7 +245,7 @@ class DebugManager(
       }
     case e: ClassUnloadEvent =>
     case e: MethodEntryEvent =>
-    case e: MethodExitEvent =>
+    case e: MethodExitEvent  =>
   }
 
   def disposeCurrentVM(): Unit = {
@@ -260,8 +263,8 @@ class DebugManager(
   def handleDebugStartReq(commandLine: String): RpcResponse = {
     disposeCurrentVM()
     try {
-      val vm = new VM(
-          VmStart(commandLine), vmOptions(), self, broadcaster, sourceMap)
+      val vm =
+        new VM(VmStart(commandLine), vmOptions(), self, broadcaster, sourceMap)
       maybeVM = Some(vm)
       vm.start()
       DebugVmSuccess()
@@ -276,7 +279,11 @@ class DebugManager(
     disposeCurrentVM()
     try {
       val vm = new VM(
-          VmAttach(hostname, port), vmOptions(), self, broadcaster, sourceMap)
+        VmAttach(hostname, port),
+        vmOptions(),
+        self,
+        broadcaster,
+        sourceMap)
       maybeVM = Some(vm)
       vm.start()
       DebugVmSuccess()
@@ -334,9 +341,9 @@ class DebugManager(
     case DebugNextReq(threadId: DebugThreadId) =>
       sender ! handleRPCWithVMAndThread(threadId) { (vm, thread) =>
         vm.newStepRequest(
-            thread,
-            StepRequest.STEP_LINE,
-            StepRequest.STEP_OVER
+          thread,
+          StepRequest.STEP_LINE,
+          StepRequest.STEP_OVER
         )
         TrueResponse
       }
@@ -344,9 +351,9 @@ class DebugManager(
     case DebugStepReq(threadId: DebugThreadId) =>
       sender ! handleRPCWithVMAndThread(threadId) { (vm, thread) =>
         vm.newStepRequest(
-            thread,
-            StepRequest.STEP_LINE,
-            StepRequest.STEP_INTO
+          thread,
+          StepRequest.STEP_LINE,
+          StepRequest.STEP_INTO
         )
         TrueResponse
       }
@@ -354,9 +361,9 @@ class DebugManager(
     case DebugStepOutReq(threadId: DebugThreadId) =>
       sender ! handleRPCWithVMAndThread(threadId) { (vm, thread) =>
         vm.newStepRequest(
-            thread,
-            StepRequest.STEP_LINE,
-            StepRequest.STEP_OUT
+          thread,
+          StepRequest.STEP_LINE,
+          StepRequest.STEP_OUT
         )
         TrueResponse
       }
@@ -377,7 +384,7 @@ class DebugManager(
       sender ! handleRPCWithVM() { vm =>
         vm.debugValueAtLocationToString(threadId, location) match {
           case Some(strValue) => StringResponse(strValue)
-          case None => FalseResponse
+          case None           => FalseResponse
         }
       }
 
@@ -400,7 +407,7 @@ class DebugManager(
             }
           case unknown =>
             log.error(
-                s"Unsupported location type for debug-set-value.: $unknown")
+              s"Unsupported location type for debug-set-value.: $unknown")
             FalseResponse
         }
       }

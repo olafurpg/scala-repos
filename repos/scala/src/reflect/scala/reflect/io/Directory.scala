@@ -25,9 +25,10 @@ object Directory {
   def apply(path: Path): Directory = path.toDirectory
 
   // Like File.makeTemp but creates a directory instead
-  def makeTemp(prefix: String = Path.randomPrefix,
-               suffix: String = null,
-               dir: JFile = null): Directory = {
+  def makeTemp(
+      prefix: String = Path.randomPrefix,
+      suffix: String = null,
+      dir: JFile = null): Directory = {
     val path = File.makeTemp(prefix, suffix, dir)
     path.delete()
     path.createDirectory()
@@ -53,11 +54,11 @@ class Directory(jfile: JFile) extends Path(jfile) {
   def list: Iterator[Path] =
     jfile.listFiles match {
       case null => Iterator.empty
-      case xs => xs.iterator map Path.apply
+      case xs   => xs.iterator map Path.apply
     }
 
   def dirs: Iterator[Directory] = list collect { case x: Directory => x }
-  def files: Iterator[File] = list collect { case x: File => x }
+  def files: Iterator[File] = list collect { case x: File          => x }
 
   override def walkFilter(cond: Path => Boolean): Iterator[Path] =
     list filter cond flatMap (_ walkFilter cond)

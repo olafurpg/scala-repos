@@ -56,19 +56,30 @@ object BroadcastedColumns {
 
   implicit def canMapValues[T, ColumnType, ResultColumn, Result](
       implicit cc: CanCollapseAxis[
-          T, Axis._0.type, ColumnType, ResultColumn, Result]): CanMapValues[
-      BroadcastedColumns[T, ColumnType], ColumnType, ResultColumn, Result] = {
+        T,
+        Axis._0.type,
+        ColumnType,
+        ResultColumn,
+        Result]): CanMapValues[
+    BroadcastedColumns[T, ColumnType],
+    ColumnType,
+    ResultColumn,
+    Result] = {
     new CanMapValues[
-        BroadcastedColumns[T, ColumnType], ColumnType, ResultColumn, Result] {
-      def apply(from: BroadcastedColumns[T, ColumnType],
-                fn: (ColumnType) => ResultColumn): Result = {
+      BroadcastedColumns[T, ColumnType],
+      ColumnType,
+      ResultColumn,
+      Result] {
+      def apply(
+          from: BroadcastedColumns[T, ColumnType],
+          fn: (ColumnType) => ResultColumn): Result = {
         cc(from.underlying, Axis._0) { fn }
       }
     }
   }
 
-  implicit def scalarOf[T, ColumnType]: ScalarOf[
-      BroadcastedColumns[T, ColumnType], ColumnType] = ScalarOf.dummy
+  implicit def scalarOf[T, ColumnType]
+    : ScalarOf[BroadcastedColumns[T, ColumnType], ColumnType] = ScalarOf.dummy
 
   implicit def broadcastOp[Op, T, ColumnType, OpResult, Result](
       implicit handhold: CanCollapseAxis.HandHold[T, Axis._0.type, ColumnType],
@@ -124,8 +135,9 @@ object BroadcastedColumns {
     new CanForeachValues[BroadcastedColumns[T, ColumnType], ColumnType] {
 
       /** Maps all key-value pairs from the given collection. */
-      override def foreach[U](from: BroadcastedColumns[T, ColumnType],
-                              fn: (ColumnType) => U): Unit = {
+      override def foreach[U](
+          from: BroadcastedColumns[T, ColumnType],
+          fn: (ColumnType) => U): Unit = {
         iter(from.underlying, Axis._0)(fn)
       }
     }
@@ -134,7 +146,8 @@ object BroadcastedColumns {
   // This is a more memory efficient representation if the sequence is long-lived but rarely accessed.
   @SerialVersionUID(1L)
   class BroadcastedDMColsISeq[T](val underlying: DenseMatrix[T])
-      extends IndexedSeq[DenseVector[T]] with Serializable {
+      extends IndexedSeq[DenseVector[T]]
+      with Serializable {
     override def length: Int = underlying.cols
 
     override def apply(idx: Int): DenseVector[T] = underlying(::, idx)

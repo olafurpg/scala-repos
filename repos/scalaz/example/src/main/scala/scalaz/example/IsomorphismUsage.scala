@@ -46,7 +46,7 @@ object IsomorphismUsage extends App {
       }
     seq.toList === lst
   }
-  assert(
-      List(Seq(1, 2), Seq(3, 4)).sequence.toList === List(List(1, 2),
-                                                          List(3, 4)).sequence)
+  assert(List(Seq(1, 2), Seq(3, 4)).sequence.toList === List(
+    List(1, 2),
+    List(3, 4)).sequence)
 }

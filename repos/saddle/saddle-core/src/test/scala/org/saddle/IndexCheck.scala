@@ -63,26 +63,24 @@ class IndexCheck extends Specification with ScalaCheck {
     "index joins work" in {
       forAll { (ix1: Index[Int], ix2: Index[Int]) =>
         val all =
-          Seq(index.LeftJoin,
-              index.RightJoin,
-              index.OuterJoin,
-              index.InnerJoin) map { jointype =>
-            val res = ix1.join(ix2, how = jointype)
+          Seq(index.LeftJoin, index.RightJoin, index.OuterJoin, index.InnerJoin) map {
+            jointype =>
+              val res = ix1.join(ix2, how = jointype)
 
-            val exp = res.index.toVec
-            val lix = ix1.toVec
-            val rix = ix2.toVec
-            val lft =
-              res.lTake.map(x => lix.take(x)) getOrElse lix fillNA {
-                exp.raw(_)
-              }
-            val rgt =
-              res.rTake.map(x => rix.take(x)) getOrElse rix fillNA {
-                exp.raw(_)
-              }
+              val exp = res.index.toVec
+              val lix = ix1.toVec
+              val rix = ix2.toVec
+              val lft =
+                res.lTake.map(x => lix.take(x)) getOrElse lix fillNA {
+                  exp.raw(_)
+                }
+              val rgt =
+                res.rTake.map(x => rix.take(x)) getOrElse rix fillNA {
+                  exp.raw(_)
+                }
 
-            lft must_== exp
-            rgt must_== exp
+              lft must_== exp
+              rgt must_== exp
           }
         all.foldLeft(true)((acc, v) => acc && v.isSuccess)
       }
@@ -91,7 +89,11 @@ class IndexCheck extends Specification with ScalaCheck {
     "index union works" in {
       implicit val arbIndex = Arbitrary(IndexArbitraries.indexIntNoDups)
       forAll { (ix1: Index[Int], ix2: Index[Int]) =>
-        ix1.union(ix2).index.toSeq.toSet must_== { ix1.toSeq ++ ix2.toSeq }.toSet
+        ix1
+          .union(ix2)
+          .index
+          .toSeq
+          .toSet must_== { ix1.toSeq ++ ix2.toSeq }.toSet
       }
     }
 
@@ -196,26 +198,24 @@ class IndexCheck extends Specification with ScalaCheck {
 
       forAll { (ix1: Index[DateTime], ix2: Index[DateTime]) =>
         val all =
-          Seq(index.LeftJoin,
-              index.RightJoin,
-              index.OuterJoin,
-              index.InnerJoin) map { jointype =>
-            val res = ix1.join(ix2, how = jointype)
+          Seq(index.LeftJoin, index.RightJoin, index.OuterJoin, index.InnerJoin) map {
+            jointype =>
+              val res = ix1.join(ix2, how = jointype)
 
-            val exp = res.index.toVec
-            val lix = ix1.toVec
-            val rix = ix2.toVec
-            val lft =
-              res.lTake.map(x => lix.take(x)) getOrElse lix fillNA {
-                exp.raw(_)
-              }
-            val rgt =
-              res.rTake.map(x => rix.take(x)) getOrElse rix fillNA {
-                exp.raw(_)
-              }
+              val exp = res.index.toVec
+              val lix = ix1.toVec
+              val rix = ix2.toVec
+              val lft =
+                res.lTake.map(x => lix.take(x)) getOrElse lix fillNA {
+                  exp.raw(_)
+                }
+              val rgt =
+                res.rTake.map(x => rix.take(x)) getOrElse rix fillNA {
+                  exp.raw(_)
+                }
 
-            lft must_== exp
-            rgt must_== exp
+              lft must_== exp
+              rgt must_== exp
           }
         all.foldLeft(true)((acc, v) => acc && v.isSuccess)
       }
@@ -225,7 +225,11 @@ class IndexCheck extends Specification with ScalaCheck {
       implicit val arbIndex = Arbitrary(IndexArbitraries.indexTimeNoDups)
 
       forAll { (ix1: Index[DateTime], ix2: Index[DateTime]) =>
-        ix1.union(ix2).index.toSeq.toSet must_== { ix1.toSeq ++ ix2.toSeq }.toSet
+        ix1
+          .union(ix2)
+          .index
+          .toSeq
+          .toSet must_== { ix1.toSeq ++ ix2.toSeq }.toSet
       }
     }
 

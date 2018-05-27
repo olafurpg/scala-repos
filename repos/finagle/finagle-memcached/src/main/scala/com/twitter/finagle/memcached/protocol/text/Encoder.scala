@@ -16,9 +16,10 @@ object Encoder {
 class Encoder extends OneToOneEncoder {
   import Encoder._
 
-  def encode(context: ChannelHandlerContext,
-             channel: Channel,
-             message: AnyRef): ChannelBuffer = {
+  def encode(
+      context: ChannelHandlerContext,
+      channel: Channel,
+      message: AnyRef): ChannelBuffer = {
     message match {
       case Tokens(tokens) =>
         val buffer = ChannelBuffers.dynamicBuffer(10 * tokens.size)

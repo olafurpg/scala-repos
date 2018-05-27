@@ -10,9 +10,9 @@ object Test extends App {
         *  a list out of them.
         */
       val persons = List(
-          new Person("Bob", 17),
-          new Person("John", 40),
-          new Person("Richard", 68)
+        new Person("Bob", 17),
+        new Person("John", 40),
+        new Person("Richard", 68)
       )
 
       /** A Person class. 'val' constructor parameters become
@@ -58,7 +58,7 @@ object Test extends App {
 
         // a for comprehension using two generators
         for (i <- 1 until n;
-        j <- 1 until (i - 1); if isPrime(i + j)) yield (i, j)
+             j <- 1 until (i - 1); if isPrime(i + j)) yield (i, j)
       }
 
       /** Return the sum of the elements of 'xs'. */
@@ -76,7 +76,7 @@ object Test extends App {
         if (xs.isEmpty) xs
         else
           xs.head :: removeDuplicates(
-              for (x <- xs.tail if x != xs.head) yield x)
+            for (x <- xs.tail if x != xs.head) yield x)
     }
 
     // import all members of object 'persons' in the current scope

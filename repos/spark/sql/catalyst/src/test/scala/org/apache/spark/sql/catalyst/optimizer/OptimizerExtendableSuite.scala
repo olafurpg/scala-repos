@@ -43,7 +43,9 @@ class OptimizerExtendableSuite extends SparkFunSuite {
     // rules set to DummyRule, would not be executed anyways
     val myBatches: Seq[Batch] = {
       Batch("once", Once, DummyRule) :: Batch(
-          "fixedPoint", FixedPoint(100), DummyRule) :: Nil
+        "fixedPoint",
+        FixedPoint(100),
+        DummyRule) :: Nil
     }
 
     override def batches: Seq[Batch] = super.batches ++ myBatches

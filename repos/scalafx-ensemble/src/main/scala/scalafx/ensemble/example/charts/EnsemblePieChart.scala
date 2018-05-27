@@ -40,11 +40,11 @@ class EnsemblePieChart extends EnsembleExample {
 
   def getContent = new PieChart {
     data = Seq(
-        PieChart.Data("Sun", 20),
-        PieChart.Data("IBM", 12),
-        PieChart.Data("HP", 25),
-        PieChart.Data("Dell", 22),
-        PieChart.Data("Apple", 30)
+      PieChart.Data("Sun", 20),
+      PieChart.Data("IBM", 12),
+      PieChart.Data("HP", 25),
+      PieChart.Data("Dell", 22),
+      PieChart.Data("Apple", 30)
     )
     clockwise = false
   }

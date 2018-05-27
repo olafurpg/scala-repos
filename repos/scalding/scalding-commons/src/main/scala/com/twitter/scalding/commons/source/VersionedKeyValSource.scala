@@ -43,32 +43,45 @@ object VersionedKeyValSource {
   val defaultVersionsToKeep = 3
 
   // TODO: have two apply methods here for binary compatibility purpose. Need to clean it up in next release.
-  def apply[K, V](path: String,
-                  sourceVersion: Option[Long] = None,
-                  sinkVersion: Option[Long] = None,
-                  maxFailures: Int = 0)(
+  def apply[K, V](
+      path: String,
+      sourceVersion: Option[Long] = None,
+      sinkVersion: Option[Long] = None,
+      maxFailures: Int = 0)(
       implicit codec: Injection[(K, V), (Array[Byte], Array[Byte])]) = {
     new VersionedKeyValSource[K, V](
-        path, sourceVersion, sinkVersion, maxFailures, defaultVersionsToKeep)
+      path,
+      sourceVersion,
+      sinkVersion,
+      maxFailures,
+      defaultVersionsToKeep)
   }
 
-  def apply[K, V](path: String,
-                  sourceVersion: Option[Long],
-                  sinkVersion: Option[Long],
-                  maxFailures: Int,
-                  versionsToKeep: Int)(
+  def apply[K, V](
+      path: String,
+      sourceVersion: Option[Long],
+      sinkVersion: Option[Long],
+      maxFailures: Int,
+      versionsToKeep: Int)(
       implicit codec: Injection[(K, V), (Array[Byte], Array[Byte])]) =
     new VersionedKeyValSource[K, V](
-        path, sourceVersion, sinkVersion, maxFailures, versionsToKeep)
+      path,
+      sourceVersion,
+      sinkVersion,
+      maxFailures,
+      versionsToKeep)
 }
 
-class VersionedKeyValSource[K, V](val path: String,
-                                  val sourceVersion: Option[Long],
-                                  val sinkVersion: Option[Long],
-                                  val maxFailures: Int,
-                                  val versionsToKeep: Int)(
+class VersionedKeyValSource[K, V](
+    val path: String,
+    val sourceVersion: Option[Long],
+    val sinkVersion: Option[Long],
+    val maxFailures: Int,
+    val versionsToKeep: Int)(
     implicit @transient codec: Injection[(K, V), (Array[Byte], Array[Byte])])
-    extends Source with Mappable[(K, V)] with TypedSink[(K, V)] {
+    extends Source
+    with Mappable[(K, V)]
+    with TypedSink[(K, V)] {
 
   import Dsl._
 
@@ -85,19 +98,23 @@ class VersionedKeyValSource[K, V](val path: String,
 
   def hdfsScheme =
     HadoopSchemeInstance(
-        new KeyValueByteScheme(fields).asInstanceOf[Scheme[_, _, _, _, _]])
+      new KeyValueByteScheme(fields).asInstanceOf[Scheme[_, _, _, _, _]])
 
   @deprecated("This method is deprecated", "0.1.6")
-  def this(path: String,
-           sourceVersion: Option[Long],
-           sinkVersion: Option[Long],
-           maxFailures: Int)(implicit @transient codec: Injection[
-                                 (K, V), (Array[Byte], Array[Byte])]) =
-    this(path,
-         sourceVersion,
-         sinkVersion,
-         maxFailures,
-         VersionedKeyValSource.defaultVersionsToKeep)(codec)
+  def this(
+      path: String,
+      sourceVersion: Option[Long],
+      sinkVersion: Option[Long],
+      maxFailures: Int)(
+      implicit @transient codec: Injection[
+        (K, V),
+        (Array[Byte], Array[Byte])]) =
+    this(
+      path,
+      sourceVersion,
+      sinkVersion,
+      maxFailures,
+      VersionedKeyValSource.defaultVersionsToKeep)(codec)
 
   def getTap(mode: TapMode) = {
     val tap = new VersionedTap(path, hdfsScheme, mode)
@@ -120,19 +137,19 @@ class VersionedKeyValSource[K, V](val path: String,
     sourceVersion.foreach { version =>
       mode match {
         case hadoopMode: HadoopMode => {
-            val store = source.getStore(new JobConf(hadoopMode.jobConf))
+          val store = source.getStore(new JobConf(hadoopMode.jobConf))
 
-            if (!store.hasVersion(version)) {
-              throw new InvalidSourceException(
-                  "Version %s does not exist. Currently available versions are: %s"
-                    .format(version, store.getAllVersions))
-            }
+          if (!store.hasVersion(version)) {
+            throw new InvalidSourceException(
+              "Version %s does not exist. Currently available versions are: %s"
+                .format(version, store.getAllVersions))
           }
+        }
 
         case _ =>
           throw new IllegalArgumentException(
-              "VersionedKeyValSource does not support mode %s. Only HadoopMode is supported"
-                .format(mode))
+            "VersionedKeyValSource does not support mode %s. Only HadoopMode is supported"
+              .format(mode))
       }
     }
   }
@@ -140,15 +157,15 @@ class VersionedKeyValSource[K, V](val path: String,
   def resourceExists(mode: Mode): Boolean =
     mode match {
       case Test(buffers) => {
-          buffers(this) map { !_.isEmpty } getOrElse false
-        }
+        buffers(this) map { !_.isEmpty } getOrElse false
+      }
       case HadoopTest(conf, buffers) => {
-          buffers(this) map { !_.isEmpty } getOrElse false
-        }
+        buffers(this) map { !_.isEmpty } getOrElse false
+      }
       case _ => {
-          val conf = new JobConf(mode.asInstanceOf[HadoopMode].jobConf)
-          source.resourceExists(conf)
-        }
+        val conf = new JobConf(mode.asInstanceOf[HadoopMode].jobConf)
+        source.resourceExists(conf)
+      }
     }
 
   def sinkExists(mode: Mode): Boolean =
@@ -176,7 +193,7 @@ class VersionedKeyValSource[K, V](val path: String,
     mode match {
       case Hdfs(_strict, _config) =>
         readOrWrite match {
-          case Read => CastHfsTap(source)
+          case Read  => CastHfsTap(source)
           case Write => CastHfsTap(sink)
         }
       case _ =>
@@ -185,8 +202,8 @@ class VersionedKeyValSource[K, V](val path: String,
   }
 
   // Override this for more control on failure on decode
-  protected lazy val checkedInversion: CheckedInversion[
-      (K, V), (Array[Byte], Array[Byte])] =
+  protected lazy val checkedInversion
+    : CheckedInversion[(K, V), (Array[Byte], Array[Byte])] =
     new MaxFailuresCheck(maxFailures)(codecBox.get)
 
   override def sinkFields: Fields = fields
@@ -205,7 +222,8 @@ class VersionedKeyValSource[K, V](val path: String,
   }
 
   override def toIterator(
-      implicit config: Config, mode: Mode): Iterator[(K, V)] = {
+      implicit config: Config,
+      mode: Mode): Iterator[(K, V)] = {
     val tap = createTap(Read)(mode)
     mode.openForRead(config, tap).asScala.flatMap { te =>
       val item = te.selectTuple(fields)
@@ -224,7 +242,10 @@ class VersionedKeyValSource[K, V](val path: String,
 
   override def toString =
     "%s path:%s,sourceVersion:%s,sinkVersion:%s".format(
-        getClass(), path, sourceVersion, sinkVersion)
+      getClass(),
+      path,
+      sourceVersion,
+      sinkVersion)
 
   override def equals(other: Any) =
     if (other.isInstanceOf[VersionedKeyValSource[_, _]]) {
@@ -240,15 +261,17 @@ class VersionedKeyValSource[K, V](val path: String,
 
 object RichPipeEx extends java.io.Serializable {
   implicit def pipeToRichPipeEx(pipe: Pipe): RichPipeEx = new RichPipeEx(pipe)
-  implicit def typedPipeToRichPipeEx[K : Ordering, V : Monoid](
+  implicit def typedPipeToRichPipeEx[K: Ordering, V: Monoid](
       pipe: TypedPipe[(K, V)]) =
     new TypedRichPipeEx(pipe)
-  implicit def keyedListLikeToRichPipeEx[K : Ordering, V : Monoid, T[
-          K, +V] <: KeyedListLike[K, V, T]](kll: KeyedListLike[K, V, T]) =
+  implicit def keyedListLikeToRichPipeEx[
+      K: Ordering,
+      V: Monoid,
+      T[K, +V] <: KeyedListLike[K, V, T]](kll: KeyedListLike[K, V, T]) =
     typedPipeToRichPipeEx(kll.toTypedPipe)
 }
 
-class TypedRichPipeEx[K : Ordering, V : Monoid](pipe: TypedPipe[(K, V)])
+class TypedRichPipeEx[K: Ordering, V: Monoid](pipe: TypedPipe[(K, V)])
     extends java.io.Serializable {
   import Dsl._
   import TDsl._
@@ -259,7 +282,8 @@ class TypedRichPipeEx[K : Ordering, V : Monoid](pipe: TypedPipe[(K, V)])
   // into the `sinkVersion` of data (or a new version) specified by
   // `src`.
   def writeIncremental(src: VersionedKeyValSource[K, V], reducers: Int = 1)(
-      implicit flowDef: FlowDef, mode: Mode): TypedPipe[(K, V)] = {
+      implicit flowDef: FlowDef,
+      mode: Mode): TypedPipe[(K, V)] = {
     val outPipe =
       if (!src.resourceExists(mode)) pipe
       else {
@@ -269,7 +293,8 @@ class TypedRichPipeEx[K : Ordering, V : Monoid](pipe: TypedPipe[(K, V)])
 
         val newPairs = pipe.sumByLocalKeys.map { case (k, v) => (k, v, 1) }
 
-        (oldPairs ++ newPairs).groupBy { _._1 }
+        (oldPairs ++ newPairs)
+          .groupBy { _._1 }
           .withReducers(reducers)
           .sortBy { _._3 }
           .mapValues { _._2 }
@@ -287,8 +312,12 @@ class RichPipeEx(pipe: Pipe) extends java.io.Serializable {
   // VersionedKeyValSource always merges with the most recent complete
   // version
   def writeIncremental[K, V](
-      src: VersionedKeyValSource[K, V], fields: Fields, reducers: Int = 1)(
-      implicit monoid: Monoid[V], flowDef: FlowDef, mode: Mode) = {
+      src: VersionedKeyValSource[K, V],
+      fields: Fields,
+      reducers: Int = 1)(
+      implicit monoid: Monoid[V],
+      flowDef: FlowDef,
+      mode: Mode) = {
     def appendToken(pipe: Pipe, token: Int) =
       pipe.mapTo((0, 1) -> ('key, 'value, 'isNew)) { pair: (K, V) =>
         pair :+ token

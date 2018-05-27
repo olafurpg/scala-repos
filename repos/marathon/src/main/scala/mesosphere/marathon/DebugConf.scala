@@ -16,12 +16,13 @@ import org.slf4j.{Logger, LoggerFactory}
 trait DebugConf extends ScallopConf {
 
   lazy val debugTracing = toggle(
-      "tracing",
-      descrYes = "Enable trace logging of service method calls.",
-      descrNo = "(Default) Disable trace logging of service method calls.",
-      default = Some(false),
-      noshort = true,
-      prefix = "disable_")
+    "tracing",
+    descrYes = "Enable trace logging of service method calls.",
+    descrNo = "(Default) Disable trace logging of service method calls.",
+    default = Some(false),
+    noshort = true,
+    prefix = "disable_"
+  )
 
   lazy val deprecatedDebugTracing =
     opt[Boolean]("enable_tracing", hidden = true)
@@ -30,16 +31,17 @@ trait DebugConf extends ScallopConf {
   lazy val enableDebugTracing = debugTracing() || deprecatedDebugTracing()
 
   lazy val metrics = toggle(
-      "metrics",
-      descrYes = "(Default) Expose the execution time of service method calls using code instrumentation" +
-        " via the metrics endpoint (/metrics). This might noticeably degrade performance" +
-        " but can help finding performance problems.",
-      descrNo = "Disable exposing execution time of service method calls using code instrumentation" +
-        " via the metrics endpoing (/metrics). " +
-        "This does not turn off reporting of other metrics.",
-      default = Some(true),
-      noshort = true,
-      prefix = "disable_")
+    "metrics",
+    descrYes = "(Default) Expose the execution time of service method calls using code instrumentation" +
+      " via the metrics endpoint (/metrics). This might noticeably degrade performance" +
+      " but can help finding performance problems.",
+    descrNo = "Disable exposing execution time of service method calls using code instrumentation" +
+      " via the metrics endpoing (/metrics). " +
+      "This does not turn off reporting of other metrics.",
+    default = Some(true),
+    noshort = true,
+    prefix = "disable_"
+  )
 
   lazy val deprecatedEnableMetrics =
     opt[Boolean]("enable_metrics", default = Some(false), hidden = true)
@@ -47,9 +49,10 @@ trait DebugConf extends ScallopConf {
   mutuallyExclusive(metrics, deprecatedEnableMetrics)
 
   lazy val logLevel = opt[String](
-      "logging_level",
-      descr = "Set logging level to one of: off, error, warn, info, debug, trace, all",
-      noshort = true)
+    "logging_level",
+    descr =
+      "Set logging level to one of: off, error, warn, info, debug, trace, all",
+    noshort = true)
 }
 
 class DebugModule(conf: DebugConf) extends AbstractModule {
@@ -95,7 +98,7 @@ class DebugModule(conf: DebugConf) extends AbstractModule {
     //set trace log level
     conf.logLevel.get.foreach { levelName =>
       val level = Level.toLevel(
-          if ("fatal".equalsIgnoreCase(levelName)) "fatal" else levelName)
+        if ("fatal".equalsIgnoreCase(levelName)) "fatal" else levelName)
       val rootLogger = LoggerFactory
         .getLogger(Logger.ROOT_LOGGER_NAME)
         .asInstanceOf[ch.qos.logback.classic.Logger]

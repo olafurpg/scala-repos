@@ -127,7 +127,7 @@ object QueryExamplesSpec extends Specification with MongoTestKit {
 
     // query for the Flinstones using a Pattern
     val flinstones = Person.findAll(
-        ("name" -> Pattern.compile("^flinst", Pattern.CASE_INSENSITIVE)))
+      ("name" -> Pattern.compile("^flinst", Pattern.CASE_INSENSITIVE)))
 
     flinstones.length must_== 2
     flinstones.map(_.id.get).filterNot(flinstonesIds.contains(_)) must_== List()

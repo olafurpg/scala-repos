@@ -53,7 +53,7 @@ private[spark] class JdbcPartition(idx: Int, val lower: Long, val upper: Long)
   *   This should only call getInt, getString, etc; the RDD takes care of calling next.
   *   The default maps a ResultSet to an array of Object.
   */
-class JdbcRDD[T : ClassTag](
+class JdbcRDD[T: ClassTag](
     sc: SparkContext,
     getConnection: () => Connection,
     sql: String,
@@ -61,17 +61,17 @@ class JdbcRDD[T : ClassTag](
     upperBound: Long,
     numPartitions: Int,
     mapRow: (ResultSet) => T = JdbcRDD.resultSetToObjectArray _)
-    extends RDD[T](sc, Nil) with Logging {
+    extends RDD[T](sc, Nil)
+    with Logging {
 
   override def getPartitions: Array[Partition] = {
     // bounds are inclusive, hence the + 1 here and - 1 on end
     val length = BigInt(1) + upperBound - lowerBound
     (0 until numPartitions)
-      .map(i =>
-            {
-          val start = lowerBound + ((i * length) / numPartitions)
-          val end = lowerBound + (((i + 1) * length) / numPartitions) - 1
-          new JdbcPartition(i, start.toLong, end.toLong)
+      .map(i => {
+        val start = lowerBound + ((i * length) / numPartitions)
+        val end = lowerBound + (((i + 1) * length) / numPartitions) - 1
+        new JdbcPartition(i, start.toLong, end.toLong)
       })
       .toArray
   }
@@ -84,14 +84,17 @@ class JdbcRDD[T : ClassTag](
       val part = thePart.asInstanceOf[JdbcPartition]
       val conn = getConnection()
       val stmt = conn.prepareStatement(
-          sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)
+        sql,
+        ResultSet.TYPE_FORWARD_ONLY,
+        ResultSet.CONCUR_READ_ONLY)
 
       // setFetchSize(Integer.MIN_VALUE) is a mysql driver specific way to force streaming results,
       // rather than pulling entire resultset into memory.
       // see http://dev.mysql.com/doc/refman/5.0/en/connector-j-reference-implementation-notes.html
       if (conn.getMetaData.getURL.matches("jdbc:mysql:.*")) {
         stmt.setFetchSize(Integer.MIN_VALUE)
-        logInfo("statement fetch size set to: " + stmt.getFetchSize +
+        logInfo(
+          "statement fetch size set to: " + stmt.getFetchSize +
             " to force MySQL streaming ")
       }
 
@@ -137,8 +140,8 @@ class JdbcRDD[T : ClassTag](
 
 object JdbcRDD {
   def resultSetToObjectArray(rs: ResultSet): Array[Object] = {
-    Array.tabulate[Object](rs.getMetaData.getColumnCount)(
-        i => rs.getObject(i + 1))
+    Array.tabulate[Object](rs.getMetaData.getColumnCount)(i =>
+      rs.getObject(i + 1))
   }
 
   trait ConnectionFactory extends Serializable {
@@ -165,22 +168,23 @@ object JdbcRDD {
     *   This should only call getInt, getString, etc; the RDD takes care of calling next.
     *   The default maps a ResultSet to an array of Object.
     */
-  def create[T](sc: JavaSparkContext,
-                connectionFactory: ConnectionFactory,
-                sql: String,
-                lowerBound: Long,
-                upperBound: Long,
-                numPartitions: Int,
-                mapRow: JFunction[ResultSet, T]): JavaRDD[T] = {
+  def create[T](
+      sc: JavaSparkContext,
+      connectionFactory: ConnectionFactory,
+      sql: String,
+      lowerBound: Long,
+      upperBound: Long,
+      numPartitions: Int,
+      mapRow: JFunction[ResultSet, T]): JavaRDD[T] = {
 
     val jdbcRDD = new JdbcRDD[T](
-        sc.sc,
-        () => connectionFactory.getConnection,
-        sql,
-        lowerBound,
-        upperBound,
-        numPartitions,
-        (resultSet: ResultSet) => mapRow.call(resultSet))(fakeClassTag)
+      sc.sc,
+      () => connectionFactory.getConnection,
+      sql,
+      lowerBound,
+      upperBound,
+      numPartitions,
+      (resultSet: ResultSet) => mapRow.call(resultSet))(fakeClassTag)
 
     new JavaRDD[T](jdbcRDD)(fakeClassTag)
   }
@@ -201,12 +205,13 @@ object JdbcRDD {
     *   Given a lowerBound of 1, an upperBound of 20, and a numPartitions of 2,
     *   the query would be executed twice, once with (1, 10) and once with (11, 20)
     */
-  def create(sc: JavaSparkContext,
-             connectionFactory: ConnectionFactory,
-             sql: String,
-             lowerBound: Long,
-             upperBound: Long,
-             numPartitions: Int): JavaRDD[Array[Object]] = {
+  def create(
+      sc: JavaSparkContext,
+      connectionFactory: ConnectionFactory,
+      sql: String,
+      lowerBound: Long,
+      upperBound: Long,
+      numPartitions: Int): JavaRDD[Array[Object]] = {
 
     val mapRow = new JFunction[ResultSet, Array[Object]] {
       override def call(resultSet: ResultSet): Array[Object] = {
@@ -214,12 +219,13 @@ object JdbcRDD {
       }
     }
 
-    create(sc,
-           connectionFactory,
-           sql,
-           lowerBound,
-           upperBound,
-           numPartitions,
-           mapRow)
+    create(
+      sc,
+      connectionFactory,
+      sql,
+      lowerBound,
+      upperBound,
+      numPartitions,
+      mapRow)
   }
 }

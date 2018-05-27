@@ -80,11 +80,11 @@ class OptCheck extends FunSuite {
   test("Name-based extractor") {
     Opt(2) match {
       case Opt(x) => // success
-      case _ => fail()
+      case _      => fail()
     }
     Opt.empty[Int] match {
       case Opt(x) => fail()
-      case _ => // success
+      case _      => // success
     }
   }
 

@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -55,14 +55,14 @@ trait GroupFinder extends parser.AST with Tracer {
             (sigma, where, dtrace)
         }
 
-      /* 
+      /*
        * Only include groups which match the set of dispatches.
-       * 
+       *
        * FIXME this will cause some queries to break erroneously:
-       * 
+       *
        * foo(x) := solve 'a count(foo where foo = 'a) + x
        * solve 'b count(foo(4) where foo(4) = 'b)
-       * 
+       *
        * The above is fine, but the actuals length trick will fail to
        * allow it through and the compiler will fail to solve 'a.  Leaving
        * this case unresolve for now since macros are going away.
@@ -81,17 +81,17 @@ trait GroupFinder extends parser.AST with Tracer {
         case (_, _: Add | _: Sub | _: Mul | _: Div | _: Neg | _: Paren) :: tail =>
           state1(tail)
         case (_, _: ComparisonOp) :: tail => state2(tail)
-        case (_, _: Dispatch) :: tail => state1(tail)
-        case _ => None
+        case (_, _: Dispatch) :: tail     => state1(tail)
+        case _                            => None
       }
 
     @tailrec
     def state2(btrace: List[(Sigma, Expr)]): Option[(Sigma, Where)] =
       btrace match {
         case (_, _: Comp | _: And | _: Or) :: tail => state2(tail)
-        case (sigma, where: Where) :: _ => Some((sigma, where))
-        case (_, _: Dispatch) :: tail => state2(tail)
-        case _ => None
+        case (sigma, where: Where) :: _            => Some((sigma, where))
+        case (_, _: Dispatch) :: tail              => state2(tail)
+        case _                                     => None
       }
 
     state1(btrace)
@@ -103,10 +103,10 @@ trait GroupFinder extends parser.AST with Tracer {
         findVars(solve, id)(left) ++ findVars(solve, id)(right)
 
       case Solve(_, constraints, child) => {
-          val constrVars =
-            constraints map findVars(solve, id) reduceOption { _ ++ _ } getOrElse Set()
-          constrVars ++ findVars(solve, id)(child)
-        }
+        val constrVars =
+          constraints map findVars(solve, id) reduceOption { _ ++ _ } getOrElse Set()
+        constrVars ++ findVars(solve, id)(child)
+      }
 
       case New(_, child) => findVars(solve, id)(child)
 
@@ -115,7 +115,8 @@ trait GroupFinder extends parser.AST with Tracer {
 
       case Relate(_, from, to, in) =>
         findVars(solve, id)(from) ++ findVars(solve, id)(to) ++ findVars(
-            solve, id)(in)
+          solve,
+          id)(in)
 
       case expr @ TicVar(_, `id`) if expr.binding == SolveBinding(solve) =>
         Set(expr)

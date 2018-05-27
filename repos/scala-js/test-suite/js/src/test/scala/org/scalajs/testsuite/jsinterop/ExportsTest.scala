@@ -275,7 +275,7 @@ class ExportsTest {
     class UhOh {
       // Something no one should export
       @JSExport
-      def ahem[T : Comparable](x: T)(implicit y: Int): Nothing = ???
+      def ahem[T: Comparable](x: T)(implicit y: Int): Nothing = ???
     }
 
     val x = (new UhOh).asInstanceOf[js.Dynamic]
@@ -650,7 +650,8 @@ class ExportsTest {
   }
 
   @Test
-  def exports_for_classes_with_qualified_name_SJSDefinedExportedClass(): Unit = {
+  def exports_for_classes_with_qualified_name_SJSDefinedExportedClass()
+    : Unit = {
     val constr = js.Dynamic.global.qualified.testclass.SJSDefinedExportedClass
     assertJSNotUndefined(constr)
     assertEquals("function", js.typeOf(constr))
@@ -681,8 +682,7 @@ class ExportsTest {
     assertEquals("a", js.Dynamic.newInstance(constr)("a").result)
     assertEquals("a|b", js.Dynamic.newInstance(constr)("a", "b").result)
     assertEquals("a|b|c", js.Dynamic.newInstance(constr)("a", "b", "c").result)
-    assertEquals(
-        "Number: <5>|a", js.Dynamic.newInstance(constr)(5, "a").result)
+    assertEquals("Number: <5>|a", js.Dynamic.newInstance(constr)(5, "a").result)
   }
 
   @Test def export_for_classes_with_default_parameters_in_ctor(): Unit = {
@@ -1138,7 +1138,7 @@ class ExportsTest {
 
     import scala.language.reflectiveCalls
 
-    val obj2 = getObj().asInstanceOf[ {
+    val obj2 = getObj().asInstanceOf[{
       val x1: String; var y1: String; def z1(): String
     }]
 

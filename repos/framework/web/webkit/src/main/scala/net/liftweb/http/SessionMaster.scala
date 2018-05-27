@@ -33,11 +33,12 @@ case class SessionWatcherInfo(sessions: Map[String, SessionInfo])
 /**
   * Information about sessions
   */
-case class SessionInfo(session: LiftSession,
-                       userAgent: Box[String],
-                       ipAddress: Box[String],
-                       requestCnt: Int,
-                       lastAccess: Long)
+case class SessionInfo(
+    session: LiftSession,
+    userAgent: Box[String],
+    ipAddress: Box[String],
+    requestCnt: Int,
+    lastAccess: Long)
 
 /**
   * Manages LiftSessions because the servlet container is less than optimal at
@@ -64,23 +65,22 @@ object SessionMaster extends LiftActor with Loggable {
     * to call to destroy the session.
     */
   @volatile
-  var sessionCheckFuncs: List[
-      (Map[String, SessionInfo], SessionInfo => Unit) => Unit] =
-    ((ses: Map[String, SessionInfo], destroyer: SessionInfo => Unit) =>
-      {
-        val now = millis
+  var sessionCheckFuncs
+    : List[(Map[String, SessionInfo], SessionInfo => Unit) => Unit] =
+    ((ses: Map[String, SessionInfo], destroyer: SessionInfo => Unit) => {
+      val now = millis
 
-        for ((id, info @ SessionInfo(session, _, _, _, _)) <- ses.iterator) {
-          if (now - session.lastServiceTime > session.inactivityLength ||
-              session.markedForTermination) {
-            logger.info(" Session " + id + " expired")
-            destroyer(info)
-          } else {
-            session.doCometActorCleanup()
-            session.cleanupUnseenFuncs()
-          }
+      for ((id, info @ SessionInfo(session, _, _, _, _)) <- ses.iterator) {
+        if (now - session.lastServiceTime > session.inactivityLength ||
+            session.markedForTermination) {
+          logger.info(" Session " + id + " expired")
+          destroyer(info)
+        } else {
+          session.doCometActorCleanup()
+          session.cleanupUnseenFuncs()
         }
-      }) :: Nil
+      }
+    }) :: Nil
 
   def getSession(req: Req, otherId: Box[String]): Box[LiftSession] = {
     val dead = otherId.map(killedSessions.containsKey(_)) openOr false
@@ -120,12 +120,12 @@ object SessionMaster extends LiftActor with Loggable {
     lockAndBump {
       val dead =
         killedSessions.containsKey(id) ||
-        (otherId.map(killedSessions.containsKey(_)) openOr false)
+          (otherId.map(killedSessions.containsKey(_)) openOr false)
 
       if (dead)(Failure("Dead session", Empty, Empty))
       else {
         otherId.flatMap(a => Box !! nsessions.get(a)) or
-        (Box !! nsessions.get(id))
+          (Box !! nsessions.get(id))
       }
     }
 
@@ -140,10 +140,11 @@ object SessionMaster extends LiftActor with Loggable {
     * Returns a LiftSession or Empty if not found
     */
   def getSession(
-      httpSession: => HTTPSession, otherId: Box[String]): Box[LiftSession] =
+      httpSession: => HTTPSession,
+      otherId: Box[String]): Box[LiftSession] =
     lockAndBump {
       otherId.flatMap(a => Box !! nsessions.get(a)) or
-      (Box !! nsessions.get(httpSession.sessionId))
+        (Box !! nsessions.get(httpSession.sessionId))
     }
 
   /**
@@ -152,7 +153,7 @@ object SessionMaster extends LiftActor with Loggable {
   def getSession(req: HTTPRequest, otherId: Box[String]): Box[LiftSession] =
     lockAndBump {
       otherId.flatMap(a => Box !! nsessions.get(a)) or req.sessionId.flatMap(
-          id => Box !! nsessions.get(id))
+        id => Box !! nsessions.get(id))
     }
 
   /**
@@ -161,12 +162,14 @@ object SessionMaster extends LiftActor with Loggable {
   private def lockAndBump(f: => Box[SessionInfo]): Box[LiftSession] =
     this.synchronized {
       f.map { s =>
-        nsessions.put(s.session.underlyingId,
-                      SessionInfo(s.session,
-                                  s.userAgent,
-                                  s.ipAddress,
-                                  s.requestCnt + 1,
-                                  millis))
+        nsessions.put(
+          s.session.underlyingId,
+          SessionInfo(
+            s.session,
+            s.userAgent,
+            s.ipAddress,
+            s.requestCnt + 1,
+            millis))
 
         s.session
       }
@@ -183,16 +186,17 @@ object SessionMaster extends LiftActor with Loggable {
   /**
     * Adds a new session to SessionMaster
     */
-  def addSession(liftSession: LiftSession,
-                 req: Req,
-                 userAgent: Box[String],
-                 ipAddress: Box[String]) {
+  def addSession(
+      liftSession: LiftSession,
+      req: Req,
+      userAgent: Box[String],
+      ipAddress: Box[String]) {
     lockAndBump {
       Full(SessionInfo(liftSession, userAgent, ipAddress, -1, 0L)) // bumped twice during session creation.  Ticket #529 DPP
     }
     S.init(Box !! req, liftSession) {
       liftSession.startSession()
-      LiftSession.afterSessionCreate.foreach(_ (liftSession, req))
+      LiftSession.afterSessionCreate.foreach(_(liftSession, req))
     }
 
     liftSession.httpSession.foreach(_.link(liftSession))
@@ -232,22 +236,23 @@ object SessionMaster extends LiftActor with Loggable {
         case SessionInfo(s, _, _, _, _) =>
           killedSessions.put(s.underlyingId, Helpers.millis)
           s.markedForShutDown_? = true
-          Schedule.schedule(() =>
-                              {
-                                try {
-                                  s.doShutDown
-                                  try {
-                                    s.httpSession.foreach(_.unlink(s))
-                                  } catch {
-                                    case e: Exception =>
-                                    // ignore... sometimes you can't do this and it's okay
-                                  }
-                                } catch {
-                                  case e: Exception =>
-                                    logger.warn("Failure in remove session", e)
-                                }
-                            },
-                            0.seconds)
+          Schedule.schedule(
+            () => {
+              try {
+                s.doShutDown
+                try {
+                  s.httpSession.foreach(_.unlink(s))
+                } catch {
+                  case e: Exception =>
+                  // ignore... sometimes you can't do this and it's okay
+                }
+              } catch {
+                case e: Exception =>
+                  logger.warn("Failure in remove session", e)
+              }
+            },
+            0.seconds
+          )
           lockWrite {
             nsessions.remove(sessionId)
           }
@@ -263,8 +268,7 @@ object SessionMaster extends LiftActor with Loggable {
         killedSessions.filter(_._2 < now).map(_._1)
       removeKeys.foreach(s => killedSessions.remove(s))
 
-      val ses = Map(
-          lockRead {
+      val ses = Map(lockRead {
         nsessions
       }.toList: _*)
 
@@ -272,27 +276,27 @@ object SessionMaster extends LiftActor with Loggable {
         f <- sessionCheckFuncs
       } {
         if (Props.inGAE) {
-          f(ses,
-            shutDown =>
-              {
-                if (!shutDown.session.markedForShutDown_?) {
-                  shutDown.session.markedForShutDown_? = true
-                  this.sendMsg(RemoveSession(shutDown.session.underlyingId))
-                }
-            })
+          f(
+            ses,
+            shutDown => {
+              if (!shutDown.session.markedForShutDown_?) {
+                shutDown.session.markedForShutDown_? = true
+                this.sendMsg(RemoveSession(shutDown.session.underlyingId))
+              }
+            }
+          )
         } else {
           Schedule.schedule(
-              () =>
-                f(ses,
-                  shutDown =>
-                    {
-                      if (!shutDown.session.markedForShutDown_?) {
-                        shutDown.session.markedForShutDown_? = true
+            () =>
+              f(ses, shutDown => {
+                if (!shutDown.session.markedForShutDown_?) {
+                  shutDown.session.markedForShutDown_? = true
 
-                        this ! RemoveSession(shutDown.session.underlyingId)
-                      }
-                  }),
-              0.seconds)
+                  this ! RemoveSession(shutDown.session.underlyingId)
+                }
+              }),
+            0.seconds
+          )
         }
       }
 

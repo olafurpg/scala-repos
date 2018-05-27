@@ -10,7 +10,8 @@ import java.util.concurrent._
 import akka.util._
 
 class MessageQueueAppendFailedException(
-    message: String, cause: Throwable = null)
+    message: String,
+    cause: Throwable = null)
     extends AkkaException(message, cause)
 
 /**
@@ -38,10 +39,10 @@ case class BoundedMailbox(val capacity: Int = {
     extends MailboxType {
   if (capacity < 0)
     throw new IllegalArgumentException(
-        "The capacity for BoundedMailbox can not be negative")
+      "The capacity for BoundedMailbox can not be negative")
   if (pushTimeOut eq null)
     throw new IllegalArgumentException(
-        "The push time-out for BoundedMailbox can not be null")
+      "The push time-out for BoundedMailbox can not be null")
 }
 
 trait UnboundedMessageQueueSemantics extends MessageQueue {
@@ -60,7 +61,7 @@ trait BoundedMessageQueueSemantics extends MessageQueue {
     if (pushTimeOut.length > 0) {
       this.offer(handle, pushTimeOut.length, pushTimeOut.unit) || {
         throw new MessageQueueAppendFailedException(
-            "Couldn't enqueue message " + handle + " to " + toString)
+          "Couldn't enqueue message " + handle + " to " + toString)
       }
     } else this put handle
   }
@@ -81,9 +82,11 @@ class UnboundedPriorityMessageQueue(cmp: Comparator[MessageInvocation])
     extends PriorityBlockingQueue[MessageInvocation](11, cmp)
     with UnboundedMessageQueueSemantics
 
-class BoundedPriorityMessageQueue(capacity: Int,
-                                  val pushTimeOut: Duration,
-                                  cmp: Comparator[MessageInvocation])
+class BoundedPriorityMessageQueue(
+    capacity: Int,
+    val pushTimeOut: Duration,
+    cmp: Comparator[MessageInvocation])
     extends BoundedBlockingQueue[MessageInvocation](
-        capacity, new PriorityQueue[MessageInvocation](11, cmp))
+      capacity,
+      new PriorityQueue[MessageInvocation](11, cmp))
     with BoundedMessageQueueSemantics

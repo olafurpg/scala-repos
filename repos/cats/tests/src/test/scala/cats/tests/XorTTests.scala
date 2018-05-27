@@ -14,73 +14,86 @@ class XorTTests extends CatsSuite {
   implicit val iso =
     CartesianTests.Isomorphisms.invariant[XorT[List, String, ?]]
   checkAll(
-      "XorT[List, String, Int]",
-      MonadErrorTests[XorT[List, String, ?], String].monadError[Int, Int, Int])
-  checkAll("MonadError[XorT[List, ?, ?]]",
-           SerializableTests.serializable(
-               MonadError[XorT[List, String, ?], String]))
-  checkAll("XorT[List, String, Int]",
-           MonoidKTests[XorT[List, String, ?]].monoidK[Int])
-  checkAll("MonoidK[XorT[List, String, ?]]",
-           SerializableTests.serializable(MonoidK[XorT[List, String, ?]]))
-  checkAll("XorT[List, ?, ?]",
-           BifunctorTests[XorT[List, ?, ?]]
-             .bifunctor[Int, Int, Int, String, String, String])
-  checkAll("Bifunctor[XorT[List, ?, ?]]",
-           SerializableTests.serializable(Bifunctor[XorT[List, ?, ?]]))
-  checkAll("XorT[List, Int, ?]",
-           TraverseTests[XorT[List, Int, ?]]
-             .traverse[Int, Int, Int, Int, Option, Option])
-  checkAll("Traverse[XorT[List, Int, ?]]",
-           SerializableTests.serializable(Traverse[XorT[List, Int, ?]]))
+    "XorT[List, String, Int]",
+    MonadErrorTests[XorT[List, String, ?], String].monadError[Int, Int, Int])
+  checkAll(
+    "MonadError[XorT[List, ?, ?]]",
+    SerializableTests.serializable(MonadError[XorT[List, String, ?], String]))
+  checkAll(
+    "XorT[List, String, Int]",
+    MonoidKTests[XorT[List, String, ?]].monoidK[Int])
+  checkAll(
+    "MonoidK[XorT[List, String, ?]]",
+    SerializableTests.serializable(MonoidK[XorT[List, String, ?]]))
+  checkAll(
+    "XorT[List, ?, ?]",
+    BifunctorTests[XorT[List, ?, ?]]
+      .bifunctor[Int, Int, Int, String, String, String])
+  checkAll(
+    "Bifunctor[XorT[List, ?, ?]]",
+    SerializableTests.serializable(Bifunctor[XorT[List, ?, ?]]))
+  checkAll(
+    "XorT[List, Int, ?]",
+    TraverseTests[XorT[List, Int, ?]]
+      .traverse[Int, Int, Int, Int, Option, Option])
+  checkAll(
+    "Traverse[XorT[List, Int, ?]]",
+    SerializableTests.serializable(Traverse[XorT[List, Int, ?]]))
   checkAll("XorT[List, String, Int]", OrderLaws[XorT[List, String, Int]].order)
-  checkAll("Order[XorT[List, String, Int]]",
-           SerializableTests.serializable(Order[XorT[List, String, Int]]))
+  checkAll(
+    "Order[XorT[List, String, Int]]",
+    SerializableTests.serializable(Order[XorT[List, String, Int]]))
 
   {
     implicit val F = ListWrapper.foldable
-    checkAll("XorT[ListWrapper, Int, ?]",
-             FoldableTests[XorT[ListWrapper, Int, ?]].foldable[Int, Int])
     checkAll(
-        "Foldable[XorT[ListWrapper, Int, ?]]",
-        SerializableTests.serializable(Foldable[XorT[ListWrapper, Int, ?]]))
+      "XorT[ListWrapper, Int, ?]",
+      FoldableTests[XorT[ListWrapper, Int, ?]].foldable[Int, Int])
+    checkAll(
+      "Foldable[XorT[ListWrapper, Int, ?]]",
+      SerializableTests.serializable(Foldable[XorT[ListWrapper, Int, ?]]))
   }
 
   {
     implicit val F = ListWrapper.functor
-    checkAll("XorT[ListWrapper, Int, ?]",
-             FunctorTests[XorT[ListWrapper, Int, ?]].functor[Int, Int, Int])
     checkAll(
-        "Functor[XorT[ListWrapper, Int, ?]]",
-        SerializableTests.serializable(Functor[XorT[ListWrapper, Int, ?]]))
+      "XorT[ListWrapper, Int, ?]",
+      FunctorTests[XorT[ListWrapper, Int, ?]].functor[Int, Int, Int])
+    checkAll(
+      "Functor[XorT[ListWrapper, Int, ?]]",
+      SerializableTests.serializable(Functor[XorT[ListWrapper, Int, ?]]))
   }
 
   {
     implicit val F = ListWrapper.partialOrder[String Xor Int]
-    checkAll("XorT[ListWrapper, String, Int]",
-             OrderLaws[XorT[ListWrapper, String, Int]].partialOrder)
-    checkAll("PartialOrder[XorT[ListWrapper, String, Int]]",
-             SerializableTests.serializable(
-                 PartialOrder[XorT[ListWrapper, String, Int]]))
+    checkAll(
+      "XorT[ListWrapper, String, Int]",
+      OrderLaws[XorT[ListWrapper, String, Int]].partialOrder)
+    checkAll(
+      "PartialOrder[XorT[ListWrapper, String, Int]]",
+      SerializableTests.serializable(
+        PartialOrder[XorT[ListWrapper, String, Int]]))
   }
 
   {
     implicit val F = ListWrapper.eqv[String Xor Int]
-    checkAll("XorT[ListWrapper, String, Int]",
-             OrderLaws[XorT[ListWrapper, String, Int]].eqv)
     checkAll(
-        "Eq[XorT[ListWrapper, String, Int]]",
-        SerializableTests.serializable(Eq[XorT[ListWrapper, String, Int]]))
+      "XorT[ListWrapper, String, Int]",
+      OrderLaws[XorT[ListWrapper, String, Int]].eqv)
+    checkAll(
+      "Eq[XorT[ListWrapper, String, Int]]",
+      SerializableTests.serializable(Eq[XorT[ListWrapper, String, Int]]))
   }
 
   {
     implicit val L = ListWrapper.semigroup[String]
     checkAll(
-        "XorT[Option, ListWrapper[String], ?]",
-        SemigroupKTests[XorT[Option, ListWrapper[String], ?]].semigroupK[Int])
-    checkAll("SemigroupK[XorT[Option, ListWrapper[String], ?]]",
-             SerializableTests.serializable(
-                 SemigroupK[XorT[Option, ListWrapper[String], ?]]))
+      "XorT[Option, ListWrapper[String], ?]",
+      SemigroupKTests[XorT[Option, ListWrapper[String], ?]].semigroupK[Int])
+    checkAll(
+      "SemigroupK[XorT[Option, ListWrapper[String], ?]]",
+      SerializableTests.serializable(
+        SemigroupK[XorT[Option, ListWrapper[String], ?]]))
   }
 
   // make sure that the Monad and Traverse instances don't result in ambiguous
@@ -94,8 +107,7 @@ class XorTTests extends CatsSuite {
   }
 
   test("withValidated") {
-    forAll { (xort: XorT[List, String, Int], f: String => Char,
-    g: Int => Double) =>
+    forAll { (xort: XorT[List, String, Int], f: String => Char, g: Int => Double) =>
       xort.withValidated(_.bimap(f, g)) should ===(xort.bimap(f, g))
     }
   }
@@ -154,19 +166,19 @@ class XorTTests extends CatsSuite {
   test("recoverWith recovers handled values") {
     val xort = XorT.left[Id, String, Int]("xort")
     xort.recoverWith { case "xort" => XorT.right[Id, String, Int](5) }.isRight should ===(
-        true)
+      true)
   }
 
   test("recoverWith ignores unhandled values") {
     val xort = XorT.left[Id, String, Int]("xort")
     xort.recoverWith { case "notxort" => XorT.right[Id, String, Int](5) } should ===(
-        xort)
+      xort)
   }
 
   test("recoverWith ignores the right side") {
     val xort = XorT.right[Id, String, Int](10)
     xort.recoverWith { case "xort" => XorT.right[Id, String, Int](5) } should ===(
-        xort)
+      xort)
   }
 
   test("transform consistent with value.map") {
@@ -182,8 +194,7 @@ class XorTTests extends CatsSuite {
   }
 
   test("fold with Id consistent with Xor fold") {
-    forAll { (xort: XorT[Id, String, Int], f: String => Long,
-    g: Int => Long) =>
+    forAll { (xort: XorT[Id, String, Int], f: String => Long, g: Int => Long) =>
       xort.fold(f, g) should ===(xort.value.fold(f, g))
     }
   }
@@ -264,8 +275,7 @@ class XorTTests extends CatsSuite {
   }
 
   test("foldRight with Id consistent with Xor foldRight") {
-    forAll { (x: XorT[Id, String, Int], l: Eval[Long], f: (Int, Eval[Long]) => Eval[
-        Long]) =>
+    forAll { (x: XorT[Id, String, Int], l: Eval[Long], f: (Int, Eval[Long]) => Eval[Long]) =>
       x.foldRight(l)(f) should ===(x.value.foldRight(l)(f))
     }
   }

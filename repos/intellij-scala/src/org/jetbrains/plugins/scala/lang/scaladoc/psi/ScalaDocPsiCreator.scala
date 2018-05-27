@@ -27,7 +27,7 @@ object ScalaDocPsiCreator {
 
         var parentNode = node
         while (parentNode.getTreeParent != null &&
-        parentNode.getElementType != SCALA_DOC_COMMENT) {
+               parentNode.getElementType != SCALA_DOC_COMMENT) {
           parentNode = parentNode.getTreeParent
           parentNode.getElementType match {
             case a: ScaladocSyntaxElementType =>
@@ -39,19 +39,19 @@ object ScalaDocPsiCreator {
         element
       case ScalaDocTokenType.DOC_INNER_CODE_TAG =>
         new ScDocInnerCodeElementImpl(node)
-      case DOC_TAG => new ScDocTagImpl(node)
-      case DOC_INLINED_TAG => new ScDocInlinedTagImpl(node)
-      case DOC_PARAM_REF => new ScDocParamRefImpl(node)
-      case DOC_METHOD_REF => new ScDocMethodRefImpl(node)
-      case DOC_FIELD_REF => new ScDocFieldRefImpl(node)
-      case DOC_METHOD_PARAMS => new ScDocMethodParamsImpl(node)
-      case DOC_METHOD_PARAMETER => new ScDocMethodParameterImpl(node)
+      case DOC_TAG                               => new ScDocTagImpl(node)
+      case DOC_INLINED_TAG                       => new ScDocInlinedTagImpl(node)
+      case DOC_PARAM_REF                         => new ScDocParamRefImpl(node)
+      case DOC_METHOD_REF                        => new ScDocMethodRefImpl(node)
+      case DOC_FIELD_REF                         => new ScDocFieldRefImpl(node)
+      case DOC_METHOD_PARAMS                     => new ScDocMethodParamsImpl(node)
+      case DOC_METHOD_PARAMETER                  => new ScDocMethodParameterImpl(node)
       case ScalaDocTokenType.DOC_TAG_VALUE_TOKEN =>
 //        new ScDocTagValueImpl(node)
         var parent = node.getTreeParent
 
         while (parent != null && parent.getPsi != null &&
-        !parent.getPsi.isInstanceOf[ScDocTag]) {
+               !parent.getPsi.isInstanceOf[ScDocTag]) {
           parent = parent.getTreeParent
         }
 

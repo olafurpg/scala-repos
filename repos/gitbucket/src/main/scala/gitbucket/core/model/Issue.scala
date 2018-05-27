@@ -24,7 +24,8 @@ trait IssueComponent extends TemplateComponent { self: Profile =>
   }
 
   class Issues(tag: Tag)
-      extends Table[Issue](tag, "ISSUE") with IssueTemplate
+      extends Table[Issue](tag, "ISSUE")
+      with IssueTemplate
       with MilestoneTemplate {
     val openedUserName = column[String]("OPENED_USER_NAME")
     val assignedUserName = column[String]("ASSIGNED_USER_NAME")
@@ -35,18 +36,19 @@ trait IssueComponent extends TemplateComponent { self: Profile =>
     val updatedDate = column[java.util.Date]("UPDATED_DATE")
     val pullRequest = column[Boolean]("PULL_REQUEST")
     def * =
-      (userName,
-       repositoryName,
-       issueId,
-       openedUserName,
-       milestoneId.?,
-       assignedUserName.?,
-       title,
-       content.?,
-       closed,
-       registeredDate,
-       updatedDate,
-       pullRequest) <> (Issue.tupled, Issue.unapply)
+      (
+        userName,
+        repositoryName,
+        issueId,
+        openedUserName,
+        milestoneId.?,
+        assignedUserName.?,
+        title,
+        content.?,
+        closed,
+        registeredDate,
+        updatedDate,
+        pullRequest) <> (Issue.tupled, Issue.unapply)
 
     def byPrimaryKey(owner: String, repository: String, issueId: Int) =
       byIssue(owner, repository, issueId)

@@ -15,13 +15,14 @@ import scala.reflect.ClassTag
   *       This implies a use-case where a single thread exclusively processes a
   *       byte stream.
   */
-private[finagle] class FixedLengthDecoder[T : ClassTag](
-    frameSize: Int, decodeFrame: Buf => T)
+private[finagle] class FixedLengthDecoder[T: ClassTag](
+    frameSize: Int,
+    decodeFrame: Buf => T)
     extends FrameDecoder[T] {
 
   if (frameSize < 1)
     throw new IllegalArgumentException(
-        s"frameSize must be greater than zero, saw: $frameSize")
+      s"frameSize must be greater than zero, saw: $frameSize")
 
   private[this] var accumulated: Buf = Buf.Empty
   private[this] val NoFrames: IndexedSeq[T] = IndexedSeq.empty[T]

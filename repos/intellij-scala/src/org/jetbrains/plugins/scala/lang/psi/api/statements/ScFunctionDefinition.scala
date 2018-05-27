@@ -10,8 +10,14 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScReferenceElement
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTypeDefinition}
-import org.jetbrains.plugins.scala.lang.psi.light.{PsiClassWrapper, StaticTraitScFunctionWrapper}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject,
+  ScTypeDefinition
+}
+import org.jetbrains.plugins.scala.lang.psi.light.{
+  PsiClassWrapper,
+  StaticTraitScFunctionWrapper
+}
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 import org.jetbrains.plugins.scala.macroAnnotations.{Cached, ModCount}
 
@@ -30,15 +36,14 @@ trait ScFunctionDefinition extends ScFunction with ScControlFlowOwner {
   def removeAssignment()
 
   def returnUsages(withBooleanInfix: Boolean = false): Array[PsiElement] =
-    body.fold(Array.empty[PsiElement])(
-        exp =>
-          {
-        (exp.depthFirst(!_.isInstanceOf[ScFunction])
-              .filter(_.isInstanceOf[ScReturnStmt]) ++ exp.calculateReturns(
-                withBooleanInfix))
-          .filter(_.getContainingFile == getContainingFile)
-          .toArray
-          .distinct
+    body.fold(Array.empty[PsiElement])(exp => {
+      (exp
+        .depthFirst(!_.isInstanceOf[ScFunction])
+        .filter(_.isInstanceOf[ScReturnStmt]) ++ exp.calculateReturns(
+        withBooleanInfix))
+        .filter(_.getContainingFile == getContainingFile)
+        .toArray
+        .distinct
     })
 
   def canBeTailRecursive = getParent match {
@@ -54,10 +59,10 @@ trait ScFunctionDefinition extends ScFunction with ScControlFlowOwner {
 
   def hasTailRecursionAnnotation: Boolean =
     annotations.exists(
-        _.typeElement
-          .getType(TypingContext.empty)
-          .map(_.canonicalText)
-          .exists(_ == "_root_.scala.annotation.tailrec"))
+      _.typeElement
+        .getType(TypingContext.empty)
+        .map(_.canonicalText)
+        .exists(_ == "_root_.scala.annotation.tailrec"))
 
   def recursiveReferences: Seq[RecursiveReference] = {
     val resultExpressions = returnUsages(withBooleanInfix = true)
@@ -65,10 +70,10 @@ trait ScFunctionDefinition extends ScFunction with ScControlFlowOwner {
     @scala.annotation.tailrec
     def possiblyTailRecursiveCallFor(elem: PsiElement): PsiElement =
       elem.getParent match {
-        case call: ScMethodCall => possiblyTailRecursiveCallFor(call)
+        case call: ScMethodCall  => possiblyTailRecursiveCallFor(call)
         case call: ScGenericCall => possiblyTailRecursiveCallFor(call)
-        case ret: ScReturnStmt => ret
-        case _ => elem
+        case ret: ScReturnStmt   => ret
+        case _                   => elem
       }
 
     def expandIf(elem: PsiElement): Seq[PsiElement] = {
@@ -87,20 +92,21 @@ trait ScFunctionDefinition extends ScFunction with ScControlFlowOwner {
       case Some(body) =>
         for {
           ref <- body.depthFirst
-                  .filterByType(classOf[ScReferenceElement])
-                  .toSeq if ref.isReferenceTo(this)
+            .filterByType(classOf[ScReferenceElement])
+            .toSeq if ref.isReferenceTo(this)
         } yield {
           RecursiveReference(
-              ref, expressions.contains(possiblyTailRecursiveCallFor(ref)))
+            ref,
+            expressions.contains(possiblyTailRecursiveCallFor(ref)))
         }
       case None => Seq.empty
     }
   }
 
   def recursionType: RecursionType = recursiveReferences match {
-    case Seq() => RecursionType.NoRecursion
+    case Seq()                           => RecursionType.NoRecursion
     case seq if seq.forall(_.isTailCall) => RecursionType.TailRecursion
-    case _ => RecursionType.OrdinaryRecursion
+    case _                               => RecursionType.OrdinaryRecursion
   }
 
   override def controlFlowScope: Option[ScalaPsiElement] = body

@@ -23,20 +23,26 @@ case class TypeBoundsType(lower: Type, upper: Type) extends Type
 case class RefinedType(classSym: Symbol, typeRefs: List[Type]) extends Type
 case class ClassInfoType(symbol: Symbol, typeRefs: Seq[Type]) extends Type
 case class ClassInfoTypeWithCons(
-    symbol: Symbol, typeRefs: Seq[Type], cons: String)
+    symbol: Symbol,
+    typeRefs: Seq[Type],
+    cons: String)
     extends Type
 case class MethodType(resultType: Type, paramSymbols: Seq[Symbol])
     extends FunctionType
 case class NullaryMethodType(resultType: Type) extends Type
 case class PolyType(typeRef: Type, symbols: Seq[TypeSymbol]) extends Type
 case class PolyTypeWithCons(
-    typeRef: Type, symbols: Seq[TypeSymbol], cons: String)
+    typeRef: Type,
+    symbols: Seq[TypeSymbol],
+    cons: String)
     extends Type
 case class ImplicitMethodType(resultType: Type, paramSymbols: Seq[Symbol])
     extends FunctionType
 case class AnnotatedType(typeRef: Type, attribTreeRefs: List[Int]) extends Type
 case class AnnotatedWithSelfType(
-    typeRef: Type, symbol: Symbol, attribTreeRefs: List[Int])
+    typeRef: Type,
+    symbol: Symbol,
+    attribTreeRefs: List[Int])
     extends Type
 case class DeBruijnIndexType(typeLevel: Int, typeIndex: Int) extends Type
 case class ExistentialType(typeRef: Type, symbols: Seq[Symbol]) extends Type

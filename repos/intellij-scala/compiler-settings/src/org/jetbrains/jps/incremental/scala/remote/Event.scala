@@ -27,7 +27,7 @@ object Event {
     if (stream.available > 0) {
       val excess = FileUtil.loadTextAndClose(stream)
       throw new IllegalArgumentException(
-          "Excess bytes after event deserialization: " + excess)
+        "Excess bytes after event deserialization: " + excess)
     }
     stream.close()
     event
@@ -35,11 +35,12 @@ object Event {
 }
 
 @SerialVersionUID(1317094340928824239L)
-case class MessageEvent(kind: Kind,
-                        text: String,
-                        source: Option[File],
-                        line: Option[Long],
-                        column: Option[Long])
+case class MessageEvent(
+    kind: Kind,
+    text: String,
+    source: Option[File],
+    line: Option[Long],
+    column: Option[Long])
     extends Event
 
 @SerialVersionUID(-6777609711619086870L)

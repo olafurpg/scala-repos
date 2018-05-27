@@ -19,7 +19,10 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
 
 class HttpEventActorTest
-    extends MarathonSpec with Mockito with GivenWhenThen with Matchers {
+    extends MarathonSpec
+    with Mockito
+    with GivenWhenThen
+    with Matchers {
 
   test("A message is broadcast to all subscribers") {
     Given("A HttpEventActor with 2 subscribers")
@@ -71,8 +74,8 @@ class HttpEventActorTest
 
     When("An event is send to the actor")
     Then("Only one subscriber is limited")
-    EventFilter.info(
-        start = "Will not send event event_stream_attached to unresponsive hosts: host1") intercept {
+    EventFilter.info(start =
+      "Will not send event event_stream_attached to unresponsive hosts: host1") intercept {
       aut ! EventStreamAttached("remote")
     }
 
@@ -84,7 +87,7 @@ class HttpEventActorTest
 
   test("A rate limited subscriber with success will not have a future backoff") {
     Given(
-        "A HttpEventActor with 2 subscribers, where one has a overdue backoff")
+      "A HttpEventActor with 2 subscribers, where one has a overdue backoff")
     val aut = TestActorRef(new NoHttpEventActor(Set("host1", "host2")))
     aut.underlyingActor.limiter +=
       "host1" -> EventNotificationLimit(23, Some((-100).seconds.fromNow))
@@ -113,9 +116,9 @@ class HttpEventActorTest
 
   before {
     system = ActorSystem(
-        "test-system",
-        ConfigFactory.parseString(
-            """akka.loggers = ["akka.testkit.TestEventListener"]"""))
+      "test-system",
+      ConfigFactory.parseString(
+        """akka.loggers = ["akka.testkit.TestEventListener"]"""))
     clock = ConstantClock()
     conf = mock[HttpEventConfiguration]
     conf.slowConsumerTimeout returns 10.seconds
@@ -133,10 +136,10 @@ class HttpEventActorTest
 
   class NoHttpEventActor(subscribers: Set[String])
       extends HttpEventActor(
-          conf,
-          TestActorRef(Props(new ReturnSubscribersTestActor(subscribers))),
-          metrics,
-          clock) {
+        conf,
+        TestActorRef(Props(new ReturnSubscribersTestActor(subscribers))),
+        metrics,
+        clock) {
     var _requests = List.empty[HttpRequest]
     def requests = synchronized(_requests)
     override def pipeline(

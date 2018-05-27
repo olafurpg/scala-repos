@@ -24,12 +24,14 @@ final class LinkingUnit(
       } { classClassDef =>
         val methodNames =
           classClassDef.memberMethods.map(_.info.encodedName).toSet
-        GlobalInfo(isParentDataAccessed = methodNames.contains(
-                  "getSuperclass__jl_Class"))
+        GlobalInfo(isParentDataAccessed =
+          methodNames.contains("getSuperclass__jl_Class"))
       }
   }
 
-  def updated(classDefs: List[LinkedClass], isComplete: Boolean): LinkingUnit = {
+  def updated(
+      classDefs: List[LinkedClass],
+      isComplete: Boolean): LinkingUnit = {
     val newInfos = infos ++ classDefs.map(cd => cd.encodedName -> cd.toInfo)
     new LinkingUnit(semantics, esLevel, classDefs, newInfos, isComplete)
   }

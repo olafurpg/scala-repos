@@ -40,18 +40,19 @@ class FlowLogSpec extends AkkaSpec("akka.loglevel = DEBUG") with ScriptedTest {
         Source(1 to 2).via(debugging).runWith(Sink.ignore)
 
         logProbe.expectMsg(
-            Logging.Debug(LogSrc, LogClazz, "[my-debug] Element: 1"))
+          Logging.Debug(LogSrc, LogClazz, "[my-debug] Element: 1"))
         logProbe.expectMsg(
-            Logging.Debug(LogSrc, LogClazz, "[my-debug] Element: 2"))
+          Logging.Debug(LogSrc, LogClazz, "[my-debug] Element: 2"))
         logProbe.expectMsg(
-            Logging.Debug(LogSrc, LogClazz, "[my-debug] Upstream finished."))
+          Logging.Debug(LogSrc, LogClazz, "[my-debug] Upstream finished."))
       }
 
       "allow disabling element logging" in {
         val disableElementLogging =
-          Attributes.logLevels(onElement = LogLevels.Off,
-                               onFinish = Logging.DebugLevel,
-                               onFailure = Logging.DebugLevel)
+          Attributes.logLevels(
+            onElement = LogLevels.Off,
+            onFinish = Logging.DebugLevel,
+            onFailure = Logging.DebugLevel)
 
         val debugging = Flow[Int].log("my-debug")
         Source(1 to 2)
@@ -60,7 +61,7 @@ class FlowLogSpec extends AkkaSpec("akka.loglevel = DEBUG") with ScriptedTest {
           .runWith(Sink.ignore)
 
         logProbe.expectMsg(
-            Logging.Debug(LogSrc, LogClazz, "[my-debug] Upstream finished."))
+          Logging.Debug(LogSrc, LogClazz, "[my-debug] Upstream finished."))
       }
     }
 
@@ -105,11 +106,11 @@ class FlowLogSpec extends AkkaSpec("akka.loglevel = DEBUG") with ScriptedTest {
         Source(1 to 2).log("flow-s2").runWith(Sink.ignore)
 
         logProbe.expectMsg(
-            Logging.Debug(LogSrc, LogClazz, "[flow-s2] Element: 1"))
+          Logging.Debug(LogSrc, LogClazz, "[flow-s2] Element: 1"))
         logProbe.expectMsg(
-            Logging.Debug(LogSrc, LogClazz, "[flow-s2] Element: 2"))
+          Logging.Debug(LogSrc, LogClazz, "[flow-s2] Element: 2"))
         logProbe.expectMsg(
-            Logging.Debug(LogSrc, LogClazz, "[flow-s2] Upstream finished."))
+          Logging.Debug(LogSrc, LogClazz, "[flow-s2] Upstream finished."))
       }
 
       "allow extracting value to be logged" in {
@@ -120,16 +121,16 @@ class FlowLogSpec extends AkkaSpec("akka.loglevel = DEBUG") with ScriptedTest {
           .runWith(Sink.ignore)
 
         logProbe.expectMsg(
-            Logging.Debug(LogSrc, LogClazz, "[flow-s3] Element: 42"))
+          Logging.Debug(LogSrc, LogClazz, "[flow-s3] Element: 42"))
         logProbe.expectMsg(
-            Logging.Debug(LogSrc, LogClazz, "[flow-s3] Upstream finished."))
+          Logging.Debug(LogSrc, LogClazz, "[flow-s3] Upstream finished."))
       }
 
       "log upstream failure" in {
         val cause = new TestException
         Source.failed(cause).log("flow-4").runWith(Sink.ignore)
-        logProbe.expectMsg(Logging.Error(
-                cause, LogSrc, LogClazz, "[flow-4] Upstream failed."))
+        logProbe.expectMsg(
+          Logging.Error(cause, LogSrc, LogClazz, "[flow-4] Upstream failed."))
       }
 
       "allow passing in custom LoggingAdapter" in {
@@ -141,27 +142,29 @@ class FlowLogSpec extends AkkaSpec("akka.loglevel = DEBUG") with ScriptedTest {
         val clazz = classOf[DummyClassForStringSources]
         logProbe.expectMsg(Logging.Debug(src, clazz, "[flow-5] Element: 42"))
         logProbe.expectMsg(
-            Logging.Debug(src, clazz, "[flow-5] Upstream finished."))
+          Logging.Debug(src, clazz, "[flow-5] Upstream finished."))
       }
 
       "allow configuring log levels via Attributes" in {
-        val logAttrs = Attributes.logLevels(onElement = Logging.WarningLevel,
-                                            onFinish = Logging.InfoLevel,
-                                            onFailure = Logging.DebugLevel)
+        val logAttrs = Attributes.logLevels(
+          onElement = Logging.WarningLevel,
+          onFinish = Logging.InfoLevel,
+          onFailure = Logging.DebugLevel)
 
         Source
           .single(42)
           .log("flow-6")
           .withAttributes(
-              Attributes.logLevels(onElement = Logging.WarningLevel,
-                                   onFinish = Logging.InfoLevel,
-                                   onFailure = Logging.DebugLevel))
+            Attributes.logLevels(
+              onElement = Logging.WarningLevel,
+              onFinish = Logging.InfoLevel,
+              onFailure = Logging.DebugLevel))
           .runWith(Sink.ignore)
 
         logProbe.expectMsg(
-            Logging.Warning(LogSrc, LogClazz, "[flow-6] Element: 42"))
+          Logging.Warning(LogSrc, LogClazz, "[flow-6] Element: 42"))
         logProbe.expectMsg(
-            Logging.Info(LogSrc, LogClazz, "[flow-6] Upstream finished."))
+          Logging.Info(LogSrc, LogClazz, "[flow-6] Upstream finished."))
 
         val cause = new TestException
         Source
@@ -170,9 +173,9 @@ class FlowLogSpec extends AkkaSpec("akka.loglevel = DEBUG") with ScriptedTest {
           .withAttributes(logAttrs)
           .runWith(Sink.ignore)
         logProbe.expectMsg(Logging.Debug(
-                LogSrc,
-                LogClazz,
-                "[flow-6e] Upstream failed, cause: FlowLogSpec$TestException: Boom!"))
+          LogSrc,
+          LogClazz,
+          "[flow-6e] Upstream failed, cause: FlowLogSpec$TestException: Boom!"))
       }
 
       "follow supervision strategy when exception thrown" in {

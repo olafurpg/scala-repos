@@ -17,7 +17,7 @@ object Blog extends LilaController {
     blogApi context ref flatMap { implicit prismic =>
       blogApi.recent(prismic.api, ref, 50) flatMap {
         case Some(response) => fuccess(Ok(views.html.blog.index(response)))
-        case _ => notFound
+        case _              => notFound
       }
     }
   }

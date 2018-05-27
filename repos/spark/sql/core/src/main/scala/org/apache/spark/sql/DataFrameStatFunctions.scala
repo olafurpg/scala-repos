@@ -34,7 +34,7 @@ import org.apache.spark.util.sketch.{BloomFilter, CountMinSketch}
   * @since 1.4.0
   */
 @Experimental
-final class DataFrameStatFunctions private[sql](df: DataFrame) {
+final class DataFrameStatFunctions private[sql] (df: DataFrame) {
 
   /**
     * Calculates the approximate quantiles of a numerical column of a DataFrame.
@@ -63,9 +63,10 @@ final class DataFrameStatFunctions private[sql](df: DataFrame) {
     *
     * @since 2.0.0
     */
-  def approxQuantile(col: String,
-                     probabilities: Array[Double],
-                     relativeError: Double): Array[Double] = {
+  def approxQuantile(
+      col: String,
+      probabilities: Array[Double],
+      relativeError: Double): Array[Double] = {
     StatFunctions
       .multipleApproxQuantiles(df, Seq(col), probabilities, relativeError)
       .head
@@ -120,9 +121,10 @@ final class DataFrameStatFunctions private[sql](df: DataFrame) {
     * @since 1.4.0
     */
   def corr(col1: String, col2: String, method: String): Double = {
-    require(method == "pearson",
-            "Currently only the calculation of the Pearson Correlation " +
-            "coefficient is supported.")
+    require(
+      method == "pearson",
+      "Currently only the calculation of the Pearson Correlation " +
+        "coefficient is supported.")
     StatFunctions.pearsonCorrelation(df, Seq(col1, col2))
   }
 
@@ -333,9 +335,12 @@ final class DataFrameStatFunctions private[sql](df: DataFrame) {
     * @since 1.5.0
     */
   def sampleBy[T](
-      col: String, fractions: Map[T, Double], seed: Long): DataFrame = {
-    require(fractions.values.forall(p => p >= 0.0 && p <= 1.0),
-            s"Fractions must be in [0, 1], but got $fractions.")
+      col: String,
+      fractions: Map[T, Double],
+      seed: Long): DataFrame = {
+    require(
+      fractions.values.forall(p => p >= 0.0 && p <= 1.0),
+      s"Fractions must be in [0, 1], but got $fractions.")
     import org.apache.spark.sql.functions.{rand, udf}
     val c = Column(col)
     val r = rand(seed)
@@ -357,7 +362,9 @@ final class DataFrameStatFunctions private[sql](df: DataFrame) {
     * @since 1.5.0
     */
   def sampleBy[T](
-      col: String, fractions: ju.Map[T, jl.Double], seed: Long): DataFrame = {
+      col: String,
+      fractions: ju.Map[T, jl.Double],
+      seed: Long): DataFrame = {
     sampleBy(col, fractions.asScala.toMap.asInstanceOf[Map[T, Double]], seed)
   }
 
@@ -372,7 +379,10 @@ final class DataFrameStatFunctions private[sql](df: DataFrame) {
     * @since 2.0.0
     */
   def countMinSketch(
-      colName: String, depth: Int, width: Int, seed: Int): CountMinSketch = {
+      colName: String,
+      depth: Int,
+      width: Int,
+      seed: Int): CountMinSketch = {
     countMinSketch(Column(colName), depth, width, seed)
   }
 
@@ -386,10 +396,11 @@ final class DataFrameStatFunctions private[sql](df: DataFrame) {
     * @return a [[CountMinSketch]] over column `colName`
     * @since 2.0.0
     */
-  def countMinSketch(colName: String,
-                     eps: Double,
-                     confidence: Double,
-                     seed: Int): CountMinSketch = {
+  def countMinSketch(
+      colName: String,
+      eps: Double,
+      confidence: Double,
+      seed: Int): CountMinSketch = {
     countMinSketch(Column(colName), eps, confidence, seed)
   }
 
@@ -404,7 +415,10 @@ final class DataFrameStatFunctions private[sql](df: DataFrame) {
     * @since 2.0.0
     */
   def countMinSketch(
-      col: Column, depth: Int, width: Int, seed: Int): CountMinSketch = {
+      col: Column,
+      depth: Int,
+      width: Int,
+      seed: Int): CountMinSketch = {
     countMinSketch(col, CountMinSketch.create(depth, width, seed))
   }
 
@@ -418,15 +432,17 @@ final class DataFrameStatFunctions private[sql](df: DataFrame) {
     * @return a [[CountMinSketch]] over column `colName`
     * @since 2.0.0
     */
-  def countMinSketch(col: Column,
-                     eps: Double,
-                     confidence: Double,
-                     seed: Int): CountMinSketch = {
+  def countMinSketch(
+      col: Column,
+      eps: Double,
+      confidence: Double,
+      seed: Int): CountMinSketch = {
     countMinSketch(col, CountMinSketch.create(eps, confidence, seed))
   }
 
   private def countMinSketch(
-      col: Column, zero: CountMinSketch): CountMinSketch = {
+      col: Column,
+      zero: CountMinSketch): CountMinSketch = {
     val singleCol = df.select(col)
     val colType = singleCol.schema.head.dataType
 
@@ -436,32 +452,31 @@ final class DataFrameStatFunctions private[sql](df: DataFrame) {
       case StringType =>
         (sketch, row) =>
           sketch.addBinary(row.getUTF8String(0).getBytes)
-        case ByteType =>
+      case ByteType =>
         (sketch, row) =>
           sketch.addLong(row.getByte(0))
-        case ShortType =>
+      case ShortType =>
         (sketch, row) =>
           sketch.addLong(row.getShort(0))
-        case IntegerType =>
+      case IntegerType =>
         (sketch, row) =>
           sketch.addLong(row.getInt(0))
-        case LongType =>
+      case LongType =>
         (sketch, row) =>
           sketch.addLong(row.getLong(0))
-        case _ =>
+      case _ =>
         throw new IllegalArgumentException(
-            s"Count-min Sketch only supports string type and integral types, " +
+          s"Count-min Sketch only supports string type and integral types, " +
             s"and does not support type $colType."
         )
     }
 
     singleCol.queryExecution.toRdd.aggregate(zero)(
-        (sketch: CountMinSketch, row: InternalRow) =>
-          {
-            updater(sketch, row)
-            sketch
-        },
-        (sketch1, sketch2) => sketch1.mergeInPlace(sketch2)
+      (sketch: CountMinSketch, row: InternalRow) => {
+        updater(sketch, row)
+        sketch
+      },
+      (sketch1, sketch2) => sketch1.mergeInPlace(sketch2)
     )
   }
 
@@ -474,9 +489,10 @@ final class DataFrameStatFunctions private[sql](df: DataFrame) {
     * @since 2.0.0
     */
   def bloomFilter(
-      colName: String, expectedNumItems: Long, fpp: Double): BloomFilter = {
-    buildBloomFilter(
-        Column(colName), BloomFilter.create(expectedNumItems, fpp))
+      colName: String,
+      expectedNumItems: Long,
+      fpp: Double): BloomFilter = {
+    buildBloomFilter(Column(colName), BloomFilter.create(expectedNumItems, fpp))
   }
 
   /**
@@ -488,7 +504,9 @@ final class DataFrameStatFunctions private[sql](df: DataFrame) {
     * @since 2.0.0
     */
   def bloomFilter(
-      col: Column, expectedNumItems: Long, fpp: Double): BloomFilter = {
+      col: Column,
+      expectedNumItems: Long,
+      fpp: Double): BloomFilter = {
     buildBloomFilter(col, BloomFilter.create(expectedNumItems, fpp))
   }
 
@@ -501,9 +519,12 @@ final class DataFrameStatFunctions private[sql](df: DataFrame) {
     * @since 2.0.0
     */
   def bloomFilter(
-      colName: String, expectedNumItems: Long, numBits: Long): BloomFilter = {
+      colName: String,
+      expectedNumItems: Long,
+      numBits: Long): BloomFilter = {
     buildBloomFilter(
-        Column(colName), BloomFilter.create(expectedNumItems, numBits))
+      Column(colName),
+      BloomFilter.create(expectedNumItems, numBits))
   }
 
   /**
@@ -515,7 +536,9 @@ final class DataFrameStatFunctions private[sql](df: DataFrame) {
     * @since 2.0.0
     */
   def bloomFilter(
-      col: Column, expectedNumItems: Long, numBits: Long): BloomFilter = {
+      col: Column,
+      expectedNumItems: Long,
+      numBits: Long): BloomFilter = {
     buildBloomFilter(col, BloomFilter.create(expectedNumItems, numBits))
   }
 
@@ -524,8 +547,8 @@ final class DataFrameStatFunctions private[sql](df: DataFrame) {
     val colType = singleCol.schema.head.dataType
 
     require(
-        colType == StringType || colType.isInstanceOf[IntegralType],
-        s"Bloom filter only supports string type and integral types, but got $colType.")
+      colType == StringType || colType.isInstanceOf[IntegralType],
+      s"Bloom filter only supports string type and integral types, but got $colType.")
 
     val updater: (BloomFilter, InternalRow) => Unit = colType match {
       // For string type, we can get bytes of our `UTF8String` directly, and call the `putBinary`
@@ -533,32 +556,31 @@ final class DataFrameStatFunctions private[sql](df: DataFrame) {
       case StringType =>
         (filter, row) =>
           filter.putBinary(row.getUTF8String(0).getBytes)
-        case ByteType =>
+      case ByteType =>
         (filter, row) =>
           filter.putLong(row.getByte(0))
-        case ShortType =>
+      case ShortType =>
         (filter, row) =>
           filter.putLong(row.getShort(0))
-        case IntegerType =>
+      case IntegerType =>
         (filter, row) =>
           filter.putLong(row.getInt(0))
-        case LongType =>
+      case LongType =>
         (filter, row) =>
           filter.putLong(row.getLong(0))
-        case _ =>
+      case _ =>
         throw new IllegalArgumentException(
-            s"Bloom filter only supports string type and integral types, " +
+          s"Bloom filter only supports string type and integral types, " +
             s"and does not support type $colType."
         )
     }
 
     singleCol.queryExecution.toRdd.aggregate(zero)(
-        (filter: BloomFilter, row: InternalRow) =>
-          {
-            updater(filter, row)
-            filter
-        },
-        (filter1, filter2) => filter1.mergeInPlace(filter2)
+      (filter: BloomFilter, row: InternalRow) => {
+        updater(filter, row)
+        filter
+      },
+      (filter1, filter2) => filter1.mergeInPlace(filter2)
     )
   }
 }

@@ -2,24 +2,24 @@ package breeze.stats;
 
 /*
  Copyright 2009 David Hall, Daniel Ramage
- 
+
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
- You may obtain a copy of the License at 
- 
+ You may obtain a copy of the License at
+
  http://www.apache.org/licenses/LICENSE-2.0
- 
+
  Unless required by applicable law or agreed to in writing, software
  distributed under the License is distributed on an "AS IS" BASIS,
  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  See the License for the specific language governing permissions and
- limitations under the License. 
+ limitations under the License.
  */
 
 import scala.collection.mutable.{Seq => _, _};
 import distributions._;
 
-/** Implements statistical significance testing for the output of two systems by randomization. 
+/** Implements statistical significance testing for the output of two systems by randomization.
   * This system assumes they're on the same dataset, which changes the procedure.
   * Follows Teh, 2000 More accurate tests for the statistical significance of result differences.
   *
@@ -29,7 +29,8 @@ import distributions._;
   */
 // TODO: use quasi-random bit sequence.
 class RandomizationTest[L](
-    val numSamples: Int, val errorMeasure: Seq[L] => Double)
+    val numSamples: Int,
+    val errorMeasure: Seq[L] => Double)
     extends ((Seq[L], Seq[L]) => Double) {
   def this(errorMeasure: Seq[L] => Double) = this(5000, errorMeasure);
 

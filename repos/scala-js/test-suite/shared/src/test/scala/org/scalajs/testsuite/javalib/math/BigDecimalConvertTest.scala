@@ -21,7 +21,8 @@ class BigDecimalConvertTest {
     assertEquals(BigDecimal.valueOf(255).byteValue(), -1.toByte)
     assertEquals(BigDecimal.ONE.byteValueExact(), 1.toByte)
     expectThrows(
-        classOf[ArithmeticException], BigDecimal.valueOf(255).byteValueExact())
+      classOf[ArithmeticException],
+      BigDecimal.valueOf(255).byteValueExact())
   }
 
   @Test def testDoubleValueNeg(): Unit = {
@@ -169,7 +170,7 @@ class BigDecimalConvertTest {
     val a =
       "-123809648392384754573567356745735.63567890295784902768787678287E+21"
     val bNumber = new BigInteger(
-        "-123809648392384754573567356745735635678902957849027687")
+      "-123809648392384754573567356745735635678902957849027687")
     val aNumber = new BigDecimal(a)
     val result = aNumber.toBigInteger()
     assertTrue(result == bNumber)
@@ -179,7 +180,7 @@ class BigDecimalConvertTest {
     val a =
       "-123809648392384754573567356745735.63567890295784902768787678287E+15"
     val bNumber = new BigInteger(
-        "-123809648392384754573567356745735635678902957849")
+      "-123809648392384754573567356745735635678902957849")
     val aNumber = new BigDecimal(a)
     val result = aNumber.toBigInteger()
     assertTrue(result == bNumber)
@@ -189,7 +190,7 @@ class BigDecimalConvertTest {
     val a =
       "-123809648392384754573567356745735.63567890295784902768787678287E+45"
     val bNumber = new BigInteger(
-        "-123809648392384754573567356745735635678902957849027687876782870000000000000000")
+      "-123809648392384754573567356745735635678902957849027687876782870000000000000000")
     val aNumber = new BigDecimal(a)
     val result = aNumber.toBigInteger()
     assertTrue(result == bNumber)
@@ -199,7 +200,7 @@ class BigDecimalConvertTest {
     val a =
       "123809648392384754573567356745735.63567890295784902768787678287E+21"
     val bNumber = new BigInteger(
-        "123809648392384754573567356745735635678902957849027687")
+      "123809648392384754573567356745735635678902957849027687")
     val aNumber = new BigDecimal(a)
     val result = aNumber.toBigInteger()
     assertTrue(result == bNumber)
@@ -209,7 +210,7 @@ class BigDecimalConvertTest {
     val a =
       "123809648392384754573567356745735.63567890295784902768787678287E+15"
     val bNumber = new BigInteger(
-        "123809648392384754573567356745735635678902957849")
+      "123809648392384754573567356745735635678902957849")
     val aNumber = new BigDecimal(a)
     val result = aNumber.toBigInteger()
     assertTrue(result == bNumber)
@@ -219,7 +220,7 @@ class BigDecimalConvertTest {
     val a =
       "123809648392384754573567356745735.63567890295784902768787678287E+45"
     val bNumber = new BigInteger(
-        "123809648392384754573567356745735635678902957849027687876782870000000000000000")
+      "123809648392384754573567356745735635678902957849027687876782870000000000000000")
     val aNumber = new BigDecimal(a)
     val result = aNumber.toBigInteger()
     assertTrue(result == bNumber)
@@ -272,8 +273,8 @@ class BigDecimalConvertTest {
     val aNumber = new BigDecimal(a)
     val result =
       "-0.00000000000000000000000000000000000000000000000000000" +
-      "0000000000000012380964839238475457356735674573563567890295784902768" +
-      "787678287"
+        "0000000000000012380964839238475457356735674573563567890295784902768" +
+        "787678287"
     assertTrue(aNumber.toPlainString() == result)
   }
 
@@ -283,8 +284,8 @@ class BigDecimalConvertTest {
     val aNumber = new BigDecimal(a)
     val result =
       "-1238096483923847545735673567457356356789029578490276878" +
-      "7678287000000000000000000000000000000000000000000000000000000000000" +
-      "00000000000"
+        "7678287000000000000000000000000000000000000000000000000000000000000" +
+        "00000000000"
     assertTrue(aNumber.toPlainString() == result)
   }
 
@@ -294,8 +295,8 @@ class BigDecimalConvertTest {
     val aNumber = new BigDecimal(a)
     val result =
       "0.000000000000000000000000000000000000000000000000000000" +
-      "0000000000000123809648392384754573567356745735635678902957849027687" +
-      "87678287"
+        "0000000000000123809648392384754573567356745735635678902957849027687" +
+        "87678287"
     assertTrue(aNumber.toPlainString() == result)
   }
 
@@ -305,8 +306,8 @@ class BigDecimalConvertTest {
     val aNumber = new BigDecimal(a)
     val result =
       "12380964839238475457356735674573563567890295784902768787" +
-      "6782870000000000000000000000000000000000000000000000000000000000000" +
-      "0000000000"
+        "6782870000000000000000000000000000000000000000000000000000000000000" +
+        "0000000000"
     assertTrue(aNumber.toPlainString() == result)
   }
 

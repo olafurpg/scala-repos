@@ -8,8 +8,7 @@ import com.twitter.finagle.ServiceFactory
   * like P2C will use these to decide where to balance
   * the next request.
   */
-protected[loadbalancer] trait NodeT[Req, Rep]
-    extends ServiceFactory[Req, Rep] {
+protected[loadbalancer] trait NodeT[Req, Rep] extends ServiceFactory[Req, Rep] {
   type This
 
   /**

@@ -20,7 +20,14 @@ import java.io.{File, FileOutputStream, FilenameFilter, OutputStream}
 import java.nio.charset.Charset
 import java.util.{Calendar, Date, logging => javalog}
 
-import com.twitter.util.{TwitterDateFormat, HandleSignal, Return, StorageUnit, Time, Try}
+import com.twitter.util.{
+  TwitterDateFormat,
+  HandleSignal,
+  Return,
+  StorageUnit,
+  Time,
+  Try
+}
 
 sealed abstract class Policy
 object Policy {
@@ -34,10 +41,10 @@ object Policy {
   case class MaxSize(size: StorageUnit) extends Policy
 
   private[this] val singletonPolicyNames: Map[String, Policy] = Map(
-      "never" -> Never,
-      "hourly" -> Hourly,
-      "daily" -> Daily,
-      "sighup" -> SigHup)
+    "never" -> Never,
+    "hourly" -> Hourly,
+    "daily" -> Daily,
+    "sighup" -> SigHup)
 
   // Regex object that matches "Weekly(n)" and extracts the `dayOfWeek` number.
   private[this] val weeklyRegex = """(?i)weekly\(([1-7]+)\)""".r
@@ -54,13 +61,14 @@ object Policy {
     *   See `StorageUnit.parse(String)` for more details.
     */
   def parse(s: String): Policy =
-    (s,
-     singletonPolicyNames.get(s.toLowerCase),
-     Try(StorageUnit.parse(s.toLowerCase))) match {
+    (
+      s,
+      singletonPolicyNames.get(s.toLowerCase),
+      Try(StorageUnit.parse(s.toLowerCase))) match {
       case (weeklyRegex(dayOfWeek), _, _) => Weekly(dayOfWeek.toInt)
-      case (_, Some(singleton), _) => singleton
-      case (_, _, Return(storageUnit)) => MaxSize(storageUnit)
-      case _ => throw new Exception("Invalid log roll policy: " + s)
+      case (_, Some(singleton), _)        => singleton
+      case (_, _, Return(storageUnit))    => MaxSize(storageUnit)
+      case _                              => throw new Exception("Invalid log roll policy: " + s)
     }
 }
 
@@ -92,19 +100,25 @@ object FileHandler {
   ) =
     () =>
       new FileHandler(
-          filename, rollPolicy, append, rotateCount, formatter, level)
+        filename,
+        rollPolicy,
+        append,
+        rotateCount,
+        formatter,
+        level)
 }
 
 /**
   * A log handler that writes log entries into a file, and rolls this file
   * at a requested interval (hourly, daily, or weekly).
   */
-class FileHandler(path: String,
-                  rollPolicy: Policy,
-                  val append: Boolean,
-                  rotateCount: Int,
-                  formatter: Formatter,
-                  level: Option[Level])
+class FileHandler(
+    path: String,
+    rollPolicy: Policy,
+    val append: Boolean,
+    rotateCount: Int,
+    formatter: Formatter,
+    level: Option[Level])
     extends Handler(formatter, level) {
 
   // This converts relative paths to absolute paths, as expected
@@ -131,7 +145,7 @@ class FileHandler(path: String,
 
   private val maxFileSize: Option[StorageUnit] = rollPolicy match {
     case Policy.MaxSize(size) => Some(size)
-    case _ => None
+    case _                    => None
   }
 
   openLog()
@@ -191,11 +205,11 @@ class FileHandler(path: String,
     */
   def timeSuffix(date: Date) = {
     val dateFormat = rollPolicy match {
-      case Policy.Never => TwitterDateFormat("yyyy")
-      case Policy.SigHup => TwitterDateFormat("yyyy")
-      case Policy.Hourly => TwitterDateFormat("yyyyMMdd-HH")
-      case Policy.Daily => TwitterDateFormat("yyyyMMdd")
-      case Policy.Weekly(_) => TwitterDateFormat("yyyyMMdd")
+      case Policy.Never      => TwitterDateFormat("yyyy")
+      case Policy.SigHup     => TwitterDateFormat("yyyy")
+      case Policy.Hourly     => TwitterDateFormat("yyyyMMdd-HH")
+      case Policy.Daily      => TwitterDateFormat("yyyyMMdd")
+      case Policy.Weekly(_)  => TwitterDateFormat("yyyyMMdd")
       case Policy.MaxSize(_) => TwitterDateFormat("yyyyMMdd-HHmmss")
     }
     dateFormat.setCalendar(formatter.calendar)
@@ -219,21 +233,21 @@ class FileHandler(path: String,
     val rv = rollPolicy match {
       case Policy.MaxSize(_) | Policy.Never | Policy.SigHup => None
       case Policy.Hourly => {
-          next.add(Calendar.HOUR_OF_DAY, 1)
-          Some(next)
-        }
+        next.add(Calendar.HOUR_OF_DAY, 1)
+        Some(next)
+      }
       case Policy.Daily => {
-          next.set(Calendar.HOUR_OF_DAY, 0)
-          next.add(Calendar.DAY_OF_MONTH, 1)
-          Some(next)
-        }
+        next.set(Calendar.HOUR_OF_DAY, 0)
+        next.add(Calendar.DAY_OF_MONTH, 1)
+        Some(next)
+      }
       case Policy.Weekly(weekday) => {
-          next.set(Calendar.HOUR_OF_DAY, 0)
-          do {
-            next.add(Calendar.DAY_OF_MONTH, 1)
-          } while (next.get(Calendar.DAY_OF_WEEK) != weekday)
-          Some(next)
-        }
+        next.set(Calendar.HOUR_OF_DAY, 0)
+        do {
+          next.add(Calendar.DAY_OF_MONTH, 1)
+        } while (next.get(Calendar.DAY_OF_WEEK) != weekday)
+        Some(next)
+      }
     }
 
     rv map { _.getTimeInMillis }
@@ -250,11 +264,11 @@ class FileHandler(path: String,
       val rotatedFiles = new File(filename)
         .getParentFile()
         .listFiles(
-            new FilenameFilter {
-              def accept(f: File, fname: String): Boolean =
-                fname != name && fname.startsWith(prefixName) &&
+          new FilenameFilter {
+            def accept(f: File, fname: String): Boolean =
+              fname != name && fname.startsWith(prefixName) &&
                 fname.endsWith(filenameSuffix)
-            }
+          }
         )
         .sortBy(_.getName)
 

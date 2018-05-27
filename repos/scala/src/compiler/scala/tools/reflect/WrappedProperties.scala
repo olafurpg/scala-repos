@@ -39,7 +39,7 @@ trait WrappedProperties extends PropertiesTrait {
       val props = System.getProperties
       val it =
         props.stringPropertyNames().asScala.iterator map
-        (k => (k, props getProperty k)) filter (_._2 ne null)
+          (k => (k, props getProperty k)) filter (_._2 ne null)
       it.toList
     } getOrElse Nil
   }
@@ -47,8 +47,10 @@ trait WrappedProperties extends PropertiesTrait {
 
 object WrappedProperties {
   object AccessControl extends WrappedProperties {
-    def wrap[T](body: => T) = try Some(body) catch {
-      case _: AccessControlException => None
-    }
+    def wrap[T](body: => T) =
+      try Some(body)
+      catch {
+        case _: AccessControlException => None
+      }
   }
 }

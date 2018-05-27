@@ -26,14 +26,18 @@ object SerializationExamples extends Specification {
   implicit val formats = Serialization.formats(NoTypeHints)
 
   val project = Project(
-      "test",
-      new Date,
-      Some(Language("Scala", 2.75)),
-      List(Team("QA", List(Employee("John Doe", 5), Employee("Mike", 3))),
-           Team("Impl",
-                List(Employee("Mark", 4),
-                     Employee("Mary", 5),
-                     Employee("Nick Noob", 1)))))
+    "test",
+    new Date,
+    Some(Language("Scala", 2.75)),
+    List(
+      Team("QA", List(Employee("John Doe", 5), Employee("Mike", 3))),
+      Team(
+        "Impl",
+        List(
+          Employee("Mark", 4),
+          Employee("Mary", 5),
+          Employee("Nick Noob", 1))))
+  )
 
   "Project serialization example" in {
     val ser = swrite(project)
@@ -41,7 +45,10 @@ object SerializationExamples extends Specification {
   }
 
   case class Project(
-      name: String, startDate: Date, lang: Option[Language], teams: List[Team])
+      name: String,
+      startDate: Date,
+      lang: Option[Language],
+      teams: List[Team])
   case class Language(name: String, version: Double)
   case class Team(role: String, members: List[Employee])
   case class Employee(name: String, experience: Int)
@@ -61,15 +68,16 @@ object SerializationExamples extends Specification {
   }
 
   "Primitive-wrapping case class serialization example" in {
-    val primitives = Primitives(124,
-                                123L,
-                                126.5,
-                                127.5.floatValue,
-                                "128",
-                                's,
-                                125,
-                                129.byteValue,
-                                true)
+    val primitives = Primitives(
+      124,
+      123L,
+      126.5,
+      127.5.floatValue,
+      "128",
+      's,
+      125,
+      129.byteValue,
+      true)
     val ser = swrite(primitives)
     read[Primitives](ser) mustEqual primitives
   }
@@ -119,9 +127,11 @@ object SerializationExamples extends Specification {
 
   "Map serialization example" in {
     val p =
-      PersonWithAddresses("joe",
-                          Map("address1" -> Address("Bulevard", "Helsinki"),
-                              "address2" -> Address("Soho", "London")))
+      PersonWithAddresses(
+        "joe",
+        Map(
+          "address1" -> Address("Bulevard", "Helsinki"),
+          "address2" -> Address("Soho", "London")))
     val ser = swrite(p)
     read[PersonWithAddresses](ser) mustEqual p
   }
@@ -157,7 +167,7 @@ object SerializationExamples extends Specification {
   "Option serialization example" in {
     val ser = swrite(Some(List(1, 2)))
     (read[Option[List[Int]]](ser) mustEqual Some(List(1, 2))) and
-    (read[Option[List[Int]]]("") mustEqual None)
+      (read[Option[List[Int]]]("") mustEqual None)
   }
 
   "None Option of tuple serialization example" in {
@@ -203,11 +213,13 @@ object FullTypeHintExamples extends TypeHintExamples {
   import Serialization.{read, write => swrite}
 
   implicit val formats = Serialization.formats(
-      FullTypeHints(List[Class[_]](classOf[Animal],
-                                   classOf[True],
-                                   classOf[False],
-                                   classOf[Falcon],
-                                   classOf[Chicken])))
+    FullTypeHints(
+      List[Class[_]](
+        classOf[Animal],
+        classOf[True],
+        classOf[False],
+        classOf[Falcon],
+        classOf[Chicken])))
 
   "Ambiguous field decomposition example" in {
     val a = Ambiguous(False())
@@ -244,7 +256,7 @@ object CustomTypeHintFieldNameExample extends TypeHintExamples {
   implicit val formats = new Formats {
     val dateFormat = DefaultFormats.lossless.dateFormat
     override val typeHints = ShortTypeHints(
-        classOf[Fish] :: classOf[Dog] :: Nil)
+      classOf[Fish] :: classOf[Dog] :: Nil)
     override val typeHintFieldName = "$type$"
   }
 
@@ -294,22 +306,22 @@ object CustomSerializerExamples extends Specification {
   import java.util.regex.Pattern
 
   class IntervalSerializer
-      extends CustomSerializer[Interval](
-          format =>
-            ({
+      extends CustomSerializer[Interval](format =>
+        ({
           case JObject(
               JField("start", JInt(s)) :: JField("end", JInt(e)) :: Nil) =>
             new Interval(s.longValue, e.longValue)
         }, {
           case x: Interval =>
-            JObject(JField("start", JInt(BigInt(x.startTime))) :: JField(
-                    "end", JInt(BigInt(x.endTime))) :: Nil)
+            JObject(
+              JField("start", JInt(BigInt(x.startTime))) :: JField(
+                "end",
+                JInt(BigInt(x.endTime))) :: Nil)
         }))
 
   class PatternSerializer
-      extends CustomSerializer[Pattern](
-          format =>
-            ({
+      extends CustomSerializer[Pattern](format =>
+        ({
           case JObject(JField("$pattern", JString(s)) :: Nil) =>
             Pattern.compile(s)
         }, {
@@ -318,14 +330,13 @@ object CustomSerializerExamples extends Specification {
         }))
 
   class DateSerializer
-      extends CustomSerializer[Date](
-          format =>
-            ({
+      extends CustomSerializer[Date](format =>
+        ({
           case JObject(List(JField("$dt", JString(s)))) =>
             format.dateFormat
               .parse(s)
               .getOrElse(
-                  throw new MappingException("Can't parse " + s + " to Date"))
+                throw new MappingException("Can't parse " + s + " to Date"))
         }, {
           case x: Date =>
             JObject(JField("$dt", JString(format.dateFormat.format(x))) :: Nil)
@@ -338,13 +349,15 @@ object CustomSerializerExamples extends Specification {
         json match {
           case JArray(xs) =>
             val t = ptype.getOrElse(
-                throw new MappingException("parameterized type not known"))
+              throw new MappingException("parameterized type not known"))
             xs.map(
-                  x =>
-                    Extraction.extract(x,
-                                       TypeInfo(t.getActualTypeArguments()(0)
-                                                  .asInstanceOf[Class[_]],
-                                                None)))
+                x =>
+                  Extraction.extract(
+                    x,
+                    TypeInfo(
+                      t.getActualTypeArguments()(0)
+                        .asInstanceOf[Class[_]],
+                      None)))
               .toIndexedSeq
           case x =>
             throw new MappingException("Can't convert " + x + " to IndexedSeq")
@@ -358,7 +371,7 @@ object CustomSerializerExamples extends Specification {
 
   implicit val formats =
     Serialization.formats(NoTypeHints) + new IntervalSerializer +
-    new PatternSerializer + new DateSerializer + new IndexedSeqSerializer
+      new PatternSerializer + new DateSerializer + new IndexedSeqSerializer
 
   "Interval serialization example" in {
     val i = new Interval(1, 4)

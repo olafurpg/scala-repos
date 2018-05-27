@@ -35,7 +35,9 @@ object ControlledShutdownResponse {
       partitionsRemaining += new TopicAndPartition(topic, partition)
     }
     new ControlledShutdownResponse(
-        correlationId, errorCode, partitionsRemaining)
+      correlationId,
+      errorCode,
+      partitionsRemaining)
   }
 }
 

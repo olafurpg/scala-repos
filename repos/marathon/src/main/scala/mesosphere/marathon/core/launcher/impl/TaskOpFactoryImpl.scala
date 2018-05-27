@@ -44,17 +44,17 @@ class TaskOpFactoryImpl @Inject()(config: MarathonConf, clock: Clock)
       .map {
         case (taskInfo, ports) =>
           val task = Task.LaunchedEphemeral(
-              taskId = Task.Id(taskInfo.getTaskId),
-              agentInfo = Task.AgentInfo(
-                    host = offer.getHostname,
-                    agentId = Some(offer.getSlaveId.getValue),
-                    attributes = offer.getAttributesList.asScala
-                ),
-              appVersion = app.version,
-              status = Task.Status(
-                    stagedAt = clock.now()
-                ),
-              networking = Task.HostPorts(ports)
+            taskId = Task.Id(taskInfo.getTaskId),
+            agentInfo = Task.AgentInfo(
+              host = offer.getHostname,
+              agentId = Some(offer.getSlaveId.getValue),
+              attributes = offer.getAttributesList.asScala
+            ),
+            appVersion = app.version,
+            status = Task.Status(
+              stagedAt = clock.now()
+            ),
+            networking = Task.HostPorts(ports)
           )
           taskOperationFactory.launch(taskInfo, task)
       }
@@ -70,7 +70,7 @@ class TaskOpFactoryImpl @Inject()(config: MarathonConf, clock: Clock)
 
     val acceptedResourceRoles: Set[String] = {
       val roles = app.acceptedResourceRoles.getOrElse(
-          config.defaultAcceptedResourceRolesSet)
+        config.defaultAcceptedResourceRolesSet)
       if (log.isDebugEnabled)
         log.debug(s"inferForResidents, acceptedResourceRoles $roles")
       roles
@@ -99,24 +99,25 @@ class TaskOpFactoryImpl @Inject()(config: MarathonConf, clock: Clock)
         maybeVolumeMatch.flatMap { volumeMatch =>
           val matchingReservedResourcesWithoutVolumes =
             ResourceMatcher.matchResources(
-                offer,
-                app,
-                tasks.values,
-                ResourceSelector(
-                    config.mesosRole.get.toSet,
-                    reserved = true,
-                    requiredLabels = TaskLabels.labelsForTask(
-                          request.frameworkId, volumeMatch.task)
-                )
+              offer,
+              app,
+              tasks.values,
+              ResourceSelector(
+                config.mesosRole.get.toSet,
+                reserved = true,
+                requiredLabels = TaskLabels
+                  .labelsForTask(request.frameworkId, volumeMatch.task)
+              )
             )
 
           matchingReservedResourcesWithoutVolumes.flatMap {
             otherResourcesMatch =>
-              launchOnReservation(app,
-                                  offer,
-                                  volumeMatch.task,
-                                  matchingReservedResourcesWithoutVolumes,
-                                  maybeVolumeMatch)
+              launchOnReservation(
+                app,
+                offer,
+                volumeMatch.task,
+                matchingReservedResourcesWithoutVolumes,
+                maybeVolumeMatch)
           }
         }
       } else None
@@ -124,14 +125,17 @@ class TaskOpFactoryImpl @Inject()(config: MarathonConf, clock: Clock)
     def maybeReserveAndCreateVolumes =
       if (needToReserve) {
         val matchingResourcesForReservation = ResourceMatcher.matchResources(
-            offer,
-            app,
-            tasks.values,
-            ResourceSelector(acceptedResourceRoles, reserved = false)
+          offer,
+          app,
+          tasks.values,
+          ResourceSelector(acceptedResourceRoles, reserved = false)
         )
         matchingResourcesForReservation.map { resourceMatch =>
           reserveAndCreateVolumes(
-              request.frameworkId, app, offer, resourceMatch)
+            request.frameworkId,
+            app,
+            offer,
+            resourceMatch)
         }
       } else None
 
@@ -150,11 +154,12 @@ class TaskOpFactoryImpl @Inject()(config: MarathonConf, clock: Clock)
     new TaskBuilder(app, (_) => task.taskId, config)
       .build(offer, resourceMatch, volumeMatch) map {
       case (taskInfo, ports) =>
-        val launch = TaskStateOp.Launch(appVersion = app.version,
-                                        status = Task.Status(
-                                              stagedAt = clock.now()
-                                          ),
-                                        networking = Task.HostPorts(ports))
+        val launch = TaskStateOp.Launch(
+          appVersion = app.version,
+          status = Task.Status(
+            stagedAt = clock.now()
+          ),
+          networking = Task.HostPorts(ports))
 
         // FIXME (3221): something like reserved.launch(...): LaunchedOnReservation so we don't need to match?
         task.update(launch) match {
@@ -163,7 +168,7 @@ class TaskOpFactoryImpl @Inject()(config: MarathonConf, clock: Clock)
 
           case unexpected: TaskStateChange =>
             throw new scala.RuntimeException(
-                s"Expected TaskStateChange.Update but got $unexpected")
+              s"Expected TaskStateChange.Update but got $unexpected")
         }
     }
   }
@@ -180,16 +185,20 @@ class TaskOpFactoryImpl @Inject()(config: MarathonConf, clock: Clock)
     }
     val persistentVolumeIds = localVolumes.map(_.id)
     val task = Task.Reserved(
-        taskId = Task.Id.forApp(app.id),
-        agentInfo = Task.AgentInfo(
-              host = offer.getHostname,
-              agentId = Some(offer.getSlaveId.getValue),
-              attributes = offer.getAttributesList.asScala
-          ),
-        reservation = Task.Reservation(
-              persistentVolumeIds, Task.Reservation.State.New(timeout = None))
+      taskId = Task.Id.forApp(app.id),
+      agentInfo = Task.AgentInfo(
+        host = offer.getHostname,
+        agentId = Some(offer.getSlaveId.getValue),
+        attributes = offer.getAttributesList.asScala
+      ),
+      reservation = Task.Reservation(
+        persistentVolumeIds,
+        Task.Reservation.State.New(timeout = None))
     )
     taskOperationFactory.reserveAndCreateVolumes(
-        frameworkId, task, resourceMatch.resources, localVolumes)
+      frameworkId,
+      task,
+      resourceMatch.resources,
+      localVolumes)
   }
 }

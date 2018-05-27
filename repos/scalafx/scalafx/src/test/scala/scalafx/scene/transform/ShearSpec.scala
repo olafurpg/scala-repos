@@ -42,7 +42,8 @@ import scalafx.testutil.{PositionDelegateSpec, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class ShearSpec
     extends SimpleSFXDelegateSpec[jfxst.Shear, Shear](
-        classOf[jfxst.Shear], classOf[Shear])
+      classOf[jfxst.Shear],
+      classOf[Shear])
     with PositionDelegateSpec[Shear] {
 
   val positionDelegate = getScalaClassInstance

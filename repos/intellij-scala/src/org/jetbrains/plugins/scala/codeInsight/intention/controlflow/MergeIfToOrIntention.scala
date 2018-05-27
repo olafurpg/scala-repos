@@ -26,7 +26,9 @@ class MergeIfToOrIntention extends PsiElementBaseIntentionAction {
   override def getText: String = "Merge sequential 'if's"
 
   def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+      project: Project,
+      editor: Editor,
+      element: PsiElement): Boolean = {
     val ifStmt: ScIfStmt =
       PsiTreeUtil.getParentOfType(element, classOf[ScIfStmt], false)
     if (ifStmt == null) return false
@@ -40,9 +42,9 @@ class MergeIfToOrIntention extends PsiElementBaseIntentionAction {
     if (ifStmt.condition.orNull == null) return false
 
     if (!(thenBranch.getTextRange.getEndOffset <= offset &&
-            offset <= elseBranch.getTextRange.getStartOffset) &&
+          offset <= elseBranch.getTextRange.getStartOffset) &&
         !(ifStmt.getTextRange.getStartOffset <= offset &&
-            offset <= ifStmt.condition.get.getTextRange.getStartOffset))
+          offset <= ifStmt.condition.get.getTextRange.getStartOffset))
       return false
 
     val innerThenBranch = elseBranch.asInstanceOf[ScIfStmt].thenBranch.orNull
@@ -55,8 +57,7 @@ class MergeIfToOrIntention extends PsiElementBaseIntentionAction {
           case (block1: ScBlockExpr, block2: ScBlockExpr)
               if block1.exprs.size != block2.exprs.size =>
             1
-          case (block1: ScBlockExpr, block2: ScBlockExpr)
-              if block1 == block2 =>
+          case (block1: ScBlockExpr, block2: ScBlockExpr) if block1 == block2 =>
             0
           case (expr1: ScExpression, expr2: ScExpression) if expr1 == expr2 =>
             0
@@ -66,7 +67,10 @@ class MergeIfToOrIntention extends PsiElementBaseIntentionAction {
     }
 
     PsiEquivalenceUtil.areElementsEquivalent(
-        thenBranch, innerThenBranch, comparator, false)
+      thenBranch,
+      innerThenBranch,
+      comparator,
+      false)
   }
 
   override def invoke(project: Project, editor: Editor, element: PsiElement) {
@@ -93,7 +97,8 @@ class MergeIfToOrIntention extends PsiElementBaseIntentionAction {
 
     val newIfStmt: ScExpression =
       ScalaPsiElementFactory.createExpressionFromText(
-          expr.toString(), element.getManager)
+        expr.toString(),
+        element.getManager)
 
     inWriteAction {
       ifStmt.replaceExpression(newIfStmt, true)

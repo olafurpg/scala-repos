@@ -17,7 +17,11 @@
 
 package org.apache.spark.ml.param
 
-import java.io.{ByteArrayOutputStream, NotSerializableException, ObjectOutputStream}
+import java.io.{
+  ByteArrayOutputStream,
+  NotSerializableException,
+  ObjectOutputStream
+}
 
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.ml.util.MyParams
@@ -62,17 +66,18 @@ class ParamsSuite extends SparkFunSuite {
     {
       // FloatParam
       val param = new FloatParam(dummy, "name", "doc")
-      for (value <- Seq(Float.NaN,
-                        Float.NegativeInfinity,
-                        Float.MinValue,
-                        -1.0f,
-                        -0.5f,
-                        0.0f,
-                        Float.MinPositiveValue,
-                        0.5f,
-                        1.0f,
-                        Float.MaxValue,
-                        Float.PositiveInfinity)) {
+      for (value <- Seq(
+             Float.NaN,
+             Float.NegativeInfinity,
+             Float.MinValue,
+             -1.0f,
+             -0.5f,
+             0.0f,
+             Float.MinPositiveValue,
+             0.5f,
+             1.0f,
+             Float.MaxValue,
+             Float.PositiveInfinity)) {
         val json = param.jsonEncode(value)
         val decoded = param.jsonDecode(json)
         if (value.isNaN) {
@@ -86,17 +91,18 @@ class ParamsSuite extends SparkFunSuite {
     {
       // DoubleParam
       val param = new DoubleParam(dummy, "name", "doc")
-      for (value <- Seq(Double.NaN,
-                        Double.NegativeInfinity,
-                        Double.MinValue,
-                        -1.0,
-                        -0.5,
-                        0.0,
-                        Double.MinPositiveValue,
-                        0.5,
-                        1.0,
-                        Double.MaxValue,
-                        Double.PositiveInfinity)) {
+      for (value <- Seq(
+             Double.NaN,
+             Double.NegativeInfinity,
+             Double.MinValue,
+             -1.0,
+             -0.5,
+             0.0,
+             Double.MinPositiveValue,
+             0.5,
+             1.0,
+             Double.MaxValue,
+             Double.PositiveInfinity)) {
         val json = param.jsonEncode(value)
         val decoded = param.jsonDecode(json)
         if (value.isNaN) {
@@ -120,10 +126,11 @@ class ParamsSuite extends SparkFunSuite {
     {
       // Param[Vector]
       val param = new Param[Vector](dummy, "name", "doc")
-      val values = Seq(Vectors.dense(Array.empty[Double]),
-                       Vectors.dense(0.0, 2.0),
-                       Vectors.sparse(0, Array.empty, Array.empty),
-                       Vectors.sparse(2, Array(1), Array(2.0)))
+      val values = Seq(
+        Vectors.dense(Array.empty[Double]),
+        Vectors.dense(0.0, 2.0),
+        Vectors.sparse(0, Array.empty, Array.empty),
+        Vectors.sparse(2, Array(1), Array(2.0)))
       for (value <- values) {
         val json = param.jsonEncode(value)
         assert(param.jsonDecode(json) === value)
@@ -144,17 +151,20 @@ class ParamsSuite extends SparkFunSuite {
     {
       // DoubleArrayParam
       val param = new DoubleArrayParam(dummy, "name", "doc")
-      val values: Seq[Array[Double]] = Seq(Array(),
-                                           Array(1.0),
-                                           Array(Double.NaN,
-                                                 Double.NegativeInfinity,
-                                                 Double.MinValue,
-                                                 -1.0,
-                                                 0.0,
-                                                 Double.MinPositiveValue,
-                                                 1.0,
-                                                 Double.MaxValue,
-                                                 Double.PositiveInfinity))
+      val values: Seq[Array[Double]] = Seq(
+        Array(),
+        Array(1.0),
+        Array(
+          Double.NaN,
+          Double.NegativeInfinity,
+          Double.MinValue,
+          -1.0,
+          0.0,
+          Double.MinPositiveValue,
+          1.0,
+          Double.MaxValue,
+          Double.PositiveInfinity)
+      )
       for (value <- values) {
         val json = param.jsonEncode(value)
         val decoded = param.jsonDecode(json)
@@ -174,9 +184,7 @@ class ParamsSuite extends SparkFunSuite {
       // StringArrayParam
       val param = new StringArrayParam(dummy, "name", "doc")
       val values: Seq[Array[String]] =
-        Seq(Array(),
-            Array(""),
-            Array("", "1", "abc", "quote\"", "newline\n"))
+        Seq(Array(), Array(""), Array("", "1", "abc", "quote\"", "newline\n"))
       for (value <- values) {
         val json = param.jsonEncode(value)
         assert(param.jsonDecode(json) === value)
@@ -199,7 +207,7 @@ class ParamsSuite extends SparkFunSuite {
 
     solver.setMaxIter(5)
     assert(
-        solver.explainParam(maxIter) === "maxIter: maximum number of iterations (>= 0) (default: 10, current: 5)")
+      solver.explainParam(maxIter) === "maxIter: maximum number of iterations (>= 0) (default: 10, current: 5)")
 
     assert(inputCol.toString === s"${uid}__inputCol")
 
@@ -286,10 +294,11 @@ class ParamsSuite extends SparkFunSuite {
     intercept[NoSuchElementException](solver.getInputCol)
 
     assert(
-        solver.explainParam(maxIter) === "maxIter: maximum number of iterations (>= 0) (default: 10, current: 100)")
-    assert(solver.explainParams() === Seq(handleInvalid, inputCol, maxIter)
-          .map(solver.explainParam)
-          .mkString("\n"))
+      solver.explainParam(maxIter) === "maxIter: maximum number of iterations (>= 0) (default: 10, current: 100)")
+    assert(
+      solver.explainParams() === Seq(handleInvalid, inputCol, maxIter)
+        .map(solver.explainParam)
+        .mkString("\n"))
 
     assert(solver.getParam("inputCol").eq(inputCol))
     assert(solver.getParam("maxIter").eq(maxIter))
@@ -349,21 +358,25 @@ class ParamsSuite extends SparkFunSuite {
     assert(ltEq1Double(1.0) && !ltEq1Double(1.1))
 
     val inRange02IntInclusive = ParamValidators.inRange[Int](0, 2)
-    assert(inRange02IntInclusive(0) && inRange02IntInclusive(1) &&
+    assert(
+      inRange02IntInclusive(0) && inRange02IntInclusive(1) &&
         inRange02IntInclusive(2) && !inRange02IntInclusive(-1) &&
         !inRange02IntInclusive(3))
-    val inRange02IntExclusive = ParamValidators.inRange[Int](
-        0, 2, lowerInclusive = false, upperInclusive = false)
-    assert(!inRange02IntExclusive(0) && inRange02IntExclusive(1) &&
+    val inRange02IntExclusive = ParamValidators
+      .inRange[Int](0, 2, lowerInclusive = false, upperInclusive = false)
+    assert(
+      !inRange02IntExclusive(0) && inRange02IntExclusive(1) &&
         !inRange02IntExclusive(2))
 
     val inRange02DoubleInclusive = ParamValidators.inRange[Double](0, 2)
-    assert(inRange02DoubleInclusive(0) && inRange02DoubleInclusive(1) &&
+    assert(
+      inRange02DoubleInclusive(0) && inRange02DoubleInclusive(1) &&
         inRange02DoubleInclusive(2) && !inRange02DoubleInclusive(-0.1) &&
         !inRange02DoubleInclusive(2.1))
-    val inRange02DoubleExclusive = ParamValidators.inRange[Double](
-        0, 2, lowerInclusive = false, upperInclusive = false)
-    assert(!inRange02DoubleExclusive(0) && inRange02DoubleExclusive(1) &&
+    val inRange02DoubleExclusive = ParamValidators
+      .inRange[Double](0, 2, lowerInclusive = false, upperInclusive = false)
+    assert(
+      !inRange02DoubleExclusive(0) && inRange02DoubleExclusive(1) &&
         !inRange02DoubleExclusive(2))
 
     val inArray = ParamValidators.inArray[Int](Array(1, 2))
@@ -384,10 +397,11 @@ class ParamsSuite extends SparkFunSuite {
   test("Filtering ParamMap") {
     val params1 = new MyParams("my_params1")
     val params2 = new MyParams("my_params2")
-    val paramMap = ParamMap(params1.intParam -> 1,
-                            params2.intParam -> 1,
-                            params1.doubleParam -> 0.2,
-                            params2.doubleParam -> 0.2)
+    val paramMap = ParamMap(
+      params1.intParam -> 1,
+      params2.intParam -> 1,
+      params1.doubleParam -> 0.2,
+      params2.doubleParam -> 0.2)
     val filteredParamMap = paramMap.filter(params1)
 
     assert(filteredParamMap.size === 2)
@@ -420,8 +434,7 @@ object ParamsSuite extends SparkFunSuite {
 
     val params = obj.params
     val paramNames = params.map(_.name)
-    require(
-        paramNames === paramNames.sorted, "params must be ordered by names")
+    require(paramNames === paramNames.sorted, "params must be ordered by names")
     params.foreach { p =>
       assert(p.parent === obj.uid)
       assert(obj.getParam(p.name) === p)
@@ -431,7 +444,7 @@ object ParamsSuite extends SparkFunSuite {
     val copyMethod = clazz.getMethod("copy", classOf[ParamMap])
     val copyReturnType = copyMethod.getReturnType
     require(
-        copyReturnType === obj.getClass,
-        s"${clazz.getName}.copy should return ${clazz.getName} instead of ${copyReturnType.getName}.")
+      copyReturnType === obj.getClass,
+      s"${clazz.getName}.copy should return ${clazz.getName} instead of ${copyReturnType.getName}.")
   }
 }

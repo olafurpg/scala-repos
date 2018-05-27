@@ -44,7 +44,7 @@ object FormatStringConverter {
 class FormatStringConverter[T <: AnyRef](
     delegate: jfxuc.FormatStringConverter[T])
     extends StringConverterDelegate[T, T, jfxuc.FormatStringConverter[T]](
-        delegate) {
+      delegate) {
 
   def this(format: Format) = this(new jfxuc.FormatStringConverter[T](format))
 }

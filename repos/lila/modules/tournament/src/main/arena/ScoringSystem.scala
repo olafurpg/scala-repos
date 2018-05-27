@@ -17,10 +17,10 @@ object ScoringSystem extends AbstractScoringSystem {
     val value =
       ((win, flag) match {
         case (Some(true), Double) => 4
-        case (Some(true), _) => 2
-        case (None, Double) => 2
-        case (None, _) => 1
-        case _ => 0
+        case (Some(true), _)      => 2
+        case (None, Double)       => 2
+        case (None, _)            => 1
+        case _                    => 0
       }) + (~win ?? berserk)
 
     def isBerserk = berserk > 0
@@ -45,20 +45,23 @@ object ScoringSystem extends AbstractScoringSystem {
             case None if p.quickDraw =>
               Score(Some(false), Normal, berserkValue)
             case None =>
-              Score(None,
-                    if (firstTwoAreWins(scores)) Double else Normal,
-                    berserkValue)
+              Score(
+                None,
+                if (firstTwoAreWins(scores)) Double else Normal,
+                berserkValue)
             case Some(w) if (userId == w) =>
-              Score(Some(true),
-                    if (firstTwoAreWins(scores)) Double
-                    else if (scores.headOption ?? (_.flag == StreakStarter))
-                      StreakStarter
-                    else
-                      n.flatMap(_.winner) match {
-                        case Some(w) if (userId == w) => StreakStarter
-                        case _ => Normal
-                      },
-                    berserkValue)
+              Score(
+                Some(true),
+                if (firstTwoAreWins(scores)) Double
+                else if (scores.headOption ?? (_.flag == StreakStarter))
+                  StreakStarter
+                else
+                  n.flatMap(_.winner) match {
+                    case Some(w) if (userId == w) => StreakStarter
+                    case _                        => Normal
+                  },
+                berserkValue
+              )
             case _ => Score(Some(false), Normal, berserkValue)
           }) :: scores
       }

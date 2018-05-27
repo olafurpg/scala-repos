@@ -22,53 +22,55 @@ class PortWithRoleCreatePortsResourcesTest extends MarathonSpec {
 
   test("one ranges resource for multiple ports of the same role") {
     val result = PortWithRole.createPortsResources(
-        Seq(PortWithRole("*", 2), PortWithRole("*", 10)))
-    assert(result == Seq(
-            rangesResource(Seq(Range(2, 2), Range(10, 10)), role = "*")))
+      Seq(PortWithRole("*", 2), PortWithRole("*", 10)))
+    assert(
+      result == Seq(
+        rangesResource(Seq(Range(2, 2), Range(10, 10)), role = "*")))
   }
 
   test("one ranges resource for consecutive multiple ports of the same role") {
     val result = PortWithRole.createPortsResources(
-        Seq(
-            PortWithRole("*", 2),
-            PortWithRole("*", 10),
-            PortWithRole("marathon", 11),
-            PortWithRole("*", 12)
-        ))
+      Seq(
+        PortWithRole("*", 2),
+        PortWithRole("*", 10),
+        PortWithRole("marathon", 11),
+        PortWithRole("*", 12)
+      ))
     assert(
-        result == Seq(
-            rangesResource(Seq(Range(2, 2), Range(10, 10)), role = "*"),
-            rangesResource(Seq(Range(11, 11)), role = "marathon"),
-            rangesResource(Seq(Range(12, 12)), role = "*")
-        ))
+      result == Seq(
+        rangesResource(Seq(Range(2, 2), Range(10, 10)), role = "*"),
+        rangesResource(Seq(Range(11, 11)), role = "marathon"),
+        rangesResource(Seq(Range(12, 12)), role = "*")
+      ))
   }
 
   test("combined consecutive ports of same role into one range") {
     val result = PortWithRole.createPortsResources(
-        Seq(
-            PortWithRole("*", 2),
-            PortWithRole("*", 3)
-        ))
-    assert(result == Seq(
-            rangesResource(Seq(Range(2, 3)), role = "*")
-        ))
+      Seq(
+        PortWithRole("*", 2),
+        PortWithRole("*", 3)
+      ))
+    assert(
+      result == Seq(
+        rangesResource(Seq(Range(2, 3)), role = "*")
+      ))
   }
 
   test("complex example") {
     val result = PortWithRole.createPortsResources(
-        Seq(
-            PortWithRole("*", 2),
-            PortWithRole("*", 3),
-            PortWithRole("*", 10),
-            PortWithRole("marathon", 11),
-            PortWithRole("*", 12)
-        ))
+      Seq(
+        PortWithRole("*", 2),
+        PortWithRole("*", 3),
+        PortWithRole("*", 10),
+        PortWithRole("marathon", 11),
+        PortWithRole("*", 12)
+      ))
     assert(
-        result == Seq(
-            rangesResource(Seq(Range(2, 3), Range(10, 10)), role = "*"),
-            rangesResource(Seq(Range(11, 11)), role = "marathon"),
-            rangesResource(Seq(Range(12, 12)), role = "*")
-        ))
+      result == Seq(
+        rangesResource(Seq(Range(2, 3), Range(10, 10)), role = "*"),
+        rangesResource(Seq(Range(11, 11)), role = "marathon"),
+        rangesResource(Seq(Range(12, 12)), role = "*")
+      ))
   }
 
   def rangesResource(ranges: Seq[Range], role: String): MesosProtos.Resource = {

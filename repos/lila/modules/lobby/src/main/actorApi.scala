@@ -5,32 +5,35 @@ import lila.game.Game
 import lila.socket.SocketMember
 import lila.user.User
 
-private[lobby] case class LobbyUser(id: String,
-                                    username: String,
-                                    troll: Boolean,
-                                    engine: Boolean,
-                                    booster: Boolean,
-                                    ratingMap: Map[String, Int],
-                                    blocking: Set[String]) {
+private[lobby] case class LobbyUser(
+    id: String,
+    username: String,
+    troll: Boolean,
+    engine: Boolean,
+    booster: Boolean,
+    ratingMap: Map[String, Int],
+    blocking: Set[String]) {
   def lame = engine || booster
 }
 
 private[lobby] object LobbyUser {
 
   def make(user: User, blocking: Set[String]) =
-    LobbyUser(id = user.id,
-              username = user.username,
-              troll = user.troll,
-              engine = user.engine,
-              booster = user.booster,
-              ratingMap = user.perfs.ratingMap,
-              blocking = blocking)
+    LobbyUser(
+      id = user.id,
+      username = user.username,
+      troll = user.troll,
+      engine = user.engine,
+      booster = user.booster,
+      ratingMap = user.perfs.ratingMap,
+      blocking = blocking)
 }
 
-private[lobby] case class Member(channel: JsChannel,
-                                 user: Option[LobbyUser],
-                                 uid: String,
-                                 mobile: Boolean)
+private[lobby] case class Member(
+    channel: JsChannel,
+    user: Option[LobbyUser],
+    uid: String,
+    mobile: Boolean)
     extends SocketMember {
 
   val userId = user map (_.id)
@@ -39,15 +42,17 @@ private[lobby] case class Member(channel: JsChannel,
 
 private[lobby] object Member {
 
-  def apply(channel: JsChannel,
-            user: Option[User],
-            blocking: Set[String],
-            uid: String,
-            mobile: Boolean): Member =
-    Member(channel = channel,
-           user = user map { LobbyUser.make(_, blocking) },
-           uid = uid,
-           mobile = mobile)
+  def apply(
+      channel: JsChannel,
+      user: Option[User],
+      blocking: Set[String],
+      uid: String,
+      mobile: Boolean): Member =
+    Member(
+      channel = channel,
+      user = user map { LobbyUser.make(_, blocking) },
+      uid = uid,
+      mobile = mobile)
 }
 
 private[lobby] case class HookMeta(hookId: Option[String] = None)
@@ -64,14 +69,25 @@ private[lobby] case class RemoveHooks(hooks: Set[Hook])
 private[lobby] case class CancelHook(uid: String)
 private[lobby] case class CancelSeek(seekId: String, user: LobbyUser)
 private[lobby] case class BiteHook(
-    hookId: String, uid: String, user: Option[LobbyUser])
+    hookId: String,
+    uid: String,
+    user: Option[LobbyUser])
 private[lobby] case class BiteSeek(seekId: String, user: LobbyUser)
 private[lobby] case class JoinHook(
-    uid: String, hook: Hook, game: Game, creatorColor: chess.Color)
+    uid: String,
+    hook: Hook,
+    game: Game,
+    creatorColor: chess.Color)
 private[lobby] case class JoinSeek(
-    userId: String, seek: Seek, game: Game, creatorColor: chess.Color)
+    userId: String,
+    seek: Seek,
+    game: Game,
+    creatorColor: chess.Color)
 private[lobby] case class Join(
-    uid: String, user: Option[User], blocking: Set[String], mobile: Boolean)
+    uid: String,
+    user: Option[User],
+    blocking: Set[String],
+    mobile: Boolean)
 private[lobby] case object Resync
 private[lobby] case class HookIds(ids: Vector[String])
 

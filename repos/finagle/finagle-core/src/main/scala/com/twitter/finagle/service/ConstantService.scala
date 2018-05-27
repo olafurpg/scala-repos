@@ -23,4 +23,4 @@ class FailedService(failure: Throwable)
   */
 object NilService
     extends FailedService(
-        new Exception("dispatch to invalid service") with NoStacktrace)
+      new Exception("dispatch to invalid service") with NoStacktrace)

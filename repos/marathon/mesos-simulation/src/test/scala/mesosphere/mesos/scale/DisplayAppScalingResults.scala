@@ -13,7 +13,11 @@ object DisplayAppScalingResults {
       ScalingTestResultFiles.readJson[Seq[JsObject]](fileName)
 
     val header = IndexedSeq(
-        "relative time (ms)", "staged", "running", "newRunning/s", "instances")
+      "relative time (ms)",
+      "staged",
+      "running",
+      "newRunning/s",
+      "instances")
     var lastTimestamp: Long = 0
     var lastRunning: Long = 0
     val rows = appInfos.map { jsObject: JsObject =>
@@ -27,16 +31,18 @@ object DisplayAppScalingResults {
       lastRunning = running
       val instances = (jsObject \ "instances").as[Long]
 
-      IndexedSeq(relativeTimestamp,
-                 staged,
-                 running,
-                 newRunningPerSecond.round,
-                 instances)
+      IndexedSeq(
+        relativeTimestamp,
+        staged,
+        running,
+        newRunningPerSecond.round,
+        instances)
     }
 
     import DisplayHelpers.right
-    DisplayHelpers.printTable(Seq(right, right, right, right, right),
-                              DisplayHelpers.withUnderline(header) ++ rows)
+    DisplayHelpers.printTable(
+      Seq(right, right, right, right, right),
+      DisplayHelpers.withUnderline(header) ++ rows)
   }
 
   def displayMetrics(fileName: String): Unit = {
@@ -71,102 +77,108 @@ object DisplayAppScalingResults {
   }
 
   def displayMeters(meters: Map[String, JsObject]): Unit = {
-    val header = IndexedSeq("meter",
-                            "count",
-                            "m15_rate",
-                            "m5_rate",
-                            "m1_rate",
-                            "mean_rate",
-                            "units")
+    val header = IndexedSeq(
+      "meter",
+      "count",
+      "m15_rate",
+      "m5_rate",
+      "m1_rate",
+      "mean_rate",
+      "units")
     val rows: Seq[IndexedSeq[Any]] = meters.map {
       case (meter: String, jsObject: JsObject) =>
         def d(fieldName: String): Any =
           (jsObject \ fieldName).asOpt[Double].map(_.round).getOrElse("-")
 
         val units: String = (jsObject \ "units").asOpt[String].getOrElse("-")
-        IndexedSeq[Any](shortenName(meter),
-                        d("count"),
-                        d("m15_rate"),
-                        d("m5_rate"),
-                        d("m1_rate"),
-                        d("mean_rate"),
-                        units)
+        IndexedSeq[Any](
+          shortenName(meter),
+          d("count"),
+          d("m15_rate"),
+          d("m5_rate"),
+          d("m1_rate"),
+          d("mean_rate"),
+          units)
     }.toSeq
 
-    val sortedRows = rows.sortBy(-_ (1).asInstanceOf[Long])
+    val sortedRows = rows.sortBy(-_(1).asInstanceOf[Long])
 
     import DisplayHelpers.{left, right}
     DisplayHelpers.printTable(
-        Seq(left, right, right, right, right, right, left),
-        DisplayHelpers.withUnderline(header) ++ sortedRows)
+      Seq(left, right, right, right, right, right, left),
+      DisplayHelpers.withUnderline(header) ++ sortedRows)
   }
 
   def displayHistograms(histograms: Map[String, JsObject]): Unit = {
-    val header = IndexedSeq("histogram",
-                            "count",
-                            "mean",
-                            "min",
-                            "p50",
-                            "p75",
-                            "p95",
-                            "p98",
-                            "p99",
-                            "p999",
-                            "max",
-                            "stddev")
+    val header = IndexedSeq(
+      "histogram",
+      "count",
+      "mean",
+      "min",
+      "p50",
+      "p75",
+      "p95",
+      "p98",
+      "p99",
+      "p999",
+      "max",
+      "stddev")
     val rows: Seq[IndexedSeq[Any]] = histograms.map {
       case (histogram: String, jsObject: JsObject) =>
         def d(fieldName: String): Any =
           (jsObject \ fieldName).asOpt[Double].map(_.round).getOrElse("-")
 
-        IndexedSeq[Any](shortenName(histogram),
-                        d("count"),
-                        d("mean"),
-                        d("min"),
-                        d("p50"),
-                        d("p75"),
-                        d("p95"),
-                        d("p98"),
-                        d("p99"),
-                        d("p999"),
-                        d("max"),
-                        d("stddev"))
+        IndexedSeq[Any](
+          shortenName(histogram),
+          d("count"),
+          d("mean"),
+          d("min"),
+          d("p50"),
+          d("p75"),
+          d("p95"),
+          d("p98"),
+          d("p99"),
+          d("p999"),
+          d("max"),
+          d("stddev"))
     }.toSeq
 
-    val sortedRows = rows.sortBy(-_ (1).asInstanceOf[Long])
+    val sortedRows = rows.sortBy(-_(1).asInstanceOf[Long])
 
     import DisplayHelpers.{left, right}
     DisplayHelpers.printTable(
-        Seq(left,
-            right,
-            right,
-            right,
-            right,
-            right,
-            right,
-            right,
-            right,
-            right,
-            right,
-            right),
-        DisplayHelpers.withUnderline(header) ++ sortedRows)
+      Seq(
+        left,
+        right,
+        right,
+        right,
+        right,
+        right,
+        right,
+        right,
+        right,
+        right,
+        right,
+        right),
+      DisplayHelpers.withUnderline(header) ++ sortedRows)
   }
 
   def displayTimers(timers: Map[String, JsObject]): Unit = {
-    val header = IndexedSeq("timer",
-                            "count",
-                            "mean",
-                            "min",
-                            "p50",
-                            "p75",
-                            "p95",
-                            "p98",
-                            "p99",
-                            "p999",
-                            "max",
-                            "stddev",
-                            "mean_rate",
-                            "units")
+    val header = IndexedSeq(
+      "timer",
+      "count",
+      "mean",
+      "min",
+      "p50",
+      "p75",
+      "p95",
+      "p98",
+      "p99",
+      "p999",
+      "max",
+      "stddev",
+      "mean_rate",
+      "units")
     val rows: Seq[IndexedSeq[Any]] = timers.map {
       case (timer: String, jsObject: JsObject) =>
         def d1000(fieldName: String): Any =
@@ -179,41 +191,44 @@ object DisplayAppScalingResults {
 
         val rateUnits: String =
           (jsObject \ "rate_units").asOpt[String].getOrElse("-")
-        IndexedSeq[Any](shortenName(timer),
-                        dFull("count"),
-                        d1000("mean"),
-                        d1000("min"),
-                        d1000("p50"),
-                        d1000("p75"),
-                        d1000("p95"),
-                        d1000("p98"),
-                        d1000("p99"),
-                        d1000("p999"),
-                        d1000("max"),
-                        d1000("stddev"),
-                        dFull("mean_rate"),
-                        rateUnits)
+        IndexedSeq[Any](
+          shortenName(timer),
+          dFull("count"),
+          d1000("mean"),
+          d1000("min"),
+          d1000("p50"),
+          d1000("p75"),
+          d1000("p95"),
+          d1000("p98"),
+          d1000("p99"),
+          d1000("p999"),
+          d1000("max"),
+          d1000("stddev"),
+          dFull("mean_rate"),
+          rateUnits
+        )
     }.toSeq
 
-    val sortedRows = rows.sortBy(-_ (1).asInstanceOf[Long])
+    val sortedRows = rows.sortBy(-_(1).asInstanceOf[Long])
 
     import DisplayHelpers.{left, right}
     DisplayHelpers.printTable(
-        Seq(left,
-            right,
-            right,
-            right,
-            right,
-            right,
-            right,
-            right,
-            right,
-            right,
-            right,
-            right,
-            right,
-            left),
-        DisplayHelpers.withUnderline(header) ++ sortedRows)
+      Seq(
+        left,
+        right,
+        right,
+        right,
+        right,
+        right,
+        right,
+        right,
+        right,
+        right,
+        right,
+        right,
+        right,
+        left),
+      DisplayHelpers.withUnderline(header) ++ sortedRows)
   }
 
   def main(args: Array[String]): Unit = {

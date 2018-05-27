@@ -20,15 +20,17 @@ class RequestHeaderSpec extends Specification {
         rh.host must_== "playframework.com"
       }
       "absolute uri" in {
-        val rh = DummyRequestHeader("GET",
-                                    "https://example.com/test",
-                                    Headers(HOST -> "playframework.com"))
+        val rh = DummyRequestHeader(
+          "GET",
+          "https://example.com/test",
+          Headers(HOST -> "playframework.com"))
         rh.host must_== "example.com"
       }
       "absolute uri with port" in {
-        val rh = DummyRequestHeader("GET",
-                                    "https://example.com:8080/test",
-                                    Headers(HOST -> "playframework.com"))
+        val rh = DummyRequestHeader(
+          "GET",
+          "https://example.com:8080/test",
+          Headers(HOST -> "playframework.com"))
         rh.host must_== "example.com:8080"
       }
     }
@@ -49,33 +51,34 @@ class RequestHeaderSpec extends Specification {
 
       "parse multiple accept languages" in {
         accept("en-US, es") must contain(
-            exactly(Lang("en-US"), Lang("es")).inOrder)
+          exactly(Lang("en-US"), Lang("es")).inOrder)
       }
 
       "sort accept languages by quality" in {
         accept("en-US;q=0.8, es;q=0.7") must contain(
-            exactly(Lang("en-US"), Lang("es")).inOrder)
+          exactly(Lang("en-US"), Lang("es")).inOrder)
         accept("en-US;q=0.7, es;q=0.8") must contain(
-            exactly(Lang("es"), Lang("en-US")).inOrder)
+          exactly(Lang("es"), Lang("en-US")).inOrder)
       }
 
       "default accept language quality to 1" in {
         accept("en-US, es;q=0.7") must contain(
-            exactly(Lang("en-US"), Lang("es")).inOrder)
+          exactly(Lang("en-US"), Lang("es")).inOrder)
         accept("en-US;q=0.7, es") must contain(
-            exactly(Lang("es"), Lang("en-US")).inOrder)
+          exactly(Lang("es"), Lang("en-US")).inOrder)
       }
     }
   }
 
   def accept(value: String) =
     DummyRequestHeader(
-        headers = Headers("Accept-Language" -> value)
+      headers = Headers("Accept-Language" -> value)
     ).acceptLanguages
 
-  case class DummyRequestHeader(requestMethod: String = "GET",
-                                requestUri: String = "/",
-                                headers: Headers = Headers())
+  case class DummyRequestHeader(
+      requestMethod: String = "GET",
+      requestUri: String = "/",
+      headers: Headers = Headers())
       extends RequestHeader {
     private[this] val parsedUri = new URI(requestUri)
     def id = 1

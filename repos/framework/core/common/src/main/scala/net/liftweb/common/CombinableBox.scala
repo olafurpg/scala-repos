@@ -30,15 +30,14 @@ object CombinableBox {
 
   private implicit def emptyBoxToFailure(eb: EmptyBox): Failure = eb match {
     case (f: Failure) => f
-    case Empty => Failure("Empty")
+    case Empty        => Failure("Empty")
   }
 
   implicit def boxToCombinableBox[A](in: Box[A]): CombinableBox[A, HNil] =
-    CombinableBox(
-        in match {
-      case Full(a) => Right(a :+: HNil)
+    CombinableBox(in match {
+      case Full(a)      => Right(a :+: HNil)
       case (f: Failure) => Left(f :: Nil)
-      case _ => Left(Failure("Empty") :: Nil)
+      case _            => Left(Failure("Empty") :: Nil)
     })
 
   implicit def boxableToCombinableBox[A](
@@ -49,13 +48,10 @@ object CombinableBox {
     CombinableBox(in)
 
   implicit def resultToBox[A](result: Result[A]): Box[A] = result match {
-    case Left(Nil) => Empty
+    case Left(Nil)      => Empty
     case Left(f :: Nil) => f
     case Left(f) =>
-      new ParamFailure("Multiple Failures",
-                       Empty,
-                       Empty,
-                       FailureList(f))
+      new ParamFailure("Multiple Failures", Empty, Empty, FailureList(f))
     case Right(x) => Full(x)
   }
 
@@ -73,9 +69,9 @@ object CombinableBox {
     def :&:[A](lhs: Box[A]): Result[A :+: B :+: C] =
       (lhs, rhs) match {
         case (failure: EmptyBox, Left(failures)) => Left(failure :: failures)
-        case (failure: EmptyBox, _) => Left(failure :: Nil)
-        case (_, Left(failures)) => Left(failures)
-        case (Full(success), Right(successes)) => Right(success :+: successes)
+        case (failure: EmptyBox, _)              => Left(failure :: Nil)
+        case (_, Left(failures))                 => Left(failures)
+        case (Full(success), Right(successes))   => Right(success :+: successes)
       }
   }
 }

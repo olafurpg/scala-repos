@@ -4,16 +4,16 @@ case class Vote(up: Int, down: Int, sum: Int) {
 
   def add(v: Boolean) =
     copy(
-        up = up + v.fold(1, 0),
-        down = down + v.fold(0, 1)
+      up = up + v.fold(1, 0),
+      down = down + v.fold(0, 1)
     ).computeSum
 
   def change(from: Boolean, to: Boolean) =
     if (from == to) this
     else
       copy(
-          up = up + to.fold(1, -1),
-          down = down + to.fold(-1, 1)
+        up = up + to.fold(1, -1),
+        down = down + to.fold(-1, 1)
       ).computeSum
 
   def count = up + down

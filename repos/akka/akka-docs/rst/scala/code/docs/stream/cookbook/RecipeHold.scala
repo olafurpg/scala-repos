@@ -17,8 +17,7 @@ object HoldOps {
 
     override val shape = FlowShape.of(in, out)
 
-    override def createLogic(
-        inheritedAttributes: Attributes): GraphStageLogic =
+    override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
       new GraphStageLogic(shape) {
         private var currentValue: T = initial
 
@@ -49,26 +48,29 @@ object HoldOps {
 
     override val shape = FlowShape.of(in, out)
 
-    override def createLogic(
-        inheritedAttributes: Attributes): GraphStageLogic =
+    override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
       new GraphStageLogic(shape) {
         private var currentValue: T = _
         private var waitingFirstValue = true
 
-        setHandlers(in, out, new InHandler with OutHandler {
-          override def onPush(): Unit = {
-            currentValue = grab(in)
-            if (waitingFirstValue) {
-              waitingFirstValue = false
-              if (isAvailable(out)) push(out, currentValue)
+        setHandlers(
+          in,
+          out,
+          new InHandler with OutHandler {
+            override def onPush(): Unit = {
+              currentValue = grab(in)
+              if (waitingFirstValue) {
+                waitingFirstValue = false
+                if (isAvailable(out)) push(out, currentValue)
+              }
+              pull(in)
             }
-            pull(in)
-          }
 
-          override def onPull(): Unit = {
-            if (!waitingFirstValue) push(out, currentValue)
+            override def onPull(): Unit = {
+              if (!waitingFirstValue) push(out, currentValue)
+            }
           }
-        })
+        )
 
         override def preStart(): Unit = {
           pull(in)

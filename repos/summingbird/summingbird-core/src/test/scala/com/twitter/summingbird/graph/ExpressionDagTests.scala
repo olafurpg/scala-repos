@@ -78,7 +78,8 @@ object ExpressionDagTests extends Properties("ExpressionDag") {
   def toLiteral = new GenFunction[Formula, L] {
     def apply[T] = { (form: Formula[T]) =>
       def recurse[T2](
-          memo: HMap[Formula, L], f: Formula[T2]): (HMap[Formula, L], L[T2]) =
+          memo: HMap[Formula, L],
+          f: Formula[T2]): (HMap[Formula, L], L[T2]) =
         memo.get(f) match {
           case Some(l) => (memo, l)
           case None =>
@@ -102,9 +103,9 @@ object ExpressionDagTests extends Properties("ExpressionDag") {
                 def makeLit[T1](s: Sum[T1]) = {
                   val (m1, fl) = recurse(memo, s.left)
                   val (m2, fr) = recurse(m1, s.right)
-                  val lit = BinaryLit(
-                      fl, fr, { (f: Formula[T1], g: Formula[T1]) =>
-                    Sum(f, g)
+                  val lit = BinaryLit(fl, fr, {
+                    (f: Formula[T1], g: Formula[T1]) =>
+                      Sum(f, g)
                   })
                   (m2 + (s -> lit), lit)
                 }
@@ -113,9 +114,9 @@ object ExpressionDagTests extends Properties("ExpressionDag") {
                 def makeLit[T1](p: Product[T1]) = {
                   val (m1, fl) = recurse(memo, p.left)
                   val (m2, fr) = recurse(m1, p.right)
-                  val lit = BinaryLit(
-                      fl, fr, { (f: Formula[T1], g: Formula[T1]) =>
-                    Product(f, g)
+                  val lit = BinaryLit(fl, fr, {
+                    (f: Formula[T1], g: Formula[T1]) =>
+                      Product(f, g)
                   })
                   (m2 + (p -> lit), lit)
                 }
@@ -132,7 +133,7 @@ object ExpressionDagTests extends Properties("ExpressionDag") {
   object CombineInc extends Rule[Formula] {
     def apply[T](on: ExpressionDag[Formula]) = {
       case Inc(i @ Inc(a, b), c) if on.fanOut(i) == 1 => Some(Inc(a, b + c))
-      case _ => None
+      case _                                          => None
     }
   }
 
@@ -162,9 +163,9 @@ object ExpressionDagTests extends Properties("ExpressionDag") {
   property("RemoveInc removes all Inc") = forAll(genForm) { form =>
     val noIncForm = ExpressionDag.applyRule(form, toLiteral, RemoveInc)
     def noInc(f: Formula[Int]): Boolean = f match {
-      case Constant(_) => true
-      case Inc(_, _) => false
-      case Sum(l, r) => noInc(l) && noInc(r)
+      case Constant(_)   => true
+      case Inc(_, _)     => false
+      case Sum(l, r)     => noInc(l) && noInc(r)
       case Product(l, r) => noInc(l) && noInc(r)
     }
     noInc(noIncForm) && (noIncForm.evaluate == form.evaluate)
@@ -180,13 +181,13 @@ object ExpressionDagTests extends Properties("ExpressionDag") {
       type BoolT[T] = Boolean // constant type function
       dag.idToExp
         .collect(
-            new GenPartial[HMap[Id, ExpressionDag[Formula]#E]#Pair, BoolT] {
-          def apply[T] = {
-            case (id, expr) =>
-              val node = expr.evaluate(dag.idToExp)
-              dag.idOf(node) == id
-          }
-        })
+          new GenPartial[HMap[Id, ExpressionDag[Formula]#E]#Pair, BoolT] {
+            def apply[T] = {
+              case (id, expr) =>
+                val node = expr.evaluate(dag.idToExp)
+                dag.idOf(node) == id
+            }
+          })
         .forall(identity)
   }
 
@@ -202,9 +203,9 @@ object ExpressionDagTests extends Properties("ExpressionDag") {
   property("CombineInc compresses linear Inc chains") = forAll(genChain) {
     chain =>
       ExpressionDag.applyRule(chain, toLiteral, CombineInc) match {
-        case Constant(n) => true
+        case Constant(n)         => true
         case Inc(Constant(n), b) => true
-        case _ => false // All others should have been compressed
+        case _                   => false // All others should have been compressed
       }
   }
 
@@ -213,16 +214,16 @@ object ExpressionDagTests extends Properties("ExpressionDag") {
     */
   object EvaluationRule extends Rule[Formula] {
     def apply[T](on: ExpressionDag[Formula]) = {
-      case Sum(Constant(a), Constant(b)) => Some(Constant(a + b))
+      case Sum(Constant(a), Constant(b))     => Some(Constant(a + b))
       case Product(Constant(a), Constant(b)) => Some(Constant(a * b))
-      case Inc(Constant(a), b) => Some(Constant(a + b))
-      case _ => None
+      case Inc(Constant(a), b)               => Some(Constant(a + b))
+      case _                                 => None
     }
   }
   property("EvaluationRule totally evaluates") = forAll(genForm) { form =>
     ExpressionDag.applyRule(form, toLiteral, EvaluationRule) match {
       case Constant(x) if x == form.evaluate => true
-      case _ => false
+      case _                                 => false
     }
   }
 }

@@ -28,9 +28,10 @@ import org.apache.spark.rdd.RDD
   * @param intercept model intercept
   * @param diagInvAtWA diagonal of matrix (A^T * W * A)^-1
   */
-private[ml] class WeightedLeastSquaresModel(val coefficients: DenseVector,
-                                            val intercept: Double,
-                                            val diagInvAtWA: DenseVector)
+private[ml] class WeightedLeastSquaresModel(
+    val coefficients: DenseVector,
+    val intercept: Double,
+    val diagInvAtWA: DenseVector)
     extends Serializable {
 
   def predict(features: Vector): Double = {
@@ -61,17 +62,19 @@ private[ml] class WeightedLeastSquaresModel(val coefficients: DenseVector,
   * @param standardizeLabel whether to standardize label. If true, delta is the population standard
   *                         deviation of the label column b. Otherwise, delta is 1.0.
   */
-private[ml] class WeightedLeastSquares(val fitIntercept: Boolean,
-                                       val regParam: Double,
-                                       val standardizeFeatures: Boolean,
-                                       val standardizeLabel: Boolean)
-    extends Logging with Serializable {
+private[ml] class WeightedLeastSquares(
+    val fitIntercept: Boolean,
+    val regParam: Double,
+    val standardizeFeatures: Boolean,
+    val standardizeLabel: Boolean)
+    extends Logging
+    with Serializable {
   import WeightedLeastSquares._
 
   require(regParam >= 0.0, s"regParam cannot be negative: $regParam")
   if (regParam == 0.0) {
     logWarning(
-        "regParam is zero, which might cause numerical instability and overfitting.")
+      "regParam is zero, which might cause numerical instability and overfitting.")
   }
 
   /**
@@ -94,20 +97,23 @@ private[ml] class WeightedLeastSquares(val fitIntercept: Boolean,
 
     if (bStd == 0) {
       if (fitIntercept) {
-        logWarning(
-            s"The standard deviation of the label is zero, so the coefficients will be " +
-            s"zeros and the intercept will be the mean of the label; as a result, " +
-            s"training is not needed.")
+        logWarning(s"The standard deviation of the label is zero, so the coefficients will be " +
+          s"zeros and the intercept will be the mean of the label; as a result, " +
+          s"training is not needed.")
         val coefficients = new DenseVector(Array.ofDim(k - 1))
         val intercept = bBar
         val diagInvAtWA = new DenseVector(Array(0D))
         return new WeightedLeastSquaresModel(
-            coefficients, intercept, diagInvAtWA)
+          coefficients,
+          intercept,
+          diagInvAtWA)
       } else {
-        require(!(regParam > 0.0 && standardizeLabel),
-                "The standard deviation of the label is zero. " +
-                "Model cannot be regularized with standardization=true")
-        logWarning(s"The standard deviation of the label is zero. " +
+        require(
+          !(regParam > 0.0 && standardizeLabel),
+          "The standard deviation of the label is zero. " +
+            "Model cannot be regularized with standardization=true")
+        logWarning(
+          s"The standard deviation of the label is zero. " +
             "Consider setting fitIntercept=true.")
       }
     }
@@ -146,8 +152,7 @@ private[ml] class WeightedLeastSquares(val fitIntercept: Boolean,
     val aaInv = CholeskyDecomposition.inverse(aa, k)
 
     // aaInv is a packed upper triangular matrix, here we get all elements on diagonal
-    val diagInvAtWA = new DenseVector(
-        (1 to k).map { i =>
+    val diagInvAtWA = new DenseVector((1 to k).map { i =>
       aaInv(i + (i - 1) * i / 2 - 1) / wSum
     }.toArray)
 
@@ -189,9 +194,10 @@ private[ml] object WeightedLeastSquares {
 
     private def init(k: Int): Unit = {
       require(
-          k <= MAX_NUM_FEATURES,
-          "In order to take the normal equation approach efficiently, " +
-          s"we set the max number of features to $MAX_NUM_FEATURES but got $k.")
+        k <= MAX_NUM_FEATURES,
+        "In order to take the normal equation approach efficiently, " +
+          s"we set the max number of features to $MAX_NUM_FEATURES but got $k."
+      )
       this.k = k
       triK = k * (k + 1) / 2
       count = 0L
@@ -214,8 +220,9 @@ private[ml] object WeightedLeastSquares {
       if (!initialized) {
         init(ak)
       }
-      assert(ak == k,
-             s"Dimension mismatch. Expect vectors of size $k but got $ak.")
+      assert(
+        ak == k,
+        s"Dimension mismatch. Expect vectors of size $k but got $ak.")
       count += 1L
       wSum += w
       wwSum += w * w
@@ -237,8 +244,9 @@ private[ml] object WeightedLeastSquares {
         if (!initialized) {
           init(other.k)
         }
-        assert(k == other.k,
-               s"dimension mismatch: this.k = $k but other.k = ${other.k}")
+        assert(
+          k == other.k,
+          s"dimension mismatch: this.k = $k but other.k = ${other.k}")
         count += other.count
         wSum += other.wSum
         wwSum += other.wwSum

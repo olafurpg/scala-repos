@@ -34,7 +34,8 @@ object Test extends DirectTest {
       }
     }
     val expected = List((false, "C"), (true, "O"), (false, "C$D"))
-    assert(results.toList == expected,
-           s"expected: $expected, actual: ${results.toList}")
+    assert(
+      results.toList == expected,
+      s"expected: $expected, actual: ${results.toList}")
   }
 }

@@ -5,7 +5,7 @@
   * The ASF licenses this file to You under the Apache License, Version 2.0
   * (the "License"); you may not use this file except in compliance with
   * the License.  You may obtain a copy of the License at
-  * 
+  *
   *    http://www.apache.org/licenses/LICENSE-2.0
   *
   * Unless required by applicable law or agreed to in writing, software
@@ -72,10 +72,10 @@ object ConsumerConfig extends Config {
   def validateAutoOffsetReset(autoOffsetReset: String) {
     autoOffsetReset match {
       case OffsetRequest.SmallestTimeString =>
-      case OffsetRequest.LargestTimeString =>
+      case OffsetRequest.LargestTimeString  =>
       case _ =>
         throw new InvalidConfigException(
-            "Wrong value " +
+          "Wrong value " +
             autoOffsetReset + " of auto.offset.reset in ConsumerConfig; " +
             "Valid values are " + OffsetRequest.SmallestTimeString + " and " +
             OffsetRequest.LargestTimeString)
@@ -85,10 +85,10 @@ object ConsumerConfig extends Config {
   def validateOffsetsStorage(storage: String) {
     storage match {
       case "zookeeper" =>
-      case "kafka" =>
+      case "kafka"     =>
       case _ =>
         throw new InvalidConfigException(
-            "Wrong value " + storage +
+          "Wrong value " + storage +
             " of offsets.storage in consumer config; " +
             "Valid values are 'zookeeper' and 'kafka'")
     }
@@ -96,11 +96,11 @@ object ConsumerConfig extends Config {
 
   def validatePartitionAssignmentStrategy(strategy: String) {
     strategy match {
-      case "range" =>
+      case "range"      =>
       case "roundrobin" =>
       case _ =>
         throw new InvalidConfigException(
-            "Wrong value " + strategy +
+          "Wrong value " + strategy +
             " of partition.assignment.strategy in consumer config; " +
             "Valid values are 'range' and 'roundrobin'")
     }
@@ -157,9 +157,10 @@ class ConsumerConfig private (val props: VerifiableProperties)
 
   /** the maximum amount of time the server will block before answering the fetch request if there isn't sufficient data to immediately satisfy fetch.min.bytes */
   val fetchWaitMaxMs = props.getInt("fetch.wait.max.ms", MaxFetchWaitMs)
-  require(fetchWaitMaxMs <= socketTimeoutMs,
-          "socket.timeout.ms should always be at least fetch.wait.max.ms" +
-          " to prevent unnecessary socket timeouts")
+  require(
+    fetchWaitMaxMs <= socketTimeoutMs,
+    "socket.timeout.ms should always be at least fetch.wait.max.ms" +
+      " to prevent unnecessary socket timeouts")
 
   /** backoff time between retries during rebalance */
   val rebalanceBackoffMs = props.getInt("rebalance.backoff.ms", zkSyncTimeMs)
@@ -175,7 +176,8 @@ class ConsumerConfig private (val props: VerifiableProperties)
   /** socket timeout to use when reading responses for Offset Fetch/Commit requests. This timeout will also be used for
     *  the ConsumerMetdata requests that are used to query for the offset coordinator. */
   val offsetsChannelSocketTimeoutMs = props.getInt(
-      "offsets.channel.socket.timeout.ms", OffsetsChannelSocketTimeoutMs)
+    "offsets.channel.socket.timeout.ms",
+    OffsetsChannelSocketTimeoutMs)
 
   /** Retry the offset commit up to this many times on failure. This retry count only applies to offset commits during
     * shut-down. It does not apply to commits from the auto-commit thread. It also does not apply to attempts to query
@@ -193,7 +195,8 @@ class ConsumerConfig private (val props: VerifiableProperties)
     * given consumer group, it is safe to turn this off after all instances within that group have been migrated to
     * the new jar that commits offsets to the broker (instead of directly to ZooKeeper). */
   val dualCommitEnabled = props.getBoolean(
-      "dual.commit.enabled", if (offsetsStorage == "kafka") true else false)
+    "dual.commit.enabled",
+    if (offsetsStorage == "kafka") true else false)
 
   /* what to do if an offset is out of range.
      smallest : automatically reset the offset to the smallest offset
@@ -216,7 +219,8 @@ class ConsumerConfig private (val props: VerifiableProperties)
 
   /** Select a strategy for assigning partitions to consumer streams. Possible values: range, roundrobin */
   val partitionAssignmentStrategy = props.getString(
-      "partition.assignment.strategy", DefaultPartitionAssignmentStrategy)
+    "partition.assignment.strategy",
+    DefaultPartitionAssignmentStrategy)
 
   validate(this)
 }

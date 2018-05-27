@@ -25,7 +25,8 @@ class ScalaSupportProvider extends FrameworkSupportInModuleProvider {
   }
 
   override def isSupportAlreadyAdded(
-      module: Module, facetsProvider: FacetsProvider) = module.hasScala
+      module: Module,
+      facetsProvider: FacetsProvider) = module.hasScala
 
   override def createConfigurable(model: FrameworkSupportModel) =
     new ScalaSupportConfigurable()

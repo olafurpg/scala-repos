@@ -8,7 +8,14 @@ import java.util.concurrent.CompletionStage
 import play.api.libs.iteratee.Execution.trampoline
 import play.api.mvc._
 import play.mvc.{Result => JResult}
-import play.mvc.Http.{Context => JContext, Request => JRequest, RequestImpl => JRequestImpl, RequestHeader => JRequestHeader, Cookies => JCookies, Cookie => JCookie}
+import play.mvc.Http.{
+  Context => JContext,
+  Request => JRequest,
+  RequestImpl => JRequestImpl,
+  RequestHeader => JRequestHeader,
+  Cookies => JCookies,
+  Cookie => JCookie
+}
 import play.mvc.Http.RequestBody
 
 import scala.compat.java8.{FutureConverters, OptionConverters}
@@ -24,13 +31,14 @@ trait JavaHelpers {
   def cookiesToScalaCookies(
       cookies: java.lang.Iterable[play.mvc.Http.Cookie]): Seq[Cookie] = {
     cookies.asScala.toSeq map { c =>
-      Cookie(c.name,
-             c.value,
-             if (c.maxAge == null) None else Some(c.maxAge),
-             c.path,
-             Option(c.domain),
-             c.secure,
-             c.httpOnly)
+      Cookie(
+        c.name,
+        c.value,
+        if (c.maxAge == null) None else Some(c.maxAge),
+        c.path,
+        Option(c.domain),
+        c.secure,
+        c.httpOnly)
     }
   }
 
@@ -41,13 +49,14 @@ trait JavaHelpers {
       }
 
       private def makeJavaCookie(cookie: Cookie): JCookie = {
-        new JCookie(cookie.name,
-                    cookie.value,
-                    cookie.maxAge.map(i => new Integer(i)).orNull,
-                    cookie.path,
-                    cookie.domain.orNull,
-                    cookie.secure,
-                    cookie.httpOnly)
+        new JCookie(
+          cookie.name,
+          cookie.value,
+          cookie.maxAge.map(i => new Integer(i)).orNull,
+          cookie.path,
+          cookie.domain.orNull,
+          cookie.secure,
+          cookie.httpOnly)
       }
 
       def iterator: java.util.Iterator[JCookie] = {
@@ -89,12 +98,12 @@ trait JavaHelpers {
     */
   def createJavaContext(req: RequestHeader): JContext = {
     new JContext(
-        req.id,
-        req,
-        new JRequestImpl(req),
-        req.session.data.asJava,
-        req.flash.data.asJava,
-        req.tags.mapValues(_.asInstanceOf[AnyRef]).asJava
+      req.id,
+      req,
+      new JRequestImpl(req),
+      req.session.data.asJava,
+      req.flash.data.asJava,
+      req.tags.mapValues(_.asInstanceOf[AnyRef]).asJava
     )
   }
 
@@ -103,12 +112,13 @@ trait JavaHelpers {
     * @param req
     */
   def createJavaContext(req: Request[RequestBody]): JContext = {
-    new JContext(req.id,
-                 req,
-                 new JRequestImpl(req),
-                 req.session.data.asJava,
-                 req.flash.data.asJava,
-                 req.tags.mapValues(_.asInstanceOf[AnyRef]).asJava)
+    new JContext(
+      req.id,
+      req,
+      new JRequestImpl(req),
+      req.session.data.asJava,
+      req.flash.data.asJava,
+      req.tags.mapValues(_.asInstanceOf[AnyRef]).asJava)
   }
 
   /**
@@ -130,10 +140,11 @@ trait JavaHelpers {
     val javaContext = createJavaContext(request)
     try {
       JContext.current.set(javaContext)
-      Option(f(javaContext.request())).map(cs =>
-            FutureConverters
-              .toScala(cs)
-              .map(createResult(javaContext, _))(trampoline))
+      Option(f(javaContext.request())).map(
+        cs =>
+          FutureConverters
+            .toScala(cs)
+            .map(createResult(javaContext, _))(trampoline))
     } finally {
       JContext.current.remove()
     }
@@ -214,7 +225,8 @@ class RequestHeaderImpl(header: RequestHeader) extends JRequestHeader {
 
   def getQueryString(key: String): String = {
     if (queryString().containsKey(key) && queryString().get(key).length > 0)
-      queryString().get(key)(0) else null
+      queryString().get(key)(0)
+    else null
   }
 
   def cookie(name: String): JCookie = {
@@ -233,7 +245,7 @@ class RequestHeaderImpl(header: RequestHeader) extends JRequestHeader {
   private def createHeaderMap(
       headers: Headers): java.util.Map[String, Array[String]] = {
     val map = new java.util.TreeMap[String, Array[String]](
-        play.core.utils.CaseInsensitiveOrdered)
+      play.core.utils.CaseInsensitiveOrdered)
     map.putAll(headers.toMap.mapValues(_.toArray).asJava)
     map
   }

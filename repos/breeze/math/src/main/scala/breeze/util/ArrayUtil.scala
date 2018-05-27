@@ -51,23 +51,24 @@ object ArrayUtil {
       case x: Array[Boolean] =>
         Arrays.fill(x, offset, offset + length, v.asInstanceOf[Boolean])
       case x: Array[_] =>
-        Arrays.fill(x.asInstanceOf[Array[AnyRef]],
-                    offset,
-                    offset + length,
-                    v.asInstanceOf[AnyRef])
+        Arrays.fill(
+          x.asInstanceOf[Array[AnyRef]],
+          offset,
+          offset + length,
+          v.asInstanceOf[AnyRef])
       case _ => throw new RuntimeException("shouldn't be here!")
     }
   }
 
   def copyOf[V](a: Array[V], length: Int): Array[V] = {
     a match {
-      case x: Array[Double] => Arrays.copyOf(x, length).asInstanceOf[Array[V]]
-      case x: Array[Int] => Arrays.copyOf(x, length).asInstanceOf[Array[V]]
-      case x: Array[Float] => Arrays.copyOf(x, length).asInstanceOf[Array[V]]
-      case x: Array[Long] => Arrays.copyOf(x, length).asInstanceOf[Array[V]]
-      case x: Array[Short] => Arrays.copyOf(x, length).asInstanceOf[Array[V]]
-      case x: Array[Char] => Arrays.copyOf(x, length).asInstanceOf[Array[V]]
-      case x: Array[Byte] => Arrays.copyOf(x, length).asInstanceOf[Array[V]]
+      case x: Array[Double]  => Arrays.copyOf(x, length).asInstanceOf[Array[V]]
+      case x: Array[Int]     => Arrays.copyOf(x, length).asInstanceOf[Array[V]]
+      case x: Array[Float]   => Arrays.copyOf(x, length).asInstanceOf[Array[V]]
+      case x: Array[Long]    => Arrays.copyOf(x, length).asInstanceOf[Array[V]]
+      case x: Array[Short]   => Arrays.copyOf(x, length).asInstanceOf[Array[V]]
+      case x: Array[Char]    => Arrays.copyOf(x, length).asInstanceOf[Array[V]]
+      case x: Array[Byte]    => Arrays.copyOf(x, length).asInstanceOf[Array[V]]
       case x: Array[Boolean] => Arrays.copyOf(x, length).asInstanceOf[Array[V]]
       case x: Array[_] =>
         Arrays
@@ -106,12 +107,12 @@ object ArrayUtil {
   def newArrayLike[V](a: Array[V], length: Int): Array[V] = {
     a match {
       case x: Array[Double] => new Array[Double](length).asInstanceOf[Array[V]]
-      case x: Array[Int] => new Array[Int](length).asInstanceOf[Array[V]]
-      case x: Array[Float] => new Array[Float](length).asInstanceOf[Array[V]]
-      case x: Array[Long] => new Array[Long](length).asInstanceOf[Array[V]]
-      case x: Array[Short] => new Array[Short](length).asInstanceOf[Array[V]]
-      case x: Array[Char] => new Array[Char](length).asInstanceOf[Array[V]]
-      case x: Array[Byte] => new Array[Byte](length).asInstanceOf[Array[V]]
+      case x: Array[Int]    => new Array[Int](length).asInstanceOf[Array[V]]
+      case x: Array[Float]  => new Array[Float](length).asInstanceOf[Array[V]]
+      case x: Array[Long]   => new Array[Long](length).asInstanceOf[Array[V]]
+      case x: Array[Short]  => new Array[Short](length).asInstanceOf[Array[V]]
+      case x: Array[Char]   => new Array[Char](length).asInstanceOf[Array[V]]
+      case x: Array[Byte]   => new Array[Byte](length).asInstanceOf[Array[V]]
       case x: Array[Boolean] =>
         new Array[Boolean](length).asInstanceOf[Array[V]]
       case x: Array[_] =>
@@ -126,14 +127,15 @@ object ArrayUtil {
     * For reasons that I cannot explain java.util.Arrays.equals(Array(0.0), Array(-0.0)) == false
     * This method fixes that for floats and doubles
     */
-  def nonstupidEquals(a: Array[_],
-                      aoffset: Int,
-                      astride: Int,
-                      alength: Int,
-                      b: Array[_],
-                      boffset: Int,
-                      bstride: Int,
-                      blength: Int): Boolean = {
+  def nonstupidEquals(
+      a: Array[_],
+      aoffset: Int,
+      astride: Int,
+      alength: Int,
+      b: Array[_],
+      boffset: Int,
+      bstride: Int,
+      blength: Int): Boolean = {
     val ac = a.getClass
     val bc = b.getClass
     if (ac != bc || alength != blength) {
@@ -178,43 +180,52 @@ object ArrayUtil {
       a match {
         case x: Array[Double] =>
           Arrays.equals(
-              a.asInstanceOf[Array[Double]], b.asInstanceOf[Array[Double]])
+            a.asInstanceOf[Array[Double]],
+            b.asInstanceOf[Array[Double]])
         case x: Array[Int] =>
           Arrays.equals(a.asInstanceOf[Array[Int]], b.asInstanceOf[Array[Int]])
         case x: Array[Float] =>
           Arrays.equals(
-              a.asInstanceOf[Array[Float]], b.asInstanceOf[Array[Float]])
+            a.asInstanceOf[Array[Float]],
+            b.asInstanceOf[Array[Float]])
         case x: Array[Boolean] =>
           Arrays.equals(
-              a.asInstanceOf[Array[Boolean]], b.asInstanceOf[Array[Boolean]])
+            a.asInstanceOf[Array[Boolean]],
+            b.asInstanceOf[Array[Boolean]])
         case x: Array[Long] =>
           Arrays.equals(
-              a.asInstanceOf[Array[Long]], b.asInstanceOf[Array[Long]])
+            a.asInstanceOf[Array[Long]],
+            b.asInstanceOf[Array[Long]])
         case x: Array[Short] =>
           Arrays.equals(
-              a.asInstanceOf[Array[Short]], b.asInstanceOf[Array[Short]])
+            a.asInstanceOf[Array[Short]],
+            b.asInstanceOf[Array[Short]])
         case x: Array[Char] =>
           Arrays.equals(
-              a.asInstanceOf[Array[Char]], b.asInstanceOf[Array[Char]])
+            a.asInstanceOf[Array[Char]],
+            b.asInstanceOf[Array[Char]])
         case x: Array[Byte] =>
           Arrays.equals(
-              a.asInstanceOf[Array[Byte]], b.asInstanceOf[Array[Byte]])
+            a.asInstanceOf[Array[Byte]],
+            b.asInstanceOf[Array[Byte]])
         case x: Array[_] =>
           Arrays.equals(
-              a.asInstanceOf[Array[AnyRef]], b.asInstanceOf[Array[AnyRef]])
+            a.asInstanceOf[Array[AnyRef]],
+            b.asInstanceOf[Array[AnyRef]])
         case _ => throw new RuntimeException("shouldn't be here!")
       }
     }
   }
 
-  def equals(a: Array[_],
-             aoffset: Int,
-             astride: Int,
-             alength: Int,
-             b: Array[_],
-             boffset: Int,
-             bstride: Int,
-             blength: Int): Boolean = {
+  def equals(
+      a: Array[_],
+      aoffset: Int,
+      astride: Int,
+      alength: Int,
+      b: Array[_],
+      boffset: Int,
+      bstride: Int,
+      blength: Int): Boolean = {
     val ac = a.getClass
     val bc = b.getClass
     if (ac != bc || alength != blength) false
@@ -337,7 +348,10 @@ object ArrayUtil {
   }
 
   def gallopSearch(
-      objs: Array[Int], fromIndex: Int, toIndex: Int, toFind: Int): Int = {
+      objs: Array[Int],
+      fromIndex: Int,
+      toIndex: Int,
+      toFind: Int): Int = {
     if (objs.length == 0) return ~0
 
 //    if(toIndex - fromIndex <= 16) return linearSearch(objs, fromIndex, toIndex, toFind)
@@ -361,7 +375,10 @@ object ArrayUtil {
   }
 
   def zeroSkippingHashCode[V](
-      data: Array[V], offset: Int, stride: Int, length: Int): Int = {
+      data: Array[V],
+      offset: Int,
+      stride: Int,
+      length: Int): Int = {
     (data: Any) match {
       case x: Array[Double] =>
         zeroSkippingHashCodeImpl_Double(x, offset, stride, length)
@@ -384,9 +401,15 @@ object ArrayUtil {
   }
 
   @expand
-  private def zeroSkippingHashCodeImpl[
-      @expand.args(Int, Float, Double, Long, Byte, Short, Char, Boolean) V](
-      data: Array[V], offset: Int, stride: Int, length: Int): Int = {
+  private def zeroSkippingHashCodeImpl[@expand.args(
+    Int,
+    Float,
+    Double,
+    Long,
+    Byte,
+    Short,
+    Char,
+    Boolean) V](data: Array[V], offset: Int, stride: Int, length: Int): Int = {
     var hash = 43
     var i = offset
     cforRange(0 until length) { _ =>
@@ -399,7 +422,10 @@ object ArrayUtil {
   }
 
   private def zeroSkippingHashCodeImplSlow[V](
-      data: Array[V], offset: Int, stride: Int, length: Int): Int = {
+      data: Array[V],
+      offset: Int,
+      stride: Int,
+      length: Int): Int = {
     var hash = 43
     var i = offset
     cforRange(0 until length) { _ =>

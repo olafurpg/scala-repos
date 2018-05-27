@@ -58,13 +58,14 @@ class MatricesSuite extends SparkFunSuite {
     assert(mat.colPtrs.eq(colPtrs), "should not copy data")
     assert(mat.rowIndices.eq(rowIndices), "should not copy data")
 
-    val entries: Array[(Int, Int, Double)] = Array((2, 2, 3.0),
-                                                   (1, 0, 1.0),
-                                                   (2, 0, 2.0),
-                                                   (1, 2, 2.0),
-                                                   (2, 2, 2.0),
-                                                   (1, 2, 2.0),
-                                                   (0, 0, 0.0))
+    val entries: Array[(Int, Int, Double)] = Array(
+      (2, 2, 3.0),
+      (1, 0, 1.0),
+      (2, 0, 2.0),
+      (1, 2, 2.0),
+      (2, 2, 2.0),
+      (1, 2, 2.0),
+      (0, 0, 0.0))
 
     val mat2 = SparseMatrix.fromCOO(m, n, entries)
     assert(mat.toBreeze === mat2.toBreeze)
@@ -83,7 +84,11 @@ class MatricesSuite extends SparkFunSuite {
 
   test("index in matrices incorrect input") {
     val sm = Matrices.sparse(
-        3, 2, Array(0, 2, 3), Array(1, 2, 1), Array(0.0, 1.0, 2.0))
+      3,
+      2,
+      Array(0, 2, 3),
+      Array(1, 2, 1),
+      Array(0.0, 1.0, 2.0))
     val dm = Matrices.dense(3, 2, Array(0.0, 2.3, 1.4, 3.2, 1.0, 9.1))
     Array(sm, dm).foreach { mat =>
       intercept[IllegalArgumentException] { mat.index(4, 1) }
@@ -202,23 +207,28 @@ class MatricesSuite extends SparkFunSuite {
 
   test("transpose") {
     val dA = new DenseMatrix(
-        4,
-        3,
-        Array(0.0, 1.0, 0.0, 0.0, 2.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 3.0))
+      4,
+      3,
+      Array(0.0, 1.0, 0.0, 0.0, 2.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 3.0))
     val sA = new SparseMatrix(
-        4, 3, Array(0, 1, 3, 4), Array(1, 0, 2, 3), Array(1.0, 2.0, 1.0, 3.0))
+      4,
+      3,
+      Array(0, 1, 3, 4),
+      Array(1, 0, 2, 3),
+      Array(1.0, 2.0, 1.0, 3.0))
 
     val dAT = dA.transpose.asInstanceOf[DenseMatrix]
     val sAT = sA.transpose.asInstanceOf[SparseMatrix]
     val dATexpected = new DenseMatrix(
-        3,
-        4,
-        Array(0.0, 2.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 3.0))
-    val sATexpected = new SparseMatrix(3,
-                                       4,
-                                       Array(0, 1, 2, 3, 4),
-                                       Array(1, 0, 1, 2),
-                                       Array(2.0, 1.0, 1.0, 3.0))
+      3,
+      4,
+      Array(0.0, 2.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 3.0))
+    val sATexpected = new SparseMatrix(
+      3,
+      4,
+      Array(0, 1, 2, 3, 4),
+      Array(1, 0, 1, 2),
+      Array(2.0, 1.0, 1.0, 3.0))
 
     assert(dAT.toBreeze === dATexpected.toBreeze)
     assert(sAT.toBreeze === sATexpected.toBreeze)
@@ -228,8 +238,9 @@ class MatricesSuite extends SparkFunSuite {
     assert(sA(2, 1) === sAT(1, 2))
 
     assert(!dA.toArray.eq(dAT.toArray), "has to have a new array")
-    assert(dA.values.eq(dAT.transpose.asInstanceOf[DenseMatrix].values),
-           "should not copy array")
+    assert(
+      dA.values.eq(dAT.transpose.asInstanceOf[DenseMatrix].values),
+      "should not copy array")
 
     assert(dAT.toSparse.toBreeze === sATexpected.toBreeze)
     assert(sAT.toDense.toBreeze === dATexpected.toBreeze)
@@ -509,7 +520,11 @@ class MatricesSuite extends SparkFunSuite {
     assert(dm1.numActives === 6)
 
     val sm1 = Matrices.sparse(
-        3, 2, Array(0, 2, 3), Array(0, 2, 1), Array(0.0, -1.2, 0.0))
+      3,
+      2,
+      Array(0, 2, 3),
+      Array(0, 2, 1),
+      Array(0.0, -1.2, 0.0))
     assert(sm1.numNonzeros === 1)
     assert(sm1.numActives === 3)
   }

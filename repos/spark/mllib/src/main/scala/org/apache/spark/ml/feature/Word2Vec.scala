@@ -35,8 +35,12 @@ import org.apache.spark.sql.types._
   * Params for [[Word2Vec]] and [[Word2VecModel]].
   */
 private[feature] trait Word2VecBase
-    extends Params with HasInputCol with HasOutputCol with HasMaxIter
-    with HasStepSize with HasSeed {
+    extends Params
+    with HasInputCol
+    with HasOutputCol
+    with HasMaxIter
+    with HasStepSize
+    with HasSeed {
 
   /**
     * The dimension of the code that you want to transform from words.
@@ -44,9 +48,9 @@ private[feature] trait Word2VecBase
     * @group param
     */
   final val vectorSize = new IntParam(
-      this,
-      "vectorSize",
-      "the dimension of codes after transforming from words")
+    this,
+    "vectorSize",
+    "the dimension of codes after transforming from words")
   setDefault(vectorSize -> 100)
 
   /** @group getParam */
@@ -57,9 +61,9 @@ private[feature] trait Word2VecBase
     * @group expertParam
     */
   final val windowSize = new IntParam(
-      this,
-      "windowSize",
-      "the window size (context words from [-window, window])")
+    this,
+    "windowSize",
+    "the window size (context words from [-window, window])")
   setDefault(windowSize -> 5)
 
   /** @group expertGetParam */
@@ -71,7 +75,9 @@ private[feature] trait Word2VecBase
     * @group param
     */
   final val numPartitions = new IntParam(
-      this, "numPartitions", "number of partitions for sentences of words")
+    this,
+    "numPartitions",
+    "number of partitions for sentences of words")
   setDefault(numPartitions -> 1)
 
   /** @group getParam */
@@ -84,9 +90,9 @@ private[feature] trait Word2VecBase
     * @group param
     */
   final val minCount = new IntParam(
-      this,
-      "minCount",
-      "the minimum number of times a token must " +
+    this,
+    "minCount",
+    "the minimum number of times a token must " +
       "appear to be included in the word2vec model's vocabulary")
   setDefault(minCount -> 5)
 
@@ -101,7 +107,9 @@ private[feature] trait Word2VecBase
     */
   protected def validateAndTransformSchema(schema: StructType): StructType = {
     SchemaUtils.checkColumnType(
-        schema, $(inputCol), new ArrayType(StringType, true))
+      schema,
+      $(inputCol),
+      new ArrayType(StringType, true))
     SchemaUtils.appendColumn(schema, $(outputCol), new VectorUDT)
   }
 }
@@ -113,7 +121,8 @@ private[feature] trait Word2VecBase
   */
 @Experimental
 final class Word2Vec(override val uid: String)
-    extends Estimator[Word2VecModel] with Word2VecBase
+    extends Estimator[Word2VecModel]
+    with Word2VecBase
     with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("w2v"))
@@ -179,10 +188,12 @@ object Word2Vec extends DefaultParamsReadable[Word2Vec] {
   * Model fitted by [[Word2Vec]].
   */
 @Experimental
-class Word2VecModel private[ml](
+class Word2VecModel private[ml] (
     override val uid: String,
     @transient private val wordVectors: feature.Word2VecModel)
-    extends Model[Word2VecModel] with Word2VecBase with MLWritable {
+    extends Model[Word2VecModel]
+    with Word2VecBase
+    with MLWritable {
 
   import Word2VecModel._
 
@@ -194,8 +205,8 @@ class Word2VecModel private[ml](
     val sc = SparkContext.getOrCreate()
     val sqlContext = SQLContext.getOrCreate(sc)
     import sqlContext.implicits._
-    val wordVec = wordVectors.getVectors.mapValues(
-        vec => Vectors.dense(vec.map(_.toDouble)))
+    val wordVec = wordVectors.getVectors.mapValues(vec =>
+      Vectors.dense(vec.map(_.toDouble)))
     sc.parallelize(wordVec.toSeq).toDF("word", "vector")
   }
 
@@ -275,12 +286,14 @@ object Word2VecModel extends MLReadable[Word2VecModel] {
       extends MLWriter {
 
     private case class Data(
-        wordIndex: Map[String, Int], wordVectors: Seq[Float])
+        wordIndex: Map[String, Int],
+        wordVectors: Seq[Float])
 
     override protected def saveImpl(path: String): Unit = {
       DefaultParamsWriter.saveMetadata(instance, path, sc)
-      val data = Data(instance.wordVectors.wordIndex,
-                      instance.wordVectors.wordVectors.toSeq)
+      val data = Data(
+        instance.wordVectors.wordIndex,
+        instance.wordVectors.wordVectors.toSeq)
       val dataPath = new Path(path, "data").toString
       sqlContext
         .createDataFrame(Seq(data))

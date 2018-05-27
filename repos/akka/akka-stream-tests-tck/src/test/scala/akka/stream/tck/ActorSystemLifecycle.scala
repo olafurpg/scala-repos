@@ -26,7 +26,7 @@ trait ActorSystemLifecycle {
   def createActorSystem(): Unit = {
     _system = ActorSystem(Logging.simpleName(getClass), AkkaSpec.testConf)
     _system.eventStream.publish(
-        TestEvent.Mute(EventFilter[RuntimeException]("Test exception")))
+      TestEvent.Mute(EventFilter[RuntimeException]("Test exception")))
   }
 
   @AfterClass
@@ -37,9 +37,9 @@ trait ActorSystemLifecycle {
     } catch {
       case _: TimeoutException ⇒
         val msg = "Failed to stop [%s] within [%s] \n%s".format(
-            system.name,
-            shutdownTimeout,
-            system.asInstanceOf[ActorSystemImpl].printTree)
+          system.name,
+          shutdownTimeout,
+          system.asInstanceOf[ActorSystemImpl].printTree)
         throw new RuntimeException(msg)
     }
   }

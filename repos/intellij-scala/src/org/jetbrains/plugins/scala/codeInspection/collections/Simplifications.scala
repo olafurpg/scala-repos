@@ -2,7 +2,11 @@ package org.jetbrains.plugins.scala
 package codeInspection.collections
 
 import com.intellij.openapi.util.TextRange
-import com.intellij.psi.{PsiElement, SmartPointerManager, SmartPsiElementPointer}
+import com.intellij.psi.{
+  PsiElement,
+  SmartPointerManager,
+  SmartPsiElementPointer
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 
 import scala.language.implicitConversions
@@ -11,17 +15,18 @@ import scala.language.implicitConversions
   * Nikolay.Tropin
   * 5/21/13
   */
-case class Simplification(exprToReplace: SmartPsiElementPointer[ScExpression],
-                          replacementText: String,
-                          hint: String,
-                          rangeInParent: TextRange)
+case class Simplification(
+    exprToReplace: SmartPsiElementPointer[ScExpression],
+    replacementText: String,
+    hint: String,
+    rangeInParent: TextRange)
 
-class SimplificationBuilder private[collections](
+class SimplificationBuilder private[collections] (
     val exprToReplace: ScExpression) {
   private var rangeInParent: TextRange = {
     val exprToHighlightFrom: ScExpression = exprToReplace match {
       case MethodRepr(_, Some(base), _, _) => base
-      case _ => exprToReplace
+      case _                               => exprToReplace
     }
     rightRangeInParent(exprToHighlightFrom, exprToReplace)
   }
@@ -40,8 +45,8 @@ class SimplificationBuilder private[collections](
     highlightElem(refNameId(exprToReplace).getOrElse(exprToReplace))
 
   def highlightElem(elem: PsiElement) = {
-    this.rangeInParent = elem.getTextRange.shiftRight(
-        -exprToReplace.getTextOffset)
+    this.rangeInParent =
+      elem.getTextRange.shiftRight(-exprToReplace.getTextOffset)
     this
   }
 

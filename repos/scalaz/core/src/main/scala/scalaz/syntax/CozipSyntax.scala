@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Cozip` */
-final class CozipOps[F[_], A] private[syntax](val self: F[A])(
+final class CozipOps[F[_], A] private[syntax] (val self: F[A])(
     implicit val F: Cozip[F])
     extends Ops[F[A]] {
   ////

@@ -9,7 +9,8 @@ import com.wix.accord.dsl._
 import com.wix.accord._
 
 case class PathId(path: List[String], absolute: Boolean = true)
-    extends Ordered[PathId] with plugin.PathId {
+    extends Ordered[PathId]
+    with plugin.PathId {
 
   def root: String = path.headOption.getOrElse("")
 
@@ -23,8 +24,8 @@ case class PathId(path: List[String], absolute: Boolean = true)
   def isRoot: Boolean = path.isEmpty
 
   def parent: PathId = path match {
-    case Nil => this
-    case head :: Nil => PathId(Nil, absolute)
+    case Nil          => this
+    case head :: Nil  => PathId(Nil, absolute)
     case head :: rest => PathId(path.reverse.tail.reverse, absolute)
   }
 
@@ -44,7 +45,9 @@ case class PathId(path: List[String], absolute: Boolean = true)
   def /(id: String): PathId = append(id)
 
   def restOf(parent: PathId): PathId = {
-    def in(currentPath: List[String], parentPath: List[String]): List[String] = {
+    def in(
+        currentPath: List[String],
+        parentPath: List[String]): List[String] = {
       if (currentPath.isEmpty) Nil
       else if (parentPath.isEmpty || currentPath.head != parentPath.head)
         currentPath
@@ -54,15 +57,16 @@ case class PathId(path: List[String], absolute: Boolean = true)
   }
 
   def canonicalPath(base: PathId = PathId(Nil, absolute = true)): PathId = {
-    require(base.absolute,
-            "Base path is not absolute, canonical path can not be computed!")
+    require(
+      base.absolute,
+      "Base path is not absolute, canonical path can not be computed!")
     def in(remaining: List[String], result: List[String] = Nil): List[String] =
       remaining match {
         case head :: tail if head == "." => in(tail, result)
         case head :: tail if head == ".." =>
           in(tail, if (result.nonEmpty) result.tail else Nil)
         case head :: tail => in(tail, head :: result)
-        case Nil => result.reverse
+        case Nil          => result.reverse
       }
     if (absolute) PathId(in(path)) else PathId(in(base.path ::: path))
   }
@@ -95,11 +99,12 @@ object PathId {
   def fromSafePath(in: String): PathId =
     PathId(in.split("_").toList, absolute = true)
   def apply(in: String): PathId =
-    PathId(in.replaceAll("""(^/+)|(/+$)""", "")
-             .split("/")
-             .filter(_.nonEmpty)
-             .toList,
-           in.startsWith("/"))
+    PathId(
+      in.replaceAll("""(^/+)|(/+$)""", "")
+        .split("/")
+        .filter(_.nonEmpty)
+        .toList,
+      in.startsWith("/"))
   def empty: PathId = PathId(Nil)
 
   implicit class StringPathId(val stringPath: String) extends AnyVal {
@@ -119,8 +124,8 @@ object PathId {
   private val validPathChars = new Validator[PathId] {
     override def apply(pathId: PathId): Result = {
       validate(pathId.path)(
-          validator = pathId.path.each should matchRegexFully(
-                ID_PATH_SEGMENT_PATTERN.pattern))
+        validator = pathId.path.each should matchRegexFully(
+          ID_PATH_SEGMENT_PATTERN.pattern))
     }
   }
 
@@ -144,7 +149,7 @@ object PathId {
 
   private def childOf(parent: PathId): Validator[PathId] = {
     isTrue[PathId](
-        s"Identifier is not child of $parent. Hint: use relative paths.") {
+      s"Identifier is not child of $parent. Hint: use relative paths.") {
       child =>
         parent == PathId.empty || !parent.absolute ||
         (parent.absolute && child.canonicalPath(parent).parent == parent)

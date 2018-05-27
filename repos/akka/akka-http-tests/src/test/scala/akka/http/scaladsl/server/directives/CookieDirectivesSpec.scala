@@ -42,22 +42,25 @@ class CookieDirectivesSpec extends RoutingSpec {
       } ~> check {
         status shouldEqual OK
         header[`Set-Cookie`] shouldEqual Some(
-            `Set-Cookie`(HttpCookie("myCookie",
-                                    "deleted",
-                                    expires = deletedTimeStamp,
-                                    domain = Some("test.com"))))
+          `Set-Cookie`(
+            HttpCookie(
+              "myCookie",
+              "deleted",
+              expires = deletedTimeStamp,
+              domain = Some("test.com"))))
       }
     }
 
     "support deleting multiple cookies at a time" in {
       Get() ~> {
-        deleteCookie(HttpCookie("myCookie", "test.com"),
-                     HttpCookie("myCookie2", "foobar.com")) { completeOk }
+        deleteCookie(
+          HttpCookie("myCookie", "test.com"),
+          HttpCookie("myCookie2", "foobar.com")) { completeOk }
       } ~> check {
         status shouldEqual OK
         headers.collect { case `Set-Cookie`(x) ⇒ x } shouldEqual List(
-            HttpCookie("myCookie", "deleted", expires = deletedTimeStamp),
-            HttpCookie("myCookie2", "deleted", expires = deletedTimeStamp))
+          HttpCookie("myCookie", "deleted", expires = deletedTimeStamp),
+          HttpCookie("myCookie2", "deleted", expires = deletedTimeStamp))
       }
     }
   }
@@ -89,19 +92,20 @@ class CookieDirectivesSpec extends RoutingSpec {
       } ~> check {
         status shouldEqual OK
         header[`Set-Cookie`] shouldEqual Some(
-            `Set-Cookie`(HttpCookie("myCookie", "test.com")))
+          `Set-Cookie`(HttpCookie("myCookie", "test.com")))
       }
     }
 
     "support setting multiple cookies at a time" in {
       Get() ~> {
-        setCookie(HttpCookie("myCookie", "test.com"),
-                  HttpCookie("myCookie2", "foobar.com")) { completeOk }
+        setCookie(
+          HttpCookie("myCookie", "test.com"),
+          HttpCookie("myCookie2", "foobar.com")) { completeOk }
       } ~> check {
         status shouldEqual OK
         headers.collect { case `Set-Cookie`(x) ⇒ x } shouldEqual List(
-            HttpCookie("myCookie", "test.com"),
-            HttpCookie("myCookie2", "foobar.com"))
+          HttpCookie("myCookie", "test.com"),
+          HttpCookie("myCookie2", "foobar.com"))
       }
     }
   }

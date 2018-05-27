@@ -11,7 +11,11 @@ import com.intellij.codeInsight.daemon.impl._
 import com.intellij.codeInsight.daemon.impl.analysis.HighlightingLevelManager
 import com.intellij.codeInsight.intention.IntentionAction
 import com.intellij.codeInspection._
-import com.intellij.lang.annotation.{Annotation, AnnotationSession, HighlightSeverity}
+import com.intellij.lang.annotation.{
+  Annotation,
+  AnnotationSession,
+  HighlightSeverity
+}
 import com.intellij.lang.findUsages.{FindUsagesProvider, LanguageFindUsages}
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.ex.IdeDocumentHistory
@@ -25,10 +29,17 @@ import org.jetbrains.plugins.scala.codeInspection.suppression.ScalaInspectionSup
 import org.jetbrains.plugins.scala.codeInspection.varCouldBeValInspection.VarCouldBeValInspection
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScDeclaredElementsHolder, ScFunction, ScVariableDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScDeclaredElementsHolder,
+  ScFunction,
+  ScVariableDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScMember
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{ScEarlyDefinitions, ScNamedElement}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{
+  ScEarlyDefinitions,
+  ScNamedElement
+}
 import org.jetbrains.plugins.scala.lang.psi.api.{ScPackageLike, ScalaFile}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
@@ -43,13 +54,15 @@ class ScalaUnusedSymbolPass(file: PsiFile, editor: Editor)
 
   private val inspectionSuppressor = new ScalaInspectionSuppressor
 
-  case class UnusedConfig(checkLocalUnused: Boolean,
-                          localUnusedSeverity: HighlightSeverity,
-                          checkLocalAssign: Boolean,
-                          localAssignSeverity: HighlightSeverity)
-  case class UnusedPassState(annotationHolder: AnnotationHolderImpl,
-                             annotations: mutable.Buffer[Annotation],
-                             config: UnusedConfig)
+  case class UnusedConfig(
+      checkLocalUnused: Boolean,
+      localUnusedSeverity: HighlightSeverity,
+      checkLocalAssign: Boolean,
+      localAssignSeverity: HighlightSeverity)
+  case class UnusedPassState(
+      annotationHolder: AnnotationHolderImpl,
+      annotations: mutable.Buffer[Annotation],
+      config: UnusedConfig)
 
   def doCollectInformation(progress: ProgressIndicator) {}
 
@@ -61,32 +74,33 @@ class ScalaUnusedSymbolPass(file: PsiFile, editor: Editor)
             .shouldInspect(file) =>
         processScalaFile(sFile)
         import scala.collection.JavaConversions._
-        UpdateHighlightersUtil.setHighlightersToEditor(file.getProject,
-                                                       editor.getDocument,
-                                                       0,
-                                                       file.getTextLength,
-                                                       highlightInfos,
-                                                       getColorsScheme,
-                                                       getId)
+        UpdateHighlightersUtil.setHighlightersToEditor(
+          file.getProject,
+          editor.getDocument,
+          0,
+          file.getTextLength,
+          highlightInfos,
+          getColorsScheme,
+          getId)
         highlightInfos.clear()
       case sFile: ScalaFile =>
-        UpdateHighlightersUtil.setHighlightersToEditor(file.getProject,
-                                                       editor.getDocument,
-                                                       0,
-                                                       file.getTextLength,
-                                                       Collections.emptyList(),
-                                                       getColorsScheme,
-                                                       getId)
+        UpdateHighlightersUtil.setHighlightersToEditor(
+          file.getProject,
+          editor.getDocument,
+          0,
+          file.getTextLength,
+          Collections.emptyList(),
+          getColorsScheme,
+          getId)
       case _ =>
     }
   }
 
   private def processScalaFile(sFile: ScalaFile) {
-    val annotationHolder = new AnnotationHolderImpl(
-        new AnnotationSession(file))
+    val annotationHolder = new AnnotationHolderImpl(new AnnotationSession(file))
     val annotations = mutable.Buffer[Annotation]()
-    val state = UnusedPassState(
-        annotationHolder, annotations, readConfig(sFile))
+    val state =
+      UnusedPassState(annotationHolder, annotations, readConfig(sFile))
     val config = state.config
     if (!config.checkLocalAssign && !config.checkLocalUnused) return
 
@@ -111,14 +125,16 @@ class ScalaUnusedSymbolPass(file: PsiFile, editor: Editor)
     }
     val localUnusedShortName = ScalaUnusedSymbolInspection.ShortName
     val localAssignShortName = VarCouldBeValInspection.ShortName
-    UnusedConfig(isEnabled(localUnusedShortName),
-                 severity(localUnusedShortName),
-                 isEnabled(localAssignShortName),
-                 severity(localAssignShortName))
+    UnusedConfig(
+      isEnabled(localUnusedShortName),
+      severity(localUnusedShortName),
+      isEnabled(localAssignShortName),
+      severity(localAssignShortName))
   }
 
   private def processDeclaredElementHolder(
-      x: ScDeclaredElementsHolder, state: UnusedPassState) {
+      x: ScDeclaredElementsHolder,
+      state: UnusedPassState) {
     x.getContext match {
       case _: ScPackageLike | _: ScalaFile | _: ScEarlyDefinitions =>
       // ignore, too expensive to check for references.
@@ -139,14 +155,15 @@ class ScalaUnusedSymbolPass(file: PsiFile, editor: Editor)
 
   /** Processes a ScDeclaredElementsHolder that is not accessible outside of the defining class/companion, ie locals or private or private[this] */
   private def processLocalDeclaredElementHolder(
-      declElementHolder: ScDeclaredElementsHolder, state: UnusedPassState) {
+      declElementHolder: ScDeclaredElementsHolder,
+      state: UnusedPassState) {
     val isSpecialDef = declElementHolder match {
       case x: PsiMethod => ScFunction.isSpecial(x.name)
-      case _ => false
+      case _            => false
     }
     val isImplicit = declElementHolder match {
       case x: ScMember => x.hasModifierProperty("implicit")
-      case _ => false
+      case _           => false
     }
     if (!isSpecialDef && !isImplicit) {
       checkUnusedAndVarCouldBeVal(declElementHolder, state)
@@ -155,7 +172,8 @@ class ScalaUnusedSymbolPass(file: PsiFile, editor: Editor)
 
   /** Highlight unused local symbols, and vals that could be vars */
   private def checkUnusedAndVarCouldBeVal(
-      declElementHolder: ScDeclaredElementsHolder, state: UnusedPassState) {
+      declElementHolder: ScDeclaredElementsHolder,
+      state: UnusedPassState) {
     val isVar = declElementHolder.isInstanceOf[ScVariableDefinition]
 
     var hasAssign = !state.config.checkLocalAssign || !isVar
@@ -216,10 +234,13 @@ class ScalaUnusedSymbolPass(file: PsiFile, editor: Editor)
       val end = declElementHolder.getTextRange.getEndOffset
       val range = TextRange.create(start, end)
       val annotation = state.annotationHolder.createAnnotation(
-          severity, new TextRange(start, end), message)
+        severity,
+        new TextRange(start, end),
+        message)
       val key = HighlightDisplayKey.find(VarCouldBeValInspection.ShortName)
       val fix = new VarToValFix(
-          declElementHolder.asInstanceOf[ScVariableDefinition], nameOpt)
+        declElementHolder.asInstanceOf[ScVariableDefinition],
+        nameOpt)
       annotation.registerFix(fix, range, key)
       state.annotations += annotation
     }
@@ -230,12 +251,14 @@ class ScalaUnusedSymbolPass(file: PsiFile, editor: Editor)
 
   private def isUnusedSymbolSuppressed(element: PsiElement) = {
     inspectionSuppressor.isSuppressedFor(
-        element, ScalaUnusedSymbolInspection.ShortName)
+      element,
+      ScalaUnusedSymbolInspection.ShortName)
   }
 
   private def isVarCouldBeValSuppressed(element: PsiElement) = {
     inspectionSuppressor.isSuppressedFor(
-        element, VarCouldBeValInspection.ShortName)
+      element,
+      VarCouldBeValInspection.ShortName)
   }
 }
 
@@ -275,7 +298,7 @@ class VarToValFix(varDef: ScVariableDefinition, name: Option[String])
   def getText: String = {
     name match {
       case Some(n) => "Convert var '%s' to val".format(n)
-      case None => "Convert var to val"
+      case None    => "Convert var to val"
     }
   }
 
@@ -290,7 +313,8 @@ class VarToValFix(varDef: ScVariableDefinition, name: Option[String])
   def invoke(project: Project, editor: Editor, file: PsiFile) {
     if (!varDef.isValid) return
     if (!FileModificationService.getInstance.prepareFileForWrite(file)) return
-    varDef.replace(ScalaPsiElementFactory.createValFromVarDefinition(
-            varDef, varDef.getManager))
+    varDef.replace(
+      ScalaPsiElementFactory
+        .createValFromVarDefinition(varDef, varDef.getManager))
   }
 }

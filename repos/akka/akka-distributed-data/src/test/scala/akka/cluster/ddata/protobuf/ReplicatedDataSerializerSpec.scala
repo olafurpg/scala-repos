@@ -27,22 +27,27 @@ import com.typesafe.config.ConfigFactory
 
 class ReplicatedDataSerializerSpec
     extends TestKit(
-        ActorSystem(
-            "ReplicatedDataSerializerSpec",
-            ConfigFactory.parseString("""
+      ActorSystem(
+        "ReplicatedDataSerializerSpec",
+        ConfigFactory.parseString(
+          """
     akka.actor.provider=akka.cluster.ClusterActorRefProvider
     akka.remote.netty.tcp.port=0
-    """))) with WordSpecLike with Matchers with BeforeAndAfterAll {
+    """)
+      ))
+    with WordSpecLike
+    with Matchers
+    with BeforeAndAfterAll {
 
   val serializer = new ReplicatedDataSerializer(
-      system.asInstanceOf[ExtendedActorSystem])
+    system.asInstanceOf[ExtendedActorSystem])
 
-  val address1 = UniqueAddress(
-      Address("akka.tcp", system.name, "some.host.org", 4711), 1)
-  val address2 = UniqueAddress(
-      Address("akka.tcp", system.name, "other.host.org", 4711), 2)
-  val address3 = UniqueAddress(
-      Address("akka.tcp", system.name, "some.host.org", 4712), 3)
+  val address1 =
+    UniqueAddress(Address("akka.tcp", system.name, "some.host.org", 4711), 1)
+  val address2 =
+    UniqueAddress(Address("akka.tcp", system.name, "other.host.org", 4711), 2)
+  val address3 =
+    UniqueAddress(Address("akka.tcp", system.name, "some.host.org", 4712), 3)
 
   override def afterAll {
     shutdown()
@@ -75,10 +80,12 @@ class ReplicatedDataSerializerSpec
 
       checkSameContent(GSet() + "a" + "b", GSet() + "a" + "b")
       checkSameContent(GSet() + "a" + "b", GSet() + "b" + "a")
-      checkSameContent(GSet() + address1 + address2 + address3,
-                       GSet() + address2 + address1 + address3)
-      checkSameContent(GSet() + address1 + address2 + address3,
-                       GSet() + address3 + address2 + address1)
+      checkSameContent(
+        GSet() + address1 + address2 + address3,
+        GSet() + address2 + address1 + address3)
+      checkSameContent(
+        GSet() + address1 + address2 + address3,
+        GSet() + address3 + address2 + address1)
     }
 
     "serialize ORSet" in {
@@ -87,15 +94,15 @@ class ReplicatedDataSerializerSpec
       checkSerialization(ORSet().add(address1, "a").add(address2, "a"))
       checkSerialization(ORSet().add(address1, "a").remove(address2, "a"))
       checkSerialization(
-          ORSet().add(address1, "a").add(address2, "b").remove(address1, "a"))
+        ORSet().add(address1, "a").add(address2, "b").remove(address1, "a"))
       checkSerialization(ORSet().add(address1, 1).add(address2, 2))
       checkSerialization(ORSet().add(address1, 1L).add(address2, 2L))
       checkSerialization(
-          ORSet()
-            .add(address1, "a")
-            .add(address2, 2)
-            .add(address3, 3L)
-            .add(address3, address3))
+        ORSet()
+          .add(address1, "a")
+          .add(address2, 2)
+          .add(address3, 3L)
+          .add(address3, address3))
 
       val s1 = ORSet().add(address1, "a").add(address2, "b")
       val s2 = ORSet().add(address2, "b").add(address1, "a")
@@ -116,95 +123,101 @@ class ReplicatedDataSerializerSpec
 
     "serialize LWWRegister" in {
       checkSerialization(
-          LWWRegister(address1, "value1", LWWRegister.defaultClock))
+        LWWRegister(address1, "value1", LWWRegister.defaultClock))
       checkSerialization(
-          LWWRegister(address1, "value2", LWWRegister.defaultClock[String])
-            .withValue(address2, "value3", LWWRegister.defaultClock[String]))
+        LWWRegister(address1, "value2", LWWRegister.defaultClock[String])
+          .withValue(address2, "value3", LWWRegister.defaultClock[String]))
     }
 
     "serialize GCounter" in {
       checkSerialization(GCounter())
       checkSerialization(GCounter().increment(address1, 3))
       checkSerialization(
-          GCounter().increment(address1, 2).increment(address2, 5))
+        GCounter().increment(address1, 2).increment(address2, 5))
 
       checkSameContent(
-          GCounter().increment(address1, 2).increment(address2, 5),
-          GCounter()
-            .increment(address2, 5)
-            .increment(address1, 1)
-            .increment(address1, 1))
+        GCounter().increment(address1, 2).increment(address2, 5),
+        GCounter()
+          .increment(address2, 5)
+          .increment(address1, 1)
+          .increment(address1, 1))
       checkSameContent(
-          GCounter().increment(address1, 2).increment(address3, 5),
-          GCounter().increment(address3, 5).increment(address1, 2))
+        GCounter().increment(address1, 2).increment(address3, 5),
+        GCounter().increment(address3, 5).increment(address1, 2))
     }
 
     "serialize PNCounter" in {
       checkSerialization(PNCounter())
       checkSerialization(PNCounter().increment(address1, 3))
       checkSerialization(
-          PNCounter().increment(address1, 3).decrement(address1, 1))
+        PNCounter().increment(address1, 3).decrement(address1, 1))
       checkSerialization(
-          PNCounter().increment(address1, 2).increment(address2, 5))
-      checkSerialization(PNCounter()
-            .increment(address1, 2)
-            .increment(address2, 5)
-            .decrement(address1, 1))
+        PNCounter().increment(address1, 2).increment(address2, 5))
+      checkSerialization(
+        PNCounter()
+          .increment(address1, 2)
+          .increment(address2, 5)
+          .decrement(address1, 1))
 
       checkSameContent(
-          PNCounter().increment(address1, 2).increment(address2, 5),
-          PNCounter()
-            .increment(address2, 5)
-            .increment(address1, 1)
-            .increment(address1, 1))
+        PNCounter().increment(address1, 2).increment(address2, 5),
+        PNCounter()
+          .increment(address2, 5)
+          .increment(address1, 1)
+          .increment(address1, 1))
       checkSameContent(
-          PNCounter().increment(address1, 2).increment(address3, 5),
-          PNCounter().increment(address3, 5).increment(address1, 2))
-      checkSameContent(PNCounter()
-                         .increment(address1, 2)
-                         .decrement(address1, 1)
-                         .increment(address3, 5),
-                       PNCounter()
-                         .increment(address3, 5)
-                         .increment(address1, 2)
-                         .decrement(address1, 1))
+        PNCounter().increment(address1, 2).increment(address3, 5),
+        PNCounter().increment(address3, 5).increment(address1, 2))
+      checkSameContent(
+        PNCounter()
+          .increment(address1, 2)
+          .decrement(address1, 1)
+          .increment(address3, 5),
+        PNCounter()
+          .increment(address3, 5)
+          .increment(address1, 2)
+          .decrement(address1, 1)
+      )
     }
 
     "serialize ORMap" in {
       checkSerialization(ORMap())
       checkSerialization(ORMap().put(address1, "a", GSet() + "A"))
-      checkSerialization(ORMap()
-            .put(address1, "a", GSet() + "A")
-            .put(address2, "b", GSet() + "B"))
+      checkSerialization(
+        ORMap()
+          .put(address1, "a", GSet() + "A")
+          .put(address2, "b", GSet() + "B"))
     }
 
     "serialize LWWMap" in {
       checkSerialization(LWWMap())
       checkSerialization(
-          LWWMap().put(address1, "a", "value1", LWWRegister.defaultClock[Any]))
-      checkSerialization(LWWMap()
-            .put(address1, "a", "value1", LWWRegister.defaultClock[Any])
-            .put(address2, "b", 17, LWWRegister.defaultClock[Any]))
+        LWWMap().put(address1, "a", "value1", LWWRegister.defaultClock[Any]))
+      checkSerialization(
+        LWWMap()
+          .put(address1, "a", "value1", LWWRegister.defaultClock[Any])
+          .put(address2, "b", 17, LWWRegister.defaultClock[Any]))
     }
 
     "serialize PNCounterMap" in {
       checkSerialization(PNCounterMap())
       checkSerialization(PNCounterMap().increment(address1, "a", 3))
-      checkSerialization(PNCounterMap()
-            .increment(address1, "a", 3)
-            .decrement(address2, "a", 2)
-            .increment(address2, "b", 5))
+      checkSerialization(
+        PNCounterMap()
+          .increment(address1, "a", 3)
+          .decrement(address2, "a", 2)
+          .increment(address2, "b", 5))
     }
 
     "serialize ORMultiMap" in {
       checkSerialization(ORMultiMap())
       checkSerialization(ORMultiMap().addBinding(address1, "a", "A"))
       checkSerialization(
-          ORMultiMap
-            .empty[String]
-            .addBinding(address1, "a", "A1")
-            .put(address2, "b", Set("B1", "B2", "B3"))
-            .addBinding(address2, "a", "A2"))
+        ORMultiMap
+          .empty[String]
+          .addBinding(address1, "a", "A1")
+          .put(address2, "b", Set("B1", "B2", "B3"))
+          .addBinding(address2, "a", "A2"))
 
       val m1 = ORMultiMap
         .empty[String]
@@ -223,7 +236,7 @@ class ReplicatedDataSerializerSpec
       checkSerialization(VersionVector())
       checkSerialization(VersionVector().increment(address1))
       checkSerialization(
-          VersionVector().increment(address1).increment(address2))
+        VersionVector().increment(address1).increment(address2))
 
       val v1 = VersionVector().increment(address1).increment(address1)
       val v2 = VersionVector().increment(address2)

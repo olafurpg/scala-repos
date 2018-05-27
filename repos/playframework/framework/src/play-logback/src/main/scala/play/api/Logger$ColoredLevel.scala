@@ -20,7 +20,7 @@ class Logger$ColoredLevel extends ColoredLevel {
     val migrationDocs =
       "https://www.playframework.com/documentation/2.5.x/Migration25#Change-to-Logback-configuration"
     addError(
-        s"You are using the deprecated ${this.getClass.getName} in $configLocation, please use ${classOf[
+      s"You are using the deprecated ${this.getClass.getName} in $configLocation, please use ${classOf[
         ColoredLevel].getName} instead. See $migrationDocs for more information.")
   }
 }

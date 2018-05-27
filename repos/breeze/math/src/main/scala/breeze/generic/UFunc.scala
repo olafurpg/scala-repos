@@ -42,21 +42,24 @@ import breeze.linalg.support._
   *@author dlwh
   */
 trait UFunc {
-  final def apply[@specialized(Int, Double, Float) V,
-                  @specialized(Int, Double, Float) VR](v: V)(
+  final def apply[
+      @specialized(Int, Double, Float) V,
+      @specialized(Int, Double, Float) VR](v: V)(
       implicit impl: Impl[V, VR]): VR = impl(v)
 
-  final def apply[@specialized(Int, Double, Float) V1,
-                  @specialized(Int, Double, Float) V2,
-                  @specialized(Int, Double, Float) VR](v1: V1, v2: V2)(
+  final def apply[
+      @specialized(Int, Double, Float) V1,
+      @specialized(Int, Double, Float) V2,
+      @specialized(Int, Double, Float) VR](v1: V1, v2: V2)(
       implicit impl: Impl2[V1, V2, VR]): VR = impl(v1, v2)
 
   // if there are three arguments, the first one is almost always a vector or something,
   // so no point specializing.
-  final def apply[V1,
-                  @specialized(Int, Double, Float) V2,
-                  @specialized(Int, Double, Float) V3,
-                  @specialized(Int, Double, Float) VR](v1: V1, v2: V2, v3: V3)(
+  final def apply[
+      V1,
+      @specialized(Int, Double, Float) V2,
+      @specialized(Int, Double, Float) V3,
+      @specialized(Int, Double, Float) VR](v1: V1, v2: V2, v3: V3)(
       implicit impl: Impl3[V1, V2, V3, VR]): VR = impl(v1, v2, v3)
 
   final def apply[V1, V2, V3, V4, VR](v1: V1, v2: V2, v3: V3, v4: V4)(
@@ -107,13 +110,15 @@ trait UFunc {
 }
 
 trait VariableUFunc[U <: UFunc, T <: VariableUFunc[U, T]] { self: T =>
-  final def apply[@specialized(Int, Double, Float) V,
-                  @specialized(Int, Double, Float) VR](v: V)(
+  final def apply[
+      @specialized(Int, Double, Float) V,
+      @specialized(Int, Double, Float) VR](v: V)(
       implicit impl: UFunc.UImpl2[U, T, V, VR]): VR = impl(self, v)
 
-  final def apply[@specialized(Int, Double, Float) V1,
-                  @specialized(Int, Double, Float) V2,
-                  @specialized(Int, Double, Float) VR](v1: V1, v2: V2)(
+  final def apply[
+      @specialized(Int, Double, Float) V1,
+      @specialized(Int, Double, Float) V2,
+      @specialized(Int, Double, Float) VR](v1: V1, v2: V2)(
       implicit impl: UFunc.UImpl3[U, T, V1, V2, VR]): VR = impl(self, v1, v2)
 
   final def apply[V1, V2, V3, VR](v1: V1, v2: V2, v3: V3)(
@@ -160,39 +165,43 @@ object UFunc {
   def apply[A1, A2, R](f: (A1, A2) => R) = new WrappedUFunc2(f)
 
 //  @implicitNotFound("Could not find an implicit implementation for ${Tag} with arguments ${V}")
-  trait UImpl[Tag,
-              @specialized(Int, Double, Float) V,
-              @specialized(Int, Double, Float) +VR]
+  trait UImpl[
+      Tag,
+      @specialized(Int, Double, Float) V,
+      @specialized(Int, Double, Float) +VR]
       extends Serializable {
     def apply(v: V): VR
   }
 
 //  @implicitNotFound("Could not find an implicit implementation for ${Tag} with arguments ${V1}, ${V2}")
-  trait UImpl2[Tag,
-               @specialized(Int, Double, Float) V1,
-               @specialized(Int, Double, Float) V2,
-               @specialized(Int, Double, Float) +VR]
+  trait UImpl2[
+      Tag,
+      @specialized(Int, Double, Float) V1,
+      @specialized(Int, Double, Float) V2,
+      @specialized(Int, Double, Float) +VR]
       extends Serializable {
     def apply(v: V1, v2: V2): VR
   }
 
 //  @implicitNotFound("Could not find an implicit implementation for ${Tag} with arguments ${V1}, ${V2}, ${V3}")
-  trait UImpl3[Tag,
-               @specialized(Int, Double, Float) V1,
-               @specialized(Int, Double, Float) V2,
-               @specialized(Int, Double, Float) V3,
-               @specialized(Int, Double, Float) +VR]
+  trait UImpl3[
+      Tag,
+      @specialized(Int, Double, Float) V1,
+      @specialized(Int, Double, Float) V2,
+      @specialized(Int, Double, Float) V3,
+      @specialized(Int, Double, Float) +VR]
       extends Serializable {
     def apply(v: V1, v2: V2, v3: V3): VR
   }
 
 //  @implicitNotFound("Could not find an implicit implementation for ${Tag} with arguments ${V1}, ${V2}, ${V3}, ${V4}")
-  trait UImpl4[Tag,
-               @specialized(Int, Double, Float) V1,
-               @specialized(Int, Double, Float) V2,
-               @specialized(Int, Double, Float) V3,
-               @specialized(Int, Double, Float) V4,
-               @specialized(Int, Double, Float) +VR]
+  trait UImpl4[
+      Tag,
+      @specialized(Int, Double, Float) V1,
+      @specialized(Int, Double, Float) V2,
+      @specialized(Int, Double, Float) V3,
+      @specialized(Int, Double, Float) V4,
+      @specialized(Int, Double, Float) +VR]
       extends Serializable {
     def apply(v: V1, v2: V2, v3: V3, v4: V4): VR
   }
@@ -297,8 +306,8 @@ object WrappedUFunc extends UFunc with WrappedUFuncLowPrio {
     }
   }
 
-  implicit def simpleApply2[A1, A2, R]: Impl3[
-      WrappedUFunc2[A1, A2, R], A1, A2, R] = {
+  implicit def simpleApply2[A1, A2, R]
+    : Impl3[WrappedUFunc2[A1, A2, R], A1, A2, R] = {
     new Impl3[WrappedUFunc2[A1, A2, R], A1, A2, R] {
       override def apply(v: WrappedUFunc2[A1, A2, R], v2: A1, v3: A2): R =
         v.f(v2, v3)
@@ -312,8 +321,7 @@ object WrappedUFunc extends UFunc with WrappedUFuncLowPrio {
     }
   }
 
-  implicit def apply2[V, A1, R, V2](
-      implicit cmv: CanZipMapValues[V, A1, R, V2])
+  implicit def apply2[V, A1, R, V2](implicit cmv: CanZipMapValues[V, A1, R, V2])
     : Impl3[WrappedUFunc2[A1, A1, R], V, V, V2] = {
     new Impl3[WrappedUFunc2[A1, A1, R], V, V, V2] {
       override def apply(v: WrappedUFunc2[A1, A1, R], v2: V, v3: V): V2 =

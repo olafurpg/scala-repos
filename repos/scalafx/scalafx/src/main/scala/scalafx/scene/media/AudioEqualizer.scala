@@ -34,8 +34,7 @@ import scalafx.beans.property.BooleanProperty
 import scalafx.delegate.SFXDelegate
 
 object AudioEqualizer {
-  implicit def sfxAudioEqualizer2jfx(
-      ae: AudioEqualizer): jfxsm.AudioEqualizer =
+  implicit def sfxAudioEqualizer2jfx(ae: AudioEqualizer): jfxsm.AudioEqualizer =
     if (ae != null) ae.delegate else null
 
   /**

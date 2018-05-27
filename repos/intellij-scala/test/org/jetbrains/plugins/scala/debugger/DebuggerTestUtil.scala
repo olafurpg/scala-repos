@@ -19,9 +19,10 @@ object DebuggerTestUtil {
     val jdkTable = JavaAwareProjectJdkTableImpl.getInstanceEx
     Option(jdkTable.findJdk(jdk8Name)).getOrElse {
       val path = discoverJRE18().getOrElse(
-          throw new RuntimeException("Could not find jdk8 installation, " +
-              "please define a valid JDK_18_x64 or JDK_18, " +
-              s"current - ${sys.env("JDK_18_x64")} or ${sys.env("JDK_18")}"))
+        throw new RuntimeException(
+          "Could not find jdk8 installation, " +
+            "please define a valid JDK_18_x64 or JDK_18, " +
+            s"current - ${sys.env("JDK_18_x64")} or ${sys.env("JDK_18")}"))
       val jdk = JavaSdk.getInstance.createJdk(jdk8Name, path)
       inWriteAction {
         jdkTable.addJdk(jdk)
@@ -42,18 +43,17 @@ object DebuggerTestUtil {
   def forceJdk8ForBuildProcess(): Unit = {
     val jdk8 = findJdk8()
     if (jdk8.getHomeDirectory == null) {
-      throw new RuntimeException(
-          s"Failed to set up JDK, got: ${jdk8.toString}")
+      throw new RuntimeException(s"Failed to set up JDK, got: ${jdk8.toString}")
     }
     val jdkHome = jdk8.getHomeDirectory.getParent.getCanonicalPath
     Registry.get("compiler.process.jdk").setValue(jdkHome)
   }
 
   val candidates = Seq(
-      "/usr/lib/jvm", // linux style
-      "C:\\Program Files\\Java\\", // windows style
-      "C:\\Program Files (x86)\\Java\\", // windows 32bit style
-      "/Library/Java/JavaVirtualMachines" // mac style
+    "/usr/lib/jvm", // linux style
+    "C:\\Program Files\\Java\\", // windows style
+    "C:\\Program Files (x86)\\Java\\", // windows 32bit style
+    "/Library/Java/JavaVirtualMachines" // mac style
   )
 
   def discoverJRE18() = discoverJre(candidates, "8")
@@ -76,12 +76,13 @@ object DebuggerTestUtil {
         if (path.startsWith("/Library")) "/Contents/Home" else "" // mac workaround
       Option(new File(path))
         .filter(_.exists())
-        .flatMap(_.listFiles()
-              .sortBy(_.getName)
-              .reverse
-              .find(f =>
-                    f.getName.contains(suffix) && isJDK(new File(f, postfix)))
-              .map(new File(_, s"$postfix/jre").getAbsolutePath))
+        .flatMap(
+          _.listFiles()
+            .sortBy(_.getName)
+            .reverse
+            .find(f =>
+              f.getName.contains(suffix) && isJDK(new File(f, postfix)))
+            .map(new File(_, s"$postfix/jre").getAbsolutePath))
     }
     def currentJava() = {
       sys.props.get("java.version") match {
@@ -96,11 +97,12 @@ object DebuggerTestUtil {
     }
     val versionStrings = Seq(s"1.$versionMajor", s"-$versionMajor")
     val priorityPaths = Seq(
-        currentJava(),
-        Option(
-            sys.env.getOrElse(s"JDK_1${versionMajor}_x64",
-                              sys.env.getOrElse(s"JDK_1$versionMajor", null)))
-          .map(_ + "/jre") // teamcity style
+      currentJava(),
+      Option(
+        sys.env.getOrElse(
+          s"JDK_1${versionMajor}_x64",
+          sys.env.getOrElse(s"JDK_1$versionMajor", null)))
+        .map(_ + "/jre") // teamcity style
     )
     if (priorityPaths.exists(_.isDefined)) {
       priorityPaths.flatten.headOption
@@ -112,7 +114,7 @@ object DebuggerTestUtil {
       for ((path, ver) <- fullSearchPaths) {
         inJvm(path, ver) match {
           case x @ Some(p) => return x
-          case _ => None
+          case _           => None
         }
       }
       None

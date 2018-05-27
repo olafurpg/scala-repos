@@ -26,7 +26,7 @@ class ThriftServerFramedCodecTest extends FunSuite with MockitoSugar {
 
       val upgradeMsg = new OutputBuffer(protocolFactory)
       upgradeMsg().writeMessageBegin(
-          new TMessage(ThriftTracing.CanTraceMethodName, TMessageType.CALL, 0))
+        new TMessage(ThriftTracing.CanTraceMethodName, TMessageType.CALL, 0))
       val options = new thrift.ConnectionOptions
       options.write(upgradeMsg())
       upgradeMsg().writeMessageEnd()
@@ -47,14 +47,15 @@ class ThriftServerFramedCodecTest extends FunSuite with MockitoSugar {
 
       val ignoreMsg = new OutputBuffer(protocolFactory)
       ignoreMsg().writeMessageBegin(
-          new TMessage("ignoreme", TMessageType.CALL, 0))
+        new TMessage("ignoreme", TMessageType.CALL, 0))
       new thrift.ConnectionOptions().write(ignoreMsg())
       ignoreMsg().writeMessageEnd()
 
-      filter(ByteArrays.concat(
-                 OutputBuffer.messageToArray(header, protocolFactory),
-                 ignoreMsg.toArray),
-             service)
+      filter(
+        ByteArrays.concat(
+          OutputBuffer.messageToArray(header, protocolFactory),
+          ignoreMsg.toArray),
+        service)
 
       bufferingTracer.iterator foreach { record =>
         assert(record.traceId == traceId)

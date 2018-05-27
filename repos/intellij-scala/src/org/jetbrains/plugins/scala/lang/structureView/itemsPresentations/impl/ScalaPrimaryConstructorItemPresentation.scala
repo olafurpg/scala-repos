@@ -18,7 +18,7 @@ class ScalaPrimaryConstructorItemPresentation(
     extends ScalaItemPresentation(element) {
   def getPresentableText: String = {
     ScalaElementPresentation.getPrimaryConstructorPresentableText(
-        myElement.asInstanceOf[ScPrimaryConstructor])
+      myElement.asInstanceOf[ScPrimaryConstructor])
   }
 
   override def getIcon(open: Boolean): Icon = {

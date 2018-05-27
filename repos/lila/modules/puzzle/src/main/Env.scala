@@ -5,10 +5,11 @@ import com.typesafe.config.Config
 
 import lila.common.PimpedConfig._
 
-final class Env(config: Config,
-                renderer: ActorSelection,
-                system: ActorSystem,
-                lifecycle: play.api.inject.ApplicationLifecycle) {
+final class Env(
+    config: Config,
+    renderer: ActorSelection,
+    system: ActorSystem,
+    lifecycle: play.api.inject.ApplicationLifecycle) {
 
   private val settings = new {
     val CollectionPuzzle = config getString "collection.puzzle"
@@ -22,26 +23,27 @@ final class Env(config: Config,
 
   private val db = new lila.db.Env(config getConfig "mongodb", lifecycle)
 
-  lazy val api = new PuzzleApi(puzzleColl = puzzleColl,
-                               attemptColl = attemptColl,
-                               apiToken = ApiToken)
+  lazy val api = new PuzzleApi(
+    puzzleColl = puzzleColl,
+    attemptColl = attemptColl,
+    apiToken = ApiToken)
 
   lazy val finisher = new Finisher(api = api, puzzleColl = puzzleColl)
 
   lazy val selector = new Selector(
-      puzzleColl = puzzleColl,
-      api = api,
-      anonMinRating = config getInt "selector.anon_min_rating",
-      maxAttempts = config getInt "selector.max_attempts")
+    puzzleColl = puzzleColl,
+    api = api,
+    anonMinRating = config getInt "selector.anon_min_rating",
+    maxAttempts = config getInt "selector.max_attempts")
 
   lazy val userInfos = UserInfos(attemptColl = attemptColl)
 
   lazy val forms = DataForm
 
   lazy val daily = new Daily(
-      puzzleColl,
-      renderer,
-      system.scheduler
+    puzzleColl,
+    renderer,
+    system.scheduler
   ).apply _
 
   lazy val pngExport = PngExport(PngExecPath) _
@@ -66,8 +68,10 @@ final class Env(config: Config,
 object Env {
 
   lazy val current: Env =
-    "puzzle" boot new Env(config = lila.common.PlayApp loadConfig "puzzle",
-                          renderer = lila.hub.Env.current.actor.renderer,
-                          system = lila.common.PlayApp.system,
-                          lifecycle = lila.common.PlayApp.lifecycle)
+    "puzzle" boot new Env(
+      config = lila.common.PlayApp loadConfig "puzzle",
+      renderer = lila.hub.Env.current.actor.renderer,
+      system = lila.common.PlayApp.system,
+      lifecycle = lila.common.PlayApp.lifecycle
+    )
 }

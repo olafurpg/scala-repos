@@ -7,7 +7,7 @@ object Main extends App {
   val x: PartialFunction[Foo, Int] = { c =>
     c.field match {
       case Some(s) => 42
-      case None => 99
+      case None    => 99
     }
   }
 

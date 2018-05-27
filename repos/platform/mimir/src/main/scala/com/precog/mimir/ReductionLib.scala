@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -74,19 +74,20 @@ trait ReductionLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
     val ReductionNamespace = Vector()
 
     override def _libReduction =
-      super._libReduction ++ Set(Count,
-                                 Max,
-                                 Min,
-                                 MaxTime,
-                                 MinTime,
-                                 Sum,
-                                 Mean,
-                                 GeometricMean,
-                                 SumSq,
-                                 Variance,
-                                 StdDev,
-                                 Forall,
-                                 Exists)
+      super._libReduction ++ Set(
+        Count,
+        Max,
+        Min,
+        MaxTime,
+        MinTime,
+        Sum,
+        Mean,
+        GeometricMean,
+        SumSq,
+        Variance,
+        StdDev,
+        Forall,
+        Exists)
 
     val CountMonoid = implicitly[Monoid[Count.Result]]
     object Count extends Reduction(ReductionNamespace, "count") {
@@ -464,8 +465,8 @@ trait ReductionLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
       implicit val monoid = new Monoid[Result] {
         def zero = None
         def append(left: Result, right: => Result) = {
-          val both = for ((l1, l2) <- left; (r1, r2) <- right) yield
-            (l1 * r1, l2 + r2)
+          val both = for ((l1, l2) <- left; (r1, r2) <- right)
+            yield (l1 * r1, l2 + r2)
           both orElse left orElse right
         }
       }
@@ -577,8 +578,9 @@ trait ReductionLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
 
     class CountSumSumSqReducer
         extends Reducer[Option[(Long, BigDecimal, BigDecimal)]] {
-      def reduce(schema: CSchema,
-                 range: Range): Option[(Long, BigDecimal, BigDecimal)] = {
+      def reduce(
+          schema: CSchema,
+          range: Range): Option[(Long, BigDecimal, BigDecimal)] = {
         val result =
           schema.columns(JNumberT) map {
             case col: LongColumn =>
@@ -659,8 +661,7 @@ trait ReductionLibModule[M[+ _]] extends ColumnarTableLibModule[M] {
     val StdDevMonoid = implicitly[Monoid[StdDev.Result]]
     object StdDev extends Reduction(ReductionNamespace, "stdDev") {
       type Result = Option[InitialResult]
-      type InitialResult = (Long, BigDecimal,
-      BigDecimal) // (count, sum, sumsq)
+      type InitialResult = (Long, BigDecimal, BigDecimal) // (count, sum, sumsq)
 
       implicit val monoid = StdDevMonoid
 

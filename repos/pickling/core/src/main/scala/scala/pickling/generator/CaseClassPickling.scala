@@ -8,7 +8,8 @@ package generator
   *
   */
 class CaseClassPickling(
-    val allowReflection: Boolean, val careAboutSubclasses: Boolean)
+    val allowReflection: Boolean,
+    val careAboutSubclasses: Boolean)
     extends PicklingAlgorithm {
   case class FieldInfo(name: String, sym: IrMethod)
   case class CaseClassInfo(constructor: IrConstructor, fields: Seq[FieldInfo])
@@ -16,15 +17,16 @@ class CaseClassPickling(
   // TODO - This helper method should be available elsewhere.
   def allVars(cls: IrClass): Seq[IrMethod] = {
     (cls.methods.filter(_.isParamAccessor) ++ IrSymbol
-          .allDeclaredMethodIncludingSubclasses(cls)
-          .filter(x => x.isVar || x.isVal))
+      .allDeclaredMethodIncludingSubclasses(cls)
+      .filter(x => x.isVar || x.isVal))
       .groupBy(_.methodName)
       .map(_._2.head)
       .toList
       .filterNot(_.isMarkedTransient)
   }
   private def checkConstructorImpl(
-      tpe: IrClass, logger: AlgorithmLogger): AlgorithmResult = {
+      tpe: IrClass,
+      logger: AlgorithmLogger): AlgorithmResult = {
     if (tpe.isCaseClass) {
       tpe.primaryConstructor match {
         case Some(c) if c.isPublic =>
@@ -37,7 +39,7 @@ class CaseClassPickling(
           // TODO - Allow us to ERROR on classes like this.
           if (!standAloneVars.isEmpty) {
             logger.warn(
-                s"Warning: ${tpe.className} has a member var not represented in the constructor.  Pickling is not guaranteed to handle this correctly.")
+              s"Warning: ${tpe.className} has a member var not represented in the constructor.  Pickling is not guaranteed to handle this correctly.")
           }
 
           // Here we need to unify the fields with the constructor names.  We assume they have the same name.
@@ -47,21 +49,20 @@ class CaseClassPickling(
             m <- vars.find(_.methodName == name)
           } yield FieldInfo(name, m)
           if (fields.length == c.parameterNames.flatten.length) {
-            val pickle = PickleBehavior(
-                Seq(PickleEntry(fields.map { field =>
+            val pickle = PickleBehavior(Seq(PickleEntry(fields.map { field =>
               GetField(field.name, field.sym)
             }.toSeq ++ standAloneVars.map { field =>
               GetField(field.methodName, field)
             })))
-            val unpickle = UnpickleBehavior(Seq(CallConstructor(
-                        fields.map(_.name),
-                        c)) ++ standAloneVars.map { field =>
-              field.setter match {
-                case Some(mth) => SetField(field.methodName, mth)
-                case _ =>
-                  sys.error(
+            val unpickle = UnpickleBehavior(Seq(
+              CallConstructor(fields.map(_.name), c)) ++ standAloneVars.map {
+              field =>
+                field.setter match {
+                  case Some(mth) => SetField(field.methodName, mth)
+                  case _ =>
+                    sys.error(
                       s"Attempting to define unpickle behavior, when no setter is defined on a var: ${field}")
-              }
+                }
             })
             if (!allowReflection &&
                 (pickle.requiresReflection || unpickle.requiresReflection)) {
@@ -86,19 +87,19 @@ class CaseClassPickling(
                 }
               val errors =
                 (reflectionErrorMessage(pickle) ++ reflectionErrorMessage(
-                        unpickle))
+                  unpickle))
               val errorString =
                 if (errors.isEmpty) "   unknown reason"
                 else errors.mkString("   - ", "\n   - ", "")
               AlgorithmFailure(
-                  s"Cannot pickle case class, because reflection is not allowed and some members are protected/private.\n$errorString")
+                s"Cannot pickle case class, because reflection is not allowed and some members are protected/private.\n$errorString")
             } else
               AlgorithmSucccess(PickleUnpickleImplementation(pickle, unpickle))
           }
           // TODO - what do we do if it doesn't line up?  This is probably some insidious bug.
           else
             AlgorithmFailure(
-                s"Encountered a case class (${tpe.className}) where we could not find all the constructor parameters.  This may be because some fields are marked transient.")
+              s"Encountered a case class (${tpe.className}) where we could not find all the constructor parameters.  This may be because some fields are marked transient.")
         case _ =>
           AlgorithmFailure("case-class constructor is not public")
       }
@@ -106,7 +107,8 @@ class CaseClassPickling(
   }
 
   def checkFactoryImpl(
-      tpe: IrClass, logger: AlgorithmLogger): AlgorithmResult = {
+      tpe: IrClass,
+      logger: AlgorithmLogger): AlgorithmResult = {
     // THis should be accurate, because all case calsses have companions
     (for {
       companion <- tpe.companion
@@ -123,7 +125,7 @@ class CaseClassPickling(
       // TODO - We should have this be configured to be a failure or silenced.  Also, we should copy the var options from above.
       if (hasStandaloneVar) {
         logger.warn(
-            s"Warning: ${tpe.className} has a member var not represented in the constructor.  Pickling is not guaranteed to handle this correctly.")
+          s"Warning: ${tpe.className} has a member var not represented in the constructor.  Pickling is not guaranteed to handle this correctly.")
       }
       val fieldNameList = factoryMethod.parameterNames.flatten.toSeq
       val fields = for {
@@ -131,18 +133,17 @@ class CaseClassPickling(
         m <- vars.find(_.methodName == name)
       } yield FieldInfo(name, m)
       if (fields.length == factoryMethod.parameterNames.flatten.length) {
-        val pickle = PickleBehavior(
-            Seq(PickleEntry(fields.map { field =>
+        val pickle = PickleBehavior(Seq(PickleEntry(fields.map { field =>
           GetField(field.name, field.sym)
         }.toSeq)))
         val unpickle = UnpickleBehavior(
-            Seq(CallModuleFactory(fieldNameList, companion, factoryMethod)))
+          Seq(CallModuleFactory(fieldNameList, companion, factoryMethod)))
         PickleUnpickleImplementation(pickle, unpickle)
       }
       // TODO - what do we do if it doesn't line up?  This is probably some insidious bug.
       else
         logger.abort(
-            s"Encountered a case class (${tpe.className}) where we could not find all the constructor parameters.")
+          s"Encountered a case class (${tpe.className}) where we could not find all the constructor parameters.")
     }) match {
       case Some(success) => AlgorithmSucccess(success)
       case None =>
@@ -156,7 +157,8 @@ class CaseClassPickling(
     * @return
     */
   override def generate(
-      tpe: IrClass, logger: AlgorithmLogger): AlgorithmResult = {
+      tpe: IrClass,
+      logger: AlgorithmLogger): AlgorithmResult = {
     // Scala modules are pickled differently, so we have to explicitly ignore `case object`
     if (tpe.isCaseClass && !tpe.isScalaModule) {
       val behavior =
@@ -171,33 +173,42 @@ class CaseClassPickling(
                 .transform(b) {
                   case x: PickleEntry =>
                     SubclassDispatch.apply(
-                        subClasses = subs.filterNot(
-                              _.className == tpe.className),
-                        tpe,
-                        Some(x),
-                        allowReflection // TODO - This should be `allow runtime pickler lookup`.
+                      subClasses = subs.filterNot(_.className == tpe.className),
+                      tpe,
+                      Some(x),
+                      allowReflection // TODO - This should be `allow runtime pickler lookup`.
                     )
                   case x: UnpickleBehavior =>
-                    UnpickleBehavior(Seq(SubclassUnpicklerDelegation(
-                                Nil, tpe, Some(x), allowReflection))) // TODO - This should be `allow runtime pickler lookup`.
+                    UnpickleBehavior(
+                      Seq(
+                        SubclassUnpicklerDelegation(
+                          Nil,
+                          tpe,
+                          Some(x),
+                          allowReflection))) // TODO - This should be `allow runtime pickler lookup`.
                   case x => x
                 }
                 .asInstanceOf[PickleUnpickleImplementation]
             }
           case scala.util.Failure(ex) if !allowReflection =>
             AlgorithmFailure(
-                s"Case class $tpe is not final, and all subclasses are unknown.  Annotate with @directSubclasses or mark final.")
+              s"Case class $tpe is not final, and all subclasses are unknown.  Annotate with @directSubclasses or mark final.")
           case scala.util.Failure(ex) =>
             behavior.map { b =>
               logger.warn(
-                  s"Warning:   Unpickler does not currently handle subclasss dipatch for type: $tpe")
+                s"Warning:   Unpickler does not currently handle subclasss dipatch for type: $tpe")
               IrAst
                 .transform(b) {
                   case x: PickleEntry =>
                     SubclassDispatch(Nil, tpe, Some(x), allowReflection) // TODO - This should be `allow runtime pickler lookup`.
                   case x: UnpickleBehavior =>
-                    UnpickleBehavior(Seq(SubclassUnpicklerDelegation(
-                                Nil, tpe, Some(x), allowReflection))) // TODO - This should be `allow runtime pickler lookup`.
+                    UnpickleBehavior(
+                      Seq(
+                        SubclassUnpicklerDelegation(
+                          Nil,
+                          tpe,
+                          Some(x),
+                          allowReflection))) // TODO - This should be `allow runtime pickler lookup`.
                   case x => x
                 }
                 .asInstanceOf[PickleUnpickleImplementation]
@@ -206,6 +217,6 @@ class CaseClassPickling(
       } else behavior
     } else
       AlgorithmFailure(
-          s"Cannot use case-class algorithm on non-case class $tpe")
+        s"Cannot use case-class algorithm on non-case class $tpe")
   }
 }

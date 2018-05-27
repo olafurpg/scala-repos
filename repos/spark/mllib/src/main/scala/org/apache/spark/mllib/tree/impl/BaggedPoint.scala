@@ -39,7 +39,8 @@ import org.apache.spark.util.random.XORShiftRandom
   *       dataset support, update.  (We store subsampleWeights as Double for this future extension.)
   */
 private[spark] class BaggedPoint[Datum](
-    val datum: Datum, val subsampleWeights: Array[Double])
+    val datum: Datum,
+    val subsampleWeights: Array[Double])
     extends Serializable
 
 private[spark] object BaggedPoint {
@@ -64,13 +65,19 @@ private[spark] object BaggedPoint {
       seed: Long = Utils.random.nextLong()): RDD[BaggedPoint[Datum]] = {
     if (withReplacement) {
       convertToBaggedRDDSamplingWithReplacement(
-          input, subsamplingRate, numSubsamples, seed)
+        input,
+        subsamplingRate,
+        numSubsamples,
+        seed)
     } else {
       if (numSubsamples == 1 && subsamplingRate == 1.0) {
         convertToBaggedRDDWithoutSampling(input)
       } else {
         convertToBaggedRDDSamplingWithoutReplacement(
-            input, subsamplingRate, numSubsamples, seed)
+          input,
+          subsamplingRate,
+          numSubsamples,
+          seed)
       }
     }
   }

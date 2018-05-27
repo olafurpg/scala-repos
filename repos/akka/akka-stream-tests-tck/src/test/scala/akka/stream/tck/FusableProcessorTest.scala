@@ -13,15 +13,15 @@ class FusableProcessorTest extends AkkaIdentityProcessorVerification[Int] {
 
   override def createIdentityProcessor(
       maxBufferSize: Int): Processor[Int, Int] = {
-    val settings = ActorMaterializerSettings(system).withInputBuffer(
-        initialSize = maxBufferSize / 2, maxSize = maxBufferSize)
+    val settings = ActorMaterializerSettings(system)
+      .withInputBuffer(initialSize = maxBufferSize / 2, maxSize = maxBufferSize)
 
     implicit val materializer = ActorMaterializer(settings)(system)
 
     // withAttributes "wraps" the underlying identity and protects it from automatic removal
     Flow[Int]
       .via(GraphStages.Identity
-            .asInstanceOf[Graph[FlowShape[Int, Int], NotUsed]])
+        .asInstanceOf[Graph[FlowShape[Int, Int], NotUsed]])
       .named("identity")
       .toProcessor
       .run()

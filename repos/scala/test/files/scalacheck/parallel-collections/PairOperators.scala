@@ -74,7 +74,8 @@ trait PairOperators[K, V] extends Operators[(K, V)] {
 
   def takeWhilePredicates =
     zipPredicates(
-        koperators.takeWhilePredicates, voperators.takeWhilePredicates)
+      koperators.takeWhilePredicates,
+      voperators.takeWhilePredicates)
 
   def dropWhilePredicates = takeWhilePredicates
 

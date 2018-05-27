@@ -16,13 +16,14 @@ import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.Parameter
   * Date: 07.03.2008
   */
 class ScArgumentExprListImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScArgumentExprList {
+    extends ScalaPsiElementImpl(node)
+    with ScArgumentExprList {
   override def toString: String = "ArgumentList"
 
   def invocationCount: Int = {
     callExpression match {
       case call: ScMethodCall => call.args.invocationCount + 1
-      case _ => 1
+      case _                  => 1
     }
   }
 
@@ -34,7 +35,7 @@ class ScArgumentExprListImpl(node: ASTNode)
           case gen: ScGenericCall =>
             gen.referencedExpr match {
               case ref: ScReferenceExpression => Some(ref)
-              case _ => None
+              case _                          => None
             }
           case _ => None
         }
@@ -47,7 +48,7 @@ class ScArgumentExprListImpl(node: ASTNode)
       case call: ScMethodCall =>
         call.deepestInvokedExpr match {
           case gen: ScGenericCall => Some(gen)
-          case _ => None
+          case _                  => None
         }
       case _ => None
     }
@@ -72,7 +73,9 @@ class ScArgumentExprListImpl(node: ASTNode)
     }
   }
 
-  override def addBefore(element: PsiElement, anchor: PsiElement): PsiElement = {
+  override def addBefore(
+      element: PsiElement,
+      anchor: PsiElement): PsiElement = {
     if (anchor == null) {
       if (exprs.isEmpty) {
         val par: PsiElement =
@@ -108,7 +111,8 @@ class ScArgumentExprListImpl(node: ASTNode)
   }
 
   def addExprAfter(
-      expr: ScExpression, anchor: PsiElement): ScArgumentExprList = {
+      expr: ScExpression,
+      anchor: PsiElement): ScArgumentExprList = {
     val nextNode = anchor.getNode.getTreeNext
     val comma = ScalaPsiElementFactory.createComma(getManager)
     val space = ScalaPsiElementFactory.createNewLineNode(getManager, " ")

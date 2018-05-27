@@ -45,7 +45,8 @@ abstract class ParallelConcurrentTrieMapCheck[K, V](tp: String)
 
 class IntIntParallelConcurrentTrieMapCheck(val tasksupport: TaskSupport)
     extends ParallelConcurrentTrieMapCheck[Int, Int]("Int, Int")
-    with PairOperators[Int, Int] with PairValues[Int, Int] {
+    with PairOperators[Int, Int]
+    with PairValues[Int, Int] {
   def intvalues = new IntValues {}
   def kvalues = intvalues.values
   def vvalues = intvalues.values
@@ -62,7 +63,8 @@ class IntIntParallelConcurrentTrieMapCheck(val tasksupport: TaskSupport)
   }
 
   override def checkDataStructureInvariants(
-      orig: Traversable[(Int, Int)], ds: AnyRef) = ds match {
+      orig: Traversable[(Int, Int)],
+      ds: AnyRef) = ds match {
     // case pm: ParHashMap[k, v] if 1 == 0 => // disabled this to make tests faster
     //   val invs = pm.brokenInvariants
 

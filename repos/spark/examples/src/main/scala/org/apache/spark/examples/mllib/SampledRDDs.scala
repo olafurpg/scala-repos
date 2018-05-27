@@ -41,12 +41,13 @@ object SampledRDDs {
 
     val parser = new OptionParser[Params]("SampledRDDs") {
       head(
-          "SampledRDDs: an example app for randomly generated and sampled RDDs.")
+        "SampledRDDs: an example app for randomly generated and sampled RDDs.")
       opt[String]("input")
         .text(
-            s"Input path to labeled examples in LIBSVM format, default: ${defaultParams.input}")
+          s"Input path to labeled examples in LIBSVM format, default: ${defaultParams.input}")
         .action((x, c) => c.copy(input = x))
-      note("""
+      note(
+        """
         |For example, the following command runs this app:
         |
         | bin/spark-submit --class org.apache.spark.examples.mllib.SampledRDDs \
@@ -73,12 +74,12 @@ object SampledRDDs {
       throw new RuntimeException("Error: Data file had no samples to load.")
     }
     println(
-        s"Loaded data with $numExamples examples from file: ${params.input}")
+      s"Loaded data with $numExamples examples from file: ${params.input}")
 
     // Example: RDD.sample() and RDD.takeSample()
     val expectedSampleSize = (numExamples * fraction).toInt
     println(
-        s"Sampling RDD using fraction $fraction.  Expected sample size = $expectedSampleSize.")
+      s"Sampling RDD using fraction $fraction.  Expected sample size = $expectedSampleSize.")
     val sampledRDD =
       examples.sample(withReplacement = true, fraction = fraction)
     println(s"  RDD.sample(): sample has ${sampledRDD.count()} examples")
@@ -103,7 +104,7 @@ object SampledRDDs {
     val keyCountsB = sampledByKeyRDD.countByKey()
     val sizeB = keyCountsB.values.sum
     println(
-        s"  Sampled $sizeB examples using approximate stratified sampling (by label)." +
+      s"  Sampled $sizeB examples using approximate stratified sampling (by label)." +
         " ==> Approx Sample")
 
     //  Subsample, and count examples per label in sampled data. (approximate)
@@ -112,7 +113,7 @@ object SampledRDDs {
     val keyCountsBExact = sampledByKeyRDDExact.countByKey()
     val sizeBExact = keyCountsBExact.values.sum
     println(
-        s"  Sampled $sizeBExact examples using exact stratified sampling (by label)." +
+      s"  Sampled $sizeBExact examples using exact stratified sampling (by label)." +
         " ==> Exact Sample")
 
     //  Compare samples

@@ -7,7 +7,13 @@ import java.util.concurrent.{TimeUnit, TimeoutException}
 
 import akka.stream.impl.fusing.GraphStages.SimpleLinearGraphStage
 import akka.stream._
-import akka.stream.stage.{GraphStage, GraphStageLogic, InHandler, OutHandler, TimerGraphStageLogic}
+import akka.stream.stage.{
+  GraphStage,
+  GraphStageLogic,
+  InHandler,
+  OutHandler,
+  TimerGraphStageLogic
+}
 
 import scala.concurrent.duration.{Duration, Deadline, FiniteDuration}
 
@@ -26,15 +32,16 @@ private[stream] object Timers {
   private def idleTimeoutCheckInterval(
       timeout: FiniteDuration): FiniteDuration = {
     import scala.concurrent.duration._
-    FiniteDuration(math.min(math.max(timeout.toNanos / 8, 100.millis.toNanos),
-                            timeout.toNanos / 2),
-                   TimeUnit.NANOSECONDS)
+    FiniteDuration(
+      math.min(
+        math.max(timeout.toNanos / 8, 100.millis.toNanos),
+        timeout.toNanos / 2),
+      TimeUnit.NANOSECONDS)
   }
 
   final class Initial[T](timeout: FiniteDuration)
       extends SimpleLinearGraphStage[T] {
-    override def createLogic(
-        inheritedAttributes: Attributes): GraphStageLogic =
+    override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
       new TimerGraphStageLogic(shape) {
         private var initialHasPassed = false
 
@@ -51,8 +58,9 @@ private[stream] object Timers {
 
         final override protected def onTimer(key: Any): Unit =
           if (!initialHasPassed)
-            failStage(new TimeoutException(
-                    s"The first element has not yet passed through in $timeout."))
+            failStage(
+              new TimeoutException(
+                s"The first element has not yet passed through in $timeout."))
 
         override def preStart(): Unit = scheduleOnce("InitialTimeout", timeout)
       }
@@ -63,8 +71,7 @@ private[stream] object Timers {
   final class Completion[T](timeout: FiniteDuration)
       extends SimpleLinearGraphStage[T] {
 
-    override def createLogic(
-        inheritedAttributes: Attributes): GraphStageLogic =
+    override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
       new TimerGraphStageLogic(shape) {
         setHandler(in, new InHandler {
           override def onPush(): Unit = push(out, grab(in))
@@ -76,8 +83,8 @@ private[stream] object Timers {
 
         final override protected def onTimer(key: Any): Unit =
           failStage(
-              new TimeoutException(
-                  s"The stream has not been completed in $timeout."))
+            new TimeoutException(
+              s"The stream has not been completed in $timeout."))
 
         override def preStart(): Unit =
           scheduleOnce("CompletionTimeoutTimer", timeout)
@@ -89,8 +96,7 @@ private[stream] object Timers {
   final class Idle[T](timeout: FiniteDuration)
       extends SimpleLinearGraphStage[T] {
 
-    override def createLogic(
-        inheritedAttributes: Attributes): GraphStageLogic =
+    override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
       new TimerGraphStageLogic(shape) {
         private var nextDeadline: Deadline = Deadline.now + timeout
         setHandler(in, new InHandler {
@@ -107,12 +113,12 @@ private[stream] object Timers {
         final override protected def onTimer(key: Any): Unit =
           if (nextDeadline.isOverdue())
             failStage(
-                new TimeoutException(
-                    s"No elements passed in the last $timeout."))
+              new TimeoutException(s"No elements passed in the last $timeout."))
 
         override def preStart(): Unit =
-          schedulePeriodically("IdleTimeoutCheckTimer",
-                               interval = idleTimeoutCheckInterval(timeout))
+          schedulePeriodically(
+            "IdleTimeoutCheckTimer",
+            interval = idleTimeoutCheckInterval(timeout))
       }
 
     override def toString = "IdleTimeout"
@@ -130,8 +136,7 @@ private[stream] object Timers {
 
     override def toString = "IdleTimeoutBidi"
 
-    override def createLogic(
-        inheritedAttributes: Attributes): GraphStageLogic =
+    override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
       new TimerGraphStageLogic(shape) {
         private var nextDeadline: Deadline = Deadline.now + timeout
 
@@ -166,12 +171,12 @@ private[stream] object Timers {
         final override def onTimer(key: Any): Unit =
           if (nextDeadline.isOverdue())
             failStage(
-                new TimeoutException(
-                    s"No elements passed in the last $timeout."))
+              new TimeoutException(s"No elements passed in the last $timeout."))
 
         override def preStart(): Unit =
           schedulePeriodically(
-              "IdleTimeoutCheckTimer", idleTimeoutCheckInterval(timeout))
+            "IdleTimeoutCheckTimer",
+            idleTimeoutCheckInterval(timeout))
       }
   }
 
@@ -182,8 +187,7 @@ private[stream] object Timers {
     override def initialAttributes = Attributes.name("DelayInitial")
     override val shape: FlowShape[T, T] = FlowShape(in, out)
 
-    override def createLogic(
-        inheritedAttributes: Attributes): GraphStageLogic =
+    override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
       new TimerGraphStageLogic(shape) {
         private val IdleTimer = "DelayTimer"
 
@@ -209,16 +213,14 @@ private[stream] object Timers {
       }
   }
 
-  final class IdleInject[I, O >: I](
-      val timeout: FiniteDuration, inject: () ⇒ O)
+  final class IdleInject[I, O >: I](val timeout: FiniteDuration, inject: () ⇒ O)
       extends GraphStage[FlowShape[I, O]] {
     val in: Inlet[I] = Inlet("IdleInject.in")
     val out: Outlet[O] = Outlet("IdleInject.out")
     override def initialAttributes = Attributes.name("IdleInject")
     override val shape: FlowShape[I, O] = FlowShape(in, out)
 
-    override def createLogic(
-        inheritedAttributes: Attributes): GraphStageLogic =
+    override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
       new TimerGraphStageLogic(shape) {
         private val IdleTimer = "IdleTimer"
         private var nextDeadline = Deadline.now + timeout
@@ -226,35 +228,41 @@ private[stream] object Timers {
         // Prefetching to ensure priority of actual upstream elements
         override def preStart(): Unit = pull(in)
 
-        setHandler(in, new InHandler {
-          override def onPush(): Unit = {
-            nextDeadline = Deadline.now + timeout
-            cancelTimer(IdleTimer)
-            if (isAvailable(out)) {
-              push(out, grab(in))
-              pull(in)
+        setHandler(
+          in,
+          new InHandler {
+            override def onPush(): Unit = {
+              nextDeadline = Deadline.now + timeout
+              cancelTimer(IdleTimer)
+              if (isAvailable(out)) {
+                push(out, grab(in))
+                pull(in)
+              }
+            }
+
+            override def onUpstreamFinish(): Unit = {
+              if (!isAvailable(in)) completeStage()
             }
           }
+        )
 
-          override def onUpstreamFinish(): Unit = {
-            if (!isAvailable(in)) completeStage()
-          }
-        })
-
-        setHandler(out, new OutHandler {
-          override def onPull(): Unit = {
-            if (isAvailable(in)) {
-              push(out, grab(in))
-              if (isClosed(in)) completeStage()
-              else pull(in)
-            } else {
-              if (nextDeadline.isOverdue()) {
-                nextDeadline = Deadline.now + timeout
-                push(out, inject())
-              } else scheduleOnce(IdleTimer, nextDeadline.timeLeft)
+        setHandler(
+          out,
+          new OutHandler {
+            override def onPull(): Unit = {
+              if (isAvailable(in)) {
+                push(out, grab(in))
+                if (isClosed(in)) completeStage()
+                else pull(in)
+              } else {
+                if (nextDeadline.isOverdue()) {
+                  nextDeadline = Deadline.now + timeout
+                  push(out, inject())
+                } else scheduleOnce(IdleTimer, nextDeadline.timeLeft)
+              }
             }
           }
-        })
+        )
 
         override protected def onTimer(timerKey: Any): Unit = {
           if (nextDeadline.isOverdue() && isAvailable(out)) {

@@ -39,7 +39,8 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class InputMethodHighlightSpec
     extends SFXEnumDelegateSpec[
-        jfxsi.InputMethodHighlight, InputMethodHighlight](
-        javaClass = classOf[jfxsi.InputMethodHighlight],
-        scalaClass = classOf[InputMethodHighlight],
-        companion = InputMethodHighlight)
+      jfxsi.InputMethodHighlight,
+      InputMethodHighlight](
+      javaClass = classOf[jfxsi.InputMethodHighlight],
+      scalaClass = classOf[InputMethodHighlight],
+      companion = InputMethodHighlight)

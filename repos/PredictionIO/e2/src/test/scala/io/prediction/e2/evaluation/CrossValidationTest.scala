@@ -20,7 +20,10 @@ object CrossValidationTest {
 }
 
 class CrossValidationTest
-    extends FlatSpec with Matchers with Inspectors with SharedSparkContext {
+    extends FlatSpec
+    with Matchers
+    with Inspectors
+    with SharedSparkContext {
 
   val Label1 = "l1"
   val Label2 = "l2"
@@ -32,18 +35,19 @@ class CrossValidationTest
   val NotAttribute2 = "na2"
 
   val labeledPoints = Seq(
-      LabeledPoint(Label1, Array(Attribute1, Attribute2)),
-      LabeledPoint(Label2, Array(NotAttribute1, Attribute2)),
-      LabeledPoint(Label3, Array(Attribute1, NotAttribute2)),
-      LabeledPoint(Label4, Array(NotAttribute1, NotAttribute2))
+    LabeledPoint(Label1, Array(Attribute1, Attribute2)),
+    LabeledPoint(Label2, Array(NotAttribute1, Attribute2)),
+    LabeledPoint(Label3, Array(Attribute1, NotAttribute2)),
+    LabeledPoint(Label4, Array(NotAttribute1, NotAttribute2))
   )
 
   val dataCount = labeledPoints.size
   val evalKs = (1 to dataCount)
   val emptyParams = new CrossValidationTest.EmptyEvaluationParams()
-  type Fold = (CrossValidationTest.TrainingData,
-  CrossValidationTest.EmptyEvaluationParams,
-  RDD[(CrossValidationTest.Query, CrossValidationTest.ActualResult)])
+  type Fold = (
+      CrossValidationTest.TrainingData,
+      CrossValidationTest.EmptyEvaluationParams,
+      RDD[(CrossValidationTest.Query, CrossValidationTest.ActualResult)])
 
   def toTestTrain(dataSplit: Fold): (Seq[LabeledPoint], Seq[LabeledPoint]) = {
     val trainingData = dataSplit._1.labeledPoints
@@ -56,17 +60,18 @@ class CrossValidationTest
   }
 
   def splitData(k: Int, labeledPointsRDD: RDD[LabeledPoint]): Seq[Fold] = {
-    CommonHelperFunctions.splitData[LabeledPoint,
-                                    CrossValidationTest.TrainingData,
-                                    CrossValidationTest.EmptyEvaluationParams,
-                                    CrossValidationTest.Query,
-                                    CrossValidationTest.ActualResult](
-        k,
-        labeledPointsRDD,
-        emptyParams,
-        CrossValidationTest.toTrainingData,
-        CrossValidationTest.toQuery,
-        CrossValidationTest.toActualResult)
+    CommonHelperFunctions.splitData[
+      LabeledPoint,
+      CrossValidationTest.TrainingData,
+      CrossValidationTest.EmptyEvaluationParams,
+      CrossValidationTest.Query,
+      CrossValidationTest.ActualResult](
+      k,
+      labeledPointsRDD,
+      emptyParams,
+      CrossValidationTest.toTrainingData,
+      CrossValidationTest.toQuery,
+      CrossValidationTest.toActualResult)
   }
 
   "Fold count" should "equal evalK" in {

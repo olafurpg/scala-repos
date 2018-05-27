@@ -82,9 +82,12 @@ import java.io.{ObjectOutputStream, ObjectInputStream}
   */
 @SerialVersionUID(-6084104484083858598L) // value computed by serialver for 2.11.2, annotation added in 2.11.4
 sealed abstract class List[+A]
-    extends AbstractSeq[A] with LinearSeq[A] with Product
+    extends AbstractSeq[A]
+    with LinearSeq[A]
+    with Product
     with GenericTraversableTemplate[A, List]
-    with LinearSeqOptimized[A, List[A]] with scala.Serializable {
+    with LinearSeqOptimized[A, List[A]]
+    with scala.Serializable {
   override def companion: GenericCompanion[List] = List
 
   def isEmpty: Boolean
@@ -160,7 +163,9 @@ sealed abstract class List[+A]
     // If any successful optimization attempts or other changes are made, please rehash them there too.
     @tailrec
     def loop(
-        mapped: ListBuffer[B], unchanged: List[A], pending: List[A]): List[B] =
+        mapped: ListBuffer[B],
+        unchanged: List[A],
+        pending: List[A]): List[B] =
       if (pending.isEmpty) {
         if (mapped eq null) unchanged
         else mapped.prependToList(unchanged)
@@ -195,7 +200,7 @@ sealed abstract class List[+A]
   override def +:[B >: A, That](elem: B)(
       implicit bf: CanBuildFrom[List[A], B, That]): That = bf match {
     case _: List.GenericCanBuildFrom[_] => (elem :: this).asInstanceOf[That]
-    case _ => super.+:(elem)(bf)
+    case _                              => super.+:(elem)(bf)
   }
 
   override def toList: List[A] = this
@@ -246,7 +251,7 @@ sealed abstract class List[+A]
   override def takeRight(n: Int): List[A] = {
     @tailrec
     def loop(lead: List[A], lag: List[A]): List[A] = lead match {
-      case Nil => lag
+      case Nil       => lag
       case _ :: tail => loop(tail, lag.tail)
     }
     loop(drop(n), this)
@@ -425,7 +430,7 @@ case object Nil extends List[Nothing] {
   // Removal of equals method here might lead to an infinite recursion similar to IntMap.equals.
   override def equals(that: Any) = that match {
     case that1: scala.collection.GenSeq[_] => that1.isEmpty
-    case _ => false
+    case _                                 => false
   }
 }
 

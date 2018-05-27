@@ -11,7 +11,7 @@ trait PostErasure {
       case ConstantType(Constant(tp: Type)) =>
         ConstantType(Constant(apply(tp)))
       case ErasedValueType(_, underlying) => underlying
-      case _ => mapOver(tp)
+      case _                              => mapOver(tp)
     }
   }
 

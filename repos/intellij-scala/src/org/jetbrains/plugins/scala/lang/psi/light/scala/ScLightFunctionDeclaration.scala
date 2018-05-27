@@ -17,10 +17,11 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult}
   * @author Alefas
   * @since 03/04/14.
   */
-class ScLightFunctionDeclaration(pTypes: List[List[ScType]],
-                                 tParams: List[TypeParameter],
-                                 rt: ScType,
-                                 val fun: ScFunctionDeclaration)
+class ScLightFunctionDeclaration(
+    pTypes: List[List[ScType]],
+    tParams: List[TypeParameter],
+    rt: ScType,
+    val fun: ScFunctionDeclaration)
     extends LightElement(fun.getManager, fun.getLanguage)
     with ScFunctionDeclaration {
   setNavigationElement(fun)
@@ -87,8 +88,8 @@ class ScLightFunctionDeclaration(pTypes: List[List[ScType]],
 
   override def canNavigateToSource: Boolean = fun.canNavigateToSource
 
-  override protected def findChildrenByClassScala[
-      T >: Null <: ScalaPsiElement](clazz: Class[T]): Array[T] =
+  override protected def findChildrenByClassScala[T >: Null <: ScalaPsiElement](
+      clazz: Class[T]): Array[T] =
     throw new UnsupportedOperationException("Operation on light function")
 
   override protected def findChildByClassScala[T >: Null <: ScalaPsiElement](

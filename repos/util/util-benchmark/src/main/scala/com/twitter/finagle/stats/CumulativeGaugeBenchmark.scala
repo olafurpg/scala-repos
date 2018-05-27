@@ -60,7 +60,8 @@ object CumulativeGaugeBenchmark {
     var gauges = Map.empty[Seq[String], () => Float]
 
     override protected[this] def registerGauge(
-        name: Seq[String], f: => Float): Unit =
+        name: Seq[String],
+        f: => Float): Unit =
       gauges += name -> (() => f)
 
     override protected[this] def deregisterGauge(name: Seq[String]): Unit =

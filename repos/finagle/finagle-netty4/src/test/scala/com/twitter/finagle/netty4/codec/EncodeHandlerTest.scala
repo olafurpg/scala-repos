@@ -19,9 +19,10 @@ class EncodeHandlerTest extends FunSuite with MockitoSugar {
     val messagesSeen = new ArrayBuffer[ByteBuf]
     val writeSnooper = new ChannelOutboundHandlerAdapter {
 
-      override def write(ctx: ChannelHandlerContext,
-                         msg: scala.Any,
-                         promise: ChannelPromise): Unit = {
+      override def write(
+          ctx: ChannelHandlerContext,
+          msg: scala.Any,
+          promise: ChannelPromise): Unit = {
         msg match {
           case s: ByteBuf =>
             messagesSeen.append(s)
@@ -51,7 +52,8 @@ class EncodeHandlerTest extends FunSuite with MockitoSugar {
     @volatile var exnSeen: Throwable = null
     val exnSnooper = new ChannelInboundHandlerAdapter {
       override def exceptionCaught(
-          ctx: ChannelHandlerContext, cause: Throwable): Unit = {
+          ctx: ChannelHandlerContext,
+          cause: Throwable): Unit = {
         exnSeen = cause.getCause
         super.exceptionCaught(ctx, cause)
       }

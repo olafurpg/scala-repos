@@ -44,9 +44,9 @@ object JSSE {
       context.init(kms, null, null)
 
       log.finest(
-          "JSSE context instantiated for certificate '%s'".format(
-              certificatePath
-          ))
+        "JSSE context instantiated for certificate '%s'".format(
+          certificatePath
+        ))
 
       context
     }
@@ -54,8 +54,8 @@ object JSSE {
     val context = synchronized {
       if (useCache)
         contextCache.getOrElseUpdate(
-            List(certificatePath, keyPath, caCertPath).mkString(" + "),
-            makeContext
+          List(certificatePath, keyPath, caCertPath).mkString(" + "),
+          makeContext
         )
       else makeContext
     }
@@ -116,7 +116,9 @@ object JSSE {
   }
 
   private[this] def client(
-      trustManagers: Array[TrustManager], host: String, port: Int): Engine = {
+      trustManagers: Array[TrustManager],
+      host: String,
+      port: Int): Engine = {
     val ctx = SSLContext.getInstance(protocol)
     ctx.init(null, trustManagers, null)
     val sslEngine = ctx.createSSLEngine(host, port)

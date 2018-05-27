@@ -1,7 +1,7 @@
 package breeze.stats.distributions
 
 /**
-  * 
+  *
   * @author dlwh
   */
 trait SufficientStatistic[T <: SufficientStatistic[T]] {

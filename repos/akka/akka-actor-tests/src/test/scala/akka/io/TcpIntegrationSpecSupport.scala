@@ -23,7 +23,8 @@ trait TcpIntegrationSpecSupport {
     def bindServer(): Unit = {
       val bindCommander = TestProbe()
       bindCommander.send(
-          IO(Tcp), Bind(bindHandler.ref, endpoint, options = bindOptions))
+        IO(Tcp),
+        Bind(bindHandler.ref, endpoint, options = bindOptions))
       bindCommander.expectMsg(Bound(endpoint))
     }
 
@@ -31,7 +32,8 @@ trait TcpIntegrationSpecSupport {
         ): (TestProbe, ActorRef, TestProbe, ActorRef) = {
       val connectCommander = TestProbe()
       connectCommander.send(
-          IO(Tcp), Connect(endpoint, options = connectOptions))
+        IO(Tcp),
+        Connect(endpoint, options = connectOptions))
       val Connected(`endpoint`, localAddress) =
         connectCommander.expectMsgType[Connected]
       val clientHandler = TestProbe()
@@ -42,14 +44,16 @@ trait TcpIntegrationSpecSupport {
       val serverHandler = TestProbe()
       bindHandler.sender() ! Register(serverHandler.ref)
 
-      (clientHandler,
-       connectCommander.sender(),
-       serverHandler,
-       bindHandler.sender())
+      (
+        clientHandler,
+        connectCommander.sender(),
+        serverHandler,
+        bindHandler.sender())
     }
 
     @tailrec final def expectReceivedData(
-        handler: TestProbe, remaining: Int): Unit =
+        handler: TestProbe,
+        remaining: Int): Unit =
       if (remaining > 0) {
         val recv = handler.expectMsgType[Received]
         expectReceivedData(handler, remaining - recv.data.size)

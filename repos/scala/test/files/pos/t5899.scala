@@ -13,8 +13,8 @@ trait Foo {
     val Stable = sym.name
     Bippy(Stable) match {
       case Bippy(nme.WILDCARD) => 1
-      case Bippy(Stable) => 2 // should not be considered unreachable
-      case Bippy(_) => 3
+      case Bippy(Stable)       => 2 // should not be considered unreachable
+      case Bippy(_)            => 3
     }
   }
 }

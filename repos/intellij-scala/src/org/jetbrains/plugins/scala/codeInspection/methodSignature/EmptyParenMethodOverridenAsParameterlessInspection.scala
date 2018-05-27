@@ -9,8 +9,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
   */
 class EmptyParenMethodOverridenAsParameterlessInspection
     extends AbstractMethodSignatureInspection(
-        "ScalaEmptyParenMethodOverridenAsParameterless",
-        "Empty-paren Scala method overriden as parameterless") {
+      "ScalaEmptyParenMethodOverridenAsParameterless",
+      "Empty-paren Scala method overriden as parameterless") {
 
   def actionFor(holder: ProblemsHolder) = {
     case f: ScFunction if f.isParameterless =>
@@ -19,7 +19,9 @@ class EmptyParenMethodOverridenAsParameterlessInspection
         case Some(method: ScFunction)
             if !method.isInCompiledFile && method.isEmptyParen =>
           holder.registerProblem(
-              f.nameId, getDisplayName, new AddEmptyParentheses(f))
+            f.nameId,
+            getDisplayName,
+            new AddEmptyParentheses(f))
         case _ =>
       }
   }

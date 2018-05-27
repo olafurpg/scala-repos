@@ -40,7 +40,9 @@ trait BooleanOrder extends Order[Boolean] with Serializable {
 
 @SerialVersionUID(0L)
 class BooleanStructure
-    extends BooleanIsBool with BooleanIsRig with BooleanOrder
+    extends BooleanIsBool
+    with BooleanIsRig
+    with BooleanOrder
     with Serializable {
   override def one: Boolean = true
   override def zero: Boolean = false

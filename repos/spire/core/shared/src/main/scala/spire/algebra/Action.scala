@@ -54,7 +54,9 @@ object RightAction {
   * 5. `g |+|> p === p <|+| g.inverse`.
   */
 trait Action[@sp(Int) P, G]
-    extends Any with LeftAction[P, G] with RightAction[P, G]
+    extends Any
+    with LeftAction[P, G]
+    with RightAction[P, G]
 
 object Action {
   @inline def apply[P, G](G: Action[P, G]): Action[P, G] = G

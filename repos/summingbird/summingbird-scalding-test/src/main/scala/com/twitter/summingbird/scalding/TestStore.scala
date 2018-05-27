@@ -31,27 +31,34 @@ import cascading.tuple.{Tuple, TupleEntry}
 import cascading.flow.FlowDef
 
 object TestStore {
-  def apply[K, V](store: String,
-                  inBatcher: Batcher,
-                  initStore: Iterable[(K, V)],
-                  lastTime: Long,
-                  pruning: PrunedSpace[(K, V)] = PrunedSpace.neverPruned)(
+  def apply[K, V](
+      store: String,
+      inBatcher: Batcher,
+      initStore: Iterable[(K, V)],
+      lastTime: Long,
+      pruning: PrunedSpace[(K, V)] = PrunedSpace.neverPruned)(
       implicit ord: Ordering[K],
       tset: TupleSetter[(K, V)],
       tconv: TupleConverter[(K, V)]) = {
     val startBatch = inBatcher.batchOf(Timestamp(0)).prev
     val endBatch = inBatcher.batchOf(Timestamp(lastTime)).next
     new TestStore[K, V](
-        store, inBatcher, startBatch, initStore, endBatch, pruning)
+      store,
+      inBatcher,
+      startBatch,
+      initStore,
+      endBatch,
+      pruning)
   }
 }
 
-class TestStore[K, V](store: String,
-                      inBatcher: Batcher,
-                      val initBatch: BatchID,
-                      initStore: Iterable[(K, V)],
-                      lastBatch: BatchID,
-                      override val pruning: PrunedSpace[(K, V)])(
+class TestStore[K, V](
+    store: String,
+    inBatcher: Batcher,
+    val initBatch: BatchID,
+    initStore: Iterable[(K, V)],
+    lastBatch: BatchID,
+    override val pruning: PrunedSpace[(K, V)])(
     implicit ord: Ordering[K],
     tset: TupleSetter[(K, V)],
     tconv: TupleConverter[(K, V)])
@@ -102,7 +109,8 @@ class TestStore[K, V](store: String,
 
   /** Instances may choose to write out the last or just compute it from the stream */
   override def writeLast(batchID: BatchID, lastVals: TypedPipe[(K, V)])(
-      implicit flowDef: FlowDef, mode: Mode): Unit = {
+      implicit flowDef: FlowDef,
+      mode: Mode): Unit = {
     val out = batches(batchID)
     lastVals.write(TypedSink[(K, V)](out))
     writtenBatches = writtenBatches + batchID

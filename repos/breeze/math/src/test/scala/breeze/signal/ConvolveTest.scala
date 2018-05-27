@@ -23,41 +23,68 @@ class ConvolveTest extends FunSuite {
     assert(correlate(data, kernelEven) == DenseVector(8.0, 11.0, 14.0))
 
     assert(
-        convolve(data, kernelEven, overhang = OptOverhang.Full) == DenseVector(
-            2.0, 7.0, 10.0, 13.0, 10))
+      convolve(data, kernelEven, overhang = OptOverhang.Full) == DenseVector(
+        2.0,
+        7.0,
+        10.0,
+        13.0,
+        10))
     assert(
-        correlate(data, kernelEven, overhang = OptOverhang.Full) == DenseVector(
-            4.0, 8.0, 11.0, 14.0, 5.0))
+      correlate(data, kernelEven, overhang = OptOverhang.Full) == DenseVector(
+        4.0,
+        8.0,
+        11.0,
+        14.0,
+        5.0))
 
     assert(
-        convolve(data, kernelEven, overhang = OptOverhang.None) == DenseVector(
-            7.0, 10.0, 13.0))
+      convolve(data, kernelEven, overhang = OptOverhang.None) == DenseVector(
+        7.0,
+        10.0,
+        13.0))
     assert(
-        correlate(data, kernelEven, overhang = OptOverhang.None) == DenseVector(
-            8.0, 11.0, 14.0))
+      correlate(data, kernelEven, overhang = OptOverhang.None) == DenseVector(
+        8.0,
+        11.0,
+        14.0))
 
     //println(convolve(data, kernel, overhang = OptOverhang.PreserveLength ))
     assert(
-        convolve(data, kernelEven, overhang = OptOverhang.PreserveLength) == DenseVector(
-            7.0, 10.0, 13.0, 10.0))
+      convolve(data, kernelEven, overhang = OptOverhang.PreserveLength) == DenseVector(
+        7.0,
+        10.0,
+        13.0,
+        10.0))
     assert(
-        correlate(data, kernelEven, overhang = OptOverhang.PreserveLength) == DenseVector(
-            8.0, 11.0, 14.0, 5.0))
+      correlate(data, kernelEven, overhang = OptOverhang.PreserveLength) == DenseVector(
+        8.0,
+        11.0,
+        14.0,
+        5.0))
     assert(
-        convolve(data, kernelOdd, overhang = OptOverhang.PreserveLength) == DenseVector(
-            7.0, 16.0, 22.0, 22.0))
+      convolve(data, kernelOdd, overhang = OptOverhang.PreserveLength) == DenseVector(
+        7.0,
+        16.0,
+        22.0,
+        22.0))
     assert(
-        correlate(data, kernelOdd, overhang = OptOverhang.PreserveLength) == DenseVector(
-            13.0, 20.0, 26.0, 14.0))
+      correlate(data, kernelOdd, overhang = OptOverhang.PreserveLength) == DenseVector(
+        13.0,
+        20.0,
+        26.0,
+        14.0))
 
     assert(convolve(data, kernelEven, 0 to 1) == DenseVector(7.0, 10.0))
     assert(
-        correlate(data, kernelEven, 2 to -1, overhang = OptOverhang.Full) == DenseVector(
-            11.0, 14.0, 5.0))
-    assert(correlate(data,
-                     kernelEven,
-                     2 to -1 by 2,
-                     overhang = OptOverhang.Full) == DenseVector(11.0, 5.0))
+      correlate(data, kernelEven, 2 to -1, overhang = OptOverhang.Full) == DenseVector(
+        11.0,
+        14.0,
+        5.0))
+    assert(correlate(
+      data,
+      kernelEven,
+      2 to -1 by 2,
+      overhang = OptOverhang.Full) == DenseVector(11.0, 5.0))
   }
   //MatLab: conv(2 : 5, 1 : 2)
   //Mathematica: ListConvolve[{1, 2}, {2, 3, 4, 5}]
@@ -69,7 +96,8 @@ class ConvolveTest extends FunSuite {
     assert(convolve(data, kernelEven) == DenseVector(7L, 10L, 13L))
     assert(correlate(data, kernelEven) == DenseVector(8L, 11L, 14L))
     assert(
-        correlate(data, kernelEven, range = (0 to 2 by 2)) == DenseVector(8L,
-                                                                          14L))
+      correlate(data, kernelEven, range = (0 to 2 by 2)) == DenseVector(
+        8L,
+        14L))
   }
 }

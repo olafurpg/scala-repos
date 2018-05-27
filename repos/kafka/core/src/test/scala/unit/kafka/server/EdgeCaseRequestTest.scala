@@ -27,7 +27,11 @@ import kafka.utils._
 import org.apache.kafka.common.TopicPartition
 import org.apache.kafka.common.protocol.types.Type
 import org.apache.kafka.common.protocol.{ApiKeys, SecurityProtocol}
-import org.apache.kafka.common.requests.{ProduceResponse, ResponseHeader, ProduceRequest}
+import org.apache.kafka.common.requests.{
+  ProduceResponse,
+  ResponseHeader,
+  ProduceRequest
+}
 import org.junit.Assert._
 import org.junit.Test
 
@@ -50,7 +54,9 @@ class EdgeCaseRequestTest extends KafkaServerTestHarness {
   }
 
   private def sendRequest(
-      socket: Socket, request: Array[Byte], id: Option[Short] = None) {
+      socket: Socket,
+      request: Array[Byte],
+      id: Option[Short] = None) {
     val outgoing = new DataOutputStream(socket.getOutputStream)
     id match {
       case Some(id) =>
@@ -72,7 +78,8 @@ class EdgeCaseRequestTest extends KafkaServerTestHarness {
   }
 
   private def requestAndReceive(
-      request: Array[Byte], id: Option[Short] = None): Array[Byte] = {
+      request: Array[Byte],
+      id: Option[Short] = None): Array[Byte] = {
     val plainSocket = connect()
     try {
       sendRequest(plainSocket, request, id)
@@ -83,13 +90,14 @@ class EdgeCaseRequestTest extends KafkaServerTestHarness {
   }
 
   // Custom header serialization so that protocol assumptions are not forced
-  private def requestHeaderBytes(apiKey: Short,
-                                 apiVersion: Short,
-                                 clientId: String = "",
-                                 correlationId: Int = -1): Array[Byte] = {
+  private def requestHeaderBytes(
+      apiKey: Short,
+      apiVersion: Short,
+      clientId: String = "",
+      correlationId: Int = -1): Array[Byte] = {
     val size = {
       2 /* apiKey */ + 2 /* version id */ + 4 /* correlation id */ +
-      Type.NULLABLE_STRING.sizeOf(clientId) /* client id */
+        Type.NULLABLE_STRING.sizeOf(clientId) /* client id */
     }
 
     val buffer = ByteBuffer.allocate(size)
@@ -104,9 +112,10 @@ class EdgeCaseRequestTest extends KafkaServerTestHarness {
     val plainSocket = connect()
     try {
       sendRequest(plainSocket, requestHeaderBytes(-1, 0))
-      assertEquals("The server should disconnect",
-                   -1,
-                   plainSocket.getInputStream.read())
+      assertEquals(
+        "The server should disconnect",
+        -1,
+        plainSocket.getInputStream.read())
     } finally {
       plainSocket.close()
     }
@@ -117,20 +126,21 @@ class EdgeCaseRequestTest extends KafkaServerTestHarness {
     val topic = "topic"
     val topicPartition = new TopicPartition(topic, 0)
     val correlationId = -1
-    TestUtils.createTopic(zkUtils,
-                          topic,
-                          numPartitions = 1,
-                          replicationFactor = 1,
-                          servers = servers)
+    TestUtils.createTopic(
+      zkUtils,
+      topic,
+      numPartitions = 1,
+      replicationFactor = 1,
+      servers = servers)
 
     val serializedBytes = {
-      val headerBytes = requestHeaderBytes(
-          ApiKeys.PRODUCE.id, 2, null, correlationId)
+      val headerBytes =
+        requestHeaderBytes(ApiKeys.PRODUCE.id, 2, null, correlationId)
       val messageBytes = "message".getBytes
       val request = new ProduceRequest(
-          1,
-          10000,
-          Map(topicPartition -> ByteBuffer.wrap(messageBytes)).asJava)
+        1,
+        10000,
+        Map(topicPartition -> ByteBuffer.wrap(messageBytes)).asJava)
       val byteBuffer = ByteBuffer.allocate(headerBytes.length + request.sizeOf)
       byteBuffer.put(headerBytes)
       request.writeTo(byteBuffer)
@@ -144,13 +154,17 @@ class EdgeCaseRequestTest extends KafkaServerTestHarness {
     val produceResponse = ProduceResponse.parse(responseBuffer)
 
     assertEquals(
-        "The response should parse completely", 0, responseBuffer.remaining())
-    assertEquals("The correlationId should match request",
-                 correlationId,
-                 responseHeader.correlationId())
-    assertEquals("One partition response should be returned",
-                 1,
-                 produceResponse.responses().size())
+      "The response should parse completely",
+      0,
+      responseBuffer.remaining())
+    assertEquals(
+      "The correlationId should match request",
+      correlationId,
+      responseHeader.correlationId())
+    assertEquals(
+      "One partition response should be returned",
+      1,
+      produceResponse.responses().size())
 
     val partitionResponse = produceResponse.responses().get(topicPartition)
     assertNotNull(partitionResponse)
@@ -177,7 +191,7 @@ class EdgeCaseRequestTest extends KafkaServerTestHarness {
     val serializedBytes = {
       // Only send apiKey and apiVersion
       val buffer = ByteBuffer.allocate(
-          2 /* apiKey */ + 2 /* apiVersion */
+        2 /* apiKey */ + 2 /* apiVersion */
       )
       buffer.putShort(ApiKeys.PRODUCE.id)
       buffer.putShort(1)

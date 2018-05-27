@@ -15,17 +15,17 @@ class LineNumberSpec extends AkkaSpec {
 
       "work for small functions" in {
         LineNumbers(oneline) should ===(
-            SourceFileLines("LineNumberSpecCodeForScala.scala", 12, 12))
+          SourceFileLines("LineNumberSpecCodeForScala.scala", 12, 12))
       }
 
       "work for larger functions" in {
         LineNumbers(twoline) should ===(
-            SourceFileLines("LineNumberSpecCodeForScala.scala", 14, 16))
+          SourceFileLines("LineNumberSpecCodeForScala.scala", 14, 16))
       }
 
       "work for partial functions" in {
         LineNumbers(partial) should ===(
-            SourceFileLines("LineNumberSpecCodeForScala.scala", 19, 21))
+          SourceFileLines("LineNumberSpecCodeForScala.scala", 19, 21))
       }
     }
 
@@ -43,7 +43,7 @@ class LineNumberSpec extends AkkaSpec {
 
       "work for anonymous classes" in {
         LineNumbers(l.f3()) should ===(
-            SourceFileLines("LineNumberSpecCodeForJava.java", 31, 35))
+          SourceFileLines("LineNumberSpecCodeForJava.java", 31, 35))
       }
     }
   }

@@ -82,9 +82,10 @@ object Block {
   def parse(builder: ScalaPsiBuilder, hasBrace: Boolean): Boolean =
     parse(builder, hasBrace, needNode = false)
 
-  def parse(builder: ScalaPsiBuilder,
-            hasBrace: Boolean,
-            needNode: Boolean): Boolean = {
+  def parse(
+      builder: ScalaPsiBuilder,
+      hasBrace: Boolean,
+      needNode: Boolean): Boolean = {
     if (hasBrace) {
       val blockMarker = builder.mark
       builder.getTokenType match {

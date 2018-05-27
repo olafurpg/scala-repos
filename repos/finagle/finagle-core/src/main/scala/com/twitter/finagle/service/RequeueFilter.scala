@@ -35,16 +35,18 @@ import com.twitter.util._
   * @see The [[https://twitter.github.io/finagle/guide/Servers.html#request-timeout user guide]]
   *      for more details.
   */
-private[finagle] class RequeueFilter[Req, Rep](retryBudget: RetryBudget,
-                                               retryBackoffs: Stream[Duration],
-                                               statsReceiver: StatsReceiver,
-                                               canRetry: () => Boolean,
-                                               maxRetriesPerReq: Double,
-                                               timer: Timer)
+private[finagle] class RequeueFilter[Req, Rep](
+    retryBudget: RetryBudget,
+    retryBackoffs: Stream[Duration],
+    statsReceiver: StatsReceiver,
+    canRetry: () => Boolean,
+    maxRetriesPerReq: Double,
+    timer: Timer)
     extends SimpleFilter[Req, Rep] {
 
-  require(maxRetriesPerReq >= 0,
-          s"maxRetriesPerReq must be non-negative: $maxRetriesPerReq")
+  require(
+    maxRetriesPerReq >= 0,
+    s"maxRetriesPerReq must be non-negative: $maxRetriesPerReq")
 
   private[this] val requeueCounter = statsReceiver.counter("requeues")
   private[this] val budgetExhaustCounter =
@@ -80,14 +82,22 @@ private[finagle] class RequeueFilter[Req, Rep](retryBudget: RetryBudget,
               // no delay between retries. Retry immediately.
               requeueCounter.incr()
               applyService(
-                  req, service, attempt + 1, retriesRemaining - 1, rest)
+                req,
+                service,
+                attempt + 1,
+                retriesRemaining - 1,
+                rest)
             case delay #:: rest =>
               // Delay and then retry.
               timer
                 .doLater(delay) {
                   requeueCounter.incr()
                   applyService(
-                      req, service, attempt + 1, retriesRemaining - 1, rest)
+                    req,
+                    service,
+                    attempt + 1,
+                    retriesRemaining - 1,
+                    rest)
                 }
                 .flatten
             case _ =>

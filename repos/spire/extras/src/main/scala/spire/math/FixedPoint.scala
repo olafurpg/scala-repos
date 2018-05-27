@@ -285,8 +285,8 @@ object FixedPoint extends FixedPointInstances {
   def apply(s: String)(implicit scale: FixedScale): FixedPoint =
     apply(Rational(s))
 
-  def apply[@sp(Float, Double) A](a: A)(
-      implicit scale: FixedScale, fr: Fractional[A]): FixedPoint = {
+  def apply[@sp(Float, Double) A](
+      a: A)(implicit scale: FixedScale, fr: Fractional[A]): FixedPoint = {
     val x = a * scale.denom
     if (x < fr.fromLong(Long.MinValue) || fr.fromLong(Long.MaxValue) < x)
       throw new FixedPointOverflow(x.toLong)
@@ -355,8 +355,8 @@ trait FixedPointInstances {
       def fromRational(n: Rational): FixedPoint = FixedPoint(n)
       def fromAlgebraic(n: Algebraic): FixedPoint =
         FixedPoint(
-            n.toRational.getOrElse(
-                Rational(n.toBigDecimal(MathContext.DECIMAL64))))
+          n.toRational.getOrElse(
+            Rational(n.toBigDecimal(MathContext.DECIMAL64))))
       def fromReal(n: Real): FixedPoint = FixedPoint(n.toRational)
 
       def fromType[B](b: B)(implicit ev: ConvertableFrom[B]): FixedPoint =
@@ -365,10 +365,10 @@ trait FixedPointInstances {
 
   import NumberTag._
   implicit final val FixedPointTag = new CustomTag[FixedPoint](
-      Approximate,
-      Some(FixedPoint.zero),
-      Some(FixedPoint.MinValue),
-      Some(FixedPoint.MaxValue),
-      true,
-      true)
+    Approximate,
+    Some(FixedPoint.zero),
+    Some(FixedPoint.MinValue),
+    Some(FixedPoint.MaxValue),
+    true,
+    true)
 }

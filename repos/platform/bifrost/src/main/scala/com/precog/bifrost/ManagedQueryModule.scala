@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -118,33 +118,38 @@ trait ManagedQueryModule extends YggConfigComponent with Logging {
     * query completes.
     */
   def createQueryJob(
-      apiKey: APIKey, data: Option[JValue], timeout: Option[Duration])(
+      apiKey: APIKey,
+      data: Option[JValue],
+      timeout: Option[Duration])(
       implicit asyncContext: ExecutionContext): Future[JobQueryTFMonad] = {
     val start = System.currentTimeMillis
     val futureJob = jobManager
-      .createJob(apiKey,
-                 "Quirrel Query",
-                 "bifrost-query",
-                 data,
-                 Some(yggConfig.clock.now()))
+      .createJob(
+        apiKey,
+        "Quirrel Query",
+        "bifrost-query",
+        data,
+        Some(yggConfig.clock.now()))
       .onComplete { _ =>
         logger.debug(
-            "Job created in %d ms".format(System.currentTimeMillis - start))
+          "Job created in %d ms".format(System.currentTimeMillis - start))
       }
     for {
       job <- futureJob map { job =>
         Some(job)
       } recover { case _ => None }
       queryStateManager = job map { job =>
-        val mgr = JobQueryStateManager(job.id,
-                                       yggConfig.clock.now() plus timeout
-                                         .getOrElse(defaultTimeout)
-                                         .toMillis)
-        mgr.start()
-        mgr
-      } getOrElse FakeJobQueryStateManager(yggConfig.clock.now() plus timeout
+        val mgr = JobQueryStateManager(
+          job.id,
+          yggConfig.clock.now() plus timeout
             .getOrElse(defaultTimeout)
             .toMillis)
+        mgr.start()
+        mgr
+      } getOrElse FakeJobQueryStateManager(
+        yggConfig.clock.now() plus timeout
+          .getOrElse(defaultTimeout)
+          .toMillis)
     } yield {
       new JobQueryTFMonad {
         val jobId = job map (_.id)
@@ -167,12 +172,12 @@ trait ManagedQueryModule extends YggConfigComponent with Logging {
       f.run recover {
         case ex =>
           M.jobId map { jobId =>
-            jobManager.addMessage(jobId,
-                                  JobManager.channels.ServerError,
-                                  JString("Internal server error."))
-            jobManager.abort(jobId,
-                             "Internal server error.",
-                             yggConfig.clock.now())
+            jobManager.addMessage(
+              jobId,
+              JobManager.channels.ServerError,
+              JString("Internal server error."))
+            jobManager
+              .abort(jobId, "Internal server error.", yggConfig.clock.now())
           }
           throw ex
       } map {
@@ -180,9 +185,9 @@ trait ManagedQueryModule extends YggConfigComponent with Logging {
           value
         case Cancelled =>
           M.jobId map
-          (jobManager.abort(_, "Query was cancelled.", yggConfig.clock.now()))
+            (jobManager.abort(_, "Query was cancelled.", yggConfig.clock.now()))
           throw QueryCancelledException(
-              "Query was cancelled before it was completed.")
+            "Query was cancelled before it was completed.")
         case Expired =>
           M.jobId map (jobManager.expire(_, yggConfig.clock.now()))
           throw QueryExpiredException("Query expired before it was completed.")
@@ -199,12 +204,13 @@ trait ManagedQueryModule extends YggConfigComponent with Logging {
     * this method is essentially the sink for managed queries.
     */
   def completeJob[N[+ _], A](result: StreamT[JobQueryTF, A])(
-      implicit M: JobQueryTFMonad, t: JobQueryTF ~> N): StreamT[N, A] = {
-    val finish: StreamT[JobQueryTF, A] = StreamT[JobQueryTF, A](
-        M.point(StreamT.Skip {
-      M.jobId map (jobManager.finish(_, yggConfig.clock.now()))
-      StreamT.empty[JobQueryTF, A]
-    }))
+      implicit M: JobQueryTFMonad,
+      t: JobQueryTF ~> N): StreamT[N, A] = {
+    val finish: StreamT[JobQueryTF, A] =
+      StreamT[JobQueryTF, A](M.point(StreamT.Skip {
+        M.jobId map (jobManager.finish(_, yggConfig.clock.now()))
+        StreamT.empty[JobQueryTF, A]
+      }))
 
     implicitly[Hoist[StreamT]].hoist[JobQueryTF, N](t).apply(result ++ finish)
   }
@@ -219,8 +225,10 @@ trait ManagedQueryModule extends YggConfigComponent with Logging {
   }
 
   private final case class JobQueryStateManager(
-      jobId: JobId, expiresAt: DateTime)
-      extends JobQueryStateMonad with Logging {
+      jobId: JobId,
+      expiresAt: DateTime)
+      extends JobQueryStateMonad
+      with Logging {
     import JobQueryState._
 
     private[this] val cancelled: AtomicBoolean = new AtomicBoolean()
@@ -241,7 +249,7 @@ trait ManagedQueryModule extends YggConfigComponent with Logging {
           // We only update cancelled if we have not yet cancelled.
           cancelled.compareAndSet(false, job map {
             case Job(_, _, _, _, _, Cancelled(_, _, _)) => true
-            case _ => false
+            case _                                      => false
           } getOrElse false)
         }
       }
@@ -264,10 +272,10 @@ trait ManagedQueryModule extends YggConfigComponent with Logging {
     def start(): Unit = lock.synchronized {
       if (poller.isEmpty) {
         poller = Some(
-            jobActorSystem.scheduler.schedule(yggConfig.jobPollFrequency,
-                                              yggConfig.jobPollFrequency) {
-          poll()
-        })
+          jobActorSystem.scheduler
+            .schedule(yggConfig.jobPollFrequency, yggConfig.jobPollFrequency) {
+              poll()
+            })
       }
     }
 

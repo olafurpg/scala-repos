@@ -31,11 +31,11 @@ object KestrelClient {
     val clients: Seq[Client] =
       hosts map { host =>
         Client(
-            ClientBuilder()
-              .codec(Kestrel())
-              .hosts(host)
-              .hostConnectionLimit(1) // process at most 1 item per connection concurrently
-              .buildFactory())
+          ClientBuilder()
+            .codec(Kestrel())
+            .hosts(host)
+            .hostConnectionLimit(1) // process at most 1 item per connection concurrently
+            .buildFactory())
       }
 
     val readHandles: Seq[ReadHandle] = {

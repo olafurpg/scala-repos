@@ -7,21 +7,21 @@ import scala.collection.JavaConverters._
 private[serverset2] object IntObj {
   def unapply(o: Object): Option[Int] = o match {
     case i: java.lang.Integer => Some(i)
-    case _ => None
+    case _                    => None
   }
 }
 
 private[serverset2] object DoubleObj {
   def unapply(o: Object): Option[Double] = o match {
     case d: java.lang.Double => Some(d)
-    case _ => None
+    case _                   => None
   }
 }
 
 private[serverset2] object StringObj {
   def unapply(o: Object): Option[String] = o match {
     case s: String => Some(s)
-    case _ => None
+    case _         => None
   }
 }
 
@@ -47,7 +47,8 @@ private[serverset2] object JsonDict {
 
   def apply(json: String): (Object => Option[Object]) = {
     val o =
-      try m.readValue(json, classOf[java.util.Map[Object, Object]]) catch {
+      try m.readValue(json, classOf[java.util.Map[Object, Object]])
+      catch {
         case NonFatal(_) => return Function.const(None)
       }
 

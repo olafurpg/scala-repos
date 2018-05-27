@@ -37,17 +37,20 @@ object StrokeLineCap
 
   val Square = new StrokeLineCap(jfxss.StrokeLineCap.SQUARE)
   @deprecated(
-      "Use Square; SQUARE will be removed in a future release", "8.0.60-R10")
+    "Use Square; SQUARE will be removed in a future release",
+    "8.0.60-R10")
   val SQUARE = Square
 
   val Butt = new StrokeLineCap(jfxss.StrokeLineCap.BUTT)
   @deprecated(
-      "Use Butt; BUTT will be removed in a future release", "8.0.60-R10")
+    "Use Butt; BUTT will be removed in a future release",
+    "8.0.60-R10")
   val BUTT = Butt
 
   val Round = new StrokeLineCap(jfxss.StrokeLineCap.ROUND)
   @deprecated(
-      "Use Round; ROUND will be removed in a future release", "8.0.60-R10")
+    "Use Round; ROUND will be removed in a future release",
+    "8.0.60-R10")
   val ROUND = Round
 
   protected override def unsortedValues: Array[StrokeLineCap] =

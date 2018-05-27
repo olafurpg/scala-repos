@@ -18,13 +18,22 @@
 package org.apache.spark.sql.execution
 
 import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.catalyst.expressions.{Ascending, Attribute, Expression, SortOrder}
-import org.apache.spark.sql.catalyst.expressions.codegen.{GenerateOrdering, GenerateUnsafeProjection}
+import org.apache.spark.sql.catalyst.expressions.{
+  Ascending,
+  Attribute,
+  Expression,
+  SortOrder
+}
+import org.apache.spark.sql.catalyst.expressions.codegen.{
+  GenerateOrdering,
+  GenerateUnsafeProjection
+}
 
 object GroupedIterator {
-  def apply(input: Iterator[InternalRow],
-            keyExpressions: Seq[Expression],
-            inputSchema: Seq[Attribute])
+  def apply(
+      input: Iterator[InternalRow],
+      keyExpressions: Seq[Expression],
+      inputSchema: Seq[Attribute])
     : Iterator[(InternalRow, Iterator[InternalRow])] = {
     if (input.hasNext) {
       new GroupedIterator(input.buffered, keyExpressions, inputSchema)
@@ -63,9 +72,10 @@ object GroupedIterator {
   *                            to `next()`.
   * @param inputSchema The schema of the rows in the `input` iterator.
   */
-class GroupedIterator private (input: BufferedIterator[InternalRow],
-                               groupingExpressions: Seq[Expression],
-                               inputSchema: Seq[Attribute])
+class GroupedIterator private (
+    input: BufferedIterator[InternalRow],
+    groupingExpressions: Seq[Expression],
+    inputSchema: Seq[Attribute])
     extends Iterator[(InternalRow, Iterator[InternalRow])] {
 
   /** Compares two input rows and returns 0 if they are in the same group. */
@@ -117,7 +127,7 @@ class GroupedIterator private (input: BufferedIterator[InternalRow],
       // Skip to next group.
       // currentRow may be overwritten by `hasNext`, so we should compare them first.
       while (keyOrdering.compare(currentGroup, currentRow) == 0 &&
-      input.hasNext) {
+             input.hasNext) {
         currentRow = input.next()
       }
 

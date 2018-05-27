@@ -59,20 +59,20 @@ object JObjectParser extends SimpleInjector {
   private def serialize(a: Any, formats: Formats): JValue = {
     import Meta.Reflection._
     a.asInstanceOf[AnyRef] match {
-      case null => JNull
+      case null                         => JNull
       case x if primitive_?(x.getClass) => primitive2jvalue(x)
-      case x if datetype_?(x.getClass) => datetype2jvalue(x)(formats)
+      case x if datetype_?(x.getClass)  => datetype2jvalue(x)(formats)
       case x if mongotype_?(x.getClass) => mongotype2jvalue(x)(formats)
-      case x: BasicDBList => JArray(x.toList.map(x => serialize(x, formats)))
+      case x: BasicDBList               => JArray(x.toList.map(x => serialize(x, formats)))
       case x: BasicDBObject =>
         JObject(
-            x.keySet.toList.map { f =>
-              JField(f.toString, serialize(x.get(f.toString), formats))
-            }
+          x.keySet.toList.map { f =>
+            JField(f.toString, serialize(x.get(f.toString), formats))
+          }
         )
       case x => {
-          JNothing
-        }
+        JNothing
+      }
     }
   }
 
@@ -88,12 +88,12 @@ object JObjectParser extends SimpleInjector {
       trimArr(arr).foreach { a =>
         a match {
           case JsonObjectId(objectId) => dbl.add(objectId)
-          case JsonRegex(regex) => dbl.add(regex)
-          case JsonUUID(uuid) => dbl.add(uuid)
-          case JsonDate(date) => dbl.add(date)
-          case JArray(arr) => dbl.add(parseArray(arr))
-          case JObject(jo) => dbl.add(parseObject(jo))
-          case jv: JValue => dbl.add(renderValue(jv))
+          case JsonRegex(regex)       => dbl.add(regex)
+          case JsonUUID(uuid)         => dbl.add(uuid)
+          case JsonDate(date)         => dbl.add(date)
+          case JArray(arr)            => dbl.add(parseArray(arr))
+          case JObject(jo)            => dbl.add(parseObject(jo))
+          case jv: JValue             => dbl.add(renderValue(jv))
         }
       }
       dbl
@@ -105,12 +105,12 @@ object JObjectParser extends SimpleInjector {
       trimObj(obj).foreach { jf =>
         jf.value match {
           case JsonObjectId(objectId) => dbo.put(jf.name, objectId)
-          case JsonRegex(regex) => dbo.put(jf.name, regex)
-          case JsonUUID(uuid) => dbo.put(jf.name, uuid)
-          case JsonDate(date) => dbo.put(jf.name, date)
-          case JArray(arr) => dbo.put(jf.name, parseArray(arr))
-          case JObject(jo) => dbo.put(jf.name, parseObject(jo))
-          case jv: JValue => dbo.put(jf.name, renderValue(jv))
+          case JsonRegex(regex)       => dbo.put(jf.name, regex)
+          case JsonUUID(uuid)         => dbo.put(jf.name, uuid)
+          case JsonDate(date)         => dbo.put(jf.name, date)
+          case JArray(arr)            => dbo.put(jf.name, parseArray(arr))
+          case JObject(jo)            => dbo.put(jf.name, parseObject(jo))
+          case jv: JValue             => dbo.put(jf.name, renderValue(jv))
         }
       }
       dbo
@@ -118,14 +118,14 @@ object JObjectParser extends SimpleInjector {
 
     private def renderValue(jv: JValue)(implicit formats: Formats): Object =
       jv match {
-        case JBool(b) => java.lang.Boolean.valueOf(b)
-        case JInt(n) => renderInteger(n)
-        case JDouble(n) => new java.lang.Double(n)
-        case JNull => null
-        case JNothing => sys.error("can't render 'nothing'")
+        case JBool(b)      => java.lang.Boolean.valueOf(b)
+        case JInt(n)       => renderInteger(n)
+        case JDouble(n)    => new java.lang.Double(n)
+        case JNull         => null
+        case JNothing      => sys.error("can't render 'nothing'")
         case JString(null) => "null"
-        case JString(s) => stringProcessor.vend(s)
-        case _ => ""
+        case JString(s)    => stringProcessor.vend(s)
+        case _             => ""
       }
 
     // FIXME: This is not ideal.

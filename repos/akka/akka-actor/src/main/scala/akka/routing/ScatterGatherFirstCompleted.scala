@@ -28,11 +28,11 @@ import java.util.concurrent.TimeoutException
   *   it will reply with [[akka.pattern.AskTimeoutException]] in a [[akka.actor.Status.Failure]]
   */
 @SerialVersionUID(1L)
-final case class ScatterGatherFirstCompletedRoutingLogic(
-    within: FiniteDuration)
+final case class ScatterGatherFirstCompletedRoutingLogic(within: FiniteDuration)
     extends RoutingLogic {
   override def select(
-      message: Any, routees: immutable.IndexedSeq[Routee]): Routee =
+      message: Any,
+      routees: immutable.IndexedSeq[Routee]): Routee =
     ScatterGatherFirstCompletedRoutees(routees, within)
 }
 
@@ -41,7 +41,8 @@ final case class ScatterGatherFirstCompletedRoutingLogic(
   */
 @SerialVersionUID(1L)
 private[akka] final case class ScatterGatherFirstCompletedRoutees(
-    routees: immutable.IndexedSeq[Routee], within: FiniteDuration)
+    routees: immutable.IndexedSeq[Routee],
+    within: FiniteDuration)
     extends Routee {
 
   override def send(message: Any, sender: ActorRef): Unit =
@@ -104,17 +105,20 @@ final case class ScatterGatherFirstCompletedPool(
     override val nrOfInstances: Int,
     override val resizer: Option[Resizer] = None,
     within: FiniteDuration,
-    override val supervisorStrategy: SupervisorStrategy = Pool.defaultSupervisorStrategy,
+    override val supervisorStrategy: SupervisorStrategy =
+      Pool.defaultSupervisorStrategy,
     override val routerDispatcher: String = Dispatchers.DefaultDispatcherId,
     override val usePoolDispatcher: Boolean = false)
     extends Pool
     with PoolOverrideUnsetConfig[ScatterGatherFirstCompletedPool] {
 
   def this(config: Config) =
-    this(nrOfInstances = config.getInt("nr-of-instances"),
-         within = config.getMillisDuration("within"),
-         resizer = Resizer.fromConfig(config),
-         usePoolDispatcher = config.hasPath("pool-dispatcher"))
+    this(
+      nrOfInstances = config.getInt("nr-of-instances"),
+      within = config.getMillisDuration("within"),
+      resizer = Resizer.fromConfig(config),
+      usePoolDispatcher = config.hasPath("pool-dispatcher")
+    )
 
   /**
     * Java API
@@ -183,8 +187,9 @@ final case class ScatterGatherFirstCompletedGroup(
     extends Group {
 
   def this(config: Config) =
-    this(paths = immutableSeq(config.getStringList("routees.paths")),
-         within = config.getMillisDuration("within"))
+    this(
+      paths = immutableSeq(config.getStringList("routees.paths")),
+      within = config.getMillisDuration("within"))
 
   /**
     * Java API

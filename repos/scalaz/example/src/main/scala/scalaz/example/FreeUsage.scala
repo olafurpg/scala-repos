@@ -51,16 +51,16 @@ object FreeUsage extends App {
   val toState: RngOp ~> RandomReader = new (RngOp ~> RandomReader) {
     def apply[A](fa: RngOp[A]) =
       fa match {
-        case RngOp.NextBoolean => _.nextBoolean
-        case RngOp.NextDouble => _.nextDouble
-        case RngOp.NextFloat => _.nextFloat
-        case RngOp.NextGaussian => _.nextGaussian
-        case RngOp.NextInt => _.nextInt
+        case RngOp.NextBoolean       => _.nextBoolean
+        case RngOp.NextDouble        => _.nextDouble
+        case RngOp.NextFloat         => _.nextFloat
+        case RngOp.NextGaussian      => _.nextGaussian
+        case RngOp.NextInt           => _.nextInt
         case RngOp.NextIntInRange(n) => _.nextInt(n)
-        case RngOp.NextLong => _.nextLong
+        case RngOp.NextLong          => _.nextLong
         case RngOp.NextPrintableChar => _.nextPrintableChar
-        case RngOp.NextString(n) => _.nextString(n)
-        case RngOp.SetSeed(n) => _.setSeed(n)
+        case RngOp.NextString(n)     => _.nextString(n)
+        case RngOp.SetSeed(n)        => _.setSeed(n)
       }
   }
 

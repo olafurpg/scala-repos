@@ -31,7 +31,8 @@ object ClusterClientSpec extends MultiNodeConfig {
   val third = role("third")
   val fourth = role("fourth")
 
-  commonConfig(ConfigFactory.parseString("""
+  commonConfig(ConfigFactory.parseString(
+    """
     akka.loglevel = INFO
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
     akka.remote.log-remote-lifecycle-events = off
@@ -71,7 +72,8 @@ class ClusterClientMultiJvmNode4 extends ClusterClientSpec
 class ClusterClientMultiJvmNode5 extends ClusterClientSpec
 
 class ClusterClientSpec
-    extends MultiNodeSpec(ClusterClientSpec) with STMultiNodeSpec
+    extends MultiNodeSpec(ClusterClientSpec)
+    with STMultiNodeSpec
     with ImplicitSender {
   import ClusterClientSpec._
 
@@ -125,12 +127,14 @@ class ClusterClientSpec
     "communicate to actor on any node in cluster" in within(10 seconds) {
       runOn(client) {
         val c =
-          system.actorOf(ClusterClient.props(ClusterClientSettings(system)
-                               .withInitialContacts(initialContacts)),
-                         "client1")
-        c ! ClusterClient.Send("/user/testService",
-                               "hello",
-                               localAffinity = true)
+          system.actorOf(
+            ClusterClient.props(ClusterClientSettings(system)
+              .withInitialContacts(initialContacts)),
+            "client1")
+        c ! ClusterClient.Send(
+          "/user/testService",
+          "hello",
+          localAffinity = true)
         expectMsgType[Reply].msg should be("hello-ack")
         system.stop(c)
       }
@@ -166,9 +170,10 @@ class ClusterClientSpec
       //#client
       runOn(client) {
         val c =
-          system.actorOf(ClusterClient.props(ClusterClientSettings(system)
-                               .withInitialContacts(initialContacts)),
-                         "client")
+          system.actorOf(
+            ClusterClient.props(ClusterClientSettings(system)
+              .withInitialContacts(initialContacts)),
+            "client")
         c ! ClusterClient.Send("/user/serviceA", "hello", localAffinity = true)
         c ! ClusterClient.SendToAll("/user/serviceB", "hi")
       }
@@ -183,10 +188,11 @@ class ClusterClientSpec
         //not used, only demo
         //#initialContacts
         val initialContacts =
-          Set(ActorPath.fromString(
-                  "akka.tcp://OtherSys@host1:2552/system/receptionist"),
-              ActorPath.fromString(
-                  "akka.tcp://OtherSys@host2:2552/system/receptionist"))
+          Set(
+            ActorPath.fromString(
+              "akka.tcp://OtherSys@host1:2552/system/receptionist"),
+            ActorPath.fromString(
+              "akka.tcp://OtherSys@host2:2552/system/receptionist"))
         val settings =
           ClusterClientSettings(system).withInitialContacts(initialContacts)
         //#initialContacts
@@ -198,7 +204,7 @@ class ClusterClientSpec
     }
 
     "re-establish connection to another receptionist when server is shutdown" in within(
-        30 seconds) {
+      30 seconds) {
       runOn(first, second, third, fourth) {
         val service2 =
           system.actorOf(Props(classOf[TestService], testActor), "service2")
@@ -209,13 +215,15 @@ class ClusterClientSpec
 
       runOn(client) {
         val c =
-          system.actorOf(ClusterClient.props(ClusterClientSettings(system)
-                               .withInitialContacts(initialContacts)),
-                         "client2")
+          system.actorOf(
+            ClusterClient.props(ClusterClientSettings(system)
+              .withInitialContacts(initialContacts)),
+            "client2")
 
-        c ! ClusterClient.Send("/user/service2",
-                               "bonjour",
-                               localAffinity = true)
+        c ! ClusterClient.Send(
+          "/user/service2",
+          "bonjour",
+          localAffinity = true)
         val reply = expectMsgType[Reply]
         reply.msg should be("bonjour-ack")
         val receptionistRoleName = roleName(reply.node) match {
@@ -226,9 +234,10 @@ class ClusterClientSpec
         remainingServerRoleNames -= receptionistRoleName
         within(remaining - 3.seconds) {
           awaitAssert {
-            c ! ClusterClient.Send("/user/service2",
-                                   "hi again",
-                                   localAffinity = true)
+            c ! ClusterClient.Send(
+              "/user/service2",
+              "hi again",
+              localAffinity = true)
             expectMsgType[Reply](1 second).msg should be("hi again-ack")
           }
         }
@@ -243,16 +252,18 @@ class ClusterClientSpec
     }
 
     "re-establish connection to receptionist after partition" in within(
-        30 seconds) {
+      30 seconds) {
       runOn(client) {
         val c =
-          system.actorOf(ClusterClient.props(ClusterClientSettings(system)
-                               .withInitialContacts(initialContacts)),
-                         "client3")
+          system.actorOf(
+            ClusterClient.props(ClusterClientSettings(system)
+              .withInitialContacts(initialContacts)),
+            "client3")
 
-        c ! ClusterClient.Send("/user/service2",
-                               "bonjour2",
-                               localAffinity = true)
+        c ! ClusterClient.Send(
+          "/user/service2",
+          "bonjour2",
+          localAffinity = true)
         val reply = expectMsgType[Reply]
         reply.msg should be("bonjour2-ack")
         val receptionistRoleName = roleName(reply.node) match {
@@ -280,10 +291,10 @@ class ClusterClientSpec
         val expectedAddress = node(receptionistRoleName).address
         awaitAssert {
           val probe = TestProbe()
-          c.tell(ClusterClient.Send("/user/service2",
-                                    "bonjour3",
-                                    localAffinity = true),
-                 probe.ref)
+          c.tell(
+            ClusterClient
+              .Send("/user/service2", "bonjour3", localAffinity = true),
+            probe.ref)
           val reply = probe.expectMsgType[Reply](1 second)
           reply.msg should be("bonjour3-ack")
           reply.node should be(expectedAddress)
@@ -295,40 +306,46 @@ class ClusterClientSpec
     }
 
     "re-establish connection to receptionist after server restart" in within(
-        30 seconds) {
+      30 seconds) {
       runOn(client) {
         remainingServerRoleNames.size should ===(1)
         val remainingContacts = remainingServerRoleNames.map { r ⇒
           node(r) / "system" / "receptionist"
         }
         val c =
-          system.actorOf(ClusterClient.props(ClusterClientSettings(system)
-                               .withInitialContacts(remainingContacts)),
-                         "client4")
+          system.actorOf(
+            ClusterClient.props(ClusterClientSettings(system)
+              .withInitialContacts(remainingContacts)),
+            "client4")
 
-        c ! ClusterClient.Send("/user/service2",
-                               "bonjour4",
-                               localAffinity = true)
-        expectMsg(10.seconds,
-                  Reply("bonjour4-ack", remainingContacts.head.address))
+        c ! ClusterClient.Send(
+          "/user/service2",
+          "bonjour4",
+          localAffinity = true)
+        expectMsg(
+          10.seconds,
+          Reply("bonjour4-ack", remainingContacts.head.address))
 
         val logSource =
           s"${system.asInstanceOf[ExtendedActorSystem].provider.getDefaultAddress}/user/client4"
 
-        EventFilter.info(start = "Connected to",
-                         source = logSource,
-                         occurrences = 1) intercept {
-          EventFilter.info(start = "Lost contact",
-                           source = logSource,
-                           occurrences = 1) intercept {
+        EventFilter.info(
+          start = "Connected to",
+          source = logSource,
+          occurrences = 1) intercept {
+          EventFilter.info(
+            start = "Lost contact",
+            source = logSource,
+            occurrences = 1) intercept {
             // shutdown server
             testConductor.shutdown(remainingServerRoleNames.head).await
           }
         }
 
-        c ! ClusterClient.Send("/user/service2",
-                               "shutdown",
-                               localAffinity = true)
+        c ! ClusterClient.Send(
+          "/user/service2",
+          "shutdown",
+          localAffinity = true)
         Thread.sleep(2000) // to ensure that it is sent out before shutting down system
       }
 
@@ -338,11 +355,12 @@ class ClusterClientSpec
       runOn(remainingServerRoleNames.toSeq: _*) {
         Await.ready(system.whenTerminated, 20.seconds)
         // start new system on same port
-        val sys2 = ActorSystem(system.name,
-                               ConfigFactory
-                                 .parseString("akka.remote.netty.tcp.port=" +
-                                     Cluster(system).selfAddress.port.get)
-                                 .withFallback(system.settings.config))
+        val sys2 = ActorSystem(
+          system.name,
+          ConfigFactory
+            .parseString("akka.remote.netty.tcp.port=" +
+              Cluster(system).selfAddress.port.get)
+            .withFallback(system.settings.config))
         Cluster(sys2).join(Cluster(sys2).selfAddress)
         val service2 =
           sys2.actorOf(Props(classOf[TestService], testActor), "service2")

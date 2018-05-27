@@ -17,12 +17,14 @@ class GetResultTest extends FunSuite with MockitoSugar {
     val ex1 = mock[Exception]
     val ex2 = mock[Exception]
     val empty = GetResult()
-    val left = GetResult(hits = Map("h1" -> value1),
-                         misses = immutable.Set("m1"),
-                         failures = Map("f1" -> ex1))
-    val right = GetResult(hits = Map("h2" -> value2),
-                          misses = immutable.Set("m2"),
-                          failures = Map("f2" -> ex2))
+    val left = GetResult(
+      hits = Map("h1" -> value1),
+      misses = immutable.Set("m1"),
+      failures = Map("f1" -> ex1))
+    val right = GetResult(
+      hits = Map("h2" -> value2),
+      misses = immutable.Set("m2"),
+      failures = Map("f2" -> ex2))
   }
 
   test("add together hits/misses/failures with ++") {
@@ -40,11 +42,11 @@ class GetResultTest extends FunSuite with MockitoSugar {
 
     info("non-empty left, non-empty right")
     assert(
-        left ++ right == GetResult(
-            hits = Map("h1" -> value1, "h2" -> value2),
-            misses = immutable.Set("m1", "m2"),
-            failures = Map("f1" -> ex1, "f2" -> ex2)
-        ))
+      left ++ right == GetResult(
+        hits = Map("h1" -> value1, "h2" -> value2),
+        misses = immutable.Set("m1", "m2"),
+        failures = Map("f1" -> ex1, "f2" -> ex2)
+      ))
   }
 
   test("merged of empty seq produces empty GetResult") {
@@ -68,9 +70,10 @@ class GetResultTest extends FunSuite with MockitoSugar {
 
     val subResults =
       (1 to 10) map { i =>
-        GetResult(hits = Map("h" + i -> mock[Value]),
-                  misses = immutable.Set("m" + i),
-                  failures = Map("f" + i -> mock[Exception]))
+        GetResult(
+          hits = Map("h" + i -> mock[Value]),
+          misses = immutable.Set("m" + i),
+          failures = Map("f" + i -> mock[Exception]))
       }
 
     assert(GetResult.merged(subResults) == (subResults.reduceLeft { _ ++ _ }))

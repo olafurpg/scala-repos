@@ -10,6 +10,6 @@ object test {
 
   def print(opt: Option[String]) = opt match {
     case Some(x) => println(x)
-    case None => println("nothing")
+    case None    => println("nothing")
   }
 }

@@ -21,13 +21,19 @@ import org.apache.spark.SparkFunSuite
 import org.apache.spark.ml.param.ParamsSuite
 import org.apache.spark.ml.util.DefaultReadWriteTest
 import org.apache.spark.mllib.feature.{IDFModel => OldIDFModel}
-import org.apache.spark.mllib.linalg.{DenseVector, SparseVector, Vector, Vectors}
+import org.apache.spark.mllib.linalg.{
+  DenseVector,
+  SparseVector,
+  Vector,
+  Vectors
+}
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.mllib.util.TestingUtils._
 import org.apache.spark.sql.Row
 
 class IDFSuite
-    extends SparkFunSuite with MLlibTestSparkContext
+    extends SparkFunSuite
+    with MLlibTestSparkContext
     with DefaultReadWriteTest {
 
   def scaleDataWithIDF(dataSet: Array[Vector], model: Vector): Array[Vector] = {
@@ -53,9 +59,9 @@ class IDFSuite
   test("compute IDF with default parameter") {
     val numOfFeatures = 4
     val data = Array(
-        Vectors.sparse(numOfFeatures, Array(1, 3), Array(1.0, 2.0)),
-        Vectors.dense(0.0, 1.0, 2.0, 3.0),
-        Vectors.sparse(numOfFeatures, Array(1), Array(1.0))
+      Vectors.sparse(numOfFeatures, Array(1, 3), Array(1.0, 2.0)),
+      Vectors.dense(0.0, 1.0, 2.0, 3.0),
+      Vectors.sparse(numOfFeatures, Array(1), Array(1.0))
     )
     val numOfData = data.size
     val idf = Vectors.dense(Array(0, 3, 1, 2).map { x =>
@@ -72,17 +78,18 @@ class IDFSuite
 
     idfModel.transform(df).select("idfValue", "expected").collect().foreach {
       case Row(x: Vector, y: Vector) =>
-        assert(x ~== y absTol 1e-5,
-               "Transformed vector is different with expected vector.")
+        assert(
+          x ~== y absTol 1e-5,
+          "Transformed vector is different with expected vector.")
     }
   }
 
   test("compute IDF with setter") {
     val numOfFeatures = 4
     val data = Array(
-        Vectors.sparse(numOfFeatures, Array(1, 3), Array(1.0, 2.0)),
-        Vectors.dense(0.0, 1.0, 2.0, 3.0),
-        Vectors.sparse(numOfFeatures, Array(1), Array(1.0))
+      Vectors.sparse(numOfFeatures, Array(1, 3), Array(1.0, 2.0)),
+      Vectors.dense(0.0, 1.0, 2.0, 3.0),
+      Vectors.sparse(numOfFeatures, Array(1), Array(1.0))
     )
     val numOfData = data.size
     val idf = Vectors.dense(Array(0, 3, 1, 2).map { x =>
@@ -102,8 +109,9 @@ class IDFSuite
 
     idfModel.transform(df).select("idfValue", "expected").collect().foreach {
       case Row(x: Vector, y: Vector) =>
-        assert(x ~== y absTol 1e-5,
-               "Transformed vector is different with expected vector.")
+        assert(
+          x ~== y absTol 1e-5,
+          "Transformed vector is different with expected vector.")
     }
   }
 

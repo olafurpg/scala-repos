@@ -1,3 +1,3 @@
 object Test {
-  type T = M forSome { type M [_] }
+  type T = M forSome { type M[_] }
 }

@@ -21,17 +21,20 @@ import scala.collection.mutable
 
 import org.apache.spark.scheduler._
 
-private[spark] case class BlockUIData(blockId: BlockId,
-                                      location: String,
-                                      storageLevel: StorageLevel,
-                                      memSize: Long,
-                                      diskSize: Long)
+private[spark] case class BlockUIData(
+    blockId: BlockId,
+    location: String,
+    storageLevel: StorageLevel,
+    memSize: Long,
+    diskSize: Long)
 
 /**
   * The aggregated status of stream blocks in an executor
   */
 private[spark] case class ExecutorStreamBlockStatus(
-    executorId: String, location: String, blocks: Seq[BlockUIData]) {
+    executorId: String,
+    location: String,
+    blocks: Seq[BlockUIData]) {
 
   def totalMemSize: Long = blocks.map(_.memSize).sum
 
@@ -60,12 +63,14 @@ private[spark] class BlockStatusListener extends SparkListener {
       // Drop the update info if the block manager is not registered
       blockManagers.get(blockManagerId).foreach { blocksInBlockManager =>
         if (storageLevel.isValid) {
-          blocksInBlockManager.put(blockId,
-                                   BlockUIData(blockId,
-                                               blockManagerId.hostPort,
-                                               storageLevel,
-                                               memSize,
-                                               diskSize))
+          blocksInBlockManager.put(
+            blockId,
+            BlockUIData(
+              blockId,
+              blockManagerId.hostPort,
+              storageLevel,
+              memSize,
+              diskSize))
         } else {
           // If isValid is not true, it means we should drop the block.
           blocksInBlockManager -= blockId
@@ -91,9 +96,10 @@ private[spark] class BlockStatusListener extends SparkListener {
     synchronized {
       blockManagers.map {
         case (blockManagerId, blocks) =>
-          ExecutorStreamBlockStatus(blockManagerId.executorId,
-                                    blockManagerId.hostPort,
-                                    blocks.values.toSeq)
+          ExecutorStreamBlockStatus(
+            blockManagerId.executorId,
+            blockManagerId.hostPort,
+            blocks.values.toSeq)
       }.toSeq
     }
 }

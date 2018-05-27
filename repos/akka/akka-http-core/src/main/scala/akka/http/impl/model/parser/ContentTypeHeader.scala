@@ -13,8 +13,11 @@ private[parser] trait ContentTypeHeader {
   // http://tools.ietf.org/html/rfc7231#section-3.1.1.5
   def `content-type` = rule {
     `media-type` ~ EOI ~>
-    ((main, sub,
-        params) ⇒ headers.`Content-Type`(contentType(main, sub, params)))
+      (
+          (
+              main,
+              sub,
+              params) ⇒ headers.`Content-Type`(contentType(main, sub, params)))
   }
 
   @tailrec private def contentType(
@@ -37,10 +40,10 @@ private[parser] trait ContentTypeHeader {
             ContentType.WithCharset(x, cs)
         }
 
-      case Seq(("charset", value), tail @ _ *) ⇒
+      case Seq(("charset", value), tail @ _*) ⇒
         contentType(main, sub, tail, Some(getCharset(value)), builder)
 
-      case Seq(kvp, tail @ _ *) ⇒
+      case Seq(kvp, tail @ _*) ⇒
         val b =
           if (builder eq null) Map.newBuilder[String, String] else builder
         b += kvp

@@ -5,7 +5,7 @@
   * The ASF licenses this file to You under the Apache License, Version 2.0
   * (the "License"); you may not use this file except in compliance with
   * the License.  You may obtain a copy of the License at
-  * 
+  *
   *    http://www.apache.org/licenses/LICENSE-2.0
   *
   * Unless required by applicable law or agreed to in writing, software
@@ -90,16 +90,20 @@ class FileMessageSetTest extends BaseMessageSetTestCases {
     checkEquals(messageSet.iterator, read.iterator)
     val items = read.iterator.toList
     val sec = items.tail.head
-    read = messageSet.read(position = MessageSet.entrySize(sec.message),
-                           size = messageSet.sizeInBytes)
-    assertEquals(
-        "Try a read starting from the second message", items.tail, read.toList)
     read = messageSet.read(
-        MessageSet.entrySize(sec.message), MessageSet.entrySize(sec.message))
+      position = MessageSet.entrySize(sec.message),
+      size = messageSet.sizeInBytes)
     assertEquals(
-        "Try a read of a single message starting from the second message",
-        List(items.tail.head),
-        read.toList)
+      "Try a read starting from the second message",
+      items.tail,
+      read.toList)
+    read = messageSet.read(
+      MessageSet.entrySize(sec.message),
+      MessageSet.entrySize(sec.message))
+    assertEquals(
+      "Try a read of a single message starting from the second message",
+      List(items.tail.head),
+      read.toList)
   }
 
   /**
@@ -109,29 +113,35 @@ class FileMessageSetTest extends BaseMessageSetTestCases {
   def testSearch() {
     // append a new message with a high offset
     val lastMessage = new Message("test".getBytes)
-    messageSet.append(new ByteBufferMessageSet(
-            NoCompressionCodec, new LongRef(50), lastMessage))
+    messageSet.append(
+      new ByteBufferMessageSet(
+        NoCompressionCodec,
+        new LongRef(50),
+        lastMessage))
     var position = 0
-    assertEquals("Should be able to find the first message by its offset",
-                 OffsetPosition(0L, position),
-                 messageSet.searchFor(0, 0))
+    assertEquals(
+      "Should be able to find the first message by its offset",
+      OffsetPosition(0L, position),
+      messageSet.searchFor(0, 0))
     position += MessageSet.entrySize(messageSet.head.message)
-    assertEquals("Should be able to find second message when starting from 0",
-                 OffsetPosition(1L, position),
-                 messageSet.searchFor(1, 0))
     assertEquals(
-        "Should be able to find second message starting from its offset",
-        OffsetPosition(1L, position),
-        messageSet.searchFor(1, position))
+      "Should be able to find second message when starting from 0",
+      OffsetPosition(1L, position),
+      messageSet.searchFor(1, 0))
+    assertEquals(
+      "Should be able to find second message starting from its offset",
+      OffsetPosition(1L, position),
+      messageSet.searchFor(1, position))
     position += MessageSet.entrySize(messageSet.tail.head.message) +
-    MessageSet.entrySize(messageSet.tail.tail.head.message)
+      MessageSet.entrySize(messageSet.tail.tail.head.message)
     assertEquals(
-        "Should be able to find fourth message from a non-existant offset",
-        OffsetPosition(50L, position),
-        messageSet.searchFor(3, position))
-    assertEquals("Should be able to find fourth message by correct offset",
-                 OffsetPosition(50L, position),
-                 messageSet.searchFor(50, position))
+      "Should be able to find fourth message from a non-existant offset",
+      OffsetPosition(50L, position),
+      messageSet.searchFor(3, position))
+    assertEquals(
+      "Should be able to find fourth message by correct offset",
+      OffsetPosition(50L, position),
+      messageSet.searchFor(50, position))
   }
 
   /**
@@ -201,8 +211,8 @@ class FileMessageSetTest extends BaseMessageSetTestCases {
     set.close()
 
     val tempReopen = new File(temp.getAbsolutePath())
-    val setReopen = new FileMessageSet(
-        tempReopen, true, 512 * 1024 * 1024, true)
+    val setReopen =
+      new FileMessageSet(tempReopen, true, 512 * 1024 * 1024, true)
     val position = setReopen.channel.position
     val size = setReopen.sizeInBytes()
 
@@ -216,36 +226,38 @@ class FileMessageSetTest extends BaseMessageSetTestCases {
 
     // Prepare messages.
     val offsets = Seq(0L, 2L)
-    val messagesV0 = Seq(new Message("hello".getBytes,
-                                     "k1".getBytes,
-                                     Message.NoTimestamp,
-                                     Message.MagicValue_V0),
-                         new Message("goodbye".getBytes,
-                                     "k2".getBytes,
-                                     Message.NoTimestamp,
-                                     Message.MagicValue_V0))
+    val messagesV0 = Seq(
+      new Message(
+        "hello".getBytes,
+        "k1".getBytes,
+        Message.NoTimestamp,
+        Message.MagicValue_V0),
+      new Message(
+        "goodbye".getBytes,
+        "k2".getBytes,
+        Message.NoTimestamp,
+        Message.MagicValue_V0)
+    )
     val messageSetV0 = new ByteBufferMessageSet(
-        compressionCodec = NoCompressionCodec,
-        offsetSeq = offsets,
-        messages = messagesV0: _*)
+      compressionCodec = NoCompressionCodec,
+      offsetSeq = offsets,
+      messages = messagesV0: _*)
     val compressedMessageSetV0 = new ByteBufferMessageSet(
-        compressionCodec = DefaultCompressionCodec,
-        offsetSeq = offsets,
-        messages = messagesV0: _*)
+      compressionCodec = DefaultCompressionCodec,
+      offsetSeq = offsets,
+      messages = messagesV0: _*)
 
     val messagesV1 = Seq(
-        new Message(
-            "hello".getBytes, "k1".getBytes, 1L, Message.MagicValue_V1),
-        new Message(
-            "goodbye".getBytes, "k2".getBytes, 2L, Message.MagicValue_V1))
+      new Message("hello".getBytes, "k1".getBytes, 1L, Message.MagicValue_V1),
+      new Message("goodbye".getBytes, "k2".getBytes, 2L, Message.MagicValue_V1))
     val messageSetV1 = new ByteBufferMessageSet(
-        compressionCodec = NoCompressionCodec,
-        offsetSeq = offsets,
-        messages = messagesV1: _*)
+      compressionCodec = NoCompressionCodec,
+      offsetSeq = offsets,
+      messages = messagesV1: _*)
     val compressedMessageSetV1 = new ByteBufferMessageSet(
-        compressionCodec = DefaultCompressionCodec,
-        offsetSeq = offsets,
-        messages = messagesV1: _*)
+      compressionCodec = DefaultCompressionCodec,
+      offsetSeq = offsets,
+      messages = messagesV1: _*)
 
     // Down conversion
     // down conversion for non-compressed messages
@@ -279,20 +291,26 @@ class FileMessageSetTest extends BaseMessageSetTestCases {
     verifyConvertedMessageSet(convertedMessageSet, Message.MagicValue_V1)
 
     def verifyConvertedMessageSet(
-        convertedMessageSet: MessageSet, magicByte: Byte) {
+        convertedMessageSet: MessageSet,
+        magicByte: Byte) {
       var i = 0
       for (messageAndOffset <- convertedMessageSet) {
-        assertEquals("magic byte should be 1",
-                     magicByte,
-                     messageAndOffset.message.magic)
         assertEquals(
-            "offset should not change", offsets(i), messageAndOffset.offset)
-        assertEquals("key should not change",
-                     messagesV0(i).key,
-                     messageAndOffset.message.key)
-        assertEquals("payload should not change",
-                     messagesV0(i).payload,
-                     messageAndOffset.message.payload)
+          "magic byte should be 1",
+          magicByte,
+          messageAndOffset.message.magic)
+        assertEquals(
+          "offset should not change",
+          offsets(i),
+          messageAndOffset.offset)
+        assertEquals(
+          "key should not change",
+          messagesV0(i).key,
+          messageAndOffset.message.key)
+        assertEquals(
+          "payload should not change",
+          messagesV0(i).payload,
+          messageAndOffset.message.payload)
         i += 1
       }
     }

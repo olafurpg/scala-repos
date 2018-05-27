@@ -31,8 +31,11 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 class HBLEvents(
-    val client: HBClient, config: StorageClientConfig, val namespace: String)
-    extends LEvents with Logging {
+    val client: HBClient,
+    config: StorageClientConfig,
+    val namespace: String)
+    extends LEvents
+    with Logging {
 
   // implicit val formats = DefaultFormats + new EventJson4sSupport.DBSerializer
 
@@ -41,7 +44,7 @@ class HBLEvents(
 
   def getTable(appId: Int, channelId: Option[Int] = None): HTableInterface =
     client.connection.getTable(
-        HBEventsUtil.tableName(namespace, appId, channelId))
+      HBEventsUtil.tableName(namespace, appId, channelId))
 
   override def init(appId: Int, channelId: Option[Int] = None): Boolean = {
     // check namespace exist
@@ -56,7 +59,8 @@ class HBLEvents(
     val tableName =
       TableName.valueOf(HBEventsUtil.tableName(namespace, appId, channelId))
     if (!client.admin.tableExists(tableName)) {
-      info(s"The table ${tableName.getNameAsString()} doesn't exist yet." +
+      info(
+        s"The table ${tableName.getNameAsString()} doesn't exist yet." +
           " Creating now...")
       val tableDesc = new HTableDescriptor(tableName)
       tableDesc.addFamily(new HColumnDescriptor("e"))
@@ -76,15 +80,15 @@ class HBLEvents(
         client.admin.deleteTable(tableName)
       } else {
         info(
-            s"Table ${tableName.getNameAsString()} doesn't exist." +
+          s"Table ${tableName.getNameAsString()} doesn't exist." +
             s" Nothing is deleted.")
       }
       true
     } catch {
       case e: Exception => {
-          error(s"Fail to remove table for appId ${appId}. Exception: ${e}")
-          false
-        }
+        error(s"Fail to remove table for appId ${appId}. Exception: ${e}")
+        false
+      }
     }
   }
 
@@ -125,7 +129,9 @@ class HBLEvents(
   }
 
   override def futureDelete(
-      eventId: String, appId: Int, channelId: Option[Int])(
+      eventId: String,
+      appId: Int,
+      channelId: Option[Int])(
       implicit ec: ExecutionContext): Future[Boolean] = {
     Future {
       val table = getTable(appId, channelId)
@@ -137,35 +143,39 @@ class HBLEvents(
     }
   }
 
-  override def futureFind(appId: Int,
-                          channelId: Option[Int] = None,
-                          startTime: Option[DateTime] = None,
-                          untilTime: Option[DateTime] = None,
-                          entityType: Option[String] = None,
-                          entityId: Option[String] = None,
-                          eventNames: Option[Seq[String]] = None,
-                          targetEntityType: Option[Option[String]] = None,
-                          targetEntityId: Option[Option[String]] = None,
-                          limit: Option[Int] = None,
-                          reversed: Option[Boolean] = None)(
+  override def futureFind(
+      appId: Int,
+      channelId: Option[Int] = None,
+      startTime: Option[DateTime] = None,
+      untilTime: Option[DateTime] = None,
+      entityType: Option[String] = None,
+      entityId: Option[String] = None,
+      eventNames: Option[Seq[String]] = None,
+      targetEntityType: Option[Option[String]] = None,
+      targetEntityId: Option[Option[String]] = None,
+      limit: Option[Int] = None,
+      reversed: Option[Boolean] = None)(
       implicit ec: ExecutionContext): Future[Iterator[Event]] = {
     Future {
 
       require(
-          !((reversed == Some(true)) &&
-              (entityType.isEmpty || entityId.isEmpty)),
-          "the parameter reversed can only be used with both entityType and entityId specified.")
+        !((reversed == Some(true)) &&
+          (entityType.isEmpty || entityId.isEmpty)),
+        "the parameter reversed can only be used with both entityType and entityId specified."
+      )
 
       val table = getTable(appId, channelId)
 
-      val scan = HBEventsUtil.createScan(startTime = startTime,
-                                         untilTime = untilTime,
-                                         entityType = entityType,
-                                         entityId = entityId,
-                                         eventNames = eventNames,
-                                         targetEntityType = targetEntityType,
-                                         targetEntityId = targetEntityId,
-                                         reversed = reversed)
+      val scan = HBEventsUtil.createScan(
+        startTime = startTime,
+        untilTime = untilTime,
+        entityType = entityType,
+        entityId = entityId,
+        eventNames = eventNames,
+        targetEntityType = targetEntityType,
+        targetEntityId = targetEntityId,
+        reversed = reversed
+      )
       val scanner = table.getScanner(scan)
       table.close()
 
@@ -174,8 +184,8 @@ class HBLEvents(
       // Get all events if None or Some(-1)
       val results: Iterator[Result] = limit match {
         case Some(-1) => eventsIter
-        case None => eventsIter
-        case Some(x) => eventsIter.take(x)
+        case None     => eventsIter
+        case Some(x)  => eventsIter.take(x)
       }
 
       val eventsIt = results.map { resultToEvent(_, appId) }

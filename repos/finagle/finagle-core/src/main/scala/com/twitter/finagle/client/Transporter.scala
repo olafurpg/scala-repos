@@ -46,7 +46,7 @@ object Transporter {
   case class ConnectTimeout(howlong: Duration) {
     if (howlong < Duration.Zero)
       throw new IllegalArgumentException(
-          s"howlong must be non-negative: saw $howlong")
+        s"howlong must be non-negative: saw $howlong")
 
     def mk(): (ConnectTimeout, Stack.Param[ConnectTimeout]) =
       (this, ConnectTimeout.param)
@@ -71,16 +71,17 @@ object Transporter {
     * $param a SocksProxy as the endpoint for a `Transporter`.
     */
   case class SocksProxy(
-      sa: Option[SocketAddress], credentials: Option[(String, String)]) {
+      sa: Option[SocketAddress],
+      credentials: Option[(String, String)]) {
     def mk(): (SocksProxy, Stack.Param[SocksProxy]) =
       (this, SocksProxy.param)
   }
   object SocksProxy {
     implicit val param = Stack.Param(
-        SocksProxy(
-            SocksProxyFlags.socksProxy,
-            SocksProxyFlags.socksUsernameAndPassword
-        ))
+      SocksProxy(
+        SocksProxyFlags.socksProxy,
+        SocksProxyFlags.socksUsernameAndPassword
+      ))
   }
 
   /**
@@ -88,7 +89,8 @@ object Transporter {
     * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#9.9
     */
   case class HttpProxy(
-      sa: Option[SocketAddress], credentials: Option[Credentials]) {
+      sa: Option[SocketAddress],
+      credentials: Option[Credentials]) {
     def mk(): (HttpProxy, Stack.Param[HttpProxy]) =
       (this, HttpProxy.param)
 

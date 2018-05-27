@@ -13,7 +13,9 @@ object IntervalSeqSampleCheck extends Properties("IntervalSeq.Sample") {
 
   // a test that works by sampling the result at all relevant places and checks consistency with the boolean operation
   def unarySampleTest(
-      a: IntervalSeq[Int], r: IntervalSeq[Int], op: Boolean => Boolean) = {
+      a: IntervalSeq[Int],
+      r: IntervalSeq[Int],
+      op: Boolean => Boolean) = {
     val support = a.edges.toArray.sorted.distinct
     support.forall { value =>
       val sameBefore = r.below(value) === op(a.below(value))
@@ -24,10 +26,11 @@ object IntervalSeqSampleCheck extends Properties("IntervalSeq.Sample") {
   }
 
   // a test that works by sampling the result at all relevant places and checks consistency with the boolean operation
-  def binarySampleTest(a: IntervalSeq[Int],
-                       b: IntervalSeq[Int],
-                       r: IntervalSeq[Int],
-                       op: (Boolean, Boolean) => Boolean) = {
+  def binarySampleTest(
+      a: IntervalSeq[Int],
+      b: IntervalSeq[Int],
+      r: IntervalSeq[Int],
+      op: (Boolean, Boolean) => Boolean) = {
     val support = (a.edges ++ b.edges).toArray.sorted.distinct
     support.forall { value =>
       val sameBefore = r.below(value) === op(a.below(value), b.below(value))
@@ -38,11 +41,12 @@ object IntervalSeqSampleCheck extends Properties("IntervalSeq.Sample") {
   }
 
   // a test that works by sampling the result at all relevant places and checks consistency with the boolean operation
-  def trinarySampleTest(a: IntervalSeq[Int],
-                        b: IntervalSeq[Int],
-                        c: IntervalSeq[Int],
-                        r: IntervalTrie[Long],
-                        op: (Boolean, Boolean, Boolean) => Boolean) = {
+  def trinarySampleTest(
+      a: IntervalSeq[Int],
+      b: IntervalSeq[Int],
+      c: IntervalSeq[Int],
+      r: IntervalTrie[Long],
+      op: (Boolean, Boolean, Boolean) => Boolean) = {
     val support = (a.edges ++ b.edges ++ c.edges).toArray.sorted.distinct
     support.forall { value =>
       val sameBefore =
@@ -63,9 +67,8 @@ object IntervalSeqSampleCheck extends Properties("IntervalSeq.Sample") {
       binarySampleTest(a, b, a & b, _ & _)
   }
 
-  property("sample_or") = forAll {
-    (a: IntervalSeq[Int], b: IntervalSeq[Int]) =>
-      binarySampleTest(a, b, a | b, _ | _)
+  property("sample_or") = forAll { (a: IntervalSeq[Int], b: IntervalSeq[Int]) =>
+    binarySampleTest(a, b, a | b, _ | _)
   }
 
   property("sample_xor") = forAll {

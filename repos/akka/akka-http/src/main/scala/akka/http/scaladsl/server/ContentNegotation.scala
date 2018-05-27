@@ -142,8 +142,7 @@ object ContentNegotiator {
         case x: model.MediaType.WithOpenCharset ⇒ MediaType(x)
       }
 
-    case class ContentType(contentType: model.ContentType)
-        extends Alternative {
+    case class ContentType(contentType: model.ContentType) extends Alternative {
       def mediaType = contentType.mediaType
       def format = contentType.toString
     }
@@ -233,7 +232,7 @@ final class LanguageNegotiator(requestHeaders: Seq[HttpHeader]) {
     case _: LanguageRange.`*` ⇒ 1f // most general, needs to come last
     case x ⇒
       -(2 * x.subTags.size +
-          x.qValue) // more subtags -> more specific -> go first
+        x.qValue) // more subtags -> more specific -> go first
   }.toList
 
   /**

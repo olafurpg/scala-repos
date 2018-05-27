@@ -1,7 +1,12 @@
 package scalaz
 package concurrent
 
-import java.util.concurrent.{ScheduledExecutorService, ExecutorService, ThreadFactory, Executors}
+import java.util.concurrent.{
+  ScheduledExecutorService,
+  ExecutorService,
+  ThreadFactory,
+  Executors
+}
 
 /**
   * Evaluate an expression in some specific manner. A typical strategy will schedule asynchronous
@@ -37,7 +42,8 @@ trait Strategys extends StrategysLow {
     */
   val DefaultExecutorService: ExecutorService = {
     Executors.newFixedThreadPool(
-        Runtime.getRuntime.availableProcessors, DefaultDaemonThreadFactory)
+      Runtime.getRuntime.availableProcessors,
+      DefaultDaemonThreadFactory)
   }
 
   /**
@@ -132,8 +138,7 @@ trait StrategysLow {
     import java.util.concurrent.{Callable, FutureTask}
 
     def apply[A](a: => A) = {
-      val task = new FutureTask[A](
-          new Callable[A] {
+      val task = new FutureTask[A](new Callable[A] {
         def call = a
       })
       invokeLater(task)

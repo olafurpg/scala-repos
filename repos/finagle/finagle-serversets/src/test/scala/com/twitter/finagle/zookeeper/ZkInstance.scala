@@ -18,7 +18,7 @@ class ZkInstance {
   lazy val zookeeperAddress = {
     if (!started)
       throw new IllegalStateException(
-          "can't get address until instance is started")
+        "can't get address until instance is started")
     new InetSocketAddress(zookeeperServer.getClientPort)
   }
 
@@ -30,15 +30,16 @@ class ZkInstance {
 
     val txn = new FileTxnSnapLog(createTempDir(), createTempDir())
     val zkdb = new ZKDatabase(txn)
-    zookeeperServer = new ZooKeeperServer(createTempDir(),
-                                          createTempDir(),
-                                          ZooKeeperServer.DEFAULT_TICK_TIME)
+    zookeeperServer = new ZooKeeperServer(
+      createTempDir(),
+      createTempDir(),
+      ZooKeeperServer.DEFAULT_TICK_TIME)
     zookeeperServer.setMaxSessionTimeout(100)
     zookeeperServer.setMinSessionTimeout(100)
     connectionFactory = ServerCnxnFactory(InetAddress.getLoopbackAddress)
     connectionFactory.startup(zookeeperServer)
-    zookeeperClient = new ZooKeeperClient(
-        Amount.of(10, Time.MILLISECONDS), zookeeperAddress)
+    zookeeperClient =
+      new ZooKeeperClient(Amount.of(10, Time.MILLISECONDS), zookeeperAddress)
 
     // Disable noise from zookeeper logger
 //    java.util.logging.LogManager.getLogManager().reset();

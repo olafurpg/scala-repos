@@ -44,8 +44,7 @@ object Coroner {
     val finishedLatch = new CountDownLatch(1)
 
     def waitForStart(): Unit = {
-      startedLatch.await(
-          startAndStopDuration.length, startAndStopDuration.unit)
+      startedLatch.await(startAndStopDuration.length, startAndStopDuration.unit)
     }
 
     def started(): Unit = startedLatch.countDown()
@@ -57,7 +56,8 @@ object Coroner {
     override def cancel(): Unit = {
       cancelPromise.trySuccess(true)
       finishedLatch.await(
-          startAndStopDuration.length, startAndStopDuration.unit)
+        startAndStopDuration.length,
+        startAndStopDuration.unit)
     }
 
     override def ready(atMost: Duration)(
@@ -81,11 +81,12 @@ object Coroner {
     * If displayThreadCounts is set to true, then the Coroner will print thread counts during start
     * and stop.
     */
-  def watch(duration: FiniteDuration,
-            reportTitle: String,
-            out: PrintStream,
-            startAndStopDuration: FiniteDuration = defaultStartAndStopDuration,
-            displayThreadCounts: Boolean = false): WatchHandle = {
+  def watch(
+      duration: FiniteDuration,
+      reportTitle: String,
+      out: PrintStream,
+      startAndStopDuration: FiniteDuration = defaultStartAndStopDuration,
+      displayThreadCounts: Boolean = false): WatchHandle = {
 
     val watchedHandle = new WatchHandleImpl(startAndStopDuration)
 
@@ -95,33 +96,35 @@ object Coroner {
       if (displayThreadCounts) {
         threadMx.resetPeakThreadCount()
         out.println(
-            s"Coroner Thread Count starts at $startThreads in $reportTitle")
+          s"Coroner Thread Count starts at $startThreads in $reportTitle")
       }
       watchedHandle.started()
       try {
         if (!Await.result(watchedHandle, duration)) {
           watchedHandle.expired()
           out.println(
-              s"Coroner not cancelled after ${duration.toMillis}ms. Looking for signs of foul play...")
-          try printReport(reportTitle, out) catch {
+            s"Coroner not cancelled after ${duration.toMillis}ms. Looking for signs of foul play...")
+          try printReport(reportTitle, out)
+          catch {
             case NonFatal(ex) ⇒ {
-                out.println("Error displaying Coroner's Report")
-                ex.printStackTrace(out)
-              }
+              out.println("Error displaying Coroner's Report")
+              ex.printStackTrace(out)
+            }
           }
         }
       } finally {
         if (displayThreadCounts) {
           val endThreads = threadMx.getThreadCount
           out.println(
-              s"Coroner Thread Count started at $startThreads, ended at $endThreads, peaked at ${threadMx.getPeakThreadCount} in $reportTitle")
+            s"Coroner Thread Count started at $startThreads, ended at $endThreads, peaked at ${threadMx.getPeakThreadCount} in $reportTitle")
         }
         out.flush()
         watchedHandle.finished()
       }
     }
-    new Thread(new Runnable { def run = triggerReportIfOverdue(duration) },
-               "Coroner").start()
+    new Thread(
+      new Runnable { def run = triggerReportIfOverdue(duration) },
+      "Coroner").start()
     watchedHandle.waitForStart()
     watchedHandle
   }
@@ -138,7 +141,7 @@ object Coroner {
     val threadMx = ManagementFactory.getThreadMXBean()
 
     println(
-        s"""#Coroner's Report: $reportTitle
+      s"""#Coroner's Report: $reportTitle
                 #OS Architecture: ${osMx.getArch()}
                 #Available processors: ${osMx.getAvailableProcessors()}
                 #System load (last minute): ${osMx.getSystemLoadAverage()}
@@ -146,21 +149,24 @@ object Coroner {
                 #VM uptime: ${rtMx.getUptime()}ms
                 #Heap usage: ${memMx.getHeapMemoryUsage()}
                 #Non-heap usage: ${memMx.getNonHeapMemoryUsage()}"""
-          .stripMargin('#'))
+        .stripMargin('#'))
 
     def dumpAllThreads: Seq[ThreadInfo] = {
-      threadMx.dumpAllThreads(threadMx.isObjectMonitorUsageSupported,
-                              threadMx.isSynchronizerUsageSupported)
+      threadMx.dumpAllThreads(
+        threadMx.isObjectMonitorUsageSupported,
+        threadMx.isSynchronizerUsageSupported)
     }
 
     def findDeadlockedThreads: (Seq[ThreadInfo], String) = {
       val (ids, desc) =
         if (threadMx.isSynchronizerUsageSupported()) {
-          (threadMx.findDeadlockedThreads(),
-           "monitors and ownable synchronizers")
+          (
+            threadMx.findDeadlockedThreads(),
+            "monitors and ownable synchronizers")
         } else {
-          (threadMx.findMonitorDeadlockedThreads(),
-           "monitors, but NOT ownable synchronizers")
+          (
+            threadMx.findMonitorDeadlockedThreads(),
+            "monitors, but NOT ownable synchronizers")
         }
       if (ids == null) {
         (Seq.empty, desc)
@@ -231,8 +237,7 @@ object Coroner {
         }
 
         for (mi ← ti.getLockedMonitors
-                     if mi.getLockedStackDepth == i) appendMsg(
-            "\t-  locked ", mi)
+             if mi.getLockedStackDepth == i) appendMsg("\t-  locked ", mi)
       }
 
       val locks = ti.getLockedSynchronizers
@@ -267,11 +272,12 @@ trait WatchedByCoroner { self: TestKit ⇒
   @volatile private var coronerWatch: Coroner.WatchHandle = _
 
   final def startCoroner() {
-    coronerWatch = Coroner.watch(expectedTestDuration.dilated,
-                                 getClass.getName,
-                                 System.err,
-                                 startAndStopDuration.dilated,
-                                 displayThreadCounts)
+    coronerWatch = Coroner.watch(
+      expectedTestDuration.dilated,
+      getClass.getName,
+      System.err,
+      startAndStopDuration.dilated,
+      displayThreadCounts)
   }
 
   final def stopCoroner() {

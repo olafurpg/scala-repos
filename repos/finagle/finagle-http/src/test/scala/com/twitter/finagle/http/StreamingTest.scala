@@ -49,12 +49,10 @@ class StreamingTest extends FunSuite with Eventually {
     val fail = new Promise[Unit]
 
     val server = startServer(echo, identity)
-    val client = connect(server.boundAddress,
-                         transport =>
-                           {
-                             if (!fail.isDefined) fail ensure transport.close()
-                             transport
-                         })
+    val client = connect(server.boundAddress, transport => {
+      if (!fail.isDefined) fail ensure transport.close()
+      transport
+    })
 
     val buf = Buf.Utf8(".")
     val req = get("/")
@@ -105,8 +103,7 @@ class StreamingTest extends FunSuite with Eventually {
     assertSecondRequestOk()
   })
 
-  test("client: fail request writer")(
-      new ClientCtx {
+  test("client: fail request writer")(new ClientCtx {
     val exc = new Exception
     req.writer.fail(exc)
     assert(!res2.isDefined)
@@ -115,8 +112,7 @@ class StreamingTest extends FunSuite with Eventually {
     assertSecondRequestOk()
   })
 
-  test("client: discard respond reader")(
-      new ClientCtx {
+  test("client: discard respond reader")(new ClientCtx {
     res.reader.discard()
     assertSecondRequestOk()
   })
@@ -141,13 +137,11 @@ class StreamingTest extends FunSuite with Eventually {
       }
     }
 
-    val server = startServer(service,
-                             transport =>
-                               {
-                                 if (!setFail.getAndSet(true))
-                                   fail ensure transport.close()
-                                 transport
-                             })
+    val server = startServer(service, transport => {
+      if (!setFail.getAndSet(true))
+        fail ensure transport.close()
+      transport
+    })
     val client1 = connect(server.boundAddress, identity, "client1")
     val client2 = connect(server.boundAddress, identity, "client2")
 
@@ -197,13 +191,11 @@ class StreamingTest extends FunSuite with Eventually {
       }
     }
 
-    val server = startServer(service,
-                             transport =>
-                               {
-                                 if (!setFail.getAndSet(true))
-                                   fail ensure transport.close()
-                                 transport
-                             })
+    val server = startServer(service, transport => {
+      if (!setFail.getAndSet(true))
+        fail ensure transport.close()
+      transport
+    })
     val client1 = connect(server.boundAddress, identity, "client1")
     val client2 = connect(server.boundAddress, identity, "client2")
 
@@ -362,7 +354,8 @@ object StreamingTest {
             sf: ServiceFactory[Request, Response]) =
           codec.prepareServiceFactory(sf)
         override def prepareConnFactory(
-            sf: ServiceFactory[Request, Response], ps: Stack.Params) =
+            sf: ServiceFactory[Request, Response],
+            ps: Stack.Params) =
           codec.prepareConnFactory(sf)
         override def newClientTransport(ch: Channel, sr: StatsReceiver) =
           codec.newClientTransport(ch, sr)
@@ -370,7 +363,8 @@ object StreamingTest {
 
         // Modified Transports
         override def newClientDispatcher(
-            transport: Transport[Any, Any], params: Stack.Params) =
+            transport: Transport[Any, Any],
+            params: Stack.Params) =
           codec.newClientDispatcher(cmod(transport), params)
         override def newServerDispatcher(
             transport: Transport[Any, Any],

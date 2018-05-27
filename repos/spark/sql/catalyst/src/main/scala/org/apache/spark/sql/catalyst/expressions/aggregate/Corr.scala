@@ -44,8 +44,8 @@ case class Corr(x: Expression, y: Expression) extends DeclarativeAggregate {
   protected val xMk = AttributeReference("xMk", DoubleType, nullable = false)()
   protected val yMk = AttributeReference("yMk", DoubleType, nullable = false)()
 
-  override val aggBufferAttributes: Seq[AttributeReference] = Seq(
-      n, xAvg, yAvg, ck, xMk, yMk)
+  override val aggBufferAttributes: Seq[AttributeReference] =
+    Seq(n, xAvg, yAvg, ck, xMk, yMk)
 
   override val initialValues: Seq[Expression] = Array.fill(6)(Literal(0.0))
 
@@ -63,12 +63,12 @@ case class Corr(x: Expression, y: Expression) extends DeclarativeAggregate {
 
     val isNull = IsNull(x) || IsNull(y)
     Seq(
-        If(isNull, n, newN),
-        If(isNull, xAvg, newXAvg),
-        If(isNull, yAvg, newYAvg),
-        If(isNull, ck, newCk),
-        If(isNull, xMk, newXMk),
-        If(isNull, yMk, newYMk)
+      If(isNull, n, newN),
+      If(isNull, xAvg, newXAvg),
+      If(isNull, yAvg, newYAvg),
+      If(isNull, ck, newCk),
+      If(isNull, xMk, newXMk),
+      If(isNull, yMk, newYMk)
     )
   }
 
@@ -91,9 +91,10 @@ case class Corr(x: Expression, y: Expression) extends DeclarativeAggregate {
   }
 
   override val evaluateExpression: Expression = {
-    If(n === Literal(0.0),
-       Literal.create(null, DoubleType),
-       If(n === Literal(1.0), Literal(Double.NaN), ck / Sqrt(xMk * yMk)))
+    If(
+      n === Literal(0.0),
+      Literal.create(null, DoubleType),
+      If(n === Literal(1.0), Literal(Double.NaN), ck / Sqrt(xMk * yMk)))
   }
 
   override def prettyName: String = "corr"

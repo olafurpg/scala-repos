@@ -31,7 +31,12 @@ import javafx.{geometry => jfxg, util => jfxu}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, DoubleProperty, IntegerProperty, ObjectProperty}
+import scalafx.beans.property.{
+  BooleanProperty,
+  DoubleProperty,
+  IntegerProperty,
+  ObjectProperty
+}
 import scalafx.delegate.SFXDelegate
 import scalafx.geometry.Orientation
 import scalafx.util.StringConverter
@@ -42,7 +47,8 @@ object Slider {
 }
 
 class Slider(override val delegate: jfxsc.Slider = new jfxsc.Slider)
-    extends Control(delegate) with SFXDelegate[jfxsc.Slider] {
+    extends Control(delegate)
+    with SFXDelegate[jfxsc.Slider] {
 
   /** Constructs a Slider control with the specified slider min, max and current value values. */
   def this(min: Double, max: Double, value: Double) {

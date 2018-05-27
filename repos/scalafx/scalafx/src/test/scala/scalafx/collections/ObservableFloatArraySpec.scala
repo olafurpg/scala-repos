@@ -43,8 +43,10 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class ObservableFloatArraySpec
     extends SimpleSFXDelegateSpec[
-        jfxc.ObservableFloatArray, ObservableFloatArray](
-        classOf[jfxc.ObservableFloatArray], classOf[ObservableFloatArray]) {
+      jfxc.ObservableFloatArray,
+      ObservableFloatArray](
+      classOf[jfxc.ObservableFloatArray],
+      classOf[ObservableFloatArray]) {
 
   /**
     * Test trait for instance testing.
@@ -70,11 +72,12 @@ class ObservableFloatArraySpec
     instance1.onChange(onChangeBrief)
     instance2.onChange(onChangeFull(_, _))
     instance2.onChange(onChangeBrief)
-    def verifyChange(n: Int,
-                     array: ObservableFloatArray,
-                     sizeChanged: Boolean,
-                     start: Int,
-                     end: Int) {
+    def verifyChange(
+        n: Int,
+        array: ObservableFloatArray,
+        sizeChanged: Boolean,
+        start: Int,
+        end: Int) {
       val (a, c) = change(n)
       assert(a eq array)
       assert(c.sizeChanged === sizeChanged)
@@ -286,8 +289,9 @@ class ObservableFloatArraySpec
   it should "return valid array from companion's apply(values*)" in {
     testEmpty(ObservableFloatArray())
     testNonEmpty(ObservableFloatArray(1.0f), Array(1.0f))
-    testNonEmpty(ObservableFloatArray(0.0f, 1.0f, 2.0f, 3.0f, 4.0f),
-                 Array(0.0f, 1.0f, 2.0f, 3.0f, 4.0f))
+    testNonEmpty(
+      ObservableFloatArray(0.0f, 1.0f, 2.0f, 3.0f, 4.0f),
+      Array(0.0f, 1.0f, 2.0f, 3.0f, 4.0f))
   }
   it should "return valid array from companion's apply(Array)" in {
     testEmpty(ObservableFloatArray(Array[Float]()))
@@ -327,7 +331,8 @@ class ObservableFloatArraySpec
     testEmpty(ObservableFloatArray.iterate(0.0f, -1)(_ + 1.0f))
     testEmpty(ObservableFloatArray.iterate(0.0f, 0)(_ + 1.0f))
     testNonEmpty(ObservableFloatArray.iterate(0.0f, 1)(_ + 1.0f), Array(0.0f))
-    testNonEmpty(ObservableFloatArray.iterate(0.0f, 5)(_ + 1.0f),
-                 Array(0.0f, 1.0f, 2.0f, 3.0f, 4.0f))
+    testNonEmpty(
+      ObservableFloatArray.iterate(0.0f, 5)(_ + 1.0f),
+      Array(0.0f, 1.0f, 2.0f, 3.0f, 4.0f))
   }
 }

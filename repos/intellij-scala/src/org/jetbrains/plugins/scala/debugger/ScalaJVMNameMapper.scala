@@ -6,7 +6,11 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.util.Computable
 import com.intellij.psi.PsiClass
 import org.jetbrains.annotations.NotNull
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTemplateDefinition, ScTrait}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject,
+  ScTemplateDefinition,
+  ScTrait
+}
 
 /**
   *@author ilyas
@@ -16,10 +20,10 @@ class ScalaJVMNameMapper extends NameMapper {
     ApplicationManager.getApplication.runReadAction(new Computable[String] {
       def compute: String = {
         clazz match {
-          case obj: ScObject => obj.qualifiedName + "$"
-          case tr: ScTrait => tr.qualifiedName
+          case obj: ScObject                  => obj.qualifiedName + "$"
+          case tr: ScTrait                    => tr.qualifiedName
           case templDef: ScTemplateDefinition => templDef.qualifiedName
-          case psiClass => null
+          case psiClass                       => null
         }
       }
     })

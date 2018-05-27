@@ -44,8 +44,7 @@ abstract class AbstractCompiler extends Compiler {
     }
   }
 
-  private class ClientProgress(client: Client)
-      extends ExtendedCompileProgress {
+  private class ClientProgress(client: Client) extends ExtendedCompileProgress {
     def generated(source: File, module: File, name: String) {
       client.progress("Generated " + module.getName)
       client.generated(source, module, name)
@@ -90,8 +89,8 @@ abstract class AbstractCompiler extends Compiler {
       }
 
       val kind = sev match {
-        case Severity.Info => Kind.INFO
-        case Severity.Warn => Kind.WARNING
+        case Severity.Info  => Kind.INFO
+        case Severity.Warn  => Kind.WARNING
         case Severity.Error => Kind.ERROR
       }
 

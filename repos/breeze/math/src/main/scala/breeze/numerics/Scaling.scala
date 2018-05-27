@@ -87,7 +87,9 @@ trait Scaling {
   }
 
   def scaleArrayToScale(
-      scores: Array[Double], currentScale: Int, targetScale: Int) {
+      scores: Array[Double],
+      currentScale: Int,
+      targetScale: Int) {
     val scaleDelta = targetScale - currentScale
 
     if (scaleDelta != 0) {
@@ -108,10 +110,11 @@ trait Scaling {
     * @param destScale
     * @return the new scale
     */
-  def sumArrays(src: Array[Double],
-                srcScale: Int,
-                dest: Array[Double],
-                destScale: Int): Int = {
+  def sumArrays(
+      src: Array[Double],
+      srcScale: Int,
+      dest: Array[Double],
+      destScale: Int): Int = {
     if (destScale == srcScale) {
       axpy(1.0, src, dest)
       destScale

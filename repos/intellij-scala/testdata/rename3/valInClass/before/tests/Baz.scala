@@ -6,7 +6,7 @@ class Baz {
   def foo() = {
     ba /*caret*/ r match {
       case `bar/*caret*/` =>
-      case _ =>
+      case _              =>
     }
   }
 }

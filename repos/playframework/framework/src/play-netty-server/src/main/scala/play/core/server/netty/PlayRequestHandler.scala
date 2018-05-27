@@ -16,7 +16,12 @@ import io.netty.handler.codec.http.websocketx.WebSocketServerHandshakerFactory
 import io.netty.handler.codec.http._
 import io.netty.handler.ssl.SslHandler
 import play.api.{Application, Logger}
-import play.api.http.{DefaultHttpErrorHandler, HttpErrorHandler, Status, HeaderNames}
+import play.api.http.{
+  DefaultHttpErrorHandler,
+  HttpErrorHandler,
+  Status,
+  HeaderNames
+}
 import play.api.libs.streams.Accumulator
 import play.api.mvc.{RequestHeader, Results, WebSocket, EssentialAction}
 import play.core.server.NettyServer
@@ -46,10 +51,10 @@ private[play] class PlayRequestHandler(val server: NettyServer)
 
   // todo: make forwarded header handling a filter
   private lazy val modelConversion = new NettyModelConversion(
-      new ForwardedHeaderHandler(
-          ForwardedHeaderHandler.ForwardedHeaderHandlerConfig(
-              server.applicationProvider.get.toOption.map(_.configuration))
-      )
+    new ForwardedHeaderHandler(
+      ForwardedHeaderHandler.ForwardedHeaderHandlerConfig(
+        server.applicationProvider.get.toOption.map(_.configuration))
+    )
   )
 
   /**
@@ -63,23 +68,25 @@ private[play] class PlayRequestHandler(val server: NettyServer)
 
     val requestId = RequestIdProvider.requestIDs.incrementAndGet()
     val tryRequest = modelConversion.convertRequest(
-        requestId,
-        channel.remoteAddress().asInstanceOf[InetSocketAddress],
-        Option(channel.pipeline().get(classOf[SslHandler])),
-        request)
+      requestId,
+      channel.remoteAddress().asInstanceOf[InetSocketAddress],
+      Option(channel.pipeline().get(classOf[SslHandler])),
+      request)
 
     def clientError(statusCode: Int, message: String) = {
       val requestHeader = modelConversion.createUnparsedRequestHeader(
-          requestId,
-          request,
-          channel.remoteAddress().asInstanceOf[InetSocketAddress],
-          Option(channel.pipeline().get(classOf[SslHandler])))
+        requestId,
+        request,
+        channel.remoteAddress().asInstanceOf[InetSocketAddress],
+        Option(channel.pipeline().get(classOf[SslHandler])))
       val result =
         errorHandler(server.applicationProvider.current).onClientError(
-            requestHeader, statusCode, if (message == null) "" else message)
+          requestHeader,
+          statusCode,
+          if (message == null) "" else message)
       // If there's a problem in parsing the request, then we should close the connection, once done with it
       requestHeader -> Left(
-          result.map(_.withHeaders(HeaderNames.CONNECTION -> "close")))
+        result.map(_.withHeaders(HeaderNames.CONNECTION -> "close")))
     }
 
     val (requestHeader, resultOrHandler) = tryRequest match {
@@ -123,11 +130,11 @@ private[play] class PlayRequestHandler(val server: NettyServer)
           .getBytes("play.websocket.buffer.limit")
           .getOrElse(65536L)
           .asInstanceOf[Int]
-        val factory = new WebSocketServerHandshakerFactory(
-            wsUrl, "*", true, bufferLimit)
+        val factory =
+          new WebSocketServerHandshakerFactory(wsUrl, "*", true, bufferLimit)
 
         val executed = Future(ws(requestHeader))(
-            play.api.libs.concurrent.Execution.defaultContext)
+          play.api.libs.concurrent.Execution.defaultContext)
 
         import play.api.libs.iteratee.Execution.Implicits.trampoline
         executed
@@ -142,10 +149,11 @@ private[play] class PlayRequestHandler(val server: NettyServer)
               val processor =
                 WebSocketHandler.messageFlowToFrameProcessor(flow, bufferLimit)
               Future.successful(
-                  new DefaultWebSocketHttpResponse(request.getProtocolVersion,
-                                                   HttpResponseStatus.OK,
-                                                   processor,
-                                                   factory))
+                new DefaultWebSocketHttpResponse(
+                  request.getProtocolVersion,
+                  HttpResponseStatus.OK,
+                  processor,
+                  factory))
           }
           .recoverWith {
             case error =>
@@ -160,16 +168,16 @@ private[play] class PlayRequestHandler(val server: NettyServer)
       case Right((ws: WebSocket, app)) =>
         logger.trace("Bad websocket request")
         val action = EssentialAction(
-            _ =>
-              Accumulator.done(
-                  Results
-                    .Status(Status.UPGRADE_REQUIRED)(
-                        "Upgrade to WebSocket required")
-                    .withHeaders(
-                        HeaderNames.UPGRADE -> "websocket",
-                        HeaderNames.CONNECTION -> HeaderNames.UPGRADE
-                    )
-              ))
+          _ =>
+            Accumulator.done(
+              Results
+                .Status(Status.UPGRADE_REQUIRED)(
+                  "Upgrade to WebSocket required")
+                .withHeaders(
+                  HeaderNames.UPGRADE -> "websocket",
+                  HeaderNames.CONNECTION -> HeaderNames.UPGRADE
+                )
+          ))
         handleAction(action, requestHeader, request, Some(app))
 
       case Left(e) =>
@@ -205,8 +213,9 @@ private[play] class PlayRequestHandler(val server: NettyServer)
           f.recover {
             case error: Exception =>
               logger.error("Exception caught in channelRead future", error)
-              sendSimpleErrorResponse(ctx,
-                                      HttpResponseStatus.SERVICE_UNAVAILABLE)
+              sendSimpleErrorResponse(
+                ctx,
+                HttpResponseStatus.SERVICE_UNAVAILABLE)
           }
         }
     }
@@ -232,7 +241,8 @@ private[play] class PlayRequestHandler(val server: NettyServer)
   }
 
   override def exceptionCaught(
-      ctx: ChannelHandlerContext, cause: Throwable): Unit = {
+      ctx: ChannelHandlerContext,
+      cause: Throwable): Unit = {
     cause match {
       // IO exceptions happen all the time, it usually just means that the client has closed the connection before fully
       // sending/receiving the response.
@@ -244,7 +254,7 @@ private[play] class PlayRequestHandler(val server: NettyServer)
         sendSimpleErrorResponse(ctx, HttpResponseStatus.REQUEST_URI_TOO_LONG)
       case e: IllegalArgumentException
           if Option(e.getMessage).exists(
-              _.contains("Header value contains a prohibited character")) =>
+            _.contains("Header value contains a prohibited character")) =>
         // https://github.com/netty/netty/blob/netty-3.9.3.Final/src/main/java/org/jboss/netty/handler/codec/http/HttpHeaders.java#L1075-L1080
         logger.debug("Handling Header value error", e)
         sendSimpleErrorResponse(ctx, HttpResponseStatus.BAD_REQUEST)
@@ -267,10 +277,11 @@ private[play] class PlayRequestHandler(val server: NettyServer)
   /**
     * Handle an essential action.
     */
-  private def handleAction(action: EssentialAction,
-                           requestHeader: RequestHeader,
-                           request: HttpRequest,
-                           app: Option[Application]): Future[HttpResponse] = {
+  private def handleAction(
+      action: EssentialAction,
+      requestHeader: RequestHeader,
+      request: HttpRequest,
+      app: Option[Application]): Future[HttpResponse] = {
     implicit val mat: Materializer =
       app.fold(server.materializer)(_.materializer)
     import play.api.libs.iteratee.Execution.Implicits.trampoline
@@ -284,19 +295,23 @@ private[play] class PlayRequestHandler(val server: NettyServer)
         bodyParser.run(source)
     }
 
-    resultFuture.recoverWith {
-      case error =>
-        logger.error("Cannot invoke the action", error)
-        errorHandler(app).onServerError(requestHeader, error)
-    }.map {
-      case result =>
-        val cleanedResult =
-          ServerResultUtils.cleanFlashCookie(requestHeader, result)
-        val validated =
-          ServerResultUtils.validateResult(requestHeader, cleanedResult)
-        modelConversion.convertResult(
-            validated, requestHeader, request.getProtocolVersion)
-    }
+    resultFuture
+      .recoverWith {
+        case error =>
+          logger.error("Cannot invoke the action", error)
+          errorHandler(app).onServerError(requestHeader, error)
+      }
+      .map {
+        case result =>
+          val cleanedResult =
+            ServerResultUtils.cleanFlashCookie(requestHeader, result)
+          val validated =
+            ServerResultUtils.validateResult(requestHeader, cleanedResult)
+          modelConversion.convertResult(
+            validated,
+            requestHeader,
+            request.getProtocolVersion)
+      }
   }
 
   /**

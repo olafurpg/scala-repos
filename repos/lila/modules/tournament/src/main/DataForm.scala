@@ -29,8 +29,8 @@ final class DataForm {
     clockIncrements ++ (3 to 7) ++ (10 to 30 by 5) ++ (40 to 60 by 10)
   val clockIncrementDefault = 0
   val clockIncrementChoices = options(clockIncrements, "%d second{s}")
-  val clockIncrementPrivateChoices = options(
-      clockIncrementsPrivate, "%d second{s}")
+  val clockIncrementPrivateChoices =
+    options(clockIncrementsPrivate, "%d second{s}")
 
   val minutes = (20 to 60 by 5) ++ (70 to 120 by 10)
   val minutesPrivate = minutes ++ (150 to 360 by 30)
@@ -50,55 +50,58 @@ final class DataForm {
 
   lazy val create =
     Form(
-        mapping(
-            "clockTime" -> numberInDouble(clockTimePrivateChoices),
-            "clockIncrement" -> numberIn(clockIncrementPrivateChoices),
-            "minutes" -> numberIn(minutePrivateChoices),
-            "waitMinutes" -> numberIn(waitMinuteChoices),
-            "variant" -> number.verifying(validVariantIds contains _),
-            "position" -> nonEmptyText.verifying(positions contains _),
-            "mode" -> optional(
-                number.verifying(Mode.all map (_.id) contains _)),
-            "private" -> optional(text.verifying("on" == _))
-        )(TournamentSetup.apply)(TournamentSetup.unapply)
-          .verifying("Invalid clock", _.validClock)
-          .verifying("Increase tournament duration, or decrease game clock",
-                     _.validTiming)) fill TournamentSetup(
-        clockTime = clockTimeDefault,
-        clockIncrement = clockIncrementDefault,
-        minutes = minuteDefault,
-        waitMinutes = waitMinuteDefault,
-        variant = chess.variant.Standard.id,
-        position = StartingPosition.initial.eco,
-        `private` = None,
-        mode = Mode.Rated.id.some)
+      mapping(
+        "clockTime" -> numberInDouble(clockTimePrivateChoices),
+        "clockIncrement" -> numberIn(clockIncrementPrivateChoices),
+        "minutes" -> numberIn(minutePrivateChoices),
+        "waitMinutes" -> numberIn(waitMinuteChoices),
+        "variant" -> number.verifying(validVariantIds contains _),
+        "position" -> nonEmptyText.verifying(positions contains _),
+        "mode" -> optional(number.verifying(Mode.all map (_.id) contains _)),
+        "private" -> optional(text.verifying("on" == _))
+      )(TournamentSetup.apply)(TournamentSetup.unapply)
+        .verifying("Invalid clock", _.validClock)
+        .verifying(
+          "Increase tournament duration, or decrease game clock",
+          _.validTiming)) fill TournamentSetup(
+      clockTime = clockTimeDefault,
+      clockIncrement = clockIncrementDefault,
+      minutes = minuteDefault,
+      waitMinutes = waitMinuteDefault,
+      variant = chess.variant.Standard.id,
+      position = StartingPosition.initial.eco,
+      `private` = None,
+      mode = Mode.Rated.id.some
+    )
 }
 
 object DataForm {
 
   import chess.variant._
 
-  val validVariants = List(Standard,
-                           Chess960,
-                           KingOfTheHill,
-                           ThreeCheck,
-                           Antichess,
-                           Atomic,
-                           Horde,
-                           RacingKings,
-                           Crazyhouse)
+  val validVariants = List(
+    Standard,
+    Chess960,
+    KingOfTheHill,
+    ThreeCheck,
+    Antichess,
+    Atomic,
+    Horde,
+    RacingKings,
+    Crazyhouse)
 
   val validVariantIds = validVariants.map(_.id).toSet
 }
 
-private[tournament] case class TournamentSetup(clockTime: Double,
-                                               clockIncrement: Int,
-                                               minutes: Int,
-                                               waitMinutes: Int,
-                                               variant: Int,
-                                               position: String,
-                                               mode: Option[Int],
-                                               `private`: Option[String]) {
+private[tournament] case class TournamentSetup(
+    clockTime: Double,
+    clockIncrement: Int,
+    minutes: Int,
+    waitMinutes: Int,
+    variant: Int,
+    position: String,
+    mode: Option[Int],
+    `private`: Option[String]) {
 
   def validClock = (clockTime + clockIncrement) > 0
 

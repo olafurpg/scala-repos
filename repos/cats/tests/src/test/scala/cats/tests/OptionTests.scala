@@ -2,27 +2,35 @@ package cats
 package tests
 
 import cats.laws.{ApplicativeLaws, CoflatMapLaws, FlatMapLaws, MonadLaws}
-import cats.laws.discipline.{TraverseTests, CoflatMapTests, MonadCombineTests, SerializableTests, CartesianTests}
+import cats.laws.discipline.{
+  TraverseTests,
+  CoflatMapTests,
+  MonadCombineTests,
+  SerializableTests,
+  CartesianTests
+}
 import cats.laws.discipline.eq._
 
 class OptionTests extends CatsSuite {
   checkAll("Option[Int]", CartesianTests[Option].cartesian[Int, Int, Int])
   checkAll(
-      "Cartesian[Option]", SerializableTests.serializable(Cartesian[Option]))
+    "Cartesian[Option]",
+    SerializableTests.serializable(Cartesian[Option]))
 
   checkAll("Option[Int]", CoflatMapTests[Option].coflatMap[Int, Int, Int])
   checkAll(
-      "CoflatMap[Option]", SerializableTests.serializable(CoflatMap[Option]))
+    "CoflatMap[Option]",
+    SerializableTests.serializable(CoflatMap[Option]))
+
+  checkAll("Option[Int]", MonadCombineTests[Option].monadCombine[Int, Int, Int])
+  checkAll(
+    "MonadCombine[Option]",
+    SerializableTests.serializable(MonadCombine[Option]))
 
   checkAll(
-      "Option[Int]", MonadCombineTests[Option].monadCombine[Int, Int, Int])
-  checkAll("MonadCombine[Option]",
-           SerializableTests.serializable(MonadCombine[Option]))
-
-  checkAll("Option[Int] with Option",
-           TraverseTests[Option].traverse[Int, Int, Int, Int, Option, Option])
-  checkAll(
-      "Traverse[Option]", SerializableTests.serializable(Traverse[Option]))
+    "Option[Int] with Option",
+    TraverseTests[Option].traverse[Int, Int, Int, Int, Option, Option])
+  checkAll("Traverse[Option]", SerializableTests.serializable(Traverse[Option]))
 
   test("show") {
     none[Int].show should ===("None")
@@ -39,24 +47,21 @@ class OptionTests extends CatsSuite {
   // instances.
 
   test("Kleisli associativity") {
-    forAll { (l: Long, f: Long => Option[Int], g: Int => Option[Char],
-    h: Char => Option[String]) =>
+    forAll { (l: Long, f: Long => Option[Int], g: Int => Option[Char], h: Char => Option[String]) =>
       val isEq = FlatMapLaws[Option].kleisliAssociativity(f, g, h, l)
       isEq.lhs should ===(isEq.rhs)
     }
   }
 
   test("Cokleisli associativity") {
-    forAll { (l: Option[Long], f: Option[Long] => Int, g: Option[Int] => Char,
-    h: Option[Char] => String) =>
+    forAll { (l: Option[Long], f: Option[Long] => Int, g: Option[Int] => Char, h: Option[Char] => String) =>
       val isEq = CoflatMapLaws[Option].cokleisliAssociativity(f, g, h, l)
       isEq.lhs should ===(isEq.rhs)
     }
   }
 
   test("applicative composition") {
-    forAll { (fa: Option[Int], fab: Option[Int => Long],
-    fbc: Option[Long => Char]) =>
+    forAll { (fa: Option[Int], fab: Option[Int => Long], fbc: Option[Long => Char]) =>
       val isEq = ApplicativeLaws[Option].applicativeComposition(fa, fab, fbc)
       isEq.lhs should ===(isEq.rhs)
     }

@@ -72,9 +72,10 @@ class CforTest extends SpireProperties {
   property("functions with side effects function by-value params in cfor") {
     val b = mutable.ArrayBuffer.empty[Int]
     var v = 0
-    def run(test: => (Int => Boolean),
-            incr: => (Int => Int),
-            body: => (Int => Unit)): Unit = {
+    def run(
+        test: => (Int => Boolean),
+        incr: => (Int => Int),
+        body: => (Int => Unit)): Unit = {
       cfor(0)(test, incr)(body)
     }
     run({ v += 1; _ < 3 }, { v += 10; _ + 1 }, {

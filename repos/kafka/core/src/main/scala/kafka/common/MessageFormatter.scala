@@ -31,8 +31,9 @@ trait MessageFormatter {
 
   def init(props: Properties) {}
 
-  def writeTo(consumerRecord: ConsumerRecord[Array[Byte], Array[Byte]],
-              output: PrintStream): Unit
+  def writeTo(
+      consumerRecord: ConsumerRecord[Array[Byte], Array[Byte]],
+      output: PrintStream): Unit
 
   def close() {}
 }

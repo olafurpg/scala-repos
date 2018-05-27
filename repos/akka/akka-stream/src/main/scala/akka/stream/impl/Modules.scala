@@ -23,13 +23,13 @@ private[akka] abstract class SourceModule[+Out, +Mat](
   final override def toString: String =
     f"$label [${System.identityHashCode(this)}%08x]"
 
-  def create(context: MaterializationContext)
-    : (Publisher[Out] @uncheckedVariance, Mat)
+  def create(
+      context: MaterializationContext): (Publisher[Out] @uncheckedVariance, Mat)
 
   override def replaceShape(s: Shape): AtomicModule =
     if (s != shape)
       throw new UnsupportedOperationException(
-          "cannot replace the shape of a Source, you need to wrap it in a Graph for that")
+        "cannot replace the shape of a Source, you need to wrap it in a Graph for that")
     else this
 
   // This is okay since the only caller of this method is right below.
@@ -54,7 +54,8 @@ private[akka] abstract class SourceModule[+Out, +Mat](
   * The `Subscriber` can later be connected to an upstream `Publisher`.
   */
 private[akka] final class SubscriberSource[Out](
-    val attributes: Attributes, shape: SourceShape[Out])
+    val attributes: Attributes,
+    shape: SourceShape[Out])
     extends SourceModule[Out, Subscriber[Out]](shape) {
 
   override def create(
@@ -78,7 +79,9 @@ private[akka] final class SubscriberSource[Out](
   * back-pressure upstream.
   */
 private[akka] final class PublisherSource[Out](
-    p: Publisher[Out], val attributes: Attributes, shape: SourceShape[Out])
+    p: Publisher[Out],
+    val attributes: Attributes,
+    shape: SourceShape[Out])
     extends SourceModule[Out, NotUsed](shape) {
 
   override protected def label: String = s"PublisherSource($p)"
@@ -96,13 +99,14 @@ private[akka] final class PublisherSource[Out](
   * INTERNAL API
   */
 private[akka] final class MaybeSource[Out](
-    val attributes: Attributes, shape: SourceShape[Out])
+    val attributes: Attributes,
+    shape: SourceShape[Out])
     extends SourceModule[Out, Promise[Option[Out]]](shape) {
 
   override def create(context: MaterializationContext) = {
     val p = Promise[Option[Out]]()
     new MaybePublisher[Out](p, attributes.nameOrDefault("MaybeSource"))(
-        context.materializer.executionContext) → p
+      context.materializer.executionContext) → p
   }
   override protected def newInstance(
       shape: SourceShape[Out]): SourceModule[Out, Promise[Option[Out]]] =
@@ -117,14 +121,16 @@ private[akka] final class MaybeSource[Out](
   * which should be [[akka.actor.Props]] for an [[akka.stream.actor.ActorPublisher]].
   */
 private[akka] final class ActorPublisherSource[Out](
-    props: Props, val attributes: Attributes, shape: SourceShape[Out])
+    props: Props,
+    val attributes: Attributes,
+    shape: SourceShape[Out])
     extends SourceModule[Out, ActorRef](shape) {
 
   override def create(context: MaterializationContext) = {
     val publisherRef = ActorMaterializer
       .downcast(context.materializer)
       .actorOf(context, props)
-      (akka.stream.actor.ActorPublisher[Out](publisherRef), publisherRef)
+    (akka.stream.actor.ActorPublisher[Out](publisherRef), publisherRef)
   }
 
   override protected def newInstance(
@@ -150,8 +156,8 @@ private[akka] final class ActorRefSource[Out](
   override def create(context: MaterializationContext) = {
     val mat = ActorMaterializer.downcast(context.materializer)
     val ref = mat.actorOf(
-        context,
-        ActorRefSourceActor.props(bufferSize, overflowStrategy, mat.settings))
+      context,
+      ActorRefSourceActor.props(bufferSize, overflowStrategy, mat.settings))
     (akka.stream.actor.ActorPublisher[Out](ref), ref)
   }
 

@@ -16,7 +16,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.ScAccessModifier
 class ScAccessModifierStubImpl[ParentPsi <: PsiElement](
     parent: StubElement[ParentPsi],
     elemType: IStubElementType[
-        _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
+      _ <: StubElement[_ <: PsiElement],
+      _ <: PsiElement])
     extends StubBaseWrapper[ScAccessModifier](parent, elemType)
     with ScAccessModifierStub {
   var _isPrivate: Boolean = _
@@ -24,17 +25,19 @@ class ScAccessModifierStubImpl[ParentPsi <: PsiElement](
   var _isThis: Boolean = _
   var idText: Option[StringRef] = None
 
-  def this(parent: StubElement[ParentPsi],
-           elemType: IStubElementType[
-               _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
-           isPrivate: Boolean,
-           isProtected: Boolean,
-           isThis: Boolean,
-           idText: Option[StringRef]) = {
+  def this(
+      parent: StubElement[ParentPsi],
+      elemType: IStubElementType[
+        _ <: StubElement[_ <: PsiElement],
+        _ <: PsiElement],
+      isPrivate: Boolean,
+      isProtected: Boolean,
+      isThis: Boolean,
+      idText: Option[StringRef]) = {
     this(
-        parent,
-        elemType
-          .asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
+      parent,
+      elemType
+        .asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
     this._isPrivate = isPrivate
     this._isProtected = isProtected
     this._isThis = isThis

@@ -64,14 +64,14 @@ private[streaming] case class JobSet(
 
   def toBatchInfo: BatchInfo = {
     BatchInfo(
-        time,
-        streamIdToInputInfo,
-        submissionTime,
-        if (hasStarted) Some(processingStartTime) else None,
-        if (hasCompleted) Some(processingEndTime) else None,
-        jobs.map { job =>
-          (job.outputOpId, job.toOutputOperationInfo)
-        }.toMap
+      time,
+      streamIdToInputInfo,
+      submissionTime,
+      if (hasStarted) Some(processingStartTime) else None,
+      if (hasCompleted) Some(processingEndTime) else None,
+      jobs.map { job =>
+        (job.outputOpId, job.toOutputOperationInfo)
+      }.toMap
     )
   }
 }

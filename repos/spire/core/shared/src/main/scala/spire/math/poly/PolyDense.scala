@@ -10,7 +10,7 @@ import spire.syntax.eq._
 import spire.syntax.field._
 
 // Dense polynomials - Little Endian Coeffs e.g. x^0, x^1, ... x^n
-class PolyDense[@sp(Double) C] private[spire](val coeffs: Array[C])(
+class PolyDense[@sp(Double) C] private[spire] (val coeffs: Array[C])(
     implicit val ct: ClassTag[C])
     extends Polynomial[C] { lhs =>
 
@@ -27,8 +27,8 @@ class PolyDense[@sp(Double) C] private[spire](val coeffs: Array[C])(
     }
   }
 
-  override def foreachNonZero[U](f: (Int, C) => U)(
-      implicit ring: Semiring[C], eq: Eq[C]): Unit = {
+  override def foreachNonZero[U](
+      f: (Int, C) => U)(implicit ring: Semiring[C], eq: Eq[C]): Unit = {
     cfor(0)(_ < coeffs.length, _ + 1) { e =>
       val c = coeffs(e)
       if (c =!= ring.zero) f(e, c)
@@ -61,7 +61,9 @@ class PolyDense[@sp(Double) C] private[spire](val coeffs: Array[C])(
     if (isZero) ring.zero else coeffs(degree)
 
   def reductum(
-      implicit e: Eq[C], ring: Semiring[C], ct: ClassTag[C]): Polynomial[C] = {
+      implicit e: Eq[C],
+      ring: Semiring[C],
+      ct: ClassTag[C]): Polynomial[C] = {
     var i = coeffs.length - 2
     while (i >= 0 && coeffs(i) === ring.zero) i -= 1
     if (i < 0) {
@@ -129,11 +131,13 @@ class PolyDense[@sp(Double) C] private[spire](val coeffs: Array[C])(
   }
 
   def +(rhs: Polynomial[C])(
-      implicit ring: Semiring[C], eq: Eq[C]): Polynomial[C] =
+      implicit ring: Semiring[C],
+      eq: Eq[C]): Polynomial[C] =
     PolyDense.plusDense(lhs, rhs)
 
   def *(rhs: Polynomial[C])(
-      implicit ring: Semiring[C], eq: Eq[C]): Polynomial[C] = {
+      implicit ring: Semiring[C],
+      eq: Eq[C]): Polynomial[C] = {
     if (rhs.isZero) return rhs
     if (lhs.isZero) return lhs
     val lcs = lhs.coeffsArray
@@ -154,7 +158,8 @@ class PolyDense[@sp(Double) C] private[spire](val coeffs: Array[C])(
   }
 
   def /%(rhs: Polynomial[C])(
-      implicit field: Field[C], eq: Eq[C]): (Polynomial[C], Polynomial[C]) = {
+      implicit field: Field[C],
+      eq: Eq[C]): (Polynomial[C], Polynomial[C]) = {
     def zipSum(lcs: Array[C], rcs: Array[C])(implicit r: Ring[C]): Array[C] =
       (lcs + rcs).tail
 
@@ -168,7 +173,9 @@ class PolyDense[@sp(Double) C] private[spire](val coeffs: Array[C])(
 
     @tailrec
     def eval(
-        q: Array[C], u: Array[C], n: Int): (Polynomial[C], Polynomial[C]) = {
+        q: Array[C],
+        u: Array[C],
+        n: Int): (Polynomial[C], Polynomial[C]) = {
       if (u.isEmpty || n < 0) {
         (polyFromCoeffsLE(q), polyFromCoeffsBE(u))
       } else {
@@ -205,8 +212,9 @@ class PolyDense[@sp(Double) C] private[spire](val coeffs: Array[C])(
 }
 
 object PolyDense {
-  private final def plusDense[C : Semiring : Eq : ClassTag](
-      lhs: Polynomial[C], rhs: Polynomial[C]): Polynomial[C] = {
+  private final def plusDense[C: Semiring: Eq: ClassTag](
+      lhs: Polynomial[C],
+      rhs: Polynomial[C]): Polynomial[C] = {
     val lcoeffs = lhs.coeffsArray
     val rcoeffs = rhs.coeffsArray
     if (lcoeffs.length < rcoeffs.length) {

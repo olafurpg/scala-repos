@@ -27,9 +27,10 @@ import org.apache.kafka.common.protocol.ApiKeys
 import org.apache.kafka.common.utils.Utils._
 
 @deprecated(
-    "This object has been deprecated and will be removed in a future release. " +
+  "This object has been deprecated and will be removed in a future release. " +
     "Please use org.apache.kafka.clients.producer.KafkaProducer instead.",
-    "0.10.0.0")
+  "0.10.0.0"
+)
 object SyncProducer {
   val RequestKey: Short = 0
   val randomGenerator = new Random
@@ -40,25 +41,26 @@ object SyncProducer {
  */
 @threadsafe
 @deprecated(
-    "This class has been deprecated and will be removed in a future release. " +
+  "This class has been deprecated and will be removed in a future release. " +
     "Please use org.apache.kafka.clients.producer.KafkaProducer instead.",
-    "0.10.0.0")
+  "0.10.0.0"
+)
 class SyncProducer(val config: SyncProducerConfig) extends Logging {
 
   private val lock = new Object()
   @volatile private var shutdown: Boolean = false
   private val blockingChannel = new BlockingChannel(
-      config.host,
-      config.port,
-      BlockingChannel.UseDefaultBufferSize,
-      config.sendBufferBytes,
-      config.requestTimeoutMs)
+    config.host,
+    config.port,
+    BlockingChannel.UseDefaultBufferSize,
+    config.sendBufferBytes,
+    config.requestTimeoutMs)
   val producerRequestStats =
     ProducerRequestStatsRegistry.getProducerRequestStats(config.clientId)
 
   trace(
-      "Instantiating Scala Sync Producer with properties: %s".format(
-          config.props))
+    "Instantiating Scala Sync Producer with properties: %s".format(
+      config.props))
 
   private def verifyRequest(request: RequestOrResponse) = {
 
@@ -81,8 +83,9 @@ class SyncProducer(val config: SyncProducerConfig) extends Logging {
   /**
     * Common functionality for the public send methods
     */
-  private def doSend(request: RequestOrResponse,
-                     readResponse: Boolean = true): NetworkReceive = {
+  private def doSend(
+      request: RequestOrResponse,
+      readResponse: Boolean = true): NetworkReceive = {
     lock synchronized {
       verifyRequest(request)
       getOrMakeConnection()
@@ -124,9 +127,10 @@ class SyncProducer(val config: SyncProducerConfig) extends Logging {
       producerRequestStats.getProducerRequestAllBrokersStats.requestTimer
     aggregateTimer.time {
       specificTimer.time {
-        response = doSend(producerRequest,
-                          if (producerRequest.requiredAcks == 0) false
-                          else true)
+        response = doSend(
+          producerRequest,
+          if (producerRequest.requiredAcks == 0) false
+          else true)
       }
     }
     if (producerRequest.requiredAcks != 0) {
@@ -170,16 +174,18 @@ class SyncProducer(val config: SyncProducerConfig) extends Logging {
     if (!blockingChannel.isConnected && !shutdown) {
       try {
         blockingChannel.connect()
-        info("Connected to " + formatAddress(config.host, config.port) +
+        info(
+          "Connected to " + formatAddress(config.host, config.port) +
             " for producing")
       } catch {
         case e: Exception => {
-            disconnect()
-            error("Producer connection to " +
-                  formatAddress(config.host, config.port) + " unsuccessful",
-                  e)
-            throw e
-          }
+          disconnect()
+          error(
+            "Producer connection to " +
+              formatAddress(config.host, config.port) + " unsuccessful",
+            e)
+          throw e
+        }
       }
     }
     blockingChannel

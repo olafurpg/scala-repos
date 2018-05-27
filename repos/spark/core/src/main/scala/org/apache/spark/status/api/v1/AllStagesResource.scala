@@ -20,8 +20,17 @@ import java.util.{Arrays, Date, List => JList}
 import javax.ws.rs.{GET, Produces, QueryParam}
 import javax.ws.rs.core.MediaType
 
-import org.apache.spark.executor.{InputMetrics => InternalInputMetrics, OutputMetrics => InternalOutputMetrics, ShuffleReadMetrics => InternalShuffleReadMetrics, ShuffleWriteMetrics => InternalShuffleWriteMetrics, TaskMetrics => InternalTaskMetrics}
-import org.apache.spark.scheduler.{AccumulableInfo => InternalAccumulableInfo, StageInfo}
+import org.apache.spark.executor.{
+  InputMetrics => InternalInputMetrics,
+  OutputMetrics => InternalOutputMetrics,
+  ShuffleReadMetrics => InternalShuffleReadMetrics,
+  ShuffleWriteMetrics => InternalShuffleWriteMetrics,
+  TaskMetrics => InternalTaskMetrics
+}
+import org.apache.spark.scheduler.{
+  AccumulableInfo => InternalAccumulableInfo,
+  StageInfo
+}
 import org.apache.spark.ui.SparkUI
 import org.apache.spark.ui.jobs.UIData.{StageUIData, TaskUIData}
 import org.apache.spark.util.Distribution
@@ -49,16 +58,20 @@ private[v1] class AllStagesResource(ui: SparkUI) {
       }
     } yield {
       AllStagesResource.stageUiToStageData(
-          status, stageInfo, stageUiData, includeDetails = false)
+        status,
+        stageInfo,
+        stageUiData,
+        includeDetails = false)
     }
   }
 }
 
 private[v1] object AllStagesResource {
-  def stageUiToStageData(status: StageStatus,
-                         stageInfo: StageInfo,
-                         stageUiData: StageUIData,
-                         includeDetails: Boolean): StageData = {
+  def stageUiToStageData(
+      status: StageStatus,
+      stageInfo: StageInfo,
+      stageUiData: StageUIData,
+      includeDetails: Boolean): StageData = {
 
     val taskLaunchTimes =
       stageUiData.taskData.values.map(_.taskInfo.launchTime).filter(_ > 0)
@@ -83,15 +96,15 @@ private[v1] object AllStagesResource {
         Some(stageUiData.executorSummary.map {
           case (k, summary) =>
             k -> new ExecutorStageSummary(
-                taskTime = summary.taskTime,
-                failedTasks = summary.failedTasks,
-                succeededTasks = summary.succeededTasks,
-                inputBytes = summary.inputBytes,
-                outputBytes = summary.outputBytes,
-                shuffleRead = summary.shuffleRead,
-                shuffleWrite = summary.shuffleWrite,
-                memoryBytesSpilled = summary.memoryBytesSpilled,
-                diskBytesSpilled = summary.diskBytesSpilled
+              taskTime = summary.taskTime,
+              failedTasks = summary.failedTasks,
+              succeededTasks = summary.succeededTasks,
+              inputBytes = summary.inputBytes,
+              outputBytes = summary.outputBytes,
+              shuffleRead = summary.shuffleRead,
+              shuffleWrite = summary.shuffleWrite,
+              memoryBytesSpilled = summary.memoryBytesSpilled,
+              diskBytesSpilled = summary.diskBytesSpilled
             )
         })
       } else {
@@ -103,32 +116,32 @@ private[v1] object AllStagesResource {
     }.toSeq
 
     new StageData(
-        status = status,
-        stageId = stageInfo.stageId,
-        attemptId = stageInfo.attemptId,
-        numActiveTasks = stageUiData.numActiveTasks,
-        numCompleteTasks = stageUiData.numCompleteTasks,
-        numFailedTasks = stageUiData.numFailedTasks,
-        executorRunTime = stageUiData.executorRunTime,
-        submissionTime = stageInfo.submissionTime.map(new Date(_)),
-        firstTaskLaunchedTime,
-        completionTime = stageInfo.completionTime.map(new Date(_)),
-        inputBytes = stageUiData.inputBytes,
-        inputRecords = stageUiData.inputRecords,
-        outputBytes = stageUiData.outputBytes,
-        outputRecords = stageUiData.outputRecords,
-        shuffleReadBytes = stageUiData.shuffleReadTotalBytes,
-        shuffleReadRecords = stageUiData.shuffleReadRecords,
-        shuffleWriteBytes = stageUiData.shuffleWriteBytes,
-        shuffleWriteRecords = stageUiData.shuffleWriteRecords,
-        memoryBytesSpilled = stageUiData.memoryBytesSpilled,
-        diskBytesSpilled = stageUiData.diskBytesSpilled,
-        schedulingPool = stageUiData.schedulingPool,
-        name = stageInfo.name,
-        details = stageInfo.details,
-        accumulatorUpdates = accumulableInfo,
-        tasks = taskData,
-        executorSummary = executorSummary
+      status = status,
+      stageId = stageInfo.stageId,
+      attemptId = stageInfo.attemptId,
+      numActiveTasks = stageUiData.numActiveTasks,
+      numCompleteTasks = stageUiData.numCompleteTasks,
+      numFailedTasks = stageUiData.numFailedTasks,
+      executorRunTime = stageUiData.executorRunTime,
+      submissionTime = stageInfo.submissionTime.map(new Date(_)),
+      firstTaskLaunchedTime,
+      completionTime = stageInfo.completionTime.map(new Date(_)),
+      inputBytes = stageUiData.inputBytes,
+      inputRecords = stageUiData.inputRecords,
+      outputBytes = stageUiData.outputBytes,
+      outputRecords = stageUiData.outputRecords,
+      shuffleReadBytes = stageUiData.shuffleReadTotalBytes,
+      shuffleReadRecords = stageUiData.shuffleReadRecords,
+      shuffleWriteBytes = stageUiData.shuffleWriteBytes,
+      shuffleWriteRecords = stageUiData.shuffleWriteRecords,
+      memoryBytesSpilled = stageUiData.memoryBytesSpilled,
+      diskBytesSpilled = stageUiData.diskBytesSpilled,
+      schedulingPool = stageUiData.schedulingPool,
+      name = stageInfo.name,
+      details = stageInfo.details,
+      accumulatorUpdates = accumulableInfo,
+      tasks = taskData,
+      executorSummary = executorSummary
     )
   }
 
@@ -136,29 +149,29 @@ private[v1] object AllStagesResource {
     val listener = ui.jobProgressListener
     listener.synchronized {
       Seq(
-          StageStatus.ACTIVE -> listener.activeStages.values.toSeq,
-          StageStatus.COMPLETE -> listener.completedStages.reverse.toSeq,
-          StageStatus.FAILED -> listener.failedStages.reverse.toSeq,
-          StageStatus.PENDING -> listener.pendingStages.values.toSeq
+        StageStatus.ACTIVE -> listener.activeStages.values.toSeq,
+        StageStatus.COMPLETE -> listener.completedStages.reverse.toSeq,
+        StageStatus.FAILED -> listener.failedStages.reverse.toSeq,
+        StageStatus.PENDING -> listener.pendingStages.values.toSeq
       )
     }
   }
 
   def convertTaskData(uiData: TaskUIData): TaskData = {
     new TaskData(
-        taskId = uiData.taskInfo.taskId,
-        index = uiData.taskInfo.index,
-        attempt = uiData.taskInfo.attemptNumber,
-        launchTime = new Date(uiData.taskInfo.launchTime),
-        executorId = uiData.taskInfo.executorId,
-        host = uiData.taskInfo.host,
-        taskLocality = uiData.taskInfo.taskLocality.toString(),
-        speculative = uiData.taskInfo.speculative,
-        accumulatorUpdates = uiData.taskInfo.accumulables.map {
-          convertAccumulableInfo
-        },
-        errorMessage = uiData.errorMessage,
-        taskMetrics = uiData.taskMetrics.map { convertUiTaskMetrics }
+      taskId = uiData.taskInfo.taskId,
+      index = uiData.taskInfo.index,
+      attempt = uiData.taskInfo.attemptNumber,
+      launchTime = new Date(uiData.taskInfo.launchTime),
+      executorId = uiData.taskInfo.executorId,
+      host = uiData.taskInfo.host,
+      taskLocality = uiData.taskInfo.taskLocality.toString(),
+      speculative = uiData.taskInfo.speculative,
+      accumulatorUpdates = uiData.taskInfo.accumulables.map {
+        convertAccumulableInfo
+      },
+      errorMessage = uiData.errorMessage,
+      taskMetrics = uiData.taskMetrics.map { convertUiTaskMetrics }
     )
   }
 
@@ -182,143 +195,147 @@ private[v1] object AllStagesResource {
 
     val inputMetrics: Option[InputMetricDistributions] =
       new MetricHelper[InternalInputMetrics, InputMetricDistributions](
-          rawMetrics, quantiles) {
+        rawMetrics,
+        quantiles) {
         def getSubmetrics(
             raw: InternalTaskMetrics): Option[InternalInputMetrics] = {
           raw.inputMetrics
         }
 
         def build: InputMetricDistributions = new InputMetricDistributions(
-            bytesRead = submetricQuantiles(_.bytesRead),
-            recordsRead = submetricQuantiles(_.recordsRead)
+          bytesRead = submetricQuantiles(_.bytesRead),
+          recordsRead = submetricQuantiles(_.recordsRead)
         )
       }.metricOption
 
     val outputMetrics: Option[OutputMetricDistributions] =
       new MetricHelper[InternalOutputMetrics, OutputMetricDistributions](
-          rawMetrics, quantiles) {
+        rawMetrics,
+        quantiles) {
         def getSubmetrics(
             raw: InternalTaskMetrics): Option[InternalOutputMetrics] = {
           raw.outputMetrics
         }
         def build: OutputMetricDistributions = new OutputMetricDistributions(
-            bytesWritten = submetricQuantiles(_.bytesWritten),
-            recordsWritten = submetricQuantiles(_.recordsWritten)
+          bytesWritten = submetricQuantiles(_.bytesWritten),
+          recordsWritten = submetricQuantiles(_.recordsWritten)
         )
       }.metricOption
 
     val shuffleReadMetrics: Option[ShuffleReadMetricDistributions] =
-      new MetricHelper[InternalShuffleReadMetrics,
-                       ShuffleReadMetricDistributions](rawMetrics, quantiles) {
+      new MetricHelper[
+        InternalShuffleReadMetrics,
+        ShuffleReadMetricDistributions](rawMetrics, quantiles) {
         def getSubmetrics(
             raw: InternalTaskMetrics): Option[InternalShuffleReadMetrics] = {
           raw.shuffleReadMetrics
         }
         def build: ShuffleReadMetricDistributions =
           new ShuffleReadMetricDistributions(
-              readBytes = submetricQuantiles(_.totalBytesRead),
-              readRecords = submetricQuantiles(_.recordsRead),
-              remoteBytesRead = submetricQuantiles(_.remoteBytesRead),
-              remoteBlocksFetched = submetricQuantiles(_.remoteBlocksFetched),
-              localBlocksFetched = submetricQuantiles(_.localBlocksFetched),
-              totalBlocksFetched = submetricQuantiles(_.totalBlocksFetched),
-              fetchWaitTime = submetricQuantiles(_.fetchWaitTime)
+            readBytes = submetricQuantiles(_.totalBytesRead),
+            readRecords = submetricQuantiles(_.recordsRead),
+            remoteBytesRead = submetricQuantiles(_.remoteBytesRead),
+            remoteBlocksFetched = submetricQuantiles(_.remoteBlocksFetched),
+            localBlocksFetched = submetricQuantiles(_.localBlocksFetched),
+            totalBlocksFetched = submetricQuantiles(_.totalBlocksFetched),
+            fetchWaitTime = submetricQuantiles(_.fetchWaitTime)
           )
       }.metricOption
 
     val shuffleWriteMetrics: Option[ShuffleWriteMetricDistributions] =
       new MetricHelper[
-          InternalShuffleWriteMetrics, ShuffleWriteMetricDistributions](
-          rawMetrics, quantiles) {
+        InternalShuffleWriteMetrics,
+        ShuffleWriteMetricDistributions](rawMetrics, quantiles) {
         def getSubmetrics(
             raw: InternalTaskMetrics): Option[InternalShuffleWriteMetrics] = {
           raw.shuffleWriteMetrics
         }
         def build: ShuffleWriteMetricDistributions =
           new ShuffleWriteMetricDistributions(
-              writeBytes = submetricQuantiles(_.bytesWritten),
-              writeRecords = submetricQuantiles(_.recordsWritten),
-              writeTime = submetricQuantiles(_.writeTime)
+            writeBytes = submetricQuantiles(_.bytesWritten),
+            writeRecords = submetricQuantiles(_.recordsWritten),
+            writeTime = submetricQuantiles(_.writeTime)
           )
       }.metricOption
 
     new TaskMetricDistributions(
-        quantiles = quantiles,
-        executorDeserializeTime = metricQuantiles(_.executorDeserializeTime),
-        executorRunTime = metricQuantiles(_.executorRunTime),
-        resultSize = metricQuantiles(_.resultSize),
-        jvmGcTime = metricQuantiles(_.jvmGCTime),
-        resultSerializationTime = metricQuantiles(_.resultSerializationTime),
-        memoryBytesSpilled = metricQuantiles(_.memoryBytesSpilled),
-        diskBytesSpilled = metricQuantiles(_.diskBytesSpilled),
-        inputMetrics = inputMetrics,
-        outputMetrics = outputMetrics,
-        shuffleReadMetrics = shuffleReadMetrics,
-        shuffleWriteMetrics = shuffleWriteMetrics
+      quantiles = quantiles,
+      executorDeserializeTime = metricQuantiles(_.executorDeserializeTime),
+      executorRunTime = metricQuantiles(_.executorRunTime),
+      resultSize = metricQuantiles(_.resultSize),
+      jvmGcTime = metricQuantiles(_.jvmGCTime),
+      resultSerializationTime = metricQuantiles(_.resultSerializationTime),
+      memoryBytesSpilled = metricQuantiles(_.memoryBytesSpilled),
+      diskBytesSpilled = metricQuantiles(_.diskBytesSpilled),
+      inputMetrics = inputMetrics,
+      outputMetrics = outputMetrics,
+      shuffleReadMetrics = shuffleReadMetrics,
+      shuffleWriteMetrics = shuffleWriteMetrics
     )
   }
 
   def convertAccumulableInfo(acc: InternalAccumulableInfo): AccumulableInfo = {
-    new AccumulableInfo(acc.id,
-                        acc.name.orNull,
-                        acc.update.map(_.toString),
-                        acc.value.map(_.toString).orNull)
+    new AccumulableInfo(
+      acc.id,
+      acc.name.orNull,
+      acc.update.map(_.toString),
+      acc.value.map(_.toString).orNull)
   }
 
   def convertUiTaskMetrics(internal: InternalTaskMetrics): TaskMetrics = {
     new TaskMetrics(
-        executorDeserializeTime = internal.executorDeserializeTime,
-        executorRunTime = internal.executorRunTime,
-        resultSize = internal.resultSize,
-        jvmGcTime = internal.jvmGCTime,
-        resultSerializationTime = internal.resultSerializationTime,
-        memoryBytesSpilled = internal.memoryBytesSpilled,
-        diskBytesSpilled = internal.diskBytesSpilled,
-        inputMetrics = internal.inputMetrics.map { convertInputMetrics },
-        outputMetrics = Option(internal.outputMetrics).flatten.map {
-          convertOutputMetrics
-        },
-        shuffleReadMetrics = internal.shuffleReadMetrics.map {
-          convertShuffleReadMetrics
-        },
-        shuffleWriteMetrics = internal.shuffleWriteMetrics.map {
-          convertShuffleWriteMetrics
-        }
+      executorDeserializeTime = internal.executorDeserializeTime,
+      executorRunTime = internal.executorRunTime,
+      resultSize = internal.resultSize,
+      jvmGcTime = internal.jvmGCTime,
+      resultSerializationTime = internal.resultSerializationTime,
+      memoryBytesSpilled = internal.memoryBytesSpilled,
+      diskBytesSpilled = internal.diskBytesSpilled,
+      inputMetrics = internal.inputMetrics.map { convertInputMetrics },
+      outputMetrics = Option(internal.outputMetrics).flatten.map {
+        convertOutputMetrics
+      },
+      shuffleReadMetrics = internal.shuffleReadMetrics.map {
+        convertShuffleReadMetrics
+      },
+      shuffleWriteMetrics = internal.shuffleWriteMetrics.map {
+        convertShuffleWriteMetrics
+      }
     )
   }
 
   def convertInputMetrics(internal: InternalInputMetrics): InputMetrics = {
     new InputMetrics(
-        bytesRead = internal.bytesRead,
-        recordsRead = internal.recordsRead
+      bytesRead = internal.bytesRead,
+      recordsRead = internal.recordsRead
     )
   }
 
   def convertOutputMetrics(internal: InternalOutputMetrics): OutputMetrics = {
     new OutputMetrics(
-        bytesWritten = internal.bytesWritten,
-        recordsWritten = internal.recordsWritten
+      bytesWritten = internal.bytesWritten,
+      recordsWritten = internal.recordsWritten
     )
   }
 
   def convertShuffleReadMetrics(
       internal: InternalShuffleReadMetrics): ShuffleReadMetrics = {
     new ShuffleReadMetrics(
-        remoteBlocksFetched = internal.remoteBlocksFetched,
-        localBlocksFetched = internal.localBlocksFetched,
-        fetchWaitTime = internal.fetchWaitTime,
-        remoteBytesRead = internal.remoteBytesRead,
-        totalBlocksFetched = internal.totalBlocksFetched,
-        recordsRead = internal.recordsRead
+      remoteBlocksFetched = internal.remoteBlocksFetched,
+      localBlocksFetched = internal.localBlocksFetched,
+      fetchWaitTime = internal.fetchWaitTime,
+      remoteBytesRead = internal.remoteBytesRead,
+      totalBlocksFetched = internal.totalBlocksFetched,
+      recordsRead = internal.recordsRead
     )
   }
 
   def convertShuffleWriteMetrics(
       internal: InternalShuffleWriteMetrics): ShuffleWriteMetrics = {
     new ShuffleWriteMetrics(
-        bytesWritten = internal.bytesWritten,
-        writeTime = internal.writeTime,
-        recordsWritten = internal.recordsWritten
+      bytesWritten = internal.bytesWritten,
+      writeTime = internal.writeTime,
+      recordsWritten = internal.recordsWritten
     )
   }
 }
@@ -330,7 +347,8 @@ private[v1] object AllStagesResource {
   * metric.  After creating an instance, call metricOption to get the result type.
   */
 private[v1] abstract class MetricHelper[I, O](
-    rawMetrics: Seq[InternalTaskMetrics], quantiles: Array[Double]) {
+    rawMetrics: Seq[InternalTaskMetrics],
+    quantiles: Array[Double]) {
 
   def getSubmetrics(raw: InternalTaskMetrics): Option[I]
 

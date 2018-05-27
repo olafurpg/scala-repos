@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -47,11 +47,12 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       result must haveSize(100)
 
-      val pageIds = List(SString("foobar"),
-                         SString("page-0"),
-                         SString("page-2"),
-                         SString("page-3"),
-                         SString("page-4"))
+      val pageIds = List(
+        SString("foobar"),
+        SString("page-0"),
+        SString("page-2"),
+        SString("page-3"),
+        SString("page-4"))
 
       result must haveAllElementsLike {
         case (ids, SArray(arr)) =>
@@ -207,7 +208,7 @@ trait MiscStackSpecs extends EvalStackSpecs {
       }
 
       val weights =
-        result collect { case (_, SObject(elems)) => elems("weight") }
+        result collect { case (_, SObject(elems))         => elems("weight") }
       val expectedWeights = result2 collect { case (_, w) => w }
 
       val weightsPlus =
@@ -717,8 +718,9 @@ trait MiscStackSpecs extends EvalStackSpecs {
         }
 
       results2 mustEqual
-      (Set(SObject(Map("num" -> SDecimal(1018), "winner" -> SString("YES"))),
-           SObject(Map("num" -> SDecimal(1), "winner" -> SString("YEs")))))
+        (Set(
+          SObject(Map("num" -> SDecimal(1018), "winner" -> SString("YES"))),
+          SObject(Map("num" -> SDecimal(1), "winner" -> SString("YEs")))))
     }
 
     "solve with a generic where inside a function" in {
@@ -745,8 +747,9 @@ trait MiscStackSpecs extends EvalStackSpecs {
         }
 
       results2 mustEqual
-      (Set(SObject(Map("num" -> SDecimal(1018), "winner" -> SString("YES"))),
-           SObject(Map("num" -> SDecimal(1), "winner" -> SString("YEs")))))
+        (Set(
+          SObject(Map("num" -> SDecimal(1018), "winner" -> SString("YES"))),
+          SObject(Map("num" -> SDecimal(1), "winner" -> SString("YEs")))))
     }
 
     "solve the results of a set and a stdlib op1 function" in {
@@ -854,27 +857,29 @@ trait MiscStackSpecs extends EvalStackSpecs {
       containsUserId must haveSize(21)
       containsUserId collect {
         case obj => obj("userId")
-      } mustEqual Set(SString("user-1000"),
-                      SString("user-1001"),
-                      SString("user-1002"),
-                      SString("user-1003"),
-                      SString("user-1004"),
-                      SString("user-1005"),
-                      SString("user-1006"),
-                      SString("user-1007"),
-                      SString("user-1008"),
-                      SString("user-1009"),
-                      SString("user-1010"),
-                      SString("user-1011"),
-                      SString("user-1012"),
-                      SString("user-1013"),
-                      SString("user-1014"),
-                      SString("user-1015"),
-                      SString("user-1016"),
-                      SString("user-1017"),
-                      SString("user-1018"),
-                      SString("user-1019"),
-                      SString("user-1020"))
+      } mustEqual Set(
+        SString("user-1000"),
+        SString("user-1001"),
+        SString("user-1002"),
+        SString("user-1003"),
+        SString("user-1004"),
+        SString("user-1005"),
+        SString("user-1006"),
+        SString("user-1007"),
+        SString("user-1008"),
+        SString("user-1009"),
+        SString("user-1010"),
+        SString("user-1011"),
+        SString("user-1012"),
+        SString("user-1013"),
+        SString("user-1014"),
+        SString("user-1015"),
+        SString("user-1016"),
+        SString("user-1017"),
+        SString("user-1018"),
+        SString("user-1019"),
+        SString("user-1020")
+      )
 
       val containsPageId =
         results collect {
@@ -884,11 +889,12 @@ trait MiscStackSpecs extends EvalStackSpecs {
       containsPageId must haveSize(5)
       containsPageId collect {
         case obj => obj("pageId")
-      } mustEqual Set(SString("page-0"),
-                      SString("page-1"),
-                      SString("page-2"),
-                      SString("page-3"),
-                      SString("page-4"))
+      } mustEqual Set(
+        SString("page-0"),
+        SString("page-1"),
+        SString("page-2"),
+        SString("page-3"),
+        SString("page-4"))
     }
 
     "accept a solve involving a tic-var as an actual" in {
@@ -1389,28 +1395,29 @@ trait MiscStackSpecs extends EvalStackSpecs {
         results must haveAllElementsLike {
           case (ids, SString(campaign)) =>
             ids.length must_== 1
-            Set("c16",
-                "c9",
-                "c21",
-                "c15",
-                "c26",
-                "c5",
-                "c18",
-                "c7",
-                "c4",
-                "c17",
-                "c11",
-                "c13",
-                "c12",
-                "c28",
-                "c23",
-                "c14",
-                "c10",
-                "c19",
-                "c6",
-                "c24",
-                "c22",
-                "c20") must contain(campaign)
+            Set(
+              "c16",
+              "c9",
+              "c21",
+              "c15",
+              "c26",
+              "c5",
+              "c18",
+              "c7",
+              "c4",
+              "c17",
+              "c11",
+              "c13",
+              "c12",
+              "c28",
+              "c23",
+              "c14",
+              "c10",
+              "c19",
+              "c6",
+              "c24",
+              "c22",
+              "c20") must contain(campaign)
         }
       }
 
@@ -1439,51 +1446,9 @@ trait MiscStackSpecs extends EvalStackSpecs {
         results must haveAllElementsLike {
           case (ids, SDecimal(num)) =>
             ids.length must_== 1
-            Set(100,
-                39,
-                91,
-                77,
-                96,
-                99,
-                48,
-                67,
-                10,
-                17,
-                90,
-                58,
-                20,
-                38,
-                1,
-                43,
-                49,
-                23,
-                72,
-                42,
-                94,
-                16,
-                9,
-                21,
-                52,
-                5,
-                40,
-                62,
-                4,
-                33,
-                28,
-                54,
-                70,
-                82,
-                76,
-                22,
-                6,
-                12,
-                65,
-                31,
-                80,
-                45,
-                51,
-                89,
-                69) must contain(num)
+            Set(100, 39, 91, 77, 96, 99, 48, 67, 10, 17, 90, 58, 20, 38, 1, 43,
+              49, 23, 72, 42, 94, 16, 9, 21, 52, 5, 40, 62, 4, 33, 28, 54, 70,
+              82, 76, 22, 6, 12, 65, 31, 80, 45, 51, 89, 69) must contain(num)
         }
       }
     }
@@ -1539,7 +1504,7 @@ trait MiscStackSpecs extends EvalStackSpecs {
           ids.length must_== 1
           obj must haveSize(5)
           obj must contain(
-              "ageRange" -> SArray(Vector(SDecimal(37), SDecimal(48))))
+            "ageRange" -> SArray(Vector(SDecimal(37), SDecimal(48))))
       }
     }
 
@@ -1563,13 +1528,14 @@ trait MiscStackSpecs extends EvalStackSpecs {
           | pageId := (//clicks).pageId
           | distinct(gender union pageId)""".stripMargin
 
-        eval(input) mustEqual Set(SString("female"),
-                                  SString("male"),
-                                  SString("page-0"),
-                                  SString("page-1"),
-                                  SString("page-2"),
-                                  SString("page-3"),
-                                  SString("page-4"))
+        eval(input) mustEqual Set(
+          SString("female"),
+          SString("male"),
+          SString("page-0"),
+          SString("page-1"),
+          SString("page-2"),
+          SString("page-3"),
+          SString("page-4"))
       }
     }
 
@@ -1581,10 +1547,10 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       results must haveAllElementsLike {
         case (ids, SObject(obj)) => {
-            ids.length must_== 1
-            obj must haveSize(1)
-            obj must haveKey("aa")
-          }
+          ids.length must_== 1
+          obj must haveSize(1)
+          obj must haveKey("aa")
+        }
       }
     }
 
@@ -1602,11 +1568,11 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       results must haveAllElementsLike {
         case (ids, SObject(obj)) => {
-            ids.length must_== 2
-            obj must haveSize(2)
-            obj must haveKey("aa")
-            obj must haveKey("bb")
-          }
+          ids.length must_== 2
+          obj must haveSize(2)
+          obj must haveKey("aa")
+          obj must haveKey("bb")
+        }
       }
     }
 
@@ -1626,9 +1592,9 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       results must haveAllElementsLike {
         case (ids, SBoolean(b)) => {
-            ids must haveSize(2)
-            b mustEqual true
-          }
+          ids must haveSize(2)
+          b mustEqual true
+        }
       }
     }
 
@@ -1677,8 +1643,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
         |   { gender: 'gender, num: count(campaigns.gender where campaigns.gender = 'gender) }""".stripMargin
 
       eval(input) mustEqual Set(
-          SObject(Map("gender" -> SString("female"), "num" -> SDecimal(46))),
-          SObject(Map("gender" -> SString("male"), "num" -> SDecimal(54))))
+        SObject(Map("gender" -> SString("female"), "num" -> SDecimal(46))),
+        SObject(Map("gender" -> SString("male"), "num" -> SDecimal(54))))
     }
 
     "determine a histogram of STATE on (tweets union tweets)" in {
@@ -1704,110 +1670,110 @@ trait MiscStackSpecs extends EvalStackSpecs {
           case (ids, sv) if ids.length == 1 => sv
         }
 
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("319")),
-                                       "state" -> SString("01"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("267")),
-                                       "state" -> SString("02"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("248")),
-                                       "state" -> SString("04"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("229")),
-                                       "state" -> SString("05"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("242")),
-                                       "state" -> SString("06"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("265")),
-                                       "state" -> SString("08"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("207")),
-                                       "state" -> SString("09"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("265")),
-                                       "state" -> SString("10"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("183")),
-                                       "state" -> SString("11"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("275")),
-                                       "state" -> SString("12"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("267")),
-                                       "state" -> SString("13"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("240")),
-                                       "state" -> SString("15"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("269")),
-                                       "state" -> SString("16"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("268")),
-                                       "state" -> SString("17"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("221")),
-                                       "state" -> SString("18"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("238")),
-                                       "state" -> SString("19"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("251")),
-                                       "state" -> SString("20"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("220")),
-                                       "state" -> SString("21"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("215")),
-                                       "state" -> SString("22"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("245")),
-                                       "state" -> SString("23"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("232")),
-                                       "state" -> SString("24"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("234")),
-                                       "state" -> SString("25"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("239")),
-                                       "state" -> SString("26"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("242")),
-                                       "state" -> SString("27"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("219")),
-                                       "state" -> SString("28"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("213")),
-                                       "state" -> SString("29"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("216")),
-                                       "state" -> SString("30"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("195")),
-                                       "state" -> SString("31"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("196")),
-                                       "state" -> SString("32"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("223")),
-                                       "state" -> SString("33"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("207")),
-                                       "state" -> SString("34"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("221")),
-                                       "state" -> SString("35"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("204")),
-                                       "state" -> SString("36"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("221")),
-                                       "state" -> SString("37"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("231")),
-                                       "state" -> SString("38"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("167")),
-                                       "state" -> SString("39"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("219")),
-                                       "state" -> SString("40"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("200")),
-                                       "state" -> SString("41"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("206")),
-                                       "state" -> SString("42"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("230")),
-                                       "state" -> SString("44"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("224")),
-                                       "state" -> SString("45"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("184")),
-                                       "state" -> SString("46"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("215")),
-                                       "state" -> SString("47"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("189")),
-                                       "state" -> SString("48"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("227")),
-                                       "state" -> SString("49"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("233")),
-                                       "state" -> SString("50"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("206")),
-                                       "state" -> SString("51"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("232")),
-                                       "state" -> SString("53"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("223")),
-                                       "state" -> SString("54"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("193")),
-                                       "state" -> SString("55"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("186")),
-                                       "state" -> SString("56"))))
-      results must contain(SObject(Map("count" -> SDecimal(BigDecimal("153")),
-                                       "state" -> SString("72"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("319")), "state" -> SString("01"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("267")), "state" -> SString("02"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("248")), "state" -> SString("04"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("229")), "state" -> SString("05"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("242")), "state" -> SString("06"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("265")), "state" -> SString("08"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("207")), "state" -> SString("09"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("265")), "state" -> SString("10"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("183")), "state" -> SString("11"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("275")), "state" -> SString("12"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("267")), "state" -> SString("13"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("240")), "state" -> SString("15"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("269")), "state" -> SString("16"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("268")), "state" -> SString("17"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("221")), "state" -> SString("18"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("238")), "state" -> SString("19"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("251")), "state" -> SString("20"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("220")), "state" -> SString("21"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("215")), "state" -> SString("22"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("245")), "state" -> SString("23"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("232")), "state" -> SString("24"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("234")), "state" -> SString("25"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("239")), "state" -> SString("26"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("242")), "state" -> SString("27"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("219")), "state" -> SString("28"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("213")), "state" -> SString("29"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("216")), "state" -> SString("30"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("195")), "state" -> SString("31"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("196")), "state" -> SString("32"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("223")), "state" -> SString("33"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("207")), "state" -> SString("34"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("221")), "state" -> SString("35"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("204")), "state" -> SString("36"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("221")), "state" -> SString("37"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("231")), "state" -> SString("38"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("167")), "state" -> SString("39"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("219")), "state" -> SString("40"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("200")), "state" -> SString("41"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("206")), "state" -> SString("42"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("230")), "state" -> SString("44"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("224")), "state" -> SString("45"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("184")), "state" -> SString("46"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("215")), "state" -> SString("47"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("189")), "state" -> SString("48"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("227")), "state" -> SString("49"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("233")), "state" -> SString("50"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("206")), "state" -> SString("51"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("232")), "state" -> SString("53"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("223")), "state" -> SString("54"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("193")), "state" -> SString("55"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("186")), "state" -> SString("56"))))
+      results must contain(SObject(
+        Map("count" -> SDecimal(BigDecimal("153")), "state" -> SString("72"))))
     }
 
     "evaluate nathan's query, once and for all" in {
@@ -1945,8 +1911,9 @@ trait MiscStackSpecs extends EvalStackSpecs {
           | gender := distinct((//campaigns).gender)
           | std::string::concat("alpha ", gender)""".stripMargin
 
-        eval(input) mustEqual Set(SString("alpha female"),
-                                  SString("alpha male"))
+        eval(input) mustEqual Set(
+          SString("alpha female"),
+          SString("alpha male"))
       }
 
       "Mathlib" >> {
@@ -1955,11 +1922,12 @@ trait MiscStackSpecs extends EvalStackSpecs {
           | selectCpm := cpm where cpm < 10
           | std::math::pow(selectCpm, 2)""".stripMargin
 
-        eval(input) mustEqual Set(SDecimal(25),
-                                  SDecimal(1),
-                                  SDecimal(36),
-                                  SDecimal(81),
-                                  SDecimal(16))
+        eval(input) mustEqual Set(
+          SDecimal(25),
+          SDecimal(1),
+          SDecimal(36),
+          SDecimal(81),
+          SDecimal(16))
       }
 
       "Timelib" >> {
@@ -2046,7 +2014,7 @@ trait MiscStackSpecs extends EvalStackSpecs {
                 fields
             }
           results2 must contain(
-              Map("slope" -> SDecimal(0), "intercept" -> SDecimal(10)))
+            Map("slope" -> SDecimal(0), "intercept" -> SDecimal(10)))
         }
       }
     }
@@ -2068,10 +2036,10 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       results must haveAllElementsLike {
         case (ids, SObject(obj)) => {
-            ids.length must_== 1
-            obj must haveSize(5)
-            obj must contain("gender" -> SString("male"))
-          }
+          ids.length must_== 1
+          obj must haveSize(5)
+          obj must contain("gender" -> SString("male"))
+        }
       }
     }
 
@@ -2108,10 +2076,11 @@ trait MiscStackSpecs extends EvalStackSpecs {
           |   m := max(nums where nums < 'n)
           |   (nums where nums = 'n) + m""".stripMargin
 
-        eval(input) mustEqual Set(SDecimal(15),
-                                  SDecimal(11),
-                                  SDecimal(9),
-                                  SDecimal(5))
+        eval(input) mustEqual Set(
+          SDecimal(15),
+          SDecimal(11),
+          SDecimal(9),
+          SDecimal(5))
       }
     }
 
@@ -2127,12 +2096,12 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       results must haveAllElementsLike {
         case (ids, SObject(obj)) => {
-            ids.length must_== 1
-            obj must haveSize(5)
-            obj must contain(
-                "ageRange" -> SArray(Vector(SDecimal(25), SDecimal(36))))
-            obj must contain("gender" -> SString("female"))
-          }
+          ids.length must_== 1
+          obj must haveSize(5)
+          obj must contain(
+            "ageRange" -> SArray(Vector(SDecimal(25), SDecimal(36))))
+          obj must contain("gender" -> SString("female"))
+        }
       }
     }
 
@@ -2167,74 +2136,125 @@ trait MiscStackSpecs extends EvalStackSpecs {
           case (ids, obj) if ids.length == 1 => obj
         }
 
-      results must contain(SObject(Map("revenue" -> SString("<500K"),
-                                       "num" -> SDecimal(BigDecimal("4")))))
-      results must contain(SObject(Map("revenue" -> SString("<500K"),
-                                       "num" -> SDecimal(BigDecimal("3")))))
-      results must contain(SObject(Map("revenue" -> SString("250-500M"),
-                                       "num" -> SDecimal(BigDecimal("5")))))
-      results must contain(SObject(Map("revenue" -> SString("5-50M"),
-                                       "num" -> SDecimal(BigDecimal("11")))))
-      results must contain(SObject(Map("revenue" -> SString("5-50M"),
-                                       "num" -> SDecimal(BigDecimal("7")))))
-      results must contain(SObject(Map("revenue" -> SString("500K-5M"),
-                                       "num" -> SDecimal(BigDecimal("5")))))
-      results must contain(SObject(Map("revenue" -> SString("5-50M"),
-                                       "num" -> SDecimal(BigDecimal("8")))))
-      results must contain(SObject(Map("revenue" -> SString("5-50M"),
-                                       "num" -> SDecimal(BigDecimal("3")))))
-      results must contain(SObject(Map("revenue" -> SString("250-500M"),
-                                       "num" -> SDecimal(BigDecimal("8")))))
-      results must contain(SObject(Map("revenue" -> SString("500K-5M"),
-                                       "num" -> SDecimal(BigDecimal("8")))))
-      results must contain(SObject(Map("revenue" -> SString("500M+"),
-                                       "num" -> SDecimal(BigDecimal("3")))))
-      results must contain(SObject(Map("revenue" -> SString("500M+"),
-                                       "num" -> SDecimal(BigDecimal("8")))))
-      results must contain(SObject(Map("revenue" -> SString("<500K"),
-                                       "num" -> SDecimal(BigDecimal("5")))))
-      results must contain(SObject(Map("revenue" -> SString("50-250M"),
-                                       "num" -> SDecimal(BigDecimal("3")))))
-      results must contain(SObject(Map("revenue" -> SString("250-500M"),
-                                       "num" -> SDecimal(BigDecimal("3")))))
-      results must contain(SObject(Map("revenue" -> SString("250-500M"),
-                                       "num" -> SDecimal(BigDecimal("1")))))
-      results must contain(SObject(Map("revenue" -> SString("<500K"),
-                                       "num" -> SDecimal(BigDecimal("7")))))
-      results must contain(SObject(Map("revenue" -> SString("50-250M"),
-                                       "num" -> SDecimal(BigDecimal("4")))))
-      results must contain(SObject(Map("revenue" -> SString("500M+"),
-                                       "num" -> SDecimal(BigDecimal("7")))))
-      results must contain(SObject(Map("revenue" -> SString("500K-5M"),
-                                       "num" -> SDecimal(BigDecimal("1")))))
-      results must contain(SObject(Map("revenue" -> SString("50-250M"),
-                                       "num" -> SDecimal(BigDecimal("5")))))
-      results must contain(SObject(Map("revenue" -> SString("<500K"),
-                                       "num" -> SDecimal(BigDecimal("2")))))
-      results must contain(SObject(Map("revenue" -> SString("250-500M"),
-                                       "num" -> SDecimal(BigDecimal("4")))))
-      results must contain(SObject(Map("revenue" -> SString("50-250M"),
-                                       "num" -> SDecimal(BigDecimal("8")))))
-      results must contain(SObject(Map("revenue" -> SString("5-50M"),
-                                       "num" -> SDecimal(BigDecimal("4")))))
-      results must contain(SObject(Map("revenue" -> SString("500M+"),
-                                       "num" -> SDecimal(BigDecimal("5")))))
-      results must contain(SObject(Map("revenue" -> SString("5-50M"),
-                                       "num" -> SDecimal(BigDecimal("2")))))
-      results must contain(SObject(Map("revenue" -> SString("500M+"),
-                                       "num" -> SDecimal(BigDecimal("4")))))
-      results must contain(SObject(Map("revenue" -> SString("250-500M"),
-                                       "num" -> SDecimal(BigDecimal("7")))))
-      results must contain(SObject(Map("revenue" -> SString("500K-5M"),
-                                       "num" -> SDecimal(BigDecimal("4")))))
-      results must contain(SObject(Map("revenue" -> SString("5-50M"),
-                                       "num" -> SDecimal(BigDecimal("5")))))
-      results must contain(SObject(Map("revenue" -> SString("500K-5M"),
-                                       "num" -> SDecimal(BigDecimal("3")))))
-      results must contain(SObject(Map("revenue" -> SString("<500K"),
-                                       "num" -> SDecimal(BigDecimal("1")))))
-      results must contain(SObject(Map("revenue" -> SString("500K-5M"),
-                                       "num" -> SDecimal(BigDecimal("7")))))
+      results must contain(SObject(
+        Map("revenue" -> SString("<500K"), "num" -> SDecimal(BigDecimal("4")))))
+      results must contain(SObject(
+        Map("revenue" -> SString("<500K"), "num" -> SDecimal(BigDecimal("3")))))
+      results must contain(
+        SObject(
+          Map(
+            "revenue" -> SString("250-500M"),
+            "num" -> SDecimal(BigDecimal("5")))))
+      results must contain(
+        SObject(
+          Map(
+            "revenue" -> SString("5-50M"),
+            "num" -> SDecimal(BigDecimal("11")))))
+      results must contain(SObject(
+        Map("revenue" -> SString("5-50M"), "num" -> SDecimal(BigDecimal("7")))))
+      results must contain(
+        SObject(
+          Map(
+            "revenue" -> SString("500K-5M"),
+            "num" -> SDecimal(BigDecimal("5")))))
+      results must contain(SObject(
+        Map("revenue" -> SString("5-50M"), "num" -> SDecimal(BigDecimal("8")))))
+      results must contain(SObject(
+        Map("revenue" -> SString("5-50M"), "num" -> SDecimal(BigDecimal("3")))))
+      results must contain(
+        SObject(
+          Map(
+            "revenue" -> SString("250-500M"),
+            "num" -> SDecimal(BigDecimal("8")))))
+      results must contain(
+        SObject(
+          Map(
+            "revenue" -> SString("500K-5M"),
+            "num" -> SDecimal(BigDecimal("8")))))
+      results must contain(SObject(
+        Map("revenue" -> SString("500M+"), "num" -> SDecimal(BigDecimal("3")))))
+      results must contain(SObject(
+        Map("revenue" -> SString("500M+"), "num" -> SDecimal(BigDecimal("8")))))
+      results must contain(SObject(
+        Map("revenue" -> SString("<500K"), "num" -> SDecimal(BigDecimal("5")))))
+      results must contain(
+        SObject(
+          Map(
+            "revenue" -> SString("50-250M"),
+            "num" -> SDecimal(BigDecimal("3")))))
+      results must contain(
+        SObject(
+          Map(
+            "revenue" -> SString("250-500M"),
+            "num" -> SDecimal(BigDecimal("3")))))
+      results must contain(
+        SObject(
+          Map(
+            "revenue" -> SString("250-500M"),
+            "num" -> SDecimal(BigDecimal("1")))))
+      results must contain(SObject(
+        Map("revenue" -> SString("<500K"), "num" -> SDecimal(BigDecimal("7")))))
+      results must contain(
+        SObject(
+          Map(
+            "revenue" -> SString("50-250M"),
+            "num" -> SDecimal(BigDecimal("4")))))
+      results must contain(SObject(
+        Map("revenue" -> SString("500M+"), "num" -> SDecimal(BigDecimal("7")))))
+      results must contain(
+        SObject(
+          Map(
+            "revenue" -> SString("500K-5M"),
+            "num" -> SDecimal(BigDecimal("1")))))
+      results must contain(
+        SObject(
+          Map(
+            "revenue" -> SString("50-250M"),
+            "num" -> SDecimal(BigDecimal("5")))))
+      results must contain(SObject(
+        Map("revenue" -> SString("<500K"), "num" -> SDecimal(BigDecimal("2")))))
+      results must contain(
+        SObject(
+          Map(
+            "revenue" -> SString("250-500M"),
+            "num" -> SDecimal(BigDecimal("4")))))
+      results must contain(
+        SObject(
+          Map(
+            "revenue" -> SString("50-250M"),
+            "num" -> SDecimal(BigDecimal("8")))))
+      results must contain(SObject(
+        Map("revenue" -> SString("5-50M"), "num" -> SDecimal(BigDecimal("4")))))
+      results must contain(SObject(
+        Map("revenue" -> SString("500M+"), "num" -> SDecimal(BigDecimal("5")))))
+      results must contain(SObject(
+        Map("revenue" -> SString("5-50M"), "num" -> SDecimal(BigDecimal("2")))))
+      results must contain(SObject(
+        Map("revenue" -> SString("500M+"), "num" -> SDecimal(BigDecimal("4")))))
+      results must contain(
+        SObject(
+          Map(
+            "revenue" -> SString("250-500M"),
+            "num" -> SDecimal(BigDecimal("7")))))
+      results must contain(
+        SObject(
+          Map(
+            "revenue" -> SString("500K-5M"),
+            "num" -> SDecimal(BigDecimal("4")))))
+      results must contain(SObject(
+        Map("revenue" -> SString("5-50M"), "num" -> SDecimal(BigDecimal("5")))))
+      results must contain(
+        SObject(
+          Map(
+            "revenue" -> SString("500K-5M"),
+            "num" -> SDecimal(BigDecimal("3")))))
+      results must contain(SObject(
+        Map("revenue" -> SString("<500K"), "num" -> SDecimal(BigDecimal("1")))))
+      results must contain(
+        SObject(
+          Map(
+            "revenue" -> SString("500K-5M"),
+            "num" -> SDecimal(BigDecimal("7")))))
     }
 
     "evaluate a function of multiple counts" in {
@@ -2255,38 +2275,60 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       results must haveSize(11)
       results must contain(
-          SObject(Map("timeZone" -> SString("+14:00"),
-                      "ratio" -> SDecimal(BigDecimal("100.0")))))
+        SObject(
+          Map(
+            "timeZone" -> SString("+14:00"),
+            "ratio" -> SDecimal(BigDecimal("100.0")))))
       results must contain(
-          SObject(Map("timeZone" -> SString("-02:00"),
-                      "ratio" -> SDecimal(BigDecimal("50.0")))))
+        SObject(
+          Map(
+            "timeZone" -> SString("-02:00"),
+            "ratio" -> SDecimal(BigDecimal("50.0")))))
       results must contain(
-          SObject(Map("timeZone" -> SString("-03:00"),
-                      "ratio" -> SDecimal(BigDecimal("100.0")))))
+        SObject(
+          Map(
+            "timeZone" -> SString("-03:00"),
+            "ratio" -> SDecimal(BigDecimal("100.0")))))
       results must contain(
-          SObject(Map("timeZone" -> SString("+11:00"),
-                      "ratio" -> SDecimal(BigDecimal("200.0")))))
+        SObject(
+          Map(
+            "timeZone" -> SString("+11:00"),
+            "ratio" -> SDecimal(BigDecimal("200.0")))))
       results must contain(
-          SObject(Map("timeZone" -> SString("+12:00"),
-                      "ratio" -> SDecimal(BigDecimal("33.0"))))) //TODO: this should be 33.3333 - find out why precision is hosed
+        SObject(
+          Map(
+            "timeZone" -> SString("+12:00"),
+            "ratio" -> SDecimal(BigDecimal("33.0"))))) //TODO: this should be 33.3333 - find out why precision is hosed
       results must contain(
-          SObject(Map("timeZone" -> SString("+04:00"),
-                      "ratio" -> SDecimal(BigDecimal("200.0")))))
+        SObject(
+          Map(
+            "timeZone" -> SString("+04:00"),
+            "ratio" -> SDecimal(BigDecimal("200.0")))))
       results must contain(
-          SObject(Map("timeZone" -> SString("+01:00"),
-                      "ratio" -> SDecimal(BigDecimal("25.0")))))
+        SObject(
+          Map(
+            "timeZone" -> SString("+01:00"),
+            "ratio" -> SDecimal(BigDecimal("25.0")))))
       results must contain(
-          SObject(Map("timeZone" -> SString("-01:00"),
-                      "ratio" -> SDecimal(BigDecimal("100.0")))))
+        SObject(
+          Map(
+            "timeZone" -> SString("-01:00"),
+            "ratio" -> SDecimal(BigDecimal("100.0")))))
       results must contain(
-          SObject(Map("timeZone" -> SString("-06:00"),
-                      "ratio" -> SDecimal(BigDecimal("300.0")))))
+        SObject(
+          Map(
+            "timeZone" -> SString("-06:00"),
+            "ratio" -> SDecimal(BigDecimal("300.0")))))
       results must contain(
-          SObject(Map("timeZone" -> SString("+02:00"),
-                      "ratio" -> SDecimal(BigDecimal("100.0")))))
+        SObject(
+          Map(
+            "timeZone" -> SString("+02:00"),
+            "ratio" -> SDecimal(BigDecimal("100.0")))))
       results must contain(
-          SObject(Map("timeZone" -> SString("-05:00"),
-                      "ratio" -> SDecimal(BigDecimal("50.0")))))
+        SObject(
+          Map(
+            "timeZone" -> SString("-05:00"),
+            "ratio" -> SDecimal(BigDecimal("50.0")))))
     }
 
     "evaluate reductions inside and outside of solves" in {
@@ -2327,397 +2369,593 @@ trait MiscStackSpecs extends EvalStackSpecs {
       val results = resultsE.map(_._2)
 
       results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329526464104")),
-                      "below" -> SDecimal(BigDecimal("1329470485350")),
-                      "time" -> SDecimal(BigDecimal("1329475769211")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329301670072")),
-                      "below" -> SDecimal(BigDecimal("1329262444197")),
-                      "time" -> SDecimal(BigDecimal("1329275667592")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329643873610")),
-                      "below" -> SDecimal(BigDecimal("1329629900716")),
-                      "time" -> SDecimal(BigDecimal("1329643873609")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329643873610")),
-                      "below" -> SDecimal(BigDecimal("1329629900716")),
-                      "time" -> SDecimal(BigDecimal("1329643873609")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329076541429")),
-                      "below" -> SDecimal(BigDecimal("1329004284627")),
-                      "time" -> SDecimal(BigDecimal("1329020233656")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329643873611")),
-                      "below" -> SDecimal(BigDecimal("1329643873609")),
-                      "time" -> SDecimal(BigDecimal("1329643873610")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329333416645")),
-                      "below" -> SDecimal(BigDecimal("1329324578771")),
-                      "time" -> SDecimal(BigDecimal("1329326691939")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329643873612")),
-                      "below" -> SDecimal(BigDecimal("1329643873610")),
-                      "time" -> SDecimal(BigDecimal("1329643873611")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328779873612")),
-                      "below" -> SDecimal(BigDecimal("1328779873610")),
-                      "time" -> SDecimal(BigDecimal("1328779873611")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328779873612")),
-                      "below" -> SDecimal(BigDecimal("1328779873610")),
-                      "time" -> SDecimal(BigDecimal("1328779873611")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328797020396")),
-                      "below" -> SDecimal(BigDecimal("1328788056054")),
-                      "time" -> SDecimal(BigDecimal("1328791229826")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328779873613")),
-                      "below" -> SDecimal(BigDecimal("1328779873611")),
-                      "time" -> SDecimal(BigDecimal("1328779873612")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328809637371")),
-                      "below" -> SDecimal(BigDecimal("1328791229826")),
-                      "time" -> SDecimal(BigDecimal("1328797020396")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329643873614")),
-                      "below" -> SDecimal(BigDecimal("1329643873611")),
-                      "time" -> SDecimal(BigDecimal("1329643873612")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329004284627")),
-                      "below" -> SDecimal(BigDecimal("1328984890189")),
-                      "time" -> SDecimal(BigDecimal("1328985989055")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329360253555")),
-                      "below" -> SDecimal(BigDecimal("1329333416645")),
-                      "time" -> SDecimal(BigDecimal("1329345853072")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328779873614")),
-                      "below" -> SDecimal(BigDecimal("1328779873612")),
-                      "time" -> SDecimal(BigDecimal("1328779873613")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328779873614")),
-                      "below" -> SDecimal(BigDecimal("1328779873612")),
-                      "time" -> SDecimal(BigDecimal("1328779873613")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328779873614")),
-                      "below" -> SDecimal(BigDecimal("1328779873612")),
-                      "time" -> SDecimal(BigDecimal("1328779873613")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329643873618")),
-                      "below" -> SDecimal(BigDecimal("1329643873612")),
-                      "time" -> SDecimal(BigDecimal("1329643873614")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329643873618")),
-                      "below" -> SDecimal(BigDecimal("1329643873612")),
-                      "time" -> SDecimal(BigDecimal("1329643873614")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329629900716")),
-                      "below" -> SDecimal(BigDecimal("1329554034828")),
-                      "time" -> SDecimal(BigDecimal("1329589296943")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328779873616")),
-                      "below" -> SDecimal(BigDecimal("1328779873613")),
-                      "time" -> SDecimal(BigDecimal("1328779873614")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328812534981")),
-                      "below" -> SDecimal(BigDecimal("1328797020396")),
-                      "time" -> SDecimal(BigDecimal("1328809637371")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329190541217")),
-                      "below" -> SDecimal(BigDecimal("1329164110718")),
-                      "time" -> SDecimal(BigDecimal("1329165986272")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328984890189")),
-                      "below" -> SDecimal(BigDecimal("1328887823569")),
-                      "time" -> SDecimal(BigDecimal("1328969812140")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329456302829")),
-                      "below" -> SDecimal(BigDecimal("1329441529486")),
-                      "time" -> SDecimal(BigDecimal("1329446825698")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328779873617")),
-                      "below" -> SDecimal(BigDecimal("1328779873614")),
-                      "time" -> SDecimal(BigDecimal("1328779873616")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328779873617")),
-                      "below" -> SDecimal(BigDecimal("1328779873614")),
-                      "time" -> SDecimal(BigDecimal("1328779873616")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328791229826")),
-                      "below" -> SDecimal(BigDecimal("1328780398002")),
-                      "time" -> SDecimal(BigDecimal("1328788056054")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329475769211")),
-                      "below" -> SDecimal(BigDecimal("1329456302829")),
-                      "time" -> SDecimal(BigDecimal("1329470485350")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329383567193")),
-                      "below" -> SDecimal(BigDecimal("1329369083745")),
-                      "time" -> SDecimal(BigDecimal("1329369428834")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328779873619")),
-                      "below" -> SDecimal(BigDecimal("1328779873616")),
-                      "time" -> SDecimal(BigDecimal("1328779873617")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328779873619")),
-                      "below" -> SDecimal(BigDecimal("1328779873616")),
-                      "time" -> SDecimal(BigDecimal("1328779873617")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329244747076")),
-                      "below" -> SDecimal(BigDecimal("1329190541217")),
-                      "time" -> SDecimal(BigDecimal("1329211954428")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329554034828")),
-                      "below" -> SDecimal(BigDecimal("1329475769211")),
-                      "time" -> SDecimal(BigDecimal("1329526464104")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329211954428")),
-                      "below" -> SDecimal(BigDecimal("1329165986272")),
-                      "time" -> SDecimal(BigDecimal("1329190541217")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329643873620")),
-                      "below" -> SDecimal(BigDecimal("1329643873614")),
-                      "time" -> SDecimal(BigDecimal("1329643873618")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329137951622")),
-                      "below" -> SDecimal(BigDecimal("1329076541429")),
-                      "time" -> SDecimal(BigDecimal("1329094347814")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328887823569")),
-                      "below" -> SDecimal(BigDecimal("1328847243682")),
-                      "time" -> SDecimal(BigDecimal("1328877415620")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328779873621")),
-                      "below" -> SDecimal(BigDecimal("1328779873617")),
-                      "time" -> SDecimal(BigDecimal("1328779873619")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328779873621")),
-                      "below" -> SDecimal(BigDecimal("1328779873617")),
-                      "time" -> SDecimal(BigDecimal("1328779873619")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328779873621")),
-                      "below" -> SDecimal(BigDecimal("1328779873617")),
-                      "time" -> SDecimal(BigDecimal("1328779873619")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328779873621")),
-                      "below" -> SDecimal(BigDecimal("1328779873617")),
-                      "time" -> SDecimal(BigDecimal("1328779873619")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329165986272")),
-                      "below" -> SDecimal(BigDecimal("1329159525492")),
-                      "time" -> SDecimal(BigDecimal("1329164110718")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329309914296")),
-                      "below" -> SDecimal(BigDecimal("1329275667592")),
-                      "time" -> SDecimal(BigDecimal("1329301670072")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329643873621")),
-                      "below" -> SDecimal(BigDecimal("1329643873618")),
-                      "time" -> SDecimal(BigDecimal("1329643873620")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329345853072")),
-                      "below" -> SDecimal(BigDecimal("1329326691939")),
-                      "time" -> SDecimal(BigDecimal("1329333416645")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329324578771")),
-                      "below" -> SDecimal(BigDecimal("1329309914296")),
-                      "time" -> SDecimal(BigDecimal("1329310139168")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329385943949")),
-                      "below" -> SDecimal(BigDecimal("1329369428834")),
-                      "time" -> SDecimal(BigDecimal("1329383567193")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328779873622")),
-                      "below" -> SDecimal(BigDecimal("1328779873619")),
-                      "time" -> SDecimal(BigDecimal("1328779873621")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329643873622")),
-                      "below" -> SDecimal(BigDecimal("1329643873620")),
-                      "time" -> SDecimal(BigDecimal("1329643873621")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329643873622")),
-                      "below" -> SDecimal(BigDecimal("1329643873620")),
-                      "time" -> SDecimal(BigDecimal("1329643873621")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328779873623")),
-                      "below" -> SDecimal(BigDecimal("1328779873621")),
-                      "time" -> SDecimal(BigDecimal("1328779873622")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329369428834")),
-                      "below" -> SDecimal(BigDecimal("1329360253555")),
-                      "time" -> SDecimal(BigDecimal("1329369083745")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329470485350")),
-                      "below" -> SDecimal(BigDecimal("1329446825698")),
-                      "time" -> SDecimal(BigDecimal("1329456302829")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329643873623")),
-                      "below" -> SDecimal(BigDecimal("1329643873621")),
-                      "time" -> SDecimal(BigDecimal("1329643873622")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329159525492")),
-                      "below" -> SDecimal(BigDecimal("1329094347814")),
-                      "time" -> SDecimal(BigDecimal("1329137951622")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329643873624")),
-                      "below" -> SDecimal(BigDecimal("1329643873622")),
-                      "time" -> SDecimal(BigDecimal("1329643873623")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329643873624")),
-                      "below" -> SDecimal(BigDecimal("1329643873622")),
-                      "time" -> SDecimal(BigDecimal("1329643873623")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329408502943")),
-                      "below" -> SDecimal(BigDecimal("1329383567193")),
-                      "time" -> SDecimal(BigDecimal("1329385943949")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328779873624")),
-                      "below" -> SDecimal(BigDecimal("1328779873622")),
-                      "time" -> SDecimal(BigDecimal("1328779873623")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329262444197")),
-                      "below" -> SDecimal(BigDecimal("1329244747076")),
-                      "time" -> SDecimal(BigDecimal("1329253270269")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328779873625")),
-                      "below" -> SDecimal(BigDecimal("1328779873623")),
-                      "time" -> SDecimal(BigDecimal("1328779873624")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328779873625")),
-                      "below" -> SDecimal(BigDecimal("1328779873623")),
-                      "time" -> SDecimal(BigDecimal("1328779873624")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329643873625")),
-                      "below" -> SDecimal(BigDecimal("1329643873623")),
-                      "time" -> SDecimal(BigDecimal("1329643873624")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329369083745")),
-                      "below" -> SDecimal(BigDecimal("1329345853072")),
-                      "time" -> SDecimal(BigDecimal("1329360253555")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329164110718")),
-                      "below" -> SDecimal(BigDecimal("1329137951622")),
-                      "time" -> SDecimal(BigDecimal("1329159525492")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328779873626")),
-                      "below" -> SDecimal(BigDecimal("1328779873624")),
-                      "time" -> SDecimal(BigDecimal("1328779873625")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328969812140")),
-                      "below" -> SDecimal(BigDecimal("1328877415620")),
-                      "time" -> SDecimal(BigDecimal("1328887823569")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329310139168")),
-                      "below" -> SDecimal(BigDecimal("1329301670072")),
-                      "time" -> SDecimal(BigDecimal("1329309914296")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329643873627")),
-                      "below" -> SDecimal(BigDecimal("1329643873624")),
-                      "time" -> SDecimal(BigDecimal("1329643873625")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329094347814")),
-                      "below" -> SDecimal(BigDecimal("1329020233656")),
-                      "time" -> SDecimal(BigDecimal("1329076541429")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329446825698")),
-                      "below" -> SDecimal(BigDecimal("1329408502943")),
-                      "time" -> SDecimal(BigDecimal("1329441529486")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328779873628")),
-                      "below" -> SDecimal(BigDecimal("1328779873625")),
-                      "time" -> SDecimal(BigDecimal("1328779873626")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328840918817")),
-                      "below" -> SDecimal(BigDecimal("1328809637371")),
-                      "time" -> SDecimal(BigDecimal("1328812534981")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329275667592")),
-                      "below" -> SDecimal(BigDecimal("1329253270269")),
-                      "time" -> SDecimal(BigDecimal("1329262444197")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328788056054")),
-                      "below" -> SDecimal(BigDecimal("1328779873631")),
-                      "time" -> SDecimal(BigDecimal("1328780398002")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329643873628")),
-                      "below" -> SDecimal(BigDecimal("1329643873625")),
-                      "time" -> SDecimal(BigDecimal("1329643873627")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329643873628")),
-                      "below" -> SDecimal(BigDecimal("1329643873625")),
-                      "time" -> SDecimal(BigDecimal("1329643873627")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328847243682")),
-                      "below" -> SDecimal(BigDecimal("1328812534981")),
-                      "time" -> SDecimal(BigDecimal("1328840918817")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329253270269")),
-                      "below" -> SDecimal(BigDecimal("1329211954428")),
-                      "time" -> SDecimal(BigDecimal("1329244747076")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328779873629")),
-                      "below" -> SDecimal(BigDecimal("1328779873626")),
-                      "time" -> SDecimal(BigDecimal("1328779873628")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328779873629")),
-                      "below" -> SDecimal(BigDecimal("1328779873626")),
-                      "time" -> SDecimal(BigDecimal("1328779873628")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328779873629")),
-                      "below" -> SDecimal(BigDecimal("1328779873626")),
-                      "time" -> SDecimal(BigDecimal("1328779873628")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329020233656")),
-                      "below" -> SDecimal(BigDecimal("1328985989055")),
-                      "time" -> SDecimal(BigDecimal("1329004284627")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328985989055")),
-                      "below" -> SDecimal(BigDecimal("1328969812140")),
-                      "time" -> SDecimal(BigDecimal("1328984890189")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329589296943")),
-                      "below" -> SDecimal(BigDecimal("1329526464104")),
-                      "time" -> SDecimal(BigDecimal("1329554034828")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328779873630")),
-                      "below" -> SDecimal(BigDecimal("1328779873628")),
-                      "time" -> SDecimal(BigDecimal("1328779873629")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328877415620")),
-                      "below" -> SDecimal(BigDecimal("1328840918817")),
-                      "time" -> SDecimal(BigDecimal("1328847243682")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329326691939")),
-                      "below" -> SDecimal(BigDecimal("1329310139168")),
-                      "time" -> SDecimal(BigDecimal("1329324578771")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328779873631")),
-                      "below" -> SDecimal(BigDecimal("1328779873629")),
-                      "time" -> SDecimal(BigDecimal("1328779873630")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328779873631")),
-                      "below" -> SDecimal(BigDecimal("1328779873629")),
-                      "time" -> SDecimal(BigDecimal("1328779873630")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328779873631")),
-                      "below" -> SDecimal(BigDecimal("1328779873629")),
-                      "time" -> SDecimal(BigDecimal("1328779873630")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328779873631")),
-                      "below" -> SDecimal(BigDecimal("1328779873629")),
-                      "time" -> SDecimal(BigDecimal("1328779873630")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329441529486")),
-                      "below" -> SDecimal(BigDecimal("1329385943949")),
-                      "time" -> SDecimal(BigDecimal("1329408502943")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1328780398002")),
-                      "below" -> SDecimal(BigDecimal("1328779873630")),
-                      "time" -> SDecimal(BigDecimal("1328779873631")))))
-      results must contain(
-          SObject(Map("above" -> SDecimal(BigDecimal("1329643873609")),
-                      "below" -> SDecimal(BigDecimal("1329589296943")),
-                      "time" -> SDecimal(BigDecimal("1329629900716")))))
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329526464104")),
+            "below" -> SDecimal(BigDecimal("1329470485350")),
+            "time" -> SDecimal(BigDecimal("1329475769211")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329301670072")),
+            "below" -> SDecimal(BigDecimal("1329262444197")),
+            "time" -> SDecimal(BigDecimal("1329275667592")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329643873610")),
+            "below" -> SDecimal(BigDecimal("1329629900716")),
+            "time" -> SDecimal(BigDecimal("1329643873609")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329643873610")),
+            "below" -> SDecimal(BigDecimal("1329629900716")),
+            "time" -> SDecimal(BigDecimal("1329643873609")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329076541429")),
+            "below" -> SDecimal(BigDecimal("1329004284627")),
+            "time" -> SDecimal(BigDecimal("1329020233656")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329643873611")),
+            "below" -> SDecimal(BigDecimal("1329643873609")),
+            "time" -> SDecimal(BigDecimal("1329643873610")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329333416645")),
+            "below" -> SDecimal(BigDecimal("1329324578771")),
+            "time" -> SDecimal(BigDecimal("1329326691939")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329643873612")),
+            "below" -> SDecimal(BigDecimal("1329643873610")),
+            "time" -> SDecimal(BigDecimal("1329643873611")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328779873612")),
+            "below" -> SDecimal(BigDecimal("1328779873610")),
+            "time" -> SDecimal(BigDecimal("1328779873611")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328779873612")),
+            "below" -> SDecimal(BigDecimal("1328779873610")),
+            "time" -> SDecimal(BigDecimal("1328779873611")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328797020396")),
+            "below" -> SDecimal(BigDecimal("1328788056054")),
+            "time" -> SDecimal(BigDecimal("1328791229826")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328779873613")),
+            "below" -> SDecimal(BigDecimal("1328779873611")),
+            "time" -> SDecimal(BigDecimal("1328779873612")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328809637371")),
+            "below" -> SDecimal(BigDecimal("1328791229826")),
+            "time" -> SDecimal(BigDecimal("1328797020396")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329643873614")),
+            "below" -> SDecimal(BigDecimal("1329643873611")),
+            "time" -> SDecimal(BigDecimal("1329643873612")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329004284627")),
+            "below" -> SDecimal(BigDecimal("1328984890189")),
+            "time" -> SDecimal(BigDecimal("1328985989055")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329360253555")),
+            "below" -> SDecimal(BigDecimal("1329333416645")),
+            "time" -> SDecimal(BigDecimal("1329345853072")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328779873614")),
+            "below" -> SDecimal(BigDecimal("1328779873612")),
+            "time" -> SDecimal(BigDecimal("1328779873613")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328779873614")),
+            "below" -> SDecimal(BigDecimal("1328779873612")),
+            "time" -> SDecimal(BigDecimal("1328779873613")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328779873614")),
+            "below" -> SDecimal(BigDecimal("1328779873612")),
+            "time" -> SDecimal(BigDecimal("1328779873613")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329643873618")),
+            "below" -> SDecimal(BigDecimal("1329643873612")),
+            "time" -> SDecimal(BigDecimal("1329643873614")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329643873618")),
+            "below" -> SDecimal(BigDecimal("1329643873612")),
+            "time" -> SDecimal(BigDecimal("1329643873614")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329629900716")),
+            "below" -> SDecimal(BigDecimal("1329554034828")),
+            "time" -> SDecimal(BigDecimal("1329589296943")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328779873616")),
+            "below" -> SDecimal(BigDecimal("1328779873613")),
+            "time" -> SDecimal(BigDecimal("1328779873614")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328812534981")),
+            "below" -> SDecimal(BigDecimal("1328797020396")),
+            "time" -> SDecimal(BigDecimal("1328809637371")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329190541217")),
+            "below" -> SDecimal(BigDecimal("1329164110718")),
+            "time" -> SDecimal(BigDecimal("1329165986272")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328984890189")),
+            "below" -> SDecimal(BigDecimal("1328887823569")),
+            "time" -> SDecimal(BigDecimal("1328969812140")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329456302829")),
+            "below" -> SDecimal(BigDecimal("1329441529486")),
+            "time" -> SDecimal(BigDecimal("1329446825698")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328779873617")),
+            "below" -> SDecimal(BigDecimal("1328779873614")),
+            "time" -> SDecimal(BigDecimal("1328779873616")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328779873617")),
+            "below" -> SDecimal(BigDecimal("1328779873614")),
+            "time" -> SDecimal(BigDecimal("1328779873616")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328791229826")),
+            "below" -> SDecimal(BigDecimal("1328780398002")),
+            "time" -> SDecimal(BigDecimal("1328788056054")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329475769211")),
+            "below" -> SDecimal(BigDecimal("1329456302829")),
+            "time" -> SDecimal(BigDecimal("1329470485350")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329383567193")),
+            "below" -> SDecimal(BigDecimal("1329369083745")),
+            "time" -> SDecimal(BigDecimal("1329369428834")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328779873619")),
+            "below" -> SDecimal(BigDecimal("1328779873616")),
+            "time" -> SDecimal(BigDecimal("1328779873617")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328779873619")),
+            "below" -> SDecimal(BigDecimal("1328779873616")),
+            "time" -> SDecimal(BigDecimal("1328779873617")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329244747076")),
+            "below" -> SDecimal(BigDecimal("1329190541217")),
+            "time" -> SDecimal(BigDecimal("1329211954428")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329554034828")),
+            "below" -> SDecimal(BigDecimal("1329475769211")),
+            "time" -> SDecimal(BigDecimal("1329526464104")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329211954428")),
+            "below" -> SDecimal(BigDecimal("1329165986272")),
+            "time" -> SDecimal(BigDecimal("1329190541217")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329643873620")),
+            "below" -> SDecimal(BigDecimal("1329643873614")),
+            "time" -> SDecimal(BigDecimal("1329643873618")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329137951622")),
+            "below" -> SDecimal(BigDecimal("1329076541429")),
+            "time" -> SDecimal(BigDecimal("1329094347814")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328887823569")),
+            "below" -> SDecimal(BigDecimal("1328847243682")),
+            "time" -> SDecimal(BigDecimal("1328877415620")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328779873621")),
+            "below" -> SDecimal(BigDecimal("1328779873617")),
+            "time" -> SDecimal(BigDecimal("1328779873619")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328779873621")),
+            "below" -> SDecimal(BigDecimal("1328779873617")),
+            "time" -> SDecimal(BigDecimal("1328779873619")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328779873621")),
+            "below" -> SDecimal(BigDecimal("1328779873617")),
+            "time" -> SDecimal(BigDecimal("1328779873619")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328779873621")),
+            "below" -> SDecimal(BigDecimal("1328779873617")),
+            "time" -> SDecimal(BigDecimal("1328779873619")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329165986272")),
+            "below" -> SDecimal(BigDecimal("1329159525492")),
+            "time" -> SDecimal(BigDecimal("1329164110718")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329309914296")),
+            "below" -> SDecimal(BigDecimal("1329275667592")),
+            "time" -> SDecimal(BigDecimal("1329301670072")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329643873621")),
+            "below" -> SDecimal(BigDecimal("1329643873618")),
+            "time" -> SDecimal(BigDecimal("1329643873620")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329345853072")),
+            "below" -> SDecimal(BigDecimal("1329326691939")),
+            "time" -> SDecimal(BigDecimal("1329333416645")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329324578771")),
+            "below" -> SDecimal(BigDecimal("1329309914296")),
+            "time" -> SDecimal(BigDecimal("1329310139168")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329385943949")),
+            "below" -> SDecimal(BigDecimal("1329369428834")),
+            "time" -> SDecimal(BigDecimal("1329383567193")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328779873622")),
+            "below" -> SDecimal(BigDecimal("1328779873619")),
+            "time" -> SDecimal(BigDecimal("1328779873621")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329643873622")),
+            "below" -> SDecimal(BigDecimal("1329643873620")),
+            "time" -> SDecimal(BigDecimal("1329643873621")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329643873622")),
+            "below" -> SDecimal(BigDecimal("1329643873620")),
+            "time" -> SDecimal(BigDecimal("1329643873621")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328779873623")),
+            "below" -> SDecimal(BigDecimal("1328779873621")),
+            "time" -> SDecimal(BigDecimal("1328779873622")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329369428834")),
+            "below" -> SDecimal(BigDecimal("1329360253555")),
+            "time" -> SDecimal(BigDecimal("1329369083745")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329470485350")),
+            "below" -> SDecimal(BigDecimal("1329446825698")),
+            "time" -> SDecimal(BigDecimal("1329456302829")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329643873623")),
+            "below" -> SDecimal(BigDecimal("1329643873621")),
+            "time" -> SDecimal(BigDecimal("1329643873622")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329159525492")),
+            "below" -> SDecimal(BigDecimal("1329094347814")),
+            "time" -> SDecimal(BigDecimal("1329137951622")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329643873624")),
+            "below" -> SDecimal(BigDecimal("1329643873622")),
+            "time" -> SDecimal(BigDecimal("1329643873623")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329643873624")),
+            "below" -> SDecimal(BigDecimal("1329643873622")),
+            "time" -> SDecimal(BigDecimal("1329643873623")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329408502943")),
+            "below" -> SDecimal(BigDecimal("1329383567193")),
+            "time" -> SDecimal(BigDecimal("1329385943949")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328779873624")),
+            "below" -> SDecimal(BigDecimal("1328779873622")),
+            "time" -> SDecimal(BigDecimal("1328779873623")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329262444197")),
+            "below" -> SDecimal(BigDecimal("1329244747076")),
+            "time" -> SDecimal(BigDecimal("1329253270269")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328779873625")),
+            "below" -> SDecimal(BigDecimal("1328779873623")),
+            "time" -> SDecimal(BigDecimal("1328779873624")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328779873625")),
+            "below" -> SDecimal(BigDecimal("1328779873623")),
+            "time" -> SDecimal(BigDecimal("1328779873624")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329643873625")),
+            "below" -> SDecimal(BigDecimal("1329643873623")),
+            "time" -> SDecimal(BigDecimal("1329643873624")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329369083745")),
+            "below" -> SDecimal(BigDecimal("1329345853072")),
+            "time" -> SDecimal(BigDecimal("1329360253555")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329164110718")),
+            "below" -> SDecimal(BigDecimal("1329137951622")),
+            "time" -> SDecimal(BigDecimal("1329159525492")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328779873626")),
+            "below" -> SDecimal(BigDecimal("1328779873624")),
+            "time" -> SDecimal(BigDecimal("1328779873625")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328969812140")),
+            "below" -> SDecimal(BigDecimal("1328877415620")),
+            "time" -> SDecimal(BigDecimal("1328887823569")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329310139168")),
+            "below" -> SDecimal(BigDecimal("1329301670072")),
+            "time" -> SDecimal(BigDecimal("1329309914296")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329643873627")),
+            "below" -> SDecimal(BigDecimal("1329643873624")),
+            "time" -> SDecimal(BigDecimal("1329643873625")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329094347814")),
+            "below" -> SDecimal(BigDecimal("1329020233656")),
+            "time" -> SDecimal(BigDecimal("1329076541429")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329446825698")),
+            "below" -> SDecimal(BigDecimal("1329408502943")),
+            "time" -> SDecimal(BigDecimal("1329441529486")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328779873628")),
+            "below" -> SDecimal(BigDecimal("1328779873625")),
+            "time" -> SDecimal(BigDecimal("1328779873626")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328840918817")),
+            "below" -> SDecimal(BigDecimal("1328809637371")),
+            "time" -> SDecimal(BigDecimal("1328812534981")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329275667592")),
+            "below" -> SDecimal(BigDecimal("1329253270269")),
+            "time" -> SDecimal(BigDecimal("1329262444197")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328788056054")),
+            "below" -> SDecimal(BigDecimal("1328779873631")),
+            "time" -> SDecimal(BigDecimal("1328780398002")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329643873628")),
+            "below" -> SDecimal(BigDecimal("1329643873625")),
+            "time" -> SDecimal(BigDecimal("1329643873627")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329643873628")),
+            "below" -> SDecimal(BigDecimal("1329643873625")),
+            "time" -> SDecimal(BigDecimal("1329643873627")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328847243682")),
+            "below" -> SDecimal(BigDecimal("1328812534981")),
+            "time" -> SDecimal(BigDecimal("1328840918817")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329253270269")),
+            "below" -> SDecimal(BigDecimal("1329211954428")),
+            "time" -> SDecimal(BigDecimal("1329244747076")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328779873629")),
+            "below" -> SDecimal(BigDecimal("1328779873626")),
+            "time" -> SDecimal(BigDecimal("1328779873628")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328779873629")),
+            "below" -> SDecimal(BigDecimal("1328779873626")),
+            "time" -> SDecimal(BigDecimal("1328779873628")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328779873629")),
+            "below" -> SDecimal(BigDecimal("1328779873626")),
+            "time" -> SDecimal(BigDecimal("1328779873628")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329020233656")),
+            "below" -> SDecimal(BigDecimal("1328985989055")),
+            "time" -> SDecimal(BigDecimal("1329004284627")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328985989055")),
+            "below" -> SDecimal(BigDecimal("1328969812140")),
+            "time" -> SDecimal(BigDecimal("1328984890189")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329589296943")),
+            "below" -> SDecimal(BigDecimal("1329526464104")),
+            "time" -> SDecimal(BigDecimal("1329554034828")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328779873630")),
+            "below" -> SDecimal(BigDecimal("1328779873628")),
+            "time" -> SDecimal(BigDecimal("1328779873629")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328877415620")),
+            "below" -> SDecimal(BigDecimal("1328840918817")),
+            "time" -> SDecimal(BigDecimal("1328847243682")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329326691939")),
+            "below" -> SDecimal(BigDecimal("1329310139168")),
+            "time" -> SDecimal(BigDecimal("1329324578771")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328779873631")),
+            "below" -> SDecimal(BigDecimal("1328779873629")),
+            "time" -> SDecimal(BigDecimal("1328779873630")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328779873631")),
+            "below" -> SDecimal(BigDecimal("1328779873629")),
+            "time" -> SDecimal(BigDecimal("1328779873630")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328779873631")),
+            "below" -> SDecimal(BigDecimal("1328779873629")),
+            "time" -> SDecimal(BigDecimal("1328779873630")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328779873631")),
+            "below" -> SDecimal(BigDecimal("1328779873629")),
+            "time" -> SDecimal(BigDecimal("1328779873630")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329441529486")),
+            "below" -> SDecimal(BigDecimal("1329385943949")),
+            "time" -> SDecimal(BigDecimal("1329408502943")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1328780398002")),
+            "below" -> SDecimal(BigDecimal("1328779873630")),
+            "time" -> SDecimal(BigDecimal("1328779873631")))))
+      results must contain(
+        SObject(
+          Map(
+            "above" -> SDecimal(BigDecimal("1329643873609")),
+            "below" -> SDecimal(BigDecimal("1329589296943")),
+            "time" -> SDecimal(BigDecimal("1329629900716")))))
     }
 
     "determine most isolated clicks in time" in {
@@ -2751,125 +2989,165 @@ trait MiscStackSpecs extends EvalStackSpecs {
         }
 
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1329275667592")),
-                      "timeZone" -> SString("+14:00"),
-                      "timeString" -> SString("2012-02-15T17:14:27.592+14:00"),
-                      "pageId" -> SString("page-4"),
-                      "userId" -> SString("user-1001"))))
+        SObject(Map(
+          "time" -> SDecimal(BigDecimal("1329275667592")),
+          "timeZone" -> SString("+14:00"),
+          "timeString" -> SString("2012-02-15T17:14:27.592+14:00"),
+          "pageId" -> SString("page-4"),
+          "userId" -> SString("user-1001")
+        )))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1329020233656")),
-                      "timeZone" -> SString("+14:00"),
-                      "timeString" -> SString("2012-02-12T18:17:13.656+14:00"),
-                      "pageId" -> SString("page-4"),
-                      "userId" -> SString("user-1017"))))
+        SObject(Map(
+          "time" -> SDecimal(BigDecimal("1329020233656")),
+          "timeZone" -> SString("+14:00"),
+          "timeString" -> SString("2012-02-12T18:17:13.656+14:00"),
+          "pageId" -> SString("page-4"),
+          "userId" -> SString("user-1017")
+        )))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1329345853072")),
-                      "timeZone" -> SString("-02:00"),
-                      "timeString" -> SString("2012-02-15T20:44:13.072-02:00"),
-                      "pageId" -> SString("page-1"),
-                      "userId" -> SString("user-1014"))))
+        SObject(Map(
+          "time" -> SDecimal(BigDecimal("1329345853072")),
+          "timeZone" -> SString("-02:00"),
+          "timeString" -> SString("2012-02-15T20:44:13.072-02:00"),
+          "pageId" -> SString("page-1"),
+          "userId" -> SString("user-1014")
+        )))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1329589296943")),
-                      "timeZone" -> SString("+03:00"),
-                      "timeString" -> SString("2012-02-18T21:21:36.943+03:00"),
-                      "pageId" -> SString("page-3"),
-                      "userId" -> SString("user-1006"))))
+        SObject(Map(
+          "time" -> SDecimal(BigDecimal("1329589296943")),
+          "timeZone" -> SString("+03:00"),
+          "timeString" -> SString("2012-02-18T21:21:36.943+03:00"),
+          "pageId" -> SString("page-3"),
+          "userId" -> SString("user-1006")
+        )))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1328969812140")),
-                      "timeZone" -> SString("+01:00"),
-                      "timeString" -> SString("2012-02-11T15:16:52.140+01:00"),
-                      "pageId" -> SString("page-1"),
-                      "userId" -> SString("user-1019"))))
+        SObject(Map(
+          "time" -> SDecimal(BigDecimal("1328969812140")),
+          "timeZone" -> SString("+01:00"),
+          "timeString" -> SString("2012-02-11T15:16:52.140+01:00"),
+          "pageId" -> SString("page-1"),
+          "userId" -> SString("user-1019")
+        )))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1329211954428")),
-                      "timeZone" -> SString("+13:00"),
-                      "timeString" -> SString("2012-02-14T22:32:34.428+13:00"),
-                      "pageId" -> SString("page-4"),
-                      "userId" -> SString("user-1020"))))
+        SObject(Map(
+          "time" -> SDecimal(BigDecimal("1329211954428")),
+          "timeZone" -> SString("+13:00"),
+          "timeString" -> SString("2012-02-14T22:32:34.428+13:00"),
+          "pageId" -> SString("page-4"),
+          "userId" -> SString("user-1020")
+        )))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1329526464104")),
-                      "timeZone" -> SString("+13:00"),
-                      "timeString" -> SString("2012-02-18T13:54:24.104+13:00"),
-                      "pageId" -> SString("page-3"),
-                      "userId" -> SString("user-1020"))))
+        SObject(Map(
+          "time" -> SDecimal(BigDecimal("1329526464104")),
+          "timeZone" -> SString("+13:00"),
+          "timeString" -> SString("2012-02-18T13:54:24.104+13:00"),
+          "pageId" -> SString("page-3"),
+          "userId" -> SString("user-1020")
+        )))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1329190541217")),
-                      "timeZone" -> SString("-12:00"),
-                      "timeString" -> SString("2012-02-13T15:35:41.217-12:00"),
-                      "pageId" -> SString("page-2"),
-                      "userId" -> SString("user-1016"))))
+        SObject(Map(
+          "time" -> SDecimal(BigDecimal("1329190541217")),
+          "timeZone" -> SString("-12:00"),
+          "timeString" -> SString("2012-02-13T15:35:41.217-12:00"),
+          "pageId" -> SString("page-2"),
+          "userId" -> SString("user-1016")
+        )))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1329094347814")),
-                      "timeZone" -> SString("+12:00"),
-                      "timeString" -> SString("2012-02-13T12:52:27.814+12:00"),
-                      "pageId" -> SString("page-1"),
-                      "userId" -> SString("user-1015"))))
+        SObject(Map(
+          "time" -> SDecimal(BigDecimal("1329094347814")),
+          "timeZone" -> SString("+12:00"),
+          "timeString" -> SString("2012-02-13T12:52:27.814+12:00"),
+          "pageId" -> SString("page-1"),
+          "userId" -> SString("user-1015")
+        )))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1328877415620")),
-                      "timeZone" -> SString("-12:00"),
-                      "timeString" -> SString("2012-02-10T00:36:55.620-12:00"),
-                      "pageId" -> SString("page-3"),
-                      "userId" -> SString("user-1018"))))
+        SObject(Map(
+          "time" -> SDecimal(BigDecimal("1328877415620")),
+          "timeZone" -> SString("-12:00"),
+          "timeString" -> SString("2012-02-10T00:36:55.620-12:00"),
+          "pageId" -> SString("page-3"),
+          "userId" -> SString("user-1018")
+        )))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1329456302829")),
-                      "timeZone" -> SString("-03:00"),
-                      "timeString" -> SString("2012-02-17T02:25:02.829-03:00"),
-                      "pageId" -> SString("page-4"),
-                      "userId" -> SString("user-1001"))))
+        SObject(Map(
+          "time" -> SDecimal(BigDecimal("1329456302829")),
+          "timeZone" -> SString("-03:00"),
+          "timeString" -> SString("2012-02-17T02:25:02.829-03:00"),
+          "pageId" -> SString("page-4"),
+          "userId" -> SString("user-1001")
+        )))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1329137951622")),
-                      "timeZone" -> SString("+04:00"),
-                      "timeString" -> SString("2012-02-13T16:59:11.622+04:00"),
-                      "pageId" -> SString("page-0"),
-                      "userId" -> SString("user-1017"))))
+        SObject(Map(
+          "time" -> SDecimal(BigDecimal("1329137951622")),
+          "timeZone" -> SString("+04:00"),
+          "timeString" -> SString("2012-02-13T16:59:11.622+04:00"),
+          "pageId" -> SString("page-0"),
+          "userId" -> SString("user-1017")
+        )))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1329360253555")),
-                      "timeZone" -> SString("+11:00"),
-                      "timeString" -> SString("2012-02-16T13:44:13.555+11:00"),
-                      "pageId" -> SString("page-1"),
-                      "userId" -> SString("user-1020"))))
+        SObject(Map(
+          "time" -> SDecimal(BigDecimal("1329360253555")),
+          "timeZone" -> SString("+11:00"),
+          "timeString" -> SString("2012-02-16T13:44:13.555+11:00"),
+          "pageId" -> SString("page-1"),
+          "userId" -> SString("user-1020")
+        )))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1328887823569")),
-                      "timeZone" -> SString("+12:00"),
-                      "timeString" -> SString("2012-02-11T03:30:23.569+12:00"),
-                      "pageId" -> SString("page-4"),
-                      "userId" -> SString("user-1007"))))
+        SObject(Map(
+          "time" -> SDecimal(BigDecimal("1328887823569")),
+          "timeZone" -> SString("+12:00"),
+          "timeString" -> SString("2012-02-11T03:30:23.569+12:00"),
+          "pageId" -> SString("page-4"),
+          "userId" -> SString("user-1007")
+        )))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1329076541429")),
-                      "timeZone" -> SString("+12:00"),
-                      "timeString" -> SString("2012-02-13T07:55:41.429+12:00"),
-                      "pageId" -> SString("page-1"),
-                      "userId" -> SString("user-1016"))))
+        SObject(Map(
+          "time" -> SDecimal(BigDecimal("1329076541429")),
+          "timeZone" -> SString("+12:00"),
+          "timeString" -> SString("2012-02-13T07:55:41.429+12:00"),
+          "pageId" -> SString("page-1"),
+          "userId" -> SString("user-1016")
+        )))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1329262444197")),
-                      "timeZone" -> SString("-06:00"),
-                      "timeString" -> SString("2012-02-14T17:34:04.197-06:00"),
-                      "pageId" -> SString("page-0"),
-                      "userId" -> SString("user-1019"))))
+        SObject(Map(
+          "time" -> SDecimal(BigDecimal("1329262444197")),
+          "timeZone" -> SString("-06:00"),
+          "timeString" -> SString("2012-02-14T17:34:04.197-06:00"),
+          "pageId" -> SString("page-0"),
+          "userId" -> SString("user-1019")
+        )))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1329004284627")),
-                      "timeZone" -> SString("+01:00"),
-                      "timeString" -> SString("2012-02-12T00:51:24.627+01:00"),
-                      "pageId" -> SString("page-1"),
-                      "userId" -> SString("user-1011"))))
+        SObject(Map(
+          "time" -> SDecimal(BigDecimal("1329004284627")),
+          "timeZone" -> SString("+01:00"),
+          "timeString" -> SString("2012-02-12T00:51:24.627+01:00"),
+          "pageId" -> SString("page-1"),
+          "userId" -> SString("user-1011")
+        )))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1329554034828")),
-                      "timeZone" -> SString("+06:00"),
-                      "timeString" -> SString("2012-02-18T14:33:54.828+06:00"),
-                      "pageId" -> SString("page-2"),
-                      "userId" -> SString("user-1016"))))
+        SObject(Map(
+          "time" -> SDecimal(BigDecimal("1329554034828")),
+          "timeZone" -> SString("+06:00"),
+          "timeString" -> SString("2012-02-18T14:33:54.828+06:00"),
+          "pageId" -> SString("page-2"),
+          "userId" -> SString("user-1016")
+        )))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1329408502943")),
-                      "timeZone" -> SString("+13:00"),
-                      "timeString" -> SString("2012-02-17T05:08:22.943+13:00"),
-                      "pageId" -> SString("page-4"),
-                      "userId" -> SString("user-1006"))))
+        SObject(Map(
+          "time" -> SDecimal(BigDecimal("1329408502943")),
+          "timeZone" -> SString("+13:00"),
+          "timeString" -> SString("2012-02-17T05:08:22.943+13:00"),
+          "pageId" -> SString("page-4"),
+          "userId" -> SString("user-1006")
+        )))
       results must contain(
-          SObject(Map("time" -> SDecimal(BigDecimal("1329629900716")),
-                      "timeZone" -> SString("-07:00"),
-                      "timeString" -> SString("2012-02-18T22:38:20.716-07:00"),
-                      "pageId" -> SString("page-0"),
-                      "userId" -> SString("user-1014"))))
+        SObject(Map(
+          "time" -> SDecimal(BigDecimal("1329629900716")),
+          "timeZone" -> SString("-07:00"),
+          "timeString" -> SString("2012-02-18T22:38:20.716-07:00"),
+          "pageId" -> SString("page-0"),
+          "userId" -> SString("user-1014")
+        )))
     }
 
     // Regression test for #39590007
@@ -3401,31 +3679,31 @@ trait MiscStackSpecs extends EvalStackSpecs {
     //  val input = """
     //    | import std::stats::*
     //    | import std::time::*
-    //    | 
+    //    |
     //    | --locations := //devicelocations/2012/07/01
     //    | locations := //test
     //    | deviceTimes := [ locations.deviceId, locations.captureTimestamp ]
-    //    | 
+    //    |
     //    | order := denseRank(deviceTimes)
-    //    | 
+    //    |
     //    | locations' := locations with { rank : order }
     //    | --locations'
     //    | newLocations := new locations'
     //    | newLocations' := newLocations with { rank : newLocations.rank - 1 }
-    //    | 
+    //    |
     //    | joined := newLocations' ~ locations'
     //    |   { first : locations', second : newLocations' } where locations'.rank
     //    | = newLocations'.rank
-    //    | 
+    //    |
     //    | r := joined where joined.first.deviceId = joined.second.deviceId
-    //    | 
-    //    | r' := 
+    //    |
+    //    | r' :=
     //    |   {
     //    |   data: r.first,
     //    |   nextLocation: r.second.currentZone,
     //    |   dwellTime: getMillis(r.second.captureTimestamp) - getMillis(r.first.captureTimestamp)
     //    |   }
-    //    | 
+    //    |
     //    | markov := solve 'location, 'nextLocation
     //    |   r'' := r' where r'.data.currentZone = 'location & r'.nextLocation = 'nextLocation
     //    |   total := count(r'.data.currentZone where r'.data.currentZone = 'location)
@@ -3433,20 +3711,20 @@ trait MiscStackSpecs extends EvalStackSpecs {
     //    |   matrix: ['location, 'nextLocation],
     //    |   prob: count(r''.nextLocation)/total
     //    |   }
-    //    | 
+    //    |
     //    | --markov
-    //    | 
+    //    |
     //    | --function for creating cumulative probability distribution and formatting intervals
-    //    | createModel(data) :=  
+    //    | createModel(data) :=
     //    |   predictedDistribution := data with {rank : indexedRank(data.prob) }
-    //    | 
+    //    |
     //    |   cumProb := solve 'rank = predictedDistribution.rank
     //    |     {
     //    |     location: predictedDistribution.matrix where  predictedDistribution.rank = 'rank,
     //    |     prob: sum(predictedDistribution.prob where predictedDistribution.rank <= 'rank),
     //    |     rank: 'rank
     //    |     }
-    //    | 
+    //    |
     //    |   buckets := solve 'rank = cumProb.rank
     //    |     minimum:= cumProb.prob where cumProb.rank = 'rank
     //    |     maximum:= min(cumProb.prob where cumProb.rank > 'rank)
@@ -3456,11 +3734,11 @@ trait MiscStackSpecs extends EvalStackSpecs {
     //    |     }
     //    | buckets
     //    | --end createModel Function
-    //    | 
+    //    |
     //    | markov' := createModel(markov)
     //    | markov'
     //    | """.stripMargin
-    //    
+    //
     //  eval(input) must not(throwA[Throwable])
     //}
 
@@ -3527,13 +3805,12 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       result must haveAllElementsLike {
         case (ids, SArray(arr)) => {
-            ids must haveSize(2)
-            arr must haveSize(2)
+          ids must haveSize(2)
+          arr must haveSize(2)
 
-            arr(0) must beOneOf(SDecimal(2), SDecimal(3), SDecimal(4))
-            arr(1) mustEqual SArray(
-                Vector(SDecimal(2), SDecimal(3), SDecimal(4)))
-          }
+          arr(0) must beOneOf(SDecimal(2), SDecimal(3), SDecimal(4))
+          arr(1) mustEqual SArray(Vector(SDecimal(2), SDecimal(3), SDecimal(4)))
+        }
         case _ => ko
       }
 
@@ -3560,13 +3837,12 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       result must haveAllElementsLike {
         case (ids, SArray(arr)) => {
-            ids must haveSize(2)
-            arr must haveSize(2)
+          ids must haveSize(2)
+          arr must haveSize(2)
 
-            arr(0) must beOneOf(SDecimal(2), SDecimal(3), SDecimal(4))
-            arr(1) mustEqual SArray(
-                Vector(SDecimal(2), SDecimal(3), SDecimal(4)))
-          }
+          arr(0) must beOneOf(SDecimal(2), SDecimal(3), SDecimal(4))
+          arr(1) mustEqual SArray(Vector(SDecimal(2), SDecimal(3), SDecimal(4)))
+        }
         case _ => ko
       }
 
@@ -3600,14 +3876,14 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       result must haveAllElementsLike {
         case (ids, SObject(obj)) => {
-            // note that `ids` has size 1 because flatten retains the original ids
-            // and adds a new synth id, and in this case there are no original ids
-            ids must haveSize(1)
-            obj.keySet mustEqual Set("foo", "bar", "ack")
+          // note that `ids` has size 1 because flatten retains the original ids
+          // and adds a new synth id, and in this case there are no original ids
+          ids must haveSize(1)
+          obj.keySet mustEqual Set("foo", "bar", "ack")
 
-            if (obj("foo") == SDecimal(5)) obj("ack") mustEqual SDecimal(10000)
-            else obj("ack") mustEqual SDecimal(0)
-          }
+          if (obj("foo") == SDecimal(5)) obj("ack") mustEqual SDecimal(10000)
+          else obj("ack") mustEqual SDecimal(0)
+        }
         case _ => ko
       }
     }
@@ -3635,7 +3911,7 @@ trait MiscStackSpecs extends EvalStackSpecs {
     "split a constant string along a constant delimiter" in {
       val input = """std::string::split("abc # def", "#")"""
       eval(input) mustEqual Set(
-          SArray(Vector(SString("abc "), SString(" def"))))
+        SArray(Vector(SString("abc "), SString(" def"))))
     }
 
     "split strings along a constant delimiter" in {
@@ -3675,14 +3951,15 @@ trait MiscStackSpecs extends EvalStackSpecs {
         | histogram(conversions) union histogram(clicks)""".stripMargin
 
       eval(input) mustEqual Set(
-          SObject(Map("count" -> SDecimal(2030), "price" -> SDecimal(9.99))),
-          SObject(Map("count" -> SDecimal(8720), "price" -> SDecimal(0.99))),
-          SObject(Map("count" -> SDecimal(5581), "price" -> SDecimal(14.99))),
-          SObject(Map("count" -> SDecimal(315), "price" -> SDecimal(24.99))),
-          SObject(Map("count" -> SDecimal(715), "price" -> SDecimal(4.99))),
-          SObject(Map("count" -> SDecimal(3231), "price" -> SDecimal(12.99))),
-          SObject(Map("count" -> SDecimal(2501), "price" -> SDecimal(7.99))),
-          SObject(Map("count" -> SDecimal(2313), "price" -> SDecimal(13.99))))
+        SObject(Map("count" -> SDecimal(2030), "price" -> SDecimal(9.99))),
+        SObject(Map("count" -> SDecimal(8720), "price" -> SDecimal(0.99))),
+        SObject(Map("count" -> SDecimal(5581), "price" -> SDecimal(14.99))),
+        SObject(Map("count" -> SDecimal(315), "price" -> SDecimal(24.99))),
+        SObject(Map("count" -> SDecimal(715), "price" -> SDecimal(4.99))),
+        SObject(Map("count" -> SDecimal(3231), "price" -> SDecimal(12.99))),
+        SObject(Map("count" -> SDecimal(2501), "price" -> SDecimal(7.99))),
+        SObject(Map("count" -> SDecimal(2313), "price" -> SDecimal(13.99)))
+      )
     }
   }
 }

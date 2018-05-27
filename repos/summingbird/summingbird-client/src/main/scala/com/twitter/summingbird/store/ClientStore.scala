@@ -31,53 +31,65 @@ import scala.collection.breakOut
   */
 object ClientStore {
   def apply[K, V](
-      onlineStore: ReadableStore[(K, BatchID), V], batchesToKeep: Int)(
-      implicit batcher: Batcher, semigroup: Semigroup[V]): ClientStore[K, V] =
+      onlineStore: ReadableStore[(K, BatchID), V],
+      batchesToKeep: Int)(
+      implicit batcher: Batcher,
+      semigroup: Semigroup[V]): ClientStore[K, V] =
     apply(ReadableStore.empty, onlineStore, batchesToKeep)
 
   // If no online store exists, supply an empty store and instruct the
   // client to keep a single batch.
   def apply[K, V](offlineStore: ReadableStore[K, (BatchID, V)])(
-      implicit batcher: Batcher, semigroup: Semigroup[V]): ClientStore[K, V] =
+      implicit batcher: Batcher,
+      semigroup: Semigroup[V]): ClientStore[K, V] =
     apply(offlineStore, ReadableStore.empty, 1)
 
   def defaultOnlineKeyFilter[K] = (k: K) => true
 
-  def apply[K, V](offlineStore: ReadableStore[K, (BatchID, V)],
-                  onlineStore: ReadableStore[(K, BatchID), V],
-                  batchesToKeep: Int)(
-      implicit batcher: Batcher, semigroup: Semigroup[V]): ClientStore[K, V] =
-    new ClientStore[K, V](offlineStore,
-                          onlineStore,
-                          batcher,
-                          batchesToKeep,
-                          defaultOnlineKeyFilter[K],
-                          FutureCollector.bestEffort)
+  def apply[K, V](
+      offlineStore: ReadableStore[K, (BatchID, V)],
+      onlineStore: ReadableStore[(K, BatchID), V],
+      batchesToKeep: Int)(
+      implicit batcher: Batcher,
+      semigroup: Semigroup[V]): ClientStore[K, V] =
+    new ClientStore[K, V](
+      offlineStore,
+      onlineStore,
+      batcher,
+      batchesToKeep,
+      defaultOnlineKeyFilter[K],
+      FutureCollector.bestEffort)
 
-  def apply[K, V](offlineStore: ReadableStore[K, (BatchID, V)],
-                  onlineStore: ReadableStore[(K, BatchID), V],
-                  batchesToKeep: Int,
-                  onlineKeyFilter: K => Boolean)(
-      implicit batcher: Batcher, semigroup: Semigroup[V]): ClientStore[K, V] =
-    new ClientStore[K, V](offlineStore,
-                          onlineStore,
-                          batcher,
-                          batchesToKeep,
-                          onlineKeyFilter,
-                          FutureCollector.bestEffort)
+  def apply[K, V](
+      offlineStore: ReadableStore[K, (BatchID, V)],
+      onlineStore: ReadableStore[(K, BatchID), V],
+      batchesToKeep: Int,
+      onlineKeyFilter: K => Boolean)(
+      implicit batcher: Batcher,
+      semigroup: Semigroup[V]): ClientStore[K, V] =
+    new ClientStore[K, V](
+      offlineStore,
+      onlineStore,
+      batcher,
+      batchesToKeep,
+      onlineKeyFilter,
+      FutureCollector.bestEffort)
 
-  def apply[K, V](offlineStore: ReadableStore[K, (BatchID, V)],
-                  onlineStore: ReadableStore[(K, BatchID), V],
-                  batchesToKeep: Int,
-                  onlineKeyFilter: K => Boolean,
-                  collector: FutureCollector[(K, Iterable[BatchID])])(
-      implicit batcher: Batcher, semigroup: Semigroup[V]): ClientStore[K, V] =
-    new ClientStore[K, V](offlineStore,
-                          onlineStore,
-                          batcher,
-                          batchesToKeep,
-                          onlineKeyFilter,
-                          collector)
+  def apply[K, V](
+      offlineStore: ReadableStore[K, (BatchID, V)],
+      onlineStore: ReadableStore[(K, BatchID), V],
+      batchesToKeep: Int,
+      onlineKeyFilter: K => Boolean,
+      collector: FutureCollector[(K, Iterable[BatchID])])(
+      implicit batcher: Batcher,
+      semigroup: Semigroup[V]): ClientStore[K, V] =
+    new ClientStore[K, V](
+      offlineStore,
+      onlineStore,
+      batcher,
+      batchesToKeep,
+      onlineKeyFilter,
+      collector)
 
   /** You can't read the batch counts before what offline has counted up to
     */
@@ -87,8 +99,8 @@ object ClientStore {
       v: Future[Option[(BatchID, V)]]): Future[Option[(BatchID, V)]] =
     v.flatMap {
       case s @ Some((bOld, v)) if (bOld.id <= b.id) => Future.value(s)
-      case Some((bOld, v)) => Future.exception(OfflinePassedBatch(k, bOld, b))
-      case None => Future.None
+      case Some((bOld, v))                          => Future.exception(OfflinePassedBatch(k, bOld, b))
+      case None                                     => Future.None
     }
 }
 
@@ -137,7 +149,7 @@ object ClientStore {
   * example, in most cases a function K => T would help tie in
   * batching logic more easily.
   */
-class ClientStore[K, V : Semigroup](
+class ClientStore[K, V: Semigroup](
     offlineStore: ReadableStore[K, (BatchID, V)],
     onlineStore: ReadableStore[(K, BatchID), V],
     batcher: Batcher,
@@ -178,8 +190,9 @@ class ClientStore[K, V : Semigroup](
     val keyToBatch: K1 => FOpt[BatchID] =
       offlineResult.andThen(_.map { _.map { _._1 } })
 
-    val fOnlineKeys: Future[Set[(K1, BatchID)]] = generateOnlineKeys(
-        possibleOnlineKeys.toSeq, batch, batchesToKeep)(keyToBatch)(
+    val fOnlineKeys: Future[Set[(K1, BatchID)]] =
+      generateOnlineKeys(possibleOnlineKeys.toSeq, batch, batchesToKeep)(
+        keyToBatch)(
         collector.asInstanceOf[FutureCollector[(K1, Iterable[BatchID])]])
 
     val m: Future[Map[K1, FOpt[V]]] = fOnlineKeys.map { onlineKeys =>
@@ -198,6 +211,8 @@ class ClientStore[K, V : Semigroup](
 }
 
 case class OfflinePassedBatch(
-    key: Any, offlineBatch: BatchID, requested: BatchID)
+    key: Any,
+    offlineBatch: BatchID,
+    requested: BatchID)
     extends Exception(
-        s"key: $key offline is at batch $offlineBatch, can't query for $requested")
+      s"key: $key offline is at batch $offlineBatch, can't query for $requested")

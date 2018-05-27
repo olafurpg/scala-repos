@@ -30,8 +30,9 @@ case class Channel(
     name: String, // must be unique within the same app
     appid: Int
 ) {
-  require(Channel.isValidName(name),
-          "Invalid channel name: ${name}. ${Channel.nameConstraint}")
+  require(
+    Channel.isValidName(name),
+    "Invalid channel name: ${name}. ${Channel.nameConstraint}")
 }
 
 /** :: DeveloperApi ::

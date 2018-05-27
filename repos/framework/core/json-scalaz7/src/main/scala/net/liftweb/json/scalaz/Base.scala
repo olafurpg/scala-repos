@@ -29,7 +29,7 @@ trait Base {
   implicit def boolJSON: JSON[Boolean] = new JSON[Boolean] {
     def read(json: JValue) = json match {
       case JBool(b) => success(b)
-      case x => failure(UnexpectedJSONError(x, classOf[JBool])).toValidationNel
+      case x        => failure(UnexpectedJSONError(x, classOf[JBool])).toValidationNel
     }
 
     def write(value: Boolean) = JBool(value)
@@ -38,7 +38,7 @@ trait Base {
   implicit def intJSON: JSON[Int] = new JSON[Int] {
     def read(json: JValue) = json match {
       case JInt(x) => success(x.intValue)
-      case x => failure(UnexpectedJSONError(x, classOf[JInt])).toValidationNel
+      case x       => failure(UnexpectedJSONError(x, classOf[JInt])).toValidationNel
     }
 
     def write(value: Int) = JInt(BigInt(value))
@@ -47,7 +47,7 @@ trait Base {
   implicit def longJSON: JSON[Long] = new JSON[Long] {
     def read(json: JValue) = json match {
       case JInt(x) => success(x.longValue)
-      case x => failure(UnexpectedJSONError(x, classOf[JInt])).toValidationNel
+      case x       => failure(UnexpectedJSONError(x, classOf[JInt])).toValidationNel
     }
 
     def write(value: Long) = JInt(BigInt(value))
@@ -76,7 +76,7 @@ trait Base {
   implicit def bigintJSON: JSON[BigInt] = new JSON[BigInt] {
     def read(json: JValue) = json match {
       case JInt(x) => success(x)
-      case x => failure(UnexpectedJSONError(x, classOf[JInt])).toValidationNel
+      case x       => failure(UnexpectedJSONError(x, classOf[JInt])).toValidationNel
     }
 
     def write(value: BigInt) = JInt(value)
@@ -87,34 +87,34 @@ trait Base {
     def write(value: JValue) = value
   }
 
-  implicit def listJSONR[A : JSONR]: JSONR[List[A]] = new JSONR[List[A]] {
+  implicit def listJSONR[A: JSONR]: JSONR[List[A]] = new JSONR[List[A]] {
     def read(json: JValue) = json match {
       case JArray(xs) => {
-          xs.map(fromJSON[A])
-            .sequence[({ type λ[α] = ValidationNel[Error, α] })#λ, A]
-        }
+        xs.map(fromJSON[A])
+          .sequence[({ type λ[α] = ValidationNel[Error, α] })#λ, A]
+      }
       case x =>
         failure(UnexpectedJSONError(x, classOf[JArray])).toValidationNel
     }
   }
-  implicit def listJSONW[A : JSONW]: JSONW[List[A]] = new JSONW[List[A]] {
+  implicit def listJSONW[A: JSONW]: JSONW[List[A]] = new JSONW[List[A]] {
     def write(values: List[A]) = JArray(values.map(x => toJSON(x)))
   }
 
-  implicit def optionJSONR[A : JSONR]: JSONR[Option[A]] =
+  implicit def optionJSONR[A: JSONR]: JSONR[Option[A]] =
     new JSONR[Option[A]] {
       def read(json: JValue) = json match {
         case JNothing | JNull => success(None)
-        case x => fromJSON[A](x).map(some)
+        case x                => fromJSON[A](x).map(some)
       }
     }
-  implicit def optionJSONW[A : JSONW]: JSONW[Option[A]] =
+  implicit def optionJSONW[A: JSONW]: JSONW[Option[A]] =
     new JSONW[Option[A]] {
       def write(value: Option[A]) =
         value.map(x => toJSON(x)).getOrElse(JNothing)
     }
 
-  implicit def mapJSONR[A : JSONR]: JSONR[Map[String, A]] =
+  implicit def mapJSONR[A: JSONR]: JSONR[Map[String, A]] =
     new JSONR[Map[String, A]] {
       def read(json: JValue) = json match {
         case JObject(fs) =>
@@ -126,10 +126,10 @@ trait Base {
           failure(UnexpectedJSONError(x, classOf[JObject])).toValidationNel
       }
     }
-  implicit def mapJSONW[A : JSONW]: JSONW[Map[String, A]] =
+  implicit def mapJSONW[A: JSONW]: JSONW[Map[String, A]] =
     new JSONW[Map[String, A]] {
       def write(values: Map[String, A]) =
         JObject(
-            values.map { case (k, v) => JField(k, toJSON(v)) }(breakOut): _*)
+          values.map { case (k, v) => JField(k, toJSON(v)) }(breakOut): _*)
     }
 }

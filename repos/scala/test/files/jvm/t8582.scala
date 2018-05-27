@@ -33,11 +33,10 @@ object Test extends BytecodeTest {
   def nprintln(s: String) = println("\n" + s)
   def printInner(cname: String): Unit = {
     val cnode = loadClassNode(cname)
-    println(
-        cnode.innerClasses.asScala.toList
-          .map(i =>
-                s"className[${i.name}] outerClassName[${i.outerName}] innerName[${i.innerName}] access[${i.access}]")
-          .mkString(" ", "\n ", ""))
+    println(cnode.innerClasses.asScala.toList
+      .map(i =>
+        s"className[${i.name}] outerClassName[${i.outerName}] innerName[${i.innerName}] access[${i.access}]")
+      .mkString(" ", "\n ", ""))
   }
 
   def show() {
@@ -59,29 +58,29 @@ object Test extends BytecodeTest {
     println(nested(classOf[A2#B2#C2]))
 
     nprintln(
-        "The InnerClass attribute of a mirror class contains the members of the module class:")
+      "The InnerClass attribute of a mirror class contains the members of the module class:")
     printInner("p1.p2.Singleton") // mirror class
     println(
-        "The module members are not in the InnerClass table of the module class (unless referenced):")
+      "The module members are not in the InnerClass table of the module class (unless referenced):")
     printInner("p1.p2.Singleton$")
 
     nprintln(
-        "An outer class has a InnerClass attribute for direct nested classes")
+      "An outer class has a InnerClass attribute for direct nested classes")
     printInner("A1")
     println(
-        "A nested class has an InnerClass attribute for itself (and also for its nested classes)")
+      "A nested class has an InnerClass attribute for itself (and also for its nested classes)")
     printInner("A1$B1")
     println(
-        "C1 is a nested class, so it has an InnerClass attribute for itself.\n" +
+      "C1 is a nested class, so it has an InnerClass attribute for itself.\n" +
         "Because that attribute leads to an entry for B1 in the constant pool, C1 needs an InnerClass attribute for B1.")
     printInner("A1$B1$C1")
 
     nprintln(
-        "The BeanInfo class has the same InnerClass attributes as the corresponding bean")
+      "The BeanInfo class has the same InnerClass attributes as the corresponding bean")
     printInner("A1$B1$C1BeanInfo")
 
     nprintln(
-        "Class A2 mentions class C2 in the constant pool (due to method  f), therefore it needs an InnerClass attribute for C1")
+      "Class A2 mentions class C2 in the constant pool (due to method  f), therefore it needs an InnerClass attribute for C1")
     printInner("A2")
     println("B2")
     printInner("A2$B2")

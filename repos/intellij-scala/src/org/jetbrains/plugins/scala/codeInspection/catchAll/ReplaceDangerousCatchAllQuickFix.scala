@@ -4,7 +4,11 @@ import com.intellij.openapi.project.Project
 import org.jetbrains.plugins.scala.ScalaBundle
 import org.jetbrains.plugins.scala.codeInsight.intention.types.AddOnlyStrategy
 import org.jetbrains.plugins.scala.codeInspection.AbstractFixOnPsiElement
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScCaseClause, ScReferencePattern, ScWildcardPattern}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScCaseClause,
+  ScReferencePattern,
+  ScWildcardPattern
+}
 
 /**
   * @author Ksenia.Sautina
@@ -12,7 +16,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScCaseClause, ScR
   */
 class ReplaceDangerousCatchAllQuickFix(caseClause: ScCaseClause)
     extends AbstractFixOnPsiElement(
-        ScalaBundle.message("specify.type.of.exception"), caseClause) {
+      ScalaBundle.message("specify.type.of.exception"),
+      caseClause) {
   def doApplyFix(project: Project) {
     val cc = getElement
     if (!cc.isValid) return
@@ -22,7 +27,7 @@ class ReplaceDangerousCatchAllQuickFix(caseClause: ScCaseClause)
 
     val strategy = AddOnlyStrategy.withoutEditor
     pattern match {
-      case p: ScWildcardPattern => strategy.addToWildcardPattern(p)
+      case p: ScWildcardPattern  => strategy.addToWildcardPattern(p)
       case p: ScReferencePattern => strategy.addToPattern(p)
       //if pattern has another type - it's a bug
     }

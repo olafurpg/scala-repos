@@ -12,7 +12,9 @@ import slick.SlickException
 /** Configure Java Beans reflectively, using Typesafe Config for data type conversions. */
 object BeanConfigurator extends Logging {
   def configure(
-      o: AnyRef, p: Properties, allowed: Set[String] = Set.empty): Unit = {
+      o: AnyRef,
+      p: Properties,
+      allowed: Set[String] = Set.empty): Unit = {
     val pds = Introspector
       .getBeanInfo(o.getClass)
       .getPropertyDescriptors
@@ -38,12 +40,12 @@ object BeanConfigurator extends Logging {
             } catch {
               case ex: Exception =>
                 throw new SlickException(
-                    s"Error setting bean property $name on target ${o.getClass}",
-                    ex)
+                  s"Error setting bean property $name on target ${o.getClass}",
+                  ex)
             }
           case None =>
             logger.warn(
-                s"Ignoring unsupported bean property $name on target ${o.getClass}")
+              s"Ignoring unsupported bean property $name on target ${o.getClass}")
         }
       }
     }

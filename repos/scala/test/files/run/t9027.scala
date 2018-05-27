@@ -3,9 +3,9 @@ object Test extends App {
   import reflect.runtime._, universe._
 
   val trees = List(
-      q"""<a/><b/>
+    q"""<a/><b/>
       println("hello, world.")""",
-      q"""<a/>
+    q"""<a/>
       <b/>
       <c/>
       println("hello, world.")"""

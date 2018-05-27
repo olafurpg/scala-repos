@@ -1,5 +1,5 @@
 trait One {
-  type Op [A]
+  type Op[A]
   type Alias = Op[Int]
 }
 

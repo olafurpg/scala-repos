@@ -1,6 +1,11 @@
 import gitbucket.core.controller._
 import gitbucket.core.plugin.PluginRegistry
-import gitbucket.core.servlet.{AccessTokenAuthenticationFilter, BasicAuthenticationFilter, Database, TransactionFilter}
+import gitbucket.core.servlet.{
+  AccessTokenAuthenticationFilter,
+  BasicAuthenticationFilter,
+  Database,
+  TransactionFilter
+}
 import gitbucket.core.util.Directory
 
 import java.util.EnumSet
@@ -15,19 +20,27 @@ class ScalatraBootstrap extends LifeCycle {
     context
       .getFilterRegistration("transactionFilter")
       .addMappingForUrlPatterns(
-          EnumSet.allOf(classOf[DispatcherType]), true, "/*")
+        EnumSet.allOf(classOf[DispatcherType]),
+        true,
+        "/*")
     context.addFilter(
-        "basicAuthenticationFilter", new BasicAuthenticationFilter)
+      "basicAuthenticationFilter",
+      new BasicAuthenticationFilter)
     context
       .getFilterRegistration("basicAuthenticationFilter")
       .addMappingForUrlPatterns(
-          EnumSet.allOf(classOf[DispatcherType]), true, "/git/*")
+        EnumSet.allOf(classOf[DispatcherType]),
+        true,
+        "/git/*")
     context.addFilter(
-        "accessTokenAuthenticationFilter", new AccessTokenAuthenticationFilter)
+      "accessTokenAuthenticationFilter",
+      new AccessTokenAuthenticationFilter)
     context
       .getFilterRegistration("accessTokenAuthenticationFilter")
       .addMappingForUrlPatterns(
-          EnumSet.allOf(classOf[DispatcherType]), true, "/api/v3/*")
+        EnumSet.allOf(classOf[DispatcherType]),
+        true,
+        "/api/v3/*")
     // Register controllers
     context.mount(new AnonymousAccessController, "/*")
 

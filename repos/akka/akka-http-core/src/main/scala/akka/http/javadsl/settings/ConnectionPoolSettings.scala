@@ -12,7 +12,7 @@ import akka.http.impl.util.JavaMapping.Implicits._
 /**
   * Public API but not intended for subclassing
   */
-abstract class ConnectionPoolSettings private[akka]() {
+abstract class ConnectionPoolSettings private[akka] () {
   self: ConnectionPoolSettingsImpl ⇒
   def getMaxConnections: Int
   def getMaxRetries: Int

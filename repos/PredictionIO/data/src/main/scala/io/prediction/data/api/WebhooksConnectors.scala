@@ -23,10 +23,10 @@ import io.prediction.data.webhooks.mailchimp.MailChimpConnector
 private[prediction] object WebhooksConnectors {
 
   val json: Map[String, JsonConnector] = Map(
-      "segmentio" -> SegmentIOConnector
+    "segmentio" -> SegmentIOConnector
   )
 
   val form: Map[String, FormConnector] = Map(
-      "mailchimp" -> MailChimpConnector
+    "mailchimp" -> MailChimpConnector
   )
 }

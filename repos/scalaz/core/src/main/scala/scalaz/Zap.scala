@@ -5,7 +5,7 @@ import Id._
 /** Functors that annihilate each other. */
 trait Zap[F[_], G[_]] { self =>
   def zapWith[A, B, C](fa: F[A], gb: G[B])(f: (A, B) => C): C
-  def zap[A, B](f: F[A => B], g: G[A]): B = zapWith(f, g)(_ (_))
+  def zap[A, B](f: F[A => B], g: G[A]): B = zapWith(f, g)(_(_))
   def flip: Zap[G, F] = new Zap[G, F] {
     def zapWith[A, B, C](ga: G[A], fb: F[B])(f: (A, B) => C): C =
       self.zapWith(fb, ga)((b, a) => f(a, b))
@@ -25,8 +25,8 @@ sealed abstract class ZapInstances {
       implicit d1: Zap[F, FF],
       d2: Zap[G, GG]): Zap[λ[α => (F[α] \/ G[α])], λ[α => (FF[α], GG[α])]] =
     new Zap[λ[α => (F[α] \/ G[α])], λ[α => (FF[α], GG[α])]] {
-      def zapWith[A, B, C](
-          a: (F[A] \/ G[A]), b: (FF[B], GG[B]))(f: (A, B) => C) =
+      def zapWith[A, B, C](a: (F[A] \/ G[A]), b: (FF[B], GG[B]))(
+          f: (A, B) => C) =
         a match {
           case -\/(fa) => d1.zapWith(fa, b._1)(f)
           case \/-(ga) => d2.zapWith(ga, b._2)(f)
@@ -48,7 +48,8 @@ sealed abstract class ZapInstances {
 
   /** A free monad and a cofree comonad annihilate each other */
   implicit def monadComonadZap[F[_], G[_]](
-      implicit d: Zap[F, G], F: Functor[F]): Zap[Free[F, ?], Cofree[G, ?]] =
+      implicit d: Zap[F, G],
+      F: Functor[F]): Zap[Free[F, ?], Cofree[G, ?]] =
     new Zap[Free[F, ?], Cofree[G, ?]] {
       def zapWith[A, B, C](ma: Free[F, A], wb: Cofree[G, B])(
           f: (A, B) => C): C =
@@ -60,7 +61,8 @@ sealed abstract class ZapInstances {
 
   /** A cofree comonad and a free monad annihilate each other */
   implicit def comonadMonadZap[F[_], G[_]](
-      implicit d: Zap[F, G], G: Functor[G]): Zap[Cofree[F, ?], Free[G, ?]] =
+      implicit d: Zap[F, G],
+      G: Functor[G]): Zap[Cofree[F, ?], Free[G, ?]] =
     new Zap[Cofree[F, ?], Free[G, ?]] {
       def zapWith[A, B, C](wa: Cofree[F, A], mb: Free[G, B])(
           f: (A, B) => C): C =

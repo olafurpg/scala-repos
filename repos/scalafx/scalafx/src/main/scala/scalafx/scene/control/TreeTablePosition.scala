@@ -79,9 +79,10 @@ class TreeTablePosition[S, T](
     * @param tableColumn   The TreeTableColumn instance that this TreeTablePosition represents.
     * @see $URL0#TreeTablePosition-javafx.scene.control.TreeTableView-int-javafx.scene.control.TreeTableColumn- $ORIGINALDOC
     */
-  def this(treeTableView: jfxsc.TreeTableView[S],
-           row: Int,
-           tableColumn: jfxsc.TreeTableColumn[S, T]) =
+  def this(
+      treeTableView: jfxsc.TreeTableView[S],
+      row: Int,
+      tableColumn: jfxsc.TreeTableColumn[S, T]) =
     this(new jfxsc.TreeTablePosition(treeTableView, row, tableColumn))
 
   /**

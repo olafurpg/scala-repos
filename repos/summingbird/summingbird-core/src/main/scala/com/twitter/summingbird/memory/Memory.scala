@@ -49,14 +49,15 @@ class Memory(implicit jobID: JobId = JobId("default.memory.jobId"))
     }
 
   private def toStream[T](
-      outerProducer: Prod[T], jamfs: JamfMap): (Stream[T], JamfMap) =
+      outerProducer: Prod[T],
+      jamfs: JamfMap): (Stream[T], JamfMap) =
     jamfs.get(outerProducer) match {
       case Some(s) => (s, jamfs)
       case None =>
         val (s, m) = outerProducer match {
-          case NamedProducer(producer, _) => toStream(producer, jamfs)
+          case NamedProducer(producer, _)      => toStream(producer, jamfs)
           case IdentityKeyedProducer(producer) => toStream(producer, jamfs)
-          case Source(source) => (source.toStream, jamfs)
+          case Source(source)                  => (source.toStream, jamfs)
           case OptionMappedProducer(producer, fn) =>
             val (s, m) = toStream(producer, jamfs)
             (s.flatMap(fn(_)), m)
@@ -111,7 +112,8 @@ class Memory(implicit jobID: JobId = JobId("default.memory.jobId"))
             val summed = s.map {
               case (k, deltaV) =>
                 val oldV = store.get(k)
-                val newV = oldV.map { semigroup.plus(_, deltaV) }
+                val newV = oldV
+                  .map { semigroup.plus(_, deltaV) }
                   .getOrElse(deltaV)
                 store.update(k, newV)
                 (k, (oldV, deltaV))

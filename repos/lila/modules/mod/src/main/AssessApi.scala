@@ -5,7 +5,16 @@ import lila.analyse.{Analysis, AnalysisRepo}
 import lila.db.BSON.BSONJodaDateTimeHandler
 import lila.db.Types.Coll
 import lila.evaluation.Statistics
-import lila.evaluation.{AccountAction, Analysed, GameAssessment, PlayerAssessment, PlayerAggregateAssessment, PlayerFlags, PlayerAssessments, Assessible}
+import lila.evaluation.{
+  AccountAction,
+  Analysed,
+  GameAssessment,
+  PlayerAssessment,
+  PlayerAggregateAssessment,
+  PlayerFlags,
+  PlayerAssessments,
+  Assessible
+}
 import lila.game.{Game, Player, GameRepo, Source, Pov}
 import lila.user.{User, UserRepo}
 
@@ -16,12 +25,13 @@ import scala.util.Random
 
 import chess.Color
 
-final class AssessApi(collAssessments: Coll,
-                      logApi: ModlogApi,
-                      modApi: ModApi,
-                      reporter: ActorSelection,
-                      fishnet: ActorSelection,
-                      userIdsSharingIp: String => Fu[List[String]]) {
+final class AssessApi(
+    collAssessments: Coll,
+    logApi: ModlogApi,
+    modApi: ModApi,
+    reporter: ActorSelection,
+    fishnet: ActorSelection,
+    userIdsSharingIp: String => Fu[List[String]]) {
 
   import PlayerFlags.playerFlagsBSONHandler
 
@@ -48,28 +58,32 @@ final class AssessApi(collAssessments: Coll,
 
   def getGameResultsById(gameId: String) =
     getResultsByGameIdAndColor(gameId, Color.White) zip getResultsByGameIdAndColor(
-        gameId, Color.Black) map { a =>
+      gameId,
+      Color.Black) map { a =>
       PlayerAssessments(a._1, a._2)
     }
 
   def getPlayerAggregateAssessment(
-      userId: String, nb: Int = 100): Fu[Option[PlayerAggregateAssessment]] = {
+      userId: String,
+      nb: Int = 100): Fu[Option[PlayerAggregateAssessment]] = {
     val relatedUsers = userIdsSharingIp(userId)
     UserRepo.byId(userId) zip getPlayerAssessmentsByUserId(userId, nb) zip relatedUsers zip
-    (relatedUsers flatMap UserRepo.filterByEngine) map {
-      case (((Some(user), assessedGamesHead :: assessedGamesTail), relatedUs),
-            relatedCheaters) =>
+      (relatedUsers flatMap UserRepo.filterByEngine) map {
+      case (
+          ((Some(user), assessedGamesHead :: assessedGamesTail), relatedUs),
+          relatedCheaters) =>
         Some(
-            PlayerAggregateAssessment(user,
-                                      assessedGamesHead :: assessedGamesTail,
-                                      relatedUs,
-                                      relatedCheaters))
+          PlayerAggregateAssessment(
+            user,
+            assessedGamesHead :: assessedGamesTail,
+            relatedUs,
+            relatedCheaters))
       case _ => none
     }
   }
 
-  def withGames(pag: PlayerAggregateAssessment)
-    : Fu[PlayerAggregateAssessment.WithGames] =
+  def withGames(
+      pag: PlayerAggregateAssessment): Fu[PlayerAggregateAssessment.WithGames] =
     GameRepo games pag.playerAssessments.map(_.gameId) map {
       PlayerAggregateAssessment.WithGames(pag, _)
     }
@@ -78,25 +92,26 @@ final class AssessApi(collAssessments: Coll,
       userId: String,
       nb: Int = 100): Fu[Option[PlayerAggregateAssessment.WithGames]] =
     getPlayerAggregateAssessment(userId, nb) flatMap {
-      case None => fuccess(none)
+      case None      => fuccess(none)
       case Some(pag) => withGames(pag).map(_.some)
     }
 
   def refreshAssessByUsername(username: String): Funit = withUser(username) {
     user =>
       (GameRepo.gamesForAssessment(user.id, 100) flatMap { gs =>
-            (gs map { g =>
-                  AnalysisRepo.byId(g.id) flatMap {
-                    case Some(a) => onAnalysisReady(g, a, false)
-                    case _ => funit
-                  }
-                }).sequenceFu.void
-          }) >> assessUser(user.id)
+        (gs map { g =>
+          AnalysisRepo.byId(g.id) flatMap {
+            case Some(a) => onAnalysisReady(g, a, false)
+            case _       => funit
+          }
+        }).sequenceFu.void
+      }) >> assessUser(user.id)
   }
 
-  def onAnalysisReady(game: Game,
-                      analysis: Analysis,
-                      thenAssessUser: Boolean = true): Funit = {
+  def onAnalysisReady(
+      game: Game,
+      analysis: Analysis,
+      thenAssessUser: Boolean = true): Funit = {
     def consistentMoveTimes(game: Game)(player: Player) =
       Statistics.consistentMoveTimes(Pov(game, player))
     val shouldAssess =
@@ -110,12 +125,12 @@ final class AssessApi(collAssessments: Coll,
     shouldAssess.?? {
       val assessible = Assessible(Analysed(game, analysis))
       createPlayerAssessment(assessible playerAssessment chess.White) >> createPlayerAssessment(
-          assessible playerAssessment chess.Black)
+        assessible playerAssessment chess.Black)
     } >>
-    ((shouldAssess && thenAssessUser) ?? {
-          game.whitePlayer.userId.??(assessUser) >> game.blackPlayer.userId
-            .??(assessUser)
-        })
+      ((shouldAssess && thenAssessUser) ?? {
+        game.whitePlayer.userId.??(assessUser) >> game.blackPlayer.userId
+          .??(assessUser)
+      })
   }
 
   def assessUser(userId: String): Funit =
@@ -135,8 +150,8 @@ final class AssessApi(collAssessments: Coll,
       case none => funit
     }
 
-  private val assessableSources: Set[Source] = Set(
-      Source.Lobby, Source.Tournament)
+  private val assessableSources: Set[Source] =
+    Set(Source.Lobby, Source.Tournament)
 
   def onGameReady(game: Game, white: User, black: User): Funit = {
 

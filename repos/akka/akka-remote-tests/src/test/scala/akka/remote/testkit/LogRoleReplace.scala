@@ -44,8 +44,9 @@ object LogRoleReplace extends ClipboardOwner {
     val replacer = new LogRoleReplace
 
     if (args.length == 0) {
-      replacer.process(new BufferedReader(new InputStreamReader(System.in)),
-                       new PrintWriter(new OutputStreamWriter(System.out)))
+      replacer.process(
+        new BufferedReader(new InputStreamReader(System.in)),
+        new PrintWriter(new OutputStreamWriter(System.out)))
     } else if (args(0) == "clipboard") {
       val clipboard = Toolkit.getDefaultToolkit.getSystemClipboard
       val contents = clipboard.getContents(null)
@@ -55,16 +56,18 @@ object LogRoleReplace extends ClipboardOwner {
           .getTransferData(DataFlavor.stringFlavor)
           .asInstanceOf[String]
         val result = new StringWriter
-        replacer.process(new BufferedReader(new StringReader(text)),
-                         new PrintWriter(result))
+        replacer.process(
+          new BufferedReader(new StringReader(text)),
+          new PrintWriter(result))
         clipboard.setContents(new StringSelection(result.toString), this)
         println("Replaced clipboard contents")
       }
     } else if (args.length == 1) {
       val inputFile = new BufferedReader(new FileReader(args(0)))
       try {
-        replacer.process(inputFile,
-                         new PrintWriter(new OutputStreamWriter(System.out)))
+        replacer.process(
+          inputFile,
+          new PrintWriter(new OutputStreamWriter(System.out)))
       } finally {
         inputFile.close()
       }

@@ -29,8 +29,9 @@ object PartitionUtil {
     Dsl.strFields((start until end).map(_.toString))
 
   /** A tuple converter that splits a cascading tuple into a pair of types.*/
-  def converter[P, T, U >: (P, T)](valueConverter: TupleConverter[T],
-                                   partitionConverter: TupleConverter[P]) = {
+  def converter[P, T, U >: (P, T)](
+      valueConverter: TupleConverter[T],
+      partitionConverter: TupleConverter[P]) = {
     TupleConverter.asSuperConverter[(P, T), U](new TupleConverter[(P, T)] {
       val arity = valueConverter.arity + partitionConverter.arity
 
@@ -41,7 +42,7 @@ object PartitionUtil {
         (0 until valueConverter.arity)
           .foreach(idx => value.set(idx, te.getObject(idx)))
         (0 until partitionConverter.arity).foreach(idx =>
-              partition.set(idx, te.getObject(idx + valueConverter.arity)))
+          partition.set(idx, te.getObject(idx + valueConverter.arity)))
 
         val valueTE = new TupleEntry(toFields(0, valueConverter.arity), value)
         val partitionTE =
@@ -66,8 +67,8 @@ object PartitionUtil {
 
         (0 until value.size)
           .foreach(idx => output.set(idx, value.getObject(idx)))
-        (0 until partition.size).foreach(
-            idx => output.set(idx + value.size, partition.getObject(idx)))
+        (0 until partition.size).foreach(idx =>
+          output.set(idx + value.size, partition.getObject(idx)))
 
         output
       }

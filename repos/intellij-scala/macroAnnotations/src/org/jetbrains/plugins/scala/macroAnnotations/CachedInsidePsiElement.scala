@@ -16,7 +16,8 @@ import scala.reflect.macros.whitebox
   */
 class CachedInsidePsiElement(psiElement: Any, dependencyItem: Object)
     extends StaticAnnotation {
-  def macroTransform(annottees: Any*) = macro CachedInsidePsiElement.cachedInsidePsiElementImpl
+  def macroTransform(annottees: Any*) =
+    macro CachedInsidePsiElement.cachedInsidePsiElementImpl
 }
 
 object CachedInsidePsiElement {
@@ -64,8 +65,8 @@ object CachedInsidePsiElement {
           ..$analyzeCachesEnterCacheArea
           $cachesUtilFQN.get($elem, $key, new $cachesUtilFQN.$provider[Any, $retTp]($elem, _ => $cachedFunName())($dependencyItem))
           """
-        val updatedDef = DefDef(
-            mods, name, tpParams, paramss, retTp, updatedRhs)
+        val updatedDef =
+          DefDef(mods, name, tpParams, paramss, retTp, updatedRhs)
         val res = q"""
           private val $key = $cachesUtilFQN.getOrCreateKey[$keyTypeFQN[$cachedValueTypeFQN[$retTp]]]($keyId)
           ${if (analyzeCaches)

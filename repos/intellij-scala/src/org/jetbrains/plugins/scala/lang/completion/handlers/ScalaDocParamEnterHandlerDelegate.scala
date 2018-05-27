@@ -17,7 +17,9 @@ import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.ScDocTag
   */
 class ScalaDocParamEnterHandlerDelegate extends EnterHandlerDelegateAdapter {
   override def postProcessEnter(
-      file: PsiFile, editor: Editor, dataContext: DataContext): Result = {
+      file: PsiFile,
+      editor: Editor,
+      dataContext: DataContext): Result = {
     if (!file.isInstanceOf[ScalaFile]) {
       return Result.Continue
     }
@@ -59,15 +61,15 @@ class ScalaDocParamEnterHandlerDelegate extends EnterHandlerDelegateAdapter {
     val startOffset = tagParent.getNameElement.getTextRange.getStartOffset
     val endOffset =
       probData.getTextRange.getStartOffset +
-      (Option(nextProbData).map(_.getElementType) match {
-            case Some(ScalaDocTokenType.DOC_COMMENT_DATA) =>
-              probData.getTextLength
-            case Some(ScalaDocTokenType.DOC_COMMENT_LEADING_ASTERISKS) => 1
-            case _ => 0
-          })
+        (Option(nextProbData).map(_.getElementType) match {
+          case Some(ScalaDocTokenType.DOC_COMMENT_DATA) =>
+            probData.getTextLength
+          case Some(ScalaDocTokenType.DOC_COMMENT_LEADING_ASTERISKS) => 1
+          case _                                                     => 0
+        })
 
     if (document.getLineNumber(caretOffset) - 1 == document.getLineNumber(
-            tagParent.getNameElement.getTextOffset)) {
+          tagParent.getNameElement.getTextOffset)) {
       val toInsert = StringUtil.repeat(" ", endOffset - startOffset)
       extensions.inWriteAction {
         document.insertString(caretOffset, toInsert)

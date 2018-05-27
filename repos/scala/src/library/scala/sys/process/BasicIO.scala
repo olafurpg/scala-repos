@@ -11,7 +11,12 @@ package sys
 package process
 
 import processInternal._
-import java.io.{BufferedReader, InputStreamReader, FilterInputStream, FilterOutputStream}
+import java.io.{
+  BufferedReader,
+  InputStreamReader,
+  FilterInputStream,
+  FilterOutputStream
+}
 import java.util.concurrent.LinkedBlockingQueue
 import scala.collection.immutable.Stream
 import scala.annotation.tailrec
@@ -53,7 +58,9 @@ object BasicIO {
         case Right(s) => Stream.cons(s, next())
       }
       new Streamed(
-          (s: T) => q put Right(s), code => q put Left(code), () => next())
+        (s: T) => q put Right(s),
+        code => q put Left(code),
+        () => next())
     }
   }
 
@@ -89,7 +96,9 @@ object BasicIO {
     * @return A `ProcessIO` with the characteristics above.
     */
   def apply(
-      withIn: Boolean, output: String => Unit, log: Option[ProcessLogger]) =
+      withIn: Boolean,
+      output: String => Unit,
+      log: Option[ProcessLogger]) =
     new ProcessIO(input(withIn), processFully(output), getErr(log))
 
   /** Creates a `ProcessIO` that appends its output to a `StringBuffer`. It can
@@ -112,8 +121,7 @@ object BasicIO {
     *               sent. If `None`, output will be sent to stderr.
     * @return A `ProcessIO` with the characteristics above.
     */
-  def apply(
-      withIn: Boolean, buffer: StringBuffer, log: Option[ProcessLogger]) =
+  def apply(withIn: Boolean, buffer: StringBuffer, log: Option[ProcessLogger]) =
     new ProcessIO(input(withIn), processFully(buffer), getErr(log))
 
   /** Creates a `ProcessIO` from a `ProcessLogger` . It can attach the
@@ -139,14 +147,16 @@ object BasicIO {
     */
   def getErr(log: Option[ProcessLogger]) = log match {
     case Some(lg) => processErrFully(lg)
-    case None => toStdErr
+    case None     => toStdErr
   }
 
   private def processErrFully(log: ProcessLogger) = processFully(log err _)
   private def processOutFully(log: ProcessLogger) = processFully(log out _)
 
   /** Closes a `Closeable` without throwing an exception */
-  def close(c: Closeable) = try c.close() catch { case _: IOException => () }
+  def close(c: Closeable) =
+    try c.close()
+    catch { case _: IOException => () }
 
   /** Returns a function `InputStream => Unit` that appends all data read to the
     * provided `Appendable`. This function can be used to create a
@@ -172,11 +182,11 @@ object BasicIO {
     *          with all data read from the stream.
     */
   def processFully(processLine: String => Unit): InputStream => Unit =
-    in =>
-      {
-        val reader = new BufferedReader(new InputStreamReader(in))
-        try processLinesFully(processLine)(reader.readLine) finally reader
-          .close()
+    in => {
+      val reader = new BufferedReader(new InputStreamReader(in))
+      try processLinesFully(processLine)(reader.readLine)
+      finally reader
+        .close()
     }
 
   /** Calls `processLine` with the result of `readLine` until the latter returns
@@ -187,8 +197,9 @@ object BasicIO {
     def halting = { Thread.currentThread.interrupt(); null }
     def readFully(): Unit =
       if (working) {
-        val line = try readLine() catch {
-          case _: InterruptedException => halting
+        val line = try readLine()
+        catch {
+          case _: InterruptedException    => halting
           case e: IOException if !working => halting
         }
         if (line != null) {
@@ -234,13 +245,13 @@ object BasicIO {
     * input stream once it's all read.
     */
   def transferFully(in: InputStream, out: OutputStream): Unit =
-    try transferFullyImpl(in, out) catch onIOInterrupt(())
+    try transferFullyImpl(in, out)
+    catch onIOInterrupt(())
 
   private[this] def appendLine(buffer: Appendable): String => Unit =
-    line =>
-      {
-        buffer append line
-        buffer append Newline
+    line => {
+      buffer append line
+      buffer append Newline
     }
 
   private[this] def transferFullyImpl(in: InputStream, out: OutputStream) {

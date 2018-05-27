@@ -18,12 +18,11 @@ trait SchemeDirectives {
     */
   def scheme(name: String): Directive0 =
     extractScheme.require(_ == name, SchemeRejection(name)) & cancelRejections(
-        classOf[SchemeRejection])
+      classOf[SchemeRejection])
 }
 
 object SchemeDirectives extends SchemeDirectives {
   import BasicDirectives._
 
-  private val _extractScheme: Directive1[String] = extract(
-      _.request.uri.scheme)
+  private val _extractScheme: Directive1[String] = extract(_.request.uri.scheme)
 }

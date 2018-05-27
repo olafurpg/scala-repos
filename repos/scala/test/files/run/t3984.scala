@@ -9,8 +9,7 @@ object SetBug {
   def run() {
     var is = ImmutSet.empty[IH]
     var ms = MutSet.empty[IH]
-    for (ih <- List(
-        IH(2, 0), IH(0, 0), IH(4, 4), IH(6, 4), IH(-8, 1520786080))) {
+    for (ih <- List(IH(2, 0), IH(0, 0), IH(4, 4), IH(6, 4), IH(-8, 1520786080))) {
       is = is + ih
       ms = ms + ih
     }
@@ -33,8 +32,7 @@ object MapBug {
   def run() {
     var im = ImmutMap.empty[IH, IH]
     var mm = MutMap.empty[IH, IH]
-    for (ih <- List(
-        IH(2, 0), IH(0, 0), IH(4, 4), IH(6, 4), IH(-8, 1520786080))) {
+    for (ih <- List(IH(2, 0), IH(0, 0), IH(4, 4), IH(6, 4), IH(-8, 1520786080))) {
       im = im + ((ih, ih))
       mm = mm + ((ih, ih))
     }

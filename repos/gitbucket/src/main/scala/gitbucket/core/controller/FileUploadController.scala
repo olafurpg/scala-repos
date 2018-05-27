@@ -15,28 +15,36 @@ import org.apache.commons.io.FileUtils
 class FileUploadController extends ScalatraServlet with FileUploadSupport {
 
   configureMultipartHandling(
-      MultipartConfig(maxFileSize = Some(3 * 1024 * 1024)))
+    MultipartConfig(maxFileSize = Some(3 * 1024 * 1024)))
 
   post("/image") {
-    execute({ (file, fileId) =>
-      FileUtils.writeByteArrayToFile(
-          new java.io.File(getTemporaryDir(session.getId), fileId), file.get)
-      session += Keys.Session.Upload(fileId) -> file.name
-    }, FileUtil.isImage)
+    execute(
+      { (file, fileId) =>
+        FileUtils.writeByteArrayToFile(
+          new java.io.File(getTemporaryDir(session.getId), fileId),
+          file.get)
+        session += Keys.Session.Upload(fileId) -> file.name
+      },
+      FileUtil.isImage
+    )
   }
 
   post("/file/:owner/:repository") {
-    execute({ (file, fileId) =>
-      FileUtils.writeByteArrayToFile(
-          new java.io.File(getAttachedDir(params("owner"),
-                                          params("repository")),
-                           fileId + "." + FileUtil.getExtension(file.getName)),
+    execute(
+      { (file, fileId) =>
+        FileUtils.writeByteArrayToFile(
+          new java.io.File(
+            getAttachedDir(params("owner"), params("repository")),
+            fileId + "." + FileUtil.getExtension(file.getName)),
           file.get)
-    }, FileUtil.isUploadableType)
+      },
+      FileUtil.isUploadableType
+    )
   }
 
   private def execute(
-      f: (FileItem, String) => Unit, mimeTypeChcker: (String) => Boolean) =
+      f: (FileItem, String) => Unit,
+      mimeTypeChcker: (String) => Boolean) =
     fileParams.get("file") match {
       case Some(file) if (mimeTypeChcker(file.name)) =>
         defining(FileUtil.generateFileId) { fileId =>

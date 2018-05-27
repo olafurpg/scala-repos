@@ -4,8 +4,16 @@ package codeInspection.booleans
 import com.intellij.codeInspection.{ProblemHighlightType, ProblemsHolder}
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
-import org.jetbrains.plugins.scala.codeInspection.{AbstractFixOnPsiElement, AbstractInspection}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScInfixExpr, ScParenthesisedExpr, ScPrefixExpr}
+import org.jetbrains.plugins.scala.codeInspection.{
+  AbstractFixOnPsiElement,
+  AbstractInspection
+}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression,
+  ScInfixExpr,
+  ScParenthesisedExpr,
+  ScPrefixExpr
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
 import scala.annotation.tailrec
@@ -19,10 +27,11 @@ class DoubleNegationInspection
     extends AbstractInspection("DoubleNegation", "Double negation") {
   def actionFor(holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
     case expr: ScExpression if DoubleNegationUtil.hasDoubleNegation(expr) =>
-      holder.registerProblem(expr,
-                             "Double negation",
-                             ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
-                             new DoubleNegationQuickFix(expr))
+      holder.registerProblem(
+        expr,
+        "Double negation",
+        ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
+        new DoubleNegationQuickFix(expr))
     case _ =>
   }
 }
@@ -65,11 +74,11 @@ object DoubleNegationUtil {
         val hasNegInfix = hasNegation(infix)
         val builder = new mutable.StringBuilder()
         builder.append(
-            if (hasNegLeft) invertedNegationText(left) else left.getText)
+          if (hasNegLeft) invertedNegationText(left) else left.getText)
         builder.append(
-            if (hasNegLeft && hasNegInfix && hasNegRight) " != " else " == ")
+          if (hasNegLeft && hasNegInfix && hasNegRight) " != " else " == ")
         builder.append(
-            if (hasNegRight) invertedNegationText(right) else right.getText)
+          if (hasNegRight) invertedNegationText(right) else right.getText)
         builder.toString()
     }
     ScalaPsiElementFactory.createExpressionFromText(text, expr.getManager)
@@ -78,15 +87,15 @@ object DoubleNegationUtil {
   @tailrec
   private def stripParentheses(expr: ScExpression): ScExpression = expr match {
     case ScParenthesisedExpr(inner) => stripParentheses(inner)
-    case expr: ScExpression => expr
+    case expr: ScExpression         => expr
   }
 
   private def hasNegation(expr: ScExpression): Boolean = {
     val withoutParentheses = stripParentheses(expr)
     withoutParentheses match {
-      case ScPrefixExpr(operation, _) => operation.refName == "!"
+      case ScPrefixExpr(operation, _)   => operation.refName == "!"
       case ScInfixExpr(_, operation, _) => operation.refName == "!="
-      case _ => false
+      case _                            => false
     }
   }
 
@@ -94,7 +103,7 @@ object DoubleNegationUtil {
     require(hasNegation(expr))
     val withoutParentheses = stripParentheses(expr)
     withoutParentheses match {
-      case ScPrefixExpr(_, operand) => operand.getText
+      case ScPrefixExpr(_, operand)    => operand.getText
       case ScInfixExpr(left, _, right) => left.getText + "==" + right.getText
     }
   }

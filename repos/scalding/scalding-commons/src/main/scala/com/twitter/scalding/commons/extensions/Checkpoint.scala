@@ -96,10 +96,11 @@ object Checkpoint {
       case Some(name) if hasInput(checkpointName, name) =>
         // We have checkpoint input; read the file instead of executing the flow.
         LOG.info(
-            s"""Checkpoint "${checkpointName}": reading ${format} input from "${name}"""")
+          s"""Checkpoint "${checkpointName}": reading ${format} input from "${name}"""")
         getSource(format, name).read
-          .mapTo(List.range(0, resultFields.size) -> resultFields)(
-            (x: A) => x)(conv, setter)
+          .mapTo(List.range(0, resultFields.size) -> resultFields)((x: A) => x)(
+            conv,
+            setter)
       // We don't have checkpoint input; execute the flow and project to the
       // requested fields.
       case Some(name) =>
@@ -107,7 +108,7 @@ object Checkpoint {
 
         // Write the checkpoint output.
         LOG.info(
-            s"""Checkpoint "${checkpointName}": writing ${format} output to "${name}"""")
+          s"""Checkpoint "${checkpointName}": writing ${format} output to "${name}"""")
         pipe.write(getSource(format, name))
       case None =>
         flow.project(resultFields)
@@ -148,7 +149,8 @@ object Checkpoint {
   // Returns the filename to use for the given checkpoint, or None if this
   // checkpoint is disabled.
   private def getFilename(checkpointName: String)(
-      implicit args: Args, mode: Mode): Option[String] = {
+      implicit args: Args,
+      mode: Mode): Option[String] = {
     val fileArg = CheckpointArg(checkpointName, "file")
     if (fileArg.overrideValue.isDefined) {
       // The flag "--checkpoint.file.<name>=<filename>" is present; use its
@@ -165,11 +167,11 @@ object Checkpoint {
 
   // Returns a format for the checkpoint.  The format of the source is
   // determined by the flag --checkpoint.format, and defaults to SequenceFile.
-  private def getFormat(checkpointName: String)(
-      implicit args: Args, mode: Mode): String = {
+  private def getFormat(
+      checkpointName: String)(implicit args: Args, mode: Mode): String = {
     val defaultFormat = mode match {
       case Hdfs(_, _) | HadoopTest(_, _) => "sequencefile"
-      case _ => "tsv"
+      case _                             => "tsv"
     }
     CheckpointArg(checkpointName, "format").value
       .getOrElse(defaultFormat)
@@ -181,14 +183,15 @@ object Checkpoint {
       implicit mode: Mode): Source = {
     format match {
       case "sequencefile" => SequenceFile(filename)
-      case "tsv" => Tsv(filename)
-      case _ => sys.error("Invalid value for --checkpoint.format: " + format)
+      case "tsv"          => Tsv(filename)
+      case _              => sys.error("Invalid value for --checkpoint.format: " + format)
     }
   }
 
   // Returns true if the given checkpoint file exists and should be read.
   private def hasInput(checkpointName: String, filename: String)(
-      implicit args: Args, mode: Mode): Boolean = {
+      implicit args: Args,
+      mode: Mode): Boolean = {
     !CheckpointArg(checkpointName, "clobber").isTrue &&
     mode.fileExists(filename)
   }

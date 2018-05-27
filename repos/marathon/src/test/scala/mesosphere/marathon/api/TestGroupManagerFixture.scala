@@ -23,28 +23,28 @@ class TestGroupManagerFixture extends Mockito with MarathonActorSupport {
 
   val metricRegistry = new MetricRegistry()
   val metrics = new Metrics(metricRegistry)
-  val capMetrics = new CapConcurrentExecutionsMetrics(
-      metrics, classOf[GroupManager])
+  val capMetrics =
+    new CapConcurrentExecutionsMetrics(metrics, classOf[GroupManager])
 
   val actorId = new AtomicInteger(0)
   def serializeExecutions() = CapConcurrentExecutions(
-      capMetrics,
-      system,
-      s"serializeGroupUpdates${actorId.incrementAndGet()}",
-      maxParallel = 1,
-      maxQueued = 10
+    capMetrics,
+    system,
+    s"serializeGroupUpdates${actorId.incrementAndGet()}",
+    maxParallel = 1,
+    maxQueued = 10
   )
 
   config.zkTimeoutDuration returns 1.seconds
   groupRepository.zkRootName returns GroupRepository.zkRootName
 
   val groupManager = new GroupManager(
-      serializeUpdates = serializeExecutions(),
-      scheduler = service,
-      groupRepo = groupRepository,
-      appRepo = appRepository,
-      storage = provider,
-      config = config,
-      eventBus = eventBus
+    serializeUpdates = serializeExecutions(),
+    scheduler = service,
+    groupRepo = groupRepository,
+    appRepo = appRepository,
+    storage = provider,
+    config = config,
+    eventBus = eventBus
   )
 }

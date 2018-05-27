@@ -45,8 +45,7 @@ object Builder {
       def apply(p1: T) = f(p1)
     }
 
-  implicit def functionToGoogleCacheLoader[T, R](
-      f: T => R): CacheLoader[T, R] =
+  implicit def functionToGoogleCacheLoader[T, R](f: T => R): CacheLoader[T, R] =
     new CacheLoader[T, R] {
       def load(p1: T) = f(p1)
     }

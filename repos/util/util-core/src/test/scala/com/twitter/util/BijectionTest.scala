@@ -16,7 +16,7 @@ class BijectionTest extends WordSpec {
 
   def isAFoo(i: Int) = i match {
     case fooject(f) => "a foo! " + f.toString
-    case _ => "not a foo"
+    case _          => "not a foo"
   }
 
   "Bijection" should {

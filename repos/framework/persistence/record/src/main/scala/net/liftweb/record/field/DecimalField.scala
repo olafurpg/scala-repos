@@ -74,8 +74,11 @@ trait DecimalTypedField extends NumericTypedField[BigDecimal] {
   * @param scale Controls the scale of the underlying BigDecimal
   */
 class DecimalField[OwnerType <: Record[OwnerType]](
-    rec: OwnerType, val context: MathContext, val scale: Int)
-    extends Field[BigDecimal, OwnerType] with MandatoryTypedField[BigDecimal]
+    rec: OwnerType,
+    val context: MathContext,
+    val scale: Int)
+    extends Field[BigDecimal, OwnerType]
+    with MandatoryTypedField[BigDecimal]
     with DecimalTypedField {
 
   /**
@@ -128,8 +131,11 @@ class DecimalField[OwnerType <: Record[OwnerType]](
   * @param scale Controls the scale of the underlying BigDecimal
   */
 class OptionalDecimalField[OwnerType <: Record[OwnerType]](
-    rec: OwnerType, val context: MathContext, val scale: Int)
-    extends Field[BigDecimal, OwnerType] with OptionalTypedField[BigDecimal]
+    rec: OwnerType,
+    val context: MathContext,
+    val scale: Int)
+    extends Field[BigDecimal, OwnerType]
+    with OptionalTypedField[BigDecimal]
     with DecimalTypedField {
 
   /**
@@ -155,10 +161,11 @@ class OptionalDecimalField[OwnerType <: Record[OwnerType]](
     * @param scale the scale of the decimal field, since there might be no value
     * @param context The MathContext that controls precision and rounding
     */
-  def this(rec: OwnerType,
-           value: Box[BigDecimal],
-           scale: Int,
-           context: MathContext) = {
+  def this(
+      rec: OwnerType,
+      value: Box[BigDecimal],
+      scale: Int,
+      context: MathContext) = {
     this(rec, context, scale)
     setBox(value)
   }

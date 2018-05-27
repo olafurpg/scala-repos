@@ -26,7 +26,9 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.util.StatCounter
 
 class PartitioningSuite
-    extends SparkFunSuite with SharedSparkContext with PrivateMethodTester {
+    extends SparkFunSuite
+    with SharedSparkContext
+    with PrivateMethodTester {
 
   test("HashPartitioner equality") {
     val p2 = new HashPartitioner(2)
@@ -125,17 +127,19 @@ class PartitioningSuite
   }
 
   test("RangePartitioner.determineBounds") {
-    assert(RangePartitioner
-             .determineBounds(ArrayBuffer.empty[(Int, Float)], 10)
-             .isEmpty,
-           "Bounds on an empty candidates set should be empty.")
-    val candidates = ArrayBuffer((0.7, 2.0f),
-                                 (0.1, 1.0f),
-                                 (0.4, 1.0f),
-                                 (0.3, 1.0f),
-                                 (0.2, 1.0f),
-                                 (0.5, 1.0f),
-                                 (1.0, 3.0f))
+    assert(
+      RangePartitioner
+        .determineBounds(ArrayBuffer.empty[(Int, Float)], 10)
+        .isEmpty,
+      "Bounds on an empty candidates set should be empty.")
+    val candidates = ArrayBuffer(
+      (0.7, 2.0f),
+      (0.1, 1.0f),
+      (0.4, 1.0f),
+      (0.3, 1.0f),
+      (0.2, 1.0f),
+      (0.5, 1.0f),
+      (1.0, 3.0f))
     assert(RangePartitioner.determineBounds(candidates, 3) === Array(0.4, 0.7))
   }
 
@@ -221,26 +225,26 @@ class PartitioningSuite
 
     assert(grouped2.join(grouped4).partitioner === grouped4.partitioner)
     assert(
-        grouped2.leftOuterJoin(grouped4).partitioner === grouped4.partitioner)
+      grouped2.leftOuterJoin(grouped4).partitioner === grouped4.partitioner)
     assert(
-        grouped2.rightOuterJoin(grouped4).partitioner === grouped4.partitioner)
+      grouped2.rightOuterJoin(grouped4).partitioner === grouped4.partitioner)
     assert(
-        grouped2.fullOuterJoin(grouped4).partitioner === grouped4.partitioner)
+      grouped2.fullOuterJoin(grouped4).partitioner === grouped4.partitioner)
     assert(grouped2.cogroup(grouped4).partitioner === grouped4.partitioner)
 
     assert(grouped2.join(reduced2).partitioner === grouped2.partitioner)
     assert(
-        grouped2.leftOuterJoin(reduced2).partitioner === grouped2.partitioner)
+      grouped2.leftOuterJoin(reduced2).partitioner === grouped2.partitioner)
     assert(
-        grouped2.rightOuterJoin(reduced2).partitioner === grouped2.partitioner)
+      grouped2.rightOuterJoin(reduced2).partitioner === grouped2.partitioner)
     assert(
-        grouped2.fullOuterJoin(reduced2).partitioner === grouped2.partitioner)
+      grouped2.fullOuterJoin(reduced2).partitioner === grouped2.partitioner)
     assert(grouped2.cogroup(reduced2).partitioner === grouped2.partitioner)
 
     assert(grouped2.map(_ => 1).partitioner === None)
     assert(grouped2.mapValues(_ => 1).partitioner === grouped2.partitioner)
     assert(
-        grouped2.flatMapValues(_ => Seq(1)).partitioner === grouped2.partitioner)
+      grouped2.flatMapValues(_ => Seq(1)).partitioner === grouped2.partitioner)
     assert(grouped2.filter(_._1 > 4).partitioner === grouped2.partitioner)
   }
 

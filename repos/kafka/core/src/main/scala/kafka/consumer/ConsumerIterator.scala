@@ -34,7 +34,8 @@ class ConsumerIterator[K, V](
     private val keyDecoder: Decoder[K],
     private val valueDecoder: Decoder[V],
     val clientId: String)
-    extends IteratorTemplate[MessageAndMetadata[K, V]] with Logging {
+    extends IteratorTemplate[MessageAndMetadata[K, V]]
+    with Logging {
 
   private val current: AtomicReference[Iterator[MessageAndOffset]] =
     new AtomicReference(null)
@@ -47,8 +48,8 @@ class ConsumerIterator[K, V](
     val item = super.next()
     if (consumedOffset < 0)
       throw new KafkaException(
-          "Offset returned by the message set is invalid %d".format(
-              consumedOffset))
+        "Offset returned by the message set is invalid %d".format(
+          consumedOffset))
     currentTopicInfo.resetConsumeOffset(consumedOffset)
     val topic = currentTopicInfo.topic
     trace("Setting %s consumed offset to %d".format(topic, consumedOffset))
@@ -64,8 +65,8 @@ class ConsumerIterator[K, V](
     if (localCurrent == null || !localCurrent.hasNext) {
       if (consumerTimeoutMs < 0) currentDataChunk = channel.take
       else {
-        currentDataChunk = channel.poll(
-            consumerTimeoutMs, TimeUnit.MILLISECONDS)
+        currentDataChunk =
+          channel.poll(consumerTimeoutMs, TimeUnit.MILLISECONDS)
         if (currentDataChunk == null) {
           // reset state to make the iterator re-iterable
           resetState()
@@ -81,8 +82,8 @@ class ConsumerIterator[K, V](
         val ctiConsumeOffset = currentTopicInfo.getConsumeOffset
         if (ctiConsumeOffset < cdcFetchOffset) {
           error(
-              "consumed offset: %d doesn't match fetch offset: %d for %s;\n Consumer may lose data"
-                .format(ctiConsumeOffset, cdcFetchOffset, currentTopicInfo))
+            "consumed offset: %d doesn't match fetch offset: %d for %s;\n Consumer may lose data"
+              .format(ctiConsumeOffset, cdcFetchOffset, currentTopicInfo))
           currentTopicInfo.resetConsumeOffset(cdcFetchOffset)
         }
         localCurrent = currentDataChunk.messages.iterator
@@ -92,30 +93,34 @@ class ConsumerIterator[K, V](
       // if we just updated the current chunk and it is empty that means the fetch size is too small!
       if (currentDataChunk.messages.validBytes == 0)
         throw new MessageSizeTooLargeException(
-            "Found a message larger than the maximum fetch size of this consumer on topic " +
+          "Found a message larger than the maximum fetch size of this consumer on topic " +
             "%s partition %d at fetch offset %d. Increase the fetch size, or decrease the maximum message size the broker will allow."
-              .format(currentDataChunk.topicInfo.topic,
-                      currentDataChunk.topicInfo.partitionId,
-                      currentDataChunk.fetchOffset))
+              .format(
+                currentDataChunk.topicInfo.topic,
+                currentDataChunk.topicInfo.partitionId,
+                currentDataChunk.fetchOffset))
     }
     var item = localCurrent.next()
     // reject the messages that have already been consumed
     while (item.offset < currentTopicInfo.getConsumeOffset &&
-    localCurrent.hasNext) {
+           localCurrent.hasNext) {
       item = localCurrent.next()
     }
     consumedOffset = item.nextOffset
 
-    item.message.ensureValid() // validate checksum of message to ensure it is valid
+    item.message
+      .ensureValid() // validate checksum of message to ensure it is valid
 
-    new MessageAndMetadata(currentTopicInfo.topic,
-                           currentTopicInfo.partitionId,
-                           item.message,
-                           item.offset,
-                           item.message.timestamp,
-                           item.message.timestampType,
-                           keyDecoder,
-                           valueDecoder)
+    new MessageAndMetadata(
+      currentTopicInfo.topic,
+      currentTopicInfo.partitionId,
+      item.message,
+      item.offset,
+      item.message.timestamp,
+      item.message.timestampType,
+      keyDecoder,
+      valueDecoder
+    )
   }
 
   def clearCurrentChunk() {

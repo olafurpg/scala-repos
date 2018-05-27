@@ -36,7 +36,8 @@ private[stream] object OutputStreamSourceStage {
 final private[stream] class OutputStreamSourceStage(
     writeTimeout: FiniteDuration)
     extends GraphStageWithMaterializedValue[
-        SourceShape[ByteString], OutputStream] {
+      SourceShape[ByteString],
+      OutputStream] {
   val out = Outlet[ByteString]("OutputStreamSource.out")
   override def initialAttributes = DefaultAttributes.outputStreamSource
   override val shape: SourceShape[ByteString] = SourceShape.of(out)
@@ -61,9 +62,9 @@ final private[stream] class OutputStreamSourceStage(
           case Failure(ex) ⇒ failStage(ex)
         }
 
-      private val upstreamCallback: AsyncCallback[
-          (AdapterToStageMessage, Promise[Unit])] = getAsyncCallback(
-          onAsyncMessage)
+      private val upstreamCallback
+        : AsyncCallback[(AdapterToStageMessage, Promise[Unit])] =
+        getAsyncCallback(onAsyncMessage)
 
       override def wakeUp(msg: AdapterToStageMessage): Future[Unit] = {
         val p = Promise[Unit]()
@@ -112,24 +113,31 @@ final private[stream] class OutputStreamSourceStage(
           sendResponseIfNeed()
         }
 
-      setHandler(out, new OutHandler {
-        override def onDownstreamFinish(): Unit = {
-          //assuming there can be no further in messages
-          downstreamStatus.set(Canceled)
-          dataQueue.clear()
-          // if blocked reading, make sure the take() completes
-          dataQueue.put(ByteString())
-          completeStage()
+      setHandler(
+        out,
+        new OutHandler {
+          override def onDownstreamFinish(): Unit = {
+            //assuming there can be no further in messages
+            downstreamStatus.set(Canceled)
+            dataQueue.clear()
+            // if blocked reading, make sure the take() completes
+            dataQueue.put(ByteString())
+            completeStage()
+          }
+          override def onPull(): Unit = {
+            implicit val ex = interpreter.materializer.executionContext
+            Future(dataQueue.take()).onComplete(downstreamCallback.invoke)
+          }
         }
-        override def onPull(): Unit = {
-          implicit val ex = interpreter.materializer.executionContext
-          Future(dataQueue.take()).onComplete(downstreamCallback.invoke)
-        }
-      })
+      )
     }
-    (logic,
-     new OutputStreamAdapter(
-         dataQueue, downstreamStatus, logic.wakeUp, writeTimeout))
+    (
+      logic,
+      new OutputStreamAdapter(
+        dataQueue,
+        downstreamStatus,
+        logic.wakeUp,
+        writeTimeout))
   }
 }
 
@@ -143,7 +151,7 @@ private[akka] class OutputStreamAdapter(
   var isActive = true
   var isPublisherAlive = true
   val publisherClosedException = new IOException(
-      "Reactive stream is terminated, no writes are possible")
+    "Reactive stream is terminated, no writes are possible")
 
   @scala.throws(classOf[IOException])
   private[this] def send(sendAction: () ⇒ Unit): Unit = {
@@ -155,24 +163,22 @@ private[akka] class OutputStreamAdapter(
 
   @scala.throws(classOf[IOException])
   private[this] def sendData(data: ByteString): Unit =
-    send(
-        () ⇒
-          {
-        try {
-          dataQueue.put(data)
-        } catch { case NonFatal(ex) ⇒ throw new IOException(ex) }
-        if (downstreamStatus.get() == Canceled) {
-          isPublisherAlive = false
-          throw publisherClosedException
-        }
+    send(() ⇒ {
+      try {
+        dataQueue.put(data)
+      } catch { case NonFatal(ex) ⇒ throw new IOException(ex) }
+      if (downstreamStatus.get() == Canceled) {
+        isPublisherAlive = false
+        throw publisherClosedException
+      }
     })
 
   @scala.throws(classOf[IOException])
   private[this] def sendMessage(
-      message: AdapterToStageMessage, handleCancelled: Boolean = true) =
-    send(
-        () ⇒
-          try {
+      message: AdapterToStageMessage,
+      handleCancelled: Boolean = true) =
+    send(() ⇒
+      try {
         Await.ready(sendToStage(message), writeTimeout)
         if (downstreamStatus.get() == Canceled && handleCancelled) {
           //Publisher considered to be terminated at earliest convenience to minimize messages sending back and forth

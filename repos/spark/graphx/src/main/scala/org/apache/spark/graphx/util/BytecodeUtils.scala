@@ -36,15 +36,16 @@ private[graphx] object BytecodeUtils {
   /**
     * Test whether the given closure invokes the specified method in the specified class.
     */
-  def invokedMethod(closure: AnyRef,
-                    targetClass: Class[_],
-                    targetMethod: String): Boolean = {
+  def invokedMethod(
+      closure: AnyRef,
+      targetClass: Class[_],
+      targetMethod: String): Boolean = {
     if (_invokedMethod(closure.getClass, "apply", targetClass, targetMethod)) {
       true
     } else {
       // look at closures enclosed in this closure
       for (f <- closure.getClass.getDeclaredFields
-                   if f.getType.getName.startsWith("scala.Function")) {
+           if f.getType.getName.startsWith("scala.Function")) {
         f.setAccessible(true)
         if (invokedMethod(f.get(closure), targetClass, targetMethod)) {
           return true
@@ -54,10 +55,11 @@ private[graphx] object BytecodeUtils {
     }
   }
 
-  private def _invokedMethod(cls: Class[_],
-                             method: String,
-                             targetClass: Class[_],
-                             targetMethod: String): Boolean = {
+  private def _invokedMethod(
+      cls: Class[_],
+      method: String,
+      targetClass: Class[_],
+      targetMethod: String): Boolean = {
 
     val seen = new HashSet[(Class[_], String)]
     var stack = List[(Class[_], String)]((cls, method))
@@ -117,23 +119,25 @@ private[graphx] object BytecodeUtils {
 
     val methodsInvoked = new HashSet[(Class[_], String)]
 
-    override def visitMethod(access: Int,
-                             name: String,
-                             desc: String,
-                             sig: String,
-                             exceptions: Array[String]): MethodVisitor = {
+    override def visitMethod(
+        access: Int,
+        name: String,
+        desc: String,
+        sig: String,
+        exceptions: Array[String]): MethodVisitor = {
       if (name == methodName) {
         new MethodVisitor(ASM5) {
-          override def visitMethodInsn(op: Int,
-                                       owner: String,
-                                       name: String,
-                                       desc: String,
-                                       itf: Boolean) {
+          override def visitMethodInsn(
+              op: Int,
+              owner: String,
+              name: String,
+              desc: String,
+              itf: Boolean) {
             if (op == INVOKEVIRTUAL || op == INVOKESPECIAL ||
                 op == INVOKESTATIC) {
               if (!skipClass(owner)) {
                 methodsInvoked.add(
-                    (Utils.classForName(owner.replace("/", ".")), name))
+                  (Utils.classForName(owner.replace("/", ".")), name))
               }
             }
           }

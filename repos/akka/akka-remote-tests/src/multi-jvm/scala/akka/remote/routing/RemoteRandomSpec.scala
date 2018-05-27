@@ -45,8 +45,10 @@ class RemoteRandomMultiJvmNode3 extends RemoteRandomSpec
 class RemoteRandomMultiJvmNode4 extends RemoteRandomSpec
 
 class RemoteRandomSpec
-    extends MultiNodeSpec(RemoteRandomMultiJvmSpec) with STMultiNodeSpec
-    with ImplicitSender with DefaultTimeout {
+    extends MultiNodeSpec(RemoteRandomMultiJvmSpec)
+    with STMultiNodeSpec
+    with ImplicitSender
+    with DefaultTimeout {
   import RemoteRandomMultiJvmSpec._
 
   def initialParticipants = roles.size
@@ -61,8 +63,9 @@ class RemoteRandomSpec
       runOn(fourth) {
         enterBarrier("start")
         val actor =
-          system.actorOf(RandomPool(nrOfInstances = 0).props(Props[SomeActor]),
-                         "service-hello")
+          system.actorOf(
+            RandomPool(nrOfInstances = 0).props(Props[SomeActor]),
+            "service-hello")
         actor.isInstanceOf[RoutedActorRef] should ===(true)
 
         val connectionCount = 3
@@ -73,11 +76,14 @@ class RemoteRandomSpec
         }
 
         val replies: Map[Address, Int] = (receiveWhile(
-            5.seconds, messages = connectionCount * iterationCount) {
+          5.seconds,
+          messages = connectionCount * iterationCount) {
           case ref: ActorRef ⇒ ref.path.address
-        }).foldLeft(Map(node(first).address -> 0,
-                        node(second).address -> 0,
-                        node(third).address -> 0)) {
+        }).foldLeft(
+          Map(
+            node(first).address -> 0,
+            node(second).address -> 0,
+            node(third).address -> 0)) {
           case (replyMap, address) ⇒
             replyMap + (address -> (replyMap(address) + 1))
         }

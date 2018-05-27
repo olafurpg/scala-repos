@@ -45,7 +45,7 @@ trait Buf { outer =>
 
   override def equals(other: Any): Boolean = other match {
     case other: Buf => Buf.equals(this, other)
-    case _ => false
+    case _          => false
   }
 
   def isEmpty = length == 0
@@ -73,9 +73,9 @@ private[io] case class ConcatBuf(chain: Vector[Buf]) extends Buf {
   require(chain.length > 0)
 
   override def concat(right: Buf): Buf = right match {
-    case buf if buf.isEmpty => this
+    case buf if buf.isEmpty    => this
     case ConcatBuf(rightChain) => ConcatBuf(chain ++ rightChain)
-    case buf => ConcatBuf(chain :+ right)
+    case buf                   => ConcatBuf(chain :+ right)
   }
 
   // Incrementally determine equality over each segment of the ConcatBuf.
@@ -154,8 +154,9 @@ private[io] case class ConcatBuf(chain: Vector[Buf]) extends Buf {
       val first: Buf =
         if (startBegin == 0 && startEnd >= untrimmedFirst.length) null
         else untrimmedFirst.slice(startBegin, startEnd)
-      ConcatBuf(if (first == null) chain.slice(start, length)
-          else first +: chain.slice(start + 1, length))
+      ConcatBuf(
+        if (first == null) chain.slice(start, length)
+        else first +: chain.slice(start + 1, length))
     } else {
       val untrimmedFirst = chain(start)
       val first: Buf =
@@ -168,10 +169,10 @@ private[io] case class ConcatBuf(chain: Vector[Buf]) extends Buf {
         else untrimmedLast.slice(finishBegin, finishEnd)
 
       ConcatBuf(
-          if (first == null && last == null) chain.slice(start, finish + 1)
-          else if (first == null) chain.slice(start, finish) :+ last
-          else if (last == null) first +: chain.slice(start + 1, finish + 1)
-          else first +: chain.slice(start + 1, finish) :+ last)
+        if (first == null && last == null) chain.slice(start, finish + 1)
+        else if (first == null) chain.slice(start, finish) :+ last
+        else if (last == null) first +: chain.slice(start + 1, finish + 1)
+        else first +: chain.slice(start + 1, finish) :+ last)
     }
   }
 
@@ -222,8 +223,7 @@ object Buf {
       private[Buf] val bytes: Array[Byte],
       private[Buf] val begin: Int,
       private[Buf] val end: Int
-  )
-      extends Buf {
+  ) extends Buf {
 
     def write(buf: Array[Byte], off: Int): Unit =
       System.arraycopy(bytes, begin, buf, off, length)
@@ -386,7 +386,7 @@ object Buf {
       case ByteBuffer(otherBB) =>
         underlying.equals(otherBB)
       case buf: Buf => Buf.equals(this, buf)
-      case _ => false
+      case _        => false
     }
 
     protected def unsafeByteArrayBuf: Option[Buf.ByteArray] =
@@ -622,7 +622,7 @@ object Buf {
 
         val value =
           ((arr(0) & 0xff) << 24) | ((arr(1) & 0xff) << 16) |
-          ((arr(2) & 0xff) << 8) | ((arr(3) & 0xff))
+            ((arr(2) & 0xff) << 8) | ((arr(3) & 0xff))
         Some((value, rem))
       }
   }
@@ -657,9 +657,9 @@ object Buf {
 
         val value =
           ((arr(0) & 0xff).toLong << 56) | ((arr(1) & 0xff).toLong << 48) |
-          ((arr(2) & 0xff).toLong << 40) | ((arr(3) & 0xff).toLong << 32) |
-          ((arr(4) & 0xff).toLong << 24) | ((arr(5) & 0xff).toLong << 16) |
-          ((arr(6) & 0xff).toLong << 8) | ((arr(7) & 0xff).toLong)
+            ((arr(2) & 0xff).toLong << 40) | ((arr(3) & 0xff).toLong << 32) |
+            ((arr(4) & 0xff).toLong << 24) | ((arr(5) & 0xff).toLong << 16) |
+            ((arr(6) & 0xff).toLong << 8) | ((arr(7) & 0xff).toLong)
         Some((value, rem))
       }
   }
@@ -690,7 +690,7 @@ object Buf {
 
         val value =
           ((arr(0) & 0xff)) | ((arr(1) & 0xff) << 8) | ((arr(2) & 0xff) << 16) |
-          ((arr(3) & 0xff) << 24)
+            ((arr(3) & 0xff) << 24)
         Some((value, rem))
       }
   }
@@ -724,10 +724,10 @@ object Buf {
         val rem = buf.slice(8, buf.length)
 
         val value =
-          ( (arr(0) & 0xff).toLong) | ((arr(1) & 0xff).toLong << 8) |
-          ((arr(2) & 0xff).toLong << 16) | ((arr(3) & 0xff).toLong << 24) |
-          ((arr(4) & 0xff).toLong << 32) | ((arr(5) & 0xff).toLong << 40) |
-          ((arr(6) & 0xff).toLong << 48) | ((arr(7) & 0xff).toLong << 56)
+          ((arr(0) & 0xff).toLong) | ((arr(1) & 0xff).toLong << 8) |
+            ((arr(2) & 0xff).toLong << 16) | ((arr(3) & 0xff).toLong << 24) |
+            ((arr(4) & 0xff).toLong << 32) | ((arr(5) & 0xff).toLong << 40) |
+            ((arr(6) & 0xff).toLong << 48) | ((arr(7) & 0xff).toLong << 56)
         Some((value, rem))
       }
   }

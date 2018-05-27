@@ -20,14 +20,17 @@ abstract class ScalaDocEnterActionTestBase
   }
 
   protected def checkGeneratedTextFromString(
-      header: String, footer: String, assumedStub: String) {
+      header: String,
+      footer: String,
+      assumedStub: String) {
     checkGeneratedTextFromString(header, footer, assumedStub, a => a)
   }
 
-  protected def checkGeneratedTextFromString(header: String,
-                                             footer: String,
-                                             assumedStub: String,
-                                             transform: String => String) {
+  protected def checkGeneratedTextFromString(
+      header: String,
+      footer: String,
+      assumedStub: String,
+      transform: String => String) {
     configureFromFileTextAdapter("dummy.scala", header + footer)
     getEditorAdapter.getCaretModel.moveToOffset(header.length - 1)
     val enterHandler = EditorActionManager
@@ -35,17 +38,18 @@ abstract class ScalaDocEnterActionTestBase
       .getActionHandler(IdeActions.ACTION_EDITOR_ENTER)
 
     enterHandler.execute(
-        getEditorAdapter,
-        getEditorAdapter.getCaretModel.getCurrentCaret,
-        new DataContext {
-          def getData(dataId: String): AnyRef = {
-            dataId match {
-              case "Language" | "language" => getFileAdapter.getLanguage
-              case "Project" | "project" => getFileAdapter.getProject
-              case _ => null
-            }
+      getEditorAdapter,
+      getEditorAdapter.getCaretModel.getCurrentCaret,
+      new DataContext {
+        def getData(dataId: String): AnyRef = {
+          dataId match {
+            case "Language" | "language" => getFileAdapter.getLanguage
+            case "Project" | "project"   => getFileAdapter.getProject
+            case _                       => null
           }
-        })
+        }
+      }
+    )
 
     assert(transform(getFileAdapter.getText).equals(assumedStub))
   }

@@ -43,8 +43,7 @@ private[scala] final class EmptyMethodCache extends MethodCache {
 private[scala] final class MegaMethodCache(
     private[this] val forName: String,
     private[this] val forParameterTypes: Array[JClass[_]]
-)
-    extends MethodCache {
+) extends MethodCache {
 
   def find(forReceiver: JClass[_]): JMethod =
     forReceiver.getMethod(forName, forParameterTypes: _*)
@@ -57,8 +56,7 @@ private[scala] final class PolyMethodCache(
     private[this] val receiver: JClass[_],
     private[this] val method: JMethod,
     private[this] val complexity: Int
-)
-    extends MethodCache {
+) extends MethodCache {
 
   /** To achieve tail recursion this must be a separate method
     *  from `find`, because the type of next is not `PolyMethodCache`.
@@ -68,7 +66,7 @@ private[scala] final class PolyMethodCache(
     else
       next match {
         case x: PolyMethodCache => x findInternal forReceiver
-        case _ => next find forReceiver
+        case _                  => next find forReceiver
       }
 
   def find(forReceiver: JClass[_]): JMethod = findInternal(forReceiver)

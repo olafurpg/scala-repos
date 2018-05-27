@@ -27,7 +27,10 @@
 
 package scalafx.beans.value
 
-import javafx.beans.value.{ChangeListener, ObservableValue => JFXObservableValue}
+import javafx.beans.value.{
+  ChangeListener,
+  ObservableValue => JFXObservableValue
+}
 
 import org.junit.runner.RunWith
 import org.scalatest.Matchers._
@@ -96,8 +99,8 @@ class ObservableValueSpec extends FlatSpec with BeforeAndAfterEach {
     // ...
     // subscription.cancel()
     val listener: ChangeListener[Number] =
-      (obs: JFXObservableValue[_ <: Number], oldV: Number,
-      newV: Number) => invalidateCalled = true
+      (obs: JFXObservableValue[_ <: Number], oldV: Number, newV: Number) =>
+        invalidateCalled = true
     property addListener listener
     invalidateCalled should be(false)
     property() = 100

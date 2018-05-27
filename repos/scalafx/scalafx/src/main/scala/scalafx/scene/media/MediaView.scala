@@ -42,7 +42,8 @@ object MediaView {
 }
 
 class MediaView(override val delegate: jfxsm.MediaView = new jfxsm.MediaView)
-    extends Node(delegate) with PositionDelegate[jfxsm.MediaView]
+    extends Node(delegate)
+    with PositionDelegate[jfxsm.MediaView]
     with SFXDelegate[jfxsm.MediaView] {
 
   /**

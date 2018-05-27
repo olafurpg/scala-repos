@@ -42,5 +42,6 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class ButtonBarSpec
     extends SimpleSFXDelegateSpec[jfxsc.ButtonBar, ButtonBar](
-        classOf[jfxsc.ButtonBar], classOf[ButtonBar])
+      classOf[jfxsc.ButtonBar],
+      classOf[ButtonBar])
     with RunOnApplicationThread

@@ -54,12 +54,12 @@ object ScalaUdpDocSpec {
     def ready(socket: ActorRef): Receive = {
       case Udp.Received(data, remote) =>
         val processed = // parse data etc., e.g. using PipelineStage
-        //#listener
-        data.utf8String
+          //#listener
+          data.utf8String
         //#listener
         socket ! Udp.Send(data, remote) // example server echoes back
         nextActor ! processed
-      case Udp.Unbind => socket ! Udp.Unbind
+      case Udp.Unbind  => socket ! Udp.Unbind
       case Udp.Unbound => context.stop(self)
     }
   }

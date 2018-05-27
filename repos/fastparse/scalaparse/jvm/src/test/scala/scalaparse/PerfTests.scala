@@ -8,7 +8,7 @@ import scala.tools.nsc.{Global, Settings}
 object PerfTests extends TestSuite {
   val genJsCodeSource = scala.io.Source
     .fromInputStream(
-        getClass.getResourceAsStream("/scalaparse/GenJSCode.scala")
+      getClass.getResourceAsStream("/scalaparse/GenJSCode.scala")
     )
     .mkString
   val tests = TestSuite {
@@ -16,11 +16,11 @@ object PerfTests extends TestSuite {
       var current = Thread.currentThread().getContextClassLoader
       val files = collection.mutable.Buffer.empty[java.io.File]
       files.appendAll(
-          System
-            .getProperty("sun.boot.class.path")
-            .split(":")
-            .map(new java.io.File(_))
-        )
+        System
+          .getProperty("sun.boot.class.path")
+          .split(":")
+          .map(new java.io.File(_))
+      )
       while (current != null) {
         current match {
           case t: java.net.URLClassLoader =>
@@ -41,7 +41,7 @@ object PerfTests extends TestSuite {
 
       val parser = Scala.CompilationUnit
       println(
-          "Loaded " + genJsCodeSource.length + " bytes of input. Parsing...")
+        "Loaded " + genJsCodeSource.length + " bytes of input. Parsing...")
 
       /**
         * Parboiled2 ( run separately in fork of parboiled project )

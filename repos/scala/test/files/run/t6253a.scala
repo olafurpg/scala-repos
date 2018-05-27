@@ -28,10 +28,11 @@ object Test extends App {
     }
   }
 
-  def testUnion[T](sizes: Seq[Int],
-                   offsets: Seq[Double],
-                   keyType: String,
-                   mkKey: Int => T) {
+  def testUnion[T](
+      sizes: Seq[Int],
+      offsets: Seq[Double],
+      keyType: String,
+      mkKey: Int => T) {
     for {
       i <- sizes
       o <- offsets
@@ -40,36 +41,41 @@ object Test extends App {
       val j = (i * o).toInt
       // create two sets of size i with overlap o
       val a = e ++ (0 until i).map(mkKey)
-      require(a.size == i,
-              s"Building HashSet of size $i failed. Key type $keyType.")
+      require(
+        a.size == i,
+        s"Building HashSet of size $i failed. Key type $keyType.")
       val b = e ++ (j until (i + j)).map(mkKey)
-      require(b.size == i,
-              s"Building HashSet of size $i failed. Key type $keyType.")
+      require(
+        b.size == i,
+        s"Building HashSet of size $i failed. Key type $keyType.")
       val as = e ++ (0 until j).map(mkKey)
-      require(as.size == j,
-              s"Building HashSet of size $j failed. Key type $keyType.")
+      require(
+        as.size == j,
+        s"Building HashSet of size $j failed. Key type $keyType.")
       val hashCount0 = hashCount
       val u = a union b
       require(
-          hashCount == hashCount0,
-          s"key.hashCode should not be called, but has been called ${hashCount -
+        hashCount == hashCount0,
+        s"key.hashCode should not be called, but has been called ${hashCount -
           hashCount0} times. Key type $keyType.")
-      require(u == (a union scala.collection.mutable.HashSet(b.toSeq: _*)),
-              s"Operation must still work for other sets!")
       require(
-          u.size == i + j,
-          s"Expected size ${i + j}. Real size ${u.size}. Key type $keyType.")
-      for (x <- 0 until i + j) require(
+        u == (a union scala.collection.mutable.HashSet(b.toSeq: _*)),
+        s"Operation must still work for other sets!")
+      require(
+        u.size == i + j,
+        s"Expected size ${i + j}. Real size ${u.size}. Key type $keyType.")
+      for (x <- 0 until i + j)
+        require(
           u.contains(mkKey(x)),
           s"Key type $keyType. Set (0 until ${i + j}) should contain $x but does not.")
       val a_as = a union as
       val as_a = as union a
       require(
-          (a_as eq a) || (a_as eq as),
-          s"No structural sharing in a union as. Key type $keyType, a=(0 until $i) as=(0 until $j)")
+        (a_as eq a) || (a_as eq as),
+        s"No structural sharing in a union as. Key type $keyType, a=(0 until $i) as=(0 until $j)")
       require(
-          (as_a eq a) || (as_a eq as),
-          s"No structural sharing in as union a. Key type $keyType, a=(0 until $i) as=(0 until $j)")
+        (as_a eq a) || (as_a eq as),
+        s"No structural sharing in as union a. Key type $keyType, a=(0 until $i) as=(0 until $j)")
     }
   }
 

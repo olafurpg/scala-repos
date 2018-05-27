@@ -23,7 +23,8 @@ trait ReplConfig {
 
   private def parens(x: Any) = "(" + x + ")"
   private def echo(msg: => String) =
-    try Console println msg catch {
+    try Console println msg
+    catch {
       case x: AssertionError =>
         Console.println("Assertion error printing debugging output: " + x)
     }
@@ -33,7 +34,8 @@ trait ReplConfig {
   private[nsc] def replinfo(msg: => String) = if (isReplInfo) echo(msg)
 
   private[nsc] def logAndDiscard[T](
-      label: String, alt: => T): PartialFunction[Throwable, T] = {
+      label: String,
+      alt: => T): PartialFunction[Throwable, T] = {
     case t: ControlThrowable => throw t
     case t: Throwable =>
       repldbg(label + ": " + unwrap(t))
@@ -42,7 +44,8 @@ trait ReplConfig {
   }
   private[nsc] def substituteAndLog[T](label: String, alt: => T)(
       body: => T): T = {
-    try body catch logAndDiscard(label, alt)
+    try body
+    catch logAndDiscard(label, alt)
   }
 
   def isReplTrace: Boolean = replProps.trace

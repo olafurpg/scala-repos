@@ -45,20 +45,20 @@ trait JdbcMappingCompilerComponent { self: JdbcProfile =>
         rc: ResultConverter[JdbcResultConverterDomain, Option[T]],
         default: () => T) = rc match {
       case rc: OptionResultConverter[_] => rc.getOrElse(default)
-      case _ => super.createGetOrElseResultConverter[T](rc, default)
+      case _                            => super.createGetOrElseResultConverter[T](rc, default)
     }
 
     override def createIsDefinedResultConverter[T](
         rc: ResultConverter[JdbcResultConverterDomain, Option[T]]) = rc match {
       case rc: OptionResultConverter[_] => rc.isDefined
-      case _ => super.createIsDefinedResultConverter(rc)
+      case _                            => super.createIsDefinedResultConverter(rc)
     }
 
     override def createTypeMappingResultConverter(
         rc: ResultConverter[JdbcResultConverterDomain, Any],
         mapper: MappedScalaType.Mapper) = {
-      val tm = new TypeMappingResultConverter(
-          rc, mapper.toBase, mapper.toMapped)
+      val tm =
+        new TypeMappingResultConverter(rc, mapper.toBase, mapper.toMapped)
       mapper.fastPath match {
         case Some(f) =>
           f(tm).asInstanceOf[ResultConverter[JdbcResultConverterDomain, Any]]
@@ -70,23 +70,29 @@ trait JdbcMappingCompilerComponent { self: JdbcProfile =>
   /** Code generator phase for queries on JdbcProfile. */
   class JdbcCodeGen(f: QueryBuilder => SQLBuilder.Result) extends CodeGen {
     def compileServerSideAndMapping(
-        serverSide: Node, mapping: Option[Node], state: CompilerState) = {
+        serverSide: Node,
+        mapping: Option[Node],
+        state: CompilerState) = {
       val (tree, tpe) = treeAndType(serverSide)
       val sbr = f(self.createQueryBuilder(tree, state))
-      (CompiledStatement(sbr.sql, sbr, tpe).infer(),
-       mapping.map(mappingCompiler.compileMapping))
+      (
+        CompiledStatement(sbr.sql, sbr, tpe).infer(),
+        mapping.map(mappingCompiler.compileMapping))
     }
   }
 
   /** Code generator phase for inserts on JdbcProfile. */
   class JdbcInsertCodeGen(f: Insert => InsertBuilder) extends CodeGen {
     def compileServerSideAndMapping(
-        serverSide: Node, mapping: Option[Node], state: CompilerState) = {
+        serverSide: Node,
+        mapping: Option[Node],
+        state: CompilerState) = {
       val ib = f(serverSide.asInstanceOf[Insert])
       val ibr = ib.buildInsert
-      (CompiledStatement(ibr.sql, ibr, serverSide.nodeType).infer(),
-       mapping.map(
-           n => mappingCompiler.compileMapping(ib.transformMapping(n))))
+      (
+        CompiledStatement(ibr.sql, ibr, serverSide.nodeType).infer(),
+        mapping.map(n =>
+          mappingCompiler.compileMapping(ib.transformMapping(n))))
     }
   }
 }

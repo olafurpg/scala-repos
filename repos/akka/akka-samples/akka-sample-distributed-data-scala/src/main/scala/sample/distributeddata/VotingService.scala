@@ -72,7 +72,9 @@ class VotingService extends Actor {
   def getVotes(open: Boolean): Receive = {
     case GetVotes ⇒
       replicator ! Get(
-          CountersKey, ReadAll(3.seconds), Some(GetVotesReq(sender())))
+        CountersKey,
+        ReadAll(3.seconds),
+        Some(GetVotesReq(sender())))
 
     case g @ GetSuccess(CountersKey, Some(GetVotesReq(replyTo))) ⇒
       val data = g.get(CountersKey)

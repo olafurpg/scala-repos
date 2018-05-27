@@ -37,8 +37,11 @@ import org.apache.spark.streaming.{Duration, TestSuiteBase}
 import org.apache.spark.util.ManualClock
 
 class KinesisCheckpointerSuite
-    extends TestSuiteBase with MockitoSugar with BeforeAndAfterEach
-    with PrivateMethodTester with Eventually {
+    extends TestSuiteBase
+    with MockitoSugar
+    with BeforeAndAfterEach
+    with PrivateMethodTester
+    with Eventually {
 
   private val workerId = "dummyWorkerId"
   private val shardId = "dummyShardId"
@@ -59,8 +62,8 @@ class KinesisCheckpointerSuite
     receiverMock = mock[KinesisReceiver[Array[Byte]]]
     checkpointerMock = mock[IRecordProcessorCheckpointer]
     clock = new ManualClock()
-    kinesisCheckpointer = new KinesisCheckpointer(
-        receiverMock, checkpointInterval, workerId, clock)
+    kinesisCheckpointer =
+      new KinesisCheckpointer(receiverMock, checkpointInterval, workerId, clock)
   }
 
   test("checkpoint is not called twice for the same sequence number") {
@@ -128,14 +131,14 @@ class KinesisCheckpointerSuite
   }
 
   test(
-      "if checkpointing is going on, wait until finished before removing and checkpointing") {
+    "if checkpointing is going on, wait until finished before removing and checkpointing") {
     when(receiverMock.getLatestSeqNumToCheckpoint(shardId))
       .thenReturn(someSeqNum)
       .thenReturn(someOtherSeqNum)
     when(checkpointerMock.checkpoint(anyString)).thenAnswer(new Answer[Unit] {
       override def answer(invocations: InvocationOnMock): Unit = {
         clock.waitTillTime(
-            clock.getTimeMillis() + checkpointInterval.milliseconds / 2)
+          clock.getTimeMillis() + checkpointInterval.milliseconds / 2)
       }
     })
 
@@ -145,8 +148,8 @@ class KinesisCheckpointerSuite
       verify(checkpointerMock, times(1)).checkpoint(anyString())
     }
     // don't block test thread
-    val f = Future(
-        kinesisCheckpointer.removeCheckpointer(shardId, checkpointerMock))(
+    val f =
+      Future(kinesisCheckpointer.removeCheckpointer(shardId, checkpointerMock))(
         ExecutionContext.global)
 
     intercept[TimeoutException] {

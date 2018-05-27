@@ -7,32 +7,42 @@ import org.specs2.mutable.Specification
 
 object ModelCollectionSpec {
   case class OnlyPrimitives(
-      id: Int, sequence: Long, deviation: Double, name: String, created: Date)
+      id: Int,
+      sequence: Long,
+      deviation: Double,
+      name: String,
+      created: Date)
 
   case class Tag(id: Sequence, name: Name)
   case class Name(value: String)
   case class Sequence(value: Long)
   case class TaggedThing(id: Long, tag: Tag, created: Date)
   case class Asset(
-      name: String, filename: String, id: Option[Int], relatedAsset: Asset)
+      name: String,
+      filename: String,
+      id: Option[Int],
+      relatedAsset: Asset)
 
-  val taggedThingModels = Set(Swagger.modelToSwagger[Tag],
-                              Swagger.modelToSwagger[Name],
-                              Swagger.modelToSwagger[Sequence],
-                              Swagger.modelToSwagger[TaggedThing])
+  val taggedThingModels = Set(
+    Swagger.modelToSwagger[Tag],
+    Swagger.modelToSwagger[Name],
+    Swagger.modelToSwagger[Sequence],
+    Swagger.modelToSwagger[TaggedThing])
   val onlyPrimitivesModel = Swagger.modelToSwagger[OnlyPrimitives].get
   val assetModel = Swagger.modelToSwagger(Reflector.scalaTypeOf[Asset]).get
 
-  case class Things(id: Long,
-                    taggedThings: List[TaggedThing],
-                    visits: List[Date],
-                    created: Date)
+  case class Things(
+      id: Long,
+      taggedThings: List[TaggedThing],
+      visits: List[Date],
+      created: Date)
   val thingsModels = taggedThingModels + Swagger.modelToSwagger[Things]
 
-  case class MapThings(id: Long,
-                       taggedThings: Map[String, TaggedThing],
-                       visits: Map[String, Date],
-                       created: Date)
+  case class MapThings(
+      id: Long,
+      taggedThings: Map[String, TaggedThing],
+      visits: Map[String, Date],
+      created: Date)
   val mapThingsModels = taggedThingModels + Swagger.modelToSwagger[MapThings]
 
   case class Thing(id: Long, thing: Option[TaggedThing])
@@ -80,13 +90,13 @@ class ModelCollectionSpec extends Specification {
 
     "collect all the models in a nested structure" in {
       Swagger.collectModels[TaggedThing](Set.empty) must containTheSameElementsAs(
-          taggedThingModels.flatten.toSeq)
+        taggedThingModels.flatten.toSeq)
     }
 
     "collect models when hiding in a list" in {
       val collected = Swagger.collectModels[Things](Set.empty)
       collected.map(_.id) must containTheSameElementsAs(
-          thingsModels.flatten.map(_.id).toSeq)
+        thingsModels.flatten.map(_.id).toSeq)
     }
     "collect models when hiding in a map" in {
       val collected = Swagger.collectModels[MapThings](Set.empty)
@@ -103,9 +113,9 @@ class ModelCollectionSpec extends Specification {
       val collected = Swagger.collectModels[OptionListThing](Set.empty)
       val r = collected.find(_.id == "OptionListThing")
       r.flatMap(_.properties.find(_._1 == "things").map(_._2.`type`)) must beSome(
-          DataType[List[TaggedThing]])
+        DataType[List[TaggedThing]])
       r.flatMap(_.properties.find(_._1 == "things").map(_._2.required)) must beSome(
-          false)
+        false)
     }
 
     "collect models when hiding in an option" in {
@@ -114,7 +124,7 @@ class ModelCollectionSpec extends Specification {
       collected
         .find(_.id == "Thing")
         .flatMap(_.properties.find(_._1 == "thing").map(_._2.`type`)) must beSome(
-          DataType[TaggedThing])
+        DataType[TaggedThing])
     }
 
     "collect Asset model" in {

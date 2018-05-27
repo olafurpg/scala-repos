@@ -18,23 +18,28 @@ object FindDeterioratedMetrics {
     * @param factor the deterioration factor. 1 means not worse than the base.
     * @return all deteriorated metrics (before, after)
     */
-  def filterDeteriorated(baseLine: MetricsSample,
-                         sample: MetricsSample,
-                         factor: Double): Map[Metric, Metric] = {
+  def filterDeteriorated(
+      baseLine: MetricsSample,
+      sample: MetricsSample,
+      factor: Double): Map[Metric, Metric] = {
     for {
       (name, metricsBase) <- baseLine.all
       metricsSample <- sample.all.get(name).toList
       metricBase <- metricsBase if metricBase.mean > 0
-      metricSample <- metricsSample.find(_.name == metricBase.name) if
-                     (metricSample.mean / metricBase.mean) > factor
+      metricSample <- metricsSample.find(_.name == metricBase.name)
+      if (metricSample.mean / metricBase.mean) > factor
     } yield metricBase -> metricSample
   }
 
   def filterDeteriorated(
-      before: URL, after: URL, deterioration: Double): Map[Metric, Metric] = {
+      before: URL,
+      after: URL,
+      deterioration: Double): Map[Metric, Metric] = {
     //only compare last
     filterDeteriorated(
-        readMetrics(before).last, readMetrics(after).last, deterioration)
+      readMetrics(before).last,
+      readMetrics(after).last,
+      deterioration)
   }
 
   /**
@@ -55,23 +60,25 @@ object FindDeterioratedMetrics {
             .map(_.toString)
       }
       printTable(
-          Seq(left, right, right, right), withUnderline(header) ++ rows.toSeq)
+        Seq(left, right, right, right),
+        withUnderline(header) ++ rows.toSeq)
     }
 
     if (args.length == 3) {
       println("\n\nMetrics that got worse (deterioration factor == 1):")
       printSlope(filterDeteriorated(new URL(args(0)), new URL(args(1)), 1))
       println(
-          s"\n\nMetrics that got deteriorated (deterioration factor == ${args(2)}):")
-      val deteriorated = filterDeteriorated(
-          new URL(args(0)), new URL(args(1)), args(2).toDouble)
+        s"\n\nMetrics that got deteriorated (deterioration factor == ${args(2)}):")
+      val deteriorated =
+        filterDeteriorated(new URL(args(0)), new URL(args(1)), args(2).toDouble)
       if (deteriorated.nonEmpty) {
         printSlope(deteriorated)
         throw new IllegalStateException(
-            s"Sample is deteriorated according to deterioration factor")
+          s"Sample is deteriorated according to deterioration factor")
       }
     } else {
-      println("""Usage:
+      println(
+        """Usage:
           | FindDeterioratedMetrics <file_base> <file_sample> <deterioration_factor>"
           | file_base: the file with the base metrics
           | file_sample: the file with the actual sampled metrics

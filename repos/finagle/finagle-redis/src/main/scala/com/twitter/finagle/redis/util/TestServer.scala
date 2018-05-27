@@ -21,10 +21,13 @@ object RedisCluster { self =>
 
   def hostAddresses(): String = {
     require(instanceStack.length > 0)
-    addresses.map { address =>
-      val addy = address.get
-      "%s:%d".format(addy.getHostName(), addy.getPort())
-    }.sorted.mkString(",")
+    addresses
+      .map { address =>
+        val addy = address.get
+        "%s:%d".format(addy.getHostName(), addy.getPort())
+      }
+      .sorted
+      .mkString(",")
   }
 
   def start(count: Int = 1) {
@@ -66,8 +69,9 @@ class ExternalRedis() {
     val p = new ProcessBuilder("redis-server", "--help").start()
     p.waitFor()
     val exitValue = p.exitValue()
-    require(exitValue == 0 || exitValue == 1,
-            "redis-server binary must be present.")
+    require(
+      exitValue == 0 || exitValue == 1,
+      "redis-server binary must be present.")
   }
 
   private[this] def findAddress() {

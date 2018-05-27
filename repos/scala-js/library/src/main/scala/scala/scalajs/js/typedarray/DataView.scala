@@ -27,21 +27,33 @@ class DataView(buffer: ArrayBuffer, byteOffset: Int = 0, byteLength: Int = ???)
   def setInt8(byteOffset: Int, value: Byte): Unit = js.native
   def setUint8(byteOffset: Int, value: Short): Unit = js.native
   def setInt16(
-      byteOffset: Int, value: Short, littleEndian: Boolean = false): Unit =
+      byteOffset: Int,
+      value: Short,
+      littleEndian: Boolean = false): Unit =
     js.native
   def setUint16(
-      byteOffset: Int, value: Int, littleEndian: Boolean = false): Unit =
+      byteOffset: Int,
+      value: Int,
+      littleEndian: Boolean = false): Unit =
     js.native
   def setInt32(
-      byteOffset: Int, value: Int, littleEndian: Boolean = false): Unit =
+      byteOffset: Int,
+      value: Int,
+      littleEndian: Boolean = false): Unit =
     js.native
   def setUint32(
-      byteOffset: Int, value: Double, littleEndian: Boolean = false): Unit =
+      byteOffset: Int,
+      value: Double,
+      littleEndian: Boolean = false): Unit =
     js.native
   def setFloat32(
-      byteOffset: Int, value: Float, littleEndian: Boolean = false): Unit =
+      byteOffset: Int,
+      value: Float,
+      littleEndian: Boolean = false): Unit =
     js.native
   def setFloat64(
-      byteOffset: Int, value: Double, littleEndian: Boolean = false): Unit =
+      byteOffset: Int,
+      value: Double,
+      littleEndian: Boolean = false): Unit =
     js.native
 }

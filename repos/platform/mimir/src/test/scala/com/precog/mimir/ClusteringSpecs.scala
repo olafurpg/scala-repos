@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -34,8 +34,10 @@ import blueeyes.json._
 import scalaz._
 
 trait ClusteringLibSpecs[M[+ _]]
-    extends Specification with EvaluatorTestSupport[M]
-    with ClusteringTestSupport with LongIdMemoryDatasetConsumer[M] {
+    extends Specification
+    with EvaluatorTestSupport[M]
+    with ClusteringTestSupport
+    with LongIdMemoryDatasetConsumer[M] {
   self =>
 
   import dag._
@@ -47,7 +49,7 @@ trait ClusteringLibSpecs[M[+ _]]
   def testEval(graph: DepGraph): Set[SEvent] = {
     consumeEval(graph, defaultEvaluationContext) match {
       case Success(results) => results
-      case Failure(error) => throw error
+      case Failure(error)   => throw error
     }
   }
 
@@ -55,7 +57,8 @@ trait ClusteringLibSpecs[M[+ _]]
     new ArrayOps(lhs)
 
   def kMediansCost(
-      points: Array[Array[Double]], centers: Array[Array[Double]]): Double = {
+      points: Array[Array[Double]],
+      centers: Array[Array[Double]]): Double = {
     points.foldLeft(0.0) { (cost, p) =>
       cost + centers
         .map({ c =>
@@ -67,11 +70,12 @@ trait ClusteringLibSpecs[M[+ _]]
 
   val ClusterIdPattern = """cluster\d+""".r
 
-  def isGoodCluster(clusterMap: Map[String, SValue],
-                    points: Array[Array[Double]],
-                    centers: Array[Array[Double]],
-                    k: Int,
-                    dimension: Int) = {
+  def isGoodCluster(
+      clusterMap: Map[String, SValue],
+      points: Array[Array[Double]],
+      centers: Array[Array[Double]],
+      k: Int,
+      dimension: Int) = {
     val targetCost = kMediansCost(points, centers)
 
     clusterMap must haveSize(k)
@@ -101,9 +105,10 @@ trait ClusteringLibSpecs[M[+ _]]
   }
 
   def clusterInput(dataset: String, k: Long) = {
-    dag.Morph2(KMediansClustering,
-               dag.AbsoluteLoad(Const(CString(dataset))(line))(line),
-               dag.Const(CLong(k))(line))(line)
+    dag.Morph2(
+      KMediansClustering,
+      dag.AbsoluteLoad(Const(CString(dataset))(line))(line),
+      dag.Const(CLong(k))(line))(line)
   }
 
   "k-medians clustering" should {
@@ -133,9 +138,10 @@ trait ClusteringLibSpecs[M[+ _]]
       val k = 5
       val clusterIds = (1 to k).map("cluster" + _).toSet
 
-      val input = dag.Morph2(KMediansClustering,
-                             dag.Const(CNum(4.4))(line),
-                             dag.Const(CLong(k))(line))(line)
+      val input = dag.Morph2(
+        KMediansClustering,
+        dag.Const(CNum(4.4))(line),
+        dag.Const(CLong(k))(line))(line)
 
       val result = testEval(input)
 
@@ -256,17 +262,19 @@ trait ClusteringLibSpecs[M[+ _]]
                 clusterMap("cluster1") must beLike {
                   case SObject(schemadCluster) =>
                     if (schemadCluster contains "a") {
-                      isGoodCluster(clusterMap,
-                                    pointsA,
-                                    centersA,
-                                    k,
-                                    dimensionA)
+                      isGoodCluster(
+                        clusterMap,
+                        pointsA,
+                        centersA,
+                        k,
+                        dimensionA)
                     } else {
-                      isGoodCluster(clusterMap,
-                                    pointsB,
-                                    centersB,
-                                    k,
-                                    dimensionB)
+                      isGoodCluster(
+                        clusterMap,
+                        pointsB,
+                        centersB,
+                        k,
+                        dimensionB)
                     }
                 }
             }
@@ -286,7 +294,7 @@ trait ClusteringLibSpecs[M[+ _]]
       val points =
         pointsA.zipWithIndex map {
           case (p, i) if i % 3 == 2 => p ++ Array.fill(3)(Random.nextDouble)
-          case (p, _) => p
+          case (p, _)               => p
         }
 
       writePointsToDataset(points) { dataset =>
@@ -317,8 +325,9 @@ trait ClusteringLibSpecs[M[+ _]]
     }
   }
 
-  def assign(points: Array[Array[Double]],
-             centers: Array[Array[Double]]): Map[RValue, String] = {
+  def assign(
+      points: Array[Array[Double]],
+      centers: Array[Array[Double]]): Map[RValue, String] = {
     points.map { p =>
       val id =
         (0 until centers.length) minBy { i =>
@@ -329,8 +338,7 @@ trait ClusteringLibSpecs[M[+ _]]
   }
 
   def makeClusters(centers: Array[Array[Double]]) = {
-    RObject(
-        pointsToJson(centers).zipWithIndex.map {
+    RObject(pointsToJson(centers).zipWithIndex.map {
       case (ctr, idx) =>
         ("cluster" + (idx + 1), ctr)
     }.toMap)
@@ -340,23 +348,26 @@ trait ClusteringLibSpecs[M[+ _]]
     val points = dag.AbsoluteLoad(Const(CString(pointsDataSet))(line))(line)
 
     val input = dag.Morph2(
-        AssignClusters,
-        points,
-        dag.AbsoluteLoad(Const(CString(modelDataSet))(line))(line))(line)
+      AssignClusters,
+      points,
+      dag.AbsoluteLoad(Const(CString(modelDataSet))(line))(line))(line)
 
-    dag.Join(JoinObject,
-             IdentitySort,
-             input,
-             dag.Join(WrapObject,
-                      Cross(Some(TableModule.CrossOrder.CrossRight)),
-                      Const(CString("point"))(line),
-                      points)(line))(line)
+    dag.Join(
+      JoinObject,
+      IdentitySort,
+      input,
+      dag.Join(
+        WrapObject,
+        Cross(Some(TableModule.CrossOrder.CrossRight)),
+        Const(CString("point"))(line),
+        points)(line))(line)
   }
 
-  def testCluster(model: Map[String, SValue],
-                  clusterMap: Map[String, RValue],
-                  assignments: Map[RValue, String],
-                  point: RValue) = {
+  def testCluster(
+      model: Map[String, SValue],
+      clusterMap: Map[String, RValue],
+      assignments: Map[RValue, String],
+      point: RValue) = {
     model.keySet mustEqual Set("clusterId", "clusterCenter")
 
     model("clusterId") must beLike {
@@ -451,14 +462,14 @@ trait ClusteringLibSpecs[M[+ _]]
               ids.length mustEqual 2
 
               (obj.keySet mustEqual Set("point", "model1")) or
-              (obj.keySet mustEqual Set("point", "model1", "model2"))
+                (obj.keySet mustEqual Set("point", "model1", "model2"))
 
               val point = obj("point")
 
               point must beLike {
                 case SArray(arr) =>
                   (arr must haveSize(dimensionA)) or
-                  (arr must haveSize(dimensionB))
+                    (arr must haveSize(dimensionB))
               }
 
               obj("model1") must beLike {
@@ -469,10 +480,11 @@ trait ClusteringLibSpecs[M[+ _]]
               if (obj.contains("model2")) {
                 obj("model2") must beLike {
                   case SObject(model) =>
-                    testCluster(model,
-                                clusterMapB,
-                                assignmentsB,
-                                point.toRValue)
+                    testCluster(
+                      model,
+                      clusterMapB,
+                      assignmentsB,
+                      point.toRValue)
                 }
               } else {
                 ok
@@ -492,7 +504,7 @@ trait ClusteringLibSpecs[M[+ _]]
       val points =
         points0.zipWithIndex map {
           case (p, i) if i % 3 == 2 => p ++ Array.fill(3)(Random.nextDouble)
-          case (p, _) => p
+          case (p, _)               => p
         }
 
       val clusters = makeClusters(centers)
@@ -529,10 +541,10 @@ trait ClusteringLibSpecs[M[+ _]]
 
     "assign correctly with multiple rows of schema with overlapping modelIds" in {
       val input = dag.Morph2(
-          AssignClusters,
-          dag.AbsoluteLoad(Const(CString("/hom/clusteringData"))(line))(line),
-          dag.AbsoluteLoad(Const(CString("/hom/clusteringModel"))(line))(
-              line))(line)
+        AssignClusters,
+        dag.AbsoluteLoad(Const(CString("/hom/clusteringData"))(line))(line),
+        dag.AbsoluteLoad(Const(CString("/hom/clusteringModel"))(line))(line)
+      )(line)
 
       val result0 = testEval(input)
 
@@ -542,36 +554,44 @@ trait ClusteringLibSpecs[M[+ _]]
         result0 collect { case (ids, value) if ids.size == 2 => value }
 
       result mustEqual Set(
-          SObject(
-              Map("model1" -> SObject(Map("clusterId" -> SString("cluster2"),
-                                          "clusterCenter" -> SObject(
-                                              Map("bar" -> SDecimal(9.0),
-                                                  "foo" -> SDecimal(4.4))))))),
-          SObject(Map("model2" -> SObject(Map("clusterId" -> SString("cluster1"),
-                                              "clusterCenter" -> SObject(
-                                                  Map("baz" -> SDecimal(
-                                                          4.0))))))),
-          SObject(
+        SObject(
+          Map(
+            "model1" -> SObject(
               Map(
-                  "model1" -> SObject(
-                      Map("clusterId" -> SString("cluster2"),
-                          "clusterCenter" -> SArray(
-                              Vector(SDecimal(6.0),
-                                     SDecimal(3.0),
-                                     SDecimal(2.0))))))),
-          SObject(Map("model1" -> SObject(
-                      Map("clusterId" -> SString("cluster3"),
-                          "clusterCenter" -> SArray(Vector(SDecimal(0.0),
-                                                           SDecimal(3.2),
-                                                           SDecimal(5.1))))))),
-          SObject(Map("model1" -> SObject(
-                      Map("clusterId" -> SString("cluster1"),
-                          "clusterCenter" -> SArray(Vector(SDecimal(2.1),
-                                                           SDecimal(3.3),
-                                                           SDecimal(4.0))))))))
+                "clusterId" -> SString("cluster2"),
+                "clusterCenter" -> SObject(
+                  Map("bar" -> SDecimal(9.0), "foo" -> SDecimal(4.4))))))),
+        SObject(
+          Map(
+            "model2" -> SObject(Map(
+              "clusterId" -> SString("cluster1"),
+              "clusterCenter" -> SObject(Map("baz" -> SDecimal(4.0))))))),
+        SObject(
+          Map(
+            "model1" -> SObject(
+              Map(
+                "clusterId" -> SString("cluster2"),
+                "clusterCenter" -> SArray(
+                  Vector(SDecimal(6.0), SDecimal(3.0), SDecimal(2.0))))))),
+        SObject(
+          Map(
+            "model1" -> SObject(
+              Map(
+                "clusterId" -> SString("cluster3"),
+                "clusterCenter" -> SArray(
+                  Vector(SDecimal(0.0), SDecimal(3.2), SDecimal(5.1))))))),
+        SObject(
+          Map(
+            "model1" -> SObject(
+              Map(
+                "clusterId" -> SString("cluster1"),
+                "clusterCenter" -> SArray(
+                  Vector(SDecimal(2.1), SDecimal(3.3), SDecimal(4.0)))))))
+      )
     }
   }
 }
 
 object ClusteringLibSpecs
-    extends ClusteringLibSpecs[test.YId] with test.YIdInstances
+    extends ClusteringLibSpecs[test.YId]
+    with test.YIdInstances

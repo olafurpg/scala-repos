@@ -7,4 +7,5 @@ import org.scalatest.junit.JUnitWrapperSuite
 
 class AgentDocJavaSpec
     extends JUnitWrapperSuite(
-        "docs.agent.AgentDocTest", Thread.currentThread.getContextClassLoader)
+      "docs.agent.AgentDocTest",
+      Thread.currentThread.getContextClassLoader)

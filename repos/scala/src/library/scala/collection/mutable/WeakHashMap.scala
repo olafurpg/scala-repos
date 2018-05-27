@@ -49,7 +49,7 @@ class WeakHashMap[A, B]
   *  @define coll weak hash map
   */
 object WeakHashMap extends MutableMapFactory[WeakHashMap] {
-  implicit def canBuildFrom[A, B]: CanBuildFrom[
-      Coll, (A, B), WeakHashMap[A, B]] = new MapCanBuildFrom[A, B]
+  implicit def canBuildFrom[A, B]
+    : CanBuildFrom[Coll, (A, B), WeakHashMap[A, B]] = new MapCanBuildFrom[A, B]
   def empty[A, B]: WeakHashMap[A, B] = new WeakHashMap[A, B]
 }

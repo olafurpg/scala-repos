@@ -43,7 +43,8 @@ trait WebSocketDirectives {
     * rejects other requests with an [[ExpectedWebSocketRequestRejection]] or an [[UnsupportedWebSocketSubprotocolRejection]].
     */
   def handleWebSocketMessagesForProtocol(
-      handler: Flow[Message, Message, Any], subprotocol: String): Route =
+      handler: Flow[Message, Message, Any],
+      subprotocol: String): Route =
     handleWebSocketMessagesForOptionalProtocol(handler, Some(subprotocol))
 
   /**
@@ -62,7 +63,7 @@ trait WebSocketDirectives {
       subprotocol: Option[String]): Route =
     extractUpgradeToWebSocket { upgrade ⇒
       if (subprotocol.forall(
-              sub ⇒ upgrade.requestedProtocols.exists(_ equalsIgnoreCase sub)))
+            sub ⇒ upgrade.requestedProtocols.exists(_ equalsIgnoreCase sub)))
         complete(upgrade.handleMessages(handler, subprotocol))
       else
         reject(UnsupportedWebSocketSubprotocolRejection(subprotocol.get)) // None.forall == true

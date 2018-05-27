@@ -22,16 +22,20 @@ import kafka.api.FetchResponsePartitionData
 import kafka.api.PartitionFetchInfo
 import kafka.common.TopicAndPartition
 import kafka.metrics.KafkaMetricsGroup
-import org.apache.kafka.common.errors.{NotLeaderForPartitionException, UnknownTopicOrPartitionException}
+import org.apache.kafka.common.errors.{
+  NotLeaderForPartitionException,
+  UnknownTopicOrPartitionException
+}
 
 import scala.collection._
 
 case class FetchPartitionStatus(
-    startOffsetMetadata: LogOffsetMetadata, fetchInfo: PartitionFetchInfo) {
+    startOffsetMetadata: LogOffsetMetadata,
+    fetchInfo: PartitionFetchInfo) {
 
   override def toString =
     "[startOffsetMetadata: " + startOffsetMetadata + ", " + "fetchInfo: " +
-    fetchInfo + "]"
+      fetchInfo + "]"
 }
 
 /**
@@ -46,7 +50,7 @@ case class FetchMetadata(
 
   override def toString =
     "[minBytes: " + fetchMinBytes + ", " + "onlyLeader:" + fetchOnlyLeader +
-    ", "
+      ", "
   "onlyCommitted: " + fetchOnlyCommitted + ", "
   "partitionStatus: " + fetchPartitionStatus + "]"
 }
@@ -55,11 +59,11 @@ case class FetchMetadata(
   * A delayed fetch operation that can be created by the replica manager and watched
   * in the fetch operation purgatory
   */
-class DelayedFetch(delayMs: Long,
-                   fetchMetadata: FetchMetadata,
-                   replicaManager: ReplicaManager,
-                   responseCallback: Map[
-                       TopicAndPartition, FetchResponsePartitionData] => Unit)
+class DelayedFetch(
+    delayMs: Long,
+    fetchMetadata: FetchMetadata,
+    replicaManager: ReplicaManager,
+    responseCallback: Map[TopicAndPartition, FetchResponsePartitionData] => Unit)
     extends DelayedOperation(delayMs) {
 
   /**
@@ -80,7 +84,8 @@ class DelayedFetch(delayMs: Long,
         try {
           if (fetchOffset != LogOffsetMetadata.UnknownOffsetMetadata) {
             val replica = replicaManager.getLeaderReplicaIfLocal(
-                topicAndPartition.topic, topicAndPartition.partition)
+              topicAndPartition.topic,
+              topicAndPartition.partition)
             val endOffset =
               if (fetchMetadata.fetchOnlyCommitted) replica.highWatermark
               else replica.logEndOffset
@@ -92,33 +97,35 @@ class DelayedFetch(delayMs: Long,
               if (endOffset.onOlderSegment(fetchOffset)) {
                 // Case C, this can happen when the new fetch operation is on a truncated leader
                 debug(
-                    "Satisfying fetch %s since it is fetching later segments of partition %s."
-                      .format(fetchMetadata, topicAndPartition))
+                  "Satisfying fetch %s since it is fetching later segments of partition %s."
+                    .format(fetchMetadata, topicAndPartition))
                 return forceComplete()
               } else if (fetchOffset.onOlderSegment(endOffset)) {
                 // Case C, this can happen when the fetch operation is falling behind the current segment
                 // or the partition has just rolled a new segment
                 debug(
-                    "Satisfying fetch %s immediately since it is fetching older segments."
-                      .format(fetchMetadata))
+                  "Satisfying fetch %s immediately since it is fetching older segments."
+                    .format(fetchMetadata))
                 return forceComplete()
               } else if (fetchOffset.messageOffset < endOffset.messageOffset) {
                 // we need take the partition fetch size as upper bound when accumulating the bytes
                 accumulatedSize +=
-                  math.min(endOffset.positionDiff(fetchOffset),
-                           fetchStatus.fetchInfo.fetchSize)
+                  math.min(
+                    endOffset.positionDiff(fetchOffset),
+                    fetchStatus.fetchInfo.fetchSize)
               }
             }
           }
         } catch {
           case utpe: UnknownTopicOrPartitionException => // Case B
-            debug("Broker no longer know of %s, satisfy %s immediately".format(
-                    topicAndPartition, fetchMetadata))
+            debug(
+              "Broker no longer know of %s, satisfy %s immediately"
+                .format(topicAndPartition, fetchMetadata))
             return forceComplete()
           case nle: NotLeaderForPartitionException => // Case A
             debug(
-                "Broker is no longer the leader of %s, satisfy %s immediately"
-                  .format(topicAndPartition, fetchMetadata))
+              "Broker is no longer the leader of %s, satisfy %s immediately"
+                .format(topicAndPartition, fetchMetadata))
             return forceComplete()
         }
     }
@@ -139,14 +146,16 @@ class DelayedFetch(delayMs: Long,
     */
   override def onComplete() {
     val logReadResults = replicaManager.readFromLocalLog(
-        fetchMetadata.fetchOnlyLeader,
-        fetchMetadata.fetchOnlyCommitted,
-        fetchMetadata.fetchPartitionStatus.mapValues(
-            status => status.fetchInfo))
+      fetchMetadata.fetchOnlyLeader,
+      fetchMetadata.fetchOnlyCommitted,
+      fetchMetadata.fetchPartitionStatus.mapValues(status => status.fetchInfo))
 
-    val fetchPartitionData = logReadResults.mapValues(result =>
-          FetchResponsePartitionData(
-              result.errorCode, result.hw, result.info.messageSet))
+    val fetchPartitionData = logReadResults.mapValues(
+      result =>
+        FetchResponsePartitionData(
+          result.errorCode,
+          result.hw,
+          result.info.messageSet))
 
     responseCallback(fetchPartitionData)
   }
@@ -155,13 +164,13 @@ class DelayedFetch(delayMs: Long,
 object DelayedFetchMetrics extends KafkaMetricsGroup {
   private val FetcherTypeKey = "fetcherType"
   val followerExpiredRequestMeter = newMeter(
-      "ExpiresPerSec",
-      "requests",
-      TimeUnit.SECONDS,
-      tags = Map(FetcherTypeKey -> "follower"))
+    "ExpiresPerSec",
+    "requests",
+    TimeUnit.SECONDS,
+    tags = Map(FetcherTypeKey -> "follower"))
   val consumerExpiredRequestMeter = newMeter(
-      "ExpiresPerSec",
-      "requests",
-      TimeUnit.SECONDS,
-      tags = Map(FetcherTypeKey -> "consumer"))
+    "ExpiresPerSec",
+    "requests",
+    TimeUnit.SECONDS,
+    tags = Map(FetcherTypeKey -> "consumer"))
 }

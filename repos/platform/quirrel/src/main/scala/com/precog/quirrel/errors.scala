@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -36,9 +36,9 @@ trait RawErrors extends Errors with Phases {
   def showError(error: Error) = error.toString
 
   override def isWarning(error: Error) = error match {
-    case UnusedLetBinding(_) => true
+    case UnusedLetBinding(_)      => true
     case DeprecatedFunction(_, _) => true
-    case _ => false
+    case _                        => false
   }
 }
 
@@ -54,10 +54,10 @@ trait LineErrors extends Errors with Phases with parser.AST {
   }
 
   override def isWarning(error: Error) = error match {
-    case Error(UnusedLetBinding(_)) => true
+    case Error(UnusedLetBinding(_))               => true
     case Error(UnableToSolveCriticalCondition(_)) => true
-    case Error(DeprecatedFunction(_, _)) => true
-    case _ => false
+    case Error(DeprecatedFunction(_, _))          => true
+    case _                                        => false
   }
 
   class Error(val loc: LineStream, val tp: ErrorType) {
@@ -136,7 +136,7 @@ case class IncorrectArity(expected: Int, got: Int) extends ErrorType {
 case class UnspecifiedRequiredParams(missing: Seq[String]) extends ErrorType {
   override def toString =
     "unconstrained parameters on function invoked without specification: " +
-    (missing mkString ", ")
+      (missing mkString ", ")
 }
 
 case object FunctionArgsInapplicable extends ErrorType {
@@ -160,8 +160,7 @@ case class UnusedFormalBinding(id: Identifier) extends ErrorType {
 
 case class UnusedTicVariable(id: TicId) extends ErrorType {
   override def toString =
-    "function parameter %s defined but not referenced or constrained".format(
-        id)
+    "function parameter %s defined but not referenced or constrained".format(id)
 }
 
 // intended to be a warning

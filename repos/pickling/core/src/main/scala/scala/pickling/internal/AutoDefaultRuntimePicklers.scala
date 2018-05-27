@@ -13,31 +13,31 @@ import scala.pickling.spi.PicklerRegistry
 trait RuntimePicklerRegistryHelper extends PicklerRegistry {
   final def autoRegisterDefaults(): Unit = {
     val tpes = List(
-        "scala.Tuple2",
-        "scala.Tuple2$mcII$sp",
-        "scala.Tuple2$mcIJ$sp",
-        "scala.Tuple2$mcID$sp",
-        "scala.Tuple2$mcIZ$sp",
-        "scala.Tuple2$mcJI$sp",
-        "scala.Tuple2$mcJJ$sp",
-        "scala.Tuple2$mcJD$sp",
-        "scala.Tuple2$mcJC$sp",
-        "scala.Tuple2$mcJZ$sp",
-        "scala.Tuple2$mcDI$sp",
-        "scala.Tuple2$mcDJ$sp",
-        "scala.Tuple2$mcDD$sp",
-        "scala.Tuple2$mcDC$sp",
-        "scala.Tuple2$mcDZ$sp",
-        "scala.Tuple2$mcCI$sp",
-        "scala.Tuple2$mcCJ$sp",
-        "scala.Tuple2$mcCD$sp",
-        "scala.Tuple2$mcCC$sp",
-        "scala.Tuple2$mcCZ$sp",
-        "scala.Tuple2$mcZI$sp",
-        "scala.Tuple2$mcZJ$sp",
-        "scala.Tuple2$mcZD$sp",
-        "scala.Tuple2$mcZC$sp",
-        "scala.Tuple2$mcZZ$sp"
+      "scala.Tuple2",
+      "scala.Tuple2$mcII$sp",
+      "scala.Tuple2$mcIJ$sp",
+      "scala.Tuple2$mcID$sp",
+      "scala.Tuple2$mcIZ$sp",
+      "scala.Tuple2$mcJI$sp",
+      "scala.Tuple2$mcJJ$sp",
+      "scala.Tuple2$mcJD$sp",
+      "scala.Tuple2$mcJC$sp",
+      "scala.Tuple2$mcJZ$sp",
+      "scala.Tuple2$mcDI$sp",
+      "scala.Tuple2$mcDJ$sp",
+      "scala.Tuple2$mcDD$sp",
+      "scala.Tuple2$mcDC$sp",
+      "scala.Tuple2$mcDZ$sp",
+      "scala.Tuple2$mcCI$sp",
+      "scala.Tuple2$mcCJ$sp",
+      "scala.Tuple2$mcCD$sp",
+      "scala.Tuple2$mcCC$sp",
+      "scala.Tuple2$mcCZ$sp",
+      "scala.Tuple2$mcZI$sp",
+      "scala.Tuple2$mcZJ$sp",
+      "scala.Tuple2$mcZD$sp",
+      "scala.Tuple2$mcZC$sp",
+      "scala.Tuple2$mcZZ$sp"
     )
 
     for (tpe <- tpes) {
@@ -46,8 +46,8 @@ trait RuntimePicklerRegistryHelper extends PicklerRegistry {
     }
   }
 
-  def tuplePicklerGenerator: AppliedType => Pickler[(Any, Any)] with Unpickler[
-      (Any, Any)] = { tpe =>
+  def tuplePicklerGenerator
+    : AppliedType => Pickler[(Any, Any)] with Unpickler[(Any, Any)] = { tpe =>
     // TODO - Actually extract the tpe of the internal things.
     val tag = FastTypeTag.apply(internal.currentMirror, tpe.toString)
     new Tuple2RTPickler()

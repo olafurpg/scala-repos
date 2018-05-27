@@ -62,25 +62,28 @@ class GaussMixtureBenchmark extends BreezeBenchmark {
 }
 
 object GaussMixtureTransform {
-  def sampleTransform(sample: DenseVector[Double],
-                      centers: DenseVector[Double],
-                      gamma: Double): Double = {
+  def sampleTransform(
+      sample: DenseVector[Double],
+      centers: DenseVector[Double],
+      gamma: Double): Double = {
     val diff: DenseVector[Double] = sample - centers
     exp(-gamma * (diff dot diff))
   }
 
-  def samplesTransform(samples: Iterable[DenseVector[Double]],
-                       centers: DenseVector[Double],
-                       gamma: Double): Double = {
+  def samplesTransform(
+      samples: Iterable[DenseVector[Double]],
+      centers: DenseVector[Double],
+      gamma: Double): Double = {
     samples
       .map((sample: DenseVector[Double]) =>
-            sampleTransform(sample, centers, gamma))
+        sampleTransform(sample, centers, gamma))
       .sum
   }
 
-  def samplesTransform(samples: DenseMatrix[Double],
-                       centers: DenseVector[Double],
-                       gamma: Double): Double = {
+  def samplesTransform(
+      samples: DenseMatrix[Double],
+      centers: DenseVector[Double],
+      gamma: Double): Double = {
     val diff: DenseMatrix[Double] = samples(*, ::) - centers
     val prod = diff :*= diff
     val sum1: DenseVector[Double] = sum(prod, Axis._1) *= (-gamma)
@@ -90,9 +93,10 @@ object GaussMixtureTransform {
 //    sum(exp(sum(diff :*= diff, Axis._1) *= (-gamma)))
   }
 
-  def samplesTransformColMajor(samples: DenseMatrix[Double],
-                               centers: DenseVector[Double],
-                               gamma: Double): Double = {
+  def samplesTransformColMajor(
+      samples: DenseMatrix[Double],
+      centers: DenseVector[Double],
+      gamma: Double): Double = {
     val diff: DenseMatrix[Double] = samples(::, *) - centers
     val prod = diff :*= diff
     val sum1 = sum(prod, Axis._0) *= (-gamma)

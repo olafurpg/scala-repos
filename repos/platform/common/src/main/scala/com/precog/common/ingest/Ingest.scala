@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -30,7 +30,10 @@ import blueeyes.json.serialization.Extractor._
 import blueeyes.json.serialization.DefaultSerialization._
 import blueeyes.json.serialization.IsoSerialization._
 import blueeyes.json.serialization.Versioned._
-import blueeyes.json.serialization.JodaSerializationImplicits.{InstantExtractor, InstantDecomposer}
+import blueeyes.json.serialization.JodaSerializationImplicits.{
+  InstantExtractor,
+  InstantDecomposer
+}
 
 import org.joda.time.Instant
 import java.util.UUID
@@ -55,7 +58,9 @@ import JavaSerialization._
 
 sealed trait Event {
   def fold[A](
-      ingest: Ingest => A, archive: Archive => A, storeFile: StoreFile => A): A
+      ingest: Ingest => A,
+      archive: Archive => A,
+      storeFile: StoreFile => A): A
   def split(n: Int): List[Event]
   def length: Int
 }
@@ -71,24 +76,26 @@ object Event {
 /**
   * If writeAs is None, then the downstream
   */
-case class Ingest(apiKey: APIKey,
-                  path: Path,
-                  writeAs: Option[Authorities],
-                  data: Seq[JValue],
-                  jobId: Option[JobId],
-                  timestamp: Instant,
-                  streamRef: StreamRef)
+case class Ingest(
+    apiKey: APIKey,
+    path: Path,
+    writeAs: Option[Authorities],
+    data: Seq[JValue],
+    jobId: Option[JobId],
+    timestamp: Instant,
+    streamRef: StreamRef)
     extends Event {
-  def fold[A](ingest: Ingest => A,
-              archive: Archive => A,
-              storeFile: StoreFile => A): A = ingest(this)
+  def fold[A](
+      ingest: Ingest => A,
+      archive: Archive => A,
+      storeFile: StoreFile => A): A = ingest(this)
 
   def split(n: Int): List[Event] = {
     val splitSize = (data.length / n) max 1
     val splitData = data
       .grouped(splitSize)
       .toSeq
-      (splitData zip streamRef.split(splitData.size)).map({
+    (splitData zip streamRef.split(splitData.size)).map({
       case (d, ref) => this.copy(data = d, streamRef = ref)
     })(collection.breakOut)
   }
@@ -101,7 +108,7 @@ object Ingest {
 
   val schemaV1 =
     "apiKey" :: "path" :: "writeAs" :: "data" :: "jobId" :: "timestamp" :: "streamRef" :: HNil
-  implicit def seqExtractor[A : Extractor]: Extractor[Seq[A]] =
+  implicit def seqExtractor[A: Extractor]: Extractor[Seq[A]] =
     implicitly[Extractor[List[A]]].map(_.toSeq)
 
   val decomposerV1: Decomposer[Ingest] =
@@ -113,16 +120,17 @@ object Ingest {
   val extractorV1a = new Extractor[Ingest] {
     def validated(obj: JValue): Validation[Error, Ingest] = {
       (obj.validated[APIKey]("apiKey") |@| obj.validated[Path]("path") |@| obj
-            .validated[Option[AccountId]]("ownerAccountId")) {
+        .validated[Option[AccountId]]("ownerAccountId")) {
         (apiKey, path, ownerAccountId) =>
           val jv = (obj \ "data")
-          Ingest(apiKey,
-                 path,
-                 ownerAccountId.map(Authorities(_)),
-                 if (jv == JUndefined) Vector() else Vector(jv),
-                 None,
-                 EventMessage.defaultTimestamp,
-                 StreamRef.Append)
+          Ingest(
+            apiKey,
+            path,
+            ownerAccountId.map(Authorities(_)),
+            if (jv == JUndefined) Vector() else Vector(jv),
+            None,
+            EventMessage.defaultTimestamp,
+            StreamRef.Append)
       }
     }
   }
@@ -132,13 +140,14 @@ object Ingest {
       (obj.validated[String]("tokenId") |@| obj.validated[Path]("path")) {
         (apiKey, path) =>
           val jv = (obj \ "data")
-          Ingest(apiKey,
-                 path,
-                 None,
-                 if (jv == JUndefined) Vector() else Vector(jv),
-                 None,
-                 EventMessage.defaultTimestamp,
-                 StreamRef.Append)
+          Ingest(
+            apiKey,
+            path,
+            None,
+            if (jv == JUndefined) Vector() else Vector(jv),
+            None,
+            EventMessage.defaultTimestamp,
+            StreamRef.Append)
       }
     }
   }
@@ -149,11 +158,15 @@ object Ingest {
 }
 
 case class Archive(
-    apiKey: APIKey, path: Path, jobId: Option[JobId], timestamp: Instant)
+    apiKey: APIKey,
+    path: Path,
+    jobId: Option[JobId],
+    timestamp: Instant)
     extends Event {
-  def fold[A](ingest: Ingest => A,
-              archive: Archive => A,
-              storeFile: StoreFile => A): A = archive(this)
+  def fold[A](
+      ingest: Ingest => A,
+      archive: Archive => A,
+      storeFile: StoreFile => A): A = archive(this)
   def split(n: Int) = List(this) // can't split an archive
   def length = 1
 }
@@ -163,10 +176,10 @@ object Archive {
 
   val schemaV1 =
     "apiKey" :: "path" :: "jobId" ::
-    ("timestamp" ||| EventMessage.defaultTimestamp) :: HNil
+      ("timestamp" ||| EventMessage.defaultTimestamp) :: HNil
   val schemaV0 =
     "tokenId" :: "path" :: Omit ::
-    ("timestamp" ||| EventMessage.defaultTimestamp) :: HNil
+      ("timestamp" ||| EventMessage.defaultTimestamp) :: HNil
 
   val decomposerV1: Decomposer[Archive] =
     decomposerV[Archive](schemaV1, Some("1.0".v))
@@ -199,16 +212,16 @@ sealed trait StreamRef {
 object StreamRef {
   def forWriteMode(mode: WriteMode, terminal: Boolean): StreamRef =
     mode match {
-      case AccessMode.Create => StreamRef.Create(UUID.randomUUID, terminal)
+      case AccessMode.Create  => StreamRef.Create(UUID.randomUUID, terminal)
       case AccessMode.Replace => StreamRef.Replace(UUID.randomUUID, terminal)
-      case AccessMode.Append => StreamRef.Append
+      case AccessMode.Append  => StreamRef.Append
     }
 
   object NewVersion {
     def unapply(ref: StreamRef): Option[(UUID, Boolean, Boolean)] = {
       ref match {
-        case Append => None
-        case Create(uuid, terminal) => Some((uuid, terminal, false))
+        case Append                  => None
+        case Create(uuid, terminal)  => Some((uuid, terminal, false))
         case Replace(uuid, terminal) => Some((uuid, terminal, true))
       }
     }
@@ -236,10 +249,10 @@ object StreamRef {
     def decompose(streamRef: StreamRef) = streamRef match {
       case Create(uuid, terminal) =>
         JObject(
-            "create" -> JObject("uuid" -> uuid.jv, "terminal" -> terminal.jv))
+          "create" -> JObject("uuid" -> uuid.jv, "terminal" -> terminal.jv))
       case Replace(uuid, terminal) =>
         JObject(
-            "replace" -> JObject("uuid" -> uuid.jv, "terminal" -> terminal.jv))
+          "replace" -> JObject("uuid" -> uuid.jv, "terminal" -> terminal.jv))
       case Append => JString("append")
     }
   }
@@ -249,11 +262,11 @@ object StreamRef {
       case JString("append") => Success(Append)
       case other =>
         ((other \? "create") map { jv =>
-              (jv, Create.apply _)
-            }) orElse
-        ((other \? "replace") map { jv =>
-              (jv, Replace.apply _)
-            }) map {
+          (jv, Create.apply _)
+        }) orElse
+          ((other \? "replace") map { jv =>
+            (jv, Replace.apply _)
+          }) map {
           case (jv, f) =>
             (jv.validated[UUID]("uuid") |@| jv.validated[Boolean]("terminal")) {
               f
@@ -265,24 +278,25 @@ object StreamRef {
   }
 }
 
-case class StoreFile(apiKey: APIKey,
-                     path: Path,
-                     writeAs: Option[Authorities],
-                     jobId: JobId,
-                     content: FileContent,
-                     timestamp: Instant,
-                     stream: StreamRef)
+case class StoreFile(
+    apiKey: APIKey,
+    path: Path,
+    writeAs: Option[Authorities],
+    jobId: JobId,
+    content: FileContent,
+    timestamp: Instant,
+    stream: StreamRef)
     extends Event {
-  def fold[A](ingest: Ingest => A,
-              archive: Archive => A,
-              storeFile: StoreFile => A): A = storeFile(this)
+  def fold[A](
+      ingest: Ingest => A,
+      archive: Archive => A,
+      storeFile: StoreFile => A): A = storeFile(this)
   def split(n: Int) = {
     val splitSize = content.data.length / n
     content.data
       .grouped(splitSize)
       .map(d =>
-            this.copy(
-                content = FileContent(d, content.mimeType, content.encoding)))
+        this.copy(content = FileContent(d, content.mimeType, content.encoding)))
       .toList
   }
 

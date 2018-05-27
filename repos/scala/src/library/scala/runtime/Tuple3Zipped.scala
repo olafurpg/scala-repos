@@ -33,9 +33,12 @@ object ZippedTraversable3 {
 }
 
 final class Tuple3Zipped[El1, Repr1, El2, Repr2, El3, Repr3](
-    val colls: (TraversableLike[El1, Repr1], IterableLike[El2, Repr2],
-    IterableLike[El3, Repr3]))
-    extends AnyVal with ZippedTraversable3[El1, El2, El3] {
+    val colls: (
+        TraversableLike[El1, Repr1],
+        IterableLike[El2, Repr2],
+        IterableLike[El3, Repr3]))
+    extends AnyVal
+    with ZippedTraversable3[El1, El2, El3] {
 
   def map[B, To](f: (El1, El2, El3) => B)(
       implicit cbf: CBF[Repr1, B, To]): To = {
@@ -120,28 +123,34 @@ final class Tuple3Zipped[El1, Repr1, El2, Repr2, El3, Repr3](
 
   override def toString: String =
     "(%s, %s, %s).zipped".format(
-        colls._1.toString, colls._2.toString, colls._3.toString)
+      colls._1.toString,
+      colls._2.toString,
+      colls._3.toString)
 }
 
 object Tuple3Zipped {
   final class Ops[T1, T2, T3](val x: (T1, T2, T3)) extends AnyVal {
-    def invert[El1,
-               CC1[X] <: TraversableOnce[X],
-               El2,
-               CC2[X] <: TraversableOnce[X],
-               El3,
-               CC3[X] <: TraversableOnce[X],
-               That](implicit w1: T1 <:< CC1[El1],
-                     w2: T2 <:< CC2[El2],
-                     w3: T3 <:< CC3[El3],
-                     bf: scala.collection.generic.CanBuildFrom[
-                         CC1[_], (El1, El2, El3), That]): That = {
+    def invert[
+        El1,
+        CC1[X] <: TraversableOnce[X],
+        El2,
+        CC2[X] <: TraversableOnce[X],
+        El3,
+        CC3[X] <: TraversableOnce[X],
+        That](
+        implicit w1: T1 <:< CC1[El1],
+        w2: T2 <:< CC2[El2],
+        w3: T3 <:< CC3[El3],
+        bf: scala.collection.generic.CanBuildFrom[
+          CC1[_],
+          (El1, El2, El3),
+          That]): That = {
       val buf = bf(x._1)
       val it1 = x._1.toIterator
       val it2 = x._2.toIterator
       val it3 = x._3.toIterator
       while (it1.hasNext && it2.hasNext && it3.hasNext) buf +=
-      ((it1.next(), it2.next(), it3.next()))
+        ((it1.next(), it2.next(), it3.next()))
 
       buf.result()
     }

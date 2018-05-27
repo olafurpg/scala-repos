@@ -57,7 +57,7 @@ class KeyedCache[K, T](size: Int, loadFactor: Box[Float], cons: K => Box[T]) {
     } else {
       cons(key) match {
         case f @ Full(v) => cache.update(key, v); f
-        case _ => Empty
+        case _           => Empty
       }
     }
 }

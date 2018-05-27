@@ -19,7 +19,8 @@ import com.twitter.finagle.Addr
   * @param key An optional unique identifier for the cache node (e.g.  shard ID).
   */
 private[cacheresolver] case class CacheNodeMetadata(
-    weight: Int, key: Option[String])
+    weight: Int,
+    key: Option[String])
 
 private[cacheresolver] object CacheNodeMetadata {
   private val key = "cache_node_metadata"

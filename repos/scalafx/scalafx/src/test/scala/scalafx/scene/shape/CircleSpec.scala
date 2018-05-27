@@ -43,4 +43,5 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class CircleSpec
     extends SimpleSFXDelegateSpec[jfxss.Circle, Circle](
-        classOf[jfxss.Circle], classOf[Circle])
+      classOf[jfxss.Circle],
+      classOf[Circle])

@@ -16,6 +16,8 @@ abstract class SchemeDirectives extends RangeDirectives {
     */
   @varargs
   def scheme(
-      scheme: String, innerRoute: Route, moreInnerRoutes: Route*): Route =
+      scheme: String,
+      innerRoute: Route,
+      moreInnerRoutes: Route*): Route =
     SchemeFilter(scheme)(innerRoute, moreInnerRoutes.toList)
 }

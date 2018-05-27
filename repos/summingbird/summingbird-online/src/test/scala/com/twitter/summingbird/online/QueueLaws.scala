@@ -45,19 +45,18 @@ object QueueLaws extends Properties("Queue") {
     q.putAll(items)
     q.trimTo(0) == items
   }
-  property("Queue works with finished futures") = forAll {
-    (items: List[Int]) =>
-      val q = Queue.linkedBlocking[(Int, Try[Int])]
-      items.foreach { i =>
-        q.put((i, Try(i * i)))
-      }
-      q.foldLeft((0, true)) {
-        case ((cnt, good), (i, ti)) =>
-          ti match {
-            case Return(ii) => (cnt + 1, good)
-            case Throw(e) => (cnt + 1, false)
-          }
-      } == (items.size, true)
+  property("Queue works with finished futures") = forAll { (items: List[Int]) =>
+    val q = Queue.linkedBlocking[(Int, Try[Int])]
+    items.foreach { i =>
+      q.put((i, Try(i * i)))
+    }
+    q.foldLeft((0, true)) {
+      case ((cnt, good), (i, ti)) =>
+        ti match {
+          case Return(ii) => (cnt + 1, good)
+          case Throw(e)   => (cnt + 1, false)
+        }
+    } == (items.size, true)
   }
   property("Queue.linkedNonBlocking works") = forAll { (items: List[Int]) =>
     val q = Queue.linkedNonBlocking[(Int, Try[Int])]
@@ -68,7 +67,7 @@ object QueueLaws extends Properties("Queue") {
       case ((cnt, good), (i, ti)) =>
         ti match {
           case Return(ii) => (cnt + 1, good)
-          case Throw(e) => (cnt + 1, false)
+          case Throw(e)   => (cnt + 1, false)
         }
     } == (items.size, true)
   }
@@ -100,17 +99,19 @@ object QueueLaws extends Properties("Queue") {
   property("Queue poll + size is correct") = forAll { (items: List[Int]) =>
     // Make sure we can fit everything
     val q = Queue[Int]()
-    items.map { i =>
-      q.put(i)
-      val size = q.size
-      if (i % 2 == 0) {
-        // do a poll test
-        q.poll match {
-          case None => q.size == 0
-          case Some(_) => q.size == (size - 1)
-        }
-      } else true
-    }.forall(identity)
+    items
+      .map { i =>
+        q.put(i)
+        val size = q.size
+        if (i % 2 == 0) {
+          // do a poll test
+          q.poll match {
+            case None    => q.size == 0
+            case Some(_) => q.size == (size - 1)
+          }
+        } else true
+      }
+      .forall(identity)
   }
   property("Queue is fifo") = forAll { (items: List[Int]) =>
     val q = Queue[Int]()

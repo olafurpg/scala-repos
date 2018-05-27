@@ -23,11 +23,11 @@ object Test extends InteractiveTest {
 
     item1.get(Timeout) match {
       case None => println("TIMEOUT")
-      case _ =>
+      case _    =>
     }
     item2.get(Timeout) match {
       case None => println("TIMEOUT")
-      case _ =>
+      case _    =>
     }
   }
 }

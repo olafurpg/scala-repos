@@ -4,7 +4,7 @@ package quasiquotes
 import scala.reflect.internal.Flags._
 import scala.reflect.macros.TypecheckException
 
-class Rank private[Rank](val value: Int) extends AnyVal {
+class Rank private[Rank] (val value: Int) extends AnyVal {
   def pred = { assert(value - 1 >= 0); new Rank(value - 1) }
   def succ = new Rank(value + 1)
   override def toString = if (value == 0) "no dots" else "." * (value + 1)
@@ -40,7 +40,7 @@ trait Holes { self: Quasiquotes =>
   private def isLiftableType(tpe: Type) = inferLiftable(tpe) != EmptyTree
   private def isNativeType(tpe: Type) =
     (tpe <:< treeType) || (tpe <:< nameType) || (tpe <:< modsType) ||
-    (tpe <:< flagsType) || (tpe <:< symbolType)
+      (tpe <:< flagsType) || (tpe <:< symbolType)
   private def isBottomType(tpe: Type) =
     tpe <:< NothingClass.tpe || tpe <:< NullClass.tpe
   private def extractIterableTParam(tpe: Type) =
@@ -57,8 +57,7 @@ trait Holes { self: Quasiquotes =>
   private def iterableTypeFromRank(n: Rank, tpe: Type): Type = {
     if (n == NoDot) tpe
     else
-      appliedType(
-          IterableClass.toType, List(iterableTypeFromRank(n.pred, tpe)))
+      appliedType(IterableClass.toType, List(iterableTypeFromRank(n.pred, tpe)))
   }
 
   /** Hole encapsulates information about unquotees in quasiquotes.
@@ -80,8 +79,8 @@ trait Holes { self: Quasiquotes =>
 
   class ApplyHole(annotatedRank: Rank, unquotee: Tree) extends Hole {
     val (strippedTpe, tpe): (Type, Type) = {
-      val (strippedRank, strippedTpe) = stripIterable(
-          unquotee.tpe, limit = annotatedRank)
+      val (strippedRank, strippedTpe) =
+        stripIterable(unquotee.tpe, limit = annotatedRank)
       if (isBottomType(strippedTpe)) cantSplice()
       else if (isNativeType(strippedTpe)) {
         if (strippedRank != NoDot && !(strippedTpe <:< treeType) &&
@@ -113,22 +112,26 @@ trait Holes { self: Quasiquotes =>
       val suggestRank = annotatedRank != iterableRank || annotatedRank != NoDot
       val unquoteeRankMsg =
         if (annotatedRank != iterableRank && iterableRank != NoDot)
-          s"using $iterableRank" else "omitting the dots"
+          s"using $iterableRank"
+        else "omitting the dots"
       val rankSuggestion = if (suggestRank) unquoteeRankMsg else ""
       val suggestLifting =
         (annotatedRank == NoDot || iterableRank != NoDot) &&
-        !(iterableType <:< treeType) && !isLiftableType(iterableType)
+          !(iterableType <:< treeType) && !isLiftableType(iterableType)
       val liftedTpe =
         if (annotatedRank != NoDot) iterableType else unquotee.tpe
       val liftSuggestion =
         if (suggestLifting)
-          s"providing an implicit instance of Liftable[$liftedTpe]" else ""
+          s"providing an implicit instance of Liftable[$liftedTpe]"
+        else ""
       val advice =
         if (isBottomType(iterableType))
           "bottom type values often indicate programmer mistake"
         else
           "consider " +
-          List(rankSuggestion, liftSuggestion).filter(_ != "").mkString(" or ")
+            List(rankSuggestion, liftSuggestion)
+              .filter(_ != "")
+              .mkString(" or ")
       c.abort(unquotee.pos, s"Can't $action, $advice")
     }
 
@@ -141,9 +144,11 @@ trait Holes { self: Quasiquotes =>
 
     private def toStats(tree: Tree): Tree =
       // q"$u.internal.reificationSupport.toStats($tree)"
-      Apply(Select(Select(Select(u, nme.internal), nme.reificationSupport),
-                   nme.toStats),
-            tree :: Nil)
+      Apply(
+        Select(
+          Select(Select(u, nme.internal), nme.reificationSupport),
+          nme.toStats),
+        tree :: Nil)
 
     private def toList(tree: Tree, tpe: Type): Tree =
       if (isListType(tpe)) tree
@@ -155,9 +160,10 @@ trait Holes { self: Quasiquotes =>
         val x = TermName(c.freshName())
         // q"$tree.map { $x => ${f(Ident(x))} }"
         Apply(
-            Select(tree, nme.map),
-            Function(ValDef(Modifiers(PARAM), x, TypeTree(), EmptyTree) :: Nil,
-                     f(Ident(x))) :: Nil)
+          Select(tree, nme.map),
+          Function(
+            ValDef(Modifiers(PARAM), x, TypeTree(), EmptyTree) :: Nil,
+            f(Ident(x))) :: Nil)
       }
 
     private object IterableType {
@@ -211,31 +217,35 @@ trait Holes { self: Quasiquotes =>
       case Bind(pname, inner) => (pname, inner.pos, None)
     }
     val treeNoUnlift = Bind(placeholderName, Ident(nme.WILDCARD))
-    lazy val tree = tptopt.map { tpt =>
-      val TypeDef(_, _, _, typedTpt) =
-        try c.typecheck(TypeDef(NoMods, TypeName("T"), Nil, tpt)) catch {
-          case TypecheckException(pos, msg) =>
-            c.abort(pos.asInstanceOf[c.Position], msg)
-        }
-      val tpe = typedTpt.tpe
-      val (iterableRank, _) = stripIterable(tpe)
-      if (iterableRank.value < rank.value)
-        c.abort(pat.pos,
-                s"Can't extract $tpe with $rank, consider using $iterableRank")
-      val (_, strippedTpe) = stripIterable(tpe, limit = rank)
-      if (strippedTpe <:< treeType) treeNoUnlift
-      else
-        unlifters
-          .spawn(strippedTpe, rank)
-          .map {
-            Apply(_, treeNoUnlift :: Nil)
+    lazy val tree = tptopt
+      .map { tpt =>
+        val TypeDef(_, _, _, typedTpt) =
+          try c.typecheck(TypeDef(NoMods, TypeName("T"), Nil, tpt))
+          catch {
+            case TypecheckException(pos, msg) =>
+              c.abort(pos.asInstanceOf[c.Position], msg)
           }
-          .getOrElse {
-            c.abort(
+        val tpe = typedTpt.tpe
+        val (iterableRank, _) = stripIterable(tpe)
+        if (iterableRank.value < rank.value)
+          c.abort(
+            pat.pos,
+            s"Can't extract $tpe with $rank, consider using $iterableRank")
+        val (_, strippedTpe) = stripIterable(tpe, limit = rank)
+        if (strippedTpe <:< treeType) treeNoUnlift
+        else
+          unlifters
+            .spawn(strippedTpe, rank)
+            .map {
+              Apply(_, treeNoUnlift :: Nil)
+            }
+            .getOrElse {
+              c.abort(
                 pat.pos,
                 s"Can't find $unliftableType[$strippedTpe], consider providing it")
-          }
-    }.getOrElse { treeNoUnlift }
+            }
+      }
+      .getOrElse { treeNoUnlift }
   }
 
   /** Full support for unliftable implies that it's possible to interleave
@@ -270,22 +280,26 @@ trait Holes { self: Quasiquotes =>
         case ((tpe, rank), idx) =>
           val name = TermName(nme.QUASIQUOTE_UNLIFT_HELPER + idx)
           val helperName = rank match {
-            case DotDot => nme.UnliftListElementwise
+            case DotDot    => nme.UnliftListElementwise
             case DotDotDot => nme.UnliftListOfListsElementwise
           }
           val lifter = inferUnliftable(tpe)
           assert(helperName.isTermName)
           // q"val $name: $u.internal.reificationSupport.${helperName.toTypeName} = $u.internal.reificationSupport.$helperName($lifter)"
-          ValDef(NoMods,
-                 name,
-                 AppliedTypeTree(Select(Select(Select(u, nme.internal),
-                                               nme.reificationSupport),
-                                        helperName.toTypeName),
-                                 List(TypeTree(tpe))),
-                 Apply(Select(Select(Select(u, nme.internal),
-                                     nme.reificationSupport),
-                              helperName),
-                       lifter :: Nil))
+          ValDef(
+            NoMods,
+            name,
+            AppliedTypeTree(
+              Select(
+                Select(Select(u, nme.internal), nme.reificationSupport),
+                helperName.toTypeName),
+              List(TypeTree(tpe))),
+            Apply(
+              Select(
+                Select(Select(u, nme.internal), nme.reificationSupport),
+                helperName),
+              lifter :: Nil)
+          )
       }
   }
 }

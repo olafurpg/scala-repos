@@ -19,11 +19,14 @@ object ShowPickled extends Names {
   import PickleFormat._
 
   case class PickleBufferEntry(
-      num: Int, startIndex: Int, tag: Int, bytes: Array[Byte]) {
+      num: Int,
+      startIndex: Int,
+      tag: Int,
+      bytes: Array[Byte]) {
     def isName = tag == TERMname || tag == TYPEname
     def hasName = tag match {
-      case TYPEsym | ALIASsym | CLASSsym | MODULEsym | VALsym |
-          EXTref | EXTMODCLASSref =>
+      case TYPEsym | ALIASsym | CLASSsym | MODULEsym | VALsym | EXTref |
+          EXTMODCLASSref =>
         true
       case _ => false
     }
@@ -58,50 +61,50 @@ object ShowPickled extends Names {
   }
 
   def tag2string(tag: Int): String = tag match {
-    case TERMname => "TERMname"
-    case TYPEname => "TYPEname"
-    case NONEsym => "NONEsym"
-    case TYPEsym => "TYPEsym"
-    case ALIASsym => "ALIASsym"
-    case CLASSsym => "CLASSsym"
-    case MODULEsym => "MODULEsym"
-    case VALsym => "VALsym"
-    case EXTref => "EXTref"
-    case EXTMODCLASSref => "EXTMODCLASSref"
-    case NOtpe => "NOtpe"
-    case NOPREFIXtpe => "NOPREFIXtpe"
-    case THIStpe => "THIStpe"
-    case SINGLEtpe => "SINGLEtpe"
-    case CONSTANTtpe => "CONSTANTtpe"
-    case TYPEREFtpe => "TYPEREFtpe"
-    case TYPEBOUNDStpe => "TYPEBOUNDStpe"
-    case REFINEDtpe => "REFINEDtpe"
-    case CLASSINFOtpe => "CLASSINFOtpe"
-    case METHODtpe => "METHODtpe"
-    case POLYtpe => "POLYtpe"
+    case TERMname          => "TERMname"
+    case TYPEname          => "TYPEname"
+    case NONEsym           => "NONEsym"
+    case TYPEsym           => "TYPEsym"
+    case ALIASsym          => "ALIASsym"
+    case CLASSsym          => "CLASSsym"
+    case MODULEsym         => "MODULEsym"
+    case VALsym            => "VALsym"
+    case EXTref            => "EXTref"
+    case EXTMODCLASSref    => "EXTMODCLASSref"
+    case NOtpe             => "NOtpe"
+    case NOPREFIXtpe       => "NOPREFIXtpe"
+    case THIStpe           => "THIStpe"
+    case SINGLEtpe         => "SINGLEtpe"
+    case CONSTANTtpe       => "CONSTANTtpe"
+    case TYPEREFtpe        => "TYPEREFtpe"
+    case TYPEBOUNDStpe     => "TYPEBOUNDStpe"
+    case REFINEDtpe        => "REFINEDtpe"
+    case CLASSINFOtpe      => "CLASSINFOtpe"
+    case METHODtpe         => "METHODtpe"
+    case POLYtpe           => "POLYtpe"
     case IMPLICITMETHODtpe => "METHODtpe" // IMPLICITMETHODtpe no longer used.
-    case SUPERtpe => "SUPERtpe"
-    case LITERALunit => "LITERALunit"
-    case LITERALboolean => "LITERALboolean"
-    case LITERALbyte => "LITERALbyte"
-    case LITERALshort => "LITERALshort"
-    case LITERALchar => "LITERALchar"
-    case LITERALint => "LITERALint"
-    case LITERALlong => "LITERALlong"
-    case LITERALfloat => "LITERALfloat"
-    case LITERALdouble => "LITERALdouble"
-    case LITERALstring => "LITERALstring"
-    case LITERALnull => "LITERALnull"
-    case LITERALclass => "LITERALclass"
-    case LITERALenum => "LITERALenum"
-    case SYMANNOT => "SYMANNOT"
-    case CHILDREN => "CHILDREN"
-    case ANNOTATEDtpe => "ANNOTATEDtpe"
-    case ANNOTINFO => "ANNOTINFO"
-    case ANNOTARGARRAY => "ANNOTARGARRAY"
-    case EXISTENTIALtpe => "EXISTENTIALtpe"
-    case TREE => "TREE"
-    case MODIFIERS => "MODIFIERS"
+    case SUPERtpe          => "SUPERtpe"
+    case LITERALunit       => "LITERALunit"
+    case LITERALboolean    => "LITERALboolean"
+    case LITERALbyte       => "LITERALbyte"
+    case LITERALshort      => "LITERALshort"
+    case LITERALchar       => "LITERALchar"
+    case LITERALint        => "LITERALint"
+    case LITERALlong       => "LITERALlong"
+    case LITERALfloat      => "LITERALfloat"
+    case LITERALdouble     => "LITERALdouble"
+    case LITERALstring     => "LITERALstring"
+    case LITERALnull       => "LITERALnull"
+    case LITERALclass      => "LITERALclass"
+    case LITERALenum       => "LITERALenum"
+    case SYMANNOT          => "SYMANNOT"
+    case CHILDREN          => "CHILDREN"
+    case ANNOTATEDtpe      => "ANNOTATEDtpe"
+    case ANNOTINFO         => "ANNOTINFO"
+    case ANNOTARGARRAY     => "ANNOTARGARRAY"
+    case EXISTENTIALtpe    => "EXISTENTIALtpe"
+    case TREE              => "TREE"
+    case MODIFIERS         => "MODIFIERS"
 
     case _ => "***BAD TAG***(" + tag + ")"
   }
@@ -116,7 +119,7 @@ object ShowPickled extends Names {
       b = data(idx).toLong
       idx += 1
       result = (result << 7) + (b & 0x7f)
-    } while ( (b & 0x80) != 0L)
+    } while ((b & 0x80) != 0L)
 
     result.toInt
   }
@@ -160,7 +163,7 @@ object ShowPickled extends Names {
           val arg1 = Flags.pickledToRawFlags(pflags)
           accessBoundary match {
             case Some(pw) => Flags.flagsToString(arg1, pw)
-            case _ => Flags.flagsToString(arg1)
+            case _        => Flags.flagsToString(arg1)
           }
         }
 
@@ -265,13 +268,13 @@ object ShowPickled extends Names {
       out.println()
       if (buf.readIndex != end) {
         out.println(
-            "BAD ENTRY END: computed = %d, actual = %d, bytes = %s".format(
-                end,
-                buf.readIndex,
-                buf.bytes
-                  .slice(index(i), (end max buf.readIndex))
-                  .mkString(", ")
-              ))
+          "BAD ENTRY END: computed = %d, actual = %d, bytes = %s".format(
+            end,
+            buf.readIndex,
+            buf.bytes
+              .slice(index(i), (end max buf.readIndex))
+              .mkString(", ")
+          ))
       }
     }
 
@@ -280,7 +283,8 @@ object ShowPickled extends Names {
 
   def fromFile(path: String) = fromBytes(io.File(path).toByteArray())
   def fromBytes(data: => Array[Byte]): Option[PickleBuffer] =
-    try Some(new PickleBuffer(data, 0, data.length)) catch {
+    try Some(new PickleBuffer(data, 0, data.length))
+    catch {
       case _: Exception => None
     }
 
@@ -296,7 +300,7 @@ object ShowPickled extends Names {
     args foreach { arg =>
       fromFile(arg) match {
         case Some(pb) => show(arg + ":", pb)
-        case _ => Console.println("Cannot read " + arg)
+        case _        => Console.println("Cannot read " + arg)
       }
     }
   }

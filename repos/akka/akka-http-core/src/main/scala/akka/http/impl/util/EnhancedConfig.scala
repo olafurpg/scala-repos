@@ -23,7 +23,7 @@ private[http] class EnhancedConfig(val underlying: Config) extends AnyVal {
       case x: FiniteDuration ⇒ x
       case _ ⇒
         throw new ConfigurationException(
-            s"Config setting '$path' must be a finite duration")
+          s"Config setting '$path' must be a finite duration")
     }
 
   def getPossiblyInfiniteInt(path: String): Int =
@@ -37,7 +37,7 @@ private[http] class EnhancedConfig(val underlying: Config) extends AnyVal {
     if (value <= Int.MaxValue) value.toInt
     else
       throw new ConfigurationException(
-          s"Config setting '$path' must not be larger than ${Int.MaxValue}")
+        s"Config setting '$path' must not be larger than ${Int.MaxValue}")
   }
 
   def getPossiblyInfiniteIntBytes(path: String): Int =

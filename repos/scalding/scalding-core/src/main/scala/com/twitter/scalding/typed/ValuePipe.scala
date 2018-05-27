@@ -39,7 +39,7 @@ object ValuePipe extends java.io.Serializable {
 sealed trait ValuePipe[+T] extends java.io.Serializable {
   def leftCross[U](that: ValuePipe[U]): ValuePipe[(T, Option[U])] =
     that match {
-      case EmptyValue => map((_, None))
+      case EmptyValue       => map((_, None))
       case LiteralValue(v2) => map((_, Some(v2)))
       // We don't know if a computed value is empty or not. We need to run the MR job:
       case _ => ComputedValue(toTypedPipe.leftCross(that))
@@ -83,7 +83,7 @@ sealed trait ValuePipe[+T] extends java.io.Serializable {
   def toOptionExecution: Execution[Option[T]] =
     toTypedPipe.toIterableExecution.map { it =>
       it.iterator.take(2).toList match {
-        case Nil => None
+        case Nil      => None
         case h :: Nil => Some(h)
         case items =>
           sys.error("More than 1 item in an ValuePipe: " + items.toString)

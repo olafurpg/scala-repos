@@ -35,16 +35,16 @@ private case class LibraryReference(level: Level, name: String) {
 
   def removeFrom(module: ModuleSettings) {
     val element = findOrderEntryIn(module).getOrElse(
-        throw new IllegalArgumentException(
-            s"Cannot remove library (${level.title}/$name}) dependency in module ${module.getModuleName}"))
+      throw new IllegalArgumentException(
+        s"Cannot remove library (${level.title}/$name}) dependency in module ${module.getModuleName}"))
 
     element.detach()
   }
 
   private def findOrderEntryIn(module: ModuleSettings): Option[Element] = {
     val node = XPath.selectSingleNode(
-        rootManagerElementIn(module),
-        s"orderEntry[@type='library' and @name='$name' and @level='${level.title}']")
+      rootManagerElementIn(module),
+      s"orderEntry[@type='library' and @name='$name' and @level='${level.title}']")
 
     Option(node.asInstanceOf[Element])
   }
@@ -63,8 +63,7 @@ private case class LibraryReference(level: Level, name: String) {
   private def directoryBasedLibraryFileIn(
       context: ConversionContext): Option[File] = {
     val libraryFiles = {
-      val librariesDirectory = new File(
-          context.getSettingsBaseDir, "libraries")
+      val librariesDirectory = new File(context.getSettingsBaseDir, "libraries")
       val files =
         Option(librariesDirectory.listFiles).map(_.toSeq).getOrElse(Seq.empty)
       files.filter(_.getName.endsWith(".xml"))
@@ -86,8 +85,8 @@ private case class LibraryReference(level: Level, name: String) {
 
   private def deleteDirectoryBasedLibrary(context: ConversionContext): File = {
     val libraryFile = directoryBasedLibraryFileIn(context).getOrElse(
-        throw new IllegalArgumentException(
-            s"Cannot delete project library: $name"))
+      throw new IllegalArgumentException(
+        s"Cannot delete project library: $name"))
 
     // We have to resort to this workaround because IDEA's converter "restores" the file otherwise
     invokeLater {
@@ -104,13 +103,13 @@ private case class LibraryReference(level: Level, name: String) {
       val rootElement = context.getProjectSettings.getRootElement
       XPath
         .selectSingleNode(
-            rootElement,
-            s"component[@name='libraryTable']/library[@name='$name']")
+          rootElement,
+          s"component[@name='libraryTable']/library[@name='$name']")
         .asInstanceOf[Element]
     }
     if (libraryElement == null) {
       throw new IllegalArgumentException(
-          s"Cannot delete project library: $name")
+        s"Cannot delete project library: $name")
     }
     libraryElement.detach()
   }
@@ -124,7 +123,8 @@ private object LibraryReference {
   }
 
   def apply(element: Element): LibraryReference = {
-    LibraryReference(Level.fromTitle(element.getAttributeValue("level")),
-                     element.getAttributeValue("name"))
+    LibraryReference(
+      Level.fromTitle(element.getAttributeValue("level")),
+      element.getAttributeValue("name"))
   }
 }

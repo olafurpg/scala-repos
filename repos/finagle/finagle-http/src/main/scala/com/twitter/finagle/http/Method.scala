@@ -31,15 +31,15 @@ object Method {
     * of the common methods, we observe the case.
     */
   def apply(name: String): Method = name.toUpperCase match {
-    case "GET" => Get
-    case "POST" => Post
-    case "PUT" => Put
-    case "HEAD" => Head
-    case "PATCH" => Patch
-    case "DELETE" => Delete
-    case "TRACE" => Trace
+    case "GET"     => Get
+    case "POST"    => Post
+    case "PUT"     => Put
+    case "HEAD"    => Head
+    case "PATCH"   => Patch
+    case "DELETE"  => Delete
+    case "TRACE"   => Trace
     case "CONNECT" => Connect
     case "OPTIONS" => Options
-    case method => Custom(name)
+    case method    => Custom(name)
   }
 }

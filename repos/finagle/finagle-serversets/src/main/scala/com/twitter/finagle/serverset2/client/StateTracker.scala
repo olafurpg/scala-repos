@@ -7,8 +7,7 @@ class StateTracker(
     statsReceiver: StatsReceiver,
     samplePeriod: Duration,
     timer: Timer
-)
-    extends Closable {
+) extends Closable {
 
   private[this] var currState: Option[SessionState] = None
   private[this] var lastSample: Time = Time.now

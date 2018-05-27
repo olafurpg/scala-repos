@@ -8,7 +8,13 @@ trait CompletionService[A, R] {
   def take(): R
 }
 
-import java.util.concurrent.{Callable, CompletionService => JCompletionService, Executor, Executors, ExecutorCompletionService}
+import java.util.concurrent.{
+  Callable,
+  CompletionService => JCompletionService,
+  Executor,
+  Executors,
+  ExecutorCompletionService
+}
 
 object CompletionService {
   def apply[A, T](poolSize: Int): (CompletionService[A, T], () => Unit) = {
@@ -29,7 +35,8 @@ object CompletionService {
       future.get()
   }
   def manage[A, T](service: CompletionService[A, T])(
-      setup: A => Unit, cleanup: A => Unit): CompletionService[A, T] =
+      setup: A => Unit,
+      cleanup: A => Unit): CompletionService[A, T] =
     wrap(service) { (node, work) => () =>
       setup(node)
       try { work() } finally { cleanup(node) }

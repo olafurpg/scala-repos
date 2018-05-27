@@ -31,10 +31,11 @@ import scala.reflect.macros.Context
  */
 object LazyMacrosRef {
   def inst(c: Context) =
-    new LazyMacros(new macrocompat.RuntimeCompatContext(
-            c.asInstanceOf[scala.reflect.macros.runtime.Context]))
+    new LazyMacros(
+      new macrocompat.RuntimeCompatContext(
+        c.asInstanceOf[scala.reflect.macros.runtime.Context]))
 
-  def mkLazyImpl[I : c.WeakTypeTag](c: Context): c.Expr[Lazy[I]] = {
+  def mkLazyImpl[I: c.WeakTypeTag](c: Context): c.Expr[Lazy[I]] = {
     import c.universe._
 
     def forward: c.Expr[Lazy[I]] = {
@@ -48,7 +49,7 @@ object LazyMacrosRef {
       case Some(lm) =>
         if (lm == LazyMacrosRef) forward
         else {
-          lm.asInstanceOf[ {
+          lm.asInstanceOf[{
               def mkLazyImpl(c: Context)(i: c.WeakTypeTag[I]): c.Expr[Lazy[I]]
             }]
             .mkLazyImpl(c)(weakTypeTag[I])
@@ -63,7 +64,7 @@ object LazyMacrosRef {
     }
   }
 
-  def mkStrictImpl[I : c.WeakTypeTag](c: Context): c.Expr[Strict[I]] = {
+  def mkStrictImpl[I: c.WeakTypeTag](c: Context): c.Expr[Strict[I]] = {
     import c.universe._
 
     def forward: c.Expr[Strict[I]] = {
@@ -77,7 +78,7 @@ object LazyMacrosRef {
       case Some(lm) =>
         if (lm == LazyMacrosRef) forward
         else {
-          lm.asInstanceOf[ {
+          lm.asInstanceOf[{
               def mkStrictImpl(c: Context)(
                   i: c.WeakTypeTag[I]): c.Expr[Strict[I]]
             }]

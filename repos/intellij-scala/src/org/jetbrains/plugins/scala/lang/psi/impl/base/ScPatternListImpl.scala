@@ -17,7 +17,9 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.ScPatternListStub
   * Date: 22.02.2008
   */
 class ScPatternListImpl private (
-    stub: StubElement[ScPatternList], nodeType: IElementType, node: ASTNode)
+    stub: StubElement[ScPatternList],
+    nodeType: IElementType,
+    node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
     with ScPatternList {
 
@@ -32,8 +34,8 @@ class ScPatternListImpl private (
     val stub = getStub
     if (stub != null && allPatternsSimple) {
       return stub.getChildrenByType(
-          ScalaElementTypes.REFERENCE_PATTERN,
-          JavaArrayFactoryUtil.ScReferencePatternFactory)
+        ScalaElementTypes.REFERENCE_PATTERN,
+        JavaArrayFactoryUtil.ScReferencePatternFactory)
     }
     findChildrenByClass[ScPattern](classOf[ScPattern])
   }

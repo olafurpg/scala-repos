@@ -56,57 +56,61 @@ abstract class MappedDouble[T <: Mapper[T]](val fieldOwner: T)
     * @return the source field metadata for the field
     */
   def sourceInfoMetadata(): SourceFieldMetadata { type ST = Double } =
-    SourceFieldMetadataRep(name, manifest, new FieldConverter {
+    SourceFieldMetadataRep(
+      name,
+      manifest,
+      new FieldConverter {
 
-      /**
-        * The type of the field
-        */
-      type T = Double
+        /**
+          * The type of the field
+          */
+        type T = Double
 
-      /**
-        * Convert the field to a String
-        * @param v the field value
-        * @return the string representation of the field value
-        */
-      def asString(v: T): String = v.toString
+        /**
+          * Convert the field to a String
+          * @param v the field value
+          * @return the string representation of the field value
+          */
+        def asString(v: T): String = v.toString
 
-      /**
-        * Convert the field into NodeSeq, if possible
-        * @param v the field value
-        * @return a NodeSeq if the field can be represented as one
-        */
-      def asNodeSeq(v: T): Box[NodeSeq] = Full(Text(asString(v)))
+        /**
+          * Convert the field into NodeSeq, if possible
+          * @param v the field value
+          * @return a NodeSeq if the field can be represented as one
+          */
+        def asNodeSeq(v: T): Box[NodeSeq] = Full(Text(asString(v)))
 
-      /**
-        * Convert the field into a JSON value
-        * @param v the field value
-        * @return the JSON representation of the field
-        */
-      def asJson(v: T): Box[JValue] = Full(JsonAST.JDouble(v))
+        /**
+          * Convert the field into a JSON value
+          * @param v the field value
+          * @return the JSON representation of the field
+          */
+        def asJson(v: T): Box[JValue] = Full(JsonAST.JDouble(v))
 
-      /**
-        * If the field can represent a sequence of SourceFields,
-        * get that
-        * @param v the field value
-        * @return the field as a sequence of SourceFields
-        */
-      def asSeq(v: T): Box[Seq[SourceFieldInfo]] = Empty
-    })
+        /**
+          * If the field can represent a sequence of SourceFields,
+          * get that
+          * @param v the field value
+          * @return the field as a sequence of SourceFields
+          */
+        def asSeq(v: T): Box[Seq[SourceFieldInfo]] = Empty
+      }
+    )
 
   def toDouble(in: Any): Double = {
     in match {
-      case null => 0.0
-      case i: Int => i
-      case n: Long => n
-      case n: Number => n.doubleValue
+      case null             => 0.0
+      case i: Int           => i
+      case n: Long          => n
+      case n: Number        => n.doubleValue
       case (n: Number) :: _ => n.doubleValue
-      case Full(n) => toDouble(n) // fixes issue 185
-      case x: EmptyBox => 0.0
-      case Some(n) => toDouble(n)
-      case None => 0.0
-      case s: String => s.toDouble
-      case x :: xs => toDouble(x)
-      case o => toDouble(o.toString)
+      case Full(n)          => toDouble(n) // fixes issue 185
+      case x: EmptyBox      => 0.0
+      case Some(n)          => toDouble(n)
+      case None             => 0.0
+      case s: String        => s.toDouble
+      case x :: xs          => toDouble(x)
+      case o                => toDouble(o.toString)
     }
   }
 
@@ -130,16 +134,16 @@ abstract class MappedDouble[T <: Mapper[T]](val fieldOwner: T)
   override def setFromAny(in: Any): Double = {
     in match {
       case JsonAST.JDouble(db) => this.set(db)
-      case JsonAST.JInt(bi) => this.set(bi.doubleValue)
-      case n: Double => this.set(n)
-      case n: Number => this.set(n.doubleValue)
-      case (n: Number) :: _ => this.set(n.doubleValue)
-      case Some(n: Number) => this.set(n.doubleValue)
-      case None => this.set(0.0)
-      case (s: String) :: _ => this.set(toDouble(s))
-      case null => this.set(0L)
-      case s: String => this.set(toDouble(s))
-      case o => this.set(toDouble(o))
+      case JsonAST.JInt(bi)    => this.set(bi.doubleValue)
+      case n: Double           => this.set(n)
+      case n: Number           => this.set(n.doubleValue)
+      case (n: Number) :: _    => this.set(n.doubleValue)
+      case Some(n: Number)     => this.set(n.doubleValue)
+      case None                => this.set(0.0)
+      case (s: String) :: _    => this.set(toDouble(s))
+      case null                => this.set(0L)
+      case s: String           => this.set(toDouble(s))
+      case o                   => this.set(toDouble(o))
     }
   }
 
@@ -152,10 +156,12 @@ abstract class MappedDouble[T <: Mapper[T]](val fieldOwner: T)
   def targetSQLType = Types.DOUBLE
   def jdbcFriendly(field: String) = new java.lang.Double(i_is_!)
   def buildSetBooleanValue(
-      accessor: Method, columnName: String): (T, Boolean, Boolean) => Unit =
+      accessor: Method,
+      columnName: String): (T, Boolean, Boolean) => Unit =
     null
   def buildSetDateValue(
-      accessor: Method, columnName: String): (T, Date) => Unit =
+      accessor: Method,
+      columnName: String): (T, Date) => Unit =
     (inst, v) =>
       doField(inst, accessor, {
         case f: MappedDouble[T] =>
@@ -163,20 +169,23 @@ abstract class MappedDouble[T <: Mapper[T]](val fieldOwner: T)
       })
 
   def buildSetStringValue(
-      accessor: Method, columnName: String): (T, String) => Unit =
+      accessor: Method,
+      columnName: String): (T, String) => Unit =
     (inst, v) =>
       doField(inst, accessor, { case f: MappedDouble[T] => f.st(toDouble(v)) })
 
   def buildSetLongValue(
-      accessor: Method, columnName: String): (T, Long, Boolean) => Unit =
+      accessor: Method,
+      columnName: String): (T, Long, Boolean) => Unit =
     (inst, v, isNull) =>
       doField(inst, accessor, {
         case f: MappedDouble[T] => f.st(if (isNull) defaultValue else v)
       })
 
-  def buildSetActualValue(accessor: Method,
-                          data: AnyRef,
-                          columnName: String): (T, AnyRef) => Unit =
+  def buildSetActualValue(
+      accessor: Method,
+      data: AnyRef,
+      columnName: String): (T, AnyRef) => Unit =
     (inst, v) =>
       doField(inst, accessor, { case f: MappedDouble[T] => f.st(toDouble(v)) })
 

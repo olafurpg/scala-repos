@@ -26,12 +26,12 @@ case class RichResponse(res: HttpServletResponse) {
     def get(key: String): Option[String] =
       res.getHeaders(key) match {
         case xs if xs.isEmpty => None
-        case xs => Some(xs.asScala mkString ",")
+        case xs               => Some(xs.asScala mkString ",")
       }
 
     def iterator: Iterator[(String, String)] =
-      for (name <- res.getHeaderNames.asScala.iterator) yield
-        (name, res.getHeaders(name).asScala mkString ", ")
+      for (name <- res.getHeaderNames.asScala.iterator)
+        yield (name, res.getHeaders(name).asScala mkString ", ")
 
     def +=(kv: (String, String)): this.type = {
       res.setHeader(kv._1, kv._2)

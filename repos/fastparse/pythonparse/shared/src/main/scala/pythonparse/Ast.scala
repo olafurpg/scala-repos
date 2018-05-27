@@ -22,15 +22,17 @@ object Ast {
 
   sealed trait stmt
   object stmt {
-    case class FunctionDef(name: identifier,
-                           args: arguments,
-                           body: Seq[stmt],
-                           decorator_list: Seq[expr])
+    case class FunctionDef(
+        name: identifier,
+        args: arguments,
+        body: Seq[stmt],
+        decorator_list: Seq[expr])
         extends stmt
-    case class ClassDef(name: identifier,
-                        bases: Seq[expr],
-                        body: Seq[stmt],
-                        decorator_list: Seq[expr])
+    case class ClassDef(
+        name: identifier,
+        bases: Seq[expr],
+        body: Seq[stmt],
+        decorator_list: Seq[expr])
         extends stmt
     case class Return(value: Option[expr]) extends stmt
 
@@ -43,29 +45,36 @@ object Ast {
         extends stmt
 
     // use 'orelse' because else is a keyword in target languages
-    case class For(
-        target: expr, iter: expr, body: Seq[stmt], orelse: Seq[stmt])
+    case class For(target: expr, iter: expr, body: Seq[stmt], orelse: Seq[stmt])
         extends stmt
     case class While(test: expr, body: Seq[stmt], orelse: Seq[stmt])
         extends stmt
     case class If(test: expr, body: Seq[stmt], orelse: Seq[stmt]) extends stmt
     case class With(
-        context_expr: expr, optional_vars: Option[expr], body: Seq[stmt])
+        context_expr: expr,
+        optional_vars: Option[expr],
+        body: Seq[stmt])
         extends stmt
 
     // 'type' is a bad name
     case class Raise(
-        `type`: Option[expr], inst: Option[expr], tback: Option[expr])
+        `type`: Option[expr],
+        inst: Option[expr],
+        tback: Option[expr])
         extends stmt
     case class TryExcept(
-        body: Seq[stmt], handlers: Seq[excepthandler], orelse: Seq[stmt])
+        body: Seq[stmt],
+        handlers: Seq[excepthandler],
+        orelse: Seq[stmt])
         extends stmt
     case class TryFinally(body: Seq[stmt], finalbody: Seq[stmt]) extends stmt
     case class Assert(test: expr, msg: Option[expr]) extends stmt
 
     case class Import(names: Seq[alias]) extends stmt
     case class ImportFrom(
-        module: Option[identifier], names: Seq[alias], level: Option[int])
+        module: Option[identifier],
+        names: Seq[alias],
+        level: Option[int])
         extends stmt
 
     // Doesn't capture requirement that locals must be
@@ -107,11 +116,12 @@ object Ast {
     // x < 4 < 3 and (x < 4) < 3
     case class Compare(left: expr, ops: Seq[cmpop], comparators: Seq[expr])
         extends expr
-    case class Call(func: expr,
-                    args: Seq[expr],
-                    keywords: Seq[keyword],
-                    starargs: Option[expr],
-                    kwargs: Option[expr])
+    case class Call(
+        func: expr,
+        args: Seq[expr],
+        keywords: Seq[keyword],
+        starargs: Option[expr],
+        kwargs: Option[expr])
         extends expr
     case class Repr(value: expr) extends expr
     case class Num(n: Any) extends expr // a number as a PyObject.
@@ -145,7 +155,9 @@ object Ast {
 
     case object Ellipsis extends slice
     case class Slice(
-        lower: Option[expr], upper: Option[expr], step: Option[expr])
+        lower: Option[expr],
+        upper: Option[expr],
+        step: Option[expr])
         extends slice
     case class ExtSlice(dims: Seq[slice]) extends slice
     case class Index(value: expr) extends slice
@@ -202,14 +214,17 @@ object Ast {
   sealed trait excepthandler
   object excepthandler {
     case class ExceptHandler(
-        `type`: Option[expr], name: Option[expr], body: Seq[stmt])
+        `type`: Option[expr],
+        name: Option[expr],
+        body: Seq[stmt])
         extends excepthandler
   }
 
-  case class arguments(args: Seq[expr],
-                       vararg: Option[identifier],
-                       kwarg: Option[identifier],
-                       defaults: Seq[expr])
+  case class arguments(
+      args: Seq[expr],
+      vararg: Option[identifier],
+      kwarg: Option[identifier],
+      defaults: Seq[expr])
 
   // keyword arguments supplied to call
   case class keyword(arg: identifier, value: expr)

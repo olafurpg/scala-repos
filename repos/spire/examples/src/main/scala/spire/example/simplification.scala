@@ -108,9 +108,10 @@ object Simplification {
     * describes the maximum distance we can shift the value to find an
     * "exact" match.
     */
-  def snap(n: Double,
-           limit: Int = 10,
-           epsilon: Double = 0.00000000001): (Double, Int, Int) = {
+  def snap(
+      n: Double,
+      limit: Int = 10,
+      epsilon: Double = 0.00000000001): (Double, Int, Int) = {
     @tailrec
     def loop(i: Int, ex: Int, div: Int): (Double, Int, Int) = {
       if (i >= limit) {
@@ -219,7 +220,7 @@ class BigCons[A](override val head: A, t: => BigStream[A])
   override def toString: String = "BigStream(%s, ...)" format head.toString
   override def equals(rhs: Any): Boolean = rhs match {
     case s: BigStream[_] => !s.isEmpty && tail == s.tail
-    case _ => false
+    case _               => false
   }
 }
 

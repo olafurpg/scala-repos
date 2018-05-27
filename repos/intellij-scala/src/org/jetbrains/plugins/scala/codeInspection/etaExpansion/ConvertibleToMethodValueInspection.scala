@@ -7,8 +7,16 @@ import com.intellij.psi._
 import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.plugins.scala.codeInspection.collections.MethodRepr
 import org.jetbrains.plugins.scala.codeInspection.etaExpansion.ConvertibleToMethodValueInspection._
-import org.jetbrains.plugins.scala.codeInspection.{AbstractFixOnPsiElement, AbstractInspection, InspectionBundle}
-import org.jetbrains.plugins.scala.extensions.{Both, PsiModifierListOwnerExt, ResolvesTo}
+import org.jetbrains.plugins.scala.codeInspection.{
+  AbstractFixOnPsiElement,
+  AbstractInspection,
+  InspectionBundle
+}
+import org.jetbrains.plugins.scala.extensions.{
+  Both,
+  PsiModifierListOwnerExt,
+  ResolvesTo
+}
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScConstructor
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
@@ -38,19 +46,20 @@ class ConvertibleToMethodValueInspection
         if ref
           .bind()
           .exists(srr =>
-                srr.implicitType.nonEmpty || srr.implicitFunction.nonEmpty) =>
+            srr.implicitType.nonEmpty || srr.implicitFunction.nonEmpty) =>
     //do nothing if implicit conversions are involved
     case MethodRepr(expr, Some(qual), Some(_), args) =>
       if (allArgsUnderscores(args) && onlyStableValuesUsed(qual))
-        registerProblem(holder,
-                        expr,
-                        InspectionBundle.message(
-                            "convertible.to.method.value.anonymous.hint"))
+        registerProblem(
+          holder,
+          expr,
+          InspectionBundle.message(
+            "convertible.to.method.value.anonymous.hint"))
     case und: ScUnderscoreSection if und.bindingExpr.isDefined =>
       val isInParameterOfParameterizedClass =
         PsiTreeUtil.getParentOfType(und, classOf[ScClassParameter]) match {
           case null => false
-          case cp => cp.containingClass.hasTypeParameters
+          case cp   => cp.containingClass.hasTypeParameters
         }
       def checkStable() = und.bindingExpr.get match {
         case ScReferenceExpression.withQualifier(qual) =>
@@ -59,45 +68,49 @@ class ConvertibleToMethodValueInspection
       }
       if (!isInParameterOfParameterizedClass && checkStable())
         registerProblem(
-            holder,
-            und,
-            InspectionBundle.message("convertible.to.method.value.eta.hint"))
+          holder,
+          und,
+          InspectionBundle.message("convertible.to.method.value.eta.hint"))
   }
 
   private def allArgsUnderscores(args: Seq[ScExpression]): Boolean = {
-    args.nonEmpty && args.forall(arg =>
-          arg.isInstanceOf[ScUnderscoreSection] &&
+    args.nonEmpty && args.forall(
+      arg =>
+        arg.isInstanceOf[ScUnderscoreSection] &&
           ScUnderScoreSectionUtil.isUnderscore(arg))
   }
 
   private def onlyStableValuesUsed(qual: ScExpression): Boolean = {
     def isStable(named: PsiNamedElement) =
       ScalaPsiUtil.nameContext(named) match {
-        case cp: ScClassParameter => !cp.isVar
-        case f: PsiField => f.hasFinalModifier
-        case o: ScObject => o.isLocal || ScalaPsiUtil.hasStablePath(o)
+        case cp: ScClassParameter         => !cp.isVar
+        case f: PsiField                  => f.hasFinalModifier
+        case o: ScObject                  => o.isLocal || ScalaPsiUtil.hasStablePath(o)
         case _: PsiMethod | _: ScVariable => false
-        case _ => true
+        case _                            => true
       }
 
     qual.depthFirst(e => !e.isInstanceOf[ScImportStmt]).forall {
       case _: ScNewTemplateDefinition => false
-      case Both(_: ScReferenceExpression | ScConstructor.byReference(_),
-                ResolvesTo(named: PsiNamedElement)) =>
+      case Both(
+          _: ScReferenceExpression | ScConstructor.byReference(_),
+          ResolvesTo(named: PsiNamedElement)) =>
         isStable(named)
       case _ => true
     }
   }
 
   private def registerProblem(
-      holder: ProblemsHolder, expr: ScExpression, hint: String) {
+      holder: ProblemsHolder,
+      expr: ScExpression,
+      hint: String) {
     possibleReplacements(expr).find(isSuitableForReplace(expr, _)).foreach {
       replacement =>
         holder.registerProblem(
-            expr,
-            inspectionName,
-            ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
-            new ConvertibleToMethodValueQuickFix(expr, replacement, hint))
+          expr,
+          inspectionName,
+          ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
+          new ConvertibleToMethodValueQuickFix(expr, replacement, hint))
     }
   }
 
@@ -110,13 +123,16 @@ class ConvertibleToMethodValueInspection
         infixCopy.getNode.removeChild(infixCopy.rOp.getNode)
         Seq(infixCopy.getText)
       case und: ScUnderscoreSection => und.bindingExpr.map(_.getText).toSeq
-      case _ => Seq.empty
+      case _                        => Seq.empty
     }
 
   private def isSuitableForReplace(
-      oldExpr: ScExpression, newExprText: String): Boolean = {
+      oldExpr: ScExpression,
+      newExprText: String): Boolean = {
     val newExpr = ScalaPsiElementFactory.createExpressionWithContextFromText(
-        newExprText, oldExpr.getContext, oldExpr)
+      newExprText,
+      oldExpr.getContext,
+      oldExpr)
     oldExpr.expectedType(fromUnderscore = false) match {
       case Some(expectedType) if ScFunctionType.isFunctionType(expectedType) =>
         def conformsExpected(expr: ScExpression): Boolean =
@@ -144,14 +160,17 @@ class ConvertibleToMethodValueInspection
 }
 
 class ConvertibleToMethodValueQuickFix(
-    expr: ScExpression, replacement: String, hint: String)
+    expr: ScExpression,
+    replacement: String,
+    hint: String)
     extends AbstractFixOnPsiElement(hint, expr) {
 
   def doApplyFix(project: Project) {
     val scExpr = getElement
     if (!scExpr.isValid) return
     val newExpr = ScalaPsiElementFactory.createExpressionFromText(
-        replacement, scExpr.getManager)
+      replacement,
+      scExpr.getManager)
     scExpr.replaceExpression(newExpr, removeParenthesis = true)
   }
 }

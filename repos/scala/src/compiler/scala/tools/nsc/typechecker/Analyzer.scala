@@ -11,10 +11,21 @@ import scala.reflect.internal.util.Statistics
 /** The main attribution phase.
   */
 trait Analyzer
-    extends AnyRef with Contexts with Namers with Typers with Infer
-    with Implicits with EtaExpansion with SyntheticMethods with Unapplies
-    with Macros with NamesDefaults with TypeDiagnostics with ContextErrors
-    with StdAttachments with AnalyzerPlugins {
+    extends AnyRef
+    with Contexts
+    with Namers
+    with Typers
+    with Infer
+    with Implicits
+    with EtaExpansion
+    with SyntheticMethods
+    with Unapplies
+    with Macros
+    with NamesDefaults
+    with TypeDiagnostics
+    with ContextErrors
+    with StdAttachments
+    with AnalyzerPlugins {
   val global: Global
   import global._
 
@@ -52,7 +63,7 @@ trait Analyzer
               openPackageModule(tree.symbol, tree.symbol.owner)
             }
           case ClassDef(_, _, _, _) => () // make it fast
-          case _ => super.traverse(tree)
+          case _                    => super.traverse(tree)
         }
       }
 

@@ -66,7 +66,7 @@ class ChannelStatsHandlerTest extends FunSpec with MockitoSugar {
           handler.channelInterestChanged(ctxUnwritable, e)
           assert(sr.counters(Seq("socket_writable_ms")) == 25.minutes.inMillis)
           assert(
-              sr.counters(Seq("socket_unwritable_ms")) == 10.minutes.inMillis)
+            sr.counters(Seq("socket_unwritable_ms")) == 10.minutes.inMillis)
         }
       }
     }

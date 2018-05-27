@@ -18,7 +18,7 @@ import scala.concurrent.duration.{Duration, FiniteDuration}
 /**
   * Public API but not intended for subclassing
   */
-abstract class ClientConnectionSettings private[akka]() {
+abstract class ClientConnectionSettings private[akka] () {
   self: ClientConnectionSettingsImpl ⇒
   def getUserAgentHeader: Optional[UserAgent]
   def getConnectingTimeout: FiniteDuration
@@ -40,8 +40,8 @@ abstract class ClientConnectionSettings private[akka]() {
     self.copy(idleTimeout = newValue)
   def withRequestHeaderSizeHint(newValue: Int): ClientConnectionSettings =
     self.copy(requestHeaderSizeHint = newValue)
-  def withWebsocketRandomFactory(newValue: java.util.function.Supplier[Random])
-    : ClientConnectionSettings =
+  def withWebsocketRandomFactory(
+      newValue: java.util.function.Supplier[Random]): ClientConnectionSettings =
     self.copy(websocketRandomFactory = () ⇒ newValue.get())
   def withSocketOptions(
       newValue: java.lang.Iterable[SocketOption]): ClientConnectionSettings =

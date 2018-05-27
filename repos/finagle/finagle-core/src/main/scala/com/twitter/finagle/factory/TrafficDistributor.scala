@@ -2,7 +2,11 @@ package com.twitter.finagle.factory
 
 import com.twitter.finagle._
 import com.twitter.finagle.addr.WeightedAddress
-import com.twitter.finagle.service.{DelayedFactory, FailingFactory, ServiceFactoryRef}
+import com.twitter.finagle.service.{
+  DelayedFactory,
+  FailingFactory,
+  ServiceFactoryRef
+}
 import com.twitter.finagle.stats.{StatsReceiver, NullStatsReceiver}
 import com.twitter.finagle.util.{Drv, Rng}
 import com.twitter.util._
@@ -13,26 +17,28 @@ private[finagle] object TrafficDistributor {
     * A [[ServiceFactory]] and its associated weight. The `closeGate` defers closes
     * to `factory` until it is set.
     */
-  case class WeightedFactory[Req, Rep](factory: ServiceFactory[Req, Rep],
-                                       closeGate: Promise[Unit],
-                                       weight: Double)
+  case class WeightedFactory[Req, Rep](
+      factory: ServiceFactory[Req, Rep],
+      closeGate: Promise[Unit],
+      weight: Double)
 
   /**
     * An intermediate representation of the endpoints that a load balancer
     * operates over, capable of being updated.
     */
-  type BalancerEndpoints[Req, Rep] = Var[Activity.State[Set[ServiceFactory[
-                  Req, Rep]]]] with Updatable[Activity.State[Set[
-              ServiceFactory[Req, Rep]]]]
+  type BalancerEndpoints[Req, Rep] =
+    Var[Activity.State[Set[ServiceFactory[Req, Rep]]]]
+      with Updatable[Activity.State[Set[ServiceFactory[Req, Rep]]]]
 
   /**
     * Represents cache entries for load balancer instances. Stores both
     * the load balancer instance and its backing updatable collection.
     * Size refers to the number of elements in `endpoints`.
     */
-  case class CachedBalancer[Req, Rep](balancer: ServiceFactory[Req, Rep],
-                                      endpoints: BalancerEndpoints[Req, Rep],
-                                      size: Int)
+  case class CachedBalancer[Req, Rep](
+      balancer: ServiceFactory[Req, Rep],
+      endpoints: BalancerEndpoints[Req, Rep],
+      size: Int)
 
   /**
     * A load balancer and its associated weight. Size refers to the
@@ -40,7 +46,9 @@ private[finagle] object TrafficDistributor {
     * operates over these.
     */
   case class WeightClass[Req, Rep](
-      balancer: ServiceFactory[Req, Rep], weight: Double, size: Int)
+      balancer: ServiceFactory[Req, Rep],
+      weight: Double,
+      size: Int)
 
   /**
     * Folds and accumulates over an [[Activity]] based event `stream` while biasing
@@ -67,7 +75,7 @@ private[finagle] object TrafficDistributor {
       case (stale @ Activity.Ok(state), Activity.Pending) if init != state =>
         stale
       case (_, failed @ Activity.Failed(_)) => failed
-      case (_, Activity.Pending) => Activity.Pending
+      case (_, Activity.Pending)            => Activity.Pending
     }
   }
 
@@ -75,11 +83,13 @@ private[finagle] object TrafficDistributor {
     * Distributes requests to `classes` according to their weight and size.
     */
   private class Distributor[Req, Rep](
-      classes: Iterable[WeightClass[Req, Rep]], rng: Rng = Rng.threadLocal)
+      classes: Iterable[WeightClass[Req, Rep]],
+      rng: Rng = Rng.threadLocal)
       extends ServiceFactory[Req, Rep] {
 
-    private[this] val (balancers, drv): (IndexedSeq[ServiceFactory[Req, Rep]],
-    Drv) = {
+    private[this] val (balancers, drv): (
+        IndexedSeq[ServiceFactory[Req, Rep]],
+        Drv) = {
       val tupled = classes.map {
         case WeightClass(b, weight, size) => (b, weight * size)
       }
@@ -126,7 +136,8 @@ private[finagle] class TrafficDistributor[Req, Rep](
     dest: Activity[Set[Address]],
     newEndpoint: Address => ServiceFactory[Req, Rep],
     newBalancer: Activity[Set[ServiceFactory[Req, Rep]]] => ServiceFactory[
-        Req, Rep],
+      Req,
+      Rep],
     eagerEviction: Boolean,
     rng: Rng = Rng.threadLocal,
     statsReceiver: StatsReceiver = NullStatsReceiver)
@@ -173,8 +184,9 @@ private[finagle] class TrafficDistributor[Req, Rep](
                   override def close(when: Time) =
                     (closeGate or outerClose).before { super.close(when) }
                 }
-                cache.updated(addr,
-                              WeightedFactory(endpoint, closeGate, weight))
+                cache.updated(
+                  addr,
+                  WeightedFactory(endpoint, closeGate, weight))
               case _ => cache
             }
         }
@@ -194,8 +206,8 @@ private[finagle] class TrafficDistributor[Req, Rep](
             }
         }
     }.map {
-      case Activity.Ok(cache) => Activity.Ok(cache.values.toSet)
-      case Activity.Pending => Activity.Pending
+      case Activity.Ok(cache)          => Activity.Ok(cache.values.toSet)
+      case Activity.Pending            => Activity.Pending
       case failed @ Activity.Failed(_) => failed
     }
   }
@@ -254,15 +266,14 @@ private[finagle] class TrafficDistributor[Req, Rep](
           case (weight, CachedBalancer(bal, _, size)) =>
             WeightClass(bal, weight, size)
         })
-      case Activity.Pending => Activity.Pending
+      case Activity.Pending            => Activity.Pending
       case failed @ Activity.Failed(_) => failed
     }
   }
 
   private[this] val weightClasses = partition(weightEndpoints(dest.states))
   private[this] val pending = new Promise[ServiceFactory[Req, Rep]]
-  private[this] val init: ServiceFactory[Req, Rep] = new DelayedFactory(
-      pending)
+  private[this] val init: ServiceFactory[Req, Rep] = new DelayedFactory(pending)
 
   @volatile
   private[this] var meanWeight = 0.0f
@@ -274,11 +285,15 @@ private[finagle] class TrafficDistributor[Req, Rep](
   private[this] def updateMeanWeight(
       classes: Iterable[WeightClass[Req, Rep]]): Unit = {
     val size = classes.map(_.size).sum
-    meanWeight = if (size != 0)
-      classes.map { c =>
-        c.weight * c.size
-      }.sum.toFloat / size
-    else 0.0F
+    meanWeight =
+      if (size != 0)
+        classes
+          .map { c =>
+            c.weight * c.size
+          }
+          .sum
+          .toFloat / size
+      else 0.0F
   }
 
   // Translate the stream of weightClasses into a stream of underlying
@@ -288,7 +303,7 @@ private[finagle] class TrafficDistributor[Req, Rep](
       case (_, Activity.Ok(wcs)) if wcs.isEmpty =>
         // Defer the handling of an empty destination set to `newBalancer`
         val emptyBal = newBalancer(
-            Activity(Var(Activity.Ok(Set.empty[ServiceFactory[Req, Rep]]))))
+          Activity(Var(Activity.Ok(Set.empty[ServiceFactory[Req, Rep]]))))
         updateMeanWeight(wcs)
         pending.updateIfEmpty(Return(emptyBal))
         emptyBal

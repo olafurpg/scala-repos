@@ -38,9 +38,10 @@ object LWWMap {
   * This class is immutable, i.e. "modifying" methods return a new instance.
   */
 @SerialVersionUID(1L)
-final class LWWMap[A] private[akka](
+final class LWWMap[A] private[akka] (
     private[akka] val underlying: ORMap[LWWRegister[A]])
-    extends ReplicatedData with ReplicatedDataSerialization
+    extends ReplicatedData
+    with ReplicatedDataSerialization
     with RemovedNodePruning {
   import LWWRegister.{Clock, defaultClock}
 
@@ -103,16 +104,18 @@ final class LWWMap[A] private[akka](
     * concurrency control.
     */
   def put(key: String, value: A)(
-      implicit node: Cluster, clock: Clock[A] = defaultClock[A]): LWWMap[A] =
+      implicit node: Cluster,
+      clock: Clock[A] = defaultClock[A]): LWWMap[A] =
     put(node, key, value, clock)
 
   /**
     * INTERNAL API
     */
-  private[akka] def put(node: UniqueAddress,
-                        key: String,
-                        value: A,
-                        clock: Clock[A]): LWWMap[A] = {
+  private[akka] def put(
+      node: UniqueAddress,
+      key: String,
+      value: A,
+      clock: Clock[A]): LWWMap[A] = {
     val newRegister = underlying.get(key) match {
       case Some(r) ⇒ r.withValue(node, value, clock)
       case None ⇒ LWWRegister(node, value, clock)
@@ -148,7 +151,8 @@ final class LWWMap[A] private[akka](
     underlying.needPruningFrom(removedNode)
 
   override def prune(
-      removedNode: UniqueAddress, collapseInto: UniqueAddress): LWWMap[A] =
+      removedNode: UniqueAddress,
+      collapseInto: UniqueAddress): LWWMap[A] =
     new LWWMap(underlying.prune(removedNode, collapseInto))
 
   override def pruningCleanup(removedNode: UniqueAddress): LWWMap[A] =
@@ -172,4 +176,5 @@ object LWWMapKey {
 
 @SerialVersionUID(1L)
 final case class LWWMapKey[A](_id: String)
-    extends Key[LWWMap[A]](_id) with ReplicatedDataSerialization
+    extends Key[LWWMap[A]](_id)
+    with ReplicatedDataSerialization

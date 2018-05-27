@@ -24,7 +24,9 @@ import org.apache.spark.annotation.{Experimental, Since}
   */
 @Since("1.0.0")
 case class SingularValueDecomposition[UType, VType](
-    U: UType, s: Vector, V: VType)
+    U: UType,
+    s: Vector,
+    V: VType)
 
 /**
   * :: Experimental ::

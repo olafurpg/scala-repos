@@ -52,7 +52,7 @@ object JDBCUtil {
         params.zipWithIndex.foreach {
           case (p, i) =>
             p match {
-              case x: Int => stmt.setInt(i + 1, x)
+              case x: Int    => stmt.setInt(i + 1, x)
               case x: String => stmt.setString(i + 1, x)
             }
         }

@@ -471,8 +471,8 @@ trait Types { self: Universe =>
 
     /** @see [[InternalApi.singleType]] */
     @deprecated(
-        "Use `ClassSymbol.thisPrefix` or `internal.singleType` instead",
-        "2.11.0")
+      "Use `ClassSymbol.thisPrefix` or `internal.singleType` instead",
+      "2.11.0")
     def apply(pre: Type, sym: Symbol)(implicit token: CompatToken): Type =
       internal.singleType(pre, sym)
   }
@@ -517,8 +517,8 @@ trait Types { self: Universe =>
 
     /** @see [[InternalApi.superType]] */
     @deprecated(
-        "Use `ClassSymbol.superPrefix` or `internal.superType` instead",
-        "2.11.0")
+      "Use `ClassSymbol.superPrefix` or `internal.superType` instead",
+      "2.11.0")
     def apply(thistpe: Type, supertpe: Type)(
         implicit token: CompatToken): Type =
       internal.superType(thistpe, supertpe)

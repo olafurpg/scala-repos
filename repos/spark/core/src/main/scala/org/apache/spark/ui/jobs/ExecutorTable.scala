@@ -26,7 +26,9 @@ import org.apache.spark.util.Utils
 
 /** Stage summary grouped by executors. */
 private[ui] class ExecutorTable(
-    stageId: Int, stageAttemptId: Int, parent: StagesTab) {
+    stageId: Int,
+    stageAttemptId: Int,
+    parent: StagesTab) {
   private val listener = parent.progressListener
 
   def toNodeSeq: Seq[Node] = {
@@ -43,14 +45,12 @@ private[ui] class ExecutorTable(
     var hasShuffleWrite = false
     var hasShuffleRead = false
     var hasBytesSpilled = false
-    stageData.foreach(
-        data =>
-          {
-        hasInput = data.hasInput
-        hasOutput = data.hasOutput
-        hasShuffleRead = data.hasShuffleRead
-        hasShuffleWrite = data.hasShuffleWrite
-        hasBytesSpilled = data.hasBytesSpilled
+    stageData.foreach(data => {
+      hasInput = data.hasInput
+      hasOutput = data.hasOutput
+      hasShuffleRead = data.hasShuffleRead
+      hasShuffleWrite = data.hasShuffleWrite
+      hasBytesSpilled = data.hasBytesSpilled
     })
 
     <table class={UIUtils.TABLE_CLASS_STRIPED_SORTABLE}>

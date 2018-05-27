@@ -33,7 +33,7 @@ class Winners {
   @tailrec private def succ1(x: Int): Int = succ1(x)
   @tailrec final def succ2(x: Int): Int = succ2(x)
   @tailrec final def succ3[T](in: List[T], acc: List[T]): List[T] = in match {
-    case Nil => Nil
+    case Nil     => Nil
     case x :: xs => succ3(xs, x :: acc)
   }
 }
@@ -51,7 +51,7 @@ class Failures {
 
   // a typical between-chair-and-keyboard error
   @tailrec final def fail2[T](xs: List[T]): List[T] = xs match {
-    case Nil => Nil
+    case Nil     => Nil
     case x :: xs => x :: fail2[T](xs)
   }
 

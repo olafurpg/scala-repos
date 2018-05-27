@@ -59,7 +59,8 @@ object PromiseRef {
     * Wraps an ActorRef and a Promise into a PromiseRef.
     */
   private[akka] def wrap[T](
-      actorRef: ActorRef, promise: Promise[T]): PromiseRef[T] = {
+      actorRef: ActorRef,
+      promise: Promise[T]): PromiseRef[T] = {
     new PromiseRefImpl(actorRef, promise)
   }
 
@@ -104,7 +105,8 @@ object FutureRef {
     * Wraps an ActorRef and a Future into a FutureRef.
     */
   private[akka] def wrap[T](
-      actorRef: ActorRef, future: Future[T]): FutureRef[T] = {
+      actorRef: ActorRef,
+      future: Future[T]): FutureRef[T] = {
     new FutureRefImpl(actorRef, future)
   }
 
@@ -143,13 +145,16 @@ object FutureRef {
 }
 
 private[akka] class PromiseRefImpl[T](
-    val ref: ActorRef, val promise: Promise[T])
-    extends PromiseRef[T] with FutureRef[T] {
+    val ref: ActorRef,
+    val promise: Promise[T])
+    extends PromiseRef[T]
+    with FutureRef[T] {
   def toFutureRef: FutureRef[T] = this
 }
 
 private[akka] final class FutureRefImpl[T](
-    val ref: ActorRef, val future: Future[T])
+    val ref: ActorRef,
+    val future: Future[T])
     extends FutureRef[T]
 
 private[akka] final class AskPromiseRef private (
@@ -160,11 +165,15 @@ private[akka] object AskPromiseRef {
   def apply(provider: ActorRefProvider, timeout: Timeout): AskPromiseRef = {
     if (timeout.duration.length > 0) {
       val promiseActorRef = PromiseActorRef(
-          provider, timeout, "unknown", "unknown", provider.deadLetters)
+        provider,
+        timeout,
+        "unknown",
+        "unknown",
+        provider.deadLetters)
       new AskPromiseRef(promiseActorRef)
     } else {
       throw new IllegalArgumentException(
-          s"Timeout length must not be negative, was: $timeout")
+        s"Timeout length must not be negative, was: $timeout")
     }
   }
 }

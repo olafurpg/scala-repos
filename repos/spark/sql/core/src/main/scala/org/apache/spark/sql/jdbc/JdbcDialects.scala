@@ -72,10 +72,11 @@ abstract class JdbcDialect extends Serializable {
     * @return The actual DataType (subclasses of [[org.apache.spark.sql.types.DataType]])
     *         or null if the default type mapping should be used.
     */
-  def getCatalystType(sqlType: Int,
-                      typeName: String,
-                      size: Int,
-                      md: MetadataBuilder): Option[DataType] = None
+  def getCatalystType(
+      sqlType: Int,
+      typeName: String,
+      size: Int,
+      md: MetadataBuilder): Option[DataType] = None
 
   /**
     * Retrieve the jdbc / sql type for a given datatype.
@@ -109,7 +110,8 @@ abstract class JdbcDialect extends Serializable {
     * @param properties The connection properties.  This is passed through from the relation.
     */
   def beforeFetch(
-      connection: Connection, properties: Map[String, String]): Unit = {}
+      connection: Connection,
+      properties: Map[String, String]): Unit = {}
 }
 
 /**

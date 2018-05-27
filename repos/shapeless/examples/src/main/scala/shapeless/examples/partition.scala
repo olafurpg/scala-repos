@@ -74,8 +74,9 @@ object ADTPartitionExample extends App {
         type Out = FieldType[K, List[H]] :: OutT
 
         def apply(c: List[FieldType[K, H] :+: T]): Out =
-          field[K](c.collect { case Inl(h) => h: H }) :: cp(
-              c.collect { case Inr(t) => t })
+          field[K](c.collect { case Inl(h) => h: H }) :: cp(c.collect {
+            case Inr(t)                    => t
+          })
       }
   }
 
@@ -99,17 +100,17 @@ object ADTPartitionExample extends App {
 
   // Some example data.
   val fruits: List[Fruit] = List(
-      Apple(1, 10),
-      Pear(2, "red"),
-      Pear(3, "green"),
-      Apple(4, 6),
-      Pear(5, "purple")
+    Apple(1, 10),
+    Pear(2, "red"),
+    Pear(3, "green"),
+    Apple(4, 6),
+    Pear(5, "purple")
   )
 
   // The expected partition.
   val expectedApples: List[Apple] = List(Apple(1, 10), Apple(4, 6))
-  val expectedPears: List[Pear] = List(
-      Pear(2, "red"), Pear(3, "green"), Pear(5, "purple"))
+  val expectedPears: List[Pear] =
+    List(Pear(2, "red"), Pear(3, "green"), Pear(5, "purple"))
 
   // Partition the list into a tuple of lists.
   val (apples, pears) = partitionTuple(fruits)

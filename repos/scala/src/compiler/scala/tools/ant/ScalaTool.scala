@@ -158,13 +158,17 @@ class ScalaTool extends ScalaMatchingTask {
     * @return The class path as a list of files. */
   private def getUnixclasspath: String =
     transposeVariableMarkup(
-        classpath.mkString("", ":", "").replace('\\', '/'), "${", "}")
+      classpath.mkString("", ":", "").replace('\\', '/'),
+      "${",
+      "}")
 
   /** Gets the value of the classpath attribute in a Scala-friendly form.
     * @return The class path as a list of files. */
   private def getWinclasspath: String =
     transposeVariableMarkup(
-        classpath.mkString("", ";", "").replace('/', '\\'), "%", "%")
+      classpath.mkString("", ";", "").replace('/', '\\'),
+      "%",
+      "%")
 
   private def getProperties: String =
     properties
@@ -179,17 +183,20 @@ class ScalaTool extends ScalaMatchingTask {
 
   // XXX encoding and generalize
   private def getResourceAsCharStream(
-      clazz: Class[_], resource: String): Stream[Char] = {
+      clazz: Class[_],
+      resource: String): Stream[Char] = {
     val stream = clazz.getClassLoader() getResourceAsStream resource
     if (stream == null) Stream.empty
     else
       Stream continually stream.read() takeWhile (_ != -1) map
-      (_.asInstanceOf[Char])
+        (_.asInstanceOf[Char])
   }
 
   // Converts a variable like @SCALA_HOME@ to ${SCALA_HOME} when pre = "${" and post = "}"
   private def transposeVariableMarkup(
-      text: String, pre: String, post: String): String = {
+      text: String,
+      pre: String,
+      post: String): String = {
     val chars = scala.io.Source.fromString(text)
     val builder = new StringBuilder()
 
@@ -210,7 +217,8 @@ class ScalaTool extends ScalaMatchingTask {
   }
 
   private def readAndPatchResource(
-      resource: String, tokens: Map[String, String]): String = {
+      resource: String,
+      tokens: Map[String, String]): String = {
     val chars = getResourceAsCharStream(this.getClass, resource).iterator
     val builder = new StringBuilder()
 
@@ -252,10 +260,10 @@ class ScalaTool extends ScalaMatchingTask {
     if (mainClass.isEmpty) buildError("Main class must be set.")
     val resourceRoot = "scala/tools/ant/templates/"
     val patches = Map(
-        ("class", mainClass.get),
-        ("properties", getProperties),
-        ("javaflags", javaFlags),
-        ("toolflags", toolFlags)
+      ("class", mainClass.get),
+      ("properties", getProperties),
+      ("javaflags", javaFlags),
+      ("toolflags", toolFlags)
     )
     // Consolidate Paths into classpath
     classpath = classpath ::: classpathPath.list.toList
@@ -263,8 +271,7 @@ class ScalaTool extends ScalaMatchingTask {
     if (platforms contains "unix") {
       val unixPatches = patches + (("classpath", getUnixclasspath))
       val unixTemplateResource = resourceRoot + "tool-unix.tmpl"
-      val unixTemplate = readAndPatchResource(
-          unixTemplateResource, unixPatches)
+      val unixTemplate = readAndPatchResource(unixTemplateResource, unixPatches)
       writeFile(file.get, unixTemplate)
     }
     if (platforms contains "windows") {

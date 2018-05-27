@@ -23,12 +23,13 @@ class ScalaWithDoWhileSurrounder extends ScalaExpressionSurrounder {
 
   override def getTemplateDescription = "do / while"
 
-  override def getSurroundSelectionRange(withDoWhileNode: ASTNode): TextRange = {
+  override def getSurroundSelectionRange(
+      withDoWhileNode: ASTNode): TextRange = {
     val element: PsiElement = withDoWhileNode.getPsi match {
       case x: ScParenthesisedExpr =>
         x.expr match {
           case Some(y) => y
-          case _ => return x.getTextRange
+          case _       => return x.getTextRange
         }
       case x => x
     }

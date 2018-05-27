@@ -240,7 +240,8 @@ trait VecStats[@spec(Int, Long, Double) A] {
   }
 
   protected def _demeaned(
-      r: Vec[A], subOp: (A, Double) => Double): Vec[Double] = {
+      r: Vec[A],
+      subOp: (A, Double) => Double): Vec[Double] = {
     val sa = r.scalarTag
     val sd = ScalarTagDouble
 
@@ -260,7 +261,8 @@ trait VecStats[@spec(Int, Long, Double) A] {
   protected def _median(r: Vec[A])(implicit n: NUM[A]): Double = {
     val sd = ScalarTagDouble
 
-    def _arrCopyToDblArr(r: Vec[A])(implicit n: NUM[A]): (Int, Array[Double]) = {
+    def _arrCopyToDblArr(r: Vec[A])(
+        implicit n: NUM[A]): (Int, Array[Double]) = {
       val arr = Array.ofDim[Double](r.length)
       val sa = r.scalarTag
       var i = 0
@@ -313,7 +315,9 @@ trait VecStats[@spec(Int, Long, Double) A] {
 
   // NB: destructive to argument v
   protected def _rank(
-      v: Array[Double], tie: RankTie, ascending: Boolean): Vec[Double] = {
+      v: Array[Double],
+      tie: RankTie,
+      ascending: Boolean): Vec[Double] = {
     val sd = ScalarTagDouble
 
     val nan =
@@ -395,13 +399,14 @@ trait VecStats[@spec(Int, Long, Double) A] {
       else {
         val n = method match {
           case PctMethod.Excel => (tile / 100.0) * (c - 1.0) + 1.0
-          case PctMethod.NIST => (tile / 100.0) * (c + 1.0)
+          case PctMethod.NIST  => (tile / 100.0) * (c + 1.0)
         }
         val s = vf.sorted
         val k = math.floor(n).toInt
         val d = n - k
         if (k <= 0) s(0)
-        else if (k >= c) s.last else s(k - 1) + d * (s(k) - s(k - 1))
+        else if (k >= c) s.last
+        else s(k - 1) + d * (s(k) - s(k - 1))
       }
     }
   }
@@ -416,16 +421,18 @@ class DoubleStats(r: Vec[Double]) extends VecStats[Double] {
   def min: Option[Double] =
     if (r.count == 0) None
     else {
-      val res = r.filterFoldLeft(sd.notMissing)(sd.inf)(
-          (x: Double, y: Double) => if (x < y) x else y)
+      val res =
+        r.filterFoldLeft(sd.notMissing)(sd.inf)((x: Double, y: Double) =>
+          if (x < y) x else y)
       Some(res)
     }
 
   def max: Option[Double] =
     if (r.count == 0) None
     else {
-      val res: Double = r.filterFoldLeft(sd.notMissing)(sd.negInf)(
-          (x: Double, y: Double) => if (x > y) x else y)
+      val res: Double =
+        r.filterFoldLeft(sd.notMissing)(sd.negInf)((x: Double, y: Double) =>
+          if (x > y) x else y)
       Some(res)
     }
 
@@ -444,8 +451,7 @@ class DoubleStats(r: Vec[Double]) extends VecStats[Double] {
     _percentile(r, tile, method)
 
   def demeaned: Vec[Double] = _demeaned(r, _ - _)
-  def rank(
-      tie: RankTie = RankTie.Avg, ascending: Boolean = true): Vec[Double] =
+  def rank(tie: RankTie = RankTie.Avg, ascending: Boolean = true): Vec[Double] =
     _rank(r.contents, tie, ascending)
 
   def argmin: Int = array.argmin(r.toArray)
@@ -458,16 +464,17 @@ class IntStats(r: Vec[Int]) extends VecStats[Int] {
   def min: Option[Int] =
     if (r.count == 0) None
     else {
-      val res: Int = r.filterFoldLeft(si.notMissing)(si.inf)(
-          (x: Int, y: Int) => if (x < y) x else y)
+      val res: Int = r.filterFoldLeft(si.notMissing)(si.inf)((x: Int, y: Int) =>
+        if (x < y) x else y)
       Some(res)
     }
 
   def max: Option[Int] =
     if (r.count == 0) None
     else {
-      val res: Int = r.filterFoldLeft(si.notMissing)(si.negInf)(
-          (x: Int, y: Int) => if (x > y) x else y)
+      val res: Int =
+        r.filterFoldLeft(si.notMissing)(si.negInf)((x: Int, y: Int) =>
+          if (x > y) x else y)
       Some(res)
     }
 
@@ -477,8 +484,8 @@ class IntStats(r: Vec[Int]) extends VecStats[Int] {
   def countif(test: Int => Boolean): Int =
     r.filterFoldLeft(t => si.notMissing(t) && test(t))(0)((a, b) => a + 1)
   def logsum: Double =
-    r.filterFoldLeft(si.notMissing)(0d)(
-        (x, y) => x + math.log(y.asInstanceOf[Double]))
+    r.filterFoldLeft(si.notMissing)(0d)((x, y) =>
+      x + math.log(y.asInstanceOf[Double]))
   def mean: Double = sum.asInstanceOf[Double] / count
   def median: Double = _median(r)
   def geomean: Double = math.exp(logsum / count)
@@ -489,8 +496,7 @@ class IntStats(r: Vec[Int]) extends VecStats[Int] {
     _percentile(r.toDoubleArray, tile, method)
 
   def demeaned: Vec[Double] = _demeaned(r, _ - _)
-  def rank(
-      tie: RankTie = RankTie.Avg, ascending: Boolean = true): Vec[Double] =
+  def rank(tie: RankTie = RankTie.Avg, ascending: Boolean = true): Vec[Double] =
     _rank(r.toDoubleArray, tie, ascending)
 
   def argmin: Int = array.argmin(r.toArray)
@@ -503,16 +509,18 @@ class LongStats(r: Vec[Long]) extends VecStats[Long] {
   def min: Option[Long] =
     if (r.count == 0) None
     else {
-      val res: Long = r.filterFoldLeft(sl.notMissing)(sl.inf)(
-          (x: Long, y: Long) => if (x < y) x else y)
+      val res: Long =
+        r.filterFoldLeft(sl.notMissing)(sl.inf)((x: Long, y: Long) =>
+          if (x < y) x else y)
       Some(res)
     }
 
   def max: Option[Long] =
     if (r.count == 0) None
     else {
-      val res: Long = r.filterFoldLeft(sl.notMissing)(sl.negInf)(
-          (x: Long, y: Long) => if (x > y) x else y)
+      val res: Long =
+        r.filterFoldLeft(sl.notMissing)(sl.negInf)((x: Long, y: Long) =>
+          if (x > y) x else y)
       Some(res)
     }
 
@@ -533,8 +541,7 @@ class LongStats(r: Vec[Long]) extends VecStats[Long] {
     _percentile(r.toDoubleArray, tile, method)
 
   def demeaned: Vec[Double] = _demeaned(r, _ - _)
-  def rank(
-      tie: RankTie = RankTie.Avg, ascending: Boolean = true): Vec[Double] =
+  def rank(tie: RankTie = RankTie.Avg, ascending: Boolean = true): Vec[Double] =
     _rank(r.toDoubleArray, tie, ascending)
 
   def argmin: Int = array.argmin(r.toArray)

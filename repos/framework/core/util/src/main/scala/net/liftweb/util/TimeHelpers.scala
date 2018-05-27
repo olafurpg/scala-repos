@@ -49,14 +49,14 @@ trait TimeHelpers { self: ControlHelpers =>
 
   /** transforms a long to a TimeSpan object. Usage: 3000L returns a TimeSpan of 3000L millis  */
   @deprecated(
-      "Long to TimeSpan conversion will be removed for possibility of ambiguous behaviours, use TimeSpan(in) instead if you are using in.millis",
-      "3.0.0")
+    "Long to TimeSpan conversion will be removed for possibility of ambiguous behaviours, use TimeSpan(in) instead if you are using in.millis",
+    "3.0.0")
   implicit def longToTimeSpan(in: Long): TimeSpan = TimeSpan(in)
 
   /** transforms an int to a TimeSpan object. Usage: 3000 returns a TimeSpan of 3000L millis  */
   @deprecated(
-      "Int to TimeSpan conversion will be removed for possibility of ambiguous behaviours, use TimeSpan(in) instead if you are using in.millis",
-      "3.0.0")
+    "Int to TimeSpan conversion will be removed for possibility of ambiguous behaviours, use TimeSpan(in) instead if you are using in.millis",
+    "3.0.0")
   implicit def intToTimeSpan(in: Int): TimeSpan = TimeSpan(in)
 
   /** class building TimeSpans given an amount (len) and a method specify the time unit  */
@@ -72,20 +72,20 @@ trait TimeHelpers { self: ControlHelpers =>
     def weeks = new TimeSpan(Left(Duration.standardDays(len * 7L)))
     def week = weeks
     @deprecated(
-        "This builder will be removed due to its unclear behavior; use Joda-Time `Period.months` and convert to `TimeSpan` manually instead.",
-        "3.0.0")
+      "This builder will be removed due to its unclear behavior; use Joda-Time `Period.months` and convert to `TimeSpan` manually instead.",
+      "3.0.0")
     def months = new TimeSpan(Right(new Period().plusMonths(len.toInt)))
     @deprecated(
-        "This builder will be removed due to its unclear behavior; use Joda-Time `Period.months` and convert to `TimeSpan` manually instead.",
-        "3.0.0")
+      "This builder will be removed due to its unclear behavior; use Joda-Time `Period.months` and convert to `TimeSpan` manually instead.",
+      "3.0.0")
     def month = months
     @deprecated(
-        "This builder will be removed due to its unclear behavior; use Joda-Time `Period.years` and convert to `TimeSpan` manually instead.",
-        "3.0.0")
+      "This builder will be removed due to its unclear behavior; use Joda-Time `Period.years` and convert to `TimeSpan` manually instead.",
+      "3.0.0")
     def years = new TimeSpan(Right(new Period().plusYears(len.toInt)))
     @deprecated(
-        "This builder will be removed due to its unclear behavior; use Joda-Time `Period.years` and convert to `TimeSpan` manually instead.",
-        "3.0.0")
+      "This builder will be removed due to its unclear behavior; use Joda-Time `Period.years` and convert to `TimeSpan` manually instead.",
+      "3.0.0")
     def year = years
   }
 
@@ -125,16 +125,16 @@ trait TimeHelpers { self: ControlHelpers =>
       * will be added to the UNIX epoch to create a `Date` object.
       */
     @deprecated(
-        "This method will be removed due to its unclear behavior; use new Date(timeSpan.millis) instead.",
-        "3.0.0")
+      "This method will be removed due to its unclear behavior; use new Date(timeSpan.millis) instead.",
+      "3.0.0")
     def date: Date = new Date(millis)
 
     /**
       * Convert to a Java `Date`. Synonym of `[[date]]`.
       */
     @deprecated(
-        "This method will be removed due to its unclear behavior; use new Date(timeSpan.millis) instead.",
-        "3.0.0")
+      "This method will be removed due to its unclear behavior; use new Date(timeSpan.millis) instead.",
+      "3.0.0")
     def toDate: Date = date
 
     /**
@@ -142,17 +142,17 @@ trait TimeHelpers { self: ControlHelpers =>
       * will be added to the UNIX epoch to create a `DateTime` object.
       */
     @deprecated(
-        "This method will be removed due to its unclear behavior; use new DateTime(timeSpan.millis) instead.",
-        "3.0.0")
+      "This method will be removed due to its unclear behavior; use new DateTime(timeSpan.millis) instead.",
+      "3.0.0")
     def toDateTime = new DateTime(millis)
 
     @deprecated(
-        "TimeSpan will not support operations on Joda-Time `Period`s in the future; use new Period(timeSpan.millis) instead.",
-        "3.0.0")
+      "TimeSpan will not support operations on Joda-Time `Period`s in the future; use new Period(timeSpan.millis) instead.",
+      "3.0.0")
     private[util] def toPeriod: Period = dt match {
       // package protected because of view bound usage in tsToPeriod
       case Left(duration) => duration.toPeriod
-      case Right(period) => period
+      case Right(period)  => period
     }
 
     /**
@@ -267,12 +267,12 @@ trait TimeHelpers { self: ControlHelpers =>
       */
     override def equals(cmp: Any) = {
       cmp match {
-        case lo: Long => lo == this.millis
-        case i: Int => i == this.millis
-        case ti: TimeSpan => ti.dt == this.dt
-        case dur: Duration => Left(dur) == this.dt
+        case lo: Long       => lo == this.millis
+        case i: Int         => i == this.millis
+        case ti: TimeSpan   => ti.dt == this.dt
+        case dur: Duration  => Left(dur) == this.dt
         case period: Period => Right(period) == this.dt
-        case _ => false
+        case _              => false
       }
     }
 
@@ -291,12 +291,13 @@ trait TimeHelpers { self: ControlHelpers =>
   object TimeSpan {
 
     /** time units and values used when converting a total number of millis to those units (see the format function)  */
-    val scales = List((1000L, "milli"),
-                      (60L, "second"),
-                      (60L, "minute"),
-                      (24L, "hour"),
-                      (7L, "day"),
-                      (10000L, "week"))
+    val scales = List(
+      (1000L, "milli"),
+      (60L, "second"),
+      (60L, "minute"),
+      (24L, "hour"),
+      (7L, "day"),
+      (10000L, "week"))
 
     /** explicit constructor for a TimeSpan  */
     def apply(in: Long) = new TimeSpan(in)
@@ -314,7 +315,7 @@ trait TimeHelpers { self: ControlHelpers =>
           ._2
       def formatAmount(amountUnit: (Long, String)) = amountUnit match {
         case (amount, unit) if (amount == 1) => amount + " " + unit
-        case (amount, unit) => amount + " " + unit + "s"
+        case (amount, unit)                  => amount + " " + unit + "s"
       }
       divideInUnits(millis)
         .filter(_._1 > 0)
@@ -326,8 +327,8 @@ trait TimeHelpers { self: ControlHelpers =>
       * Convert a Date to a TimeSpan
       */
     @deprecated(
-        "Date to TimeSpan conversion will be removed for possibility of mistakes in on-duration operations",
-        "3.0.0")
+      "Date to TimeSpan conversion will be removed for possibility of mistakes in on-duration operations",
+      "3.0.0")
     implicit def dateToTS(in: Date): TimeSpan =
       new TimeSpan(Left(new Duration(in.getTime)))
 
@@ -341,8 +342,8 @@ trait TimeHelpers { self: ControlHelpers =>
       * Convert a Period to a TimeSpan
       */
     @deprecated(
-        "Implicit conversion from Period to TimeSpan will be removed due to its unclear behavior; use new Period(timeSpan.millis) instead.",
-        "3.0.0")
+      "Implicit conversion from Period to TimeSpan will be removed due to its unclear behavior; use new Period(timeSpan.millis) instead.",
+      "3.0.0")
     implicit def periodToTS(in: Period): TimeSpan =
       new TimeSpan(Right(in))
 
@@ -350,16 +351,17 @@ trait TimeHelpers { self: ControlHelpers =>
       * Convert a TimeSpan to a Period
       */
     @deprecated(
-        "Implicit conversion from TimeSpan to Period will be removed due to its unclear behavior; use new TimeSpan(period.toDurationFrom(startDateTime)) instead.",
-        "3.0.0")
+      "Implicit conversion from TimeSpan to Period will be removed due to its unclear behavior; use new TimeSpan(period.toDurationFrom(startDateTime)) instead.",
+      "3.0.0"
+    )
     implicit def tsToPeriod[TS <% TimeSpan](in: TS): Period = in.toPeriod
 
     /**
       * Convert a DateTime to a TimeSpan
       */
     @deprecated(
-        "Implicit conversion from DateTime to TimeSpan will be removed due to its unclear behavior; use new TimeSpan(dateTime.getMillis) instead.",
-        "3.0.0")
+      "Implicit conversion from DateTime to TimeSpan will be removed due to its unclear behavior; use new TimeSpan(dateTime.getMillis) instead.",
+      "3.0.0")
     implicit def dateTimeToTS(in: DateTime): TimeSpan =
       new TimeSpan(Left(new Duration(in.getMillis)))
   }
@@ -554,14 +556,14 @@ trait TimeHelpers { self: ControlHelpers =>
   def toDate(in: Any): Box[Date] = {
     try {
       in match {
-        case null => Empty
-        case d: Date => Full(d)
-        case lng: Long => Full(new Date(lng))
-        case lng: Number => Full(new Date(lng.longValue))
+        case null                                  => Empty
+        case d: Date                               => Full(d)
+        case lng: Long                             => Full(new Date(lng))
+        case lng: Number                           => Full(new Date(lng.longValue))
         case Nil | Empty | None | Failure(_, _, _) => Empty
-        case Full(v) => toDate(v)
-        case Some(v) => toDate(v)
-        case v :: vs => toDate(v)
+        case Full(v)                               => toDate(v)
+        case Some(v)                               => toDate(v)
+        case v :: vs                               => toDate(v)
         case s: String =>
           tryo(internetDateFormatter.parse(s)) or tryo(dateFormatter.parse(s))
         case o => toDate(o.toString)

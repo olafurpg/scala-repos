@@ -88,7 +88,7 @@ case class JsObject(private val underlying: Map[String, JsValue])
     */
   lazy val value: Map[String, JsValue] = underlying match {
     case m: immutable.Map[String, JsValue] => m
-    case m => m.toMap
+    case m                                 => m.toMap
   }
 
   /**
@@ -134,7 +134,7 @@ case class JsObject(private val underlying: Map[String, JsValue])
 
             val newValue = (maybeExistingValue, otherValue) match {
               case (Some(e: JsObject), o: JsObject) => merge(e, o)
-              case _ => otherValue
+              case _                                => otherValue
             }
             otherKey -> newValue
         }
@@ -145,7 +145,7 @@ case class JsObject(private val underlying: Map[String, JsValue])
 
   override def equals(other: Any): Boolean = other match {
     case that: JsObject => (that canEqual this) && fieldSet == that.fieldSet
-    case _ => false
+    case _              => false
   }
 
   def canEqual(other: Any): Boolean = other.isInstanceOf[JsObject]

@@ -32,7 +32,7 @@ object JobTest {
   def apply(cons: (Args) => Job) = {
     new JobTest(cons)
   }
-  def apply[T <: Job : Manifest] = {
+  def apply[T <: Job: Manifest] = {
     val cons = { (args: Args) =>
       manifest[T].runtimeClass
         .getConstructor(classOf[Args])
@@ -79,8 +79,9 @@ class JobTest(cons: (Args) => Job) {
     this
   }
 
-  private def sourceBuffer[T : TupleSetter](
-      s: Source, tups: Iterable[T]): JobTest = {
+  private def sourceBuffer[T: TupleSetter](
+      s: Source,
+      tups: Iterable[T]): JobTest = {
     source { src =>
       if (src == s) Some(tups) else None
     }
@@ -133,10 +134,11 @@ class JobTest(cons: (Args) => Job) {
      */
     sinkSet += s
     callbacks +=
-    (() =>
-          op(buffer.map { tup =>
-            conv(new TupleEntry(tup))
-          }))
+      (
+          () =>
+            op(buffer.map { tup =>
+              conv(new TupleEntry(tup))
+            }))
     this
   }
 
@@ -150,15 +152,15 @@ class JobTest(cons: (Args) => Job) {
   def counter(counter: String, group: String = Stats.ScaldingGroup)(
       op: Long => Unit) = {
     statsCallbacks +=
-    ((stats: CascadingStats) =>
-          op(Stats.getCounterValue(counter, group)(stats)))
+      ((stats: CascadingStats) =>
+        op(Stats.getCounterValue(counter, group)(stats)))
     this
   }
 
   // Used to check an assertion on all custom counters of a given scalding job.
   def counters(op: Map[String, Long] => Unit) = {
     statsCallbacks +=
-    ((stats: CascadingStats) => op(Stats.getAllCustomCounters()(stats)))
+      ((stats: CascadingStats) => op(Stats.getAllCustomCounters()(stats)))
     this
   }
 
@@ -209,8 +211,8 @@ class JobTest(cons: (Args) => Job) {
         conf.set("cascading.flow.job.pollinginterval", "5")
         // Work around for local hadoop race
         conf.set(
-            "mapred.local.dir",
-            "/tmp/hadoop/%s/mapred/local".format(java.util.UUID.randomUUID))
+          "mapred.local.dir",
+          "/tmp/hadoop/%s/mapred/local".format(java.util.UUID.randomUUID))
         HadoopTest(conf, sourceMap)
       } else {
         Test(sourceMap)
@@ -229,14 +231,15 @@ class JobTest(cons: (Args) => Job) {
 
     // create cascading 3.0 planner trace files during tests
     if (System.getenv.asScala.getOrElse("SCALDING_CASCADING3_DEBUG", "0") == "1") {
-      System.setProperty("cascading.planner.plan.path",
-                         "target/test/cascading/traceplan/" + job.name)
       System.setProperty(
-          "cascading.planner.plan.transforms.path",
-          "target/test/cascading/traceplan/" + job.name + "/transform")
+        "cascading.planner.plan.path",
+        "target/test/cascading/traceplan/" + job.name)
       System.setProperty(
-          "cascading.planner.stats.path",
-          "target/test/cascading/traceplan/" + job.name + "/stats")
+        "cascading.planner.plan.transforms.path",
+        "target/test/cascading/traceplan/" + job.name + "/transform")
+      System.setProperty(
+        "cascading.planner.stats.path",
+        "target/test/cascading/traceplan/" + job.name + "/stats")
     }
 
     if (validateJob) {
@@ -250,25 +253,25 @@ class JobTest(cons: (Args) => Job) {
     next match {
       case Some(nextjob) => runJob(nextjob, runNext)
       case None => {
-          job.mode match {
-            case hadoopTest @ HadoopTest(_, _) => {
-                /* NOTE: `HadoopTest.finalize` depends on `sinkSet` matching the set of
-                 * "keys" in the `sourceMap`.  Do not change the following line unless
-                 * you also modify the `finalize` function accordingly.
-                 */
-                // The sinks are written to disk, we need to clean them up:
-                sinkSet.foreach { hadoopTest.finalize(_) }
-              }
-            case _ => ()
+        job.mode match {
+          case hadoopTest @ HadoopTest(_, _) => {
+            /* NOTE: `HadoopTest.finalize` depends on `sinkSet` matching the set of
+             * "keys" in the `sourceMap`.  Do not change the following line unless
+             * you also modify the `finalize` function accordingly.
+             */
+            // The sinks are written to disk, we need to clean them up:
+            sinkSet.foreach { hadoopTest.finalize(_) }
           }
-          // Now it is time to check the test conditions:
-          callbacks.foreach { cb =>
-            cb()
-          }
-          statsCallbacks.foreach { cb =>
-            cb(job.scaldingCascadingStats.get)
-          }
+          case _ => ()
         }
+        // Now it is time to check the test conditions:
+        callbacks.foreach { cb =>
+          cb()
+        }
+        statsCallbacks.foreach { cb =>
+          cb(job.scaldingCascadingStats.get)
+        }
+      }
     }
   }
 }

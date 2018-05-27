@@ -11,25 +11,28 @@ object XPathSpec extends Specification {
   sequential
 
   val xmlWithNamespace = XML.fromString(
-      """<x:foo xmlns:x="http://foo.com/"><x:bar><x:baz>hey</x:baz></x:bar></x:foo>""")
+    """<x:foo xmlns:x="http://foo.com/"><x:bar><x:baz>hey</x:baz></x:bar></x:foo>""")
   val xmlWithoutNamespace = XML.fromString(
-      """<foo><bar><baz>hey</baz></bar><bizz></bizz><bizz></bizz></foo>""")
+    """<foo><bar><baz>hey</baz></bar><bizz></bizz><bizz></bizz></foo>""")
 
   "XPath" should {
     "ignore already bound namespaces" in {
-      val ns = Map("x" -> "http://foo.com/",
-                   "ns" -> "http://www.w3.org/XML/1998/namespace",
-                   "y" -> "http://foo.com/")
+      val ns = Map(
+        "x" -> "http://foo.com/",
+        "ns" -> "http://www.w3.org/XML/1998/namespace",
+        "y" -> "http://foo.com/")
       XPath.selectText("//x:baz", xmlWithNamespace, ns.asJava) must not(
-          throwAn[UnsupportedOperationException])
+        throwAn[UnsupportedOperationException])
     }
 
     "find text with namespace" in {
       val text =
-        XPath.selectText("//x:baz",
-                         xmlWithNamespace,
-                         Map("ns" -> "http://www.w3.org/XML/1998/namespace",
-                             "x" -> "http://foo.com/").asJava)
+        XPath.selectText(
+          "//x:baz",
+          xmlWithNamespace,
+          Map(
+            "ns" -> "http://www.w3.org/XML/1998/namespace",
+            "x" -> "http://foo.com/").asJava)
       text must_== "hey"
     }
 
@@ -40,10 +43,12 @@ object XPathSpec extends Specification {
 
     "find node with namespace" in {
       val node =
-        XPath.selectNode("//x:baz",
-                         xmlWithNamespace,
-                         Map("ns" -> "http://www.w3.org/XML/1998/namespace",
-                             "x" -> "http://foo.com/").asJava)
+        XPath.selectNode(
+          "//x:baz",
+          xmlWithNamespace,
+          Map(
+            "ns" -> "http://www.w3.org/XML/1998/namespace",
+            "x" -> "http://foo.com/").asJava)
       node.getNodeName must_== "x:baz"
     }
 

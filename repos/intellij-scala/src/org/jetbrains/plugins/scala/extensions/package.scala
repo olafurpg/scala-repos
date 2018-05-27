@@ -16,15 +16,29 @@ import com.intellij.util.Processor
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.plugins.scala.extensions.implementation._
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScBindingPattern
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScClassParameter, ScParameter}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScDeclaredElementsHolder, ScFunction}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScClassParameter,
+  ScParameter
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScDeclaredElementsHolder,
+  ScFunction
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{ScModifierListOwner, ScNamedElement, ScTypedDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{
+  ScModifierListOwner,
+  ScNamedElement,
+  ScTypedDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.fake.FakePsiParameter
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.ScSyntheticClass
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.MixinNodes
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.TypeDefinitionMembers.SignatureNodes
-import org.jetbrains.plugins.scala.lang.psi.light.{PsiClassWrapper, PsiTypedDefinitionWrapper, StaticPsiMethodWrapper}
+import org.jetbrains.plugins.scala.lang.psi.light.{
+  PsiClassWrapper,
+  PsiTypedDefinitionWrapper,
+  StaticPsiMethodWrapper
+}
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 import org.jetbrains.plugins.scala.lang.psi.{ScalaPsiElement, ScalaPsiUtil}
@@ -56,20 +70,20 @@ package object extensions {
     def hasQueryLikeName = {
       def startsWith(name: String, prefix: String) =
         name.length > prefix.length && name.startsWith(prefix) &&
-        name.charAt(prefix.length).isUpper
+          name.charAt(prefix.length).isUpper
 
       repr.getName match {
         case "getInstance" => false // TODO others?
         case name if startsWith(name, "getAnd") || startsWith(name, "getOr") =>
           false
         case AccessorNamePattern() => true
-        case _ => false
+        case _                     => false
       }
     }
 
     def hasMutatorLikeName = repr.getName match {
       case MutatorNamePattern() => true
-      case _ => false
+      case _                    => false
     }
 
     def hasVoidReturnType = repr.getReturnType == PsiType.VOID
@@ -156,7 +170,7 @@ package object extensions {
   implicit class ObjectExt[T](val v: T) extends AnyVal {
     def toOption: Option[T] = Option(v)
 
-    def asOptionOf[E : ClassTag]: Option[E] = {
+    def asOptionOf[E: ClassTag]: Option[E] = {
       if (classTag[E].runtimeClass.isInstance(v)) Some(v.asInstanceOf[E])
       else None
     }
@@ -186,7 +200,7 @@ package object extensions {
     def startOffsetInParent: Int = {
       repr match {
         case s: ScalaPsiElement => s.startOffsetInParent
-        case _ => repr.getStartOffsetInParent
+        case _                  => repr.getStartOffsetInParent
       }
     }
   }
@@ -198,9 +212,9 @@ package object extensions {
       */
     def containingClass: PsiClass = {
       member match {
-        case member: ScMember => member.containingClass
+        case member: ScMember    => member.containingClass
         case b: ScBindingPattern => b.containingClass
-        case _ => member.getContainingClass
+        case _                   => member.getContainingClass
       }
     }
   }
@@ -213,20 +227,20 @@ package object extensions {
     def qualifiedName: String = {
       clazz match {
         case t: ScTemplateDefinition => t.qualifiedName
-        case _ => clazz.getQualifiedName
+        case _                       => clazz.getQualifiedName
       }
     }
 
     def constructors: Array[PsiMethod] = {
       clazz match {
         case c: ScClass => c.constructors
-        case _ => clazz.getConstructors
+        case _          => clazz.getConstructors
       }
     }
 
     def isEffectivelyFinal: Boolean = clazz match {
       case scClass: ScClass => scClass.hasFinalModifier
-      case _: ScObject => true
+      case _: ScObject      => true
       case synth: ScSyntheticClass
           if !Seq("AnyRef", "AnyVal").contains(synth.className) =>
         true //wrappers for value types
@@ -234,7 +248,9 @@ package object extensions {
     }
 
     def processPsiMethodsForNode(
-        node: SignatureNodes.Node, isStatic: Boolean, isInterface: Boolean)(
+        node: SignatureNodes.Node,
+        isStatic: Boolean,
+        isInterface: Boolean)(
         processMethod: PsiMethod => Unit,
         processName: String => Unit = _ => ()): Unit = {
 
@@ -253,8 +269,8 @@ package object extensions {
               case t: ScTrait =>
                 val linearization = MixinNodes
                   .linearization(clazz)
-                  .flatMap(
-                      tp => ScType.extractClass(tp, Some(clazz.getProject)))
+                  .flatMap(tp =>
+                    ScType.extractClass(tp, Some(clazz.getProject)))
                 var index = linearization.indexWhere(_ == t)
                 while (index >= 0) {
                   val cl = linearization(index)
@@ -271,9 +287,9 @@ package object extensions {
       node.info.namedElement match {
         case fun: ScFunction if !fun.isConstructor =>
           val wrappers = fun.getFunctionWrappers(
-              isStatic,
-              isInterface = fun.isAbstractMember,
-              concreteClassFor(fun))
+            isStatic,
+            isInterface = fun.isAbstractMember,
+            concreteClassFor(fun))
           wrappers.foreach(processMethod)
           wrappers.foreach(w => processName(w.name))
         case method: PsiMethod if !method.isConstructor =>
@@ -289,15 +305,16 @@ package object extensions {
           }
         case t: ScTypedDefinition
             if t.isVal || t.isVar ||
-            (t.isInstanceOf[ScClassParameter] &&
+              (t.isInstanceOf[ScClassParameter] &&
                 t.asInstanceOf[ScClassParameter].isCaseClassVal) =>
-          PsiTypedDefinitionWrapper.processWrappersFor(t,
-                                                       concreteClassFor(t),
-                                                       node.info.name,
-                                                       isStatic,
-                                                       isInterface,
-                                                       processMethod,
-                                                       processName)
+          PsiTypedDefinitionWrapper.processWrappersFor(
+            t,
+            concreteClassFor(t),
+            node.info.name,
+            isStatic,
+            isInterface,
+            processMethod,
+            processName)
         case _ =>
       }
     }
@@ -307,16 +324,15 @@ package object extensions {
         case td: ScTemplateDefinition =>
           td.members.flatMap {
             case holder: ScDeclaredElementsHolder => holder.declaredElements
-            case named: ScNamedElement => Seq(named)
-            case _ => Seq.empty
+            case named: ScNamedElement            => Seq(named)
+            case _                                => Seq.empty
           }
         case _ => clazz.getFields ++ clazz.getMethods
       }
     }
   }
 
-  implicit class PsiNamedElementExt(val named: PsiNamedElement)
-      extends AnyVal {
+  implicit class PsiNamedElementExt(val named: PsiNamedElement) extends AnyVal {
 
     /**
       * Second match branch is for Java only.
@@ -324,7 +340,7 @@ package object extensions {
     def name: String = {
       named match {
         case nd: ScNamedElement => nd.name
-        case nd => nd.getName
+        case nd                 => nd.getName
       }
     }
   }
@@ -338,7 +354,7 @@ package object extensions {
     def hasAbstractModifier: Boolean = {
       member match {
         case member: ScModifierListOwner => member.hasAbstractModifier
-        case _ => member.hasModifierProperty(PsiModifier.ABSTRACT)
+        case _                           => member.hasModifierProperty(PsiModifier.ABSTRACT)
       }
     }
 
@@ -348,7 +364,7 @@ package object extensions {
     def hasFinalModifier: Boolean = {
       member match {
         case member: ScModifierListOwner => member.hasFinalModifier
-        case _ => member.hasModifierProperty(PsiModifier.FINAL)
+        case _                           => member.hasModifierProperty(PsiModifier.FINAL)
       }
     }
 
@@ -424,7 +440,8 @@ package object extensions {
   }
 
   def inWriteCommandAction[T](
-      project: Project, commandName: String = "Undefined")(body: => T): T = {
+      project: Project,
+      commandName: String = "Undefined")(body: => T): T = {
     val computable = new Computable[T] {
       override def compute(): T = body
     }
@@ -448,7 +465,7 @@ package object extensions {
   def withProgressSynchronously[T](title: String)(
       body: ((String => Unit) => T)): T = {
     withProgressSynchronouslyTry[T](title)(body) match {
-      case Success(result) => result
+      case Success(result)    => result
       case Failure(exception) => throw exception
     }
   }
@@ -467,7 +484,10 @@ package object extensions {
 
     catching(classOf[Exception]).withTry {
       progressManager.runProcessWithProgressSynchronously(
-          computable, title, false, null)
+        computable,
+        title,
+        false,
+        null)
     }
   }
 
@@ -490,8 +510,7 @@ package object extensions {
   }
 
   def invokeLater[T](body: => T) {
-    ApplicationManager.getApplication.invokeLater(
-        new Runnable {
+    ApplicationManager.getApplication.invokeLater(new Runnable {
       def run() {
         body
       }
@@ -500,8 +519,7 @@ package object extensions {
 
   def invokeAndWait[T](body: => Unit) {
     preservingControlFlow {
-      SwingUtilities.invokeAndWait(
-          new Runnable {
+      SwingUtilities.invokeAndWait(new Runnable {
         def run() {
           body
         }
@@ -516,7 +534,7 @@ package object extensions {
       case e: InvocationTargetException =>
         e.getTargetException match {
           case control: NonLocalReturnControl[_] => throw control
-          case _ => throw e
+          case _                                 => throw e
         }
     }
   }
@@ -539,40 +557,42 @@ package object extensions {
     def paramType: ScType = {
       param match {
         case f: FakePsiParameter => f.parameter.paramType
-        case param: ScParameter => param.getType(TypingContext.empty).getOrAny
+        case param: ScParameter  => param.getType(TypingContext.empty).getOrAny
         case _ =>
-          ScType.create(param.getType,
-                        param.getProject,
-                        param.getResolveScope,
-                        paramTopLevel = true)
+          ScType.create(
+            param.getType,
+            param.getProject,
+            param.getResolveScope,
+            paramTopLevel = true)
       }
     }
 
     def exactParamType(treatJavaObjectAsAny: Boolean = true): ScType = {
       param match {
         case f: FakePsiParameter => f.parameter.paramType
-        case param: ScParameter => param.getType(TypingContext.empty).getOrAny
+        case param: ScParameter  => param.getType(TypingContext.empty).getOrAny
         case _ =>
           val paramType = param.getType match {
             case p: PsiArrayType if param.isVarArgs => p.getComponentType
-            case tp => tp
+            case tp                                 => tp
           }
-          ScType.create(paramType,
-                        param.getProject,
-                        param.getResolveScope,
-                        paramTopLevel = true,
-                        treatJavaObjectAsAny = treatJavaObjectAsAny)
+          ScType.create(
+            paramType,
+            param.getProject,
+            param.getResolveScope,
+            paramTopLevel = true,
+            treatJavaObjectAsAny = treatJavaObjectAsAny)
       }
     }
 
     def index: Int = {
       param match {
         case f: FakePsiParameter => f.parameter.index
-        case p: ScParameter => p.index
+        case p: ScParameter      => p.index
         case _ =>
           param.getParent match {
             case pList: PsiParameterList => pList.getParameterIndex(param)
-            case _ => -1
+            case _                       => -1
           }
       }
     }

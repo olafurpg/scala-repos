@@ -14,32 +14,36 @@ import org.jetbrains.sbt.resolvers.SbtResolver
   * @author Pavel Fatin
   */
 class ProjectNode(val data: ProjectData) extends Node[ProjectData] {
-  def this(name: String,
-           ideProjectFileDirectoryPath: String,
-           linkedExternalProjectPath: String) {
+  def this(
+      name: String,
+      ideProjectFileDirectoryPath: String,
+      linkedExternalProjectPath: String) {
     this(
-        new ProjectData(SbtProjectSystem.Id,
-                        name,
-                        ideProjectFileDirectoryPath,
-                        linkedExternalProjectPath))
+      new ProjectData(
+        SbtProjectSystem.Id,
+        name,
+        ideProjectFileDirectoryPath,
+        linkedExternalProjectPath))
   }
 
   protected def key = ProjectKeys.PROJECT
 }
 
 class ModuleNode(val data: ModuleData) extends Node[ModuleData] {
-  def this(typeId: String,
-           id: String,
-           name: String,
-           moduleFileDirectoryPath: String,
-           externalConfigPath: String) {
+  def this(
+      typeId: String,
+      id: String,
+      name: String,
+      moduleFileDirectoryPath: String,
+      externalConfigPath: String) {
     this(
-        new ModuleData(id,
-                       SbtProjectSystem.Id,
-                       typeId,
-                       name,
-                       moduleFileDirectoryPath,
-                       externalConfigPath))
+      new ModuleData(
+        id,
+        SbtProjectSystem.Id,
+        typeId,
+        name,
+        moduleFileDirectoryPath,
+        externalConfigPath))
   }
 
   protected def key = ProjectKeys.MODULE
@@ -57,8 +61,7 @@ class LibraryNode(val data: LibraryData) extends Node[LibraryData] {
   protected def key = ProjectKeys.LIBRARY
 }
 
-class ContentRootNode(val data: ContentRootData)
-    extends Node[ContentRootData] {
+class ContentRootNode(val data: ContentRootData) extends Node[ContentRootData] {
   def this(path: String) {
     this(new ContentRootData(SbtProjectSystem.Id, path))
   }
@@ -81,8 +84,7 @@ class ModuleDependencyNode(val data: ModuleDependencyData)
 
 class LibraryDependencyNode(val data: LibraryDependencyData)
     extends Node[LibraryDependencyData] {
-  def this(
-      ownerModule: ModuleData, library: LibraryData, level: LibraryLevel) {
+  def this(ownerModule: ModuleData, library: LibraryData, level: LibraryLevel) {
     this(new LibraryDependencyData(ownerModule, library, level))
   }
 
@@ -90,36 +92,40 @@ class LibraryDependencyNode(val data: LibraryDependencyData)
 }
 
 class SbtProjectNode(val data: SbtProjectData) extends Node[SbtProjectData] {
-  def this(basePackages: Seq[String],
-           jdk: Option[Sdk],
-           javacOptions: Seq[String],
-           sbtVersion: String,
-           projectPath: String) {
+  def this(
+      basePackages: Seq[String],
+      jdk: Option[Sdk],
+      javacOptions: Seq[String],
+      sbtVersion: String,
+      projectPath: String) {
     this(
-        new SbtProjectData(SbtProjectSystem.Id,
-                           basePackages,
-                           jdk,
-                           javacOptions,
-                           sbtVersion,
-                           projectPath))
+      new SbtProjectData(
+        SbtProjectSystem.Id,
+        basePackages,
+        jdk,
+        javacOptions,
+        sbtVersion,
+        projectPath))
   }
 
   protected def key = SbtProjectData.Key
 }
 
 class ModuleExtNode(val data: ModuleExtData) extends Node[ModuleExtData] {
-  def this(scalaVersion: Option[Version],
-           scalacClasspath: Seq[File],
-           scalacOptions: Seq[String],
-           jdk: Option[Sdk],
-           javacOptions: Seq[String]) {
+  def this(
+      scalaVersion: Option[Version],
+      scalacClasspath: Seq[File],
+      scalacOptions: Seq[String],
+      jdk: Option[Sdk],
+      javacOptions: Seq[String]) {
     this(
-        new ModuleExtData(SbtProjectSystem.Id,
-                          scalaVersion,
-                          scalacClasspath,
-                          scalacOptions,
-                          jdk,
-                          javacOptions))
+      new ModuleExtData(
+        SbtProjectSystem.Id,
+        scalaVersion,
+        scalacClasspath,
+        scalacOptions,
+        jdk,
+        javacOptions))
   }
 
   protected def key = ModuleExtData.Key
@@ -127,26 +133,28 @@ class ModuleExtNode(val data: ModuleExtData) extends Node[ModuleExtData] {
 
 class AndroidFacetNode(val data: AndroidFacetData)
     extends Node[AndroidFacetData] {
-  def this(version: String,
-           manifest: File,
-           apk: File,
-           res: File,
-           assets: File,
-           gen: File,
-           libs: File,
-           isLibrary: Boolean,
-           proguardConfig: Seq[String]) {
+  def this(
+      version: String,
+      manifest: File,
+      apk: File,
+      res: File,
+      assets: File,
+      gen: File,
+      libs: File,
+      isLibrary: Boolean,
+      proguardConfig: Seq[String]) {
     this(
-        new AndroidFacetData(SbtProjectSystem.Id,
-                             version,
-                             manifest,
-                             apk,
-                             res,
-                             assets,
-                             gen,
-                             libs,
-                             isLibrary,
-                             proguardConfig))
+      new AndroidFacetData(
+        SbtProjectSystem.Id,
+        version,
+        manifest,
+        apk,
+        res,
+        assets,
+        gen,
+        libs,
+        isLibrary,
+        proguardConfig))
   }
 
   protected def key = AndroidFacetData.Key

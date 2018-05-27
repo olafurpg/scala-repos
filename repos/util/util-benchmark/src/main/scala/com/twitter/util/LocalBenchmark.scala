@@ -12,7 +12,7 @@ class LocalBenchmark extends StdBenchAnnotations {
     local.let("hi") {
       local() match {
         case Some(v) => v
-        case None => "bye"
+        case None    => "bye"
       }
     }
 }

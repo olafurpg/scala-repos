@@ -52,11 +52,11 @@ class PatmatBytecodeTest extends ClearAfterClass {
 
     val List(c) = compileClasses(compiler)(code)
     assert(
-        getSingleMethod(c, "s1").instructions.count(_.opcode == TABLESWITCH) == 1,
-        textify(c))
+      getSingleMethod(c, "s1").instructions.count(_.opcode == TABLESWITCH) == 1,
+      textify(c))
     assert(
-        getSingleMethod(c, "s2").instructions.count(_.opcode == TABLESWITCH) == 1,
-        textify(c))
+      getSingleMethod(c, "s2").instructions.count(_.opcode == TABLESWITCH) == 1,
+      textify(c))
   }
 
   @Test
@@ -84,11 +84,11 @@ class PatmatBytecodeTest extends ClearAfterClass {
 
     val List(c) = compileClasses(compiler)(code)
     assert(
-        getSingleMethod(c, "s1").instructions.count(_.opcode == TABLESWITCH) == 1,
-        textify(c))
+      getSingleMethod(c, "s1").instructions.count(_.opcode == TABLESWITCH) == 1,
+      textify(c))
     assert(
-        getSingleMethod(c, "s2").instructions.count(_.opcode == TABLESWITCH) == 1,
-        textify(c))
+      getSingleMethod(c, "s2").instructions.count(_.opcode == TABLESWITCH) == 1,
+      textify(c))
   }
 
   @Test
@@ -102,8 +102,9 @@ class PatmatBytecodeTest extends ClearAfterClass {
       """.stripMargin
     val c = compileClasses(optCompiler)(code).head
 
-    assertSameSummary(getSingleMethod(c, "a"),
-                      List(NEW, DUP, ICONST_1, LDC, "<init>", "y", ARETURN))
+    assertSameSummary(
+      getSingleMethod(c, "a"),
+      List(NEW, DUP, ICONST_1, LDC, "<init>", "y", ARETURN))
   }
 
   @Test
@@ -116,9 +117,10 @@ class PatmatBytecodeTest extends ClearAfterClass {
         |}
       """.stripMargin
     val c = compileClasses(optCompiler)(code).head
-    assert(!getSingleMethod(c, "a").instructions
-             .exists(i => i.opcode == IFNULL || i.opcode == IFNONNULL),
-           textify(findAsmMethod(c, "a")))
+    assert(
+      !getSingleMethod(c, "a").instructions
+        .exists(i => i.opcode == IFNULL || i.opcode == IFNONNULL),
+      textify(findAsmMethod(c, "a")))
   }
 
   @Test
@@ -131,29 +133,33 @@ class PatmatBytecodeTest extends ClearAfterClass {
         |}
       """.stripMargin
     val c = compileClasses(optCompiler)(code).head
-    assertSameSummary(getSingleMethod(c, "a"),
-                      List(NEW,
-                           DUP,
-                           ICONST_1,
-                           "boxToInteger",
-                           LDC,
-                           "<init>",
-                           ASTORE /*1*/,
-                           ALOAD /*1*/,
-                           "y",
-                           ASTORE /*2*/,
-                           ALOAD /*1*/,
-                           "x",
-                           INSTANCEOF,
-                           IFNE /*R*/,
-                           NEW,
-                           DUP,
-                           ALOAD /*1*/,
-                           "<init>",
-                           ATHROW,
-                           /*R*/ -1,
-                           ALOAD /*2*/,
-                           ARETURN))
+    assertSameSummary(
+      getSingleMethod(c, "a"),
+      List(
+        NEW,
+        DUP,
+        ICONST_1,
+        "boxToInteger",
+        LDC,
+        "<init>",
+        ASTORE /*1*/,
+        ALOAD /*1*/,
+        "y",
+        ASTORE /*2*/,
+        ALOAD /*1*/,
+        "x",
+        INSTANCEOF,
+        IFNE /*R*/,
+        NEW,
+        DUP,
+        ALOAD /*1*/,
+        "<init>",
+        ATHROW,
+        /*R*/ -1,
+        ALOAD /*2*/,
+        ARETURN
+      )
+    )
   }
 
   @Test
@@ -168,26 +174,29 @@ class PatmatBytecodeTest extends ClearAfterClass {
         |}
       """.stripMargin
     val c = compileClasses(optCompiler)(
-        code, allowMessage = _.msg.contains("may not be exhaustive")).head
+      code,
+      allowMessage = _.msg.contains("may not be exhaustive")).head
 
-    val expected = List(ALOAD /*1*/,
-                        INSTANCEOF /*::*/,
-                        IFEQ /*A*/,
-                        ALOAD,
-                        CHECKCAST /*::*/,
-                        "head",
-                        "unboxToInt",
-                        ISTORE,
-                        GOTO /*B*/,
-                        -1 /*A*/,
-                        NEW /*MatchError*/,
-                        DUP,
-                        ALOAD /*1*/,
-                        "<init>",
-                        ATHROW,
-                        -1 /*B*/,
-                        ILOAD,
-                        IRETURN)
+    val expected = List(
+      ALOAD /*1*/,
+      INSTANCEOF /*::*/,
+      IFEQ /*A*/,
+      ALOAD,
+      CHECKCAST /*::*/,
+      "head",
+      "unboxToInt",
+      ISTORE,
+      GOTO /*B*/,
+      -1 /*A*/,
+      NEW /*MatchError*/,
+      DUP,
+      ALOAD /*1*/,
+      "<init>",
+      ATHROW,
+      -1 /*B*/,
+      ILOAD,
+      IRETURN
+    )
 
     assertSameSummary(getSingleMethod(c, "a"), expected)
     assertSameSummary(getSingleMethod(c, "b"), expected)
@@ -213,30 +222,31 @@ class PatmatBytecodeTest extends ClearAfterClass {
       """.stripMargin
     val List(c, cMod) = compileClasses(optCompiler)(code)
     assertSameSummary(
-        getSingleMethod(c, "t1"), List(ICONST_1, ICONST_2, IADD, IRETURN))
+      getSingleMethod(c, "t1"),
+      List(ICONST_1, ICONST_2, IADD, IRETURN))
     assertSameSummary(getSingleMethod(c, "t2"), List(ICONST_1, IRETURN))
-    assertInvokedMethods(getSingleMethod(c, "t3"),
-                         List("C.tplCall",
-                              "scala/Tuple2._1",
-                              "scala/Tuple2._2$mcI$sp",
-                              "scala/MatchError.<init>",
-                              "java/lang/String.length"))
     assertInvokedMethods(
-        getSingleMethod(c, "t4"),
-        List("C.tplCall", "scala/Tuple2._2$mcI$sp", "scala/MatchError.<init>"))
+      getSingleMethod(c, "t3"),
+      List(
+        "C.tplCall",
+        "scala/Tuple2._1",
+        "scala/Tuple2._2$mcI$sp",
+        "scala/MatchError.<init>",
+        "java/lang/String.length"))
+    assertInvokedMethods(
+      getSingleMethod(c, "t4"),
+      List("C.tplCall", "scala/Tuple2._2$mcI$sp", "scala/MatchError.<init>"))
     assertNoInvoke(getSingleMethod(c, "t5"))
     assertSameSummary(getSingleMethod(c, "t6"), List(BIPUSH, IRETURN))
 
     // MatchError reachable because of the type pattern `s: String`
-    assertInvokedMethods(getSingleMethod(c, "t7"),
-                         List("C.a",
-                              "C.b",
-                              "scala/MatchError.<init>",
-                              "java/lang/String.length"))
+    assertInvokedMethods(
+      getSingleMethod(c, "t7"),
+      List("C.a", "C.b", "scala/MatchError.<init>", "java/lang/String.length"))
     assertSameSummary(getSingleMethod(c, "t8"), List(ALOAD, "b", IRETURN))
     // C allocation not eliminated - constructor may have side-effects.
     assertSameSummary(
-        getSingleMethod(c, "t9"),
-        List(NEW, DUP, LDC, BIPUSH, "<init>", "a", "toString", ARETURN))
+      getSingleMethod(c, "t9"),
+      List(NEW, DUP, LDC, BIPUSH, "<init>", "a", "toString", ARETURN))
   }
 }

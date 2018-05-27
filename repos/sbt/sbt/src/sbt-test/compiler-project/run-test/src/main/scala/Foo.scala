@@ -13,7 +13,7 @@ class Foo {
   val settings = new Settings()
   settings.classpath.value = location(classOf[Holder])
   settings.bootclasspath.value = settings.bootclasspath.value + / +
-  location(classOf[Product]) + / + location(classOf[Settings])
+    location(classOf[Product]) + / + location(classOf[Settings])
   val inter = new Interpreter(settings) {
     override protected def parentClassLoader = Foo.this.getClass.getClassLoader
   }

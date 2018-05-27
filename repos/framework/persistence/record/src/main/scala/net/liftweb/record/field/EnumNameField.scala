@@ -41,8 +41,8 @@ trait EnumNameTypedField[EnumType <: Enumeration]
 
   def setFromString(s: String): Box[EnumType#Value] = s match {
     case null | "" if optional_? => setBox(Empty)
-    case null | "" => setBox(Failure(notOptionalErrorMessage))
-    case _ => setBox(enum.values.find(_.toString == s))
+    case null | ""               => setBox(Failure(notOptionalErrorMessage))
+    case _                       => setBox(enum.values.find(_.toString == s))
   }
 
   /** Label for the selection item representing Empty, show when this field is optional. Defaults to the empty string. */
@@ -59,13 +59,15 @@ trait EnumNameTypedField[EnumType <: Enumeration]
 
   private def elem =
     SHtml.selectObj[Box[EnumType#Value]](
-        buildDisplayList, Full(valueBox), setBox(_)) %
-    ("tabindex" -> tabIndex.toString)
+      buildDisplayList,
+      Full(valueBox),
+      setBox(_)) %
+      ("tabindex" -> tabIndex.toString)
 
   def toForm: Box[NodeSeq] =
     uniqueFieldId match {
       case Full(id) => Full(elem % ("id" -> id))
-      case _ => Full(elem)
+      case _        => Full(elem)
     }
 
   def defaultValue: EnumType#Value = enum.values.iterator.next
@@ -78,7 +80,7 @@ trait EnumNameTypedField[EnumType <: Enumeration]
     case JNothing | JNull if optional_? => setBox(Empty)
     case JString(s) =>
       setBox(
-          enum.values.find(_.toString == s) ?~ ("Unknown value \"" + s + "\""))
+        enum.values.find(_.toString == s) ?~ ("Unknown value \"" + s + "\""))
     case other => setBox(FieldHelpers.expectedA("JString", other))
   }
 
@@ -88,8 +90,8 @@ trait EnumNameTypedField[EnumType <: Enumeration]
 }
 
 class EnumNameField[OwnerType <: Record[OwnerType], EnumType <: Enumeration](
-    rec: OwnerType, protected val enum: EnumType)(
-    implicit m: Manifest[EnumType#Value])
+    rec: OwnerType,
+    protected val enum: EnumType)(implicit m: Manifest[EnumType#Value])
     extends Field[EnumType#Value, OwnerType]
     with MandatoryTypedField[EnumType#Value]
     with EnumNameTypedField[EnumType] {
@@ -104,11 +106,12 @@ class EnumNameField[OwnerType <: Record[OwnerType], EnumType <: Enumeration](
 }
 
 class OptionalEnumNameField[
-    OwnerType <: Record[OwnerType], EnumType <: Enumeration](
-    rec: OwnerType, protected val enum: EnumType)(
+    OwnerType <: Record[OwnerType],
+    EnumType <: Enumeration](rec: OwnerType, protected val enum: EnumType)(
     implicit m: Manifest[EnumType#Value])
     extends Field[EnumType#Value, OwnerType]
-    with OptionalTypedField[EnumType#Value] with EnumNameTypedField[EnumType] {
+    with OptionalTypedField[EnumType#Value]
+    with EnumNameTypedField[EnumType] {
   def this(rec: OwnerType, enum: EnumType, value: Box[EnumType#Value])(
       implicit m: Manifest[EnumType#Value]) = {
     this(rec, enum)

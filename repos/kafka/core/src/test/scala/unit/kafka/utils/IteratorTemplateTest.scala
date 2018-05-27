@@ -41,12 +41,18 @@ class IteratorTemplateTest extends Assertions {
     for (i <- 0 until 10) {
       assertEquals("We should have an item to read.", true, iterator.hasNext)
       assertEquals(
-          "Checking again shouldn't change anything.", true, iterator.hasNext)
+        "Checking again shouldn't change anything.",
+        true,
+        iterator.hasNext)
       assertEquals(
-          "Peeking at the item should show the right thing.", i, iterator.peek)
+        "Peeking at the item should show the right thing.",
+        i,
+        iterator.peek)
       assertEquals("Peeking again shouldn't change anything", i, iterator.peek)
       assertEquals(
-          "Getting the item should give the right thing.", i, iterator.next)
+        "Getting the item should give the right thing.",
+        i,
+        iterator.next)
     }
     assertEquals("All gone!", false, iterator.hasNext)
     intercept[NoSuchElementException] {

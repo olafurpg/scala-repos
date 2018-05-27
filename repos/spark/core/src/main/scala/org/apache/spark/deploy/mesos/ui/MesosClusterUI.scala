@@ -25,13 +25,17 @@ import org.apache.spark.ui.JettyUtils._
 /**
   * UI that displays driver results from the [[org.apache.spark.deploy.mesos.MesosClusterDispatcher]]
   */
-private[spark] class MesosClusterUI(securityManager: SecurityManager,
-                                    port: Int,
-                                    conf: SparkConf,
-                                    dispatcherPublicAddress: String,
-                                    val scheduler: MesosClusterScheduler)
+private[spark] class MesosClusterUI(
+    securityManager: SecurityManager,
+    port: Int,
+    conf: SparkConf,
+    dispatcherPublicAddress: String,
+    val scheduler: MesosClusterScheduler)
     extends WebUI(
-        securityManager, securityManager.getSSLOptions("mesos"), port, conf) {
+      securityManager,
+      securityManager.getSSLOptions("mesos"),
+      port,
+      conf) {
 
   initialize()
 
@@ -42,7 +46,7 @@ private[spark] class MesosClusterUI(securityManager: SecurityManager,
     attachPage(new MesosClusterPage(this))
     attachPage(new DriverPage(this))
     attachHandler(
-        createStaticHandler(MesosClusterUI.STATIC_RESOURCE_DIR, "/static"))
+      createStaticHandler(MesosClusterUI.STATIC_RESOURCE_DIR, "/static"))
   }
 }
 

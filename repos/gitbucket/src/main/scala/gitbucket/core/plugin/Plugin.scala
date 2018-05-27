@@ -25,9 +25,10 @@ trait Plugin {
   /**
     * Override to declare this plug-in provides images.
     */
-  def images(registry: PluginRegistry,
-             context: ServletContext,
-             settings: SystemSettings): Seq[(String, Array[Byte])] = Nil
+  def images(
+      registry: PluginRegistry,
+      context: ServletContext,
+      settings: SystemSettings): Seq[(String, Array[Byte])] = Nil
 
   /**
     * Override to declare this plug-in provides controllers.
@@ -37,9 +38,10 @@ trait Plugin {
   /**
     * Override to declare this plug-in provides controllers.
     */
-  def controllers(registry: PluginRegistry,
-                  context: ServletContext,
-                  settings: SystemSettings): Seq[(String, ControllerBase)] =
+  def controllers(
+      registry: PluginRegistry,
+      context: ServletContext,
+      settings: SystemSettings): Seq[(String, ControllerBase)] =
     Nil
 
   /**
@@ -50,9 +52,10 @@ trait Plugin {
   /**
     * Override to declare this plug-in provides JavaScript.
     */
-  def javaScripts(registry: PluginRegistry,
-                  context: ServletContext,
-                  settings: SystemSettings): Seq[(String, String)] = Nil
+  def javaScripts(
+      registry: PluginRegistry,
+      context: ServletContext,
+      settings: SystemSettings): Seq[(String, String)] = Nil
 
   /**
     * Override to declare this plug-in provides renderers.
@@ -62,9 +65,10 @@ trait Plugin {
   /**
     * Override to declare this plug-in provides renderers.
     */
-  def renderers(registry: PluginRegistry,
-                context: ServletContext,
-                settings: SystemSettings): Seq[(String, Renderer)] = Nil
+  def renderers(
+      registry: PluginRegistry,
+      context: ServletContext,
+      settings: SystemSettings): Seq[(String, Renderer)] = Nil
 
   /**
     * Override to add git repository routings.
@@ -74,9 +78,10 @@ trait Plugin {
   /**
     * Override to add git repository routings.
     */
-  def repositoryRoutings(registry: PluginRegistry,
-                         context: ServletContext,
-                         settings: SystemSettings): Seq[GitRepositoryRouting] =
+  def repositoryRoutings(
+      registry: PluginRegistry,
+      context: ServletContext,
+      settings: SystemSettings): Seq[GitRepositoryRouting] =
     Nil
 
   /**
@@ -87,17 +92,19 @@ trait Plugin {
   /**
     * Override to add receive hooks.
     */
-  def receiveHooks(registry: PluginRegistry,
-                   context: ServletContext,
-                   settings: SystemSettings): Seq[ReceiveHook] = Nil
+  def receiveHooks(
+      registry: PluginRegistry,
+      context: ServletContext,
+      settings: SystemSettings): Seq[ReceiveHook] = Nil
 
   /**
     * This method is invoked in initialization of plugin system.
     * Register plugin functionality to PluginRegistry.
     */
-  def initialize(registry: PluginRegistry,
-                 context: ServletContext,
-                 settings: SystemSettings): Unit = {
+  def initialize(
+      registry: PluginRegistry,
+      context: ServletContext,
+      settings: SystemSettings): Unit = {
     (images ++ images(registry, context, settings)).foreach {
       case (id, in) =>
         registry.addImage(id, in)
@@ -114,10 +121,10 @@ trait Plugin {
       case (extension, renderer) =>
         registry.addRenderer(extension, renderer)
     }
-    (repositoryRoutings ++ repositoryRoutings(registry, context, settings)).foreach {
-      routing =>
+    (repositoryRoutings ++ repositoryRoutings(registry, context, settings))
+      .foreach { routing =>
         registry.addRepositoryRouting(routing)
-    }
+      }
     (receiveHooks ++ receiveHooks(registry, context, settings)).foreach {
       receiveHook =>
         registry.addReceiveHook(receiveHook)
@@ -128,9 +135,10 @@ trait Plugin {
     * This method is invoked in shutdown of plugin system.
     * If the plugin has any resources, release them in this method.
     */
-  def shutdown(registry: PluginRegistry,
-               context: ServletContext,
-               settings: SystemSettings): Unit = {}
+  def shutdown(
+      registry: PluginRegistry,
+      context: ServletContext,
+      settings: SystemSettings): Unit = {}
 
   /**
     * Helper method to get a resource from classpath.

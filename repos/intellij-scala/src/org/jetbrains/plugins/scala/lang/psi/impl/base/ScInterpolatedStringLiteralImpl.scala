@@ -2,24 +2,32 @@ package org.jetbrains.plugins.scala
 package lang.psi.impl.base
 
 import com.intellij.lang.ASTNode
-import org.jetbrains.plugins.scala.lang.psi.api.base.{InterpolatedStringType, ScInterpolatedStringLiteral}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  InterpolatedStringType,
+  ScInterpolatedStringLiteral
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScReferenceExpression
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure,
+  TypeResult,
+  TypingContext
+}
 
 /**
   * User: Dmitry Naydanov
   * Date: 3/17/12
   */
 class ScInterpolatedStringLiteralImpl(node: ASTNode)
-    extends ScLiteralImpl(node) with ScInterpolatedStringLiteral {
+    extends ScLiteralImpl(node)
+    with ScInterpolatedStringLiteral {
   def getType: InterpolatedStringType.StringType =
     getNode.getFirstChildNode.getText match {
-      case "s" => InterpolatedStringType.STANDART
-      case "f" => InterpolatedStringType.FORMAT
-      case "id" => InterpolatedStringType.PATTERN
+      case "s"   => InterpolatedStringType.STANDART
+      case "f"   => InterpolatedStringType.FORMAT
+      case "id"  => InterpolatedStringType.PATTERN
       case "raw" => InterpolatedStringType.RAW
-      case _ => null
+      case _     => null
     }
 
   protected override def innerType(ctx: TypingContext): TypeResult[ScType] = {
@@ -27,15 +35,15 @@ class ScInterpolatedStringLiteralImpl(node: ASTNode)
       case Some(expr) => expr.getNonValueType(ctx)
       case _ =>
         Failure(
-            s"Cannot find method ${getFirstChild.getText} of StringContext",
-            Some(this))
+          s"Cannot find method ${getFirstChild.getText} of StringContext",
+          Some(this))
     }
   }
 
   def reference: Option[ScReferenceExpression] = {
     getFirstChild match {
       case ref: ScReferenceExpression => Some(ref)
-      case _ => None
+      case _                          => None
     }
   }
 
@@ -46,6 +54,6 @@ class ScInterpolatedStringLiteralImpl(node: ASTNode)
   override def getValue: AnyRef =
     findChildByClassScala(classOf[ScLiteralImpl]) match {
       case literal: ScLiteralImpl => literal.getValue
-      case _ => ""
+      case _                      => ""
     }
 }

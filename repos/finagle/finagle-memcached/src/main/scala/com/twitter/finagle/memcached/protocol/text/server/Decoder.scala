@@ -10,7 +10,8 @@ import org.jboss.netty.buffer.ChannelBuffer
 import org.jboss.netty.channel._
 
 class Decoder(storageCommands: collection.Set[ChannelBuffer])
-    extends AbstractDecoder with StateMachine {
+    extends AbstractDecoder
+    with StateMachine {
 
   case class AwaitingCommand() extends State
   case class AwaitingData(tokens: Seq[ChannelBuffer], bytesNeeded: Int)
@@ -24,9 +25,10 @@ class Decoder(storageCommands: collection.Set[ChannelBuffer])
     super.exceptionCaught(ctx, e)
   }
 
-  def decode(ctx: ChannelHandlerContext,
-             channel: Channel,
-             buffer: ChannelBuffer): Decoding = {
+  def decode(
+      ctx: ChannelHandlerContext,
+      channel: Channel,
+      buffer: ChannelBuffer): Decoding = {
     state match {
       case AwaitingCommand() =>
         decodeLine(buffer, needsData) { tokens =>
@@ -34,14 +36,16 @@ class Decoder(storageCommands: collection.Set[ChannelBuffer])
         }
       case AwaitingData(tokens, bytesNeeded) =>
         decodeData(bytesNeeded, buffer) { data =>
-          TokensWithData(tokens.map { ChannelBufferBuf.Owned(_) },
-                         ChannelBufferBuf.Owned(data))
+          TokensWithData(
+            tokens.map { ChannelBufferBuf.Owned(_) },
+            ChannelBufferBuf.Owned(data))
         }
     }
   }
 
   final protected[memcached] def awaitData(
-      tokens: Seq[ChannelBuffer], bytesNeeded: Int) {
+      tokens: Seq[ChannelBuffer],
+      bytesNeeded: Int) {
     state = AwaitingData(tokens, bytesNeeded)
   }
 

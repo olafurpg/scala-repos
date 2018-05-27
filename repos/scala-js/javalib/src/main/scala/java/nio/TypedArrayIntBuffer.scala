@@ -86,12 +86,18 @@ private[nio] final class TypedArrayIntBuffer private (
 
   @inline
   override private[nio] def load(
-      startIndex: Int, dst: Array[Int], offset: Int, length: Int): Unit =
+      startIndex: Int,
+      dst: Array[Int],
+      offset: Int,
+      length: Int): Unit =
     GenBuffer(this).generic_load(startIndex, dst, offset, length)
 
   @inline
   override private[nio] def store(
-      startIndex: Int, src: Array[Int], offset: Int, length: Int): Unit =
+      startIndex: Int,
+      src: Array[Int],
+      offset: Int,
+      length: Int): Unit =
     GenBuffer(this).generic_store(startIndex, src, offset, length)
 }
 
@@ -100,17 +106,23 @@ private[nio] object TypedArrayIntBuffer {
       extends GenTypedArrayBuffer.NewTypedArrayBuffer[IntBuffer] {
     def bytesPerElem: Int = 4
 
-    def apply(typedArray: Int32Array,
-              initialPosition: Int,
-              initialLimit: Int,
-              readOnly: Boolean): TypedArrayIntBuffer = {
+    def apply(
+        typedArray: Int32Array,
+        initialPosition: Int,
+        initialLimit: Int,
+        readOnly: Boolean): TypedArrayIntBuffer = {
       new TypedArrayIntBuffer(
-          typedArray, initialPosition, initialLimit, readOnly)
+        typedArray,
+        initialPosition,
+        initialLimit,
+        readOnly)
     }
 
     @inline
     def newTypedArray(
-        buffer: ArrayBuffer, byteOffset: Int, length: Int): Int32Array = {
+        buffer: ArrayBuffer,
+        byteOffset: Int,
+        length: Int): Int32Array = {
       new Int32Array(buffer, byteOffset, length)
     }
   }

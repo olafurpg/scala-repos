@@ -19,14 +19,15 @@ object WebSocketHandler {
   /**
     * Handle a WebSocket
     */
-  def handleWebSocket(upgrade: UpgradeToWebSocket,
-                      flow: Flow[Message, Message, _],
-                      bufferLimit: Int): HttpResponse = upgrade match {
+  def handleWebSocket(
+      upgrade: UpgradeToWebSocket,
+      flow: Flow[Message, Message, _],
+      bufferLimit: Int): HttpResponse = upgrade match {
     case lowLevel: UpgradeToWebSocketLowLevel =>
       lowLevel.handleFrames(messageFlowToFrameFlow(flow, bufferLimit))
     case other =>
       throw new IllegalArgumentException(
-          "UpgradeToWebsocket is not an Akka HTTP UpgradeToWebsocketLowLevel")
+        "UpgradeToWebsocket is not an Akka HTTP UpgradeToWebsocketLowLevel")
   }
 
   /**
@@ -44,7 +45,7 @@ object WebSocketHandler {
     Flow[FrameEvent]
       .transform(() => aggregateFrames(bufferLimit))
       .via(handleProtocolFailures(
-              WebSocketFlowHandler.webSocketProtocol(bufferLimit).join(flow)))
+        WebSocketFlowHandler.webSocketProtocol(bufferLimit).join(flow)))
       .map(messageToFrameEvent)
   }
 
@@ -70,7 +71,7 @@ object WebSocketHandler {
             // since it has sent the start of a frame before finishing
             // the previous frame.
             ctx.push(
-                close(Protocol.CloseCodes.UnexpectedCondition, "Server error"))
+              close(Protocol.CloseCodes.UnexpectedCondition, "Server error"))
           case FrameData(data, _)
               if currentFrameData.size + data.size > bufferLimit =>
             ctx.push(close(Protocol.CloseCodes.TooBig))
@@ -80,8 +81,8 @@ object WebSocketHandler {
             currentFrameData ++= data
             ctx.pull()
           case FrameData(data, true) =>
-            val message = frameToRawMessage(
-                currentFrameHeader, currentFrameData ++ data)
+            val message =
+              frameToRawMessage(currentFrameHeader, currentFrameData ++ data)
             currentFrameHeader = null
             currentFrameData = null
             ctx.push(Right(message))
@@ -92,12 +93,12 @@ object WebSocketHandler {
             // since it has sent the start of a frame before finishing
             // the previous frame.
             ctx.push(
-                close(Protocol.CloseCodes.UnexpectedCondition, "Server error"))
+              close(Protocol.CloseCodes.UnexpectedCondition, "Server error"))
 
           // Frame start protocol errors
           case FrameStart(header, _) if header.mask.isEmpty =>
-            ctx.push(close(Protocol.CloseCodes.ProtocolError,
-                           "Unmasked client frame"))
+            ctx.push(
+              close(Protocol.CloseCodes.ProtocolError, "Unmasked client frame"))
 
           // Frame start
           case fs @ FrameStart(header, data) if fs.lastPart =>
@@ -145,8 +146,8 @@ object WebSocketHandler {
       case TextMessage(data) =>
         frameEvent(Protocol.Opcode.Text, ByteString(data))
       case BinaryMessage(data) => frameEvent(Protocol.Opcode.Binary, data)
-      case PingMessage(data) => frameEvent(Protocol.Opcode.Ping, data)
-      case PongMessage(data) => frameEvent(Protocol.Opcode.Pong, data)
+      case PingMessage(data)   => frameEvent(Protocol.Opcode.Ping, data)
+      case PongMessage(data)   => frameEvent(Protocol.Opcode.Pong, data)
       case CloseMessage(Some(statusCode), reason) =>
         FrameEvent.closeFrame(statusCode, reason)
       case CloseMessage(None, _) =>
@@ -158,14 +159,19 @@ object WebSocketHandler {
     * Handles the protocol failures by gracefully closing the connection.
     */
   private def handleProtocolFailures: Flow[RawMessage, Message, _] => Flow[
-      Either[Message, RawMessage], Message, _] = {
+    Either[Message, RawMessage],
+    Message,
+    _] = {
     AkkaStreams.bypassWith(
-        Flow[Either[Message, RawMessage]].transform(() =>
-              new PushStage[Either[Message, RawMessage],
-                            Either[RawMessage, Message]] {
+      Flow[Either[Message, RawMessage]].transform(
+        () =>
+          new PushStage[
+            Either[Message, RawMessage],
+            Either[RawMessage, Message]] {
             var closing = false
-            def onPush(elem: Either[Message, RawMessage],
-                       ctx: Context[Either[RawMessage, Message]]) =
+            def onPush(
+                elem: Either[Message, RawMessage],
+                ctx: Context[Either[RawMessage, Message]]) =
               elem match {
                 case _ if closing =>
                   ctx.finish()
@@ -176,7 +182,8 @@ object WebSocketHandler {
                   ctx.push(Right(close))
               }
         }),
-        Merge(2, eagerComplete = true))
+      Merge(2, eagerComplete = true)
+    )
   }
 
   private case class Frame(header: FrameHeader, data: ByteString) {

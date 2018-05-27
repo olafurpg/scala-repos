@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -32,7 +32,10 @@ import scalaz.syntax.traverse._
 import scalaz.std.list._
 
 case class Prepare(
-    blockid: Long, seqId: Long, root: File, source: StorageReader)
+    blockid: Long,
+    seqId: Long,
+    root: File,
+    source: StorageReader)
 case class Spoilt(blockid: Long, seqId: Long)
 case class Cooked(blockid: Long, seqId: Long, root: File, metadata: File)
 
@@ -46,7 +49,8 @@ final case class Chef(blockFormat: CookedBlockFormat, format: SegmentFormat)
   }
 
   def cook(
-      root: File, reader: StorageReader): ValidationNel[IOException, File] = {
+      root: File,
+      reader: StorageReader): ValidationNel[IOException, File] = {
     assert(root.exists)
     assert(root.isDirectory)
     assert(root.canWrite)
@@ -67,12 +71,13 @@ final case class Chef(blockFormat: CookedBlockFormat, format: SegmentFormat)
       }
 
     val files = files0.toList.sequence[
-        ({ type λ[α] = ValidationNel[IOException, α] })#λ, (SegmentId, File)]
+      ({ type λ[α] = ValidationNel[IOException, α] })#λ,
+      (SegmentId, File)]
     files flatMap { segs =>
       val metadata =
         CookedBlockMetadata(reader.id, reader.length, segs.toArray)
-      val mdFile = File.createTempFile(
-          "block-%08x".format(reader.id), ".cookedmeta", root)
+      val mdFile =
+        File.createTempFile("block-%08x".format(reader.id), ".cookedmeta", root)
       val channel = new FileOutputStream(mdFile).getChannel()
       try {
         blockFormat.writeCookedBlock(channel, metadata).toValidationNel.map {

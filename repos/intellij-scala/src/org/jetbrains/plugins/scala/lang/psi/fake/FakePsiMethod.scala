@@ -30,19 +30,19 @@ class FakePsiMethod(
     val params: Array[Parameter],
     val retType: ScType,
     hasModifier: String => Boolean
-)
-    extends {
+) extends {
   val project: Project = navElement.getProject
   val scope: GlobalSearchScope = navElement.getResolveScope
   val manager = navElement.getManager
   val language = navElement.getLanguage
 } with LightElement(manager, language) with PsiMethod {
   def this(value: ScTypedDefinition, hasModifier: String => Boolean) = {
-    this(value,
-         value.name,
-         Array.empty,
-         value.getType(TypingContext.empty).getOrAny,
-         hasModifier)
+    this(
+      value,
+      value.name,
+      Array.empty,
+      value.getType(TypingContext.empty).getOrAny,
+      hasModifier)
   }
   override def toString: String = name + "()"
 
@@ -104,8 +104,8 @@ class FakePsiMethod(
     case b: ScBindingPattern =>
       b.nameContext match {
         case v: ScVariable => v.getModifierList
-        case v: ScValue => v.getModifierList
-        case _ => ScalaPsiUtil.getEmptyModifierList(getManager)
+        case v: ScValue    => v.getModifierList
+        case _             => ScalaPsiUtil.getEmptyModifierList(getManager)
       }
     case _ => ScalaPsiUtil.getEmptyModifierList(getManager)
   }
@@ -125,7 +125,9 @@ class FakePsiMethod(
 
   def getThrowsList: PsiReferenceList =
     new FakePsiReferenceList(
-        manager, language, PsiReferenceList.Role.THROWS_LIST)
+      manager,
+      language,
+      PsiReferenceList.Role.THROWS_LIST)
 
   def isVarArgs: Boolean = false
 
@@ -148,7 +150,8 @@ class FakePsiMethod(
 }
 
 class FakePsiTypeElement(manager: PsiManager, language: Language, tp: ScType)
-    extends LightElement(manager, language) with PsiTypeElement {
+    extends LightElement(manager, language)
+    with PsiTypeElement {
   def getTypeNoResolve(context: PsiElement): PsiType =
     PsiType.VOID //ScType.toPsi(tp, manager.getProject, GlobalSearchScope.allScope(manager.getProject))
 
@@ -158,7 +161,9 @@ class FakePsiTypeElement(manager: PsiManager, language: Language, tp: ScType)
 
   def getType: PsiType =
     ScType.toPsi(
-        tp, manager.getProject, GlobalSearchScope.allScope(manager.getProject))
+      tp,
+      manager.getProject,
+      GlobalSearchScope.allScope(manager.getProject))
 
   def addAnnotation(qualifiedName: String): PsiAnnotation = null
 
@@ -176,11 +181,13 @@ class FakePsiTypeElement(manager: PsiManager, language: Language, tp: ScType)
   override def copy: PsiElement = new FakePsiTypeElement(manager, language, tp)
 }
 
-class FakePsiParameter(manager: PsiManager,
-                       language: Language,
-                       val parameter: Parameter,
-                       name: String)
-    extends LightElement(manager, language) with PsiParameter {
+class FakePsiParameter(
+    manager: PsiManager,
+    language: Language,
+    val parameter: Parameter,
+    name: String)
+    extends LightElement(manager, language)
+    with PsiParameter {
   def getDeclarationScope: PsiElement = null
 
   def getTypeNoResolve: PsiType = PsiType.VOID
@@ -198,9 +205,10 @@ class FakePsiParameter(manager: PsiManager,
   def getInitializer: PsiExpression = null
 
   def getType: PsiType =
-    ScType.toPsi(parameter.paramType,
-                 manager.getProject,
-                 GlobalSearchScope.allScope(manager.getProject))
+    ScType.toPsi(
+      parameter.paramType,
+      manager.getProject,
+      GlobalSearchScope.allScope(manager.getProject))
 
   def isVarArgs: Boolean = false
 
@@ -225,8 +233,11 @@ class FakePsiParameter(manager: PsiManager,
 }
 
 class FakePsiParameterList(
-    manager: PsiManager, language: Language, params: Array[Parameter])
-    extends LightElement(manager, language) with PsiParameterList {
+    manager: PsiManager,
+    language: Language,
+    params: Array[Parameter])
+    extends LightElement(manager, language)
+    with PsiParameterList {
   def getParameters: Array[PsiParameter] =
     params.map(new FakePsiParameter(manager, language, _, "param"))
 
@@ -245,8 +256,11 @@ class FakePsiParameterList(
 }
 
 class FakePsiReferenceList(
-    manager: PsiManager, language: Language, role: PsiReferenceList.Role)
-    extends LightElement(manager, language) with PsiReferenceList {
+    manager: PsiManager,
+    language: Language,
+    role: PsiReferenceList.Role)
+    extends LightElement(manager, language)
+    with PsiReferenceList {
   override def getText: String = ""
 
   def getRole: PsiReferenceList.Role = role
@@ -262,11 +276,13 @@ class FakePsiReferenceList(
     new FakePsiReferenceList(manager, language, role)
 }
 
-class FakePsiTypeParameterList(manager: PsiManager,
-                               language: Language,
-                               params: Array[ScTypeParam],
-                               owner: PsiTypeParameterListOwner)
-    extends LightElement(manager, language) with PsiTypeParameterList {
+class FakePsiTypeParameterList(
+    manager: PsiManager,
+    language: Language,
+    params: Array[ScTypeParam],
+    owner: PsiTypeParameterListOwner)
+    extends LightElement(manager, language)
+    with PsiTypeParameterList {
   override def getText: String = params.map(_.getText).mkString("(", ", ", ")")
 
   override def toString: String = "FakePsiTypeParameterList"

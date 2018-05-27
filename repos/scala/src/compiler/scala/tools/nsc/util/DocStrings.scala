@@ -92,14 +92,15 @@ object DocStrings {
     *  of their own
     */
   def tagIndex(
-      str: String, p: Int => Boolean = (idx => true)): List[(Int, Int)] = {
+      str: String,
+      p: Int => Boolean = (idx => true)): List[(Int, Int)] = {
     var indices = findAll(str, 0)(idx => str(idx) == '@' && p(idx))
     indices = mergeUsecaseSections(str, indices)
     indices = mergeInheritdocSections(str, indices)
 
     indices match {
       case List() => List()
-      case idxs => idxs zip (idxs.tail ::: List(str.length - 2))
+      case idxs   => idxs zip (idxs.tail ::: List(str.length - 2))
     }
   }
 
@@ -132,22 +133,23 @@ object DocStrings {
 
   def startsWithTag(str: String, start: Int, tag: String): Boolean =
     str.startsWith(tag, start) &&
-    !isIdentifierPart(str charAt (start + tag.length))
+      !isIdentifierPart(str charAt (start + tag.length))
 
   /** The first start tag of a list of tag intervals,
     *  or the end of the whole comment string - 2 if list is empty
     */
   def startTag(str: String, sections: List[(Int, Int)]) = sections match {
-    case Nil => str.length - 2
+    case Nil             => str.length - 2
     case (start, _) :: _ => start
   }
 
   /** A map from parameter names to start/end indices describing all parameter
     *  sections in `str` tagged with `tag`, where `sections` is the index of `str`.
     */
-  def paramDocs(str: String,
-                tag: String,
-                sections: List[(Int, Int)]): Map[String, (Int, Int)] =
+  def paramDocs(
+      str: String,
+      tag: String,
+      sections: List[(Int, Int)]): Map[String, (Int, Int)] =
     Map() ++ {
       for (section <- sections if startsWithTag(str, section, tag)) yield {
         val start = skipWhitespace(str, section._1 + tag.length)
@@ -187,10 +189,10 @@ object DocStrings {
 
   /** A map from the section tag to section parameters */
   def sectionTagMap(
-      str: String, sections: List[(Int, Int)]): Map[String, (Int, Int)] =
+      str: String,
+      sections: List[(Int, Int)]): Map[String, (Int, Int)] =
     Map() ++ {
-      for (section <- sections) yield
-        extractSectionTag(str, section) -> section
+      for (section <- sections) yield extractSectionTag(str, section) -> section
     }
 
   /** Extract the section tag, treating the section tag as an identifier */
@@ -200,7 +202,8 @@ object DocStrings {
   /** Extract the section parameter */
   def extractSectionParam(str: String, section: (Int, Int)): String = {
     val (beg, _) = section
-    assert(str.startsWith("@param", beg) || str.startsWith("@tparam", beg) ||
+    assert(
+      str.startsWith("@param", beg) || str.startsWith("@tparam", beg) ||
         str.startsWith("@throws", beg))
 
     val start = skipWhitespace(str, skipTag(str, beg))
@@ -214,9 +217,11 @@ object DocStrings {
     val (beg, end) = section
     if (str.startsWith("@param", beg) || str.startsWith("@tparam", beg) ||
         str.startsWith("@throws", beg))
-      (skipWhitespace(
-           str, skipIdent(str, skipWhitespace(str, skipTag(str, beg)))),
-       end)
+      (
+        skipWhitespace(
+          str,
+          skipIdent(str, skipWhitespace(str, skipTag(str, beg)))),
+        end)
     else (skipWhitespace(str, skipTag(str, beg)), end)
   }
 

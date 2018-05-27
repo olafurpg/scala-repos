@@ -9,10 +9,9 @@ object TypeDeconstructionProps
     t1 ≈ t
   }
 
-  property("applied type tree") = forAll {
-    (name1: TypeName, name2: TypeName) =>
-      val tq"$a[$b]" = AppliedTypeTree(Ident(name1), List(Ident(name2)))
-      a ≈ Ident(name1) && b ≈ Ident(name2)
+  property("applied type tree") = forAll { (name1: TypeName, name2: TypeName) =>
+    val tq"$a[$b]" = AppliedTypeTree(Ident(name1), List(Ident(name2)))
+    a ≈ Ident(name1) && b ≈ Ident(name2)
   }
 
   property("tuple type (1)") = test {

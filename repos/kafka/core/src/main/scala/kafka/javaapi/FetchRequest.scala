@@ -34,12 +34,12 @@ class FetchRequest(
       (requestInfo: mutable.Map[TopicAndPartition, PartitionFetchInfo]).toMap
     }
     kafka.api.FetchRequest(
-        correlationId = correlationId,
-        clientId = clientId,
-        replicaId = Request.OrdinaryConsumerId,
-        maxWait = maxWait,
-        minBytes = minBytes,
-        requestInfo = scalaMap
+      correlationId = correlationId,
+      clientId = clientId,
+      replicaId = Request.OrdinaryConsumerId,
+      maxWait = maxWait,
+      minBytes = minBytes,
+      requestInfo = scalaMap
     )
   }
 

@@ -30,10 +30,11 @@ object CallGraphTest extends ClearAfterClass.Clearable {
 
   // allows inspecting the caches after a compilation run
   val notPerRun: List[Clearable] = List(
-      compiler.genBCode.bTypes.classBTypeFromInternalName,
-      compiler.genBCode.bTypes.byteCodeRepository.compilingClasses,
-      compiler.genBCode.bTypes.byteCodeRepository.parsedClasses,
-      compiler.genBCode.bTypes.callGraph.callsites)
+    compiler.genBCode.bTypes.classBTypeFromInternalName,
+    compiler.genBCode.bTypes.byteCodeRepository.compilingClasses,
+    compiler.genBCode.bTypes.byteCodeRepository.parsedClasses,
+    compiler.genBCode.bTypes.callGraph.callsites
+  )
   notPerRun foreach compiler.perRunCaches.unrecordCache
 }
 
@@ -45,9 +46,10 @@ class CallGraphTest extends ClearAfterClass {
   import compiler.genBCode.bTypes._
   import callGraph._
 
-  def compile(code: String,
-              allowMessage: StoreReporter#Info => Boolean = _ =>
-                  false): List[ClassNode] = {
+  def compile(
+      code: String,
+      allowMessage: StoreReporter#Info => Boolean = _ => false)
+    : List[ClassNode] = {
     CallGraphTest.notPerRun.foreach(_.clear())
     compileClasses(compiler)(code, allowMessage = allowMessage)
       .map(c => byteCodeRepository.classNode(c.name).get)
@@ -60,14 +62,15 @@ class CallGraphTest extends ClearAfterClass {
       })
       .toList
 
-  def checkCallsite(call: MethodInsnNode,
-                    callsiteMethod: MethodNode,
-                    target: MethodNode,
-                    calleeDeclClass: ClassBType,
-                    safeToInline: Boolean,
-                    atInline: Boolean,
-                    atNoInline: Boolean,
-                    argInfos: IntMap[ArgInfo] = IntMap.empty) = {
+  def checkCallsite(
+      call: MethodInsnNode,
+      callsiteMethod: MethodNode,
+      target: MethodNode,
+      calleeDeclClass: ClassBType,
+      safeToInline: Boolean,
+      atInline: Boolean,
+      atNoInline: Boolean,
+      argInfos: IntMap[ArgInfo] = IntMap.empty) = {
     val callsite = callGraph.callsites(callsiteMethod)(call)
     try {
       assert(callsite.callsiteInstruction == call)
@@ -117,31 +120,45 @@ class CallGraphTest extends ClearAfterClass {
     // The callGraph.callsites map is indexed by instructions of those ClassNodes.
 
     val ok = Set(
-        "D::f1()I is annotated @inline but cannot be inlined: the method is not final and may be overridden", // only one warning for D.f1: C.f1 is not annotated @inline
-        "C::f3()I is annotated @inline but cannot be inlined: the method is not final and may be overridden", // only one warning for C.f3: D.f3 does not have @inline (and it would also be safe to inline)
-        "C::f7()I is annotated @inline but cannot be inlined: the method is not final and may be overridden", // two warnings (the error message mentions C.f7 even if the receiver type is D, because f7 is inherited from C)
-        "operand stack at the callsite in Test::t1(LC;)I contains more values",
-        "operand stack at the callsite in Test::t2(LD;)I contains more values")
+      "D::f1()I is annotated @inline but cannot be inlined: the method is not final and may be overridden", // only one warning for D.f1: C.f1 is not annotated @inline
+      "C::f3()I is annotated @inline but cannot be inlined: the method is not final and may be overridden", // only one warning for C.f3: D.f3 does not have @inline (and it would also be safe to inline)
+      "C::f7()I is annotated @inline but cannot be inlined: the method is not final and may be overridden", // two warnings (the error message mentions C.f7 even if the receiver type is D, because f7 is inherited from C)
+      "operand stack at the callsite in Test::t1(LC;)I contains more values",
+      "operand stack at the callsite in Test::t2(LD;)I contains more values"
+    )
     var msgCount = 0
-    val checkMsg = (m: StoreReporter#Info) =>
-      {
-        msgCount += 1
-        ok exists (m.msg contains _)
+    val checkMsg = (m: StoreReporter#Info) => {
+      msgCount += 1
+      ok exists (m.msg contains _)
     }
     val List(cCls, cMod, dCls, testCls) = compile(code, checkMsg)
     assert(msgCount == 6, msgCount)
 
-    val List(cf1, cf2, cf3, cf4, cf5, cf6, cf7) = findAsmMethods(
-        cCls, _.startsWith("f"))
+    val List(cf1, cf2, cf3, cf4, cf5, cf6, cf7) =
+      findAsmMethods(cCls, _.startsWith("f"))
     val List(df1, df3) = findAsmMethods(dCls, _.startsWith("f"))
     val g1 = findAsmMethod(cMod, "g1")
     val List(t1, t2) = findAsmMethods(testCls, _.startsWith("t"))
 
     val List(
-    cf1Call, cf2Call, cf3Call, cf4Call, cf5Call, cf6Call, cf7Call, cg1Call) =
+      cf1Call,
+      cf2Call,
+      cf3Call,
+      cf4Call,
+      cf5Call,
+      cf6Call,
+      cf7Call,
+      cg1Call) =
       callsInMethod(t1)
     val List(
-    df1Call, df2Call, df3Call, df4Call, df5Call, df6Call, df7Call, dg1Call) =
+      df1Call,
+      df2Call,
+      df3Call,
+      df4Call,
+      df5Call,
+      df6Call,
+      df7Call,
+      dg1Call) =
       callsInMethod(t2)
 
     val cClassBType = classBTypeFromClassNode(cCls)
@@ -177,20 +194,22 @@ class CallGraphTest extends ClearAfterClass {
     val m = findAsmMethod(c, "m")
     val List(fn) = callsInMethod(m)
     val forNameMeth = byteCodeRepository
-      .methodNode("java/lang/Class",
-                  "forName",
-                  "(Ljava/lang/String;)Ljava/lang/Class;")
+      .methodNode(
+        "java/lang/Class",
+        "forName",
+        "(Ljava/lang/String;)Ljava/lang/Class;")
       .get
       ._1
     val classTp = classBTypeFromInternalName("java/lang/Class")
     val r = callGraph.callsites(m)(fn)
-    checkCallsite(fn,
-                  m,
-                  forNameMeth,
-                  classTp,
-                  safeToInline = false,
-                  atInline = false,
-                  atNoInline = false)
+    checkCallsite(
+      fn,
+      m,
+      forNameMeth,
+      classTp,
+      safeToInline = false,
+      atInline = false,
+      atNoInline = false)
   }
 
   @Test

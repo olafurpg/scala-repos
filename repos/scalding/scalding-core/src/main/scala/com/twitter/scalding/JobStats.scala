@@ -23,8 +23,7 @@ import scala.util.{Failure, Try}
 object JobStats {
   def apply(stats: CascadingStats): JobStats = {
     val m = statsMap(stats)
-    new JobStats(
-        stats match {
+    new JobStats(stats match {
       case cs: CascadeStats => m
       case fs: FlowStats =>
         m + ("flow_step_stats" -> fs.getFlowStepStats.asScala.map(statsMap))
@@ -34,29 +33,32 @@ object JobStats {
   private def counterMap(
       stats: CascadingStats): Map[String, Map[String, Long]] =
     stats.getCounterGroups.asScala.map { group =>
-      (group,
-       stats
-         .getCountersFor(group)
-         .asScala
-         .map { counter =>
-           (counter, stats.getCounterValue(group, counter))
-         }
-         .toMap)
+      (
+        group,
+        stats
+          .getCountersFor(group)
+          .asScala
+          .map { counter =>
+            (counter, stats.getCounterValue(group, counter))
+          }
+          .toMap)
     }.toMap
 
   private def statsMap(stats: CascadingStats): Map[String, Any] =
-    Map("counters" -> counterMap(stats),
-        "duration" -> stats.getDuration,
-        "finished_time" -> stats.getFinishedTime,
-        "id" -> stats.getID,
-        "name" -> stats.getName,
-        "run_time" -> stats.getRunTime,
-        "start_time" -> stats.getStartTime,
-        "submit_time" -> stats.getSubmitTime,
-        "failed" -> stats.isFailed,
-        "skipped" -> stats.isSkipped,
-        "stopped" -> stats.isStopped,
-        "successful" -> stats.isSuccessful)
+    Map(
+      "counters" -> counterMap(stats),
+      "duration" -> stats.getDuration,
+      "finished_time" -> stats.getFinishedTime,
+      "id" -> stats.getID,
+      "name" -> stats.getName,
+      "run_time" -> stats.getRunTime,
+      "start_time" -> stats.getStartTime,
+      "submit_time" -> stats.getSubmitTime,
+      "failed" -> stats.isFailed,
+      "skipped" -> stats.isSkipped,
+      "stopped" -> stats.isStopped,
+      "successful" -> stats.isSuccessful
+    )
 
   /**
     * Returns the counters with Group String -> Counter String -> Long
@@ -71,11 +73,11 @@ object JobStats {
               v match {
                 case m: Map[_, _] =>
                   acc +
-                  (k -> m.foldLeft(Map.empty[String, Long]) {
-                        case (acc2, (k: String, v: Long)) => acc2 + (k -> v)
-                        case (_, kv) =>
-                          sys.error("inner k, v not (String, Long):" + kv)
-                      })
+                    (k -> m.foldLeft(Map.empty[String, Long]) {
+                      case (acc2, (k: String, v: Long)) => acc2 + (k -> v)
+                      case (_, kv) =>
+                        sys.error("inner k, v not (String, Long):" + kv)
+                    })
                 case _ => sys.error("inner values are not Maps: " + v)
               }
             case kv => sys.error("Map does not contain string keys: " + (kv))
@@ -88,13 +90,17 @@ object JobStats {
   def toJsonValue(a: Any): String =
     if (a == null) "null"
     else {
-      Try(a.toString.toInt).recoverWith {
-        case t: Throwable => Try(a.toString.toDouble)
-      }.recover {
-        case t: Throwable =>
-          val s = a.toString
-          "\"%s\"".format(s)
-      }.get.toString
+      Try(a.toString.toInt)
+        .recoverWith {
+          case t: Throwable => Try(a.toString.toDouble)
+        }
+        .recover {
+          case t: Throwable =>
+            val s = a.toString
+            "\"%s\"".format(s)
+        }
+        .get
+        .toString
     }
 }
 
@@ -109,7 +115,9 @@ case class JobStats(toMap: Map[String, Any]) {
       .get
 
   def toJson: String =
-    toMap.map {
-      case (k, v) => "\"%s\" : %s".format(k, JobStats.toJsonValue(v))
-    }.mkString("{", ",", "}")
+    toMap
+      .map {
+        case (k, v) => "\"%s\" : %s".format(k, JobStats.toJsonValue(v))
+      }
+      .mkString("{", ",", "}")
 }

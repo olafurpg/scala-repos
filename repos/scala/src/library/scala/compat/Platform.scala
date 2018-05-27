@@ -25,7 +25,8 @@ object Platform {
     * For example, many common collection types do not allow modifying a collection
     * while it is being iterated over.
     */
-  type ConcurrentModificationException = java.util.ConcurrentModificationException
+  type ConcurrentModificationException =
+    java.util.ConcurrentModificationException
 
   /** Copies `length` elements of array `src` starting at position `srcPos` to the
     * array `dest` starting at position `destPos`. If `src`==`dest`, the copying will
@@ -48,7 +49,11 @@ object Platform {
     */
   @inline
   def arraycopy(
-      src: AnyRef, srcPos: Int, dest: AnyRef, destPos: Int, length: Int) {
+      src: AnyRef,
+      srcPos: Int,
+      dest: AnyRef,
+      destPos: Int,
+      length: Int) {
     System.arraycopy(src, srcPos, dest, destPos, length)
   }
 

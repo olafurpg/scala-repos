@@ -14,7 +14,7 @@ package object list {
       */
     def initLast: (List[T], T) = list.reverse match {
       case head :: tail => (tail.reverse, head)
-      case _ => throw new IllegalArgumentException("list was empty")
+      case _            => throw new IllegalArgumentException("list was empty")
     }
   }
 

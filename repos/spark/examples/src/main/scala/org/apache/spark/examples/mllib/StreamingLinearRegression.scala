@@ -20,7 +20,10 @@ package org.apache.spark.examples.mllib
 
 import org.apache.spark.SparkConf
 import org.apache.spark.mllib.linalg.Vectors
-import org.apache.spark.mllib.regression.{LabeledPoint, StreamingLinearRegressionWithSGD}
+import org.apache.spark.mllib.regression.{
+  LabeledPoint,
+  StreamingLinearRegressionWithSGD
+}
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 
 /**
@@ -48,7 +51,7 @@ object StreamingLinearRegression {
 
     if (args.length != 4) {
       System.err.println(
-          "Usage: StreamingLinearRegression <trainingDir> <testDir> <batchDuration> <numFeatures>")
+        "Usage: StreamingLinearRegression <trainingDir> <testDir> <batchDuration> <numFeatures>")
       System.exit(1)
     }
 

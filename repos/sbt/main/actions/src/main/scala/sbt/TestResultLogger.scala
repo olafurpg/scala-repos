@@ -23,13 +23,15 @@ trait TestResultLogger {
   def run(log: Logger, results: Output, taskName: String): Unit
 
   /** Only allow invocation if certain criteria is met, else use another `TestResultLogger` (defaulting to nothing) . */
-  final def onlyIf(f: (Output, String) => Boolean,
-                   otherwise: TestResultLogger = TestResultLogger.Null) =
+  final def onlyIf(
+      f: (Output, String) => Boolean,
+      otherwise: TestResultLogger = TestResultLogger.Null) =
     TestResultLogger.choose(f, this, otherwise)
 
   /** Allow invocation unless a certain predicate passes, in which case use another `TestResultLogger` (defaulting to nothing) . */
-  final def unless(f: (Output, String) => Boolean,
-                   otherwise: TestResultLogger = TestResultLogger.Null) =
+  final def unless(
+      f: (Output, String) => Boolean,
+      otherwise: TestResultLogger = TestResultLogger.Null) =
     TestResultLogger.choose(f, otherwise, this)
 }
 
@@ -60,19 +62,19 @@ object TestResultLogger {
     * @param t The `TestResultLogger` to choose if the predicate passes.
     * @param f The `TestResultLogger` to choose if the predicate fails.
     */
-  def choose(cond: (Output, String) => Boolean,
-             t: TestResultLogger,
-             f: TestResultLogger) =
-    TestResultLogger(
-        (log, results, taskName) =>
-          (if (cond(results, taskName)) t else f).run(log, results, taskName))
+  def choose(
+      cond: (Output, String) => Boolean,
+      t: TestResultLogger,
+      f: TestResultLogger) =
+    TestResultLogger((log, results, taskName) =>
+      (if (cond(results, taskName)) t else f).run(log, results, taskName))
 
   /** Transforms the input to be completely silent when the subject module doesn't contain any tests. */
   def silenceWhenNoTests(d: Defaults.Main) =
     d.copy(
-        printStandard = d.printStandard.unless(
-              (results, _) => results.events.isEmpty),
-        printNoTests = Null
+      printStandard =
+        d.printStandard.unless((results, _) => results.events.isEmpty),
+      printNoTests = Null
     )
 
   object Defaults {
@@ -104,11 +106,10 @@ object TestResultLogger {
       }
     }
 
-    val printSummary = TestResultLogger(
-        (log, results, _) =>
-          {
-        val multipleFrameworks = results.summaries.size > 1
-        for (Summary(name, message) <- results.summaries) if (message.isEmpty)
+    val printSummary = TestResultLogger((log, results, _) => {
+      val multipleFrameworks = results.summaries.size > 1
+      for (Summary(name, message) <- results.summaries)
+        if (message.isEmpty)
           log.debug("Summary for " + name + " not available.")
         else {
           if (multipleFrameworks) log.info(name)
@@ -119,76 +120,79 @@ object TestResultLogger {
     val printStandard_? : Output => Boolean = results =>
       // Print the standard one-liner statistic if no framework summary is defined, or when > 1 framework is in used.
       results.summaries.size > 1 ||
-      results.summaries.headOption.forall(_.summaryText.isEmpty)
+        results.summaries.headOption.forall(_.summaryText.isEmpty)
 
-    val printStandard = TestResultLogger(
-        (log, results, _) =>
-          {
-        val (skippedCount,
-             errorsCount,
-             passedCount,
-             failuresCount,
-             ignoredCount,
-             canceledCount,
-             pendingCount) = results.events.foldLeft((0, 0, 0, 0, 0, 0, 0)) {
-          case ((skippedAcc,
-                 errorAcc,
-                 passedAcc,
-                 failureAcc,
-                 ignoredAcc,
-                 canceledAcc,
-                 pendingAcc),
-                (name, testEvent)) =>
-            (skippedAcc + testEvent.skippedCount,
-             errorAcc + testEvent.errorCount,
-             passedAcc + testEvent.passedCount,
-             failureAcc + testEvent.failureCount,
-             ignoredAcc + testEvent.ignoredCount,
-             canceledAcc + testEvent.canceledCount,
-             pendingAcc + testEvent.pendingCount)
-        }
-        val totalCount =
-          failuresCount + errorsCount + skippedCount + passedCount
-        val base =
-          s"Total $totalCount, Failed $failuresCount, Errors $errorsCount, Passed $passedCount"
+    val printStandard = TestResultLogger((log, results, _) => {
+      val (
+        skippedCount,
+        errorsCount,
+        passedCount,
+        failuresCount,
+        ignoredCount,
+        canceledCount,
+        pendingCount) = results.events.foldLeft((0, 0, 0, 0, 0, 0, 0)) {
+        case (
+            (
+              skippedAcc,
+              errorAcc,
+              passedAcc,
+              failureAcc,
+              ignoredAcc,
+              canceledAcc,
+              pendingAcc),
+            (name, testEvent)) =>
+          (
+            skippedAcc + testEvent.skippedCount,
+            errorAcc + testEvent.errorCount,
+            passedAcc + testEvent.passedCount,
+            failureAcc + testEvent.failureCount,
+            ignoredAcc + testEvent.ignoredCount,
+            canceledAcc + testEvent.canceledCount,
+            pendingAcc + testEvent.pendingCount)
+      }
+      val totalCount =
+        failuresCount + errorsCount + skippedCount + passedCount
+      val base =
+        s"Total $totalCount, Failed $failuresCount, Errors $errorsCount, Passed $passedCount"
 
-        val otherCounts = Seq("Skipped" -> skippedCount,
-                              "Ignored" -> ignoredCount,
-                              "Canceled" -> canceledCount,
-                              "Pending" -> pendingCount)
-        val extra = otherCounts.filter(_._2 > 0).map {
-          case (label, count) => s", $label $count"
-        }
+      val otherCounts = Seq(
+        "Skipped" -> skippedCount,
+        "Ignored" -> ignoredCount,
+        "Canceled" -> canceledCount,
+        "Pending" -> pendingCount)
+      val extra = otherCounts.filter(_._2 > 0).map {
+        case (label, count) => s", $label $count"
+      }
 
-        val postfix = base + extra.mkString
-        results.overall match {
-          case TestResult.Error => log.error("Error: " + postfix)
-          case TestResult.Passed => log.info("Passed: " + postfix)
-          case TestResult.Failed => log.error("Failed: " + postfix)
-        }
+      val postfix = base + extra.mkString
+      results.overall match {
+        case TestResult.Error  => log.error("Error: " + postfix)
+        case TestResult.Passed => log.info("Passed: " + postfix)
+        case TestResult.Failed => log.error("Failed: " + postfix)
+      }
     })
 
-    val printFailures = TestResultLogger(
-        (log, results, _) =>
-          {
-        def select(resultTpe: TestResult.Value) = results.events collect {
-          case (name, tpe) if tpe.result == resultTpe =>
-            scala.reflect.NameTransformer.decode(name)
+    val printFailures = TestResultLogger((log, results, _) => {
+      def select(resultTpe: TestResult.Value) = results.events collect {
+        case (name, tpe) if tpe.result == resultTpe =>
+          scala.reflect.NameTransformer.decode(name)
+      }
+
+      def show(
+          label: String,
+          level: Level.Value,
+          tests: Iterable[String]): Unit =
+        if (tests.nonEmpty) {
+          log.log(level, label)
+          log.log(level, tests.mkString("\t", "\n\t", ""))
         }
 
-        def show(
-            label: String, level: Level.Value, tests: Iterable[String]): Unit =
-          if (tests.nonEmpty) {
-            log.log(level, label)
-            log.log(level, tests.mkString("\t", "\n\t", ""))
-          }
-
-        show("Passed tests:", Level.Debug, select(TestResult.Passed))
-        show("Failed tests:", Level.Error, select(TestResult.Failed))
-        show("Error during tests:", Level.Error, select(TestResult.Error))
+      show("Passed tests:", Level.Debug, select(TestResult.Passed))
+      show("Failed tests:", Level.Error, select(TestResult.Failed))
+      show("Error during tests:", Level.Error, select(TestResult.Error))
     })
 
-    val printNoTests = TestResultLogger((log, results,
-        taskName) => log.info("No tests to run for " + taskName))
+    val printNoTests = TestResultLogger(
+      (log, results, taskName) => log.info("No tests to run for " + taskName))
   }
 }

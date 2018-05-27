@@ -5,7 +5,12 @@ package akka.http.impl.engine.client
 
 import akka.http.impl.engine.client.OutgoingConnectionBlueprint.PrepareResponse
 import akka.http.impl.engine.parsing.ParserOutput
-import akka.http.impl.engine.parsing.ParserOutput.{StrictEntityCreator, EntityStreamError, EntityChunk, StreamedEntityCreator}
+import akka.http.impl.engine.parsing.ParserOutput.{
+  StrictEntityCreator,
+  EntityStreamError,
+  EntityChunk,
+  StreamedEntityCreator
+}
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.settings.ParserSettings
 import akka.stream.{ActorMaterializer, Attributes}
@@ -19,25 +24,27 @@ class PrepareResponseSpec extends AkkaSpec {
   val parserSettings = ParserSettings(system)
 
   val chunkedStart = ParserOutput.ResponseStart(
-      StatusCodes.OK,
-      HttpProtocols.`HTTP/1.1`,
-      List(),
-      StreamedEntityCreator[ParserOutput, ResponseEntity] { entityChunks ⇒
-        val chunks = entityChunks.collect {
-          case EntityChunk(chunk) ⇒ chunk
-          case EntityStreamError(info) ⇒ throw EntityStreamException(info)
-        }
-        HttpEntity.Chunked(ContentTypes.`application/octet-stream`,
-                           HttpEntity.limitableChunkSource(chunks))
-      },
-      closeRequested = false)
+    StatusCodes.OK,
+    HttpProtocols.`HTTP/1.1`,
+    List(),
+    StreamedEntityCreator[ParserOutput, ResponseEntity] { entityChunks ⇒
+      val chunks = entityChunks.collect {
+        case EntityChunk(chunk) ⇒ chunk
+        case EntityStreamError(info) ⇒ throw EntityStreamException(info)
+      }
+      HttpEntity.Chunked(
+        ContentTypes.`application/octet-stream`,
+        HttpEntity.limitableChunkSource(chunks))
+    },
+    closeRequested = false
+  )
 
   val strictStart = ParserOutput.ResponseStart(
-      StatusCodes.OK,
-      HttpProtocols.`HTTP/1.1`,
-      List(),
-      StrictEntityCreator(HttpEntity("body")),
-      closeRequested = false)
+    StatusCodes.OK,
+    HttpProtocols.`HTTP/1.1`,
+    List(),
+    StrictEntityCreator(HttpEntity("body")),
+    closeRequested = false)
 
   val chunk = ParserOutput.EntityChunk(HttpEntity.ChunkStreamPart("abc"))
 

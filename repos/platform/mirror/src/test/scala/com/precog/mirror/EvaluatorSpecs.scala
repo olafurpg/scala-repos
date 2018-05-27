@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -28,9 +28,10 @@ object EvaluatorSpecs extends Specification with EvaluatorModule {
   import Function.const
 
   "mirror evaluator" should {
-    implicit val fs = FS("/nums" -> Vector(JNum(1), JNum(2), JNum(3)),
-                         "/nums2" -> Vector(JNum(1), JNum(2), JNum(3)),
-                         "/nums3" -> Vector(JNum(1), JNum(2), JNum(3)))
+    implicit val fs = FS(
+      "/nums" -> Vector(JNum(1), JNum(2), JNum(3)),
+      "/nums2" -> Vector(JNum(1), JNum(2), JNum(3)),
+      "/nums3" -> Vector(JNum(1), JNum(2), JNum(3)))
 
     "evaluate basic literals" >> {
       "strings" >> {
@@ -156,7 +157,7 @@ object EvaluatorSpecs extends Specification with EvaluatorModule {
 
     "evaluate a simple object concatenation" in {
       "{a:1} with {b:2}" must evalTo(
-          JObject(Map("a" -> JNum(1), "b" -> JNum(2))))
+        JObject(Map("a" -> JNum(1), "b" -> JNum(2))))
     }
 
     "evaluate a simple object deref" in {
@@ -231,15 +232,16 @@ object EvaluatorSpecs extends Specification with EvaluatorModule {
         |   n + n2
         | """.stripMargin
 
-      input must evalTo(JNum(2),
-                        JNum(3),
-                        JNum(4),
-                        JNum(3),
-                        JNum(4),
-                        JNum(5),
-                        JNum(4),
-                        JNum(5),
-                        JNum(6))
+      input must evalTo(
+        JNum(2),
+        JNum(3),
+        JNum(4),
+        JNum(3),
+        JNum(4),
+        JNum(5),
+        JNum(4),
+        JNum(5),
+        JNum(6))
     }
 
     "evaluate a join between related resultants" in {
@@ -252,15 +254,16 @@ object EvaluatorSpecs extends Specification with EvaluatorModule {
         |   (n + n2) * (n3 + n)
         | """.stripMargin
 
-      input must evalTo(JNum(4),
-                        JNum(9),
-                        JNum(16),
-                        JNum(9),
-                        JNum(16),
-                        JNum(25),
-                        JNum(16),
-                        JNum(25),
-                        JNum(36))
+      input must evalTo(
+        JNum(4),
+        JNum(9),
+        JNum(16),
+        JNum(9),
+        JNum(16),
+        JNum(25),
+        JNum(16),
+        JNum(25),
+        JNum(36))
     }
 
     "restrict cartesians by filtered relation" in {
@@ -300,16 +303,18 @@ object EvaluatorSpecs extends Specification with EvaluatorModule {
       val actual = doEval(q)
 
       "evaluates to [%s], not [%s]".format(
-          actual map { _.renderCompact } mkString ",", expect map {
-        _.renderCompact
-      } mkString ",")
+        actual map { _.renderCompact } mkString ",",
+        expect map {
+          _.renderCompact
+        } mkString ",")
     }
 
     (inner _, message _)
   }
 
   private def evalAndThrow[E <: Throwable](
-      implicit fs: FS, evidence: ClassManifest[E]): Matcher[String] = {
+      implicit fs: FS,
+      evidence: ClassManifest[E]): Matcher[String] = {
     def inner(q: String): Boolean =
       eval(compileSingle(q))(fs.map) must throwA[E]
     (inner _, "unused error message")

@@ -3,7 +3,10 @@ package codeInspection.collections
 
 import org.jetbrains.plugins.scala.codeInspection.InspectionBundle
 import org.jetbrains.plugins.scala.extensions.ExpressionType
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScMethodCall}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression,
+  ScMethodCall
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.types.ScFunctionType
 import org.jetbrains.plugins.scala.lang.psi.types.result.Success
@@ -35,50 +38,55 @@ object MapGetOrElse extends SimplificationType() {
     }
   }
 
-  def replacementText(qual: ScExpression,
-                      mapArg: ScExpression,
-                      goeArg: ScExpression): Option[String] = {
+  def replacementText(
+      qual: ScExpression,
+      mapArg: ScExpression,
+      goeArg: ScExpression): Option[String] = {
     val firstArgText = argListText(Seq(goeArg))
     val secondArgText = argListText(Seq(mapArg))
     Some(s"${qual.getText}.fold $firstArgText$secondArgText")
   }
 
-  def checkTypes(qual: ScExpression,
-                 mapArg: ScExpression,
-                 replacementText: String): Boolean = {
+  def checkTypes(
+      qual: ScExpression,
+      mapArg: ScExpression,
+      replacementText: String): Boolean = {
     val mapArgRetType = mapArg match {
       case ExpressionType(ScFunctionType(retType, _)) => retType
-      case _ => return false
+      case _                                          => return false
     }
     ScalaPsiElementFactory.createExpressionFromText(
-        replacementText, qual.getContext) match {
+      replacementText,
+      qual.getContext) match {
       case ScMethodCall(ScMethodCall(_, Seq(firstArg)), _) =>
         mapArgRetType.conforms(firstArg.getType().getOrNothing)
       case _ => false
     }
   }
 
-  def checkTypes(optionalBase: Option[ScExpression],
-                 mapArgs: Seq[ScExpression],
-                 getOrElseArgs: Seq[ScExpression]): Boolean = {
+  def checkTypes(
+      optionalBase: Option[ScExpression],
+      mapArgs: Seq[ScExpression],
+      getOrElseArgs: Seq[ScExpression]): Boolean = {
     val (mapArg, getOrElseArg) = (mapArgs, getOrElseArgs) match {
       case (Seq(a1), Seq(a2)) => (a1, a2)
-      case _ => return false
+      case _                  => return false
     }
     val baseExpr = optionalBase match {
       case Some(e) => e
-      case _ => return false
+      case _       => return false
     }
     val mapArgRetType = mapArg.getType() match {
       case Success(ScFunctionType(retType, _), _) => retType
-      case _ => return false
+      case _                                      => return false
     }
     val firstArgText = stripped(getOrElseArg).getText
     val secondArgText = stripped(mapArg).getText
     val newExprText =
       s"${baseExpr.getText}.fold {$firstArgText}{$secondArgText}"
     ScalaPsiElementFactory.createExpressionFromText(
-        newExprText, baseExpr.getContext) match {
+      newExprText,
+      baseExpr.getContext) match {
       case ScMethodCall(ScMethodCall(_, Seq(firstArg)), _) =>
         mapArgRetType.conforms(firstArg.getType().getOrNothing)
       case _ => false

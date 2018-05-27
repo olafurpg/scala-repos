@@ -97,7 +97,8 @@ trait CompilationUnits { global: Global =>
       }
       def get(sym: Symbol): Option[Tree] =
         debuglogResultIf[Option[Tree]](
-            s"found synthetic for $sym in $self", _.isDefined) {
+          s"found synthetic for $sym in $self",
+          _.isDefined) {
           map get sym
         }
       def keys: Iterable[Symbol] = map.keys
@@ -131,24 +132,24 @@ trait CompilationUnits { global: Global =>
     @deprecated("Call global.reporter.echo directly instead.", "2.11.2")
     final def echo(pos: Position, msg: String): Unit = reporter.echo(pos, msg)
     @deprecated(
-        "Call global.reporter.error (or typer.context.error) directly instead.",
-        "2.11.2")
+      "Call global.reporter.error (or typer.context.error) directly instead.",
+      "2.11.2")
     final def error(pos: Position, msg: String): Unit =
       reporter.error(pos, msg)
     @deprecated(
-        "Call global.reporter.warning (or typer.context.warning) directly instead.",
-        "2.11.2")
+      "Call global.reporter.warning (or typer.context.warning) directly instead.",
+      "2.11.2")
     final def warning(pos: Position, msg: String): Unit =
       reporter.warning(pos, msg)
 
     @deprecated(
-        "Call global.currentRun.reporting.deprecationWarning directly instead.",
-        "2.11.2")
+      "Call global.currentRun.reporting.deprecationWarning directly instead.",
+      "2.11.2")
     final def deprecationWarning(pos: Position, msg: String): Unit =
       currentRun.reporting.deprecationWarning(pos, msg)
     @deprecated(
-        "Call global.currentRun.reporting.uncheckedWarning directly instead.",
-        "2.11.2")
+      "Call global.currentRun.reporting.uncheckedWarning directly instead.",
+      "2.11.2")
     final def uncheckedWarning(pos: Position, msg: String): Unit =
       currentRun.reporting.uncheckedWarning(pos, msg)
 

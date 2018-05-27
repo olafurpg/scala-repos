@@ -23,8 +23,7 @@ object RootIsolator {
 
   implicit val RationalRootIsolator: RootIsolator[Rational] =
     new RootIsolator[Rational] {
-      def isolateRoots(
-          poly: Polynomial[Rational]): Vector[Interval[Rational]] =
+      def isolateRoots(poly: Polynomial[Rational]): Vector[Interval[Rational]] =
         VAS(Roots.removeFractions(poly))
     }
 
@@ -49,19 +48,25 @@ object RootIsolator {
     * Analysis of Algorithms in Algebraic Computation" by Vikram Sharma which
     * goes into greater detail.
     */
-  private final def VAS(poly: Polynomial[BigInt]): Vector[Interval[Rational]] = {
+  private final def VAS(
+      poly: Polynomial[BigInt]): Vector[Interval[Rational]] = {
     val x = Polynomial.x[BigInt]
     val one = Polynomial.one[BigInt]
 
     case class TransformedPoly(
-        p: Polynomial[BigInt], a: BigInt, b: BigInt, c: BigInt, d: BigInt)
+        p: Polynomial[BigInt],
+        a: BigInt,
+        b: BigInt,
+        c: BigInt,
+        d: BigInt)
 
     // Find all roots recursively that are between (0, 1) and (1, infinity).
-    def split1(p: Polynomial[BigInt],
-               a: BigInt,
-               b: BigInt,
-               c: BigInt,
-               d: BigInt): List[TransformedPoly] = {
+    def split1(
+        p: Polynomial[BigInt],
+        a: BigInt,
+        b: BigInt,
+        c: BigInt,
+        d: BigInt): List[TransformedPoly] = {
       val r = p.compose(x + one)
       val rRoots = TransformedPoly(r, a, b + a, c, d + c)
       if (r.signVariations < p.signVariations) {
@@ -77,14 +82,16 @@ object RootIsolator {
     }
 
     // Isolate all positive roots in polynomial p.
-    def rec(polys: List[TransformedPoly],
-            acc: Vector[Interval[Rational]] = Vector.empty)
+    def rec(
+        polys: List[TransformedPoly],
+        acc: Vector[Interval[Rational]] = Vector.empty)
       : Vector[Interval[Rational]] = polys match {
       case TransformedPoly(p, a, b, c, d) :: rest =>
         if (p(BigInt(0)) == BigInt(0)) {
           val p0 = p.mapTerms { case Term(coeff, exp) => Term(coeff, exp - 1) }
-          rec(TransformedPoly(p0, a, b, c, d) :: rest,
-              acc :+ Interval.point(Rational(b, d)))
+          rec(
+            TransformedPoly(p0, a, b, c, d) :: rest,
+            acc :+ Interval.point(Rational(b, d)))
         } else {
           p.signVariations match {
             case 0 => // No roots.
@@ -100,7 +107,7 @@ object RootIsolator {
                 // We map the upper bound for p back to a bound for the initial
                 // polynomial by using the inverse Mobius transformation.
                 (Rational(d) * ub0 - Rational(b)) /
-                (Rational(-c) * ub0 + Rational(a))
+                  (Rational(-c) * ub0 + Rational(a))
               }
               val i0 = if (c == 0) ub else Rational(a, c)
               val i1 = if (d == 0) ub else Rational(b, d)
@@ -114,11 +121,12 @@ object RootIsolator {
                 rec(more reverse_::: rest, acc)
               } else {
                 val flr = BigInt(1) << lb
-                val more = split1(p.compose(x + Polynomial.constant(flr)),
-                                  a,
-                                  b + a * flr,
-                                  c,
-                                  d + c * flr)
+                val more = split1(
+                  p.compose(x + Polynomial.constant(flr)),
+                  a,
+                  b + a * flr,
+                  c,
+                  d + c * flr)
                 rec(more reverse_::: rest, acc)
               }
           }

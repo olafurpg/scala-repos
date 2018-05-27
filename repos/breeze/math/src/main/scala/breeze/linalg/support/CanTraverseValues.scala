@@ -33,17 +33,20 @@ trait CanTraverseValues[From, A] {
   def foldLeft[B](from: From, b: B)(fn: (B, A) => B): B = {
     var bb = b
 
-    traverse(from, new ValuesVisitor[A] {
-      override def visit(a: A): Unit = {
-        bb = fn(bb, a)
-      }
+    traverse(
+      from,
+      new ValuesVisitor[A] {
+        override def visit(a: A): Unit = {
+          bb = fn(bb, a)
+        }
 
-      override def zeros(numZero: Int, zeroValue: A): Unit = {
-        for (i <- 0 until numZero) {
-          bb = fn(bb, zeroValue)
+        override def zeros(numZero: Int, zeroValue: A): Unit = {
+          for (i <- 0 until numZero) {
+            bb = fn(bb, zeroValue)
+          }
         }
       }
-    })
+    )
 
     bb
   }
@@ -56,7 +59,10 @@ object CanTraverseValues {
     def visitArray(arr: Array[A]): Unit = visitArray(arr, 0, arr.length, 1)
 
     def visitArray(
-        arr: Array[A], offset: Int, length: Int, stride: Int): Unit = {
+        arr: Array[A],
+        offset: Int,
+        length: Int,
+        stride: Int): Unit = {
       import spire.syntax.cfor._
       // Standard array bounds check stuff
       if (stride == 1) {
@@ -101,13 +107,14 @@ object CanTraverseValues {
   implicit object OpArrayDD extends OpArray[Double]
 
   implicit object OpArrayCC extends OpArray[Complex]
-  implicit def canTraverseTraversable[
-      V, X <: TraversableOnce[V]]: CanTraverseValues[X, V] = {
+  implicit def canTraverseTraversable[V, X <: TraversableOnce[V]]
+    : CanTraverseValues[X, V] = {
     new CanTraverseValues[X, V] {
 
       /** Traverses all values from the given collection. */
       override def traverse(
-          from: X, fn: CanTraverseValues.ValuesVisitor[V]): Unit = {
+          from: X,
+          fn: CanTraverseValues.ValuesVisitor[V]): Unit = {
         for (v <- from) {
           fn.visit(v)
         }
@@ -125,7 +132,8 @@ trait LowPrioCanTraverseValues {
 
       /** Traverses all values from the given collection. */
       override def traverse(
-          from: V, fn: CanTraverseValues.ValuesVisitor[V]): Unit = {
+          from: V,
+          fn: CanTraverseValues.ValuesVisitor[V]): Unit = {
         fn.visit(from)
       }
 

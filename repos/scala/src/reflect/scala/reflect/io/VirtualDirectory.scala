@@ -16,11 +16,12 @@ import scala.collection.mutable
   * ''Note:  This library is considered experimental and should not be used unless you know what you are doing.''
   */
 class VirtualDirectory(
-    val name: String, maybeContainer: Option[VirtualDirectory])
+    val name: String,
+    maybeContainer: Option[VirtualDirectory])
     extends AbstractFile {
   def path: String =
     maybeContainer match {
-      case None => name
+      case None         => name
       case Some(parent) => parent.path + '/' + name
     }
 

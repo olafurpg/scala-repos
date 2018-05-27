@@ -21,7 +21,8 @@ import play.server.api.SSLEngineProvider
 class WrongSSLEngineProvider {}
 
 class RightSSLEngineProvider(appPro: ApplicationProvider)
-    extends SSLEngineProvider with Mockito {
+    extends SSLEngineProvider
+    with Mockito {
   override def createSSLEngine: SSLEngine = {
     require(appPro != null)
     mock[SSLEngine]
@@ -29,7 +30,8 @@ class RightSSLEngineProvider(appPro: ApplicationProvider)
 }
 
 class JavaSSLEngineProvider(appPro: play.server.ApplicationProvider)
-    extends play.server.SSLEngineProvider with Mockito {
+    extends play.server.SSLEngineProvider
+    with Mockito {
   override def createSSLEngine: SSLEngine = {
     require(appPro != null)
     mock[SSLEngine]
@@ -41,7 +43,9 @@ class ServerSSLEngineSpec extends Specification with Mockito {
   sequential
 
   trait ApplicationContext
-      extends Mockito with Scope with MustThrownExpectations {}
+      extends Mockito
+      with Scope
+      with MustThrownExpectations {}
 
   trait TempConfDir extends After {
     val tempDir = File.createTempFile("ServerSSLEngine", ".tmp")
@@ -65,12 +69,14 @@ class ServerSSLEngineSpec extends Specification with Mockito {
   }
 
   def createEngine(
-      engineProvider: Option[String], tempDir: Option[File] = None) = {
+      engineProvider: Option[String],
+      tempDir: Option[File] = None) = {
     val app = mock[ApplicationProvider]
     app.get returns Failure(new Exception("no app"))
     ServerSSLEngine
       .createSSLEngineProvider(
-          serverConfig(tempDir.getOrElse(new File(".")), engineProvider), app)
+        serverConfig(tempDir.getOrElse(new File(".")), engineProvider),
+        app)
       .createSSLEngine()
   }
 
@@ -87,17 +93,17 @@ class ServerSSLEngineSpec extends Specification with Mockito {
 
     "fail to load an existing SSLEngineProvider with the wrong type" in new ApplicationContext {
       createEngine(Some(classOf[WrongSSLEngineProvider].getName)) must throwA[
-          ClassCastException]
+        ClassCastException]
     }
 
     "load a custom SSLContext from a SSLEngineProvider" in new ApplicationContext {
       createEngine(Some(classOf[RightSSLEngineProvider].getName)) must beAnInstanceOf[
-          SSLEngine]
+        SSLEngine]
     }
 
     "load a custom SSLContext from a java SSLEngineProvider" in new ApplicationContext {
       createEngine(Some(classOf[JavaSSLEngineProvider].getName)) must beAnInstanceOf[
-          SSLEngine]
+        SSLEngine]
     }
   }
 }

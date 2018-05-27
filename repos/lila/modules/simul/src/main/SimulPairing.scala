@@ -2,11 +2,12 @@ package lila.simul
 
 import lila.game.{PovRef, IdGenerator}
 
-case class SimulPairing(player: SimulPlayer,
-                        gameId: String,
-                        status: chess.Status,
-                        wins: Option[Boolean],
-                        hostColor: chess.Color) {
+case class SimulPairing(
+    player: SimulPlayer,
+    gameId: String,
+    status: chess.Status,
+    wins: Option[Boolean],
+    hostColor: chess.Color) {
 
   def finished = status >= chess.Status.Mate
 
@@ -24,9 +25,10 @@ case class SimulPairing(player: SimulPlayer,
 private[simul] object SimulPairing {
 
   def apply(player: SimulPlayer): SimulPairing =
-    new SimulPairing(player = player,
-                     gameId = IdGenerator.game,
-                     status = chess.Status.Created,
-                     wins = none,
-                     hostColor = chess.White)
+    new SimulPairing(
+      player = player,
+      gameId = IdGenerator.game,
+      status = chess.Status.Created,
+      wins = none,
+      hostColor = chess.White)
 }

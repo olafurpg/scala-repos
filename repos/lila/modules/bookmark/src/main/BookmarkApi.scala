@@ -13,7 +13,7 @@ final class BookmarkApi(cached: Cached, paginator: PaginatorBuilder) {
       _ ?? { game =>
         BookmarkRepo.toggle(gameId, userId) flatMap { bookmarked =>
           GameRepo.incBookmarks(gameId, bookmarked.fold(1, -1)) >>-
-          (cached.gameIdsCache invalidate userId)
+            (cached.gameIdsCache invalidate userId)
         }
       }
     }

@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Catchable` */
-final class CatchableOps[F[_], A] private[syntax](val self: F[A])(
+final class CatchableOps[F[_], A] private[syntax] (val self: F[A])(
     implicit val F: Catchable[F])
     extends Ops[F[A]] {
   ////

@@ -34,9 +34,10 @@ object PCAOnRowMatrixExample {
     val sc = new SparkContext(conf)
 
     // $example on$
-    val data = Array(Vectors.sparse(5, Seq((1, 1.0), (3, 7.0))),
-                     Vectors.dense(2.0, 0.0, 3.0, 4.0, 5.0),
-                     Vectors.dense(4.0, 0.0, 0.0, 6.0, 7.0))
+    val data = Array(
+      Vectors.sparse(5, Seq((1, 1.0), (3, 7.0))),
+      Vectors.dense(2.0, 0.0, 3.0, 4.0, 5.0),
+      Vectors.dense(4.0, 0.0, 0.0, 6.0, 7.0))
 
     val dataRDD = sc.parallelize(data, 2)
 

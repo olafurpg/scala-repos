@@ -25,7 +25,8 @@ import org.apache.spark.rpc.{RpcCallContext, RpcEndpoint, RpcEnv}
   * This is used when setting up a remote endpoint reference.
   */
 private[netty] class RpcEndpointVerifier(
-    override val rpcEnv: RpcEnv, dispatcher: Dispatcher)
+    override val rpcEnv: RpcEnv,
+    dispatcher: Dispatcher)
     extends RpcEndpoint {
 
   override def receiveAndReply(

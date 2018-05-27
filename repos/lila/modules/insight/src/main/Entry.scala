@@ -6,24 +6,25 @@ import lila.rating.PerfType
 import org.joda.time.DateTime
 import scalaz.NonEmptyList
 
-case class Entry(id: String, // gameId + w/b
-                 number: Int, // auto increment over userId
-                 userId: String,
-                 color: Color,
-                 perf: PerfType,
-                 eco: Option[Ecopening],
-                 myCastling: Castling,
-                 opponentRating: Int,
-                 opponentStrength: RelativeStrength,
-                 opponentCastling: Castling,
-                 moves: List[Move],
-                 queenTrade: QueenTrade,
-                 result: Result,
-                 termination: Termination,
-                 ratingDiff: Int,
-                 analysed: Boolean,
-                 provisional: Boolean,
-                 date: DateTime) {
+case class Entry(
+    id: String, // gameId + w/b
+    number: Int, // auto increment over userId
+    userId: String,
+    color: Color,
+    perf: PerfType,
+    eco: Option[Ecopening],
+    myCastling: Castling,
+    opponentRating: Int,
+    opponentStrength: RelativeStrength,
+    opponentCastling: Castling,
+    moves: List[Move],
+    queenTrade: QueenTrade,
+    result: Result,
+    termination: Termination,
+    ratingDiff: Int,
+    analysed: Boolean,
+    provisional: Boolean,
+    date: DateTime) {
 
   def gameId = id take Game.gameIdSize
 }
@@ -75,8 +76,7 @@ object Termination {
   case object Stalemate extends Termination(5, "Stalemate")
   case object Checkmate extends Termination(6, "Checkmate")
 
-  val all = List(
-      ClockFlag, Disconnect, Resignation, Draw, Stalemate, Checkmate)
+  val all = List(ClockFlag, Disconnect, Resignation, Draw, Stalemate, Checkmate)
   val byId = all map { p =>
     (p.id, p)
   } toMap
@@ -84,13 +84,13 @@ object Termination {
   import chess.{Status => S}
 
   def fromStatus(s: chess.Status) = s match {
-    case S.Timeout => Disconnect
-    case S.Outoftime => ClockFlag
-    case S.Resign => Resignation
-    case S.Draw => Draw
-    case S.Stalemate => Stalemate
+    case S.Timeout             => Disconnect
+    case S.Outoftime           => ClockFlag
+    case S.Resign              => Resignation
+    case S.Draw                => Draw
+    case S.Stalemate           => Stalemate
     case S.Mate | S.VariantEnd => Checkmate
-    case S.Cheat => Resignation
+    case S.Cheat               => Resignation
     case S.Created | S.Started | S.Aborted | S.NoStart | S.UnknownFinish =>
       logger.error("Unfinished game in the insight indexer")
       Resignation
@@ -124,7 +124,7 @@ object Phase {
       case m =>
         div.end.fold[Phase](Middle) {
           case e if e > ply => Middle
-          case _ => End
+          case _            => End
         }
     }
 }
@@ -139,9 +139,9 @@ object Castling {
     (p.id, p)
   } toMap
   def fromMoves(moves: List[String]) = moves.find(_ startsWith "O") match {
-    case Some("O-O") => Kingside
+    case Some("O-O")   => Kingside
     case Some("O-O-O") => Queenside
-    case _ => None
+    case _             => None
   }
 }
 
@@ -167,14 +167,16 @@ object RelativeStrength {
   def apply(diff: Int) = diff match {
     case d if d < -200 => MuchWeaker
     case d if d < -100 => Weaker
-    case d if d > 200 => MuchStronger
-    case d if d > 100 => Stronger
-    case _ => Similar
+    case d if d > 200  => MuchStronger
+    case d if d > 100  => Stronger
+    case _             => Similar
   }
 }
 
 sealed abstract class MovetimeRange(
-    val id: Int, val name: String, val tenths: NonEmptyList[Int])
+    val id: Int,
+    val name: String,
+    val tenths: NonEmptyList[Int])
 object MovetimeRange {
   case object MTR1
       extends MovetimeRange(1, "0 to 1 second", NonEmptyList(1, 5, 10))
@@ -185,8 +187,7 @@ object MovetimeRange {
   case object MTR10
       extends MovetimeRange(10, "5 to 10 seconds", NonEmptyList(60, 80, 100))
   case object MTR30
-      extends MovetimeRange(
-          30, "10 to 30 seconds", NonEmptyList(150, 200, 300))
+      extends MovetimeRange(30, "10 to 30 seconds", NonEmptyList(150, 200, 300))
   case object MTRInf
       extends MovetimeRange(60, "More than 30 seconds", NonEmptyList(400, 600))
   val all = List(MTR1, MTR3, MTR5, MTR10, MTR30, MTRInf)
@@ -197,7 +198,9 @@ object MovetimeRange {
 }
 
 sealed abstract class MaterialRange(
-    val id: Int, val name: String, val imbalance: Int) {
+    val id: Int,
+    val name: String,
+    val imbalance: Int) {
   def negative = imbalance <= 0
 }
 object MaterialRange {

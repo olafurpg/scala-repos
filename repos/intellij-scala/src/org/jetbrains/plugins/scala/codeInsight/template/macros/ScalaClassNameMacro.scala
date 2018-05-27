@@ -14,19 +14,24 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScObject
   */
 class ScalaClassNameMacro extends Macro {
   override def calculateResult(
-      params: Array[Expression], context: ExpressionContext): Result = {
-    Option(PsiTreeUtil.getParentOfType(context.getPsiElementAtStartOffset,
-                                       classOf[PsiClass])).map {
-      case obj: ScObject => obj.fakeCompanionClassOrCompanionClass.getName
-      case cl: PsiClass => cl.getName
-    }.map(new TextResult(_)).orNull
+      params: Array[Expression],
+      context: ExpressionContext): Result = {
+    Option(
+      PsiTreeUtil
+        .getParentOfType(context.getPsiElementAtStartOffset, classOf[PsiClass]))
+      .map {
+        case obj: ScObject => obj.fakeCompanionClassOrCompanionClass.getName
+        case cl: PsiClass  => cl.getName
+      }
+      .map(new TextResult(_))
+      .orNull
   }
 
   override def getName: String = MacroUtil.scalaIdPrefix + "className"
 
   override def getPresentableName: String =
     MacroUtil.scalaPresentablePrefix + CodeInsightBundle.message(
-        "macro.classname")
+      "macro.classname")
 
   override def isAcceptableInContext(context: TemplateContextType): Boolean =
     context.isInstanceOf[ScalaCodeContextType]

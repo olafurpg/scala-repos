@@ -18,16 +18,21 @@ class PatternAnnotatorTest
     ScalaBundle.message("fruitless.type.test", exprType, patType)
   private def incompatible(exprType: String, patType: String) =
     ScalaBundle.message(
-        "scrutinee.incompatible.pattern.type", exprType, patType)
+      "scrutinee.incompatible.pattern.type",
+      exprType,
+      patType)
   private def cannotBeUsed(typeText: String) =
     s"type $typeText cannot be used in a type pattern or isInstanceOf test"
   private def patternTypeIncompatible(found: String, required: String) =
     ScalaBundle.message(
-        "pattern.type.incompatible.with.expected", found, required)
-  private def constructorCannotBeInstantiated(
-      found: String, required: String) =
+      "pattern.type.incompatible.with.expected",
+      found,
+      required)
+  private def constructorCannotBeInstantiated(found: String, required: String) =
     ScalaBundle.message(
-        "constructor.cannot.be.instantiated.to.expected.type", found, required)
+      "constructor.cannot.be.instantiated.to.expected.type",
+      found,
+      required)
 
   private def collectAnnotatorMessages(text: String): List[Message] = {
     configureFromFileTextAdapter("dummy.scala", text)
@@ -36,8 +41,8 @@ class PatternAnnotatorTest
     val patterns = getFileAdapter.depthFirst.collect {
       case p: ScPattern => p
     }
-    patterns.foreach(
-        p => annotator.annotatePattern(p, mock, highlightErrors = true))
+    patterns.foreach(p =>
+      annotator.annotatePattern(p, mock, highlightErrors = true))
     mock.annotations
   }
 
@@ -48,28 +53,32 @@ class PatternAnnotatorTest
   private def collectWarnings(text: String): List[Message] =
     collectAnnotatorMessages(text).filter {
       case _: Warning => true
-      case _ => false
+      case _          => false
     }
 
   private def checkWarning(
-      text: String, element: String, expectedMsg: String): Unit = {
+      text: String,
+      element: String,
+      expectedMsg: String): Unit = {
     collectWarnings(text) match {
       case Warning(`element`, `expectedMsg`) :: Nil =>
       case actual =>
         Assert.assertTrue(
-            s"expected: ${Warning(element, expectedMsg)}\n actual: $actual",
-            false)
+          s"expected: ${Warning(element, expectedMsg)}\n actual: $actual",
+          false)
     }
   }
 
   private def collectErrors(text: String): List[Message] =
     collectAnnotatorMessages(text).filter {
       case error: Error => true
-      case _ => false
+      case _            => false
     }
 
   private def checkError(
-      text: String, element: String, expectedMsg: String): Unit = {
+      text: String,
+      element: String,
+      expectedMsg: String): Unit = {
     checkErrors(text, List(Error(element, expectedMsg)))
   }
 
@@ -87,25 +96,28 @@ class PatternAnnotatorTest
 
   def testSomeConstructor(): Unit = {
     val code: String = "val Some(x) = None"
-    checkError(code,
-               "Some(x)",
-               constructorCannotBeInstantiated("Some[A]", "None.type"))
+    checkError(
+      code,
+      "Some(x)",
+      constructorCannotBeInstantiated("Some[A]", "None.type"))
     assertNoWarnings(code)
   }
 
   def testVectorNil(): Unit = {
     val code: String = "val Vector(a) = Nil"
-    checkError(code,
-               "Vector(a)",
-               constructorCannotBeInstantiated("Vector[A]", "Nil.type"))
+    checkError(
+      code,
+      "Vector(a)",
+      constructorCannotBeInstantiated("Vector[A]", "Nil.type"))
     assertNoWarnings(code)
   }
 
   def testListToPattern(): Unit = {
     val code: String = "val Vector(a) = List(1)"
-    checkError(code,
-               "Vector(a)",
-               constructorCannotBeInstantiated("Vector[A]", "List[Int]"))
+    checkError(
+      code,
+      "Vector(a)",
+      constructorCannotBeInstantiated("Vector[A]", "List[Int]"))
     assertNoWarnings(code)
   }
 
@@ -119,10 +131,11 @@ class PatternAnnotatorTest
 
   def testConstructorPatternFruitless(): Unit = {
     val code: String = "val List(seq: Seq[Int]) = List(List(\"\"))"
-    checkWarning(code,
-                 "seq: Seq[Int]",
-                 fruitless("List[String]", "Seq[Int]") +
-                 ScalaBundle.message("erasure.warning"))
+    checkWarning(
+      code,
+      "seq: Seq[Int]",
+      fruitless("List[String]", "Seq[Int]") +
+        ScalaBundle.message("erasure.warning"))
     assertNoErrors(code)
   }
 
@@ -151,21 +164,23 @@ class PatternAnnotatorTest
 
   def testTuple2ToTuple3Constructor(): Unit = {
     val code: String = "val (x, y) = (1, 2, 3)"
-    checkError(code,
-               "(x, y)",
-               patternTypeIncompatible("(Int, Int)", "(Int, Int, Int)"))
+    checkError(
+      code,
+      "(x, y)",
+      patternTypeIncompatible("(Int, Int)", "(Int, Int, Int)"))
     assertNoWarnings(code)
   }
 
   def testTupleWrongDeclaredType(): Unit = {
     val code: String = "val (x: String, y) = (1, 2)"
     checkErrors(
-        code,
-        List(
-            Error("(x: String, y)",
-                  patternTypeIncompatible("(String, Int)", "(Int, Int)")),
-            Error("x: String", incompatible("String", "Int"))
-        ))
+      code,
+      List(
+        Error(
+          "(x: String, y)",
+          patternTypeIncompatible("(String, Int)", "(Int, Int)")),
+        Error("x: String", incompatible("String", "Int"))
+      ))
     assertNoWarnings(code)
   }
 
@@ -175,20 +190,21 @@ class PatternAnnotatorTest
 
   def testIncompatibleSomeConstructor(): Unit = {
     val code: String = "val Some(x: Int) = \"\""
-    checkError(code,
-               "Some(x: Int)",
-               constructorCannotBeInstantiated("Some[A]", "String"))
+    checkError(
+      code,
+      "Some(x: Int)",
+      constructorCannotBeInstantiated("Some[A]", "String"))
     assertNoWarnings(code)
   }
 
   def testIncompatibleCons(): Unit = {
     val code: String = "val (x: Int) :: xs = List(\"1\", \"2\")"
     checkErrors(
-        code,
-        List(
-            Error("(x: Int)", patternTypeIncompatible("Int", "String")),
-            Error("x: Int", incompatible("Int", "String"))
-        ))
+      code,
+      List(
+        Error("(x: Int)", patternTypeIncompatible("Int", "String")),
+        Error("x: Int", incompatible("Int", "String"))
+      ))
     assertNoWarnings(code)
   }
 
@@ -288,9 +304,9 @@ class PatternAnnotatorTest
         |}
       """.stripMargin
     checkError(
-        code,
-        "TakeSnapShot(promise, _)",
-        ScalaBundle.message("wrong.number.arguments.extractor", "2", "3"))
+      code,
+      "TakeSnapShot(promise, _)",
+      ScalaBundle.message("wrong.number.arguments.extractor", "2", "3"))
     assertNoWarnings(code)
   }
 
@@ -317,9 +333,10 @@ class PatternAnnotatorTest
 
   def testUncheckedRefinement() {
     checkWarning(
-        "val Some(x: AnyRef{def foo(i: Int): Int}) = Some(new AnyRef())",
-        "AnyRef{def foo(i: Int): Int}",
-        ScalaBundle.message("pattern.on.refinement.unchecked"))
+      "val Some(x: AnyRef{def foo(i: Int): Int}) = Some(new AnyRef())",
+      "AnyRef{def foo(i: Int): Int}",
+      ScalaBundle.message("pattern.on.refinement.unchecked")
+    )
   }
 
   def testExpectedTypeIsTupleIfThereIsOneArgumentAndMoreThanOneArgumentIsReturnedByUnapplySCL8115(
@@ -352,10 +369,10 @@ class PatternAnnotatorTest
       """.stripMargin
     val errors =
       Error("ONE", ScalaBundle.message("stable.identifier.required", "ONE")) :: Error(
-          "`two`",
-          ScalaBundle.message("stable.identifier.required", "`two`")) :: Error(
-          "this.two",
-          ScalaBundle.message("stable.identifier.required", "this.two")) :: Nil
+        "`two`",
+        ScalaBundle.message("stable.identifier.required", "`two`")) :: Error(
+        "this.two",
+        ScalaBundle.message("stable.identifier.required", "this.two")) :: Nil
     checkErrors(code, errors)
     assertNoWarnings(code)
   }
@@ -370,7 +387,9 @@ class PatternAnnotatorTest
         |}
       """.stripMargin
     checkError(
-        code, "ONE", ScalaBundle.message("stable.identifier.required", "ONE"))
+      code,
+      "ONE",
+      ScalaBundle.message("stable.identifier.required", "ONE"))
     assertNoWarnings(code)
   }
 
@@ -387,9 +406,10 @@ class PatternAnnotatorTest
         |  case class appliedTo2(name: String, arg1: String, arg2: String)
         |}
       """.stripMargin
-    checkError(code,
-               "foo appliedTo2 (\"1\", \"2\")",
-               patternTypeIncompatible("Bar.appliedTo2", "Int"))
+    checkError(
+      code,
+      "foo appliedTo2 (\"1\", \"2\")",
+      patternTypeIncompatible("Bar.appliedTo2", "Int"))
     assertNoWarnings(code)
   }
 
@@ -405,9 +425,9 @@ class PatternAnnotatorTest
         |}
       """.stripMargin
     checkError(
-        code,
-        "foo appliedTo2 (\"1\", \"2\", \"3\", \"4\")",
-        ScalaBundle.message("wrong.number.arguments.extractor", "5", "3"))
+      code,
+      "foo appliedTo2 (\"1\", \"2\", \"3\", \"4\")",
+      ScalaBundle.message("wrong.number.arguments.extractor", "5", "3"))
     assertNoWarnings(code)
   }
 
@@ -424,15 +444,17 @@ class PatternAnnotatorTest
         |  case class appliedTo2(name: String, arg1: String, arg2: String)
         |}
       """.stripMargin
-    checkErrors(code,
-                List(
-                    Error("foo appliedTo2 (\"1\")",
-                          ScalaBundle.message(
-                              "wrong.number.arguments.extractor", "2", "3")),
-                    Error("foo appliedTo2 ()",
-                          ScalaBundle.message(
-                              "wrong.number.arguments.extractor", "2", "3"))
-                ))
+    checkErrors(
+      code,
+      List(
+        Error(
+          "foo appliedTo2 (\"1\")",
+          ScalaBundle.message("wrong.number.arguments.extractor", "2", "3")),
+        Error(
+          "foo appliedTo2 ()",
+          ScalaBundle.message("wrong.number.arguments.extractor", "2", "3"))
+      )
+    )
     assertNoWarnings(code)
   }
 
@@ -454,7 +476,8 @@ class PatternAnnotatorTest
         |}
       """.stripMargin
     checkErrors(
-        code, List(Error("4", patternTypeIncompatible("Int", "String"))))
+      code,
+      List(Error("4", patternTypeIncompatible("Int", "String"))))
     assertNoWarnings(code)
   }
 
@@ -469,10 +492,11 @@ class PatternAnnotatorTest
         |  case class appliedTo(name: String, arg1: String, arg2: String, otherArgs: String*)
         |}
       """.stripMargin
-    checkError(code,
-               "foo appliedTo \"\"",
-               ScalaBundle.message(
-                   "wrong.number.arguments.extractor.unapplySeq", "2", "3"))
+    checkError(
+      code,
+      "foo appliedTo \"\"",
+      ScalaBundle
+        .message("wrong.number.arguments.extractor.unapplySeq", "2", "3"))
   }
 
   def testNumberOfArgumentsCons(): Unit = {
@@ -507,9 +531,9 @@ class PatternAnnotatorTest
       """.stripMargin
     assertNoWarnings(code)
     checkError(
-        code,
-        "RemoteProcessFailed(why)",
-        ScalaBundle.message("wrong.number.arguments.extractor", "1", "2"))
+      code,
+      "RemoteProcessFailed(why)",
+      ScalaBundle.message("wrong.number.arguments.extractor", "1", "2"))
   }
 
   def testNonFinalConstructorPattern(): Unit = {

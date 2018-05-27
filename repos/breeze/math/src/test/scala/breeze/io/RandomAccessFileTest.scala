@@ -30,7 +30,7 @@ sealed trait RandomAccessFileTest extends FunSuite {
     val stream = new RAF(file, "rw")
     stream.writeDouble(0.0)
     stream.writeDouble(
-        Array[Double](3.141592653589793, 2.718281828459045, 6.02214E23))
+      Array[Double](3.141592653589793, 2.718281828459045, 6.02214E23))
     stream.writeDouble(1.6726231000000002E-24)
     stream.close
 
@@ -163,12 +163,14 @@ sealed trait RandomAccessFileTest extends FunSuite {
     val tempMaxRead = stream2.readUInt8(4)
     assert(tempMaxRead.drop(1).dropRight(1).forall(_ == 0xFF))
     //Allows same test to be used for BigEndian or LittleEndian
-    assert((tempMaxRead(0) == 0x7F && tempMaxRead(3) == 0xFF) ||
+    assert(
+      (tempMaxRead(0) == 0x7F && tempMaxRead(3) == 0xFF) ||
         (tempMaxRead(0) == 0xFF && tempMaxRead(3) == 0x7F))
     val tempMinRead = stream2.readUInt8(4)
     assert(tempMinRead.drop(1).dropRight(1).forall(_ == 0x00))
     //Allows same test to be used for BigEndian or LittleEndian
-    assert((tempMinRead(0) == 0x80 && tempMinRead(3) == 0x00) ||
+    assert(
+      (tempMinRead(0) == 0x80 && tempMinRead(3) == 0x00) ||
         (tempMinRead(0) == 0x00 && tempMinRead(3) == 0x80))
 
     stream2.close
@@ -219,12 +221,14 @@ sealed trait RandomAccessFileTest extends FunSuite {
     val tempMaxRead = stream2.readUInt8(8)
     assert(tempMaxRead.drop(1).dropRight(1).forall(_ == 0xFF))
     //Allows same test to be used for BigEndian or LittleEndian
-    assert((tempMaxRead(0) == 0x7F && tempMaxRead(7) == 0xFF) ||
+    assert(
+      (tempMaxRead(0) == 0x7F && tempMaxRead(7) == 0xFF) ||
         (tempMaxRead(0) == 0xFF && tempMaxRead(7) == 0x7F))
     val tempMinRead = stream2.readUInt8(8)
     assert(tempMinRead.drop(1).dropRight(1).forall(_ == 0x00))
     //Allows same test to be used for BigEndian or LittleEndian
-    assert((tempMinRead(0) == 0x80 && tempMinRead(7) == 0x00) ||
+    assert(
+      (tempMinRead(0) == 0x80 && tempMinRead(7) == 0x00) ||
         (tempMinRead(0) == 0x00 && tempMinRead(7) == 0x80))
 
     stream2.close
@@ -237,7 +241,7 @@ sealed trait RandomAccessFileTest extends FunSuite {
 
     stream.writeUInt64(ULong(0L))
     stream.writeUInt64(
-        Array[ULong](ULong(1L), ULong(32767L), ULong(9223372036854775807L)))
+      Array[ULong](ULong(1L), ULong(32767L), ULong(9223372036854775807L)))
     stream.writeUInt64(ULong(9223372036854775807L))
     stream.writeUInt64(Array(UInt64Max, UInt64Max))
     stream.close

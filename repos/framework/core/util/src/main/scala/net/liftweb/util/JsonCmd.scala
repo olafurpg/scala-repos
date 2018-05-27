@@ -27,10 +27,11 @@ trait HasParams {
 /**
   * Impersonates a JSON command
   */
-case class JsonCmd(command: String,
-                   target: String,
-                   params: Any,
-                   all: scala.collection.Map[String, Any])
+case class JsonCmd(
+    command: String,
+    target: String,
+    params: Any,
+    all: scala.collection.Map[String, Any])
 
 import net.liftweb.json.JsonAST._
 
@@ -51,7 +52,7 @@ object JsonCommand {
     } yield {
       val target = (in \ "target") match {
         case JString(t) => Some(t)
-        case _ => None
+        case _          => None
       }
       (command, target, params)
     }

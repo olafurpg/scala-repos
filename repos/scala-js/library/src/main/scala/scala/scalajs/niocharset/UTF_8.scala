@@ -14,10 +14,11 @@ import java.nio._
 import java.nio.charset._
 
 private[niocharset] object UTF_8
-    extends Charset("UTF-8",
-                    Array( // scalastyle:ignore
-                          "UTF8",
-                          "unicode-1-1-utf-8")) {
+    extends Charset(
+      "UTF-8",
+      Array( // scalastyle:ignore
+        "UTF8",
+        "unicode-1-1-utf-8")) {
 
   import java.lang.Character._
 
@@ -40,144 +41,23 @@ private[niocharset] object UTF_8
    */
 
   private val lengthByLeading: Array[Int] = Array(
-      // 10wwwwww
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      // 110yyyyy
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      2,
-      // 1110zzzz
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      3,
-      // 11110uuu
-      4,
-      4,
-      4,
-      4,
-      4,
-      4,
-      4,
-      4,
-      // > 11110111
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1,
-      -1
+    // 10wwwwww
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    -1, -1, -1, -1, -1, -1, -1, // 110yyyyy
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+    2, 2, 2, 2, 2, 2, 2, // 1110zzzz
+    3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, // 11110uuu
+    4, 4, 4, 4, 4, 4, 4, 4, // > 11110111
+    -1, -1, -1, -1, -1, -1, -1, -1
   )
 
   @inline
   private class DecodedMultiByte(
-      val failure: CoderResult, val high: Char, val low: Char)
+      val failure: CoderResult,
+      val high: Char,
+      val low: Char)
 
   private object DecodedMultiByte {
     @inline def apply(failure: CoderResult): DecodedMultiByte =
@@ -196,7 +76,9 @@ private[niocharset] object UTF_8
       else decodeLoopNoArray(in, out)
     }
 
-    private def decodeLoopArray(in: ByteBuffer, out: CharBuffer): CoderResult = {
+    private def decodeLoopArray(
+        in: ByteBuffer,
+        out: CharBuffer): CoderResult = {
       val inArray = in.array
       val inOffset = in.arrayOffset
       val inStart = in.position + inOffset
@@ -274,7 +156,8 @@ private[niocharset] object UTF_8
     }
 
     private def decodeLoopNoArray(
-        in: ByteBuffer, out: CharBuffer): CoderResult = {
+        in: ByteBuffer,
+        out: CharBuffer): CoderResult = {
       @inline
       @tailrec
       def loop(): CoderResult = {
@@ -381,7 +264,10 @@ private[niocharset] object UTF_8
     }
 
     @inline private def decode4(
-        b1: Int, b2: Int, b3: Int, b4: Int): DecodedMultiByte = {
+        b1: Int,
+        b2: Int,
+        b3: Int,
+        b4: Int): DecodedMultiByte = {
       if (isInvalidNextByte(b2))
         DecodedMultiByte(CoderResult.malformedForLength(1))
       else if (isInvalidNextByte(b3))
@@ -391,7 +277,7 @@ private[niocharset] object UTF_8
       else {
         val codePoint =
           (((b1 & 0x7) << 18) | ((b2 & 0x3f) << 12) | ((b3 & 0x3f) << 6) |
-              (b4 & 0x3f))
+            (b4 & 0x3f))
         // By construction, 0 <= codePoint <= 0x1fffff
         if (codePoint < 0x10000 || codePoint > MAX_CODE_POINT) {
           // It should have been encoded with 1, 2, or 3 bytes
@@ -401,8 +287,9 @@ private[niocharset] object UTF_8
           // Here, we need to encode the code point as a surrogate pair.
           // http://en.wikipedia.org/wiki/UTF-16
           val offsetCodePoint = codePoint - 0x10000
-          DecodedMultiByte(((offsetCodePoint >> 10) | 0xd800).toChar,
-                           ((offsetCodePoint & 0x3ff) | 0xdc00).toChar)
+          DecodedMultiByte(
+            ((offsetCodePoint >> 10) | 0xd800).toChar,
+            ((offsetCodePoint & 0x3ff) | 0xdc00).toChar)
         }
       }
     }
@@ -414,7 +301,9 @@ private[niocharset] object UTF_8
       else encodeLoopNoArray(in, out)
     }
 
-    private def encodeLoopArray(in: CharBuffer, out: ByteBuffer): CoderResult = {
+    private def encodeLoopArray(
+        in: CharBuffer,
+        out: ByteBuffer): CoderResult = {
       val inArray = in.array
       val inOffset = in.arrayOffset
       val inStart = in.position + inOffset
@@ -494,7 +383,8 @@ private[niocharset] object UTF_8
     }
 
     private def encodeLoopNoArray(
-        in: CharBuffer, out: ByteBuffer): CoderResult = {
+        in: CharBuffer,
+        out: ByteBuffer): CoderResult = {
       @inline
       @tailrec
       def loop(): CoderResult = {

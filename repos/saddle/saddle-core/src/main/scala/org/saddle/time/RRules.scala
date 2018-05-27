@@ -85,7 +85,7 @@ object RRules {
     */
   def conform(rule: RRule, dt: DateTime, forward: Boolean = true): DateTime = {
     forward match {
-      case true => rule counting -1 from { rule counting +1 from dt }
+      case true  => rule counting -1 from { rule counting +1 from dt }
       case false => rule counting +1 from { rule counting -1 from dt }
     }
   }

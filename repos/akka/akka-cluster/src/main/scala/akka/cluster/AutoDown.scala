@@ -126,7 +126,9 @@ private[cluster] abstract class AutoDownBase(
       downOrAddPending(node)
     } else {
       val task = scheduler.scheduleOnce(
-          autoDownUnreachableAfter, self, UnreachableTimeout(node))
+        autoDownUnreachableAfter,
+        self,
+        UnreachableTimeout(node))
       scheduledUnreachable += (node -> task)
     }
   }

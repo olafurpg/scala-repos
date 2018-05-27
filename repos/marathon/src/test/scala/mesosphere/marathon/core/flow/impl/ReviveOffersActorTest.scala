@@ -5,7 +5,10 @@ import akka.testkit.{TestActorRef, TestProbe}
 import mesosphere.marathon.core.base.ConstantClock
 import mesosphere.marathon.core.flow.ReviveOffersConfig
 import mesosphere.marathon.core.flow.impl.ReviveOffersActor.TimedCheck
-import mesosphere.marathon.event.{SchedulerRegisteredEvent, SchedulerReregisteredEvent}
+import mesosphere.marathon.event.{
+  SchedulerRegisteredEvent,
+  SchedulerReregisteredEvent
+}
 import mesosphere.marathon.{MarathonSchedulerDriverHolder, MarathonSpec}
 import org.apache.mesos.SchedulerDriver
 import org.mockito.Mockito
@@ -16,7 +19,9 @@ import rx.lang.scala.subjects.PublishSubject
 import scala.concurrent.duration._
 
 class ReviveOffersActorTest
-    extends MarathonSpec with GivenWhenThen with Matchers {
+    extends MarathonSpec
+    with GivenWhenThen
+    with Matchers {
   test("do not do anything") {
     val f = new Fixture()
     When("the actor starts")
@@ -57,9 +62,9 @@ class ReviveOffersActorTest
   }
 
   for (reviveEvent <- Seq(
-      SchedulerReregisteredEvent("somemaster"),
-      SchedulerRegisteredEvent("frameworkid", "somemaster")
-  )) {
+         SchedulerReregisteredEvent("somemaster"),
+         SchedulerRegisteredEvent("frameworkid", "somemaster")
+       )) {
     test(s"revive if offers wanted and we receive $reviveEvent") {
       val f = new Fixture()
       Given("a started actor that wants offers")
@@ -116,10 +121,10 @@ class ReviveOffersActorTest
   }
 
   for (reviveEvent <- Seq(
-      SchedulerReregisteredEvent("somemaster"),
-      SchedulerRegisteredEvent("frameworkid", "somemaster"),
-      ReviveOffersActor.TimedCheck
-  )) {
+         SchedulerReregisteredEvent("somemaster"),
+         SchedulerRegisteredEvent("frameworkid", "somemaster"),
+         ReviveOffersActor.TimedCheck
+       )) {
     test(s"DO NOT revive if offers NOT wanted and we receive $reviveEvent") {
       val f = new Fixture()
       Given("a started actor that wants offers")
@@ -173,7 +178,7 @@ class ReviveOffersActorTest
   test("Revive timer is cancelled if offers not wanted anymore") {
     val f = new Fixture()
     Given(
-        "we received offersWanted = true two times and thus scheduled a timer")
+      "we received offersWanted = true two times and thus scheduled a timer")
     f.actorRef.start()
     f.offersWanted.onNext(true)
     f.offersWanted.onNext(true)
@@ -191,8 +196,7 @@ class ReviveOffersActorTest
     f.verifyNoMoreInteractions()
   }
 
-  test(
-      "Check revives if last offersWanted == true and more than 5.seconds ago") {
+  test("Check revives if last offersWanted == true and more than 5.seconds ago") {
     val f = new Fixture()
     Given("that we received various flipping offers wanted requests")
     f.actorRef.start()
@@ -219,7 +223,7 @@ class ReviveOffersActorTest
   }
 
   test(
-      "Check does not revives if last offersWanted == false and more than 5.seconds ago") {
+    "Check does not revives if last offersWanted == false and more than 5.seconds ago") {
     val f = new Fixture()
     Given("that we received various flipping offers wanted requests")
     f.actorRef.start()
@@ -257,7 +261,8 @@ class ReviveOffersActorTest
     Mockito.reset(f.driver)
 
     for (i <- 2L to f.repetitions.toLong - 1) {
-      When("the min_revive_offers_interval has passed and we receive a TimedCheck")
+      When(
+        "the min_revive_offers_interval has passed and we receive a TimedCheck")
       f.clock += f.conf.minReviveOffersInterval().millis
       f.actorRef ! ReviveOffersActor.TimedCheck
 
@@ -276,7 +281,8 @@ class ReviveOffersActorTest
       f.actorRef.underlyingActor.revivesNeeded should be(f.repetitions - i)
     }
 
-    When("the min_revive_offers_interval has passed and we receive our last TimedCheck")
+    When(
+      "the min_revive_offers_interval has passed and we receive our last TimedCheck")
     f.clock += f.conf.minReviveOffersInterval().millis
     f.actorRef ! ReviveOffersActor.TimedCheck
 
@@ -292,7 +298,7 @@ class ReviveOffersActorTest
 
     And("we have NOT scheduled the next revive")
     f.actorRef.underlyingActor.scheduled should have size
-    (f.repetitions.toLong - 1)
+      (f.repetitions.toLong - 1)
     f.actorRef.underlyingActor.revivesNeeded should be(0)
 
     f.verifyNoMoreInteractions()
@@ -313,9 +319,11 @@ class ReviveOffersActorTest
     lazy val conf: ReviveOffersConfig = {
       val conf = new ReviveOffersConfig {
         override lazy val reviveOffersRepetitions = opt[Int](
-            "revive_offers_repetitions",
-            descr = "Repeat every reviveOffer request this many times, delayed by the --min_revive_offers_interval.",
-            default = Some(repetitions))
+          "revive_offers_repetitions",
+          descr =
+            "Repeat every reviveOffer request this many times, delayed by the --min_revive_offers_interval.",
+          default = Some(repetitions)
+        )
       }
       conf.afterInit()
       conf
@@ -349,11 +357,11 @@ class ReviveOffersActorTest
 
     class TestableActor
         extends ReviveOffersActor(
-            clock,
-            conf,
-            actorSystem.eventStream,
-            offersWanted,
-            driverHolder
+          clock,
+          conf,
+          actorSystem.eventStream,
+          offersWanted,
+          driverHolder
         ) {
       var scheduled = Vector.empty[FiniteDuration]
       var cancellable = mock[Cancellable]

@@ -47,13 +47,14 @@ case class SimpleSigarProvider(location: String = "native")
 /**
   * Provide sigar library as static mock.
   */
-case class MockitoSigarProvider(pid: Long = 123,
-                                loadAverage: Array[Double] = Array(
-                                      0.7, 0.3, 0.1),
-                                cpuCombined: Double = 0.5,
-                                cpuStolen: Double = 0.2,
-                                steps: Int = 5)
-    extends SigarProvider with MockitoSugar {
+case class MockitoSigarProvider(
+    pid: Long = 123,
+    loadAverage: Array[Double] = Array(0.7, 0.3, 0.1),
+    cpuCombined: Double = 0.5,
+    cpuStolen: Double = 0.2,
+    steps: Int = 5)
+    extends SigarProvider
+    with MockitoSugar {
 
   import org.hyperic.sigar._
   import org.mockito.Mockito._
@@ -119,15 +120,17 @@ trait MetricsCollectorFactory {
 
   /** Create Sigar collector. Rely on sigar-loader provisioner. */
   def collectorSigarProvision: MetricsCollector =
-    new SigarMetricsCollector(selfAddress,
-                              defaultDecayFactor,
-                              SimpleSigarProvider().createSigarInstance)
+    new SigarMetricsCollector(
+      selfAddress,
+      defaultDecayFactor,
+      SimpleSigarProvider().createSigarInstance)
 
   /** Create Sigar collector. Rely on static sigar library mock. */
   def collectorSigarMockito: MetricsCollector =
-    new SigarMetricsCollector(selfAddress,
-                              defaultDecayFactor,
-                              MockitoSigarProvider().createSigarInstance)
+    new SigarMetricsCollector(
+      selfAddress,
+      defaultDecayFactor,
+      MockitoSigarProvider().createSigarInstance)
 
   def isSigar(collector: MetricsCollector): Boolean =
     collector.isInstanceOf[SigarMetricsCollector]
@@ -138,9 +141,9 @@ trait MetricsCollectorFactory {
   */
 class MockitoSigarMetricsCollector(system: ActorSystem)
     extends SigarMetricsCollector(
-        Address("akka.tcp", system.name),
-        MetricsConfig.defaultDecayFactor,
-        MockitoSigarProvider().createSigarInstance) {}
+      Address("akka.tcp", system.name),
+      MetricsConfig.defaultDecayFactor,
+      MockitoSigarProvider().createSigarInstance) {}
 
 /**
   * Metrics test configurations.
@@ -208,8 +211,9 @@ class ClusterMetricsView(system: ExtendedActorSystem) extends Closeable {
   /** Create actor that subscribes to the cluster eventBus to update current read view state. */
   private val eventBusListener: ActorRef = {
     system.systemActorOf(
-        Props(new Actor with ActorLogging
-            with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
+      Props(
+        new Actor with ActorLogging
+        with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
           override def preStart(): Unit = extension.subscribe(self)
           override def postStop(): Unit = extension.unsubscribe(self)
           def receive = {
@@ -219,9 +223,11 @@ class ClusterMetricsView(system: ExtendedActorSystem) extends Closeable {
             case _ ⇒
             // Ignore.
           }
-        }).withDispatcher(Dispatchers.DefaultDispatcherId)
-          .withDeploy(Deploy.local),
-        name = "metrics-event-bus-listener")
+        })
+        .withDispatcher(Dispatchers.DefaultDispatcherId)
+        .withDeploy(Deploy.local),
+      name = "metrics-event-bus-listener"
+    )
   }
 
   /** Current cluster metrics. */

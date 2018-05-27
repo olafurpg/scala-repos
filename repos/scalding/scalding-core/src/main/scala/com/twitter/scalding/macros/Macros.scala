@@ -28,31 +28,41 @@ object Macros {
   // In both cases recursive case classes, primitive types, and options are flattened down onto cascading tuples.
   // In the unknown casehowever if a type is reached that we don't know what to do we store that type into the tuple.
 
-  def caseClassTupleSetter[T]: TupleSetter[T] = macro TupleSetterImpl
-    .caseClassTupleSetterImpl[T]
-  def caseClassTupleSetterWithUnknown[T]: TupleSetter[T] = macro TupleSetterImpl
-    .caseClassTupleSetterWithUnknownImpl[T]
+  def caseClassTupleSetter[T]: TupleSetter[T] =
+    macro TupleSetterImpl
+      .caseClassTupleSetterImpl[T]
+  def caseClassTupleSetterWithUnknown[T]: TupleSetter[T] =
+    macro TupleSetterImpl
+      .caseClassTupleSetterWithUnknownImpl[T]
 
-  def caseClassTupleConverter[T]: TupleConverter[T] = macro TupleConverterImpl
-    .caseClassTupleConverterImpl[T]
-  def caseClassTupleConverterWithUnknown[T]: TupleConverter[T] = macro TupleConverterImpl
-    .caseClassTupleConverterWithUnknownImpl[T]
+  def caseClassTupleConverter[T]: TupleConverter[T] =
+    macro TupleConverterImpl
+      .caseClassTupleConverterImpl[T]
+  def caseClassTupleConverterWithUnknown[T]: TupleConverter[T] =
+    macro TupleConverterImpl
+      .caseClassTupleConverterWithUnknownImpl[T]
 
   def toFields[T]: Fields = macro FieldsProviderImpl.toFieldsImpl[T]
-  def toFieldsWithUnknown[T]: Fields = macro FieldsProviderImpl
-    .toFieldsWithUnknownImpl[T]
+  def toFieldsWithUnknown[T]: Fields =
+    macro FieldsProviderImpl
+      .toFieldsWithUnknownImpl[T]
 
   def toNamedFields[T]: Fields = macro FieldsProviderImpl.toFieldsImpl[T]
-  def toNamedFieldsWithUnknown[T]: Fields = macro FieldsProviderImpl
-    .toFieldsWithUnknownImpl[T]
+  def toNamedFieldsWithUnknown[T]: Fields =
+    macro FieldsProviderImpl
+      .toFieldsWithUnknownImpl[T]
 
-  def toIndexedFields[T]: Fields = macro FieldsProviderImpl
-    .toIndexedFieldsImpl[T]
-  def toIndexedFieldsWithUnknown[T]: Fields = macro FieldsProviderImpl
-    .toIndexedFieldsWithUnknownImpl[T]
+  def toIndexedFields[T]: Fields =
+    macro FieldsProviderImpl
+      .toIndexedFieldsImpl[T]
+  def toIndexedFieldsWithUnknown[T]: Fields =
+    macro FieldsProviderImpl
+      .toIndexedFieldsWithUnknownImpl[T]
 
-  def caseClassTypeDescriptor[T]: TypeDescriptor[T] = macro TypeDescriptorProviderImpl
-    .caseClassTypeDescriptorImpl[T]
-  def caseClassTypeDescriptorWithUnknown[T]: TypeDescriptor[T] = macro TypeDescriptorProviderImpl
-    .caseClassTypeDescriptorWithUnknownImpl[T]
+  def caseClassTypeDescriptor[T]: TypeDescriptor[T] =
+    macro TypeDescriptorProviderImpl
+      .caseClassTypeDescriptorImpl[T]
+  def caseClassTypeDescriptorWithUnknown[T]: TypeDescriptor[T] =
+    macro TypeDescriptorProviderImpl
+      .caseClassTypeDescriptorWithUnknownImpl[T]
 }

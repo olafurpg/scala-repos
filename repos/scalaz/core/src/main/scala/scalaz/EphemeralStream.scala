@@ -107,8 +107,8 @@ sealed abstract class EphemeralStream[A] {
 
   def unzip[X, Y](
       implicit ev: A <:< (X, Y)): (EphemeralStream[X], EphemeralStream[Y]) =
-    foldRight((emptyEphemeralStream[X], emptyEphemeralStream[Y]))(
-        q => r => (cons(q._1, r._1), cons(q._2, r._2)))
+    foldRight((emptyEphemeralStream[X], emptyEphemeralStream[Y]))(q =>
+      r => (cons(q._1, r._1), cons(q._2, r._2)))
 
   def alignWith[B, C](f: A \&/ B => C)(
       b: EphemeralStream[B]): EphemeralStream[C] =
@@ -141,10 +141,14 @@ sealed abstract class EphemeralStream[A] {
 
 sealed abstract class EphemeralStreamInstances {
   // TODO more instances
-  implicit val ephemeralStreamInstance: MonadPlus[EphemeralStream] with BindRec[
-      EphemeralStream] with Zip[EphemeralStream] with Unzip[EphemeralStream] with Align[
-      EphemeralStream] with Traverse[EphemeralStream] with Cobind[
-      EphemeralStream] with IsEmpty[EphemeralStream] =
+  implicit val ephemeralStreamInstance: MonadPlus[EphemeralStream]
+    with BindRec[EphemeralStream]
+    with Zip[EphemeralStream]
+    with Unzip[EphemeralStream]
+    with Align[EphemeralStream]
+    with Traverse[EphemeralStream]
+    with Cobind[EphemeralStream]
+    with IsEmpty[EphemeralStream] =
     new MonadPlus[EphemeralStream] with BindRec[EphemeralStream]
     with Zip[EphemeralStream] with Unzip[EphemeralStream]
     with Align[EphemeralStream] with Traverse[EphemeralStream]
@@ -182,8 +186,8 @@ sealed abstract class EphemeralStreamInstances {
           f: (B, A) => B) =
         fa.foldLeft(z)(b => a => f(b, a))
       override def zipWithL[A, B, C](
-          fa: EphemeralStream[A], fb: EphemeralStream[B])(
-          f: (A, Option[B]) => C) = {
+          fa: EphemeralStream[A],
+          fb: EphemeralStream[B])(f: (A, Option[B]) => C) = {
         if (fa.isEmpty) emptyEphemeralStream
         else {
           val (bo, bTail) =
@@ -193,8 +197,8 @@ sealed abstract class EphemeralStreamInstances {
         }
       }
       override def zipWithR[A, B, C](
-          fa: EphemeralStream[A], fb: EphemeralStream[B])(
-          f: (Option[A], B) => C) =
+          fa: EphemeralStream[A],
+          fb: EphemeralStream[B])(f: (Option[A], B) => C) =
         zipWithL(fb, fa)((b, a) => f(a, b))
       def traverseImpl[G[_], A, B](fa: EphemeralStream[A])(f: A => G[B])(
           implicit G: Applicative[G]): G[EphemeralStream[B]] = {
@@ -222,9 +226,9 @@ sealed abstract class EphemeralStreamInstances {
           @annotation.tailrec
           def rec(abs: EphemeralStream[A \/ B]): EphemeralStream[B] =
             abs match {
-              case \/-(b) ##:: tail => cons(b, go(tail))
+              case \/-(b) ##:: tail  => cons(b, go(tail))
               case -\/(a0) ##:: tail => rec(f(a0) ++ tail)
-              case _ => emptyEphemeralStream
+              case _                 => emptyEphemeralStream
             }
           rec(s)
         }
@@ -234,7 +238,7 @@ sealed abstract class EphemeralStreamInstances {
 
   import std.list._
 
-  implicit def ephemeralStreamEqual[A : Equal]: Equal[EphemeralStream[A]] =
+  implicit def ephemeralStreamEqual[A: Equal]: Equal[EphemeralStream[A]] =
     Equal[List[A]] contramap { (_: EphemeralStream[A]).toList }
 }
 
@@ -259,7 +263,7 @@ object EphemeralStream extends EphemeralStreamInstances {
 
   def unfold[A, B](b: => B)(f: B => Option[(A, B)]): EphemeralStream[A] =
     f(b) match {
-      case None => emptyEphemeralStream
+      case None         => emptyEphemeralStream
       case Some((a, r)) => cons(a, unfold(r)(f))
     }
 
@@ -275,7 +279,7 @@ object EphemeralStream extends EphemeralStreamInstances {
 
   def fromStream[A](s: => Stream[A]): EphemeralStream[A] = s match {
     case Stream() => emptyEphemeralStream
-    case h #:: t => cons(h, fromStream(t))
+    case h #:: t  => cons(h, fromStream(t))
   }
 
   def toIterable[A](e: EphemeralStream[A]): Iterable[A] = new Iterable[A] {
@@ -315,12 +319,13 @@ object EphemeralStream extends EphemeralStreamInstances {
   def apply[A](as: A*): EphemeralStream[A] = {
     val as0 = as match {
       case indexedSeq: collection.IndexedSeq[A] => indexedSeq
-      case other => other.toIndexedSeq
+      case other                                => other.toIndexedSeq
     }
     val size = as.size
-    unfold(0)(b =>
-          if (b < size) Some((as0(b), b + 1))
-          else None)
+    unfold(0)(
+      b =>
+        if (b < size) Some((as0(b), b + 1))
+        else None)
   }
 
   class ConsWrap[A](e: => EphemeralStream[A]) {

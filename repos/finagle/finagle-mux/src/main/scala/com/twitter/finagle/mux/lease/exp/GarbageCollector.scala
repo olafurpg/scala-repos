@@ -14,10 +14,11 @@ private[lease] object GarbageCollector {
       meth.invoke(null)
   } catch {
     case exc: ClassNotFoundException =>
-      log.log(Level.INFO,
-              "Failed to resolve com.twitter.hotspot.System; falling " +
-              "back to full GC",
-              exc)
+      log.log(
+        Level.INFO,
+        "Failed to resolve com.twitter.hotspot.System; falling " +
+          "back to full GC",
+        exc)
       () =>
         System.gc()
   }

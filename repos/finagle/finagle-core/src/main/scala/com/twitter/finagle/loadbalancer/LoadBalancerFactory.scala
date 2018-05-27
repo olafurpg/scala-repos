@@ -11,12 +11,13 @@ import java.util.logging.{Level, Logger}
 
 object perHostStats
     extends GlobalFlag(
-        false,
-        "enable/default per-host stats.\n" +
+      false,
+      "enable/default per-host stats.\n" +
         "\tWhen enabled,the configured stats receiver will be used,\n" +
         "\tor the loaded stats receiver if none given.\n" +
         "\tWhen disabled, the configured stats receiver will be used,\n" +
-        "\tor the NullStatsReceiver if none given.")
+        "\tor the NullStatsReceiver if none given."
+    )
 
 object LoadBalancerFactory {
   val role = Stack.Role("LoadBalancer")
@@ -102,14 +103,16 @@ object LoadBalancerFactory {
   private[finagle] trait StackModule[Req, Rep]
       extends Stack.Module[ServiceFactory[Req, Rep]] {
     val role = LoadBalancerFactory.role
-    val parameters = Seq(implicitly[Stack.Param[ErrorLabel]],
-                         implicitly[Stack.Param[Dest]],
-                         implicitly[Stack.Param[Param]],
-                         implicitly[Stack.Param[HostStats]],
-                         implicitly[Stack.Param[param.Stats]],
-                         implicitly[Stack.Param[param.Logger]],
-                         implicitly[Stack.Param[param.Monitor]],
-                         implicitly[Stack.Param[param.Reporter]])
+    val parameters = Seq(
+      implicitly[Stack.Param[ErrorLabel]],
+      implicitly[Stack.Param[Dest]],
+      implicitly[Stack.Param[Param]],
+      implicitly[Stack.Param[HostStats]],
+      implicitly[Stack.Param[param.Stats]],
+      implicitly[Stack.Param[param.Logger]],
+      implicitly[Stack.Param[param.Monitor]],
+      implicitly[Stack.Param[param.Reporter]]
+    )
 
     def make(params: Stack.Params, next: Stack[ServiceFactory[Req, Rep]]) = {
       val ErrorLabel(errorLabel) = params[ErrorLabel]
@@ -125,7 +128,7 @@ object LoadBalancerFactory {
 
       val rawStatsReceiver = statsReceiver match {
         case sr: RollupStatsReceiver => sr.self
-        case sr => sr
+        case sr                      => sr
       }
 
       // Determine which stats receiver to use based on `perHostStats`
@@ -155,7 +158,7 @@ object LoadBalancerFactory {
         val composite = {
           val ia = addr match {
             case Address.Inet(ia, _) => Some(ia)
-            case _ => None
+            case _                   => None
           }
           reporter(label, ia).andThen(monitor)
         }
@@ -175,7 +178,7 @@ object LoadBalancerFactory {
               if (isClosed) return Future.exception(new ServiceClosedException)
               if (underlying == null)
                 underlying = next.make(
-                    params + Transporter.EndpointAddr(addr) +
+                  params + Transporter.EndpointAddr(addr) +
                     param.Stats(stats) + param.Monitor(composite))
             }
             underlying(conn)
@@ -205,13 +208,13 @@ object LoadBalancerFactory {
           Activity.Ok(set)
         case Addr.Neg =>
           log.info(
-              s"$label: name resolution is negative (local dtab: ${Dtab.local})")
+            s"$label: name resolution is negative (local dtab: ${Dtab.local})")
           Activity.Ok(Set.empty)
         case Addr.Failed(e) =>
           log.log(
-              Level.INFO,
-              s"$label: name resolution failed  (local dtab: ${Dtab.local})",
-              e)
+            Level.INFO,
+            s"$label: name resolution failed  (local dtab: ${Dtab.local})",
+            e)
           Activity.Failed(e)
         case Addr.Pending =>
           if (log.isLoggable(Level.FINE)) {
@@ -222,14 +225,16 @@ object LoadBalancerFactory {
 
       // Instead of simply creating a newBalancer here, we defer to the
       // traffic distributor to interpret weighted `Addresses`.
-      Stack.Leaf(role,
-                 new TrafficDistributor[Req, Rep](
-                     dest = destActivity,
-                     newEndpoint = newEndpoint,
-                     newBalancer = newBalancer,
-                     eagerEviction = !probationEnabled,
-                     statsReceiver = balancerStats
-                 ))
+      Stack.Leaf(
+        role,
+        new TrafficDistributor[Req, Rep](
+          dest = destActivity,
+          newEndpoint = newEndpoint,
+          newBalancer = newBalancer,
+          eagerEviction = !probationEnabled,
+          statsReceiver = balancerStats
+        )
+      )
     }
   }
 
@@ -255,8 +260,8 @@ object ConcurrentLoadBalancerFactory {
   // package private for testing
   private[finagle] def replicate(num: Int): Address => Set[Address] = {
     case Address.Inet(ia, metadata) =>
-      for (i: Int <- (0 until num).toSet) yield
-        Address.Inet(ia, metadata + (ReplicaKey -> i))
+      for (i: Int <- (0 until num).toSet)
+        yield Address.Inet(ia, metadata + (ReplicaKey -> i))
     case addr => Set(addr)
   }
 
@@ -275,10 +280,11 @@ object ConcurrentLoadBalancerFactory {
     new StackModule[Req, Rep] {
       val description =
         "Balance requests across multiple connections on a single " +
-        "endpoint, used for pipelining protocols"
+          "endpoint, used for pipelining protocols"
 
       override def make(
-          params: Stack.Params, next: Stack[ServiceFactory[Req, Rep]]) = {
+          params: Stack.Params,
+          next: Stack[ServiceFactory[Req, Rep]]) = {
         val Param(numConnections) = params[Param]
         val Dest(dest) = params[Dest]
         val newDest = dest.map {
@@ -335,14 +341,15 @@ abstract class LoadBalancerFactory {
   * }}
   */
 @deprecated(
-    "Use com.twitter.finagle.loadbalancer.Balancers per-client.", "2015-06-15")
+  "Use com.twitter.finagle.loadbalancer.Balancers per-client.",
+  "2015-06-15")
 object defaultBalancer extends GlobalFlag("choice", "Default load balancer")
 
 package exp {
   object loadMetric
       extends GlobalFlag(
-          "leastReq",
-          "Metric used to measure load across endpoints (leastReq | ewma)")
+        "leastReq",
+        "Metric used to measure load across endpoints (leastReq | ewma)")
 }
 
 object DefaultBalancerFactory extends LoadBalancerFactory {
@@ -351,11 +358,11 @@ object DefaultBalancerFactory extends LoadBalancerFactory {
   private def p2c(): LoadBalancerFactory =
     exp.loadMetric() match {
       case "ewma" => Balancers.p2cPeakEwma()
-      case _ => Balancers.p2c()
+      case _      => Balancers.p2c()
     }
 
   private val underlying = defaultBalancer() match {
-    case "heap" => Balancers.heap()
+    case "heap"   => Balancers.heap()
     case "choice" => p2c()
     case x =>
       log.warning(s"""Invalid load balancer $x, using "choice" balancer.""")

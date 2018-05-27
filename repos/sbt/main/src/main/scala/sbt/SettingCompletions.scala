@@ -1,6 +1,14 @@
 package sbt
 
-import sbt.internal.util.{AttributeKey, complete, Relation, Settings, Show, Types, Util}
+import sbt.internal.util.{
+  AttributeKey,
+  complete,
+  Relation,
+  Settings,
+  Show,
+  Types,
+  Util
+}
 
 import sbt.librarymanagement.Configuration
 
@@ -18,9 +26,10 @@ import DefaultParsers._
   * The verbose summary will typically use more vertical space and show full details,
   * while the quiet summary will be a couple of lines and truncate information.
   */
-private[sbt] class SetResult(val session: SessionSettings,
-                             val verboseSummary: String,
-                             val quietSummary: String)
+private[sbt] class SetResult(
+    val session: SessionSettings,
+    val verboseSummary: String,
+    val quietSummary: String)
 
 /** Defines methods for implementing the `set` command.*/
 private[sbt] object SettingCompletions {
@@ -34,20 +43,24 @@ private[sbt] object SettingCompletions {
     import extracted._
     val r = relation(extracted.structure, true)
     val allDefs = Def
-      .flattenLocals(Def.compiled(extracted.structure.settings, true)(
-              structure.delegates,
-              structure.scopeLocal,
-              implicitly[Show[ScopedKey[_]]]))
+      .flattenLocals(
+        Def.compiled(extracted.structure.settings, true)(
+          structure.delegates,
+          structure.scopeLocal,
+          implicitly[Show[ScopedKey[_]]]))
       .keys
     val projectScope = Load.projectScope(currentRef)
     def resolve(s: Setting[_]): Seq[Setting[_]] =
       Load.transformSettings(
-          projectScope, currentRef.build, rootProject, s :: Nil)
+        projectScope,
+        currentRef.build,
+        rootProject,
+        s :: Nil)
     def rescope[T](setting: Setting[T]): Seq[Setting[_]] = {
       val akey = setting.key.key
       val global = ScopedKey(Global, akey)
       val globalSetting = resolve(
-          Def.setting(global, setting.init, setting.pos))
+        Def.setting(global, setting.init, setting.pos))
       globalSetting ++ allDefs.flatMap { d =>
         if (d.key == akey) Seq(SettingKey(akey) in d.scope <<= global)
         else Nil
@@ -59,24 +72,31 @@ private[sbt] object SettingCompletions {
   }
 
   /** Implementation of the `set` command that will reload the current project with `settings` appended to the current settings. */
-  def setThis(s: State,
-              extracted: Extracted,
-              settings: Seq[Def.Setting[_]],
-              arg: String): SetResult = {
+  def setThis(
+      s: State,
+      extracted: Extracted,
+      settings: Seq[Def.Setting[_]],
+      arg: String): SetResult = {
     import extracted._
     val append = Load.transformSettings(
-        Load.projectScope(currentRef), currentRef.build, rootProject, settings)
+      Load.projectScope(currentRef),
+      currentRef.build,
+      rootProject,
+      settings)
     val newSession =
       session.appendSettings(append map (a => (a, arg.split('\n').toList)))
     val struct = extracted.structure
     val r = relation(newSession.mergeSettings, true)(
-        structure.delegates, structure.scopeLocal, implicitly)
+      structure.delegates,
+      structure.scopeLocal,
+      implicitly)
     setResult(newSession, r, append)
   }
 
-  private[this] def setResult(session: SessionSettings,
-                              r: Relation[ScopedKey[_], ScopedKey[_]],
-                              redefined: Seq[Setting[_]])(
+  private[this] def setResult(
+      session: SessionSettings,
+      r: Relation[ScopedKey[_], ScopedKey[_]],
+      redefined: Seq[Setting[_]])(
       implicit show: Show[ScopedKey[_]]): SetResult = {
     val redefinedKeys = redefined.map(_.key).toSet
     val affectedKeys = redefinedKeys.flatMap(r.reverse)
@@ -85,10 +105,10 @@ private[sbt] object SettingCompletions {
     new SetResult(session, summary(true), summary(false))
   }
 
-  private[this] def setSummary(redefined: Set[ScopedKey[_]],
-                               affected: Set[ScopedKey[_]],
-                               verbose: Boolean)(
-      implicit display: Show[ScopedKey[_]]): String = {
+  private[this] def setSummary(
+      redefined: Set[ScopedKey[_]],
+      affected: Set[ScopedKey[_]],
+      verbose: Boolean)(implicit display: Show[ScopedKey[_]]): String = {
     val QuietLimit = 3
     def strings(in: Set[ScopedKey[_]]): Seq[String] =
       in.toSeq.map(sk => display(sk)).sorted
@@ -103,7 +123,7 @@ private[sbt] object SettingCompletions {
         val s = first
           .take(QuietLimit - 1)
           .mkString("", ", ", " and " + last.size + " others.")
-          (s, true)
+        (s, true)
       }
     }
     if (redefined.isEmpty) "No settings or tasks were redefined."
@@ -113,7 +133,10 @@ private[sbt] object SettingCompletions {
       val details = if (trimR || trimU) "\n\tRun `last` for details." else ""
       val valuesString = if (redefined.size == 1) "value" else "values"
       "Defining %s\nThe new %s will be used by %s%s".format(
-          redef, valuesString, used, details)
+        redef,
+        valuesString,
+        used,
+        details)
     }
   }
 
@@ -125,22 +148,26 @@ private[sbt] object SettingCompletions {
     * when there are fewer choices or tab is pressed multiple times.
     * The last part of the completion will generate a template for the value or function literal that will initialize the setting or task.
     */
-  def settingParser(settings: Settings[Scope],
-                    rawKeyMap: Map[String, AttributeKey[_]],
-                    context: ResolvedProject): Parser[String] = {
+  def settingParser(
+      settings: Settings[Scope],
+      rawKeyMap: Map[String, AttributeKey[_]],
+      context: ResolvedProject): Parser[String] = {
     val cutoff = KeyRanks.MainCutoff
     val keyMap: Map[String, AttributeKey[_]] = rawKeyMap.map {
       case (k, v) => (keyScalaID(k), v)
     } toMap;
-    def inputScopedKey(
-        pred: AttributeKey[_] => Boolean): Parser[ScopedKey[_]] =
+    def inputScopedKey(pred: AttributeKey[_] => Boolean): Parser[ScopedKey[_]] =
       scopedKeyParser(
-          keyMap.filter { case (_, k) => pred(k) }, settings, context)
+        keyMap.filter { case (_, k) => pred(k) },
+        settings,
+        context)
     val full = for {
       defineKey <- scopedKeyParser(keyMap, settings, context)
       a <- assign(defineKey)
       deps <- valueParser(
-          defineKey, a, inputScopedKey(keyFilter(defineKey.key)))
+        defineKey,
+        a,
+        inputScopedKey(keyFilter(defineKey.key)))
     } yield
       () // parser is currently only for completion and the parsed data structures are not used
 
@@ -148,17 +175,18 @@ private[sbt] object SettingCompletions {
   }
 
   /** Parser for a Scope+AttributeKey (ScopedKey). */
-  def scopedKeyParser(keyMap: Map[String, AttributeKey[_]],
-                      settings: Settings[Scope],
-                      context: ResolvedProject): Parser[ScopedKey[_]] = {
+  def scopedKeyParser(
+      keyMap: Map[String, AttributeKey[_]],
+      settings: Settings[Scope],
+      context: ResolvedProject): Parser[ScopedKey[_]] = {
     val cutoff = KeyRanks.MainCutoff
     val keyCompletions = fixedCompletions { (seen, level) =>
       completeKey(seen, keyMap, level, cutoff, 10).toSet
     }
     val keyID: Parser[AttributeKey[_]] = scalaID(keyMap, "key")
     val keyParser = token(keyID, keyCompletions)
-    for (key <- keyParser; scope <- scopeParser(key, settings, context)) yield
-      ScopedKey(scope, key)
+    for (key <- keyParser; scope <- scopeParser(key, settings, context))
+      yield ScopedKey(scope, key)
   }
 
   /** Parser for the `in` method name that slightly augments the naive completion to give a hint of the purpose of `in`.*/
@@ -196,9 +224,10 @@ private[sbt] object SettingCompletions {
     * The completions are restricted to be more useful.  Currently, this parser will suggest
     * only known axis values for configurations and tasks and only in that order.
     */
-  def scopeParser(key: AttributeKey[_],
-                  settings: Settings[Scope],
-                  context: ResolvedProject): Parser[Scope] = {
+  def scopeParser(
+      key: AttributeKey[_],
+      settings: Settings[Scope],
+      context: ResolvedProject): Parser[Scope] = {
     val data = settings.data
     val allScopes = data.keys.toSeq
     val definedScopes =
@@ -208,17 +237,19 @@ private[sbt] object SettingCompletions {
     scope(key, allScopes, definedScopes, context)
   }
 
-  private[this] def scope(key: AttributeKey[_],
-                          allScopes: Seq[Scope],
-                          definedScopes: Seq[Scope],
-                          context: ResolvedProject): Parser[Scope] = {
-    def axisParser[T](axis: Scope => ScopeAxis[T],
-                      name: T => String,
-                      description: T => Option[String],
-                      label: String): Parser[ScopeAxis[T]] = {
+  private[this] def scope(
+      key: AttributeKey[_],
+      allScopes: Seq[Scope],
+      definedScopes: Seq[Scope],
+      context: ResolvedProject): Parser[Scope] = {
+    def axisParser[T](
+        axis: Scope => ScopeAxis[T],
+        name: T => String,
+        description: T => Option[String],
+        label: String): Parser[ScopeAxis[T]] = {
       def getChoice(s: Scope): Seq[(String, T)] = axis(s) match {
         case Select(t) => (name(t), t) :: Nil
-        case _ => Nil
+        case _         => Nil
       }
       def getChoices(scopes: Seq[Scope]): Map[String, T] =
         scopes.flatMap(getChoice).toMap
@@ -228,19 +259,24 @@ private[sbt] object SettingCompletions {
       val completions = fixedCompletions { (seen, level) =>
         completeScope(seen, level, definedChoices, fullChoices)(description).toSet
       }
-      Act.optionalAxis(inParser ~> token(Space) ~> token(
-                           scalaID(fullChoices, label), completions),
-                       This)
+      Act.optionalAxis(
+        inParser ~> token(Space) ~> token(
+          scalaID(fullChoices, label),
+          completions),
+        This)
     }
     val configurations: Map[String, Configuration] =
       context.configurations.map(c => (configScalaID(c.name), c)).toMap
     val configParser = axisParser[ConfigKey](
-        _.config,
-        c => configScalaID(c.name),
-        ck => configurations.get(ck.name).map(_.description),
-        "configuration")
+      _.config,
+      c => configScalaID(c.name),
+      ck => configurations.get(ck.name).map(_.description),
+      "configuration")
     val taskParser = axisParser[AttributeKey[_]](
-        _.task, k => keyScalaID(k.label), _.description, "task")
+      _.task,
+      k => keyScalaID(k.label),
+      _.description,
+      "task")
     val nonGlobal =
       (configParser ~ taskParser) map {
         case (c, t) => Scope(This, c, t, Global)
@@ -264,7 +300,8 @@ private[sbt] object SettingCompletions {
     TokenCompletions.fixed((s, l) => Completions(f(s, l)))
 
   private[this] def scalaID[T](
-      keyMap: Map[String, T], label: String): Parser[T] = {
+      keyMap: Map[String, T],
+      label: String): Parser[T] = {
     val identifier =
       Act.filterStrings(ScalaID, keyMap.keySet, label) map keyMap
     optionallyQuoted(identifier)
@@ -282,7 +319,9 @@ private[sbt] object SettingCompletions {
     * This will filter possible assignment methods based on the underlying type of `key`, so that only `<<=` is shown for input tasks, for example.
     */
   def completeAssign(
-      seen: String, level: Int, key: ScopedKey[_]): Seq[Completion] = {
+      seen: String,
+      level: Int,
+      key: ScopedKey[_]): Seq[Completion] = {
     val allowed: Iterable[Assign.Value] =
       if (appendable(key.key)) Assign.values
       else assignNoAppend
@@ -293,42 +332,47 @@ private[sbt] object SettingCompletions {
     completeDescribed(seen, true, applicable)(assignDescription)
   }
 
-  def completeKey(seen: String,
-                  keys: Map[String, AttributeKey[_]],
-                  level: Int,
-                  prominentCutoff: Int,
-                  detailLimit: Int): Seq[Completion] =
+  def completeKey(
+      seen: String,
+      keys: Map[String, AttributeKey[_]],
+      level: Int,
+      prominentCutoff: Int,
+      detailLimit: Int): Seq[Completion] =
     completeSelectDescribed(seen, level, keys, detailLimit)(_.description) {
       case (k, v) => v.rank <= prominentCutoff
     }
 
-  def completeScope[T](seen: String,
-                       level: Int,
-                       definedChoices: Set[String],
-                       allChoices: Map[String, T])(
+  def completeScope[T](
+      seen: String,
+      level: Int,
+      definedChoices: Set[String],
+      allChoices: Map[String, T])(
       description: T => Option[String]): Seq[Completion] =
     completeSelectDescribed(seen, level, allChoices, 10)(description) {
       case (k, v) => definedChoices(k)
     }
 
   def completeSelectDescribed[T](
-      seen: String, level: Int, all: Map[String, T], detailLimit: Int)(
-      description: T => Option[String])(
+      seen: String,
+      level: Int,
+      all: Map[String, T],
+      detailLimit: Int)(description: T => Option[String])(
       prominent: (String, T) => Boolean): Seq[Completion] = {
     val applicable = all.toSeq.filter { case (k, v) => k startsWith seen }
     val prominentOnly = applicable filter { case (k, v) => prominent(k, v) }
 
     val showAll =
       (level >= 3) || (level == 2 && prominentOnly.size <= detailLimit) ||
-      prominentOnly.isEmpty
+        prominentOnly.isEmpty
     val showKeys = if (showAll) applicable else prominentOnly
     val showDescriptions = (level >= 2) || (showKeys.size <= detailLimit)
-    completeDescribed(seen, showDescriptions, showKeys)(
-        s => description(s).toList.mkString)
+    completeDescribed(seen, showDescriptions, showKeys)(s =>
+      description(s).toList.mkString)
   }
   def completeDescribed[T](
-      seen: String, showDescriptions: Boolean, in: Seq[(String, T)])(
-      description: T => String): Seq[Completion] = {
+      seen: String,
+      showDescriptions: Boolean,
+      in: Seq[(String, T)])(description: T => String): Seq[Completion] = {
     def appendString(id: String): String = id.stripPrefix(seen) + " "
     if (in.isEmpty) Nil
     else if (showDescriptions) {
@@ -338,7 +382,8 @@ private[sbt] object SettingCompletions {
       (padded, in).zipped.map {
         case (line, (id, key)) =>
           Completion.tokenDisplay(
-              append = appendString(id), display = line + "\n")
+            append = appendString(id),
+            display = line + "\n")
       }
     } else
       in map {
@@ -361,10 +406,12 @@ private[sbt] object SettingCompletions {
   def configScalaID(c: String): String = Util.quoteIfKeyword(c.capitalize)
 
   /** Applies a function on the underlying manifest for T for `key` depending if it is for a `Setting[T]`, `Task[T]`, or `InputTask[T]`.*/
-  def keyType[S](key: AttributeKey[_])(onSetting: Manifest[_] => S,
-                                       onTask: Manifest[_] => S,
-                                       onInput: Manifest[_] => S)(
-      implicit tm: Manifest[Task[_]], im: Manifest[InputTask[_]]): S = {
+  def keyType[S](key: AttributeKey[_])(
+      onSetting: Manifest[_] => S,
+      onTask: Manifest[_] => S,
+      onInput: Manifest[_] => S)(
+      implicit tm: Manifest[Task[_]],
+      im: Manifest[InputTask[_]]): S = {
     def argTpe = key.manifest.typeArguments.head
     val e = key.manifest.runtimeClass
     if (e == tm.runtimeClass) onTask(argTpe)
@@ -424,10 +471,10 @@ private[sbt] object SettingCompletions {
 
   /** Returns the description associated with the provided assignment method. */
   def assignDescription(a: Assign.Value): String = a match {
-    case AppendValue => "append value"
+    case AppendValue  => "append value"
     case AppendValues => "append values"
-    case Define => "define value, overwriting any existing value"
-    case Update => "transform existing value"
+    case Define       => "define value, overwriting any existing value"
+    case Update       => "transform existing value"
   }
 
   /** The assignment methods except for the ones that append. */
@@ -435,12 +482,12 @@ private[sbt] object SettingCompletions {
 
   /** Class values to approximate which types can be appended*/
   val appendableClasses = Seq(
-      classOf[Seq[_]],
-      classOf[Map[_, _]],
-      classOf[Set[_]],
-      classOf[Int],
-      classOf[Double],
-      classOf[Long],
-      classOf[String]
+    classOf[Seq[_]],
+    classOf[Map[_, _]],
+    classOf[Set[_]],
+    classOf[Int],
+    classOf[Double],
+    classOf[Long],
+    classOf[String]
   )
 }

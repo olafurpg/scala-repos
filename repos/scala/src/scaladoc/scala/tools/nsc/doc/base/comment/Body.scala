@@ -18,28 +18,28 @@ final case class Body(blocks: Seq[Block]) {
   /** The summary text of the comment body. */
   lazy val summary: Option[Inline] = {
     def summaryInBlock(block: Block): Seq[Inline] = block match {
-      case Title(text, _) => summaryInInline(text)
-      case Paragraph(text) => summaryInInline(text)
-      case UnorderedList(items) => items flatMap summaryInBlock
+      case Title(text, _)        => summaryInInline(text)
+      case Paragraph(text)       => summaryInInline(text)
+      case UnorderedList(items)  => items flatMap summaryInBlock
       case OrderedList(items, _) => items flatMap summaryInBlock
       case DefinitionList(items) => items.values.toSeq flatMap summaryInBlock
-      case _ => Nil
+      case _                     => Nil
     }
     def summaryInInline(text: Inline): Seq[Inline] = text match {
-      case Summary(text) => List(text)
-      case Chain(items) => items flatMap summaryInInline
-      case Italic(text) => summaryInInline(text)
-      case Bold(text) => summaryInInline(text)
-      case Underline(text) => summaryInInline(text)
+      case Summary(text)     => List(text)
+      case Chain(items)      => items flatMap summaryInInline
+      case Italic(text)      => summaryInInline(text)
+      case Bold(text)        => summaryInInline(text)
+      case Underline(text)   => summaryInInline(text)
       case Superscript(text) => summaryInInline(text)
-      case Subscript(text) => summaryInInline(text)
-      case Link(_, title) => summaryInInline(title)
-      case _ => Nil
+      case Subscript(text)   => summaryInInline(text)
+      case Link(_, title)    => summaryInInline(title)
+      case _                 => Nil
     }
     (blocks flatMap { summaryInBlock(_) }).toList match {
-      case Nil => None
+      case Nil           => None
       case inline :: Nil => Some(inline)
-      case inlines => Some(Chain(inlines))
+      case inlines       => Some(Chain(inlines))
     }
   }
 }

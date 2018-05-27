@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -121,7 +121,7 @@ object util {
   case object NConcat {
 
     // Closest thing we can get to casting an array. This is completely unsafe.
-    private def copyCastArray[A : Manifest](as: Array[_]): Array[A] = {
+    private def copyCastArray[A: Manifest](as: Array[_]): Array[A] = {
       var bs = new Array[A](as.length)
       System.arraycopy(as, 0, bs, 0, as.length)
       bs
@@ -136,8 +136,7 @@ object util {
         case (_, _: BoolColumn) :: _
             if Loop.forall(columns)(_.isInstanceOf[BoolColumn]) =>
           val boolColumns = copyCastArray[BoolColumn](columns)
-          Some(
-              new NConcatColumn(offsets, boolColumns) with BoolColumn {
+          Some(new NConcatColumn(offsets, boolColumns) with BoolColumn {
             def apply(row: Int) = {
               val i = indexOf(row)
               boolColumns(i)(row - offsets(i))
@@ -147,8 +146,7 @@ object util {
         case (_, _: LongColumn) :: _
             if Loop.forall(columns)(_.isInstanceOf[LongColumn]) =>
           val longColumns = copyCastArray[LongColumn](columns)
-          Some(
-              new NConcatColumn(offsets, longColumns) with LongColumn {
+          Some(new NConcatColumn(offsets, longColumns) with LongColumn {
             def apply(row: Int) = {
               val i = indexOf(row)
               longColumns(i)(row - offsets(i))
@@ -158,8 +156,7 @@ object util {
         case (_, _: DoubleColumn) :: _
             if Loop.forall(columns)(_.isInstanceOf[DoubleColumn]) =>
           val doubleColumns = copyCastArray[DoubleColumn](columns)
-          Some(
-              new NConcatColumn(offsets, doubleColumns) with DoubleColumn {
+          Some(new NConcatColumn(offsets, doubleColumns) with DoubleColumn {
             def apply(row: Int) = {
               val i = indexOf(row)
               doubleColumns(i)(row - offsets(i))
@@ -169,8 +166,7 @@ object util {
         case (_, _: NumColumn) :: _
             if Loop.forall(columns)(_.isInstanceOf[NumColumn]) =>
           val numColumns = copyCastArray[NumColumn](columns)
-          Some(
-              new NConcatColumn(offsets, numColumns) with NumColumn {
+          Some(new NConcatColumn(offsets, numColumns) with NumColumn {
             def apply(row: Int) = {
               val i = indexOf(row)
               numColumns(i)(row - offsets(i))
@@ -180,8 +176,7 @@ object util {
         case (_, _: StrColumn) :: _
             if Loop.forall(columns)(_.isInstanceOf[StrColumn]) =>
           val strColumns = copyCastArray[StrColumn](columns)
-          Some(
-              new NConcatColumn(offsets, strColumns) with StrColumn {
+          Some(new NConcatColumn(offsets, strColumns) with StrColumn {
             def apply(row: Int) = {
               val i = indexOf(row)
               strColumns(i)(row - offsets(i))
@@ -191,8 +186,7 @@ object util {
         case (_, _: DateColumn) :: _
             if Loop.forall(columns)(_.isInstanceOf[DateColumn]) =>
           val dateColumns = copyCastArray[DateColumn](columns)
-          Some(
-              new NConcatColumn(offsets, dateColumns) with DateColumn {
+          Some(new NConcatColumn(offsets, dateColumns) with DateColumn {
             def apply(row: Int) = {
               val i = indexOf(row)
               dateColumns(i)(row - offsets(i))
@@ -202,8 +196,7 @@ object util {
         case (_, _: PeriodColumn) :: _
             if Loop.forall(columns)(_.isInstanceOf[PeriodColumn]) =>
           val periodColumns = copyCastArray[PeriodColumn](columns)
-          Some(
-              new NConcatColumn(offsets, periodColumns) with PeriodColumn {
+          Some(new NConcatColumn(offsets, periodColumns) with PeriodColumn {
             def apply(row: Int) = {
               val i = indexOf(row)
               periodColumns(i)(row - offsets(i))
@@ -214,15 +207,14 @@ object util {
             if Loop.forall(columns)(_.isInstanceOf[EmptyArrayColumn]) =>
           val emptyArrayColumns = copyCastArray[EmptyArrayColumn](columns)
           Some(
-              new NConcatColumn(offsets, emptyArrayColumns)
-              with EmptyArrayColumn)
+            new NConcatColumn(offsets, emptyArrayColumns) with EmptyArrayColumn)
 
         case (_, _: EmptyObjectColumn) :: _
             if Loop.forall(columns)(_.isInstanceOf[EmptyObjectColumn]) =>
           val emptyObjectColumns = copyCastArray[EmptyObjectColumn](columns)
           Some(
-              new NConcatColumn(offsets, emptyObjectColumns)
-              with EmptyObjectColumn)
+            new NConcatColumn(offsets, emptyObjectColumns)
+            with EmptyObjectColumn)
 
         case (_, _: NullColumn) :: _
             if Loop.forall(columns)(_.isInstanceOf[NullColumn]) =>
@@ -353,9 +345,9 @@ object util {
         def apply(row: Int) = c(row - by)
       }
 
-    case c: EmptyArrayColumn => new ShiftColumn(by, c) with EmptyArrayColumn
+    case c: EmptyArrayColumn  => new ShiftColumn(by, c) with EmptyArrayColumn
     case c: EmptyObjectColumn => new ShiftColumn(by, c) with EmptyObjectColumn
-    case c: NullColumn => new ShiftColumn(by, c) with NullColumn
+    case c: NullColumn        => new ShiftColumn(by, c) with NullColumn
   }
 
   def Sparsen(idx: Array[Int], toSize: Int) = CF1P("builtin::ct::sparsen") {
@@ -401,12 +393,12 @@ object util {
   }
 
   val Empty = CF1P("builtin::ct::empty") {
-    case c: BoolColumn => new EmptyColumn[BoolColumn] with BoolColumn
-    case c: LongColumn => new EmptyColumn[LongColumn] with LongColumn
+    case c: BoolColumn   => new EmptyColumn[BoolColumn] with BoolColumn
+    case c: LongColumn   => new EmptyColumn[LongColumn] with LongColumn
     case c: DoubleColumn => new EmptyColumn[DoubleColumn] with DoubleColumn
-    case c: NumColumn => new EmptyColumn[NumColumn] with NumColumn
-    case c: StrColumn => new EmptyColumn[StrColumn] with StrColumn
-    case c: DateColumn => new EmptyColumn[DateColumn] with DateColumn
+    case c: NumColumn    => new EmptyColumn[NumColumn] with NumColumn
+    case c: StrColumn    => new EmptyColumn[StrColumn] with StrColumn
+    case c: DateColumn   => new EmptyColumn[DateColumn] with DateColumn
     case c: PeriodColumn => new EmptyColumn[PeriodColumn] with PeriodColumn
     case c: HomogeneousArrayColumn[a] =>
       new EmptyColumn[HomogeneousArrayColumn[a]]
@@ -444,9 +436,9 @@ object util {
         val tpe = c.tpe
         def apply(row: Int) = c(f(row))
       }
-    case c: EmptyArrayColumn => new RemapColumn(c, f) with EmptyArrayColumn
+    case c: EmptyArrayColumn  => new RemapColumn(c, f) with EmptyArrayColumn
     case c: EmptyObjectColumn => new RemapColumn(c, f) with EmptyObjectColumn
-    case c: NullColumn => new RemapColumn(c, f) with NullColumn
+    case c: NullColumn        => new RemapColumn(c, f) with NullColumn
   }
 
   def RemapFilter(filter: Int => Boolean, offset: Int) =
@@ -659,62 +651,62 @@ object util {
 
   def DefinedConst(value: CValue) = CF1("builtin::ct::definedConst") { c =>
     Some(
-        value match {
-          case CString(s) =>
-            new StrColumn {
-              def isDefinedAt(row: Int) = c.isDefinedAt(row)
-              def apply(row: Int) = s
-            }
-          case CBoolean(b) =>
-            new BoolColumn {
-              def isDefinedAt(row: Int) = c.isDefinedAt(row)
-              def apply(row: Int) = b
-            }
-          case CLong(l) =>
-            new LongColumn {
-              def isDefinedAt(row: Int) = c.isDefinedAt(row)
-              def apply(row: Int) = l
-            }
-          case CDouble(d) =>
-            new DoubleColumn {
-              def isDefinedAt(row: Int) = c.isDefinedAt(row)
-              def apply(row: Int) = d
-            }
-          case CNum(n) =>
-            new NumColumn {
-              def isDefinedAt(row: Int) = c.isDefinedAt(row)
-              def apply(row: Int) = n
-            }
-          case CDate(d) =>
-            new DateColumn {
-              def isDefinedAt(row: Int) = c.isDefinedAt(row)
-              def apply(row: Int) = d
-            }
-          case CPeriod(p) =>
-            new PeriodColumn {
-              def isDefinedAt(row: Int) = c.isDefinedAt(row)
-              def apply(row: Int) = p
-            }
-          case value: CArray[a] =>
-            new HomogeneousArrayColumn[a] {
-              val tpe = value.cType
-              def isDefinedAt(row: Int) = c.isDefinedAt(row)
-              def apply(row: Int) = value.value
-            }
-          case CNull =>
-            new NullColumn {
-              def isDefinedAt(row: Int) = c.isDefinedAt(row)
-            }
-          case CEmptyObject =>
-            new EmptyObjectColumn {
-              def isDefinedAt(row: Int) = c.isDefinedAt(row)
-            }
-          case CEmptyArray =>
-            new EmptyArrayColumn {
-              def isDefinedAt(row: Int) = c.isDefinedAt(row)
-            }
-          case CUndefined => UndefinedColumn(c)
-        }
+      value match {
+        case CString(s) =>
+          new StrColumn {
+            def isDefinedAt(row: Int) = c.isDefinedAt(row)
+            def apply(row: Int) = s
+          }
+        case CBoolean(b) =>
+          new BoolColumn {
+            def isDefinedAt(row: Int) = c.isDefinedAt(row)
+            def apply(row: Int) = b
+          }
+        case CLong(l) =>
+          new LongColumn {
+            def isDefinedAt(row: Int) = c.isDefinedAt(row)
+            def apply(row: Int) = l
+          }
+        case CDouble(d) =>
+          new DoubleColumn {
+            def isDefinedAt(row: Int) = c.isDefinedAt(row)
+            def apply(row: Int) = d
+          }
+        case CNum(n) =>
+          new NumColumn {
+            def isDefinedAt(row: Int) = c.isDefinedAt(row)
+            def apply(row: Int) = n
+          }
+        case CDate(d) =>
+          new DateColumn {
+            def isDefinedAt(row: Int) = c.isDefinedAt(row)
+            def apply(row: Int) = d
+          }
+        case CPeriod(p) =>
+          new PeriodColumn {
+            def isDefinedAt(row: Int) = c.isDefinedAt(row)
+            def apply(row: Int) = p
+          }
+        case value: CArray[a] =>
+          new HomogeneousArrayColumn[a] {
+            val tpe = value.cType
+            def isDefinedAt(row: Int) = c.isDefinedAt(row)
+            def apply(row: Int) = value.value
+          }
+        case CNull =>
+          new NullColumn {
+            def isDefinedAt(row: Int) = c.isDefinedAt(row)
+          }
+        case CEmptyObject =>
+          new EmptyObjectColumn {
+            def isDefinedAt(row: Int) = c.isDefinedAt(row)
+          }
+        case CEmptyArray =>
+          new EmptyArrayColumn {
+            def isDefinedAt(row: Int) = c.isDefinedAt(row)
+          }
+        case CUndefined => UndefinedColumn(c)
+      }
     )
   }
 

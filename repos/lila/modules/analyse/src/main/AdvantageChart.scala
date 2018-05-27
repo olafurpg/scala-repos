@@ -7,15 +7,18 @@ object AdvantageChart {
   val max = Score.CEILING
   private val scale = intBox(-max to max) _
 
-  def apply(advices: InfoAdvices, moves: List[String], startPly: Int): String = {
+  def apply(
+      advices: InfoAdvices,
+      moves: List[String],
+      startPly: Int): String = {
 
     val pgnMoves = moves.toIndexedSeq
 
     def move(info: Info, advice: Option[Advice]) = "%s%s %s%s".format(
-        info.turn,
-        info.color.fold(".", "..."),
-        pgnMoves lift (info.ply - 1 - startPly) getOrElse "",
-        advice.??(" " + _.makeComment(withEval = true, withBestMove = false))
+      info.turn,
+      info.color.fold(".", "..."),
+      pgnMoves lift (info.ply - 1 - startPly) getOrElse "",
+      advice.??(" " + _.makeComment(withEval = true, withBestMove = false))
     )
 
     def point(name: String, y: Int) = Json.obj("name" -> name, "y" -> scale(y))

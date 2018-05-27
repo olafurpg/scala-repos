@@ -11,9 +11,10 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.ScReferenceExpression
   * @author Alexander Podkhalyuzin
   */
 class ScalaCompletionConfidence extends CompletionConfidence {
-  override def shouldSkipAutopopup(contextElement: PsiElement,
-                                   psiFile: PsiFile,
-                                   offset: Int): ThreeState = {
+  override def shouldSkipAutopopup(
+      contextElement: PsiElement,
+      psiFile: PsiFile,
+      offset: Int): ThreeState = {
     if (offset != 0) {
       val elementType: IElementType =
         psiFile.findElementAt(offset - 1).getNode.getElementType
@@ -28,7 +29,7 @@ class ScalaCompletionConfidence extends CompletionConfidence {
             if psiFile.getText.charAt(offset - 1) == '.' =>
           psiFile.findElementAt(offset).getPrevSibling match {
             case ref: ScReferenceExpression => return ThreeState.NO
-            case _ =>
+            case _                          =>
           }
         case _ =>
       }

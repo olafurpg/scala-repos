@@ -8,33 +8,36 @@ import akka.testkit.AkkaSpec
 
 class FlowIdleInjectSpec extends AkkaSpec {
 
-  val settings = ActorMaterializerSettings(system).withInputBuffer(
-      initialSize = 2, maxSize = 16)
+  val settings = ActorMaterializerSettings(system)
+    .withInputBuffer(initialSize = 2, maxSize = 16)
 
   implicit val materializer = ActorMaterializer(settings)
 
   "keepAlive" must {
 
-    "not emit additional elements if upstream is fast enough" in Utils.assertAllStagesStopped {
-      Await.result(Source(1 to 10)
-                     .keepAlive(1.second, () ⇒ 0)
-                     .grouped(1000)
-                     .runWith(Sink.head),
-                   3.seconds) should ===(1 to 10)
-    }
+    "not emit additional elements if upstream is fast enough" in Utils
+      .assertAllStagesStopped {
+        Await.result(
+          Source(1 to 10)
+            .keepAlive(1.second, () ⇒ 0)
+            .grouped(1000)
+            .runWith(Sink.head),
+          3.seconds) should ===(1 to 10)
+      }
 
-    "emit elements periodically after silent periods" in Utils.assertAllStagesStopped {
-      val sourceWithIdleGap =
-        Source(1 to 5) ++ Source(6 to 10).initialDelay(2.second)
+    "emit elements periodically after silent periods" in Utils
+      .assertAllStagesStopped {
+        val sourceWithIdleGap =
+          Source(1 to 5) ++ Source(6 to 10).initialDelay(2.second)
 
-      val result =
-        Await.result(sourceWithIdleGap
-                       .keepAlive(0.6.seconds, () ⇒ 0)
-                       .grouped(1000)
-                       .runWith(Sink.head),
-                     3.seconds) should ===(
-            List(1, 2, 3, 4, 5, 0, 0, 0, 6, 7, 8, 9, 10))
-    }
+        val result =
+          Await.result(
+            sourceWithIdleGap
+              .keepAlive(0.6.seconds, () ⇒ 0)
+              .grouped(1000)
+              .runWith(Sink.head),
+            3.seconds) should ===(List(1, 2, 3, 4, 5, 0, 0, 0, 6, 7, 8, 9, 10))
+      }
 
     "immediately pull upstream" in {
       val upstream = TestPublisher.probe[Int]()

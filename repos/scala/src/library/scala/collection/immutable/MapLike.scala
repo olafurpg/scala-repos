@@ -76,7 +76,9 @@ trait MapLike[A, +B, +This <: MapLike[A, B, This] with Map[A, B]]
     *  @return A new map with the new bindings added to this map.
     */
   override def +[B1 >: B](
-      elem1: (A, B1), elem2: (A, B1), elems: (A, B1)*): immutable.Map[A, B1] =
+      elem1: (A, B1),
+      elem2: (A, B1),
+      elems: (A, B1)*): immutable.Map[A, B1] =
     this + elem1 + elem2 ++ elems
 
   /** Adds a number of elements provided by a traversable object
@@ -111,7 +113,8 @@ trait MapLike[A, +B, +This <: MapLike[A, B, This] with Map[A, B]]
   override def keySet: immutable.Set[A] = new ImmutableDefaultKeySet
 
   protected class ImmutableDefaultKeySet
-      extends super.DefaultKeySet with immutable.Set[A] {
+      extends super.DefaultKeySet
+      with immutable.Set[A] {
     override def +(elem: A): immutable.Set[A] =
       if (this(elem)) this
       else immutable.Set[A]() ++ this + elem

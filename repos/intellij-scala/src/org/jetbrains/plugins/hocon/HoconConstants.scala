@@ -9,8 +9,8 @@ object HoconConstants {
   final val FileQualifier = "file("
   final val ClasspathQualifier = "classpath("
 
-  final val IncludeQualifiers = Set(
-      UrlQualifier, ClasspathQualifier, FileQualifier)
+  final val IncludeQualifiers =
+    Set(UrlQualifier, ClasspathQualifier, FileQualifier)
   final val IntegerPattern = """-?(0|[1-9][0-9]*)""".r
   final val DecimalPartPattern = """([0-9]+)((e|E)(\+|-)?[0-9]+)?""".r
   final val ProperlyClosedQuotedString = ".*[^\\\\](\\\\\\\\)*\"".r

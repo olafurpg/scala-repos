@@ -66,7 +66,10 @@ class CategorizingExceptionStatsHandler(
   private[this] val underlying: ExceptionStatsHandler = {
     val mkLabel: Throwable => String = t => categorizer(t).getOrElse(Failures)
     new MultiCategorizingExceptionStatsHandler(
-        mkLabel, _ => Set.empty, sourceFunction, rollup)
+      mkLabel,
+      _ => Set.empty,
+      sourceFunction,
+      rollup)
   }
 
   def record(statsReceiver: StatsReceiver, t: Throwable): Unit =
@@ -137,7 +140,7 @@ private[finagle] class MultiCategorizingExceptionStatsHandler(
 
     val labels: Seq[Seq[String]] = mkSource(t) match {
       case Some(service) => flagLabels :+ Seq(SourcedFailures, service)
-      case None => flagLabels
+      case None          => flagLabels
     }
 
     val paths: Seq[Seq[String]] = statPaths(t, labels, rollup)

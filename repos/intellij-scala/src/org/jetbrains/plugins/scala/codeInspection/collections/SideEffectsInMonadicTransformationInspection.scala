@@ -16,9 +16,9 @@ class SideEffectsInMonadicTransformationInspection
       exprsWithSideEffects(arg).foreach {
         case expr =>
           holder.registerProblem(
-              expr,
-              InspectionBundle.message("side.effects.in.monadic"),
-              highlightType)
+            expr,
+            InspectionBundle.message("side.effects.in.monadic"),
+            highlightType)
       }
   }
 

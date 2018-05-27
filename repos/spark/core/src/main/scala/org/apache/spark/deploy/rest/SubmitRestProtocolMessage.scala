@@ -20,7 +20,11 @@ package org.apache.spark.deploy.rest
 import com.fasterxml.jackson.annotation._
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility
 import com.fasterxml.jackson.annotation.JsonInclude.Include
-import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper, SerializationFeature}
+import com.fasterxml.jackson.databind.{
+  DeserializationFeature,
+  ObjectMapper,
+  SerializationFeature
+}
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import org.json4s.JsonAST._
 import org.json4s.jackson.JsonMethods._
@@ -38,7 +42,8 @@ import org.apache.spark.util.Utils
   */
 @JsonInclude(Include.NON_NULL)
 @JsonAutoDetect(
-    getterVisibility = Visibility.ANY, setterVisibility = Visibility.ANY)
+  getterVisibility = Visibility.ANY,
+  setterVisibility = Visibility.ANY)
 @JsonPropertyOrder(alphabetic = true)
 private[rest] abstract class SubmitRestProtocolMessage {
   @JsonIgnore
@@ -69,7 +74,8 @@ private[rest] abstract class SubmitRestProtocolMessage {
     } catch {
       case e: Exception =>
         throw new SubmitRestProtocolException(
-            s"Validation of message $messageType failed!", e)
+          s"Validation of message $messageType failed!",
+          e)
     }
   }
 
@@ -77,7 +83,7 @@ private[rest] abstract class SubmitRestProtocolMessage {
   protected def doValidate(): Unit = {
     if (action == null) {
       throw new SubmitRestMissingFieldException(
-          s"The action field is missing in $messageType")
+        s"The action field is missing in $messageType")
     }
   }
 
@@ -85,7 +91,7 @@ private[rest] abstract class SubmitRestProtocolMessage {
   protected def assertFieldIsSet[T](value: T, name: String): Unit = {
     if (value == null) {
       throw new SubmitRestMissingFieldException(
-          s"'$name' is missing in message $messageType.")
+        s"'$name' is missing in message $messageType.")
     }
   }
 
@@ -122,7 +128,7 @@ private[spark] object SubmitRestProtocolMessage {
     }
     value.getOrElse {
       throw new SubmitRestMissingFieldException(
-          s"Action field not found in JSON:\n$json")
+        s"Action field not found in JSON:\n$json")
     }
   }
 
@@ -137,8 +143,7 @@ private[spark] object SubmitRestProtocolMessage {
     val className = parseAction(json)
     val clazz = Utils
       .classForName(packagePrefix + "." + className)
-      .asSubclass[SubmitRestProtocolMessage](
-          classOf[SubmitRestProtocolMessage])
+      .asSubclass[SubmitRestProtocolMessage](classOf[SubmitRestProtocolMessage])
     fromJson(json, clazz)
   }
 
@@ -150,7 +155,8 @@ private[spark] object SubmitRestProtocolMessage {
     * represents custom user-defined messages.
     */
   def fromJson[T <: SubmitRestProtocolMessage](
-      json: String, clazz: Class[T]): T = {
+      json: String,
+      clazz: Class[T]): T = {
     mapper.readValue(json, clazz)
   }
 }

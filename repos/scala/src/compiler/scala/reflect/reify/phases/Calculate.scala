@@ -16,10 +16,10 @@ trait Calculate { self: Reifier =>
   implicit class RichCalculateType(tpe: Type) {
     def isLocalToReifee =
       tpe != null &&
-      (tpe exists
+        (tpe exists
           (tp =>
-                (localSymbols contains tp.typeSymbol) ||
-                (localSymbols contains tp.termSymbol)))
+            (localSymbols contains tp.typeSymbol) ||
+              (localSymbols contains tp.termSymbol)))
   }
 
   private def localSymbols: Map[Symbol, Int] =
@@ -29,9 +29,10 @@ trait Calculate { self: Reifier =>
   private def registerLocalSymbol(sym: Symbol, metalevel: Int): Unit =
     if (sym != null && sym != NoSymbol) {
       if (localSymbols contains sym)
-        assert(localSymbols(sym) == metalevel,
-               "metalevel mismatch: expected %s, actual %s".format(
-                   localSymbols(sym), metalevel))
+        assert(
+          localSymbols(sym) == metalevel,
+          "metalevel mismatch: expected %s, actual %s"
+            .format(localSymbols(sym), metalevel))
       else localSymbols += (sym -> metalevel)
     }
 
@@ -45,12 +46,13 @@ trait Calculate { self: Reifier =>
     override def traverse(tree: Tree): Unit = tree match {
       case TreeSplice(_) =>
         currMetalevel -= 1
-        try super.traverse(tree) finally currMetalevel += 1
+        try super.traverse(tree)
+        finally currMetalevel += 1
       case tree if tree.isDef =>
         if (reifyDebug)
           println(
-              "boundSym: %s of type %s".format(
-                  tree.symbol, (tree.productIterator.toList collect {
+            "boundSym: %s of type %s"
+              .format(tree.symbol, (tree.productIterator.toList collect {
                 case tt: TypeTree => tt
               }).headOption.getOrElse(TypeTree(tree.tpe))))
         registerLocalSymbol(tree.symbol, currMetalevel)
@@ -66,7 +68,7 @@ trait Calculate { self: Reifier =>
         Some(tree) collect {
           case labelDef: LabelDef =>
             labelDef.params foreach
-            (param => bindRelatedSymbol(param.symbol, "labelParam"))
+              (param => bindRelatedSymbol(param.symbol, "labelParam"))
         }
         def bindRelatedSymbol(related: Symbol, name: String): Unit =
           if (related != null && related != NoSymbol) {

@@ -19,8 +19,9 @@ class BufInputStreamTest extends FunSuite {
 
   test("available") {
     val is = new BufInputStream(fileBuf)
-    assert(is.available() == fileString.length(),
-           "Returned incorrect number of available bytes")
+    assert(
+      is.available() == fileString.length(),
+      "Returned incorrect number of available bytes")
   }
 
   test("close") {
@@ -75,8 +76,8 @@ class BufInputStreamTest extends FunSuite {
     val c = is.read()
     is.reset()
     assert(
-        c == fileString.charAt(0),
-        "read returned incorrect char %s %s".format(c, fileString.charAt(0)))
+      c == fileString.charAt(0),
+      "read returned incorrect char %s %s".format(c, fileString.charAt(0)))
   }
 
   test("read") {
@@ -172,7 +173,8 @@ class BufInputStreamTest extends FunSuite {
     val c = is.read(array, 0, array.length)
     assert(c == fileBuf.length, "Stream should have been exhausted")
     assert(is.read(array, c, 0) == -1, "Stream should have repored exhaustion")
-    assert(is.read(array, c, array.length - c) == -1,
-           "Stream should have repored exhaustion")
+    assert(
+      is.read(array, c, array.length - c) == -1,
+      "Stream should have repored exhaustion")
   }
 }

@@ -15,19 +15,19 @@ class SizeToLengthTest extends OperationsOnCollectionInspectionTest {
     doTest(s"""|"".${START}size$END""".stripMargin, "\"\".size", "\"\".length")
 
     doTest(
-        s"""
+      s"""
          |object Foo {
          |  val s = ""
          |  s.${START}size$END
          |}
        """.stripMargin,
-        """
+      """
          |object Foo {
          |  val s = ""
          |  s.size
          |}
        """.stripMargin,
-        """
+      """
         |object Foo {
         |  val s = ""
         |  s.length
@@ -37,28 +37,30 @@ class SizeToLengthTest extends OperationsOnCollectionInspectionTest {
   }
 
   def testArray(): Unit = {
-    doTest(s"Array(1, 2).${START}size$END",
-           "Array(1, 2).size",
-           "Array(1, 2).length")
-
-    doTest(s"Seq(1, 2).toArray.${START}size$END",
-           "Seq(1, 2).toArray.size",
-           "Seq(1, 2).toArray.length")
+    doTest(
+      s"Array(1, 2).${START}size$END",
+      "Array(1, 2).size",
+      "Array(1, 2).length")
 
     doTest(
-        s"""
+      s"Seq(1, 2).toArray.${START}size$END",
+      "Seq(1, 2).toArray.size",
+      "Seq(1, 2).toArray.length")
+
+    doTest(
+      s"""
          |object Foo {
          |  val arr = Array(1, 2)
          |  arr.${START}size$END
          |}
        """.stripMargin,
-        """
+      """
         |object Foo {
         |  val arr = Array(1, 2)
         |  arr.size
         |}
       """.stripMargin,
-        """
+      """
         |object Foo {
         |  val arr = Array(1, 2)
         |  arr.length

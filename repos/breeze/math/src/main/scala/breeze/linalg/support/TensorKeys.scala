@@ -21,10 +21,11 @@ package support
   * @author dlwh
   */
 class TensorKeys[K, V, +This](
-    private val tensor: This, active: Boolean = false, f: K => Boolean = {
-  (k: K) =>
-    true
-})(implicit ev: This <:< Tensor[K, V]) {
+    private val tensor: This,
+    active: Boolean = false,
+    f: K => Boolean = { (k: K) =>
+      true
+    })(implicit ev: This <:< Tensor[K, V]) {
   def size = tensor.size
   def iterator = {
     if (active) tensor.activeKeysIterator else tensor.keysIterator

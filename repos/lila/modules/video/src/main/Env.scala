@@ -6,10 +6,11 @@ import scala.concurrent.duration._
 
 import lila.common.PimpedConfig._
 
-final class Env(config: Config,
-                scheduler: lila.common.Scheduler,
-                db: lila.db.Env,
-                isDev: Boolean) {
+final class Env(
+    config: Config,
+    scheduler: lila.common.Scheduler,
+    db: lila.db.Env,
+    isDev: Boolean) {
 
   private val settings = new {
     val CollectionVideo = config getString "collection.video"
@@ -27,10 +28,11 @@ final class Env(config: Config,
 
   private lazy val sheet = new Sheet(url = SheetUrl, api = api)
 
-  private lazy val youtube = new Youtube(url = YoutubeUrl,
-                                         apiKey = YoutubeApiKey,
-                                         max = YoutubeMax,
-                                         api = api)
+  private lazy val youtube = new Youtube(
+    url = YoutubeUrl,
+    apiKey = YoutubeApiKey,
+    max = YoutubeMax,
+    api = api)
 
   if (!isDev) {
     scheduler.effect(SheetDelay, "video update from sheet") {
@@ -49,8 +51,9 @@ final class Env(config: Config,
 object Env {
 
   lazy val current: Env =
-    "video" boot new Env(config = lila.common.PlayApp loadConfig "video",
-                         scheduler = lila.common.PlayApp.scheduler,
-                         isDev = lila.common.PlayApp.isDev,
-                         db = lila.db.Env.current)
+    "video" boot new Env(
+      config = lila.common.PlayApp loadConfig "video",
+      scheduler = lila.common.PlayApp.scheduler,
+      isDev = lila.common.PlayApp.isDev,
+      db = lila.db.Env.current)
 }

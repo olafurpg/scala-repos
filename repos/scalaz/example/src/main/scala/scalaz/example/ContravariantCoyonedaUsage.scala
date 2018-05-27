@@ -19,11 +19,12 @@ import scalaz.syntax.std.string._
 object ContravariantCoyonedaUsage extends App {
   // Suppose I have some unstructured data.
   val unstructuredData: List[Vector[String]] = List(
-      Vector("Zürich", "807", "383,708"),
-      Vector("東京", "1868", "13,185,502"),
-      Vector("Brisbane", "1824-09-13", "2,189,878"),
-      Vector("München", "1158", "1,388,308"),
-      Vector("Boston", "1630-09-07", "636,479"))
+    Vector("Zürich", "807", "383,708"),
+    Vector("東京", "1868", "13,185,502"),
+    Vector("Brisbane", "1824-09-13", "2,189,878"),
+    Vector("München", "1158", "1,388,308"),
+    Vector("Boston", "1630-09-07", "636,479")
+  )
 
   // Or, really, maybe it has some structure.  That’s not important.
   // What matters is, I want to sort the data according to various
@@ -52,7 +53,7 @@ object ContravariantCoyonedaUsage extends App {
 
   def parseCommaNum(s: String): Long \/ String =
     ("""-?[0-9,]+""".r findFirstIn s flatMap
-        (_.filter(_ != ',').parseLong.toOption)) <\/ s
+      (_.filter(_ != ',').parseLong.toOption)) <\/ s
 
   def caseInsensitively(s: String): String =
     s.toUpperCase.toLowerCase
@@ -90,8 +91,7 @@ object ContravariantCoyonedaUsage extends App {
   // functions, it can make a great deal of difference.  So we use the
   // Schwartzian transform:
 
-  def schwartzian[A, B](xs: List[A])(f: A => B)(
-      implicit B: Order[B]): List[A] =
+  def schwartzian[A, B](xs: List[A])(f: A => B)(implicit B: Order[B]): List[A] =
     xs.map(a => (a, f(a))).sortBy(_._2)(B.toScalaOrdering).map(_._1)
 
   def nonschwartzian[A, B](xs: List[A])(f: A => B)(
@@ -113,9 +113,10 @@ object ContravariantCoyonedaUsage extends App {
   // by particular elements of the data above.
 
   val byDirectSorts: List[List[Vector[String]]] = List(
-      schwartzian(unstructuredData)(v => caseInsensitively(v(0))),
-      schwartzian(unstructuredData)(v => parseDate(v(1))),
-      schwartzian(unstructuredData)(v => parseCommaNum(v(2))))
+    schwartzian(unstructuredData)(v => caseInsensitively(v(0))),
+    schwartzian(unstructuredData)(v => parseDate(v(1))),
+    schwartzian(unstructuredData)(v => parseCommaNum(v(2)))
+  )
 
   // Something interesting happens when you try to abstract over the
   // sort key function, though:
@@ -135,8 +136,8 @@ object ContravariantCoyonedaUsage extends App {
   // Fails to compile with the given type error.  That’s because the
   // type of that list of sort key functions and indexes is:
 
-  val untypedSortKeys: List[(String => java.io.Serializable, Int)] = List(
-      (caseInsensitively _, 0), (parseDate _, 1), (parseCommaNum _, 2))
+  val untypedSortKeys: List[(String => java.io.Serializable, Int)] =
+    List((caseInsensitively _, 0), (parseDate _, 1), (parseCommaNum _, 2))
 
   // The problem is that the return type for each sort key is different,
   // and is an absolutely essential part of the sort process.  Check
@@ -149,9 +150,7 @@ object ContravariantCoyonedaUsage extends App {
   // result’s ordering.  That’s what happens here:
 
   val byOrdListSorts: List[List[Vector[String]]] = for {
-    (ord, i) <- List((caseInsensitivelyOrd, 0),
-                     (dateOrd, 1),
-                     (numerically2, 2))
+    (ord, i) <- List((caseInsensitivelyOrd, 0), (dateOrd, 1), (numerically2, 2))
   } yield unstructuredData.sortBy(v => v(i))(ord.toScalaOrdering)
 
   // We can no longer use `schwartzian', though, because there is no
@@ -192,9 +191,9 @@ object ContravariantCoyonedaUsage extends App {
   // calls.
 
   val decomposedSortKeys: List[(CtCoyo[Order, String], Int)] = List(
-      (CCOrder(caseInsensitively), 0),
-      (CCOrder(parseDate), 1),
-      (numerically4, 2))
+    (CCOrder(caseInsensitively), 0),
+    (CCOrder(parseDate), 1),
+    (numerically4, 2))
 
   // Now we’re ready.
 
@@ -210,8 +209,8 @@ object ContravariantCoyonedaUsage extends App {
   val bySchwartzianListSortsTP: List[List[Vector[String]]] = for {
     (ccord, i) <- decomposedSortKeys
   } yield
-    (schwartzian[Vector[String], ccord.I](unstructuredData)(
-        v => ccord.k(v(i)))(ccord.fi))
+    (schwartzian[Vector[String], ccord.I](unstructuredData)(v => ccord.k(v(i)))(
+      ccord.fi))
 
   // `I' is the “pivot”, how the function `k' result type and `fi'
   // order type relate to each other.  As seen above, this existential
@@ -244,23 +243,24 @@ object ContravariantCoyonedaUsage extends App {
   // With a sample specification that sorts the columns left-to-right,
   // with the sort key associations we’ve been using.
 
-  val mainLtoRsort: SortSpec = List(
-      (SortType.CI, 0), (SortType.Dateish, 1), (SortType.Num, 2))
+  val mainLtoRsort: SortSpec =
+    List((SortType.CI, 0), (SortType.Dateish, 1), (SortType.Num, 2))
 
   // It’s simple enough to “interpret” each `SortType' to a
   // contravariant co-Yoneda Order.
 
   def sortTypeOrd(s: SortType): CtCoyo[Order, String] = s match {
-    case SortType.CI => CCOrder(caseInsensitively)
+    case SortType.CI      => CCOrder(caseInsensitively)
     case SortType.Dateish => CCOrder(parseDate)
-    case SortType.Num => CCOrder(parseCommaNum) // like numerically4
+    case SortType.Num     => CCOrder(parseCommaNum) // like numerically4
   }
 
   // And then, similarly to `bySchwartzianListSorts', to combine one
   // of these `k's with a Vector lookup to produce a sort of records.
 
   def recItemOrd(
-      i: Int, o: CtCoyo[Order, String]): CtCoyo[Order, Vector[String]] =
+      i: Int,
+      o: CtCoyo[Order, String]): CtCoyo[Order, Vector[String]] =
     o contramap (v => v(i))
 
   // Now what?  A `SortSpec' has several such values in it; how do we
@@ -299,8 +299,9 @@ object ContravariantCoyonedaUsage extends App {
   // type member in each case.  We’ll drop it entirely when using
   // these functions.
 
-  def ordFanout[A](l: CtCoyo[Order, A],
-                   r: CtCoyo[Order, A]): CtCoyo.Aux[Order, A, (l.I, r.I)] = {
+  def ordFanout[A](
+      l: CtCoyo[Order, A],
+      r: CtCoyo[Order, A]): CtCoyo.Aux[Order, A, (l.I, r.I)] = {
     implicit val lfi: Order[l.I] = l.fi
     implicit val rfi: Order[r.I] = r.fi
     CCOrder(l.k &&& r.k)
@@ -315,18 +316,20 @@ object ContravariantCoyonedaUsage extends App {
       ordFanout(recItemOrd(i, sortTypeOrd(st)), acc)
     }
 
-  def sortDataBy(xs: List[Vector[String]], o: SortSpec): List[Vector[String]] = {
+  def sortDataBy(
+      xs: List[Vector[String]],
+      o: SortSpec): List[Vector[String]] = {
     val coyo = sortSpecOrd(o)
     schwartzian(xs)(coyo.k)(coyo.fi)
   }
 
-  val sortedBySpec: List[Vector[String]] = sortDataBy(
-      unstructuredData, mainLtoRsort)
+  val sortedBySpec: List[Vector[String]] =
+    sortDataBy(unstructuredData, mainLtoRsort)
 
   println("sortedBySpec: " |+| sortedBySpec.shows)
 
-  val sortedByNonCity: List[Vector[String]] = sortDataBy(
-      unstructuredData, mainLtoRsort.tail)
+  val sortedByNonCity: List[Vector[String]] =
+    sortDataBy(unstructuredData, mainLtoRsort.tail)
 
   println("sortedByNonCity: " |+| sortedByNonCity.shows)
 
@@ -362,16 +365,16 @@ object ContravariantCoyonedaUsage extends App {
   val mainLtoRcoyo: CtCoyo[Order, Vector[String]] = sortSpecOrd(mainLtoRsort)
 
   val mainLtoRtailcoyo: CtCoyo[Order, Vector[String]] = sortSpecOrd(
-      mainLtoRsort.tail)
+    mainLtoRsort.tail)
 
   println(
-      "list of mainLtoRcoyo.I: " |+| unstructuredData
-        .map(r => mainLtoRcoyo.k(r).toString)
-        .shows)
+    "list of mainLtoRcoyo.I: " |+| unstructuredData
+      .map(r => mainLtoRcoyo.k(r).toString)
+      .shows)
   println(
-      "list of mainLtoRtailcoyo.I: " |+| unstructuredData
-        .map(r => mainLtoRtailcoyo.k(r).toString)
-        .shows)
+    "list of mainLtoRtailcoyo.I: " |+| unstructuredData
+      .map(r => mainLtoRtailcoyo.k(r).toString)
+      .shows)
 
   // Digression: the monoid
   // ----------------------
@@ -392,9 +395,9 @@ object ContravariantCoyonedaUsage extends App {
   val mainLtoRcoyoL: CtCoyo[Order, Vector[String]] = sortSpecOrdL(mainLtoRsort)
 
   println(
-      "list of mainLtoRcoyoL.I: " |+| unstructuredData
-        .map(r => mainLtoRcoyoL.k(r).toString)
-        .shows)
+    "list of mainLtoRcoyoL.I: " |+| unstructuredData
+      .map(r => mainLtoRcoyoL.k(r).toString)
+      .shows)
 
   // Now the type looks like this:
   //
@@ -477,10 +480,12 @@ object ContravariantCoyonedaUsage extends App {
     implicit def descOption[A](implicit a: Binfmt[A]): Binfmt[Option[A]] =
       Binfmt("?<" |+| a.describe |+| ">")
     implicit def desc_\/[A, B](
-        implicit a: Binfmt[A], b: Binfmt[B]): Binfmt[A \/ B] =
+        implicit a: Binfmt[A],
+        b: Binfmt[B]): Binfmt[A \/ B] =
       Binfmt("<" |+| a.describe |+| "\\/" |+| b.describe |+| ">")
     implicit def desc2Tuple[A, B](
-        implicit a: Binfmt[A], b: Binfmt[B]): Binfmt[(A, B)] =
+        implicit a: Binfmt[A],
+        b: Binfmt[B]): Binfmt[(A, B)] =
       Binfmt(a.describe |+| b.describe)
   }
 
@@ -499,14 +504,14 @@ object ContravariantCoyonedaUsage extends App {
 
   type BinOrd[A] = (Binfmt[A], Order[A])
 
-  def CCBinOrd[A, B](f: A => B)(
-      implicit b: Binfmt[B], o: Order[B]): CtCoyo.Aux[BinOrd, A, B] =
+  def CCBinOrd[A, B](
+      f: A => B)(implicit b: Binfmt[B], o: Order[B]): CtCoyo.Aux[BinOrd, A, B] =
     CtCoyo[BinOrd, A, B]((b, o))(f)
 
   def sortTypeBinOrd(s: SortType): CtCoyo[BinOrd, String] = s match {
-    case SortType.CI => CCBinOrd(caseInsensitively)
+    case SortType.CI      => CCBinOrd(caseInsensitively)
     case SortType.Dateish => CCBinOrd(parseDate)
-    case SortType.Num => CCBinOrd(parseCommaNum)
+    case SortType.Num     => CCBinOrd(parseCommaNum)
   }
 
   // It turns out that recItemOrd is completely abstract:

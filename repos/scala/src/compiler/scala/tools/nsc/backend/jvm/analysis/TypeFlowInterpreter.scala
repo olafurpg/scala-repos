@@ -14,10 +14,10 @@ abstract class TypeFlowInterpreter extends BasicInterpreter {
 
   def isRef(tp: Type) =
     tp != null &&
-    (tp.getSort match {
-          case Type.OBJECT | Type.ARRAY => true
-          case _ => false
-        })
+      (tp.getSort match {
+        case Type.OBJECT | Type.ARRAY => true
+        case _                        => false
+      })
 
   def refLub(a: BasicValue, b: BasicValue): BasicValue
 

@@ -22,7 +22,7 @@ object H5Implicits {
   /**
     * Provides enrichment on Frame object for writing to an HDF5 file.
     */
-  implicit def frame2H5Writer[RX : ST : ORD, CX : ST : ORD, T : ST](
+  implicit def frame2H5Writer[RX: ST: ORD, CX: ST: ORD, T: ST](
       frame: Frame[RX, CX, T]) = new {
 
     /**

@@ -46,8 +46,8 @@ object SnapshotParameters {
   *
   * @since 2.2
   */
-class SnapshotParameters(
-    override val delegate: jfxs.SnapshotParameters = new jfxs.SnapshotParameters)
+class SnapshotParameters(override val delegate: jfxs.SnapshotParameters =
+  new jfxs.SnapshotParameters)
     extends SFXDelegate[jfxs.SnapshotParameters] {
 
   /**

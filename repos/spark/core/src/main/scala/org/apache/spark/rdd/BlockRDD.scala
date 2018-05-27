@@ -27,8 +27,9 @@ private[spark] class BlockRDDPartition(val blockId: BlockId, idx: Int)
   val index = idx
 }
 
-private[spark] class BlockRDD[T : ClassTag](
-    sc: SparkContext, @transient val blockIds: Array[BlockId])
+private[spark] class BlockRDD[T: ClassTag](
+    sc: SparkContext,
+    @transient val blockIds: Array[BlockId])
     extends RDD[T](sc, Nil) {
 
   @transient lazy val _locations =
@@ -38,9 +39,8 @@ private[spark] class BlockRDD[T : ClassTag](
   override def getPartitions: Array[Partition] = {
     assertValid()
     (0 until blockIds.length)
-      .map(i =>
-            {
-          new BlockRDDPartition(blockIds(i), i).asInstanceOf[Partition]
+      .map(i => {
+        new BlockRDDPartition(blockIds(i), i).asInstanceOf[Partition]
       })
       .toArray
   }
@@ -53,7 +53,7 @@ private[spark] class BlockRDD[T : ClassTag](
       case Some(block) => block.data.asInstanceOf[Iterator[T]]
       case None =>
         throw new Exception(
-            "Could not compute split, block " + blockId + " not found")
+          "Could not compute split, block " + blockId + " not found")
     }
   }
 
@@ -86,8 +86,8 @@ private[spark] class BlockRDD[T : ClassTag](
   private[spark] def assertValid() {
     if (!isValid) {
       throw new SparkException(
-          "Attempted to use %s after its blocks have been removed!".format(
-              toString))
+        "Attempted to use %s after its blocks have been removed!".format(
+          toString))
     }
   }
 

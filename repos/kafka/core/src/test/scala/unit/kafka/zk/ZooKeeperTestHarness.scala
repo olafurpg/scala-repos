@@ -5,7 +5,7 @@
   * The ASF licenses this file to You under the Apache License, Version 2.0
   * (the "License"); you may not use this file except in compliance with
   * the License.  You may obtain a copy of the License at
-  * 
+  *
   *    http://www.apache.org/licenses/LICENSE-2.0
   *
   * Unless required by applicable law or agreed to in writing, software
@@ -39,8 +39,8 @@ object FourLetterWords {
       outstream.flush
     } catch {
       case e: SocketTimeoutException => {
-          throw new IOException("Exception while sending 4lw")
-        }
+        throw new IOException("Exception while sending 4lw")
+      }
     } finally {
       sock.close
       if (reader != null) reader.close
@@ -62,10 +62,11 @@ trait ZooKeeperTestHarness extends JUnitSuite with Logging {
   def setUp() {
     zookeeper = new EmbeddedZookeeper()
     zkPort = zookeeper.port
-    zkUtils = ZkUtils(zkConnect,
-                      zkSessionTimeout,
-                      zkConnectionTimeout,
-                      JaasUtils.isZkSecurityEnabled())
+    zkUtils = ZkUtils(
+      zkConnect,
+      zkSessionTimeout,
+      zkConnectionTimeout,
+      JaasUtils.isZkSecurityEnabled())
   }
 
   @After
@@ -79,9 +80,9 @@ trait ZooKeeperTestHarness extends JUnitSuite with Logging {
         FourLetterWords.sendStat("127.0.0.1", zkPort, 3000)
       } catch {
         case _: Throwable => {
-            info("Server is down")
-            isDown = true
-          }
+          info("Server is down")
+          isDown = true
+        }
       }
     }
     Configuration.setConfiguration(null)

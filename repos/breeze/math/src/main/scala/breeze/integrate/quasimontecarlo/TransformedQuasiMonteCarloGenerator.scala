@@ -80,8 +80,7 @@ trait ProvidesTransformedQuasiMonteCarlo {
     }
   }
 
-  case class GammaQuasiRandomVariableSpecAlphaLeq1(
-      alpha: Double, theta: Double)
+  case class GammaQuasiRandomVariableSpecAlphaLeq1(alpha: Double, theta: Double)
       extends RejectionSampledGammaQuasiRandomVariable {
     /*
      * Uses Algorithm 1 from http://home.iitk.ac.in/~kundu/paper120.pdf.
@@ -102,7 +101,7 @@ trait ProvidesTransformedQuasiMonteCarlo {
       x = -2 * math.log(1 - math.pow(u, one_over_alpha))
       val exp_minus_x_over_two = math.exp(-0.5 * x)
       v <= (math.pow(x, alpha - 1) * exp_minus_x_over_two) /
-      (two_to_alpha_minus_one * math.pow(1 - exp_minus_x_over_two, alpha - 1))
+        (two_to_alpha_minus_one * math.pow(1 - exp_minus_x_over_two, alpha - 1))
     }
 
     def compute(rvs: Array[Double], position: Int): Double = (theta * x)
@@ -110,8 +109,7 @@ trait ProvidesTransformedQuasiMonteCarlo {
     def copy = GammaQuasiRandomVariableSpecAlphaLeq1(alpha, theta)
   }
 
-  case class GammaQuasiRandomVariableSpecAlphaGeq1(
-      alpha: Double, theta: Double)
+  case class GammaQuasiRandomVariableSpecAlphaGeq1(alpha: Double, theta: Double)
       extends RejectionSampledGammaQuasiRandomVariable {
     /*
      * Uses Algorithm 8 from http://arxiv.org/pdf/1403.5599.pdf
@@ -169,19 +167,19 @@ trait ProvidesTransformedQuasiMonteCarlo {
         val next = baseGenerator.getNextUnsafe
         var inputPosition = 0
         var i = 0
-        while ( (i < dimension) && accepted) {
+        while ((i < dimension) && accepted) {
           variables(i) match {
             case (v: TransformingQuasiRandomVariableSpec) => {
-                currentValue(i) = v.transform(next, inputPosition)
-              }
+              currentValue(i) = v.transform(next, inputPosition)
+            }
             case (v: RejectionQuasiRandomVariableSpec) => {
-                if (v.accept(next, inputPosition)) {
-                  currentValue(i) = v.compute(next, inputPosition)
-                } else {
-                  rejectedCount(i) = rejectedCount(i) + 1
-                  accepted = false
-                }
+              if (v.accept(next, inputPosition)) {
+                currentValue(i) = v.compute(next, inputPosition)
+              } else {
+                rejectedCount(i) = rejectedCount(i) + 1
+                accepted = false
               }
+            }
           }
           inputPosition = inputPosition + variables(i).numInputs
           i = i + 1

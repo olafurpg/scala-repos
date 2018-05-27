@@ -64,9 +64,10 @@ class ServiceRegistry extends Actor with ActorLogging {
 
   override def preStart(): Unit = {
     replicator ! Subscribe(AllServicesKey, self)
-    cluster.subscribe(self,
-                      ClusterEvent.InitialStateAsEvents,
-                      classOf[ClusterEvent.LeaderChanged])
+    cluster.subscribe(
+      self,
+      ClusterEvent.InitialStateAsEvents,
+      classOf[ClusterEvent.LeaderChanged])
   }
 
   override def postStop(): Unit = {
@@ -89,7 +90,9 @@ class ServiceRegistry extends Actor with ActorLogging {
     case c @ Changed(AllServicesKey) ⇒
       val newKeys = c.get(AllServicesKey).elements
       log.debug(
-          "Services changed, added: {}, all: {}", (newKeys -- keys), newKeys)
+        "Services changed, added: {}, all: {}",
+        (newKeys -- keys),
+        newKeys)
       (newKeys -- keys).foreach { dKey ⇒
         // subscribe to get notifications of when services with this name are added or removed
         replicator ! Subscribe(dKey, self)

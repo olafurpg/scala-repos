@@ -17,7 +17,12 @@
 
 package org.apache.spark.rdd
 
-import org.apache.spark.{Partition, SharedSparkContext, SparkFunSuite, TaskContext}
+import org.apache.spark.{
+  Partition,
+  SharedSparkContext,
+  SparkFunSuite,
+  TaskContext
+}
 
 class PartitionPruningRDDSuite extends SparkFunSuite with SharedSparkContext {
 
@@ -25,9 +30,10 @@ class PartitionPruningRDDSuite extends SparkFunSuite with SharedSparkContext {
 
     val rdd = new RDD[Int](sc, Nil) {
       override protected def getPartitions = {
-        Array[Partition](new TestPartition(0, 1),
-                         new TestPartition(1, 1),
-                         new TestPartition(2, 1))
+        Array[Partition](
+          new TestPartition(0, 1),
+          new TestPartition(1, 1),
+          new TestPartition(2, 1))
       }
 
       def compute(split: Partition, context: TaskContext) = {
@@ -45,9 +51,10 @@ class PartitionPruningRDDSuite extends SparkFunSuite with SharedSparkContext {
 
     val rdd = new RDD[Int](sc, Nil) {
       override protected def getPartitions = {
-        Array[Partition](new TestPartition(0, 4),
-                         new TestPartition(1, 5),
-                         new TestPartition(2, 6))
+        Array[Partition](
+          new TestPartition(0, 4),
+          new TestPartition(1, 5),
+          new TestPartition(2, 6))
       }
 
       def compute(split: Partition, context: TaskContext) = {

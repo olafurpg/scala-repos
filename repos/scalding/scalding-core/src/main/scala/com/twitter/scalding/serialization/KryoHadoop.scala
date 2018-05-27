@@ -24,7 +24,11 @@ import com.twitter.scalding.Args
 
 import com.twitter.chill.algebird._
 import com.twitter.chill.config.Config
-import com.twitter.chill.{SingletonSerializer, ScalaKryoInstantiator, KryoInstantiator}
+import com.twitter.chill.{
+  SingletonSerializer,
+  ScalaKryoInstantiator,
+  KryoInstantiator
+}
 
 class KryoHadoop(@transient config: Config) extends KryoInstantiator {
   // keeping track of references is costly for memory, and often triggers OOM on Hadoop
@@ -48,34 +52,45 @@ class KryoHadoop(@transient config: Config) extends KryoInstantiator {
     newK.register(classOf[DateRange], new DateRangeSerializer())
     newK.register(classOf[Args], new ArgsSerializer)
     // Some of the monoids from Algebird that we use:
-    newK.register(classOf[com.twitter.algebird.AveragedValue],
-                  new AveragedValueSerializer)
     newK.register(
-        classOf[com.twitter.algebird.DecayedValue], new DecayedValueSerializer)
-    newK.register(classOf[com.twitter.algebird.HyperLogLogMonoid],
-                  new HLLMonoidSerializer)
+      classOf[com.twitter.algebird.AveragedValue],
+      new AveragedValueSerializer)
+    newK.register(
+      classOf[com.twitter.algebird.DecayedValue],
+      new DecayedValueSerializer)
+    newK.register(
+      classOf[com.twitter.algebird.HyperLogLogMonoid],
+      new HLLMonoidSerializer)
     newK.register(classOf[com.twitter.algebird.Moments], new MomentsSerializer)
     newK.addDefaultSerializer(
-        classOf[com.twitter.algebird.HLL], new HLLSerializer)
+      classOf[com.twitter.algebird.HLL],
+      new HLLSerializer)
     // Don't serialize Boxed instances using Kryo.
     newK.addDefaultSerializer(
-        classOf[com.twitter.scalding.serialization.Boxed[_]],
-        new ThrowingSerializer)
+      classOf[com.twitter.scalding.serialization.Boxed[_]],
+      new ThrowingSerializer)
 
     /**
       * AdaptiveVector is IndexedSeq, which picks up the chill IndexedSeq serializer
       * (which is its own bug), force using the fields serializer here
       */
-    newK.register(classOf[com.twitter.algebird.DenseVector[_]],
-                  new FieldSerializer[com.twitter.algebird.DenseVector[_]](
-                      newK, classOf[com.twitter.algebird.DenseVector[_]]))
+    newK.register(
+      classOf[com.twitter.algebird.DenseVector[_]],
+      new FieldSerializer[com.twitter.algebird.DenseVector[_]](
+        newK,
+        classOf[com.twitter.algebird.DenseVector[_]])
+    )
 
-    newK.register(classOf[com.twitter.algebird.SparseVector[_]],
-                  new FieldSerializer[com.twitter.algebird.SparseVector[_]](
-                      newK, classOf[com.twitter.algebird.SparseVector[_]]))
+    newK.register(
+      classOf[com.twitter.algebird.SparseVector[_]],
+      new FieldSerializer[com.twitter.algebird.SparseVector[_]](
+        newK,
+        classOf[com.twitter.algebird.SparseVector[_]])
+    )
 
-    newK.addDefaultSerializer(classOf[com.twitter.algebird.AdaptiveVector[_]],
-                              classOf[FieldSerializer[_]])
+    newK.addDefaultSerializer(
+      classOf[com.twitter.algebird.AdaptiveVector[_]],
+      classOf[FieldSerializer[_]])
 
     /**
       * Pipes can be swept up into closures inside of case classes.  This can generally
@@ -86,7 +101,8 @@ class KryoHadoop(@transient config: Config) extends KryoInstantiator {
       * is serialized, but that's very expensive.
       */
     newK.addDefaultSerializer(
-        classOf[cascading.pipe.Pipe], new SingletonSerializer(null))
+      classOf[cascading.pipe.Pipe],
+      new SingletonSerializer(null))
 
     newK.setReferences(useRefs)
 

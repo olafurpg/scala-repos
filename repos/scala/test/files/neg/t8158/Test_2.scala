@@ -8,7 +8,7 @@ class BugTest {
   def bug(): Unit = {
     "any" match {
       case X() =>
-      case _ => ???
+      case _   => ???
     }
   }
 }

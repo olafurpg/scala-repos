@@ -11,16 +11,18 @@ final class JUnitTask(val taskDef: TaskDef, runner: JUnitBaseRunner)
 
   def tags: Array[String] = Array.empty
 
-  def execute(eventHandler: EventHandler,
-              loggers: Array[Logger],
-              continuation: Array[Task] => Unit): Unit = {
+  def execute(
+      eventHandler: EventHandler,
+      loggers: Array[Logger],
+      continuation: Array[Task] => Unit): Unit = {
     continuation(execute(eventHandler, loggers))
   }
 
   def execute(
-      eventHandler: EventHandler, loggers: Array[Logger]): Array[Task] = {
-    val richLogger = new RichLogger(
-        loggers, runner.runSettings, taskDef.fullyQualifiedName)
+      eventHandler: EventHandler,
+      loggers: Array[Logger]): Array[Task] = {
+    val richLogger =
+      new RichLogger(loggers, runner.runSettings, taskDef.fullyQualifiedName)
 
     if (runner.runSettings.verbose)
       richLogger.info(c("Test run started", INFO))
@@ -33,19 +35,23 @@ final class JUnitTask(val taskDef: TaskDef, runner: JUnitBaseRunner)
     Try(TestUtils.loadModule(bootstrapperName, runner.testClassLoader)) match {
       case Success(classMetadata: JUnitTestBootstrapper) =>
         new JUnitExecuteTest(
-            taskDef, runner, classMetadata, richLogger, eventHandler)
+          taskDef,
+          runner,
+          classMetadata,
+          richLogger,
+          eventHandler)
           .executeTests()
 
       case Success(_) =>
         richLogger.error(
-            "Error while loading test class: " +
+          "Error while loading test class: " +
             taskDef.fullyQualifiedName + ", expected " + bootstrapperName +
             " to extend JUnitTestBootstrapper")
 
       case Failure(exception) =>
         richLogger.error(
-            "Error while loading test class: " + taskDef.fullyQualifiedName,
-            exception)
+          "Error while loading test class: " + taskDef.fullyQualifiedName,
+          exception)
     }
 
     runner.taskDone()
@@ -56,11 +62,12 @@ final class JUnitTask(val taskDef: TaskDef, runner: JUnitBaseRunner)
       val ignored = runner.taskIgnoredCount
       val total = runner.taskTotalCount
       val msg = Seq(
-          c("Test run finished:", INFO),
-          c(s"$failed failed,", if (failed == 0) INFO else ERRCOUNT),
-          c(s"$ignored ignored,", if (ignored == 0) INFO else IGNCOUNT),
-          c(s"$total total,", INFO),
-          c(s"${time.toDouble / 1000000000}s", INFO))
+        c("Test run finished:", INFO),
+        c(s"$failed failed,", if (failed == 0) INFO else ERRCOUNT),
+        c(s"$ignored ignored,", if (ignored == 0) INFO else IGNCOUNT),
+        c(s"$total total,", INFO),
+        c(s"${time.toDouble / 1000000000}s", INFO)
+      )
       richLogger.info(msg.mkString(" "))
     }
 

@@ -10,8 +10,10 @@ import scala.concurrent._
 import scala.concurrent.duration._
 
 class SearchServiceSpec
-    extends EnsimeSpec with SharedTestKitFixture
-    with SharedSearchServiceFixture with SearchServiceTestUtils {
+    extends EnsimeSpec
+    with SharedTestKitFixture
+    with SharedSearchServiceFixture
+    with SearchServiceTestUtils {
 
   def original = EnsimeConfigFixture.SimpleTestProject
 
@@ -64,68 +66,68 @@ class SearchServiceSpec
   "class searching" should "return results from J2SE" in withSearchService {
     implicit service =>
       searchesClasses(
-          "java.lang.String",
-          "String",
-          "string",
-          "j.l.str",
-          "j l str"
+        "java.lang.String",
+        "String",
+        "string",
+        "j.l.str",
+        "j l str"
       )
   }
 
   it should "return results from dependencies" in withSearchService {
     implicit service =>
       searchesClasses(
-          "org.scalatest.FunSuite",
-          "FunSuite",
-          "funsuite",
-          "funsu",
-          "o s Fun"
+        "org.scalatest.FunSuite",
+        "FunSuite",
+        "funsuite",
+        "funsu",
+        "o s Fun"
       )
   }
 
   it should "return results from the project" in withSearchService {
     implicit service =>
       searchesClasses(
-          "org.example.Bloo",
-          "o e bloo"
+        "org.example.Bloo",
+        "o e bloo"
       )
 
       searchesClasses(
-          "org.example.Blue$",
-          "o e blue"
+        "org.example.Blue$",
+        "o e blue"
       )
 
       searchesClasses(
-          "org.example.CaseClassWithCamelCaseName",
-          "CaseClassWith",
-          "caseclasswith",
-          "o e Case",
-          "o.e.caseclasswith",
-          "CCWC" // <= CamelCaseAwesomeNess
+        "org.example.CaseClassWithCamelCaseName",
+        "CaseClassWith",
+        "caseclasswith",
+        "o e Case",
+        "o.e.caseclasswith",
+        "CCWC" // <= CamelCaseAwesomeNess
       )
   }
 
   it should "return results from package objects" in withSearchService {
     implicit service =>
       searchClasses(
-          "org.example.Blip$",
-          "Blip"
+        "org.example.Blip$",
+        "Blip"
       )
 
       searchClasses(
-          "org.example.Blop",
-          "Blop"
+        "org.example.Blop",
+        "Blop"
       )
   }
 
   "class and method searching" should "return results from classes" in {
     withSearchService { implicit service =>
       searchesClassesAndMethods(
-          "java.lang.String",
-          "String",
-          "string",
-          "j.l.str",
-          "j l str"
+        "java.lang.String",
+        "String",
+        "string",
+        "j.l.str",
+        "j l str"
       )
     }
   }
@@ -133,33 +135,33 @@ class SearchServiceSpec
   it should "return results from static fields" in withSearchService {
     implicit service =>
       searchesEmpty(
-          "CASE_INSENSITIVE",
-          "case_insensitive",
-          "case_"
+        "CASE_INSENSITIVE",
+        "case_insensitive",
+        "case_"
       )
   }
 
   it should "not return results from instance fields" in withSearchService {
     implicit service =>
       searchesEmpty(
-          "java.awt.Point.x"
+        "java.awt.Point.x"
       )
   }
 
   it should "return results from static methods" in withSearchService {
     implicit service =>
       searchesClassesAndMethods(
-          "java.lang.Runtime.addShutdownHook",
-          "addShutdownHook"
+        "java.lang.Runtime.addShutdownHook",
+        "addShutdownHook"
       )
   }
 
   it should "return results from instance methods" in withSearchService {
     implicit service =>
       searchesClassesAndMethods(
-          "java.lang.Runtime.availableProcessors",
-          "availableProcessors",
-          "availableP"
+        "java.lang.Runtime.availableProcessors",
+        "availableProcessors",
+        "availableP"
       )
   }
 
@@ -167,14 +169,16 @@ class SearchServiceSpec
     implicit service =>
       val hits = service.searchClasses("Baz", 10).map(_.fqn)
       hits should contain theSameElementsAs
-      (Seq(
-              "org.example2.Baz",
-              "org.example2.Baz$Wibble$baz",
-              "org.example2.Baz$Wibble$baz$",
-              "org.example2.Baz$Wibble$",
-              "org.example2.Baz$",
-              "org.example2.Baz$Wibble"
-          ))
+        (
+          Seq(
+            "org.example2.Baz",
+            "org.example2.Baz$Wibble$baz",
+            "org.example2.Baz$Wibble$baz$",
+            "org.example2.Baz$Wibble$",
+            "org.example2.Baz$",
+            "org.example2.Baz$Wibble"
+          )
+        )
       hits.head shouldBe "org.example2.Baz"
   }
 
@@ -226,7 +230,7 @@ trait SearchServiceTestUtils { self: EnsimeSpec =>
     val max = 1
     val results = service.searchClassesMethods(List(query), max)
     withClue("expected empty results from %s".format(query))(
-        results shouldBe empty)
+      results shouldBe empty)
     results
   }
 

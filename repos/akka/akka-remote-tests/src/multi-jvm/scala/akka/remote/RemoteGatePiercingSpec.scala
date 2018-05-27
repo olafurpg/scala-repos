@@ -10,7 +10,11 @@ import scala.concurrent.duration._
 import com.typesafe.config.ConfigFactory
 import akka.actor._
 import akka.remote.testconductor.RoleName
-import akka.remote.transport.ThrottlerTransportAdapter.{ForceDisassociateExplicitly, ForceDisassociate, Direction}
+import akka.remote.transport.ThrottlerTransportAdapter.{
+  ForceDisassociateExplicitly,
+  ForceDisassociate,
+  Direction
+}
 import akka.remote.testkit.MultiNodeConfig
 import akka.remote.testkit.MultiNodeSpec
 import akka.remote.testkit.STMultiNodeSpec
@@ -24,17 +28,21 @@ object RemoteGatePiercingSpec extends MultiNodeConfig {
   val first = role("first")
   val second = role("second")
 
-  commonConfig(debugConfig(on = false).withFallback(ConfigFactory.parseString("""
+  commonConfig(
+    debugConfig(on = false).withFallback(ConfigFactory.parseString(
+      """
       akka.loglevel = INFO
       akka.remote.log-remote-lifecycle-events = INFO
       akka.remote.transport-failure-detector.acceptable-heartbeat-pause = 5 s
                               """)))
 
-  nodeConfig(first)(ConfigFactory.parseString(
-          "akka.remote.retry-gate-closed-for  = 1 d # Keep it long"))
+  nodeConfig(first)(
+    ConfigFactory.parseString(
+      "akka.remote.retry-gate-closed-for  = 1 d # Keep it long"))
 
-  nodeConfig(second)(ConfigFactory.parseString(
-          "akka.remote.retry-gate-closed-for  = 1 s # Keep it short"))
+  nodeConfig(second)(
+    ConfigFactory.parseString(
+      "akka.remote.retry-gate-closed-for  = 1 s # Keep it short"))
 
   testTransport(on = true)
 
@@ -49,7 +57,8 @@ class RemoteGatePiercingSpecMultiJvmNode1 extends RemoteGatePiercingSpec
 class RemoteGatePiercingSpecMultiJvmNode2 extends RemoteGatePiercingSpec
 
 abstract class RemoteGatePiercingSpec
-    extends MultiNodeSpec(RemoteGatePiercingSpec) with STMultiNodeSpec
+    extends MultiNodeSpec(RemoteGatePiercingSpec)
+    with STMultiNodeSpec
     with ImplicitSender {
 
   import RemoteGatePiercingSpec._
@@ -57,8 +66,7 @@ abstract class RemoteGatePiercingSpec
   override def initialParticipants = 2
 
   def identify(role: RoleName, actorName: String): ActorRef = {
-    system.actorSelection(node(role) / "user" / actorName) ! Identify(
-        actorName)
+    system.actorSelection(node(role) / "user" / actorName) ! Identify(actorName)
     expectMsgType[ActorIdentity].ref.get
   }
 
@@ -77,10 +85,11 @@ abstract class RemoteGatePiercingSpec
           .warning(pattern = "address is now gated", occurrences = 1)
           .intercept {
             Await.result(
-                RARP(system).provider.transport.managementCommand(
-                    ForceDisassociateExplicitly(node(second).address,
-                                                AssociationHandle.Unknown)),
-                3.seconds)
+              RARP(system).provider.transport.managementCommand(
+                ForceDisassociateExplicitly(
+                  node(second).address,
+                  AssociationHandle.Unknown)),
+              3.seconds)
           }
 
         enterBarrier("gated")

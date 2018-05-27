@@ -91,21 +91,23 @@ class KernelDensity extends Serializable {
     val logStandardDeviationPlusHalfLog2Pi =
       math.log(bandwidth) + 0.5 * math.log(2 * math.Pi)
     val (densities, count) = sample.aggregate((new Array[Double](n), 0L))(
-        (x, y) =>
-          {
-            var i = 0
-            while (i < n) {
-              x._1(i) += normPdf(
-                  y, bandwidth, logStandardDeviationPlusHalfLog2Pi, points(i))
-              i += 1
-            }
-            (x._1, x._2 + 1)
-        },
-        (x, y) =>
-          {
-            blas.daxpy(n, 1.0, y._1, 1, x._1, 1)
-            (x._1, x._2 + y._2)
-        })
+      (x, y) => {
+        var i = 0
+        while (i < n) {
+          x._1(i) += normPdf(
+            y,
+            bandwidth,
+            logStandardDeviationPlusHalfLog2Pi,
+            points(i))
+          i += 1
+        }
+        (x._1, x._2 + 1)
+      },
+      (x, y) => {
+        blas.daxpy(n, 1.0, y._1, 1, x._1, 1)
+        (x._1, x._2 + y._2)
+      }
+    )
     blas.dscal(n, 1.0 / count, densities, 1)
     densities
   }
@@ -114,10 +116,11 @@ class KernelDensity extends Serializable {
 private object KernelDensity {
 
   /** Evaluates the PDF of a normal distribution. */
-  def normPdf(mean: Double,
-              standardDeviation: Double,
-              logStandardDeviationPlusHalfLog2Pi: Double,
-              x: Double): Double = {
+  def normPdf(
+      mean: Double,
+      standardDeviation: Double,
+      logStandardDeviationPlusHalfLog2Pi: Double,
+      x: Double): Double = {
     val x0 = x - mean
     val x1 = x0 / standardDeviation
     val logDensity = -0.5 * x1 * x1 - logStandardDeviationPlusHalfLog2Pi

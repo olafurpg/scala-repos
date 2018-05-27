@@ -16,7 +16,7 @@ class ScalaQualifiedClassNameMacro extends Macro {
 
   override def getPresentableName: String =
     MacroUtil.scalaPresentablePrefix + CodeInsightBundle.message(
-        "macro.qualified.class.name")
+      "macro.qualified.class.name")
 
   override def getDefaultValue = "a"
 
@@ -24,9 +24,11 @@ class ScalaQualifiedClassNameMacro extends Macro {
     context.isInstanceOf[ScalaCodeContextType]
 
   override def calculateResult(
-      params: Array[Expression], context: ExpressionContext): Result = {
-    Option(PsiTreeUtil.getParentOfType(context.getPsiElementAtStartOffset,
-                                       classOf[PsiClass]))
+      params: Array[Expression],
+      context: ExpressionContext): Result = {
+    Option(
+      PsiTreeUtil
+        .getParentOfType(context.getPsiElementAtStartOffset, classOf[PsiClass]))
       .map(_.getQualifiedName)
       .map(new TextResult(_))
       .orNull

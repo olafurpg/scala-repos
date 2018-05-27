@@ -6,7 +6,9 @@ import scala.collection.mutable
 import scala.collection.JavaConversions._
 
 class Hashtable[K, V] private (inner: mutable.HashMap[Box[Any], V])
-    extends ju.Dictionary[K, V] with ju.Map[K, V] with Cloneable
+    extends ju.Dictionary[K, V]
+    with ju.Map[K, V]
+    with Cloneable
     with Serializable {
 
   def this() =
@@ -86,7 +88,7 @@ class Hashtable[K, V] private (inner: mutable.HashMap[Box[Any], V])
       def setValue(value: V): V = boxedEntry.setValue(value)
       override def equals(o: Any): Boolean = o match {
         case o: UnboxedEntry => boxedEntry.equals(o.boxedEntry)
-        case _ => false
+        case _               => false
       }
       override def hashCode(): Int = boxedEntry.hashCode()
     }

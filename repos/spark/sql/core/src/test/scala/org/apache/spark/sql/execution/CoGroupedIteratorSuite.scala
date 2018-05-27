@@ -40,16 +40,17 @@ class CoGroupedIteratorSuite extends SparkFunSuite with ExpressionEvalHelper {
         assert(key.numFields == 1)
         (key.getInt(0), leftData.toSeq, rightData.toSeq)
     }.toSeq
-    assert(
-        result == (1,
-                   Seq(create_row(1, "a"), create_row(1, "b")),
-                   Seq(create_row(1, 2L))) :: (
-            2, Seq(create_row(2, "c")), Seq(create_row(2, 3L))) :: (
-            3, Seq.empty, Seq(create_row(3, 4L))) :: Nil)
+    assert(result == (
+      1,
+      Seq(create_row(1, "a"), create_row(1, "b")),
+      Seq(create_row(1, 2L))) :: (
+      2,
+      Seq(create_row(2, "c")),
+      Seq(create_row(2, 3L))) :: (3, Seq.empty, Seq(create_row(3, 4L))) :: Nil)
   }
 
   test(
-      "SPARK-11393: respect the fact that GroupedIterator.hasNext is not idempotent") {
+    "SPARK-11393: respect the fact that GroupedIterator.hasNext is not idempotent") {
     val leftInput = Seq(create_row(2, "a")).iterator
     val rightInput = Seq(create_row(1, 2L)).iterator
     val leftGrouped =
@@ -65,7 +66,10 @@ class CoGroupedIteratorSuite extends SparkFunSuite with ExpressionEvalHelper {
         (key.getInt(0), leftData.toSeq, rightData.toSeq)
     }.toSeq
 
-    assert(result == (1, Seq.empty, Seq(create_row(1, 2L))) :: (
-            2, Seq(create_row(2, "a")), Seq.empty) :: Nil)
+    assert(
+      result == (1, Seq.empty, Seq(create_row(1, 2L))) :: (
+        2,
+        Seq(create_row(2, "a")),
+        Seq.empty) :: Nil)
   }
 }

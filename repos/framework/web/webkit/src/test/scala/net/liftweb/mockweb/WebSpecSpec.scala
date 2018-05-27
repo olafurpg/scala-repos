@@ -34,16 +34,17 @@ object WebSpecSpecBoot {
 
     LiftRules.statelessRewrite.append {
       case RewriteRequest(
-          ParsePath(List("test", "stateless"), _, _, _), _, _) => {
-          RewriteResponse(List("stateless", "works"))
-        }
+          ParsePath(List("test", "stateless"), _, _, _),
+          _,
+          _) => {
+        RewriteResponse(List("stateless", "works"))
+      }
     }
 
     LiftRules.statefulRewrite.append {
-      case RewriteRequest(
-          ParsePath(List("test", "stateful"), _, _, _), _, _) => {
-          RewriteResponse(List("stateful", "works"))
-        }
+      case RewriteRequest(ParsePath(List("test", "stateful"), _, _, _), _, _) => {
+        RewriteResponse(List("stateful", "works"))
+      }
     }
   }
 }
@@ -54,8 +55,8 @@ object WebSpecSpecBoot {
 object WebSpecSpecRest extends RestHelper {
   serve {
     case "api" :: "info" :: Nil JsonGet req => {
-        ("version" -> "1.0") ~ ("name" -> "WebSpec")
-      }
+      ("version" -> "1.0") ~ ("name" -> "WebSpec")
+    }
   }
 }
 
@@ -82,12 +83,12 @@ class WebSpecSpec extends WebSpec(WebSpecSpecBoot.boot _) {
     "properly set up S with a String url" withSFor (testUrl) in {
       S.request match {
         case Full(req) => req.path.partPath must_== List("stateless", "works")
-        case _ => failure("No request in S")
+        case _         => failure("No request in S")
       }
     }
 
     "properly set up S with a String url and session" withSFor
-    (testUrl, testSession) in {
+      (testUrl, testSession) in {
       TestVar("foo!")
       TestVar.is must_== "foo!"
     }
@@ -106,7 +107,7 @@ class WebSpecSpec extends WebSpec(WebSpecSpecBoot.boot _) {
     }
 
     "properly set up a Req with a String url and context path" withReqFor
-    (testUrl, "/test") in {
+      (testUrl, "/test") in {
       _.path.partPath must_== List("stateless")
     }
 
@@ -115,12 +116,12 @@ class WebSpecSpec extends WebSpec(WebSpecSpecBoot.boot _) {
     }
 
     "properly set a plain text body" withReqFor (testUrl) withPost
-    ("This is a test") in { req =>
+      ("This is a test") in { req =>
       req.contentType must_== Full("text/plain")
       req.post_? must_== true
       req.body match {
         case Full(body) => (new String(body)) must_== "This is a test"
-        case _ => failure("No body set")
+        case _          => failure("No body set")
       }
     }
 
@@ -146,20 +147,20 @@ class WebSpecSpec extends WebSpec(WebSpecSpecBoot.boot _) {
     }
 
     "properly mutate the request" withSFor (testUrl) withMods
-    (_.contentType = "application/xml") in {
+      (_.contentType = "application/xml") in {
       (S.request.map(_.xml_?) openOr false) must_== true
     }
 
     "process a JSON RestHelper Request" withReqFor
-    ("http://foo.com/api/info.json") in { req =>
+      ("http://foo.com/api/info.json") in { req =>
       (WebSpecSpecRest(req)() match {
         case Full(JsonResponse(_, _, _, 200)) => success
-        case other => failure("Invalid response : " + other)
+        case other                            => failure("Invalid response : " + other)
       })
     }
 
     "properly process a template" withTemplateFor
-    ("http://foo.com/net/liftweb/mockweb/webspecspectemplate") in {
+      ("http://foo.com/net/liftweb/mockweb/webspecspectemplate") in {
       case Full(template) =>
         template.toString.contains("Hello, WebSpec!") must_== true
       case other => failure("Error on template : " + other)

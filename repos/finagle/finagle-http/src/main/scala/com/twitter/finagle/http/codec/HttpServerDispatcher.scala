@@ -5,7 +5,11 @@ import com.twitter.finagle.dispatch.GenSerialServerDispatcher
 import com.twitter.finagle.http._
 import com.twitter.finagle.http.netty.Bijections._
 import com.twitter.finagle.netty3.ChannelBufferBuf
-import com.twitter.finagle.stats.{StatsReceiver, DefaultStatsReceiver, RollupStatsReceiver}
+import com.twitter.finagle.stats.{
+  StatsReceiver,
+  DefaultStatsReceiver,
+  RollupStatsReceiver
+}
 import com.twitter.finagle.transport.Transport
 import com.twitter.io.{Reader, BufReader}
 import com.twitter.logging.Logger
@@ -14,9 +18,10 @@ import java.net.InetSocketAddress
 import org.jboss.netty.handler.codec.frame.TooLongFrameException
 import org.jboss.netty.handler.codec.http.{HttpRequest, HttpResponse}
 
-class HttpServerDispatcher(trans: Transport[Any, Any],
-                           service: Service[Request, Response],
-                           stats: StatsReceiver)
+class HttpServerDispatcher(
+    trans: Transport[Any, Any],
+    service: Service[Request, Response],
+    stats: StatsReceiver)
     extends GenSerialServerDispatcher[Request, Response, Any, Any](trans) {
 
   def this(trans: Transport[Any, Any], service: Service[Request, Response]) =
@@ -42,7 +47,8 @@ class HttpServerDispatcher(trans: Transport[Any, Any],
               Response(from(badReq.httpVersion), Status.RequestURITooLong)
             else
               Response(
-                  from(badReq.httpVersion), Status.RequestHeaderFieldsTooLarge)
+                from(badReq.httpVersion),
+                Status.RequestHeaderFieldsTooLarge)
           case _ =>
             Response(from(badReq.httpVersion), Status.BadRequest)
         }
@@ -69,7 +75,7 @@ class HttpServerDispatcher(trans: Transport[Any, Any],
 
         val addr = trans.remoteAddress match {
           case ia: InetSocketAddress => ia
-          case _ => new InetSocketAddress(0)
+          case _                     => new InetSocketAddress(0)
         }
 
         val req = Request(reqIn, reader, addr)
@@ -80,7 +86,7 @@ class HttpServerDispatcher(trans: Transport[Any, Any],
       case invalid =>
         eos.setDone()
         Future.exception(
-            new IllegalArgumentException("Invalid message " + invalid))
+          new IllegalArgumentException("Invalid message " + invalid))
     }
 
   protected def handle(rep: Response): Future[Unit] = {
@@ -96,7 +102,8 @@ class HttpServerDispatcher(trans: Transport[Any, Any],
       val p = new Promise[Unit]
       val f =
         trans.write(from[Response, HttpResponse](rep)) before streamChunks(
-            trans, rep.reader)
+          trans,
+          rep.reader)
       f.proxyTo(p)
       // This awkwardness is unfortunate but necessary for now as you may be
       // interrupted in the middle of a write, or when there otherwise isn’t
@@ -104,8 +111,7 @@ class HttpServerDispatcher(trans: Transport[Any, Any],
       f.onFailure { t =>
         Logger
           .get(this.getClass.getName)
-          .debug(
-              t, "Failed mid-stream. Terminating stream, closing connection")
+          .debug(t, "Failed mid-stream. Terminating stream, closing connection")
         failureReceiver.counter(Throwables.mkString(t): _*).incr()
         rep.reader.discard()
       }

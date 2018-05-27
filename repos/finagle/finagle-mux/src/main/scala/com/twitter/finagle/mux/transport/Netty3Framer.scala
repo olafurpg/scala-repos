@@ -19,19 +19,22 @@ private[finagle] object Netty3Framer extends ChannelPipelineFactory {
     * That is, a mux frame is a 4-byte length encoded set of bytes.
     */
   private class Framer extends SimpleChannelHandler {
-    val dec = new frame.LengthFieldBasedFrameDecoder(maxFrameLength,
-                                                     lengthFieldOffset,
-                                                     lengthFieldLength,
-                                                     lengthAdjustment,
-                                                     initialBytesToStrip)
+    val dec = new frame.LengthFieldBasedFrameDecoder(
+      maxFrameLength,
+      lengthFieldOffset,
+      lengthFieldLength,
+      lengthAdjustment,
+      initialBytesToStrip)
     val enc = new frame.LengthFieldPrepender(lengthFieldLength)
 
     override def handleUpstream(
-        ctx: ChannelHandlerContext, e: ChannelEvent): Unit =
+        ctx: ChannelHandlerContext,
+        e: ChannelEvent): Unit =
       dec.handleUpstream(ctx, e)
 
     override def handleDownstream(
-        ctx: ChannelHandlerContext, e: ChannelEvent): Unit =
+        ctx: ChannelHandlerContext,
+        e: ChannelEvent): Unit =
       enc.handleDownstream(ctx, e)
   }
 

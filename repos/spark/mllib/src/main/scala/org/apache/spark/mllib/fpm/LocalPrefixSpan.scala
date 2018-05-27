@@ -28,8 +28,10 @@ import org.apache.spark.internal.Logging
   * @param maxPatternLength max pattern length for a frequent pattern
   */
 private[fpm] class LocalPrefixSpan(
-    val minCount: Long, val maxPatternLength: Int)
-    extends Logging with Serializable {
+    val minCount: Long,
+    val maxPatternLength: Int)
+    extends Logging
+    with Serializable {
   import PrefixSpan.Postfix
   import LocalPrefixSpan.ReversedPrefix
 

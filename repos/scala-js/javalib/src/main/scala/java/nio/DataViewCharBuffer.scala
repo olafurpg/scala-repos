@@ -36,7 +36,11 @@ private[nio] final class DataViewCharBuffer private (
     if (start < 0 || end < start || end > remaining)
       throw new IndexOutOfBoundsException
     new DataViewCharBuffer(
-        _dataView, position + start, position + end, isReadOnly, isBigEndian)
+      _dataView,
+      position + start,
+      position + end,
+      isReadOnly,
+      isBigEndian)
   }
 
   @noinline
@@ -90,12 +94,18 @@ private[nio] final class DataViewCharBuffer private (
 
   @inline
   override private[nio] def load(
-      startIndex: Int, dst: Array[Char], offset: Int, length: Int): Unit =
+      startIndex: Int,
+      dst: Array[Char],
+      offset: Int,
+      length: Int): Unit =
     GenBuffer(this).generic_load(startIndex, dst, offset, length)
 
   @inline
   override private[nio] def store(
-      startIndex: Int, src: Array[Char], offset: Int, length: Int): Unit =
+      startIndex: Int,
+      src: Array[Char],
+      offset: Int,
+      length: Int): Unit =
     GenBuffer(this).generic_store(startIndex, src, offset, length)
 }
 
@@ -104,13 +114,18 @@ private[nio] object DataViewCharBuffer {
       extends GenDataViewBuffer.NewDataViewBuffer[CharBuffer] {
     def bytesPerElem: Int = 2
 
-    def apply(dataView: DataView,
-              initialPosition: Int,
-              initialLimit: Int,
-              readOnly: Boolean,
-              isBigEndian: Boolean): CharBuffer = {
+    def apply(
+        dataView: DataView,
+        initialPosition: Int,
+        initialLimit: Int,
+        readOnly: Boolean,
+        isBigEndian: Boolean): CharBuffer = {
       new DataViewCharBuffer(
-          dataView, initialPosition, initialLimit, readOnly, isBigEndian)
+        dataView,
+        initialPosition,
+        initialLimit,
+        readOnly,
+        isBigEndian)
     }
   }
 

@@ -12,20 +12,19 @@ class TextualContentCompressorTest extends FunSuite {
   val compressor = new TextualContentCompressor
 
   def newRequest(contentType: String): HttpMessage = {
-    val request = new DefaultHttpRequest(
-        HttpVersion.HTTP_1_1, HttpMethod.GET, "/")
+    val request =
+      new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/")
     request.headers.set(HttpHeaders.Names.CONTENT_TYPE, contentType)
     request
   }
 
-  (TextLike ++ Seq("text/plain",
-                   "text/html",
-                   "application/json;charset=utf-8")) foreach { contentType =>
-    test("enabled for " + contentType) {
-      val request = newRequest(contentType)
-      val encoder = compressor.newContentEncoder(request, "gzip")
-      assert(encoder != null)
-    }
+  (TextLike ++ Seq("text/plain", "text/html", "application/json;charset=utf-8")) foreach {
+    contentType =>
+      test("enabled for " + contentType) {
+        val request = newRequest(contentType)
+        val encoder = compressor.newContentEncoder(request, "gzip")
+        assert(encoder != null)
+      }
   }
 
   test("disabled for non-textual content-type") {

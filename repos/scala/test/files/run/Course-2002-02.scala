@@ -209,10 +209,11 @@ object M8 {
 //############################################################################
 
 object M9 {
-  def accumulate[t](combiner: (t, t) => t,
-                    nullValue: t,
-                    f: Int => t,
-                    next: Int => Int)(a: Int, b: Int): t =
+  def accumulate[t](
+      combiner: (t, t) => t,
+      nullValue: t,
+      f: Int => t,
+      next: Int => Int)(a: Int, b: Int): t =
     if (a > b) nullValue
     else combiner(f(a), accumulate(combiner, nullValue, f, next)(next(a), b))
 
@@ -237,7 +238,7 @@ object M9 {
 
   val pi =
     2 * product(x => 2 * x * 2 * x)(1, 20) / product(
-        x => (2 * x - 1) * (2 * x - 1))(1, 20) / 40
+      x => (2 * x - 1) * (2 * x - 1))(1, 20) / 40
 
   Console.println(sumInts(1, 4))
   Console.println(sumCubes(1, 4))

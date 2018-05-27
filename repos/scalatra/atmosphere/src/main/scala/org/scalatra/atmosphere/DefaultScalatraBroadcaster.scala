@@ -7,7 +7,8 @@ import org.atmosphere.cpr._
 
 final class DefaultScalatraBroadcaster(
     )(implicit wireFormat: WireFormat, system: ActorSystem)
-    extends DefaultBroadcaster with ScalatraBroadcaster {
+    extends DefaultBroadcaster
+    with ScalatraBroadcaster {
 
   protected var _resources: ConcurrentLinkedQueue[AtmosphereResource] =
     resources

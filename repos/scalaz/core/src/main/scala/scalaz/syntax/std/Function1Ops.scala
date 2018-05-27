@@ -34,8 +34,8 @@ final class Function1Ops[T, R](val self: T => R) extends AnyVal {
   def succState(implicit e: Enum[T]): State[T, R] =
     e.succState(self)
 
-  def succStateZeroM[Y](k: R => State[T, Y])(
-      implicit e: Enum[T], m: Monoid[T]): Y =
+  def succStateZeroM[Y](
+      k: R => State[T, Y])(implicit e: Enum[T], m: Monoid[T]): Y =
     e.succStateZeroM(self, k)
 
   def succStateZero[Y](k: R => Y)(implicit e: Enum[T], m: Monoid[T]): Y =
@@ -50,8 +50,8 @@ final class Function1Ops[T, R](val self: T => R) extends AnyVal {
   def predState(implicit e: Enum[T]): State[T, R] =
     e.predState(self)
 
-  def predStateZeroM[Y](k: R => State[T, Y])(
-      implicit e: Enum[T], m: Monoid[T]): Y =
+  def predStateZeroM[Y](
+      k: R => State[T, Y])(implicit e: Enum[T], m: Monoid[T]): Y =
     e.predStateZeroM(self, k)
 
   def predStateZero[Y](k: R => Y)(implicit e: Enum[T], m: Monoid[T]): Y =

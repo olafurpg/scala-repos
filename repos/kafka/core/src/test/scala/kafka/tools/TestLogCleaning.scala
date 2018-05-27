@@ -25,20 +25,24 @@ import kafka.serializer._
 import kafka.utils._
 import kafka.log.FileMessageSet
 import kafka.log.Log
-import org.apache.kafka.clients.producer.{ProducerRecord, KafkaProducer, ProducerConfig}
+import org.apache.kafka.clients.producer.{
+  ProducerRecord,
+  KafkaProducer,
+  ProducerConfig
+}
 
 /**
   * This is a torture test that runs against an existing broker. Here is how it works:
-  * 
+  *
   * It produces a series of specially formatted messages to one or more partitions. Each message it produces
   * it logs out to a text file. The messages have a limited set of keys, so there is duplication in the key space.
-  * 
+  *
   * The broker will clean its log as the test runs.
-  * 
+  *
   * When the specified number of messages have been produced we create a consumer and consume all the messages in the topic
   * and write that out to another text file.
-  * 
-  * Using a stable unix sort we sort both the producer log of what was sent and the consumer log of what was retrieved by the message key. 
+  *
+  * Using a stable unix sort we sort both the producer log of what was sent and the consumer log of what was retrieved by the message key.
   * Then we compare the final message in both logs for each key. If this final message is not the same for all keys we
   * print an error and exit with exit code 1, otherwise we print the size reduction and exit with exit code 0.
   */
@@ -76,8 +80,7 @@ object TestLogCleaning {
       .ofType(classOf[java.lang.Integer])
       .defaultsTo(1)
     val percentDeletesOpt = parser
-      .accepts("percent-deletes",
-               "The percentage of updates that are deletes.")
+      .accepts("percent-deletes", "The percentage of updates that are deletes.")
       .withRequiredArg
       .describedAs("percent")
       .ofType(classOf[java.lang.Integer])
@@ -95,8 +98,8 @@ object TestLogCleaning {
       .defaultsTo(0)
     val dumpOpt = parser
       .accepts(
-          "dump",
-          "Dump the message contents of a topic partition that contains test data from this test to standard out.")
+        "dump",
+        "Dump the message contents of a topic partition that contains test data from this test to standard out.")
       .withRequiredArg
       .describedAs("directory")
       .ofType(classOf[String])
@@ -105,7 +108,8 @@ object TestLogCleaning {
 
     if (args.length == 0)
       CommandLineUtils.printUsageAndDie(
-          parser, "An integration test for log cleaning.")
+        parser,
+        "An integration test for log cleaning.")
 
     if (options.has(dumpOpt)) {
       dumpLog(new File(options.valueOf(dumpOpt)))
@@ -113,7 +117,11 @@ object TestLogCleaning {
     }
 
     CommandLineUtils.checkRequiredArgs(
-        parser, options, brokerOpt, zkConnectOpt, numMessagesOpt)
+      parser,
+      options,
+      brokerOpt,
+      zkConnectOpt,
+      numMessagesOpt)
 
     // parse options
     val messages = options.valueOf(numMessagesOpt).longValue
@@ -131,7 +139,12 @@ object TestLogCleaning {
 
     println("Producing %d messages...".format(messages))
     val producedDataFile = produceMessages(
-        brokerUrl, topics, messages, compressionType, dups, percentDeletes)
+      brokerUrl,
+      topics,
+      messages,
+      compressionType,
+      dups,
+      percentDeletes)
     println("Sleeping for %d seconds...".format(sleepSecs))
     Thread.sleep(sleepSecs * 1000)
     println("Consuming messages...")
@@ -141,8 +154,8 @@ object TestLogCleaning {
     val consumedLines = lineCount(consumedDataFile)
     val reduction = 1.0 - consumedLines.toDouble / producedLines.toDouble
     println(
-        "%d rows of data produced, %d rows of data consumed (%.1f%% reduction)."
-          .format(producedLines, consumedLines, 100 * reduction))
+      "%d rows of data produced, %d rows of data consumed (%.1f%% reduction)."
+        .format(producedLines, consumedLines, 100 * reduction))
 
     println("De-duplicating and validating output files...")
     validateOutput(producedDataFile, consumedDataFile)
@@ -160,8 +173,8 @@ object TestLogCleaning {
           if (entry.message.isNull) null
           else TestUtils.readString(entry.message.payload)
         println(
-            "offset = %s, key = %s, content = %s".format(
-                entry.offset, key, content))
+          "offset = %s, key = %s, content = %s"
+            .format(entry.offset, key, content))
       }
     }
   }
@@ -174,13 +187,13 @@ object TestLogCleaning {
     val produced = valuesIterator(producedReader)
     val consumed = valuesIterator(consumedReader)
     val producedDedupedFile = new File(
-        producedDataFile.getAbsolutePath + ".deduped")
-    val producedDeduped = new BufferedWriter(
-        new FileWriter(producedDedupedFile), 1024 * 1024)
+      producedDataFile.getAbsolutePath + ".deduped")
+    val producedDeduped =
+      new BufferedWriter(new FileWriter(producedDedupedFile), 1024 * 1024)
     val consumedDedupedFile = new File(
-        consumedDataFile.getAbsolutePath + ".deduped")
-    val consumedDeduped = new BufferedWriter(
-        new FileWriter(consumedDedupedFile), 1024 * 1024)
+      consumedDataFile.getAbsolutePath + ".deduped")
+    val consumedDeduped =
+      new BufferedWriter(new FileWriter(consumedDedupedFile), 1024 * 1024)
     var total = 0
     var mismatched = 0
     while (produced.hasNext && consumed.hasNext) {
@@ -196,10 +209,12 @@ object TestLogCleaning {
     producedDeduped.close()
     consumedDeduped.close()
     println("Validated " + total + " values, " + mismatched + " mismatches.")
-    require(!produced.hasNext,
-            "Additional values produced not found in consumer log.")
-    require(!consumed.hasNext,
-            "Additional values consumed not found in producer log.")
+    require(
+      !produced.hasNext,
+      "Additional values produced not found in consumer log.")
+    require(
+      !consumed.hasNext,
+      "Additional values consumed not found in producer log.")
     require(mismatched == 0, "Non-zero number of row mismatches.")
     // if all the checks worked out we can delete the deduped files
     producedDedupedFile.delete()
@@ -241,12 +256,12 @@ object TestLogCleaning {
 
   def externalSort(file: File): BufferedReader = {
     val builder = new ProcessBuilder(
-        "sort",
-        "--key=1,2",
-        "--stable",
-        "--buffer-size=20%",
-        "--temporary-directory=" + System.getProperty("java.io.tmpdir"),
-        file.getAbsolutePath)
+      "sort",
+      "--key=1,2",
+      "--stable",
+      "--buffer-size=20%",
+      "--temporary-directory=" + System.getProperty("java.io.tmpdir"),
+      file.getAbsolutePath)
     val process = builder.start()
     new Thread() {
       override def run() {
@@ -260,36 +275,41 @@ object TestLogCleaning {
       }
     }.start()
     new BufferedReader(
-        new InputStreamReader(process.getInputStream()), 10 * 1024 * 1024)
+      new InputStreamReader(process.getInputStream()),
+      10 * 1024 * 1024)
   }
 
-  def produceMessages(brokerUrl: String,
-                      topics: Array[String],
-                      messages: Long,
-                      compressionType: String,
-                      dups: Int,
-                      percentDeletes: Int): File = {
+  def produceMessages(
+      brokerUrl: String,
+      topics: Array[String],
+      messages: Long,
+      compressionType: String,
+      dups: Int,
+      percentDeletes: Int): File = {
     val producerProps = new Properties
     producerProps.setProperty(
-        ProducerConfig.MAX_BLOCK_MS_CONFIG, Long.MaxValue.toString)
+      ProducerConfig.MAX_BLOCK_MS_CONFIG,
+      Long.MaxValue.toString)
     producerProps.setProperty(
-        ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerUrl)
+      ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
+      brokerUrl)
     producerProps.put(
-        ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
-        "org.apache.kafka.common.serialization.ByteArraySerializer")
+      ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+      "org.apache.kafka.common.serialization.ByteArraySerializer")
     producerProps.put(
-        ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
-        "org.apache.kafka.common.serialization.ByteArraySerializer")
+      ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+      "org.apache.kafka.common.serialization.ByteArraySerializer")
     producerProps.setProperty(
-        ProducerConfig.COMPRESSION_TYPE_CONFIG, compressionType)
+      ProducerConfig.COMPRESSION_TYPE_CONFIG,
+      compressionType)
     val producer = new KafkaProducer[Array[Byte], Array[Byte]](producerProps)
     val rand = new Random(1)
     val keyCount = (messages / dups).toInt
     val producedFile =
       File.createTempFile("kafka-log-cleaner-produced-", ".txt")
     println("Logging produce requests to " + producedFile.getAbsolutePath)
-    val producedWriter = new BufferedWriter(
-        new FileWriter(producedFile), 1024 * 1024)
+    val producedWriter =
+      new BufferedWriter(new FileWriter(producedFile), 1024 * 1024)
     for (i <- 0L until (messages * topics.length)) {
       val topic = topics((i % topics.length).toInt)
       val key = rand.nextInt(keyCount)
@@ -297,10 +317,14 @@ object TestLogCleaning {
       val msg =
         if (delete)
           new ProducerRecord[Array[Byte], Array[Byte]](
-              topic, key.toString.getBytes(), null)
+            topic,
+            key.toString.getBytes(),
+            null)
         else
           new ProducerRecord[Array[Byte], Array[Byte]](
-              topic, key.toString.getBytes(), i.toString.getBytes())
+            topic,
+            key.toString.getBytes(),
+            i.toString.getBytes())
       producer.send(msg)
       producedWriter.write(TestRecord(topic, key, i, delete).toString)
       producedWriter.newLine()
@@ -311,10 +335,12 @@ object TestLogCleaning {
   }
 
   def makeConsumer(
-      zkUrl: String, topics: Array[String]): ZookeeperConsumerConnector = {
+      zkUrl: String,
+      topics: Array[String]): ZookeeperConsumerConnector = {
     val consumerProps = new Properties
     consumerProps.setProperty(
-        "group.id", "log-cleaner-test-" + new Random().nextInt(Int.MaxValue))
+      "group.id",
+      "log-cleaner-test-" + new Random().nextInt(Int.MaxValue))
     consumerProps.setProperty("zookeeper.connect", zkUrl)
     consumerProps.setProperty("consumer.timeout.ms", (20 * 1000).toString)
     consumerProps.setProperty("auto.offset.reset", "smallest")
@@ -324,9 +350,9 @@ object TestLogCleaning {
   def consumeMessages(zkUrl: String, topics: Array[String]): File = {
     val connector = makeConsumer(zkUrl, topics)
     val streams = connector.createMessageStreams(
-        topics.map(topic => (topic, 1)).toMap,
-        new StringDecoder,
-        new StringDecoder)
+      topics.map(topic => (topic, 1)).toMap,
+      new StringDecoder,
+      new StringDecoder)
     val consumedFile =
       File.createTempFile("kafka-log-cleaner-consumed-", ".txt")
     println("Logging consumed messages to " + consumedFile.getAbsolutePath)
@@ -338,7 +364,7 @@ object TestLogCleaning {
           val delete = item.message == null
           val value = if (delete) -1L else item.message.toLong
           consumedWriter.write(
-              TestRecord(topic, item.key.toInt, value, delete).toString)
+            TestRecord(topic, item.key.toInt, value, delete).toString)
           consumedWriter.newLine()
         }
       } catch {
@@ -352,7 +378,10 @@ object TestLogCleaning {
 }
 
 case class TestRecord(
-    val topic: String, val key: Int, val value: Long, val delete: Boolean) {
+    val topic: String,
+    val key: Int,
+    val value: Long,
+    val delete: Boolean) {
   def this(pieces: Array[String]) =
     this(pieces(0), pieces(1).toInt, pieces(2).toLong, pieces(3) == "d")
   def this(line: String) = this(line.split("\t"))

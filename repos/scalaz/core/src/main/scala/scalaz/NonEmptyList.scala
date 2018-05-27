@@ -1,7 +1,7 @@
 package scalaz
 
 /** A singly-linked list that is guaranteed to be non-empty. */
-final class NonEmptyList[A] private[scalaz](val head: A, val tail: IList[A]) {
+final class NonEmptyList[A] private[scalaz] (val head: A, val tail: IList[A]) {
   import NonEmptyList._
   import Zipper._
   import scalaz.Liskov._
@@ -9,7 +9,7 @@ final class NonEmptyList[A] private[scalaz](val head: A, val tail: IList[A]) {
   def <::(b: A): NonEmptyList[A] = nel(b, head :: tail)
 
   def <:::(bs: IList[A]): NonEmptyList[A] = bs match {
-    case INil() => this
+    case INil()       => this
     case ICons(b, bs) => nel(b, bs ::: list)
   }
 
@@ -41,8 +41,9 @@ final class NonEmptyList[A] private[scalaz](val head: A, val tail: IList[A]) {
     tail match {
       case INil() => F.map(f(head))(nel(_, INil()))
       case ICons(b, bs) =>
-        F.apply2(f(head),
-                 OneAnd.oneAndTraverse[IList].traverse1(OneAnd(b, bs))(f)) {
+        F.apply2(
+          f(head),
+          OneAnd.oneAndTraverse[IList].traverse1(OneAnd(b, bs))(f)) {
           case (h, t) => nel(h, t.head :: t.tail)
         }
     }
@@ -57,7 +58,7 @@ final class NonEmptyList[A] private[scalaz](val head: A, val tail: IList[A]) {
   def zipperEnd: Zipper[A] = {
     import Stream._
     tail.reverse match {
-      case INil() => zipper(empty, head, empty)
+      case INil()       => zipper(empty, head, empty)
       case ICons(t, ts) => zipper(ts.toStream :+ head, t, empty)
     }
   }
@@ -73,10 +74,11 @@ final class NonEmptyList[A] private[scalaz](val head: A, val tail: IList[A]) {
 
   def tails: NonEmptyList[NonEmptyList[A]] = {
     @annotation.tailrec
-    def tails0(as: NonEmptyList[A],
-               accum: IList[NonEmptyList[A]]): NonEmptyList[NonEmptyList[A]] =
+    def tails0(
+        as: NonEmptyList[A],
+        accum: IList[NonEmptyList[A]]): NonEmptyList[NonEmptyList[A]] =
       as.tail match {
-        case INil() => nel(as, accum).reverse
+        case INil()      => nel(as, accum).reverse
         case ICons(h, t) => tails0(nel(h, t), as :: accum)
       }
     tails0(this, IList.empty)
@@ -123,7 +125,7 @@ final class NonEmptyList[A] private[scalaz](val head: A, val tail: IList[A]) {
     def loop(as: IList[A], i: Int, acc: IList[(A, Int)]): IList[(A, Int)] =
       as match {
         case ICons(x, y) => loop(y, i + 1, (x, i) :: acc)
-        case _ => acc.reverse
+        case _           => acc.reverse
       }
     new NonEmptyList((head, 0), loop(tail, 1, IList.empty))
   }
@@ -133,7 +135,7 @@ final class NonEmptyList[A] private[scalaz](val head: A, val tail: IList[A]) {
   override def equals(any: Any): Boolean =
     any match {
       case that: NonEmptyList[_] => this.list == that.list
-      case _ => false
+      case _                     => false
     }
 
   override def hashCode: Int =
@@ -160,14 +162,19 @@ object NonEmptyList extends NonEmptyListInstances {
 }
 
 sealed abstract class NonEmptyListInstances0 {
-  implicit def nonEmptyListEqual[A : Equal]: Equal[NonEmptyList[A]] =
+  implicit def nonEmptyListEqual[A: Equal]: Equal[NonEmptyList[A]] =
     Equal.equalBy[NonEmptyList[A], IList[A]](_.list)(IList.equal[A])
 }
 
 sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
-  implicit val nonEmptyList: Traverse1[NonEmptyList] with Monad[NonEmptyList] with BindRec[
-      NonEmptyList] with Plus[NonEmptyList] with Comonad[NonEmptyList] with Zip[
-      NonEmptyList] with Unzip[NonEmptyList] with Align[NonEmptyList] =
+  implicit val nonEmptyList: Traverse1[NonEmptyList]
+    with Monad[NonEmptyList]
+    with BindRec[NonEmptyList]
+    with Plus[NonEmptyList]
+    with Comonad[NonEmptyList]
+    with Zip[NonEmptyList]
+    with Unzip[NonEmptyList]
+    with Align[NonEmptyList] =
     new Traverse1[NonEmptyList] with Monad[NonEmptyList]
     with BindRec[NonEmptyList] with Plus[NonEmptyList]
     with Comonad[NonEmptyList] with Zip[NonEmptyList] with Unzip[NonEmptyList]
@@ -220,10 +227,10 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
       def unzip[A, B](a: NonEmptyList[(A, B)]) = a.unzip
 
       def alignWith[A, B, C](f: A \&/ B => C) =
-        (a, b) =>
-          {
-            NonEmptyList.nel(f(\&/.Both(a.head, b.head)),
-                             Align[IList].alignWith(f)(a.tail, b.tail))
+        (a, b) => {
+          NonEmptyList.nel(
+            f(\&/.Both(a.head, b.head)),
+            Align[IList].alignWith(f)(a.tail, b.tail))
         }
 
       override def length[A](a: NonEmptyList[A]): Int = a.size
@@ -249,9 +256,9 @@ sealed abstract class NonEmptyListInstances extends NonEmptyListInstances0 {
       def append(f1: NonEmptyList[A], f2: => NonEmptyList[A]) = f1 append f2
     }
 
-  implicit def nonEmptyListShow[A : Show]: Show[NonEmptyList[A]] =
+  implicit def nonEmptyListShow[A: Show]: Show[NonEmptyList[A]] =
     Contravariant[Show].contramap(IList.show[A])(_.list)
 
-  implicit def nonEmptyListOrder[A : Order]: Order[NonEmptyList[A]] =
+  implicit def nonEmptyListOrder[A: Order]: Order[NonEmptyList[A]] =
     Order.orderBy[NonEmptyList[A], IList[A]](_.list)(IList.order[A])
 }

@@ -52,7 +52,10 @@ trait Reifiers { self: blackbox.Context =>
     *  For more information and examples see the documentation for `Context.reifyTree` and `Universe.reify`.
     */
   def reifyType(
-      universe: Tree, mirror: Tree, tpe: Type, concrete: Boolean = false): Tree
+      universe: Tree,
+      mirror: Tree,
+      tpe: Type,
+      concrete: Boolean = false): Tree
 
   /** Given a type, generate a tree that when compiled and executed produces the runtime class of the original type.
     *  If `concrete` is true, then this function will bail on types, who refer to abstract types (like `ClassTag` does).
@@ -95,5 +98,7 @@ case class ReificationException(pos: scala.reflect.api.Position, msg: String)
   *  so that the latter can be reported as compilation errors, while the former manifest themselves as compiler crashes.
   */
 case class UnexpectedReificationException(
-    pos: scala.reflect.api.Position, msg: String, cause: Throwable = null)
+    pos: scala.reflect.api.Position,
+    msg: String,
+    cause: Throwable = null)
     extends Exception(msg, cause)

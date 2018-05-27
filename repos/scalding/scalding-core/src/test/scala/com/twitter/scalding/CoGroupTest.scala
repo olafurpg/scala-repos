@@ -18,21 +18,17 @@ package com.twitter.scalding
 import org.scalatest.{WordSpec, Matchers}
 
 class StarJoinJob(args: Args) extends Job(args) {
-  val in0 = Tsv("input0").read.mapTo((0, 1) -> ('x0, 'a)) {
-    input: (Int, Int) =>
-      input
+  val in0 = Tsv("input0").read.mapTo((0, 1) -> ('x0, 'a)) { input: (Int, Int) =>
+    input
   }
-  val in1 = Tsv("input1").read.mapTo((0, 1) -> ('x1, 'b)) {
-    input: (Int, Int) =>
-      input
+  val in1 = Tsv("input1").read.mapTo((0, 1) -> ('x1, 'b)) { input: (Int, Int) =>
+    input
   }
-  val in2 = Tsv("input2").read.mapTo((0, 1) -> ('x2, 'c)) {
-    input: (Int, Int) =>
-      input
+  val in2 = Tsv("input2").read.mapTo((0, 1) -> ('x2, 'c)) { input: (Int, Int) =>
+    input
   }
-  val in3 = Tsv("input3").read.mapTo((0, 1) -> ('x3, 'd)) {
-    input: (Int, Int) =>
-      input
+  val in3 = Tsv("input3").read.mapTo((0, 1) -> ('x3, 'd)) { input: (Int, Int) =>
+    input
   }
 
   in0
@@ -55,10 +51,11 @@ class CoGroupTest extends WordSpec with Matchers {
       .sink[(Int, Int, Int, Int, Int)](Tsv("output")) { outputBuf =>
         "be able to work" in {
           val out = outputBuf.toSet
-          val expected = Set((0, 1, 1, 0, 9),
-                             (1, 1, 0, 1, 0),
-                             (2, 1, 5, 8, 11),
-                             (3, 2, 2, 0, 0))
+          val expected = Set(
+            (0, 1, 1, 0, 9),
+            (1, 1, 0, 1, 0),
+            (2, 1, 5, 8, 11),
+            (3, 2, 2, 0, 0))
           out shouldBe expected
         }
       }

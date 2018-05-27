@@ -12,9 +12,10 @@ class JdbcPublisherTest
   import profile.api._
 
   def createDB = {
-    val db = Database.forURL("jdbc:h2:mem:DatabasePublisherTest",
-                             driver = "org.h2.Driver",
-                             keepAliveConnection = true)
+    val db = Database.forURL(
+      "jdbc:h2:mem:DatabasePublisherTest",
+      driver = "org.h2.Driver",
+      keepAliveConnection = true)
     // Wait until the database has been initialized and can process queries:
     try { Await.result(db.run(sql"select 1".as[Int]), Duration.Inf) } catch {
       case NonFatal(ex) =>

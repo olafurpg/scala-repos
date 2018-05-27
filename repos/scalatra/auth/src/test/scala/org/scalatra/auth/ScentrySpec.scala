@@ -41,7 +41,7 @@ object ScentrySpec extends Specification with Mockito {
     implicit val res = mock[HttpServletResponse].smart
 
     val theScentry = new Scentry[User](context, { case User(id) => id }, {
-      case s: String => User(s)
+      case s: String                                            => User(s)
     }, new SessionAuthStore(context))
     var beforeFetchCalled = false
     var afterFetchCalled = false
@@ -64,16 +64,18 @@ object ScentrySpec extends Specification with Mockito {
 
     val s = new ScentryStrategy[User] {
       protected val app = context
-      def authenticate()(implicit request: HttpServletRequest,
-                         response: HttpServletResponse) = {
+      def authenticate()(
+          implicit request: HttpServletRequest,
+          response: HttpServletResponse) = {
         successStrategyCalled = true
         Some(User("12345"))
       }
       override def beforeFetch[IdType](id: IdType)(
           implicit request: HttpServletRequest,
           response: HttpServletResponse) = beforeFetchCalled = true
-      override def afterFetch(user: User)(implicit request: HttpServletRequest,
-                                          response: HttpServletResponse) =
+      override def afterFetch(user: User)(
+          implicit request: HttpServletRequest,
+          response: HttpServletResponse) =
         afterFetchCalled = true
       override def beforeSetUser(user: User)(
           implicit request: HttpServletRequest,
@@ -87,33 +89,38 @@ object ScentrySpec extends Specification with Mockito {
       override def afterLogout(user: User)(
           implicit request: HttpServletRequest,
           response: HttpServletResponse) = afterLogoutCalled = true
-      override def beforeAuthenticate(implicit request: HttpServletRequest,
-                                      response: HttpServletResponse) =
+      override def beforeAuthenticate(
+          implicit request: HttpServletRequest,
+          response: HttpServletResponse) =
         beforeAuthenticateCalled = true
       override def afterAuthenticate(winningStrategy: String, user: User)(
           implicit request: HttpServletRequest,
           response: HttpServletResponse) = afterAuthenticateCalled = true
-      override def unauthenticated()(implicit request: HttpServletRequest,
-                                     response: HttpServletResponse) {
+      override def unauthenticated()(
+          implicit request: HttpServletRequest,
+          response: HttpServletResponse) {
         unauthenticatedSuccessCalled = true
       }
     }
 
     val sUnsuccess = new ScentryStrategy[User] {
       protected val app = context
-      def authenticate()(implicit request: HttpServletRequest,
-                         response: HttpServletResponse) = {
+      def authenticate()(
+          implicit request: HttpServletRequest,
+          response: HttpServletResponse) = {
         failingStrategyCalled = true
         None
       }
-      override def beforeAuthenticate(implicit request: HttpServletRequest,
-                                      response: HttpServletResponse) =
+      override def beforeAuthenticate(
+          implicit request: HttpServletRequest,
+          response: HttpServletResponse) =
         beforeAuthenticateCalled = true
       override def afterAuthenticate(winningStrategy: String, user: User)(
           implicit request: HttpServletRequest,
           response: HttpServletResponse) = afterAuthenticateCalled = true
-      override def unauthenticated()(implicit request: HttpServletRequest,
-                                     response: HttpServletResponse) {
+      override def unauthenticated()(
+          implicit request: HttpServletRequest,
+          response: HttpServletResponse) {
         unauthenticatedCalled = true
       }
     }
@@ -148,8 +155,8 @@ object ScentrySpec extends Specification with Mockito {
       req.getAttribute("scentry.auth.default.user") returns null
       (theScentry.user = User("6789")) must be_==("6789")
       req.getAttribute("scentry.auth.default.user") returns User("6789")
-      there was atLeastOne(req).setAttribute("scentry.auth.default.user",
-                                             User("6789"))
+      there was atLeastOne(req)
+        .setAttribute("scentry.auth.default.user", User("6789"))
       beforeSetUserCalled must beTrue
       afterSetUserCalled must beTrue
     }
@@ -168,8 +175,8 @@ object ScentrySpec extends Specification with Mockito {
       theScentry.register("LocalFoo", _ => s)
       req.getAttribute("scentry.auth.default.user") returns null
       theScentry.authenticate()
-      there were two(req).setAttribute("scentry.auth.default.user",
-                                       User("12345"))
+      there were two(req)
+        .setAttribute("scentry.auth.default.user", User("12345"))
       req.getAttribute("scentry.auth.default.user") returns User("12345")
       beforeAuthenticateCalled must beTrue
       afterAuthenticateCalled must beTrue

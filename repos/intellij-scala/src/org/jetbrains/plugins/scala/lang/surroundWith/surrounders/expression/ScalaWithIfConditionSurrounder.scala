@@ -7,7 +7,11 @@ package expression
 import com.intellij.lang.ASTNode
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScIfStmt, ScParenthesisedExpr}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression,
+  ScIfStmt,
+  ScParenthesisedExpr
+}
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 
 /**
@@ -22,7 +26,9 @@ class ScalaWithIfConditionSurrounder extends ScalaExpressionSurrounder {
     if (elements.length != 1) return false
     elements(0) match {
       case x: ScExpression
-          if x.getTypeIgnoreBaseType(TypingContext.empty).getOrAny == psi.types.Boolean =>
+          if x
+            .getTypeIgnoreBaseType(TypingContext.empty)
+            .getOrAny == psi.types.Boolean =>
         return true
       case _ => return false
     }
@@ -32,7 +38,7 @@ class ScalaWithIfConditionSurrounder extends ScalaExpressionSurrounder {
       case x: ScParenthesisedExpr =>
         x.expr match {
           case Some(y) => y
-          case _ => return x.getTextRange
+          case _       => return x.getTextRange
         }
       case x => x
     }

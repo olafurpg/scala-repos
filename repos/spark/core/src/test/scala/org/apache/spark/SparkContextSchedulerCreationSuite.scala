@@ -20,35 +20,48 @@ package org.apache.spark
 import org.scalatest.PrivateMethodTester
 
 import org.apache.spark.internal.Logging
-import org.apache.spark.scheduler.{SchedulerBackend, TaskScheduler, TaskSchedulerImpl}
+import org.apache.spark.scheduler.{
+  SchedulerBackend,
+  TaskScheduler,
+  TaskSchedulerImpl
+}
 import org.apache.spark.scheduler.cluster.SparkDeploySchedulerBackend
-import org.apache.spark.scheduler.cluster.mesos.{CoarseMesosSchedulerBackend, MesosSchedulerBackend}
+import org.apache.spark.scheduler.cluster.mesos.{
+  CoarseMesosSchedulerBackend,
+  MesosSchedulerBackend
+}
 import org.apache.spark.scheduler.local.LocalBackend
 import org.apache.spark.util.Utils
 
 class SparkContextSchedulerCreationSuite
-    extends SparkFunSuite with LocalSparkContext with PrivateMethodTester
+    extends SparkFunSuite
+    with LocalSparkContext
+    with PrivateMethodTester
     with Logging {
 
   def createTaskScheduler(master: String): TaskSchedulerImpl =
     createTaskScheduler(master, "client")
 
   def createTaskScheduler(
-      master: String, deployMode: String): TaskSchedulerImpl =
+      master: String,
+      deployMode: String): TaskSchedulerImpl =
     createTaskScheduler(master, deployMode, new SparkConf())
 
-  def createTaskScheduler(master: String,
-                          deployMode: String,
-                          conf: SparkConf): TaskSchedulerImpl = {
+  def createTaskScheduler(
+      master: String,
+      deployMode: String,
+      conf: SparkConf): TaskSchedulerImpl = {
     // Create local SparkContext to setup a SparkEnv. We don't actually want to start() the
     // real schedulers, so we don't want to create a full SparkContext with the desired scheduler.
     sc = new SparkContext("local", "test", conf)
     val createTaskSchedulerMethod =
       PrivateMethod[Tuple2[SchedulerBackend, TaskScheduler]](
-          'createTaskScheduler)
+        'createTaskScheduler)
     val (_, sched) =
       SparkContext invokePrivate createTaskSchedulerMethod(
-          sc, master, deployMode)
+        sc,
+        master,
+        deployMode)
     sched.asInstanceOf[TaskSchedulerImpl]
   }
 
@@ -63,7 +76,7 @@ class SparkContextSchedulerCreationSuite
     val sched = createTaskScheduler("local")
     sched.backend match {
       case s: LocalBackend => assert(s.totalCores === 1)
-      case _ => fail()
+      case _               => fail()
     }
   }
 
@@ -81,7 +94,7 @@ class SparkContextSchedulerCreationSuite
     assert(sched.maxTaskFailures === 1)
     sched.backend match {
       case s: LocalBackend => assert(s.totalCores === 5)
-      case _ => fail()
+      case _               => fail()
     }
   }
 
@@ -100,7 +113,7 @@ class SparkContextSchedulerCreationSuite
     assert(sched.maxTaskFailures === 2)
     sched.backend match {
       case s: LocalBackend => assert(s.totalCores === 4)
-      case _ => fail()
+      case _               => fail()
     }
   }
 
@@ -124,14 +137,14 @@ class SparkContextSchedulerCreationSuite
 
     sched.backend match {
       case s: LocalBackend => assert(s.defaultParallelism() === 16)
-      case _ => fail()
+      case _               => fail()
     }
   }
 
   test("local-cluster") {
     createTaskScheduler("local-cluster[3, 14, 1024]").backend match {
       case s: SparkDeploySchedulerBackend => // OK
-      case _ => fail()
+      case _                              => fail()
     }
   }
 
@@ -143,20 +156,23 @@ class SparkContextSchedulerCreationSuite
       case e: SparkException =>
         assert(e.getMessage.contains("YARN mode not available"))
         logWarning(
-            "YARN not available, could not test actual YARN scheduler creation")
+          "YARN not available, could not test actual YARN scheduler creation")
       case e: Throwable => fail(e)
     }
   }
 
   test("yarn-cluster") {
-    testYarn("yarn",
-             "cluster",
-             "org.apache.spark.scheduler.cluster.YarnClusterScheduler")
+    testYarn(
+      "yarn",
+      "cluster",
+      "org.apache.spark.scheduler.cluster.YarnClusterScheduler")
   }
 
   test("yarn-client") {
     testYarn(
-        "yarn", "client", "org.apache.spark.scheduler.cluster.YarnScheduler")
+      "yarn",
+      "client",
+      "org.apache.spark.scheduler.cluster.YarnScheduler")
   }
 
   def testMesos(master: String, expectedClass: Class[_], coarse: Boolean) {
@@ -168,32 +184,36 @@ class SparkContextSchedulerCreationSuite
       case e: UnsatisfiedLinkError =>
         assert(e.getMessage.contains("mesos"))
         logWarning(
-            "Mesos not available, could not test actual Mesos scheduler creation")
+          "Mesos not available, could not test actual Mesos scheduler creation")
       case e: Throwable => fail(e)
     }
   }
 
   test("mesos fine-grained") {
-    testMesos("mesos://localhost:1234",
-              classOf[MesosSchedulerBackend],
-              coarse = false)
+    testMesos(
+      "mesos://localhost:1234",
+      classOf[MesosSchedulerBackend],
+      coarse = false)
   }
 
   test("mesos coarse-grained") {
-    testMesos("mesos://localhost:1234",
-              classOf[CoarseMesosSchedulerBackend],
-              coarse = true)
+    testMesos(
+      "mesos://localhost:1234",
+      classOf[CoarseMesosSchedulerBackend],
+      coarse = true)
   }
 
   test("mesos with zookeeper") {
-    testMesos("mesos://zk://localhost:1234,localhost:2345",
-              classOf[MesosSchedulerBackend],
-              coarse = false)
+    testMesos(
+      "mesos://zk://localhost:1234,localhost:2345",
+      classOf[MesosSchedulerBackend],
+      coarse = false)
   }
 
   test("mesos with zookeeper and Master URL starting with zk://") {
-    testMesos("zk://localhost:1234,localhost:2345",
-              classOf[MesosSchedulerBackend],
-              coarse = false)
+    testMesos(
+      "zk://localhost:1234,localhost:2345",
+      classOf[MesosSchedulerBackend],
+      coarse = false)
   }
 }

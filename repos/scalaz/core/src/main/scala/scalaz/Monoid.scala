@@ -38,12 +38,12 @@ trait Monoid[F] extends Semigroup[F] { self =>
   final def ifEmpty[B](a: F)(t: => B)(f: => B)(implicit eq: Equal[F]): B =
     if (isMZero(a)) { t } else { f }
 
-  final def onNotEmpty[B](a: F)(v: => B)(
-      implicit eq: Equal[F], mb: Monoid[B]): B =
+  final def onNotEmpty[B](a: F)(
+      v: => B)(implicit eq: Equal[F], mb: Monoid[B]): B =
     ifEmpty(a)(mb.zero)(v)
 
-  final def onEmpty[A, B](a: F)(v: => B)(
-      implicit eq: Equal[F], mb: Monoid[B]): B =
+  final def onEmpty[A, B](a: F)(
+      v: => B)(implicit eq: Equal[F], mb: Monoid[B]): B =
     ifEmpty(a)(v)(mb.zero)
 
   /** Every `Monoid` gives rise to a [[scalaz.Category]], for which
@@ -97,7 +97,8 @@ object Monoid {
     }
 
   private trait ApplicativeMonoid[F[_], M]
-      extends Monoid[F[M]] with Semigroup.ApplySemigroup[F, M] {
+      extends Monoid[F[M]]
+      with Semigroup.ApplySemigroup[F, M] {
     implicit def F: Applicative[F]
     implicit def M: Monoid[M]
     val zero = F.point(M.zero)
@@ -105,7 +106,8 @@ object Monoid {
 
   /**A monoid for sequencing Applicative effects. */
   def liftMonoid[F[_], M](
-      implicit F0: Applicative[F], M0: Monoid[M]): Monoid[F[M]] =
+      implicit F0: Applicative[F],
+      M0: Monoid[M]): Monoid[F[M]] =
     new ApplicativeMonoid[F, M] {
       implicit def F: Applicative[F] = F0
       implicit def M: Monoid[M] = M0

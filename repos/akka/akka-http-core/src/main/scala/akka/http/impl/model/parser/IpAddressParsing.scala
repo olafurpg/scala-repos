@@ -11,13 +11,13 @@ private[parser] trait IpAddressParsing {
 
   def `ip-v4-address` = rule {
     `ip-number` ~ '.' ~ `ip-number` ~ '.' ~ `ip-number` ~ '.' ~ `ip-number` ~>
-    (Array[Byte](_, _, _, _))
+      (Array[Byte](_, _, _, _))
   }
 
   def `ip-number` = rule {
     capture(
-        '2' ~ (DIGIT04 ~ DIGIT | '5' ~ DIGIT05) | '1' ~ DIGIT ~ DIGIT | DIGIT19 ~ DIGIT | DIGIT) ~>
-    (java.lang.Integer.parseInt(_).toByte)
+      '2' ~ (DIGIT04 ~ DIGIT | '5' ~ DIGIT05) | '1' ~ DIGIT ~ DIGIT | DIGIT19 ~ DIGIT | DIGIT) ~>
+      (java.lang.Integer.parseInt(_).toByte)
   }
 
   def `ip-v6-address`: Rule1[Array[Byte]] = {
@@ -29,18 +29,17 @@ private[parser] trait IpAddressParsing {
     }
     def h4(ix: Int) = rule { HEXDIG ~ run(a(ix) = hv(lastChar).toByte) }
     def h8(ix: Int) = rule {
-      HEXDIG ~ HEXDIG ~ run(
-          a(ix) = (hv(charAt(-2)) * 16 + hv(lastChar)).toByte)
+      HEXDIG ~ HEXDIG ~ run(a(ix) = (hv(charAt(-2)) * 16 + hv(lastChar)).toByte)
     }
     def h16(ix: Int) = rule {
       h8(ix) ~ h8(ix + 1) | h4(ix) ~ h8(ix + 1) | zero(ix) ~ h8(ix + 1) | zero(
-          ix) ~ h4(ix + 1)
+        ix) ~ h4(ix + 1)
     }
     def h16c(ix: Int) = rule { h16(ix) ~ ':' ~ !':' }
     def ch16o(ix: Int) = rule { optional(':' ~ !':') ~ (h16(ix) | zero2(ix)) }
     def ls32 = rule {
       h16(12) ~ ':' ~ h16(14) | `ip-v4-address` ~>
-      (System.arraycopy(_, 0, a, 12, 4))
+        (System.arraycopy(_, 0, a, 12, 4))
     }
     def cc(ix: Int) = rule { ':' ~ ':' ~ zero2(ix) }
     def tail2 = rule { h16c(2) ~ tail4 }
@@ -50,13 +49,13 @@ private[parser] trait IpAddressParsing {
     def tail10 = rule { h16c(10) ~ ls32 }
     rule {
       !(':' ~ HEXDIG) ~ push { a = new Array[Byte](16); a } ~
-      (h16c(0) ~ tail2 | cc(0) ~ tail2 | ch16o(0) ~
+        (h16c(0) ~ tail2 | cc(0) ~ tail2 | ch16o(0) ~
           (cc(2) ~ tail4 | ch16o(2) ~
-              (cc(4) ~ tail6 | ch16o(4) ~
-                  (cc(6) ~ tail8 | ch16o(6) ~
-                      (cc(8) ~ tail10 | ch16o(8) ~
-                          (cc(10) ~ ls32 | ch16o(10) ~
-                              (cc(12) ~ h16(14) | ch16o(12) ~ cc(14))))))))
+            (cc(4) ~ tail6 | ch16o(4) ~
+              (cc(6) ~ tail8 | ch16o(6) ~
+                (cc(8) ~ tail10 | ch16o(8) ~
+                  (cc(10) ~ ls32 | ch16o(10) ~
+                    (cc(12) ~ h16(14) | ch16o(12) ~ cc(14))))))))
     }
   }
 

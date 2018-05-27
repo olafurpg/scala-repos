@@ -30,7 +30,7 @@ private[sql] class ExamplePoint(val x: Double, val y: Double)
     extends Serializable {
   override def equals(other: Any): Boolean = other match {
     case that: ExamplePoint => this.x == that.x && this.y == that.y
-    case _ => false
+    case _                  => false
   }
 }
 

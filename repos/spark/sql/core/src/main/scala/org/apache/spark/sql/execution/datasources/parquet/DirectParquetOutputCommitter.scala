@@ -22,7 +22,12 @@ import org.apache.hadoop.fs.Path
 import org.apache.hadoop.mapreduce.{JobContext, TaskAttemptContext}
 import org.apache.hadoop.mapreduce.lib.output.FileOutputCommitter
 import org.apache.parquet.Log
-import org.apache.parquet.hadoop.{ParquetFileReader, ParquetFileWriter, ParquetOutputCommitter, ParquetOutputFormat}
+import org.apache.parquet.hadoop.{
+  ParquetFileReader,
+  ParquetFileWriter,
+  ParquetOutputCommitter,
+  ParquetOutputFormat
+}
 import org.apache.parquet.hadoop.util.ContextUtil
 
 /**
@@ -42,7 +47,8 @@ import org.apache.parquet.hadoop.util.ContextUtil
   *   left empty).
   */
 private[datasources] class DirectParquetOutputCommitter(
-    outputPath: Path, context: TaskAttemptContext)
+    outputPath: Path,
+    context: TaskAttemptContext)
     extends ParquetOutputCommitter(outputPath, context) {
   val LOG = Log.getLog(classOf[ParquetOutputCommitter])
 
@@ -61,15 +67,18 @@ private[datasources] class DirectParquetOutputCommitter(
       try {
         val outputStatus = fileSystem.getFileStatus(outputPath)
         val footers = ParquetFileReader.readAllFootersInParallel(
-            configuration, outputStatus)
+          configuration,
+          outputStatus)
         try {
           ParquetFileWriter.writeMetadataFile(
-              configuration, outputPath, footers)
+            configuration,
+            outputPath,
+            footers)
         } catch {
           case e: Exception =>
             LOG.warn("could not write summary file for " + outputPath, e)
-            val metadataPath = new Path(
-                outputPath, ParquetFileWriter.PARQUET_METADATA_FILE)
+            val metadataPath =
+              new Path(outputPath, ParquetFileWriter.PARQUET_METADATA_FILE)
             if (fileSystem.exists(metadataPath)) {
               fileSystem.delete(metadataPath, true)
             }
@@ -81,10 +90,11 @@ private[datasources] class DirectParquetOutputCommitter(
     }
 
     if (configuration.getBoolean(
-            "mapreduce.fileoutputcommitter.marksuccessfuljobs", true)) {
+          "mapreduce.fileoutputcommitter.marksuccessfuljobs",
+          true)) {
       try {
-        val successPath = new Path(
-            outputPath, FileOutputCommitter.SUCCEEDED_FILE_NAME)
+        val successPath =
+          new Path(outputPath, FileOutputCommitter.SUCCEEDED_FILE_NAME)
         fileSystem.create(successPath).close()
       } catch {
         case e: Exception =>

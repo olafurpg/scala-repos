@@ -13,4 +13,5 @@ object HoconJoinLinesTest extends TestSuiteCompanion[HoconJoinLinesTest]
 @RunWith(classOf[AllTests])
 class HoconJoinLinesTest
     extends HoconEditorActionTest(
-        IdeActions.ACTION_EDITOR_JOIN_LINES, "joinLines")
+      IdeActions.ACTION_EDITOR_JOIN_LINES,
+      "joinLines")

@@ -34,14 +34,16 @@ import org.apache.spark.sql.types.{Metadata, MetadataBuilder, StructField}
   *              indices in the array.
   */
 @DeveloperApi
-class AttributeGroup private (val name: String,
-                              val numAttributes: Option[Int],
-                              attrs: Option[Array[Attribute]])
+class AttributeGroup private (
+    val name: String,
+    val numAttributes: Option[Int],
+    attrs: Option[Array[Attribute]])
     extends Serializable {
 
   require(name.nonEmpty, "Cannot have an empty string for name.")
-  require(!(numAttributes.isDefined && attrs.isDefined),
-          "Cannot have both numAttributes and attrs defined.")
+  require(
+    !(numAttributes.isDefined && attrs.isDefined),
+    "Cannot have both numAttributes and attrs defined.")
 
   /**
     * Creates an attribute group without attribute info.
@@ -69,8 +71,7 @@ class AttributeGroup private (val name: String,
   /**
     * Optional array of attributes. At most one of `numAttributes` and `attributes` can be defined.
     */
-  val attributes: Option[Array[Attribute]] = attrs.map(
-      _.view.zipWithIndex.map {
+  val attributes: Option[Array[Attribute]] = attrs.map(_.view.zipWithIndex.map {
     case (attr, i) =>
       attr.withIndex(i)
   }.toArray)
@@ -137,15 +138,18 @@ class AttributeGroup private (val name: String,
       val attrBldr = new MetadataBuilder
       if (numericMetadata.nonEmpty) {
         attrBldr.putMetadataArray(
-            AttributeType.Numeric.name, numericMetadata.toArray)
+          AttributeType.Numeric.name,
+          numericMetadata.toArray)
       }
       if (nominalMetadata.nonEmpty) {
         attrBldr.putMetadataArray(
-            AttributeType.Nominal.name, nominalMetadata.toArray)
+          AttributeType.Nominal.name,
+          nominalMetadata.toArray)
       }
       if (binaryMetadata.nonEmpty) {
         attrBldr.putMetadataArray(
-            AttributeType.Binary.name, binaryMetadata.toArray)
+          AttributeType.Binary.name,
+          binaryMetadata.toArray)
       }
       bldr.putMetadata(ATTRIBUTES, attrBldr.build())
       bldr.putLong(NUM_ATTRIBUTES, attributes.get.length)
@@ -169,7 +173,10 @@ class AttributeGroup private (val name: String,
   /** Converts to a StructField with some existing metadata. */
   def toStructField(existingMetadata: Metadata): StructField = {
     StructField(
-        name, new VectorUDT, nullable = false, toMetadata(existingMetadata))
+      name,
+      new VectorUDT,
+      nullable = false,
+      toMetadata(existingMetadata))
   }
 
   /** Converts to a StructField. */
@@ -179,7 +186,7 @@ class AttributeGroup private (val name: String,
     other match {
       case o: AttributeGroup =>
         (name == o.name) && (numAttributes == o.numAttributes) &&
-        (attributes.map(_.toSeq) == o.attributes.map(_.toSeq))
+          (attributes.map(_.toSeq) == o.attributes.map(_.toSeq))
       case _ =>
         false
     }
@@ -207,7 +214,8 @@ object AttributeGroup {
 
   /** Creates an attribute group from a [[Metadata]] instance with name. */
   private[attribute] def fromMetadata(
-      metadata: Metadata, name: String): AttributeGroup = {
+      metadata: Metadata,
+      name: String): AttributeGroup = {
     import org.apache.spark.ml.attribute.AttributeType._
     if (metadata.contains(ATTRIBUTES)) {
       val numAttrs = metadata.getLong(NUM_ATTRIBUTES).toInt

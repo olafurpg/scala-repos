@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -61,8 +61,11 @@ import scalaz.syntax.std.boolean._
 import scalaz.syntax.bifunctor._
 
 trait SliceTransforms[M[+ _]]
-    extends TableModule[M] with ColumnarTableTypes[M] with ObjectConcatHelpers
-    with ArrayConcatHelpers with MapUtils {
+    extends TableModule[M]
+    with ColumnarTableTypes[M]
+    with ObjectConcatHelpers
+    with ArrayConcatHelpers
+    with MapUtils {
 
   import TableModule._
   import trans._
@@ -72,11 +75,9 @@ trait SliceTransforms[M[+ _]]
     def identity[A](initial: A) =
       SliceTransform1.liftM[A](initial, (a: A, s: Slice) => (a, s))
     def left[A](initial: A) =
-      SliceTransform2.liftM[A](
-          initial, (a: A, sl: Slice, sr: Slice) => (a, sl))
+      SliceTransform2.liftM[A](initial, (a: A, sl: Slice, sr: Slice) => (a, sl))
     def right[A](initial: A) =
-      SliceTransform2.liftM[A](
-          initial, (a: A, sl: Slice, sr: Slice) => (a, sr))
+      SliceTransform2.liftM[A](initial, (a: A, sl: Slice, sr: Slice) => (a, sr))
 
     def liftM(f: Slice => Slice): SliceTransform1[Unit] =
       SliceTransform1.liftM[Unit]((), { (u, s) =>
@@ -156,10 +157,10 @@ trait SliceTransforms[M[+ _]]
                 val definedAt = new BitSet
                 filter.columns.values.foreach {
                   case col: BoolColumn => {
-                      cf.util.isSatisfied(col).foreach { c =>
-                        definedAt.or(c.definedAt(0, s.size))
-                      }
+                    cf.util.isSatisfied(col).foreach { c =>
+                      definedAt.or(c.definedAt(0, s.size))
                     }
+                  }
                 }
 
                 s mapColumns { cf.util.filter(0, s.size, definedAt) }
@@ -190,7 +191,7 @@ trait SliceTransforms[M[+ _]]
            * - v1 = undefined = false
            * - undefined = v2 = false
            * - undefined = undefined = true
-           * 
+           *
            * The undefined comparison is required because we are comparing columns
            * that may be nested inside a larger object.  We don't have the information
            * at the pair level to determine whether the answer should be
@@ -209,22 +210,22 @@ trait SliceTransforms[M[+ _]]
                 val (leftNonNum, leftNum) =
                   sl.columns partition {
                     case (ColumnRef(_, CLong | CDouble | CNum), _) => false
-                    case _ => true
+                    case _                                         => true
                   }
 
                 val (rightNonNum, rightNum) =
                   sr.columns partition {
                     case (ColumnRef(_, CLong | CDouble | CNum), _) => false
-                    case _ => true
+                    case _                                         => true
                   }
 
                 val groupedNonNum =
                   (leftNonNum mapValues { _ :: Nil }) cogroup
-                  (rightNonNum mapValues { _ :: Nil })
+                    (rightNonNum mapValues { _ :: Nil })
 
                 val simplifiedGroupNonNum =
                   groupedNonNum map {
-                    case (_, Left3(column)) => Left(column)
+                    case (_, Left3(column))  => Left(column)
                     case (_, Right3(column)) => Left(column)
                     case (_, Middle3((left :: Nil, right :: Nil))) =>
                       Right((left, right))
@@ -257,10 +258,10 @@ trait SliceTransforms[M[+ _]]
                 def stripTypes(cols: Map[ColumnRef, Column]) = {
                   cols.foldLeft(Map[CPath, Set[Column]]()) {
                     case (acc, (ColumnRef(path, _), column)) => {
-                        val set =
-                          acc get path map { _ + column } getOrElse Set(column)
-                        acc.updated(path, set)
-                      }
+                      val set =
+                        acc get path map { _ + column } getOrElse Set(column)
+                      acc.updated(path, set)
+                    }
                   }
                 }
 
@@ -277,8 +278,9 @@ trait SliceTransforms[M[+ _]]
                       Left(column): Either[Column, (Set[Column], Set[Column])]
 
                     case (_, Middle3((left, right))) =>
-                      Right((left, right)): Either[Column,
-                                                   (Set[Column], Set[Column])]
+                      Right((left, right)): Either[
+                        Column,
+                        (Set[Column], Set[Column])]
                   }
 
                 val testedNum: Array[BoolColumn] = simplifiedGroupedNum.map({
@@ -301,7 +303,7 @@ trait SliceTransforms[M[+ _]]
                 val unified = new BoolColumn {
                   def isDefinedAt(row: Int): Boolean =
                     unifiedNonNum.isDefinedAt(row) ||
-                    unifiedNum.isDefinedAt(row)
+                      unifiedNum.isDefinedAt(row)
                   def apply(row: Int): Boolean = {
                     val left =
                       !unifiedNonNum.isDefinedAt(row) || unifiedNonNum(row)
@@ -323,52 +325,53 @@ trait SliceTransforms[M[+ _]]
           }
 
         case EqualLiteral(source, value, invert) => {
-            val id = System.currentTimeMillis
-            import cf.std.Eq
+          val id = System.currentTimeMillis
+          import cf.std.Eq
 
-            val sourceSlice = composeSliceTransform2(source)
+          val sourceSlice = composeSliceTransform2(source)
 
-            def complement(col: BoolColumn) = new BoolColumn {
-              def isDefinedAt(row: Int) = col.isDefinedAt(row)
-              def apply(row: Int) = !col(row)
-            }
+          def complement(col: BoolColumn) = new BoolColumn {
+            def isDefinedAt(row: Int) = col.isDefinedAt(row)
+            def apply(row: Int) = !col(row)
+          }
 
-            sourceSlice map { ss =>
-              new Slice {
-                val size = ss.size
-                val columns = {
-                  val (comparable0, other0) = ss.columns.toList.partition {
-                    case (ref @ ColumnRef(CPath.Identity, tpe), col)
-                        if CType.canCompare(CType.of(value), tpe) =>
-                      true
-                    case _ => false
-                  }
-
-                  val comparable = comparable0.map(_._2).flatMap { col =>
-                    Eq.partialRight(value)(col).map(_.asInstanceOf[BoolColumn])
-                  }
-                  val other = other0.map(_._2).map { col =>
-                    new Map1Column(col) with BoolColumn {
-                      def apply(row: Int) = false
-                    }
-                  }
-
-                  val columns = comparable ++ other
-                  val aggregate = new BoolColumn {
-                    def isDefinedAt(row: Int) = columns.exists {
-                      _.isDefinedAt(row)
-                    }
-                    def apply(row: Int) = columns.exists { col =>
-                      col.isDefinedAt(row) && col(row)
-                    }
-                  }
-
-                  Map(ColumnRef(CPath.Identity, CBoolean) ->
-                      (if (invert) complement(aggregate) else aggregate))
+          sourceSlice map { ss =>
+            new Slice {
+              val size = ss.size
+              val columns = {
+                val (comparable0, other0) = ss.columns.toList.partition {
+                  case (ref @ ColumnRef(CPath.Identity, tpe), col)
+                      if CType.canCompare(CType.of(value), tpe) =>
+                    true
+                  case _ => false
                 }
+
+                val comparable = comparable0.map(_._2).flatMap { col =>
+                  Eq.partialRight(value)(col).map(_.asInstanceOf[BoolColumn])
+                }
+                val other = other0.map(_._2).map { col =>
+                  new Map1Column(col) with BoolColumn {
+                    def apply(row: Int) = false
+                  }
+                }
+
+                val columns = comparable ++ other
+                val aggregate = new BoolColumn {
+                  def isDefinedAt(row: Int) = columns.exists {
+                    _.isDefinedAt(row)
+                  }
+                  def apply(row: Int) = columns.exists { col =>
+                    col.isDefinedAt(row) && col(row)
+                  }
+                }
+
+                Map(
+                  ColumnRef(CPath.Identity, CBoolean) ->
+                    (if (invert) complement(aggregate) else aggregate))
               }
             }
           }
+        }
 
         case ConstLiteral(value, target) =>
           composeSliceTransform2(target) map { _.definedConst(value) }
@@ -383,7 +386,7 @@ trait SliceTransforms[M[+ _]]
             _ wrap CPathIndex(0)
           }
 
-        case OuterObjectConcat(objects @ _ *) =>
+        case OuterObjectConcat(objects @ _*) =>
           if (objects.size == 1) {
             val typed = Typed(objects.head, JObjectUnfixedT)
             composeSliceTransform2(typed)
@@ -395,17 +398,24 @@ trait SliceTransforms[M[+ _]]
 
                   val columns: Map[ColumnRef, Column] = {
                     val (leftObjectBits, leftEmptyBits) = buildFilters(
-                        sl.columns, sl.size, filterObjects, filterEmptyObjects)
+                      sl.columns,
+                      sl.size,
+                      filterObjects,
+                      filterEmptyObjects)
                     val (rightObjectBits, rightEmptyBits) = buildFilters(
-                        sr.columns, sr.size, filterObjects, filterEmptyObjects)
+                      sr.columns,
+                      sr.size,
+                      filterObjects,
+                      filterEmptyObjects)
 
                     val (leftFields, rightFields) =
                       buildFields(sl.columns, sr.columns)
 
-                    val emptyBits = buildOuterBits(leftEmptyBits,
-                                                   rightEmptyBits,
-                                                   leftObjectBits,
-                                                   rightObjectBits)
+                    val emptyBits = buildOuterBits(
+                      leftEmptyBits,
+                      rightEmptyBits,
+                      leftObjectBits,
+                      rightObjectBits)
 
                     val emptyObjects = buildEmptyObjects(emptyBits)
                     val nonemptyObjects =
@@ -418,7 +428,7 @@ trait SliceTransforms[M[+ _]]
             }
           }
 
-        case InnerObjectConcat(objects @ _ *) =>
+        case InnerObjectConcat(objects @ _*) =>
           /**
             * This test is for special casing object concats when we know we
             * won't have any unions, or funky behaviour arising from empty
@@ -465,24 +475,27 @@ trait SliceTransforms[M[+ _]]
                       sl.columns ++ sr.columns
                     } else {
                       val (leftObjectBits, leftEmptyBits) =
-                        buildFilters(sl.columns,
-                                     sl.size,
-                                     filterObjects,
-                                     filterEmptyObjects)
+                        buildFilters(
+                          sl.columns,
+                          sl.size,
+                          filterObjects,
+                          filterEmptyObjects)
                       val (rightObjectBits, rightEmptyBits) =
-                        buildFilters(sr.columns,
-                                     sr.size,
-                                     filterObjects,
-                                     filterEmptyObjects)
+                        buildFilters(
+                          sr.columns,
+                          sr.size,
+                          filterObjects,
+                          filterEmptyObjects)
 
                       val (leftFields, rightFields) =
                         buildFields(sl.columns, sr.columns)
 
                       val (emptyBits, nonemptyBits) =
-                        buildInnerBits(leftEmptyBits,
-                                       rightEmptyBits,
-                                       leftObjectBits,
-                                       rightObjectBits)
+                        buildInnerBits(
+                          leftEmptyBits,
+                          rightEmptyBits,
+                          leftObjectBits,
+                          rightObjectBits)
 
                       val emptyObjects = buildEmptyObjects(emptyBits)
                       val nonemptyObjects =
@@ -502,7 +515,7 @@ trait SliceTransforms[M[+ _]]
             }
           }
 
-        case OuterArrayConcat(elements @ _ *) =>
+        case OuterArrayConcat(elements @ _*) =>
           if (elements.size == 1) {
             val typed = Typed(elements.head, JArrayUnfixedT)
             composeSliceTransform2(typed)
@@ -514,14 +527,21 @@ trait SliceTransforms[M[+ _]]
 
                   val columns: Map[ColumnRef, Column] = {
                     val (leftArrayBits, leftEmptyBits) = buildFilters(
-                        sl.columns, sl.size, filterArrays, filterEmptyArrays)
+                      sl.columns,
+                      sl.size,
+                      filterArrays,
+                      filterEmptyArrays)
                     val (rightArrayBits, rightEmptyBits) = buildFilters(
-                        sr.columns, sr.size, filterArrays, filterEmptyArrays)
+                      sr.columns,
+                      sr.size,
+                      filterArrays,
+                      filterEmptyArrays)
 
-                    val emptyBits = buildOuterBits(leftEmptyBits,
-                                                   rightEmptyBits,
-                                                   leftArrayBits,
-                                                   rightArrayBits)
+                    val emptyBits = buildOuterBits(
+                      leftEmptyBits,
+                      rightEmptyBits,
+                      leftArrayBits,
+                      rightArrayBits)
 
                     val emptyArrays = buildEmptyArrays(emptyBits)
                     val nonemptyArrays =
@@ -534,7 +554,7 @@ trait SliceTransforms[M[+ _]]
             }
           }
 
-        case InnerArrayConcat(elements @ _ *) =>
+        case InnerArrayConcat(elements @ _*) =>
           if (elements.size == 1) {
             val typed = Typed(elements.head, JArrayUnfixedT)
             composeSliceTransform2(typed)
@@ -549,15 +569,22 @@ trait SliceTransforms[M[+ _]]
                       Map.empty[ColumnRef, Column]
                     } else {
                       val (leftArrayBits, leftEmptyBits) = buildFilters(
-                          sl.columns, sl.size, filterArrays, filterEmptyArrays)
+                        sl.columns,
+                        sl.size,
+                        filterArrays,
+                        filterEmptyArrays)
                       val (rightArrayBits, rightEmptyBits) = buildFilters(
-                          sr.columns, sr.size, filterArrays, filterEmptyArrays)
+                        sr.columns,
+                        sr.size,
+                        filterArrays,
+                        filterEmptyArrays)
 
                       val (emptyBits, nonemptyBits) =
-                        buildInnerBits(leftEmptyBits,
-                                       rightEmptyBits,
-                                       leftArrayBits,
-                                       rightArrayBits)
+                        buildInnerBits(
+                          leftEmptyBits,
+                          rightEmptyBits,
+                          leftArrayBits,
+                          rightArrayBits)
 
                       val emptyArrays = buildEmptyArrays(emptyBits)
                       val nonemptyArrays =
@@ -600,34 +627,36 @@ trait SliceTransforms[M[+ _]]
         case Scan(source, scanner) =>
           composeSliceTransform2(source) andThen {
             SliceTransform1.liftM[scanner.A](
-                scanner.init, { (state: scanner.A, slice: Slice) =>
-                  val (newState, newCols) =
-                    scanner.scan(state, slice.columns, 0 until slice.size)
+              scanner.init, { (state: scanner.A, slice: Slice) =>
+                val (newState, newCols) =
+                  scanner.scan(state, slice.columns, 0 until slice.size)
 
-                  val newSlice = new Slice {
-                    val size = slice.size
-                    val columns = newCols
-                  }
-
-                  (newState, newSlice)
+                val newSlice = new Slice {
+                  val size = slice.size
+                  val columns = newCols
                 }
+
+                (newState, newSlice)
+              }
             )
           }
 
         case MapWith(source, mapper0) =>
           composeSliceTransform2(source) andThen {
-            mapper0.fold({ mapper =>
-              SliceTransform1.liftM[Unit]((), { (_: Unit, slice: Slice) =>
-                val cols = mapper.map(slice.columns, 0 until slice.size)
-                ((), Slice(cols, slice.size))
-              })
-            }, { mapper =>
-              SliceTransform1[Unit]((), { (_: Unit, slice: Slice) =>
-                mapper.map(slice.columns, 0 until slice.size) map { cols =>
+            mapper0.fold(
+              { mapper =>
+                SliceTransform1.liftM[Unit]((), { (_: Unit, slice: Slice) =>
+                  val cols = mapper.map(slice.columns, 0 until slice.size)
                   ((), Slice(cols, slice.size))
-                }
-              })
-            })
+                })
+              }, { mapper =>
+                SliceTransform1[Unit]((), { (_: Unit, slice: Slice) =>
+                  mapper.map(slice.columns, 0 until slice.size) map { cols =>
+                    ((), Slice(cols, slice.size))
+                  }
+                })
+              }
+            )
           }
 
         case DerefMetadataStatic(source, field) =>
@@ -704,54 +733,54 @@ trait SliceTransforms[M[+ _]]
           }
 
         case Cond(pred, left, right) => {
-            val predTransform = composeSliceTransform2(pred)
-            val leftTransform = composeSliceTransform2(left)
-            val rightTransform = composeSliceTransform2(right)
+          val predTransform = composeSliceTransform2(pred)
+          val leftTransform = composeSliceTransform2(left)
+          val rightTransform = composeSliceTransform2(right)
 
-            predTransform.zip2(leftTransform, rightTransform) {
-              (predS, leftS, rightS) =>
-                new Slice {
-                  val size = predS.size
+          predTransform.zip2(leftTransform, rightTransform) {
+            (predS, leftS, rightS) =>
+              new Slice {
+                val size = predS.size
 
-                  val columns: Map[ColumnRef, Column] = {
-                    predS.columns get ColumnRef(CPath.Identity, CBoolean) map {
-                      predC =>
-                        val leftMask =
-                          predC.asInstanceOf[BoolColumn].asBitSet(false, size)
+                val columns: Map[ColumnRef, Column] = {
+                  predS.columns get ColumnRef(CPath.Identity, CBoolean) map {
+                    predC =>
+                      val leftMask =
+                        predC.asInstanceOf[BoolColumn].asBitSet(false, size)
 
-                        val rightMask =
-                          predC.asInstanceOf[BoolColumn].asBitSet(true, size)
-                        rightMask.flip(0, size)
+                      val rightMask =
+                        predC.asInstanceOf[BoolColumn].asBitSet(true, size)
+                      rightMask.flip(0, size)
 
-                        val grouped =
-                          (leftS.columns mapValues { _ :: Nil }) cogroup
+                      val grouped =
+                        (leftS.columns mapValues { _ :: Nil }) cogroup
                           (rightS.columns mapValues { _ :: Nil })
 
-                        val joined: Map[ColumnRef, Column] = grouped.map({
-                          case (ref, Left3(col)) =>
-                            ref -> cf.util.filter(0, size, leftMask)(col).get
+                      val joined: Map[ColumnRef, Column] = grouped.map({
+                        case (ref, Left3(col)) =>
+                          ref -> cf.util.filter(0, size, leftMask)(col).get
 
-                          case (ref, Right3(col)) =>
-                            ref -> cf.util.filter(0, size, rightMask)(col).get
+                        case (ref, Right3(col)) =>
+                          ref -> cf.util.filter(0, size, rightMask)(col).get
 
-                          case (ref, Middle3((left :: Nil, right :: Nil))) => {
-                              val left2 =
-                                cf.util.filter(0, size, leftMask)(left).get
-                              val right2 =
-                                cf.util.filter(0, size, rightMask)(right).get
+                        case (ref, Middle3((left :: Nil, right :: Nil))) => {
+                          val left2 =
+                            cf.util.filter(0, size, leftMask)(left).get
+                          val right2 =
+                            cf.util.filter(0, size, rightMask)(right).get
 
-                              ref -> cf.util
-                                .MaskedUnion(leftMask)(left2, right2)
-                                .get // safe because types are grouped
-                            }
-                        })(collection.breakOut)
+                          ref -> cf.util
+                            .MaskedUnion(leftMask)(left2, right2)
+                            .get // safe because types are grouped
+                        }
+                      })(collection.breakOut)
 
-                        joined
-                    } getOrElse Map[ColumnRef, Column]()
-                  }
+                      joined
+                  } getOrElse Map[ColumnRef, Column]()
                 }
-            }
+              }
           }
+        }
       }
 
       result
@@ -807,51 +836,57 @@ trait SliceTransforms[M[+ _]]
           })
 
         case (sta, stb) =>
-          SliceTransform1[(A, B)]((sta.initial, stb.initial), {
-            case ((a0, b0), s0) =>
-              for (ares <- sta.f(a0, s0); bres <- stb.f(b0, s0)) yield {
-                val (a, sa) = ares
-                val (b, sb) = bres
-                assert(sa.size == sb.size)
-                ((a, b), combine(sa, sb))
-              }
-          })
+          SliceTransform1[(A, B)](
+            (sta.initial, stb.initial), {
+              case ((a0, b0), s0) =>
+                for (ares <- sta.f(a0, s0); bres <- stb.f(b0, s0)) yield {
+                  val (a, sa) = ares
+                  val (b, sb) = bres
+                  assert(sa.size == sb.size)
+                  ((a, b), combine(sa, sb))
+                }
+            }
+          )
       }
     }
 
     def zip2[B, C](t: SliceTransform1[B], t2: SliceTransform1[C])(
-        combine: (Slice, Slice,
-        Slice) => Slice): SliceTransform1[(A, B, C)] = {
+        combine: (Slice, Slice, Slice) => Slice): SliceTransform1[(A, B, C)] = {
 
       // We can do this in 4 cases efficiently simply be re-ordering the 3 sts.
       // Since they're done in parallel, we just need to make sure combine works.
 
       (this, t, t2) match {
-        case (sta: SliceTransform1S[_],
-              stb: SliceTransform1S[_],
-              stc: SliceTransform1S[_]) =>
-          SliceTransform1S((sta.initial, stb.initial, stc.initial), {
-            case ((a0, b0, c0), s0) =>
-              val (a, sa) = sta.f0(a0, s0)
-              val (b, sb) = stb.f0(b0, s0)
-              val (c, sc) = stc.f0(c0, s0)
-              ((a, b, c), combine(sa, sb, sc))
-          })
+        case (
+            sta: SliceTransform1S[_],
+            stb: SliceTransform1S[_],
+            stc: SliceTransform1S[_]) =>
+          SliceTransform1S(
+            (sta.initial, stb.initial, stc.initial), {
+              case ((a0, b0, c0), s0) =>
+                val (a, sa) = sta.f0(a0, s0)
+                val (b, sb) = stb.f0(b0, s0)
+                val (c, sc) = stc.f0(c0, s0)
+                ((a, b, c), combine(sa, sb, sc))
+            }
+          )
 
         case (sta, stb, stc) =>
-          SliceTransform1M((sta.initial, stb.initial, stc.initial), {
-            case ((a0, b0, c0), s0) =>
-              for {
-                resa <- sta.f(a0, s0)
-                resb <- stb.f(b0, s0)
-                resc <- stc.f(c0, s0)
-              } yield {
-                val (a, sa) = resa
-                val (b, sb) = resb
-                val (c, sc) = resc
-                ((a, b, c), combine(sa, sb, sc))
-              }
-          })
+          SliceTransform1M(
+            (sta.initial, stb.initial, stc.initial), {
+              case ((a0, b0, c0), s0) =>
+                for {
+                  resa <- sta.f(a0, s0)
+                  resb <- stb.f(b0, s0)
+                  resc <- stc.f(c0, s0)
+                } yield {
+                  val (a, sa) = resa
+                  val (b, sb) = resb
+                  val (c, sc) = resc
+                  ((a, b, c), combine(sa, sb, sc))
+                }
+            }
+          )
       }
     }
 
@@ -895,17 +930,15 @@ trait SliceTransforms[M[+ _]]
       (sta, stb) match {
         case (Identity, stb) =>
           SliceTransform1S((sta.initial, stb.initial), {
-            case ((_, b0), s0) =>
-              { (b: B) =>
-                (sta.initial, b)
-              } <-: stb.f0(b0, s0)
+            case ((_, b0), s0) => { (b: B) =>
+              (sta.initial, b)
+            } <-: stb.f0(b0, s0)
           })
         case (sta, Identity) =>
           SliceTransform1S((sta.initial, stb.initial), {
-            case ((a0, _), s0) =>
-              { (a: A) =>
-                (a, stb.initial)
-              } <-: sta.f0(a0, s0)
+            case ((a0, _), s0) => { (a: A) =>
+              (a, stb.initial)
+            } <-: sta.f0(a0, s0)
           })
         case (SliceTransform1S(i1, f1), SliceTransform1S(i2, f2)) =>
           SliceTransform1S((i1, i2), {
@@ -929,54 +962,57 @@ trait SliceTransforms[M[+ _]]
         case (SliceTransform1M(i0, f0), SliceTransform1M(i1, f1)) =>
           SliceTransform1M((i0, i1), {
             case ((a0, b0), s0) =>
-              for (r0 <- f0(i0, s0); r1 <- f1(i1, r0._2)) yield
-                ((r0._1, r1._1), r1._2)
+              for (r0 <- f0(i0, s0); r1 <- f1(i1, r0._2))
+                yield ((r0._1, r1._1), r1._2)
           })
 
         case (sta: SliceTransform1S[_], stb: SliceTransform1M[_]) =>
           val st = SliceTransform1SMS(sta, stb, Identity)
           st.mapState({ case (a, b, _) => (a, b) }, {
-            case (a, b) => (a, b, ())
+            case (a, b)                => (a, b, ())
           })
 
         case (sta: SliceTransform1M[_], stb: SliceTransform1S[_]) =>
           val st = SliceTransform1SMS(Identity, sta, stb)
           st.mapState({ case (_, a, b) => (a, b) }, {
-            case (a, b) => ((), a, b)
+            case (a, b)                => ((), a, b)
           })
 
         case (sta: SliceTransform1S[_], SliceTransform1SMS(stb, stc, std)) =>
           val st = SliceTransform1SMS(chainS(sta, stb), stc, std)
           st.mapState({ case ((a, b), c, d) => (a, (b, c, d)) }, {
-            case (a, (b, c, d)) => ((a, b), c, d)
+            case (a, (b, c, d))             => ((a, b), c, d)
           })
 
         case (SliceTransform1SMS(sta, stb, stc), std: SliceTransform1S[_]) =>
           val st = SliceTransform1SMS(sta, stb, chainS(stc, std))
           st.mapState({ case (a, b, (c, d)) => ((a, b, c), d) }, {
-            case ((a, b, c), d) => (a, b, (c, d))
+            case ((a, b, c), d)             => (a, b, (c, d))
           })
 
         case (sta: SliceTransform1M[_], SliceTransform1SMS(stb, stc, std)) =>
-          val st = SliceTransform1SMS(
-              Identity, sta andThen stb andThen stc, std)
+          val st =
+            SliceTransform1SMS(Identity, sta andThen stb andThen stc, std)
           st.mapState({ case (_, ((a, b), c), d) => (a, (b, c, d)) }, {
-            case (a, (b, c, d)) => ((), ((a, b), c), d)
+            case (a, (b, c, d))                  => ((), ((a, b), c), d)
           })
 
         case (SliceTransform1SMS(sta, stb, stc), std: SliceTransform1M[_]) =>
-          val st = SliceTransform1SMS(
-              sta, stb andThen stc andThen std, Identity)
+          val st =
+            SliceTransform1SMS(sta, stb andThen stc andThen std, Identity)
           st.mapState({ case (a, ((b, c), d), _) => ((a, b, c), d) }, {
-            case ((a, b, c), d) => (a, ((b, c), d), ())
+            case ((a, b, c), d)                  => (a, ((b, c), d), ())
           })
 
-        case (SliceTransform1SMS(sta, stb, stc),
-              SliceTransform1SMS(std, ste, stf)) =>
+        case (
+            SliceTransform1SMS(sta, stb, stc),
+            SliceTransform1SMS(std, ste, stf)) =>
           val st = SliceTransform1SMS(
-              sta, stb andThen stc andThen std andThen ste, stf)
+            sta,
+            stb andThen stc andThen std andThen ste,
+            stf)
           st.mapState({
-            case (a, (((b, c), d), e), f) => ((a, b, c), (d, e, f))
+            case (a, (((b, c), d), e), f)  => ((a, b, c), (d, e, f))
           }, { case ((a, b, c), (d, e, f)) => (a, (((b, c), d), e), f) })
 
         case (MappedState1(sta, f, g), stb) =>
@@ -988,19 +1024,21 @@ trait SliceTransforms[M[+ _]]
     }
 
     private[table] case class SliceTransform1S[A](
-        initial: A, f0: (A, Slice) => (A, Slice))
+        initial: A,
+        f0: (A, Slice) => (A, Slice))
         extends SliceTransform1[A] {
       override def unlift = Some(f0)
       val f: (A, Slice) => M[(A, Slice)] = { case (a, s) => M point f0(a, s) }
       def advance(s: Slice): M[(SliceTransform1[A], Slice)] =
         M point
-        ({ (a: A) =>
-          SliceTransform1S[A](a, f0)
-        } <-: f0(initial, s))
+          ({ (a: A) =>
+            SliceTransform1S[A](a, f0)
+          } <-: f0(initial, s))
     }
 
     private[table] case class SliceTransform1M[A](
-        initial: A, f: (A, Slice) => M[(A, Slice)])
+        initial: A,
+        f: (A, Slice) => M[(A, Slice)])
         extends SliceTransform1[A] {
       def advance(s: Slice): M[(SliceTransform1[A], Slice)] = apply(s) map {
         case (next, slice) =>
@@ -1029,14 +1067,19 @@ trait SliceTransforms[M[+ _]]
         apply(s) map {
           case ((a, b, c), slice) =>
             val transM0 = SliceTransform1M(b, transM.f)
-            (SliceTransform1SMS[A, B, C](
-                 before.copy(initial = a), transM0, after.copy(initial = c)),
-             slice)
+            (
+              SliceTransform1SMS[A, B, C](
+                before.copy(initial = a),
+                transM0,
+                after.copy(initial = c)),
+              slice)
         }
     }
 
     private[table] case class MappedState1[A, B](
-        st: SliceTransform1[A], to: A => B, from: B => A)
+        st: SliceTransform1[A],
+        to: A => B,
+        from: B => A)
         extends SliceTransform1[B] {
       def initial: B = to(st.initial)
       def f: (B, Slice) => M[(B, Slice)] = { (b, s) =>
@@ -1067,83 +1110,95 @@ trait SliceTransforms[M[+ _]]
         combine: (Slice, Slice) => Slice): SliceTransform2[(A, B)] = {
       (this, that) match {
         case (sta: SliceTransform2S[_], stb: SliceTransform2S[_]) =>
-          SliceTransform2S[(A, B)]((sta.initial, stb.initial), {
-            case ((a0, b0), sl0, sr0) =>
-              val (a, sa) = sta.f0(a0, sl0, sr0)
-              val (b, sb) = stb.f0(b0, sl0, sr0)
-              assert(sa.size == sb.size)
-              ((a, b), combine(sa, sb))
-          })
+          SliceTransform2S[(A, B)](
+            (sta.initial, stb.initial), {
+              case ((a0, b0), sl0, sr0) =>
+                val (a, sa) = sta.f0(a0, sl0, sr0)
+                val (b, sb) = stb.f0(b0, sl0, sr0)
+                assert(sa.size == sb.size)
+                ((a, b), combine(sa, sb))
+            }
+          )
 
         case (sta: SliceTransform2S[_], stb) =>
-          SliceTransform2M[(A, B)]((sta.initial, stb.initial), {
-            case ((a0, b0), sl0, sr0) =>
-              val (a, sa) = sta.f0(a0, sl0, sr0)
-              stb.f(b0, sl0, sr0) map {
-                case (b, sb) =>
-                  assert(sa.size == sb.size)
-                  ((a, b), combine(sa, sb))
-              }
-          })
+          SliceTransform2M[(A, B)](
+            (sta.initial, stb.initial), {
+              case ((a0, b0), sl0, sr0) =>
+                val (a, sa) = sta.f0(a0, sl0, sr0)
+                stb.f(b0, sl0, sr0) map {
+                  case (b, sb) =>
+                    assert(sa.size == sb.size)
+                    ((a, b), combine(sa, sb))
+                }
+            }
+          )
 
         case (sta, stb: SliceTransform2S[_]) =>
-          SliceTransform2M[(A, B)]((sta.initial, stb.initial), {
-            case ((a0, b0), sl0, sr0) =>
-              sta.f(a0, sl0, sr0) map {
-                case (a, sa) =>
-                  val (b, sb) = stb.f0(b0, sl0, sr0)
-                  assert(sa.size == sb.size)
-                  ((a, b), combine(sa, sb))
-              }
-          })
+          SliceTransform2M[(A, B)](
+            (sta.initial, stb.initial), {
+              case ((a0, b0), sl0, sr0) =>
+                sta.f(a0, sl0, sr0) map {
+                  case (a, sa) =>
+                    val (b, sb) = stb.f0(b0, sl0, sr0)
+                    assert(sa.size == sb.size)
+                    ((a, b), combine(sa, sb))
+                }
+            }
+          )
 
         case (sta, stb) =>
-          SliceTransform2[(A, B)]((sta.initial, stb.initial), {
-                                    case ((a0, b0), sl0, sr0) =>
-                                      for (ares <- sta.f(a0, sl0, sr0);
-                                      bres <- stb.f(b0, sl0, sr0)) yield {
-                                        val (a, sa) = ares
-                                        val (b, sb) = bres
-                                        assert(sa.size == sb.size)
-                                        ((a, b), combine(sa, sb))
-                                      }
-                                  })
+          SliceTransform2[(A, B)](
+            (sta.initial, stb.initial), {
+              case ((a0, b0), sl0, sr0) =>
+                for (ares <- sta.f(a0, sl0, sr0);
+                     bres <- stb.f(b0, sl0, sr0)) yield {
+                  val (a, sa) = ares
+                  val (b, sb) = bres
+                  assert(sa.size == sb.size)
+                  ((a, b), combine(sa, sb))
+                }
+            }
+          )
       }
     }
 
     def zip2[B, C](t: SliceTransform2[B], t2: SliceTransform2[C])(
-        combine: (Slice, Slice,
-        Slice) => Slice): SliceTransform2[(A, B, C)] = {
+        combine: (Slice, Slice, Slice) => Slice): SliceTransform2[(A, B, C)] = {
 
       // We can do this in 4 cases efficiently simply be re-ordering the 3 sts.
       // Since they're done in parallel, we just need to make sure combine works.
 
       (this, t, t2) match {
-        case (sta: SliceTransform2S[_],
-              stb: SliceTransform2S[_],
-              stc: SliceTransform2S[_]) =>
-          SliceTransform2S((sta.initial, stb.initial, stc.initial), {
-            case ((a0, b0, c0), sl0, sr0) =>
-              val (a, sa) = sta.f0(a0, sl0, sr0)
-              val (b, sb) = stb.f0(b0, sl0, sr0)
-              val (c, sc) = stc.f0(c0, sl0, sr0)
-              ((a, b, c), combine(sa, sb, sc))
-          })
+        case (
+            sta: SliceTransform2S[_],
+            stb: SliceTransform2S[_],
+            stc: SliceTransform2S[_]) =>
+          SliceTransform2S(
+            (sta.initial, stb.initial, stc.initial), {
+              case ((a0, b0, c0), sl0, sr0) =>
+                val (a, sa) = sta.f0(a0, sl0, sr0)
+                val (b, sb) = stb.f0(b0, sl0, sr0)
+                val (c, sc) = stc.f0(c0, sl0, sr0)
+                ((a, b, c), combine(sa, sb, sc))
+            }
+          )
 
         case (sta, stb, stc) =>
-          SliceTransform2M((sta.initial, stb.initial, stc.initial), {
-            case ((a0, b0, c0), sl0, sr0) =>
-              for {
-                resa <- sta.f(a0, sl0, sr0)
-                resb <- stb.f(b0, sl0, sr0)
-                resc <- stc.f(c0, sl0, sr0)
-              } yield {
-                val (a, sa) = resa
-                val (b, sb) = resb
-                val (c, sc) = resc
-                ((a, b, c), combine(sa, sb, sc))
-              }
-          })
+          SliceTransform2M(
+            (sta.initial, stb.initial, stc.initial), {
+              case ((a0, b0, c0), sl0, sr0) =>
+                for {
+                  resa <- sta.f(a0, sl0, sr0)
+                  resb <- stb.f(b0, sl0, sr0)
+                  resc <- stc.f(c0, sl0, sr0)
+                } yield {
+                  val (a, sa) = resa
+                  val (b, sb) = resb
+                  val (c, sc) = resc
+                  ((a, b, c), combine(sa, sb, sc))
+                }
+            }
+          )
       }
     }
 
@@ -1166,18 +1221,25 @@ trait SliceTransforms[M[+ _]]
   }
 
   object SliceTransform2 {
-    import SliceTransform1.{SliceTransform1S, SliceTransform1M, SliceTransform1SMS, MappedState1}
+    import SliceTransform1.{
+      SliceTransform1S,
+      SliceTransform1M,
+      SliceTransform1SMS,
+      MappedState1
+    }
 
     def liftM[A](
-        init: A, f: (A, Slice, Slice) => (A, Slice)): SliceTransform2[A] =
+        init: A,
+        f: (A, Slice, Slice) => (A, Slice)): SliceTransform2[A] =
       SliceTransform2S(init, f)
 
     def apply[A](
-        init: A, f: (A, Slice, Slice) => M[(A, Slice)]): SliceTransform2[A] =
+        init: A,
+        f: (A, Slice, Slice) => M[(A, Slice)]): SliceTransform2[A] =
       SliceTransform2M(init, f)
 
-    private def mapS[A](
-        st: SliceTransform2S[A])(f: Slice => Slice): SliceTransform2S[A] =
+    private def mapS[A](st: SliceTransform2S[A])(
+        f: Slice => Slice): SliceTransform2S[A] =
       SliceTransform2S(st.initial, {
         case (a, sl, sr) => st.f0(a, sl, sr) :-> f
       })
@@ -1199,10 +1261,9 @@ trait SliceTransforms[M[+ _]]
       (sta, stb) match {
         case (sta, SliceTransform1.Identity) =>
           SliceTransform2S((sta.initial, stb.initial), {
-            case ((a0, _), sl0, sr0) =>
-              { (a: A) =>
-                (a, stb.initial)
-              } <-: sta.f0(a0, sl0, sr0)
+            case ((a0, _), sl0, sr0) => { (a: A) =>
+              (a, stb.initial)
+            } <-: sta.f0(a0, sl0, sr0)
           })
         case (SliceTransform2S(i1, f1), SliceTransform1S(i2, f2)) =>
           SliceTransform2S((i1, i2), {
@@ -1242,13 +1303,13 @@ trait SliceTransforms[M[+ _]]
         case (SliceTransform2SM(sta, stb), stc) =>
           val st = SliceTransform2SM(sta, stb andThen stc)
           st.mapState({ case (a, (b, c)) => ((a, b), c) }, {
-            case ((a, b), c) => (a, (b, c))
+            case ((a, b), c)             => (a, (b, c))
           })
 
         case (SliceTransform2MS(sta, stb), stc) =>
           val st = chain(sta, stb andThen stc)
           st.mapState({ case (a, (b, c)) => ((a, b), c) }, {
-            case ((a, b), c) => (a, (b, c))
+            case ((a, b), c)             => (a, (b, c))
           })
 
         case (MappedState2(sta, f, g), stb) =>
@@ -1257,7 +1318,8 @@ trait SliceTransforms[M[+ _]]
     }
 
     private case class SliceTransform2S[A](
-        initial: A, f0: (A, Slice, Slice) => (A, Slice))
+        initial: A,
+        f0: (A, Slice, Slice) => (A, Slice))
         extends SliceTransform2[A] {
       override def unlift = Some(f0)
       val f: (A, Slice, Slice) => M[(A, Slice)] = {
@@ -1265,13 +1327,14 @@ trait SliceTransforms[M[+ _]]
       }
       def advance(sl: Slice, sr: Slice): M[(SliceTransform2[A], Slice)] =
         M point
-        ({ (a: A) =>
-          SliceTransform2S[A](a, f0)
-        } <-: f0(initial, sl, sr))
+          ({ (a: A) =>
+            SliceTransform2S[A](a, f0)
+          } <-: f0(initial, sl, sr))
     }
 
     private case class SliceTransform2M[A](
-        initial: A, f: (A, Slice, Slice) => M[(A, Slice)])
+        initial: A,
+        f: (A, Slice, Slice) => M[(A, Slice)])
         extends SliceTransform2[A] {
       def advance(sl: Slice, sr: Slice): M[(SliceTransform2[A], Slice)] =
         apply(sl, sr) map {
@@ -1281,7 +1344,8 @@ trait SliceTransforms[M[+ _]]
     }
 
     private case class SliceTransform2SM[A, B](
-        before: SliceTransform2S[A], after: SliceTransform1[B])
+        before: SliceTransform2S[A],
+        after: SliceTransform1[B])
         extends SliceTransform2[(A, B)] {
       def initial: (A, B) = (before.initial, after.initial)
 
@@ -1300,7 +1364,8 @@ trait SliceTransforms[M[+ _]]
     }
 
     private case class SliceTransform2MS[A, B](
-        before: SliceTransform2[A], after: SliceTransform1S[B])
+        before: SliceTransform2[A],
+        after: SliceTransform1S[B])
         extends SliceTransform2[(A, B)] {
       def initial: (A, B) = (before.initial, after.initial)
 
@@ -1322,7 +1387,9 @@ trait SliceTransforms[M[+ _]]
     }
 
     private case class MappedState2[A, B](
-        st: SliceTransform2[A], to: A => B, from: B => A)
+        st: SliceTransform2[A],
+        to: A => B,
+        from: B => A)
         extends SliceTransform2[B] {
       def initial: B = to(st.initial)
       def f: (B, Slice, Slice) => M[(B, Slice)] = { (b, sl, sr) =>
@@ -1343,24 +1410,30 @@ trait ConcatHelpers {
       filter: Map[ColumnRef, Column] => Map[ColumnRef, Column],
       filterEmpty: Map[ColumnRef, Column] => Map[ColumnRef, Column]) = {
     val definedBits =
-      filter(columns).values.map(_.definedAt(0, size)).reduceOption(_ | _) getOrElse new BitSet
+      filter(columns).values
+        .map(_.definedAt(0, size))
+        .reduceOption(_ | _) getOrElse new BitSet
     val emptyBits =
-      filterEmpty(columns).values.map(_.definedAt(0, size)).reduceOption(_ | _) getOrElse new BitSet
+      filterEmpty(columns).values
+        .map(_.definedAt(0, size))
+        .reduceOption(_ | _) getOrElse new BitSet
     (definedBits, emptyBits)
   }
 
-  def buildOuterBits(leftEmptyBits: BitSet,
-                     rightEmptyBits: BitSet,
-                     leftDefinedBits: BitSet,
-                     rightDefinedBits: BitSet): BitSet = {
+  def buildOuterBits(
+      leftEmptyBits: BitSet,
+      rightEmptyBits: BitSet,
+      leftDefinedBits: BitSet,
+      rightDefinedBits: BitSet): BitSet = {
     (rightEmptyBits & leftEmptyBits) | (rightEmptyBits &~ leftDefinedBits) |
-    (leftEmptyBits &~ rightDefinedBits)
+      (leftEmptyBits &~ rightDefinedBits)
   }
 
-  def buildInnerBits(leftEmptyBits: BitSet,
-                     rightEmptyBits: BitSet,
-                     leftDefinedBits: BitSet,
-                     rightDefinedBits: BitSet) = {
+  def buildInnerBits(
+      leftEmptyBits: BitSet,
+      rightEmptyBits: BitSet,
+      leftDefinedBits: BitSet,
+      rightDefinedBits: BitSet) = {
     val emptyBits = rightEmptyBits & leftEmptyBits
     val nonemptyBits = leftDefinedBits & rightDefinedBits
     (emptyBits, nonemptyBits)
@@ -1369,18 +1442,18 @@ trait ConcatHelpers {
 
 trait ArrayConcatHelpers extends ConcatHelpers {
   def filterArrays(columns: Map[ColumnRef, Column]) = columns.filter {
-    case (ColumnRef(CPath(CPathIndex(_), _ @_ *), _), _) => true
-    case (ColumnRef(CPath.Identity, CEmptyArray), _) => true
-    case _ => false
+    case (ColumnRef(CPath(CPathIndex(_), _ @_*), _), _) => true
+    case (ColumnRef(CPath.Identity, CEmptyArray), _)    => true
+    case _                                              => false
   }
 
   def filterEmptyArrays(columns: Map[ColumnRef, Column]) = columns.filter {
     case (ColumnRef(CPath.Identity, CEmptyArray), _) => true
-    case _ => false
+    case _                                           => false
   }
 
   def collectIndices(columns: Map[ColumnRef, Column]) = columns.collect {
-    case (ref @ ColumnRef(CPath(CPathIndex(i), xs @ _ *), ctype), col) =>
+    case (ref @ ColumnRef(CPath(CPathIndex(i), xs @ _*), ctype), col) =>
       (i, xs, ref, col)
   }
 
@@ -1388,18 +1461,18 @@ trait ArrayConcatHelpers extends ConcatHelpers {
     Map(ColumnRef(CPath.Identity, CEmptyArray) -> EmptyArrayColumn(emptyBits))
 
   def buildNonemptyArrays(
-      left: Map[ColumnRef, Column], right: Map[ColumnRef, Column]) = {
+      left: Map[ColumnRef, Column],
+      right: Map[ColumnRef, Column]) = {
     val leftIndices = collectIndices(left)
     val rightIndices = collectIndices(right)
 
     val maxId = if (leftIndices.isEmpty) -1 else leftIndices.map(_._1).max
     val newCols =
       (leftIndices map { case (_, _, ref, col) => ref -> col }) ++
-      (rightIndices map {
-            case (i, xs, ref, col) =>
-              ColumnRef(CPath(CPathIndex(i + maxId + 1) :: xs.toList),
-                        ref.ctype) -> col
-          })
+        (rightIndices map {
+          case (i, xs, ref, col) =>
+            ColumnRef(CPath(CPathIndex(i + maxId + 1) :: xs.toList), ref.ctype) -> col
+        })
 
     newCols.toMap
   }
@@ -1407,34 +1480,36 @@ trait ArrayConcatHelpers extends ConcatHelpers {
 
 trait ObjectConcatHelpers extends ConcatHelpers {
   def filterObjects(columns: Map[ColumnRef, Column]) = columns.filter {
-    case (ColumnRef(CPath(CPathField(_), _ @_ *), _), _) => true
-    case (ColumnRef(CPath.Identity, CEmptyObject), _) => true
-    case _ => false
+    case (ColumnRef(CPath(CPathField(_), _ @_*), _), _) => true
+    case (ColumnRef(CPath.Identity, CEmptyObject), _)   => true
+    case _                                              => false
   }
 
   def filterEmptyObjects(columns: Map[ColumnRef, Column]) = columns.filter {
     case (ColumnRef(CPath.Identity, CEmptyObject), _) => true
-    case _ => false
+    case _                                            => false
   }
 
   def filterFields(columns: Map[ColumnRef, Column]) = columns.filter {
-    case (ColumnRef(CPath(CPathField(_), _ @_ *), _), _) => true
-    case _ => false
+    case (ColumnRef(CPath(CPathField(_), _ @_*), _), _) => true
+    case _                                              => false
   }
 
-  def buildFields(leftColumns: Map[ColumnRef, Column],
-                  rightColumns: Map[ColumnRef, Column]) =
+  def buildFields(
+      leftColumns: Map[ColumnRef, Column],
+      rightColumns: Map[ColumnRef, Column]) =
     (filterFields(leftColumns), filterFields(rightColumns))
 
   def buildEmptyObjects(emptyBits: BitSet) = {
     if (emptyBits.isEmpty) Map.empty[ColumnRef, Column]
     else
-      Map(ColumnRef(CPath.Identity, CEmptyObject) -> EmptyObjectColumn(
-              emptyBits))
+      Map(
+        ColumnRef(CPath.Identity, CEmptyObject) -> EmptyObjectColumn(emptyBits))
   }
 
-  def buildNonemptyObjects(leftFields: Map[ColumnRef, Column],
-                           rightFields: Map[ColumnRef, Column]) = {
+  def buildNonemptyObjects(
+      leftFields: Map[ColumnRef, Column],
+      rightFields: Map[ColumnRef, Column]) = {
     val (leftInner, leftOuter) =
       leftFields partition {
         case (ColumnRef(path, _), _) =>
@@ -1465,10 +1540,10 @@ trait ObjectConcatHelpers extends ConcatHelpers {
         val rightMerged =
           rightSelection map {
             case (ref, col) => {
-                if (leftInner contains ref)
-                  ref -> cf.util.UnionRight(leftInner(ref), col).get
-                else ref -> col
-              }
+              if (leftInner contains ref)
+                ref -> cf.util.UnionRight(leftInner(ref), col).get
+              else ref -> col
+            }
           }
 
         rightMerged ++ leftSelection

@@ -14,7 +14,10 @@ import org.scalatest.{GivenWhenThen, Matchers, FunSuite}
 import scala.concurrent.Future
 
 class NotifyLaunchQueueStepImplTest
-    extends FunSuite with Matchers with GivenWhenThen with Mockito
+    extends FunSuite
+    with Matchers
+    with GivenWhenThen
+    with Mockito
     with ScalaFutures {
   test("name") {
     new Fixture().step.name should equal("notifyLaunchQueue")
@@ -24,18 +27,20 @@ class NotifyLaunchQueueStepImplTest
     val f = new Fixture
     val status = runningTaskStatus
     val expectedUpdate = TaskStatusUpdate(
-        updateTimestamp, Task.Id(taskId), MarathonTaskStatus(status))
+      updateTimestamp,
+      Task.Id(taskId),
+      MarathonTaskStatus(status))
 
     Given("a status update")
     f.launchQueue.notifyOfTaskUpdate(expectedUpdate) returns Future.successful(
-        None)
+      None)
 
     When("calling processUpdate")
     f.step
       .processUpdate(
-          updateTimestamp,
-          task = MarathonTestHelper.mininimalTask(appId),
-          status = status
+        updateTimestamp,
+        task = MarathonTestHelper.mininimalTask(appId),
+        status = status
       )
       .futureValue
 

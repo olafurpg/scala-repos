@@ -62,7 +62,8 @@ object NingWSClientConfigFactory {
 class NingAsyncHttpClientConfigBuilder(
     ningConfig: NingWSClientConfig = NingWSClientConfig()) {
 
-  protected val addCustomSettings: DefaultAsyncHttpClientConfig.Builder => DefaultAsyncHttpClientConfig.Builder =
+  protected val addCustomSettings
+    : DefaultAsyncHttpClientConfig.Builder => DefaultAsyncHttpClientConfig.Builder =
     identity
 
   /**
@@ -142,24 +143,24 @@ class NingAsyncHttpClientConfigBuilder(
     builder.setMaxConnections(ningConfig.maxConnectionsTotal)
     builder.setConnectionTtl(toMillis(ningConfig.maxConnectionLifetime))
     builder.setPooledConnectionIdleTimeout(
-        toMillis(ningConfig.idleConnectionInPoolTimeout))
+      toMillis(ningConfig.idleConnectionInPoolTimeout))
     builder.setMaxRedirects(ningConfig.maxNumberOfRedirects)
     builder.setMaxRequestRetry(ningConfig.maxRequestRetry)
-    builder.setDisableUrlEncodingForBoundRequests(
-        ningConfig.disableUrlEncoding)
-    // forcing shutdown of the AHC event loop because otherwise the test suite fails with a 
-    // OutOfMemoryException: cannot create new native thread. This is because when executing 
-    // tests in parallel there can be many threads pool that are left around because AHC is 
+    builder.setDisableUrlEncodingForBoundRequests(ningConfig.disableUrlEncoding)
+    // forcing shutdown of the AHC event loop because otherwise the test suite fails with a
+    // OutOfMemoryException: cannot create new native thread. This is because when executing
+    // tests in parallel there can be many threads pool that are left around because AHC is
     // shutting them down gracefully.
-    // The proper solution is to make these parameters configurable, so that they can be set 
-    // to 0 when running tests, and keep sensible defaults otherwise. AHC defaults are 
+    // The proper solution is to make these parameters configurable, so that they can be set
+    // to 0 when running tests, and keep sensible defaults otherwise. AHC defaults are
     // shutdownQuiet=2000 (milliseconds) and shutdownTimeout=15000 (milliseconds).
     builder.setShutdownQuietPeriod(0)
     builder.setShutdownTimeout(0)
   }
 
-  def configureProtocols(existingProtocols: Array[String],
-                         sslConfig: SSLConfig): Array[String] = {
+  def configureProtocols(
+      existingProtocols: Array[String],
+      sslConfig: SSLConfig): Array[String] = {
     val definedProtocols = sslConfig.enabledProtocols match {
       case Some(configuredProtocols) =>
         // If we are given a specific list of protocols, then return it in exactly that order,
@@ -178,7 +179,7 @@ class NingAsyncHttpClientConfigBuilder(
       for (deprecatedProtocol <- deprecatedProtocols) {
         if (definedProtocols.contains(deprecatedProtocol)) {
           throw new IllegalStateException(
-              s"Weak protocol $deprecatedProtocol found in ws.ssl.protocols!")
+            s"Weak protocol $deprecatedProtocol found in ws.ssl.protocols!")
         }
       }
     }
@@ -186,7 +187,8 @@ class NingAsyncHttpClientConfigBuilder(
   }
 
   def configureCipherSuites(
-      existingCiphers: Array[String], sslConfig: SSLConfig): Array[String] = {
+      existingCiphers: Array[String],
+      sslConfig: SSLConfig): Array[String] = {
     val definedCiphers = sslConfig.enabledCipherSuites match {
       case Some(configuredCiphers) =>
         // If we are given a specific list of ciphers, return it in that order.
@@ -201,7 +203,7 @@ class NingAsyncHttpClientConfigBuilder(
       for (deprecatedCipher <- deprecatedCiphers) {
         if (definedCiphers.contains(deprecatedCipher)) {
           throw new IllegalStateException(
-              s"Weak cipher $deprecatedCipher found in ws.ssl.ciphers!")
+            s"Weak cipher $deprecatedCipher found in ws.ssl.ciphers!")
         }
       }
     }
@@ -217,7 +219,7 @@ class NingAsyncHttpClientConfigBuilder(
     val sslContext =
       if (sslConfig.default) {
         logger.info(
-            "buildSSLContext: ws.ssl.default is true, using default SSLContext")
+          "buildSSLContext: ws.ssl.default is true, using default SSLContext")
         validateDefaultTrustManager(sslConfig)
         SSLContext.getDefault
       } else {
@@ -225,7 +227,9 @@ class NingAsyncHttpClientConfigBuilder(
         val keyManagerFactory = buildKeyManagerFactory(sslConfig)
         val trustManagerFactory = buildTrustManagerFactory(sslConfig)
         new ConfigSSLContextBuilder(
-            sslConfig, keyManagerFactory, trustManagerFactory).build()
+          sslConfig,
+          keyManagerFactory,
+          trustManagerFactory).build()
       }
 
     // protocols!
@@ -274,21 +278,24 @@ class NingAsyncHttpClientConfigBuilder(
       tmf.getTrustManagers()(0).asInstanceOf[X509TrustManager]
 
     val constraints = sslConfig.disabledKeyAlgorithms
-      .map(a =>
-            AlgorithmConstraintsParser
-              .parseAll(AlgorithmConstraintsParser.expression, a)
-              .get)
+      .map(
+        a =>
+          AlgorithmConstraintsParser
+            .parseAll(AlgorithmConstraintsParser.expression, a)
+            .get)
       .toSet
     val algorithmChecker = new AlgorithmChecker(
-        keyConstraints = constraints, signatureConstraints = Set())
+      keyConstraints = constraints,
+      signatureConstraints = Set())
     for (cert <- trustManager.getAcceptedIssuers) {
       try {
         algorithmChecker.checkKeyAlgorithms(cert)
       } catch {
         case e: CertPathValidatorException =>
           logger.warn(
-              "You are using ws.ssl.default=true and have a weak certificate in your default trust store!  (You can modify ws.ssl.disabledKeyAlgorithms to remove this message.)",
-              e)
+            "You are using ws.ssl.default=true and have a weak certificate in your default trust store!  (You can modify ws.ssl.disabledKeyAlgorithms to remove this message.)",
+            e
+          )
       }
     }
   }

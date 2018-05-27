@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Miles Sabin 
+ * Copyright (c) 2014 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import shapeless._
 
 /**
   * LabelledGeneric examples.
-  * 
+  *
   * @author Miles Sabin
   */
 object LabelledGenericExamples extends App {
@@ -30,13 +30,17 @@ object LabelledGenericExamples extends App {
 
   case class Book(author: String, title: String, id: Int, price: Double)
   case class ExtendedBook(
-      author: String, title: String, id: Int, price: Double, inPrint: Boolean)
+      author: String,
+      title: String,
+      id: Int,
+      price: Double,
+      inPrint: Boolean)
 
   val bookGen = LabelledGeneric[Book]
   val bookExtGen = LabelledGeneric[ExtendedBook]
 
-  val tapl = Book(
-      "Benjamin Pierce", "Types and Programming Languages", 262162091, 44.11)
+  val tapl =
+    Book("Benjamin Pierce", "Types and Programming Languages", 262162091, 44.11)
 
   val rec = bookGen.to(tapl)
 

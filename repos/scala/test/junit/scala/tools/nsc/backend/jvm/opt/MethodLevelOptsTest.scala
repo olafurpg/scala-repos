@@ -41,9 +41,11 @@ class MethodLevelOptsTest extends ClearAfterClass {
   def eliminateEmptyTry(): Unit = {
     val code = "def f = { try {} catch { case _: Throwable => 0; () }; 1 }"
     val warn = "a pure expression does nothing in statement position"
-    assertSameCode(singleMethodInstructions(methodOptCompiler)(
-                       code, allowMessage = _.msg contains warn),
-                   wrapInDefault(Op(ICONST_1), Op(IRETURN)))
+    assertSameCode(
+      singleMethodInstructions(methodOptCompiler)(
+        code,
+        allowMessage = _.msg contains warn),
+      wrapInDefault(Op(ICONST_1), Op(IRETURN)))
   }
 
   @Test
@@ -63,15 +65,17 @@ class MethodLevelOptsTest extends ClearAfterClass {
     val m = singleMethod(methodOptCompiler)(code)
     assertHandlerLabelPostions(m.handlers.head, m.instructions, 0, 3, 5)
     assertSameCode(
-        m.instructions,
-        wrapInDefault(VarOp(ALOAD, 1),
-                      Label(3),
-                      Op(ATHROW),
-                      Label(5),
-                      FrameEntry(4, List(), List("java/lang/Throwable")),
-                      Op(POP),
-                      VarOp(ALOAD, 1),
-                      Op(ATHROW)))
+      m.instructions,
+      wrapInDefault(
+        VarOp(ALOAD, 1),
+        Label(3),
+        Op(ATHROW),
+        Label(5),
+        FrameEntry(4, List(), List("java/lang/Throwable")),
+        Op(POP),
+        VarOp(ALOAD, 1),
+        Op(ATHROW))
+    )
   }
 
   @Test
@@ -81,15 +85,17 @@ class MethodLevelOptsTest extends ClearAfterClass {
     val m = singleMethod(methodOptCompiler)(code)
     assertHandlerLabelPostions(m.handlers.head, m.instructions, 0, 3, 5)
     assertSameCode(
-        m.instructions,
-        wrapInDefault(Op(ICONST_1),
-                      Label(3),
-                      Op(IRETURN),
-                      Label(5),
-                      FrameEntry(4, List(), List("java/lang/Throwable")),
-                      Op(POP),
-                      Op(ICONST_2),
-                      Op(IRETURN)))
+      m.instructions,
+      wrapInDefault(
+        Op(ICONST_1),
+        Label(3),
+        Op(IRETURN),
+        Label(5),
+        FrameEntry(4, List(), List("java/lang/Throwable")),
+        Op(POP),
+        Op(ICONST_2),
+        Op(IRETURN))
+    )
   }
 
   @Test
@@ -127,14 +133,17 @@ class MethodLevelOptsTest extends ClearAfterClass {
         |}
       """.stripMargin
     val List(c) = compileClasses(methodOptCompiler)(code)
-    assertSameCode(getSingleMethod(c, "t"),
-                   List(Op(ACONST_NULL),
-                        Invoke(INVOKEVIRTUAL,
-                               "java/lang/Object",
-                               "toString",
-                               "()Ljava/lang/String;",
-                               false),
-                        Op(ARETURN)))
+    assertSameCode(
+      getSingleMethod(c, "t"),
+      List(
+        Op(ACONST_NULL),
+        Invoke(
+          INVOKEVIRTUAL,
+          "java/lang/Object",
+          "toString",
+          "()Ljava/lang/String;",
+          false),
+        Op(ARETURN)))
   }
 
   @Test
@@ -171,22 +180,26 @@ class MethodLevelOptsTest extends ClearAfterClass {
     val List(c) = compileClasses(methodOptCompiler)(code)
 
     assertSameCode(
-        getSingleMethod(c, "t"),
-        List(Ldc(LDC, "el"),
-             VarOp(ASTORE, 1),
-             Field(GETSTATIC, "scala/Predef$", "MODULE$", "Lscala/Predef$;"),
-             VarOp(ALOAD, 1),
-             Invoke(INVOKEVIRTUAL,
-                    "scala/Predef$",
-                    "println",
-                    "(Ljava/lang/Object;)V",
-                    false),
-             Op(ACONST_NULL),
-             VarOp(ASTORE, 1),
-             Ldc(LDC, "zit"),
-             VarOp(ASTORE, 1),
-             VarOp(ALOAD, 1),
-             Op(ARETURN)))
+      getSingleMethod(c, "t"),
+      List(
+        Ldc(LDC, "el"),
+        VarOp(ASTORE, 1),
+        Field(GETSTATIC, "scala/Predef$", "MODULE$", "Lscala/Predef$;"),
+        VarOp(ALOAD, 1),
+        Invoke(
+          INVOKEVIRTUAL,
+          "scala/Predef$",
+          "println",
+          "(Ljava/lang/Object;)V",
+          false),
+        Op(ACONST_NULL),
+        VarOp(ASTORE, 1),
+        Ldc(LDC, "zit"),
+        VarOp(ASTORE, 1),
+        VarOp(ALOAD, 1),
+        Op(ARETURN)
+      )
+    )
   }
 
   @Test
@@ -205,14 +218,16 @@ class MethodLevelOptsTest extends ClearAfterClass {
         |}
       """.stripMargin
     val List(c) = compileClasses(methodOptCompiler)(code)
-    assertSameCode(getSingleMethod(c, "t"),
-                   List(IntOp(BIPUSH, 23),
-                        IntOp(NEWARRAY, 5),
-                        Op(POP),
-                        VarOp(ILOAD, 1),
-                        VarOp(ILOAD, 2),
-                        Op(IADD),
-                        Op(IRETURN)))
+    assertSameCode(
+      getSingleMethod(c, "t"),
+      List(
+        IntOp(BIPUSH, 23),
+        IntOp(NEWARRAY, 5),
+        Op(POP),
+        VarOp(ILOAD, 1),
+        VarOp(ILOAD, 2),
+        Op(IADD),
+        Op(IRETURN)))
   }
 
   @Test
@@ -225,18 +240,23 @@ class MethodLevelOptsTest extends ClearAfterClass {
         |}
       """.stripMargin
     val List(c) = compileClasses(methodOptCompiler)(code)
-    assertSameCode(getSingleMethod(c, "t"),
-                   List(TypeOp(NEW, "java/lang/Integer"),
-                        Ldc(LDC, "nono"),
-                        Invoke(INVOKESPECIAL,
-                               "java/lang/Integer",
-                               "<init>",
-                               "(Ljava/lang/String;)V",
-                               false),
-                        VarOp(ILOAD, 1),
-                        VarOp(ILOAD, 2),
-                        Op(IADD),
-                        Op(IRETURN)))
+    assertSameCode(
+      getSingleMethod(c, "t"),
+      List(
+        TypeOp(NEW, "java/lang/Integer"),
+        Ldc(LDC, "nono"),
+        Invoke(
+          INVOKESPECIAL,
+          "java/lang/Integer",
+          "<init>",
+          "(Ljava/lang/String;)V",
+          false),
+        VarOp(ILOAD, 1),
+        VarOp(ILOAD, 2),
+        Op(IADD),
+        Op(IRETURN)
+      )
+    )
   }
 
   @Test
@@ -276,14 +296,17 @@ class MethodLevelOptsTest extends ClearAfterClass {
       """.stripMargin
     val List(c) = compileClasses(methodOptCompiler)(code)
     assertSameCode(
-        getSingleMethod(c, "t"),
-        List(IntOp(BIPUSH, 30),
-             VarOp(ISTORE, 3), // no constant propagation, so we keep the store (and load below) of a const
-             VarOp(ILOAD, 1),
-             VarOp(ILOAD, 2),
-             VarOp(ILOAD, 3),
-             Invoke(INVOKESTATIC, "C", "C$$$anonfun$1", "(III)I", false),
-             Op(IRETURN)))
+      getSingleMethod(c, "t"),
+      List(
+        IntOp(BIPUSH, 30),
+        VarOp(ISTORE, 3), // no constant propagation, so we keep the store (and load below) of a const
+        VarOp(ILOAD, 1),
+        VarOp(ILOAD, 2),
+        VarOp(ILOAD, 3),
+        Invoke(INVOKESTATIC, "C", "C$$$anonfun$1", "(III)I", false),
+        Op(IRETURN)
+      )
+    )
   }
 
   @Test
@@ -384,9 +407,13 @@ class MethodLevelOptsTest extends ClearAfterClass {
     assertNoInvoke(getSingleMethod(c, "t1"))
     assertNoInvoke(getSingleMethod(c, "t2"))
     assertInvoke(
-        getSingleMethod(c, "t3"), "scala/runtime/BoxesRunTime", "unboxToInt")
+      getSingleMethod(c, "t3"),
+      "scala/runtime/BoxesRunTime",
+      "unboxToInt")
     assertInvoke(
-        getSingleMethod(c, "t4"), "scala/runtime/BoxesRunTime", "boxToLong")
+      getSingleMethod(c, "t4"),
+      "scala/runtime/BoxesRunTime",
+      "boxToLong")
     assertNoInvoke(getSingleMethod(c, "t5"))
     assertNoInvoke(getSingleMethod(c, "t6"))
     assertNoInvoke(getSingleMethod(c, "t7"))
@@ -397,34 +424,41 @@ class MethodLevelOptsTest extends ClearAfterClass {
       case Invoke(_, owner, name, _, _) => (owner, name)
     }, List(("java/lang/Integer", "valueOf"), ("C", "escape")))
 
-    assertSameSummary(getSingleMethod(c, "t11"),
-                      List(BIPUSH,
-                           "valueOf",
-                           ASTORE /*2*/,
-                           BIPUSH,
-                           "valueOf",
-                           ASTORE /*3*/,
-                           ALOAD /*0*/,
-                           ALOAD /*2*/,
-                           "escape",
-                           ILOAD /*1*/,
-                           IFEQ /*L1*/,
-                           ALOAD /*2*/,
-                           GOTO /*L2*/, /*Label L1*/ -1,
-                           ALOAD /*3*/, /*Label L2*/ -1,
-                           ASTORE /*4*/,
-                           GETSTATIC /*Predef*/,
-                           ALOAD /*4*/,
-                           "Integer2int",
-                           IRETURN))
+    assertSameSummary(
+      getSingleMethod(c, "t11"),
+      List(
+        BIPUSH,
+        "valueOf",
+        ASTORE /*2*/,
+        BIPUSH,
+        "valueOf",
+        ASTORE /*3*/,
+        ALOAD /*0*/,
+        ALOAD /*2*/,
+        "escape",
+        ILOAD /*1*/,
+        IFEQ /*L1*/,
+        ALOAD /*2*/,
+        GOTO /*L2*/, /*Label L1*/ -1,
+        ALOAD /*3*/, /*Label L2*/ -1,
+        ASTORE /*4*/,
+        GETSTATIC /*Predef*/,
+        ALOAD /*4*/,
+        "Integer2int",
+        IRETURN
+      )
+    )
 
     // no unbox invocations
-    assertEquals(getSingleMethod(c, "t12").instructions collect {
-                   case Invoke(_, owner, name, _, _) => (owner, name)
-                 },
-                 List(("java/lang/Integer", "valueOf"),
-                      ("java/lang/Integer", "valueOf"),
-                      ("C", "escape")))
+    assertEquals(
+      getSingleMethod(c, "t12").instructions collect {
+        case Invoke(_, owner, name, _, _) => (owner, name)
+      },
+      List(
+        ("java/lang/Integer", "valueOf"),
+        ("java/lang/Integer", "valueOf"),
+        ("C", "escape"))
+    )
   }
 
   @Test
@@ -481,11 +515,14 @@ class MethodLevelOptsTest extends ClearAfterClass {
     assertEquals(getSingleMethod(c, "t5").instructions collect {
       case Field(_, owner, name, _) => s"$owner.$name"
     }, List("scala/runtime/IntRef.elem"))
-    assertEquals(getSingleMethod(c, "t6").instructions collect {
-                   case Field(op, owner, name, _) => s"$op $owner.$name"
-                 },
-                 List(s"$PUTFIELD scala/runtime/IntRef.elem",
-                      s"$GETFIELD scala/runtime/IntRef.elem"))
+    assertEquals(
+      getSingleMethod(c, "t6").instructions collect {
+        case Field(op, owner, name, _) => s"$op $owner.$name"
+      },
+      List(
+        s"$PUTFIELD scala/runtime/IntRef.elem",
+        s"$GETFIELD scala/runtime/IntRef.elem")
+    )
   }
 
   @Test
@@ -544,33 +581,42 @@ class MethodLevelOptsTest extends ClearAfterClass {
     val List(c) = compileClasses(methodOptCompiler)(code)
     assertNoInvoke(getSingleMethod(c, "t1"))
     assertSameSummary(
-        getSingleMethod(c, "t2"), List(ICONST_1, ICONST_3, IADD, IRETURN))
+      getSingleMethod(c, "t2"),
+      List(ICONST_1, ICONST_3, IADD, IRETURN))
     assertSameSummary(
-        getSingleMethod(c, "t3"), List(ICONST_3, ICONST_4, IADD, IRETURN))
+      getSingleMethod(c, "t3"),
+      List(ICONST_3, ICONST_4, IADD, IRETURN))
     assertSameSummary(
-        getSingleMethod(c, "t4"), List(ICONST_3, "boxToInteger", ARETURN))
-    assertEquals(getSingleMethod(c, "t5").instructions collect {
-                   case Invoke(_, owner, name, _, _) => (owner, name)
-                 },
-                 List(("scala/runtime/BoxesRunTime", "boxToInteger"),
-                      ("scala/runtime/BoxesRunTime", "boxToInteger"),
-                      ("C", "tpl"),
-                      ("scala/Tuple2", "_1$mcI$sp")))
+      getSingleMethod(c, "t4"),
+      List(ICONST_3, "boxToInteger", ARETURN))
+    assertEquals(
+      getSingleMethod(c, "t5").instructions collect {
+        case Invoke(_, owner, name, _, _) => (owner, name)
+      },
+      List(
+        ("scala/runtime/BoxesRunTime", "boxToInteger"),
+        ("scala/runtime/BoxesRunTime", "boxToInteger"),
+        ("C", "tpl"),
+        ("scala/Tuple2", "_1$mcI$sp"))
+    )
     assertSameSummary(
-        getSingleMethod(c, "t6"), List(ICONST_1, ICONST_2, ISUB, IRETURN))
-    assertSameSummary(getSingleMethod(c, "t7"),
-                      List(ICONST_1,
-                           ICONST_2,
-                           ISTORE,
-                           ISTORE,
-                           ICONST_3,
-                           ISTORE,
-                           ILOAD,
-                           ILOAD,
-                           IADD,
-                           ILOAD,
-                           IADD,
-                           IRETURN))
+      getSingleMethod(c, "t6"),
+      List(ICONST_1, ICONST_2, ISUB, IRETURN))
+    assertSameSummary(
+      getSingleMethod(c, "t7"),
+      List(
+        ICONST_1,
+        ICONST_2,
+        ISTORE,
+        ISTORE,
+        ICONST_3,
+        ISTORE,
+        ILOAD,
+        ILOAD,
+        IADD,
+        ILOAD,
+        IADD,
+        IRETURN))
     assertNoInvoke(getSingleMethod(c, "t8"))
     assertNoInvoke(getSingleMethod(c, "t9"))
   }
@@ -623,13 +669,13 @@ class MethodLevelOptsTest extends ClearAfterClass {
       """.stripMargin
     val List(c) = compileClasses(methodOptCompiler)(code)
     assertSameSummary(
-        getSingleMethod(c, "t1"), List(NEW, DUP, "<init>", ARETURN))
+      getSingleMethod(c, "t1"),
+      List(NEW, DUP, "<init>", ARETURN))
     assertSameCode(getSingleMethod(c, "t2"), List(Op(LCONST_0), Op(LRETURN)))
     assertSameCode(getSingleMethod(c, "t3"), List(Op(ICONST_1), Op(IRETURN)))
     assertSameCode(getSingleMethod(c, "t4"), List(Op(ICONST_1), Op(IRETURN)))
     assertSameCode(getSingleMethod(c, "t5"), List(Op(DCONST_0), Op(DRETURN)))
-    assertSameCode(
-        getSingleMethod(c, "t6"), List(Op(ACONST_NULL), Op(ARETURN)))
+    assertSameCode(getSingleMethod(c, "t6"), List(Op(ACONST_NULL), Op(ARETURN)))
     assertSameCode(getSingleMethod(c, "t7"), List(Op(ICONST_0), Op(IRETURN)))
   }
 
@@ -643,14 +689,16 @@ class MethodLevelOptsTest extends ClearAfterClass {
         |}
       """.stripMargin
     val List(c) = compileClasses(methodOptCompiler)(code)
-    assertSameCode(getSingleMethod(c, "t"),
-                   List(VarOp(ALOAD, 1),
-                        Jump(IFNULL, Label(6)),
-                        Op(ICONST_1),
-                        Op(IRETURN),
-                        Label(6),
-                        Op(ICONST_0),
-                        Op(IRETURN)))
+    assertSameCode(
+      getSingleMethod(c, "t"),
+      List(
+        VarOp(ALOAD, 1),
+        Jump(IFNULL, Label(6)),
+        Op(ICONST_1),
+        Op(IRETURN),
+        Label(6),
+        Op(ICONST_0),
+        Op(IRETURN)))
   }
 
   @Test
@@ -723,30 +771,38 @@ class MethodLevelOptsTest extends ClearAfterClass {
       getSingleMethod(c, m).instructions.filter(_.opcode == ASTORE)
 
     assertEquals(
-        locals(c, "t1"), List(("this", 0), ("kept1", 1), ("result", 2)))
-    assert(stores("t1") == List(VarOp(ASTORE, 1),
-                                VarOp(ASTORE, 2),
-                                VarOp(ASTORE, 1),
-                                VarOp(ASTORE, 1)),
-           textify(findAsmMethod(c, "t1")))
+      locals(c, "t1"),
+      List(("this", 0), ("kept1", 1), ("result", 2)))
+    assert(
+      stores("t1") == List(
+        VarOp(ASTORE, 1),
+        VarOp(ASTORE, 2),
+        VarOp(ASTORE, 1),
+        VarOp(ASTORE, 1)),
+      textify(findAsmMethod(c, "t1")))
 
-    assertEquals(
-        locals(c, "t2"), List(("this", 0), ("kept2", 1), ("kept3", 2)))
-    assert(stores("t2") == List(
-               VarOp(ASTORE, 1), VarOp(ASTORE, 2), VarOp(ASTORE, 1)),
-           textify(findAsmMethod(c, "t2")))
+    assertEquals(locals(c, "t2"), List(("this", 0), ("kept2", 1), ("kept3", 2)))
+    assert(
+      stores("t2") == List(
+        VarOp(ASTORE, 1),
+        VarOp(ASTORE, 2),
+        VarOp(ASTORE, 1)),
+      textify(findAsmMethod(c, "t2")))
 
     assertEquals(locals(c, "t3"), List(("this", 0), ("kept4", 1)))
-    assert(stores("t3") == List(VarOp(ASTORE, 1), VarOp(ASTORE, 1)),
-           textify(findAsmMethod(c, "t3")))
+    assert(
+      stores("t3") == List(VarOp(ASTORE, 1), VarOp(ASTORE, 1)),
+      textify(findAsmMethod(c, "t3")))
 
     assertEquals(locals(c, "t4"), List(("this", 0), ("kept5", 1)))
-    assert(stores("t4") == List(VarOp(ASTORE, 1), VarOp(ASTORE, 1)),
-           textify(findAsmMethod(c, "t4")))
+    assert(
+      stores("t4") == List(VarOp(ASTORE, 1), VarOp(ASTORE, 1)),
+      textify(findAsmMethod(c, "t4")))
 
     assertEquals(locals(c, "t5"), List(("this", 0), ("kept6", 1)))
-    assert(stores("t5") == List(VarOp(ASTORE, 1), VarOp(ASTORE, 1)),
-           textify(findAsmMethod(c, "t5")))
+    assert(
+      stores("t5") == List(VarOp(ASTORE, 1), VarOp(ASTORE, 1)),
+      textify(findAsmMethod(c, "t5")))
   }
 
   @Test
@@ -798,14 +854,16 @@ class MethodLevelOptsTest extends ClearAfterClass {
     assertEquals(locals(c, "t2"), List(("this", 0), ("x", 1)))
     // we don't have constant propagation (yet).
     // the local var can't be optimized as a store;laod sequence, there's a GETSTATIC between the two
-    assertSameSummary(getSingleMethod(c, "t2"),
-                      List(ICONST_2,
-                           ISTORE,
-                           GETSTATIC,
-                           ILOAD,
-                           "boxToInteger",
-                           "println",
-                           RETURN))
+    assertSameSummary(
+      getSingleMethod(c, "t2"),
+      List(
+        ICONST_2,
+        ISTORE,
+        GETSTATIC,
+        ILOAD,
+        "boxToInteger",
+        "println",
+        RETURN))
 
     assertEquals(locals(c, "t3"), List(("this", 0)))
     assertEquals(locals(c, "t4"), List(("this", 0), ("x", 1)))
@@ -857,21 +915,23 @@ class MethodLevelOptsTest extends ClearAfterClass {
       """.stripMargin
     val List(c) = compileClasses(methodOptCompiler)(code)
 
-    assertSameSummary(getSingleMethod(c, "t"),
-                      List(BIPUSH,
-                           ILOAD,
-                           IF_ICMPNE,
-                           BIPUSH,
-                           ILOAD,
-                           IF_ICMPNE,
-                           LDC,
-                           ASTORE,
-                           GOTO,
-                           -1,
-                           LDC,
-                           ASTORE,
-                           -1,
-                           ALOAD,
-                           ARETURN))
+    assertSameSummary(
+      getSingleMethod(c, "t"),
+      List(
+        BIPUSH,
+        ILOAD,
+        IF_ICMPNE,
+        BIPUSH,
+        ILOAD,
+        IF_ICMPNE,
+        LDC,
+        ASTORE,
+        GOTO,
+        -1,
+        LDC,
+        ASTORE,
+        -1,
+        ALOAD,
+        ARETURN))
   }
 }

@@ -3,7 +3,13 @@ package com.twitter.app
 import com.twitter.util._
 import com.twitter.util.registry.GlobalRegistry
 import java.io.File
-import java.lang.{Boolean => JBoolean, Double => JDouble, Float => JFloat, Integer => JInteger, Long => JLong}
+import java.lang.{
+  Boolean => JBoolean,
+  Double => JDouble,
+  Float => JFloat,
+  Integer => JInteger,
+  Long => JLong
+}
 import java.net.InetSocketAddress
 import java.util.{List => JList, Map => JMap, Set => JSet}
 import java.util.concurrent.atomic.AtomicBoolean
@@ -119,7 +125,7 @@ object Flaggable {
   // Conversions for common non-primitive types and collections.
   implicit val ofDuration: Flaggable[Duration] = mandatory(Duration.parse(_))
   implicit val ofStorageUnit: Flaggable[StorageUnit] = mandatory(
-      StorageUnit.parse(_))
+    StorageUnit.parse(_))
 
   private val defaultTimeFormat = new TimeFormat("yyyy-MM-dd HH:mm:ss Z")
   implicit val ofTime: Flaggable[Time] = mandatory(defaultTimeFormat.parse(_))
@@ -138,7 +144,7 @@ object Flaggable {
       override def show(addr: InetSocketAddress) =
         "%s:%d".format(Option(addr.getAddress) match {
           case Some(a) if a.isAnyLocalAddress => ""
-          case _ => addr.getHostName
+          case _                              => addr.getHostName
         }, addr.getPort)
     }
 
@@ -147,7 +153,7 @@ object Flaggable {
     override def show(file: File) = file.toString
   }
 
-  implicit def ofTuple[T : Flaggable, U : Flaggable]: Flaggable[(T, U)] =
+  implicit def ofTuple[T: Flaggable, U: Flaggable]: Flaggable[(T, U)] =
     new Flaggable[(T, U)] {
       private val tflag = implicitly[Flaggable[T]]
       private val uflag = implicitly[Flaggable[U]]
@@ -157,7 +163,7 @@ object Flaggable {
 
       def parse(v: String): (T, U) = v.split(",") match {
         case Array(t, u) => (tflag.parse(t), uflag.parse(u))
-        case _ => throw new IllegalArgumentException("not a 't,u'")
+        case _           => throw new IllegalArgumentException("not a 't,u'")
       }
 
       override def show(tup: (T, U)) = {
@@ -166,7 +172,7 @@ object Flaggable {
       }
     }
 
-  private[app] class SetFlaggable[T : Flaggable] extends Flaggable[Set[T]] {
+  private[app] class SetFlaggable[T: Flaggable] extends Flaggable[Set[T]] {
     private val flag = implicitly[Flaggable[T]]
     assert(!flag.default.isDefined)
     override def parse(v: String): Set[T] =
@@ -174,14 +180,14 @@ object Flaggable {
     override def show(set: Set[T]) = set map flag.show mkString ","
   }
 
-  private[app] class SeqFlaggable[T : Flaggable] extends Flaggable[Seq[T]] {
+  private[app] class SeqFlaggable[T: Flaggable] extends Flaggable[Seq[T]] {
     private val flag = implicitly[Flaggable[T]]
     assert(!flag.default.isDefined)
     def parse(v: String): Seq[T] = v.split(",") map flag.parse
     override def show(seq: Seq[T]) = seq map flag.show mkString ","
   }
 
-  private[app] class MapFlaggable[K : Flaggable, V : Flaggable]
+  private[app] class MapFlaggable[K: Flaggable, V: Flaggable]
       extends Flaggable[Map[K, V]] {
     private val kflag = implicitly[Flaggable[K]]
     private val vflag = implicitly[Flaggable[V]]
@@ -201,37 +207,37 @@ object Flaggable {
       tuples.map { tup =>
         tup.split("=") match {
           case Array(k, v) => (kflag.parse(k), vflag.parse(v))
-          case _ => throw new IllegalArgumentException("not a 'k=v'")
+          case _           => throw new IllegalArgumentException("not a 'k=v'")
         }
       }.toMap
     }
 
     override def show(out: Map[K, V]) = {
       out.toSeq map { case (k, v) => k.toString + "=" + v.toString } mkString
-      (",")
+        (",")
     }
   }
 
-  implicit def ofSet[T : Flaggable]: Flaggable[Set[T]] = new SetFlaggable[T]
-  implicit def ofSeq[T : Flaggable]: Flaggable[Seq[T]] = new SeqFlaggable[T]
-  implicit def ofMap[K : Flaggable, V : Flaggable]: Flaggable[Map[K, V]] =
+  implicit def ofSet[T: Flaggable]: Flaggable[Set[T]] = new SetFlaggable[T]
+  implicit def ofSeq[T: Flaggable]: Flaggable[Seq[T]] = new SeqFlaggable[T]
+  implicit def ofMap[K: Flaggable, V: Flaggable]: Flaggable[Map[K, V]] =
     new MapFlaggable[K, V]
 
-  implicit def ofJavaSet[T : Flaggable]: Flaggable[JSet[T]] =
+  implicit def ofJavaSet[T: Flaggable]: Flaggable[JSet[T]] =
     new Flaggable[JSet[T]] {
       val setFlaggable = new SetFlaggable[T]
       override def parse(v: String): JSet[T] = setFlaggable.parse(v).asJava
       override def show(set: JSet[T]) = setFlaggable.show(set.asScala.toSet)
     }
 
-  implicit def ofJavaList[T : Flaggable]: Flaggable[JList[T]] =
+  implicit def ofJavaList[T: Flaggable]: Flaggable[JList[T]] =
     new Flaggable[JList[T]] {
       val seqFlaggable = new SeqFlaggable[T]
       override def parse(v: String): JList[T] = seqFlaggable.parse(v).asJava
       override def show(list: JList[T]) = seqFlaggable.show(list.asScala)
     }
 
-  implicit def ofJavaMap[K : Flaggable, V : Flaggable]: Flaggable[JMap[K, V]] = {
+  implicit def ofJavaMap[K: Flaggable, V: Flaggable]: Flaggable[JMap[K, V]] = {
     val mapFlaggable = new MapFlaggable[K, V]
 
     new Flaggable[JMap[K, V]] {
@@ -269,23 +275,26 @@ object Flag {
   *
   * @see [[com.twitter.app.Flags]]
   */
-class Flag[T : Flaggable] private[app](val name: String,
-                                       val help: String,
-                                       defaultOrUsage: Either[() => T, String],
-                                       failFastUntilParsed: Boolean) {
+class Flag[T: Flaggable] private[app] (
+    val name: String,
+    val help: String,
+    defaultOrUsage: Either[() => T, String],
+    failFastUntilParsed: Boolean) {
   import com.twitter.app.Flag._
   import java.util.logging._
 
-  private[app] def this(name: String,
-                        help: String,
-                        default: => T,
-                        failFastUntilParsed: Boolean) =
+  private[app] def this(
+      name: String,
+      help: String,
+      default: => T,
+      failFastUntilParsed: Boolean) =
     this(name, help, Left(() => default), failFastUntilParsed)
 
-  private[app] def this(name: String,
-                        help: String,
-                        usage: String,
-                        failFastUntilParsed: Boolean) =
+  private[app] def this(
+      name: String,
+      help: String,
+      usage: String,
+      failFastUntilParsed: Boolean) =
     this(name, help, Right(usage), failFastUntilParsed)
 
   private[app] def this(name: String, help: String, default: => T) =
@@ -302,7 +311,7 @@ class Flag[T : Flaggable] private[app](val name: String,
     case None => None
     case Some(flagValues) =>
       flagValues.get(this) match {
-        case None => None
+        case None            => None
         case Some(flagValue) => Some(flagValue.asInstanceOf[T])
       }
   }
@@ -310,9 +319,9 @@ class Flag[T : Flaggable] private[app](val name: String,
   private[this] def setLocalValue(value: Option[T]): Unit = {
     val updatedMap: Map[Flag[_], Any] = (localFlagValues(), value) match {
       case (Some(map), Some(v)) => map + (this -> v)
-      case (Some(map), None) => map - this
-      case (None, Some(v)) => Map(this -> v)
-      case (None, None) => Map.empty[Flag[_], Any]
+      case (Some(map), None)    => map - this
+      case (None, Some(v))      => Map(this -> v)
+      case (None, None)         => Map.empty[Flag[_], Any]
     }
     if (updatedMap.isEmpty) localFlagValues.clear()
     else localFlagValues.set(Some(updatedMap))
@@ -332,7 +341,7 @@ class Flag[T : Flaggable] private[app](val name: String,
     }
     localValue match {
       case lv @ Some(_) => lv
-      case None => value
+      case None         => value
     }
   }
 
@@ -347,13 +356,14 @@ class Flag[T : Flaggable] private[app](val name: String,
       } catch {
         case e: Throwable =>
           throw new RuntimeException(
-              s"Could not run default function for flag $name", e)
+            s"Could not run default function for flag $name",
+            e)
       }
   }
 
   private def valueOrDefault: Option[T] = getValue match {
     case v @ Some(_) => v
-    case None => default
+    case None        => default
   }
 
   private[this] def flagNotFound: IllegalArgumentException =
@@ -366,7 +376,8 @@ class Flag[T : Flaggable] private[app](val name: String,
   def let(t: T)(f: => Unit): Unit = {
     val prev = localValue
     setLocalValue(Some(t))
-    try f finally {
+    try f
+    finally {
       setLocalValue(prev)
     }
   }
@@ -383,7 +394,7 @@ class Flag[T : Flaggable] private[app](val name: String,
     }
     valueOrDefault match {
       case Some(v) => v
-      case None => throw flagNotFound
+      case None    => throw flagNotFound
     }
   }
 
@@ -432,7 +443,7 @@ class Flag[T : Flaggable] private[app](val name: String,
 
   def usageString: String = {
     val defaultOrUsageStr = defaultOrUsage match {
-      case Left(_) => runDefaultString
+      case Left(_)      => runDefaultString
       case Right(usage) => usage
     }
     s"  -$name='$defaultOrUsageStr': $help"
@@ -534,7 +545,9 @@ object Flags {
   * application itself will be consulted.
   */
 class Flags(
-    argv0: String, includeGlobal: Boolean, failFastUntilParsed: Boolean) {
+    argv0: String,
+    includeGlobal: Boolean,
+    failFastUntilParsed: Boolean) {
   import com.twitter.app.Flags._
 
   def this(argv0: String, includeGlobal: Boolean) =
@@ -598,8 +611,8 @@ class Flags(
             if (allowUndefinedFlags) remaining += a
             else
               return Error(
-                  "Error parsing flag \"%s\": %s\n%s".format(
-                      k, FlagUndefinedMessage, usage)
+                "Error parsing flag \"%s\": %s\n%s"
+                  .format(k, FlagUndefinedMessage, usage)
               )
 
           // Flag isn't defined
@@ -607,8 +620,8 @@ class Flags(
             if (allowUndefinedFlags) remaining += a
             else
               return Error(
-                  "Error parsing flag \"%s\": %s\n%s".format(
-                      k, FlagUndefinedMessage, usage)
+                "Error parsing flag \"%s\": %s\n%s"
+                  .format(k, FlagUndefinedMessage, usage)
               )
 
           // Optional argument without a value
@@ -618,28 +631,30 @@ class Flags(
           // Mandatory argument without a value and with no more arguments.
           case Array(k) if i == args.size =>
             return Error(
-                "Error parsing flag \"%s\": %s\n%s".format(
-                    k, FlagValueRequiredMessage, usage)
+              "Error parsing flag \"%s\": %s\n%s"
+                .format(k, FlagValueRequiredMessage, usage)
             )
 
           // Mandatory argument with another argument
           case Array(k) =>
             i += 1
-            try flag(k).parse(args(i - 1)) catch {
+            try flag(k).parse(args(i - 1))
+            catch {
               case NonFatal(e) =>
                 return Error(
-                    "Error parsing flag \"%s\": %s\n%s".format(
-                        k, e.getMessage, usage)
+                  "Error parsing flag \"%s\": %s\n%s"
+                    .format(k, e.getMessage, usage)
                 )
             }
 
           // Mandatory k=v
           case Array(k, v) =>
-            try flag(k).parse(v) catch {
+            try flag(k).parse(v)
+            catch {
               case e: Throwable =>
                 return Error(
-                    "Error parsing flag \"%s\": %s\n%s".format(
-                        k, e.getMessage, usage)
+                  "Error parsing flag \"%s\": %s\n%s"
+                    .format(k, e.getMessage, usage)
                 )
             }
         }
@@ -673,7 +688,7 @@ class Flags(
       undefOk: Boolean = false
   ): Seq[String] = parseArgs(args, undefOk) match {
     case Ok(remainder) => remainder
-    case Help(usage) => throw FlagUsageError(usage)
+    case Help(usage)   => throw FlagUsageError(usage)
     case Error(reason) => throw FlagParseException(reason)
   }
 
@@ -719,7 +734,7 @@ class Flags(
     * @param default A default value, as a thunk.
     * @param help The help string of the flag.
     */
-  def apply[T : Flaggable](name: String, default: => T, help: String) = {
+  def apply[T: Flaggable](name: String, default: => T, help: String) = {
     val f = new Flag[T](name, help, default, failFastUntilParsed)
     add(f)
     f
@@ -732,7 +747,8 @@ class Flags(
     * @param help The help string of the flag.
     */
   def apply[T](name: String, help: String)(
-      implicit _f: Flaggable[T], m: Manifest[T]) = {
+      implicit _f: Flaggable[T],
+      m: Manifest[T]) = {
     val f = new Flag[T](name, help, m.toString, failFastUntilParsed)
     add(f)
     f
@@ -745,10 +761,11 @@ class Flags(
     * @param default A default value.
     * @param help The help string of the flag.
     */
-  def create[T](name: String,
-                default: T,
-                help: String,
-                flaggable: Flaggable[T]): Flag[T] = {
+  def create[T](
+      name: String,
+      default: T,
+      help: String,
+      flaggable: Flaggable[T]): Flag[T] = {
     implicit val impl = flaggable
     apply(name, default, help)
   }
@@ -760,10 +777,11 @@ class Flags(
     * @param help the help text explaining the purpose of the flag
     * @param usage a string describing the type of the flag, i.e.: Integer
     */
-  def createMandatory[T](name: String,
-                         help: String,
-                         usage: String,
-                         flaggable: Flaggable[T]): Flag[T] = {
+  def createMandatory[T](
+      name: String,
+      help: String,
+      usage: String,
+      flaggable: Flaggable[T]): Flag[T] = {
     implicit val impl = flaggable
     val f = new Flag[T](name, help, usage, failFastUntilParsed)
     add(f)
@@ -792,10 +810,10 @@ class Flags(
     val cmd = if (cmdUsage.nonEmpty) cmdUsage + "\n" else "usage: "
 
     cmd + argv0 + " [<flag>...]\n" + "flags:\n" + (lines mkString "\n") +
-    (if (globalLines.isEmpty) ""
-     else {
-       "\nglobal flags:\n" + (globalLines mkString "\n")
-     })
+      (if (globalLines.isEmpty) ""
+       else {
+         "\nglobal flags:\n" + (globalLines mkString "\n")
+       })
   }
 
   /**
@@ -892,7 +910,7 @@ class Flags(
   * those supplied by system properties.
   */
 @GlobalFlagVisible
-class GlobalFlag[T] private[app](
+class GlobalFlag[T] private[app] (
     defaultOrUsage: Either[() => T, String],
     help: String
 )(implicit _f: Flaggable[T])
@@ -901,13 +919,15 @@ class GlobalFlag[T] private[app](
   override protected[this] def parsingDone: Boolean = true
   private[this] lazy val propertyValue =
     Option(System.getProperty(name)) flatMap { p =>
-      try Some(flaggable.parse(p)) catch {
+      try Some(flaggable.parse(p))
+      catch {
         case NonFatal(exc) =>
           java.util.logging.Logger
             .getLogger("")
-            .log(java.util.logging.Level.SEVERE,
-                 "Failed to parse system property " + name + " as flag",
-                 exc)
+            .log(
+              java.util.logging.Level.SEVERE,
+              "Failed to parse system property " + name + " as flag",
+              exc)
           None
       }
     }
@@ -923,7 +943,7 @@ class GlobalFlag[T] private[app](
 
   protected override def getValue = super.getValue match {
     case v @ Some(_) => v
-    case _ => propertyValue
+    case _           => propertyValue
   }
 
   def getGlobalFlag: Flag[_] = this
@@ -967,7 +987,7 @@ private object GlobalFlag {
       if (cls.isAnnotationPresent(markerClass)) {
         get(info.name.dropRight(1)) match {
           case Some(f) => flags += f
-          case None => println("failed for " + info.name)
+          case None    => println("failed for " + info.name)
         }
       }
     } catch {

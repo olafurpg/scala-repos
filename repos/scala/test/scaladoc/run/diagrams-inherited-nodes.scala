@@ -63,11 +63,13 @@ object Test extends ScaladocModelTest {
       // trait T1
       val T = base._trait(t)
       val TDiag = T.contentDiagram.get
-      assert(TDiag.nodes.length == nodes,
-             t + ": " + TDiag.nodes + ".length == " + nodes)
-      assert(TDiag.edges.map(_._2.length).sum == edges,
-             t + ": " + TDiag.edges.mkString("List(\n", ",\n", "\n)") +
-             ".map(_._2.length).sum == " + edges)
+      assert(
+        TDiag.nodes.length == nodes,
+        t + ": " + TDiag.nodes + ".length == " + nodes)
+      assert(
+        TDiag.edges.map(_._2.length).sum == edges,
+        t + ": " + TDiag.edges.mkString("List(\n", ",\n", "\n)") +
+          ".map(_._2.length).sum == " + edges)
     }
 
     checkDiagram("T1", 3, 2)

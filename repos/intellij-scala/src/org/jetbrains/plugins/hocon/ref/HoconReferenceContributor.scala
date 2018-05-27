@@ -8,9 +8,10 @@ class HoconReferenceContributor extends PsiReferenceContributor {
   def registerReferenceProviders(registrar: PsiReferenceRegistrar): Unit = {
     val hStringPattern = PlatformPatterns.psiElement(classOf[HString])
     registrar.registerReferenceProvider(
-        hStringPattern, new HStringJavaClassReferenceProvider)
+      hStringPattern,
+      new HStringJavaClassReferenceProvider)
     registrar.registerReferenceProvider(
-        hStringPattern.withParent(classOf[HIncluded]),
-        new IncludedFileReferenceProvider)
+      hStringPattern.withParent(classOf[HIncluded]),
+      new IncludedFileReferenceProvider)
   }
 }

@@ -3,10 +3,19 @@
   */
 package akka.http.scaladsl
 
-import java.io.{BufferedReader, BufferedWriter, InputStreamReader, OutputStreamWriter}
+import java.io.{
+  BufferedReader,
+  BufferedWriter,
+  InputStreamReader,
+  OutputStreamWriter
+}
 import java.net.{BindException, Socket}
 import java.util.concurrent.TimeoutException
-import akka.http.scaladsl.settings.{ConnectionPoolSettings, ClientConnectionSettings, ServerSettings}
+import akka.http.scaladsl.settings.{
+  ConnectionPoolSettings,
+  ClientConnectionSettings,
+  ServerSettings
+}
 
 import scala.annotation.tailrec
 import scala.concurrent.duration._
@@ -29,7 +38,10 @@ import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpec}
 import org.scalatest.concurrent.ScalaFutures
 
 class ClientServerSpec
-    extends WordSpec with Matchers with BeforeAndAfterAll with ScalaFutures {
+    extends WordSpec
+    with Matchers
+    with BeforeAndAfterAll
+    with ScalaFutures {
   val testConf: Config =
     ConfigFactory.parseString("""
     akka.loggers = ["akka.testkit.TestEventListener"]
@@ -64,7 +76,7 @@ class ClientServerSpec
     }
 
     "report failure if bind fails" in EventFilter[BindException](
-        occurrences = 2).intercept {
+      occurrences = 2).intercept {
       val (_, hostname, port) = TestUtils.temporaryServerHostnameAndPort()
       val binding = Http().bind(hostname, port)
       val probe1 = TestSubscriber.manualProbe[Http.IncomingConnection]()
@@ -92,8 +104,8 @@ class ClientServerSpec
       if (!akka.util.Helpers.isWindows) {
         val probe4 = TestSubscriber.manualProbe[Http.IncomingConnection]()
         // Bind succeeded, we have a local address
-        val b2 = Await.result(binding.to(Sink.fromSubscriber(probe4)).run(),
-                              3.seconds)
+        val b2 =
+          Await.result(binding.to(Sink.fromSubscriber(probe4)).run(), 3.seconds)
         probe4.expectSubscription()
 
         // clean up
@@ -101,21 +113,24 @@ class ClientServerSpec
       }
     }
 
-    "properly terminate client when server is not running" in Utils.assertAllStagesStopped {
-      for (i ← 1 to 10) withClue(s"iterator $i: ") {
-        Source
-          .single(HttpRequest(HttpMethods.POST,
-                              "/test",
-                              List.empty,
-                              HttpEntity(MediaTypes.`text/plain`.withCharset(
-                                             HttpCharsets.`UTF-8`),
-                                         "buh")))
-          .via(Http(actorSystem).outgoingConnection("localhost", 7777))
-          .runWith(Sink.head)
-          .failed
-          .futureValue shouldBe a[StreamTcpException]
+    "properly terminate client when server is not running" in Utils
+      .assertAllStagesStopped {
+        for (i ← 1 to 10) withClue(s"iterator $i: ") {
+          Source
+            .single(
+              HttpRequest(
+                HttpMethods.POST,
+                "/test",
+                List.empty,
+                HttpEntity(
+                  MediaTypes.`text/plain`.withCharset(HttpCharsets.`UTF-8`),
+                  "buh")))
+            .via(Http(actorSystem).outgoingConnection("localhost", 7777))
+            .runWith(Sink.head)
+            .failed
+            .futureValue shouldBe a[StreamTcpException]
+        }
       }
-    }
 
     "run with bindAndHandleSync" in {
       val (_, hostname, port) = TestUtils.temporaryServerHostnameAndPort()
@@ -143,7 +158,7 @@ class ClientServerSpec
           case "/slow" ⇒
             receivedSlow.complete(Success(System.nanoTime()))
             akka.pattern.after(1.seconds, system.scheduler)(
-                Future.successful(HttpResponse()))
+              Future.successful(HttpResponse()))
           case "/fast" ⇒
             receivedFast.complete(Success(System.nanoTime()))
             Future.successful(HttpResponse())
@@ -190,8 +205,8 @@ class ClientServerSpec
           Promise().future // never complete the request with a response; we're waiting for the timeout to happen, nothing else
         }
 
-        val binding = Http().bindAndHandleAsync(
-            handle, hostname, port, settings = settings)
+        val binding =
+          Http().bindAndHandleAsync(handle, hostname, port, settings = settings)
         val b1 = Await.result(binding, 3.seconds)
         (receivedRequest, b1)
       }
@@ -206,13 +221,14 @@ class ClientServerSpec
           try {
             def runIdleRequest(uri: Uri): Future[HttpResponse] = {
               val itNeverEnds =
-                Chunked.fromData(ContentTypes.`text/plain(UTF-8)`,
-                                 Source.maybe[ByteString])
+                Chunked.fromData(
+                  ContentTypes.`text/plain(UTF-8)`,
+                  Source.maybe[ByteString])
               Http()
                 .outgoingConnection(hostname, port)
                 .runWith(
-                    Source.single(HttpRequest(PUT, uri, entity = itNeverEnds)),
-                    Sink.head)
+                  Source.single(HttpRequest(PUT, uri, entity = itNeverEnds)),
+                  Sink.head)
                 ._2
             }
 
@@ -228,7 +244,7 @@ class ClientServerSpec
             }
 
             (System.nanoTime() -
-                serverReceivedRequestAtNanos).millis should be >= serverTimeout
+              serverReceivedRequestAtNanos).millis should be >= serverTimeout
           } finally Await.result(b1.unbind(), 1.second)
         }
       }
@@ -248,13 +264,14 @@ class ClientServerSpec
           try {
             def runRequest(uri: Uri): Future[HttpResponse] = {
               val itNeverSends =
-                Chunked.fromData(ContentTypes.`text/plain(UTF-8)`,
-                                 Source.maybe[ByteString])
+                Chunked.fromData(
+                  ContentTypes.`text/plain(UTF-8)`,
+                  Source.maybe[ByteString])
               Http()
                 .outgoingConnection(hostname, port, settings = clientSettings)
-                .runWith(Source.single(
-                             HttpRequest(POST, uri, entity = itNeverSends)),
-                         Sink.head)
+                .runWith(
+                  Source.single(HttpRequest(POST, uri, entity = itNeverSends)),
+                  Sink.head)
                 ._2
             }
 
@@ -287,14 +304,14 @@ class ClientServerSpec
             bindServer(hostname, port, serverTimeout)
 
           try {
-            val pool = Http().cachedHostConnectionPool[Int](hostname,
-                                                            port,
-                                                            clientPoolSettings)
+            val pool = Http()
+              .cachedHostConnectionPool[Int](hostname, port, clientPoolSettings)
 
             def runRequest(uri: Uri): Future[(Try[HttpResponse], Int)] = {
               val itNeverSends =
-                Chunked.fromData(ContentTypes.`text/plain(UTF-8)`,
-                                 Source.maybe[ByteString])
+                Chunked.fromData(
+                  ContentTypes.`text/plain(UTF-8)`,
+                  Source.maybe[ByteString])
               Source
                 .single(HttpRequest(POST, uri, entity = itNeverSends) -> 1)
                 .via(pool)
@@ -332,12 +349,12 @@ class ClientServerSpec
           try {
             def runRequest(uri: Uri): Future[HttpResponse] = {
               val itNeverSends =
-                Chunked.fromData(ContentTypes.`text/plain(UTF-8)`,
-                                 Source.maybe[ByteString])
-              Http().singleRequest(HttpRequest(POST,
-                                               uri,
-                                               entity = itNeverSends),
-                                   settings = clientPoolSettings)
+                Chunked.fromData(
+                  ContentTypes.`text/plain(UTF-8)`,
+                  Source.maybe[ByteString])
+              Http().singleRequest(
+                HttpRequest(POST, uri, entity = itNeverSends),
+                settings = clientPoolSettings)
             }
 
             val clientsResponseFuture = runRequest(s"http://$hostname:$port/")
@@ -371,17 +388,19 @@ class ClientServerSpec
           Http(system2).bindAndHandle(flow, hostname, port)(materializer2)
         val b1 = Await.result(binding, 3.seconds)
 
-        EventFilter[RuntimeException](message = "BOOM", occurrences = 1).intercept {
-          val (_, responseFuture) = Http(system2)
-            .outgoingConnection(hostname, port)
-            .runWith(Source.single(HttpRequest()), Sink.head)(materializer2)
-          try Await.result(responseFuture, 5.second).status should ===(
-              StatusCodes.InternalServerError) catch {
-            case _: StreamTcpException ⇒
-            // Also fine, depends on the race between abort and 500, caused by materialization panic which
-            // tries to tear down everything, but the order is nondeterministic
-          }
-        }(system2)
+        EventFilter[RuntimeException](message = "BOOM", occurrences = 1)
+          .intercept {
+            val (_, responseFuture) = Http(system2)
+              .outgoingConnection(hostname, port)
+              .runWith(Source.single(HttpRequest()), Sink.head)(materializer2)
+            try Await.result(responseFuture, 5.second).status should ===(
+              StatusCodes.InternalServerError)
+            catch {
+              case _: StreamTcpException ⇒
+              // Also fine, depends on the race between abort and 500, caused by materialization panic which
+              // tries to tear down everything, but the order is nondeterministic
+            }
+          }(system2)
         Await.result(b1.unbind(), 1.second)
       }(materializer2)
 
@@ -396,136 +415,144 @@ class ClientServerSpec
           Http(system2).bindAndHandle(flow, hostname, port)(materializer2)
         val b1 = Await.result(binding, 1.seconds)
 
-        EventFilter[RuntimeException](message = "BOOM", occurrences = 1).intercept {
-          val (_, responseFuture) = Http(system2)
-            .outgoingConnection(hostname, port)
-            .runWith(Source.single(HttpRequest()), Sink.head)(materializer2)
-          try Await.result(responseFuture, 5.seconds).status should ===(
-              StatusCodes.InternalServerError) catch {
-            case _: StreamTcpException ⇒
-            // Also fine, depends on the race between abort and 500, caused by materialization panic which
-            // tries to tear down everything, but the order is nondeterministic
-          }
-        }(system2)
+        EventFilter[RuntimeException](message = "BOOM", occurrences = 1)
+          .intercept {
+            val (_, responseFuture) = Http(system2)
+              .outgoingConnection(hostname, port)
+              .runWith(Source.single(HttpRequest()), Sink.head)(materializer2)
+            try Await.result(responseFuture, 5.seconds).status should ===(
+              StatusCodes.InternalServerError)
+            catch {
+              case _: StreamTcpException ⇒
+              // Also fine, depends on the race between abort and 500, caused by materialization panic which
+              // tries to tear down everything, but the order is nondeterministic
+            }
+          }(system2)
         Await.result(b1.unbind(), 1.second)
       }(materializer2)
     }
 
-    "properly complete a simple request/response cycle" in Utils.assertAllStagesStopped {
-      new TestSetup {
-        val (clientOut, clientIn) = openNewClientConnection()
-        val (serverIn, serverOut) = acceptConnection()
+    "properly complete a simple request/response cycle" in Utils
+      .assertAllStagesStopped {
+        new TestSetup {
+          val (clientOut, clientIn) = openNewClientConnection()
+          val (serverIn, serverOut) = acceptConnection()
 
-        val clientOutSub = clientOut.expectSubscription()
-        clientOutSub.expectRequest()
-        clientOutSub.sendNext(HttpRequest(uri = "/abc"))
+          val clientOutSub = clientOut.expectSubscription()
+          clientOutSub.expectRequest()
+          clientOutSub.sendNext(HttpRequest(uri = "/abc"))
 
-        val serverInSub = serverIn.expectSubscription()
-        serverInSub.request(1)
-        serverIn.expectNext().uri shouldEqual Uri(
+          val serverInSub = serverIn.expectSubscription()
+          serverInSub.request(1)
+          serverIn.expectNext().uri shouldEqual Uri(
             s"http://$hostname:$port/abc")
 
-        val serverOutSub = serverOut.expectSubscription()
-        serverOutSub.expectRequest()
-        serverOutSub.sendNext(HttpResponse(entity = "yeah"))
+          val serverOutSub = serverOut.expectSubscription()
+          serverOutSub.expectRequest()
+          serverOutSub.sendNext(HttpResponse(entity = "yeah"))
 
-        val clientInSub = clientIn.expectSubscription()
-        clientInSub.request(1)
-        val response = clientIn.expectNext()
-        toStrict(response.entity) shouldEqual HttpEntity("yeah")
+          val clientInSub = clientIn.expectSubscription()
+          clientInSub.request(1)
+          val response = clientIn.expectNext()
+          toStrict(response.entity) shouldEqual HttpEntity("yeah")
 
-        clientOutSub.sendComplete()
-        serverIn.expectComplete()
-        serverOutSub.expectCancellation()
-        clientIn.expectComplete()
+          clientOutSub.sendComplete()
+          serverIn.expectComplete()
+          serverOutSub.expectCancellation()
+          clientIn.expectComplete()
 
-        binding.foreach(_.unbind())
+          binding.foreach(_.unbind())
+        }
       }
-    }
 
-    "properly complete a chunked request/response cycle" in Utils.assertAllStagesStopped {
-      new TestSetup {
-        val (clientOut, clientIn) = openNewClientConnection()
-        val (serverIn, serverOut) = acceptConnection()
+    "properly complete a chunked request/response cycle" in Utils
+      .assertAllStagesStopped {
+        new TestSetup {
+          val (clientOut, clientIn) = openNewClientConnection()
+          val (serverIn, serverOut) = acceptConnection()
 
-        val chunks =
-          List(Chunk("abc"), Chunk("defg"), Chunk("hijkl"), LastChunk)
-        val chunkedContentType: ContentType =
-          MediaTypes.`application/base64` withCharset HttpCharsets.`UTF-8`
-        val chunkedEntity =
-          HttpEntity.Chunked(chunkedContentType, Source(chunks))
+          val chunks =
+            List(Chunk("abc"), Chunk("defg"), Chunk("hijkl"), LastChunk)
+          val chunkedContentType: ContentType =
+            MediaTypes.`application/base64` withCharset HttpCharsets.`UTF-8`
+          val chunkedEntity =
+            HttpEntity.Chunked(chunkedContentType, Source(chunks))
 
-        val clientOutSub = clientOut.expectSubscription()
-        clientOutSub.sendNext(HttpRequest(POST,
-                                          "/chunked",
-                                          List(Accept(MediaRanges.`*/*`)),
-                                          chunkedEntity))
+          val clientOutSub = clientOut.expectSubscription()
+          clientOutSub.sendNext(
+            HttpRequest(
+              POST,
+              "/chunked",
+              List(Accept(MediaRanges.`*/*`)),
+              chunkedEntity))
 
-        val serverInSub = serverIn.expectSubscription()
-        serverInSub.request(1)
-        private val HttpRequest(
-        POST,
-        uri,
-        List(Accept(Seq(MediaRanges.`*/*`)), Host(_, _), `User-Agent`(_)),
-        Chunked(`chunkedContentType`, chunkStream),
-        HttpProtocols.`HTTP/1.1`) = serverIn.expectNext()
-        uri shouldEqual Uri(s"http://$hostname:$port/chunked")
-        Await.result(chunkStream.limit(5).runWith(Sink.seq), 100.millis) shouldEqual chunks
+          val serverInSub = serverIn.expectSubscription()
+          serverInSub.request(1)
+          private val HttpRequest(
+            POST,
+            uri,
+            List(Accept(Seq(MediaRanges.`*/*`)), Host(_, _), `User-Agent`(_)),
+            Chunked(`chunkedContentType`, chunkStream),
+            HttpProtocols.`HTTP/1.1`) = serverIn.expectNext()
+          uri shouldEqual Uri(s"http://$hostname:$port/chunked")
+          Await.result(chunkStream.limit(5).runWith(Sink.seq), 100.millis) shouldEqual chunks
 
-        val serverOutSub = serverOut.expectSubscription()
-        serverOutSub.expectRequest()
-        serverOutSub.sendNext(HttpResponse(206, List(Age(42)), chunkedEntity))
+          val serverOutSub = serverOut.expectSubscription()
+          serverOutSub.expectRequest()
+          serverOutSub.sendNext(HttpResponse(206, List(Age(42)), chunkedEntity))
 
-        val clientInSub = clientIn.expectSubscription()
-        clientInSub.request(1)
-        val HttpResponse(StatusCodes.PartialContent,
-                         List(Age(42), Server(_), Date(_)),
-                         Chunked(`chunkedContentType`, chunkStream2),
-                         HttpProtocols.`HTTP/1.1`) = clientIn.expectNext()
-        Await.result(chunkStream2.limit(1000).runWith(Sink.seq), 100.millis) shouldEqual chunks
+          val clientInSub = clientIn.expectSubscription()
+          clientInSub.request(1)
+          val HttpResponse(
+            StatusCodes.PartialContent,
+            List(Age(42), Server(_), Date(_)),
+            Chunked(`chunkedContentType`, chunkStream2),
+            HttpProtocols.`HTTP/1.1`) = clientIn.expectNext()
+          Await.result(chunkStream2.limit(1000).runWith(Sink.seq), 100.millis) shouldEqual chunks
 
-        clientOutSub.sendComplete()
-        serverInSub.request(1)
-        serverIn.expectComplete()
-        serverOutSub.expectCancellation()
-        clientInSub.request(1)
-        clientIn.expectComplete()
+          clientOutSub.sendComplete()
+          serverInSub.request(1)
+          serverIn.expectComplete()
+          serverOutSub.expectCancellation()
+          clientInSub.request(1)
+          clientIn.expectComplete()
 
-        connSourceSub.cancel()
+          connSourceSub.cancel()
+        }
       }
-    }
 
-    "be able to deal with eager closing of the request stream on the client side" in Utils.assertAllStagesStopped {
-      new TestSetup {
-        val (clientOut, clientIn) = openNewClientConnection()
-        val (serverIn, serverOut) = acceptConnection()
+    "be able to deal with eager closing of the request stream on the client side" in Utils
+      .assertAllStagesStopped {
+        new TestSetup {
+          val (clientOut, clientIn) = openNewClientConnection()
+          val (serverIn, serverOut) = acceptConnection()
 
-        val clientOutSub = clientOut.expectSubscription()
-        clientOutSub.sendNext(HttpRequest(uri = "/abc"))
-        clientOutSub.sendComplete()
-        // complete early
+          val clientOutSub = clientOut.expectSubscription()
+          clientOutSub.sendNext(HttpRequest(uri = "/abc"))
+          clientOutSub.sendComplete()
+          // complete early
 
-        val serverInSub = serverIn.expectSubscription()
-        serverInSub.request(1)
-        serverIn.expectNext().uri shouldEqual Uri(
+          val serverInSub = serverIn.expectSubscription()
+          serverInSub.request(1)
+          serverIn.expectNext().uri shouldEqual Uri(
             s"http://$hostname:$port/abc")
 
-        val serverOutSub = serverOut.expectSubscription()
-        serverOutSub.expectRequest()
-        serverOutSub.sendNext(HttpResponse(entity = "yeah"))
+          val serverOutSub = serverOut.expectSubscription()
+          serverOutSub.expectRequest()
+          serverOutSub.sendNext(HttpResponse(entity = "yeah"))
 
-        val clientInSub = clientIn.expectSubscription()
-        clientInSub.request(1)
-        val response = clientIn.expectNext()
-        toStrict(response.entity) shouldEqual HttpEntity("yeah")
+          val clientInSub = clientIn.expectSubscription()
+          clientInSub.request(1)
+          val response = clientIn.expectNext()
+          toStrict(response.entity) shouldEqual HttpEntity("yeah")
 
-        serverIn.expectComplete()
-        serverOutSub.expectCancellation()
-        clientIn.expectComplete()
+          serverIn.expectComplete()
+          serverOutSub.expectCancellation()
+          clientIn.expectComplete()
 
-        connSourceSub.cancel()
+          connSourceSub.cancel()
+        }
       }
-    }
   }
 
   override def afterAll() = {
@@ -539,26 +566,26 @@ class ClientServerSpec
 
     // automatically bind a server
     val (connSource, binding: Future[ServerBinding]) = {
-      val settings = configOverrides.toOption.fold(ServerSettings(system))(
-          ServerSettings(_))
+      val settings =
+        configOverrides.toOption.fold(ServerSettings(system))(ServerSettings(_))
       val connections = Http().bind(hostname, port, settings = settings)
       val probe = TestSubscriber.manualProbe[Http.IncomingConnection]
       val binding = connections
         .toMat(Sink.fromSubscriber(probe))(Keep.left)
         .run()
-        (probe, binding)
+      (probe, binding)
     }
     val connSourceSub = connSource.expectSubscription()
 
-    def openNewClientConnection(
-        settings: ClientConnectionSettings = ClientConnectionSettings(system)) = {
+    def openNewClientConnection(settings: ClientConnectionSettings =
+      ClientConnectionSettings(system)) = {
       val requestPublisherProbe = TestPublisher.manualProbe[HttpRequest]()
       val responseSubscriberProbe = TestSubscriber.manualProbe[HttpResponse]()
 
       val connectionFuture = Source
         .fromPublisher(requestPublisherProbe)
-        .viaMat(Http().outgoingConnection(
-                hostname, port, settings = settings))(Keep.right)
+        .viaMat(Http().outgoingConnection(hostname, port, settings = settings))(
+          Keep.right)
         .to(Sink.fromSubscriber(responseSubscriberProbe))
         .run()
 
@@ -569,8 +596,9 @@ class ClientServerSpec
       requestPublisherProbe -> responseSubscriberProbe
     }
 
-    def acceptConnection(): (TestSubscriber.ManualProbe[HttpRequest],
-    TestPublisher.ManualProbe[HttpResponse]) = {
+    def acceptConnection(): (
+        TestSubscriber.ManualProbe[HttpRequest],
+        TestPublisher.ManualProbe[HttpResponse]) = {
       connSourceSub.request(1)
       val incomingConnection = connSource.expectNext()
       val sink = Sink.asPublisher[HttpRequest](false)
@@ -591,15 +619,16 @@ class ClientServerSpec
 
     def write(socket: Socket, data: String) = {
       val writer = new BufferedWriter(
-          new OutputStreamWriter(socket.getOutputStream))
+        new OutputStreamWriter(socket.getOutputStream))
       writer.write(data)
       writer.flush()
       writer
     }
 
     def readAll(socket: Socket)(
-        reader: BufferedReader = new BufferedReader(new InputStreamReader(
-                  socket.getInputStream))): (String, BufferedReader) = {
+        reader: BufferedReader = new BufferedReader(
+          new InputStreamReader(socket.getInputStream)))
+      : (String, BufferedReader) = {
       val sb = new java.lang.StringBuilder
       val cbuf = new Array[Char](256)
       @tailrec def drain(): (String, BufferedReader) =

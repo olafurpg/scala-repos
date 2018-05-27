@@ -16,12 +16,18 @@ import scala.collection.immutable.Queue
 
 trait JavaCompilerFixture {
   def withJavaCompiler(
-      testCode: (TestKitFix, EnsimeConfig, JavaCompiler, JavaStoreReporter,
-      SearchService) => Any
+      testCode: (
+          TestKitFix,
+          EnsimeConfig,
+          JavaCompiler,
+          JavaStoreReporter,
+          SearchService) => Any
   ): Any
 
   def runForPositionInCompiledSource(
-      config: EnsimeConfig, cc: JavaCompiler, lines: String*)(
+      config: EnsimeConfig,
+      cc: JavaCompiler,
+      lines: String*)(
       testCode: (SourceFileInfo, Int, String, JavaCompiler) => Any): Any = {
     val contents = lines.mkString("\n")
     var offset = 0
@@ -32,7 +38,8 @@ trait JavaCompilerFixture {
       offset += ((m.end - m.start))
     }
     val f = new File(
-        config.rootDir, "testing/simple/src/main/java/org/example/Test1.java")
+      config.rootDir,
+      "testing/simple/src/main/java/org/example/Test1.java")
     val file = SourceFileInfo(f, Some(contents.replaceAll(re, "")), None)
     cc.askTypecheckFiles(List(file))
     assert(points.nonEmpty)
@@ -67,12 +74,18 @@ class JavaStoreReporter extends ReportHandler {
 }
 
 trait IsolatedJavaCompilerFixture
-    extends JavaCompilerFixture with IsolatedEnsimeVFSFixture
-    with IsolatedTestKitFixture with IsolatedSearchServiceFixture {
+    extends JavaCompilerFixture
+    with IsolatedEnsimeVFSFixture
+    with IsolatedTestKitFixture
+    with IsolatedSearchServiceFixture {
 
   override def withJavaCompiler(
-      testCode: (TestKitFix, EnsimeConfig, JavaCompiler, JavaStoreReporter,
-      SearchService) => Any
+      testCode: (
+          TestKitFix,
+          EnsimeConfig,
+          JavaCompiler,
+          JavaStoreReporter,
+          SearchService) => Any
   ): Any = {
     withVFS { implicit vfs =>
       withTestKit { testkit =>

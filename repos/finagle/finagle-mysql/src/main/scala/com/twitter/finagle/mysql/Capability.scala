@@ -21,23 +21,23 @@ object Capability {
   val PluginAuth = 0x80000 // supports auth plugins
 
   val CapabilityMap = Map(
-      "CLIENT_LONG_PASSWORD" -> LongPassword,
-      "CLIENT_FOUND_ROWS" -> FoundRows,
-      "CLIENT_LONG_FLAG" -> LongFlag,
-      "CLIENT_CONNECT_WITH_DB" -> ConnectWithDB,
-      "CLIENT_NO_SCHEMA" -> NoSchema,
-      "CLIENT_COMPRESS" -> Compress,
-      "CLIENT_ODBC" -> ODBC,
-      "CLIENT_LOCAL_FILES" -> LocalFiles,
-      "CLIENT_IGNORE_SPACE" -> IgnoreSpace,
-      "CLIENT_PROTOCOL_41" -> Protocol41,
-      "CLIENT_INTERACTIVE" -> Interactive,
-      "CLIENT_SSL" -> SSL,
-      "CLIENT_IGNORE_SIGPIPE" -> IgnoreSigPipe,
-      "CLIENT_TRANSACTIONS" -> Transactions,
-      "CLIENT_SECURE_CONNECTION" -> SecureConnection,
-      "CLIENT_MULTI_STATEMENTS" -> MultiStatements,
-      "CLIENT_MULTI_RESULTS" -> MultiResults
+    "CLIENT_LONG_PASSWORD" -> LongPassword,
+    "CLIENT_FOUND_ROWS" -> FoundRows,
+    "CLIENT_LONG_FLAG" -> LongFlag,
+    "CLIENT_CONNECT_WITH_DB" -> ConnectWithDB,
+    "CLIENT_NO_SCHEMA" -> NoSchema,
+    "CLIENT_COMPRESS" -> Compress,
+    "CLIENT_ODBC" -> ODBC,
+    "CLIENT_LOCAL_FILES" -> LocalFiles,
+    "CLIENT_IGNORE_SPACE" -> IgnoreSpace,
+    "CLIENT_PROTOCOL_41" -> Protocol41,
+    "CLIENT_INTERACTIVE" -> Interactive,
+    "CLIENT_SSL" -> SSL,
+    "CLIENT_IGNORE_SIGPIPE" -> IgnoreSigPipe,
+    "CLIENT_TRANSACTIONS" -> Transactions,
+    "CLIENT_SECURE_CONNECTION" -> SecureConnection,
+    "CLIENT_MULTI_STATEMENTS" -> MultiStatements,
+    "CLIENT_MULTI_RESULTS" -> MultiResults
   )
 
   /**
@@ -45,15 +45,15 @@ object Capability {
     * capability.
     */
   val baseCap = Capability(
-      Capability.LongFlag,
-      Capability.Transactions,
-      Capability.Protocol41,
-      Capability.FoundRows,
-      Capability.Interactive,
-      Capability.LongPassword,
-      Capability.ConnectWithDB,
-      Capability.SecureConnection,
-      Capability.LocalFiles
+    Capability.LongFlag,
+    Capability.Transactions,
+    Capability.Protocol41,
+    Capability.FoundRows,
+    Capability.Interactive,
+    Capability.LongPassword,
+    Capability.ConnectWithDB,
+    Capability.SecureConnection,
+    Capability.LocalFiles
   )
 
   def apply(flags: Int*): Capability = {

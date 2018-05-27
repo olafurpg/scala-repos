@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -36,7 +36,13 @@ import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 import org.eclipse.jetty.http.MimeTypes
 import org.eclipse.jetty.server.{Handler, Request, Server}
-import org.eclipse.jetty.server.handler.{AbstractHandler, DefaultHandler, HandlerList, HandlerWrapper, ResourceHandler}
+import org.eclipse.jetty.server.handler.{
+  AbstractHandler,
+  DefaultHandler,
+  HandlerList,
+  HandlerWrapper,
+  ResourceHandler
+}
 
 import org.streum.configrity.Configuration
 
@@ -61,9 +67,10 @@ trait StandaloneShardServer extends BlueEyesServer with ShardService {
 
   def caveatMessage: Option[String]
 
-  def platformFor(config: Configuration,
-                  apiKeyManager: APIKeyFinder[Future],
-                  jobManager: JobManager[Future]): (ManagedPlatform, Stoppable)
+  def platformFor(
+      config: Configuration,
+      apiKeyManager: APIKeyFinder[Future],
+      jobManager: JobManager[Future]): (ManagedPlatform, Stoppable)
 
   def configureShardState(config: Configuration) = M.point {
     val apiKey = config[String]("security.masterAccount.apiKey")
@@ -77,32 +84,33 @@ trait StandaloneShardServer extends BlueEyesServer with ShardService {
 
         if (!dir.isDirectory) {
           throw new Exception(
-              "Configured job dir %s is not a directory".format(dir))
+            "Configured job dir %s is not a directory".format(dir))
         }
 
         if (!dir.canWrite) {
           throw new Exception(
-              "Configured job dir %s is not writeable".format(dir))
+            "Configured job dir %s is not writeable".format(dir))
         }
 
         FileJobManager(dir, M)
       } getOrElse {
         new ExpiringJobManager(
-            Duration(config[Int]("jobs.ttl", 300), TimeUnit.SECONDS))
+          Duration(config[Int]("jobs.ttl", 300), TimeUnit.SECONDS))
       }
 
     val (platform, stoppable) = platformFor(config, apiKeyFinder, jobManager)
 
     // We always want a managed bifrost now, for better error reporting and Labcoat compatibility
-    ShardState(platform,
-               apiKeyFinder,
-               accountFinder,
-               NoopVFS,
-               NoopStoredQueries[Future],
-               NoopScheduler[Future],
-               jobManager,
-               Clock.System,
-               stoppable)
+    ShardState(
+      platform,
+      apiKeyFinder,
+      accountFinder,
+      NoopVFS,
+      NoopStoredQueries[Future],
+      NoopScheduler[Future],
+      jobManager,
+      Clock.System,
+      stoppable)
   }
 
   val jettyService = this.service("labcoat", "1.0") { context =>
@@ -126,13 +134,14 @@ trait StandaloneShardServer extends BlueEyesServer with ShardService {
       resourceHandler.setDirectoriesListed(false)
       resourceHandler.setWelcomeFiles(new Array[String](0))
       resourceHandler.setResourceBase(
-          this.getClass.getClassLoader.getResource("web").toString)
+        this.getClass.getClassLoader.getResource("web").toString)
 
       val corsHandler = new HandlerWrapper {
-        override def handle(target: String,
-                            baseRequest: Request,
-                            request: HttpServletRequest,
-                            response: HttpServletResponse): Unit = {
+        override def handle(
+            target: String,
+            baseRequest: Request,
+            request: HttpServletRequest,
+            response: HttpServletResponse): Unit = {
           response.addHeader("Access-Control-Allow-Origin", "*")
           _handler.handle(target, baseRequest, request, response)
         }
@@ -141,17 +150,18 @@ trait StandaloneShardServer extends BlueEyesServer with ShardService {
       corsHandler.setHandler(resourceHandler)
 
       val rootHandler = new AbstractHandler {
-        def handle(target: String,
-                   baseRequest: Request,
-                   request: HttpServletRequest,
-                   response: HttpServletResponse): Unit = {
+        def handle(
+            target: String,
+            baseRequest: Request,
+            request: HttpServletRequest,
+            response: HttpServletResponse): Unit = {
           if (target == "/") {
             val requestedHost = Option(request.getHeader("Host"))
               .map(_.toLowerCase.split(':').head)
               .getOrElse("localhost")
             response.sendRedirect(
-                "http://%1$s:%2$d/index.html?apiKey=%3$s&analyticsService=http://%1$s:%4$d/&version=2"
-                  .format(requestedHost, serverPort, rootKey, quirrelPort))
+              "http://%1$s:%2$d/index.html?apiKey=%3$s&analyticsService=http://%1$s:%4$d/&version=2"
+                .format(requestedHost, serverPort, rootKey, quirrelPort))
           }
         }
       }
@@ -159,7 +169,7 @@ trait StandaloneShardServer extends BlueEyesServer with ShardService {
       val handlers = new HandlerList
 
       handlers.setHandlers(
-          Array[Handler](rootHandler, resourceHandler, new DefaultHandler))
+        Array[Handler](rootHandler, resourceHandler, new DefaultHandler))
       corsHandler.setHandler(handlers)
 
       server.setHandler(corsHandler)

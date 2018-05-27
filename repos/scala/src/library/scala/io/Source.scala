@@ -10,7 +10,13 @@ package scala
 package io
 
 import scala.collection.AbstractIterator
-import java.io.{FileInputStream, InputStream, PrintStream, File => JFile, Closeable}
+import java.io.{
+  FileInputStream,
+  InputStream,
+  PrintStream,
+  File => JFile,
+  Closeable
+}
 import java.net.{URI, URL}
 
 /** This object provides convenience methods to create an iterable
@@ -93,10 +99,10 @@ object Source {
     val inputStream = new FileInputStream(file)
 
     createBufferedSource(
-        inputStream,
-        bufferSize,
-        () => fromFile(file, bufferSize)(codec),
-        () => inputStream.close()
+      inputStream,
+      bufferSize,
+      () => fromFile(file, bufferSize)(codec),
+      () => inputStream.close()
     )(codec) withDescription ("file:" + file.getAbsolutePath)
   }
 
@@ -160,9 +166,8 @@ object Source {
   )(implicit codec: Codec): BufferedSource = {
     // workaround for default arguments being unable to refer to other parameters
     val resetFn =
-      if (reset == null)
-        () =>
-          createBufferedSource(inputStream, bufferSize, reset, close)(codec)
+      if (reset == null)() =>
+        createBufferedSource(inputStream, bufferSize, reset, close)(codec)
       else reset
 
     new BufferedSource(inputStream, bufferSize)(codec) withReset resetFn withClose close
@@ -172,9 +177,10 @@ object Source {
     fromInputStream(is)(Codec(enc))
 
   def fromInputStream(is: InputStream)(implicit codec: Codec): BufferedSource =
-    createBufferedSource(is,
-                         reset = () => fromInputStream(is)(codec),
-                         close = () => is.close())(codec)
+    createBufferedSource(
+      is,
+      reset = () => fromInputStream(is)(codec),
+      close = () => is.close())(codec)
 
   /** Reads data from a classpath resource, using either a context classloader (default) or a passed one.
     *
@@ -182,11 +188,11 @@ object Source {
     *  @param  classLoader  classloader to be used, or context classloader if not specified
     *  @return              the buffered source
     */
-  def fromResource(resource: String,
-                   classLoader: ClassLoader = Thread
-                       .currentThread()
-                       .getContextClassLoader())(
-      implicit codec: Codec): BufferedSource =
+  def fromResource(
+      resource: String,
+      classLoader: ClassLoader = Thread
+        .currentThread()
+        .getContextClassLoader())(implicit codec: Codec): BufferedSource =
     fromInputStream(classLoader.getResourceAsStream(resource))
 }
 
@@ -328,7 +334,12 @@ abstract class Source extends Iterator[Char] with Closeable {
     val col = Position column pos
 
     out println "%s:%d:%d: %s%s%s^".format(
-        descr, line, col, msg, lineNum(line), spaces(col - 1))
+      descr,
+      line,
+      col,
+      msg,
+      lineNum(line),
+      spaces(col - 1))
   }
 
   /**
@@ -378,5 +389,5 @@ abstract class Source extends Iterator[Char] with Closeable {
     if (resetFunction != null) resetFunction()
     else
       throw new UnsupportedOperationException(
-          "Source's reset() method was not set.")
+        "Source's reset() method was not set.")
 }

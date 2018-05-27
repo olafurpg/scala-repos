@@ -25,9 +25,10 @@ import org.apache.spark.sql.types._
 
 class PredicateSuite extends SparkFunSuite with ExpressionEvalHelper {
 
-  private def booleanLogicTest(name: String,
-                               op: (Expression, Expression) => Expression,
-                               truthTable: Seq[(Any, Any, Any)]) {
+  private def booleanLogicTest(
+      name: String,
+      op: (Expression, Expression) => Expression,
+      truthTable: Seq[(Any, Any, Any)]) {
     test(s"3VL $name") {
       truthTable.foreach {
         case (l, r, answer) =>
@@ -82,59 +83,67 @@ class PredicateSuite extends SparkFunSuite with ExpressionEvalHelper {
   }
 
   booleanLogicTest(
-      "AND",
-      And,
-      (true, true, true) :: (true, false, false) :: (true, null, null) :: (
-          false,
-          true,
-          false) :: (false, false, false) :: (false, null, false) :: (
-          null,
-          true,
-          null) :: (null, false, false) :: (null, null, null) :: Nil)
+    "AND",
+    And,
+    (true, true, true) :: (true, false, false) :: (true, null, null) :: (
+      false,
+      true,
+      false) :: (false, false, false) :: (false, null, false) :: (
+      null,
+      true,
+      null) :: (null, false, false) :: (null, null, null) :: Nil
+  )
 
   booleanLogicTest(
-      "OR",
-      Or,
-      (true, true, true) :: (true, false, true) :: (true, null, true) :: (
-          false,
-          true,
-          true) :: (false, false, false) :: (false, null, null) :: (
-          null,
-          true,
-          true) :: (null, false, null) :: (null, null, null) :: Nil)
+    "OR",
+    Or,
+    (true, true, true) :: (true, false, true) :: (true, null, true) :: (
+      false,
+      true,
+      true) :: (false, false, false) :: (false, null, null) :: (
+      null,
+      true,
+      true) :: (null, false, null) :: (null, null, null) :: Nil
+  )
 
   booleanLogicTest(
-      "=",
-      EqualTo,
-      (true, true, true) :: (true, false, false) :: (true, null, null) :: (
-          false,
-          true,
-          false) :: (false, false, true) :: (false, null, null) :: (
-          null,
-          true,
-          null) :: (null, false, null) :: (null, null, null) :: Nil)
+    "=",
+    EqualTo,
+    (true, true, true) :: (true, false, false) :: (true, null, null) :: (
+      false,
+      true,
+      false) :: (false, false, true) :: (false, null, null) :: (
+      null,
+      true,
+      null) :: (null, false, null) :: (null, null, null) :: Nil
+  )
 
   test("IN") {
     checkEvaluation(
-        In(Literal.create(null, IntegerType), Seq(Literal(1), Literal(2))),
-        null)
-    checkEvaluation(In(Literal.create(null, IntegerType),
-                       Seq(Literal.create(null, IntegerType))),
-                    null)
+      In(Literal.create(null, IntegerType), Seq(Literal(1), Literal(2))),
+      null)
     checkEvaluation(
-        In(Literal(1), Seq(Literal.create(null, IntegerType))), null)
+      In(
+        Literal.create(null, IntegerType),
+        Seq(Literal.create(null, IntegerType))),
+      null)
     checkEvaluation(
-        In(Literal(1), Seq(Literal(1), Literal.create(null, IntegerType))),
-        true)
+      In(Literal(1), Seq(Literal.create(null, IntegerType))),
+      null)
     checkEvaluation(
-        In(Literal(2), Seq(Literal(1), Literal.create(null, IntegerType))),
-        null)
+      In(Literal(1), Seq(Literal(1), Literal.create(null, IntegerType))),
+      true)
+    checkEvaluation(
+      In(Literal(2), Seq(Literal(1), Literal.create(null, IntegerType))),
+      null)
     checkEvaluation(In(Literal(1), Seq(Literal(1), Literal(2))), true)
     checkEvaluation(In(Literal(2), Seq(Literal(1), Literal(2))), true)
     checkEvaluation(In(Literal(3), Seq(Literal(1), Literal(2))), false)
-    checkEvaluation(And(In(Literal(1), Seq(Literal(1), Literal(2))),
-                        In(Literal(2), Seq(Literal(1), Literal(2)))),
-                    true)
+    checkEvaluation(
+      And(
+        In(Literal(1), Seq(Literal(1), Literal(2))),
+        In(Literal(2), Seq(Literal(1), Literal(2)))),
+      true)
 
     val ns = Literal.create(null, StringType)
     checkEvaluation(In(ns, Seq(Literal("1"), Literal("2"))), null)
@@ -142,29 +151,32 @@ class PredicateSuite extends SparkFunSuite with ExpressionEvalHelper {
     checkEvaluation(In(Literal("a"), Seq(ns)), null)
     checkEvaluation(In(Literal("^Ba*n"), Seq(Literal("^Ba*n"), ns)), true)
     checkEvaluation(
-        In(Literal("^Ba*n"), Seq(Literal("aa"), Literal("^Ba*n"))), true)
+      In(Literal("^Ba*n"), Seq(Literal("aa"), Literal("^Ba*n"))),
+      true)
     checkEvaluation(
-        In(Literal("^Ba*n"), Seq(Literal("aa"), Literal("^n"))), false)
+      In(Literal("^Ba*n"), Seq(Literal("aa"), Literal("^n"))),
+      false)
 
-    val primitiveTypes = Seq(IntegerType,
-                             FloatType,
-                             DoubleType,
-                             StringType,
-                             ByteType,
-                             ShortType,
-                             LongType,
-                             BinaryType,
-                             BooleanType,
-                             DecimalType.USER_DEFAULT,
-                             TimestampType)
+    val primitiveTypes = Seq(
+      IntegerType,
+      FloatType,
+      DoubleType,
+      StringType,
+      ByteType,
+      ShortType,
+      LongType,
+      BinaryType,
+      BooleanType,
+      DecimalType.USER_DEFAULT,
+      TimestampType)
     primitiveTypes.map { t =>
       val dataGen = RandomDataGenerator.forType(t, nullable = true).get
       val inputData = Seq.fill(10) {
         val value = dataGen.apply()
         value match {
           case d: Double if d.isNaN => 0.0d
-          case f: Float if f.isNaN => 0.0f
-          case _ => value
+          case f: Float if f.isNaN  => 0.0f
+          case _                    => value
         }
       }
       val input = inputData.map(Literal.create(_, t))
@@ -197,25 +209,26 @@ class PredicateSuite extends SparkFunSuite with ExpressionEvalHelper {
     checkEvaluation(InSet(nl, hS), null)
     checkEvaluation(InSet(nl, nS), null)
 
-    val primitiveTypes = Seq(IntegerType,
-                             FloatType,
-                             DoubleType,
-                             StringType,
-                             ByteType,
-                             ShortType,
-                             LongType,
-                             BinaryType,
-                             BooleanType,
-                             DecimalType.USER_DEFAULT,
-                             TimestampType)
+    val primitiveTypes = Seq(
+      IntegerType,
+      FloatType,
+      DoubleType,
+      StringType,
+      ByteType,
+      ShortType,
+      LongType,
+      BinaryType,
+      BooleanType,
+      DecimalType.USER_DEFAULT,
+      TimestampType)
     primitiveTypes.map { t =>
       val dataGen = RandomDataGenerator.forType(t, nullable = true).get
       val inputData = Seq.fill(10) {
         val value = dataGen.apply()
         value match {
           case d: Double if d.isNaN => 0.0d
-          case f: Float if f.isNaN => 0.0f
-          case _ => value
+          case f: Float if f.isNaN  => 0.0f
+          case _                    => value
         }
       }
       val input = inputData.map(Literal(_))
@@ -281,10 +294,10 @@ class PredicateSuite extends SparkFunSuite with ExpressionEvalHelper {
 
   test("BinaryComparison: GreaterThanOrEqual") {
     for (i <- 0 until smallValues.length) {
+      checkEvaluation(GreaterThanOrEqual(smallValues(i), largeValues(i)), false)
       checkEvaluation(
-          GreaterThanOrEqual(smallValues(i), largeValues(i)), false)
-      checkEvaluation(
-          GreaterThanOrEqual(equalValues1(i), equalValues2(i)), true)
+        GreaterThanOrEqual(equalValues1(i), equalValues2(i)),
+        true)
       checkEvaluation(GreaterThanOrEqual(largeValues(i), smallValues(i)), true)
     }
   }

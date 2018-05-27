@@ -7,6 +7,6 @@ object M {
     c.universe.reify(println(a.splice))
 
   @reflect.internal.annotations.compileTimeOnly(
-      "cto may only be used as an argument to " + "m")
+    "cto may only be used as an argument to " + "m")
   def cto = 0
 }

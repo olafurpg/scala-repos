@@ -208,7 +208,8 @@ class ReflectiveCallTest {
     assertEquals(4, lenA("asdf"))
   }
 
-  @Test def should_properly_generate_forwarders_for_inherited_methods(): Unit = {
+  @Test def should_properly_generate_forwarders_for_inherited_methods()
+    : Unit = {
     trait A {
       def foo: Int
     }
@@ -225,7 +226,8 @@ class ReflectiveCallTest {
   }
 
   @Test
-  def should_be_bug_compatible_with_Scala_JVM_for_inherited_overloads(): Unit = {
+  def should_be_bug_compatible_with_Scala_JVM_for_inherited_overloads()
+    : Unit = {
     class Base {
       def foo(x: Option[Int]): String = "a"
     }
@@ -301,7 +303,9 @@ class ReflectiveCallTest {
       def isInfinite(): Boolean
     }
     def test(
-        x: FloatingNumberLike, isNaN: Boolean, isInfinite: Boolean): Unit = {
+        x: FloatingNumberLike,
+        isNaN: Boolean,
+        isInfinite: Boolean): Unit = {
       assertEquals(isNaN, x.isNaN())
       assertEquals(isInfinite, x.isInfinite())
     }
@@ -341,8 +345,7 @@ class ReflectiveCallTest {
      * methods in structural types.
      */
 
-    def test(
-        foo: {
+    def test(foo: {
       def makeInt: Int
       def testInt(x: Int): Unit
       def makeRef: Option[String]

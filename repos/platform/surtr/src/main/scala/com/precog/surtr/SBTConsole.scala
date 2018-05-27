@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -74,15 +74,21 @@ import scalaz.syntax.comonad._
 import java.io.File
 
 trait PlatformConfig
-    extends BaseConfig with IdSourceConfig with EvaluatorConfig
-    with StandaloneShardSystemConfig with ColumnarTableModuleConfig
+    extends BaseConfig
+    with IdSourceConfig
+    with EvaluatorConfig
+    with StandaloneShardSystemConfig
+    with ColumnarTableModuleConfig
     with BlockStoreColumnarTableModuleConfig
 
 trait SBTConsolePlatform
     extends muspelheim.ParseEvalStack[Future]
-    with SecureVFSModule[Future, Slice] with ActorVFSModule
-    with IdSourceScannerModule with VFSColumnarTableModule
-    with StandaloneActorProjectionSystem with XLightWebHttpClientModule[Future]
+    with SecureVFSModule[Future, Slice]
+    with ActorVFSModule
+    with IdSourceScannerModule
+    with VFSColumnarTableModule
+    with StandaloneActorProjectionSystem
+    with XLightWebHttpClientModule[Future]
     with LongIdMemoryDatasetConsumer[Future] {
   self =>
 
@@ -134,45 +140,60 @@ object SBTConsole {
     val rawAPIKeyFinder = new InMemoryAPIKeyManager[Future](Clock.System)
     val accessControl = new DirectAPIKeyFinder(rawAPIKeyFinder)
     val permissionsFinder = new PermissionsFinder(
-        accessControl, accountFinder, new org.joda.time.Instant())
+      accessControl,
+      accountFinder,
+      new org.joda.time.Instant())
 
     val rootAPIKey = rawAPIKeyFinder.rootAPIKey.copoint
-    val rootAccount = AccountDetails("root",
-                                     "nobody@precog.com",
-                                     new DateTime,
-                                     rootAPIKey,
-                                     Path.Root,
-                                     AccountPlan.Root)
+    val rootAccount = AccountDetails(
+      "root",
+      "nobody@precog.com",
+      new DateTime,
+      rootAPIKey,
+      Path.Root,
+      AccountPlan.Root)
     def evaluationContext =
       EvaluationContext(
-          rootAPIKey, rootAccount, Path.Root, Path.Root, new DateTime)
+        rootAPIKey,
+        rootAccount,
+        Path.Root,
+        Path.Root,
+        new DateTime)
 
     val storageTimeout = yggConfig.storageTimeout
 
     val masterChef = actorSystem.actorOf(
-        Props(Chef(VersionedCookedBlockFormat(Map(1 -> V1CookedBlockFormat)),
-                   VersionedSegmentFormat(Map(1 -> V1SegmentFormat)))))
+      Props(
+        Chef(
+          VersionedCookedBlockFormat(Map(1 -> V1CookedBlockFormat)),
+          VersionedSegmentFormat(Map(1 -> V1SegmentFormat)))))
 
-    val resourceBuilder = new ResourceBuilder(actorSystem,
-                                              yggConfig.clock,
-                                              masterChef,
-                                              yggConfig.cookThreshold,
-                                              yggConfig.storageTimeout)
+    val resourceBuilder = new ResourceBuilder(
+      actorSystem,
+      yggConfig.clock,
+      masterChef,
+      yggConfig.cookThreshold,
+      yggConfig.storageTimeout)
     val projectionsActor = actorSystem.actorOf(
-        Props(new PathRoutingActor(yggConfig.dataDir,
-                                   yggConfig.storageTimeout.duration,
-                                   yggConfig.quiescenceTimeout,
-                                   100,
-                                   yggConfig.clock)))
+      Props(
+        new PathRoutingActor(
+          yggConfig.dataDir,
+          yggConfig.storageTimeout.duration,
+          yggConfig.quiescenceTimeout,
+          100,
+          yggConfig.clock)))
 
     val jobManager = new InMemoryJobManager[Future]
     val actorVFS = new ActorVFS(
-        projectionsActor, yggConfig.storageTimeout, yggConfig.storageTimeout)
-    val vfs = new SecureVFS(
-        actorVFS, permissionsFinder, jobManager, Clock.System)
+      projectionsActor,
+      yggConfig.storageTimeout,
+      yggConfig.storageTimeout)
+    val vfs =
+      new SecureVFS(actorVFS, permissionsFinder, jobManager, Clock.System)
 
     def Evaluator[N[+ _]](N0: Monad[N])(
-        implicit mn: Future ~> N, nm: N ~> Future): EvaluatorLike[N] =
+        implicit mn: Future ~> N,
+        nm: N ~> Future): EvaluatorLike[N] =
       new Evaluator[N](N0) {
         type YggConfig = PlatformConfig
         val yggConfig = console.yggConfig
@@ -182,7 +203,7 @@ object SBTConsole {
 
     def eval(str: String): Set[SValue] = evalE(str) match {
       case Success(results) => results.map(_._2)
-      case Failure(t) => throw t
+      case Failure(t)       => throw t
     }
 
     def evalE(str: String) = {
@@ -219,8 +240,8 @@ object SBTConsole {
     def shutdown() {
       // stop storage bifrost
       Await.result(
-          gracefulStop(projectionsActor, yggConfig.storageTimeout.duration),
-          yggConfig.storageTimeout.duration)
+        gracefulStop(projectionsActor, yggConfig.storageTimeout.duration),
+        yggConfig.storageTimeout.duration)
       actorSystem.shutdown()
     }
   }

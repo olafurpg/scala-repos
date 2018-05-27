@@ -9,11 +9,12 @@ import reactivemongo.bson.{BSONDocument, BSONInteger, BSONArray}
 import lila.db.Types.Coll
 import lila.user.User
 
-private[opening] final class Selector(openingColl: Coll,
-                                      api: OpeningApi,
-                                      toleranceStep: Int,
-                                      toleranceMax: Int,
-                                      modulo: Int) {
+private[opening] final class Selector(
+    openingColl: Coll,
+    api: OpeningApi,
+    toleranceStep: Int,
+    toleranceMax: Int,
+    modulo: Int) {
 
   val anonSkipMax = 1500
 
@@ -33,18 +34,18 @@ private[opening] final class Selector(openingColl: Coll,
     }).mon(_.opening.selector.time) >>- lila.mon.opening.selector.count()
 
   private def tryRange(
-      user: User, tolerance: Int, ids: BSONArray): Fu[Opening] =
+      user: User,
+      tolerance: Int,
+      ids: BSONArray): Fu[Opening] =
     openingColl
       .find(
-          BSONDocument(
-              Opening.BSONFields.id -> BSONDocument("$nin" -> ids),
-              Opening.BSONFields.rating -> BSONDocument(
-                  "$gt" -> BSONInteger(
-                      user.perfs.opening.intRating - tolerance),
-                  "$lt" -> BSONInteger(
-                      user.perfs.opening.intRating + tolerance)
-              )
-          ))
+        BSONDocument(
+          Opening.BSONFields.id -> BSONDocument("$nin" -> ids),
+          Opening.BSONFields.rating -> BSONDocument(
+            "$gt" -> BSONInteger(user.perfs.opening.intRating - tolerance),
+            "$lt" -> BSONInteger(user.perfs.opening.intRating + tolerance)
+          )
+        ))
       .one[Opening] flatMap {
       case Some(opening) => fuccess(opening)
       case None =>

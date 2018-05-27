@@ -18,19 +18,19 @@ import akka.testkit.{TestKit, AkkaSpec}
 
 private[camel] object TestSupport {
   def start(actor: ⇒ Actor, name: String)(
-      implicit system: ActorSystem, timeout: Timeout): ActorRef =
+      implicit system: ActorSystem,
+      timeout: Timeout): ActorRef =
     Await.result(
-        CamelExtension(system).activationFutureFor(system.actorOf(Props(actor),
-                                                                  name))(
-            timeout, system.dispatcher),
-        timeout.duration)
+      CamelExtension(system).activationFutureFor(
+        system.actorOf(Props(actor), name))(timeout, system.dispatcher),
+      timeout.duration)
 
-  def stop(actorRef: ActorRef)(
-      implicit system: ActorSystem, timeout: Timeout) {
+  def stop(actorRef: ActorRef)(implicit system: ActorSystem, timeout: Timeout) {
     system.stop(actorRef)
-    Await.result(CamelExtension(system).deactivationFutureFor(actorRef)(
-                     timeout, system.dispatcher),
-                 timeout.duration)
+    Await.result(
+      CamelExtension(system)
+        .deactivationFutureFor(actorRef)(timeout, system.dispatcher),
+      timeout.duration)
   }
 
   private[camel] implicit def camelToTestWrapper(camel: Camel) =
@@ -43,7 +43,10 @@ private[camel] object TestSupport {
       * It only waits for the response until timeout passes.
       * This is to reduce cases when unit-tests block infinitely.
       */
-    def sendTo(to: String, msg: String, timeout: Duration = 1 second): AnyRef = {
+    def sendTo(
+        to: String,
+        msg: String,
+        timeout: Duration = 1 second): AnyRef = {
       try {
         camel.template
           .asyncRequestBody(to, msg)
@@ -52,8 +55,8 @@ private[camel] object TestSupport {
         case e: ExecutionException ⇒ throw e.getCause
         case e: TimeoutException ⇒
           throw new AssertionError(
-              "Failed to get response to message [%s], send to endpoint [%s], within [%s]"
-                .format(msg, to, timeout))
+            "Failed to get response to message [%s], send to endpoint [%s], within [%s]"
+              .format(msg, to, timeout))
       }
     }
 
@@ -99,8 +102,9 @@ private[camel] object TestSupport {
     val clazz = tag.runtimeClass.asInstanceOf[Class[T]]
     new BePropertyMatcher[AnyRef] {
       def apply(left: AnyRef) =
-        BePropertyMatchResult(clazz.isAssignableFrom(left.getClass),
-                              "an instance of " + clazz.getName)
+        BePropertyMatchResult(
+          clazz.isAssignableFrom(left.getClass),
+          "an instance of " + clazz.getName)
     }
   }
 }

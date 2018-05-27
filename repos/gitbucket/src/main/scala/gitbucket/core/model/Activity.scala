@@ -7,7 +7,8 @@ trait ActivityComponent extends TemplateComponent { self: Profile =>
   lazy val Activities = TableQuery[Activities]
 
   class Activities(tag: Tag)
-      extends Table[Activity](tag, "ACTIVITY") with BasicTemplate {
+      extends Table[Activity](tag, "ACTIVITY")
+      with BasicTemplate {
     val activityId = column[Int]("ACTIVITY_ID", O AutoInc)
     val activityUserName = column[String]("ACTIVITY_USER_NAME")
     val activityType = column[String]("ACTIVITY_TYPE")
@@ -15,14 +16,15 @@ trait ActivityComponent extends TemplateComponent { self: Profile =>
     val additionalInfo = column[String]("ADDITIONAL_INFO")
     val activityDate = column[java.util.Date]("ACTIVITY_DATE")
     def * =
-      (userName,
-       repositoryName,
-       activityUserName,
-       activityType,
-       message,
-       additionalInfo.?,
-       activityDate,
-       activityId) <> (Activity.tupled, Activity.unapply)
+      (
+        userName,
+        repositoryName,
+        activityUserName,
+        activityType,
+        message,
+        additionalInfo.?,
+        activityDate,
+        activityId) <> (Activity.tupled, Activity.unapply)
   }
 }
 

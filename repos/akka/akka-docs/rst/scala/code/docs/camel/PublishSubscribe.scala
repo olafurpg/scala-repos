@@ -23,14 +23,15 @@ object PublishSubscribe {
   }
 
   class PublisherBridge(uri: String, publisher: ActorRef)
-      extends Actor with Consumer {
+      extends Actor
+      with Consumer {
     def endpointUri = uri
 
     def receive = {
       case msg: CamelMessage => {
-          publisher ! msg.bodyAs[String]
-          sender() ! ("message published")
-        }
+        publisher ! msg.bodyAs[String]
+        sender() ! ("message published")
+      }
     }
   }
 
@@ -45,8 +46,9 @@ object PublishSubscribe {
   val jmsPublisher =
     system.actorOf(Props(classOf[Publisher], "jms-publisher", jmsUri))
   val jmsPublisherBridge = system.actorOf(
-      Props(classOf[PublisherBridge],
-            "jetty:http://0.0.0.0:8877/camel/pub/jms",
-            jmsPublisher))
+    Props(
+      classOf[PublisherBridge],
+      "jetty:http://0.0.0.0:8877/camel/pub/jms",
+      jmsPublisher))
   //#PubSub
 }

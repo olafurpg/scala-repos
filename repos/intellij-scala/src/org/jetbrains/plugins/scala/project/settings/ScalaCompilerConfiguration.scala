@@ -3,7 +3,10 @@ package org.jetbrains.plugins.scala.project.settings
 import com.intellij.openapi.components._
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
-import com.intellij.util.xmlb.{SkipDefaultValuesSerializationFilters, XmlSerializer}
+import com.intellij.util.xmlb.{
+  SkipDefaultValuesSerializationFilters,
+  XmlSerializer
+}
 import org.jdom.Element
 import org.jetbrains.plugins.scala.project.IncrementalityType
 
@@ -14,8 +17,8 @@ import scala.collection.JavaConverters._
   * @author Pavel Fatin
   */
 @State(
-    name = "ScalaCompilerConfiguration",
-    storages = Array(new Storage("scala_compiler.xml"))
+  name = "ScalaCompilerConfiguration",
+  storages = Array(new Storage("scala_compiler.xml"))
 )
 class ScalaCompilerConfiguration(project: Project)
     extends PersistentStateComponent[Element] {
@@ -34,7 +37,9 @@ class ScalaCompilerConfiguration(project: Project)
   }
 
   def configureSettingsForModule(
-      module: Module, source: String, options: Seq[String]) {
+      module: Module,
+      source: String,
+      options: Seq[String]) {
     customProfiles.foreach { profile =>
       profile.removeModuleName(module.getName)
       if (profile.getName.startsWith(source) &&
@@ -66,25 +71,28 @@ class ScalaCompilerConfiguration(project: Project)
 
   def getState: Element = {
     val configurationElement = XmlSerializer.serialize(
-        defaultProfile.getSettings.getState,
-        new SkipDefaultValuesSerializationFilters())
+      defaultProfile.getSettings.getState,
+      new SkipDefaultValuesSerializationFilters())
 
     if (incrementalityType != IncrementalityType.IDEA) {
       val incrementalityTypeElement = new Element("option")
       incrementalityTypeElement.setAttribute("name", "incrementalityType")
       incrementalityTypeElement.setAttribute(
-          "value", incrementalityType.toString)
+        "value",
+        incrementalityType.toString)
       configurationElement.addContent(incrementalityTypeElement)
     }
 
     customProfiles.foreach { profile =>
       val profileElement =
-        XmlSerializer.serialize(profile.getSettings.getState,
-                                new SkipDefaultValuesSerializationFilters())
+        XmlSerializer.serialize(
+          profile.getSettings.getState,
+          new SkipDefaultValuesSerializationFilters())
       profileElement.setName("profile")
       profileElement.setAttribute("name", profile.getName)
       profileElement.setAttribute(
-          "modules", profile.getModuleNames.asScala.mkString(","))
+        "modules",
+        profile.getModuleNames.asScala.mkString(","))
 
       configurationElement.addContent(profileElement)
     }
@@ -100,17 +108,17 @@ class ScalaCompilerConfiguration(project: Project)
       .map(it => IncrementalityType.valueOf(it.getAttributeValue("value")))
       .getOrElse(IncrementalityType.IDEA)
 
-    defaultProfile.setSettings(
-        new ScalaCompilerSettings(XmlSerializer.deserialize(
-                configurationElement, classOf[ScalaCompilerSettingsState])))
+    defaultProfile.setSettings(new ScalaCompilerSettings(XmlSerializer
+      .deserialize(configurationElement, classOf[ScalaCompilerSettingsState])))
 
     customProfiles = configurationElement.getChildren("profile").asScala.map {
       profileElement =>
         val profile = new ScalaCompilerSettingsProfile(
-            profileElement.getAttributeValue("name"))
+          profileElement.getAttributeValue("name"))
 
-        val settings = new ScalaCompilerSettings(XmlSerializer.deserialize(
-                profileElement, classOf[ScalaCompilerSettingsState]))
+        val settings = new ScalaCompilerSettings(
+          XmlSerializer
+            .deserialize(profileElement, classOf[ScalaCompilerSettingsState]))
         profile.setSettings(settings)
 
         val moduleNames = profileElement

@@ -33,12 +33,13 @@ object CircuitBreaker {
     * @param callTimeout [[scala.concurrent.duration.FiniteDuration]] of time after which to consider a call a failure
     * @param resetTimeout [[scala.concurrent.duration.FiniteDuration]] of time after which to attempt to close the circuit
     */
-  def apply(scheduler: Scheduler,
-            maxFailures: Int,
-            callTimeout: FiniteDuration,
-            resetTimeout: FiniteDuration): CircuitBreaker =
+  def apply(
+      scheduler: Scheduler,
+      maxFailures: Int,
+      callTimeout: FiniteDuration,
+      resetTimeout: FiniteDuration): CircuitBreaker =
     new CircuitBreaker(scheduler, maxFailures, callTimeout, resetTimeout)(
-        sameThreadExecutionContext)
+      sameThreadExecutionContext)
 
   /**
     * Java API: Create a new CircuitBreaker.
@@ -52,10 +53,11 @@ object CircuitBreaker {
     * @param callTimeout [[scala.concurrent.duration.FiniteDuration]] of time after which to consider a call a failure
     * @param resetTimeout [[scala.concurrent.duration.FiniteDuration]] of time after which to attempt to close the circuit
     */
-  def create(scheduler: Scheduler,
-             maxFailures: Int,
-             callTimeout: FiniteDuration,
-             resetTimeout: FiniteDuration): CircuitBreaker =
+  def create(
+      scheduler: Scheduler,
+      maxFailures: Int,
+      callTimeout: FiniteDuration,
+      resetTimeout: FiniteDuration): CircuitBreaker =
     apply(scheduler, maxFailures, callTimeout, resetTimeout)
 }
 
@@ -86,11 +88,12 @@ class CircuitBreaker(
     resetTimeout: FiniteDuration)(implicit executor: ExecutionContext)
     extends AbstractCircuitBreaker {
 
-  def this(executor: ExecutionContext,
-           scheduler: Scheduler,
-           maxFailures: Int,
-           callTimeout: FiniteDuration,
-           resetTimeout: FiniteDuration) = {
+  def this(
+      executor: ExecutionContext,
+      scheduler: Scheduler,
+      maxFailures: Int,
+      callTimeout: FiniteDuration,
+      resetTimeout: FiniteDuration) = {
     this(scheduler, maxFailures, callTimeout, resetTimeout)(executor)
   }
 
@@ -110,7 +113,10 @@ class CircuitBreaker(
   @inline
   private[this] def swapState(oldState: State, newState: State): Boolean =
     Unsafe.instance.compareAndSwapObject(
-        this, AbstractCircuitBreaker.stateOffset, oldState, newState)
+      this,
+      AbstractCircuitBreaker.stateOffset,
+      oldState,
+      newState)
 
   /**
     * Helper method for accessing underlying state via Unsafe
@@ -157,9 +163,13 @@ class CircuitBreaker(
     * @return The result of the call
     */
   def withSyncCircuitBreaker[T](body: ⇒ T): T =
-    Await.result(withCircuitBreaker(try Future.successful(body) catch {
-      case NonFatal(t) ⇒ Future.failed(t)
-    }), callTimeout)
+    Await.result(
+      withCircuitBreaker(
+        try Future.successful(body)
+        catch {
+          case NonFatal(t) ⇒ Future.failed(t)
+        }),
+      callTimeout)
 
   /**
     * Java API for [[#withSyncCircuitBreaker]]. Throws [[java.util.concurrent.TimeoutException]] if the call timed out.
@@ -274,7 +284,7 @@ class CircuitBreaker(
   private def attemptReset(): Unit = transition(Open, HalfOpen)
 
   private val timeoutFuture = Future.failed(
-      new TimeoutException("Circuit Breaker Timed out.") with NoStackTrace)
+    new TimeoutException("Circuit Breaker Timed out.") with NoStackTrace)
 
   /**
     * Internal state abstraction
@@ -320,9 +330,11 @@ class CircuitBreaker(
       */
     def callThrough[T](body: ⇒ Future[T]): Future[T] = {
 
-      def materialize[U](value: ⇒ Future[U]): Future[U] = try value catch {
-        case NonFatal(t) ⇒ Future.failed(t)
-      }
+      def materialize[U](value: ⇒ Future[U]): Future[U] =
+        try value
+        catch {
+          case NonFatal(t) ⇒ Future.failed(t)
+        }
 
       if (callTimeout == Duration.Zero) {
         materialize(body)
@@ -547,4 +559,5 @@ class CircuitBreaker(
 class CircuitBreakerOpenException(
     val remainingDuration: FiniteDuration,
     message: String = "Circuit Breaker is open; calls are failing fast")
-    extends AkkaException(message) with NoStackTrace
+    extends AkkaException(message)
+    with NoStackTrace

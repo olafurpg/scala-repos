@@ -20,12 +20,12 @@ trait ScPatternArgumentList extends ScArguments {
   def missedLastExpr: Boolean = {
     var child = getLastChild
     while (child != null &&
-    child.getNode.getElementType != ScalaTokenTypes.tCOMMA) {
+           child.getNode.getElementType != ScalaTokenTypes.tCOMMA) {
       if (child.isInstanceOf[ScPattern] || child.isInstanceOf[ScSequenceArg])
         return false
       child = child.getPrevSibling
     }
     return child != null &&
-    child.getNode.getElementType == ScalaTokenTypes.tCOMMA
+      child.getNode.getElementType == ScalaTokenTypes.tCOMMA
   }
 }

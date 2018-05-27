@@ -70,7 +70,8 @@ object svd extends UFunc {
     * @return The singular value decomposition (SVD) with the singular values,
     *         the left and right singular vectors (DOUBLE PRECISION)
     */
-  private def doSVD_Double(mat: DenseMatrix[Double])(mode: SVDMode): DenseSVD = {
+  private def doSVD_Double(mat: DenseMatrix[Double])(
+      mode: SVDMode): DenseSVD = {
     requireNonEmptyMatrix(mat)
 
     val m = mat.rows
@@ -78,41 +79,42 @@ object svd extends UFunc {
     val S = DenseVector.zeros[Double](m min n)
     val U = mode match {
       case CompleteSVD => DenseMatrix.zeros[Double](m, m)
-      case ReducedSVD => DenseMatrix.zeros[Double](m, m min n)
+      case ReducedSVD  => DenseMatrix.zeros[Double](m, m min n)
     }
     val Vt = mode match {
       case CompleteSVD => DenseMatrix.zeros[Double](n, n)
-      case ReducedSVD => DenseMatrix.zeros[Double](m min n, n)
+      case ReducedSVD  => DenseMatrix.zeros[Double](m min n, n)
     }
     val iwork = new Array[Int](8 * (m min n))
     val workSize =
       (3 * scala.math.min(m, n) * scala.math.min(m, n) + scala.math.max(
-              scala.math.max(m, n),
-              4 * scala.math.min(m, n) * scala.math.min(m, n) +
-              4 * scala.math.min(m, n)))
+        scala.math.max(m, n),
+        4 * scala.math.min(m, n) * scala.math.min(m, n) +
+          4 * scala.math.min(m, n)))
     val work = new Array[Double](workSize)
     val info = new intW(0)
     val cm = copy(mat)
 
     val LDVT = mode match {
       case CompleteSVD => scala.math.max(1, n)
-      case ReducedSVD => m min n
+      case ReducedSVD  => m min n
     }
 
-    lapack.dgesdd(mode.JOBZ,
-                  m,
-                  n,
-                  cm.data,
-                  scala.math.max(1, m),
-                  S.data,
-                  U.data,
-                  scala.math.max(1, m),
-                  Vt.data,
-                  LDVT,
-                  work,
-                  work.length,
-                  iwork,
-                  info)
+    lapack.dgesdd(
+      mode.JOBZ,
+      m,
+      n,
+      cm.data,
+      scala.math.max(1, m),
+      S.data,
+      U.data,
+      scala.math.max(1, m),
+      Vt.data,
+      LDVT,
+      work,
+      work.length,
+      iwork,
+      info)
 
     if (info.`val` > 0)
       throw new NotConvergedException(NotConvergedException.Iterations)
@@ -145,9 +147,9 @@ object svd extends UFunc {
     val iwork = new Array[Int](8 * (m min n))
     val workSize =
       (3 * scala.math.min(m, n) * scala.math.min(m, n) + scala.math.max(
-              scala.math.max(m, n),
-              4 * scala.math.min(m, n) * scala.math.min(m, n) +
-              4 * scala.math.min(m, n)))
+        scala.math.max(m, n),
+        4 * scala.math.min(m, n) * scala.math.min(m, n) +
+          4 * scala.math.min(m, n)))
     val work = new Array[Float](workSize)
     val info = new intW(0)
     val cm = copy(mat)
@@ -157,20 +159,21 @@ object svd extends UFunc {
       case "S" => m min n
     }
 
-    lapack.sgesdd(mode.JOBZ,
-                  m,
-                  n,
-                  cm.data,
-                  scala.math.max(1, m),
-                  S.data,
-                  U.data,
-                  scala.math.max(1, m),
-                  Vt.data,
-                  LDVT,
-                  work,
-                  work.length,
-                  iwork,
-                  info)
+    lapack.sgesdd(
+      mode.JOBZ,
+      m,
+      n,
+      cm.data,
+      scala.math.max(1, m),
+      S.data,
+      U.data,
+      scala.math.max(1, m),
+      Vt.data,
+      LDVT,
+      work,
+      work.length,
+      iwork,
+      info)
 
     if (info.`val` > 0)
       throw new NotConvergedException(NotConvergedException.Iterations)
@@ -179,8 +182,8 @@ object svd extends UFunc {
     SVD(U, S, Vt)
   }
 
-  type OpMulMatrixDenseVector[Mat] = OpMulMatrix.Impl2[
-      Mat, DenseVector[Double], DenseVector[Double]]
+  type OpMulMatrixDenseVector[Mat] =
+    OpMulMatrix.Impl2[Mat, DenseVector[Double], DenseVector[Double]]
 
   /**
     * Implementation of svds for a sparse matrix. The caller provides two operations: mul - matrix
@@ -220,19 +223,19 @@ object svd extends UFunc {
       implicit mul: OpMulMatrixDenseVector[Mat],
       trans: CanTranspose[Mat, MatTranspose],
       mulTrans: OpMulMatrixDenseVector[MatTranspose],
-      dimImpl: dim.Impl[Mat, (Int, Int)])
-    : Impl3[Mat, Int, Double, DenseSVD] = {
+      dimImpl: dim.Impl[Mat, (Int, Int)]): Impl3[Mat, Int, Double, DenseSVD] = {
 
     class Svd_Sparse_Impl_Instance extends Impl3[Mat, Int, Double, DenseSVD] {
       val arpack = ARPACK.getInstance()
 
-      def av(mat: Mat,
-             matTrans: MatTranspose,
-             n: Int,
-             k: Int,
-             work: Array[Double],
-             input_offset: Int,
-             output_offset: Int) {
+      def av(
+          mat: Mat,
+          matTrans: MatTranspose,
+          n: Int,
+          k: Int,
+          work: Array[Double],
+          input_offset: Int,
+          output_offset: Int) {
         val w = DenseVector(work)
         val x = w(input_offset until input_offset + n)
         val y = w(output_offset until output_offset + n)
@@ -240,7 +243,7 @@ object svd extends UFunc {
         val z = mulTrans(matTrans, x)
         if (z.length <= k)
           throw new IllegalArgumentException(
-              "The number of rows or columns " + "should be bigger than k.")
+            "The number of rows or columns " + "should be bigger than k.")
         y := mul(mat, z)
       }
 
@@ -259,7 +262,7 @@ object svd extends UFunc {
         val n = dim(mt)._1
         if (n <= k)
           throw new IllegalArgumentException(
-              "The number of rows or columns should be bigger than k.")
+            "The number of rows or columns should be bigger than k.")
 
         val mtTrans = trans.apply(mt)
 
@@ -284,43 +287,45 @@ object svd extends UFunc {
         var workl = new Array[Double](ncv * (ncv + 8))
         var ipntr = new Array[Int](11)
 
-        arpack.dsaupd(ido,
-                      bmat,
-                      n,
-                      which,
-                      nev.`val`,
-                      tolW,
-                      resid,
-                      ncv,
-                      v,
-                      n,
-                      iparam,
-                      ipntr,
-                      workd,
-                      workl,
-                      workl.length,
-                      info)
+        arpack.dsaupd(
+          ido,
+          bmat,
+          n,
+          which,
+          nev.`val`,
+          tolW,
+          resid,
+          ncv,
+          v,
+          n,
+          iparam,
+          ipntr,
+          workd,
+          workl,
+          workl.length,
+          info)
 
         while (ido.`val` != 99) {
           if (ido.`val` != -1 && ido.`val` != 1)
             throw new IllegalStateException("ido = " + ido.`val`)
           av(mt, mtTrans, n, k, workd, ipntr(0) - 1, ipntr(1) - 1)
-          arpack.dsaupd(ido,
-                        bmat,
-                        n,
-                        which,
-                        nev.`val`,
-                        tolW,
-                        resid,
-                        ncv,
-                        v,
-                        n,
-                        iparam,
-                        ipntr,
-                        workd,
-                        workl,
-                        workl.length,
-                        info)
+          arpack.dsaupd(
+            ido,
+            bmat,
+            n,
+            which,
+            nev.`val`,
+            tolW,
+            resid,
+            ncv,
+            v,
+            n,
+            iparam,
+            ipntr,
+            workd,
+            workl,
+            workl.length,
+            info)
         }
 
         if (info.`val` != 0)
@@ -330,28 +335,29 @@ object svd extends UFunc {
         val select = new Array[Boolean](ncv)
         val z = java.util.Arrays.copyOfRange(v, 0, nev.`val` * n)
 
-        arpack.dseupd(true,
-                      "A",
-                      select,
-                      d,
-                      z,
-                      n,
-                      0.0,
-                      bmat,
-                      n,
-                      which,
-                      nev,
-                      tol,
-                      resid,
-                      ncv,
-                      v,
-                      n,
-                      iparam,
-                      ipntr,
-                      workd,
-                      workl,
-                      workl.length,
-                      info)
+        arpack.dseupd(
+          true,
+          "A",
+          select,
+          d,
+          z,
+          n,
+          0.0,
+          bmat,
+          n,
+          which,
+          nev,
+          tol,
+          resid,
+          ncv,
+          v,
+          n,
+          iparam,
+          ipntr,
+          workd,
+          workl,
+          workl.length,
+          info)
 
         val computed = iparam(4)
         val eigenVectors = new DenseVector(z)
@@ -362,7 +368,7 @@ object svd extends UFunc {
           val eigenVal = d(i)
           if (eigenVal < 0.0)
             throw new IllegalStateException(
-                "encountered negative eigenvalue, " +
+              "encountered negative eigenvalue, " +
                 "please make sure your multiplication operators are applied to the same matrix.")
           val eigenVec = eigenVectors(i * n until i * n + n)
           mp(i) = (scala.math.sqrt(eigenVal), eigenVec)
@@ -373,13 +379,13 @@ object svd extends UFunc {
 
         val s = DenseVector(sp.toArray)
         val siMatrix: DenseMatrix[Double] = diag(
-            DenseVector(sp.map(u => 1 / u).toArray))
+          DenseVector(sp.map(u => 1 / u).toArray))
 
         val va = mp.map { case (ek, ev) => ev }
         val uOutput = DenseMatrix(va.map(r => r.toArray).toSeq: _*).t
         val vtOutput =
           siMatrix * DenseMatrix(
-              va.map(r => mulTrans(mtTrans, r).toArray).toSeq: _*)
+            va.map(r => mulTrans(mtTrans, r).toArray).toSeq: _*)
         SVD(uOutput, s, vtOutput)
       }
     }
@@ -402,7 +408,7 @@ object svd extends UFunc {
       val tol = 1e-6
       if (k >= mt.cols || k >= mt.rows) {
         throw new IllegalArgumentException(
-            "The desired number of singular values is greater " +
+          "The desired number of singular values is greater " +
             "than or equal to min(mt.cols, mt.rows). Please use the full svd.")
       }
 

@@ -13,27 +13,31 @@ class SlickException(msg: String, parent: Throwable = null)
     extends RuntimeException(msg, parent)
 
 /** A SlickException that contains a `Dumpable` with more details. */
-class SlickTreeException(msg: String,
-                         detail: Dumpable,
-                         parent: Throwable = null,
-                         mark: (Dumpable => Boolean) = null,
-                         removeUnmarked: Boolean = true)
+class SlickTreeException(
+    msg: String,
+    detail: Dumpable,
+    parent: Throwable = null,
+    mark: (Dumpable => Boolean) = null,
+    removeUnmarked: Boolean = true)
     extends SlickException(
-        SlickTreeException.format(msg, detail, mark, removeUnmarked), parent)
+      SlickTreeException.format(msg, detail, mark, removeUnmarked),
+      parent)
 
 private[slick] object SlickTreeException {
-  val treePrinter = new TreePrinter(prefix = DumpInfo.highlight(
-            if (GlobalConfig.unicodeDump) "\u2503 " else "| "))
+  val treePrinter = new TreePrinter(
+    prefix =
+      DumpInfo.highlight(if (GlobalConfig.unicodeDump) "\u2503 " else "| "))
 
-  def format(msg: String,
-             detail: Dumpable,
-             _mark: (Dumpable => Boolean),
-             removeUnmarked: Boolean): String =
+  def format(
+      msg: String,
+      detail: Dumpable,
+      _mark: (Dumpable => Boolean),
+      removeUnmarked: Boolean): String =
     if (detail eq null) msg
     else
       msg + {
         try {
-          val mark = if (_mark eq null) ((_: Dumpable) => false) else _mark
+          val mark = if (_mark eq null)((_: Dumpable) => false) else _mark
           val tp = treePrinter.copy(mark = mark)
           val markedTop =
             if (!removeUnmarked || (_mark eq null)) detail

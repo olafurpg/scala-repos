@@ -56,8 +56,10 @@ import parallel.ParSet
   *  @define mayNotTerminateInf
   */
 trait SetLike[A, +This <: SetLike[A, This] with Set[A]]
-    extends IterableLike[A, This] with GenSetLike[A, This]
-    with Subtractable[A, This] with Parallelizable[A, ParSet[A]] {
+    extends IterableLike[A, This]
+    with GenSetLike[A, This]
+    with Subtractable[A, This]
+    with Parallelizable[A, ParSet[A]] {
   self =>
 
   /** The empty set of the same type as this set
@@ -95,8 +97,9 @@ trait SetLike[A, +This <: SetLike[A, This] with Set[A]]
   // note: this is only overridden here to add the migration annotation,
   // which I hope to turn into an Xlint style warning as the migration aspect
   // is not central to its importance.
-  @migration("Set.map now returns a Set, so it will discard duplicate values.",
-             "2.8.0")
+  @migration(
+    "Set.map now returns a Set, so it will discard duplicate values.",
+    "2.8.0")
   override def map[B, That](f: A => B)(
       implicit bf: CanBuildFrom[This, B, That]): That = super.map(f)(bf)
 
@@ -252,5 +255,5 @@ trait SetLike[A, +This <: SetLike[A, This] with Set[A]]
     *           Unless overridden this is simply `"Set"`.
     */
   override def stringPrefix: String = "Set"
-  override def toString = super [IterableLike].toString
+  override def toString = super[IterableLike].toString
 }

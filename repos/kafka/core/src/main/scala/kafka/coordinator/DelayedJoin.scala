@@ -28,9 +28,10 @@ import kafka.server.DelayedOperation
   * the group are marked as failed, and complete this operation to proceed rebalance with
   * the rest of the group.
   */
-private[coordinator] class DelayedJoin(coordinator: GroupCoordinator,
-                                       group: GroupMetadata,
-                                       sessionTimeout: Long)
+private[coordinator] class DelayedJoin(
+    coordinator: GroupCoordinator,
+    group: GroupMetadata,
+    sessionTimeout: Long)
     extends DelayedOperation(sessionTimeout) {
 
   override def tryComplete(): Boolean =

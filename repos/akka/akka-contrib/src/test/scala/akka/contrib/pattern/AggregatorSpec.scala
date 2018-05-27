@@ -26,11 +26,13 @@ case object Savings extends AccountType
 case object MoneyMarket extends AccountType
 
 final case class GetCustomerAccountBalances(
-    id: Long, accountTypes: Set[AccountType])
+    id: Long,
+    accountTypes: Set[AccountType])
 final case class GetAccountBalances(id: Long)
 
-final case class AccountBalances(accountType: AccountType,
-                                 balance: Option[List[(Long, BigDecimal)]])
+final case class AccountBalances(
+    accountType: AccountType,
+    balance: Option[List[(Long, BigDecimal)]])
 
 final case class CheckingAccountBalances(
     balances: Option[List[(Long, BigDecimal)]])
@@ -75,9 +77,10 @@ class AccountBalanceRetriever extends Actor with Aggregator {
   }
   //#initial-expect
 
-  class AccountAggregator(originalSender: ActorRef,
-                          id: Long,
-                          types: Set[AccountType]) {
+  class AccountAggregator(
+      originalSender: ActorRef,
+      id: Long,
+      types: Set[AccountType]) {
 
     val results = mutable.ArrayBuffer
       .empty[(AccountType, Option[List[(Long, BigDecimal)]])]
@@ -192,12 +195,15 @@ class ChainingSample extends Actor with Aggregator {
 //#chain-sample
 
 class AggregatorSpec
-    extends TestKit(ActorSystem("test")) with ImplicitSender with FunSuiteLike
+    extends TestKit(ActorSystem("test"))
+    with ImplicitSender
+    with FunSuiteLike
     with Matchers {
 
   test("Test request 1 account type") {
     system.actorOf(Props[AccountBalanceRetriever]) ! GetCustomerAccountBalances(
-        1, Set(Savings))
+      1,
+      Set(Savings))
     receiveOne(10.seconds) match {
       case result: List[_] ⇒
         result should have size 1
@@ -208,7 +214,8 @@ class AggregatorSpec
 
   test("Test request 3 account types") {
     system.actorOf(Props[AccountBalanceRetriever]) ! GetCustomerAccountBalances(
-        1, Set(Checking, Savings, MoneyMarket))
+      1,
+      Set(Checking, Savings, MoneyMarket))
     receiveOne(10.seconds) match {
       case result: List[_] ⇒
         result should have size 3
@@ -267,22 +274,19 @@ class WorkListSpec extends FunSuiteLike {
   test("Process temp entries") {
 
     // ProcessAndRemove something in the middle
-    assert(
-        workList process {
+    assert(workList process {
       case TestEntry(2) ⇒ true
       case _ ⇒ false
     })
 
     // ProcessAndRemove the head
-    assert(
-        workList process {
+    assert(workList process {
       case TestEntry(0) ⇒ true
       case _ ⇒ false
     })
 
     // ProcessAndRemove the tail
-    assert(
-        workList process {
+    assert(workList process {
       case TestEntry(3) ⇒ true
       case _ ⇒ false
     })
@@ -296,8 +300,7 @@ class WorkListSpec extends FunSuiteLike {
   }
 
   test("Process permanent entry") {
-    assert(
-        workList process {
+    assert(workList process {
       case TestEntry(4) ⇒ true
       case _ ⇒ false
     })

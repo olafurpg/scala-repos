@@ -28,7 +28,11 @@ class DenseDotProductBenchmark extends BreezeBenchmark {
     var sum = 0.0
     cforRange(0 until reps) { rep =>
       sum += DenseVectorSupportMethods.dotProduct_Double(
-          dvBig.data, 0, dv2Big.data, 0, dvBig.length)
+        dvBig.data,
+        0,
+        dv2Big.data,
+        0,
+        dvBig.length)
     }
     sum
   }
@@ -75,7 +79,11 @@ class DenseDotProductBenchmark extends BreezeBenchmark {
     var sum = 0.0
     cforRange(0 until reps) { rep =>
       sum += DenseVectorSupportMethods.dotProduct_Float(
-          fvBig.data, 0, fv2Big.data, 0, fvBig.length)
+        fvBig.data,
+        0,
+        fv2Big.data,
+        0,
+        fvBig.length)
     }
     sum
   }

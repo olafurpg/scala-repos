@@ -39,7 +39,8 @@ object Blend {
 }
 
 class Blend(override val delegate: jfxse.Blend = new jfxse.Blend)
-    extends Effect(delegate) with SFXDelegate[jfxse.Blend] {
+    extends Effect(delegate)
+    with SFXDelegate[jfxse.Blend] {
 
   /**
     * Creates a new instance of Blend with the specified mode.

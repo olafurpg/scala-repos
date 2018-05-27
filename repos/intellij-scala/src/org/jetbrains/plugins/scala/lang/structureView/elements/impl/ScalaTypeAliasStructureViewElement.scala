@@ -14,7 +14,8 @@ import org.jetbrains.plugins.scala.lang.structureView.itemsPresentations.impl.Sc
   * Date: 31.07.2008
   */
 class ScalaTypeAliasStructureViewElement(
-    private val element: ScTypeAlias, val isInherited: Boolean)
+    private val element: ScTypeAlias,
+    val isInherited: Boolean)
     extends ScalaStructureViewElement(element, isInherited) {
   def getPresentation: ItemPresentation =
     new ScalaTypeAliasItemPresentation(element, isInherited)

@@ -6,7 +6,7 @@ class Outer {
 
   def belongs(a: Any): Unit = a match {
     case Inner(s) => // unchecked warning
-    case _ =>
+    case _        =>
   }
 
   def belongsStaticSameOuter(a: Inner): Unit = a match {
@@ -15,9 +15,9 @@ class Outer {
   }
 
   def belongsOtherOuter(a: Outer#Inner): Unit = a match {
-    case Inner(s) => // unchecked warning
+    case Inner(s)   => // unchecked warning
     case O.Inner(s) => // unchecked warning
-    case _ =>
+    case _          =>
   }
 }
 
@@ -39,22 +39,22 @@ object O extends Outer {
 
   def belongsOtherOuter2(a: Outer#Inner): Unit = a match {
     case Inner(s) => // unchecked warning
-    case _ =>
+    case _        =>
   }
 
   def belongsOtherOuter3(a: Outer#Inner): Unit = a match {
     case _: Inner => // unchecked warning
-    case _ =>
+    case _        =>
   }
 
   def belongsOtherOuter4(a: Outer#Inner): Unit = a match {
     case _: (Inner @unchecked) => // warning supressed
-    case _ =>
+    case _                     =>
   }
 
   def belongsOtherOuter5(a: Outer#Inner): Unit = a match {
     case _: (Inner @uncheckedVariance) => // unchecked warning
-    case _ =>
+    case _                             =>
   }
 
   def nested: Unit = {
@@ -62,7 +62,7 @@ object O extends Outer {
 
     def check1(a: Any): Unit = a match {
       case I(s) => // no need for outer check
-      case _ =>
+      case _    =>
     }
 
     def check2(a: I): Unit = a match {
@@ -78,7 +78,7 @@ class O2 {
 
     def check1(a: Any): Unit = a match {
       case I(s) => // no need for outer check (is this correct?)
-      case _ =>
+      case _    =>
     }
 
     def check2(a: I): Unit = a match {
@@ -101,6 +101,6 @@ object U {
 class Test {
   def m(a: Any) = a match {
     case U.T.C(1) => 1 // used to warn
-    case _ => 1
+    case _        => 1
   }
 }

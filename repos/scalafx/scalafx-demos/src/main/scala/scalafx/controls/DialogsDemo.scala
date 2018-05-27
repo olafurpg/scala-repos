@@ -51,16 +51,17 @@ object DialogsDemo extends JFXApp {
       title = "Dialogs Demo"
       root = new VBox {
         children = Seq(
-            button("Information", informationDialog),
-            button("Without Header Text", withoutHeader),
-            button("Warning", warningDialog),
-            button("Error", errorDialog),
-            button("Exception", exceptionDialog),
-            button("Confirmation", confirmationDialog),
-            button("Confirmation Dialog with Custom Actions",
-                   confirmationWithCustomActions),
-            button("Text Input", textInputDialog),
-            button("Choice", choiceDialog)
+          button("Information", informationDialog),
+          button("Without Header Text", withoutHeader),
+          button("Warning", warningDialog),
+          button("Error", errorDialog),
+          button("Exception", exceptionDialog),
+          button("Confirmation", confirmationDialog),
+          button(
+            "Confirmation Dialog with Custom Actions",
+            confirmationWithCustomActions),
+          button("Text Input", textInputDialog),
+          button("Choice", choiceDialog)
         )
         spacing = 6
         padding = Insets(10)
@@ -161,7 +162,7 @@ object DialogsDemo extends JFXApp {
 
     result match {
       case Some(ButtonType.OK) => println("OK")
-      case _ => println("Cancel or closed")
+      case _                   => println("Cancel or closed")
     }
   }
 
@@ -177,17 +178,17 @@ object DialogsDemo extends JFXApp {
       contentText = "Choose your option."
       // Note that we override here default dialog buttons, OK and Cancel, with new ones.
       // We could also just add to existing button using `++=`.
-      buttonTypes = Seq(
-          ButtonTypeOne, ButtonTypeTwo, ButtonTypeThree, ButtonType.Cancel)
+      buttonTypes =
+        Seq(ButtonTypeOne, ButtonTypeTwo, ButtonTypeThree, ButtonType.Cancel)
     }
 
     val result = alert.showAndWait()
 
     result match {
-      case Some(ButtonTypeOne) => println("... user chose \"One\"")
-      case Some(ButtonTypeTwo) => println("... user chose \"Two\"")
+      case Some(ButtonTypeOne)   => println("... user chose \"One\"")
+      case Some(ButtonTypeTwo)   => println("... user chose \"Two\"")
       case Some(ButtonTypeThree) => println("... user chose \"Three\"")
-      case _ => println("... user chose CANCEL or closed the dialog")
+      case _                     => println("... user chose CANCEL or closed the dialog")
     }
   }
 
@@ -202,7 +203,7 @@ object DialogsDemo extends JFXApp {
     val result = dialog.showAndWait()
     result match {
       case Some(name) => println("Your name: " + name)
-      case None => println("Dialog was canceled.")
+      case None       => println("Dialog was canceled.")
     }
   }
 
@@ -221,7 +222,7 @@ object DialogsDemo extends JFXApp {
 
     result match {
       case Some(choice) => println("Your choice: " + choice)
-      case None => println("No selection")
+      case None         => println("No selection")
     }
   }
 }

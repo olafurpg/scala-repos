@@ -19,7 +19,12 @@ package org.apache.spark.sql.streaming.test
 
 import org.scalatest.BeforeAndAfter
 
-import org.apache.spark.sql.{AnalysisException, ContinuousQuery, SQLContext, StreamTest}
+import org.apache.spark.sql.{
+  AnalysisException,
+  ContinuousQuery,
+  SQLContext,
+  StreamTest
+}
 import org.apache.spark.sql.execution.streaming.{Batch, Offset, Sink, Source}
 import org.apache.spark.sql.sources.{StreamSinkProvider, StreamSourceProvider}
 import org.apache.spark.sql.test.SharedSQLContext
@@ -33,10 +38,11 @@ object LastOptions {
 
 /** Dummy provider: returns no-op source/sink and records options in [[LastOptions]]. */
 class DefaultSource extends StreamSourceProvider with StreamSinkProvider {
-  override def createSource(sqlContext: SQLContext,
-                            schema: Option[StructType],
-                            providerName: String,
-                            parameters: Map[String, String]): Source = {
+  override def createSource(
+      sqlContext: SQLContext,
+      schema: Option[StructType],
+      providerName: String,
+      parameters: Map[String, String]): Source = {
     LastOptions.parameters = parameters
     LastOptions.schema = schema
     new Source {
@@ -46,9 +52,10 @@ class DefaultSource extends StreamSourceProvider with StreamSinkProvider {
     }
   }
 
-  override def createSink(sqlContext: SQLContext,
-                          parameters: Map[String, String],
-                          partitionColumns: Seq[String]): Sink = {
+  override def createSink(
+      sqlContext: SQLContext,
+      parameters: Map[String, String],
+      partitionColumns: Seq[String]): Sink = {
     LastOptions.parameters = parameters
     LastOptions.partitionColumns = partitionColumns
     new Sink {
@@ -59,7 +66,9 @@ class DefaultSource extends StreamSourceProvider with StreamSinkProvider {
 }
 
 class DataFrameReaderWriterSuite
-    extends StreamTest with SharedSQLContext with BeforeAndAfter {
+    extends StreamTest
+    with SharedSQLContext
+    with BeforeAndAfter {
   import testImplicits._
 
   after {
@@ -218,8 +227,9 @@ class DataFrameReaderWriterSuite
     def activeStreamNames: Set[String] = {
       val streams = sqlContext.streams.active
       val names = streams.map(_.name).toSet
-      assert(streams.length === names.size,
-             s"names of active queries are not unique: $names")
+      assert(
+        streams.length === names.size,
+        s"names of active queries are not unique: $names")
       names
     }
 

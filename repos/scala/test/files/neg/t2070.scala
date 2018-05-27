@@ -1,6 +1,6 @@
 object t2070 {
   trait A {
-    type T [X]
+    type T[X]
     def f(x: T[Int]) = x
   }
 

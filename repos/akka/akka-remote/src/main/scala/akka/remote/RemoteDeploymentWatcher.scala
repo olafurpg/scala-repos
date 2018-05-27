@@ -24,7 +24,8 @@ private[akka] object RemoteDeploymentWatcher {
   * goes down (jvm crash, network failure), i.e. triggered by [[akka.actor.AddressTerminated]].
   */
 private[akka] class RemoteDeploymentWatcher
-    extends Actor with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
+    extends Actor
+    with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
   import RemoteDeploymentWatcher._
   var supervisors = Map.empty[ActorRef, InternalActorRef]
 
@@ -36,9 +37,10 @@ private[akka] class RemoteDeploymentWatcher
     case t @ Terminated(a) if supervisors isDefinedAt a ⇒
       // send extra DeathWatchNotification to the supervisor so that it will remove the child
       supervisors(a).sendSystemMessage(
-          DeathWatchNotification(a,
-                                 existenceConfirmed = t.existenceConfirmed,
-                                 addressTerminated = t.addressTerminated))
+        DeathWatchNotification(
+          a,
+          existenceConfirmed = t.existenceConfirmed,
+          addressTerminated = t.addressTerminated))
       supervisors -= a
 
     case _: Terminated ⇒

@@ -11,21 +11,23 @@ trait Tags { self: Analyzer =>
     private val runDefinitions = currentRun.runDefinitions
 
     private def resolveTag(
-        pos: Position, taggedTp: Type, allowMaterialization: Boolean) =
+        pos: Position,
+        taggedTp: Type,
+        allowMaterialization: Boolean) =
       enteringTyper {
         def wrapper(tree: => Tree): Tree =
           if (allowMaterialization)(context.withMacrosEnabled[Tree](tree))
           else (context.withMacrosDisabled[Tree](tree))
         wrapper(
-            inferImplicit(
-                EmptyTree,
-                taggedTp,
-                reportAmbiguous = true,
-                isView = false,
-                context,
-                saveAmbiguousDivergent = true,
-                pos
-            ).tree)
+          inferImplicit(
+            EmptyTree,
+            taggedTp,
+            reportAmbiguous = true,
+            isView = false,
+            context,
+            saveAmbiguousDivergent = true,
+            pos
+          ).tree)
       }
 
     /** Finds in scope or materializes a ClassTag.
@@ -43,9 +45,10 @@ trait Tags { self: Analyzer =>
       *           EmptyTree if the result contains unresolved (i.e. not spliced) type parameters and abstract type members.
       *           EmptyTree if `allowMaterialization` is false, and there is no class tag in scope.
       */
-    def resolveClassTag(pos: Position,
-                        tp: Type,
-                        allowMaterialization: Boolean = true): Tree = {
+    def resolveClassTag(
+        pos: Position,
+        tp: Type,
+        allowMaterialization: Boolean = true): Tree = {
       val taggedTp = appliedType(ClassTagClass.typeConstructor, List(tp))
       resolveTag(pos, taggedTp, allowMaterialization)
     }
@@ -66,11 +69,12 @@ trait Tags { self: Analyzer =>
       *           EmptyTree if `concrete` is true and the result contains unresolved (i.e. not spliced) type parameters and abstract type members.
       *           EmptyTree if `allowMaterialization` is false, and there is no array tag in scope.
       */
-    def resolveTypeTag(pos: Position,
-                       pre: Type,
-                       tp: Type,
-                       concrete: Boolean,
-                       allowMaterialization: Boolean = true): Tree =
+    def resolveTypeTag(
+        pos: Position,
+        pre: Type,
+        tp: Type,
+        concrete: Boolean,
+        allowMaterialization: Boolean = true): Tree =
       // if someone requests a type tag, but scala-reflect.jar isn't on the library classpath, then bail
       if (pre == NoType && ApiUniverseClass == NoSymbol) EmptyTree
       else {

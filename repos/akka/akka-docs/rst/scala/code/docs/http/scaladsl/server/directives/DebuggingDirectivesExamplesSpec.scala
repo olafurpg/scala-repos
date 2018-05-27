@@ -6,7 +6,11 @@ package docs.http.scaladsl.server.directives
 
 import akka.event.Logging
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
-import akka.http.scaladsl.server.directives.{DebuggingDirectives, LogEntry, LoggingMagnet}
+import akka.http.scaladsl.server.directives.{
+  DebuggingDirectives,
+  LogEntry,
+  LoggingMagnet
+}
 import docs.http.scaladsl.server.RoutingSpec
 
 class DebuggingDirectivesExamplesSpec extends RoutingSpec {
@@ -56,16 +60,16 @@ class DebuggingDirectivesExamplesSpec extends RoutingSpec {
         Some(LogEntry(req.method + ":" + res.status, Logging.InfoLevel))
       case _ => None // other kind of responses
     }
-    DebuggingDirectives.logRequestResult(
-        requestMethodAndResponseStatusAsInfo _)
+    DebuggingDirectives.logRequestResult(requestMethodAndResponseStatusAsInfo _)
 
     // This one doesn't use the implicit LoggingContext but uses `println` for logging
     def printRequestMethodAndResponseStatus(req: HttpRequest)(res: Any): Unit =
-      println(requestMethodAndResponseStatusAsInfo(req)(res)
-            .map(_.obj.toString)
-            .getOrElse(""))
+      println(
+        requestMethodAndResponseStatusAsInfo(req)(res)
+          .map(_.obj.toString)
+          .getOrElse(""))
     val logRequestResultPrintln = DebuggingDirectives.logRequestResult(
-        LoggingMagnet(_ => printRequestMethodAndResponseStatus))
+      LoggingMagnet(_ => printRequestMethodAndResponseStatus))
 
     // tests:
     Get("/") ~> logRequestResultPrintln(complete("logged")) ~> check {
@@ -85,7 +89,7 @@ class DebuggingDirectivesExamplesSpec extends RoutingSpec {
     // logs just the response status at debug level
     def responseStatus(res: Any): String = res match {
       case x: HttpResponse => x.status.toString
-      case _ => "unknown response part"
+      case _               => "unknown response part"
     }
     DebuggingDirectives.logResult(responseStatus _)
 

@@ -80,25 +80,26 @@ private[nio] object HeapByteBufferFloatView {
       extends GenHeapBufferView.NewHeapBufferView[FloatBuffer] {
     def bytesPerElem: Int = 4
 
-    def apply(capacity: Int,
-              byteArray: Array[Byte],
-              byteArrayOffset: Int,
-              initialPosition: Int,
-              initialLimit: Int,
-              readOnly: Boolean,
-              isBigEndian: Boolean): FloatBuffer = {
-      new HeapByteBufferFloatView(capacity,
-                                  byteArray,
-                                  byteArrayOffset,
-                                  initialPosition,
-                                  initialLimit,
-                                  readOnly,
-                                  isBigEndian)
+    def apply(
+        capacity: Int,
+        byteArray: Array[Byte],
+        byteArrayOffset: Int,
+        initialPosition: Int,
+        initialLimit: Int,
+        readOnly: Boolean,
+        isBigEndian: Boolean): FloatBuffer = {
+      new HeapByteBufferFloatView(
+        capacity,
+        byteArray,
+        byteArrayOffset,
+        initialPosition,
+        initialLimit,
+        readOnly,
+        isBigEndian)
     }
   }
 
   @inline
-  private[nio] def fromHeapByteBuffer(
-      byteBuffer: HeapByteBuffer): FloatBuffer =
+  private[nio] def fromHeapByteBuffer(byteBuffer: HeapByteBuffer): FloatBuffer =
     GenHeapBufferView.generic_fromHeapByteBuffer(byteBuffer)
 }

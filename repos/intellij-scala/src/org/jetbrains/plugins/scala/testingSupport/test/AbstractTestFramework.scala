@@ -43,15 +43,16 @@ abstract class AbstractTestFramework extends JavaTestFramework {
   def isTestClass(clazz: PsiClass, canBePotential: Boolean): Boolean = {
     val parent: ScTypeDefinition = PsiTreeUtil.getParentOfType(clazz match {
       case wrapper: PsiClassWrapper => wrapper.definition
-      case _ => clazz
+      case _                        => clazz
     }, classOf[ScTypeDefinition], false)
     if (parent == null) return false
     val project = clazz.getProject
     val suiteClazz: PsiClass = ScalaPsiManager
       .instance(project)
-      .getCachedClass(getMarkerClassFQName,
-                      GlobalSearchScope.allScope(project),
-                      ScalaPsiManager.ClassCategory.TYPE)
+      .getCachedClass(
+        getMarkerClassFQName,
+        GlobalSearchScope.allScope(project),
+        ScalaPsiManager.ClassCategory.TYPE)
     if (suiteClazz == null) return false
     ScalaPsiUtil.cachedDeepIsInheritor(parent, suiteClazz)
   }
@@ -73,12 +74,13 @@ abstract class AbstractTestFramework extends JavaTestFramework {
     val (libraries, resolvers, options) = module.scalaSdk match {
       case Some(scalaSdk) =>
         val compilerVersion = scalaSdk.compilerVersion
-        (getLibraryDependencies(compilerVersion),
-         getLibraryResolvers(compilerVersion),
-         getAdditionalBuildCommands(compilerVersion))
+        (
+          getLibraryDependencies(compilerVersion),
+          getLibraryResolvers(compilerVersion),
+          getAdditionalBuildCommands(compilerVersion))
       case None =>
         throw new RuntimeException(
-            "Failed to download test library jars: scala SDK is not specified to module" +
+          "Failed to download test library jars: scala SDK is not specified to module" +
             module.getName)
     }
     val modifier = new SimpleBuildFileModifier(libraries, resolvers, options)

@@ -5,13 +5,14 @@ import sbt.internal.util.AttributeKey
 import java.net.URI
 
 object Resolve {
-  def apply(index: BuildUtil[_],
-            current: ScopeAxis[Reference],
-            key: AttributeKey[_],
-            mask: ScopeMask): Scope => Scope = {
+  def apply(
+      index: BuildUtil[_],
+      current: ScopeAxis[Reference],
+      key: AttributeKey[_],
+      mask: ScopeMask): Scope => Scope = {
     val rs =
       resolveProject(current, mask) _ :: resolveExtra(mask) _ :: resolveTask(
-          mask) _ :: resolveConfig(index, key, mask) _ :: Nil
+        mask) _ :: resolveConfig(index, key, mask) _ :: Nil
     scope =>
       (scope /: rs) { (s, f) =>
         f(s)
@@ -28,8 +29,9 @@ object Resolve {
     if (mask.extra) scope else scope.copy(extra = Global)
 
   def resolveConfig[P](
-      index: BuildUtil[P], key: AttributeKey[_], mask: ScopeMask)(
-      scope: Scope): Scope =
+      index: BuildUtil[P],
+      key: AttributeKey[_],
+      mask: ScopeMask)(scope: Scope): Scope =
     if (mask.config) scope
     else {
       val (resolvedRef, proj) = scope.project match {

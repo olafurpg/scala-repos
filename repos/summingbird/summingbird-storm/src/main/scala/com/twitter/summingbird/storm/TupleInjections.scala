@@ -48,6 +48,6 @@ class KeyValueInjection[K, V] extends Injection[(K, V), JList[AnyRef]] {
     val value = v
       .get(1)
       .asInstanceOf[V]
-      (key, value)
+    (key, value)
   }
 }

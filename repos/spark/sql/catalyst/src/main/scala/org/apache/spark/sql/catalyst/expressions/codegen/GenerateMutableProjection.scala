@@ -36,12 +36,14 @@ object GenerateMutableProjection
     in.map(ExpressionCanonicalizer.execute)
 
   protected def bind(
-      in: Seq[Expression], inputSchema: Seq[Attribute]): Seq[Expression] =
+      in: Seq[Expression],
+      inputSchema: Seq[Attribute]): Seq[Expression] =
     in.map(BindReferences.bindReference(_, inputSchema))
 
-  def generate(expressions: Seq[Expression],
-               inputSchema: Seq[Attribute],
-               useSubexprElimination: Boolean): (() => MutableProjection) = {
+  def generate(
+      expressions: Seq[Expression],
+      inputSchema: Seq[Attribute],
+      useSubexprElimination: Boolean): (() => MutableProjection) = {
     create(canonicalize(bind(expressions, inputSchema)), useSubexprElimination)
   }
 
@@ -56,7 +58,7 @@ object GenerateMutableProjection
     val ctx = newCodeGenContext()
     val (validExpr, index) = expressions.zipWithIndex.filter {
       case (NoOp, _) => false
-      case _ => true
+      case _         => true
     }.unzip
     val exprVals = ctx.generateExpressions(validExpr, useSubexprElimination)
     val projectionCodes = exprVals.zip(index).map {
@@ -67,9 +69,9 @@ object GenerateMutableProjection
           val value = s"value_$i"
           ctx.addMutableState("boolean", isNull, s"this.$isNull = true;")
           ctx.addMutableState(
-              ctx.javaType(e.dataType),
-              value,
-              s"this.$value = ${ctx.defaultValue(e.dataType)};")
+            ctx.javaType(e.dataType),
+            value,
+            s"this.$value = ${ctx.defaultValue(e.dataType)};")
           s"""
             ${ev.code}
             this.$isNull = ${ev.isNull};
@@ -78,9 +80,9 @@ object GenerateMutableProjection
         } else {
           val value = s"value_$i"
           ctx.addMutableState(
-              ctx.javaType(e.dataType),
-              value,
-              s"this.$value = ${ctx.defaultValue(e.dataType)};")
+            ctx.javaType(e.dataType),
+            value,
+            s"this.$value = ${ctx.defaultValue(e.dataType)};")
           s"""
             ${ev.code}
             this.$value = ${ev.value};
@@ -140,7 +142,7 @@ object GenerateMutableProjection
     """
 
     logDebug(
-        s"code for ${expressions.mkString(",")}:\n${CodeFormatter.format(code)}")
+      s"code for ${expressions.mkString(",")}:\n${CodeFormatter.format(code)}")
 
     val c = CodeGenerator.compile(code)
     () =>

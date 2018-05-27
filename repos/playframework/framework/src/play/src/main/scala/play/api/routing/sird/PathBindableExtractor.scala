@@ -22,9 +22,9 @@ class PathBindableExtractor[T](implicit pb: PathBindable[T]) { self =>
     */
   def unapply(s: Option[String]): Option[Option[T]] = {
     s match {
-      case None => Some(None)
+      case None              => Some(None)
       case Some(self(value)) => Some(Some(value))
-      case _ => None
+      case _                 => None
     }
   }
 

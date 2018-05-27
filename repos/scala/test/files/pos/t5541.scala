@@ -20,7 +20,9 @@ object HASkipList {
   }
   sealed trait HeadOrBranch[S <: Sys[S], A]
   final class Branch[S <: Sys[S], @specialized(Int) A]()
-      extends BranchLike[S, A] with HeadOrBranch[S, A] with Node[S, A] {
+      extends BranchLike[S, A]
+      with HeadOrBranch[S, A]
+      with Node[S, A] {
     def size: Int = 1234
     def key(i: Int): A = sys.error("TODO")
     def isLeaf: Boolean = false
@@ -45,8 +47,8 @@ class HASkipListView[S <: Sys[S], A](private val l: HASkipList[S, A])(
       if (n.isLeaf) None
       else {
         val nb = n.asBranch
-        Some(IndexedSeq.tabulate(sz)(
-                i => buildBoxMap(nb.down(i), isRight && (i == szm))))
+        Some(IndexedSeq.tabulate(sz)(i =>
+          buildBoxMap(nb.down(i), isRight && (i == szm))))
       }
     val b = NodeBox(n, keys, chbo.map(_.map(_._2)))
     val bb = chbo match {
@@ -64,8 +66,9 @@ class HASkipListView[S <: Sys[S], A](private val l: HASkipList[S, A])(
   private case class Horiz(spacing: Int = 20, bs: IndexedSeq[Box]) extends Box
   private final case class Vert(spacing: Int = 20, bs: IndexedSeq[Box])
       extends Box
-  private final case class NodeBox(n: Node[S, A],
-                                   keys: IndexedSeq[(A, String)],
-                                   downs: Option[IndexedSeq[NodeBox]])
+  private final case class NodeBox(
+      n: Node[S, A],
+      keys: IndexedSeq[(A, String)],
+      downs: Option[IndexedSeq[NodeBox]])
       extends Box
 }

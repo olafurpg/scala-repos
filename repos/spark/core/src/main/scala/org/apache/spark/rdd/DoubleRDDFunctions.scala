@@ -80,26 +80,26 @@ class DoubleRDDFunctions(self: RDD[Double]) extends Logging with Serializable {
     * Approximate operation to return the mean within a timeout.
     */
   def meanApprox(
-      timeout: Long, confidence: Double = 0.95): PartialResult[BoundedDouble] =
+      timeout: Long,
+      confidence: Double = 0.95): PartialResult[BoundedDouble] =
     self.withScope {
-      val processPartition = (ctx: TaskContext,
-      ns: Iterator[Double]) => StatCounter(ns)
+      val processPartition =
+        (ctx: TaskContext, ns: Iterator[Double]) => StatCounter(ns)
       val evaluator = new MeanEvaluator(self.partitions.length, confidence)
-      self.context.runApproximateJob(
-          self, processPartition, evaluator, timeout)
+      self.context.runApproximateJob(self, processPartition, evaluator, timeout)
     }
 
   /**
     * Approximate operation to return the sum within a timeout.
     */
   def sumApprox(
-      timeout: Long, confidence: Double = 0.95): PartialResult[BoundedDouble] =
+      timeout: Long,
+      confidence: Double = 0.95): PartialResult[BoundedDouble] =
     self.withScope {
-      val processPartition = (ctx: TaskContext,
-      ns: Iterator[Double]) => StatCounter(ns)
+      val processPartition =
+        (ctx: TaskContext, ns: Iterator[Double]) => StatCounter(ns)
       val evaluator = new SumEvaluator(self.partitions.length, confidence)
-      self.context.runApproximateJob(
-          self, processPartition, evaluator, timeout)
+      self.context.runApproximateJob(self, processPartition, evaluator, timeout)
     }
 
   /**
@@ -114,21 +114,25 @@ class DoubleRDDFunctions(self: RDD[Double]) extends Logging with Serializable {
     self.withScope {
       // Scala's built-in range has issues. See #SI-8782
       def customRange(
-          min: Double, max: Double, steps: Int): IndexedSeq[Double] = {
+          min: Double,
+          max: Double,
+          steps: Int): IndexedSeq[Double] = {
         val span = max - min
         Range.Int(0, steps, 1).map(s => min + (s * span) / steps) :+ max
       }
       // Compute the minimum and the maximum
-      val (max: Double, min: Double) = self.mapPartitions { items =>
-        Iterator(items.foldRight(Double.NegativeInfinity,
-                                 Double.PositiveInfinity)((e: Double,
-                x: (Double, Double)) => (x._1.max(e), x._2.min(e))))
-      }.reduce { (maxmin1, maxmin2) =>
-        (maxmin1._1.max(maxmin2._1), maxmin1._2.min(maxmin2._2))
-      }
+      val (max: Double, min: Double) = self
+        .mapPartitions { items =>
+          Iterator(
+            items.foldRight(Double.NegativeInfinity, Double.PositiveInfinity)(
+              (e: Double, x: (Double, Double)) => (x._1.max(e), x._2.min(e))))
+        }
+        .reduce { (maxmin1, maxmin2) =>
+          (maxmin1._1.max(maxmin2._1), maxmin1._2.min(maxmin2._2))
+        }
       if (min.isNaN || max.isNaN || max.isInfinity || min.isInfinity) {
         throw new UnsupportedOperationException(
-            "Histogram on either an empty RDD or RDD containing +/-infinity or NaN")
+          "Histogram on either an empty RDD or RDD containing +/-infinity or NaN")
       }
       val range =
         if (min != max) {
@@ -161,11 +165,12 @@ class DoubleRDDFunctions(self: RDD[Double]) extends Logging with Serializable {
     * in that bucket.
     */
   def histogram(
-      buckets: Array[Double], evenBuckets: Boolean = false): Array[Long] =
+      buckets: Array[Double],
+      evenBuckets: Boolean = false): Array[Long] =
     self.withScope {
       if (buckets.length < 2) {
         throw new IllegalArgumentException(
-            "buckets array must have at least two elements")
+          "buckets array must have at least two elements")
       }
       // The histogramPartition function computes the partail histogram for a given
       // partition. The provided bucketFunction determines which bucket in the array
@@ -178,7 +183,7 @@ class DoubleRDDFunctions(self: RDD[Double]) extends Logging with Serializable {
         while (iter.hasNext) {
           bucketFunction(iter.next()) match {
             case Some(x: Int) => { counters(x) += 1 }
-            case _ => {}
+            case _            => {}
           }
         }
         Iterator(counters)

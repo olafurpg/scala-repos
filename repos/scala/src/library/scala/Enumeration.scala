@@ -8,7 +8,13 @@
 
 package scala
 
-import scala.collection.{mutable, immutable, generic, SortedSetLike, AbstractSet}
+import scala.collection.{
+  mutable,
+  immutable,
+  generic,
+  SortedSetLike,
+  AbstractSet
+}
 import java.lang.reflect.{Method => JMethod, Field => JField}
 import scala.reflect.NameTransformer._
 import scala.util.matching.Regex
@@ -64,7 +70,7 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
     */
   override def toString =
     ((getClass.getName stripSuffix MODULE_SUFFIX_STRING split '.').last split Regex
-          .quote(NAME_JOIN_STRING)).last
+      .quote(NAME_JOIN_STRING)).last
 
   /** The mapping from the integer used to identify values to the actual
     * values. */
@@ -160,13 +166,13 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
     val fields: Array[JField] = getClass.getDeclaredFields
     def isValDef(m: JMethod): Boolean =
       fields exists
-      (fd => fd.getName == m.getName && fd.getType == m.getReturnType)
+        (fd => fd.getName == m.getName && fd.getType == m.getReturnType)
 
     // The list of possible Value methods: 0-args which return a conforming type
     val methods: Array[JMethod] =
       getClass.getMethods filter
-      (m =>
-            m.getParameterTypes.isEmpty &&
+        (m =>
+          m.getParameterTypes.isEmpty &&
             classOf[Value].isAssignableFrom(m.getReturnType) &&
             m.getDeclaringClass != classOf[Enumeration] && isValDef(m))
     methods foreach { m =>
@@ -233,7 +239,8 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
     override def toString() =
       if (name != null) name
       else
-        try thisenum.nameOf(i) catch {
+        try thisenum.nameOf(i)
+        catch {
           case _: NoSuchElementException =>
             "<Invalid enum: no field for #" + i + ">"
         }
@@ -257,15 +264,16 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
     *    not fall below zero), organized as a `BitSet`.
     *  @define Coll `collection.immutable.SortedSet`
     */
-  class ValueSet private[ValueSet](private[this] var nnIds: immutable.BitSet)
-      extends AbstractSet[Value] with immutable.SortedSet[Value]
-      with SortedSetLike[Value, ValueSet] with Serializable {
+  class ValueSet private[ValueSet] (private[this] var nnIds: immutable.BitSet)
+      extends AbstractSet[Value]
+      with immutable.SortedSet[Value]
+      with SortedSetLike[Value, ValueSet]
+      with Serializable {
 
     implicit def ordering: Ordering[Value] = ValueOrdering
     def rangeImpl(from: Option[Value], until: Option[Value]): ValueSet =
       new ValueSet(
-          nnIds.rangeImpl(
-              from.map(_.id - bottomId), until.map(_.id - bottomId)))
+        nnIds.rangeImpl(from.map(_.id - bottomId), until.map(_.id - bottomId)))
 
     override def empty = ValueSet.empty
     def contains(v: Value) = nnIds contains (v.id - bottomId)

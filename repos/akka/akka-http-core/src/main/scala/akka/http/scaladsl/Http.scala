@@ -17,8 +17,16 @@ import akka.http.impl.settings.{ConnectionPoolSetup, HostConnectionPoolSetup}
 import akka.http.impl.util.{MapError, StreamUtils}
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.model.headers.Host
-import akka.http.scaladsl.model.ws.{Message, WebSocketRequest, WebSocketUpgradeResponse}
-import akka.http.scaladsl.settings.{ServerSettings, ClientConnectionSettings, ConnectionPoolSettings}
+import akka.http.scaladsl.model.ws.{
+  Message,
+  WebSocketRequest,
+  WebSocketUpgradeResponse
+}
+import akka.http.scaladsl.settings.{
+  ServerSettings,
+  ClientConnectionSettings,
+  ConnectionPoolSettings
+}
 import akka.http.scaladsl.util.FastFuture
 import akka.{Done, NotUsed}
 import akka.stream._
@@ -35,18 +43,20 @@ import scala.util.control.NonFatal
 import scala.compat.java8.FutureConverters._
 
 class HttpExt(private val config: Config)(implicit val system: ActorSystem)
-    extends akka.actor.Extension with DefaultSSLContextCreation {
+    extends akka.actor.Extension
+    with DefaultSSLContextCreation {
 
   import Http._
 
   override val sslConfig = AkkaSSLConfig(system)
 
   private[this] val defaultConnectionPoolSettings = ConnectionPoolSettings(
-      system)
+    system)
 
   // configured default HttpsContext for the client-side
   // SYNCHRONIZED ACCESS ONLY!
-  private[this] var _defaultClientHttpsConnectionContext: HttpsConnectionContext =
+  private[this] var _defaultClientHttpsConnectionContext
+    : HttpsConnectionContext =
     _
   private[this] var _defaultServerConnectionContext: ConnectionContext = _
 
@@ -75,36 +85,41 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
     * To configure additional settings for a server started using this method,
     * use the `akka.http.server` config section or pass in a [[akka.http.scaladsl.settings.ServerSettings]] explicitly.
     */
-  def bind(interface: String,
-           port: Int = DefaultPortForProtocol,
-           connectionContext: ConnectionContext = defaultServerHttpContext,
-           settings: ServerSettings = ServerSettings(system),
-           log: LoggingAdapter = system.log)(implicit fm: Materializer)
+  def bind(
+      interface: String,
+      port: Int = DefaultPortForProtocol,
+      connectionContext: ConnectionContext = defaultServerHttpContext,
+      settings: ServerSettings = ServerSettings(system),
+      log: LoggingAdapter = system.log)(implicit fm: Materializer)
     : Source[IncomingConnection, Future[ServerBinding]] = {
     val effectivePort = if (port >= 0) port else connectionContext.defaultPort
     val tlsStage = sslTlsStage(connectionContext, Server)
     val connections: Source[Tcp.IncomingConnection, Future[Tcp.ServerBinding]] =
-      Tcp().bind(interface,
-                 effectivePort,
-                 settings.backlog,
-                 settings.socketOptions,
-                 halfClose = false,
-                 settings.timeouts.idleTimeout)
-    connections.map {
-      case Tcp.IncomingConnection(localAddress, remoteAddress, flow) ⇒
-        val layer = serverLayer(settings, Some(remoteAddress), log)
-        val flowWithTimeoutRecovered = flow.via(MapError {
-          case t: TimeoutException ⇒
-            new HttpConnectionTimeoutException(t.getMessage)
-        })
-        IncomingConnection(localAddress,
-                           remoteAddress,
-                           layer atop tlsStage join flowWithTimeoutRecovered)
-    }.mapMaterializedValue {
-      _.map(tcpBinding ⇒
-            ServerBinding(tcpBinding.localAddress)(() ⇒ tcpBinding.unbind()))(
+      Tcp().bind(
+        interface,
+        effectivePort,
+        settings.backlog,
+        settings.socketOptions,
+        halfClose = false,
+        settings.timeouts.idleTimeout)
+    connections
+      .map {
+        case Tcp.IncomingConnection(localAddress, remoteAddress, flow) ⇒
+          val layer = serverLayer(settings, Some(remoteAddress), log)
+          val flowWithTimeoutRecovered = flow.via(MapError {
+            case t: TimeoutException ⇒
+              new HttpConnectionTimeoutException(t.getMessage)
+          })
+          IncomingConnection(
+            localAddress,
+            remoteAddress,
+            layer atop tlsStage join flowWithTimeoutRecovered)
+      }
+      .mapMaterializedValue {
+        _.map(tcpBinding ⇒
+          ServerBinding(tcpBinding.localAddress)(() ⇒ tcpBinding.unbind()))(
           fm.executionContext)
-    }
+      }
   }
 
   /**
@@ -130,11 +145,13 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
       try incomingConnection.flow
         .viaMat(StreamUtils.identityFinishReporter)(Keep.right)
         .joinMat(handler)(Keep.left)
-        .run() catch {
+        .run()
+      catch {
         case NonFatal(e) ⇒
-          log.error(e,
-                    "Could not materialize handling flow for {}",
-                    incomingConnection)
+          log.error(
+            e,
+            "Could not materialize handling flow for {}",
+            incomingConnection)
           throw e
       }
 
@@ -170,12 +187,13 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
       settings: ServerSettings = ServerSettings(system),
       log: LoggingAdapter = system.log)(
       implicit fm: Materializer): Future[ServerBinding] =
-    bindAndHandle(Flow[HttpRequest].map(handler),
-                  interface,
-                  port,
-                  connectionContext,
-                  settings,
-                  log)
+    bindAndHandle(
+      Flow[HttpRequest].map(handler),
+      interface,
+      port,
+      connectionContext,
+      settings,
+      log)
 
   /**
     * Convenience method which starts a new HTTP server at the given endpoint and uses the given `handler`
@@ -196,12 +214,13 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
       parallelism: Int = 1,
       log: LoggingAdapter = system.log)(
       implicit fm: Materializer): Future[ServerBinding] =
-    bindAndHandle(Flow[HttpRequest].mapAsync(parallelism)(handler),
-                  interface,
-                  port,
-                  connectionContext,
-                  settings,
-                  log)
+    bindAndHandle(
+      Flow[HttpRequest].mapAsync(parallelism)(handler),
+      interface,
+      port,
+      connectionContext,
+      settings,
+      log)
 
   type ServerLayer = Http.ServerLayer
 
@@ -219,9 +238,10 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
     * can only be materialized once. The `remoteAddress`, if provided, will be added as a header to each [[akka.http.scaladsl.model.HttpRequest]]
     * this layer produces if the `akka.http.server.remote-address-header` configuration option is enabled.
     */
-  def serverLayer(settings: ServerSettings,
-                  remoteAddress: Option[InetSocketAddress] = None,
-                  log: LoggingAdapter = system.log)(
+  def serverLayer(
+      settings: ServerSettings,
+      remoteAddress: Option[InetSocketAddress] = None,
+      log: LoggingAdapter = system.log)(
       implicit mat: Materializer): ServerLayer =
     HttpServerBluePrint(settings, remoteAddress, log)
 
@@ -241,12 +261,13 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
       settings: ClientConnectionSettings = ClientConnectionSettings(system),
       log: LoggingAdapter = system.log)
     : Flow[HttpRequest, HttpResponse, Future[OutgoingConnection]] =
-    _outgoingConnection(host,
-                        port,
-                        localAddress,
-                        settings,
-                        ConnectionContext.noEncryption(),
-                        log)
+    _outgoingConnection(
+      host,
+      port,
+      localAddress,
+      settings,
+      ConnectionContext.noEncryption(),
+      log)
 
   /**
     * Same as [[#outgoingConnection]] but for encrypted (HTTPS) connections.
@@ -266,22 +287,33 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
       log: LoggingAdapter = system.log)
     : Flow[HttpRequest, HttpResponse, Future[OutgoingConnection]] =
     _outgoingConnection(
-        host, port, localAddress, settings, connectionContext, log)
+      host,
+      port,
+      localAddress,
+      settings,
+      connectionContext,
+      log)
 
-  private def _outgoingConnection(host: String,
-                                  port: Int,
-                                  localAddress: Option[InetSocketAddress],
-                                  settings: ClientConnectionSettings,
-                                  connectionContext: ConnectionContext,
-                                  log: LoggingAdapter)
+  private def _outgoingConnection(
+      host: String,
+      port: Int,
+      localAddress: Option[InetSocketAddress],
+      settings: ClientConnectionSettings,
+      connectionContext: ConnectionContext,
+      log: LoggingAdapter)
     : Flow[HttpRequest, HttpResponse, Future[OutgoingConnection]] = {
     val hostHeader =
       if (port == connectionContext.defaultPort) Host(host)
       else Host(host, port)
     val layer = clientLayer(hostHeader, settings, log)
-    layer.joinMat(_outgoingTlsConnectionLayer(
-            host, port, localAddress, settings, connectionContext, log))(
-        Keep.right)
+    layer.joinMat(
+      _outgoingTlsConnectionLayer(
+        host,
+        port,
+        localAddress,
+        settings,
+        connectionContext,
+        log))(Keep.right)
   }
 
   private def _outgoingTlsConnectionLayer(
@@ -294,12 +326,12 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
     : Flow[SslTlsOutbound, SslTlsInbound, Future[OutgoingConnection]] = {
     val tlsStage = sslTlsStage(connectionContext, Client, Some(host -> port))
     val transportFlow = Tcp().outgoingConnection(
-        new InetSocketAddress(host, port),
-        localAddress,
-        settings.socketOptions,
-        halfClose = true,
-        settings.connectingTimeout,
-        settings.idleTimeout)
+      new InetSocketAddress(host, port),
+      localAddress,
+      settings.socketOptions,
+      halfClose = true,
+      settings.connectingTimeout,
+      settings.idleTimeout)
 
     tlsStage.joinMat(transportFlow) { (_, tcpConnFuture) ⇒
       import system.dispatcher
@@ -321,9 +353,10 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
   /**
     * Constructs a [[akka.http.scaladsl.Http.ClientLayer]] stage using the given [[akka.http.scaladsl.settings.ClientConnectionSettings]].
     */
-  def clientLayer(hostHeader: Host,
-                  settings: ClientConnectionSettings,
-                  log: LoggingAdapter = system.log): ClientLayer =
+  def clientLayer(
+      hostHeader: Host,
+      settings: ClientConnectionSettings,
+      log: LoggingAdapter = system.log): ClientLayer =
     OutgoingConnectionBlueprint(hostHeader, settings, log)
 
   // ** CONNECTION POOL ** //
@@ -351,8 +384,8 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
       settings: ConnectionPoolSettings = defaultConnectionPoolSettings,
       log: LoggingAdapter = system.log)(implicit fm: Materializer)
     : Flow[(HttpRequest, T), (Try[HttpResponse], T), HostConnectionPool] = {
-    val cps = ConnectionPoolSetup(
-        settings, ConnectionContext.noEncryption(), log)
+    val cps =
+      ConnectionPoolSetup(settings, ConnectionContext.noEncryption(), log)
     newHostConnectionPool(HostConnectionPoolSetup(host, port, cps))
   }
 
@@ -392,8 +425,8 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
     * In order to allow for easy response-to-request association the flow takes in a custom, opaque context
     * object of type `T` from the application which is emitted together with the corresponding response.
     */
-  private[akka] def newHostConnectionPool[T](
-      setup: HostConnectionPoolSetup)(implicit fm: Materializer)
+  private[akka] def newHostConnectionPool[T](setup: HostConnectionPoolSetup)(
+      implicit fm: Materializer)
     : Flow[(HttpRequest, T), (Try[HttpResponse], T), HostConnectionPool] = {
     val gatewayFuture =
       FastFuture.successful(new PoolGateway(setup, Promise()))
@@ -426,8 +459,8 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
       settings: ConnectionPoolSettings = defaultConnectionPoolSettings,
       log: LoggingAdapter = system.log)(implicit fm: Materializer)
     : Flow[(HttpRequest, T), (Try[HttpResponse], T), HostConnectionPool] = {
-    val cps = ConnectionPoolSetup(
-        settings, ConnectionContext.noEncryption(), log)
+    val cps =
+      ConnectionPoolSetup(settings, ConnectionContext.noEncryption(), log)
     val setup = HostConnectionPoolSetup(host, port, cps)
     cachedHostConnectionPool(setup)
   }
@@ -470,8 +503,8 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
     * In order to allow for easy response-to-request association the flow takes in a custom, opaque context
     * object of type `T` from the application which is emitted together with the corresponding response.
     */
-  private def cachedHostConnectionPool[T](
-      setup: HostConnectionPoolSetup)(implicit fm: Materializer)
+  private def cachedHostConnectionPool[T](setup: HostConnectionPoolSetup)(
+      implicit fm: Materializer)
     : Flow[(HttpRequest, T), (Try[HttpResponse], T), HostConnectionPool] =
     gatewayClientFlow(setup, cachedGateway(setup))
 
@@ -517,9 +550,9 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
       log: LoggingAdapter = system.log)(
       implicit fm: Materializer): Future[HttpResponse] =
     try {
-      val gatewayFuture = cachedGateway(
-          request, settings, connectionContext, log)
-      gatewayFuture.flatMap(_ (request))(fm.executionContext)
+      val gatewayFuture =
+        cachedGateway(request, settings, connectionContext, log)
+      gatewayFuture.flatMap(_(request))(fm.executionContext)
     } catch {
       case e: IllegalUriException ⇒ FastFuture.failed(e)
     }
@@ -549,26 +582,32 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
       log: LoggingAdapter = system.log)
     : Flow[Message, Message, Future[WebSocketUpgradeResponse]] = {
     import request.uri
-    require(uri.isAbsolute,
-            s"WebSocket request URI must be absolute but was '$uri'")
+    require(
+      uri.isAbsolute,
+      s"WebSocket request URI must be absolute but was '$uri'")
 
     val ctx = uri.scheme match {
       case "ws" ⇒ ConnectionContext.noEncryption()
       case "wss" if connectionContext.isSecure ⇒ connectionContext
       case "wss" ⇒
         throw new IllegalArgumentException(
-            "Provided connectionContext is not secure, yet request to secure `wss` endpoint detected!")
+          "Provided connectionContext is not secure, yet request to secure `wss` endpoint detected!")
       case scheme ⇒
         throw new IllegalArgumentException(
-            s"Illegal URI scheme '$scheme' in '$uri' for WebSocket request. " +
+          s"Illegal URI scheme '$scheme' in '$uri' for WebSocket request. " +
             s"WebSocket requests must use either 'ws' or 'wss'")
     }
     val host = uri.authority.host.address
     val port = uri.effectivePort
 
     webSocketClientLayer(request, settings, log).joinMat(
-        _outgoingTlsConnectionLayer(
-            host, port, localAddress, settings, ctx, log))(Keep.left)
+      _outgoingTlsConnectionLayer(
+        host,
+        port,
+        localAddress,
+        settings,
+        ctx,
+        log))(Keep.left)
   }
 
   /**
@@ -583,11 +622,9 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
       settings: ClientConnectionSettings = ClientConnectionSettings(system),
       log: LoggingAdapter = system.log)(
       implicit mat: Materializer): (Future[WebSocketUpgradeResponse], T) =
-    webSocketClientFlow(request,
-                        connectionContext,
-                        localAddress,
-                        settings,
-                        log).joinMat(clientFlow)(Keep.both).run()
+    webSocketClientFlow(request, connectionContext, localAddress, settings, log)
+      .joinMat(clientFlow)(Keep.both)
+      .run()
 
   /**
     * Triggers an orderly shutdown of all host connections pools currently maintained by the [[akka.actor.ActorSystem]].
@@ -603,7 +640,7 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
     import scala.collection.JavaConverters._
     val gateways = hostPoolCache.values().asScala
     system.log.debug(
-        "Initiating orderly shutdown of all active host connections pools...")
+      "Initiating orderly shutdown of all active host connections pools...")
     Future.sequence(gateways.map(_.flatMap(_.shutdown()))).map(_ ⇒ ())
   }
 
@@ -653,19 +690,18 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
   private[http] val hostPoolCache =
     new ConcurrentHashMap[HostConnectionPoolSetup, Future[PoolGateway]]
 
-  private def cachedGateway(request: HttpRequest,
-                            settings: ConnectionPoolSettings,
-                            connectionContext: ConnectionContext,
-                            log: LoggingAdapter)(
-      implicit fm: Materializer): Future[PoolGateway] =
+  private def cachedGateway(
+      request: HttpRequest,
+      settings: ConnectionPoolSettings,
+      connectionContext: ConnectionContext,
+      log: LoggingAdapter)(implicit fm: Materializer): Future[PoolGateway] =
     if (request.uri.scheme.nonEmpty && request.uri.authority.nonEmpty) {
       val httpsCtx =
         if (request.uri.scheme.equalsIgnoreCase("https")) connectionContext
         else ConnectionContext.noEncryption()
       val setup = ConnectionPoolSetup(settings, httpsCtx, log)
       val host = request.uri.authority.host.toString()
-      val hcps = HostConnectionPoolSetup(
-          host, request.uri.effectivePort, setup)
+      val hcps = HostConnectionPoolSetup(host, request.uri.effectivePort, setup)
       cachedGateway(hcps)
     } else {
       val msg =
@@ -680,7 +716,8 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
     hostPoolCache.putIfAbsent(setup, gatewayPromise.future) match {
       case null ⇒ // only one thread can get here at a time
         val whenShuttingDown = Promise[Done]()
-        val gateway = try new PoolGateway(setup, whenShuttingDown) catch {
+        val gateway = try new PoolGateway(setup, whenShuttingDown)
+        catch {
           case NonFatal(e) ⇒
             hostPoolCache.remove(setup)
             gatewayPromise.failure(e)
@@ -689,8 +726,8 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
         val fastFuture = FastFuture.successful(gateway)
         hostPoolCache.put(setup, fastFuture) // optimize subsequent gateway accesses
         gatewayPromise.success(gateway) // satisfy everyone who got a hold of our promise while we were starting up
-        whenShuttingDown.future.onComplete(
-            _ ⇒ hostPoolCache.remove(setup, fastFuture))(fm.executionContext)
+        whenShuttingDown.future.onComplete(_ ⇒
+          hostPoolCache.remove(setup, fastFuture))(fm.executionContext)
         fastFuture
 
       case future ⇒ future // return cached instance
@@ -706,7 +743,8 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
 
   private def clientFlow[T](settings: ConnectionPoolSettings)(
       f: HttpRequest ⇒ (HttpRequest, Future[PoolGateway]))(
-      implicit system: ActorSystem, fm: Materializer)
+      implicit system: ActorSystem,
+      fm: Materializer)
     : Flow[(HttpRequest, T), (Try[HttpResponse], T), NotUsed] = {
     // a connection pool can never have more than pipeliningLimit * maxConnections requests in flight at any point
     val parallelism = settings.pipeliningLimit * settings.maxConnections
@@ -716,18 +754,18 @@ class HttpExt(private val config: Config)(implicit val system: ActorSystem)
         val result =
           Promise[(Try[HttpResponse], T)]() // TODO: simplify to `transformWith` when on Scala 2.12
         gatewayFuture
-          .flatMap(_ (effectiveRequest))(fm.executionContext)
-          .onComplete(
-              responseTry ⇒ result.success(responseTry -> userContext))(
-              fm.executionContext)
+          .flatMap(_(effectiveRequest))(fm.executionContext)
+          .onComplete(responseTry ⇒ result.success(responseTry -> userContext))(
+            fm.executionContext)
         result.future
     }
   }
 
   /** Creates real or placebo SslTls stage based on if ConnectionContext is HTTPS or not. */
-  private[http] def sslTlsStage(connectionContext: ConnectionContext,
-                                role: TLSRole,
-                                hostInfo: Option[(String, Int)] = None) =
+  private[http] def sslTlsStage(
+      connectionContext: ConnectionContext,
+      role: TLSRole,
+      hostInfo: Option[(String, Int)] = None) =
     connectionContext match {
       case hctx: HttpsConnectionContext ⇒
         TLS(hctx.sslContext, hctx.firstSession, role, hostInfo = hostInfo)
@@ -750,8 +788,8 @@ object Http extends ExtensionId[HttpExt] with ExtensionIdProvider {
     *                +------+
     * }}}
     */
-  type ServerLayer = BidiFlow[
-      HttpResponse, SslTlsOutbound, SslTlsInbound, HttpRequest, NotUsed]
+  type ServerLayer =
+    BidiFlow[HttpResponse, SslTlsOutbound, SslTlsInbound, HttpRequest, NotUsed]
   //#
 
   //#client-layer
@@ -767,8 +805,8 @@ object Http extends ExtensionId[HttpExt] with ExtensionIdProvider {
     *                +------+
     * }}}
     */
-  type ClientLayer = BidiFlow[
-      HttpRequest, SslTlsOutbound, SslTlsInbound, HttpResponse, NotUsed]
+  type ClientLayer =
+    BidiFlow[HttpRequest, SslTlsOutbound, SslTlsInbound, HttpResponse, NotUsed]
   //#
 
   /**
@@ -783,11 +821,12 @@ object Http extends ExtensionId[HttpExt] with ExtensionIdProvider {
     *                +------+
     * }}}
     */
-  type WebSocketClientLayer = BidiFlow[Message,
-                                       SslTlsOutbound,
-                                       SslTlsInbound,
-                                       Message,
-                                       Future[WebSocketUpgradeResponse]]
+  type WebSocketClientLayer = BidiFlow[
+    Message,
+    SslTlsOutbound,
+    SslTlsInbound,
+    Message,
+    Future[WebSocketUpgradeResponse]]
 
   /**
     * Represents a prospective HTTP server binding.
@@ -834,8 +873,8 @@ object Http extends ExtensionId[HttpExt] with ExtensionIdProvider {
       * Handles the connection with the given handler function.
       */
     def handleWithAsyncHandler(
-        handler: HttpRequest ⇒ Future[HttpResponse], parallelism: Int = 1)(
-        implicit fm: Materializer): Unit =
+        handler: HttpRequest ⇒ Future[HttpResponse],
+        parallelism: Int = 1)(implicit fm: Materializer): Unit =
       handleWith(Flow[HttpRequest].mapAsync(parallelism)(handler))
   }
 
@@ -843,12 +882,13 @@ object Http extends ExtensionId[HttpExt] with ExtensionIdProvider {
     * Represents a prospective outgoing HTTP connection.
     */
   final case class OutgoingConnection(
-      localAddress: InetSocketAddress, remoteAddress: InetSocketAddress)
+      localAddress: InetSocketAddress,
+      remoteAddress: InetSocketAddress)
 
   /**
     * Represents a connection pool to a specific target host and pool configuration.
     */
-  final case class HostConnectionPool private[http](
+  final case class HostConnectionPool private[http] (
       setup: HostConnectionPoolSetup)(
       private[http] val gatewayFuture: Future[PoolGateway]) {
     // enable test access
@@ -900,7 +940,7 @@ trait DefaultSSLContextCreation {
     val sslContext =
       if (sslConfig.config.default) {
         log.debug(
-            "buildSSLContext: ssl-config.default is true, using default SSLContext")
+          "buildSSLContext: ssl-config.default is true, using default SSLContext")
         sslConfig.validateDefaultTrustManager(config)
         SSLContext.getDefault
       } else {
@@ -908,7 +948,10 @@ trait DefaultSSLContextCreation {
         val keyManagerFactory = sslConfig.buildKeyManagerFactory(config)
         val trustManagerFactory = sslConfig.buildTrustManagerFactory(config)
         new ConfigSSLContextBuilder(
-            mkLogger, config, keyManagerFactory, trustManagerFactory).build()
+          mkLogger,
+          config,
+          keyManagerFactory,
+          trustManagerFactory).build()
       }
 
     // protocols!
@@ -933,10 +976,11 @@ trait DefaultSSLContextCreation {
     // hostname!
     defaultParams.setEndpointIdentificationAlgorithm("https")
 
-    new HttpsConnectionContext(sslContext,
-                               Some(cipherSuites.toList),
-                               Some(defaultProtocols.toList),
-                               clientAuth,
-                               Some(defaultParams))
+    new HttpsConnectionContext(
+      sslContext,
+      Some(cipherSuites.toList),
+      Some(defaultProtocols.toList),
+      clientAuth,
+      Some(defaultParams))
   }
 }

@@ -16,7 +16,8 @@ class ClassLoaderObjectInputStream(classLoader: ClassLoader, is: InputStream)
     extends ObjectInputStream(is) {
   override protected def resolveClass(
       objectStreamClass: ObjectStreamClass): Class[_] =
-    try Class.forName(objectStreamClass.getName, false, classLoader) catch {
+    try Class.forName(objectStreamClass.getName, false, classLoader)
+    catch {
       case cnfe: ClassNotFoundException ⇒ super.resolveClass(objectStreamClass)
     }
 }

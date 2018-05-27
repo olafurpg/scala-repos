@@ -12,7 +12,7 @@ object FileEditHelper {
   def fromChange(ch: Change): FileEdit = {
     ch match {
       case ch: TextChange => TextEdit(ch.file.file, ch.from, ch.to, ch.text)
-      case _ => throw new UnsupportedOperationException(ch.toString)
+      case _              => throw new UnsupportedOperationException(ch.toString)
     }
   }
 
@@ -22,13 +22,17 @@ object FileEditHelper {
     }
   }
 
-  def diffFromTextEdits(ch: List[TextEdit],
-                        source: String,
-                        originalFile: File,
-                        revisedFile: File): String = {
+  def diffFromTextEdits(
+      ch: List[TextEdit],
+      source: String,
+      originalFile: File,
+      revisedFile: File): String = {
     val newContents = applyEdits(ch, source)
     DiffUtil.compareContents(
-        source.lines.toSeq, newContents.lines.toSeq, originalFile, revisedFile)
+      source.lines.toSeq,
+      newContents.lines.toSeq,
+      originalFile,
+      revisedFile)
   }
 
   //TODO: add diffFromNewFile and diffFromDeleteFile

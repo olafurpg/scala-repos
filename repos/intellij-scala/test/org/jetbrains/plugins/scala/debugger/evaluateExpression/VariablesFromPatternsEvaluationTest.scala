@@ -1,22 +1,29 @@
 package org.jetbrains.plugins.scala
 package debugger.evaluateExpression
 
-import org.jetbrains.plugins.scala.debugger.{ScalaDebuggerTestCase, ScalaVersion_2_11, ScalaVersion_2_12}
+import org.jetbrains.plugins.scala.debugger.{
+  ScalaDebuggerTestCase,
+  ScalaVersion_2_11,
+  ScalaVersion_2_12
+}
 
 /**
   * Nikolay.Tropin
   * 8/5/13
   */
 class VariablesFromPatternsEvaluationTest
-    extends VariablesFromPatternsEvaluationTestBase with ScalaVersion_2_11
+    extends VariablesFromPatternsEvaluationTestBase
+    with ScalaVersion_2_11
 
 class VariablesFromPatternsEvaluationTest_212
-    extends VariablesFromPatternsEvaluationTestBase with ScalaVersion_2_12
+    extends VariablesFromPatternsEvaluationTestBase
+    with ScalaVersion_2_12
 
 abstract class VariablesFromPatternsEvaluationTestBase
     extends ScalaDebuggerTestCase {
-  addFileWithBreakpoints("Match.scala",
-                         s"""
+  addFileWithBreakpoints(
+    "Match.scala",
+    s"""
        |object Match {
        |  val name = "name"
        |  def main(args: Array[String]) {
@@ -28,7 +35,8 @@ abstract class VariablesFromPatternsEvaluationTestBase
        |    }
        |  }
        |}
-      """.stripMargin.trim())
+      """.stripMargin.trim()
+  )
   def testMatch() {
     runDebugger() {
       waitForBreakpoint()
@@ -43,8 +51,9 @@ abstract class VariablesFromPatternsEvaluationTestBase
     }
   }
 
-  addFileWithBreakpoints("MatchInForStmt.scala",
-                         s"""
+  addFileWithBreakpoints(
+    "MatchInForStmt.scala",
+    s"""
        |object MatchInForStmt {
        |  val name = "name"
        |  def main(args: Array[String]) {
@@ -58,7 +67,8 @@ abstract class VariablesFromPatternsEvaluationTestBase
        |    }
        |  }
        |}
-      """.stripMargin.trim())
+      """.stripMargin.trim()
+  )
   def testMatchInForStmt() {
     runDebugger() {
       waitForBreakpoint()
@@ -77,9 +87,10 @@ abstract class VariablesFromPatternsEvaluationTestBase
     }
   }
 
-  addFileWithBreakpoints("RegexMatch.scala", {
-    val pattern = """"(-)?(\\d+)(\\.\\d*)?".r"""
-    s"""
+  addFileWithBreakpoints(
+    "RegexMatch.scala", {
+      val pattern = """"(-)?(\\d+)(\\.\\d*)?".r"""
+      s"""
          |object RegexMatch {
          |  val name = "name"
          |  def main(args: Array[String]) {
@@ -92,7 +103,8 @@ abstract class VariablesFromPatternsEvaluationTestBase
          |  }
          |}
       """.stripMargin.trim()
-  })
+    }
+  )
   def testRegexMatch() {
     runDebugger() {
       waitForBreakpoint()
@@ -103,8 +115,9 @@ abstract class VariablesFromPatternsEvaluationTestBase
     }
   }
 
-  addFileWithBreakpoints("Multilevel.scala",
-                         s"""
+  addFileWithBreakpoints(
+    "Multilevel.scala",
+    s"""
        |object Multilevel {
        |  val name = "name"
        |  def main(args: Array[String]) {
@@ -123,7 +136,8 @@ abstract class VariablesFromPatternsEvaluationTestBase
        |    }
        |  }
        |}
-      """.stripMargin.trim())
+      """.stripMargin.trim()
+  )
   def testMultilevel() {
     runDebugger() {
       waitForBreakpoint()
@@ -136,8 +150,9 @@ abstract class VariablesFromPatternsEvaluationTestBase
     }
   }
 
-  addFileWithBreakpoints("LocalInMatch.scala",
-                         s"""
+  addFileWithBreakpoints(
+    "LocalInMatch.scala",
+    s"""
        |object LocalInMatch {
        |  val name = "name"
        |  def main(args: Array[String]) {
@@ -151,7 +166,8 @@ abstract class VariablesFromPatternsEvaluationTestBase
        |    }
        |  }
        |}
-      """.stripMargin.trim())
+      """.stripMargin.trim()
+  )
   def testLocalInMatch() {
     runDebugger() {
       waitForBreakpoint()
@@ -163,8 +179,9 @@ abstract class VariablesFromPatternsEvaluationTestBase
     }
   }
 
-  addFileWithBreakpoints("AnonymousInMatch.scala",
-                         s"""
+  addFileWithBreakpoints(
+    "AnonymousInMatch.scala",
+    s"""
        |object AnonymousInMatch {
        |  val name = "name"
        |  def main(args: Array[String]) {
@@ -177,7 +194,8 @@ abstract class VariablesFromPatternsEvaluationTestBase
        |    }
        |  }
        |}
-      """.stripMargin.trim())
+      """.stripMargin.trim()
+  )
   def testAnonymousInMatch() {
     runDebugger() {
       waitForBreakpoint()

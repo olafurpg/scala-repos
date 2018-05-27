@@ -10,7 +10,8 @@ import akka.http.scaladsl.unmarshalling.PredefinedFromStringUnmarshallers
 import docs.http.scaladsl.server.RoutingSpec
 
 class ParameterDirectivesExamplesSpec
-    extends RoutingSpec with PredefinedFromStringUnmarshallers {
+    extends RoutingSpec
+    with PredefinedFromStringUnmarshallers {
   "example-1" in {
     val route = parameter('color) { color =>
       complete(s"The color is '$color'")
@@ -30,7 +31,7 @@ class ParameterDirectivesExamplesSpec
     val route = parameters('color, 'backgroundColor) {
       (color, backgroundColor) =>
         complete(
-            s"The color is '$color' and the background is '$backgroundColor'")
+          s"The color is '$color' and the background is '$backgroundColor'")
     }
 
     // tests:
@@ -47,7 +48,7 @@ class ParameterDirectivesExamplesSpec
       (color, backgroundColor) =>
         val backgroundStr = backgroundColor.getOrElse("<undefined>")
         complete(
-            s"The color is '$color' and the background is '$backgroundStr'")
+          s"The color is '$color' and the background is '$backgroundStr'")
     }
 
     // tests:
@@ -62,7 +63,7 @@ class ParameterDirectivesExamplesSpec
     val route = parameters('color, 'backgroundColor ? "white") {
       (color, backgroundColor) =>
         complete(
-            s"The color is '$color' and the background is '$backgroundColor'")
+          s"The color is '$color' and the background is '$backgroundColor'")
     }
 
     // tests:
@@ -111,7 +112,7 @@ class ParameterDirectivesExamplesSpec
           complete(s"The color is '$color' and the city is $city.")
         case multiple =>
           complete(
-              s"The color is '$color' and the cities are ${multiple.mkString(", ")}.")
+            s"The color is '$color' and the cities are ${multiple.mkString(", ")}.")
       }
     }
 
@@ -137,7 +138,7 @@ class ParameterDirectivesExamplesSpec
           complete(s"The color is '$color' and the distance is $distance.")
         case multiple =>
           complete(
-              s"The color is '$color' and the distances are ${multiple.mkString(", ")}.")
+            s"The color is '$color' and the distances are ${multiple.mkString(", ")}.")
       }
     }
 
@@ -172,7 +173,7 @@ class ParameterDirectivesExamplesSpec
   "parameterMultiMap" in {
     val route = parameterMultiMap { params =>
       complete(
-          s"There are parameters ${params.map(x => x._1 + " -> " + x._2.size).mkString(", ")}")
+        s"There are parameters ${params.map(x => x._1 + " -> " + x._2.size).mkString(", ")}")
     }
 
     // tests:

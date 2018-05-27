@@ -13,17 +13,19 @@ private[pickling] sealed trait IrSymbol {
 private[pickling] object IrSymbol {
   // TODO - This helper method should be available elsewhere.
   def allDeclaredMethodIncludingSubclasses(cls: IrClass): Seq[IrMethod] = {
-    def allmethods(clss: List[IrClass],
-                   mthds: Seq[IrMethod],
-                   visitedClasses: Set[String]): Seq[IrMethod] =
+    def allmethods(
+        clss: List[IrClass],
+        mthds: Seq[IrMethod],
+        visitedClasses: Set[String]): Seq[IrMethod] =
       clss match {
         case hd :: tail if visitedClasses(hd.className) =>
           allmethods(tail, mthds, visitedClasses)
         case hd :: tail =>
           val newMthds = hd.methods
-          allmethods(tail ++ hd.parentClasses,
-                     newMthds ++ mthds,
-                     visitedClasses + hd.className)
+          allmethods(
+            tail ++ hd.parentClasses,
+            newMthds ++ mthds,
+            visitedClasses + hd.className)
         case Nil => mthds
       }
     // TODO - We should maybe warn if we see transient fields that cause us not to compile correctly, or maybe
@@ -32,17 +34,19 @@ private[pickling] object IrSymbol {
   }
 
   def allDeclaredFieldsIncludingSubclasses(cls: IrClass): Seq[IrField] = {
-    def allfields(clss: List[IrClass],
-                  fields: Seq[IrField],
-                  visitedClasses: Set[String]): Seq[IrField] =
+    def allfields(
+        clss: List[IrClass],
+        fields: Seq[IrField],
+        visitedClasses: Set[String]): Seq[IrField] =
       clss match {
         case hd :: tail if visitedClasses(hd.className) =>
           allfields(tail, fields, visitedClasses)
         case hd :: tail =>
           val newFields = hd.fields
-          allfields(tail ++ hd.parentClasses,
-                    newFields ++ fields,
-                    visitedClasses + hd.className)
+          allfields(
+            tail ++ hd.parentClasses,
+            newFields ++ fields,
+            visitedClasses + hd.className)
         case Nil => fields
       }
     // TODO - We should maybe warn if we see transient fields that cause us not to compile correctly, or maybe

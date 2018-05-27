@@ -9,7 +9,9 @@ import breeze.numerics.{expm1, log, sqrt}
   * @author dlwh
   **/
 case class Rayleigh(scale: Double)(implicit rand: RandBasis = Rand)
-    extends ContinuousDistr[Double] with Moments[Double, Double] with HasCdf {
+    extends ContinuousDistr[Double]
+    with Moments[Double, Double]
+    with HasCdf {
   def mean: Double = scale * sqrt(Pi / 2)
 
   def mode: Double = scale

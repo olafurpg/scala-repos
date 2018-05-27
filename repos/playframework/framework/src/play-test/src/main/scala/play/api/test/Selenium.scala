@@ -107,7 +107,8 @@ object TestBrowser {
     * @param baseUrl The default base URL that will be used for relative URLs
     */
   def of[WEBDRIVER <: WebDriver](
-      webDriver: Class[WEBDRIVER], baseUrl: Option[String] = None) =
+      webDriver: Class[WEBDRIVER],
+      baseUrl: Option[String] = None) =
     TestBrowser(WebDriverFactory(webDriver), baseUrl)
 }
 
@@ -123,7 +124,7 @@ object WebDriverFactory {
     // Driver-specific configuration
     driver match {
       case htmlunit: HtmlUnitDriver => htmlunit.setJavascriptEnabled(true)
-      case _ =>
+      case _                        =>
     }
     driver
   }

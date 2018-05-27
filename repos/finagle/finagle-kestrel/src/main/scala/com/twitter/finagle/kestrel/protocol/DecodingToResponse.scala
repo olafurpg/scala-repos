@@ -11,10 +11,10 @@ private[kestrel] class DecodingToResponse
   def parseResponse(tokens: Seq[Buf]) = {
     tokens.head match {
       case NOT_FOUND => NotFound()
-      case STORED => Stored()
-      case DELETED => Deleted()
-      case ERROR => Error()
-      case _ => Error()
+      case STORED    => Stored()
+      case DELETED   => Deleted()
+      case ERROR     => Error()
+      case _         => Error()
     }
   }
 

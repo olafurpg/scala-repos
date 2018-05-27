@@ -37,18 +37,27 @@ import org.apache.spark.rdd.RDD
 class LassoModel @Since("1.1.0")(
     @Since("1.0.0") override val weights: Vector,
     @Since("0.8.0") override val intercept: Double)
-    extends GeneralizedLinearModel(weights, intercept) with RegressionModel
-    with Serializable with Saveable with PMMLExportable {
+    extends GeneralizedLinearModel(weights, intercept)
+    with RegressionModel
+    with Serializable
+    with Saveable
+    with PMMLExportable {
 
   override protected def predictPoint(
-      dataMatrix: Vector, weightMatrix: Vector, intercept: Double): Double = {
+      dataMatrix: Vector,
+      weightMatrix: Vector,
+      intercept: Double): Double = {
     weightMatrix.toBreeze.dot(dataMatrix.toBreeze) + intercept
   }
 
   @Since("1.3.0")
   override def save(sc: SparkContext, path: String): Unit = {
     GLMRegressionModel.SaveLoadV1_0.save(
-        sc, path, this.getClass.getName, weights, intercept)
+      sc,
+      path,
+      this.getClass.getName,
+      weights,
+      intercept)
   }
 
   override protected def formatVersion: String = "1.0"
@@ -66,11 +75,14 @@ object LassoModel extends Loader[LassoModel] {
       case (className, "1.0") if className == classNameV1_0 =>
         val numFeatures = RegressionModel.getNumFeatures(metadata)
         val data = GLMRegressionModel.SaveLoadV1_0.loadData(
-            sc, path, classNameV1_0, numFeatures)
+          sc,
+          path,
+          classNameV1_0,
+          numFeatures)
         new LassoModel(data.weights, data.intercept)
       case _ =>
         throw new Exception(
-            s"LassoModel.load did not recognize model with (className, format version):" +
+          s"LassoModel.load did not recognize model with (className, format version):" +
             s"($loadedClassName, $version).  Supported:\n" +
             s"  ($classNameV1_0, 1.0)")
     }
@@ -86,11 +98,13 @@ object LassoModel extends Loader[LassoModel] {
   * See also the documentation for the precise formulation.
   */
 @Since("0.8.0")
-class LassoWithSGD private (private var stepSize: Double,
-                            private var numIterations: Int,
-                            private var regParam: Double,
-                            private var miniBatchFraction: Double)
-    extends GeneralizedLinearAlgorithm[LassoModel] with Serializable {
+class LassoWithSGD private (
+    private var stepSize: Double,
+    private var numIterations: Int,
+    private var regParam: Double,
+    private var miniBatchFraction: Double)
+    extends GeneralizedLinearAlgorithm[LassoModel]
+    with Serializable {
 
   private val gradient = new LeastSquaresGradient()
   private val updater = new L1Updater()
@@ -137,12 +151,13 @@ object LassoWithSGD {
     *
     */
   @Since("1.0.0")
-  def train(input: RDD[LabeledPoint],
-            numIterations: Int,
-            stepSize: Double,
-            regParam: Double,
-            miniBatchFraction: Double,
-            initialWeights: Vector): LassoModel = {
+  def train(
+      input: RDD[LabeledPoint],
+      numIterations: Int,
+      stepSize: Double,
+      regParam: Double,
+      miniBatchFraction: Double,
+      initialWeights: Vector): LassoModel = {
     new LassoWithSGD(stepSize, numIterations, regParam, miniBatchFraction)
       .run(input, initialWeights)
   }
@@ -161,11 +176,12 @@ object LassoWithSGD {
     *
     */
   @Since("0.8.0")
-  def train(input: RDD[LabeledPoint],
-            numIterations: Int,
-            stepSize: Double,
-            regParam: Double,
-            miniBatchFraction: Double): LassoModel = {
+  def train(
+      input: RDD[LabeledPoint],
+      numIterations: Int,
+      stepSize: Double,
+      regParam: Double,
+      miniBatchFraction: Double): LassoModel = {
     new LassoWithSGD(stepSize, numIterations, regParam, miniBatchFraction)
       .run(input)
   }
@@ -184,10 +200,11 @@ object LassoWithSGD {
     *
     */
   @Since("0.8.0")
-  def train(input: RDD[LabeledPoint],
-            numIterations: Int,
-            stepSize: Double,
-            regParam: Double): LassoModel = {
+  def train(
+      input: RDD[LabeledPoint],
+      numIterations: Int,
+      stepSize: Double,
+      regParam: Double): LassoModel = {
     train(input, numIterations, stepSize, regParam, 1.0)
   }
 

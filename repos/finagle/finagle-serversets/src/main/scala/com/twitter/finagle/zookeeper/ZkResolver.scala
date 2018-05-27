@@ -24,15 +24,15 @@ class ZkResolverException(msg: String) extends Exception(msg)
 
 // Note: this is still used by finagle-memcached.
 private[finagle] class ZkGroup(serverSet: ServerSet, path: String)
-    extends Thread("ZkGroup(%s)".format(path)) with Group[ServiceInstance] {
+    extends Thread("ZkGroup(%s)".format(path))
+    with Group[ServiceInstance] {
   setDaemon(true)
   start()
 
   protected[finagle] val set = Var(Set[ServiceInstance]())
 
   override def run() {
-    serverSet.watch(
-        new DynamicHostSet.HostChangeMonitor[ServiceInstance] {
+    serverSet.watch(new DynamicHostSet.HostChangeMonitor[ServiceInstance] {
       def onChange(newSet: ImmutableSet[ServiceInstance]) = synchronized {
         set() = newSet.asScala.toSet
       }
@@ -51,8 +51,7 @@ private class ZkOffer(serverSet: ServerSet, path: String)
 
   override def run() {
     try {
-      serverSet.watch(
-          new DynamicHostSet.HostChangeMonitor[ServiceInstance] {
+      serverSet.watch(new DynamicHostSet.HostChangeMonitor[ServiceInstance] {
         def onChange(newSet: ImmutableSet[ServiceInstance]) {
           inbound !! newSet.asScala.toSet
         }
@@ -62,10 +61,11 @@ private class ZkOffer(serverSet: ServerSet, path: String)
         // There are certain path permission checks in the serverset library
         // that can cause exceptions here. We'll send an empty set (which
         // becomes a negative resolution).
-        log.log(Level.WARNING,
-                "Exception when trying to watch a ServerSet! " +
-                "Returning negative resolution.",
-                exc)
+        log.log(
+          Level.WARNING,
+          "Exception when trying to watch a ServerSet! " +
+            "Returning negative resolution.",
+          exc)
         inbound !! Set.empty
     }
   }
@@ -79,20 +79,21 @@ class ZkResolver(factory: ZkClientFactory) extends Resolver {
   // With the current serverset client, instances are maintained
   // forever; additional resource leaks aren't created by caching
   // instances here.
-  private type CacheKey = (Set[InetSocketAddress], String, Option[String],
-  Option[Int])
+  private type CacheKey =
+    (Set[InetSocketAddress], String, Option[String], Option[Int])
   private val cache = new mutable.HashMap[CacheKey, Var[Addr]]
 
   def this() = this(DefaultZkClientFactory)
 
-  def resolve(zkHosts: Set[InetSocketAddress],
-              path: String,
-              endpoint: Option[String] = None,
-              shardId: Option[Int] = None): Var[Addr] =
+  def resolve(
+      zkHosts: Set[InetSocketAddress],
+      path: String,
+      endpoint: Option[String] = None,
+      shardId: Option[Int] = None): Var[Addr] =
     synchronized {
       cache.getOrElseUpdate(
-          (zkHosts, path, endpoint, shardId),
-          newVar(zkHosts, path, newToAddresses(endpoint, shardId)))
+        (zkHosts, path, endpoint, shardId),
+        newVar(zkHosts, path, newToAddresses(endpoint, shardId)))
     }
 
   private def newToAddresses(endpoint: Option[String], shardId: Option[Int]) = {
@@ -100,19 +101,19 @@ class ZkResolver(factory: ZkClientFactory) extends Resolver {
     val getEndpoint: PartialFunction[ServiceInstance, Endpoint] =
       endpoint match {
         case Some(epname) => {
-            case inst if inst.getAdditionalEndpoints.containsKey(epname) =>
-              inst.getAdditionalEndpoints.get(epname)
-          }
+          case inst if inst.getAdditionalEndpoints.containsKey(epname) =>
+            inst.getAdditionalEndpoints.get(epname)
+        }
         case None => {
-            case inst: ServiceInstance => inst.getServiceEndpoint()
-          }
+          case inst: ServiceInstance => inst.getServiceEndpoint()
+        }
       }
 
     val filterShardId: PartialFunction[ServiceInstance, ServiceInstance] =
       shardId match {
         case Some(id) => {
-            case inst if inst.isSetShard && inst.shard == id => inst
-          }
+          case inst if inst.isSetShard && inst.shard == id => inst
+        }
         case None => { case x => x }
       }
 
@@ -123,9 +124,10 @@ class ZkResolver(factory: ZkClientFactory) extends Resolver {
       insts.collect(filterShardId).collect(getEndpoint).map(toAddress)
   }
 
-  private def newVar(zkHosts: Set[InetSocketAddress],
-                     path: String,
-                     toAddresses: Set[ServiceInstance] => Set[Address]) = {
+  private def newVar(
+      zkHosts: Set[InetSocketAddress],
+      path: String,
+      toAddresses: Set[ServiceInstance] => Set[Address]) = {
 
     val (zkClient, zkHealthHandler) = factory.get(zkHosts)
     val zkOffer = new ZkOffer(new ServerSetImpl(zkClient, path), path)
@@ -136,10 +138,11 @@ class ZkResolver(factory: ZkClientFactory) extends Resolver {
         else Addr.Neg
       }
 
-    val stable = StabilizingAddr(addrOffer,
-                                 zkHealthHandler,
-                                 factory.sessionTimeout,
-                                 DefaultStatsReceiver.scope("zkGroup"))
+    val stable = StabilizingAddr(
+      addrOffer,
+      zkHealthHandler,
+      factory.sessionTimeout,
+      DefaultStatsReceiver.scope("zkGroup"))
 
     val v = Var[Addr](Addr.Pending)
     stable foreach { newAddr =>
@@ -153,7 +156,7 @@ class ZkResolver(factory: ZkClientFactory) extends Resolver {
     val zkHosts = factory.hostSet(hosts)
     if (zkHosts.isEmpty) {
       throw new ZkResolverException(
-          "ZK client address \"%s\" resolves to nothing".format(hosts))
+        "ZK client address \"%s\" resolves to nothing".format(hosts))
     }
     zkHosts
   }

@@ -29,22 +29,24 @@ import org.apache.spark.{SparkContext, SparkException, SparkFunSuite, TestUtils}
 class MutableURLClassLoaderSuite extends SparkFunSuite with Matchers {
 
   val urls2 = List(
-      TestUtils.createJarWithClasses(
-          classNames = Seq("FakeClass1", "FakeClass2", "FakeClass3"),
-          toStringValue = "2")).toArray
+    TestUtils.createJarWithClasses(
+      classNames = Seq("FakeClass1", "FakeClass2", "FakeClass3"),
+      toStringValue = "2")).toArray
   val urls = List(
-      TestUtils.createJarWithClasses(
-          classNames = Seq("FakeClass1"),
-          classNamesWithBase = Seq(("FakeClass2", "FakeClass3")), // FakeClass3 is in parent
-          toStringValue = "1",
-          classpathUrls = urls2)).toArray
+    TestUtils.createJarWithClasses(
+      classNames = Seq("FakeClass1"),
+      classNamesWithBase = Seq(("FakeClass2", "FakeClass3")), // FakeClass3 is in parent
+      toStringValue = "1",
+      classpathUrls = urls2)).toArray
 
   val fileUrlsChild = List(
-      TestUtils.createJarWithFiles(
-          Map("resource1" -> "resource1Contents-child",
-              "resource2" -> "resource2Contents"))).toArray
-  val fileUrlsParent = List(TestUtils.createJarWithFiles(
-          Map("resource1" -> "resource1Contents-parent"))).toArray
+    TestUtils.createJarWithFiles(
+      Map(
+        "resource1" -> "resource1Contents-child",
+        "resource2" -> "resource2Contents"))).toArray
+  val fileUrlsParent = List(
+    TestUtils.createJarWithFiles(
+      Map("resource1" -> "resource1Contents-parent"))).toArray
 
   test("child first") {
     val parentLoader = new URLClassLoader(urls2, null)
@@ -105,7 +107,7 @@ class MutableURLClassLoaderSuite extends SparkFunSuite with Matchers {
     assert(classLoader.getResources("resource2").asScala.size === 1)
 
     res1.map(scala.io.Source.fromURL(_).mkString) should contain inOrderOnly
-    ("resource1Contents-child", "resource1Contents-parent")
+      ("resource1Contents-child", "resource1Contents-parent")
   }
 
   test("driver sets context class loader in local mode") {

@@ -25,12 +25,14 @@ object TmplDef {
   def parse(builder: ScalaPsiBuilder): Boolean = {
     val templateMarker = builder.mark
     templateMarker.setCustomEdgeTokenBinders(
-        ScalaTokenBinders.PRECEEDING_COMMENTS_TOKEN, null)
+      ScalaTokenBinders.PRECEEDING_COMMENTS_TOKEN,
+      null)
     val annotationsMarker = builder.mark
     while (Annotation.parse(builder)) {}
     annotationsMarker.done(ScalaElementTypes.ANNOTATIONS)
     annotationsMarker.setCustomEdgeTokenBinders(
-        ScalaTokenBinders.DEFAULT_LEFT_EDGE_BINDER, null)
+      ScalaTokenBinders.DEFAULT_LEFT_EDGE_BINDER,
+      null)
     //parsing modifiers
     val modifierMarker = builder.mark
     while (Modifier.parse(builder)) {}
@@ -65,24 +67,24 @@ object TmplDef {
         modifierMarker.done(ScalaElementTypes.MODIFIERS)
         builder.getTokenType match {
           case ScalaTokenTypes.kTRAIT => {
-              builder.advanceLexer() //Ate trait
-              if (TraitDef.parse(builder)) {
-                templateMarker.done(ScalaElementTypes.TRAIT_DEF)
-              } else {
-                templateMarker.drop()
-              }
-              true
+            builder.advanceLexer() //Ate trait
+            if (TraitDef.parse(builder)) {
+              templateMarker.done(ScalaElementTypes.TRAIT_DEF)
+            } else {
+              templateMarker.drop()
             }
+            true
+          }
           // In this way wrong case modifier
           case _ => {
-              builder error ErrMsg("wrong.case.modifier")
-              builder.advanceLexer() //Ate case
-              builder.getTokenText
-              builder.advanceLexer() //Ate trait
-              TraitDef.parse(builder)
-              templateMarker.done(ScalaElementTypes.TRAIT_DEF)
-              true
-            }
+            builder error ErrMsg("wrong.case.modifier")
+            builder.advanceLexer() //Ate case
+            builder.getTokenText
+            builder.advanceLexer() //Ate trait
+            TraitDef.parse(builder)
+            templateMarker.done(ScalaElementTypes.TRAIT_DEF)
+            true
+          }
         }
       //it's error
       case _ =>

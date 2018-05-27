@@ -59,21 +59,20 @@ object PowerIterationClusteringExample {
       k: Int = 2,
       numPoints: Int = 10,
       maxIterations: Int = 15
-  )
-      extends AbstractParams[Params]
+  ) extends AbstractParams[Params]
 
   def main(args: Array[String]) {
     val defaultParams = Params()
 
     val parser = new OptionParser[Params]("PowerIterationClusteringExample") {
       head(
-          "PowerIterationClusteringExample: an example PIC app using concentric circles.")
+        "PowerIterationClusteringExample: an example PIC app using concentric circles.")
       opt[Int]('k', "k")
         .text(s"number of circles (clusters), default: ${defaultParams.k}")
         .action((x, c) => c.copy(k = x))
       opt[Int]('n', "n")
         .text(
-            s"number of points in smallest circle, default: ${defaultParams.numPoints}")
+          s"number of points in smallest circle, default: ${defaultParams.numPoints}")
         .action((x, c) => c.copy(numPoints = x))
       opt[Int]("maxIterations")
         .text(s"number of iterations, default: ${defaultParams.maxIterations}")
@@ -109,13 +108,18 @@ object PowerIterationClusteringExample {
     val clusters =
       model.assignments.collect().groupBy(_.cluster).mapValues(_.map(_.id))
     val assignments = clusters.toList.sortBy { case (k, v) => v.length }
-    val assignmentsStr = assignments.map {
-      case (k, v) =>
-        s"$k -> ${v.sorted.mkString("[", ",", "]")}"
-    }.mkString(", ")
-    val sizesStr = assignments.map {
-      _._2.length
-    }.sorted.mkString("(", ",", ")")
+    val assignmentsStr = assignments
+      .map {
+        case (k, v) =>
+          s"$k -> ${v.sorted.mkString("[", ",", "]")}"
+      }
+      .mkString(", ")
+    val sizesStr = assignments
+      .map {
+        _._2.length
+      }
+      .sorted
+      .mkString("(", ",", ")")
     println(s"Cluster assignments: $assignmentsStr\ncluster sizes: $sizesStr")
     // $example off$
 
@@ -129,9 +133,10 @@ object PowerIterationClusteringExample {
     }
   }
 
-  def generateCirclesRdd(sc: SparkContext,
-                         nCircles: Int,
-                         nPoints: Int): RDD[(Long, Long, Double)] = {
+  def generateCirclesRdd(
+      sc: SparkContext,
+      nCircles: Int,
+      nPoints: Int): RDD[(Long, Long, Double)] = {
     val points = (1 to nCircles).flatMap { i =>
       generateCircle(i, i * nPoints)
     }.zipWithIndex

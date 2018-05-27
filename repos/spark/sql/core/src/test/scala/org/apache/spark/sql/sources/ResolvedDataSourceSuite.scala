@@ -25,33 +25,39 @@ class ResolvedDataSourceSuite extends SparkFunSuite {
     DataSource(sqlContext = null, className = name).providingClass
 
   test("jdbc") {
-    assert(getProvidingClass("jdbc") === classOf[
-            org.apache.spark.sql.execution.datasources.jdbc.DefaultSource])
     assert(
-        getProvidingClass("org.apache.spark.sql.execution.datasources.jdbc") === classOf[
-            org.apache.spark.sql.execution.datasources.jdbc.DefaultSource])
-    assert(getProvidingClass("org.apache.spark.sql.jdbc") === classOf[
-            org.apache.spark.sql.execution.datasources.jdbc.DefaultSource])
+      getProvidingClass("jdbc") === classOf[
+        org.apache.spark.sql.execution.datasources.jdbc.DefaultSource])
+    assert(
+      getProvidingClass("org.apache.spark.sql.execution.datasources.jdbc") === classOf[
+        org.apache.spark.sql.execution.datasources.jdbc.DefaultSource])
+    assert(
+      getProvidingClass("org.apache.spark.sql.jdbc") === classOf[
+        org.apache.spark.sql.execution.datasources.jdbc.DefaultSource])
   }
 
   test("json") {
-    assert(getProvidingClass("json") === classOf[
-            org.apache.spark.sql.execution.datasources.json.DefaultSource])
     assert(
-        getProvidingClass("org.apache.spark.sql.execution.datasources.json") === classOf[
-            org.apache.spark.sql.execution.datasources.json.DefaultSource])
-    assert(getProvidingClass("org.apache.spark.sql.json") === classOf[
-            org.apache.spark.sql.execution.datasources.json.DefaultSource])
+      getProvidingClass("json") === classOf[
+        org.apache.spark.sql.execution.datasources.json.DefaultSource])
+    assert(
+      getProvidingClass("org.apache.spark.sql.execution.datasources.json") === classOf[
+        org.apache.spark.sql.execution.datasources.json.DefaultSource])
+    assert(
+      getProvidingClass("org.apache.spark.sql.json") === classOf[
+        org.apache.spark.sql.execution.datasources.json.DefaultSource])
   }
 
   test("parquet") {
-    assert(getProvidingClass("parquet") === classOf[
-            org.apache.spark.sql.execution.datasources.parquet.DefaultSource])
+    assert(
+      getProvidingClass("parquet") === classOf[
+        org.apache.spark.sql.execution.datasources.parquet.DefaultSource])
     assert(getProvidingClass(
-            "org.apache.spark.sql.execution.datasources.parquet") === classOf[
-            org.apache.spark.sql.execution.datasources.parquet.DefaultSource])
-    assert(getProvidingClass("org.apache.spark.sql.parquet") === classOf[
-            org.apache.spark.sql.execution.datasources.parquet.DefaultSource])
+      "org.apache.spark.sql.execution.datasources.parquet") === classOf[
+      org.apache.spark.sql.execution.datasources.parquet.DefaultSource])
+    assert(
+      getProvidingClass("org.apache.spark.sql.parquet") === classOf[
+        org.apache.spark.sql.execution.datasources.parquet.DefaultSource])
   }
 
   test("error message for unknown data sources") {

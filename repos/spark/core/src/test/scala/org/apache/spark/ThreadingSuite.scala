@@ -35,8 +35,7 @@ object ThreadingSuiteState {
   }
 }
 
-class ThreadingSuite
-    extends SparkFunSuite with LocalSparkContext with Logging {
+class ThreadingSuite extends SparkFunSuite with LocalSparkContext with Logging {
 
   test("accessing SparkContext form a different thread") {
     sc = new SparkContext("local", "test")
@@ -127,19 +126,18 @@ class ThreadingSuite
         override def run() {
           try {
             val ans = nums
-              .map(number =>
-                    {
-                  val running = ThreadingSuiteState.runningThreads
-                  running.getAndIncrement()
-                  val time = System.currentTimeMillis()
-                  while (running.get() != 4 &&
-                  System.currentTimeMillis() < time + 1000) {
-                    Thread.sleep(100)
-                  }
-                  if (running.get() != 4) {
-                    ThreadingSuiteState.failed.set(true)
-                  }
-                  number
+              .map(number => {
+                val running = ThreadingSuiteState.runningThreads
+                running.getAndIncrement()
+                val time = System.currentTimeMillis()
+                while (running.get() != 4 &&
+                       System.currentTimeMillis() < time + 1000) {
+                  Thread.sleep(100)
+                }
+                if (running.get() != 4) {
+                  ThreadingSuiteState.failed.set(true)
+                }
+                number
               })
               .collect()
             assert(ans.toList === List(1, 2))
@@ -157,7 +155,8 @@ class ThreadingSuite
       throw improveStackTrace(t)
     }
     if (ThreadingSuiteState.failed.get()) {
-      logError("Waited 1 second without seeing runningThreads = 4 (it was " +
+      logError(
+        "Waited 1 second without seeing runningThreads = 4 (it was " +
           ThreadingSuiteState.runningThreads.get() + "); failing test")
       fail("One or more threads didn't see runningThreads = 4")
     }

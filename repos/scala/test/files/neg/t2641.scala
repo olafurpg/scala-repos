@@ -11,7 +11,8 @@ abstract class ManagedSeqStrict[+A]
 }
 
 trait ManagedSeq[+A, +Coll]
-    extends ManagedSeqStrict[A] with TraversableView[A, ManagedSeqStrict[A]]
+    extends ManagedSeqStrict[A]
+    with TraversableView[A, ManagedSeqStrict[A]]
     with TraversableViewLike[A, ManagedSeqStrict[A], ManagedSeq[A]] {
   self =>
 

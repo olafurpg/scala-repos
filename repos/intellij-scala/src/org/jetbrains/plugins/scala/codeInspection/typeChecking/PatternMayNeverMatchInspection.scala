@@ -3,11 +3,22 @@ package org.jetbrains.plugins.scala.codeInspection.typeChecking
 import com.intellij.codeInspection.{ProblemHighlightType, ProblemsHolder}
 import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.annotator.PatternAnnotatorUtil
-import org.jetbrains.plugins.scala.codeInspection.typeChecking.PatternMayNeverMatchInspection.{ScPatternExpectedAndPatternType, inspectionId, inspectionName}
-import org.jetbrains.plugins.scala.codeInspection.{AbstractInspection, InspectionBundle}
+import org.jetbrains.plugins.scala.codeInspection.typeChecking.PatternMayNeverMatchInspection.{
+  ScPatternExpectedAndPatternType,
+  inspectionId,
+  inspectionName
+}
+import org.jetbrains.plugins.scala.codeInspection.{
+  AbstractInspection,
+  InspectionBundle
+}
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScPattern
 import org.jetbrains.plugins.scala.lang.psi.types.ComparingUtil._
-import org.jetbrains.plugins.scala.lang.psi.types.{Conformance, ScType, ScTypePresentation}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  Conformance,
+  ScType,
+  ScTypePresentation
+}
 
 /**
   * Author: Svyatoslav Ilinskiy
@@ -19,12 +30,14 @@ class PatternMayNeverMatchInspection
       holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
     case pat @ ScPatternExpectedAndPatternType(exTp, patType)
         if !PatternAnnotatorUtil.matchesPattern(exTp, patType) &&
-        !Conformance.conforms(exTp, patType) =>
+          !Conformance.conforms(exTp, patType) =>
       if (!isNeverSubType(exTp, patType)) {
         //need to check so inspection highlighting doesn't interfere with PatterAnnotator's
         val message = PatternMayNeverMatchInspection.message(exTp, patType)
         holder.registerProblem(
-            pat, message, ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
+          pat,
+          message,
+          ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
       }
   }
 }
@@ -41,7 +54,7 @@ object PatternMayNeverMatchInspection {
     def unapply(pat: ScPattern): Option[(ScType, ScType)] = {
       (pat.expectedType, PatternAnnotatorUtil.patternType(pat)) match {
         case (Some(expected), Some(pattern)) => Option((expected, pattern))
-        case _ => None
+        case _                               => None
       }
     }
   }

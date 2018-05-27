@@ -223,7 +223,10 @@ trait BitSetLike[+This <: BitSetLike[This] with SortedSet[Int]]
   }
 
   override def addString(
-      sb: StringBuilder, start: String, sep: String, end: String) = {
+      sb: StringBuilder,
+      start: String,
+      sep: String,
+      end: String) = {
     sb append start
     var pre = ""
     val max = nwords * WordLength
@@ -249,7 +252,9 @@ object BitSetLike {
   private[collection] final val MaxSize = (Int.MaxValue >> LogWL) + 1
 
   private[collection] def updateArray(
-      elems: Array[Long], idx: Int, w: Long): Array[Long] = {
+      elems: Array[Long],
+      idx: Int,
+      w: Long): Array[Long] = {
     var len = elems.length
     while (len > 0 && (elems(len - 1) == 0L || w == 0L && idx == len - 1)) len -= 1
     var newlen = len

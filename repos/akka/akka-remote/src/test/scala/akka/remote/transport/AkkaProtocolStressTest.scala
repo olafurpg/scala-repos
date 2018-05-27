@@ -13,7 +13,7 @@ import scala.concurrent.Await
 object AkkaProtocolStressTest {
   val configA: Config =
     ConfigFactory parseString
-    ("""
+      ("""
     akka {
       #loglevel = DEBUG
       actor.serialize-messages = off
@@ -41,8 +41,7 @@ object AkkaProtocolStressTest {
 
   object ResendFinal
 
-  class SequenceVerifier(remote: ActorRef, controller: ActorRef)
-      extends Actor {
+  class SequenceVerifier(remote: ActorRef, controller: ActorRef) extends Actor {
     import context.dispatcher
 
     val limit = 100000
@@ -89,7 +88,9 @@ object AkkaProtocolStressTest {
 }
 
 class AkkaProtocolStressTest
-    extends AkkaSpec(configA) with ImplicitSender with DefaultTimeout {
+    extends AkkaSpec(configA)
+    with ImplicitSender
+    with DefaultTimeout {
 
   val systemB = ActorSystem("systemB", system.settings.config)
   val remote = systemB.actorOf(Props(new Actor {
@@ -110,9 +111,10 @@ class AkkaProtocolStressTest
     "guarantee at-most-once delivery and message ordering despite packet loss" taggedAs TimingTest in {
       system.eventStream.publish(TestEvent.Mute(DeadLettersFilter[Any]))
       systemB.eventStream.publish(TestEvent.Mute(DeadLettersFilter[Any]))
-      Await.result(RARP(system).provider.transport
-                     .managementCommand(One(addressB, Drop(0.1, 0.1))),
-                   3.seconds.dilated)
+      Await.result(
+        RARP(system).provider.transport
+          .managementCommand(One(addressB, Drop(0.1, 0.1))),
+        3.seconds.dilated)
 
       val tester =
         system.actorOf(Props(classOf[SequenceVerifier], here, self)) ! "start"
@@ -120,25 +122,27 @@ class AkkaProtocolStressTest
       expectMsgPF(60.seconds) {
         case (received: Int, lost: Int) ⇒
           log.debug(
-              s" ######## Received ${received - lost} messages from ${received} ########")
+            s" ######## Received ${received - lost} messages from ${received} ########")
       }
     }
   }
 
   override def beforeTermination() {
     system.eventStream.publish(
-        TestEvent.Mute(
-            EventFilter.warning(
-                source = "akka://AkkaProtocolStressTest/user/$a",
-                start = "received dead letter"),
-            EventFilter.warning(
-                pattern = "received dead letter.*(InboundPayload|Disassociate)")))
+      TestEvent.Mute(
+        EventFilter.warning(
+          source = "akka://AkkaProtocolStressTest/user/$a",
+          start = "received dead letter"),
+        EventFilter.warning(
+          pattern = "received dead letter.*(InboundPayload|Disassociate)")
+      ))
     systemB.eventStream.publish(
-        TestEvent.Mute(
-            EventFilter[EndpointException](),
-            EventFilter.error(start = "AssociationError"),
-            EventFilter.warning(
-                pattern = "received dead letter.*(InboundPayload|Disassociate)")))
+      TestEvent.Mute(
+        EventFilter[EndpointException](),
+        EventFilter.error(start = "AssociationError"),
+        EventFilter.warning(
+          pattern = "received dead letter.*(InboundPayload|Disassociate)")
+      ))
   }
 
   override def afterTermination(): Unit = shutdown(systemB)

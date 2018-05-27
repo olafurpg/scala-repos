@@ -6,13 +6,14 @@ import play.api.mvc.{Request, RequestHeader}
 import lila.pref.Pref
 import lila.user.{UserContext, HeaderUserContext, BodyUserContext}
 
-case class PageData(friends: List[lila.common.LightUser],
-                    teamNbRequests: Int,
-                    nbMessages: Int,
-                    nbChallenges: Int,
-                    pref: Pref,
-                    blindMode: Boolean,
-                    hasFingerprint: Boolean)
+case class PageData(
+    friends: List[lila.common.LightUser],
+    teamNbRequests: Int,
+    nbMessages: Int,
+    nbChallenges: Int,
+    pref: Pref,
+    blindMode: Boolean,
+    hasFingerprint: Boolean)
 
 object PageData {
 
@@ -43,15 +44,15 @@ sealed trait Context extends lila.user.UserContextWrapper {
 
   def currentPieceSet =
     ctxPref("pieceSet").fold(Pref.default.realPieceSet)(
-        lila.pref.PieceSet.apply)
+      lila.pref.PieceSet.apply)
 
   def currentPieceSet3d =
     ctxPref("pieceSet3d").fold(Pref.default.realPieceSet3d)(
-        lila.pref.PieceSet3d.apply)
+      lila.pref.PieceSet3d.apply)
 
   def currentSoundSet =
     ctxPref("soundSet").fold(Pref.default.realSoundSet)(
-        lila.pref.SoundSet.apply)
+      lila.pref.SoundSet.apply)
 
   lazy val currentBg = ctxPref("bg") | "light"
 
@@ -68,7 +69,8 @@ sealed trait Context extends lila.user.UserContextWrapper {
 }
 
 sealed abstract class BaseContext(
-    val userContext: lila.user.UserContext, val pageData: PageData)
+    val userContext: lila.user.UserContext,
+    val pageData: PageData)
     extends Context
 
 final class BodyContext[A](val bodyContext: BodyUserContext[A], data: PageData)
@@ -85,11 +87,11 @@ object Context {
   def apply(req: RequestHeader): HeaderContext =
     new HeaderContext(UserContext(req, none), PageData.default)
 
-  def apply(
-      userContext: HeaderUserContext, pageData: PageData): HeaderContext =
+  def apply(userContext: HeaderUserContext, pageData: PageData): HeaderContext =
     new HeaderContext(userContext, pageData)
 
   def apply[A](
-      userContext: BodyUserContext[A], pageData: PageData): BodyContext[A] =
+      userContext: BodyUserContext[A],
+      pageData: PageData): BodyContext[A] =
     new BodyContext(userContext, pageData)
 }

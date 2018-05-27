@@ -22,6 +22,6 @@ object Future {
   def applySequentially[A](list: List[A])(f: A => Funit): Funit =
     list match {
       case h :: t => f(h) >> applySequentially(t)(f)
-      case Nil => funit
+      case Nil    => funit
     }
 }

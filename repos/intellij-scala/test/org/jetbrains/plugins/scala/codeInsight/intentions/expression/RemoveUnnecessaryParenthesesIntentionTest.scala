@@ -8,8 +8,7 @@ import org.jetbrains.plugins.scala.codeInsight.intentions.ScalaIntentionTestBase
   * Nikolay.Tropin
   * 4/29/13
   */
-class RemoveUnnecessaryParenthesesIntentionTest
-    extends ScalaIntentionTestBase {
+class RemoveUnnecessaryParenthesesIntentionTest extends ScalaIntentionTestBase {
   def familyName: String = RemoveUnnecessaryParenthesesIntention.familyName
 
   def test_1() {

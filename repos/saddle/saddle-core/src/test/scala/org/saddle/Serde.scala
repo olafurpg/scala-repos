@@ -1,6 +1,11 @@
 package org.saddle
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, ObjectInputStream, ObjectOutputStream}
+import java.io.{
+  ByteArrayInputStream,
+  ByteArrayOutputStream,
+  ObjectInputStream,
+  ObjectOutputStream
+}
 
 /**
   * utility methods for tests
@@ -16,8 +21,7 @@ object Serde {
     oos.writeObject(input)
     oos.close()
 
-    val bais = new ObjectInputStream(
-        new ByteArrayInputStream(baos.toByteArray))
+    val bais = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray))
     bais.readObject().asInstanceOf[T]
   }
 }

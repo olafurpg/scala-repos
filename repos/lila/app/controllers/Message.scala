@@ -34,11 +34,12 @@ object Message extends LilaController {
     NotForKids {
       OptionFuOk(api.thread(id, me)) { thread =>
         relationApi.fetchBlocks(thread otherUserId me, me.id) map { blocked =>
-          html.message.thread(thread,
-                              forms.post,
-                              blocked,
-                              answerable = !Env.message.LichessSenders
-                                  .contains(thread.creatorId))
+          html.message.thread(
+            thread,
+            forms.post,
+            blocked,
+            answerable = !Env.message.LichessSenders
+              .contains(thread.creatorId))
         }
       } map NoCache
     }
@@ -48,20 +49,19 @@ object Message extends LilaController {
     OptionFuResult(api.thread(id, me)) { thread =>
       implicit val req = ctx.body
       forms.post.bindFromRequest.fold(
-          err =>
-            relationApi.fetchBlocks(thread otherUserId me, me.id) map {
-              blocked =>
-                BadRequest(
-                    html.message.thread(
-                        thread,
-                        err,
-                        blocked,
-                        answerable = !Env.message.LichessSenders
-                            .contains(thread.creatorId)))
-          },
-          text =>
-            api.makePost(thread, text, me) inject Redirect(
-                routes.Message.thread(thread.id) + "#bottom")
+        err =>
+          relationApi.fetchBlocks(thread otherUserId me, me.id) map { blocked =>
+            BadRequest(
+              html.message.thread(
+                thread,
+                err,
+                blocked,
+                answerable = !Env.message.LichessSenders
+                  .contains(thread.creatorId)))
+        },
+        text =>
+          api.makePost(thread, text, me) inject Redirect(
+            routes.Message.thread(thread.id) + "#bottom")
       )
     }
   }
@@ -78,25 +78,28 @@ object Message extends LilaController {
       forms
         .thread(me)
         .bindFromRequest
-        .fold(err => renderForm(me, none, _ => err) map { BadRequest(_) },
-              data =>
-                api.makeThread(data, me) map { thread =>
-                  Redirect(routes.Message.thread(thread.id))
-              })
+        .fold(
+          err => renderForm(me, none, _ => err) map { BadRequest(_) },
+          data =>
+            api.makeThread(data, me) map { thread =>
+              Redirect(routes.Message.thread(thread.id))
+          })
     }
   }
 
   private def renderForm(
-      me: UserModel, title: Option[String], f: Form[_] => Form[_])(
-      implicit ctx: Context): Fu[Html] =
+      me: UserModel,
+      title: Option[String],
+      f: Form[_] => Form[_])(implicit ctx: Context): Fu[Html] =
     get("user") ?? UserRepo.named flatMap { user =>
       user.fold(fuccess(true))(u => security.canMessage(me.id, u.id)) map {
         canMessage =>
-          html.message.form(f(forms thread me),
-                            user,
-                            title,
-                            canMessage = canMessage ||
-                              Granter(_.MessageAnyone)(me))
+          html.message.form(
+            f(forms thread me),
+            user,
+            title,
+            canMessage = canMessage ||
+              Granter(_.MessageAnyone)(me))
       }
     }
 

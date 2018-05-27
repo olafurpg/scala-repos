@@ -28,15 +28,16 @@ import org.apache.kafka.common.requests.ProduceResponse.PartitionResponse
 import scala.collection._
 
 case class ProducePartitionStatus(
-    requiredOffset: Long, responseStatus: PartitionResponse) {
+    requiredOffset: Long,
+    responseStatus: PartitionResponse) {
   @volatile var acksPending = false
 
   override def toString =
     "[acksPending: %b, error: %d, startOffset: %d, requiredOffset: %d]".format(
-        acksPending,
-        responseStatus.errorCode,
-        responseStatus.baseOffset,
-        requiredOffset)
+      acksPending,
+      responseStatus.errorCode,
+      responseStatus.baseOffset,
+      requiredOffset)
 }
 
 /**
@@ -48,7 +49,8 @@ case class ProduceMetadata(
 
   override def toString =
     "[requiredAcks: %d, partitionStatus: %s]".format(
-        produceRequiredAcks, produceStatus)
+      produceRequiredAcks,
+      produceStatus)
 }
 
 /**
@@ -73,8 +75,8 @@ class DelayedProduce(
         status.acksPending = false
       }
 
-      trace("Initial partition status for %s is %s".format(topicPartition,
-                                                           status))
+      trace(
+        "Initial partition status for %s is %s".format(topicPartition, status))
   }
 
   /**
@@ -91,12 +93,14 @@ class DelayedProduce(
     // check for each partition if it still has pending acks
     produceMetadata.produceStatus.foreach {
       case (topicAndPartition, status) =>
-        trace("Checking produce satisfaction for %s, current status %s".format(
-                topicAndPartition, status))
+        trace(
+          "Checking produce satisfaction for %s, current status %s"
+            .format(topicAndPartition, status))
         // skip those partitions that have already been satisfied
         if (status.acksPending) {
           val partitionOpt = replicaManager.getPartition(
-              topicAndPartition.topic, topicAndPartition.partition)
+            topicAndPartition.topic,
+            topicAndPartition.partition)
           val (hasEnough, errorCode) = partitionOpt match {
             case Some(partition) =>
               partition.checkEnoughReplicasReachOffset(status.requiredOffset)
@@ -143,17 +147,17 @@ class DelayedProduce(
 
 object DelayedProduceMetrics extends KafkaMetricsGroup {
 
-  private val aggregateExpirationMeter = newMeter(
-      "ExpiresPerSec", "requests", TimeUnit.SECONDS)
+  private val aggregateExpirationMeter =
+    newMeter("ExpiresPerSec", "requests", TimeUnit.SECONDS)
 
   private val partitionExpirationMeterFactory = (key: TopicPartition) =>
-    newMeter("ExpiresPerSec",
-             "requests",
-             TimeUnit.SECONDS,
-             tags = Map("topic" -> key.topic,
-                        "partition" -> key.partition.toString))
+    newMeter(
+      "ExpiresPerSec",
+      "requests",
+      TimeUnit.SECONDS,
+      tags = Map("topic" -> key.topic, "partition" -> key.partition.toString))
   private val partitionExpirationMeters = new Pool[TopicPartition, Meter](
-      valueFactory = Some(partitionExpirationMeterFactory))
+    valueFactory = Some(partitionExpirationMeterFactory))
 
   def recordExpiration(partition: TopicPartition) {
     aggregateExpirationMeter.mark()

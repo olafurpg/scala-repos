@@ -21,7 +21,10 @@ import java.nio.{ByteBuffer, ByteOrder}
 
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.execution.columnar.ColumnBuilder._
-import org.apache.spark.sql.execution.columnar.compression.{AllCompressionSchemes, CompressibleColumnBuilder}
+import org.apache.spark.sql.execution.columnar.compression.{
+  AllCompressionSchemes,
+  CompressibleColumnBuilder
+}
 import org.apache.spark.sql.types._
 
 private[columnar] trait ColumnBuilder {
@@ -29,9 +32,10 @@ private[columnar] trait ColumnBuilder {
   /**
     * Initializes with an approximate lower bound on the expected number of elements in this column.
     */
-  def initialize(initialSize: Int,
-                 columnName: String = "",
-                 useCompression: Boolean = false)
+  def initialize(
+      initialSize: Int,
+      columnName: String = "",
+      useCompression: Boolean = false)
 
   /**
     * Appends `row(ordinal)` to the column builder.
@@ -50,16 +54,18 @@ private[columnar] trait ColumnBuilder {
 }
 
 private[columnar] class BasicColumnBuilder[JvmType](
-    val columnStats: ColumnStats, val columnType: ColumnType[JvmType])
+    val columnStats: ColumnStats,
+    val columnType: ColumnType[JvmType])
     extends ColumnBuilder {
 
   protected var columnName: String = _
 
   protected var buffer: ByteBuffer = _
 
-  override def initialize(initialSize: Int,
-                          columnName: String = "",
-                          useCompression: Boolean = false): Unit = {
+  override def initialize(
+      initialSize: Int,
+      columnName: String = "",
+      useCompression: Boolean = false): Unit = {
 
     val size =
       if (initialSize == 0) DEFAULT_INITIAL_BUFFER_SIZE else initialSize
@@ -91,7 +97,8 @@ private[columnar] class NullColumnBuilder
     with NullableColumnBuilder
 
 private[columnar] abstract class ComplexColumnBuilder[JvmType](
-    columnStats: ColumnStats, columnType: ColumnType[JvmType])
+    columnStats: ColumnStats,
+    columnType: ColumnType[JvmType])
     extends BasicColumnBuilder[JvmType](columnStats, columnType)
     with NullableColumnBuilder
 
@@ -99,7 +106,8 @@ private[columnar] abstract class NativeColumnBuilder[T <: AtomicType](
     override val columnStats: ColumnStats,
     override val columnType: NativeColumnType[T])
     extends BasicColumnBuilder[T#InternalType](columnStats, columnType)
-    with NullableColumnBuilder with AllCompressionSchemes
+    with NullableColumnBuilder
+    with AllCompressionSchemes
     with CompressibleColumnBuilder[T]
 
 private[columnar] class BooleanColumnBuilder
@@ -131,23 +139,26 @@ private[columnar] class BinaryColumnBuilder
 
 private[columnar] class CompactDecimalColumnBuilder(dataType: DecimalType)
     extends NativeColumnBuilder(
-        new DecimalColumnStats(dataType), COMPACT_DECIMAL(dataType))
+      new DecimalColumnStats(dataType),
+      COMPACT_DECIMAL(dataType))
 
 private[columnar] class DecimalColumnBuilder(dataType: DecimalType)
     extends ComplexColumnBuilder(
-        new DecimalColumnStats(dataType), LARGE_DECIMAL(dataType))
+      new DecimalColumnStats(dataType),
+      LARGE_DECIMAL(dataType))
 
 private[columnar] class StructColumnBuilder(dataType: StructType)
     extends ComplexColumnBuilder(
-        new ObjectColumnStats(dataType), STRUCT(dataType))
+      new ObjectColumnStats(dataType),
+      STRUCT(dataType))
 
 private[columnar] class ArrayColumnBuilder(dataType: ArrayType)
     extends ComplexColumnBuilder(
-        new ObjectColumnStats(dataType), ARRAY(dataType))
+      new ObjectColumnStats(dataType),
+      ARRAY(dataType))
 
 private[columnar] class MapColumnBuilder(dataType: MapType)
-    extends ComplexColumnBuilder(
-        new ObjectColumnStats(dataType), MAP(dataType))
+    extends ComplexColumnBuilder(new ObjectColumnStats(dataType), MAP(dataType))
 
 private[columnar] object ColumnBuilder {
   val DEFAULT_INITIAL_BUFFER_SIZE = 128 * 1024
@@ -169,27 +180,28 @@ private[columnar] object ColumnBuilder {
     }
   }
 
-  def apply(dataType: DataType,
-            initialSize: Int = 0,
-            columnName: String = "",
-            useCompression: Boolean = false): ColumnBuilder = {
+  def apply(
+      dataType: DataType,
+      initialSize: Int = 0,
+      columnName: String = "",
+      useCompression: Boolean = false): ColumnBuilder = {
     val builder: ColumnBuilder = dataType match {
-      case NullType => new NullColumnBuilder
-      case BooleanType => new BooleanColumnBuilder
-      case ByteType => new ByteColumnBuilder
-      case ShortType => new ShortColumnBuilder
-      case IntegerType | DateType => new IntColumnBuilder
+      case NullType                 => new NullColumnBuilder
+      case BooleanType              => new BooleanColumnBuilder
+      case ByteType                 => new ByteColumnBuilder
+      case ShortType                => new ShortColumnBuilder
+      case IntegerType | DateType   => new IntColumnBuilder
       case LongType | TimestampType => new LongColumnBuilder
-      case FloatType => new FloatColumnBuilder
-      case DoubleType => new DoubleColumnBuilder
-      case StringType => new StringColumnBuilder
-      case BinaryType => new BinaryColumnBuilder
+      case FloatType                => new FloatColumnBuilder
+      case DoubleType               => new DoubleColumnBuilder
+      case StringType               => new StringColumnBuilder
+      case BinaryType               => new BinaryColumnBuilder
       case dt: DecimalType if dt.precision <= Decimal.MAX_LONG_DIGITS =>
         new CompactDecimalColumnBuilder(dt)
-      case dt: DecimalType => new DecimalColumnBuilder(dt)
+      case dt: DecimalType    => new DecimalColumnBuilder(dt)
       case struct: StructType => new StructColumnBuilder(struct)
-      case array: ArrayType => new ArrayColumnBuilder(array)
-      case map: MapType => new MapColumnBuilder(map)
+      case array: ArrayType   => new ArrayColumnBuilder(array)
+      case map: MapType       => new MapColumnBuilder(map)
       case udt: UserDefinedType[_] =>
         return apply(udt.sqlType, initialSize, columnName, useCompression)
       case other =>

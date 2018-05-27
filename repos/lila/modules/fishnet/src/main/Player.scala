@@ -21,18 +21,21 @@ final class Player(moveDb: MoveDB, uciMemo: UciMemo) {
       if (game.turns <= maxPlies)
         GameRepo.initialFen(game) zip uciMemo.get(game) map {
           case (initialFen, moves) =>
-            Work.Move(_id = Work.makeId,
-                      game = Work.Game(id = game.id,
-                                       initialFen = initialFen map FEN.apply,
-                                       variant = game.variant,
-                                       moves = moves mkString " "),
-                      currentFen = FEN(Forsyth >> game.toChess),
-                      level = level,
-                      tries = 0,
-                      acquired = None,
-                      createdAt = DateTime.now)
+            Work.Move(
+              _id = Work.makeId,
+              game = Work.Game(
+                id = game.id,
+                initialFen = initialFen map FEN.apply,
+                variant = game.variant,
+                moves = moves mkString " "),
+              currentFen = FEN(Forsyth >> game.toChess),
+              level = level,
+              tries = 0,
+              acquired = None,
+              createdAt = DateTime.now
+            )
         } else
         fufail(
-            s"[fishnet] Too many moves (${game.turns}), won't play ${game.id}")
+          s"[fishnet] Too many moves (${game.turns}), won't play ${game.id}")
     else fufail("[fishnet] invalid position")
 }

@@ -69,7 +69,8 @@ trait TypedArrayTest[V, T <: TypedArray[V, T]] {
   }
 
   @Test
-  def should_allow_constructing_a_new_name_from_an_ArrayBuffer_2_args(): Unit = {
+  def should_allow_constructing_a_new_name_from_an_ArrayBuffer_2_args()
+    : Unit = {
     val buf = arrCtor(js.Array(5, 6, 7, 8)).buffer
     val x = bufCtor2(buf, bytesPerElement)
     assertTrue(hasType(x))
@@ -81,7 +82,8 @@ trait TypedArrayTest[V, T <: TypedArray[V, T]] {
   }
 
   @Test
-  def should_allow_constructing_a_new_name_from_an_ArrayBuffer_3_args(): Unit = {
+  def should_allow_constructing_a_new_name_from_an_ArrayBuffer_3_args()
+    : Unit = {
     val buf = arrCtor(js.Array(5, 6, 7, 8)).buffer
     val x = bufCtor3(buf, bytesPerElement, 2)
     assertTrue(hasType(x))

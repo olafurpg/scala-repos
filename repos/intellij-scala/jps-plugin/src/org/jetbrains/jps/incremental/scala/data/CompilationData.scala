@@ -18,27 +18,29 @@ import scala.collection.JavaConverters._
 /**
   * @author Pavel Fatin
   */
-case class CompilationData(sources: Seq[File],
-                           classpath: Seq[File],
-                           output: File,
-                           scalaOptions: Seq[String],
-                           javaOptions: Seq[String],
-                           order: CompileOrder,
-                           cacheFile: File,
-                           outputToCacheMap: Map[File, File],
-                           outputGroups: Seq[(File, File)],
-                           sbtIncOptions: Option[SbtIncrementalOptions])
+case class CompilationData(
+    sources: Seq[File],
+    classpath: Seq[File],
+    output: File,
+    scalaOptions: Seq[String],
+    javaOptions: Seq[String],
+    order: CompileOrder,
+    cacheFile: File,
+    outputToCacheMap: Map[File, File],
+    outputGroups: Seq[(File, File)],
+    sbtIncOptions: Option[SbtIncrementalOptions])
 
 object CompilationData {
-  def from(sources: Seq[File],
-           context: CompileContext,
-           chunk: ModuleChunk): Either[String, CompilationData] = {
+  def from(
+      sources: Seq[File],
+      context: CompileContext,
+      chunk: ModuleChunk): Either[String, CompilationData] = {
     val target = chunk.representativeTarget
     val module = target.getModule
 
     outputsNotSpecified(chunk) match {
       case Some(message) => return Left(message)
-      case None =>
+      case None          =>
     }
     val output = target.getOutputDir
     checkOrCreate(output)
@@ -58,9 +60,9 @@ object CompilationData {
 
     createOutputToCacheMap(context).map { outputToCacheMap =>
       val cacheFile = outputToCacheMap.getOrElse(
-          output,
-          throw new RuntimeException(
-              "Unknown build target output directory: " + output))
+        output,
+        throw new RuntimeException(
+          "Unknown build target output directory: " + output))
 
       val relevantOutputToCacheMap =
         (outputToCacheMap - output).filter(p => classpath.contains(p._1))
@@ -75,16 +77,18 @@ object CompilationData {
 
       val outputGroups = createOutputGroups(chunk)
 
-      CompilationData(sources,
-                      classpath,
-                      output,
-                      commonOptions ++ scalaOptions,
-                      commonOptions ++ javaOptions,
-                      order,
-                      cacheFile,
-                      relevantOutputToCacheMap,
-                      outputGroups,
-                      Some(compilerSettings.getSbtIncrementalOptions))
+      CompilationData(
+        sources,
+        classpath,
+        output,
+        commonOptions ++ scalaOptions,
+        commonOptions ++ javaOptions,
+        order,
+        cacheFile,
+        relevantOutputToCacheMap,
+        outputGroups,
+        Some(compilerSettings.getSbtIncrementalOptions)
+      )
     }
   }
 
@@ -93,11 +97,12 @@ object CompilationData {
       try {
         if (!output.mkdirs())
           throw new IOException(
-              "Cannot create output directory: " + output.toString)
+            "Cannot create output directory: " + output.toString)
       } catch {
         case t: Throwable =>
           throw new IOException(
-              "Cannot create output directory: " + output.toString, t)
+            "Cannot create output directory: " + output.toString,
+            t)
       }
     }
   }
@@ -109,11 +114,12 @@ object CompilationData {
   }
 
   private def javaOptionsFor(
-      context: CompileContext, chunk: ModuleChunk): Seq[String] = {
+      context: CompileContext,
+      chunk: ModuleChunk): Seq[String] = {
     val compilerConfig = {
       val project = context.getProjectDescriptor.getProject
       JpsJavaExtensionService.getInstance.getOrCreateCompilerConfiguration(
-          project)
+        project)
     }
 
     val options = new util.ArrayList[String]()
@@ -126,14 +132,18 @@ object CompilationData {
     }
 
     JavaBuilder.addCompilationOptions(
-        options, context, chunk, annotationProcessingProfile)
+      options,
+      context,
+      chunk,
+      annotationProcessingProfile)
 
     options.asScala
   }
 
   // TODO JavaBuilder.loadCommonJavacOptions should be public
-  def addCommonJavacOptions(options: util.ArrayList[String],
-                            compilerOptions: JpsJavaCompilerOptions) {
+  def addCommonJavacOptions(
+      options: util.ArrayList[String],
+      compilerOptions: JpsJavaCompilerOptions) {
     if (compilerOptions.DEBUGGING_INFO) {
       options.add("-g")
     }
@@ -149,7 +159,7 @@ object CompilationData {
     if (!compilerOptions.ADDITIONAL_OPTIONS_STRING.isEmpty) {
       // TODO extract VM options
       options.addAll(
-          compilerOptions.ADDITIONAL_OPTIONS_STRING.split("\\s+").toSeq.asJava)
+        compilerOptions.ADDITIONAL_OPTIONS_STRING.split("\\s+").toSeq.asJava)
     }
   }
 
@@ -161,8 +171,8 @@ object CompilationData {
     outputClashesIn(targetToOutput).toLeft {
       val paths = context.getProjectDescriptor.dataManager.getDataPaths
 
-      for ((target, output) <- targetToOutput.toMap) yield
-        (output, new File(paths.getTargetDataRoot(target), "cache.dat"))
+      for ((target, output) <- targetToOutput.toMap)
+        yield (output, new File(paths.getTargetDataRoot(target), "cache.dat"))
     }
   }
 
@@ -172,7 +182,7 @@ object CompilationData {
       module = target.getModule
       output = target.getOutputDir
       sourceRoot <- module.getSourceRoots.asScala.map(_.getFile)
-                       if sourceRoot.exists
+      if sourceRoot.exists
     } yield (sourceRoot, output)
   }
 
@@ -205,7 +215,7 @@ object CompilationData {
     if (errors.isEmpty) None
     else
       Some(
-          errors.mkString("\n") +
+        errors.mkString("\n") +
           "\nPlease configure separate output paths to proceed with the compilation." +
           "\nTIP: you can use Project Artifacts to combine compiled classes if needed.")
   }

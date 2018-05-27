@@ -36,12 +36,14 @@ import com.fasterxml.jackson.databind.ObjectMapper
   * @param failOnEmptyLines When set to false, it just skips empty lines instead of failing the jobs. Defaults to true
   *                         for backwards compatibility.
   */
-case class JsonLine(p: String,
-                    fields: Fields = Fields.ALL,
-                    override val sinkMode: SinkMode = SinkMode.REPLACE,
-                    override val transformInTest: Boolean = false,
-                    failOnEmptyLines: Boolean = true)
-    extends FixedPathSource(p) with TextLineScheme {
+case class JsonLine(
+    p: String,
+    fields: Fields = Fields.ALL,
+    override val sinkMode: SinkMode = SinkMode.REPLACE,
+    override val transformInTest: Boolean = false,
+    failOnEmptyLines: Boolean = true)
+    extends FixedPathSource(p)
+    with TextLineScheme {
 
   import Dsl._
   import JsonLine._
@@ -54,14 +56,15 @@ case class JsonLine(p: String,
   override def transformForRead(pipe: Pipe) = {
     @scala.annotation.tailrec
     def nestedRetrieval(
-        node: Option[Map[String, AnyRef]], path: List[String]): AnyRef = {
+        node: Option[Map[String, AnyRef]],
+        path: List[String]): AnyRef = {
       (path, node) match {
-        case (_, None) => null
+        case (_, None)            => null
         case (h :: Nil, Some(fs)) => fs.get(h).orNull
         case (h :: tail, Some(fs)) =>
           fs.get(h).orNull match {
             case fs: Map[String, AnyRef] => nestedRetrieval(Option(fs), tail)
-            case _ => null
+            case _                       => null
           }
         case (Nil, _) => null
       }
@@ -88,12 +91,18 @@ case class JsonLine(p: String,
   */
 object JsonLine
     extends scala.runtime.AbstractFunction5[
-        String, Fields, SinkMode, Boolean, Boolean, JsonLine] with Serializable
+      String,
+      Fields,
+      SinkMode,
+      Boolean,
+      Boolean,
+      JsonLine]
+    with Serializable
     with scala.Serializable {
 
   val mapTypeReference = typeReference[Map[String, AnyRef]]
 
-  private[this] def typeReference[T : Manifest] = new TypeReference[T] {
+  private[this] def typeReference[T: Manifest] = new TypeReference[T] {
     override def getType = typeFromManifest(manifest[T])
   }
 

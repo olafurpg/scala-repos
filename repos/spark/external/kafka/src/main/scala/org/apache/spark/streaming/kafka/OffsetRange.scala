@@ -42,10 +42,11 @@ trait HasOffsetRanges {
   * @param fromOffset Inclusive starting offset
   * @param untilOffset Exclusive ending offset
   */
-final class OffsetRange private (val topic: String,
-                                 val partition: Int,
-                                 val fromOffset: Long,
-                                 val untilOffset: Long)
+final class OffsetRange private (
+    val topic: String,
+    val partition: Int,
+    val fromOffset: Long,
+    val untilOffset: Long)
     extends Serializable {
   import OffsetRange.OffsetRangeTuple
 
@@ -59,8 +60,8 @@ final class OffsetRange private (val topic: String,
   override def equals(obj: Any): Boolean = obj match {
     case that: OffsetRange =>
       this.topic == that.topic && this.partition == that.partition &&
-      this.fromOffset == that.fromOffset &&
-      this.untilOffset == that.untilOffset
+        this.fromOffset == that.fromOffset &&
+        this.untilOffset == that.untilOffset
     case _ => false
   }
 
@@ -81,33 +82,39 @@ final class OffsetRange private (val topic: String,
   * Companion object the provides methods to create instances of [[OffsetRange]].
   */
 object OffsetRange {
-  def create(topic: String,
-             partition: Int,
-             fromOffset: Long,
-             untilOffset: Long): OffsetRange =
+  def create(
+      topic: String,
+      partition: Int,
+      fromOffset: Long,
+      untilOffset: Long): OffsetRange =
     new OffsetRange(topic, partition, fromOffset, untilOffset)
 
-  def create(topicAndPartition: TopicAndPartition,
-             fromOffset: Long,
-             untilOffset: Long): OffsetRange =
-    new OffsetRange(topicAndPartition.topic,
-                    topicAndPartition.partition,
-                    fromOffset,
-                    untilOffset)
+  def create(
+      topicAndPartition: TopicAndPartition,
+      fromOffset: Long,
+      untilOffset: Long): OffsetRange =
+    new OffsetRange(
+      topicAndPartition.topic,
+      topicAndPartition.partition,
+      fromOffset,
+      untilOffset)
 
-  def apply(topic: String,
-            partition: Int,
-            fromOffset: Long,
-            untilOffset: Long): OffsetRange =
+  def apply(
+      topic: String,
+      partition: Int,
+      fromOffset: Long,
+      untilOffset: Long): OffsetRange =
     new OffsetRange(topic, partition, fromOffset, untilOffset)
 
-  def apply(topicAndPartition: TopicAndPartition,
-            fromOffset: Long,
-            untilOffset: Long): OffsetRange =
-    new OffsetRange(topicAndPartition.topic,
-                    topicAndPartition.partition,
-                    fromOffset,
-                    untilOffset)
+  def apply(
+      topicAndPartition: TopicAndPartition,
+      fromOffset: Long,
+      untilOffset: Long): OffsetRange =
+    new OffsetRange(
+      topicAndPartition.topic,
+      topicAndPartition.partition,
+      fromOffset,
+      untilOffset)
 
   /** this is to avoid ClassNotFoundException during checkpoint restore */
   private[kafka] type OffsetRangeTuple = (String, Int, Long, Long)

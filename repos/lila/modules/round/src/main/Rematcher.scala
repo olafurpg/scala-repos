@@ -8,22 +8,32 @@ import chess.{Game => ChessGame, Board, Clock, Color => ChessColor, Castles}
 import ChessColor.{White, Black}
 
 import lila.db.api._
-import lila.game.{GameRepo, Game, Event, Progress, Pov, Source, AnonCookie, PerfPicker}
+import lila.game.{
+  GameRepo,
+  Game,
+  Event,
+  Progress,
+  Pov,
+  Source,
+  AnonCookie,
+  PerfPicker
+}
 import lila.memo.ExpireSetMemo
 import lila.user.{User, UserRepo}
 import makeTimeout.short
 
-private[round] final class Rematcher(messenger: Messenger,
-                                     onStart: String => Unit,
-                                     rematch960Cache: ExpireSetMemo,
-                                     isRematchCache: ExpireSetMemo) {
+private[round] final class Rematcher(
+    messenger: Messenger,
+    onStart: String => Unit,
+    rematch960Cache: ExpireSetMemo,
+    isRematchCache: ExpireSetMemo) {
 
   def yes(pov: Pov): Fu[Events] = pov match {
     case Pov(game, color) if (game playerCanRematch color) =>
       (game.opponent(color).isOfferingRematch ||
-          game.opponent(color).isAi).fold(
-          game.next.fold(rematchJoin(pov))(rematchExists(pov)),
-          rematchCreate(pov)
+        game.opponent(color).isAi).fold(
+        game.next.fold(rematchJoin(pov))(rematchExists(pov)),
+        rematchCreate(pov)
       )
     case _ => fuccess(Nil)
   }
@@ -55,8 +65,8 @@ private[round] final class Rematcher(messenger: Messenger,
     for {
       nextGame ← returnGame(pov) map (_.start)
       _ ← (GameRepo insertDenormalized nextGame) >> GameRepo.saveNext(
-          pov.game, nextGame.id) >>- messenger.system(
-          pov.game, _.rematchOfferAccepted) >>- {
+        pov.game,
+        nextGame.id) >>- messenger.system(pov.game, _.rematchOfferAccepted) >>- {
         isRematchCache.put(nextGame.id)
         if (pov.game.variant == Chess960 && !rematch960Cache.get(pov.game.id))
           rematch960Cache.put(nextGame.id)
@@ -89,24 +99,29 @@ private[round] final class Rematcher(messenger: Messenger,
       users <- UserRepo byIds pov.game.userIds
     } yield
       Game.make(
-          game = ChessGame(
-                board = Board(pieces, variant = pov.game.variant).withCastles {
-                situation.fold(Castles.init)(_.situation.board.history.castles)
-              },
-                clock = pov.game.clock map (_.reset),
-                turns = situation ?? (_.turns),
-                startedAtTurn = situation ?? (_.turns)),
-          whitePlayer = returnPlayer(pov.game, White, users),
-          blackPlayer = returnPlayer(pov.game, Black, users),
-          mode = if (users.exists(_.lame)) chess.Mode.Casual
-            else pov.game.mode,
-          variant = pov.game.variant,
-          source = pov.game.source | Source.Lobby,
-          daysPerTurn = pov.game.daysPerTurn,
-          pgnImport = None)
+        game = ChessGame(
+          board = Board(pieces, variant = pov.game.variant).withCastles {
+            situation.fold(Castles.init)(_.situation.board.history.castles)
+          },
+          clock = pov.game.clock map (_.reset),
+          turns = situation ?? (_.turns),
+          startedAtTurn = situation ?? (_.turns)
+        ),
+        whitePlayer = returnPlayer(pov.game, White, users),
+        blackPlayer = returnPlayer(pov.game, Black, users),
+        mode =
+          if (users.exists(_.lame)) chess.Mode.Casual
+          else pov.game.mode,
+        variant = pov.game.variant,
+        source = pov.game.source | Source.Lobby,
+        daysPerTurn = pov.game.daysPerTurn,
+        pgnImport = None
+      )
 
   private def returnPlayer(
-      game: Game, color: ChessColor, users: List[User]): lila.game.Player = {
+      game: Game,
+      color: ChessColor,
+      users: List[User]): lila.game.Player = {
     val player = lila.game.Player
       .make(color = color, aiLevel = game.opponent(color).aiLevel)
     game
@@ -123,9 +138,11 @@ private[round] final class Rematcher(messenger: Messenger,
   private def redirectEvents(game: Game): Events = {
     val whiteId = game fullIdOf White
     val blackId = game fullIdOf Black
-    List(Event.RedirectOwner(White, blackId, AnonCookie.json(game, Black)),
-         Event.RedirectOwner(Black, whiteId, AnonCookie.json(game, White)),
-         // tell spectators to reload
-         Event.Reload)
+    List(
+      Event.RedirectOwner(White, blackId, AnonCookie.json(game, Black)),
+      Event.RedirectOwner(Black, whiteId, AnonCookie.json(game, White)),
+      // tell spectators to reload
+      Event.Reload
+    )
   }
 }

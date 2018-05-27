@@ -159,7 +159,7 @@ trait Creators {
     *        either be an [[akka.actor.ActorSystem]] or an [[akka.actor.ActorContext]],
     *        where the latter is always implicitly available within an [[akka.actor.Actor]].
     */
-  def actor[T <: Actor : ClassTag](ctor: ⇒ T)(
+  def actor[T <: Actor: ClassTag](ctor: ⇒ T)(
       implicit factory: ActorRefFactory): ActorRef = {
     // configure dispatcher/mailbox based on runtime class
     val classOfActor = implicitly[ClassTag[T]].runtimeClass
@@ -179,7 +179,7 @@ trait Creators {
     *        either be an [[akka.actor.ActorSystem]] or an [[akka.actor.ActorContext]],
     *        where the latter is always implicitly available within an [[akka.actor.Actor]].
     */
-  def actor[T <: Actor : ClassTag](name: String)(ctor: ⇒ T)(
+  def actor[T <: Actor: ClassTag](name: String)(ctor: ⇒ T)(
       implicit factory: ActorRefFactory): ActorRef = {
     // configure dispatcher/mailbox based on runtime class
     val classOfActor = implicitly[ClassTag[T]].runtimeClass
@@ -201,7 +201,7 @@ trait Creators {
     *        either be an [[akka.actor.ActorSystem]] or an [[akka.actor.ActorContext]],
     *        where the latter is always implicitly available within an [[akka.actor.Actor]].
     */
-  def actor[T <: Actor : ClassTag](factory: ActorRefFactory, name: String)(
+  def actor[T <: Actor: ClassTag](factory: ActorRefFactory, name: String)(
       ctor: ⇒ T): ActorRef =
     actor(name)(ctor)(implicitly[ClassTag[T]], factory)
 
@@ -216,7 +216,7 @@ trait Creators {
     *        either be an [[akka.actor.ActorSystem]] or an [[akka.actor.ActorContext]],
     *        where the latter is always implicitly available within an [[akka.actor.Actor]].
     */
-  def actor[T <: Actor : ClassTag](factory: ActorRefFactory)(
+  def actor[T <: Actor: ClassTag](factory: ActorRefFactory)(
       ctor: ⇒ T): ActorRef =
     actor(null: String)(ctor)(implicitly[ClassTag[T]], factory)
 }

@@ -14,9 +14,10 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlockExpr, ScWhileStmt}
   */
 @SuppressWarnings(Array("HardCodedStringLiteral"))
 class ScalaWhileConditionFixer extends ScalaFixer {
-  def apply(editor: Editor,
-            processor: ScalaSmartEnterProcessor,
-            psiElement: PsiElement): OperationPerformed = {
+  def apply(
+      editor: Editor,
+      processor: ScalaSmartEnterProcessor,
+      psiElement: PsiElement): OperationPerformed = {
     val whileStatement =
       PsiTreeUtil.getParentOfType(psiElement, classOf[ScWhileStmt], false)
     if (whileStatement == null) return NoOperation
@@ -28,10 +29,11 @@ class ScalaWhileConditionFixer extends ScalaFixer {
     whileStatement.condition match {
       case None
           if leftParenthesis != null &&
-          !leftParenthesis.getNextSibling.isInstanceOf[PsiErrorElement] &&
-          whileStatement.lastChild.exists(_.isInstanceOf[PsiErrorElement]) =>
+            !leftParenthesis.getNextSibling.isInstanceOf[PsiErrorElement] &&
+            whileStatement.lastChild.exists(_.isInstanceOf[PsiErrorElement]) =>
         doc.insertString(
-            whileStatement.lastChild.get.getTextRange.getEndOffset, ") {}")
+          whileStatement.lastChild.get.getTextRange.getEndOffset,
+          ") {}")
         WithEnter(3)
       case None if leftParenthesis == null || rightParenthesis == null =>
         val whileStartOffset = whileStatement.getTextRange.getStartOffset
@@ -40,8 +42,7 @@ class ScalaWhileConditionFixer extends ScalaFixer {
         val whLength = "while (".length
 
         whileStatement.body.foreach(bl =>
-              stopOffset = Math.min(
-                  stopOffset, bl.getTextRange.getStartOffset))
+          stopOffset = Math.min(stopOffset, bl.getTextRange.getStartOffset))
 
         doc.replaceString(whileStartOffset, stopOffset, "while () {\n\n}")
         moveToStart(editor, whileStatement)
@@ -57,7 +58,7 @@ class ScalaWhileConditionFixer extends ScalaFixer {
           case Some(block: ScBlockExpr) =>
             return placeInWholeBlock(block, editor)
           case Some(expr) => moveToEnd(editor, expr)
-          case _ =>
+          case _          =>
         }
         WithReformat(0)
       case Some(cond) if rightParenthesis == null =>

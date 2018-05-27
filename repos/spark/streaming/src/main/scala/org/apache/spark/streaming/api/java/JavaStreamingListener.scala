@@ -22,15 +22,13 @@ import org.apache.spark.streaming.Time
 private[streaming] trait PythonStreamingListener {
 
   /** Called when a receiver has been started */
-  def onReceiverStarted(
-      receiverStarted: JavaStreamingListenerReceiverStarted) {}
+  def onReceiverStarted(receiverStarted: JavaStreamingListenerReceiverStarted) {}
 
   /** Called when a receiver has reported an error */
   def onReceiverError(receiverError: JavaStreamingListenerReceiverError) {}
 
   /** Called when a receiver has been stopped */
-  def onReceiverStopped(
-      receiverStopped: JavaStreamingListenerReceiverStopped) {}
+  def onReceiverStopped(receiverStopped: JavaStreamingListenerReceiverStopped) {}
 
   /** Called when a batch of jobs has been submitted for processing. */
   def onBatchSubmitted(batchSubmitted: JavaStreamingListenerBatchSubmitted) {}
@@ -236,14 +234,15 @@ private[streaming] case class JavaStreamInputInfo(
 /**
   * Class having information about a receiver
   */
-private[streaming] case class JavaReceiverInfo(streamId: Int,
-                                               name: String,
-                                               active: Boolean,
-                                               location: String,
-                                               executorId: String,
-                                               lastErrorMessage: String,
-                                               lastError: String,
-                                               lastErrorTime: Long)
+private[streaming] case class JavaReceiverInfo(
+    streamId: Int,
+    name: String,
+    active: Boolean,
+    location: String,
+    executorId: String,
+    lastErrorMessage: String,
+    lastError: String,
+    lastErrorTime: Long)
 
 /**
   * Class having information on output operations.
@@ -259,10 +258,11 @@ private[streaming] case class JavaReceiverInfo(streamId: Int,
   * @param failureReason Failure reason if this output operation fails. If the output operation is
   *                      successful, this field is `null`.
   */
-private[streaming] case class JavaOutputOperationInfo(batchTime: Time,
-                                                      id: Int,
-                                                      name: String,
-                                                      description: String,
-                                                      startTime: Long,
-                                                      endTime: Long,
-                                                      failureReason: String)
+private[streaming] case class JavaOutputOperationInfo(
+    batchTime: Time,
+    id: Int,
+    name: String,
+    description: String,
+    startTime: Long,
+    endTime: Long,
+    failureReason: String)

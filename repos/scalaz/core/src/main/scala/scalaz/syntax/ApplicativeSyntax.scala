@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Applicative` */
-final class ApplicativeOps[F[_], A] private[syntax](val self: F[A])(
+final class ApplicativeOps[F[_], A] private[syntax] (val self: F[A])(
     implicit val F: Applicative[F])
     extends Ops[F[A]] {
   ////
@@ -25,8 +25,7 @@ sealed trait ToApplicativeOps0 {
 }
 
 trait ToApplicativeOps extends ToApplicativeOps0 with ToApplyOps {
-  implicit def ToApplicativeOps[F[_], A](v: F[A])(
-      implicit F0: Applicative[F]) =
+  implicit def ToApplicativeOps[F[_], A](v: F[A])(implicit F0: Applicative[F]) =
     new ApplicativeOps[F, A](v)
 
   ////

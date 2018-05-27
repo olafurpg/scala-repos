@@ -18,20 +18,18 @@ import org.scalacheck.Prop._
 
 class GCDTest extends FunSuite with Checkers {
   implicit def ArbBigDecimal: Arbitrary[BigDecimal] =
-    Arbitrary(
-        for {
+    Arbitrary(for {
       value <- arbitrary[Long]
       scale <- arbitrary[Short]
     } yield BigDecimal(value, scale.toInt))
 
   implicit def ArbRational: Arbitrary[Rational] =
-    Arbitrary(
-        for {
+    Arbitrary(for {
       n <- arbitrary[Long]
       d <- arbitrary[Long] if d != 0
     } yield Rational(n, d))
 
-  def testGcd[A : EuclideanRing : IsReal : NumberTag](x: A, y: A): Boolean = {
+  def testGcd[A: EuclideanRing: IsReal: NumberTag](x: A, y: A): Boolean = {
     (x == Ring[A].zero || y == Ring[A].zero) || {
       val den = spire.math.gcd(x, y)
       val x0 = x /~ den

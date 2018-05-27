@@ -5,7 +5,11 @@ import akka.event.EventStream
 import mesosphere.marathon.SchedulerActions
 import mesosphere.marathon.core.launchqueue.LaunchQueue
 import mesosphere.marathon.core.task.tracker.TaskTracker
-import mesosphere.marathon.event.{HealthStatusChanged, MarathonHealthCheckEvent, MesosStatusUpdateEvent}
+import mesosphere.marathon.event.{
+  HealthStatusChanged,
+  MarathonHealthCheckEvent,
+  MesosStatusUpdateEvent
+}
 import mesosphere.marathon.state.AppDefinition
 import org.apache.mesos.SchedulerDriver
 
@@ -65,30 +69,40 @@ trait StartingBehavior {
 
   final def checkForRunning: Receive = {
     case MesosStatusUpdateEvent(
-        _, taskId, "TASK_RUNNING", _, app.`id`, _, _, _, VersionString, _, _)
-        if !startedRunningTasks(taskId.idString) =>
+        _,
+        taskId,
+        "TASK_RUNNING",
+        _,
+        app.`id`,
+        _,
+        _,
+        _,
+        VersionString,
+        _,
+        _) if !startedRunningTasks(taskId.idString) =>
       // scalastyle:off line.size.limit
       startedRunningTasks += taskId.idString
       log.info(
-          s"New task $taskId now running during app ${app.id.toString} scaling, " +
+        s"New task $taskId now running during app ${app.id.toString} scaling, " +
           s"${nrToStart - startedRunningTasks.size} more to go")
       checkFinished()
   }
 
   def commonBehavior: Receive = {
-    case MesosStatusUpdateEvent(_,
-                                taskId,
-                                StartErrorState(_),
-                                _,
-                                app.`id`,
-                                _,
-                                _,
-                                _,
-                                VersionString,
-                                _,
-                                _) => // scalastyle:off line.size.limit
+    case MesosStatusUpdateEvent(
+        _,
+        taskId,
+        StartErrorState(_),
+        _,
+        app.`id`,
+        _,
+        _,
+        _,
+        VersionString,
+        _,
+        _) => // scalastyle:off line.size.limit
       log.warning(
-          s"New task [$taskId] failed during app ${app.id.toString} scaling, queueing another task")
+        s"New task [$taskId] failed during app ${app.id.toString} scaling, queueing another task")
       startedRunningTasks -= taskId.idString
       taskQueue.add(app)
 
@@ -100,7 +114,7 @@ trait StartingBehavior {
       val tasksToStartNow = Math.max(scaleTo - actualSize, 0)
       if (tasksToStartNow > 0) {
         log.info(
-            s"Reconciling tasks during app ${app.id.toString} scaling: queuing $tasksToStartNow new tasks")
+          s"Reconciling tasks during app ${app.id.toString} scaling: queuing $tasksToStartNow new tasks")
         taskQueue.add(app, tasksToStartNow)
       }
       context.system.scheduler.scheduleOnce(5.seconds, self, Sync)

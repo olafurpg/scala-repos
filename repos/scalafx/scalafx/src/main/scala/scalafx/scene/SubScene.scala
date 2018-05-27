@@ -43,7 +43,8 @@ object SubScene {
 
 /** Wraps [[http://docs.oracle.com/javafx/8/api/javafx/scene/SubScene.html]]. */
 class SubScene(override val delegate: jfxs.SubScene)
-    extends Node(delegate) with SFXDelegate[jfxs.SubScene] {
+    extends Node(delegate)
+    with SFXDelegate[jfxs.SubScene] {
 
   // TODO Combine common features with Scene in a trait used by both.
 
@@ -60,13 +61,18 @@ class SubScene(override val delegate: jfxs.SubScene)
     * as root Node, with a dimension of width and height,
     * specifies whether a depth buffer is created for this scene and specifies the level of antialiasing required.
     */
-  def this(width: Double,
-           height: Double,
-           depthBuffer: Boolean,
-           antiAliasing: SceneAntialiasing) =
+  def this(
+      width: Double,
+      height: Double,
+      depthBuffer: Boolean,
+      antiAliasing: SceneAntialiasing) =
     this(
-        new jfxs.SubScene(
-            new jfxs.Group(), width, height, depthBuffer, antiAliasing))
+      new jfxs.SubScene(
+        new jfxs.Group(),
+        width,
+        height,
+        depthBuffer,
+        antiAliasing))
 
   /** Creates a SubScene for a specific root Node with a specific size. */
   def this(root: Parent, width: Double, height: Double) =
@@ -75,11 +81,12 @@ class SubScene(override val delegate: jfxs.SubScene)
   /** Constructs a SubScene consisting of a root, with a dimension of width and height,
     * specifies whether a depth buffer is created for this scene and specifies the level of antialiasing required.
     */
-  def this(root: Parent,
-           width: Double,
-           height: Double,
-           depthBuffer: Boolean,
-           antiAliasing: SceneAntialiasing) =
+  def this(
+      root: Parent,
+      width: Double,
+      height: Double,
+      depthBuffer: Boolean,
+      antiAliasing: SceneAntialiasing) =
     this(new jfxs.SubScene(root, width, height, depthBuffer, antiAliasing))
 
   /** Defines the root Node of the SubScene scene graph. */
@@ -93,10 +100,10 @@ class SubScene(override val delegate: jfxs.SubScene)
     */
   def getChildren = root.value match {
     case group: jfxs.Group => group.getChildren
-    case pane: jfxsl.Pane => pane.getChildren
+    case pane: jfxsl.Pane  => pane.getChildren
     case _ =>
       throw new IllegalStateException(
-          "Cannot access children of root: " + root +
+        "Cannot access children of root: " + root +
           "\nUse a class that extends Group or Pane, or override the getChildren method.")
   }
 

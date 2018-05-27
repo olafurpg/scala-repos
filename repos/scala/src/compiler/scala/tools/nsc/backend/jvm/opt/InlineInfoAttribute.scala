@@ -44,11 +44,12 @@ case class InlineInfoAttribute(inlineInfo: InlineInfo)
     * Serialize the `inlineInfo` into a byte array. Strings are added to the constant pool and serialized
     * as references.
     */
-  override def write(cw: ClassWriter,
-                     code: Array[Byte],
-                     len: Int,
-                     maxStack: Int,
-                     maxLocals: Int): ByteVector = {
+  override def write(
+      cw: ClassWriter,
+      code: Array[Byte],
+      len: Int,
+      maxStack: Int,
+      maxLocals: Int): ByteVector = {
     val result = new ByteVector()
 
     result.putByte(InlineInfoAttribute.VERSION)
@@ -98,12 +99,13 @@ case class InlineInfoAttribute(inlineInfo: InlineInfo)
     * `buf` is a pre-allocated character array that is guaranteed to be long enough to hold any
     * string of the constant pool. So we can use it to invoke `cr.readUTF8`.
     */
-  override def read(cr: ClassReader,
-                    off: Int,
-                    len: Int,
-                    buf: Array[Char],
-                    codeOff: Int,
-                    labels: Array[Label]): InlineInfoAttribute = {
+  override def read(
+      cr: ClassReader,
+      off: Int,
+      len: Int,
+      buf: Array[Char],
+      codeOff: Int,
+      labels: Array[Label]): InlineInfoAttribute = {
     var next = off
 
     def nextByte() = { val r = cr.readByte(next); next += 1; r }
@@ -134,21 +136,22 @@ case class InlineInfoAttribute(inlineInfo: InlineInfo)
 
       val numEntries = nextShort()
       val infos = (0 until numEntries)
-        .map(_ =>
-              {
-            val name = nextUTF8()
-            val desc = nextUTF8()
+        .map(_ => {
+          val name = nextUTF8()
+          val desc = nextUTF8()
 
-            val inlineInfo = nextByte()
-            val isFinal = (inlineInfo & 1) != 0
-            val traitMethodWithStaticImplementation = (inlineInfo & 2) != 0
-            val isInline = (inlineInfo & 4) != 0
-            val isNoInline = (inlineInfo & 8) != 0
-            (name + desc,
-             MethodInlineInfo(isFinal,
-                              traitMethodWithStaticImplementation,
-                              isInline,
-                              isNoInline))
+          val inlineInfo = nextByte()
+          val isFinal = (inlineInfo & 1) != 0
+          val traitMethodWithStaticImplementation = (inlineInfo & 2) != 0
+          val isInline = (inlineInfo & 4) != 0
+          val isNoInline = (inlineInfo & 8) != 0
+          (
+            name + desc,
+            MethodInlineInfo(
+              isFinal,
+              traitMethodWithStaticImplementation,
+              isInline,
+              isNoInline))
         })
         .toMap
 

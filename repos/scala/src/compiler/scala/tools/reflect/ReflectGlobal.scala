@@ -10,9 +10,10 @@ import scala.tools.nsc.typechecker.Analyzer
 /** A version of Global that uses reflection to get class
   *  infos, instead of reading class or source files.
   */
-class ReflectGlobal(currentSettings: Settings,
-                    reporter: Reporter,
-                    override val rootClassLoader: ClassLoader)
+class ReflectGlobal(
+    currentSettings: Settings,
+    reporter: Reporter,
+    override val rootClassLoader: ClassLoader)
     extends Global(currentSettings, reporter)
     with scala.tools.reflect.ReflectSetup
     with scala.reflect.runtime.SymbolTable {
@@ -34,11 +35,10 @@ class ReflectGlobal(currentSettings: Settings,
 
   override def transformedType(sym: Symbol) =
     postErasure.transformInfo(
+      sym,
+      erasure.transformInfo(
         sym,
-        erasure.transformInfo(
-            sym,
-            uncurry.transformInfo(sym,
-                                  refChecks.transformInfo(sym, sym.info))))
+        uncurry.transformInfo(sym, refChecks.transformInfo(sym, sym.info))))
 
   override def isCompilerUniverse = true
 

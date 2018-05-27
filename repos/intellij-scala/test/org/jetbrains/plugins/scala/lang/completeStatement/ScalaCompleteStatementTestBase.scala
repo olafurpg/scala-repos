@@ -8,14 +8,15 @@ import org.jetbrains.plugins.scala.codeInsight.ScalaCodeInsightTestBase
   * User: Dmitry.Naydanov
   * Date: 27.07.15.
   */
-abstract class ScalaCompleteStatementTestBase
-    extends ScalaCodeInsightTestBase {
+abstract class ScalaCompleteStatementTestBase extends ScalaCodeInsightTestBase {
   protected def getDefaultScalaFileName = "dummy.scala"
 
   protected def getDefaultJavaFileName = "dummy.java"
 
   protected def configureAndCheckFile(
-      fileText: String, resultText: String, fileName: String) {
+      fileText: String,
+      resultText: String,
+      fileName: String) {
     //We should change this setting in order to be sure EnterProcessor works without 'swap-settings-hack'
     //it was in org.jetbrains.plugins.scala.editor.smartEnter.ScalaSmartEnterProcessor#moveCaretInsideBracesIfAny
     CodeStyleSettingsManager

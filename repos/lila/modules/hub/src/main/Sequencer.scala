@@ -6,9 +6,10 @@ import scala.util.Try
 
 import akka.actor._
 
-final class Sequencer(receiveTimeout: Option[FiniteDuration],
-                      executionTimeout: Option[FiniteDuration] = None,
-                      logger: lila.log.Logger)
+final class Sequencer(
+    receiveTimeout: Option[FiniteDuration],
+    executionTimeout: Option[FiniteDuration] = None,
+    logger: lila.log.Logger)
     extends Actor {
 
   receiveTimeout.foreach(context.setReceiveTimeout)
@@ -24,7 +25,7 @@ final class Sequencer(receiveTimeout: Option[FiniteDuration],
 
     case Done =>
       dequeue match {
-        case None => context become idle
+        case None       => context become idle
         case Some(work) => processThenDone(work)
       }
 
@@ -45,9 +46,9 @@ final class Sequencer(receiveTimeout: Option[FiniteDuration],
         val future =
           timeoutOption.orElse(executionTimeout).fold(run()) { timeout =>
             run().withTimeout(
-                duration = timeout,
-                error = lila.common.LilaException(
-                      s"Sequencer timed out after $timeout")
+              duration = timeout,
+              error =
+                lila.common.LilaException(s"Sequencer timed out after $timeout")
             )(context.system)
           } andThenAnyway {
             self ! Done
@@ -60,12 +61,14 @@ final class Sequencer(receiveTimeout: Option[FiniteDuration],
 
 object Sequencer {
 
-  case class Work(run: () => Funit,
-                  promise: Option[Promise[Unit]] = None,
-                  timeout: Option[FiniteDuration] = None)
+  case class Work(
+      run: () => Funit,
+      promise: Option[Promise[Unit]] = None,
+      timeout: Option[FiniteDuration] = None)
 
-  def work(run: => Funit,
-           promise: Option[Promise[Unit]] = None,
-           timeout: Option[FiniteDuration] = None): Work =
+  def work(
+      run: => Funit,
+      promise: Option[Promise[Unit]] = None,
+      timeout: Option[FiniteDuration] = None): Work =
     Work(() => run, promise, timeout)
 }

@@ -70,7 +70,7 @@ object EmitHtml {
           emitText(text)
           out print "\""
 
-        case DefinitionList(definitions @ _ *) =>
+        case DefinitionList(definitions @ _*) =>
           out println "<ins><dl>"
           for (d <- definitions) {
             out println "<dt>"
@@ -139,7 +139,8 @@ object EmitHtml {
     }
 
     val name = section.title.replaceAll("\\p{Space}", "_").toLowerCase()
-    out.println("\n<h" + depth + " id=\"" + name + "\">" + section.title +
+    out.println(
+      "\n<h" + depth + " id=\"" + name + "\">" + section.title +
         "</h" + depth + ">")
     section.paragraphs foreach emitParagraph
   }
@@ -172,17 +173,17 @@ object EmitHtml {
 
   def emitDocument(document: Document) {
     out.println(
-        "<?xml version=\"1.1\" encoding=\"" + document.encoding + "\"?>")
+      "<?xml version=\"1.1\" encoding=\"" + document.encoding + "\"?>")
     out.println(
-        "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">")
+      "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">")
     out.println(
-        "<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">\n")
+      "<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">\n")
 
     out println "<head>"
     out.println("<title>" + document.title + " man page</title>")
     out.println("<meta http-equiv=\"Content-Language\" content=\"en\"/>")
     out.println(
-        "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=" +
+      "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=" +
         document.encoding + "\"/>")
     out.println("<meta name=\"Author\" content=\"" + document.author + "\"/>")
     out println "<style type=\"text/css\">"
@@ -208,7 +209,7 @@ object EmitHtml {
 
   def main(args: Array[String]) = args match {
     case Array(classname) => emitHtml(classname)
-    case Array(classname, file, _ *) =>
+    case Array(classname, file, _*) =>
       emitHtml(classname, new java.io.FileOutputStream(file))
     case _ => sys.exit(1)
   }

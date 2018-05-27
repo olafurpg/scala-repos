@@ -33,7 +33,7 @@ final class ProjectNavigation(s: State) {
     action match {
       case None =>
         show(); s
-      case Some(BuildRef(uri)) => changeBuild(uri)
+      case Some(BuildRef(uri))       => changeBuild(uri)
       case Some(ProjectRef(uri, id)) => selectProject(uri, id)
       /*			else if(to.forall(_ == '.'))
 				if(to.length > 1) gotoParent(to.length - 1, nav, s) else s */ // semantics currently undefined
@@ -44,14 +44,16 @@ final class ProjectNavigation(s: State) {
   def selectProject(uri: URI, to: String): State =
     if (structure.units(uri).defined.contains(to)) setProject(uri, to)
     else
-      fail("Invalid project name '" + to + "' in build " + uri +
+      fail(
+        "Invalid project name '" + to + "' in build " + uri +
           " (type 'projects' to list available projects).")
 
   def changeBuild(newBuild: URI): State =
     if (structure.units contains newBuild)
       setProject(newBuild, getRoot(newBuild))
     else
-      fail("Invalid build unit '" + newBuild +
+      fail(
+        "Invalid build unit '" + newBuild +
           "' (type 'projects' to list available builds).")
 
   def fail(msg: String): State = {
@@ -64,7 +66,9 @@ final class ProjectNavigation(s: State) {
 
   val parser: Parser[Option[ResolvedReference]] = {
     val reference = Act.resolvedReference(
-        structure.index.keyIndex, currentRef.build, success(()))
+      structure.index.keyIndex,
+      currentRef.build,
+      success(()))
     val root = token('/' ^^^ rootRef)
     success(None) | some(token(Space) ~> (root | reference))
   }

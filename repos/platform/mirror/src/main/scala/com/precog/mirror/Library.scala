@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -36,7 +36,8 @@ trait LibraryModule extends Binder {
     type Morphism2 = Morphism2Like
 
     abstract class Op1(val namespace: Vector[String], val name: String)
-        extends Op1Like with Morphism1 {
+        extends Op1Like
+        with Morphism1 {
       val opcode = 0x0001 // we really don't care
       val tpe = UnaryOperationType(JUniverseT, JUniverseT)
       val rowLevel = true
@@ -52,7 +53,8 @@ trait LibraryModule extends Binder {
     }
 
     abstract class Reduction(val namespace: Vector[String], val name: String)
-        extends ReductionLike with Morphism1
+        extends ReductionLike
+        with Morphism1
         with ((JValue, JValue) => JValue) {
       val opcode = 0x0001 // we really don't care
       val tpe = UnaryOperationType(JUniverseT, JUniverseT)
@@ -88,15 +90,15 @@ trait LibraryModule extends Binder {
       object roundTo extends Op2(Namespace, "roundTo") {
         override def pf = {
           case (JNum(nBD), JNum(digitsBD)) => {
-              val n = nBD.toDouble
-              val digits = digitsBD.toDouble
+            val n = nBD.toDouble
+            val digits = digitsBD.toDouble
 
-              val adjusted = n * scala.math.pow(10, digits)
-              val rounded =
-                if (scala.math.abs(n) >= 4503599627370496.0) adjusted
-                else scala.math.round(adjusted)
-              JNum(rounded * scala.math.pow(10, -digits))
-            }
+            val adjusted = n * scala.math.pow(10, digits)
+            val rounded =
+              if (scala.math.abs(n) >= 4503599627370496.0) adjusted
+              else scala.math.round(adjusted)
+            JNum(rounded * scala.math.pow(10, -digits))
+          }
         }
       }
     }
@@ -113,7 +115,7 @@ trait LibraryModule extends Binder {
 
         override def apply(left: JValue, right: JValue) = (left, right) match {
           case (JNum(l), JNum(r)) => JNum(l + r)
-          case _ => JNum(0)
+          case _                  => JNum(0)
         }
       }
     }

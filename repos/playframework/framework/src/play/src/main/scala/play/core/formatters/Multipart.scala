@@ -10,7 +10,12 @@ import java.util.concurrent.ThreadLocalRandom
 
 import akka.NotUsed
 import akka.stream.scaladsl.{Flow, Source}
-import akka.stream.stage.{Context, PushPullStage, SyncDirective, TerminationDirective}
+import akka.stream.stage.{
+  Context,
+  PushPullStage,
+  SyncDirective,
+  TerminationDirective
+}
 import akka.util.{ByteString, ByteStringBuilder}
 import play.api.mvc.MultipartFormData
 import play.api.mvc.MultipartFormData.Part
@@ -27,8 +32,9 @@ object Multipart {
   /**
     * Transforms a `Source[MultipartFormData.Part]` to a `Source[ByteString]`
     */
-  def transform(body: Source[MultipartFormData.Part[Source[ByteString, _]], _],
-                boundary: String): Source[ByteString, _] = {
+  def transform(
+      body: Source[MultipartFormData.Part[Source[ByteString, _]], _],
+      boundary: String): Source[ByteString, _] = {
     body.via(format(boundary, Charset.defaultCharset(), 4096))
   }
 
@@ -36,7 +42,9 @@ object Multipart {
     * Provides a Formatting Flow which could be used to format a MultipartFormData.Part source to a multipart/form data body
     */
   def format(boundary: String, nioCharset: Charset, chunkSize: Int): Flow[
-      MultipartFormData.Part[Source[ByteString, _]], ByteString, NotUsed] = {
+    MultipartFormData.Part[Source[ByteString, _]],
+    ByteString,
+    NotUsed] = {
     Flow[MultipartFormData.Part[Source[ByteString, _]]]
       .transform(() => streamed(boundary, nioCharset, chunkSize))
       .flatMapConcat(identity)
@@ -53,7 +61,7 @@ object Multipart {
       random: java.util.Random = ThreadLocalRandom.current()): String = {
     if (length < 1 && length > 70)
       throw new IllegalArgumentException(
-          "length can't be greater than 70 or less than 1")
+        "length can't be greater than 70 or less than 1")
     val bytes: Seq[Byte] = for (byte <- 1 to length) yield {
       alphabet(random.nextInt(alphabet.length))
     }
@@ -74,7 +82,8 @@ object Multipart {
   }
 
   private class CustomCharsetByteStringFormatter(
-      nioCharset: Charset, sizeHint: Int)
+      nioCharset: Charset,
+      sizeHint: Int)
       extends Formatter {
     private[this] val charBuffer = CharBuffer.allocate(64)
     private[this] val builder = new ByteStringBuilder
@@ -124,10 +133,14 @@ object Multipart {
   }
 
   private def streamed(
-      boundary: String, nioCharset: Charset, chunkSize: Int): PushPullStage[
-      MultipartFormData.Part[Source[ByteString, _]], Source[ByteString, Any]] =
-    new PushPullStage[MultipartFormData.Part[Source[ByteString, _]],
-                      Source[ByteString, Any]] {
+      boundary: String,
+      nioCharset: Charset,
+      chunkSize: Int): PushPullStage[
+    MultipartFormData.Part[Source[ByteString, _]],
+    Source[ByteString, Any]] =
+    new PushPullStage[
+      MultipartFormData.Part[Source[ByteString, _]],
+      Source[ByteString, Any]] {
       var firstBoundaryRendered = false
 
       override def onPush(
@@ -150,14 +163,19 @@ object Multipart {
           }
 
         renderBoundary(
-            f, boundary, suppressInitialCrLf = !firstBoundaryRendered)
+          f,
+          boundary,
+          suppressInitialCrLf = !firstBoundaryRendered)
         firstBoundaryRendered = true
 
         val (key, filename, contentType) = bodyPart match {
           case MultipartFormData.DataPart(innerKey, _) =>
             (innerKey, None, Option("text/plain"))
           case MultipartFormData.FilePart(
-              innerKey, innerFilename, innerContentType, _) =>
+              innerKey,
+              innerFilename,
+              innerContentType,
+              _) =>
             (innerKey, Option(innerFilename), innerContentType)
           case _ => throw new UnsupportedOperationException()
         }
@@ -188,9 +206,10 @@ object Multipart {
         ctx.absorbTermination()
     }
 
-  private def renderBoundary(f: Formatter,
-                             boundary: String,
-                             suppressInitialCrLf: Boolean = false): Unit = {
+  private def renderBoundary(
+      f: Formatter,
+      boundary: String,
+      suppressInitialCrLf: Boolean = false): Unit = {
     if (!suppressInitialCrLf) f ~~ CrLf
     f ~~ '-' ~~ '-' ~~ boundary ~~ CrLf
   }
@@ -198,9 +217,10 @@ object Multipart {
   private def renderFinalBoundary(f: Formatter, boundary: String): Unit =
     f ~~ CrLf ~~ '-' ~~ '-' ~~ boundary ~~ '-' ~~ '-'
 
-  private def renderDisposition(f: Formatter,
-                                contentDisposition: String,
-                                filename: Option[String]): Unit = {
+  private def renderDisposition(
+      f: Formatter,
+      contentDisposition: String,
+      filename: Option[String]): Unit = {
     f ~~ "Content-Disposition: form-data; name=" ~~ '"' ~~ contentDisposition ~~ '"'
     filename.foreach { name =>
       f ~~ "; filename=" ~~ '"' ~~ name ~~ '"'

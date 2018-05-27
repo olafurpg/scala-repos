@@ -62,8 +62,8 @@ object WebErrorEvent {
   val UserDataDirectoryAlreadyInUse: EventType[jfxsw.WebErrorEvent] =
     jfxsw.WebErrorEvent.USER_DATA_DIRECTORY_ALREADY_IN_USE
   @deprecated(
-      "Use UserDataDirectoryAlreadyInUse; USER_DATA_DIRECTORY_ALREADY_IN_USE will be removed in a future release",
-      "8.0.60-R10")
+    "Use UserDataDirectoryAlreadyInUse; USER_DATA_DIRECTORY_ALREADY_IN_USE will be removed in a future release",
+    "8.0.60-R10")
   val USER_DATA_DIRECTORY_ALREADY_IN_USE = UserDataDirectoryAlreadyInUse
 
   /**
@@ -73,8 +73,8 @@ object WebErrorEvent {
   val UserDataDirectoryIOError: EventType[jfxsw.WebErrorEvent] =
     jfxsw.WebErrorEvent.USER_DATA_DIRECTORY_IO_ERROR
   @deprecated(
-      "Use UserDataDirectoryIOError; USER_DATA_DIRECTORY_IO_ERROR will be removed in a future release",
-      "8.0.60-R10")
+    "Use UserDataDirectoryIOError; USER_DATA_DIRECTORY_IO_ERROR will be removed in a future release",
+    "8.0.60-R10")
   val USER_DATA_DIRECTORY_IO_ERROR = UserDataDirectoryIOError
 
   /**
@@ -84,8 +84,8 @@ object WebErrorEvent {
   val UserDataDirectorySecurityError: EventType[jfxsw.WebErrorEvent] =
     jfxsw.WebErrorEvent.USER_DATA_DIRECTORY_SECURITY_ERROR
   @deprecated(
-      "Use UserDataDirectorySecurityError; USER_DATA_DIRECTORY_SECURITY_ERROR will be removed in a future release",
-      "8.0.60-R10")
+    "Use UserDataDirectorySecurityError; USER_DATA_DIRECTORY_SECURITY_ERROR will be removed in a future release",
+    "8.0.60-R10")
   val USER_DATA_DIRECTORY_SECURITY_ERROR = UserDataDirectorySecurityError
 }
 
@@ -97,7 +97,8 @@ object WebErrorEvent {
   * @since 8.0
   */
 final class WebErrorEvent(override val delegate: jfxsw.WebErrorEvent)
-    extends Event(delegate) with SFXDelegate[jfxsw.WebErrorEvent] {
+    extends Event(delegate)
+    with SFXDelegate[jfxsw.WebErrorEvent] {
 
   /**
     * Creates a new WebErrorEvent.
@@ -107,10 +108,11 @@ final class WebErrorEvent(override val delegate: jfxsw.WebErrorEvent)
     * @param message the text message associated with the event; may be <code>null</code>.
     * @param exception the exception associated with the event; may be <code>null</code>.
     */
-  def this(source: AnyRef,
-           eventType: jfxe.EventType[jfxsw.WebErrorEvent],
-           message: String,
-           exception: Throwable) =
+  def this(
+      source: AnyRef,
+      eventType: jfxe.EventType[jfxsw.WebErrorEvent],
+      message: String,
+      exception: Throwable) =
     this(new jfxsw.WebErrorEvent(source, eventType, message, exception))
 
   /**

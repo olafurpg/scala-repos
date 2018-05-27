@@ -60,11 +60,11 @@ object rot90 extends UFunc {
     new Impl2[DenseMatrix[T], Int, DenseMatrix[T]] {
       def apply(v: DenseMatrix[T], k: Int): DenseMatrix[T] = {
         (k % 4) match {
-          case 0 => v.copy
+          case 0      => v.copy
           case 1 | -3 => fliplr(v).t
           case 2 | -2 => fliplr(flipud(v))
           case 3 | -1 => fliplr(v.t)
-          case _ => sys.error("Shouldn't be here!")
+          case _      => sys.error("Shouldn't be here!")
         }
       }
     }

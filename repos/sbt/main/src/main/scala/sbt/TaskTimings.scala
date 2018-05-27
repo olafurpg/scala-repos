@@ -14,10 +14,11 @@ private[sbt] final class TaskTimings extends ExecuteProgress[Task] {
   type S = Unit
 
   def initial = { start = System.nanoTime }
-  def registered(state: Unit,
-                 task: Task[_],
-                 allDeps: Iterable[Task[_]],
-                 pendingDeps: Iterable[Task[_]]) = {
+  def registered(
+      state: Unit,
+      task: Task[_],
+      allDeps: Iterable[Task[_]],
+      pendingDeps: Iterable[Task[_]]) = {
     pendingDeps foreach { t =>
       if (transformNode(t).isEmpty) anonOwners.put(t, task)
     }
@@ -38,9 +39,9 @@ private[sbt] final class TaskTimings extends ExecuteProgress[Task] {
     def sumTimes(in: Seq[(Task[_], Long)]) = in.map(_._2).sum
     val timingsByName =
       timings.toSeq.groupBy { case (t, time) => mappedName(t) } mapValues
-      (sumTimes)
-    for ((taskName, time) <- timingsByName.toSeq.sortBy(_._2).reverse) println(
-        "  " + taskName + ": " + (time * 1e-6) + " ms")
+        (sumTimes)
+    for ((taskName, time) <- timingsByName.toSeq.sortBy(_._2).reverse)
+      println("  " + taskName + ": " + (time * 1e-6) + " ms")
   }
   private[this] def inferredName(t: Task[_]): Option[String] =
     nameDelegate(t) map mappedName

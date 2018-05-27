@@ -36,17 +36,19 @@ object BackoffSupervisor {
     *   random delay based on this factor is added, e.g. `0.2` adds up to `20%` delay.
     *   In order to skip this additional delay pass in `0`.
     */
-  def props(childProps: Props,
-            childName: String,
-            minBackoff: FiniteDuration,
-            maxBackoff: FiniteDuration,
-            randomFactor: Double): Props = {
-    propsWithSupervisorStrategy(childProps,
-                                childName,
-                                minBackoff,
-                                maxBackoff,
-                                randomFactor,
-                                SupervisorStrategy.defaultStrategy)
+  def props(
+      childProps: Props,
+      childName: String,
+      minBackoff: FiniteDuration,
+      maxBackoff: FiniteDuration,
+      randomFactor: Double): Props = {
+    propsWithSupervisorStrategy(
+      childProps,
+      childName,
+      minBackoff,
+      maxBackoff,
+      randomFactor,
+      SupervisorStrategy.defaultStrategy)
   }
 
   /**
@@ -69,23 +71,26 @@ object BackoffSupervisor {
     * @param strategy the supervision strategy to use for handling exceptions
     *   in the child
     */
-  def propsWithSupervisorStrategy(childProps: Props,
-                                  childName: String,
-                                  minBackoff: FiniteDuration,
-                                  maxBackoff: FiniteDuration,
-                                  randomFactor: Double,
-                                  strategy: SupervisorStrategy): Props = {
+  def propsWithSupervisorStrategy(
+      childProps: Props,
+      childName: String,
+      minBackoff: FiniteDuration,
+      maxBackoff: FiniteDuration,
+      randomFactor: Double,
+      strategy: SupervisorStrategy): Props = {
     require(minBackoff > Duration.Zero, "minBackoff must be > 0")
     require(maxBackoff >= minBackoff, "maxBackoff must be >= minBackoff")
-    require(0.0 <= randomFactor && randomFactor <= 1.0,
-            "randomFactor must be between 0.0 and 1.0")
+    require(
+      0.0 <= randomFactor && randomFactor <= 1.0,
+      "randomFactor must be between 0.0 and 1.0")
     Props(
-        new BackoffSupervisor(childProps,
-                              childName,
-                              minBackoff,
-                              maxBackoff,
-                              randomFactor,
-                              strategy))
+      new BackoffSupervisor(
+        childProps,
+        childName,
+        minBackoff,
+        maxBackoff,
+        randomFactor,
+        strategy))
   }
 
   /**
@@ -146,7 +151,7 @@ object BackoffSupervisor {
 
   private[akka] final case object StartChild extends DeadLetterSuppression
 
-  // not final for binary compatibility with 2.4.1 
+  // not final for binary compatibility with 2.4.1
   private[akka] case class ResetRestartCount(current: Int)
       extends DeadLetterSuppression
 
@@ -155,10 +160,11 @@ object BackoffSupervisor {
     *
     * Calculates an exponential back off delay.
     */
-  private[akka] def calculateDelay(restartCount: Int,
-                                   minBackoff: FiniteDuration,
-                                   maxBackoff: FiniteDuration,
-                                   randomFactor: Double): FiniteDuration = {
+  private[akka] def calculateDelay(
+      restartCount: Int,
+      minBackoff: FiniteDuration,
+      maxBackoff: FiniteDuration,
+      randomFactor: Double): FiniteDuration = {
     val rnd = 1.0 + ThreadLocalRandom.current().nextDouble() * randomFactor
     if (restartCount >= 30) // Duration overflow protection (> 100 years)
       maxBackoff
@@ -175,14 +181,16 @@ object BackoffSupervisor {
   * This back-off supervisor is created by using `akka.pattern.BackoffSupervisor.props`
   * with `Backoff.onStop`.
   */
-final class BackoffSupervisor(val childProps: Props,
-                              val childName: String,
-                              minBackoff: FiniteDuration,
-                              maxBackoff: FiniteDuration,
-                              val reset: BackoffReset,
-                              randomFactor: Double,
-                              strategy: SupervisorStrategy)
-    extends Actor with HandleBackoff {
+final class BackoffSupervisor(
+    val childProps: Props,
+    val childName: String,
+    minBackoff: FiniteDuration,
+    maxBackoff: FiniteDuration,
+    val reset: BackoffReset,
+    randomFactor: Double,
+    strategy: SupervisorStrategy)
+    extends Actor
+    with HandleBackoff {
 
   import BackoffSupervisor._
   import context.dispatcher
@@ -190,9 +198,10 @@ final class BackoffSupervisor(val childProps: Props,
   // to keep binary compatibility with 2.4.1
   override val supervisorStrategy = strategy match {
     case oneForOne: OneForOneStrategy ⇒
-      OneForOneStrategy(oneForOne.maxNrOfRetries,
-                        oneForOne.withinTimeRange,
-                        oneForOne.loggingEnabled) {
+      OneForOneStrategy(
+        oneForOne.maxNrOfRetries,
+        oneForOne.withinTimeRange,
+        oneForOne.loggingEnabled) {
         case ex ⇒
           val defaultDirective: Directive = super.supervisorStrategy.decider
             .applyOrElse(ex, (_: Any) ⇒ Escalate)
@@ -203,38 +212,42 @@ final class BackoffSupervisor(val childProps: Props,
   }
 
   // for binary compatibility with 2.4.1
-  def this(childProps: Props,
-           childName: String,
-           minBackoff: FiniteDuration,
-           maxBackoff: FiniteDuration,
-           randomFactor: Double,
-           supervisorStrategy: SupervisorStrategy) =
-    this(childProps,
-         childName,
-         minBackoff,
-         maxBackoff,
-         AutoReset(minBackoff),
-         randomFactor,
-         supervisorStrategy)
+  def this(
+      childProps: Props,
+      childName: String,
+      minBackoff: FiniteDuration,
+      maxBackoff: FiniteDuration,
+      randomFactor: Double,
+      supervisorStrategy: SupervisorStrategy) =
+    this(
+      childProps,
+      childName,
+      minBackoff,
+      maxBackoff,
+      AutoReset(minBackoff),
+      randomFactor,
+      supervisorStrategy)
 
   // for binary compatibility with 2.4.0
-  def this(childProps: Props,
-           childName: String,
-           minBackoff: FiniteDuration,
-           maxBackoff: FiniteDuration,
-           randomFactor: Double) =
-    this(childProps,
-         childName,
-         minBackoff,
-         maxBackoff,
-         randomFactor,
-         SupervisorStrategy.defaultStrategy)
+  def this(
+      childProps: Props,
+      childName: String,
+      minBackoff: FiniteDuration,
+      maxBackoff: FiniteDuration,
+      randomFactor: Double) =
+    this(
+      childProps,
+      childName,
+      minBackoff,
+      maxBackoff,
+      randomFactor,
+      SupervisorStrategy.defaultStrategy)
 
   def onTerminated: Receive = {
     case Terminated(ref) if child.contains(ref) ⇒
       child = None
-      val restartDelay = calculateDelay(
-          restartCount, minBackoff, maxBackoff, randomFactor)
+      val restartDelay =
+        calculateDelay(restartCount, minBackoff, maxBackoff, randomFactor)
       context.system.scheduler.scheduleOnce(restartDelay, self, StartChild)
       restartCount += 1
   }

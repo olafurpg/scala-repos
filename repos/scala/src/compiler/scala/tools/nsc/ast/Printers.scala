@@ -18,22 +18,24 @@ trait Printers extends scala.reflect.internal.Printers {
     override def print(args: Any*): Unit = args foreach {
       case tree: Tree =>
         printPosition(tree)
-        printTree(if (tree.isDef && tree.symbol != NoSymbol &&
-                      tree.symbol.isInitialized) {
-          tree match {
-            case ClassDef(_, _, _, impl @ Template(ps, noSelfType, body))
-                if (tree.symbol.thisSym != tree.symbol) =>
-              ClassDef(tree.symbol,
-                       Template(ps, ValDef(tree.symbol.thisSym), body))
-            case ClassDef(_, _, _, impl) => ClassDef(tree.symbol, impl)
-            case ModuleDef(_, _, impl) => ModuleDef(tree.symbol, impl)
-            case ValDef(_, _, _, rhs) => ValDef(tree.symbol, rhs)
-            case DefDef(_, _, _, vparamss, _, rhs) =>
-              DefDef(tree.symbol, vparamss, rhs)
-            case TypeDef(_, _, _, rhs) => TypeDef(tree.symbol, rhs)
-            case _ => tree
-          }
-        } else tree)
+        printTree(
+          if (tree.isDef && tree.symbol != NoSymbol &&
+              tree.symbol.isInitialized) {
+            tree match {
+              case ClassDef(_, _, _, impl @ Template(ps, noSelfType, body))
+                  if (tree.symbol.thisSym != tree.symbol) =>
+                ClassDef(
+                  tree.symbol,
+                  Template(ps, ValDef(tree.symbol.thisSym), body))
+              case ClassDef(_, _, _, impl) => ClassDef(tree.symbol, impl)
+              case ModuleDef(_, _, impl)   => ModuleDef(tree.symbol, impl)
+              case ValDef(_, _, _, rhs)    => ValDef(tree.symbol, rhs)
+              case DefDef(_, _, _, vparamss, _, rhs) =>
+                DefDef(tree.symbol, vparamss, rhs)
+              case TypeDef(_, _, _, rhs) => TypeDef(tree.symbol, rhs)
+              case _                     => tree
+            }
+          } else tree)
       case unit: CompilationUnit =>
         print("// Scala source: " + unit.source + "\n")
         if (unit.body == null) print("<null>")
@@ -68,7 +70,10 @@ trait Printers extends scala.reflect.internal.Printers {
     */
   class CompactTreePrinter(out: PrintWriter) extends TreePrinter(out) {
     override def printRow(
-        ts: List[Tree], start: String, sep: String, end: String) {
+        ts: List[Tree],
+        start: String,
+        sep: String,
+        end: String) {
       print(start)
       printSeq(ts)(print(_))(print(sep))
       print(end)
@@ -77,7 +82,7 @@ trait Printers extends scala.reflect.internal.Printers {
     // drill down through Blocks and pull out the real statements.
     def allStatements(t: Tree): List[Tree] = t match {
       case Block(stmts, expr) => (stmts flatMap allStatements) ::: List(expr)
-      case _ => List(t)
+      case _                  => List(t)
     }
 
     def printLogicalOr(t1: (Tree, Boolean), t2: (Tree, Boolean)) =
@@ -143,11 +148,11 @@ trait Printers extends scala.reflect.internal.Printers {
         case Block(stats, expr) =>
           allStatements(tree) match {
             case List(x) => printTree(x)
-            case xs => s()
+            case xs      => s()
           }
 
         // We get a lot of this stuff
-        case If(IsTrue(), x, _) => printTree(x)
+        case If(IsTrue(), x, _)  => printTree(x)
         case If(IsFalse(), _, x) => printTree(x)
 
         case If(cond, IsTrue(), elsep) =>
@@ -170,8 +175,8 @@ trait Printers extends scala.reflect.internal.Printers {
 
           thenStmts match {
             case List(x: If) => ifIndented(x)
-            case List(x) => printTree(x)
-            case _ => printTree(thenp)
+            case List(x)     => printTree(x)
+            case _           => printTree(thenp)
           }
 
           if (elseStmts.nonEmpty) {
@@ -179,7 +184,7 @@ trait Printers extends scala.reflect.internal.Printers {
             indent(); println()
             elseStmts match {
               case List(x) => printTree(x)
-              case _ => printTree(elsep)
+              case _       => printTree(elsep)
             }
             undent(); println()
           }
@@ -189,19 +194,21 @@ trait Printers extends scala.reflect.internal.Printers {
   }
 
   def asString(t: Tree): String =
-    render(t,
-           newStandardTreePrinter,
-           settings.printtypes,
-           settings.uniqid,
-           settings.Yshowsymowners,
-           settings.Yshowsymkinds)
+    render(
+      t,
+      newStandardTreePrinter,
+      settings.printtypes,
+      settings.uniqid,
+      settings.Yshowsymowners,
+      settings.Yshowsymkinds)
   def asCompactString(t: Tree): String =
-    render(t,
-           newCompactTreePrinter,
-           settings.printtypes,
-           settings.uniqid,
-           settings.Yshowsymowners,
-           settings.Yshowsymkinds)
+    render(
+      t,
+      newCompactTreePrinter,
+      settings.printtypes,
+      settings.uniqid,
+      settings.Yshowsymowners,
+      settings.Yshowsymkinds)
   def asCompactDebugString(t: Tree): String =
     render(t, newCompactTreePrinter, true, true, true, true)
 

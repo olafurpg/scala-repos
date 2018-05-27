@@ -7,18 +7,24 @@ package javaguide.testhelpers {
 
   import akka.stream.Materializer
   import play.api.mvc.{Action, Request}
-  import play.core.j.{DefaultJavaHandlerComponents, JavaHelpers, JavaActionAnnotations, JavaAction}
+  import play.core.j.{
+    DefaultJavaHandlerComponents,
+    JavaHelpers,
+    JavaActionAnnotations,
+    JavaAction
+  }
   import play.http.DefaultActionCreator
   import play.mvc.{Controller, Http, Result}
   import play.api.test.Helpers
   import java.lang.reflect.Method
 
   abstract class MockJavaAction
-      extends Controller with Action[Http.RequestBody] { self =>
+      extends Controller
+      with Action[Http.RequestBody] { self =>
 
     private lazy val components = new DefaultJavaHandlerComponents(
-        play.api.Play.current.injector,
-        new DefaultActionCreator
+      play.api.Play.current.injector,
+      new DefaultActionCreator
     )
 
     private lazy val action = new JavaAction(components) {
@@ -26,7 +32,7 @@ package javaguide.testhelpers {
 
       def parser = {
         play.HandlerInvokerFactoryAccessor.javaBodyParserToScala(
-            components.getBodyParser(annotations.parser)
+          components.getBodyParser(annotations.parser)
         )
       }
 
@@ -42,7 +48,7 @@ package javaguide.testhelpers {
 
     def invocation = {
       method.invoke(this) match {
-        case r: Result => CompletableFuture.completedFuture(r)
+        case r: Result             => CompletableFuture.completedFuture(r)
         case f: CompletionStage[_] => f.asInstanceOf[CompletionStage[Result]]
       }
     }
@@ -52,18 +58,19 @@ package javaguide.testhelpers {
 
     import Helpers.defaultAwaitTimeout
 
-    def call(action: Action[Http.RequestBody],
-             requestBuilder: play.mvc.Http.RequestBuilder)(
+    def call(
+        action: Action[Http.RequestBody],
+        requestBuilder: play.mvc.Http.RequestBuilder)(
         implicit mat: Materializer): Result = {
       Helpers
-        .await(
-            requestBuilder.body() match {
+        .await(requestBuilder.body() match {
           case null =>
             action.apply(requestBuilder.build()._underlyingRequest)
           case other =>
-            Helpers.call(action,
-                         requestBuilder.build()._underlyingRequest,
-                         other.asBytes())
+            Helpers.call(
+              action,
+              requestBuilder.build()._underlyingRequest,
+              other.asBytes())
         })
         .asJava
     }
@@ -73,8 +80,8 @@ package javaguide.testhelpers {
         requestBuilder: play.mvc.Http.RequestBuilder,
         body: String)(implicit mat: Materializer): Result = {
       Helpers
-        .await(Helpers.call(
-                action, requestBuilder.build()._underlyingRequest, body))
+        .await(
+          Helpers.call(action, requestBuilder.build()._underlyingRequest, body))
         .asJava
     }
 
@@ -100,8 +107,8 @@ package javaguide.testhelpers {
     def findActionMethod(obj: AnyRef): Method = {
       val maybeMethod = obj.getClass.getDeclaredMethods.find(!_.isSynthetic)
       val theMethod = maybeMethod.getOrElse(
-          throw new RuntimeException(
-              "MockJavaAction must declare at least one non synthetic method")
+        throw new RuntimeException(
+          "MockJavaAction must declare at least one non synthetic method")
       )
       theMethod.setAccessible(true)
       theMethod

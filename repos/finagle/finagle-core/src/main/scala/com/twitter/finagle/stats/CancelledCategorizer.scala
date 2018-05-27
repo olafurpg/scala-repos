@@ -1,6 +1,9 @@
 package com.twitter.finagle.stats
 
-import com.twitter.finagle.{CancelledConnectionException, CancelledRequestException}
+import com.twitter.finagle.{
+  CancelledConnectionException,
+  CancelledRequestException
+}
 import com.twitter.util.Throwables.RootCause
 
 /**
@@ -11,10 +14,10 @@ object CancelledCategorizer {
 
   def unapply(exc: Throwable): Option[Throwable] = {
     exc match {
-      case t: CancelledRequestException => Some(t)
-      case t: CancelledConnectionException => Some(t)
+      case t: CancelledRequestException       => Some(t)
+      case t: CancelledConnectionException    => Some(t)
       case RootCause(CancelledCategorizer(t)) => Some(t)
-      case _ => None
+      case _                                  => None
     }
   }
 

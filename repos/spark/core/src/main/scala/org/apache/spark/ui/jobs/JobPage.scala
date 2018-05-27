@@ -118,7 +118,7 @@ private[ui] class JobPage(parent: JobsTab) extends WebUIPage("job") {
                |    'data-toggle="tooltip" data-placement="bottom"' +
                |    'data-title="Executor ${executorId}<br>' +
                |    'Removed at ${UIUtils.formatDate(
-                                    new Date(event.finishTime.get))}' +
+                                  new Date(event.finishTime.get))}' +
                |    '${if (event.finishReason.isDefined) {
                                   s"""<br>Reason: ${event.finishReason.get}"""
                                 } else {
@@ -133,9 +133,10 @@ private[ui] class JobPage(parent: JobsTab) extends WebUIPage("job") {
     events.toSeq
   }
 
-  private def makeTimeline(stages: Seq[StageInfo],
-                           executors: HashMap[String, ExecutorUIData],
-                           appStartTime: Long): Seq[Node] = {
+  private def makeTimeline(
+      stages: Seq[StageInfo],
+      executors: HashMap[String, ExecutorUIData],
+      appStartTime: Long): Seq[Node] = {
 
     val stageEventJsonAsStrSeq = makeStageEvent(stages)
     val executorsJsonAsStrSeq = makeExecutorEvent(executors)
@@ -179,7 +180,8 @@ private[ui] class JobPage(parent: JobsTab) extends WebUIPage("job") {
     listener.synchronized {
       val parameterId = request.getParameter("id")
       require(
-          parameterId != null && parameterId.nonEmpty, "Missing id parameter")
+        parameterId != null && parameterId.nonEmpty,
+        "Missing id parameter")
 
       val jobId = parameterId.toInt
       val jobDataOption = listener.jobIdToData.get(jobId)
@@ -188,7 +190,9 @@ private[ui] class JobPage(parent: JobsTab) extends WebUIPage("job") {
             <p>No information to display for job {jobId}</p>
           </div>
         return UIUtils.headerSparkPage(
-            s"Details for Job $jobId", content, parent)
+          s"Details for Job $jobId",
+          content,
+          parent)
       }
       val jobData = jobDataOption.get
       val isComplete = jobData.status != JobExecutionStatus.RUNNING
@@ -196,9 +200,15 @@ private[ui] class JobPage(parent: JobsTab) extends WebUIPage("job") {
         // This could be empty if the JobProgressListener hasn't received information about the
         // stage or if the stage information has been garbage collected
         listener.stageIdToInfo.getOrElse(
+          stageId,
+          new StageInfo(
             stageId,
-            new StageInfo(
-                stageId, 0, "Unknown", 0, Seq.empty, Seq.empty, "Unknown"))
+            0,
+            "Unknown",
+            0,
+            Seq.empty,
+            Seq.empty,
+            "Unknown"))
       }
 
       val activeStages = Buffer[StageInfo]()
@@ -221,28 +231,33 @@ private[ui] class JobPage(parent: JobsTab) extends WebUIPage("job") {
       }
 
       val activeStagesTable =
-        new StageTableBase(activeStages.sortBy(_.submissionTime).reverse,
-                           parent.basePath,
-                           parent.jobProgresslistener,
-                           isFairScheduler = parent.isFairScheduler,
-                           killEnabled = parent.killEnabled)
+        new StageTableBase(
+          activeStages.sortBy(_.submissionTime).reverse,
+          parent.basePath,
+          parent.jobProgresslistener,
+          isFairScheduler = parent.isFairScheduler,
+          killEnabled = parent.killEnabled
+        )
       val pendingOrSkippedStagesTable =
-        new StageTableBase(pendingOrSkippedStages.sortBy(_.stageId).reverse,
-                           parent.basePath,
-                           parent.jobProgresslistener,
-                           isFairScheduler = parent.isFairScheduler,
-                           killEnabled = false)
+        new StageTableBase(
+          pendingOrSkippedStages.sortBy(_.stageId).reverse,
+          parent.basePath,
+          parent.jobProgresslistener,
+          isFairScheduler = parent.isFairScheduler,
+          killEnabled = false)
       val completedStagesTable =
-        new StageTableBase(completedStages.sortBy(_.submissionTime).reverse,
-                           parent.basePath,
-                           parent.jobProgresslistener,
-                           isFairScheduler = parent.isFairScheduler,
-                           killEnabled = false)
+        new StageTableBase(
+          completedStages.sortBy(_.submissionTime).reverse,
+          parent.basePath,
+          parent.jobProgresslistener,
+          isFairScheduler = parent.isFairScheduler,
+          killEnabled = false)
       val failedStagesTable =
-        new FailedStageTable(failedStages.sortBy(_.submissionTime).reverse,
-                             parent.basePath,
-                             parent.jobProgresslistener,
-                             isFairScheduler = parent.isFairScheduler)
+        new FailedStageTable(
+          failedStages.sortBy(_.submissionTime).reverse,
+          parent.basePath,
+          parent.jobProgresslistener,
+          isFairScheduler = parent.isFairScheduler)
 
       val shouldShowActiveStages = activeStages.nonEmpty
       val shouldShowPendingStages =
@@ -315,12 +330,14 @@ private[ui] class JobPage(parent: JobsTab) extends WebUIPage("job") {
       val executorListener = parent.executorListener
       val operationGraphListener = parent.operationGraphListener
 
-      content ++= makeTimeline(activeStages ++ completedStages ++ failedStages,
-                               executorListener.executorIdToData,
-                               appStartTime)
+      content ++= makeTimeline(
+        activeStages ++ completedStages ++ failedStages,
+        executorListener.executorIdToData,
+        appStartTime)
 
       content ++= UIUtils.showDagVizForJob(
-          jobId, operationGraphListener.getOperationGraphForJob(jobId))
+        jobId,
+        operationGraphListener.getOperationGraphForJob(jobId))
 
       if (shouldShowActiveStages) {
         content ++=
@@ -343,7 +360,10 @@ private[ui] class JobPage(parent: JobsTab) extends WebUIPage("job") {
           <h4 id ="failed">Failed Stages ({failedStages.size})</h4> ++ failedStagesTable.toNodeSeq
       }
       UIUtils.headerSparkPage(
-          s"Details for Job $jobId", content, parent, showVisualization = true)
+        s"Details for Job $jobId",
+        content,
+        parent,
+        showVisualization = true)
     }
   }
 }

@@ -4,7 +4,12 @@ package local
 import java.io.File
 
 import org.jetbrains.jps.incremental.scala.data.CompilationData
-import sbt.compiler.{AnalyzingCompiler, CompileOutput, CompilerArguments, CompilerCache}
+import sbt.compiler.{
+  AnalyzingCompiler,
+  CompileOutput,
+  CompilerArguments,
+  CompilerCache
+}
 import xsbti.api.SourceAPI
 import xsbti.compile.DependencyChanges
 import xsbti.{DependencyContext, Position, Severity}
@@ -28,17 +33,22 @@ class IdeaIncrementalCompiler(scalac: AnalyzingCompiler)
     val cArgs = new CompilerArguments(scalac.scalaInstance, scalac.cp)
     val options =
       "IntellijIdea.simpleAnalysis" +: cArgs(
-          Nil, compilationData.classpath, None, compilationData.scalaOptions)
+        Nil,
+        compilationData.classpath,
+        None,
+        compilationData.scalaOptions)
 
-    try scalac.compile(compilationData.sources,
-                       emptyChanges,
-                       options,
-                       out,
-                       clientCallback,
-                       reporter,
-                       CompilerCache.fresh,
-                       logger,
-                       Option(progress)) catch {
+    try scalac.compile(
+      compilationData.sources,
+      emptyChanges,
+      options,
+      out,
+      clientCallback,
+      reporter,
+      CompilerCache.fresh,
+      logger,
+      Option(progress))
+    catch {
       case _: xsbti.CompileFailed =>
       // the error should be already handled via the `reporter`
     }
@@ -60,27 +70,36 @@ private class ClientCallback(client: Client) extends ClientCallbackBase {
 
 abstract class ClientCallbackBase extends xsbti.AnalysisCallback {
   override def sourceDependency(
-      dependsOn: File, source: File, publicInherited: Boolean): Unit = {}
+      dependsOn: File,
+      source: File,
+      publicInherited: Boolean): Unit = {}
   override def sourceDependency(
-      file: File, file1: File, dependencyContext: DependencyContext): Unit = {}
-  override def binaryDependency(binary: File,
-                                name: String,
-                                source: File,
-                                publicInherited: Boolean): Unit = {}
+      file: File,
+      file1: File,
+      dependencyContext: DependencyContext): Unit = {}
+  override def binaryDependency(
+      binary: File,
+      name: String,
+      source: File,
+      publicInherited: Boolean): Unit = {}
   override def binaryDependency(
       file: File,
       s: String,
       file1: File,
       dependencyContext: DependencyContext): Unit = {}
-  override def generatedClass(source: File, module: File, name: String): Unit = {}
+  override def generatedClass(
+      source: File,
+      module: File,
+      name: String): Unit = {}
   override def beginSource(p1: File) = {}
   override def endSource(sourcePath: File): Unit = {}
   override def api(sourceFile: File, source: SourceAPI): Unit = {}
-  override def problem(what: String,
-                       pos: Position,
-                       msg: String,
-                       severity: Severity,
-                       reported: Boolean): Unit = {}
+  override def problem(
+      what: String,
+      pos: Position,
+      msg: String,
+      severity: Severity,
+      reported: Boolean): Unit = {}
   override def usedName(p1: File, p2: String) = {}
 }
 

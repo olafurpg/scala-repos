@@ -72,18 +72,18 @@ private[finagle] class ByteBufAsBuf(private val underlying: ByteBuf)
   def slice(from: Int, until: Int): Buf = {
     if (from < 0 || until < 0)
       throw new IndexOutOfBoundsException(
-          s"slice indexes must be >= 0, saw from: $from until: $until")
+        s"slice indexes must be >= 0, saw from: $from until: $until")
 
     if (until <= from || from >= length) Buf.Empty
     else if (from == 0 && until >= length) this
     else
       new ByteBufAsBuf(
-          underlying.slice(from, Math.min((until - from), (length - from))))
+        underlying.slice(from, Math.min((until - from), (length - from))))
   }
 
   override def equals(other: Any): Boolean = other match {
     case ByteBufAsBuf.Owned(otherBB) => underlying.equals(otherBB)
-    case other: Buf => Buf.equals(this, other)
-    case _ => false
+    case other: Buf                  => Buf.equals(this, other)
+    case _                           => false
   }
 }

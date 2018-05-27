@@ -53,12 +53,13 @@ object GraphGenerators extends Logging {
     * @param seed (optional, default: -1) seed for RNGs, -1 causes a random seed to be chosen
     * @return Graph object
     */
-  def logNormalGraph(sc: SparkContext,
-                     numVertices: Int,
-                     numEParts: Int = 0,
-                     mu: Double = 4.0,
-                     sigma: Double = 1.3,
-                     seed: Long = -1): Graph[Long, Int] = {
+  def logNormalGraph(
+      sc: SparkContext,
+      numVertices: Int,
+      numEParts: Int = 0,
+      mu: Double = 4.0,
+      sigma: Double = 1.3,
+      seed: Long = -1): Graph[Long, Int] = {
 
     val evalNumEParts =
       if (numEParts == 0) sc.defaultParallelism else numEParts
@@ -76,7 +77,10 @@ object GraphGenerators extends Logging {
     val edges = vertices.flatMap {
       case (src, degree) =>
         generateRandomEdges(
-            src.toInt, degree.toInt, numVertices, seed = (seed2 ^ src))
+          src.toInt,
+          degree.toInt,
+          numVertices,
+          seed = (seed2 ^ src))
     }
 
     Graph(vertices, edges, 0)
@@ -86,10 +90,11 @@ object GraphGenerators extends Logging {
   // the edge data is the weight (default 1)
   val RMATc = 0.15
 
-  def generateRandomEdges(src: Int,
-                          numEdges: Int,
-                          maxVertexId: Int,
-                          seed: Long = -1): Array[Edge[Int]] = {
+  def generateRandomEdges(
+      src: Int,
+      numEdges: Int,
+      maxVertexId: Int,
+      seed: Long = -1): Array[Edge[Int]] = {
     val rand = if (seed == -1) new Random() else new Random(seed)
     Array.fill(numEdges) { Edge[Int](src, rand.nextInt(maxVertexId), 1) }
   }
@@ -107,7 +112,10 @@ object GraphGenerators extends Logging {
     * @param seed optional seed
     */
   private[spark] def sampleLogNormal(
-      mu: Double, sigma: Double, maxVal: Int, seed: Long = -1): Int = {
+      mu: Double,
+      sigma: Double,
+      maxVal: Int,
+      seed: Long = -1): Int = {
     val rand = if (seed == -1) new Random() else new Random(seed)
 
     val sigmaSq = sigma * sigma
@@ -130,21 +138,23 @@ object GraphGenerators extends Logging {
     *
     * See [[http://www.cs.cmu.edu/~christos/PUBLICATIONS/siam04.pdf]].
     */
-  def rmatGraph(sc: SparkContext,
-                requestedNumVertices: Int,
-                numEdges: Int): Graph[Int, Int] = {
+  def rmatGraph(
+      sc: SparkContext,
+      requestedNumVertices: Int,
+      numEdges: Int): Graph[Int, Int] = {
     // let N = requestedNumVertices
     // the number of vertices is 2^n where n=ceil(log2[N])
     // This ensures that the 4 quadrants are the same size at all recursion levels
     val numVertices = math
-      .round(math.pow(
-              2.0, math.ceil(math.log(requestedNumVertices) / math.log(2.0))))
+      .round(
+        math
+          .pow(2.0, math.ceil(math.log(requestedNumVertices) / math.log(2.0))))
       .toInt
     val numEdgesUpperBound =
       math.pow(2.0, 2 * ((math.log(numVertices) / math.log(2.0)) - 1)).toInt
     if (numEdgesUpperBound < numEdges) {
       throw new IllegalArgumentException(
-          s"numEdges must be <= $numEdgesUpperBound but was $numEdges")
+        s"numEdges must be <= $numEdgesUpperBound but was $numEdges")
     }
     var edges: Set[Edge[Int]] = Set()
     while (edges.size < numEdges) {
@@ -156,11 +166,14 @@ object GraphGenerators extends Logging {
     outDegreeFromEdges(sc.parallelize(edges.toList))
   }
 
-  private def outDegreeFromEdges[ED : ClassTag](
+  private def outDegreeFromEdges[ED: ClassTag](
       edges: RDD[Edge[ED]]): Graph[Int, ED] = {
-    val vertices = edges.flatMap { edge =>
-      List((edge.srcId, 1))
-    }.reduceByKey(_ + _).map { case (vid, degree) => (vid, degree) }
+    val vertices = edges
+      .flatMap { edge =>
+        List((edge.srcId, 1))
+      }
+      .reduceByKey(_ + _)
+      .map { case (vid, degree) => (vid, degree) }
     Graph(vertices, edges, 0)
   }
 
@@ -227,16 +240,16 @@ object GraphGenerators extends Logging {
   private def pickQuadrant(a: Double, b: Double, c: Double, d: Double): Int = {
     if (a + b + c + d != 1.0) {
       throw new IllegalArgumentException(
-          "R-MAT probability parameters sum to " + (a + b + c + d) +
+        "R-MAT probability parameters sum to " + (a + b + c + d) +
           ", should sum to 1.0")
     }
     val rand = new Random()
     val result = rand.nextDouble()
     result match {
-      case x if x < a => 0 // 0 corresponds to quadrant a
-      case x if (x >= a && x < a + b) => 1 // 1 corresponds to b
+      case x if x < a                         => 0 // 0 corresponds to quadrant a
+      case x if (x >= a && x < a + b)         => 1 // 1 corresponds to b
       case x if (x >= a + b && x < a + b + c) => 2 // 2 corresponds to c
-      case _ => 3 // 3 corresponds to d
+      case _                                  => 3 // 3 corresponds to d
     }
   }
 
@@ -253,7 +266,9 @@ object GraphGenerators extends Logging {
     * as their attributes and edge values as 1.0.
     */
   def gridGraph(
-      sc: SparkContext, rows: Int, cols: Int): Graph[(Int, Int), Double] = {
+      sc: SparkContext,
+      rows: Int,
+      cols: Int): Graph[(Int, Int), Double] = {
     // Convert row column address into vertex ids (row major order)
     def sub2ind(r: Int, c: Int): VertexId = r * cols + c
 
@@ -261,15 +276,17 @@ object GraphGenerators extends Logging {
       sc.parallelize(0 until rows).flatMap { r =>
         (0 until cols).map(c => (sub2ind(r, c), (r, c)))
       }
-    val edges: RDD[Edge[Double]] = vertices.flatMap {
-      case (vid, (r, c)) =>
-        (if (r + 1 < rows) { Seq((sub2ind(r, c), sub2ind(r + 1, c))) } else {
-           Seq.empty
-         }) ++
-        (if (c + 1 < cols) { Seq((sub2ind(r, c), sub2ind(r, c + 1))) } else {
-           Seq.empty
-         })
-    }.map { case (src, dst) => Edge(src, dst, 1.0) }
+    val edges: RDD[Edge[Double]] = vertices
+      .flatMap {
+        case (vid, (r, c)) =>
+          (if (r + 1 < rows) { Seq((sub2ind(r, c), sub2ind(r + 1, c))) } else {
+             Seq.empty
+           }) ++
+            (if (c + 1 < cols) { Seq((sub2ind(r, c), sub2ind(r, c + 1))) } else {
+               Seq.empty
+             })
+      }
+      .map { case (src, dst) => Edge(src, dst, 1.0) }
     Graph(vertices, edges)
   } // end of gridGraph
 

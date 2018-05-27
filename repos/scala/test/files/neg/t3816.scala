@@ -2,7 +2,7 @@ class B {
   def ::(a: List[Int]) {
     a match {
       case x :: xs =>
-      case _ =>
+      case _       =>
     }
   }
 }
@@ -12,7 +12,7 @@ object Test {
     val stable = 2
     x match {
       case Some(`stable`) =>
-      case _ =>
+      case _              =>
     }
   }
 
@@ -20,7 +20,7 @@ object Test {
   def testSuccess2(x: Any) = {
     x match {
       case Some(`bar`) =>
-      case _ =>
+      case _           =>
     }
   }
 
@@ -28,7 +28,7 @@ object Test {
     var syncID = 0
     x match {
       case Some(`syncID`) =>
-      case _ =>
+      case _              =>
     }
   }
 
@@ -36,7 +36,7 @@ object Test {
   def testFail2(x: Any) = {
     x match {
       case Some(`foo`) =>
-      case _ =>
+      case _           =>
     }
   }
 }

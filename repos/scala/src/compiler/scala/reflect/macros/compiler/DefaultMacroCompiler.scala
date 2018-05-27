@@ -4,7 +4,9 @@ package compiler
 import scala.tools.nsc.Global
 
 abstract class DefaultMacroCompiler
-    extends Resolvers with Validators with Errors {
+    extends Resolvers
+    with Validators
+    with Errors {
   val global: Global
   import global._
   import analyzer._
@@ -19,8 +21,11 @@ abstract class DefaultMacroCompiler
   lazy val macroDef = macroDdef.symbol
 
   case class MacroImplRefCompiler(
-      untypedMacroImplRef: Tree, isImplBundle: Boolean)
-      extends Resolver with Validator with Error
+      untypedMacroImplRef: Tree,
+      isImplBundle: Boolean)
+      extends Resolver
+      with Validator
+      with Error
   private case class MacroImplResolutionException(pos: Position, msg: String)
       extends Exception
   def abort(pos: Position, msg: String) =
@@ -49,13 +54,13 @@ abstract class DefaultMacroCompiler
         case ex: MacroImplResolutionException => scala.util.Failure(ex)
       }
     }
-    val vanillaImplRef = MacroImplRefCompiler(
-        macroDdef.rhs.duplicate, isImplBundle = false)
+    val vanillaImplRef =
+      MacroImplRefCompiler(macroDdef.rhs.duplicate, isImplBundle = false)
     val (maybeBundleRef, methName, targs) = macroDdef.rhs.duplicate match {
-      case Applied(Select(
-                   Applied(RefTree(qual, bundleName), _, Nil), methName),
-                   targs,
-                   Nil) =>
+      case Applied(
+          Select(Applied(RefTree(qual, bundleName), _, Nil), methName),
+          targs,
+          Nil) =>
         (RefTree(qual, bundleName.toTypeName), methName, targs)
       case Applied(Ident(methName), targs, Nil) =>
         (Ident(context.owner.enclClass), methName, targs)
@@ -63,12 +68,13 @@ abstract class DefaultMacroCompiler
         (EmptyTree, TermName(""), Nil)
     }
     val bundleImplRef = MacroImplRefCompiler(
-        atPos(macroDdef.rhs.pos)(
-            gen.mkTypeApply(Select(New(maybeBundleRef,
-                                       List(List(Literal(Constant(null))))),
-                                   methName),
-                            targs)),
-        isImplBundle = true
+      atPos(macroDdef.rhs.pos)(
+        gen.mkTypeApply(
+          Select(
+            New(maybeBundleRef, List(List(Literal(Constant(null))))),
+            methName),
+          targs)),
+      isImplBundle = true
     )
     val vanillaResult = tryCompile(vanillaImplRef)
     val bundleResult = tryCompile(bundleImplRef)

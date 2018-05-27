@@ -15,13 +15,14 @@ import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.ScDocSyntaxElement
   * Date: 11/14/11
   */
 class ScDocSyntaxElementImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScDocSyntaxElement {
+    extends ScalaPsiElementImpl(node)
+    with ScDocSyntaxElement {
   override def toString = "DocSyntaxElement " + getFlags
 
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case s: ScalaElementVisitor => accept(s)
-      case _ => super.accept(visitor)
+      case _                      => super.accept(visitor)
     }
   }
 

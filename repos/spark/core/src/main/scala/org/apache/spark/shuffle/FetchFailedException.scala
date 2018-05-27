@@ -27,30 +27,38 @@ import org.apache.spark.util.Utils
   *
   * Note that bmAddress can be null.
   */
-private[spark] class FetchFailedException(bmAddress: BlockManagerId,
-                                          shuffleId: Int,
-                                          mapId: Int,
-                                          reduceId: Int,
-                                          message: String,
-                                          cause: Throwable = null)
+private[spark] class FetchFailedException(
+    bmAddress: BlockManagerId,
+    shuffleId: Int,
+    mapId: Int,
+    reduceId: Int,
+    message: String,
+    cause: Throwable = null)
     extends Exception(message, cause) {
 
-  def this(bmAddress: BlockManagerId,
-           shuffleId: Int,
-           mapId: Int,
-           reduceId: Int,
-           cause: Throwable) {
+  def this(
+      bmAddress: BlockManagerId,
+      shuffleId: Int,
+      mapId: Int,
+      reduceId: Int,
+      cause: Throwable) {
     this(bmAddress, shuffleId, mapId, reduceId, cause.getMessage, cause)
   }
 
   def toTaskEndReason: TaskEndReason =
     FetchFailed(
-        bmAddress, shuffleId, mapId, reduceId, Utils.exceptionString(this))
+      bmAddress,
+      shuffleId,
+      mapId,
+      reduceId,
+      Utils.exceptionString(this))
 }
 
 /**
   * Failed to get shuffle metadata from [[org.apache.spark.MapOutputTracker]].
   */
 private[spark] class MetadataFetchFailedException(
-    shuffleId: Int, reduceId: Int, message: String)
+    shuffleId: Int,
+    reduceId: Int,
+    message: String)
     extends FetchFailedException(null, shuffleId, -1, reduceId, message)

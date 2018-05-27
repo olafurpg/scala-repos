@@ -11,7 +11,9 @@ import lila.game.Pov
 import lila.pref.Pref
 
 private[api] final class RoundApiBalancer(
-    system: ActorSystem, api: RoundApi, nbActors: Int) {
+    system: ActorSystem,
+    api: RoundApi,
+    nbActors: Int) {
 
   private val logger = lila.log("round").branch("balancer")
 
@@ -20,56 +22,61 @@ private[api] final class RoundApiBalancer(
     implicit val timeout = makeTimeout seconds 20
 
     case class Player(pov: Pov, apiVersion: Int, ctx: Context)
-    case class Watcher(pov: Pov,
-                       apiVersion: Int,
-                       tv: Option[lila.round.OnTv],
-                       analysis: Option[(Pgn, Analysis)] = None,
-                       initialFenO: Option[Option[String]] = None,
-                       withMoveTimes: Boolean = false,
-                       withOpening: Boolean = false,
-                       ctx: Context)
-    case class UserAnalysis(pov: Pov,
-                            pref: Pref,
-                            initialFen: Option[String],
-                            orientation: chess.Color,
-                            owner: Boolean)
+    case class Watcher(
+        pov: Pov,
+        apiVersion: Int,
+        tv: Option[lila.round.OnTv],
+        analysis: Option[(Pgn, Analysis)] = None,
+        initialFenO: Option[Option[String]] = None,
+        withMoveTimes: Boolean = false,
+        withOpening: Boolean = false,
+        ctx: Context)
+    case class UserAnalysis(
+        pov: Pov,
+        pref: Pref,
+        initialFen: Option[String],
+        orientation: chess.Color,
+        owner: Boolean)
 
     val router = system.actorOf(
-        akka.routing
-          .RoundRobinPool(nbActors)
-          .props(Props(new lila.hub.SequentialProvider {
-            val futureTimeout = 20.seconds
-            val logger = RoundApiBalancer.this.logger
-            def process = {
-              case Player(pov, apiVersion, ctx) => {
-                  api.player(pov, apiVersion)(ctx) addFailureEffect { e =>
-                    logger.error(pov.toString, e)
-                  }
-                }.chronometer
-                  .logIfSlow(500, logger) { _ =>
-                    s"inner player $pov"
-                  }
-                  .result
-              case Watcher(pov,
-                           apiVersion,
-                           tv,
-                           analysis,
-                           initialFenO,
-                           withMoveTimes,
-                           withOpening,
-                           ctx) =>
-                api.watcher(pov,
-                            apiVersion,
-                            tv,
-                            analysis,
-                            initialFenO,
-                            withMoveTimes,
-                            withOpening)(ctx)
-              case UserAnalysis(pov, pref, initialFen, orientation, owner) =>
-                api.userAnalysisJson(pov, pref, initialFen, orientation, owner)
-            }
-          })),
-        "api.round.router")
+      akka.routing
+        .RoundRobinPool(nbActors)
+        .props(Props(new lila.hub.SequentialProvider {
+          val futureTimeout = 20.seconds
+          val logger = RoundApiBalancer.this.logger
+          def process = {
+            case Player(pov, apiVersion, ctx) => {
+              api.player(pov, apiVersion)(ctx) addFailureEffect { e =>
+                logger.error(pov.toString, e)
+              }
+            }.chronometer
+              .logIfSlow(500, logger) { _ =>
+                s"inner player $pov"
+              }
+              .result
+            case Watcher(
+                pov,
+                apiVersion,
+                tv,
+                analysis,
+                initialFenO,
+                withMoveTimes,
+                withOpening,
+                ctx) =>
+              api.watcher(
+                pov,
+                apiVersion,
+                tv,
+                analysis,
+                initialFenO,
+                withMoveTimes,
+                withOpening)(ctx)
+            case UserAnalysis(pov, pref, initialFen, orientation, owner) =>
+              api.userAnalysisJson(pov, pref, initialFen, orientation, owner)
+          }
+        })),
+      "api.round.router"
+    )
   }
 
   import implementation._
@@ -86,29 +93,31 @@ private[api] final class RoundApiBalancer(
     }
     .result
 
-  def watcher(pov: Pov,
-              apiVersion: Int,
-              tv: Option[lila.round.OnTv],
-              analysis: Option[(Pgn, Analysis)] = None,
-              initialFenO: Option[Option[String]] = None,
-              withMoveTimes: Boolean = false,
-              withOpening: Boolean = false)(
-      implicit ctx: Context): Fu[JsObject] = {
-    router ? Watcher(pov,
-                     apiVersion,
-                     tv,
-                     analysis,
-                     initialFenO,
-                     withMoveTimes,
-                     withOpening,
-                     ctx) mapTo manifest[JsObject]
+  def watcher(
+      pov: Pov,
+      apiVersion: Int,
+      tv: Option[lila.round.OnTv],
+      analysis: Option[(Pgn, Analysis)] = None,
+      initialFenO: Option[Option[String]] = None,
+      withMoveTimes: Boolean = false,
+      withOpening: Boolean = false)(implicit ctx: Context): Fu[JsObject] = {
+    router ? Watcher(
+      pov,
+      apiVersion,
+      tv,
+      analysis,
+      initialFenO,
+      withMoveTimes,
+      withOpening,
+      ctx) mapTo manifest[JsObject]
   }.mon(_.round.api.watcher)
 
-  def userAnalysisJson(pov: Pov,
-                       pref: Pref,
-                       initialFen: Option[String],
-                       orientation: chess.Color,
-                       owner: Boolean): Fu[JsObject] =
+  def userAnalysisJson(
+      pov: Pov,
+      pref: Pref,
+      initialFen: Option[String],
+      orientation: chess.Color,
+      owner: Boolean): Fu[JsObject] =
     router ? UserAnalysis(pov, pref, initialFen, orientation, owner) mapTo manifest[
-        JsObject]
+      JsObject]
 }

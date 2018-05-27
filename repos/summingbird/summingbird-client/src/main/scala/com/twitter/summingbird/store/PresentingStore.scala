@@ -35,9 +35,10 @@ import com.twitter.util.Future
   * @author Oscar Boykin
   */
 object PresentingStore {
-  def apply[K, V, U](onlineStore: MergeableStore[(K, BatchID), V],
-                     clientStore: ReadableStore[K, V],
-                     presentingStore: Store[K, U])(
+  def apply[K, V, U](
+      onlineStore: MergeableStore[(K, BatchID), V],
+      clientStore: ReadableStore[K, V],
+      presentingStore: Store[K, U])(
       fn: V => U): MergeableStore[(K, BatchID), V] =
     new SideEffectStore(onlineStore)({
       case (k, _) =>

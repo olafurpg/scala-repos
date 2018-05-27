@@ -37,7 +37,7 @@ object DebugConfigurationSpec extends Specification with After {
 
       Option(System.getProperty("java.security.debug")) must beLike {
         case Some(value) => value must beEmpty
-        case None => ok
+        case None        => ok
       }
 
       val debugConfig = SSLDebugConfig(certpath = true)
@@ -62,7 +62,7 @@ object DebugConfigurationSpec extends Specification with After {
 
       Option(System.getProperty("javax.net.debug")) must beLike {
         case Some(value) => value must beEmpty
-        case None => ok
+        case None        => ok
       }
 
       val debugConfig = SSLDebugConfig(ssl = true)

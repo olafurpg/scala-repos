@@ -42,66 +42,66 @@ object TaskStatusUpdateTestHelper {
   val taskId = newTaskID("/app")
 
   val running = TaskStatusUpdateTestHelper(
-      TaskStatusUpdate(
-          timestamp = Timestamp.apply(new DateTime(2015, 2, 3, 12, 30, 0, 0)),
-          taskId = taskId,
-          status = MarathonTaskStatusTestHelper.running
-      )
+    TaskStatusUpdate(
+      timestamp = Timestamp.apply(new DateTime(2015, 2, 3, 12, 30, 0, 0)),
+      taskId = taskId,
+      status = MarathonTaskStatusTestHelper.running
+    )
   )
 
   val runningHealthy = TaskStatusUpdateTestHelper(
-      TaskStatusUpdate(
-          timestamp = Timestamp.apply(new DateTime(2015, 2, 3, 12, 30, 0, 0)),
-          taskId = taskId,
-          status = MarathonTaskStatusTestHelper.runningHealthy
-      )
+    TaskStatusUpdate(
+      timestamp = Timestamp.apply(new DateTime(2015, 2, 3, 12, 30, 0, 0)),
+      taskId = taskId,
+      status = MarathonTaskStatusTestHelper.runningHealthy
+    )
   )
 
   val runningUnhealthy = TaskStatusUpdateTestHelper(
-      TaskStatusUpdate(
-          timestamp = Timestamp.apply(new DateTime(2015, 2, 3, 12, 30, 0, 0)),
-          taskId = taskId,
-          status = MarathonTaskStatusTestHelper.runningUnhealthy
-      )
+    TaskStatusUpdate(
+      timestamp = Timestamp.apply(new DateTime(2015, 2, 3, 12, 30, 0, 0)),
+      taskId = taskId,
+      status = MarathonTaskStatusTestHelper.runningUnhealthy
+    )
   )
 
   val staging = TaskStatusUpdateTestHelper(
-      TaskStatusUpdate(
-          timestamp = Timestamp.apply(new DateTime(2015, 2, 3, 12, 31, 0, 0)),
-          taskId = taskId,
-          status = MarathonTaskStatusTestHelper.staging
-      )
+    TaskStatusUpdate(
+      timestamp = Timestamp.apply(new DateTime(2015, 2, 3, 12, 31, 0, 0)),
+      taskId = taskId,
+      status = MarathonTaskStatusTestHelper.staging
+    )
   )
 
   val finished = TaskStatusUpdateTestHelper(
-      TaskStatusUpdate(
-          timestamp = Timestamp.apply(new DateTime(2015, 2, 3, 12, 31, 0, 0)),
-          taskId = taskId,
-          status = MarathonTaskStatusTestHelper.finished
-      )
+    TaskStatusUpdate(
+      timestamp = Timestamp.apply(new DateTime(2015, 2, 3, 12, 31, 0, 0)),
+      taskId = taskId,
+      status = MarathonTaskStatusTestHelper.finished
+    )
   )
 
   val lost = TaskStatusUpdateTestHelper(
-      TaskStatusUpdate(
-          timestamp = Timestamp.apply(new DateTime(2015, 2, 3, 12, 31, 0, 0)),
-          taskId = taskId,
-          status = MarathonTaskStatusTestHelper.lost
-      )
+    TaskStatusUpdate(
+      timestamp = Timestamp.apply(new DateTime(2015, 2, 3, 12, 31, 0, 0)),
+      taskId = taskId,
+      status = MarathonTaskStatusTestHelper.lost
+    )
   )
 
   val killed = TaskStatusUpdateTestHelper(
-      TaskStatusUpdate(
-          timestamp = Timestamp.apply(new DateTime(2015, 2, 3, 12, 31, 0, 0)),
-          taskId = taskId,
-          status = MarathonTaskStatusTestHelper.killed
-      )
+    TaskStatusUpdate(
+      timestamp = Timestamp.apply(new DateTime(2015, 2, 3, 12, 31, 0, 0)),
+      taskId = taskId,
+      status = MarathonTaskStatusTestHelper.killed
+    )
   )
 
   val error = TaskStatusUpdateTestHelper(
-      TaskStatusUpdate(
-          timestamp = Timestamp.apply(new DateTime(2015, 2, 3, 12, 31, 0, 0)),
-          taskId = taskId,
-          status = MarathonTaskStatusTestHelper.error
-      )
+    TaskStatusUpdate(
+      timestamp = Timestamp.apply(new DateTime(2015, 2, 3, 12, 31, 0, 0)),
+      taskId = taskId,
+      status = MarathonTaskStatusTestHelper.error
+    )
   )
 }

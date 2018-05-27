@@ -12,7 +12,9 @@ import akka.routing.ActorRefRoutee
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class WeightedRouteesSpec
-    extends AkkaSpec(ConfigFactory.parseString("""
+    extends AkkaSpec(
+      ConfigFactory.parseString(
+        """
       akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
       akka.remote.netty.tcp.port = 0
       """)) {
@@ -23,11 +25,11 @@ class WeightedRouteesSpec
   val d1 = Address("akka.tcp", "sys", "d1", 2551)
 
   val routeeA = ActorSelectionRoutee(
-      system.actorSelection(RootActorPath(a1) / "user" / "a"))
+    system.actorSelection(RootActorPath(a1) / "user" / "a"))
   val routeeB = ActorSelectionRoutee(
-      system.actorSelection(RootActorPath(b1) / "user" / "b"))
+    system.actorSelection(RootActorPath(b1) / "user" / "b"))
   val routeeC = ActorSelectionRoutee(
-      system.actorSelection(RootActorPath(c1) / "user" / "c"))
+    system.actorSelection(RootActorPath(c1) / "user" / "c"))
   val routees = Vector(routeeA, routeeB, routeeC)
   val testActorRoutee = ActorRefRoutee(testActor)
 

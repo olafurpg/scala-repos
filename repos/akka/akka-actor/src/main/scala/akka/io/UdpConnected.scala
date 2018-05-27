@@ -24,7 +24,8 @@ import akka.actor._
   * The Java API for generating UDP commands is available at [[UdpConnectedMessage]].
   */
 object UdpConnected
-    extends ExtensionId[UdpConnectedExt] with ExtensionIdProvider {
+    extends ExtensionId[UdpConnectedExt]
+    with ExtensionIdProvider {
 
   override def lookup = UdpConnected
 
@@ -72,7 +73,8 @@ object UdpConnected
     */
   final case class Send(payload: ByteString, ack: Any) extends Command {
     require(
-        ack != null, "ack must be non-null. Use NoAck if you don't want acks.")
+      ack != null,
+      "ack must be non-null. Use NoAck if you don't want acks.")
 
     def wantsAck: Boolean = !ack.isInstanceOf[NoAck]
   }
@@ -86,10 +88,11 @@ object UdpConnected
     * which is restricted to sending to and receiving from the given `remoteAddress`.
     * All received datagrams will be sent to the designated `handler` actor.
     */
-  final case class Connect(handler: ActorRef,
-                           remoteAddress: InetSocketAddress,
-                           localAddress: Option[InetSocketAddress] = None,
-                           options: immutable.Traversable[SocketOption] = Nil)
+  final case class Connect(
+      handler: ActorRef,
+      remoteAddress: InetSocketAddress,
+      localAddress: Option[InetSocketAddress] = None,
+      options: immutable.Traversable[SocketOption] = Nil)
       extends Command
 
   /**
@@ -149,12 +152,13 @@ object UdpConnected
 class UdpConnectedExt(system: ExtendedActorSystem) extends IO.Extension {
 
   val settings: UdpSettings = new UdpSettings(
-      system.settings.config.getConfig("akka.io.udp-connected"))
+    system.settings.config.getConfig("akka.io.udp-connected"))
 
   val manager: ActorRef = {
-    system.systemActorOf(props = Props(classOf[UdpConnectedManager], this)
-                             .withDeploy(Deploy.local),
-                         name = "IO-UDP-CONN")
+    system.systemActorOf(
+      props = Props(classOf[UdpConnectedManager], this)
+        .withDeploy(Deploy.local),
+      name = "IO-UDP-CONN")
   }
 
   /**
@@ -163,7 +167,8 @@ class UdpConnectedExt(system: ExtendedActorSystem) extends IO.Extension {
   def getManager: ActorRef = manager
 
   val bufferPool: BufferPool = new DirectByteBufferPool(
-      settings.DirectBufferSize, settings.MaxDirectBufferPoolSize)
+    settings.DirectBufferSize,
+    settings.MaxDirectBufferPoolSize)
 }
 
 /**
@@ -179,18 +184,20 @@ object UdpConnectedMessage {
     * which is restricted to sending to and receiving from the given `remoteAddress`.
     * All received datagrams will be sent to the designated `handler` actor.
     */
-  def connect(handler: ActorRef,
-              remoteAddress: InetSocketAddress,
-              localAddress: InetSocketAddress,
-              options: JIterable[SocketOption]): Command =
+  def connect(
+      handler: ActorRef,
+      remoteAddress: InetSocketAddress,
+      localAddress: InetSocketAddress,
+      options: JIterable[SocketOption]): Command =
     Connect(handler, remoteAddress, Some(localAddress), options)
 
   /**
     * Connect without specifying the `localAddress`.
     */
-  def connect(handler: ActorRef,
-              remoteAddress: InetSocketAddress,
-              options: JIterable[SocketOption]): Command =
+  def connect(
+      handler: ActorRef,
+      remoteAddress: InetSocketAddress,
+      options: JIterable[SocketOption]): Command =
     Connect(handler, remoteAddress, None, options)
 
   /**

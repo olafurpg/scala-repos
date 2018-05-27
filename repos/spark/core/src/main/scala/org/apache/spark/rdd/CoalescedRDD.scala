@@ -75,14 +75,16 @@ private[spark] case class CoalescedRDDPartition(
   * @param maxPartitions number of desired partitions in the coalesced RDD (must be positive)
   * @param balanceSlack used to trade-off balance and locality. 1.0 is all locality, 0 is all balance
   */
-private[spark] class CoalescedRDD[T : ClassTag](@transient var prev: RDD[T],
-                                                maxPartitions: Int,
-                                                balanceSlack: Double = 0.10)
+private[spark] class CoalescedRDD[T: ClassTag](
+    @transient var prev: RDD[T],
+    maxPartitions: Int,
+    balanceSlack: Double = 0.10)
     extends RDD[T](prev.context, Nil) {
   // Nil since we implement getDependencies
 
-  require(maxPartitions > 0 || maxPartitions == prev.partitions.length,
-          s"Number of partitions ($maxPartitions) must be positive.")
+  require(
+    maxPartitions > 0 || maxPartitions == prev.partitions.length,
+    s"Number of partitions ($maxPartitions) must be positive.")
 
   override def getPartitions: Array[Partition] = {
     val pc = new PartitionCoalescer(maxPartitions, prev, balanceSlack)
@@ -95,7 +97,8 @@ private[spark] class CoalescedRDD[T : ClassTag](@transient var prev: RDD[T],
   }
 
   override def compute(
-      partition: Partition, context: TaskContext): Iterator[T] = {
+      partition: Partition,
+      context: TaskContext): Iterator[T] = {
     partition.asInstanceOf[CoalescedRDDPartition].parents.iterator.flatMap {
       parentPartition =>
         firstParent[T].iterator(parentPartition, context)
@@ -103,8 +106,7 @@ private[spark] class CoalescedRDD[T : ClassTag](@transient var prev: RDD[T],
   }
 
   override def getDependencies: Seq[Dependency[_]] = {
-    Seq(
-        new NarrowDependency(prev) {
+    Seq(new NarrowDependency(prev) {
       def getParents(id: Int): Seq[Int] =
         partitions(id).asInstanceOf[CoalescedRDDPartition].parentsIndices
     })
@@ -156,14 +158,16 @@ private[spark] class CoalescedRDD[T : ClassTag](@transient var prev: RDD[T],
   *
   */
 private class PartitionCoalescer(
-    maxPartitions: Int, prev: RDD[_], balanceSlack: Double) {
+    maxPartitions: Int,
+    prev: RDD[_],
+    balanceSlack: Double) {
 
   def compare(o1: PartitionGroup, o2: PartitionGroup): Boolean =
     o1.size < o2.size
-  def compare(
-      o1: Option[PartitionGroup], o2: Option[PartitionGroup]): Boolean =
+  def compare(o1: Option[PartitionGroup], o2: Option[PartitionGroup]): Boolean =
     if (o1 == None) false
-    else if (o2 == None) true else compare(o1.get, o2.get)
+    else if (o2 == None) true
+    else compare(o1.get, o2.get)
 
   val rnd = new scala.util.Random(7919) // keep this class deterministic
 
@@ -200,12 +204,10 @@ private class PartitionCoalescer(
 
     // initializes/resets to start iterating from the beginning
     def resetIterator(): Iterator[(String, Partition)] = {
-      val iterators = (0 to 2).map(
-          x =>
-            prev.partitions.iterator.flatMap(p =>
-                  {
-            if (currPrefLocs(p).size > x) Some((currPrefLocs(p)(x), p))
-            else None
+      val iterators = (0 to 2).map(x =>
+        prev.partitions.iterator.flatMap(p => {
+          if (currPrefLocs(p).size > x) Some((currPrefLocs(p)(x), p))
+          else None
         }))
       iterators.reduceLeft((x, y) => x ++ y)
     }
@@ -305,7 +307,9 @@ private class PartitionCoalescer(
     */
   def pickBin(p: Partition): PartitionGroup = {
     val pref =
-      currPrefLocs(p).map(getLeastGroupHash(_)).sortWith(compare) // least loaded pref locs
+      currPrefLocs(p)
+        .map(getLeastGroupHash(_))
+        .sortWith(compare) // least loaded pref locs
     val prefPart = if (pref == Nil) None else pref.head
 
     val r1 = rnd.nextInt(groupArr.size)

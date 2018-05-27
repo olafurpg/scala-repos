@@ -55,9 +55,10 @@ class OutputStreamWriterTest {
     assertArrayEquals(Array[Byte](1, 65, 66, 67), bos.toByteArray())
   }
 
-  def testW(body: OutputStreamWriter => Unit,
-            expected: Array[Int],
-            alreadyFlushed: Boolean = false): Unit = {
+  def testW(
+      body: OutputStreamWriter => Unit,
+      expected: Array[Int],
+      alreadyFlushed: Boolean = false): Unit = {
     val (osw, bos) = newOSWriter()
     body(osw)
     if (!alreadyFlushed) {
@@ -79,30 +80,18 @@ class OutputStreamWriterTest {
 
   @Test def write_Unicode_repertoire_without_surrogates(): Unit = {
     testW(_.write('é'), Array(0xc3, 0xa9))
-    testW(_.write("こんにちは"),
-          Array(0xe3,
-                0x81,
-                0x93,
-                0xe3,
-                0x82,
-                0x93,
-                0xe3,
-                0x81,
-                0xab,
-                0xe3,
-                0x81,
-                0xa1,
-                0xe3,
-                0x81,
-                0xaf))
-    testW(_.write("Καλημέρα", 3, 4),
-          Array(0xce, 0xb7, 0xce, 0xbc, 0xce, 0xad, 0xcf, 0x81))
+    testW(
+      _.write("こんにちは"),
+      Array(0xe3, 0x81, 0x93, 0xe3, 0x82, 0x93, 0xe3, 0x81, 0xab, 0xe3, 0x81,
+        0xa1, 0xe3, 0x81, 0xaf))
+    testW(
+      _.write("Καλημέρα", 3, 4),
+      Array(0xce, 0xb7, 0xce, 0xbc, 0xce, 0xad, 0xcf, 0x81))
   }
 
   @Test def write_surrogate_pairs(): Unit = {
     testW(_.write("\ud83d\udca9"), Array(0xf0, 0x9f, 0x92, 0xa9))
-    testW(
-        _.write("ab\ud83d\udca9cd", 1, 3), Array('b', 0xf0, 0x9f, 0x92, 0xa9))
+    testW(_.write("ab\ud83d\udca9cd", 1, 3), Array('b', 0xf0, 0x9f, 0x92, 0xa9))
   }
 
   @Test def write_surrogate_pairs_spread_across_multiple_writes(): Unit = {

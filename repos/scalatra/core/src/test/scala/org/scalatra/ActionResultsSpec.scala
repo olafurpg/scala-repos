@@ -44,10 +44,11 @@ trait ActionResultTestBase { self: ScalatraBase =>
       if (params.getOrElse("lcase", "false") == "true") "content-type"
       else "Content-Type"
 
-    Ok("Hello, world!",
-       headers = Map(
-             headerName -> "application/vnd.ms-excel"
-         ))
+    Ok(
+      "Hello, world!",
+      headers = Map(
+        headerName -> "application/vnd.ms-excel"
+      ))
   }
 
   get("/custom-reason") {
@@ -108,7 +109,7 @@ abstract class ActionResultsSpec extends MutableScalatraSpec {
     "infer contentType for Array[Byte]" in {
       get("/bytes") {
         response.getContentType mustEqual "text/plain; charset=" +
-        java.nio.charset.Charset.defaultCharset.displayName
+          java.nio.charset.Charset.defaultCharset.displayName
       }
     }
 

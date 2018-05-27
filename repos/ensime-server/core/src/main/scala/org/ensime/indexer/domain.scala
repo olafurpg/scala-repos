@@ -27,8 +27,8 @@ sealed trait FullyQualifiedName {
 
 case class PackageName(path: List[String]) extends FullyQualifiedName {
   def contains(o: FullyQualifiedName) = o match {
-    case PackageName(pn) => pn.startsWith(path)
-    case ClassName(p, _) => contains(p)
+    case PackageName(pn)  => pn.startsWith(path)
+    case ClassName(p, _)  => contains(p)
     case MemberName(c, _) => contains(c)
   }
   def fqnString = path.mkString(".")
@@ -36,12 +36,13 @@ case class PackageName(path: List[String]) extends FullyQualifiedName {
 }
 
 case class ClassName(pack: PackageName, name: String)
-    extends FullyQualifiedName with DescriptorType {
+    extends FullyQualifiedName
+    with DescriptorType {
   def contains(o: FullyQualifiedName) = o match {
     case ClassName(op, on) if pack == op && on.startsWith(name) =>
       (on == name) || on.startsWith(name + "$")
     case MemberName(cn, _) => contains(cn)
-    case _ => false
+    case _                 => false
   }
 
   def fqnString =
@@ -50,8 +51,8 @@ case class ClassName(pack: PackageName, name: String)
 
   def internalString =
     "L" +
-    (if (pack.path.isEmpty) name else pack.path.mkString("/") + "/" + name) +
-    ";"
+      (if (pack.path.isEmpty) name else pack.path.mkString("/") + "/" + name) +
+      ";"
 }
 
 object ClassName {
@@ -77,7 +78,7 @@ object ClassName {
   // strips array reification
   def fromDescriptor(desc: String): ClassName =
     DescriptorParser.parseType(desc) match {
-      case c: ClassName => c
+      case c: ClassName       => c
       case a: ArrayDescriptor => a.reifier
     }
 
@@ -99,8 +100,7 @@ object ClassName {
 case class MemberName(
     owner: ClassName,
     name: String
-)
-    extends FullyQualifiedName {
+) extends FullyQualifiedName {
   def contains(o: FullyQualifiedName) = this == o
   def fqnString = ClassName.cleanupPackage(owner.fqnString + "." + name)
 }
@@ -111,7 +111,7 @@ sealed trait DescriptorType {
 
 case class ArrayDescriptor(fqn: DescriptorType) extends DescriptorType {
   def reifier: ClassName = fqn match {
-    case c: ClassName => c
+    case c: ClassName       => c
     case a: ArrayDescriptor => a.reifier
   }
   def internalString = "[" + fqn.internalString

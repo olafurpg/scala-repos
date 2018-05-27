@@ -31,7 +31,17 @@ import scalafx.ensemble.commons.EnsembleExample
 import scalafx.geometry.Insets
 import scalafx.scene.layout.HBox
 import scalafx.scene.paint.Color
-import scalafx.scene.shape.{ArcTo, ClosePath, CubicCurveTo, HLineTo, LineTo, MoveTo, Path, QuadCurveTo, VLineTo}
+import scalafx.scene.shape.{
+  ArcTo,
+  ClosePath,
+  CubicCurveTo,
+  HLineTo,
+  LineTo,
+  MoveTo,
+  Path,
+  QuadCurveTo,
+  VLineTo
+}
 
 class EnsemblePath extends EnsembleExample {
 
@@ -39,25 +49,26 @@ class EnsemblePath extends EnsembleExample {
     spacing = 20
     padding = Insets(20)
     children = List(
-        new Path {
-          elements = List(MoveTo(35, 35),
-                          HLineTo(75),
-                          VLineTo(75),
-                          LineTo(35, 75),
-                          new ClosePath())
-          fill = Color.Orange
-          stroke = Color.Black
-          strokeWidth = 1d
-        },
-        new Path {
-          elements = List(
-              MoveTo(100, 55),
-              CubicCurveTo(120, 20, 130, 80, 140, 45),
-              QuadCurveTo(150, 0, 160, 45),
-              ArcTo(20, 40, 0, 180, 45, true, true)
-          )
-          fill = Color.Azure
-        }
+      new Path {
+        elements = List(
+          MoveTo(35, 35),
+          HLineTo(75),
+          VLineTo(75),
+          LineTo(35, 75),
+          new ClosePath())
+        fill = Color.Orange
+        stroke = Color.Black
+        strokeWidth = 1d
+      },
+      new Path {
+        elements = List(
+          MoveTo(100, 55),
+          CubicCurveTo(120, 20, 130, 80, 140, 45),
+          QuadCurveTo(150, 0, 160, 45),
+          ArcTo(20, 40, 0, 180, 45, true, true)
+        )
+        fill = Color.Azure
+      }
     )
   }
 }

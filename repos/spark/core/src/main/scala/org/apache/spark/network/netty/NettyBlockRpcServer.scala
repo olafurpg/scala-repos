@@ -25,8 +25,17 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.network.BlockDataManager
 import org.apache.spark.network.buffer.{ManagedBuffer, NioManagedBuffer}
 import org.apache.spark.network.client.{RpcResponseCallback, TransportClient}
-import org.apache.spark.network.server.{OneForOneStreamManager, RpcHandler, StreamManager}
-import org.apache.spark.network.shuffle.protocol.{BlockTransferMessage, OpenBlocks, StreamHandle, UploadBlock}
+import org.apache.spark.network.server.{
+  OneForOneStreamManager,
+  RpcHandler,
+  StreamManager
+}
+import org.apache.spark.network.shuffle.protocol.{
+  BlockTransferMessage,
+  OpenBlocks,
+  StreamHandle,
+  UploadBlock
+}
 import org.apache.spark.serializer.Serializer
 import org.apache.spark.storage.{BlockId, StorageLevel}
 
@@ -38,14 +47,18 @@ import org.apache.spark.storage.{BlockId, StorageLevel}
   * is equivalent to one Spark-level shuffle block.
   */
 class NettyBlockRpcServer(
-    appId: String, serializer: Serializer, blockManager: BlockDataManager)
-    extends RpcHandler with Logging {
+    appId: String,
+    serializer: Serializer,
+    blockManager: BlockDataManager)
+    extends RpcHandler
+    with Logging {
 
   private val streamManager = new OneForOneStreamManager()
 
-  override def receive(client: TransportClient,
-                       rpcMessage: ByteBuffer,
-                       responseContext: RpcResponseCallback): Unit = {
+  override def receive(
+      client: TransportClient,
+      rpcMessage: ByteBuffer,
+      responseContext: RpcResponseCallback): Unit = {
     val message = BlockTransferMessage.Decoder.fromByteBuffer(rpcMessage)
     logTrace(s"Received request: $message")
 
@@ -57,7 +70,7 @@ class NettyBlockRpcServer(
           streamManager.registerStream(appId, blocks.iterator.asJava)
         logTrace(s"Registered streamId $streamId with ${blocks.size} buffers")
         responseContext.onSuccess(
-            new StreamHandle(streamId, blocks.size).toByteBuffer)
+          new StreamHandle(streamId, blocks.size).toByteBuffer)
 
       case uploadBlock: UploadBlock =>
         // StorageLevel is serialized as bytes using our JavaSerializer.

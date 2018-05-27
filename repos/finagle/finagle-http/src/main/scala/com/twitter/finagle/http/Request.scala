@@ -84,7 +84,7 @@ abstract class Request extends Message with HttpRequestProxy {
     val u = uri
     u.indexOf('?') match {
       case -1 => u
-      case n => u.substring(0, n)
+      case n  => u.substring(0, n)
     }
   }
 
@@ -94,11 +94,11 @@ abstract class Request extends Message with HttpRequestProxy {
     val p = path
     val leaf = p.lastIndexOf('/') match {
       case -1 => p
-      case n => p.substring(n + 1)
+      case n  => p.substring(n + 1)
     }
     leaf.lastIndexOf('.') match {
       case -1 => ""
-      case n => leaf.substring(n + 1).toLowerCase
+      case n  => leaf.substring(n + 1).toLowerCase
     }
   }
 
@@ -227,7 +227,7 @@ object Request {
   /** Decode a Request from Array[Byte] */
   def decodeBytes(b: Array[Byte]): Request = {
     val decoder = new DecoderEmbedder(
-        new HttpRequestDecoder(Int.MaxValue, Int.MaxValue, Int.MaxValue))
+      new HttpRequestDecoder(Int.MaxValue, Int.MaxValue, Int.MaxValue))
     decoder.offer(ChannelBuffers.wrappedBuffer(b))
     val req = decoder.poll().asInstanceOf[HttpRequest]
     assert(req ne null)
@@ -324,7 +324,8 @@ object Request {
 
   /** Create Request from HttpRequest and Channel.  Used by Codec. */
   private[finagle] def apply(
-      httpRequestArg: HttpRequest, channel: Channel): Request =
+      httpRequestArg: HttpRequest,
+      channel: Channel): Request =
     new Request {
       val httpRequest = httpRequestArg
       lazy val remoteSocketAddress =

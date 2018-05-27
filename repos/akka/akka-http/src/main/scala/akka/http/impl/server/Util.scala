@@ -21,7 +21,8 @@ object Util {
       convert: function.Function[T, U]): Unmarshaller[T, U] =
     new Unmarshaller[T, U] {
       def apply(value: T)(
-          implicit ec: ExecutionContext, mat: Materializer): Future[U] =
+          implicit ec: ExecutionContext,
+          mat: Materializer): Future[U] =
         FastFuture(Try(convert(value)))
     }
 

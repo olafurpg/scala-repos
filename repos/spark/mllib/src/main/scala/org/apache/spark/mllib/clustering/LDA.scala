@@ -43,13 +43,14 @@ import org.apache.spark.util.Utils
   *       (Wikipedia)]]
   */
 @Since("1.3.0")
-class LDA private (private var k: Int,
-                   private var maxIterations: Int,
-                   private var docConcentration: Vector,
-                   private var topicConcentration: Double,
-                   private var seed: Long,
-                   private var checkpointInterval: Int,
-                   private var ldaOptimizer: LDAOptimizer)
+class LDA private (
+    private var k: Int,
+    private var maxIterations: Int,
+    private var docConcentration: Vector,
+    private var topicConcentration: Double,
+    private var seed: Long,
+    private var checkpointInterval: Int,
+    private var ldaOptimizer: LDAOptimizer)
     extends Logging {
 
   /**
@@ -57,13 +58,15 @@ class LDA private (private var k: Int,
     */
   @Since("1.3.0")
   def this() =
-    this(k = 10,
-         maxIterations = 20,
-         docConcentration = Vectors.dense(-1),
-         topicConcentration = -1,
-         seed = Utils.random.nextLong(),
-         checkpointInterval = 10,
-         ldaOptimizer = new EMLDAOptimizer)
+    this(
+      k = 10,
+      maxIterations = 20,
+      docConcentration = Vectors.dense(-1),
+      topicConcentration = -1,
+      seed = Utils.random.nextLong(),
+      checkpointInterval = 10,
+      ldaOptimizer = new EMLDAOptimizer
+    )
 
   /**
     * Number of topics to infer, i.e., the number of soft cluster centers.
@@ -77,8 +80,7 @@ class LDA private (private var k: Int,
     */
   @Since("1.3.0")
   def setK(k: Int): this.type = {
-    require(
-        k > 0, s"LDA k (number of clusters) must be > 0, but was set to $k")
+    require(k > 0, s"LDA k (number of clusters) must be > 0, but was set to $k")
     this.k = k
     this
   }
@@ -137,7 +139,8 @@ class LDA private (private var k: Int,
   @Since("1.5.0")
   def setDocConcentration(docConcentration: Vector): this.type = {
     require(
-        docConcentration.size > 0, "docConcentration must have > 0 elements")
+      docConcentration.size > 0,
+      "docConcentration must have > 0 elements")
     this.docConcentration = docConcentration
     this
   }
@@ -306,11 +309,11 @@ class LDA private (private var k: Int,
   @Since("1.4.0")
   def setOptimizer(optimizerName: String): this.type = {
     this.ldaOptimizer = optimizerName.toLowerCase match {
-      case "em" => new EMLDAOptimizer
+      case "em"     => new EMLDAOptimizer
       case "online" => new OnlineLDAOptimizer
       case other =>
         throw new IllegalArgumentException(
-            s"Only em, online are supported but got $other.")
+          s"Only em, online are supported but got $other.")
     }
     this
   }
@@ -421,12 +424,13 @@ private[clustering] object LDA {
   /**
     * Compute gamma_{wjk}, a distribution over topics k.
     */
-  private[clustering] def computePTopic(docTopicCounts: TopicCounts,
-                                        termTopicCounts: TopicCounts,
-                                        totalTopicCounts: TopicCounts,
-                                        vocabSize: Int,
-                                        eta: Double,
-                                        alpha: Double): TopicCounts = {
+  private[clustering] def computePTopic(
+      docTopicCounts: TopicCounts,
+      termTopicCounts: TopicCounts,
+      totalTopicCounts: TopicCounts,
+      vocabSize: Int,
+      eta: Double,
+      alpha: Double): TopicCounts = {
     val K = docTopicCounts.length
     val N_j = docTopicCounts.data
     val N_w = termTopicCounts.data

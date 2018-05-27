@@ -46,27 +46,29 @@ private[spark] class MesosDriverDescription(
     val retryState: Option[MesosClusterRetryState] = None)
     extends Serializable {
 
-  def copy(name: String = name,
-           jarUrl: String = jarUrl,
-           mem: Int = mem,
-           cores: Double = cores,
-           supervise: Boolean = supervise,
-           command: Command = command,
-           schedulerProperties: Map[String, String] = schedulerProperties,
-           submissionId: String = submissionId,
-           submissionDate: Date = submissionDate,
-           retryState: Option[MesosClusterRetryState] = retryState)
+  def copy(
+      name: String = name,
+      jarUrl: String = jarUrl,
+      mem: Int = mem,
+      cores: Double = cores,
+      supervise: Boolean = supervise,
+      command: Command = command,
+      schedulerProperties: Map[String, String] = schedulerProperties,
+      submissionId: String = submissionId,
+      submissionDate: Date = submissionDate,
+      retryState: Option[MesosClusterRetryState] = retryState)
     : MesosDriverDescription = {
-    new MesosDriverDescription(name,
-                               jarUrl,
-                               mem,
-                               cores,
-                               supervise,
-                               command,
-                               schedulerProperties,
-                               submissionId,
-                               submissionDate,
-                               retryState)
+    new MesosDriverDescription(
+      name,
+      jarUrl,
+      mem,
+      cores,
+      supervise,
+      command,
+      schedulerProperties,
+      submissionId,
+      submissionDate,
+      retryState)
   }
 
   override def toString: String =

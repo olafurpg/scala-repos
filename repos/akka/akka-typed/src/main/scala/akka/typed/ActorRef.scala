@@ -69,7 +69,8 @@ trait ScalaActorRef[-T] {
 
 object ActorRef {
   private class Combined[T](val untypedRef: akka.actor.ActorRef)
-      extends ActorRef[T] with ScalaActorRef[T]
+      extends ActorRef[T]
+      with ScalaActorRef[T]
 
   implicit def toScalaActorRef[T](ref: ActorRef[T]): ScalaActorRef[T] =
     ref.asInstanceOf[ScalaActorRef[T]]

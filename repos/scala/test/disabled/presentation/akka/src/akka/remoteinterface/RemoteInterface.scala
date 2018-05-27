@@ -19,7 +19,8 @@ import java.lang.reflect.InvocationTargetException
 trait RemoteModule {
   val UUID_PREFIX = "uuid:".intern
 
-  def optimizeLocalScoped_?(): Boolean //Apply optimizations for remote operations in local scope
+  def optimizeLocalScoped_?()
+    : Boolean //Apply optimizations for remote operations in local scope
   protected[akka] def notifyListeners(message: => Any): Unit
 
   private[akka] def actors: ConcurrentHashMap[String, ActorRef]
@@ -27,8 +28,8 @@ trait RemoteModule {
   private[akka] def actorsFactories: ConcurrentHashMap[String, () => ActorRef]
   private[akka] def typedActors: ConcurrentHashMap[String, AnyRef]
   private[akka] def typedActorsByUuid: ConcurrentHashMap[String, AnyRef]
-  private[akka] def typedActorsFactories: ConcurrentHashMap[
-      String, () => AnyRef]
+  private[akka] def typedActorsFactories
+    : ConcurrentHashMap[String, () => AnyRef]
 
   /** Lookup methods **/
   private[akka] def findActorById(id: String): ActorRef = actors.get(id)
@@ -58,7 +59,8 @@ trait RemoteModule {
   }
 
   private[akka] def findTypedActorByIdOrUuid(
-      id: String, uuid: String): AnyRef = {
+      id: String,
+      uuid: String): AnyRef = {
     var actorRefOrNull =
       if (id.startsWith(UUID_PREFIX))
         findTypedActorByUuid(id.substring(UUID_PREFIX.length))
@@ -72,9 +74,10 @@ trait RemoteModule {
   * Life-cycle events for RemoteClient.
   */
 sealed trait RemoteClientLifeCycleEvent
-case class RemoteClientError(@BeanProperty cause: Throwable,
-                             @BeanProperty client: RemoteClientModule,
-                             @BeanProperty remoteAddress: InetSocketAddress)
+case class RemoteClientError(
+    @BeanProperty cause: Throwable,
+    @BeanProperty client: RemoteClientModule,
+    @BeanProperty remoteAddress: InetSocketAddress)
     extends RemoteClientLifeCycleEvent
 case class RemoteClientDisconnected(
     @BeanProperty client: RemoteClientModule,
@@ -84,11 +87,13 @@ case class RemoteClientConnected(
     @BeanProperty client: RemoteClientModule,
     @BeanProperty remoteAddress: InetSocketAddress)
     extends RemoteClientLifeCycleEvent
-case class RemoteClientStarted(@BeanProperty client: RemoteClientModule,
-                               @BeanProperty remoteAddress: InetSocketAddress)
+case class RemoteClientStarted(
+    @BeanProperty client: RemoteClientModule,
+    @BeanProperty remoteAddress: InetSocketAddress)
     extends RemoteClientLifeCycleEvent
-case class RemoteClientShutdown(@BeanProperty client: RemoteClientModule,
-                                @BeanProperty remoteAddress: InetSocketAddress)
+case class RemoteClientShutdown(
+    @BeanProperty client: RemoteClientModule,
+    @BeanProperty remoteAddress: InetSocketAddress)
     extends RemoteClientLifeCycleEvent
 case class RemoteClientWriteFailed(
     @BeanProperty request: AnyRef,
@@ -105,8 +110,9 @@ case class RemoteServerStarted(@BeanProperty val server: RemoteServerModule)
     extends RemoteServerLifeCycleEvent
 case class RemoteServerShutdown(@BeanProperty val server: RemoteServerModule)
     extends RemoteServerLifeCycleEvent
-case class RemoteServerError(@BeanProperty val cause: Throwable,
-                             @BeanProperty val server: RemoteServerModule)
+case class RemoteServerError(
+    @BeanProperty val cause: Throwable,
+    @BeanProperty val server: RemoteServerModule)
     extends RemoteServerLifeCycleEvent
 case class RemoteServerClientConnected(
     @BeanProperty val server: RemoteServerModule,
@@ -130,7 +136,7 @@ case class RemoteServerWriteFailed(
 /**
   * Thrown for example when trying to send a message using a RemoteClient that is either not started or shut down.
   */
-class RemoteClientException private[akka](
+class RemoteClientException private[akka] (
     message: String,
     @BeanProperty val client: RemoteClientModule,
     val remoteAddress: InetSocketAddress,
@@ -140,17 +146,19 @@ class RemoteClientException private[akka](
 /**
   * Thrown when the remote server actor dispatching fails for some reason.
   */
-class RemoteServerException private[akka](message: String)
+class RemoteServerException private[akka] (message: String)
     extends AkkaException(message)
 
 /**
   * Thrown when a remote exception sent over the wire cannot be loaded and instantiated
   */
-case class CannotInstantiateRemoteExceptionDueToRemoteProtocolParsingErrorException private[akka](
-    cause: Throwable, originalClassName: String, originalMessage: String)
+case class CannotInstantiateRemoteExceptionDueToRemoteProtocolParsingErrorException private[akka] (
+    cause: Throwable,
+    originalClassName: String,
+    originalMessage: String)
     extends AkkaException(
-        "\nParsingError[%s]\nOriginalException[%s]\nOriginalMessage[%s]"
-          .format(cause.toString, originalClassName, originalMessage)) {
+      "\nParsingError[%s]\nOriginalException[%s]\nOriginalMessage[%s]"
+        .format(cause.toString, originalClassName, originalMessage)) {
   override def printStackTrace = cause.printStackTrace
   override def printStackTrace(printStream: PrintStream) =
     cause.printStackTrace(printStream)
@@ -159,7 +167,8 @@ case class CannotInstantiateRemoteExceptionDueToRemoteProtocolParsingErrorExcept
 }
 
 abstract class RemoteSupport
-    extends ListenerManagement with RemoteServerModule
+    extends ListenerManagement
+    with RemoteServerModule
     with RemoteClientModule {
 
   lazy val eventHandler: ActorRef = {
@@ -231,9 +240,11 @@ abstract class RemoteSupport
     * </pre>
     */
   @deprecated("Will be removed after 1.1", "1.1")
-  def actorOf[T <: Actor : ClassTag](host: String, port: Int): ActorRef =
+  def actorOf[T <: Actor: ClassTag](host: String, port: Int): ActorRef =
     clientManagedActorOf(
-        () => createActorFromClass(classTag[T].erasure), host, port)
+      () => createActorFromClass(classTag[T].erasure),
+      host,
+      port)
 
   protected def createActorFromClass(clazz: Class[_]): Actor = {
     import ReflectiveAccess.{createInstance, noParams, noArgs}
@@ -242,15 +253,16 @@ abstract class RemoteSupport
       case Left(exception) =>
         val cause = exception match {
           case i: InvocationTargetException => i.getTargetException
-          case _ => exception
+          case _                            => exception
         }
 
         throw new ActorInitializationException(
-            "Could not instantiate Actor of " +
+          "Could not instantiate Actor of " +
             clazz + "\nMake sure Actor is NOT defined inside a class/trait," +
             "\nif so put it outside the class/trait, f.e. in a companion object," +
             "\nOR try to change: 'actorOf[MyActor]' to 'actorOf(new MyActor)'.",
-            cause)
+          cause
+        )
     }
   }
 
@@ -303,18 +315,18 @@ trait RemoteServerModule extends RemoteModule {
     */
   def start(): RemoteServerModule =
     start(
-        ReflectiveAccess.Remote.configDefaultAddress.getAddress.getHostAddress,
-        ReflectiveAccess.Remote.configDefaultAddress.getPort,
-        None)
+      ReflectiveAccess.Remote.configDefaultAddress.getAddress.getHostAddress,
+      ReflectiveAccess.Remote.configDefaultAddress.getPort,
+      None)
 
   /**
     *  Starts the server up
     */
   def start(loader: ClassLoader): RemoteServerModule =
     start(
-        ReflectiveAccess.Remote.configDefaultAddress.getAddress.getHostAddress,
-        ReflectiveAccess.Remote.configDefaultAddress.getPort,
-        Option(loader))
+      ReflectiveAccess.Remote.configDefaultAddress.getAddress.getHostAddress,
+      ReflectiveAccess.Remote.configDefaultAddress.getPort,
+      Option(loader))
 
   /**
     *  Starts the server up
@@ -332,7 +344,9 @@ trait RemoteServerModule extends RemoteModule {
     *  Starts the server up
     */
   def start(
-      host: String, port: Int, loader: Option[ClassLoader]): RemoteServerModule
+      host: String,
+      port: Int,
+      loader: Option[ClassLoader]): RemoteServerModule
 
   /**
     *  Shuts the server down
@@ -356,7 +370,8 @@ trait RemoteServerModule extends RemoteModule {
     * Register typed actor by interface name.
     */
   def registerTypedPerSessionActor(
-      intfClass: Class[_], factory: => AnyRef): Unit =
+      intfClass: Class[_],
+      factory: => AnyRef): Unit =
     registerTypedActor(intfClass.getName, factory)
 
   /**
@@ -364,7 +379,8 @@ trait RemoteServerModule extends RemoteModule {
     * Java API
     */
   def registerTypedPerSessionActor(
-      intfClass: Class[_], factory: Creator[AnyRef]): Unit =
+      intfClass: Class[_],
+      factory: Creator[AnyRef]): Unit =
     registerTypedActor(intfClass.getName, factory)
 
   /**
@@ -380,8 +396,7 @@ trait RemoteServerModule extends RemoteModule {
     * @param typedActor typed actor to register
     * Java API
     */
-  def registerTypedPerSessionActor(
-      id: String, factory: Creator[AnyRef]): Unit =
+  def registerTypedPerSessionActor(id: String, factory: Creator[AnyRef]): Unit =
     registerTypedPerSessionActor(id, factory.create)
 
   /**
@@ -455,125 +470,147 @@ trait RemoteServerModule extends RemoteModule {
 trait RemoteClientModule extends RemoteModule { self: RemoteModule =>
 
   def actorFor(
-      classNameOrServiceId: String, hostname: String, port: Int): ActorRef =
-    actorFor(classNameOrServiceId,
-             classNameOrServiceId,
-             Actor.TIMEOUT,
-             hostname,
-             port,
-             None)
+      classNameOrServiceId: String,
+      hostname: String,
+      port: Int): ActorRef =
+    actorFor(
+      classNameOrServiceId,
+      classNameOrServiceId,
+      Actor.TIMEOUT,
+      hostname,
+      port,
+      None)
 
-  def actorFor(classNameOrServiceId: String,
-               hostname: String,
-               port: Int,
-               loader: ClassLoader): ActorRef =
-    actorFor(classNameOrServiceId,
-             classNameOrServiceId,
-             Actor.TIMEOUT,
-             hostname,
-             port,
-             Some(loader))
+  def actorFor(
+      classNameOrServiceId: String,
+      hostname: String,
+      port: Int,
+      loader: ClassLoader): ActorRef =
+    actorFor(
+      classNameOrServiceId,
+      classNameOrServiceId,
+      Actor.TIMEOUT,
+      hostname,
+      port,
+      Some(loader))
 
-  def actorFor(serviceId: String,
-               className: String,
-               hostname: String,
-               port: Int): ActorRef =
+  def actorFor(
+      serviceId: String,
+      className: String,
+      hostname: String,
+      port: Int): ActorRef =
     actorFor(serviceId, className, Actor.TIMEOUT, hostname, port, None)
 
-  def actorFor(serviceId: String,
-               className: String,
-               hostname: String,
-               port: Int,
-               loader: ClassLoader): ActorRef =
+  def actorFor(
+      serviceId: String,
+      className: String,
+      hostname: String,
+      port: Int,
+      loader: ClassLoader): ActorRef =
     actorFor(serviceId, className, Actor.TIMEOUT, hostname, port, Some(loader))
 
-  def actorFor(classNameOrServiceId: String,
-               timeout: Long,
-               hostname: String,
-               port: Int): ActorRef =
-    actorFor(classNameOrServiceId,
-             classNameOrServiceId,
-             timeout,
-             hostname,
-             port,
-             None)
+  def actorFor(
+      classNameOrServiceId: String,
+      timeout: Long,
+      hostname: String,
+      port: Int): ActorRef =
+    actorFor(
+      classNameOrServiceId,
+      classNameOrServiceId,
+      timeout,
+      hostname,
+      port,
+      None)
 
-  def actorFor(classNameOrServiceId: String,
-               timeout: Long,
-               hostname: String,
-               port: Int,
-               loader: ClassLoader): ActorRef =
-    actorFor(classNameOrServiceId,
-             classNameOrServiceId,
-             timeout,
-             hostname,
-             port,
-             Some(loader))
+  def actorFor(
+      classNameOrServiceId: String,
+      timeout: Long,
+      hostname: String,
+      port: Int,
+      loader: ClassLoader): ActorRef =
+    actorFor(
+      classNameOrServiceId,
+      classNameOrServiceId,
+      timeout,
+      hostname,
+      port,
+      Some(loader))
 
-  def actorFor(serviceId: String,
-               className: String,
-               timeout: Long,
-               hostname: String,
-               port: Int): ActorRef =
+  def actorFor(
+      serviceId: String,
+      className: String,
+      timeout: Long,
+      hostname: String,
+      port: Int): ActorRef =
     actorFor(serviceId, className, timeout, hostname, port, None)
 
-  def typedActorFor[T](intfClass: Class[T],
-                       serviceIdOrClassName: String,
-                       hostname: String,
-                       port: Int): T =
-    typedActorFor(intfClass,
-                  serviceIdOrClassName,
-                  serviceIdOrClassName,
-                  Actor.TIMEOUT,
-                  hostname,
-                  port,
-                  None)
+  def typedActorFor[T](
+      intfClass: Class[T],
+      serviceIdOrClassName: String,
+      hostname: String,
+      port: Int): T =
+    typedActorFor(
+      intfClass,
+      serviceIdOrClassName,
+      serviceIdOrClassName,
+      Actor.TIMEOUT,
+      hostname,
+      port,
+      None)
 
-  def typedActorFor[T](intfClass: Class[T],
-                       serviceIdOrClassName: String,
-                       timeout: Long,
-                       hostname: String,
-                       port: Int): T =
-    typedActorFor(intfClass,
-                  serviceIdOrClassName,
-                  serviceIdOrClassName,
-                  timeout,
-                  hostname,
-                  port,
-                  None)
+  def typedActorFor[T](
+      intfClass: Class[T],
+      serviceIdOrClassName: String,
+      timeout: Long,
+      hostname: String,
+      port: Int): T =
+    typedActorFor(
+      intfClass,
+      serviceIdOrClassName,
+      serviceIdOrClassName,
+      timeout,
+      hostname,
+      port,
+      None)
 
-  def typedActorFor[T](intfClass: Class[T],
-                       serviceIdOrClassName: String,
-                       timeout: Long,
-                       hostname: String,
-                       port: Int,
-                       loader: ClassLoader): T =
-    typedActorFor(intfClass,
-                  serviceIdOrClassName,
-                  serviceIdOrClassName,
-                  timeout,
-                  hostname,
-                  port,
-                  Some(loader))
+  def typedActorFor[T](
+      intfClass: Class[T],
+      serviceIdOrClassName: String,
+      timeout: Long,
+      hostname: String,
+      port: Int,
+      loader: ClassLoader): T =
+    typedActorFor(
+      intfClass,
+      serviceIdOrClassName,
+      serviceIdOrClassName,
+      timeout,
+      hostname,
+      port,
+      Some(loader))
 
-  def typedActorFor[T](intfClass: Class[T],
-                       serviceId: String,
-                       implClassName: String,
-                       timeout: Long,
-                       hostname: String,
-                       port: Int,
-                       loader: ClassLoader): T =
-    typedActorFor(intfClass,
-                  serviceId,
-                  implClassName,
-                  timeout,
-                  hostname,
-                  port,
-                  Some(loader))
+  def typedActorFor[T](
+      intfClass: Class[T],
+      serviceId: String,
+      implClassName: String,
+      timeout: Long,
+      hostname: String,
+      port: Int,
+      loader: ClassLoader): T =
+    typedActorFor(
+      intfClass,
+      serviceId,
+      implClassName,
+      timeout,
+      hostname,
+      port,
+      Some(loader))
 
   @deprecated("Will be removed after 1.1", "1.1")
   def clientManagedActorOf(
-      factory: () => Actor, host: String, port: Int): ActorRef
+      factory: () => Actor,
+      host: String,
+      port: Int): ActorRef
 
   /**
     * Clean-up all open connections.
@@ -591,20 +628,22 @@ trait RemoteClientModule extends RemoteModule { self: RemoteModule =>
   def restartClientConnection(address: InetSocketAddress): Boolean
 
   /** Methods that needs to be implemented by a transport **/
-  protected[akka] def typedActorFor[T](intfClass: Class[T],
-                                       serviceId: String,
-                                       implClassName: String,
-                                       timeout: Long,
-                                       host: String,
-                                       port: Int,
-                                       loader: Option[ClassLoader]): T
+  protected[akka] def typedActorFor[T](
+      intfClass: Class[T],
+      serviceId: String,
+      implClassName: String,
+      timeout: Long,
+      host: String,
+      port: Int,
+      loader: Option[ClassLoader]): T
 
-  protected[akka] def actorFor(serviceId: String,
-                               className: String,
-                               timeout: Long,
-                               hostname: String,
-                               port: Int,
-                               loader: Option[ClassLoader]): ActorRef
+  protected[akka] def actorFor(
+      serviceId: String,
+      className: String,
+      timeout: Long,
+      hostname: String,
+      port: Int,
+      loader: Option[ClassLoader]): ActorRef
 
   protected[akka] def send[T](
       message: Any,
@@ -624,9 +663,13 @@ trait RemoteClientModule extends RemoteModule { self: RemoteModule =>
 
   @deprecated("Will be removed after 1.1", "1.1")
   private[akka] def registerClientManagedActor(
-      hostname: String, port: Int, uuid: Uuid): Unit
+      hostname: String,
+      port: Int,
+      uuid: Uuid): Unit
 
   @deprecated("Will be removed after 1.1", "1.1")
   private[akka] def unregisterClientManagedActor(
-      hostname: String, port: Int, uuid: Uuid): Unit
+      hostname: String,
+      port: Int,
+      uuid: Uuid): Unit
 }

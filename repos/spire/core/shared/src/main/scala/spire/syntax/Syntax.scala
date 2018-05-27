@@ -10,16 +10,16 @@ import spire.macros.Syntax
 import spire.syntax.std._
 
 trait EqSyntax {
-  implicit def eqOps[A : Eq](a: A): EqOps[A] = new EqOps(a)
+  implicit def eqOps[A: Eq](a: A): EqOps[A] = new EqOps(a)
 }
 
 trait PartialOrderSyntax extends EqSyntax {
-  implicit def partialOrderOps[A : PartialOrder](a: A): PartialOrderOps[A] =
+  implicit def partialOrderOps[A: PartialOrder](a: A): PartialOrderOps[A] =
     new PartialOrderOps(a)
 }
 
 trait OrderSyntax extends PartialOrderSyntax {
-  implicit def orderOps[A : Order](a: A): OrderOps[A] = new OrderOps(a)
+  implicit def orderOps[A: Order](a: A): OrderOps[A] = new OrderOps(a)
   implicit def literalIntOrderOps(lhs: Int): LiteralIntOrderOps =
     new LiteralIntOrderOps(lhs)
   implicit def literalLongOrderOps(lhs: Long): LiteralLongOrderOps =
@@ -29,29 +29,29 @@ trait OrderSyntax extends PartialOrderSyntax {
 }
 
 trait IsRealSyntax extends OrderSyntax with SignedSyntax {
-  implicit def isRealOps[A : IsReal](a: A): IsRealOps[A] = new IsRealOps(a)
+  implicit def isRealOps[A: IsReal](a: A): IsRealOps[A] = new IsRealOps(a)
 }
 
 trait SignedSyntax {
-  implicit def signedOps[A : Signed](a: A): SignedOps[A] = new SignedOps(a)
+  implicit def signedOps[A: Signed](a: A): SignedOps[A] = new SignedOps(a)
 }
 
 trait SemigroupoidSyntax {
-  implicit def semigroupoidOps[A : Semigroupoid](a: A): SemigroupoidOps[A] =
+  implicit def semigroupoidOps[A: Semigroupoid](a: A): SemigroupoidOps[A] =
     new SemigroupoidOps[A](a)
 }
 
 trait GroupoidSyntax extends SemigroupoidSyntax {
-  implicit def groupoidCommonOps[A](
-      a: A)(implicit ev: Groupoid[A],
-            ni: NoImplicit[Monoid[A]]): GroupoidCommonOps[A] =
+  implicit def groupoidCommonOps[A](a: A)(
+      implicit ev: Groupoid[A],
+      ni: NoImplicit[Monoid[A]]): GroupoidCommonOps[A] =
     new GroupoidCommonOps[A](a)(ev)
   implicit def groupoidOps[A](a: A)(implicit ev: Groupoid[A]): GroupoidOps[A] =
     new GroupoidOps[A](a)
 }
 
 trait SemigroupSyntax {
-  implicit def semigroupOps[A : Semigroup](a: A): SemigroupOps[A] =
+  implicit def semigroupOps[A: Semigroup](a: A): SemigroupOps[A] =
     new SemigroupOps(a)
 }
 
@@ -61,11 +61,11 @@ trait MonoidSyntax extends SemigroupSyntax {
 }
 
 trait GroupSyntax extends MonoidSyntax {
-  implicit def groupOps[A : Group](a: A): GroupOps[A] = new GroupOps(a)
+  implicit def groupOps[A: Group](a: A): GroupOps[A] = new GroupOps(a)
 }
 
 trait AdditiveSemigroupSyntax {
-  implicit def additiveSemigroupOps[A : AdditiveSemigroup](
+  implicit def additiveSemigroupOps[A: AdditiveSemigroup](
       a: A): AdditiveSemigroupOps[A] = new AdditiveSemigroupOps(a)
   implicit def literalIntAdditiveSemigroupOps(
       lhs: Int): LiteralIntAdditiveSemigroupOps =
@@ -85,7 +85,7 @@ trait AdditiveMonoidSyntax extends AdditiveSemigroupSyntax {
 }
 
 trait AdditiveGroupSyntax extends AdditiveMonoidSyntax {
-  implicit def additiveGroupOps[A : AdditiveGroup](a: A): AdditiveGroupOps[A] =
+  implicit def additiveGroupOps[A: AdditiveGroup](a: A): AdditiveGroupOps[A] =
     new AdditiveGroupOps(a)
   implicit def literalIntAdditiveGroupOps(
       lhs: Int): LiteralIntAdditiveGroupOps =
@@ -99,7 +99,7 @@ trait AdditiveGroupSyntax extends AdditiveMonoidSyntax {
 }
 
 trait MultiplicativeSemigroupSyntax {
-  implicit def multiplicativeSemigroupOps[A : MultiplicativeSemigroup](
+  implicit def multiplicativeSemigroupOps[A: MultiplicativeSemigroup](
       a: A): MultiplicativeSemigroupOps[A] = new MultiplicativeSemigroupOps(a)
   implicit def literalIntMultiplicativeSemigroupOps(
       lhs: Int): LiteralIntMultiplicativeSemigroupOps =
@@ -119,7 +119,7 @@ trait MultiplicativeMonoidSyntax extends MultiplicativeSemigroupSyntax {
 }
 
 trait MultiplicativeGroupSyntax extends MultiplicativeMonoidSyntax {
-  implicit def multiplicativeGroupOps[A : MultiplicativeGroup](
+  implicit def multiplicativeGroupOps[A: MultiplicativeGroup](
       a: A): MultiplicativeGroupOps[A] = new MultiplicativeGroupOps(a)
   implicit def literalIntMultiplicativeGroupOps(
       lhs: Int): LiteralIntMultiplicativeGroupOps =
@@ -133,8 +133,9 @@ trait MultiplicativeGroupSyntax extends MultiplicativeMonoidSyntax {
 }
 
 trait SemiringSyntax
-    extends AdditiveSemigroupSyntax with MultiplicativeSemigroupSyntax {
-  implicit def semiringOps[A : Semiring](a: A): SemiringOps[A] =
+    extends AdditiveSemigroupSyntax
+    with MultiplicativeSemigroupSyntax {
+  implicit def semiringOps[A: Semiring](a: A): SemiringOps[A] =
     new SemiringOps(a)
 }
 
@@ -145,7 +146,7 @@ trait RngSyntax extends SemiringSyntax with AdditiveGroupSyntax
 trait RingSyntax extends RngSyntax with RigSyntax
 
 trait EuclideanRingSyntax extends RingSyntax {
-  implicit def euclideanRingOps[A : EuclideanRing](a: A): EuclideanRingOps[A] =
+  implicit def euclideanRingOps[A: EuclideanRing](a: A): EuclideanRingOps[A] =
     new EuclideanRingOps(a)
   implicit def literalIntEuclideanRingOps(
       lhs: Int): LiteralIntEuclideanRingOps =
@@ -161,7 +162,7 @@ trait EuclideanRingSyntax extends RingSyntax {
 trait FieldSyntax extends EuclideanRingSyntax with MultiplicativeGroupSyntax
 
 trait NRootSyntax {
-  implicit def nrootOps[A : NRoot](a: A): NRootOps[A] = new NRootOps(a)
+  implicit def nrootOps[A: NRoot](a: A): NRootOps[A] = new NRootOps(a)
 }
 
 trait ModuleSyntax extends RingSyntax {
@@ -194,24 +195,24 @@ trait CoordinateSpaceSyntax extends InnerProductSpaceSyntax {
 }
 
 trait TrigSyntax {
-  implicit def trigOps[A : Trig](a: A): TrigOps[A] = new TrigOps(a)
+  implicit def trigOps[A: Trig](a: A): TrigOps[A] = new TrigOps(a)
 }
 
 trait LatticeSyntax {
-  implicit def meetOps[A : MeetSemilattice](a: A): MeetOps[A] = new MeetOps(a)
-  implicit def joinOps[A : JoinSemilattice](a: A): JoinOps[A] = new JoinOps(a)
+  implicit def meetOps[A: MeetSemilattice](a: A): MeetOps[A] = new MeetOps(a)
+  implicit def joinOps[A: JoinSemilattice](a: A): JoinOps[A] = new JoinOps(a)
 }
 
 trait HeytingSyntax {
-  implicit def heytingOps[A : Heyting](a: A): HeytingOps[A] = new HeytingOps(a)
+  implicit def heytingOps[A: Heyting](a: A): HeytingOps[A] = new HeytingOps(a)
 }
 
 trait BoolSyntax extends HeytingSyntax {
-  implicit def boolOps[A : Bool](a: A): BoolOps[A] = new BoolOps(a)
+  implicit def boolOps[A: Bool](a: A): BoolOps[A] = new BoolOps(a)
 }
 
 trait BitStringSyntax {
-  implicit def bitStringOps[A : BitString](a: A): BitStringOps[A] =
+  implicit def bitStringOps[A: BitString](a: A): BitStringOps[A] =
     new BitStringOps(a)
 }
 
@@ -229,7 +230,7 @@ trait ActionSyntax {
 }
 
 trait IntervalSyntax {
-  implicit def groupActionGroupOps[A : Order : AdditiveGroup](
+  implicit def groupActionGroupOps[A: Order: AdditiveGroup](
       a: A): IntervalPointOps[A] =
     new IntervalPointOps(a)
 }
@@ -261,30 +262,39 @@ trait TorsorSyntax {
 }
 
 trait IntegralSyntax
-    extends EuclideanRingSyntax with ConvertableFromSyntax with OrderSyntax
+    extends EuclideanRingSyntax
+    with ConvertableFromSyntax
+    with OrderSyntax
     with SignedSyntax {
-  implicit def integralOps[A : Integral](a: A): IntegralOps[A] =
+  implicit def integralOps[A: Integral](a: A): IntegralOps[A] =
     new IntegralOps(a)
 }
 
 trait FractionalSyntax
-    extends FieldSyntax with NRootSyntax with ConvertableFromSyntax
-    with OrderSyntax with SignedSyntax
+    extends FieldSyntax
+    with NRootSyntax
+    with ConvertableFromSyntax
+    with OrderSyntax
+    with SignedSyntax
 
 trait NumericSyntax
-    extends FieldSyntax with NRootSyntax with ConvertableFromSyntax
-    with OrderSyntax with SignedSyntax
+    extends FieldSyntax
+    with NRootSyntax
+    with ConvertableFromSyntax
+    with OrderSyntax
+    with SignedSyntax
 
 trait ConvertableFromSyntax {
-  implicit def convertableOps[A : ConvertableFrom](
-      a: A): ConvertableFromOps[A] = new ConvertableFromOps(a)
+  implicit def convertableOps[A: ConvertableFrom](a: A): ConvertableFromOps[A] =
+    new ConvertableFromOps(a)
 }
 
 trait CforSyntax {
   def cfor[A](init: A)(test: A => Boolean, next: A => A)(
       body: A => Unit): Unit = macro Syntax.cforMacro[A]
   def cforRange(r: Range)(body: Int => Unit): Unit = macro Syntax.cforRangeMacro
-  def cforRange2(r1: Range, r2: Range)(body: (Int, Int) => Unit): Unit = macro Syntax.cforRange2Macro
+  def cforRange2(r1: Range, r2: Range)(body: (Int, Int) => Unit): Unit =
+    macro Syntax.cforRange2Macro
 }
 
 trait LiteralsSyntax {
@@ -303,19 +313,52 @@ trait LiteralsSyntax {
 }
 
 trait AllSyntax
-    extends LiteralsSyntax with CforSyntax with EqSyntax
-    with PartialOrderSyntax with OrderSyntax with SignedSyntax
-    with IsRealSyntax with ConvertableFromSyntax with SemigroupoidSyntax
-    with GroupoidSyntax with SemigroupSyntax with MonoidSyntax with GroupSyntax
-    with AdditiveSemigroupSyntax with AdditiveMonoidSyntax
-    with AdditiveGroupSyntax with MultiplicativeSemigroupSyntax
-    with MultiplicativeMonoidSyntax with MultiplicativeGroupSyntax
-    with SemiringSyntax with RigSyntax with RngSyntax with RingSyntax
-    with EuclideanRingSyntax with FieldSyntax with NRootSyntax with TrigSyntax
-    with IntervalSyntax with ModuleSyntax with VectorSpaceSyntax
-    with NormedVectorSpaceSyntax with InnerProductSpaceSyntax
-    with CoordinateSpaceSyntax with LatticeSyntax with HeytingSyntax
-    with BoolSyntax with BitStringSyntax with PartialActionSyntax
-    with ActionSyntax with TorsorSyntax with IntegralSyntax
-    with FractionalSyntax with NumericSyntax with IntSyntax with LongSyntax
-    with DoubleSyntax with BigIntSyntax with ArraySyntax with SeqSyntax
+    extends LiteralsSyntax
+    with CforSyntax
+    with EqSyntax
+    with PartialOrderSyntax
+    with OrderSyntax
+    with SignedSyntax
+    with IsRealSyntax
+    with ConvertableFromSyntax
+    with SemigroupoidSyntax
+    with GroupoidSyntax
+    with SemigroupSyntax
+    with MonoidSyntax
+    with GroupSyntax
+    with AdditiveSemigroupSyntax
+    with AdditiveMonoidSyntax
+    with AdditiveGroupSyntax
+    with MultiplicativeSemigroupSyntax
+    with MultiplicativeMonoidSyntax
+    with MultiplicativeGroupSyntax
+    with SemiringSyntax
+    with RigSyntax
+    with RngSyntax
+    with RingSyntax
+    with EuclideanRingSyntax
+    with FieldSyntax
+    with NRootSyntax
+    with TrigSyntax
+    with IntervalSyntax
+    with ModuleSyntax
+    with VectorSpaceSyntax
+    with NormedVectorSpaceSyntax
+    with InnerProductSpaceSyntax
+    with CoordinateSpaceSyntax
+    with LatticeSyntax
+    with HeytingSyntax
+    with BoolSyntax
+    with BitStringSyntax
+    with PartialActionSyntax
+    with ActionSyntax
+    with TorsorSyntax
+    with IntegralSyntax
+    with FractionalSyntax
+    with NumericSyntax
+    with IntSyntax
+    with LongSyntax
+    with DoubleSyntax
+    with BigIntSyntax
+    with ArraySyntax
+    with SeqSyntax

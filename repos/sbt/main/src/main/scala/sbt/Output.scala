@@ -24,31 +24,35 @@ object Output {
       implicit display: Show[ScopedKey[_]]): Unit =
     last(keys, streams, printLines, None)(display)
 
-  def last(keys: Values[_],
-           streams: Streams,
-           printLines: Seq[String] => Unit,
-           sid: Option[String])(implicit display: Show[ScopedKey[_]]): Unit =
+  def last(
+      keys: Values[_],
+      streams: Streams,
+      printLines: Seq[String] => Unit,
+      sid: Option[String])(implicit display: Show[ScopedKey[_]]): Unit =
     printLines(flatLines(lastLines(keys, streams, sid))(idFun))
 
-  def last(file: File,
-           printLines: Seq[String] => Unit,
-           tailDelim: String = DefaultTail): Unit =
+  def last(
+      file: File,
+      printLines: Seq[String] => Unit,
+      tailDelim: String = DefaultTail): Unit =
     printLines(tailLines(file, tailDelim))
 
-  def lastGrep(keys: Values[_],
-               streams: Streams,
-               patternString: String,
-               printLines: Seq[String] => Unit)(
+  def lastGrep(
+      keys: Values[_],
+      streams: Streams,
+      patternString: String,
+      printLines: Seq[String] => Unit)(
       implicit display: Show[ScopedKey[_]]): Unit = {
     val pattern = Pattern compile patternString
     val lines =
       flatLines(lastLines(keys, streams))(_ flatMap showMatches(pattern))
     printLines(lines)
   }
-  def lastGrep(file: File,
-               patternString: String,
-               printLines: Seq[String] => Unit,
-               tailDelim: String = DefaultTail): Unit =
+  def lastGrep(
+      file: File,
+      patternString: String,
+      printLines: Seq[String] => Unit,
+      tailDelim: String = DefaultTail): Unit =
     printLines(grep(tailLines(file, tailDelim), patternString))
   def grep(lines: Seq[String], patternString: String): Seq[String] =
     lines flatMap showMatches(Pattern compile patternString)
@@ -63,9 +67,10 @@ object Output {
     }
   }
 
-  def lastLines(keys: Values[_],
-                streams: Streams,
-                sid: Option[String] = None): Values[Seq[String]] = {
+  def lastLines(
+      keys: Values[_],
+      streams: Streams,
+      sid: Option[String] = None): Values[Seq[String]] = {
     val outputs =
       keys map { (kv: KeyValue[_]) =>
         KeyValue(kv.key, lastLines(kv.key, streams, sid))
@@ -78,12 +83,14 @@ object Output {
     lastLines(key, mgr, None)
 
   def lastLines(
-      key: ScopedKey[_], mgr: Streams, sid: Option[String]): Seq[String] =
+      key: ScopedKey[_],
+      mgr: Streams,
+      sid: Option[String]): Seq[String] =
     mgr.use(key) { s =>
       // Workaround for #1155 - Keys.streams are always scoped by the task they're included in
       // but are keyed by the Keys.streams key.  I think this isn't actually a workaround, but
       // is how things are expected to work now.
-      // You can see where streams are injected using their own key scope in 
+      // You can see where streams are injected using their own key scope in
       // EvaluateTask.injectStreams.
       val streamScopedKey: ScopedKey[_] =
         ScopedKey(Project.fillTaskAxis(key).scope, Keys.streams.key)

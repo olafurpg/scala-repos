@@ -9,7 +9,7 @@ import com.typesafe.config.Config
 /**
   * Public API but not intended for subclassing
   */
-abstract class RoutingSettings private[akka]()
+abstract class RoutingSettings private[akka] ()
     extends akka.http.javadsl.settings.RoutingSettings {
   self: RoutingSettingsImpl ⇒
   def verboseErrorMessages: Boolean
@@ -46,8 +46,7 @@ abstract class RoutingSettings private[akka]()
   override def withDecodeMaxBytesPerChunk(
       decodeMaxBytesPerChunk: Int): RoutingSettings =
     self.copy(decodeMaxBytesPerChunk = decodeMaxBytesPerChunk)
-  override def withFileIODispatcher(
-      fileIODispatcher: String): RoutingSettings =
+  override def withFileIODispatcher(fileIODispatcher: String): RoutingSettings =
     self.copy(fileIODispatcher = fileIODispatcher)
 }
 

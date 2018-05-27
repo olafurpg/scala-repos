@@ -51,10 +51,12 @@ import org.apache.spark.util.{ThreadUtils, Utils}
   * acquire a lock on us, so we need to make sure that we don't try to lock the backend while
   * we are holding a lock on ourselves.
   */
-private[spark] class TaskSchedulerImpl(val sc: SparkContext,
-                                       val maxTaskFailures: Int,
-                                       isLocal: Boolean = false)
-    extends TaskScheduler with Logging {
+private[spark] class TaskSchedulerImpl(
+    val sc: SparkContext,
+    val maxTaskFailures: Int,
+    isLocal: Boolean = false)
+    extends TaskScheduler
+    with Logging {
   def this(sc: SparkContext) =
     this(sc, sc.conf.getInt("spark.task.maxFailures", 4))
 
@@ -66,7 +68,7 @@ private[spark] class TaskSchedulerImpl(val sc: SparkContext,
 
   private val speculationScheduler =
     ThreadUtils.newDaemonSingleThreadScheduledExecutor(
-        "task-scheduler-speculation")
+      "task-scheduler-speculation")
 
   // Threshold above which we warn user initial TaskSet may be starved
   val STARVATION_TIMEOUT_MS =
@@ -118,7 +120,7 @@ private[spark] class TaskSchedulerImpl(val sc: SparkContext,
   } catch {
     case e: java.util.NoSuchElementException =>
       throw new SparkException(
-          s"Unrecognized spark.scheduler.mode: $schedulingModeConf")
+        s"Unrecognized spark.scheduler.mode: $schedulingModeConf")
   }
 
   // This is a var so that we can reset it for testing purposes.
@@ -151,14 +153,15 @@ private[spark] class TaskSchedulerImpl(val sc: SparkContext,
     if (!isLocal && conf.getBoolean("spark.speculation", false)) {
       logInfo("Starting speculative execution thread")
       speculationScheduler.scheduleAtFixedRate(
-          new Runnable {
-            override def run(): Unit = Utils.tryOrStopSparkContext(sc) {
-              checkSpeculatableTasks()
-            }
-          },
-          SPECULATION_INTERVAL_MS,
-          SPECULATION_INTERVAL_MS,
-          TimeUnit.MILLISECONDS)
+        new Runnable {
+          override def run(): Unit = Utils.tryOrStopSparkContext(sc) {
+            checkSpeculatableTasks()
+          }
+        },
+        SPECULATION_INTERVAL_MS,
+        SPECULATION_INTERVAL_MS,
+        TimeUnit.MILLISECONDS
+      )
     }
   }
 
@@ -169,12 +172,13 @@ private[spark] class TaskSchedulerImpl(val sc: SparkContext,
   override def submitTasks(taskSet: TaskSet) {
     val tasks = taskSet.tasks
     logInfo(
-        "Adding task set " + taskSet.id + " with " + tasks.length + " tasks")
+      "Adding task set " + taskSet.id + " with " + tasks.length + " tasks")
     this.synchronized {
       val manager = createTaskSetManager(taskSet, maxTaskFailures)
       val stage = taskSet.stageId
       val stageTaskSets = taskSetsByStageIdAndAttempt.getOrElseUpdate(
-          stage, new HashMap[Int, TaskSetManager])
+        stage,
+        new HashMap[Int, TaskSetManager])
       stageTaskSets(taskSet.stageAttemptId) = manager
       val conflictingTaskSet = stageTaskSets.exists {
         case (_, ts) =>
@@ -182,23 +186,27 @@ private[spark] class TaskSchedulerImpl(val sc: SparkContext,
       }
       if (conflictingTaskSet) {
         throw new IllegalStateException(
-            s"more than one active taskSet for stage $stage:" +
+          s"more than one active taskSet for stage $stage:" +
             s" ${stageTaskSets.toSeq.map { _._2.taskSet.id }.mkString(",")}")
       }
       schedulableBuilder.addTaskSetManager(manager, manager.taskSet.properties)
 
       if (!isLocal && !hasReceivedTask) {
-        starvationTimer.scheduleAtFixedRate(new TimerTask() {
-          override def run() {
-            if (!hasLaunchedTask) {
-              logWarning("Initial job has not accepted any resources; " +
+        starvationTimer.scheduleAtFixedRate(
+          new TimerTask() {
+            override def run() {
+              if (!hasLaunchedTask) {
+                logWarning("Initial job has not accepted any resources; " +
                   "check your cluster UI to ensure that workers are registered " +
                   "and have sufficient resources")
-            } else {
-              this.cancel()
+              } else {
+                this.cancel()
+              }
             }
-          }
-        }, STARVATION_TIMEOUT_MS, STARVATION_TIMEOUT_MS)
+          },
+          STARVATION_TIMEOUT_MS,
+          STARVATION_TIMEOUT_MS
+        )
       }
       hasReceivedTask = true
     }
@@ -207,7 +215,8 @@ private[spark] class TaskSchedulerImpl(val sc: SparkContext,
 
   // Label as private[scheduler] to allow tests to swap in different task set managers if necessary
   private[scheduler] def createTaskSetManager(
-      taskSet: TaskSet, maxTaskFailures: Int): TaskSetManager = {
+      taskSet: TaskSet,
+      maxTaskFailures: Int): TaskSetManager = {
     new TaskSetManager(this, taskSet, maxTaskFailures)
   }
 
@@ -247,8 +256,9 @@ private[spark] class TaskSchedulerImpl(val sc: SparkContext,
         }
     }
     manager.parent.removeSchedulable(manager)
-    logInfo("Removed TaskSet %s, whose tasks have all completed, from pool %s"
-          .format(manager.taskSet.id, manager.parent.name))
+    logInfo(
+      "Removed TaskSet %s, whose tasks have all completed, from pool %s"
+        .format(manager.taskSet.id, manager.parent.name))
   }
 
   private def resourceOfferSingleTaskSet(
@@ -277,7 +287,7 @@ private[spark] class TaskSchedulerImpl(val sc: SparkContext,
         } catch {
           case e: TaskNotSerializableException =>
             logError(
-                s"Resource offer failed, task set ${taskSet.name} was not serializable")
+              s"Resource offer failed, task set ${taskSet.name} was not serializable")
             // Do not offer resources for this task, but don't throw an error to allow other
             // task sets to be submitted.
             return launchedTask
@@ -318,8 +328,9 @@ private[spark] class TaskSchedulerImpl(val sc: SparkContext,
       val availableCpus = shuffledOffers.map(o => o.cores).toArray
       val sortedTaskSets = rootPool.getSortedTaskSetQueue
       for (taskSet <- sortedTaskSets) {
-        logDebug("parentName: %s, name: %s, runningTasks: %s".format(
-                taskSet.parent.name, taskSet.name, taskSet.runningTasks))
+        logDebug(
+          "parentName: %s, name: %s, runningTasks: %s"
+            .format(taskSet.parent.name, taskSet.name, taskSet.runningTasks))
         if (newExecAvail) {
           taskSet.executorAdded()
         }
@@ -332,7 +343,11 @@ private[spark] class TaskSchedulerImpl(val sc: SparkContext,
       for (taskSet <- sortedTaskSets; maxLocality <- taskSet.myLocalityLevels) {
         do {
           launchedTask = resourceOfferSingleTaskSet(
-              taskSet, maxLocality, shuffledOffers, availableCpus, tasks)
+            taskSet,
+            maxLocality,
+            shuffledOffers,
+            availableCpus,
+            tasks)
         } while (launchedTask)
       }
 
@@ -352,9 +367,9 @@ private[spark] class TaskSchedulerImpl(val sc: SparkContext,
 
           if (executorIdToTaskCount.contains(execId)) {
             removeExecutor(
-                execId,
-                SlaveLost(
-                    s"Task $tid was lost, so marking the executor as lost as well."))
+              execId,
+              SlaveLost(
+                s"Task $tid was lost, so marking the executor as lost as well."))
             failedExecutor = Some(execId)
           }
         }
@@ -371,18 +386,23 @@ private[spark] class TaskSchedulerImpl(val sc: SparkContext,
             if (state == TaskState.FINISHED) {
               taskSet.removeRunningTask(tid)
               taskResultGetter.enqueueSuccessfulTask(
-                  taskSet, tid, serializedData)
+                taskSet,
+                tid,
+                serializedData)
             } else if (Set(TaskState.FAILED, TaskState.KILLED, TaskState.LOST)
                          .contains(state)) {
               taskSet.removeRunningTask(tid)
               taskResultGetter.enqueueFailedTask(
-                  taskSet, tid, state, serializedData)
+                taskSet,
+                tid,
+                state,
+                serializedData)
             }
           case None =>
             logError(
-                ("Ignoring update with state %s for TID %s because its task set is gone (this is " +
-                    "likely the result of receiving duplicate task finished status updates)")
-                  .format(state, tid))
+              ("Ignoring update with state %s for TID %s because its task set is gone (this is " +
+                "likely the result of receiving duplicate task finished status updates)")
+                .format(state, tid))
         }
       } catch {
         case e: Exception => logError("Exception in statusUpdate", e)
@@ -410,21 +430,24 @@ private[spark] class TaskSchedulerImpl(val sc: SparkContext,
         accumUpdates.flatMap {
           case (id, updates) =>
             taskIdToTaskSetManager.get(id).map { taskSetMgr =>
-              (id,
-               taskSetMgr.stageId,
-               taskSetMgr.taskSet.stageAttemptId,
-               updates)
+              (
+                id,
+                taskSetMgr.stageId,
+                taskSetMgr.taskSet.stageAttemptId,
+                updates)
             }
         }
       }
     dagScheduler.executorHeartbeatReceived(
-        execId, accumUpdatesWithTaskIds, blockManagerId)
+      execId,
+      accumUpdatesWithTaskIds,
+      blockManagerId)
   }
 
-  def handleTaskGettingResult(
-      taskSetManager: TaskSetManager, tid: Long): Unit = synchronized {
-    taskSetManager.handleTaskGettingResult(tid)
-  }
+  def handleTaskGettingResult(taskSetManager: TaskSetManager, tid: Long): Unit =
+    synchronized {
+      taskSetManager.handleTaskGettingResult(tid)
+    }
 
   def handleSuccessfulTask(
       taskSetManager: TaskSetManager,
@@ -433,10 +456,11 @@ private[spark] class TaskSchedulerImpl(val sc: SparkContext,
     taskSetManager.handleSuccessfulTask(tid, taskResult)
   }
 
-  def handleFailedTask(taskSetManager: TaskSetManager,
-                       tid: Long,
-                       taskState: TaskState,
-                       reason: TaskEndReason): Unit = synchronized {
+  def handleFailedTask(
+      taskSetManager: TaskSetManager,
+      tid: Long,
+      taskState: TaskState,
+      reason: TaskEndReason): Unit = synchronized {
     taskSetManager.handleFailedTask(tid, taskState, reason)
     if (!taskSetManager.isZombie && taskState != TaskState.KILLED) {
       // Need to revive offers again now that the task set manager state has been updated to
@@ -464,7 +488,7 @@ private[spark] class TaskSchedulerImpl(val sc: SparkContext,
         // must mean the error is during registration.
         // It might be good to do something smarter here in the future.
         throw new SparkException(
-            s"Exiting due to error from cluster scheduler: $message")
+          s"Exiting due to error from cluster scheduler: $message")
       }
     }
   }
@@ -494,7 +518,8 @@ private[spark] class TaskSchedulerImpl(val sc: SparkContext,
   }
 
   override def executorLost(
-      executorId: String, reason: ExecutorLossReason): Unit = {
+      executorId: String,
+      reason: ExecutorLossReason): Unit = {
     var failedExecutor: Option[String] = None
 
     synchronized {
@@ -517,8 +542,7 @@ private[spark] class TaskSchedulerImpl(val sc: SparkContext,
             // one may be triggered by a dropped connection from the slave while another may be a
             // report of executor termination from Mesos. We produce log messages for both so we
             // eventually report the termination reason.
-            logError(
-                s"Lost an executor $executorId (already removed): $reason")
+            logError(s"Lost an executor $executorId (already removed): $reason")
         }
       }
     }
@@ -535,7 +559,7 @@ private[spark] class TaskSchedulerImpl(val sc: SparkContext,
       reason: ExecutorLossReason): Unit = reason match {
     case LossReasonPending =>
       logDebug(
-          s"Executor $executorId on $hostPort lost, but reason not yet known.")
+        s"Executor $executorId on $hostPort lost, but reason not yet known.")
     case ExecutorKilled =>
       logInfo(s"Executor $executorId on $hostPort killed by driver.")
     case _ =>
@@ -614,7 +638,8 @@ private[spark] class TaskSchedulerImpl(val sc: SparkContext,
     backend.applicationAttemptId()
 
   private[scheduler] def taskSetManagerForAttempt(
-      stageId: Int, stageAttemptId: Int): Option[TaskSetManager] = {
+      stageId: Int,
+      stageAttemptId: Int): Option[TaskSetManager] = {
     for {
       attempts <- taskSetsByStageIdAndAttempt.get(stageId)
       manager <- attempts.get(stageAttemptId)
@@ -643,7 +668,7 @@ private[spark] object TaskSchedulerImpl {
 
     // order keyList based on population of value in map
     val keyList = _keyList.sortWith(
-        (left, right) => map(left).size > map(right).size
+      (left, right) => map(left).size > map(right).size
     )
 
     val retval = new ArrayBuffer[T](keyList.size * 2)

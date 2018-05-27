@@ -35,22 +35,22 @@ trait Constants extends api.Constants { self: SymbolTable =>
     import java.lang.Float.floatToRawIntBits
 
     val tag: Int = value match {
-      case null => NullTag
-      case x: Unit => UnitTag
+      case null       => NullTag
+      case x: Unit    => UnitTag
       case x: Boolean => BooleanTag
-      case x: Byte => ByteTag
-      case x: Short => ShortTag
-      case x: Int => IntTag
-      case x: Long => LongTag
-      case x: Float => FloatTag
-      case x: Double => DoubleTag
-      case x: String => StringTag
-      case x: Char => CharTag
-      case x: Type => ClazzTag
-      case x: Symbol => EnumTag
+      case x: Byte    => ByteTag
+      case x: Short   => ShortTag
+      case x: Int     => IntTag
+      case x: Long    => LongTag
+      case x: Float   => FloatTag
+      case x: Double  => DoubleTag
+      case x: String  => StringTag
+      case x: Char    => CharTag
+      case x: Type    => ClazzTag
+      case x: Symbol  => EnumTag
       case _ =>
         throw new Error(
-            "bad constant value: " + value + " of class " + value.getClass)
+          "bad constant value: " + value + " of class " + value.getClass)
     }
 
     def isByteRange: Boolean =
@@ -67,19 +67,19 @@ trait Constants extends api.Constants { self: SymbolTable =>
     def isAnyVal = UnitTag <= tag && tag <= DoubleTag
 
     def tpe: Type = tag match {
-      case UnitTag => UnitTpe
+      case UnitTag    => UnitTpe
       case BooleanTag => BooleanTpe
-      case ByteTag => ByteTpe
-      case ShortTag => ShortTpe
-      case CharTag => CharTpe
-      case IntTag => IntTpe
-      case LongTag => LongTpe
-      case FloatTag => FloatTpe
-      case DoubleTag => DoubleTpe
-      case StringTag => StringTpe
-      case NullTag => NullTpe
-      case ClazzTag => ClassType(typeValue)
-      case EnumTag => EnumType(symbolValue)
+      case ByteTag    => ByteTpe
+      case ShortTag   => ShortTpe
+      case CharTag    => CharTpe
+      case IntTag     => IntTpe
+      case LongTag    => LongTpe
+      case FloatTag   => FloatTpe
+      case DoubleTag  => DoubleTpe
+      case StringTag  => StringTpe
+      case NullTag    => NullTpe
+      case ClazzTag   => ClassType(typeValue)
+      case EnumTag    => EnumType(symbolValue)
     }
 
     /** We need the equals method to take account of tags as well as values.
@@ -92,9 +92,9 @@ trait Constants extends api.Constants { self: SymbolTable =>
     }
 
     def isNaN = value match {
-      case f: Float => f.isNaN
+      case f: Float  => f.isNaN
       case d: Double => d.isNaN
-      case _ => false
+      case _         => false
     }
 
     def booleanValue: Boolean =
@@ -102,80 +102,80 @@ trait Constants extends api.Constants { self: SymbolTable =>
       else throw new Error("value " + value + " is not a boolean")
 
     def byteValue: Byte = tag match {
-      case ByteTag => value.asInstanceOf[Byte]
-      case ShortTag => value.asInstanceOf[Short].toByte
-      case CharTag => value.asInstanceOf[Char].toByte
-      case IntTag => value.asInstanceOf[Int].toByte
-      case LongTag => value.asInstanceOf[Long].toByte
-      case FloatTag => value.asInstanceOf[Float].toByte
+      case ByteTag   => value.asInstanceOf[Byte]
+      case ShortTag  => value.asInstanceOf[Short].toByte
+      case CharTag   => value.asInstanceOf[Char].toByte
+      case IntTag    => value.asInstanceOf[Int].toByte
+      case LongTag   => value.asInstanceOf[Long].toByte
+      case FloatTag  => value.asInstanceOf[Float].toByte
       case DoubleTag => value.asInstanceOf[Double].toByte
-      case _ => throw new Error("value " + value + " is not a Byte")
+      case _         => throw new Error("value " + value + " is not a Byte")
     }
 
     def shortValue: Short = tag match {
-      case ByteTag => value.asInstanceOf[Byte].toShort
-      case ShortTag => value.asInstanceOf[Short]
-      case CharTag => value.asInstanceOf[Char].toShort
-      case IntTag => value.asInstanceOf[Int].toShort
-      case LongTag => value.asInstanceOf[Long].toShort
-      case FloatTag => value.asInstanceOf[Float].toShort
+      case ByteTag   => value.asInstanceOf[Byte].toShort
+      case ShortTag  => value.asInstanceOf[Short]
+      case CharTag   => value.asInstanceOf[Char].toShort
+      case IntTag    => value.asInstanceOf[Int].toShort
+      case LongTag   => value.asInstanceOf[Long].toShort
+      case FloatTag  => value.asInstanceOf[Float].toShort
       case DoubleTag => value.asInstanceOf[Double].toShort
-      case _ => throw new Error("value " + value + " is not a Short")
+      case _         => throw new Error("value " + value + " is not a Short")
     }
 
     def charValue: Char = tag match {
-      case ByteTag => value.asInstanceOf[Byte].toChar
-      case ShortTag => value.asInstanceOf[Short].toChar
-      case CharTag => value.asInstanceOf[Char]
-      case IntTag => value.asInstanceOf[Int].toChar
-      case LongTag => value.asInstanceOf[Long].toChar
-      case FloatTag => value.asInstanceOf[Float].toChar
+      case ByteTag   => value.asInstanceOf[Byte].toChar
+      case ShortTag  => value.asInstanceOf[Short].toChar
+      case CharTag   => value.asInstanceOf[Char]
+      case IntTag    => value.asInstanceOf[Int].toChar
+      case LongTag   => value.asInstanceOf[Long].toChar
+      case FloatTag  => value.asInstanceOf[Float].toChar
       case DoubleTag => value.asInstanceOf[Double].toChar
-      case _ => throw new Error("value " + value + " is not a Char")
+      case _         => throw new Error("value " + value + " is not a Char")
     }
 
     def intValue: Int = tag match {
-      case ByteTag => value.asInstanceOf[Byte].toInt
-      case ShortTag => value.asInstanceOf[Short].toInt
-      case CharTag => value.asInstanceOf[Char].toInt
-      case IntTag => value.asInstanceOf[Int]
-      case LongTag => value.asInstanceOf[Long].toInt
-      case FloatTag => value.asInstanceOf[Float].toInt
+      case ByteTag   => value.asInstanceOf[Byte].toInt
+      case ShortTag  => value.asInstanceOf[Short].toInt
+      case CharTag   => value.asInstanceOf[Char].toInt
+      case IntTag    => value.asInstanceOf[Int]
+      case LongTag   => value.asInstanceOf[Long].toInt
+      case FloatTag  => value.asInstanceOf[Float].toInt
       case DoubleTag => value.asInstanceOf[Double].toInt
-      case _ => throw new Error("value " + value + " is not an Int")
+      case _         => throw new Error("value " + value + " is not an Int")
     }
 
     def longValue: Long = tag match {
-      case ByteTag => value.asInstanceOf[Byte].toLong
-      case ShortTag => value.asInstanceOf[Short].toLong
-      case CharTag => value.asInstanceOf[Char].toLong
-      case IntTag => value.asInstanceOf[Int].toLong
-      case LongTag => value.asInstanceOf[Long]
-      case FloatTag => value.asInstanceOf[Float].toLong
+      case ByteTag   => value.asInstanceOf[Byte].toLong
+      case ShortTag  => value.asInstanceOf[Short].toLong
+      case CharTag   => value.asInstanceOf[Char].toLong
+      case IntTag    => value.asInstanceOf[Int].toLong
+      case LongTag   => value.asInstanceOf[Long]
+      case FloatTag  => value.asInstanceOf[Float].toLong
       case DoubleTag => value.asInstanceOf[Double].toLong
-      case _ => throw new Error("value " + value + " is not a Long")
+      case _         => throw new Error("value " + value + " is not a Long")
     }
 
     def floatValue: Float = tag match {
-      case ByteTag => value.asInstanceOf[Byte].toFloat
-      case ShortTag => value.asInstanceOf[Short].toFloat
-      case CharTag => value.asInstanceOf[Char].toFloat
-      case IntTag => value.asInstanceOf[Int].toFloat
-      case LongTag => value.asInstanceOf[Long].toFloat
-      case FloatTag => value.asInstanceOf[Float]
+      case ByteTag   => value.asInstanceOf[Byte].toFloat
+      case ShortTag  => value.asInstanceOf[Short].toFloat
+      case CharTag   => value.asInstanceOf[Char].toFloat
+      case IntTag    => value.asInstanceOf[Int].toFloat
+      case LongTag   => value.asInstanceOf[Long].toFloat
+      case FloatTag  => value.asInstanceOf[Float]
       case DoubleTag => value.asInstanceOf[Double].toFloat
-      case _ => throw new Error("value " + value + " is not a Float")
+      case _         => throw new Error("value " + value + " is not a Float")
     }
 
     def doubleValue: Double = tag match {
-      case ByteTag => value.asInstanceOf[Byte].toDouble
-      case ShortTag => value.asInstanceOf[Short].toDouble
-      case CharTag => value.asInstanceOf[Char].toDouble
-      case IntTag => value.asInstanceOf[Int].toDouble
-      case LongTag => value.asInstanceOf[Long].toDouble
-      case FloatTag => value.asInstanceOf[Float].toDouble
+      case ByteTag   => value.asInstanceOf[Byte].toDouble
+      case ShortTag  => value.asInstanceOf[Short].toDouble
+      case CharTag   => value.asInstanceOf[Char].toDouble
+      case IntTag    => value.asInstanceOf[Int].toDouble
+      case LongTag   => value.asInstanceOf[Long].toDouble
+      case FloatTag  => value.asInstanceOf[Float].toDouble
       case DoubleTag => value.asInstanceOf[Double]
-      case _ => throw new Error("value " + value + " is not a Double")
+      case _         => throw new Error("value " + value + " is not a Double")
     }
 
     /** Convert constant value to conform to given type.
@@ -204,7 +204,7 @@ trait Constants extends api.Constants { self: SymbolTable =>
       case '\n' => "\\n"
       case '\f' => "\\f"
       case '\r' => "\\r"
-      case '"' => "\\\""
+      case '"'  => "\\\""
       case '\'' => "\\\'"
       case '\\' => "\\\\"
       case _ =>
@@ -215,7 +215,7 @@ trait Constants extends api.Constants { self: SymbolTable =>
     def escapedStringValue: String = {
       def escape(text: String): String = text flatMap escapedChar
       tag match {
-        case NullTag => "null"
+        case NullTag   => "null"
         case StringTag => "\"" + escape(stringValue) + "\""
         case ClazzTag =>
           def show(tpe: Type) = "classOf[" + signature(tpe) + "]"
@@ -234,7 +234,7 @@ trait Constants extends api.Constants { self: SymbolTable =>
         case CharTag => "'" + escapedChar(charValue) + "'"
         case LongTag => longValue.toString() + "L"
         case EnumTag => symbolValue.name.toString()
-        case _ => String.valueOf(value)
+        case _       => String.valueOf(value)
       }
     }
     def typeValue: Type = value.asInstanceOf[Type]
@@ -251,9 +251,9 @@ trait Constants extends api.Constants { self: SymbolTable =>
       * conjure them with a macro.
       */
     private def equalHashValue: Any = value match {
-      case f: Float => floatToRawIntBits(f)
+      case f: Float  => floatToRawIntBits(f)
       case d: Double => doubleToRawLongBits(d)
-      case v => v
+      case v         => v
     }
 
     override def hashCode: Int = {

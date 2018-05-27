@@ -17,24 +17,27 @@ private[finagle] object EndpointRecorder {
 
       val description: String = "Records endpoints in the endpoint registry"
 
-      val parameters = Seq(implicitly[Stack.Param[Label]],
-                           implicitly[Stack.Param[BindingFactory.BaseDtab]],
-                           implicitly[Stack.Param[BindingFactory.Dest]])
+      val parameters = Seq(
+        implicitly[Stack.Param[Label]],
+        implicitly[Stack.Param[BindingFactory.BaseDtab]],
+        implicitly[Stack.Param[BindingFactory.Dest]])
 
-      def make(params: Stack.Params,
-               next: ServiceFactory[Req, Rep]): ServiceFactory[Req, Rep] = {
+      def make(
+          params: Stack.Params,
+          next: ServiceFactory[Req, Rep]): ServiceFactory[Req, Rep] = {
         val BindingFactory.Dest(dest) = params[BindingFactory.Dest]
         dest match {
           case bound: Name.Bound =>
             val Label(client) = params[Label]
             val BindingFactory.BaseDtab(baseDtab) =
               params[BindingFactory.BaseDtab]
-            new EndpointRecorder(next,
-                                 EndpointRegistry.registry,
-                                 client,
-                                 baseDtab() ++ Dtab.local,
-                                 bound.idStr,
-                                 bound.addr)
+            new EndpointRecorder(
+              next,
+              EndpointRegistry.registry,
+              client,
+              baseDtab() ++ Dtab.local,
+              bound.idStr,
+              bound.addr)
           case _ => next
         }
       }

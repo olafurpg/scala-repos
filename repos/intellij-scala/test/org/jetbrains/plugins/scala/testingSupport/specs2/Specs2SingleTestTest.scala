@@ -10,8 +10,9 @@ abstract class Specs2SingleTestTest extends Specs2TestCase {
   protected val specsTestClassName = "SpecificationTest"
 
   def testSpecification() {
-    addFileToProject(specsTestFileName,
-                     """
+    addFileToProject(
+      specsTestFileName,
+      """
         |import org.specs2.mutable.Specification
         |
         |class SpecificationTest extends Specification {
@@ -31,55 +32,65 @@ abstract class Specs2SingleTestTest extends Specs2TestCase {
         |    }
         |  }
         |}
-      """.stripMargin)
+      """.stripMargin
+    )
 
     runTestByLocation(
-        5,
-        10,
-        specsTestFileName,
-        checkConfigAndSettings(_, specsTestClassName, "run single test"),
-        root =>
-          checkResultTreeHasExactNamedPath(root,
-                                           "[root]",
-                                           specsTestClassName,
-                                           "The 'SpecificationTest' should",
-                                           "run single test") &&
-          checkResultTreeDoesNotHaveNodes(root,
-                                          "ignore other test",
-                                          "run greater test",
-                                          "run exclamation test"),
-        debug = true)
+      5,
+      10,
+      specsTestFileName,
+      checkConfigAndSettings(_, specsTestClassName, "run single test"),
+      root =>
+        checkResultTreeHasExactNamedPath(
+          root,
+          "[root]",
+          specsTestClassName,
+          "The 'SpecificationTest' should",
+          "run single test") &&
+          checkResultTreeDoesNotHaveNodes(
+            root,
+            "ignore other test",
+            "run greater test",
+            "run exclamation test"),
+      debug = true
+    )
 
     runTestByLocation(
-        10,
-        35,
-        specsTestFileName,
-        checkConfigAndSettings(_, specsTestClassName, "run exclamation test"),
-        root =>
-          checkResultTreeHasExactNamedPath(root,
-                                           "[root]",
-                                           specsTestClassName,
-                                           "The 'SpecificationTest' should",
-                                           "run exclamation test") &&
-          checkResultTreeDoesNotHaveNodes(root,
-                                          "ignore other test",
-                                          "run single test",
-                                          "run greater test"))
+      10,
+      35,
+      specsTestFileName,
+      checkConfigAndSettings(_, specsTestClassName, "run exclamation test"),
+      root =>
+        checkResultTreeHasExactNamedPath(
+          root,
+          "[root]",
+          specsTestClassName,
+          "The 'SpecificationTest' should",
+          "run exclamation test") &&
+          checkResultTreeDoesNotHaveNodes(
+            root,
+            "ignore other test",
+            "run single test",
+            "run greater test")
+    )
 
     runTestByLocation(
-        12,
-        10,
-        specsTestFileName,
-        checkConfigAndSettings(_, specsTestClassName, "run greater test"),
-        root =>
-          checkResultTreeHasExactNamedPath(root,
-                                           "[root]",
-                                           specsTestClassName,
-                                           "The 'SpecificationTest' should",
-                                           "run greater test") &&
-          checkResultTreeDoesNotHaveNodes(root,
-                                          "ignore other test",
-                                          "run single test",
-                                          "run exclamation test"))
+      12,
+      10,
+      specsTestFileName,
+      checkConfigAndSettings(_, specsTestClassName, "run greater test"),
+      root =>
+        checkResultTreeHasExactNamedPath(
+          root,
+          "[root]",
+          specsTestClassName,
+          "The 'SpecificationTest' should",
+          "run greater test") &&
+          checkResultTreeDoesNotHaveNodes(
+            root,
+            "ignore other test",
+            "run single test",
+            "run exclamation test")
+    )
   }
 }

@@ -38,24 +38,26 @@ class BaseOrdering extends Ordering[InternalRow] {
   * Generates bytecode for an [[Ordering]] of rows for a given set of expressions.
   */
 object GenerateOrdering
-    extends CodeGenerator[Seq[SortOrder], Ordering[InternalRow]] with Logging {
+    extends CodeGenerator[Seq[SortOrder], Ordering[InternalRow]]
+    with Logging {
 
   protected def canonicalize(in: Seq[SortOrder]): Seq[SortOrder] =
     in.map(ExpressionCanonicalizer.execute(_).asInstanceOf[SortOrder])
 
   protected def bind(
-      in: Seq[SortOrder], inputSchema: Seq[Attribute]): Seq[SortOrder] =
+      in: Seq[SortOrder],
+      inputSchema: Seq[Attribute]): Seq[SortOrder] =
     in.map(BindReferences.bindReference(_, inputSchema))
 
   /**
     * Creates a code gen ordering for sorting this schema, in ascending order.
     */
   def create(schema: StructType): BaseOrdering = {
-    create(
-        schema.zipWithIndex.map {
+    create(schema.zipWithIndex.map {
       case (field, ordinal) =>
-        SortOrder(BoundReference(ordinal, field.dataType, nullable = true),
-                  Ascending)
+        SortOrder(
+          BoundReference(ordinal, field.dataType, nullable = true),
+          Ascending)
     })
   }
 
@@ -75,14 +77,15 @@ object GenerateOrdering
     * Generates the code for ordering based on the given order.
     */
   def genComparisons(ctx: CodegenContext, ordering: Seq[SortOrder]): String = {
-    val comparisons = ordering.map { order =>
-      val eval = order.child.gen(ctx)
-      val asc = order.direction == Ascending
-      val isNullA = ctx.freshName("isNullA")
-      val primitiveA = ctx.freshName("primitiveA")
-      val isNullB = ctx.freshName("isNullB")
-      val primitiveB = ctx.freshName("primitiveB")
-      s"""
+    val comparisons = ordering
+      .map { order =>
+        val eval = order.child.gen(ctx)
+        val asc = order.direction == Ascending
+        val isNullA = ctx.freshName("isNullA")
+        val primitiveA = ctx.freshName("primitiveA")
+        val isNullB = ctx.freshName("isNullB")
+        val primitiveB = ctx.freshName("primitiveB")
+        s"""
           ${ctx.INPUT_ROW} = a;
           boolean $isNullA;
           ${ctx.javaType(order.child.dataType)} $primitiveA;
@@ -107,13 +110,16 @@ object GenerateOrdering
             return ${if (order.direction == Ascending) "1" else "-1"};
           } else {
             int comp = ${ctx.genComp(
-          order.child.dataType, primitiveA, primitiveB)};
+          order.child.dataType,
+          primitiveA,
+          primitiveB)};
             if (comp != 0) {
               return ${if (asc) "comp" else "-comp"};
             }
           }
       """
-    }.mkString("\n")
+      }
+      .mkString("\n")
     comparisons
   }
 
@@ -181,11 +187,11 @@ object LazilyGeneratedOrdering {
     * Creates a [[LazilyGeneratedOrdering]] for the given schema, in natural ascending order.
     */
   def forSchema(schema: StructType): LazilyGeneratedOrdering = {
-    new LazilyGeneratedOrdering(
-        schema.zipWithIndex.map {
+    new LazilyGeneratedOrdering(schema.zipWithIndex.map {
       case (field, ordinal) =>
-        SortOrder(BoundReference(ordinal, field.dataType, nullable = true),
-                  Ascending)
+        SortOrder(
+          BoundReference(ordinal, field.dataType, nullable = true),
+          Ascending)
     })
   }
 }

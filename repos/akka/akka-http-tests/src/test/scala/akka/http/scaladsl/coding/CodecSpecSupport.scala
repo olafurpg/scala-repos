@@ -27,7 +27,7 @@ trait CodecSpecSupport extends Matchers with BeforeAndAfterAll { self: Suite ⇒
   def printBytes(i: Int, id: String) = {
     def byte(i: Int) = (i & 0xFF).toHexString
     println(
-        id + ": " + byte(i) + ":" + byte(i >> 8) + ":" + byte(i >> 16) + ":" +
+      id + ": " + byte(i) + ":" + byte(i >> 8) + ":" + byte(i >> 16) + ":" +
         byte(i >> 24))
     i
   }

@@ -51,7 +51,7 @@ private[std] sealed trait Function1Instances extends Function1Instances0 {
     new Choice[Function1] with Arrow[Function1] {
       def choice[A, B, C](f: A => C, g: B => C): Xor[A, B] => C =
         _ match {
-          case Xor.Left(a) => f(a)
+          case Xor.Left(a)  => f(a)
           case Xor.Right(b) => g(b)
         }
 
@@ -63,8 +63,7 @@ private[std] sealed trait Function1Instances extends Function1Instances0 {
 
       def id[A]: A => A = a => a
 
-      override def split[A, B, C, D](
-          f: A => B, g: C => D): ((A, C)) => (B, D) = {
+      override def split[A, B, C, D](f: A => B, g: C => D): ((A, C)) => (B, D) = {
         case (a, c) => (f(a), g(c))
       }
 
@@ -96,7 +95,8 @@ private[std] sealed trait Function1Semigroup[A, B] extends Semigroup[A => B] {
 }
 
 private[std] sealed trait Function1Monoid[A, B]
-    extends Monoid[A => B] with Function1Semigroup[A, B] {
+    extends Monoid[A => B]
+    with Function1Semigroup[A, B] {
   implicit def B: Monoid[B]
 
   override def empty: A => B = _ => B.empty
@@ -108,7 +108,8 @@ private[std] sealed trait Function1SemigroupK
 }
 
 private[std] sealed trait Function1MonoidK
-    extends MonoidK[Lambda[A => A => A]] with Function1SemigroupK {
+    extends MonoidK[Lambda[A => A => A]]
+    with Function1SemigroupK {
   override def empty[A]: A => A = identity[A]
 }
 

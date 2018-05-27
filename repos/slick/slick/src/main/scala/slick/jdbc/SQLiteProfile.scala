@@ -77,21 +77,22 @@ trait SQLiteProfile extends JdbcProfile {
 
   override protected def computeCapabilities: Set[Capability] =
     (super.computeCapabilities - RelationalCapabilities.functionDatabase -
-        RelationalCapabilities.functionUser - RelationalCapabilities.joinFull -
-        RelationalCapabilities.joinRight - JdbcCapabilities.mutable -
-        SqlCapabilities.sequence - JdbcCapabilities.returnInsertOther -
-        RelationalCapabilities.typeBigDecimal -
-        RelationalCapabilities.typeBlob - RelationalCapabilities.zip -
-        JdbcCapabilities.insertOrUpdate -
-        JdbcCapabilities.defaultValueMetaData -
-        JdbcCapabilities.booleanMetaData - JdbcCapabilities.supportsByte -
-        JdbcCapabilities.distinguishesIntTypes)
+      RelationalCapabilities.functionUser - RelationalCapabilities.joinFull -
+      RelationalCapabilities.joinRight - JdbcCapabilities.mutable -
+      SqlCapabilities.sequence - JdbcCapabilities.returnInsertOther -
+      RelationalCapabilities.typeBigDecimal -
+      RelationalCapabilities.typeBlob - RelationalCapabilities.zip -
+      JdbcCapabilities.insertOrUpdate -
+      JdbcCapabilities.defaultValueMetaData -
+      JdbcCapabilities.booleanMetaData - JdbcCapabilities.supportsByte -
+      JdbcCapabilities.distinguishesIntTypes)
 
   class ModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
       implicit ec: ExecutionContext)
       extends JdbcModelBuilder(mTables, ignoreInvalidDefaults) {
     override def createColumnBuilder(
-        tableBuilder: TableBuilder, meta: MColumn): ColumnBuilder =
+        tableBuilder: TableBuilder,
+        meta: MColumn): ColumnBuilder =
       new ColumnBuilder(tableBuilder, meta) {
 
         /** Regex matcher to extract name and length out of a db type name with length ascription */
@@ -110,12 +111,12 @@ trait SQLiteProfile extends JdbcProfile {
             }
             .getOrElse { super.default }
         override def tpe = dbType match {
-          case Some("DOUBLE") => "Double"
-          case Some("DATE") => "java.sql.Date"
-          case Some("TIME") => "java.sql.Time"
+          case Some("DOUBLE")    => "Double"
+          case Some("DATE")      => "java.sql.Date"
+          case Some("TIME")      => "java.sql.Time"
           case Some("TIMESTAMP") => "java.sql.Timestamp"
-          case Some("BLOB") => "java.sql.Blob"
-          case _ => super.tpe
+          case Some("BLOB")      => "java.sql.Blob"
+          case _                 => super.tpe
         }
       }
     override def createPrimaryKeyBuilder(
@@ -129,19 +130,19 @@ trait SQLiteProfile extends JdbcProfile {
   }
 
   override def createModelBuilder(
-      tables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
+      tables: Seq[MTable],
+      ignoreInvalidDefaults: Boolean)(
       implicit ec: ExecutionContext): JdbcModelBuilder =
     new ModelBuilder(tables, ignoreInvalidDefaults)
 
-  override def defaultTables(
-      implicit ec: ExecutionContext): DBIO[Seq[MTable]] =
+  override def defaultTables(implicit ec: ExecutionContext): DBIO[Seq[MTable]] =
     MTable
       .getTables(Some(""), Some(""), None, Some(Seq("TABLE")))
       .map(_.filter(_.name.name.toLowerCase != "sqlite_sequence"))
 
   override val columnTypes = new JdbcTypes
-  override def createQueryBuilder(
-      n: Node, state: CompilerState): QueryBuilder = new QueryBuilder(n, state)
+  override def createQueryBuilder(n: Node, state: CompilerState): QueryBuilder =
+    new QueryBuilder(n, state)
   override def createUpsertBuilder(node: Insert): super.InsertBuilder =
     new UpsertBuilder(node)
   override def createInsertBuilder(node: Insert): super.InsertBuilder =
@@ -149,7 +150,8 @@ trait SQLiteProfile extends JdbcProfile {
   override def createTableDDLBuilder(table: Table[_]): TableDDLBuilder =
     new TableDDLBuilder(table)
   override def createColumnDDLBuilder(
-      column: FieldSymbol, table: Table[_]): ColumnDDLBuilder =
+      column: FieldSymbol,
+      table: Table[_]): ColumnDDLBuilder =
     new ColumnDDLBuilder(column)
   override def createInsertActionExtensionMethods[T](
       compiled: CompiledInsert): InsertActionExtensionMethods[T] =
@@ -171,29 +173,30 @@ trait SQLiteProfile extends JdbcProfile {
     }
 
     override protected def buildFetchOffsetClause(
-        fetch: Option[Node], offset: Option[Node]) = (fetch, offset) match {
+        fetch: Option[Node],
+        offset: Option[Node]) = (fetch, offset) match {
       case (Some(t), Some(d)) => b"\nlimit $d,$t"
-      case (Some(t), None) => b"\nlimit $t"
-      case (None, Some(d)) => b"\nlimit $d,-1"
-      case _ =>
+      case (Some(t), None)    => b"\nlimit $t"
+      case (None, Some(d))    => b"\nlimit $d,-1"
+      case _                  =>
     }
 
     override def expr(c: Node, skipParens: Boolean = false): Unit = c match {
       case Library.UCase(ch) => b"upper(!$ch)"
       case Library.LCase(ch) => b"lower(!$ch)"
       case Library.Substring(n, start, end) =>
-        b"substr($n, ${QueryParameter.constOp[Int]("+")(_ + _)(
-            start, LiteralNode(1).infer())}, ${QueryParameter.constOp[Int](
-            "-")(_ - _)(end, start)})"
+        b"substr($n, ${QueryParameter
+          .constOp[Int]("+")(_ + _)(start, LiteralNode(1).infer())}, ${QueryParameter
+          .constOp[Int]("-")(_ - _)(end, start)})"
       case Library.Substring(n, start) =>
-        b"substr($n, ${QueryParameter.constOp[Int]("+")(_ + _)(
-            start, LiteralNode(1).infer())})\)"
+        b"substr($n, ${QueryParameter
+          .constOp[Int]("+")(_ + _)(start, LiteralNode(1).infer())})\)"
       case Library.IndexOf(n, str) => b"\(charindex($str, $n) - 1\)"
-      case Library.%(l, r) => b"\($l%$r\)"
-      case Library.Ceiling(ch) => b"round($ch+0.5)"
-      case Library.Floor(ch) => b"round($ch-0.5)"
-      case Library.User() => b"''"
-      case Library.Database() => b"''"
+      case Library.%(l, r)         => b"\($l%$r\)"
+      case Library.Ceiling(ch)     => b"round($ch+0.5)"
+      case Library.Floor(ch)       => b"round($ch-0.5)"
+      case Library.User()          => b"''"
+      case Library.Database()      => b"''"
       case RowNumber(_) =>
         throw new SlickException("SQLite does not support row numbers")
       // https://github.com/jOOQ/jOOQ/issues/1595
@@ -252,7 +255,8 @@ trait SQLiteProfile extends JdbcProfile {
   }
 
   override def defaultSqlTypeName(
-      tmd: JdbcType[_], sym: Option[FieldSymbol]): String = tmd.sqlType match {
+      tmd: JdbcType[_],
+      sym: Option[FieldSymbol]): String = tmd.sqlType match {
     case java.sql.Types.TINYINT | java.sql.Types.SMALLINT |
         java.sql.Types.BIGINT =>
       "INTEGER"

@@ -30,25 +30,32 @@ object LocalConcurrencySpec {
     def receive = {
       case s: String ⇒
         val update = Replicator.Update(
-            Updater.key, ORSet.empty[String], Replicator.WriteLocal)(_ + s)
+          Updater.key,
+          ORSet.empty[String],
+          Replicator.WriteLocal)(_ + s)
         replicator ! update
     }
   }
 }
 
 class LocalConcurrencySpec(_system: ActorSystem)
-    extends TestKit(_system) with WordSpecLike with Matchers
-    with BeforeAndAfterAll with ImplicitSender {
+    extends TestKit(_system)
+    with WordSpecLike
+    with Matchers
+    with BeforeAndAfterAll
+    with ImplicitSender {
   import LocalConcurrencySpec._
 
   def this() {
     this(
-        ActorSystem(
-            "LocalConcurrencySpec",
-            ConfigFactory.parseString("""
+      ActorSystem(
+        "LocalConcurrencySpec",
+        ConfigFactory.parseString(
+          """
       akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
       akka.remote.netty.tcp.port=0
-      """)))
+      """)
+      ))
   }
 
   override def afterAll(): Unit = {
@@ -70,7 +77,7 @@ class LocalConcurrencySpec(_system: ActorSystem)
       }
 
       val expected = ((1 to numMessages).map("a" + _) ++ (1 to numMessages)
-            .map("b" + _)).toSet
+        .map("b" + _)).toSet
       awaitAssert {
         replicator ! Replicator.Get(Updater.key, Replicator.ReadLocal)
         val ORSet(elements) =

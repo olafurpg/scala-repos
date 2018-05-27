@@ -19,14 +19,15 @@ package kafka.producer
 /**
   * A partitioner controls the mapping between user-provided keys and kafka partitions. Users can implement a custom
   * partitioner to change this mapping.
-  * 
-  * Implementations will be constructed via reflection and are required to have a constructor that takes a single 
+  *
+  * Implementations will be constructed via reflection and are required to have a constructor that takes a single
   * VerifiableProperties instance--this allows passing configuration properties into the partitioner implementation.
   */
 @deprecated(
-    "This trait has been deprecated and will be removed in a future release. " +
+  "This trait has been deprecated and will be removed in a future release. " +
     "Please use org.apache.kafka.clients.producer.Partitioner instead.",
-    "0.10.0.0")
+  "0.10.0.0"
+)
 trait Partitioner {
 
   /**

@@ -9,14 +9,14 @@ import play.twirl.api.Html
 case class SendTo(userId: String, message: JsObject)
 
 object SendTo {
-  def apply[A : Writes](userId: String, typ: String, data: A): SendTo =
+  def apply[A: Writes](userId: String, typ: String, data: A): SendTo =
     SendTo(userId, Json.obj("t" -> typ, "d" -> data))
 }
 
 case class SendTos(userIds: Set[String], message: JsObject)
 
 object SendTos {
-  def apply[A : Writes](userIds: Set[String], typ: String, data: A): SendTos =
+  def apply[A: Writes](userIds: Set[String], typ: String, data: A): SendTos =
     SendTos(userIds, Json.obj("t" -> typ, "d" -> data))
 }
 
@@ -53,7 +53,9 @@ package shutup {
   case class RecordPublicForumMessage(userId: String, text: String)
   case class RecordTeamForumMessage(userId: String, text: String)
   case class RecordPrivateMessage(
-      userId: String, toUserId: String, text: String)
+      userId: String,
+      toUserId: String,
+      text: String)
   case class RecordPrivateChat(chatId: String, userId: String, text: String)
   case class RecordPublicChat(chatId: String, userId: String, text: String)
 }
@@ -97,10 +99,11 @@ package timeline {
       extends Atom(s"teamJoin", false)
   case class TeamCreate(userId: String, teamId: String)
       extends Atom(s"teamCreate", false)
-  case class ForumPost(userId: String,
-                       topicId: Option[String],
-                       topicName: String,
-                       postId: String)
+  case class ForumPost(
+      userId: String,
+      topicId: Option[String],
+      topicName: String,
+      postId: String)
       extends Atom(s"forum:${~topicId}", false)
   case class NoteCreate(from: String, to: String) extends Atom(s"note", false)
   case class TourJoin(userId: String, tourId: String, tourName: String)
@@ -110,12 +113,16 @@ package timeline {
   case class QaAnswer(userId: String, id: Int, title: String, answerId: Int)
       extends Atom(s"qa", true)
   case class QaComment(
-      userId: String, id: Int, title: String, commentId: String)
+      userId: String,
+      id: Int,
+      title: String,
+      commentId: String)
       extends Atom(s"qa", true)
-  case class GameEnd(playerId: String,
-                     opponent: Option[String],
-                     win: Option[Boolean],
-                     perf: String)
+  case class GameEnd(
+      playerId: String,
+      opponent: Option[String],
+      win: Option[Boolean],
+      perf: String)
       extends Atom(s"gameEnd", true)
   case class SimulCreate(userId: String, simulId: String, simulName: String)
       extends Atom(s"simulCreate", true)
@@ -170,7 +177,10 @@ package tv {
 
 package message {
   case class LichessThread(
-      from: String, to: String, subject: String, message: String)
+      from: String,
+      to: String,
+      subject: String,
+      message: String)
 }
 
 package router {
@@ -190,13 +200,14 @@ package fishnet {
 }
 
 package round {
-  case class MoveEvent(gameId: String,
-                       fen: String,
-                       move: String,
-                       color: chess.Color,
-                       mobilePushable: Boolean,
-                       opponentUserId: Option[String],
-                       simulId: Option[String])
+  case class MoveEvent(
+      gameId: String,
+      fen: String,
+      move: String,
+      color: chess.Color,
+      mobilePushable: Boolean,
+      opponentUserId: Option[String],
+      simulId: Option[String])
   case class NbRounds(nb: Int)
   case class Abort(gameId: String, byColor: String)
   case class Berserk(gameId: String, userId: String)
@@ -229,8 +240,9 @@ package relation {
   case class UnBlock(u1: String, u2: String)
 }
 
-case class DonationEvent(userId: Option[String],
-                         gross: Int,
-                         net: Int,
-                         message: Option[String],
-                         progress: Int)
+case class DonationEvent(
+    userId: Option[String],
+    gross: Int,
+    net: Int,
+    message: Option[String],
+    progress: Int)

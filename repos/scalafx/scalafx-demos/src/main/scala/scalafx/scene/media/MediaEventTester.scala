@@ -47,11 +47,11 @@ object MediaEventTester extends JFXApp {
   val url = "http://download.oracle.com/otndocs/products/javafx/oow2010-2.flv"
   val media = new Media(url)
   media.markers ++= Map(
-      "Clouds" -> (100 ms),
-      "Planes" -> (3000 ms),
-      "Parachute" -> (8000 ms),
-      "Car" -> (13000 ms),
-      "..." -> (15000 ms)
+    "Clouds" -> (100 ms),
+    "Planes" -> (3000 ms),
+    "Parachute" -> (8000 ms),
+    "Car" -> (13000 ms),
+    "..." -> (15000 ms)
   )
 
   val mediaPlayer = new MediaPlayer(media)

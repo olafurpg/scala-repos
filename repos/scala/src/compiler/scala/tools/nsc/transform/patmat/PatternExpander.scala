@@ -41,7 +41,9 @@ trait PatternExpander[Pattern, Type] {
     *  sequenceType is Seq[T], elementType is T, repeatedType is T*.
     */
   sealed case class Repeated(
-      sequenceType: Type, elementType: Type, repeatedType: Type) {
+      sequenceType: Type,
+      elementType: Type,
+      repeatedType: Type) {
     def exists = elementType != NoType
 
     def elementList = if (exists) elementType :: Nil else Nil
@@ -88,10 +90,11 @@ trait PatternExpander[Pattern, Type] {
     *  @param  fixed     The non-sequence types which are extracted
     *  @param  repeated  The sequence type which is extracted
     */
-  final case class Extractor(whole: Type,
-                             fixed: List[Type],
-                             repeated: Repeated,
-                             typeOfSinglePattern: Type) {
+  final case class Extractor(
+      whole: Type,
+      fixed: List[Type],
+      repeated: Repeated,
+      typeOfSinglePattern: Type) {
     require(whole != NoType, s"expandTypes($whole, $fixed, $repeated)")
 
     /** A pattern with arity-1 that doesn't match the arity of the Product-like result of the `get` method,
@@ -125,9 +128,9 @@ trait PatternExpander[Pattern, Type] {
       if (isErroneous) "<error>"
       else
         typeStrings match {
-          case Nil => "Boolean"
+          case Nil       => "Boolean"
           case tp :: Nil => tp
-          case tps => tps.mkString("(", ", ", ")")
+          case tps       => tps.mkString("(", ", ", ")")
         }
     override def toString = "%s => %s".format(whole, offeringString)
   }

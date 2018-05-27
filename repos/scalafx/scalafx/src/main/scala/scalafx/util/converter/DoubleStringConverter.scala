@@ -39,4 +39,6 @@ object DoubleStringConverter {
 class DoubleStringConverter(
     delegate: jfxuc.DoubleStringConverter = new jfxuc.DoubleStringConverter)
     extends StringConverterDelegate[
-        java.lang.Double, Double, jfxuc.DoubleStringConverter](delegate)
+      java.lang.Double,
+      Double,
+      jfxuc.DoubleStringConverter](delegate)

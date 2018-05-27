@@ -22,8 +22,9 @@ class Specs2RunConfiguration(
     Seq("-Dspecs2.ex=\"\\A" + testName + "\\Z\"")
 
   override def suitePaths =
-    List("org.specs2.specification.SpecificationStructure",
-         "org.specs2.specification.core.SpecificationStructure")
+    List(
+      "org.specs2.specification.SpecificationStructure",
+      "org.specs2.specification.core.SpecificationStructure")
 
   override def mainClass =
     "org.jetbrains.plugins.scala.testingSupport.specs2.JavaSpecs2Runner"
@@ -46,5 +47,5 @@ object Specs2RunConfiguration extends SuiteValidityChecker {
   override protected[test] def lackSuitableConstructor(
       clazz: PsiClass): Boolean =
     !isScalaObject(clazz) &&
-    AbstractTestRunConfiguration.lackSuitableConstructor(clazz)
+      AbstractTestRunConfiguration.lackSuitableConstructor(clazz)
 }

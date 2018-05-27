@@ -34,7 +34,7 @@ private[testadapter] object SelectorSerializers {
             .fld("testWildcard", sel.testWildcard)
         case _ =>
           throw new IllegalArgumentException(
-              s"Unknown Selector type: ${sel.getClass}")
+            s"Unknown Selector type: ${sel.getClass}")
       }
       bld.toJSON
     }
@@ -51,8 +51,9 @@ private[testadapter] object SelectorSerializers {
         case "NestedSuiteSelector" =>
           new NestedSuiteSelector(obj.fld[String]("suiteId"))
         case "NestedTestSelector" =>
-          new NestedTestSelector(obj.fld[String]("suiteId"),
-                                 obj.fld[String]("testName"))
+          new NestedTestSelector(
+            obj.fld[String]("suiteId"),
+            obj.fld[String]("testName"))
         case "TestWildcardSelector" =>
           new TestWildcardSelector(obj.fld[String]("testWildcard"))
         case tpe =>

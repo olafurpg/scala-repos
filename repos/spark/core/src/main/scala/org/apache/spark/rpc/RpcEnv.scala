@@ -32,14 +32,15 @@ import org.apache.spark.util.RpcUtils
   */
 private[spark] object RpcEnv {
 
-  def create(name: String,
-             host: String,
-             port: Int,
-             conf: SparkConf,
-             securityManager: SecurityManager,
-             clientMode: Boolean = false): RpcEnv = {
-    val config = RpcEnvConfig(
-        conf, name, host, port, securityManager, clientMode)
+  def create(
+      name: String,
+      host: String,
+      port: Int,
+      conf: SparkConf,
+      securityManager: SecurityManager,
+      clientMode: Boolean = false): RpcEnv = {
+    val config =
+      RpcEnvConfig(conf, name, host, port, securityManager, clientMode)
     new NettyRpcEnvFactory().create(config)
   }
 }
@@ -91,7 +92,8 @@ private[spark] abstract class RpcEnv(conf: SparkConf) {
     * This is a blocking action.
     */
   def setupEndpointRef(
-      address: RpcAddress, endpointName: String): RpcEndpointRef = {
+      address: RpcAddress,
+      endpointName: String): RpcEndpointRef = {
     setupEndpointRefByURI(RpcEndpointAddress(address, endpointName).toString)
   }
 
@@ -174,15 +176,17 @@ private[spark] trait RpcEnvFileServer {
   /** Validates and normalizes the base URI for directories. */
   protected def validateDirectoryUri(baseUri: String): String = {
     val fixedBaseUri = "/" + baseUri.stripPrefix("/").stripSuffix("/")
-    require(fixedBaseUri != "/files" && fixedBaseUri != "/jars",
-            "Directory URI cannot be /files nor /jars.")
+    require(
+      fixedBaseUri != "/files" && fixedBaseUri != "/jars",
+      "Directory URI cannot be /files nor /jars.")
     fixedBaseUri
   }
 }
 
-private[spark] case class RpcEnvConfig(conf: SparkConf,
-                                       name: String,
-                                       host: String,
-                                       port: Int,
-                                       securityManager: SecurityManager,
-                                       clientMode: Boolean)
+private[spark] case class RpcEnvConfig(
+    conf: SparkConf,
+    name: String,
+    host: String,
+    port: Int,
+    securityManager: SecurityManager,
+    clientMode: Boolean)

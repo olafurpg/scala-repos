@@ -133,14 +133,17 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
         case _ ⇒ c.abort(x.pos, "Illegal `separatedBy` base: " + base)
       }
     case call @ (Apply(_, _) | Select(_, _) | Ident(_) | TypeApply(_, _)) ⇒
-      RuleCall(Right(call),
-               Literal(Constant(callName(call) getOrElse c.abort(
-                           call.pos, "Illegal rule call: " + call))))
+      RuleCall(
+        Right(call),
+        Literal(
+          Constant(callName(call) getOrElse c
+            .abort(call.pos, "Illegal rule call: " + call))))
   }
 
   def OpTree(tree: Tree): OpTree =
     opTreePF.applyOrElse(
-        tree, (t: Tree) ⇒ c.abort(t.pos, "Invalid rule definition: " + t))
+      tree,
+      (t: Tree) ⇒ c.abort(t.pos, "Invalid rule definition: " + t))
 
   def Sequence(lhs: OpTree, rhs: OpTree): Sequence =
     lhs -> rhs match {
@@ -184,7 +187,7 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
       q"""val mark = __saveState; ${ops
         .map(_.render(wrapped))
         .reduceLeft((l, r) ⇒
-              q"val l = $l; if (!l) { __restoreState(mark); $r } else true // work-around for https://issues.scala-lang.org/browse/SI-8657")}"""
+          q"val l = $l; if (!l) { __restoreState(mark); $r } else true // work-around for https://issues.scala-lang.org/browse/SI-8657")}"""
   }
 
   case class CharMatch(charTree: Tree) extends TerminalOpTree {
@@ -228,7 +231,8 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
         case Literal(Constant(s: String))
             if s.length <= autoExpandMaxStringLength ⇒
           if (s.isEmpty) q"true"
-          else if (wrapped) unrollWrapped(s) else unrollUnwrapped(s)
+          else if (wrapped) unrollWrapped(s)
+          else unrollUnwrapped(s)
         case _ ⇒
           if (wrapped) q"__matchStringWrapped($stringTree)"
           else q"__matchString($stringTree)"
@@ -247,8 +251,9 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
     else if (argTypeSymbol == definitions.StringClass)
       IgnoreCaseString(argTree)
     else
-      c.abort(argTree.pos,
-              "Unexpected `ignoreCase` argument type: " + argTypeSymbol)
+      c.abort(
+        argTree.pos,
+        "Unexpected `ignoreCase` argument type: " + argTypeSymbol)
   }
 
   case class IgnoreCaseChar(charTree: Tree) extends TerminalOpTree {
@@ -294,7 +299,8 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
         case Literal(Constant(s: String))
             if s.length <= autoExpandMaxStringLength ⇒
           if (s.isEmpty) q"true"
-          else if (wrapped) unrollWrapped(s) else unrollUnwrapped(s)
+          else if (wrapped) unrollWrapped(s)
+          else unrollUnwrapped(s)
         case _ ⇒
           if (wrapped) q"__matchIgnoreCaseStringWrapped($stringTree)"
           else q"__matchIgnoreCaseString($stringTree)"
@@ -364,7 +370,9 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
   }
 
   case class ZeroOrMore(
-      op: OpTree, collector: Collector, separator: Separator = null)
+      op: OpTree,
+      collector: Collector,
+      separator: Separator = null)
       extends WithSeparator {
     def withSeparator(sep: Separator) = copy(separator = sep)
     def ruleTraceNonTerminalKey = reify(RuleTrace.ZeroOrMore).tree
@@ -390,7 +398,9 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
   }
 
   case class OneOrMore(
-      op: OpTree, collector: Collector, separator: Separator = null)
+      op: OpTree,
+      collector: Collector,
+      separator: Separator = null)
       extends WithSeparator {
     def withSeparator(sep: Separator) = copy(separator = sep)
     def ruleTraceNonTerminalKey = reify(RuleTrace.OneOrMore).tree
@@ -419,10 +429,11 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
     }
   }
 
-  def Times(base: Tree,
-            rule: OpTree,
-            collector: Collector,
-            separator: Separator = null): OpTree = {
+  def Times(
+      base: Tree,
+      rule: OpTree,
+      collector: Collector,
+      separator: Separator = null): OpTree = {
     def handleRange(mn: Tree, mx: Tree, r: Tree) = (mn, mx) match {
       case (Literal(Constant(min: Int)), Literal(Constant(max: Int))) ⇒
         if (min <= 0)
@@ -449,7 +460,8 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
             Times(rule, q"val min = $n; val max = min", collector, separator)
           case _ ⇒
             c.abort(
-                n.pos, "Invalid int base expression for `.times(...)`: " + n)
+              n.pos,
+              "Invalid int base expression for `.times(...)`: " + n)
         }
       case q"$a.this.range2NTimes($r)" ⇒
         r match {
@@ -458,13 +470,15 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
           case q"scala.this.Predef.intWrapper($mn).to($mx)" ⇒
             handleRange(mn, mx, r) // Scala 2.11
           case x @ (Ident(_) | Select(_, _)) ⇒
-            Times(rule,
-                  q"val r = $r; val min = r.start; val max = r.end",
-                  collector,
-                  separator)
+            Times(
+              rule,
+              q"val r = $r; val min = r.start; val max = r.end",
+              collector,
+              separator)
           case _ ⇒
             c.abort(
-                r.pos, "Invalid range base expression for `.times(...)`: " + r)
+              r.pos,
+              "Invalid range base expression for `.times(...)`: " + r)
         }
       case _ ⇒
         c.abort(base.pos, "Invalid base expression for `.times(...)`: " + base)
@@ -472,7 +486,10 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
   }
 
   case class Times(
-      op: OpTree, init: Tree, collector: Collector, separator: Separator)
+      op: OpTree,
+      init: Tree,
+      collector: Collector,
+      separator: Separator)
       extends WithSeparator {
     def withSeparator(sep: Separator) = copy(separator = sep)
     val Block(inits, _) = init
@@ -590,7 +607,8 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
     def ruleTraceNonTerminalKey = reify(RuleTrace.Run).tree
     def renderInner(wrapped: Boolean): Tree = {
       def renderFunctionAction(
-          resultTypeTree: Tree, argTypeTrees: Tree*): Tree = {
+          resultTypeTree: Tree,
+          argTypeTrees: Tree*): Tree = {
         def actionBody(tree: Tree): Tree =
           tree match {
             case Block(statements, res) ⇒ block(statements, actionBody(res))
@@ -601,7 +619,8 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
                   case Block(statements, res) ⇒ block(statements, rewrite(res))
                   case x
                       if isSubClass(
-                          resultTypeTree.tpe, "akka.parboiled2.Rule") ⇒
+                        resultTypeTree.tpe,
+                        "akka.parboiled2.Rule") ⇒
                     expand(x, wrapped)
                   case x ⇒ q"__push($x)"
                 }
@@ -616,7 +635,8 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
 
             case x ⇒
               c.abort(
-                  argTree.pos, "Unexpected `run` argument: " + show(argTree))
+                argTree.pos,
+                "Unexpected `run` argument: " + show(argTree))
           }
 
         actionBody(c.resetLocalAttrs(argTree))
@@ -640,8 +660,8 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
 
         case q"RunResult.this.Aux.forFHList[$il, $r, $in, $out]($a)" ⇒
           c.abort(
-              argTree.pos,
-              "`run` with a function taking an HList is not yet implemented") // TODO: implement
+            argTree.pos,
+            "`run` with a function taking an HList is not yet implemented") // TODO: implement
 
         case x ⇒ c.abort(rrTree.pos, "Unexpected RunResult.Aux: " + show(x))
       }
@@ -650,14 +670,17 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
 
   case class PushAction(argTree: Tree, hlTree: Tree) extends OpTree {
     def render(wrapped: Boolean): Tree =
-      block(hlTree match {
-        case q"support.this.HListable.fromUnit" ⇒ argTree
-        case q"support.this.HListable.fromHList[$t]" ⇒
-          q"valueStack.pushAll(${c.resetLocalAttrs(argTree)})"
-        case q"support.this.HListable.fromAnyRef[$t]" ⇒
-          q"valueStack.push(${c.resetLocalAttrs(argTree)})"
-        case x ⇒ c.abort(hlTree.pos, "Unexpected HListable: " + show(x))
-      }, q"true")
+      block(
+        hlTree match {
+          case q"support.this.HListable.fromUnit" ⇒ argTree
+          case q"support.this.HListable.fromHList[$t]" ⇒
+            q"valueStack.pushAll(${c.resetLocalAttrs(argTree)})"
+          case q"support.this.HListable.fromAnyRef[$t]" ⇒
+            q"valueStack.push(${c.resetLocalAttrs(argTree)})"
+          case x ⇒ c.abort(hlTree.pos, "Unexpected HListable: " + show(x))
+        },
+        q"true"
+      )
   }
 
   case class DropAction(hlTree: Tree) extends OpTree {
@@ -699,8 +722,9 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
       case (Literal(Constant(l: String)), Literal(Constant(u: String))) ⇒
         l -> u
       case _ ⇒
-        c.abort(lowerTree.pos,
-                "Character ranges must be specified with string literals")
+        c.abort(
+          lowerTree.pos,
+          "Character ranges must be specified with string literals")
     }
     if (lower.length != 1)
       c.abort(lowerTree.pos, "lower bound must be a single char string")
@@ -804,11 +828,12 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
 
   /////////////////////////////////// helpers ////////////////////////////////////
 
-  class Collector(val valBuilder: Tree,
-                  val popToBuilder: Tree,
-                  val pushBuilderResult: Tree,
-                  val pushSomePop: Tree,
-                  val pushNone: Tree)
+  class Collector(
+      val valBuilder: Tree,
+      val popToBuilder: Tree,
+      val pushBuilderResult: Tree,
+      val pushSomePop: Tree,
+      val pushNone: Tree)
 
   lazy val rule0Collector = {
     val unit = q"()"
@@ -816,11 +841,13 @@ trait OpTreeContext[OpTreeCtx <: ParserMacros.ParserContext] {
   }
 
   lazy val rule1Collector = new Collector(
-      valBuilder = q"val builder = new scala.collection.immutable.VectorBuilder[Any]",
-      popToBuilder = q"builder += valueStack.pop()",
-      pushBuilderResult = q"valueStack.push(builder.result()); true",
-      pushSomePop = q"valueStack.push(Some(valueStack.pop()))",
-      pushNone = q"valueStack.push(None)")
+    valBuilder =
+      q"val builder = new scala.collection.immutable.VectorBuilder[Any]",
+    popToBuilder = q"builder += valueStack.pop()",
+    pushBuilderResult = q"valueStack.push(builder.result()); true",
+    pushSomePop = q"valueStack.push(Some(valueStack.pop()))",
+    pushNone = q"valueStack.push(None)"
+  )
 
   type Separator = Boolean ⇒ Tree
 

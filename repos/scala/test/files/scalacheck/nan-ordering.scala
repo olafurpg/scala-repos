@@ -5,14 +5,14 @@ import Prop._
 object Test extends Properties("NaN-Ordering") {
 
   val specFloats: Gen[Float] = oneOf(
-      Float.MaxValue,
-      Float.MinPositiveValue,
-      Float.MinValue,
-      Float.NaN,
-      Float.NegativeInfinity,
-      Float.PositiveInfinity,
-      -0.0f,
-      +0.0f
+    Float.MaxValue,
+    Float.MinPositiveValue,
+    Float.MinValue,
+    Float.NaN,
+    Float.NegativeInfinity,
+    Float.PositiveInfinity,
+    -0.0f,
+    +0.0f
   )
 
   property("Float min") = forAll(specFloats, specFloats) { (d1, d2) =>
@@ -85,20 +85,19 @@ object Test extends Properties("NaN-Ordering") {
     numFloat.reverse.gteq(d1, d2) == d2 >= d1
   }
 
-  property("Float reverse.equiv") = forAll(specFloats, specFloats) {
-    (d1, d2) =>
-      numFloat.reverse.equiv(d1, d2) == (d1 == d2)
+  property("Float reverse.equiv") = forAll(specFloats, specFloats) { (d1, d2) =>
+    numFloat.reverse.equiv(d1, d2) == (d1 == d2)
   }
 
   val specDoubles: Gen[Double] = oneOf(
-      Double.MaxValue,
-      Double.MinPositiveValue,
-      Double.MinValue,
-      Double.NaN,
-      Double.NegativeInfinity,
-      Double.PositiveInfinity,
-      -0.0,
-      +0.0
+    Double.MaxValue,
+    Double.MinPositiveValue,
+    Double.MinValue,
+    Double.NaN,
+    Double.NegativeInfinity,
+    Double.PositiveInfinity,
+    -0.0,
+    +0.0
   )
 
   // ticket #5104
@@ -158,9 +157,8 @@ object Test extends Properties("NaN-Ordering") {
       }
   }
 
-  property("Double reverse.lt") = forAll(specDoubles, specDoubles) {
-    (d1, d2) =>
-      numDouble.reverse.lt(d1, d2) == d2 < d1
+  property("Double reverse.lt") = forAll(specDoubles, specDoubles) { (d1, d2) =>
+    numDouble.reverse.lt(d1, d2) == d2 < d1
   }
 
   property("Double reverse.lteq") = forAll(specDoubles, specDoubles) {
@@ -168,9 +166,8 @@ object Test extends Properties("NaN-Ordering") {
       numDouble.reverse.lteq(d1, d2) == d2 <= d1
   }
 
-  property("Double reverse.gt") = forAll(specDoubles, specDoubles) {
-    (d1, d2) =>
-      numDouble.reverse.gt(d1, d2) == d2 > d1
+  property("Double reverse.gt") = forAll(specDoubles, specDoubles) { (d1, d2) =>
+    numDouble.reverse.gt(d1, d2) == d2 > d1
   }
 
   property("Double reverse.gteq") = forAll(specDoubles, specDoubles) {

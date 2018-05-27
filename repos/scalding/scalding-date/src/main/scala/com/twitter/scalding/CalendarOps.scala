@@ -12,14 +12,14 @@ object CalendarOps {
     def truncateIter(cal: Calendar, field: Int, currentField: Int): Calendar = {
       if (currentField > field) {
         currentField match {
-          case Calendar.DAY_OF_MONTH => cal.set(currentField, 1)
+          case Calendar.DAY_OF_MONTH         => cal.set(currentField, 1)
           case Calendar.DAY_OF_WEEK_IN_MONTH => () // Skip
-          case Calendar.DAY_OF_WEEK => () // Skip
-          case Calendar.DAY_OF_YEAR => () // Skip
-          case Calendar.WEEK_OF_MONTH => () // Skip
-          case Calendar.WEEK_OF_YEAR => () // Skip
-          case Calendar.HOUR_OF_DAY => () // Skip
-          case _ => cal.set(currentField, 0)
+          case Calendar.DAY_OF_WEEK          => () // Skip
+          case Calendar.DAY_OF_YEAR          => () // Skip
+          case Calendar.WEEK_OF_MONTH        => () // Skip
+          case Calendar.WEEK_OF_YEAR         => () // Skip
+          case Calendar.HOUR_OF_DAY          => () // Skip
+          case _                             => cal.set(currentField, 0)
         }
 
         truncateIter(cal, field, currentField - 1)

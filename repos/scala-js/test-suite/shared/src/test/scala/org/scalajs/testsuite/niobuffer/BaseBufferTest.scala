@@ -7,7 +7,12 @@
 \*                                                                      */
 package org.scalajs.testsuite.niobuffer
 
-import java.nio.{ReadOnlyBufferException, BufferUnderflowException, InvalidMarkException, BufferOverflowException}
+import java.nio.{
+  ReadOnlyBufferException,
+  BufferUnderflowException,
+  InvalidMarkException,
+  BufferOverflowException
+}
 
 import org.junit.Test
 import org.junit.Assert._
@@ -269,30 +274,36 @@ abstract class BaseBufferTest {
     if (!createsReadOnly) {
       buf.put(Array[ElementType](6, 7, 12))
       assertArrayEquals(
-          boxedElemsFromInt(6, 7, 12, 0), boxed((0 to 3).map(buf.get).toArray))
+        boxedElemsFromInt(6, 7, 12, 0),
+        boxed((0 to 3).map(buf.get).toArray))
       assertEquals(3, buf.position())
 
       buf.position(2)
       buf.put(Array[ElementType](44, 55, 66, 77, 88), 2, 2)
-      assertArrayEquals(boxedElemsFromInt(6, 7, 66, 77, 0),
-                        boxed((0 to 4).map(buf.get).toArray))
+      assertArrayEquals(
+        boxedElemsFromInt(6, 7, 66, 77, 0),
+        boxed((0 to 4).map(buf.get).toArray))
       assertEquals(4, buf.position())
 
-      expectThrows(classOf[BufferOverflowException],
-                   buf.put(Array.fill[ElementType](10)(0)))
+      expectThrows(
+        classOf[BufferOverflowException],
+        buf.put(Array.fill[ElementType](10)(0)))
       assertEquals(4, buf.position())
-      assertArrayEquals(boxedElemsFromInt(6, 7, 66, 77, 0),
-                        boxed((0 to 4).map(buf.get).toArray))
+      assertArrayEquals(
+        boxedElemsFromInt(6, 7, 66, 77, 0),
+        boxed((0 to 4).map(buf.get).toArray))
     } else {
-      expectThrows(classOf[ReadOnlyBufferException],
-                   buf.put(Array[ElementType](6, 7, 12)))
+      expectThrows(
+        classOf[ReadOnlyBufferException],
+        buf.put(Array[ElementType](6, 7, 12)))
       assertEquals(0, buf.position())
       assertEquals(elemFromInt(0), buf.get(0))
 
       buf.position(8)
       if (!executingInJVM) // throws BufferOverflowException on JVM
-        expectThrows(classOf[ReadOnlyBufferException],
-                     buf.put(Array[ElementType](6, 7, 12)))
+        expectThrows(
+          classOf[ReadOnlyBufferException],
+          buf.put(Array[ElementType](6, 7, 12)))
       assertEquals(8, buf.position())
       assertEquals(elemFromInt(0), buf.get(8))
     }

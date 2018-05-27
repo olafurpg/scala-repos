@@ -70,27 +70,30 @@ trait DocComments { self: Global =>
     *  the doc comment of the overridden version is copied instead.
     */
   def cookedDocComment(sym: Symbol, docStr: String = ""): String =
-    cookedDocComments.getOrElseUpdate(sym, {
-      var ownComment =
-        if (docStr.length == 0)
-          docComments get sym map (_.template) getOrElse ""
-        else DocComment(docStr).template
-      ownComment = replaceInheritDocToInheritdoc(ownComment)
+    cookedDocComments.getOrElseUpdate(
+      sym, {
+        var ownComment =
+          if (docStr.length == 0)
+            docComments get sym map (_.template) getOrElse ""
+          else DocComment(docStr).template
+        ownComment = replaceInheritDocToInheritdoc(ownComment)
 
-      superComment(sym) match {
-        case None =>
-          // SI-8210 - The warning would be false negative when this symbol is a setter
-          if (ownComment.indexOf("@inheritdoc") != -1 && !sym.isSetter)
-            reporter.warning(
+        superComment(sym) match {
+          case None =>
+            // SI-8210 - The warning would be false negative when this symbol is a setter
+            if (ownComment.indexOf("@inheritdoc") != -1 && !sym.isSetter)
+              reporter.warning(
                 sym.pos,
                 s"The comment for ${sym} contains @inheritdoc, but no parent comment is available to inherit from.")
-          ownComment.replaceAllLiterally(
-              "@inheritdoc", "<invalid inheritdoc annotation>")
-        case Some(sc) =>
-          if (ownComment == "") sc
-          else expandInheritdoc(sc, merge(sc, ownComment, sym), sym)
+            ownComment.replaceAllLiterally(
+              "@inheritdoc",
+              "<invalid inheritdoc annotation>")
+          case Some(sc) =>
+            if (ownComment == "") sc
+            else expandInheritdoc(sc, merge(sc, ownComment, sym), sym)
+        }
       }
-    })
+    )
 
   /** The cooked doc comment of symbol `sym` after variable expansion, or "" if missing.
     *
@@ -101,7 +104,9 @@ trait DocComments { self: Global =>
     *                                  interpreted as a recursive variable definition.
     */
   def expandedDocComment(
-      sym: Symbol, site: Symbol, docStr: String = ""): String = {
+      sym: Symbol,
+      site: Symbol,
+      docStr: String = ""): String = {
     // when parsing a top level class or module, use the (module-)class itself to look up variable definitions
     val site1 =
       if ((sym.isModule || sym.isClass) && site.hasPackageFlag) sym
@@ -128,12 +133,12 @@ trait DocComments { self: Global =>
         // 2 - expanding explicit inheritance @inheritdoc tags
         // 3 - expanding variables like $COLL
         val useCaseCommentRaw = uc.comment.raw
-        val useCaseCommentMerged = merge(
-            fullSigComment, useCaseCommentRaw, defn)
-        val useCaseCommentInheritdoc = expandInheritdoc(
-            fullSigComment, useCaseCommentMerged, sym)
-        val useCaseCommentVariables = expandVariables(
-            useCaseCommentInheritdoc, sym, site)
+        val useCaseCommentMerged =
+          merge(fullSigComment, useCaseCommentRaw, defn)
+        val useCaseCommentInheritdoc =
+          expandInheritdoc(fullSigComment, useCaseCommentMerged, sym)
+        val useCaseCommentVariables =
+          expandVariables(useCaseCommentInheritdoc, sym, site)
         (defn, useCaseCommentVariables, uc.pos)
       }
     }
@@ -146,14 +151,14 @@ trait DocComments { self: Global =>
   /** The cooked doc comment of an overridden symbol */
   protected def superComment(sym: Symbol): Option[String] =
     allInheritedOverriddenSymbols(sym).iterator map (x => cookedDocComment(x)) find
-    (_ != "")
+      (_ != "")
 
   private def mapFind[A, B](xs: Iterable[A])(f: A => Option[B]): Option[B] =
     xs collectFirst scala.Function.unlift(f)
 
   private def isMovable(str: String, sec: (Int, Int)): Boolean =
     startsWithTag(str, sec, "@param") || startsWithTag(str, sec, "@tparam") ||
-    startsWithTag(str, sec, "@return")
+      startsWithTag(str, sec, "@return")
 
   /** Merge elements of doccomment `src` into doc comment `dst` for symbol `sym`.
     *  In detail:
@@ -162,10 +167,11 @@ trait DocComments { self: Global =>
     *     in `dst` for that parameter name, but there is one on `src`, copy that section.
     *  3. If there is no @return section in `dst` but there is one in `src`, copy it.
     */
-  def merge(src: String,
-            dst: String,
-            sym: Symbol,
-            copyFirstPara: Boolean = false): String = {
+  def merge(
+      src: String,
+      dst: String,
+      sym: Symbol,
+      copyFirstPara: Boolean = false): String = {
     val srcSections = tagIndex(src)
     val dstSections = tagIndex(dst)
     val srcParams = paramDocs(src, "@param", srcSections)
@@ -178,8 +184,7 @@ trait DocComments { self: Global =>
 
     if (copyFirstPara) {
       val eop = // end of comment body (first para), which is delimited by blank line, or tag, or end of comment
-        (findNext(src, 0)(src.charAt(_) == '\n')) min startTag(
-            src, srcSections)
+        (findNext(src, 0)(src.charAt(_) == '\n')) min startTag(src, srcSections)
       out append src.substring(0, eop).trim
       copied = 3
       tocopy = 3
@@ -192,18 +197,21 @@ trait DocComments { self: Global =>
         case None =>
           srcSec match {
             case Some((start1, end1)) => {
-                out append dst.substring(copied, tocopy).trim
-                out append "\n"
-                copied = tocopy
-                out append src.substring(start1, end1).trim
-              }
+              out append dst.substring(copied, tocopy).trim
+              out append "\n"
+              copied = tocopy
+              out append src.substring(start1, end1).trim
+            }
             case None =>
           }
       }
 
-    for (params <- sym.paramss; param <- params) mergeSection(
-        srcParams get param.name.toString, dstParams get param.name.toString)
-    for (tparam <- sym.typeParams) mergeSection(
+    for (params <- sym.paramss; param <- params)
+      mergeSection(
+        srcParams get param.name.toString,
+        dstParams get param.name.toString)
+    for (tparam <- sym.typeParams)
+      mergeSection(
         srcTParams get tparam.name.toString,
         dstTParams get tparam.name.toString)
     mergeSection(returnDoc(src, srcSections), returnDoc(dst, dstSections))
@@ -240,8 +248,8 @@ trait DocComments { self: Global =>
       val parentTagMap = sectionTagMap(parent, parentSections)
       val parentNamedParams =
         Map() + ("@param" -> paramDocs(parent, "@param", parentSections)) +
-        ("@tparam" -> paramDocs(parent, "@tparam", parentSections)) +
-        ("@throws" -> paramDocs(parent, "@throws", parentSections))
+          ("@tparam" -> paramDocs(parent, "@tparam", parentSections)) +
+          ("@throws" -> paramDocs(parent, "@throws", parentSections))
 
       val out = new StringBuilder
 
@@ -258,26 +266,29 @@ trait DocComments { self: Global =>
         }
 
         def sectionString(
-            param: String, paramMap: Map[String, (Int, Int)]): String =
+            param: String,
+            paramMap: Map[String, (Int, Int)]): String =
           paramMap.get(param) match {
             case Some(section) =>
               // Cleanup the section tag and parameter
               val sectionTextBounds = extractSectionText(parent, section)
               cleanupSectionText(
-                  parent.substring(sectionTextBounds._1, sectionTextBounds._2))
+                parent.substring(sectionTextBounds._1, sectionTextBounds._2))
             case None =>
               reporter.info(
-                  sym.pos,
-                  "The \"" + getSectionHeader + "\" annotation of the " + sym +
+                sym.pos,
+                "The \"" + getSectionHeader + "\" annotation of the " + sym +
                   " comment contains @inheritdoc, but the corresponding section in the parent is not defined.",
-                  force = true)
+                force = true
+              )
               "<invalid inheritdoc annotation>"
           }
 
         child.substring(section._1, section._1 + 7) match {
           case param @ ("@param " | "@tparam" | "@throws") =>
-            sectionString(extractSectionParam(child, section),
-                          parentNamedParams(param.trim))
+            sectionString(
+              extractSectionParam(child, section),
+              parentNamedParams(param.trim))
           case _ =>
             sectionString(extractSectionTag(child, section), parentTagMap)
         }
@@ -289,13 +300,17 @@ trait DocComments { self: Global =>
 
       // Append main comment
       out.append("/**")
-      out.append(replaceInheritdoc(mainComment(child, childSections),
-                                   mainComment(parent, parentSections)))
+      out.append(
+        replaceInheritdoc(
+          mainComment(child, childSections),
+          mainComment(parent, parentSections)))
 
       // Append sections
-      for (section <- childSections) out.append(
-          replaceInheritdoc(child.substring(section._1, section._2),
-                            getParentSection(section)))
+      for (section <- childSections)
+        out.append(
+          replaceInheritdoc(
+            child.substring(section._1, section._2),
+            getParentSection(section)))
 
       out.append("*/")
       out.toString
@@ -323,7 +338,7 @@ trait DocComments { self: Global =>
         case x if defs(x) contains vble => defs(x)(vble)
       } match {
         case Some(str) if str startsWith "$" => lookupVariable(str.tail, site)
-        case res => res orElse lookupVariable(vble, site.owner)
+        case res                             => res orElse lookupVariable(vble, site.owner)
       }
   }
 
@@ -336,7 +351,9 @@ trait DocComments { self: Global =>
     *  @return             Expanded string
     */
   protected def expandVariables(
-      initialStr: String, sym: Symbol, site: Symbol): String = {
+      initialStr: String,
+      sym: Symbol,
+      site: Symbol): String = {
     val expandLimit = 10
 
     def expandInternal(str: String, depth: Int): String = {
@@ -362,9 +379,9 @@ trait DocComments { self: Global =>
               superComment(sym) foreach { sc =>
                 val superSections = tagIndex(sc)
                 replaceWith(sc.substring(3, startTag(sc, superSections)))
-                for (sec @ (start, end) <- superSections) if (!isMovable(
-                                                                  sc, sec))
-                  out append sc.substring(start, end)
+                for (sec @ (start, end) <- superSections)
+                  if (!isMovable(sc, sec))
+                    out append sc.substring(start, end)
               }
             case "" => idx += 1
             case vname =>
@@ -374,8 +391,8 @@ trait DocComments { self: Global =>
                   val pos = docCommentPos(sym)
                   val loc = pos withPoint (pos.start + vstart + 1)
                   reporter.warning(
-                      loc,
-                      s"Variable $vname undefined in comment for $sym in $site")
+                    loc,
+                    s"Variable $vname undefined in comment for $sym in $site")
               }
           }
         }
@@ -393,9 +410,10 @@ trait DocComments { self: Global =>
   }
 
   // !!! todo: inherit from Comment?
-  case class DocComment(raw: String,
-                        pos: Position = NoPosition,
-                        codePos: Position = NoPosition) {
+  case class DocComment(
+      raw: String,
+      pos: Position = NoPosition,
+      codePos: Position = NoPosition) {
 
     /** Returns:
       *   template: the doc comment minus all @define and @usecase sections
@@ -410,9 +428,10 @@ trait DocComments { self: Global =>
 
       val end = startTag(raw, (defines ::: usecases).sortBy(_._1))
 
-      (if (end == raw.length - 2) raw else raw.substring(0, end) + "*/",
-       defines map { case (start, end) => raw.substring(start, end) },
-       usecases map { case (start, end) => decomposeUseCase(start, end) })
+      (
+        if (end == raw.length - 2) raw else raw.substring(0, end) + "*/",
+        defines map { case (start, end)  => raw.substring(start, end) },
+        usecases map { case (start, end) => decomposeUseCase(start, end) })
     }
 
     private def decomposeUseCase(start: Int, end: Int): UseCase = {
@@ -466,7 +485,7 @@ trait DocComments { self: Global =>
 
       def getSite(name: Name): Type = {
         def findIn(sites: List[Symbol]): Type = sites match {
-          case List() => NoType
+          case List()         => NoType
           case site :: sites1 => select(site.thisType, name, findIn(sites1))
         }
         // Previously, searching was taking place *only* in the current package and in the root package
@@ -492,8 +511,8 @@ trait DocComments { self: Global =>
         val parts = getParts(0)
         if (parts.isEmpty) {
           reporter.error(
-              comment.codePos,
-              "Incorrect variable expansion for " +
+            comment.codePos,
+            "Incorrect variable expansion for " +
               variable + " in use case. Does the " +
               "variable expand to wiki syntax when documenting " + site + "?")
           return ErrorType
@@ -504,7 +523,7 @@ trait DocComments { self: Global =>
           case _ :: "this" :: _ =>
             site.ownerChain.find(_.name == partnames.head) match {
               case Some(clazz) => (clazz.thisType, partnames drop 2)
-              case _ => (NoType, Nil)
+              case _           => (NoType, Nil)
             }
           case _ =>
             (getSite(partnames.head), partnames.tail)
@@ -512,11 +531,12 @@ trait DocComments { self: Global =>
         val result = (start /: rest)(select(_, _, NoType))
         if (result == NoType)
           reporter.warning(
-              comment.codePos,
-              "Could not find the type " +
+            comment.codePos,
+            "Could not find the type " +
               variable + " points to while expanding it " +
               "for the usecase signature of " + sym + " in " + site + "." +
-              "In this context, " + variable + " = \"" + str + "\".")
+              "In this context, " + variable + " = \"" + str + "\"."
+          )
         result
       }
 
@@ -534,24 +554,28 @@ trait DocComments { self: Global =>
 
       // the Boolean tells us whether we can normalize: if we found an actual type, then yes, we can normalize, else no,
       // use the synthetic alias created for the variable
-      val aliasExpansions: List[(Type, Boolean)] = for (alias <- aliases) yield
-        lookupVariable(alias.name.toString.substring(1), site) match {
-          case Some(repl) =>
-            val repl2 = cleanupVariable(repl)
-            val tpe = getType(repl2, alias.name.toString)
-            if (tpe != NoType) (tpe, true)
-            else {
-              val alias1 = alias.cloneSymbol(
-                  rootMirror.RootClass, alias.rawflags, newTypeName(repl2))
-              (typeRef(NoPrefix, alias1, Nil), false)
-            }
-          case None =>
-            (typeRef(NoPrefix, alias, Nil), false)
-        }
+      val aliasExpansions: List[(Type, Boolean)] = for (alias <- aliases)
+        yield
+          lookupVariable(alias.name.toString.substring(1), site) match {
+            case Some(repl) =>
+              val repl2 = cleanupVariable(repl)
+              val tpe = getType(repl2, alias.name.toString)
+              if (tpe != NoType) (tpe, true)
+              else {
+                val alias1 = alias.cloneSymbol(
+                  rootMirror.RootClass,
+                  alias.rawflags,
+                  newTypeName(repl2))
+                (typeRef(NoPrefix, alias1, Nil), false)
+              }
+            case None =>
+              (typeRef(NoPrefix, alias, Nil), false)
+          }
 
-      def subst(sym: Symbol,
-                from: List[Symbol],
-                to: List[(Type, Boolean)]): (Type, Boolean) =
+      def subst(
+          sym: Symbol,
+          from: List[Symbol],
+          to: List[(Type, Boolean)]): (Type, Boolean) =
         if (from.isEmpty) (sym.tpe, false)
         else if (from.head == sym) to.head
         else subst(sym, from.tail, to.tail)
@@ -574,7 +598,7 @@ trait DocComments { self: Global =>
 
       for (defn <- defined) yield {
         defn.cloneSymbol(sym.owner, sym.flags | Flags.SYNTHETIC) modifyInfo
-        (info => substAliases(info).asSeenFrom(site.thisType, sym.owner))
+          (info => substAliases(info).asSeenFrom(site.thisType, sym.owner))
       }
     }
   }

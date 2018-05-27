@@ -6,7 +6,12 @@ package akka.stream.scaladsl
 import akka.actor.ActorRef
 import akka.stream.{Attributes, ActorMaterializer}
 import akka.stream.impl.fusing.GraphStages.SimpleLinearGraphStage
-import akka.stream.stage.{TimerGraphStageLogic, OutHandler, AsyncCallback, InHandler}
+import akka.stream.stage.{
+  TimerGraphStageLogic,
+  OutHandler,
+  AsyncCallback,
+  InHandler
+}
 import akka.testkit.AkkaSpec
 import akka.testkit.TestDuration
 
@@ -169,11 +174,14 @@ class GraphStageTimersSpec extends AkkaSpec {
             override def onDownstreamFinish() = completeStage()
           })
 
-          setHandler(in, new InHandler {
-            override def onPush() = () // Do nothing
-            override def onUpstreamFinish() = completeStage()
-            override def onUpstreamFailure(ex: Throwable) = failStage(ex)
-          })
+          setHandler(
+            in,
+            new InHandler {
+              override def onPush() = () // Do nothing
+              override def onUpstreamFinish() = completeStage()
+              override def onUpstreamFailure(ex: Throwable) = failStage(ex)
+            }
+          )
 
           override def onTimer(timerKey: Any) = {
             tickCount += 1

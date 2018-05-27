@@ -9,7 +9,13 @@
 package scala
 package io
 
-import java.nio.charset.{Charset, CharsetDecoder, CharsetEncoder, CharacterCodingException, CodingErrorAction => Action}
+import java.nio.charset.{
+  Charset,
+  CharsetDecoder,
+  CharsetEncoder,
+  CharacterCodingException,
+  CodingErrorAction => Action
+}
 import scala.annotation.migration
 import scala.language.implicitConversions
 
@@ -78,7 +84,8 @@ class Codec(val charSet: Charset) {
   }
 
   def wrap(body: => Int): Int =
-    try body catch {
+    try body
+    catch {
       case e: CharacterCodingException => _onCodingException(e)
     }
 }
@@ -110,8 +117,8 @@ object Codec extends LowPriorityCodecImplicits {
   }
 
   @migration(
-      "This method was previously misnamed `toUTF8`. Converts from Array[Byte] to Array[Char].",
-      "2.9.0")
+    "This method was previously misnamed `toUTF8`. Converts from Array[Byte] to Array[Char].",
+    "2.9.0")
   def fromUTF8(bytes: Array[Byte]): Array[Char] =
     fromUTF8(bytes, 0, bytes.length)
   def fromUTF8(bytes: Array[Byte], offset: Int, len: Int): Array[Char] = {
@@ -124,8 +131,8 @@ object Codec extends LowPriorityCodecImplicits {
   }
 
   @migration(
-      "This method was previously misnamed `fromUTF8`. Converts from character sequence to Array[Byte].",
-      "2.9.0")
+    "This method was previously misnamed `fromUTF8`. Converts from character sequence to Array[Byte].",
+    "2.9.0")
   def toUTF8(cs: CharSequence): Array[Byte] = {
     val cbuffer = java.nio.CharBuffer.wrap(cs, 0, cs.length)
     val bbuffer = UTF8.charSet encode cbuffer

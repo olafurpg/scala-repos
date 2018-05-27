@@ -13,6 +13,6 @@ object test1 {
   val closure = (x: Int, x: Float) => x
   List() match {
     case x :: x => x
-    case Nil => Nil
+    case Nil    => Nil
   }
 }

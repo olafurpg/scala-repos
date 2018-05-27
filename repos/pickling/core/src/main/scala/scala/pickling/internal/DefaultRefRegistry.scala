@@ -3,7 +3,11 @@ package scala.pickling.internal
 import java.util.IdentityHashMap
 
 import scala.pickling.PicklingException
-import scala.pickling.spi.{RefUnpicklingRegistry, RefPicklingRegistry, RefRegistry}
+import scala.pickling.spi.{
+  RefUnpicklingRegistry,
+  RefPicklingRegistry,
+  RefRegistry
+}
 
 /** Default implementation of the Ref registry that allows circular dependencies to be handled.
   * Uses thread-local caches (per pickler/unpickler thread).
@@ -75,7 +79,7 @@ class DefaultRefUnpicklingRegistry(maxRefs: Int = 655536)
   override def lookupUnpicklee(oid: Int): Any = {
     if (oid >= idx)
       throw PicklingException(
-          s"fatal error: invalid index $oid unpicklee cache of length $idx")
+        s"fatal error: invalid index $oid unpicklee cache of length $idx")
     val result = refs(oid)
     if (result == null)
       throw new Error(s"fatal error: unpicklee cache is corrupted at $oid")

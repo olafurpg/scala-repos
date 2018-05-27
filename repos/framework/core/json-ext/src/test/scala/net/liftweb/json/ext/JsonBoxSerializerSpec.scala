@@ -33,13 +33,13 @@ object JsonBoxSerializerSpec extends Specification {
     net.liftweb.json.DefaultFormats + new JsonBoxSerializer
 
   "Extract empty age" in {
-    parse("""{"name":"joe"}""").extract[Person] mustEqual Person(
-        "joe", Empty, Empty)
+    parse("""{"name":"joe"}""")
+      .extract[Person] mustEqual Person("joe", Empty, Empty)
   }
 
   "Extract boxed thing" in {
-    parse("""{"name":"joe", "thing": "rog", "age":12}""").extract[Person] mustEqual Person(
-        "joe", Full(12), Empty, Full("rog"))
+    parse("""{"name":"joe", "thing": "rog", "age":12}""")
+      .extract[Person] mustEqual Person("joe", Full(12), Empty, Full("rog"))
   }
 
   "Extract boxed mother" in {
@@ -58,9 +58,10 @@ object JsonBoxSerializerSpec extends Specification {
   "Serialize failure" in {
     val exn1 = SomeException("e1")
     val exn2 = SomeException("e2")
-    val p = Person("joe",
-                   Full(12),
-                   Failure("f", Full(exn1), Failure("f2", Full(exn2), Empty)))
+    val p = Person(
+      "joe",
+      Full(12),
+      Failure("f", Full(exn1), Failure("f2", Full(exn2), Empty)))
     val ser = swrite(p)
     read[Person](ser) mustEqual p
   }
@@ -68,7 +69,9 @@ object JsonBoxSerializerSpec extends Specification {
   "Serialize param failure" in {
     val exn = SomeException("e1")
     val p = Person(
-        "joe", Full(12), ParamFailure("f", Full(exn), Empty, "param value"))
+      "joe",
+      Full(12),
+      ParamFailure("f", Full(exn), Empty, "param value"))
     val ser = swrite(p)
     read[Person](ser) mustEqual p
   }
@@ -76,7 +79,8 @@ object JsonBoxSerializerSpec extends Specification {
 
 case class SomeException(msg: String) extends Exception
 
-case class Person(name: String,
-                  age: Box[Int],
-                  mother: Box[Person],
-                  thing: Box[String] = Empty)
+case class Person(
+    name: String,
+    age: Box[Int],
+    mother: Box[Person],
+    thing: Box[String] = Empty)

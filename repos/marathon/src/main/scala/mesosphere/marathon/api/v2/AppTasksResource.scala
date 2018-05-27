@@ -15,21 +15,27 @@ import mesosphere.marathon.health.HealthCheckManager
 import mesosphere.marathon.plugin.auth._
 import mesosphere.marathon.state.PathId._
 import mesosphere.marathon.state.{GroupManager, PathId}
-import mesosphere.marathon.{UnknownGroupException, MarathonConf, MarathonSchedulerService, UnknownAppException}
+import mesosphere.marathon.{
+  UnknownGroupException,
+  MarathonConf,
+  MarathonSchedulerService,
+  UnknownAppException
+}
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.Future
 
 @Consumes(Array(MediaType.APPLICATION_JSON))
 @Produces(Array(MarathonMediaType.PREFERRED_APPLICATION_JSON))
-class AppTasksResource @Inject()(service: MarathonSchedulerService,
-                                 taskTracker: TaskTracker,
-                                 taskKiller: TaskKiller,
-                                 healthCheckManager: HealthCheckManager,
-                                 val config: MarathonConf,
-                                 groupManager: GroupManager,
-                                 val authorizer: Authorizer,
-                                 val authenticator: Authenticator)
+class AppTasksResource @Inject()(
+    service: MarathonSchedulerService,
+    taskTracker: TaskTracker,
+    taskKiller: TaskKiller,
+    healthCheckManager: HealthCheckManager,
+    val config: MarathonConf,
+    groupManager: GroupManager,
+    val authorizer: Authorizer,
+    val authenticator: Authenticator)
     extends AuthResource {
 
   val log = LoggerFactory.getLogger(getClass.getName)
@@ -37,8 +43,9 @@ class AppTasksResource @Inject()(service: MarathonSchedulerService,
 
   @GET
   @Timed
-  def indexJson(@PathParam("appId") id: String,
-                @Context req: HttpServletRequest): Response =
+  def indexJson(
+      @PathParam("appId") id: String,
+      @Context req: HttpServletRequest): Response =
     authenticated(req) { implicit identity =>
       val taskMap = taskTracker.tasksByAppSync
 
@@ -56,8 +63,9 @@ class AppTasksResource @Inject()(service: MarathonSchedulerService,
           val maybeGroup = result(groupManager.group(groupPath))
           withAuthorization(ViewGroup, maybeGroup, unknownGroup(groupPath)) {
             group =>
-              ok(jsonObjString(
-                      "tasks" -> runningTasks(group.transitiveApps.map(_.id))))
+              ok(
+                jsonObjString(
+                  "tasks" -> runningTasks(group.transitiveApps.map(_.id))))
           }
         case _ =>
           val appId = id.toRootPath
@@ -71,8 +79,9 @@ class AppTasksResource @Inject()(service: MarathonSchedulerService,
   @GET
   @Produces(Array(MediaType.TEXT_PLAIN))
   @Timed
-  def indexTxt(@PathParam("appId") appId: String,
-               @Context req: HttpServletRequest): Response =
+  def indexTxt(
+      @PathParam("appId") appId: String,
+      @Context req: HttpServletRequest): Response =
     authenticated(req) { implicit identity =>
       val id = appId.toRootPath
       withAuthorization(ViewApp, result(groupManager.app(id)), unknownApp(id)) {
@@ -127,8 +136,8 @@ class AppTasksResource @Inject()(service: MarathonSchedulerService,
         deploymentResult(result(deploymentF))
       } else {
         reqToResponse(taskKiller.kill(pathId, findToKill)) { tasks =>
-          tasks.headOption.fold(unknownTask(id))(
-              task => ok(jsonObjString("task" -> task)))
+          tasks.headOption.fold(unknownTask(id))(task =>
+            ok(jsonObjString("task" -> task)))
         }
       }
   }

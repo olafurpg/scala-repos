@@ -43,7 +43,7 @@ object RE {
   implicit def matchResToBoolean(in: REMatcher): Boolean = {
     in match {
       case null => false
-      case _ => in.matches
+      case _    => in.matches
     }
   }
 
@@ -56,7 +56,8 @@ object RE {
 }
 
 class REDoer[T](
-    val pattern: String, val func: Box[PartialFunction[(T, List[String]), T]])
+    val pattern: String,
+    val func: Box[PartialFunction[(T, List[String]), T]])
     extends Function2[T, String, Box[T]] {
   val compiled = Pattern.compile(pattern)
 
@@ -72,9 +73,10 @@ class REDoer[T](
     val ma = new REMatcher(other, compiled)
     if (!ma.matches) Empty
     else
-      func.flatMap(f =>
-            if (f.isDefinedAt((obj, ma.capture))) Full(f((obj, ma.capture)))
-            else Empty)
+      func.flatMap(
+        f =>
+          if (f.isDefinedAt((obj, ma.capture))) Full(f((obj, ma.capture)))
+          else Empty)
   }
 }
 
@@ -121,8 +123,9 @@ class REMatcher(val str: String, val compiled: Pattern) {
     matcher.reset
     val m = matcher
     while (matcher.find) {
-      func(str.substring(pos, m.start),
-           (0 to m.groupCount).toList.map(i => m.group(i)))
+      func(
+        str.substring(pos, m.start),
+        (0 to m.groupCount).toList.map(i => m.group(i)))
       pos = matcher.end
     }
 
@@ -139,7 +142,8 @@ class REMatcher(val str: String, val compiled: Pattern) {
 
     def doIt {
       def runIt(pos: Int) {
-        if (pos >= cnt) return else {
+        if (pos >= cnt) return
+        else {
           ab += f(matcher.group(pos + 1)); runIt(pos + 1)
         }
       }

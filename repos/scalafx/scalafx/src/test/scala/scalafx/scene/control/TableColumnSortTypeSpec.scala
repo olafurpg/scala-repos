@@ -38,7 +38,8 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class TableColumnSortTypeSpec
     extends SFXEnumDelegateSpec[
-        jfxsc.TableColumn.SortType, TableColumn.SortType](
-        classOf[jfxsc.TableColumn.SortType],
-        classOf[TableColumn.SortType],
-        TableColumn.SortType)
+      jfxsc.TableColumn.SortType,
+      TableColumn.SortType](
+      classOf[jfxsc.TableColumn.SortType],
+      classOf[TableColumn.SortType],
+      TableColumn.SortType)

@@ -38,7 +38,8 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class ScrollPaneScrollBarPolicySpec
     extends SFXEnumDelegateSpec[
-        jfxsc.ScrollPane.ScrollBarPolicy, ScrollPane.ScrollBarPolicy](
-        classOf[jfxsc.ScrollPane.ScrollBarPolicy],
-        classOf[ScrollPane.ScrollBarPolicy],
-        ScrollPane.ScrollBarPolicy)
+      jfxsc.ScrollPane.ScrollBarPolicy,
+      ScrollPane.ScrollBarPolicy](
+      classOf[jfxsc.ScrollPane.ScrollBarPolicy],
+      classOf[ScrollPane.ScrollBarPolicy],
+      ScrollPane.ScrollBarPolicy)

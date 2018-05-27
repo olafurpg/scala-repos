@@ -18,11 +18,12 @@ private[bookmark] final class PaginatorBuilder(maxPerPage: Int) {
     paginator(new UserAdapter(user), page)
 
   private def paginator(
-      adapter: AdapterLike[Bookmark], page: Int): Fu[Paginator[Bookmark]] =
+      adapter: AdapterLike[Bookmark],
+      page: Int): Fu[Paginator[Bookmark]] =
     Paginator(
-        adapter,
-        currentPage = page,
-        maxPerPage = maxPerPage
+      adapter,
+      currentPage = page,
+      maxPerPage = maxPerPage
     )
 
   final class UserAdapter(user: User) extends AdapterLike[Bookmark] {
@@ -31,10 +32,11 @@ private[bookmark] final class PaginatorBuilder(maxPerPage: Int) {
 
     def slice(offset: Int, length: Int): Fu[Seq[Bookmark]] =
       for {
-        gameIds ← $primitive(selector,
-                             "g",
-                             _ sort sorting skip offset,
-                             length.some)(_.asOpt[String])
+        gameIds ← $primitive(
+          selector,
+          "g",
+          _ sort sorting skip offset,
+          length.some)(_.asOpt[String])
         games ← lila.game.tube.gameTube |> { implicit t =>
           $find.byOrderedIds[Game](gameIds)
         }

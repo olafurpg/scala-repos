@@ -147,7 +147,7 @@ object IteratorSpec extends Spec {
         override def run() {
           for (i <- 0 until sz) ct.putIfAbsent(new Wrap(i), i) match {
             case Some(_) => ct.remove(new Wrap(i))
-            case None =>
+            case None    =>
           }
         }
       }
@@ -188,7 +188,8 @@ object IteratorSpec extends Spec {
         override def run() {
           for (i <- 0 until sz) {
             assert(ct.remove(new Wrap(i)) == Some(i))
-            for (i <- 0 until removerslowdown) ct.get(new Wrap(i)) // slow down, mate
+            for (i <- 0 until removerslowdown)
+              ct.get(new Wrap(i)) // slow down, mate
           }
           //println("done removing")
         }
@@ -210,8 +211,8 @@ object IteratorSpec extends Spec {
       val remover = new Remover
       remover.start()
       for (_ <- 0 until sgroupnum) {
-        val iters = for (_ <- 0 until sgroupsize) yield
-          consistentIteration(ct.iterator)
+        val iters = for (_ <- 0 until sgroupsize)
+          yield consistentIteration(ct.iterator)
         iters.foreach(_.start())
         iters.foreach(_.join())
       }
@@ -230,7 +231,8 @@ object IteratorSpec extends Spec {
         override def run() {
           for (i <- 0 until sz) {
             assert(ct.put(new Wrap(i), i) == None)
-            for (i <- 0 until inserterslowdown) ct.get(new Wrap(i)) // slow down, mate
+            for (i <- 0 until inserterslowdown)
+              ct.get(new Wrap(i)) // slow down, mate
           }
           //println("done inserting")
         }
@@ -252,8 +254,8 @@ object IteratorSpec extends Spec {
       val inserter = new Inserter
       inserter.start()
       for (_ <- 0 until sgroupnum) {
-        val iters = for (_ <- 0 until sgroupsize) yield
-          consistentIteration(ct.iterator)
+        val iters = for (_ <- 0 until sgroupsize)
+          yield consistentIteration(ct.iterator)
         iters.foreach(_.start())
         iters.foreach(_.join())
       }

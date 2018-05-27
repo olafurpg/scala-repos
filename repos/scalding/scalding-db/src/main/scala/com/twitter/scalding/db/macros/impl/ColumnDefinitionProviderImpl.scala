@@ -6,7 +6,11 @@ import scala.reflect.macros.Context
 import scala.util.{Success, Failure}
 
 import com.twitter.bijection.macros.impl.IsCaseClassImpl
-import com.twitter.scalding.db.{ColumnDefinition, ColumnDefinitionProvider, ResultSetExtractor}
+import com.twitter.scalding.db.{
+  ColumnDefinition,
+  ColumnDefinitionProvider,
+  ResultSetExtractor
+}
 import com.twitter.scalding.db.macros._
 import com.twitter.scalding.db.macros.impl.handler._
 
@@ -26,8 +30,8 @@ object ColumnDefinitionProviderImpl {
     val moduleSym = classSym.companionSymbol
     if (moduleSym == NoSymbol) {
       c.abort(
-          c.enclosingPosition,
-          s"No companion for case class ${tpe} available. Possibly a nested class? These do not work with this macro.")
+        c.enclosingPosition,
+        s"No companion for case class ${tpe} available. Possibly a nested class? These do not work with this macro.")
     }
     // pick the last apply method which (anecdotally) gives us the defaults
     // set in the case class declaration, not the companion object
@@ -46,8 +50,8 @@ object ColumnDefinitionProviderImpl {
           if (!p.isParamWithDefault) None
           else {
             val getterName = newTermName("apply$default$" + (i + 1))
-            Some(p.name.toString -> c.Expr(
-                    q"${moduleSym}.$getterName.toString"))
+            Some(
+              p.name.toString -> c.Expr(q"${moduleSym}.$getterName.toString"))
           }
       }
       .toMap
@@ -59,9 +63,10 @@ object ColumnDefinitionProviderImpl {
 
     if (!IsCaseClassImpl.isCaseClassType(c)(T.tpe))
       c.abort(
-          c.enclosingPosition,
-          s"""We cannot enforce ${T.tpe} is a case class, either it is not a case class or this macro call is possibly enclosed in a class.
-        This will mean the macro is operating on a non-resolved type.""")
+        c.enclosingPosition,
+        s"""We cannot enforce ${T.tpe} is a case class, either it is not a case class or this macro call is possibly enclosed in a class.
+        This will mean the macro is operating on a non-resolved type."""
+      )
 
     // Field To JDBCColumn
     def matchField(
@@ -75,70 +80,82 @@ object ColumnDefinitionProviderImpl {
         // String handling
         case tpe if tpe =:= typeOf[String] =>
           StringTypeHandler(c)(
-              accessorTree, fieldName, defaultValOpt, annotationInfo, nullable)
+            accessorTree,
+            fieldName,
+            defaultValOpt,
+            annotationInfo,
+            nullable)
         case tpe if tpe =:= typeOf[Short] =>
-          NumericTypeHandler(c)(accessorTree,
-                                fieldName,
-                                defaultValOpt,
-                                annotationInfo,
-                                nullable,
-                                "SMALLINT")
+          NumericTypeHandler(c)(
+            accessorTree,
+            fieldName,
+            defaultValOpt,
+            annotationInfo,
+            nullable,
+            "SMALLINT")
         case tpe if tpe =:= typeOf[Int] =>
-          NumericTypeHandler(c)(accessorTree,
-                                fieldName,
-                                defaultValOpt,
-                                annotationInfo,
-                                nullable,
-                                "INT")
+          NumericTypeHandler(c)(
+            accessorTree,
+            fieldName,
+            defaultValOpt,
+            annotationInfo,
+            nullable,
+            "INT")
         case tpe if tpe =:= typeOf[Long] =>
-          NumericTypeHandler(c)(accessorTree,
-                                fieldName,
-                                defaultValOpt,
-                                annotationInfo,
-                                nullable,
-                                "BIGINT")
+          NumericTypeHandler(c)(
+            accessorTree,
+            fieldName,
+            defaultValOpt,
+            annotationInfo,
+            nullable,
+            "BIGINT")
         case tpe if tpe =:= typeOf[Double] =>
-          NumericTypeHandler(c)(accessorTree,
-                                fieldName,
-                                defaultValOpt,
-                                annotationInfo,
-                                nullable,
-                                "DOUBLE")
+          NumericTypeHandler(c)(
+            accessorTree,
+            fieldName,
+            defaultValOpt,
+            annotationInfo,
+            nullable,
+            "DOUBLE")
         case tpe if tpe =:= typeOf[Boolean] =>
-          NumericTypeHandler(c)(accessorTree,
-                                fieldName,
-                                defaultValOpt,
-                                annotationInfo,
-                                nullable,
-                                "BOOLEAN")
+          NumericTypeHandler(c)(
+            accessorTree,
+            fieldName,
+            defaultValOpt,
+            annotationInfo,
+            nullable,
+            "BOOLEAN")
         case tpe if tpe =:= typeOf[java.util.Date] =>
           DateTypeHandler(c)(
-              accessorTree, fieldName, defaultValOpt, annotationInfo, nullable)
+            accessorTree,
+            fieldName,
+            defaultValOpt,
+            annotationInfo,
+            nullable)
         case tpe if tpe.erasure =:= typeOf[Option[Any]] && nullable == true =>
-          Failure(
-              new Exception(
-                  s"Case class ${T.tpe} has field ${fieldName} which contains a nested option. This is not supported by this macro."))
+          Failure(new Exception(
+            s"Case class ${T.tpe} has field ${fieldName} which contains a nested option. This is not supported by this macro."))
 
         case tpe if tpe.erasure =:= typeOf[Option[Any]] && nullable == false =>
           if (defaultValOpt.isDefined)
             Failure(new Exception(
-                    s"Case class ${T.tpe} has field ${fieldName}: ${oTpe.toString}, with a default value. Options cannot have default values"))
+              s"Case class ${T.tpe} has field ${fieldName}: ${oTpe.toString}, with a default value. Options cannot have default values"))
           else {
-            matchField(accessorTree,
-                       tpe.asInstanceOf[TypeRefApi].args.head,
-                       fieldName,
-                       None,
-                       annotationInfo,
-                       true)
+            matchField(
+              accessorTree,
+              tpe.asInstanceOf[TypeRefApi].args.head,
+              fieldName,
+              None,
+              annotationInfo,
+              true)
           }
         case tpe if IsCaseClassImpl.isCaseClassType(c)(tpe) =>
           expandMethod(accessorTree, tpe)
 
         // default
         case _ =>
-          Failure(
-              new Exception(
-                  s"Case class ${T.tpe} has field ${fieldName}: ${oTpe.toString}, which is not supported for talking to JDBC"))
+          Failure(new Exception(
+            s"Case class ${T.tpe} has field ${fieldName}: ${oTpe.toString}, which is not supported for talking to JDBC"))
       }
     }
 
@@ -153,10 +170,12 @@ object ColumnDefinitionProviderImpl {
       // We have to build this up front as if the case class definition moves to another file
       // the annotation moves from the value onto the getter method?
       val annotationData: Map[String, List[(Type, List[Tree])]] =
-        outerTpe.declarations.map { m =>
-          val mappedAnnotations = m.annotations.map(t => (t.tpe, t.scalaArgs))
-          m.name.toString.trim -> mappedAnnotations
-        }.groupBy(_._1)
+        outerTpe.declarations
+          .map { m =>
+            val mappedAnnotations = m.annotations.map(t => (t.tpe, t.scalaArgs))
+            m.name.toString.trim -> mappedAnnotations
+          }
+          .groupBy(_._1)
           .map {
             case (k, l) =>
               (k, l.map(_._2).reduce(_ ++ _))
@@ -166,46 +185,52 @@ object ColumnDefinitionProviderImpl {
               !v.isEmpty
           }
 
-      outerTpe.declarations.collect {
-        case m: MethodSymbol if m.isCaseAccessor => m
-      }.map { m =>
-        val fieldName = m.name.toTermName.toString.trim
-        val defaultVal = defaultArgs.get(fieldName)
+      outerTpe.declarations
+        .collect {
+          case m: MethodSymbol if m.isCaseAccessor => m
+        }
+        .map { m =>
+          val fieldName = m.name.toTermName.toString.trim
+          val defaultVal = defaultArgs.get(fieldName)
 
-        val annotationInfo: List[(Type, Option[Int])] = annotationData
-          .getOrElse(m.name.toString.trim, Nil)
-          .collect {
-            case (tpe, List(Literal(Constant(siz: Int))))
-                if tpe =:= typeOf[com.twitter.scalding.db.macros.size] =>
-              (tpe, Some(siz))
-            case (tpe, _)
-                if tpe =:= typeOf[com.twitter.scalding.db.macros.size] =>
-              c.abort(c.enclosingPosition,
-                      "Hit a size macro where we couldn't parse the value. Probably not a literal constant. Only literal constants are supported.")
-            case (tpe, _)
-                if tpe <:< typeOf[
+          val annotationInfo: List[(Type, Option[Int])] = annotationData
+            .getOrElse(m.name.toString.trim, Nil)
+            .collect {
+              case (tpe, List(Literal(Constant(siz: Int))))
+                  if tpe =:= typeOf[com.twitter.scalding.db.macros.size] =>
+                (tpe, Some(siz))
+              case (tpe, _)
+                  if tpe =:= typeOf[com.twitter.scalding.db.macros.size] =>
+                c.abort(
+                  c.enclosingPosition,
+                  "Hit a size macro where we couldn't parse the value. Probably not a literal constant. Only literal constants are supported.")
+              case (tpe, _)
+                  if tpe <:< typeOf[
                     com.twitter.scalding.db.macros.ScaldingDBAnnotation] =>
-              (tpe, None)
-          }
+                (tpe, None)
+            }
           (m, fieldName, defaultVal, annotationInfo)
-      }.map {
-        case (accessorMethod, fieldName, defaultVal, annotationInfo) =>
-          matchField(outerAccessorTree :+ accessorMethod,
-                     accessorMethod.returnType,
-                     FieldName(fieldName),
-                     defaultVal,
-                     annotationInfo,
-                     false)
-      }.toList
-      // This algorithm returns the error from the first exception we run into.
+        }
+        .map {
+          case (accessorMethod, fieldName, defaultVal, annotationInfo) =>
+            matchField(
+              outerAccessorTree :+ accessorMethod,
+              accessorMethod.returnType,
+              FieldName(fieldName),
+              defaultVal,
+              annotationInfo,
+              false)
+        }
+        .toList
+        // This algorithm returns the error from the first exception we run into.
         .foldLeft(scala.util.Try[List[ColumnFormat[c.type]]](Nil)) {
-        case (pTry, nxt) =>
-          (pTry, nxt) match {
-            case (Success(l), Success(r)) => Success(l ::: r)
-            case (f @ Failure(_), _) => f
-            case (_, f @ Failure(_)) => f
-          }
-      }
+          case (pTry, nxt) =>
+            (pTry, nxt) match {
+              case (Success(l), Success(r)) => Success(l ::: r)
+              case (f @ Failure(_), _)      => f
+              case (_, f @ Failure(_))      => f
+            }
+        }
     }
 
     val formats = expandMethod(Nil, T.tpe) match {
@@ -217,10 +242,13 @@ object ColumnDefinitionProviderImpl {
       formats.map(_.fieldName).groupBy(identity).filter(_._2.size > 1).keys
 
     if (duplicateFields.nonEmpty) {
-      c.abort(c.enclosingPosition, s"""
+      c.abort(
+        c.enclosingPosition,
+        s"""
         Duplicate field names found: ${duplicateFields.mkString(",")}.
         Please check your nested case classes.
-        """)
+        """
+      )
     } else {
       formats
     }
@@ -276,7 +304,7 @@ object ColumnDefinitionProviderImpl {
           case "BOOLEAN" | "TINYINT" =>
             q"""List("BOOLEAN", "BOOL", "TINYINT").contains($typeNameTerm)"""
           case "INT" => q"""List("INTEGER", "INT").contains($typeNameTerm)"""
-          case f => q"""$f == $typeNameTerm"""
+          case f     => q"""$f == $typeNameTerm"""
         }
         val typeAssert = q"""
         if (!$typeValidation) {
@@ -303,27 +331,27 @@ object ColumnDefinitionProviderImpl {
     val rsTerm = newTermName(c.fresh("rs"))
     val formats = columnFormats.map {
       case cf: ColumnFormat[_] => {
-          val fieldName = cf.fieldName.toStr
-          // java boxed types needed below to populate cascading's Tuple
-          cf.fieldType match {
-            case "VARCHAR" | "TEXT" => q"""$rsTerm.getString($fieldName)"""
-            case "BOOLEAN" | "TINYINT" =>
-              q"""_root_.java.lang.Boolean.valueOf($rsTerm.getBoolean($fieldName))"""
-            case "DATE" | "DATETIME" =>
-              q"""Option($rsTerm.getTimestamp($fieldName)).map { ts => new java.util.Date(ts.getTime) }.orNull"""
-            // dates set to null are populated as None by tuple converter
-            // if the corresponding case class field is an Option[Date]
-            case "DOUBLE" =>
-              q"""_root_.java.lang.Double.valueOf($rsTerm.getDouble($fieldName))"""
-            case "BIGINT" =>
-              q"""_root_.java.lang.Long.valueOf($rsTerm.getLong($fieldName))"""
-            case "INT" | "SMALLINT" =>
-              q"""_root_.java.lang.Integer.valueOf($rsTerm.getInt($fieldName))"""
-            case f =>
-              q"""sys.error("Invalid format " + $f + " for " + $fieldName)"""
-          }
-          // note: UNSIGNED BIGINT is currently unsupported
+        val fieldName = cf.fieldName.toStr
+        // java boxed types needed below to populate cascading's Tuple
+        cf.fieldType match {
+          case "VARCHAR" | "TEXT" => q"""$rsTerm.getString($fieldName)"""
+          case "BOOLEAN" | "TINYINT" =>
+            q"""_root_.java.lang.Boolean.valueOf($rsTerm.getBoolean($fieldName))"""
+          case "DATE" | "DATETIME" =>
+            q"""Option($rsTerm.getTimestamp($fieldName)).map { ts => new java.util.Date(ts.getTime) }.orNull"""
+          // dates set to null are populated as None by tuple converter
+          // if the corresponding case class field is an Option[Date]
+          case "DOUBLE" =>
+            q"""_root_.java.lang.Double.valueOf($rsTerm.getDouble($fieldName))"""
+          case "BIGINT" =>
+            q"""_root_.java.lang.Long.valueOf($rsTerm.getLong($fieldName))"""
+          case "INT" | "SMALLINT" =>
+            q"""_root_.java.lang.Integer.valueOf($rsTerm.getInt($fieldName))"""
+          case f =>
+            q"""sys.error("Invalid format " + $f + " for " + $fieldName)"""
         }
+        // note: UNSIGNED BIGINT is currently unsupported
+      }
     }
     val tcTerm = newTermName(c.fresh("conv"))
     val res = q"""

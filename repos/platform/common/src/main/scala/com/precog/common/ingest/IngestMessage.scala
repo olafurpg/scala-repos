@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -32,7 +32,10 @@ import blueeyes.json.serialization.DefaultSerialization._
 import blueeyes.json.serialization.IsoSerialization._
 import blueeyes.json.serialization.Extractor._
 import blueeyes.json.serialization.Versioned._
-import blueeyes.json.serialization.JodaSerializationImplicits.{InstantExtractor, InstantDecomposer}
+import blueeyes.json.serialization.JodaSerializationImplicits.{
+  InstantExtractor,
+  InstantDecomposer
+}
 
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
@@ -54,14 +57,15 @@ sealed trait EventMessage {
   def path: Path
   def jobId: Option[JobId]
   def timestamp: Instant
-  def fold[A](im: IngestMessage => A,
-              am: ArchiveMessage => A,
-              sf: StoreFileMessage => A): A
+  def fold[A](
+      im: IngestMessage => A,
+      am: ArchiveMessage => A,
+      sf: StoreFileMessage => A): A
 }
 
 object EventMessage {
-  type EventMessageExtraction = (APIKey, Path,
-  Authorities => EventMessage) \/ EventMessage
+  type EventMessageExtraction =
+    (APIKey, Path, Authorities => EventMessage) \/ EventMessage
 
   // an instant that's close enough to the start of timestamping for our purposes
   val defaultTimestamp = new Instant(1362465101979L)
@@ -69,9 +73,10 @@ object EventMessage {
   implicit val decomposer: Decomposer[EventMessage] =
     new Decomposer[EventMessage] {
       override def decompose(eventMessage: EventMessage): JValue = {
-        eventMessage.fold(IngestMessage.Decomposer.apply _,
-                          ArchiveMessage.Decomposer.apply _,
-                          StoreFileMessage.Decomposer.apply _)
+        eventMessage.fold(
+          IngestMessage.Decomposer.apply _,
+          ArchiveMessage.Decomposer.apply _,
+          StoreFileMessage.Decomposer.apply _)
       }
     }
 }
@@ -110,23 +115,26 @@ object IngestRecord {
   * ownerAccountId must be determined before the message is sent to the central queue; we have to
   * accept records for processing in the local queue.
   */
-case class IngestMessage(apiKey: APIKey,
-                         path: Path,
-                         writeAs: Authorities,
-                         data: Seq[IngestRecord],
-                         jobId: Option[JobId],
-                         timestamp: Instant,
-                         streamRef: StreamRef)
+case class IngestMessage(
+    apiKey: APIKey,
+    path: Path,
+    writeAs: Authorities,
+    data: Seq[IngestRecord],
+    jobId: Option[JobId],
+    timestamp: Instant,
+    streamRef: StreamRef)
     extends EventMessage {
-  def fold[A](im: IngestMessage => A,
-              am: ArchiveMessage => A,
-              sf: StoreFileMessage => A): A = im(this)
+  def fold[A](
+      im: IngestMessage => A,
+      am: ArchiveMessage => A,
+      sf: StoreFileMessage => A): A = im(this)
   def split: Seq[IngestMessage] = {
     if (data.size > 1) {
       val (dataA, dataB) = data.splitAt(data.size / 2)
       val Seq(refA, refB) = streamRef.split(2)
-      List(this.copy(data = dataA, streamRef = refA),
-           this.copy(data = dataB, streamRef = refB))
+      List(
+        this.copy(data = dataA, streamRef = refA),
+        this.copy(data = dataB, streamRef = refB))
     } else {
       List(this)
     }
@@ -134,7 +142,13 @@ case class IngestMessage(apiKey: APIKey,
 
   override def toString =
     "IngestMessage(%s, %s, %s, (%d records), %s, %s, %s)".format(
-        apiKey, path, writeAs, data.size, jobId, timestamp, streamRef)
+      apiKey,
+      path,
+      writeAs,
+      data.size,
+      jobId,
+      timestamp,
+      streamRef)
 }
 
 object IngestMessage {
@@ -145,8 +159,8 @@ object IngestMessage {
 
   val schemaV1 =
     "apiKey" :: "path" :: "writeAs" :: "data" :: "jobId" :: "timestamp" ::
-    ("streamRef" ||| StreamRef.Append.asInstanceOf[StreamRef]) :: HNil
-  implicit def seqExtractor[A : Extractor]: Extractor[Seq[A]] =
+      ("streamRef" ||| StreamRef.Append.asInstanceOf[StreamRef]) :: HNil
+  implicit def seqExtractor[A: Extractor]: Extractor[Seq[A]] =
     implicitly[Extractor[List[A]]].map(_.toSeq)
 
   val decomposerV1: Decomposer[IngestMessage] =
@@ -172,25 +186,29 @@ object IngestMessage {
                 }
               ingest.writeAs map { authorities =>
                 assert(ingest.data.size == 1)
-                \/.right(IngestMessage(ingest.apiKey,
-                                       ingest.path,
-                                       authorities,
-                                       eventRecords,
-                                       ingest.jobId,
-                                       defaultTimestamp,
-                                       StreamRef.Append))
+                \/.right(
+                  IngestMessage(
+                    ingest.apiKey,
+                    ingest.path,
+                    authorities,
+                    eventRecords,
+                    ingest.jobId,
+                    defaultTimestamp,
+                    StreamRef.Append))
               } getOrElse {
                 \/.left(
-                    (ingest.apiKey,
-                     ingest.path,
-                     (authorities: Authorities) =>
-                       IngestMessage(ingest.apiKey,
-                                     ingest.path,
-                                     authorities,
-                                     eventRecords,
-                                     ingest.jobId,
-                                     defaultTimestamp,
-                                     StreamRef.Append))
+                  (
+                    ingest.apiKey,
+                    ingest.path,
+                    (authorities: Authorities) =>
+                      IngestMessage(
+                        ingest.apiKey,
+                        ingest.path,
+                        authorities,
+                        eventRecords,
+                        ingest.jobId,
+                        defaultTimestamp,
+                        StreamRef.Append))
                 )
               }
           }
@@ -202,15 +220,17 @@ object IngestMessage {
     extractorV1 <+> extractorV0
 }
 
-case class ArchiveMessage(apiKey: APIKey,
-                          path: Path,
-                          jobId: Option[JobId],
-                          eventId: EventId,
-                          timestamp: Instant)
+case class ArchiveMessage(
+    apiKey: APIKey,
+    path: Path,
+    jobId: Option[JobId],
+    eventId: EventId,
+    timestamp: Instant)
     extends EventMessage {
-  def fold[A](im: IngestMessage => A,
-              am: ArchiveMessage => A,
-              sf: StoreFileMessage => A): A = am(this)
+  def fold[A](
+      im: IngestMessage => A,
+      am: ArchiveMessage => A,
+      sf: StoreFileMessage => A): A = am(this)
 }
 
 object ArchiveMessage {
@@ -228,13 +248,13 @@ object ArchiveMessage {
   val extractorV0: Extractor[ArchiveMessage] = new Extractor[ArchiveMessage] {
     override def validated(obj: JValue): Validation[Error, ArchiveMessage] = {
       (obj.validated[Int]("producerId") |@| obj.validated[Int]("deletionId") |@| obj
-            .validated[Archive]("deletion")) {
-        (producerId, sequenceId, archive) =>
-          ArchiveMessage(archive.apiKey,
-                         archive.path,
-                         archive.jobId,
-                         EventId(producerId, sequenceId),
-                         defaultTimestamp)
+        .validated[Archive]("deletion")) { (producerId, sequenceId, archive) =>
+        ArchiveMessage(
+          archive.apiKey,
+          archive.path,
+          archive.jobId,
+          EventId(producerId, sequenceId),
+          defaultTimestamp)
       }
     }
   }
@@ -244,18 +264,20 @@ object ArchiveMessage {
     extractorV1 <+> extractorV0
 }
 
-case class StoreFileMessage(apiKey: APIKey,
-                            path: Path,
-                            writeAs: Authorities,
-                            jobId: Option[JobId],
-                            eventId: EventId,
-                            content: FileContent,
-                            timestamp: Instant,
-                            streamRef: StreamRef)
+case class StoreFileMessage(
+    apiKey: APIKey,
+    path: Path,
+    writeAs: Authorities,
+    jobId: Option[JobId],
+    eventId: EventId,
+    content: FileContent,
+    timestamp: Instant,
+    streamRef: StreamRef)
     extends EventMessage {
-  def fold[A](im: IngestMessage => A,
-              am: ArchiveMessage => A,
-              sf: StoreFileMessage => A): A = sf(this)
+  def fold[A](
+      im: IngestMessage => A,
+      am: ArchiveMessage => A,
+      sf: StoreFileMessage => A): A = sf(this)
 }
 
 object StoreFileMessage {

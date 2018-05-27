@@ -1,6 +1,10 @@
 package com.twitter.util
 
-import java.util.concurrent.atomic.{AtomicLong, AtomicReference, AtomicReferenceArray}
+import java.util.concurrent.atomic.{
+  AtomicLong,
+  AtomicReference,
+  AtomicReferenceArray
+}
 import java.util.{List => JList}
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
@@ -66,24 +70,23 @@ trait Var[+T] { self =>
     def observe(depth: Int, obs: Observer[U]) = {
       val inner = new AtomicReference(Closable.nop)
       val outer = self.observe(
-          depth,
-          Observer(
-              t =>
-                {
-              // TODO: Right now we rely on synchronous propagation; and
-              // thus also synchronous closes. We should instead perform
-              // asynchronous propagation so that it is is safe &
-              // predictable to have asynchronously closing Vars, for
-              // example. Currently the only source of potentially
-              // asynchronous closing is Var.async; here we have modified
-              // the external process to close asynchronously with the Var
-              // itself. Thus we know the code path here is synchronous:
-              // we control all Var implementations, and also all Closable
-              // combinators have been modified to evaluate their respective
-              // Futures eagerly.
-              val done = inner.getAndSet(f(t).observe(depth + 1, obs)).close()
-              assert(done.isDone)
-          }))
+        depth,
+        Observer(t => {
+          // TODO: Right now we rely on synchronous propagation; and
+          // thus also synchronous closes. We should instead perform
+          // asynchronous propagation so that it is is safe &
+          // predictable to have asynchronously closing Vars, for
+          // example. Currently the only source of potentially
+          // asynchronous closing is Var.async; here we have modified
+          // the external process to close asynchronously with the Var
+          // itself. Thus we know the code path here is synchronous:
+          // we control all Var implementations, and also all Closable
+          // combinators have been modified to evaluate their respective
+          // Futures eagerly.
+          val done = inner.getAndSet(f(t).observe(depth + 1, obs)).close()
+          assert(done.isDone)
+        })
+      )
 
       Closable.sequence(outer, Closable.ref(inner))
     }
@@ -110,8 +113,7 @@ trait Var[+T] { self =>
     * Produce an [[Event]] reflecting the differences between
     * each update to this [[Var]].
     */
-  def diff[CC[_]: Diffable, U](
-      implicit toCC: T <:< CC[U]): Event[Diff[CC, U]] =
+  def diff[CC[_]: Diffable, U](implicit toCC: T <:< CC[U]): Event[Diff[CC, U]] =
     changes.diff
 
   def sample(): T = Var.sample(this)
@@ -235,7 +237,7 @@ object Var {
   /**
     * Collect a collection of Vars into a Var of collection.
     */
-  def collect[T : ClassTag, CC[X] <: Traversable[X]](vars: CC[Var[T]])(
+  def collect[T: ClassTag, CC[X] <: Traversable[X]](vars: CC[Var[T]])(
       implicit newBuilder: CanBuildFrom[CC[T], T, CC[T]]): Var[CC[T]] = {
     val vs = vars.toArray
 
@@ -347,7 +349,9 @@ private object UpdatableVar {
   }
 
   case class State[T](
-      value: T, version: Long, parties: immutable.SortedSet[Party[T]]) {
+      value: T,
+      version: Long,
+      parties: immutable.SortedSet[Party[T]]) {
     def -(p: Party[T]) = copy(parties = parties - p)
     def +(p: Party[T]) = copy(parties = parties + p)
     def :=(newv: T) = copy(value = newv, version = version + 1)
@@ -365,13 +369,15 @@ private object UpdatableVar {
 }
 
 private[util] class UpdatableVar[T](init: T)
-    extends Var[T] with Updatable[T] with Extractable[T] {
+    extends Var[T]
+    with Updatable[T]
+    with Extractable[T] {
   import UpdatableVar._
   import Var.Observer
 
   private[this] val n = new AtomicLong(0)
   private[this] val state = new AtomicReference(
-      State[T](init, 0, immutable.SortedSet.empty))
+    State[T](init, 0, immutable.SortedSet.empty))
 
   @tailrec
   private[this] def cas(next: State[T] => State[T]): State[T] = {

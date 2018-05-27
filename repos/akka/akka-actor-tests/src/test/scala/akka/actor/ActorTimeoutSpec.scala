@@ -17,7 +17,7 @@ class ActorTimeoutSpec extends AkkaSpec {
   val leeway = 500.millis.dilated
 
   system.eventStream.publish(
-      Mute(EventFilter.warning(pattern = ".*unhandled message from.*hallo")))
+    Mute(EventFilter.warning(pattern = ".*unhandled message from.*hallo")))
 
   "An Actor-based Future" must {
 

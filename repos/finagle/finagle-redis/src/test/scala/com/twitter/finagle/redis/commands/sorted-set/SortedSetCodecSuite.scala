@@ -3,7 +3,11 @@ package com.twitter.finagle.redis.protocol
 import com.twitter.finagle.redis.ClientError
 import com.twitter.finagle.redis.naggati.RedisRequestTest
 import com.twitter.finagle.redis.tags.CodecTest
-import com.twitter.finagle.redis.util.{CBToString, BytesToString, StringToChannelBuffer}
+import com.twitter.finagle.redis.util.{
+  CBToString,
+  BytesToString,
+  StringToChannelBuffer
+}
 import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
@@ -13,11 +17,11 @@ final class SortedSetCodecSuite extends RedisRequestTest {
 
   test("Throw a ClientError for ZADD with invalid arguments", CodecTest) {
     List(
-        "ZADD",
-        "ZADD foo",
-        "ZADD foo 123",
-        "ZADD foo BAD_SCORE bar",
-        "ZADD foo 123 bar BAD_SCORE bar"
+      "ZADD",
+      "ZADD foo",
+      "ZADD foo 123",
+      "ZADD foo BAD_SCORE bar",
+      "ZADD foo 123 bar BAD_SCORE bar"
     ).foreach { e =>
       intercept[ClientError] {
         codec(wrap("%s\r\n".format(e)))
@@ -72,15 +76,15 @@ final class SortedSetCodecSuite extends RedisRequestTest {
 
   test("Throw a ClientError for ZCOUNT with invalid arguments", CodecTest) {
     List(
-        "ZCOUNT",
-        "ZCOUNT foo",
-        "ZCOUNT foo 1",
-        "ZCOUNT foo 1 bar",
-        "ZCOUNT foo bar 1",
-        "ZCOUNT foo -inf foo",
-        "ZCOUNT foo 1 +info",
-        "ZCOUNT foo )1 3",
-        "ZCOUNT foo (1 n"
+      "ZCOUNT",
+      "ZCOUNT foo",
+      "ZCOUNT foo 1",
+      "ZCOUNT foo 1 bar",
+      "ZCOUNT foo bar 1",
+      "ZCOUNT foo -inf foo",
+      "ZCOUNT foo 1 +info",
+      "ZCOUNT foo )1 3",
+      "ZCOUNT foo (1 n"
     ).foreach { e =>
       intercept[ClientError] {
         codec(wrap("%s\r\n".format(e)))
@@ -90,12 +94,14 @@ final class SortedSetCodecSuite extends RedisRequestTest {
 
   test("Correctly encode ZCOUNT") {
     Map(
-        "foo -inf +inf" -> ZCount(StringToChannelBuffer("foo"),
-                                  ZInterval.MIN,
-                                  ZInterval.MAX),
-        "foo (1.0 3.0" -> ZCount(StringToChannelBuffer("foo"),
-                                 ZInterval.exclusive(1),
-                                 ZInterval(3))
+      "foo -inf +inf" -> ZCount(
+        StringToChannelBuffer("foo"),
+        ZInterval.MIN,
+        ZInterval.MAX),
+      "foo (1.0 3.0" -> ZCount(
+        StringToChannelBuffer("foo"),
+        ZInterval.exclusive(1),
+        ZInterval(3))
     ).foreach {
       case (s, v) =>
         unwrap(codec(wrap("ZCOUNT %s\r\n".format(s)))) {
@@ -107,10 +113,10 @@ final class SortedSetCodecSuite extends RedisRequestTest {
 
   test("Throw a ClientError for ZINCRBY with invalid arguments", CodecTest) {
     List(
-        "ZINCRBY",
-        "ZINCRBY key",
-        "ZINCRBY key 1",
-        "ZINCRBY key bad member"
+      "ZINCRBY",
+      "ZINCRBY key",
+      "ZINCRBY key 1",
+      "ZINCRBY key bad member"
     ).foreach { b =>
       intercept[ClientError] {
         codec(wrap("%s\r\n".format(b)))
@@ -138,21 +144,21 @@ final class SortedSetCodecSuite extends RedisRequestTest {
   }
 
   test(
-      "Throw a ClientError for ZINTERSTORE and ZUNIONSTORE with invalid arguments",
-      CodecTest) {
+    "Throw a ClientError for ZINTERSTORE and ZUNIONSTORE with invalid arguments",
+    CodecTest) {
     val bad = List(
-        "%s",
-        "%s foo",
-        "%s foo 1 a b",
-        "%s foo 2 a b WEIGHTS 2",
-        "%s foo 2 a b WEIGHTS 1",
-        "%s foo 2 a b WEIGHTS 2 2 AGGREGATE foo",
-        "%s foo 2 a b c WEIGHTS 2 2 2",
-        "%s foo 1 b WEIGHTS 2 AGGREGATE",
-        "%s foo 2 a b WEIGHTS 2 2 2",
-        "%s foo 1 a WEIGHTS a",
-        "%s foo 1 a WEIGHTS 2 WEIGHTS 3",
-        "%s foo 1 a AGGREGATE SUM AGGREGATE MAX"
+      "%s",
+      "%s foo",
+      "%s foo 1 a b",
+      "%s foo 2 a b WEIGHTS 2",
+      "%s foo 2 a b WEIGHTS 1",
+      "%s foo 2 a b WEIGHTS 2 2 AGGREGATE foo",
+      "%s foo 2 a b c WEIGHTS 2 2 2",
+      "%s foo 1 b WEIGHTS 2 AGGREGATE",
+      "%s foo 2 a b WEIGHTS 2 2 2",
+      "%s foo 1 a WEIGHTS a",
+      "%s foo 1 a WEIGHTS 2 WEIGHTS 3",
+      "%s foo 1 a AGGREGATE SUM AGGREGATE MAX"
     )
 
     List("ZINTERSTORE", "ZUNIONSTORE").foreach { cmd =>
@@ -170,11 +176,11 @@ final class SortedSetCodecSuite extends RedisRequestTest {
       f: (Seq[ChannelBuffer], Option[Weights], Option[Aggregate]) => Unit
   ): PartialFunction[Command, Unit] = cmd match {
     case "ZINTERSTORE" => {
-        case ZInterStore(k, n, keys, w, a) => f(keys, w, a)
-      }
+      case ZInterStore(k, n, keys, w, a) => f(keys, w, a)
+    }
     case "ZUNIONSTORE" => {
-        case ZUnionStore(k, n, keys, w, a) => f(keys, w, a)
-      }
+      case ZUnionStore(k, n, keys, w, a) => f(keys, w, a)
+    }
     case _ => throw new Exception("Unhandled type")
   }
 
@@ -183,7 +189,7 @@ final class SortedSetCodecSuite extends RedisRequestTest {
       unwrap(doCmd(cmd, "%s out 2 zset1 zset2\r\n")) {
         verifyIU(cmd, "out", 2) { (keys, weights, aggregate) =>
           assert(
-              keys.map(s => BytesToString(s.array)) == List("zset1", "zset2"))
+            keys.map(s => BytesToString(s.array)) == List("zset1", "zset2"))
           assert(weights == None)
           assert(aggregate == None)
         }
@@ -191,13 +197,12 @@ final class SortedSetCodecSuite extends RedisRequestTest {
     }
   }
 
-  test(
-      "Correctly encode ZINTERSTORE and ZUNIONSTORE with two keys and weights") {
+  test("Correctly encode ZINTERSTORE and ZUNIONSTORE with two keys and weights") {
     List("ZINTERSTORE", "ZUNIONSTORE").foreach { cmd =>
       unwrap(doCmd(cmd, "%s out 2 zset1 zset2 WEIGHTS 2 3\r\n")) {
         verifyIU(cmd, "out", 2) { (keys, weights, aggregate) =>
           assert(
-              keys.map(s => BytesToString(s.array)) == List("zset1", "zset2"))
+            keys.map(s => BytesToString(s.array)) == List("zset1", "zset2"))
           assert(weights == Some(Weights(2, 3)))
           assert(aggregate == None)
         }
@@ -206,12 +211,12 @@ final class SortedSetCodecSuite extends RedisRequestTest {
   }
 
   test(
-      "Correctly encode ZINTERSTORE and ZUNIONSTORE with two keys and aggregate sum") {
+    "Correctly encode ZINTERSTORE and ZUNIONSTORE with two keys and aggregate sum") {
     List("ZINTERSTORE", "ZUNIONSTORE").foreach { cmd =>
       unwrap(doCmd(cmd, "%s out 2 zset1 zset2 aggregate sum\r\n")) {
         verifyIU(cmd, "out", 2) { (keys, weights, aggregate) =>
           assert(
-              keys.map(s => BytesToString(s.array)) == List("zset1", "zset2"))
+            keys.map(s => BytesToString(s.array)) == List("zset1", "zset2"))
           assert(weights == None)
           assert(aggregate == Some(Aggregate.Sum))
         }
@@ -220,12 +225,12 @@ final class SortedSetCodecSuite extends RedisRequestTest {
   }
 
   test(
-      "Correctly encode ZINTERSTORE and ZUNIONSTORE with two keys, weights, and aggregate min") {
+    "Correctly encode ZINTERSTORE and ZUNIONSTORE with two keys, weights, and aggregate min") {
     List("ZINTERSTORE", "ZUNIONSTORE").foreach { cmd =>
       unwrap(doCmd(cmd, "%s out 2 zset1 zset2 weights 2 3 aggregate min\r\n")) {
         verifyIU(cmd, "out", 2) { (keys, weights, aggregate) =>
           assert(
-              keys.map(s => BytesToString(s.array)) == List("zset1", "zset2"))
+            keys.map(s => BytesToString(s.array)) == List("zset1", "zset2"))
           assert(weights == Some(Weights(2, 3)))
           assert(aggregate == Some(Aggregate.Min))
         }
@@ -234,12 +239,12 @@ final class SortedSetCodecSuite extends RedisRequestTest {
   }
 
   test(
-      "Correctly encode ZINTERSTORE and ZUNIONSTORE with two keys, weights, and aggregate max") {
+    "Correctly encode ZINTERSTORE and ZUNIONSTORE with two keys, weights, and aggregate max") {
     List("ZINTERSTORE", "ZUNIONSTORE").foreach { cmd =>
       unwrap(doCmd(cmd, "%s out 2 zset1 zset2 aggregate max weights 2 3\r\n")) {
         verifyIU(cmd, "out", 2) { (keys, weights, aggregate) =>
           assert(
-              keys.map(s => BytesToString(s.array)) == List("zset1", "zset2"))
+            keys.map(s => BytesToString(s.array)) == List("zset1", "zset2"))
           assert(weights == Some(Weights(2, 3)))
           assert(aggregate == Some(Aggregate.Max))
         }
@@ -247,15 +252,16 @@ final class SortedSetCodecSuite extends RedisRequestTest {
     }
   }
 
-  test("Throw a ClientError for ZRANGE and ZREVRANGE with invalid arguments",
-       CodecTest) {
+  test(
+    "Throw a ClientError for ZRANGE and ZREVRANGE with invalid arguments",
+    CodecTest) {
     val bad = List(
-        "%s",
-        "%s myset",
-        "%s myset 1",
-        "%s myset 1 foo",
-        "%s myset foo 1",
-        "%s myset 0 2 blah"
+      "%s",
+      "%s myset",
+      "%s myset 1",
+      "%s myset 1 foo",
+      "%s myset foo 1",
+      "%s myset 0 2 blah"
     )
 
     List("ZRANGE", "ZREVRANGE").foreach { cmd =>
@@ -276,11 +282,11 @@ final class SortedSetCodecSuite extends RedisRequestTest {
   ): PartialFunction[Command, Unit] = {
     cmd match {
       case "ZRANGE" => {
-          case ZRange(k, start, stop, scored) => ()
-        }
+        case ZRange(k, start, stop, scored) => ()
+      }
       case "ZREVRANGE" => {
-          case ZRevRange(k, start, stop, scored) => ()
-        }
+        case ZRevRange(k, start, stop, scored) => ()
+      }
     }
   }
 
@@ -314,7 +320,7 @@ final class SortedSetCodecSuite extends RedisRequestTest {
   }
 
   test(
-      "Ensure that, after encoding ZRANGE, the bytes we threw in are the bytes we get back") {
+    "Ensure that, after encoding ZRANGE, the bytes we threw in are the bytes we get back") {
     val goodKey = Array[Byte](58, 49, 127)
     val nonAsciiKey = Array[Byte](58, 49, -128)
     testZRangeBytes(goodKey)
@@ -322,24 +328,24 @@ final class SortedSetCodecSuite extends RedisRequestTest {
   }
 
   test(
-      "Throw a ClientError for ZRANGEBYSCORE and ZREVRANGEBYSCORE with invalid arguments",
-      CodecTest
+    "Throw a ClientError for ZRANGEBYSCORE and ZREVRANGEBYSCORE with invalid arguments",
+    CodecTest
   ) {
     val bad = List(
-        "%s",
-        "%s key",
-        "%s key -inf",
-        "%s key -inf foo",
-        "%s key foo +inf",
-        "%s key 0 1 NOSCORES",
-        "%s key 0 1 LIMOT 1 2",
-        "%s key 0 1 LIMIT foo 1",
-        "%s key 0 1 LIMIT 1 foo",
-        "%s key 0 1 WITHSCORES WITHSCORES",
-        "%s key 0 1 LIMIT 0 1 LIMIT 0 1 WITHSCORES",
-        "%s key 0 1 LIMIT 0 1 NOSCORES",
-        "%s key 0 1 LIMIT 1",
-        "%s key 0 1 LIMIT 0 1 WITHSCORES NOSCORES"
+      "%s",
+      "%s key",
+      "%s key -inf",
+      "%s key -inf foo",
+      "%s key foo +inf",
+      "%s key 0 1 NOSCORES",
+      "%s key 0 1 LIMOT 1 2",
+      "%s key 0 1 LIMIT foo 1",
+      "%s key 0 1 LIMIT 1 foo",
+      "%s key 0 1 WITHSCORES WITHSCORES",
+      "%s key 0 1 LIMIT 0 1 LIMIT 0 1 WITHSCORES",
+      "%s key 0 1 LIMIT 0 1 NOSCORES",
+      "%s key 0 1 LIMIT 1",
+      "%s key 0 1 LIMIT 0 1 WITHSCORES NOSCORES"
     )
 
     List("ZRANGEBYSCORE", "ZREVRANGEBYSCORE").foreach { cmd =>
@@ -352,15 +358,18 @@ final class SortedSetCodecSuite extends RedisRequestTest {
   }
 
   def verifyRangeByScore(
-      cmd: String, k: String, min: ZInterval, max: ZInterval)(
+      cmd: String,
+      k: String,
+      min: ZInterval,
+      max: ZInterval)(
       f: (Option[CommandArgument], Option[Limit]) => Unit
   ): PartialFunction[Command, Unit] = cmd match {
     case "ZRANGEBYSCORE" => {
-        case ZRangeByScore(k, min, max, s, l) => f(s, l)
-      }
+      case ZRangeByScore(k, min, max, s, l) => f(s, l)
+    }
     case "ZREVRANGEBYSCORE" => {
-        case ZRevRangeByScore(k, min, max, s, l) => f(s, l)
-      }
+      case ZRevRangeByScore(k, min, max, s, l) => f(s, l)
+    }
   }
 
   test("Correctly encode ZRANGEBYSCORE and ZREVRANGEBYSCORE from -inf to +inf") {
@@ -388,7 +397,7 @@ final class SortedSetCodecSuite extends RedisRequestTest {
   }
 
   test(
-      "Correctly encode ZRANGEBYSCORE and ZREVRANGEBYSCORE from 1 (exclusive) to 2") {
+    "Correctly encode ZRANGEBYSCORE and ZREVRANGEBYSCORE from 1 (exclusive) to 2") {
     List("ZRANGEBYSCORE", "ZREVRANGEBYSCORE").foreach { cmd =>
       unwrap(doCmd(cmd, "%s myzset (1 2\r\n")) {
         verifyRangeByScore(cmd, "myzset", ZInterval.exclusive(1), ZInterval(2)) {
@@ -401,13 +410,14 @@ final class SortedSetCodecSuite extends RedisRequestTest {
   }
 
   test(
-      "Correctly encode ZRANGEBYSCORE and ZREVRANGEBYSCORE from 1 (excl.) to 2 (excl.)") {
+    "Correctly encode ZRANGEBYSCORE and ZREVRANGEBYSCORE from 1 (excl.) to 2 (excl.)") {
     List("ZRANGEBYSCORE", "ZREVRANGEBYSCORE").foreach { cmd =>
       unwrap(doCmd(cmd, "%s myzset (1 (2\r\n")) {
-        verifyRangeByScore(cmd,
-                           "myzset",
-                           ZInterval.exclusive(1),
-                           ZInterval.exclusive(2)) { (s, l) =>
+        verifyRangeByScore(
+          cmd,
+          "myzset",
+          ZInterval.exclusive(1),
+          ZInterval.exclusive(2)) { (s, l) =>
           assert(s == None)
           assert(l == None)
         }
@@ -428,7 +438,7 @@ final class SortedSetCodecSuite extends RedisRequestTest {
   }
 
   test(
-      "Correctly encode ZRANGEBYSCORE and ZREVRANGEBYSCORE with limit and scores") {
+    "Correctly encode ZRANGEBYSCORE and ZREVRANGEBYSCORE with limit and scores") {
     List("ZRANGEBYSCORE", "ZREVRANGEBYSCORE").foreach { cmd =>
       unwrap(doCmd(cmd, "%s myzset -inf +inf LIMIT 3 9 WITHSCORES\r\n")) {
         verifyRangeByScore(cmd, "myzset", ZInterval.MIN, ZInterval.MAX) {
@@ -440,8 +450,9 @@ final class SortedSetCodecSuite extends RedisRequestTest {
     }
   }
 
-  test("Throw a ClientError for ZRANK and ZREVRANK with invalid arguments",
-       CodecTest) {
+  test(
+    "Throw a ClientError for ZRANK and ZREVRANK with invalid arguments",
+    CodecTest) {
     val bad = List("%s", "%s key", "%s key member member")
 
     List("ZRANK", "ZREVRANK").foreach { cmd =>
@@ -457,11 +468,11 @@ final class SortedSetCodecSuite extends RedisRequestTest {
       f: ChannelBuffer => Unit): PartialFunction[Command, Unit] =
     cmd match {
       case "ZRANK" => {
-          case ZRank(k, m) => f(m)
-        }
+        case ZRank(k, m) => f(m)
+      }
       case "ZREVRANK" => {
-          case ZRevRank(k, m) => f(m)
-        }
+        case ZRevRank(k, m) => f(m)
+      }
     }
 
   test("Correctly encode ZRANK and ZREVRANK") {
@@ -504,14 +515,16 @@ final class SortedSetCodecSuite extends RedisRequestTest {
     }
   }
 
-  test("Throw a ClientError for ZREMRANGEBYRANK with invalid arguments",
-       CodecTest) {
-    List("%s",
-         "%s key",
-         "%s key start",
-         "%s key 1",
-         "%s key 1 stop",
-         "%s key start 2").foreach { b =>
+  test(
+    "Throw a ClientError for ZREMRANGEBYRANK with invalid arguments",
+    CodecTest) {
+    List(
+      "%s",
+      "%s key",
+      "%s key start",
+      "%s key 1",
+      "%s key 1 stop",
+      "%s key start 2").foreach { b =>
       intercept[ClientError] {
         codec(wrap("%s\r\n".format(b.format("ZREMRANGEBYRANK"))))
       }
@@ -527,14 +540,16 @@ final class SortedSetCodecSuite extends RedisRequestTest {
     }
   }
 
-  test("Throw a ClientError for ZREMRANGEBYSCORE with invalid arguments",
-       CodecTest) {
-    List("%s",
-         "%s key",
-         "%s key min",
-         "%s key min max",
-         "%s key ( 1",
-         "%s key (1 max").foreach { b =>
+  test(
+    "Throw a ClientError for ZREMRANGEBYSCORE with invalid arguments",
+    CodecTest) {
+    List(
+      "%s",
+      "%s key",
+      "%s key min",
+      "%s key min max",
+      "%s key ( 1",
+      "%s key (1 max").foreach { b =>
       intercept[ClientError] {
         codec(wrap("%s\r\n".format(b.format("ZREMRANGEBYSCORE"))))
       }

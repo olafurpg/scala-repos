@@ -21,7 +21,12 @@ import org.apache.spark.SparkFunSuite
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.catalyst.dsl.expressions._
 import org.apache.spark.sql.catalyst.encoders.RowEncoder
-import org.apache.spark.sql.types.{IntegerType, LongType, StringType, StructType}
+import org.apache.spark.sql.types.{
+  IntegerType,
+  LongType,
+  StringType,
+  StructType
+}
 
 class GroupedIteratorSuite extends SparkFunSuite {
 
@@ -29,9 +34,10 @@ class GroupedIteratorSuite extends SparkFunSuite {
     val schema = new StructType().add("i", IntegerType).add("s", StringType)
     val encoder = RowEncoder(schema)
     val input = Seq(Row(1, "a"), Row(1, "b"), Row(2, "c"))
-    val grouped = GroupedIterator(input.iterator.map(encoder.toRow),
-                                  Seq('i.int.at(0)),
-                                  schema.toAttributes)
+    val grouped = GroupedIterator(
+      input.iterator.map(encoder.toRow),
+      Seq('i.int.at(0)),
+      schema.toAttributes)
 
     val result = grouped.map {
       case (key, data) =>
@@ -49,15 +55,17 @@ class GroupedIteratorSuite extends SparkFunSuite {
       .add("s", StringType)
     val encoder = RowEncoder(schema)
 
-    val input = Seq(Row(1, 2L, "a"),
-                    Row(1, 2L, "b"),
-                    Row(1, 3L, "c"),
-                    Row(2, 1L, "d"),
-                    Row(3, 2L, "e"))
+    val input = Seq(
+      Row(1, 2L, "a"),
+      Row(1, 2L, "b"),
+      Row(1, 3L, "c"),
+      Row(2, 1L, "d"),
+      Row(3, 2L, "e"))
 
-    val grouped = GroupedIterator(input.iterator.map(encoder.toRow),
-                                  Seq('i.int.at(0), 'l.long.at(1)),
-                                  schema.toAttributes)
+    val grouped = GroupedIterator(
+      input.iterator.map(encoder.toRow),
+      Seq('i.int.at(0), 'l.long.at(1)),
+      schema.toAttributes)
 
     val result = grouped.map {
       case (key, data) =>
@@ -66,17 +74,20 @@ class GroupedIteratorSuite extends SparkFunSuite {
     }.toSeq
 
     assert(
-        result == (1, 2L, Seq(input(0), input(1))) :: (1, 3L, Seq(input(2))) :: (
-            2, 1L, Seq(input(3))) :: (3, 2L, Seq(input(4))) :: Nil)
+      result == (1, 2L, Seq(input(0), input(1))) :: (1, 3L, Seq(input(2))) :: (
+        2,
+        1L,
+        Seq(input(3))) :: (3, 2L, Seq(input(4))) :: Nil)
   }
 
   test("do nothing to the value iterator") {
     val schema = new StructType().add("i", IntegerType).add("s", StringType)
     val encoder = RowEncoder(schema)
     val input = Seq(Row(1, "a"), Row(1, "b"), Row(2, "c"))
-    val grouped = GroupedIterator(input.iterator.map(encoder.toRow),
-                                  Seq('i.int.at(0)),
-                                  schema.toAttributes)
+    val grouped = GroupedIterator(
+      input.iterator.map(encoder.toRow),
+      Seq('i.int.at(0)),
+      schema.toAttributes)
 
     assert(grouped.length == 2)
   }

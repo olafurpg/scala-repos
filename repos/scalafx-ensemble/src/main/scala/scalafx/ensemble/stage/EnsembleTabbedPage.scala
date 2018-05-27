@@ -43,14 +43,14 @@ object EnsembleTabbedPage {
       vgrow = Priority.Always
       id = "source-tabs"
       tabs = Seq(
-          new Tab() {
-            text = "Demo"
-            closable = false
-          },
-          new Tab() {
-            text = "Source"
-            closable = false
-          }
+        new Tab() {
+          text = "Demo"
+          closable = false
+        },
+        new Tab() {
+          text = "Source"
+          closable = false
+        }
       )
     }
 
@@ -72,9 +72,9 @@ class EnsembleTabbedPage(tabPane: TabPane, ctrlName: String, ctrlGroup: String)
   def getPage = {
     import scalafx.ensemble.stage.EnsembleTabbedPage._
     tabPane.tabs(0).content = buildTabContent(
-        ContentFactory.createContent(ctrlName, ctrlGroup))
+      ContentFactory.createContent(ctrlName, ctrlGroup))
     tabPane.tabs(1).content = buildTabContent(
-        ContentFactory.createSrcContent(ctrlName, ctrlGroup))
+      ContentFactory.createSrcContent(ctrlName, ctrlGroup))
     tabPane
   }
 }

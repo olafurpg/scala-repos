@@ -14,19 +14,22 @@ trait SystemSettingsService {
 
   def saveSystemSettings(settings: SystemSettings): Unit = {
     defining(new java.util.Properties()) { props =>
-      settings.baseUrl.foreach(
-          x => props.setProperty(BaseURL, x.replaceFirst("/\\Z", "")))
+      settings.baseUrl.foreach(x =>
+        props.setProperty(BaseURL, x.replaceFirst("/\\Z", "")))
       settings.information.foreach(x => props.setProperty(Information, x))
       props.setProperty(
-          AllowAccountRegistration, settings.allowAccountRegistration.toString)
+        AllowAccountRegistration,
+        settings.allowAccountRegistration.toString)
       props.setProperty(
-          AllowAnonymousAccess, settings.allowAnonymousAccess.toString)
+        AllowAnonymousAccess,
+        settings.allowAnonymousAccess.toString)
       props.setProperty(
-          IsCreateRepoOptionPublic, settings.isCreateRepoOptionPublic.toString)
+        IsCreateRepoOptionPublic,
+        settings.isCreateRepoOptionPublic.toString)
       props.setProperty(Gravatar, settings.gravatar.toString)
       props.setProperty(Notification, settings.notification.toString)
-      settings.activityLogLimit.foreach(
-          x => props.setProperty(ActivityLogLimit, x.toString))
+      settings.activityLogLimit.foreach(x =>
+        props.setProperty(ActivityLogLimit, x.toString))
       props.setProperty(Ssh, settings.ssh.toString)
       settings.sshHost.foreach(x => props.setProperty(SshHost, x.trim))
       settings.sshPort.foreach(x => props.setProperty(SshPort, x.toString))
@@ -43,22 +46,22 @@ trait SystemSettingsService {
         }
       }
       props.setProperty(
-          LdapAuthentication, settings.ldapAuthentication.toString)
+        LdapAuthentication,
+        settings.ldapAuthentication.toString)
       if (settings.ldapAuthentication) {
         settings.ldap.map { ldap =>
           props.setProperty(LdapHost, ldap.host)
           ldap.port.foreach(x => props.setProperty(LdapPort, x.toString))
           ldap.bindDN.foreach(x => props.setProperty(LdapBindDN, x))
-          ldap.bindPassword.foreach(
-              x => props.setProperty(LdapBindPassword, x))
+          ldap.bindPassword.foreach(x => props.setProperty(LdapBindPassword, x))
           props.setProperty(LdapBaseDN, ldap.baseDN)
           props.setProperty(LdapUserNameAttribute, ldap.userNameAttribute)
-          ldap.additionalFilterCondition.foreach(
-              x => props.setProperty(LdapAdditionalFilterCondition, x))
-          ldap.fullNameAttribute.foreach(
-              x => props.setProperty(LdapFullNameAttribute, x))
-          ldap.mailAttribute.foreach(
-              x => props.setProperty(LdapMailAddressAttribute, x))
+          ldap.additionalFilterCondition.foreach(x =>
+            props.setProperty(LdapAdditionalFilterCondition, x))
+          ldap.fullNameAttribute.foreach(x =>
+            props.setProperty(LdapFullNameAttribute, x))
+          ldap.mailAttribute.foreach(x =>
+            props.setProperty(LdapMailAddressAttribute, x))
           ldap.tls.foreach(x => props.setProperty(LdapTls, x.toString))
           ldap.ssl.foreach(x => props.setProperty(LdapSsl, x.toString))
           ldap.keystore.foreach(x => props.setProperty(LdapKeystore, x))
@@ -78,50 +81,53 @@ trait SystemSettingsService {
         }
       }
       SystemSettings(
-          getOptionValue[String](props, BaseURL, None)
-            .map(x => x.replaceFirst("/\\Z", "")),
-          getOptionValue(props, Information, None),
-          getValue(props, AllowAccountRegistration, false),
-          getValue(props, AllowAnonymousAccess, true),
-          getValue(props, IsCreateRepoOptionPublic, true),
-          getValue(props, Gravatar, true),
-          getValue(props, Notification, false),
-          getOptionValue[Int](props, ActivityLogLimit, None),
-          getValue(props, Ssh, false),
-          getOptionValue[String](props, SshHost, None).map(_.trim),
-          getOptionValue(props, SshPort, Some(DefaultSshPort)),
-          getValue(props, UseSMTP, getValue(props, Notification, false)), // handle migration scenario from only notification to useSMTP
-          if (getValue(props, UseSMTP, getValue(props, Notification, false))) {
-            Some(
-                Smtp(getValue(props, SmtpHost, ""),
-                     getOptionValue(props, SmtpPort, Some(DefaultSmtpPort)),
-                     getOptionValue(props, SmtpUser, None),
-                     getOptionValue(props, SmtpPassword, None),
-                     getOptionValue[Boolean](props, SmtpSsl, None),
-                     getOptionValue(props, SmtpFromAddress, None),
-                     getOptionValue(props, SmtpFromName, None)))
-          } else {
-            None
-          },
-          getValue(props, LdapAuthentication, false),
-          if (getValue(props, LdapAuthentication, false)) {
-            Some(
-                Ldap(
-                    getValue(props, LdapHost, ""),
-                    getOptionValue(props, LdapPort, Some(DefaultLdapPort)),
-                    getOptionValue(props, LdapBindDN, None),
-                    getOptionValue(props, LdapBindPassword, None),
-                    getValue(props, LdapBaseDN, ""),
-                    getValue(props, LdapUserNameAttribute, ""),
-                    getOptionValue(props, LdapAdditionalFilterCondition, None),
-                    getOptionValue(props, LdapFullNameAttribute, None),
-                    getOptionValue(props, LdapMailAddressAttribute, None),
-                    getOptionValue[Boolean](props, LdapTls, None),
-                    getOptionValue[Boolean](props, LdapSsl, None),
-                    getOptionValue(props, LdapKeystore, None)))
-          } else {
-            None
-          }
+        getOptionValue[String](props, BaseURL, None)
+          .map(x => x.replaceFirst("/\\Z", "")),
+        getOptionValue(props, Information, None),
+        getValue(props, AllowAccountRegistration, false),
+        getValue(props, AllowAnonymousAccess, true),
+        getValue(props, IsCreateRepoOptionPublic, true),
+        getValue(props, Gravatar, true),
+        getValue(props, Notification, false),
+        getOptionValue[Int](props, ActivityLogLimit, None),
+        getValue(props, Ssh, false),
+        getOptionValue[String](props, SshHost, None).map(_.trim),
+        getOptionValue(props, SshPort, Some(DefaultSshPort)),
+        getValue(props, UseSMTP, getValue(props, Notification, false)), // handle migration scenario from only notification to useSMTP
+        if (getValue(props, UseSMTP, getValue(props, Notification, false))) {
+          Some(
+            Smtp(
+              getValue(props, SmtpHost, ""),
+              getOptionValue(props, SmtpPort, Some(DefaultSmtpPort)),
+              getOptionValue(props, SmtpUser, None),
+              getOptionValue(props, SmtpPassword, None),
+              getOptionValue[Boolean](props, SmtpSsl, None),
+              getOptionValue(props, SmtpFromAddress, None),
+              getOptionValue(props, SmtpFromName, None)
+            ))
+        } else {
+          None
+        },
+        getValue(props, LdapAuthentication, false),
+        if (getValue(props, LdapAuthentication, false)) {
+          Some(
+            Ldap(
+              getValue(props, LdapHost, ""),
+              getOptionValue(props, LdapPort, Some(DefaultLdapPort)),
+              getOptionValue(props, LdapBindDN, None),
+              getOptionValue(props, LdapBindPassword, None),
+              getValue(props, LdapBaseDN, ""),
+              getValue(props, LdapUserNameAttribute, ""),
+              getOptionValue(props, LdapAdditionalFilterCondition, None),
+              getOptionValue(props, LdapFullNameAttribute, None),
+              getOptionValue(props, LdapMailAddressAttribute, None),
+              getOptionValue[Boolean](props, LdapTls, None),
+              getOptionValue[Boolean](props, LdapSsl, None),
+              getOptionValue(props, LdapKeystore, None)
+            ))
+        } else {
+          None
+        }
       )
     }
   }
@@ -130,21 +136,22 @@ trait SystemSettingsService {
 object SystemSettingsService {
   import scala.reflect.ClassTag
 
-  case class SystemSettings(baseUrl: Option[String],
-                            information: Option[String],
-                            allowAccountRegistration: Boolean,
-                            allowAnonymousAccess: Boolean,
-                            isCreateRepoOptionPublic: Boolean,
-                            gravatar: Boolean,
-                            notification: Boolean,
-                            activityLogLimit: Option[Int],
-                            ssh: Boolean,
-                            sshHost: Option[String],
-                            sshPort: Option[Int],
-                            useSMTP: Boolean,
-                            smtp: Option[Smtp],
-                            ldapAuthentication: Boolean,
-                            ldap: Option[Ldap]) {
+  case class SystemSettings(
+      baseUrl: Option[String],
+      information: Option[String],
+      allowAccountRegistration: Boolean,
+      allowAnonymousAccess: Boolean,
+      isCreateRepoOptionPublic: Boolean,
+      gravatar: Boolean,
+      notification: Boolean,
+      activityLogLimit: Option[Int],
+      ssh: Boolean,
+      sshHost: Option[String],
+      sshPort: Option[Int],
+      useSMTP: Boolean,
+      smtp: Option[Smtp],
+      ldapAuthentication: Boolean,
+      ldap: Option[Ldap]) {
     def baseUrl(request: HttpServletRequest): String =
       baseUrl.fold(request.baseUrl)(_.stripSuffix("/"))
 
@@ -154,26 +161,28 @@ object SystemSettingsService {
       } yield SshAddress(host, sshPort.getOrElse(DefaultSshPort))
   }
 
-  case class Ldap(host: String,
-                  port: Option[Int],
-                  bindDN: Option[String],
-                  bindPassword: Option[String],
-                  baseDN: String,
-                  userNameAttribute: String,
-                  additionalFilterCondition: Option[String],
-                  fullNameAttribute: Option[String],
-                  mailAttribute: Option[String],
-                  tls: Option[Boolean],
-                  ssl: Option[Boolean],
-                  keystore: Option[String])
+  case class Ldap(
+      host: String,
+      port: Option[Int],
+      bindDN: Option[String],
+      bindPassword: Option[String],
+      baseDN: String,
+      userNameAttribute: String,
+      additionalFilterCondition: Option[String],
+      fullNameAttribute: Option[String],
+      mailAttribute: Option[String],
+      tls: Option[Boolean],
+      ssl: Option[Boolean],
+      keystore: Option[String])
 
-  case class Smtp(host: String,
-                  port: Option[Int],
-                  user: Option[String],
-                  password: Option[String],
-                  ssl: Option[Boolean],
-                  fromAddress: Option[String],
-                  fromName: Option[String])
+  case class Smtp(
+      host: String,
+      port: Option[Int],
+      user: Option[String],
+      password: Option[String],
+      ssl: Option[Boolean],
+      fromAddress: Option[String],
+      fromName: Option[String])
 
   case class SshAddress(host: String, port: Int)
 
@@ -215,22 +224,25 @@ object SystemSettingsService {
   private val LdapSsl = "ldap.ssl"
   private val LdapKeystore = "ldap.keystore"
 
-  private def getValue[A : ClassTag](
-      props: java.util.Properties, key: String, default: A): A =
+  private def getValue[A: ClassTag](
+      props: java.util.Properties,
+      key: String,
+      default: A): A =
     defining(props.getProperty(key)) { value =>
       if (value == null || value.isEmpty) default
       else convertType(value).asInstanceOf[A]
     }
 
-  private def getOptionValue[A : ClassTag](props: java.util.Properties,
-                                           key: String,
-                                           default: Option[A]): Option[A] =
+  private def getOptionValue[A: ClassTag](
+      props: java.util.Properties,
+      key: String,
+      default: Option[A]): Option[A] =
     defining(props.getProperty(key)) { value =>
       if (value == null || value.isEmpty) default
       else Some(convertType(value)).asInstanceOf[Option[A]]
     }
 
-  private def convertType[A : ClassTag](value: String) =
+  private def convertType[A: ClassTag](value: String) =
     defining(implicitly[ClassTag[A]].runtimeClass) { c =>
       if (c == classOf[Boolean]) value.toBoolean
       else if (c == classOf[Int]) value.toInt

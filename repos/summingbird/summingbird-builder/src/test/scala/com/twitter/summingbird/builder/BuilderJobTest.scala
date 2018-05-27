@@ -61,9 +61,11 @@ object TestJob {
 class TestJobWithOffline(env: Env) extends AbstractJob(env) {
   import TestJob._
 
-  EventSource.fromOnline {
-    Spout.fromTraversable(1 to 100)
-  }.withTime(new Date(_))
+  EventSource
+    .fromOnline {
+      Spout.fromTraversable(1 to 100)
+    }
+    .withTime(new Date(_))
     .map { i =>
       (100L, i)
     }
@@ -73,9 +75,11 @@ class TestJobWithOffline(env: Env) extends AbstractJob(env) {
 class TestJobWithOnline(env: Env) extends AbstractJob(env) {
   import TestJob._
 
-  EventSource.fromOnline {
-    Spout.fromTraversable(1 to 100)
-  }.withTime(new Date(_))
+  EventSource
+    .fromOnline {
+      Spout.fromTraversable(1 to 100)
+    }
+    .withTime(new Date(_))
     .map { i =>
       (100L, i)
     }
@@ -85,16 +89,16 @@ class TestJobWithOnline(env: Env) extends AbstractJob(env) {
 class BuilderJobTest extends WordSpec {
   "Builder API should NOT throw when building a storm job w/ onlineStore" in {
     AbstractJob(
-        "com.twitter.summingbird.builder.TestJobWithOnline",
-        StormEnv("name", Args(Array.empty[String]))
+      "com.twitter.summingbird.builder.TestJobWithOnline",
+      StormEnv("name", Args(Array.empty[String]))
     )
   }
 
   "Builder API should throw when building a storm job w/ missing onlineStore" in {
     intercept[Exception] {
       AbstractJob(
-          "com.twitter.summingbird.builder.TestJobWithOffline",
-          StormEnv("name", Args(Array.empty[String]))
+        "com.twitter.summingbird.builder.TestJobWithOffline",
+        StormEnv("name", Args(Array.empty[String]))
       )
     }
   }

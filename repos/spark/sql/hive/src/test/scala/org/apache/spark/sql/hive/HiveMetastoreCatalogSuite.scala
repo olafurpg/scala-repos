@@ -51,30 +51,32 @@ class HiveMetastoreCatalogSuite extends SparkFunSuite with TestHiveSingleton {
 }
 
 class DataSourceWithHiveMetastoreCatalogSuite
-    extends QueryTest with SQLTestUtils with TestHiveSingleton {
+    extends QueryTest
+    with SQLTestUtils
+    with TestHiveSingleton {
   import hiveContext._
   import testImplicits._
 
   private val testDF = range(1, 3)
     .select(
-        ('id + 0.1) cast DecimalType(10, 3) as 'd1,
-        'id cast StringType as 'd2
+      ('id + 0.1) cast DecimalType(10, 3) as 'd1,
+      'id cast StringType as 'd2
     )
     .coalesce(1)
 
   Seq(
-      "parquet" ->
+    "parquet" ->
       ("org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat",
-          "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat",
-          "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"),
-      "orc" ->
+      "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat",
+      "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"),
+    "orc" ->
       ("org.apache.hadoop.hive.ql.io.orc.OrcInputFormat",
-          "org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat",
-          "org.apache.hadoop.hive.ql.io.orc.OrcSerde")
+      "org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat",
+      "org.apache.hadoop.hive.ql.io.orc.OrcSerde")
   ).foreach {
     case (provider, (inputFormat, outputFormat, serde)) =>
       test(
-          s"Persist non-partitioned $provider relation into metastore as managed table") {
+        s"Persist non-partitioned $provider relation into metastore as managed table") {
         withTable("t") {
           withSQLConf(SQLConf.PARQUET_WRITE_LEGACY_FORMAT.key -> "true") {
             testDF.write
@@ -101,7 +103,7 @@ class DataSourceWithHiveMetastoreCatalogSuite
       }
 
       test(
-          s"Persist non-partitioned $provider relation into metastore as external table") {
+        s"Persist non-partitioned $provider relation into metastore as external table") {
         withTempPath { dir =>
           withTable("t") {
             val path = dir.getCanonicalFile
@@ -121,8 +123,9 @@ class DataSourceWithHiveMetastoreCatalogSuite
             assert(hiveTable.storage.serde === Some(serde))
 
             assert(hiveTable.tableType === CatalogTableType.EXTERNAL_TABLE)
-            assert(hiveTable.storage.locationUri === Some(
-                    path.toURI.toString.stripSuffix(File.separator)))
+            assert(
+              hiveTable.storage.locationUri === Some(
+                path.toURI.toString.stripSuffix(File.separator)))
 
             val columns = hiveTable.schema
             assert(columns.map(_.name) === Seq("d1", "d2"))
@@ -135,7 +138,7 @@ class DataSourceWithHiveMetastoreCatalogSuite
       }
 
       test(
-          s"Persist non-partitioned $provider relation into metastore as managed table using CTAS") {
+        s"Persist non-partitioned $provider relation into metastore as managed table using CTAS") {
         withTempPath { dir =>
           withTable("t") {
             val path = dir.getCanonicalPath

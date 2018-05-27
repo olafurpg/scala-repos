@@ -16,7 +16,9 @@ package distributions
  limitations under the License.
  */
 
-import org.apache.commons.math3.distribution.{CauchyDistribution => ApacheCauchyDistribution}
+import org.apache.commons.math3.distribution.{
+  CauchyDistribution => ApacheCauchyDistribution
+}
 import org.apache.commons.math3.random.RandomGenerator
 
 /**
@@ -30,8 +32,8 @@ class CauchyDistribution(median: Double, scale: Double)(
   val rng: RandomGenerator = rand.generator
   val inverseCumAccuracy: Double =
     ApacheCauchyDistribution.DEFAULT_INVERSE_ABSOLUTE_ACCURACY
-  protected final val inner = new ApacheCauchyDistribution(
-      rng, median, scale, inverseCumAccuracy)
+  protected final val inner =
+    new ApacheCauchyDistribution(rng, median, scale, inverseCumAccuracy)
 }
 
 object CauchyDistribution

@@ -28,7 +28,9 @@ private[persistence] object JournalProtocol {
     * (inclusive).
     */
   final case class DeleteMessagesTo(
-      persistenceId: String, toSequenceNr: Long, persistentActor: ActorRef)
+      persistenceId: String,
+      toSequenceNr: Long,
+      persistentActor: ActorRef)
       extends Request
 
   /**
@@ -37,10 +39,12 @@ private[persistence] object JournalProtocol {
     * @param messages messages to be written.
     * @param persistentActor write requestor.
     */
-  final case class WriteMessages(messages: immutable.Seq[PersistentEnvelope],
-                                 persistentActor: ActorRef,
-                                 actorInstanceId: Int)
-      extends Request with NoSerializationVerificationNeeded
+  final case class WriteMessages(
+      messages: immutable.Seq[PersistentEnvelope],
+      persistentActor: ActorRef,
+      actorInstanceId: Int)
+      extends Request
+      with NoSerializationVerificationNeeded
 
   /**
     * Reply message to a successful [[WriteMessages]] request. This reply is sent to the requestor
@@ -63,7 +67,8 @@ private[persistence] object JournalProtocol {
     * @param persistent successfully written message.
     */
   final case class WriteMessageSuccess(
-      persistent: PersistentRepr, actorInstanceId: Int)
+      persistent: PersistentRepr,
+      actorInstanceId: Int)
       extends Response
 
   /**
@@ -75,8 +80,11 @@ private[persistence] object JournalProtocol {
     * @param cause failure cause.
     */
   final case class WriteMessageRejected(
-      message: PersistentRepr, cause: Throwable, actorInstanceId: Int)
-      extends Response with NoSerializationVerificationNeeded
+      message: PersistentRepr,
+      cause: Throwable,
+      actorInstanceId: Int)
+      extends Response
+      with NoSerializationVerificationNeeded
 
   /**
     * Reply message to a failed [[WriteMessages]] request. For each contained [[PersistentRepr]] message
@@ -86,8 +94,11 @@ private[persistence] object JournalProtocol {
     * @param cause failure cause.
     */
   final case class WriteMessageFailure(
-      message: PersistentRepr, cause: Throwable, actorInstanceId: Int)
-      extends Response with NoSerializationVerificationNeeded
+      message: PersistentRepr,
+      cause: Throwable,
+      actorInstanceId: Int)
+      extends Response
+      with NoSerializationVerificationNeeded
 
   /**
     * Reply message to a [[WriteMessages]] with a non-persistent message.
@@ -95,7 +106,8 @@ private[persistence] object JournalProtocol {
     * @param message looped message.
     */
   final case class LoopMessageSuccess(message: Any, actorInstanceId: Int)
-      extends Response with NoSerializationVerificationNeeded
+      extends Response
+      with NoSerializationVerificationNeeded
 
   /**
     * Request to replay messages to `persistentActor`.
@@ -106,11 +118,12 @@ private[persistence] object JournalProtocol {
     * @param persistenceId requesting persistent actor id.
     * @param persistentActor requesting persistent actor.
     */
-  final case class ReplayMessages(fromSequenceNr: Long,
-                                  toSequenceNr: Long,
-                                  max: Long,
-                                  persistenceId: String,
-                                  persistentActor: ActorRef)
+  final case class ReplayMessages(
+      fromSequenceNr: Long,
+      toSequenceNr: Long,
+      max: Long,
+      persistenceId: String,
+      persistentActor: ActorRef)
       extends Request
 
   /**
@@ -120,7 +133,8 @@ private[persistence] object JournalProtocol {
     * @param persistent replayed message.
     */
   final case class ReplayedMessage(persistent: PersistentRepr)
-      extends Response with DeadLetterSuppression
+      extends Response
+      with DeadLetterSuppression
       with NoSerializationVerificationNeeded
 
   /**
@@ -133,12 +147,14 @@ private[persistence] object JournalProtocol {
     * @param highestSequenceNr highest stored sequence number.
     */
   case class RecoverySuccess(highestSequenceNr: Long)
-      extends Response with DeadLetterSuppression
+      extends Response
+      with DeadLetterSuppression
 
   /**
     * Reply message to a failed [[ReplayMessages]] request. This reply is sent to the requestor
     * if a replay could not be successfully completed.
     */
   final case class ReplayMessagesFailure(cause: Throwable)
-      extends Response with DeadLetterSuppression
+      extends Response
+      with DeadLetterSuppression
 }

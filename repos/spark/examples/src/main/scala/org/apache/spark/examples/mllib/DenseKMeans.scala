@@ -41,10 +41,11 @@ object DenseKMeans {
 
   import InitializationMode._
 
-  case class Params(input: String = null,
-                    k: Int = -1,
-                    numIterations: Int = 10,
-                    initializationMode: InitializationMode = Parallel)
+  case class Params(
+      input: String = null,
+      k: Int = -1,
+      numIterations: Int = 10,
+      initializationMode: InitializationMode = Parallel)
       extends AbstractParams[Params]
 
   def main(args: Array[String]) {
@@ -61,10 +62,10 @@ object DenseKMeans {
         .action((x, c) => c.copy(numIterations = x))
       opt[String]("initMode")
         .text(
-            s"initialization mode (${InitializationMode.values.mkString(",")}), " +
+          s"initialization mode (${InitializationMode.values.mkString(",")}), " +
             s"default: ${defaultParams.initializationMode}")
-        .action((x,
-            c) => c.copy(initializationMode = InitializationMode.withName(x)))
+        .action((x, c) =>
+          c.copy(initializationMode = InitializationMode.withName(x)))
       arg[String]("<input>")
         .text("input paths to examples")
         .required()
@@ -99,7 +100,7 @@ object DenseKMeans {
     println(s"numExamples = $numExamples.")
 
     val initMode = params.initializationMode match {
-      case Random => KMeans.RANDOM
+      case Random   => KMeans.RANDOM
       case Parallel => KMeans.K_MEANS_PARALLEL
     }
 

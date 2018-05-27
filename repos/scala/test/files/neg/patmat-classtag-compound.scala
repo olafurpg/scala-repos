@@ -8,9 +8,9 @@ object Test extends App {
   //   - type tests on compound types.
   //
   // We could try make these work together, but an unchecked warning is okay for now.
-  def x[A : reflect.ClassTag](a: Any): Boolean = a match {
+  def x[A: reflect.ClassTag](a: Any): Boolean = a match {
     case b: A with Bar => true
-    case _ => false
+    case _             => false
   }
   println(x[Foo](new Bar {}))
   println(x[String](""))

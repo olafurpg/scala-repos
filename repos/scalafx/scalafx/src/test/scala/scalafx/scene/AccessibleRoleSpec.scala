@@ -39,6 +39,6 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class AccessibleRoleSpec
     extends SFXEnumDelegateSpec[jfxs.AccessibleRole, AccessibleRole](
-        javaClass = classOf[jfxs.AccessibleRole],
-        scalaClass = classOf[AccessibleRole],
-        companion = AccessibleRole)
+      javaClass = classOf[jfxs.AccessibleRole],
+      scalaClass = classOf[AccessibleRole],
+      companion = AccessibleRole)

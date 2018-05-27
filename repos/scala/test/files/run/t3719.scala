@@ -7,7 +7,7 @@ object Days extends Enumeration {
       this match {
         case Sun => false
         case Sat => false
-        case _ => true
+        case _   => true
       }
   }
 }

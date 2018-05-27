@@ -20,20 +20,20 @@ class FormatterTest extends FunSuite {
 
   test("add should handle empties") {
     assert(
-        Formatter.add(Map.empty, Seq.empty, "big") == Map(
-            Formatter.Eponymous -> "big")
+      Formatter.add(Map.empty, Seq.empty, "big") == Map(
+        Formatter.Eponymous -> "big")
     )
   }
 
   test(
-      "add should handle putting an entry in an existing map if nothing's there") {
+    "add should handle putting an entry in an existing map if nothing's there") {
     assert(
-        Formatter.add(Map.empty, Seq("it's"), "big") == Map("it's" -> "big")
+      Formatter.add(Map.empty, Seq("it's"), "big") == Map("it's" -> "big")
     )
   }
 
   test(
-      "add should handle putting recursive entries in an existing map if nothing's there") {
+    "add should handle putting recursive entries in an existing map if nothing's there") {
     val actual = Formatter.add(Map.empty, Seq("it's", "very"), "big")
     val expected = Map("it's" -> Map("very" -> "big"))
     assert(actual == expected)
@@ -41,7 +41,9 @@ class FormatterTest extends FunSuite {
 
   test("add should handle colliding prefixes") {
     val actual = Formatter.add(
-        Map("it's" -> Map("not" -> "small")), Seq("it's", "very"), "big")
+      Map("it's" -> Map("not" -> "small")),
+      Seq("it's", "very"),
+      "big")
     val expected = Map("it's" -> Map("very" -> "big", "not" -> "small"))
     assert(actual == expected)
   }

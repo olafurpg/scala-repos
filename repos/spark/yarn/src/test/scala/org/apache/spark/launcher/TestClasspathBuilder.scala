@@ -25,8 +25,7 @@ import java.util.{List => JList, Map => JMap}
   */
 private[spark] class TestClasspathBuilder extends AbstractCommandBuilder {
 
-  childEnv.put(
-      CommandBuilderUtils.ENV_SPARK_HOME, sys.props("spark.test.home"))
+  childEnv.put(CommandBuilderUtils.ENV_SPARK_HOME, sys.props("spark.test.home"))
 
   override def buildClassPath(extraCp: String): JList[String] =
     super.buildClassPath(extraCp)

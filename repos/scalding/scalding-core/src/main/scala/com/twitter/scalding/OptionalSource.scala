@@ -18,8 +18,7 @@ package com.twitter.scalding
 import scala.util.{Try, Success, Failure}
 import cascading.tap.Tap
 
-case class OptionalSource[T](src: Mappable[T])
-    extends Source with Mappable[T] {
+case class OptionalSource[T](src: Mappable[T]) extends Source with Mappable[T] {
   override def converter[U >: T] =
     TupleConverter.asSuperConverter(src.converter)
 

@@ -15,7 +15,8 @@ object mpow extends UFunc {
       requireSquareMatrix(m)
       val Eig(real, imag, evectors) = eig(m)
       require(
-          norm(imag, 1.0) == 0.0, "We cannot handle complex eigenvalues yet.")
+        norm(imag, 1.0) == 0.0,
+        "We cannot handle complex eigenvalues yet.")
       val exped = new DenseVector(real.data.map(scala.math.pow(_, exp)))
 
       (evectors.t \ (evectors * diag(exped)).t).t

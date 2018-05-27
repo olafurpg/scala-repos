@@ -39,6 +39,6 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class SideSpec
     extends SFXEnumDelegateSpec[jfxg.Side, Side](
-        javaClass = classOf[jfxg.Side],
-        scalaClass = classOf[Side],
-        companion = Side)
+      javaClass = classOf[jfxg.Side],
+      scalaClass = classOf[Side],
+      companion = Side)

@@ -129,7 +129,7 @@ trait BaseField extends FieldIdentifier with util.BaseField {
 
   def label: NodeSeq = uniqueFieldId match {
     case Full(id) => <label for={id}>{displayName}</label>
-    case _ => NodeSeq.Empty
+    case _        => NodeSeq.Empty
   }
 
   def asString: String
@@ -197,8 +197,8 @@ trait TypedField[ThisType] extends BaseField {
   protected def setFromJString(jvalue: JValue)(
       decode: String => Box[MyType]): Box[MyType] = jvalue match {
     case JNothing | JNull if optional_? => setBox(Empty)
-    case JString(s) => setBox(decode(s))
-    case other => setBox(FieldHelpers.expectedA("JString", other))
+    case JString(s)                     => setBox(decode(s))
+    case other                          => setBox(FieldHelpers.expectedA("JString", other))
   }
 
   def validations: List[ValidationFunction] = Nil
@@ -208,15 +208,15 @@ trait TypedField[ThisType] extends BaseField {
 
   /** Helper function that does validation of a value by using the validators specified for the field */
   protected def runValidation(in: Box[MyType]): List[FieldError] = in match {
-    case Full(_) => validations.flatMap(_ (toValueType(in))).distinct
-    case Empty => Nil
+    case Full(_)            => validations.flatMap(_(toValueType(in))).distinct
+    case Empty              => Nil
     case Failure(msg, _, _) => Text(msg)
   }
 
   protected implicit def boxNodeToFieldError(in: Box[Node]): List[FieldError] =
     in match {
       case Full(node) => List(FieldError(this, node))
-      case _ => Nil
+      case _          => Nil
     }
 
   protected implicit def nodeToFieldError(node: Node): List[FieldError] =
@@ -241,17 +241,17 @@ trait TypedField[ThisType] extends BaseField {
     val oldValue = data
     data = in match {
       case _ if !canWrite_? => Failure(noValueErrorMessage)
-      case Full(_) => set_!(in)
-      case _ if optional_? => set_!(in)
-      case (f: Failure) => set_!(f) // preserve failures set in
-      case _ => Failure(notOptionalErrorMessage)
+      case Full(_)          => set_!(in)
+      case _ if optional_?  => set_!(in)
+      case (f: Failure)     => set_!(f) // preserve failures set in
+      case _                => Failure(notOptionalErrorMessage)
     }
     if (forceDirty_?) {
       dirty_?(true)
     } else if (!dirty_?) {
       val same = (oldValue, data) match {
         case (Full(ov), Full(nv)) => ov == nv
-        case (a, b) => a == b
+        case (a, b)               => a == b
       }
       dirty_?(!same)
     }
@@ -280,9 +280,10 @@ trait TypedField[ThisType] extends BaseField {
     liftSetFilterToBox _ :: Nil
 
   def runFilters(
-      in: Box[MyType], filter: List[Box[MyType] => Box[MyType]]): Box[MyType] =
+      in: Box[MyType],
+      filter: List[Box[MyType] => Box[MyType]]): Box[MyType] =
     filter match {
-      case Nil => in
+      case Nil     => in
       case x :: xs => runFilters(x(in), xs)
     }
 
@@ -318,15 +319,15 @@ trait TypedField[ThisType] extends BaseField {
       setBox(Full(value.asInstanceOf[MyType]))
     case (value) :: _ if m.runtimeClass.isInstance(value) =>
       setBox(Full(value.asInstanceOf[MyType]))
-    case (value: String) => setFromString(value)
-    case Some(value: String) => setFromString(value)
-    case Full(value: String) => setFromString(value)
+    case (value: String)      => setFromString(value)
+    case Some(value: String)  => setFromString(value)
+    case Full(value: String)  => setFromString(value)
     case (value: String) :: _ => setFromString(value)
-    case null | None | Empty => setBox(defaultValueBox)
-    case (failure: Failure) => setBox(failure)
-    case Some(other) => setFromString(String.valueOf(other))
-    case Full(other) => setFromString(String.valueOf(other))
-    case other => setFromString(String.valueOf(other))
+    case null | None | Empty  => setBox(defaultValueBox)
+    case (failure: Failure)   => setBox(failure)
+    case Some(other)          => setFromString(String.valueOf(other))
+    case Full(other)          => setFromString(String.valueOf(other))
+    case other                => setFromString(String.valueOf(other))
   }
 
   /**
@@ -352,13 +353,14 @@ trait TypedField[ThisType] extends BaseField {
 
   /** Clear the value of this field */
   def clear: Unit = optional_? match {
-    case true => setBox(Empty)
+    case true  => setBox(Empty)
     case false => setBox(defaultValueBox)
   }
 }
 
 trait MandatoryTypedField[ThisType]
-    extends TypedField[ThisType] with Product1[ThisType] {
+    extends TypedField[ThisType]
+    with Product1[ThisType] {
 
   /**
     * ValueType represents the type that users will work with.  For MandatoryTypeField, this is
@@ -400,14 +402,15 @@ trait MandatoryTypedField[ThisType]
 
   override def toString = valueBox match {
     case Full(null) | null => "null"
-    case Full(v) => v.toString
+    case Full(v)           => v.toString
     case _ =>
       defaultValueBox.map(v => if (v != null) v.toString else "null") openOr ""
   }
 }
 
 trait OptionalTypedField[ThisType]
-    extends TypedField[ThisType] with Product1[Box[ThisType]] {
+    extends TypedField[ThisType]
+    with Product1[Box[ThisType]] {
 
   /**
     * ValueType represents the type that users will work with.  For OptionalTypedField, this is
@@ -450,7 +453,7 @@ trait OptionalTypedField[ThisType]
 
   override def toString = valueBox match {
     case Full(null) | null => "null"
-    case Full(v) => v.toString
+    case Full(v)           => v.toString
     case _ =>
       defaultValueBox.map(v => if (v != null) v.toString else "null") openOr ""
   }
@@ -460,7 +463,8 @@ trait OptionalTypedField[ThisType]
   * A simple field that can store and retrieve a value of a given type
   */
 trait Field[ThisType, OwnerType <: Record[OwnerType]]
-    extends OwnedField[OwnerType] with TypedField[ThisType] {
+    extends OwnedField[OwnerType]
+    with TypedField[ThisType] {
 
   def apply(in: MyType): OwnerType = apply(Full(in))
 
@@ -485,8 +489,8 @@ trait Field[ThisType, OwnerType <: Record[OwnerType]]
 trait DisplayWithLabel[OwnerType <: Record[OwnerType]]
     extends OwnedField[OwnerType] {
   override abstract def toForm: Box[NodeSeq] =
-    for (id <- uniqueFieldId; control <- super.toForm) yield
-      <div id={ id + "_holder" }>
+    for (id <- uniqueFieldId; control <- super.toForm)
+      yield <div id={ id + "_holder" }>
         <div><label for={ id }>{ displayName }</label></div>
         { control }
         <lift:msg id={id} errorClass="lift_error"/>
@@ -502,7 +506,8 @@ trait KeyField[
 
 object FieldHelpers {
   def expectedA(what: String, notA: AnyRef): Failure =
-    Failure("Expected a " + what + ", not a " +
+    Failure(
+      "Expected a " + what + ", not a " +
         (if (notA == null) "null" else notA.getClass.getName))
 }
 

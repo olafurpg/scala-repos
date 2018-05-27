@@ -24,18 +24,20 @@ object StatsReceivers {
     * Java compatible version of [[StatsReceiver.addGauge]].
     */
   @varargs
-  def addGauge(statsReceiver: StatsReceiver,
-               callable: Callable[JFloat],
-               name: String*): Gauge =
+  def addGauge(
+      statsReceiver: StatsReceiver,
+      callable: Callable[JFloat],
+      name: String*): Gauge =
     statsReceiver.addGauge(name: _*)(callable.call())
 
   /**
     * Java compatible version of [[StatsReceiver.provideGauge]].
     */
   @varargs
-  def provideGauge(statsReceiver: StatsReceiver,
-                   callable: Callable[JFloat],
-                   name: String*): Unit =
+  def provideGauge(
+      statsReceiver: StatsReceiver,
+      callable: Callable[JFloat],
+      name: String*): Unit =
     statsReceiver.provideGauge(name: _*)(callable.call())
 
   /**
@@ -164,7 +166,7 @@ trait StatsReceiver { self =>
   @varargs
   final def scope(namespaces: String*): StatsReceiver =
     namespaces.foldLeft(this)(
-        (statsReceiver, name) => statsReceiver.scope(name))
+      (statsReceiver, name) => statsReceiver.scope(name))
 
   /**
     * Prepend a suffix value to the next scope.

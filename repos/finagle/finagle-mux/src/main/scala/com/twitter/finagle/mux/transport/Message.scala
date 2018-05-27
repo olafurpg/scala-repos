@@ -4,7 +4,11 @@ import com.twitter.finagle.tracing.{SpanId, TraceId, Flags}
 import com.twitter.finagle.{Dtab, Dentry, NameTree, Path}
 import com.twitter.io.Charsets
 import com.twitter.util.{Duration, Time, Updatable}
-import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers, ReadOnlyChannelBuffer}
+import org.jboss.netty.buffer.{
+  ChannelBuffer,
+  ChannelBuffers,
+  ReadOnlyChannelBuffer
+}
 import scala.collection.mutable.ArrayBuffer
 
 /**
@@ -129,17 +133,19 @@ private[twitter] object Message {
     }
   }
 
-  case class Tinit(tag: Int,
-                   version: Short,
-                   headers: Seq[(ChannelBuffer, ChannelBuffer)])
+  case class Tinit(
+      tag: Int,
+      version: Short,
+      headers: Seq[(ChannelBuffer, ChannelBuffer)])
       extends Message {
     def typ: Byte = Types.Tinit
     lazy val buf: ChannelBuffer = Init.encode(version, headers)
   }
 
-  case class Rinit(tag: Int,
-                   version: Short,
-                   headers: Seq[(ChannelBuffer, ChannelBuffer)])
+  case class Rinit(
+      tag: Int,
+      version: Short,
+      headers: Seq[(ChannelBuffer, ChannelBuffer)])
       extends Message {
     def typ: Byte = Types.Rinit
     lazy val buf: ChannelBuffer = Init.encode(version, headers)
@@ -208,11 +214,12 @@ private[twitter] object Message {
 
   private[this] val noBytes = Array.empty[Byte]
 
-  case class Tdispatch(tag: Int,
-                       contexts: Seq[(ChannelBuffer, ChannelBuffer)],
-                       dst: Path,
-                       dtab: Dtab,
-                       req: ChannelBuffer)
+  case class Tdispatch(
+      tag: Int,
+      contexts: Seq[(ChannelBuffer, ChannelBuffer)],
+      dst: Path,
+      dtab: Dtab,
+      req: ChannelBuffer)
       extends Message {
     def typ = Types.Tdispatch
     lazy val buf = {
@@ -285,9 +292,10 @@ private[twitter] object Message {
   }
 
   /** A reply to a `Tdispatch` message */
-  abstract class Rdispatch(status: Byte,
-                           contexts: Seq[(ChannelBuffer, ChannelBuffer)],
-                           body: ChannelBuffer)
+  abstract class Rdispatch(
+      status: Byte,
+      contexts: Seq[(ChannelBuffer, ChannelBuffer)],
+      body: ChannelBuffer)
       extends Message {
     def typ = Types.Rdispatch
     lazy val buf = {
@@ -320,18 +328,21 @@ private[twitter] object Message {
     }
   }
 
-  case class RdispatchOk(tag: Int,
-                         contexts: Seq[(ChannelBuffer, ChannelBuffer)],
-                         reply: ChannelBuffer)
+  case class RdispatchOk(
+      tag: Int,
+      contexts: Seq[(ChannelBuffer, ChannelBuffer)],
+      reply: ChannelBuffer)
       extends Rdispatch(0, contexts, reply)
 
-  case class RdispatchError(tag: Int,
-                            contexts: Seq[(ChannelBuffer, ChannelBuffer)],
-                            error: String)
+  case class RdispatchError(
+      tag: Int,
+      contexts: Seq[(ChannelBuffer, ChannelBuffer)],
+      error: String)
       extends Rdispatch(1, contexts, encodeString(error))
 
   case class RdispatchNack(
-      tag: Int, contexts: Seq[(ChannelBuffer, ChannelBuffer)])
+      tag: Int,
+      contexts: Seq[(ChannelBuffer, ChannelBuffer)])
       extends Rdispatch(2, contexts, ChannelBuffers.EMPTY_BUFFER)
 
   /** Indicates to the client to stop sending new requests. */
@@ -357,7 +368,7 @@ private[twitter] object Message {
     def tag = ???
 
     private[this] val cb = new ReadOnlyChannelBuffer(
-        encode(Tping(Tags.PingTag)))
+      encode(Tping(Tags.PingTag)))
     cb.markReaderIndex()
 
     def buf = {
@@ -390,10 +401,12 @@ private[twitter] object Message {
       extends MarkerMessage {
     def typ = Types.BAD_Tdiscarded
     lazy val buf = ChannelBuffers.wrappedBuffer(
-        ChannelBuffers.wrappedBuffer(Array[Byte]((which >> 16 & 0xff).toByte,
-                                                 (which >> 8 & 0xff).toByte,
-                                                 (which & 0xff).toByte)),
-        encodeString(why))
+      ChannelBuffers.wrappedBuffer(
+        Array[Byte](
+          (which >> 16 & 0xff).toByte,
+          (which >> 8 & 0xff).toByte,
+          (which & 0xff).toByte)),
+      encodeString(why))
   }
 
   object Tlease {
@@ -468,7 +481,7 @@ private[twitter] object Message {
       val key = buf.readByte()
       val vsize = buf.readByte().toInt match {
         case s if s < 0 => s + 256
-        case s => s
+        case s          => s
       }
 
       if (buf.readableBytes < vsize)
@@ -481,10 +494,11 @@ private[twitter] object Message {
           if (vsize != 24)
             throw BadMessageException("bad traceid size %d".format(vsize))
           trace3 = Some(
-              (SpanId(buf.readLong()), // spanId
-               SpanId(buf.readLong()), // parentId
-               SpanId(buf.readLong())) // traceId
-              )
+            (
+              SpanId(buf.readLong()), // spanId
+              SpanId(buf.readLong()), // parentId
+              SpanId(buf.readLong())) // traceId
+          )
 
         case Treq.Keys.TraceFlag =>
           // We only know about bit=0, so discard
@@ -503,11 +517,12 @@ private[twitter] object Message {
     val id = trace3 match {
       case Some((spanId, parentId, traceId)) =>
         Some(
-            TraceId(Some(traceId),
-                    Some(parentId),
-                    spanId,
-                    None,
-                    Flags(traceFlags)))
+          TraceId(
+            Some(traceId),
+            Some(parentId),
+            spanId,
+            None,
+            Flags(traceFlags)))
       case None => None
     }
 
@@ -585,7 +600,7 @@ private[twitter] object Message {
       throw BadMessageException("short Tdiscarded message")
     val which =
       ((buf.readByte() & 0xff) << 16) | ((buf.readByte() & 0xff) << 8) |
-      (buf.readByte() & 0xff)
+        (buf.readByte() & 0xff)
     Tdiscarded(which, decodeUtf8(buf))
   }
 
@@ -609,20 +624,20 @@ private[twitter] object Message {
       case Types.Rinit =>
         val (version, ctx) = Init.decode(buf)
         Rinit(tag, version, ctx)
-      case Types.Treq => decodeTreq(tag, buf)
-      case Types.Rreq => decodeRreq(tag, buf)
-      case Types.Tdispatch => decodeTdispatch(tag, buf)
-      case Types.Rdispatch => decodeRdispatch(tag, buf)
-      case Types.Tdrain => Tdrain(tag)
-      case Types.Rdrain => Rdrain(tag)
-      case Types.Tping => Tping(tag)
-      case Types.Rping => Rping(tag)
-      case Types.Rerr | Types.BAD_Rerr => Rerr(tag, decodeUtf8(buf))
+      case Types.Treq                              => decodeTreq(tag, buf)
+      case Types.Rreq                              => decodeRreq(tag, buf)
+      case Types.Tdispatch                         => decodeTdispatch(tag, buf)
+      case Types.Rdispatch                         => decodeRdispatch(tag, buf)
+      case Types.Tdrain                            => Tdrain(tag)
+      case Types.Rdrain                            => Rdrain(tag)
+      case Types.Tping                             => Tping(tag)
+      case Types.Rping                             => Rping(tag)
+      case Types.Rerr | Types.BAD_Rerr             => Rerr(tag, decodeUtf8(buf))
       case Types.Tdiscarded | Types.BAD_Tdiscarded => decodeTdiscarded(buf)
-      case Types.Tlease => decodeTlease(buf)
+      case Types.Tlease                            => decodeTlease(buf)
       case unknown =>
         throw new BadMessageException(
-            s"unknown message type: $unknown [tag=$tag]")
+          s"unknown message type: $unknown [tag=$tag]")
     }
   }
 
@@ -633,10 +648,10 @@ private[twitter] object Message {
         throw new BadMessageException("invalid tag number %d".format(m.tag))
 
       val head = Array[Byte](
-          m.typ,
-          (m.tag >> 16 & 0xff).toByte,
-          (m.tag >> 8 & 0xff).toByte,
-          (m.tag & 0xff).toByte
+        m.typ,
+        (m.tag >> 16 & 0xff).toByte,
+        (m.tag >> 8 & 0xff).toByte,
+        (m.tag & 0xff).toByte
       )
 
       ChannelBuffers.wrappedBuffer(ChannelBuffers.wrappedBuffer(head), m.buf)

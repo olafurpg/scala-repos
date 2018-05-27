@@ -2,7 +2,11 @@ package org.jetbrains.sbt
 package project
 
 import com.intellij.notification.{Notification, NotificationType, Notifications}
-import com.intellij.openapi.externalSystem.model.task.{ExternalSystemTaskType, ExternalSystemTaskId, ExternalSystemTaskNotificationListenerAdapter}
+import com.intellij.openapi.externalSystem.model.task.{
+  ExternalSystemTaskType,
+  ExternalSystemTaskId,
+  ExternalSystemTaskNotificationListenerAdapter
+}
 import org.jetbrains.sbt.project.settings.SbtLocalSettings
 
 /**
@@ -12,7 +16,9 @@ import org.jetbrains.sbt.project.settings.SbtLocalSettings
 class SbtNotificationListener
     extends ExternalSystemTaskNotificationListenerAdapter {
   override def onTaskOutput(
-      id: ExternalSystemTaskId, text: String, stdOut: Boolean) {
+      id: ExternalSystemTaskId,
+      text: String,
+      stdOut: Boolean) {
     // TODO this check must be performed in the External System itself (see SCL-7405)
     if (id.getProjectSystemId == SbtProjectSystem.Id) {
       processOutput(text)
@@ -23,7 +29,7 @@ class SbtNotificationListener
     for {
       project <- Option(id.findProject())
       settings <- Option(SbtLocalSettings.getInstance(project))
-                     if id.getType == ExternalSystemTaskType.RESOLVE_PROJECT
+      if id.getType == ExternalSystemTaskType.RESOLVE_PROJECT
     } {
       settings.lastUpdateTimestamp = System.currentTimeMillis()
     }
@@ -33,10 +39,11 @@ class SbtNotificationListener
     text match {
       case WarningMessage(message) =>
         Notifications.Bus.notify(
-            new Notification("scala",
-                             "SBT project import",
-                             message,
-                             NotificationType.WARNING))
+          new Notification(
+            "scala",
+            "SBT project import",
+            message,
+            NotificationType.WARNING))
       case _ => // do nothing
     }
   }

@@ -22,8 +22,9 @@ object MonadCatchIOTest extends SpecLite {
   // using syntax, return a function that consumes a T[A] and evaluates the corresponding T[B]
   // using the given predicate. Kind of contrived but it saves a lot of duplication and lets
   // us test the module and syntax at the same time.
-  def mkTest[A, B](a: (MonadCatchIO.type, T[A]) => T[B],
-                   b: T[A] => T[B]): T[A] => (T[B] => Boolean) => Boolean =
+  def mkTest[A, B](
+      a: (MonadCatchIO.type, T[A]) => T[B],
+      b: T[A] => T[B]): T[A] => (T[B] => Boolean) => Boolean =
     t => f => f(a(MonadCatchIO, t)) && f(b(t))
 
   // Used by the catchSome* tests below
@@ -32,8 +33,9 @@ object MonadCatchIOTest extends SpecLite {
 
   "MonadCatchIO.catchSome" should {
     val test =
-      mkTest[Int, Int](_.catchSome(_)(catch1, (s: String) => ok(s.length)),
-                       _.catchSome(catch1, (s: String) => ok(s.length)))
+      mkTest[Int, Int](
+        _.catchSome(_)(catch1, (s: String) => ok(s.length)),
+        _.catchSome(catch1, (s: String) => ok(s.length)))
     "do nothing if nothing thrown" in {
       test(ok(3))(_.run(1).unsafePerformIO == 3)
     }
@@ -64,13 +66,14 @@ object MonadCatchIOTest extends SpecLite {
 
   "MonadCatchIO.catchSomeLeft" should {
     val test = mkTest[Int, String \/ Int](
-        _.catchSomeLeft(_)(catch1), _.catchSomeLeft(catch1))
+      _.catchSomeLeft(_)(catch1),
+      _.catchSomeLeft(catch1))
     "do nothing if nothing thrown" in {
       test(ok(3))(_.run(1).unsafePerformIO == \/-(3))
     }
     "catch some exceptions" in {
       test(ok(3) >> fail[Int](err1))(
-          _.run(1).unsafePerformIO == -\/(err1.getMessage))
+        _.run(1).unsafePerformIO == -\/(err1.getMessage))
     }
     "not catch other exceptions" in {
       test(ok(3) >> fail[Int](err2)) { a =>

@@ -5,21 +5,21 @@ import scalaz.syntax.show._
 
 sealed abstract class Either3[+A, +B, +C] extends Product with Serializable {
   def fold[Z](left: A => Z, middle: B => Z, right: C => Z): Z = this match {
-    case Left3(a) => left(a)
+    case Left3(a)   => left(a)
     case Middle3(b) => middle(b)
-    case Right3(c) => right(c)
+    case Right3(c)  => right(c)
   }
 
   def eitherLeft: (A \/ B) \/ C = this match {
-    case Left3(a) => -\/(-\/(a))
+    case Left3(a)   => -\/(-\/(a))
     case Middle3(b) => -\/(\/-(b))
-    case Right3(c) => \/-(c)
+    case Right3(c)  => \/-(c)
   }
 
   def eitherRight: A \/ (B \/ C) = this match {
-    case Left3(a) => -\/(a)
+    case Left3(a)   => -\/(a)
     case Middle3(b) => \/-(-\/(b))
-    case Right3(c) => \/-(\/-(c))
+    case Right3(c)  => \/-(\/-(c))
   }
 
   def leftOr[Z](z: => Z)(f: A => Z) = fold(f, _ => z, _ => z)
@@ -36,23 +36,22 @@ object Either3 {
   def middle3[A, B, C](b: B): Either3[A, B, C] = Middle3(b)
   def right3[A, B, C](c: C): Either3[A, B, C] = Right3(c)
 
-  implicit def equal[
-      A : Equal, B : Equal, C : Equal]: Equal[Either3[A, B, C]] =
+  implicit def equal[A: Equal, B: Equal, C: Equal]: Equal[Either3[A, B, C]] =
     new Equal[Either3[A, B, C]] {
       def equal(e1: Either3[A, B, C], e2: Either3[A, B, C]) = (e1, e2) match {
-        case (Left3(a1), Left3(a2)) => a1 === a2
+        case (Left3(a1), Left3(a2))     => a1 === a2
         case (Middle3(b1), Middle3(b2)) => b1 === b2
-        case (Right3(c1), Right3(c2)) => c1 === c2
-        case _ => false
+        case (Right3(c1), Right3(c2))   => c1 === c2
+        case _                          => false
       }
     }
 
-  implicit def show[A : Show, B : Show, C : Show]: Show[Either3[A, B, C]] =
+  implicit def show[A: Show, B: Show, C: Show]: Show[Either3[A, B, C]] =
     new Show[Either3[A, B, C]] {
       override def show(v: Either3[A, B, C]) = v match {
-        case Left3(a) => Cord("Left3(", a.shows, ")")
+        case Left3(a)   => Cord("Left3(", a.shows, ")")
         case Middle3(b) => Cord("Middle3(", b.shows, ")")
-        case Right3(c) => Cord("Right3(", c.shows, ")")
+        case Right3(c)  => Cord("Right3(", c.shows, ")")
       }
     }
 }

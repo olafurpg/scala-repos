@@ -11,8 +11,8 @@ class NoCodingSpec extends CoderSpec {
 
   override protected def corruptInputCheck = false
 
-  protected def newEncodedOutputStream(
-      underlying: OutputStream): OutputStream = underlying
+  protected def newEncodedOutputStream(underlying: OutputStream): OutputStream =
+    underlying
   protected def newDecodedInputStream(underlying: InputStream): InputStream =
     underlying
 }

@@ -24,7 +24,7 @@ class CookieSignerSpec extends Specification {
       val cryptoConfig = CryptoConfig(key, None, "AES")
       val signer = new HMACSHA1CookieSigner(cryptoConfig)
       signer.sign(text, key.getBytes("UTF-8")) must be_==(
-          "470037631bddcbd13bb85d80d531c97a340f836f")
+        "470037631bddcbd13bb85d80d531c97a340f836f")
     }
 
     "be able to sign input using HMAC-SHA1 using an explicitly passed in key (same as secret)" in {
@@ -33,7 +33,7 @@ class CookieSignerSpec extends Specification {
       val cryptoConfig = CryptoConfig(key, None, "AES")
       val signer = new HMACSHA1CookieSigner(cryptoConfig)
       signer.sign(text, key.getBytes("UTF-8")) must be_==(
-          "94f63b1470ee74e15dc15fd704e26b0df36ef848")
+        "94f63b1470ee74e15dc15fd704e26b0df36ef848")
     }
   }
 }

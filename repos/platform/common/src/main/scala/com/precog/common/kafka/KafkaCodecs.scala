@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -63,12 +63,12 @@ trait EncodingFlags {
       if (stop == stopByte) {
         success(msgType)
       } else {
-        failure(Error.invalid(
-                "Invalid message: bad stop byte. Found [" + stop + "]"))
+        failure(
+          Error.invalid("Invalid message: bad stop byte. Found [" + stop + "]"))
       }
     } else {
-      failure(Error.invalid(
-              "Invalid message: bad magic byte. Found [" + magic + "]"))
+      failure(
+        Error.invalid("Invalid message: bad magic byte. Found [" + magic + "]"))
     }
   }
 }
@@ -93,9 +93,8 @@ object EventEncoding extends EncodingFlags with Logging {
     val msgBuffer = charset.encode(serialized)
     val bytes = ByteBuffer.allocate(msgBuffer.limit + 3)
     writeHeader(
-        bytes,
-        event.fold(
-            _ => jsonIngestFlag, _ => jsonArchiveFlag, _ => storeFileFlag))
+      bytes,
+      event.fold(_ => jsonIngestFlag, _ => jsonArchiveFlag, _ => storeFileFlag))
     bytes.put(msgBuffer)
     bytes.flip()
     bytes
@@ -110,11 +109,11 @@ object EventEncoding extends EncodingFlags with Logging {
       msgType <- readHeader(buffer)
       jv <- ((Error.thrown _) <-: JParser.parseFromByteBuffer(buffer))
       event <- msgType match {
-        case `jsonIngestFlag` => jv.validated[Ingest]
-        case `jsonArchiveFlag` => jv.validated[Archive]
-        case `jsonIngestMessageFlag` => jv.validated[Ingest]("ingest")
+        case `jsonIngestFlag`         => jv.validated[Ingest]
+        case `jsonArchiveFlag`        => jv.validated[Archive]
+        case `jsonIngestMessageFlag`  => jv.validated[Ingest]("ingest")
         case `jsonArchiveMessageFlag` => jv.validated[Archive]("archive")
-        case `storeFileFlag` => jv.validated[StoreFile]
+        case `storeFileFlag`          => jv.validated[StoreFile]
       }
     } yield event
   }
@@ -139,10 +138,12 @@ object EventMessageEncoding extends EncodingFlags with Logging {
     logger.trace("Serialized event " + msg + " to " + serialized)
     val msgBuffer = charset.encode(serialized)
     val bytes = ByteBuffer.allocate(msgBuffer.limit + 3)
-    writeHeader(bytes,
-                msg.fold(_ => jsonIngestMessageFlag,
-                         _ => jsonArchiveMessageFlag,
-                         _ => storeFileFlag))
+    writeHeader(
+      bytes,
+      msg.fold(
+        _ => jsonIngestMessageFlag,
+        _ => jsonArchiveMessageFlag,
+        _ => storeFileFlag))
     bytes.put(msgBuffer)
     bytes.flip()
     bytes

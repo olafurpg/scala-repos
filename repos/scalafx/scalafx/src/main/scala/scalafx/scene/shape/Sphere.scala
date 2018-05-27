@@ -43,7 +43,8 @@ object Sphere {
   * Creates a new instance of Sphere of radius of 1.0.
   */
 class Sphere(override val delegate: jfxss.Sphere = new jfxss.Sphere())
-    extends Shape3D(delegate) with SFXDelegate[jfxss.Sphere] {
+    extends Shape3D(delegate)
+    with SFXDelegate[jfxss.Sphere] {
 
   /** Creates a new instance of Sphere of a given radius. */
   def this(radius: Double) = this(new jfxss.Sphere(radius))

@@ -14,21 +14,25 @@ import akka.actor.SupervisorStrategy._
   * This back-off supervisor is created by using ``akka.pattern.BackoffSupervisor.props``
   * with ``akka.pattern.Backoff.onFailure``.
   */
-private class BackoffOnRestartSupervisor(val childProps: Props,
-                                         val childName: String,
-                                         minBackoff: FiniteDuration,
-                                         maxBackoff: FiniteDuration,
-                                         val reset: BackoffReset,
-                                         randomFactor: Double,
-                                         strategy: OneForOneStrategy)
-    extends Actor with HandleBackoff with ActorLogging {
+private class BackoffOnRestartSupervisor(
+    val childProps: Props,
+    val childName: String,
+    minBackoff: FiniteDuration,
+    maxBackoff: FiniteDuration,
+    val reset: BackoffReset,
+    randomFactor: Double,
+    strategy: OneForOneStrategy)
+    extends Actor
+    with HandleBackoff
+    with ActorLogging {
 
   import context._
   import BackoffSupervisor._
   override val supervisorStrategy =
-    OneForOneStrategy(strategy.maxNrOfRetries,
-                      strategy.withinTimeRange,
-                      strategy.loggingEnabled) {
+    OneForOneStrategy(
+      strategy.maxNrOfRetries,
+      strategy.withinTimeRange,
+      strategy.loggingEnabled) {
       case ex ⇒
         val defaultDirective: Directive =
           super.supervisorStrategy.decider.applyOrElse(ex, (_: Any) ⇒ Escalate)
@@ -40,7 +44,7 @@ private class BackoffOnRestartSupervisor(val childProps: Props,
           case Restart ⇒
             val childRef = sender()
             become(
-                waitChildTerminatedBeforeBackoff(childRef) orElse handleBackoff)
+              waitChildTerminatedBeforeBackoff(childRef) orElse handleBackoff)
             Stop
 
           case other ⇒ other
@@ -52,7 +56,10 @@ private class BackoffOnRestartSupervisor(val childProps: Props,
       become(receive)
       child = None
       val restartDelay = BackoffSupervisor.calculateDelay(
-          restartCount, minBackoff, maxBackoff, randomFactor)
+        restartCount,
+        minBackoff,
+        maxBackoff,
+        randomFactor)
       context.system.scheduler
         .scheduleOnce(restartDelay, self, BackoffSupervisor.StartChild)
       restartCount += 1

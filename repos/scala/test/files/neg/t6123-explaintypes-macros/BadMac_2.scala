@@ -5,5 +5,6 @@ import scala.reflect.macros.blackbox.Context
 object BadMac {
   def printf(format: String, params: Any*): Unit = macro printf_impl
   def printf_impl(c: Context)(
-      format: c.Expr[String], params: c.Expr[String]*): c.Expr[Unit] = ???
+      format: c.Expr[String],
+      params: c.Expr[String]*): c.Expr[Unit] = ???
 }

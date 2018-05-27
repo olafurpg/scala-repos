@@ -47,10 +47,13 @@ abstract class ExternalCatalog {
   // --------------------------------------------------------------------------
 
   def createDatabase(
-      dbDefinition: CatalogDatabase, ignoreIfExists: Boolean): Unit
+      dbDefinition: CatalogDatabase,
+      ignoreIfExists: Boolean): Unit
 
   def dropDatabase(
-      db: String, ignoreIfNotExists: Boolean, cascade: Boolean): Unit
+      db: String,
+      ignoreIfNotExists: Boolean,
+      cascade: Boolean): Unit
 
   /**
     * Alter a database whose name matches the one specified in `dbDefinition`,
@@ -76,7 +79,9 @@ abstract class ExternalCatalog {
   // --------------------------------------------------------------------------
 
   def createTable(
-      db: String, tableDefinition: CatalogTable, ignoreIfExists: Boolean): Unit
+      db: String,
+      tableDefinition: CatalogTable,
+      ignoreIfExists: Boolean): Unit
 
   def dropTable(db: String, table: String, ignoreIfNotExists: Boolean): Unit
 
@@ -101,24 +106,27 @@ abstract class ExternalCatalog {
   // Partitions
   // --------------------------------------------------------------------------
 
-  def createPartitions(db: String,
-                       table: String,
-                       parts: Seq[CatalogTablePartition],
-                       ignoreIfExists: Boolean): Unit
+  def createPartitions(
+      db: String,
+      table: String,
+      parts: Seq[CatalogTablePartition],
+      ignoreIfExists: Boolean): Unit
 
-  def dropPartitions(db: String,
-                     table: String,
-                     parts: Seq[TablePartitionSpec],
-                     ignoreIfNotExists: Boolean): Unit
+  def dropPartitions(
+      db: String,
+      table: String,
+      parts: Seq[TablePartitionSpec],
+      ignoreIfNotExists: Boolean): Unit
 
   /**
     * Override the specs of one or many existing table partitions, assuming they exist.
     * This assumes index i of `specs` corresponds to index i of `newSpecs`.
     */
-  def renamePartitions(db: String,
-                       table: String,
-                       specs: Seq[TablePartitionSpec],
-                       newSpecs: Seq[TablePartitionSpec]): Unit
+  def renamePartitions(
+      db: String,
+      table: String,
+      specs: Seq[TablePartitionSpec],
+      newSpecs: Seq[TablePartitionSpec]): Unit
 
   /**
     * Alter one or many table partitions whose specs that match those specified in `parts`,
@@ -128,11 +136,14 @@ abstract class ExternalCatalog {
     * this becomes a no-op.
     */
   def alterPartitions(
-      db: String, table: String, parts: Seq[CatalogTablePartition]): Unit
+      db: String,
+      table: String,
+      parts: Seq[CatalogTablePartition]): Unit
 
-  def getPartition(db: String,
-                   table: String,
-                   spec: TablePartitionSpec): CatalogTablePartition
+  def getPartition(
+      db: String,
+      table: String,
+      spec: TablePartitionSpec): CatalogTablePartition
 
   // TODO: support listing by pattern
   def listPartitions(db: String, table: String): Seq[CatalogTablePartition]
@@ -172,21 +183,23 @@ case class CatalogFunction(name: FunctionIdentifier, className: String)
 /**
   * Storage format, used to describe how a partition or a table is stored.
   */
-case class CatalogStorageFormat(locationUri: Option[String],
-                                inputFormat: Option[String],
-                                outputFormat: Option[String],
-                                serde: Option[String],
-                                serdeProperties: Map[String, String])
+case class CatalogStorageFormat(
+    locationUri: Option[String],
+    inputFormat: Option[String],
+    outputFormat: Option[String],
+    serde: Option[String],
+    serdeProperties: Map[String, String])
 
 /**
   * A column in a table.
   */
-case class CatalogColumn(name: String,
-                         // This may be null when used to create views. TODO: make this type-safe; this is left
-                         // as a string due to issues in converting Hive varchars to and from SparkSQL strings.
-                         @Nullable dataType: String,
-                         nullable: Boolean = true,
-                         comment: Option[String] = None)
+case class CatalogColumn(
+    name: String,
+    // This may be null when used to create views. TODO: make this type-safe; this is left
+    // as a string due to issues in converting Hive varchars to and from SparkSQL strings.
+    @Nullable dataType: String,
+    nullable: Boolean = true,
+    comment: Option[String] = None)
 
 /**
   * A partition (Hive style) defined in the catalog.
@@ -195,7 +208,8 @@ case class CatalogColumn(name: String,
   * @param storage storage format of the partition
   */
 case class CatalogTablePartition(
-    spec: ExternalCatalog.TablePartitionSpec, storage: CatalogStorageFormat)
+    spec: ExternalCatalog.TablePartitionSpec,
+    storage: CatalogStorageFormat)
 
 /**
   * A table defined in the catalog.
@@ -203,18 +217,19 @@ case class CatalogTablePartition(
   * Note that Hive's metastore also tracks skewed columns. We should consider adding that in the
   * future once we have a better understanding of how we want to handle skewed columns.
   */
-case class CatalogTable(name: TableIdentifier,
-                        tableType: CatalogTableType,
-                        storage: CatalogStorageFormat,
-                        schema: Seq[CatalogColumn],
-                        partitionColumns: Seq[CatalogColumn] = Seq.empty,
-                        sortColumns: Seq[CatalogColumn] = Seq.empty,
-                        numBuckets: Int = 0,
-                        createTime: Long = System.currentTimeMillis,
-                        lastAccessTime: Long = System.currentTimeMillis,
-                        properties: Map[String, String] = Map.empty,
-                        viewOriginalText: Option[String] = None,
-                        viewText: Option[String] = None) {
+case class CatalogTable(
+    name: TableIdentifier,
+    tableType: CatalogTableType,
+    storage: CatalogStorageFormat,
+    schema: Seq[CatalogColumn],
+    partitionColumns: Seq[CatalogColumn] = Seq.empty,
+    sortColumns: Seq[CatalogColumn] = Seq.empty,
+    numBuckets: Int = 0,
+    createTime: Long = System.currentTimeMillis,
+    lastAccessTime: Long = System.currentTimeMillis,
+    properties: Map[String, String] = Map.empty,
+    viewOriginalText: Option[String] = None,
+    viewText: Option[String] = None) {
 
   /** Return the database this table was specified to belong to, assuming it exists. */
   def database: String = name.database.getOrElse {
@@ -232,8 +247,13 @@ case class CatalogTable(name: TableIdentifier,
       serde: Option[String] = storage.serde,
       serdeProperties: Map[String, String] = storage.serdeProperties)
     : CatalogTable = {
-    copy(storage = CatalogStorageFormat(
-              locationUri, inputFormat, outputFormat, serde, serdeProperties))
+    copy(
+      storage = CatalogStorageFormat(
+        locationUri,
+        inputFormat,
+        outputFormat,
+        serde,
+        serdeProperties))
   }
 }
 
@@ -248,10 +268,11 @@ object CatalogTableType {
 /**
   * A database defined in the catalog.
   */
-case class CatalogDatabase(name: String,
-                           description: String,
-                           locationUri: String,
-                           properties: Map[String, String])
+case class CatalogDatabase(
+    name: String,
+    description: String,
+    locationUri: String,
+    properties: Map[String, String])
 
 object ExternalCatalog {
 
@@ -265,13 +286,15 @@ object ExternalCatalog {
   * A [[LogicalPlan]] that wraps [[CatalogTable]].
   */
 case class CatalogRelation(
-    db: String, metadata: CatalogTable, alias: Option[String] = None)
+    db: String,
+    metadata: CatalogTable,
+    alias: Option[String] = None)
     extends LeafNode {
 
   // TODO: implement this
   override def output: Seq[Attribute] = Seq.empty
 
   require(
-      metadata.name.database == Some(db),
-      "provided database does not much the one specified in the table definition")
+    metadata.name.database == Some(db),
+    "provided database does not much the one specified in the table definition")
 }

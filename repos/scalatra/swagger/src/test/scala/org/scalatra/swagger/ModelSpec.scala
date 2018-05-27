@@ -1,6 +1,9 @@
 package org.scalatra.swagger
 
-import org.scalatra.swagger.AllowableValues.{AllowableRangeValues, AllowableValuesList}
+import org.scalatra.swagger.AllowableValues.{
+  AllowableRangeValues,
+  AllowableValuesList
+}
 import org.scalatra.swagger.annotations._
 import org.scalatra.swagger.reflect.Reflector
 import org.specs2.mutable.Specification
@@ -8,17 +11,20 @@ import org.specs2.mutable.Specification
 object ModelSpec {
 
   case class WithDescription(
-      @ApiModelProperty(description = "a description",
-                        allowableValues = "item1,item2") id: String)
+      @ApiModelProperty(
+        description = "a description",
+        allowableValues = "item1,item2") id: String)
   case class WithAllowableValues(
       @ApiModelProperty(allowableValues = "item1,item2") id: String)
   case class WithAllowableRangeValues(
       @ApiModelProperty(allowableValues = "range[1,10]") id: String)
 
   case class WithRequiredFalse(
-      id: String, @ApiModelProperty(required = false) name: String)
+      id: String,
+      @ApiModelProperty(required = false) name: String)
   case class WithRequiredTrue(
-      id: String, @ApiModelProperty(required = true) name: String)
+      id: String,
+      @ApiModelProperty(required = true) name: String)
 
   case class WithOption(id: String, name: Option[String])
   case class WithDefaultValue(id: String, name: String = "April")
@@ -43,7 +49,7 @@ class ModelSpec extends Specification {
 
     "convert a populated description property of an ApiProperty annotation" in {
       swaggerProperties[WithDescription].description must beSome(
-          "a description")
+        "a description")
     }
 
     "convert a populated allowable values property of an ApiProperty annotation" in {

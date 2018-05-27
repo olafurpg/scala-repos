@@ -31,7 +31,7 @@ trait Rendering {
         implicit request: RequestHeader): Result = {
       def _render(ms: Seq[MediaRange]): Result = ms match {
         case Nil => NotAcceptable
-        case Seq(m, ms @ _ *) =>
+        case Seq(m, ms @ _*) =>
           f.applyOrElse(m, (m: MediaRange) => _render(ms))
       }
 
@@ -65,7 +65,7 @@ trait Rendering {
         implicit request: RequestHeader): Future[Result] = {
       def _render(ms: Seq[MediaRange]): Future[Result] = ms match {
         case Nil => Future.successful(NotAcceptable)
-        case Seq(m, ms @ _ *) =>
+        case Seq(m, ms @ _*) =>
           f.applyOrElse(m, (m: MediaRange) => _render(ms))
       }
 

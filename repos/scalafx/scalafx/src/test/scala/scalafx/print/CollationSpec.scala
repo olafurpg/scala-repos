@@ -38,6 +38,6 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class CollationSpec
     extends SFXEnumDelegateSpec[jfxp.Collation, Collation](
-        javaClass = classOf[jfxp.Collation],
-        scalaClass = classOf[Collation],
-        companion = Collation)
+      javaClass = classOf[jfxp.Collation],
+      scalaClass = classOf[Collation],
+      companion = Collation)

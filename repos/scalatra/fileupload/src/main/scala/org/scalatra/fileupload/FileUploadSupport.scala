@@ -2,11 +2,20 @@ package org.scalatra
 package fileupload
 
 import java.util.{HashMap => JHashMap, List => JList, Map => JMap}
-import javax.servlet.http.{HttpServletRequest, HttpServletRequestWrapper, HttpServletResponse}
+import javax.servlet.http.{
+  HttpServletRequest,
+  HttpServletRequestWrapper,
+  HttpServletResponse
+}
 
 import org.apache.commons.fileupload.disk.{DiskFileItem, DiskFileItemFactory}
 import org.apache.commons.fileupload.servlet.ServletFileUpload
-import org.apache.commons.fileupload.{FileItem, FileItemFactory, FileUploadBase, FileUploadException}
+import org.apache.commons.fileupload.{
+  FileItem,
+  FileItemFactory,
+  FileUploadBase,
+  FileUploadException
+}
 import org.scalatra.servlet._
 
 import scala.collection.JavaConversions._
@@ -22,9 +31,9 @@ import scala.collection.JavaConversions._
   * the lifetime of the request.
   */
 @deprecated(
-    message = "Deprecated in favor of Servlet 3.0 API's multipart features. " +
-      "Please use org.scalatra.servlet.FileUploadSupport instead.",
-    since = "2.1.0")
+  message = "Deprecated in favor of Servlet 3.0 API's multipart features. " +
+    "Please use org.scalatra.servlet.FileUploadSupport instead.",
+  since = "2.1.0")
 trait FileUploadSupport extends ServletBase {
   import org.scalatra.fileupload.FileUploadSupport._
 
@@ -43,9 +52,9 @@ trait FileUploadSupport extends ServletBase {
       } else req
     } catch {
       case e: FileUploadException => {
-          req.setAttribute(ScalatraBase.PrehandleExceptionKey, e)
-          req
-        }
+        req.setAttribute(ScalatraBase.PrehandleExceptionKey, e)
+        req
+      }
     }
 
     super.handle(req2, resp)
@@ -61,10 +70,10 @@ trait FileUploadSupport extends ServletBase {
 
     isPostOrPut &&
     (req.contentType match {
-          case Some(contentType) =>
-            contentType.startsWith(FileUploadBase.MULTIPART)
-          case _ => false
-        })
+      case Some(contentType) =>
+        contentType.startsWith(FileUploadBase.MULTIPART)
+      case _ => false
+    })
   }
 
   private def extractMultipartParams(req: HttpServletRequest): BodyParams =
@@ -79,18 +88,23 @@ trait FileUploadSupport extends ServletBase {
           items.foldRight(BodyParams(FileMultiParams(), Map.empty)) {
             (item, params) =>
               if (item.isFormField)
-                BodyParams(params.fileParams,
-                           params.formParams +
-                           ((item.getFieldName,
-                             fileItemToString(req, item) :: params.formParams
-                               .getOrElse(item.getFieldName, List[String]()))))
+                BodyParams(
+                  params.fileParams,
+                  params.formParams +
+                    (
+                      (
+                        item.getFieldName,
+                        fileItemToString(req, item) :: params.formParams
+                          .getOrElse(item.getFieldName, List[String]()))))
               else
                 BodyParams(
-                    params.fileParams +
-                    ((item.getFieldName,
-                      item +: params.fileParams.getOrElse(item.getFieldName,
-                                                          List[FileItem]()))),
-                    params.formParams)
+                  params.fileParams +
+                    (
+                      (
+                        item.getFieldName,
+                        item +: params.fileParams
+                          .getOrElse(item.getFieldName, List[FileItem]()))),
+                  params.formParams)
           }
         req(BodyParamsKey) = bodyParams
         bodyParams
@@ -108,7 +122,8 @@ trait FileUploadSupport extends ServletBase {
     * falls back to the kernel's charset.
     */
   protected def fileItemToString(
-      req: HttpServletRequest, item: FileItem): String = {
+      req: HttpServletRequest,
+      item: FileItem): String = {
     val charset = item match {
       case diskItem: DiskFileItem =>
         // Why doesn't FileItem have this method???
@@ -120,7 +135,8 @@ trait FileUploadSupport extends ServletBase {
   }
 
   private def wrapRequest(
-      req: HttpServletRequest, formMap: Map[String, Seq[String]]) = {
+      req: HttpServletRequest,
+      formMap: Map[String, Seq[String]]) = {
     val wrapped = new HttpServletRequestWrapper(req) {
       override def getParameter(name: String) =
         formMap.get(name) map { _.head } getOrElse null
@@ -129,9 +145,9 @@ trait FileUploadSupport extends ServletBase {
         formMap.get(name) map { _.toArray } getOrElse null
       override def getParameterMap =
         new JHashMap[String, Array[String]] ++
-        (formMap transform { (k, v) =>
-              v.toArray
-            })
+          (formMap transform { (k, v) =>
+            v.toArray
+          })
     }
     wrapped
   }
@@ -153,7 +169,7 @@ trait FileUploadSupport extends ServletBase {
     * `newServletFileUpload`.  By default, we use a DiskFileItemFactory.
     */
   /*
-   * [non-scaladoc] This method predates newServletFileUpload.  If I had it 
+   * [non-scaladoc] This method predates newServletFileUpload.  If I had it
    * to do over again, we'd have that instead of this.  Oops.
    */
   protected def fileItemFactory: FileItemFactory = new DiskFileItemFactory
@@ -176,6 +192,7 @@ trait FileUploadSupport extends ServletBase {
 
 object FileUploadSupport {
   case class BodyParams(
-      fileParams: FileMultiParams, formParams: Map[String, List[String]])
+      fileParams: FileMultiParams,
+      formParams: Map[String, List[String]])
   private val BodyParamsKey = "org.scalatra.fileupload.bodyParams"
 }

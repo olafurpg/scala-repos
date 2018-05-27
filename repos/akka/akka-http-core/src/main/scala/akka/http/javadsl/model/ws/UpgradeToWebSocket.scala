@@ -53,7 +53,8 @@ trait UpgradeToWebSocket extends sm.HttpHeader {
     *
     * The given subprotocol must be one of the ones offered by the client.
     */
-  def handleMessagesWith(inSink: Graph[SinkShape[Message], _ <: Any],
-                         outSource: Graph[SourceShape[Message], _ <: Any],
-                         subprotocol: String): HttpResponse
+  def handleMessagesWith(
+      inSink: Graph[SinkShape[Message], _ <: Any],
+      outSource: Graph[SourceShape[Message], _ <: Any],
+      subprotocol: String): HttpResponse
 }

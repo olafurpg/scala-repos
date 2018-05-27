@@ -66,8 +66,9 @@ object EnsembleTree {
 
   private def loadExampleNames(): Array[(String, Array[String])] = {
 
-    require(examplListURL != null,
-            "Failed to locate resource in classpath: " + exampleListPath)
+    require(
+      examplListURL != null,
+      "Failed to locate resource in classpath: " + exampleListPath)
 
     val lines = scala.io.Source.fromURL(examplListURL).getLines()
 
@@ -99,11 +100,10 @@ object EnsembleTree {
           contentDisplay = ContentDisplay.Top
           styleClass.clear()
           styleClass += "sample-tile"
-          onAction = (ae: ActionEvent) =>
-            {
-              Ensemble.splitPane.items.remove(1)
-              Ensemble.splitPane.items.add(
-                  1, PageDisplayer.choosePage(groupName + " > " + sampleName))
+          onAction = (ae: ActionEvent) => {
+            Ensemble.splitPane.items.remove(1)
+            Ensemble.splitPane.items
+              .add(1, PageDisplayer.choosePage(groupName + " > " + sampleName))
           }
         }
         EnsembleThumbNail(button)
@@ -120,8 +120,9 @@ case class EnsembleThumbNail(button: Button)
   * The class provide accessibility methods to access the
   * underlying map
   */
-class EnsembleTree(tree: Map[String, List[TreeItem[String]]],
-                   thumbnails: Map[String, List[EnsembleThumbNail]]) {
+class EnsembleTree(
+    tree: Map[String, List[TreeItem[String]]],
+    thumbnails: Map[String, List[EnsembleThumbNail]]) {
 
   def getLeaves(keyName: String) = tree(keyName)
 
@@ -146,8 +147,8 @@ class EnsembleTree(tree: Map[String, List[TreeItem[String]]],
 
   def getDashThumb(ctrlGrpName: String) =
     Seq(
-        createCategoryLabel(ctrlGrpName),
-        createTiles(thumbnails(ctrlGrpName))
+      createCategoryLabel(ctrlGrpName),
+      createTiles(thumbnails(ctrlGrpName))
     )
 
   private def createCategoryLabel(value: String) =

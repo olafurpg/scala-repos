@@ -28,23 +28,24 @@ import net.liftweb.record.{Field, FieldHelpers, MandatoryTypedField}
 import net.liftweb.util.Helpers.tryo
 
 class PatternField[OwnerType <: BsonRecord[OwnerType]](rec: OwnerType)
-    extends Field[Pattern, OwnerType] with MandatoryTypedField[Pattern] {
+    extends Field[Pattern, OwnerType]
+    with MandatoryTypedField[Pattern] {
 
   def owner = rec
 
   def defaultValue = Pattern.compile("")
 
   def setFromAny(in: Any): Box[Pattern] = in match {
-    case p: Pattern => setBox(Full(p))
-    case Some(p: Pattern) => setBox(Full(p))
-    case Full(p: Pattern) => setBox(Full(p))
-    case (p: Pattern) :: _ => setBox(Full(p))
-    case s: String => setFromString(s)
-    case Some(s: String) => setFromString(s)
-    case Full(s: String) => setFromString(s)
+    case p: Pattern          => setBox(Full(p))
+    case Some(p: Pattern)    => setBox(Full(p))
+    case Full(p: Pattern)    => setBox(Full(p))
+    case (p: Pattern) :: _   => setBox(Full(p))
+    case s: String           => setFromString(s)
+    case Some(s: String)     => setFromString(s)
+    case Full(s: String)     => setFromString(s)
     case null | None | Empty => setBox(defaultValueBox)
-    case f: Failure => setBox(f)
-    case o => setFromString(o.toString)
+    case f: Failure          => setBox(f)
+    case o                   => setFromString(o.toString)
   }
 
   def setFromJValue(jvalue: JValue): Box[Pattern] = jvalue match {
@@ -59,7 +60,7 @@ class PatternField[OwnerType <: BsonRecord[OwnerType]](rec: OwnerType)
   def setFromString(in: String): Box[Pattern] =
     tryo(JsonParser.parse(in)) match {
       case Full(jv: JValue) => setFromJValue(jv)
-      case f: Failure => setBox(f)
+      case f: Failure       => setBox(f)
       case other =>
         setBox(Failure("Error parsing String into a JValue: " + in))
     }
@@ -68,7 +69,7 @@ class PatternField[OwnerType <: BsonRecord[OwnerType]](rec: OwnerType)
 
   def asJs = asJValue match {
     case JNothing => JsNull
-    case jv => Str(compactRender(jv))
+    case jv       => Str(compactRender(jv))
   }
 
   def asJValue: JValue =

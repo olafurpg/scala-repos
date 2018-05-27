@@ -26,10 +26,10 @@ import com.twitter.summingbird.batch._
 object SerializationLaws extends Properties("SerializationLaws") {
 
   implicit val batchId: Arbitrary[BatchID] = Arbitrary(
-      Arbitrary.arbitrary[Long].map(BatchID(_)))
+    Arbitrary.arbitrary[Long].map(BatchID(_)))
 
   implicit val timestamp: Arbitrary[Timestamp] = Arbitrary(
-      Arbitrary.arbitrary[Long].map(Timestamp(_)))
+    Arbitrary.arbitrary[Long].map(Timestamp(_)))
 
   implicit def batchSer: KSerializer[BatchID] = new BatchIDSerializer
   implicit def timestampSer: KSerializer[Timestamp] = new TimestampSerializer
@@ -41,7 +41,7 @@ object SerializationLaws extends Properties("SerializationLaws") {
     KryoPool.withBuffer(1, kinst, 100, 10000).deepCopy(t)
   }
 
-  def roundTrips[T : Arbitrary : KSerializer : Equiv] = forAll { (t: T) =>
+  def roundTrips[T: Arbitrary: KSerializer: Equiv] = forAll { (t: T) =>
     val kser = implicitly[KSerializer[T]]
     Equiv[T].equiv(round(kser, t), t)
   }

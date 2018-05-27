@@ -66,7 +66,7 @@ object ParserUtils {
     str match {
       case singleQuotedString(s) => s
       case doubleQuotedString(s) => s
-      case other => other
+      case other                 => other
     }
   }
 
@@ -76,25 +76,26 @@ object ParserUtils {
   def cleanIdentifier(ident: String): String = {
     ident match {
       case escapedIdentifier(i) => i
-      case plainIdent => plainIdent
+      case plainIdent           => plainIdent
     }
   }
 
-  def getClauses(clauseNames: Seq[String],
-                 nodeList: Seq[ASTNode]): Seq[Option[ASTNode]] = {
+  def getClauses(
+      clauseNames: Seq[String],
+      nodeList: Seq[ASTNode]): Seq[Option[ASTNode]] = {
     var remainingNodes = nodeList
     val clauses = clauseNames.map { clauseName =>
       val (matches, nonMatches) =
         remainingNodes.partition(_.text.toUpperCase == clauseName)
       remainingNodes = nonMatches ++
-      (if (matches.nonEmpty) matches.tail else Nil)
+        (if (matches.nonEmpty) matches.tail else Nil)
       matches.headOption
     }
 
     if (remainingNodes.nonEmpty) {
       sys.error(s"""Unhandled clauses: ${remainingNodes
-                 .map(_.treeString)
-                 .mkString("\n")}.
+                     .map(_.treeString)
+                     .mkString("\n")}.
             |You are likely trying to use an unsupported Hive feature."""".stripMargin)
     }
     clauses
@@ -102,15 +103,16 @@ object ParserUtils {
 
   def getClause(clauseName: String, nodeList: Seq[ASTNode]): ASTNode = {
     getClauseOption(clauseName, nodeList).getOrElse(sys.error(
-            s"Expected clause $clauseName missing from ${nodeList.map(_.treeString).mkString("\n")}"))
+      s"Expected clause $clauseName missing from ${nodeList.map(_.treeString).mkString("\n")}"))
   }
 
   def getClauseOption(
-      clauseName: String, nodeList: Seq[ASTNode]): Option[ASTNode] = {
+      clauseName: String,
+      nodeList: Seq[ASTNode]): Option[ASTNode] = {
     nodeList.filter { case ast: ASTNode => ast.text == clauseName } match {
       case Seq(oneMatch) => Some(oneMatch)
-      case Seq() => None
-      case _ => sys.error(s"Found multiple instances of clause $clauseName")
+      case Seq()         => None
+      case _             => sys.error(s"Found multiple instances of clause $clauseName")
     }
   }
 
@@ -122,7 +124,8 @@ object ParserUtils {
       case Seq(databaseName, table) =>
         TableIdentifier(table, Some(databaseName))
       case other =>
-        sys.error("Hive only supports tables names like 'tableName' " +
+        sys.error(
+          "Hive only supports tables names like 'tableName' " +
             s"or 'databaseName.tableName', found '$other'")
     }
   }
@@ -132,20 +135,20 @@ object ParserUtils {
       DecimalType(precision.text.toInt, scale.text.toInt)
     case Token("TOK_DECIMAL", precision :: Nil) =>
       DecimalType(precision.text.toInt, 0)
-    case Token("TOK_DECIMAL", Nil) => DecimalType.USER_DEFAULT
-    case Token("TOK_BIGINT", Nil) => LongType
-    case Token("TOK_INT", Nil) => IntegerType
-    case Token("TOK_TINYINT", Nil) => ByteType
-    case Token("TOK_SMALLINT", Nil) => ShortType
-    case Token("TOK_BOOLEAN", Nil) => BooleanType
-    case Token("TOK_STRING", Nil) => StringType
+    case Token("TOK_DECIMAL", Nil)                  => DecimalType.USER_DEFAULT
+    case Token("TOK_BIGINT", Nil)                   => LongType
+    case Token("TOK_INT", Nil)                      => IntegerType
+    case Token("TOK_TINYINT", Nil)                  => ByteType
+    case Token("TOK_SMALLINT", Nil)                 => ShortType
+    case Token("TOK_BOOLEAN", Nil)                  => BooleanType
+    case Token("TOK_STRING", Nil)                   => StringType
     case Token("TOK_VARCHAR", Token(_, Nil) :: Nil) => StringType
-    case Token("TOK_CHAR", Token(_, Nil) :: Nil) => StringType
-    case Token("TOK_FLOAT", Nil) => FloatType
-    case Token("TOK_DOUBLE", Nil) => DoubleType
-    case Token("TOK_DATE", Nil) => DateType
-    case Token("TOK_TIMESTAMP", Nil) => TimestampType
-    case Token("TOK_BINARY", Nil) => BinaryType
+    case Token("TOK_CHAR", Token(_, Nil) :: Nil)    => StringType
+    case Token("TOK_FLOAT", Nil)                    => FloatType
+    case Token("TOK_DOUBLE", Nil)                   => DoubleType
+    case Token("TOK_DATE", Nil)                     => DateType
+    case Token("TOK_TIMESTAMP", Nil)                => TimestampType
+    case Token("TOK_BINARY", Nil)                   => BinaryType
     case Token("TOK_LIST", elementType :: Nil) =>
       ArrayType(nodeToDataType(elementType))
     case Token("TOK_STRUCT", Token("TOK_TABCOLLIST", fields) :: Nil) =>
@@ -158,18 +161,21 @@ object ParserUtils {
 
   def nodeToStructField(node: ASTNode): StructField = node match {
     case Token("TOK_TABCOL", Token(fieldName, Nil) :: dataType :: Nil) =>
-      StructField(cleanIdentifier(fieldName),
-                  nodeToDataType(dataType),
-                  nullable = true)
+      StructField(
+        cleanIdentifier(fieldName),
+        nodeToDataType(dataType),
+        nullable = true)
     case Token(
-        "TOK_TABCOL", Token(fieldName, Nil) :: dataType :: comment :: Nil) =>
+        "TOK_TABCOL",
+        Token(fieldName, Nil) :: dataType :: comment :: Nil) =>
       val meta = new MetadataBuilder()
         .putString("comment", unquoteString(comment.text))
         .build()
-      StructField(cleanIdentifier(fieldName),
-                  nodeToDataType(dataType),
-                  nullable = true,
-                  meta)
+      StructField(
+        cleanIdentifier(fieldName),
+        nodeToDataType(dataType),
+        nullable = true,
+        meta)
     case _ =>
       noParseRule("StructField", node)
   }
@@ -186,6 +192,6 @@ object ParserUtils {
     */
   def noParseRule(msg: String, node: ASTNode): Nothing = {
     throw new NotImplementedError(
-        s"[$msg]: No parse rules for ASTNode type: ${node.tokenType}, tree:\n${node.treeString}")
+      s"[$msg]: No parse rules for ASTNode type: ${node.tokenType}, tree:\n${node.treeString}")
   }
 }

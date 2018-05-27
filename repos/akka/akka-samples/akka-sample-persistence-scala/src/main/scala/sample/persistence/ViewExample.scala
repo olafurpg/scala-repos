@@ -37,16 +37,16 @@ object ViewExample extends App {
       case SnapshotOffer(metadata, snapshot: Int) =>
         numReplicated = snapshot
         println(
-            s"view received snapshot offer ${snapshot} (metadata = ${metadata})")
+          s"view received snapshot offer ${snapshot} (metadata = ${metadata})")
       case payload if isPersistent =>
         numReplicated += 1
         println(
-            s"view replayed event ${payload} (num replicated = ${numReplicated})")
+          s"view replayed event ${payload} (num replicated = ${numReplicated})")
       case SaveSnapshotSuccess(metadata) =>
         println(s"view saved snapshot (metadata = ${metadata})")
       case SaveSnapshotFailure(metadata, reason) =>
         println(
-            s"view snapshot failure (metadata = ${metadata}), caused by ${reason}")
+          s"view snapshot failure (metadata = ${metadata}), caused by ${reason}")
       case payload =>
         println(s"view received other message ${payload}")
     }
@@ -60,6 +60,9 @@ object ViewExample extends App {
   import system.dispatcher
 
   system.scheduler.schedule(
-      Duration.Zero, 2.seconds, persistentActor, "scheduled")
+    Duration.Zero,
+    2.seconds,
+    persistentActor,
+    "scheduled")
   system.scheduler.schedule(Duration.Zero, 5.seconds, view, "snap")
 }

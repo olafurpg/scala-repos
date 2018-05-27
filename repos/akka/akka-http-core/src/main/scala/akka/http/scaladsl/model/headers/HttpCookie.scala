@@ -16,7 +16,8 @@ import scala.compat.java8.OptionConverters._
 // see http://tools.ietf.org/html/rfc6265
 // sealed abstract to prevent generation of default apply method in companion
 sealed abstract case class HttpCookiePair private (name: String, value: String)
-    extends jm.headers.HttpCookiePair with ToStringRenderable {
+    extends jm.headers.HttpCookiePair
+    with ToStringRenderable {
 
   def render[R <: Rendering](r: R): r.type = r ~~ name ~~ '=' ~~ value
   def toCookie: HttpCookie = HttpCookie.fromPair(this)
@@ -37,34 +38,36 @@ object HttpCookiePair {
   private[http] def validate(name: String, value: String): Unit = {
     import HttpCookie._
     require(
-        nameChars.matchesAll(name),
-        s"'${nameChars.firstMismatch(name).get}' not allowed in cookie name ('$name')")
+      nameChars.matchesAll(name),
+      s"'${nameChars.firstMismatch(name).get}' not allowed in cookie name ('$name')")
     require(
-        valueChars.matchesAll(value),
-        s"'${valueChars.firstMismatch(value).get}' not allowed in cookie content ('$value')")
+      valueChars.matchesAll(value),
+      s"'${valueChars.firstMismatch(value).get}' not allowed in cookie content ('$value')")
   }
   private[http] def validateRaw(name: String, value: String): Unit = {
     import HttpCookie._
     require(
-        nameChars.matchesAll(name),
-        s"'${nameChars.firstMismatch(name).get}' not allowed in cookie name ('$name')")
+      nameChars.matchesAll(name),
+      s"'${nameChars.firstMismatch(name).get}' not allowed in cookie name ('$name')")
     require(
-        rawValueChars.matchesAll(value),
-        s"'${rawValueChars.firstMismatch(value).get}' not allowed in cookie content ('$value')")
+      rawValueChars.matchesAll(value),
+      s"'${rawValueChars.firstMismatch(value).get}' not allowed in cookie content ('$value')")
   }
 }
 
 // see http://tools.ietf.org/html/rfc6265
-final case class HttpCookie(name: String,
-                            value: String,
-                            expires: Option[DateTime] = None,
-                            maxAge: Option[Long] = None,
-                            domain: Option[String] = None,
-                            path: Option[String] = None,
-                            secure: Boolean = false,
-                            httpOnly: Boolean = false,
-                            extension: Option[String] = None)
-    extends jm.headers.HttpCookie with ToStringRenderable {
+final case class HttpCookie(
+    name: String,
+    value: String,
+    expires: Option[DateTime] = None,
+    maxAge: Option[Long] = None,
+    domain: Option[String] = None,
+    path: Option[String] = None,
+    secure: Boolean = false,
+    httpOnly: Boolean = false,
+    extension: Option[String] = None)
+    extends jm.headers.HttpCookie
+    with ToStringRenderable {
 
   /** Returns the name/value pair for this cookie, to be used in [[Cookie]] headers. */
   def pair: HttpCookiePair = HttpCookiePair(name, value)
@@ -75,14 +78,15 @@ final case class HttpCookie(name: String,
 
   HttpCookiePair.validate(name, value)
   require(
-      domain.forall(domainChars.matchesAll),
-      s"'${domainChars.firstMismatch(domain.get).get}' not allowed in cookie domain ('${domain.get}')")
+    domain.forall(domainChars.matchesAll),
+    s"'${domainChars.firstMismatch(domain.get).get}' not allowed in cookie domain ('${domain.get}')")
   require(
-      path.forall(pathOrExtChars.matchesAll),
-      s"'${pathOrExtChars.firstMismatch(path.get).get}' not allowed in cookie path ('${path.get}')")
+    path.forall(pathOrExtChars.matchesAll),
+    s"'${pathOrExtChars.firstMismatch(path.get).get}' not allowed in cookie path ('${path.get}')")
   require(
-      extension.forall(pathOrExtChars.matchesAll),
-      s"'${pathOrExtChars.firstMismatch(extension.get).get}' not allowed in cookie extension ('${extension.get}')")
+    extension.forall(pathOrExtChars.matchesAll),
+    s"'${pathOrExtChars.firstMismatch(extension.get).get}' not allowed in cookie extension ('${extension.get}')"
+  )
 
   def render[R <: Rendering](r: R): r.type = {
     r ~~ name ~~ '=' ~~ value
@@ -140,34 +144,37 @@ final case class HttpCookie(name: String,
 }
 
 object HttpCookie {
-  def fromPair(pair: HttpCookiePair,
-               expires: Option[DateTime] = None,
-               maxAge: Option[Long] = None,
-               domain: Option[String] = None,
-               path: Option[String] = None,
-               secure: Boolean = false,
-               httpOnly: Boolean = false,
-               extension: Option[String] = None): HttpCookie =
-    HttpCookie(pair.name,
-               pair.value,
-               expires,
-               maxAge,
-               domain,
-               path,
-               secure,
-               httpOnly,
-               extension)
+  def fromPair(
+      pair: HttpCookiePair,
+      expires: Option[DateTime] = None,
+      maxAge: Option[Long] = None,
+      domain: Option[String] = None,
+      path: Option[String] = None,
+      secure: Boolean = false,
+      httpOnly: Boolean = false,
+      extension: Option[String] = None): HttpCookie =
+    HttpCookie(
+      pair.name,
+      pair.value,
+      expires,
+      maxAge,
+      domain,
+      path,
+      secure,
+      httpOnly,
+      extension)
 
   import akka.http.impl.model.parser.CharacterClasses._
 
   private[http] def nameChars = tchar
   // http://tools.ietf.org/html/rfc6265#section-4.1.1
   // ; US-ASCII characters excluding CTLs, whitespace DQUOTE, comma, semicolon, and backslash
-  private[http] val valueChars = CharPredicate('\u0021',
-                                               '\u0023' to '\u002B',
-                                               '\u002D' to '\u003A',
-                                               '\u003C' to '\u005B',
-                                               '\u005D' to '\u007E')
+  private[http] val valueChars = CharPredicate(
+    '\u0021',
+    '\u0023' to '\u002B',
+    '\u002D' to '\u003A',
+    '\u003C' to '\u005B',
+    '\u005D' to '\u007E')
   private[http] val rawValueChars = CharacterClasses.`cookie-octet-raw`
   private[http] val domainChars = ALPHANUM ++ ".-"
   private[http] val pathOrExtChars = VCHAR ++ ' ' -- ';'

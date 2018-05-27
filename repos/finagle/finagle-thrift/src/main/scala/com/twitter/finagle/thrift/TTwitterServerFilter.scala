@@ -11,8 +11,7 @@ import org.apache.thrift.protocol.{TMessage, TMessageType, TProtocolFactory}
 private[finagle] class TTwitterServerFilter(
     serviceName: String,
     protocolFactory: TProtocolFactory
-)
-    extends SimpleFilter[Array[Byte], Array[Byte]] {
+) extends SimpleFilter[Array[Byte], Array[Byte]] {
   // Concurrency is not an issue here since we have an instance per
   // channel, and receive only one request at a time (thrift does no
   // pipelining).  Furthermore, finagle will guarantee this by
@@ -23,7 +22,7 @@ private[finagle] class TTwitterServerFilter(
   private[this] lazy val successfulUpgradeReply = Future {
     val buffer = new OutputBuffer(protocolFactory)
     buffer().writeMessageBegin(
-        new TMessage(ThriftTracing.CanTraceMethodName, TMessageType.REPLY, 0))
+      new TMessage(ThriftTracing.CanTraceMethodName, TMessageType.REPLY, 0))
     val upgradeReply = new thrift.UpgradeReply
     upgradeReply.write(buffer())
     buffer().writeMessageEnd()
@@ -57,9 +56,9 @@ private[finagle] class TTwitterServerFilter(
           while (iter.hasNext) {
             val c = iter.next()
             env = Contexts.broadcast.Translucent(
-                env,
-                Buf.ByteArray.Owned(c.getKey()),
-                Buf.ByteArray.Owned(c.getValue()))
+              env,
+              Buf.ByteArray.Owned(c.getKey()),
+              Buf.ByteArray.Owned(c.getValue()))
           }
         }
 
@@ -72,17 +71,18 @@ private[finagle] class TTwitterServerFilter(
         // If `header.client_id` field is non-null, then allow it to take
         // precedence over the id provided by ClientIdContext.
         ClientId.let(richHeader.clientId) {
-          Trace.recordBinary("srv/thrift/clientId",
-                             ClientId.current.getOrElse("None"))
+          Trace.recordBinary(
+            "srv/thrift/clientId",
+            ClientId.current.getOrElse("None"))
 
           Contexts.broadcast.let(env) {
             service(request_) map {
               case response if response.isEmpty => response
               case response =>
                 val responseHeader = new thrift.ResponseHeader
-                ByteArrays.concat(OutputBuffer.messageToArray(responseHeader,
-                                                              protocolFactory),
-                                  response)
+                ByteArrays.concat(
+                  OutputBuffer.messageToArray(responseHeader, protocolFactory),
+                  response)
             }
           }
         }

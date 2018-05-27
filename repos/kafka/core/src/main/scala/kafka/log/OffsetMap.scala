@@ -5,7 +5,7 @@
   * The ASF licenses this file to You under the Apache License, Version 2.0
   * (the "License"); you may not use this file except in compliance with
   * the License.  You may obtain a copy of the License at
-  * 
+  *
   *    http://www.apache.org/licenses/LICENSE-2.0
   *
   * Unless required by applicable law or agreed to in writing, software
@@ -77,8 +77,7 @@ class SkimpyOffsetMap(val memory: Int, val hashAlgorithm: String = "MD5")
     * @param offset The offset
     */
   override def put(key: ByteBuffer, offset: Long) {
-    require(
-        entries < slots, "Attempt to add a new entry to a full offset map.")
+    require(entries < slots, "Attempt to add a new entry to a full offset map.")
     lookups += 1
     hashInto(key, hash1)
     // probe until we find the first empty slot
@@ -107,7 +106,7 @@ class SkimpyOffsetMap(val memory: Int, val hashAlgorithm: String = "MD5")
     */
   private def isEmpty(position: Int): Boolean =
     bytes.getLong(position) == 0 && bytes.getLong(position + 8) == 0 &&
-    bytes.getLong(position + 16) == 0
+      bytes.getLong(position + 16) == 0
 
   /**
     * Get the offset associated with this key.
@@ -138,10 +137,11 @@ class SkimpyOffsetMap(val memory: Int, val hashAlgorithm: String = "MD5")
     this.entries = 0
     this.lookups = 0L
     this.probes = 0L
-    Arrays.fill(bytes.array,
-                bytes.arrayOffset,
-                bytes.arrayOffset + bytes.limit,
-                0.toByte)
+    Arrays.fill(
+      bytes.array,
+      bytes.arrayOffset,
+      bytes.arrayOffset + bytes.limit,
+      0.toByte)
   }
 
   /**
@@ -165,7 +165,8 @@ class SkimpyOffsetMap(val memory: Int, val hashAlgorithm: String = "MD5")
   private def positionOf(hash: Array[Byte], attempt: Int): Int = {
     val probe =
       CoreUtils.readInt(hash, math.min(attempt, hashSize - 4)) + math.max(
-          0, attempt - hashSize + 4)
+        0,
+        attempt - hashSize + 4)
     val slot = Utils.abs(probe) % slots
     this.probes += 1
     slot * bytesPerEntry

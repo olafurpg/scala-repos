@@ -92,14 +92,13 @@ class SQLConfSuite extends QueryTest with SharedSQLContext {
       sql(s"set ${SQLConf.CASE_SENSITIVE.key}=10")
     }
     assert(
-        e.getMessage === s"${SQLConf.CASE_SENSITIVE.key} should be boolean, but was 10")
+      e.getMessage === s"${SQLConf.CASE_SENSITIVE.key} should be boolean, but was 10")
   }
 
   test("Test SHUFFLE_TARGET_POSTSHUFFLE_INPUT_SIZE's method") {
     sqlContext.conf.clear()
 
-    sqlContext.setConf(
-        SQLConf.SHUFFLE_TARGET_POSTSHUFFLE_INPUT_SIZE.key, "100")
+    sqlContext.setConf(SQLConf.SHUFFLE_TARGET_POSTSHUFFLE_INPUT_SIZE.key, "100")
     assert(sqlContext.conf.targetPostShuffleInputSize === 100)
 
     sqlContext.setConf(SQLConf.SHUFFLE_TARGET_POSTSHUFFLE_INPUT_SIZE.key, "1k")
@@ -117,21 +116,24 @@ class SQLConfSuite extends QueryTest with SharedSQLContext {
     // Test overflow exception
     intercept[IllegalArgumentException] {
       // This value exceeds Long.MaxValue
-      sqlContext.setConf(SQLConf.SHUFFLE_TARGET_POSTSHUFFLE_INPUT_SIZE.key,
-                         "90000000000g")
+      sqlContext.setConf(
+        SQLConf.SHUFFLE_TARGET_POSTSHUFFLE_INPUT_SIZE.key,
+        "90000000000g")
     }
 
     intercept[IllegalArgumentException] {
       // This value less than Int.MinValue
-      sqlContext.setConf(SQLConf.SHUFFLE_TARGET_POSTSHUFFLE_INPUT_SIZE.key,
-                         "-90000000000g")
+      sqlContext.setConf(
+        SQLConf.SHUFFLE_TARGET_POSTSHUFFLE_INPUT_SIZE.key,
+        "-90000000000g")
     }
 
     // Test invalid input
     intercept[IllegalArgumentException] {
       // This value exceeds Long.MaxValue
-      sqlContext.setConf(SQLConf.SHUFFLE_TARGET_POSTSHUFFLE_INPUT_SIZE.key,
-                         "-1g")
+      sqlContext.setConf(
+        SQLConf.SHUFFLE_TARGET_POSTSHUFFLE_INPUT_SIZE.key,
+        "-1g")
     }
     sqlContext.conf.clear()
   }

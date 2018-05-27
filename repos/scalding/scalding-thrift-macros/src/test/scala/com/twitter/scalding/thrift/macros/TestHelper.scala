@@ -35,7 +35,8 @@ object TestHelper extends Matchers {
     r.head
   }
 
-  def oBufCompare[T](a: T, b: T)(implicit obuf: OrderedSerialization[T]): Int = {
+  def oBufCompare[T](a: T, b: T)(
+      implicit obuf: OrderedSerialization[T]): Int = {
     obuf.compare(a, b)
   }
 

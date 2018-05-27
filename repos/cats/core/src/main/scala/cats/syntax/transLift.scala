@@ -7,6 +7,6 @@ trait TransLiftSyntax {
 }
 
 final class TransLiftOps[M[_], A](val ma: M[A]) extends AnyVal {
-  def liftT[MT[_ [_], _]](implicit TL: TransLift[MT, M]): MT[M, A] =
+  def liftT[MT[_[_], _]](implicit TL: TransLift[MT, M]): MT[M, A] =
     TL.liftT(ma)
 }

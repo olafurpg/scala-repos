@@ -1,6 +1,11 @@
 package play.libs.streams
 
-import java.util.concurrent.{CompletableFuture, CompletionStage, ExecutionException, TimeUnit}
+import java.util.concurrent.{
+  CompletableFuture,
+  CompletionStage,
+  ExecutionException,
+  TimeUnit
+}
 
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
@@ -29,8 +34,9 @@ object AccumulatorSpec extends org.specs2.mutable.Specification {
   }
 
   def sum: Accumulator[Int, Int] =
-    Accumulator.fromSink(Sink.fold[Int, Int](
-            0, new JFn2[Int, Int, Int] { def apply(a: Int, b: Int) = a + b }))
+    Accumulator.fromSink(Sink.fold[Int, Int](0, new JFn2[Int, Int, Int] {
+      def apply(a: Int, b: Int) = a + b
+    }))
 
   def source = Source from asJavaIterable(1 to 3)
   def sawait[T](f: Future[T]) = Await.result(f, 10.seconds)
@@ -38,8 +44,7 @@ object AccumulatorSpec extends org.specs2.mutable.Specification {
     f.toCompletableFuture.get(10, TimeUnit.SECONDS)
 
   def errorSource[T] =
-    Source.fromPublisher(
-        new Publisher[T] {
+    Source.fromPublisher(new Publisher[T] {
       def subscribe(s: Subscriber[_ >: T]) = {
         s.onSubscribe(new Subscription {
           def cancel() = s.onComplete()
@@ -69,7 +74,7 @@ object AccumulatorSpec extends org.specs2.mutable.Specification {
           case ex =>
             val cause = ex.getCause
             cause.isInstanceOf[RuntimeException] must beTrue and
-            (cause.getMessage must_== "failed")
+              (cause.getMessage must_== "failed")
         }
       }
 
@@ -83,7 +88,7 @@ object AccumulatorSpec extends org.specs2.mutable.Specification {
           case ex =>
             val cause = ex.getCause
             cause.isInstanceOf[RuntimeException] must beTrue and
-            (cause.getMessage must_== "error")
+              (cause.getMessage must_== "error")
         }
       }
     }
@@ -91,14 +96,15 @@ object AccumulatorSpec extends org.specs2.mutable.Specification {
     "be compatible with Java accumulator" in {
       "Java asScala" in withMaterializer { implicit m =>
         val sink = sum.toSink.mapMaterializedValue(
-            new JFn[CompletionStage[Int], Future[Int]] {
-          def apply(f: CompletionStage[Int]): Future[Int] =
-            FutureConverters.toScala(f)
-        })
+          new JFn[CompletionStage[Int], Future[Int]] {
+            def apply(f: CompletionStage[Int]): Future[Int] =
+              FutureConverters.toScala(f)
+          })
 
-        sawait(play.api.libs.streams
-              .Accumulator(sink.asScala)
-              .run(source.asScala)) must_== 6
+        sawait(
+          play.api.libs.streams
+            .Accumulator(sink.asScala)
+            .run(source.asScala)) must_== 6
       }
     }
   }

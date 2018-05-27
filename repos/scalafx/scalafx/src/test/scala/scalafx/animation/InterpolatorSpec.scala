@@ -64,7 +64,7 @@ class InterpolatorSpec extends FlatSpec with PropertyComparator {
     val kv1 = doubleProperty -> 50 tween Interpolator.SPLINE(.2, .2, .8, .8)
     // equals method doesn't work, so the best we can do is test the class type
     kv1.interpolator.getClass should equal(
-        Interpolator.SPLINE(.2, .2, .8, .8).getClass)
+      Interpolator.SPLINE(.2, .2, .8, .8).getClass)
   }
 
   it should "support tangent interpolations" in {
@@ -72,12 +72,11 @@ class InterpolatorSpec extends FlatSpec with PropertyComparator {
     val kv1 = doubleProperty -> 50 tween Interpolator.TANGENT((100 ms), .3)
     // equals method doesn't work, so the best we can do is test the class type
     kv1.interpolator.getClass should equal(
-        Interpolator.TANGENT((100 ms), .3).getClass)
+      Interpolator.TANGENT((100 ms), .3).getClass)
     val kv2 =
-      doubleProperty -> 50 tween Interpolator.TANGENT(
-          (50 ms), .5, (100 ms), .3)
+      doubleProperty -> 50 tween Interpolator.TANGENT((50 ms), .5, (100 ms), .3)
     // equals method doesn't work, so the best we can do is test the class type
     kv2.interpolator.getClass should equal(
-        Interpolator.TANGENT((50 ms), .5, (100 ms), .3).getClass)
+      Interpolator.TANGENT((50 ms), .5, (100 ms), .3).getClass)
   }
 }

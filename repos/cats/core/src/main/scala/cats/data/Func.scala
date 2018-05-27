@@ -21,8 +21,8 @@ object Func extends FuncInstances {
     }
 
   /** applicative function. */
-  def appFunc[F[_], A, B](
-      run0: A => F[B])(implicit FF: Applicative[F]): AppFunc[F, A, B] =
+  def appFunc[F[_], A, B](run0: A => F[B])(
+      implicit FF: Applicative[F]): AppFunc[F, A, B] =
     new AppFunc[F, A, B] {
       def F: Applicative[F] = FF
       def run: A => F[B] = run0
@@ -67,7 +67,8 @@ sealed trait FuncFunctor[F[_], C] extends Functor[Lambda[X => Func[F, C, X]]] {
 }
 
 sealed trait FuncApply[F[_], C]
-    extends Apply[Lambda[X => Func[F, C, X]]] with FuncFunctor[F, C] {
+    extends Apply[Lambda[X => Func[F, C, X]]]
+    with FuncFunctor[F, C] {
   def F: Apply[F]
   def ap[A, B](f: Func[F, C, A => B])(fa: Func[F, C, A]): Func[F, C, B] =
     Func.func(c => F.ap(f.run(c))(fa.run(c)))
@@ -76,7 +77,8 @@ sealed trait FuncApply[F[_], C]
 }
 
 sealed trait FuncApplicative[F[_], C]
-    extends Applicative[Lambda[X => Func[F, C, X]]] with FuncApply[F, C] {
+    extends Applicative[Lambda[X => Func[F, C, X]]]
+    with FuncApply[F, C] {
   def F: Applicative[F]
   def pure[A](a: A): Func[F, C, A] =
     Func.func(c => F.pure(a))
@@ -123,8 +125,8 @@ sealed abstract class AppFunc[F[_], A, B] extends Func[F, A, B] { self =>
 object AppFunc extends AppFuncInstances
 
 private[data] abstract class AppFuncInstances {
-  implicit def appFuncApplicative[F[_], C](implicit FF: Applicative[F])
-    : Applicative[Lambda[X => AppFunc[F, C, X]]] =
+  implicit def appFuncApplicative[F[_], C](
+      implicit FF: Applicative[F]): Applicative[Lambda[X => AppFunc[F, C, X]]] =
     new AppFuncApplicative[F, C] {
       def F: Applicative[F] = FF
     }
@@ -139,7 +141,8 @@ private[data] sealed trait AppFuncApplicative[F[_], C]
       fa: AppFunc[F, C, A]): AppFunc[F, C, B] =
     Func.appFunc[F, C, B](c => F.ap(f.run(c))(fa.run(c)))(F)
   def product[A, B](
-      fa: AppFunc[F, C, A], fb: AppFunc[F, C, B]): AppFunc[F, C, (A, B)] =
+      fa: AppFunc[F, C, A],
+      fb: AppFunc[F, C, B]): AppFunc[F, C, (A, B)] =
     Func.appFunc[F, C, (A, B)](c => F.product(fa.run(c), fb.run(c)))(F)
   def pure[A](a: A): AppFunc[F, C, A] =
     Func.appFunc[F, C, A](c => F.pure(a))(F)

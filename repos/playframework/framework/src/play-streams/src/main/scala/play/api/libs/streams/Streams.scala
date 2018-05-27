@@ -7,7 +7,10 @@ import akka.stream.Materializer
 import akka.stream.scaladsl._
 import org.reactivestreams._
 import play.api.libs.iteratee._
-import play.api.libs.streams.impl.{SubscriberPublisherProcessor, SubscriberIteratee}
+import play.api.libs.streams.impl.{
+  SubscriberPublisherProcessor,
+  SubscriberIteratee
+}
 import scala.concurrent.{ExecutionContext, Future, Promise}
 
 /**
@@ -111,7 +114,7 @@ object Streams {
       case Step.Done(x, _) => Future.successful(x)
       case notDone: Step[T, U] =>
         Future.failed(
-            new Exception(s"Can only get value from Done iteratee: $notDone"))
+          new Exception(s"Can only get value from Done iteratee: $notDone"))
     })(Execution.trampoline)
   }
 
@@ -120,7 +123,8 @@ object Streams {
     * by iterateeDoneToPublisher to extract the value of a Done iteratee.
     */
   private def iterateeFoldToPublisher[T, U, V](
-      iter: Iteratee[T, U], f: Step[T, U] => Future[V])(
+      iter: Iteratee[T, U],
+      f: Step[T, U] => Future[V])(
       implicit ec: ExecutionContext): Publisher[V] = {
     val fut: Future[V] = iter.fold(f)(ec.prepare)
     val pubr: Publisher[V] = futureToPublisher(fut)
@@ -155,7 +159,8 @@ object Streams {
     * with the value x.
     */
   def enumeratorToPublisher[T](
-      enum: Enumerator[T], emptyElement: Option[T] = None): Publisher[T] =
+      enum: Enumerator[T],
+      emptyElement: Option[T] = None): Publisher[T] =
     new impl.EnumeratorPublisher(enum, emptyElement)
 
   /**

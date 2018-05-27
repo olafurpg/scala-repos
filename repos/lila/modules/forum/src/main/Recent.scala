@@ -7,10 +7,11 @@ import spray.caching.{LruCache, Cache}
 import lila.security.{Permission, Granter => MasterGranter}
 import lila.user.User
 
-private[forum] final class Recent(postApi: PostApi,
-                                  ttl: Duration,
-                                  nb: Int,
-                                  publicCategIds: List[String]) {
+private[forum] final class Recent(
+    postApi: PostApi,
+    ttl: Duration,
+    nb: Int,
+    publicCategIds: List[String]) {
 
   private type GetTeams = String => Set[String]
 
@@ -32,9 +33,9 @@ private[forum] final class Recent(postApi: PostApi,
   private def userCacheKey(user: Option[User], getTeams: GetTeams): String =
     user.fold("en")(_.langs.mkString(",")) :: {
       (user.??(_.troll) ?? List("[troll]")) :::
-      (user ?? MasterGranter(Permission.StaffForum))
+        (user ?? MasterGranter(Permission.StaffForum))
         .fold(staffCategIds, publicCategIds) :::
-      ((user.map(_.id) ?? getTeams) map teamSlug).toList
+        ((user.map(_.id) ?? getTeams) map teamSlug).toList
     } mkString ";"
 
   private lazy val staffCategIds = "staff" :: publicCategIds

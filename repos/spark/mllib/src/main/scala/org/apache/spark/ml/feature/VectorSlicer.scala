@@ -42,7 +42,9 @@ import org.apache.spark.sql.types.StructType
   */
 @Experimental
 final class VectorSlicer(override val uid: String)
-    extends Transformer with HasInputCol with HasOutputCol
+    extends Transformer
+    with HasInputCol
+    with HasOutputCol
     with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("vectorSlicer"))
@@ -54,11 +56,11 @@ final class VectorSlicer(override val uid: String)
     * @group param
     */
   val indices = new IntArrayParam(
-      this,
-      "indices",
-      "An array of indices to select features from a vector column." +
+    this,
+    "indices",
+    "An array of indices to select features from a vector column." +
       " There can be no overlap with names.",
-      VectorSlicer.validIndices)
+    VectorSlicer.validIndices)
 
   setDefault(indices -> Array.empty[Int])
 
@@ -76,11 +78,11 @@ final class VectorSlicer(override val uid: String)
     * @group param
     */
   val names = new StringArrayParam(
-      this,
-      "names",
-      "An array of feature names to select features from a vector column." +
+    this,
+    "names",
+    "An array of feature names to select features from a vector column." +
       " There can be no overlap with indices.",
-      VectorSlicer.validNames)
+    VectorSlicer.validNames)
 
   setDefault(names -> Array.empty[String])
 
@@ -103,8 +105,8 @@ final class VectorSlicer(override val uid: String)
     inputAttr.numAttributes.foreach { numFeatures =>
       val maxIndex = $(indices).max
       require(
-          maxIndex < numFeatures,
-          s"Selected feature index $maxIndex invalid for only $numFeatures input features.")
+        maxIndex < numFeatures,
+        s"Selected feature index $maxIndex invalid for only $numFeatures input features.")
     }
 
     // Prepare output attributes
@@ -115,18 +117,20 @@ final class VectorSlicer(override val uid: String)
     }
     val outputAttr = selectedAttrs match {
       case Some(attrs) => new AttributeGroup($(outputCol), attrs)
-      case None => new AttributeGroup($(outputCol), inds.length)
+      case None        => new AttributeGroup($(outputCol), inds.length)
     }
 
     // Select features
     val slicer = udf { vec: Vector =>
       vec match {
-        case features: DenseVector => Vectors.dense(inds.map(features.apply))
+        case features: DenseVector  => Vectors.dense(inds.map(features.apply))
         case features: SparseVector => features.slice(inds)
       }
     }
     dataset.withColumn(
-        $(outputCol), slicer(dataset($(inputCol))), outputAttr.toMetadata())
+      $(outputCol),
+      slicer(dataset($(inputCol))),
+      outputAttr.toMetadata())
   }
 
   /** Get the feature indices in order: indices, names */
@@ -137,25 +141,27 @@ final class VectorSlicer(override val uid: String)
     val numDistinctFeatures = (nameFeatures ++ indFeatures).distinct.length
     lazy val errMsg =
       "VectorSlicer requires indices and names to be disjoint" +
-      s" sets of features, but they overlap." +
-      s" indices: ${indFeatures.mkString("[", ",", "]")}." + s" names: " +
-      nameFeatures
-        .zip($(names))
-        .map { case (i, n) => s"$i:$n" }
-        .mkString("[", ",", "]")
-    require(nameFeatures.length + indFeatures.length == numDistinctFeatures,
-            errMsg)
+        s" sets of features, but they overlap." +
+        s" indices: ${indFeatures.mkString("[", ",", "]")}." + s" names: " +
+        nameFeatures
+          .zip($(names))
+          .map { case (i, n) => s"$i:$n" }
+          .mkString("[", ",", "]")
+    require(
+      nameFeatures.length + indFeatures.length == numDistinctFeatures,
+      errMsg)
     indFeatures ++ nameFeatures
   }
 
   override def transformSchema(schema: StructType): StructType = {
-    require($(indices).length > 0 || $(names).length > 0,
-            s"VectorSlicer requires that at least one feature be selected.")
+    require(
+      $(indices).length > 0 || $(names).length > 0,
+      s"VectorSlicer requires that at least one feature be selected.")
     SchemaUtils.checkColumnType(schema, $(inputCol), new VectorUDT)
 
     if (schema.fieldNames.contains($(outputCol))) {
       throw new IllegalArgumentException(
-          s"Output column ${$(outputCol)} already exists.")
+        s"Output column ${$(outputCol)} already exists.")
     }
     val numFeaturesSelected = $(indices).length + $(names).length
     val outputAttr = new AttributeGroup($(outputCol), numFeaturesSelected)

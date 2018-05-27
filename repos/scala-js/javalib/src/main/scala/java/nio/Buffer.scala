@@ -2,7 +2,7 @@ package java.nio
 
 import scala.scalajs.js.typedarray._
 
-abstract class Buffer private[nio](val _capacity: Int) {
+abstract class Buffer private[nio] (val _capacity: Int) {
   private[nio] type ElementType
 
   private[nio] type BufferType >: this.type <: Buffer {
@@ -149,11 +149,17 @@ abstract class Buffer private[nio](val _capacity: Int) {
 
   /** Loads a range of elements with absolute, unchecked indices. */
   private[nio] def load(
-      startIndex: Int, dst: Array[ElementType], offset: Int, length: Int): Unit
+      startIndex: Int,
+      dst: Array[ElementType],
+      offset: Int,
+      length: Int): Unit
 
   /** Stores a range of elements with absolute, unchecked indices. */
   private[nio] def store(
-      startIndex: Int, src: Array[ElementType], offset: Int, length: Int): Unit
+      startIndex: Int,
+      src: Array[ElementType],
+      offset: Int,
+      length: Int): Unit
 
   /* Only for HeapByteBufferViews -- but that's the only place we can put it.
    * For all other types, it will be dce'ed.
@@ -172,7 +178,9 @@ abstract class Buffer private[nio](val _capacity: Int) {
   }
 
   @inline private[nio] def validateArrayIndexRange(
-      array: Array[_], offset: Int, length: Int): Unit = {
+      array: Array[_],
+      offset: Int,
+      length: Int): Unit = {
     if (offset < 0 || length < 0 || offset > array.length - length)
       throw new IndexOutOfBoundsException
   }

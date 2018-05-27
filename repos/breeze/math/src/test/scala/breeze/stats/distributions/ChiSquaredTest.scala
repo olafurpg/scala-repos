@@ -25,8 +25,11 @@ import org.apache.commons.math3.random.MersenneTwister
 
 @RunWith(classOf[JUnitRunner])
 class ChiSquaredTest
-    extends FunSuite with Checkers with UnivariateContinuousDistrTestBase
-    with MomentsTestBase[Double] with ExpFamTest[ChiSquared, Double]
+    extends FunSuite
+    with Checkers
+    with UnivariateContinuousDistrTestBase
+    with MomentsTestBase[Double]
+    with ExpFamTest[ChiSquared, Double]
     with HasCdfTestBase {
   type Distr = ChiSquared
   import Arbitrary.arbitrary
@@ -47,8 +50,8 @@ class ChiSquaredTest
 
   implicit def arbDistr = Arbitrary {
     for (shape <- arbitrary[Double].map { x =>
-      math.abs(x) % 1000.0 + 4.2
-    }) yield new ChiSquared(shape)(new RandBasis(new MersenneTwister(0)))
+           math.abs(x) % 1000.0 + 4.2
+         }) yield new ChiSquared(shape)(new RandBasis(new MersenneTwister(0)))
   }
 
   override val VARIANCE_TOLERANCE: Double = 1E-2

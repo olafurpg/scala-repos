@@ -6,29 +6,32 @@ import chess.variant.Variant
 import lila.common.PimpedJson._
 import play.api.libs.json.JsObject
 
-case class AnaDrop(role: chess.Role,
-                   pos: chess.Pos,
-                   variant: Variant,
-                   fen: String,
-                   path: String) {
+case class AnaDrop(
+    role: chess.Role,
+    pos: chess.Pos,
+    variant: Variant,
+    fen: String,
+    path: String) {
 
   def step: Valid[Step] =
     chess.Game(variant.some, fen.some).drop(role, pos) map {
       case (game, drop) =>
         val movable = !game.situation.end
         val fen = chess.format.Forsyth >> game
-        Step(ply = game.turns,
-             move = game.pgnMoves.lastOption.map { san =>
-               Step.Move(Uci(drop), san)
-             },
-             fen = fen,
-             check = game.situation.check,
-             dests = Some(movable ?? game.situation.destinations),
-             opening = Variant.openingSensibleVariants(variant) ?? {
-               FullOpeningDB findByFen fen
-             },
-             drops = movable.fold(game.situation.drops, Some(Nil)),
-             crazyData = game.situation.board.crazyData)
+        Step(
+          ply = game.turns,
+          move = game.pgnMoves.lastOption.map { san =>
+            Step.Move(Uci(drop), san)
+          },
+          fen = fen,
+          check = game.situation.check,
+          dests = Some(movable ?? game.situation.destinations),
+          opening = Variant.openingSensibleVariants(variant) ?? {
+            FullOpeningDB findByFen fen
+          },
+          drops = movable.fold(game.situation.drops, Some(Nil)),
+          crazyData = game.situation.board.crazyData
+        )
     }
 }
 
@@ -43,9 +46,5 @@ object AnaDrop {
       fen ← d str "fen"
       path ← d str "path"
     } yield
-      AnaDrop(role = role,
-              pos = pos,
-              variant = variant,
-              fen = fen,
-              path = path)
+      AnaDrop(role = role, pos = pos, variant = variant, fen = fen, path = path)
 }

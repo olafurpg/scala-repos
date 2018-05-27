@@ -14,22 +14,25 @@ import org.scalatest.testng.TestNGSuiteLike
 import org.testng.annotations.AfterClass
 
 abstract class AkkaIdentityProcessorVerification[T](
-    env: TestEnvironment, publisherShutdownTimeout: Long)
+    env: TestEnvironment,
+    publisherShutdownTimeout: Long)
     extends IdentityProcessorVerification[T](env, publisherShutdownTimeout)
-    with TestNGSuiteLike with ActorSystemLifecycle {
+    with TestNGSuiteLike
+    with ActorSystemLifecycle {
 
   def this(printlnDebug: Boolean) =
-    this(new TestEnvironment(Timeouts.defaultTimeoutMillis, printlnDebug),
-         Timeouts.publisherShutdownTimeoutMillis)
+    this(
+      new TestEnvironment(Timeouts.defaultTimeoutMillis, printlnDebug),
+      Timeouts.publisherShutdownTimeoutMillis)
 
   def this() = this(false)
 
   override def createFailedPublisher(): Publisher[T] =
-    TestPublisher.error(
-        new Exception("Unable to serve subscribers right now!"))
+    TestPublisher.error(new Exception("Unable to serve subscribers right now!"))
 
   def processorFromSubscriberAndPublisher(
-      sub: Subscriber[T], pub: Publisher[T]): Processor[T, T] = {
+      sub: Subscriber[T],
+      pub: Publisher[T]): Processor[T, T] = {
     new Processor[T, T] {
       override def onSubscribe(s: Subscription): Unit = sub.onSubscribe(s)
       override def onError(t: Throwable): Unit = sub.onError(t)

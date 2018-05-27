@@ -44,12 +44,13 @@ class IntegerLiteralCheckTest extends SimpleTestCase {
   def appendL(s: String): List[String] = List(s + "l", s + "L")
 
   val intValues = List(0, -0, 1, -1, 1234, -1234, Int.MinValue, Int.MaxValue)
-  val longValues = List(1l + Int.MaxValue,
-                        12345l + Int.MaxValue,
-                        -1l + Int.MinValue,
-                        -1234l + Int.MinValue,
-                        Long.MinValue,
-                        Long.MaxValue)
+  val longValues = List(
+    1l + Int.MaxValue,
+    12345l + Int.MaxValue,
+    -1l + Int.MinValue,
+    -1234l + Int.MinValue,
+    Long.MinValue,
+    Long.MaxValue)
   val numOfGenInteger = 10
 
   def testFine() {
@@ -62,11 +63,11 @@ class IntegerLiteralCheckTest extends SimpleTestCase {
     }
     val longStrings =
       (intStrings flatMap appendL) ++
-      (longValues ++ randomLongValues(numOfGenInteger))
-        .flatMap(expandIntegerLiteral)
-        .flatMap(prependSign)
-        .flatMap(appendL)
-        .distinct
+        (longValues ++ randomLongValues(numOfGenInteger))
+          .flatMap(expandIntegerLiteral)
+          .flatMap(prependSign)
+          .flatMap(appendL)
+          .distinct
     for (s <- longStrings) {
       assertNothing(messages(s"val a = $s"))
     }
@@ -86,13 +87,16 @@ class IntegerLiteralCheckTest extends SimpleTestCase {
 
   def testLiteralOverflowLong() {
     val overflowLongStrings =
-      (longValues ++ randomLongValues(numOfGenInteger)).flatMap(x =>
-            List(x.toString.padTo(21, '1'),
-                 "0x" + x.toHexString.padTo(17, '1'),
-                 "0" + x.toOctalString.padTo(23, '1')))
+      (longValues ++ randomLongValues(numOfGenInteger)).flatMap(
+        x =>
+          List(
+            x.toString.padTo(21, '1'),
+            "0x" + x.toHexString.padTo(17, '1'),
+            "0" + x.toOctalString.padTo(23, '1')))
     val overflowLongStringsWithL = overflowLongStrings.flatMap(appendL)
     for (s <- overflowLongStrings ++ overflowLongStringsWithL ++ Seq(
-        "9223372036854775808l", "-9223372036854775809l")) {
+           "9223372036854775808l",
+           "-9223372036854775809l")) {
       assertMatches(messages(s"val a = $s")) {
         case Error(s, OverflowLongPattern()) :: Nil =>
       }
@@ -108,7 +112,7 @@ class IntegerLiteralCheckTest extends SimpleTestCase {
 
     parse.depthFirst.foreach {
       case literal: ScLiteral => annotator.annotate(literal, mock)
-      case _ =>
+      case _                  =>
     }
 
     mock.annotations.filter((p: Message) => !p.isInstanceOf[Info])

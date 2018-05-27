@@ -41,7 +41,7 @@ class JsonValueReader(val data: JValue)(implicit formats: Formats)
     val jv = subj \ path
     jv match {
       case JNothing => None
-      case o => Some(o)
+      case o        => Some(o)
     }
   }
 }

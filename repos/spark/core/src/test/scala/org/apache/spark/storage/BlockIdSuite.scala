@@ -39,7 +39,7 @@ class BlockIdSuite extends SparkFunSuite {
       fail()
     } catch {
       case e: IllegalStateException => // OK
-      case _: Throwable => fail()
+      case _: Throwable             => fail()
     }
   }
 

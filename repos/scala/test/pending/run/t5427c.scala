@@ -8,6 +8,6 @@ object Test extends App {
   val bar = tpe.nonPrivateMember(TermName("bar"))
   bar match {
     case NoSymbol => println("no public member")
-    case _ => println("i'm screwed")
+    case _        => println("i'm screwed")
   }
 }

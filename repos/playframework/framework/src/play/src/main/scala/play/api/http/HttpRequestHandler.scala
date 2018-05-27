@@ -11,7 +11,11 @@ import play.api.libs.streams.Accumulator
 import play.api.mvc._
 import play.api.routing.Router
 import play.api.{Configuration, Environment, GlobalSettings, PlayConfig}
-import play.core.j.{JavaHttpRequestHandlerDelegate, JavaHandler, JavaHandlerComponents}
+import play.core.j.{
+  JavaHttpRequestHandlerDelegate,
+  JavaHandler,
+  JavaHandlerComponents
+}
 import play.utils.Reflect
 
 /**
@@ -48,19 +52,20 @@ object HttpRequestHandler {
       configuration: Configuration): Seq[Binding[_]] = {
 
     val fromConfiguration = Reflect
-      .bindingsFromConfiguration[HttpRequestHandler,
-                                 play.http.HttpRequestHandler,
-                                 play.core.j.JavaHttpRequestHandlerAdapter,
-                                 play.http.DefaultHttpRequestHandler,
-                                 JavaCompatibleHttpRequestHandler](
+      .bindingsFromConfiguration[
+        HttpRequestHandler,
+        play.http.HttpRequestHandler,
+        play.core.j.JavaHttpRequestHandlerAdapter,
+        play.http.DefaultHttpRequestHandler,
+        JavaCompatibleHttpRequestHandler](
         environment,
         PlayConfig(configuration),
         "play.http.requestHandler",
         "RequestHandler")
 
     val javaComponentsBindings = Seq(
-        BindingKey(classOf[play.core.j.JavaHandlerComponents])
-          .to[play.core.j.DefaultJavaHandlerComponents])
+      BindingKey(classOf[play.core.j.JavaHandlerComponents])
+        .to[play.core.j.DefaultJavaHandlerComponents])
 
     fromConfiguration ++ javaComponentsBindings
   }
@@ -73,13 +78,14 @@ object ActionCreator {
       environment: Environment,
       configuration: Configuration): Seq[Binding[_]] = {
     Reflect
-      .configuredClass[ActionCreator,
-                       ActionCreator,
-                       HttpRequestHandlerActionCreator](
-          environment,
-          PlayConfig(configuration),
-          "play.http.actionCreator",
-          "ActionCreator")
+      .configuredClass[
+        ActionCreator,
+        ActionCreator,
+        HttpRequestHandlerActionCreator](
+        environment,
+        PlayConfig(configuration),
+        "play.http.actionCreator",
+        "ActionCreator")
       .fold(Seq[Binding[_]]()) { either =>
         val impl = either.fold(identity, identity)
         Seq(BindingKey(classOf[ActionCreator]).to(impl))
@@ -107,17 +113,19 @@ object NotImplementedHttpRequestHandler extends HttpRequestHandler {
   * of this, so when not providing any custom logic, whether this is used or the global settings http request handler
   * is used is irrelevant.
   */
-class DefaultHttpRequestHandler(router: Router,
-                                errorHandler: HttpErrorHandler,
-                                configuration: HttpConfiguration,
-                                filters: EssentialFilter*)
+class DefaultHttpRequestHandler(
+    router: Router,
+    errorHandler: HttpErrorHandler,
+    configuration: HttpConfiguration,
+    filters: EssentialFilter*)
     extends HttpRequestHandler {
 
   @Inject
-  def this(router: Router,
-           errorHandler: HttpErrorHandler,
-           configuration: HttpConfiguration,
-           filters: HttpFilters) =
+  def this(
+      router: Router,
+      errorHandler: HttpErrorHandler,
+      configuration: HttpConfiguration,
+      filters: HttpFilters) =
     this(router, errorHandler, configuration, filters.filters: _*)
 
   private val context = configuration.context.stripSuffix("/")
@@ -135,14 +143,14 @@ class DefaultHttpRequestHandler(router: Router,
     //   - Path starts with context followed by a '/' character.
     context.isEmpty ||
     (path.startsWith(context) &&
-        (path.length == context.length || path.charAt(context.length) == '/'))
+    (path.length == context.length || path.charAt(context.length) == '/'))
   }
 
   def handlerForRequest(request: RequestHeader) = {
 
     def notFoundHandler =
-      Action.async(BodyParsers.parse.empty)(
-          req => errorHandler.onClientError(req, NOT_FOUND))
+      Action.async(BodyParsers.parse.empty)(req =>
+        errorHandler.onClientError(req, NOT_FOUND))
 
     val (routedRequest, handler) =
       routeRequest(request) map {
@@ -216,8 +224,8 @@ class DefaultHttpRequestHandler(router: Router,
   * Custom handlers need not extend this.
   */
 @deprecated(
-    "GlobalSettings is deprecated. Use DefaultHttpRequestHandler or JavaCompatibleHttpRequestHandler.",
-    "2.5.0")
+  "GlobalSettings is deprecated. Use DefaultHttpRequestHandler or JavaCompatibleHttpRequestHandler.",
+  "2.5.0")
 class GlobalSettingsHttpRequestHandler @Inject()(
     global: Provider[GlobalSettings])
     extends HttpRequestHandler {
@@ -242,7 +250,10 @@ class JavaCompatibleHttpRequestHandler @Inject()(
     filters: HttpFilters,
     components: JavaHandlerComponents)
     extends DefaultHttpRequestHandler(
-        router, errorHandler, configuration, filters.filters: _*) {
+      router,
+      errorHandler,
+      configuration,
+      filters.filters: _*) {
 
   override def routeRequest(request: RequestHeader): Option[Handler] = {
     super.routeRequest(request) match {

@@ -37,7 +37,7 @@ object Test extends App {
       d.hours = 25 // throws a DateError exception
     } catch {
       case de: DateError => println("DateError")
-      case e: Exception => println("Exception")
+      case e: Exception  => println("Exception")
     }
   }.eval
 }

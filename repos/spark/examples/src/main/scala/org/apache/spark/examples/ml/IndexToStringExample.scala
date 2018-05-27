@@ -34,14 +34,14 @@ object IndexToStringExample {
     // $example on$
     val df = sqlContext
       .createDataFrame(
-          Seq(
-              (0, "a"),
-              (1, "b"),
-              (2, "c"),
-              (3, "a"),
-              (4, "a"),
-              (5, "c")
-          ))
+        Seq(
+          (0, "a"),
+          (1, "b"),
+          (2, "c"),
+          (3, "a"),
+          (4, "a"),
+          (5, "c")
+        ))
       .toDF("id", "category")
 
     val indexer = new StringIndexer()

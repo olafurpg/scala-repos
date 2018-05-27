@@ -4,13 +4,14 @@ package ui
 import org.apache.commons.lang3.StringEscapeUtils.escapeHtml4
 import play.twirl.api.Html
 
-case class OpenGraph(title: String,
-                     description: String,
-                     url: String,
-                     `type`: String = "website",
-                     image: Option[String] = None,
-                     siteName: String = "lichess.org",
-                     more: List[(String, String)] = Nil) {
+case class OpenGraph(
+    title: String,
+    description: String,
+    url: String,
+    `type`: String = "website",
+    image: Option[String] = None,
+    siteName: String = "lichess.org",
+    more: List[(String, String)] = Nil) {
 
   def html = Html(og.str + twitter.str)
 
@@ -23,13 +24,13 @@ case class OpenGraph(title: String,
 
     def str =
       List(
-          "title" -> title,
-          "description" -> description,
-          "url" -> url,
-          "type" -> `type`,
-          "site_name" -> siteName
+        "title" -> title,
+        "description" -> description,
+        "url" -> url,
+        "type" -> `type`,
+        "site_name" -> siteName
       ).map(tupledTag).mkString + image.?? { tag("image", _) } +
-      more.map(tupledTag).mkString
+        more.map(tupledTag).mkString
   }
 
   object twitter {
@@ -41,11 +42,11 @@ case class OpenGraph(title: String,
 
     def str =
       List(
-          "card" -> "summary",
-          "title" -> title,
-          "description" -> description,
-          "site" -> "@lichessorg"
+        "card" -> "summary",
+        "title" -> title,
+        "description" -> description,
+        "site" -> "@lichessorg"
       ).map(tupledTag).mkString + image.?? { tag("image", _) } +
-      more.map(tupledTag).mkString
+        more.map(tupledTag).mkString
   }
 }

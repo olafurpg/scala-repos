@@ -23,9 +23,9 @@ trait Tryo {
       Full(f)
     } catch {
       case c if ignore.exists(_.isAssignableFrom(c.getClass)) =>
-        onError.foreach(_ (c)); Empty
+        onError.foreach(_(c)); Empty
       case c if (ignore == null || ignore.isEmpty) =>
-        onError.foreach(_ (c)); Failure(c.getMessage, Full(c), Empty)
+        onError.foreach(_(c)); Failure(c.getMessage, Full(c), Empty)
     }
   }
 
@@ -48,7 +48,7 @@ trait Tryo {
       Full(f)
     } catch {
       case t if handler.isDefinedAt(t) => Full(handler(t))
-      case e: Throwable => Failure(e.getMessage, Full(e), Empty)
+      case e: Throwable                => Failure(e.getMessage, Full(e), Empty)
     }
   }
 

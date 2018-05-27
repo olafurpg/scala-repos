@@ -130,7 +130,8 @@ class ConduitSpscBenchmark extends StdBenchAnnotations {
     else source().map(_ *:: mkSpool(n - 1))
 
   private[this] def consumeSpool[A](
-      spool: Spool[A], b: Boolean): Future[Boolean] =
+      spool: Spool[A],
+      b: Boolean): Future[Boolean] =
     if (spool.isEmpty) Future.value(b)
     else
       sink(spool.head).flatMap { newB =>

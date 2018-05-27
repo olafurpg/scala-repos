@@ -22,7 +22,8 @@ class DecodeHandlerTest extends FunSuite with MockitoSugar {
     var nonStringsMessageCount = 0
     val readSnooper = new ChannelInboundHandlerAdapter {
       override def channelRead(
-          ctx: ChannelHandlerContext, msg: scala.Any): Unit = {
+          ctx: ChannelHandlerContext,
+          msg: scala.Any): Unit = {
         msg match {
           case s: String =>
             messagesSeen.append(s)
@@ -33,7 +34,8 @@ class DecodeHandlerTest extends FunSuite with MockitoSugar {
       }
     }
     val ch = new EmbeddedChannel(
-        new DecodeHandler[String](() => StringDecoder), readSnooper)
+      new DecodeHandler[String](() => StringDecoder),
+      readSnooper)
     ch.pipeline.fireChannelActive
 
     ch.writeInbound(Unpooled.wrappedBuffer("hi".getBytes))

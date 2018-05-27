@@ -65,7 +65,7 @@ object EmitManPage {
           emitText(text)
           out.print("\"")
 
-        case DefinitionList(definitions @ _ *) =>
+        case DefinitionList(definitions @ _*) =>
           var n = definitions.length
           for (d <- definitions) {
             out println ".TP"
@@ -133,7 +133,8 @@ object EmitManPage {
     }
 
     out println ".\\\""
-    out.println(".\\\" ############################## " + section.title +
+    out.println(
+      ".\\\" ############################## " + section.title +
         " ###############################")
     out println ".\\\""
     val tag = if (depth > 1) ".SS" else ".SH"
@@ -158,7 +159,7 @@ object EmitManPage {
     out println ".\\\" Process this file with nroff -man scala.1"
     out println ".\\\""
     out.println(
-        ".TH " + doc.title + " " + doc.category.id + "  \"" + doc.date +
+      ".TH " + doc.title + " " + doc.category.id + "  \"" + doc.date +
         "\" \"version " + doc.version + "\" \"" + doc.category + "\"")
 
     doc.sections foreach (s => emitSection(s, 1))
@@ -166,13 +167,14 @@ object EmitManPage {
 
   def main(args: Array[String]) = args match {
     case Array(classname) => emitManPage(classname)
-    case Array(classname, file, _ *) =>
+    case Array(classname, file, _*) =>
       emitManPage(classname, new java.io.FileOutputStream(file))
     case _ => sys.exit(1)
   }
 
   def emitManPage(
-      classname: String, outStream: java.io.OutputStream = out.out) {
+      classname: String,
+      outStream: java.io.OutputStream = out.out) {
     if (outStream != out.out) out setOut outStream
     try {
       val cl = this.getClass.getClassLoader()

@@ -11,7 +11,7 @@ object Range {
 
   import play.api.libs.json._
 
-  implicit def rangeJsonWriter[A : Writes] = Writes[Range[A]] { r =>
+  implicit def rangeJsonWriter[A: Writes] = Writes[Range[A]] { r =>
     Json.obj("a" -> r.a, "b" -> r.b)
   }
 
@@ -20,8 +20,8 @@ object Range {
       case (Some(aa), Some(bb)) =>
         o.lt(aa, bb)
           .fold(
-              new Range(a, b),
-              new Range(b, a)
+            new Range(a, b),
+            new Range(b, a)
           )
       case (x, y) => new Range(x, y)
     }

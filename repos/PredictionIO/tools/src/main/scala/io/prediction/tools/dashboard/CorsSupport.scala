@@ -30,7 +30,8 @@ trait CORSSupport {
 
   private val allowOriginHeader = `Access-Control-Allow-Origin`(AllOrigins)
   private val optionsCorsHeaders = List(
-      `Access-Control-Allow-Headers`("""Origin,
+    `Access-Control-Allow-Headers`(
+      """Origin,
                                       |X-Requested-With,
                                       |Content-Type,
                                       |Accept,
@@ -38,41 +39,42 @@ trait CORSSupport {
                                       |Accept-Language,
                                       |Host,
                                       |Referer,
-                                      |User-Agent""".stripMargin.replace("\n",
-                                                                         " ")),
-      `Access-Control-Max-Age`(1728000)
+                                      |User-Agent""".stripMargin
+        .replace("\n", " ")),
+    `Access-Control-Max-Age`(1728000)
   )
 
   def cors[T]: Directive0 = mapRequestContext { ctx =>
-    ctx.withRouteResponseHandling {
-      // OPTION request for a resource that responds to other methods
-      case Rejected(x)
-          if
-          (ctx.request.method.equals(HttpMethods.OPTIONS) &&
+    ctx
+      .withRouteResponseHandling {
+        // OPTION request for a resource that responds to other methods
+        case Rejected(x)
+            if (ctx.request.method.equals(HttpMethods.OPTIONS) &&
               x.exists(_.isInstanceOf[MethodRejection])) => {
           val allowedMethods: List[HttpMethod] = x.collect {
             case rejection: MethodRejection => rejection.supported
           }
           ctx.complete {
             HttpResponse().withHeaders(
-                `Access-Control-Allow-Methods`(
-                    HttpMethods.OPTIONS,
-                    allowedMethods: _*) :: allowOriginHeader :: optionsCorsHeaders
+              `Access-Control-Allow-Methods`(
+                HttpMethods.OPTIONS,
+                allowedMethods: _*) :: allowOriginHeader :: optionsCorsHeaders
             )
           }
         }
-    }.withHttpResponseHeadersMapped { headers =>
-      allowOriginHeader :: headers
-    }
+      }
+      .withHttpResponseHeadersMapped { headers =>
+        allowOriginHeader :: headers
+      }
   }
 
   override def timeoutRoute: StandardRoute = complete {
     HttpResponse(
-        StatusCodes.InternalServerError,
-        HttpEntity(
-            ContentTypes.`text/plain(UTF-8)`,
-            "The server was not able to produce a timely response to your request."),
-        List(allowOriginHeader)
+      StatusCodes.InternalServerError,
+      HttpEntity(
+        ContentTypes.`text/plain(UTF-8)`,
+        "The server was not able to produce a timely response to your request."),
+      List(allowOriginHeader)
     )
   }
 }

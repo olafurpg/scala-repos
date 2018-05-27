@@ -45,17 +45,19 @@ import org.apache.spark.launcher.YarnCommandBuilderUtils
 import org.apache.spark.network.util.JavaUtils
 import org.apache.spark.util.Utils
 
-private[yarn] class ExecutorRunnable(container: Container,
-                                     conf: Configuration,
-                                     sparkConf: SparkConf,
-                                     masterAddress: String,
-                                     slaveId: String,
-                                     hostname: String,
-                                     executorMemory: Int,
-                                     executorCores: Int,
-                                     appId: String,
-                                     securityMgr: SecurityManager)
-    extends Runnable with Logging {
+private[yarn] class ExecutorRunnable(
+    container: Container,
+    conf: Configuration,
+    sparkConf: SparkConf,
+    masterAddress: String,
+    slaveId: String,
+    hostname: String,
+    executorMemory: Int,
+    executorCores: Int,
+    appId: String,
+    securityMgr: SecurityManager)
+    extends Runnable
+    with Logging {
 
   var rpc: YarnRPC = YarnRPC.create(conf)
   var nmClient: NMClient = _
@@ -87,13 +89,14 @@ private[yarn] class ExecutorRunnable(container: Container,
     credentials.writeTokenStorageToStream(dob)
     ctx.setTokens(ByteBuffer.wrap(dob.getData()))
 
-    val commands = prepareCommand(masterAddress,
-                                  slaveId,
-                                  hostname,
-                                  executorMemory,
-                                  executorCores,
-                                  appId,
-                                  localResources)
+    val commands = prepareCommand(
+      masterAddress,
+      slaveId,
+      hostname,
+      executorMemory,
+      executorCores,
+      appId,
+      localResources)
 
     logInfo(s"""
       |===============================================================================
@@ -107,7 +110,7 @@ private[yarn] class ExecutorRunnable(container: Container,
 
     ctx.setCommands(commands.asJava)
     ctx.setApplicationACLs(
-        YarnSparkHadoopUtil.getApplicationAclsForYarn(securityMgr).asJava)
+      YarnSparkHadoopUtil.getApplicationAclsForYarn(securityMgr).asJava)
 
     // If external shuffle service is enabled, register with the Yarn shuffle service already
     // started on the NodeManager and, if authentication is enabled, provide it with our secret
@@ -122,8 +125,7 @@ private[yarn] class ExecutorRunnable(container: Container,
           // Authentication is not enabled, so just provide dummy metadata
           ByteBuffer.allocate(0)
         }
-      ctx.setServiceData(
-          Collections.singletonMap("spark_shuffle", secretBytes))
+      ctx.setServiceData(Collections.singletonMap("spark_shuffle", secretBytes))
     }
 
     // Send the start request to the ContainerManager
@@ -132,9 +134,9 @@ private[yarn] class ExecutorRunnable(container: Container,
     } catch {
       case ex: Exception =>
         throw new SparkException(
-            s"Exception while starting container ${container.getId}" +
+          s"Exception while starting container ${container.getId}" +
             s" on host $hostname",
-            ex)
+          ex)
     }
   }
 
@@ -169,23 +171,26 @@ private[yarn] class ExecutorRunnable(container: Container,
     }
     sparkConf.get(EXECUTOR_LIBRARY_PATH).foreach { p =>
       prefixEnv = Some(
-          Client.getClusterPath(sparkConf, Utils.libraryPathEnvPrefix(Seq(p))))
+        Client.getClusterPath(sparkConf, Utils.libraryPathEnvPrefix(Seq(p))))
     }
 
     javaOpts += "-Djava.io.tmpdir=" + new Path(
-        YarnSparkHadoopUtil.expandEnvironment(Environment.PWD),
-        YarnConfiguration.DEFAULT_CONTAINER_TEMP_DIR
+      YarnSparkHadoopUtil.expandEnvironment(Environment.PWD),
+      YarnConfiguration.DEFAULT_CONTAINER_TEMP_DIR
     )
 
     // Certain configs need to be passed here because they are needed before the Executor
     // registers with the Scheduler and transfers the spark configs. Since the Executor backend
     // uses RPC to connect to the scheduler, the RPC settings are needed as well as the
     // authentication settings.
-    sparkConf.getAll.filter {
-      case (k, v) => SparkConf.isExecutorStartupConf(k)
-    }.foreach {
-      case (k, v) => javaOpts += YarnSparkHadoopUtil.escapeForShell(s"-D$k=$v")
-    }
+    sparkConf.getAll
+      .filter {
+        case (k, v) => SparkConf.isExecutorStartupConf(k)
+      }
+      .foreach {
+        case (k, v) =>
+          javaOpts += YarnSparkHadoopUtil.escapeForShell(s"-D$k=$v")
+      }
 
     // Commenting it out for now - so that people can refer to the properties if required. Remove
     // it once cpuset version is pushed out.
@@ -215,7 +220,7 @@ private[yarn] class ExecutorRunnable(container: Container,
 
     // For log4j configuration to reference
     javaOpts +=
-    ("-Dspark.yarn.app.container.log.dir=" +
+      ("-Dspark.yarn.app.container.log.dir=" +
         ApplicationConstants.LOG_DIR_EXPANSION_VAR)
     YarnCommandBuilderUtils.addPermGenSizeOpt(javaOpts)
 
@@ -234,30 +239,32 @@ private[yarn] class ExecutorRunnable(container: Container,
 
     val commands =
       prefixEnv ++ Seq(
-          YarnSparkHadoopUtil.expandEnvironment(Environment.JAVA_HOME) +
+        YarnSparkHadoopUtil.expandEnvironment(Environment.JAVA_HOME) +
           "/bin/java",
-          "-server",
-          // Kill if OOM is raised - leverage yarn's failure handling to cause rescheduling.
-          // Not killing the task leaves various aspects of the executor and (to some extent) the jvm in
-          // an inconsistent state.
-          // TODO: If the OOM is not recoverable by rescheduling it on different node, then do
-          // 'something' to fail job ... akin to blacklisting trackers in mapred ?
-          YarnSparkHadoopUtil.getOutOfMemoryErrorArgument) ++ javaOpts ++ Seq(
-          "org.apache.spark.executor.CoarseGrainedExecutorBackend",
-          "--driver-url",
-          masterAddress.toString,
-          "--executor-id",
-          slaveId.toString,
-          "--hostname",
-          hostname.toString,
-          "--cores",
-          executorCores.toString,
-          "--app-id",
-          appId) ++ userClassPath ++ Seq(
-          "1>",
-          ApplicationConstants.LOG_DIR_EXPANSION_VAR + "/stdout",
-          "2>",
-          ApplicationConstants.LOG_DIR_EXPANSION_VAR + "/stderr")
+        "-server",
+        // Kill if OOM is raised - leverage yarn's failure handling to cause rescheduling.
+        // Not killing the task leaves various aspects of the executor and (to some extent) the jvm in
+        // an inconsistent state.
+        // TODO: If the OOM is not recoverable by rescheduling it on different node, then do
+        // 'something' to fail job ... akin to blacklisting trackers in mapred ?
+        YarnSparkHadoopUtil.getOutOfMemoryErrorArgument
+      ) ++ javaOpts ++ Seq(
+        "org.apache.spark.executor.CoarseGrainedExecutorBackend",
+        "--driver-url",
+        masterAddress.toString,
+        "--executor-id",
+        slaveId.toString,
+        "--hostname",
+        hostname.toString,
+        "--cores",
+        executorCores.toString,
+        "--app-id",
+        appId
+      ) ++ userClassPath ++ Seq(
+        "1>",
+        ApplicationConstants.LOG_DIR_EXPANSION_VAR + "/stdout",
+        "2>",
+        ApplicationConstants.LOG_DIR_EXPANSION_VAR + "/stderr")
 
     // TODO: it would be nicer to just make sure there are no null commands here
     commands.map(s => if (s == null) "null" else s).toList
@@ -293,12 +300,13 @@ private[yarn] class ExecutorRunnable(container: Container,
       val visibilities =
         System.getenv("SPARK_YARN_CACHE_FILES_VISIBILITIES").split(',')
       for (i <- 0 to distFiles.length - 1) {
-        setupDistributedCache(distFiles(i),
-                              LocalResourceType.FILE,
-                              localResources,
-                              timeStamps(i),
-                              fileSizes(i),
-                              visibilities(i))
+        setupDistributedCache(
+          distFiles(i),
+          LocalResourceType.FILE,
+          localResources,
+          timeStamps(i),
+          fileSizes(i),
+          visibilities(i))
       }
     }
 
@@ -311,12 +319,13 @@ private[yarn] class ExecutorRunnable(container: Container,
       val visibilities =
         System.getenv("SPARK_YARN_CACHE_ARCHIVES_VISIBILITIES").split(',')
       for (i <- 0 to distArchives.length - 1) {
-        setupDistributedCache(distArchives(i),
-                              LocalResourceType.ARCHIVE,
-                              localResources,
-                              timeStamps(i),
-                              fileSizes(i),
-                              visibilities(i))
+        setupDistributedCache(
+          distArchives(i),
+          LocalResourceType.ARCHIVE,
+          localResources,
+          timeStamps(i),
+          fileSizes(i),
+          visibilities(i))
       }
     }
 
@@ -327,12 +336,13 @@ private[yarn] class ExecutorRunnable(container: Container,
   private def prepareEnvironment(
       container: Container): HashMap[String, String] = {
     val env = new HashMap[String, String]()
-    Client.populateClasspath(null,
-                             yarnConf,
-                             sparkConf,
-                             env,
-                             false,
-                             sparkConf.get(EXECUTOR_CLASS_PATH))
+    Client.populateClasspath(
+      null,
+      yarnConf,
+      sparkConf,
+      env,
+      false,
+      sparkConf.get(EXECUTOR_CLASS_PATH))
 
     sparkConf.getExecutorEnv.foreach {
       case (key, value) =>
@@ -348,8 +358,8 @@ private[yarn] class ExecutorRunnable(container: Container,
 
     // lookup appropriate http scheme for container log urls
     val yarnHttpPolicy = yarnConf.get(
-        YarnConfiguration.YARN_HTTP_POLICY_KEY,
-        YarnConfiguration.YARN_HTTP_POLICY_DEFAULT
+      YarnConfiguration.YARN_HTTP_POLICY_KEY,
+      YarnConfiguration.YARN_HTTP_POLICY_DEFAULT
     )
     val httpScheme =
       if (yarnHttpPolicy == "HTTPS_ONLY") "https://" else "http://"

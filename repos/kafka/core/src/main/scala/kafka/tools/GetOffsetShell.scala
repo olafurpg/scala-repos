@@ -31,8 +31,8 @@ object GetOffsetShell {
     val parser = new OptionParser
     val brokerListOpt = parser
       .accepts(
-          "broker-list",
-          "REQUIRED: The list of hostname and port of the server to connect to.")
+        "broker-list",
+        "REQUIRED: The list of hostname and port of the server to connect to.")
       .withRequiredArg
       .describedAs("hostname:port,...,hostname:port")
       .ofType(classOf[String])
@@ -43,8 +43,8 @@ object GetOffsetShell {
       .ofType(classOf[String])
     val partitionOpt = parser
       .accepts(
-          "partitions",
-          "comma separated list of partition ids. If not specified, it will find offsets for all partitions")
+        "partitions",
+        "comma separated list of partition ids. If not specified, it will find offsets for all partitions")
       .withRequiredArg
       .describedAs("partition ids")
       .ofType(classOf[String])
@@ -62,8 +62,9 @@ object GetOffsetShell {
       .ofType(classOf[java.lang.Integer])
       .defaultsTo(1)
     val maxWaitMsOpt = parser
-      .accepts("max-wait-ms",
-               "The max amount of time each fetch request waits.")
+      .accepts(
+        "max-wait-ms",
+        "The max amount of time each fetch request waits.")
       .withRequiredArg
       .describedAs("ms")
       .ofType(classOf[java.lang.Integer])
@@ -71,12 +72,17 @@ object GetOffsetShell {
 
     if (args.length == 0)
       CommandLineUtils.printUsageAndDie(
-          parser, "An interactive shell for getting consumer offsets.")
+        parser,
+        "An interactive shell for getting consumer offsets.")
 
     val options = parser.parse(args: _*)
 
     CommandLineUtils.checkRequiredArgs(
-        parser, options, brokerListOpt, topicOpt, timeOpt)
+      parser,
+      options,
+      brokerListOpt,
+      topicOpt,
+      timeOpt)
 
     val clientId = "GetOffsetShell"
     val brokerList = options.valueOf(brokerListOpt)
@@ -90,11 +96,15 @@ object GetOffsetShell {
 
     val topicsMetadata = ClientUtils
       .fetchTopicMetadata(
-          Set(topic), metadataTargetBrokers, clientId, maxWaitMs)
+        Set(topic),
+        metadataTargetBrokers,
+        clientId,
+        maxWaitMs)
       .topicsMetadata
     if (topicsMetadata.size != 1 || !topicsMetadata(0).topic.equals(topic)) {
-      System.err.println(("Error: no valid topic metadata for topic: %s, " +
-              " probably the topic does not exist, run ").format(topic) +
+      System.err.println(
+        ("Error: no valid topic metadata for topic: %s, " +
+          " probably the topic does not exist, run ").format(topic) +
           "kafka-list-topic.sh to verify")
       System.exit(1)
     }
@@ -112,26 +122,32 @@ object GetOffsetShell {
           metadata.leader match {
             case Some(leader) =>
               val consumer = new SimpleConsumer(
-                  leader.host, leader.port, 10000, 100000, clientId)
+                leader.host,
+                leader.port,
+                10000,
+                100000,
+                clientId)
               val topicAndPartition = TopicAndPartition(topic, partitionId)
               val request = OffsetRequest(
-                  Map(topicAndPartition -> PartitionOffsetRequestInfo(
-                          time, nOffsets)))
+                Map(
+                  topicAndPartition -> PartitionOffsetRequestInfo(
+                    time,
+                    nOffsets)))
               val offsets = consumer
                 .getOffsetsBefore(request)
                 .partitionErrorAndOffsets(topicAndPartition)
                 .offsets
 
               println(
-                  "%s:%d:%s".format(topic, partitionId, offsets.mkString(",")))
+                "%s:%d:%s".format(topic, partitionId, offsets.mkString(",")))
             case None =>
               System.err.println(
-                  "Error: partition %d does not have a leader. Skip getting offsets"
-                    .format(partitionId))
+                "Error: partition %d does not have a leader. Skip getting offsets"
+                  .format(partitionId))
           }
         case None =>
           System.err.println(
-              "Error: partition %d does not exist".format(partitionId))
+            "Error: partition %d does not exist".format(partitionId))
       }
     }
   }

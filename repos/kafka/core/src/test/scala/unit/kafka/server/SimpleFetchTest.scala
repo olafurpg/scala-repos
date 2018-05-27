@@ -42,9 +42,11 @@ class SimpleFetchTest {
 
   val overridingProps = new Properties()
   overridingProps.put(
-      KafkaConfig.ReplicaLagTimeMaxMsProp, replicaLagTimeMaxMs.toString)
+    KafkaConfig.ReplicaLagTimeMaxMsProp,
+    replicaLagTimeMaxMs.toString)
   overridingProps.put(
-      KafkaConfig.ReplicaFetchWaitMaxMsProp, replicaFetchWaitMaxMs.toString)
+    KafkaConfig.ReplicaFetchWaitMaxMsProp,
+    replicaFetchWaitMaxMs.toString)
 
   val configs = TestUtils
     .createBrokerConfigs(2, TestUtils.MockZkConnect)
@@ -91,17 +93,19 @@ class SimpleFetchTest {
       .anyTimes()
     EasyMock
       .expect(log.read(0, fetchSize, Some(partitionHW)))
-      .andReturn(new FetchDataInfo(
-              new LogOffsetMetadata(0L, 0L, 0),
-              new ByteBufferMessageSet(messagesToHW)
-          ))
+      .andReturn(
+        new FetchDataInfo(
+          new LogOffsetMetadata(0L, 0L, 0),
+          new ByteBufferMessageSet(messagesToHW)
+        ))
       .anyTimes()
     EasyMock
       .expect(log.read(0, fetchSize, None))
-      .andReturn(new FetchDataInfo(
-              new LogOffsetMetadata(0L, 0L, 0),
-              new ByteBufferMessageSet(messagesToLEO)
-          ))
+      .andReturn(
+        new FetchDataInfo(
+          new LogOffsetMetadata(0L, 0L, 0),
+          new ByteBufferMessageSet(messagesToLEO)
+        ))
       .anyTimes()
     EasyMock.replay(log)
 
@@ -114,21 +118,22 @@ class SimpleFetchTest {
     EasyMock.replay(logManager)
 
     // create the replica manager
-    replicaManager = new ReplicaManager(configs.head,
-                                        metrics,
-                                        time,
-                                        jTime,
-                                        zkUtils,
-                                        scheduler,
-                                        logManager,
-                                        new AtomicBoolean(false))
+    replicaManager = new ReplicaManager(
+      configs.head,
+      metrics,
+      time,
+      jTime,
+      zkUtils,
+      scheduler,
+      logManager,
+      new AtomicBoolean(false))
 
     // add the partition with two replicas, both in ISR
     val partition = replicaManager.getOrCreatePartition(topic, partitionId)
 
     // create the leader replica with the local log
-    val leaderReplica = new Replica(
-        configs(0).brokerId, partition, time, 0, Some(log))
+    val leaderReplica =
+      new Replica(configs(0).brokerId, partition, time, 0, Some(log))
     leaderReplica.highWatermark = new LogOffsetMetadata(partitionHW)
     partition.leaderReplicaIdOpt = Some(leaderReplica.brokerId)
 
@@ -136,7 +141,7 @@ class SimpleFetchTest {
     val followerReplica = new Replica(configs(1).brokerId, partition, time)
     val leo = new LogOffsetMetadata(followerLEO, 0L, followerLEO.toInt)
     followerReplica.updateLogReadResult(
-        new LogReadResult(FetchDataInfo(leo, MessageSet.Empty), -1L, -1, true))
+      new LogReadResult(FetchDataInfo(leo, MessageSet.Empty), -1L, -1, true))
 
     // add both of them to ISR
     val allReplicas = List(leaderReplica, followerReplica)
@@ -176,39 +181,43 @@ class SimpleFetchTest {
       BrokerTopicStats.getBrokerAllTopicsStats().totalFetchRequestRate.count();
 
     assertEquals(
-        "Reading committed data should return messages only up to high watermark",
-        messagesToHW,
-        replicaManager
-          .readFromLocalLog(true, true, fetchInfo)
-          .get(topicAndPartition)
-          .get
-          .info
-          .messageSet
-          .head
-          .message)
+      "Reading committed data should return messages only up to high watermark",
+      messagesToHW,
+      replicaManager
+        .readFromLocalLog(true, true, fetchInfo)
+        .get(topicAndPartition)
+        .get
+        .info
+        .messageSet
+        .head
+        .message
+    )
     assertEquals(
-        "Reading any data can return messages up to the end of the log",
-        messagesToLEO,
-        replicaManager
-          .readFromLocalLog(true, false, fetchInfo)
-          .get(topicAndPartition)
-          .get
-          .info
-          .messageSet
-          .head
-          .message)
+      "Reading any data can return messages up to the end of the log",
+      messagesToLEO,
+      replicaManager
+        .readFromLocalLog(true, false, fetchInfo)
+        .get(topicAndPartition)
+        .get
+        .info
+        .messageSet
+        .head
+        .message
+    )
 
-    assertEquals("Counts should increment after fetch",
-                 initialTopicCount + 2,
-                 BrokerTopicStats
-                   .getBrokerTopicStats(topic)
-                   .totalFetchRequestRate
-                   .count());
-    assertEquals("Counts should increment after fetch",
-                 initialAllTopicsCount + 2,
-                 BrokerTopicStats
-                   .getBrokerAllTopicsStats()
-                   .totalFetchRequestRate
-                   .count());
+    assertEquals(
+      "Counts should increment after fetch",
+      initialTopicCount + 2,
+      BrokerTopicStats
+        .getBrokerTopicStats(topic)
+        .totalFetchRequestRate
+        .count());
+    assertEquals(
+      "Counts should increment after fetch",
+      initialAllTopicsCount + 2,
+      BrokerTopicStats
+        .getBrokerAllTopicsStats()
+        .totalFetchRequestRate
+        .count());
   }
 }

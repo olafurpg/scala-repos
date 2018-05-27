@@ -40,12 +40,17 @@ class SpectralProjectedGradient[T](val projection: T => T = { (t: T) =>
 }, tolerance: Double = 1e-6, suffDec: Double = 1e-4, fvalMemory: Int = 30, alphaMax: Double = 1e10, alphaMin: Double = 1e-10, bbMemory: Int = 10, maxIter: Int = -1, val initFeas: Boolean = false, val curvilinear: Boolean = false, val bbType: Int = 1, val maxSrcht: Int = 30)(
     implicit space: MutableVectorField[T, Double])
     extends FirstOrderMinimizer[T, DiffFunction[T]](
-        fvalMemory = fvalMemory, maxIter = maxIter, tolerance = tolerance)
-    with Projecting[T] with SerializableLogging {
+      fvalMemory = fvalMemory,
+      maxIter = maxIter,
+      tolerance = tolerance)
+    with Projecting[T]
+    with SerializableLogging {
   import space._
   case class History(alphaBB: Double, fvals: IndexedSeq[Double])
 
-  override protected def initialHistory(f: DiffFunction[T], init: T): History = {
+  override protected def initialHistory(
+      f: DiffFunction[T],
+      init: T): History = {
     History(0.1, IndexedSeq.empty)
   }
 
@@ -65,11 +70,12 @@ class SpectralProjectedGradient[T](val projection: T => T = { (t: T) =>
     alpha
   }
 
-  override protected def updateHistory(newX: T,
-                                       newGrad: T,
-                                       newVal: Double,
-                                       f: DiffFunction[T],
-                                       oldState: State): History = {
+  override protected def updateHistory(
+      newX: T,
+      newGrad: T,
+      newVal: Double,
+      f: DiffFunction[T],
+      oldState: State): History = {
     val s = newX - oldState.x
     val y = newGrad - oldState.grad
     History(bbAlpha(s, y), (newVal +: oldState.history.fvals).take(bbMemory))
@@ -82,13 +88,16 @@ class SpectralProjectedGradient[T](val projection: T => T = { (t: T) =>
   }
 
   override protected def chooseDescentDirection(
-      state: State, f: DiffFunction[T]): T = {
+      state: State,
+      f: DiffFunction[T]): T = {
     if (curvilinear) state.x - state.grad * state.history.alphaBB
     else projection(state.x - state.grad * state.history.alphaBB) - state.x
   }
 
   override protected def determineStepSize(
-      state: State, f: DiffFunction[T], direction: T): Double = {
+      state: State,
+      f: DiffFunction[T],
+      direction: T): Double = {
     val fb =
       if (state.history.fvals.isEmpty) state.value
       else state.value max state.history.fvals.max
@@ -117,7 +126,10 @@ class SpectralProjectedGradient[T](val projection: T => T = { (t: T) =>
 
   // because of the projection, we have to do our own verstion
   private def functionFromSearchDirection[T, I](
-      f: DiffFunction[T], x: T, direction: T, project: T => T)(
+      f: DiffFunction[T],
+      x: T,
+      direction: T,
+      project: T => T)(
       implicit prod: InnerProductModule[T, Double]): DiffFunction[Double] =
     new DiffFunction[Double] {
       import prod._

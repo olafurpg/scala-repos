@@ -11,7 +11,11 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScStableCodeReferenceElement
-import org.jetbrains.plugins.scala.lang.psi.api.base.types.{ScParameterizedTypeElement, ScParenthesisedTypeElement, ScTypeArgs}
+import org.jetbrains.plugins.scala.lang.psi.api.base.types.{
+  ScParameterizedTypeElement,
+  ScParenthesisedTypeElement,
+  ScTypeArgs
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
 /** Converts type element `@@[A, B]` to `(A @@ B)` */
@@ -22,10 +26,12 @@ class ConvertToInfixIntention extends PsiElementBaseIntentionAction {
 
   def isAvailable(project: Project, editor: Editor, element: PsiElement) = {
     element match {
-      case Parent(Both(ref: ScStableCodeReferenceElement,
-                       Parent(Parent(param: ScParameterizedTypeElement))))
+      case Parent(
+          Both(
+            ref: ScStableCodeReferenceElement,
+            Parent(Parent(param: ScParameterizedTypeElement))))
           if param.typeArgList.typeArgs.size == 2 &&
-          !ref.refName.forall(_.isLetterOrDigit) =>
+            !ref.refName.forall(_.isLetterOrDigit) =>
         true
       case _ => false
     }
@@ -35,26 +41,30 @@ class ConvertToInfixIntention extends PsiElementBaseIntentionAction {
     if (element == null || !element.isValid) return
     val paramTypeElement: ScParameterizedTypeElement =
       PsiTreeUtil.getParentOfType(
-          element, classOf[ScParameterizedTypeElement], false)
+        element,
+        classOf[ScParameterizedTypeElement],
+        false)
     val Seq(targ1, targ2) = paramTypeElement.typeArgList.typeArgs
     val needParens = paramTypeElement.getParent match {
       case _: ScTypeArgs | _: ScParenthesisedTypeElement => false
-      case _ => true
+      case _                                             => true
     }
     val newTypeText = Seq(targ1, paramTypeElement.typeElement, targ2)
       .map(_.getText)
       .mkString(" ")
       .parenthesisedIf(needParens)
     val newTypeElement = ScalaPsiElementFactory.createTypeElementFromText(
-        newTypeText, element.getManager)
+      newTypeText,
+      element.getManager)
     if (paramTypeElement.isValid) {
       val replaced = try {
         paramTypeElement.replace(newTypeElement)
       } catch {
         case npe: NullPointerException =>
-          throw new RuntimeException("Unable to replace: %s with %s".format(
-                                         paramTypeElement, newTypeText),
-                                     npe)
+          throw new RuntimeException(
+            "Unable to replace: %s with %s"
+              .format(paramTypeElement, newTypeText),
+            npe)
       }
       UndoUtil.markPsiFileForUndo(replaced.getContainingFile)
     }

@@ -29,46 +29,46 @@ class ImportAdditionalIdentifiersIntention
     if (!element.isValid) return
     check(project, editor, element) match {
       case Some(x) => x()
-      case None =>
+      case None    =>
     }
   }
 
   override def startInWriteAction(): Boolean = false
 
   @tailrec
-  private def check(project: Project,
-                    editor: Editor,
-                    element: PsiElement): Option[() => Unit] = {
+  private def check(
+      project: Project,
+      editor: Editor,
+      element: PsiElement): Option[() => Unit] = {
     element match {
       case ws: PsiWhiteSpace
           if element.getPrevSibling != null &&
-          editor.getCaretModel.getOffset == element.getPrevSibling.getTextRange.getEndOffset =>
+            editor.getCaretModel.getOffset == element.getPrevSibling.getTextRange.getEndOffset =>
         val prev = element.getContainingFile.findElementAt(
-            element.getPrevSibling.getTextRange.getEndOffset - 1)
+          element.getPrevSibling.getTextRange.getEndOffset - 1)
         check(project, editor, prev)
       case null => None
       case ChildOf(id: ScStableCodeReferenceElement) if id.nameId == element =>
         id.getParent match {
           case imp: ScImportExpr
               if imp.selectorSet.isEmpty && imp.qualifier != null =>
-            val doIt = () =>
-              {
-                val newExpr = ScalaPsiElementFactory.createImportExprFromText(
-                    imp.qualifier.getText + ".{" + id.nameId.getText + "}",
-                    element.getManager)
-                val replaced = inWriteAction {
-                  val replaced = imp.replace(newExpr)
-                  PsiDocumentManager
-                    .getInstance(project)
-                    .commitDocument(editor.getDocument)
-                  replaced
-                }
-                inWriteAction {
-                  editor.getDocument.insertString(
-                      replaced.getTextRange.getEndOffset - 1, ", ")
-                  editor.getCaretModel.moveToOffset(
-                      replaced.getTextRange.getEndOffset + 1)
-                }
+            val doIt = () => {
+              val newExpr = ScalaPsiElementFactory.createImportExprFromText(
+                imp.qualifier.getText + ".{" + id.nameId.getText + "}",
+                element.getManager)
+              val replaced = inWriteAction {
+                val replaced = imp.replace(newExpr)
+                PsiDocumentManager
+                  .getInstance(project)
+                  .commitDocument(editor.getDocument)
+                replaced
+              }
+              inWriteAction {
+                editor.getDocument
+                  .insertString(replaced.getTextRange.getEndOffset - 1, ", ")
+                editor.getCaretModel.moveToOffset(
+                  replaced.getTextRange.getEndOffset + 1)
+              }
             }
             Some(doIt)
           case _ => None

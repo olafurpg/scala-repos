@@ -30,7 +30,7 @@ object StatsSample {
       val config = ConfigFactory
         .parseString(s"akka.remote.netty.tcp.port=" + port)
         .withFallback(
-            ConfigFactory.parseString("akka.cluster.roles = [compute]"))
+          ConfigFactory.parseString("akka.cluster.roles = [compute]"))
         .withFallback(ConfigFactory.load("stats1"))
 
       val system = ActorSystem("ClusterSystem", config)
@@ -46,7 +46,8 @@ object StatsSampleClient {
     // note that client is not a compute node, role not defined
     val system = ActorSystem("ClusterSystem")
     system.actorOf(
-        Props(classOf[StatsSampleClient], "/user/statsService"), "client")
+      Props(classOf[StatsSampleClient], "/user/statsService"),
+      "client")
   }
 }
 
@@ -56,7 +57,7 @@ class StatsSampleClient(servicePath: String) extends Actor {
     case RelativeActorPath(elements) => elements
     case _ =>
       throw new IllegalArgumentException(
-          "servicePath [%s] is not a valid relative actor path" format servicePath)
+        "servicePath [%s] is not a valid relative actor path" format servicePath)
   }
   import context.dispatcher
   val tickTask =
@@ -89,9 +90,9 @@ class StatsSampleClient(servicePath: String) extends Actor {
         case m if m.hasRole("compute") && m.status == MemberStatus.Up =>
           m.address
       }
-    case MemberUp(m) if m.hasRole("compute") => nodes += m.address
-    case other: MemberEvent => nodes -= other.member.address
-    case UnreachableMember(m) => nodes -= m.address
+    case MemberUp(m) if m.hasRole("compute")        => nodes += m.address
+    case other: MemberEvent                         => nodes -= other.member.address
+    case UnreachableMember(m)                       => nodes -= m.address
     case ReachableMember(m) if m.hasRole("compute") => nodes += m.address
   }
 }

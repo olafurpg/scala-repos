@@ -24,7 +24,7 @@ import util.Concat.Promoter
 /**
   * Vec of Any
   */
-class VecAny[T : ST](values: Array[T]) extends Vec[T] { self =>
+class VecAny[T: ST](values: Array[T]) extends Vec[T] { self =>
   def length = values.length
 
   def scalarTag = implicitly[ST[T]]
@@ -44,41 +44,43 @@ class VecAny[T : ST](values: Array[T]) extends Vec[T] { self =>
 
   def unary_-(): Vec[T] = sys.error("Cannot negate AnyVec")
 
-  def concat[B, C](v: Vec[B])(
-      implicit wd: Promoter[T, B, C], mc: ST[C]): Vec[C] =
+  def concat[B, C](
+      v: Vec[B])(implicit wd: Promoter[T, B, C], mc: ST[C]): Vec[C] =
     Vec(util.Concat.append[T, B, C](toArray, v.toArray))
 
-  def foldLeft[@spec(Boolean, Int, Long, Double) B : ST](init: B)(
+  def foldLeft[@spec(Boolean, Int, Long, Double) B: ST](init: B)(
       f: (B, T) => B): B =
     VecImpl.foldLeft(this)(init)(f)
 
-  def foldLeftWhile[@spec(Boolean, Int, Long, Double) B : ST](init: B)(
+  def foldLeftWhile[@spec(Boolean, Int, Long, Double) B: ST](init: B)(
       f: (B, T) => B)(cond: (B, T) => Boolean): B =
     VecImpl.foldLeftWhile(this)(init)(f)(cond)
 
-  def filterFoldLeft[@spec(Boolean, Int, Long, Double) B : ST](
+  def filterFoldLeft[@spec(Boolean, Int, Long, Double) B: ST](
       pred: T => Boolean)(init: B)(f: (B, T) => B): B =
     VecImpl.filterFoldLeft(this)(pred)(init)(f)
 
-  def filterScanLeft[@spec(Boolean, Int, Long, Double) B : ST](
+  def filterScanLeft[@spec(Boolean, Int, Long, Double) B: ST](
       pred: (T) => Boolean)(init: B)(f: (B, T) => B): Vec[B] =
     VecImpl.filterScanLeft(this)(pred)(init)(f)
 
-  def rolling[@spec(Boolean, Int, Long, Double) B : ST](
-      winSz: Int, f: Vec[T] => B): Vec[B] =
+  def rolling[@spec(Boolean, Int, Long, Double) B: ST](
+      winSz: Int,
+      f: Vec[T] => B): Vec[B] =
     VecImpl.rolling(this)(winSz, f)
 
-  def map[@spec(Boolean, Int, Long, Double) B : ST](f: T => B): Vec[B] =
+  def map[@spec(Boolean, Int, Long, Double) B: ST](f: T => B): Vec[B] =
     VecImpl.map(this)(f)
 
-  def flatMap[@spec(Boolean, Int, Long, Double) B : ST](
-      f: T => Vec[B]): Vec[B] = VecImpl.flatMap(this)(f)
+  def flatMap[@spec(Boolean, Int, Long, Double) B: ST](f: T => Vec[B]): Vec[B] =
+    VecImpl.flatMap(this)(f)
 
-  def scanLeft[@spec(Boolean, Int, Long, Double) B : ST](init: B)(
+  def scanLeft[@spec(Boolean, Int, Long, Double) B: ST](init: B)(
       f: (B, T) => B): Vec[B] = VecImpl.scanLeft(this)(init)(f)
 
-  def zipMap[@spec(Int, Long, Double) B : ST,
-             @spec(Boolean, Int, Long, Double) C : ST](other: Vec[B])(
+  def zipMap[
+      @spec(Int, Long, Double) B: ST,
+      @spec(Boolean, Int, Long, Double) C: ST](other: Vec[B])(
       f: (T, B) => C): Vec[C] =
     VecImpl.zipMap(this, other)(f)
 
@@ -97,7 +99,7 @@ class VecAny[T : ST](values: Array[T]) extends Vec[T] { self =>
           val loc = b + i * stride
           if (loc >= ub)
             throw new ArrayIndexOutOfBoundsException(
-                "Cannot access location %d >= length %d".format(loc, ub))
+              "Cannot access location %d >= length %d".format(loc, ub))
           self.apply(loc)
         }
 
@@ -119,8 +121,7 @@ class VecAny[T : ST](values: Array[T]) extends Vec[T] { self =>
         val loc = b + i
         if (loc >= e || loc < b)
           throw new ArrayIndexOutOfBoundsException(
-              "Cannot access location %d (vec length %d)".format(
-                  i, self.length))
+            "Cannot access location %d (vec length %d)".format(i, self.length))
         else if (loc >= self.length || loc < 0) scalarTag.missing
         else self.apply(loc)
       }
@@ -151,8 +152,8 @@ class VecAny[T : ST](values: Array[T]) extends Vec[T] { self =>
         var eq = true
         while (eq && i < this.length) {
           eq &&=
-          (apply(i) == rv(i) || this.scalarTag.isMissing(apply(i)) &&
-              rv.scalarTag.isMissing(rv(i)))
+            (apply(i) == rv(i) || this.scalarTag.isMissing(apply(i)) &&
+            rv.scalarTag.isMissing(rv(i)))
           i += 1
         }
         eq

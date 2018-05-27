@@ -16,7 +16,18 @@ limitations under the License.
 
 package com.twitter.summingbird.batch
 
-import com.twitter.algebird.{Universe, Empty, Interval, Intersection, InclusiveLower, ExclusiveUpper, InclusiveUpper, ExclusiveLower, Lower, Upper}
+import com.twitter.algebird.{
+  Universe,
+  Empty,
+  Interval,
+  Intersection,
+  InclusiveLower,
+  ExclusiveUpper,
+  InclusiveUpper,
+  ExclusiveLower,
+  Lower,
+  Upper
+}
 
 import scala.collection.immutable.SortedSet
 import java.util.{Comparator, Date}
@@ -74,20 +85,20 @@ object Batcher {
     override def toInterval(b: BatchID): Interval[Timestamp] =
       if (b == BatchID(0))
         Intersection(
-            InclusiveLower(Timestamp.Min),
-            InclusiveUpper(Timestamp.Max)
+          InclusiveLower(Timestamp.Min),
+          InclusiveUpper(Timestamp.Max)
         )
       else Empty[Timestamp]()
 
     val totalBatchInterval = Intersection(
-        InclusiveLower(currentBatch),
-        ExclusiveUpper(currentBatch.next)
+      InclusiveLower(currentBatch),
+      ExclusiveUpper(currentBatch.next)
     )
     override def batchesCoveredBy(
         interval: Interval[Timestamp]): Interval[BatchID] =
       interval match {
-        case Empty() => Empty()
-        case Universe() => totalBatchInterval
+        case Empty()               => Empty()
+        case Universe()            => totalBatchInterval
         case ExclusiveUpper(upper) => Empty()
         case InclusiveLower(lower) =>
           if (lower == Timestamp.Min) totalBatchInterval
@@ -103,7 +114,7 @@ object Batcher {
     override def cover(interval: Interval[Timestamp]): Interval[BatchID] =
       interval match {
         case Empty() => Empty()
-        case _ => totalBatchInterval
+        case _       => totalBatchInterval
       }
   }
 }
@@ -129,12 +140,12 @@ trait Batcher extends Serializable {
       onExcUp: (Timestamp) => BatchID): Interval[BatchID] = {
 
     interval match {
-      case Empty() => Empty()
-      case Universe() => Universe()
-      case ExclusiveUpper(upper) => ExclusiveUpper(onExcUp(upper))
-      case InclusiveLower(lower) => InclusiveLower(onIncLow(lower))
-      case InclusiveUpper(upper) => ExclusiveUpper(onExcUp(upper.next))
-      case ExclusiveLower(lower) => InclusiveLower(onIncLow(lower.next))
+      case Empty()                 => Empty()
+      case Universe()              => Universe()
+      case ExclusiveUpper(upper)   => ExclusiveUpper(onExcUp(upper))
+      case InclusiveLower(lower)   => InclusiveLower(onIncLow(lower))
+      case InclusiveUpper(upper)   => ExclusiveUpper(onExcUp(upper.next))
+      case ExclusiveLower(lower)   => InclusiveLower(onIncLow(lower.next))
       case Intersection(low, high) =>
         // Convert to inclusive:
         val lowdate = low match {
@@ -163,17 +174,18 @@ trait Batcher extends Serializable {
     dateToBatch(interval)(truncateUp)(truncateDown)
 
   def toInterval(b: BatchID): Interval[Timestamp] =
-    Intersection(InclusiveLower(earliestTimeOf(b)),
-                 ExclusiveUpper(earliestTimeOf(b.next)))
+    Intersection(
+      InclusiveLower(earliestTimeOf(b)),
+      ExclusiveUpper(earliestTimeOf(b.next)))
 
   def toTimestamp(b: Interval[BatchID]): Interval[Timestamp] =
     b match {
-      case Empty() => Empty[Timestamp]()
-      case Universe() => Universe[Timestamp]()
-      case ExclusiveUpper(upper) => ExclusiveUpper(earliestTimeOf(upper))
-      case InclusiveUpper(upper) => InclusiveUpper(latestTimeOf(upper))
-      case InclusiveLower(lower) => InclusiveLower(earliestTimeOf(lower))
-      case ExclusiveLower(lower) => ExclusiveLower(latestTimeOf(lower))
+      case Empty()                 => Empty[Timestamp]()
+      case Universe()              => Universe[Timestamp]()
+      case ExclusiveUpper(upper)   => ExclusiveUpper(earliestTimeOf(upper))
+      case InclusiveUpper(upper)   => InclusiveUpper(latestTimeOf(upper))
+      case InclusiveLower(lower)   => InclusiveLower(earliestTimeOf(lower))
+      case ExclusiveLower(lower)   => ExclusiveLower(latestTimeOf(lower))
       case Intersection(low, high) => toTimestamp(low) && toTimestamp(high)
     }
 
@@ -202,16 +214,17 @@ trait Batcher extends Serializable {
     val earliestInclusive = earliestTimeOf(batchID)
     val latestInclusive = latestTimeOf(batchID)
     BatchID.range(
-        other.batchOf(earliestInclusive),
-        other.batchOf(latestInclusive)
+      other.batchOf(earliestInclusive),
+      other.batchOf(latestInclusive)
     )
   }
 
   def enclosedBy(
-      extremities: (BatchID, BatchID), other: Batcher): Iterable[BatchID] = {
+      extremities: (BatchID, BatchID),
+      other: Batcher): Iterable[BatchID] = {
     val (bottom, top) = extremities
     SortedSet(
-        BatchID.range(bottom, top).toSeq.flatMap(enclosedBy(_, other)): _*
+      BatchID.range(bottom, top).toSeq.flatMap(enclosedBy(_, other)): _*
     )
   }
 }

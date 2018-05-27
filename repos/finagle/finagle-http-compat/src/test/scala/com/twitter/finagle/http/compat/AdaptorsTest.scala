@@ -1,12 +1,23 @@
 package com.twitter.finagle.http.compat
 
 import com.twitter.finagle.http.netty.Bijections
-import com.twitter.finagle.http.{Fields, Request, Response, Method, Status, Version}
+import com.twitter.finagle.http.{
+  Fields,
+  Request,
+  Response,
+  Method,
+  Status,
+  Version
+}
 import com.twitter.finagle.netty3.BufChannelBuffer
 import com.twitter.io.{Buf, BufReader, Reader}
 import com.twitter.util.Await
 import java.net.{InetAddress, InetSocketAddress, URI}
-import org.jboss.netty.handler.codec.http.{HttpVersion, HttpRequest, HttpResponse}
+import org.jboss.netty.handler.codec.http.{
+  HttpVersion,
+  HttpRequest,
+  HttpResponse
+}
 import org.junit.runner.RunWith
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.FunSuite
@@ -18,13 +29,14 @@ class AdaptorsTest extends FunSuite with GeneratorDrivenPropertyChecks {
   import Arbitrary.arbitrary
   import Bijections._
 
-  val arbMethod = Gen.oneOf(Method.Get,
-                            Method.Post,
-                            Method.Trace,
-                            Method.Delete,
-                            Method.Put,
-                            Method.Connect,
-                            Method.Options)
+  val arbMethod = Gen.oneOf(
+    Method.Get,
+    Method.Post,
+    Method.Trace,
+    Method.Delete,
+    Method.Put,
+    Method.Connect,
+    Method.Options)
 
   val arbKeys = Gen.oneOf("Foo", "Bar", "Foo-Bar", "Bar-Baz")
 
@@ -72,9 +84,10 @@ class AdaptorsTest extends FunSuite with GeneratorDrivenPropertyChecks {
   } yield {
     val reqIn = Request(version, method, uri)
     headers foreach { case (k, v) => reqIn.headers.add(k, v) }
-    val req = Request(reqIn.httpRequest,
-                      BufReader(Buf.Utf8(body)),
-                      new InetSocketAddress(InetAddress.getLoopbackAddress, 0))
+    val req = Request(
+      reqIn.httpRequest,
+      BufReader(Buf.Utf8(body)),
+      new InetSocketAddress(InetAddress.getLoopbackAddress, 0))
     if (chunked) {
       req.headers.set(Fields.TransferEncoding, "chunked")
       req.setChunked(chunked)
@@ -83,9 +96,9 @@ class AdaptorsTest extends FunSuite with GeneratorDrivenPropertyChecks {
   }
 
   val arbNettyVersion = Gen.oneOf(
-      HttpVersion.HTTP_1_0,
-      HttpVersion.HTTP_1_1,
-      new HttpVersion("SECURE-HTTP/1.4", true)
+    HttpVersion.HTTP_1_0,
+    HttpVersion.HTTP_1_1,
+    new HttpVersion("SECURE-HTTP/1.4", true)
   )
 
   val arbNettyResponse = for {

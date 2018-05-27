@@ -13,10 +13,11 @@ import com.twitter.util.Future
   * @Param forwardAfterService forward the dark request after the service has processed the request
   *        instead of concurrently.
   */
-class DarkTrafficFilter[Req, Rep](darkService: Service[Req, Rep],
-                                  enableSampling: Req => Boolean,
-                                  statsReceiver: StatsReceiver,
-                                  forwardAfterService: Boolean)
+class DarkTrafficFilter[Req, Rep](
+    darkService: Service[Req, Rep],
+    enableSampling: Req => Boolean,
+    statsReceiver: StatsReceiver,
+    forwardAfterService: Boolean)
     extends SimpleFilter[Req, Rep] {
 
   def this(

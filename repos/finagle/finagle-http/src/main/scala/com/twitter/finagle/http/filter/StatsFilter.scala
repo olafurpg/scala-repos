@@ -23,8 +23,9 @@ class StatsFilter[REQUEST <: Request](stats: StatsReceiver)
   private[this] val timeReceiver = stats.scope("time")
   private[this] val responseSizeStat = stats.stat("response_size")
 
-  def apply(request: REQUEST,
-            service: Service[REQUEST, Response]): Future[Response] = {
+  def apply(
+      request: REQUEST,
+      service: Service[REQUEST, Response]): Future[Response] = {
     val elapsed = Stopwatch.start()
     val future = service(request)
     future respond {

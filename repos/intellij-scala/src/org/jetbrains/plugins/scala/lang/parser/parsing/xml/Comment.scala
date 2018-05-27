@@ -25,14 +25,14 @@ object Comment {
         return false
     }
     while (builder.getTokenType != ScalaXmlTokenTypes.XML_COMMENT_END &&
-    builder.getTokenType != null) {
+           builder.getTokenType != null) {
       if (builder.getTokenType == ScalaXmlTokenTypes.XML_BAD_CHARACTER)
         builder error ErrMsg("xml.wrong.character")
       builder.advanceLexer()
     }
     builder.getTokenType match {
       case ScalaXmlTokenTypes.XML_COMMENT_END => builder.advanceLexer()
-      case _ => builder error ErrMsg("xml.comment.end.expected")
+      case _                                  => builder error ErrMsg("xml.comment.end.expected")
     }
     commentMarker.done(ScalaElementTypes.XML_COMMENT)
     true

@@ -38,7 +38,7 @@ trait PhasedLatches {
   private[this] lazy val phaseOrder = Order.order[Int] { (a, b) =>
     import Ordering._
     (b - a) match {
-      case 0 => EQ
+      case 0          => EQ
       case x if x > 0 => GT
       case y if y < 0 => LT
     }

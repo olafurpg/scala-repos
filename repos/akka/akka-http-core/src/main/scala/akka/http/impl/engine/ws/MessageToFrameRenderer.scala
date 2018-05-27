@@ -26,7 +26,8 @@ private[http] object MessageToFrameRenderer {
         opcode: Opcode,
         data: Source[ByteString, M]): Source[FrameStart, NotUsed] =
       Source.single(FrameEvent.empty(opcode, fin = false)) ++ data.map(
-          FrameEvent.fullFrame(Opcode.Continuation, None, _, fin = false)) ++ Source
+        FrameEvent
+          .fullFrame(Opcode.Continuation, None, _, fin = false)) ++ Source
         .single(FrameEvent.emptyLastContinuationFrame)
 
     Flow[Message].flatMapConcat {
@@ -36,7 +37,8 @@ private[http] object MessageToFrameRenderer {
         strictFrames(Opcode.Text, ByteString(text, "UTF-8"))
       case tm: TextMessage ⇒
         streamedFrames(
-            Opcode.Text, tm.textStream.transform(() ⇒ new Utf8Encoder))
+          Opcode.Text,
+          tm.textStream.transform(() ⇒ new Utf8Encoder))
     }
   }
 }

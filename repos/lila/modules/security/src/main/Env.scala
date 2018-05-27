@@ -10,12 +10,13 @@ import lila.common.PimpedConfig._
 import lila.db.Types.Coll
 import lila.user.{User, UserRepo}
 
-final class Env(config: Config,
-                captcher: akka.actor.ActorSelection,
-                messenger: akka.actor.ActorSelection,
-                system: ActorSystem,
-                scheduler: lila.common.Scheduler,
-                db: lila.db.Env) {
+final class Env(
+    config: Config,
+    captcher: akka.actor.ActorSelection,
+    messenger: akka.actor.ActorSelection,
+    system: ActorSystem,
+    scheduler: lila.common.Scheduler,
+    db: lila.db.Env) {
 
   private val settings = new {
     val CollectionSecurity = config getString "collection.security"
@@ -62,20 +63,21 @@ final class Env(config: Config,
   val RecaptchaPublicKey = config getString "recaptcha.public_key"
 
   lazy val firewall = new Firewall(
-      cookieName = FirewallCookieName.some filter (_ => FirewallCookieEnabled),
-      enabled = FirewallEnabled,
-      cachedIpsTtl = FirewallCachedIpsTtl)
+    cookieName = FirewallCookieName.some filter (_ => FirewallCookieEnabled),
+    enabled = FirewallEnabled,
+    cachedIpsTtl = FirewallCachedIpsTtl)
 
   lazy val flood = new Flood(FloodDuration)
 
   lazy val recaptcha: Recaptcha =
     if (RecaptchaEnabled)
       new RecaptchaGoogle(
-          privateKey = RecaptchaPrivateKey, endpoint = RecaptchaEndpoint)
+        privateKey = RecaptchaPrivateKey,
+        endpoint = RecaptchaEndpoint)
     else RecaptchaSkip
 
-  lazy val forms = new DataForm(
-      captcher = captcher, emailAddress = emailAddress)
+  lazy val forms =
+    new DataForm(captcher = captcher, emailAddress = emailAddress)
 
   lazy val geoIP = new GeoIP(file = GeoIPFile, cacheTtl = GeoIPCacheTtl)
 
@@ -87,35 +89,38 @@ final class Env(config: Config,
 
   lazy val emailConfirm: EmailConfirm =
     if (EmailConfirmEnabled)
-      new EmailConfirmMailGun(apiUrl = EmailConfirmMailgunApiUrl,
-                              apiKey = EmailConfirmMailgunApiKey,
-                              sender = EmailConfirmMailgunSender,
-                              baseUrl = EmailConfirmMailgunBaseUrl,
-                              secret = EmailConfirmSecret)
+      new EmailConfirmMailGun(
+        apiUrl = EmailConfirmMailgunApiUrl,
+        apiKey = EmailConfirmMailgunApiKey,
+        sender = EmailConfirmMailgunSender,
+        baseUrl = EmailConfirmMailgunBaseUrl,
+        secret = EmailConfirmSecret
+      )
     else EmailConfirmSkip
 
   lazy val passwordReset = new PasswordReset(
-      apiUrl = PasswordResetMailgunApiUrl,
-      apiKey = PasswordResetMailgunApiKey,
-      sender = PasswordResetMailgunSender,
-      baseUrl = PasswordResetMailgunBaseUrl,
-      secret = PasswordResetSecret)
+    apiUrl = PasswordResetMailgunApiUrl,
+    apiKey = PasswordResetMailgunApiKey,
+    sender = PasswordResetMailgunSender,
+    baseUrl = PasswordResetMailgunBaseUrl,
+    secret = PasswordResetSecret
+  )
 
   lazy val emailAddress = new EmailAddress(disposableEmailDomain)
 
   private lazy val disposableEmailDomain = new DisposableEmailDomain(
-      providerUrl = DisposableEmailProviderUrl,
-      busOption = system.lilaBus.some)
+    providerUrl = DisposableEmailProviderUrl,
+    busOption = system.lilaBus.some)
 
   scheduler.once(10 seconds)(disposableEmailDomain.refresh)
   scheduler.effect(
-      DisposableEmailRefreshDelay, "Refresh disposable email domains")(
-      disposableEmailDomain.refresh)
+    DisposableEmailRefreshDelay,
+    "Refresh disposable email domains")(disposableEmailDomain.refresh)
 
   lazy val tor = new Tor(TorProviderUrl)
   scheduler.once(30 seconds)(tor.refresh(_ => funit))
   scheduler.effect(TorRefreshDelay, "Refresh TOR exit nodes")(
-      tor.refresh(firewall.unblockIps))
+    tor.refresh(firewall.unblockIps))
 
   lazy val api = new Api(firewall, tor, geoIP, emailAddress)
 
@@ -128,10 +133,12 @@ final class Env(config: Config,
 object Env {
 
   lazy val current =
-    "security" boot new Env(config = lila.common.PlayApp loadConfig "security",
-                            db = lila.db.Env.current,
-                            system = lila.common.PlayApp.system,
-                            scheduler = lila.common.PlayApp.scheduler,
-                            captcher = lila.hub.Env.current.actor.captcher,
-                            messenger = lila.hub.Env.current.actor.messenger)
+    "security" boot new Env(
+      config = lila.common.PlayApp loadConfig "security",
+      db = lila.db.Env.current,
+      system = lila.common.PlayApp.system,
+      scheduler = lila.common.PlayApp.scheduler,
+      captcher = lila.hub.Env.current.actor.captcher,
+      messenger = lila.hub.Env.current.actor.messenger
+    )
 }

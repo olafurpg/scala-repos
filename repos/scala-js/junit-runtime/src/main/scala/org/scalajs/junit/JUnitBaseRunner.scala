@@ -3,10 +3,11 @@ package org.scalajs.junit
 import com.novocode.junit.RunSettings
 import sbt.testing._
 
-abstract class JUnitBaseRunner(val args: Array[String],
-                               val remoteArgs: Array[String],
-                               private[junit] val testClassLoader: ClassLoader,
-                               private[junit] val runSettings: RunSettings)
+abstract class JUnitBaseRunner(
+    val args: Array[String],
+    val remoteArgs: Array[String],
+    private[junit] val testClassLoader: ClassLoader,
+    private[junit] val runSettings: RunSettings)
     extends Runner {
 
   protected def newTask(taskDef: TaskDef): Task =
@@ -48,22 +49,24 @@ object JUnitBaseRunner {
       if (split.length != 6) {
         throw new IllegalArgumentException(str)
       } else {
-        Done(split(0).toInt,
-             split(1).toInt,
-             split(2).toInt,
-             split(3).toInt,
-             split(4).toInt,
-             split(5).toInt)
+        Done(
+          split(0).toInt,
+          split(1).toInt,
+          split(2).toInt,
+          split(3).toInt,
+          split(4).toInt,
+          split(5).toInt)
       }
     }
   }
 
-  case class Done(done: Int,
-                  passed: Int,
-                  failed: Int,
-                  ignored: Int,
-                  skipped: Int,
-                  total: Int) {
+  case class Done(
+      done: Int,
+      passed: Int,
+      failed: Int,
+      ignored: Int,
+      skipped: Int,
+      total: Int) {
     def serialize(): String =
       Seq(done, passed, failed, ignored, skipped, total).mkString(":")
   }

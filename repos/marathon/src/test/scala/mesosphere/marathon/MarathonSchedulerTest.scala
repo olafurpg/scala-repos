@@ -7,10 +7,18 @@ import mesosphere.marathon.core.base.Clock
 import mesosphere.marathon.core.launcher.OfferProcessor
 import mesosphere.marathon.core.launchqueue.LaunchQueue
 import mesosphere.marathon.core.task.update.TaskStatusUpdateProcessor
-import mesosphere.marathon.event.{SchedulerDisconnectedEvent, SchedulerRegisteredEvent, SchedulerReregisteredEvent}
+import mesosphere.marathon.event.{
+  SchedulerDisconnectedEvent,
+  SchedulerRegisteredEvent,
+  SchedulerReregisteredEvent
+}
 import mesosphere.marathon.state.AppRepository
 import mesosphere.marathon.test.{Mockito, MarathonActorSupport}
-import mesosphere.util.state.{FrameworkIdUtil, MesosLeaderInfo, MutableMesosLeaderInfo}
+import mesosphere.util.state.{
+  FrameworkIdUtil,
+  MesosLeaderInfo,
+  MutableMesosLeaderInfo
+}
 import org.apache.mesos.Protos._
 import org.apache.mesos.SchedulerDriver
 import org.scalatest.{Matchers, GivenWhenThen, BeforeAndAfterAll}
@@ -18,8 +26,12 @@ import org.scalatest.{Matchers, GivenWhenThen, BeforeAndAfterAll}
 import scala.concurrent.Future
 
 class MarathonSchedulerTest
-    extends MarathonActorSupport with MarathonSpec with BeforeAndAfterAll
-    with Mockito with Matchers with GivenWhenThen {
+    extends MarathonActorSupport
+    with MarathonSpec
+    with BeforeAndAfterAll
+    with Mockito
+    with Matchers
+    with GivenWhenThen {
 
   var probe: TestProbe = _
   var repo: AppRepository = _
@@ -46,17 +58,17 @@ class MarathonSchedulerTest
     eventBus = system.eventStream
     taskStatusProcessor = mock[TaskStatusUpdateProcessor]
     scheduler = new MarathonScheduler(
-        eventBus,
-        Clock(),
-        offerProcessor = offerProcessor,
-        taskStatusProcessor = taskStatusProcessor,
-        frameworkIdUtil,
-        mesosLeaderInfo,
-        mock[ActorSystem],
-        config,
-        new SchedulerCallbacks {
-          override def disconnected(): Unit = {}
-        }
+      eventBus,
+      Clock(),
+      offerProcessor = offerProcessor,
+      taskStatusProcessor = taskStatusProcessor,
+      frameworkIdUtil,
+      mesosLeaderInfo,
+      mock[ActorSystem],
+      config,
+      new SchedulerCallbacks {
+        override def disconnected(): Unit = {}
+      }
     ) {
       override protected def suicide(removeFrameworkId: Boolean): Unit = {
         suicideFn(removeFrameworkId)

@@ -47,7 +47,7 @@ trait FramedStringProtocol extends Protocol with SLF4JLogging {
         val msgUTF8 = messageBytes
           .drop(headerLen)
           .utf8String
-          (Some(msgUTF8), remainingBytes)
+        (Some(msgUTF8), remainingBytes)
       }
     }
   }

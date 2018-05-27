@@ -19,7 +19,11 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameter
 import org.jetbrains.plugins.scala.lang.psi.stubs.ScFunctionStub
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypeResult,
+  TypingContext
+}
 import org.jetbrains.plugins.scala.lang.psi.types.{ScType, Unit}
 
 /**
@@ -27,21 +31,28 @@ import org.jetbrains.plugins.scala.lang.psi.types.{ScType, Unit}
   * Date: 22.02.2008
   */
 class ScFunctionDefinitionImpl protected (
-    stub: StubElement[ScFunction], nodeType: IElementType, node: ASTNode)
-    extends ScFunctionImpl(stub, nodeType, node) with ScFunctionDefinition {
+    stub: StubElement[ScFunction],
+    nodeType: IElementType,
+    node: ASTNode)
+    extends ScFunctionImpl(stub, nodeType, node)
+    with ScFunctionDefinition {
   def this(node: ASTNode) = { this(null, null, node) }
 
   def this(stub: ScFunctionStub) = {
     this(stub, ScalaElementTypes.FUNCTION_DEFINITION, null)
   }
 
-  override def processDeclarations(processor: PsiScopeProcessor,
-                                   state: ResolveState,
-                                   lastParent: PsiElement,
-                                   place: PsiElement): Boolean = {
+  override def processDeclarations(
+      processor: PsiScopeProcessor,
+      state: ResolveState,
+      lastParent: PsiElement,
+      place: PsiElement): Boolean = {
     //process function's parameters for dependent method types, and process type parameters
-    if (!super [ScFunctionImpl].processDeclarations(
-            processor, state, lastParent, place)) return false
+    if (!super[ScFunctionImpl].processDeclarations(
+          processor,
+          state,
+          lastParent,
+          place)) return false
 
     //do not process parameters for default parameters, only for function body
     //processing parameters for default parameters in ScParameters
@@ -51,7 +62,7 @@ class ScFunctionDefinitionImpl protected (
       body match {
         case Some(x)
             if lastParent != null &&
-            (!needCheckProcessingDeclarationsForBody ||
+              (!needCheckProcessingDeclarationsForBody ||
                 x.startOffsetInParent == lastParent.startOffsetInParent) =>
           for (p <- parameterIncludingSynthetic) {
             ProgressManager.checkCanceled()
@@ -80,7 +91,7 @@ class ScFunctionDefinitionImpl protected (
     case None =>
       body match {
         case Some(b) => b.getType(TypingContext.empty)
-        case _ => Success(Unit, Some(this))
+        case _       => Success(Unit, Some(this))
       }
     case Some(rte: ScTypeElement) => rte.getType(TypingContext.empty)
   }
@@ -124,7 +135,7 @@ class ScFunctionDefinitionImpl protected (
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case s: ScalaElementVisitor => s.visitFunctionDefinition(this)
-      case _ => super.accept(visitor)
+      case _                      => super.accept(visitor)
     }
   }
 

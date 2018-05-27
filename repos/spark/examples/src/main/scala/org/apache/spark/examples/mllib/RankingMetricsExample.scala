@@ -51,7 +51,7 @@ object RankingMetricsExample {
     val numUsers = ratings.map(_.user).distinct().count()
     val numMovies = ratings.map(_.product).distinct().count()
     println(
-        s"Got $numRatings ratings from $numUsers users on $numMovies movies.")
+      s"Got $numRatings ratings from $numUsers users on $numMovies movies.")
 
     // Build the model
     val numIterations = 10
@@ -76,8 +76,9 @@ object RankingMetricsExample {
     val userMovies = binarizedRatings.groupBy(_.user)
     val relevantDocuments = userMovies.join(userRecommended).map {
       case (user, (actual, predictions)) =>
-        (predictions.map(_.product),
-         actual.filter(_.rating > 0.0).map(_.product).toArray)
+        (
+          predictions.map(_.product),
+          actual.filter(_.rating > 0.0).map(_.product).toArray)
     }
 
     // Instantiate metrics object

@@ -99,7 +99,8 @@ trait QuasiTensor[@spec(Int) K, @spec(Double, Int, Float, Long) V] {
 
 trait TensorLike[
     @spec(Int) K, @spec(Double, Int, Float, Long) V, +This <: Tensor[K, V]]
-    extends QuasiTensor[K, V] with NumericOps[This] {
+    extends QuasiTensor[K, V]
+    with NumericOps[This] {
 
   def apply(i: K): V
   def update(i: K, v: V)
@@ -195,8 +196,8 @@ trait TensorLike[
 
   /** Returns true if and only if the given predicate is true for all elements. */
   @deprecated(
-      "Please use 'forall' with the same arguments, which is more in accordance with scala.collections syntax",
-      "0.8")
+    "Please use 'forall' with the same arguments, which is more in accordance with scala.collections syntax",
+    "0.8")
   def forallValues(fn: V => Boolean): Boolean = forall(fn)
 
   /** Returns true if and only if the given predicate is true for all elements. */
@@ -229,7 +230,8 @@ object Tensor {
   }
 
   implicit def liftTransposeInPlaceOps[Op, K, V, T](
-      implicit ev: T <:< Tensor[K, V], op: UFunc.InPlaceImpl2[Op, T, V])
+      implicit ev: T <:< Tensor[K, V],
+      op: UFunc.InPlaceImpl2[Op, T, V])
     : UFunc.InPlaceImpl2[Op, Transpose[T], V] = {
     new UFunc.InPlaceImpl2[Op, Transpose[T], V] {
       def apply(a: Transpose[T], b: V) {
@@ -245,51 +247,57 @@ object Tensor {
     }
   }
 
-  implicit def canSliceTensor[K, V : ClassTag]: CanSlice[
-      Tensor[K, V], Seq[K], SliceVector[K, V]] =
+  implicit def canSliceTensor[K, V: ClassTag]
+    : CanSlice[Tensor[K, V], Seq[K], SliceVector[K, V]] =
     new CanSlice[Tensor[K, V], Seq[K], SliceVector[K, V]] {
       def apply(from: Tensor[K, V], slice: Seq[K]): SliceVector[K, V] =
         new SliceVector(from, slice.toIndexedSeq)
     }
 
-  implicit def canSliceTensorBoolean[K, V : ClassTag]: CanSlice[
-      Tensor[K, V], Tensor[K, Boolean], SliceVector[K, V]] =
+  implicit def canSliceTensorBoolean[K, V: ClassTag]
+    : CanSlice[Tensor[K, V], Tensor[K, Boolean], SliceVector[K, V]] =
     new CanSlice[Tensor[K, V], Tensor[K, Boolean], SliceVector[K, V]] {
       override def apply(
-          from: Tensor[K, V], slice: Tensor[K, Boolean]): SliceVector[K, V] = {
+          from: Tensor[K, V],
+          slice: Tensor[K, Boolean]): SliceVector[K, V] = {
         new SliceVector(from, slice.findAll(_ == true))
       }
     }
 
-  implicit def canSliceTensor2[K1, K2, V : Semiring : ClassTag]: CanSlice2[
-      Tensor[(K1, K2), V], Seq[K1], Seq[K2], SliceMatrix[K1, K2, V]] = {
-    new CanSlice2[
-        Tensor[(K1, K2), V], Seq[K1], Seq[K2], SliceMatrix[K1, K2, V]] {
-      def apply(from: Tensor[(K1, K2), V],
-                slice: Seq[K1],
-                slice2: Seq[K2]): SliceMatrix[K1, K2, V] = {
+  implicit def canSliceTensor2[K1, K2, V: Semiring: ClassTag]: CanSlice2[
+    Tensor[(K1, K2), V],
+    Seq[K1],
+    Seq[K2],
+    SliceMatrix[K1, K2, V]] = {
+    new CanSlice2[Tensor[(K1, K2), V], Seq[K1], Seq[K2], SliceMatrix[K1, K2, V]] {
+      def apply(
+          from: Tensor[(K1, K2), V],
+          slice: Seq[K1],
+          slice2: Seq[K2]): SliceMatrix[K1, K2, V] = {
         new SliceMatrix(from, slice.toIndexedSeq, slice2.toIndexedSeq)
       }
     }
   }
 
-  implicit def canSliceTensor2_CRs[K1, K2, V : Semiring : ClassTag]: CanSlice2[
-      Tensor[(K1, K2), V], Seq[K1], K2, SliceMatrix[K1, K2, V]] = {
+  implicit def canSliceTensor2_CRs[K1, K2, V: Semiring: ClassTag]
+    : CanSlice2[Tensor[(K1, K2), V], Seq[K1], K2, SliceMatrix[K1, K2, V]] = {
     new CanSlice2[Tensor[(K1, K2), V], Seq[K1], K2, SliceMatrix[K1, K2, V]] {
-      def apply(from: Tensor[(K1, K2), V],
-                slice: Seq[K1],
-                slice2: K2): SliceMatrix[K1, K2, V] = {
+      def apply(
+          from: Tensor[(K1, K2), V],
+          slice: Seq[K1],
+          slice2: K2): SliceMatrix[K1, K2, V] = {
         new SliceMatrix(from, slice.toIndexedSeq, IndexedSeq(slice2))
       }
     }
   }
 
-  implicit def canSliceTensor2_CsR[K1, K2, V : Semiring : ClassTag]: CanSlice2[
-      Tensor[(K1, K2), V], K1, Seq[K2], SliceMatrix[K1, K2, V]] = {
+  implicit def canSliceTensor2_CsR[K1, K2, V: Semiring: ClassTag]
+    : CanSlice2[Tensor[(K1, K2), V], K1, Seq[K2], SliceMatrix[K1, K2, V]] = {
     new CanSlice2[Tensor[(K1, K2), V], K1, Seq[K2], SliceMatrix[K1, K2, V]] {
-      def apply(from: Tensor[(K1, K2), V],
-                slice: K1,
-                slice2: Seq[K2]): SliceMatrix[K1, K2, V] = {
+      def apply(
+          from: Tensor[(K1, K2), V],
+          slice: K1,
+          slice2: Seq[K2]): SliceMatrix[K1, K2, V] = {
         new SliceMatrix(from, IndexedSeq(slice), slice2.toIndexedSeq)
       }
     }

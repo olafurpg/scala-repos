@@ -11,7 +11,7 @@ object Test extends DirectTest {
   def compileCode(code: String) = {
     val classpath =
       List(sys.props("partest.lib"), testOutput.path) mkString sys.props(
-          "path.separator")
+        "path.separator")
     compileString(newCompiler("-cp", classpath, "-d", testOutput.path))(code)
   }
 

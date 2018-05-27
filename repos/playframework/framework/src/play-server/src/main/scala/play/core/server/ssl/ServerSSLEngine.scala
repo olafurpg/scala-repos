@@ -36,20 +36,20 @@ object ServerSSLEngine {
       case i
           if classOf[ScalaSSLEngineProvider].isAssignableFrom(providerClass) =>
         createScalaSSLEngineProvider(
-            i.asInstanceOf[Class[ScalaSSLEngineProvider]],
-            serverConfig,
-            applicationProvider)
+          i.asInstanceOf[Class[ScalaSSLEngineProvider]],
+          serverConfig,
+          applicationProvider)
 
       case s
           if classOf[JavaSSLEngineProvider].isAssignableFrom(providerClass) =>
         createJavaSSLEngineProvider(
-            s.asInstanceOf[Class[JavaSSLEngineProvider]],
-            serverConfig,
-            applicationProvider)
+          s.asInstanceOf[Class[JavaSSLEngineProvider]],
+          serverConfig,
+          applicationProvider)
 
       case _ =>
         throw new ClassCastException(
-            "Must define play.server.api.SSLEngineProvider or play.server.SSLEngineProvider as interface!")
+          "Must define play.server.api.SSLEngineProvider or play.server.SSLEngineProvider as interface!")
     }
   }
 
@@ -97,7 +97,7 @@ object ServerSSLEngine {
         .asInstanceOf[play.server.SSLEngineProvider]
     } else {
       throw new ClassCastException(
-          "No constructor with (appProvider:play.server.ApplicationProvider) or no-args constructor defined!")
+        "No constructor with (appProvider:play.server.ApplicationProvider) or no-args constructor defined!")
     }
   }
 
@@ -106,8 +106,8 @@ object ServerSSLEngine {
       serverConfig: ServerConfig,
       applicationProvider: ApplicationProvider): ScalaSSLEngineProvider = {
 
-    var serverConfigProviderArgsConstructor: Constructor[
-        ScalaSSLEngineProvider] = null
+    var serverConfigProviderArgsConstructor
+      : Constructor[ScalaSSLEngineProvider] = null
     var providerArgsConstructor: Constructor[ScalaSSLEngineProvider] = null
     var noArgsConstructor: Constructor[ScalaSSLEngineProvider] = null
     for (constructor <- providerClass.getConstructors) {
@@ -122,7 +122,7 @@ object ServerSSLEngine {
       } else if (parameterTypes.length == 2 &&
                  classOf[ServerConfig].isAssignableFrom(parameterTypes(0)) &&
                  classOf[ApplicationProvider].isAssignableFrom(
-                     parameterTypes(1))) {
+                   parameterTypes(1))) {
         serverConfigProviderArgsConstructor = constructor
           .asInstanceOf[Constructor[ScalaSSLEngineProvider]]
       }
@@ -130,14 +130,15 @@ object ServerSSLEngine {
 
     if (serverConfigProviderArgsConstructor != null) {
       serverConfigProviderArgsConstructor.newInstance(
-          serverConfig, applicationProvider)
+        serverConfig,
+        applicationProvider)
     } else if (providerArgsConstructor != null) {
       providerArgsConstructor.newInstance(applicationProvider)
     } else if (noArgsConstructor != null) {
       noArgsConstructor.newInstance()
     } else {
       throw new ClassCastException(
-          "No constructor with (appProvider:play.core.ApplicationProvider) or no-args constructor defined!")
+        "No constructor with (appProvider:play.core.ApplicationProvider) or no-args constructor defined!")
     }
   }
 }

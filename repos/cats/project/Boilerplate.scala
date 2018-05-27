@@ -22,9 +22,9 @@ object Boilerplate {
   }
 
   val templates: Seq[Template] = Seq(
-      GenCartesianBuilders,
-      GenCartesianArityFunctions,
-      GenApplyArityFunctions
+    GenCartesianBuilders,
+    GenCartesianArityFunctions,
+    GenApplyArityFunctions
   )
 
   val header =
@@ -72,7 +72,7 @@ object Boilerplate {
         rawContents flatMap { _ filter (_ startsWith "-") map (_.tail) }
       val postBody =
         rawContents.head dropWhile (_ startsWith "|") dropWhile
-        (_ startsWith "-") map (_.tail)
+          (_ startsWith "-") map (_.tail)
       (headerLines ++ preBody ++ instances ++ postBody) mkString "\n"
     }
   }
@@ -229,7 +229,7 @@ object Boilerplate {
         .foldRight(s"cartesian.product(f${arity - 2}, f${arity - 1})")(
           (i, acc) => s"cartesian.product(f$i, $acc)")
       val `nested (a..n)` = (0 until (arity - 2)).foldRight(
-          s"(a${arity - 2}, a${arity - 1})")((i, acc) => s"(a$i, $acc)")
+        s"(a${arity - 2}, a${arity - 1})")((i, acc) => s"(a$i, $acc)")
 
       block"""
          |package cats

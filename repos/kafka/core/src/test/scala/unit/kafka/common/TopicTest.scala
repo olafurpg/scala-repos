@@ -29,21 +29,22 @@ class TopicTest {
     var longName = "ATCG"
     for (i <- 1 to 6) longName += longName
     invalidTopicNames += longName
-    val badChars = Array('/',
-                         '\\',
-                         ',',
-                         '\u0000',
-                         ':',
-                         "\"",
-                         '\'',
-                         ';',
-                         '*',
-                         '?',
-                         ' ',
-                         '\t',
-                         '\r',
-                         '\n',
-                         '=')
+    val badChars = Array(
+      '/',
+      '\\',
+      ',',
+      '\u0000',
+      ':',
+      "\"",
+      '\'',
+      ';',
+      '*',
+      '?',
+      ' ',
+      '\t',
+      '\r',
+      '\n',
+      '=')
     for (weirdChar <- badChars) {
       invalidTopicNames += "Is" + weirdChar + "illegal"
     }
@@ -73,14 +74,14 @@ class TopicTest {
   def testTopicHasCollisionChars() = {
     val falseTopics = List("start", "end", "middle", "many")
     val trueTopics = List(
-        ".start",
-        "end.",
-        "mid.dle",
-        ".ma.ny.",
-        "_start",
-        "end_",
-        "mid_dle",
-        "_ma_ny."
+      ".start",
+      "end.",
+      "mid.dle",
+      ".ma.ny.",
+      "_start",
+      "end_",
+      "mid_dle",
+      "_ma_ny."
     )
 
     falseTopics.foreach(t => assertFalse(Topic.hasCollisionChars(t)))
@@ -91,8 +92,8 @@ class TopicTest {
   @Test
   def testTopicHasCollision() = {
     val periodFirstMiddleLastNone = List(".topic", "to.pic", "topic.", "topic")
-    val underscoreFirstMiddleLastNone = List(
-        "_topic", "to_pic", "topic_", "topic")
+    val underscoreFirstMiddleLastNone =
+      List("_topic", "to_pic", "topic_", "topic")
 
     // Self
     periodFirstMiddleLastNone.foreach { t =>

@@ -70,15 +70,16 @@ abstract class TreeInfo extends scala.reflect.internal.TreeInfo {
     object BoxAndUnbox {
       def unapply(t: Tree): Option[Tree] = t match {
         case Unbox(Box(v, tpe)) if isValueClass(tpe) => Some(v)
-        case _ => None
+        case _                                       => None
       }
     }
     // new B(v1) op new B(v2) where op is == or !=. Returns v1, op, v2.
     object BoxAndCompare {
       def unapply(t: Tree): Option[(Tree, Symbol, Tree)] = t match {
         case BinaryOp(
-            Box(v1, tpe1), op @ (Object_== | Object_!=), Box(v2, tpe2))
-            if isValueClass(tpe1) && tpe1 =:= tpe2 =>
+            Box(v1, tpe1),
+            op @ (Object_== | Object_!=),
+            Box(v2, tpe2)) if isValueClass(tpe1) && tpe1 =:= tpe2 =>
           Some((v1, op, v2))
         case _ => None
       }
@@ -94,18 +95,18 @@ abstract class TreeInfo extends scala.reflect.internal.TreeInfo {
     */
   override def isInterfaceMember(tree: Tree): Boolean = tree match {
     case DocDef(_, definition) => isInterfaceMember(definition)
-    case _ => super.isInterfaceMember(tree)
+    case _                     => super.isInterfaceMember(tree)
   }
 
   override def isConstructorWithDefault(t: Tree) = t match {
     case DocDef(_, definition) => isConstructorWithDefault(definition)
-    case _ => super.isConstructorWithDefault(t)
+    case _                     => super.isConstructorWithDefault(t)
   }
 
   /** Is tree a pure (i.e. non-side-effecting) definition?
     */
   override def isPureDef(tree: Tree): Boolean = tree match {
     case DocDef(_, definition) => isPureDef(definition)
-    case _ => super.isPureDef(tree)
+    case _                     => super.isPureDef(tree)
   }
 }

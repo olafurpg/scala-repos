@@ -5,7 +5,7 @@ object Test extends App {
   def foo[A, B, C](unapply1: A => Option[(B, C)], v: A) = {
     unapply1(v) match {
       case Some((fst, snd)) => println("first: " + fst, " second: " + snd)
-      case _ => println(":(")
+      case _                => println(":(")
     }
   }
 

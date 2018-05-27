@@ -20,14 +20,16 @@ class Compiler(classpath: Array[URL], val settings: Settings) {
     classLoader create foreignCompilerName
 
   private def settingsArray: Array[String] = settings.toArgs.toArray
-  foreignInvoke(
-      "args_$eq", Array(classOf[Array[String]]), Array(settingsArray))
+  foreignInvoke("args_$eq", Array(classOf[Array[String]]), Array(settingsArray))
 
   private def foreignInvoke(
-      method: String, types: Array[Class[_]], args: Array[AnyRef]) =
+      method: String,
+      types: Array[Class[_]],
+      args: Array[AnyRef]) =
     try foreignCompiler.getClass
       .getMethod(method, types: _*)
-      .invoke(foreignCompiler, args: _*) catch {
+      .invoke(foreignCompiler, args: _*)
+    catch {
       case e: InvocationTargetException => throw e.getCause
     }
 
@@ -35,10 +37,12 @@ class Compiler(classpath: Array[URL], val settings: Settings) {
     //(errors, warnings)
     try {
       foreignInvoke(
-          "args_$eq", Array(classOf[Array[String]]), Array(settingsArray))
-      val result = foreignInvoke(
-          "compile", Array(classOf[Array[File]]), Array(files))
-        .asInstanceOf[Int]
+        "args_$eq",
+        Array(classOf[Array[String]]),
+        Array(settingsArray))
+      val result =
+        foreignInvoke("compile", Array(classOf[Array[File]]), Array(files))
+          .asInstanceOf[Int]
       (result >> 16, result & 0x00FF)
     } catch {
       case ex: Exception => throw CompilationFailure(ex.getMessage, ex)

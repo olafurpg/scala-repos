@@ -14,7 +14,10 @@ import com.intellij.testFramework.LightVirtualFile
 import org.jetbrains.plugins.scala.ScalaFileType
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScStableCodeReferenceElement
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScReferenceExpression
-import org.jetbrains.plugins.scala.lang.psi.impl.{ScalaFileImpl, ScalaPsiElementFactory}
+import org.jetbrains.plugins.scala.lang.psi.impl.{
+  ScalaFileImpl,
+  ScalaPsiElementFactory
+}
 
 import scala.collection.mutable
 
@@ -22,10 +25,10 @@ import scala.collection.mutable
   * @author Alexander Podkhalyuzin
   */
 class ScalaCodeFragment(project: Project, text: String) extends {
-  private var vFile = new LightVirtualFile(
-      "Dummy.scala", ScalaFileType.SCALA_FILE_TYPE, text)
-  private var provider = new SingleRootFileViewProvider(
-      PsiManager.getInstance(project), vFile, true)
+  private var vFile =
+    new LightVirtualFile("Dummy.scala", ScalaFileType.SCALA_FILE_TYPE, text)
+  private var provider =
+    new SingleRootFileViewProvider(PsiManager.getInstance(project), vFile, true)
 } with ScalaFileImpl(provider) with JavaCodeFragment {
   getViewProvider.forceCachedPsi(this)
 
@@ -94,39 +97,42 @@ class ScalaCodeFragment(project: Project, text: String) extends {
     UndoManager
       .getInstance(project)
       .undoableActionPerformed(
-          new ScalaCodeFragment.ImportClassUndoableAction(
-              path, document, imports)
+        new ScalaCodeFragment.ImportClassUndoableAction(path, document, imports)
       )
     val newRef = ref match {
       case st: ScStableCodeReferenceElement if st.resolve() == null =>
         Some(
-            ScalaPsiElementFactory.createReferenceFromText(
-                st.getText, st.getParent, st))
+          ScalaPsiElementFactory
+            .createReferenceFromText(st.getText, st.getParent, st))
       case expr: ScReferenceExpression if expr.resolve() == null =>
         Some(
-            ScalaPsiElementFactory
-              .createExpressionFromText(expr.getText, expr)
-              .asInstanceOf[ScReferenceExpression])
+          ScalaPsiElementFactory
+            .createExpressionFromText(expr.getText, expr)
+            .asInstanceOf[ScReferenceExpression])
       case _ => None
     }
     newRef match {
       case Some(r) if r.resolve() != null => ref.replace(r)
-      case _ =>
+      case _                              =>
     }
   }
 
   override def addImportsForPaths(
-      paths: Seq[String], refsContainer: PsiElement): Unit = {
+      paths: Seq[String],
+      refsContainer: PsiElement): Unit = {
     paths.foreach(addImportForPath(_, refsContainer))
   }
 
-  override def processDeclarations(processor: PsiScopeProcessor,
-                                   state: ResolveState,
-                                   lastParent: PsiElement,
-                                   place: PsiElement): Boolean = {
+  override def processDeclarations(
+      processor: PsiScopeProcessor,
+      state: ResolveState,
+      lastParent: PsiElement,
+      place: PsiElement): Boolean = {
     for (qName <- imports) {
       val imp = ScalaPsiElementFactory.createImportFromTextWithContext(
-          "import _root_." + qName, this, this)
+        "import _root_." + qName,
+        this,
+        this)
       if (!imp.processDeclarations(processor, state, lastParent, place))
         return false
     }
@@ -140,9 +146,13 @@ class ScalaCodeFragment(project: Project, text: String) extends {
       .asInstanceOf[ScalaCodeFragment]
     clone.imports = this.imports
     clone.vFile = new LightVirtualFile(
-        "Dummy.scala", ScalaFileType.SCALA_FILE_TYPE, getText)
+      "Dummy.scala",
+      ScalaFileType.SCALA_FILE_TYPE,
+      getText)
     clone.provider = new SingleRootFileViewProvider(
-        PsiManager.getInstance(project), clone.vFile, true)
+      PsiManager.getInstance(project),
+      clone.vFile,
+      true)
     clone.provider.forceCachedPsi(clone)
     clone
   }
@@ -150,9 +160,10 @@ class ScalaCodeFragment(project: Project, text: String) extends {
 
 object ScalaCodeFragment {
 
-  private class ImportClassUndoableAction(path: String,
-                                          document: Document,
-                                          imports: mutable.HashSet[String])
+  private class ImportClassUndoableAction(
+      path: String,
+      document: Document,
+      imports: mutable.HashSet[String])
       extends BasicUndoableAction {
     def undo() {
       imports -= path

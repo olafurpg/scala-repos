@@ -110,7 +110,7 @@ trait Constraints {
     Constraint[T]("constraint.min", minValue) { o =>
       (ordering.compare(o, minValue).signum, strict) match {
         case (1, _) | (0, false) => Valid
-        case (_, false) => Invalid(ValidationError("error.min", minValue))
+        case (_, false)          => Invalid(ValidationError("error.min", minValue))
         case (_, true) =>
           Invalid(ValidationError("error.min.strict", minValue))
       }
@@ -127,7 +127,7 @@ trait Constraints {
     Constraint[T]("constraint.max", maxValue) { o =>
       (ordering.compare(o, maxValue).signum, strict) match {
         case (-1, _) | (0, false) => Valid
-        case (_, false) => Invalid(ValidationError("error.max", maxValue))
+        case (_, false)           => Invalid(ValidationError("error.max", maxValue))
         case (_, true) =>
           Invalid(ValidationError("error.max.strict", maxValue))
       }
@@ -167,9 +167,10 @@ trait Constraints {
     * '''name'''[constraint.pattern(regex)] or defined by the name parameter.
     * '''error'''[error.pattern(regex)] or defined by the error parameter.
     */
-  def pattern(regex: => scala.util.matching.Regex,
-              name: String = "constraint.pattern",
-              error: String = "error.pattern"): Constraint[String] =
+  def pattern(
+      regex: => scala.util.matching.Regex,
+      name: String = "constraint.pattern",
+      error: String = "error.pattern"): Constraint[String] =
     Constraint[String](name, () => regex) { o =>
       require(regex != null, "regex must not be null")
       require(name != null, "name must not be null")
@@ -236,13 +237,14 @@ object Invalid {
 
 object ParameterValidator {
   def apply[T](
-      constraints: Iterable[Constraint[T]], optionalParam: Option[T]*) =
+      constraints: Iterable[Constraint[T]],
+      optionalParam: Option[T]*) =
     optionalParam.flatMap {
       _.map { param =>
         constraints.flatMap {
-          _ (param) match {
+          _(param) match {
             case i: Invalid => Some(i)
-            case _ => None
+            case _          => None
           }
         }
       }

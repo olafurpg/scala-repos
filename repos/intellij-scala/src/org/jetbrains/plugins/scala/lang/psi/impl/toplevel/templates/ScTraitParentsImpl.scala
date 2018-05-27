@@ -20,9 +20,10 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
   * Date: 22.02.2008
   * Time: 9:22:37
   */
-class ScTraitParentsImpl private (stub: StubElement[ScTemplateParents],
-                                  nodeType: IElementType,
-                                  node: ASTNode)
+class ScTraitParentsImpl private (
+    stub: StubElement[ScTemplateParents],
+    nodeType: IElementType,
+    node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
     with ScTraitParents {
   def this(node: ASTNode) = { this(null, null, node) }
@@ -35,7 +36,9 @@ class ScTraitParentsImpl private (stub: StubElement[ScTemplateParents],
   def superTypes: Seq[ScType] = {
     val stub = getStub
     if (stub != null) {
-      return stub.asInstanceOf[ScTemplateParentsStub].getTemplateParentsTypes ++ syntheticTypeElements
+      return stub
+        .asInstanceOf[ScTemplateParentsStub]
+        .getTemplateParentsTypes ++ syntheticTypeElements
         .map(_.getType(TypingContext.empty).getOrAny)
     }
     allTypeElements.map(_.getType(TypingContext.empty).getOrAny)

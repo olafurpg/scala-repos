@@ -44,7 +44,8 @@ class SparkILoop(in0: Option[BufferedReader], out: JPrintWriter)
           _sc
         }
         """)
-      processLine("""
+      processLine(
+        """
         @transient val sqlContext = {
           val _sqlContext = org.apache.spark.repl.Main.createSQLContext()
           println("SQL context available as sqlContext.")
@@ -69,7 +70,9 @@ class SparkILoop(in0: Option[BufferedReader], out: JPrintWriter)
       /_/
          """.format(SPARK_VERSION))
     val welcomeMsg = "Using Scala %s (%s, Java %s)".format(
-        versionString, javaVmName, javaVersion)
+      versionString,
+      javaVmName,
+      javaVersion)
     echo(welcomeMsg)
     echo("Type in expressions to have them evaluated.")
     echo("Type :help for more information.")
@@ -77,8 +80,8 @@ class SparkILoop(in0: Option[BufferedReader], out: JPrintWriter)
 
   import LoopCommand.{cmd, nullary}
 
-  private val blockedCommands = Set(
-      "implicits", "javap", "power", "type", "kind")
+  private val blockedCommands =
+    Set("implicits", "javap", "power", "type", "kind")
 
   /** Standard commands **/
   lazy val sparkStandardCommands: List[SparkILoop.this.LoopCommand] =

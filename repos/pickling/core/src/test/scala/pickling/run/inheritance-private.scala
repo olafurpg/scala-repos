@@ -15,7 +15,8 @@ class Employee {
 }
 
 case class Firefighter(val name: String, val age: Int, val since: Int)
-    extends Employee with Person
+    extends Employee
+    with Person
 object Firefighter {
   implicit val fpickler = PicklerUnpickler.generate[Firefighter]
 }
@@ -27,7 +28,7 @@ class InheritancePrivateTest extends FunSuite {
 
     val pickleF = (f: Firefighter).pickle
     assert(
-        pickleF.value === """
+      pickleF.value === """
       |{
       |  "$type": "scala.pickling.inheritance.private.Firefighter",
       |  "name": "Jeff",
@@ -47,7 +48,7 @@ class InheritancePrivateTest extends FunSuite {
 
     val pickleE = (f: Employee).pickle
     assert(
-        pickleE.value === """
+      pickleE.value === """
       |{
       |  "$type": "scala.pickling.inheritance.private.Firefighter",
       |  "name": "Jeff",
@@ -67,7 +68,7 @@ class InheritancePrivateTest extends FunSuite {
 
     val pickleP = (f: Person).pickle
     assert(
-        pickleP.value === """
+      pickleP.value === """
       |{
       |  "$type": "scala.pickling.inheritance.private.Firefighter",
       |  "name": "Jeff",

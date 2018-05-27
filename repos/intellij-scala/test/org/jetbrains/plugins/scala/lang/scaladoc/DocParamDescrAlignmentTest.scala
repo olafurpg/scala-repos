@@ -16,7 +16,7 @@ class DocParamDescrAlignmentTest extends ScalaDocEnterActionTestBase {
     val testText = "\n */"
     val stub =
       "/**\n * @param i blah-blah\n *" +
-      StringUtil.repeat(" ", docParamText.length) + testText
+        StringUtil.repeat(" ", docParamText.length) + testText
 
     checkGeneratedTextFromString(header, testText, stub)
   }
@@ -27,7 +27,7 @@ class DocParamDescrAlignmentTest extends ScalaDocEnterActionTestBase {
     val testText = "\n */"
     val stub =
       "/**\n *" + docParamText + spaces + "\n *" +
-      StringUtil.repeat(" ", docParamText.length) + testText
+        StringUtil.repeat(" ", docParamText.length) + testText
 
     checkGeneratedTextFromString(header, testText, stub)
   }
@@ -38,7 +38,7 @@ class DocParamDescrAlignmentTest extends ScalaDocEnterActionTestBase {
     val testText = "\n */"
     val stub =
       "/**\n *" + docParamText + spaces + "blah-blah\n *" +
-      StringUtil.repeat(" ", docParamText.length) + spaces + testText
+        StringUtil.repeat(" ", docParamText.length) + spaces + testText
 
     checkGeneratedTextFromString(header, testText, stub)
   }
@@ -48,7 +48,7 @@ class DocParamDescrAlignmentTest extends ScalaDocEnterActionTestBase {
     val testText = "\n */"
     val stub =
       "/**\n *" + docParamText + "blah \n *" +
-      StringUtil.repeat(" ", docParamText.length) + testText
+        StringUtil.repeat(" ", docParamText.length) + testText
 
     checkGeneratedTextFromString(header, testText, stub)
   }
@@ -58,7 +58,7 @@ class DocParamDescrAlignmentTest extends ScalaDocEnterActionTestBase {
     val testText = "\n */"
     val stub =
       "/**\n * @param   \n *" + StringUtil.repeat(" ", " @param".length) +
-      testText
+        testText
 
     checkGeneratedTextFromString(header, testText, stub)
   }
@@ -70,7 +70,7 @@ class DocParamDescrAlignmentTest extends ScalaDocEnterActionTestBase {
     val testText = "\n */"
     val stub =
       "/**\n * @see" + spaces + descrText + "\n" + " *" +
-      StringUtil.repeat(" ", " @see".length) + spaces + testText
+        StringUtil.repeat(" ", " @see".length) + spaces + testText
 
     checkGeneratedTextFromString(header, testText, stub)
   }

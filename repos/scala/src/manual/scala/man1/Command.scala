@@ -41,19 +41,22 @@ trait Command {
 
   def authors =
     Section(
-        "AUTHOR",
-        "Written by Martin Odersky and other members of the " & Link(
-            "Scala team",
-            "http://www.scala-lang.org/news/2014/01/22/10-years-of-scala.html") & ".")
+      "AUTHOR",
+      "Written by Martin Odersky and other members of the " & Link(
+        "Scala team",
+        "http://www.scala-lang.org/news/2014/01/22/10-years-of-scala.html") & "."
+    )
 
   def copyright =
     Section(
-        "COPYRIGHT",
-        "This is open-source software, available to you under a BSD-like license. " & "See accompanying \"copyright\" or \"LICENSE\" file for copying conditions. " & "There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A " & "PARTICULAR PURPOSE.")
+      "COPYRIGHT",
+      "This is open-source software, available to you under a BSD-like license. " & "See accompanying \"copyright\" or \"LICENSE\" file for copying conditions. " & "There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A " & "PARTICULAR PURPOSE."
+    )
 
   def bugs =
-    Section("REPORTING BUGS",
-            "Report bugs to " & Mono("https://issues.scala-lang.org/") & ".")
+    Section(
+      "REPORTING BUGS",
+      "Report bugs to " & Mono("https://issues.scala-lang.org/") & ".")
 
   def manpage: Document
 }

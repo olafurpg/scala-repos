@@ -8,8 +8,8 @@ object Test extends App {
 
   // all cases are reachable and the match is exhaustive
   (C: X) match {
-    case B =>
-    case C =>
+    case B    =>
+    case C    =>
     case A(_) =>
   }
 

@@ -24,8 +24,7 @@ import kafka.utils.{SystemTime, threadsafe}
 import scala.math._
 
 @threadsafe
-private[timer] class TimerTaskList(taskCounter: AtomicInteger)
-    extends Delayed {
+private[timer] class TimerTaskList(taskCounter: AtomicInteger) extends Delayed {
 
   // TimerTaskList forms a doubly linked cyclic list using a dummy root entry
   // root.next points to the head
@@ -119,7 +118,8 @@ private[timer] class TimerTaskList(taskCounter: AtomicInteger)
 
   def getDelay(unit: TimeUnit): Long = {
     unit.convert(
-        max(getExpiration - SystemTime.milliseconds, 0), TimeUnit.MILLISECONDS)
+      max(getExpiration - SystemTime.milliseconds, 0),
+      TimeUnit.MILLISECONDS)
   }
 
   def compareTo(d: Delayed): Int = {

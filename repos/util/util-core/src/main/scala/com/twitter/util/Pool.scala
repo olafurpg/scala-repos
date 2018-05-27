@@ -57,7 +57,9 @@ abstract class FactoryPool[A](numItems: Int) extends Pool[A] {
 }
 
 private class HealthyQueue[A](
-    makeItem: () => Future[A], numItems: Int, isHealthy: A => Boolean)
+    makeItem: () => Future[A],
+    numItems: Int,
+    isHealthy: A => Boolean)
     extends mutable.QueueProxy[Future[A]] {
   val self = new mutable.Queue[Future[A]]
   0.until(numItems) foreach { _ =>

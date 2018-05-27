@@ -28,7 +28,7 @@ import scala.language.experimental.{macros => sMacros}
   * generate this for case classes, which may be very convenient.
   */
 @implicitNotFound(
-    """This class is used to bind together a Fields instance to an instance of type T. There is a implicit macro that generates a TypeDescriptor[T] for any type T where T is Boolean, String, Short, Int, Long, FLoat, or Double, or an option of these (with the exception of Option[String]), or a tuple or case class of a supported type. (Nested tuples and case classes are allowed.) Note: Option[String] specifically is not allowed as Some("") and None are indistinguishable. If your type T is not one of these, then you must write your own TypeDescriptor.""")
+  """This class is used to bind together a Fields instance to an instance of type T. There is a implicit macro that generates a TypeDescriptor[T] for any type T where T is Boolean, String, Short, Int, Long, FLoat, or Double, or an option of these (with the exception of Option[String]), or a tuple or case class of a supported type. (Nested tuples and case classes are allowed.) Note: Option[String] specifically is not allowed as Some("") and None are indistinguishable. If your type T is not one of these, then you must write your own TypeDescriptor.""")
 trait TypeDescriptor[T] extends java.io.Serializable {
   def setter: TupleSetter[T]
   def converter: TupleConverter[T]
@@ -49,6 +49,7 @@ object TypeDescriptor {
     * as the java type would have different consequences for Cascading's
     * null handling.
     */
-  implicit def typeDescriptor[T]: TypeDescriptor[T] = macro com.twitter.scalding.macros.impl.TypeDescriptorProviderImpl
-    .caseClassTypeDescriptorImpl[T]
+  implicit def typeDescriptor[T]: TypeDescriptor[T] =
+    macro com.twitter.scalding.macros.impl.TypeDescriptorProviderImpl
+      .caseClassTypeDescriptorImpl[T]
 }

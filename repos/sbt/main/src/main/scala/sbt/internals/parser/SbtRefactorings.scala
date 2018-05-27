@@ -21,8 +21,9 @@ private[sbt] object SbtRefactorings {
     *                 the first will be replaced and the other will be removed.
     * @return a SbtConfigFile with new lines which represent the contents of the refactored .sbt file.
     */
-  def applySessionSettings(configFile: SbtConfigFile,
-                           commands: Seq[SessionSetting]): SbtConfigFile = {
+  def applySessionSettings(
+      configFile: SbtConfigFile,
+      commands: Seq[SessionSetting]): SbtConfigFile = {
     val (file, lines) = configFile
     val split = SbtParser(FAKE_FILE, lines)
     val recordedCommands = recordCommands(commands, split)
@@ -30,7 +31,8 @@ private[sbt] object SbtRefactorings {
       recordedCommands.sortBy(_._1)(REVERSE_ORDERING_INT)
 
     val newContent = replaceFromBottomToTop(
-        lines.mkString(END_OF_LINE), sortedRecordedCommands)
+      lines.mkString(END_OF_LINE),
+      sortedRecordedCommands)
     (file, newContent.lines.toList)
   }
 
@@ -62,7 +64,9 @@ private[sbt] object SbtRefactorings {
     }
 
   private def treesToReplacements(
-      split: SbtParser, name: String, command: Seq[String]) =
+      split: SbtParser,
+      name: String,
+      command: Seq[String]) =
     split.settingsTrees.foldLeft(Seq.empty[(Int, String, String)]) {
       case (acc, (st, tree)) =>
         val treeName = extractSettingName(tree)

@@ -27,11 +27,12 @@ import org.apache.spark.util.Utils
   * Stores information about a SQL SparkPlan.
   */
 @DeveloperApi
-class SparkPlanInfo(val nodeName: String,
-                    val simpleString: String,
-                    val children: Seq[SparkPlanInfo],
-                    val metadata: Map[String, String],
-                    val metrics: Seq[SQLMetricInfo]) {
+class SparkPlanInfo(
+    val nodeName: String,
+    val simpleString: String,
+    val children: Seq[SparkPlanInfo],
+    val metadata: Map[String, String],
+    val metrics: Seq[SQLMetricInfo]) {
 
   override def hashCode(): Int = {
     // hashCode of simpleString should be good enough to distinguish the plans from each other
@@ -42,7 +43,7 @@ class SparkPlanInfo(val nodeName: String,
   override def equals(other: Any): Boolean = other match {
     case o: SparkPlanInfo =>
       nodeName == o.nodeName && simpleString == o.simpleString &&
-      children == o.children
+        children == o.children
     case _ => false
   }
 }
@@ -52,19 +53,21 @@ private[sql] object SparkPlanInfo {
   def fromSparkPlan(plan: SparkPlan): SparkPlanInfo = {
     val children = plan match {
       case ReusedExchange(_, child) => child :: Nil
-      case _ => plan.children ++ plan.subqueries
+      case _                        => plan.children ++ plan.subqueries
     }
     val metrics = plan.metrics.toSeq.map {
       case (key, metric) =>
-        new SQLMetricInfo(metric.name.getOrElse(key),
-                          metric.id,
-                          Utils.getFormattedClassName(metric.param))
+        new SQLMetricInfo(
+          metric.name.getOrElse(key),
+          metric.id,
+          Utils.getFormattedClassName(metric.param))
     }
 
-    new SparkPlanInfo(plan.nodeName,
-                      plan.simpleString,
-                      children.map(fromSparkPlan),
-                      plan.metadata,
-                      metrics)
+    new SparkPlanInfo(
+      plan.nodeName,
+      plan.simpleString,
+      children.map(fromSparkPlan),
+      plan.metadata,
+      metrics)
   }
 }

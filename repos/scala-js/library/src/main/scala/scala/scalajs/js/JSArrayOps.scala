@@ -81,8 +81,9 @@ trait JSArrayOps[A] extends Object {
     * MDN
     */
   @JSName("every")
-  def jsEvery[T](callbackfn: ThisFunction3[T, A, Int, Array[A], Boolean],
-                 thisArg: T): Boolean = native
+  def jsEvery[T](
+      callbackfn: ThisFunction3[T, A, Int, Array[A], Boolean],
+      thisArg: T): Boolean = native
   @JSName("every")
   def jsEvery(callbackfn: Function3[A, Int, Array[A], Boolean]): Boolean =
     native
@@ -107,8 +108,9 @@ trait JSArrayOps[A] extends Object {
     * MDN
     */
   @JSName("some")
-  def jsSome[T](callbackfn: ThisFunction3[T, A, Int, Array[A], Boolean],
-                thisArg: T): Boolean = native
+  def jsSome[T](
+      callbackfn: ThisFunction3[T, A, Int, Array[A], Boolean],
+      thisArg: T): Boolean = native
   @JSName("some")
   def jsSome(callbackfn: Function3[A, Int, Array[A], Boolean]): Boolean =
     native
@@ -139,7 +141,8 @@ trait JSArrayOps[A] extends Object {
     */
   @JSName("forEach")
   def jsForEach[T](
-      callbackfn: ThisFunction3[T, A, Int, Array[A], _], thisArg: T): Unit =
+      callbackfn: ThisFunction3[T, A, Int, Array[A], _],
+      thisArg: T): Unit =
     native
   @JSName("forEach")
   def jsForEach(callbackfn: Function3[A, Int, Array[A], _]): Unit = native
@@ -167,8 +170,9 @@ trait JSArrayOps[A] extends Object {
     * MDN
     */
   @JSName("map")
-  def jsMap[B, T](callbackfn: ThisFunction3[T, A, Int, Array[A], B],
-                  thisArg: T): Array[B] = native
+  def jsMap[B, T](
+      callbackfn: ThisFunction3[T, A, Int, Array[A], B],
+      thisArg: T): Array[B] = native
   @JSName("map")
   def jsMap[B](callbackfn: Function3[A, Int, Array[A], B]): Array[B] = native
   @JSName("map")
@@ -199,8 +203,9 @@ trait JSArrayOps[A] extends Object {
     * MDN
     */
   @JSName("filter")
-  def jsFilter[T](callbackfn: ThisFunction3[T, A, Int, Array[A], Boolean],
-                  thisArg: T): Array[A] = native
+  def jsFilter[T](
+      callbackfn: ThisFunction3[T, A, Int, Array[A], Boolean],
+      thisArg: T): Array[A] = native
   @JSName("filter")
   def jsFilter(callbackfn: Function3[A, Int, Array[A], Boolean]): Array[A] =
     native
@@ -227,7 +232,8 @@ trait JSArrayOps[A] extends Object {
     */
   @JSName("reduce")
   def jsReduce[B](
-      callbackfn: Function4[B, A, Int, Array[A], B], initialValue: B): B =
+      callbackfn: Function4[B, A, Int, Array[A], B],
+      initialValue: B): B =
     native
   @JSName("reduce")
   def jsReduce[B](callbackfn: Function3[B, A, Int, B], initialValue: B): B =
@@ -252,11 +258,13 @@ trait JSArrayOps[A] extends Object {
     */
   @JSName("reduceRight")
   def jsReduceRight[B](
-      callbackfn: Function4[B, A, Int, Array[A], B], initialValue: B): B =
+      callbackfn: Function4[B, A, Int, Array[A], B],
+      initialValue: B): B =
     native
   @JSName("reduceRight")
   def jsReduceRight[B](
-      callbackfn: Function3[B, A, Int, B], initialValue: B): B = native
+      callbackfn: Function3[B, A, Int, B],
+      initialValue: B): B = native
   @JSName("reduceRight")
   def jsReduceRight[B](callbackfn: Function2[B, A, B], initialValue: B): B =
     native

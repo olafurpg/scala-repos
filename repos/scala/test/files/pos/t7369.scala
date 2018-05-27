@@ -3,7 +3,7 @@ object Test {
   (null: Tuple1[Boolean]) match {
     case Tuple1(X) =>
     case Tuple1(Y) => // unreachable
-    case _ =>
+    case _         =>
   }
 }
 
@@ -19,7 +19,7 @@ object Test2 {
   (null: Tuple1[B]) match {
     case Tuple1(X) =>
     case Tuple1(Y) => // no warning
-    case _ =>
+    case _         =>
   }
 }
 
@@ -30,7 +30,7 @@ object Test3 {
       case (X, X, X) => "middle"
       case (X, X, O) => "right"
       case (O, X, X) => "left"
-      case _ => throw new IllegalArgumentException("Invalid")
+      case _         => throw new IllegalArgumentException("Invalid")
     }
   }
 }

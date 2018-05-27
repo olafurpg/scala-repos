@@ -30,7 +30,7 @@ trait Validators { self: DefaultMacroCompiler =>
         if (isImplMethod) macroImplOwner else macroImplOwner.owner
       val effectivelyStatic =
         effectiveOwner.isStaticOwner ||
-        effectiveOwner.moduleClass.isStaticOwner
+          effectiveOwner.moduleClass.isStaticOwner
       val correctBundleness =
         if (isImplMethod) macroImplOwner.isModuleClass
         else macroImplOwner.isClass && !macroImplOwner.isModuleClass
@@ -48,43 +48,42 @@ trait Validators { self: DefaultMacroCompiler =>
       // we only check strict correspondence between value parameterss
       // type parameters of macro defs and macro impls don't have to coincide with each other
       if (aparamss.length != rparamss.length) MacroImplParamssMismatchError()
-      map2(aparamss, rparamss)(
-          (aparams, rparams) =>
-            {
-          if (aparams.length < rparams.length)
-            MacroImplMissingParamsError(aparams, rparams)
-          if (rparams.length < aparams.length)
-            MacroImplExtraParamsError(aparams, rparams)
+      map2(aparamss, rparamss)((aparams, rparams) => {
+        if (aparams.length < rparams.length)
+          MacroImplMissingParamsError(aparams, rparams)
+        if (rparams.length < aparams.length)
+          MacroImplExtraParamsError(aparams, rparams)
       })
 
       try {
         // cannot fuse this map2 and the map2 above because if aparamss.flatten != rparamss.flatten
         // then `atpeToRtpe` is going to fail with an unsound substitution
-        map2(aparamss.flatten, rparamss.flatten)((aparam, rparam) =>
-              {
-            if (aparam.name != rparam.name && !rparam.isSynthetic)
-              MacroImplParamNameMismatchError(aparam, rparam)
-            if (isRepeated(aparam) ^ isRepeated(rparam))
-              MacroImplVarargMismatchError(aparam, rparam)
-            val aparamtpe = aparam.tpe match {
-              case MacroContextType(tpe) => tpe
-              case tpe => tpe
-            }
-            checkMacroImplParamTypeMismatch(atpeToRtpe(aparamtpe), rparam)
+        map2(aparamss.flatten, rparamss.flatten)((aparam, rparam) => {
+          if (aparam.name != rparam.name && !rparam.isSynthetic)
+            MacroImplParamNameMismatchError(aparam, rparam)
+          if (isRepeated(aparam) ^ isRepeated(rparam))
+            MacroImplVarargMismatchError(aparam, rparam)
+          val aparamtpe = aparam.tpe match {
+            case MacroContextType(tpe) => tpe
+            case tpe                   => tpe
+          }
+          checkMacroImplParamTypeMismatch(atpeToRtpe(aparamtpe), rparam)
         })
 
         checkMacroImplResultTypeMismatch(atpeToRtpe(aret), rret)
 
         val maxLubDepth =
           lubDepth(aparamss.flatten map (_.tpe)) max lubDepth(
-              rparamss.flatten map (_.tpe))
-        val atargs = solvedTypes(atvars,
-                                 atparams,
-                                 atparams map varianceInType(aret),
-                                 upper = false,
-                                 maxLubDepth)
-        val boundsOk = typer.silent(_.infer.checkBounds(
-                macroDdef, NoPrefix, NoSymbol, atparams, atargs, ""))
+            rparamss.flatten map (_.tpe))
+        val atargs = solvedTypes(
+          atvars,
+          atparams,
+          atparams map varianceInType(aret),
+          upper = false,
+          maxLubDepth)
+        val boundsOk = typer.silent(
+          _.infer
+            .checkBounds(macroDdef, NoPrefix, NoSymbol, atparams, atargs, ""))
         boundsOk match {
           case SilentResultValue(true) => // do nothing, success
           case SilentResultValue(false) | SilentTypeError(_) =>
@@ -109,13 +108,15 @@ trait Validators { self: DefaultMacroCompiler =>
     // Technically this can be just an alias to MethodType, but promoting it to a first-class entity
     // provides better encapsulation and convenient syntax for pattern matching.
     private case class MacroImplSig(
-        tparams: List[Symbol], paramss: List[List[Symbol]], ret: Type) {
+        tparams: List[Symbol],
+        paramss: List[List[Symbol]],
+        ret: Type) {
       private def tparams_s =
         if (tparams.isEmpty) ""
         else tparams.map(_.defString).mkString("[", ", ", "]")
       private def paramss_s =
         paramss map
-        (ps => ps.map(s => s"${s.name}: ${s.tpe_*}").mkString("(", ", ", ")")) mkString ""
+          (ps => ps.map(s => s"${s.name}: ${s.tpe_*}").mkString("(", ", ", ")")) mkString ""
       override def toString =
         "MacroImplSig(" + tparams_s + paramss_s + ret + ")"
     }
@@ -144,7 +145,8 @@ trait Validators { self: DefaultMacroCompiler =>
     private lazy val macroImplSig: MacroImplSig = {
       val tparams = macroImpl.typeParams
       val paramss = transformTypeTagEvidenceParams(
-          macroImplRef, (param, tparam) => NoSymbol)
+        macroImplRef,
+        (param, tparam) => NoSymbol)
       val ret = macroImpl.info.finalResultType
       MacroImplSig(tparams, paramss, ret)
     }
@@ -184,11 +186,12 @@ trait Validators { self: DefaultMacroCompiler =>
         val ctxPrefix =
           if (isImplMethod)
             singleType(
-                NoPrefix,
-                makeParam(nme.macroContext, macroDdef.pos, ctxTpe, SYNTHETIC))
+              NoPrefix,
+              makeParam(nme.macroContext, macroDdef.pos, ctxTpe, SYNTHETIC))
           else
             singleType(
-                ThisType(macroImpl.owner), macroImpl.owner.tpe.member(nme.c))
+              ThisType(macroImpl.owner),
+              macroImpl.owner.tpe.member(nme.c))
         val paramss =
           if (isImplMethod)
             List(ctxPrefix.termSymbol) :: mmap(macroDdef.vparamss)(param)
@@ -204,8 +207,8 @@ trait Validators { self: DefaultMacroCompiler =>
             case ThisType(sym) if sym == macroDef.owner =>
               singleType(singleType(ctxPrefix, MacroContextPrefix), ExprValue)
             case SingleType(NoPrefix, sym) =>
-              mfind(macroDdef.vparamss)(_.symbol == sym).fold(pre)(
-                  p => singleType(singleType(NoPrefix, param(p)), ExprValue))
+              mfind(macroDdef.vparamss)(_.symbol == sym).fold(pre)(p =>
+                singleType(singleType(NoPrefix, param(p)), ExprValue))
             case _ =>
               mapOver(pre)
           }
@@ -224,21 +227,24 @@ trait Validators { self: DefaultMacroCompiler =>
         def makeParam(name: Name, pos: Position, tpe: Type, flags: Long) =
           macroDef.newValueParameter(name.toTermName, pos, flags) setInfo tpe
         def param(tree: Tree): Symbol = (
-            cache.getOrElseUpdate(tree.symbol, {
+          cache.getOrElseUpdate(
+            tree.symbol, {
               val sym = tree.symbol
               assert(sym.isTerm, s"sym = $sym, tree = $tree")
-              makeParam(sym.name,
-                        sym.pos,
-                        sigma(increaseMetalevel(ctxPrefix, sym.tpe)),
-                        sym.flags)
-            })
+              makeParam(
+                sym.name,
+                sym.pos,
+                sigma(increaseMetalevel(ctxPrefix, sym.tpe)),
+                sym.flags)
+            }
+          )
         )
       }
 
       import SigGenerator._
       macroLogVerbose(s"generating macroImplSigs for: $macroDdef")
-      val result = MacroImplSig(
-          macroDdef.tparams map (_.symbol), paramss, implReturnType)
+      val result =
+        MacroImplSig(macroDdef.tparams map (_.symbol), paramss, implReturnType)
       macroLogVerbose(s"result is: $result")
       result
     }

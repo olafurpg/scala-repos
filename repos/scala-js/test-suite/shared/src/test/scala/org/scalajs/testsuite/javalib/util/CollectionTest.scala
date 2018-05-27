@@ -225,7 +225,7 @@ object CollectionFactory {
 
 trait CollectionFactory {
   def implementationName: String
-  def empty[E : ClassTag]: ju.Collection[E]
+  def empty[E: ClassTag]: ju.Collection[E]
   def allowsMutationThroughIterator: Boolean = true
   def allowsNullElementQuery: Boolean = true
 }

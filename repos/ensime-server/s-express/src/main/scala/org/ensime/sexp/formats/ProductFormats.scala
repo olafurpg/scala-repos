@@ -24,7 +24,7 @@ trait LowPriorityProductFormats {
       def write(x: HNil) = Nil
       def read(value: List[Sexp]) = value match {
         case Nil => HNil
-        case x => throw new DeserializationException(s"Didn't expect $x")
+        case x   => throw new DeserializationException(s"Didn't expect $x")
       }
     }
 
@@ -38,7 +38,7 @@ trait LowPriorityProductFormats {
         import HList.ListCompat._
         values match {
           case head :: tail => h.value.read(head) :: t.value.read(tail)
-          case x => throw new DeserializationException("Didn't expect Nil")
+          case x            => throw new DeserializationException("Didn't expect Nil")
         }
       }
     }
@@ -104,7 +104,7 @@ trait ProductFormats extends LowPriorityProductFormats {
     def write(x: T): Sexp = SexpList(r.value.write(g.to(x)))
     def read(value: Sexp): T = value match {
       case SexpList(els) => g.from(r.value.read(els))
-      case x => deserializationError(x)
+      case x             => deserializationError(x)
     }
   }
 }

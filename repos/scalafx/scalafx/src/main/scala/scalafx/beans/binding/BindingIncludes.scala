@@ -26,7 +26,12 @@
  */
 package scalafx.beans.binding
 
-import javafx.beans.binding.{DoubleBinding, FloatBinding, IntegerBinding, LongBinding}
+import javafx.beans.binding.{
+  DoubleBinding,
+  FloatBinding,
+  IntegerBinding,
+  LongBinding
+}
 import javafx.beans.value.ChangeListener
 import javafx.beans.{InvalidationListener, binding => jfxbb, value => jfxbv}
 import javafx.{beans => jfxb}
@@ -64,8 +69,7 @@ trait BindingIncludes extends Bindings {
     * @param bb $JFX $BOB
     * @return $SFX $BOB
     */
-  implicit def jfxBooleanBinding2sfx(
-      bb: jfxbb.BooleanBinding): BooleanBinding =
+  implicit def jfxBooleanBinding2sfx(bb: jfxbb.BooleanBinding): BooleanBinding =
     if (bb != null) new BooleanBinding(bb) else null
 
   /**
@@ -175,9 +179,10 @@ trait BindingIncludes extends Bindings {
   implicit def closure2ChangedListener[P](
       cl: (jfxbv.ObservableValue[_ <: P], P, P) => Unit): ChangeListener[P] =
     new jfxbv.ChangeListener[P]() {
-      def changed(observable: jfxbv.ObservableValue[_ <: P],
-                  oldValue: P,
-                  newValue: P) {
+      def changed(
+          observable: jfxbv.ObservableValue[_ <: P],
+          oldValue: P,
+          newValue: P) {
         cl(observable, oldValue, newValue)
       }
     }

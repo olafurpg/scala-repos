@@ -27,10 +27,20 @@ import org.apache.spark.ml.tree._
 import org.apache.spark.ml.tree.DecisionTreeModelReadWrite._
 import org.apache.spark.ml.tree.impl.RandomForest
 import org.apache.spark.ml.util._
-import org.apache.spark.mllib.linalg.{DenseVector, SparseVector, Vector, Vectors}
+import org.apache.spark.mllib.linalg.{
+  DenseVector,
+  SparseVector,
+  Vector,
+  Vectors
+}
 import org.apache.spark.mllib.regression.LabeledPoint
-import org.apache.spark.mllib.tree.configuration.{Algo => OldAlgo, Strategy => OldStrategy}
-import org.apache.spark.mllib.tree.model.{DecisionTreeModel => OldDecisionTreeModel}
+import org.apache.spark.mllib.tree.configuration.{
+  Algo => OldAlgo,
+  Strategy => OldStrategy
+}
+import org.apache.spark.mllib.tree.model.{
+  DecisionTreeModel => OldDecisionTreeModel
+}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
 
@@ -46,8 +56,11 @@ import org.apache.spark.sql.DataFrame
 final class DecisionTreeClassifier @Since("1.4.0")(
     @Since("1.4.0") override val uid: String)
     extends ProbabilisticClassifier[
-        Vector, DecisionTreeClassifier, DecisionTreeClassificationModel]
-    with DecisionTreeClassifierParams with DefaultParamsWritable {
+      Vector,
+      DecisionTreeClassifier,
+      DecisionTreeClassificationModel]
+    with DecisionTreeClassifierParams
+    with DefaultParamsWritable {
 
   @Since("1.4.0")
   def this() = this(Identifiable.randomUID("dtc"))
@@ -95,19 +108,20 @@ final class DecisionTreeClassifier @Since("1.4.0")(
         case Some(n: Int) => n
         case None =>
           throw new IllegalArgumentException(
-              "DecisionTreeClassifier was given input" +
+            "DecisionTreeClassifier was given input" +
               s" with invalid label column ${$(labelCol)}, without the number of classes" +
               " specified. See StringIndexer.")
         // TODO: Automatically index labels: SPARK-7126
       }
     val oldDataset: RDD[LabeledPoint] = extractLabeledPoints(dataset)
     val strategy = getOldStrategy(categoricalFeatures, numClasses)
-    val trees = RandomForest.run(oldDataset,
-                                 strategy,
-                                 numTrees = 1,
-                                 featureSubsetStrategy = "all",
-                                 seed = $(seed),
-                                 parentUID = Some(uid))
+    val trees = RandomForest.run(
+      oldDataset,
+      strategy,
+      numTrees = 1,
+      featureSubsetStrategy = "all",
+      seed = $(seed),
+      parentUID = Some(uid))
     trees.head.asInstanceOf[DecisionTreeClassificationModel]
   }
 
@@ -115,23 +129,26 @@ final class DecisionTreeClassifier @Since("1.4.0")(
   private[ml] def train(
       data: RDD[LabeledPoint],
       oldStrategy: OldStrategy): DecisionTreeClassificationModel = {
-    val trees = RandomForest.run(data,
-                                 oldStrategy,
-                                 numTrees = 1,
-                                 featureSubsetStrategy = "all",
-                                 seed = 0L,
-                                 parentUID = Some(uid))
+    val trees = RandomForest.run(
+      data,
+      oldStrategy,
+      numTrees = 1,
+      featureSubsetStrategy = "all",
+      seed = 0L,
+      parentUID = Some(uid))
     trees.head.asInstanceOf[DecisionTreeClassificationModel]
   }
 
   /** (private[ml]) Create a Strategy instance to use with the old API. */
   private[ml] def getOldStrategy(
-      categoricalFeatures: Map[Int, Int], numClasses: Int): OldStrategy = {
-    super.getOldStrategy(categoricalFeatures,
-                         numClasses,
-                         OldAlgo.Classification,
-                         getOldImpurity,
-                         subsamplingRate = 1.0)
+      categoricalFeatures: Map[Int, Int],
+      numClasses: Int): OldStrategy = {
+    super.getOldStrategy(
+      categoricalFeatures,
+      numClasses,
+      OldAlgo.Classification,
+      getOldImpurity,
+      subsamplingRate = 1.0)
   }
 
   @Since("1.4.1")
@@ -161,18 +178,22 @@ object DecisionTreeClassifier
   */
 @Since("1.4.0")
 @Experimental
-final class DecisionTreeClassificationModel private[ml](
+final class DecisionTreeClassificationModel private[ml] (
     @Since("1.4.0") override val uid: String,
     @Since("1.4.0") override val rootNode: Node,
     @Since("1.6.0") override val numFeatures: Int,
     @Since("1.5.0") override val numClasses: Int)
     extends ProbabilisticClassificationModel[
-        Vector, DecisionTreeClassificationModel] with DecisionTreeModel
-    with DecisionTreeClassifierParams with MLWritable with Serializable {
+      Vector,
+      DecisionTreeClassificationModel]
+    with DecisionTreeModel
+    with DecisionTreeClassifierParams
+    with MLWritable
+    with Serializable {
 
   require(
-      rootNode != null,
-      "DecisionTreeClassificationModel given null rootNode, but it requires a non-null rootNode.")
+    rootNode != null,
+    "DecisionTreeClassificationModel given null rootNode, but it requires a non-null rootNode.")
 
   /**
     * Construct a decision tree classification model.
@@ -197,16 +218,20 @@ final class DecisionTreeClassificationModel private[ml](
         dv
       case sv: SparseVector =>
         throw new RuntimeException(
-            "Unexpected error in DecisionTreeClassificationModel:" +
+          "Unexpected error in DecisionTreeClassificationModel:" +
             " raw2probabilityInPlace encountered SparseVector")
     }
   }
 
   @Since("1.4.0")
   override def copy(extra: ParamMap): DecisionTreeClassificationModel = {
-    copyValues(new DecisionTreeClassificationModel(
-                   uid, rootNode, numFeatures, numClasses),
-               extra).setParent(parent)
+    copyValues(
+      new DecisionTreeClassificationModel(
+        uid,
+        rootNode,
+        numFeatures,
+        numClasses),
+      extra).setParent(parent)
   }
 
   @Since("1.4.0")
@@ -242,7 +267,7 @@ final class DecisionTreeClassificationModel private[ml](
   @Since("2.0.0")
   override def write: MLWriter =
     new DecisionTreeClassificationModel.DecisionTreeClassificationModelWriter(
-        this)
+      this)
 }
 
 @Since("2.0.0")
@@ -262,8 +287,9 @@ object DecisionTreeClassificationModel
       extends MLWriter {
 
     override protected def saveImpl(path: String): Unit = {
-      val extraMetadata: JObject = Map("numFeatures" -> instance.numFeatures,
-                                       "numClasses" -> instance.numClasses)
+      val extraMetadata: JObject = Map(
+        "numFeatures" -> instance.numFeatures,
+        "numClasses" -> instance.numClasses)
       DefaultParamsWriter.saveMetadata(instance, path, sc, Some(extraMetadata))
       val (nodeData, _) = NodeData.build(instance.rootNode, 0)
       val dataPath = new Path(path, "data").toString
@@ -284,7 +310,10 @@ object DecisionTreeClassificationModel
       val numClasses = (metadata.metadata \ "numClasses").extract[Int]
       val root = loadTreeNodes(path, metadata, sqlContext)
       val model = new DecisionTreeClassificationModel(
-          metadata.uid, root, numFeatures, numClasses)
+        metadata.uid,
+        root,
+        numFeatures,
+        numClasses)
       DefaultParamsReader.getAndSetParams(model, metadata)
       model
     }
@@ -297,9 +326,10 @@ object DecisionTreeClassificationModel
       categoricalFeatures: Map[Int, Int],
       numFeatures: Int = -1): DecisionTreeClassificationModel = {
     require(
-        oldModel.algo == OldAlgo.Classification,
-        s"Cannot convert non-classification DecisionTreeModel (old API) to" +
-        s" DecisionTreeClassificationModel (new API).  Algo is: ${oldModel.algo}")
+      oldModel.algo == OldAlgo.Classification,
+      s"Cannot convert non-classification DecisionTreeModel (old API) to" +
+        s" DecisionTreeClassificationModel (new API).  Algo is: ${oldModel.algo}"
+    )
     val rootNode = Node.fromOld(oldModel.topNode, categoricalFeatures)
     val uid = if (parent != null) parent.uid else Identifiable.randomUID("dtc")
     // Can't infer number of features from old model, so default to -1

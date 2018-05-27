@@ -76,7 +76,7 @@ object Receptionist {
     * }}}
     */
   val behavior: Behavior[Command] = behavior(
-      TypedMultiMap.empty[AbstractServiceKey, KV])
+    TypedMultiMap.empty[AbstractServiceKey, KV])
 
   private type KV[K <: AbstractServiceKey] = ActorRef[K#Type]
 

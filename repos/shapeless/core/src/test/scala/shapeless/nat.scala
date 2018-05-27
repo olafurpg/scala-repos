@@ -181,7 +181,8 @@ class NatTests {
     assertTypedEquals[_0 :: HNil](_0 :: HNil, r2())
     assertTypedEquals[HNil](HNil, r3())
     assertTypedEquals[_1 :: _2 :: _3 :: _4 :: HNil](
-        _1 :: _2 :: _3 :: _4 :: HNil, r4())
+      _1 :: _2 :: _3 :: _4 :: HNil,
+      r4())
 
     // GCD tests
 

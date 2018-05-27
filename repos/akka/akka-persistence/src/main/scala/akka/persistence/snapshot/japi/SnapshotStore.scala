@@ -21,7 +21,8 @@ abstract class SnapshotStore extends SSnapshotStore with SnapshotStorePlugin {
     doLoadAsync(persistenceId, criteria).map(option)
 
   override final def saveAsync(
-      metadata: SnapshotMetadata, snapshot: Any): Future[Unit] =
+      metadata: SnapshotMetadata,
+      snapshot: Any): Future[Unit] =
     doSaveAsync(metadata, snapshot).map(Unit.unbox)
 
   override final def deleteAsync(metadata: SnapshotMetadata): Future[Unit] =

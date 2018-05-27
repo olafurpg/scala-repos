@@ -9,7 +9,7 @@ import spray.caching.{LruCache, Cache}
 import lila.db.BSON.BSONJodaDateTimeHandler
 import lila.db.Types._
 
-final class MongoCache[K, V : MongoCache.Handler] private (
+final class MongoCache[K, V: MongoCache.Handler] private (
     prefix: String,
     expiresAt: () => DateTime,
     cache: Cache[V],
@@ -21,8 +21,8 @@ final class MongoCache[K, V : MongoCache.Handler] private (
     coll.find(select(k)).one[Entry] flatMap {
       case None =>
         f(k) flatMap { v =>
-          coll.insert(makeEntry(k, v)) recover lila.db.recoverDuplicateKey(
-              _ => ()) inject v
+          coll.insert(makeEntry(k, v)) recover lila.db.recoverDuplicateKey(_ =>
+            ()) inject v
         }
       case Some(entry) => fuccess(entry.v)
     }
@@ -51,7 +51,7 @@ object MongoCache {
 
   final class Builder(coll: Coll) {
 
-    def apply[K, V : Handler](
+    def apply[K, V: Handler](
         prefix: String,
         f: K => Fu[V],
         maxCapacity: Int = 512,
@@ -60,24 +60,26 @@ object MongoCache {
         timeToLiveMongo: Option[FiniteDuration] = None,
         keyToString: K => String = (k: K) => k.toString): MongoCache[K, V] =
       new MongoCache[K, V](
-          prefix = prefix,
-          expiresAt = expiresAt(timeToLiveMongo | timeToLive),
-          cache = LruCache(maxCapacity, initialCapacity, timeToLive),
-          coll = coll,
-          f = f,
-          keyToString = keyToString)
+        prefix = prefix,
+        expiresAt = expiresAt(timeToLiveMongo | timeToLive),
+        cache = LruCache(maxCapacity, initialCapacity, timeToLive),
+        coll = coll,
+        f = f,
+        keyToString = keyToString
+      )
 
-    def single[V : Handler](prefix: String,
-                            f: => Fu[V],
-                            timeToLive: FiniteDuration,
-                            timeToLiveMongo: Option[FiniteDuration] = None) =
+    def single[V: Handler](
+        prefix: String,
+        f: => Fu[V],
+        timeToLive: FiniteDuration,
+        timeToLiveMongo: Option[FiniteDuration] = None) =
       new MongoCache[Boolean, V](
-          prefix = prefix,
-          expiresAt = expiresAt(timeToLiveMongo | timeToLive),
-          cache = LruCache(timeToLive = timeToLive),
-          coll = coll,
-          f = _ => f,
-          keyToString = _.toString)
+        prefix = prefix,
+        expiresAt = expiresAt(timeToLiveMongo | timeToLive),
+        cache = LruCache(timeToLive = timeToLive),
+        coll = coll,
+        f = _ => f,
+        keyToString = _.toString)
   }
 
   def apply(coll: Coll) = new Builder(coll)

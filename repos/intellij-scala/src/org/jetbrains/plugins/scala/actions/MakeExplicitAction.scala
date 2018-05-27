@@ -25,12 +25,12 @@ class MakeExplicitAction
     val project = CommonDataKeys.PROJECT.getData(context)
     val selectedItem = PlatformDataKeys.SELECTED_ITEM.getData(context) match {
       case s: Parameters => s
-      case _ => null
+      case _             => null
     }
     if (selectedItem == null || selectedItem.getNewExpression == null) return
     val function = selectedItem.getNewExpression match {
       case f: ScFunction => f
-      case _ => null
+      case _             => null
     }
     val expression = selectedItem.getOldExpression
     val editor = selectedItem.getEditor
@@ -40,12 +40,13 @@ class MakeExplicitAction
     val file = PsiUtilBase.getPsiFileInEditor(editor, project)
     if (!file.isInstanceOf[ScalaFile]) return
 
-    IntentionUtils.showMakeExplicitPopup(project,
-                                         expression,
-                                         function,
-                                         editor,
-                                         secondPart,
-                                         getCurrentItemBounds _)
+    IntentionUtils.showMakeExplicitPopup(
+      project,
+      expression,
+      function,
+      editor,
+      secondPart,
+      getCurrentItemBounds _)
   }
 
   def getCurrentItemBounds: Rectangle = {

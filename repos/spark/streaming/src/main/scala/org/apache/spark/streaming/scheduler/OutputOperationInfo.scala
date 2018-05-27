@@ -32,13 +32,14 @@ import org.apache.spark.streaming.Time
   * @param failureReason Failure reason if this output operation fails
   */
 @DeveloperApi
-case class OutputOperationInfo(batchTime: Time,
-                               id: Int,
-                               name: String,
-                               description: String,
-                               startTime: Option[Long],
-                               endTime: Option[Long],
-                               failureReason: Option[String]) {
+case class OutputOperationInfo(
+    batchTime: Time,
+    id: Int,
+    name: String,
+    description: String,
+    startTime: Option[Long],
+    endTime: Option[Long],
+    failureReason: Option[String]) {
 
   /**
     * Return the duration of this output operation.

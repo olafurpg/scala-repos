@@ -26,7 +26,7 @@ object DriverRegistrationSpec extends Specification {
       }
 
       DriverManager.getDriver(jdbcUrl) aka "Acolyte driver" must
-      (throwA[SQLException](message = "No suitable driver"))
+        (throwA[SQLException](message = "No suitable driver"))
     }
 
     "be registered for both Acolyte & H2 when databases are connected" in {
@@ -34,17 +34,16 @@ object DriverRegistrationSpec extends Specification {
 
       (DriverManager.getDriver(jdbcUrl) aka "Acolyte driver" must not(beNull))
         .and(DriverManager.getDriver("jdbc:h2:mem:").aka("H2 driver") must not(
-              beNull))
+          beNull))
     }
 
     "be deregistered for Acolyte but still there for H2 after databases stop" in {
       dbApi.shutdown()
 
-      (DriverManager.getDriver("jdbc:h2:mem:") aka "H2 driver" must not(
-              beNull))
+      (DriverManager.getDriver("jdbc:h2:mem:") aka "H2 driver" must not(beNull))
         .and(DriverManager.getDriver(jdbcUrl) aka "Acolyte driver" must {
-        throwA[SQLException](message = "No suitable driver")
-      })
+          throwA[SQLException](message = "No suitable driver")
+        })
     }
   }
 
@@ -52,17 +51,19 @@ object DriverRegistrationSpec extends Specification {
 
   lazy val dbApi: DefaultDBApi = {
     // Fake driver
-    acolyte.jdbc.Driver.register(
-        "DriverRegistrationSpec", acolyte.jdbc.CompositeHandler.empty())
+    acolyte.jdbc.Driver
+      .register("DriverRegistrationSpec", acolyte.jdbc.CompositeHandler.empty())
 
     new DefaultDBApi(
-        Map("default" -> Configuration
-              .from(Map(
-                      "driver" -> "acolyte.jdbc.Driver",
-                      "url" -> jdbcUrl
-                  ))
-              .underlying
-              .withFallback(ConfigFactory.defaultReference.getConfig(
-                      "play.db.prototype"))))
+      Map(
+        "default" -> Configuration
+          .from(
+            Map(
+              "driver" -> "acolyte.jdbc.Driver",
+              "url" -> jdbcUrl
+            ))
+          .underlying
+          .withFallback(
+            ConfigFactory.defaultReference.getConfig("play.db.prototype"))))
   }
 }

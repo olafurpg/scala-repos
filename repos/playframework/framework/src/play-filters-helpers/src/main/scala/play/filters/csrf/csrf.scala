@@ -42,7 +42,8 @@ case class CSRFConfig(
     cookieName: Option[String] = None,
     secureCookie: Boolean = false,
     httpOnlyCookie: Boolean = false,
-    createIfNotFound: RequestHeader => Boolean = CSRFConfig.defaultCreateIfNotFound,
+    createIfNotFound: RequestHeader => Boolean =
+      CSRFConfig.defaultCreateIfNotFound,
     postBodyBuffer: Long = 102400,
     signTokens: Boolean = true,
     checkMethod: String => Boolean = !CSRFConfig.SafeMethods.contains(_),
@@ -78,8 +79,7 @@ case class CSRFConfig(
     copy(checkContentType = checkContentType.asScala.compose(_.asJava))
   def withShouldProtect(shouldProtect: ju.function.Predicate[JRequestHeader]) =
     copy(
-        shouldProtect = shouldProtect.asScala.compose(
-              new JRequestHeaderImpl(_)))
+      shouldProtect = shouldProtect.asScala.compose(new JRequestHeaderImpl(_)))
   def withBypassCorsTrustedOrigins(bypass: Boolean) =
     copy(bypassCorsTrustedOrigins = bypass)
 }
@@ -146,7 +146,7 @@ object CSRFConfig {
     val shouldProtect: RequestHeader => Boolean = { rh =>
       def foundHeaderValues(headersToCheck: Map[String, String]) = {
         headersToCheck.exists {
-          case (name, "*") => rh.headers.get(name).isDefined
+          case (name, "*")   => rh.headers.get(name).isDefined
           case (name, value) => rh.headers.get(name).contains(value)
         }
       }
@@ -156,20 +156,19 @@ object CSRFConfig {
     }
 
     CSRFConfig(
-        tokenName = config.get[String]("token.name"),
-        cookieName = config.get[Option[String]]("cookie.name"),
-        secureCookie = config.get[Boolean]("cookie.secure"),
-        httpOnlyCookie = config.get[Boolean]("cookie.httpOnly"),
-        postBodyBuffer = config
-            .get[ConfigMemorySize]("body.bufferSize")
-            .toBytes,
-        signTokens = config.get[Boolean]("token.sign"),
-        checkMethod = checkMethod,
-        checkContentType = checkContentType,
-        headerName = config.get[String]("header.name"),
-        shouldProtect = shouldProtect,
-        bypassCorsTrustedOrigins = config.get[Boolean](
-              "bypassCorsTrustedOrigins")
+      tokenName = config.get[String]("token.name"),
+      cookieName = config.get[Option[String]]("cookie.name"),
+      secureCookie = config.get[Boolean]("cookie.secure"),
+      httpOnlyCookie = config.get[Boolean]("cookie.httpOnly"),
+      postBodyBuffer = config
+        .get[ConfigMemorySize]("body.bufferSize")
+        .toBytes,
+      signTokens = config.get[Boolean]("token.sign"),
+      checkMethod = checkMethod,
+      checkContentType = checkContentType,
+      headerName = config.get[String]("header.name"),
+      shouldProtect = shouldProtect,
+      bypassCorsTrustedOrigins = config.get[Boolean]("bypassCorsTrustedOrigins")
     )
   }
 }
@@ -232,16 +231,16 @@ object CSRF {
   }
 
   class TokenProviderProvider @Inject()(
-      config: CSRFConfig, tokenSigner: CSRFTokenSigner)
+      config: CSRFConfig,
+      tokenSigner: CSRFTokenSigner)
       extends Provider[TokenProvider] {
     override val get = config.signTokens match {
-      case true => new SignedTokenProvider(tokenSigner)
+      case true  => new SignedTokenProvider(tokenSigner)
       case false => new UnsignedTokenProvider(tokenSigner)
     }
   }
 
-  class ConfigTokenProvider(
-      config: => CSRFConfig, tokenSigner: CSRFTokenSigner)
+  class ConfigTokenProvider(config: => CSRFConfig, tokenSigner: CSRFTokenSigner)
       extends TokenProvider {
     lazy val underlying = new TokenProviderProvider(config, tokenSigner).get
     def generateToken = underlying.generateToken
@@ -287,8 +286,7 @@ object CSRF {
   class JavaCSRFErrorHandlerAdapter @Inject()(underlying: CSRFErrorHandler)
       extends ErrorHandler {
     def handle(request: RequestHeader, msg: String) =
-      JavaHelpers.invokeWithContext(
-          request, req => underlying.handle(req, msg))
+      JavaHelpers.invokeWithContext(request, req => underlying.handle(req, msg))
   }
 
   class JavaCSRFErrorHandlerDelegate @Inject()(delegate: ErrorHandler)
@@ -297,22 +295,23 @@ object CSRF {
 
     def handle(req: Http.RequestHeader, msg: String) =
       FutureConverters.toJava(
-          delegate.handle(req._underlyingHeader(), msg).map(_.asJava))
+        delegate.handle(req._underlyingHeader(), msg).map(_.asJava))
   }
 
   object ErrorHandler {
     def bindingsFromConfiguration(
         environment: Environment,
         configuration: Configuration): Seq[Binding[_]] = {
-      Reflect.bindingsFromConfiguration[ErrorHandler,
-                                        CSRFErrorHandler,
-                                        JavaCSRFErrorHandlerAdapter,
-                                        JavaCSRFErrorHandlerDelegate,
-                                        CSRFHttpErrorHandler](
-          environment,
-          PlayConfig(configuration),
-          "play.filters.csrf.errorHandler",
-          "CSRFErrorHandler")
+      Reflect.bindingsFromConfiguration[
+        ErrorHandler,
+        CSRFErrorHandler,
+        JavaCSRFErrorHandlerAdapter,
+        JavaCSRFErrorHandlerDelegate,
+        CSRFHttpErrorHandler](
+        environment,
+        PlayConfig(configuration),
+        "play.filters.csrf.errorHandler",
+        "CSRFErrorHandler")
     }
   }
 }
@@ -323,9 +322,9 @@ object CSRF {
 class CSRFModule extends Module {
   def bindings(environment: Environment, configuration: Configuration) = {
     Seq(
-        bind[CSRFConfig].toProvider[CSRFConfigProvider],
-        bind[CSRF.TokenProvider].toProvider[CSRF.TokenProviderProvider],
-        bind[CSRFFilter].toSelf
+      bind[CSRFConfig].toProvider[CSRFConfigProvider],
+      bind[CSRF.TokenProvider].toProvider[CSRF.TokenProviderProvider],
+      bind[CSRFFilter].toSelf
     ) ++ ErrorHandler.bindingsFromConfiguration(environment, configuration)
   }
 }
@@ -343,7 +342,10 @@ trait CSRFComponents {
   lazy val csrfTokenProvider: CSRF.TokenProvider =
     new CSRF.TokenProviderProvider(csrfConfig, csrfTokenSigner).get
   lazy val csrfErrorHandler: CSRF.ErrorHandler = new CSRFHttpErrorHandler(
-      httpErrorHandler)
+    httpErrorHandler)
   lazy val csrfFilter: CSRFFilter = new CSRFFilter(
-      csrfConfig, csrfTokenSigner, csrfTokenProvider, csrfErrorHandler)
+    csrfConfig,
+    csrfTokenSigner,
+    csrfTokenProvider,
+    csrfErrorHandler)
 }

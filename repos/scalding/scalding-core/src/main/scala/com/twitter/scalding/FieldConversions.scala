@@ -26,22 +26,23 @@ import scala.collection.JavaConverters._
 trait LowPriorityFieldConversions {
 
   protected def anyToFieldArg(f: Any): Comparable[_] = f match {
-    case x: Symbol => x.name
-    case y: String => y
+    case x: Symbol            => x.name
+    case y: String            => y
     case z: java.lang.Integer => z
     case v: Enumeration#Value => v.toString
-    case fld: Field[_] => fld.id
+    case fld: Field[_]        => fld.id
     case flds: Fields => {
-        if (flds.size == 1) {
-          flds.get(0)
-        } else {
-          throw new Exception("Cannot convert Fields(" + flds.toString +
-              ") to a single fields arg")
-        }
+      if (flds.size == 1) {
+        flds.get(0)
+      } else {
+        throw new Exception(
+          "Cannot convert Fields(" + flds.toString +
+            ") to a single fields arg")
       }
+    }
     case w =>
       throw new Exception(
-          "Could not convert: " + w.toString + " to Fields argument")
+        "Could not convert: " + w.toString + " to Fields argument")
   }
 
   /**
@@ -57,7 +58,7 @@ trait LowPriorityFieldConversions {
     f.productIterator.foreach {
       _ match {
         case field: Field[_] => fields.setComparator(field.id, field.ord)
-        case _ =>
+        case _               =>
       }
     }
     fields
@@ -103,7 +104,7 @@ trait FieldConversions extends LowPriorityFieldConversions {
       val fromSet = asSet(fromFields)
       val toSet = asSet(toFields)
       (fromSet.subsetOf(toSet), toSet.subsetOf(fromSet)) match {
-        case (true, true) => Fields.REPLACE //equal
+        case (true, true)  => Fields.REPLACE //equal
         case (true, false) => Fields.SWAP //output super set, replaces input
         case (false, true) => Fields.SWAP //throw away some input
         /*
@@ -138,7 +139,9 @@ trait FieldConversions extends LowPriorityFieldConversions {
 
   @tailrec
   final def newSymbol(
-      avoid: Set[Symbol], guess: Symbol, trial: Int = 0): Symbol = {
+      avoid: Set[Symbol],
+      guess: Symbol,
+      trial: Int = 0): Symbol = {
     if (!avoid(guess)) {
       //We are good:
       guess
@@ -155,7 +158,9 @@ trait FieldConversions extends LowPriorityFieldConversions {
   }
 
   final def ensureUniqueFields(
-      left: Fields, right: Fields, rightPipe: Pipe): (Fields, Pipe) = {
+      left: Fields,
+      right: Fields,
+      rightPipe: Pipe): (Fields, Pipe) = {
     val leftSet = asSet(left)
     val collisions = asSet(left) & asSet(right)
     if (collisions.isEmpty) {
@@ -165,13 +170,15 @@ trait FieldConversions extends LowPriorityFieldConversions {
       val leftSetSyms = leftSet.map { f =>
         Symbol(f.toString)
       }
-      val (_, reversedRename) = asList(right).map { f =>
-        Symbol(f.toString)
-      }.foldLeft((leftSetSyms, List[Symbol]())) { (takenRename, name) =>
-        val (taken, renames) = takenRename
-        val newName = newSymbol(taken, name)
-        (taken + newName, newName :: renames)
-      }
+      val (_, reversedRename) = asList(right)
+        .map { f =>
+          Symbol(f.toString)
+        }
+        .foldLeft((leftSetSyms, List[Symbol]())) { (takenRename, name) =>
+          val (taken, renames) = takenRename
+          val newName = newSymbol(taken, name)
+          (taken + newName, newName :: renames)
+        }
       val newRight =
         fields(reversedRename.reverse) // We pushed in as a stack, so we need to reverse
       (newRight, RichPipe(rightPipe).rename(right -> newRight))
@@ -205,7 +212,7 @@ trait FieldConversions extends LowPriorityFieldConversions {
     anyf.foreach {
       _ match {
         case field: Field[_] => fields.setComparator(field.id, field.ord)
-        case _ =>
+        case _               =>
       }
     }
     fields
@@ -213,7 +220,8 @@ trait FieldConversions extends LowPriorityFieldConversions {
 
   //Handle a pair generally:
   implicit def tuple2ToFieldsPair[T, U](pair: (T, U))(
-      implicit tf: T => Fields, uf: U => Fields): (Fields, Fields) = {
+      implicit tf: T => Fields,
+      uf: U => Fields): (Fields, Fields) = {
     val f1 = tf(pair._1)
     val f2 = uf(pair._2)
     (f1, f2)
@@ -242,20 +250,21 @@ trait FieldConversions extends LowPriorityFieldConversions {
     // available "all at once" by calling getComparators.)
 
     new RichFields(
-        asList(fields)
-          .zip(fields.getComparators)
-          .map {
-        case (id: Comparable[_], comparator: Comparator[_]) =>
-          id match {
-            case x: java.lang.Integer =>
-              IntField(x)(Ordering.comparatorToOrdering(comparator), None)
-            case y: String =>
-              StringField(y)(Ordering.comparatorToOrdering(comparator), None)
-            case z =>
-              sys.error("not expecting object of type " + z.getClass +
-                  " as field name")
-          }
-      })
+      asList(fields)
+        .zip(fields.getComparators)
+        .map {
+          case (id: Comparable[_], comparator: Comparator[_]) =>
+            id match {
+              case x: java.lang.Integer =>
+                IntField(x)(Ordering.comparatorToOrdering(comparator), None)
+              case y: String =>
+                StringField(y)(Ordering.comparatorToOrdering(comparator), None)
+              case z =>
+                sys.error(
+                  "not expecting object of type " + z.getClass +
+                    " as field name")
+            }
+        })
   }
 }
 

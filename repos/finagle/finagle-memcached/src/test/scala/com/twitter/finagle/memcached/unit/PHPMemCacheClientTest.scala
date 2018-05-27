@@ -15,8 +15,8 @@ class PHPMemCacheClientTest extends FunSuite with MockitoSugar {
     val client1 = mock[Client]
     val client2 = mock[Client]
     val client3 = mock[Client]
-    val phpMemCacheClient = new PHPMemCacheClient(
-        Array(client1, client2, client3), KeyHasher.FNV1_32)
+    val phpMemCacheClient =
+      new PHPMemCacheClient(Array(client1, client2, client3), KeyHasher.FNV1_32)
   }
 
   test("pick the correct node") {

@@ -21,10 +21,10 @@ p.getC() = java.awt.Color[r=255,g=0,b=0]
   def connect() = {
     val p = new ColoredPoint(5, 7, Color.RED);
     List(
-        "p.x = " + p.x,
-        "p.c = " + p.c,
-        "p.getX() = " + p.getX(),
-        "p.getC() = " + p.getC()
+      "p.x = " + p.x,
+      "p.c = " + p.c,
+      "p.getX() = " + p.getX(),
+      "p.getC() = " + p.getC()
     ).mkString("\n")
   }
 

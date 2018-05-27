@@ -15,7 +15,8 @@ final class CatsEquivalence[T](T: Eq[T]) extends Equivalence[T] {
 
 trait LowPriorityStrictCatsConstraints extends TripleEquals {
   implicit def lowPriorityCatsCanEqual[A, B](
-      implicit B: Eq[B], ev: A <:< B): CanEqual[A, B] =
+      implicit B: Eq[B],
+      ev: A <:< B): CanEqual[A, B] =
     new AToBEquivalenceConstraint[A, B](new CatsEquivalence(B), ev)
 }
 
@@ -28,7 +29,8 @@ trait StrictCatsEquality extends LowPriorityStrictCatsConstraints {
       implicit equalityOfA: Equality[A]): CanEqual[A, B] =
     super.unconstrainedEquality[A, B]
   implicit def catsCanEqual[A, B](
-      implicit A: Eq[A], ev: B <:< A): CanEqual[A, B] =
+      implicit A: Eq[A],
+      ev: B <:< A): CanEqual[A, B] =
     new BToAEquivalenceConstraint[A, B](new CatsEquivalence(A), ev)
 }
 

@@ -28,8 +28,16 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.execution.LogicalRDD
 import org.apache.spark.sql.execution.datasources.{DataSource, LogicalRelation}
-import org.apache.spark.sql.execution.datasources.jdbc.{JDBCPartition, JDBCPartitioningInfo, JDBCRelation}
-import org.apache.spark.sql.execution.datasources.json.{InferSchema, JacksonParser, JSONOptions}
+import org.apache.spark.sql.execution.datasources.jdbc.{
+  JDBCPartition,
+  JDBCPartitioningInfo,
+  JDBCRelation
+}
+import org.apache.spark.sql.execution.datasources.json.{
+  InferSchema,
+  JacksonParser,
+  JSONOptions
+}
 import org.apache.spark.sql.execution.streaming.StreamingRelation
 import org.apache.spark.sql.types.StructType
 
@@ -41,7 +49,7 @@ import org.apache.spark.sql.types.StructType
   * @since 1.4.0
   */
 @Experimental
-class DataFrameReader private[sql](sqlContext: SQLContext) extends Logging {
+class DataFrameReader private[sql] (sqlContext: SQLContext) extends Logging {
 
   /**
     * Specifies the input data source format.
@@ -104,7 +112,8 @@ class DataFrameReader private[sql](sqlContext: SQLContext) extends Logging {
     *
     * @since 1.4.0
     */
-  def options(options: scala.collection.Map[String, String]): DataFrameReader = {
+  def options(
+      options: scala.collection.Map[String, String]): DataFrameReader = {
     this.extraOptions ++= options
     this
   }
@@ -126,12 +135,14 @@ class DataFrameReader private[sql](sqlContext: SQLContext) extends Logging {
     * @since 1.4.0
     */
   def load(): DataFrame = {
-    val dataSource = DataSource(sqlContext,
-                                userSpecifiedSchema = userSpecifiedSchema,
-                                className = source,
-                                options = extraOptions.toMap)
+    val dataSource = DataSource(
+      sqlContext,
+      userSpecifiedSchema = userSpecifiedSchema,
+      className = source,
+      options = extraOptions.toMap)
     Dataset.newDataFrame(
-        sqlContext, LogicalRelation(dataSource.resolveRelation()))
+      sqlContext,
+      LogicalRelation(dataSource.resolveRelation()))
   }
 
   /**
@@ -156,13 +167,14 @@ class DataFrameReader private[sql](sqlContext: SQLContext) extends Logging {
       sqlContext.emptyDataFrame
     } else {
       sqlContext.baseRelationToDataFrame(
-          DataSource
-            .apply(sqlContext,
-                   paths = paths,
-                   userSpecifiedSchema = userSpecifiedSchema,
-                   className = source,
-                   options = extraOptions.toMap)
-            .resolveRelation())
+        DataSource
+          .apply(
+            sqlContext,
+            paths = paths,
+            userSpecifiedSchema = userSpecifiedSchema,
+            className = source,
+            options = extraOptions.toMap)
+          .resolveRelation())
     }
   }
 
@@ -173,12 +185,14 @@ class DataFrameReader private[sql](sqlContext: SQLContext) extends Logging {
     * @since 2.0.0
     */
   def stream(): DataFrame = {
-    val dataSource = DataSource(sqlContext,
-                                userSpecifiedSchema = userSpecifiedSchema,
-                                className = source,
-                                options = extraOptions.toMap)
+    val dataSource = DataSource(
+      sqlContext,
+      userSpecifiedSchema = userSpecifiedSchema,
+      className = source,
+      options = extraOptions.toMap)
     Dataset.newDataFrame(
-        sqlContext, StreamingRelation(dataSource.createSource()))
+      sqlContext,
+      StreamingRelation(dataSource.createSource()))
   }
 
   /**
@@ -221,15 +235,16 @@ class DataFrameReader private[sql](sqlContext: SQLContext) extends Logging {
     *                             should be included.
     * @since 1.4.0
     */
-  def jdbc(url: String,
-           table: String,
-           columnName: String,
-           lowerBound: Long,
-           upperBound: Long,
-           numPartitions: Int,
-           connectionProperties: Properties): DataFrame = {
-    val partitioning = JDBCPartitioningInfo(
-        columnName, lowerBound, upperBound, numPartitions)
+  def jdbc(
+      url: String,
+      table: String,
+      columnName: String,
+      lowerBound: Long,
+      upperBound: Long,
+      numPartitions: Int,
+      connectionProperties: Properties): DataFrame = {
+    val partitioning =
+      JDBCPartitioningInfo(columnName, lowerBound, upperBound, numPartitions)
     val parts = JDBCRelation.columnPartition(partitioning)
     jdbc(url, table, parts, connectionProperties)
   }
@@ -251,10 +266,11 @@ class DataFrameReader private[sql](sqlContext: SQLContext) extends Logging {
     *                             should be included.
     * @since 1.4.0
     */
-  def jdbc(url: String,
-           table: String,
-           predicates: Array[String],
-           connectionProperties: Properties): DataFrame = {
+  def jdbc(
+      url: String,
+      table: String,
+      predicates: Array[String],
+      connectionProperties: Properties): DataFrame = {
     val parts: Array[Partition] = predicates.zipWithIndex.map {
       case (part, i) =>
         JDBCPartition(part, i): Partition
@@ -262,10 +278,11 @@ class DataFrameReader private[sql](sqlContext: SQLContext) extends Logging {
     jdbc(url, table, parts, connectionProperties)
   }
 
-  private def jdbc(url: String,
-                   table: String,
-                   parts: Array[Partition],
-                   connectionProperties: Properties): DataFrame = {
+  private def jdbc(
+      url: String,
+      table: String,
+      parts: Array[Partition],
+      connectionProperties: Properties): DataFrame = {
     val props = new Properties()
     extraOptions.foreach {
       case (key, value) =>
@@ -364,17 +381,20 @@ class DataFrameReader private[sql](sqlContext: SQLContext) extends Logging {
     val parsedOptions: JSONOptions = new JSONOptions(extraOptions.toMap)
     val schema = userSpecifiedSchema.getOrElse {
       InferSchema.infer(
-          jsonRDD, sqlContext.conf.columnNameOfCorruptRecord, parsedOptions)
+        jsonRDD,
+        sqlContext.conf.columnNameOfCorruptRecord,
+        parsedOptions)
     }
 
     Dataset.newDataFrame(
-        sqlContext,
-        LogicalRDD(
-            schema.toAttributes,
-            JacksonParser.parse(jsonRDD,
-                                schema,
-                                sqlContext.conf.columnNameOfCorruptRecord,
-                                parsedOptions))(sqlContext))
+      sqlContext,
+      LogicalRDD(
+        schema.toAttributes,
+        JacksonParser.parse(
+          jsonRDD,
+          schema,
+          sqlContext.conf.columnNameOfCorruptRecord,
+          parsedOptions))(sqlContext))
   }
 
   /**
@@ -415,9 +435,9 @@ class DataFrameReader private[sql](sqlContext: SQLContext) extends Logging {
     */
   def table(tableName: String): DataFrame = {
     Dataset.newDataFrame(
-        sqlContext,
-        sqlContext.sessionState.catalog.lookupRelation(
-            sqlContext.sessionState.sqlParser.parseTableIdentifier(tableName)))
+      sqlContext,
+      sqlContext.sessionState.catalog.lookupRelation(
+        sqlContext.sessionState.sqlParser.parseTableIdentifier(tableName)))
   }
 
   /**

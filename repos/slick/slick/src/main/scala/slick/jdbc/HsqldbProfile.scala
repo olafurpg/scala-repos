@@ -37,7 +37,7 @@ trait HsqldbProfile extends JdbcProfile {
 
   override protected def computeCapabilities: Set[Capability] =
     (super.computeCapabilities - SqlCapabilities.sequenceCurr -
-        JdbcCapabilities.insertOrUpdate)
+      JdbcCapabilities.insertOrUpdate)
 
   class ModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
       implicit ec: ExecutionContext)
@@ -52,20 +52,20 @@ trait HsqldbProfile extends JdbcProfile {
   }
 
   override def createModelBuilder(
-      tables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
+      tables: Seq[MTable],
+      ignoreInvalidDefaults: Boolean)(
       implicit ec: ExecutionContext): JdbcModelBuilder =
     new ModelBuilder(tables, ignoreInvalidDefaults)
 
-  override def defaultTables(
-      implicit ec: ExecutionContext): DBIO[Seq[MTable]] =
+  override def defaultTables(implicit ec: ExecutionContext): DBIO[Seq[MTable]] =
     MTable.getTables(None, None, None, Some(Seq("TABLE")))
 
   override protected def computeQueryCompiler =
     super.computeQueryCompiler.replace(Phase.resolveZipJoinsRownumStyle) +
-    Phase.specializeParameters - Phase.fixRowNumberOrdering
+      Phase.specializeParameters - Phase.fixRowNumberOrdering
   override val columnTypes = new JdbcTypes
-  override def createQueryBuilder(
-      n: Node, state: CompilerState): QueryBuilder = new QueryBuilder(n, state)
+  override def createQueryBuilder(n: Node, state: CompilerState): QueryBuilder =
+    new QueryBuilder(n, state)
   override def createTableDDLBuilder(table: Table[_]): TableDDLBuilder =
     new TableDDLBuilder(table)
   override def createSequenceDDLBuilder(
@@ -96,7 +96,7 @@ trait HsqldbProfile extends JdbcProfile {
         b" as varchar(16777216))"
       /* Hsqldb uses the SQL:2008 syntax for NEXTVAL */
       case Library.NextValue(SequenceNode(name)) => b"(next value for `$name)"
-      case Library.CurrentValue(_ *) =>
+      case Library.CurrentValue(_*) =>
         throw new SlickException("Hsqldb does not support CURRVAL")
       case RowNumber(_) =>
         b"rownum()" // Hsqldb uses Oracle ROWNUM semantics but needs parens
@@ -108,34 +108,37 @@ trait HsqldbProfile extends JdbcProfile {
        * into joined views have already been mapped to unique identifiers at this point, so we can
        * safely rearrange views. */
       j match {
-        case Join(ls,
-                  rs,
-                  l,
-                  Join(ls2, rs2, l2, r2, JoinType.Inner, on2),
-                  JoinType.Inner,
-                  on) =>
+        case Join(
+            ls,
+            rs,
+            l,
+            Join(ls2, rs2, l2, r2, JoinType.Inner, on2),
+            JoinType.Inner,
+            on) =>
           val on3 = (on, on2) match {
             case (a, LiteralNode(true)) => a
             case (LiteralNode(true), b) => b
-            case (a, b) => Apply(Library.And, ConstArray(a, b))(UnassignedType)
+            case (a, b)                 => Apply(Library.And, ConstArray(a, b))(UnassignedType)
           }
           buildJoin(
-              Join(rs,
-                   rs2,
-                   Join(ls, ls2, l, l2, JoinType.Inner, LiteralNode(true)),
-                   r2,
-                   JoinType.Inner,
-                   on3))
+            Join(
+              rs,
+              rs2,
+              Join(ls, ls2, l, l2, JoinType.Inner, LiteralNode(true)),
+              r2,
+              JoinType.Inner,
+              on3))
         case j => super.buildJoin(j)
       }
     }
 
     override protected def buildFetchOffsetClause(
-        fetch: Option[Node], offset: Option[Node]) = (fetch, offset) match {
+        fetch: Option[Node],
+        offset: Option[Node]) = (fetch, offset) match {
       case (Some(t), Some(d)) => b"\nlimit $t offset $d"
-      case (Some(t), None) => b"\nlimit $t"
-      case (None, Some(d)) => b"\noffset $d"
-      case _ =>
+      case (Some(t), None)    => b"\nlimit $t"
+      case (None, Some(d))    => b"\noffset $d"
+      case _                  =>
     }
   }
 
@@ -158,7 +161,7 @@ trait HsqldbProfile extends JdbcProfile {
          * CONSTRAINT. */
         val sb =
           new StringBuilder append "ALTER TABLE " append quoteIdentifier(
-              table.tableName) append " ADD "
+            table.tableName) append " ADD "
         sb append "CONSTRAINT " append quoteIdentifier(idx.name) append " UNIQUE("
         addIndexColumnList(idx.on, sb, idx.table.tableName)
         sb append ")"
@@ -176,7 +179,7 @@ trait HsqldbProfile extends JdbcProfile {
       val start = seq._start.getOrElse(if (desc) -1 else 1)
       val b =
         new StringBuilder append "CREATE SEQUENCE " append quoteIdentifier(
-            seq.name)
+          seq.name)
       seq._increment.foreach { b append " INCREMENT BY " append _ }
       seq._minValue.foreach { b append " MINVALUE " append _ }
       seq._maxValue.foreach { b append " MAXVALUE " append _ }

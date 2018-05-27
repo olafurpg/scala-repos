@@ -99,9 +99,9 @@ object Sink {
   def foreachParallel[T](parallel: Int)(f: function.Procedure[T])(
       ec: ExecutionContext): Sink[T, CompletionStage[Done]] =
     new Sink(
-        scaladsl.Sink
-          .foreachParallel(parallel)(f.apply)(ec)
-          .toCompletionStage())
+      scaladsl.Sink
+        .foreachParallel(parallel)(f.apply)(ec)
+        .toCompletionStage())
 
   /**
     * A `Sink` that when the flow is completed, either through a failure or normal
@@ -131,10 +131,10 @@ object Sink {
     */
   def headOption[In](): Sink[In, CompletionStage[Optional[In]]] =
     new Sink(
-        scaladsl.Sink
-          .headOption[In]
-          .mapMaterializedValue(_.map(_.asJava)(
-                  ExecutionContexts.sameThreadExecutionContext).toJava))
+      scaladsl.Sink
+        .headOption[In]
+        .mapMaterializedValue(
+          _.map(_.asJava)(ExecutionContexts.sameThreadExecutionContext).toJava))
 
   /**
     * A `Sink` that materializes into a `CompletionStage` of the last value received.
@@ -155,10 +155,10 @@ object Sink {
     */
   def lastOption[In](): Sink[In, CompletionStage[Optional[In]]] =
     new Sink(
-        scaladsl.Sink
-          .lastOption[In]
-          .mapMaterializedValue(_.map(_.asJava)(
-                  ExecutionContexts.sameThreadExecutionContext).toJava))
+      scaladsl.Sink
+        .lastOption[In]
+        .mapMaterializedValue(
+          _.map(_.asJava)(ExecutionContexts.sameThreadExecutionContext).toJava))
 
   /**
     * A `Sink` that keeps on collecting incoming elements until upstream terminates.
@@ -173,13 +173,13 @@ object Sink {
   def seq[In]: Sink[In, CompletionStage[java.util.List[In]]] = {
     import scala.collection.JavaConverters._
     new Sink(
-        scaladsl.Sink
-          .seq[In]
-          .mapMaterializedValue(fut ⇒
-                fut
-                  .map(sq ⇒ sq.asJava)(
-                      ExecutionContexts.sameThreadExecutionContext)
-                  .toJava))
+      scaladsl.Sink
+        .seq[In]
+        .mapMaterializedValue(
+          fut ⇒
+            fut
+              .map(sq ⇒ sq.asJava)(ExecutionContexts.sameThreadExecutionContext)
+              .toJava))
   }
 
   /**
@@ -221,11 +221,12 @@ object Sink {
       onCompleteMessage: Any,
       onFailureMessage: function.Function[Throwable, Any]): Sink[In, NotUsed] =
     new Sink(
-        scaladsl.Sink.actorRefWithAck[In](ref,
-                                          onInitMessage,
-                                          ackMessage,
-                                          onCompleteMessage,
-                                          onFailureMessage.apply))
+      scaladsl.Sink.actorRefWithAck[In](
+        ref,
+        onInitMessage,
+        ackMessage,
+        onCompleteMessage,
+        onFailureMessage.apply))
 
   /**
     * Creates a `Sink` that is materialized to an [[akka.actor.ActorRef]] which points to an Actor
@@ -253,13 +254,13 @@ object Sink {
       output2: Sink[U, _],
       rest: java.util.List[Sink[U, _]],
       strategy: function.Function[
-          java.lang.Integer, Graph[UniformFanOutShape[T, U], NotUsed]])
-    : Sink[T, NotUsed] = {
+        java.lang.Integer,
+        Graph[UniformFanOutShape[T, U], NotUsed]]): Sink[T, NotUsed] = {
     import scala.collection.JavaConverters._
     val seq = if (rest != null) rest.asScala.map(_.asScala) else Seq()
     new Sink(
-        scaladsl.Sink.combine(output1.asScala, output2.asScala, seq: _*)(
-            num ⇒ strategy.apply(num)))
+      scaladsl.Sink.combine(output1.asScala, output2.asScala, seq: _*)(num ⇒
+        strategy.apply(num)))
   }
 
   /**
@@ -281,7 +282,7 @@ object Sink {
     */
   def queue[T](): Sink[T, SinkQueue[T]] =
     new Sink(
-        scaladsl.Sink.queue[T]().mapMaterializedValue(new SinkQueueAdapter(_)))
+      scaladsl.Sink.queue[T]().mapMaterializedValue(new SinkQueueAdapter(_)))
 }
 
 /**
@@ -305,7 +306,8 @@ final class Sink[-In, +Mat](delegate: scaladsl.Sink[In, Mat])
     * Connect this `Sink` to a `Source` and run it.
     */
   def runWith[M](
-      source: Graph[SourceShape[In], M], materializer: Materializer): M =
+      source: Graph[SourceShape[In], M],
+      materializer: Materializer): M =
     asScala.runWith(source)(materializer)
 
   /**

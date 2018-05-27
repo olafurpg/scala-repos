@@ -1,7 +1,14 @@
 package com.twitter.scalding.parquet.tuple.macros
 
-import com.twitter.scalding.parquet.tuple.macros.impl.{ParquetReadSupportProvider, ParquetSchemaProvider, WriteSupportProvider}
-import com.twitter.scalding.parquet.tuple.scheme.{ParquetReadSupport, ParquetWriteSupport}
+import com.twitter.scalding.parquet.tuple.macros.impl.{
+  ParquetReadSupportProvider,
+  ParquetSchemaProvider,
+  WriteSupportProvider
+}
+import com.twitter.scalding.parquet.tuple.scheme.{
+  ParquetReadSupport,
+  ParquetWriteSupport
+}
 
 import scala.language.experimental.macros
 
@@ -34,20 +41,23 @@ object Macros {
     * @tparam T Case class type that contains primitive fields or collection fields or nested case class.
     * @return Generated case class parquet message type string
     */
-  implicit def caseClassParquetSchema[T]: String = macro ParquetSchemaProvider
-    .toParquetSchemaImpl[T]
+  implicit def caseClassParquetSchema[T]: String =
+    macro ParquetSchemaProvider
+      .toParquetSchemaImpl[T]
 
   /**
     * Macro generated case class read support
     */
-  implicit def caseClassParquetReadSupport[T]: ParquetReadSupport[T] = macro ParquetReadSupportProvider
-    .toParquetReadSupportImpl[T]
+  implicit def caseClassParquetReadSupport[T]: ParquetReadSupport[T] =
+    macro ParquetReadSupportProvider
+      .toParquetReadSupportImpl[T]
 
   /**
     * Macro used to generate case class write support to parquet.
     * @tparam T User defined case class tuple type.
     * @return Generated case class tuple write support function.
     */
-  implicit def caseClassParquetWriteSupport[T]: ParquetWriteSupport[T] = macro WriteSupportProvider
-    .toWriteSupportImpl[T]
+  implicit def caseClassParquetWriteSupport[T]: ParquetWriteSupport[T] =
+    macro WriteSupportProvider
+      .toWriteSupportImpl[T]
 }

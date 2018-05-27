@@ -46,7 +46,8 @@ import javax.servlet.http._
   * @author Steve Jenson (stevej@pobox.com)
   */
 class MockHttpServletResponse(
-    var writer: PrintWriter, var outputStream: ServletOutputStream)
+    var writer: PrintWriter,
+    var outputStream: ServletOutputStream)
     extends HttpServletResponse {
   protected var statusCode: Int = 200
   protected var statusString: String = "OK"

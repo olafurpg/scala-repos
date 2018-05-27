@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -38,16 +38,17 @@ abstract class BrowseServiceSpecs[M[+ _]](
     implicit val M: Monad[M] with Comonad[M])
     extends Specification {
   def colSizeMetadata(descriptor: ColumnRef, size: Long): ColumnMetadata = Map(
-      descriptor -> Map(StringValueStats -> StringValueStats(size, "a", "z"))
+    descriptor -> Map(StringValueStats -> StringValueStats(size, "a", "z"))
   )
 
   lazy val projectionMetadata: Map[Path, Map[ColumnRef, Long]] = Map(
-      Path("/foo/bar1/baz/quux1") -> Map(ColumnRef(CPath(), CString) -> 10L),
-      Path("/foo/bar2/baz/quux1") -> Map(ColumnRef(CPath(), CString) -> 20L),
-      Path("/foo/bar2/baz/quux2") -> Map(ColumnRef(CPath(), CString) -> 30L),
-      Path("/foo2/bar1/baz/quux1") -> Map(ColumnRef(CPath(), CString) -> 40L),
-      Path("/foo/bar/") -> Map(ColumnRef(CPath(".bar"), CLong) -> 50,
-                               ColumnRef(CPath(".baz"), CLong) -> 60L)
+    Path("/foo/bar1/baz/quux1") -> Map(ColumnRef(CPath(), CString) -> 10L),
+    Path("/foo/bar2/baz/quux1") -> Map(ColumnRef(CPath(), CString) -> 20L),
+    Path("/foo/bar2/baz/quux2") -> Map(ColumnRef(CPath(), CString) -> 30L),
+    Path("/foo2/bar1/baz/quux1") -> Map(ColumnRef(CPath(), CString) -> 40L),
+    Path("/foo/bar/") -> Map(
+      ColumnRef(CPath(".bar"), CLong) -> 50,
+      ColumnRef(CPath(".baz"), CLong) -> 60L)
   )
 
   val metadata = new StubVFSMetadata[M](projectionMetadata)
@@ -61,7 +62,7 @@ abstract class BrowseServiceSpecs[M[+ _]](
         .copoint must beLike {
         case JArray(results) =>
           results.map(_ \ "name") must haveTheSameElementsAs(
-              JString("bar/") :: JString("bar1/") :: JString("bar2/") :: Nil)
+            JString("bar/") :: JString("bar1/") :: JString("bar2/") :: Nil)
       }
     }
   }
@@ -103,8 +104,8 @@ abstract class BrowseServiceSpecs[M[+ _]](
         .copoint must beLike {
         case result =>
           result must_== JObject(
-              "children" -> JArray(JString(".bar") :: JString(".baz") :: Nil),
-              "types" -> JObject())
+            "children" -> JArray(JString(".bar") :: JString(".baz") :: Nil),
+            "types" -> JObject())
       }
     }
 
@@ -114,8 +115,9 @@ abstract class BrowseServiceSpecs[M[+ _]](
         .valueOr(e => sys.error(e.toString))
         .copoint must beLike {
         case result =>
-          result must_== JObject("children" -> JArray(),
-                                 "types" -> JObject("Number" -> JNum(50)))
+          result must_== JObject(
+            "children" -> JArray(),
+            "types" -> JObject("Number" -> JNum(50)))
       }
     }
 

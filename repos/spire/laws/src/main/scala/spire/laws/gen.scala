@@ -37,13 +37,13 @@ object gen {
   lazy val bigInteger: Gen[BigInteger] = arbitrary[BigInt].map(_.bigInteger)
 
   lazy val safeLong: Gen[SafeLong] = Gen.frequency(
-      1 → SafeLong(BigInt("393050634124102232869567034555427371542904833")),
-      100 → arbitrary[Long].map(SafeLong(_)),
-      100 → arbitrary[BigInt].map(SafeLong(_)))
+    1 → SafeLong(BigInt("393050634124102232869567034555427371542904833")),
+    100 → arbitrary[Long].map(SafeLong(_)),
+    100 → arbitrary[BigInt].map(SafeLong(_)))
 
   lazy val natural: Gen[Natural] = Gen.oneOf(
-      arbitrary[Long].map(n => Natural(n & Long.MaxValue)),
-      arbitrary[BigInt].map(n => Natural(n.abs)))
+    arbitrary[Long].map(n => Natural(n & Long.MaxValue)),
+    arbitrary[BigInt].map(n => Natural(n.abs)))
 
   lazy val rational: Gen[Rational] = {
     val rationalFromLongs: Gen[Rational] = for {
@@ -62,19 +62,19 @@ object gen {
     }
 
     Gen.frequency(
-        10 → rationalFromLongs, // we keep this to make long/long rationals more frequent
-        10 → arbitrary[Double].map(n => Rational(n)),
-        1 → rationalFromSafeLongs,
-        1 → bigRational, // a rational that is guaranteed to have a big denominator
-        1 → bigRational.map(x ⇒ if (x.isZero) Rational.one else x.inverse)
+      10 → rationalFromLongs, // we keep this to make long/long rationals more frequent
+      10 → arbitrary[Double].map(n => Rational(n)),
+      1 → rationalFromSafeLongs,
+      1 → bigRational, // a rational that is guaranteed to have a big denominator
+      1 → bigRational.map(x ⇒ if (x.isZero) Rational.one else x.inverse)
     )
   }
 
   lazy val number: Gen[Number] = Gen.oneOf(
-      arbitrary[Long].map(Number(_)),
-      arbitrary[Double].map(Number(_)),
-      arbitrary[BigDecimal].map(Number(_)),
-      rational.map(Number(_)))
+    arbitrary[Long].map(Number(_)),
+    arbitrary[Double].map(Number(_)),
+    arbitrary[BigDecimal].map(Number(_)),
+    rational.map(Number(_)))
 
   lazy val algebraic: Gen[Algebraic] = arbitrary[Int].map(Algebraic(_))
 
@@ -82,38 +82,37 @@ object gen {
 
   lazy val sign: Gen[Sign] = Gen.oneOf(Sign.Positive, Sign.Zero, Sign.Negative)
 
-  def term[A : Arbitrary]: Gen[poly.Term[A]] =
+  def term[A: Arbitrary]: Gen[poly.Term[A]] =
     for {
       e <- arbitrary[Short]
       c <- arbitrary[A]
     } yield poly.Term(c, e.toInt)
 
-  def polynomial[
-      A : Arbitrary : Semiring : Eq : ClassTag]: Gen[Polynomial[A]] =
+  def polynomial[A: Arbitrary: Semiring: Eq: ClassTag]: Gen[Polynomial[A]] =
     for {
       ts <- Gen.listOf(term[A])
     } yield Polynomial(ts.take(6))
 
-  def complex[A : Arbitrary]: Gen[Complex[A]] =
+  def complex[A: Arbitrary]: Gen[Complex[A]] =
     for {
       r <- arbitrary[A]
       i <- arbitrary[A]
     } yield Complex(r, i)
 
-  def jet2[A : Arbitrary : ClassTag]: Gen[Jet[A]] =
+  def jet2[A: Arbitrary: ClassTag]: Gen[Jet[A]] =
     for {
       r <- arbitrary[A]
       inf0 <- arbitrary[A]
       inf1 <- arbitrary[A]
     } yield Jet(r, Array(inf0, inf1))
 
-  def jet[A : Arbitrary : ClassTag]: Gen[Jet[A]] =
+  def jet[A: Arbitrary: ClassTag]: Gen[Jet[A]] =
     for {
       r <- arbitrary[A]
       infs <- arbitrary[Array[A]]
     } yield Jet(r, infs)
 
-  def quaternion[A : Arbitrary]: Gen[Quaternion[A]] =
+  def quaternion[A: Arbitrary]: Gen[Quaternion[A]] =
     for {
       r <- arbitrary[A]
       i <- arbitrary[A]
@@ -121,45 +120,49 @@ object gen {
       k <- arbitrary[A]
     } yield Quaternion(r, i, j, k)
 
-  def bound[A : Arbitrary]: Gen[Bound[A]] =
-    Gen.oneOf(arbitrary[A].map(Open(_)),
-              arbitrary[A].map(Closed(_)),
-              Gen.const(Unbound[A]))
+  def bound[A: Arbitrary]: Gen[Bound[A]] =
+    Gen.oneOf(
+      arbitrary[A].map(Open(_)),
+      arbitrary[A].map(Closed(_)),
+      Gen.const(Unbound[A]))
 
-  def bounds[A : Arbitrary : Order]: Gen[(A, A)] =
+  def bounds[A: Arbitrary: Order]: Gen[(A, A)] =
     arbitrary[(A, A)].map { case (x, y) => if (x <= y) (x, y) else (y, x) }
 
-  def makeBoundedInterval[A : Arbitrary : Order](
+  def makeBoundedInterval[A: Arbitrary: Order](
       f: (A, A) => Interval[A]): Gen[Interval[A]] =
     bounds[A].map { case (l, u) => f(l, u) }
 
-  def openInterval[A : Arbitrary : Order]: Gen[Interval[A]] =
+  def openInterval[A: Arbitrary: Order]: Gen[Interval[A]] =
     makeBoundedInterval[A](Interval.open(_, _))
 
-  def openLowerInterval[A : Arbitrary : Order]: Gen[Interval[A]] =
+  def openLowerInterval[A: Arbitrary: Order]: Gen[Interval[A]] =
     makeBoundedInterval[A](Interval.openLower(_, _))
 
-  def openUpperInterval[A : Arbitrary : Order]: Gen[Interval[A]] =
+  def openUpperInterval[A: Arbitrary: Order]: Gen[Interval[A]] =
     makeBoundedInterval[A](Interval.openUpper(_, _))
 
-  def closedInterval[A : Arbitrary : Order]: Gen[Interval[A]] =
+  def closedInterval[A: Arbitrary: Order]: Gen[Interval[A]] =
     makeBoundedInterval[A](Interval.closed(_, _))
 
-  def boundedInterval[A : Arbitrary : Order]: Gen[Interval[A]] =
-    Gen.oneOf(openInterval[A],
-              openLowerInterval[A],
-              openUpperInterval[A],
-              closedInterval[A])
+  def boundedInterval[A: Arbitrary: Order]: Gen[Interval[A]] =
+    Gen.oneOf(
+      openInterval[A],
+      openLowerInterval[A],
+      openUpperInterval[A],
+      closedInterval[A])
 
-  def interval[A : Arbitrary : Order : AdditiveMonoid]: Gen[Interval[A]] =
-    Gen.frequency[Interval[A]]((1, Gen.const(Interval.all[A])),
-                               (1, arbitrary[A].map(Interval.above(_))),
-                               (1, arbitrary[A].map(Interval.atOrAbove(_))),
-                               (1, arbitrary[A].map(Interval.below(_))),
-                               (1, arbitrary[A].map(Interval.atOrBelow(_))),
-                               (15, boundedInterval[A]))
+  def interval[A: Arbitrary: Order: AdditiveMonoid]: Gen[Interval[A]] =
+    Gen.frequency[Interval[A]](
+      (1, Gen.const(Interval.all[A])),
+      (1, arbitrary[A].map(Interval.above(_))),
+      (1, arbitrary[A].map(Interval.atOrAbove(_))),
+      (1, arbitrary[A].map(Interval.below(_))),
+      (1, arbitrary[A].map(Interval.atOrBelow(_))),
+      (15, boundedInterval[A])
+    )
 
-  def freeMonoid[A : Arbitrary]: Gen[FreeMonoid[A]] =
+  def freeMonoid[A: Arbitrary]: Gen[FreeMonoid[A]] =
     for {
       as <- arbitrary[List[A]]
     } yield
@@ -167,16 +170,16 @@ object gen {
         acc |+| FreeMonoid(a)
       }
 
-  def freeGroup[A : Arbitrary]: Gen[FreeGroup[A]] =
+  def freeGroup[A: Arbitrary]: Gen[FreeGroup[A]] =
     for {
       aas <- arbitrary[List[Either[A, A]]]
     } yield
       aas.foldLeft(FreeGroup.id[A]) {
-        case (acc, Left(a)) => acc |-| FreeGroup(a)
+        case (acc, Left(a))  => acc |-| FreeGroup(a)
         case (acc, Right(a)) => acc |+| FreeGroup(a)
       }
 
-  def freeAbGroup[A : Arbitrary]: Gen[FreeAbGroup[A]] =
+  def freeAbGroup[A: Arbitrary]: Gen[FreeAbGroup[A]] =
     for {
       tpls <- arbitrary[List[(A, Short)]]
     } yield

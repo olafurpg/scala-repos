@@ -2,9 +2,8 @@ package com.twitter.util
 
 import scala.reflect.ClassTag
 
-@deprecated(
-    "Use com.google.common.collect.EvictingQueue instead", "2014-10-11")
-class RingBuffer[A : ClassTag](val maxSize: Int) extends Seq[A] {
+@deprecated("Use com.google.common.collect.EvictingQueue instead", "2014-10-11")
+class RingBuffer[A: ClassTag](val maxSize: Int) extends Seq[A] {
   private val array = new Array[A](maxSize)
   private var read = 0
   private var write = 0

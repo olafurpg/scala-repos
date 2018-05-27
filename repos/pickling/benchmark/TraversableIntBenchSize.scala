@@ -5,7 +5,12 @@ import scala.pickling._
 import scala.pickling.Defaults._
 import scala.pickling.binary._
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, ObjectOutputStream, ObjectInputStream}
+import java.io.{
+  ByteArrayInputStream,
+  ByteArrayOutputStream,
+  ObjectOutputStream,
+  ObjectInputStream
+}
 
 object TraversableIntBenchSize
     extends scala.pickling.testing.PicklingBenchmark {

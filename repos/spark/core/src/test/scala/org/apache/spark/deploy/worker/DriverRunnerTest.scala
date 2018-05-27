@@ -31,20 +31,22 @@ import org.apache.spark.util.Clock
 class DriverRunnerTest extends SparkFunSuite {
   private def createDriverRunner() = {
     val command = new Command("mainClass", Seq(), Map(), Seq(), Seq(), Seq())
-    val driverDescription = new DriverDescription(
-        "jarUrl", 512, 1, true, command)
+    val driverDescription =
+      new DriverDescription("jarUrl", 512, 1, true, command)
     val conf = new SparkConf()
-    new DriverRunner(conf,
-                     "driverId",
-                     new File("workDir"),
-                     new File("sparkHome"),
-                     driverDescription,
-                     null,
-                     "spark://1.2.3.4/worker/",
-                     new SecurityManager(conf))
+    new DriverRunner(
+      conf,
+      "driverId",
+      new File("workDir"),
+      new File("sparkHome"),
+      driverDescription,
+      null,
+      "spark://1.2.3.4/worker/",
+      new SecurityManager(conf))
   }
 
-  private def createProcessBuilderAndProcess(): (ProcessBuilderLike, Process) = {
+  private def createProcessBuilderAndProcess()
+    : (ProcessBuilderLike, Process) = {
     val processBuilder = mock(classOf[ProcessBuilderLike])
     when(processBuilder.command).thenReturn(Seq("mocked", "command"))
     val process = mock(classOf[Process])

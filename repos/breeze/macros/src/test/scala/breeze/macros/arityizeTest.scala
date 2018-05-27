@@ -40,7 +40,7 @@ class arityizeTest extends FunSuite {
       def apply(workSize1: Int = 1, workSize2: Int = 1, workSize3: Int = 1)(
           @arityize.replicate t: T @arityize.relative(t)): Unit = {
         Whatever.invoke(Array(workSize1, workSize2, workSize3), blockDims, fn)(
-            (t: @arityize.replicate))
+          (t: @arityize.replicate))
       }
     }
 
@@ -58,10 +58,12 @@ class arityizeTest extends FunSuite {
 
     @arityize(2)
     def getKernel[@arityize.replicate T](
-        name: String, blockDims: Array[Int] = Array(32, 1, 1))
+        name: String,
+        blockDims: Array[Int] = Array(32, 1, 1))
       : (CuKernel[T @arityize.replicate] @arityize.relative(getKernel)) = {
       new (CuKernel[T @arityize.replicate] @arityize.relative(getKernel))(
-          name, blockDims)
+        name,
+        blockDims)
     }
   }
 
@@ -70,8 +72,8 @@ class arityizeTest extends FunSuite {
     trait LiteralRow[K, V] {}
 
     @arityize(6)
-    implicit def tuple[V]: LiteralRow[
-        Tuple[V @arityize.repeat] @arityize.relative(tuple), V] =
+    implicit def tuple[V]
+      : LiteralRow[Tuple[V @arityize.repeat] @arityize.relative(tuple), V] =
       new LiteralRow[Tuple[V @arityize.repeat] @arityize.relative(tuple), V] {
         def foreach[X](
             tup: Tuple[V @arityize.repeat] @arityize.relative(tuple),
@@ -90,12 +92,12 @@ class arityizeTest extends FunSuite {
     @arityize(22)
     case class TupleToDenseVector(
         tuple: Tuple[Any @arityize.repeat] @arityize.relative(
-            TupleToDenseVector))
+          TupleToDenseVector))
 
     @arityize(22)
     implicit def tupleToDenseVector(
         tuple: Tuple[Any @arityize.repeat] @arityize.relative(
-            tupleToDenseVector)) = {
+          tupleToDenseVector)) = {
       new (TupleToDenseVector @arityize.relative(tupleToDenseVector))(tuple)
     }
   }

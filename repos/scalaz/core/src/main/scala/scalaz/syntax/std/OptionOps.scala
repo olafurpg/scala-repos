@@ -27,7 +27,7 @@ final class OptionOps[A](self: Option[A]) {
 
   final class Conditional[X](s: => X) {
     def |(n: => X): X = self match {
-      case None => n
+      case None    => n
       case Some(_) => s
     }
   }
@@ -92,7 +92,7 @@ final class OptionOps[A](self: Option[A]) {
 
   final def last: Option[A] @@ Last = Tag(self)
 
-  final def orEmpty[M[_]: Applicative : PlusEmpty]: M[A] =
+  final def orEmpty[M[_]: Applicative: PlusEmpty]: M[A] =
     o.orEmpty[A, M](self)
 
   final def foldLift[F[_]: Applicative, B](b: => B, k: F[A] => B): B =

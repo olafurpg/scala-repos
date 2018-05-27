@@ -35,8 +35,7 @@ import scalafx.geometry.Pos
 /**
   * Trait to test AlignmentDelegate subclasses
   */
-trait AlignmentDelegateSpec[
-    J <: Object with Aligned, D <: AlignmentDelegate[J]]
+trait AlignmentDelegateSpec[J <: Object with Aligned, D <: AlignmentDelegate[J]]
     extends SFXDelegateSpec[J, D] {
 
   it should "have its Alignment observed when changed" in {
@@ -46,12 +45,10 @@ trait AlignmentDelegateSpec[
     val finalValue = Pos.CenterRight
 
     delegate.alignment = initialValue
-    val subscription = delegate.alignment.onChange(
-        (ov, oldValue, newValue) =>
-          {
-        oldValue should be(initialValue.delegate)
-        newValue should be(finalValue.delegate)
-        changed = true
+    val subscription = delegate.alignment.onChange((ov, oldValue, newValue) => {
+      oldValue should be(initialValue.delegate)
+      newValue should be(finalValue.delegate)
+      changed = true
     })
 
     delegate.alignment = finalValue

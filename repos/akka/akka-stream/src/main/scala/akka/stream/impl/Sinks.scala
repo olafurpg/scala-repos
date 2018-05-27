@@ -40,7 +40,7 @@ private[akka] abstract class SinkModule[-In, Mat](val shape: SinkShape[In])
   override def replaceShape(s: Shape): AtomicModule =
     if (s != shape)
       throw new UnsupportedOperationException(
-          "cannot replace the shape of a Sink, you need to wrap it in a Graph for that")
+        "cannot replace the shape of a Sink, you need to wrap it in a Graph for that")
     else this
 
   // This is okay since we the only caller of this method is right below.
@@ -71,7 +71,8 @@ private[akka] abstract class SinkModule[-In, Mat](val shape: SinkShape[In])
   * a subscriber connects and creates demand for elements to be emitted.
   */
 private[akka] class PublisherSink[In](
-    val attributes: Attributes, shape: SinkShape[In])
+    val attributes: Attributes,
+    shape: SinkShape[In])
     extends SinkModule[In, Publisher[In]](shape) {
 
   /*
@@ -96,17 +97,18 @@ private[akka] class PublisherSink[In](
   * INTERNAL API
   */
 private[akka] final class FanoutPublisherSink[In](
-    val attributes: Attributes, shape: SinkShape[In])
+    val attributes: Attributes,
+    shape: SinkShape[In])
     extends SinkModule[In, Publisher[In]](shape) {
 
   override def create(
       context: MaterializationContext): (Subscriber[In], Publisher[In]) = {
     val actorMaterializer = ActorMaterializer.downcast(context.materializer)
     val fanoutProcessor = ActorProcessorFactory[In, In](
-        actorMaterializer.actorOf(
-            context,
-            FanoutProcessorImpl.props(
-                actorMaterializer.effectiveSettings(attributes))))
+      actorMaterializer.actorOf(
+        context,
+        FanoutProcessorImpl.props(
+          actorMaterializer.effectiveSettings(attributes))))
     (fanoutProcessor, fanoutProcessor)
   }
 
@@ -124,7 +126,8 @@ private[akka] final class FanoutPublisherSink[In](
   * elements.
   */
 private[akka] final class SinkholeSink(
-    val attributes: Attributes, shape: SinkShape[Any])
+    val attributes: Attributes,
+    shape: SinkShape[Any])
     extends SinkModule[Any, Future[Done]](shape) {
 
   override def create(context: MaterializationContext) = {
@@ -146,9 +149,10 @@ private[akka] final class SinkholeSink(
   * INTERNAL API
   * Attaches a subscriber to this stream.
   */
-private[akka] final class SubscriberSink[In](subscriber: Subscriber[In],
-                                             val attributes: Attributes,
-                                             shape: SinkShape[In])
+private[akka] final class SubscriberSink[In](
+    subscriber: Subscriber[In],
+    val attributes: Attributes,
+    shape: SinkShape[In])
     extends SinkModule[In, NotUsed](shape) {
 
   override def create(context: MaterializationContext) = (subscriber, NotUsed)
@@ -165,7 +169,8 @@ private[akka] final class SubscriberSink[In](subscriber: Subscriber[In],
   * A sink that immediately cancels its upstream upon materialization.
   */
 private[akka] final class CancelSink(
-    val attributes: Attributes, shape: SinkShape[Any])
+    val attributes: Attributes,
+    shape: SinkShape[Any])
     extends SinkModule[Any, NotUsed](shape) {
   override def create(
       context: MaterializationContext): (Subscriber[Any], NotUsed) =
@@ -183,14 +188,16 @@ private[akka] final class CancelSink(
   * which should be [[akka.actor.Props]] for an [[akka.stream.actor.ActorSubscriber]].
   */
 private[akka] final class ActorSubscriberSink[In](
-    props: Props, val attributes: Attributes, shape: SinkShape[In])
+    props: Props,
+    val attributes: Attributes,
+    shape: SinkShape[In])
     extends SinkModule[In, ActorRef](shape) {
 
   override def create(context: MaterializationContext) = {
     val subscriberRef = ActorMaterializer
       .downcast(context.materializer)
       .actorOf(context, props)
-      (akka.stream.actor.ActorSubscriber[In](subscriberRef), subscriberRef)
+    (akka.stream.actor.ActorSubscriber[In](subscriberRef), subscriberRef)
   }
 
   override protected def newInstance(
@@ -203,10 +210,11 @@ private[akka] final class ActorSubscriberSink[In](
 /**
   * INTERNAL API
   */
-private[akka] final class ActorRefSink[In](ref: ActorRef,
-                                           onCompleteMessage: Any,
-                                           val attributes: Attributes,
-                                           shape: SinkShape[In])
+private[akka] final class ActorRefSink[In](
+    ref: ActorRef,
+    onCompleteMessage: Any,
+    val attributes: Attributes,
+    shape: SinkShape[In])
     extends SinkModule[In, NotUsed](shape) {
 
   override def create(context: MaterializationContext) = {
@@ -214,9 +222,9 @@ private[akka] final class ActorRefSink[In](ref: ActorRef,
     val effectiveSettings =
       actorMaterializer.effectiveSettings(context.effectiveAttributes)
     val subscriberRef = actorMaterializer.actorOf(
-        context,
-        ActorRefSinkActor.props(
-            ref, effectiveSettings.maxInputBufferSize, onCompleteMessage))
+      context,
+      ActorRefSinkActor
+        .props(ref, effectiveSettings.maxInputBufferSize, onCompleteMessage))
     (akka.stream.actor.ActorSubscriber[In](subscriberRef), NotUsed)
   }
 
@@ -239,27 +247,30 @@ private[akka] final class LastOptionStage[T]
     val p: Promise[Option[T]] = Promise()
     (new GraphStageLogic(shape) {
       override def preStart(): Unit = pull(in)
-      setHandler(in, new InHandler {
-        private[this] var prev: T = null.asInstanceOf[T]
+      setHandler(
+        in,
+        new InHandler {
+          private[this] var prev: T = null.asInstanceOf[T]
 
-        override def onPush(): Unit = {
-          prev = grab(in)
-          pull(in)
-        }
+          override def onPush(): Unit = {
+            prev = grab(in)
+            pull(in)
+          }
 
-        override def onUpstreamFinish(): Unit = {
-          val head = prev
-          prev = null.asInstanceOf[T]
-          p.trySuccess(Option(head))
-          completeStage()
-        }
+          override def onUpstreamFinish(): Unit = {
+            val head = prev
+            prev = null.asInstanceOf[T]
+            p.trySuccess(Option(head))
+            completeStage()
+          }
 
-        override def onUpstreamFailure(ex: Throwable): Unit = {
-          prev = null.asInstanceOf[T]
-          p.tryFailure(ex)
-          failStage(ex)
+          override def onUpstreamFailure(ex: Throwable): Unit = {
+            prev = null.asInstanceOf[T]
+            p.tryFailure(ex)
+            failStage(ex)
+          }
         }
-      })
+      )
     }, p.future)
   }
 
@@ -278,22 +289,25 @@ private[akka] final class HeadOptionStage[T]
     val p: Promise[Option[T]] = Promise()
     (new GraphStageLogic(shape) {
       override def preStart(): Unit = pull(in)
-      setHandler(in, new InHandler {
-        override def onPush(): Unit = {
-          p.trySuccess(Option(grab(in)))
-          completeStage()
-        }
+      setHandler(
+        in,
+        new InHandler {
+          override def onPush(): Unit = {
+            p.trySuccess(Option(grab(in)))
+            completeStage()
+          }
 
-        override def onUpstreamFinish(): Unit = {
-          p.trySuccess(None)
-          completeStage()
-        }
+          override def onUpstreamFinish(): Unit = {
+            p.trySuccess(None)
+            completeStage()
+          }
 
-        override def onUpstreamFailure(ex: Throwable): Unit = {
-          p.tryFailure(ex)
-          failStage(ex)
+          override def onUpstreamFailure(ex: Throwable): Unit = {
+            p.tryFailure(ex)
+            failStage(ex)
+          }
         }
-      })
+      )
     }, p.future)
   }
 
@@ -302,7 +316,8 @@ private[akka] final class HeadOptionStage[T]
 
 private[akka] final class SeqStage[T]
     extends GraphStageWithMaterializedValue[
-        SinkShape[T], Future[immutable.Seq[T]]] {
+      SinkShape[T],
+      Future[immutable.Seq[T]]] {
   val in = Inlet[T]("seq.in")
 
   override def toString: String = "SeqStage"
@@ -320,24 +335,27 @@ private[akka] final class SeqStage[T]
 
       override def preStart(): Unit = pull(in)
 
-      setHandler(in, new InHandler {
+      setHandler(
+        in,
+        new InHandler {
 
-        override def onPush(): Unit = {
-          buf += grab(in)
-          pull(in)
-        }
+          override def onPush(): Unit = {
+            buf += grab(in)
+            pull(in)
+          }
 
-        override def onUpstreamFinish(): Unit = {
-          val result = buf.result()
-          p.trySuccess(result)
-          completeStage()
-        }
+          override def onUpstreamFinish(): Unit = {
+            val result = buf.result()
+            p.trySuccess(result)
+            completeStage()
+          }
 
-        override def onUpstreamFailure(ex: Throwable): Unit = {
-          p.tryFailure(ex)
-          failStage(ex)
+          override def onUpstreamFailure(ex: Throwable): Unit = {
+            p.tryFailure(ex)
+            failStage(ex)
+          }
         }
-      })
+      )
     }
 
     (logic, p.future)
@@ -382,23 +400,23 @@ final private[stream] class QueueSink[T]()
 
       override def postStop(): Unit =
         stopCallback(
-            promise ⇒
-              promise.failure(new IllegalStateException(
-                      "Stream is terminated. QueueSink is detached")))
+          promise ⇒
+            promise.failure(new IllegalStateException(
+              "Stream is terminated. QueueSink is detached")))
 
       private val callback: AsyncCallback[Requested[T]] = getAsyncCallback(
-          promise ⇒
-            currentRequest match {
-          case Some(_) ⇒
-            promise.failure(new IllegalStateException(
-                    "You have to wait for previous future to be resolved to send another request"))
-          case None ⇒
-            if (buffer.isEmpty) currentRequest = Some(promise)
-            else {
-              if (buffer.used == maxBuffer) tryPull(in)
-              sendDownstream(promise)
-            }
-      })
+        promise ⇒
+          currentRequest match {
+            case Some(_) ⇒
+              promise.failure(new IllegalStateException(
+                "You have to wait for previous future to be resolved to send another request"))
+            case None ⇒
+              if (buffer.isEmpty) currentRequest = Some(promise)
+              else {
+                if (buffer.used == maxBuffer) tryPull(in)
+                sendDownstream(promise)
+              }
+        })
 
       def sendDownstream(promise: Requested[T]): Unit = {
         val e = buffer.dequeue()
@@ -420,15 +438,19 @@ final private[stream] class QueueSink[T]()
         }
       }
 
-      setHandler(in, new InHandler {
-        override def onPush(): Unit = {
-          enqueueAndNotify(Success(Some(grab(in))))
-          if (buffer.used < maxBuffer) pull(in)
+      setHandler(
+        in,
+        new InHandler {
+          override def onPush(): Unit = {
+            enqueueAndNotify(Success(Some(grab(in))))
+            if (buffer.used < maxBuffer) pull(in)
+          }
+          override def onUpstreamFinish(): Unit =
+            enqueueAndNotify(Success(None))
+          override def onUpstreamFailure(ex: Throwable): Unit =
+            enqueueAndNotify(Failure(ex))
         }
-        override def onUpstreamFinish(): Unit = enqueueAndNotify(Success(None))
-        override def onUpstreamFailure(ex: Throwable): Unit =
-          enqueueAndNotify(Failure(ex))
-      })
+      )
     }
 
     (stageLogic, new SinkQueue[T] {

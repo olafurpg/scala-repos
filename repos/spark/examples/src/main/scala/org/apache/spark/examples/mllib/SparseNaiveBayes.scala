@@ -34,10 +34,11 @@ import org.apache.spark.mllib.util.MLUtils
   */
 object SparseNaiveBayes {
 
-  case class Params(input: String = null,
-                    minPartitions: Int = 0,
-                    numFeatures: Int = -1,
-                    lambda: Double = 1.0)
+  case class Params(
+      input: String = null,
+      minPartitions: Int = 0,
+      numFeatures: Int = -1,
+      lambda: Double = 1.0)
       extends AbstractParams[Params]
 
   def main(args: Array[String]) {
@@ -81,7 +82,10 @@ object SparseNaiveBayes {
       else sc.defaultMinPartitions
 
     val examples = MLUtils.loadLibSVMFile(
-        sc, params.input, params.numFeatures, minPartitions)
+      sc,
+      params.input,
+      params.numFeatures,
+      minPartitions)
     // Cache examples because it will be used in both training and evaluation.
     examples.cache()
 

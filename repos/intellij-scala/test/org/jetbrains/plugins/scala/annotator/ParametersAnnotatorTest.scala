@@ -43,19 +43,21 @@ class ParametersAnnotatorTest extends SimpleTestCase {
     }
     assertMatches(messages("def f(a: A*, b: B*, c: C) {}")) {
       case Error("a: A*", "*-parameter must come last") :: Error(
-          "b: B*", "*-parameter must come last") :: Nil =>
+            "b: B*",
+            "*-parameter must come last") :: Nil =>
     }
     assertMatches(messages("def f(a: A*, c: C)(b: B*, c: C) {}")) {
       case Error("a: A*", "*-parameter must come last") :: Error(
-          "b: B*", "*-parameter must come last") :: Nil =>
+            "b: B*",
+            "*-parameter must come last") :: Nil =>
     }
   }
 
   def testRepeatedWithDefault(): Unit = {
     assertMatches(messages("def f(i: Int, js: Int* = 1) {}")) {
       case Error(
-          "(i: Int, js: Int* = 1)",
-          "Parameter section with *-parameter cannot have default arguments") :: Nil =>
+            "(i: Int, js: Int* = 1)",
+            "Parameter section with *-parameter cannot have default arguments") :: Nil =>
     }
   }
 
@@ -76,10 +78,11 @@ class ParametersAnnotatorTest extends SimpleTestCase {
 
   def testMissingTypeAnnotation(): Unit = {
     assertMatches(
-        messages("def test(p1: String, p2 = \"default\") = p1 concat p2")) {
+      messages("def test(p1: String, p2 = \"default\") = p1 concat p2")) {
       //SCL-3799
-      case Error("p2 = \"default\"",
-                 "Missing type annotation for parameter: p2") :: Nil =>
+      case Error(
+            "p2 = \"default\"",
+            "Missing type annotation for parameter: p2") :: Nil =>
     }
   }
 

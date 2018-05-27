@@ -142,152 +142,152 @@ object Commands {
   val PFMERGE = "PFMERGE"
 
   val commandMap: Map[String, Function1[List[Array[Byte]], Command]] = Map(
-      // key commands
-      DEL -> { Del(_) },
-      DUMP -> { Dump(_) },
-      EXISTS -> { Exists(_) },
-      EXPIRE -> { Expire(_) },
-      EXPIREAT -> { ExpireAt(_) },
-      KEYS -> { Keys(_) },
-      MOVE -> { Move(_) },
-      PERSIST -> { Persist(_) },
-      PEXPIRE -> { PExpire(_) },
-      PEXPIREAT -> { PExpireAt(_) },
-      PTTL -> { PTtl(_) },
-      RANDOMKEY -> { _ =>
-        Randomkey()
-      },
-      RENAME -> { Rename(_) },
-      RENAMENX -> { RenameNx(_) },
-      SCAN -> { Scan(_) },
-      TTL -> { Ttl(_) },
-      TYPE -> { Type(_) },
-      // string commands
-      APPEND -> { Append(_) },
-      BITCOUNT -> { BitCount(_) },
-      BITOP -> { BitOp(_) },
-      DECR -> { Decr(_) },
-      DECRBY -> { DecrBy(_) },
-      GET -> { Get(_) },
-      GETBIT -> { GetBit(_) },
-      GETRANGE -> { GetRange(_) },
-      GETSET -> { GetSet(_) },
-      INCR -> { Incr(_) },
-      INCRBY -> { IncrBy(_) },
-      MGET -> { MGet(_) },
-      MSET -> { MSet(_) },
-      MSETNX -> { MSetNx(_) },
-      PSETEX -> { PSetEx(_) },
-      SET -> { Set(_) },
-      SETBIT -> { SetBit(_) },
-      SETEX -> { SetEx(_) },
-      SETNX -> { SetNx(_) },
-      SETRANGE -> { SetRange(_) },
-      STRLEN -> { Strlen(_) },
-      // sorted sets
-      ZADD -> { ZAdd(_) },
-      ZCARD -> { ZCard(_) },
-      ZCOUNT -> { ZCount(_) },
-      ZINCRBY -> { ZIncrBy(_) },
-      ZINTERSTORE -> { ZInterStore(_) },
-      ZRANGE -> { ZRange(_) },
-      ZRANGEBYSCORE -> { ZRangeByScore(_) },
-      ZRANK -> { ZRank(_) },
-      ZREM -> { ZRem(_) },
-      ZREMRANGEBYRANK -> { ZRemRangeByRank(_) },
-      ZREMRANGEBYSCORE -> { ZRemRangeByScore(_) },
-      ZREVRANGE -> { ZRevRange(_) },
-      ZREVRANGEBYSCORE -> { ZRevRangeByScore(_) },
-      ZREVRANK -> { ZRevRank(_) },
-      ZSCORE -> { ZScore(_) },
-      ZUNIONSTORE -> { ZUnionStore(_) },
-      // Btree Sorted Set
-      BADD -> { BAdd(_) },
-      BCARD -> { BCard(_) },
-      BREM -> { BRem(_) },
-      BGET -> { BGet(_) },
-      // miscellaneous
-      FLUSHALL -> { _ =>
-        FlushAll
-      },
-      FLUSHDB -> { _ =>
-        FlushDB
-      },
-      SELECT -> { Select(_) },
-      AUTH -> { Auth(_) },
-      INFO -> { Info(_) },
-      QUIT -> { _ =>
-        Quit
-      },
-      SLAVEOF -> { SlaveOf(_) },
-      CONFIG -> { Config(_) },
-      // hash sets
-      HDEL -> { HDel(_) },
-      HEXISTS -> { HExists(_) },
-      HGET -> { HGet(_) },
-      HGETALL -> { HGetAll(_) },
-      HINCRBY -> { HIncrBy(_) },
-      HKEYS -> { HKeys(_) },
-      HMGET -> { HMGet(_) },
-      HMSET -> { HMSet(_) },
-      HSCAN -> { HScan(_) },
-      HSET -> { HSet(_) },
-      HSETNX -> { HSetNx(_) },
-      HVALS -> { HVals(_) },
-      // Lists
-      LLEN -> { LLen(_) },
-      LINDEX -> { LIndex(_) },
-      LINSERT -> { LInsert(_) },
-      LPOP -> { LPop(_) },
-      LPUSH -> { LPush(_) },
-      LREM -> { LRem(_) },
-      LSET -> { LSet(_) },
-      LRANGE -> { LRange(_) },
-      RPUSH -> { RPush(_) },
-      RPOP -> { RPop(_) },
-      LTRIM -> { LTrim(_) },
-      // Sets
-      SADD -> { SAdd(_) },
-      SMEMBERS -> { SMembers(_) },
-      SISMEMBER -> { SIsMember(_) },
-      SCARD -> { SCard(_) },
-      SREM -> { SRem(_) },
-      SPOP -> { SPop(_) },
-      SRANDMEMBER -> { SRandMember(_) },
-      SINTER -> { SInter(_) },
-      // transactions
-      DISCARD -> { _ =>
-        Discard
-      },
-      EXEC -> { _ =>
-        Exec
-      },
-      MULTI -> { _ =>
-        Multi
-      },
-      UNWATCH -> { _ =>
-        UnWatch
-      },
-      WATCH -> { Watch(_) },
-      // HyperLogLogs
-      PFADD -> { PFAdd(_) },
-      PFCOUNT -> { PFCount(_) },
-      PFMERGE -> { PFMerge(_) }
+    // key commands
+    DEL -> { Del(_) },
+    DUMP -> { Dump(_) },
+    EXISTS -> { Exists(_) },
+    EXPIRE -> { Expire(_) },
+    EXPIREAT -> { ExpireAt(_) },
+    KEYS -> { Keys(_) },
+    MOVE -> { Move(_) },
+    PERSIST -> { Persist(_) },
+    PEXPIRE -> { PExpire(_) },
+    PEXPIREAT -> { PExpireAt(_) },
+    PTTL -> { PTtl(_) },
+    RANDOMKEY -> { _ =>
+      Randomkey()
+    },
+    RENAME -> { Rename(_) },
+    RENAMENX -> { RenameNx(_) },
+    SCAN -> { Scan(_) },
+    TTL -> { Ttl(_) },
+    TYPE -> { Type(_) },
+    // string commands
+    APPEND -> { Append(_) },
+    BITCOUNT -> { BitCount(_) },
+    BITOP -> { BitOp(_) },
+    DECR -> { Decr(_) },
+    DECRBY -> { DecrBy(_) },
+    GET -> { Get(_) },
+    GETBIT -> { GetBit(_) },
+    GETRANGE -> { GetRange(_) },
+    GETSET -> { GetSet(_) },
+    INCR -> { Incr(_) },
+    INCRBY -> { IncrBy(_) },
+    MGET -> { MGet(_) },
+    MSET -> { MSet(_) },
+    MSETNX -> { MSetNx(_) },
+    PSETEX -> { PSetEx(_) },
+    SET -> { Set(_) },
+    SETBIT -> { SetBit(_) },
+    SETEX -> { SetEx(_) },
+    SETNX -> { SetNx(_) },
+    SETRANGE -> { SetRange(_) },
+    STRLEN -> { Strlen(_) },
+    // sorted sets
+    ZADD -> { ZAdd(_) },
+    ZCARD -> { ZCard(_) },
+    ZCOUNT -> { ZCount(_) },
+    ZINCRBY -> { ZIncrBy(_) },
+    ZINTERSTORE -> { ZInterStore(_) },
+    ZRANGE -> { ZRange(_) },
+    ZRANGEBYSCORE -> { ZRangeByScore(_) },
+    ZRANK -> { ZRank(_) },
+    ZREM -> { ZRem(_) },
+    ZREMRANGEBYRANK -> { ZRemRangeByRank(_) },
+    ZREMRANGEBYSCORE -> { ZRemRangeByScore(_) },
+    ZREVRANGE -> { ZRevRange(_) },
+    ZREVRANGEBYSCORE -> { ZRevRangeByScore(_) },
+    ZREVRANK -> { ZRevRank(_) },
+    ZSCORE -> { ZScore(_) },
+    ZUNIONSTORE -> { ZUnionStore(_) },
+    // Btree Sorted Set
+    BADD -> { BAdd(_) },
+    BCARD -> { BCard(_) },
+    BREM -> { BRem(_) },
+    BGET -> { BGet(_) },
+    // miscellaneous
+    FLUSHALL -> { _ =>
+      FlushAll
+    },
+    FLUSHDB -> { _ =>
+      FlushDB
+    },
+    SELECT -> { Select(_) },
+    AUTH -> { Auth(_) },
+    INFO -> { Info(_) },
+    QUIT -> { _ =>
+      Quit
+    },
+    SLAVEOF -> { SlaveOf(_) },
+    CONFIG -> { Config(_) },
+    // hash sets
+    HDEL -> { HDel(_) },
+    HEXISTS -> { HExists(_) },
+    HGET -> { HGet(_) },
+    HGETALL -> { HGetAll(_) },
+    HINCRBY -> { HIncrBy(_) },
+    HKEYS -> { HKeys(_) },
+    HMGET -> { HMGet(_) },
+    HMSET -> { HMSet(_) },
+    HSCAN -> { HScan(_) },
+    HSET -> { HSet(_) },
+    HSETNX -> { HSetNx(_) },
+    HVALS -> { HVals(_) },
+    // Lists
+    LLEN -> { LLen(_) },
+    LINDEX -> { LIndex(_) },
+    LINSERT -> { LInsert(_) },
+    LPOP -> { LPop(_) },
+    LPUSH -> { LPush(_) },
+    LREM -> { LRem(_) },
+    LSET -> { LSet(_) },
+    LRANGE -> { LRange(_) },
+    RPUSH -> { RPush(_) },
+    RPOP -> { RPop(_) },
+    LTRIM -> { LTrim(_) },
+    // Sets
+    SADD -> { SAdd(_) },
+    SMEMBERS -> { SMembers(_) },
+    SISMEMBER -> { SIsMember(_) },
+    SCARD -> { SCard(_) },
+    SREM -> { SRem(_) },
+    SPOP -> { SPop(_) },
+    SRANDMEMBER -> { SRandMember(_) },
+    SINTER -> { SInter(_) },
+    // transactions
+    DISCARD -> { _ =>
+      Discard
+    },
+    EXEC -> { _ =>
+      Exec
+    },
+    MULTI -> { _ =>
+      Multi
+    },
+    UNWATCH -> { _ =>
+      UnWatch
+    },
+    WATCH -> { Watch(_) },
+    // HyperLogLogs
+    PFADD -> { PFAdd(_) },
+    PFCOUNT -> { PFCount(_) },
+    PFMERGE -> { PFMerge(_) }
   )
 
   def doMatch(cmd: String, args: List[Array[Byte]]) =
     commandMap
       .get(cmd.toUpperCase)
       .map {
-        _ (args)
+        _(args)
       }
       .getOrElse(throw ClientError("Unsupported command: " + cmd))
 
   def trimList(list: Seq[Array[Byte]], count: Int, from: String = "") = {
     RequireClientProtocol(list != null, "%s Empty list found".format(from))
     RequireClientProtocol(
-        list.length == count,
-        "%s Expected %d elements, found %d".format(from, count, list.length))
+      list.length == count,
+      "%s Expected %d elements, found %d".format(from, count, list.length))
     val newList = list.take(count)
     newList.foreach { item =>
       RequireClientProtocol(item != null, "Found empty item in list")
@@ -463,7 +463,8 @@ class CommandCodec extends UnifiedProtocolCodec {
 
   def commandDecode(lines: List[Array[Byte]]): Command = {
     RequireClientProtocol(
-        lines != null && lines.length > 0, "Invalid client command protocol")
+      lines != null && lines.length > 0,
+      "Invalid client command protocol")
     val cmd = BytesToString(lines.head)
     val args = lines.tail
     try {
@@ -471,9 +472,10 @@ class CommandCodec extends UnifiedProtocolCodec {
     } catch {
       case e: ClientError => throw e
       case t: Throwable =>
-        log.warning(t,
-                    "Unhandled exception %s(%s)".format(
-                        t.getClass.toString, t.getMessage))
+        log.warning(
+          t,
+          "Unhandled exception %s(%s)"
+            .format(t.getClass.toString, t.getMessage))
         throw new ClientError(t.getMessage)
     }
   }

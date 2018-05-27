@@ -5,7 +5,7 @@
   * The ASF licenses this file to You under the Apache License, Version 2.0
   * (the "License"); you may not use this file except in compliance with
   * the License.  You may obtain a copy of the License at
-  * 
+  *
   *    http://www.apache.org/licenses/LICENSE-2.0
   *
   * Unless required by applicable law or agreed to in writing, software
@@ -21,7 +21,7 @@ import org.apache.kafka.common.network.{NetworkReceive, Send}
 private[kafka] object Handler {
 
   /**
-    * A request handler is a function that turns an incoming 
+    * A request handler is a function that turns an incoming
     * transmission into an outgoing transmission
     */
   type Handler = NetworkReceive => Option[Send]

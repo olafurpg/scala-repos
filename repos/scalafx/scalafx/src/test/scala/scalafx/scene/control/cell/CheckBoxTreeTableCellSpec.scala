@@ -40,6 +40,7 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class CheckBoxTreeTableCellSpec[S, T]
     extends SimpleSFXDelegateSpec[
-        jfxscc.CheckBoxTreeTableCell[S, T], CheckBoxTreeTableCell[S, T]](
-        classOf[jfxscc.CheckBoxTreeTableCell[S, T]],
-        classOf[CheckBoxTreeTableCell[S, T]])
+      jfxscc.CheckBoxTreeTableCell[S, T],
+      CheckBoxTreeTableCell[S, T]](
+      classOf[jfxscc.CheckBoxTreeTableCell[S, T]],
+      classOf[CheckBoxTreeTableCell[S, T]])

@@ -14,12 +14,13 @@ import org.jetbrains.plugins.scala.settings.ScalaApplicationSettings
   * Nikolay.Tropin
   * 11/29/13
   */
-class ScalaMoveClassesOrPackagesProcessor(project: Project,
-                                          elements: Array[PsiElement],
-                                          moveDestination: MoveDestination,
-                                          searchInComments: Boolean,
-                                          searchInNonJavaFiles: Boolean,
-                                          moveCallback: MoveCallback)
+class ScalaMoveClassesOrPackagesProcessor(
+    project: Project,
+    elements: Array[PsiElement],
+    moveDestination: MoveDestination,
+    searchInComments: Boolean,
+    searchInNonJavaFiles: Boolean,
+    moveCallback: MoveCallback)
     extends {
   private val expandedElements =
     if (ScalaApplicationSettings.getInstance().MOVE_COMPANION)
@@ -28,15 +29,18 @@ class ScalaMoveClassesOrPackagesProcessor(project: Project,
           td :: ScalaPsiUtil.getBaseCompanionModule(td).toList
         case e => List(e)
       } else elements
-} with MoveClassesOrPackagesProcessor(project,
-                                      expandedElements,
-                                      moveDestination,
-                                      searchInComments,
-                                      searchInNonJavaFiles,
-                                      moveCallback) {
+} with MoveClassesOrPackagesProcessor(
+  project,
+  expandedElements,
+  moveDestination,
+  searchInComments,
+  searchInNonJavaFiles,
+  moveCallback) {
   extensions.inWriteAction {
-    expandedElements.foreach(c =>
-          ScalaMoveUtil.saveMoveDestination(
-              c, moveDestination.getTargetDirectory(c.getContainingFile)))
+    expandedElements.foreach(
+      c =>
+        ScalaMoveUtil.saveMoveDestination(
+          c,
+          moveDestination.getTargetDirectory(c.getContainingFile)))
   }
 }

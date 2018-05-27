@@ -13,7 +13,7 @@ class DiningHakkerSerializer(val system: ExtendedActorSystem)
   override def identifier = 98765
 
   lazy val javaSerializer = SerializationExtension(system).findSerializerFor(
-      classOf[java.io.Serializable])
+    classOf[java.io.Serializable])
 
   def toBinary(obj: AnyRef): Array[Byte] = {
     javaSerializer.toBinary(obj)

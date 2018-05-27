@@ -16,8 +16,9 @@ object InterpolatedStringParser extends StringParser {
 
   def parse(element: PsiElement) = parse(element, checkStripMargin = true)
 
-  def parse(element: PsiElement,
-            checkStripMargin: Boolean): Option[Seq[StringPart]] = {
+  def parse(
+      element: PsiElement,
+      checkStripMargin: Boolean): Option[Seq[StringPart]] = {
     if (checkStripMargin)
       element match {
         case WithStrippedMargin(_, _) =>
@@ -49,7 +50,7 @@ object InterpolatedStringParser extends StringParser {
                     FormatSpecifierPattern
                       .findFirstIn(textIn(e))
                       .map(format =>
-                            Specifier(Span(e, 0, format.length), format))
+                        Specifier(Span(e, 0, format.length), format))
                   case _ => None
                 }
             Injection(actualExpression, specifier)
@@ -77,10 +78,10 @@ object InterpolatedStringParser extends StringParser {
           case it => it
         }) flatMap {
           case t: Text => t.withEscapedPercent(element.getManager)
-          case part => List(part)
+          case part    => List(part)
         } filter {
           case Text("") => false
-          case _ => true
+          case _        => true
         }
     }
   }

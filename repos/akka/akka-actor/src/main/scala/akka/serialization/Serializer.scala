@@ -123,7 +123,8 @@ abstract class SerializerWithStringManifest extends Serializer {
   def fromBinary(bytes: Array[Byte], manifest: String): AnyRef
 
   final def fromBinary(
-      bytes: Array[Byte], manifest: Option[Class[_]]): AnyRef = {
+      bytes: Array[Byte],
+      manifest: Option[Class[_]]): AnyRef = {
     val manifestString = manifest match {
       case Some(c) ⇒ c.getName
       case None ⇒ ""
@@ -175,8 +176,7 @@ trait BaseSerializer extends Serializer {
   * the JSerializer (also possible with empty constructor).
   */
 abstract class JSerializer extends Serializer {
-  final def fromBinary(
-      bytes: Array[Byte], manifest: Option[Class[_]]): AnyRef =
+  final def fromBinary(bytes: Array[Byte], manifest: Option[Class[_]]): AnyRef =
     fromBinaryJava(bytes, manifest.orNull)
 
   /**
@@ -205,8 +205,7 @@ object JavaSerializer {
     * currentSystem.withValue(system, callable)
     */
   val currentSystem = new CurrentSystem
-  final class CurrentSystem
-      extends DynamicVariable[ExtendedActorSystem](null) {
+  final class CurrentSystem extends DynamicVariable[ExtendedActorSystem](null) {
 
     /**
       * Java API: invoke the callable with the current system being set to the given value for this thread.
@@ -245,7 +244,8 @@ class JavaSerializer(val system: ExtendedActorSystem) extends BaseSerializer {
 
   def fromBinary(bytes: Array[Byte], clazz: Option[Class[_]]): AnyRef = {
     val in = new ClassLoaderObjectInputStream(
-        system.dynamicAccess.classLoader, new ByteArrayInputStream(bytes))
+      system.dynamicAccess.classLoader,
+      new ByteArrayInputStream(bytes))
     val obj = JavaSerializer.currentSystem.withValue(system) { in.readObject }
     in.close()
     obj
@@ -284,7 +284,7 @@ class ByteArraySerializer(val system: ExtendedActorSystem)
     case o: Array[Byte] ⇒ o
     case other ⇒
       throw new IllegalArgumentException(
-          "ByteArraySerializer only serializes byte arrays, not [" + other +
+        "ByteArraySerializer only serializes byte arrays, not [" + other +
           "]")
   }
   def fromBinary(bytes: Array[Byte], clazz: Option[Class[_]]): AnyRef = bytes

@@ -2,7 +2,11 @@ package org.jetbrains.plugins.scala.project.template
 
 import java.io.{File, FileNotFoundException}
 
-import com.intellij.execution.process.{OSProcessHandler, ProcessAdapter, ProcessEvent}
+import com.intellij.execution.process.{
+  OSProcessHandler,
+  ProcessAdapter,
+  ProcessEvent
+}
 import com.intellij.openapi.util.Key
 
 /**
@@ -29,8 +33,9 @@ trait Downloader {
           Runtime.getRuntime.exec(osCommandsFor(file).toArray, null, directory)
 
         val listenerAdapter = new ProcessAdapter {
-          override def onTextAvailable(event: ProcessEvent,
-                                       outputType: Key[_]) {
+          override def onTextAvailable(
+              event: ProcessEvent,
+              outputType: Key[_]) {
             val text = event.getText
             listener(text)
             buffer.append(text)
@@ -54,12 +59,13 @@ trait Downloader {
       jarWith[this.type].getParentFile.getParentFile / "launcher" / "sbt-launch.jar"
 
     if (launcher.exists()) {
-      Seq("java",
-          "-Djline.terminal=jline.UnsupportedTerminal",
-          "-Dsbt.log.noformat=true",
-          "-jar",
-          launcher.getAbsolutePath,
-          "< " + file.getAbsolutePath)
+      Seq(
+        "java",
+        "-Djline.terminal=jline.UnsupportedTerminal",
+        "-Dsbt.log.noformat=true",
+        "-jar",
+        launcher.getAbsolutePath,
+        "< " + file.getAbsolutePath)
     } else {
       throw new FileNotFoundException(launcher.getPath)
     }

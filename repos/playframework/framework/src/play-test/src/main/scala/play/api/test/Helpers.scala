@@ -85,8 +85,8 @@ trait PlayRunners extends HttpVerbs {
     * Executes a block of code in a running server, with a test browser.
     */
   def running[T, WEBDRIVER <: WebDriver](
-      testServer: TestServer, webDriver: Class[WEBDRIVER])(
-      block: TestBrowser => T): T = {
+      testServer: TestServer,
+      webDriver: Class[WEBDRIVER])(block: TestBrowser => T): T = {
     running(testServer, WebDriverFactory(webDriver))(block)
   }
 
@@ -120,17 +120,19 @@ trait PlayRunners extends HttpVerbs {
   /**
     * Constructs a in-memory (h2) database configuration to add to a FakeApplication.
     */
-  def inMemoryDatabase(name: String = "default",
-                       options: Map[String, String] = Map
-                           .empty[String, String]): Map[String, String] = {
-    val optionsForDbUrl = options.map { case (k, v) => k + "=" + v }
+  def inMemoryDatabase(
+      name: String = "default",
+      options: Map[String, String] = Map
+        .empty[String, String]): Map[String, String] = {
+    val optionsForDbUrl = options
+      .map { case (k, v) => k + "=" + v }
       .mkString(";", ";", "")
 
     Map(
-        ("db." + name + ".driver") -> "org.h2.Driver",
-        ("db." + name + ".url") ->
+      ("db." + name + ".driver") -> "org.h2.Driver",
+      ("db." + name + ".url") ->
         ("jdbc:h2:mem:play-test-" + scala.util.Random.nextInt +
-            optionsForDbUrl)
+          optionsForDbUrl)
     )
   }
 }
@@ -219,7 +221,8 @@ trait EssentialActionCaller { self: Writeables =>
     * The body is serialised using the implicit writable, so that the action body parser can deserialise it.
     */
   def call[T](action: EssentialAction, req: Request[T])(
-      implicit w: Writeable[T], mat: Materializer): Future[Result] =
+      implicit w: Writeable[T],
+      mat: Materializer): Future[Result] =
     call(action, req, req.body)
 
   /**
@@ -228,13 +231,16 @@ trait EssentialActionCaller { self: Writeables =>
     * The body is serialised using the implicit writable, so that the action body parser can deserialise it.
     */
   def call[T](action: EssentialAction, rh: RequestHeader, body: T)(
-      implicit w: Writeable[T], mat: Materializer): Future[Result] = {
+      implicit w: Writeable[T],
+      mat: Materializer): Future[Result] = {
     import play.api.http.HeaderNames._
     val newContentType =
       rh.headers.get(CONTENT_TYPE).fold(w.contentType)(_ => None)
-    val rhWithCt = newContentType.map { ct =>
-      rh.copy(headers = rh.headers.replace(CONTENT_TYPE -> ct))
-    }.getOrElse(rh)
+    val rhWithCt = newContentType
+      .map { ct =>
+        rh.copy(headers = rh.headers.replace(CONTENT_TYPE -> ct))
+      }
+      .getOrElse(rh)
 
     val requestBody = Source.single(w.transform(body))
     action(rhWithCt).run(requestBody)
@@ -244,9 +250,10 @@ trait EssentialActionCaller { self: Writeables =>
 trait RouteInvokers extends EssentialActionCaller { self: Writeables =>
 
   // Java compatibility
-  def jRoute[T](app: Application,
-                r: RequestHeader,
-                body: RequestBody): Option[Future[Result]] = {
+  def jRoute[T](
+      app: Application,
+      r: RequestHeader,
+      body: RequestBody): Option[Future[Result]] = {
     route(app, r, body.asBytes())
   }
 
@@ -352,7 +359,8 @@ trait ResultExtractors { self: HeaderNames with Status =>
     * Extracts the content as String.
     */
   def contentAsString(of: Future[Result])(
-      implicit timeout: Timeout, mat: Materializer = NoMaterializer): String =
+      implicit timeout: Timeout,
+      mat: Materializer = NoMaterializer): String =
     contentAsBytes(of).decodeString(charset(of).getOrElse("utf-8"))
 
   /**
@@ -369,7 +377,8 @@ trait ResultExtractors { self: HeaderNames with Status =>
     * Extracts the content as Json.
     */
   def contentAsJson(of: Future[Result])(
-      implicit timeout: Timeout, mat: Materializer = NoMaterializer): JsValue =
+      implicit timeout: Timeout,
+      mat: Materializer = NoMaterializer): JsValue =
     Json.parse(contentAsString(of))
 
   /**
@@ -400,10 +409,10 @@ trait ResultExtractors { self: HeaderNames with Status =>
   /**
     * Extracts the Location header of this Result value if this Result is a Redirect.
     */
-  def redirectLocation(
-      of: Future[Result])(implicit timeout: Timeout): Option[String] =
+  def redirectLocation(of: Future[Result])(
+      implicit timeout: Timeout): Option[String] =
     Await.result(of, timeout.duration).header match {
-      case ResponseHeader(FOUND, headers, _) => headers.get(LOCATION)
+      case ResponseHeader(FOUND, headers, _)     => headers.get(LOCATION)
       case ResponseHeader(SEE_OTHER, headers, _) => headers.get(LOCATION)
       case ResponseHeader(TEMPORARY_REDIRECT, headers, _) =>
         headers.get(LOCATION)
@@ -427,9 +436,16 @@ trait ResultExtractors { self: HeaderNames with Status =>
 }
 
 object Helpers
-    extends PlayRunners with HeaderNames with Status with MimeTypes
-    with HttpProtocol with DefaultAwaitTimeout with ResultExtractors
-    with Writeables with EssentialActionCaller with RouteInvokers
+    extends PlayRunners
+    with HeaderNames
+    with Status
+    with MimeTypes
+    with HttpProtocol
+    with DefaultAwaitTimeout
+    with ResultExtractors
+    with Writeables
+    with EssentialActionCaller
+    with RouteInvokers
     with FutureAwaits
 
 /**
@@ -442,17 +458,19 @@ private[play] object NoMaterializer extends Materializer {
     throw new UnsupportedOperationException("NoMaterializer cannot be named")
   implicit def executionContext =
     throw new UnsupportedOperationException(
-        "NoMaterializer does not have an execution context")
+      "NoMaterializer does not have an execution context")
   def materialize[Mat](runnable: Graph[ClosedShape, Mat]) =
     throw new UnsupportedOperationException(
-        "No materializer was provided, probably when attempting to extract a response body, but that body is a streamed body and so requires a materializer to extract it.")
+      "No materializer was provided, probably when attempting to extract a response body, but that body is a streamed body and so requires a materializer to extract it.")
   override def scheduleOnce(
-      delay: FiniteDuration, task: Runnable): Cancellable =
+      delay: FiniteDuration,
+      task: Runnable): Cancellable =
     throw new UnsupportedOperationException(
-        "NoMaterializer can't schedule tasks")
-  override def schedulePeriodically(initialDelay: FiniteDuration,
-                                    interval: FiniteDuration,
-                                    task: Runnable): Cancellable =
+      "NoMaterializer can't schedule tasks")
+  override def schedulePeriodically(
+      initialDelay: FiniteDuration,
+      interval: FiniteDuration,
+      task: Runnable): Cancellable =
     throw new UnsupportedOperationException(
-        "NoMaterializer can't schedule tasks")
+      "NoMaterializer can't schedule tasks")
 }

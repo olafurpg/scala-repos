@@ -47,7 +47,8 @@ object FloatProperty {
 
 class FloatProperty(
     override val delegate: jfxbp.FloatProperty = new jfxbp.SimpleFloatProperty)
-    extends ReadOnlyFloatProperty(delegate) with Property[Float, Number]
+    extends ReadOnlyFloatProperty(delegate)
+    with Property[Float, Number]
     with SFXDelegate[jfxbp.FloatProperty] {
 
   def this(bean: Object, name: String) =

@@ -77,14 +77,15 @@ object Route {
       val sealedRoute = seal(route)
       request ⇒
         sealedRoute(
-            new RequestContextImpl(request,
-                                   routingLog.requestLog(request),
-                                   routingSettings,
-                                   effectiveParserSettings)).fast.map {
+          new RequestContextImpl(
+            request,
+            routingLog.requestLog(request),
+            routingSettings,
+            effectiveParserSettings)).fast.map {
           case RouteResult.Complete(response) ⇒ response
           case RouteResult.Rejected(rejected) ⇒
             throw new IllegalStateException(
-                s"Unhandled rejections '$rejected', unsealed RejectionHandler?!")
+              s"Unhandled rejections '$rejected', unsealed RejectionHandler?!")
         }
     }
   }

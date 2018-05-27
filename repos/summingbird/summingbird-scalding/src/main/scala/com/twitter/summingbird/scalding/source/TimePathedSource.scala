@@ -57,22 +57,24 @@ object TimePathedSource extends java.io.Serializable {
           case None => None
           case Some(newInit) if newInit.contains(init) =>
             sys.error(
-                "DateRange expansion ill-behaved: %s -> %s -> %s -> %s".format(
-                    init, expanded, subset, newInit))
+              "DateRange expansion ill-behaved: %s -> %s -> %s -> %s"
+                .format(init, expanded, subset, newInit))
           case Some(newInit) => minifyRec(newInit, expander, vertractor)
         }
     }
   }
 
-  def minify(expander: DateRange => DateRange,
-             vertractor: DateRange => Option[DateRange])
+  def minify(
+      expander: DateRange => DateRange,
+      vertractor: DateRange => Option[DateRange])
     : (DateRange => Option[DateRange]) = { (init: DateRange) =>
     minifyRec(init, expander, vertractor)
   }
 
-  def satisfiableHdfs(mode: Hdfs,
-                      desired: DateRange,
-                      fn: DateRange => STPS): Option[DateRange] = {
+  def satisfiableHdfs(
+      mode: Hdfs,
+      desired: DateRange,
+      fn: DateRange => STPS): Option[DateRange] = {
     val expander: (DateRange => DateRange) = fn.andThen(_.dateRange)
 
     val (tz, pattern) = {
@@ -82,20 +84,24 @@ object TimePathedSource extends java.io.Serializable {
     def toPath(date: RichDate): String =
       String.format(pattern, date.toCalendar(tz))
 
-    val stepSize: Option[Duration] = List("%1$tH" -> Hours(1),
-                                          "%1$td" -> Days(1)(tz),
-                                          "%1$tm" -> Months(1)(tz),
-                                          "%1$tY" -> Years(1)(tz)).find {
-      unitDur: (String, Duration) =>
+    val stepSize: Option[Duration] = List(
+      "%1$tH" -> Hours(1),
+      "%1$td" -> Days(1)(tz),
+      "%1$tm" -> Months(1)(tz),
+      "%1$tY" -> Years(1)(tz))
+      .find { unitDur: (String, Duration) =>
         pattern.contains(unitDur._1)
-    }.map(_._2)
+      }
+      .map(_._2)
 
     def allPaths(dateRange: DateRange): Iterable[(DateRange, String)] =
-      stepSize.map {
-        dateRange.each(_).map { dr =>
-          (dr, toPath(dr.start))
+      stepSize
+        .map {
+          dateRange.each(_).map { dr =>
+            (dr, toPath(dr.start))
+          }
         }
-      }.getOrElse(List((dateRange, pattern))) // This must not have any time after all
+        .getOrElse(List((dateRange, pattern))) // This must not have any time after all
 
     def pathIsGood(p: String): Boolean = {
       val path = new Path(p)
@@ -103,13 +109,14 @@ object TimePathedSource extends java.io.Serializable {
         .map(_.length > 0)
         .getOrElse(false)
       logger.debug(
-          "Tested input %s, Valid: %s. Conditions: Any files present, DateRange: %s"
-            .format(p, valid, desired))
+        "Tested input %s, Valid: %s. Conditions: Any files present, DateRange: %s"
+          .format(p, valid, desired))
       valid
     }
 
     val vertractor = { (dr: DateRange) =>
-      allPaths(dr).takeWhile { case (_, path) => pathIsGood(path) }
+      allPaths(dr)
+        .takeWhile { case (_, path) => pathIsGood(path) }
         .map(_._1)
         .reduceOption { (older, newer) =>
           DateRange(older.start, newer.end)

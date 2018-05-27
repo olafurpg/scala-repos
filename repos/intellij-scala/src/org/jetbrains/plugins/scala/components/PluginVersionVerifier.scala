@@ -25,8 +25,11 @@ abstract class ScalaPluginVersionVerifier {
 object ScalaPluginVersionVerifier {
 
   class Version(
-      private val major: Int, private val minor: Int, private val build: Int)
-      extends Ordered[Version] with Serializable {
+      private val major: Int,
+      private val minor: Int,
+      private val build: Int)
+      extends Ordered[Version]
+      with Serializable {
     def compare(that: Version) =
       implicitly[Ordering[(Int, Int, Int)]]
         .compare((major, minor, build), (that.major, that.minor, that.build))
@@ -61,7 +64,7 @@ object ScalaPluginVersionVerifier {
     getClass.getClassLoader match {
       case pluginLoader: PluginClassLoader =>
         Version.parse(
-            PluginManager.getPlugin(pluginLoader.getPluginId).getVersion)
+          PluginManager.getPlugin(pluginLoader.getPluginId).getVersion)
       case _ => Some(Version.Snapshot)
     }
   }
@@ -80,7 +83,7 @@ object ScalaPluginVersionVerifier {
 
 object ScalaPluginVersionVerifierApplicationComponent {
   private val LOG = Logger.getInstance(
-      "#org.jetbrains.plugins.scala.components.ScalaPluginVersionVerifierApplicationComponent")
+    "#org.jetbrains.plugins.scala.components.ScalaPluginVersionVerifierApplicationComponent")
 }
 
 class ScalaPluginVersionVerifierApplicationComponent
@@ -107,44 +110,47 @@ class ScalaPluginVersionVerifierApplicationComponent
                     PluginManager.getPlugin(pluginLoader.getPluginId)
                   val message =
                     s"Plugin ${plugin.getName} of version ${plugin.getVersion} is " +
-                    s"icompatible with Scala plugin of version $version. Do you want to disable ${plugin.getName} plugin?\n" +
-                    s"""<p/><a href="Yes">Yes, disable it</a>\n""" +
-                    s"""<p/><a href="No">No, leave it enabled</a>"""
+                      s"icompatible with Scala plugin of version $version. Do you want to disable ${plugin.getName} plugin?\n" +
+                      s"""<p/><a href="Yes">Yes, disable it</a>\n""" +
+                      s"""<p/><a href="No">No, leave it enabled</a>"""
                   if (ApplicationManager.getApplication.isUnitTestMode) {
                     ScalaPluginVersionVerifierApplicationComponent.LOG.error(
-                        message)
+                      message)
                   } else {
                     val Scala_Group = "Scala Plugin Incompatibility"
                     val app: Application = ApplicationManager.getApplication
                     if (!app.isDisposed) {
                       app.getMessageBus
                         .syncPublisher(Notifications.TOPIC)
-                        .register(Scala_Group,
-                                  NotificationDisplayType.STICKY_BALLOON)
+                        .register(
+                          Scala_Group,
+                          NotificationDisplayType.STICKY_BALLOON)
                     }
                     NotificationGroup.balloonGroup(Scala_Group)
                     val notification = new Notification(
-                        Scala_Group,
-                        "Incompatible plugin detected",
-                        message,
-                        NotificationType.ERROR,
-                        new NotificationListener {
-                          def hyperlinkUpdate(notification: Notification,
-                                              event: HyperlinkEvent) {
-                            notification.expire()
-                            val description = event.getDescription
-                            description match {
-                              case "Yes" =>
-                                PluginManagerCore.disablePlugin(
-                                    plugin.getPluginId.getIdString)
-                                PluginManagerConfigurable.showRestartDialog()
-                              case "No" =>
-                              //do nothing it seems all is ok for the user
-                              case _ =>
-                              //do nothing it seems all is ok for the user
-                            }
+                      Scala_Group,
+                      "Incompatible plugin detected",
+                      message,
+                      NotificationType.ERROR,
+                      new NotificationListener {
+                        def hyperlinkUpdate(
+                            notification: Notification,
+                            event: HyperlinkEvent) {
+                          notification.expire()
+                          val description = event.getDescription
+                          description match {
+                            case "Yes" =>
+                              PluginManagerCore.disablePlugin(
+                                plugin.getPluginId.getIdString)
+                              PluginManagerConfigurable.showRestartDialog()
+                            case "No" =>
+                            //do nothing it seems all is ok for the user
+                            case _ =>
+                            //do nothing it seems all is ok for the user
                           }
-                        })
+                        }
+                      }
+                    )
 
                     Notifications.Bus.notify(notification)
                   }
@@ -170,8 +176,7 @@ class ScalaPluginVersionVerifierApplicationComponent
       }
       ScalaPluginUpdater.askUpdatePluginBranch()
     }
-    SwingUtilities.invokeLater(
-        new Runnable {
+    SwingUtilities.invokeLater(new Runnable {
       def run() {
         ScalaPluginUpdater.upgradeRepo()
         checkVersion()

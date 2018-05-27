@@ -18,17 +18,19 @@ import scala.tools.scalap.Decompiler
   * @author ilyas
   */
 object DecompilerUtil {
-  protected val LOG: Logger = Logger.getInstance(
-      "#org.jetbrains.plugins.scala.decompiler.DecompilerUtil")
+  protected val LOG: Logger =
+    Logger.getInstance("#org.jetbrains.plugins.scala.decompiler.DecompilerUtil")
 
   val DECOMPILER_VERSION = 270
-  private val SCALA_DECOMPILER_FILE_ATTRIBUTE = new FileAttribute(
-      "_is_scala_compiled_new_key_", DECOMPILER_VERSION, true)
+  private val SCALA_DECOMPILER_FILE_ATTRIBUTE =
+    new FileAttribute("_is_scala_compiled_new_key_", DECOMPILER_VERSION, true)
   private val SCALA_DECOMPILER_KEY =
     new Key[SoftReference[DecompilationResult]]("Is Scala File Key")
 
   class DecompilationResult(
-      val isScala: Boolean, val sourceName: String, val timeStamp: Long) {
+      val isScala: Boolean,
+      val sourceName: String,
+      val timeStamp: Long) {
     def sourceText: String = ""
   }
   object DecompilationResult {
@@ -62,13 +64,15 @@ object DecompilerUtil {
   private def attributesSupported = !ScalaLoader.isUnderUpsource
 
   def isScalaFile(file: VirtualFile): Boolean =
-    try isScalaFile(file, file.contentsToByteArray) catch {
+    try isScalaFile(file, file.contentsToByteArray)
+    catch {
       case e: IOException => false
     }
   def isScalaFile(file: VirtualFile, bytes: => Array[Byte]): Boolean =
     decompile(file, bytes).isScala
   def decompile(
-      file: VirtualFile, bytes: => Array[Byte]): DecompilationResult = {
+      file: VirtualFile,
+      bytes: => Array[Byte]): DecompilationResult = {
     if (!file.isInstanceOf[VirtualFileWithId]) return DecompilationResult.empty
     val timeStamp = file.getTimeStamp
     var data = file.getUserData(SCALA_DECOMPILER_KEY)
@@ -76,7 +80,8 @@ object DecompilerUtil {
     if (res == null || res.timeStamp != timeStamp) {
       val readAttribute =
         if (attributesSupported)
-          SCALA_DECOMPILER_FILE_ATTRIBUTE.readAttribute(file) else null
+          SCALA_DECOMPILER_FILE_ATTRIBUTE.readAttribute(file)
+        else null
       def updateAttributeAndData() {
         val decompilationResult = decompileInner(file, bytes)
         if (attributesSupported) {
@@ -100,12 +105,12 @@ object DecompilerUtil {
           val attributeTimeStamp = readAttribute.readLong()
           if (attributeTimeStamp != timeStamp) updateAttributeAndData()
           else
-            res = new DecompilationResult(
-                isScala, sourceName, attributeTimeStamp) {
-              override lazy val sourceText: String = {
-                decompileInner(file, bytes).sourceText
+            res =
+              new DecompilationResult(isScala, sourceName, attributeTimeStamp) {
+                override lazy val sourceText: String = {
+                  decompileInner(file, bytes).sourceText
+                }
               }
-            }
         } catch {
           case e: IOException => updateAttributeAndData()
         }
@@ -117,12 +122,15 @@ object DecompilerUtil {
   }
 
   private def decompileInner(
-      file: VirtualFile, bytes: Array[Byte]): DecompilationResult = {
+      file: VirtualFile,
+      bytes: Array[Byte]): DecompilationResult = {
     try {
       Decompiler.decompile(file.getName, bytes) match {
         case Some((sourceFileName, decompiledSourceText)) =>
           new DecompilationResult(
-              isScala = true, sourceFileName, file.getTimeStamp) {
+            isScala = true,
+            sourceFileName,
+            file.getTimeStamp) {
             override def sourceText: String = decompiledSourceText
           }
         case _ =>
@@ -131,11 +139,11 @@ object DecompilerUtil {
     } catch {
       case m: MatchError =>
         LOG.warn(
-            s"Error during decompiling $file: ${m.getMessage()}. Stacktrace is suppressed.")
+          s"Error during decompiling $file: ${m.getMessage()}. Stacktrace is suppressed.")
         new DecompilationResult(isScala = false, "", file.getTimeStamp)
       case t: Throwable =>
         LOG.warn(
-            s"Error during decompiling $file: ${t.getMessage}. Stacktrace is suppressed.")
+          s"Error during decompiling $file: ${t.getMessage}. Stacktrace is suppressed.")
         new DecompilationResult(isScala = false, "", file.getTimeStamp)
     }
   }

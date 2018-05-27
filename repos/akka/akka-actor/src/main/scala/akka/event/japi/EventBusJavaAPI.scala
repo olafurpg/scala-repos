@@ -109,8 +109,7 @@ abstract class SubchannelEventBus[E, S, C] extends EventBus[E, S, C] {
     override protected def classify(event: Event): Classifier =
       SubchannelEventBus.this.classify(event)
 
-    override protected def publish(
-        event: Event, subscriber: Subscriber): Unit =
+    override protected def publish(event: Event, subscriber: Subscriber): Unit =
       SubchannelEventBus.this.publish(event, subscriber)
   }
 

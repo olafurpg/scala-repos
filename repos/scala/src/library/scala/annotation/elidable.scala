@@ -105,17 +105,17 @@ object elidable {
 
   // for command line parsing so we can use names or ints
   val byName: Map[String, Int] = Map(
-      "FINEST" -> FINEST,
-      "FINER" -> FINER,
-      "FINE" -> FINE,
-      "CONFIG" -> CONFIG,
-      "INFO" -> INFO,
-      "WARNING" -> WARNING,
-      "SEVERE" -> SEVERE,
-      "ASSERTION" -> ASSERTION,
-      "ALL" -> ALL,
-      "OFF" -> OFF,
-      "MAXIMUM" -> MAXIMUM,
-      "MINIMUM" -> MINIMUM
+    "FINEST" -> FINEST,
+    "FINER" -> FINER,
+    "FINE" -> FINE,
+    "CONFIG" -> CONFIG,
+    "INFO" -> INFO,
+    "WARNING" -> WARNING,
+    "SEVERE" -> SEVERE,
+    "ASSERTION" -> ASSERTION,
+    "ALL" -> ALL,
+    "OFF" -> OFF,
+    "MAXIMUM" -> MAXIMUM,
+    "MINIMUM" -> MINIMUM
   )
 }

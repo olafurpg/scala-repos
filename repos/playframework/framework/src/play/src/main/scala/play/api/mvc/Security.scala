@@ -40,16 +40,19 @@ object Security {
     * @param onUnauthorized function used to generate alternative result if the user is not authenticated
     * @param action the action to wrap
     */
-  def Authenticated[A](userinfo: RequestHeader => Option[A],
-                       onUnauthorized: RequestHeader => Result)(
+  def Authenticated[A](
+      userinfo: RequestHeader => Option[A],
+      onUnauthorized: RequestHeader => Result)(
       action: A => EssentialAction): EssentialAction = {
 
     EssentialAction { request =>
-      userinfo(request).map { user =>
-        action(user)(request)
-      }.getOrElse {
-        Accumulator.done(onUnauthorized(request))
-      }
+      userinfo(request)
+        .map { user =>
+          action(user)(request)
+        }
+        .getOrElse {
+          Accumulator.done(onUnauthorized(request))
+        }
     }
   }
 
@@ -58,7 +61,7 @@ object Security {
     */
   lazy val username: String =
     Play.privateMaybeApplication.flatMap(
-        _.configuration.getString("session.username")) getOrElse ("username")
+      _.configuration.getString("session.username")) getOrElse ("username")
 
   /**
     * Wraps another action, allowing only authenticated HTTP requests.
@@ -84,8 +87,8 @@ object Security {
     */
   def Authenticated(action: String => EssentialAction): EssentialAction =
     Authenticated(
-        req => req.session.get(username),
-        _ => Unauthorized(views.html.defaultpages.unauthorized()))(action)
+      req => req.session.get(username),
+      _ => Unauthorized(views.html.defaultpages.unauthorized()))(action)
 
   /**
     * An authenticated request
@@ -134,11 +137,12 @@ object Security {
   class AuthenticatedBuilder[U](
       userinfo: RequestHeader => Option[U],
       onUnauthorized: RequestHeader => Result = _ =>
-          Unauthorized(views.html.defaultpages.unauthorized()))
+        Unauthorized(views.html.defaultpages.unauthorized()))
       extends ActionBuilder[({ type R[A] = AuthenticatedRequest[A, U] })#R] {
 
-    def invokeBlock[A](request: Request[A],
-                       block: (AuthenticatedRequest[A, U]) => Future[Result]) =
+    def invokeBlock[A](
+        request: Request[A],
+        block: (AuthenticatedRequest[A, U]) => Future[Result]) =
       authenticate(request, block)
 
     /**
@@ -196,9 +200,10 @@ object Security {
       * @param userinfo The function that looks up the user info.
       * @param onUnauthorized The function to get the result for when no authenticated user can be found.
       */
-    def apply[U](userinfo: RequestHeader => Option[U],
-                 onUnauthorized: RequestHeader => Result = _ =>
-                     Unauthorized(views.html.defaultpages.unauthorized()))
+    def apply[U](
+        userinfo: RequestHeader => Option[U],
+        onUnauthorized: RequestHeader => Result = _ =>
+          Unauthorized(views.html.defaultpages.unauthorized()))
       : AuthenticatedBuilder[U] =
       new AuthenticatedBuilder(userinfo, onUnauthorized)
 

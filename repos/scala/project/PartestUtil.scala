@@ -3,14 +3,16 @@ import sbt.complete._, Parser._, Parsers._
 
 object PartestUtil {
   private case class TestFiles(
-      srcPath: String, globalBase: File, testBase: File) {
+      srcPath: String,
+      globalBase: File,
+      testBase: File) {
     private val testCaseDir = new SimpleFileFilter(
-        f =>
-          f.isDirectory && f.listFiles.nonEmpty && !(f.getParentFile /
-              (f.name + ".res")).exists)
+      f =>
+        f.isDirectory && f.listFiles.nonEmpty && !(f.getParentFile /
+          (f.name + ".res")).exists)
     private val testCaseFilter =
       GlobFilter("*.scala") | GlobFilter("*.java") | GlobFilter("*.res") ||
-      testCaseDir
+        testCaseDir
     private def testCaseFinder =
       (testBase / srcPath).*(AllPassFilter).*(testCaseFilter)
     private val basePaths =
@@ -24,7 +26,7 @@ object PartestUtil {
       if (f == null || !f.exists) Iterator()
       else
         Iterator(f) ++
-        (if (f.getParentFile == null) Nil else parentChain(f.getParentFile))
+          (if (f.getParentFile == null) Nil else parentChain(f.getParentFile))
     def isParentOf(parent: File, f2: File, maxDepth: Int) =
       parentChain(f2).take(maxDepth).exists(p1 => equiv(p1, parent))
     def isTestCase(f: File) = {
@@ -42,26 +44,28 @@ object PartestUtil {
 
   /** A parser for the custom `partest` command */
   def partestParser(globalBase: File, testBase: File): Parser[String] = {
-    val knownUnaryOptions = List("--pos",
-                                 "--neg",
-                                 "--run",
-                                 "--jvm",
-                                 "--res",
-                                 "--ant",
-                                 "--scalap",
-                                 "--specialized",
-                                 "--scalacheck",
-                                 "--instrumented",
-                                 "--presentation",
-                                 "--failed",
-                                 "--update-check",
-                                 "--show-diff",
-                                 "--verbose",
-                                 "--terse",
-                                 "--debug",
-                                 "--version",
-                                 "--self-test",
-                                 "--help")
+    val knownUnaryOptions = List(
+      "--pos",
+      "--neg",
+      "--run",
+      "--jvm",
+      "--res",
+      "--ant",
+      "--scalap",
+      "--specialized",
+      "--scalacheck",
+      "--instrumented",
+      "--presentation",
+      "--failed",
+      "--update-check",
+      "--show-diff",
+      "--verbose",
+      "--terse",
+      "--debug",
+      "--version",
+      "--self-test",
+      "--help"
+    )
     val srcPathOption = "--srcpath"
     val grepOption = "--grep"
 
@@ -76,9 +80,9 @@ object PartestUtil {
       _testFiles
     }
     val TestPathParser = ParserUtil.FileParser(
-        new SimpleFileFilter(f => testFiles.isTestCase(f)),
-        new SimpleFileFilter(f => testFiles.mayContainTestCase(f)),
-        globalBase)
+      new SimpleFileFilter(f => testFiles.isTestCase(f)),
+      new SimpleFileFilter(f => testFiles.mayContainTestCase(f)),
+      globalBase)
 
     // allow `--grep "is unchecked" | --grep *t123*, in the spirit of ./bin/partest-ack
     // superset of the --grep built into partest itself.
@@ -112,21 +116,22 @@ object PartestUtil {
       }
 
       val completion = Completions.strict(
-          Set("<filename glob>",
-              "<regex> (for source, flags or checkfile contents)").map(
-              s => Completion.displayOnly(s)))
+        Set(
+          "<filename glob>",
+          "<regex> (for source, flags or checkfile contents)").map(s =>
+          Completion.displayOnly(s)))
       val tokenCompletion = TokenCompletions.fixed((seen, level) => completion)
 
       val globOrPattern = StringBasic.map(expandGrep).flatMap {
         case Seq() => failure("no tests match pattern / glob")
-        case x => success(x.mkString(" "))
+        case x     => success(x.mkString(" "))
       }
       token(grepOption <~ Space) ~> token(globOrPattern, tokenCompletion)
     }
 
     val SrcPath =
       ((token(srcPathOption) <~ Space) ~ token(
-              StringBasic.examples(Set("files", "pending", "scaladoc")))) map {
+        StringBasic.examples(Set("files", "pending", "scaladoc")))) map {
         case opt ~ path =>
           srcPath = path
           opt + " " + path

@@ -45,8 +45,7 @@ object BidiFlowDocSpec {
   }
   //#codec-impl
 
-  val codecVerbose = BidiFlow.fromGraph(
-      GraphDSL.create() { b =>
+  val codecVerbose = BidiFlow.fromGraph(GraphDSL.create() { b =>
     // construct and add the top flow, going outbound
     val outbound = b.add(Flow[Message].map(toBytes))
     // construct and add the bottom flow, going inbound
@@ -89,19 +88,22 @@ object BidiFlowDocSpec {
               else pull(in)
             }
           })
-          setHandler(in, new InHandler {
-            override def onPush(): Unit = {
-              val bytes = grab(in)
-              stash = stash ++ bytes
-              run()
-            }
+          setHandler(
+            in,
+            new InHandler {
+              override def onPush(): Unit = {
+                val bytes = grab(in)
+                stash = stash ++ bytes
+                run()
+              }
 
-            override def onUpstreamFinish(): Unit = {
-              if (stash.isEmpty) completeStage()
-              // wait with completion and let run() complete when the
-              // rest of the stash has been sent downstream
+              override def onUpstreamFinish(): Unit = {
+                if (stash.isEmpty) completeStage()
+                // wait with completion and let run() complete when the
+                // rest of the stash has been sent downstream
+              }
             }
-          })
+          )
 
           private def run(): Unit = {
             if (needed == -1) {
@@ -136,14 +138,12 @@ object BidiFlowDocSpec {
   })
   //#framing
 
-  val chopUp = BidiFlow.fromGraph(
-      GraphDSL.create() { b =>
+  val chopUp = BidiFlow.fromGraph(GraphDSL.create() { b =>
     val f = Flow[ByteString].mapConcat(_.map(ByteString(_)))
     BidiShape.fromFlows(b.add(f), b.add(f))
   })
 
-  val accumulate = BidiFlow.fromGraph(
-      GraphDSL.create() { b =>
+  val accumulate = BidiFlow.fromGraph(GraphDSL.create() { b =>
     val f =
       Flow[ByteString].grouped(1000).map(_.fold(ByteString.empty)(_ ++ _))
     BidiShape.fromFlows(b.add(f), b.add(f))

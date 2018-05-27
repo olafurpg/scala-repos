@@ -445,19 +445,18 @@ abstract class ScalaPrimitives {
     if (alts.isEmpty) inform(s"Unknown primitive method $cls.$method")
     else
       alts foreach
-      (s =>
-            addPrimitive(s, s.info.paramTypes match {
-              case tp :: _ if code == ADD && tp =:= StringTpe => CONCAT
-              case _ => code
-            }))
+        (s =>
+          addPrimitive(s, s.info.paramTypes match {
+            case tp :: _ if code == ADD && tp =:= StringTpe => CONCAT
+            case _                                          => code
+          }))
   }
 
   def isCoercion(code: Int): Boolean = (code >= B2B) && (code <= D2D)
 
   /** Check whether the given operation code is an array operation. */
   def isArrayOp(code: Int): Boolean =
-    isArrayNew(code) | isArrayLength(code) | isArrayGet(code) | isArraySet(
-        code)
+    isArrayNew(code) | isArrayLength(code) | isArrayGet(code) | isArraySet(code)
 
   def isArrayNew(code: Int): Boolean = code match {
     case NEW_ZARRAY | NEW_BARRAY | NEW_SARRAY | NEW_CARRAY | NEW_IARRAY |
@@ -467,9 +466,9 @@ abstract class ScalaPrimitives {
   }
 
   def isArrayLength(code: Int): Boolean = code match {
-    case ZARRAY_LENGTH | BARRAY_LENGTH |
-        SARRAY_LENGTH | CARRAY_LENGTH | IARRAY_LENGTH | LARRAY_LENGTH |
-        FARRAY_LENGTH | DARRAY_LENGTH | OARRAY_LENGTH | LENGTH =>
+    case ZARRAY_LENGTH | BARRAY_LENGTH | SARRAY_LENGTH | CARRAY_LENGTH |
+        IARRAY_LENGTH | LARRAY_LENGTH | FARRAY_LENGTH | DARRAY_LENGTH |
+        OARRAY_LENGTH | LENGTH =>
       true
     case _ => false
   }
@@ -498,25 +497,25 @@ abstract class ScalaPrimitives {
   def isReferenceEqualityOp(code: Int): Boolean = (code == ID) || (code == NI)
 
   def isArithmeticOp(code: Int): Boolean = code match {
-    case POS | NEG | NOT => true; // unary
-    case ADD | SUB | MUL | DIV | MOD => true; // binary
+    case POS | NEG | NOT                  => true; // unary
+    case ADD | SUB | MUL | DIV | MOD      => true; // binary
     case OR | XOR | AND | LSL | LSR | ASR => true; // bitwise
-    case _ => false
+    case _                                => false
   }
 
   def isLogicalOp(code: Int): Boolean = code match {
     case ZNOT | ZAND | ZOR => true
-    case _ => false
+    case _                 => false
   }
 
   def isShiftOp(code: Int): Boolean = code match {
     case LSL | LSR | ASR => true
-    case _ => false
+    case _               => false
   }
 
   def isBitwiseOp(code: Int): Boolean = code match {
     case OR | XOR | AND => true
-    case _ => false
+    case _              => false
   }
 
   def isPrimitive(sym: Symbol): Boolean = primitives contains sym
@@ -524,7 +523,8 @@ abstract class ScalaPrimitives {
   /** Return the code for the given symbol. */
   def getPrimitive(sym: Symbol): Int =
     primitives.getOrElse(
-        sym, throw new AssertionError(s"Unknown primitive $sym"))
+      sym,
+      throw new AssertionError(s"Unknown primitive $sym"))
 
   /**
     * Return the primitive code of the given operation. If the
@@ -545,7 +545,8 @@ abstract class ScalaPrimitives {
         tpe :: tpe.parents collectFirst {
           case TypeRef(_, ArrayClass, elem :: Nil) => elem
         }
-      arrayParent getOrElse sys.error(fun.fullName + " : " +
+      arrayParent getOrElse sys.error(
+        fun.fullName + " : " +
           (tpe :: tpe.baseTypeSeq.toList).mkString(", "))
     }
 
@@ -553,14 +554,14 @@ abstract class ScalaPrimitives {
 
       case APPLY =>
         typeToBType(elementType) match {
-          case BOOL => ZARRAY_GET
-          case BYTE => BARRAY_GET
-          case SHORT => SARRAY_GET
-          case CHAR => CARRAY_GET
-          case INT => IARRAY_GET
-          case LONG => LARRAY_GET
-          case FLOAT => FARRAY_GET
-          case DOUBLE => DARRAY_GET
+          case BOOL                          => ZARRAY_GET
+          case BYTE                          => BARRAY_GET
+          case SHORT                         => SARRAY_GET
+          case CHAR                          => CARRAY_GET
+          case INT                           => IARRAY_GET
+          case LONG                          => LARRAY_GET
+          case FLOAT                         => FARRAY_GET
+          case DOUBLE                        => DARRAY_GET
           case _: ClassBType | _: ArrayBType => OARRAY_GET
           case _ =>
             abort("Unexpected array element type: " + elementType)
@@ -568,14 +569,14 @@ abstract class ScalaPrimitives {
 
       case UPDATE =>
         typeToBType(elementType) match {
-          case BOOL => ZARRAY_SET
-          case BYTE => BARRAY_SET
-          case SHORT => SARRAY_SET
-          case CHAR => CARRAY_SET
-          case INT => IARRAY_SET
-          case LONG => LARRAY_SET
-          case FLOAT => FARRAY_SET
-          case DOUBLE => DARRAY_SET
+          case BOOL                          => ZARRAY_SET
+          case BYTE                          => BARRAY_SET
+          case SHORT                         => SARRAY_SET
+          case CHAR                          => CARRAY_SET
+          case INT                           => IARRAY_SET
+          case LONG                          => LARRAY_SET
+          case FLOAT                         => FARRAY_SET
+          case DOUBLE                        => DARRAY_SET
           case _: ClassBType | _: ArrayBType => OARRAY_SET
           case _ =>
             abort("Unexpected array element type: " + elementType)
@@ -583,14 +584,14 @@ abstract class ScalaPrimitives {
 
       case LENGTH =>
         typeToBType(elementType) match {
-          case BOOL => ZARRAY_LENGTH
-          case BYTE => BARRAY_LENGTH
-          case SHORT => SARRAY_LENGTH
-          case CHAR => CARRAY_LENGTH
-          case INT => IARRAY_LENGTH
-          case LONG => LARRAY_LENGTH
-          case FLOAT => FARRAY_LENGTH
-          case DOUBLE => DARRAY_LENGTH
+          case BOOL                          => ZARRAY_LENGTH
+          case BYTE                          => BARRAY_LENGTH
+          case SHORT                         => SARRAY_LENGTH
+          case CHAR                          => CARRAY_LENGTH
+          case INT                           => IARRAY_LENGTH
+          case LONG                          => LARRAY_LENGTH
+          case FLOAT                         => FARRAY_LENGTH
+          case DOUBLE                        => DARRAY_LENGTH
           case _: ClassBType | _: ArrayBType => OARRAY_LENGTH
           case _ =>
             abort("Unexpected array element type: " + elementType)

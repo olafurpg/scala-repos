@@ -139,7 +139,11 @@ class StatCounter(values: TraversableOnce[Double]) extends Serializable {
 
   override def toString: String = {
     "(count: %d, mean: %f, stdev: %f, max: %f, min: %f)".format(
-        count, mean, stdev, max, min)
+      count,
+      mean,
+      stdev,
+      max,
+      min)
   }
 }
 

@@ -91,7 +91,7 @@ object TextMessage {
       def isStrict: Boolean = false
       def getStrictText: String =
         throw new IllegalStateException(
-            "Cannot get strict text for streamed message.")
+          "Cannot get strict text for streamed message.")
       def getStreamedText: Source[String, _] = textStream
 
       def asScala: sm.ws.TextMessage = sm.ws.TextMessage(textStream.asScala)
@@ -152,7 +152,7 @@ object BinaryMessage {
       def isStrict: Boolean = false
       def getStrictData: ByteString =
         throw new IllegalStateException(
-            "Cannot get strict data for streamed message.")
+          "Cannot get strict data for streamed message.")
       def getStreamedData: Source[ByteString, _] = dataStream
 
       def asScala: sm.ws.BinaryMessage =

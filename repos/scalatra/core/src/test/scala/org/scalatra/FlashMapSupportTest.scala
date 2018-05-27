@@ -25,13 +25,14 @@ class FlashMapSupportTestServlet extends ScalatraServlet with FlashMapSupport {
   override def sweepUnusedFlashEntries(req: HttpServletRequest) = {
     req.getParameter("sweep") match {
       case null => false
-      case x => x.toBoolean
+      case x    => x.toBoolean
     }
   }
 }
 
 class FlashMapSupportSecondTestServlet
-    extends ScalatraServlet with FlashMapSupport {
+    extends ScalatraServlet
+    with FlashMapSupport {
   post("/redirect") {
     flash("message") = "redirected"
     redirect("/first/message")
@@ -48,7 +49,7 @@ class FlashMapSupportTestFilter extends ScalatraFilter with FlashMapSupport {
   override def sweepUnusedFlashEntries(req: HttpServletRequest) =
     req.getParameter("sweep") match {
       case null => false
-      case x => x.toBoolean
+      case x    => x.toBoolean
     }
 }
 
@@ -89,7 +90,7 @@ class FlashMapSupportTest extends ScalatraFunSuite {
   }
 
   test(
-      "messages should be available in outer filter when flash map supports are nested") {
+    "messages should be available in outer filter when flash map supports are nested") {
     session {
       post("/message") {}
       get("/filter") {

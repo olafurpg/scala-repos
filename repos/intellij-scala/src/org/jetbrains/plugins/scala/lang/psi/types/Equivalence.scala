@@ -23,9 +23,11 @@ object Equivalence {
   }
 
   val cache: ConcurrentWeakHashMap[
-      (ScType, ScType, Boolean), (Boolean, ScUndefinedSubstitutor)] =
+    (ScType, ScType, Boolean),
+    (Boolean, ScUndefinedSubstitutor)] =
     new ConcurrentWeakHashMap[
-        (ScType, ScType, Boolean), (Boolean, ScUndefinedSubstitutor)]()
+      (ScType, ScType, Boolean),
+      (Boolean, ScUndefinedSubstitutor)]()
 
   /**
     * @param falseUndef use false to consider undef type equals to any type
@@ -86,8 +88,8 @@ object Equivalence {
       (l, r) match {
         case (_, _: ScUndefinedType) => r.equivInner(l, subst, falseUndef)
         case (_: ScUndefinedType, _) => l.equivInner(r, subst, falseUndef)
-        case (_, _: ScAbstractType) => r.equivInner(l, subst, falseUndef)
-        case (_: ScAbstractType, _) => l.equivInner(r, subst, falseUndef)
+        case (_, _: ScAbstractType)  => r.equivInner(l, subst, falseUndef)
+        case (_: ScAbstractType, _)  => l.equivInner(r, subst, falseUndef)
         case (_, ScParameterizedType(_: ScAbstractType, _)) =>
           r.equivInner(l, subst, falseUndef)
         case (ScParameterizedType(_: ScAbstractType, _), _) =>
@@ -100,15 +102,17 @@ object Equivalence {
         case (_: ScParameterizedType, _: JavaArrayType) =>
           r.equivInner(l, subst, falseUndef)
         case (_, proj: ScProjectionType) => r.equivInner(l, subst, falseUndef)
-        case (_, proj: ScCompoundType) => r.equivInner(l, subst, falseUndef)
-        case (_, ex: ScExistentialType) => r.equivInner(l, subst, falseUndef)
-        case _ => l.equivInner(r, subst, falseUndef)
+        case (_, proj: ScCompoundType)   => r.equivInner(l, subst, falseUndef)
+        case (_, ex: ScExistentialType)  => r.equivInner(l, subst, falseUndef)
+        case _                           => l.equivInner(r, subst, falseUndef)
       }
     }
     val res = guard.doPreventingRecursion(
-        key, false, new Computable[(Boolean, ScUndefinedSubstitutor)] {
-      def compute(): (Boolean, ScUndefinedSubstitutor) = comp()
-    })
+      key,
+      false,
+      new Computable[(Boolean, ScUndefinedSubstitutor)] {
+        def compute(): (Boolean, ScUndefinedSubstitutor) = comp()
+      })
     if (res == null) return (false, new ScUndefinedSubstitutor())
     if (!nowEval) {
       try {

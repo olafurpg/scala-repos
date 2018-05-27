@@ -47,12 +47,10 @@ trait ColorDelegateSpec[D <: ColorDelegate[_]] extends FlatSpec {
 
     colorDelegate.color = initialColor
 
-    colorDelegate.color.onChange(
-        (ov, oldColor, newColor) =>
-          {
-        oldColor should be(initialColor.delegate)
-        newColor should be(finalColor.delegate)
-        changed = true
+    colorDelegate.color.onChange((ov, oldColor, newColor) => {
+      oldColor should be(initialColor.delegate)
+      newColor should be(finalColor.delegate)
+      changed = true
     })
 
     colorDelegate.color = finalColor

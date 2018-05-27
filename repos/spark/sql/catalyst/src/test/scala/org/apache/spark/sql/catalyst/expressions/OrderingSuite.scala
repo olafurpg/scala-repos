@@ -39,11 +39,11 @@ class OrderingSuite extends SparkFunSuite with ExpressionEvalHelper {
       val rowB = toCatalyst(Row(b)).asInstanceOf[InternalRow]
       Seq(Ascending, Descending).foreach { direction =>
         val sortOrder = direction match {
-          case Ascending => BoundReference(0, dataType, nullable = true).asc
+          case Ascending  => BoundReference(0, dataType, nullable = true).asc
           case Descending => BoundReference(0, dataType, nullable = true).desc
         }
         val expectedCompareResult = direction match {
-          case Ascending => signum(expected)
+          case Ascending  => signum(expected)
           case Descending => -1 * signum(expected)
         }
         val intOrdering = new InterpretedOrdering(sortOrder :: Nil)
@@ -51,10 +51,9 @@ class OrderingSuite extends SparkFunSuite with ExpressionEvalHelper {
         Seq(intOrdering, genOrdering).foreach { ordering =>
           assert(ordering.compare(rowA, rowA) === 0)
           assert(ordering.compare(rowB, rowB) === 0)
+          assert(signum(ordering.compare(rowA, rowB)) === expectedCompareResult)
           assert(
-              signum(ordering.compare(rowA, rowB)) === expectedCompareResult)
-          assert(
-              signum(ordering.compare(rowB, rowA)) === -1 * expectedCompareResult)
+            signum(ordering.compare(rowB, rowA)) === -1 * expectedCompareResult)
         }
       }
     }
@@ -99,12 +98,16 @@ class OrderingSuite extends SparkFunSuite with ExpressionEvalHelper {
         test(s"GenerateOrdering with $dataType") {
           val rowOrdering =
             InterpretedOrdering.forSchema(Seq(dataType, dataType))
-          val genOrdering = GenerateOrdering.generate(BoundReference(
-                  0, dataType, nullable = true).asc :: BoundReference(
-                  1, dataType, nullable = true).asc :: Nil)
+          val genOrdering = GenerateOrdering.generate(
+            BoundReference(0, dataType, nullable = true).asc :: BoundReference(
+              1,
+              dataType,
+              nullable = true).asc :: Nil)
           val rowType = StructType(
-              StructField("a", dataType, nullable = true) :: StructField(
-                  "b", dataType, nullable = true) :: Nil)
+            StructField("a", dataType, nullable = true) :: StructField(
+              "b",
+              dataType,
+              nullable = true) :: Nil)
           val maybeDataGenerator =
             RandomDataGenerator.forType(rowType, nullable = false)
           assume(maybeDataGenerator.isDefined)
@@ -119,13 +122,16 @@ class OrderingSuite extends SparkFunSuite with ExpressionEvalHelper {
               assert(genOrdering.compare(b, b) === 0)
               assert(rowOrdering.compare(a, a) === 0)
               assert(rowOrdering.compare(b, b) === 0)
-              assert(signum(genOrdering.compare(a, b)) === -1 * signum(
-                      genOrdering.compare(b, a)))
-              assert(signum(rowOrdering.compare(a, b)) === -1 * signum(
-                      rowOrdering.compare(b, a)))
-              assert(signum(rowOrdering.compare(a, b)) === signum(
-                         genOrdering.compare(a, b)),
-                     "Generated and non-generated orderings should agree")
+              assert(
+                signum(genOrdering.compare(a, b)) === -1 * signum(
+                  genOrdering.compare(b, a)))
+              assert(
+                signum(rowOrdering.compare(a, b)) === -1 * signum(
+                  rowOrdering.compare(b, a)))
+              assert(
+                signum(rowOrdering.compare(a, b)) === signum(
+                  genOrdering.compare(a, b)),
+                "Generated and non-generated orderings should agree")
             }
           }
         }

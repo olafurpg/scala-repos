@@ -5,7 +5,10 @@ import java.util
 
 import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.extensions.childOf
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScCaseClause, ScCaseClauses}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScCaseClause,
+  ScCaseClauses
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScMatchStmt
 
 /**
@@ -24,7 +27,8 @@ class ScalaMatchUnwrapper extends ScalaUnwrapper {
     } {}
 
   override def collectAffectedElements(
-      e: PsiElement, toExtract: util.List[PsiElement]) =
+      e: PsiElement,
+      toExtract: util.List[PsiElement]) =
     forCaseClauseInMatch[PsiElement](e) { (cl, m) =>
       super.collectAffectedElements(e, toExtract)
       m

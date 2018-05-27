@@ -92,7 +92,7 @@ trait NamedExpression extends Expression {
     if (resolved) {
       dataType match {
         case LongType => "L"
-        case _ => ""
+        case _        => ""
       }
     } else {
       ""
@@ -134,12 +134,13 @@ case class Alias(child: Expression, name: String)(
     val qualifiers: Seq[String] = Nil,
     val explicitMetadata: Option[Metadata] = None,
     override val isGenerated: java.lang.Boolean = false)
-    extends UnaryExpression with NamedExpression {
+    extends UnaryExpression
+    with NamedExpression {
 
   // Alias(Generator, xx) need to be transformed into Generate(generator, ...)
   override lazy val resolved =
     childrenResolved && checkInputDataTypes().isSuccess &&
-    !child.isInstanceOf[Generator]
+      !child.isInstanceOf[Generator]
 
   override def eval(input: InternalRow): Any = child.eval(input)
 
@@ -154,20 +155,23 @@ case class Alias(child: Expression, name: String)(
     explicitMetadata.getOrElse {
       child match {
         case named: NamedExpression => named.metadata
-        case _ => Metadata.empty
+        case _                      => Metadata.empty
       }
     }
   }
 
   def newInstance(): NamedExpression =
-    Alias(child, name)(qualifiers = qualifiers,
-                       explicitMetadata = explicitMetadata,
-                       isGenerated = isGenerated)
+    Alias(child, name)(
+      qualifiers = qualifiers,
+      explicitMetadata = explicitMetadata,
+      isGenerated = isGenerated)
 
   override def toAttribute: Attribute = {
     if (resolved) {
       AttributeReference(name, child.dataType, child.nullable, metadata)(
-          exprId, qualifiers, isGenerated)
+        exprId,
+        qualifiers,
+        isGenerated)
     } else {
       UnresolvedAttribute(name)
     }
@@ -182,7 +186,7 @@ case class Alias(child: Expression, name: String)(
   override def equals(other: Any): Boolean = other match {
     case a: Alias =>
       name == a.name && exprId == a.exprId && child == a.child &&
-      qualifiers == a.qualifiers && explicitMetadata == a.explicitMetadata
+        qualifiers == a.qualifiers && explicitMetadata == a.explicitMetadata
     case _ => false
   }
 
@@ -215,7 +219,8 @@ case class AttributeReference(
     val exprId: ExprId = NamedExpression.newExprId,
     val qualifiers: Seq[String] = Nil,
     override val isGenerated: java.lang.Boolean = false)
-    extends Attribute with Unevaluable {
+    extends Attribute
+    with Unevaluable {
 
   /**
     * Returns true iff the expression id is the same for both attributes.
@@ -225,14 +230,14 @@ case class AttributeReference(
   override def equals(other: Any): Boolean = other match {
     case ar: AttributeReference =>
       name == ar.name && dataType == ar.dataType && nullable == ar.nullable &&
-      metadata == ar.metadata && exprId == ar.exprId &&
-      qualifiers == ar.qualifiers
+        metadata == ar.metadata && exprId == ar.exprId &&
+        qualifiers == ar.qualifiers
     case _ => false
   }
 
   override def semanticEquals(other: Expression): Boolean = other match {
     case ar: AttributeReference => sameRef(ar)
-    case _ => false
+    case _                      => false
   }
 
   override def semanticHash(): Int = {
@@ -253,7 +258,8 @@ case class AttributeReference(
 
   override def newInstance(): AttributeReference =
     AttributeReference(name, dataType, nullable, metadata)(
-        qualifiers = qualifiers, isGenerated = isGenerated)
+      qualifiers = qualifiers,
+      isGenerated = isGenerated)
 
   /**
     * Returns a copy of this [[AttributeReference]] with changed nullability.
@@ -263,7 +269,9 @@ case class AttributeReference(
       this
     } else {
       AttributeReference(name, dataType, newNullability, metadata)(
-          exprId, qualifiers, isGenerated)
+        exprId,
+        qualifiers,
+        isGenerated)
     }
   }
 
@@ -272,19 +280,24 @@ case class AttributeReference(
       this
     } else {
       AttributeReference(newName, dataType, nullable, metadata)(
-          exprId, qualifiers, isGenerated)
+        exprId,
+        qualifiers,
+        isGenerated)
     }
   }
 
   /**
     * Returns a copy of this [[AttributeReference]] with new qualifiers.
     */
-  override def withQualifiers(newQualifiers: Seq[String]): AttributeReference = {
+  override def withQualifiers(
+      newQualifiers: Seq[String]): AttributeReference = {
     if (newQualifiers.toSet == qualifiers.toSet) {
       this
     } else {
       AttributeReference(name, dataType, nullable, metadata)(
-          exprId, newQualifiers, isGenerated)
+        exprId,
+        newQualifiers,
+        isGenerated)
     }
   }
 
@@ -293,7 +306,9 @@ case class AttributeReference(
       this
     } else {
       AttributeReference(name, dataType, nullable, metadata)(
-          newExprId, qualifiers, isGenerated)
+        newExprId,
+        qualifiers,
+        isGenerated)
     }
   }
 
@@ -320,13 +335,14 @@ case class AttributeReference(
   * expression id or the unresolved indicator.
   */
 case class PrettyAttribute(name: String, dataType: DataType = NullType)
-    extends Attribute with Unevaluable {
+    extends Attribute
+    with Unevaluable {
 
   def this(attribute: Attribute) =
     this(attribute.name, attribute match {
       case a: AttributeReference => a.dataType
-      case a: PrettyAttribute => a.dataType
-      case _ => NullType
+      case a: PrettyAttribute    => a.dataType
+      case _                     => NullType
     })
 
   override def toString: String = name
@@ -349,5 +365,5 @@ case class PrettyAttribute(name: String, dataType: DataType = NullType)
 object VirtualColumn {
   val groupingIdName: String = "grouping__id"
   val groupingIdAttribute: UnresolvedAttribute = UnresolvedAttribute(
-      groupingIdName)
+    groupingIdName)
 }

@@ -7,8 +7,7 @@ object Test extends App {
     // a key that has many hashCode collisions
     case class Collision(i: Int) { override def hashCode = i / 5 }
 
-    def subsetTest[T](
-        emptyA: Set[T], emptyB: Set[T], mkKey: Int => T, n: Int) {
+    def subsetTest[T](emptyA: Set[T], emptyB: Set[T], mkKey: Int => T, n: Int) {
       val outside = mkKey(n + 1)
       for (i <- 0 to n) {
         val a = emptyA ++ (0 until i).map(mkKey)
@@ -34,11 +33,17 @@ object Test extends App {
 
     // test the HashSet/HashSet case for Collision keys
     subsetTest(
-        HashSet.empty[Collision], HashSet.empty[Collision], Collision, 100)
+      HashSet.empty[Collision],
+      HashSet.empty[Collision],
+      Collision,
+      100)
 
     // test the HashSet/other set case for Collision keys
     subsetTest(
-        HashSet.empty[Collision], ListSet.empty[Collision], Collision, 100)
+      HashSet.empty[Collision],
+      ListSet.empty[Collision],
+      Collision,
+      100)
   }
 
   /**
@@ -59,8 +64,9 @@ object Test extends App {
     val b = HashSet.empty ++ (0 until 50).map(HashCodeCounter)
     val count0 = count
     val result = b.subsetOf(a)
-    require(count == count0,
-            "key.hashCode must not be called during subsetOf of two HashSets")
+    require(
+      count == count0,
+      "key.hashCode must not be called during subsetOf of two HashSets")
     result
   }
   testCorrectness()

@@ -6,7 +6,7 @@ object Test extends App {
   val x = HashSet.empty + 1 + 2
   if (x.getClass.getSimpleName != "HashTrieSet")
     println(
-        "A hash set containing two non-colliding values should be a HashTrieSet")
+      "A hash set containing two non-colliding values should be a HashTrieSet")
 
   val y = x - 1
   if (y.getClass.getSimpleName != "HashSet1")

@@ -12,7 +12,8 @@ trait Broadcasted[+T, B] extends NumericOps[Broadcasted[T, B]] {
 }
 
 trait BroadcastedLike[T, B, Self <: Broadcasted[T, B]]
-    extends Broadcasted[T, B] with NumericOps[Self] {
+    extends Broadcasted[T, B]
+    with NumericOps[Self] {
   def map[U, Res](f: B => U)(
       implicit cmv: CanMapValues[Self, B, U, Res]): Res = {
     cmv(repr, f)
@@ -33,9 +34,10 @@ object Broadcaster {
       handhold: CanCollapseAxis.HandHold[From, Axis._0.type, Col])
     : CanSlice2[From, Slice1, *.type, BroadcastedColumns[To, Col]] = {
     new CanSlice2[From, Slice1, *.type, BroadcastedColumns[To, Col]] {
-      def apply(from: From,
-                slice: Slice1,
-                slice2: *.type): BroadcastedColumns[To, Col] = {
+      def apply(
+          from: From,
+          slice: Slice1,
+          slice2: *.type): BroadcastedColumns[To, Col] = {
         BroadcastedColumns(cs2_::(from, slice, ::))
       }
     }
@@ -45,9 +47,10 @@ object Broadcaster {
       implicit handhold: CanCollapseAxis.HandHold[From, Axis._0.type, Col])
     : CanSlice2[From, ::.type, *.type, BroadcastedColumns[From, Col]] = {
     new CanSlice2[From, ::.type, *.type, BroadcastedColumns[From, Col]] {
-      def apply(from: From,
-                slice: ::.type,
-                slice2: *.type): BroadcastedColumns[From, Col] = {
+      def apply(
+          from: From,
+          slice: ::.type,
+          slice2: *.type): BroadcastedColumns[From, Col] = {
         BroadcastedColumns(from)
       }
     }
@@ -58,9 +61,10 @@ object Broadcaster {
       handhold: CanCollapseAxis.HandHold[From, Axis._1.type, Row])
     : CanSlice2[From, *.type, Slice1, BroadcastedRows[To, Row]] = {
     new CanSlice2[From, *.type, Slice1, BroadcastedRows[To, Row]] {
-      def apply(from: From,
-                slice2: *.type,
-                slice: Slice1): BroadcastedRows[To, Row] = {
+      def apply(
+          from: From,
+          slice2: *.type,
+          slice: Slice1): BroadcastedRows[To, Row] = {
         BroadcastedRows(cs2_::(from, ::, slice))
       }
     }
@@ -70,9 +74,10 @@ object Broadcaster {
       implicit handhold: CanCollapseAxis.HandHold[From, Axis._1.type, Row])
     : CanSlice2[From, *.type, ::.type, BroadcastedRows[From, Row]] = {
     new CanSlice2[From, *.type, ::.type, BroadcastedRows[From, Row]] {
-      def apply(from: From,
-                slice2: *.type,
-                slice: ::.type): BroadcastedRows[From, Row] = {
+      def apply(
+          from: From,
+          slice2: *.type,
+          slice: ::.type): BroadcastedRows[From, Row] = {
         BroadcastedRows(from)
       }
     }

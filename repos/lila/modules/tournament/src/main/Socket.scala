@@ -14,12 +14,13 @@ import lila.memo.ExpireSetMemo
 import lila.socket.actorApi.{Connected => _, _}
 import lila.socket.{SocketActor, History, Historical}
 
-private[tournament] final class Socket(tournamentId: String,
-                                       val history: History[Messadata],
-                                       jsonView: JsonView,
-                                       lightUser: String => Option[LightUser],
-                                       uidTimeout: Duration,
-                                       socketTimeout: Duration)
+private[tournament] final class Socket(
+    tournamentId: String,
+    val history: History[Messadata],
+    jsonView: JsonView,
+    lightUser: String => Option[LightUser],
+    uidTimeout: Duration,
+    socketTimeout: Duration)
     extends SocketActor[Member](uidTimeout)
     with Historical[Member, Messadata] {
 
@@ -59,23 +60,25 @@ private[tournament] final class Socket(tournamentId: String,
       sender ! waitingUsers
 
     case PingVersion(uid, v) => {
-        ping(uid)
-        timeBomb.delay
-        withMember(uid) { m =>
-          history.since(v).fold(resync(m))(_ foreach sendMessage(m))
-        }
+      ping(uid)
+      timeBomb.delay
+      withMember(uid) { m =>
+        history.since(v).fold(resync(m))(_ foreach sendMessage(m))
       }
+    }
 
     case Broom => {
-        broom
-        if (timeBomb.boom) self ! PoisonPill
-      }
+      broom
+      if (timeBomb.boom) self ! PoisonPill
+    }
 
     case lila.chat.actorApi.ChatLine(_, line) =>
       line match {
         case line: lila.chat.UserLine =>
           notifyVersion(
-              "message", lila.chat.Line toJson line, Messadata(line.troll))
+            "message",
+            lila.chat.Line toJson line,
+            Messadata(line.troll))
         case _ =>
       }
 

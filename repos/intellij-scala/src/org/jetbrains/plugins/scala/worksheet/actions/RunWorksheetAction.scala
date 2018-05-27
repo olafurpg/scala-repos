@@ -3,7 +3,11 @@ package worksheet.actions
 
 import com.intellij.execution._
 import com.intellij.execution.configurations.JavaParameters
-import com.intellij.execution.process.{OSProcessHandler, ProcessAdapter, ProcessEvent}
+import com.intellij.execution.process.{
+  OSProcessHandler,
+  ProcessAdapter,
+  ProcessEvent
+}
 import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.icons.AllIcons
 import com.intellij.ide.scratch.{ScratchFileService, ScratchRootType}
@@ -11,7 +15,11 @@ import com.intellij.ide.util.EditorHelper
 import com.intellij.internal.statistic.UsageTrigger
 import com.intellij.openapi.actionSystem.{AnAction, AnActionEvent}
 import com.intellij.openapi.application.{ApplicationManager, ModalityState}
-import com.intellij.openapi.compiler.{CompileContext, CompileStatusNotification, CompilerManager}
+import com.intellij.openapi.compiler.{
+  CompileContext,
+  CompileStatusNotification,
+  CompilerManager
+}
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.keymap.{KeymapManager, KeymapUtil}
 import com.intellij.openapi.module.{Module, ModuleManager}
@@ -35,7 +43,7 @@ import org.jetbrains.plugins.scala.worksheet.ui.WorksheetEditorPrinter
 
 /**
   * @author Ksenia.Sautina
-  * @author Dmitry Naydanov        
+  * @author Dmitry Naydanov
   * @since 10/17/12
   */
 class RunWorksheetAction extends AnAction with TopComponentAction {
@@ -51,7 +59,7 @@ class RunWorksheetAction extends AnAction with TopComponentAction {
     if (shortcuts.nonEmpty) {
       val shortcutText = " (" + KeymapUtil.getShortcutText(shortcuts(0)) + ")"
       presentation.setText(
-          ScalaBundle.message("worksheet.execute.button") + shortcutText)
+        ScalaBundle.message("worksheet.execute.button") + shortcutText)
     }
 
     updateInner(presentation, e.getProject)
@@ -79,11 +87,11 @@ object RunWorksheetAction {
 
     if (project.hasDotty) {
       PopupUtil.showBalloonForComponent(
-          editor.getComponent,
-          "Worksheet is not supported for Dotty yet",
-          MessageType.ERROR,
-          true,
-          null)
+        editor.getComponent,
+        "Worksheet is not supported for Dotty yet",
+        MessageType.ERROR,
+        true,
+        null)
       return
     }
 
@@ -96,77 +104,87 @@ object RunWorksheetAction {
         val viewer = WorksheetViewerInfo getViewer editor
 
         if (viewer != null) {
-          ApplicationManager.getApplication.invokeAndWait(new Runnable {
-            override def run() {
-              scala.extensions.inWriteAction {
-                CleanWorksheetAction.resetScrollModel(viewer)
-                if (!auto)
-                  CleanWorksheetAction.cleanWorksheet(
-                      file.getNode, editor, viewer, project)
+          ApplicationManager.getApplication.invokeAndWait(
+            new Runnable {
+              override def run() {
+                scala.extensions.inWriteAction {
+                  CleanWorksheetAction.resetScrollModel(viewer)
+                  if (!auto)
+                    CleanWorksheetAction
+                      .cleanWorksheet(file.getNode, editor, viewer, project)
+                }
               }
-            }
-          }, ModalityState.any())
+            },
+            ModalityState.any()
+          )
         }
 
         def runnable() = {
           new WorksheetCompiler().compileAndRun(
-              editor,
-              file,
-              (className: String, addToCp: String) =>
-                {
-                  ApplicationManager.getApplication invokeLater new Runnable {
-                    override def run() {
-                      executeWorksheet(file.getName,
-                                       project,
-                                       file.getContainingFile,
-                                       className,
-                                       addToCp)
-                    }
-                  }
-              },
-              Option(editor),
-              auto)
+            editor,
+            file,
+            (className: String, addToCp: String) => {
+              ApplicationManager.getApplication invokeLater new Runnable {
+                override def run() {
+                  executeWorksheet(
+                    file.getName,
+                    project,
+                    file.getContainingFile,
+                    className,
+                    addToCp)
+                }
+              }
+            },
+            Option(editor),
+            auto
+          )
         }
 
         if (WorksheetCompiler isMakeBeforeRun psiFile) {
           CompilerManager
             .getInstance(project)
-            .make(getModuleFor(file), new CompileStatusNotification {
-              override def finished(aborted: Boolean,
-                                    errors: Int,
-                                    warnings: Int,
-                                    compileContext: CompileContext) {
-                if (!aborted && errors == 0) runnable()
+            .make(
+              getModuleFor(file),
+              new CompileStatusNotification {
+                override def finished(
+                    aborted: Boolean,
+                    errors: Int,
+                    warnings: Int,
+                    compileContext: CompileContext) {
+                  if (!aborted && errors == 0) runnable()
+                }
               }
-            })
+            )
         } else runnable()
       case _ =>
     }
   }
 
-  def executeWorksheet(name: String,
-                       project: Project,
-                       file: PsiFile,
-                       mainClassName: String,
-                       addToCp: String) {
+  def executeWorksheet(
+      name: String,
+      project: Project,
+      file: PsiFile,
+      mainClassName: String,
+      addToCp: String) {
     val virtualFile = file.getVirtualFile
     val params = createParameters(
-        getModuleFor(file),
-        mainClassName,
-        Option(project.getBaseDir) map (_.getPath) getOrElse "",
-        addToCp,
-        "",
-        virtualFile.getCanonicalPath) //todo extract default java options??
+      getModuleFor(file),
+      mainClassName,
+      Option(project.getBaseDir) map (_.getPath) getOrElse "",
+      addToCp,
+      "",
+      virtualFile.getCanonicalPath) //todo extract default java options??
 
     setUpUiAndRun(params.createOSProcessHandler(), file)
   }
 
-  private def createParameters(module: Module,
-                               mainClassName: String,
-                               workingDirectory: String,
-                               additionalCp: String,
-                               consoleArgs: String,
-                               worksheetField: String) = {
+  private def createParameters(
+      module: Module,
+      mainClassName: String,
+      workingDirectory: String,
+      additionalCp: String,
+      consoleArgs: String,
+      worksheetField: String) = {
     import _root_.scala.collection.JavaConverters._
 
     if (module == null) throw new ExecutionException("Module is not specified")
@@ -175,7 +193,7 @@ object RunWorksheetAction {
 
     val scalaSdk = module.scalaSdk.getOrElse {
       throw new ExecutionException(
-          "No Scala facet configured for module " + module.getName)
+        "No Scala facet configured for module " + module.getName)
     }
 
     val rootManager = ModuleRootManager.getInstance(module)
@@ -233,7 +251,8 @@ object RunWorksheetAction {
   }
 
   def isScratchWorksheet(
-      vFileOpt: Option[VirtualFile], project: Project): Boolean =
+      vFileOpt: Option[VirtualFile],
+      project: Project): Boolean =
     vFileOpt.exists {
       case vFile =>
         ScratchFileService
@@ -251,7 +270,7 @@ object RunWorksheetAction {
     vFile match {
       case _: VirtualFileWithId =>
         Option(
-            ProjectFileIndex.SERVICE getInstance project getModuleForFile vFile) getOrElse project.anyScalaModule
+          ProjectFileIndex.SERVICE getInstance project getModuleForFile vFile) getOrElse project.anyScalaModule
           .map(_.module)
           .orNull
       case _ => project.anyScalaModule.map(_.module).orNull
@@ -263,7 +282,7 @@ object RunWorksheetAction {
       case name =>
         scala.extensions.inReadAction {
           Option(
-              ModuleManager getInstance file.getProject findModuleByName name)
+            ModuleManager getInstance file.getProject findModuleByName name)
         }
     } getOrElse getModuleFor(file.getVirtualFile, file.getProject)
 }

@@ -17,14 +17,15 @@ object LoggingDocSpec {
       log.debug("Starting")
     }
     override def preRestart(reason: Throwable, message: Option[Any]) {
-      log.error(reason,
-                "Restarting due to [{}] when processing [{}]",
-                reason.getMessage,
-                message.getOrElse(""))
+      log.error(
+        reason,
+        "Restarting due to [{}] when processing [{}]",
+        reason.getMessage,
+        message.getOrElse(""))
     }
     def receive = {
       case "test" => log.info("Received test")
-      case x => log.warning("Received unknown message: {}", x)
+      case x      => log.warning("Received unknown message: {}", x)
     }
   }
   //#my-actor
@@ -36,16 +37,16 @@ object LoggingDocSpec {
     def receive = {
 
       case _ => {
-          //#mdc
-          val mdc = Map("requestId" -> 1234, "visitorId" -> 5678)
-          log.mdc(mdc)
+        //#mdc
+        val mdc = Map("requestId" -> 1234, "visitorId" -> 5678)
+        log.mdc(mdc)
 
-          // Log something
-          log.info("Starting new request")
+        // Log something
+        log.info("Starting new request")
 
-          log.clearMDC()
-          //#mdc
-        }
+        log.clearMDC()
+        //#mdc
+      }
     }
   }
 
@@ -62,15 +63,15 @@ object LoggingDocSpec {
       val always = Map("requestId" -> reqId)
       val perMessage = currentMessage match {
         case r: Req => Map("visitorId" -> r.visitorId)
-        case _ => Map()
+        case _      => Map()
       }
       always ++ perMessage
     }
 
     def receive: Receive = {
       case r: Req => {
-          log.info(s"Starting new request: ${r.work}")
-        }
+        log.info(s"Starting new request: ${r.work}")
+      }
     }
   }
 
@@ -86,11 +87,11 @@ object LoggingDocSpec {
 
   class MyEventListener extends Actor {
     def receive = {
-      case InitializeLogger(_) => sender() ! LoggerInitialized
+      case InitializeLogger(_)                        => sender() ! LoggerInitialized
       case Error(cause, logSource, logClass, message) => // ...
-      case Warning(logSource, logClass, message) => // ...
-      case Info(logSource, logClass, message) => // ...
-      case Debug(logSource, logClass, message) => // ...
+      case Warning(logSource, logClass, message)      => // ...
+      case Info(logSource, logClass, message)         => // ...
+      case Debug(logSource, logClass, message)        => // ...
     }
   }
   //#my-event-listener

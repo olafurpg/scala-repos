@@ -202,7 +202,7 @@ abstract class PositionedResult(val rs: ResultSet) extends Closeable { outer =>
     val npos = pos + 1;
     v match {
       case Some(s) => rs.updateBoolean(npos, s);
-      case None => rs.updateNull(npos)
+      case None    => rs.updateNull(npos)
     }; pos = npos
   }
   final def updateBlobOption(v: Option[Blob]) {
@@ -239,7 +239,7 @@ abstract class PositionedResult(val rs: ResultSet) extends Closeable { outer =>
     val npos = pos + 1;
     v match {
       case Some(s) => rs.updateDouble(npos, s);
-      case None => rs.updateNull(npos)
+      case None    => rs.updateNull(npos)
     }; pos = npos
   }
   final def updateFloatOption(v: Option[Float]) {
@@ -270,7 +270,7 @@ abstract class PositionedResult(val rs: ResultSet) extends Closeable { outer =>
     val npos = pos + 1;
     v match {
       case Some(s) => rs.updateString(npos, s);
-      case None => rs.updateNull(npos)
+      case None    => rs.updateNull(npos)
     }; pos = npos
   }
   final def updateTimeOption(v: Option[Time]) {
@@ -283,21 +283,21 @@ abstract class PositionedResult(val rs: ResultSet) extends Closeable { outer =>
     val npos = pos + 1;
     v match {
       case Some(s) => rs.updateTimestamp(npos, s);
-      case None => rs.updateNull(npos)
+      case None    => rs.updateNull(npos)
     }; pos = npos
   }
   final def updateBigDecimalOption(v: Option[BigDecimal]) {
     val npos = pos + 1;
     v match {
       case Some(s) => rs.updateBigDecimal(npos, s.bigDecimal);
-      case None => rs.updateNull(npos)
+      case None    => rs.updateNull(npos)
     }; pos = npos
   }
   final def updateObjectOption(v: Option[AnyRef]) {
     val npos = pos + 1;
     v match {
       case Some(s) => rs.updateObject(npos, s);
-      case None => rs.updateNull(npos)
+      case None    => rs.updateNull(npos)
     }; pos = npos
   }
 
@@ -316,9 +316,10 @@ abstract class PositionedResult(val rs: ResultSet) extends Closeable { outer =>
     * and ends when the discriminator predicate (which can read columns starting
     * at discriminatorPos) returns false or when this PositionedResult ends.
     */
-  def view(discriminatorPos: Int,
-           dataPos: Int,
-           discriminator: (PositionedResult => Boolean)): PositionedResult =
+  def view(
+      discriminatorPos: Int,
+      dataPos: Int,
+      discriminator: (PositionedResult => Boolean)): PositionedResult =
     new PositionedResult(rs) {
       override protected[this] val startPos = dataPos
       pos = Int.MinValue
@@ -364,10 +365,10 @@ abstract class PositionedResult(val rs: ResultSet) extends Closeable { outer =>
 
   final def to[C[_]] = new To[C]()
 
-  final class To[C[_]] private[PositionedResult]() {
-    def apply[R](
-        gr: GetResult[R])(implicit session: JdbcBackend#Session,
-                          canBuildFrom: CanBuildFrom[Nothing, R, C[R]]) =
+  final class To[C[_]] private[PositionedResult] () {
+    def apply[R](gr: GetResult[R])(
+        implicit session: JdbcBackend#Session,
+        canBuildFrom: CanBuildFrom[Nothing, R, C[R]]) =
       build[C, R](gr)
   }
 }
@@ -376,8 +377,11 @@ abstract class PositionedResult(val rs: ResultSet) extends Closeable { outer =>
   * An CloseableIterator for a PositionedResult.
   */
 abstract class PositionedResultIterator[+T](
-    val pr: PositionedResult, maxRows: Int, autoClose: Boolean)
-    extends ReadAheadIterator[T] with CloseableIterator[T] {
+    val pr: PositionedResult,
+    maxRows: Int,
+    autoClose: Boolean)
+    extends ReadAheadIterator[T]
+    with CloseableIterator[T] {
 
   private[this] var closed = false
   private[this] var readRows = 0

@@ -27,7 +27,8 @@ import org.apache.spark.mllib.util.TestingUtils._
 import org.apache.spark.util.Utils
 
 class PowerIterationClusteringSuite
-    extends SparkFunSuite with MLlibTestSparkContext {
+    extends SparkFunSuite
+    with MLlibTestSparkContext {
 
   import org.apache.spark.mllib.clustering.PowerIterationClustering._
 
@@ -144,12 +145,17 @@ class PowerIterationClusteringSuite
      1/2   0 1/2   0
      */
     val similarities = Seq[(Long, Long, Double)](
-        (0, 1, 1.0), (0, 2, 1.0), (0, 3, 1.0), (1, 2, 1.0), (2, 3, 1.0))
+      (0, 1, 1.0),
+      (0, 2, 1.0),
+      (0, 3, 1.0),
+      (1, 2, 1.0),
+      (2, 3, 1.0))
     // scalastyle:off
-    val expected = Array(Array(0.0, 1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0),
-                         Array(1.0 / 2.0, 0.0, 1.0 / 2.0, 0.0),
-                         Array(1.0 / 3.0, 1.0 / 3.0, 0.0, 1.0 / 3.0),
-                         Array(1.0 / 2.0, 0.0, 1.0 / 2.0, 0.0))
+    val expected = Array(
+      Array(0.0, 1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0),
+      Array(1.0 / 2.0, 0.0, 1.0 / 2.0, 0.0),
+      Array(1.0 / 3.0, 1.0 / 3.0, 0.0, 1.0 / 3.0),
+      Array(1.0 / 2.0, 0.0, 1.0 / 2.0, 0.0))
     // scalastyle:on
     val w = normalize(sc.parallelize(similarities, 2))
     w.edges.collect().foreach {
@@ -157,7 +163,8 @@ class PowerIterationClusteringSuite
         assert(x ~== expected(i.toInt)(j.toInt) absTol 1e-14)
     }
     val v0 = sc.parallelize(
-        Seq[(Long, Double)]((0, 0.1), (1, 0.2), (2, 0.3), (3, 0.4)), 2)
+      Seq[(Long, Double)]((0, 0.1), (1, 0.2), (2, 0.3), (3, 0.4)),
+      2)
     val w0 = Graph(v0, w.edges)
     val v1 = powerIter(w0, maxIterations = 1).collect()
     val u = Array(0.3, 0.2, 0.7 / 3.0, 0.2)
@@ -184,16 +191,18 @@ class PowerIterationClusteringSuite
 }
 
 object PowerIterationClusteringSuite extends SparkFunSuite {
-  def createModel(sc: SparkContext,
-                  k: Int,
-                  nPoints: Int): PowerIterationClusteringModel = {
-    val assignments = sc.parallelize((0 until nPoints).map(
-            p => PowerIterationClustering.Assignment(p, Random.nextInt(k))))
+  def createModel(
+      sc: SparkContext,
+      k: Int,
+      nPoints: Int): PowerIterationClusteringModel = {
+    val assignments = sc.parallelize((0 until nPoints).map(p =>
+      PowerIterationClustering.Assignment(p, Random.nextInt(k))))
     new PowerIterationClusteringModel(k, assignments)
   }
 
-  def checkEqual(a: PowerIterationClusteringModel,
-                 b: PowerIterationClusteringModel): Unit = {
+  def checkEqual(
+      a: PowerIterationClusteringModel,
+      b: PowerIterationClusteringModel): Unit = {
     assert(a.k === b.k)
 
     val aAssignments = a.assignments.map(x => (x.id, x.cluster))

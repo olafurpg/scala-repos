@@ -40,35 +40,41 @@ class WorksheetFoldingBuilder extends FoldingBuilder {
   }
 
   override def buildFoldRegions(
-      astNode: ASTNode, document: Document): Array[FoldingDescriptor] = {
+      astNode: ASTNode,
+      document: Document): Array[FoldingDescriptor] = {
     val descriptors = new ArrayBuffer[FoldingDescriptor]
     val processedComments = new util.HashSet[PsiElement]
     appendDescriptors(astNode, document, descriptors, processedComments)
     descriptors.toArray
   }
 
-  private def appendDescriptors(node: ASTNode,
-                                document: Document,
-                                descriptors: ArrayBuffer[FoldingDescriptor],
-                                processedComments: util.HashSet[PsiElement]) {
+  private def appendDescriptors(
+      node: ASTNode,
+      document: Document,
+      descriptors: ArrayBuffer[FoldingDescriptor],
+      processedComments: util.HashSet[PsiElement]) {
     if (node.getElementType == ScalaTokenTypes.tLINE_COMMENT &&
         (node.getText.startsWith(WorksheetFoldingBuilder.FIRST_LINE_PREFIX) ||
-            node.getText.startsWith(WorksheetFoldingBuilder.LINE_PREFIX))) {
-      val length = Math.max(WorksheetFoldingBuilder.FIRST_LINE_PREFIX.length,
-                            WorksheetFoldingBuilder.LINE_PREFIX.length)
+        node.getText.startsWith(WorksheetFoldingBuilder.LINE_PREFIX))) {
+      val length = Math.max(
+        WorksheetFoldingBuilder.FIRST_LINE_PREFIX.length,
+        WorksheetFoldingBuilder.LINE_PREFIX.length)
       descriptors +=
-      (new FoldingDescriptor(node,
-                             new TextRange(node.getPsi
-                                             .asInstanceOf[PsiComment]
-                                             .getTextRange
-                                             .getStartOffset,
-                                           node.getPsi
-                                             .asInstanceOf[PsiComment]
-                                             .getTextRange
-                                             .getStartOffset + length),
-                             null,
-                             Collections.emptySet[AnyRef],
-                             true))
+        (new FoldingDescriptor(
+          node,
+          new TextRange(
+            node.getPsi
+              .asInstanceOf[PsiComment]
+              .getTextRange
+              .getStartOffset,
+            node.getPsi
+              .asInstanceOf[PsiComment]
+              .getTextRange
+              .getStartOffset + length),
+          null,
+          Collections.emptySet[AnyRef],
+          true
+        ))
     }
 
     for (child <- node.getChildren(null)) {

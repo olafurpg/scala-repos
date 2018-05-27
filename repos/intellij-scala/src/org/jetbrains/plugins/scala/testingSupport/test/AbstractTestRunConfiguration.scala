@@ -8,7 +8,10 @@ import com.intellij.execution._
 import com.intellij.execution.configurations._
 import com.intellij.execution.runners.{ExecutionEnvironment, ProgramRunner}
 import com.intellij.execution.testframework.TestFrameworkRunningModel
-import com.intellij.execution.testframework.sm.{CompositeTestLocationProvider, SMTestRunnerConnectionUtil}
+import com.intellij.execution.testframework.sm.{
+  CompositeTestLocationProvider,
+  SMTestRunnerConnectionUtil
+}
 import com.intellij.execution.testframework.sm.runner.SMTRunnerConsoleProperties
 import com.intellij.execution.testframework.sm.runner.ui.SMTRunnerConsoleView
 import com.intellij.openapi.application.ApplicationManager
@@ -27,14 +30,23 @@ import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.ScPackage
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScModifierListOwner
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject}
-import org.jetbrains.plugins.scala.lang.psi.impl.{ScPackageImpl, ScalaPsiManager}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass,
+  ScObject
+}
+import org.jetbrains.plugins.scala.lang.psi.impl.{
+  ScPackageImpl,
+  ScalaPsiManager
+}
 import org.jetbrains.plugins.scala.project._
 import org.jetbrains.plugins.scala.project.maven.ScalaTestDefaultWorkingDirectoryProvider
 import org.jetbrains.plugins.scala.testingSupport.ScalaTestingConfiguration
 import org.jetbrains.plugins.scala.testingSupport.locationProvider.ScalaTestLocationProvider
 import org.jetbrains.plugins.scala.testingSupport.test.AbstractTestRunConfiguration.PropertiesExtension
-import org.jetbrains.plugins.scala.testingSupport.test.TestRunConfigurationForm.{SearchForTest, TestKind}
+import org.jetbrains.plugins.scala.testingSupport.test.TestRunConfigurationForm.{
+  SearchForTest,
+  TestKind
+}
 import org.jetbrains.plugins.scala.util.ScalaUtil
 
 import scala.beans.BeanProperty
@@ -50,11 +62,13 @@ abstract class AbstractTestRunConfiguration(
     val project: Project,
     val configurationFactory: ConfigurationFactory,
     val name: String,
-    private var envs: java.util.Map[String, String] = new mutable.HashMap[
-          String, String](),
+    private var envs: java.util.Map[String, String] =
+      new mutable.HashMap[String, String](),
     private var addIntegrationTestsClasspath: Boolean = false)
     extends ModuleBasedConfiguration[RunConfigurationModule](
-        name, new RunConfigurationModule(project), configurationFactory)
+      name,
+      new RunConfigurationModule(project),
+      configurationFactory)
     with ScalaTestingConfiguration {
 
   val SCALA_HOME = "-Dscala.home="
@@ -126,7 +140,7 @@ abstract class AbstractTestRunConfiguration(
     ScalaTestDefaultWorkingDirectoryProvider.EP_NAME.getExtensions
       .find(_.getWorkingDirectory(module) != null) match {
       case Some(provider) => provider.getWorkingDirectory(module)
-      case _ => Option(getProject.getBaseDir).map(_.getPath).getOrElse("")
+      case _              => Option(getProject.getBaseDir).map(_.getPath).getOrElse("")
     }
   }
 
@@ -162,11 +176,11 @@ abstract class AbstractTestRunConfiguration(
     setModule(configuration.getModule)
     val workDir = configuration.getWorkingDirectory
     setWorkingDirectory(
-        if (workDir != null && !workDir.trim.isEmpty) {
-          workDir
-        } else {
-          provideDefaultWorkingDir
-        }
+      if (workDir != null && !workDir.trim.isEmpty) {
+        workDir
+      } else {
+        provideDefaultWorkingDir
+      }
     )
 
     setTestName(configuration.getTestName)
@@ -181,7 +195,8 @@ abstract class AbstractTestRunConfiguration(
     val objectClasses = classes.filter(_.isInstanceOf[ScObject])
     val nonObjectClasses = classes.filter(!_.isInstanceOf[ScObject])
     if (nonObjectClasses.nonEmpty) nonObjectClasses(0)
-    else if (objectClasses.nonEmpty) objectClasses(0) else null
+    else if (objectClasses.nonEmpty) objectClasses(0)
+    else null
   }
 
   def getPackage(path: String): PsiPackage = {
@@ -211,12 +226,11 @@ abstract class AbstractTestRunConfiguration(
           case SearchForTest.IN_WHOLE_PROJECT => unionScope(_ => true)
           case SearchForTest.IN_SINGLE_MODULE if getModule != null =>
             mScope(getModule)
-          case SearchForTest.ACCROSS_MODULE_DEPENDENCIES
-              if getModule != null =>
+          case SearchForTest.ACCROSS_MODULE_DEPENDENCIES if getModule != null =>
             unionScope(
-                ModuleManager
-                  .getInstance(getProject)
-                  .isModuleDependent(getModule, _))
+              ModuleManager
+                .getInstance(getProject)
+                .isModuleDependent(getModule, _))
           case _ => unionScope(_ => true)
         }
       case _ =>
@@ -248,30 +262,30 @@ abstract class AbstractTestRunConfiguration(
 
   override def getModules: Array[Module] = {
     ApplicationManager.getApplication.runReadAction(
-        new Computable[Array[Module]] {
-      @SuppressWarnings(Array("ConstantConditions"))
-      def compute: Array[Module] = {
-        searchTest match {
-          case SearchForTest.ACCROSS_MODULE_DEPENDENCIES
-              if getModule != null =>
-            val buffer = new ArrayBuffer[Module]()
-            buffer += getModule
-            for (module <- ModuleManager.getInstance(getProject).getModules) {
-              if (ModuleManager
-                    .getInstance(getProject)
-                    .isModuleDependent(getModule, module)) {
-                buffer += module
+      new Computable[Array[Module]] {
+        @SuppressWarnings(Array("ConstantConditions"))
+        def compute: Array[Module] = {
+          searchTest match {
+            case SearchForTest.ACCROSS_MODULE_DEPENDENCIES
+                if getModule != null =>
+              val buffer = new ArrayBuffer[Module]()
+              buffer += getModule
+              for (module <- ModuleManager.getInstance(getProject).getModules) {
+                if (ModuleManager
+                      .getInstance(getProject)
+                      .isModuleDependent(getModule, module)) {
+                  buffer += module
+                }
               }
-            }
-            buffer.toArray
-          case SearchForTest.IN_SINGLE_MODULE if getModule != null =>
-            Array(getModule)
-          case SearchForTest.IN_WHOLE_PROJECT =>
-            ModuleManager.getInstance(getProject).getModules
-          case _ => Array.empty
+              buffer.toArray
+            case SearchForTest.IN_SINGLE_MODULE if getModule != null =>
+              Array(getModule)
+            case SearchForTest.IN_WHOLE_PROJECT =>
+              ModuleManager.getInstance(getProject).getModules
+            case _ => Array.empty
+          }
         }
-      }
-    })
+      })
   }
 
   private def getSuiteClass = {
@@ -285,7 +299,7 @@ abstract class AbstractTestRunConfiguration(
 
     if (suiteClasses.size > 1) {
       throw new RuntimeConfigurationException(
-          "Multiple suite traits detected: " + suiteClasses)
+        "Multiple suite traits detected: " + suiteClasses)
     }
 
     suiteClasses.head
@@ -303,8 +317,7 @@ abstract class AbstractTestRunConfiguration(
           case SearchForTest.IN_SINGLE_MODULE |
               SearchForTest.ACCROSS_MODULE_DEPENDENCIES =>
             if (getModule == null) {
-              throw new RuntimeConfigurationException(
-                  "Module is not specified")
+              throw new RuntimeConfigurationException("Module is not specified")
             }
         }
         val pack =
@@ -317,19 +330,17 @@ abstract class AbstractTestRunConfiguration(
           throw new RuntimeConfigurationException("Module is not specified")
         }
         if (getTestClassPath == "") {
-          throw new RuntimeConfigurationException(
-              "Test Class is not specified")
+          throw new RuntimeConfigurationException("Test Class is not specified")
         }
         val clazz = getClazz(getTestClassPath, withDependencies = false)
         if (clazz == null || isInvalidSuite(clazz)) {
           throw new RuntimeConfigurationException(
-              "No Suite Class is found for Class %s in module %s".format(
-                  getTestClassPath, getModule.getName))
+            "No Suite Class is found for Class %s in module %s"
+              .format(getTestClassPath, getModule.getName))
         }
         if (!ScalaPsiUtil.cachedDeepIsInheritor(clazz, suiteClass)) {
           throw new RuntimeConfigurationException(
-              "Class %s is not inheritor of Suite trait".format(
-                  getTestClassPath))
+            "Class %s is not inheritor of Suite trait".format(getTestClassPath))
         }
         if (testKind == TestKind.TEST_NAME && getTestName == "") {
           throw new RuntimeConfigurationException("Test Name is not specified")
@@ -343,11 +354,12 @@ abstract class AbstractTestRunConfiguration(
     val group: SettingsEditorGroup[AbstractTestRunConfiguration] =
       new SettingsEditorGroup
     group.addEditor(
-        ExecutionBundle.message("run.configuration.configuration.tab.title"),
-        new AbstractTestRunConfigurationEditor(project, this))
+      ExecutionBundle.message("run.configuration.configuration.tab.title"),
+      new AbstractTestRunConfigurationEditor(project, this))
     JavaRunConfigurationExtensionManager.getInstance.appendEditors(this, group)
     group.addEditor(
-        ExecutionBundle.message("logs.tab.title"), new LogConfigurationPanel)
+      ExecutionBundle.message("logs.tab.title"),
+      new LogConfigurationPanel)
     group
   }
 
@@ -355,7 +367,8 @@ abstract class AbstractTestRunConfiguration(
     AbstractTestRunConfiguration.isInvalidSuite(clazz)
 
   override def getState(
-      executor: Executor, env: ExecutionEnvironment): RunProfileState = {
+      executor: Executor,
+      env: ExecutionEnvironment): RunProfileState = {
     def classNotFoundError() {
       throw new ExecutionException("Test class not found.")
     }
@@ -427,7 +440,10 @@ abstract class AbstractTestRunConfiguration(
         //expand environment variables in vmParams
         for (entry <- params.getEnv.entrySet) {
           vmParams = StringUtil.replace(
-              vmParams, "$" + entry.getKey + "$", entry.getValue, false)
+            vmParams,
+            "$" + entry.getKey + "$",
+            entry.getValue,
+            false)
         }
 
         params.getVMParametersList.addParametersString(vmParams)
@@ -449,15 +465,18 @@ abstract class AbstractTestRunConfiguration(
           case SearchForTest.IN_WHOLE_PROJECT =>
             var jdk: Sdk = null
             for (module <- ModuleManager.getInstance(project).getModules
-                              if jdk == null) {
+                 if jdk == null) {
               jdk = JavaParameters.getModuleJdk(module)
             }
             params.configureByProject(
-                project, JavaParameters.JDK_AND_CLASSES_AND_TESTS, jdk)
+              project,
+              JavaParameters.JDK_AND_CLASSES_AND_TESTS,
+              jdk)
           case _ =>
-            params.configureByModule(module,
-                                     JavaParameters.JDK_AND_CLASSES_AND_TESTS,
-                                     JavaParameters.getModuleJdk(module))
+            params.configureByModule(
+              module,
+              JavaParameters.JDK_AND_CLASSES_AND_TESTS,
+              JavaParameters.getModuleJdk(module))
         }
 
         params.setMainClass(mainClass)
@@ -512,8 +531,8 @@ abstract class AbstractTestRunConfiguration(
           } catch {
             case ioException: IOException =>
               throw new ExecutionException(
-                  "Failed to create dynamic classpath file with command-line args.",
-                  ioException)
+                "Failed to create dynamic classpath file with command-line args.",
+                ioException)
           }
         } else {
           if (getFailedTests == null) {
@@ -552,10 +571,11 @@ abstract class AbstractTestRunConfiguration(
           params.getProgramParametersList.addParametersString(getTestArgs)
         }
 
-        for (ext <- Extensions.getExtensions(
-            RunConfigurationExtension.EP_NAME)) {
+        for (ext <- Extensions.getExtensions(RunConfigurationExtension.EP_NAME)) {
           ext.updateJavaParameters(
-              currentConfiguration, params, getRunnerSettings)
+            currentConfiguration,
+            params,
+            getRunnerSettings)
         }
 
         params
@@ -570,9 +590,13 @@ abstract class AbstractTestRunConfiguration(
         val config = getConfiguration
         JavaRunConfigurationExtensionManager.getInstance
           .attachExtensionsToProcess(
-            currentConfiguration, processHandler, runnerSettings)
+            currentConfiguration,
+            processHandler,
+            runnerSettings)
         val consoleProperties = new SMTRunnerConsoleProperties(
-            currentConfiguration, "Scala", executor) with PropertiesExtension {
+          currentConfiguration,
+          "Scala",
+          executor) with PropertiesExtension {
           override def getTestLocator = new ScalaTestLocationProvider
           def getRunConfigurationBase: RunConfigurationBase = config
         }
@@ -581,22 +605,24 @@ abstract class AbstractTestRunConfiguration(
 
         // console view
         val consoleView = SMTestRunnerConnectionUtil.createAndAttachConsole(
-            "Scala", processHandler, consoleProperties)
+          "Scala",
+          processHandler,
+          consoleProperties)
 
         val res = new DefaultExecutionResult(
-            consoleView,
-            processHandler,
-            createActions(consoleView, processHandler, executor): _*)
+          consoleView,
+          processHandler,
+          createActions(consoleView, processHandler, executor): _*)
 
         val rerunFailedTestsAction = new AbstractTestRerunFailedTestsAction(
-            consoleView)
+          consoleView)
         rerunFailedTestsAction.init(consoleView.getProperties)
         rerunFailedTestsAction.setModelProvider(
-            new Getter[TestFrameworkRunningModel] {
-          def get: TestFrameworkRunningModel = {
-            consoleView.asInstanceOf[SMTRunnerConsoleView].getResultsViewer
-          }
-        })
+          new Getter[TestFrameworkRunningModel] {
+            def get: TestFrameworkRunningModel = {
+              consoleView.asInstanceOf[SMTRunnerConsoleView].getResultsViewer
+            }
+          })
         res.setRestartActions(rerunFailedTestsAction)
         res
       }
@@ -610,8 +636,8 @@ abstract class AbstractTestRunConfiguration(
 
   override def writeExternal(element: Element) {
     super.writeExternal(element)
-    JavaRunConfigurationExtensionManager.getInstance.writeExternal(
-        this, element)
+    JavaRunConfigurationExtensionManager.getInstance
+      .writeExternal(this, element)
     writeModule(element)
     JDOMExternalizer.write(element, "path", getTestClassPath)
     JDOMExternalizer.write(element, "package", getTestPackagePath)
@@ -620,12 +646,15 @@ abstract class AbstractTestRunConfiguration(
     JDOMExternalizer.write(element, "workingDirectory", workingDirectory)
     JDOMExternalizer.write(element, "searchForTest", searchTest.toString)
     JDOMExternalizer.write(element, "testName", testName)
-    JDOMExternalizer.write(element,
-                           "testKind",
-                           if (testKind != null) testKind.toString
-                           else TestKind.CLASS.toString)
     JDOMExternalizer.write(
-        element, "showProgressMessages", showProgressMessages.toString)
+      element,
+      "testKind",
+      if (testKind != null) testKind.toString
+      else TestKind.CLASS.toString)
+    JDOMExternalizer.write(
+      element,
+      "showProgressMessages",
+      showProgressMessages.toString)
     JDOMExternalizer.writeMap(element, envs, "envs", "envVar")
     PathMacroManager.getInstance(getProject).collapsePathsRecursively(element)
   }
@@ -633,8 +662,7 @@ abstract class AbstractTestRunConfiguration(
   override def readExternal(element: Element) {
     PathMacroManager.getInstance(getProject).expandPaths(element)
     super.readExternal(element)
-    JavaRunConfigurationExtensionManager.getInstance.readExternal(
-        this, element)
+    JavaRunConfigurationExtensionManager.getInstance.readExternal(this, element)
     readModule(element)
     testClassPath = JDOMExternalizer.readString(element, "path")
     testPackagePath = JDOMExternalizer.readString(element, "package")
@@ -649,10 +677,10 @@ abstract class AbstractTestRunConfiguration(
     testName = Option(JDOMExternalizer.readString(element, "testName"))
       .getOrElse("")
     testKind = TestKind.fromString(
-        Option(JDOMExternalizer.readString(element, "testKind"))
-          .getOrElse("Class"))
-    showProgressMessages = JDOMExternalizer.readBoolean(
-        element, "showProgressMessages")
+      Option(JDOMExternalizer.readString(element, "testKind"))
+        .getOrElse("Class"))
+    showProgressMessages =
+      JDOMExternalizer.readBoolean(element, "showProgressMessages")
   }
 }
 
@@ -690,7 +718,9 @@ object AbstractTestRunConfiguration extends SuiteValidityChecker {
   protected[test] def lackSuitableConstructor(clazz: PsiClass): Boolean = {
     val constructors = clazz match {
       case c: ScClass =>
-        c.secondaryConstructors.filter(_.isConstructor).toList ::: c.constructor.toList
+        c.secondaryConstructors
+          .filter(_.isConstructor)
+          .toList ::: c.constructor.toList
       case _ => clazz.getConstructors.toList
     }
     for (con <- constructors) {

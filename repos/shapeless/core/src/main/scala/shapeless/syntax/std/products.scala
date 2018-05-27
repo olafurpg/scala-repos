@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 Miles Sabin 
+ * Copyright (c) 2013 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,8 +55,7 @@ final class ProductOps[P](val p: P) extends AnyVal {
   /**
     * Returns a collection `M` whose elements are typed as the Lub of the elements of this product.
     */
-  def to[M[_]](
-      implicit toTraversable: ToTraversable[P, M]): toTraversable.Out =
+  def to[M[_]](implicit toTraversable: ToTraversable[P, M]): toTraversable.Out =
     toTraversable(p)
 
   /**

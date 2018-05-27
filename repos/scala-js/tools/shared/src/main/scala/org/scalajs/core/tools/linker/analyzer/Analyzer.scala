@@ -18,9 +18,10 @@ import Definitions._
 
 import org.scalajs.core.tools.sem._
 
-private final class Analyzer(semantics: Semantics,
-                             symbolRequirements: SymbolRequirement,
-                             allowAddingSyntheticMethods: Boolean)
+private final class Analyzer(
+    semantics: Semantics,
+    symbolRequirements: SymbolRequirement,
+    allowAddingSyntheticMethods: Boolean)
     extends Analysis {
   import Analyzer._
   import Analysis._
@@ -52,8 +53,9 @@ private final class Analyzer(semantics: Semantics,
     require(_classInfos.isEmpty, "Cannot run the same Analyzer multiple times")
 
     // Load data
-    for (classData <- allData) _classInfos +=
-      classData.encodedName -> new ClassInfo(classData)
+    for (classData <- allData)
+      _classInfos +=
+        classData.encodedName -> new ClassInfo(classData)
 
     linkClasses()
 
@@ -65,8 +67,8 @@ private final class Analyzer(semantics: Semantics,
       /* Hijacked classes are always instantiated, because values of primitive
        * types are their instances.
        */
-      for (hijacked <- HijackedClasses) lookupClass(hijacked).instantiated()(
-          fromAnalyzer)
+      for (hijacked <- HijackedClasses)
+        lookupClass(hijacked).instantiated()(fromAnalyzer)
 
       reachSymbolRequirement(symbolRequirements)
 
@@ -92,7 +94,8 @@ private final class Analyzer(semantics: Semantics,
   }
 
   private def reachSymbolRequirement(
-      requirement: SymbolRequirement, optional: Boolean = false): Unit = {
+      requirement: SymbolRequirement,
+      optional: Boolean = false): Unit = {
 
     def withClass(className: String)(body: ClassInfo => Unit) = {
       val clazz = lookupClass(className)
@@ -128,18 +131,18 @@ private final class Analyzer(semantics: Semantics,
 
       case CallMethod(origin, className, methodName, statically) =>
         withMethod(className, methodName)(
-            _.callMethod(methodName, statically)(FromCore(origin)))
+          _.callMethod(methodName, statically)(FromCore(origin)))
 
       case CallStaticMethod(origin, className, methodName) =>
         withMethod(className, methodName)(
-            _.callStaticMethod(methodName)(FromCore(origin)))
+          _.callStaticMethod(methodName)(FromCore(origin)))
 
       case Optional(requirement) =>
         reachSymbolRequirement(requirement, optional = true)
 
       case Multiple(requirements) =>
-        for (requirement <- requirements) reachSymbolRequirement(
-            requirement, optional)
+        for (requirement <- requirements)
+          reachSymbolRequirement(requirement, optional)
 
       case NoRequirement => // skip
     }
@@ -153,9 +156,9 @@ private final class Analyzer(semantics: Semantics,
      * superclasses of classes whose data we can already reach.
      */
     for {
-      getSuperclassMethodInfo <- classClassInfo.flatMap(_.methodInfos.get(
-                                        "getSuperclass__jl_Class"))
-                                    if getSuperclassMethodInfo.isReachable
+      getSuperclassMethodInfo <- classClassInfo.flatMap(
+        _.methodInfos.get("getSuperclass__jl_Class"))
+      if getSuperclassMethodInfo.isReachable
     } {
       // calledFrom should always be nonEmpty if isReachable, but let's be robust
       implicit val from =
@@ -246,7 +249,7 @@ private final class Analyzer(semantics: Semantics,
 
     def isNeededAtAll =
       areInstanceTestsUsed || isDataAccessed || isAnySubclassInstantiated ||
-      isAnyStaticMethodReachable || isAnyDefaultMethodReachable
+        isAnyStaticMethodReachable || isAnyDefaultMethodReachable
 
     def isAnyStaticMethodReachable =
       staticMethodInfos.values.exists(_.isReachable)
@@ -255,8 +258,8 @@ private final class Analyzer(semantics: Semantics,
       isInterface && methodInfos.values.exists(_.isReachable)
 
     lazy val (methodInfos, staticMethodInfos) = {
-      val allInfos = for (methodData <- data.methods) yield
-        (methodData.encodedName, new MethodInfo(this, methodData))
+      val allInfos = for (methodData <- data.methods)
+        yield (methodData.encodedName, new MethodInfo(this, methodData))
       val (staticMethodInfos, methodInfos) = allInfos.partition(_._2.isStatic)
       (mutable.Map(methodInfos: _*), mutable.Map(staticMethodInfos: _*))
     }
@@ -279,9 +282,10 @@ private final class Analyzer(semantics: Semantics,
             inherited
           } else {
             val syntheticInfo =
-              Infos.MethodInfo(encodedName = ctorName,
-                               methodsCalledStatically = Map(
-                                     superClass.encodedName -> List(ctorName)))
+              Infos.MethodInfo(
+                encodedName = ctorName,
+                methodsCalledStatically =
+                  Map(superClass.encodedName -> List(ctorName)))
             val m = new MethodInfo(this, syntheticInfo)
             m.syntheticKind = MethodSyntheticKind.InheritedConstructor
             methodInfos += ctorName -> m
@@ -306,15 +310,16 @@ private final class Analyzer(semantics: Semantics,
     }
 
     def tryLookupMethod(methodName: String): Option[MethodInfo] = {
-      assert(isScalaClass || isInterface,
-             s"Cannot call lookupMethod($methodName) on non Scala class $this")
+      assert(
+        isScalaClass || isInterface,
+        s"Cannot call lookupMethod($methodName) on non Scala class $this")
 
       @tailrec
       def tryLookupInherited(ancestorInfo: ClassInfo): Option[MethodInfo] = {
         if (ancestorInfo ne null) {
           ancestorInfo.methodInfos.get(methodName) match {
             case Some(m) if !m.isAbstract => Some(m)
-            case _ => tryLookupInherited(ancestorInfo.superClass)
+            case _                        => tryLookupInherited(ancestorInfo.superClass)
           }
         } else {
           None
@@ -339,7 +344,7 @@ private final class Analyzer(semantics: Semantics,
           existing
         } { defaultTarget =>
           if (existing.exists(
-                  _.defaultBridgeTarget == defaultTarget.owner.encodedName)) {
+                _.defaultBridgeTarget == defaultTarget.owner.encodedName)) {
             /* If we found an existing bridge targeting the right method, we
              * can reuse it.
              * We also get here with None when there is no target whatsoever.
@@ -364,7 +369,7 @@ private final class Analyzer(semantics: Semantics,
       val candidates = for {
         intf <- ancestors if intf.isInterface
         m <- intf.methodInfos.get(methodName) if !m.isAbstract &&
-            !m.isDefaultBridge
+          !m.isDefaultBridge
       } yield m
 
       val notShadowed =
@@ -397,12 +402,12 @@ private final class Analyzer(semantics: Semantics,
       val targetOwner = target.owner
 
       val syntheticInfo = Infos.MethodInfo(
-          encodedName = methodName,
-          methodsCalledStatically = Map(
-                targetOwner.encodedName -> List(methodName)))
+        encodedName = methodName,
+        methodsCalledStatically =
+          Map(targetOwner.encodedName -> List(methodName)))
       val m = new MethodInfo(this, syntheticInfo)
-      m.syntheticKind = MethodSyntheticKind.DefaultBridge(
-          targetOwner.encodedName)
+      m.syntheticKind =
+        MethodSyntheticKind.DefaultBridge(targetOwner.encodedName)
       methodInfos += methodName -> m
       m
     }
@@ -479,17 +484,19 @@ private final class Analyzer(semantics: Semantics,
     }
 
     private def reflProxyMatches(
-        methodName: String, proxyName: String): Boolean = {
+        methodName: String,
+        proxyName: String): Boolean = {
       val sepPos = methodName.lastIndexOf("__")
       sepPos >= 0 && methodName.substring(0, sepPos + 2) == proxyName
     }
 
     private def methodResultType(methodName: String): ir.Types.ReferenceType =
       decodeReferenceType(
-          methodName.substring(methodName.lastIndexOf("__") + 2))
+        methodName.substring(methodName.lastIndexOf("__") + 2))
 
-    private def isMoreSpecific(left: ir.Types.ReferenceType,
-                               right: ir.Types.ReferenceType): Boolean = {
+    private def isMoreSpecific(
+        left: ir.Types.ReferenceType,
+        right: ir.Types.ReferenceType): Boolean = {
       import ir.Types._
 
       def classIsMoreSpecific(leftCls: String, rightCls: String): Boolean = {
@@ -506,8 +513,9 @@ private final class Analyzer(semantics: Semantics,
       (left, right) match {
         case (ClassType(leftCls), ClassType(rightCls)) =>
           classIsMoreSpecific(leftCls, rightCls)
-        case (ArrayType(leftBase, leftDepth),
-              ArrayType(rightBase, rightDepth)) =>
+        case (
+            ArrayType(leftBase, leftDepth),
+            ArrayType(rightBase, rightDepth)) =>
           leftDepth == rightDepth && classIsMoreSpecific(leftBase, rightBase)
         case (ArrayType(_, _), ClassType(ObjectClass)) =>
           true
@@ -517,20 +525,24 @@ private final class Analyzer(semantics: Semantics,
     }
 
     private def createReflProxy(
-        proxyName: String, targetName: String): MethodInfo = {
-      assert(this.isScalaClass,
-             s"Cannot create reflective proxy in non-Scala class $this")
+        proxyName: String,
+        targetName: String): MethodInfo = {
+      assert(
+        this.isScalaClass,
+        s"Cannot create reflective proxy in non-Scala class $this")
 
       val returnsChar = targetName.endsWith("__C")
       val syntheticInfo = Infos.MethodInfo(
-          encodedName = proxyName,
-          methodsCalled = Map(this.encodedName -> List(targetName)),
-          methodsCalledStatically = (if (returnsChar)
-                                       Map(BoxedCharacterClass -> List(
-                                               "init___C"))
-                                     else Map.empty),
-          instantiatedClasses = (if (returnsChar) List(BoxedCharacterClass)
-                                 else Nil))
+        encodedName = proxyName,
+        methodsCalled = Map(this.encodedName -> List(targetName)),
+        methodsCalledStatically =
+          (if (returnsChar)
+             Map(BoxedCharacterClass -> List("init___C"))
+           else Map.empty),
+        instantiatedClasses =
+          (if (returnsChar) List(BoxedCharacterClass)
+           else Nil)
+      )
       val m = new MethodInfo(this, syntheticInfo)
       m.syntheticKind = MethodSyntheticKind.ReflectiveProxy(targetName)
       methodInfos += proxyName -> m
@@ -590,8 +602,8 @@ private final class Analyzer(semantics: Semantics,
           accessData()
           ancestors.foreach(_.subclassInstantiated())
 
-          for ((methodName, from) <- delayedCalls) delayedCallMethod(
-              methodName)(from)
+          for ((methodName, from) <- delayedCalls)
+            delayedCallMethod(methodName)(from)
         } else {
           assert(isAnyRawJSType)
 
@@ -639,12 +651,13 @@ private final class Analyzer(semantics: Semantics,
       if (isConstructorName(methodName)) {
         // constructors must always be called statically
         assert(
-            statically,
-            s"Trying to call dynamically the constructor $this.$methodName from $from")
+          statically,
+          s"Trying to call dynamically the constructor $this.$methodName from $from")
         lookupConstructor(methodName).reachStatic()
       } else if (statically) {
-        assert(!isReflProxyName(methodName),
-               s"Trying to call statically refl proxy $this.$methodName")
+        assert(
+          !isReflProxyName(methodName),
+          s"Trying to call statically refl proxy $this.$methodName")
         lookupMethod(methodName).reachStatic()
       } else {
         for (descendentClass <- descendentClasses) {
@@ -699,7 +712,8 @@ private final class Analyzer(semantics: Semantics,
 
     def reachStatic()(implicit from: From): Unit = {
       assert(
-          !isAbstract, s"Trying to reach statically the abstract method $this")
+        !isAbstract,
+        s"Trying to reach statically the abstract method $this")
 
       checkExistent()
 
@@ -712,12 +726,15 @@ private final class Analyzer(semantics: Semantics,
 
     def reach(inClass: ClassInfo)(implicit from: From): Unit = {
       assert(!isStatic, s"Trying to dynamically reach the static method $this")
-      assert(!isAbstract,
-             s"Trying to dynamically reach the abstract method $this")
-      assert(owner.isAnyClass,
-             s"Trying to dynamically reach the non-class method $this")
-      assert(!isConstructorName(encodedName),
-             s"Trying to dynamically reach the constructor $this")
+      assert(
+        !isAbstract,
+        s"Trying to dynamically reach the abstract method $this")
+      assert(
+        owner.isAnyClass,
+        s"Trying to dynamically reach the non-class method $this")
+      assert(
+        !isConstructorName(encodedName),
+        s"Trying to dynamically reach the constructor $this")
 
       checkExistent()
 
@@ -790,8 +807,8 @@ private final class Analyzer(semantics: Semantics,
       while (methodsCalledStaticallyIterator.hasNext) {
         val (className, methods) = methodsCalledStaticallyIterator.next()
         val classInfo = lookupClass(className)
-        for (methodName <- methods) classInfo.callMethod(
-            methodName, statically = true)
+        for (methodName <- methods)
+          classInfo.callMethod(methodName, statically = true)
       }
 
       val staticMethodsCalledIterator = data.staticMethodsCalled.iterator
@@ -806,12 +823,12 @@ private final class Analyzer(semantics: Semantics,
   private def createMissingClassInfo(encodedName: String): Infos.ClassInfo = {
     // We create a module class to avoid cascading errors
     Infos.ClassInfo(
-        encodedName = encodedName,
-        isExported = false,
-        kind = ClassKind.ModuleClass,
-        superClass = Some("O"),
-        interfaces = Nil,
-        methods = List(createMissingMethodInfo("init___"))
+      encodedName = encodedName,
+      isExported = false,
+      kind = ClassKind.ModuleClass,
+      superClass = Some("O"),
+      interfaces = Nil,
+      methods = List(createMissingMethodInfo("init___"))
     )
   }
 
@@ -819,19 +836,21 @@ private final class Analyzer(semantics: Semantics,
       encodedName: String,
       isStatic: Boolean = false,
       isAbstract: Boolean = false): Infos.MethodInfo = {
-    Infos.MethodInfo(encodedName = encodedName,
-                     isStatic = isStatic,
-                     isAbstract = isAbstract)
+    Infos.MethodInfo(
+      encodedName = encodedName,
+      isStatic = isStatic,
+      isAbstract = isAbstract)
   }
 }
 
 object Analyzer {
-  def computeReachability(semantics: Semantics,
-                          symbolRequirements: SymbolRequirement,
-                          allData: Seq[Infos.ClassInfo],
-                          allowAddingSyntheticMethods: Boolean): Analysis = {
-    val analyzer = new Analyzer(
-        semantics, symbolRequirements, allowAddingSyntheticMethods)
+  def computeReachability(
+      semantics: Semantics,
+      symbolRequirements: SymbolRequirement,
+      allData: Seq[Infos.ClassInfo],
+      allowAddingSyntheticMethods: Boolean): Analysis = {
+    val analyzer =
+      new Analyzer(semantics, symbolRequirements, allowAddingSyntheticMethods)
     analyzer.computeReachability(allData)
     analyzer
   }

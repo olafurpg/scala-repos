@@ -18,13 +18,13 @@ object Search extends LilaController {
       Reasonable(page, 100) {
         implicit def req = ctx.body
         searchForm.bindFromRequest.fold(
-            failure => Ok(html.search.index(failure)).fuccess,
-            data =>
-              data.nonEmptyQuery ?? { query =>
-                env.paginator(query, page) map (_.some)
-              } map { pager =>
-                Ok(html.search.index(searchForm fill data, pager))
-            }
+          failure => Ok(html.search.index(failure)).fuccess,
+          data =>
+            data.nonEmptyQuery ?? { query =>
+              env.paginator(query, page) map (_.some)
+            } map { pager =>
+              Ok(html.search.index(searchForm fill data, pager))
+          }
         )
       }
     }
@@ -34,22 +34,23 @@ object Search extends LilaController {
     NoBot {
       implicit def req = ctx.body
       searchForm.bindFromRequest.fold(
-          failure => Ok(html.search.index(failure)).fuccess,
-          data =>
-            data.nonEmptyQuery ?? { query =>
-              env.api.ids(query, 5000) map {
-                ids =>
-                  import org.joda.time.DateTime
-                  import org.joda.time.format.DateTimeFormat
-                  val date =
-                    (DateTimeFormat forPattern "yyyy-MM-dd") print DateTime.now
-                  Ok.chunked(Env.api.pgnDump exportGamesFromIds ids)
-                    .withHeaders(CONTENT_TYPE -> ContentTypes.TEXT,
-                                 CONTENT_DISPOSITION ->
-                                 ("attachment; filename=" +
-                                     s"lichess_search_$date.pgn"))
-              }
-          }
+        failure => Ok(html.search.index(failure)).fuccess,
+        data =>
+          data.nonEmptyQuery ?? { query =>
+            env.api.ids(query, 5000) map {
+              ids =>
+                import org.joda.time.DateTime
+                import org.joda.time.format.DateTimeFormat
+                val date =
+                  (DateTimeFormat forPattern "yyyy-MM-dd") print DateTime.now
+                Ok.chunked(Env.api.pgnDump exportGamesFromIds ids)
+                  .withHeaders(
+                    CONTENT_TYPE -> ContentTypes.TEXT,
+                    CONTENT_DISPOSITION ->
+                      ("attachment; filename=" +
+                        s"lichess_search_$date.pgn"))
+            }
+        }
       )
     }
   }

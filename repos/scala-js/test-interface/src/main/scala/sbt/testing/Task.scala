@@ -38,9 +38,10 @@ trait Task {
     *  When running in a JavaScript environment, only this method will be
     *  called.
     */
-  def execute(eventHandler: EventHandler,
-              loggers: Array[Logger],
-              continuation: Array[Task] => Unit): Unit
+  def execute(
+      eventHandler: EventHandler,
+      loggers: Array[Logger],
+      continuation: Array[Task] => Unit): Unit
 
   /** Returns the <code>TaskDef</code> that was used to request this
     *  <code>Task</code>.

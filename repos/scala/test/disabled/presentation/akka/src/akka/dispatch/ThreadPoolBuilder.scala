@@ -53,13 +53,15 @@ object ThreadPoolConfig {
 }
 
 case class ThreadPoolConfig(
-    allowCorePoolTimeout: Boolean = ThreadPoolConfig.defaultAllowCoreThreadTimeout,
+    allowCorePoolTimeout: Boolean =
+      ThreadPoolConfig.defaultAllowCoreThreadTimeout,
     corePoolSize: Int = ThreadPoolConfig.defaultCorePoolSize,
     maxPoolSize: Int = ThreadPoolConfig.defaultMaxPoolSize,
     threadTimeout: Duration = ThreadPoolConfig.defaultTimeout,
-    flowHandler: ThreadPoolConfig.FlowHandler = ThreadPoolConfig.defaultFlowHandler,
+    flowHandler: ThreadPoolConfig.FlowHandler =
+      ThreadPoolConfig.defaultFlowHandler,
     queueFactory: ThreadPoolConfig.QueueFactory = ThreadPoolConfig
-        .linkedBlockingQueue()) {
+      .linkedBlockingQueue()) {
 
   final def createLazyExecutorService(
       threadFactory: ThreadFactory): ExecutorService =
@@ -69,22 +71,24 @@ case class ThreadPoolConfig(
       threadFactory: ThreadFactory): ExecutorService = {
     flowHandler match {
       case Left(rejectHandler) =>
-        val service = new ThreadPoolExecutor(corePoolSize,
-                                             maxPoolSize,
-                                             threadTimeout.length,
-                                             threadTimeout.unit,
-                                             queueFactory(),
-                                             threadFactory,
-                                             rejectHandler)
+        val service = new ThreadPoolExecutor(
+          corePoolSize,
+          maxPoolSize,
+          threadTimeout.length,
+          threadTimeout.unit,
+          queueFactory(),
+          threadFactory,
+          rejectHandler)
         service.allowCoreThreadTimeOut(allowCorePoolTimeout)
         service
       case Right(bounds) =>
-        val service = new ThreadPoolExecutor(corePoolSize,
-                                             maxPoolSize,
-                                             threadTimeout.length,
-                                             threadTimeout.unit,
-                                             queueFactory(),
-                                             threadFactory)
+        val service = new ThreadPoolExecutor(
+          corePoolSize,
+          maxPoolSize,
+          threadTimeout.length,
+          threadTimeout.unit,
+          queueFactory(),
+          threadFactory)
         service.allowCoreThreadTimeOut(allowCorePoolTimeout)
         new BoundedExecutorDecorator(service, bounds)
     }
@@ -97,8 +101,10 @@ trait DispatcherBuilder {
 
 object ThreadPoolConfigDispatcherBuilder {
   def conf_?[T](opt: Option[T])(
-      fun: (T) => ThreadPoolConfigDispatcherBuilder => ThreadPoolConfigDispatcherBuilder)
-    : Option[(ThreadPoolConfigDispatcherBuilder) => ThreadPoolConfigDispatcherBuilder] =
+      fun: (
+          T) => ThreadPoolConfigDispatcherBuilder => ThreadPoolConfigDispatcherBuilder)
+    : Option[(
+        ThreadPoolConfigDispatcherBuilder) => ThreadPoolConfigDispatcherBuilder] =
     opt map fun
 }
 
@@ -115,38 +121,49 @@ case class ThreadPoolConfigDispatcherBuilder(
 
   def withNewBoundedThreadPoolWithLinkedBlockingQueueWithUnboundedCapacity(
       bounds: Int): ThreadPoolConfigDispatcherBuilder =
-    this.copy(config = config.copy(flowHandler = flowHandler(bounds),
-                                   queueFactory = linkedBlockingQueue()))
+    this.copy(
+      config = config.copy(
+        flowHandler = flowHandler(bounds),
+        queueFactory = linkedBlockingQueue()))
 
   def withNewThreadPoolWithCustomBlockingQueue(
       newQueueFactory: QueueFactory): ThreadPoolConfigDispatcherBuilder =
-    this.copy(config = config.copy(flowHandler = defaultFlowHandler,
-                                   queueFactory = newQueueFactory))
+    this.copy(
+      config = config
+        .copy(flowHandler = defaultFlowHandler, queueFactory = newQueueFactory))
 
   def withNewThreadPoolWithCustomBlockingQueue(
       queue: BlockingQueue[Runnable]): ThreadPoolConfigDispatcherBuilder =
     withNewThreadPoolWithCustomBlockingQueue(reusableQueue(queue))
 
-  def withNewThreadPoolWithLinkedBlockingQueueWithUnboundedCapacity: ThreadPoolConfigDispatcherBuilder =
-    this.copy(config = config.copy(queueFactory = linkedBlockingQueue(),
-                                   flowHandler = defaultFlowHandler))
+  def withNewThreadPoolWithLinkedBlockingQueueWithUnboundedCapacity
+    : ThreadPoolConfigDispatcherBuilder =
+    this.copy(
+      config = config.copy(
+        queueFactory = linkedBlockingQueue(),
+        flowHandler = defaultFlowHandler))
 
   def withNewThreadPoolWithLinkedBlockingQueueWithCapacity(
       capacity: Int): ThreadPoolConfigDispatcherBuilder =
     this.copy(
-        config = config.copy(queueFactory = linkedBlockingQueue(capacity),
-                             flowHandler = defaultFlowHandler))
+      config = config.copy(
+        queueFactory = linkedBlockingQueue(capacity),
+        flowHandler = defaultFlowHandler))
 
   def withNewThreadPoolWithSynchronousQueueWithFairness(
       fair: Boolean): ThreadPoolConfigDispatcherBuilder =
-    this.copy(config = config.copy(queueFactory = synchronousQueue(fair),
-                                   flowHandler = defaultFlowHandler))
+    this.copy(
+      config = config.copy(
+        queueFactory = synchronousQueue(fair),
+        flowHandler = defaultFlowHandler))
 
   def withNewThreadPoolWithArrayBlockingQueueWithCapacityAndFairness(
-      capacity: Int, fair: Boolean): ThreadPoolConfigDispatcherBuilder =
+      capacity: Int,
+      fair: Boolean): ThreadPoolConfigDispatcherBuilder =
     this.copy(
-        config = config.copy(queueFactory = arrayBlockingQueue(capacity, fair),
-                             flowHandler = defaultFlowHandler))
+      config = config.copy(
+        queueFactory = arrayBlockingQueue(capacity, fair),
+        flowHandler = defaultFlowHandler))
 
   def setCorePoolSize(size: Int): ThreadPoolConfigDispatcherBuilder =
     this.copy(config = config.copy(corePoolSize = size))
@@ -184,10 +201,11 @@ case class ThreadPoolConfigDispatcherBuilder(
     this.copy(config = config.copy(allowCorePoolTimeout = allow))
 
   def configure(
-      fs: Option[Function[ThreadPoolConfigDispatcherBuilder,
-                          ThreadPoolConfigDispatcherBuilder]]*)
+      fs: Option[Function[
+        ThreadPoolConfigDispatcherBuilder,
+        ThreadPoolConfigDispatcherBuilder]]*)
     : ThreadPoolConfigDispatcherBuilder =
-    fs.foldLeft(this)((c, f) => f.map(_ (c)).getOrElse(c))
+    fs.foldLeft(this)((c, f) => f.map(_(c)).getOrElse(c))
 }
 
 /**
@@ -215,10 +233,10 @@ object MonitorableThread {
   */
 class MonitorableThread(runnable: Runnable, name: String)
     extends Thread(
-        runnable, name + "-" + MonitorableThread.created.incrementAndGet) {
+      runnable,
+      name + "-" + MonitorableThread.created.incrementAndGet) {
 
-  setUncaughtExceptionHandler(
-      new Thread.UncaughtExceptionHandler() {
+  setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
     def uncaughtException(thread: Thread, cause: Throwable) = {}
   })
 
@@ -242,8 +260,7 @@ class BoundedExecutorDecorator(val executor: ExecutorService, bound: Int)
   override def execute(command: Runnable) = {
     semaphore.acquire
     try {
-      executor.execute(
-          new Runnable() {
+      executor.execute(new Runnable() {
         def run = {
           try {
             command.run
@@ -290,14 +307,18 @@ trait ExecutorServiceDelegate extends ExecutorService {
     executor.invokeAll(callables)
 
   def invokeAll[T](
-      callables: Collection[_ <: Callable[T]], l: Long, timeUnit: TimeUnit) =
+      callables: Collection[_ <: Callable[T]],
+      l: Long,
+      timeUnit: TimeUnit) =
     executor.invokeAll(callables, l, timeUnit)
 
   def invokeAny[T](callables: Collection[_ <: Callable[T]]) =
     executor.invokeAny(callables)
 
   def invokeAny[T](
-      callables: Collection[_ <: Callable[T]], l: Long, timeUnit: TimeUnit) =
+      callables: Collection[_ <: Callable[T]],
+      l: Long,
+      timeUnit: TimeUnit) =
     executor.invokeAny(callables, l, timeUnit)
 }
 

@@ -54,11 +54,12 @@ abstract class Updater extends Serializable {
     * @return A tuple of 2 elements. The first element is a column matrix containing updated weights,
     *         and the second element is the regularization value computed using updated weights.
     */
-  def compute(weightsOld: Vector,
-              gradient: Vector,
-              stepSize: Double,
-              iter: Int,
-              regParam: Double): (Vector, Double)
+  def compute(
+      weightsOld: Vector,
+      gradient: Vector,
+      stepSize: Double,
+      iter: Int,
+      regParam: Double): (Vector, Double)
 }
 
 /**
@@ -68,11 +69,12 @@ abstract class Updater extends Serializable {
   */
 @DeveloperApi
 class SimpleUpdater extends Updater {
-  override def compute(weightsOld: Vector,
-                       gradient: Vector,
-                       stepSize: Double,
-                       iter: Int,
-                       regParam: Double): (Vector, Double) = {
+  override def compute(
+      weightsOld: Vector,
+      gradient: Vector,
+      stepSize: Double,
+      iter: Int,
+      regParam: Double): (Vector, Double) = {
     val thisIterStepSize = stepSize / math.sqrt(iter)
     val brzWeights: BV[Double] = weightsOld.toBreeze.toDenseVector
     brzAxpy(-thisIterStepSize, gradient.toBreeze, brzWeights)
@@ -102,11 +104,12 @@ class SimpleUpdater extends Updater {
   */
 @DeveloperApi
 class L1Updater extends Updater {
-  override def compute(weightsOld: Vector,
-                       gradient: Vector,
-                       stepSize: Double,
-                       iter: Int,
-                       regParam: Double): (Vector, Double) = {
+  override def compute(
+      weightsOld: Vector,
+      gradient: Vector,
+      stepSize: Double,
+      iter: Int,
+      regParam: Double): (Vector, Double) = {
     val thisIterStepSize = stepSize / math.sqrt(iter)
     // Take gradient step
     val brzWeights: BV[Double] = weightsOld.toBreeze.toDenseVector
@@ -133,11 +136,12 @@ class L1Updater extends Updater {
   */
 @DeveloperApi
 class SquaredL2Updater extends Updater {
-  override def compute(weightsOld: Vector,
-                       gradient: Vector,
-                       stepSize: Double,
-                       iter: Int,
-                       regParam: Double): (Vector, Double) = {
+  override def compute(
+      weightsOld: Vector,
+      gradient: Vector,
+      stepSize: Double,
+      iter: Int,
+      regParam: Double): (Vector, Double) = {
     // add up both updates from the gradient of the loss (= step) as well as
     // the gradient of the regularizer (= regParam * weightsOld)
     // w' = w - thisIterStepSize * (gradient + regParam * w)

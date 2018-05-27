@@ -4,9 +4,11 @@ package std
 import algebra.Eq
 
 trait OptionInstances extends OptionInstances1 {
-  implicit val optionInstance: Traverse[Option] with MonadCombine[Option] with CoflatMap[
-      Option] with Alternative[Option] = new Traverse[Option]
-  with MonadCombine[Option] with CoflatMap[Option] with Alternative[Option] {
+  implicit val optionInstance: Traverse[Option]
+    with MonadCombine[Option]
+    with CoflatMap[Option]
+    with Alternative[Option] = new Traverse[Option] with MonadCombine[Option]
+  with CoflatMap[Option] with Alternative[Option] {
 
     def empty[A]: Option[A] = None
 
@@ -29,21 +31,21 @@ trait OptionInstances extends OptionInstances1 {
 
     def foldLeft[A, B](fa: Option[A], b: B)(f: (B, A) => B): B =
       fa match {
-        case None => b
+        case None    => b
         case Some(a) => f(b, a)
       }
 
-    def foldRight[A, B](
-        fa: Option[A], lb: Eval[B])(f: (A, Eval[B]) => Eval[B]): Eval[B] =
+    def foldRight[A, B](fa: Option[A], lb: Eval[B])(
+        f: (A, Eval[B]) => Eval[B]): Eval[B] =
       fa match {
-        case None => lb
+        case None    => lb
         case Some(a) => f(a, lb)
       }
 
     def traverse[G[_]: Applicative, A, B](fa: Option[A])(
         f: A => G[B]): G[Option[B]] =
       fa match {
-        case None => Applicative[G].pure(None)
+        case None    => Applicative[G].pure(None)
         case Some(a) => Applicative[G].map(f(a))(Some(_))
       }
 
@@ -65,7 +67,7 @@ trait OptionInstances extends OptionInstances1 {
           case None => y
           case Some(xx) =>
             y match {
-              case None => x
+              case None     => x
               case Some(yy) => Some(ev.combine(xx, yy))
             }
         }
@@ -78,7 +80,7 @@ trait OptionInstances extends OptionInstances1 {
           case Some(a) =>
             y match {
               case Some(b) => ev.compare(a, b)
-              case None => 1
+              case None    => 1
             }
           case None =>
             if (y.isDefined) -1 else 0
@@ -89,7 +91,7 @@ trait OptionInstances extends OptionInstances1 {
     new Show[Option[A]] {
       def show(fa: Option[A]): String = fa match {
         case Some(a) => s"Some(${A.show(a)})"
-        case None => "None"
+        case None    => "None"
       }
     }
 }
@@ -99,8 +101,8 @@ private[std] sealed trait OptionInstances1 extends OptionInstances2 {
       implicit ev: PartialOrder[A]): PartialOrder[Option[A]] =
     new PartialOrder[Option[A]] {
       def partialCompare(x: Option[A], y: Option[A]): Double =
-        x.fold(if (y.isDefined) -1.0 else 0.0)(
-            a => y.fold(1.0)(ev.partialCompare(_, a)))
+        x.fold(if (y.isDefined) -1.0 else 0.0)(a =>
+          y.fold(1.0)(ev.partialCompare(_, a)))
     }
 }
 

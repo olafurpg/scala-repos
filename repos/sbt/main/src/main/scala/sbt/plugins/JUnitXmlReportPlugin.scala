@@ -25,6 +25,6 @@ object JUnitXmlReportPlugin extends AutoPlugin {
   // Right now we add to the global test listeners which should capture *all* tests.
   // It might be a good idea to derive this setting into specific test scopes.
   override lazy val projectSettings: Seq[Setting[_]] = Seq(
-      testListeners += new JUnitXmlTestsListener(target.value.getAbsolutePath)
+    testListeners += new JUnitXmlTestsListener(target.value.getAbsolutePath)
   )
 }

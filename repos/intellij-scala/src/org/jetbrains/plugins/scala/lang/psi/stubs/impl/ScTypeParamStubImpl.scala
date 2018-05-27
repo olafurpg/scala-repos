@@ -19,7 +19,8 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 class ScTypeParamStubImpl[ParentPsi <: PsiElement](
     parent: StubElement[ParentPsi],
     elemType: IStubElementType[
-        _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
+      _ <: StubElement[_ <: PsiElement],
+      _ <: PsiElement])
     extends StubBaseWrapper[ScTypeParam](parent, elemType)
     with ScTypeParamStub {
   private var name: StringRef = _
@@ -39,23 +40,25 @@ class ScTypeParamStubImpl[ParentPsi <: PsiElement](
 
   def getName: String = StringRef.toString(name)
 
-  def this(parent: StubElement[ParentPsi],
-           elemType: IStubElementType[
-               _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
-           name: StringRef,
-           upperText: StringRef,
-           lowerText: StringRef,
-           viewText: Seq[StringRef],
-           contextBoundText: Seq[StringRef],
-           covariant: Boolean,
-           contravariant: Boolean,
-           position: Int,
-           fileName: StringRef,
-           typeParameterText: StringRef) {
+  def this(
+      parent: StubElement[ParentPsi],
+      elemType: IStubElementType[
+        _ <: StubElement[_ <: PsiElement],
+        _ <: PsiElement],
+      name: StringRef,
+      upperText: StringRef,
+      lowerText: StringRef,
+      viewText: Seq[StringRef],
+      contextBoundText: Seq[StringRef],
+      covariant: Boolean,
+      contravariant: Boolean,
+      position: Int,
+      fileName: StringRef,
+      typeParameterText: StringRef) {
     this(
-        parent,
-        elemType
-          .asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
+      parent,
+      elemType
+        .asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
     this.name = name
     this.upperText = upperText
     this.lowerText = lowerText
@@ -83,15 +86,15 @@ class ScTypeParamStubImpl[ParentPsi <: PsiElement](
       val lowerTypeElement = lowerElement.get
       if (lowerTypeElement != null &&
           (lowerTypeElement.isEmpty ||
-              (lowerTypeElement.get.getContext eq getPsi))) {
+          (lowerTypeElement.get.getContext eq getPsi))) {
         return lowerTypeElement
       }
     }
     val res: Option[ScTypeElement] =
       if (getLowerText != "")
         Some(
-            ScalaPsiElementFactory.createTypeElementFromText(
-                getLowerText, getPsi, null))
+          ScalaPsiElementFactory
+            .createTypeElementFromText(getLowerText, getPsi, null))
       else None
     lowerElement = new SofterReference[Option[ScTypeElement]](res)
     res
@@ -102,15 +105,15 @@ class ScTypeParamStubImpl[ParentPsi <: PsiElement](
       val upperTypeElement = upperElement.get
       if (upperTypeElement != null &&
           (upperTypeElement.isEmpty ||
-              (upperTypeElement.get.getContext eq getPsi))) {
+          (upperTypeElement.get.getContext eq getPsi))) {
         return upperTypeElement
       }
     }
     val res: Option[ScTypeElement] =
       if (getUpperText != "")
         Some(
-            ScalaPsiElementFactory.createTypeElementFromText(
-                getUpperText, getPsi, null))
+          ScalaPsiElementFactory
+            .createTypeElementFromText(getUpperText, getPsi, null))
       else None
     upperElement = new SofterReference[Option[ScTypeElement]](res)
     res
@@ -130,7 +133,7 @@ class ScTypeParamStubImpl[ParentPsi <: PsiElement](
         return viewTypeElements
     }
     val res: Seq[ScTypeElement] = getViewText.map(
-        ScalaPsiElementFactory.createTypeElementFromText(_, getPsi, null))
+      ScalaPsiElementFactory.createTypeElementFromText(_, getPsi, null))
     viewElement = new SofterReference(res)
     res
   }
@@ -143,7 +146,7 @@ class ScTypeParamStubImpl[ParentPsi <: PsiElement](
         return contextTypeElements
     }
     val res: Seq[ScTypeElement] = getContextBoundText.map(
-        ScalaPsiElementFactory.createTypeElementFromText(_, getPsi, null))
+      ScalaPsiElementFactory.createTypeElementFromText(_, getPsi, null))
     contextBoundElement = new SofterReference(res)
     res
   }

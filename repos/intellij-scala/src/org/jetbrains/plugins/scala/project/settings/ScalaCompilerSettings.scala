@@ -43,35 +43,38 @@ class ScalaCompilerSettings(state: ScalaCompilerSettingsState) {
   var plugins: Seq[String] = _
 
   private val ToggleOptions: Seq[(String, () => Boolean, Boolean => Unit)] =
-    Seq(("-language:dynamics", () => dynamics, dynamics = _),
-        ("-language:postfixOps", () => postfixOps, postfixOps = _),
-        ("-language:reflectiveCalls",
-         () => reflectiveCalls,
-         reflectiveCalls = _),
-        ("-language:implicitConversions",
-         () => implicitConversions,
-         implicitConversions = _),
-        ("-language:higherKinds", () => higherKinds, higherKinds = _),
-        ("-language:existentials", () => existentials, existentials = _),
-        ("-language:experimental.macros", () => macros, macros = _),
-        ("-Xexperimental", () => experimental, experimental = _),
-        ("-nowarn", () => !warnings, (b: Boolean) => warnings = !b),
-        ("-deprecation", () => deprecationWarnings, deprecationWarnings = _),
-        ("-unchecked", () => uncheckedWarnings, uncheckedWarnings = _),
-        ("-feature", () => featureWarnings, featureWarnings = _),
-        ("-optimise", () => optimiseBytecode, optimiseBytecode = _),
-        ("-explaintypes", () => explainTypeErrors, explainTypeErrors = _),
-        ("-no-specialization",
-         () => !specialization,
-         (b: Boolean) => specialization = !b),
-        ("-P:continuations:enable", () => continuations, continuations = _))
+    Seq(
+      ("-language:dynamics", () => dynamics, dynamics = _),
+      ("-language:postfixOps", () => postfixOps, postfixOps = _),
+      ("-language:reflectiveCalls", () => reflectiveCalls, reflectiveCalls = _),
+      (
+        "-language:implicitConversions",
+        () => implicitConversions,
+        implicitConversions = _),
+      ("-language:higherKinds", () => higherKinds, higherKinds = _),
+      ("-language:existentials", () => existentials, existentials = _),
+      ("-language:experimental.macros", () => macros, macros = _),
+      ("-Xexperimental", () => experimental, experimental = _),
+      ("-nowarn", () => !warnings, (b: Boolean) => warnings = !b),
+      ("-deprecation", () => deprecationWarnings, deprecationWarnings = _),
+      ("-unchecked", () => uncheckedWarnings, uncheckedWarnings = _),
+      ("-feature", () => featureWarnings, featureWarnings = _),
+      ("-optimise", () => optimiseBytecode, optimiseBytecode = _),
+      ("-explaintypes", () => explainTypeErrors, explainTypeErrors = _),
+      (
+        "-no-specialization",
+        () => !specialization,
+        (b: Boolean) => specialization = !b),
+      ("-P:continuations:enable", () => continuations, continuations = _)
+    )
 
   private val DebuggingOptions: Map[String, DebuggingInfoLevel] = Map(
-      "-g:none" -> DebuggingInfoLevel.None,
-      "-g:source" -> DebuggingInfoLevel.Source,
-      "-g:line" -> DebuggingInfoLevel.Line,
-      "-g:vars" -> DebuggingInfoLevel.Vars,
-      "-g:notailcalls" -> DebuggingInfoLevel.Notailcalls)
+    "-g:none" -> DebuggingInfoLevel.None,
+    "-g:source" -> DebuggingInfoLevel.Source,
+    "-g:line" -> DebuggingInfoLevel.Line,
+    "-g:vars" -> DebuggingInfoLevel.Vars,
+    "-g:notailcalls" -> DebuggingInfoLevel.Notailcalls
+  )
 
   private val PluginOptionPattern = "-Xplugin:(.+)".r
 
@@ -95,7 +98,10 @@ class ScalaCompilerSettings(state: ScalaCompilerSettingsState) {
 
   def sbtIncOptions =
     SbtIncrementalOptions(
-        nameHashing, recompileOnMacroDef, transitiveStep, recompileAllFraction)
+      nameHashing,
+      recompileOnMacroDef,
+      transitiveStep,
+      recompileAllFraction)
 
   private def initFrom0(options: Seq[String]) {
     val optionToSetter = ToggleOptions.map(it => (it._1, it._3)).toMap

@@ -45,26 +45,33 @@ sealed abstract class Marshaller[-A, +B] {
           (_, newMediaType) match {
             case (WithFixedContentType(_, marshal), newMT: MediaType.Binary) ⇒
               WithFixedContentType(newMT, () ⇒ cto(marshal(), newMT))
-            case (WithFixedContentType(oldCT: ContentType.Binary, marshal),
-                  newMT: MediaType.WithFixedCharset) ⇒
+            case (
+                WithFixedContentType(oldCT: ContentType.Binary, marshal),
+                newMT: MediaType.WithFixedCharset) ⇒
               WithFixedContentType(newMT, () ⇒ cto(marshal(), newMT))
-            case (WithFixedContentType(oldCT: ContentType.NonBinary, marshal),
-                  newMT: MediaType.WithFixedCharset)
+            case (
+                WithFixedContentType(oldCT: ContentType.NonBinary, marshal),
+                newMT: MediaType.WithFixedCharset)
                 if oldCT.charset == newMT.charset ⇒
               WithFixedContentType(newMT, () ⇒ cto(marshal(), newMT))
-            case (WithFixedContentType(oldCT: ContentType.NonBinary, marshal),
-                  newMT: MediaType.WithOpenCharset) ⇒
+            case (
+                WithFixedContentType(oldCT: ContentType.NonBinary, marshal),
+                newMT: MediaType.WithOpenCharset) ⇒
               val newCT = newMT withCharset oldCT.charset
               WithFixedContentType(newCT, () ⇒ cto(marshal(), newCT))
 
-            case (WithOpenCharset(oldMT, marshal),
-                  newMT: MediaType.WithOpenCharset) ⇒
-              WithOpenCharset(newMT,
-                              cs ⇒ cto(marshal(cs), newMT withCharset cs))
-            case (WithOpenCharset(oldMT, marshal),
-                  newMT: MediaType.WithFixedCharset) ⇒
-              WithFixedContentType(newMT,
-                                   () ⇒ cto(marshal(newMT.charset), newMT))
+            case (
+                WithOpenCharset(oldMT, marshal),
+                newMT: MediaType.WithOpenCharset) ⇒
+              WithOpenCharset(
+                newMT,
+                cs ⇒ cto(marshal(cs), newMT withCharset cs))
+            case (
+                WithOpenCharset(oldMT, marshal),
+                newMT: MediaType.WithFixedCharset) ⇒
+              WithFixedContentType(
+                newMT,
+                () ⇒ cto(marshal(newMT.charset), newMT))
 
             case (Opaque(marshal), newMT: MediaType.Binary) ⇒
               WithFixedContentType(newMT, () ⇒ cto(marshal(), newMT))
@@ -73,7 +80,7 @@ sealed abstract class Marshaller[-A, +B] {
 
             case x ⇒
               sys.error(
-                  s"Illegal marshaller wrapping. Marshalling `$x` cannot be wrapped with MediaType `$newMediaType`")
+                s"Illegal marshaller wrapping. Marshalling `$x` cannot be wrapped with MediaType `$newMediaType`")
           }
         }
       }
@@ -88,8 +95,10 @@ sealed abstract class Marshaller[-A, +B] {
 
 //# marshaller-creation
 object Marshaller
-    extends GenericMarshallers with PredefinedToEntityMarshallers
-    with PredefinedToResponseMarshallers with PredefinedToRequestMarshallers {
+    extends GenericMarshallers
+    with PredefinedToEntityMarshallers
+    with PredefinedToResponseMarshallers
+    with PredefinedToRequestMarshallers {
 
   /**
     * Creates a [[Marshaller]] from the given function.
@@ -98,7 +107,8 @@ object Marshaller
     : Marshaller[A, B] =
     new Marshaller[A, B] {
       def apply(value: A)(implicit ec: ExecutionContext) =
-        try f(ec)(value) catch { case NonFatal(e) ⇒ FastFuture.failed(e) }
+        try f(ec)(value)
+        catch { case NonFatal(e) ⇒ FastFuture.failed(e) }
     }
 
   /**
@@ -115,7 +125,7 @@ object Marshaller
     */
   def oneOf[A, B](marshallers: Marshaller[A, B]*): Marshaller[A, B] =
     Marshaller { implicit ec ⇒ a ⇒
-      FastFuture.sequence(marshallers.map(_ (a))).fast.map(_.flatten.toList)
+      FastFuture.sequence(marshallers.map(_(a))).fast.map(_.flatten.toList)
     }
 
   /**
@@ -155,8 +165,8 @@ object Marshaller
     * Helper for creating a [[Marshaller]] combined of the provided `marshal` function
     * and an implicit Marshaller which is able to produce the required final type.
     */
-  def combined[A, B, C](
-      marshal: A ⇒ B)(implicit m2: Marshaller[B, C]): Marshaller[A, C] =
+  def combined[A, B, C](marshal: A ⇒ B)(
+      implicit m2: Marshaller[B, C]): Marshaller[A, C] =
     Marshaller[A, C] { ec ⇒ a ⇒
       m2.compose(marshal).apply(a)(ec)
     }
@@ -176,8 +186,9 @@ object Marshalling {
   /**
     * A Marshalling to a specific [[akka.http.scaladsl.model.ContentType]].
     */
-  final case class WithFixedContentType[A](contentType: ContentType,
-                                           marshal: () ⇒ A)
+  final case class WithFixedContentType[A](
+      contentType: ContentType,
+      marshal: () ⇒ A)
       extends Marshalling[A] {
     def map[B](f: A ⇒ B): WithFixedContentType[B] =
       copy(marshal = () ⇒ f(marshal()))
@@ -186,8 +197,9 @@ object Marshalling {
   /**
     * A Marshalling to a specific [[akka.http.scaladsl.model.MediaType]] with a flexible charset.
     */
-  final case class WithOpenCharset[A](mediaType: MediaType.WithOpenCharset,
-                                      marshal: HttpCharset ⇒ A)
+  final case class WithOpenCharset[A](
+      mediaType: MediaType.WithOpenCharset,
+      marshal: HttpCharset ⇒ A)
       extends Marshalling[A] {
     def map[B](f: A ⇒ B): WithOpenCharset[B] =
       copy(marshal = cs ⇒ f(marshal(cs)))

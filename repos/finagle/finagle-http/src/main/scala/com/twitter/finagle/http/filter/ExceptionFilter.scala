@@ -19,8 +19,9 @@ class ExceptionFilter[REQUEST <: Request]
 
   private val log = Logger("finagle.http")
 
-  def apply(request: REQUEST,
-            service: Service[REQUEST, Response]): Future[Response] = {
+  def apply(
+      request: REQUEST,
+      service: Service[REQUEST, Response]): Future[Response] = {
     try {
       service(request)
     } catch {
@@ -46,7 +47,8 @@ class ExceptionFilter[REQUEST <: Request]
   }
 
   private def respond(
-      request: REQUEST, responseStatus: Status): Future[Response] = {
+      request: REQUEST,
+      responseStatus: Status): Future[Response] = {
     val response = request.response
     response.status = responseStatus
     response.clearContent()

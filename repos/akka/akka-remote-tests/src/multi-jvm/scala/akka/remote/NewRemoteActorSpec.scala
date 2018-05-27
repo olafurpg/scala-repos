@@ -28,14 +28,13 @@ object NewRemoteActorMultiJvmSpec extends MultiNodeConfig {
     }
   }
 
-  commonConfig(debugConfig(on = false).withFallback(ConfigFactory.parseString(
-              "akka.remote.log-remote-lifecycle-events = off")))
+  commonConfig(debugConfig(on = false).withFallback(
+    ConfigFactory.parseString("akka.remote.log-remote-lifecycle-events = off")))
 
   val master = role("master")
   val slave = role("slave")
 
-  deployOn(master,
-           """
+  deployOn(master, """
     /service-hello.remote = "@slave@"
     /service-hello-null.remote = "@slave@"
     /service-hello3.remote = "@slave@"
@@ -48,8 +47,10 @@ class NewRemoteActorMultiJvmNode1 extends NewRemoteActorSpec
 class NewRemoteActorMultiJvmNode2 extends NewRemoteActorSpec
 
 class NewRemoteActorSpec
-    extends MultiNodeSpec(NewRemoteActorMultiJvmSpec) with STMultiNodeSpec
-    with ImplicitSender with DefaultTimeout {
+    extends MultiNodeSpec(NewRemoteActorMultiJvmSpec)
+    with STMultiNodeSpec
+    with ImplicitSender
+    with DefaultTimeout {
   import NewRemoteActorMultiJvmSpec._
 
   def initialParticipants = roles.size
@@ -76,8 +77,9 @@ class NewRemoteActorSpec
     "be locally instantiated on a remote node (with null parameter) and be able to communicate through its RemoteActorRef" in {
 
       runOn(master) {
-        val actor = system.actorOf(Props(classOf[SomeActorWithParam], null),
-                                   "service-hello-null")
+        val actor = system.actorOf(
+          Props(classOf[SomeActorWithParam], null),
+          "service-hello-null")
         actor.isInstanceOf[RemoteActorRef] should ===(true)
         actor.path.address should ===(node(slave).address)
 
@@ -105,7 +107,7 @@ class NewRemoteActorSpec
     }
 
     "be able to shutdown system when using remote deployed actor" in within(
-        20 seconds) {
+      20 seconds) {
       runOn(master) {
         val actor = system.actorOf(Props[SomeActor], "service-hello3")
         actor.isInstanceOf[RemoteActorRef] should ===(true)

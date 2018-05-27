@@ -34,7 +34,7 @@ class DecompilerTest extends TestCase {
       .slurp()
       .replace("\r", "")
 
-      (Decompiler.decompile(fileName, bytes): @unchecked) match {
+    (Decompiler.decompile(fileName, bytes): @unchecked) match {
       case Some((_, text)) =>
         Assert.assertEquals(expectedResult, text)
     }

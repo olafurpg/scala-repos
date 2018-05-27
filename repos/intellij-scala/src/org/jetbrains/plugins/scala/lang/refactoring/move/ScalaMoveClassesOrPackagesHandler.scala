@@ -10,8 +10,15 @@ import com.intellij.openapi.ui.{DialogWrapper, Messages}
 import com.intellij.psi.{PsiClass, PsiDirectory, PsiElement}
 import com.intellij.refactoring.move.MoveCallback
 import com.intellij.refactoring.move.moveClassesOrPackages._
-import com.intellij.refactoring.util.{CommonRefactoringUtil, TextOccurrencesUtil}
-import com.intellij.refactoring.{HelpID, JavaRefactoringSettings, MoveDestination}
+import com.intellij.refactoring.util.{
+  CommonRefactoringUtil,
+  TextOccurrencesUtil
+}
+import com.intellij.refactoring.{
+  HelpID,
+  JavaRefactoringSettings,
+  MoveDestination
+}
 import org.jetbrains.annotations.{NotNull, Nullable}
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinition
@@ -24,14 +31,15 @@ import org.jetbrains.plugins.scala.settings.ScalaApplicationSettings
   */
 class ScalaMoveClassesOrPackagesHandler
     extends JavaMoveClassesOrPackagesHandler {
-  override def doMove(project: Project,
-                      elements: Array[PsiElement],
-                      targetContainer: PsiElement,
-                      callback: MoveCallback) {
+  override def doMove(
+      project: Project,
+      elements: Array[PsiElement],
+      targetContainer: PsiElement,
+      callback: MoveCallback) {
     def refactoringIsNotSupported() {
       Messages.showErrorDialog(
-          ScalaBundle.message("move.to.inner.is.not.supported"),
-          ScalaBundle.message("move.to.inner.is.not.supported.title"))
+        ScalaBundle.message("move.to.inner.is.not.supported"),
+        ScalaBundle.message("move.to.inner.is.not.supported.title"))
     }
     targetContainer match {
       case td: ScTypeDefinition =>
@@ -50,7 +58,8 @@ class ScalaMoveClassesOrPackagesHandler
   }
 
   override def canMove(
-      elements: Array[PsiElement], targetContainer: PsiElement): Boolean = {
+      elements: Array[PsiElement],
+      targetContainer: PsiElement): Boolean = {
     //sort of hack to save destinations here, need to be sure that it is called
     val scalaElements =
       elements.filter(_.getLanguage.isInstanceOf[ScalaLanguage])
@@ -71,24 +80,29 @@ class ScalaMoveClassesOrPackagesHandler
 
     import scala.collection.JavaConversions._
     if (!CommonRefactoringUtil.checkReadOnlyStatusRecursively(
-            project, adjustedElements.toSeq, true)) {
+          project,
+          adjustedElements.toSeq,
+          true)) {
       return
     }
     val initialTargetPackageName: String =
       MoveClassesOrPackagesImpl.getInitialTargetPackageName(
-          initialTargetElement, adjustedElements)
+        initialTargetElement,
+        adjustedElements)
     val initialTargetDirectory: PsiDirectory =
       MoveClassesOrPackagesImpl.getInitialTargetDirectory(
-          initialTargetElement, adjustedElements)
+        initialTargetElement,
+        adjustedElements)
     val isTargetDirectoryFixed: Boolean = initialTargetDirectory == null
-    val searchTextOccurences: Boolean = adjustedElements.exists(
-        TextOccurrencesUtil.isSearchTextOccurencesEnabled)
+    val searchTextOccurences: Boolean =
+      adjustedElements.exists(TextOccurrencesUtil.isSearchTextOccurencesEnabled)
     val moveDialog: MoveClassesOrPackagesDialog =
-      new MoveClassesOrPackagesDialog(project,
-                                      searchTextOccurences,
-                                      adjustedElements,
-                                      initialTargetElement,
-                                      moveCallback) {
+      new MoveClassesOrPackagesDialog(
+        project,
+        searchTextOccurences,
+        adjustedElements,
+        initialTargetElement,
+        moveCallback) {
         override def createCenterPanel(): JComponent = {
           addMoveCompanionChb(super.createCenterPanel(), adjustedElements)
         }
@@ -98,26 +112,29 @@ class ScalaMoveClassesOrPackagesHandler
             elementsToMove: Array[PsiElement],
             callback: MoveCallback): MoveClassesOrPackagesProcessor = {
 
-          new ScalaMoveClassesOrPackagesProcessor(project,
-                                                  elementsToMove,
-                                                  destination,
-                                                  isSearchInComments,
-                                                  searchTextOccurences,
-                                                  callback)
+          new ScalaMoveClassesOrPackagesProcessor(
+            project,
+            elementsToMove,
+            destination,
+            isSearchInComments,
+            searchTextOccurences,
+            callback)
         }
       }
     val searchInComments: Boolean =
       JavaRefactoringSettings.getInstance.MOVE_SEARCH_IN_COMMENTS
     val searchForTextOccurences: Boolean =
       JavaRefactoringSettings.getInstance.MOVE_SEARCH_FOR_TEXT
-    moveDialog.setData(adjustedElements,
-                       initialTargetPackageName,
-                       initialTargetDirectory,
-                       isTargetDirectoryFixed,
-                       initialTargetElement == null,
-                       searchInComments,
-                       searchForTextOccurences,
-                       HelpID.getMoveHelpID(adjustedElements(0)))
+    moveDialog.setData(
+      adjustedElements,
+      initialTargetPackageName,
+      initialTargetDirectory,
+      isTargetDirectoryFixed,
+      initialTargetElement == null,
+      searchInComments,
+      searchForTextOccurences,
+      HelpID.getMoveHelpID(adjustedElements(0))
+    )
     moveDialog.show()
   }
 
@@ -127,7 +144,9 @@ class ScalaMoveClassesOrPackagesHandler
       elementsToMove: Array[PsiElement],
       moveCallback: MoveCallback): DialogWrapper = {
     new MoveClassesOrPackagesToNewDirectoryDialog(
-        directory, elementsToMove, moveCallback) {
+      directory,
+      elementsToMove,
+      moveCallback) {
       protected override def createCenterPanel(): JComponent = {
         addMoveCompanionChb(super.createCenterPanel(), elementsToMove)
       }
@@ -140,12 +159,13 @@ class ScalaMoveClassesOrPackagesHandler
           searchInNonJavaFiles: Boolean,
           moveCallback: MoveCallback): MoveClassesOrPackagesProcessor = {
 
-        new ScalaMoveClassesOrPackagesProcessor(project,
-                                                elements,
-                                                moveDestination,
-                                                searchInComments,
-                                                searchInNonJavaFiles,
-                                                moveCallback)
+        new ScalaMoveClassesOrPackagesProcessor(
+          project,
+          elements,
+          moveDestination,
+          searchInComments,
+          searchInNonJavaFiles,
+          moveCallback)
       }
     }
   }
@@ -161,13 +181,13 @@ class ScalaMoveClassesOrPackagesHandler
       val result = new JPanel(new BorderLayout())
       if (panel != null) result.add(panel, BorderLayout.NORTH)
       val chbMoveCompanion = new JCheckBox(
-          ScalaBundle.message("move.with.companion"))
+        ScalaBundle.message("move.with.companion"))
       chbMoveCompanion.setSelected(
-          ScalaApplicationSettings.getInstance().MOVE_COMPANION)
-      chbMoveCompanion.addActionListener(
-          new ActionListener {
+        ScalaApplicationSettings.getInstance().MOVE_COMPANION)
+      chbMoveCompanion.addActionListener(new ActionListener {
         def actionPerformed(e: ActionEvent) {
-          ScalaApplicationSettings.getInstance().MOVE_COMPANION = chbMoveCompanion.isSelected
+          ScalaApplicationSettings.getInstance().MOVE_COMPANION =
+            chbMoveCompanion.isSelected
         }
       })
       chbMoveCompanion.setMnemonic('t')

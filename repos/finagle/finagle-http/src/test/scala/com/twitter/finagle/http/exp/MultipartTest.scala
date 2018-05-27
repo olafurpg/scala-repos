@@ -3,7 +3,13 @@ package com.twitter.finagle.http.exp
 import org.junit.runner.RunWith
 import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
-import com.twitter.finagle.http.{FileElement, Request, RequestBuilder, SimpleElement, Method}
+import com.twitter.finagle.http.{
+  FileElement,
+  Request,
+  RequestBuilder,
+  SimpleElement,
+  Method
+}
 import com.twitter.io.{Files, Buf}
 
 @RunWith(classOf[JUnitRunner])
@@ -22,8 +28,8 @@ class MultipartTest extends FunSuite {
   private[this] def newRequest(buf: Buf): Request =
     RequestBuilder()
       .url("http://example.com")
-      .add(FileElement(
-              "groups", buf, Some("image/gif"), Some("dealwithit.gif")))
+      .add(
+        FileElement("groups", buf, Some("image/gif"), Some("dealwithit.gif")))
       .add(SimpleElement("type", "text"))
       .buildFormPost(multipart = true)
 
@@ -33,17 +39,18 @@ class MultipartTest extends FunSuite {
     req.contentString = "abc=foo&def=123&abc=bar"
 
     assert(
-        req.multipart == Some(
-            Multipart(Map(
-                          "abc" -> Seq("foo", "bar"),
-                          "def" -> Seq("123")
-                      ),
-                      Map.empty[String, Seq[Multipart.FileUpload]])))
+      req.multipart == Some(
+        Multipart(
+          Map(
+            "abc" -> Seq("foo", "bar"),
+            "def" -> Seq("123")
+          ),
+          Map.empty[String, Seq[Multipart.FileUpload]])))
   }
 
   test("Attribute") {
     assert(
-        newRequest(Buf.Empty).multipart.get.attributes("type").head == "text")
+      newRequest(Buf.Empty).multipart.get.attributes("type").head == "text")
   }
 
   test("FileUpload (in-memory)") {
@@ -51,7 +58,10 @@ class MultipartTest extends FunSuite {
     val multipart = newRequest(foo).multipart.get
 
     val Multipart.InMemoryFileUpload(
-    buf, contentType, fileName, contentTransferEncoding) =
+      buf,
+      contentType,
+      fileName,
+      contentTransferEncoding) =
       multipart.files("groups").head
     val attr = multipart.attributes("type").head
 
@@ -68,12 +78,15 @@ class MultipartTest extends FunSuite {
     val multipart = newRequest(foo).multipart.get
 
     val Multipart.OnDiskFileUpload(
-    file, contentType, fileName, contentTransferEncoding) =
+      file,
+      contentType,
+      fileName,
+      contentTransferEncoding) =
       multipart.files("groups").head
     val attr = multipart.attributes("type").head
 
     assert(
-        Buf.ByteArray.Owned(Files.readBytes(file, limit = Int.MaxValue)) == foo)
+      Buf.ByteArray.Owned(Files.readBytes(file, limit = Int.MaxValue)) == foo)
     assert(contentType == "image/gif")
     assert(fileName == "dealwithit.gif")
     assert(contentTransferEncoding == "binary")

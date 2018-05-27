@@ -36,8 +36,8 @@ final class OptimizerOptions private (
 ) {
 
   @deprecated(
-      "Bypassing linking errors will not be possible in the next major version.",
-      "0.6.6")
+    "Bypassing linking errors will not be possible in the next major version.",
+    "0.6.6")
   def withBypassLinkingErrors(bypassLinkingErrors: Boolean): OptimizerOptions =
     copy(bypassLinkingErrors = bypassLinkingErrors)
 
@@ -60,20 +60,22 @@ final class OptimizerOptions private (
   def withUseClosureCompiler(useClosureCompiler: Boolean): OptimizerOptions =
     copy(useClosureCompiler = useClosureCompiler)
 
-  private def copy(bypassLinkingErrors: Boolean = bypassLinkingErrors,
-                   parallel: Boolean = parallel,
-                   batchMode: Boolean = batchMode,
-                   disableOptimizer: Boolean = disableOptimizer,
-                   prettyPrintFullOptJS: Boolean = prettyPrintFullOptJS,
-                   checkScalaJSIR: Boolean = checkScalaJSIR,
-                   useClosureCompiler: Boolean = useClosureCompiler) = {
-    new OptimizerOptions(bypassLinkingErrors,
-                         parallel,
-                         batchMode,
-                         disableOptimizer,
-                         prettyPrintFullOptJS,
-                         checkScalaJSIR,
-                         useClosureCompiler)
+  private def copy(
+      bypassLinkingErrors: Boolean = bypassLinkingErrors,
+      parallel: Boolean = parallel,
+      batchMode: Boolean = batchMode,
+      disableOptimizer: Boolean = disableOptimizer,
+      prettyPrintFullOptJS: Boolean = prettyPrintFullOptJS,
+      checkScalaJSIR: Boolean = checkScalaJSIR,
+      useClosureCompiler: Boolean = useClosureCompiler) = {
+    new OptimizerOptions(
+      bypassLinkingErrors,
+      parallel,
+      batchMode,
+      disableOptimizer,
+      prettyPrintFullOptJS,
+      checkScalaJSIR,
+      useClosureCompiler)
   }
 
   override def toString: String = {

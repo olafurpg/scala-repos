@@ -8,8 +8,9 @@ import slick.util.ConfigExtensionMethods._
 
 /** A JdbcDataSource for a HikariCP connection pool.
   * See `slick.jdbc.JdbcBackend#Database.forConfig` for documentation on the config parameters. */
-class HikariCPJdbcDataSource(val ds: com.zaxxer.hikari.HikariDataSource,
-                             val hconf: com.zaxxer.hikari.HikariConfig)
+class HikariCPJdbcDataSource(
+    val ds: com.zaxxer.hikari.HikariDataSource,
+    val hconf: com.zaxxer.hikari.HikariConfig)
     extends JdbcDataSource {
   def createConnection(): Connection = ds.getConnection()
   def close(): Unit = ds.close()
@@ -18,13 +19,14 @@ class HikariCPJdbcDataSource(val ds: com.zaxxer.hikari.HikariDataSource,
 object HikariCPJdbcDataSource extends JdbcDataSourceFactory {
   import com.zaxxer.hikari._
 
-  def forConfig(c: Config,
-                driver: Driver,
-                name: String,
-                classLoader: ClassLoader): HikariCPJdbcDataSource = {
+  def forConfig(
+      c: Config,
+      driver: Driver,
+      name: String,
+      classLoader: ClassLoader): HikariCPJdbcDataSource = {
     if (driver ne null)
       throw new SlickException(
-          "An explicit Driver object is not supported by HikariCPJdbcDataSource")
+        "An explicit Driver object is not supported by HikariCPJdbcDataSource")
     val hconf = new HikariConfig()
 
     // Connection settings
@@ -45,9 +47,9 @@ object HikariCPJdbcDataSource extends JdbcDataSourceFactory {
     hconf.setIdleTimeout(c.getMillisecondsOr("idleTimeout", 600000))
     hconf.setMaxLifetime(c.getMillisecondsOr("maxLifetime", 1800000))
     hconf.setLeakDetectionThreshold(
-        c.getMillisecondsOr("leakDetectionThreshold", 0))
+      c.getMillisecondsOr("leakDetectionThreshold", 0))
     hconf.setInitializationFailFast(
-        c.getBooleanOr("initializationFailFast", false))
+      c.getBooleanOr("initializationFailFast", false))
     c.getStringOpt("connectionTestQuery").foreach(hconf.setConnectionTestQuery)
     c.getStringOpt("connectionInitSql").foreach(hconf.setConnectionInitSql)
     val numThreads = c.getIntOr("numThreads", 20)

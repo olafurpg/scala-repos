@@ -27,29 +27,34 @@ private[scheduler] class DAGSchedulerSource(val dagScheduler: DAGScheduler)
   override val sourceName = "DAGScheduler"
 
   metricRegistry.register(
-      MetricRegistry.name("stage", "failedStages"), new Gauge[Int] {
-    override def getValue: Int = dagScheduler.failedStages.size
-  })
+    MetricRegistry.name("stage", "failedStages"),
+    new Gauge[Int] {
+      override def getValue: Int = dagScheduler.failedStages.size
+    })
 
   metricRegistry.register(
-      MetricRegistry.name("stage", "runningStages"), new Gauge[Int] {
-    override def getValue: Int = dagScheduler.runningStages.size
-  })
+    MetricRegistry.name("stage", "runningStages"),
+    new Gauge[Int] {
+      override def getValue: Int = dagScheduler.runningStages.size
+    })
 
   metricRegistry.register(
-      MetricRegistry.name("stage", "waitingStages"), new Gauge[Int] {
-    override def getValue: Int = dagScheduler.waitingStages.size
-  })
+    MetricRegistry.name("stage", "waitingStages"),
+    new Gauge[Int] {
+      override def getValue: Int = dagScheduler.waitingStages.size
+    })
 
   metricRegistry.register(
-      MetricRegistry.name("job", "allJobs"), new Gauge[Int] {
-    override def getValue: Int = dagScheduler.numTotalJobs
-  })
+    MetricRegistry.name("job", "allJobs"),
+    new Gauge[Int] {
+      override def getValue: Int = dagScheduler.numTotalJobs
+    })
 
   metricRegistry.register(
-      MetricRegistry.name("job", "activeJobs"), new Gauge[Int] {
-    override def getValue: Int = dagScheduler.activeJobs.size
-  })
+    MetricRegistry.name("job", "activeJobs"),
+    new Gauge[Int] {
+      override def getValue: Int = dagScheduler.activeJobs.size
+    })
 
   /** Timer that tracks the time to process messages in the DAGScheduler's event loop */
   val messageProcessingTimer: Timer =

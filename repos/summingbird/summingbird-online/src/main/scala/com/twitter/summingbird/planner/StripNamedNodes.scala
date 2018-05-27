@@ -37,22 +37,22 @@ object StripNamedNode {
   private def irreducible[P <: Platform[P]](
       node: Producer[P, Any]): Option[Any] =
     node match {
-      case Source(src) => Some(src)
-      case OptionMappedProducer(_, fn) => Some(fn)
-      case FlatMappedProducer(_, fn) => Some(fn)
+      case Source(src)                    => Some(src)
+      case OptionMappedProducer(_, fn)    => Some(fn)
+      case FlatMappedProducer(_, fn)      => Some(fn)
       case ValueFlatMappedProducer(_, fn) => Some(fn)
-      case KeyFlatMappedProducer(_, fn) => Some(fn)
-      case LeftJoinedProducer(_, serv) => Some(serv)
-      case Summer(_, store, semi) => Some((store, semi))
-      case WrittenProducer(_, sink) => Some(sink)
+      case KeyFlatMappedProducer(_, fn)   => Some(fn)
+      case LeftJoinedProducer(_, serv)    => Some(serv)
+      case Summer(_, store, semi)         => Some((store, semi))
+      case WrittenProducer(_, sink)       => Some(sink)
       // The following have nothing to put options on:
-      case AlsoProducer(_, producer) => None
-      case NamedProducer(producer, _) => None
+      case AlsoProducer(_, producer)       => None
+      case NamedProducer(producer, _)      => None
       case IdentityKeyedProducer(producer) => None
-      case MergedProducer(l, r) => None
+      case MergedProducer(l, r)            => None
       case _ =>
         sys.error(
-            "Unreachable. Here to warn us if we add Producer subclasses but forget to update this")
+          "Unreachable. Here to warn us if we add Producer subclasses but forget to update this")
     }
 
   def apply[P <: Platform[P], T](tail: TailProducer[P, T])
@@ -96,7 +96,7 @@ object StripNamedNode {
           case None =>
             val newLine = "\n"
             sys.error(
-                s"Node $n in the new node has no corresponding node in the original graph: ${tail}.\n" +
+              s"Node $n in the new node has no corresponding node in the original graph: ${tail}.\n" +
                 s"new: ${newNodeIrr}\n" +
                 s"old: ${oldIrrToNode.mkString(newLine)}")
         }

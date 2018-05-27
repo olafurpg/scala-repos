@@ -43,4 +43,5 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class SVGPathSpec
     extends SimpleSFXDelegateSpec[jfxss.SVGPath, SVGPath](
-        classOf[jfxss.SVGPath], classOf[SVGPath])
+      classOf[jfxss.SVGPath],
+      classOf[SVGPath])

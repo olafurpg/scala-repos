@@ -1,13 +1,24 @@
 package org.jetbrains.plugins.scala
 package codeInsight.template.macros
 
-import com.intellij.codeInsight.lookup.{LookupElementBuilder, LookupElement, LookupItem}
+import com.intellij.codeInsight.lookup.{
+  LookupElementBuilder,
+  LookupElement,
+  LookupItem
+}
 import com.intellij.codeInsight.template._
 import com.intellij.psi.{PsiDocumentManager, PsiNamedElement}
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
-import org.jetbrains.plugins.scala.lang.psi.types.{JavaArrayType, ScParameterizedType, ScType}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypingContext
+}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  JavaArrayType,
+  ScParameterizedType,
+  ScType
+}
 import org.jetbrains.plugins.scala.lang.refactoring.namesSuggester.NameSuggester
 
 /**
@@ -27,7 +38,8 @@ class SuggestScalaVariableNameMacro extends Macro {
   }
 
   def calculateResult(
-      params: Array[Expression], context: ExpressionContext): Result = {
+      params: Array[Expression],
+      context: ExpressionContext): Result = {
     val a = SuggestNamesUtil.getNames(params, context)
     if (a.length == 0) return null
     new TextResult(a(0))
@@ -40,14 +52,16 @@ class SuggestScalaVariableNameMacro extends Macro {
   override def getDefaultValue: String = "value"
 
   override def calculateQuickResult(
-      params: Array[Expression], context: ExpressionContext): Result = null
+      params: Array[Expression],
+      context: ExpressionContext): Result = null
 
   def getPresentableName: String = "Suggest Scala variable macro"
 }
 
 object SuggestNamesUtil {
   def getNames(
-      params: Array[Expression], context: ExpressionContext): Array[String] = {
+      params: Array[Expression],
+      context: ExpressionContext): Array[String] = {
     val p: Array[String] = params.map(_.calculateResult(context).toString)
     val offset = context.getStartOffset
     val editor = context.getEditor
@@ -64,7 +78,7 @@ object SuggestNamesUtil {
         try {
           val items = (new ScalaVariableOfTypeMacro)
             .calculateLookupItems(Array[String](x(0) match {
-              case "option" => "scala.Option"
+              case "option"  => "scala.Option"
               case "foreach" => "foreach"
             }), context, showOne = true)
             .map(_.getObject)
@@ -78,7 +92,7 @@ object SuggestNamesUtil {
                 case Success(ScParameterizedType(_, typeArgs), _) =>
                   typeArgs.head
                 case Success(JavaArrayType(arg), _) => arg
-                case _ => return Array[String]("x")
+                case _                              => return Array[String]("x")
               }
             case _ => return Array[String]("x")
           }

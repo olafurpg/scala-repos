@@ -53,7 +53,7 @@ object Printers {
 
     protected def shouldPrintSepAfterTree(tree: Tree): Boolean = tree match {
       case _: DocComment | _: FunctionDef | _: ClassDef => false
-      case _ => true
+      case _                                            => true
     }
 
     protected def printRow(ts: List[Tree], start: Char, end: Char): Unit = {
@@ -287,11 +287,11 @@ object Printers {
 
         case New(ctor, args) =>
           def containsOnlySelectsFromAtom(tree: Tree): Boolean = tree match {
-            case DotSelect(qual, _) => containsOnlySelectsFromAtom(qual)
+            case DotSelect(qual, _)     => containsOnlySelectsFromAtom(qual)
             case BracketSelect(qual, _) => containsOnlySelectsFromAtom(qual)
-            case VarRef(_) => true
-            case This() => true
-            case _ => false // in particular, Apply
+            case VarRef(_)              => true
+            case This()                 => true
+            case _                      => false // in particular, Apply
           }
           if (containsOnlySelectsFromAtom(ctor)) {
             print("new ")
@@ -340,10 +340,10 @@ object Printers {
             print("typeof ")
           } else {
             (op: @switch) match {
-              case + => print('+')
-              case - => print('-')
-              case ~ => print('~')
-              case ! => print('!')
+              case +        => print('+')
+              case -        => print('-')
+              case ~        => print('~')
+              case !        => print('!')
               case `typeof` => print("typeof ")
             }
           }
@@ -365,22 +365,22 @@ object Printers {
             case / => "/"
             case % => "%"
 
-            case | => "|"
-            case & => "&"
-            case ^ => "^"
-            case << => "<<"
-            case >> => ">>"
+            case |   => "|"
+            case &   => "&"
+            case ^   => "^"
+            case <<  => "<<"
+            case >>  => ">>"
             case >>> => ">>>"
 
-            case < => "<"
+            case <  => "<"
             case <= => "<="
-            case > => ">"
+            case >  => ">"
             case >= => ">="
 
             case && => "&&"
             case || => "||"
 
-            case `in` => "in"
+            case `in`         => "in"
             case `instanceof` => "instanceof"
           })
           print(' ')
@@ -533,7 +533,7 @@ object Printers {
 
     private final def print(propName: PropertyName): Unit = propName match {
       case lit: StringLiteral => print(lit: Tree)
-      case ident: Ident => print(ident)
+      case ident: Ident       => print(ident)
     }
 
     protected def print(s: String): Unit =

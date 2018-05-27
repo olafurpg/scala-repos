@@ -13,9 +13,10 @@ import mesosphere.marathon.state.{PathId, Timestamp}
 import org.slf4j.LoggerFactory
 
 object TaskTrackerActor {
-  def props(metrics: ActorMetrics,
-            taskLoader: TaskLoader,
-            taskUpdaterProps: ActorRef => Props): Props = {
+  def props(
+      metrics: ActorMetrics,
+      taskLoader: TaskLoader,
+      taskUpdaterProps: ActorRef => Props): Props = {
     Props(new TaskTrackerActor(metrics, taskLoader, taskUpdaterProps))
   }
 
@@ -28,7 +29,9 @@ object TaskTrackerActor {
     * FIXME: change taskId to [[Task.Id]]
     */
   private[impl] case class ForwardTaskOp(
-      deadline: Timestamp, taskId: Task.Id, action: TaskOpProcessor.Action)
+      deadline: Timestamp,
+      taskId: Task.Id,
+      action: TaskOpProcessor.Action)
 
   /** Describes where and what to send after an update event has beend processed by the [[TaskTrackerActor]]. */
   private[impl] case class Ack(initiator: ActorRef, msg: Any = ()) {
@@ -43,9 +46,11 @@ object TaskTrackerActor {
 
   private[tracker] class ActorMetrics(metrics: Metrics) {
     val stagedCount = metrics.gauge(
-        "service.mesosphere.marathon.task.staged.count", new AtomicIntGauge)
+      "service.mesosphere.marathon.task.staged.count",
+      new AtomicIntGauge)
     val runningCount = metrics.gauge(
-        "service.mesosphere.marathon.task.running.count", new AtomicIntGauge)
+      "service.mesosphere.marathon.task.running.count",
+      new AtomicIntGauge)
 
     def resetMetrics(): Unit = {
       stagedCount.setValue(0)
@@ -60,10 +65,12 @@ object TaskTrackerActor {
   *
   * It also spawns the [[TaskUpdateActor]] as a child and forwards update operations to it.
   */
-private class TaskTrackerActor(metrics: TaskTrackerActor.ActorMetrics,
-                               taskLoader: TaskLoader,
-                               taskUpdaterProps: ActorRef => Props)
-    extends Actor with Stash {
+private class TaskTrackerActor(
+    metrics: TaskTrackerActor.ActorMetrics,
+    taskLoader: TaskLoader,
+    taskUpdaterProps: ActorRef => Props)
+    extends Actor
+    with Stash {
 
   private[this] val log = LoggerFactory.getLogger(getClass)
   private[this] val updaterRef =
@@ -98,9 +105,10 @@ private class TaskTrackerActor(metrics: TaskTrackerActor.ActorMetrics,
         log.info("Task loading complete.")
 
         unstashAll()
-        context.become(withTasks(appTasks,
-                                 TaskCounts(appTasks.allTasks,
-                                            healthStatuses = Map.empty)))
+        context.become(
+          withTasks(
+            appTasks,
+            TaskCounts(appTasks.allTasks, healthStatuses = Map.empty)))
 
       case Status.Failure(cause) =>
         // escalate this failure
@@ -111,12 +119,13 @@ private class TaskTrackerActor(metrics: TaskTrackerActor.ActorMetrics,
     }
 
   private[this] def withTasks(
-      appTasks: TaskTracker.TasksByApp, counts: TaskCounts): Receive = {
+      appTasks: TaskTracker.TasksByApp,
+      counts: TaskCounts): Receive = {
 
-    def becomeWithUpdatedApp(appId: PathId)(
-        taskId: Task.Id, newTask: Option[Task]): Unit = {
+    def becomeWithUpdatedApp(
+        appId: PathId)(taskId: Task.Id, newTask: Option[Task]): Unit = {
       val updatedAppTasks = newTask match {
-        case None => appTasks.updateApp(appId)(_.withoutTask(taskId))
+        case None       => appTasks.updateApp(appId)(_.withoutTask(taskId))
         case Some(task) => appTasks.updateApp(appId)(_.withTask(task))
       }
 

@@ -41,7 +41,7 @@ class HTTPResponseServlet(resp: HttpServletResponse) extends HTTPResponse {
         import scala.language.reflectiveCalls
 
         try {
-          val cook30 = cookie.asInstanceOf[ {
+          val cook30 = cookie.asInstanceOf[{
             def setHttpOnly(b: Boolean): Unit
           }]
           cook30.setHttpOnly(bv)
@@ -68,9 +68,9 @@ class HTTPResponseServlet(resp: HttpServletResponse) extends HTTPResponse {
 
   def addHeaders(headers: List[HTTPParam]) {
     val appearOnce = Set(
-        LiftRules.overwrittenReponseHeaders.vend.map(_.toLowerCase): _*)
+      LiftRules.overwrittenReponseHeaders.vend.map(_.toLowerCase): _*)
     for (h <- headers;
-    value <- h.values) {
+         value <- h.values) {
       if (appearOnce.contains(h.name.toLowerCase))
         resp.setHeader(h.name, value)
       else resp.addHeader(h.name, value)

@@ -64,9 +64,9 @@ trait FastTypeTag[T] extends Equals {
   // contain all the information).
   override def equals(x: Any) = canEqual(x) && {
     x match {
-      case null => false
+      case null                  => false
       case other: FastTypeTag[_] => this.key == other.key
-      case _ => false
+      case _                     => false
     }
   }
   override def hashCode = key.hashCode
@@ -74,13 +74,15 @@ trait FastTypeTag[T] extends Equals {
 }
 
 object FastTypeTag {
-  implicit def materializeFastTypeTag[T]: FastTypeTag[T] = macro Compat
-    .FastTypeTagMacros_impl[T]
+  implicit def materializeFastTypeTag[T]: FastTypeTag[T] =
+    macro Compat
+      .FastTypeTagMacros_impl[T]
 
-  implicit def materializeFastTypeTagOfClassTag[T]: FastTypeTag[ClassTag[T]] = macro Compat
-    .FastTypeTagMacros_implClassTag[T]
+  implicit def materializeFastTypeTagOfClassTag[T]: FastTypeTag[ClassTag[T]] =
+    macro Compat
+      .FastTypeTagMacros_implClassTag[T]
 
-  private def stdTag[T : ru.TypeTag]: FastTypeTag[T] =
+  private def stdTag[T: ru.TypeTag]: FastTypeTag[T] =
     apply(scala.reflect.runtime.currentMirror, ru.typeOf[T], ru.typeOf[T].key)
       .asInstanceOf[FastTypeTag[T]]
 
@@ -122,27 +124,27 @@ object FastTypeTag {
   // NOTE; This is a bit of a hack, copied from [[Symbols.isPrimitive]]
   private val EffectivePrimitiveTags: Set[String] = {
     val primitives = Seq(
-        Double,
-        Float,
-        Long,
-        Int,
-        Char,
-        Short,
-        Byte,
-        Unit,
-        Boolean
+      Double,
+      Float,
+      Long,
+      Int,
+      Char,
+      Short,
+      Byte,
+      Unit,
+      Boolean
     )
     // TODO - create array primitives out of the above seq
     val arrayPrimitives = Seq(
-        ArrayDouble,
-        ArrayFloat,
-        ArrayLong,
-        ArrayInt,
-        ArrayChar,
-        ArrayShort,
-        ArrayByte,
-        ArrayUnit,
-        ArrayBoolean
+      ArrayDouble,
+      ArrayFloat,
+      ArrayLong,
+      ArrayInt,
+      ArrayChar,
+      ArrayShort,
+      ArrayByte,
+      ArrayUnit,
+      ArrayBoolean
     )
     (primitives ++ arrayPrimitives).map(_.key).toSet
   }
@@ -167,7 +169,7 @@ object FastTypeTag {
   /** Construct  anew fast type tage using the currently active pickling Mirror and lazily instantiate the Type. */
   def apply(key: String): FastTypeTag[_] = macro Compat.FastTypeTagMacros_apply
 
-  def apply[T : ru.TypeTag]: FastTypeTag[T] = {
+  def apply[T: ru.TypeTag]: FastTypeTag[T] = {
     val ruTpe = implicitly[ru.TypeTag[T]].tpe
     new FastTypeTag[T] {
       def mirror = scala.reflect.runtime.currentMirror
@@ -178,64 +180,65 @@ object FastTypeTag {
 
   def valueTypeName(tag: FastTypeTag[_]): String = {
     val clazz: Class[_] = tag match {
-      case FastTypeTag.String => classOf[java.lang.String]
-      case FastTypeTag.Byte => classOf[java.lang.Byte]
-      case FastTypeTag.Short => classOf[java.lang.Short]
-      case FastTypeTag.Char => classOf[java.lang.Character]
-      case FastTypeTag.Int => classOf[java.lang.Integer]
-      case FastTypeTag.Long => classOf[java.lang.Long]
+      case FastTypeTag.String  => classOf[java.lang.String]
+      case FastTypeTag.Byte    => classOf[java.lang.Byte]
+      case FastTypeTag.Short   => classOf[java.lang.Short]
+      case FastTypeTag.Char    => classOf[java.lang.Character]
+      case FastTypeTag.Int     => classOf[java.lang.Integer]
+      case FastTypeTag.Long    => classOf[java.lang.Long]
       case FastTypeTag.Boolean => classOf[java.lang.Boolean]
-      case FastTypeTag.Float => classOf[java.lang.Float]
-      case FastTypeTag.Double => classOf[java.lang.Double]
-      case _ => null
+      case FastTypeTag.Float   => classOf[java.lang.Float]
+      case FastTypeTag.Double  => classOf[java.lang.Double]
+      case _                   => null
     }
     if (clazz == null)
       tag match {
-        case FastTypeTag.Null => "null"
-        case FastTypeTag.ArrayString => "[Ljava.lang.String;"
-        case FastTypeTag.ArrayInt => "[I"
-        case FastTypeTag.ArrayDouble => "[D"
+        case FastTypeTag.Null         => "null"
+        case FastTypeTag.ArrayString  => "[Ljava.lang.String;"
+        case FastTypeTag.ArrayInt     => "[I"
+        case FastTypeTag.ArrayDouble  => "[D"
         case FastTypeTag.ArrayBoolean => "[Z"
-        case FastTypeTag.ArrayLong => "[J"
-        case FastTypeTag.ArrayByte => "[B"
-        case FastTypeTag.ArrayFloat => "[F"
-        case FastTypeTag.ArrayChar => "[C"
-        case FastTypeTag.ArrayShort => "[S"
-        case _ => tag.key
+        case FastTypeTag.ArrayLong    => "[J"
+        case FastTypeTag.ArrayByte    => "[B"
+        case FastTypeTag.ArrayFloat   => "[F"
+        case FastTypeTag.ArrayChar    => "[C"
+        case FastTypeTag.ArrayShort   => "[S"
+        case _                        => tag.key
       } else clazz.getName
   }
 
   val raw = Map[Class[_], FastTypeTag[_]](
-      classOf[java.lang.String] -> FastTypeTag.String,
-      classOf[java.lang.Byte] -> FastTypeTag.Byte,
-      classOf[java.lang.Short] -> FastTypeTag.Short,
-      classOf[java.lang.Character] -> FastTypeTag.Char,
-      classOf[java.lang.Integer] -> FastTypeTag.Int,
-      classOf[java.lang.Long] -> FastTypeTag.Long,
-      classOf[java.lang.Boolean] -> FastTypeTag.Boolean,
-      classOf[java.lang.Float] -> FastTypeTag.Float,
-      classOf[java.lang.Double] -> FastTypeTag.Double,
-      classOf[Byte] -> FastTypeTag.Byte,
-      classOf[Short] -> FastTypeTag.Short,
-      classOf[Char] -> FastTypeTag.Char,
-      classOf[Int] -> FastTypeTag.Int,
-      classOf[Long] -> FastTypeTag.Long,
-      classOf[Boolean] -> FastTypeTag.Boolean,
-      classOf[Float] -> FastTypeTag.Float,
-      classOf[Double] -> FastTypeTag.Double,
-      classOf[Array[String]] -> FastTypeTag.ArrayString,
-      classOf[Array[Int]] -> FastTypeTag.ArrayInt,
-      classOf[Array[Byte]] -> FastTypeTag.ArrayByte,
-      classOf[Array[Short]] -> FastTypeTag.ArrayShort,
-      classOf[Array[Char]] -> FastTypeTag.ArrayChar,
-      classOf[Array[Long]] -> FastTypeTag.ArrayLong,
-      classOf[Array[Boolean]] -> FastTypeTag.ArrayBoolean,
-      classOf[Array[Float]] -> FastTypeTag.ArrayFloat,
-      classOf[Array[Double]] -> FastTypeTag.ArrayDouble
+    classOf[java.lang.String] -> FastTypeTag.String,
+    classOf[java.lang.Byte] -> FastTypeTag.Byte,
+    classOf[java.lang.Short] -> FastTypeTag.Short,
+    classOf[java.lang.Character] -> FastTypeTag.Char,
+    classOf[java.lang.Integer] -> FastTypeTag.Int,
+    classOf[java.lang.Long] -> FastTypeTag.Long,
+    classOf[java.lang.Boolean] -> FastTypeTag.Boolean,
+    classOf[java.lang.Float] -> FastTypeTag.Float,
+    classOf[java.lang.Double] -> FastTypeTag.Double,
+    classOf[Byte] -> FastTypeTag.Byte,
+    classOf[Short] -> FastTypeTag.Short,
+    classOf[Char] -> FastTypeTag.Char,
+    classOf[Int] -> FastTypeTag.Int,
+    classOf[Long] -> FastTypeTag.Long,
+    classOf[Boolean] -> FastTypeTag.Boolean,
+    classOf[Float] -> FastTypeTag.Float,
+    classOf[Double] -> FastTypeTag.Double,
+    classOf[Array[String]] -> FastTypeTag.ArrayString,
+    classOf[Array[Int]] -> FastTypeTag.ArrayInt,
+    classOf[Array[Byte]] -> FastTypeTag.ArrayByte,
+    classOf[Array[Short]] -> FastTypeTag.ArrayShort,
+    classOf[Array[Char]] -> FastTypeTag.ArrayChar,
+    classOf[Array[Long]] -> FastTypeTag.ArrayLong,
+    classOf[Array[Boolean]] -> FastTypeTag.ArrayBoolean,
+    classOf[Array[Float]] -> FastTypeTag.ArrayFloat,
+    classOf[Array[Double]] -> FastTypeTag.ArrayDouble
   )
 
   def mkRawArrayTypeAndKey(
-      clazz: Class[_], mirror: ru.Mirror): (ru.Type, String) = {
+      clazz: Class[_],
+      mirror: ru.Mirror): (ru.Type, String) = {
     // create Type without going through `typeFromString`
     val elemClass = clazz.getComponentType()
     // debug(s"creating tag for array with element type '${elemClass.getName}'")
@@ -249,7 +252,7 @@ object FastTypeTag {
         } catch {
           case t: Throwable =>
             sys.error(
-                s"error: could not find class '${elemClass.getName}' in runtime mirror")
+              s"error: could not find class '${elemClass.getName}' in runtime mirror")
         }
         val primitiveTag: FastTypeTag[_] = raw.getOrElse(elemClass, null)
         val k =
@@ -271,36 +274,38 @@ object FastTypeTag {
     if (clazz == null) FastTypeTag.Null
     else
       try {
-        raw.getOrElse(clazz, {
-          // debug(s"!!! could not find primitive tag for class ${clazz.getName} !!!")
-          // handle arrays of non-primitive element type
-          if (clazz.isArray) mkRawArray(clazz, mirror)
-          else {
-            val clazzName0 = clazz.getName()
-            val clazzName =
-              if (clazzName0.contains("anonfun$") ||
-                  clazzName0.contains("$colon$colon") ||
-                  clazzName0.endsWith("$") || clazzName0.endsWith("$sp"))
-                clazzName0
-              else clazzName0.replace('$', '.')
-            apply(mirror, clazzName)
+        raw.getOrElse(
+          clazz, {
+            // debug(s"!!! could not find primitive tag for class ${clazz.getName} !!!")
+            // handle arrays of non-primitive element type
+            if (clazz.isArray) mkRawArray(clazz, mirror)
+            else {
+              val clazzName0 = clazz.getName()
+              val clazzName =
+                if (clazzName0.contains("anonfun$") ||
+                    clazzName0.contains("$colon$colon") ||
+                    clazzName0.endsWith("$") || clazzName0.endsWith("$sp"))
+                  clazzName0
+                else clazzName0.replace('$', '.')
+              apply(mirror, clazzName)
+            }
           }
-        })
+        )
       } catch {
         case t: Throwable =>
           sys.error(
-              s"error: could not create FastTypeTag for class '${clazz.getName}'")
+            s"error: could not create FastTypeTag for class '${clazz.getName}'")
       }
 }
 
 trait FastTypeTagMacros extends Macro {
-  def impl[T : c.WeakTypeTag]: c.Tree = {
+  def impl[T: c.WeakTypeTag]: c.Tree = {
     import c.universe._
     val T = weakTypeOf[T]
     if (T.typeSymbol.isParameter)
       c.abort(
-          c.enclosingPosition,
-          s"cannot generate FastTypeTag for type parameter $T, FastTypeTag can only be generated for concrete types")
+        c.enclosingPosition,
+        s"cannot generate FastTypeTag for type parameter $T, FastTypeTag can only be generated for concrete types")
 
     q"""
       new _root_.scala.pickling.FastTypeTag[$T] {
@@ -310,7 +315,7 @@ trait FastTypeTagMacros extends Macro {
       }
     """
   }
-  def implClassTag[T : c.WeakTypeTag]: c.Tree = {
+  def implClassTag[T: c.WeakTypeTag]: c.Tree = {
     import c.universe._
     val T = weakTypeOf[T]
     q"""

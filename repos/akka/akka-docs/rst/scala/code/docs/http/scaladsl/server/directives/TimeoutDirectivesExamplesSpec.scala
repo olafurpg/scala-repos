@@ -38,8 +38,9 @@ class TimeoutDirectivesExamplesSpec extends RoutingSpec with CompileOnlySpec {
     "allow mapping the response while setting the timeout" in compileOnlySpec {
       //#withRequestTimeout-with-handler
       val timeoutResponse = HttpResponse(
-          StatusCodes.EnhanceYourCalm,
-          entity = "Unable to serve response within time limit, please enchance your calm.")
+        StatusCodes.EnhanceYourCalm,
+        entity =
+          "Unable to serve response within time limit, please enchance your calm.")
 
       val route = path("timeout") {
         // updates timeout and handler at
@@ -56,8 +57,9 @@ class TimeoutDirectivesExamplesSpec extends RoutingSpec with CompileOnlySpec {
 
       //#withRequestTimeoutResponse
       val timeoutResponse = HttpResponse(
-          StatusCodes.EnhanceYourCalm,
-          entity = "Unable to serve response within time limit, please enchance your calm.")
+        StatusCodes.EnhanceYourCalm,
+        entity =
+          "Unable to serve response within time limit, please enchance your calm.")
 
       val route = path("timeout") {
         withRequestTimeout(1.milli) {

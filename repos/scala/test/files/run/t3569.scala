@@ -17,10 +17,11 @@ object Test {
     final private lazy val lval2: Int = 2
     final private[this] lazy val lval3: Int = 2
   }
-  case class Y(final var x: Int,
-               final private var y: Int,
-               final val z1: Int,
-               final private val z2: Int) {}
+  case class Y(
+      final var x: Int,
+      final private var y: Int,
+      final val z1: Int,
+      final private val z2: Int) {}
 
   def f = new X(0).x += 1
   def main(args: Array[String]) {
@@ -30,8 +31,8 @@ object Test {
     println(s.x)
 
     // under -Xcheckinit there's an additional $init$ field
-    (classOf[X].getDeclaredFields map ("" + _)).sorted.filter(
-        _ != "private volatile byte Test$X.bitmap$init$0") foreach println
+    (classOf[X].getDeclaredFields map ("" + _)).sorted
+      .filter(_ != "private volatile byte Test$X.bitmap$init$0") foreach println
     (classOf[Y].getDeclaredFields map ("" + _)).sorted foreach println
   }
 }

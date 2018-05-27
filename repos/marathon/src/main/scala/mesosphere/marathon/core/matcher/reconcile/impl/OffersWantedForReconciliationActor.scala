@@ -19,17 +19,18 @@ import scala.concurrent.duration._
   * In this case, this actor indicates additional demand for offers.
   */
 private[reconcile] object OffersWantedForReconciliationActor {
-  def props(reviveOffersConfig: ReviveOffersConfig,
-            clock: Clock,
-            eventStream: EventStream,
-            offersWanted: Observer[Boolean]): Props =
+  def props(
+      reviveOffersConfig: ReviveOffersConfig,
+      clock: Clock,
+      eventStream: EventStream,
+      offersWanted: Observer[Boolean]): Props =
     Props(
-        new OffersWantedForReconciliationActor(
-            reviveOffersConfig,
-            clock,
-            eventStream,
-            offersWanted
-        ))
+      new OffersWantedForReconciliationActor(
+        reviveOffersConfig,
+        clock,
+        eventStream,
+        offersWanted
+      ))
 
   private case class RequestOffers(reason: String)
   case object RecheckInterest
@@ -46,7 +47,7 @@ private[reconcile] class OffersWantedForReconciliationActor(
   /** Make certain that the normal number of revives that the user specified will be executed. */
   private[this] val interestDuration =
     (reviveOffersConfig.minReviveOffersInterval() *
-        (reviveOffersConfig.reviveOffersRepetitions() + 0.5)).millis
+      (reviveOffersConfig.reviveOffersRepetitions() + 0.5)).millis
 
   override def preStart(): Unit = {
     super.preStart()
@@ -54,7 +55,7 @@ private[reconcile] class OffersWantedForReconciliationActor(
     eventStream.subscribe(self, classOf[DeploymentStepSuccess])
 
     log.info(
-        s"Started. Will remain interested in offer reconciliation for $interestDuration when needed.")
+      s"Started. Will remain interested in offer reconciliation for $interestDuration when needed.")
     self ! OffersWantedForReconciliationActor.RequestOffers("becoming leader")
   }
 
@@ -77,7 +78,7 @@ private[reconcile] class OffersWantedForReconciliationActor(
         val terminatedResidentAppsString =
           terminatedResidentApps.map(_.id).mkString(", ")
         self ! OffersWantedForReconciliationActor.RequestOffers(
-            s"terminated resident app(s) $terminatedResidentAppsString"
+          s"terminated resident app(s) $terminatedResidentAppsString"
         )
       }
   }
@@ -87,20 +88,21 @@ private[reconcile] class OffersWantedForReconciliationActor(
     offersWanted.onNext(true)
     val until: Timestamp = clock.now() + interestDuration
     log.info(
-        s"interested in offers for reservation reconciliation because of $reason (until $until)")
+      s"interested in offers for reservation reconciliation because of $reason (until $until)")
     subscribedToOffers(until, nextCheck)
   }
 
   protected def scheduleNextCheck: Cancellable = {
     context.system.scheduler.scheduleOnce(
-        interestDuration,
-        self,
-        OffersWantedForReconciliationActor.RecheckInterest
+      interestDuration,
+      self,
+      OffersWantedForReconciliationActor.RecheckInterest
     )(context.dispatcher)
   }
 
   private[this] def subscribedToOffers(
-      until: Timestamp, nextCheck: Cancellable): Receive =
+      until: Timestamp,
+      nextCheck: Cancellable): Receive =
     LoggingReceive.withLabel("subscribedToOffers") {
 
       handleRequestOfferIndicators orElse {

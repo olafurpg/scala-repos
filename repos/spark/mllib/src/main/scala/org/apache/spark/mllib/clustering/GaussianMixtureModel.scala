@@ -45,10 +45,12 @@ import org.apache.spark.sql.{Row, SQLContext}
 class GaussianMixtureModel @Since("1.3.0")(
     @Since("1.3.0") val weights: Array[Double],
     @Since("1.3.0") val gaussians: Array[MultivariateGaussian])
-    extends Serializable with Saveable {
+    extends Serializable
+    with Saveable {
 
-  require(weights.length == gaussians.length,
-          "Length of weight and Gaussian arrays must match")
+  require(
+    weights.length == gaussians.length,
+    "Length of weight and Gaussian arrays must match")
 
   override protected def formatVersion = "1.0"
 
@@ -99,7 +101,10 @@ class GaussianMixtureModel @Since("1.3.0")(
     val bcWeights = sc.broadcast(weights)
     points.map { x =>
       computeSoftAssignments(
-          x.toBreeze.toDenseVector, bcDists.value, bcWeights.value, k)
+        x.toBreeze.toDenseVector,
+        bcDists.value,
+        bcWeights.value,
+        k)
     }
   }
 
@@ -114,10 +119,11 @@ class GaussianMixtureModel @Since("1.3.0")(
   /**
     * Compute the partial assignments for each vector
     */
-  private def computeSoftAssignments(pt: BreezeVector[Double],
-                                     dists: Array[MultivariateGaussian],
-                                     weights: Array[Double],
-                                     k: Int): Array[Double] = {
+  private def computeSoftAssignments(
+      pt: BreezeVector[Double],
+      dists: Array[MultivariateGaussian],
+      weights: Array[Double],
+      k: Int): Array[Double] = {
     val p = weights.zip(dists).map {
       case (weight, dist) => MLUtils.EPSILON + weight * dist.pdf(pt)
     }
@@ -141,17 +147,20 @@ object GaussianMixtureModel extends Loader[GaussianMixtureModel] {
     val classNameV1_0 =
       "org.apache.spark.mllib.clustering.GaussianMixtureModel"
 
-    def save(sc: SparkContext,
-             path: String,
-             weights: Array[Double],
-             gaussians: Array[MultivariateGaussian]): Unit = {
+    def save(
+        sc: SparkContext,
+        path: String,
+        weights: Array[Double],
+        gaussians: Array[MultivariateGaussian]): Unit = {
 
       val sqlContext = SQLContext.getOrCreate(sc)
       import sqlContext.implicits._
 
       // Create JSON metadata.
-      val metadata = compact(render(("class" -> classNameV1_0) ~
-              ("version" -> formatVersionV1_0) ~ ("k" -> weights.length)))
+      val metadata = compact(
+        render(
+          ("class" -> classNameV1_0) ~
+            ("version" -> formatVersionV1_0) ~ ("k" -> weights.length)))
       sc.parallelize(Seq(metadata), 1)
         .saveAsTextFile(Loader.metadataPath(path))
 
@@ -187,18 +196,20 @@ object GaussianMixtureModel extends Loader[GaussianMixtureModel] {
     val classNameV1_0 = SaveLoadV1_0.classNameV1_0
     (loadedClassName, version) match {
       case (classNameV1_0, "1.0") => {
-          val model = SaveLoadV1_0.load(sc, path)
-          require(model.weights.length == k,
-                  s"GaussianMixtureModel requires weights of length $k " +
-                  s"got weights of length ${model.weights.length}")
-          require(model.gaussians.length == k,
-                  s"GaussianMixtureModel requires gaussians of length $k" +
-                  s"got gaussians of length ${model.gaussians.length}")
-          model
-        }
+        val model = SaveLoadV1_0.load(sc, path)
+        require(
+          model.weights.length == k,
+          s"GaussianMixtureModel requires weights of length $k " +
+            s"got weights of length ${model.weights.length}")
+        require(
+          model.gaussians.length == k,
+          s"GaussianMixtureModel requires gaussians of length $k" +
+            s"got gaussians of length ${model.gaussians.length}")
+        model
+      }
       case _ =>
         throw new Exception(
-            s"GaussianMixtureModel.load did not recognize model with (className, format version):" +
+          s"GaussianMixtureModel.load did not recognize model with (className, format version):" +
             s"($loadedClassName, $version).  Supported:\n" +
             s"  ($classNameV1_0, 1.0)")
     }

@@ -7,18 +7,27 @@ import akka.actor.{ActorSystem, Props}
 import akka.event.EventStream
 import akka.testkit.{EventFilter, ImplicitSender, TestActorRef, TestKit}
 import mesosphere.marathon.MarathonSpec
-import mesosphere.marathon.event.{EventStreamAttached, EventStreamDetached, Subscribe}
+import mesosphere.marathon.event.{
+  EventStreamAttached,
+  EventStreamDetached,
+  Subscribe
+}
 import mesosphere.marathon.test.{MarathonActorSupport, Mockito}
 import org.scalatest.{BeforeAndAfter, GivenWhenThen, Matchers}
 
 import scala.concurrent.duration._
 
 class HttpEventStreamHandleActorTest
-    extends MarathonActorSupport with MarathonSpec with Matchers
-    with GivenWhenThen with ImplicitSender with BeforeAndAfter with Mockito {
+    extends MarathonActorSupport
+    with MarathonSpec
+    with Matchers
+    with GivenWhenThen
+    with ImplicitSender
+    with BeforeAndAfter
+    with Mockito {
 
   test(
-      "A message send to the handle actor will be transferred to the stream handle") {
+    "A message send to the handle actor will be transferred to the stream handle") {
     Given("A handler that will postpone sending until latch is hit")
     val latch = new CountDownLatch(1)
     handle.sendEvent(any[String], any[String]) answers (_ => latch.countDown())
@@ -32,7 +41,7 @@ class HttpEventStreamHandleActorTest
   }
 
   test(
-      "If the consumer is slow and maxOutstanding limit is reached, messages get dropped") {
+    "If the consumer is slow and maxOutstanding limit is reached, messages get dropped") {
     Given("A handler that will postpone the sending")
     val latch = new CountDownLatch(1)
     handle.sendEvent(any[String], any[String]) answers (_ => latch.await())
@@ -70,9 +79,9 @@ class HttpEventStreamHandleActorTest
       events ::= args(0).asInstanceOf[String]; latch.await()
     }
     handleActor = TestActorRef(
-        Props(
-            new HttpEventStreamHandleActor(handle, stream, 50)
-        ))
+      Props(
+        new HttpEventStreamHandleActor(handle, stream, 50)
+      ))
     val attached = EventStreamAttached("remote")
     val detached = EventStreamDetached("remote")
     val subscribe = Subscribe("ip", "url")
@@ -84,7 +93,7 @@ class HttpEventStreamHandleActorTest
 
     Then("The actor stores the events in reverse order")
     handleActor.underlyingActor.outstanding should be(
-        subscribe :: detached :: Nil)
+      subscribe :: detached :: Nil)
 
     When("The first event is delivered")
     latch.countDown()
@@ -92,7 +101,7 @@ class HttpEventStreamHandleActorTest
     Then("All events are transferred in correct order")
     awaitCond(events.size == 3)
     events.reverse should be(
-        "event_stream_attached" :: "event_stream_detached" :: "subscribe_event" :: Nil)
+      "event_stream_attached" :: "event_stream_detached" :: "subscribe_event" :: Nil)
   }
 
   var handleActor: TestActorRef[HttpEventStreamHandleActor] = _
@@ -103,8 +112,8 @@ class HttpEventStreamHandleActorTest
     handle = mock[HttpEventStreamHandle]
     stream = mock[EventStream]
     handleActor = TestActorRef(
-        Props(
-            new HttpEventStreamHandleActor(handle, stream, 1)
-        ))
+      Props(
+        new HttpEventStreamHandleActor(handle, stream, 1)
+      ))
   }
 }

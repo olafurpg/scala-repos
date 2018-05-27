@@ -7,17 +7,19 @@ import sbt.librarymanagement.ModuleID
 
 import java.net.{URI, URL, URLClassLoader}
 
-final case class PluginManagement(overrides: Set[ModuleID],
-                                  applyOverrides: Set[ModuleID],
-                                  loader: PluginClassLoader,
-                                  initialLoader: ClassLoader,
-                                  context: Context) {
+final case class PluginManagement(
+    overrides: Set[ModuleID],
+    applyOverrides: Set[ModuleID],
+    loader: PluginClassLoader,
+    initialLoader: ClassLoader,
+    context: Context) {
   def shift: PluginManagement =
-    PluginManagement(Set.empty,
-                     overrides,
-                     new PluginClassLoader(initialLoader),
-                     initialLoader,
-                     context)
+    PluginManagement(
+      Set.empty,
+      overrides,
+      new PluginClassLoader(initialLoader),
+      initialLoader,
+      context)
 
   def addOverrides(os: Set[ModuleID]): PluginManagement =
     copy(overrides = overrides ++ os)
@@ -26,30 +28,31 @@ final case class PluginManagement(overrides: Set[ModuleID],
     addOverrides(extractOverrides(cp))
 
   def inject: Seq[Setting[_]] = Seq(
-      Keys.dependencyOverrides ++= overrides
+    Keys.dependencyOverrides ++= overrides
   )
 
   def resetDepth: PluginManagement =
-    copy(
-        context = Context(globalPluginProject = false, pluginProjectDepth = 0))
+    copy(context = Context(globalPluginProject = false, pluginProjectDepth = 0))
   def forGlobalPlugin: PluginManagement =
     copy(context = Context(globalPluginProject = true, pluginProjectDepth = 0))
   def forPlugin: PluginManagement =
     copy(
-        context = context.copy(
-              pluginProjectDepth = context.pluginProjectDepth + 1))
+      context =
+        context.copy(pluginProjectDepth = context.pluginProjectDepth + 1))
 }
 object PluginManagement {
-  final case class Context private[sbt](
-      globalPluginProject: Boolean, pluginProjectDepth: Int)
+  final case class Context private[sbt] (
+      globalPluginProject: Boolean,
+      pluginProjectDepth: Int)
   val emptyContext: Context = Context(false, 0)
 
   def apply(initialLoader: ClassLoader): PluginManagement =
-    PluginManagement(Set.empty,
-                     Set.empty,
-                     new PluginClassLoader(initialLoader),
-                     initialLoader,
-                     emptyContext)
+    PluginManagement(
+      Set.empty,
+      Set.empty,
+      new PluginClassLoader(initialLoader),
+      initialLoader,
+      emptyContext)
 
   def extractOverrides(classpath: Classpath): Set[ModuleID] =
     classpath flatMap { _.metadata get Keys.moduleID.key map keepOverrideInfo } toSet;

@@ -53,16 +53,19 @@ object GradientBoostingRegressionExample {
       val prediction = model.predict(point.features)
       (point.label, prediction)
     }
-    val testMSE = labelsAndPredictions.map {
-      case (v, p) => math.pow((v - p), 2)
-    }.mean()
+    val testMSE = labelsAndPredictions
+      .map {
+        case (v, p) => math.pow((v - p), 2)
+      }
+      .mean()
     println("Test Mean Squared Error = " + testMSE)
     println("Learned regression GBT model:\n" + model.toDebugString)
 
     // Save and load model
     model.save(sc, "target/tmp/myGradientBoostingRegressionModel")
     val sameModel = GradientBoostedTreesModel.load(
-        sc, "target/tmp/myGradientBoostingRegressionModel")
+      sc,
+      "target/tmp/myGradientBoostingRegressionModel")
     // $example off$
   }
 }

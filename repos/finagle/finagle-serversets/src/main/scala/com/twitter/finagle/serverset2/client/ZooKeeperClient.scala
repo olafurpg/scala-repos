@@ -137,9 +137,10 @@ object ZooKeeperReader {
   }
 
   /** An implementation helper for ZooKeeperReader.glob */
-  def processGlob(path: String,
-                  prefix: String,
-                  children: java.util.List[String]): Seq[String] = {
+  def processGlob(
+      path: String,
+      prefix: String,
+      children: java.util.List[String]): Seq[String] = {
     val seq = Seq.newBuilder[String]
     val iter = children.iterator()
     while (iter.hasNext()) {
@@ -162,10 +163,11 @@ private[serverset2] trait ZooKeeperWriter extends ZooKeeperClient {
     * @param createMode specifies what type of node to create.
     * @return a Future[String] containing the actual path of the created node.
     */
-  def create(path: String,
-             data: Option[Buf],
-             acl: Seq[Data.ACL],
-             createMode: CreateMode): Future[String]
+  def create(
+      path: String,
+      data: Option[Buf],
+      acl: Seq[Data.ACL],
+      createMode: CreateMode): Future[String]
 
   /**
     * Delete the node with the given path. The call will succeed if such a node
@@ -196,7 +198,9 @@ private[serverset2] trait ZooKeeperWriter extends ZooKeeperClient {
     * @return a Future[Data.Stat]
     */
   def setData(
-      path: String, data: Option[Buf], version: Option[Int]): Future[Data.Stat]
+      path: String,
+      data: Option[Buf],
+      version: Option[Int]): Future[Data.Stat]
 
   /**
     * Set the ACL for the node of the given path if such a node exists and the
@@ -208,9 +212,10 @@ private[serverset2] trait ZooKeeperWriter extends ZooKeeperClient {
     * @param version the expected matching version.
     * @return a Future[Data.Stat]
     */
-  def setACL(path: String,
-             acl: Seq[Data.ACL],
-             version: Option[Int]): Future[Data.Stat]
+  def setACL(
+      path: String,
+      acl: Seq[Data.ACL],
+      version: Option[Int]): Future[Data.Stat]
 }
 
 private[serverset2] trait ZooKeeperMulti extends ZooKeeperClient {
@@ -225,7 +230,9 @@ private[serverset2] trait ZooKeeperMulti extends ZooKeeperClient {
 }
 
 private[serverset2] trait ZooKeeperRW
-    extends ZooKeeperReader with ZooKeeperWriter
+    extends ZooKeeperReader
+    with ZooKeeperWriter
 
 private[serverset2] trait ZooKeeperRWMulti
-    extends ZooKeeperRW with ZooKeeperMulti
+    extends ZooKeeperRW
+    with ZooKeeperMulti

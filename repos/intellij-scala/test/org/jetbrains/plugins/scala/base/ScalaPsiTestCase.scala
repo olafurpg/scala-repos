@@ -7,7 +7,11 @@ import _root_.com.intellij.testFramework.PsiTestCase
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.projectRoots.JavaSdk
 import com.intellij.openapi.roots.libraries.Library.ModifiableModel
-import com.intellij.openapi.roots.{ModifiableRootModel, ModuleRootManager, OrderRootType}
+import com.intellij.openapi.roots.{
+  ModifiableRootModel,
+  ModuleRootManager,
+  OrderRootType
+}
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.vfs.{LocalFileSystem, VfsUtil}
 import org.jetbrains.plugins.scala.util.TestUtils
@@ -38,7 +42,7 @@ abstract class ScalaPsiTestCase extends PsiTestCase {
 
       val contentEntry = rootModel.addContentEntry(testDataRoot)
       rootModel.setSdk(
-          JavaSdk.getInstance.createJdk("java sdk", JDK_HOME, false))
+        JavaSdk.getInstance.createJdk("java sdk", JDK_HOME, false))
       contentEntry.addSourceFolder(testDataRoot, false)
 
       // Add Scala Library
@@ -53,12 +57,13 @@ abstract class ScalaPsiTestCase extends PsiTestCase {
         assert(srcRoot.exists)
 
         libModel.addRoot(
-            VfsUtil.getUrlForLibraryRoot(libRoot), OrderRootType.CLASSES)
+          VfsUtil.getUrlForLibraryRoot(libRoot),
+          OrderRootType.CLASSES)
         libModel.addRoot(
-            VfsUtil.getUrlForLibraryRoot(srcRoot), OrderRootType.SOURCES)
+          VfsUtil.getUrlForLibraryRoot(srcRoot),
+          OrderRootType.SOURCES)
 
-        ApplicationManager.getApplication.runWriteAction(
-            new Runnable {
+        ApplicationManager.getApplication.runWriteAction(new Runnable {
           def run() {
             libModel.commit()
             rootModel.commit()

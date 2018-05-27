@@ -82,10 +82,11 @@ private[spark] abstract class ImpurityAggregator(val statsSize: Int)
     * @param allStats  Flat stats array, with stats for this (node, feature, bin) contiguous.
     * @param offset    Start index of stats for this (node, feature, bin).
     */
-  def update(allStats: Array[Double],
-             offset: Int,
-             label: Double,
-             instanceWeight: Double): Unit
+  def update(
+      allStats: Array[Double],
+      offset: Int,
+      label: Double,
+      instanceWeight: Double): Unit
 
   /**
     * Get an [[ImpurityCalculator]] for a (node, feature, bin).
@@ -119,9 +120,10 @@ private[spark] abstract class ImpurityCalculator(val stats: Array[Double])
     */
   def add(other: ImpurityCalculator): ImpurityCalculator = {
     require(
-        stats.length == other.stats.length,
-        s"Two ImpurityCalculator instances cannot be added with different counts sizes." +
-        s"  Sizes are ${stats.length} and ${other.stats.length}.")
+      stats.length == other.stats.length,
+      s"Two ImpurityCalculator instances cannot be added with different counts sizes." +
+        s"  Sizes are ${stats.length} and ${other.stats.length}."
+    )
     var i = 0
     val len = other.stats.length
     while (i < len) {
@@ -137,9 +139,10 @@ private[spark] abstract class ImpurityCalculator(val stats: Array[Double])
     */
   def subtract(other: ImpurityCalculator): ImpurityCalculator = {
     require(
-        stats.length == other.stats.length,
-        s"Two ImpurityCalculator instances cannot be subtracted with different counts sizes." +
-        s"  Sizes are ${stats.length} and ${other.stats.length}.")
+      stats.length == other.stats.length,
+      s"Two ImpurityCalculator instances cannot be subtracted with different counts sizes." +
+        s"  Sizes are ${stats.length} and ${other.stats.length}."
+    )
     var i = 0
     val len = other.stats.length
     while (i < len) {
@@ -178,7 +181,8 @@ private[spark] abstract class ImpurityCalculator(val stats: Array[Double])
         }
     }
     if (result._1 < 0) {
-      throw new RuntimeException("ImpurityCalculator internal error:" +
+      throw new RuntimeException(
+        "ImpurityCalculator internal error:" +
           " indexOfLargestArrayElement failed")
     }
     result._1
@@ -192,14 +196,15 @@ private[spark] object ImpurityCalculator {
     * the given stats.
     */
   def getCalculator(
-      impurity: String, stats: Array[Double]): ImpurityCalculator = {
+      impurity: String,
+      stats: Array[Double]): ImpurityCalculator = {
     impurity match {
-      case "gini" => new GiniCalculator(stats)
-      case "entropy" => new EntropyCalculator(stats)
+      case "gini"     => new GiniCalculator(stats)
+      case "entropy"  => new EntropyCalculator(stats)
       case "variance" => new VarianceCalculator(stats)
       case _ =>
         throw new IllegalArgumentException(
-            s"ImpurityCalculator builder did not recognize impurity type: $impurity")
+          s"ImpurityCalculator builder did not recognize impurity type: $impurity")
     }
   }
 }

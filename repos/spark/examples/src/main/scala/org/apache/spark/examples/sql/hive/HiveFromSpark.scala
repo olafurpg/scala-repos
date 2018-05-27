@@ -61,7 +61,7 @@ object HiveFromSpark {
     // The results of SQL queries are themselves RDDs and support all normal RDD functions.  The
     // items in the RDD are of type Row, which allows you to access each column by ordinal.
     val rddFromSql = sql(
-        "SELECT key, value FROM src WHERE key < 10 ORDER BY key")
+      "SELECT key, value FROM src WHERE key < 10 ORDER BY key")
 
     println("Result of RDD.map:")
     val rddAsStrings = rddFromSql.rdd.map {

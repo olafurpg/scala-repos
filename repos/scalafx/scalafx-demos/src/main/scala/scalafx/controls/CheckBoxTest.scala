@@ -76,9 +76,9 @@ class CheckBoxControls(check: CheckBox)
   val lblSelected = new Label {
     text = check.selected().toString
   }
-  check.onAction = (event: ActionEvent) =>
-    {
-      lblSelected.text = if (check.indeterminate()) "Indeterminate"
+  check.onAction = (event: ActionEvent) => {
+    lblSelected.text =
+      if (check.indeterminate()) "Indeterminate"
       else check.selected().toString
   }
 

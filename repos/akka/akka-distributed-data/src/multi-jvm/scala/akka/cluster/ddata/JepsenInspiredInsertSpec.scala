@@ -22,7 +22,9 @@ object JepsenInspiredInsertSpec extends MultiNodeConfig {
   val n4 = role("n4")
   val n5 = role("n5")
 
-  commonConfig(ConfigFactory.parseString("""
+  commonConfig(
+    ConfigFactory.parseString(
+      """
     akka.loglevel = INFO
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
     akka.log-dead-letters = off
@@ -42,7 +44,8 @@ class JepsenInspiredInsertSpecMultiJvmNode5 extends JepsenInspiredInsertSpec
 class JepsenInspiredInsertSpecMultiJvmNode6 extends JepsenInspiredInsertSpec
 
 class JepsenInspiredInsertSpec
-    extends MultiNodeSpec(JepsenInspiredInsertSpec) with STMultiNodeSpec
+    extends MultiNodeSpec(JepsenInspiredInsertSpec)
+    with STMultiNodeSpec
     with ImplicitSender {
   import JepsenInspiredInsertSpec._
   import Replicator._
@@ -116,8 +119,9 @@ class JepsenInspiredInsertSpec
       val writeProbe = TestProbe()
       val writeAcks = myData.map { i ⇒
         sleepDelay()
-        replicator.tell(Update(key, ORSet(), WriteLocal, Some(i))(_ + i),
-                        writeProbe.ref)
+        replicator.tell(
+          Update(key, ORSet(), WriteLocal, Some(i))(_ + i),
+          writeProbe.ref)
         writeProbe.receiveOne(3.seconds)
       }
       val successWriteAcks = writeAcks.collect {
@@ -155,8 +159,9 @@ class JepsenInspiredInsertSpec
       val writeProbe = TestProbe()
       val writeAcks = myData.map { i ⇒
         sleepDelay()
-        replicator.tell(Update(key, ORSet(), writeMajority, Some(i))(_ + i),
-                        writeProbe.ref)
+        replicator.tell(
+          Update(key, ORSet(), writeMajority, Some(i))(_ + i),
+          writeProbe.ref)
         writeProbe.receiveOne(timeout + 1.second)
       }
       val successWriteAcks = writeAcks.collect {
@@ -193,13 +198,15 @@ class JepsenInspiredInsertSpec
     val key = ORSetKey[Int]("C")
     runOn(controller) {
       sleepBeforePartition()
-      for (a ← List(n1, n4, n5); b ← List(n2, n3)) testConductor
-        .blackhole(a, b, Direction.Both)
-        .await
+      for (a ← List(n1, n4, n5); b ← List(n2, n3))
+        testConductor
+          .blackhole(a, b, Direction.Both)
+          .await
       sleepDuringPartition()
-      for (a ← List(n1, n4, n5); b ← List(n2, n3)) testConductor
-        .passThrough(a, b, Direction.Both)
-        .await
+      for (a ← List(n1, n4, n5); b ← List(n2, n3))
+        testConductor
+          .passThrough(a, b, Direction.Both)
+          .await
       enterBarrier("partition-healed-3")
     }
 
@@ -207,8 +214,9 @@ class JepsenInspiredInsertSpec
       val writeProbe = TestProbe()
       val writeAcks = myData.map { i ⇒
         sleepDelay()
-        replicator.tell(Update(key, ORSet(), WriteLocal, Some(i))(_ + i),
-                        writeProbe.ref)
+        replicator.tell(
+          Update(key, ORSet(), WriteLocal, Some(i))(_ + i),
+          writeProbe.ref)
         writeProbe.receiveOne(3.seconds)
       }
       val successWriteAcks = writeAcks.collect {
@@ -246,13 +254,15 @@ class JepsenInspiredInsertSpec
     val writeMajority = WriteMajority(timeout)
     runOn(controller) {
       sleepBeforePartition()
-      for (a ← List(n1, n4, n5); b ← List(n2, n3)) testConductor
-        .blackhole(a, b, Direction.Both)
-        .await
+      for (a ← List(n1, n4, n5); b ← List(n2, n3))
+        testConductor
+          .blackhole(a, b, Direction.Both)
+          .await
       sleepDuringPartition()
-      for (a ← List(n1, n4, n5); b ← List(n2, n3)) testConductor
-        .passThrough(a, b, Direction.Both)
-        .await
+      for (a ← List(n1, n4, n5); b ← List(n2, n3))
+        testConductor
+          .passThrough(a, b, Direction.Both)
+          .await
       enterBarrier("partition-healed-4")
     }
 
@@ -260,8 +270,9 @@ class JepsenInspiredInsertSpec
       val writeProbe = TestProbe()
       val writeAcks = myData.map { i ⇒
         sleepDelay()
-        replicator.tell(Update(key, ORSet(), writeMajority, Some(i))(_ + i),
-                        writeProbe.ref)
+        replicator.tell(
+          Update(key, ORSet(), writeMajority, Some(i))(_ + i),
+          writeProbe.ref)
         writeProbe.receiveOne(timeout + 1.second)
       }
       val successWriteAcks = writeAcks.collect {

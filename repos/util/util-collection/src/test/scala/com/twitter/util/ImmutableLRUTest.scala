@@ -11,8 +11,8 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 class ImmutableLRUTest extends FunSuite with GeneratorDrivenPropertyChecks {
 
   // don't waste too much time testing this and keep things small
-  implicit override val generatorDrivenConfig = PropertyCheckConfig(
-      minSuccessful = 5, minSize = 2, maxSize = 10)
+  implicit override val generatorDrivenConfig =
+    PropertyCheckConfig(minSuccessful = 5, minSize = 2, maxSize = 10)
 
   test("ImmutableLRU insertion") {
     forAll(Gen.zip(Gen.identifier, arbitrary[Int])) {
@@ -34,7 +34,7 @@ class ImmutableLRUTest extends FunSuite with GeneratorDrivenPropertyChecks {
       lru: ImmutableLRU[String, V],
       entries: List[(String, V)]): ImmutableLRU[String, V] = {
     entries match {
-      case Nil => lru
+      case Nil          => lru
       case head :: tail => buildLRU((lru + head)._2, tail)
     }
   }
@@ -42,10 +42,11 @@ class ImmutableLRUTest extends FunSuite with GeneratorDrivenPropertyChecks {
   test("ImmutableLRU eviction") {
     forAll(LRUEntriesGenerator[Int]) { entries =>
       val lru = buildLRU(ImmutableLRU[String, Int](4), entries)
-      assert(lru.keySet == entries
-            .map(_._1)
-            .slice(entries.size - 4, entries.size)
-            .toSet)
+      assert(
+        lru.keySet == entries
+          .map(_._1)
+          .slice(entries.size - 4, entries.size)
+          .toSet)
     }
   }
 

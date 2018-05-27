@@ -30,12 +30,13 @@ import scala.concurrent.duration._
   *   Always matching is acceptable since the list of headers can be unbounded.
   *
   */
-case class CORSConfig(allowedOrigins: Origins = Origins.None,
-                      isHttpMethodAllowed: String => Boolean = _ => true,
-                      isHttpHeaderAllowed: String => Boolean = _ => true,
-                      exposedHeaders: Seq[String] = Seq.empty,
-                      supportsCredentials: Boolean = true,
-                      preflightMaxAge: Duration = 1.hour) {
+case class CORSConfig(
+    allowedOrigins: Origins = Origins.None,
+    isHttpMethodAllowed: String => Boolean = _ => true,
+    isHttpHeaderAllowed: String => Boolean = _ => true,
+    exposedHeaders: Seq[String] = Seq.empty,
+    supportsCredentials: Boolean = true,
+    preflightMaxAge: Duration = 1.hour) {
   def anyOriginAllowed: Boolean = allowedOrigins == Origins.All
   def withAnyOriginAllowed = withOriginsAllowed(Origins.All)
 
@@ -90,12 +91,14 @@ object CORSConfig {
   /**
     *
     */
-  val denyAll: CORSConfig = CORSConfig(allowedOrigins = Origins.None,
-                                       isHttpMethodAllowed = _ => false,
-                                       isHttpHeaderAllowed = _ => false,
-                                       exposedHeaders = Seq.empty,
-                                       supportsCredentials = true,
-                                       preflightMaxAge = 0.seconds)
+  val denyAll: CORSConfig = CORSConfig(
+    allowedOrigins = Origins.None,
+    isHttpMethodAllowed = _ => false,
+    isHttpHeaderAllowed = _ => false,
+    exposedHeaders = Seq.empty,
+    supportsCredentials = true,
+    preflightMaxAge = 0.seconds
+  )
 
   /**
     * Build a [[CORSConfig]]from a [[play.api.Configuration]]
@@ -122,27 +125,27 @@ object CORSConfig {
   private[cors] def fromUnprefixedConfiguration(
       config: PlayConfig): CORSConfig = {
     CORSConfig(
-        allowedOrigins = config.get[Option[Seq[String]]]("allowedOrigins") match {
-          case Some(allowed) => Origins.Matching(allowed.toSet)
-          case None => Origins.All
-        },
-        isHttpMethodAllowed = config
-            .get[Option[Seq[String]]]("allowedHttpMethods")
-            .map { methods =>
-            val s = methods.toSet
-            s.contains _
-          }
-            .getOrElse(_ => true),
-        isHttpHeaderAllowed = config
-            .get[Option[Seq[String]]]("allowedHttpHeaders")
-            .map { headers =>
-            val s = headers.map(_.toLowerCase(java.util.Locale.ENGLISH)).toSet
-            s.contains _
-          }
-            .getOrElse(_ => true),
-        exposedHeaders = config.get[Seq[String]]("exposedHeaders"),
-        supportsCredentials = config.get[Boolean]("supportsCredentials"),
-        preflightMaxAge = config.get[Duration]("preflightMaxAge")
+      allowedOrigins = config.get[Option[Seq[String]]]("allowedOrigins") match {
+        case Some(allowed) => Origins.Matching(allowed.toSet)
+        case None          => Origins.All
+      },
+      isHttpMethodAllowed = config
+        .get[Option[Seq[String]]]("allowedHttpMethods")
+        .map { methods =>
+          val s = methods.toSet
+          s.contains _
+        }
+        .getOrElse(_ => true),
+      isHttpHeaderAllowed = config
+        .get[Option[Seq[String]]]("allowedHttpHeaders")
+        .map { headers =>
+          val s = headers.map(_.toLowerCase(java.util.Locale.ENGLISH)).toSet
+          s.contains _
+        }
+        .getOrElse(_ => true),
+      exposedHeaders = config.get[Seq[String]]("exposedHeaders"),
+      supportsCredentials = config.get[Boolean]("supportsCredentials"),
+      preflightMaxAge = config.get[Duration]("preflightMaxAge")
     )
   }
 }

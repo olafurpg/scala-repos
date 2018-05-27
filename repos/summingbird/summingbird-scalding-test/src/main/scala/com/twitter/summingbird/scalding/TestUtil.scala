@@ -31,11 +31,11 @@ object TestUtil {
   def simpleTimeExtractor[T <: (Long, _)]: TimeExtractor[T] =
     TimeExtractor(_._1)
 
-  def compareMaps[K, V : Group](original: Iterable[Any],
-                                inMemory: Map[K, V],
-                                produced: Map[K, V],
-                                name: String)(
-      implicit batcher: Batcher): Boolean = {
+  def compareMaps[K, V: Group](
+      original: Iterable[Any],
+      inMemory: Map[K, V],
+      produced: Map[K, V],
+      name: String)(implicit batcher: Batcher): Boolean = {
     val diffMap = Group.minus(inMemory, produced)
     val wrong = Monoid.isNonZero(diffMap)
     if (wrong) {
@@ -50,10 +50,11 @@ object TestUtil {
     !wrong
   }
 
-  def compareMaps[K, V : Group](original: Iterable[Any],
-                                inMemory: Map[K, V],
-                                testStore: TestStore[K, V],
-                                name: String = ""): Boolean = {
+  def compareMaps[K, V: Group](
+      original: Iterable[Any],
+      inMemory: Map[K, V],
+      testStore: TestStore[K, V],
+      name: String = ""): Boolean = {
     val produced = testStore.lastToIterable.toMap
     val diffMap = Group.minus(inMemory, produced)
     val wrong = Monoid.isNonZero(diffMap)
@@ -62,12 +63,13 @@ object TestUtil {
       println("input: " + original)
       println("input size: " + original.size)
       println(
-          "input batches: " +
+        "input batches: " +
           testStore.batcher.batchOf(Timestamp(original.size)))
       println("producer extra keys: " + (produced.keySet -- inMemory.keySet))
       println("producer missing keys: " + (inMemory.keySet -- produced.keySet))
       println("written batches: " + testStore.writtenBatches)
-      println("earliest unwritten time: " +
+      println(
+        "earliest unwritten time: " +
           testStore.batcher.earliestTimeOf(testStore.writtenBatches.max.next))
       println("Difference: " + diffMap)
     }
@@ -88,9 +90,10 @@ object TestUtil {
   }
 
   /* keep just the values */
-  def pruneToBatchCovered[T](input: TraversableOnce[(Long, T)],
-                             inputRange: Interval[Timestamp],
-                             batcher: Batcher): TraversableOnce[T] = {
+  def pruneToBatchCovered[T](
+      input: TraversableOnce[(Long, T)],
+      inputRange: Interval[Timestamp],
+      batcher: Batcher): TraversableOnce[T] = {
     pruneToBatchCoveredWithTime(input, inputRange, batcher).map {
       case (ts, v) => v
     }

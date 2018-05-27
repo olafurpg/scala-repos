@@ -20,19 +20,23 @@ package org.apache.spark.sql.execution
 import org.apache.spark.SparkContext
 import org.apache.spark.sql._
 import org.apache.spark.sql.catalyst.expressions._
-import org.apache.spark.sql.execution.datasources.{DataSourceStrategy, FileSourceStrategy}
+import org.apache.spark.sql.execution.datasources.{
+  DataSourceStrategy,
+  FileSourceStrategy
+}
 import org.apache.spark.sql.internal.SQLConf
 
-class SparkPlanner(val sparkContext: SparkContext,
-                   val conf: SQLConf,
-                   val experimentalMethods: ExperimentalMethods)
+class SparkPlanner(
+    val sparkContext: SparkContext,
+    val conf: SQLConf,
+    val experimentalMethods: ExperimentalMethods)
     extends SparkStrategies {
 
   def numPartitions: Int = conf.numShufflePartitions
 
   def strategies: Seq[Strategy] =
     experimentalMethods.extraStrategies ++
-    (FileSourceStrategy :: DataSourceStrategy :: DDLStrategy :: SpecialLimits :: Aggregation :: LeftSemiJoin :: EquiJoinSelection :: InMemoryScans :: BasicOperators :: BroadcastNestedLoop :: CartesianProduct :: DefaultJoin :: Nil)
+      (FileSourceStrategy :: DataSourceStrategy :: DDLStrategy :: SpecialLimits :: Aggregation :: LeftSemiJoin :: EquiJoinSelection :: InMemoryScans :: BasicOperators :: BroadcastNestedLoop :: CartesianProduct :: DefaultJoin :: Nil)
 
   /**
     * Used to build table scan operators where complex projection and filtering are done using
@@ -56,7 +60,7 @@ class SparkPlanner(val sparkContext: SparkContext,
     val projectSet = AttributeSet(projectList.flatMap(_.references))
     val filterSet = AttributeSet(filterPredicates.flatMap(_.references))
     val filterCondition: Option[Expression] = prunePushedDownFilters(
-        filterPredicates).reduceLeftOption(catalyst.expressions.And)
+      filterPredicates).reduceLeftOption(catalyst.expressions.And)
 
     // Right now we still use a projection even if the only evaluation is applying an alias
     // to a column.  Since this is a no-op, it could be avoided. However, using this
@@ -73,8 +77,7 @@ class SparkPlanner(val sparkContext: SparkContext,
       filterCondition.map(Filter(_, scan)).getOrElse(scan)
     } else {
       val scan = scanBuilder((projectSet ++ filterSet).toSeq)
-      Project(
-          projectList, filterCondition.map(Filter(_, scan)).getOrElse(scan))
+      Project(projectList, filterCondition.map(Filter(_, scan)).getOrElse(scan))
     }
   }
 }

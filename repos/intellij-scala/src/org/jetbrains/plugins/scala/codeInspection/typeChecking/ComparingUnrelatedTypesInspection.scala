@@ -6,7 +6,10 @@ import com.intellij.psi.{PsiMethod, PsiElement}
 import com.siyeh.ig.psiutils.MethodUtils
 import org.jetbrains.plugins.scala.codeInspection.collections.MethodRepr
 import org.jetbrains.plugins.scala.codeInspection.typeChecking.ComparingUnrelatedTypesInspection._
-import org.jetbrains.plugins.scala.codeInspection.{AbstractInspection, InspectionBundle}
+import org.jetbrains.plugins.scala.codeInspection.{
+  AbstractInspection,
+  InspectionBundle
+}
 import org.jetbrains.plugins.scala.extensions.{PsiClassExt, ResolvesTo}
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScReferenceExpression
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
@@ -79,28 +82,32 @@ class ComparingUnrelatedTypesInspection
     case MethodRepr(expr, Some(left), Some(oper), Seq(right))
         if Seq("==", "!=", "ne", "eq", "equals") contains oper.refName =>
       val needHighlighting = oper.resolve() match {
-        case synth: ScSyntheticFunction => true
+        case synth: ScSyntheticFunction              => true
         case m: PsiMethod if MethodUtils.isEquals(m) => true
-        case _ => false
+        case _                                       => false
       }
       if (needHighlighting) {
         //getType() for the reference on the left side returns singleton type, little hack here
         val leftOnTheRight =
           ScalaPsiElementFactory.createExpressionWithContextFromText(
-              left.getText, right.getParent, right)
+            left.getText,
+            right.getParent,
+            right)
         Seq(leftOnTheRight, right) map (_.getType()) match {
           case Seq(Success(leftType, _), Success(rightType, _))
               if cannotBeCompared(leftType, rightType) =>
             holder.registerProblem(
-                expr,
-                inspectionName,
-                ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
+              expr,
+              inspectionName,
+              ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
           case _ =>
         }
       }
     case MethodRepr(
-        _, Some(baseExpr), Some(ResolvesTo(fun: ScFunction)), Seq(arg, _ *))
-        if mayNeedHighlighting(fun) =>
+        _,
+        Some(baseExpr),
+        Some(ResolvesTo(fun: ScFunction)),
+        Seq(arg, _*)) if mayNeedHighlighting(fun) =>
       for {
         ScParameterizedType(_, Seq(elemType)) <- baseExpr
           .getType()
@@ -110,23 +117,28 @@ class ComparingUnrelatedTypesInspection
         val (elemTypeText, argTypeText) =
           ScTypePresentation.different(elemType, argType)
         val message = InspectionBundle.message(
-            "comparing.unrelated.types.hint", elemTypeText, argTypeText)
+          "comparing.unrelated.types.hint",
+          elemTypeText,
+          argTypeText)
         holder.registerProblem(
-            arg, message, ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
+          arg,
+          message,
+          ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
       }
     case IsInstanceOfCall(call) =>
       val qualType = call.referencedExpr match {
         case ScReferenceExpression.withQualifier(q) => q.getType().toOption
-        case _ => None
+        case _                                      => None
       }
       val argType = call.arguments.headOption.flatMap(_.getType().toOption)
       for {
         t1 <- qualType
         t2 <- argType if cannotBeCompared(t1, t2)
       } {
-        holder.registerProblem(call,
-                               inspectionName,
-                               ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
+        holder.registerProblem(
+          call,
+          inspectionName,
+          ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
       }
   }
 

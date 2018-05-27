@@ -49,16 +49,19 @@ class ClusterHeartbeatSenderStateSpec extends WordSpec with Matchers {
 
   private def emptyState(selfUniqueAddress: UniqueAddress) =
     ClusterHeartbeatSenderState(
-        ring = HeartbeatNodeRing(selfUniqueAddress,
-                                 Set(selfUniqueAddress),
-                                 Set.empty,
-                                 monitoredByNrOfMembers = 3),
-        oldReceiversNowUnreachable = Set.empty[UniqueAddress],
-        failureDetector = new DefaultFailureDetectorRegistry[Address](
-              () ⇒ new FailureDetectorStub))
+      ring = HeartbeatNodeRing(
+        selfUniqueAddress,
+        Set(selfUniqueAddress),
+        Set.empty,
+        monitoredByNrOfMembers = 3),
+      oldReceiversNowUnreachable = Set.empty[UniqueAddress],
+      failureDetector = new DefaultFailureDetectorRegistry[Address](() ⇒
+        new FailureDetectorStub)
+    )
 
-  private def fd(state: ClusterHeartbeatSenderState,
-                 node: UniqueAddress): FailureDetectorStub =
+  private def fd(
+      state: ClusterHeartbeatSenderState,
+      node: UniqueAddress): FailureDetectorStub =
     state.failureDetector
       .asInstanceOf[DefaultFailureDetectorRegistry[Address]]
       .failureDetector(node.address)
@@ -73,22 +76,22 @@ class ClusterHeartbeatSenderStateSpec extends WordSpec with Matchers {
 
     "init with empty" in {
       emptyState.init(Set.empty, Set.empty).activeReceivers should ===(
-          Set.empty)
+        Set.empty)
     }
 
     "init with self" in {
       emptyState.init(Set(aa, bb, cc), Set.empty).activeReceivers should ===(
-          Set(bb, cc))
+        Set(bb, cc))
     }
 
     "init without self" in {
       emptyState.init(Set(bb, cc), Set.empty).activeReceivers should ===(
-          Set(bb, cc))
+        Set(bb, cc))
     }
 
     "use added members" in {
       emptyState.addMember(bb).addMember(cc).activeReceivers should ===(
-          Set(bb, cc))
+        Set(bb, cc))
     }
 
     "use added members also when unreachable" in {
@@ -100,8 +103,11 @@ class ClusterHeartbeatSenderStateSpec extends WordSpec with Matchers {
     }
 
     "not use removed members" in {
-      emptyState.addMember(bb).addMember(cc).removeMember(bb).activeReceivers should ===(
-          Set(cc))
+      emptyState
+        .addMember(bb)
+        .addMember(cc)
+        .removeMember(bb)
+        .activeReceivers should ===(Set(cc))
     }
 
     "use specified number of members" in {
@@ -193,11 +199,10 @@ class ClusterHeartbeatSenderStateSpec extends WordSpec with Matchers {
                 state = state.addMember(node)
                 // keep unreachable
                 (oldUnreachable diff state.activeReceivers) should ===(
-                    Set.empty)
+                  Set.empty)
                 state.failureDetector.isMonitoring(node.address) should ===(
-                    false)
-                state.failureDetector.isAvailable(node.address) should ===(
-                    true)
+                  false)
+                state.failureDetector.isAvailable(node.address) should ===(true)
               }
 
             case Remove ⇒
@@ -208,15 +213,14 @@ class ClusterHeartbeatSenderStateSpec extends WordSpec with Matchers {
                 // keep unreachable, unless it was the removed
                 if (oldUnreachable(node))
                   (oldUnreachable diff state.activeReceivers) should ===(
-                      Set(node))
+                    Set(node))
                 else
                   (oldUnreachable diff state.activeReceivers) should ===(
-                      Set.empty)
+                    Set.empty)
 
                 state.failureDetector.isMonitoring(node.address) should ===(
-                    false)
-                state.failureDetector.isAvailable(node.address) should ===(
-                    true)
+                  false)
+                state.failureDetector.isAvailable(node.address) should ===(true)
                 state.activeReceivers should not contain (node)
               }
 
@@ -225,9 +229,9 @@ class ClusterHeartbeatSenderStateSpec extends WordSpec with Matchers {
                 state.failureDetector.heartbeat(node.address) // make sure the fd is created
                 fd(state, node).markNodeAsUnavailable()
                 state.failureDetector.isMonitoring(node.address) should ===(
-                    true)
+                  true)
                 state.failureDetector.isAvailable(node.address) should ===(
-                    false)
+                  false)
                 state = state.unreachableMember(node)
               }
 
@@ -244,22 +248,21 @@ class ClusterHeartbeatSenderStateSpec extends WordSpec with Matchers {
 
                 if (oldUnreachable(node) && !oldRingReceivers(node))
                   state.failureDetector.isMonitoring(node.address) should ===(
-                      false)
+                    false)
 
                 if (oldRingReceivers(node))
                   state.failureDetector.isMonitoring(node.address) should ===(
-                      true)
+                    true)
 
                 state.ring.myReceivers should ===(oldRingReceivers)
-                state.failureDetector.isAvailable(node.address) should ===(
-                    true)
+                state.failureDetector.isAvailable(node.address) should ===(true)
               }
           }
         } catch {
           case e: Throwable ⇒
             println(s"Failure context: i=$i, node=$node, op=$operation, " +
-                s"oldReceiversNowUnreachable=${state.oldReceiversNowUnreachable}, " +
-                s"ringReceivers=${state.ring.myReceivers}, ringNodes=${state.ring.nodes}")
+              s"oldReceiversNowUnreachable=${state.oldReceiversNowUnreachable}, " +
+              s"ringReceivers=${state.ring.myReceivers}, ringNodes=${state.ring.nodes}")
             throw e
         }
       }

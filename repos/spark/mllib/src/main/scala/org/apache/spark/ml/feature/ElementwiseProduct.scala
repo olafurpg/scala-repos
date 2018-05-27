@@ -20,7 +20,11 @@ package org.apache.spark.ml.feature
 import org.apache.spark.annotation.{Experimental, Since}
 import org.apache.spark.ml.UnaryTransformer
 import org.apache.spark.ml.param.Param
-import org.apache.spark.ml.util.{DefaultParamsReadable, DefaultParamsWritable, Identifiable}
+import org.apache.spark.ml.util.{
+  DefaultParamsReadable,
+  DefaultParamsWritable,
+  Identifiable
+}
 import org.apache.spark.mllib.feature
 import org.apache.spark.mllib.linalg.{Vector, VectorUDT}
 import org.apache.spark.sql.types.DataType
@@ -42,8 +46,8 @@ class ElementwiseProduct(override val uid: String)
     * the vector to multiply with input vectors
     * @group param
     */
-  val scalingVec: Param[Vector] = new Param(
-      this, "scalingVec", "vector for hadamard product")
+  val scalingVec: Param[Vector] =
+    new Param(this, "scalingVec", "vector for hadamard product")
 
   /** @group setParam */
   def setScalingVec(value: Vector): this.type = set(scalingVec, value)
@@ -52,8 +56,9 @@ class ElementwiseProduct(override val uid: String)
   def getScalingVec: Vector = getOrDefault(scalingVec)
 
   override protected def createTransformFunc: Vector => Vector = {
-    require(params.contains(scalingVec),
-            s"transformation requires a weight vector")
+    require(
+      params.contains(scalingVec),
+      s"transformation requires a weight vector")
     val elemScaler = new feature.ElementwiseProduct($(scalingVec))
     elemScaler.transform
   }

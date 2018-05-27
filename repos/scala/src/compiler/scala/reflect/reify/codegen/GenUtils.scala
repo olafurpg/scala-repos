@@ -107,7 +107,7 @@ trait GenUtils { self: Reifier =>
     case TypeApply(hk, _) => isCrossStageTypeBearer(hk)
     case Select(sym @ Select(_, ctor), nme.apply)
         if ctor == nme.WeakTypeTag || ctor == nme.TypeTag ||
-        ctor == nme.Expr =>
+          ctor == nme.Expr =>
       true
     case _ => false
   }
@@ -117,7 +117,9 @@ trait GenUtils { self: Reifier =>
     if (sym.owner != NoSymbol) origin += "defined by %s".format(sym.owner.name)
     if (sym.pos != NoPosition)
       origin += " in %s:%s:%s".format(
-          sym.pos.source.file.name, sym.pos.line, sym.pos.column)
+        sym.pos.source.file.name,
+        sym.pos.line,
+        sym.pos.column)
     if (origin == "") origin = "of unknown origin"
     origin
   }

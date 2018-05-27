@@ -53,29 +53,33 @@ object FastEvalEngineWorkflow {
   }
 
   case class PreparatorPrefix(
-      dataSourceParams: (String, Params), preparatorParams: (String, Params)) {
+      dataSourceParams: (String, Params),
+      preparatorParams: (String, Params)) {
     def this(ap: AlgorithmsPrefix) = {
       this(ap.dataSourceParams, ap.preparatorParams)
     }
   }
 
-  case class AlgorithmsPrefix(dataSourceParams: (String, Params),
-                              preparatorParams: (String, Params),
-                              algorithmParamsList: Seq[(String, Params)]) {
+  case class AlgorithmsPrefix(
+      dataSourceParams: (String, Params),
+      preparatorParams: (String, Params),
+      algorithmParamsList: Seq[(String, Params)]) {
     def this(sp: ServingPrefix) = {
       this(sp.dataSourceParams, sp.preparatorParams, sp.algorithmParamsList)
     }
   }
 
-  case class ServingPrefix(dataSourceParams: (String, Params),
-                           preparatorParams: (String, Params),
-                           algorithmParamsList: Seq[(String, Params)],
-                           servingParams: (String, Params)) {
+  case class ServingPrefix(
+      dataSourceParams: (String, Params),
+      preparatorParams: (String, Params),
+      algorithmParamsList: Seq[(String, Params)],
+      servingParams: (String, Params)) {
     def this(ep: EngineParams) =
-      this(ep.dataSourceParams,
-           ep.preparatorParams,
-           ep.algorithmParamsList,
-           ep.servingParams)
+      this(
+        ep.dataSourceParams,
+        ep.preparatorParams,
+        ep.algorithmParamsList,
+        ep.servingParams)
   }
 
   def getDataSourceResult[TD, EI, PD, Q, P, A](
@@ -85,15 +89,15 @@ object FastEvalEngineWorkflow {
 
     if (!cache.contains(prefix)) {
       val dataSource = Doer(
-          workflow.engine.dataSourceClassMap(prefix.dataSourceParams._1),
-          prefix.dataSourceParams._2)
+        workflow.engine.dataSourceClassMap(prefix.dataSourceParams._1),
+        prefix.dataSourceParams._2)
 
       val result = dataSource
         .readEvalBase(workflow.sc)
         .map {
           case (td, ei, qaRDD) => {
-              (td, ei, qaRDD.zipWithUniqueId().map(_.swap))
-            }
+            (td, ei, qaRDD.zipWithUniqueId().map(_.swap))
+          }
         }
         .zipWithIndex
         .map(_.swap)
@@ -111,12 +115,13 @@ object FastEvalEngineWorkflow {
 
     if (!cache.contains(prefix)) {
       val preparator = Doer(
-          workflow.engine.preparatorClassMap(prefix.preparatorParams._1),
-          prefix.preparatorParams._2)
+        workflow.engine.preparatorClassMap(prefix.preparatorParams._1),
+        prefix.preparatorParams._2)
 
       val result =
-        getDataSourceResult(workflow = workflow,
-                            prefix = new DataSourcePrefix(prefix)).mapValues {
+        getDataSourceResult(
+          workflow = workflow,
+          prefix = new DataSourcePrefix(prefix)).mapValues {
           case (td, _, _) => preparator.prepareBase(workflow.sc, td)
         }
 
@@ -130,30 +135,34 @@ object FastEvalEngineWorkflow {
       prefix: AlgorithmsPrefix): Map[EX, RDD[(QX, Seq[P])]] = {
 
     val algoMap: Map[AX, BaseAlgorithm[PD, _, Q, P]] =
-      prefix.algorithmParamsList.map {
-        case (algoName, algoParams) => {
+      prefix.algorithmParamsList
+        .map {
+          case (algoName, algoParams) => {
             try {
               Doer(workflow.engine.algorithmClassMap(algoName), algoParams)
             } catch {
               case e: NoSuchElementException => {
-                  val algorithmClassMap = workflow.engine.algorithmClassMap
-                  if (algoName == "") {
-                    logger.error(
-                        "Empty algorithm name supplied but it could not " +
-                        "match with any algorithm in the engine's definition. " +
-                        "Existing algorithm name(s) are: " +
-                        s"${algorithmClassMap.keys.mkString(", ")}. Aborting.")
-                  } else {
-                    logger.error(
-                        s"${algoName} cannot be found in the engine's " +
-                        "definition. Existing algorithm name(s) are: " +
-                        s"${algorithmClassMap.keys.mkString(", ")}. Aborting.")
-                  }
-                  sys.exit(1)
+                val algorithmClassMap = workflow.engine.algorithmClassMap
+                if (algoName == "") {
+                  logger.error(
+                    "Empty algorithm name supplied but it could not " +
+                      "match with any algorithm in the engine's definition. " +
+                      "Existing algorithm name(s) are: " +
+                      s"${algorithmClassMap.keys.mkString(", ")}. Aborting.")
+                } else {
+                  logger.error(
+                    s"${algoName} cannot be found in the engine's " +
+                      "definition. Existing algorithm name(s) are: " +
+                      s"${algorithmClassMap.keys.mkString(", ")}. Aborting.")
                 }
+                sys.exit(1)
+              }
             }
           }
-      }.zipWithIndex.map(_.swap).toMap
+        }
+        .zipWithIndex
+        .map(_.swap)
+        .toMap
 
     val algoCount = algoMap.size
 
@@ -166,10 +175,12 @@ object FastEvalEngineWorkflow {
 
     // Predict
     val dataSourceResult = FastEvalEngineWorkflow.getDataSourceResult(
-        workflow = workflow, prefix = new DataSourcePrefix(prefix))
+      workflow = workflow,
+      prefix = new DataSourcePrefix(prefix))
 
-    val algoResult: Map[EX, RDD[(QX, Seq[P])]] = dataSourceResult.par.map {
-      case (ex, (td, ei, iqaRDD)) => {
+    val algoResult: Map[EX, RDD[(QX, Seq[P])]] = dataSourceResult.par
+      .map {
+        case (ex, (td, ei, iqaRDD)) => {
           val modelsMap: Map[AX, Any] = algoModelsMap(ex)
           val qs: RDD[(QX, Q)] = iqaRDD.mapValues(_._1)
 
@@ -193,15 +204,18 @@ object FastEvalEngineWorkflow {
             .groupByKey
             .mapValues { ps =>
               {
-                assert(ps.size == algoCount,
-                       "Must have same length as algoCount")
+                assert(
+                  ps.size == algoCount,
+                  "Must have same length as algoCount")
                 // TODO. Check size == algoCount
                 ps.toSeq.sortBy(_._1).map(_._2)
               }
             }
-            (ex, unionAlgoPredicts)
+          (ex, unionAlgoPredicts)
         }
-    }.seq.toMap
+      }
+      .seq
+      .toMap
 
     algoResult
   }
@@ -223,30 +237,32 @@ object FastEvalEngineWorkflow {
     val cache = workflow.servingCache
     if (!cache.contains(prefix)) {
       val serving = Doer(
-          workflow.engine.servingClassMap(prefix.servingParams._1),
-          prefix.servingParams._2)
+        workflow.engine.servingClassMap(prefix.servingParams._1),
+        prefix.servingParams._2)
 
       val algoPredictsMap = getAlgorithmsResult(
-          workflow = workflow, prefix = new AlgorithmsPrefix(prefix))
+        workflow = workflow,
+        prefix = new AlgorithmsPrefix(prefix))
 
       val dataSourceResult = getDataSourceResult(
-          workflow = workflow, prefix = new DataSourcePrefix(prefix))
+        workflow = workflow,
+        prefix = new DataSourcePrefix(prefix))
 
       val evalQAsMap = dataSourceResult.mapValues(_._3)
       val evalInfoMap = dataSourceResult.mapValues(_._2)
 
       val servingQPAMap: Map[EX, RDD[(Q, P, A)]] = algoPredictsMap.map {
         case (ex, psMap) => {
-            val qasMap: RDD[(QX, (Q, A))] = evalQAsMap(ex)
-            val qpsaMap: RDD[(QX, Q, Seq[P], A)] = psMap.join(qasMap).map {
-              case (qx, t) => (qx, t._2._1, t._1, t._2._2)
-            }
-
-            val qpaMap: RDD[(Q, P, A)] = qpsaMap.map {
-              case (qx, q, ps, a) => (q, serving.serveBase(q, ps), a)
-            }
-            (ex, qpaMap)
+          val qasMap: RDD[(QX, (Q, A))] = evalQAsMap(ex)
+          val qpsaMap: RDD[(QX, Q, Seq[P], A)] = psMap.join(qasMap).map {
+            case (qx, t) => (qx, t._2._1, t._1, t._2._2)
           }
+
+          val qpaMap: RDD[(Q, P, A)] = qpsaMap.map {
+            case (qx, q, ps, a) => (q, serving.serveBase(q, ps), a)
+          }
+          (ex, qpaMap)
+        }
       }
 
       val servingResult = (0 until evalQAsMap.size).map { ex =>
@@ -266,8 +282,9 @@ object FastEvalEngineWorkflow {
     : Seq[(EngineParams, Seq[(EI, RDD[(Q, P, A)])])] = {
     engineParamsList.map { engineParams =>
       {
-        (engineParams,
-         getServingResult(workflow, new ServingPrefix(engineParams)))
+        (
+          engineParams,
+          getServingResult(workflow, new ServingPrefix(engineParams)))
       }
     }
   }
@@ -310,22 +327,25 @@ class FastEvalEngine[TD, EI, PD, Q, P, A](
     preparatorClassMap: Map[String, Class[_ <: BasePreparator[TD, PD]]],
     algorithmClassMap: Map[String, Class[_ <: BaseAlgorithm[PD, _, Q, P]]],
     servingClassMap: Map[String, Class[_ <: BaseServing[Q, P]]])
-    extends Engine[TD, EI, PD, Q, P, A](dataSourceClassMap,
-                                        preparatorClassMap,
-                                        algorithmClassMap,
-                                        servingClassMap) {
+    extends Engine[TD, EI, PD, Q, P, A](
+      dataSourceClassMap,
+      preparatorClassMap,
+      algorithmClassMap,
+      servingClassMap) {
   @transient override lazy val logger = Logger[this.type]
 
-  override def eval(sc: SparkContext,
-                    engineParams: EngineParams,
-                    params: WorkflowParams): Seq[(EI, RDD[(Q, P, A)])] = {
+  override def eval(
+      sc: SparkContext,
+      engineParams: EngineParams,
+      params: WorkflowParams): Seq[(EI, RDD[(Q, P, A)])] = {
     logger.info("FastEvalEngine.eval")
     batchEval(sc, Seq(engineParams), params).head._2
   }
 
-  override def batchEval(sc: SparkContext,
-                         engineParamsList: Seq[EngineParams],
-                         params: WorkflowParams)
+  override def batchEval(
+      sc: SparkContext,
+      engineParamsList: Seq[EngineParams],
+      params: WorkflowParams)
     : Seq[(EngineParams, Seq[(EI, RDD[(Q, P, A)])])] = {
 
     val fastEngineWorkflow = new FastEvalEngineWorkflow(this, sc, params)

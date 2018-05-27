@@ -4,7 +4,8 @@ package runtime
 
 // SI-6240: test thread-safety, make trees synchronized as well
 private[reflect] trait SynchronizedOps
-    extends internal.SymbolTable with SynchronizedSymbols
+    extends internal.SymbolTable
+    with SynchronizedSymbols
     with SynchronizedTypes {
   self: SymbolTable =>
 
@@ -15,7 +16,8 @@ private[reflect] trait SynchronizedOps
 // BaseTypeSeqs
 
   override protected def newBaseTypeSeq(
-      parents: List[Type], elems: Array[Type]) =
+      parents: List[Type],
+      elems: Array[Type]) =
     // only need to synchronize BaseTypeSeqs if they contain refined types
     if (elems.exists(_.isInstanceOf[RefinedType]))
       new BaseTypeSeq(parents, elems) with SynchronizedBaseTypeSeq

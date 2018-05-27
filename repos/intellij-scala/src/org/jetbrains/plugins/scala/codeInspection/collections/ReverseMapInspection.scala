@@ -13,9 +13,9 @@ object ReverseMap extends SimplificationType() {
     expr match {
       case qual `.reverse` () `.map` () =>
         Some(
-            replace(expr)
-              .withText(invocationText(qual, "reverseMap"))
-              .highlightFrom(qual))
+          replace(expr)
+            .withText(invocationText(qual, "reverseMap"))
+            .highlightFrom(qual))
       case _ => None
     }
   }

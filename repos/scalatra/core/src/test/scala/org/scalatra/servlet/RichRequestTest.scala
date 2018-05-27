@@ -22,7 +22,8 @@ class RichRequestTest extends FunSuite with Matchers {
   }
 
   def createStubRequestWithContent(
-      content: Array[Byte], encoding: String): HttpServletRequest = {
+      content: Array[Byte],
+      encoding: String): HttpServletRequest = {
     val request = mock(classOf[HttpServletRequest])
     when(request.getInputStream)
       .thenReturn(new FakeServletInputStream(content))

@@ -52,27 +52,31 @@ import cascading.tuple.{Fields, Tuple, TupleEntry}
   * @param template Template for the partitioned path
   * @param encoding Text encoding of the file content
   */
-case class PartitionedTextLine[P](path: String,
-                                  template: String,
-                                  encoding: String = TextLine.DEFAULT_CHARSET)(
+case class PartitionedTextLine[P](
+    path: String,
+    template: String,
+    encoding: String = TextLine.DEFAULT_CHARSET)(
     implicit val valueSetter: TupleSetter[String],
     val valueConverter: TupleConverter[(Long, String)],
     val partitionSetter: TupleSetter[P],
     val partitionConverter: TupleConverter[P])
-    extends SchemedSource with TypedSink[(P, String)]
-    with Mappable[(P, (Long, String))] with HfsTapProvider
+    extends SchemedSource
+    with TypedSink[(P, String)]
+    with Mappable[(P, (Long, String))]
+    with HfsTapProvider
     with java.io.Serializable {
 
   // The partition fields, offset by the value arity.
   val partitionFields = PartitionUtil.toFields(
-      valueSetter.arity, valueSetter.arity + partitionSetter.arity)
+    valueSetter.arity,
+    valueSetter.arity + partitionSetter.arity)
 
   // Create the underlying scheme and explicitly set the sink fields to be only the specified fields
   // see sinkFields in PartitionSchemed for other half of this work around.
   override def hdfsScheme = {
     val scheme = HadoopSchemeInstance(
-        new TextLine(TextLine.DEFAULT_SOURCE_FIELDS, encoding)
-          .asInstanceOf[Scheme[_, _, _, _, _]])
+      new TextLine(TextLine.DEFAULT_SOURCE_FIELDS, encoding)
+        .asInstanceOf[Scheme[_, _, _, _, _]])
     scheme.setSinkFields(PartitionUtil.toFields(0, valueSetter.arity))
     scheme
   }
@@ -95,29 +99,33 @@ case class PartitionedTextLine[P](path: String,
     PartitionUtil.toFields(0, valueSetter.arity + partitionSetter.arity)
 
   /** Creates the taps for local and hdfs mode.*/
-  override def createTap(
-      readOrWrite: AccessMode)(implicit mode: Mode): Tap[_, _, _] =
+  override def createTap(readOrWrite: AccessMode)(
+      implicit mode: Mode): Tap[_, _, _] =
     mode match {
       case Local(_) => {
-          val fileTap = new FileTap(localScheme, path, SinkMode.REPLACE)
-          new LocalPartitionTap(
-              fileTap,
-              new TemplatePartition(partitionFields, template),
-              SinkMode.UPDATE).asInstanceOf[Tap[_, _, _]]
-        }
+        val fileTap = new FileTap(localScheme, path, SinkMode.REPLACE)
+        new LocalPartitionTap(
+          fileTap,
+          new TemplatePartition(partitionFields, template),
+          SinkMode.UPDATE).asInstanceOf[Tap[_, _, _]]
+      }
       case Hdfs(_, _) => {
-          val hfs = createHfsTap(hdfsScheme, path, SinkMode.REPLACE)
-          new PartitionTap(hfs,
-                           new TemplatePartition(partitionFields, template),
-                           SinkMode.UPDATE).asInstanceOf[Tap[_, _, _]]
-        }
+        val hfs = createHfsTap(hdfsScheme, path, SinkMode.REPLACE)
+        new PartitionTap(
+          hfs,
+          new TemplatePartition(partitionFields, template),
+          SinkMode.UPDATE).asInstanceOf[Tap[_, _, _]]
+      }
       case hdfsTest @ HadoopTest(_, _) => {
-          val hfs = createHfsTap(
-              hdfsScheme, hdfsTest.getWritePathFor(this), SinkMode.REPLACE)
-          new PartitionTap(hfs,
-                           new TemplatePartition(partitionFields, template),
-                           SinkMode.UPDATE).asInstanceOf[Tap[_, _, _]]
-        }
+        val hfs = createHfsTap(
+          hdfsScheme,
+          hdfsTest.getWritePathFor(this),
+          SinkMode.REPLACE)
+        new PartitionTap(
+          hfs,
+          new TemplatePartition(partitionFields, template),
+          SinkMode.UPDATE).asInstanceOf[Tap[_, _, _]]
+      }
       case _ => TestTapFactory(this, hdfsScheme).createTap(readOrWrite)
     }
 
@@ -127,7 +135,8 @@ case class PartitionedTextLine[P](path: String,
     */
   override def converter[U >: (P, (Long, String))] =
     PartitionUtil.converter[P, (Long, String), U](
-        valueConverter, partitionConverter)
+      valueConverter,
+      partitionConverter)
 
   /** Flatten a pair of `P` and `line` into a cascading tuple.*/
   override def setter[U <: (P, String)] =

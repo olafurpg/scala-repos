@@ -27,7 +27,7 @@ private class NameTreeParsers private (str: String) {
       if (atEnd) s"$str[]"
       else s"${str.take(idx)}[${str(idx)}]${str.drop(idx + 1)}"
     throw new IllegalArgumentException(
-        s"$expected expected but $found found at '$displayStr'")
+      s"$expected expected but $found found at '$displayStr'")
   }
 
   private[this] def illegal(expected: Char, found: String): Nothing =

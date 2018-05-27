@@ -22,18 +22,20 @@ class SbtProjectOpenProcessor(builder: SbtProjectImportBuilder)
   override def canOpenProject(file: VirtualFile) =
     SbtProjectImportProvider.canImport(file)
 
-  override def doQuickImport(file: VirtualFile, wizardContext: WizardContext) = {
+  override def doQuickImport(
+      file: VirtualFile,
+      wizardContext: WizardContext) = {
     val path = SbtProjectImportProvider.projectRootOf(file).getPath
 
-    val dialog = new AddModuleWizard(
-        null, path, new SbtProjectImportProvider(getBuilder))
+    val dialog =
+      new AddModuleWizard(null, path, new SbtProjectImportProvider(getBuilder))
 
     getBuilder.prepare(wizardContext)
     getBuilder.getControl(null).setLinkedProjectPath(path)
 
     dialog.getWizardContext.setProjectBuilder(getBuilder)
-    dialog.navigateToStep(
-        (step: Step) => step.isInstanceOf[SelectExternalProjectStep])
+    dialog.navigateToStep((step: Step) =>
+      step.isInstanceOf[SelectExternalProjectStep])
 
     if (StringUtil.isEmpty(wizardContext.getProjectName)) {
       val projectName = dialog.getWizardContext.getProjectName

@@ -9,8 +9,7 @@ import scala.collection.JavaConverters._
   * [[HeaderMap]] implementation which proxies all calls to a
   * mutable netty `HttpHeaders` instance.
   */
-private[http4] class Netty4HeaderMap(
-    private[http4] val underlying: HttpHeaders)
+private[http4] class Netty4HeaderMap(private[http4] val underlying: HttpHeaders)
     extends HeaderMap {
   import Netty4HeaderMap._
 

@@ -40,15 +40,16 @@ object LoggerConfigurator {
     }
   }
 
-  def apply(loggerConfiguratorClassName: String,
-            classLoader: ClassLoader): Option[LoggerConfigurator] = {
+  def apply(
+      loggerConfiguratorClassName: String,
+      classLoader: ClassLoader): Option[LoggerConfigurator] = {
     try {
       val loggerConfiguratorClass: Class[_] =
         classLoader.loadClass(loggerConfiguratorClassName)
       Some(
-          loggerConfiguratorClass
-            .newInstance()
-            .asInstanceOf[LoggerConfigurator])
+        loggerConfiguratorClass
+          .newInstance()
+          .asInstanceOf[LoggerConfigurator])
     } catch {
       case ex: Exception =>
         val msg = s"""

@@ -1,5 +1,11 @@
 import com.twitter.finagle.exp.Mysql
-import com.twitter.finagle.exp.mysql.{ResultSet, Row, QueryRequest, LongValue, IntValue}
+import com.twitter.finagle.exp.mysql.{
+  ResultSet,
+  Row,
+  QueryRequest,
+  LongValue,
+  IntValue
+}
 import com.twitter.util.Await
 import com.twitter.finagle.client.DefaultPool
 import com.twitter.conversions.time._
@@ -9,8 +15,8 @@ object Shared {
   def processRow(row: Row): Option[Long] =
     row("product").flatMap {
       case LongValue(l) => Some(l)
-      case IntValue(i) => Some(i.toLong)
-      case _ => None
+      case IntValue(i)  => Some(i.toLong)
+      case _            => None
     }
   //#processRow
 }
@@ -22,11 +28,13 @@ object ServiceFactoryExample {
   val client = Mysql.client
     .withCredentials("<user>", "<password>")
     .withDatabase("test")
-    .configured(DefaultPool.Param(low = 0,
-                                  high = 10,
-                                  idleTime = 5.minutes,
-                                  bufferSize = 0,
-                                  maxWaiters = Int.MaxValue))
+    .configured(
+      DefaultPool.Param(
+        low = 0,
+        high = 10,
+        idleTime = 5.minutes,
+        bufferSize = 0,
+        maxWaiters = Int.MaxValue))
     .newClient("127.0.0.1:3306")
   //#client
 
@@ -36,7 +44,7 @@ object ServiceFactoryExample {
       // `service` is checked out from the pool.
       service(QueryRequest("SELECT 5*5 AS `product`")) map {
         case rs: ResultSet => rs.rows.map(processRow)
-        case _ => Seq.empty
+        case _             => Seq.empty
       } ensure {
         // put `service` back into the pool.
         service.close()
@@ -55,11 +63,13 @@ object RichExample {
   val richClient = Mysql.client
     .withCredentials("<user>", "<password>")
     .withDatabase("test")
-    .configured(DefaultPool.Param(low = 0,
-                                  high = 10,
-                                  idleTime = 5.minutes,
-                                  bufferSize = 0,
-                                  maxWaiters = Int.MaxValue))
+    .configured(
+      DefaultPool.Param(
+        low = 0,
+        high = 10,
+        idleTime = 5.minutes,
+        bufferSize = 0,
+        maxWaiters = Int.MaxValue))
     .newRichClient("127.0.0.1:3306")
   //#richClient
 

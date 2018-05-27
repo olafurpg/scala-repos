@@ -15,19 +15,22 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.ScImportSelecto
 class ScImportSelectorsStubImpl[ParentPsi <: PsiElement](
     parent: StubElement[ParentPsi],
     elemType: IStubElementType[
-        _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
+      _ <: StubElement[_ <: PsiElement],
+      _ <: PsiElement])
     extends StubBaseWrapper[ScImportSelectors](parent, elemType)
     with ScImportSelectorsStub {
   var singleWildcard: Boolean = _
 
-  def this(parent: StubElement[ParentPsi],
-           elemType: IStubElementType[
-               _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
-           singleWildcard: Boolean) {
+  def this(
+      parent: StubElement[ParentPsi],
+      elemType: IStubElementType[
+        _ <: StubElement[_ <: PsiElement],
+        _ <: PsiElement],
+      singleWildcard: Boolean) {
     this(
-        parent,
-        elemType
-          .asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
+      parent,
+      elemType
+        .asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
     this.singleWildcard = singleWildcard
   }
 

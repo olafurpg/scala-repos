@@ -10,11 +10,12 @@ import org.jetbrains.jps.incremental.messages.BuildMessage.Kind
   */
 class EventGeneratingClient(listener: Event => Unit, canceled: => Boolean)
     extends Client {
-  def message(kind: Kind,
-              text: String,
-              source: Option[File],
-              line: Option[Long],
-              column: Option[Long]) {
+  def message(
+      kind: Kind,
+      text: String,
+      source: Option[File],
+      line: Option[Long],
+      column: Option[Long]) {
     listener(MessageEvent(kind, text, source, line, column))
   }
 

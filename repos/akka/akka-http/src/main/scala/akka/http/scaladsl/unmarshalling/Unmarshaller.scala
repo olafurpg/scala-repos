@@ -14,7 +14,8 @@ import akka.http.scaladsl.model._
 trait Unmarshaller[-A, B] {
 
   def apply(value: A)(
-      implicit ec: ExecutionContext, materializer: Materializer): Future[B]
+      implicit ec: ExecutionContext,
+      materializer: Materializer): Future[B]
 
   def transform[C](f: ExecutionContext ⇒ Materializer ⇒ Future[B] ⇒ Future[C])
     : Unmarshaller[A, C] =
@@ -39,7 +40,8 @@ trait Unmarshaller[-A, B] {
 }
 
 object Unmarshaller
-    extends GenericUnmarshallers with PredefinedFromEntityUnmarshallers
+    extends GenericUnmarshallers
+    with PredefinedFromEntityUnmarshallers
     with PredefinedFromStringUnmarshallers {
 
   // format: OFF
@@ -89,12 +91,12 @@ object Unmarshaller
   implicit class EnhancedUnmarshaller[A, B](val um: Unmarshaller[A, B])
       extends AnyVal {
     def mapWithInput[C](f: (A, B) ⇒ C): Unmarshaller[A, C] =
-      Unmarshaller.withMaterializer(
-          implicit ec ⇒ implicit mat ⇒ a ⇒ um(a).fast.map(f(a, _)))
+      Unmarshaller.withMaterializer(implicit ec ⇒
+        implicit mat ⇒ a ⇒ um(a).fast.map(f(a, _)))
 
     def flatMapWithInput[C](f: (A, B) ⇒ Future[C]): Unmarshaller[A, C] =
-      Unmarshaller.withMaterializer(
-          implicit ec ⇒ implicit mat ⇒ a ⇒ um(a).fast.flatMap(f(a, _)))
+      Unmarshaller.withMaterializer(implicit ec ⇒
+        implicit mat ⇒ a ⇒ um(a).fast.flatMap(f(a, _)))
   }
 
   implicit class EnhancedFromEntityUnmarshaller[A](
@@ -118,8 +120,8 @@ object Unmarshaller
         if (entity.contentType == ContentTypes.NoContentType ||
             ranges.exists(_ matches entity.contentType)) {
           underlying(entity).fast
-            .recover[A](barkAtUnsupportedContentTypeException(
-                  ranges, entity.contentType))
+            .recover[A](
+              barkAtUnsupportedContentTypeException(ranges, entity.contentType))
         } else FastFuture.failed(UnsupportedContentTypeException(ranges: _*))
       }
 
@@ -130,7 +132,7 @@ object Unmarshaller
         newContentType: ContentType): PartialFunction[Throwable, Nothing] = {
       case UnsupportedContentTypeException(supported) ⇒
         throw new IllegalStateException(
-            s"Illegal use of `unmarshaller.forContentTypes($ranges)`: $newContentType is not supported by underlying marshaller!")
+          s"Illegal use of `unmarshaller.forContentTypes($ranges)`: $newContentType is not supported by underlying marshaller!")
     }
   }
 
@@ -159,8 +161,7 @@ object Unmarshaller
   final case class UnsupportedContentTypeException(
       supported: Set[ContentTypeRange])
       extends RuntimeException(
-          supported.mkString(
-              "Unsupported Content-Type, supported: ", ", ", ""))
+        supported.mkString("Unsupported Content-Type, supported: ", ", ", ""))
 
   object UnsupportedContentTypeException {
     def apply(supported: ContentTypeRange*): UnsupportedContentTypeException =

@@ -39,7 +39,9 @@ object StatsSampleSpecConfig extends MultiNodeConfig {
 
   // this configuration will be used for all nodes
   // note that no fixed host names and ports are used
-  commonConfig(ConfigFactory.parseString("""
+  commonConfig(
+    ConfigFactory.parseString(
+      """
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
     akka.remote.log-remote-lifecycle-events = off
     akka.cluster.roles = [compute]
@@ -75,8 +77,11 @@ import akka.remote.testkit.MultiNodeSpec
 import akka.testkit.ImplicitSender
 
 abstract class StatsSampleSpec
-    extends MultiNodeSpec(StatsSampleSpecConfig) with WordSpecLike
-    with Matchers with BeforeAndAfterAll with ImplicitSender {
+    extends MultiNodeSpec(StatsSampleSpecConfig)
+    with WordSpecLike
+    with Matchers
+    with BeforeAndAfterAll
+    with ImplicitSender {
 
   import StatsSampleSpecConfig._
 
@@ -109,7 +114,7 @@ abstract class StatsSampleSpec
       system.actorOf(Props[StatsService], "statsService")
 
       receiveN(3).collect { case MemberUp(m) => m.address }.toSet should be(
-          Set(firstAddress, secondAddress, thirdAddress))
+        Set(firstAddress, secondAddress, thirdAddress))
 
       Cluster(system).unsubscribe(testActor)
 
@@ -134,7 +139,7 @@ abstract class StatsSampleSpec
       awaitAssert {
         service ! StatsJob("this is the text that will be analyzed")
         expectMsgType[StatsResult](1.second).meanWordLength should be(
-            3.875 +- 0.001)
+          3.875 +- 0.001)
       }
     }
     //#test-statsService

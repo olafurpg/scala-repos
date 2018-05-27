@@ -13,26 +13,31 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScVariable
   * Pavel Fatin
   */
 class LoopVariableNotUpdatedInspection
-    extends AbstractInspection("LoopVariableNotUpdatedInspection",
-                               "Loop variable not updated inside loop") {
+    extends AbstractInspection(
+      "LoopVariableNotUpdatedInspection",
+      "Loop variable not updated inside loop") {
   private val ComparisonOperators = Set("==", "!=", ">", "<", ">=", "<=")
 
   def actionFor(holder: ProblemsHolder) = {
-    case ScWhileStmt(Some(
-                     ScInfixExpr((ref: ScReferenceExpression) &&(ResolvesTo(
-                                 target @ Parent(Parent(entity: ScVariable)))),
-                                 ElementText(operator),
-                                 _)),
-                     Some(body))
+    case ScWhileStmt(
+        Some(
+          ScInfixExpr(
+            (ref: ScReferenceExpression) &&(ResolvesTo(
+              target @ Parent(Parent(entity: ScVariable)))),
+            ElementText(operator),
+            _)),
+        Some(body))
         if !ref.isQualified && ComparisonOperators.contains(operator) &&
-        !isMutatedWithing(body, target) =>
-      holder.registerProblem(ref.asInstanceOf[PsiReference],
-                             getDisplayName,
-                             ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
+          !isMutatedWithing(body, target) =>
+      holder.registerProblem(
+        ref.asInstanceOf[PsiReference],
+        getDisplayName,
+        ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
   }
 
   private def isMutatedWithing(
-      scope: ScalaPsiElement, target: PsiElement): Boolean = {
+      scope: ScalaPsiElement,
+      target: PsiElement): Boolean = {
     val Target = target
 
     scope.breadthFirst.exists {

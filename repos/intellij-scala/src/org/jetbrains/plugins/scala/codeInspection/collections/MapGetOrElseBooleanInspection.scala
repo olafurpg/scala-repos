@@ -14,18 +14,20 @@ class MapGetOrElseBooleanInspection extends OperationOnCollectionInspection {
 }
 
 abstract class MapGetOrElseBoolean(
-    defaultValue: String, newMethodName: String, hintKey: String)
+    defaultValue: String,
+    newMethodName: String,
+    hintKey: String)
     extends SimplificationType() {
   def hint = InspectionBundle.message(hintKey)
 
   override def getSimplification(expr: ScExpression): Option[Simplification] = {
     expr match {
       case qual `.map` (f @ returnsBoolean()) `.getOrElse`(literal(
-          `defaultValue`)) if isOption(qual) =>
+            `defaultValue`)) if isOption(qual) =>
         Some(
-            replace(expr)
-              .withText(invocationText(qual, newMethodName, f))
-              .highlightFrom(qual))
+          replace(expr)
+            .withText(invocationText(qual, newMethodName, f))
+            .highlightFrom(qual))
       case _ => None
     }
   }

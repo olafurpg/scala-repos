@@ -25,7 +25,7 @@ trait JdbcType[
   final def setOption(v: Option[T], p: PreparedStatement, idx: Int): Unit =
     v match {
       case Some(v) => setValue(v, p, idx)
-      case None => setNull(p, idx)
+      case None    => setNull(p, idx)
     }
 
   /** Get a result column of the type. For reference types, SQL NULL values

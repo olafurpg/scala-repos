@@ -71,9 +71,10 @@ class ClusterSpec extends AkkaSpec(ClusterSpec.config) with ImplicitSender {
 
     "publish inital state as snapshot to subscribers" in {
       try {
-        cluster.subscribe(testActor,
-                          ClusterEvent.InitialStateAsSnapshot,
-                          classOf[ClusterEvent.MemberEvent])
+        cluster.subscribe(
+          testActor,
+          ClusterEvent.InitialStateAsSnapshot,
+          classOf[ClusterEvent.MemberEvent])
         expectMsgClass(classOf[ClusterEvent.CurrentClusterState])
       } finally {
         cluster.unsubscribe(testActor)
@@ -82,9 +83,10 @@ class ClusterSpec extends AkkaSpec(ClusterSpec.config) with ImplicitSender {
 
     "publish inital state as events to subscribers" in {
       try {
-        cluster.subscribe(testActor,
-                          ClusterEvent.InitialStateAsEvents,
-                          classOf[ClusterEvent.MemberEvent])
+        cluster.subscribe(
+          testActor,
+          ClusterEvent.InitialStateAsEvents,
+          classOf[ClusterEvent.MemberEvent])
         expectMsgClass(classOf[ClusterEvent.MemberUp])
       } finally {
         cluster.unsubscribe(testActor)
@@ -107,18 +109,20 @@ class ClusterSpec extends AkkaSpec(ClusterSpec.config) with ImplicitSender {
 
       cluster.shutdown()
       expectMsgType[ClusterEvent.MemberRemoved].member.address should ===(
-          selfAddress)
+        selfAddress)
 
       callbackProbe.expectMsg("OnMemberRemoved")
     }
 
     "allow join and leave with local address" in {
       val sys2 = ActorSystem(
-          "ClusterSpec2",
-          ConfigFactory.parseString("""
+        "ClusterSpec2",
+        ConfigFactory.parseString(
+          """
         akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
         akka.remote.netty.tcp.port = 0
-        """))
+        """)
+      )
       try {
         val ref = sys2.actorOf(Props.empty)
         Cluster(sys2).join(ref.path.address) // address doesn't contain full address information

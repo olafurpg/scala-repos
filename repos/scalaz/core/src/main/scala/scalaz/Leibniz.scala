@@ -129,7 +129,7 @@ object Leibniz extends LeibnizInstances {
       b: Leibniz[LB, HB, B, B2]
   ): Leibniz[LT, HT, T[A, B], T[A2, B2]] =
     b.subst[λ[`X >: LB <: HB` => Leibniz[LT, HT, T[A, B], T[A2, X]]]](
-        a.subst[λ[`X >: LA <: HA` => Leibniz[LT, HT, T[A, B], T[X, B]]]](refl))
+      a.subst[λ[`X >: LA <: HA` => Leibniz[LT, HT, T[A, B], T[X, B]]]](refl))
 
   /** We can lift equality into any type constructor */
   def lift3[
@@ -154,12 +154,9 @@ object Leibniz extends LeibnizInstances {
       c: Leibniz[LC, HC, C, C2]
   ): Leibniz[LT, HT, T[A, B, C], T[A2, B2, C2]] =
     c.subst[λ[`X >: LC <: HC` => Leibniz[LT, HT, T[A, B, C], T[A2, B2, X]]]](
-        b.subst[
-            λ[`X >: LB <: HB` => Leibniz[LT, HT, T[A, B, C], T[A2, X, C]]]](
-            a.subst[λ[`X >: LA <: HA` => Leibniz[LT,
-                                                 HT,
-                                                 T[A, B, C],
-                                                 T[X, B, C]]]](refl)))
+      b.subst[λ[`X >: LB <: HB` => Leibniz[LT, HT, T[A, B, C], T[A2, X, C]]]](
+        a.subst[λ[`X >: LA <: HA` => Leibniz[LT, HT, T[A, B, C], T[X, B, C]]]](
+          refl)))
 
   /**
     * Unsafe coercion between types. force abuses asInstanceOf to explicitly coerce types.

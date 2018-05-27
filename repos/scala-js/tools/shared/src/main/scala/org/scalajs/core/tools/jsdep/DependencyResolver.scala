@@ -7,8 +7,8 @@ import JSLibResolveException.Problem
 
 object DependencyResolver {
 
-  type DependencyFilter = Traversable[FlatJSDependency] => Traversable[
-      FlatJSDependency]
+  type DependencyFilter =
+    Traversable[FlatJSDependency] => Traversable[FlatJSDependency]
 
   /** Constructs an ordered list of JS libraries to include. Fails if:
     *  - Resource names do not identify a unique resource on the classpath
@@ -21,27 +21,29 @@ object DependencyResolver {
       dependencyFilter: DependencyFilter): List[ResolvedJSDependency] = {
 
     val resourceNames = collectAllResourceNames(manifests)
-    val resolvedJSLibs = resolveAllResourceNames(
-        resourceNames, availableLibs.keys)
+    val resolvedJSLibs =
+      resolveAllResourceNames(resourceNames, availableLibs.keys)
 
     val allFlatDeps = for {
       manifest <- manifests
       dep <- manifest.libDeps
     } yield {
-      new FlatJSDependency(manifest.origin,
-                           resolvedJSLibs(dep.resourceName),
-                           dep.dependencies.map(resolvedJSLibs),
-                           dep.commonJSName,
-                           dep.minifiedResourceName.map(resolvedJSLibs))
+      new FlatJSDependency(
+        manifest.origin,
+        resolvedJSLibs(dep.resourceName),
+        dep.dependencies.map(resolvedJSLibs),
+        dep.commonJSName,
+        dep.minifiedResourceName.map(resolvedJSLibs))
     }
 
     val flatDeps = dependencyFilter(allFlatDeps)
     val includeList = createIncludeList(flatDeps)
 
     for (info <- includeList) yield {
-      new ResolvedJSDependency(availableLibs(info.relPath),
-                               info.relPathMinified.map(availableLibs),
-                               info)
+      new ResolvedJSDependency(
+        availableLibs(info.relPath),
+        info.relPathMinified.map(availableLibs),
+        info)
     }
   }
 
@@ -90,9 +92,9 @@ object DependencyResolver {
       origins: List[Origin],
       relPaths: Traversable[String]): Either[Problem, String] = {
     val candidates = (relPaths collect {
-          case relPath if ("/" + relPath).endsWith("/" + resourceName) =>
-            relPath
-        }).toList
+      case relPath if ("/" + relPath).endsWith("/" + resourceName) =>
+        relPath
+    }).toList
 
     candidates match {
       case relPath :: Nil =>
@@ -118,8 +120,9 @@ object DependencyResolver {
     // Very simple O(n²) topological sort for elements assumed to be distinct
     // Copied :( from GenJSExports (but different exception)
     @scala.annotation.tailrec
-    def loop(coll: List[ResolutionInfo],
-             acc: List[ResolutionInfo]): List[ResolutionInfo] = {
+    def loop(
+        coll: List[ResolutionInfo],
+        acc: List[ResolutionInfo]): List[ResolutionInfo] = {
 
       if (coll.isEmpty) acc
       else if (coll.tail.isEmpty) coll.head :: acc
@@ -150,11 +153,11 @@ object DependencyResolver {
 
     byRelPath.mapValues { sameName =>
       new ResolutionInfo(
-          relPath = sameName.head.relPath,
-          dependencies = sameName.flatMap(_.dependencies).toSet,
-          origins = sameName.map(_.origin).toList,
-          commonJSName = sameName.flatMap(_.commonJSName).headOption,
-          relPathMinified = sameName.flatMap(_.relPathMinified).headOption
+        relPath = sameName.head.relPath,
+        dependencies = sameName.flatMap(_.dependencies).toSet,
+        origins = sameName.map(_.origin).toList,
+        commonJSName = sameName.flatMap(_.commonJSName).headOption,
+        relPathMinified = sameName.flatMap(_.relPathMinified).headOption
       )
     }
   }
@@ -164,7 +167,7 @@ object DependencyResolver {
     @inline
     def hasConflict(x: FlatJSDependency, y: FlatJSDependency) =
       (x.commonJSName.isDefined && y.commonJSName.isDefined &&
-          (x.relPath == y.relPath ^ x.commonJSName == y.commonJSName))
+        (x.relPath == y.relPath ^ x.commonJSName == y.commonJSName))
 
     val conflicts = for {
       dep <- flatDeps if flatDeps.exists(hasConflict(dep, _))
@@ -180,7 +183,7 @@ object DependencyResolver {
     @inline
     def hasConflict(x: FlatJSDependency, y: FlatJSDependency) =
       (x.relPathMinified.isDefined && y.relPathMinified.isDefined &&
-          x.relPathMinified != y.relPathMinified)
+        x.relPathMinified != y.relPathMinified)
 
     val conflicts = for {
       (_, deps) <- byRelPath

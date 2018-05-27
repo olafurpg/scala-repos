@@ -13,15 +13,17 @@ import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
 class TimerStatsTest
-    extends FunSuite with MockitoSugar with Eventually
+    extends FunSuite
+    with MockitoSugar
+    with Eventually
     with IntegrationPatience {
 
   test("deviation") {
     val tickDuration = 10.milliseconds
     val hwt = new netty.HashedWheelTimer(
-        new NamedPoolThreadFactory(getClass.getSimpleName),
-        tickDuration.inMillis,
-        TimeUnit.MILLISECONDS)
+      new NamedPoolThreadFactory(getClass.getSimpleName),
+      tickDuration.inMillis,
+      TimeUnit.MILLISECONDS)
     val sr = new InMemoryStatsReceiver()
     val deviation: ReadableStat = sr.stat("deviation_ms")
     assert(deviation().isEmpty)
@@ -38,9 +40,9 @@ class TimerStatsTest
   test("hashedWheelTimerInternals") {
     val tickDuration = 10.milliseconds
     val hwt = new netty.HashedWheelTimer(
-        new NamedPoolThreadFactory(getClass.getSimpleName),
-        tickDuration.inMillis,
-        TimeUnit.MILLISECONDS)
+      new NamedPoolThreadFactory(getClass.getSimpleName),
+      tickDuration.inMillis,
+      TimeUnit.MILLISECONDS)
     val sr = new InMemoryStatsReceiver()
     val pendingTimeouts: ReadableStat = sr.stat("pending_tasks")
 
@@ -50,16 +52,15 @@ class TimerStatsTest
     val nTasks = 5
     // schedule some tasks, but they won't run for 10 minutes
     // to ensure they are queued up when the monitoring task runs
-    for (_ <- 0.until(nTasks)) hwt.newTimeout(
-        mock[netty.TimerTask], 10, TimeUnit.MINUTES)
+    for (_ <- 0.until(nTasks))
+      hwt.newTimeout(mock[netty.TimerTask], 10, TimeUnit.MINUTES)
 
     // kick off the task to do the monitoring.
     // have the monitoring task to run quickly the first time and only once.
     var count = 0
-    val nextRunAt = () =>
-      {
-        count += 1
-        if (count == 1) 1.millisecond else 5.minutes
+    val nextRunAt = () => {
+      count += 1
+      if (count == 1) 1.millisecond else 5.minutes
     }
     TimerStats.hashedWheelTimerInternals(hwt, nextRunAt, sr)
 

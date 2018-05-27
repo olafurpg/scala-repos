@@ -39,6 +39,6 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class CacheHintSpec
     extends SFXEnumDelegateSpec[jfxs.CacheHint, CacheHint](
-        javaClass = classOf[jfxs.CacheHint],
-        scalaClass = classOf[CacheHint],
-        companion = CacheHint)
+      javaClass = classOf[jfxs.CacheHint],
+      scalaClass = classOf[CacheHint],
+      companion = CacheHint)

@@ -21,14 +21,15 @@ object Factors {
 }
 
 case class Factors(factors: Map[SafeLong, Int], sign: Sign)
-    extends Iterable[(SafeLong, Int)] with Ordered[Factors] { lhs =>
+    extends Iterable[(SafeLong, Int)]
+    with Ordered[Factors] { lhs =>
 
   private[prime] def prod(m: Map[SafeLong, Int]): SafeLong =
     m.foldLeft(SafeLong.one) { case (t, (p, e)) => t * p.pow(e) }
 
   lazy val value: SafeLong = sign match {
     case Positive => prod(factors)
-    case Zero => SafeLong.zero
+    case Zero     => SafeLong.zero
     case Negative => -prod(factors)
   }
 
@@ -38,7 +39,7 @@ case class Factors(factors: Map[SafeLong, Int], sign: Sign)
       else factors.toSeq.sorted.map { case (p, e) => s"$p^$e" }.mkString(" * ")
     sign match {
       case Positive => s"($terms)"
-      case Zero => "(0)"
+      case Zero     => "(0)"
       case Negative => s"-($terms)"
     }
   }
@@ -172,7 +173,7 @@ case class Factors(factors: Map[SafeLong, Int], sign: Sign)
     } else {
       val sign = lhs.sign match {
         case Negative if (rhs & 1) == 0 => Positive
-        case sign => sign
+        case sign                       => sign
       }
       Factors(lhs.factors.map { case (p, e) => (p, e * rhs) }, sign)
     }

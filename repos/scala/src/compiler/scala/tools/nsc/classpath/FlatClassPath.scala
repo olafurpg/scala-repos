@@ -47,8 +47,9 @@ object FlatClassPath {
   val RootPackage = ""
 }
 
-case class FlatClassPathEntries(packages: Seq[PackageEntry],
-                                classesAndSources: Seq[ClassRepClassPathEntry])
+case class FlatClassPathEntries(
+    packages: Seq[PackageEntry],
+    classesAndSources: Seq[ClassRepClassPathEntry])
 
 object FlatClassPathEntries {
   import scala.language.implicitConversions
@@ -88,7 +89,8 @@ private[nsc] case class SourceFileEntryImpl(file: AbstractFile)
 }
 
 private[nsc] case class ClassAndSourceFilesEntry(
-    classFile: AbstractFile, srcFile: AbstractFile)
+    classFile: AbstractFile,
+    srcFile: AbstractFile)
     extends ClassRepClassPathEntry {
   override def name = FileUtils.stripClassExtension(classFile.name)
 

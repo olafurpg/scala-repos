@@ -291,17 +291,17 @@ final case class OldHtmlProperties(userAgent: Box[String])
   def htmlParser: InputStream => Box[NodeSeq] = PCDataXmlParser.apply _
 
   def htmlWriter: (Node, Writer) => Unit =
-    (n: Node, w: Writer) =>
-      {
-        val sb = new StringBuilder(64000)
-        AltXML.toXML(n,
-                     scala.xml.TopScope,
-                     sb,
-                     false,
-                     !LiftRules.convertToEntity.vend,
-                     S.legacyIeCompatibilityMode)
-        w.append(sb)
-        w.flush()
+    (n: Node, w: Writer) => {
+      val sb = new StringBuilder(64000)
+      AltXML.toXML(
+        n,
+        scala.xml.TopScope,
+        sb,
+        false,
+        !LiftRules.convertToEntity.vend,
+        S.legacyIeCompatibilityMode)
+      w.append(sb)
+      w.flush()
     }
 
   def htmlOutputHeader: Box[String] =

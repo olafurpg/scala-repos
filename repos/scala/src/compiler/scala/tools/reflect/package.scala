@@ -53,14 +53,14 @@ package object reflect {
       override def hasWarnings = reporter.hasWarnings
 
       def display(info: Info): Unit = info.severity match {
-        case API_INFO => reporter.info(info.pos, info.msg, force = false)
+        case API_INFO    => reporter.info(info.pos, info.msg, force = false)
         case API_WARNING => reporter.warning(info.pos, info.msg)
-        case API_ERROR => reporter.error(info.pos, info.msg)
+        case API_ERROR   => reporter.error(info.pos, info.msg)
       }
 
       def interactive(): Unit = reporter match {
         case reporter: AbstractReporter => reporter.displayPrompt()
-        case _ => // do nothing
+        case _                          => // do nothing
       }
 
       override def flush(): Unit = {
@@ -75,7 +75,8 @@ package object reflect {
     }
 
   private[reflect] def frontEndToReporter(
-      frontEnd: FrontEnd, settings0: Settings): Reporter =
+      frontEnd: FrontEnd,
+      settings0: Settings): Reporter =
     new AbstractReporter {
       val settings = settings0
 
@@ -90,9 +91,9 @@ package object reflect {
 
       def display(pos: Position, msg: String, nscSeverity: NscSeverity): Unit =
         frontEnd.log(pos, msg, nscSeverity match {
-          case NSC_INFO => API_INFO
+          case NSC_INFO    => API_INFO
           case NSC_WARNING => API_WARNING
-          case NSC_ERROR => API_ERROR
+          case NSC_ERROR   => API_ERROR
         })
 
       def displayPrompt(): Unit =

@@ -21,21 +21,27 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScMember
 import org.jetbrains.plugins.scala.lang.psi.api.{ScalaElementVisitor, ScalaFile}
 import org.jetbrains.plugins.scala.lang.psi.stubs.ScReferencePatternStub
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Failure,
+  Success,
+  TypingContext
+}
 
 /**
   * @author Alexander Podkhalyuzin
   * Date: 28.02.2008
   */
-class ScReferencePatternImpl private (stub: StubElement[ScReferencePattern],
-                                      nodeType: IElementType,
-                                      node: ASTNode)
+class ScReferencePatternImpl private (
+    stub: StubElement[ScReferencePattern],
+    nodeType: IElementType,
+    node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
-    with ScReferencePattern with ContributedReferenceHost {
+    with ScReferencePattern
+    with ContributedReferenceHost {
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case visitor: ScalaElementVisitor => super.accept(visitor)
-      case _ => super.accept(visitor)
+      case _                            => super.accept(visitor)
     }
   }
 
@@ -56,7 +62,7 @@ class ScReferencePatternImpl private (stub: StubElement[ScReferencePattern],
   override def getType(ctx: TypingContext) = {
     expectedType match {
       case Some(x) => Success(x, Some(this))
-      case _ => Failure("Cannot define expected type", Some(this))
+      case _       => Failure("Cannot define expected type", Some(this))
     }
   }
 
@@ -66,26 +72,32 @@ class ScReferencePatternImpl private (stub: StubElement[ScReferencePattern],
 
   override def getNavigationElement = getContainingFile match {
     case sf: ScalaFile if sf.isCompiled => {
-        val parent =
-          PsiTreeUtil.getParentOfType(this, classOf[ScMember]) // there is no complicated pattern-based declarations in decompiled files
-        if (parent != null) {
-          val navElem = parent.getNavigationElement
-          navElem match {
-            case holder: ScDeclaredElementsHolder =>
-              holder.declaredElements.find(_.name == name).getOrElse(navElem)
-            case x => x
-          }
-        } else super.getNavigationElement
-      }
+      val parent =
+        PsiTreeUtil
+          .getParentOfType(this, classOf[ScMember]) // there is no complicated pattern-based declarations in decompiled files
+      if (parent != null) {
+        val navElem = parent.getNavigationElement
+        navElem match {
+          case holder: ScDeclaredElementsHolder =>
+            holder.declaredElements.find(_.name == name).getOrElse(navElem)
+          case x => x
+        }
+      } else super.getNavigationElement
+    }
     case _ => super.getNavigationElement
   }
 
-  override def processDeclarations(processor: PsiScopeProcessor,
-                                   state: ResolveState,
-                                   lastParent: PsiElement,
-                                   place: PsiElement): Boolean = {
+  override def processDeclarations(
+      processor: PsiScopeProcessor,
+      state: ResolveState,
+      lastParent: PsiElement,
+      place: PsiElement): Boolean = {
     ScalaPsiUtil.processImportLastParent(
-        processor, state, place, lastParent, getType(TypingContext.empty))
+      processor,
+      state,
+      place,
+      lastParent,
+      getType(TypingContext.empty))
   }
 
   override def delete() {
@@ -118,5 +130,5 @@ class ScReferencePatternImpl private (stub: StubElement[ScReferencePattern],
   }
 
   override def getOriginalElement: PsiElement =
-    super [ScReferencePattern].getOriginalElement
+    super[ScReferencePattern].getOriginalElement
 }

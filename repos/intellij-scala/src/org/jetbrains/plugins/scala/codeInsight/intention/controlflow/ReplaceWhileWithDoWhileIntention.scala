@@ -24,10 +24,12 @@ class ReplaceWhileWithDoWhileIntention extends PsiElementBaseIntentionAction {
   override def getText: String = ReplaceWhileWithDoWhileIntention.familyName
 
   def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+      project: Project,
+      editor: Editor,
+      element: PsiElement): Boolean = {
     for {
       whileStmt <- Option(
-          PsiTreeUtil.getParentOfType(element, classOf[ScWhileStmt], false))
+        PsiTreeUtil.getParentOfType(element, classOf[ScWhileStmt], false))
       condition <- whileStmt.condition
       body <- whileStmt.body
     } {
@@ -55,7 +57,8 @@ class ReplaceWhileWithDoWhileIntention extends PsiElementBaseIntentionAction {
 
       val newStmt: ScExpression =
         ScalaPsiElementFactory.createExpressionFromText(
-            newStmtText, element.getManager)
+          newStmtText,
+          element.getManager)
 
       inWriteAction {
         whileStmt.replaceExpression(newStmt, removeParenthesis = true)

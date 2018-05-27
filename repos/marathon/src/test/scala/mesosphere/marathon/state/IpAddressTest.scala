@@ -18,28 +18,28 @@ class IpAddressTest extends MarathonSpec with Matchers {
     lazy val defaultIpAddress = IpAddress()
 
     lazy val ipAddressWithGroups = IpAddress(
-        groups = Vector("foo", "bar"),
-        labels = Map.empty
+      groups = Vector("foo", "bar"),
+      labels = Map.empty
     )
 
     lazy val ipAddressWithGroupsAndLabels = IpAddress(
-        groups = Vector("a", "b", "c"),
-        labels = Map(
-              "foo" -> "bar",
-              "baz" -> "buzz"
-          )
+      groups = Vector("a", "b", "c"),
+      labels = Map(
+        "foo" -> "bar",
+        "baz" -> "buzz"
+      )
     )
 
     lazy val ipAddressWithDiscoveryInfo = IpAddress(
-        groups = Vector("a", "b", "c"),
-        labels = Map(
-              "foo" -> "bar",
-              "baz" -> "buzz"
-          ),
-        discoveryInfo = DiscoveryInfo(
-              ports = Vector(DiscoveryInfo.Port(
-                        name = "http", number = 80, protocol = "tcp"))
-          )
+      groups = Vector("a", "b", "c"),
+      labels = Map(
+        "foo" -> "bar",
+        "baz" -> "buzz"
+      ),
+      discoveryInfo = DiscoveryInfo(
+        ports = Vector(
+          DiscoveryInfo.Port(name = "http", number = 80, protocol = "tcp"))
+      )
     )
   }
 
@@ -69,9 +69,10 @@ class IpAddressTest extends MarathonSpec with Matchers {
     val f = fixture()
     val proto = f.ipAddressWithGroupsAndLabels.toProto
     proto.getGroupsList.asScala should equal(
-        f.ipAddressWithGroupsAndLabels.groups)
-    proto.getLabelsList.asScala.map(kv => kv.getKey -> kv.getValue).toMap should equal(
-        f.ipAddressWithGroupsAndLabels.labels)
+      f.ipAddressWithGroupsAndLabels.groups)
+    proto.getLabelsList.asScala
+      .map(kv => kv.getKey -> kv.getValue)
+      .toMap should equal(f.ipAddressWithGroupsAndLabels.labels)
   }
 
   test("ToProto with groups and labels and discovery") {
@@ -87,9 +88,10 @@ class IpAddressTest extends MarathonSpec with Matchers {
       Protos.DiscoveryInfo.newBuilder.addPorts(portProto).build
 
     proto.getGroupsList.asScala should equal(
-        f.ipAddressWithGroupsAndLabels.groups)
-    proto.getLabelsList.asScala.map(kv => kv.getKey -> kv.getValue).toMap should equal(
-        f.ipAddressWithGroupsAndLabels.labels)
+      f.ipAddressWithGroupsAndLabels.groups)
+    proto.getLabelsList.asScala
+      .map(kv => kv.getKey -> kv.getValue)
+      .toMap should equal(f.ipAddressWithGroupsAndLabels.labels)
     proto.getDiscoveryInfo should equal(discoveryInfoProto)
   }
 
@@ -154,13 +156,13 @@ class IpAddressTest extends MarathonSpec with Matchers {
   test("JSON Serialization round-trip ipAddressWithGroupsAndLabels") {
     val f = fixture()
     JsonTestHelper.assertSerializationRoundtripWorks(
-        f.ipAddressWithGroupsAndLabels)
+      f.ipAddressWithGroupsAndLabels)
   }
 
   test("JSON Serialization round-trip ipAddressWithDiscoveryInfo") {
     val f = fixture()
     JsonTestHelper.assertSerializationRoundtripWorks(
-        f.ipAddressWithDiscoveryInfo)
+      f.ipAddressWithDiscoveryInfo)
   }
 
   private[this] def fromJson(json: String): IpAddress = {

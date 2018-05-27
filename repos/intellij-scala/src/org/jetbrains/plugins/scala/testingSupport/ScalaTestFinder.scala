@@ -36,9 +36,10 @@ class ScalaTestFinder extends JavaTestFinder {
           if (frameworks.isTestClass(testClass) ||
               frameworks.isPotentialTestClass(testClass)) {
             res.add(
-                Pair.create(testClass,
-                            TestFinderHelper.calcTestNameProximity(
-                                klassName, testClassName)))
+              Pair.create(
+                testClass,
+                TestFinderHelper
+                  .calcTestNameProximity(klassName, testClassName)))
           }
         }
       }

@@ -85,29 +85,32 @@ object Arguments {
             i += 1
           } else {
             res.addBinding(
-                args(i), parseBinding(args(i + 1), optionalBindings(args(i))));
+              args(i),
+              parseBinding(args(i + 1), optionalBindings(args(i))));
             i += 2
           }
         } else {
           var iter = prefixes.iterator
           val j = i
-          while ( (i == j) && iter.hasNext) {
+          while ((i == j) && iter.hasNext) {
             val prefix = iter.next
             if (args(i) startsWith prefix) {
               res.addPrefixed(
-                  prefix, args(i).substring(prefix.length()).trim());
+                prefix,
+                args(i).substring(prefix.length()).trim());
               i += 1
             }
           }
           if (i == j) {
             val iter = prefixedBindings.keysIterator;
-            while ( (i == j) && iter.hasNext) {
+            while ((i == j) && iter.hasNext) {
               val prefix = iter.next
               if (args(i) startsWith prefix) {
                 val arg = args(i).substring(prefix.length()).trim()
                 i = i + 1
                 res.addBinding(
-                    prefix, parseBinding(arg, prefixedBindings(prefix)));
+                  prefix,
+                  parseBinding(arg, prefixedBindings(prefix)));
               }
             }
             if (i == j) {
@@ -170,25 +173,25 @@ class Arguments {
 
   def getSuffixes(prefix: String): Set[String] =
     prefixes.get(prefix) match {
-      case None => new HashSet
+      case None      => new HashSet
       case Some(set) => set
     }
 
   def containsSuffix(prefix: String, suffix: String): Boolean =
     prefixes.get(prefix) match {
-      case None => false
+      case None      => false
       case Some(set) => set contains suffix
     }
 
   def getBindings(tag: String): Map[String, String] =
     bindings.get(tag) match {
-      case None => new HashMap
+      case None      => new HashMap
       case Some(map) => map
     }
 
   def getBinding(option: String, key: String): Option[String] =
     bindings.get(option) match {
-      case None => None
+      case None      => None
       case Some(map) => map get key
     }
 

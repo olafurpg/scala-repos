@@ -60,16 +60,19 @@ case class GroupCoordinatorRequest(
     ApiUtils.writeShortString(buffer, group)
   }
 
-  override def handleError(e: Throwable,
-                           requestChannel: RequestChannel,
-                           request: RequestChannel.Request): Unit = {
+  override def handleError(
+      e: Throwable,
+      requestChannel: RequestChannel,
+      request: RequestChannel.Request): Unit = {
     // return ConsumerCoordinatorNotAvailable for all uncaught errors
     val errorResponse = GroupCoordinatorResponse(
-        None, Errors.GROUP_COORDINATOR_NOT_AVAILABLE.code, correlationId)
+      None,
+      Errors.GROUP_COORDINATOR_NOT_AVAILABLE.code,
+      correlationId)
     requestChannel.sendResponse(
-        new Response(
-            request,
-            new RequestOrResponseSend(request.connectionId, errorResponse)))
+      new Response(
+        request,
+        new RequestOrResponseSend(request.connectionId, errorResponse)))
   }
 
   def describe(details: Boolean) = {

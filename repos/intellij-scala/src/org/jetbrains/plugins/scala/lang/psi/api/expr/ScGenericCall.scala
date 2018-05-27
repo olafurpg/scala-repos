@@ -5,11 +5,14 @@ package api
 package expr
 
 import com.intellij.psi.ResolveResult
-import org.jetbrains.plugins.scala.lang.psi.api.base.types.{ScTypeArgs, ScTypeElement}
+import org.jetbrains.plugins.scala.lang.psi.api.base.types.{
+  ScTypeArgs,
+  ScTypeElement
+}
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypeResult
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 06.03.2008
   */
@@ -22,7 +25,7 @@ trait ScGenericCall extends ScExpression {
   def arguments: Seq[ScTypeElement] =
     (for (t <- typeArgs) yield t.typeArgs) match {
       case Some(x) => x
-      case _ => Nil
+      case _       => Nil
     }
 
   def shapeType: TypeResult[ScType]

@@ -9,8 +9,9 @@ import scala.collection.mutable.WrappedArray
 case class Rating(x: Int)
 
 class WrappedArrayTest extends FunSuite {
-  def mkAnyRefWrappedArrayPickler(implicit pf: PickleFormat): Pickler[
-      WrappedArray.ofRef[AnyRef]] with Unpickler[WrappedArray.ofRef[AnyRef]] =
+  def mkAnyRefWrappedArrayPickler(
+      implicit pf: PickleFormat): Pickler[WrappedArray.ofRef[AnyRef]]
+    with Unpickler[WrappedArray.ofRef[AnyRef]] =
     new Pickler[WrappedArray.ofRef[AnyRef]]
     with Unpickler[WrappedArray.ofRef[AnyRef]] {
 
@@ -23,7 +24,8 @@ class WrappedArrayTest extends FunSuite {
 
       def pickle(coll: WrappedArray.ofRef[AnyRef], builder: PBuilder): Unit = {
         builder.beginEntry(
-            coll, implicitly[FastTypeTag[WrappedArray.ofRef[AnyRef]]])
+          coll,
+          implicitly[FastTypeTag[WrappedArray.ofRef[AnyRef]]])
 
         builder.beginCollection(coll.size)
         coll.foreach { (elem: AnyRef) =>
@@ -67,11 +69,11 @@ class WrappedArrayTest extends FunSuite {
     }
   // TODO - This is kind of a hack because we don't really know the full tag, and we're tagging the instance with a partial tag.
   internal.currentRuntime.picklers.registerPickler(
-      "scala.collection.mutable.WrappedArray.ofRef",
-      mkAnyRefWrappedArrayPickler)
+    "scala.collection.mutable.WrappedArray.ofRef",
+    mkAnyRefWrappedArrayPickler)
   internal.currentRuntime.picklers.registerUnpickler(
-      "scala.collection.mutable.WrappedArray.ofRef[java.lang.Object]",
-      mkAnyRefWrappedArrayPickler)
+    "scala.collection.mutable.WrappedArray.ofRef[java.lang.Object]",
+    mkAnyRefWrappedArrayPickler)
 
   test("main") {
     val l = List(Rating(10), Rating(5), Rating(2))

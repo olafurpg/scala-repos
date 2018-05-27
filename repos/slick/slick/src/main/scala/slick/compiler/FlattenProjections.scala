@@ -24,17 +24,19 @@ class FlattenProjections extends Phase {
           flattenProjection(tr(v, false), !topLevel)
         translations += ts -> newTranslations
         logger.debug(
-            s"Adding translation for $ts: ($newTranslations, ${newV.nodeType})")
+          s"Adding translation for $ts: ($newTranslations, ${newV.nodeType})")
         val res = Pure(newV, ts)
         logger.debug("Flattened projection to", res)
         res
       case p: PathElement =>
-        logger.debug("Analyzing " + p.pathString + " with symbols " +
-                     translations.keySet.mkString(", "),
-                     p)
+        logger.debug(
+          "Analyzing " + p.pathString + " with symbols " +
+            translations.keySet.mkString(", "),
+          p)
         val p2 = splitPath(p, translations.keySet) match {
           case Some((base, rest, tsym)) =>
-            logger.debug("Found " + p.pathString + " with local part " +
+            logger.debug(
+              "Found " + p.pathString + " with local part " +
                 Path.toString(rest) + " over " + tsym)
             val paths = translations(tsym)
             logger.debug(s"  Translation for $tsym: $paths")
@@ -77,7 +79,7 @@ class FlattenProjections extends Phase {
       case Select(in, field) =>
         splitPath(in.asInstanceOf[PathElement], candidates) match {
           case Some((n, p, tsym)) => Some((n, field :: p, tsym))
-          case None => checkType(n.nodeType)
+          case None               => checkType(n.nodeType)
         }
       case _: Ref => checkType(n.nodeType)
     }

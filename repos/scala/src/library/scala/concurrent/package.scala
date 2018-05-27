@@ -20,11 +20,11 @@ import scala.annotation.implicitNotFound
   * [[http://docs.scala-lang.org/overviews/core/futures.html]].
   *
   * == Common Imports ==
-  * 
+  *
   * When working with Futures, you will often find that importing the whole concurrent
   * package is convenient, furthermore you are likely to need an implicit ExecutionContext
   * in scope for many operations involving Futures and Promises:
-  * 
+  *
   * {{{
   * import scala.concurrent._
   * import ExecutionContext.Implicits.global
@@ -41,7 +41,7 @@ import scala.annotation.implicitNotFound
   * }}}
   *
   * == Using Futures For Non-blocking Computation ==
-  * 
+  *
   * Basic use of futures is easy with the factory method on Future, which executes a
   * provided function asynchronously, handing you back a future result of that function
   * without blocking the current thread. In order to create the Future you will need
@@ -50,7 +50,7 @@ import scala.annotation.implicitNotFound
   * {{{
   * import scala.concurrent._
   * import ExecutionContext.Implicits.global  // implicit execution context
-  * 
+  *
   * val firstZebra: Future[Int] = Future {
   *   val source = scala.io.Source.fromFile("/etc/dictionaries-common/words")
   *   source.toSeq.indexOfSlice("zebra")
@@ -80,7 +80,7 @@ import scala.annotation.implicitNotFound
   * animalRange.onSuccess {
   *   case x if x > 500000 => println("It's a long way from Aardvark to Zebra")
   * }
-  * }}} 
+  * }}}
   */
 package object concurrent {
   type ExecutionException = java.util.concurrent.ExecutionException
@@ -134,7 +134,7 @@ package concurrent {
     * user code is currently calling the methods on [[Await]].
     */
   @implicitNotFound(
-      "Don't call `Awaitable` methods directly, use the `Await` object.")
+    "Don't call `Awaitable` methods directly, use the `Await` object.")
   sealed trait CanAwait
 
   /**

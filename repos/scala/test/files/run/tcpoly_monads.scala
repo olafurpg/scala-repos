@@ -35,12 +35,13 @@ trait OptionMonad extends Monads {
       def unit[a](orig: a) = Some(orig)
       def >>=[b](fun: a => Option[b]): Option[b] = self match {
         case Some(x) => fun(x)
-        case None => None
+        case None    => None
       }
     }
 }
 
 object Test extends OptionMonad with App {
-  Console.println((Some("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa") >>=
-          (x => Some(x.length))).get)
+  Console.println(
+    (Some("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa") >>=
+      (x => Some(x.length))).get)
 }

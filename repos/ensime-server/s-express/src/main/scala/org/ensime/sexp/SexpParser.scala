@@ -30,18 +30,18 @@ object SexpParser {
   // https://www.gnu.org/software/emacs/manual/html_node/elisp/Syntax-for-Strings.html
   // Not supported: https://www.gnu.org/software/emacs/manual/html_node/elisp/Non_002dASCII-in-Strings.html
   private[sexp] val specialChars = Map[String, String](
-      "\"" -> "\"",
-      "a" -> "\u0007",
-      "b" -> "\b",
-      "t" -> "\t",
-      "n" -> "\n",
-      "v" -> "\u000b",
-      "f" -> "\f",
-      "r" -> "\r",
-      "e" -> "\u001b",
-      "s" -> " ",
-      "d" -> "\u007f",
-      "\\" -> "\\"
+    "\"" -> "\"",
+    "a" -> "\u0007",
+    "b" -> "\b",
+    "t" -> "\t",
+    "n" -> "\n",
+    "v" -> "\u000b",
+    "f" -> "\f",
+    "r" -> "\r",
+    "e" -> "\u001b",
+    "s" -> " ",
+    "d" -> "\u007f",
+    "\\" -> "\\"
   )
 
   val SexpQuote = SexpSymbol("quote")
@@ -101,10 +101,9 @@ class SexpParser(val input: ParserInput) extends Parser with StringBuilding {
   def NormalCharSB = rule { NCCharPredicate ~ appendSB() }
 
   def EscapedCharSB = rule(
-      QuoteSlashBackSlash ~ appendSB() | '\"' ~ appendSB('\"') | 'b' ~ appendSB(
-          '\b') | 's' ~ appendSB(' ') | 'f' ~ appendSB('\f') | 'n' ~ appendSB(
-          '\n') | 'r' ~ appendSB('\r') | 't' ~ appendSB('\t') | ' ' ~ appendSB(
-          "") // special emacs magic for comments \<space< and \<newline> are removed
+    QuoteSlashBackSlash ~ appendSB() | '\"' ~ appendSB('\"') | 'b' ~ appendSB(
+      '\b') | 's' ~ appendSB(' ') | 'f' ~ appendSB('\f') | 'n' ~ appendSB('\n') | 'r' ~ appendSB(
+      '\r') | 't' ~ appendSB('\t') | ' ' ~ appendSB("") // special emacs magic for comments \<space< and \<newline> are removed
       | '\n' ~ appendSB("") | 'a' ~ appendSB('\u0007') // bell
       | 'v' ~ appendSB('\u000b') // vertical tab
       | 'e' ~ appendSB('\u001b') // escape
@@ -137,7 +136,7 @@ class SexpParser(val input: ParserInput) extends Parser with StringBuilding {
 
   private def SexpNaNP: Rule1[SexpAtom] = rule {
     "-1.0e+INF" ~ push(SexpNegInf) | "1.0e+INF" ~ push(SexpPosInf) | optional(
-        '-') ~ "0.0e+NaN" ~ push(SexpNaN)
+      '-') ~ "0.0e+NaN" ~ push(SexpNaN)
   }
 
   private def SexpQuotedP: Rule1[Sexp] = rule {
@@ -149,7 +148,7 @@ class SexpParser(val input: ParserInput) extends Parser with StringBuilding {
   private def SexpSymbolP: Rule1[SexpAtom] = rule {
     // ? allowed at the end of symbol names
     capture(oneOrMore(SymbolStartCharPredicate) ~ zeroOrMore(
-            SymbolBodyCharPredicate) ~ optional('?')) ~> { sym: String =>
+      SymbolBodyCharPredicate) ~ optional('?')) ~> { sym: String =>
       if (sym == "nil") SexpNil
       else SexpSymbol(sym)
     }

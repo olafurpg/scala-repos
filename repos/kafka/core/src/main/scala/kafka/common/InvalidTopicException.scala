@@ -16,7 +16,6 @@
   */
 package kafka.common
 
-class InvalidTopicException(message: String)
-    extends RuntimeException(message) {
+class InvalidTopicException(message: String) extends RuntimeException(message) {
   def this() = this(null)
 }

@@ -25,11 +25,14 @@ object DummyASTNode extends TreeElement(ScalaElementTypes.DUMMY_ELEMENT) {
   def getTextLength: Int = 42
   def getChildren(filter: TokenSet) = Array[ASTNode]()
   def addLeaf(
-      leafType: IElementType, leafText: CharSequence, anchorBefore: ASTNode) {}
+      leafType: IElementType,
+      leafText: CharSequence,
+      anchorBefore: ASTNode) {}
   def removeChild(child: ASTNode) {}
-  def addChildren(firstChild: ASTNode,
-                  firstChildToNotAdd: ASTNode,
-                  anchorBefore: ASTNode) {}
+  def addChildren(
+      firstChild: ASTNode,
+      firstChildToNotAdd: ASTNode,
+      anchorBefore: ASTNode) {}
   def findChildByType(typesSet: TokenSet) = null
   def findChildByType(elem: IElementType) = null
   def findChildByType(elem: IElementType, anchor: ASTNode) = null

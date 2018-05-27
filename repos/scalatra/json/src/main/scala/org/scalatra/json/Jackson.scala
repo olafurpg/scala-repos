@@ -8,16 +8,20 @@ import org.json4s._
 import org.scalatra.util.RicherString._
 
 trait JacksonJsonSupport
-    extends JsonSupport[JValue] with JacksonJsonOutput with JValueResult {
+    extends JsonSupport[JValue]
+    with JacksonJsonOutput
+    with JValueResult {
 
   override def initialize(config: ConfigT): Unit = {
     super.initialize(config)
-    mapper.configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS,
-                     jsonFormats.wantsBigDecimal)
+    mapper.configure(
+      DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS,
+      jsonFormats.wantsBigDecimal)
   }
 
   protected def readJsonFromStreamWithCharset(
-      stream: InputStream, charset: String): JValue = {
+      stream: InputStream,
+      charset: String): JValue = {
     val rdr = new InputStreamReader(stream, charset)
     if (rdr.ready()) mapper.readValue(rdr, classOf[JValue])
     else {

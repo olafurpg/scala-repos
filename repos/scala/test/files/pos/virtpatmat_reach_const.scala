@@ -3,9 +3,9 @@ object Test {
   type Formula = List[String]
   val TrueF: Formula = List()
   def distribute(a: Formula, b: Formula) = (a, b) match {
-    case (TrueF, _) =>
-    case (_, TrueF) => // bug: considered unreachable
+    case (TrueF, _)           =>
+    case (_, TrueF)           => // bug: considered unreachable
     case (a :: Nil, b :: Nil) =>
-    case _ =>
+    case _                    =>
   }
 }

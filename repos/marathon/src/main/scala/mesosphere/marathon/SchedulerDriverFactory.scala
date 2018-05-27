@@ -25,7 +25,10 @@ class MesosSchedulerDriverFactory @Inject()(
     implicit val zkTimeout = config.zkTimeoutDuration
     val frameworkId = frameworkIdUtil.fetch()
     val driver = MarathonSchedulerDriver.newDriver(
-        config, httpConfig, scheduler, frameworkId)
+      config,
+      httpConfig,
+      scheduler,
+      frameworkId)
     holder.driver = Some(driver)
     driver
   }

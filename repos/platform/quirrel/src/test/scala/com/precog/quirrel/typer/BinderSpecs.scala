@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -30,8 +30,12 @@ import java.io.File
 import scala.io.Source
 
 object BinderSpecs
-    extends Specification with ScalaCheck with Parser with StubPhases
-    with Binder with StaticLibrarySpec {
+    extends Specification
+    with ScalaCheck
+    with Parser
+    with StubPhases
+    with Binder
+    with StaticLibrarySpec {
 
   import ast._
   import library._
@@ -78,7 +82,11 @@ object BinderSpecs
 
       {
         val e @ Let(
-        _, _, _, Add(_, Add(_, tb: Dispatch, tc: Dispatch), td: Dispatch), _) =
+          _,
+          _,
+          _,
+          Add(_, Add(_, tb: Dispatch, tc: Dispatch), td: Dispatch),
+          _) =
           parseSingle("a(b, c, d) := b + c + d a(1, 2, 3)")
 
         tb.binding mustEqual FormalBinding(e)
@@ -105,7 +113,10 @@ object BinderSpecs
       }
 
       {
-        val e @ Solve(_, _, Add(_, Add(_, tb: TicVar, tc: TicVar), td: TicVar)) =
+        val e @ Solve(
+          _,
+          _,
+          Add(_, Add(_, tb: TicVar, tc: TicVar), td: TicVar)) =
           parseSingle("solve 'b, 'c, 'd 'b + 'c + 'd")
 
         tb.binding mustEqual SolveBinding(e)
@@ -132,7 +143,10 @@ object BinderSpecs
       }
 
       {
-        val e @ Solve(_, _, Add(_, Add(_, ta: TicVar, tb: TicVar), tc: TicVar)) =
+        val e @ Solve(
+          _,
+          _,
+          Add(_, Add(_, ta: TicVar, tb: TicVar), tc: TicVar)) =
           parseSingle("solve 'a, 'b, 'c 'a + 'b + 'c")
 
         ta.binding mustEqual SolveBinding(e)
@@ -145,7 +159,10 @@ object BinderSpecs
       }
 
       {
-        val e @ Solve(_, _, Add(_, Add(_, ta: TicVar, tb: TicVar), tc: TicVar)) =
+        val e @ Solve(
+          _,
+          _,
+          Add(_, Add(_, ta: TicVar, tb: TicVar), tc: TicVar)) =
           parseSingle("solve 'a * 42, 'b = false where count('c) 'a + 'b + 'c")
 
         ta.binding mustEqual SolveBinding(e)
@@ -247,7 +264,7 @@ object BinderSpecs
         d.binding mustEqual NullBinding
         d.isReduction mustEqual false
         d.errors mustEqual Set(
-            UndefinedFunction(Identifier(Vector("foo", "bar"), "baz")))
+          UndefinedFunction(Identifier(Vector("foo", "bar"), "baz")))
       }
 
       {
@@ -255,7 +272,7 @@ object BinderSpecs
         d.binding mustEqual NullBinding
         d.isReduction mustEqual false
         d.errors mustEqual Set(
-            UndefinedFunction(Identifier(Vector("foo", "bar"), "baz")))
+          UndefinedFunction(Identifier(Vector("foo", "bar"), "baz")))
       }
     }
 
@@ -1063,8 +1080,8 @@ object BinderSpecs
 
     "emit a warning on deprecated usage" in {
       val d @ Dispatch(_, _, _) = parseSingle("bin25(1)")
-      d.errors must contain(DeprecatedFunction(Identifier(Vector(), "bin25"),
-                                               "use bin5 instead"))
+      d.errors must contain(
+        DeprecatedFunction(Identifier(Vector(), "bin25"), "use bin5 instead"))
     }
   }
 
@@ -1174,8 +1191,7 @@ object BinderSpecs
       d1.binding mustEqual Op1Binding(Op1(Vector("std", "lib"), "baz", 0x0003))
       d1.errors must beEmpty
 
-      d2.binding mustEqual Op2Binding(
-          Op2(Vector("std", "lib"), "baz2", 0x0003))
+      d2.binding mustEqual Op2Binding(Op2(Vector("std", "lib"), "baz2", 0x0003))
       d2.errors must beEmpty
     }
 

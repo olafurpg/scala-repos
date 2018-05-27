@@ -31,7 +31,8 @@ import scala.util.Random
 
 /** Elasticsearch implementation of AccessKeys. */
 class ESAccessKeys(client: Client, config: StorageClientConfig, index: String)
-    extends AccessKeys with Logging {
+    extends AccessKeys
+    with Logging {
   implicit val formats = DefaultFormats.lossless
   private val estype = "accesskeys"
 
@@ -45,9 +46,9 @@ class ESAccessKeys(client: Client, config: StorageClientConfig, index: String)
   if (!typeExistResponse.isExists) {
     val json =
       (estype ->
-          ("properties" ->
-              ("key" -> ("type" -> "string") ~ ("index" -> "not_analyzed")) ~
-              ("events" -> ("type" -> "string") ~ ("index" -> "not_analyzed"))))
+        ("properties" ->
+          ("key" -> ("type" -> "string") ~ ("index" -> "not_analyzed")) ~
+            ("events" -> ("type" -> "string") ~ ("index" -> "not_analyzed"))))
     indices
       .preparePutMapping(index)
       .setType(estype)

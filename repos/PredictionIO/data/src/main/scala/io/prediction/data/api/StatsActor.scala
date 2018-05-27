@@ -64,10 +64,11 @@ class StatsActor extends Actor {
     case Bookkeeping(appId, statusCode, event) =>
       bookkeeping(appId, statusCode, event)
     case GetStats(appId) =>
-      sender() ! Map("time" -> DateTime.now,
-                     "currentHour" -> hourlyStats.get(appId),
-                     "prevHour" -> prevHourlyStats.get(appId),
-                     "longLive" -> longLiveStats.get(appId))
+      sender() ! Map(
+        "time" -> DateTime.now,
+        "currentHour" -> hourlyStats.get(appId),
+        "prevHour" -> prevHourlyStats.get(appId),
+        "longLive" -> longLiveStats.get(appId))
     case _ => log.error("Unknown message.")
   }
 }

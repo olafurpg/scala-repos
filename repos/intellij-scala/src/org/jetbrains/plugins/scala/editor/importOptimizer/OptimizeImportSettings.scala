@@ -6,27 +6,28 @@ import org.jetbrains.plugins.scala.lang.formatting.settings.ScalaCodeStyleSettin
 /**
   * @author Nikolay.Tropin
   */
-case class OptimizeImportSettings(addFullQualifiedImports: Boolean,
-                                  isLocalImportsCanBeRelative: Boolean,
-                                  sortImports: Boolean,
-                                  collectImports: Boolean,
-                                  isUnicodeArrow: Boolean,
-                                  spacesInImports: Boolean,
-                                  classCountToUseImportOnDemand: Int,
-                                  importLayout: Array[String],
-                                  isAlwaysUsedImport: String => Boolean) {
+case class OptimizeImportSettings(
+    addFullQualifiedImports: Boolean,
+    isLocalImportsCanBeRelative: Boolean,
+    sortImports: Boolean,
+    collectImports: Boolean,
+    isUnicodeArrow: Boolean,
+    spacesInImports: Boolean,
+    classCountToUseImportOnDemand: Int,
+    importLayout: Array[String],
+    isAlwaysUsedImport: String => Boolean) {
 
   private def this(s: ScalaCodeStyleSettings) {
     this(
-        s.isAddFullQualifiedImports,
-        s.isDoNotChangeLocalImportsOnOptimize,
-        s.isSortImports,
-        s.isCollectImports,
-        s.REPLACE_CASE_ARROW_WITH_UNICODE_CHAR,
-        s.SPACES_IN_IMPORTS,
-        s.getClassCountToUseImportOnDemand,
-        s.getImportLayout,
-        s.isAlwaysUsedImport
+      s.isAddFullQualifiedImports,
+      s.isDoNotChangeLocalImportsOnOptimize,
+      s.isSortImports,
+      s.isCollectImports,
+      s.REPLACE_CASE_ARROW_WITH_UNICODE_CHAR,
+      s.SPACES_IN_IMPORTS,
+      s.getClassCountToUseImportOnDemand,
+      s.getImportLayout,
+      s.isAlwaysUsedImport
     )
   }
 }

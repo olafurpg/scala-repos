@@ -18,11 +18,11 @@ private[site] final class Socket(timeout: Duration)
   def receiveSpecific = {
 
     case Join(uid, username, tags) => {
-        val (enumerator, channel) = Concurrent.broadcast[JsValue]
-        val member = Member(channel, username, tags)
-        addMember(uid, member)
-        sender ! Connected(enumerator, member)
-      }
+      val (enumerator, channel) = Concurrent.broadcast[JsValue]
+      val member = Member(channel, username, tags)
+      addMember(uid, member)
+      sender ! Connected(enumerator, member)
+    }
 
     case SendToFlag(flag, message) =>
       members.values filter (_ hasFlag flag) foreach {

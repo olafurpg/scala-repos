@@ -27,7 +27,9 @@ import org.scalatest.concurrent.Eventually._
 import org.apache.spark.JobExecutionStatus._
 
 class StatusTrackerSuite
-    extends SparkFunSuite with Matchers with LocalSparkContext {
+    extends SparkFunSuite
+    with Matchers
+    with LocalSparkContext {
 
   test("basic status API usage") {
     sc = new SparkContext("local", "test", new SparkConf(false))
@@ -72,7 +74,7 @@ class StatusTrackerSuite
     }
     eventually(timeout(10 seconds)) {
       sc.statusTracker.getJobIdsForGroup(null).toSet should be(
-          Set(defaultJobGroupJobId))
+        Set(defaultJobGroupJobId))
     }
     // Test jobs submitted in job groups:
     sc.setJobGroup("my-job-group", "description")
@@ -83,7 +85,7 @@ class StatusTrackerSuite
     }
     eventually(timeout(10 seconds)) {
       sc.statusTracker.getJobIdsForGroup("my-job-group") should be(
-          Seq(firstJobId))
+        Seq(firstJobId))
     }
     val secondJobFuture = sc.parallelize(1 to 1000).countAsync()
     val secondJobId = eventually(timeout(10 seconds)) {
@@ -91,7 +93,7 @@ class StatusTrackerSuite
     }
     eventually(timeout(10 seconds)) {
       sc.statusTracker.getJobIdsForGroup("my-job-group").toSet should be(
-          Set(firstJobId, secondJobId))
+        Set(firstJobId, secondJobId))
     }
   }
 
@@ -105,7 +107,7 @@ class StatusTrackerSuite
     }
     eventually(timeout(10 seconds)) {
       sc.statusTracker.getJobIdsForGroup("my-job-group2") should be(
-          Seq(firstJobId))
+        Seq(firstJobId))
     }
   }
 

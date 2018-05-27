@@ -18,10 +18,11 @@ private[challenge] final class SocketHandler(
     socketHub: ActorRef,
     pingChallenge: Challenge.ID => Funit) {
 
-  def join(challengeId: Challenge.ID,
-           uid: String,
-           userId: Option[User.ID],
-           owner: Boolean): Fu[Option[JsSocketHandler]] =
+  def join(
+      challengeId: Challenge.ID,
+      uid: String,
+      userId: Option[User.ID],
+      owner: Boolean): Fu[Option[JsSocketHandler]] =
     for {
       socket ← socketHub ? Get(challengeId) mapTo manifest[ActorRef]
       join = Socket.Join(uid = uid, userId = userId, owner = owner)
@@ -31,10 +32,11 @@ private[challenge] final class SocketHandler(
       }
     } yield handler.some
 
-  private def controller(socket: ActorRef,
-                         challengeId: Challenge.ID,
-                         uid: String,
-                         member: Socket.Member): Handler.Controller = {
+  private def controller(
+      socket: ActorRef,
+      challengeId: Challenge.ID,
+      uid: String,
+      member: Socket.Member): Handler.Controller = {
     case ("p", o) =>
       o int "v" foreach { v =>
         socket ! PingVersion(uid, v)

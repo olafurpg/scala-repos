@@ -11,30 +11,34 @@ import org.jetbrains.jps.incremental.scala._
 /**
   * @author Pavel Fatin
   */
-case class SbtData(interfaceJar: File,
-                   sourceJar: File,
-                   interfacesHome: File,
-                   javaClassVersion: String)
+case class SbtData(
+    interfaceJar: File,
+    sourceJar: File,
+    interfacesHome: File,
+    javaClassVersion: String)
 
 object SbtData {
   val compilerInterfacesKey = "scala.compiler.interfaces.dir"
 
   private def compilerInterfacesDir = {
     def defaultDir =
-      new File(new File(System.getProperty("user.home"), ".idea-build"),
-               "scala-compiler-interfaces")
+      new File(
+        new File(System.getProperty("user.home"), ".idea-build"),
+        "scala-compiler-interfaces")
 
     val customPath = Option(System.getProperty(compilerInterfacesKey))
     customPath.map(new File(_)).getOrElse(defaultDir)
   }
 
-  def from(classLoader: ClassLoader,
-           pluginRoot: File,
-           javaClassVersion: String): Either[String, SbtData] = {
+  def from(
+      classLoader: ClassLoader,
+      pluginRoot: File,
+      javaClassVersion: String): Either[String, SbtData] = {
     Either
-      .cond(pluginRoot.exists,
-            pluginRoot,
-            "SBT home directory does not exist: " + pluginRoot)
+      .cond(
+        pluginRoot.exists,
+        pluginRoot,
+        "SBT home directory does not exist: " + pluginRoot)
       .flatMap { sbtHome =>
         Option(sbtHome.listFiles)
           .toRight("Invalid SBT home directory: " + sbtHome.getPath)
@@ -45,7 +49,8 @@ object SbtData {
               .flatMap { interfaceJar =>
                 files
                   .find(_.getName == "compiler-interface-sources.jar")
-                  .toRight("No 'compiler-interface-sources.jar' in SBT home directory")
+                  .toRight(
+                    "No 'compiler-interface-sources.jar' in SBT home directory")
                   .flatMap { sourceJar =>
                     readSbtVersionFrom(classLoader)
                       .toRight("Unable to read SBT version from JVM classpath")
@@ -53,13 +58,15 @@ object SbtData {
                         val checksum =
                           DatatypeConverter.printHexBinary(md5(sourceJar))
                         val interfacesHome =
-                          new File(compilerInterfacesDir,
-                                   sbtVersion + "-idea-" + checksum)
+                          new File(
+                            compilerInterfacesDir,
+                            sbtVersion + "-idea-" + checksum)
 
-                        new SbtData(interfaceJar,
-                                    sourceJar,
-                                    interfacesHome,
-                                    javaClassVersion)
+                        new SbtData(
+                          interfaceJar,
+                          sourceJar,
+                          interfacesHome,
+                          javaClassVersion)
                       }
                   }
               }
@@ -71,9 +78,10 @@ object SbtData {
     readProperty(classLoader, "xsbt.version.properties", "version").map {
       version =>
         if (version.endsWith("-SNAPSHOT")) {
-          readProperty(getClass.getClassLoader,
-                       "xsbt.version.properties",
-                       "timestamp")
+          readProperty(
+            getClass.getClassLoader,
+            "xsbt.version.properties",
+            "timestamp")
             .map(timestamp => version + "-" + timestamp)
             .getOrElse(version)
         } else {

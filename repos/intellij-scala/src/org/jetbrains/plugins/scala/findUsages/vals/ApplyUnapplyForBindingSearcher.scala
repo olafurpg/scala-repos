@@ -4,16 +4,31 @@ package findUsages.vals
 import com.intellij.openapi.project.{IndexNotReadyException, Project}
 import com.intellij.psi.search.searches.ReferencesSearch
 import com.intellij.psi.search.searches.ReferencesSearch.SearchParameters
-import com.intellij.psi.search.{PsiSearchHelper, SearchScope, TextOccurenceProcessor, UsageSearchContext}
+import com.intellij.psi.search.{
+  PsiSearchHelper,
+  SearchScope,
+  TextOccurenceProcessor,
+  UsageSearchContext
+}
 import com.intellij.psi.{PsiElement, PsiReference}
 import com.intellij.util.{Processor, QueryExecutor}
 import org.jetbrains.plugins.scala.extensions.inReadAction
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScStableCodeReferenceElement
-import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScBindingPattern, ScConstructorPattern}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScMethodCall, ScNewTemplateDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{
+  ScBindingPattern,
+  ScConstructorPattern
+}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScMethodCall,
+  ScNewTemplateDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDefinition
-import org.jetbrains.plugins.scala.lang.resolve.{ResolvableReferenceElement, ResolvableReferenceExpression, ScalaResolveResult}
+import org.jetbrains.plugins.scala.lang.resolve.{
+  ResolvableReferenceElement,
+  ResolvableReferenceExpression,
+  ScalaResolveResult
+}
 
 /**
   * Nikolay.Tropin
@@ -21,35 +36,40 @@ import org.jetbrains.plugins.scala.lang.resolve.{ResolvableReferenceElement, Res
   */
 class ApplyUnapplyForBindingSearcher
     extends QueryExecutor[PsiReference, ReferencesSearch.SearchParameters] {
-  def execute(queryParameters: SearchParameters,
-              consumer: Processor[PsiReference]): Boolean = {
+  def execute(
+      queryParameters: SearchParameters,
+      consumer: Processor[PsiReference]): Boolean = {
     val scope = inReadAction(queryParameters.getEffectiveSearchScope)
     val element = queryParameters.getElementToSearch
     element match {
       case _ if inReadAction(!element.isValid) => true
       case binding: ScBindingPattern =>
         val processor = createProcessor(
-            consumer, binding, checkApply = true, checkUnapply = true)
+          consumer,
+          binding,
+          checkApply = true,
+          checkUnapply = true)
         processBinding(processor, scope, binding, queryParameters.getProject)
       case inAnonClassWithBinding((binding, checkApply, checkUnapply)) =>
-        val processor = createProcessor(
-            consumer, binding, checkApply, checkUnapply)
+        val processor =
+          createProcessor(consumer, binding, checkApply, checkUnapply)
         processBinding(processor, scope, binding, queryParameters.getProject)
       case _ => true
     }
   }
 
-  private def createProcessor(consumer: Processor[PsiReference],
-                              binding: ScBindingPattern,
-                              checkApply: Boolean,
-                              checkUnapply: Boolean) =
+  private def createProcessor(
+      consumer: Processor[PsiReference],
+      binding: ScBindingPattern,
+      checkApply: Boolean,
+      checkUnapply: Boolean) =
     new TextOccurenceProcessor {
       def execute(element: PsiElement, offsetInElement: Int): Boolean = {
         val references = inReadAction(element.getReferences)
         val IsApply = new Apply(binding)
         val IsUnapply = new Unapply(binding)
         for (ref <- references
-                       if ref.getRangeInElement.contains(offsetInElement)) {
+             if ref.getRangeInElement.contains(offsetInElement)) {
           inReadAction {
             ref match {
               case IsApply(reference) if checkApply =>
@@ -64,15 +84,20 @@ class ApplyUnapplyForBindingSearcher
       }
     }
 
-  private def processBinding(processor: TextOccurenceProcessor,
-                             scope: SearchScope,
-                             binding: ScBindingPattern,
-                             project: Project): Boolean = {
+  private def processBinding(
+      processor: TextOccurenceProcessor,
+      scope: SearchScope,
+      binding: ScBindingPattern,
+      project: Project): Boolean = {
     val helper: PsiSearchHelper = PsiSearchHelper.SERVICE.getInstance(project)
     try {
       val name = inReadAction(binding.name)
       helper.processElementsWithWord(
-          processor, scope, name, UsageSearchContext.IN_CODE, true)
+        processor,
+        scope,
+        name,
+        UsageSearchContext.IN_CODE,
+        true)
     } catch {
       case ignore: IndexNotReadyException => true
     }
@@ -88,7 +113,7 @@ class ApplyUnapplyForBindingSearcher
                 if Set("unapply", "unapplySeq").contains(fun.name) =>
               resolve.innerResolveResult match {
                 case Some(ScalaResolveResult(`binding`, _)) => Some(sref)
-                case _ => None
+                case _                                      => None
               }
             case Some(resolve @ ScalaResolveResult(`binding`, _)) =>
               resolve.innerResolveResult match {
@@ -132,9 +157,9 @@ class ApplyUnapplyForBindingSearcher
       : Option[(ScBindingPattern, Boolean, Boolean)] =
       inReadAction {
         val (checkApply, checkUnapply) = fun.name match {
-          case "apply" => (true, false)
+          case "apply"                  => (true, false)
           case "unapply" | "unapplySeq" => (false, true)
-          case _ => (false, false)
+          case _                        => (false, false)
         }
         if (checkApply || checkUnapply) {
           fun.containingClass match {

@@ -28,10 +28,11 @@ import scalar.ScalarTag
   * @param useQuote If true, fields containing separChar will be wrapped in quotes
   * @param quoteChar Quote character; default double-quote
   */
-case class CsvSettings(separChar: Char = ',',
-                       quoteChar: Char = '"',
-                       useQuote: Boolean = true,
-                       encoding: String = UTF8)
+case class CsvSettings(
+    separChar: Char = ',',
+    quoteChar: Char = '"',
+    useQuote: Boolean = true,
+    encoding: String = UTF8)
 
 /**
   * Provides implicit functionality for writing data to CSV file format. Usage:
@@ -48,20 +49,22 @@ object CsvImplicits {
   /**
     * Provides enrichment on Series object for writing to a Csv file.
     */
-  implicit def series2CsvWriter[X : ST : ORD, T : ST](series: Series[X, T]) =
+  implicit def series2CsvWriter[X: ST: ORD, T: ST](series: Series[X, T]) =
     new {
-      def writeCsvFile(path: String,
-                       withColIx: Boolean = false,
-                       withRowIx: Boolean = true,
-                       settings: CsvSettings = new CsvSettings()) {
+      def writeCsvFile(
+          path: String,
+          withColIx: Boolean = false,
+          withRowIx: Boolean = true,
+          settings: CsvSettings = new CsvSettings()) {
         frame2CsvWriter(Frame(series))
           .writeCsvFile(path, withColIx, withRowIx, settings)
       }
 
-      def writeCsvStream(stream: OutputStream,
-                         withColIx: Boolean = false,
-                         withRowIx: Boolean = true,
-                         settings: CsvSettings = new CsvSettings()) {
+      def writeCsvStream(
+          stream: OutputStream,
+          withColIx: Boolean = false,
+          withRowIx: Boolean = true,
+          settings: CsvSettings = new CsvSettings()) {
         frame2CsvWriter(Frame(series))
           .writeCsvStream(stream, withColIx, withRowIx, settings)
       }
@@ -70,7 +73,7 @@ object CsvImplicits {
   /**
     * Provides enrichment on Frame object for writing to a Csv file.
     */
-  implicit def frame2CsvWriter[RX : ST : ORD, CX : ST : ORD, T : ST](
+  implicit def frame2CsvWriter[RX: ST: ORD, CX: ST: ORD, T: ST](
       frame: Frame[RX, CX, T]) = new {
 
     /**
@@ -81,10 +84,11 @@ object CsvImplicits {
       * @param withRowIx If true, print out index value as first column
       * @param settings Settings to use in formatting
       */
-    def writeCsvFile(path: String,
-                     withColIx: Boolean = true,
-                     withRowIx: Boolean = true,
-                     settings: CsvSettings = new CsvSettings()) {
+    def writeCsvFile(
+        path: String,
+        withColIx: Boolean = true,
+        withRowIx: Boolean = true,
+        settings: CsvSettings = new CsvSettings()) {
 
       val file = new FileOutputStream(path)
       val stream = new BufferedOutputStream(file, 4 * 1024)
@@ -105,10 +109,11 @@ object CsvImplicits {
       * @param withRowIx If true, print out index value as first column
       * @param settings Settings to use in formatting
       */
-    def writeCsvStream(stream: OutputStream,
-                       withColIx: Boolean = true,
-                       withRowIx: Boolean = true,
-                       settings: CsvSettings = new CsvSettings()) {
+    def writeCsvStream(
+        stream: OutputStream,
+        withColIx: Boolean = true,
+        withRowIx: Boolean = true,
+        settings: CsvSettings = new CsvSettings()) {
 
       val newLine = "\n".getBytes(settings.encoding)
 

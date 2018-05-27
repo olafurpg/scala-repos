@@ -5,7 +5,13 @@ package akka.actor.dungeon
 
 import scala.collection.immutable
 
-import akka.actor.{InvalidActorNameException, ChildStats, ChildRestartStats, ChildNameReserved, ActorRef}
+import akka.actor.{
+  InvalidActorNameException,
+  ChildStats,
+  ChildRestartStats,
+  ChildNameReserved,
+  ActorRef
+}
 import akka.util.Collections.{EmptyImmutableSeq, PartialImmutableValuesIterable}
 
 /**
@@ -45,7 +51,8 @@ private[akka] object ChildrenContainer {
   case object UserRequest extends SuspendReason
   // careful with those system messages, all handling to be taking place in ActorCell.scala!
   final case class Recreation(cause: Throwable)
-      extends SuspendReason with WaitingForChildren
+      extends SuspendReason
+      with WaitingForChildren
   final case class Creation() extends SuspendReason with WaitingForChildren
   case object Termination extends SuspendReason
 
@@ -71,7 +78,8 @@ private[akka] object ChildrenContainer {
   trait EmptyChildrenContainer extends ChildrenContainer {
     val emptyStats = immutable.TreeMap.empty[String, ChildStats]
     override def add(
-        name: String, stats: ChildRestartStats): ChildrenContainer =
+        name: String,
+        stats: ChildRestartStats): ChildrenContainer =
       new NormalChildrenContainer(emptyStats.updated(name, stats))
     override def remove(child: ActorRef): ChildrenContainer = this
     override def getByName(name: String): Option[ChildRestartStats] = None
@@ -99,10 +107,11 @@ private[akka] object ChildrenContainer {
     */
   object TerminatedChildrenContainer extends EmptyChildrenContainer {
     override def add(
-        name: String, stats: ChildRestartStats): ChildrenContainer = this
+        name: String,
+        stats: ChildRestartStats): ChildrenContainer = this
     override def reserve(name: String): ChildrenContainer =
       throw new IllegalStateException(
-          "cannot reserve actor name '" + name + "': already terminated")
+        "cannot reserve actor name '" + name + "': already terminated")
     override def isTerminating: Boolean = true
     override def isNormal: Boolean = false
     override def toString = "terminated"
@@ -118,7 +127,8 @@ private[akka] object ChildrenContainer {
       extends ChildrenContainer {
 
     override def add(
-        name: String, stats: ChildRestartStats): ChildrenContainer =
+        name: String,
+        stats: ChildRestartStats): ChildrenContainer =
       new NormalChildrenContainer(c.updated(name, stats))
 
     override def remove(child: ActorRef): ChildrenContainer =
@@ -145,7 +155,7 @@ private[akka] object ChildrenContainer {
     override def reserve(name: String): ChildrenContainer =
       if (c contains name)
         throw new InvalidActorNameException(
-            s"actor name [$name] is not unique!")
+          s"actor name [$name] is not unique!")
       else new NormalChildrenContainer(c.updated(name, ChildNameReserved))
 
     override def unreserve(name: String): ChildrenContainer =
@@ -182,7 +192,8 @@ private[akka] object ChildrenContainer {
       extends ChildrenContainer {
 
     override def add(
-        name: String, stats: ChildRestartStats): ChildrenContainer =
+        name: String,
+        stats: ChildRestartStats): ChildrenContainer =
       copy(c.updated(name, stats))
 
     override def remove(child: ActorRef): ChildrenContainer = {
@@ -215,11 +226,11 @@ private[akka] object ChildrenContainer {
     override def reserve(name: String): ChildrenContainer = reason match {
       case Termination ⇒
         throw new IllegalStateException(
-            "cannot reserve actor name '" + name + "': terminating")
+          "cannot reserve actor name '" + name + "': terminating")
       case _ ⇒
         if (c contains name)
           throw new InvalidActorNameException(
-              s"actor name [$name] is not unique!")
+            s"actor name [$name] is not unique!")
         else copy(c = c.updated(name, ChildNameReserved))
     }
 
@@ -235,8 +246,9 @@ private[akka] object ChildrenContainer {
     override def toString =
       if (c.size > 20) c.size + " children"
       else
-        c.mkString("children (" + toDie.size + " terminating):\n    ",
-                   "\n    ",
-                   "\n") + toDie
+        c.mkString(
+          "children (" + toDie.size + " terminating):\n    ",
+          "\n    ",
+          "\n") + toDie
   }
 }

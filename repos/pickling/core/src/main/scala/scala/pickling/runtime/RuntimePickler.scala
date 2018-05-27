@@ -9,7 +9,9 @@ import ir._
 import internal._
 
 class RuntimeTypeInfo(
-    classLoader: ClassLoader, clazz: Class[_], share: refs.Share) {
+    classLoader: ClassLoader,
+    clazz: Class[_],
+    share: refs.Share) {
   import ru._
   import definitions._
 
@@ -26,7 +28,8 @@ class RuntimeTypeInfo(
 
     if (elemClass != null) // assume it's an array
       appliedType(
-          ArrayClass.toType, List(mirror.classSymbol(elemClass).asType.toType))
+        ArrayClass.toType,
+        List(mirror.classSymbol(elemClass).asType.toType))
     else sym.asType.toType
   }
   // debug(s"tpe: ${tpe.key}")
@@ -50,13 +53,15 @@ class RuntimeTypeInfo(
 
 // Note: This entire class must be constructed inside of a GRL-locked method.
 class RuntimePickler(
-    classLoader: ClassLoader, clazz: Class[_], fastTag: FastTypeTag[_])(
-    implicit share: refs.Share)
+    classLoader: ClassLoader,
+    clazz: Class[_],
+    fastTag: FastTypeTag[_])(implicit share: refs.Share)
     extends RuntimeTypeInfo(classLoader, clazz, share) {
   import ru._
 
-  assert(scala.pickling.internal.GRL.isHeldByCurrentThread,
-         "Failed to aquire GRL lock before instantiating a runtime pickler!")
+  assert(
+    scala.pickling.internal.GRL.isHeldByCurrentThread,
+    "Failed to aquire GRL lock before instantiating a runtime pickler!")
 
   sealed abstract class Logic(fir: irs.FieldIR, isEffFinal: Boolean) {
     // debug(s"creating Logic for ${fir.name}")
@@ -88,29 +93,28 @@ class RuntimePickler(
         .asInstanceOf[Pickler[Any]]
       //debug(s"looked up field pickler: $fldPickler")
 
-      builder.putField(
-          fir.name,
-          b =>
-            {
-              pickleLogic(fldClass, fldValue, b, fldPickler, fldTag)
-          })
+      builder.putField(fir.name, b => {
+        pickleLogic(fldClass, fldValue, b, fldPickler, fldTag)
+      })
     }
 
-    def pickleLogic(fieldClass: Class[_],
-                    fieldValue: Any,
-                    builder: PBuilder,
-                    pickler: Pickler[Any],
-                    fieldTag: FastTypeTag[_]): Unit
+    def pickleLogic(
+        fieldClass: Class[_],
+        fieldValue: Any,
+        builder: PBuilder,
+        pickler: Pickler[Any],
+        fieldTag: FastTypeTag[_]): Unit
   }
 
   final class DefaultLogic(fir: irs.FieldIR) extends Logic(fir, false) {
     // debug(s"creating DefaultLogic for ${fir.name}")
     val staticClass = mirror.runtimeClass(fir.tpe.erasure)
-    def pickleLogic(fldClass: Class[_],
-                    fldValue: Any,
-                    b: PBuilder,
-                    fldPickler: Pickler[Any],
-                    fldTag: FastTypeTag[_]): Unit = {
+    def pickleLogic(
+        fldClass: Class[_],
+        fldValue: Any,
+        b: PBuilder,
+        fldPickler: Pickler[Any],
+        fldTag: FastTypeTag[_]): Unit = {
       // TODO - Dynamic elides are no longer supported, but here is where they could be.  They were never generated
       //        for non-runtime picklers, and therefore were of little use.
       //        The issue with dynamic elides is that the unpickler needs to support them, and it's not
@@ -120,14 +124,14 @@ class RuntimePickler(
     }
   }
 
-  final class EffectivelyFinalLogic(fir: irs.FieldIR)
-      extends Logic(fir, true) {
+  final class EffectivelyFinalLogic(fir: irs.FieldIR) extends Logic(fir, true) {
     // debug(s"creating EffectivelyFinalLogic for ${fir.name}")
-    def pickleLogic(fldClass: Class[_],
-                    fldValue: Any,
-                    b: PBuilder,
-                    fldPickler: Pickler[Any],
-                    fldTag: FastTypeTag[_]): Unit = {
+    def pickleLogic(
+        fldClass: Class[_],
+        fldValue: Any,
+        b: PBuilder,
+        fldPickler: Pickler[Any],
+        fldTag: FastTypeTag[_]): Unit = {
       b.hintElidedType(fldTag)
       pickleInto(fldClass, fldValue, b, fldPickler, fldTag)
     }
@@ -135,11 +139,12 @@ class RuntimePickler(
 
   final class AbstractLogic(fir: irs.FieldIR) extends Logic(fir, false) {
     // debug(s"creating AbstractLogic for ${fir.name}")
-    def pickleLogic(fldClass: Class[_],
-                    fldValue: Any,
-                    b: PBuilder,
-                    fldPickler: Pickler[Any],
-                    fldTag: FastTypeTag[_]): Unit = {
+    def pickleLogic(
+        fldClass: Class[_],
+        fldValue: Any,
+        b: PBuilder,
+        fldPickler: Pickler[Any],
+        fldTag: FastTypeTag[_]): Unit = {
       pickleInto(fldClass, fldValue, b, fldPickler, fldTag)
     }
   }
@@ -148,7 +153,9 @@ class RuntimePickler(
       extends Logic(fir, false) {
     // debug(s"creating PrivateJavaFieldLogic for ${fir.name}")
     override def run(
-        builder: PBuilder, picklee: Any, im: ru.InstanceMirror): Unit = {
+        builder: PBuilder,
+        picklee: Any,
+        im: ru.InstanceMirror): Unit = {
       field.setAccessible(true)
       val fldValue = field.get(picklee)
       val fldClass = if (fldValue != null) fldValue.getClass else null
@@ -169,43 +176,44 @@ class RuntimePickler(
         .asInstanceOf[Pickler[Any]]
       // debug(s"looked up field pickler: $fldPickler")
 
-      builder.putField(
-          field.getName,
-          b =>
-            {
-              pickleLogic(fldClass, fldValue, b, fldPickler, fldTag)
-          })
+      builder.putField(field.getName, b => {
+        pickleLogic(fldClass, fldValue, b, fldPickler, fldTag)
+      })
     }
 
-    def pickleLogic(fldClass: Class[_],
-                    fldValue: Any,
-                    b: PBuilder,
-                    fldPickler: Pickler[Any],
-                    fldTag: FastTypeTag[_]): Unit = {
+    def pickleLogic(
+        fldClass: Class[_],
+        fldValue: Any,
+        b: PBuilder,
+        fldPickler: Pickler[Any],
+        fldTag: FastTypeTag[_]): Unit = {
       pickleInto(fldClass, fldValue, b, fldPickler, fldTag)
     }
   }
 
   final class PrivateEffectivelyFinalJavaFieldLogic(
-      fir: irs.FieldIR, field: Field)
+      fir: irs.FieldIR,
+      field: Field)
       extends PrivateJavaFieldLogic(fir, field) {
     // debug(s"creating PrivateEffectivelyFinalJavaFieldLogic for ${fir.name}")
-    override def pickleLogic(fldClass: Class[_],
-                             fldValue: Any,
-                             b: PBuilder,
-                             fldPickler: Pickler[Any],
-                             fldTag: FastTypeTag[_]): Unit = {
+    override def pickleLogic(
+        fldClass: Class[_],
+        fldValue: Any,
+        b: PBuilder,
+        fldPickler: Pickler[Any],
+        fldTag: FastTypeTag[_]): Unit = {
       b.hintElidedType(fldTag)
       pickleInto(fldClass, fldValue, b, fldPickler, fldTag)
     }
   }
 
   // difference to old runtime pickler: create tag based on fieldClass instead of fir.tpe
-  def pickleInto(fieldClass: Class[_],
-                 fieldValue: Any,
-                 builder: PBuilder,
-                 pickler: Pickler[Any],
-                 fieldTag: FastTypeTag[_]): Unit = {
+  def pickleInto(
+      fieldClass: Class[_],
+      fieldValue: Any,
+      builder: PBuilder,
+      pickler: Pickler[Any],
+      fieldTag: FastTypeTag[_]): Unit = {
     //debug(s"fieldTag for pickleInto: ${fieldTag.key}")
 
     val fieldTpe = fieldTag.tpe
@@ -225,19 +233,19 @@ class RuntimePickler(
       val fields: List[Logic] = cir.fields.flatMap { fir =>
         if (fir.accessor.nonEmpty)
           List(
-              if (fir.tpe.typeSymbol.isEffectivelyFinal)
-                new EffectivelyFinalLogic(fir)
-              else if (fir.tpe.typeSymbol.asType.isAbstractType)
-                new AbstractLogic(fir)
-              else new DefaultLogic(fir)
+            if (fir.tpe.typeSymbol.isEffectivelyFinal)
+              new EffectivelyFinalLogic(fir)
+            else if (fir.tpe.typeSymbol.asType.isAbstractType)
+              new AbstractLogic(fir)
+            else new DefaultLogic(fir)
           )
         else
           try {
             val javaField = clazz.getDeclaredField(fir.name)
             List(
-                if (fir.tpe.typeSymbol.isEffectivelyFinal)
-                  new PrivateEffectivelyFinalJavaFieldLogic(fir, javaField)
-                else new PrivateJavaFieldLogic(fir, javaField)
+              if (fir.tpe.typeSymbol.isEffectivelyFinal)
+                new PrivateEffectivelyFinalJavaFieldLogic(fir, javaField)
+              else new PrivateJavaFieldLogic(fir, javaField)
             )
           } catch {
             case e: java.lang.NoSuchFieldException => List()

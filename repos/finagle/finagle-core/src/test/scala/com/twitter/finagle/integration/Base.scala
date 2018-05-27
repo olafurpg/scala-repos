@@ -11,7 +11,14 @@ import com.twitter.finagle.stats.{InMemoryStatsReceiver, StatsReceiver}
 import com.twitter.finagle.tracing.TraceInitializerFilter
 import com.twitter.finagle.transport.Transport
 import java.net.InetSocketAddress
-import org.jboss.netty.channel.{Channel, ChannelFactory, ChannelPipeline, ChannelPipelineFactory, Channels, DefaultChannelConfig}
+import org.jboss.netty.channel.{
+  Channel,
+  ChannelFactory,
+  ChannelPipeline,
+  ChannelPipelineFactory,
+  Channels,
+  DefaultChannelConfig
+}
 import org.mockito.Matchers._
 import org.mockito.Mockito.when
 import org.scalatest.FunSuite
@@ -29,8 +36,10 @@ trait IntegrationBase extends FunSuite with MockitoSugar {
     val statsReceiver = new InMemoryStatsReceiver
 
     val codec = mock[Codec[String, String]]
-    when(codec.prepareConnFactory(any[ServiceFactory[String, String]],
-                                  any[Stack.Params])) thenAnswer {
+    when(
+      codec.prepareConnFactory(
+        any[ServiceFactory[String, String]],
+        any[Stack.Params])) thenAnswer {
       new Answer[ServiceFactory[String, String]] {
         def answer(
             invocation: InvocationOnMock): ServiceFactory[String, String] = {
@@ -57,14 +66,13 @@ trait IntegrationBase extends FunSuite with MockitoSugar {
           }
       }
     }
-    when(codec.newClientDispatcher(any[Transport[Any, Any]],
-                                   any[Stack.Params])) thenAnswer {
+    when(codec.newClientDispatcher(any[Transport[Any, Any]], any[Stack.Params])) thenAnswer {
       new Answer[SerialClientDispatcher[String, String]] {
         def answer(invocation: InvocationOnMock)
           : SerialClientDispatcher[String, String] = {
           val arg = invocation.getArguments.head
           new SerialClientDispatcher[String, String](
-              arg.asInstanceOf[Transport[String, String]])
+            arg.asInstanceOf[Transport[String, String]])
         }
       }
     }
@@ -116,12 +124,12 @@ trait IntegrationBase extends FunSuite with MockitoSugar {
 
     case class Client(
         stack: Stack[ServiceFactory[String, String]] = StackClient
-            .newStack[String, String],
+          .newStack[String, String],
         params: Stack.Params = StackClient.defaultParams
-    )
-        extends StdStackClient[String, String, Client] {
-      def copy1(stack: Stack[ServiceFactory[String, String]] = this.stack,
-                params: Stack.Params = this.params): Client =
+    ) extends StdStackClient[String, String, Client] {
+      def copy1(
+          stack: Stack[ServiceFactory[String, String]] = this.stack,
+          params: Stack.Params = this.params): Client =
         copy(stack, params)
 
       type In = String
@@ -139,11 +147,11 @@ trait IntegrationBase extends FunSuite with MockitoSugar {
     def client = {
       val client = Client()
       client.withStack(
-          // needed for ClientBuilderTest.ClientBuilderHelper
-          client.stack.replace(
-              StackClient.Role.prepConn,
-              (next: ServiceFactory[String, String]) =>
-                codec.prepareConnFactory(next, Stack.Params.empty)))
+        // needed for ClientBuilderTest.ClientBuilderHelper
+        client.stack.replace(
+          StackClient.Role.prepConn,
+          (next: ServiceFactory[String, String]) =>
+            codec.prepareConnFactory(next, Stack.Params.empty)))
     }
   }
 }

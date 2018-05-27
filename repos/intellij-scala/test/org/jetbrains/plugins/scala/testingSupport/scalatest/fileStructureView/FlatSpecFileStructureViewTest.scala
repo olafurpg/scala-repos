@@ -11,8 +11,9 @@ trait FlatSpecFileStructureViewTest extends ScalaTestTestCase {
   private val className = "FlatSpecViewTest"
 
   def addFlatSpecViewTest() {
-    addFileToProject(className + ".scala",
-                     """
+    addFileToProject(
+      className + ".scala",
+      """
         |import org.scalatest._
         |
         |class FlatSpecViewTest extends FlatSpec {
@@ -34,38 +35,43 @@ trait FlatSpecFileStructureViewTest extends ScalaTestTestCase {
         |
         |  it should "ignore and pend2" ignore pending
         |}
-      """.stripMargin)
+      """.stripMargin
+    )
   }
 
   def testFlatSpecNormal(): Unit = {
     addFlatSpecViewTest()
-    runFileStructureViewTest(className,
-                             normalStatusId,
-                             "it should \"child1\"",
-                             "they should \"child2\"")
+    runFileStructureViewTest(
+      className,
+      normalStatusId,
+      "it should \"child1\"",
+      "they should \"child2\"")
   }
 
   def testFlatSpecIgnored(): Unit = {
     addFlatSpecViewTest()
-    runFileStructureViewTest(className,
-                             ignoredStatusId,
-                             "ignore should \"ignore1\"",
-                             "they should \"ignore2\"")
+    runFileStructureViewTest(
+      className,
+      ignoredStatusId,
+      "ignore should \"ignore1\"",
+      "they should \"ignore2\"")
   }
 
   def testFlatSpecIgnoredAndPending(): Unit = {
     addFlatSpecViewTest()
-    runFileStructureViewTest(className,
-                             ignoredStatusId,
-                             "ignore should \"ignore and pend\"",
-                             "it should \"ignore and pend2\"")
+    runFileStructureViewTest(
+      className,
+      ignoredStatusId,
+      "ignore should \"ignore and pend\"",
+      "it should \"ignore and pend2\"")
   }
 
   def testFlatSpecPending(): Unit = {
     addFlatSpecViewTest()
-    runFileStructureViewTest(className,
-                             pendingStatusId,
-                             "\"second\" should \"pend1\"",
-                             "it should \"pend2\"")
+    runFileStructureViewTest(
+      className,
+      pendingStatusId,
+      "\"second\" should \"pend1\"",
+      "it should \"pend2\"")
   }
 }

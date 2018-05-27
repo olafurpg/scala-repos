@@ -27,7 +27,8 @@ abstract class Cookie {
   @varargs
   def delete(innerRoute: Route, moreInnerRoutes: Route*): Route =
     RouteStructure.DeleteCookie(name(), domain().asScala, path().asScala)(
-        innerRoute, moreInnerRoutes.toList)
+      innerRoute,
+      moreInnerRoutes.toList)
 }
 object Cookies {
   def create(name: String): Cookie = new CookieImpl(name)

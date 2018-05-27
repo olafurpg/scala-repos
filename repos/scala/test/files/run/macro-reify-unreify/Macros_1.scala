@@ -10,11 +10,12 @@ object Macros {
 
       val world = c.reifyTree(gen.mkRuntimeUniverseRef, EmptyTree, s.tree)
       val greeting = c.reifyTree(
-          gen.mkRuntimeUniverseRef,
-          EmptyTree,
-          c.typecheck(
-              Apply(Select(Literal(Constant("hello ")), TermName("$plus")),
-                    List(c.unreifyTree(world)))))
+        gen.mkRuntimeUniverseRef,
+        EmptyTree,
+        c.typecheck(
+          Apply(
+            Select(Literal(Constant("hello ")), TermName("$plus")),
+            List(c.unreifyTree(world)))))
       val typedGreeting = c.Expr[String](greeting)
 
       c.universe.reify {

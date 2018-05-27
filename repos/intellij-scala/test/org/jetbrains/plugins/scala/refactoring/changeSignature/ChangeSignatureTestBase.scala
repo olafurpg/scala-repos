@@ -17,7 +17,10 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.types
 import org.jetbrains.plugins.scala.lang.refactoring.changeSignature.changeInfo.ScalaChangeInfo
-import org.jetbrains.plugins.scala.lang.refactoring.changeSignature.{ScalaChangeSignatureProcessor, ScalaParameterInfo}
+import org.jetbrains.plugins.scala.lang.refactoring.changeSignature.{
+  ScalaChangeSignatureProcessor,
+  ScalaParameterInfo
+}
 import org.junit.Assert._
 
 /**
@@ -46,10 +49,11 @@ abstract class ChangeSignatureTestBase
 
   def findTargetElement: PsiMember
 
-  protected def doTest(newVisibility: String,
-                       newName: String,
-                       newReturnType: String,
-                       newParams: => Seq[Seq[ParameterInfo]]) {
+  protected def doTest(
+      newVisibility: String,
+      newName: String,
+      newReturnType: String,
+      newParams: => Seq[Seq[ParameterInfo]]) {
     val testName = getTestName(false)
 
     val secondName = secondFileName(testName)
@@ -86,9 +90,10 @@ abstract class ChangeSignatureTestBase
         LightPlatformTestCase.getSourceRoot.createChildData(null, fileName)
       VfsUtil.saveText(vFile, text)
       val psiFile = LightPlatformTestCase.getPsiManager.findFile(vFile)
-      assertNotNull("Can't create PsiFile for '" + fileName +
-                    "'. Unknown file type most probably.",
-                    vFile)
+      assertNotNull(
+        "Can't create PsiFile for '" + fileName +
+          "'. Unknown file type most probably.",
+        vFile)
       assertTrue(psiFile.isPhysical)
       vFile.setCharset(CharsetToolkit.UTF8_CHARSET)
       PsiDocumentManager.getInstance(getProjectAdapter).commitAllDocuments()
@@ -102,7 +107,8 @@ abstract class ChangeSignatureTestBase
   }
 
   protected def getPsiTypeFromText(
-      typeText: String, context: PsiElement): PsiType = {
+      typeText: String,
+      context: PsiElement): PsiType = {
     val factory: JavaCodeFragmentFactory =
       JavaCodeFragmentFactory.getInstance(getProjectAdapter)
     factory.createTypeCodeFragment(typeText, context, false).getType
@@ -122,13 +128,14 @@ abstract class ChangeSignatureTestBase
     val params =
       newParams.flatten.map(_.asInstanceOf[ParameterInfoImpl]).toArray
 
-    new ChangeSignatureProcessor(getProjectAdapter,
-                                 psiMethod, /*generateDelegate = */ false,
-                                 newVisibility,
-                                 newName,
-                                 retType,
-                                 params,
-                                 Array.empty)
+    new ChangeSignatureProcessor(
+      getProjectAdapter,
+      psiMethod, /*generateDelegate = */ false,
+      newVisibility,
+      newName,
+      retType,
+      params,
+      Array.empty)
   }
 
   protected def scalaProcessor(
@@ -148,12 +155,12 @@ abstract class ChangeSignatureTestBase
     val params = newParams.map(_.map(_.asInstanceOf[ScalaParameterInfo]))
 
     val changeInfo = new ScalaChangeInfo(
-        newVisibility,
-        targetMethod.asInstanceOf[ScMethodLike],
-        newName,
-        retType,
-        params,
-        isAddDefaultValue)
+      newVisibility,
+      targetMethod.asInstanceOf[ScMethodLike],
+      newName,
+      retType,
+      params,
+      isAddDefaultValue)
 
     new ScalaChangeSignatureProcessor(getProjectAdapter, changeInfo)
   }

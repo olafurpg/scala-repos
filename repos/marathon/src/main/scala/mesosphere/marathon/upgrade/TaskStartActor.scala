@@ -10,15 +10,18 @@ import org.apache.mesos.SchedulerDriver
 
 import scala.concurrent.Promise
 
-class TaskStartActor(val driver: SchedulerDriver,
-                     val scheduler: SchedulerActions,
-                     val taskQueue: LaunchQueue,
-                     val taskTracker: TaskTracker,
-                     val eventBus: EventStream,
-                     val app: AppDefinition,
-                     val scaleTo: Int,
-                     promise: Promise[Unit])
-    extends Actor with ActorLogging with StartingBehavior {
+class TaskStartActor(
+    val driver: SchedulerDriver,
+    val scheduler: SchedulerActions,
+    val taskQueue: LaunchQueue,
+    val taskTracker: TaskTracker,
+    val eventBus: EventStream,
+    val app: AppDefinition,
+    val scaleTo: Int,
+    promise: Promise[Unit])
+    extends Actor
+    with ActorLogging
+    with StartingBehavior {
 
   val nrToStart: Int =
     scaleTo - taskQueue
@@ -33,8 +36,8 @@ class TaskStartActor(val driver: SchedulerDriver,
   override def postStop(): Unit = {
     eventBus.unsubscribe(self)
     if (!promise.isCompleted)
-      promise.tryFailure(new TaskUpgradeCanceledException(
-              "The task upgrade has been cancelled"))
+      promise.tryFailure(
+        new TaskUpgradeCanceledException("The task upgrade has been cancelled"))
   }
 
   override def success(): Unit = {

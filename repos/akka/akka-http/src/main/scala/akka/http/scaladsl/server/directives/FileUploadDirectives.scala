@@ -57,29 +57,35 @@ trait FileUploadDirectives {
     */
   def fileUpload(
       fieldName: String): Directive1[(FileInfo, Source[ByteString, Any])] =
-    entity(as[Multipart.FormData]).flatMap { formData ⇒
-      extractRequestContext.flatMap { ctx ⇒
-        implicit val mat = ctx.materializer
-        implicit val ec = ctx.executionContext
+    entity(as[Multipart.FormData])
+      .flatMap { formData ⇒
+        extractRequestContext.flatMap { ctx ⇒
+          implicit val mat = ctx.materializer
+          implicit val ec = ctx.executionContext
 
-        val onePartSource: Source[(FileInfo, Source[ByteString, Any]), Any] =
-          formData.parts
-            .filter(part ⇒ part.filename.isDefined && part.name == fieldName)
-            .map(part ⇒
-                  (FileInfo(
-                       part.name, part.filename.get, part.entity.contentType),
-                   part.entity.dataBytes))
-            .take(1)
+          val onePartSource: Source[(FileInfo, Source[ByteString, Any]), Any] =
+            formData.parts
+              .filter(part ⇒ part.filename.isDefined && part.name == fieldName)
+              .map(
+                part ⇒
+                  (
+                    FileInfo(
+                      part.name,
+                      part.filename.get,
+                      part.entity.contentType),
+                    part.entity.dataBytes))
+              .take(1)
 
-        val onePartF = onePartSource.runWith(
+          val onePartF = onePartSource.runWith(
             Sink.headOption[(FileInfo, Source[ByteString, Any])])
 
-        onSuccess(onePartF)
+          onSuccess(onePartF)
+        }
       }
-    }.flatMap {
-      case Some(tuple) ⇒ provide(tuple)
-      case None ⇒ reject(MissingFormFieldRejection(fieldName))
-    }
+      .flatMap {
+        case Some(tuple) ⇒ provide(tuple)
+        case None ⇒ reject(MissingFormFieldRejection(fieldName))
+      }
 }
 
 object FileUploadDirectives extends FileUploadDirectives
@@ -92,4 +98,6 @@ object FileUploadDirectives extends FileUploadDirectives
   * @param contentType Content type of the file
   */
 final case class FileInfo(
-    fieldName: String, fileName: String, contentType: ContentType)
+    fieldName: String,
+    fileName: String,
+    contentType: ContentType)

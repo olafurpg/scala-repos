@@ -38,7 +38,8 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class PrinterJobJobStatus
     extends SFXEnumDelegateSpec[
-        jfxp.PrinterJob.JobStatus, PrinterJob.JobStatus](
-        javaClass = classOf[jfxp.PrinterJob.JobStatus],
-        scalaClass = classOf[PrinterJob.JobStatus],
-        companion = PrinterJob.JobStatus)
+      jfxp.PrinterJob.JobStatus,
+      PrinterJob.JobStatus](
+      javaClass = classOf[jfxp.PrinterJob.JobStatus],
+      scalaClass = classOf[PrinterJob.JobStatus],
+      companion = PrinterJob.JobStatus)

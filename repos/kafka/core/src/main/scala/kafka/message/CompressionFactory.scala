@@ -21,15 +21,19 @@ import java.util.zip.GZIPOutputStream
 import java.util.zip.GZIPInputStream
 import java.io.InputStream
 
-import org.apache.kafka.common.record.{KafkaLZ4BlockInputStream, KafkaLZ4BlockOutputStream}
+import org.apache.kafka.common.record.{
+  KafkaLZ4BlockInputStream,
+  KafkaLZ4BlockOutputStream
+}
 
 object CompressionFactory {
 
-  def apply(compressionCodec: CompressionCodec,
-            stream: OutputStream): OutputStream = {
+  def apply(
+      compressionCodec: CompressionCodec,
+      stream: OutputStream): OutputStream = {
     compressionCodec match {
       case DefaultCompressionCodec => new GZIPOutputStream(stream)
-      case GZIPCompressionCodec => new GZIPOutputStream(stream)
+      case GZIPCompressionCodec    => new GZIPOutputStream(stream)
       case SnappyCompressionCodec =>
         import org.xerial.snappy.SnappyOutputStream
         new SnappyOutputStream(stream)
@@ -37,15 +41,16 @@ object CompressionFactory {
         new KafkaLZ4BlockOutputStream(stream)
       case _ =>
         throw new kafka.common.UnknownCodecException(
-            "Unknown Codec: " + compressionCodec)
+          "Unknown Codec: " + compressionCodec)
     }
   }
 
   def apply(
-      compressionCodec: CompressionCodec, stream: InputStream): InputStream = {
+      compressionCodec: CompressionCodec,
+      stream: InputStream): InputStream = {
     compressionCodec match {
       case DefaultCompressionCodec => new GZIPInputStream(stream)
-      case GZIPCompressionCodec => new GZIPInputStream(stream)
+      case GZIPCompressionCodec    => new GZIPInputStream(stream)
       case SnappyCompressionCodec =>
         import org.xerial.snappy.SnappyInputStream
         new SnappyInputStream(stream)
@@ -53,7 +58,7 @@ object CompressionFactory {
         new KafkaLZ4BlockInputStream(stream)
       case _ =>
         throw new kafka.common.UnknownCodecException(
-            "Unknown Codec: " + compressionCodec)
+          "Unknown Codec: " + compressionCodec)
     }
   }
 }

@@ -6,7 +6,11 @@ import com.twitter.common.zookeeper.ZooKeeperClient
 import com.twitter.finagle.Memcached
 import com.twitter.finagle.cacheresolver.ZookeeperStateMonitor
 import com.twitter.finagle.memcached._
-import com.twitter.finagle.stats.{ClientStatsReceiver, NullStatsReceiver, StatsReceiver}
+import com.twitter.finagle.stats.{
+  ClientStatsReceiver,
+  NullStatsReceiver,
+  StatsReceiver
+}
 import com.twitter.finagle.zookeeper.DefaultZkClientFactory
 import com.twitter.io.Buf
 import com.twitter.util.{Future, Time}
@@ -15,9 +19,10 @@ import com.twitter.util.{Future, Time}
   * migration config data
   */
 private[memcached] object MigrationConstants {
-  case class MigrationConfig(state: String,
-                             readRepairBack: Boolean,
-                             readRepairFront: Boolean)
+  case class MigrationConfig(
+      state: String,
+      readRepairBack: Boolean,
+      readRepairFront: Boolean)
 
   val jsonMapper = new ObjectMapper().registerModule(DefaultScalaModule)
 
@@ -45,8 +50,8 @@ class MigrationClient(
     protected val zkPath: String,
     protected val zkClient: ZooKeeperClient,
     protected val statsReceiver: StatsReceiver = NullStatsReceiver
-)
-    extends ProxyClient with ZookeeperStateMonitor {
+) extends ProxyClient
+    with ZookeeperStateMonitor {
 
   import MigrationConstants._
 
@@ -65,8 +70,8 @@ class MigrationClient(
       case MigrationState.Pending =>
         proxyClient = new FrontendClient(oldClient)
       case MigrationState.Warming if (config.readRepairBack) =>
-        proxyClient = new FrontendClient(oldClient)
-        with DarkRead with ReadWarmup with DarkWrite {
+        proxyClient = new FrontendClient(oldClient) with DarkRead
+        with ReadWarmup with DarkWrite {
           val backendClient = newClient
         }
       case MigrationState.Warming =>
@@ -75,8 +80,8 @@ class MigrationClient(
           val backendClient = newClient
         }
       case MigrationState.Verifying if (config.readRepairFront) =>
-        proxyClient = new FrontendClient(newClient)
-        with FallbackRead with ReadRepair {
+        proxyClient = new FrontendClient(newClient) with FallbackRead
+        with ReadRepair {
           val backendClient = oldClient
         }
       case MigrationState.Verifying =>
@@ -181,35 +186,50 @@ trait DarkWrite extends Client {
   protected val backendClient: Client
 
   abstract override def set(
-      key: String, flags: Int, expiry: Time, value: Buf) = {
+      key: String,
+      flags: Int,
+      expiry: Time,
+      value: Buf) = {
     val result = super.set(key, flags, expiry, value)
     backendClient.set(key, flags, expiry, value)
     result
   }
 
   abstract override def add(
-      key: String, flags: Int, expiry: Time, value: Buf) = {
+      key: String,
+      flags: Int,
+      expiry: Time,
+      value: Buf) = {
     val result = super.add(key, flags, expiry, value)
     backendClient.add(key, flags, expiry, value)
     result
   }
 
   abstract override def append(
-      key: String, flags: Int, expiry: Time, value: Buf) = {
+      key: String,
+      flags: Int,
+      expiry: Time,
+      value: Buf) = {
     val result = super.append(key, flags, expiry, value)
     backendClient.append(key, flags, expiry, value)
     result
   }
 
   abstract override def prepend(
-      key: String, flags: Int, expiry: Time, value: Buf) = {
+      key: String,
+      flags: Int,
+      expiry: Time,
+      value: Buf) = {
     val result = super.prepend(key, flags, expiry, value)
     backendClient.prepend(key, flags, expiry, value)
     result
   }
 
   abstract override def replace(
-      key: String, flags: Int, expiry: Time, value: Buf) = {
+      key: String,
+      flags: Int,
+      expiry: Time,
+      value: Buf) = {
     val result = super.replace(key, flags, expiry, value)
     backendClient.replace(key, flags, expiry, value)
     result
@@ -229,7 +249,11 @@ trait DarkWrite extends Client {
 
   // cas operation does not migrate
   abstract override def checkAndSet(
-      key: String, flags: Int, expiry: Time, value: Buf, casUnique: Buf) =
+      key: String,
+      flags: Int,
+      expiry: Time,
+      value: Buf,
+      casUnique: Buf) =
     super.checkAndSet(key, flags, expiry, value, casUnique)
 
   abstract override def delete(key: String) = {
@@ -267,7 +291,8 @@ trait FallbackRead extends Client {
   }
 
   protected def combineGetResult(
-      frontR: GetResult, backR: GetResult): GetResult = {
+      frontR: GetResult,
+      backR: GetResult): GetResult = {
     // when fallback, merge the front hits with back result
     GetResult.merged(Seq(GetResult(frontR.hits), backR))
   }
@@ -291,7 +316,8 @@ trait FallbackRead extends Client {
   */
 trait ReadRepair { self: FallbackRead =>
   override def combineGetResult(
-      frontR: GetResult, backR: GetResult): GetResult = {
+      frontR: GetResult,
+      backR: GetResult): GetResult = {
     // when readrepair, use back hit to repair front miss
     backR.hits foreach {
       case (k, v) => set(k, v.value)
@@ -327,6 +353,10 @@ object MigrationClient {
 
     // create MigrationClient, by oldClient newClient, (zkPath, zkClient)
     new MigrationClient(
-        oldClient, newClient, zkPath, zkClient, migrationStatsReceiver)
+      oldClient,
+      newClient,
+      zkPath,
+      zkClient,
+      migrationStatsReceiver)
   }
 }

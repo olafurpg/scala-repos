@@ -69,19 +69,23 @@ object HashedWheelTimer {
     */
   def apply(): Timer =
     HashedWheelTimer(
-        Executors.defaultThreadFactory(), TickDuration, TicksPerWheel)
+      Executors.defaultThreadFactory(),
+      TickDuration,
+      TicksPerWheel)
 
   /**
     * Create a `HashedWheelTimer` with custom [[ThreadFactory]], [[Duration]]
     * and ticks per wheel.
     */
-  def apply(threadFactory: ThreadFactory,
-            tickDuration: Duration,
-            ticksPerWheel: Int): Timer = {
-    val hwt = new netty.HashedWheelTimer(threadFactory,
-                                         tickDuration.inNanoseconds,
-                                         TimeUnit.NANOSECONDS,
-                                         ticksPerWheel)
+  def apply(
+      threadFactory: ThreadFactory,
+      tickDuration: Duration,
+      ticksPerWheel: Int): Timer = {
+    val hwt = new netty.HashedWheelTimer(
+      threadFactory,
+      tickDuration.inNanoseconds,
+      TimeUnit.NANOSECONDS,
+      ticksPerWheel)
     new HashedWheelTimer(hwt)
   }
 
@@ -96,14 +100,18 @@ object HashedWheelTimer {
     */
   def apply(tickDuration: Duration): Timer =
     HashedWheelTimer(
-        Executors.defaultThreadFactory(), tickDuration, TicksPerWheel)
+      Executors.defaultThreadFactory(),
+      tickDuration,
+      TicksPerWheel)
 
   /**
     * Create a `HashedWheelTimer` with custom [[Duration]] and ticks per wheel.
     */
   def apply(tickDuration: Duration, ticksPerWheel: Int): Timer =
     HashedWheelTimer(
-        Executors.defaultThreadFactory(), tickDuration, ticksPerWheel)
+      Executors.defaultThreadFactory(),
+      tickDuration,
+      ticksPerWheel)
 
   /**
     * Create a `HashedWheelTimer` based on a netty.HashedWheelTimer.
@@ -115,18 +123,22 @@ object HashedWheelTimer {
   // ticks, which gives ~5100 milliseconds worth of scheduling. This should
   // suffice for most usage without having tasks scheduled for a later round.
   private[finagle] val nettyHwt = new netty.HashedWheelTimer(
-      new NamedPoolThreadFactory("Finagle Default Timer", /*daemons = */ true),
-      TickDuration.inMilliseconds,
-      TimeUnit.MILLISECONDS,
-      TicksPerWheel)
+    new NamedPoolThreadFactory("Finagle Default Timer", /*daemons = */ true),
+    TickDuration.inMilliseconds,
+    TimeUnit.MILLISECONDS,
+    TicksPerWheel)
 
   val Default: Timer = new HashedWheelTimer(nettyHwt)
 
   TimerStats.deviation(
-      nettyHwt, 10.milliseconds, FinagleStatsReceiver.scope("timer"))
+    nettyHwt,
+    10.milliseconds,
+    FinagleStatsReceiver.scope("timer"))
 
   TimerStats.hashedWheelTimerInternals(
-      nettyHwt, () => 10.seconds, FinagleStatsReceiver.scope("timer"))
+    nettyHwt,
+    () => 10.seconds,
+    FinagleStatsReceiver.scope("timer"))
 }
 
 /**

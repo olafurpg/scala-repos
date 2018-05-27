@@ -37,10 +37,10 @@ private[ml] trait TrainValidationSplitParams extends ValidatorParams {
     * @group param
     */
   val trainRatio: DoubleParam = new DoubleParam(
-      this,
-      "trainRatio",
-      "ratio between training set and validation set (>= 0 && <= 1)",
-      ParamValidators.inRange(0, 1))
+    this,
+    "trainRatio",
+    "ratio between training set and validation set (>= 0 && <= 1)",
+    ParamValidators.inRange(0, 1))
 
   /** @group getParam */
   def getTrainRatio: Double = $(trainRatio)
@@ -60,7 +60,8 @@ private[ml] trait TrainValidationSplitParams extends ValidatorParams {
 class TrainValidationSplit @Since("1.5.0")(
     @Since("1.5.0") override val uid: String)
     extends Estimator[TrainValidationSplitModel]
-    with TrainValidationSplitParams with Logging {
+    with TrainValidationSplitParams
+    with Logging {
 
   @Since("1.5.0")
   def this() = this(Identifiable.randomUID("tvs"))
@@ -121,7 +122,7 @@ class TrainValidationSplit @Since("1.5.0")(
     logInfo(s"Best train validation split metric: $bestMetric.")
     val bestModel = est.fit(dataset, epm(bestIndex)).asInstanceOf[Model[_]]
     copyValues(
-        new TrainValidationSplitModel(uid, bestModel, metrics).setParent(this))
+      new TrainValidationSplitModel(uid, bestModel, metrics).setParent(this))
   }
 
   @Since("1.5.0")
@@ -151,11 +152,12 @@ class TrainValidationSplit @Since("1.5.0")(
   */
 @Since("1.5.0")
 @Experimental
-class TrainValidationSplitModel private[ml](
+class TrainValidationSplitModel private[ml] (
     @Since("1.5.0") override val uid: String,
     @Since("1.5.0") val bestModel: Model[_],
     @Since("1.5.0") val validationMetrics: Array[Double])
-    extends Model[TrainValidationSplitModel] with TrainValidationSplitParams {
+    extends Model[TrainValidationSplitModel]
+    with TrainValidationSplitParams {
 
   @Since("1.5.0")
   override def transform(dataset: DataFrame): DataFrame = {
@@ -171,9 +173,9 @@ class TrainValidationSplitModel private[ml](
   @Since("1.5.0")
   override def copy(extra: ParamMap): TrainValidationSplitModel = {
     val copied = new TrainValidationSplitModel(
-        uid,
-        bestModel.copy(extra).asInstanceOf[Model[_]],
-        validationMetrics.clone())
+      uid,
+      bestModel.copy(extra).asInstanceOf[Model[_]],
+      validationMetrics.clone())
     copyValues(copied, extra)
   }
 }

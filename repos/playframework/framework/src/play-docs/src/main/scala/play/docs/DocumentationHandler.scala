@@ -18,8 +18,11 @@ import play.doc.{FileRepository, PlayDoc, RenderedPage, PageIndex}
   * the filesystem.
   */
 class DocumentationHandler(
-    repo: FileRepository, apiRepo: FileRepository, toClose: Closeable)
-    extends BuildDocHandler with Closeable {
+    repo: FileRepository,
+    apiRepo: FileRepository,
+    toClose: Closeable)
+    extends BuildDocHandler
+    with Closeable {
 
   def this(repo: FileRepository, toClose: Closeable) =
     this(repo, repo, toClose)
@@ -31,20 +34,21 @@ class DocumentationHandler(
     * This is a def because we want to reindex the docs each time.
     */
   def playDoc = {
-    new PlayDoc(repo,
-                repo,
-                "resources",
-                PlayVersion.current,
-                PageIndex.parseFrom(repo, "Home", Some("manual")),
-                "Next")
+    new PlayDoc(
+      repo,
+      repo,
+      "resources",
+      PlayVersion.current,
+      PageIndex.parseFrom(repo, "Home", Some("manual")),
+      "Next")
   }
 
   val locator: String => String = new Memoise(
-      name =>
-        repo
-          .findFileWithName(name)
-          .orElse(apiRepo.findFileWithName(name))
-          .getOrElse(name))
+    name =>
+      repo
+        .findFileWithName(name)
+        .orElse(apiRepo.findFileWithName(name))
+        .getOrElse(name))
 
   // Method without Scala types. Required by BuildDocHandler to allow communication
   // between code compiled by different versions of Scala
@@ -61,15 +65,15 @@ class DocumentationHandler(
     def sendFileInline(repo: FileRepository, path: String): Option[Result] = {
       repo.handleFile(path) { handle =>
         Results.Ok.sendEntity(
-            HttpEntity.Streamed(
-                StreamConverters
-                  .fromInputStream(() => handle.is)
-                  .mapMaterializedValue(_ => handle.close),
-                Some(handle.size),
-                MimeTypes
-                  .forFileName(handle.name)
-                  .orElse(Some(ContentTypes.BINARY))
-              ))
+          HttpEntity.Streamed(
+            StreamConverters
+              .fromInputStream(() => handle.is)
+              .mapMaterializedValue(_ => handle.close),
+            Some(handle.size),
+            MimeTypes
+              .forFileName(handle.name)
+              .orElse(Some(ContentTypes.BINARY))
+          ))
       }
     }
 
@@ -85,27 +89,29 @@ class DocumentationHandler(
       case documentation() => Some(Redirect("/@documentation/Home"))
       case apiDoc(page) =>
         Some(
-            sendFileInline(apiRepo, "api/" + page).getOrElse(
-                NotFound(views.html.play20.manual(page, None, None, locator)))
+          sendFileInline(apiRepo, "api/" + page).getOrElse(
+            NotFound(views.html.play20.manual(page, None, None, locator)))
         )
       case wikiResource(path) =>
         Some(
-            sendFileInline(repo, path)
-              .orElse(sendFileInline(apiRepo, path))
-              .getOrElse(NotFound("Resource not found [" + path + "]"))
-          )
+          sendFileInline(repo, path)
+            .orElse(sendFileInline(apiRepo, path))
+            .getOrElse(NotFound("Resource not found [" + path + "]"))
+        )
       case wikiPage(page) =>
         Some(
-            playDoc.renderPage(page) match {
-              case None =>
-                NotFound(views.html.play20.manual(page, None, None, locator))
-              case Some(RenderedPage(mainPage, None, _)) =>
-                Ok(views.html.play20
-                      .manual(page, Some(mainPage), None, locator))
-              case Some(RenderedPage(mainPage, Some(sidebar), _)) =>
-                Ok(views.html.play20
-                      .manual(page, Some(mainPage), Some(sidebar), locator))
-            }
+          playDoc.renderPage(page) match {
+            case None =>
+              NotFound(views.html.play20.manual(page, None, None, locator))
+            case Some(RenderedPage(mainPage, None, _)) =>
+              Ok(
+                views.html.play20
+                  .manual(page, Some(mainPage), None, locator))
+            case Some(RenderedPage(mainPage, Some(sidebar), _)) =>
+              Ok(
+                views.html.play20
+                  .manual(page, Some(mainPage), Some(sidebar), locator))
+          }
         )
       case _ => None
     }

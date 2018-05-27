@@ -78,7 +78,8 @@ object HBox {
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/layout/HBox.html]]
   */
 class HBox(override val delegate: jfxsl.HBox = new jfxsl.HBox)
-    extends Pane(delegate) with AlignmentDelegate[jfxsl.HBox]
+    extends Pane(delegate)
+    with AlignmentDelegate[jfxsl.HBox]
     with SFXDelegate[jfxsl.HBox] {
 
   /**

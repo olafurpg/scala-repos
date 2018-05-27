@@ -47,8 +47,9 @@ object ReadOnlyIntegerWrapper {
 
 /** Wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/beans/property/ReadOnlyIntegerWrapper.html javafx.beans.property.ReadOnlyIntegerWrapper]] */
 class ReadOnlyIntegerWrapper(
-    override val delegate: jfxbp.ReadOnlyIntegerWrapper = new jfxbp.ReadOnlyIntegerWrapper(
-          ))
+    override val delegate: jfxbp.ReadOnlyIntegerWrapper =
+      new jfxbp.ReadOnlyIntegerWrapper(
+        ))
     extends IntegerProperty(delegate)
     with SFXDelegate[jfxbp.ReadOnlyIntegerWrapper] {
 

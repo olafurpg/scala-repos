@@ -24,8 +24,11 @@ import org.scalatest.prop._
 
 @RunWith(classOf[JUnitRunner])
 class GaussianTest
-    extends FunSuite with Checkers with UnivariateContinuousDistrTestBase
-    with MomentsTestBase[Double] with ExpFamTest[Gaussian, Double]
+    extends FunSuite
+    with Checkers
+    with UnivariateContinuousDistrTestBase
+    with MomentsTestBase[Double]
+    with ExpFamTest[Gaussian, Double]
     with HasCdfTestBase {
   override type Distr = Gaussian
   val expFam = Gaussian
@@ -33,9 +36,9 @@ class GaussianTest
 
   def arbParameter = Arbitrary {
     for (mean <- arbitrary[Double].map { _ % 10000.0 };
-    std <- arbitrary[Double].map { x =>
-      math.abs(x) % 8.0 + .1
-    }) yield (mean, std)
+         std <- arbitrary[Double].map { x =>
+           math.abs(x) % 8.0 + .1
+         }) yield (mean, std)
   }
 
   def paramsClose(p: (Double, Double), b: (Double, Double)) = {
@@ -45,8 +48,7 @@ class GaussianTest
   }
 
   test("Probability of mean") {
-    check(
-        Prop.forAll { (m: Double, s: Double) =>
+    check(Prop.forAll { (m: Double, s: Double) =>
       (s == 0) || {
         val b = new Gaussian(mu = m, sigma = s.abs);
         b.unnormalizedLogPdf(m) == 0.0;
@@ -56,8 +58,9 @@ class GaussianTest
 
   test("#295, cdf/inverseCdf broken") {
     val gaussian = Gaussian(0, 1)
-    assert((gaussian.cdf(gaussian.inverseCdf(0.1)) - 0.1).abs <= 1E-3,
-           gaussian.cdf(gaussian.inverseCdf(0.1)) + " was not close to " + 0.1)
+    assert(
+      (gaussian.cdf(gaussian.inverseCdf(0.1)) - 0.1).abs <= 1E-3,
+      gaussian.cdf(gaussian.inverseCdf(0.1)) + " was not close to " + 0.1)
   }
 
   test("Probability of N(0,1)(1) propto exp(-.5))") {
@@ -68,11 +71,11 @@ class GaussianTest
 
   implicit def arbDistr: Arbitrary[Distr] = Arbitrary {
     for (mean <- arbitrary[Double].map { x =>
-      math.abs(x) % 10000.0
-    };
-    std <- arbitrary[Double].map { x =>
-      math.abs(x) % 8.0 + .1
-    }) yield new Gaussian(mean, std);
+           math.abs(x) % 10000.0
+         };
+         std <- arbitrary[Double].map { x =>
+           math.abs(x) % 8.0 + .1
+         }) yield new Gaussian(mean, std);
   }
 
   def asDouble(x: Double) = x

@@ -21,8 +21,9 @@ private[http] class EnhancedString(val underlying: String) extends AnyVal {
     * empty leading or trailing empty string (respectively).
     */
   def fastSplit(delimiter: Char): immutable.LinearSeq[String] = {
-    @tailrec def split(end: Int = underlying.length, elements: List[String] = Nil)
-      : List[String] = {
+    @tailrec def split(
+        end: Int = underlying.length,
+        elements: List[String] = Nil): List[String] = {
       val ix = underlying.lastIndexOf(delimiter, end - 1)
       if (ix < 0) underlying.substring(0, end) :: elements
       else split(ix, underlying.substring(ix + 1, end) :: elements)

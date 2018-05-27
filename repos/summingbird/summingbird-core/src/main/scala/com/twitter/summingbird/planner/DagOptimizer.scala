@@ -29,14 +29,14 @@ trait DagOptimizer[P <: Platform[P]] {
     * in converting from an AlsoProducer to a Literal[T, Prod] below, it is
     * not actually dangerous because we always use it in a safe position.
     */
-  protected def mkAlso[T, U]: (Prod[T], Prod[U]) => Prod[U] = {
-    (left, right) =>
-      AlsoProducer(left.asInstanceOf[TailProducer[P, T]], right)
+  protected def mkAlso[T, U]: (Prod[T], Prod[U]) => Prod[U] = { (left, right) =>
+    AlsoProducer(left.asInstanceOf[TailProducer[P, T]], right)
   }
   protected def mkAlsoTail[T, U]: (Prod[T], Prod[U]) => Prod[U] = {
     (left, right) =>
-      new AlsoTailProducer(left.asInstanceOf[TailProducer[P, T]],
-                           right.asInstanceOf[TailProducer[P, U]])
+      new AlsoTailProducer(
+        left.asInstanceOf[TailProducer[P, T]],
+        right.asInstanceOf[TailProducer[P, U]])
   }
   protected def mkMerge[T]: (Prod[T], Prod[T]) => Prod[T] = { (left, right) =>
     MergedProducer(left, right)
@@ -77,9 +77,8 @@ trait DagOptimizer[P <: Platform[P]] {
   }
   protected def mkSum[K, V](
       store: P#Store[K, V],
-      sg: Semigroup[V]): (Prod[(K, V)] => Prod[(K, (Option[V], V))]) = {
-    prod =>
-      Summer(prod, store, sg)
+      sg: Semigroup[V]): (Prod[(K, V)] => Prod[(K, (Option[V], V))]) = { prod =>
+    Summer(prod, store, sg)
   }
 
   type LitProd[T] = Literal[T, Prod]
@@ -177,7 +176,8 @@ trait DagOptimizer[P <: Platform[P]] {
     def summer[K, V](s: Summer[P, K, V]): (M, L[(K, (Option[V], V))]) = {
       val (h1, l1) = toLiteral(hm, s.producer)
       val lit = UnaryLit[(K, V), (K, (Option[V], V)), N](
-          l1, mkSum(s.store, s.semigroup))
+        l1,
+        mkSum(s.store, s.semigroup))
       (h1 + (s -> lit), lit)
     }
 
@@ -194,21 +194,21 @@ trait DagOptimizer[P <: Platform[P]] {
           case s @ Source(_) => source(s)
           case a: AlsoTailProducer[_, _, _] =>
             alsoTail(a.asInstanceOf[AlsoTailProducer[P, _, T]])
-          case a @ AlsoProducer(_, _) => also(a)
+          case a @ AlsoProducer(_, _)   => also(a)
           case m @ MergedProducer(l, r) => merge(m)
           case n: TPNamedProducer[_, _] =>
             namedTP(n.asInstanceOf[TPNamedProducer[P, T]])
-          case n @ NamedProducer(producer, name) => named(n)
-          case w @ WrittenProducer(producer, sink) => writer(w)
-          case fm @ FlatMappedProducer(producer, fn) => flm(fm)
+          case n @ NamedProducer(producer, name)       => named(n)
+          case w @ WrittenProducer(producer, sink)     => writer(w)
+          case fm @ FlatMappedProducer(producer, fn)   => flm(fm)
           case om @ OptionMappedProducer(producer, fn) => optm(om)
           // These casts can't fail due to the pattern match,
           // but I can't convince scala of this without the cast.
-          case ik @ IdentityKeyedProducer(producer) => cast(ikp(ik))
-          case kf @ KeyFlatMappedProducer(producer, fn) => cast(kfm(kf))
+          case ik @ IdentityKeyedProducer(producer)       => cast(ikp(ik))
+          case kf @ KeyFlatMappedProducer(producer, fn)   => cast(kfm(kf))
           case vf @ ValueFlatMappedProducer(producer, fn) => cast(vfm(vf))
-          case j @ LeftJoinedProducer(producer, srv) => cast(joined(j))
-          case s @ Summer(producer, store, sg) => cast(summer(s))
+          case j @ LeftJoinedProducer(producer, srv)      => cast(joined(j))
+          case s @ Summer(producer, store, sg)            => cast(summer(s))
         }
     }
   }
@@ -345,10 +345,11 @@ trait DagOptimizer[P <: Platform[P]] {
   object DiamondToFlatMap extends PartialRule[Prod] {
     def applyWhere[T](on: ExpressionDag[Prod]) = {
       //Can't fuse flatMaps when on fanout
-      case MergedProducer(left @ FlatMappedProducer(inleft, fnleft),
-                          right @ FlatMappedProducer(inright, fnright))
+      case MergedProducer(
+          left @ FlatMappedProducer(inleft, fnleft),
+          right @ FlatMappedProducer(inright, fnright))
           if (inleft == inright) && (on.fanOut(left) == 1) &&
-          (on.fanOut(right) == 1) =>
+            (on.fanOut(right) == 1) =>
         FlatMappedProducer(inleft, MergeResults(fnleft, fnright))
     }
   }

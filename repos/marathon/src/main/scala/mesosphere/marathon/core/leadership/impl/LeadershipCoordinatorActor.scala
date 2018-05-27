@@ -1,6 +1,14 @@
 package mesosphere.marathon.core.leadership.impl
 
-import akka.actor.{Actor, ActorLogging, ActorRef, Props, Stash, Status, Terminated}
+import akka.actor.{
+  Actor,
+  ActorLogging,
+  ActorRef,
+  Props,
+  Stash,
+  Status,
+  Terminated
+}
 import akka.event.LoggingReceive
 import mesosphere.marathon.core.leadership.PreparationMessages
 import mesosphere.marathon.core.leadership.impl.WhenLeaderActor.{Stopped, Stop}
@@ -12,7 +20,9 @@ private[leadership] object LeadershipCoordinatorActor {
 }
 
 private class LeadershipCoordinatorActor(var whenLeaderActors: Set[ActorRef])
-    extends Actor with ActorLogging with Stash {
+    extends Actor
+    with ActorLogging
+    with Stash {
 
   override def preStart(): Unit = {
     whenLeaderActors.foreach(context.watch)
@@ -23,8 +33,9 @@ private class LeadershipCoordinatorActor(var whenLeaderActors: Set[ActorRef])
   override def receive: Receive = suspended
 
   private[impl] def suspended: Receive = {
-    log.info("All actors suspended:\n{}",
-             whenLeaderActors.map(actorRef => s"* $actorRef").mkString("\n"))
+    log.info(
+      "All actors suspended:\n{}",
+      whenLeaderActors.map(actorRef => s"* $actorRef").mkString("\n"))
 
     LoggingReceive.withLabel("suspended") {
       case Terminated(actorRef) =>
@@ -50,25 +61,31 @@ private class LeadershipCoordinatorActor(var whenLeaderActors: Set[ActorRef])
     } else {
       LoggingReceive.withLabel("preparingForStart") {
         case PreparationMessages.PrepareForStart =>
-          context.become(preparingForStart(ackStartRefs + sender(),
-                                           whenLeaderActorsWithoutAck))
+          context.become(
+            preparingForStart(
+              ackStartRefs + sender(),
+              whenLeaderActorsWithoutAck))
 
         case PreparationMessages.Prepared(whenLeaderRef) =>
-          context.become(preparingForStart(
-                  ackStartRefs, whenLeaderActorsWithoutAck - whenLeaderRef))
+          context.become(
+            preparingForStart(
+              ackStartRefs,
+              whenLeaderActorsWithoutAck - whenLeaderRef))
 
         case Terminated(actorRef) =>
           log.error("unexpected death of {}", actorRef)
           whenLeaderActors -= actorRef
           context.become(
-              preparingForStart(ackStartRefs - actorRef,
-                                whenLeaderActorsWithoutAck - actorRef))
+            preparingForStart(
+              ackStartRefs - actorRef,
+              whenLeaderActorsWithoutAck - actorRef))
 
         case WhenLeaderActor.Stop =>
           whenLeaderActors.foreach(_ ! Stop)
           ackStartRefs.foreach { ackStartRef =>
-            ackStartRef ! Status.Failure(new IllegalStateException(
-                    s"Stopped while still preparing to start ($self)"))
+            ackStartRef ! Status.Failure(
+              new IllegalStateException(
+                s"Stopped while still preparing to start ($self)"))
           }
           context.become(suspended)
       }
@@ -76,8 +93,9 @@ private class LeadershipCoordinatorActor(var whenLeaderActors: Set[ActorRef])
   }
 
   private[impl] def active: Receive = LoggingReceive.withLabel("active") {
-    log.info("All actors active:\n{}",
-             whenLeaderActors.map(actorRef => s"* $actorRef").mkString("\n"))
+    log.info(
+      "All actors active:\n{}",
+      whenLeaderActors.map(actorRef => s"* $actorRef").mkString("\n"))
 
     LoggingReceive.withLabel("active") {
       case Terminated(actorRef) =>

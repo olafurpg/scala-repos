@@ -31,13 +31,15 @@ import org.apache.spark.util.collection.OpenHashSet
   *
   * TODO Clean up the metadata files periodically
   */
-class FileStreamSource(sqlContext: SQLContext,
-                       metadataPath: String,
-                       path: String,
-                       dataSchema: Option[StructType],
-                       providerName: String,
-                       dataFrameBuilder: Array[String] => DataFrame)
-    extends Source with Logging {
+class FileStreamSource(
+    sqlContext: SQLContext,
+    metadataPath: String,
+    path: String,
+    dataSchema: Option[StructType],
+    providerName: String,
+    dataFrameBuilder: Array[String] => DataFrame)
+    extends Source
+    with Logging {
 
   private val fs = FileSystem.get(sqlContext.sparkContext.hadoopConfiguration)
   private val metadataLog =

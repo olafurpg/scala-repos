@@ -225,7 +225,8 @@ class FancyTailCalls {
     if ({
       def loop(n: Int): Int = if (n == 0) v else loop(n - 1)
       loop(x)
-    } == v) true else false
+    } == v) true
+    else false
   }
   def tcInPatternGuard(x: Int, v: Int): Boolean =
     v match {
@@ -274,8 +275,8 @@ object Test {
       }
     } catch {
       case exception: Throwable => {
-          print(" raised exception " + exception)
-        }
+        print(" raised exception " + exception)
+      }
     }
     println
   }
@@ -291,8 +292,8 @@ object Test {
       }
     } catch {
       case exception: Throwable => {
-          Console.print(" raised exception " + exception);
-        }
+        Console.print(" raised exception " + exception);
+      }
     }
     println
   }
@@ -305,8 +306,8 @@ object Test {
       case exception: compat.Platform.StackOverflowError =>
         println(" was successful")
       case exception: Throwable => {
-          print(" raised exception " + exception)
-        }
+        print(" raised exception " + exception)
+      }
     }
     println
   }
@@ -401,21 +402,29 @@ object Test {
 
     val FancyTailCalls = new FancyTailCalls;
     check_success(
-        "FancyTailCalls.tcTryLocal", FancyTailCalls.tcTryLocal(max, max), max)
-    check_success_b("FancyTailCalls.tcInBooleanExprFirstOp",
-                    FancyTailCalls.tcInBooleanExprFirstOp(max, max),
-                    true)
-    check_success_b("FancyTailCalls.tcInBooleanExprSecondOp",
-                    FancyTailCalls.tcInBooleanExprSecondOp(max, max),
-                    true)
+      "FancyTailCalls.tcTryLocal",
+      FancyTailCalls.tcTryLocal(max, max),
+      max)
     check_success_b(
-        "FancyTailCalls.tcInIfCond", FancyTailCalls.tcInIfCond(max, max), true)
-    check_success_b("FancyTailCalls.tcInPatternGuard",
-                    FancyTailCalls.tcInPatternGuard(max, max),
-                    true)
-    check_success("FancyTailCalls.differentInstance",
-                  FancyTailCalls.differentInstance(max, 42),
-                  42)
+      "FancyTailCalls.tcInBooleanExprFirstOp",
+      FancyTailCalls.tcInBooleanExprFirstOp(max, max),
+      true)
+    check_success_b(
+      "FancyTailCalls.tcInBooleanExprSecondOp",
+      FancyTailCalls.tcInBooleanExprSecondOp(max, max),
+      true)
+    check_success_b(
+      "FancyTailCalls.tcInIfCond",
+      FancyTailCalls.tcInIfCond(max, max),
+      true)
+    check_success_b(
+      "FancyTailCalls.tcInPatternGuard",
+      FancyTailCalls.tcInPatternGuard(max, max),
+      true)
+    check_success(
+      "FancyTailCalls.differentInstance",
+      FancyTailCalls.differentInstance(max, 42),
+      42)
     check_success("PolyObject.tramp", PolyObject.tramp[Int](max), 0)
   }
 

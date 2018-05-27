@@ -10,8 +10,8 @@ object Test {
     override def buildFrom(x: A) = new B {}
   }
 
-  implicit def a2b[From, To >: B](x: From)(
-      implicit bl: Builder[From, To]): To = bl.buildFrom(x)
+  implicit def a2b[From, To >: B](x: From)(implicit bl: Builder[From, To]): To =
+    bl.buildFrom(x)
 
   def f(b: B) = println(b)
 

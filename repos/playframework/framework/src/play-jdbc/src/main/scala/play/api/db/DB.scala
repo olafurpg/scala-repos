@@ -89,7 +89,6 @@ object DB {
     * @param block Code block to execute.
     */
   @deprecated("Inject DBApi into your component", "2.5.0")
-  def withTransaction[A](block: Connection => A)(
-      implicit app: Application): A =
+  def withTransaction[A](block: Connection => A)(implicit app: Application): A =
     db.database("default").withTransaction(block)
 }

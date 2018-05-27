@@ -33,7 +33,13 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable.Buffer
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, DoubleProperty, ObjectProperty, ReadOnlyBooleanProperty, StringProperty}
+import scalafx.beans.property.{
+  BooleanProperty,
+  DoubleProperty,
+  ObjectProperty,
+  ReadOnlyBooleanProperty,
+  StringProperty
+}
 import scalafx.delegate.SFXDelegate
 import scalafx.scene.Node
 import scalafx.scene.Node._
@@ -118,7 +124,8 @@ object Tooltip {
   * @param delegate JavaFX Tooltip to be wrapped. It defaul value is a new JavaFX Tooltip with no text.
   */
 class Tooltip(override val delegate: jfxsc.Tooltip = new jfxsc.Tooltip)
-    extends PopupControl(delegate) with SFXDelegate[jfxsc.Tooltip] {
+    extends PopupControl(delegate)
+    with SFXDelegate[jfxsc.Tooltip] {
 
   /**
     * Creates a tooltip with the specified text.

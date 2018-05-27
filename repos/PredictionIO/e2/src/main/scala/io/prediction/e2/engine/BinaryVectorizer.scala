@@ -30,12 +30,12 @@ class BinaryVectorizer(propertyMap: HashMap[(String, String), Int])
 
   override def toString: String = {
     s"BinaryVectorizer($numFeatures): " +
-    properties.map(e => s"(${e._1}, ${e._2})").mkString(",")
+      properties.map(e => s"(${e._1}, ${e._2})").mkString(",")
   }
 
   def toBinary(map: Array[(String, String)]): Vector = {
     val mapArr: Seq[(Int, Double)] = map.flatMap(
-        e => propertyMap.get(e).map(idx => (idx, 1.0))
+      e => propertyMap.get(e).map(idx => (idx, 1.0))
     )
 
     Vectors.sparse(numFeatures, mapArr)
@@ -43,17 +43,18 @@ class BinaryVectorizer(propertyMap: HashMap[(String, String), Int])
 }
 
 object BinaryVectorizer {
-  def apply(input: RDD[HashMap[String, String]],
-            properties: HashSet[String]): BinaryVectorizer = {
+  def apply(
+      input: RDD[HashMap[String, String]],
+      properties: HashSet[String]): BinaryVectorizer = {
     new BinaryVectorizer(
-        HashMap(
-            input
-              .flatMap(identity)
-              .filter(e => properties.contains(e._1))
-              .distinct
-              .collect
-              .zipWithIndex: _*
-        ))
+      HashMap(
+        input
+          .flatMap(identity)
+          .filter(e => properties.contains(e._1))
+          .distinct
+          .collect
+          .zipWithIndex: _*
+      ))
   }
 
   def apply(input: Seq[(String, String)]): BinaryVectorizer = {

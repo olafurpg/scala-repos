@@ -11,10 +11,10 @@ object Test {
 
   def firstDigit(x: Int): Int =
     x match {
-      case 0 => 0
-      case _ if (x < 0) => firstDigit(-x)
+      case 0             => 0
+      case _ if (x < 0)  => firstDigit(-x)
       case _ if (x < 10) => x
-      case _ => firstDigit(x / 10)
+      case _             => firstDigit(x / 10)
     }
 
   {

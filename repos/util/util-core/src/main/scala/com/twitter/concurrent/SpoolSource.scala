@@ -7,8 +7,7 @@ import scala.annotation.tailrec
 import com.twitter.util.{Future, Promise, Return}
 
 object SpoolSource {
-  private object DefaultInterruptHandler
-      extends PartialFunction[Any, Nothing] {
+  private object DefaultInterruptHandler extends PartialFunction[Any, Nothing] {
     def isDefinedAt(x: Any) = false
     def apply(x: Any) = throw new MatchError(x)
   }

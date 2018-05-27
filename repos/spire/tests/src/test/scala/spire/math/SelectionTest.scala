@@ -10,10 +10,10 @@ import org.scalatest.prop.Checkers
 trait SelectTest extends FunSuite /* with Checkers */ {
   def selector: Select
 
-  final def select[@sp A : Order : ClassTag](data: Array[A], k: Int) =
+  final def select[@sp A: Order: ClassTag](data: Array[A], k: Int) =
     selector.select(data, k)
 
-  def shuffle[A : ClassTag](as: Array[A]): Array[A] =
+  def shuffle[A: ClassTag](as: Array[A]): Array[A] =
     scala.util.Random.shuffle(as.toList).toArray
 
   test("selection in 0-length array") {
@@ -46,9 +46,10 @@ trait SelectTest extends FunSuite /* with Checkers */ {
           val bs = shuffle(as)
           val orig = bs.clone()
           select(bs, i)
-          assert(bs(i) === i,
-                 "Select %d on %s failed." format
-                 (i, orig.mkString("[ ", ", ", " ]")))
+          assert(
+            bs(i) === i,
+            "Select %d on %s failed." format
+              (i, orig.mkString("[ ", ", ", " ]")))
         }
       }
     }

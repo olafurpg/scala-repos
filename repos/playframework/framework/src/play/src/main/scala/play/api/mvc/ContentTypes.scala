@@ -17,7 +17,12 @@ import play.api.libs.Files.TemporaryFile
 import MultipartFormData._
 import java.util.Locale
 import scala.util.control.NonFatal
-import play.api.http.{LazyHttpErrorHandler, ParserConfiguration, HttpConfiguration, HttpVerbs}
+import play.api.http.{
+  LazyHttpErrorHandler,
+  ParserConfiguration,
+  HttpConfiguration,
+  HttpVerbs
+}
 import play.utils.PlayIO
 import play.api.http.Status._
 import akka.stream._
@@ -34,7 +39,7 @@ sealed trait AnyContent {
     */
   def asFormUrlEncoded: Option[Map[String, Seq[String]]] = this match {
     case AnyContentAsFormUrlEncoded(data) => Some(data)
-    case _ => None
+    case _                                => None
   }
 
   /**
@@ -42,7 +47,7 @@ sealed trait AnyContent {
     */
   def asText: Option[String] = this match {
     case AnyContentAsText(txt) => Some(txt)
-    case _ => None
+    case _                     => None
   }
 
   /**
@@ -50,7 +55,7 @@ sealed trait AnyContent {
     */
   def asXml: Option[NodeSeq] = this match {
     case AnyContentAsXml(xml) => Some(xml)
-    case _ => None
+    case _                    => None
   }
 
   /**
@@ -58,7 +63,7 @@ sealed trait AnyContent {
     */
   def asJson: Option[JsValue] = this match {
     case AnyContentAsJson(json) => Some(json)
-    case _ => None
+    case _                      => None
   }
 
   /**
@@ -67,7 +72,7 @@ sealed trait AnyContent {
   def asMultipartFormData: Option[MultipartFormData[TemporaryFile]] =
     this match {
       case AnyContentAsMultipartFormData(mfd) => Some(mfd)
-      case _ => None
+      case _                                  => None
     }
 
   /**
@@ -75,7 +80,7 @@ sealed trait AnyContent {
     */
   def asRaw: Option[RawBuffer] = this match {
     case AnyContentAsRaw(raw) => Some(raw)
-    case _ => None
+    case _                    => None
   }
 }
 
@@ -119,9 +124,10 @@ case class AnyContentAsMultipartFormData(mdf: MultipartFormData[TemporaryFile])
 /**
   * Multipart form data body.
   */
-case class MultipartFormData[A](dataParts: Map[String, Seq[String]],
-                                files: Seq[FilePart[A]],
-                                badParts: Seq[BadPart]) {
+case class MultipartFormData[A](
+    dataParts: Map[String, Seq[String]],
+    files: Seq[FilePart[A]],
+    badParts: Seq[BadPart]) {
 
   /**
     * Extract the data parts as Form url encoded.
@@ -155,7 +161,10 @@ object MultipartFormData {
     * A file part.
     */
   case class FilePart[A](
-      key: String, filename: String, contentType: Option[String], ref: A)
+      key: String,
+      filename: String,
+      contentType: Option[String],
+      ref: A)
       extends Part[A]
 
   /**
@@ -185,7 +194,8 @@ object MultipartFormData {
   * @param memoryThreshold If the content size is bigger than this limit, the content is stored as file.
   */
 case class RawBuffer(
-    memoryThreshold: Int, initialData: ByteString = ByteString.empty) {
+    memoryThreshold: Int,
+    initialData: ByteString = ByteString.empty) {
 
   import play.api.libs.Files._
 
@@ -239,8 +249,7 @@ case class RawBuffer(
     */
   def asBytes(maxLength: Long = memoryThreshold): Option[ByteString] = {
     if (size <= maxLength) {
-      Some(
-          if (inMemory != null) {
+      Some(if (inMemory != null) {
         inMemory
       } else {
         ByteString(PlayIO.readFile(backedByTemporaryFile.file))
@@ -263,7 +272,7 @@ case class RawBuffer(
 
   override def toString = {
     "RawBuffer(inMemory=" + Option(inMemory).map(_.size).orNull +
-    ", backedByTemporaryFile=" + backedByTemporaryFile + ")"
+      ", backedByTemporaryFile=" + backedByTemporaryFile + ")"
   }
 }
 
@@ -339,9 +348,9 @@ trait BodyParsers {
       * @param maxLength Max length allowed or returns EntityTooLarge HTTP response.
       */
     def text(maxLength: Int): BodyParser[String] = when(
-        _.contentType.exists(_.equalsIgnoreCase("text/plain")),
-        tolerantText(maxLength),
-        createBadResult("Expecting text/plain body", UNSUPPORTED_MEDIA_TYPE)
+      _.contentType.exists(_.equalsIgnoreCase("text/plain")),
+      tolerantText(maxLength),
+      createBadResult("Expecting text/plain body", UNSUPPORTED_MEDIA_TYPE)
     )
 
     /**
@@ -356,19 +365,24 @@ trait BodyParsers {
       *
       * @param memoryThreshold If the content size is bigger than this limit, the content is stored as file.
       */
-    def raw(memoryThreshold: Int = DefaultMaxTextLength,
-            maxLength: Long = DefaultMaxDiskLength): BodyParser[RawBuffer] =
+    def raw(
+        memoryThreshold: Int = DefaultMaxTextLength,
+        maxLength: Long = DefaultMaxDiskLength): BodyParser[RawBuffer] =
       BodyParser("raw, memoryThreshold=" + memoryThreshold) { request =>
         import play.api.libs.iteratee.Execution.Implicits.trampoline
-        enforceMaxLength(request, maxLength, Accumulator {
-          val buffer = RawBuffer(memoryThreshold)
-          val sink = Sink.fold[RawBuffer, ByteString](buffer) { (bf, bs) =>
-            bf.push(bs); bf
-          }
-          sink.mapMaterializedValue { future =>
-            future andThen { case _ => buffer.close() }
-          }
-        } map (buffer => Right(buffer)))
+        enforceMaxLength(
+          request,
+          maxLength,
+          Accumulator {
+            val buffer = RawBuffer(memoryThreshold)
+            val sink = Sink.fold[RawBuffer, ByteString](buffer) { (bf, bs) =>
+              bf.push(bs); bf
+            }
+            sink.mapMaterializedValue { future =>
+              future andThen { case _ => buffer.close() }
+            }
+          } map (buffer => Right(buffer))
+        )
       }
 
     /**
@@ -403,12 +417,14 @@ trait BodyParsers {
       * @param maxLength Max length allowed or returns EntityTooLarge HTTP response.
       */
     def json(maxLength: Int): BodyParser[JsValue] = when(
-        _.contentType.exists(m =>
-              m.equalsIgnoreCase("text/json") ||
-              m.equalsIgnoreCase("application/json")),
-        tolerantJson(maxLength),
-        createBadResult("Expecting text/json or application/json body",
-                        UNSUPPORTED_MEDIA_TYPE)
+      _.contentType.exists(
+        m =>
+          m.equalsIgnoreCase("text/json") ||
+            m.equalsIgnoreCase("application/json")),
+      tolerantJson(maxLength),
+      createBadResult(
+        "Expecting text/json or application/json body",
+        UNSUPPORTED_MEDIA_TYPE)
     )
 
     /**
@@ -458,10 +474,11 @@ trait BodyParsers {
       * @param maxLength Max length allowed or returns EntityTooLarge HTTP response. If `None`, the default `play.http.parser.maxMemoryBuffer` configuration value is used.
       * @param onErrors The result to reply in case of errors during the form binding process
       */
-    def form[A](form: Form[A],
-                maxLength: Option[Long] = None,
-                onErrors: Form[A] => Result = (formErrors: Form[A]) =>
-                    Results.BadRequest): BodyParser[A] =
+    def form[A](
+        form: Form[A],
+        maxLength: Option[Long] = None,
+        onErrors: Form[A] => Result = (formErrors: Form[A]) =>
+          Results.BadRequest): BodyParser[A] =
       BodyParser { requestHeader =>
         import play.api.libs.iteratee.Execution.Implicits.trampoline
         anyContent(maxLength)(requestHeader).map { resultOrBody =>
@@ -501,17 +518,17 @@ trait BodyParsers {
           // An externally declared charset takes precedence
           request.charset
             .orElse(
-                // If omitted, maybe select a default charset, based on the media type.
-                request.mediaType.collect {
-                  // According to RFC 3023, the default encoding for text/xml is us-ascii. This contradicts RFC 2616, which
-                  // states that the default for text/* is ISO-8859-1.  An RFC 3023 conforming client will send US-ASCII,
-                  // in that case it is safe for us to use US-ASCII or ISO-8859-1.  But a client that knows nothing about
-                  // XML, and therefore nothing about RFC 3023, but rather conforms to RFC 2616, will send ISO-8859-1.
-                  // Since decoding as ISO-8859-1 works for both clients that conform to RFC 3023, and clients that conform
-                  // to RFC 2616, we use that.
-                  case mt if mt.mediaType == "text" => "iso-8859-1"
-                  // Otherwise, there should be no default, it will be detected by the XML parser.
-                }
+              // If omitted, maybe select a default charset, based on the media type.
+              request.mediaType.collect {
+                // According to RFC 3023, the default encoding for text/xml is us-ascii. This contradicts RFC 2616, which
+                // states that the default for text/* is ISO-8859-1.  An RFC 3023 conforming client will send US-ASCII,
+                // in that case it is safe for us to use US-ASCII or ISO-8859-1.  But a client that knows nothing about
+                // XML, and therefore nothing about RFC 3023, but rather conforms to RFC 2616, will send ISO-8859-1.
+                // Since decoding as ISO-8859-1 works for both clients that conform to RFC 3023, and clients that conform
+                // to RFC 2616, we use that.
+                case mt if mt.mediaType == "text" => "iso-8859-1"
+                // Otherwise, there should be no default, it will be detected by the XML parser.
+              }
             )
             .foreach { charset =>
               inputSource.setEncoding(charset)
@@ -530,13 +547,13 @@ trait BodyParsers {
       * @param maxLength Max length allowed or returns EntityTooLarge HTTP response.
       */
     def xml(maxLength: Int): BodyParser[NodeSeq] = when(
-        _.contentType.exists { t =>
-          val tl = t.toLowerCase(Locale.ENGLISH)
-          tl.startsWith("text/xml") || tl.startsWith("application/xml") ||
-          ApplicationXmlMatcher.pattern.matcher(tl).matches()
-        },
-        tolerantXml(maxLength),
-        createBadResult("Expecting xml body", UNSUPPORTED_MEDIA_TYPE)
+      _.contentType.exists { t =>
+        val tl = t.toLowerCase(Locale.ENGLISH)
+        tl.startsWith("text/xml") || tl.startsWith("application/xml") ||
+        ApplicationXmlMatcher.pattern.matcher(tl).matches()
+      },
+      tolerantXml(maxLength),
+      createBadResult("Expecting xml body", UNSUPPORTED_MEDIA_TYPE)
     )
 
     /**
@@ -555,7 +572,7 @@ trait BodyParsers {
       request =>
         import play.api.libs.iteratee.Execution.Implicits.trampoline
         Accumulator(
-            StreamConverters.fromOutputStream(() => new FileOutputStream(to)))
+          StreamConverters.fromOutputStream(() => new FileOutputStream(to)))
           .map(_ => Right(to))
     }
 
@@ -566,7 +583,7 @@ trait BodyParsers {
       BodyParser("temporaryFile") { request =>
         val tempFile = TemporaryFile("requestBody", "asTemporaryFile")
         file(tempFile.file)(request).map(_ => Right(tempFile))(
-            play.api.libs.iteratee.Execution.trampoline)
+          play.api.libs.iteratee.Execution.trampoline)
       }
 
     // -- FormUrlEncoded
@@ -578,14 +595,14 @@ trait BodyParsers {
       */
     def tolerantFormUrlEncoded(
         maxLength: Int): BodyParser[Map[String, Seq[String]]] =
-      tolerantBodyParser("urlFormEncoded",
-                         maxLength,
-                         "Error parsing application/x-www-form-urlencoded") {
-        (request, bytes) =>
-          import play.core.parsers._
-          FormUrlEncodedParser.parse(
-              bytes.decodeString(request.charset.getOrElse("utf-8")),
-              request.charset.getOrElse("utf-8"))
+      tolerantBodyParser(
+        "urlFormEncoded",
+        maxLength,
+        "Error parsing application/x-www-form-urlencoded") { (request, bytes) =>
+        import play.core.parsers._
+        FormUrlEncodedParser.parse(
+          bytes.decodeString(request.charset.getOrElse("utf-8")),
+          request.charset.getOrElse("utf-8"))
       }
 
     /**
@@ -601,11 +618,12 @@ trait BodyParsers {
       */
     def urlFormEncoded(maxLength: Int): BodyParser[Map[String, Seq[String]]] =
       when(
-          _.contentType
-            .exists(_.equalsIgnoreCase("application/x-www-form-urlencoded")),
-          tolerantFormUrlEncoded(maxLength),
-          createBadResult("Expecting application/x-www-form-urlencoded body",
-                          UNSUPPORTED_MEDIA_TYPE)
+        _.contentType
+          .exists(_.equalsIgnoreCase("application/x-www-form-urlencoded")),
+        tolerantFormUrlEncoded(maxLength),
+        createBadResult(
+          "Expecting application/x-www-form-urlencoded body",
+          UNSUPPORTED_MEDIA_TYPE)
       )
 
     /**
@@ -675,8 +693,9 @@ trait BodyParsers {
 
           case Some("multipart/form-data") =>
             logger.trace("Parsing AnyContent as multipartFormData")
-            multipartFormData(Multipart.handleFilePartAsTemporaryFile,
-                              maxLengthOrDefaultLarge)
+            multipartFormData(
+              Multipart.handleFilePartAsTemporaryFile,
+              maxLengthOrDefaultLarge)
               .apply(request)
               .map(_.right.map(m => AnyContentAsMultipartFormData(m)))
 
@@ -700,8 +719,9 @@ trait BodyParsers {
       *
       * @param filePartHandler Handles file parts.
       */
-    def multipartFormData[A](filePartHandler: Multipart.FilePartHandler[A],
-                             maxLength: Long = DefaultMaxDiskLength)
+    def multipartFormData[A](
+        filePartHandler: Multipart.FilePartHandler[A],
+        maxLength: Long = DefaultMaxDiskLength)
       : BodyParser[MultipartFormData[A]] = {
       BodyParser("multipartFormData") { request =>
         val app = Play.privateMaybeApplication.get // throw exception
@@ -732,17 +752,17 @@ trait BodyParsers {
           // Apply the request
           val parserSink = parser.apply(request).toSink
 
-          Accumulator(
-              takeUpToFlow.toMat(parserSink) { (statusFuture, resultFuture) =>
-            statusFuture.flatMap {
-              case exceeded: MaxSizeExceeded =>
-                Future.successful(Right(Left(exceeded)))
-              case _ =>
-                resultFuture.map {
-                  case Left(result) => Left(result)
-                  case Right(a) => Right(Right(a))
-                }
-            }
+          Accumulator(takeUpToFlow.toMat(parserSink) {
+            (statusFuture, resultFuture) =>
+              statusFuture.flatMap {
+                case exceeded: MaxSizeExceeded =>
+                  Future.successful(Right(Left(exceeded)))
+                case _ =>
+                  resultFuture.map {
+                    case Left(result) => Left(result)
+                    case Right(a)     => Right(Right(a))
+                  }
+              }
           })
       }
 
@@ -765,9 +785,10 @@ trait BodyParsers {
     /**
       * Create a conditional BodyParser.
       */
-    def when[A](predicate: RequestHeader => Boolean,
-                parser: BodyParser[A],
-                badResult: RequestHeader => Future[Result]): BodyParser[A] = {
+    def when[A](
+        predicate: RequestHeader => Boolean,
+        parser: BodyParser[A],
+        badResult: RequestHeader => Future[Result]): BodyParser[A] = {
       BodyParser("conditional, wrapping=" + parser.toString) { request =>
         if (predicate(request)) {
           parser(request)
@@ -804,10 +825,11 @@ trait BodyParsers {
             case MaxSizeExceeded(_) =>
               val badResult = Future
                 .successful(())
-                .flatMap(_ =>
-                      createBadResult("Request Entity Too Large",
-                                      REQUEST_ENTITY_TOO_LARGE)(request))(
-                    defaultCtx)
+                .flatMap(
+                  _ =>
+                    createBadResult(
+                      "Request Entity Too Large",
+                      REQUEST_ENTITY_TOO_LARGE)(request))(defaultCtx)
               badResult.map(Left(_))
             case MaxSizeNotExceeded => resultFuture
           }
@@ -823,27 +845,30 @@ trait BodyParsers {
       * @param parser The parser.
       */
     private def tolerantBodyParser[A](
-        name: String, maxLength: Long, errorMessage: String)(
+        name: String,
+        maxLength: Long,
+        errorMessage: String)(
         parser: (RequestHeader, ByteString) => A): BodyParser[A] =
       BodyParser(name + ", maxLength=" + maxLength) { request =>
         import play.api.libs.iteratee.Execution.Implicits.trampoline
 
         enforceMaxLength(
-            request,
-            maxLength,
-            Accumulator(
-                Sink.fold[ByteString, ByteString](ByteString.empty)((state,
-                    bs) => state ++ bs)
-            ) mapFuture { bytes =>
-              try {
-                Future.successful(Right(parser(request, bytes)))
-              } catch {
-                case NonFatal(e) =>
-                  logger.debug(errorMessage, e)
-                  createBadResult(errorMessage + ": " + e.getMessage)(request)
-                    .map(Left(_))
-              }
-            })
+          request,
+          maxLength,
+          Accumulator(
+            Sink.fold[ByteString, ByteString](ByteString.empty)((state, bs) =>
+              state ++ bs)
+          ) mapFuture { bytes =>
+            try {
+              Future.successful(Right(parser(request, bytes)))
+            } catch {
+              case NonFatal(e) =>
+                logger.debug(errorMessage, e)
+                createBadResult(errorMessage + ": " + e.getMessage)(request)
+                  .map(Left(_))
+            }
+          }
+        )
       }
   }
 }
@@ -862,7 +887,8 @@ object BodyParsers extends BodyParsers {
 
   private[play] class TakeUpTo(maxLength: Long)
       extends GraphStageWithMaterializedValue[
-          FlowShape[ByteString, ByteString], Future[MaxSizeStatus]] {
+        FlowShape[ByteString, ByteString],
+        Future[MaxSizeStatus]] {
 
     private val in = Inlet[ByteString]("TakeUpTo.in")
     private val out = Outlet[ByteString]("TakeUpTo.out")
@@ -886,27 +912,30 @@ object BodyParsers extends BodyParsers {
             completeStage()
           }
         })
-        setHandler(in, new InHandler {
-          override def onPush(): Unit = {
-            val chunk = grab(in)
-            pushedBytes += chunk.size
-            if (pushedBytes > maxLength) {
-              status.success(MaxSizeExceeded(maxLength))
-              // Make sure we fail the stream, this will ensure downstream body parsers don't try to parse it
-              failStage(new MaxLengthLimitAttained)
-            } else {
-              push(out, chunk)
+        setHandler(
+          in,
+          new InHandler {
+            override def onPush(): Unit = {
+              val chunk = grab(in)
+              pushedBytes += chunk.size
+              if (pushedBytes > maxLength) {
+                status.success(MaxSizeExceeded(maxLength))
+                // Make sure we fail the stream, this will ensure downstream body parsers don't try to parse it
+                failStage(new MaxLengthLimitAttained)
+              } else {
+                push(out, chunk)
+              }
+            }
+            override def onUpstreamFinish(): Unit = {
+              status.success(MaxSizeNotExceeded)
+              completeStage()
+            }
+            override def onUpstreamFailure(ex: Throwable): Unit = {
+              status.failure(ex)
+              failStage(ex)
             }
           }
-          override def onUpstreamFinish(): Unit = {
-            status.success(MaxSizeNotExceeded)
-            completeStage()
-          }
-          override def onUpstreamFailure(ex: Throwable): Unit = {
-            status.failure(ex)
-            failStage(ex)
-          }
-        })
+        )
       }
 
       (logic, status.future)

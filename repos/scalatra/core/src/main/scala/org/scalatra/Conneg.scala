@@ -21,25 +21,8 @@ object Conneg {
     def entry: Parser[Option[T]]
 
     val Separators: Set[Char] = {
-      Set('(',
-          ')',
-          '<',
-          '>',
-          '@',
-          ',',
-          ';',
-          ':',
-          '\\',
-          '"',
-          '/',
-          '[',
-          ']',
-          '?',
-          '=',
-          '{',
-          '}',
-          ' ',
-          '\t')
+      Set('(', ')', '<', '>', '@', ',', ';', ':', '\\', '"', '/', '[', ']', '?',
+        '=', '{', '}', ' ', '\t')
     }
 
     // - Base elements -------------------------------------------------------------------------------------------------
@@ -86,7 +69,7 @@ object Conneg {
     /** Parser for a single conneg value. */
     def conneg: Parser[Option[Conneg[T]]] = entry ~ qValue ^^ {
       case Some(entry) ~ q => Some(new Conneg(entry, q))
-      case _ => None
+      case _               => None
     }
 
     /** Parser for a list of conneg values. */
@@ -94,17 +77,18 @@ object Conneg {
 
     /** Parser for the content-negotiation `q` parameter. */
     def qValue: Parser[Float] = {
-      opt(paramSep ~> ("q" ~ valueSep) ~> """[0-1](\.[0-9]{1,3})?""".r ^^
+      opt(
+        paramSep ~> ("q" ~ valueSep) ~> """[0-1](\.[0-9]{1,3})?""".r ^^
           (_.toFloat)) ^^ {
         case Some(q) => q
-        case _ => 1.0f
+        case _       => 1.0f
       }
     }
 
     def values(raw: String): List[Conneg[T]] = {
       parseAll(connegs, raw) match {
         case Success(a, _) => a.collect { case Some(v) => v }
-        case _ => List()
+        case _             => List()
       }
     }
   }
@@ -121,7 +105,8 @@ object Conneg {
     * an exception.
     */
   def values[T](name: String)(
-      implicit req: HttpServletRequest, format: Format[T]): List[Conneg[T]] = {
+      implicit req: HttpServletRequest,
+      format: Format[T]): List[Conneg[T]] = {
     val header = req.getHeader(name)
     if (header == null) List()
     else format.values(header.trim())
@@ -129,13 +114,13 @@ object Conneg {
 
   /** Retrieves the preferred supported value for the specified content-negotiation header. */
   def preferredValue[T](name: String)(
-      implicit req: HttpServletRequest, format: Format[T]): Option[T] = {
+      implicit req: HttpServletRequest,
+      format: Format[T]): Option[T] = {
     val all = values(name)
 
     if (all.isEmpty) None
     else
-      Some(
-          all.reduce { (a, b) =>
+      Some(all.reduce { (a, b) =>
         if (a.q < b.q) b else a
       }.value)
   }

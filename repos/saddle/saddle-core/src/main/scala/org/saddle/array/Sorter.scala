@@ -129,8 +129,7 @@ object Sorter {
   object timeSorter extends Sorter[DateTime] {
     def argSorted(arr: Array[DateTime]) = {
       val res = range(0, arr.length)
-      LongArrays.radixSortIndirect(
-          res, ScalarTagTime.time2LongArray(arr), true)
+      LongArrays.radixSortIndirect(res, ScalarTagTime.time2LongArray(arr), true)
       res
     }
 
@@ -176,7 +175,7 @@ object Sorter {
     tmp
   }
 
-  def anySorter[T : ORD] = new Sorter[T] {
+  def anySorter[T: ORD] = new Sorter[T] {
     def argSorted(arr: Array[T]) = {
       val res = range(0, arr.length)
       val cmp = implicitly[ORD[T]]

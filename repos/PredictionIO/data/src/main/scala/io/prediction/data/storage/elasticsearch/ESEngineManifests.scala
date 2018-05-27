@@ -26,8 +26,11 @@ import org.json4s.native.Serialization.read
 import org.json4s.native.Serialization.write
 
 class ESEngineManifests(
-    client: Client, config: StorageClientConfig, index: String)
-    extends EngineManifests with Logging {
+    client: Client,
+    config: StorageClientConfig,
+    index: String)
+    extends EngineManifests
+    with Logging {
   implicit val formats = DefaultFormats + new EngineManifestSerializer
   private val estype = "engine_manifests"
   private def esid(id: String, version: String) = s"$id $version"
@@ -36,7 +39,9 @@ class ESEngineManifests(
     val json = write(engineManifest)
     val response = client
       .prepareIndex(
-          index, estype, esid(engineManifest.id, engineManifest.version))
+        index,
+        estype,
+        esid(engineManifest.id, engineManifest.version))
       .setSource(json)
       .execute()
       .actionGet()

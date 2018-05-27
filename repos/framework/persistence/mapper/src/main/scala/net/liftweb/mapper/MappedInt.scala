@@ -35,8 +35,8 @@ import js._
   * See https://issues.scala-lang.org/browse/SI-3687 for details
   */
 abstract class MappedEnum[T <: Mapper[T], ENUM <: Enumeration](
-    val fieldOwner: T, val enum: ENUM)(
-    implicit val manifest: TypeTag[ENUM#Value])
+    val fieldOwner: T,
+    val enum: ENUM)(implicit val manifest: TypeTag[ENUM#Value])
     extends MappedField[ENUM#Value, T] {
   private var data: ENUM#Value = defaultValue
   private var orgData: ENUM#Value = defaultValue
@@ -63,42 +63,46 @@ abstract class MappedEnum[T <: Mapper[T], ENUM <: Enumeration](
     * @return the source field metadata for the field
     */
   def sourceInfoMetadata(): SourceFieldMetadata { type ST = ENUM#Value } =
-    SourceFieldMetadataRep(name, manifest, new FieldConverter {
+    SourceFieldMetadataRep(
+      name,
+      manifest,
+      new FieldConverter {
 
-      /**
-        * The type of the field
-        */
-      type T = ENUM#Value
+        /**
+          * The type of the field
+          */
+        type T = ENUM#Value
 
-      /**
-        * Convert the field to a String
-        * @param v the field value
-        * @return the string representation of the field value
-        */
-      def asString(v: T): String = v.toString
+        /**
+          * Convert the field to a String
+          * @param v the field value
+          * @return the string representation of the field value
+          */
+        def asString(v: T): String = v.toString
 
-      /**
-        * Convert the field into NodeSeq, if possible
-        * @param v the field value
-        * @return a NodeSeq if the field can be represented as one
-        */
-      def asNodeSeq(v: T): Box[NodeSeq] = Full(Text(asString(v)))
+        /**
+          * Convert the field into NodeSeq, if possible
+          * @param v the field value
+          * @return a NodeSeq if the field can be represented as one
+          */
+        def asNodeSeq(v: T): Box[NodeSeq] = Full(Text(asString(v)))
 
-      /**
-        * Convert the field into a JSON value
-        * @param v the field value
-        * @return the JSON representation of the field
-        */
-      def asJson(v: T): Box[JValue] = Full(JsonAST.JInt(v.id))
+        /**
+          * Convert the field into a JSON value
+          * @param v the field value
+          * @return the JSON representation of the field
+          */
+        def asJson(v: T): Box[JValue] = Full(JsonAST.JInt(v.id))
 
-      /**
-        * If the field can represent a sequence of SourceFields,
-        * get that
-        * @param v the field value
-        * @return the field as a sequence of SourceFields
-        */
-      def asSeq(v: T): Box[Seq[SourceFieldInfo]] = Empty
-    })
+        /**
+          * If the field can represent a sequence of SourceFields,
+          * get that
+          * @param v the field value
+          * @return the field as a sequence of SourceFields
+          */
+        def asSeq(v: T): Box[Seq[SourceFieldInfo]] = Empty
+      }
+    )
 
   protected def real_i_set_!(value: ENUM#Value): ENUM#Value = {
     if (value != data) {
@@ -125,19 +129,19 @@ abstract class MappedEnum[T <: Mapper[T], ENUM <: Enumeration](
 
   override def setFromAny(in: Any): ENUM#Value = {
     in match {
-      case JsonAST.JInt(bi) => this.set(fromInt(bi.intValue))
-      case n: Int => this.set(fromInt(n))
-      case n: Long => this.set(fromInt(n.toInt))
-      case n: Number => this.set(fromInt(n.intValue))
-      case (n: Number) :: _ => this.set(fromInt(n.intValue))
-      case Some(n: Number) => this.set(fromInt(n.intValue))
-      case Full(n: Number) => this.set(fromInt(n.intValue))
+      case JsonAST.JInt(bi)                => this.set(fromInt(bi.intValue))
+      case n: Int                          => this.set(fromInt(n))
+      case n: Long                         => this.set(fromInt(n.toInt))
+      case n: Number                       => this.set(fromInt(n.intValue))
+      case (n: Number) :: _                => this.set(fromInt(n.intValue))
+      case Some(n: Number)                 => this.set(fromInt(n.intValue))
+      case Full(n: Number)                 => this.set(fromInt(n.intValue))
       case None | Empty | Failure(_, _, _) => this.set(defaultValue)
-      case (s: String) :: _ => this.set(fromInt(Helpers.toInt(s)))
-      case vs: ENUM#Value => this.set(vs)
-      case null => this.set(defaultValue)
-      case s: String => this.set(fromInt(Helpers.toInt(s)))
-      case o => this.set(fromInt(Helpers.toInt(o)))
+      case (s: String) :: _                => this.set(fromInt(Helpers.toInt(s)))
+      case vs: ENUM#Value                  => this.set(vs)
+      case null                            => this.set(defaultValue)
+      case s: String                       => this.set(fromInt(Helpers.toInt(s)))
+      case o                               => this.set(fromInt(Helpers.toInt(o)))
     }
   }
 
@@ -148,18 +152,21 @@ abstract class MappedEnum[T <: Mapper[T], ENUM <: Enumeration](
     orgData = in
   }
 
-  def buildSetActualValue(accessor: Method,
-                          data: AnyRef,
-                          columnName: String): (T, AnyRef) => Unit =
+  def buildSetActualValue(
+      accessor: Method,
+      data: AnyRef,
+      columnName: String): (T, AnyRef) => Unit =
     (inst, v) =>
       doField(inst, accessor, {
         case f: MappedEnum[T, ENUM] =>
-          f.st(if (v eq null) defaultValue
-              else fromInt(Helpers.toInt(v.toString)))
+          f.st(
+            if (v eq null) defaultValue
+            else fromInt(Helpers.toInt(v.toString)))
       })
 
   def buildSetLongValue(
-      accessor: Method, columnName: String): (T, Long, Boolean) => Unit =
+      accessor: Method,
+      columnName: String): (T, Long, Boolean) => Unit =
     (inst, v, isNull) =>
       doField(inst, accessor, {
         case f: MappedEnum[T, ENUM] =>
@@ -167,7 +174,8 @@ abstract class MappedEnum[T <: Mapper[T], ENUM <: Enumeration](
       })
 
   def buildSetStringValue(
-      accessor: Method, columnName: String): (T, String) => Unit =
+      accessor: Method,
+      columnName: String): (T, String) => Unit =
     (inst, v) =>
       doField(inst, accessor, {
         case f: MappedEnum[T, ENUM] =>
@@ -175,7 +183,8 @@ abstract class MappedEnum[T <: Mapper[T], ENUM <: Enumeration](
       })
 
   def buildSetDateValue(
-      accessor: Method, columnName: String): (T, Date) => Unit =
+      accessor: Method,
+      columnName: String): (T, Date) => Unit =
     (inst, v) =>
       doField(inst, accessor, {
         case f: MappedEnum[T, ENUM] =>
@@ -183,7 +192,8 @@ abstract class MappedEnum[T <: Mapper[T], ENUM <: Enumeration](
       })
 
   def buildSetBooleanValue(
-      accessor: Method, columnName: String): (T, Boolean, Boolean) => Unit =
+      accessor: Method,
+      columnName: String): (T, Boolean, Boolean) => Unit =
     (inst, v, isNull) =>
       doField(inst, accessor, {
         case f: MappedEnum[T, ENUM] => f.st(defaultValue)
@@ -222,14 +232,13 @@ abstract class MappedEnum[T <: Mapper[T], ENUM <: Enumeration](
                                       v => this.set(fromInt(v))))
     else
      */
-    Full(
-        SHtml.selectObj[Int](buildDisplayList,
-                             Full(toInt),
-                             v => this.set(fromInt(v))))
+    Full(SHtml
+      .selectObj[Int](buildDisplayList, Full(toInt), v => this.set(fromInt(v))))
 }
 
 abstract class MappedIntIndex[T <: Mapper[T]](owner: T)
-    extends MappedInt[T](owner) with IndexedField[Int] {
+    extends MappedInt[T](owner)
+    with IndexedField[Int] {
 
   override def writePermission_? = false // not writable
 
@@ -276,8 +285,7 @@ abstract class MappedIntIndex[T <: Mapper[T]](owner: T)
     }
   }
 
-  override def fieldCreatorString(
-      dbType: DriverType, colName: String): String =
+  override def fieldCreatorString(dbType: DriverType, colName: String): String =
     colName + " " + dbType.integerIndexColumnType + notNullAppender()
 }
 
@@ -302,42 +310,46 @@ abstract class MappedInt[T <: Mapper[T]](val fieldOwner: T)
     * @return the source field metadata for the field
     */
   def sourceInfoMetadata(): SourceFieldMetadata { type ST = Int } =
-    SourceFieldMetadataRep(name, manifest, new FieldConverter {
+    SourceFieldMetadataRep(
+      name,
+      manifest,
+      new FieldConverter {
 
-      /**
-        * The type of the field
-        */
-      type T = Int
+        /**
+          * The type of the field
+          */
+        type T = Int
 
-      /**
-        * Convert the field to a String
-        * @param v the field value
-        * @return the string representation of the field value
-        */
-      def asString(v: T): String = v.toString
+        /**
+          * Convert the field to a String
+          * @param v the field value
+          * @return the string representation of the field value
+          */
+        def asString(v: T): String = v.toString
 
-      /**
-        * Convert the field into NodeSeq, if possible
-        * @param v the field value
-        * @return a NodeSeq if the field can be represented as one
-        */
-      def asNodeSeq(v: T): Box[NodeSeq] = Full(Text(asString(v)))
+        /**
+          * Convert the field into NodeSeq, if possible
+          * @param v the field value
+          * @return a NodeSeq if the field can be represented as one
+          */
+        def asNodeSeq(v: T): Box[NodeSeq] = Full(Text(asString(v)))
 
-      /**
-        * Convert the field into a JSON value
-        * @param v the field value
-        * @return the JSON representation of the field
-        */
-      def asJson(v: T): Box[JValue] = Full(JsonAST.JInt(v))
+        /**
+          * Convert the field into a JSON value
+          * @param v the field value
+          * @return the JSON representation of the field
+          */
+        def asJson(v: T): Box[JValue] = Full(JsonAST.JInt(v))
 
-      /**
-        * If the field can represent a sequence of SourceFields,
-        * get that
-        * @param v the field value
-        * @return the field as a sequence of SourceFields
-        */
-      def asSeq(v: T): Box[Seq[SourceFieldInfo]] = Empty
-    })
+        /**
+          * If the field can represent a sequence of SourceFields,
+          * get that
+          * @param v the field value
+          * @return the field as a sequence of SourceFields
+          */
+        def asSeq(v: T): Box[Seq[SourceFieldInfo]] = Empty
+      }
+    )
 
   protected def i_is_! = data
   protected def i_was_! = orgData
@@ -372,17 +384,17 @@ abstract class MappedInt[T <: Mapper[T]](val fieldOwner: T)
 
   override def setFromAny(in: Any): Int = {
     in match {
-      case n: Int => this.set(n)
-      case JsonAST.JInt(bigint) => this.set(bigint.intValue)
-      case n: Number => this.set(n.intValue)
-      case (n: Number) :: _ => this.set(n.intValue)
-      case Some(n: Number) => this.set(n.intValue)
-      case Full(n: Number) => this.set(n.intValue)
+      case n: Int                          => this.set(n)
+      case JsonAST.JInt(bigint)            => this.set(bigint.intValue)
+      case n: Number                       => this.set(n.intValue)
+      case (n: Number) :: _                => this.set(n.intValue)
+      case Some(n: Number)                 => this.set(n.intValue)
+      case Full(n: Number)                 => this.set(n.intValue)
       case None | Empty | Failure(_, _, _) => this.set(0)
-      case (s: String) :: _ => this.set(toInt(s))
-      case null => this.set(0)
-      case s: String => this.set(toInt(s))
-      case o => this.set(toInt(o))
+      case (s: String) :: _                => this.set(toInt(s))
+      case null                            => this.set(0)
+      case s: String                       => this.set(toInt(s))
+      case o                               => this.set(toInt(o))
     }
   }
 
@@ -394,29 +406,35 @@ abstract class MappedInt[T <: Mapper[T]](val fieldOwner: T)
   }
 
   def buildSetActualValue(
-      accessor: Method, v: AnyRef, columnName: String): (T, AnyRef) => Unit =
+      accessor: Method,
+      v: AnyRef,
+      columnName: String): (T, AnyRef) => Unit =
     (inst, v) =>
       doField(inst, accessor, { case f: MappedInt[T] => f.st(toInt(v)) })
 
   def buildSetLongValue(
-      accessor: Method, columnName: String): (T, Long, Boolean) => Unit =
+      accessor: Method,
+      columnName: String): (T, Long, Boolean) => Unit =
     (inst, v, isNull) =>
       doField(inst, accessor, {
         case f: MappedInt[T] => f.st(if (isNull) 0 else v.toInt)
       })
 
   def buildSetStringValue(
-      accessor: Method, columnName: String): (T, String) => Unit =
+      accessor: Method,
+      columnName: String): (T, String) => Unit =
     (inst, v) =>
       doField(inst, accessor, { case f: MappedInt[T] => f.st(toInt(v)) })
 
   def buildSetDateValue(
-      accessor: Method, columnName: String): (T, Date) => Unit =
+      accessor: Method,
+      columnName: String): (T, Date) => Unit =
     (inst, v) =>
       doField(inst, accessor, { case f: MappedInt[T] => f.st(toInt(v)) })
 
   def buildSetBooleanValue(
-      accessor: Method, columnName: String): (T, Boolean, Boolean) => Unit =
+      accessor: Method,
+      columnName: String): (T, Boolean, Boolean) => Unit =
     (inst, v, isNull) =>
       doField(inst, accessor, {
         case f: MappedInt[T] => f.st(if (isNull || !v) 0 else 1)

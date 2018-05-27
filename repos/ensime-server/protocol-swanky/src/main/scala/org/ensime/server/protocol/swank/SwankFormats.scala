@@ -24,12 +24,17 @@ import scala.util.{Failure, Success, Try}
  */
 
 case class SwankRPCFormatException(
-    msg: String, callId: Int, cause: Throwable = null)
+    msg: String,
+    callId: Int,
+    cause: Throwable = null)
     extends Exception(msg, cause)
 
 object SwankProtocolConversions
-    extends DefaultSexpProtocol with SymbolAltFormat with OptionAltFormat
-    with FamilyFormats with CamelCaseToDashes {
+    extends DefaultSexpProtocol
+    with SymbolAltFormat
+    with OptionAltFormat
+    with FamilyFormats
+    with CamelCaseToDashes {
   override def skipNilValues: Boolean = true
 }
 
@@ -55,13 +60,13 @@ object SwankProtocolCommon {
         SexpData(key -> th.hint)
       case other =>
         serializationError(
-            s"expected ${th.hint}'s wrap to be SexpData, was $other")
+          s"expected ${th.hint}'s wrap to be SexpData, was $other")
     }
     final def read(sexp: Sexp): T = sexp match {
       case SexpData(map) if map.contains(key) =>
         map(key) match {
           case hint: SexpSymbol => read(hint, SexpData((map - key).toList))
-          case not => deserializationError(not)
+          case not              => deserializationError(not)
         }
       case x => deserializationError(x)
     }
@@ -71,23 +76,23 @@ object SwankProtocolCommon {
   implicit val SourceFileInfoFormat = SexpFormat[SourceFileInfo]
 
   private val sourceSymbolMap = Map(
-      "object" -> ObjectSymbol,
-      "class" -> ClassSymbol,
-      "trait" -> TraitSymbol,
-      "package" -> PackageSymbol,
-      "constructor" -> ConstructorSymbol,
-      "importedName" -> ImportedNameSymbol,
-      "typeParam" -> TypeParamSymbol,
-      "param" -> ParamSymbol,
-      "varField" -> VarFieldSymbol,
-      "valField" -> ValFieldSymbol,
-      "operator" -> OperatorFieldSymbol,
-      "var" -> VarSymbol,
-      "val" -> ValSymbol,
-      "functionCall" -> FunctionCallSymbol,
-      "implicitConversion" -> ImplicitConversionSymbol,
-      "implicitParams" -> ImplicitParamsSymbol,
-      "deprecated" -> DeprecatedSymbol
+    "object" -> ObjectSymbol,
+    "class" -> ClassSymbol,
+    "trait" -> TraitSymbol,
+    "package" -> PackageSymbol,
+    "constructor" -> ConstructorSymbol,
+    "importedName" -> ImportedNameSymbol,
+    "typeParam" -> TypeParamSymbol,
+    "param" -> ParamSymbol,
+    "varField" -> VarFieldSymbol,
+    "valField" -> ValFieldSymbol,
+    "operator" -> OperatorFieldSymbol,
+    "var" -> VarSymbol,
+    "val" -> ValSymbol,
+    "functionCall" -> FunctionCallSymbol,
+    "implicitConversion" -> ImplicitConversionSymbol,
+    "implicitParams" -> ImplicitParamsSymbol,
+    "deprecated" -> DeprecatedSymbol
   )
   private val reverseSourceSymbolMap: Map[SourceSymbol, String] =
     sourceSymbolMap.map { case (name, symbol) => symbol -> name }
@@ -131,16 +136,16 @@ object SwankProtocolCommon {
   }
 
   implicit val DebugThreadIdFormat: SexpFormat[DebugThreadId] = viaString(
-      new ViaString[DebugThreadId] {
-    def toSexpString(id: DebugThreadId) = id.id.toString
-    def fromSexpString(s: String) = DebugThreadId(s)
-  })
+    new ViaString[DebugThreadId] {
+      def toSexpString(id: DebugThreadId) = id.id.toString
+      def fromSexpString(s: String) = DebugThreadId(s)
+    })
 
   implicit val DebugObjectIdFormat: SexpFormat[DebugObjectId] = viaString(
-      new ViaString[DebugObjectId] {
-    def toSexpString(id: DebugObjectId) = id.id.toString
-    def fromSexpString(s: String) = DebugObjectId(s)
-  })
+    new ViaString[DebugObjectId] {
+      def toSexpString(id: DebugObjectId) = id.id.toString
+      def fromSexpString(s: String) = DebugObjectId(s)
+    })
 
   implicit val DebugObjectReferenceHint =
     TypeHint[DebugObjectReference](SexpSymbol("reference"))
@@ -159,9 +164,9 @@ object SwankProtocolCommon {
   implicit object DebugLocationFormat extends TraitFormatAlt[DebugLocation] {
     def write(dl: DebugLocation): Sexp = dl match {
       case dor: DebugObjectReference => wrap(dor)
-      case dae: DebugArrayElement => wrap(dae)
-      case dof: DebugObjectField => wrap(dof)
-      case dss: DebugStackSlot => wrap(dss)
+      case dae: DebugArrayElement    => wrap(dae)
+      case dof: DebugObjectField     => wrap(dof)
+      case dss: DebugStackSlot       => wrap(dss)
     }
     def read(hint: SexpSymbol, value: Sexp): DebugLocation = hint match {
       case s if s == DebugObjectReferenceHint.hint =>
@@ -217,15 +222,15 @@ object SwankProtocolResponse {
     TypeHint[AnalyzerReadyEvent.type](SexpSymbol(":compiler-ready"))
   implicit val FullTypeCheckCompleteHint =
     TypeHint[FullTypeCheckCompleteEvent.type](
-        SexpSymbol(":full-typecheck-finished"))
+      SexpSymbol(":full-typecheck-finished"))
   implicit val IndexerReadyHint =
     TypeHint[IndexerReadyEvent.type](SexpSymbol(":indexer-ready"))
   implicit val CompilerRestartedHint =
     TypeHint[CompilerRestartedEvent.type](SexpSymbol(":compiler-restarted"))
   implicit val NewScalaNotesHint =
     TypeHint[NewScalaNotesEvent](SexpSymbol(":scala-notes"))
-  implicit val ClearAllScalaNotesHint = TypeHint[ClearAllScalaNotesEvent.type](
-      SexpSymbol(":clear-all-scala-notes"))
+  implicit val ClearAllScalaNotesHint =
+    TypeHint[ClearAllScalaNotesEvent.type](SexpSymbol(":clear-all-scala-notes"))
   implicit val NewJavaNotesHint =
     TypeHint[NewJavaNotesEvent](SexpSymbol(":java-notes"))
   implicit val ClearAllJavaNotesHint =
@@ -300,9 +305,9 @@ object SwankProtocolResponse {
     def write(dv: DebugValue): Sexp = dv match {
       case dpv: DebugPrimitiveValue => wrap(dpv)
       case doi: DebugObjectInstance => wrap(doi)
-      case dai: DebugArrayInstance => wrap(dai)
+      case dai: DebugArrayInstance  => wrap(dai)
       case dsi: DebugStringInstance => wrap(dsi)
-      case dnv: DebugNullValue => wrap(dnv)
+      case dnv: DebugNullValue      => wrap(dnv)
     }
     def read(hint: SexpSymbol, value: Sexp): DebugValue = hint match {
       case s if s == DebugPrimitiveHint.hint =>
@@ -321,8 +326,8 @@ object SwankProtocolResponse {
 
   implicit object SourcePositionFormat extends TraitFormatAlt[SourcePosition] {
     def write(dl: SourcePosition): Sexp = dl match {
-      case empty: EmptySourcePosition => wrap(empty)
-      case line: LineSourcePosition => wrap(line)
+      case empty: EmptySourcePosition   => wrap(empty)
+      case line: LineSourcePosition     => wrap(line)
       case offset: OffsetSourcePosition => wrap(offset)
     }
     def read(hint: SexpSymbol, value: Sexp): SourcePosition = hint match {
@@ -339,14 +344,14 @@ object SwankProtocolResponse {
   implicit object NoteSeverityFormat extends TraitFormat[NoteSeverity] {
     def write(ns: NoteSeverity): Sexp = ns match {
       case NoteError => NoteErrorHint.hint
-      case NoteWarn => NoteWarnHint.hint
-      case NoteInfo => NoteInfoHint.hint
+      case NoteWarn  => NoteWarnHint.hint
+      case NoteInfo  => NoteInfoHint.hint
     }
     def read(hint: SexpSymbol, value: Sexp): NoteSeverity = hint match {
       case s if s == NoteErrorHint.hint => NoteError
-      case s if s == NoteWarnHint.hint => NoteWarn
-      case s if s == NoteInfoHint.hint => NoteInfo
-      case _ => deserializationError(hint)
+      case s if s == NoteWarnHint.hint  => NoteWarn
+      case s if s == NoteInfoHint.hint  => NoteInfo
+      case _                            => deserializationError(hint)
     }
   }
   // must be defined after NoteSeverity
@@ -356,19 +361,19 @@ object SwankProtocolResponse {
 
   implicit object DebugEventFormat extends TraitFormatAlt[DebugEvent] {
     def write(ee: DebugEvent): Sexp = ee match {
-      case dse: DebugStepEvent => wrap(dse)
-      case dbe: DebugBreakEvent => wrap(dbe)
-      case DebugVMStartEvent => wrap(DebugVMStartEvent)
-      case DebugVMDisconnectEvent => wrap(DebugVMDisconnectEvent)
-      case dee: DebugExceptionEvent => wrap(dee)
+      case dse: DebugStepEvent        => wrap(dse)
+      case dbe: DebugBreakEvent       => wrap(dbe)
+      case DebugVMStartEvent          => wrap(DebugVMStartEvent)
+      case DebugVMDisconnectEvent     => wrap(DebugVMDisconnectEvent)
+      case dee: DebugExceptionEvent   => wrap(dee)
       case dts: DebugThreadStartEvent => wrap(dts)
       case dtd: DebugThreadDeathEvent => wrap(dtd)
-      case doe: DebugOutputEvent => wrap(doe)
+      case doe: DebugOutputEvent      => wrap(doe)
     }
     def read(hint: SexpSymbol, value: Sexp): DebugEvent = hint match {
-      case s if s == DebugStepHint.hint => value.convertTo[DebugStepEvent]
-      case s if s == DebugBreakHint.hint => value.convertTo[DebugBreakEvent]
-      case s if s == DebugVMStartHint.hint => DebugVMStartEvent
+      case s if s == DebugStepHint.hint         => value.convertTo[DebugStepEvent]
+      case s if s == DebugBreakHint.hint        => value.convertTo[DebugBreakEvent]
+      case s if s == DebugVMStartHint.hint      => DebugVMStartEvent
       case s if s == DebugVMDisconnectHint.hint => DebugVMDisconnectEvent
       case s if s == DebugExceptionHint.hint =>
         value.convertTo[DebugExceptionEvent]
@@ -377,7 +382,7 @@ object SwankProtocolResponse {
       case s if s == DebugThreadDeathHint.hint =>
         value.convertTo[DebugThreadDeathEvent]
       case s if s == DebugOutputHint.hint => value.convertTo[DebugOutputEvent]
-      case _ => deserializationError(hint)
+      case _                              => deserializationError(hint)
     }
   }
 
@@ -388,20 +393,20 @@ object SwankProtocolResponse {
     */
   implicit object EnsimeEventFormat extends TraitFormat[EnsimeEvent] {
     def write(ee: EnsimeEvent): Sexp = ee match {
-      case e: AnalyzerReadyEvent.type => wrap(e)
+      case e: AnalyzerReadyEvent.type         => wrap(e)
       case e: FullTypeCheckCompleteEvent.type => wrap(e)
-      case e: IndexerReadyEvent.type => wrap(e)
-      case e: CompilerRestartedEvent.type => wrap(e)
-      case nsc: NewScalaNotesEvent => wrap(nsc)
-      case e: ClearAllScalaNotesEvent.type => wrap(e)
-      case njc: NewJavaNotesEvent => wrap(njc)
-      case e: ClearAllJavaNotesEvent.type => wrap(e)
+      case e: IndexerReadyEvent.type          => wrap(e)
+      case e: CompilerRestartedEvent.type     => wrap(e)
+      case nsc: NewScalaNotesEvent            => wrap(nsc)
+      case e: ClearAllScalaNotesEvent.type    => wrap(e)
+      case njc: NewJavaNotesEvent             => wrap(njc)
+      case e: ClearAllJavaNotesEvent.type     => wrap(e)
       case sbm: SendBackgroundMessageEvent =>
         SexpList(
-            // the odd one out...
-            SendBackgroundMessageHint.hint,
-            SexpNumber(sbm.code),
-            sbm.detail.toSexp
+          // the odd one out...
+          SendBackgroundMessageHint.hint,
+          SexpNumber(sbm.code),
+          sbm.detail.toSexp
         )
       case de: DebugEvent => wrap(de)
     }
@@ -409,17 +414,17 @@ object SwankProtocolResponse {
       case s if s == AnalyzerReadyHint.hint => AnalyzerReadyEvent
       case s if s == FullTypeCheckCompleteHint.hint =>
         FullTypeCheckCompleteEvent
-      case s if s == IndexerReadyHint.hint => IndexerReadyEvent
+      case s if s == IndexerReadyHint.hint      => IndexerReadyEvent
       case s if s == CompilerRestartedHint.hint => CompilerRestartedEvent
       case s if s == NewScalaNotesHint.hint =>
         value.convertTo[NewScalaNotesEvent]
       case s if s == ClearAllScalaNotesHint.hint => ClearAllScalaNotesEvent
       case s if s == NewJavaNotesHint.hint =>
         value.convertTo[NewJavaNotesEvent]
-      case s if s == ClearAllJavaNotesHint.hint => ClearAllJavaNotesEvent
+      case s if s == ClearAllJavaNotesHint.hint     => ClearAllJavaNotesEvent
       case s if s == SendBackgroundMessageHint.hint => ??? // unsupported
-      case s if s == DebugHint.hint => value.convertTo[DebugEvent]
-      case _ => deserializationError(hint)
+      case s if s == DebugHint.hint                 => value.convertTo[DebugEvent]
+      case _                                        => deserializationError(hint)
     }
   }
 
@@ -431,9 +436,9 @@ object SwankProtocolResponse {
     def read(sexp: Sexp): CompletionSignature = sexp match {
       case SexpList(a :: b :: c :: Nil) =>
         CompletionSignature(
-            a.convertTo[List[List[(String, String)]]],
-            b.convertTo[String],
-            c.convertTo[Boolean]
+          a.convertTo[List[List[(String, String)]]],
+          b.convertTo[String],
+          c.convertTo[Boolean]
         )
       case _ => deserializationError(sexp)
     }
@@ -447,15 +452,15 @@ object SwankProtocolResponse {
     override val key = SexpSymbol(":info-type")
     def write(ti: EntityInfo): Sexp = ti match {
       case named: NamedTypeMemberInfo => wrap(named)
-      case pack: PackageInfo => wrap(pack)
-      case tpe: TypeInfo => wrap(tpe)
+      case pack: PackageInfo          => wrap(pack)
+      case tpe: TypeInfo              => wrap(tpe)
     }
     def read(hint: SexpSymbol, value: Sexp): EntityInfo = hint match {
       case s if s == NamedTypeMemberHint.hint =>
         value.convertTo[NamedTypeMemberInfo]
-      case s if s == PackageHint.hint => value.convertTo[PackageInfo]
+      case s if s == PackageHint.hint  => value.convertTo[PackageInfo]
       case s if s == TypeInfoHint.hint => value.convertTo[TypeInfo]
-      case _ => deserializationError(hint)
+      case _                           => deserializationError(hint)
     }
   }
   implicit object TypeInfoFormat extends TraitFormatAlt[TypeInfo] {
@@ -468,7 +473,7 @@ object SwankProtocolResponse {
     def read(hint: SexpSymbol, value: Sexp): TypeInfo = hint match {
       case s if s == ArrowTypeHint.hint => value.convertTo[ArrowTypeInfo]
       case s if s == BasicTypeHint.hint => value.convertTo[BasicTypeInfo]
-      case _ => deserializationError(hint)
+      case _                            => deserializationError(hint)
     }
   }
   implicit def NamedTypeMemberInfoFormat = SexpFormat[NamedTypeMemberInfo]
@@ -483,7 +488,7 @@ object SwankProtocolResponse {
   implicit object FileEditFormat extends TraitFormatAlt[FileEdit] {
     def write(ti: FileEdit): Sexp = ti match {
       case text: TextEdit => wrap(text)
-      case nf: NewFile => wrap(nf)
+      case nf: NewFile    => wrap(nf)
       case df: DeleteFile => wrap(df)
     }
     def read(hint: SexpSymbol, value: Sexp): FileEdit = hint match {
@@ -506,7 +511,7 @@ object SwankProtocolResponse {
   implicit object SymbolSearchResultFormat
       extends TraitFormatAlt[SymbolSearchResult] {
     def write(ti: SymbolSearchResult): Sexp = ti match {
-      case ts: TypeSearchResult => wrap(ts)
+      case ts: TypeSearchResult   => wrap(ts)
       case ms: MethodSearchResult => wrap(ms)
     }
     def read(hint: SexpSymbol, value: Sexp): SymbolSearchResult = hint match {
@@ -522,14 +527,14 @@ object SwankProtocolResponse {
       extends SexpFormat[SymbolSearchResults] {
     def write(o: SymbolSearchResults): Sexp = o.syms.toSexp
     def read(sexp: Sexp): SymbolSearchResults = SymbolSearchResults(
-        sexp.convertTo[List[SymbolSearchResult]]
+      sexp.convertTo[List[SymbolSearchResult]]
     )
   }
   implicit object ImportSuggestionsFormat
       extends SexpFormat[ImportSuggestions] {
     def write(o: ImportSuggestions): Sexp = o.symLists.toSexp
     def read(sexp: Sexp): ImportSuggestions = ImportSuggestions(
-        sexp.convertTo[List[List[SymbolSearchResult]]]
+      sexp.convertTo[List[List[SymbolSearchResult]]]
     )
   }
 
@@ -538,9 +543,9 @@ object SwankProtocolResponse {
       extends SexpFormat[SymbolDesignation] {
     def write(o: SymbolDesignation): Sexp =
       SexpList(
-          SexpSymbol(sourceSymbolToSymbol(o.symType)),
-          o.start.toSexp,
-          o.end.toSexp
+        SexpSymbol(sourceSymbolToSymbol(o.symType)),
+        o.start.toSexp,
+        o.end.toSexp
       )
     def read(sexp: Sexp): SymbolDesignation = ???
   }
@@ -553,7 +558,7 @@ object SwankProtocolResponse {
   implicit object ImplicitInfoFormat extends TraitFormatAlt[ImplicitInfo] {
     def write(i: ImplicitInfo): Sexp = i match {
       case c: ImplicitConversionInfo => wrap(c)
-      case p: ImplicitParamInfo => wrap(p)
+      case p: ImplicitParamInfo      => wrap(p)
     }
     def read(hint: SexpSymbol, sexp: Sexp): ImplicitInfo = ???
   }
@@ -565,12 +570,12 @@ object SwankProtocolResponse {
   implicit object DebugVmStatusFormat extends TraitFormatAlt[DebugVmStatus] {
     def write(ti: DebugVmStatus): Sexp = ti match {
       case s: DebugVmSuccess => wrap(s)
-      case e: DebugVmError => wrap(e)
+      case e: DebugVmError   => wrap(e)
     }
     def read(hint: SexpSymbol, value: Sexp): DebugVmStatus = hint match {
       case t if t == DebugVmSuccessHint.hint => value.convertTo[DebugVmSuccess]
-      case t if t == DebugVmErrorHint.hint => value.convertTo[DebugVmError]
-      case _ => deserializationError(hint)
+      case t if t == DebugVmErrorHint.hint   => value.convertTo[DebugVmError]
+      case _                                 => deserializationError(hint)
     }
   }
   implicit def StructureViewFormat = SexpFormat[StructureView]
@@ -578,48 +583,48 @@ object SwankProtocolResponse {
   implicit object RpcResponseFormat extends SexpFormat[RpcResponse] {
     def read(sexp: Sexp): RpcResponse = ???
     def write(r: RpcResponse): Sexp = r match {
-      case VoidResponse => false.toSexp
-      case TrueResponse => true.toSexp
-      case FalseResponse => false.toSexp
+      case VoidResponse          => false.toSexp
+      case TrueResponse          => true.toSexp
+      case FalseResponse         => false.toSexp
       case value: StringResponse => value.text.toSexp
 
       case value: ConnectionInfo => value.toSexp
 
       case value: NamedTypeMemberInfo => value.toSexp
-      case value: TypeInfo => value.toSexp
-      case value: EntityInfo => value.toSexp
-      case value: SymbolSearchResult => value.toSexp
-      case value: DebugVmStatus => value.toSexp
+      case value: TypeInfo            => value.toSexp
+      case value: EntityInfo          => value.toSexp
+      case value: SymbolSearchResult  => value.toSexp
+      case value: DebugVmStatus       => value.toSexp
 
-      case value: SourcePosition => value.toSexp
-      case value: DebugLocation => value.toSexp
-      case value: DebugValue => value.toSexp
-      case value: DebugClassField => value.toSexp
-      case value: DebugStackLocal => value.toSexp
-      case value: DebugStackFrame => value.toSexp
-      case value: DebugBacktrace => value.toSexp
-      case value: Breakpoint => value.toSexp
-      case value: BreakpointList => value.toSexp
-      case value: Note => value.toSexp
-      case value: CompletionInfo => value.toSexp
-      case value: CompletionInfoList => value.toSexp
-      case value: SymbolInfo => value.toSexp
-      case value: InterfaceInfo => value.toSexp
-      case value: TypeInspectInfo => value.toSexp
+      case value: SourcePosition      => value.toSexp
+      case value: DebugLocation       => value.toSexp
+      case value: DebugValue          => value.toSexp
+      case value: DebugClassField     => value.toSexp
+      case value: DebugStackLocal     => value.toSexp
+      case value: DebugStackFrame     => value.toSexp
+      case value: DebugBacktrace      => value.toSexp
+      case value: Breakpoint          => value.toSexp
+      case value: BreakpointList      => value.toSexp
+      case value: Note                => value.toSexp
+      case value: CompletionInfo      => value.toSexp
+      case value: CompletionInfoList  => value.toSexp
+      case value: SymbolInfo          => value.toSexp
+      case value: InterfaceInfo       => value.toSexp
+      case value: TypeInspectInfo     => value.toSexp
       case value: SymbolSearchResults => value.toSexp
-      case value: ImportSuggestions => value.toSexp
-      case value: ERangePositions => value.toSexp
-      case value: FileRange => value.toSexp
-      case value: SymbolDesignations => value.toSexp
-      case value: RefactorFailure => value.toSexp
-      case value: RefactorEffect => value.toSexp
-      case value: RefactorDiffEffect => value.toSexp
-      case value: RefactorResult => value.toSexp
-      case value: ImplicitInfos => value.toSexp
-      case value: StructureView => value.toSexp
+      case value: ImportSuggestions   => value.toSexp
+      case value: ERangePositions     => value.toSexp
+      case value: FileRange           => value.toSexp
+      case value: SymbolDesignations  => value.toSexp
+      case value: RefactorFailure     => value.toSexp
+      case value: RefactorEffect      => value.toSexp
+      case value: RefactorDiffEffect  => value.toSexp
+      case value: RefactorResult      => value.toSexp
+      case value: ImplicitInfos       => value.toSexp
+      case value: StructureView       => value.toSexp
       case error: EnsimeServerError =>
         throw new IllegalArgumentException(
-            s"for legacy reasons, RpcError should be marshalled as an EnsimeServerMessage: $error"
+          s"for legacy reasons, RpcError should be marshalled as an EnsimeServerMessage: $error"
         )
     }
   }
@@ -639,16 +644,15 @@ object SwankProtocolResponse {
       case RpcResponseEnvelope(_, event: EnsimeEvent) => event.toSexp
       case RpcResponseEnvelope(Some(callId), EnsimeServerError(detail)) =>
         SexpList(
-            SexpSymbol(":return"),
-            SexpList(
-                SexpSymbol(":abort"), SexpNumber(666), SexpString(detail)),
-            SexpNumber(callId)
+          SexpSymbol(":return"),
+          SexpList(SexpSymbol(":abort"), SexpNumber(666), SexpString(detail)),
+          SexpNumber(callId)
         )
       case RpcResponseEnvelope(Some(callId), payload) =>
         SexpList(
-            SexpSymbol(":return"),
-            SexpList(SexpSymbol(":ok"), payload.toSexp),
-            SexpNumber(callId)
+          SexpSymbol(":return"),
+          SexpList(SexpSymbol(":ok"), payload.toSexp),
+          SexpNumber(callId)
         )
     }
   }
@@ -700,9 +704,9 @@ object SwankProtocolRequest {
     TypeHint[CompletionsReq](SexpSymbol("swank:completions"))
   implicit val PackageMemberCompletionReqHint =
     TypeHint[PackageMemberCompletionReq](
-        SexpSymbol("swank:package-member-completion"))
+      SexpSymbol("swank:package-member-completion"))
   implicit val UsesOfSymbolAtPointReqHint = TypeHint[UsesOfSymbolAtPointReq](
-      SexpSymbol("swank:uses-of-symbol-at-point"))
+    SexpSymbol("swank:uses-of-symbol-at-point"))
   implicit val TypeByNameReqHint =
     TypeHint[TypeByNameReq](SexpSymbol("swank:type-by-name"))
   implicit val TypeByNameAtPointReqHint =
@@ -718,7 +722,7 @@ object SwankProtocolRequest {
   implicit val SymbolByNameReqHint =
     TypeHint[SymbolByNameReq](SexpSymbol("swank:symbol-by-name"))
   implicit val InspectPackageByPathReqHint = TypeHint[InspectPackageByPathReq](
-      SexpSymbol("swank:inspect-package-by-path"))
+    SexpSymbol("swank:inspect-package-by-path"))
   implicit val PrepareRefactorReqHint =
     TypeHint[PrepareRefactorReq](SexpSymbol("swank:prepare-refactor"))
   implicit val ExecRefactorReqHint =
@@ -749,10 +753,10 @@ object SwankProtocolRequest {
     TypeHint[DebugClearBreakReq](SexpSymbol("swank:debug-clear-break"))
   implicit val DebugClearAllBreaksReqHint =
     TypeHint[DebugClearAllBreaksReq.type](
-        SexpSymbol("swank:debug-clear-all-breaks"))
+      SexpSymbol("swank:debug-clear-all-breaks"))
   implicit val DebugListBreakpointsReqHint =
     TypeHint[DebugListBreakpointsReq.type](
-        SexpSymbol("swank:debug-list-breakpoints"))
+      SexpSymbol("swank:debug-list-breakpoints"))
   implicit val DebugRunReqHint =
     TypeHint[DebugRunReq.type](SexpSymbol("swank:debug-run"))
   implicit val DebugContinueReqHint =
@@ -778,7 +782,8 @@ object SwankProtocolRequest {
   // should pick up on this instead, also private so we don't
   // accidentally export it.
   private implicit def tupledProductFormat[
-      T <: RpcRequest, R <: shapeless.HList](
+      T <: RpcRequest,
+      R <: shapeless.HList](
       implicit g: shapeless.Generic.Aux[T, R],
       r: HListFormat[R]
   ): SexpFormat[T] = new SexpFormat[T] {
@@ -800,10 +805,9 @@ object SwankProtocolRequest {
           SexpString("+") :: SexpNumber(i) :: SexpString(text) :: Nil) =>
         PatchInsert(i.intValue, text)
       case SexpList(SexpString("*") :: SexpNumber(i) :: SexpNumber(j) :: SexpString(
-          text) :: Nil) =>
+            text) :: Nil) =>
         PatchReplace(i.intValue, j.intValue, text)
-      case SexpList(
-          SexpString("-") :: SexpNumber(i) :: SexpNumber(j) :: Nil) =>
+      case SexpList(SexpString("-") :: SexpNumber(i) :: SexpNumber(j) :: Nil) =>
         PatchDelete(i.intValue, j.intValue)
       case _ => deserializationError(sexp)
     }
@@ -824,11 +828,11 @@ object SwankProtocolRequest {
           .collect {
             case List(SexpSymbol("qualifiedName"), value) =>
               (Loc.QualifiedName, value)
-            case List(SexpSymbol("file"), value) => (Loc.File, value)
+            case List(SexpSymbol("file"), value)    => (Loc.File, value)
             case List(SexpSymbol("newName"), value) => (Loc.NewName, value)
-            case List(SexpSymbol("name"), value) => (Loc.Name, value)
-            case List(SexpSymbol("start"), value) => (Loc.Start, value)
-            case List(SexpSymbol("end"), value) => (Loc.End, value)
+            case List(SexpSymbol("name"), value)    => (Loc.Name, value)
+            case List(SexpSymbol("start"), value)   => (Loc.Start, value)
+            case List(SexpSymbol("end"), value)     => (Loc.End, value)
             case List(SexpSymbol("methodName"), value) =>
               (Loc.MethodName, value)
           }
@@ -841,7 +845,10 @@ object SwankProtocolRequest {
               (Loc.Start, SexpNumber(start))
               ) =>
             RenameRefactorDesc(
-                newName, File(f).canon, start.intValue, end.intValue)
+              newName,
+              File(f).canon,
+              start.intValue,
+              end.intValue)
 
           case List(
               (Loc.End, SexpNumber(end)),
@@ -850,7 +857,10 @@ object SwankProtocolRequest {
               (Loc.Start, SexpNumber(start))
               ) =>
             ExtractMethodRefactorDesc(
-                methodName, File(f).canon, start.intValue, end.intValue)
+              methodName,
+              File(f).canon,
+              start.intValue,
+              end.intValue)
 
           case List(
               (Loc.End, SexpNumber(end)),
@@ -859,15 +869,17 @@ object SwankProtocolRequest {
               (Loc.Start, SexpNumber(start))
               ) =>
             ExtractLocalRefactorDesc(
-                name, File(f).canon, start.intValue, end.intValue)
+              name,
+              File(f).canon,
+              start.intValue,
+              end.intValue)
 
           case List(
               (Loc.End, SexpNumber(end)),
               (Loc.File, SexpString(f)),
               (Loc.Start, SexpNumber(start))
               ) =>
-            InlineLocalRefactorDesc(
-                File(f).canon, start.intValue, end.intValue)
+            InlineLocalRefactorDesc(File(f).canon, start.intValue, end.intValue)
 
           case List(
               (Loc.File, SexpString(f))
@@ -953,7 +965,7 @@ object SwankProtocolRequest {
             value.convertTo[TypecheckFileReq]
           case s if s == TypecheckFilesReqHint.hint =>
             value.convertTo[TypecheckFilesReq]
-          case s if s == UnloadAllReqHint.hint => UnloadAllReq
+          case s if s == UnloadAllReqHint.hint    => UnloadAllReq
           case s if s == TypecheckAllReqHint.hint => TypecheckAllReq
           case s if s == FormatSourceReqHint.hint =>
             value.convertTo[FormatSourceReq]
@@ -1056,7 +1068,9 @@ object SwankProtocolRequest {
             // we failed to parse to a valid s, but we have a call id - so we
             // should return an rpc abort rather than :reader-error as emacs tends to bork.
             throw new SwankRPCFormatException(
-                s"Invalid rpc request ${form.compactPrint}", callId, ex)
+              s"Invalid rpc request ${form.compactPrint}",
+              callId,
+              ex)
         }
 
       case _ => deserializationError(sexp)

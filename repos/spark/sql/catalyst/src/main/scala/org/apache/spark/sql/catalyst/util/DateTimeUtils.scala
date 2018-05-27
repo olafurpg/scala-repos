@@ -336,7 +336,7 @@ object DateTimeUtils {
 
     if (!justTime &&
         (segments(0) < 0 || segments(0) > 9999 || segments(1) < 1 ||
-            segments(1) > 12 || segments(2) < 1 || segments(2) > 31)) {
+        segments(1) > 12 || segments(2) < 1 || segments(2) > 31)) {
       return None
     }
 
@@ -356,8 +356,9 @@ object DateTimeUtils {
       if (timeZone.isEmpty) {
         Calendar.getInstance()
       } else {
-        Calendar.getInstance(TimeZone.getTimeZone(
-                f"GMT${timeZone.get.toChar}${segments(7)}%02d:${segments(8)}%02d"))
+        Calendar.getInstance(
+          TimeZone.getTimeZone(
+            f"GMT${timeZone.get.toChar}${segments(7)}%02d:${segments(8)}%02d"))
       }
     c.set(Calendar.MILLISECOND, 0)
 
@@ -366,12 +367,13 @@ object DateTimeUtils {
       c.set(Calendar.MINUTE, segments(4))
       c.set(Calendar.SECOND, segments(5))
     } else {
-      c.set(segments(0),
-            segments(1) - 1,
-            segments(2),
-            segments(3),
-            segments(4),
-            segments(5))
+      c.set(
+        segments(0),
+        segments(1) - 1,
+        segments(2),
+        segments(3),
+        segments(4),
+        segments(5))
     }
 
     Some(c.getTimeInMillis * 1000 + segments(6))
@@ -443,7 +445,7 @@ object DateTimeUtils {
 
   private def localTimestamp(microsec: SQLTimestamp): SQLTimestamp = {
     absoluteMicroSecond(microsec) +
-    defaultTimeZone.getOffset(microsec / 1000) * 1000L
+      defaultTimeZone.getOffset(microsec / 1000) * 1000L
   }
 
   /**
@@ -563,10 +565,11 @@ object DateTimeUtils {
         if (dayInYear <= 31) {
           (year, 1, dayInYear, 31 - dayInYear)
         } else if (dayInYear <= 59) {
-          (year,
-           2,
-           dayInYear - 31,
-           if (isLeap) 60 - dayInYear else 59 - dayInYear)
+          (
+            year,
+            2,
+            dayInYear - 31,
+            if (isLeap) 60 - dayInYear else 59 - dayInYear)
         } else if (dayInYear <= 90) {
           (year, 3, dayInYear - 59, 90 - dayInYear)
         } else if (dayInYear <= 120) {
@@ -706,7 +709,7 @@ object DateTimeUtils {
   private def getDateFromYear(absoluteYear: Int): SQLDate = {
     val absoluteDays =
       (absoluteYear * 365 + absoluteYear / 400 - absoluteYear / 100 +
-          absoluteYear / 4)
+        absoluteYear / 4)
     absoluteDays - toYearZero
   }
 
@@ -741,11 +744,13 @@ object DateTimeUtils {
     * Returns a timestamp value, expressed in microseconds since 1.1.1970 00:00:00.
     */
   def timestampAddInterval(
-      start: SQLTimestamp, months: Int, microseconds: Long): SQLTimestamp = {
+      start: SQLTimestamp,
+      months: Int,
+      microseconds: Long): SQLTimestamp = {
     val days = millisToDays(start / 1000L)
     val newDays = dateAddMonths(days, months)
     daysToMillis(newDays) * 1000L + start - daysToMillis(days) * 1000L +
-    microseconds
+      microseconds
   }
 
   /**
@@ -790,14 +795,14 @@ object DateTimeUtils {
   def getDayOfWeekFromString(string: UTF8String): Int = {
     val dowString = string.toString.toUpperCase
     dowString match {
-      case "SU" | "SUN" | "SUNDAY" => 3
-      case "MO" | "MON" | "MONDAY" => 4
-      case "TU" | "TUE" | "TUESDAY" => 5
+      case "SU" | "SUN" | "SUNDAY"    => 3
+      case "MO" | "MON" | "MONDAY"    => 4
+      case "TU" | "TUE" | "TUESDAY"   => 5
       case "WE" | "WED" | "WEDNESDAY" => 6
-      case "TH" | "THU" | "THURSDAY" => 0
-      case "FR" | "FRI" | "FRIDAY" => 1
-      case "SA" | "SAT" | "SATURDAY" => 2
-      case _ => -1
+      case "TH" | "THU" | "THURSDAY"  => 0
+      case "FR" | "FRI" | "FRIDAY"    => 1
+      case "SA" | "SAT" | "SATURDAY"  => 2
+      case _                          => -1
     }
   }
 
@@ -848,7 +853,7 @@ object DateTimeUtils {
       format.toString.toUpperCase match {
         case "YEAR" | "YYYY" | "YY" => TRUNC_TO_YEAR
         case "MON" | "MONTH" | "MM" => TRUNC_TO_MONTH
-        case _ => TRUNC_INVALID
+        case _                      => TRUNC_INVALID
       }
     }
   }

@@ -35,11 +35,14 @@ object LinearRegressionWithSGDExample {
     // $example on$
     // Load and parse the data
     val data = sc.textFile("data/mllib/ridge-data/lpsa.data")
-    val parsedData = data.map { line =>
-      val parts = line.split(',')
-      LabeledPoint(parts(0).toDouble,
-                   Vectors.dense(parts(1).split(' ').map(_.toDouble)))
-    }.cache()
+    val parsedData = data
+      .map { line =>
+        val parts = line.split(',')
+        LabeledPoint(
+          parts(0).toDouble,
+          Vectors.dense(parts(1).split(' ').map(_.toDouble)))
+      }
+      .cache()
 
     // Building the model
     val numIterations = 100
@@ -58,7 +61,8 @@ object LinearRegressionWithSGDExample {
     // Save and load model
     model.save(sc, "target/tmp/scalaLinearRegressionWithSGDModel")
     val sameModel = LinearRegressionModel.load(
-        sc, "target/tmp/scalaLinearRegressionWithSGDModel")
+      sc,
+      "target/tmp/scalaLinearRegressionWithSGDModel")
     // $example off$
 
     sc.stop()

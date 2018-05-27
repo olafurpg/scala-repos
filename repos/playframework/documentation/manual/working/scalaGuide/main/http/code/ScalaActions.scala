@@ -26,44 +26,46 @@ package scalaguide.http.scalaactions {
 
       "support zero arg actions" in {
         testAction(
-            //#zero-arg-action
-            Action {
-              Ok("Hello world")
-            }
-            //#zero-arg-action
+          //#zero-arg-action
+          Action {
+            Ok("Hello world")
+          }
+          //#zero-arg-action
         )
       }
 
       "pass the request to the action" in {
         testAction(
-            //#request-action
-            Action { request =>
-              Ok("Got request [" + request + "]")
-            }
-            //#request-action
+          //#request-action
+          Action { request =>
+            Ok("Got request [" + request + "]")
+          }
+          //#request-action
         )
       }
 
       "pass the request implicitly to the action" in {
         testAction(
-            //#implicit-request-action
-            Action { implicit request =>
-              Ok("Got request [" + request + "]")
-            }
-            //#implicit-request-action
+          //#implicit-request-action
+          Action { implicit request =>
+            Ok("Got request [" + request + "]")
+          }
+          //#implicit-request-action
         )
       }
 
       "allow specifying a parser" in {
-        testAction(action = //#json-parser-action
-                     Action(parse.json) { implicit request =>
-                     Ok("Got request [" + request + "]")
-                   }
-                   //#json-parser-action
-                   ,
-                   request = FakeRequest()
-                       .withBody(Json.obj())
-                       .withHeaders(CONTENT_TYPE -> "application/json"))
+        testAction(
+          action = //#json-parser-action
+            Action(parse.json) { implicit request =>
+              Ok("Got request [" + request + "]")
+            }
+          //#json-parser-action
+          ,
+          request = FakeRequest()
+            .withBody(Json.obj())
+            .withHeaders(CONTENT_TYPE -> "application/json")
+        )
       }
 
       "work for a full controller class" in {
@@ -88,9 +90,9 @@ package scalaguide.http.scalaactions {
 
         def index = Action {
           Result(
-              header = ResponseHeader(200, Map.empty),
-              body = HttpEntity.Strict(ByteString("Hello world!"),
-                                       Some("text/plain"))
+            header = ResponseHeader(200, Map.empty),
+            body =
+              HttpEntity.Strict(ByteString("Hello world!"), Some("text/plain"))
           )
         }
         //#simple-result-action
@@ -153,17 +155,19 @@ package scalaguide.http.scalaactions {
       }
     }
 
-    def testAction[A](action: Action[A],
-                      expectedResponse: Int = OK,
-                      request: Request[A] = FakeRequest()) = {
+    def testAction[A](
+        action: Action[A],
+        expectedResponse: Int = OK,
+        request: Request[A] = FakeRequest()) = {
       assertAction(action, expectedResponse, request) { result =>
         success
       }
     }
 
-    def assertAction[A, T : AsResult](action: Action[A],
-                                      expectedResponse: Int = OK,
-                                      request: Request[A] = FakeRequest())(
+    def assertAction[A, T: AsResult](
+        action: Action[A],
+        expectedResponse: Int = OK,
+        request: Request[A] = FakeRequest())(
         assertions: Future[Result] => T) = {
       running() { _ =>
         val result = action(request)

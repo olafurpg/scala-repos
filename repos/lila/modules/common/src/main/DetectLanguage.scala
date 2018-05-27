@@ -9,7 +9,9 @@ import play.api.Play.current
 final class DetectLanguage(url: String, key: String) {
 
   private case class Detection(
-      language: String, confidence: Float, isReliable: Boolean)
+      language: String,
+      confidence: Float,
+      isReliable: Boolean)
 
   private implicit val DetectionReads = Json.reads[Detection]
 
@@ -17,10 +19,11 @@ final class DetectLanguage(url: String, key: String) {
 
   def apply(message: String): Fu[Option[Lang]] =
     WS.url(url)
-      .post(Map(
-              "key" -> Seq(key),
-              "q" -> Seq(message take messageMaxLength)
-          )) map { response =>
+      .post(
+        Map(
+          "key" -> Seq(key),
+          "q" -> Seq(message take messageMaxLength)
+        )) map { response =>
       (response.json \ "data" \ "detections").asOpt[List[Detection]] match {
         case None =>
           lila
@@ -29,7 +32,7 @@ final class DetectLanguage(url: String, key: String) {
           None
         case Some(res) =>
           res.filter(_.isReliable).sortBy(-_.confidence).headOption map
-          (_.language) flatMap Lang.get
+            (_.language) flatMap Lang.get
       }
     } recover {
       case e: Exception =>
@@ -43,5 +46,6 @@ object DetectLanguage {
   import com.typesafe.config.Config
   def apply(config: Config): DetectLanguage =
     new DetectLanguage(
-        url = config getString "api.url", key = config getString "api.key")
+      url = config getString "api.url",
+      key = config getString "api.key")
 }

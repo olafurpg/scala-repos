@@ -17,7 +17,11 @@
 
 package org.apache.spark.sql.catalyst.plans.logical
 
-import org.apache.spark.sql.catalyst.expressions.{Attribute, Expression, SortOrder}
+import org.apache.spark.sql.catalyst.expressions.{
+  Attribute,
+  Expression,
+  SortOrder
+}
 
 /**
   * Performs a physical redistribution of the data.  Used when the consumer of the query
@@ -38,12 +42,13 @@ case class SortPartitions(sortExpressions: Seq[SortOrder], child: LogicalPlan)
   * If `numPartitions` is not specified, the number of partitions will be the number set by
   * `spark.sql.shuffle.partitions`.
   */
-case class RepartitionByExpression(partitionExpressions: Seq[Expression],
-                                   child: LogicalPlan,
-                                   numPartitions: Option[Int] = None)
+case class RepartitionByExpression(
+    partitionExpressions: Seq[Expression],
+    child: LogicalPlan,
+    numPartitions: Option[Int] = None)
     extends RedistributeData {
   numPartitions match {
     case Some(n) => require(n > 0, "numPartitions must be greater than 0.")
-    case None => // Ok
+    case None    => // Ok
   }
 }

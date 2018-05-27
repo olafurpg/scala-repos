@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -40,7 +40,7 @@ class SliceSpec extends Specification with ArbitrarySlice with ScalaCheck {
     new Ordering[List[A]] {
       def compare(a: List[A], b: List[A]): Int =
         (a zip b) map ((ord0.compare _).tupled) find (_ != 0) getOrElse
-        (a.length - b.length)
+          (a.length - b.length)
     }
 
   def extractCValues(colGroups: List[List[Column]], row: Int): List[CValue] = {
@@ -59,8 +59,9 @@ class SliceSpec extends Specification with ArbitrarySlice with ScalaCheck {
       cpaths: VectorCase[CPath]): List[(List[CValue], List[CValue])] = {
     val byCPath = columnsByCPath(slice)
     (0 until slice.size).map({ row =>
-      (extractCValues(cpaths.map(byCPath).toList, row),
-       extractCValues(byCPath.values.toList, row))
+      (
+        extractCValues(cpaths.map(byCPath).toList, row),
+        extractCValues(byCPath.values.toList, row))
     })(collection.breakOut)
   }
 
@@ -134,14 +135,14 @@ class SliceSpec extends Specification with ArbitrarySlice with ScalaCheck {
   //}
 
   private def concatProjDesc = Seq(
-      ColumnRef(CPath("0"), CLong),
-      ColumnRef(CPath("1"), CBoolean),
-      ColumnRef(CPath("2"), CString),
-      ColumnRef(CPath("3"), CDouble),
-      ColumnRef(CPath("4"), CNum),
-      ColumnRef(CPath("5"), CEmptyObject),
-      ColumnRef(CPath("6"), CEmptyArray),
-      ColumnRef(CPath("7"), CNum)
+    ColumnRef(CPath("0"), CLong),
+    ColumnRef(CPath("1"), CBoolean),
+    ColumnRef(CPath("2"), CString),
+    ColumnRef(CPath("3"), CDouble),
+    ColumnRef(CPath("4"), CNum),
+    ColumnRef(CPath("5"), CEmptyObject),
+    ColumnRef(CPath("6"), CEmptyArray),
+    ColumnRef(CPath("7"), CNum)
   )
 
   "concat" should {
@@ -175,7 +176,7 @@ class SliceSpec extends Specification with ArbitrarySlice with ScalaCheck {
         val slices =
           fullSlices collect {
             case slice if Random.nextBoolean => slice
-            case _ => emptySlice
+            case _                           => emptySlice
           }
         val slice = Slice.concat(slices)
         toCValues(slice) must_== fakeConcat(slices)

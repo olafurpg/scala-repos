@@ -25,51 +25,53 @@ object ClusterShardingSettings {
     */
   def apply(config: Config): ClusterShardingSettings = {
     val tuningParameters = new TuningParameters(
-        coordinatorFailureBackoff = config
-            .getDuration("coordinator-failure-backoff", MILLISECONDS)
-            .millis,
-        retryInterval = config
-            .getDuration("retry-interval", MILLISECONDS)
-            .millis,
-        bufferSize = config.getInt("buffer-size"),
-        handOffTimeout = config
-            .getDuration("handoff-timeout", MILLISECONDS)
-            .millis,
-        shardStartTimeout = config
-            .getDuration("shard-start-timeout", MILLISECONDS)
-            .millis,
-        shardFailureBackoff = config
-            .getDuration("shard-failure-backoff", MILLISECONDS)
-            .millis,
-        entityRestartBackoff = config
-            .getDuration("entity-restart-backoff", MILLISECONDS)
-            .millis,
-        rebalanceInterval = config
-            .getDuration("rebalance-interval", MILLISECONDS)
-            .millis,
-        snapshotAfter = config.getInt("snapshot-after"),
-        leastShardAllocationRebalanceThreshold = config.getInt(
-              "least-shard-allocation-strategy.rebalance-threshold"),
-        leastShardAllocationMaxSimultaneousRebalance = config.getInt(
-              "least-shard-allocation-strategy.max-simultaneous-rebalance"),
-        waitingForStateTimeout = config
-            .getDuration("waiting-for-state-timeout", MILLISECONDS)
-            .millis,
-        updatingStateTimeout = config
-            .getDuration("updating-state-timeout", MILLISECONDS)
-            .millis)
+      coordinatorFailureBackoff = config
+        .getDuration("coordinator-failure-backoff", MILLISECONDS)
+        .millis,
+      retryInterval = config
+        .getDuration("retry-interval", MILLISECONDS)
+        .millis,
+      bufferSize = config.getInt("buffer-size"),
+      handOffTimeout = config
+        .getDuration("handoff-timeout", MILLISECONDS)
+        .millis,
+      shardStartTimeout = config
+        .getDuration("shard-start-timeout", MILLISECONDS)
+        .millis,
+      shardFailureBackoff = config
+        .getDuration("shard-failure-backoff", MILLISECONDS)
+        .millis,
+      entityRestartBackoff = config
+        .getDuration("entity-restart-backoff", MILLISECONDS)
+        .millis,
+      rebalanceInterval = config
+        .getDuration("rebalance-interval", MILLISECONDS)
+        .millis,
+      snapshotAfter = config.getInt("snapshot-after"),
+      leastShardAllocationRebalanceThreshold =
+        config.getInt("least-shard-allocation-strategy.rebalance-threshold"),
+      leastShardAllocationMaxSimultaneousRebalance = config.getInt(
+        "least-shard-allocation-strategy.max-simultaneous-rebalance"),
+      waitingForStateTimeout = config
+        .getDuration("waiting-for-state-timeout", MILLISECONDS)
+        .millis,
+      updatingStateTimeout = config
+        .getDuration("updating-state-timeout", MILLISECONDS)
+        .millis
+    )
 
     val coordinatorSingletonSettings = ClusterSingletonManagerSettings(
-        config.getConfig("coordinator-singleton"))
+      config.getConfig("coordinator-singleton"))
 
     new ClusterShardingSettings(
-        role = roleOption(config.getString("role")),
-        rememberEntities = config.getBoolean("remember-entities"),
-        journalPluginId = config.getString("journal-plugin-id"),
-        snapshotPluginId = config.getString("snapshot-plugin-id"),
-        stateStoreMode = config.getString("state-store-mode"),
-        tuningParameters,
-        coordinatorSingletonSettings)
+      role = roleOption(config.getString("role")),
+      rememberEntities = config.getBoolean("remember-entities"),
+      journalPluginId = config.getString("journal-plugin-id"),
+      snapshotPluginId = config.getString("snapshot-plugin-id"),
+      stateStoreMode = config.getString("state-store-mode"),
+      tuningParameters,
+      coordinatorSingletonSettings
+    )
   }
 
   /**
@@ -90,19 +92,20 @@ object ClusterShardingSettings {
   private[akka] def roleOption(role: String): Option[String] =
     if (role == "") None else Option(role)
 
-  class TuningParameters(val coordinatorFailureBackoff: FiniteDuration,
-                         val retryInterval: FiniteDuration,
-                         val bufferSize: Int,
-                         val handOffTimeout: FiniteDuration,
-                         val shardStartTimeout: FiniteDuration,
-                         val shardFailureBackoff: FiniteDuration,
-                         val entityRestartBackoff: FiniteDuration,
-                         val rebalanceInterval: FiniteDuration,
-                         val snapshotAfter: Int,
-                         val leastShardAllocationRebalanceThreshold: Int,
-                         val leastShardAllocationMaxSimultaneousRebalance: Int,
-                         val waitingForStateTimeout: FiniteDuration,
-                         val updatingStateTimeout: FiniteDuration)
+  class TuningParameters(
+      val coordinatorFailureBackoff: FiniteDuration,
+      val retryInterval: FiniteDuration,
+      val bufferSize: Int,
+      val handOffTimeout: FiniteDuration,
+      val shardStartTimeout: FiniteDuration,
+      val shardFailureBackoff: FiniteDuration,
+      val entityRestartBackoff: FiniteDuration,
+      val rebalanceInterval: FiniteDuration,
+      val snapshotAfter: Int,
+      val leastShardAllocationRebalanceThreshold: Int,
+      val leastShardAllocationMaxSimultaneousRebalance: Int,
+      val waitingForStateTimeout: FiniteDuration,
+      val updatingStateTimeout: FiniteDuration)
 }
 
 /**
@@ -131,8 +134,8 @@ final class ClusterShardingSettings(
     extends NoSerializationVerificationNeeded {
 
   require(
-      stateStoreMode == "persistence" || stateStoreMode == "ddata",
-      s"Unknown 'state-store-mode' [$stateStoreMode], valid values are 'persistence' or 'ddata'")
+    stateStoreMode == "persistence" || stateStoreMode == "ddata",
+    s"Unknown 'state-store-mode' [$stateStoreMode], valid values are 'persistence' or 'ddata'")
 
   def withRole(role: String): ClusterShardingSettings =
     copy(role = ClusterShardingSettings.roleOption(role))
@@ -140,8 +143,7 @@ final class ClusterShardingSettings(
   def withRole(role: Option[String]): ClusterShardingSettings =
     copy(role = role)
 
-  def withRememberEntities(
-      rememberEntities: Boolean): ClusterShardingSettings =
+  def withRememberEntities(rememberEntities: Boolean): ClusterShardingSettings =
     copy(rememberEntities = rememberEntities)
 
   def withJournalPluginId(journalPluginId: String): ClusterShardingSettings =
@@ -170,14 +172,16 @@ final class ClusterShardingSettings(
       journalPluginId: String = journalPluginId,
       snapshotPluginId: String = snapshotPluginId,
       stateStoreMode: String = stateStoreMode,
-      tuningParameters: ClusterShardingSettings.TuningParameters = tuningParameters,
-      coordinatorSingletonSettings: ClusterSingletonManagerSettings = coordinatorSingletonSettings)
-    : ClusterShardingSettings =
-    new ClusterShardingSettings(role,
-                                rememberEntities,
-                                journalPluginId,
-                                snapshotPluginId,
-                                stateStoreMode,
-                                tuningParameters,
-                                coordinatorSingletonSettings)
+      tuningParameters: ClusterShardingSettings.TuningParameters =
+        tuningParameters,
+      coordinatorSingletonSettings: ClusterSingletonManagerSettings =
+        coordinatorSingletonSettings): ClusterShardingSettings =
+    new ClusterShardingSettings(
+      role,
+      rememberEntities,
+      journalPluginId,
+      snapshotPluginId,
+      stateStoreMode,
+      tuningParameters,
+      coordinatorSingletonSettings)
 }

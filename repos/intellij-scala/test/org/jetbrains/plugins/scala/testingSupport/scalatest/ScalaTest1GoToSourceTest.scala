@@ -11,9 +11,10 @@ trait ScalaTest1GoToSourceTest extends ScalaTestGoToSourceTest {
     List("[root]", "pending test should be pending")
   //for ignored test, we launch the whole suite
   def getIgnoredTestPath: List[String] =
-    List("[root]",
-         "IgnoredGoToLocationTest",
-         "pending test should be ignored !!! IGNORED !!!")
+    List(
+      "[root]",
+      "IgnoredGoToLocationTest",
+      "pending test should be ignored !!! IGNORED !!!")
   def getFailedTestPath: List[String] =
     List("[root]", "failed test should fail")
 

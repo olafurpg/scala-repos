@@ -8,7 +8,10 @@ import mesosphere.marathon.state.Timestamp
 import org.scalatest.{GivenWhenThen, Matchers}
 
 class TaskLifeTimeTest
-    extends MarathonSpec with Mockito with GivenWhenThen with Matchers {
+    extends MarathonSpec
+    with Mockito
+    with GivenWhenThen
+    with Matchers {
   private[this] val now: Timestamp = ConstantClock().now()
   private[this] var taskIdCounter = 0
   private[this] def newTaskId(): String = {
@@ -21,9 +24,10 @@ class TaskLifeTimeTest
   }
 
   private[this] def runningTaskWithLifeTime(lifeTimeSeconds: Double): Task = {
-    MarathonTestHelper.runningTask(newTaskId(),
-                                   startedAt = (now.toDateTime.getMillis -
-                                         lifeTimeSeconds * 1000.0).round)
+    MarathonTestHelper.runningTask(
+      newTaskId(),
+      startedAt = (now.toDateTime.getMillis -
+        lifeTimeSeconds * 1000.0).round)
   }
 
   test("life time for no tasks") {
@@ -50,12 +54,12 @@ class TaskLifeTimeTest
     val lifeTimes = TaskLifeTime.forSomeTasks(now, tasks)
     Then("we get the correct stats")
     lifeTimes should be(
-        Some(
-            TaskLifeTime(
-                averageSeconds = 5.0,
-                medianSeconds = 4.0
-            )
+      Some(
+        TaskLifeTime(
+          averageSeconds = 5.0,
+          medianSeconds = 4.0
         )
+      )
     )
   }
 
@@ -67,12 +71,12 @@ class TaskLifeTimeTest
     val lifeTimes = TaskLifeTime.forSomeTasks(now, tasks)
     Then("we get the correct stats")
     lifeTimes should be(
-        Some(
-            TaskLifeTime(
-                averageSeconds = 5.0,
-                medianSeconds = 4.0
-            )
+      Some(
+        TaskLifeTime(
+          averageSeconds = 5.0,
+          medianSeconds = 4.0
         )
+      )
     )
   }
 }

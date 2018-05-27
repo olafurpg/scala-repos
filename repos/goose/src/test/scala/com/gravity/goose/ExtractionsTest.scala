@@ -18,7 +18,8 @@ class ExtractionsTest {
 
   def getHtml(filename: String): String = {
     FileHelper.loadResourceFile(
-        TestUtils.staticHtmlDir + filename, Goose.getClass)
+      TestUtils.staticHtmlDir + filename,
+      Goose.getClass)
   }
 
   @Test
@@ -31,7 +32,9 @@ class ExtractionsTest {
     val title = "Democrats to use Social Security against GOP this fall"
     val content = "Washington (CNN) -- Democrats pledged "
     TestUtils.runArticleAssertions(
-        article = article, expectedTitle = title, expectedStart = content)
+      article = article,
+      expectedTitle = title,
+      expectedStart = content)
   }
 
   @Test
@@ -42,9 +45,10 @@ class ExtractionsTest {
       "http://www.businessweek.com/technology/here-comes-apples-real-tv-09132011.html"
     val article = TestUtils.getArticle(url, html)
     TestUtils.runArticleAssertions(
-        article = article,
-        expectedStart = "At Home Depot, we first realized we needed to have a real conversation with",
-        expectedImage = null)
+      article = article,
+      expectedStart =
+        "At Home Depot, we first realized we needed to have a real conversation with",
+      expectedImage = null)
     TestUtils.printReport()
   }
 
@@ -56,9 +60,10 @@ class ExtractionsTest {
       "http://www.businessweek.com/management/five-social-media-lessons-for-business-09202011.html"
     val article = TestUtils.getArticle(url, html)
     TestUtils.runArticleAssertions(
-        article = article,
-        expectedStart = "Get ready, America, because by Christmas 2012 you will have an Apple TV in your living room",
-        expectedImage = null)
+      article = article,
+      expectedStart =
+        "Get ready, America, because by Christmas 2012 you will have an Apple TV in your living room",
+      expectedImage = null)
     TestUtils.printReport()
   }
 
@@ -73,7 +78,9 @@ class ExtractionsTest {
     val title = "2005 Zuckerberg Didn’t Want To Take Over The World"
     val article = TestUtils.getArticle(url = url, rawHTML = html)
     TestUtils.runArticleAssertions(
-        article = article, expectedTitle = title, expectedStart = content)
+      article = article,
+      expectedTitle = title,
+      expectedStart = content)
   }
 
   @Test
@@ -87,7 +94,9 @@ class ExtractionsTest {
       "Six years ago, Olivia Munn arrived in Hollywood with fading ambitions of making it as a sports reporter and set about deploying"
     val article = TestUtils.getArticle(url = url, rawHTML = html)
     TestUtils.runArticleAssertions(
-        article = article, expectedTitle = title, expectedStart = content)
+      article = article,
+      expectedTitle = title,
+      expectedStart = content)
   }
 
   @Test
@@ -142,10 +151,11 @@ class ExtractionsTest {
     val description =
       "A top regional Federal Reserve official sharply criticized Friday the Fed's ongoing policy of keeping interest rates near zero -- and at record lows -- as a \"dangerous gamble.\""
     val article = TestUtils.getArticle(url = url, rawHTML = html)
-    TestUtils.runArticleAssertions(article = article,
-                                   expectedTitle = title,
-                                   expectedStart = content,
-                                   expectedDescription = description)
+    TestUtils.runArticleAssertions(
+      article = article,
+      expectedTitle = title,
+      expectedStart = content,
+      expectedDescription = description)
 
     val expectedTags =
       "Federal Open Market Committee" :: "Federal Reserve" :: "Federal Reserve Bank Of Kansas City" :: "Financial Crisis" :: "Financial Reform" :: "Financial Regulation" :: "Financial Regulatory Reform" :: "Fomc" :: "Great Recession" :: "Interest Rates" :: "Kansas City Fed" :: "Monetary Policy" :: "The Financial Fix" :: "Thomas Hoenig" :: "Too Big To Fail" :: "Wall Street Reform" :: "Business News" :: Nil
@@ -153,8 +163,9 @@ class ExtractionsTest {
     assertTrue("Tags should not be empty!", article.tags.size > 0)
 
     for (actualTag <- article.tags) {
-      assertTrue("Each Tag should be contained in the expected set!",
-                 expectedTags.contains(actualTag))
+      assertTrue(
+        "Each Tag should be contained in the expected set!",
+        expectedTags.contains(actualTag))
     }
   }
 
@@ -209,17 +220,18 @@ class ExtractionsTest {
     val article = TestUtils.getArticle(url, rawHTML = html)
 
     TestUtils.runArticleAssertions(
-        article,
-        "Stress Hormones Could Predict Boxing Dominance",
-        "On November 25, 1980, professional boxing");
+      article,
+      "Stress Hormones Could Predict Boxing Dominance",
+      "On November 25, 1980, professional boxing");
 
     val expectedDateString = "2010-08-18";
     assertNotNull("publishDate should not be null!", article.publishDate);
-    assertEquals("Publish date should equal: \"2010-08-18\"",
-                 expectedDateString,
-                 fmt.format(article.publishDate));
+    assertEquals(
+      "Publish date should equal: \"2010-08-18\"",
+      expectedDateString,
+      fmt.format(article.publishDate));
     System.out.println(
-        "Publish Date Extracted: " + fmt.format(article.publishDate));
+      "Publish Date Extracted: " + fmt.format(article.publishDate));
   }
 
   @Test
@@ -230,8 +242,9 @@ class ExtractionsTest {
       "http://sports.espn.go.com/espn/commentary/news/story?id=5461430"
     val article = TestUtils.getArticle(url, html)
     TestUtils.runArticleAssertions(
-        article = article,
-        expectedStart = "If you believe what college football coaches have said about sports")
+      article = article,
+      expectedStart =
+        "If you believe what college football coaches have said about sports")
   }
 
   @Test
@@ -242,8 +255,8 @@ class ExtractionsTest {
       "http://www.engadget.com/2010/08/18/verizon-fios-set-top-boxes-getting-a-new-hd-guide-external-stor/"
     val article = TestUtils.getArticle(url, html)
     TestUtils.runArticleAssertions(
-        article = article,
-        expectedStart = "Streaming and downloading TV content to mobiles is nice")
+      article = article,
+      expectedStart = "Streaming and downloading TV content to mobiles is nice")
   }
 
   @Test
@@ -269,9 +282,10 @@ class ExtractionsTest {
 
     assertNotNull("publishDate should not be null!", article.publishDate)
     val expDate = new java.util.Date(1321657238000L) // "2011-11-18T23:00:38Z"
-    assertEquals(s"""Publish date should equal: "$expDate"""",
-                 expDate,
-                 article.publishDate)
+    assertEquals(
+      s"""Publish date should equal: "$expDate"""",
+      expDate,
+      article.publishDate)
     System.out.println("Publish Date Extracted: " + article.publishDate)
   }
 
@@ -283,9 +297,11 @@ class ExtractionsTest {
       "http://www.time.com/time/health/article/0,8599,2011497,00.html"
     val article = TestUtils.getArticle(url, html)
     TestUtils.runArticleAssertions(
-        article = article,
-        expectedStart = "This month, the federal government released",
-        expectedTitle = "Invisible Oil from BP Spill May Threaten Gulf Aquatic Life")
+      article = article,
+      expectedStart = "This month, the federal government released",
+      expectedTitle =
+        "Invisible Oil from BP Spill May Threaten Gulf Aquatic Life"
+    )
   }
 
   @Test
@@ -296,8 +312,9 @@ class ExtractionsTest {
       "http://newsfeed.time.com/2011/08/24/washington-monument-closes-to-repair-earthquake-induced-crack/"
     val article = TestUtils.getArticle(url, html)
     TestUtils.runArticleAssertions(
-        article = article,
-        expectedStart = "Despite what the jeers of jaded Californians might suggest")
+      article = article,
+      expectedStart =
+        "Despite what the jeers of jaded Californians might suggest")
   }
 
   @Test
@@ -308,8 +325,8 @@ class ExtractionsTest {
       "http://news.cnet.com/8301-30686_3-20014053-266.html?tag=topStories1"
     val article = TestUtils.getArticle(url, html)
     TestUtils.runArticleAssertions(
-        article = article,
-        expectedStart = "NEW YORK--Verizon Communications is prepping a new")
+      article = article,
+      expectedStart = "NEW YORK--Verizon Communications is prepping a new")
   }
 
   @Test
@@ -320,8 +337,9 @@ class ExtractionsTest {
       "http://news.yahoo.com/apple-says-steve-jobs-resigning-ceo-224628633.html"
     val article = TestUtils.getArticle(url, html)
     TestUtils.runArticleAssertions(
-        article = article,
-        expectedStart = "SAN FRANCISCO (AP) — Steve Jobs, the mind behind the iPhone")
+      article = article,
+      expectedStart =
+        "SAN FRANCISCO (AP) — Steve Jobs, the mind behind the iPhone")
   }
 
   @Test
@@ -331,8 +349,8 @@ class ExtractionsTest {
     val url: String = "http://www.politico.com/news/stories/1010/43352.html"
     val article = TestUtils.getArticle(url, html)
     TestUtils.runArticleAssertions(
-        article = article,
-        expectedStart = "If the newest Census Bureau estimates stay close to form")
+      article = article,
+      expectedStart = "If the newest Census Bureau estimates stay close to form")
   }
 
   @Test
@@ -343,8 +361,8 @@ class ExtractionsTest {
     val html = getHtml("businessinsider1.txt")
     val article = TestUtils.getArticle(url, html)
     TestUtils.runArticleAssertions(
-        article = article,
-        expectedStart = "As everyone in the world was transfixed on the Fed")
+      article = article,
+      expectedStart = "As everyone in the world was transfixed on the Fed")
 
     println(article.cleanedArticleText)
   }
@@ -358,8 +376,8 @@ class ExtractionsTest {
     val article = TestUtils.getArticle(url, html)
 
     TestUtils.runArticleAssertions(
-        article = article,
-        expectedStart = "From Goldman on the FOMC operation twist announcement")
+      article = article,
+      expectedStart = "From Goldman on the FOMC operation twist announcement")
   }
 
   @Test
@@ -369,8 +387,9 @@ class ExtractionsTest {
     val html = getHtml("cnbc1.txt")
     val article = TestUtils.getArticle(url, html)
     TestUtils.runArticleAssertions(
-        article = article,
-        expectedStart = "Some traders found Wednesday's Fed statement to be a bit gloomier than expected.")
+      article = article,
+      expectedStart =
+        "Some traders found Wednesday's Fed statement to be a bit gloomier than expected.")
   }
 
   /*
@@ -385,9 +404,10 @@ class ExtractionsTest {
     val expected = getHtml("issue_24_result.txt")
     val url: String = "http://danielspicar.github.com/goose-bug.html"
     val article = TestUtils.getArticle(url, html)
-    assertEquals("The beginning of the article text was not as expected!",
-                 expected,
-                 article.cleanedArticleText)
+    assertEquals(
+      "The beginning of the article text was not as expected!",
+      expected,
+      article.cleanedArticleText)
   }
 
   @Test
@@ -398,8 +418,10 @@ class ExtractionsTest {
       "http://www.accountancyage.com/aa/analysis/2111729/institutes-ifrs-bang"
     val article = TestUtils.getArticle(url, html)
     TestUtils.runArticleAssertions(
-        article = article,
-        expectedStart = "UK INSTITUTES have thrown their weight behind rapid adoption of international financial reporting standards in the US.")
+      article = article,
+      expectedStart =
+        "UK INSTITUTES have thrown their weight behind rapid adoption of international financial reporting standards in the US."
+    )
   }
 
   @Test
@@ -410,9 +432,10 @@ class ExtractionsTest {
       "http://www.telegraph.co.uk/foodanddrink/foodanddrinknews/8808120/Worlds-hottest-chilli-contest-leaves-two-in-hospital.html"
     val article = TestUtils.getArticle(url, html)
     TestUtils.runArticleAssertions(
-        article = article,
-        expectedStart = "Emergency services were called to Kismot Restaurant's curry-eating challenge,",
-        expectedImage = null)
+      article = article,
+      expectedStart =
+        "Emergency services were called to Kismot Restaurant's curry-eating challenge,",
+      expectedImage = null)
   }
 
   @Test
@@ -424,8 +447,8 @@ class ExtractionsTest {
       "http://www.tulsaworld.com/site/articlepath.aspx?articleid=20111118_61_A16_Opposi344152&rss_lnk=7"
     val article = TestUtils.getArticle(url, html)
     TestUtils.runArticleAssertions(
-        article = article,
-        expectedStart = "Opposition to a proposal to remove certain personal data",
-        expectedImage = null)
+      article = article,
+      expectedStart = "Opposition to a proposal to remove certain personal data",
+      expectedImage = null)
   }
 }

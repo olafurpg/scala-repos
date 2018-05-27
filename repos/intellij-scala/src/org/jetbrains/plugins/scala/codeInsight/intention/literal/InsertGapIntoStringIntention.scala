@@ -19,16 +19,22 @@ class InsertGapIntoStringIntention extends PsiElementBaseIntentionAction {
   override def getText: String = "Insert gap with concatenation: (\" +  + \")"
 
   def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean =
+      project: Project,
+      editor: Editor,
+      element: PsiElement): Boolean =
     element != null && element.getNode != null &&
-    Set(tSTRING, tMULTILINE_STRING).contains(element.getNode.getElementType)
+      Set(tSTRING, tMULTILINE_STRING).contains(element.getNode.getElementType)
 
   override def invoke(project: Project, editor: Editor, element: PsiElement) {
     def insertString(str: String, caretMove: Int) {
       extensions.inWriteAction {
         editor.getDocument.insertString(editor.getCaretModel.getOffset, str)
         editor.getCaretModel.moveCaretRelatively(
-            caretMove, 0, false, false, false)
+          caretMove,
+          0,
+          false,
+          false,
+          false)
       }
     }
 

@@ -6,7 +6,10 @@ import com.intellij.openapi.editor.RangeMarker
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.{Ref, TextRange}
 import com.intellij.psi.{PsiDocumentManager, PsiElement, PsiFile}
-import com.intellij.refactoring.changeSignature.{ChangeInfo, ChangeSignatureUsageProcessor}
+import com.intellij.refactoring.changeSignature.{
+  ChangeInfo,
+  ChangeSignatureUsageProcessor
+}
 import com.intellij.refactoring.rename.ResolveSnapshotProvider
 import com.intellij.refactoring.rename.ResolveSnapshotProvider.ResolveSnapshot
 import com.intellij.usageView.UsageInfo
@@ -37,10 +40,11 @@ class ScalaIntroduceParameterUsageProcessor
     case _ => Array.empty
   }
 
-  override def processUsage(changeInfo: ChangeInfo,
-                            usageInfo: UsageInfo,
-                            beforeMethodChange: Boolean,
-                            usages: Array[UsageInfo]): Boolean = {
+  override def processUsage(
+      changeInfo: ChangeInfo,
+      usageInfo: UsageInfo,
+      beforeMethodChange: Boolean,
+      usages: Array[UsageInfo]): Boolean = {
     if (!beforeMethodChange) return false
 
     changeInfo match {
@@ -57,12 +61,12 @@ class ScalaIntroduceParameterUsageProcessor
 
         val manager = PsiDocumentManager.getInstance(file.getProject)
         manager.doPostponedOperationsAndUnblockDocument(
-            manager.getDocument(file))
+          manager.getDocument(file))
 
         ScalaRefactoringUtil.replaceOccurences(
-            textRangeUsages.map(usage => TextRange.create(usage.range)),
-            text,
-            file)
+          textRangeUsages.map(usage => TextRange.create(usage.range)),
+          text,
+          file)
         textRangeUsages.foreach(_.processed = true)
         true
       case _ => false
@@ -72,7 +76,8 @@ class ScalaIntroduceParameterUsageProcessor
   override def processPrimaryMethod(changeInfo: ChangeInfo): Boolean = false
 
   override def shouldPreviewUsages(
-      changeInfo: ChangeInfo, usages: Array[UsageInfo]): Boolean = false
+      changeInfo: ChangeInfo,
+      usages: Array[UsageInfo]): Boolean = false
 
   override def findConflicts(
       info: ChangeInfo,
@@ -85,9 +90,10 @@ class ScalaIntroduceParameterUsageProcessor
       usages: Array[UsageInfo],
       changeInfo: ChangeInfo): Unit = {}
 
-  override def setupDefaultValues(changeInfo: ChangeInfo,
-                                  refUsages: Ref[Array[UsageInfo]],
-                                  project: Project): Boolean = true
+  override def setupDefaultValues(
+      changeInfo: ChangeInfo,
+      refUsages: Ref[Array[UsageInfo]],
+      project: Project): Boolean = true
 }
 
 private case class TextRangeUsageInfo(file: PsiFile, range: RangeMarker)

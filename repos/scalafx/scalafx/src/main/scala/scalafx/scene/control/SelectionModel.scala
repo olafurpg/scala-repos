@@ -39,8 +39,7 @@ object SelectionModel {
     if (v != null) v.delegate else null
 }
 
-abstract class SelectionModel[T](
-    override val delegate: jfxsc.SelectionModel[T])
+abstract class SelectionModel[T](override val delegate: jfxsc.SelectionModel[T])
     extends SFXDelegate[jfxsc.SelectionModel[T]] {
 
   /**

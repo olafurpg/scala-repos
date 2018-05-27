@@ -47,13 +47,17 @@ object ExtCoreArtifactsSpec extends Specification {
 
   "ExtCoreArtifacts.showAndFocus" should {
     "return the correct javascript expression" in {
-      ExtCoreArtifacts.showAndFocus("id").toJsCmd must_== """Ext.fly("id").show().focus(200)"""
+      ExtCoreArtifacts
+        .showAndFocus("id")
+        .toJsCmd must_== """Ext.fly("id").show().focus(200)"""
     }
   }
 
   "ExtCoreArtifacts.serialize" should {
     "return the correct javascript expression" in {
-      ExtCoreArtifacts.serialize("id").toJsCmd must_== """Ext.Ajax.serializeForm("id")"""
+      ExtCoreArtifacts
+        .serialize("id")
+        .toJsCmd must_== """Ext.Ajax.serializeForm("id")"""
     }
   }
 }

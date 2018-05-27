@@ -17,17 +17,19 @@ final class Env(config: Config, db: lila.db.Env) {
 
   val AnimationDuration = config duration "animation.duration"
 
-  lazy val api = new OpeningApi(openingColl = openingColl,
-                                attemptColl = attemptColl,
-                                nameColl = nameColl,
-                                apiToken = ApiToken)
+  lazy val api = new OpeningApi(
+    openingColl = openingColl,
+    attemptColl = attemptColl,
+    nameColl = nameColl,
+    apiToken = ApiToken)
 
   lazy val selector = new Selector(
-      openingColl = openingColl,
-      api = api,
-      toleranceStep = config getInt "selector.tolerance.step",
-      toleranceMax = config getInt "selector.tolerance.max",
-      modulo = config getInt "selector.modulo")
+    openingColl = openingColl,
+    api = api,
+    toleranceStep = config getInt "selector.tolerance.step",
+    toleranceMax = config getInt "selector.tolerance.max",
+    modulo = config getInt "selector.modulo"
+  )
 
   lazy val finisher = new Finisher(api = api, openingColl = openingColl)
 
@@ -41,6 +43,7 @@ final class Env(config: Config, db: lila.db.Env) {
 object Env {
 
   lazy val current: Env =
-    "opening" boot new Env(config = lila.common.PlayApp loadConfig "opening",
-                           db = lila.db.Env.current)
+    "opening" boot new Env(
+      config = lila.common.PlayApp loadConfig "opening",
+      db = lila.db.Env.current)
 }

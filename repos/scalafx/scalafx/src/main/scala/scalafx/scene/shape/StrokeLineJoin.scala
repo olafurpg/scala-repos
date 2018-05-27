@@ -37,17 +37,20 @@ object StrokeLineJoin
 
   val Miter = new StrokeLineJoin(jfxss.StrokeLineJoin.MITER)
   @deprecated(
-      "Use Miter; MITER will be removed in a future release", "8.0.60-R10")
+    "Use Miter; MITER will be removed in a future release",
+    "8.0.60-R10")
   val MITER = Miter
 
   val Bevel = new StrokeLineJoin(jfxss.StrokeLineJoin.BEVEL)
   @deprecated(
-      "Use Bevel; BEVEL will be removed in a future release", "8.0.60-R10")
+    "Use Bevel; BEVEL will be removed in a future release",
+    "8.0.60-R10")
   val BEVEL = Bevel
 
   val Round = new StrokeLineJoin(jfxss.StrokeLineJoin.ROUND)
   @deprecated(
-      "Use Round; ROUND will be removed in a future release", "8.0.60-R10")
+    "Use Round; ROUND will be removed in a future release",
+    "8.0.60-R10")
   val ROUND = Round
 
   protected override def unsortedValues: Array[StrokeLineJoin] =

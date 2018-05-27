@@ -75,7 +75,7 @@ class Random(seed_in: Long) extends AnyRef with java.io.Serializable {
   def nextDouble(): Double = {
     // ((next(26).toLong << 27) + next(27)) / (1L << 53).toDouble
     ((next(26).toDouble * (1L << 27).toDouble) + next(27).toDouble) /
-    (1L << 53).toDouble
+      (1L << 53).toDouble
   }
 
   def nextBoolean(): Boolean = next(1) != 0

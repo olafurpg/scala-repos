@@ -16,7 +16,9 @@ limitations under the License.
 
 package com.twitter.summingbird.batch.store
 
-import com.twitter.scalding.commons.datastores.{VersionedStore => BacktypeVersionedStore}
+import com.twitter.scalding.commons.datastores.{
+  VersionedStore => BacktypeVersionedStore
+}
 import com.twitter.bijection.json.{JsonInjection, JsonNodeInjection}
 import java.io.{DataOutputStream, DataInputStream}
 import java.net.URI
@@ -61,13 +63,14 @@ private[summingbird] object HDFSMetadata {
     new HDFSMetadata(conf, rootPath)
 
   /** Get from the most recent version */
-  def get[T : JsonNodeInjection](
-      conf: Configuration, path: String): Option[T] =
+  def get[T: JsonNodeInjection](conf: Configuration, path: String): Option[T] =
     apply(conf, path).mostRecentVersion.flatMap { _.get[T].toOption }
 
   /** Put to the most recent version */
-  def put[T : JsonNodeInjection](
-      conf: Configuration, path: String, obj: Option[T]) =
+  def put[T: JsonNodeInjection](
+      conf: Configuration,
+      path: String,
+      obj: Option[T]) =
     apply(conf, path).mostRecentVersion.get.put(obj)
 }
 
@@ -99,12 +102,12 @@ class HDFSMetadata(conf: Configuration, rootPath: String) {
   def newVersion: Long = versionedStore.newVersion
 
   /** Find the newest version that satisfies a predicate */
-  def find[T : JsonNodeInjection](
+  def find[T: JsonNodeInjection](
       fn: (T) => Boolean): Option[(T, HDFSVersionMetadata)] =
     select(fn).headOption
 
   /** select all versions that satisfy a predicate */
-  def select[T : JsonNodeInjection](
+  def select[T: JsonNodeInjection](
       fn: (T) => Boolean): Iterable[(T, HDFSVersionMetadata)] =
     for {
       v <- versions
@@ -134,8 +137,10 @@ class HDFSMetadata(conf: Configuration, rootPath: String) {
 /**
   * Refers to a specific version on disk. Allows reading and writing metadata to specific locations
   */
-private[summingbird] class HDFSVersionMetadata private[store](
-    val version: Long, conf: Configuration, val path: Path) {
+private[summingbird] class HDFSVersionMetadata private[store] (
+    val version: Long,
+    conf: Configuration,
+    val path: Path) {
   private def getFS = path.getFileSystem(conf)
   private def getString: Try[String] =
     Try {
@@ -148,7 +153,7 @@ private[summingbird] class HDFSVersionMetadata private[store](
   /**
     * get an item from the metadata file. If there is any failure, you get None.
     */
-  def get[T : JsonNodeInjection]: Try[T] =
+  def get[T: JsonNodeInjection]: Try[T] =
     getString.flatMap { JsonInjection.fromString[T](_) }
 
   private def putString(str: String) {
@@ -158,7 +163,7 @@ private[summingbird] class HDFSVersionMetadata private[store](
   }
 
   /** Put a new meta-data file, or overwrite on HDFS */
-  def put[T : JsonNodeInjection](obj: Option[T]) = putString {
+  def put[T: JsonNodeInjection](obj: Option[T]) = putString {
     obj.map { JsonInjection.toString[T].apply(_) }.getOrElse("")
   }
 }

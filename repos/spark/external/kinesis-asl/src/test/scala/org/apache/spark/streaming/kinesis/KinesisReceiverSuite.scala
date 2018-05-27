@@ -37,7 +37,10 @@ import org.apache.spark.util.Utils
   * Suite of Kinesis streaming receiver tests focusing mostly on the KinesisRecordProcessor
   */
 class KinesisReceiverSuite
-    extends TestSuiteBase with Matchers with BeforeAndAfter with MockitoSugar {
+    extends TestSuiteBase
+    with Matchers
+    with BeforeAndAfter
+    with MockitoSugar {
 
   val app = "TestKinesisReceiver"
   val stream = "mySparkStream"
@@ -50,10 +53,10 @@ class KinesisReceiverSuite
 
   val record1 = new Record()
   record1.setData(
-      ByteBuffer.wrap("Spark In Action".getBytes(StandardCharsets.UTF_8)))
+    ByteBuffer.wrap("Spark In Action".getBytes(StandardCharsets.UTF_8)))
   val record2 = new Record()
   record2.setData(
-      ByteBuffer.wrap("Learning Spark".getBytes(StandardCharsets.UTF_8)))
+    ByteBuffer.wrap("Learning Spark".getBytes(StandardCharsets.UTF_8)))
   val batch = Arrays.asList(record1, record2)
 
   var receiverMock: KinesisReceiver[Array[Byte]] = _
@@ -66,7 +69,7 @@ class KinesisReceiverSuite
 
   test("check serializability of SerializableAWSCredentials") {
     Utils.deserialize[SerializableAWSCredentials](
-        Utils.serialize(new SerializableAWSCredentials("x", "y")))
+      Utils.serialize(new SerializableAWSCredentials("x", "y")))
   }
 
   test("process records including store and set checkpointer") {
@@ -88,16 +91,16 @@ class KinesisReceiverSuite
     recordProcessor.processRecords(batch, checkpointerMock)
 
     verify(receiverMock, times(1)).isStopped()
-    verify(receiverMock, never).addRecords(
-        anyString, anyListOf(classOf[Record]))
-    verify(receiverMock, never).setCheckpointer(
-        anyString, meq(checkpointerMock))
+    verify(receiverMock, never)
+      .addRecords(anyString, anyListOf(classOf[Record]))
+    verify(receiverMock, never)
+      .setCheckpointer(anyString, meq(checkpointerMock))
   }
 
   test("shouldn't update checkpointer when exception occurs during store") {
     when(receiverMock.isStopped()).thenReturn(false)
     when(
-        receiverMock.addRecords(anyString, anyListOf(classOf[Record]))
+      receiverMock.addRecords(anyString, anyListOf(classOf[Record]))
     ).thenThrow(new RuntimeException())
 
     intercept[RuntimeException] {
@@ -108,8 +111,8 @@ class KinesisReceiverSuite
 
     verify(receiverMock, times(1)).isStopped()
     verify(receiverMock, times(1)).addRecords(shardId, batch)
-    verify(receiverMock, never).setCheckpointer(
-        anyString, meq(checkpointerMock))
+    verify(receiverMock, never)
+      .setCheckpointer(anyString, meq(checkpointerMock))
   }
 
   test("shutdown should checkpoint if the reason is TERMINATE") {
@@ -125,7 +128,7 @@ class KinesisReceiverSuite
   }
 
   test(
-      "shutdown should not checkpoint if the reason is something other than TERMINATE") {
+    "shutdown should not checkpoint if the reason is something other than TERMINATE") {
     when(receiverMock.getLatestSeqNumToCheckpoint(shardId))
       .thenReturn(someSeqNum)
 
@@ -134,8 +137,8 @@ class KinesisReceiverSuite
     recordProcessor.shutdown(checkpointerMock, ShutdownReason.ZOMBIE)
     recordProcessor.shutdown(checkpointerMock, null)
 
-    verify(receiverMock, times(2)).removeCheckpointer(
-        meq(shardId), meq[IRecordProcessorCheckpointer](null))
+    verify(receiverMock, times(2))
+      .removeCheckpointer(meq(shardId), meq[IRecordProcessorCheckpointer](null))
   }
 
   test("retry success on first attempt") {

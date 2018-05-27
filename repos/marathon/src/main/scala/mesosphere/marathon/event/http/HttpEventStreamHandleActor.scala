@@ -7,17 +7,23 @@ import akka.event.EventStream
 import akka.pattern.pipe
 import mesosphere.marathon.api.v2.json.Formats._
 import mesosphere.marathon.event.http.HttpEventStreamHandleActor.WorkDone
-import mesosphere.marathon.event.{EventStreamAttached, EventStreamDetached, MarathonEvent}
+import mesosphere.marathon.event.{
+  EventStreamAttached,
+  EventStreamDetached,
+  MarathonEvent
+}
 import mesosphere.util.ThreadPoolContext
 import play.api.libs.json.Json
 
 import scala.concurrent.Future
 import scala.util.Try
 
-class HttpEventStreamHandleActor(handle: HttpEventStreamHandle,
-                                 stream: EventStream,
-                                 maxOutStanding: Int)
-    extends Actor with ActorLogging {
+class HttpEventStreamHandleActor(
+    handle: HttpEventStreamHandle,
+    stream: EventStream,
+    maxOutStanding: Int)
+    extends Actor
+    with ActorLogging {
 
   private[http] var outstanding = List.empty[MarathonEvent]
 
@@ -61,8 +67,7 @@ class HttpEventStreamHandleActor(handle: HttpEventStreamHandle,
       context.become(stashEvents)
       val sendFuture = Future {
         toSend.foreach(event =>
-              handle.sendEvent(event.eventType,
-                               Json.stringify(eventToJson(event))))
+          handle.sendEvent(event.eventType, Json.stringify(eventToJson(event))))
         WorkDone
       }(ThreadPoolContext.ioContext)
 
@@ -76,7 +81,7 @@ class HttpEventStreamHandleActor(handle: HttpEventStreamHandle,
   private[this] def handleException(ex: Throwable): Unit = ex match {
     case eof: EOFException =>
       log.info(
-          s"Received EOF from stream handle $handle. Ignore subsequent events.")
+        s"Received EOF from stream handle $handle. Ignore subsequent events.")
       //We know the connection is dead, but it is not finalized from the container.
       //Do not act any longer on any event.
       context.become(Actor.emptyBehavior)

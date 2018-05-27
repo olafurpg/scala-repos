@@ -20,26 +20,25 @@ import scala.reflect.ClassTag
   * `fromIterator` and `fromIterable` provide generalised instances of `PagedSeq`
   *  @since 2.7
   */
-@deprecated("This object will be moved to the scala-parser-combinators module",
-            "2.11.8")
+@deprecated(
+  "This object will be moved to the scala-parser-combinators module",
+  "2.11.8")
 object PagedSeq {
   final val UndeterminedEnd = Int.MaxValue
 
   /** Constructs a paged sequence from an iterator */
-  def fromIterator[T : ClassTag](source: Iterator[T]): PagedSeq[T] =
-    new PagedSeq[T](
-        (data: Array[T], start: Int, len: Int) =>
-          {
-        var i = 0
-        while (i < len && source.hasNext) {
-          data(start + i) = source.next()
-          i += 1
-        }
-        if (i == 0) -1 else i
+  def fromIterator[T: ClassTag](source: Iterator[T]): PagedSeq[T] =
+    new PagedSeq[T]((data: Array[T], start: Int, len: Int) => {
+      var i = 0
+      while (i < len && source.hasNext) {
+        data(start + i) = source.next()
+        i += 1
+      }
+      if (i == 0) -1 else i
     })
 
   /** Constructs a paged sequence from an iterable */
-  def fromIterable[T : ClassTag](source: Iterable[T]): PagedSeq[T] =
+  def fromIterable[T: ClassTag](source: Iterable[T]): PagedSeq[T] =
     fromIterator(source.iterator)
 
   /** Constructs a paged character sequence from a string iterator */
@@ -69,8 +68,7 @@ object PagedSeq {
     */
   def fromLines(source: Iterator[String]): PagedSeq[Char] = {
     var isFirst = true
-    fromStrings(
-        source map { line =>
+    fromStrings(source map { line =>
       if (isFirst) {
         isFirst = false
         line
@@ -127,10 +125,14 @@ import PagedSeq._
   *  @define mayNotTerminateInf
   *  @define willNotTerminateInf
   */
-@deprecated("This class will be moved to the scala-parser-combinators module",
-            "2.11.8")
-class PagedSeq[T : ClassTag] protected (
-    more: (Array[T], Int, Int) => Int, first1: Page[T], start: Int, end: Int)
+@deprecated(
+  "This class will be moved to the scala-parser-combinators module",
+  "2.11.8")
+class PagedSeq[T: ClassTag] protected (
+    more: (Array[T], Int, Int) => Int,
+    first1: Page[T],
+    start: Int,
+    end: Int)
     extends scala.collection.AbstractSeq[T]
     with scala.collection.IndexedSeq[T] {
   def this(more: (Array[T], Int, Int) => Int) =
@@ -145,7 +147,7 @@ class PagedSeq[T : ClassTag] protected (
   private def page(absindex: Int) = {
     if (absindex < current.start) current = first1
     while (absindex >= current.end &&
-    current.next != null) current = current.next
+           current.next != null) current = current.next
     while (absindex >= current.end && !current.isLast) {
       current = addMore()
     }
@@ -212,7 +214,7 @@ class PagedSeq[T : ClassTag] protected (
 
 /** Page containing up to PageSize characters of the input sequence.
   */
-private class Page[T : ClassTag](val num: Int) {
+private class Page[T: ClassTag](val num: Int) {
 
   private final val PageSize = 4096
 

@@ -98,7 +98,8 @@ object VersionVector {
   */
 @SerialVersionUID(1L)
 sealed abstract class VersionVector
-    extends ReplicatedData with ReplicatedDataSerialization
+    extends ReplicatedData
+    with ReplicatedDataSerialization
     with RemovedNodePruning {
 
   type T = VersionVector
@@ -178,17 +179,20 @@ sealed abstract class VersionVector
     * If you send in the ordering FullOrder, you will get a full comparison.
     */
   private final def compareOnlyTo(
-      that: VersionVector, order: Ordering): Ordering = {
+      that: VersionVector,
+      order: Ordering): Ordering = {
     def nextOrElse[A](iter: Iterator[A], default: A): A =
       if (iter.hasNext) iter.next() else default
 
-    def compare(i1: Iterator[(UniqueAddress, Long)],
-                i2: Iterator[(UniqueAddress, Long)],
-                requestedOrder: Ordering): Ordering = {
+    def compare(
+        i1: Iterator[(UniqueAddress, Long)],
+        i2: Iterator[(UniqueAddress, Long)],
+        requestedOrder: Ordering): Ordering = {
       @tailrec
-      def compareNext(nt1: (UniqueAddress, Long),
-                      nt2: (UniqueAddress, Long),
-                      currentOrder: Ordering): Ordering =
+      def compareNext(
+          nt1: (UniqueAddress, Long),
+          nt2: (UniqueAddress, Long),
+          currentOrder: Ordering): Ordering =
         if ((requestedOrder ne FullOrder) && (currentOrder ne Same) &&
             (currentOrder ne requestedOrder)) currentOrder
         else if ((nt1 eq cmpEndMarker) && (nt2 eq cmpEndMarker)) currentOrder
@@ -206,23 +210,26 @@ sealed abstract class VersionVector
             // both nodes exist compare the timestamps
             // same timestamp so just continue with the next nodes
             if (nt1._2 == nt2._2)
-              compareNext(nextOrElse(i1, cmpEndMarker),
-                          nextOrElse(i2, cmpEndMarker),
-                          currentOrder)
+              compareNext(
+                nextOrElse(i1, cmpEndMarker),
+                nextOrElse(i2, cmpEndMarker),
+                currentOrder)
             else if (nt1._2 < nt2._2) {
               // t1 is less than t2, so i1 can only be Before
               if (currentOrder eq After) Concurrent
               else
-                compareNext(nextOrElse(i1, cmpEndMarker),
-                            nextOrElse(i2, cmpEndMarker),
-                            Before)
+                compareNext(
+                  nextOrElse(i1, cmpEndMarker),
+                  nextOrElse(i2, cmpEndMarker),
+                  Before)
             } else {
               // t2 is less than t1, so i1 can only be After
               if (currentOrder eq Before) Concurrent
               else
-                compareNext(nextOrElse(i1, cmpEndMarker),
-                            nextOrElse(i2, cmpEndMarker),
-                            After)
+                compareNext(
+                  nextOrElse(i1, cmpEndMarker),
+                  nextOrElse(i2, cmpEndMarker),
+                  After)
             }
           } else if (nc < 0) {
             // this node only exists in i1 so i1 can only be After
@@ -236,14 +243,17 @@ sealed abstract class VersionVector
         }
 
       compareNext(
-          nextOrElse(i1, cmpEndMarker), nextOrElse(i2, cmpEndMarker), Same)
+        nextOrElse(i1, cmpEndMarker),
+        nextOrElse(i2, cmpEndMarker),
+        Same)
     }
 
     if (this eq that) Same
     else
-      compare(this.versionsIterator,
-              that.versionsIterator,
-              if (order eq Concurrent) FullOrder else order)
+      compare(
+        this.versionsIterator,
+        that.versionsIterator,
+        if (order eq Concurrent) FullOrder else order)
   }
 
   /**
@@ -273,13 +283,15 @@ sealed abstract class VersionVector
   override def needPruningFrom(removedNode: UniqueAddress): Boolean
 
   override def prune(
-      removedNode: UniqueAddress, collapseInto: UniqueAddress): VersionVector
+      removedNode: UniqueAddress,
+      collapseInto: UniqueAddress): VersionVector
 
   override def pruningCleanup(removedNode: UniqueAddress): VersionVector
 }
 
-final case class OneVersionVector private[akka](
-    node: UniqueAddress, version: Long)
+final case class OneVersionVector private[akka] (
+    node: UniqueAddress,
+    version: Long)
     extends VersionVector {
   import VersionVector.Timestamp
 
@@ -326,7 +338,8 @@ final case class OneVersionVector private[akka](
     node == removedNode
 
   override def prune(
-      removedNode: UniqueAddress, collapseInto: UniqueAddress): VersionVector =
+      removedNode: UniqueAddress,
+      collapseInto: UniqueAddress): VersionVector =
     (if (node == removedNode) VersionVector.empty else this) + collapseInto
 
   override def pruningCleanup(removedNode: UniqueAddress): VersionVector =
@@ -390,13 +403,15 @@ final case class ManyVersionVector(versions: TreeMap[UniqueAddress, Long])
     versions.contains(removedNode)
 
   override def prune(
-      removedNode: UniqueAddress, collapseInto: UniqueAddress): VersionVector =
+      removedNode: UniqueAddress,
+      collapseInto: UniqueAddress): VersionVector =
     VersionVector(versions = versions - removedNode) + collapseInto
 
   override def pruningCleanup(removedNode: UniqueAddress): VersionVector =
     VersionVector(versions = versions - removedNode)
 
   override def toString: String =
-    versions.map { case ((n, v)) ⇒ n + " -> " + v }
+    versions
+      .map { case ((n, v)) ⇒ n + " -> " + v }
       .mkString("VersionVector(", ", ", ")")
 }

@@ -148,7 +148,7 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
     val N = 100 << 20
     val M = 1 << 16
     val dim = broadcast(
-        sqlContext.range(M).selectExpr("id as k", "cast(id as string) as v"))
+      sqlContext.range(M).selectExpr("id as k", "cast(id as string) as v"))
 
     runBenchmark("Join w long", N) {
       sqlContext
@@ -166,18 +166,20 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
      */
 
     val dim2 = broadcast(
-        sqlContext
-          .range(M)
-          .selectExpr("cast(id as int) as k1",
-                      "cast(id as int) as k2",
-                      "cast(id as string) as v"))
+      sqlContext
+        .range(M)
+        .selectExpr(
+          "cast(id as int) as k1",
+          "cast(id as int) as k2",
+          "cast(id as string) as v"))
 
     runBenchmark("Join w 2 ints", N) {
       sqlContext
         .range(N)
-        .join(dim2,
-              (col("id") bitwiseAND M).cast(IntegerType) === col("k1") &&
-              (col("id") bitwiseAND M).cast(IntegerType) === col("k2"))
+        .join(
+          dim2,
+          (col("id") bitwiseAND M).cast(IntegerType) === col("k1") &&
+            (col("id") bitwiseAND M).cast(IntegerType) === col("k2"))
         .count()
     }
 
@@ -188,16 +190,18 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
     Join w 2 ints codegen=false              7159 / 7224         14.6          68.3       1.0X
     Join w 2 ints codegen=true               1135 / 1197         92.4          10.8       6.3X
       */
-    val dim3 = broadcast(sqlContext
-          .range(M)
-          .selectExpr("id as k1", "id as k2", "cast(id as string) as v"))
+    val dim3 = broadcast(
+      sqlContext
+        .range(M)
+        .selectExpr("id as k1", "id as k2", "cast(id as string) as v"))
 
     runBenchmark("Join w 2 longs", N) {
       sqlContext
         .range(N)
-        .join(dim3,
-              (col("id") bitwiseAND M) === col("k1") &&
-              (col("id") bitwiseAND M) === col("k2"))
+        .join(
+          dim3,
+          (col("id") bitwiseAND M) === col("k1") &&
+            (col("id") bitwiseAND M) === col("k2"))
         .count()
     }
 
@@ -325,7 +329,10 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
       while (i < N) {
         key.setInt(0, i % 1000)
         val h = Murmur3_x86_32.hashUnsafeWords(
-            key.getBaseObject, key.getBaseOffset, key.getSizeInBytes, 42)
+          key.getBaseObject,
+          key.getBaseOffset,
+          key.getSizeInBytes,
+          42)
         s += h
         i += 1
       }
@@ -442,14 +449,15 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
     Seq("off", "on").foreach { heap =>
       benchmark.addCase(s"BytesToBytesMap ($heap Heap)") { iter =>
         val taskMemoryManager = new TaskMemoryManager(
-            new StaticMemoryManager(
-                new SparkConf()
-                  .set("spark.memory.offHeap.enabled", s"${heap == "off"}")
-                  .set("spark.memory.offHeap.size", "102400000"),
-                Long.MaxValue,
-                Long.MaxValue,
-                1),
-            0)
+          new StaticMemoryManager(
+            new SparkConf()
+              .set("spark.memory.offHeap.enabled", s"${heap == "off"}")
+              .set("spark.memory.offHeap.size", "102400000"),
+            Long.MaxValue,
+            Long.MaxValue,
+            1),
+          0
+        )
         val map = new BytesToBytesMap(taskMemoryManager, 1024, 64L << 20)
         val keyBytes = new Array[Byte](16)
         val valueBytes = new Array[Byte](16)
@@ -460,23 +468,26 @@ class BenchmarkWholeStageCodegen extends SparkFunSuite {
         var i = 0
         while (i < N) {
           key.setInt(0, i % 65536)
-          val loc = map.lookup(key.getBaseObject,
-                               key.getBaseOffset,
-                               key.getSizeInBytes,
-                               Murmur3_x86_32.hashLong(i % 65536, 42))
+          val loc = map.lookup(
+            key.getBaseObject,
+            key.getBaseOffset,
+            key.getSizeInBytes,
+            Murmur3_x86_32.hashLong(i % 65536, 42))
           if (loc.isDefined) {
-            value.pointTo(loc.getValueBase,
-                          loc.getValueOffset,
-                          loc.getValueLength)
+            value.pointTo(
+              loc.getValueBase,
+              loc.getValueOffset,
+              loc.getValueLength)
             value.setInt(0, value.getInt(0) + 1)
             i += 1
           } else {
-            loc.putNewKey(key.getBaseObject,
-                          key.getBaseOffset,
-                          key.getSizeInBytes,
-                          value.getBaseObject,
-                          value.getBaseOffset,
-                          value.getSizeInBytes)
+            loc.putNewKey(
+              key.getBaseObject,
+              key.getBaseOffset,
+              key.getSizeInBytes,
+              value.getBaseObject,
+              value.getBaseOffset,
+              value.getSizeInBytes)
           }
         }
       }

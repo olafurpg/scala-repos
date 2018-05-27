@@ -3,7 +3,12 @@ package lang.completion.lookups
 
 import com.intellij.codeInsight.AutoPopupController
 import com.intellij.codeInsight.completion.InsertionContext
-import com.intellij.codeInsight.lookup.{LookupElement, LookupElementDecorator, LookupElementPresentation, LookupItem}
+import com.intellij.codeInsight.lookup.{
+  LookupElement,
+  LookupElementDecorator,
+  LookupElementPresentation,
+  LookupItem
+}
 import com.intellij.openapi.util.Condition
 import com.intellij.psi._
 import com.intellij.psi.util.PsiTreeUtil
@@ -18,15 +23,35 @@ import org.jetbrains.plugins.scala.lang.psi.PresentationUtil._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScBindingPattern
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScFieldId, ScReferenceElement, ScStableCodeReferenceElement}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlock, ScReferenceExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScFieldId,
+  ScReferenceElement,
+  ScStableCodeReferenceElement
+}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScBlock,
+  ScReferenceExpression
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameter
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFun, ScFunction, ScTypeAliasDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFun,
+  ScFunction,
+  ScTypeAliasDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypeParametersOwner
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.{ScImportSelectors, ScImportStmt}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTemplateDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.{
+  ScImportSelectors,
+  ScImportStmt
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject,
+  ScTemplateDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypingContext
+}
 import org.jetbrains.plugins.scala.lang.psi.types.{ScSubstitutor, ScType}
 import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
 import org.jetbrains.plugins.scala.settings._
@@ -37,9 +62,10 @@ import scala.annotation.tailrec
   * @author Alefas
   * @since 22.03.12
   */
-class ScalaLookupItem(val element: PsiNamedElement,
-                      _name: String,
-                      containingClass0: Option[PsiClass] = None)
+class ScalaLookupItem(
+    val element: PsiNamedElement,
+    _name: String,
+    containingClass0: Option[PsiClass] = None)
     extends {
   val name: String =
     if (ScalaNamesUtil.isKeyword(_name) && _name != "this") "`" + _name + "`"
@@ -73,11 +99,11 @@ class ScalaLookupItem(val element: PsiNamedElement,
 
   def isNamedParameterOrAssignment = isNamedParameter || isAssignment
 
-  val containingClass = containingClass0.getOrElse(
-      ScalaPsiUtil.nameContext(element) match {
-    case memb: PsiMember => memb.containingClass
-    case _ => null
-  })
+  val containingClass =
+    containingClass0.getOrElse(ScalaPsiUtil.nameContext(element) match {
+      case memb: PsiMember => memb.containingClass
+      case _               => null
+    })
 
   override def equals(o: Any): Boolean = {
     if (!super.equals(o)) return false
@@ -101,14 +127,14 @@ class ScalaLookupItem(val element: PsiNamedElement,
       case t: ScTypeParametersOwner =>
         t.typeParametersClause match {
           case Some(tp) => presentationString(tp, substitutor)
-          case None => ""
+          case None     => ""
         }
       case p: PsiTypeParameterListOwner if p.getTypeParameters.nonEmpty =>
         p.getTypeParameters
           .map(ptp => presentationString(ptp))
           .mkString("[", ", ", "]")
       case p: PsiPackage => s"    (${p.getQualifiedName})"
-      case _ => ""
+      case _             => ""
     }
     element match {
       //scala
@@ -122,35 +148,40 @@ class ScalaLookupItem(val element: PsiNamedElement,
             " = " + presentationString(fun.paramClauses, substitutor)
           } else {
             tailText +
-            (if (!isOverloadedForClassName)
-               presentationString(fun.paramClauses, substitutor)
-             else "(...)") +
-            (if (shouldImport && isClassName && containingClass != null)
-               " " + containingClass.getPresentation.getLocationString
-             else if (isClassName && containingClass != null)
-               " in " + containingClass.name + " " +
-               containingClass.getPresentation.getLocationString
-             else "")
+              (if (!isOverloadedForClassName)
+                 presentationString(fun.paramClauses, substitutor)
+               else "(...)") +
+              (if (shouldImport && isClassName && containingClass != null)
+                 " " + containingClass.getPresentation.getLocationString
+               else if (isClassName && containingClass != null)
+                 " in " + containingClass.name + " " +
+                   containingClass.getPresentation.getLocationString
+               else "")
           }
         if (!etaExpanded) presentation.setTailText(tailText1)
         else presentation.setTailText(" _")
       case fun: ScFun =>
         presentation.setTypeText(presentationString(fun.retType, substitutor))
         val paramClausesText = fun.paramClauses
-          .map(_.map(presentationString(_, substitutor))
-                .mkString("(", ", ", ")"))
+          .map(
+            _.map(presentationString(_, substitutor))
+              .mkString("(", ", ", ")"))
           .mkString
         presentation.setTailText(tailText + paramClausesText)
       case bind: ScBindingPattern =>
-        presentation.setTypeText(presentationString(
-                bind.getType(TypingContext.empty).getOrAny, substitutor))
+        presentation.setTypeText(
+          presentationString(
+            bind.getType(TypingContext.empty).getOrAny,
+            substitutor))
       case f: ScFieldId =>
-        presentation.setTypeText(presentationString(
-                f.getType(TypingContext.empty).getOrAny, substitutor))
+        presentation.setTypeText(
+          presentationString(
+            f.getType(TypingContext.empty).getOrAny,
+            substitutor))
       case param: ScParameter =>
         val str: String = presentationString(
-            param.getRealParameterType(TypingContext.empty).getOrAny,
-            substitutor)
+          param.getRealParameterType(TypingContext.empty).getOrAny,
+          substitutor)
         if (isNamedParameter) {
           presentation.setTailText(" = " + str)
         } else {
@@ -163,7 +194,8 @@ class ScalaLookupItem(val element: PsiNamedElement,
           clazz match {
             case t: ScTemplateDefinition =>
               t.getTypeWithProjections(
-                  TypingContext.empty, thisProjections = true) match {
+                TypingContext.empty,
+                thisProjections = true) match {
                 case Success(tp, _) =>
                   presentation.setTypeText(tp.presentableText)
                 case _ =>
@@ -173,7 +205,7 @@ class ScalaLookupItem(val element: PsiNamedElement,
         }
       case alias: ScTypeAliasDefinition =>
         presentation.setTypeText(
-            presentationString(alias.aliasedType.getOrAny, substitutor))
+          presentationString(alias.aliasedType.getOrAny, substitutor))
       case method: PsiMethod =>
         val str: String = presentationString(method.getReturnType, substitutor)
         if (isNamedParameter) {
@@ -186,18 +218,18 @@ class ScalaLookupItem(val element: PsiNamedElement,
             else "(...)"
           val tailText1 =
             tailText + params +
-            (if (shouldImport && isClassName && containingClass != null)
-               " " + containingClass.getPresentation.getLocationString
-             else if (isClassName && containingClass != null)
-               " in " + containingClass.name + " " +
-               containingClass.getPresentation.getLocationString
-             else "")
+              (if (shouldImport && isClassName && containingClass != null)
+                 " " + containingClass.getPresentation.getLocationString
+               else if (isClassName && containingClass != null)
+                 " in " + containingClass.name + " " +
+                   containingClass.getPresentation.getLocationString
+               else "")
           presentation.setTailText(tailText1)
         }
       case f: PsiField =>
         presentation.setTypeText(presentationString(f.getType, substitutor))
       case p: PsiPackage => presentation.setTailText(tailText, /*grayed*/ true)
-      case _ =>
+      case _             =>
     }
     if (presentation.isReal) presentation.setIcon(element.getIcon(0))
     else presentation.setIcon(IconUtil.getEmptyIcon(false))
@@ -266,20 +298,22 @@ class ScalaLookupItem(val element: PsiNamedElement,
             }
           }
           var ref = PsiTreeUtil.findElementOfClassAtOffset(
-              context.getFile,
-              context.getStartOffset + shift,
-              classOf[ScReferenceElement],
-              false)
+            context.getFile,
+            context.getStartOffset + shift,
+            classOf[ScReferenceElement],
+            false)
           val useFullyQualifiedName =
             PsiTreeUtil.getParentOfType(ref, classOf[ScImportStmt]) != null &&
-            PsiTreeUtil.getParentOfType(ref, classOf[ScImportSelectors]) == null //do not complete in sel
+              PsiTreeUtil.getParentOfType(ref, classOf[ScImportSelectors]) == null //do not complete in sel
           if (ref == null) return
           while (ref.getParent != null &&
-          ref.getParent.isInstanceOf[ScReferenceElement] &&
-          (ref.getParent.asInstanceOf[ScReferenceElement].qualifier match {
-                case Some(r) => r != ref
-                case _ => true
-              })) ref = ref.getParent.asInstanceOf[ScReferenceElement]
+                 ref.getParent.isInstanceOf[ScReferenceElement] &&
+                 (ref.getParent
+                   .asInstanceOf[ScReferenceElement]
+                   .qualifier match {
+                   case Some(r) => r != ref
+                   case _       => true
+                 })) ref = ref.getParent.asInstanceOf[ScReferenceElement]
           val newRef = ref match {
             case ref: ScReferenceExpression if prefixCompletion =>
               val parts = cl.qualifiedName.split('.')
@@ -290,21 +324,23 @@ class ScalaLookupItem(val element: PsiNamedElement,
                   .asInstanceOf[ScReferenceExpression]
               } else {
                 ref.createReplacingElementWithClassName(
-                    useFullyQualifiedName, cl)
+                  useFullyQualifiedName,
+                  cl)
               }
             case ref: ScStableCodeReferenceElement if prefixCompletion =>
               val parts = cl.qualifiedName.split('.')
               if (parts.length > 1) {
                 val newRefText = parts.takeRight(2).mkString(".")
                 ScalaPsiElementFactory.createReferenceFromText(
-                    newRefText, ref.getManager)
+                  newRefText,
+                  ref.getManager)
               } else {
                 ref.createReplacingElementWithClassName(
-                    useFullyQualifiedName, cl)
+                  useFullyQualifiedName,
+                  cl)
               }
             case _ =>
-              ref.createReplacingElementWithClassName(
-                  useFullyQualifiedName, cl)
+              ref.createReplacingElementWithClassName(useFullyQualifiedName, cl)
           }
           ref.getNode.getTreeParent.replaceChild(ref.getNode, newRef.getNode)
           newRef.bindToElement(cl.element)
@@ -314,10 +350,10 @@ class ScalaLookupItem(val element: PsiNamedElement,
                 AutoPopupController
                   .getInstance(context.getProject)
                   .scheduleAutoPopup(
-                      context.getEditor,
-                      new Condition[PsiFile] {
-                        def value(t: PsiFile): Boolean = t == context.getFile
-                      }
+                    context.getEditor,
+                    new Condition[PsiFile] {
+                      def value(t: PsiFile): Boolean = t == context.getFile
+                    }
                   )
               }
             })
@@ -326,10 +362,10 @@ class ScalaLookupItem(val element: PsiNamedElement,
           simpleInsert(context)
           context.commitDocument()
           val ref: ScReferenceElement = PsiTreeUtil.findElementOfClassAtOffset(
-              context.getFile,
-              context.getStartOffset + shift,
-              classOf[ScReferenceElement],
-              false)
+            context.getFile,
+            context.getStartOffset + shift,
+            classOf[ScReferenceElement],
+            false)
           if (ref == null) return
           ScalaImportTypeFix
             .getImportHolder(ref, ref.getProject)
@@ -348,8 +384,8 @@ class ScalaLookupItem(val element: PsiNamedElement,
                 def qualifyReference(ref: ScReferenceExpression) {
                   val newRef = ScalaPsiElementFactory
                     .createExpressionFromText(
-                        containingClass.name + "." + ref.getText,
-                        containingClass.getManager)
+                      containingClass.name + "." + ref.getText,
+                      containingClass.getManager)
                     .asInstanceOf[ScReferenceExpression]
                   ref.getNode.getTreeParent
                     .replaceChild(ref.getNode, newRef.getNode)
@@ -376,7 +412,8 @@ class ScalaLookupItem(val element: PsiNamedElement,
                               ScalaImportTypeFix
                                 .getImportHolder(ref, ref.getProject)
                                 .addImportForPsiNamedElement(
-                                    elementToImport, null)
+                                  elementToImport,
+                                  null)
                             }
                           case _ =>
                         }

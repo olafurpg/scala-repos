@@ -4,7 +4,11 @@
 
 package akka.persistence.snapshot
 
-import akka.persistence.{SelectedSnapshot, SnapshotMetadata, SnapshotSelectionCriteria}
+import akka.persistence.{
+  SelectedSnapshot,
+  SnapshotMetadata,
+  SnapshotSelectionCriteria
+}
 
 import scala.concurrent.Future
 
@@ -31,13 +35,15 @@ final class NoSnapshotStore extends SnapshotStore {
     none
 
   override def saveAsync(
-      metadata: SnapshotMetadata, snapshot: Any): Future[Unit] =
+      metadata: SnapshotMetadata,
+      snapshot: Any): Future[Unit] =
     flop
 
   override def deleteAsync(metadata: SnapshotMetadata): Future[Unit] =
     flop
 
-  override def deleteAsync(persistenceId: String,
-                           criteria: SnapshotSelectionCriteria): Future[Unit] =
+  override def deleteAsync(
+      persistenceId: String,
+      criteria: SnapshotSelectionCriteria): Future[Unit] =
     flop
 }

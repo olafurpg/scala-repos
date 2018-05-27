@@ -7,4 +7,5 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.ScalaTestWholeSuiteT
   * @since 11.02.2015.
   */
 class Scalatest2_11_2_1_7_WholeSuiteTest
-    extends Scalatest2_11_2_1_7_Base with ScalaTestWholeSuiteTest {}
+    extends Scalatest2_11_2_1_7_Base
+    with ScalaTestWholeSuiteTest {}

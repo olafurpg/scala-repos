@@ -24,10 +24,10 @@ class FilePublisherTest extends AkkaPublisherVerification[ByteString] {
   @BeforeClass
   override def createActorSystem(): Unit = {
     _system = ActorSystem(
-        Logging.simpleName(getClass),
-        UnboundedMailboxConfig.withFallback(AkkaSpec.testConf))
+      Logging.simpleName(getClass),
+      UnboundedMailboxConfig.withFallback(AkkaSpec.testConf))
     _system.eventStream.publish(
-        TestEvent.Mute(EventFilter[RuntimeException]("Test exception")))
+      TestEvent.Mute(EventFilter[RuntimeException]("Test exception")))
   }
 
   val file = {

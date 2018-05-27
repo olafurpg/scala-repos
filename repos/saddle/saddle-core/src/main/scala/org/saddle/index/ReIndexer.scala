@@ -114,8 +114,7 @@ object ReIndexer {
     * @param ix The joint index
     * @tparam T The type of the index
     */
-  def apply[T](
-      lft: Option[Array[Int]], rgt: Option[Array[Int]], ix: Index[T]) =
+  def apply[T](lft: Option[Array[Int]], rgt: Option[Array[Int]], ix: Index[T]) =
     new ReIndexer[T] {
       def lTake = lft
       def rTake = rgt

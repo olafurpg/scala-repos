@@ -6,7 +6,10 @@ import java.util
 import com.intellij.psi.PsiElement
 import com.intellij.refactoring.changeSignature.MethodDescriptor
 import com.intellij.refactoring.changeSignature.MethodDescriptor.ReadWriteOption
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScMethodLike, ScPrimaryConstructor}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScMethodLike,
+  ScPrimaryConstructor
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
 
 import scala.collection.JavaConverters._
@@ -22,7 +25,7 @@ class ScalaMethodDescriptor(val fun: ScMethodLike)
       if (fun.isConstructor) fun.containingClass.name
       else fun.name
     case pc: ScPrimaryConstructor => pc.containingClass.name
-    case _ => ""
+    case _                        => ""
   }
 
   override def canChangeName: Boolean = !fun.isConstructor
@@ -47,7 +50,7 @@ class ScalaMethodDescriptor(val fun: ScMethodLike)
 
   def returnTypeText = fun match {
     case f: ScFunction => f.returnType.getOrAny.presentableText
-    case _ => ""
+    case _             => ""
   }
 
   protected def parametersInner: Seq[Seq[ScalaParameterInfo]] =

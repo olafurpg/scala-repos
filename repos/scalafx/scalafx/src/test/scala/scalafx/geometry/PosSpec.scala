@@ -37,6 +37,7 @@ import scalafx.testutil.SFXEnumDelegateSpec
 /** Tests for [[scalafx.geometry.Pos]]. */
 @RunWith(classOf[JUnitRunner])
 class PosSpec
-    extends SFXEnumDelegateSpec[jfxg.Pos, Pos](javaClass = classOf[jfxg.Pos],
-                                               scalaClass = classOf[Pos],
-                                               companion = Pos)
+    extends SFXEnumDelegateSpec[jfxg.Pos, Pos](
+      javaClass = classOf[jfxg.Pos],
+      scalaClass = classOf[Pos],
+      companion = Pos)

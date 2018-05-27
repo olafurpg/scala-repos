@@ -23,9 +23,10 @@ import org.apache.spark.sql.Row
 import org.apache.spark.sql.test.SharedSQLContext
 
 class ParquetInteroperabilitySuite
-    extends ParquetCompatibilityTest with SharedSQLContext {
+    extends ParquetCompatibilityTest
+    with SharedSQLContext {
   test(
-      "parquet files with different physical schemas but share the same logical schema") {
+    "parquet files with different physical schemas but share the same logical schema") {
     import ParquetCompatibilityTest._
 
     // This test case writes two Parquet files, both representing the following Catalyst schema
@@ -80,8 +81,9 @@ class ParquetInteroperabilitySuite
 
       logParquetSchema(protobufStylePath)
 
-      checkAnswer(sqlContext.read.parquet(dir.getCanonicalPath),
-                  Seq(Row(Seq(0, 1)), Row(Seq(2, 3))))
+      checkAnswer(
+        sqlContext.read.parquet(dir.getCanonicalPath),
+        Seq(Row(Seq(0, 1)), Row(Seq(2, 3))))
     }
   }
 }

@@ -13,14 +13,16 @@ import Predef.{any2stringadd => _, _}
 import sbt.io.IO
 
 object SettingGraph {
-  def apply(structure: BuildStructure,
-            basedir: File,
-            scoped: ScopedKey[_],
-            generation: Int)(
-      implicit display: Show[ScopedKey[_]]): SettingGraph = {
+  def apply(
+      structure: BuildStructure,
+      basedir: File,
+      scoped: ScopedKey[_],
+      generation: Int)(implicit display: Show[ScopedKey[_]]): SettingGraph = {
     val cMap = flattenLocals(
-        compiled(structure.settings, false)(
-            structure.delegates, structure.scopeLocal, display))
+      compiled(structure.settings, false)(
+        structure.delegates,
+        structure.scopeLocal,
+        display))
     def loop(scoped: ScopedKey[_], generation: Int): SettingGraph = {
       val key = scoped.key
       val scope = scoped.scope
@@ -34,39 +36,42 @@ object SettingGraph {
       // val related = cMap.keys.filter(k => k.key == key && k.scope != scope)
       // val reverse = reverseDependencies(cMap, scoped)
 
-      SettingGraph(display(scoped),
-                   definedIn,
-                   Project.scopedKeyData(structure, scope, key),
-                   key.description,
-                   basedir,
-                   depends map { (x: ScopedKey[_]) =>
-                     loop(x, generation + 1)
-                   })
+      SettingGraph(
+        display(scoped),
+        definedIn,
+        Project.scopedKeyData(structure, scope, key),
+        key.description,
+        basedir,
+        depends map { (x: ScopedKey[_]) =>
+          loop(x, generation + 1)
+        })
     }
     loop(scoped, generation)
   }
 }
 
-case class SettingGraph(name: String,
-                        definedIn: Option[String],
-                        data: Option[ScopedKeyData[_]],
-                        description: Option[String],
-                        basedir: File,
-                        depends: Set[SettingGraph]) {
+case class SettingGraph(
+    name: String,
+    definedIn: Option[String],
+    data: Option[ScopedKeyData[_]],
+    description: Option[String],
+    basedir: File,
+    depends: Set[SettingGraph]) {
   def dataString: String =
     data map { d =>
       d.settingValue map {
         case f: File => IO.relativize(basedir, f) getOrElse { f.toString }
-        case x => x.toString
+        case x       => x.toString
       } getOrElse { d.typeName }
     } getOrElse { "" }
 
   def dependsAscii: String =
-    Graph.toAscii(this,
-                  (x: SettingGraph) => x.depends.toSeq.sortBy(_.name),
-                  (x: SettingGraph) =>
-                    "%s = %s" format
-                    (x.definedIn getOrElse { "" }, x.dataString))
+    Graph.toAscii(
+      this,
+      (x: SettingGraph) => x.depends.toSeq.sortBy(_.name),
+      (x: SettingGraph) =>
+        "%s = %s" format
+          (x.definedIn getOrElse { "" }, x.dataString))
 }
 
 object Graph {
@@ -75,7 +80,10 @@ object Graph {
   // [info]   | +-baz
   // [info]   |
   // [info]   +-quux
-  def toAscii[A](top: A, children: A => Seq[A], display: A => String): String = {
+  def toAscii[A](
+      top: A,
+      children: A => Seq[A],
+      display: A => String): String = {
     val defaultWidth = 40
     // TODO: Fix JLine
     val maxColumn =
@@ -88,14 +96,14 @@ object Graph {
     def insertBar(s: String, at: Int): String =
       if (at < s.length)
         s.slice(0, at) +
-        (s(at).toString match {
-              case " " => "|"
-              case x => x
-            }) + s.slice(at + 1, s.length)
+          (s(at).toString match {
+            case " " => "|"
+            case x   => x
+          }) + s.slice(at + 1, s.length)
       else s
     def toAsciiLines(node: A, level: Int): Vector[String] = {
       val line = limitLine(
-          (twoSpaces * level) + (if (level == 0) "" else "+-") + display(node))
+        (twoSpaces * level) + (if (level == 0) "" else "+-") + display(node))
       val cs = Vector(children(node): _*)
       val childLines = cs map { toAsciiLines(_, level + 1) }
       val withBar =

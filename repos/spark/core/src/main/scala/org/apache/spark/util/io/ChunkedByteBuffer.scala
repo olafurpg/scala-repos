@@ -76,7 +76,7 @@ private[spark] class ChunkedByteBuffer(var chunks: Array[ByteBuffer]) {
   def toArray: Array[Byte] = {
     if (size >= Integer.MAX_VALUE) {
       throw new UnsupportedOperationException(
-          s"cannot call toArray because buffer size ($size bytes) exceeds maximum array size")
+        s"cannot call toArray because buffer size ($size bytes) exceeds maximum array size")
     }
     val byteChannel = new ByteArrayWritableChannel(size.toInt)
     writeFully(byteChannel)
@@ -147,7 +147,8 @@ private[spark] class ChunkedByteBuffer(var chunks: Array[ByteBuffer]) {
   *                in order to close any memory-mapped files which back the buffer.
   */
 private class ChunkedByteBufferInputStream(
-    var chunkedByteBuffer: ChunkedByteBuffer, dispose: Boolean)
+    var chunkedByteBuffer: ChunkedByteBuffer,
+    dispose: Boolean)
     extends InputStream {
 
   private[this] var chunks = chunkedByteBuffer.getChunks().iterator

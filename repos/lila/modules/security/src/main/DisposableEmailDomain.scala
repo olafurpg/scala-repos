@@ -5,7 +5,8 @@ import play.api.libs.ws.WS
 import play.api.Play.current
 
 final class DisposableEmailDomain(
-    providerUrl: String, busOption: Option[lila.common.Bus]) {
+    providerUrl: String,
+    busOption: Option[lila.common.Bus]) {
 
   private type Matcher = String => Boolean
 
@@ -17,7 +18,7 @@ final class DisposableEmailDomain(
       lila.mon.email.disposableDomain(matchers.size)
     } recover {
       case _: java.net.ConnectException => // ignore network errors
-      case e: Exception => onError(e)
+      case e: Exception                 => onError(e)
     }
   }
 
@@ -41,9 +42,9 @@ final class DisposableEmailDomain(
       failed = true
       busOption.foreach { bus =>
         bus.publish(
-            lila.hub.actorApi.slack.Error(
-                s"Disposable emails list: ${e.getMessage}\nPlease fix $providerUrl"),
-            'slack)
+          lila.hub.actorApi.slack.Error(
+            s"Disposable emails list: ${e.getMessage}\nPlease fix $providerUrl"),
+          'slack)
       }
     }
   }
@@ -54,5 +55,5 @@ final class DisposableEmailDomain(
       matcher(s).matches
   }
 
-  def apply(domain: String) = matchers exists { _ (domain) }
+  def apply(domain: String) = matchers exists { _(domain) }
 }

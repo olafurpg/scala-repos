@@ -8,7 +8,7 @@ object Test extends JavapTest {
 
   override def yah(res: Seq[String]) = {
     val r = """public class \S*Betty""".r.unanchored
-    def filtered = res filter { case r(_ *) => true; case _ => false }
+    def filtered = res filter { case r(_*) => true; case _ => false }
     1 == filtered.size
   }
 }

@@ -4,7 +4,12 @@
 
 package com.twitter.util
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, DataInputStream, DataOutputStream}
+import java.io.{
+  ByteArrayInputStream,
+  ByteArrayOutputStream,
+  DataInputStream,
+  DataOutputStream
+}
 import scala.language.implicitConversions
 
 class RichU64Long(l64: Long) {
@@ -65,7 +70,7 @@ class RichU64ByteArray(bytes: Array[Byte]) {
 class RichU64String(string: String) {
   private[this] def validateHexDigit(c: Char): Unit = {
     if (!(('0' <= c && c <= '9') || ('a' <= c && c <= 'f') ||
-            ('A' <= c && c <= 'F'))) {
+          ('A' <= c && c <= 'F'))) {
       throw new NumberFormatException("For input string: \"" + string + "\"")
     }
   }
@@ -80,11 +85,10 @@ class RichU64String(string: String) {
   def toU64ByteArray: Array[Byte] = {
     val padded = "0" * (16 - string.length()) + string
     (0 until 16 by 2)
-      .map(i =>
-            {
-          val parsed = Integer.parseInt(padded.slice(i, i + 2), 16)
-          assert(parsed >= 0)
-          parsed.toByte
+      .map(i => {
+        val parsed = Integer.parseInt(padded.slice(i, i + 2), 16)
+        assert(parsed >= 0)
+        parsed.toByte
       })
       .toArray
   }
@@ -100,7 +104,7 @@ object U64 {
 
   def u64ToBigint(x: Long): BigInt =
     if ((x & 0x8000000000000000L) != 0L)
-      ( (x & 0x7FFFFFFFFFFFFFFFL): BigInt) + bigInt0x8000000000000000L
+      ((x & 0x7FFFFFFFFFFFFFFFL): BigInt) + bigInt0x8000000000000000L
     else x: BigInt
 
   // compares x < y

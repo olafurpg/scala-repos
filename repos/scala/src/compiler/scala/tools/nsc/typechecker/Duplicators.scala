@@ -24,18 +24,20 @@ abstract class Duplicators extends Analyzer {
     *  the old class with the new class, and map symbols through the given 'env'. The
     *  environment is a map from type skolems to concrete types (see SpecializedTypes).
     */
-  def retyped(context: Context,
-              tree: Tree,
-              oldThis: Symbol,
-              newThis: Symbol,
-              env: scala.collection.Map[Symbol, Type]): Tree = {
+  def retyped(
+      context: Context,
+      tree: Tree,
+      oldThis: Symbol,
+      newThis: Symbol,
+      env: scala.collection.Map[Symbol, Type]): Tree = {
     if (oldThis ne newThis) {
       oldClassOwner = oldThis
       newClassOwner = newThis
     } else resetClassOwners()
 
     envSubstitution = new SubstSkolemsTypeMap(
-        env.keysIterator.toList, env.valuesIterator.toList)
+      env.keysIterator.toList,
+      env.valuesIterator.toList)
     debuglog("retyped with env: " + env)
 
     newBodyDuplicator(context).typed(tree)
@@ -84,13 +86,13 @@ abstract class Duplicators extends Analyzer {
         case TypeRef(NoPrefix, sym, args) if sym.isTypeParameterOrSkolem =>
           val sym1 =
             (context.scope lookup sym.name orElse {
-                  // try harder (look in outer scopes)
-                  // with virtpatmat, this can happen when the sym is referenced in the scope of a LabelDef but
-                  // is defined in the scope of an outer DefDef (e.g., in AbstractPartialFunction's andThen)
-                  BodyDuplicator. super
-                    .silent(_ typedType Ident(sym.name))
-                    .fold(NoSymbol: Symbol)(_.symbol)
-                } filter (_ ne sym))
+              // try harder (look in outer scopes)
+              // with virtpatmat, this can happen when the sym is referenced in the scope of a LabelDef but
+              // is defined in the scope of an outer DefDef (e.g., in AbstractPartialFunction's andThen)
+              BodyDuplicator.super
+                .silent(_ typedType Ident(sym.name))
+                .fold(NoSymbol: Symbol)(_.symbol)
+            } filter (_ ne sym))
           if (sym1.exists) {
             debuglog(s"fixing $sym -> $sym1")
             typeRef(NoPrefix, sym1, mapOverArgs(args, sym1.typeParams))
@@ -163,7 +165,7 @@ abstract class Duplicators extends Analyzer {
             newsym.setInfo(fixType(vdef.symbol.info))
             vdef.symbol = newsym
             debuglog(
-                "newsym: " + newsym + " info: " + newsym.info + ", owner: " +
+              "newsym: " + newsym + " info: " + newsym.info + ", owner: " +
                 newsym.owner + ", " + newsym.owner.isClass)
             if (newsym.owner.isClass) newsym.owner.info.decls enter newsym
 
@@ -272,9 +274,10 @@ abstract class Duplicators extends Analyzer {
           val rhs1 =
             (new TreeSubstituter(params map (_.symbol), params1) transform rhs) // TODO: duplicate?
 
-          super.typed(treeCopy.LabelDef(tree, name, params1, rhs1.clearType()),
-                      mode,
-                      pt)
+          super.typed(
+            treeCopy.LabelDef(tree, name, params1, rhs1.clearType()),
+            mode,
+            pt)
 
         case Bind(name, _) =>
           // log("bind: " + tree)
@@ -287,7 +290,8 @@ abstract class Duplicators extends Analyzer {
           super.typed(tree.clearType(), mode, pt)
 
         case Ident(_) if (origtreesym ne null) && origtreesym.isLazy =>
-          debuglog("Ident to a lazy val " + tree + ", " + tree.symbol +
+          debuglog(
+            "Ident to a lazy val " + tree + ", " + tree.symbol +
               " updated to " + origtreesym)
           tree.symbol = updateSym(origtreesym)
           super.typed(tree.clearType(), mode, pt)
@@ -312,19 +316,22 @@ abstract class Duplicators extends Analyzer {
                val memberString = memberByName.defString
                alts zip memberTypes filter (_._2 =:= typeInNewClass) match {
                  case ((alt, tpe)) :: Nil =>
-                   log(s"Arrested overloaded type in Duplicators, narrowing to ${alt
-                     .defStringSeenAs(tpe)}\n  Overload was: $memberString")
+                   log(
+                     s"Arrested overloaded type in Duplicators, narrowing to ${alt
+                       .defStringSeenAs(tpe)}\n  Overload was: $memberString")
                    Select(This(newClassOwner), alt)
                  case xs =>
                    alts filter
-                   (alt =>
-                         (alt.paramss corresponds tree.symbol.paramss)(
-                             _.size == _.size)) match {
+                     (alt =>
+                       (alt.paramss corresponds tree.symbol.paramss)(
+                         _.size == _.size)) match {
                      case alt :: Nil =>
-                       log(s"Resorted to parameter list arity to disambiguate to $alt\n  Overload was: $memberString")
+                       log(
+                         s"Resorted to parameter list arity to disambiguate to $alt\n  Overload was: $memberString")
                        Select(This(newClassOwner), alt)
                      case _ =>
-                       log(s"Could not disambiguate $memberTypes. Attempting name-based selection, but we may crash later.")
+                       log(
+                         s"Could not disambiguate $memberTypes. Attempting name-based selection, but we may crash later.")
                        nameSelection
                    }
                }

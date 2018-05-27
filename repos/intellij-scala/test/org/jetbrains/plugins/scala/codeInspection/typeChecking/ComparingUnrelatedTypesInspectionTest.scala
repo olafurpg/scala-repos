@@ -212,7 +212,7 @@ class ComparingUnrelatedTypesInspectionTest
 
   def testOverridenWithImplicitParam(): Unit = {
     checkTextHasError(
-        s"""
+      s"""
         |class Store(val foo: Int, val bar: String)
         |trait Binder[T] {
         |  def get(implicit store: Store): T

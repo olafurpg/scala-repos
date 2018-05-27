@@ -6,7 +6,8 @@ import scala.concurrent.duration._
 import actorApi._
 
 private[tournament] final class CreatedOrganizer(
-    api: TournamentApi, isOnline: String => Boolean)
+    api: TournamentApi,
+    isOnline: String => Boolean)
     extends Actor {
 
   override def preStart {
@@ -42,7 +43,7 @@ private[tournament] final class CreatedOrganizer(
                 case _ =>
               }
             case Some(schedule) if tour.hasWaitedEnough => api start tour
-            case _ => ejectLeavers(tour)
+            case _                                      => ejectLeavers(tour)
           }
         }
         val nbTours = tours.size

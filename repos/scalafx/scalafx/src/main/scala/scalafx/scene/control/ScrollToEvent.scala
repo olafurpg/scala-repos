@@ -76,7 +76,8 @@ object ScrollToEvent {
   * @tparam T scroll target type
   */
 class ScrollToEvent[T](override val delegate: jfxsc.ScrollToEvent[T])
-    extends Event(delegate) with SFXDelegate[jfxsc.ScrollToEvent[T]] {
+    extends Event(delegate)
+    with SFXDelegate[jfxsc.ScrollToEvent[T]] {
 
   /**
     * Construct a new Event with the specified event source, target and type.
@@ -86,10 +87,11 @@ class ScrollToEvent[T](override val delegate: jfxsc.ScrollToEvent[T])
     * @param eventType the event type
     * @param scrollTarget the target of the scroll to operation
     */
-  def this(source: Any,
-           target: jfxe.EventTarget,
-           eventType: jfxe.EventType[jfxsc.ScrollToEvent[T]],
-           scrollTarget: T) =
+  def this(
+      source: Any,
+      target: jfxe.EventTarget,
+      eventType: jfxe.EventType[jfxsc.ScrollToEvent[T]],
+      scrollTarget: T) =
     this(new jfxsc.ScrollToEvent[T](source, target, eventType, scrollTarget))
 
   /**

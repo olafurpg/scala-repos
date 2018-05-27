@@ -16,7 +16,8 @@ private[syntax] trait BitraverseSyntax1 {
 final class BitraverseOps[F[_, _], A, B](fab: F[A, B])(
     implicit F: Bitraverse[F]) {
   def bitraverse[G[_]: Applicative, C, D](
-      f: A => G[C], g: B => G[D]): G[F[C, D]] =
+      f: A => G[C],
+      g: B => G[D]): G[F[C, D]] =
     F.bitraverse(fab)(f, g)
 }
 

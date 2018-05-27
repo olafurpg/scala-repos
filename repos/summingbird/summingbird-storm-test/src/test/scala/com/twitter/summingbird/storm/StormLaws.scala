@@ -38,7 +38,13 @@ import org.scalacheck._
 import org.scalacheck.Prop._
 import org.scalacheck.Properties
 import scala.collection.JavaConverters._
-import scala.collection.mutable.{ArrayBuffer, HashMap => MutableHashMap, Map => MutableMap, SynchronizedBuffer, SynchronizedMap}
+import scala.collection.mutable.{
+  ArrayBuffer,
+  HashMap => MutableHashMap,
+  Map => MutableMap,
+  SynchronizedBuffer,
+  SynchronizedMap
+}
 import java.security.Permission
 
 /**
@@ -57,21 +63,21 @@ object StormLaws {
 
   implicit val storm = Storm.local(Map())
 
-  def sample[T : Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
+  def sample[T: Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
 
   def genStore: (String, Storm#Store[Int, Int]) =
     TestStore.createStore[Int, Int]()
 
   def genSink: () => ((Int) => Future[Unit]) =
-    () =>
-      { x: Int =>
-        append(x)
-        Future.Unit
+    () => { x: Int =>
+      append(x)
+      Future.Unit
     }
 
   def memoryPlanWithoutSummer(original: List[Int])(
-      mkJob: (Producer[Memory, Int],
-      Memory#Sink[Int]) => TailProducer[Memory, Int]): List[Int] = {
+      mkJob: (
+          Producer[Memory, Int],
+          Memory#Sink[Int]) => TailProducer[Memory, Int]): List[Int] = {
     val memory = new Memory
     val outputList = ArrayBuffer[Int]()
     val sink: (Int) => Unit = { x: Int =>
@@ -79,8 +85,8 @@ object StormLaws {
     }
 
     val job = mkJob(
-        Memory.toSource(original),
-        sink
+      Memory.toSource(original),
+      sink
     )
     val topo = memory.plan(job)
     memory.run(topo)
@@ -92,15 +98,15 @@ object StormLaws {
   }
 
   def runWithOutSummer(original: List[Int])(
-      mkJob: (Producer[Storm, Int],
-      Storm#Sink[Int]) => TailProducer[Storm, Int]): List[Int] = {
+      mkJob: (Producer[Storm, Int], Storm#Sink[Int]) => TailProducer[Storm, Int])
+    : List[Int] = {
     val cluster = new LocalCluster()
 
     val job = mkJob(
-        Storm.source(TraversableSpout(original)),
-        Storm.sink[Int]({ (x: Int) =>
-          append(x); Future.Unit
-        })
+      Storm.source(TraversableSpout(original)),
+      Storm.sink[Int]({ (x: Int) =>
+        append(x); Future.Unit
+      })
     )
 
     StormTestRun(job)
@@ -131,14 +137,14 @@ class StormLaws extends WordSpec {
   "StormPlatform matches Scala for single step jobs" in {
     val original = sample[List[Int]]
     val returnedState = StormTestRun.simpleRun[Int, Int, Int](
-        original,
-        TestGraphs.singleStepJob[Storm, Int, Int, Int](_, _)(testFn))
+      original,
+      TestGraphs.singleStepJob[Storm, Int, Int, Int](_, _)(testFn))
 
     assert(
-        Equiv[Map[Int, Int]].equiv(
-            TestGraphs.singleStepInScala(original)(testFn),
-            returnedState.toScala
-        ) == true)
+      Equiv[Map[Int, Int]].equiv(
+        TestGraphs.singleStepInScala(original)(testFn),
+        returnedState.toScala
+      ) == true)
   }
 
   "FlatMap to nothing" in {
@@ -147,13 +153,14 @@ class StormLaws extends WordSpec {
       List[(Int, Int)]()
     }
     val returnedState = StormTestRun.simpleRun[Int, Int, Int](
-        original, TestGraphs.singleStepJob[Storm, Int, Int, Int](_, _)(fn))
+      original,
+      TestGraphs.singleStepJob[Storm, Int, Int, Int](_, _)(fn))
 
     assert(
-        Equiv[Map[Int, Int]].equiv(
-            TestGraphs.singleStepInScala(original)(fn),
-            returnedState.toScala
-        ) == true)
+      Equiv[Map[Int, Int]].equiv(
+        TestGraphs.singleStepInScala(original)(fn),
+        returnedState.toScala
+      ) == true)
   }
 
   "OptionMap and FlatMap" in {
@@ -162,15 +169,16 @@ class StormLaws extends WordSpec {
     val fnB = sample[Int => List[(Int, Int)]]
 
     val returnedState = StormTestRun.simpleRun[Int, Int, Int](
-        original,
-        TestGraphs.twinStepOptionMapFlatMapJob[Storm, Int, Int, Int, Int](
-            _, _)(fnA, fnB))
+      original,
+      TestGraphs.twinStepOptionMapFlatMapJob[Storm, Int, Int, Int, Int](_, _)(
+        fnA,
+        fnB))
 
     assert(
-        Equiv[Map[Int, Int]].equiv(
-            TestGraphs.twinStepOptionMapFlatMapScala(original)(fnA, fnB),
-            returnedState.toScala
-        ) == true)
+      Equiv[Map[Int, Int]].equiv(
+        TestGraphs.twinStepOptionMapFlatMapScala(original)(fnA, fnB),
+        returnedState.toScala
+      ) == true)
   }
 
   "OptionMap to nothing and FlatMap" in {
@@ -181,14 +189,15 @@ class StormLaws extends WordSpec {
     val fnB = sample[Int => List[(Int, Int)]]
 
     val returnedState = StormTestRun.simpleRun[Int, Int, Int](
-        original,
-        TestGraphs.twinStepOptionMapFlatMapJob[Storm, Int, Int, Int, Int](
-            _, _)(fnA, fnB))
+      original,
+      TestGraphs.twinStepOptionMapFlatMapJob[Storm, Int, Int, Int, Int](_, _)(
+        fnA,
+        fnB))
     assert(
-        Equiv[Map[Int, Int]].equiv(
-            TestGraphs.twinStepOptionMapFlatMapScala(original)(fnA, fnB),
-            returnedState.toScala
-        ) == true)
+      Equiv[Map[Int, Int]].equiv(
+        TestGraphs.twinStepOptionMapFlatMapScala(original)(fnA, fnB),
+        returnedState.toScala
+      ) == true)
   }
 
   "StormPlatform matches Scala for large expansion single step jobs" in {
@@ -200,64 +209,33 @@ class StormLaws extends WordSpec {
       }
     }
     val returnedState = StormTestRun.simpleRun[Int, Int, Int](
-        original,
-        TestGraphs.singleStepJob[Storm, Int, Int, Int](_, _)(expansionFunc))
+      original,
+      TestGraphs.singleStepJob[Storm, Int, Int, Int](_, _)(expansionFunc))
 
     assert(
-        Equiv[Map[Int, Int]].equiv(
-            TestGraphs.singleStepInScala(original)(expansionFunc),
-            returnedState.toScala
-        ) == true)
+      Equiv[Map[Int, Int]].equiv(
+        TestGraphs.singleStepInScala(original)(expansionFunc),
+        returnedState.toScala
+      ) == true)
   }
 
   "StormPlatform matches Scala for flatmap keys jobs" in {
-    val original = List(1,
-                        2,
-                        3,
-                        4,
-                        5,
-                        6,
-                        7,
-                        1,
-                        2,
-                        3,
-                        4,
-                        5,
-                        6,
-                        7,
-                        8,
-                        9,
-                        10,
-                        11,
-                        12,
-                        13,
-                        41,
-                        1,
-                        2,
-                        3,
-                        4,
-                        5,
-                        6,
-                        7,
-                        8,
-                        9,
-                        10,
-                        11,
-                        12,
-                        13,
-                        41) // sample[List[Int]]
+    val original =
+      List(1, 2, 3, 4, 5, 6, 7, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 41,
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 41) // sample[List[Int]]
     val fnA = sample[Int => List[(Int, Int)]]
     val fnB = sample[Int => List[Int]]
     val returnedState = StormTestRun.simpleRun[Int, Int, Int](
-        original,
-        TestGraphs.singleStepMapKeysJob[Storm, Int, Int, Int, Int](_, _)(fnA,
-                                                                         fnB))
+      original,
+      TestGraphs.singleStepMapKeysJob[Storm, Int, Int, Int, Int](_, _)(
+        fnA,
+        fnB))
 
     assert(
-        Equiv[Map[Int, Int]].equiv(
-            TestGraphs.singleStepMapKeysInScala(original)(fnA, fnB),
-            returnedState.toScala
-        ) == true)
+      Equiv[Map[Int, Int]].equiv(
+        TestGraphs.singleStepMapKeysInScala(original)(fnA, fnB),
+        returnedState.toScala
+      ) == true)
   }
 
   "StormPlatform matches Scala for left join jobs" in {
@@ -266,16 +244,15 @@ class StormLaws extends WordSpec {
       List((i -> i))
     }
     val returnedState = StormTestRun.simpleRun[Int, Int, Int](
-        original,
-        TestGraphs.leftJoinJob[Storm, Int, Int, Int, Int, Int](_, service, _)(
-            staticFunc)(nextFn))
+      original,
+      TestGraphs.leftJoinJob[Storm, Int, Int, Int, Int, Int](_, service, _)(
+        staticFunc)(nextFn))
 
     assert(
-        Equiv[Map[Int, Int]].equiv(
-            TestGraphs.leftJoinInScala(original)(serviceFn)(staticFunc)(
-                nextFn),
-            returnedState.toScala
-        ) == true)
+      Equiv[Map[Int, Int]].equiv(
+        TestGraphs.leftJoinInScala(original)(serviceFn)(staticFunc)(nextFn),
+        returnedState.toScala
+      ) == true)
   }
 
   "StormPlatform matches Scala for left join with flatMapValues jobs" in {
@@ -285,17 +262,19 @@ class StormLaws extends WordSpec {
     }
 
     val returnedState = StormTestRun.simpleRun[Int, Int, Int](
-        original,
-        TestGraphs
-          .leftJoinJobWithFlatMapValues[Storm, Int, Int, Int, Int, Int](
-            _, service, _)(staticFunc)(nextFn1))
+      original,
+      TestGraphs
+        .leftJoinJobWithFlatMapValues[Storm, Int, Int, Int, Int, Int](
+          _,
+          service,
+          _)(staticFunc)(nextFn1))
 
     assert(
-        Equiv[Map[Int, Int]].equiv(
-            TestGraphs.leftJoinWithFlatMapValuesInScala(original)(serviceFn)(
-                staticFunc)(nextFn1),
-            returnedState.toScala
-        ) == true)
+      Equiv[Map[Int, Int]].equiv(
+        TestGraphs.leftJoinWithFlatMapValuesInScala(original)(serviceFn)(
+          staticFunc)(nextFn1),
+        returnedState.toScala
+      ) == true)
   }
 
   "StormPlatform matches Scala for repeated tuple leftJoin jobs" in {
@@ -304,16 +283,18 @@ class StormLaws extends WordSpec {
       List((i -> i))
     }
     val returnedState = StormTestRun.simpleRun[Int, Int, Int](
-        original,
-        TestGraphs.repeatedTupleLeftJoinJob[Storm, Int, Int, Int, Int, Int](
-            _, service, _)(staticFunc)(nextFn))
+      original,
+      TestGraphs.repeatedTupleLeftJoinJob[Storm, Int, Int, Int, Int, Int](
+        _,
+        service,
+        _)(staticFunc)(nextFn))
 
     assert(
-        Equiv[Map[Int, Int]].equiv(
-            TestGraphs.repeatedTupleLeftJoinInScala(original)(serviceFn)(
-                staticFunc)(nextFn),
-            returnedState.toScala
-        ) == true)
+      Equiv[Map[Int, Int]].equiv(
+        TestGraphs.repeatedTupleLeftJoinInScala(original)(serviceFn)(
+          staticFunc)(nextFn),
+        returnedState.toScala
+      ) == true)
   }
 
   "StormPlatform matches Scala for optionMap only jobs" in {
@@ -331,10 +312,10 @@ class StormLaws extends WordSpec {
     StormTestRun(producer)
 
     assert(
-        Equiv[Map[Int, Int]].equiv(
-            MapAlgebra.sumByKey(original.filter(_ % 2 == 0).map(_ -> 10)),
-            TestStore[Int, Int](id).get.toScala
-        ) == true)
+      Equiv[Map[Int, Int]].equiv(
+        MapAlgebra.sumByKey(original.filter(_ % 2 == 0).map(_ -> 10)),
+        TestStore[Int, Int](id).get.toScala
+      ) == true)
   }
 
   "StormPlatform matches Scala for MapOnly/NoSummer" in {
@@ -344,51 +325,19 @@ class StormLaws extends WordSpec {
     }
 
     val stormOutputList = runWithOutSummer(original)(
-        TestGraphs.mapOnlyJob[Storm, Int, Int](_, _)(doubler)
+      TestGraphs.mapOnlyJob[Storm, Int, Int](_, _)(doubler)
     ).sorted
 
     val memoryOutputList = memoryPlanWithoutSummer(original)(
-        TestGraphs.mapOnlyJob[Memory, Int, Int](_, _)(doubler)).sorted
+      TestGraphs.mapOnlyJob[Memory, Int, Int](_, _)(doubler)).sorted
 
     assert(stormOutputList == memoryOutputList)
   }
 
   "StormPlatform with multiple summers" in {
-    val original = List(1,
-                        2,
-                        3,
-                        4,
-                        5,
-                        6,
-                        7,
-                        1,
-                        2,
-                        3,
-                        4,
-                        5,
-                        6,
-                        7,
-                        8,
-                        9,
-                        10,
-                        11,
-                        12,
-                        13,
-                        41,
-                        1,
-                        2,
-                        3,
-                        4,
-                        5,
-                        6,
-                        7,
-                        8,
-                        9,
-                        10,
-                        11,
-                        12,
-                        13,
-                        41) // sample[List[Int]]
+    val original =
+      List(1, 2, 3, 4, 5, 6, 7, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 41,
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 41) // sample[List[Int]]
     val doubler = { (x): (Int) =>
       List((x -> x * 2))
     }
@@ -402,7 +351,9 @@ class StormLaws extends WordSpec {
 
     val tail =
       TestGraphs.multipleSummerJob[Storm, Int, Int, Int, Int, Int, Int](
-          source, store1, store2)(simpleOp, doubler, doubler)
+        source,
+        store1,
+        store2)(simpleOp, doubler, doubler)
 
     StormTestRun(tail)
 
@@ -412,16 +363,16 @@ class StormLaws extends WordSpec {
     val store1Map = TestStore[Int, Int](store1Id).get.toScala
     val store2Map = TestStore[Int, Int](store2Id).get.toScala
     assert(
-        Equiv[Map[Int, Int]].equiv(
-            scalaA,
-            store1Map
-        ) == true)
+      Equiv[Map[Int, Int]].equiv(
+        scalaA,
+        store1Map
+      ) == true)
 
     assert(
-        Equiv[Map[Int, Int]].equiv(
-            scalaB,
-            store2Map
-        ) == true)
+      Equiv[Map[Int, Int]].equiv(
+        scalaB,
+        store2Map
+      ) == true)
   }
 
   "StormPlatform should be efficent in real world job" in {
@@ -464,22 +415,23 @@ class StormLaws extends WordSpec {
     assert(OnlinePlan(tail).nodes.size < 10)
     StormTestRun(tail)
 
-    val scalaA = TestGraphs.realJoinTestJobInScala(original1,
-                                                   original2,
-                                                   original3,
-                                                   original4,
-                                                   serviceFn,
-                                                   fn1,
-                                                   fn2,
-                                                   fn3,
-                                                   preJoinFn,
-                                                   postJoinFn)
+    val scalaA = TestGraphs.realJoinTestJobInScala(
+      original1,
+      original2,
+      original3,
+      original4,
+      serviceFn,
+      fn1,
+      fn2,
+      fn3,
+      preJoinFn,
+      postJoinFn)
 
     val store1Map = TestStore[Int, Int](store1Id).get.toScala
     assert(
-        Equiv[Map[Int, Int]].equiv(
-            scalaA,
-            store1Map
-        ) == true)
+      Equiv[Map[Int, Int]].equiv(
+        scalaA,
+        store1Map
+      ) == true)
   }
 }

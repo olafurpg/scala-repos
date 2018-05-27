@@ -30,8 +30,11 @@ import org.apache.spark.internal.Logging
   * iterator of bytebuffers.
   */
 private[streaming] class FileBasedWriteAheadLogReader(
-    path: String, conf: Configuration)
-    extends Iterator[ByteBuffer] with Closeable with Logging {
+    path: String,
+    conf: Configuration)
+    extends Iterator[ByteBuffer]
+    with Closeable
+    with Logging {
 
   private val instream = HdfsUtils.getInputStream(path, conf)
   private var closed =
@@ -61,9 +64,9 @@ private[streaming] class FileBasedWriteAheadLogReader(
           false
         case e: IOException =>
           logWarning(
-              "Error while trying to read data. If the file was deleted, " +
+            "Error while trying to read data. If the file was deleted, " +
               "this should be okay.",
-              e)
+            e)
           close()
           if (HdfsUtils.checkFileExists(path, conf)) {
             // If file exists, this could be a legitimate error
@@ -86,7 +89,7 @@ private[streaming] class FileBasedWriteAheadLogReader(
     val data = nextItem.getOrElse {
       close()
       throw new IllegalStateException(
-          "next called without calling hasNext or after hasNext returned false")
+        "next called without calling hasNext or after hasNext returned false")
     }
     nextItem = None // Ensure the next hasNext call loads new data.
     data

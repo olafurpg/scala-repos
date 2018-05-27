@@ -35,21 +35,23 @@ class TlsEndpointVerificationSpec
   "The client implementation" should {
     "not accept certificates signed by unknown CA" in {
       val pipe = pipeline(
-          Http().defaultClientHttpsContext,
-          hostname = "akka.example.org") // default context doesn't include custom CA
+        Http().defaultClientHttpsContext,
+        hostname = "akka.example.org") // default context doesn't include custom CA
 
-      whenReady(pipe(HttpRequest(uri = "https://akka.example.org/")).failed,
-                timeout) { e ⇒
+      whenReady(
+        pipe(HttpRequest(uri = "https://akka.example.org/")).failed,
+        timeout) { e ⇒
         e shouldBe an[Exception]
       }
     }
     "accept certificates signed by known CA" in {
       val pipe = pipeline(
-          ExampleHttpContexts.exampleClientContext,
-          hostname = "akka.example.org") // example context does include custom CA
+        ExampleHttpContexts.exampleClientContext,
+        hostname = "akka.example.org") // example context does include custom CA
 
-      whenReady(pipe(HttpRequest(uri = "https://akka.example.org:8080/")),
-                timeout) { response ⇒
+      whenReady(
+        pipe(HttpRequest(uri = "https://akka.example.org:8080/")),
+        timeout) { response ⇒
         response.status shouldEqual StatusCodes.OK
         val tlsInfo = response.header[`Tls-Session-Info`].get
         tlsInfo.peerPrincipal.get.getName shouldEqual "CN=akka.example.org,O=Internet Widgits Pty Ltd,ST=Some-State,C=AU"
@@ -57,8 +59,8 @@ class TlsEndpointVerificationSpec
     }
     "not accept certificates for foreign hosts" in {
       val pipe = pipeline(
-          ExampleHttpContexts.exampleClientContext,
-          hostname = "hijack.de") // example context does include custom CA
+        ExampleHttpContexts.exampleClientContext,
+        hostname = "hijack.de") // example context does include custom CA
 
       whenReady(pipe(HttpRequest(uri = "https://hijack.de/")).failed, timeout) {
         e ⇒
@@ -97,8 +99,9 @@ class TlsEndpointVerificationSpec
     }
   }
 
-  def pipeline(clientContext: ConnectionContext,
-               hostname: String): HttpRequest ⇒ Future[HttpResponse] =
+  def pipeline(
+      clientContext: ConnectionContext,
+      hostname: String): HttpRequest ⇒ Future[HttpResponse] =
     req ⇒
       Source
         .single(req)
@@ -113,11 +116,12 @@ class TlsEndpointVerificationSpec
       val name =
         req.header[`Tls-Session-Info`].flatMap(_.localPrincipal).map(_.getName)
       if (name.exists(
-              _ == "CN=akka.example.org,O=Internet Widgits Pty Ltd,ST=Some-State,C=AU"))
+            _ == "CN=akka.example.org,O=Internet Widgits Pty Ltd,ST=Some-State,C=AU"))
         HttpResponse()
       else
-        HttpResponse(StatusCodes.BadRequest,
-                     entity = "Tls-Session-Info header verification failed")
+        HttpResponse(
+          StatusCodes.BadRequest,
+          entity = "Tls-Session-Info header verification failed")
     }
 
     val serverSideTls =

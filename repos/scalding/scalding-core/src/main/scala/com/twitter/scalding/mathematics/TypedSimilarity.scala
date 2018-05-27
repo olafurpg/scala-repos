@@ -106,9 +106,10 @@ trait TypedSimilarity[N, E, S] extends Serializable {
     * The Edge.from nodes in the result will all satisfy smallpred, and the Edge.to will
     * all satisfy bigpred. It is more efficient if you keep the smallpred set smaller.
     */
-  def apply(g: TypedPipe[Edge[N, E]],
-            smallpred: N => Boolean,
-            bigpred: N => Boolean): TypedPipe[Edge[N, S]]
+  def apply(
+      g: TypedPipe[Edge[N, E]],
+      smallpred: N => Boolean,
+      bigpred: N => Boolean): TypedPipe[Edge[N, S]]
   // Do similarity on all the nodes
   def apply(g: TypedPipe[Edge[N, E]]): TypedPipe[Edge[N, S]] = {
     val always = { n: N =>
@@ -120,16 +121,17 @@ trait TypedSimilarity[N, E, S] extends Serializable {
 
 object TypedSimilarity extends Serializable {
   private def maybeWithReducers[T <: WithReducers[T]](
-      withReds: T, reds: Option[Int]) =
+      withReds: T,
+      reds: Option[Int]) =
     reds match {
       case Some(i) => withReds.withReducers(i)
-      case None => withReds
+      case None    => withReds
     }
 
   // key: document,
   // value: (word, documentsWithWord)
   // return: Edge of similarity between words measured by documents
-  def exactSetSimilarity[N : Ordering](
+  def exactSetSimilarity[N: Ordering](
       g: Grouped[N, (N, Int)],
       smallpred: N => Boolean,
       bigpred: N => Boolean): TypedPipe[Edge[N, SetSimilarity]] =
@@ -138,24 +140,28 @@ object TypedSimilarity extends Serializable {
      * = \sum_k E_ki E_kj
      */
     // First compute (i,j) => E_{ki} E_{kj}
-    maybeWithReducers(g.join(g)
-                        .values
-                        .flatMap {
-                          case ((node1, deg1), (node2, deg2)) =>
-                            if (smallpred(node1) && bigpred(node2))
-                              Some(((node1, node2), (1, deg1, deg2))) else None
-                        }
-                        .group,
-                      g.reducers)
+    maybeWithReducers(
+      g.join(g)
+        .values
+        .flatMap {
+          case ((node1, deg1), (node2, deg2)) =>
+            if (smallpred(node1) && bigpred(node2))
+              Some(((node1, node2), (1, deg1, deg2)))
+            else None
+        }
+        .group,
+      g.reducers
+    )
     // Use reduceLeft to push to reducers, no benefit in mapside here
-    .reduceLeft { (left, right) =>
-      // The degrees we always take the left:
-      val (leftCnt, deg1, deg2) = left
-      (leftCnt + right._1, deg1, deg2)
-    }.map {
-      case ((node1, node2), (cnt, deg1, deg2)) =>
-        Edge(node1, node2, SetSimilarity(cnt, deg1, deg2))
-    }
+      .reduceLeft { (left, right) =>
+        // The degrees we always take the left:
+        val (leftCnt, deg1, deg2) = left
+        (leftCnt + right._1, deg1, deg2)
+      }
+      .map {
+        case ((node1, node2), (cnt, deg1, deg2)) =>
+          Edge(node1, node2, SetSimilarity(cnt, deg1, deg2))
+      }
 
   /*
    * key: document,
@@ -163,7 +169,7 @@ object TypedSimilarity extends Serializable {
    * return: Edge of similarity between words measured by documents
    * See: http://arxiv.org/pdf/1206.2082v2.pdf
    */
-  def discoCosineSimilarity[N : Ordering](
+  def discoCosineSimilarity[N: Ordering](
       smallG: Grouped[N, (N, Int)],
       bigG: Grouped[N, (N, Int)],
       oversample: Double): TypedPipe[Edge[N, Double]] = {
@@ -171,30 +177,31 @@ object TypedSimilarity extends Serializable {
     // 2) fix seed so that map-reduce speculative execution does not give inconsistent results.
     lazy val rnd = new scala.util.Random(1024)
     maybeWithReducers(
-        smallG
-          .cogroup(bigG) {
-            (n: N, leftit: Iterator[(N, Int)], rightit: Iterable[(N, Int)]) =>
-              // Use a co-group to ensure this happens in the reducer:
-              leftit.flatMap {
-                case (node1, deg1) =>
-                  rightit.iterator.flatMap {
-                    case (node2, deg2) =>
-                      val weight =
-                        1.0 / scala.math.sqrt(deg1.toDouble * deg2.toDouble)
-                      val prob = oversample * weight
-                      if (prob >= 1.0) {
-                        // Small degree case, just output all of them:
-                        Iterator(((node1, node2), weight))
-                      } else if (rnd.nextDouble < prob) {
-                        // Sample
-                        Iterator(((node1, node2), 1.0 / oversample))
-                      } else Iterator.empty
-                  }
-              }
-          }
-          .values
-          .group,
-        smallG.reducers).forceToReducers.sum.map {
+      smallG
+        .cogroup(bigG) {
+          (n: N, leftit: Iterator[(N, Int)], rightit: Iterable[(N, Int)]) =>
+            // Use a co-group to ensure this happens in the reducer:
+            leftit.flatMap {
+              case (node1, deg1) =>
+                rightit.iterator.flatMap {
+                  case (node2, deg2) =>
+                    val weight =
+                      1.0 / scala.math.sqrt(deg1.toDouble * deg2.toDouble)
+                    val prob = oversample * weight
+                    if (prob >= 1.0) {
+                      // Small degree case, just output all of them:
+                      Iterator(((node1, node2), weight))
+                    } else if (rnd.nextDouble < prob) {
+                      // Sample
+                      Iterator(((node1, node2), 1.0 / oversample))
+                    } else Iterator.empty
+                }
+            }
+        }
+        .values
+        .group,
+      smallG.reducers
+    ).forceToReducers.sum.map {
       case ((node1, node2), sim) => Edge(node1, node2, sim)
     }
   }
@@ -205,37 +212,40 @@ object TypedSimilarity extends Serializable {
    * return: Edge of similarity between words measured by documents
    * See: http://stanford.edu/~rezab/papers/dimsum.pdf
    */
-  def dimsumCosineSimilarity[N : Ordering](
+  def dimsumCosineSimilarity[N: Ordering](
       smallG: Grouped[N, (N, Double, Double)],
       bigG: Grouped[N, (N, Double, Double)],
       oversample: Double): TypedPipe[Edge[N, Double]] = {
     lazy val rnd = new scala.util.Random(1024)
     maybeWithReducers(
-        smallG
-          .cogroup(bigG) {
-            (n: N, leftit: Iterator[(N, Double, Double)],
-            rightit: Iterable[(N, Double, Double)]) =>
-              // Use a co-group to ensure this happens in the reducer:
-              leftit.flatMap {
-                case (node1, weight1, norm1) =>
-                  rightit.iterator.flatMap {
-                    case (node2, weight2, norm2) =>
-                      val weight = 1.0 / (norm1.toDouble * norm2.toDouble)
-                      val prob = oversample * weight
-                      if (prob >= 1.0) {
-                        // Small degree case, just output all of them:
-                        Iterator(((node1, node2), weight * weight1 * weight2))
-                      } else if (rnd.nextDouble < prob) {
-                        // Sample
-                        Iterator(((node1, node2),
-                                  1.0 / oversample * weight1 * weight2))
-                      } else Iterator.empty
-                  }
-              }
-          }
-          .values
-          .group,
-        smallG.reducers).forceToReducers.sum.map {
+      smallG
+        .cogroup(bigG) {
+          (
+              n: N,
+              leftit: Iterator[(N, Double, Double)],
+              rightit: Iterable[(N, Double, Double)]) =>
+            // Use a co-group to ensure this happens in the reducer:
+            leftit.flatMap {
+              case (node1, weight1, norm1) =>
+                rightit.iterator.flatMap {
+                  case (node2, weight2, norm2) =>
+                    val weight = 1.0 / (norm1.toDouble * norm2.toDouble)
+                    val prob = oversample * weight
+                    if (prob >= 1.0) {
+                      // Small degree case, just output all of them:
+                      Iterator(((node1, node2), weight * weight1 * weight2))
+                    } else if (rnd.nextDouble < prob) {
+                      // Sample
+                      Iterator(
+                        ((node1, node2), 1.0 / oversample * weight1 * weight2))
+                    } else Iterator.empty
+                }
+            }
+        }
+        .values
+        .group,
+      smallG.reducers
+    ).forceToReducers.sum.map {
       case ((node1, node2), sim) => Edge(node1, node2, sim)
     }
   }
@@ -245,18 +255,23 @@ object TypedSimilarity extends Serializable {
   * This algothm is just matrix multiplication done by hand to make it
   * clearer when we do the sampling implementation
   */
-class ExactInCosine[N](
-    reducers: Int = -1)(implicit override val nodeOrdering: Ordering[N])
+class ExactInCosine[N](reducers: Int = -1)(
+    implicit override val nodeOrdering: Ordering[N])
     extends TypedSimilarity[N, InDegree, Double] {
 
-  def apply(graph: TypedPipe[Edge[N, InDegree]],
-            smallpred: N => Boolean,
-            bigpred: N => Boolean): TypedPipe[Edge[N, Double]] = {
-    val groupedOnSrc = graph.filter { e =>
-      smallpred(e.to) || bigpred(e.to)
-    }.map { e =>
-      (e.from, (e.to, e.data.degree))
-    }.group.withReducers(reducers)
+  def apply(
+      graph: TypedPipe[Edge[N, InDegree]],
+      smallpred: N => Boolean,
+      bigpred: N => Boolean): TypedPipe[Edge[N, Double]] = {
+    val groupedOnSrc = graph
+      .filter { e =>
+        smallpred(e.to) || bigpred(e.to)
+      }
+      .map { e =>
+        (e.from, (e.to, e.data.degree))
+      }
+      .group
+      .withReducers(reducers)
     TypedSimilarity
       .exactSetSimilarity(groupedOnSrc, smallpred, bigpred)
       .flatMap { e =>
@@ -277,8 +292,10 @@ class ExactInCosine[N](
   * see: http://arxiv.org/pdf/1206.2082v2.pdf for more details
   */
 class DiscoInCosine[N](
-    minCos: Double, delta: Double, boundedProb: Double, reducers: Int = -1)(
-    implicit override val nodeOrdering: Ordering[N])
+    minCos: Double,
+    delta: Double,
+    boundedProb: Double,
+    reducers: Int = -1)(implicit override val nodeOrdering: Ordering[N])
     extends TypedSimilarity[N, InDegree, Double] {
 
   // The probability of being more than delta error is approx:
@@ -286,28 +303,41 @@ class DiscoInCosine[N](
   private val oversample =
     (-2.0 * scala.math.log(boundedProb) / (delta * delta)) / minCos
 
-  def apply(graph: TypedPipe[Edge[N, InDegree]],
-            smallpred: N => Boolean,
-            bigpred: N => Boolean): TypedPipe[Edge[N, Double]] = {
-    val bigGroupedOnSrc = graph.filter { e =>
-      bigpred(e.to)
-    }.map { e =>
-      (e.from, (e.to, e.data.degree))
-    }.group.withReducers(reducers)
-    val smallGroupedOnSrc = graph.filter { e =>
-      smallpred(e.to)
-    }.map { e =>
-      (e.from, (e.to, e.data.degree))
-    }.group.withReducers(reducers)
+  def apply(
+      graph: TypedPipe[Edge[N, InDegree]],
+      smallpred: N => Boolean,
+      bigpred: N => Boolean): TypedPipe[Edge[N, Double]] = {
+    val bigGroupedOnSrc = graph
+      .filter { e =>
+        bigpred(e.to)
+      }
+      .map { e =>
+        (e.from, (e.to, e.data.degree))
+      }
+      .group
+      .withReducers(reducers)
+    val smallGroupedOnSrc = graph
+      .filter { e =>
+        smallpred(e.to)
+      }
+      .map { e =>
+        (e.from, (e.to, e.data.degree))
+      }
+      .group
+      .withReducers(reducers)
 
     TypedSimilarity.discoCosineSimilarity(
-        smallGroupedOnSrc, bigGroupedOnSrc, oversample)
+      smallGroupedOnSrc,
+      bigGroupedOnSrc,
+      oversample)
   }
 }
 
 class DimsumInCosine[N](
-    minCos: Double, delta: Double, boundedProb: Double, reducers: Int = -1)(
-    implicit override val nodeOrdering: Ordering[N])
+    minCos: Double,
+    delta: Double,
+    boundedProb: Double,
+    reducers: Int = -1)(implicit override val nodeOrdering: Ordering[N])
     extends TypedSimilarity[N, (Weight, L2Norm), Double] {
 
   // The probability of being more than delta error is approx:
@@ -315,21 +345,32 @@ class DimsumInCosine[N](
   private val oversample =
     (-2.0 * scala.math.log(boundedProb) / (delta * delta)) / minCos
 
-  def apply(graph: TypedPipe[Edge[N, (Weight, L2Norm)]],
-            smallpred: N => Boolean,
-            bigpred: N => Boolean): TypedPipe[Edge[N, Double]] = {
-    val bigGroupedOnSrc = graph.filter { e =>
-      bigpred(e.to)
-    }.map { e =>
-      (e.from, (e.to, e.data._1.weight, e.data._2.norm))
-    }.group.withReducers(reducers)
-    val smallGroupedOnSrc = graph.filter { e =>
-      smallpred(e.to)
-    }.map { e =>
-      (e.from, (e.to, e.data._1.weight, e.data._2.norm))
-    }.group.withReducers(reducers)
+  def apply(
+      graph: TypedPipe[Edge[N, (Weight, L2Norm)]],
+      smallpred: N => Boolean,
+      bigpred: N => Boolean): TypedPipe[Edge[N, Double]] = {
+    val bigGroupedOnSrc = graph
+      .filter { e =>
+        bigpred(e.to)
+      }
+      .map { e =>
+        (e.from, (e.to, e.data._1.weight, e.data._2.norm))
+      }
+      .group
+      .withReducers(reducers)
+    val smallGroupedOnSrc = graph
+      .filter { e =>
+        smallpred(e.to)
+      }
+      .map { e =>
+        (e.from, (e.to, e.data._1.weight, e.data._2.norm))
+      }
+      .group
+      .withReducers(reducers)
 
     TypedSimilarity.dimsumCosineSimilarity(
-        smallGroupedOnSrc, bigGroupedOnSrc, oversample)
+      smallGroupedOnSrc,
+      bigGroupedOnSrc,
+      oversample)
   }
 }

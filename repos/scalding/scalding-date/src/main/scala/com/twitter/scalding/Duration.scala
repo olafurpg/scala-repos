@@ -29,10 +29,11 @@ object Duration extends java.io.Serializable {
   val SEC_IN_MS = 1000
   val MIN_IN_MS = 60 * SEC_IN_MS
   val HOUR_IN_MS = 60 * MIN_IN_MS
-  val UTC_UNITS = List((Hours, HOUR_IN_MS),
-                       (Minutes, MIN_IN_MS),
-                       (Seconds, SEC_IN_MS),
-                       (Millisecs, 1))
+  val UTC_UNITS = List(
+    (Hours, HOUR_IN_MS),
+    (Minutes, MIN_IN_MS),
+    (Seconds, SEC_IN_MS),
+    (Millisecs, 1))
 }
 
 abstract class Duration(val calField: Int, val count: Int, val tz: TimeZone)
@@ -69,7 +70,7 @@ case class Weeks(cnt: Int)(implicit tz: TimeZone)
     @tailrec def recentMonday(rd: RichDate): RichDate = {
       rd.toCalendar(tz).get(Calendar.DAY_OF_WEEK) match {
         case Calendar.MONDAY => rd
-        case _ => recentMonday(step.subtractFrom(rd))
+        case _               => recentMonday(step.subtractFrom(rd))
       }
     }
     //Set it to the earliest point in the day:

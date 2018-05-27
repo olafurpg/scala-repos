@@ -30,9 +30,10 @@ import org.apache.spark.mllib.fpm.FPGrowth
   */
 object FPGrowthExample {
 
-  case class Params(input: String = null,
-                    minSupport: Double = 0.3,
-                    numPartition: Int = -1)
+  case class Params(
+      input: String = null,
+      minSupport: Double = 0.3,
+      numPartition: Int = -1)
       extends AbstractParams[Params]
 
   def main(args: Array[String]) {
@@ -47,7 +48,8 @@ object FPGrowthExample {
         .text(s"number of partition, default: ${defaultParams.numPartition}")
         .action((x, c) => c.copy(numPartition = x))
       arg[String]("<input>")
-        .text("input paths to input data set, whose file format is that each line " +
+        .text(
+          "input paths to input data set, whose file format is that each line " +
             "contains a transaction with each item in String and separated by a space")
         .required()
         .action((x, c) => c.copy(input = x))

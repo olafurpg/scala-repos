@@ -39,7 +39,7 @@ package object sbt {
   implicit class RichFile(val file: File) extends AnyVal {
     def /(path: String): File = new File(file, path)
 
-    def `<<`: File = <<(1)
+    def `<<` : File = <<(1)
 
     def `<<`(level: Int): File = RichFile.parent(file, level)
 
@@ -134,12 +134,12 @@ package object sbt {
       if (opt.isEmpty) None else Option(f(opt.get))
   }
 
-  def jarWith[T : ClassTag]: File = {
+  def jarWith[T: ClassTag]: File = {
     val tClass = implicitly[ClassTag[T]].runtimeClass
 
     Option(PathUtil.getJarPathForClass(tClass)).map(new File(_)).getOrElse {
       throw new RuntimeException(
-          "Jar file not found for class " + tClass.getName)
+        "Jar file not found for class " + tClass.getName)
     }
   }
 
@@ -186,7 +186,7 @@ package object sbt {
 
   private def parse(fileName: String): (String, String) = fileName match {
     case NameWithExtension(name, extension) => (name, extension)
-    case name => (name, "")
+    case name                               => (name, "")
   }
 
   def inWriteAction[T](body: => T): T = {

@@ -55,7 +55,10 @@ private[interval] object Tree {
     * @return the result, can be null
     */
   @inline private final def branch(
-      p: Long, level: Byte, l: Tree, r: Tree): Tree =
+      p: Long,
+      level: Byte,
+      l: Tree,
+      r: Tree): Tree =
     if (l eq null) r
     else if (r eq null) l
     else Branch(p, level, l, r)
@@ -68,7 +71,10 @@ private[interval] object Tree {
   sealed abstract class BooleanBinaryOperator {
 
     @inline private final def disjoint(
-        a0: Boolean, a: Tree, b0: Boolean, b: Tree): Boolean = {
+        a0: Boolean,
+        a: Tree,
+        b0: Boolean,
+        b: Tree): Boolean = {
       val a_p = a.prefix
       val b_p = b.prefix
       val level = levelAbove(a_p, b_p)
@@ -93,8 +99,7 @@ private[interval] object Tree {
       * @param b a leaf from the rhs
       * @return the result. Can be a leaf or null
       */
-    protected def collision(
-        a0: Boolean, a: Leaf, b0: Boolean, b: Leaf): Boolean
+    protected def collision(a0: Boolean, a: Leaf, b0: Boolean, b: Leaf): Boolean
 
     /**
       * This will be called when a is completely covered by a contiguous interval of b
@@ -122,7 +127,11 @@ private[interval] object Tree {
       * @param b a node (leaf or branch) from the rhs
       * @return the result, can be null
       */
-    private final def op(a0: Boolean, a: Tree, b0: Boolean, b: Tree): Boolean = {
+    private final def op(
+        a0: Boolean,
+        a: Tree,
+        b0: Boolean,
+        b: Tree): Boolean = {
       val a_l = a.level
       val a_p = a.prefix
       val b_l = b.level
@@ -355,13 +364,20 @@ private[interval] object Tree {
     override protected def op(a: Boolean, b: Boolean): Boolean = !(a & b)
 
     override protected def overlapB(
-        a0: Boolean, b0: Boolean, b: Tree): Boolean = !a0
+        a0: Boolean,
+        b0: Boolean,
+        b: Tree): Boolean = !a0
 
     override protected def overlapA(
-        a0: Boolean, a: Tree, b0: Boolean): Boolean = !b0
+        a0: Boolean,
+        a: Tree,
+        b0: Boolean): Boolean = !b0
 
     override protected def collision(
-        a0: Boolean, a: Leaf, b0: Boolean, b: Leaf): Boolean = {
+        a0: Boolean,
+        a: Leaf,
+        b0: Boolean,
+        b: Leaf): Boolean = {
       val at1 = !((a.at ^ a0) & (b.at ^ b0))
       val above1 = !((a.above ^ a0) & (b.above ^ b0))
       at1 && above1
@@ -373,13 +389,20 @@ private[interval] object Tree {
     override protected def op(a: Boolean, b: Boolean): Boolean = a | !b
 
     override protected def overlapB(
-        a0: Boolean, b0: Boolean, b: Tree): Boolean = a0
+        a0: Boolean,
+        b0: Boolean,
+        b: Tree): Boolean = a0
 
     override protected def overlapA(
-        a0: Boolean, a: Tree, b0: Boolean): Boolean = !b0
+        a0: Boolean,
+        a: Tree,
+        b0: Boolean): Boolean = !b0
 
     override protected def collision(
-        a0: Boolean, a: Leaf, b0: Boolean, b: Leaf): Boolean = {
+        a0: Boolean,
+        a: Leaf,
+        b0: Boolean,
+        b: Leaf): Boolean = {
       val at1 = (a.at ^ a0) | !(b.at ^ b0)
       val above1 = (a.above ^ a0) | !(b.above ^ b0)
       at1 && above1
@@ -502,8 +525,7 @@ private[interval] object Tree {
     * A leaf.
     * @param prefix the prefix, which in case of a leaf is identical to the key
     */
-  final case class Leaf(prefix: Long, at: Boolean, sign: Boolean)
-      extends Tree {
+  final case class Leaf(prefix: Long, at: Boolean, sign: Boolean) extends Tree {
 
     /**
       * For a leaf, the prefix is the key

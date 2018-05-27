@@ -25,13 +25,16 @@ private[tournament] final class Reminder(renderer: ActorSelection)
             if (activeUserIds.size > max)
               scala.util.Random.shuffle(activeUserIds) take max
             else activeUserIds
-          bus.publish(SendTos(userIds.toSet,
-                              Json.obj("t" -> "tournamentReminder",
-                                       "d" -> Json.obj(
-                                           "id" -> tour.id,
-                                           "html" -> html.toString
-                                       ))),
-                      'users)
+          bus.publish(
+            SendTos(
+              userIds.toSet,
+              Json.obj(
+                "t" -> "tournamentReminder",
+                "d" -> Json.obj(
+                  "id" -> tour.id,
+                  "html" -> html.toString
+                ))),
+            'users)
       }
   }
 }

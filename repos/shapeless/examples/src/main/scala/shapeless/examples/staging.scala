@@ -72,26 +72,29 @@ object ReflectionUtils {
   import scala.tools.reflect.Eval
 
   def mkTypeTree(a: Any): Tree = a match {
-    case _: Byte => tq"_root_.scala.Byte"
-    case _: Char => tq"_root_.scala.Char"
-    case _: Short => tq"_root_.scala.Short"
-    case _: Int => tq"_root_.scala.Int"
-    case _: Long => tq"_root_.scala.Long"
-    case _: Float => tq"_root_.scala.Float"
-    case _: Double => tq"_root_.scala.Double"
+    case _: Byte    => tq"_root_.scala.Byte"
+    case _: Char    => tq"_root_.scala.Char"
+    case _: Short   => tq"_root_.scala.Short"
+    case _: Int     => tq"_root_.scala.Int"
+    case _: Long    => tq"_root_.scala.Long"
+    case _: Float   => tq"_root_.scala.Float"
+    case _: Double  => tq"_root_.scala.Double"
     case _: Boolean => tq"_root_.scala.Boolean"
-    case _: Unit => tq"_root_.scala.Unit"
-    case other => tq"${other.getClass.getName}"
+    case _: Unit    => tq"_root_.scala.Unit"
+    case other      => tq"${other.getClass.getName}"
   }
 
-  def mkExpr[T : TypeTag](tree: Tree): Expr[T] =
-    Expr[T](currentMirror, new TreeCreator {
-      def apply[U <: Universe with Singleton](m: Mirror[U]): U#Tree =
-        if (m eq currentMirror) tree.asInstanceOf[U#Tree]
-        else
-          throw new IllegalArgumentException(
+  def mkExpr[T: TypeTag](tree: Tree): Expr[T] =
+    Expr[T](
+      currentMirror,
+      new TreeCreator {
+        def apply[U <: Universe with Singleton](m: Mirror[U]): U#Tree =
+          if (m eq currentMirror) tree.asInstanceOf[U#Tree]
+          else
+            throw new IllegalArgumentException(
               s"Expr defined in $currentMirror cannot be migrated to other mirrors.")
-    })
+      }
+    )
 
-  def evalTree[T : TypeTag](tree: Tree) = mkExpr[T](tree).eval
+  def evalTree[T: TypeTag](tree: Tree) = mkExpr[T](tree).eval
 }

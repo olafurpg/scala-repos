@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -57,22 +57,23 @@ trait PerfTestRunner[M[+ _], T] {
       Tree.node((test, a, t), kids)
   }
 
-  private def merge[A : Monoid](
-      run: RunResult[A], f: Option[(T, T)] => A): Tree[(PerfTest, A)] = {
+  private def merge[A: Monoid](
+      run: RunResult[A],
+      f: Option[(T, T)] => A): Tree[(PerfTest, A)] = {
     fill(run) match {
       case Tree.Node((test, a, time), children) =>
         Tree.node((test, a |+| f(time)), children map (merge(_, f)))
     }
   }
 
-  def runAll[A : Monoid](test: Tree[PerfTest], n: Int)(
-      f: Option[(T, T)] => A) = runAllM(test, n)(f).copoint
+  def runAll[A: Monoid](test: Tree[PerfTest], n: Int)(f: Option[(T, T)] => A) =
+    runAllM(test, n)(f).copoint
 
   /**
     * Runs `test` `n` times, merging the times for queries together by converting
     * the times to `A`s, then appending them.
     */
-  def runAllM[A : Monoid](test: Tree[PerfTest], n: Int)(
+  def runAllM[A: Monoid](test: Tree[PerfTest], n: Int)(
       f: Option[(T, T)] => A) = {
     require(n > 0)
 
@@ -129,8 +130,8 @@ trait PerfTestRunner[M[+ _], T] {
   }
 }
 
-class MockPerfTestRunner[M[+ _]](
-    evalTime: => Int)(implicit val M: Monad[M] with Comonad[M])
+class MockPerfTestRunner[M[+ _]](evalTime: => Int)(
+    implicit val M: Monad[M] with Comonad[M])
     extends PerfTestRunner[M, Long] {
   import scalaz.syntax.monad._
 

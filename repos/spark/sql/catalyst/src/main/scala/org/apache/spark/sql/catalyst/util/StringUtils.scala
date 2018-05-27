@@ -35,13 +35,13 @@ object StringUtils {
             c match {
               case '_' => "_"
               case '%' => "%"
-              case _ => Pattern.quote("\\" + c)
+              case _   => Pattern.quote("\\" + c)
             }
           case (prev, c) =>
             c match {
               case '_' => "."
               case '%' => ".*"
-              case _ => Pattern.quote(Character.toString(c))
+              case _   => Pattern.quote(Character.toString(c))
             }
         }
         .mkString

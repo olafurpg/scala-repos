@@ -4,7 +4,8 @@
   */
 class Foo(param1: => Object, param2: => String) {
   lazy val field1 = param1
-  lazy val field2 = try param2 finally println("")
+  lazy val field2 = try param2
+  finally println("")
 }
 
 object Test extends App {

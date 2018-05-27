@@ -22,7 +22,10 @@ object Item {
 
 class DataSource(val dsp: DataSourceParams)
     extends PDataSource[
-        TrainingData, EmptyEvaluationInfo, Query, EmptyActualResult] {
+      TrainingData,
+      EmptyEvaluationInfo,
+      Query,
+      EmptyActualResult] {
 
   @transient lazy val logger = Logger[this.type]
   private lazy val EntityType = "movie"
@@ -34,8 +37,8 @@ class DataSource(val dsp: DataSourceParams)
     // HOWTO: collecting items(movies)
     val itemsRDD = eventsDb
       .aggregateProperties(
-          appId = dsp.appId,
-          entityType = "item"
+        appId = dsp.appId,
+        entityType = "item"
       )(sc)
       .flatMap {
         case (entityId, properties) ⇒
@@ -44,25 +47,29 @@ class DataSource(val dsp: DataSourceParams)
 
     // get all user rate events
     val rateEventsRDD: RDD[Event] =
-      eventsDb.find(appId = dsp.appId,
-                    entityType = Some("user"),
-                    eventNames = Some(List("rate")), // read "rate"
-                    // targetEntityType is optional field of an event.
-                    targetEntityType = Some(Some(EntityType)))(sc)
+      eventsDb.find(
+        appId = dsp.appId,
+        entityType = Some("user"),
+        eventNames = Some(List("rate")), // read "rate"
+        // targetEntityType is optional field of an event.
+        targetEntityType = Some(Some(EntityType))
+      )(sc)
 
     // collect ratings
-    val ratingsRDD = rateEventsRDD.flatMap { event ⇒
-      try {
-        (event.event match {
-          case "rate" => event.properties.getOpt[Double]("rating")
-          case _ ⇒ None
-        }).map(Rating(event.entityId, event.targetEntityId.get, _))
-      } catch {
-        case e: Exception ⇒
-          logger.error(s"Cannot convert ${event} to Rating. Exception: ${e}.")
-          throw e
+    val ratingsRDD = rateEventsRDD
+      .flatMap { event ⇒
+        try {
+          (event.event match {
+            case "rate" => event.properties.getOpt[Double]("rating")
+            case _ ⇒ None
+          }).map(Rating(event.entityId, event.targetEntityId.get, _))
+        } catch {
+          case e: Exception ⇒
+            logger.error(s"Cannot convert ${event} to Rating. Exception: ${e}.")
+            throw e
+        }
       }
-    }.cache()
+      .cache()
 
     new TrainingData(ratingsRDD, itemsRDD)
   }
@@ -81,5 +88,5 @@ class TrainingData(val ratings: RDD[Rating], val items: RDD[(String, Item)])
 
   override def toString =
     s"ratings: [${ratings.count()}] (${ratings.take(2).toList}...)" +
-    s"items: [${items.count()} (${items.take(2).toList}...)]"
+      s"items: [${items.count()} (${items.take(2).toList}...)]"
 }

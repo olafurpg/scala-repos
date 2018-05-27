@@ -31,7 +31,8 @@ import org.apache.spark.serializer.Serializer
   */
 @DeveloperApi
 abstract class StandaloneRecoveryModeFactory(
-    conf: SparkConf, serializer: Serializer) {
+    conf: SparkConf,
+    serializer: Serializer) {
 
   /**
     * PersistenceEngine defines how the persistent data(Information about worker, driver etc..)
@@ -51,8 +52,10 @@ abstract class StandaloneRecoveryModeFactory(
   * recovery is made by restoring from filesystem.
   */
 private[master] class FileSystemRecoveryModeFactory(
-    conf: SparkConf, serializer: Serializer)
-    extends StandaloneRecoveryModeFactory(conf, serializer) with Logging {
+    conf: SparkConf,
+    serializer: Serializer)
+    extends StandaloneRecoveryModeFactory(conf, serializer)
+    with Logging {
 
   val RECOVERY_DIR = conf.get("spark.deploy.recoveryDirectory", "")
 
@@ -61,20 +64,23 @@ private[master] class FileSystemRecoveryModeFactory(
     new FileSystemPersistenceEngine(RECOVERY_DIR, serializer)
   }
 
-  def createLeaderElectionAgent(master: LeaderElectable): LeaderElectionAgent = {
+  def createLeaderElectionAgent(
+      master: LeaderElectable): LeaderElectionAgent = {
     new MonarchyLeaderAgent(master)
   }
 }
 
 private[master] class ZooKeeperRecoveryModeFactory(
-    conf: SparkConf, serializer: Serializer)
+    conf: SparkConf,
+    serializer: Serializer)
     extends StandaloneRecoveryModeFactory(conf, serializer) {
 
   def createPersistenceEngine(): PersistenceEngine = {
     new ZooKeeperPersistenceEngine(conf, serializer)
   }
 
-  def createLeaderElectionAgent(master: LeaderElectable): LeaderElectionAgent = {
+  def createLeaderElectionAgent(
+      master: LeaderElectable): LeaderElectionAgent = {
     new ZooKeeperLeaderElectionAgent(master, conf)
   }
 }

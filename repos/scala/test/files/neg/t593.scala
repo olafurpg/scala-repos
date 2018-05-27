@@ -1,2 +1,1 @@
-trait Wrapper[T](x : T) {
-}
+trait Wrapper[T](x: T) {}

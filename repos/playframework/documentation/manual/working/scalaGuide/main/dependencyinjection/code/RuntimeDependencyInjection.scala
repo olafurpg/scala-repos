@@ -11,7 +11,7 @@ object RuntimeDependencyInjection extends PlaySpecification {
   "Play's runtime dependency injection support" should {
     "support constructor injection" in new WithApplication() {
       app.injector.instanceOf[constructor.MyComponent] must beAnInstanceOf[
-          constructor.MyComponent]
+        constructor.MyComponent]
     }
     "support singleton scope" in new WithApplication() {
       app.injector.instanceOf[singleton.CurrentSharePrice].set(10)
@@ -24,7 +24,9 @@ object RuntimeDependencyInjection extends PlaySpecification {
       cleanup.MessageQueue.stopped must_== true
     }
     "support implemented by annotation" in new WithApplication() {
-      app.injector.instanceOf[implemented.Hello].sayHello("world") must_== "Hello world"
+      app.injector
+        .instanceOf[implemented.Hello]
+        .sayHello("world") must_== "Hello world"
     }
   }
 }
@@ -189,8 +191,8 @@ package playmodule {
 
   class HelloModule extends Module {
     def bindings(environment: Environment, configuration: Configuration) = Seq(
-        bind[Hello].qualifiedWith("en").to[EnglishHello],
-        bind[Hello].qualifiedWith("de").to[GermanHello]
+      bind[Hello].qualifiedWith("en").to[EnglishHello],
+      bind[Hello].qualifiedWith("de").to[GermanHello]
     )
   }
 //#play-module
@@ -207,8 +209,8 @@ package eagerplaymodule {
 
   class HelloModule extends Module {
     def bindings(environment: Environment, configuration: Configuration) = Seq(
-        bind[Hello].qualifiedWith("en").to[EnglishHello].eagerly,
-        bind[Hello].qualifiedWith("de").to[GermanHello].eagerly
+      bind[Hello].qualifiedWith("en").to[EnglishHello].eagerly,
+      bind[Hello].qualifiedWith("de").to[GermanHello].eagerly
     )
   }
 //#eager-play-module

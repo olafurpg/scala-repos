@@ -12,7 +12,9 @@ import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import makeTimeout.veryLarge
 
 private[i18n] final class GitWrite(
-    transRelPath: String, repoPath: String, system: ActorSystem) {
+    transRelPath: String,
+    repoPath: String,
+    system: ActorSystem) {
 
   private val repo = (new FileRepositoryBuilder())
     .setGitDir(new File(repoPath + "/.git"))
@@ -27,7 +29,7 @@ private[i18n] final class GitWrite(
     git.currentBranch flatMap { currentBranch =>
       logger.info("Current branch is " + currentBranch)
       (translations map gitActor.?).sequenceFu >>
-      (gitActor ? currentBranch mapTo manifest[Unit])
+        (gitActor ? currentBranch mapTo manifest[Unit])
     }
   }
 
@@ -36,27 +38,28 @@ private[i18n] final class GitWrite(
     def receive = {
 
       case branch: String => {
-          logger.info("Checkout " + branch)
-          git checkout branch
-          sender ! (())
-        }
+        logger.info("Checkout " + branch)
+        git checkout branch
+        sender ! (())
+      }
 
       case translation: Translation => {
-          val branch = "t/" + translation.id
-          val code = translation.code
-          val name = (LangList name code) err "Lang does not exist: " + code
-          val commitMsg = commitMessage(translation, name)
-          sender !
+        val branch = "t/" + translation.id
+        val code = translation.code
+        val name = (LangList name code) err "Lang does not exist: " + code
+        val commitMsg = commitMessage(translation, name)
+        sender !
           (git branchExists branch flatMap {
-                _.fold(
-                    fuccess(logger.warn("! Branch already exists: " + branch)),
-                    git.checkout(branch, true) >> writeMessages(translation) >>- logger
-                      .info("Add " + relFileOf(translation)) >>
-                    (git add relFileOf(translation)) >>- logger.info("- " +
-                        commitMsg) >> (git commit commitMsg).void
-                )
-              }).await
-        }
+            _.fold(
+              fuccess(logger.warn("! Branch already exists: " + branch)),
+              git
+                .checkout(branch, true) >> writeMessages(translation) >>- logger
+                .info("Add " + relFileOf(translation)) >>
+                (git add relFileOf(translation)) >>- logger.info("- " +
+                commitMsg) >> (git commit commitMsg).void
+            )
+          }).await
+      }
     }
   }))
 
@@ -75,11 +78,11 @@ private[i18n] final class GitWrite(
 
   private def commitMessage(translation: Translation, name: String) =
     """%s "%s" translation #%d. Author: %s. %s""".format(
-        translation.code,
-        name,
-        translation.id,
-        translation.author | "Anonymous",
-        translation.comment | "")
+      translation.code,
+      name,
+      translation.id,
+      translation.author | "Anonymous",
+      translation.comment | "")
 
   final class Git(repo: Repository, debug: Boolean = false) {
 

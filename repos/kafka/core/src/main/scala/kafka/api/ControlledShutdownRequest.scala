@@ -38,15 +38,16 @@ object ControlledShutdownRequest extends Logging {
   }
 }
 
-case class ControlledShutdownRequest(versionId: Short,
-                                     correlationId: Int,
-                                     clientId: Option[String],
-                                     brokerId: Int)
+case class ControlledShutdownRequest(
+    versionId: Short,
+    correlationId: Int,
+    clientId: Option[String],
+    brokerId: Int)
     extends RequestOrResponse(Some(ApiKeys.CONTROLLED_SHUTDOWN_KEY.id)) {
 
   if (versionId > 0 && clientId.isEmpty)
     throw new IllegalArgumentException(
-        "`clientId` must be defined if `versionId` > 0")
+      "`clientId` must be defined if `versionId` > 0")
 
   def writeTo(buffer: ByteBuffer) {
     buffer.putShort(versionId)
@@ -65,17 +66,18 @@ case class ControlledShutdownRequest(versionId: Short,
     describe(true)
   }
 
-  override def handleError(e: Throwable,
-                           requestChannel: RequestChannel,
-                           request: RequestChannel.Request): Unit = {
+  override def handleError(
+      e: Throwable,
+      requestChannel: RequestChannel,
+      request: RequestChannel.Request): Unit = {
     val errorResponse = ControlledShutdownResponse(
-        correlationId,
-        Errors.forException(e).code,
-        Set.empty[TopicAndPartition])
+      correlationId,
+      Errors.forException(e).code,
+      Set.empty[TopicAndPartition])
     requestChannel.sendResponse(
-        new Response(
-            request,
-            new RequestOrResponseSend(request.connectionId, errorResponse)))
+      new Response(
+        request,
+        new RequestOrResponseSend(request.connectionId, errorResponse)))
   }
 
   override def describe(details: Boolean = false): String = {

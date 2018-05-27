@@ -43,14 +43,16 @@ object LineChart {
   def apply[X, Y](xAxis: Axis[X], yAxis: Axis[Y]) =
     new LineChart[X, Y](new jfxsc.LineChart[X, Y](xAxis, yAxis))
 
-  def apply[X, Y](xAxis: Axis[X],
-                  yAxis: Axis[Y],
-                  data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) =
+  def apply[X, Y](
+      xAxis: Axis[X],
+      yAxis: Axis[Y],
+      data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) =
     new LineChart[X, Y](new jfxsc.LineChart[X, Y](xAxis, yAxis, data))
 
   object SortingPolicy
       extends SFXEnumDelegateCompanion[
-          jfxsc.LineChart.SortingPolicy, SortingPolicy] {
+        jfxsc.LineChart.SortingPolicy,
+        SortingPolicy] {
 
     /**
       * The data should be left in the order defined by the list in [[scalafx.scene.chart.LineChart.data]] property.
@@ -77,15 +79,17 @@ object LineChart {
 }
 
 class LineChart[X, Y](override val delegate: jfxsc.LineChart[X, Y])
-    extends XYChart[X, Y](delegate) with SFXDelegate[jfxsc.LineChart[X, Y]] {
+    extends XYChart[X, Y](delegate)
+    with SFXDelegate[jfxsc.LineChart[X, Y]] {
 
   def this(xAxis: Axis[X], yAxis: Axis[Y]) {
     this(new jfxsc.LineChart[X, Y](xAxis, yAxis))
   }
 
-  def this(xAxis: Axis[X],
-           yAxis: Axis[Y],
-           data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) {
+  def this(
+      xAxis: Axis[X],
+      yAxis: Axis[Y],
+      data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) {
     this(new jfxsc.LineChart[X, Y](xAxis, yAxis, data))
   }
 

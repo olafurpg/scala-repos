@@ -5,14 +5,14 @@ import Import._
 object Build extends Build {
 
   lazy val root: Project = Project(
-      "root",
-      file("."),
-      aggregate = Seq(sub)
+    "root",
+    file("."),
+    aggregate = Seq(sub)
   )
 
   lazy val sub: Project = Project(
-      "sub",
-      file("sub"),
-      dependencies = Seq(root)
+    "sub",
+    file("sub"),
+    dependencies = Seq(root)
   )
 }

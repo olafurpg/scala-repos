@@ -27,8 +27,7 @@ import common._
 /**
   * Systems under specification for HtmlHelpers.
   */
-object HtmlHelpersSpec
-    extends Specification with HtmlHelpers with XmlMatchers {
+object HtmlHelpersSpec extends Specification with HtmlHelpers with XmlMatchers {
   "HtmlHelpers Specification".title
 
   "findBox" should {
@@ -116,12 +115,12 @@ object HtmlHelpersSpec
 
     "ignore non-head" in {
       Helpers.stripHead(<head3><i>hello</i></head3>) must ==/(
-          <head3><i>hello</i></head3>)
+        <head3><i>hello</i></head3>)
     }
 
     "String subhead" in {
       Helpers.stripHead(<head3><i><head>hello</head></i></head3>) must ==/(
-          <head3><i>hello</i></head3>)
+        <head3><i>hello</i></head3>)
     }
   }
 
@@ -138,7 +137,7 @@ object HtmlHelpersSpec
       val removed = removeAttribute("attribute", element.attributes)
 
       (removed("attribute") must_== null) and
-      (removed("otherAttribute") must_== Text("good-bye"))
+        (removed("otherAttribute") must_== Text("good-bye"))
     }
   }
 
@@ -162,13 +161,13 @@ object HtmlHelpersSpec
       val uniqued = <wrapper>{ensureUniqueId(xml).head}</wrapper>
 
       (uniqued must \("boom", "id" -> "thing")) and
-      (uniqued must \\("hello", "id" -> "other-thing")) and
-      (uniqued must \\("bye", "id" -> "third-thing"))
+        (uniqued must \\("hello", "id" -> "other-thing")) and
+        (uniqued must \\("bye", "id" -> "third-thing"))
     }
 
     "strip the ids if elements have an id matching a previous one" in {
       val xml = Group(
-          <boom id="thing" />
+        <boom id="thing" />
           <hello id="thing" />
           <bye id="thing" />
       )
@@ -176,7 +175,7 @@ object HtmlHelpersSpec
       val uniqued = NodeSeq.seqToNodeSeq(ensureUniqueId(xml).flatten)
 
       uniqued must ==/(
-          <boom id="thing" />
+        <boom id="thing" />
         <hello />
         <bye />
       )
@@ -191,7 +190,7 @@ object HtmlHelpersSpec
       val uniqued = <wrapper>{ensureUniqueId(xml).head}</wrapper>
 
       (uniqued must \\("hello", "id" -> "thing")) and
-      (uniqued must \\("bye", "id" -> "thing"))
+        (uniqued must \\("bye", "id" -> "thing"))
     }
   }
 
@@ -205,13 +204,13 @@ object HtmlHelpersSpec
       val uniqued = <wrapper>{deepEnsureUniqueId(xml).head}</wrapper>
 
       (uniqued must \("boom", "id" -> "thing")) and
-      (uniqued must \\("hello", "id" -> "other-thing")) and
-      (uniqued must \\("bye", "id" -> "third-thing"))
+        (uniqued must \\("hello", "id" -> "other-thing")) and
+        (uniqued must \\("bye", "id" -> "third-thing"))
     }
 
     "strip the ids if elements have an id matching a previous one" in {
       val xml = Group(
-          <boom id="thing" />
+        <boom id="thing" />
           <hello id="thing" />
           <bye id="thing" />
       )
@@ -219,7 +218,7 @@ object HtmlHelpersSpec
       val uniqued = NodeSeq.seqToNodeSeq(deepEnsureUniqueId(xml).flatten)
 
       uniqued must ==/(
-          <boom id="thing" />
+        <boom id="thing" />
         <hello />
         <bye />
       )
@@ -237,7 +236,7 @@ object HtmlHelpersSpec
       val uniqued = <wrapper>{deepEnsureUniqueId(xml).head}</wrapper>
 
       uniqued must ==/(
-          <wrapper>
+        <wrapper>
           <boom id="thing">
             <hello />
             <good id="other-thing">Boom</good>
@@ -281,7 +280,7 @@ object HtmlHelpersSpec
 
     "not affect other elements" in {
       val xml = Group(
-          <boom id="thing" />
+        <boom id="thing" />
           <hello id="thing" />
           <bye id="thing" />
       )
@@ -290,7 +289,7 @@ object HtmlHelpersSpec
         NodeSeq.seqToNodeSeq(ensureId(xml, "other-thinger").flatten)
 
       uniqued must ==/(
-          <boom id="other-thinger" />
+        <boom id="other-thinger" />
         <hello id="thing" />
         <bye id="thing" />
       )

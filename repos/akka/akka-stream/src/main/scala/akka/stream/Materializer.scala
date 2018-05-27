@@ -50,9 +50,10 @@ abstract class Materializer {
     * @return A [[akka.actor.Cancellable]] that allows cancelling the timer. Cancelling is best effort, if the event
     *         has been already enqueued it will not have an effect.
     */
-  def schedulePeriodically(initialDelay: FiniteDuration,
-                           interval: FiniteDuration,
-                           task: Runnable): Cancellable
+  def schedulePeriodically(
+      initialDelay: FiniteDuration,
+      interval: FiniteDuration,
+      task: Runnable): Cancellable
 }
 
 /**
@@ -62,21 +63,21 @@ private[akka] object NoMaterializer extends Materializer {
   override def withNamePrefix(name: String): Materializer =
     throw new UnsupportedOperationException("NoMaterializer cannot be named")
   override def materialize[Mat](runnable: Graph[ClosedShape, Mat]): Mat =
-    throw new UnsupportedOperationException(
-        "NoMaterializer cannot materialize")
+    throw new UnsupportedOperationException("NoMaterializer cannot materialize")
   override def executionContext: ExecutionContextExecutor =
     throw new UnsupportedOperationException(
-        "NoMaterializer does not provide an ExecutionContext")
+      "NoMaterializer does not provide an ExecutionContext")
 
   def scheduleOnce(delay: FiniteDuration, task: Runnable): Cancellable =
     throw new UnsupportedOperationException(
-        "NoMaterializer cannot schedule a single event")
+      "NoMaterializer cannot schedule a single event")
 
-  def schedulePeriodically(initialDelay: FiniteDuration,
-                           interval: FiniteDuration,
-                           task: Runnable): Cancellable =
+  def schedulePeriodically(
+      initialDelay: FiniteDuration,
+      interval: FiniteDuration,
+      task: Runnable): Cancellable =
     throw new UnsupportedOperationException(
-        "NoMaterializer cannot schedule a repeated event")
+      "NoMaterializer cannot schedule a repeated event")
 }
 
 /**

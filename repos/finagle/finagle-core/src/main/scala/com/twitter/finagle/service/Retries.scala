@@ -94,8 +94,8 @@ object Retries {
     * Retries failures that are guaranteed to be safe to retry
     * (see [[RetryPolicy.RetryableWriteException]]).
     */
-  private[finagle] def moduleRequeueable[Req, Rep]: Stackable[ServiceFactory[
-          Req, Rep]] =
+  private[finagle] def moduleRequeueable[Req, Rep]
+    : Stackable[ServiceFactory[Req, Rep]] =
     new Stack.Module3[Stats, Budget, HighResTimer, ServiceFactory[Req, Rep]] {
       def role: Stack.Role = Retries.Role
 
@@ -115,12 +115,12 @@ object Retries {
         val timer = timerP.timer
 
         val filters = newRequeueFilter(
-            retryBudget,
-            budgetP.requeueBackoffs,
-            withdrawsOnly = false,
-            scoped,
-            timer,
-            next
+          retryBudget,
+          budgetP.requeueBackoffs,
+          withdrawsOnly = false,
+          scoped,
+          timer,
+          next
         )
         svcFactory(retryBudget, filters, scoped, requeues, next)
       }
@@ -138,20 +138,20 @@ object Retries {
     *       level failures. This is particularly important for codecs that
     *       include exceptions, such as `Thrift`.
     */
-  private[finagle] def moduleWithRetryPolicy[Req, Rep]: Stackable[
-      ServiceFactory[Req, Rep]] =
+  private[finagle] def moduleWithRetryPolicy[Req, Rep]
+    : Stackable[ServiceFactory[Req, Rep]] =
     new Stack.Module4[
-        Stats,
-        Budget,
-        Policy,
-        HighResTimer,
-        ServiceFactory[Req, Rep]
+      Stats,
+      Budget,
+      Policy,
+      HighResTimer,
+      ServiceFactory[Req, Rep]
     ] {
       def role: Stack.Role = Retries.Role
 
       def description: String =
         "Retries requests, at the service application level, that have been rejected " +
-        "or meet the application-configured retry policy for transport level failures."
+          "or meet the application-configured retry policy for transport level failures."
 
       def make(
           statsP: param.Stats,
@@ -168,23 +168,27 @@ object Retries {
 
         val filters =
           if (retryPolicy eq RetryPolicy.Never) {
-            newRequeueFilter(retryBudget,
-                             budgetP.requeueBackoffs,
-                             withdrawsOnly = false,
-                             scoped,
-                             timerP.timer,
-                             next)
+            newRequeueFilter(
+              retryBudget,
+              budgetP.requeueBackoffs,
+              withdrawsOnly = false,
+              scoped,
+              timerP.timer,
+              next)
           } else {
             val retryFilter = new RetryExceptionsFilter[Req, Rep](
-                retryPolicy, timerP.timer, statsRecv, retryBudget)
+              retryPolicy,
+              timerP.timer,
+              statsRecv,
+              retryBudget)
             // note that we wrap the budget, since the retry filter wraps this
             val requeueFilter = newRequeueFilter(
-                retryBudget,
-                budgetP.requeueBackoffs,
-                withdrawsOnly = true,
-                scoped,
-                timerP.timer,
-                next
+              retryBudget,
+              budgetP.requeueBackoffs,
+              withdrawsOnly = true,
+              scoped,
+              timerP.timer,
+              next
             )
             retryFilter.andThen(requeueFilter)
           }
@@ -204,14 +208,16 @@ object Retries {
     val budget =
       if (withdrawsOnly) new WithdrawOnlyRetryBudget(retryBudget)
       else retryBudget
-    new RequeueFilter[Req, Rep](budget,
-                                retrySchedule,
-                                statsReceiver,
-                                // TODO: If we ensure that the stack doesn't return restartable
-                                // failures when it isn't Open, we wouldn't need to gate on status.
-                                () => next.status == Status.Open,
-                                MaxRequeuesPerReq,
-                                timer)
+    new RequeueFilter[Req, Rep](
+      budget,
+      retrySchedule,
+      statsReceiver,
+      // TODO: If we ensure that the stack doesn't return restartable
+      // failures when it isn't Open, we wouldn't need to gate on status.
+      () => next.status == Status.Open,
+      MaxRequeuesPerReq,
+      timer
+    )
   }
 
   private[this] def svcFactory[Req, Rep](
@@ -240,7 +246,8 @@ object Retries {
         * some exceptions to acquire a service are considered fatal.
         */
       private[this] def applySelf(
-          conn: ClientConnection, n: Int): Future[Service[Req, Rep]] =
+          conn: ClientConnection,
+          n: Int): Future[Service[Req, Rep]] =
         self(conn).rescue {
           case e @ RetryPolicy.RetryableWriteException(_) if n > 0 =>
             if (status == Status.Open) {

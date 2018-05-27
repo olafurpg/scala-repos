@@ -20,7 +20,8 @@ object AutoDownSpec {
   val memberC = TestMember(Address("akka.tcp", "sys", "c", 2552), Up)
 
   class AutoDownTestActor(
-      autoDownUnreachableAfter: FiniteDuration, probe: ActorRef)
+      autoDownUnreachableAfter: FiniteDuration,
+      probe: ActorRef)
       extends AutoDownBase(autoDownUnreachableAfter) {
 
     override def selfAddress = memberA.address
@@ -39,7 +40,7 @@ class AutoDownSpec extends AkkaSpec {
 
   def autoDownActor(autoDownUnreachableAfter: FiniteDuration): ActorRef =
     system.actorOf(
-        Props(classOf[AutoDownTestActor], autoDownUnreachableAfter, testActor))
+      Props(classOf[AutoDownTestActor], autoDownUnreachableAfter, testActor))
 
   "AutoDown" must {
 

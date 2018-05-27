@@ -45,7 +45,7 @@ private[finagle] object SingletonPool {
 
     override def close(deadline: Time): Future[Unit] =
       count.decrementAndGet() match {
-        case 0 => underlying.close(deadline)
+        case 0          => underlying.close(deadline)
         case n if n < 0 =>
           // This is technically an API usage error.
           count.incrementAndGet()
@@ -70,7 +70,8 @@ private[finagle] object SingletonPool {
   * fails or the current service has become unavailable.
   */
 class SingletonPool[Req, Rep](
-    underlying: ServiceFactory[Req, Rep], statsReceiver: StatsReceiver)
+    underlying: ServiceFactory[Req, Rep],
+    statsReceiver: StatsReceiver)
     extends ServiceFactory[Req, Rep] {
   import SingletonPool._
 
@@ -88,7 +89,7 @@ class SingletonPool[Req, Rep](
     */
   private[this] def connect(done: Promise[Unit], conn: ClientConnection) {
     def complete(newState: State[Req, Rep]) = state.get match {
-      case s @ Awaiting(d) if d == done => state.compareAndSet(s, newState)
+      case s @ Awaiting(d) if d == done          => state.compareAndSet(s, newState)
       case Idle | Closed | Awaiting(_) | Open(_) => false
     }
 
@@ -108,8 +109,8 @@ class SingletonPool[Req, Rep](
         complete(Idle)
         svc.close()
         Future.exception(
-            Failure("Returned unavailable service", Failure.Restartable)
-              .withSource(Failure.Source.Role, SingletonPool.role))
+          Failure("Returned unavailable service", Failure.Restartable)
+            .withSource(Failure.Source.Role, SingletonPool.role))
 
       case Return(svc) =>
         if (!complete(Open(new RefcountedService(svc)))) svc.close()
@@ -156,19 +157,19 @@ class SingletonPool[Req, Rep](
   /**
     * @inheritdoc
     *
-    * The status of a [[SingletonPool]] is the worse of the 
+    * The status of a [[SingletonPool]] is the worse of the
     * the underlying status and the status of the currently
     * cached service, if any.
     */
   override def status: Status =
     state.get match {
-      case Closed => Status.Closed
+      case Closed    => Status.Closed
       case Open(svc) =>
         // We don't account for closed services as these will
         // be reestablished on the next request.
         svc.status match {
           case Status.Closed => underlying.status
-          case status => Status.worst(status, underlying.status)
+          case status        => Status.worst(status, underlying.status)
         }
       case Idle | Awaiting(_) =>
         // This could also be Status.worst(underlying.status, Status.Busy(p));

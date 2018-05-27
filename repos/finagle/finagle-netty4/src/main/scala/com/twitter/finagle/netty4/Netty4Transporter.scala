@@ -42,8 +42,9 @@ private[netty4] object Netty4Transporter {
         .option[JBool](ChannelOption.TCP_NODELAY, noDelay)
         .option[JBool](ChannelOption.SO_REUSEADDR, reuseAddr)
         .option[JBool](ChannelOption.AUTO_READ, false) // backpressure! no reads on transport => no reads on the socket
-        .option[JInt](ChannelOption.CONNECT_TIMEOUT_MILLIS,
-                      compensatedConnectTimeoutMs.toInt)
+        .option[JInt](
+          ChannelOption.CONNECT_TIMEOUT_MILLIS,
+          compensatedConnectTimeoutMs.toInt)
         .handler(init)
 
       val Transport.Liveness(_, _, keepAlive) = params[Transport.Liveness]
@@ -58,8 +59,7 @@ private[netty4] object Netty4Transporter {
         case _ => nettyConnectF.cancel(true /* mayInterruptIfRunning */ )
       }
 
-      nettyConnectF.addListener(
-          new GenericFutureListener[ChannelPromise] {
+      nettyConnectF.addListener(new GenericFutureListener[ChannelPromise] {
         def operationComplete(channelP: ChannelPromise): Unit =
           if (channelP.cause != null)
             transportP.updateIfEmpty(Throw(channelP.cause))
@@ -78,8 +78,8 @@ private[netty4] object Netty4Transporter {
       params: Stack.Params
   ): Transporter[In, Out] = {
     val transportP = new Promise[Transport[In, Out]]
-    val init = new RawNetty4ClientChannelInitializer[In, Out](
-        transportP, params, pipeCb)
+    val init =
+      new RawNetty4ClientChannelInitializer[In, Out](transportP, params, pipeCb)
 
     build(init, params, transportP)
   }
@@ -95,7 +95,10 @@ private[netty4] object Netty4Transporter {
   ): Transporter[In, Out] = {
     val transportP = new Promise[Transport[In, Out]]
     val init = new Netty4ClientChannelInitializer[In, Out](
-        transportP, params, enc, decoderFactory)
+      transportP,
+      params,
+      enc,
+      decoderFactory)
 
     build(init, params, transportP)
   }

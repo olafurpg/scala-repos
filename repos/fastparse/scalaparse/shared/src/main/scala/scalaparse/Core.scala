@@ -92,7 +92,7 @@ trait Core extends syntax.Literals {
     val ThisSuper = P(`this` | `super` ~ ClassQualifier.?)
     val ThisPath: P0 = P(ThisSuper ~ ("." ~ PostDotCheck ~/ Id).rep)
     val IdPath: P0 = P(
-        Id ~ ("." ~ PostDotCheck ~/ (`this` | Id)).rep ~ ("." ~ ThisPath).?)
+      Id ~ ("." ~ PostDotCheck ~/ (`this` | Id)).rep ~ ("." ~ ThisPath).?)
     P(ThisPath | IdPath)
   }
 }

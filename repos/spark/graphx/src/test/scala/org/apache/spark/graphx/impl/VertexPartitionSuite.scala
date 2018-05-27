@@ -25,9 +25,8 @@ import org.apache.spark.serializer.KryoSerializer
 class VertexPartitionSuite extends SparkFunSuite {
 
   test("isDefined, filter") {
-    val vp = VertexPartition(Iterator((0L, 1), (1L, 1))).filter {
-      (vid, attr) =>
-        vid == 0
+    val vp = VertexPartition(Iterator((0L, 1), (1L, 1))).filter { (vid, attr) =>
+      vid == 0
     }
     assert(vp.isDefined(0))
     assert(!vp.isDefined(1))
@@ -67,11 +66,13 @@ class VertexPartitionSuite extends SparkFunSuite {
 
   test("leftJoin") {
     val vp = VertexPartition(Iterator((0L, 1), (1L, 1), (2L, 1)))
-    val vp2a = vp.filter { (vid, attr) =>
-      vid <= 1
-    }.map { (vid, attr) =>
-      2
-    }
+    val vp2a = vp
+      .filter { (vid, attr) =>
+        vid <= 1
+      }
+      .map { (vid, attr) =>
+        2
+      }
     val vp2b = VertexPartition(vp2a.iterator)
     // leftJoin with same index
     val join1 = vp.leftJoin(vp2a) { (vid, a, bOpt) =>
@@ -92,11 +93,13 @@ class VertexPartitionSuite extends SparkFunSuite {
 
   test("innerJoin") {
     val vp = VertexPartition(Iterator((0L, 1), (1L, 1), (2L, 1)))
-    val vp2a = vp.filter { (vid, attr) =>
-      vid <= 1
-    }.map { (vid, attr) =>
-      2
-    }
+    val vp2a = vp
+      .filter { (vid, attr) =>
+        vid <= 1
+      }
+      .map { (vid, attr) =>
+        2
+      }
     val vp2b = VertexPartition(vp2a.iterator)
     // innerJoin with same index
     val join1 = vp.innerJoin(vp2a) { (vid, a, b) =>

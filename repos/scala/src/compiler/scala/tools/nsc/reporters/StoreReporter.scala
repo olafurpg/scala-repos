@@ -18,7 +18,10 @@ class StoreReporter extends Reporter {
   }
   val infos = new mutable.LinkedHashSet[Info]
   protected def info0(
-      pos: Position, msg: String, severity: Severity, force: Boolean) {
+      pos: Position,
+      msg: String,
+      severity: Severity,
+      force: Boolean) {
     if (!force) {
       infos += new Info(pos, msg, severity)
       severity.count += 1

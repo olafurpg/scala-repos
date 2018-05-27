@@ -32,6 +32,6 @@ trait Foo {
 
 object Test extends App {
   typeOf[Foo].decls.sorted.foreach(m =>
-        println(
-            s"$m: isPrivateThis = ${m.isPrivateThis}, isProtectedThis = ${m.isProtectedThis}"))
+    println(
+      s"$m: isPrivateThis = ${m.isPrivateThis}, isProtectedThis = ${m.isProtectedThis}"))
 }

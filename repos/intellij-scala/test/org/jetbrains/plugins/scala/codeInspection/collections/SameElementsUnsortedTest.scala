@@ -37,7 +37,7 @@ class SameElementsUnsortedTest extends OperationsOnCollectionInspectionTest {
 
   def testSeqSortedMap(): Unit = {
     checkTextHasNoErrors(
-        "Seq((1, 1)).sameElements(scala.collection.SortedMap(1 -> 1))")
+      "Seq((1, 1)).sameElements(scala.collection.SortedMap(1 -> 1))")
   }
 
   def testSeqArray(): Unit = {
@@ -65,7 +65,7 @@ class CorrespondsUnsortedTest extends OperationsOnCollectionInspectionTest {
 
   def testCorrespondsSortedSet(): Unit = {
     checkTextHasNoErrors(
-        "Iterator(1).corresponds(scala.collection.SortedSet(1))((x, y) => true)")
+      "Iterator(1).corresponds(scala.collection.SortedSet(1))((x, y) => true)")
   }
 
   def testCorrespondsArray(): Unit = {

@@ -30,16 +30,17 @@ object DemoMain {
   }
   @JSExport
   def whitespaceMath(container: html.Div) = {
-    helper(container,
-           fastparse.WhiteSpaceMathTests.expr,
-           "  (  (  1+1  * 2   ) +( 3* 4  *5  )  )/3")
+    helper(
+      container,
+      fastparse.WhiteSpaceMathTests.expr,
+      "  (  (  1+1  * 2   ) +( 3* 4  *5  )  )/3")
   }
   @JSExport
   def indentation(container: html.Div) = {
     helper(
-        container,
-        fastparse.IndentationTests.expr,
-        """+
+      container,
+      fastparse.IndentationTests.expr,
+      """+
         |  +
         |    1
         |    *
@@ -53,9 +54,10 @@ object DemoMain {
   }
   @JSExport
   def json(container: html.Div) = {
-    helper(container,
-           fastparse.JsonTests.jsonExpr,
-           """{
+    helper(
+      container,
+      fastparse.JsonTests.jsonExpr,
+      """{
         |  "firstName": "John",
         |  "lastName": "Smith",
         |  "age": 25,
@@ -75,16 +77,17 @@ object DemoMain {
         |          "number": "646 555-4567"
         |      }
         |  ]
-        |}""".stripMargin)
+        |}""".stripMargin
+    )
   }
   def helper(container: html.Div, parser: Parser[_], default: String) = {
     import scalatags.JsDom.all._
     val inputBox = textarea(
-        width := "45%",
-        float.left,
-        fontFamily := "monospace",
-        fontSize := 16,
-        default
+      width := "45%",
+      float.left,
+      fontFamily := "monospace",
+      fontSize := 16,
+      default
     ).render
 
     val outputBox = div(width := "45%", float.right, overflowX.scroll).render
@@ -94,9 +97,9 @@ object DemoMain {
       val details = parser.parse(inputBox.value) match {
         case s: Parsed.Success[_] =>
           table(
-              width := "100%",
-              tr(td("Success!")),
-              tr(td("value:"), td(code(s.value.toString)))
+            width := "100%",
+            tr(td("Success!")),
+            tr(td("value:"), td(code(s.value.toString)))
           )
 
         case Parsed.Failure(lastParser, index, extra) =>
@@ -104,11 +107,11 @@ object DemoMain {
             .literalize(extra.input.slice(index, index + 15))
             .toString
           table(
-              width := "100%",
-              tr(td("Failure!")),
-              tr(td("at index:"), td(code(index))),
-              tr(td("found:"), td("...", code(pretty))),
-              tr(td("expected:"), td(code(lastParser.toString)))
+            width := "100%",
+            tr(td("Failure!")),
+            tr(td("at index:"), td(code(index))),
+            tr(td("found:"), td("...", code(pretty))),
+            tr(td("expected:"), td(code(lastParser.toString)))
           )
       }
       outputBox.innerHTML = ""

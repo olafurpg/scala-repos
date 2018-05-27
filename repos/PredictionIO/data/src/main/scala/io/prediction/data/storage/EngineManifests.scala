@@ -30,12 +30,13 @@ import org.json4s._
   * @group Meta Data
   */
 @DeveloperApi
-case class EngineManifest(id: String,
-                          version: String,
-                          name: String,
-                          description: Option[String],
-                          files: Seq[String],
-                          engineFactory: String)
+case class EngineManifest(
+    id: String,
+    version: String,
+    name: String,
+    description: Option[String],
+    files: Seq[String],
+    engineFactory: String)
 
 /** :: DeveloperApi ::
   * Base trait of the [[EngineManifest]] data access object
@@ -69,14 +70,15 @@ trait EngineManifests {
 @DeveloperApi
 class EngineManifestSerializer
     extends CustomSerializer[EngineManifest](format =>
-          ({
+      ({
         case JObject(fields) =>
-          val seed = EngineManifest(id = "",
-                                    version = "",
-                                    name = "",
-                                    description = None,
-                                    files = Nil,
-                                    engineFactory = "")
+          val seed = EngineManifest(
+            id = "",
+            version = "",
+            name = "",
+            description = None,
+            files = Nil,
+            engineFactory = "")
           fields.foldLeft(seed) {
             case (enginemanifest, field) =>
               field match {
@@ -89,9 +91,9 @@ class EngineManifestSerializer
                   enginemanifest.copy(description = Some(description))
                 case JField("files", JArray(s)) =>
                   enginemanifest.copy(files = s.map(t =>
-                              t match {
+                    t match {
                       case JString(file) => file
-                      case _ => ""
+                      case _             => ""
                   }))
                 case JField("engineFactory", JString(engineFactory)) =>
                   enginemanifest.copy(engineFactory = engineFactory)
@@ -101,16 +103,19 @@ class EngineManifestSerializer
       }, {
         case enginemanifest: EngineManifest =>
           JObject(
-              JField("id", JString(enginemanifest.id)) :: JField(
-                  "version", JString(enginemanifest.version)) :: JField(
-                  "name", JString(enginemanifest.name)) :: JField(
-                  "description",
-                  enginemanifest.description
-                    .map(x => JString(x))
-                    .getOrElse(JNothing)) :: JField("files",
-                                                    JArray(enginemanifest.files
-                                                          .map(x => JString(x))
-                                                          .toList)) :: JField(
-                  "engineFactory",
-                  JString(enginemanifest.engineFactory)) :: Nil)
+            JField("id", JString(enginemanifest.id)) :: JField(
+              "version",
+              JString(enginemanifest.version)) :: JField(
+              "name",
+              JString(enginemanifest.name)) :: JField(
+              "description",
+              enginemanifest.description
+                .map(x => JString(x))
+                .getOrElse(JNothing)) :: JField(
+              "files",
+              JArray(enginemanifest.files
+                .map(x => JString(x))
+                .toList)) :: JField(
+              "engineFactory",
+              JString(enginemanifest.engineFactory)) :: Nil)
       }))

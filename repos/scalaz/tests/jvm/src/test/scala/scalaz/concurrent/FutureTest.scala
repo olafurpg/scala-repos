@@ -8,7 +8,7 @@ import java.util.concurrent._
 import ConcurrentTest._
 
 object FutureTest extends SpecLite {
-  implicit def FutureEqual[A : Equal] =
+  implicit def FutureEqual[A: Equal] =
     Equal[A].contramap((_: Future[A]).unsafePerformSync)
 
   checkAll(monad.laws[Future])
@@ -90,7 +90,7 @@ object FutureTest extends SpecLite {
       val duration = System.currentTimeMillis() - start
 
       result.length must_== times.size and duration.toInt mustBe_< times.fold(
-          0)(_ + _)
+        0)(_ + _)
     }
   }
 
@@ -107,14 +107,14 @@ object FutureTest extends SpecLite {
   def deadlocks(depth: Int): Future[List[Long]] =
     if (depth == 1)
       Future.fork(
-          Future.delay({
-            Thread.sleep(20)
-            List(System.currentTimeMillis)
-          })
+        Future.delay({
+          Thread.sleep(20)
+          List(System.currentTimeMillis)
+        })
       )
     else
       Future.fork(
-          non.both(deadlocks(depth - 1), deadlocks(depth - 1)) map
+        non.both(deadlocks(depth - 1), deadlocks(depth - 1)) map
           ({
             case (l, r) => l ++ r
           })

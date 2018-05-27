@@ -5,10 +5,9 @@ object Test {
   class A1; class B1
   def test1(x: String, x1: String, default: String) = pf {
     case _
-        if
-        (x.isEmpty && default.isEmpty // was binding to synthetic param
-            && x1.isEmpty // was binding to synthetic param
-            ) =>
+        if (x.isEmpty && default.isEmpty // was binding to synthetic param
+          && x1.isEmpty // was binding to synthetic param
+        ) =>
       x.isEmpty
       default.isEmpty // was binding to synthetic param
       x1.isEmpty // was binding to synthetic param

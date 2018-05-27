@@ -40,7 +40,7 @@ class Cookie(private[http] val underlying: NettyCookie) {
 
   override def equals(obj: Any): Boolean = obj match {
     case c: Cookie => underlying.equals(c.underlying)
-    case _ => false
+    case _         => false
   }
 
   override def hashCode(): Int = underlying.hashCode()

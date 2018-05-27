@@ -10,7 +10,16 @@ package scala
 package reflect
 package io
 
-import java.io.{FileInputStream, FileOutputStream, BufferedWriter, OutputStreamWriter, BufferedOutputStream, IOException, PrintWriter, File => JFile}
+import java.io.{
+  FileInputStream,
+  FileOutputStream,
+  BufferedWriter,
+  OutputStreamWriter,
+  BufferedOutputStream,
+  IOException,
+  PrintWriter,
+  File => JFile
+}
 
 import scala.io.Codec
 
@@ -23,9 +32,10 @@ object File {
   def apply(path: Path)(implicit codec: Codec) = new File(path.jfile)(codec)
 
   // Create a temporary file, which will be deleted upon jvm exit.
-  def makeTemp(prefix: String = Path.randomPrefix,
-               suffix: String = null,
-               dir: JFile = null) = {
+  def makeTemp(
+      prefix: String = Path.randomPrefix,
+      suffix: String = null,
+      dir: JFile = null) = {
     val jfile = java.io.File.createTempFile(prefix, suffix, dir)
     jfile.deleteOnExit()
     apply(jfile)
@@ -44,7 +54,8 @@ object File {
   *  ''Note:  This is library is considered experimental and should not be used unless you know what you are doing.''
   */
 class File(jfile: JFile)(implicit constructorCodec: Codec)
-    extends Path(jfile) with Streamable.Chars {
+    extends Path(jfile)
+    with Streamable.Chars {
   override val creationCodec = constructorCodec
 
   override def addExtension(ext: String): File = super.addExtension(ext).toFile
@@ -53,7 +64,7 @@ class File(jfile: JFile)(implicit constructorCodec: Codec)
   override def toDirectory: Directory = new Directory(jfile)
   override def toFile: File = this
   override def normalize: File = super.normalize.toFile
-  override def length = super [Path].length
+  override def length = super[Path].length
   override def walkFilter(cond: Path => Boolean): Iterator[Path] =
     if (cond(this)) Iterator.single(this) else Iterator.empty
 
@@ -86,35 +97,43 @@ class File(jfile: JFile)(implicit constructorCodec: Codec)
   /** Creates a new file and writes all the Strings to it. */
   def writeAll(strings: String*): Unit = {
     val out = bufferedWriter()
-    try strings foreach (out write _) finally out.close()
+    try strings foreach (out write _)
+    finally out.close()
   }
 
   def appendAll(strings: String*): Unit = {
     val out = bufferedWriter(append = true)
-    try strings foreach (out write _) finally out.close()
+    try strings foreach (out write _)
+    finally out.close()
   }
 
   /** Calls println on each string (so it adds a newline in the PrintWriter fashion.) */
   def printlnAll(strings: String*): Unit = {
     val out = printWriter()
-    try strings foreach (out println _) finally out.close()
+    try strings foreach (out println _)
+    finally out.close()
   }
 
   def safeSlurp(): Option[String] =
-    try Some(slurp()) catch { case _: IOException => None }
+    try Some(slurp())
+    catch { case _: IOException => None }
 
   /** Reflection since we're into the java 6+ API.
     */
   def setExecutable(executable: Boolean, ownerOnly: Boolean = true): Boolean = {
     type JBoolean = java.lang.Boolean
     val method = try classOf[JFile].getMethod(
-        "setExecutable", classOf[Boolean], classOf[Boolean]) catch {
+      "setExecutable",
+      classOf[Boolean],
+      classOf[Boolean])
+    catch {
       case _: NoSuchMethodException => return false
     }
 
     try method
       .invoke(jfile, executable: JBoolean, ownerOnly: JBoolean)
       .asInstanceOf[JBoolean]
-      .booleanValue catch { case _: Exception => false }
+      .booleanValue
+    catch { case _: Exception => false }
   }
 }

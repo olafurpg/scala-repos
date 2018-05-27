@@ -11,7 +11,10 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.JDOMExternalizer
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.{PsiElement, PsiManager}
-import com.intellij.refactoring.listeners.{RefactoringElementAdapter, RefactoringElementListener}
+import com.intellij.refactoring.listeners.{
+  RefactoringElementAdapter,
+  RefactoringElementListener
+}
 import com.intellij.vcsUtil.VcsUtil
 import org.jdom.Element
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
@@ -28,7 +31,9 @@ class ScalaScriptRunConfiguration(
     val configurationFactory: ConfigurationFactory,
     val name: String)
     extends ModuleBasedConfiguration[RunConfigurationModule](
-        name, new RunConfigurationModule(project), configurationFactory)
+      name,
+      new RunConfigurationModule(project),
+      configurationFactory)
     with RefactoringListenerProvider {
   val SCALA_HOME = "-Dscala.home="
   val CLASSPATH = "-Denv.classpath=\"%CLASSPATH%\""
@@ -74,7 +79,8 @@ class ScalaScriptRunConfiguration(
   }
 
   def getState(
-      executor: Executor, env: ExecutionEnvironment): RunProfileState = {
+      executor: Executor,
+      env: ExecutionEnvironment): RunProfileState = {
     def fileNotFoundError() {
       throw new ExecutionException("Scala script file not found.")
     }
@@ -82,7 +88,7 @@ class ScalaScriptRunConfiguration(
       val file: VirtualFile = VcsUtil.getVirtualFile(scriptPath)
       PsiManager.getInstance(project).findFile(file) match {
         case f: ScalaFile if f.isScriptFile() && !f.isWorksheetFile =>
-        case _ => fileNotFoundError()
+        case _                                                      => fileNotFoundError()
       }
     } catch {
       case e: Exception => fileNotFoundError()
@@ -108,10 +114,11 @@ class ScalaScriptRunConfiguration(
         params.getProgramParametersList.add("-nocompdaemon") //todo: seems to be a bug in scala compiler. Ticket #1498
         params.getProgramParametersList.add("-classpath")
         params.configureByModule(
-            module, JavaParameters.JDK_AND_CLASSES_AND_TESTS)
+          module,
+          JavaParameters.JDK_AND_CLASSES_AND_TESTS)
         params.getProgramParametersList.add(params.getClassPath.getPathsString)
         params.getClassPath.addAllFiles(
-            module.scalaSdk.map(_.compilerClasspath).getOrElse(Seq.empty))
+          module.scalaSdk.map(_.compilerClasspath).getOrElse(Seq.empty))
         val array = getConsoleArgs.trim.split("\\s+").filter(!_.trim().isEmpty)
         params.getProgramParametersList.addAll(array: _*)
         params.getProgramParametersList.add(scriptPath)
@@ -180,8 +187,8 @@ class ScalaScriptRunConfiguration(
               Integer.parseInt(cache.substring(0, cache.indexOf(":")))
             cache = cache.replaceFirst("[^:]", "")
             end += line.length - cache.length
-            val hyperlink = new OpenFileHyperlinkInfo(
-                getProject, file, lineNumber - 1)
+            val hyperlink =
+              new OpenFileHyperlinkInfo(getProject, file, lineNumber - 1)
             new Result(start, end, hyperlink)
           } catch {
             case _: Exception => return null
@@ -206,7 +213,8 @@ class ScalaScriptRunConfiguration(
 
         //todo this method does not called when undo of moving action executed
         def undoElementMovedOrRenamed(
-            newElement: PsiElement, oldQualifiedName: String) {
+            newElement: PsiElement,
+            oldQualifiedName: String) {
           setScriptPath(oldQualifiedName)
         }
       }

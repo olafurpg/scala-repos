@@ -21,7 +21,12 @@ import org.apache.spark.sql.catalyst.analysis.EliminateSubqueryAliases
 import org.apache.spark.sql.catalyst.dsl.expressions._
 import org.apache.spark.sql.catalyst.dsl.plans._
 import org.apache.spark.sql.catalyst.expressions.Add
-import org.apache.spark.sql.catalyst.plans.{FullOuter, LeftOuter, PlanTest, RightOuter}
+import org.apache.spark.sql.catalyst.plans.{
+  FullOuter,
+  LeftOuter,
+  PlanTest,
+  RightOuter
+}
 import org.apache.spark.sql.catalyst.plans.logical._
 import org.apache.spark.sql.catalyst.rules._
 
@@ -30,12 +35,12 @@ class LimitPushdownSuite extends PlanTest {
   private object Optimize extends RuleExecutor[LogicalPlan] {
     val batches =
       Batch("Subqueries", Once, EliminateSubqueryAliases) :: Batch(
-          "Limit pushdown",
-          FixedPoint(100),
-          LimitPushDown,
-          CombineLimits,
-          ConstantFolding,
-          BooleanSimplification) :: Nil
+        "Limit pushdown",
+        FixedPoint(100),
+        LimitPushDown,
+        CombineLimits,
+        ConstantFolding,
+        BooleanSimplification) :: Nil
   }
 
   private val testRelation = LocalRelation('a.int, 'b.int, 'c.int)
@@ -48,27 +53,27 @@ class LimitPushdownSuite extends PlanTest {
   test("Union: limit to each side") {
     val unionQuery = Union(testRelation, testRelation2).limit(1)
     val unionOptimized = Optimize.execute(unionQuery.analyze)
-    val unionCorrectAnswer = Limit(1,
-                                   Union(LocalLimit(1, testRelation),
-                                         LocalLimit(1, testRelation2))).analyze
+    val unionCorrectAnswer = Limit(
+      1,
+      Union(LocalLimit(1, testRelation), LocalLimit(1, testRelation2))).analyze
     comparePlans(unionOptimized, unionCorrectAnswer)
   }
 
   test("Union: limit to each side with constant-foldable limit expressions") {
     val unionQuery = Union(testRelation, testRelation2).limit(Add(1, 1))
     val unionOptimized = Optimize.execute(unionQuery.analyze)
-    val unionCorrectAnswer = Limit(2,
-                                   Union(LocalLimit(2, testRelation),
-                                         LocalLimit(2, testRelation2))).analyze
+    val unionCorrectAnswer = Limit(
+      2,
+      Union(LocalLimit(2, testRelation), LocalLimit(2, testRelation2))).analyze
     comparePlans(unionOptimized, unionCorrectAnswer)
   }
 
   test("Union: limit to each side with the new limit number") {
     val unionQuery = Union(testRelation, testRelation2.limit(3)).limit(1)
     val unionOptimized = Optimize.execute(unionQuery.analyze)
-    val unionCorrectAnswer = Limit(1,
-                                   Union(LocalLimit(1, testRelation),
-                                         LocalLimit(1, testRelation2))).analyze
+    val unionCorrectAnswer = Limit(
+      1,
+      Union(LocalLimit(1, testRelation), LocalLimit(1, testRelation2))).analyze
     comparePlans(unionOptimized, unionCorrectAnswer)
   }
 
@@ -77,7 +82,8 @@ class LimitPushdownSuite extends PlanTest {
       Union(testRelation.limit(1), testRelation2.select('d).limit(1)).limit(2)
     val unionOptimized = Optimize.execute(unionQuery.analyze)
     val unionCorrectAnswer = Limit(
-        2, Union(testRelation.limit(1), testRelation2.select('d).limit(1))).analyze
+      2,
+      Union(testRelation.limit(1), testRelation2.select('d).limit(1))).analyze
     comparePlans(unionOptimized, unionCorrectAnswer)
   }
 
@@ -87,9 +93,11 @@ class LimitPushdownSuite extends PlanTest {
     val unionQuery = testLimitUnion.limit(2)
     val unionOptimized = Optimize.execute(unionQuery.analyze)
     val unionCorrectAnswer =
-      Limit(2,
-            Union(LocalLimit(2, testRelation),
-                  LocalLimit(2, testRelation2.select('d)))).analyze
+      Limit(
+        2,
+        Union(
+          LocalLimit(2, testRelation),
+          LocalLimit(2, testRelation2.select('d)))).analyze
     comparePlans(unionOptimized, unionCorrectAnswer)
   }
 
@@ -110,7 +118,7 @@ class LimitPushdownSuite extends PlanTest {
   }
 
   test(
-      "larger limits are not pushed on top of smaller ones in right outer join") {
+    "larger limits are not pushed on top of smaller ones in right outer join") {
     val originalQuery = x.join(y.limit(5), RightOuter).limit(10)
     val optimized = Optimize.execute(originalQuery.analyze)
     val correctAnswer = Limit(10, x.join(Limit(5, y), RightOuter)).analyze
@@ -118,7 +126,7 @@ class LimitPushdownSuite extends PlanTest {
   }
 
   test(
-      "full outer join where neither side is limited and both sides have same statistics") {
+    "full outer join where neither side is limited and both sides have same statistics") {
     assert(x.statistics.sizeInBytes === y.statistics.sizeInBytes)
     val originalQuery = x.join(y, FullOuter).limit(1)
     val optimized = Optimize.execute(originalQuery.analyze)
@@ -127,7 +135,7 @@ class LimitPushdownSuite extends PlanTest {
   }
 
   test(
-      "full outer join where neither side is limited and left side has larger statistics") {
+    "full outer join where neither side is limited and left side has larger statistics") {
     val xBig = testRelation.copy(data = Seq.fill(2)(null)).subquery('x)
     assert(xBig.statistics.sizeInBytes > y.statistics.sizeInBytes)
     val originalQuery = xBig.join(y, FullOuter).limit(1)
@@ -138,7 +146,7 @@ class LimitPushdownSuite extends PlanTest {
   }
 
   test(
-      "full outer join where neither side is limited and right side has larger statistics") {
+    "full outer join where neither side is limited and right side has larger statistics") {
     val yBig = testRelation.copy(data = Seq.fill(2)(null)).subquery('y)
     assert(x.statistics.sizeInBytes < yBig.statistics.sizeInBytes)
     val originalQuery = x.join(yBig, FullOuter).limit(1)

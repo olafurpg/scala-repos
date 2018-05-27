@@ -60,7 +60,8 @@ object Rotate {
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/scene/transform/Rotate.html]]
   */
 class Rotate(override val delegate: jfxst.Rotate = new jfxst.Rotate)
-    extends Transform(delegate) with SFXDelegate[jfxst.Rotate] {
+    extends Transform(delegate)
+    with SFXDelegate[jfxst.Rotate] {
 
   /**
     * Creates a two-dimensional Rotate transform.
@@ -82,11 +83,12 @@ class Rotate(override val delegate: jfxst.Rotate = new jfxst.Rotate)
   /**
     * Creates a three-dimensional Rotate transform with pivot.
     */
-  def this(angle: Double,
-           pivotX: Double,
-           pivotY: Double,
-           pivotZ: Double,
-           axis: Point3D) =
+  def this(
+      angle: Double,
+      pivotX: Double,
+      pivotY: Double,
+      pivotZ: Double,
+      axis: Point3D) =
     this(new jfxst.Rotate(angle, pivotX, pivotY, pivotZ, axis))
 
   /**

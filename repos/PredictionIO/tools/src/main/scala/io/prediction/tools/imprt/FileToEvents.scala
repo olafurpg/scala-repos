@@ -27,13 +27,14 @@ import org.json4s.native.Serialization._
 
 import scala.util.{Failure, Try}
 
-case class FileToEventsArgs(env: String = "",
-                            logFile: String = "",
-                            appId: Int = 0,
-                            channel: Option[String] = None,
-                            inputPath: String = "",
-                            verbose: Boolean = false,
-                            debug: Boolean = false)
+case class FileToEventsArgs(
+    env: String = "",
+    logFile: String = "",
+    appId: Int = 0,
+    channel: Option[String] = None,
+    inputPath: String = "",
+    verbose: Boolean = false,
+    debug: Boolean = false)
 
 object FileToEvents extends Logging {
   def main(args: Array[String]): Unit = {
@@ -80,9 +81,10 @@ object FileToEvents extends Logging {
       WorkflowUtils.modifyLogging(verbose = args.verbose)
       @transient lazy implicit val formats =
         Utils.json4sDefaultFormats + new EventJson4sSupport.APISerializer
-      val sc = WorkflowContext(mode = "Import",
-                               batch = "App ID " + args.appId + channelStr,
-                               executorEnv = Runner.envStringToMap(args.env))
+      val sc = WorkflowContext(
+        mode = "Import",
+        batch = "App ID " + args.appId + channelStr,
+        executorEnv = Runner.envStringToMap(args.env))
       val rdd = sc.textFile(args.inputPath).filter(_.trim.nonEmpty).map {
         json =>
           Try(read[Event](json)).recoverWith {

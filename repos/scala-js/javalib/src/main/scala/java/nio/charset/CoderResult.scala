@@ -23,9 +23,9 @@ class CoderResult private (kind: Int, _length: Int) {
   }
 
   def throwException(): Unit = (kind: @switch) match {
-    case Overflow => throw new BufferOverflowException
-    case Underflow => throw new BufferUnderflowException
-    case Malformed => throw new MalformedInputException(_length)
+    case Overflow   => throw new BufferOverflowException
+    case Underflow  => throw new BufferUnderflowException
+    case Malformed  => throw new MalformedInputException(_length)
     case Unmappable => throw new UnmappableCharacterException(_length)
   }
 }
@@ -76,5 +76,6 @@ object CoderResult {
 
   private def unmappableForLengthImpl(length: Int): CoderResult =
     uniqueUnmappable.getOrElseUpdate(
-        length, new CoderResult(Unmappable, length))
+      length,
+      new CoderResult(Unmappable, length))
 }

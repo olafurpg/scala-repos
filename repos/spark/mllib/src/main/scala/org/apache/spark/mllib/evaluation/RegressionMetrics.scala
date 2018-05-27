@@ -20,7 +20,10 @@ package org.apache.spark.mllib.evaluation
 import org.apache.spark.annotation.Since
 import org.apache.spark.internal.Logging
 import org.apache.spark.mllib.linalg.Vectors
-import org.apache.spark.mllib.stat.{MultivariateOnlineSummarizer, MultivariateStatisticalSummary}
+import org.apache.spark.mllib.stat.{
+  MultivariateOnlineSummarizer,
+  MultivariateStatisticalSummary
+}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
 
@@ -33,7 +36,8 @@ import org.apache.spark.sql.DataFrame
   */
 @Since("1.2.0")
 class RegressionMetrics @Since("2.0.0")(
-    predictionAndObservations: RDD[(Double, Double)], throughOrigin: Boolean)
+    predictionAndObservations: RDD[(Double, Double)],
+    throughOrigin: Boolean)
     extends Logging {
 
   @Since("1.2.0")
@@ -47,21 +51,22 @@ class RegressionMetrics @Since("2.0.0")(
     */
   private[mllib] def this(predictionAndObservations: DataFrame) =
     this(
-        predictionAndObservations.rdd.map(
-            r => (r.getDouble(0), r.getDouble(1))))
+      predictionAndObservations.rdd.map(r => (r.getDouble(0), r.getDouble(1))))
 
   /**
     * Use MultivariateOnlineSummarizer to calculate summary statistics of observations and errors.
     */
   private lazy val summary: MultivariateStatisticalSummary = {
     val summary: MultivariateStatisticalSummary =
-      predictionAndObservations.map {
-        case (prediction, observation) =>
-          Vectors.dense(observation, observation - prediction)
-      }.aggregate(new MultivariateOnlineSummarizer())(
+      predictionAndObservations
+        .map {
+          case (prediction, observation) =>
+            Vectors.dense(observation, observation - prediction)
+        }
+        .aggregate(new MultivariateOnlineSummarizer())(
           (summary, v) => summary.add(v),
           (sum1, sum2) => sum1.merge(sum2)
-      )
+        )
     summary
   }
 
@@ -70,9 +75,11 @@ class RegressionMetrics @Since("2.0.0")(
   private lazy val SStot = summary.variance(0) * (summary.count - 1)
   private lazy val SSreg = {
     val yMean = summary.mean(0)
-    predictionAndObservations.map {
-      case (prediction, _) => math.pow(prediction - yMean, 2)
-    }.sum()
+    predictionAndObservations
+      .map {
+        case (prediction, _) => math.pow(prediction - yMean, 2)
+      }
+      .sum()
   }
 
   /**

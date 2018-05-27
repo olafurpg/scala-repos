@@ -13,11 +13,11 @@ class ConvertScalaToJavaCollectionIntention
     extends BaseJavaConvertersIntention("asJava") {
 
   val targetCollections = Set(
-      "scala.collection.Seq",
-      "scala.collection.Set",
-      "scala.collection.Map",
-      "scala.collection.Iterator",
-      "scala.collection.Iterable"
+    "scala.collection.Seq",
+    "scala.collection.Set",
+    "scala.collection.Map",
+    "scala.collection.Iterator",
+    "scala.collection.Iterable"
   )
 
   val alreadyConvertedPrefixes: Set[String] = Set("java.")

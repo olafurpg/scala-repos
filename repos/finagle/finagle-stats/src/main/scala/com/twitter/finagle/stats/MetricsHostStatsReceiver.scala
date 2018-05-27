@@ -15,7 +15,8 @@ class MetricsHostStatsReceiver(val registry: Metrics)
 }
 
 class HostMetricsExporter(val registry: Metrics)
-    extends JsonExporter(registry) with HttpMuxHandler {
+    extends JsonExporter(registry)
+    with HttpMuxHandler {
   def this() = this(MetricsStatsReceiver.defaultHostRegistry)
   val pattern = "/admin/per_host_metrics.json"
 

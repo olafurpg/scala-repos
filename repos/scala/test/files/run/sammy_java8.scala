@@ -9,7 +9,7 @@ object Test extends CompilerTest {
 
     // This test itself does not depend on JDK8.
     javaCompilationUnits(global)(samSource) ++ compilationUnits(global)(
-        useSamSource)
+      useSamSource)
   }
 
   private def samSource = """

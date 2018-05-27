@@ -30,8 +30,7 @@ class One2OneBidiFlowSpec extends AkkaSpec {
     "be fully transparent to errors" in {
       val f =
         One2OneBidiFlow[Int, Int](-1) join Flow[Int].map(x ⇒ 10 / (x - 2))
-      an[ArithmeticException] should be thrownBy Await.result(test(f),
-                                                              1.second)
+      an[ArithmeticException] should be thrownBy Await.result(test(f), 1.second)
     }
 
     "trigger an `OutputTruncationException` if the wrapped stream completes early" in assertAllStagesStopped {
@@ -40,8 +39,8 @@ class One2OneBidiFlowSpec extends AkkaSpec {
 
       val testSetup =
         One2OneBidiFlow[Int, Int](-1) join Flow.fromSinkAndSource(
-            Sink.fromSubscriber(flowInProbe),
-            Source.fromPublisher(flowOutProbe))
+          Sink.fromSubscriber(flowInProbe),
+          Source.fromPublisher(flowOutProbe))
 
       val upstreamProbe = TestPublisher.probe[Int]()
       val downstreamProbe = TestSubscriber.probe[Int]()
@@ -76,8 +75,8 @@ class One2OneBidiFlowSpec extends AkkaSpec {
 
       val testSetup =
         One2OneBidiFlow[Int, Int](-1) join Flow.fromSinkAndSource(
-            Sink.fromSubscriber(flowInProbe),
-            Source.fromPublisher(flowOutProbe))
+          Sink.fromSubscriber(flowInProbe),
+          Source.fromPublisher(flowOutProbe))
 
       val upstreamProbe = TestPublisher.probe[Int]()
       val downstreamProbe = TestSubscriber.probe[Int]()
@@ -145,9 +144,10 @@ class One2OneBidiFlowSpec extends AkkaSpec {
 
       Source(1 to 1000)
         .log("", seen.set)
-        .via(One2OneBidiFlow[Int, Int](MAX_PENDING) join Flow
-              .fromSinkAndSourceMat(Sink.ignore, Source.fromPublisher(out))(
-                Keep.left))
+        .via(
+          One2OneBidiFlow[Int, Int](MAX_PENDING) join Flow
+            .fromSinkAndSourceMat(Sink.ignore, Source.fromPublisher(out))(
+              Keep.left))
         .runWith(Sink.ignore)
 
       Thread.sleep(50)
@@ -168,9 +168,11 @@ class One2OneBidiFlowSpec extends AkkaSpec {
 
     Source
       .fromPublisher(inIn)
-      .via(One2OneBidiFlow[Int, Int](maxPending) join Flow
-            .fromSinkAndSourceMat(Sink.fromSubscriber(inOut),
-                                  Source.fromPublisher(outIn))(Keep.left))
+      .via(
+        One2OneBidiFlow[Int, Int](maxPending) join Flow
+          .fromSinkAndSourceMat(
+            Sink.fromSubscriber(inOut),
+            Source.fromPublisher(outIn))(Keep.left))
       .runWith(Sink.fromSubscriber(outOut))
   }
 }

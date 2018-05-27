@@ -24,8 +24,9 @@ import org.ensime.util.FileUtils
 class Project(
     broadcaster: ActorRef,
     implicit val config: EnsimeConfig
-)
-    extends Actor with ActorLogging with Stash {
+) extends Actor
+    with ActorLogging
+    with Stash {
   import context.{dispatcher, system}
 
   import FileUtils._
@@ -54,8 +55,8 @@ class Project(
     override def baseReCreated(f: FileObject): Unit = reTypeCheck()
   }
   private val classfileWatcher = context.actorOf(
-      Props(new ClassfileWatcher(config, searchService :: reTypecheck :: Nil)),
-      "classFileWatcher")
+    Props(new ClassfileWatcher(config, searchService :: reTypecheck :: Nil)),
+    "classFileWatcher")
 
   def receive: Receive = awaitingConnectionInfoReq
 
@@ -94,20 +95,21 @@ class Project(
           case Broadcaster.Persist(AnalyzerReadyEvent) if senders.size == 1 =>
             broadcaster ! Broadcaster.Persist(AnalyzerReadyEvent)
           case Broadcaster.Persist(AnalyzerReadyEvent) => senders += sender()
-          case msg => broadcaster forward msg
+          case msg                                     => broadcaster forward msg
         }
       }))
 
-      scalac = context.actorOf(
-          Analyzer(merger, indexer, searchService), "scalac")
-      javac = context.actorOf(
-          JavaAnalyzer(merger, indexer, searchService), "javac")
+      scalac =
+        context.actorOf(Analyzer(merger, indexer, searchService), "scalac")
+      javac =
+        context.actorOf(JavaAnalyzer(merger, indexer, searchService), "javac")
     } else {
       log.warning(
-          "Detected a pure Java project. Scala queries are not available.")
+        "Detected a pure Java project. Scala queries are not available.")
       scalac = system.deadLetters
       javac = context.actorOf(
-          JavaAnalyzer(broadcaster, indexer, searchService), "javac")
+        JavaAnalyzer(broadcaster, indexer, searchService),
+        "javac")
     }
     debugger = context.actorOf(DebugManager(broadcaster), "debugging")
     docs = context.actorOf(DocResolver(), "docs")
@@ -127,16 +129,16 @@ class Project(
     case AskReTypecheck =>
       Option(rechecking).foreach(_.cancel())
       rechecking = system.scheduler.scheduleOnce(
-          5 seconds,
-          scalac,
-          ReloadExistingFilesEvent
+        5 seconds,
+        scalac,
+        ReloadExistingFilesEvent
       )
     // HACK: to expedite initial dev, Java requests use the Scala API
     case m @ TypecheckFileReq(sfi) if sfi.file.isJava => javac forward m
     case m @ CompletionsReq(sfi, _, _, _, _) if sfi.file.isJava =>
       javac forward m
     case m @ DocUriAtPointReq(sfi, _) if sfi.file.isJava => javac forward m
-    case m @ TypeAtPointReq(sfi, _) if sfi.file.isJava => javac forward m
+    case m @ TypeAtPointReq(sfi, _) if sfi.file.isJava   => javac forward m
     case m @ SymbolDesignationsReq(sfi, _, _, _) if sfi.file.isJava =>
       javac forward m
     case m @ SymbolAtPointReq(sfi, _) if sfi.file.isJava => javac forward m
@@ -149,8 +151,8 @@ class Project(
 
     case m: RpcAnalyserRequest => scalac forward m
     case m: RpcDebuggerRequest => debugger forward m
-    case m: RpcSearchRequest => indexer forward m
-    case m: DocSigPair => docs forward m
+    case m: RpcSearchRequest   => indexer forward m
+    case m: DocSigPair         => docs forward m
 
     // added here to prevent errors when client sends this repeatedly (e.g. as a keepalive
     case ConnectionInfoReq =>

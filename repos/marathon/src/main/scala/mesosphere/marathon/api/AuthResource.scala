@@ -3,7 +3,11 @@ package mesosphere.marathon.api
 import javax.servlet.http.HttpServletRequest
 import javax.ws.rs.core.Response
 
-import mesosphere.marathon.{UnknownGroupException, UnknownAppException, AccessDeniedException}
+import mesosphere.marathon.{
+  UnknownGroupException,
+  UnknownAppException,
+  AccessDeniedException
+}
 import mesosphere.marathon.plugin.auth._
 import mesosphere.marathon.plugin.http.HttpResponse
 
@@ -18,32 +22,35 @@ trait AuthResource extends RestResource {
       fn: Identity => Response): Response = {
     val requestWrapper = new RequestFacade(request)
     val maybeIdentity = result(authenticator.authenticate(requestWrapper))
-    maybeIdentity.map { identity =>
-      try {
-        fn(identity)
-      } catch {
-        case e: AccessDeniedException =>
-          withResponseFacade(authorizer.handleNotAuthorized(identity, _))
+    maybeIdentity
+      .map { identity =>
+        try {
+          fn(identity)
+        } catch {
+          case e: AccessDeniedException =>
+            withResponseFacade(authorizer.handleNotAuthorized(identity, _))
+        }
       }
-    }.getOrElse {
-      withResponseFacade(
+      .getOrElse {
+        withResponseFacade(
           authenticator.handleNotAuthenticated(requestWrapper, _))
-    }
+      }
   }
 
-  def checkAuthorization[T](action: AuthorizedAction[T],
-                            maybeResource: Option[T],
-                            ifNotExists: Exception)(
-      implicit identity: Identity): Unit = {
+  def checkAuthorization[T](
+      action: AuthorizedAction[T],
+      maybeResource: Option[T],
+      ifNotExists: Exception)(implicit identity: Identity): Unit = {
     maybeResource match {
       case Some(resource) => checkAuthorization(action, resource)
-      case None => throw ifNotExists
+      case None           => throw ifNotExists
     }
   }
 
-  def withAuthorization[A, B >: A](action: AuthorizedAction[B],
-                                   maybeResource: Option[A],
-                                   ifNotExists: Response)(fn: A => Response)(
+  def withAuthorization[A, B >: A](
+      action: AuthorizedAction[B],
+      maybeResource: Option[A],
+      ifNotExists: Response)(fn: A => Response)(
       implicit identity: Identity): Response = {
     maybeResource match {
       case Some(resource) =>

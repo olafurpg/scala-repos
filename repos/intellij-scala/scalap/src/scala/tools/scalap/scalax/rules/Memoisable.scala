@@ -27,13 +27,15 @@ trait MemoisableRules extends Rules {
   }
 
   override def ruleWithName[In, Out, A, X](
-      name: String, f: In => rules.Result[Out, A, X]) =
-    super.ruleWithName(name,
-                       (in: In) =>
-                         in match {
-                           case s: Memoisable => s.memo(name, f(in))
-                           case _ => f(in)
-                       })
+      name: String,
+      f: In => rules.Result[Out, A, X]) =
+    super.ruleWithName(
+      name,
+      (in: In) =>
+        in match {
+          case s: Memoisable => s.memo(name, f(in))
+          case _             => f(in)
+      })
 }
 
 trait Memoisable {

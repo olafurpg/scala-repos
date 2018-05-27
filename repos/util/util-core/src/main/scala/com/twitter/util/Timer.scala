@@ -201,7 +201,7 @@ class JavaTimer(isDaemon: Boolean, name: Option[String]) extends Timer {
 
   private[this] val underlying = name match {
     case Some(n) => new java.util.Timer(n, isDaemon)
-    case None => new java.util.Timer(isDaemon)
+    case None    => new java.util.Timer(isDaemon)
   }
 
   private[this] val catcher: PartialFunction[Throwable, Unit] = {
@@ -213,14 +213,18 @@ class JavaTimer(isDaemon: Boolean, name: Option[String]) extends Timer {
   }
 
   protected def scheduleOnce(when: Time)(f: => Unit): TimerTask = {
-    val task = toJavaTimerTask(try f catch catcher)
+    val task = toJavaTimerTask(
+      try f
+      catch catcher)
     underlying.schedule(task, safeTime(when).toDate)
     toTimerTask(task)
   }
 
   protected def schedulePeriodically(when: Time, period: Duration)(
       f: => Unit): TimerTask = {
-    val task = toJavaTimerTask(try f catch catcher)
+    val task = toJavaTimerTask(
+      try f
+      catch catcher)
     underlying.schedule(task, safeTime(when).toDate, period.inMillis)
     toTimerTask(task)
   }
@@ -236,7 +240,7 @@ class JavaTimer(isDaemon: Boolean, name: Option[String]) extends Timer {
     */
   def logError(t: Throwable): Unit = {
     System.err.println(
-        "WARNING: JavaTimer caught exception running task: %s".format(t))
+      "WARNING: JavaTimer caught exception running task: %s".format(t))
     t.printStackTrace(System.err)
   }
 
@@ -264,15 +268,17 @@ class ScheduledThreadPoolTimer(
   def this(poolSize: Int, threadFactory: ThreadFactory) =
     this(poolSize, threadFactory, None)
 
-  def this(poolSize: Int,
-           threadFactory: ThreadFactory,
-           handler: RejectedExecutionHandler) =
+  def this(
+      poolSize: Int,
+      threadFactory: ThreadFactory,
+      handler: RejectedExecutionHandler) =
     this(poolSize, threadFactory, Some(handler))
 
   /** Construct a ScheduledThreadPoolTimer with a NamedPoolThreadFactory. */
-  def this(poolSize: Int = 2,
-           name: String = "timer",
-           makeDaemons: Boolean = false) =
+  def this(
+      poolSize: Int = 2,
+      name: String = "timer",
+      makeDaemons: Boolean = false) =
     this(poolSize, new NamedPoolThreadFactory(name, makeDaemons), None)
 
   private[this] val underlying = rejectedExecutionHandler match {
@@ -289,7 +295,9 @@ class ScheduledThreadPoolTimer(
   protected def scheduleOnce(when: Time)(f: => Unit): TimerTask = {
     val runnable = toRunnable(f)
     val javaFuture = underlying.schedule(
-        runnable, when.sinceNow.inMillis, TimeUnit.MILLISECONDS)
+      runnable,
+      when.sinceNow.inMillis,
+      TimeUnit.MILLISECONDS)
     new TimerTask {
       def cancel(): Unit = {
         javaFuture.cancel(true)
@@ -305,7 +313,10 @@ class ScheduledThreadPoolTimer(
   def schedule(wait: Duration, period: Duration)(f: => Unit): TimerTask = {
     val runnable = toRunnable(f)
     val javaFuture = underlying.scheduleAtFixedRate(
-        runnable, wait.inMillis, period.inMillis, TimeUnit.MILLISECONDS)
+      runnable,
+      wait.inMillis,
+      period.inMillis,
+      TimeUnit.MILLISECONDS)
     new TimerTask {
       def cancel(): Unit = {
         javaFuture.cancel(true)

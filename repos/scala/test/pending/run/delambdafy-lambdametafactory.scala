@@ -24,7 +24,7 @@ trait T {
   }
 }
 
-// A functional interface. Function1 contains abstract methods that are filled in by mixin 
+// A functional interface. Function1 contains abstract methods that are filled in by mixin
 trait Function1ish[A, B] {
   def apply(a: A): B
 }
@@ -39,46 +39,50 @@ object Test {
     val caller = MethodHandles.lookup
     val methodType =
       MethodType.methodType(classOf[AnyRef], Array[Class[_]](classOf[AnyRef]))
-    val instantiatedMethodType = MethodType.methodType(
-        instantiatedRet, Array[Class[_]](instantiatedParam))
+    val instantiatedMethodType =
+      MethodType.methodType(instantiatedRet, Array[Class[_]](instantiatedParam))
     val (capturedParamTypes, captured) = capturedParams.unzip
     val targetMethodType = MethodType.methodType(
-        instantiatedRet, capturedParamTypes :+ instantiatedParam)
+      instantiatedRet,
+      capturedParamTypes :+ instantiatedParam)
     val invokedType =
       MethodType.methodType(classOf[Function1ish[_, _]], capturedParamTypes)
     val target = caller.findStatic(hostClass, accessorName, targetMethodType)
-    val site = LambdaMetafactory.metafactory(caller,
-                                             "apply",
-                                             invokedType,
-                                             methodType,
-                                             target,
-                                             instantiatedMethodType)
+    val site = LambdaMetafactory.metafactory(
+      caller,
+      "apply",
+      invokedType,
+      methodType,
+      target,
+      instantiatedMethodType)
     site.getTarget
       .invokeWithArguments(captured: _*)
       .asInstanceOf[Function1ish[A, B]]
   }
   def main(args: Array[String]) {
     println(
-        lambdaFactory(
-            classOf[C], classOf[String], classOf[String], "accessor$1")
-          .apply("abc"))
+      lambdaFactory(classOf[C], classOf[String], classOf[String], "accessor$1")
+        .apply("abc"))
     println(
-        lambdaFactory(classOf[C],
-                      classOf[String],
-                      classOf[String],
-                      "accessor$2",
-                      Array(classOf[String] -> "capture1")).apply("abc"))
+      lambdaFactory(
+        classOf[C],
+        classOf[String],
+        classOf[String],
+        "accessor$2",
+        Array(classOf[String] -> "capture1")).apply("abc"))
     println(
-        lambdaFactory(classOf[C],
-                      classOf[String],
-                      classOf[String],
-                      "accessor$3",
-                      Array(classOf[C] -> new C)).apply("abc"))
+      lambdaFactory(
+        classOf[C],
+        classOf[String],
+        classOf[String],
+        "accessor$3",
+        Array(classOf[C] -> new C)).apply("abc"))
     println(
-        lambdaFactory(Class.forName("T$class"),
-                      classOf[String],
-                      classOf[String],
-                      "accessor$4",
-                      Array(classOf[T] -> new T {})).apply("abc"))
+      lambdaFactory(
+        Class.forName("T$class"),
+        classOf[String],
+        classOf[String],
+        "accessor$4",
+        Array(classOf[T] -> new T {})).apply("abc"))
   }
 }

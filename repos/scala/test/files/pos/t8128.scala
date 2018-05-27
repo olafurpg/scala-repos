@@ -10,6 +10,6 @@ object Test {
   (0: Any) match {
     case G(v) => v
     case H(v) => v
-    case _ =>
+    case _    =>
   }
 }

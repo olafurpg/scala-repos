@@ -16,7 +16,12 @@
   */
 package kafka.consumer
 
-import kafka.api.{OffsetRequest, Request, FetchRequestBuilder, FetchResponsePartitionData}
+import kafka.api.{
+  OffsetRequest,
+  Request,
+  FetchRequestBuilder,
+  FetchResponsePartitionData
+}
 import kafka.cluster.BrokerEndPoint
 import kafka.message.ByteBufferMessageSet
 import kafka.server.{PartitionFetchState, AbstractFetcherThread}
@@ -32,11 +37,11 @@ class ConsumerFetcherThread(
     partitionMap: Map[TopicAndPartition, PartitionTopicInfo],
     val consumerFetcherManager: ConsumerFetcherManager)
     extends AbstractFetcherThread(
-        name = name,
-        clientId = config.clientId,
-        sourceBroker = sourceBroker,
-        fetchBackOffMs = config.refreshLeaderBackoffMs,
-        isInterruptible = true) {
+      name = name,
+      clientId = config.clientId,
+      sourceBroker = sourceBroker,
+      fetchBackOffMs = config.refreshLeaderBackoffMs,
+      isInterruptible = true) {
 
   type REQ = FetchRequest
   type PD = PartitionData
@@ -45,11 +50,11 @@ class ConsumerFetcherThread(
   private val fetchSize = config.fetchMessageMaxBytes
 
   private val simpleConsumer = new SimpleConsumer(
-      sourceBroker.host,
-      sourceBroker.port,
-      config.socketTimeoutMs,
-      config.socketReceiveBufferBytes,
-      config.clientId)
+    sourceBroker.host,
+    sourceBroker.port,
+    config.socketTimeoutMs,
+    config.socketReceiveBufferBytes,
+    config.clientId)
 
   private val fetchRequestBuilder = new FetchRequestBuilder()
     .clientId(clientId)
@@ -71,30 +76,34 @@ class ConsumerFetcherThread(
   }
 
   // process fetched data
-  def processPartitionData(topicAndPartition: TopicAndPartition,
-                           fetchOffset: Long,
-                           partitionData: PartitionData) {
+  def processPartitionData(
+      topicAndPartition: TopicAndPartition,
+      fetchOffset: Long,
+      partitionData: PartitionData) {
     val pti = partitionMap(topicAndPartition)
     if (pti.getFetchOffset != fetchOffset)
       throw new RuntimeException(
-          "Offset doesn't match for partition [%s,%d] pti offset: %d fetch offset: %d"
-            .format(topicAndPartition.topic,
-                    topicAndPartition.partition,
-                    pti.getFetchOffset,
-                    fetchOffset))
+        "Offset doesn't match for partition [%s,%d] pti offset: %d fetch offset: %d"
+          .format(
+            topicAndPartition.topic,
+            topicAndPartition.partition,
+            pti.getFetchOffset,
+            fetchOffset))
     pti.enqueue(
-        partitionData.underlying.messages.asInstanceOf[ByteBufferMessageSet])
+      partitionData.underlying.messages.asInstanceOf[ByteBufferMessageSet])
   }
 
   // handle a partition whose offset is out of range and return a new fetch offset
   def handleOffsetOutOfRange(topicAndPartition: TopicAndPartition): Long = {
     val startTimestamp = config.autoOffsetReset match {
       case OffsetRequest.SmallestTimeString => OffsetRequest.EarliestTime
-      case OffsetRequest.LargestTimeString => OffsetRequest.LatestTime
-      case _ => OffsetRequest.LatestTime
+      case OffsetRequest.LargestTimeString  => OffsetRequest.LatestTime
+      case _                                => OffsetRequest.LatestTime
     }
     val newOffset = simpleConsumer.earliestOrLatestOffset(
-        topicAndPartition, startTimestamp, Request.OrdinaryConsumerId)
+      topicAndPartition,
+      startTimestamp,
+      Request.OrdinaryConsumerId)
     val pti = partitionMap(topicAndPartition)
     pti.resetFetchOffset(newOffset)
     pti.resetConsumeOffset(newOffset)
@@ -113,10 +122,11 @@ class ConsumerFetcherThread(
     partitionMap.foreach {
       case ((topicAndPartition, partitionFetchState)) =>
         if (partitionFetchState.isActive)
-          fetchRequestBuilder.addFetch(topicAndPartition.topic,
-                                       topicAndPartition.partition,
-                                       partitionFetchState.offset,
-                                       fetchSize)
+          fetchRequestBuilder.addFetch(
+            topicAndPartition.topic,
+            topicAndPartition.partition,
+            partitionFetchState.offset,
+            fetchSize)
     }
 
     new FetchRequest(fetchRequestBuilder.build())

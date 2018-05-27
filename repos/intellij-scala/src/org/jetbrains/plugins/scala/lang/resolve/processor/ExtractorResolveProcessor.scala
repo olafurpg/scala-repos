@@ -8,18 +8,25 @@ import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil.FakeCompanionClassOrCom
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScReferenceElement
 import org.jetbrains.plugins.scala.lang.psi.api.statements._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass,
+  ScObject
+}
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypingContext
+}
 import org.jetbrains.plugins.scala.project.ProjectPsiElementExt
 import org.jetbrains.plugins.scala.project.ScalaLanguageLevel.Scala_2_11
 
 import scala.collection.{Set, mutable}
 
-class ExtractorResolveProcessor(ref: ScReferenceElement,
-                                refName: String,
-                                kinds: Set[ResolveTargets.Value],
-                                expected: Option[ScType])
+class ExtractorResolveProcessor(
+    ref: ScReferenceElement,
+    refName: String,
+    kinds: Set[ResolveTargets.Value],
+    expected: Option[ScType])
     extends ResolveProcessor(kinds, ref, refName) {
 
   override def execute(element: PsiElement, state: ResolveState): Boolean = {
@@ -33,7 +40,8 @@ class ExtractorResolveProcessor(ref: ScReferenceElement,
           val typeResult = getFromType(state) match {
             case Some(tp) =>
               Success(
-                  ScProjectionType(tp, obj, superReference = false), Some(obj))
+                ScProjectionType(tp, obj, superReference = false),
+                Some(obj))
             case _ => obj.getType(TypingContext.empty)
           }
           val processor = new CollectMethodsProcessor(ref, unapplyName)
@@ -46,19 +54,21 @@ class ExtractorResolveProcessor(ref: ScReferenceElement,
           addResults(sigs.map {
             case (m, subst, parent) =>
               val resolveToMethod =
-                new ScalaResolveResult(m,
-                                       subst,
-                                       getImports(state),
-                                       fromType = getFromType(state),
-                                       parentElement = parent,
-                                       isAccessible = accessible)
+                new ScalaResolveResult(
+                  m,
+                  subst,
+                  getImports(state),
+                  fromType = getFromType(state),
+                  parentElement = parent,
+                  isAccessible = accessible)
               val resolveToNamed =
-                new ScalaResolveResult(named,
-                                       subst,
-                                       getImports(state),
-                                       fromType = getFromType(state),
-                                       parentElement = parent,
-                                       isAccessible = accessible)
+                new ScalaResolveResult(
+                  named,
+                  subst,
+                  getImports(state),
+                  fromType = getFromType(state),
+                  parentElement = parent,
+                  isAccessible = accessible)
 
               resolveToMethod.copy(innerResolveResult = Option(resolveToNamed))
           })
@@ -72,14 +82,15 @@ class ExtractorResolveProcessor(ref: ScReferenceElement,
           obj match {
             case FakeCompanionClassOrCompanionClass(cl: ScClass)
                 if cl.tooBigForUnapply &&
-                cl.scalaLanguageLevel.exists(_ >= Scala_2_11) =>
+                  cl.scalaLanguageLevel.exists(_ >= Scala_2_11) =>
               addResult(
-                  new ScalaResolveResult(named,
-                                         ScSubstitutor.empty,
-                                         getImports(state),
-                                         fromType = getFromType(state),
-                                         parentElement = Option(obj),
-                                         isAccessible = accessible))
+                new ScalaResolveResult(
+                  named,
+                  ScSubstitutor.empty,
+                  getImports(state),
+                  fromType = getFromType(state),
+                  parentElement = Option(obj),
+                  isAccessible = accessible))
             case _ =>
           }
         }
@@ -87,8 +98,8 @@ class ExtractorResolveProcessor(ref: ScReferenceElement,
 
       named match {
         case o: ScObject if o.isPackageObject =>
-        case td: ScTypedDefinition => resultsForTypedDef(td)
-        case _ =>
+        case td: ScTypedDefinition            => resultsForTypedDef(td)
+        case _                                =>
       }
     }
     true
@@ -105,10 +116,9 @@ class ExtractorResolveProcessor(ref: ScReferenceElement,
               if (clauses.length != 0 &&
                   clauses.apply(0).parameters.length == 1) {
                 for (paramType <- clauses(0).parameters
-                                   .apply(0)
-                                   .getType(TypingContext.empty)
-                                     if tp conforms r.substitutor.subst(
-                                     paramType)) return true
+                       .apply(0)
+                       .getType(TypingContext.empty)
+                     if tp conforms r.substitutor.subst(paramType)) return true
               }
               false
             case _ => true
@@ -119,9 +129,10 @@ class ExtractorResolveProcessor(ref: ScReferenceElement,
         else if (filtered.size == 1) filtered
         else {
           new MostSpecificUtil(ref, 1).mostSpecificForResolveResult(
-              filtered, expandInnerResult = false) match {
+            filtered,
+            expandInnerResult = false) match {
             case Some(r) => mutable.HashSet(r)
-            case None => candidates
+            case None    => candidates
           }
         }
       case _ => candidates

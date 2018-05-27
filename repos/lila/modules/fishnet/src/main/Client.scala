@@ -26,12 +26,13 @@ case class Client(
 
 object Client {
 
-  val offline = Client(_id = Key("offline"),
-                       userId = UserId("offline"),
-                       skill = Skill.All,
-                       instance = None,
-                       enabled = true,
-                       createdAt = DateTime.now)
+  val offline = Client(
+    _id = Key("offline"),
+    userId = UserId("offline"),
+    skill = Skill.All,
+    instance = None,
+    enabled = true,
+    createdAt = DateTime.now)
 
   case class Key(value: String) extends AnyVal with StringValue
   case class Version(value: String) extends AnyVal with StringValue
@@ -39,10 +40,11 @@ object Client {
   case class IpAddress(value: String) extends AnyVal with StringValue
   case class Engine(name: String)
 
-  case class Instance(version: Version,
-                      engine: Engine,
-                      ip: IpAddress,
-                      seenAt: DateTime) {
+  case class Instance(
+      version: Version,
+      engine: Engine,
+      ip: IpAddress,
+      seenAt: DateTime) {
 
     def update(i: Instance): Option[Instance] =
       if (i.version != version) i.some

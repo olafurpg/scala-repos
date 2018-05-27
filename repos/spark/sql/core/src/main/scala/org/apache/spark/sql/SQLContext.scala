@@ -37,7 +37,11 @@ import org.apache.spark.sql.catalyst.encoders.encoderFor
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.optimizer.Optimizer
 import org.apache.spark.sql.catalyst.parser.ParserInterface
-import org.apache.spark.sql.catalyst.plans.logical.{LocalRelation, LogicalPlan, Range}
+import org.apache.spark.sql.catalyst.plans.logical.{
+  LocalRelation,
+  LogicalPlan,
+  Range
+}
 import org.apache.spark.sql.catalyst.rules.RuleExecutor
 import org.apache.spark.sql.execution._
 import org.apache.spark.sql.execution.command.ShowTablesCommand
@@ -65,18 +69,20 @@ import org.apache.spark.util.Utils
   * @groupname Ungrouped Support functions for language integrated queries
   * @since 1.0.0
   */
-class SQLContext private[sql](
+class SQLContext private[sql] (
     @transient val sparkContext: SparkContext,
     @transient protected[sql] val cacheManager: CacheManager,
     @transient private[sql] val listener: SQLListener,
     val isRootContext: Boolean)
-    extends Logging with Serializable { self =>
+    extends Logging
+    with Serializable { self =>
 
   def this(sparkContext: SparkContext) = {
-    this(sparkContext,
-         new CacheManager,
-         SQLContext.createListenerAndUI(sparkContext),
-         true)
+    this(
+      sparkContext,
+      new CacheManager,
+      SQLContext.createListenerAndUI(sparkContext),
+      true)
   }
 
   def this(sparkContext: JavaSparkContext) = this(sparkContext.sc)
@@ -84,8 +90,8 @@ class SQLContext private[sql](
   // If spark.sql.allowMultipleContexts is true, we will throw an exception if a user
   // wants to create a new root SQLContext (a SQLContext that is not created by newSession).
   private val allowMultipleContexts = sparkContext.conf.getBoolean(
-      SQLConf.ALLOW_MULTIPLE_CONTEXTS.key,
-      SQLConf.ALLOW_MULTIPLE_CONTEXTS.defaultValue.get)
+    SQLConf.ALLOW_MULTIPLE_CONTEXTS.key,
+    SQLConf.ALLOW_MULTIPLE_CONTEXTS.defaultValue.get)
 
   // Assert no root SQLContext is running when allowMultipleContexts is false.
   {
@@ -94,9 +100,9 @@ class SQLContext private[sql](
         case Some(rootSQLContext) =>
           val errMsg =
             "Only one SQLContext/HiveContext may be running in this JVM. " +
-            s"It is recommended to use SQLContext.getOrCreate to get the instantiated " +
-            s"SQLContext/HiveContext. To ignore this error, " +
-            s"set ${SQLConf.ALLOW_MULTIPLE_CONTEXTS.key} = true in SparkConf."
+              s"It is recommended to use SQLContext.getOrCreate to get the instantiated " +
+              s"SQLContext/HiveContext. To ignore this error, " +
+              s"set ${SQLConf.ALLOW_MULTIPLE_CONTEXTS.key} = true in SparkConf."
           throw new SparkException(errMsg)
         case None => // OK
       }
@@ -110,10 +116,11 @@ class SQLContext private[sql](
     * @since 1.6.0
     */
   def newSession(): SQLContext = {
-    new SQLContext(sparkContext = sparkContext,
-                   cacheManager = cacheManager,
-                   listener = listener,
-                   isRootContext = false)
+    new SQLContext(
+      sparkContext = sparkContext,
+      cacheManager = cacheManager,
+      listener = listener,
+      isRootContext = false)
   }
 
   /**
@@ -255,8 +262,8 @@ class SQLContext private[sql](
     */
   @Experimental
   @transient
-  lazy val emptyDataFrame: DataFrame = createDataFrame(
-      sparkContext.emptyRDD[Row], StructType(Nil))
+  lazy val emptyDataFrame: DataFrame =
+    createDataFrame(sparkContext.emptyRDD[Row], StructType(Nil))
 
   /**
     * A collection of methods for registering user-defined functions (UDF).
@@ -371,7 +378,7 @@ class SQLContext private[sql](
     * @since 1.3.0
     */
   @Experimental
-  def createDataFrame[A <: Product : TypeTag](rdd: RDD[A]): DataFrame = {
+  def createDataFrame[A <: Product: TypeTag](rdd: RDD[A]): DataFrame = {
     SQLContext.setActive(self)
     val schema = ScalaReflection.schemaFor[A].dataType.asInstanceOf[StructType]
     val attributeSeq = schema.toAttributes
@@ -387,7 +394,7 @@ class SQLContext private[sql](
     * @since 1.3.0
     */
   @Experimental
-  def createDataFrame[A <: Product : TypeTag](data: Seq[A]): DataFrame = {
+  def createDataFrame[A <: Product: TypeTag](data: Seq[A]): DataFrame = {
     SQLContext.setActive(self)
     val schema = ScalaReflection.schemaFor[A].dataType.asInstanceOf[StructType]
     val attributeSeq = schema.toAttributes
@@ -446,7 +453,9 @@ class SQLContext private[sql](
     * converted to Catalyst rows.
     */
   private[sql] def createDataFrame(
-      rowRDD: RDD[Row], schema: StructType, needsConversion: Boolean) = {
+      rowRDD: RDD[Row],
+      schema: StructType,
+      needsConversion: Boolean) = {
     // TODO: use MutableProjection when rowRDD is another DataFrame and the applied
     // schema differs from the existing schema on any field data type.
     val catalystRows =
@@ -463,7 +472,7 @@ class SQLContext private[sql](
     Dataset.newDataFrame(this, logicalPlan)
   }
 
-  def createDataset[T : Encoder](data: Seq[T]): Dataset[T] = {
+  def createDataset[T: Encoder](data: Seq[T]): Dataset[T] = {
     val enc = encoderFor[T]
     val attributes = enc.schema.toAttributes
     val encoded = data.map(d => enc.toRow(d).copy())
@@ -472,7 +481,7 @@ class SQLContext private[sql](
     Dataset[T](this, plan)
   }
 
-  def createDataset[T : Encoder](data: RDD[T]): Dataset[T] = {
+  def createDataset[T: Encoder](data: RDD[T]): Dataset[T] = {
     val enc = encoderFor[T]
     val attributes = enc.schema.toAttributes
     val encoded = data.map(d => enc.toRow(d))
@@ -481,7 +490,7 @@ class SQLContext private[sql](
     Dataset[T](this, plan)
   }
 
-  def createDataset[T : Encoder](data: java.util.List[T]): Dataset[T] = {
+  def createDataset[T: Encoder](data: java.util.List[T]): Dataset[T] = {
     createDataset(data.asScala)
   }
 
@@ -490,7 +499,8 @@ class SQLContext private[sql](
     * converted to Catalyst rows.
     */
   private[sql] def internalCreateDataFrame(
-      catalystRows: RDD[InternalRow], schema: StructType) = {
+      catalystRows: RDD[InternalRow],
+      schema: StructType) = {
     // TODO: use MutableProjection when rowRDD is another DataFrame and the applied
     // schema differs from the existing schema on any field data type.
     val logicalPlan = LogicalRDD(schema.toAttributes, catalystRows)(self)
@@ -522,10 +532,11 @@ class SQLContext private[sql](
     */
   @DeveloperApi
   def createDataFrame(
-      rows: java.util.List[Row], schema: StructType): DataFrame = {
+      rows: java.util.List[Row],
+      schema: StructType): DataFrame = {
     Dataset.newDataFrame(
-        self,
-        LocalRelation.fromExternalRows(schema.toAttributes, rows.asScala))
+      self,
+      LocalRelation.fromExternalRows(schema.toAttributes, rows.asScala))
   }
 
   /**
@@ -569,7 +580,8 @@ class SQLContext private[sql](
     * @since 1.6.0
     */
   def createDataFrame(
-      data: java.util.List[_], beanClass: Class[_]): DataFrame = {
+      data: java.util.List[_],
+      beanClass: Class[_]): DataFrame = {
     val attrSeq = getSchema(beanClass)
     val className = beanClass.getName
     val beanInfo = Introspector.getBeanInfo(beanClass)
@@ -615,7 +627,9 @@ class SQLContext private[sql](
     */
   @Experimental
   def createExternalTable(
-      tableName: String, path: String, source: String): DataFrame = {
+      tableName: String,
+      path: String,
+      source: String): DataFrame = {
     createExternalTable(tableName, source, Map("path" -> path))
   }
 
@@ -645,17 +659,19 @@ class SQLContext private[sql](
     * @since 1.3.0
     */
   @Experimental
-  def createExternalTable(tableName: String,
-                          source: String,
-                          options: Map[String, String]): DataFrame = {
+  def createExternalTable(
+      tableName: String,
+      source: String,
+      options: Map[String, String]): DataFrame = {
     val tableIdent = sessionState.sqlParser.parseTableIdentifier(tableName)
-    val cmd = CreateTableUsing(tableIdent,
-                               userSpecifiedSchema = None,
-                               source,
-                               temporary = false,
-                               options,
-                               allowExisting = false,
-                               managedIfNoPath = false)
+    val cmd = CreateTableUsing(
+      tableIdent,
+      userSpecifiedSchema = None,
+      source,
+      temporary = false,
+      options,
+      allowExisting = false,
+      managedIfNoPath = false)
     executePlan(cmd).toRdd
     table(tableIdent)
   }
@@ -687,18 +703,20 @@ class SQLContext private[sql](
     * @since 1.3.0
     */
   @Experimental
-  def createExternalTable(tableName: String,
-                          source: String,
-                          schema: StructType,
-                          options: Map[String, String]): DataFrame = {
+  def createExternalTable(
+      tableName: String,
+      source: String,
+      schema: StructType,
+      options: Map[String, String]): DataFrame = {
     val tableIdent = sessionState.sqlParser.parseTableIdentifier(tableName)
-    val cmd = CreateTableUsing(tableIdent,
-                               userSpecifiedSchema = Some(schema),
-                               source,
-                               temporary = false,
-                               options,
-                               allowExisting = false,
-                               managedIfNoPath = false)
+    val cmd = CreateTableUsing(
+      tableIdent,
+      userSpecifiedSchema = Some(schema),
+      source,
+      temporary = false,
+      options,
+      allowExisting = false,
+      managedIfNoPath = false)
     executePlan(cmd).toRdd
     table(tableIdent)
   }
@@ -708,9 +726,11 @@ class SQLContext private[sql](
     * only during the lifetime of this instance of SQLContext.
     */
   private[sql] def registerDataFrameAsTable(
-      df: DataFrame, tableName: String): Unit = {
+      df: DataFrame,
+      tableName: String): Unit = {
     sessionState.catalog.registerTable(
-        sessionState.sqlParser.parseTableIdentifier(tableName), df.logicalPlan)
+      sessionState.sqlParser.parseTableIdentifier(tableName),
+      df.logicalPlan)
   }
 
   /**
@@ -747,8 +767,7 @@ class SQLContext private[sql](
     */
   @Experimental
   def range(start: Long, end: Long): Dataset[Long] = {
-    range(
-        start, end, step = 1, numPartitions = sparkContext.defaultParallelism)
+    range(start, end, step = 1, numPartitions = sparkContext.defaultParallelism)
   }
 
   /**
@@ -774,12 +793,15 @@ class SQLContext private[sql](
     * @group dataset
     */
   @Experimental
-  def range(start: Long,
-            end: Long,
-            step: Long,
-            numPartitions: Int): Dataset[Long] = {
+  def range(
+      start: Long,
+      end: Long,
+      step: Long,
+      numPartitions: Int): Dataset[Long] = {
     new Dataset(
-        this, Range(start, end, step, numPartitions), implicits.newLongEncoder)
+      this,
+      Range(start, end, step, numPartitions),
+      implicits.newLongEncoder)
   }
 
   /**
@@ -895,7 +917,8 @@ class SQLContext private[sql](
     * Apply a schema defined by the schemaString to an RDD. It is only used by PySpark.
     */
   protected[sql] def applySchemaToPythonRDD(
-      rdd: RDD[Array[Any]], schemaString: String): DataFrame = {
+      rdd: RDD[Array[Any]],
+      schemaString: String): DataFrame = {
     val schema = parseDataType(schemaString).asInstanceOf[StructType]
     applySchemaToPythonRDD(rdd, schema)
   }
@@ -904,10 +927,11 @@ class SQLContext private[sql](
     * Apply a schema defined by the schema to an RDD. It is only used by PySpark.
     */
   protected[sql] def applySchemaToPythonRDD(
-      rdd: RDD[Array[Any]], schema: StructType): DataFrame = {
+      rdd: RDD[Array[Any]],
+      schema: StructType): DataFrame = {
 
     val rowRdd = rdd.map(r =>
-          python.EvaluatePython.fromJava(r, schema).asInstanceOf[InternalRow])
+      python.EvaluatePython.fromJava(r, schema).asInstanceOf[InternalRow])
     Dataset.newDataFrame(this, LogicalRDD(schema.toAttributes, rowRdd)(self))
   }
 
@@ -924,8 +948,7 @@ class SQLContext private[sql](
   // Register a successfully instantiated context to the singleton. This should be at the end of
   // the class definition so that the singleton is updated only if there is no exception in the
   // construction of the instance.
-  sparkContext.addSparkListener(
-      new SparkListener {
+  sparkContext.addSparkListener(new SparkListener {
     override def onApplicationEnd(
         applicationEnd: SparkListenerApplicationEnd): Unit = {
       SQLContext.clearInstantiatedContext()
@@ -1051,9 +1074,11 @@ object SQLContext {
     }
     data.map { element =>
       new GenericInternalRow(
-          methodsToConverts.map {
+        methodsToConverts
+          .map {
             case (e, convert) => convert(e.invoke(element))
-          }.toArray[Any]
+          }
+          .toArray[Any]
       ): InternalRow
     }
   }

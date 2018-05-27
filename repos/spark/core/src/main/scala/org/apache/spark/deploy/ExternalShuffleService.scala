@@ -26,7 +26,10 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.network.TransportContext
 import org.apache.spark.network.netty.SparkTransportConf
 import org.apache.spark.network.sasl.SaslServerBootstrap
-import org.apache.spark.network.server.{TransportServer, TransportServerBootstrap}
+import org.apache.spark.network.server.{
+  TransportServer,
+  TransportServerBootstrap
+}
 import org.apache.spark.network.shuffle.ExternalShuffleBlockHandler
 import org.apache.spark.network.util.TransportConf
 import org.apache.spark.util.{ShutdownHookManager, Utils}
@@ -39,7 +42,8 @@ import org.apache.spark.util.{ShutdownHookManager, Utils}
   * Optionally requires SASL authentication in order to read. See [[SecurityManager]].
   */
 private[deploy] class ExternalShuffleService(
-    sparkConf: SparkConf, securityManager: SecurityManager)
+    sparkConf: SparkConf,
+    securityManager: SecurityManager)
     extends Logging {
 
   private val enabled =
@@ -50,8 +54,8 @@ private[deploy] class ExternalShuffleService(
   private val transportConf =
     SparkTransportConf.fromSparkConf(sparkConf, "shuffle", numUsableCores = 0)
   private val blockHandler = newShuffleBlockHandler(transportConf)
-  private val transportContext: TransportContext = new TransportContext(
-      transportConf, blockHandler, true)
+  private val transportContext: TransportContext =
+    new TransportContext(transportConf, blockHandler, true)
 
   private var server: TransportServer = _
 
@@ -104,15 +108,17 @@ object ExternalShuffleService extends Logging {
   private val barrier = new CountDownLatch(1)
 
   def main(args: Array[String]): Unit = {
-    main(args,
-         (conf: SparkConf,
-         sm: SecurityManager) => new ExternalShuffleService(conf, sm))
+    main(
+      args,
+      (conf: SparkConf, sm: SecurityManager) =>
+        new ExternalShuffleService(conf, sm))
   }
 
   /** A helper main method that allows the caller to call this with a custom shuffle service. */
-  private[spark] def main(args: Array[String],
-                          newShuffleService: (SparkConf,
-                          SecurityManager) => ExternalShuffleService): Unit = {
+  private[spark] def main(
+      args: Array[String],
+      newShuffleService: (SparkConf, SecurityManager) => ExternalShuffleService)
+    : Unit = {
     Utils.initDaemon(log)
     val sparkConf = new SparkConf
     Utils.loadDefaultSparkProperties(sparkConf)

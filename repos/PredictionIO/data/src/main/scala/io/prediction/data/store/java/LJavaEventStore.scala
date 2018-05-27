@@ -48,39 +48,40 @@ object LJavaEventStore {
     * @param latest Return latest event first
     * @return java.util.List[Event]
     */
-  def findByEntity(appName: String,
-                   entityType: String,
-                   entityId: String,
-                   channelName: Option[String],
-                   eventNames: Option[java.util.List[String]],
-                   targetEntityType: Option[Option[String]],
-                   targetEntityId: Option[Option[String]],
-                   startTime: Option[DateTime],
-                   untilTime: Option[DateTime],
-                   limit: Option[Integer],
-                   latest: Boolean,
-                   timeout: Duration): java.util.List[Event] = {
+  def findByEntity(
+      appName: String,
+      entityType: String,
+      entityId: String,
+      channelName: Option[String],
+      eventNames: Option[java.util.List[String]],
+      targetEntityType: Option[Option[String]],
+      targetEntityId: Option[Option[String]],
+      startTime: Option[DateTime],
+      untilTime: Option[DateTime],
+      limit: Option[Integer],
+      latest: Boolean,
+      timeout: Duration): java.util.List[Event] = {
 
     val eventNamesSeq = eventNames.map(JavaConversions.asScalaBuffer(_).toSeq)
     val limitInt = limit.map(_.intValue())
 
     JavaConversions.seqAsJavaList(
-        LEventStore
-          .findByEntity(
-              appName,
-              entityType,
-              entityId,
-              channelName,
-              eventNamesSeq,
-              targetEntityType,
-              targetEntityId,
-              startTime,
-              untilTime,
-              limitInt,
-              latest,
-              timeout
-          )
-          .toSeq)
+      LEventStore
+        .findByEntity(
+          appName,
+          entityType,
+          entityId,
+          channelName,
+          eventNamesSeq,
+          targetEntityType,
+          targetEntityId,
+          startTime,
+          untilTime,
+          limitInt,
+          latest,
+          timeout
+        )
+        .toSeq)
   }
 
   /** Reads events generically. If entityType or entityId is not specified, it
@@ -108,36 +109,37 @@ object LJavaEventStore {
     * @param limit Limit number of events. Get all events if None or Some(-1)
     * @return java.util.List[Event]
     */
-  def find(appName: String,
-           entityType: Option[String],
-           entityId: Option[String],
-           channelName: Option[String],
-           eventNames: Option[java.util.List[String]],
-           targetEntityType: Option[Option[String]],
-           targetEntityId: Option[Option[String]],
-           startTime: Option[DateTime],
-           untilTime: Option[DateTime],
-           limit: Option[Integer],
-           timeout: Duration): java.util.List[Event] = {
+  def find(
+      appName: String,
+      entityType: Option[String],
+      entityId: Option[String],
+      channelName: Option[String],
+      eventNames: Option[java.util.List[String]],
+      targetEntityType: Option[Option[String]],
+      targetEntityId: Option[Option[String]],
+      startTime: Option[DateTime],
+      untilTime: Option[DateTime],
+      limit: Option[Integer],
+      timeout: Duration): java.util.List[Event] = {
 
     val eventNamesSeq = eventNames.map(JavaConversions.asScalaBuffer(_).toSeq)
     val limitInt = limit.map(_.intValue())
 
     JavaConversions.seqAsJavaList(
-        LEventStore
-          .find(
-              appName,
-              entityType,
-              entityId,
-              channelName,
-              eventNamesSeq,
-              targetEntityType,
-              targetEntityId,
-              startTime,
-              untilTime,
-              limitInt,
-              timeout
-          )
-          .toSeq)
+      LEventStore
+        .find(
+          appName,
+          entityType,
+          entityId,
+          channelName,
+          eventNamesSeq,
+          targetEntityType,
+          targetEntityId,
+          startTime,
+          untilTime,
+          limitInt,
+          timeout
+        )
+        .toSeq)
   }
 }

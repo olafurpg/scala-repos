@@ -65,9 +65,9 @@ class ThriftDispatchBench extends StdBenchAnnotations {
 
   // Protocols.binaryFactory()
   val scroogeService1 = scroogeService(
-      Protocols.binaryFactory(statsReceiver = NullStatsReceiver))
+    Protocols.binaryFactory(statsReceiver = NullStatsReceiver))
   val scroogeClient1 = scroogeClient(
-      Protocols.binaryFactory(statsReceiver = NullStatsReceiver))
+    Protocols.binaryFactory(statsReceiver = NullStatsReceiver))
 
   @Benchmark
   def scroogeDispatch_StdTBinaryProt(): Array[Byte] = {

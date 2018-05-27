@@ -276,7 +276,7 @@ trait TraversableOnce[+A] extends Any with GenTraversableOnce[A] { self =>
   def copyToArray[B >: A](xs: Array[B]): Unit =
     copyToArray(xs, 0, xs.length)
 
-  def toArray[B >: A : ClassTag]: Array[B] = {
+  def toArray[B >: A: ClassTag]: Array[B] = {
     if (isTraversableAgain) {
       val result = new Array[B](size)
       copyToArray(result, 0)
@@ -347,10 +347,11 @@ trait TraversableOnce[+A] extends Any with GenTraversableOnce[A] { self =>
     *  @param end   the ending string.
     *  @return      the string builder `b` to which elements were appended.
     */
-  def addString(b: StringBuilder,
-                start: String,
-                sep: String,
-                end: String): StringBuilder = {
+  def addString(
+      b: StringBuilder,
+      start: String,
+      sep: String,
+      end: String): StringBuilder = {
     var first = true
 
     b append start

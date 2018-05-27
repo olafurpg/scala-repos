@@ -27,15 +27,17 @@ trait Spec {
   }
 
   def evaluating[U](body: => U) = new {
-    def shouldProduce[T <: Throwable : ClassTag]() = {
+    def shouldProduce[T <: Throwable: ClassTag]() = {
       var produced = false
-      try body catch {
+      try body
+      catch {
         case e: Throwable =>
           if (e.getClass == implicitly[ClassTag[T]].runtimeClass)
             produced = true
       } finally {
-        assert(produced,
-               "Did not produce exception of type: " + implicitly[ClassTag[T]])
+        assert(
+          produced,
+          "Did not produce exception of type: " + implicitly[ClassTag[T]])
       }
     }
   }

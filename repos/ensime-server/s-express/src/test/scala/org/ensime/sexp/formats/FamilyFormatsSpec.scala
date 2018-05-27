@@ -44,18 +44,18 @@ class FamilyFormatsSpec extends FormatSpec with FamilyFormats {
       // implicit val QualifierTokenTH = typehint[QualifierToken]
 
       def write(obj: TokenTree): Sexp = obj match {
-        case f: FieldTerm => wrap(f)
-        case b: BoundedTerm => wrap(b)
-        case u: Unparsed => wrap(u)
-        case i: Ignored => wrap(i)
-        case u: Unclear => wrap(u)
-        case i: InTerm => wrap(i)
-        case like: LikeTerm => wrap(like)
-        case a: AndCondition => wrap(a)
-        case o: OrCondition => wrap(o)
+        case f: FieldTerm        => wrap(f)
+        case b: BoundedTerm      => wrap(b)
+        case u: Unparsed         => wrap(u)
+        case i: Ignored          => wrap(i)
+        case u: Unclear          => wrap(u)
+        case i: InTerm           => wrap(i)
+        case like: LikeTerm      => wrap(like)
+        case a: AndCondition     => wrap(a)
+        case o: OrCondition      => wrap(o)
         case prefer: PreferToken => wrap(prefer)
-        case q: QualifierToken => wrap(q)
-        case SpecialToken => wrap(SpecialToken)
+        case q: QualifierToken   => wrap(q)
+        case SpecialToken        => wrap(SpecialToken)
       }
 
       def read(hint: SexpSymbol, value: Sexp): TokenTree = hint match {
@@ -90,16 +90,15 @@ class FamilyFormatsSpec extends FormatSpec with FamilyFormats {
     /////////////////// END OF BOILERPLATE /////////////////
 
     assertFormat(SpecialToken, SexpNil)
-    assertFormat(
-        SpecialToken: TokenTree, SexpList(SexpSymbol(":SpecialToken")))
+    assertFormat(SpecialToken: TokenTree, SexpList(SexpSymbol(":SpecialToken")))
 
     val fieldTerm = FieldTerm("thing is ten", DatabaseField("THING"), "10")
     val expectField = SexpData(
-        SexpSymbol(":text") -> SexpString("thing is ten"),
-        SexpSymbol(":field") -> SexpData(
-            SexpSymbol(":column") -> SexpString("THING")
-        ),
-        SexpSymbol(":value") -> SexpString("10")
+      SexpSymbol(":text") -> SexpString("thing is ten"),
+      SexpSymbol(":field") -> SexpData(
+        SexpSymbol(":column") -> SexpString("THING")
+      ),
+      SexpSymbol(":value") -> SexpString("10")
     )
 
     // confirm that the wrapper is picked up for a specific case class
@@ -113,9 +112,9 @@ class FamilyFormatsSpec extends FormatSpec with FamilyFormats {
     // confirm recursive works
     val and = AndCondition(fieldTerm, fieldTerm, "wibble")
     val expectAnd = SexpData(
-        SexpSymbol(":left") -> expectFieldTree,
-        SexpSymbol(":right") -> expectFieldTree,
-        SexpSymbol(":text") -> SexpString("wibble")
+      SexpSymbol(":left") -> expectFieldTree,
+      SexpSymbol(":right") -> expectFieldTree,
+      SexpSymbol(":text") -> SexpString("wibble")
     )
     assertFormat(and, expectAnd)
 

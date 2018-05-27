@@ -17,7 +17,15 @@
 package com.twitter.summingbird.scalding.batch
 
 import com.twitter.summingbird.batch.{BatchID, Batcher}
-import com.twitter.algebird.{Universe, Empty, Interval, Intersection, InclusiveLower, ExclusiveUpper, InclusiveUpper}
+import com.twitter.algebird.{
+  Universe,
+  Empty,
+  Interval,
+  Intersection,
+  InclusiveLower,
+  ExclusiveUpper,
+  InclusiveUpper
+}
 import com.twitter.bijection.{Injection, Bijection, Conversion}
 import com.twitter.summingbird.batch.Timestamp
 import com.twitter.summingbird.scalding._
@@ -41,12 +49,14 @@ private class BatchedOperations(batcher: Batcher) {
   def batchToTimestamp(bint: Interval[BatchID]): Interval[Timestamp] =
     bint.mapNonDecreasing { batcher.earliestTimeOf(_) }
 
-  def intersect(batches: Interval[BatchID],
-                ts: Interval[Timestamp]): Interval[Timestamp] =
+  def intersect(
+      batches: Interval[BatchID],
+      ts: Interval[Timestamp]): Interval[Timestamp] =
     batchToTimestamp(batches) && ts
 
-  def intersect(batches: Iterable[BatchID],
-                ts: Interval[Timestamp]): Option[Interval[Timestamp]] =
+  def intersect(
+      batches: Iterable[BatchID],
+      ts: Interval[Timestamp]): Option[Interval[Timestamp]] =
     BatchID.toInterval(batches).map { intersect(_, ts) }
 
   def readAvailableTimes[T](

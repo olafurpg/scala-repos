@@ -28,8 +28,8 @@ trait BinOpVec {
   // ***************
 
   // Binary element-wise operation on one Vec and one scalar
-  final class VecSclrElemOp[
-      OP <: ScalarOp, @spec(Boolean, Int, Long, Double) A, @spec(Boolean, Int, Long, Double) B, @spec(Boolean, Int, Long, Double) C : ST](
+  final class VecSclrElemOp[OP <: ScalarOp, @spec(Boolean, Int, Long, Double) A,
+  @spec(Boolean, Int, Long, Double) B, @spec(Boolean, Int, Long, Double) C: ST](
       val op: BinOp[OP, A, B, C])
       extends BinOp[OP, Vec[A], B, Vec[C]] {
     def apply(v1: Vec[A], v2: B) = {
@@ -114,8 +114,8 @@ trait BinOpVec {
   // ***************
 
   // Binary element-wise operation on two Vecs
-  final class VecVecElemOp[
-      OP <: ScalarOp, @spec(Boolean, Int, Long, Double) A, @spec(Boolean, Int, Long, Double) B, @spec(Boolean, Int, Long, Double) C : ST](
+  final class VecVecElemOp[OP <: ScalarOp, @spec(Boolean, Int, Long, Double) A,
+  @spec(Boolean, Int, Long, Double) B, @spec(Boolean, Int, Long, Double) C: ST](
       op: BinOp[OP, A, B, C])
       extends BinOp[OP, Vec[A], Vec[B], Vec[C]] {
 
@@ -203,10 +203,12 @@ trait BinOpVec {
 
   // Binary dot product of two vectors
 
-  final class VecVecDot[@spec(Int, Long, Double) A,
-                        @spec(Int, Long, Double) B,
-                        @spec(Int, Long, Double) C : ST : NUM](
-      opadd: BinOp[Add, C, C, C], opmul: BinOp[Multiply, A, B, C])
+  final class VecVecDot[
+      @spec(Int, Long, Double) A,
+      @spec(Int, Long, Double) B,
+      @spec(Int, Long, Double) C: ST: NUM](
+      opadd: BinOp[Add, C, C, C],
+      opmul: BinOp[Multiply, A, B, C])
       extends BinOp[InnerProd, Vec[A], Vec[B], C] {
 
     def apply(v1: Vec[A], v2: Vec[B]) = {
@@ -222,40 +224,49 @@ trait BinOpVec {
     }
   }
 
-  implicit def VecVecDotOpDDD(implicit opA: BinOp[Add, Double, Double, Double],
-                              opM: BinOp[Multiply, Double, Double, Double]) =
+  implicit def VecVecDotOpDDD(
+      implicit opA: BinOp[Add, Double, Double, Double],
+      opM: BinOp[Multiply, Double, Double, Double]) =
     new VecVecDot[Double, Double, Double](opA, opM)
-  implicit def VecVecDotOpDLD(implicit opA: BinOp[Add, Double, Double, Double],
-                              opM: BinOp[Multiply, Double, Long, Double]) =
+  implicit def VecVecDotOpDLD(
+      implicit opA: BinOp[Add, Double, Double, Double],
+      opM: BinOp[Multiply, Double, Long, Double]) =
     new VecVecDot[Double, Long, Double](opA, opM)
-  implicit def VecVecDotOpDID(implicit opA: BinOp[Add, Double, Double, Double],
-                              opM: BinOp[Multiply, Double, Int, Double]) =
+  implicit def VecVecDotOpDID(
+      implicit opA: BinOp[Add, Double, Double, Double],
+      opM: BinOp[Multiply, Double, Int, Double]) =
     new VecVecDot[Double, Int, Double](opA, opM)
 
-  implicit def VecVecDotOpLDD(implicit opA: BinOp[Add, Double, Double, Double],
-                              opM: BinOp[Multiply, Long, Double, Double]) =
+  implicit def VecVecDotOpLDD(
+      implicit opA: BinOp[Add, Double, Double, Double],
+      opM: BinOp[Multiply, Long, Double, Double]) =
     new VecVecDot[Long, Double, Double](opA, opM)
-  implicit def VecVecDotOpLLL(implicit opA: BinOp[Add, Long, Long, Long],
-                              opM: BinOp[Multiply, Long, Long, Long]) =
+  implicit def VecVecDotOpLLL(
+      implicit opA: BinOp[Add, Long, Long, Long],
+      opM: BinOp[Multiply, Long, Long, Long]) =
     new VecVecDot[Long, Long, Long](opA, opM)
-  implicit def VecVecDotOpLIL(implicit opA: BinOp[Add, Long, Long, Long],
-                              opM: BinOp[Multiply, Long, Int, Long]) =
+  implicit def VecVecDotOpLIL(
+      implicit opA: BinOp[Add, Long, Long, Long],
+      opM: BinOp[Multiply, Long, Int, Long]) =
     new VecVecDot[Long, Int, Long](opA, opM)
 
-  implicit def VecVecDotOpIDD(implicit opA: BinOp[Add, Double, Double, Double],
-                              opM: BinOp[Multiply, Int, Double, Double]) =
+  implicit def VecVecDotOpIDD(
+      implicit opA: BinOp[Add, Double, Double, Double],
+      opM: BinOp[Multiply, Int, Double, Double]) =
     new VecVecDot[Int, Double, Double](opA, opM)
-  implicit def VecVecDotOpILL(implicit opA: BinOp[Add, Long, Long, Long],
-                              opM: BinOp[Multiply, Int, Long, Long]) =
+  implicit def VecVecDotOpILL(
+      implicit opA: BinOp[Add, Long, Long, Long],
+      opM: BinOp[Multiply, Int, Long, Long]) =
     new VecVecDot[Int, Long, Long](opA, opM)
-  implicit def VecVecDotOpIII(implicit opA: BinOp[Add, Int, Int, Int],
-                              opM: BinOp[Multiply, Int, Int, Int]) =
+  implicit def VecVecDotOpIII(
+      implicit opA: BinOp[Add, Int, Int, Int],
+      opM: BinOp[Multiply, Int, Int, Int]) =
     new VecVecDot[Int, Int, Int](opA, opM)
 
   // Binary outer product of two vectors
 
-  final class VecVecOuter[
-      @spec(Int, Long, Double) A, @spec(Int, Long, Double) B, @spec(Int, Long, Double) C : ST](
+  final class VecVecOuter[@spec(Int, Long, Double) A,
+  @spec(Int, Long, Double) B, @spec(Int, Long, Double) C: ST](
       opmul: BinOp[Multiply, A, B, C])
       extends BinOp[OuterProd, Vec[A], Vec[B], Mat[C]] {
 

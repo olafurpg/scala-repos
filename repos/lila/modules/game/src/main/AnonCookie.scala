@@ -9,8 +9,8 @@ object AnonCookie {
 
   def json(game: Game, color: chess.Color): Option[JsObject] =
     !game.player(color).userId.isDefined option Json.obj(
-        "name" -> name,
-        "maxAge" -> maxAge,
-        "value" -> game.player(color).id
+      "name" -> name,
+      "maxAge" -> maxAge,
+      "value" -> game.player(color).id
     )
 }

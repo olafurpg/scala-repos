@@ -43,17 +43,18 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class BorderStrokeStyleSpec
     extends SimpleSFXDelegateSpec[jfxsl.BorderStrokeStyle, BorderStrokeStyle](
-        classOf[jfxsl.BorderStrokeStyle], classOf[BorderStrokeStyle]) {
+      classOf[jfxsl.BorderStrokeStyle],
+      classOf[BorderStrokeStyle]) {
 
   override protected def getScalaClassInstance =
     new BorderStrokeStyle(getJavaClassInstance) {}
 
   override protected def getJavaClassInstance = new jfxsl.BorderStrokeStyle(
-      StrokeType.Centered,
-      StrokeLineJoin.BEVEL,
-      StrokeLineCap.BUTT,
-      1,
-      1,
-      new java.util.ArrayList[java.lang.Double]()
+    StrokeType.Centered,
+    StrokeLineJoin.BEVEL,
+    StrokeLineCap.BUTT,
+    1,
+    1,
+    new java.util.ArrayList[java.lang.Double]()
   )
 }

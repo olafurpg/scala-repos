@@ -25,21 +25,21 @@ sealed trait Frequency {
   protected[time] def toICal: com.google.ical.values.Frequency = this match {
     case SECONDLY => com.google.ical.values.Frequency.SECONDLY
     case MINUTELY => com.google.ical.values.Frequency.MINUTELY
-    case HOURLY => com.google.ical.values.Frequency.HOURLY
-    case DAILY => com.google.ical.values.Frequency.DAILY
-    case WEEKLY => com.google.ical.values.Frequency.WEEKLY
-    case MONTHLY => com.google.ical.values.Frequency.MONTHLY
-    case YEARLY => com.google.ical.values.Frequency.YEARLY
+    case HOURLY   => com.google.ical.values.Frequency.HOURLY
+    case DAILY    => com.google.ical.values.Frequency.DAILY
+    case WEEKLY   => com.google.ical.values.Frequency.WEEKLY
+    case MONTHLY  => com.google.ical.values.Frequency.MONTHLY
+    case YEARLY   => com.google.ical.values.Frequency.YEARLY
   }
 
   protected[time] def toDur: Period = this match {
     case SECONDLY => Period.seconds(1)
     case MINUTELY => Period.minutes(1)
-    case HOURLY => Period.hours(1)
-    case DAILY => Period.days(1)
-    case WEEKLY => Period.weeks(1)
-    case MONTHLY => Period.months(1)
-    case YEARLY => Period.years(1)
+    case HOURLY   => Period.hours(1)
+    case DAILY    => Period.days(1)
+    case WEEKLY   => Period.weeks(1)
+    case MONTHLY  => Period.months(1)
+    case YEARLY   => Period.years(1)
   }
 }
 

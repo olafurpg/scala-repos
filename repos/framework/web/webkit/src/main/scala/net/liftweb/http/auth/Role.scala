@@ -26,9 +26,8 @@ object AuthRole {
   }
 
   def apply(roleNames: String*): List[Role] =
-    roleNames.toList.map(
-        n =>
-          new Role {
+    roleNames.toList.map(n =>
+      new Role {
         def name = n
     })
 
@@ -84,10 +83,9 @@ trait Role {
   def getRoleByName(roleName: String): Box[Role] =
     (this.name == roleName) match {
       case false =>
-        childs.find(
-            role =>
-              role.getRoleByName(roleName) match {
-            case Empty => false
+        childs.find(role =>
+          role.getRoleByName(roleName) match {
+            case Empty       => false
             case theRole @ _ => return theRole
         })
         Empty
@@ -118,7 +116,7 @@ trait Role {
     */
   def isChildOf(roleName: String): Boolean = (this.name == roleName) match {
     case true => return true
-    case _ => this.parent.map(_ isChildOf (roleName)) openOr false
+    case _    => this.parent.map(_ isChildOf (roleName)) openOr false
   }
 
   /**

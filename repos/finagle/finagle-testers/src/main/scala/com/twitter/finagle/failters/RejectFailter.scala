@@ -17,7 +17,8 @@ case class RejectFailter[Req, Rep](
     rejectWith: (() => Throwable) = (() => new RejectedExecutionException()),
     seed: Long = Failter.DefaultSeed,
     stats: StatsReceiver = NullStatsReceiver)
-    extends SimpleFilter[Req, Rep] with Failter {
+    extends SimpleFilter[Req, Rep]
+    with Failter {
 
   def apply(req: Req, service: Service[Req, Rep]): Future[Rep] = {
     if (prob == 0.0 || rand.nextDouble() >= prob) {
@@ -38,7 +39,8 @@ case class ByzantineRejectFailter[Req, Rep](
     rejectWith: (() => Throwable) = (() => new RejectedExecutionException()),
     seed: Long = Failter.DefaultSeed,
     stats: StatsReceiver = NullStatsReceiver)
-    extends SimpleFilter[Req, Rep] with Failter {
+    extends SimpleFilter[Req, Rep]
+    with Failter {
 
   def apply(req: Req, service: Service[Req, Rep]): Future[Rep] = {
     service(req).transform { result =>

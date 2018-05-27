@@ -37,7 +37,8 @@ trait MultipartMarshallers {
     */
   protected def randomBoundary(): String =
     BodyPartRenderer.randomBoundary(
-        length = multipartBoundaryLength, random = multipartBoundaryRandom)
+      length = multipartBoundaryLength,
+      random = multipartBoundaryRandom)
 }
 
 object MultipartMarshallers extends MultipartMarshallers

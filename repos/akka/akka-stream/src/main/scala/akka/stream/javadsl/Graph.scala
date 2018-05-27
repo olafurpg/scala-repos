@@ -32,8 +32,9 @@ object Merge {
   /**
     * Create a new `Merge` stage with the specified output type.
     */
-  def create[T](clazz: Class[T],
-                inputPorts: Int): Graph[UniformFanInShape[T, T], NotUsed] =
+  def create[T](
+      clazz: Class[T],
+      inputPorts: Int): Graph[UniformFanInShape[T, T], NotUsed] =
     create(inputPorts)
 
   /**
@@ -148,8 +149,9 @@ object Broadcast {
   /**
     * Create a new `Broadcast` stage with the specified input type.
     */
-  def create[T](clazz: Class[T],
-                outputCount: Int): Graph[UniformFanOutShape[T, T], NotUsed] =
+  def create[T](
+      clazz: Class[T],
+      outputCount: Int): Graph[UniformFanOutShape[T, T], NotUsed] =
     create(outputCount)
 }
 
@@ -176,8 +178,7 @@ object Partition {
     */
   def create[T](outputCount: Int, partitioner: function.Function[T, Int])
     : Graph[UniformFanOutShape[T, T], NotUsed] =
-    scaladsl.Partition(
-        outputCount, partitioner = (t: T) ⇒ partitioner.apply(t))
+    scaladsl.Partition(outputCount, partitioner = (t: T) ⇒ partitioner.apply(t))
 
   /**
     * Create a new `Partition` stage with the specified input type.
@@ -185,9 +186,10 @@ object Partition {
     * @param outputCount number of output ports
     * @param partitioner function deciding which output each element will be targeted
     */
-  def create[T](clazz: Class[T],
-                outputCount: Int,
-                partitioner: function.Function[T, Int])
+  def create[T](
+      clazz: Class[T],
+      outputCount: Int,
+      partitioner: function.Function[T, Int])
     : Graph[UniformFanOutShape[T, T], NotUsed] =
     create(outputCount, partitioner)
 }
@@ -226,8 +228,9 @@ object Balance {
   /**
     * Create a new `Balance` stage with the specified input type.
     */
-  def create[T](clazz: Class[T],
-                outputCount: Int): Graph[UniformFanOutShape[T, T], NotUsed] =
+  def create[T](
+      clazz: Class[T],
+      outputCount: Int): Graph[UniformFanOutShape[T, T], NotUsed] =
     create(outputCount)
 
   /**
@@ -237,7 +240,9 @@ object Balance {
     *   elements to downstream outputs until all of them have requested at least one element
     */
   def create[T](
-      clazz: Class[T], outputCount: Int, waitForAllDownstreams: Boolean)
+      clazz: Class[T],
+      outputCount: Int,
+      waitForAllDownstreams: Boolean)
     : Graph[UniformFanOutShape[T, T], NotUsed] =
     create(outputCount, waitForAllDownstreams)
 }

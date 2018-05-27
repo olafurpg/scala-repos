@@ -19,6 +19,6 @@ class `SI-8531` {
     case (x, A5) => "a5"
     case (A6, x) => "a6"
     case (x, A6) => "a6"
-    case (a, b) => "ab"
+    case (a, b)  => "ab"
   }
 }

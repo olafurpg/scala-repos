@@ -41,7 +41,7 @@ object EndToEndLatency {
   def main(args: Array[String]) {
     if (args.length != 5 && args.length != 6) {
       System.err.println("USAGE: java " + getClass.getName +
-          " broker_list topic num_messages producer_acks message_size_bytes [optional] ssl_properties_file")
+        " broker_list topic num_messages producer_acks message_size_bytes [optional] ssl_properties_file")
       System.exit(1)
     }
 
@@ -54,22 +54,23 @@ object EndToEndLatency {
 
     if (!List("1", "all").contains(producerAcks))
       throw new IllegalArgumentException(
-          "Latency testing requires synchronous acknowledgement. Please use 1 or all")
+        "Latency testing requires synchronous acknowledgement. Please use 1 or all")
 
     val consumerProps =
       if (sslPropsFile.equals("")) new Properties()
       else Utils.loadProps(sslPropsFile)
     consumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerList)
-    consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG,
-                      "test-group-" + System.currentTimeMillis())
+    consumerProps.put(
+      ConsumerConfig.GROUP_ID_CONFIG,
+      "test-group-" + System.currentTimeMillis())
     consumerProps.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false")
     consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest")
     consumerProps.put(
-        ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
-        "org.apache.kafka.common.serialization.ByteArrayDeserializer")
+      ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
+      "org.apache.kafka.common.serialization.ByteArrayDeserializer")
     consumerProps.put(
-        ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
-        "org.apache.kafka.common.serialization.ByteArrayDeserializer")
+      ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,
+      "org.apache.kafka.common.serialization.ByteArrayDeserializer")
     consumerProps.put(ConsumerConfig.FETCH_MAX_WAIT_MS_CONFIG, "0") //ensure we have no temporal batching
 
     val consumer = new KafkaConsumer[Array[Byte], Array[Byte]](consumerProps)
@@ -81,14 +82,15 @@ object EndToEndLatency {
     producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerList)
     producerProps.put(ProducerConfig.LINGER_MS_CONFIG, "0") //ensure writes are synchronous
     producerProps.put(
-        ProducerConfig.MAX_BLOCK_MS_CONFIG, Long.MaxValue.toString)
+      ProducerConfig.MAX_BLOCK_MS_CONFIG,
+      Long.MaxValue.toString)
     producerProps.put(ProducerConfig.ACKS_CONFIG, producerAcks.toString)
     producerProps.put(
-        ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
-        "org.apache.kafka.common.serialization.ByteArraySerializer")
+      ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+      "org.apache.kafka.common.serialization.ByteArraySerializer")
     producerProps.put(
-        ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
-        "org.apache.kafka.common.serialization.ByteArraySerializer")
+      ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+      "org.apache.kafka.common.serialization.ByteArraySerializer")
     val producer = new KafkaProducer[Array[Byte], Array[Byte]](producerProps)
 
     def finalise() {
@@ -121,7 +123,7 @@ object EndToEndLatency {
       if (!recordIter.hasNext) {
         finalise()
         throw new RuntimeException(
-            s"poll() timed out before finding a result (timeout:[$timeout])")
+          s"poll() timed out before finding a result (timeout:[$timeout])")
       }
 
       //Check result matches the original record
@@ -130,7 +132,7 @@ object EndToEndLatency {
       if (!read.equals(sent)) {
         finalise()
         throw new RuntimeException(
-            s"The message read [$read] did not match the message sent [$sent]")
+          s"The message read [$read] did not match the message sent [$sent]")
       }
 
       //Check we only got the one message
@@ -138,7 +140,7 @@ object EndToEndLatency {
         var count = 1
         for (elem <- recordIter) count += 1
         throw new RuntimeException(
-            s"Only one result was expected during this test. We found [$count]")
+          s"Only one result was expected during this test. We found [$count]")
       }
 
       //Report progress
@@ -149,15 +151,14 @@ object EndToEndLatency {
 
     //Results
     println(
-        "Avg latency: %.4f ms\n".format(
-            totalTime / numMessages / 1000.0 / 1000.0))
+      "Avg latency: %.4f ms\n".format(
+        totalTime / numMessages / 1000.0 / 1000.0))
     Arrays.sort(latencies)
     val p50 = latencies((latencies.length * 0.5).toInt)
     val p99 = latencies((latencies.length * 0.99).toInt)
     val p999 = latencies((latencies.length * 0.999).toInt)
     println(
-        "Percentiles: 50th = %d, 99th = %d, 99.9th = %d".format(
-            p50, p99, p999))
+      "Percentiles: 50th = %d, 99th = %d, 99.9th = %d".format(p50, p99, p999))
 
     finalise()
   }

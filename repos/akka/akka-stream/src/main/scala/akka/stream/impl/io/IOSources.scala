@@ -19,10 +19,11 @@ import scala.concurrent.{Future, Promise}
   * INTERNAL API
   * Creates simple synchronous (Java 6 compatible) Source backed by the given file.
   */
-private[akka] final class FileSource(f: File,
-                                     chunkSize: Int,
-                                     val attributes: Attributes,
-                                     shape: SourceShape[ByteString])
+private[akka] final class FileSource(
+    f: File,
+    chunkSize: Int,
+    val attributes: Attributes,
+    shape: SourceShape[ByteString])
     extends SourceModule[ByteString, Future[IOResult]](shape) {
   require(chunkSize > 0, "chunkSize must be greater than 0")
   override def create(context: MaterializationContext) = {
@@ -31,11 +32,12 @@ private[akka] final class FileSource(f: File,
     val settings = materializer.effectiveSettings(context.effectiveAttributes)
 
     val ioResultPromise = Promise[IOResult]()
-    val props = FilePublisher.props(f,
-                                    ioResultPromise,
-                                    chunkSize,
-                                    settings.initialInputBufferSize,
-                                    settings.maxInputBufferSize)
+    val props = FilePublisher.props(
+      f,
+      ioResultPromise,
+      chunkSize,
+      settings.initialInputBufferSize,
+      settings.maxInputBufferSize)
     val dispatcher =
       context.effectiveAttributes.get[Dispatcher](IODispatcher).dispatcher
 

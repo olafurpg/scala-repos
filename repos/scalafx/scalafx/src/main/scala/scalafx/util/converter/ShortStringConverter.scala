@@ -39,4 +39,6 @@ object ShortStringConverter {
 class ShortStringConverter(
     delegate: jfxuc.ShortStringConverter = new jfxuc.ShortStringConverter)
     extends StringConverterDelegate[
-        java.lang.Short, Short, jfxuc.ShortStringConverter](delegate)
+      java.lang.Short,
+      Short,
+      jfxuc.ShortStringConverter](delegate)

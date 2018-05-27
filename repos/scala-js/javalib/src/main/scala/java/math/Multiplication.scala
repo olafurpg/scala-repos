@@ -91,8 +91,8 @@ private[math] object Multiplication {
     } else {
       val resLength = aNumberLength + 1
       val resDigits = new Array[Int](resLength)
-      resDigits(aNumberLength) = multiplyByInt(
-          resDigits, aDigits, aNumberLength, factor)
+      resDigits(aNumberLength) =
+        multiplyByInt(resDigits, aDigits, aNumberLength, factor)
       val result = new BigInteger(resSign, resLength, resDigits)
       result.cutOffLeadingZeroes()
       result
@@ -156,7 +156,7 @@ private[math] object Multiplication {
     */
   def unsignedMultAddAdd(a: Int, b: Int, c: Int, d: Int): Long =
     (a & 0xFFFFFFFFL) * (b & 0xFFFFFFFFL) + (c & 0xFFFFFFFFL) +
-    (d & 0xFFFFFFFFL)
+      (d & 0xFFFFFFFFL)
 
   /** Performs the multiplication with the Karatsuba's algorithm.
     *
@@ -195,8 +195,8 @@ private[math] object Multiplication {
 
       var upper = karatsuba(upperOp1, upperOp2)
       val lower = karatsuba(lowerOp1, lowerOp2)
-      var middle = karatsuba(
-          upperOp1.subtract(lowerOp1), lowerOp2.subtract(upperOp2))
+      var middle =
+        karatsuba(upperOp1.subtract(lowerOp1), lowerOp2.subtract(upperOp2))
       middle = middle.add(upper).add(lower)
       middle = middle.shiftLeft(ndiv2)
       upper = upper.shiftLeft(ndiv2 << 1)
@@ -204,11 +204,12 @@ private[math] object Multiplication {
     }
   }
 
-  def multArraysPAP(aDigits: Array[Int],
-                    aLen: Int,
-                    bDigits: Array[Int],
-                    bLen: Int,
-                    resDigits: Array[Int]): Unit = {
+  def multArraysPAP(
+      aDigits: Array[Int],
+      aLen: Int,
+      bDigits: Array[Int],
+      bLen: Int,
+      resDigits: Array[Int]): Unit = {
     if (!(aLen == 0 || bLen == 0)) {
       if (aLen == 1)
         resDigits(bLen) = multiplyByInt(resDigits, bDigits, bLen, aDigits(0))
@@ -424,7 +425,10 @@ private[math] object Multiplication {
   }
 
   private def multiplyByInt(
-      res: Array[Int], a: Array[Int], aSize: Int, factor: Int): Int = {
+      res: Array[Int],
+      a: Array[Int],
+      aSize: Int,
+      factor: Int): Int = {
     var carry = 0
     for (i <- 0 until aSize) {
       val t = unsignedMultAddAdd(a(i), factor, carry, 0)
@@ -434,11 +438,12 @@ private[math] object Multiplication {
     carry
   }
 
-  private def multPAP(a: Array[Int],
-                      b: Array[Int],
-                      t: Array[Int],
-                      aLen: Int,
-                      bLen: Int): Unit = {
+  private def multPAP(
+      a: Array[Int],
+      b: Array[Int],
+      t: Array[Int],
+      aLen: Int,
+      bLen: Int): Unit = {
     if (a == b && aLen == bLen) {
       square(a, aLen, t)
     } else {

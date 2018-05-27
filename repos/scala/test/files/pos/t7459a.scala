@@ -6,7 +6,7 @@ object Test {
       ???
     } catch {
       case e: SpecialException => e.isInstanceOf[SpecialException]
-      case e =>
+      case e                   =>
     }
 
     // OKAY

@@ -7,7 +7,7 @@ object Test {
   def matchPair(i: Int) = {
     (i, "abc") match {
       case this.option1 => true
-      case _ => false
+      case _            => false
     }
   }
 

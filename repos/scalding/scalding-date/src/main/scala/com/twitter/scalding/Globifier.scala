@@ -25,11 +25,12 @@ import java.util.regex.Pattern
  * current range.  This children must be ordered from largest
  * to smallest in size.
  */
-class BaseGlobifier(dur: Duration,
-                    val sym: String,
-                    pattern: String,
-                    tz: TimeZone,
-                    child: Option[BaseGlobifier])
+class BaseGlobifier(
+    dur: Duration,
+    val sym: String,
+    pattern: String,
+    tz: TimeZone,
+    child: Option[BaseGlobifier])
     extends java.io.Serializable {
   import DateOps._
   // result <= rd
@@ -43,7 +44,7 @@ class BaseGlobifier(dur: Duration,
   // Generate a lazy list of all children
   final def children: Stream[BaseGlobifier] = child match {
     case Some(c) => Stream.cons(c, c.children)
-    case None => Stream.empty
+    case None    => Stream.empty
   }
 
   final def asteriskChildren(rd: RichDate): String = {
@@ -74,10 +75,10 @@ class BaseGlobifier(dur: Duration,
           val bottom = children.last
           val fillsright =
             format(leastUpperBound(dr.end)) == format(
-                bottom.leastUpperBound(dr.end))
+              bottom.leastUpperBound(dr.end))
           val fillsleft =
             format(greatestLowerBound(dr.start)) == format(
-                bottom.greatestLowerBound(dr.start))
+              bottom.greatestLowerBound(dr.start))
           if (fillsright && fillsleft) {
             List(asteriskChildren(dr.start))
           } else {
@@ -113,13 +114,13 @@ class BaseGlobifier(dur: Duration,
     else if (mid1 == mid2) {
       //we contain exactly one boundary point:
       simpleCase(DateRange(dr.start, mid1 - Millisecs(1))) ++ simpleCase(
-          DateRange(mid1, dr.end))
+        DateRange(mid1, dr.end))
     } else {
       //We contain 2 or more boundary points:
       // [start <= mid1 < mid2 <= end]
       // First check to see if we even need to check our children:
       simpleCase(DateRange(dr.start, mid1 - Millisecs(1))) ++
-      (asteriskChildren(mid1) :: globify(DateRange(mid1 + dur, dr.end)))
+        (asteriskChildren(mid1) :: globify(DateRange(mid1 + dur, dr.end)))
     }
   }
 }

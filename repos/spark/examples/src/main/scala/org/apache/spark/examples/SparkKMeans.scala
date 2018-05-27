@@ -50,7 +50,8 @@ object SparkKMeans {
   }
 
   def showWarning() {
-    System.err.println("""WARN: This is a naive implementation of KMeans Clustering and is given as an example!
+    System.err.println(
+      """WARN: This is a naive implementation of KMeans Clustering and is given as an example!
         |Please use the KMeans method found in org.apache.spark.mllib.clustering
         |for more conventional use.
       """.stripMargin)
@@ -82,9 +83,11 @@ object SparkKMeans {
         case ((p1, c1), (p2, c2)) => (p1 + p2, c1 + c2)
       }
 
-      val newPoints = pointStats.map { pair =>
-        (pair._1, pair._2._1 * (1.0 / pair._2._2))
-      }.collectAsMap()
+      val newPoints = pointStats
+        .map { pair =>
+          (pair._1, pair._2._1 * (1.0 / pair._2._2))
+        }
+        .collectAsMap()
 
       tempDist = 0.0
       for (i <- 0 until K) {

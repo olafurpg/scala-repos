@@ -12,22 +12,29 @@ class RewriteDistinct extends Phase {
 
   def apply(state: CompilerState) =
     if (state.get(Phase.assignUniqueSymbols).map(_.distinct).getOrElse(true))
-      state.map(_.replace({
+      state.map(
+        _.replace(
+          {
 
-        case n @ Bind(s1, dist1: Distinct, Pure(sel1, ts1)) =>
-          logger.debug("Rewriting Distinct in Bind:", Ellipsis(n, List(0, 0)))
-          val (inner, sel2) = rewrite(s1, dist1, sel1)
-          Bind(s1, inner, Pure(sel2, ts1)).infer()
+            case n @ Bind(s1, dist1: Distinct, Pure(sel1, ts1)) =>
+              logger
+                .debug("Rewriting Distinct in Bind:", Ellipsis(n, List(0, 0)))
+              val (inner, sel2) = rewrite(s1, dist1, sel1)
+              Bind(s1, inner, Pure(sel2, ts1)).infer()
 
-        case n @ Aggregate(s1, dist1: Distinct, sel1) =>
-          logger.debug("Rewriting Distinct in Aggregate:",
-                       Ellipsis(n, List(0, 0)))
-          val (inner, sel2) = rewrite(s1, dist1, sel1)
-          Aggregate(s1, inner, sel2).infer()
-      }, keepType = true, bottomUp = true))
+            case n @ Aggregate(s1, dist1: Distinct, sel1) =>
+              logger.debug(
+                "Rewriting Distinct in Aggregate:",
+                Ellipsis(n, List(0, 0)))
+              val (inner, sel2) = rewrite(s1, dist1, sel1)
+              Aggregate(s1, inner, sel2).infer()
+          },
+          keepType = true,
+          bottomUp = true
+        ))
     else {
       logger.debug(
-          "No DISTINCT used as determined by assignUniqueSymbols - skipping phase")
+        "No DISTINCT used as determined by assignUniqueSymbols - skipping phase")
       state
     }
 
@@ -45,7 +52,8 @@ class RewriteDistinct extends Phase {
         case (Select(Ref(s), f), idx) if s == dist1.generator => (f, idx)
       }
       .toMap
-    logger.debug("Fields used directly in 'on' clause: " +
+    logger.debug(
+      "Fields used directly in 'on' clause: " +
         onFieldPos.keySet.mkString(", "))
     if ((refFields -- onFieldPos.keys).isEmpty) {
       // Only distinct fields referenced -> Create subquery and remove 'on' clause
@@ -56,15 +64,16 @@ class RewriteDistinct extends Phase {
         }
         .toMap
       val inner = Bind(
-          dist1.generator,
-          Distinct(new AnonSymbol, dist1.from, ProductNode(ConstArray.empty)),
-          Pure(StructNode(onDefs)))
+        dist1.generator,
+        Distinct(new AnonSymbol, dist1.from, ProductNode(ConstArray.empty)),
+        Pure(StructNode(onDefs)))
       val sel2 = sel1.replace {
         case Select(Ref(s), f) if s == s1 => Select(Ref(s), onLookup(f))
       }
       val ret = Subquery(inner, Subquery.AboveDistinct)
       logger.debug(
-          "Removed 'on' clause from Distinct:", Ellipsis(ret, List(0, 0, 0)))
+        "Removed 'on' clause from Distinct:",
+        Ellipsis(ret, List(0, 0, 0)))
       (ret, sel2)
     } else {
       val sel2 = sel1.replace {
@@ -74,9 +83,10 @@ class RewriteDistinct extends Phase {
               Select(Select(Ref(s), ElementSymbol(1)), ElementSymbol(idx + 1))
             case None =>
               val as = new AnonSymbol
-              Aggregate(as,
-                        Select(Ref(s), ElementSymbol(2)),
-                        Library.Min.typed(tpe, Select(Ref(as), f)))
+              Aggregate(
+                as,
+                Select(Ref(s), ElementSymbol(2)),
+                Library.Min.typed(tpe, Select(Ref(as), f)))
           }
       }
       val ret = GroupBy(dist1.generator, dist1.from, onFlat)

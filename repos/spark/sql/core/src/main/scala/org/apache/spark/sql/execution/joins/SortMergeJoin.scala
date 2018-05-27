@@ -22,27 +22,37 @@ import scala.collection.mutable.ArrayBuffer
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions._
-import org.apache.spark.sql.catalyst.expressions.codegen.{CodegenContext, ExprCode}
+import org.apache.spark.sql.catalyst.expressions.codegen.{
+  CodegenContext,
+  ExprCode
+}
 import org.apache.spark.sql.catalyst.plans._
 import org.apache.spark.sql.catalyst.plans.physical._
-import org.apache.spark.sql.execution.{BinaryNode, CodegenSupport, RowIterator, SparkPlan}
+import org.apache.spark.sql.execution.{
+  BinaryNode,
+  CodegenSupport,
+  RowIterator,
+  SparkPlan
+}
 import org.apache.spark.sql.execution.metric.{LongSQLMetric, SQLMetrics}
 import org.apache.spark.util.collection.BitSet
 
 /**
   * Performs an sort merge join of two child relations.
   */
-case class SortMergeJoin(leftKeys: Seq[Expression],
-                         rightKeys: Seq[Expression],
-                         joinType: JoinType,
-                         condition: Option[Expression],
-                         left: SparkPlan,
-                         right: SparkPlan)
-    extends BinaryNode with CodegenSupport {
+case class SortMergeJoin(
+    leftKeys: Seq[Expression],
+    rightKeys: Seq[Expression],
+    joinType: JoinType,
+    condition: Option[Expression],
+    left: SparkPlan,
+    right: SparkPlan)
+    extends BinaryNode
+    with CodegenSupport {
 
   override private[sql] lazy val metrics = Map(
-      "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext,
-                                                     "number of output rows"))
+    "numOutputRows" -> SQLMetrics
+      .createLongMetric(sparkContext, "number of output rows"))
 
   override def output: Seq[Attribute] = {
     joinType match {
@@ -56,22 +66,22 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
         (left.output ++ right.output).map(_.withNullability(true))
       case x =>
         throw new IllegalArgumentException(
-            s"${getClass.getSimpleName} should not take $x as the JoinType")
+          s"${getClass.getSimpleName} should not take $x as the JoinType")
     }
   }
 
   override def outputPartitioning: Partitioning = joinType match {
     case Inner =>
       PartitioningCollection(
-          Seq(left.outputPartitioning, right.outputPartitioning))
+        Seq(left.outputPartitioning, right.outputPartitioning))
     // For left and right outer joins, the output is partitioned by the streamed input's join keys.
-    case LeftOuter => left.outputPartitioning
+    case LeftOuter  => left.outputPartitioning
     case RightOuter => right.outputPartitioning
     case FullOuter =>
       UnknownPartitioning(left.outputPartitioning.numPartitions)
     case x =>
       throw new IllegalArgumentException(
-          s"${getClass.getSimpleName} should not take $x as the JoinType")
+        s"${getClass.getSimpleName} should not take $x as the JoinType")
   }
 
   override def requiredChildDistribution: Seq[Distribution] =
@@ -98,11 +108,13 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
 
     left.execute().zipPartitions(right.execute()) { (leftIter, rightIter) =>
       val boundCondition: (InternalRow) => Boolean = {
-        condition.map { cond =>
-          newPredicate(cond, left.output ++ right.output)
-        }.getOrElse { (r: InternalRow) =>
-          true
-        }
+        condition
+          .map { cond =>
+            newPredicate(cond, left.output ++ right.output)
+          }
+          .getOrElse { (r: InternalRow) =>
+            true
+          }
       }
       // An ordering that can be used to compare keys from both sides.
       val keyOrdering = newNaturalAscendingOrdering(leftKeys.map(_.dataType))
@@ -127,11 +139,11 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
             private[this] var currentRightMatches: ArrayBuffer[InternalRow] = _
             private[this] var currentMatchIdx: Int = -1
             private[this] val smjScanner = new SortMergeJoinScanner(
-                leftKeyGenerator,
-                rightKeyGenerator,
-                keyOrdering,
-                RowIterator.fromScala(leftIter),
-                RowIterator.fromScala(rightIter)
+              leftKeyGenerator,
+              rightKeyGenerator,
+              keyOrdering,
+              RowIterator.fromScala(leftIter),
+              RowIterator.fromScala(rightIter)
             )
             private[this] val joinRow = new JoinedRow
             private[this] val resultProjection: (InternalRow) => InternalRow =
@@ -172,52 +184,55 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
 
         case LeftOuter =>
           val smjScanner = new SortMergeJoinScanner(
-              streamedKeyGenerator = createLeftKeyGenerator(),
-              bufferedKeyGenerator = createRightKeyGenerator(),
-              keyOrdering,
-              streamedIter = RowIterator.fromScala(leftIter),
-              bufferedIter = RowIterator.fromScala(rightIter)
+            streamedKeyGenerator = createLeftKeyGenerator(),
+            bufferedKeyGenerator = createRightKeyGenerator(),
+            keyOrdering,
+            streamedIter = RowIterator.fromScala(leftIter),
+            bufferedIter = RowIterator.fromScala(rightIter)
           )
           val rightNullRow = new GenericInternalRow(right.output.length)
-          new LeftOuterIterator(smjScanner,
-                                rightNullRow,
-                                boundCondition,
-                                resultProj,
-                                numOutputRows).toScala
+          new LeftOuterIterator(
+            smjScanner,
+            rightNullRow,
+            boundCondition,
+            resultProj,
+            numOutputRows).toScala
 
         case RightOuter =>
           val smjScanner = new SortMergeJoinScanner(
-              streamedKeyGenerator = createRightKeyGenerator(),
-              bufferedKeyGenerator = createLeftKeyGenerator(),
-              keyOrdering,
-              streamedIter = RowIterator.fromScala(rightIter),
-              bufferedIter = RowIterator.fromScala(leftIter)
+            streamedKeyGenerator = createRightKeyGenerator(),
+            bufferedKeyGenerator = createLeftKeyGenerator(),
+            keyOrdering,
+            streamedIter = RowIterator.fromScala(rightIter),
+            bufferedIter = RowIterator.fromScala(leftIter)
           )
           val leftNullRow = new GenericInternalRow(left.output.length)
-          new RightOuterIterator(smjScanner,
-                                 leftNullRow,
-                                 boundCondition,
-                                 resultProj,
-                                 numOutputRows).toScala
+          new RightOuterIterator(
+            smjScanner,
+            leftNullRow,
+            boundCondition,
+            resultProj,
+            numOutputRows).toScala
 
         case FullOuter =>
           val leftNullRow = new GenericInternalRow(left.output.length)
           val rightNullRow = new GenericInternalRow(right.output.length)
           val smjScanner = new SortMergeFullOuterJoinScanner(
-              leftKeyGenerator = createLeftKeyGenerator(),
-              rightKeyGenerator = createRightKeyGenerator(),
-              keyOrdering,
-              leftIter = RowIterator.fromScala(leftIter),
-              rightIter = RowIterator.fromScala(rightIter),
-              boundCondition,
-              leftNullRow,
-              rightNullRow)
+            leftKeyGenerator = createLeftKeyGenerator(),
+            rightKeyGenerator = createRightKeyGenerator(),
+            keyOrdering,
+            leftIter = RowIterator.fromScala(leftIter),
+            rightIter = RowIterator.fromScala(rightIter),
+            boundCondition,
+            leftNullRow,
+            rightNullRow
+          )
 
           new FullOuterIterator(smjScanner, resultProj, numOutputRows).toScala
 
         case x =>
           throw new IllegalArgumentException(
-              s"SortMergeJoin should not take $x as the JoinType")
+            s"SortMergeJoin should not take $x as the JoinType")
       }
     }
   }
@@ -230,16 +245,18 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
     left.execute() :: right.execute() :: Nil
   }
 
-  private def createJoinKey(ctx: CodegenContext,
-                            row: String,
-                            keys: Seq[Expression],
-                            input: Seq[Attribute]): Seq[ExprCode] = {
+  private def createJoinKey(
+      ctx: CodegenContext,
+      row: String,
+      keys: Seq[Expression],
+      input: Seq[Attribute]): Seq[ExprCode] = {
     ctx.INPUT_ROW = row
     keys.map(BindReferences.bindReference(_, input).gen(ctx))
   }
 
   private def copyKeys(
-      ctx: CodegenContext, vars: Seq[ExprCode]): Seq[ExprCode] = {
+      ctx: CodegenContext,
+      vars: Seq[ExprCode]): Seq[ExprCode] = {
     vars.zipWithIndex.map {
       case (ev, i) =>
         val value = ctx.freshName("value")
@@ -252,7 +269,9 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
   }
 
   private def genComparision(
-      ctx: CodegenContext, a: Seq[ExprCode], b: Seq[ExprCode]): String = {
+      ctx: CodegenContext,
+      a: Seq[ExprCode],
+      b: Seq[ExprCode]): String = {
     val comparisons = a.zip(b).zipWithIndex.map {
       case ((l, r), i) =>
         s"""
@@ -293,7 +312,9 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
     // Copy the left keys as class members so they could be used in next function call.
     val matchedKeyVars = copyKeys(ctx, leftKeyVars)
 
-    ctx.addNewFunction("findNextInnerJoinRows", s"""
+    ctx.addNewFunction(
+      "findNextInnerJoinRows",
+      s"""
          |private boolean findNextInnerJoinRows(
          |    scala.collection.Iterator leftIter,
          |    scala.collection.Iterator rightIter) {
@@ -346,7 +367,8 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
          |  }
          |  return false; // unreachable
          |}
-       """.stripMargin)
+       """.stripMargin
+    )
 
     (leftRow, matches)
   }
@@ -359,7 +381,8 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
     * codegen of BoundReference here.
     */
   private def createLeftVars(
-      ctx: CodegenContext, leftRow: String): Seq[ExprCode] = {
+      ctx: CodegenContext,
+      leftRow: String): Seq[ExprCode] = {
     ctx.INPUT_ROW = leftRow
     left.output.zipWithIndex.map {
       case (a, i) =>
@@ -386,7 +409,8 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
     * part are accessed inside the loop.
     */
   private def createRightVar(
-      ctx: CodegenContext, rightRow: String): Seq[ExprCode] = {
+      ctx: CodegenContext,
+      rightRow: String): Seq[ExprCode] = {
     ctx.INPUT_ROW = rightRow
     right.output.zipWithIndex.map {
       case (a, i) =>
@@ -422,10 +446,14 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
     ctx.copyResult = true
     val leftInput = ctx.freshName("leftInput")
     ctx.addMutableState(
-        "scala.collection.Iterator", leftInput, s"$leftInput = inputs[0];")
+      "scala.collection.Iterator",
+      leftInput,
+      s"$leftInput = inputs[0];")
     val rightInput = ctx.freshName("rightInput")
     ctx.addMutableState(
-        "scala.collection.Iterator", rightInput, s"$rightInput = inputs[1];")
+      "scala.collection.Iterator",
+      rightInput,
+      s"$rightInput = inputs[1];")
 
     val (leftRow, matches) = genScanner(ctx)
 
@@ -441,10 +469,10 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
       if (condition.isDefined) {
         // Split the code of creating variables based on whether it's used by condition or not.
         val loaded = ctx.freshName("loaded")
-        val (leftBefore, leftAfter) = splitVarsByCondition(
-            left.output, leftVars)
-        val (rightBefore, rightAfter) = splitVarsByCondition(
-            right.output, rightVars)
+        val (leftBefore, leftAfter) =
+          splitVarsByCondition(left.output, leftVars)
+        val (rightBefore, rightAfter) =
+          splitVarsByCondition(right.output, rightVars)
         // Generate code for condition
         ctx.currentVars = leftVars ++ rightVars
         val cond = BindReferences.bindReference(condition.get, output).gen(ctx)
@@ -504,11 +532,12 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
   * @param bufferedIter an input whose rows will be buffered to construct sequences of rows that
   *                     have the same join key.
   */
-private[joins] class SortMergeJoinScanner(streamedKeyGenerator: Projection,
-                                          bufferedKeyGenerator: Projection,
-                                          keyOrdering: Ordering[InternalRow],
-                                          streamedIter: RowIterator,
-                                          bufferedIter: RowIterator) {
+private[joins] class SortMergeJoinScanner(
+    streamedKeyGenerator: Projection,
+    bufferedKeyGenerator: Projection,
+    keyOrdering: Ordering[InternalRow],
+    streamedIter: RowIterator,
+    bufferedIter: RowIterator) {
   private[this] var streamedRow: InternalRow = _
   private[this] var streamedRowKey: InternalRow = _
   private[this] var bufferedRow: InternalRow = _
@@ -679,23 +708,29 @@ private[joins] class SortMergeJoinScanner(streamedKeyGenerator: Projection,
     matchJoinKey = streamedRowKey.copy()
     bufferedMatches.clear()
     do {
-      bufferedMatches += bufferedRow.copy() // need to copy mutable rows before buffering them
+      bufferedMatches += bufferedRow
+        .copy() // need to copy mutable rows before buffering them
       advancedBufferedToRowWithNullFreeJoinKey()
     } while (bufferedRow != null &&
-    keyOrdering.compare(streamedRowKey, bufferedRowKey) == 0)
+      keyOrdering.compare(streamedRowKey, bufferedRowKey) == 0)
   }
 }
 
 /**
   * An iterator for outputting rows in left outer join.
   */
-private class LeftOuterIterator(smjScanner: SortMergeJoinScanner,
-                                rightNullRow: InternalRow,
-                                boundCondition: InternalRow => Boolean,
-                                resultProj: InternalRow => InternalRow,
-                                numOutputRows: LongSQLMetric)
+private class LeftOuterIterator(
+    smjScanner: SortMergeJoinScanner,
+    rightNullRow: InternalRow,
+    boundCondition: InternalRow => Boolean,
+    resultProj: InternalRow => InternalRow,
+    numOutputRows: LongSQLMetric)
     extends OneSideOuterIterator(
-        smjScanner, rightNullRow, boundCondition, resultProj, numOutputRows) {
+      smjScanner,
+      rightNullRow,
+      boundCondition,
+      resultProj,
+      numOutputRows) {
 
   protected override def setStreamSideOutput(row: InternalRow): Unit =
     joinedRow.withLeft(row)
@@ -706,13 +741,18 @@ private class LeftOuterIterator(smjScanner: SortMergeJoinScanner,
 /**
   * An iterator for outputting rows in right outer join.
   */
-private class RightOuterIterator(smjScanner: SortMergeJoinScanner,
-                                 leftNullRow: InternalRow,
-                                 boundCondition: InternalRow => Boolean,
-                                 resultProj: InternalRow => InternalRow,
-                                 numOutputRows: LongSQLMetric)
+private class RightOuterIterator(
+    smjScanner: SortMergeJoinScanner,
+    leftNullRow: InternalRow,
+    boundCondition: InternalRow => Boolean,
+    resultProj: InternalRow => InternalRow,
+    numOutputRows: LongSQLMetric)
     extends OneSideOuterIterator(
-        smjScanner, leftNullRow, boundCondition, resultProj, numOutputRows) {
+      smjScanner,
+      leftNullRow,
+      boundCondition,
+      resultProj,
+      numOutputRows) {
 
   protected override def setStreamSideOutput(row: InternalRow): Unit =
     joinedRow.withRight(row)
@@ -876,12 +916,12 @@ private class SortMergeFullOuterJoinScanner(
     rightIndex = 0
 
     while (leftRowKey != null &&
-    keyOrdering.compare(leftRowKey, matchingKey) == 0) {
+           keyOrdering.compare(leftRowKey, matchingKey) == 0) {
       leftMatches += leftRow.copy()
       advancedLeft()
     }
     while (rightRowKey != null &&
-    keyOrdering.compare(rightRowKey, matchingKey) == 0) {
+           keyOrdering.compare(rightRowKey, matchingKey) == 0) {
       rightMatches += rightRow.copy()
       advancedRight()
     }
@@ -981,9 +1021,10 @@ private class SortMergeFullOuterJoinScanner(
   }
 }
 
-private class FullOuterIterator(smjScanner: SortMergeFullOuterJoinScanner,
-                                resultProj: InternalRow => InternalRow,
-                                numRows: LongSQLMetric)
+private class FullOuterIterator(
+    smjScanner: SortMergeFullOuterJoinScanner,
+    resultProj: InternalRow => InternalRow,
+    numRows: LongSQLMetric)
     extends RowIterator {
   private[this] val joinedRow: JoinedRow = smjScanner.getJoinedRow()
 

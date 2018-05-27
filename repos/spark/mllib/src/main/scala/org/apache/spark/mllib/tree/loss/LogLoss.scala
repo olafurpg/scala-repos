@@ -47,7 +47,8 @@ object LogLoss extends Loss {
   }
 
   override private[spark] def computeError(
-      prediction: Double, label: Double): Double = {
+      prediction: Double,
+      label: Double): Double = {
     val margin = 2.0 * label * prediction
     // The following is equivalent to 2.0 * log(1 + exp(-margin)) but more numerically stable.
     2.0 * MLUtils.log1pExp(-margin)

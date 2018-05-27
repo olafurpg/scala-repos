@@ -59,9 +59,8 @@ object Base5 {
   trait Test7 {
     private[this] var _st: Int = 0
     def close =
-      () =>
-        {
-          _st = 1
+      () => {
+        _st = 1
       }
   }
 }
@@ -70,9 +69,8 @@ object Base6 {
   class Test8 {
     private[this] var _st: Int = 0
     def close =
-      () =>
-        {
-          _st = 1
+      () => {
+        _st = 1
       }
   }
 }
@@ -81,9 +79,8 @@ object Base7 {
   trait Test9 {
     var st: Int = 0
     def close =
-      () =>
-        {
-          st = 1
+      () => {
+        st = 1
       }
   }
 }

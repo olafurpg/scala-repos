@@ -33,7 +33,11 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
 import scalafx.Includes._
-import scalafx.testutil.{DimensionDelegateSpec, PositionDelegateSpec, SimpleSFXDelegateSpec}
+import scalafx.testutil.{
+  DimensionDelegateSpec,
+  PositionDelegateSpec,
+  SimpleSFXDelegateSpec
+}
 
 /**
   * Rectangle Spec tests.
@@ -43,7 +47,8 @@ import scalafx.testutil.{DimensionDelegateSpec, PositionDelegateSpec, SimpleSFXD
 @RunWith(classOf[JUnitRunner])
 class RectangleSpec
     extends SimpleSFXDelegateSpec[jfxss.Rectangle, Rectangle](
-        classOf[jfxss.Rectangle], classOf[Rectangle])
+      classOf[jfxss.Rectangle],
+      classOf[Rectangle])
     with PositionDelegateSpec[Rectangle]
     with DimensionDelegateSpec[Rectangle] {
 

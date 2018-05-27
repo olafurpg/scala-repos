@@ -6,7 +6,7 @@ trait Baz {
   def foo() = {
     bar /*caret*/ match {
       case `bar` /*caret*/ =>
-      case _ =>
+      case _               =>
     }
   }
 }

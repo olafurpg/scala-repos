@@ -5,14 +5,15 @@ import ornicar.scalalib.Random
 
 import lila.user.User
 
-case class Thread(id: String,
-                  name: String,
-                  createdAt: DateTime,
-                  updatedAt: DateTime,
-                  posts: List[Post],
-                  creatorId: String,
-                  invitedId: String,
-                  visibleByUserIds: List[String]) {
+case class Thread(
+    id: String,
+    name: String,
+    createdAt: DateTime,
+    updatedAt: DateTime,
+    posts: List[Post],
+    creatorId: String,
+    invitedId: String,
+    visibleByUserIds: List[String]) {
 
   def +(post: Post) = copy(posts = posts :+ post, updatedAt = post.createdAt)
 
@@ -50,7 +51,7 @@ case class Thread(id: String,
   def nonEmptyName = (name.trim.some filter (_.nonEmpty)) | "No subject"
 
   def deleteFor(user: User) = copy(
-      visibleByUserIds = visibleByUserIds filter (user.id !=)
+    visibleByUserIds = visibleByUserIds filter (user.id !=)
   )
 
   def hasPostsWrittenBy(userId: String) =
@@ -63,22 +64,25 @@ object Thread {
 
   val idSize = 8
 
-  def make(name: String,
-           text: String,
-           creatorId: String,
-           invitedId: String): Thread =
-    Thread(id = Random nextStringUppercase idSize,
-           name = name,
-           createdAt = DateTime.now,
-           updatedAt = DateTime.now,
-           posts = List(
-                 Post.make(
-                     text = text,
-                     isByCreator = true
-                 )),
-           creatorId = creatorId,
-           invitedId = invitedId,
-           visibleByUserIds = List(creatorId, invitedId))
+  def make(
+      name: String,
+      text: String,
+      creatorId: String,
+      invitedId: String): Thread =
+    Thread(
+      id = Random nextStringUppercase idSize,
+      name = name,
+      createdAt = DateTime.now,
+      updatedAt = DateTime.now,
+      posts = List(
+        Post.make(
+          text = text,
+          isByCreator = true
+        )),
+      creatorId = creatorId,
+      invitedId = invitedId,
+      visibleByUserIds = List(creatorId, invitedId)
+    )
 
   import lila.db.JsTube
   import JsTube.Helpers._
@@ -87,9 +91,9 @@ object Thread {
   private[message] lazy val tube =
     Post.tube |> { implicit pt =>
       JsTube(
-          (__.json update (readDate('createdAt) andThen readDate('updatedAt))) andThen Json
-            .reads[Thread],
-          Json.writes[Thread] andThen
+        (__.json update (readDate('createdAt) andThen readDate('updatedAt))) andThen Json
+          .reads[Thread],
+        Json.writes[Thread] andThen
           (__.json update (writeDate('createdAt) andThen writeDate('updatedAt)))
       )
     }

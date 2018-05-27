@@ -24,10 +24,11 @@ trait EngineServerPlugin {
 
   def start(context: EngineServerPluginContext): Unit
 
-  def process(engineInstance: EngineInstance,
-              query: JValue,
-              prediction: JValue,
-              context: EngineServerPluginContext): JValue
+  def process(
+      engineInstance: EngineInstance,
+      query: JValue,
+      prediction: JValue,
+      context: EngineServerPluginContext): JValue
 
   def handleREST(arguments: Seq[String]): String
 }

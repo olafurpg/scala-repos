@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -32,19 +32,21 @@ import scalaz.syntax.traverse._
 import scalaz.std.list._
 
 object CookedReader {
-  def load(baseDir: File,
-           metadataFile: File,
-           blockFormat: CookedBlockFormat = VersionedCookedBlockFormat(
-                 Map(1 -> V1CookedBlockFormat)),
-           segmentFormat: SegmentFormat = VersionedSegmentFormat(
-                 Map(1 -> V1SegmentFormat))): CookedReader =
+  def load(
+      baseDir: File,
+      metadataFile: File,
+      blockFormat: CookedBlockFormat = VersionedCookedBlockFormat(
+        Map(1 -> V1CookedBlockFormat)),
+      segmentFormat: SegmentFormat = VersionedSegmentFormat(
+        Map(1 -> V1SegmentFormat))): CookedReader =
     new CookedReader(baseDir, metadataFile, blockFormat, segmentFormat)
 }
 
-final class CookedReader(baseDir: File,
-                         metadataFile0: File,
-                         blockFormat: CookedBlockFormat,
-                         segmentFormat: SegmentFormat)
+final class CookedReader(
+    baseDir: File,
+    metadataFile0: File,
+    blockFormat: CookedBlockFormat,
+    segmentFormat: SegmentFormat)
     extends StorageReader {
   private val metadataFile =
     if (metadataFile0.isAbsolute) metadataFile0
@@ -149,8 +151,8 @@ final class CookedReader(baseDir: File,
     }
   }
 
-  private def segmentsByRef: Validation[
-      IOException, Map[ColumnRef, List[File]]] = metadata map { md =>
+  private def segmentsByRef
+    : Validation[IOException, Map[ColumnRef, List[File]]] = metadata map { md =>
     md.segments
       .groupBy(s => (s._1.cpath, s._1.ctype))
       .map {
@@ -164,22 +166,26 @@ final class CookedReader(baseDir: File,
     : ValidationNel[IOException, List[(ColumnRef, List[Segment])]] = {
     segmentsByRef.toValidationNel flatMap {
       (segsByRef: Map[ColumnRef, List[File]]) =>
-        paths.map { path =>
-          val v: ValidationNel[IOException, List[Segment]] = segsByRef
-            .getOrElse(path, Nil)
-            .map { file0 =>
-              val file =
-                if (file0.isAbsolute) file0
-                else new File(baseDir, file0.getPath)
-              read(file) { channel =>
-                segmentFormat.reader.readSegment(channel).toValidationNel
+        paths
+          .map { path =>
+            val v: ValidationNel[IOException, List[Segment]] = segsByRef
+              .getOrElse(path, Nil)
+              .map { file0 =>
+                val file =
+                  if (file0.isAbsolute) file0
+                  else new File(baseDir, file0.getPath)
+                read(file) { channel =>
+                  segmentFormat.reader.readSegment(channel).toValidationNel
+                }
               }
-            }
-            .sequence[({ type λ[α] = ValidationNel[IOException, α] })#λ,
-                      Segment]
-          v map (path -> _)
-        }.sequence[({ type λ[α] = ValidationNel[IOException, α] })#λ,
-                   (ColumnRef, List[Segment])]
+              .sequence[
+                ({ type λ[α] = ValidationNel[IOException, α] })#λ,
+                Segment]
+            v map (path -> _)
+          }
+          .sequence[
+            ({ type λ[α] = ValidationNel[IOException, α] })#λ,
+            (ColumnRef, List[Segment])]
     }
   }
 }

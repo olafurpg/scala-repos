@@ -6,7 +6,8 @@ import org.atmosphere.container._
 import org.atmosphere.cpr.{AtmosphereFramework, Action => AtmoAction}
 
 class ScalatraAtmosphereFramework(
-    isFilter: Boolean = false, autoDetectHandlers: Boolean = false)
+    isFilter: Boolean = false,
+    autoDetectHandlers: Boolean = false)
     extends AtmosphereFramework(isFilter, autoDetectHandlers) {
 
   private[this] val logger = Logger[ScalatraAtmosphereFramework]

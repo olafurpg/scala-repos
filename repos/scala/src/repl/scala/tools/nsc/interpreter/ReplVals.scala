@@ -33,9 +33,9 @@ class StdReplVals(final val r: ILoop) extends ReplVals {
   with ast.TreeDSL {}
 
   final lazy val typer = analyzer.newTyper(
-      analyzer.rootContext(
-          power.unit("").asInstanceOf[analyzer.global.CompilationUnit]
-      )
+    analyzer.rootContext(
+      power.unit("").asInstanceOf[analyzer.global.CompilationUnit]
+    )
   )
   def lastRequest = intp.lastRequest
 
@@ -76,13 +76,13 @@ object ReplVals {
         if (sym eq NoSymbol) NoType
         else appliedType(sym, compilerTypeFromTag(m1).asInstanceOf[Type])
 
-      def apply[M1, M2](
-          implicit m1: ru.TypeTag[M1], m2: ru.TypeTag[M2]): Type =
+      def apply[M1, M2](implicit m1: ru.TypeTag[M1], m2: ru.TypeTag[M2]): Type =
         if (sym eq NoSymbol) NoType
         else
-          appliedType(sym,
-                      compilerTypeFromTag(m1).asInstanceOf[Type],
-                      compilerTypeFromTag(m2).asInstanceOf[Type])
+          appliedType(
+            sym,
+            compilerTypeFromTag(m1).asInstanceOf[Type],
+            compilerTypeFromTag(m2).asInstanceOf[Type])
     }
 
     (sym: Symbol) =>

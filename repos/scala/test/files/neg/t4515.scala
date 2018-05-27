@@ -10,10 +10,11 @@ object Main {
   trait DerivedPushNode[EventType] extends PushNode[EventType] {}
 
   trait HandlerBase[EventType] {
-    def onEvent(target: Target,
-                event: EventType,
-                node: PushNode[EventType],
-                ctx: PushEventContext[EventType]): Unit
+    def onEvent(
+        target: Target,
+        event: EventType,
+        node: PushNode[EventType],
+        ctx: PushEventContext[EventType]): Unit
   }
   val handlers = new HashMap[DerivedPushNode[_], HandlerBase[_]]
 
@@ -23,8 +24,9 @@ object Main {
   }
 
   class TimerPushService {
-    def add[EventType](node: DerivedPushNode[EventType],
-                       context: PushEventContext[EventType]): Unit = {}
+    def add[EventType](
+        node: DerivedPushNode[EventType],
+        context: PushEventContext[EventType]): Unit = {}
 
     def pollEvents[EventType](
         node: DerivedPushNode[EventType]): List[PushEventContext[EventType]] =

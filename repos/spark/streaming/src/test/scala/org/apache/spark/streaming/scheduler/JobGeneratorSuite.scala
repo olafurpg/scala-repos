@@ -61,76 +61,76 @@ class JobGeneratorSuite extends TestSuiteBase {
     val checkpointDir = Utils.createTempDir()
     val testConf = conf
     testConf.set(
-        "spark.streaming.clock", "org.apache.spark.streaming.util.ManualClock")
+      "spark.streaming.clock",
+      "org.apache.spark.streaming.util.ManualClock")
     testConf.set("spark.streaming.receiver.writeAheadLog.rollingInterval", "1")
 
-    withStreamingContext(new StreamingContext(testConf, batchDuration)) {
-      ssc =>
-        val clock = ssc.scheduler.clock.asInstanceOf[ManualClock]
-        val numBatches = 10
-        val longBatchNumber = 3 // 3rd batch will take a long time
-        val longBatchTime = longBatchNumber * batchDuration.milliseconds
+    withStreamingContext(new StreamingContext(testConf, batchDuration)) { ssc =>
+      val clock = ssc.scheduler.clock.asInstanceOf[ManualClock]
+      val numBatches = 10
+      val longBatchNumber = 3 // 3rd batch will take a long time
+      val longBatchTime = longBatchNumber * batchDuration.milliseconds
 
-        val testTimeout = timeout(10 seconds)
-        val inputStream = ssc.receiverStream(new TestReceiver)
+      val testTimeout = timeout(10 seconds)
+      val inputStream = ssc.receiverStream(new TestReceiver)
 
-        inputStream.foreachRDD(
-            (rdd: RDD[Int], time: Time) =>
-              {
-            if (time.milliseconds == longBatchTime) {
-              while (waitLatch.getCount() > 0) {
-                waitLatch.await()
-              }
-            }
-        })
-
-        val batchCounter = new BatchCounter(ssc)
-        ssc.checkpoint(checkpointDir.getAbsolutePath)
-        ssc.start()
-
-        // Make sure the only 1 batch of information is to be remembered
-        assert(inputStream.rememberDuration === batchDuration)
-        val receiverTracker = ssc.scheduler.receiverTracker
-
-        // Get the blocks belonging to a batch
-        def getBlocksOfBatch(batchTime: Long): Seq[ReceivedBlockInfo] = {
-          receiverTracker.getBlocksOfBatchAndStream(Time(batchTime),
-                                                    inputStream.id)
-        }
-
-        // Wait for new blocks to be received
-        def waitForNewReceivedBlocks() {
-          eventually(testTimeout) {
-            assert(receiverTracker.hasUnallocatedBlocks)
+      inputStream.foreachRDD((rdd: RDD[Int], time: Time) => {
+        if (time.milliseconds == longBatchTime) {
+          while (waitLatch.getCount() > 0) {
+            waitLatch.await()
           }
         }
+      })
 
-        // Wait for received blocks to be allocated to a batch
-        def waitForBlocksToBeAllocatedToBatch(batchTime: Long) {
-          eventually(testTimeout) {
-            assert(getBlocksOfBatch(batchTime).nonEmpty)
-          }
-        }
+      val batchCounter = new BatchCounter(ssc)
+      ssc.checkpoint(checkpointDir.getAbsolutePath)
+      ssc.start()
 
-        // Generate a large number of batches with blocks in them
-        for (batchNum <- 1 to numBatches) {
-          waitForNewReceivedBlocks()
-          clock.advance(batchDuration.milliseconds)
-          waitForBlocksToBeAllocatedToBatch(clock.getTimeMillis())
-        }
+      // Make sure the only 1 batch of information is to be remembered
+      assert(inputStream.rememberDuration === batchDuration)
+      val receiverTracker = ssc.scheduler.receiverTracker
 
-        // Wait for 3rd batch to start
+      // Get the blocks belonging to a batch
+      def getBlocksOfBatch(batchTime: Long): Seq[ReceivedBlockInfo] = {
+        receiverTracker.getBlocksOfBatchAndStream(
+          Time(batchTime),
+          inputStream.id)
+      }
+
+      // Wait for new blocks to be received
+      def waitForNewReceivedBlocks() {
         eventually(testTimeout) {
-          ssc.scheduler
-            .getPendingTimes()
-            .contains(Time(numBatches * batchDuration.milliseconds))
+          assert(receiverTracker.hasUnallocatedBlocks)
         }
+      }
 
-        // Verify that the 3rd batch's block data is still present while the 3rd batch is incomplete
-        assert(getBlocksOfBatch(longBatchTime).nonEmpty,
-               "blocks of incomplete batch already deleted")
-        assert(batchCounter.getNumCompletedBatches < longBatchNumber)
-        waitLatch.countDown()
+      // Wait for received blocks to be allocated to a batch
+      def waitForBlocksToBeAllocatedToBatch(batchTime: Long) {
+        eventually(testTimeout) {
+          assert(getBlocksOfBatch(batchTime).nonEmpty)
+        }
+      }
+
+      // Generate a large number of batches with blocks in them
+      for (batchNum <- 1 to numBatches) {
+        waitForNewReceivedBlocks()
+        clock.advance(batchDuration.milliseconds)
+        waitForBlocksToBeAllocatedToBatch(clock.getTimeMillis())
+      }
+
+      // Wait for 3rd batch to start
+      eventually(testTimeout) {
+        ssc.scheduler
+          .getPendingTimes()
+          .contains(Time(numBatches * batchDuration.milliseconds))
+      }
+
+      // Verify that the 3rd batch's block data is still present while the 3rd batch is incomplete
+      assert(
+        getBlocksOfBatch(longBatchTime).nonEmpty,
+        "blocks of incomplete batch already deleted")
+      assert(batchCounter.getNumCompletedBatches < longBatchNumber)
+      waitLatch.countDown()
     }
   }
 }

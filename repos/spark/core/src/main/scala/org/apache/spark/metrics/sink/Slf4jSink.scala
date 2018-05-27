@@ -25,9 +25,10 @@ import com.codahale.metrics.{MetricRegistry, Slf4jReporter}
 import org.apache.spark.SecurityManager
 import org.apache.spark.metrics.MetricsSystem
 
-private[spark] class Slf4jSink(val property: Properties,
-                               val registry: MetricRegistry,
-                               securityMgr: SecurityManager)
+private[spark] class Slf4jSink(
+    val property: Properties,
+    val registry: MetricRegistry,
+    securityMgr: SecurityManager)
     extends Sink {
   val SLF4J_DEFAULT_PERIOD = 10
   val SLF4J_DEFAULT_UNIT = "SECONDS"
@@ -37,12 +38,12 @@ private[spark] class Slf4jSink(val property: Properties,
 
   val pollPeriod = Option(property.getProperty(SLF4J_KEY_PERIOD)) match {
     case Some(s) => s.toInt
-    case None => SLF4J_DEFAULT_PERIOD
+    case None    => SLF4J_DEFAULT_PERIOD
   }
 
   val pollUnit: TimeUnit = Option(property.getProperty(SLF4J_KEY_UNIT)) match {
     case Some(s) => TimeUnit.valueOf(s.toUpperCase())
-    case None => TimeUnit.valueOf(SLF4J_DEFAULT_UNIT)
+    case None    => TimeUnit.valueOf(SLF4J_DEFAULT_UNIT)
   }
 
   MetricsSystem.checkMinimalPollingPeriod(pollUnit, pollPeriod)

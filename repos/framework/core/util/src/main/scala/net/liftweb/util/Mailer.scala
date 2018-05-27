@@ -42,10 +42,11 @@ object Mailer extends Mailer {
     */
   final case class MessageHeader(name: String, value: String) extends MailTypes
   abstract class MailBodyType extends MailTypes
-  final case class PlusImageHolder(name: String,
-                                   mimeType: String,
-                                   bytes: Array[Byte],
-                                   attachment: Boolean = false)
+  final case class PlusImageHolder(
+      name: String,
+      mimeType: String,
+      bytes: Array[Byte],
+      attachment: Boolean = false)
 
   /**
     * Represents a text/plain mail body. The given text will
@@ -82,7 +83,9 @@ object Mailer extends Mailer {
       extends AddressType
 
   final case class MessageInfo(
-      from: From, subject: Subject, info: List[MailTypes])
+      from: From,
+      subject: Subject,
+      info: List[MailTypes])
 }
 
 /**
@@ -156,14 +159,14 @@ trait Mailer extends SimpleInjector {
 
   private def _host = properties.getProperty("mail.smtp.host") match {
     case null => "localhost"
-    case s => s
+    case s    => s
   }
 
   def buildProps: Properties = {
     val p = properties.clone.asInstanceOf[Properties]
     p.getProperty("mail.smtp.host") match {
       case null => p.put("mail.smtp.host", host)
-      case _ =>
+      case _    =>
     }
 
     p
@@ -175,7 +178,7 @@ trait Mailer extends SimpleInjector {
     */
   lazy val charSet = properties.getProperty("mail.charset") match {
     case null => "UTF-8"
-    case x => x
+    case x    => x
   }
 
   // def host_=(hostname: String) = System.setProperty("mail.smtp.host", hostname)
@@ -195,11 +198,11 @@ trait Mailer extends SimpleInjector {
     import Props.RunModes._
     (Props.mode match {
       case Development => devModeSend.vend
-      case Test => testModeSend.vend
-      case Staging => stagingModeSend.vend
-      case Production => productionModeSend.vend
-      case Pilot => pilotModeSend.vend
-      case Profile => profileModeSend.vend
+      case Test        => testModeSend.vend
+      case Staging     => stagingModeSend.vend
+      case Production  => productionModeSend.vend
+      case Pilot       => pilotModeSend.vend
+      case Profile     => profileModeSend.vend
     }).apply(msg)
   }
 
@@ -213,8 +216,8 @@ trait Mailer extends SimpleInjector {
     * How to send a message in test mode.  By default, log the message
     */
   lazy val testModeSend: Inject[MimeMessage => Unit] =
-    new Inject[MimeMessage => Unit](
-        (m: MimeMessage) => logger.info("Sending Mime Message: " + m)) {}
+    new Inject[MimeMessage => Unit]((m: MimeMessage) =>
+      logger.info("Sending Mime Message: " + m)) {}
 
   /**
     * How to send a message in staging mode.  By default, use Transport.send(msg)
@@ -250,34 +253,33 @@ trait Mailer extends SimpleInjector {
   def msgSendImpl(from: From, subject: Subject, info: List[MailTypes]) {
     val session = authenticator match {
       case Full(a) => jndiSession openOr Session.getInstance(buildProps, a)
-      case _ => jndiSession openOr Session.getInstance(buildProps)
+      case _       => jndiSession openOr Session.getInstance(buildProps)
     }
     val subj = MimeUtility.encodeText(subject.subject, "utf-8", "Q")
     val message = new MimeMessage(session)
     message.setFrom(from)
     message.setRecipients(Message.RecipientType.TO, info.flatMap {
       case x: To => Some[To](x)
-      case _ => None
+      case _     => None
     })
     message.setRecipients(Message.RecipientType.CC, info.flatMap {
       case x: CC => Some[CC](x)
-      case _ => None
+      case _     => None
     })
     message.setRecipients(Message.RecipientType.BCC, info.flatMap {
       case x: BCC => Some[BCC](x)
-      case _ => None
+      case _      => None
     })
     message.setSentDate(new java.util.Date())
     // message.setReplyTo(filter[MailTypes, ReplyTo](info, {case x @ ReplyTo(_) => Some(x); case _ => None}))
-    message.setReplyTo(
-        info.flatMap {
+    message.setReplyTo(info.flatMap {
       case x: ReplyTo => Some[ReplyTo](x)
-      case _ => None
+      case _          => None
     })
     message.setSubject(subj)
     info.foreach {
       case MessageHeader(name, value) => message.addHeader(name, value)
-      case _ =>
+      case _                          =>
     }
 
     val bodyTypes = info.flatMap {
@@ -313,7 +315,7 @@ trait Mailer extends SimpleInjector {
       ns.toList.collect {
         case e: Elem => e
       } match {
-        case Nil => if (ns.length == 0) Text("") else ns(0)
+        case Nil     => if (ns.length == 0) Text("") else ns(0)
         case x :: xs => x
       }
   }
@@ -333,16 +335,16 @@ trait Mailer extends SimpleInjector {
         bp.setText(txt, charset)
 
       case XHTMLMailBodyType(html) =>
-        bp.setContent(
-            encodeHtmlBodyPart(html), "text/html; charset=" + charSet)
+        bp.setContent(encodeHtmlBodyPart(html), "text/html; charset=" + charSet)
 
-      case XHTMLPlusImages(html, img @ _ *) =>
+      case XHTMLPlusImages(html, img @ _*) =>
         val (attachments, images) = img.partition(_.attachment)
         val relatedMultipart = new MimeMultipart("related")
 
         val htmlBodyPart = new MimeBodyPart
         htmlBodyPart.setContent(
-            encodeHtmlBodyPart(html), "text/html; charset=" + charSet)
+          encodeHtmlBodyPart(html),
+          "text/html; charset=" + charSet)
         relatedMultipart.addBodyPart(htmlBodyPart)
 
         images.foreach { image =>
@@ -378,16 +380,15 @@ trait Mailer extends SimpleInjector {
 
     part.setFileName(holder.name)
     part.setContentID(holder.name)
-    part.setDisposition(
-        if (holder.attachment) Part.ATTACHMENT else Part.INLINE)
+    part.setDisposition(if (holder.attachment) Part.ATTACHMENT else Part.INLINE)
     part.setDataHandler(
-        new javax.activation.DataHandler(new javax.activation.DataSource {
-      def getContentType = holder.mimeType
-      def getInputStream = new java.io.ByteArrayInputStream(holder.bytes)
-      def getName = holder.name
-      def getOutputStream =
-        throw new java.io.IOException("Unable to write to item")
-    }))
+      new javax.activation.DataHandler(new javax.activation.DataSource {
+        def getContentType = holder.mimeType
+        def getInputStream = new java.io.ByteArrayInputStream(holder.bytes)
+        def getName = holder.name
+        def getOutputStream =
+          throw new java.io.IOException("Unable to write to item")
+      }))
 
     part
   }

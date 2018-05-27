@@ -42,8 +42,8 @@ class TableDef[T](_cols: Column[T]*) {
     val argLists = rows map colApply
 
     val headers = List(
-        headFormat.format(colNames: _*),
-        (colWidths, sepWidths).zipped map ((w1, w2) => "-" * w1 + " " * w2) mkString
+      headFormat.format(colNames: _*),
+      (colWidths, sepWidths).zipped map ((w1, w2) => "-" * w1 + " " * w2) mkString
     )
 
     def mkFormatString(sepf: Int => String): String =

@@ -75,9 +75,9 @@ class EnsembleAdvancedBarChart extends EnsembleExample {
       name = "Data Series 2"
       // Example of assigning data using a container
       data = ObservableBuffer(
-          XYChart.Data[String, Number](years(0), 956),
-          XYChart.Data[String, Number](years(1), 1665),
-          XYChart.Data[String, Number](years(2), 2450)
+        XYChart.Data[String, Number](years(0), 956),
+        XYChart.Data[String, Number](years(1), 1665),
+        XYChart.Data[String, Number](years(2), 2450)
       )
     }
 

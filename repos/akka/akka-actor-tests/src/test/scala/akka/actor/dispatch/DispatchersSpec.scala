@@ -70,7 +70,8 @@ object DispatchersSpec {
   }
 
   class OneShotMailboxType(settings: ActorSystem.Settings, config: Config)
-      extends MailboxType with ProducesMessageQueue[DoublingMailbox] {
+      extends MailboxType
+      with ProducesMessageQueue[DoublingMailbox] {
     val created = new AtomicBoolean(false)
     override def create(owner: Option[ActorRef], system: Option[ActorSystem]) =
       if (created.compareAndSet(false, true)) {
@@ -91,7 +92,8 @@ object DispatchersSpec {
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class DispatchersSpec
-    extends AkkaSpec(DispatchersSpec.config) with ImplicitSender {
+    extends AkkaSpec(DispatchersSpec.config)
+    with ImplicitSender {
   import DispatchersSpec._
   val df = system.dispatchers
   import df._
@@ -106,13 +108,13 @@ class DispatchersSpec
 
   def instance(dispatcher: MessageDispatcher): (MessageDispatcher) ⇒ Boolean =
     _ == dispatcher
-  def ofType[
-      T <: MessageDispatcher : ClassTag]: (MessageDispatcher) ⇒ Boolean =
+  def ofType[T <: MessageDispatcher: ClassTag]: (MessageDispatcher) ⇒ Boolean =
     _.getClass == implicitly[ClassTag[T]].runtimeClass
 
   def typesAndValidators: Map[String, (MessageDispatcher) ⇒ Boolean] =
-    Map("PinnedDispatcher" -> ofType[PinnedDispatcher],
-        "Dispatcher" -> ofType[Dispatcher])
+    Map(
+      "PinnedDispatcher" -> ofType[PinnedDispatcher],
+      "Dispatcher" -> ofType[Dispatcher])
 
   def validTypes = typesAndValidators.keys.toList
 
@@ -122,11 +124,13 @@ class DispatchersSpec
   lazy val allDispatchers: Map[String, MessageDispatcher] = {
     validTypes
       .map(
-          t ⇒
-            (t,
-             from(ConfigFactory
-                   .parseMap(Map(tipe -> t, id -> t).asJava)
-                   .withFallback(defaultDispatcherConfig))))
+        t ⇒
+          (
+            t,
+            from(
+              ConfigFactory
+                .parseMap(Map(tipe -> t, id -> t).asJava)
+                .withFallback(defaultDispatcherConfig))))
       .toMap
   }
 
@@ -164,17 +168,18 @@ class DispatchersSpec
 
     "throw ConfigurationException if type does not exist" in {
       intercept[ConfigurationException] {
-        from(ConfigFactory
-              .parseMap(Map(tipe -> "typedoesntexist",
-                            id -> "invalid-dispatcher").asJava)
-              .withFallback(defaultDispatcherConfig))
+        from(
+          ConfigFactory
+            .parseMap(
+              Map(tipe -> "typedoesntexist", id -> "invalid-dispatcher").asJava)
+            .withFallback(defaultDispatcherConfig))
       }
     }
 
     "get the correct types of dispatchers" in {
       //All created/obtained dispatchers are of the expeced type/instance
-      assert(typesAndValidators.forall(
-              tuple ⇒ tuple._2(allDispatchers(tuple._1))))
+      assert(
+        typesAndValidators.forall(tuple ⇒ tuple._2(allDispatchers(tuple._1))))
     }
 
     "provide lookup of dispatchers by id" in {
@@ -184,13 +189,15 @@ class DispatchersSpec
     }
 
     "include system name and dispatcher id in thread names for fork-join-executor" in {
-      assertMyDispatcherIsUsed(system.actorOf(
-              Props[ThreadNameEcho].withDispatcher("myapp.mydispatcher")))
+      assertMyDispatcherIsUsed(
+        system.actorOf(
+          Props[ThreadNameEcho].withDispatcher("myapp.mydispatcher")))
     }
 
     "include system name and dispatcher id in thread names for thread-pool-executor" in {
-      system.actorOf(Props[ThreadNameEcho].withDispatcher(
-              "myapp.thread-pool-dispatcher")) ! "what's the name?"
+      system.actorOf(
+        Props[ThreadNameEcho]
+          .withDispatcher("myapp.thread-pool-dispatcher")) ! "what's the name?"
       val Expected =
         "(DispatchersSpec-myapp.thread-pool-dispatcher-[1-9][0-9]*)".r
       expectMsgPF() {
@@ -208,8 +215,9 @@ class DispatchersSpec
     }
 
     "include system name and dispatcher id in thread names for pinned dispatcher" in {
-      system.actorOf(Props[ThreadNameEcho].withDispatcher(
-              "myapp.my-pinned-dispatcher")) ! "what's the name?"
+      system.actorOf(
+        Props[ThreadNameEcho]
+          .withDispatcher("myapp.my-pinned-dispatcher")) ! "what's the name?"
       val Expected =
         "(DispatchersSpec-myapp.my-pinned-dispatcher-[1-9][0-9]*)".r
       expectMsgPF() {
@@ -218,8 +226,9 @@ class DispatchersSpec
     }
 
     "include system name and dispatcher id in thread names for balancing dispatcher" in {
-      system.actorOf(Props[ThreadNameEcho].withDispatcher(
-              "myapp.balancing-dispatcher")) ! "what's the name?"
+      system.actorOf(
+        Props[ThreadNameEcho]
+          .withDispatcher("myapp.balancing-dispatcher")) ! "what's the name?"
       val Expected =
         "(DispatchersSpec-myapp.balancing-dispatcher-[1-9][0-9]*)".r
       expectMsgPF() {
@@ -229,14 +238,14 @@ class DispatchersSpec
 
     "use dispatcher in deployment config" in {
       assertMyDispatcherIsUsed(
-          system.actorOf(Props[ThreadNameEcho], name = "echo1"))
+        system.actorOf(Props[ThreadNameEcho], name = "echo1"))
     }
 
     "use dispatcher in deployment config, trumps code" in {
       assertMyDispatcherIsUsed(
-          system.actorOf(Props[ThreadNameEcho].withDispatcher(
-                             "myapp.my-pinned-dispatcher"),
-                         name = "echo2"))
+        system.actorOf(
+          Props[ThreadNameEcho].withDispatcher("myapp.my-pinned-dispatcher"),
+          name = "echo2"))
     }
 
     "use pool-dispatcher router of deployment config" in {
@@ -253,8 +262,7 @@ class DispatchersSpec
     }
 
     "use balancing-pool router with special routees mailbox of deployment config" in {
-      system.actorOf(FromConfig.props(Props[ThreadNameEcho]),
-                     name = "balanced") ! "what's the name?"
+      system.actorOf(FromConfig.props(Props[ThreadNameEcho]), name = "balanced") ! "what's the name?"
       val Expected =
         """(DispatchersSpec-BalancingPool-/balanced-[1-9][0-9]*)""".r
       expectMsgPF() {

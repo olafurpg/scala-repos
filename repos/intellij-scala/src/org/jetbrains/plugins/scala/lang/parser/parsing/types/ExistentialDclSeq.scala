@@ -6,7 +6,10 @@ package types
 
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
-import org.jetbrains.plugins.scala.lang.parser.parsing.statements.{Dcl, EmptyDcl}
+import org.jetbrains.plugins.scala.lang.parser.parsing.statements.{
+  Dcl,
+  EmptyDcl
+}
 
 /**
   * @author Alexander Podkhalyuzin
@@ -31,7 +34,7 @@ object ExistentialDclSeq {
         return
     }
     while (builder.getTokenType == ScalaTokenTypes.tSEMICOLON ||
-    builder.newlineBeforeCurrentToken) {
+           builder.newlineBeforeCurrentToken) {
       if (builder.getTokenType == ScalaTokenTypes.tSEMICOLON)
         builder.advanceLexer() //Ate semi
       builder.getTokenType match {

@@ -6,12 +6,21 @@ import com.intellij.codeInspection.{ProblemHighlightType, ProblemsHolder}
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.PsiTreeUtil
-import org.jetbrains.plugins.scala.codeInsight.unwrap.{ScalaUnwrapContext, ScalaWhileUnwrapper}
-import org.jetbrains.plugins.scala.codeInspection.{AbstractFixOnPsiElement, AbstractInspection}
+import org.jetbrains.plugins.scala.codeInsight.unwrap.{
+  ScalaUnwrapContext,
+  ScalaWhileUnwrapper
+}
+import org.jetbrains.plugins.scala.codeInspection.{
+  AbstractFixOnPsiElement,
+  AbstractInspection
+}
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlock, ScDoStmt}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDefinition
-import org.jetbrains.plugins.scala.lang.psi.controlFlow.{ControlFlowUtil, Instruction}
+import org.jetbrains.plugins.scala.lang.psi.controlFlow.{
+  ControlFlowUtil,
+  Instruction
+}
 
 import scala.annotation.tailrec
 
@@ -57,11 +66,11 @@ class ScalaUnreachableCodeInspection
     @tailrec
     def getParentStmt(element: PsiElement): Option[PsiElement] = {
       element.getParent match {
-        case _: ScBlock => Some(element)
+        case _: ScBlock              => Some(element)
         case _: ScFunctionDefinition => Some(element)
         case doStmt: ScDoStmt if doStmt.condition.contains(element) =>
           Some(element)
-        case null => None
+        case null   => None
         case parent => getParentStmt(parent)
       }
     }
@@ -75,7 +84,8 @@ class ScalaUnreachableCodeInspection
   }
 
   private def registerProblem(
-      fragment: Seq[PsiElement], holder: ProblemsHolder) {
+      fragment: Seq[PsiElement],
+      holder: ProblemsHolder) {
     if (fragment.isEmpty) return
 
     val descriptor = {
@@ -87,15 +97,16 @@ class ScalaUnreachableCodeInspection
           new UnwrapDoStmtFix(doStmt)
         case _ => new RemoveFragmentQuickFix(fragment)
       }
-      new ProblemDescriptorImpl(fragment.head,
-                                fragment.last,
-                                message,
-                                Array(fix),
-                                ProblemHighlightType.LIKE_UNUSED_SYMBOL,
-                                false,
-                                null,
-                                null,
-                                false)
+      new ProblemDescriptorImpl(
+        fragment.head,
+        fragment.last,
+        message,
+        Array(fix),
+        ProblemHighlightType.LIKE_UNUSED_SYMBOL,
+        false,
+        null,
+        null,
+        false)
     }
 
     holder.registerProblem(descriptor)
@@ -104,7 +115,9 @@ class ScalaUnreachableCodeInspection
 
 class RemoveFragmentQuickFix(fragment: Seq[PsiElement])
     extends AbstractFixOnPsiElement(
-        "Remove unreachable code", fragment.head, fragment.last) {
+      "Remove unreachable code",
+      fragment.head,
+      fragment.last) {
   override def doApplyFix(project: Project): Unit = {
     val startElement: PsiElement = getStartElement
     if (startElement == null) return

@@ -6,7 +6,10 @@ import java.util
 import java.util.Collections
 
 import com.intellij.conversion._
-import com.intellij.conversion.impl.{ComponentManagerSettingsImpl, ConversionContextImpl}
+import com.intellij.conversion.impl.{
+  ComponentManagerSettingsImpl,
+  ConversionContextImpl
+}
 import com.intellij.openapi.util.JDOMUtil
 import com.intellij.util.SystemProperties
 import org.jdom.Document
@@ -24,13 +27,13 @@ class ImportPanelConverterProvider
   override def createConverter(context: ConversionContext): ProjectConverter = {
     import org.jdom.Element
     val actualSettingsSet = Set(
-        "addFullQualifiedImports",
-        "addImportMostCloseToReference",
-        "classCountToUseImportOnDemand",
-        "importMembersUsingUnderScore",
-        "importShortestPathForAmbiguousReferences",
-        "importsWithPrefix",
-        "sortImports"
+      "addFullQualifiedImports",
+      "addImportMostCloseToReference",
+      "classCountToUseImportOnDemand",
+      "importMembersUsingUnderScore",
+      "importShortestPathForAmbiguousReferences",
+      "importsWithPrefix",
+      "sortImports"
     )
 
     def getElements: Seq[Element] = {
@@ -50,7 +53,7 @@ class ImportPanelConverterProvider
                     elem.getName == "option" &&
                     elem.getAttribute("name") != null &&
                     actualSettingsSet.contains(
-                        elem.getAttribute("name").getValue)
+                      elem.getAttribute("name").getValue)
                   }
                 case None => Seq.empty
               }
@@ -72,7 +75,7 @@ class ImportPanelConverterProvider
           .listFiles()
           .find(_.getName == "codeStyleSettings.xml") match {
           case Some(file) => Collections.singleton(file)
-          case None => Collections.emptyList()
+          case None       => Collections.emptyList()
         }
       }
 
@@ -96,12 +99,13 @@ class ImportPanelConverterProvider
                     settingsValue = new Element("ScalaCodeStyleSettings")
                     value.addContent(settingsValue)
                   }
-                  getElements.foreach(
-                      elem => settingsValue.addContent(elem.clone()))
+                  getElements.foreach(elem =>
+                    settingsValue.addContent(elem.clone()))
                 }
-                JDOMUtil.writeDocument(new Document(root.clone()),
-                                       file,
-                                       SystemProperties.getLineSeparator)
+                JDOMUtil.writeDocument(
+                  new Document(root.clone()),
+                  file,
+                  SystemProperties.getLineSeparator)
             }
           case _ =>
         }

@@ -9,10 +9,23 @@ import akka.util.Timeout
 import mesosphere.marathon.Protos.HealthCheckDefinition.Protocol
 import mesosphere.marathon.core.task.Task
 import mesosphere.marathon.core.task.tracker.TaskTracker
-import mesosphere.marathon.event.{AddHealthCheck, EventModule, RemoveHealthCheck}
+import mesosphere.marathon.event.{
+  AddHealthCheck,
+  EventModule,
+  RemoveHealthCheck
+}
 import mesosphere.marathon.health.HealthCheckActor.{AppHealth, GetAppHealth}
-import mesosphere.marathon.state.{AppDefinition, AppRepository, PathId, Timestamp}
-import mesosphere.marathon.{MarathonScheduler, MarathonSchedulerDriverHolder, ZookeeperConf}
+import mesosphere.marathon.state.{
+  AppDefinition,
+  AppRepository,
+  PathId,
+  Timestamp
+}
+import mesosphere.marathon.{
+  MarathonScheduler,
+  MarathonSchedulerDriverHolder,
+  ZookeeperConf
+}
 import mesosphere.util.RWLock
 import org.apache.mesos.Protos.TaskStatus
 
@@ -33,10 +46,12 @@ class MarathonHealthCheckManager @Inject()(
     extends HealthCheckManager {
 
   protected[this] case class ActiveHealthCheck(
-      healthCheck: HealthCheck, actor: ActorRef)
+      healthCheck: HealthCheck,
+      actor: ActorRef)
 
-  protected[this] var appHealthChecks: RWLock[
-      mutable.Map[PathId, Map[Timestamp, Set[ActiveHealthCheck]]]] = RWLock(
+  protected[this] var appHealthChecks
+    : RWLock[mutable.Map[PathId, Map[Timestamp, Set[ActiveHealthCheck]]]] =
+    RWLock(
       mutable.Map.empty
         .withDefaultValue(Map.empty.withDefaultValue(Set.empty)))
 
@@ -49,33 +64,38 @@ class MarathonHealthCheckManager @Inject()(
     }
 
   protected[this] def listActive(
-      appId: PathId, appVersion: Timestamp): Set[ActiveHealthCheck] =
+      appId: PathId,
+      appVersion: Timestamp): Set[ActiveHealthCheck] =
     appHealthChecks.readLock { ahcs =>
       ahcs(appId)(appVersion)
     }
 
   override def add(
-      appId: PathId, appVersion: Timestamp, healthCheck: HealthCheck): Unit =
+      appId: PathId,
+      appVersion: Timestamp,
+      healthCheck: HealthCheck): Unit =
     appHealthChecks.writeLock { ahcs =>
       val healthChecksForApp = listActive(appId, appVersion)
 
       if (healthChecksForApp.exists(_.healthCheck == healthCheck))
         log.debug(
-            s"Not adding duplicate health check for app [$appId] and version [$appVersion]: [$healthCheck]")
+          s"Not adding duplicate health check for app [$appId] and version [$appVersion]: [$healthCheck]")
       else {
         log.info(
-            s"Adding health check for app [$appId] and version [$appVersion]: [$healthCheck]")
-        Await.result(appRepository.app(appId, appVersion),
-                     zkConf.zkTimeoutDuration) match {
+          s"Adding health check for app [$appId] and version [$appVersion]: [$healthCheck]")
+        Await.result(
+          appRepository.app(appId, appVersion),
+          zkConf.zkTimeoutDuration) match {
           case Some(app: AppDefinition) =>
             val ref = system.actorOf(
-                Props(classOf[HealthCheckActor],
-                      app,
-                      driverHolder,
-                      scheduler,
-                      healthCheck,
-                      taskTracker,
-                      eventBus))
+              Props(
+                classOf[HealthCheckActor],
+                app,
+                driverHolder,
+                scheduler,
+                healthCheck,
+                taskTracker,
+                eventBus))
             val newHealthChecksForApp =
               healthChecksForApp + ActiveHealthCheck(healthCheck, ref)
 
@@ -85,7 +105,7 @@ class MarathonHealthCheckManager @Inject()(
             eventBus.publish(AddHealthCheck(appId, appVersion, healthCheck))
           case None =>
             log.warn(
-                s"Couldn't add health check for app [$appId] and version [$appVersion] - app definition not found")
+              s"Couldn't add health check for app [$appId] and version [$appVersion] - app definition not found")
         }
       }
     }
@@ -97,7 +117,9 @@ class MarathonHealthCheckManager @Inject()(
     }
 
   override def remove(
-      appId: PathId, appVersion: Timestamp, healthCheck: HealthCheck): Unit =
+      appId: PathId,
+      appVersion: Timestamp,
+      healthCheck: HealthCheck): Unit =
     appHealthChecks.writeLock { ahcs =>
       val healthChecksForVersion: Set[ActiveHealthCheck] =
         listActive(appId, appVersion)
@@ -105,7 +127,7 @@ class MarathonHealthCheckManager @Inject()(
         healthChecksForVersion.filter(_.healthCheck == healthCheck)
       for (ahc <- toRemove) {
         log.info(
-            s"Removing health check for app [$appId] and version [$appVersion]: [$healthCheck]")
+          s"Removing health check for app [$appId] and version [$appVersion]: [$healthCheck]")
         deactivate(ahc)
         eventBus.publish(RemoveHealthCheck(appId))
       }
@@ -144,7 +166,7 @@ class MarathonHealthCheckManager @Inject()(
         val tasks: Iterable[Task] = taskTracker.appTasksSync(app.id)
         val activeAppVersions: Set[Timestamp] =
           tasks.iterator.flatMap(_.launched.map(_.appVersion)).toSet +
-          app.version
+            app.version
 
         val healthCheckAppVersions: Set[Timestamp] =
           appHealthChecks.writeLock { ahcs =>
@@ -152,9 +174,8 @@ class MarathonHealthCheckManager @Inject()(
             // since only current version tasks are launched.
             for {
               (version, activeHealthChecks) <- ahcs(appId)
-                                                  if version != app.version &&
-                                              !activeAppVersions.contains(
-                                                  version)
+              if version != app.version &&
+                !activeAppVersions.contains(version)
               activeHealthCheck <- activeHealthChecks
             } remove(appId, version, activeHealthCheck.healthCheck)
 
@@ -173,7 +194,7 @@ class MarathonHealthCheckManager @Inject()(
                 // We generated a new app version for every scale change. If maxVersions is configured, we
                 // throw away old versions such that we may not have the app configuration of all tasks available anymore.
                 log.warn(
-                    s"Cannot find health check configuration for [$appId] and version [$version], " +
+                  s"Cannot find health check configuration for [$appId] and version [$version], " +
                     "using most recent one.")
 
               case Some(appVersion) =>
@@ -194,9 +215,10 @@ class MarathonHealthCheckManager @Inject()(
         if (taskStatus.hasHealthy) {
           val healthy = taskStatus.getHealthy
           log.info(
-              s"Received status for $taskId with version [$version] and healthy [$healthy]")
-          Some(if (healthy) Healthy(taskId, version)
-              else Unhealthy(taskId, version, ""))
+            s"Received status for $taskId with version [$version] and healthy [$healthy]")
+          Some(
+            if (healthy) Healthy(taskId, version)
+            else Unhealthy(taskId, version, ""))
         } else {
           log.debug(s"Ignoring status for $taskId with no health information")
           None
@@ -218,7 +240,7 @@ class MarathonHealthCheckManager @Inject()(
         ref <- healthCheckActors
       } {
         log.info(
-            s"Forwarding health result [$result] to health check actor [$ref]")
+          s"Forwarding health result [$result] to health check actor [$ref]")
         ref ! result
       }
     }
@@ -235,10 +257,12 @@ class MarathonHealthCheckManager @Inject()(
       case None => Future.successful(Nil)
       case Some(appVersion) =>
         Future.sequence(
-            listActive(appId, appVersion).iterator.collect {
+          listActive(appId, appVersion).iterator
+            .collect {
               case ActiveHealthCheck(_, actor) =>
                 (actor ? GetTaskHealth(taskId)).mapTo[Health]
-            }.to[Seq]
+            }
+            .to[Seq]
         )
     }
   }
@@ -257,7 +281,7 @@ class MarathonHealthCheckManager @Inject()(
           appTasks.iterator.map { task =>
             groupedHealth.get(task.taskId) match {
               case Some(xs) => task.taskId -> xs.toSeq
-              case None => task.taskId -> Nil
+              case None     => task.taskId -> Nil
             }
           }.toMap
         }

@@ -28,7 +28,7 @@ object JDBCUtils {
     val capture = """jdbc:([^:]+):""".r
     capture findFirstIn url match {
       case Some(capture(driverType)) => driverType
-      case None => ""
+      case None                      => ""
     }
   }
 
@@ -40,8 +40,8 @@ object JDBCUtils {
   def binaryColumnType(url: String): SQLSyntax = {
     driverType(url) match {
       case "postgresql" => sqls"bytea"
-      case "mysql" => sqls"longblob"
-      case _ => sqls"longblob"
+      case "mysql"      => sqls"longblob"
+      case _            => sqls"longblob"
     }
   }
 
@@ -53,8 +53,8 @@ object JDBCUtils {
   def timestampFunction(url: String): String = {
     driverType(url) match {
       case "postgresql" => "to_timestamp"
-      case "mysql" => "from_unixtime"
-      case _ => "from_unixtime"
+      case "mysql"      => "from_unixtime"
+      case _            => "from_unixtime"
     }
   }
 
@@ -103,6 +103,8 @@ object JDBCUtils {
     * @return Full event table name
     */
   def eventTableName(
-      namespace: String, appId: Int, channelId: Option[Int]): String =
+      namespace: String,
+      appId: Int,
+      channelId: Option[Int]): String =
     s"${namespace}_${appId}${channelId.map("_" + _).getOrElse("")}"
 }

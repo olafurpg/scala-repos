@@ -7,7 +7,9 @@ import rx.lang.scala.Observable
 
 object TaskStatusObservables {
   case class TaskStatusUpdate(
-      timestamp: Timestamp, taskId: Task.Id, status: MarathonTaskStatus) {
+      timestamp: Timestamp,
+      taskId: Task.Id,
+      status: MarathonTaskStatus) {
     def appId: PathId = taskId.appId
   }
 }

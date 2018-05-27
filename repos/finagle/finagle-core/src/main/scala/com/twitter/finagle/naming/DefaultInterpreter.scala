@@ -16,7 +16,7 @@ object DefaultInterpreter extends NameInterpreter {
     def lookup(path: Path): Activity[NameTree[Name]] =
       dtab.lookup(path) match {
         case NameTree.Neg => Namer.global.lookup(path)
-        case t => Activity.value(t)
+        case t            => Activity.value(t)
       }
 
     Namer.bind(lookup, NameTree.Leaf(path))

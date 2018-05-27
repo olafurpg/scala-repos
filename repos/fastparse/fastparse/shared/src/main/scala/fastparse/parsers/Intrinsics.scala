@@ -44,7 +44,7 @@ object Intrinsics {
   case class CharsWhile(pred: Char => Boolean, min: Int = 1)
       extends Parser[Unit] {
     private[this] val uberSet = CharBitSet(
-        (Char.MinValue to Char.MaxValue).filter(pred))
+      (Char.MinValue to Char.MaxValue).filter(pred))
 
     def parseRec(cfg: ParseCtx, index: Int) = {
       var curr = index

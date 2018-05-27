@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -74,8 +74,9 @@ object VersionLog {
             version <- jv match {
               case JString(`unsetSentinel`) =>
                 \/.left(
-                    NotFound("No current data for the path %s exists; it has been archived."
-                          .format(dir)))
+                  NotFound(
+                    "No current data for the path %s exists; it has been archived."
+                      .format(dir)))
               case other =>
                 other.validated[VersionEntry].disjunction leftMap { err =>
                   Corrupt(err.message)
@@ -99,7 +100,7 @@ object VersionLog {
     if (!baseDir.isDirectory) {
       if (!baseDir.mkdirs)
         throw new IllegalStateException(
-            baseDir + " cannot be created as a directory.")
+          baseDir + " cannot be created as a directory.")
     }
 
     val logFiles = new LogFiles(baseDir)
@@ -112,7 +113,7 @@ object VersionLog {
           jv <- JParser.parseFromFile(headFile).leftMap(Error.thrown)
           version <- jv match {
             case JString(`unsetSentinel`) => Success(None)
-            case other => other.validated[VersionEntry].map(Some(_))
+            case other                    => other.validated[VersionEntry].map(Some(_))
           }
         } yield version
       } else {
@@ -152,10 +153,11 @@ object VersionLog {
 /**
   * Track path versions. This class is not thread safe
   */
-class VersionLog(logFiles: VersionLog.LogFiles,
-                 initVersion: Option[VersionEntry],
-                 initAllVersions: List[VersionEntry],
-                 initCompletedVersions: Set[UUID])
+class VersionLog(
+    logFiles: VersionLog.LogFiles,
+    initVersion: Option[VersionEntry],
+    initAllVersions: List[VersionEntry],
+    initCompletedVersions: Set[UUID])
     extends Logging {
   import VersionLog._
   import logFiles._
@@ -191,14 +193,16 @@ class VersionLog(logFiles: VersionLog.LogFiles,
     if (allVersions.exists(_.id == version)) {
       !isCompleted(version) whenM {
         logger.debug("Completing version " + version)
-        IOUtils.writeToFile(version.serialize.renderCompact + "\n",
-                            completedFile)
+        IOUtils.writeToFile(
+          version.serialize.renderCompact + "\n",
+          completedFile)
       } map { _ =>
         PrecogUnit
       }
     } else {
-      IO.throwIO(new IllegalStateException(
-              "Cannot make nonexistent version %s current" format version))
+      IO.throwIO(
+        new IllegalStateException(
+          "Cannot make nonexistent version %s current" format version))
     }
   }
 
@@ -211,8 +215,9 @@ class VersionLog(logFiles: VersionLog.LogFiles,
             currentVersion = Some(entry);
         }
       } flatMap {
-        _.isEmpty.whenM(IO.throwIO(new IllegalStateException(
-                    "Attempt to set head to nonexistent version %s" format newHead)))
+        _.isEmpty.whenM(
+          IO.throwIO(new IllegalStateException(
+            "Attempt to set head to nonexistent version %s" format newHead)))
       }
     } map { _ =>
       PrecogUnit
@@ -225,7 +230,9 @@ class VersionLog(logFiles: VersionLog.LogFiles,
 }
 
 case class VersionEntry(
-    id: UUID, typeName: PathData.DataType, timestamp: Instant)
+    id: UUID,
+    typeName: PathData.DataType,
+    timestamp: Instant)
 
 object VersionEntry {
   implicit val versionEntryIso =
@@ -233,8 +240,8 @@ object VersionEntry {
 
   val schemaV1 = "id" :: "typeName" :: "timestamp" :: HNil
 
-  implicit val Decomposer: Decomposer[VersionEntry] = decomposerV(
-      schemaV1, Some("1.0".v))
-  implicit val Extractor: Extractor[VersionEntry] = extractorV(
-      schemaV1, Some("1.0".v))
+  implicit val Decomposer: Decomposer[VersionEntry] =
+    decomposerV(schemaV1, Some("1.0".v))
+  implicit val Extractor: Extractor[VersionEntry] =
+    extractorV(schemaV1, Some("1.0".v))
 }

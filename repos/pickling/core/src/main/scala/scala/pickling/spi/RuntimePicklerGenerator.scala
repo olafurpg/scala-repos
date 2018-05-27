@@ -10,8 +10,9 @@ trait RuntimePicklerGenerator {
 
   /** Create a new pickler using the given tagKey. */
   def genPickler(
-      classLoader: ClassLoader, clazz: Class[_], tag: FastTypeTag[_])(
-      implicit share: refs.Share): Pickler[_]
+      classLoader: ClassLoader,
+      clazz: Class[_],
+      tag: FastTypeTag[_])(implicit share: refs.Share): Pickler[_]
 
   /** Create a new unpickler using the given tagKey. */
   def genUnpickler(mirror: Mirror, key: String)(

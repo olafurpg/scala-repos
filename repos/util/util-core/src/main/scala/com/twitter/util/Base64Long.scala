@@ -7,70 +7,11 @@ package com.twitter.util
   */
 object Base64Long {
   val StandardBase64Alphabet: Int => Char = Array[Char](
-      'A',
-      'B',
-      'C',
-      'D',
-      'E',
-      'F',
-      'G',
-      'H',
-      'I',
-      'J',
-      'K',
-      'L',
-      'M',
-      'N',
-      'O',
-      'P',
-      'Q',
-      'R',
-      'S',
-      'T',
-      'U',
-      'V',
-      'W',
-      'X',
-      'Y',
-      'Z',
-      'a',
-      'b',
-      'c',
-      'd',
-      'e',
-      'f',
-      'g',
-      'h',
-      'i',
-      'j',
-      'k',
-      'l',
-      'm',
-      'n',
-      'o',
-      'p',
-      'q',
-      'r',
-      's',
-      't',
-      'u',
-      'v',
-      'w',
-      'x',
-      'y',
-      'z',
-      '0',
-      '1',
-      '2',
-      '3',
-      '4',
-      '5',
-      '6',
-      '7',
-      '8',
-      '9',
-      '+',
-      '/'
+    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
+    'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd',
+    'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
+    't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7',
+    '8', '9', '+', '/'
   )
 
   /**
@@ -115,16 +56,17 @@ object Base64Long {
     * The number is treated as unsigned, so there is never a leading negative sign, and the
     * representations of negative numbers are larger than positive numbers.
     */
-  def toBase64(builder: StringBuilder,
-               l: Long,
-               alphabet: Int => Char = StandardBase64Alphabet) {
+  def toBase64(
+      builder: StringBuilder,
+      l: Long,
+      alphabet: Int => Char = StandardBase64Alphabet) {
     if (l == 0) {
       // Special case for zero: Just like in decimal, if the number is
       // zero, represent it as a single zero digit.
       builder.append(alphabet(0))
     } else {
       var bitPosition = StartingBitPosition
-      while ( (l >>> bitPosition) == 0) {
+      while ((l >>> bitPosition) == 0) {
         bitPosition -= DigitWidth
       }
       // Copy in the 6-bit segments, one at a time.

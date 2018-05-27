@@ -51,22 +51,22 @@ class RewriteBooleans extends Phase {
     * conversion to a real boolean. */
   def toFake(n: Node) = n match {
     case ToRealBoolean(ch) => ch
-    case _ => ToFakeBoolean.typed(n.nodeType, n).infer()
+    case _                 => ToFakeBoolean.typed(n.nodeType, n).infer()
   }
 
   /** Create a conversion to a real boolean, cancelling out an existing
     * conversion to a fake boolean. */
   def toReal(n: Node) = n match {
     case ToFakeBoolean(ch) => ch
-    case _ => ToRealBoolean.typed(n.nodeType, n).infer()
+    case _                 => ToRealBoolean.typed(n.nodeType, n).infer()
   }
 
   /** Check if a type is equivalent to the Scala Boolean type or a (possibly
     * nested) Option of that type. */
   def isBooleanLike(t: Type): Boolean = t match {
     case t: TypedType[_] if t.scalaType == ScalaBaseType.booleanType => true
-    case t: OptionType => isBooleanLike(t.elementType)
-    case _ => false
+    case t: OptionType                                               => isBooleanLike(t.elementType)
+    case _                                                           => false
   }
 }
 

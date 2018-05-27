@@ -45,9 +45,14 @@ private[hive] class SparkExecuteStatementOperation(
     statement: String,
     confOverlay: JMap[String, String],
     runInBackground: Boolean = true)(
-    hiveContext: HiveContext, sessionToActivePool: SMap[SessionHandle, String])
+    hiveContext: HiveContext,
+    sessionToActivePool: SMap[SessionHandle, String])
     extends ExecuteStatementOperation(
-        parentSession, statement, confOverlay, runInBackground) with Logging {
+      parentSession,
+      statement,
+      confOverlay,
+      runInBackground)
+    with Logging {
 
   private var result: DataFrame = _
   private var iter: Iterator[SparkRow] = _
@@ -61,7 +66,9 @@ private[hive] class SparkExecuteStatementOperation(
       logInfo(s"Result Schema: ${result.queryExecution.analyzed.output}")
       val schema = result.queryExecution.analyzed.output.map { attr =>
         new FieldSchema(
-            attr.name, HiveMetastoreTypes.toMetastoreType(attr.dataType), "")
+          attr.name,
+          HiveMetastoreTypes.toMetastoreType(attr.dataType),
+          "")
       }
       new TableSchema(schema.asJava)
     }
@@ -75,7 +82,9 @@ private[hive] class SparkExecuteStatementOperation(
   }
 
   def addNonNullColumnValue(
-      from: SparkRow, to: ArrayBuffer[Any], ordinal: Int) {
+      from: SparkRow,
+      to: ArrayBuffer[Any],
+      ordinal: Int) {
     dataTypes(ordinal) match {
       case StringType =>
         to += from.getString(ordinal)
@@ -170,9 +179,10 @@ private[hive] class SparkExecuteStatementOperation(
           } catch {
             case e: Exception =>
               setOperationException(new HiveSQLException(e))
-              logError("Error running hive query as user : " +
-                       sparkServiceUGI.getShortUserName(),
-                       e)
+              logError(
+                "Error running hive query as user : " +
+                  sparkServiceUGI.getShortUserName(),
+                e)
           }
         }
       }
@@ -186,9 +196,9 @@ private[hive] class SparkExecuteStatementOperation(
         case rejected: RejectedExecutionException =>
           setState(OperationState.ERROR)
           throw new HiveSQLException(
-              "The background threadpool cannot accept" +
+            "The background threadpool cannot accept" +
               " new task for execution, please retry the operation",
-              rejected)
+            rejected)
         case NonFatal(e) =>
           logError(s"Error executing query in background", e)
           setState(OperationState.ERROR)
@@ -207,11 +217,11 @@ private[hive] class SparkExecuteStatementOperation(
     Thread.currentThread().setContextClassLoader(executionHiveClassLoader)
 
     HiveThriftServer2.listener.onStatementStart(
-        statementId,
-        parentSession.getSessionHandle.getSessionId.toString,
-        statement,
-        statementId,
-        parentSession.getUsername)
+      statementId,
+      parentSession.getSessionHandle.getSessionId.toString,
+      statement,
+      statementId,
+      parentSession.getUsername)
     hiveContext.sparkContext.setJobGroup(statementId, statement)
     sessionToActivePool.get(parentSession.getSessionHandle).foreach { pool =>
       hiveContext.sparkContext.setLocalProperty("spark.scheduler.pool", pool)
@@ -223,11 +233,11 @@ private[hive] class SparkExecuteStatementOperation(
         case SetCommand(Some((SQLConf.THRIFTSERVER_POOL.key, Some(value)))) =>
           sessionToActivePool(parentSession.getSessionHandle) = value
           logInfo(
-              s"Setting spark.scheduler.pool=$value for future statements in this session.")
+            s"Setting spark.scheduler.pool=$value for future statements in this session.")
         case _ =>
       }
-      HiveThriftServer2.listener.onStatementParsed(
-          statementId, result.queryExecution.toString())
+      HiveThriftServer2.listener
+        .onStatementParsed(statementId, result.queryExecution.toString())
       iter = {
         val useIncrementalCollect = hiveContext
           .getConf("spark.sql.thriftServer.incrementalCollect", "false")
@@ -254,7 +264,9 @@ private[hive] class SparkExecuteStatementOperation(
         logError(s"Error executing query, currentState $currentState, ", e)
         setState(OperationState.ERROR)
         HiveThriftServer2.listener.onStatementError(
-            statementId, e.getMessage, SparkUtils.exceptionString(e))
+          statementId,
+          e.getMessage,
+          SparkUtils.exceptionString(e))
         throw new HiveSQLException(e.toString)
     }
     setState(OperationState.FINISHED)

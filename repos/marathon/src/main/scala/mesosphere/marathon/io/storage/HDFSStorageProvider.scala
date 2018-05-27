@@ -14,7 +14,10 @@ import org.apache.hadoop.fs.{FileSystem, Path}
   * @param fsPath the path inside the file system.
   */
 case class HDFSStorageItem(
-    fs: FileSystem, fsPath: Path, base: String, path: String)
+    fs: FileSystem,
+    fsPath: Path,
+    base: String,
+    path: String)
     extends StorageItem {
 
   def store(fn: (OutputStream) => Unit): StorageItem = {

@@ -9,7 +9,9 @@ object TraitHasImplicitBound extends AnnotatorPart[ScTrait] {
   def kind = classOf[ScTrait]
 
   def annotate(
-      definition: ScTrait, holder: AnnotationHolder, typeAware: Boolean) {
+      definition: ScTrait,
+      holder: AnnotationHolder,
+      typeAware: Boolean) {
     val contextBoundElements =
       definition.typeParameters.flatMap(p => p.contextBoundTypeElement)
     for (te <- contextBoundElements) {

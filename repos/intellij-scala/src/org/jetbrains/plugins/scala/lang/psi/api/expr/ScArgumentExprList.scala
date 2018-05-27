@@ -9,7 +9,7 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params._
 import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.Parameter
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 07.03.2008
   */
@@ -64,7 +64,7 @@ trait ScArgumentExprList extends ScArguments {
   def missedLastExpr: Boolean = {
     var child = getLastChild
     while (child != null &&
-    child.getNode.getElementType != ScalaTokenTypes.tCOMMA) {
+           child.getNode.getElementType != ScalaTokenTypes.tCOMMA) {
       if (child.isInstanceOf[ScExpression]) return false
       child = child.getPrevSibling
     }

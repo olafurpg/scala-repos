@@ -31,8 +31,9 @@ trait PicklerRegistry {
     * @param tag The full tag of the type we're pickling, which may or may not include type parameters.
     */
   def genPickler(
-      classLoader: ClassLoader, clazz: Class[_], tag: FastTypeTag[_])(
-      implicit share: refs.Share): Pickler[_]
+      classLoader: ClassLoader,
+      clazz: Class[_],
+      tag: FastTypeTag[_])(implicit share: refs.Share): Pickler[_]
 
   /** Checks the existince of an unpickler.
     *
@@ -66,7 +67,8 @@ trait PicklerRegistry {
     * @param p  The unpickler to register.
     */
   def registerPicklerUnpickler[T](
-      key: String, p: (Pickler[T] with Unpickler[T]))
+      key: String,
+      p: (Pickler[T] with Unpickler[T]))
     : Unit // TODO - Return old pickler if one existed?
 
   /** Registers a function which can generate picklers for a given type constructor.
@@ -79,7 +81,8 @@ trait PicklerRegistry {
     *                   the arguments are.  You can treat this case as 'existential' arguments.
     */
   def registerPicklerGenerator[T](
-      typeConstructorKey: String, generator: AppliedType => Pickler[T]): Unit
+      typeConstructorKey: String,
+      generator: AppliedType => Pickler[T]): Unit
 
   /** Registers a function which can generate picklers for a given type constructor.
     *
@@ -88,7 +91,8 @@ trait PicklerRegistry {
     *                   this type.
     */
   def registerUnpicklerGenerator[T](
-      typeConstructorKey: String, generator: AppliedType => Unpickler[T]): Unit
+      typeConstructorKey: String,
+      generator: AppliedType => Unpickler[T]): Unit
 
   /** Registers a function which can generate picklers for a given type constructor.
     *

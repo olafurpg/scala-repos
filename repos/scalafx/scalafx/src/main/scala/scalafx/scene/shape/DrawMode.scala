@@ -42,8 +42,9 @@ object DrawMode extends SFXEnumDelegateCompanion[jfxss.DrawMode, DrawMode] {
   /**
     * Render polygonal faces as solid surfaces.
     */
-  @deprecated("Use Fill instead; FILL will be removed in a future release.",
-              "8.0.0-M4")
+  @deprecated(
+    "Use Fill instead; FILL will be removed in a future release.",
+    "8.0.0-M4")
   val FILL = Fill
 
   /**
@@ -54,8 +55,9 @@ object DrawMode extends SFXEnumDelegateCompanion[jfxss.DrawMode, DrawMode] {
   /**
     * Render polygonal faces as wireframes, with lines linking consecutive vertices.
     */
-  @deprecated("Use Line instead; LINE will be removed in a future release.",
-              "8.0.0-M4")
+  @deprecated(
+    "Use Line instead; LINE will be removed in a future release.",
+    "8.0.0-M4")
   val LINE = Line
 
   protected override def unsortedValues: Array[DrawMode] = Array(Fill, Line)

@@ -5,12 +5,19 @@ import java.awt.event.{ActionEvent, ActionListener}
 import java.util
 import javax.swing.table.AbstractTableModel
 
-import com.intellij.openapi.roots.ui.configuration.{ModuleConfigurationState, ModuleElementsEditor}
+import com.intellij.openapi.roots.ui.configuration.{
+  ModuleConfigurationState,
+  ModuleElementsEditor
+}
 import com.intellij.ui.CollectionListModel
 import com.intellij.util.text.DateFormatUtil
 import org.jetbrains.plugins.scala.util.JListCompatibility
 import org.jetbrains.plugins.scala.util.JListCompatibility.CollectionListModelWrapper
-import org.jetbrains.sbt.resolvers.{SbtResolver, SbtResolverIndex, SbtResolverIndexesManager}
+import org.jetbrains.sbt.resolvers.{
+  SbtResolver,
+  SbtResolverIndex,
+  SbtResolverIndexesManager
+}
 import org.jetbrains.sbt.settings.SbtSystemSettings
 
 import scala.collection.JavaConverters._
@@ -23,7 +30,7 @@ class SbtModuleSettingsEditor(state: ModuleConfigurationState)
     extends ModuleElementsEditor(state) {
   private val myForm = new SbtModuleSettingsForm
   private val modelWrapper = new CollectionListModelWrapper(
-      new CollectionListModel[String](new util.ArrayList[String]))
+    new CollectionListModel[String](new util.ArrayList[String]))
   private val resolvers = SbtModule.getResolversFrom(getModel.getModule).toSeq
 
   def getDisplayName = SbtBundle("sbt.settings.sbtModuleSettings")
@@ -34,9 +41,8 @@ class SbtModuleSettingsEditor(state: ModuleConfigurationState)
 
   def createComponentImpl() = {
     myForm.sbtImportsList.setEmptyText(
-        SbtBundle("sbt.settings.noImplicitImportsFound"))
-    JListCompatibility.setModel(
-        myForm.sbtImportsList, modelWrapper.getModelRaw)
+      SbtBundle("sbt.settings.noImplicitImportsFound"))
+    JListCompatibility.setModel(myForm.sbtImportsList, modelWrapper.getModelRaw)
 
     myForm.updateButton.addActionListener(new ActionListener {
       override def actionPerformed(e: ActionEvent): Unit = {
@@ -53,12 +59,13 @@ class SbtModuleSettingsEditor(state: ModuleConfigurationState)
     val moduleSettings = SbtSystemSettings
       .getInstance(state.getProject)
       .getLinkedProjectSettings(getModel.getModule)
-    myForm.sbtVersionTextField.setText(moduleSettings
-          .map(_.sbtVersion)
-          .getOrElse(SbtBundle("sbt.settings.sbtVersionNotDetected")))
+    myForm.sbtVersionTextField.setText(
+      moduleSettings
+        .map(_.sbtVersion)
+        .getOrElse(SbtBundle("sbt.settings.sbtVersionNotDetected")))
 
     modelWrapper.getModel.replaceAll(
-        SbtModule.getImportsFrom(getModel.getModule).asJava)
+      SbtModule.getImportsFrom(getModel.getModule).asJava)
 
     myForm.resolversTable.setModel(new ResolversModel(resolvers))
     myForm.resolversTable.setRowSelectionInterval(0, 0)
@@ -72,9 +79,9 @@ private class ResolversModel(val resolvers: Seq[SbtResolver])
     extends AbstractTableModel {
 
   private val columns = Seq(
-      SbtBundle("sbt.settings.resolvers.name"),
-      SbtBundle("sbt.settings.resolvers.url"),
-      SbtBundle("sbt.settings.resolvers.updated")
+    SbtBundle("sbt.settings.resolvers.name"),
+    SbtBundle("sbt.settings.resolvers.url"),
+    SbtBundle("sbt.settings.resolvers.updated")
   )
 
   def getColumnCount = columns.size

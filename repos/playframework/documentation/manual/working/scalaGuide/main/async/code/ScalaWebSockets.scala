@@ -19,7 +19,9 @@ object ScalaWebSockets extends PlaySpecification {
   "Scala WebSockets" should {
 
     def runWebSocket[In, Out](
-        webSocket: WebSocket, in: Source[Message, _], expectOut: Int)(
+        webSocket: WebSocket,
+        in: Source[Message, _],
+        expectOut: Int)(
         implicit mat: Materializer): Either[Result, List[Message]] = {
       await(webSocket(FakeRequest())).right.map { flow =>
         // When running in the real world, if the flow cancels upstream, Play's WebSocket protocol implementation will
@@ -30,16 +32,16 @@ object ScalaWebSockets extends PlaySpecification {
         val flowResult =
           in via flow runWith Sink
             .fold[(List[Message], Int), Message]((Nil, expectOut)) {
-            (state, out) =>
-              val (result, remaining) = state
-              if (remaining == 1) {
-                promise.success(result :+ out)
-              }
-              (result :+ out, remaining - 1)
-          }
+              (state, out) =>
+                val (result, remaining) = state
+                if (remaining == 1) {
+                  promise.success(result :+ out)
+                }
+                (result :+ out, remaining - 1)
+            }
         import play.api.libs.iteratee.Execution.Implicits.trampoline
         await(
-            Future.firstCompletedOf(Seq(promise.future, flowResult.map(_._1))))
+          Future.firstCompletedOf(Seq(promise.future, flowResult.map(_._1))))
       }
     }
 
@@ -48,9 +50,10 @@ object ScalaWebSockets extends PlaySpecification {
       import akka.actor._
 
       "allow creating a simple echoing actor" in new WithApplication() {
-        runWebSocket(Samples.Controller1.socket,
-                     Source.single(TextMessage("foo")),
-                     1) must beRight.like {
+        runWebSocket(
+          Samples.Controller1.socket,
+          Source.single(TextMessage("foo")),
+          1) must beRight.like {
           case list =>
             list must_== List(TextMessage("I received your message: foo"))
         }
@@ -72,10 +75,10 @@ object ScalaWebSockets extends PlaySpecification {
         }
 
         runWebSocket(
-            WebSocket.acceptWithActor[String, String](
-                req => out => Props(new MyActor)),
-            Source.empty,
-            0
+          WebSocket.acceptWithActor[String, String](req =>
+            out => Props(new MyActor)),
+          Source.empty,
+          0
         ) must beRight[List[Message]]
         await(closed.future) must_== ()
       }
@@ -92,38 +95,39 @@ object ScalaWebSockets extends PlaySpecification {
         }
 
         runWebSocket(
-            WebSocket.acceptWithActor[String, String](
-                req => out => Props(new MyActor)),
-            Source.maybe,
-            0
+          WebSocket.acceptWithActor[String, String](req =>
+            out => Props(new MyActor)),
+          Source.maybe,
+          0
         ) must beRight[List[Message]]
       }
 
       "allow rejecting the WebSocket" in new WithApplication() {
-        runWebSocket(Samples.Controller2.socket, Source.empty, 0) must beLeft.which {
-          result =>
+        runWebSocket(Samples.Controller2.socket, Source.empty, 0) must beLeft
+          .which { result =>
             result.header.status must_== FORBIDDEN
-        }
+          }
       }
 
       "allow creating a json actor" in new WithApplication() {
         val json = Json.obj("foo" -> "bar")
-        runWebSocket(Samples.Controller4.socket,
-                     Source.single(TextMessage(Json.stringify(json))),
-                     1) must beRight.which { out =>
+        runWebSocket(
+          Samples.Controller4.socket,
+          Source.single(TextMessage(Json.stringify(json))),
+          1) must beRight.which { out =>
           out must_== List(TextMessage(Json.stringify(json)))
         }
       }
 
       "allow creating a higher level object actor" in new WithApplication() {
         runWebSocket(
-            Samples.Controller5.socket,
-            Source.single(TextMessage(Json.stringify(
-                        Json.toJson(Samples.Controller5.InEvent("blah"))))),
-            1
+          Samples.Controller5.socket,
+          Source.single(TextMessage(
+            Json.stringify(Json.toJson(Samples.Controller5.InEvent("blah"))))),
+          1
         ) must beRight.which { out =>
-          out must_== List(TextMessage(Json.stringify(
-                      Json.toJson(Samples.Controller5.OutEvent("blah")))))
+          out must_== List(TextMessage(
+            Json.stringify(Json.toJson(Samples.Controller5.OutEvent("blah")))))
         }
       }
     }
@@ -131,23 +135,24 @@ object ScalaWebSockets extends PlaySpecification {
     "support iteratees" in {
 
       "iteratee1" in new WithApplication() {
-        runWebSocket(Samples.Controller6.socket, Source.empty, 1) must beRight.which {
-          out =>
+        runWebSocket(Samples.Controller6.socket, Source.empty, 1) must beRight
+          .which { out =>
             out must_== List(TextMessage("Hello!"))
-        }
+          }
       }
 
       "iteratee2" in new WithApplication() {
-        runWebSocket(Samples.Controller7.socket, Source.maybe, 1) must beRight.which {
-          out =>
+        runWebSocket(Samples.Controller7.socket, Source.maybe, 1) must beRight
+          .which { out =>
             out must_== List(TextMessage("Hello!"))
-        }
+          }
       }
 
       "iteratee3" in new WithApplication() {
-        runWebSocket(Samples.Controller8.socket,
-                     Source.single(TextMessage("foo")),
-                     1) must beRight.which { out =>
+        runWebSocket(
+          Samples.Controller8.socket,
+          Source.single(TextMessage("foo")),
+          1) must beRight.which { out =>
           out must_== List(TextMessage("I received your message: foo"))
         }
       }
@@ -204,9 +209,8 @@ object Samples {
     import play.api.Play.materializer
 
     def socket = WebSocket.tryAcceptWithActor[String, String] { request =>
-      Future.successful(
-          request.session.get("user") match {
-        case None => Left(Forbidden)
+      Future.successful(request.session.get("user") match {
+        case None    => Left(Forbidden)
         case Some(_) => Right(MyWebSocketActor.props)
       })
     }
@@ -234,9 +238,8 @@ object Samples {
     import play.api.Play.current
     import play.api.Play.materializer
 
-    def socket = WebSocket.acceptWithActor[JsValue, JsValue] {
-      request => out =>
-        MyWebSocketActor.props(out)
+    def socket = WebSocket.acceptWithActor[JsValue, JsValue] { request => out =>
+      MyWebSocketActor.props(out)
     }
     //#actor-json
   }

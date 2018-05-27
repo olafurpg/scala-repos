@@ -34,7 +34,7 @@ object Test extends App {
         }
 
         override def toString() = maybeValue match {
-          case None => "Susp(?)"
+          case None        => "Susp(?)"
           case Some(value) => "Susp(" + value + ")"
         }
       }

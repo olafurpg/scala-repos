@@ -29,14 +29,16 @@ private[game] object GameDiff {
     }
 
     def dOpt[A, B <: BSONValue](
-        name: String, getter: Game => A, toBson: A => Option[B]) {
+        name: String,
+        getter: Game => A,
+        toBson: A => Option[B]) {
       val (va, vb) = (getter(a), getter(b))
       if (va != vb) {
         if (vb == None || vb == null || vb == "")
           unsetBuilder += (name -> BSONBoolean(true))
         else
           toBson(vb) match {
-            case None => unsetBuilder += (name -> BSONBoolean(true))
+            case None    => unsetBuilder += (name -> BSONBoolean(true))
             case Some(x) => setBuilder += name -> x
           }
       }
@@ -48,37 +50,43 @@ private[game] object GameDiff {
     d(binaryPgn, _.binaryPgn, ByteArray.ByteArrayBSONHandler.write)
     d(status, _.status.id, w.int)
     d(turns, _.turns, w.int)
-    d(castleLastMoveTime,
+    d(
+      castleLastMoveTime,
       _.castleLastMoveTime,
       CastleLastMoveTime.castleLastMoveTimeBSONHandler.write)
-    d(moveTimes,
+    d(
+      moveTimes,
       _.moveTimes,
       (x: Vector[Int]) =>
         ByteArray.ByteArrayBSONHandler.write(BinaryFormat.moveTime write x))
     dOpt(positionHashes, _.positionHashes, w.bytesO)
-    dOpt(clock,
-         _.clock,
-         (o: Option[Clock]) =>
-           o map { c =>
-             BSONHandlers.clockBSONWrite(a.createdAt, c)
-         })
-    dOpt(checkCount,
-         _.checkCount,
-         (o: CheckCount) =>
-           o.nonEmpty option { BSONHandlers.checkCountWriter write o })
+    dOpt(
+      clock,
+      _.clock,
+      (o: Option[Clock]) =>
+        o map { c =>
+          BSONHandlers.clockBSONWrite(a.createdAt, c)
+      })
+    dOpt(
+      checkCount,
+      _.checkCount,
+      (o: CheckCount) =>
+        o.nonEmpty option { BSONHandlers.checkCountWriter write o })
     if (a.variant == Crazyhouse)
-      dOpt(crazyData,
-           _.crazyData,
-           (o: Option[Crazyhouse.Data]) =>
-             o map BSONHandlers.crazyhouseDataBSONHandler.write)
+      dOpt(
+        crazyData,
+        _.crazyData,
+        (o: Option[Crazyhouse.Data]) =>
+          o map BSONHandlers.crazyhouseDataBSONHandler.write)
     for (i ← 0 to 1) {
       import Player.BSONFields._
       val name = s"p$i."
       val player: Game => Player =
         if (i == 0) (_.whitePlayer) else (_.blackPlayer)
-      dOpt(s"$name$lastDrawOffer",
-           player(_).lastDrawOffer,
-           w.map[Option, Int, BSONInteger])
+      dOpt(
+        s"$name$lastDrawOffer",
+        player(_).lastDrawOffer,
+        w.map[Option, Int, BSONInteger])
       dOpt(s"$name$isOfferingDraw", player(_).isOfferingDraw, w.boolO)
       dOpt(s"$name$isOfferingRematch", player(_).isOfferingRematch, w.boolO)
       dOpt(s"$name$proposeTakebackAt", player(_).proposeTakebackAt, w.intO)
@@ -91,7 +99,7 @@ private[game] object GameDiff {
   private def addUa(sets: List[Set]): List[Set] = sets match {
     case Nil => Nil
     case sets =>
-      (Game.BSONFields.updatedAt -> BSONJodaDateTimeHandler.write(
-              DateTime.now)) :: sets
+      (Game.BSONFields.updatedAt -> BSONJodaDateTimeHandler
+        .write(DateTime.now)) :: sets
   }
 }

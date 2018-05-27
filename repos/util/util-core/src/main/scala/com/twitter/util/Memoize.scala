@@ -129,7 +129,7 @@ object Memoize {
         // is absent, call missing() to determine what to do.
         memo.get(a) match {
           case Some(Right(b)) => b
-          case _ => missing(a)
+          case _              => missing(a)
         }
     }
 }

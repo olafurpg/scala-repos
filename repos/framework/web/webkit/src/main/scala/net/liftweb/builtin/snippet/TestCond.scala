@@ -27,7 +27,7 @@ import net.liftweb.http._
   */
 object TestCond extends DispatchSnippet {
   def dispatch: DispatchIt = {
-    case "loggedin" | "logged_in" | "LoggedIn" | "loggedIn" => loggedIn _
+    case "loggedin" | "logged_in" | "LoggedIn" | "loggedIn"     => loggedIn _
     case "loggedout" | "logged_out" | "LoggedOut" | "loggedOut" => loggedOut _
   }
 

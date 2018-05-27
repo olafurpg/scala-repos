@@ -24,7 +24,13 @@ import cascading.scheme.{NullScheme, Scheme}
 import cascading.tap.hadoop.Hfs
 import cascading.tap.SinkMode
 import cascading.tap.{Tap, SourceTap, SinkTap}
-import cascading.tuple.{Fields, Tuple => CTuple, TupleEntry, TupleEntryCollector, TupleEntryIterator}
+import cascading.tuple.{
+  Fields,
+  Tuple => CTuple,
+  TupleEntry,
+  TupleEntryCollector,
+  TupleEntryIterator
+}
 
 import cascading.pipe.Pipe
 
@@ -60,10 +66,11 @@ class InvalidSourceTap(val hdfsPaths: Iterable[String])
 
   override def getModifiedTime(conf: JobConf): Long = 0L
 
-  override def openForRead(flow: FlowProcess[JobConf],
-                           input: RecordReader[_, _]): TupleEntryIterator =
+  override def openForRead(
+      flow: FlowProcess[JobConf],
+      input: RecordReader[_, _]): TupleEntryIterator =
     throw new InvalidSourceException(
-        s"InvalidSourceTap: No good paths in $hdfsPaths")
+      s"InvalidSourceTap: No good paths in $hdfsPaths")
 
   override def resourceExists(conf: JobConf): Boolean = false
 
@@ -79,7 +86,8 @@ class InvalidSourceTap(val hdfsPaths: Iterable[String])
   // In the worst case if the flow plan is misconfigured,
   // openForRead on mappers should fail when using this tap.
   override def sourceConfInit(
-      flow: FlowProcess[JobConf], conf: JobConf): Unit = {
+      flow: FlowProcess[JobConf],
+      conf: JobConf): Unit = {
     conf.setInputFormat(classOf[cascading.tap.hadoop.io.MultiInputFormat])
     super.sourceConfInit(flow, conf)
   }
@@ -98,14 +106,13 @@ case object Write extends AccessMode
 
 object HadoopSchemeInstance {
   def apply(scheme: Scheme[_, _, _, _, _]) =
-    scheme.asInstanceOf[Scheme[
-            JobConf, RecordReader[_, _], OutputCollector[_, _], _, _]]
+    scheme.asInstanceOf[
+      Scheme[JobConf, RecordReader[_, _], OutputCollector[_, _], _, _]]
 }
 
 object CastHfsTap {
   // The scala compiler has problems with the generics in Cascading
-  def apply(
-      tap: Hfs): Tap[JobConf, RecordReader[_, _], OutputCollector[_, _]] =
+  def apply(tap: Hfs): Tap[JobConf, RecordReader[_, _], OutputCollector[_, _]] =
     tap.asInstanceOf[Tap[JobConf, RecordReader[_, _], OutputCollector[_, _]]]
 }
 
@@ -147,15 +154,16 @@ abstract class Source extends java.io.Serializable {
      */
     val uuid = java.util.UUID.randomUUID
     val srcName = sourceId + uuid.toString
-    assert(!sources.containsKey(srcName),
-           "Source %s had collision in uuid: %s".format(this, uuid))
+    assert(
+      !sources.containsKey(srcName),
+      "Source %s had collision in uuid: %s".format(this, uuid))
     sources.put(srcName, createTap(Read)(mode))
     FlowStateMap.mutate(flowDef) { st =>
       (st.addSource(srcName, this), ())
     }
     (mode, transformInTest) match {
       case (test: TestMode, false) => new Pipe(srcName)
-      case _ => transformForRead(new Pipe(srcName))
+      case _                       => transformForRead(new Pipe(srcName))
     }
   }
 
@@ -174,7 +182,7 @@ abstract class Source extends java.io.Serializable {
     }
     val newPipe = (mode, transformInTest) match {
       case (test: TestMode, false) => pipe
-      case _ => transformForWrite(pipe)
+      case _                       => transformForWrite(pipe)
     }
     val outPipe = new Pipe(sinkName, newPipe)
     flowDef.addTail(outPipe)
@@ -182,8 +190,9 @@ abstract class Source extends java.io.Serializable {
   }
 
   protected def checkFlowDefNotNull(implicit flowDef: FlowDef, mode: Mode) {
-    assert(flowDef != null,
-           "Trying to access null FlowDef while in mode: %s".format(mode))
+    assert(
+      flowDef != null,
+      "Trying to access null FlowDef while in mode: %s".format(mode))
   }
 
   protected def transformForWrite(pipe: Pipe) = pipe
@@ -201,7 +210,8 @@ abstract class Source extends java.io.Serializable {
 
   @deprecated("replace with Mappable.toIterator", "0.9.0")
   def readAtSubmitter[T](
-      implicit mode: Mode, conv: TupleConverter[T]): Stream[T] = {
+      implicit mode: Mode,
+      conv: TupleConverter[T]): Stream[T] = {
     validateTaps(mode)
     val tap = createTap(Read)(mode)
     mode
@@ -226,7 +236,9 @@ abstract class Source extends java.io.Serializable {
 trait Mappable[+T] extends Source with TypedSource[T] {
 
   final def mapTo[U](out: Fields)(mf: (T) => U)(
-      implicit flowDef: FlowDef, mode: Mode, setter: TupleSetter[U]): Pipe = {
+      implicit flowDef: FlowDef,
+      mode: Mode,
+      setter: TupleSetter[U]): Pipe = {
     RichPipe(read(flowDef, mode))
       .mapTo[T, U](sourceFields -> out)(mf)(converter, setter)
   }
@@ -236,7 +248,9 @@ trait Mappable[+T] extends Source with TypedSource[T] {
     * Filter does not change column names, and we generally expect to change columns here
     */
   final def flatMapTo[U](out: Fields)(mf: (T) => TraversableOnce[U])(
-      implicit flowDef: FlowDef, mode: Mode, setter: TupleSetter[U]): Pipe = {
+      implicit flowDef: FlowDef,
+      mode: Mode,
+      setter: TupleSetter[U]): Pipe = {
     RichPipe(read(flowDef, mode))
       .flatMapTo[T, U](sourceFields -> out)(mf)(converter, setter)
   }
@@ -270,9 +284,10 @@ trait SingleMappable[T] extends Mappable[T] {
   */
 class NullTap[Config, Input, Output, SourceContext, SinkContext]
     extends SinkTap[Config, Output](
-        new NullScheme[Config, Input, Output, SourceContext, SinkContext](
-            Fields.NONE, Fields.ALL),
-        SinkMode.UPDATE) {
+      new NullScheme[Config, Input, Output, SourceContext, SinkContext](
+        Fields.NONE,
+        Fields.ALL),
+      SinkMode.UPDATE) {
 
   def getIdentifier = "nullTap"
   def openForWrite(flowProcess: FlowProcess[Config], output: Output) =
@@ -297,7 +312,11 @@ trait BaseNullSource extends Source {
         mode match {
           case Hdfs(_, _) =>
             new NullTap[
-                JobConf, RecordReader[_, _], OutputCollector[_, _], Any, Any]
+              JobConf,
+              RecordReader[_, _],
+              OutputCollector[_, _],
+              Any,
+              Any]
           case Local(_) =>
             new NullTap[Properties, InputStream, OutputStream, Any, Any]
           case Test(_) =>

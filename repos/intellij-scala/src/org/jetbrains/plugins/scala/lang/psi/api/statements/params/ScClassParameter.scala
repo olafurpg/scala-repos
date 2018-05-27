@@ -6,14 +6,19 @@ package statements
 package params
 
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScModifierListOwner
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScMember}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass,
+  ScMember
+}
 
 /**
   * @author Alexander Podkhalyuzin
   * Date: 22.02.2008
   */
 trait ScClassParameter
-    extends ScParameter with ScModifierListOwner with ScMember {
+    extends ScParameter
+    with ScModifierListOwner
+    with ScMember {
   def isVal: Boolean
   def isVar: Boolean
   def isPrivateThis: Boolean
@@ -26,7 +31,7 @@ trait ScClassParameter
     case c: ScClass if c.isCase =>
       val isInPrimaryConstructorFirstParamSection = c.constructor match {
         case Some(const) => const.effectiveFirstParameterSection.contains(this)
-        case None => false
+        case None        => false
       }
       val hasExplicitModifier =
         Option(getModifierList).exists(_.hasExplicitModifiers)

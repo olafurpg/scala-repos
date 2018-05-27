@@ -39,7 +39,8 @@ object Modality extends SFXEnumDelegateCompanion[jfxs.Modality, Modality] {
     */
   val None = new Modality(jfxs.Modality.NONE)
   @deprecated(
-      "Use None; NONE will be removed in a future release", "8.0.60-R10")
+    "Use None; NONE will be removed in a future release",
+    "8.0.60-R10")
   val NONE = None
 
   /**
@@ -47,8 +48,8 @@ object Modality extends SFXEnumDelegateCompanion[jfxs.Modality, Modality] {
     */
   val WindowModal = new Modality(jfxs.Modality.WINDOW_MODAL)
   @deprecated(
-      "Use WindowModal; WINDOW_MODAL will be removed in a future release",
-      "8.0.60-R10")
+    "Use WindowModal; WINDOW_MODAL will be removed in a future release",
+    "8.0.60-R10")
   val WINDOW_MODAL = WindowModal
 
   /**
@@ -56,8 +57,8 @@ object Modality extends SFXEnumDelegateCompanion[jfxs.Modality, Modality] {
     */
   val ApplicationModal = new Modality(jfxs.Modality.APPLICATION_MODAL)
   @deprecated(
-      "Use ApplicationModal; APPLICATION_MODAL will be removed in a future release",
-      "8.0.60-R10")
+    "Use ApplicationModal; APPLICATION_MODAL will be removed in a future release",
+    "8.0.60-R10")
   val APPLICATION_MODAL = ApplicationModal
 
   protected override def unsortedValues: Array[Modality] =

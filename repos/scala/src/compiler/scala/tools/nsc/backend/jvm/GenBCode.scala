@@ -78,11 +78,12 @@ abstract class GenBCode extends BCodeSyncAndTry {
 
     /* ---------------- q2 ---------------- */
 
-    case class Item2(arrivalPos: Int,
-                     mirror: asm.tree.ClassNode,
-                     plain: asm.tree.ClassNode,
-                     bean: asm.tree.ClassNode,
-                     outFolder: scala.tools.nsc.io.AbstractFile) {
+    case class Item2(
+        arrivalPos: Int,
+        mirror: asm.tree.ClassNode,
+        plain: asm.tree.ClassNode,
+        bean: asm.tree.ClassNode,
+        outFolder: scala.tools.nsc.io.AbstractFile) {
       def isPoison = { arrivalPos == Int.MaxValue }
     }
 
@@ -103,11 +104,12 @@ abstract class GenBCode extends BCodeSyncAndTry {
         jclassBytes: Array[Byte]
     )
 
-    case class Item3(arrivalPos: Int,
-                     mirror: SubItem3,
-                     plain: SubItem3,
-                     bean: SubItem3,
-                     outFolder: scala.tools.nsc.io.AbstractFile) {
+    case class Item3(
+        arrivalPos: Int,
+        mirror: SubItem3,
+        plain: SubItem3,
+        bean: SubItem3,
+        outFolder: scala.tools.nsc.io.AbstractFile) {
 
       def isPoison = { arrivalPos == Int.MaxValue }
     }
@@ -139,7 +141,7 @@ abstract class GenBCode extends BCodeSyncAndTry {
               case ex: Throwable =>
                 ex.printStackTrace()
                 error(
-                    s"Error while emitting ${item.cunit.source}\n${ex.getMessage}")
+                  s"Error while emitting ${item.cunit.source}\n${ex.getMessage}")
             }
           }
         }
@@ -162,8 +164,8 @@ abstract class GenBCode extends BCodeSyncAndTry {
             caseInsensitively.put(lowercaseJavaClassName, claszSymbol)
           case Some(dupClassSym) =>
             reporter.warning(
-                claszSymbol.pos,
-                s"Class ${claszSymbol.javaClassName} differs only in case from ${dupClassSym.javaClassName}. " +
+              claszSymbol.pos,
+              s"Class ${claszSymbol.javaClassName} differs only in case from ${dupClassSym.javaClassName}. " +
                 "Such classes will overwrite one another on case-insensitive filesystems."
             )
         }
@@ -179,7 +181,8 @@ abstract class GenBCode extends BCodeSyncAndTry {
             if (claszSymbol.companionClass == NoSymbol) {
               mirrorCodeGen.genMirrorClass(claszSymbol, cunit)
             } else {
-              log(s"No mirror class for module with linked class: ${claszSymbol.fullName}")
+              log(
+                s"No mirror class for module with linked class: ${claszSymbol.fullName}")
               null
             }
           } else null
@@ -196,10 +199,10 @@ abstract class GenBCode extends BCodeSyncAndTry {
         val beanC =
           if (claszSymbol hasAnnotation BeanInfoAttr) {
             beanInfoCodeGen.genBeanInfoClass(
-                claszSymbol,
-                cunit,
-                fieldSymbols(claszSymbol),
-                methodSymbols(cd)
+              claszSymbol,
+              cunit,
+              fieldSymbols(claszSymbol),
+              methodSymbols(cd)
             )
           } else null
 
@@ -228,13 +231,14 @@ abstract class GenBCode extends BCodeSyncAndTry {
             case Item2(_, mirror, plain, bean, _) =>
               if (mirror != null)
                 byteCodeRepository.add(
-                    mirror, ByteCodeRepository.CompilationUnit)
+                  mirror,
+                  ByteCodeRepository.CompilationUnit)
               if (plain != null)
                 byteCodeRepository.add(
-                    plain, ByteCodeRepository.CompilationUnit)
+                  plain,
+                  ByteCodeRepository.CompilationUnit)
               if (bean != null)
-                byteCodeRepository.add(
-                    bean, ByteCodeRepository.CompilationUnit)
+                byteCodeRepository.add(bean, ByteCodeRepository.CompilationUnit)
           }
         if (settings.YoptBuildCallGraph)
           q2.asScala foreach { item =>
@@ -248,14 +252,15 @@ abstract class GenBCode extends BCodeSyncAndTry {
 
       def localOptimizations(classNode: ClassNode): Unit = {
         BackendStats.timed(BackendStats.methodOptTimer)(
-            localOpt.methodOptimizations(classNode))
+          localOpt.methodOptimizations(classNode))
       }
 
       def setInnerClasses(classNode: ClassNode): Unit =
         if (classNode != null) {
           classNode.innerClasses.clear()
           addInnerClasses(
-              classNode, bTypes.backendUtils.collectNestedClasses(classNode))
+            classNode,
+            bTypes.backendUtils.collectNestedClasses(classNode))
         }
 
       def run() {
@@ -276,14 +281,14 @@ abstract class GenBCode extends BCodeSyncAndTry {
             } catch {
               case e: java.lang.RuntimeException
                   if e.getMessage != null &&
-                  (e.getMessage contains "too large!") =>
+                    (e.getMessage contains "too large!") =>
                 reporter.error(
-                    NoPosition,
-                    s"Could not write class ${item.plain.name} because it exceeds JVM code size limits. ${e.getMessage}")
+                  NoPosition,
+                  s"Could not write class ${item.plain.name} because it exceeds JVM code size limits. ${e.getMessage}")
               case ex: Throwable =>
                 ex.printStackTrace()
                 error(
-                    s"Error while emitting ${item.plain.name}\n${ex.getMessage}")
+                  s"Error while emitting ${item.plain.name}\n${ex.getMessage}")
             }
           }
         }
@@ -406,7 +411,8 @@ abstract class GenBCode extends BCodeSyncAndTry {
     private def drainQ3() {
 
       def sendToDisk(
-          cfr: SubItem3, outFolder: scala.tools.nsc.io.AbstractFile) {
+          cfr: SubItem3,
+          outFolder: scala.tools.nsc.io.AbstractFile) {
         if (cfr != null) {
           val SubItem3(jclassName, jclassBytes) = cfr
           try {
@@ -414,7 +420,10 @@ abstract class GenBCode extends BCodeSyncAndTry {
               if (outFolder == null) null
               else getFileForClassfile(outFolder, jclassName, ".class")
             bytecodeWriter.writeClass(
-                jclassName, jclassName, jclassBytes, outFile)
+              jclassName,
+              jclassName,
+              jclassBytes,
+              outFile)
           } catch {
             case e: FileConflictException =>
               error(s"error writing $jclassName: ${e.getMessage}")
@@ -449,7 +458,7 @@ abstract class GenBCode extends BCodeSyncAndTry {
 
       def gen(tree: Tree) {
         tree match {
-          case EmptyTree => ()
+          case EmptyTree            => ()
           case PackageDef(_, stats) => stats foreach gen
           case cd: ClassDef =>
             q1 add Item1(arrivalPos, cd, cunit)

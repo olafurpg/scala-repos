@@ -20,7 +20,9 @@ import scala.language.postfixOps
 import scala.concurrent.{ExecutionContext, Future}
 
 class HttpServerExampleSpec
-    extends WordSpec with Matchers with CompileOnlySpec {
+    extends WordSpec
+    with Matchers
+    with CompileOnlySpec {
 
   // never actually called
   val log: LoggingAdapter = null
@@ -34,8 +36,8 @@ class HttpServerExampleSpec
     implicit val materializer = ActorMaterializer()
     implicit val executionContext = system.dispatcher
 
-    val serverSource: Source[Http.IncomingConnection,
-                             Future[Http.ServerBinding]] =
+    val serverSource
+      : Source[Http.IncomingConnection, Future[Http.ServerBinding]] =
       Http().bind(interface = "localhost", port = 8080)
     val bindingFuture: Future[Http.ServerBinding] = serverSource
       .to(Sink.foreach { connection =>
@@ -72,8 +74,8 @@ class HttpServerExampleSpec
   }
 
   // mock values:
-  val handleConnections: Sink[
-      Http.IncomingConnection, Future[Http.ServerBinding]] =
+  val handleConnections
+    : Sink[Http.IncomingConnection, Future[Http.ServerBinding]] =
     Sink.ignore.mapMaterializedValue(_ => Future.failed(new Exception("")))
 
   "binding-failure-handling" in compileOnlySpec {
@@ -114,7 +116,7 @@ class HttpServerExampleSpec
 
     val reactToTopLevelFailures =
       Flow[IncomingConnection].watchTermination()((_, termination) =>
-            termination.onFailure {
+        termination.onFailure {
           case cause => failureMonitor ! cause
       })
 
@@ -141,8 +143,10 @@ class HttpServerExampleSpec
     val httpEcho = Flow[HttpRequest].via(reactToConnectionFailure).map {
       request =>
         // simple text "echo" response:
-        HttpResponse(entity = HttpEntity(ContentTypes.`text/plain(UTF-8)`,
-                                         request.entity.dataBytes))
+        HttpResponse(
+          entity = HttpEntity(
+            ContentTypes.`text/plain(UTF-8)`,
+            request.entity.dataBytes))
     }
 
     serverSource.runForeach { con =>
@@ -166,8 +170,9 @@ class HttpServerExampleSpec
     val requestHandler: HttpRequest => HttpResponse = {
       case HttpRequest(GET, Uri.Path("/"), _, _, _) =>
         HttpResponse(
-            entity = HttpEntity(ContentTypes.`text/html(UTF-8)`,
-                                "<html><body>Hello world!</body></html>"))
+          entity = HttpEntity(
+            ContentTypes.`text/html(UTF-8)`,
+            "<html><body>Hello world!</body></html>"))
 
       case HttpRequest(GET, Uri.Path("/ping"), _, _, _) =>
         HttpResponse(entity = "PONG!")
@@ -208,8 +213,9 @@ class HttpServerExampleSpec
         val requestHandler: HttpRequest => HttpResponse = {
           case HttpRequest(GET, Uri.Path("/"), _, _, _) =>
             HttpResponse(
-                entity = HttpEntity(ContentTypes.`text/html(UTF-8)`,
-                                    "<html><body>Hello world!</body></html>"))
+              entity = HttpEntity(
+                ContentTypes.`text/html(UTF-8)`,
+                "<html><body>Hello world!</body></html>"))
 
           case HttpRequest(GET, Uri.Path("/ping"), _, _, _) =>
             HttpResponse(entity = "PONG!")
@@ -224,7 +230,7 @@ class HttpServerExampleSpec
         val bindingFuture =
           Http().bindAndHandleSync(requestHandler, "localhost", 8080)
         println(
-            s"Server online at http://localhost:8080/\nPress RETURN to stop...")
+          s"Server online at http://localhost:8080/\nPress RETURN to stop...")
         StdIn.readLine() // let it run until user presses return
         bindingFuture
           .flatMap(_.unbind()) // trigger unbinding from the port

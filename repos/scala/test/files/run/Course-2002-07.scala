@@ -53,11 +53,12 @@ object M0 {
     Console.println("        0 = " + eval(new Number(0)));
     Console.println("        1 = " + eval(new Number(1)));
     Console.println(
-        "    0 + 1 = " + eval(new Sum(new Number(0), new Number(1))));
+      "    0 + 1 = " + eval(new Sum(new Number(0), new Number(1))));
     Console.println(
-        "    1 + 2 = " + eval(new Sum(new Number(1), new Number(2))));
-    Console.println("2 + 3 + 4 = " + eval(
-            new Sum(new Sum(new Number(2), new Number(3)), new Number(4))));
+      "    1 + 2 = " + eval(new Sum(new Number(1), new Number(2))));
+    Console.println(
+      "2 + 3 + 4 = " + eval(
+        new Sum(new Sum(new Number(2), new Number(3)), new Number(4))));
     Console.println;
   }
 }
@@ -80,11 +81,13 @@ object M1 {
     Console.println("        0 = " + new Number(0).eval);
     Console.println("        1 = " + new Number(1).eval);
     Console.println(
-        "    0 + 1 = " + new Sum(new Number(0), new Number(1)).eval);
+      "    0 + 1 = " + new Sum(new Number(0), new Number(1)).eval);
     Console.println(
-        "    1 + 2 = " + new Sum(new Number(1), new Number(2)).eval);
-    Console.println("2 + 3 + 4 = " + new Sum(
-            new Sum(new Number(2), new Number(3)), new Number(4)).eval);
+      "    1 + 2 = " + new Sum(new Number(1), new Number(2)).eval);
+    Console.println(
+      "2 + 3 + 4 = " + new Sum(
+        new Sum(new Number(2), new Number(3)),
+        new Number(4)).eval);
     Console.println;
   }
 }
@@ -98,7 +101,7 @@ object M2 {
   case class Sum(e1: Expr, e2: Expr) extends Expr;
 
   def eval(e: Expr): Int = e match {
-    case Number(n) => n
+    case Number(n)   => n
     case Sum(e1, e2) => eval(e1) + eval(e2)
   }
 
@@ -108,7 +111,7 @@ object M2 {
     Console.println("    0 + 1 = " + eval(Sum(Number(0), Number(1))));
     Console.println("    1 + 2 = " + eval(Sum(Number(1), Number(2))));
     Console.println(
-        "2 + 3 + 4 = " + eval(Sum(Sum(Number(2), Number(3)), Number(4))));
+      "2 + 3 + 4 = " + eval(Sum(Sum(Number(2), Number(3)), Number(4))));
     Console.println;
   }
 }
@@ -119,7 +122,7 @@ object M3 {
 
   trait Expr {
     def eval: Int = this match {
-      case Number(n) => n
+      case Number(n)   => n
       case Sum(e1, e2) => e1.eval + e2.eval
     }
   }
@@ -132,7 +135,7 @@ object M3 {
     Console.println("    0 + 1 = " + Sum(Number(0), Number(1)).eval);
     Console.println("    1 + 2 = " + Sum(Number(1), Number(2)).eval);
     Console.println(
-        "2 + 3 + 4 = " + Sum(Sum(Number(2), Number(3)), Number(4)).eval);
+      "2 + 3 + 4 = " + Sum(Sum(Number(2), Number(3)), Number(4)).eval);
     Console.println;
   }
 }
@@ -142,7 +145,7 @@ object M3 {
 object M4 {
 
   def concat[a](xss: List[List[a]]): List[a] = xss match {
-    case List() => List()
+    case List()     => List()
     case xs :: xss1 => xs ::: concat(xss1)
   }
 
@@ -180,13 +183,14 @@ object M5 {
 
   def zipFun[a, b](xs: List[a], ys: List[b]): List[Tuple2[a, b]] =
     (xs, ys) match {
-      case (List(), _) => List()
-      case (_, List()) => List()
+      case (List(), _)          => List()
+      case (_, List())          => List()
       case (x :: xs1, y :: ys1) => (x, y) :: zipFun(xs1, ys1)
     }
 
   def test_zipFun[a, b](xs: List[a], ys: List[b]) = {
-    Console.println(zipFun(xs, ys).toString + " = zipFun(" + xs + "," + ys +
+    Console.println(
+      zipFun(xs, ys).toString + " = zipFun(" + xs + "," + ys +
         ")"); // !!! .toString
   }
 
@@ -220,7 +224,8 @@ object M6 {
     }
 
   def test_zipFun[a, b](xs: List[a], ys: List[b]) = {
-    Console.println(zipFun(xs, ys).toString + " = zipFun(" + xs + "," + ys +
+    Console.println(
+      zipFun(xs, ys).toString + " = zipFun(" + xs + "," + ys +
         ")"); // !!! .toString
   }
 
@@ -249,7 +254,7 @@ object M7 {
 
   def heads[a](xss: List[List[a]]): List[a] = xss flatMap {
     case x :: xs => List(x)
-    case List() => List()
+    case List()  => List()
   }
 
   def test_heads[a](xss: List[List[a]]) = {
@@ -292,7 +297,7 @@ object M8 {
   def heads[a](xss: List[List[a]]): List[a] = xss.flatMap { y =>
     y match {
       case x :: xs => List(x)
-      case List() => List()
+      case List()  => List()
     }
   }
 
@@ -335,9 +340,9 @@ object M9 {
 
   trait Expr {
     def derive(v: Var): Expr = this match {
-      case Number(_) => Number(0)
-      case Var(name) => if (name == v.name) Number(1) else Number(0)
-      case Sum(e1, e2) => Sum(e1 derive v, e2 derive v)
+      case Number(_)    => Number(0)
+      case Var(name)    => if (name == v.name) Number(1) else Number(0)
+      case Sum(e1, e2)  => Sum(e1 derive v, e2 derive v)
       case Prod(e1, e2) => Sum(Prod(e1, e2 derive v), Prod(e2, e1 derive v))
     }
   }
@@ -369,7 +374,7 @@ object M9 {
 object MA {
 
   def lookup[k, v](xs: List[Tuple2[k, v]], k: k): v = xs match {
-    case List() => sys.error("no value for " + k)
+    case List()          => sys.error("no value for " + k)
     case (k1, v1) :: xs1 => if (k1 == k) v1 else lookup(xs1, k)
   }
 
@@ -377,9 +382,9 @@ object MA {
     def +(that: Expr) = Sum(this, that);
     def *(that: Expr) = Prod(this, that);
     def derive(v: Var): Expr = this match {
-      case Number(_) => Number(0)
-      case Var(name) => if (name == v.name) Number(1) else Number(0)
-      case Sum(e1, e2) => (e1 derive v) + (e2 derive v)
+      case Number(_)    => Number(0)
+      case Var(name)    => if (name == v.name) Number(1) else Number(0)
+      case Sum(e1, e2)  => (e1 derive v) + (e2 derive v)
       case Prod(e1, e2) => e1 * (e2 derive v) + e2 * (e1 derive v)
     }
   }
@@ -396,24 +401,24 @@ object MA {
     override def toString = {
       def factorToString(e: Expr) = e match {
         case Sum(_, _) => "(" + e.toString + ")"
-        case _ => e.toString
+        case _         => e.toString
       }
       factorToString(e1) + " * " + factorToString(e2);
     }
   }
 
   def eval(e: Expr): Int = e match {
-    case Number(n) => n
-    case Var(_) => sys.error("cannot evaluate variable")
-    case Sum(e1, e2) => eval(e1) + eval(e2)
+    case Number(n)    => n
+    case Var(_)       => sys.error("cannot evaluate variable")
+    case Sum(e1, e2)  => eval(e1) + eval(e2)
     case Prod(e1, e2) => eval(e1) * eval(e2)
   }
 
   def evalvars(xs: List[(String, Int)]): Expr => Int = {
     def loop(e: Expr): Int = e match {
-      case Number(n) => n
-      case Var(name) => lookup(xs, name)
-      case Sum(e1, e2) => loop(e1) + loop(e2)
+      case Number(n)    => n
+      case Var(name)    => lookup(xs, name)
+      case Sum(e1, e2)  => loop(e1) + loop(e2)
       case Prod(e1, e2) => loop(e1) * loop(e2)
     }
     loop
@@ -444,7 +449,8 @@ object Utils {
 
   private def power0(x: Int, y: Int): Int =
     if (y == 1) x
-    else if (y % 2 == 0) power0(x * x, y / 2) else x * power0(x, y - 1);
+    else if (y % 2 == 0) power0(x * x, y / 2)
+    else x * power0(x, y - 1);
 
   def power(x: Int, y: Int): Int = (x, y) match {
     case (0, 0) => sys.error("power(0,0)")
@@ -457,19 +463,19 @@ object Utils {
   }
 
   def lookup(entries: List[(String, Int)], key: String): Int = entries match {
-    case List() => sys.error("no value for " + key)
+    case List()                    => sys.error("no value for " + key)
     case (k, v) :: _ if (k == key) => v
-    case _ :: rest => lookup(rest, key)
+    case _ :: rest                 => lookup(rest, key)
   }
 
   def compare(xs: List[String], ys: List[String]): Int = (xs, ys) match {
     case (List(), List()) => 0
-    case (List(), _) => -1
-    case (_, List()) => +1
+    case (List(), _)      => -1
+    case (_, List())      => +1
     case (x :: xs, y :: ys) => {
-        val diff = x.compareTo(y);
-        if (diff != 0) diff else compare(xs, ys)
-      }
+      val diff = x.compareTo(y);
+      if (diff != 0) diff else compare(xs, ys)
+    }
   }
 }
 
@@ -480,22 +486,22 @@ object MB {
   sealed trait Expr {
 
     private def count: Int = this match {
-      case Lit(n) => n
+      case Lit(n)         => n
       case Mul(Lit(n), _) => n
-      case _ => 1
+      case _              => 1
     }
 
     private def term: Expr = this match {
-      case Lit(_) => Lit(1)
+      case Lit(_)         => Lit(1)
       case Mul(Lit(_), r) => r
-      case _ => this
+      case _              => this
     }
 
     private def vars: List[String] = this match {
-      case Var(n) => List(n)
+      case Var(n)    => List(n)
       case Mul(l, r) => l.vars ::: r.vars
       case Pow(l, n) => { val vs = l.vars; List.range(0, n).flatMap(i => vs) }
-      case _ => List()
+      case _         => List()
     }
 
     private def +<(that: Expr): Boolean = (this +<? that) < 0;
@@ -503,75 +509,75 @@ object MB {
     private def +<?(that: Expr): Int = (this, that) match {
       case (Add(_, _), _) => 0
       case (_, Add(_, _)) => 0
-      case (_, _) => compare(this.vars, that.vars)
+      case (_, _)         => compare(this.vars, that.vars)
     }
 
     def +(that: Expr): Expr =
       if (that +<= this)
         (this, that) match {
-          case (_, Lit(0)) => this
-          case (Lit(l), Lit(r)) => Lit(l + r)
-          case (_, Add(rl, rr)) => (this + rl) + rr
+          case (_, Lit(0))                       => this
+          case (Lit(l), Lit(r))                  => Lit(l + r)
+          case (_, Add(rl, rr))                  => (this + rl) + rr
           case (Add(ll, lr), _) if (lr +<= that) => ll + (that + lr)
           case (_, _) => {
-              val l = this.term;
-              val r = that.term;
-              if (l equ r) Lit(this.count + that.count) * r
-              else Add(this, that)
-            }
+            val l = this.term;
+            val r = that.term;
+            if (l equ r) Lit(this.count + that.count) * r
+            else Add(this, that)
+          }
         } else that + this;
 
     private def *<(that: Expr): Boolean = (this *<? that) < 0;
     private def *<=(that: Expr): Boolean = (this *<? that) <= 0;
     private def *<?(that: Expr): Int = (this, that) match {
-      case (Mul(_, _), _) => 0
-      case (_, Mul(_, _)) => 0
+      case (Mul(_, _), _)         => 0
+      case (_, Mul(_, _))         => 0
       case (Add(_, _), Add(_, _)) => 0
-      case (Add(_, _), _) => -1
-      case (_, Add(_, _)) => +1
-      case (Lit(_), Lit(_)) => 0
-      case (Lit(_), _) => -1
-      case (_, Lit(_)) => +1
-      case (Var(l), Var(r)) => l.compareTo(r)
-      case (Var(_), Pow(r, _)) => if (this *<= r) -1 else +1
-      case (Pow(l, _), Var(_)) => if (l *< that) -1 else +1
+      case (Add(_, _), _)         => -1
+      case (_, Add(_, _))         => +1
+      case (Lit(_), Lit(_))       => 0
+      case (Lit(_), _)            => -1
+      case (_, Lit(_))            => +1
+      case (Var(l), Var(r))       => l.compareTo(r)
+      case (Var(_), Pow(r, _))    => if (this *<= r) -1 else +1
+      case (Pow(l, _), Var(_))    => if (l *< that) -1 else +1
       case (Pow(l, _), Pow(r, _)) => l *<? r
     }
 
     def *(that: Expr): Expr =
       if (this *<= that)
         (this, that) match {
-          case (Lit(0), _) => this
-          case (Lit(1), _) => that
-          case (Mul(ll, lr), r) => ll * (lr * r)
-          case (Add(ll, lr), r) => ll * r + lr * r
-          case (Lit(l), Lit(r)) => Lit(l * r)
-          case (Var(_), Var(_)) if (this equ that) => Pow(this, 2)
-          case (Var(_), Pow(r, n)) if (this equ r) => Pow(this, n + 1)
+          case (Lit(0), _)                               => this
+          case (Lit(1), _)                               => that
+          case (Mul(ll, lr), r)                          => ll * (lr * r)
+          case (Add(ll, lr), r)                          => ll * r + lr * r
+          case (Lit(l), Lit(r))                          => Lit(l * r)
+          case (Var(_), Var(_)) if (this equ that)       => Pow(this, 2)
+          case (Var(_), Pow(r, n)) if (this equ r)       => Pow(this, n + 1)
           case (Pow(ll, lr), Pow(rl, rr)) if (ll equ rl) => Pow(ll, lr + rr)
-          case (l, Mul(rl, rr)) if (rl *<= l) => (rl * l) * rr
-          case (_, _) => Mul(this, that)
+          case (l, Mul(rl, rr)) if (rl *<= l)            => (rl * l) * rr
+          case (_, _)                                    => Mul(this, that)
         } else that * this;
 
     def ^(that: Int): Expr = (this, that) match {
-      case (_, 1) => this
-      case (Lit(i), n) => Lit(power(i, n))
-      case (Var(_), n) => Pow(this, n)
+      case (_, 1)         => this
+      case (Lit(i), n)    => Lit(power(i, n))
+      case (Var(_), n)    => Pow(this, n)
       case (Add(_, _), n) => this * (this ^ (n - 1))
       case (Mul(l, r), n) => (l ^ n) * (r ^ n)
       case (Pow(e, m), n) => Pow(e, m + n)
     }
 
     def derive(v: Var): Expr = this match {
-      case Lit(_) => Lit(0)
-      case Var(name) => if (name == v.name) Lit(1) else Lit(0)
+      case Lit(_)      => Lit(0)
+      case Var(name)   => if (name == v.name) Lit(1) else Lit(0)
       case Add(e1, e2) => (e1 derive v) + (e2 derive v)
       case Mul(e1, e2) => e1 * (e2 derive v) + e2 * (e1 derive v)
       case Pow(e1, i2) => Lit(i2) * (e1 derive v) * (e1 ^ (i2 - 1))
     }
 
     def evaluate(vars: List[(String, Int)]): Int = this match {
-      case Lit(cst) => cst
+      case Lit(cst)  => cst
       case Var(name) => lookup(vars, name)
       case Add(l, r) => l.evaluate(vars) + r.evaluate(vars)
       case Mul(l, r) => l.evaluate(vars) * r.evaluate(vars)
@@ -579,12 +585,12 @@ object MB {
     }
 
     def equ(that: Expr): Boolean = (this, that) match {
-      case (Lit(l), Lit(r)) => l == r
-      case (Var(l), Var(r)) => l == r
+      case (Lit(l), Lit(r))           => l == r
+      case (Var(l), Var(r))           => l == r
       case (Add(ll, lr), Add(rl, rr)) => (ll equ rl) && (lr equ rr)
       case (Mul(ll, lr), Mul(rl, rr)) => (ll equ rl) && (lr equ rr)
       case (Pow(ll, lr), Pow(rl, rr)) => (ll equ rl) && (lr == rr)
-      case _ => false
+      case _                          => false
     }
   }
 
@@ -604,7 +610,7 @@ object MB {
     override def toString = {
       def factorToString(e: Expr) = e match {
         case Add(_, _) => "(" + e.toString + ")"
-        case _ => e.toString
+        case _         => e.toString
       }
       factorToString(e1) + " * " + factorToString(e2);
     }
@@ -615,7 +621,7 @@ object MB {
       def factorToString(e: Expr) = e match {
         case Add(_, _) => "(" + e.toString + ")"
         case Mul(_, _) => "(" + e.toString + ")"
-        case _ => e.toString
+        case _         => e.toString
       }
       factorToString(e1) + "^" + i2;
     }
@@ -651,7 +657,7 @@ object MB {
 
     val f4 =
       (x + _3) * (_2 + x) * x * (x + _1) + (x + _5) * (x * (x + _2) + x + _1) +
-      (x ^ 2) + x;
+        (x ^ 2) + x;
     val f3 = f4.derive(x);
     val f2 = f3.derive(x);
     val f1 = f2.derive(x);

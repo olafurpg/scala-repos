@@ -2,12 +2,13 @@ package lila.blog
 
 import org.joda.time.DateTime
 
-case class MiniPost(id: String,
-                    slug: String,
-                    title: String,
-                    shortlede: String,
-                    date: DateTime,
-                    image: String)
+case class MiniPost(
+    id: String,
+    slug: String,
+    title: String,
+    shortlede: String,
+    date: DateTime,
+    image: String)
 
 object MiniPost {
 
@@ -18,10 +19,11 @@ object MiniPost {
       date <- doc getDate s"$coll.date" map (_.value)
       image = ~doc.getImage(s"$coll.image", "column").map(_.url)
     } yield
-      MiniPost(doc.id,
-               doc.slug,
-               title,
-               shortlede,
-               date.toDateTimeAtStartOfDay,
-               image)
+      MiniPost(
+        doc.id,
+        doc.slug,
+        title,
+        shortlede,
+        date.toDateTimeAtStartOfDay,
+        image)
 }

@@ -58,39 +58,41 @@ object ManifestScalaType {
   }
 
   def apply(
-      erasure: Class[_], typeArgs: Seq[ScalaType] = Seq.empty): ScalaType = {
+      erasure: Class[_],
+      typeArgs: Seq[ScalaType] = Seq.empty): ScalaType = {
     val mf = ManifestFactory.manifestOf(
-        erasure, typeArgs.map(ManifestFactory.manifestOf(_)))
+      erasure,
+      typeArgs.map(ManifestFactory.manifestOf(_)))
     ManifestScalaType(mf)
   }
 
   private val IntType: ScalaType = new PrimitiveManifestScalaType(Manifest.Int)
   private val NumberType: ScalaType = new PrimitiveManifestScalaType(
-      manifest[Number])
+    manifest[Number])
   private val LongType: ScalaType = new PrimitiveManifestScalaType(
-      Manifest.Long)
+    Manifest.Long)
   private val ByteType: ScalaType = new PrimitiveManifestScalaType(
-      Manifest.Byte)
+    Manifest.Byte)
   private val ShortType: ScalaType = new PrimitiveManifestScalaType(
-      Manifest.Short)
+    Manifest.Short)
   private val BooleanType: ScalaType = new PrimitiveManifestScalaType(
-      Manifest.Boolean)
+    Manifest.Boolean)
   private val FloatType: ScalaType = new PrimitiveManifestScalaType(
-      Manifest.Float)
+    Manifest.Float)
   private val DoubleType: ScalaType = new PrimitiveManifestScalaType(
-      Manifest.Double)
+    Manifest.Double)
   private val StringType: ScalaType = new PrimitiveManifestScalaType(
-      manifest[java.lang.String])
+    manifest[java.lang.String])
   private val SymbolType: ScalaType = new PrimitiveManifestScalaType(
-      manifest[Symbol])
+    manifest[Symbol])
   private val BigDecimalType: ScalaType = new PrimitiveManifestScalaType(
-      manifest[BigDecimal])
+    manifest[BigDecimal])
   private val BigIntType: ScalaType = new PrimitiveManifestScalaType(
-      manifest[BigInt])
+    manifest[BigInt])
   private val DateType: ScalaType = new PrimitiveManifestScalaType(
-      manifest[java.util.Date])
+    manifest[java.util.Date])
   private val TimestampType: ScalaType = new PrimitiveManifestScalaType(
-      manifest[java.sql.Timestamp])
+    manifest[java.sql.Timestamp])
 
   private class PrimitiveManifestScalaType(mf: Manifest[_])
       extends ManifestScalaType(mf) {
@@ -103,7 +105,8 @@ object ManifestScalaType {
       extends ManifestScalaType(mf) {
     override def typeVars = {
       if (_typeVars == null)
-        _typeVars = Map.empty[TypeVariable[_], ScalaType] ++ erasure.getTypeParameters
+        _typeVars = Map
+          .empty[TypeVariable[_], ScalaType] ++ erasure.getTypeParameters
           .map(_.asInstanceOf[TypeVariable[_]])
           .toList
           .zip(manifest.typeArguments map (ManifestScalaType(_)))
@@ -127,14 +130,18 @@ trait ScalaType extends Equals {
   def isOption: Boolean
   def <:<(that: ScalaType): Boolean
   def >:>(that: ScalaType): Boolean
-  def copy(erasure: Class[_] = erasure,
-           typeArgs: Seq[ScalaType] = typeArgs,
-           typeVars: Map[TypeVariable[_], ScalaType] = typeVars): ScalaType
+  def copy(
+      erasure: Class[_] = erasure,
+      typeArgs: Seq[ScalaType] = typeArgs,
+      typeVars: Map[TypeVariable[_], ScalaType] = typeVars): ScalaType
 }
 
 class ManifestScalaType(val manifest: Manifest[_]) extends ScalaType {
 
-  import org.scalatra.swagger.reflect.ManifestScalaType.{CopiedManifestScalaType, types}
+  import org.scalatra.swagger.reflect.ManifestScalaType.{
+    CopiedManifestScalaType,
+    types
+  }
   private[this] val self = this
   val erasure: Class[_] = manifest.runtimeClass
 
@@ -149,8 +156,9 @@ class ManifestScalaType(val manifest: Manifest[_]) extends ScalaType {
 
   val typeArgs =
     manifest.typeArguments.map(ta => Reflector.scalaTypeOf(ta)) ++
-    (if (erasure.isArray) List(Reflector.scalaTypeOf(erasure.getComponentType))
-     else Nil)
+      (if (erasure.isArray)
+         List(Reflector.scalaTypeOf(erasure.getComponentType))
+       else Nil)
 
   private[this] var _typeVars: Map[TypeVariable[_], ScalaType] = null
   def typeVars = {
@@ -178,15 +186,17 @@ class ManifestScalaType(val manifest: Manifest[_]) extends ScalaType {
 
   lazy val simpleName: String =
     rawSimpleName +
-    (if (typeArgs.nonEmpty) typeArgs.map(_.simpleName).mkString("[", ", ", "]")
-     else
-       (if (typeVars.nonEmpty)
-          typeVars.map(_._2.simpleName).mkString("[", ", ", "]") else ""))
+      (if (typeArgs.nonEmpty)
+         typeArgs.map(_.simpleName).mkString("[", ", ", "]")
+       else
+         (if (typeVars.nonEmpty)
+            typeVars.map(_._2.simpleName).mkString("[", ", ", "]")
+          else ""))
 
   lazy val fullName: String =
     rawFullName +
-    (if (typeArgs.nonEmpty) typeArgs.map(_.fullName).mkString("[", ", ", "]")
-     else "")
+      (if (typeArgs.nonEmpty) typeArgs.map(_.fullName).mkString("[", ", ", "]")
+       else "")
 
   val isPrimitive = false
 
@@ -196,23 +206,23 @@ class ManifestScalaType(val manifest: Manifest[_]) extends ScalaType {
   def isOption = classOf[Option[_]].isAssignableFrom(erasure)
   def <:<(that: ScalaType): Boolean = that match {
     case t: ManifestScalaType => manifest <:< t.manifest
-    case _ => manifest <:< ManifestFactory.manifestOf(that)
+    case _                    => manifest <:< ManifestFactory.manifestOf(that)
   }
   def >:>(that: ScalaType): Boolean = that match {
     case t: ManifestScalaType => manifest >:> t.manifest
-    case _ => manifest >:> ManifestFactory.manifestOf(that)
+    case _                    => manifest >:> ManifestFactory.manifestOf(that)
   }
 
   override def hashCode(): Int = manifest.##
 
   override def equals(obj: Any): Boolean = obj match {
     case a: ManifestScalaType => manifest == a.manifest
-    case _ => false
+    case _                    => false
   }
 
   def canEqual(that: Any): Boolean = that match {
     case s: ManifestScalaType => manifest.canEqual(s.manifest)
-    case _ => false
+    case _                    => false
   }
 
   def copy(
@@ -251,7 +261,8 @@ class ManifestScalaType(val manifest: Manifest[_]) extends ScalaType {
     /* end optimization */
     else {
       val mf = ManifestFactory.manifestOf(
-          erasure, typeArgs.map(ManifestFactory.manifestOf(_)))
+        erasure,
+        typeArgs.map(ManifestFactory.manifestOf(_)))
       val st = new CopiedManifestScalaType(mf, typeVars, isPrimitive)
       if (typeArgs.isEmpty) types.replace(mf, st)
       else st
@@ -261,18 +272,22 @@ class ManifestScalaType(val manifest: Manifest[_]) extends ScalaType {
   override def toString: String = simpleName
 }
 case class PropertyDescriptor(
-    name: String, mangledName: String, returnType: ScalaType, field: Field)
+    name: String,
+    mangledName: String,
+    returnType: ScalaType,
+    field: Field)
     extends Descriptor {
   def set(receiver: Any, value: Any) = field.set(receiver, value)
   def get(receiver: AnyRef) = field.get(receiver)
 
   def isPrimitive = returnType.isPrimitive
 }
-case class ConstructorParamDescriptor(name: String,
-                                      mangledName: String,
-                                      argIndex: Int,
-                                      argType: ScalaType,
-                                      defaultValue: Option[() => Any])
+case class ConstructorParamDescriptor(
+    name: String,
+    mangledName: String,
+    argIndex: Int,
+    argType: ScalaType,
+    defaultValue: Option[() => Any])
     extends Descriptor {
   lazy val isOptional = defaultValue.isDefined || isOption
   def isPrimitive = argType.isPrimitive
@@ -281,24 +296,27 @@ case class ConstructorParamDescriptor(name: String,
   def isOption = argType.isOption
   def isCustom = !(isPrimitive || isMap || isCollection || isOption)
 }
-case class ConstructorDescriptor(params: Seq[ConstructorParamDescriptor],
-                                 constructor: java.lang.reflect.Constructor[_],
-                                 isPrimary: Boolean)
+case class ConstructorDescriptor(
+    params: Seq[ConstructorParamDescriptor],
+    constructor: java.lang.reflect.Constructor[_],
+    isPrimary: Boolean)
     extends Descriptor
-case class SingletonDescriptor(simpleName: String,
-                               fullName: String,
-                               erasure: ScalaType,
-                               instance: AnyRef,
-                               properties: Seq[PropertyDescriptor])
+case class SingletonDescriptor(
+    simpleName: String,
+    fullName: String,
+    erasure: ScalaType,
+    instance: AnyRef,
+    properties: Seq[PropertyDescriptor])
     extends Descriptor
 
 trait ObjectDescriptor extends Descriptor
-case class ClassDescriptor(simpleName: String,
-                           fullName: String,
-                           erasure: ScalaType,
-                           companion: Option[SingletonDescriptor],
-                           constructors: Seq[ConstructorDescriptor],
-                           properties: Seq[PropertyDescriptor])
+case class ClassDescriptor(
+    simpleName: String,
+    fullName: String,
+    erasure: ScalaType,
+    companion: Option[SingletonDescriptor],
+    constructors: Seq[ConstructorDescriptor],
+    properties: Seq[PropertyDescriptor])
     extends ObjectDescriptor {
   //    def bestConstructor(argNames: Seq[String]): Option[ConstructorDescriptor] = {
   //      constructors.sortBy(-_.params.size)
@@ -308,5 +326,7 @@ case class ClassDescriptor(simpleName: String,
     else constructors.sortBy(-_.params.size).head.params
 }
 case class PrimitiveDescriptor(
-    simpleName: String, fullName: String, erasure: ScalaType)
+    simpleName: String,
+    fullName: String,
+    erasure: ScalaType)
     extends ObjectDescriptor {}

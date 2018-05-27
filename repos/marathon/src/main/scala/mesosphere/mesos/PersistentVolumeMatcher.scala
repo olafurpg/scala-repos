@@ -26,8 +26,8 @@ object PersistentVolumeMatcher {
             .map(_.idString)
             .forall(availableVolumes.contains))
         Some(
-            task.reservation.volumeIds
-              .flatMap(id => availableVolumes.get(id.idString)))
+          task.reservation.volumeIds
+            .flatMap(id => availableVolumes.get(id.idString)))
       else None
     }
 
@@ -37,5 +37,6 @@ object PersistentVolumeMatcher {
   }
 
   case class VolumeMatch(
-      task: Task, persistentVolumeResources: Iterable[Mesos.Resource])
+      task: Task,
+      persistentVolumeResources: Iterable[Mesos.Resource])
 }

@@ -18,8 +18,9 @@ class AccessTokenServiceSpec extends FunSuite with ServiceSpecBase {
       val (id, token) = AccessTokenService.generateAccessToken("root", "note")
       val tokenHash = AccessTokenService.tokenToHash(token)
 
-      assert(AccessTokenService.getAccessTokens("root") == List(
-              AccessToken(`id`, "root", `tokenHash`, "note")))
+      assert(
+        AccessTokenService.getAccessTokens("root") == List(
+          AccessToken(`id`, "root", `tokenHash`, "note")))
     }
   }
 
@@ -30,8 +31,9 @@ class AccessTokenServiceSpec extends FunSuite with ServiceSpecBase {
       val user2 = generateNewAccount("user2")
       AccessTokenService.generateAccessToken("user2", "note2")
 
-      assert(AccessTokenService.getAccessTokens("root") == List(
-              AccessToken(`id`, "root", `tokenHash`, "note")))
+      assert(
+        AccessTokenService.getAccessTokens("root") == List(
+          AccessToken(`id`, "root", `tokenHash`, "note")))
     }
   }
 

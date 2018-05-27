@@ -17,7 +17,11 @@
 
 package org.apache.spark.streaming.scheduler
 
-import org.apache.spark.scheduler.{LiveListenerBus, SparkListener, SparkListenerEvent}
+import org.apache.spark.scheduler.{
+  LiveListenerBus,
+  SparkListener,
+  SparkListenerEvent
+}
 import org.apache.spark.util.ListenerBus
 
 /**
@@ -26,8 +30,7 @@ import org.apache.spark.util.ListenerBus
   * registers itself with Spark listener bus, so that it can receive WrappedStreamingListenerEvents,
   * unwrap them as StreamingListenerEvent and dispatch them to StreamingListeners.
   */
-private[streaming] class StreamingListenerBus(
-    sparkListenerBus: LiveListenerBus)
+private[streaming] class StreamingListenerBus(sparkListenerBus: LiveListenerBus)
     extends SparkListener
     with ListenerBus[StreamingListener, StreamingListenerEvent] {
 
@@ -48,7 +51,8 @@ private[streaming] class StreamingListenerBus(
   }
 
   protected override def doPostEvent(
-      listener: StreamingListener, event: StreamingListenerEvent): Unit = {
+      listener: StreamingListener,
+      event: StreamingListenerEvent): Unit = {
     event match {
       case receiverStarted: StreamingListenerReceiverStarted =>
         listener.onReceiverStarted(receiverStarted)

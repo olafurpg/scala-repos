@@ -17,12 +17,17 @@ trait ScImportableDeclarationsOwner extends ScalaPsiElement {
   /**
     * Declarations may be taken from stable elements only
     */
-  override def processDeclarations(processor: PsiScopeProcessor,
-                                   state: ResolveState,
-                                   lastParent: PsiElement,
-                                   place: PsiElement) =
+  override def processDeclarations(
+      processor: PsiScopeProcessor,
+      state: ResolveState,
+      lastParent: PsiElement,
+      place: PsiElement) =
     if (isStable) {
       ScalaPsiUtil.processImportLastParent(
-          processor, state, place, lastParent, getType(TypingContext.empty))
+        processor,
+        state,
+        place,
+        lastParent,
+        getType(TypingContext.empty))
     } else true
 }

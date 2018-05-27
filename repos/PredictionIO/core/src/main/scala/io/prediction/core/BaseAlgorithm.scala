@@ -53,7 +53,8 @@ trait BaseQuerySerializer {
   */
 @DeveloperApi
 abstract class BaseAlgorithm[PD, M, Q, P]
-    extends AbstractDoer with BaseQuerySerializer {
+    extends AbstractDoer
+    with BaseQuerySerializer {
 
   /** :: DeveloperApi ::
     * Engine developers should not use this directly. This is called by workflow
@@ -77,7 +78,9 @@ abstract class BaseAlgorithm[PD, M, Q, P]
     */
   @DeveloperApi
   def batchPredictBase(
-      sc: SparkContext, bm: Any, qs: RDD[(Long, Q)]): RDD[(Long, P)]
+      sc: SparkContext,
+      bm: Any,
+      qs: RDD[(Long, Q)]): RDD[(Long, P)]
 
   /** :: DeveloperApi ::
     * Engine developers should not use this directly. Called by serving to
@@ -107,7 +110,10 @@ abstract class BaseAlgorithm[PD, M, Q, P]
     */
   @DeveloperApi
   def makePersistentModel(
-      sc: SparkContext, modelId: String, algoParams: Params, bm: Any): Any =
+      sc: SparkContext,
+      modelId: String,
+      algoParams: Params,
+      bm: Any): Any =
     Unit
 
   /** :: DeveloperApi ::
@@ -117,7 +123,8 @@ abstract class BaseAlgorithm[PD, M, Q, P]
     */
   def queryClass: Class[Q] = {
     val types = TypeResolver.resolveRawArguments(
-        classOf[BaseAlgorithm[PD, M, Q, P]], getClass)
+      classOf[BaseAlgorithm[PD, M, Q, P]],
+      getClass)
     types(2).asInstanceOf[Class[Q]]
   }
 }

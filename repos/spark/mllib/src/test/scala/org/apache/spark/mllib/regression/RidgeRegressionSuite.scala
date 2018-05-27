@@ -21,20 +21,26 @@ import scala.util.Random
 
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.mllib.linalg.Vectors
-import org.apache.spark.mllib.util.{LinearDataGenerator, LocalClusterSparkContext, MLlibTestSparkContext}
+import org.apache.spark.mllib.util.{
+  LinearDataGenerator,
+  LocalClusterSparkContext,
+  MLlibTestSparkContext
+}
 import org.apache.spark.util.Utils
 
 private object RidgeRegressionSuite {
 
   /** 3 features */
   val model = new RidgeRegressionModel(
-      weights = Vectors.dense(0.1, 0.2, 0.3), intercept = 0.5)
+    weights = Vectors.dense(0.1, 0.2, 0.3),
+    intercept = 0.5)
 }
 
 class RidgeRegressionSuite extends SparkFunSuite with MLlibTestSparkContext {
 
   def predictionError(
-      predictions: Seq[Double], input: Seq[LabeledPoint]): Double = {
+      predictions: Seq[Double],
+      input: Seq[LabeledPoint]): Double = {
     predictions
       .zip(input)
       .map {
@@ -57,8 +63,8 @@ class RidgeRegressionSuite extends SparkFunSuite with MLlibTestSparkContext {
     val w = Array.fill(numFeatures)(random.nextDouble() - 0.5)
 
     // Use half of data for training and other half for validation
-    val data = LinearDataGenerator.generateLinearInput(
-        3.0, w, 2 * numExamples, 42, 10.0)
+    val data =
+      LinearDataGenerator.generateLinearInput(3.0, w, 2 * numExamples, 42, 10.0)
     val testData = data.take(numExamples)
     val validationData = data.takeRight(numExamples)
 
@@ -71,20 +77,21 @@ class RidgeRegressionSuite extends SparkFunSuite with MLlibTestSparkContext {
 
     val linearModel = linearReg.run(testRDD)
     val linearErr = predictionError(
-        linearModel.predict(validationRDD.map(_.features)).collect(),
-        validationData)
+      linearModel.predict(validationRDD.map(_.features)).collect(),
+      validationData)
 
     val ridgeReg = new RidgeRegressionWithSGD()
     ridgeReg.optimizer.setNumIterations(200).setRegParam(0.1).setStepSize(1.0)
     val ridgeModel = ridgeReg.run(testRDD)
     val ridgeErr = predictionError(
-        ridgeModel.predict(validationRDD.map(_.features)).collect(),
-        validationData)
+      ridgeModel.predict(validationRDD.map(_.features)).collect(),
+      validationData)
 
     // Ridge validation error should be lower than linear regression.
-    assert(ridgeErr < linearErr,
-           "ridgeError (" + ridgeErr + ") was not less than linearError(" +
-           linearErr + ")")
+    assert(
+      ridgeErr < linearErr,
+      "ridgeError (" + ridgeErr + ") was not less than linearError(" +
+        linearErr + ")")
   }
 
   test("model save/load") {
@@ -106,7 +113,8 @@ class RidgeRegressionSuite extends SparkFunSuite with MLlibTestSparkContext {
 }
 
 class RidgeRegressionClusterSuite
-    extends SparkFunSuite with LocalClusterSparkContext {
+    extends SparkFunSuite
+    with LocalClusterSparkContext {
 
   test("task size should be small in both training and prediction") {
     val m = 4
@@ -116,8 +124,7 @@ class RidgeRegressionClusterSuite
       .mapPartitionsWithIndex { (idx, iter) =>
         val random = new Random(idx)
         iter.map(i =>
-              LabeledPoint(1.0,
-                           Vectors.dense(Array.fill(n)(random.nextDouble()))))
+          LabeledPoint(1.0, Vectors.dense(Array.fill(n)(random.nextDouble()))))
       }
       .cache()
     // If we serialize data directly in the task closure, the size of the serialized task would be

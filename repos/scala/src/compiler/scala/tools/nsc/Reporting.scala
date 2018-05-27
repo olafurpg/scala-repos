@@ -16,7 +16,9 @@ import scala.reflect.internal.util.StringOps.countElementsAsString
   * TODO: make reporting configurable
   */
 trait Reporting extends scala.reflect.internal.Reporting {
-  self: ast.Positions with CompilationUnits with scala.reflect.internal.Symbols =>
+  self: ast.Positions
+    with CompilationUnits
+    with scala.reflect.internal.Symbols =>
   def settings: Settings
 
   // not deprecated yet, but a method called "error" imported into
@@ -29,7 +31,9 @@ trait Reporting extends scala.reflect.internal.Reporting {
 
     /** Collects for certain classes of warnings during this run. */
     private class ConditionalWarning(
-        what: String, doReport: () => Boolean, setting: Settings#Setting) {
+        what: String,
+        doReport: () => Boolean,
+        setting: Settings#Setting) {
       def this(what: String, booleanSetting: Settings#BooleanSetting) {
         this(what, () => booleanSetting, booleanSetting)
       }
@@ -41,31 +45,32 @@ trait Reporting extends scala.reflect.internal.Reporting {
         if (warnings.nonEmpty && (setting.isDefault || doReport())) {
           val numWarnings = warnings.size
           val warningVerb = if (numWarnings == 1) "was" else "were"
-          val warningCount = countElementsAsString(
-              numWarnings, s"$what warning")
+          val warningCount =
+            countElementsAsString(numWarnings, s"$what warning")
 
           reporter.warning(
-              NoPosition,
-              s"there $warningVerb $warningCount; re-run with ${setting.name} for details")
+            NoPosition,
+            s"there $warningVerb $warningCount; re-run with ${setting.name} for details")
         }
     }
 
     // This change broke sbt; I gave it the thrilling name of uncheckedWarnings0 so
     // as to recover uncheckedWarnings for its ever-fragile compiler interface.
-    private val _deprecationWarnings = new ConditionalWarning(
-        "deprecation", settings.deprecation)
-    private val _uncheckedWarnings = new ConditionalWarning(
-        "unchecked", settings.unchecked)
-    private val _featureWarnings = new ConditionalWarning(
-        "feature", settings.feature)
+    private val _deprecationWarnings =
+      new ConditionalWarning("deprecation", settings.deprecation)
+    private val _uncheckedWarnings =
+      new ConditionalWarning("unchecked", settings.unchecked)
+    private val _featureWarnings =
+      new ConditionalWarning("feature", settings.feature)
     private val _inlinerWarnings = new ConditionalWarning(
-        "inliner",
-        () => !settings.YoptWarningsSummaryOnly,
-        settings.YoptWarnings)
-    private val _allConditionalWarnings = List(_deprecationWarnings,
-                                               _uncheckedWarnings,
-                                               _featureWarnings,
-                                               _inlinerWarnings)
+      "inliner",
+      () => !settings.YoptWarningsSummaryOnly,
+      settings.YoptWarnings)
+    private val _allConditionalWarnings = List(
+      _deprecationWarnings,
+      _uncheckedWarnings,
+      _featureWarnings,
+      _inlinerWarnings)
 
     // TODO: remove in favor of the overload that takes a Symbol, give that argument a default (NoSymbol)
     def deprecationWarning(pos: Position, msg: String): Unit =
@@ -90,19 +95,22 @@ trait Reporting extends scala.reflect.internal.Reporting {
     def deprecationWarning(pos: Position, sym: Symbol): Unit = {
       val suffix = sym.deprecationMessage match {
         case Some(msg) => ": " + msg
-        case _ => ""
+        case _         => ""
       }
       deprecationWarning(
-          pos, sym, s"$sym${sym.locationString} is deprecated$suffix")
+        pos,
+        sym,
+        s"$sym${sym.locationString} is deprecated$suffix")
     }
 
     private[this] var reportedFeature = Set[Symbol]()
-    def featureWarning(pos: Position,
-                       featureName: String,
-                       featureDesc: String,
-                       featureTrait: Symbol,
-                       construct: => String = "",
-                       required: Boolean): Unit = {
+    def featureWarning(
+        pos: Position,
+        featureName: String,
+        featureDesc: String,
+        featureTrait: Symbol,
+        construct: => String = "",
+        required: Boolean): Unit = {
       val req = if (required) "needs to" else "should"
       val fqname = "scala.language." + featureName
       val explain = (if (reportedFeature contains featureTrait) "" else s"""|
@@ -114,7 +122,7 @@ trait Reporting extends scala.reflect.internal.Reporting {
 
       val msg =
         s"$featureDesc $req be enabled\nby making the implicit value $fqname visible.$explain" replace
-        ("#", construct)
+          ("#", construct)
       if (required) reporter.error(pos, msg)
       else featureWarning(pos, msg)
     }
@@ -127,15 +135,17 @@ trait Reporting extends scala.reflect.internal.Reporting {
 
       if (seenMacroExpansionsFallingBack)
         reporter.warning(
-            NoPosition,
-            "some macros could not be expanded and code fell back to overridden methods;" +
-            "\nrecompiling with generated classfiles on the classpath might help.")
+          NoPosition,
+          "some macros could not be expanded and code fell back to overridden methods;" +
+            "\nrecompiling with generated classfiles on the classpath might help."
+        )
 
       // todo: migrationWarnings
 
       if (settings.fatalWarnings && reporter.hasWarnings)
         reporter.error(
-            NoPosition, "No warnings can be incurred under -Xfatal-warnings.")
+          NoPosition,
+          "No warnings can be incurred under -Xfatal-warnings.")
     }
   }
 }

@@ -17,11 +17,14 @@ class ExtractTraitTestConflicts extends ExtractTraitTestBase {
       """.stripMargin
 
     val message = ScalaBundle.message(
-        "private.member.cannot.be.used.in.extracted.member",
-        "bar",
-        "foo(): Int")
+      "private.member.cannot.be.used.in.extracted.member",
+      "bar",
+      "foo(): Int")
     checkException(
-        text, message, onlyDeclarations = false, onlyFirstMember = true)
+      text,
+      message,
+      onlyDeclarations = false,
+      onlyFirstMember = true)
 
     val result = """
         |class A extends ExtractedTrait {
@@ -51,11 +54,14 @@ class ExtractTraitTestConflicts extends ExtractTraitTestBase {
       """.stripMargin
 
     val message = ScalaBundle.message(
-        "member.of.anonymous.class.cannot.be.used.in.extracted.member",
-        "bar",
-        "run(): Unit")
+      "member.of.anonymous.class.cannot.be.used.in.extracted.member",
+      "bar",
+      "run(): Unit")
     checkException(
-        text, message, onlyDeclarations = false, onlyFirstMember = true)
+      text,
+      message,
+      onlyDeclarations = false,
+      onlyFirstMember = true)
 
     val result = """
         |object A {
@@ -70,8 +76,7 @@ class ExtractTraitTestConflicts extends ExtractTraitTestBase {
         |
         |}
       """.stripMargin
-    checkResult(
-        text, result, onlyDeclarations = false, onlyFirstMember = false)
+    checkResult(text, result, onlyDeclarations = false, onlyFirstMember = false)
   }
 
   def testSuperReference() {
@@ -85,9 +90,13 @@ class ExtractTraitTestConflicts extends ExtractTraitTestBase {
         |}
       """.stripMargin
     val message = ScalaBundle.message(
-        "super.reference.used.in.extracted.member", "foo(): Unit")
+      "super.reference.used.in.extracted.member",
+      "foo(): Unit")
     checkException(
-        text, message, onlyDeclarations = false, onlyFirstMember = true)
+      text,
+      message,
+      onlyDeclarations = false,
+      onlyFirstMember = true)
   }
 
   def testClassTypeParams() {
@@ -103,6 +112,9 @@ class ExtractTraitTestConflicts extends ExtractTraitTestBase {
     val message =
       ScalaBundle.message("type.parameters.for.self.type.not.supported", "AA")
     checkException(
-        text, message, onlyDeclarations = false, onlyFirstMember = true)
+      text,
+      message,
+      onlyDeclarations = false,
+      onlyFirstMember = true)
   }
 }

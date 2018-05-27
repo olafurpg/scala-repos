@@ -13,13 +13,15 @@ final class Live(roundMap: ActorRef) {
   def create = {
     val variant = chess.variant.Standard
     val g = Game
-      .make(game = chess.Game(variant),
-            whitePlayer = Player.white,
-            blackPlayer = Player.black,
-            mode = chess.Mode.Casual,
-            variant = variant,
-            source = Source.ImportLive,
-            pgnImport = none)
+      .make(
+        game = chess.Game(variant),
+        whitePlayer = Player.white,
+        blackPlayer = Player.black,
+        mode = chess.Mode.Casual,
+        variant = variant,
+        source = Source.ImportLive,
+        pgnImport = none
+      )
       .start
     GameRepo insertDenormalized g inject g
   }
@@ -55,12 +57,13 @@ final class Live(roundMap: ActorRef) {
     }
 
   private def applyMove(pov: Pov, uci: Uci) {
-    roundMap ! Tell(pov.gameId,
-                    HumanPlay(
-                        playerId = pov.playerId,
-                        uci = uci,
-                        blur = false,
-                        lag = 0.millis
-                    ))
+    roundMap ! Tell(
+      pov.gameId,
+      HumanPlay(
+        playerId = pov.playerId,
+        uci = uci,
+        blur = false,
+        lag = 0.millis
+      ))
   }
 }

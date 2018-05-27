@@ -19,7 +19,10 @@ package org.apache.spark.sql.catalyst.expressions
 
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.analysis.TypeCheckResult
-import org.apache.spark.sql.catalyst.expressions.codegen.{CodegenContext, ExprCode}
+import org.apache.spark.sql.catalyst.expressions.codegen.{
+  CodegenContext,
+  ExprCode
+}
 import org.apache.spark.sql.types._
 import org.apache.spark.util.collection.unsafe.sort.PrefixComparators.BinaryPrefixComparator
 import org.apache.spark.util.collection.unsafe.sort.PrefixComparators.DoublePrefixComparator
@@ -41,7 +44,8 @@ case object Descending extends SortDirection {
   * transformations over expression will descend into its child.
   */
 case class SortOrder(child: Expression, direction: SortDirection)
-    extends UnaryExpression with Unevaluable {
+    extends UnaryExpression
+    with Unevaluable {
 
   /** Sort order is not foldable because we don't have an eval for it. */
   override def foldable: Boolean = false
@@ -51,7 +55,7 @@ case class SortOrder(child: Expression, direction: SortDirection)
       TypeCheckResult.TypeCheckSuccess
     } else {
       TypeCheckResult.TypeCheckFailure(
-          s"cannot sort data type ${dataType.simpleString}")
+        s"cannot sort data type ${dataType.simpleString}")
     }
   }
 
@@ -86,8 +90,9 @@ case class SortPrefix(child: SortOrder) extends UnaryExpression {
       case DateType | TimestampType =>
         (Long.MinValue, s"(long) $input")
       case FloatType | DoubleType =>
-        (DoublePrefixComparator.computePrefix(Double.NegativeInfinity),
-         s"$DoublePrefixCmp.computePrefix((double)$input)")
+        (
+          DoublePrefixComparator.computePrefix(Double.NegativeInfinity),
+          s"$DoublePrefixCmp.computePrefix((double)$input)")
       case StringType => (0L, s"$input.getPrefix()")
       case BinaryType => (0L, s"$BinaryPrefixCmp.computePrefix($input)")
       case dt: DecimalType
@@ -103,8 +108,9 @@ case class SortPrefix(child: SortOrder) extends UnaryExpression {
           }
         (Long.MinValue, prefix)
       case dt: DecimalType =>
-        (DoublePrefixComparator.computePrefix(Double.NegativeInfinity),
-         s"$DoublePrefixCmp.computePrefix($input.toDouble())")
+        (
+          DoublePrefixComparator.computePrefix(Double.NegativeInfinity),
+          s"$DoublePrefixCmp.computePrefix($input.toDouble())")
       case _ => (0L, "0L")
     }
 

@@ -29,7 +29,11 @@ package scalafx.controls
 
 import scalafx.Includes._
 import scalafx.application.JFXApp
-import scalafx.controls.controls.{ControlControls, TextFieldControls, TextInputControlControls}
+import scalafx.controls.controls.{
+  ControlControls,
+  TextFieldControls,
+  TextInputControlControls
+}
 import scalafx.geometry.Pos
 import scalafx.scene.Scene
 import scalafx.scene.control.TextField
@@ -45,9 +49,10 @@ object TextFieldTest extends JFXApp {
     fillWidth = true
     alignment = Pos.Center
     hgrow = Priority.Never
-    children = List(new TextFieldControls(textField),
-                    new TextInputControlControls(textField),
-                    new ControlControls(textField))
+    children = List(
+      new TextFieldControls(textField),
+      new TextInputControlControls(textField),
+      new ControlControls(textField))
   }
 
   val mainPane = new BorderPane {

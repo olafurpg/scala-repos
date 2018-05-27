@@ -80,7 +80,7 @@ object Codec {
 
     override def toString = {
       super.toString +
-      flags.map { _.toString }.mkString(" with Signalling(", ", ", ")")
+        flags.map { _.toString }.mkString(" with Signalling(", ", ", ")")
     }
   }
 }
@@ -93,13 +93,13 @@ object DontCareCounter extends (Int => Unit) {
   * A netty ChannelHandler for decoding data into protocol objects on the way in, and packing
   * objects into byte arrays on the way out. Optionally, the bytes in/out are tracked.
   */
-class Codec[A : Manifest](
+class Codec[A: Manifest](
     firstStage: Stage,
     encoder: Encoder[A],
     bytesReadCounter: Int => Unit,
     bytesWrittenCounter: Int => Unit
-)
-    extends FrameDecoder with ChannelDownstreamHandler {
+) extends FrameDecoder
+    with ChannelDownstreamHandler {
   def this(firstStage: Stage, encoder: Encoder[A]) =
     this(firstStage, encoder, DontCareCounter, DontCareCounter)
 
@@ -119,41 +119,44 @@ class Codec[A : Manifest](
 
   // turn an Encodable message into a Buffer.
   override final def handleDownstream(
-      context: ChannelHandlerContext, event: ChannelEvent) {
+      context: ChannelHandlerContext,
+      event: ChannelEvent) {
     event match {
       case message: DownstreamMessageEvent => {
-          val obj = message.getMessage
-          if (manifest[A].runtimeClass.isAssignableFrom(obj.getClass)) {
-            encode(obj.asInstanceOf[A]) match {
-              case Some(buffer) =>
-                Channels.write(context,
-                               message.getFuture,
-                               buffer,
-                               message.getRemoteAddress)
-              case None =>
-                message.getFuture.setSuccess()
-            }
-          } else {
-            context.sendDownstream(event)
+        val obj = message.getMessage
+        if (manifest[A].runtimeClass.isAssignableFrom(obj.getClass)) {
+          encode(obj.asInstanceOf[A]) match {
+            case Some(buffer) =>
+              Channels.write(
+                context,
+                message.getFuture,
+                buffer,
+                message.getRemoteAddress)
+            case None =>
+              message.getFuture.setSuccess()
           }
-          obj match {
-            case signalling: Codec.Signalling => {
-                signalling.signals.foreach {
-                  case Codec.Disconnect => context.getChannel.close()
-                  case _ =>
-                }
-              }
-            case _ =>
-          }
+        } else {
+          context.sendDownstream(event)
         }
+        obj match {
+          case signalling: Codec.Signalling => {
+            signalling.signals.foreach {
+              case Codec.Disconnect => context.getChannel.close()
+              case _                =>
+            }
+          }
+          case _ =>
+        }
+      }
       case _ => context.sendDownstream(event)
     }
   }
 
   @tailrec
-  override final def decode(context: ChannelHandlerContext,
-                            channel: Channel,
-                            buffer: ChannelBuffer) = {
+  override final def decode(
+      context: ChannelHandlerContext,
+      channel: Channel,
+      buffer: ChannelBuffer) = {
     val readableBytes = buffer.readableBytes()
     val nextStep = try {
       stage(buffer)

@@ -65,7 +65,7 @@ class FSMDocSpec extends MyFavoriteTestFrameWorkPlusAkkaTestKit {
       case Active -> Idle =>
         stateData match {
           case Todo(ref, queue) => ref ! Batch(queue)
-          case _ => // nothing to do
+          case _                => // nothing to do
         }
     }
     //#transition-elided
@@ -85,7 +85,10 @@ class FSMDocSpec extends MyFavoriteTestFrameWorkPlusAkkaTestKit {
 
       case Event(e, s) =>
         log.warning(
-            "received unhandled request {} in state {}/{}", e, stateName, s)
+          "received unhandled request {} in state {}/{}",
+          e,
+          stateName,
+          s)
         stay
     }
     //#unhandled-elided
@@ -120,7 +123,7 @@ class FSMDocSpec extends MyFavoriteTestFrameWorkPlusAkkaTestKit {
         case Idle -> Active =>
           setTimer("timeout", Tick, 1 second, repeat = true)
         case Active -> _ => cancelTimer("timeout")
-        case x -> Idle => log.info("entering Idle from " + x)
+        case x -> Idle   => log.info("entering Idle from " + x)
       }
       //#transition-syntax
 
@@ -141,8 +144,7 @@ class FSMDocSpec extends MyFavoriteTestFrameWorkPlusAkkaTestKit {
       //#stop-syntax
 
       //#transform-syntax
-      when(SomeState)(
-          transform {
+      when(SomeState)(transform {
         case Event(bytes: ByteString, read) => stay using (read + bytes.length)
       } using {
         case s @ FSM.State(state, read, timeout, stopReason, replies)
@@ -165,8 +167,8 @@ class FSMDocSpec extends MyFavoriteTestFrameWorkPlusAkkaTestKit {
 
       //#termination-syntax
       onTermination {
-        case StopEvent(FSM.Normal, state, data) => // ...
-        case StopEvent(FSM.Shutdown, state, data) => // ...
+        case StopEvent(FSM.Normal, state, data)         => // ...
+        case StopEvent(FSM.Shutdown, state, data)       => // ...
         case StopEvent(FSM.Failure(cause), state, data) => // ...
       }
       //#termination-syntax
@@ -191,7 +193,8 @@ class FSMDocSpec extends MyFavoriteTestFrameWorkPlusAkkaTestKit {
       onTermination {
         case StopEvent(FSM.Failure(_), state, data) =>
           val lastEvents = getLog.mkString("\n\t")
-          log.warning("Failure in state " + state + " with data " + data +
+          log.warning(
+            "Failure in state " + state + " with data " + data +
               "\n" + "Events leading up to this point:\n\t" + lastEvents)
       }
       // ...

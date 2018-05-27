@@ -36,7 +36,7 @@ class EvalTests extends CatsSuite {
     *  2. How to create Eval instances (memoized, eager, or by-name).
     *  3. How many times we expect the value to be computed.
     */
-  def runValue[A : Eq](value: A)(init: A => (Spooky, Eval[A]))(
+  def runValue[A: Eq](value: A)(init: A => (Spooky, Eval[A]))(
       numCalls: Int => Int): Unit = {
     var spin = 0
     def nTimes(n: Int, numEvals: Int): Unit = {
@@ -102,14 +102,14 @@ class EvalTests extends CatsSuite {
 
   {
     implicit val A = ListWrapper.monoid[Int]
-    checkAll(
-        "Eval[ListWrapper[Int]]", GroupLaws[Eval[ListWrapper[Int]]].monoid)
+    checkAll("Eval[ListWrapper[Int]]", GroupLaws[Eval[ListWrapper[Int]]].monoid)
   }
 
   {
     implicit val A = ListWrapper.semigroup[Int]
     checkAll(
-        "Eval[ListWrapper[Int]]", GroupLaws[Eval[ListWrapper[Int]]].semigroup)
+      "Eval[ListWrapper[Int]]",
+      GroupLaws[Eval[ListWrapper[Int]]].semigroup)
   }
 
   {
@@ -119,8 +119,9 @@ class EvalTests extends CatsSuite {
 
   {
     implicit val A = ListWrapper.partialOrder[Int]
-    checkAll("Eval[ListWrapper[Int]]",
-             OrderLaws[Eval[ListWrapper[Int]]].partialOrder)
+    checkAll(
+      "Eval[ListWrapper[Int]]",
+      OrderLaws[Eval[ListWrapper[Int]]].partialOrder)
   }
 
   {

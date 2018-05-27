@@ -60,7 +60,8 @@ import json.JsonAST._
   *
   */
 class MockHttpServletRequest(
-    val url: String = null, var contextPath: String = "")
+    val url: String = null,
+    var contextPath: String = "")
     extends HttpServletRequest {
   var attributes: Map[String, Object] = Map()
 
@@ -201,19 +202,19 @@ class MockHttpServletRequest(
       q.split('&').foreach { pair =>
         pair.split('=') match {
           case Array(key, value) => {
-              // Append to the current key's value
-              newParams += key -> value
-            }
+            // Append to the current key's value
+            newParams += key -> value
+          }
           case Array("") =>
             throw new IllegalArgumentException(
-                "Invalid query string: \"" + q + "\"")
+              "Invalid query string: \"" + q + "\"")
           case Array(key) => {
-              // Append to the current key's value
-              newParams += key -> ""
-            }
+            // Append to the current key's value
+            newParams += key -> ""
+          }
           case invalid =>
             throw new IllegalArgumentException(
-                "Invalid query string: \"" + q + "\"")
+              "Invalid query string: \"" + q + "\"")
         }
       }
 
@@ -275,7 +276,7 @@ class MockHttpServletRequest(
   if (contextPath.length > 0 &&
       (contextPath(0) != '/' || contextPath.last == '/')) {
     throw new IllegalArgumentException(
-        "Context path must be empty, or must start with a '/' and not end with a '/': " +
+      "Context path must be empty, or must start with a '/' and not end with a '/': " +
         contextPath)
   }
 
@@ -322,13 +323,13 @@ class MockHttpServletRequest(
     } else if (url.startsWith("/")) {
       computeRealPath(url).split('?') match {
         case Array(path, query) => this.path = path; queryString = query
-        case Array(path) => this.path = path; queryString = null
+        case Array(path)        => this.path = path; queryString = null
         case _ =>
           throw new IllegalArgumentException("too many '?' in URL : " + url)
       }
     } else {
       throw new IllegalArgumentException(
-          "Could not process url: \"%s\"".format(url))
+        "Could not process url: \"%s\"".format(url))
     }
   }
 
@@ -348,7 +349,7 @@ class MockHttpServletRequest(
   def processUrl(url: URL) {
     // Deconstruct the URL to set values
     url.getProtocol match {
-      case "http" => scheme = "http"; secure = false
+      case "http"  => scheme = "http"; secure = false
       case "https" => scheme = "https"; secure = true
       case other =>
         throw new IllegalArgumentException("Unsupported protocol: " + other)
@@ -375,8 +376,8 @@ class MockHttpServletRequest(
   def computeRealPath(path: String) = {
     if (!path.startsWith(contextPath)) {
       throw new IllegalArgumentException(
-          "Path \"%s\" doesn't begin with context path \"%s\"!".format(
-              path, contextPath))
+        "Path \"%s\" doesn't begin with context path \"%s\"!"
+          .format(path, contextPath))
     }
 
     path.substring(contextPath.length)
@@ -428,7 +429,8 @@ class MockHttpServletRequest(
         newMap += k -> (newMap(k) ::: v :: Nil) // Ugly, but it works and keeps order
     }
 
-    newMap.map { case (k, v) => (k, v.toArray) }
+    newMap
+      .map { case (k, v) => (k, v.toArray) }
       .asInstanceOf[Map[String, Array[String]]]
 //    asMap(newMap.map{case (k,v) => (k,v.toArray)}.asInstanceOf[Map[Object,Object]])
   }
@@ -443,7 +445,7 @@ class MockHttpServletRequest(
 
   def getReader(): BufferedReader =
     new BufferedReader(
-        new InputStreamReader(new ByteArrayInputStream(body), charEncoding))
+      new InputStreamReader(new ByteArrayInputStream(body), charEncoding))
 
   def getRealPath(s: String): String = s
 
@@ -480,26 +482,27 @@ class MockHttpServletRequest(
   def getDateHeader(h: String): Long = {
     val handler: PartialFunction[Throwable, Box[Long]] = {
       case pe: ParseException => {
-          throw new IllegalArgumentException(
-              "Could not parse the date for %s : \"%s\"".format(
-                  h, getHeader(h)))
-          Empty
-        }
+        throw new IllegalArgumentException(
+          "Could not parse the date for %s : \"%s\"".format(h, getHeader(h)))
+        Empty
+      }
     }
 
     Helpers
-      .tryo(handler, {
-        // Have to use internetDateFormatter directly since parseInternetDate returns the epoch date on failure
-        Box
-          .!!(getHeader(h))
-          .map(Helpers.internetDateFormatter.parse(_).getTime)
-      })
+      .tryo(
+        handler, {
+          // Have to use internetDateFormatter directly since parseInternetDate returns the epoch date on failure
+          Box
+            .!!(getHeader(h))
+            .map(Helpers.internetDateFormatter.parse(_).getTime)
+        }
+      )
       .flatMap(x => x) openOr -1L
   }
 
   def getHeader(h: String): String = headers.get(h) match {
     case Some(v :: _) => v
-    case _ => null
+    case _            => null
   }
 
   def getHeaderNames(): JEnum[String] = headers.keys.iterator
@@ -591,8 +594,9 @@ class MockHttpServletRequest(
   def getServletContext(): ServletContext = null
   def isAsyncStarted(): Boolean = false
   def isAsyncSupported(): Boolean = false
-  def startAsync(request: javax.servlet.ServletRequest,
-                 response: javax.servlet.ServletResponse): AsyncContext = null
+  def startAsync(
+      request: javax.servlet.ServletRequest,
+      response: javax.servlet.ServletResponse): AsyncContext = null
   def startAsync(): AsyncContext = null
   def changeSessionId(): String = null
   def getContentLengthLong(): Long = body.length

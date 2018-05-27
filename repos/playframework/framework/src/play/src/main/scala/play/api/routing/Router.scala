@@ -57,22 +57,25 @@ object Router {
     *
     * @return The router class if configured or if a default one in the root package was detected.
     */
-  def load(env: Environment,
-           configuration: Configuration): Option[Class[_ <: Router]] = {
+  def load(
+      env: Environment,
+      configuration: Configuration): Option[Class[_ <: Router]] = {
     val className = PlayConfig(configuration)
       .getDeprecated[Option[String]]("play.http.router", "application.router")
 
     try {
       Some(
-          Reflect.getClass[Router](
-              className.getOrElse("router.Routes"), env.classLoader))
+        Reflect.getClass[Router](
+          className.getOrElse("router.Routes"),
+          env.classLoader))
     } catch {
       case e: ClassNotFoundException =>
         // Only throw an exception if a router was explicitly configured, but not found.
         // Otherwise, it just means this application has no router, and that's ok.
         className.map { routerName =>
           throw configuration.reportError(
-              "application.router", "Router not found: " + routerName)
+            "application.router",
+            "Router not found: " + routerName)
         }
     }
   }

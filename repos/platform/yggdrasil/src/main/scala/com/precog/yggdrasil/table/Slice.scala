@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -107,9 +107,10 @@ trait Slice { source =>
 
       resultColumns.groupBy(_.tpe) map {
         case (tpe, cols) =>
-          (ColumnRef(CPath.Identity, tpe),
-           cols.reduceLeft(
-               (c1, c2) => Column.unionRightSemigroup.append(c1, c2)))
+          (
+            ColumnRef(CPath.Identity, tpe),
+            cols.reduceLeft((c1, c2) =>
+              Column.unionRightSemigroup.append(c1, c2)))
       }
     }
   }
@@ -125,11 +126,12 @@ trait Slice { source =>
 
       resultColumns.groupBy(_._1) map {
         case (ref, pairs) =>
-          (ref,
-           pairs
-             .map(_._2)
-             .reduceLeft(
-                 (c1, c2) => Column.unionRightSemigroup.append(c1, c2)))
+          (
+            ref,
+            pairs
+              .map(_._2)
+              .reduceLeft(
+                (c1, c2) => Column.unionRightSemigroup.append(c1, c2)))
       } toMap
     }
   }
@@ -139,9 +141,9 @@ trait Slice { source =>
 
     val cols0 =
       (source.columns).toList sortBy { case (ref, _) => ref.selector }
-    val cols = cols0 map { case (_, col) => col }
+    val cols = cols0 map { case (_, col)             => col }
 
-    def inflate[@spec A : Manifest](cols: Array[Int => A], row: Int) = {
+    def inflate[@spec A: Manifest](cols: Array[Int => A], row: Int) = {
       val as = new Array[A](cols.length)
       var i = 0
       while (i < cols.length) {
@@ -155,76 +157,74 @@ trait Slice { source =>
       !cols.isEmpty && Loop.forall(cols)(_ isDefinedAt row)
 
     val columns: Map[ColumnRef, Column] = {
-      Map(
-          (ColumnRef(CPath(CPathArray), CArrayType(tpe0)),
-           tpe0 match {
-         case CLong =>
-           val longcols =
-             cols.collect { case (col: LongColumn) => col }.toArray
+      Map((ColumnRef(CPath(CPathArray), CArrayType(tpe0)), tpe0 match {
+        case CLong =>
+          val longcols =
+            cols.collect { case (col: LongColumn) => col }.toArray
 
-           new HomogeneousArrayColumn[Long] {
-             private val cols: Array[Int => Long] =
-               longcols map { col =>
-                 col.apply _
-               }
+          new HomogeneousArrayColumn[Long] {
+            private val cols: Array[Int => Long] =
+              longcols map { col =>
+                col.apply _
+              }
 
-             val tpe = CArrayType(CLong)
-             def isDefinedAt(row: Int) = loopForall[LongColumn](longcols)(row)
-             def apply(row: Int): Array[Long] = inflate(cols, row)
-           }
-         case CDouble =>
-           val doublecols =
-             cols.collect { case (col: DoubleColumn) => col }.toArray
-           new HomogeneousArrayColumn[Double] {
-             private val cols: Array[Int => Double] =
-               doublecols map { x =>
-                 x(_)
-               }
+            val tpe = CArrayType(CLong)
+            def isDefinedAt(row: Int) = loopForall[LongColumn](longcols)(row)
+            def apply(row: Int): Array[Long] = inflate(cols, row)
+          }
+        case CDouble =>
+          val doublecols =
+            cols.collect { case (col: DoubleColumn) => col }.toArray
+          new HomogeneousArrayColumn[Double] {
+            private val cols: Array[Int => Double] =
+              doublecols map { x =>
+                x(_)
+              }
 
-             val tpe = CArrayType(CDouble)
-             def isDefinedAt(row: Int) =
-               loopForall[DoubleColumn](doublecols)(row)
-             def apply(row: Int): Array[Double] = inflate(cols, row)
-           }
-         case CNum =>
-           val numcols = cols.collect { case (col: NumColumn) => col }.toArray
-           new HomogeneousArrayColumn[BigDecimal] {
-             private val cols: Array[Int => BigDecimal] =
-               numcols map { x =>
-                 x(_)
-               }
+            val tpe = CArrayType(CDouble)
+            def isDefinedAt(row: Int) =
+              loopForall[DoubleColumn](doublecols)(row)
+            def apply(row: Int): Array[Double] = inflate(cols, row)
+          }
+        case CNum =>
+          val numcols = cols.collect { case (col: NumColumn) => col }.toArray
+          new HomogeneousArrayColumn[BigDecimal] {
+            private val cols: Array[Int => BigDecimal] =
+              numcols map { x =>
+                x(_)
+              }
 
-             val tpe = CArrayType(CNum)
-             def isDefinedAt(row: Int) = loopForall[NumColumn](numcols)(row)
-             def apply(row: Int): Array[BigDecimal] = inflate(cols, row)
-           }
-         case CBoolean =>
-           val boolcols =
-             cols.collect { case (col: BoolColumn) => col }.toArray
-           new HomogeneousArrayColumn[Boolean] {
-             private val cols: Array[Int => Boolean] =
-               boolcols map { x =>
-                 x(_)
-               }
+            val tpe = CArrayType(CNum)
+            def isDefinedAt(row: Int) = loopForall[NumColumn](numcols)(row)
+            def apply(row: Int): Array[BigDecimal] = inflate(cols, row)
+          }
+        case CBoolean =>
+          val boolcols =
+            cols.collect { case (col: BoolColumn) => col }.toArray
+          new HomogeneousArrayColumn[Boolean] {
+            private val cols: Array[Int => Boolean] =
+              boolcols map { x =>
+                x(_)
+              }
 
-             val tpe = CArrayType(CBoolean)
-             def isDefinedAt(row: Int) = loopForall[BoolColumn](boolcols)(row)
-             def apply(row: Int): Array[Boolean] = inflate(cols, row)
-           }
-         case CString =>
-           val strcols = cols.collect { case (col: StrColumn) => col }.toArray
-           new HomogeneousArrayColumn[String] {
-             private val cols: Array[Int => String] =
-               strcols map { x =>
-                 x(_)
-               }
+            val tpe = CArrayType(CBoolean)
+            def isDefinedAt(row: Int) = loopForall[BoolColumn](boolcols)(row)
+            def apply(row: Int): Array[Boolean] = inflate(cols, row)
+          }
+        case CString =>
+          val strcols = cols.collect { case (col: StrColumn) => col }.toArray
+          new HomogeneousArrayColumn[String] {
+            private val cols: Array[Int => String] =
+              strcols map { x =>
+                x(_)
+              }
 
-             val tpe = CArrayType(CString)
-             def isDefinedAt(row: Int) = loopForall[StrColumn](strcols)(row)
-             def apply(row: Int): Array[String] = inflate(cols, row)
-           }
-         case _ => sys.error("unsupported type")
-       }))
+            val tpe = CArrayType(CString)
+            def isDefinedAt(row: Int) = loopForall[StrColumn](strcols)(row)
+            def apply(row: Int): Array[String] = inflate(cols, row)
+          }
+        case _ => sys.error("unsupported type")
+      }))
     }
   }
 
@@ -238,64 +238,65 @@ trait Slice { source =>
     val size = source.size
     val columns = {
       Map(
-          value match {
-            case CString(s) =>
-              (ColumnRef(CPath.Identity, CString), new StrColumn {
+        value match {
+          case CString(s) =>
+            (ColumnRef(CPath.Identity, CString), new StrColumn {
+              def isDefinedAt(row: Int) = source.isDefinedAt(row)
+              def apply(row: Int) = s
+            })
+          case CBoolean(b) =>
+            (ColumnRef(CPath.Identity, CBoolean), new BoolColumn {
+              def isDefinedAt(row: Int) = source.isDefinedAt(row)
+              def apply(row: Int) = b
+            })
+          case CLong(l) =>
+            (ColumnRef(CPath.Identity, CLong), new LongColumn {
+              def isDefinedAt(row: Int) = source.isDefinedAt(row)
+              def apply(row: Int) = l
+            })
+          case CDouble(d) =>
+            (ColumnRef(CPath.Identity, CDouble), new DoubleColumn {
+              def isDefinedAt(row: Int) = source.isDefinedAt(row)
+              def apply(row: Int) = d
+            })
+          case CNum(n) =>
+            (ColumnRef(CPath.Identity, CNum), new NumColumn {
+              def isDefinedAt(row: Int) = source.isDefinedAt(row)
+              def apply(row: Int) = n
+            })
+          case CDate(d) =>
+            (ColumnRef(CPath.Identity, CDate), new DateColumn {
+              def isDefinedAt(row: Int) = source.isDefinedAt(row)
+              def apply(row: Int) = d
+            })
+          case CPeriod(p) =>
+            (ColumnRef(CPath.Identity, CPeriod), new PeriodColumn {
+              def isDefinedAt(row: Int) = source.isDefinedAt(row)
+              def apply(row: Int) = p
+            })
+          case value: CArray[a] =>
+            (
+              ColumnRef(CPath.Identity, value.cType),
+              new HomogeneousArrayColumn[a] {
+                val tpe = value.cType
                 def isDefinedAt(row: Int) = source.isDefinedAt(row)
-                def apply(row: Int) = s
+                def apply(row: Int) = value.value
               })
-            case CBoolean(b) =>
-              (ColumnRef(CPath.Identity, CBoolean), new BoolColumn {
-                def isDefinedAt(row: Int) = source.isDefinedAt(row)
-                def apply(row: Int) = b
-              })
-            case CLong(l) =>
-              (ColumnRef(CPath.Identity, CLong), new LongColumn {
-                def isDefinedAt(row: Int) = source.isDefinedAt(row)
-                def apply(row: Int) = l
-              })
-            case CDouble(d) =>
-              (ColumnRef(CPath.Identity, CDouble), new DoubleColumn {
-                def isDefinedAt(row: Int) = source.isDefinedAt(row)
-                def apply(row: Int) = d
-              })
-            case CNum(n) =>
-              (ColumnRef(CPath.Identity, CNum), new NumColumn {
-                def isDefinedAt(row: Int) = source.isDefinedAt(row)
-                def apply(row: Int) = n
-              })
-            case CDate(d) =>
-              (ColumnRef(CPath.Identity, CDate), new DateColumn {
-                def isDefinedAt(row: Int) = source.isDefinedAt(row)
-                def apply(row: Int) = d
-              })
-            case CPeriod(p) =>
-              (ColumnRef(CPath.Identity, CPeriod), new PeriodColumn {
-                def isDefinedAt(row: Int) = source.isDefinedAt(row)
-                def apply(row: Int) = p
-              })
-            case value: CArray[a] =>
-              (ColumnRef(CPath.Identity, value.cType),
-               new HomogeneousArrayColumn[a] {
-                 val tpe = value.cType
-                 def isDefinedAt(row: Int) = source.isDefinedAt(row)
-                 def apply(row: Int) = value.value
-               })
-            case CNull =>
-              (ColumnRef(CPath.Identity, CNull), new NullColumn {
-                def isDefinedAt(row: Int) = source.isDefinedAt(row)
-              })
-            case CEmptyObject =>
-              (ColumnRef(CPath.Identity, CEmptyObject), new EmptyObjectColumn {
-                def isDefinedAt(row: Int) = source.isDefinedAt(row)
-              })
-            case CEmptyArray =>
-              (ColumnRef(CPath.Identity, CEmptyArray), new EmptyArrayColumn {
-                def isDefinedAt(row: Int) = source.isDefinedAt(row)
-              })
-            case CUndefined =>
-              sys.error("Cannot define a constant undefined value")
-          }
+          case CNull =>
+            (ColumnRef(CPath.Identity, CNull), new NullColumn {
+              def isDefinedAt(row: Int) = source.isDefinedAt(row)
+            })
+          case CEmptyObject =>
+            (ColumnRef(CPath.Identity, CEmptyObject), new EmptyObjectColumn {
+              def isDefinedAt(row: Int) = source.isDefinedAt(row)
+            })
+          case CEmptyArray =>
+            (ColumnRef(CPath.Identity, CEmptyArray), new EmptyArrayColumn {
+              def isDefinedAt(row: Int) = source.isDefinedAt(row)
+            })
+          case CUndefined =>
+            sys.error("Cannot define a constant undefined value")
+        }
       )
     }
   }
@@ -305,17 +306,18 @@ trait Slice { source =>
     val columns = node match {
       case CPathIndex(i) =>
         source.columns collect {
-          case (ColumnRef(CPath(CPathArray, xs @ _ *), CArrayType(elemType)),
-                col: HomogeneousArrayColumn[_]) =>
+          case (
+              ColumnRef(CPath(CPathArray, xs @ _*), CArrayType(elemType)),
+              col: HomogeneousArrayColumn[_]) =>
             (ColumnRef(CPath(xs: _*), elemType), col.select(i))
 
-          case (ColumnRef(CPath(CPathIndex(`i`), xs @ _ *), ctype), col) =>
+          case (ColumnRef(CPath(CPathIndex(`i`), xs @ _*), ctype), col) =>
             (ColumnRef(CPath(xs: _*), ctype), col)
         }
 
       case _ =>
         source.columns collect {
-          case (ColumnRef(CPath(`node`, xs @ _ *), ctype), col) =>
+          case (ColumnRef(CPath(`node`, xs @ _*), ctype), col) =>
             (ColumnRef(CPath(xs: _*), ctype), col)
         }
     }
@@ -331,12 +333,12 @@ trait Slice { source =>
     val columns = wrapper match {
       case CPathArray =>
         source.columns map {
-          case (ColumnRef(CPath(nodes @ _ *), ctype), col) =>
+          case (ColumnRef(CPath(nodes @ _*), ctype), col) =>
             (ColumnRef(CPath(CPathIndex(0) +: nodes: _*), ctype), col)
         }
       case _ =>
         source.columns map {
-          case (ColumnRef(CPath(nodes @ _ *), ctype), col) =>
+          case (ColumnRef(CPath(nodes @ _*), ctype), col) =>
             (ColumnRef(CPath(wrapper +: nodes: _*), ctype), col)
         }
     }
@@ -353,8 +355,8 @@ trait Slice { source =>
     def fixArrays(columns: Map[ColumnRef, Column]): Map[ColumnRef, Column] = {
       columns.toSeq
         .sortBy(_._1)
-        .foldLeft((Map.empty[Vector[CPathNode], Int],
-                   Map.empty[ColumnRef, Column])) {
+        .foldLeft(
+          (Map.empty[Vector[CPathNode], Int], Map.empty[ColumnRef, Column])) {
           case ((arrayPaths, acc), (ColumnRef(jpath, ctype), col)) =>
             val (arrayPaths0, nodes) =
               jpath.nodes.foldLeft((arrayPaths, Vector.empty[CPathNode])) {
@@ -374,48 +376,50 @@ trait Slice { source =>
     // flatMap, that will modify the homogeneous array according to `jType`.
     //
     def flattenDeleteTree[A](
-        jType: JType, cType: CValueType[A], cPath: CPath): A => Option[A] = {
+        jType: JType,
+        cType: CValueType[A],
+        cPath: CPath): A => Option[A] = {
       val delete: A => Option[A] = _ => None
       val retain: A => Option[A] = Some(_)
 
       (jType, cType, cPath) match {
         case (JUnionT(aJType, bJType), _, _) =>
           flattenDeleteTree(aJType, cType, cPath) andThen
-          (_ flatMap flattenDeleteTree(bJType, cType, cPath))
+            (_ flatMap flattenDeleteTree(bJType, cType, cPath))
         case (JTextT, CString, CPath.Identity) =>
           delete
         case (JBooleanT, CBoolean, CPath.Identity) =>
           delete
         case (JNumberT, CLong | CDouble | CNum, CPath.Identity) =>
           delete
-        case (JObjectUnfixedT, _, CPath(CPathField(_), _ *)) =>
+        case (JObjectUnfixedT, _, CPath(CPathField(_), _*)) =>
           delete
-        case (
-            JObjectFixedT(fields), _, CPath(CPathField(name), cPath @ _ *)) =>
+        case (JObjectFixedT(fields), _, CPath(CPathField(name), cPath @ _*)) =>
           fields get name map (flattenDeleteTree(_, cType, CPath(cPath: _*))) getOrElse
-          (retain)
-        case (JArrayUnfixedT, _, CPath(CPathArray | CPathIndex(_), _ *)) =>
+            (retain)
+        case (JArrayUnfixedT, _, CPath(CPathArray | CPathIndex(_), _*)) =>
           delete
-        case (JArrayFixedT(elems), cType, CPath(CPathIndex(i), cPath @ _ *)) =>
+        case (JArrayFixedT(elems), cType, CPath(CPathIndex(i), cPath @ _*)) =>
           elems get i map (flattenDeleteTree(_, cType, CPath(cPath: _*))) getOrElse
-          (retain)
-        case (JArrayFixedT(elems),
-              CArrayType(cElemType),
-              CPath(CPathArray, cPath @ _ *)) =>
+            (retain)
+        case (
+            JArrayFixedT(elems),
+            CArrayType(cElemType),
+            CPath(CPathArray, cPath @ _*)) =>
           val mappers =
             elems mapValues (flattenDeleteTree(_, cElemType, CPath(cPath: _*)))
           xs =>
-            Some(
-                xs.zipWithIndex map {
+            Some(xs.zipWithIndex map {
               case (x, j) =>
                 mappers get j match {
                   case Some(f) => f(x)
-                  case None => x
+                  case None    => x
                 }
             })
-          case (JArrayHomogeneousT(jType),
-                CArrayType(cType),
-                CPath(CPathArray, _ *)) if Schema.ctypes(jType)(cType) =>
+        case (
+            JArrayHomogeneousT(jType),
+            CArrayType(cType),
+            CPath(CPathArray, _*)) if Schema.ctypes(jType)(cType) =>
           delete
         case _ =>
           retain
@@ -428,15 +432,16 @@ trait Slice { source =>
           if Schema.includes(jtype, cpath, ctype) =>
         None
 
-      case (ref @ ColumnRef(cpath, ctype: CArrayType[a]),
-            col: HomogeneousArrayColumn[_]) if ctype == col.tpe =>
+      case (
+          ref @ ColumnRef(cpath, ctype: CArrayType[a]),
+          col: HomogeneousArrayColumn[_]) if ctype == col.tpe =>
         val trans = flattenDeleteTree(jtype, ctype, cpath)
         Some((ref, new HomogeneousArrayColumn[a] {
           val tpe = ctype
           def isDefinedAt(row: Int) = col.isDefinedAt(row)
           def apply(row: Int): Array[a] =
             trans(col(row).asInstanceOf[Array[a]]) getOrElse sys.error(
-                "Oh dear, this cannot be happening to me.")
+              "Oh dear, this cannot be happening to me.")
         }))
 
       case (ref, col) =>
@@ -447,7 +452,7 @@ trait Slice { source =>
   def deleteFields(prefixes: scala.collection.Set[CPathField]) = new Slice {
     private val (removed, withoutPrefixes) =
       source.columns partition {
-        case (ColumnRef(CPath(head @ CPathField(_), _ @_ *), _), _) =>
+        case (ColumnRef(CPath(head @ CPathField(_), _ @_*), _), _) =>
           prefixes contains head
         case _ => false
       }
@@ -521,7 +526,9 @@ trait Slice { source =>
     val subsumes = Schema.subsumes(pathsAndTypes, jtpe)
 
     val definedBits =
-      (source.columns).values.map(_.definedAt(0, size)).reduceOption(_ | _) getOrElse new BitSet
+      (source.columns).values
+        .map(_.definedAt(0, size))
+        .reduceOption(_ | _) getOrElse new BitSet
 
     val columns =
       if (subsumes) {
@@ -534,19 +541,19 @@ trait Slice { source =>
         val included = Schema.findTypes(jtpe, CPath.Identity, cols, size)
         val includedBits = BitSetUtil.filteredRange(0, size)(included)
 
-        Map(ColumnRef(CPath.Identity, CBoolean) -> BoolColumn.Either(
-                definedBits, includedBits))
+        Map(
+          ColumnRef(CPath.Identity, CBoolean) -> BoolColumn
+            .Either(definedBits, includedBits))
       } else {
-        Map(ColumnRef(CPath.Identity, CBoolean) -> BoolColumn.False(
-                definedBits))
+        Map(
+          ColumnRef(CPath.Identity, CBoolean) -> BoolColumn.False(definedBits))
       }
   }
 
   def nest(selectorPrefix: CPath) = new Slice {
-    val arraylessPrefix = CPath(
-        selectorPrefix.nodes map {
+    val arraylessPrefix = CPath(selectorPrefix.nodes map {
       case CPathArray => CPathIndex(0)
-      case n => n
+      case n          => n
     }: _*)
 
     val size = source.size
@@ -560,8 +567,9 @@ trait Slice { source =>
   def arraySwap(index: Int) = new Slice {
     val size = source.size
     val columns = source.columns.collect {
-      case (ColumnRef(cPath @ CPath(CPathArray, _ *), cType),
-            col: HomogeneousArrayColumn[a]) =>
+      case (
+          ColumnRef(cPath @ CPath(CPathArray, _*), cType),
+          col: HomogeneousArrayColumn[a]) =>
         (ColumnRef(cPath, cType), new HomogeneousArrayColumn[a] {
           val tpe = col.tpe
           def isDefinedAt(row: Int) = col.isDefinedAt(row)
@@ -584,13 +592,13 @@ trait Slice { source =>
           }
         })
 
-      case (ColumnRef(CPath(CPathIndex(0), xs @ _ *), ctype), col) =>
+      case (ColumnRef(CPath(CPathIndex(0), xs @ _*), ctype), col) =>
         (ColumnRef(CPath(CPathIndex(index) +: xs: _*), ctype), col)
 
-      case (ColumnRef(CPath(CPathIndex(`index`), xs @ _ *), ctype), col) =>
+      case (ColumnRef(CPath(CPathIndex(`index`), xs @ _*), ctype), col) =>
         (ColumnRef(CPath(CPathIndex(0) +: xs: _*), ctype), col)
 
-      case c @ (ColumnRef(CPath(CPathIndex(i), xs @ _ *), ctype), col) => c
+      case c @ (ColumnRef(CPath(CPathIndex(i), xs @ _*), ctype), col) => c
     }
   }
 
@@ -625,9 +633,10 @@ trait Slice { source =>
 
       resultColumns.groupBy(_.tpe) map {
         case (tpe, cols) =>
-          (ColumnRef(to, tpe),
-           cols.reduceLeft(
-               (c1, c2) => Column.unionRightSemigroup.append(c1, c2)))
+          (
+            ColumnRef(to, tpe),
+            cols.reduceLeft((c1, c2) =>
+              Column.unionRightSemigroup.append(c1, c2)))
       }
     }
   }
@@ -648,9 +657,10 @@ trait Slice { source =>
 
       resultColumns.groupBy(_.tpe) map {
         case (tpe, cols) =>
-          (ColumnRef(to, tpe),
-           cols.reduceLeft(
-               (c1, c2) => Column.unionRightSemigroup.append(c1, c2)))
+          (
+            ColumnRef(to, tpe),
+            cols.reduceLeft((c1, c2) =>
+              Column.unionRightSemigroup.append(c1, c2)))
       }
     }
   }
@@ -686,38 +696,38 @@ trait Slice { source =>
 
       lazy val retained = definedness match {
         case AnyDefined => {
-            val acc = new ArrayIntList
-            Loop.range(0, filter.size) { i =>
-              if (cols.values.toArray.exists(_.isDefinedAt(i))) acc.add(i)
-            }
-            acc
+          val acc = new ArrayIntList
+          Loop.range(0, filter.size) { i =>
+            if (cols.values.toArray.exists(_.isDefinedAt(i))) acc.add(i)
           }
+          acc
+        }
 
         case AllDefined => {
-            val acc = new ArrayIntList
-            val (numCols, otherCols) =
-              cols partition {
-                case (ColumnRef(_, ctype), _) =>
-                  ctype.isNumeric
+          val acc = new ArrayIntList
+          val (numCols, otherCols) =
+            cols partition {
+              case (ColumnRef(_, ctype), _) =>
+                ctype.isNumeric
+            }
+
+          val grouped =
+            numCols groupBy { case (ColumnRef(cpath, _), _) => cpath }
+
+          Loop.range(0, filter.size) { i =>
+            val numBools =
+              grouped.values map {
+                case refs =>
+                  refs.values.toArray.exists(_.isDefinedAt(i))
               }
 
-            val grouped =
-              numCols groupBy { case (ColumnRef(cpath, _), _) => cpath }
+            val numBool = numBools reduce { _ && _ }
+            val otherBool = otherCols.values.toArray.forall(_.isDefinedAt(i))
 
-            Loop.range(0, filter.size) { i =>
-              val numBools =
-                grouped.values map {
-                  case refs =>
-                    refs.values.toArray.exists(_.isDefinedAt(i))
-                }
-
-              val numBool = numBools reduce { _ && _ }
-              val otherBool = otherCols.values.toArray.forall(_.isDefinedAt(i))
-
-              if (otherBool && numBool) acc.add(i)
-            }
-            acc
+            if (otherBool && numBool) acc.add(i)
           }
+          acc
+        }
       }
 
       lazy val size = retained.size
@@ -766,7 +776,8 @@ trait Slice { source =>
 
           @tailrec
           def findStraddlingDistinct0(
-              prevRow: Int, curRow: Int): ArrayIntList = {
+              prevRow: Int,
+              curRow: Int): ArrayIntList = {
             if (curRow >= filter.size) acc
             else {
               val retain = straddleComparator.compare(prevRow, curRow) != EQ
@@ -779,20 +790,22 @@ trait Slice { source =>
           findStraddlingDistinct0(prevRow, curRow)
         }
 
-        val lastDefined = prevFilter.flatMap { slice =>
-          (slice.size - 1 to 0 by -1)
-            .find(row => slice.columns.values.exists(_.isDefinedAt(row)))
-        }.map {
-          (prevFilter.get, _)
-        }
+        val lastDefined = prevFilter
+          .flatMap { slice =>
+            (slice.size - 1 to 0 by -1)
+              .find(row => slice.columns.values.exists(_.isDefinedAt(row)))
+          }
+          .map {
+            (prevFilter.get, _)
+          }
 
         val firstDefined = (0 until filter.size)
           .find(i => filter.columns.values.exists(_.isDefinedAt(i)))
 
         (lastDefined, firstDefined) match {
           case (Some((prev, i)), Some(j)) => findStraddlingDistinct(prev, i, j)
-          case (_, Some(j)) => acc.add(j); findSelfDistinct(j, j + 1)
-          case _ => acc
+          case (_, Some(j))               => acc.add(j); findSelfDistinct(j, j + 1)
+          case _                          => acc
         }
       }
 
@@ -869,8 +882,9 @@ trait Slice { source =>
       }
     }
 
-  def sortWith(keySlice: Slice,
-               sortOrder: DesiredSortOrder = SortAscending): (Slice, Slice) = {
+  def sortWith(
+      keySlice: Slice,
+      sortOrder: DesiredSortOrder = SortAscending): (Slice, Slice) = {
 
     // We filter out rows that are completely undefined.
     val order: Array[Int] =
@@ -893,12 +907,14 @@ trait Slice { source =>
     val sortedKeySlice = keySlice.remap(remapOrder)
 
     // TODO Remove the duplicate distinct call. Should be able to handle this in 1 pass.
-    (sortedSlice.distinct(None, sortedKeySlice),
-     sortedKeySlice.distinct(None, sortedKeySlice))
+    (
+      sortedSlice.distinct(None, sortedKeySlice),
+      sortedKeySlice.distinct(None, sortedKeySlice))
   }
 
-  def sortBy(prefixes: VectorCase[CPath],
-             sortOrder: DesiredSortOrder = SortAscending): Slice = {
+  def sortBy(
+      prefixes: VectorCase[CPath],
+      sortOrder: DesiredSortOrder = SortAscending): Slice = {
     // TODO This is slow... Faster would require a prefix map or something... argh.
     val keySlice = new Slice {
       val size = source.size
@@ -967,10 +983,10 @@ trait Slice { source =>
         other.columns.foldLeft(source.columns) {
           case (acc, (ref, col)) =>
             acc +
-            (ref ->
+              (ref ->
                 (acc get ref flatMap { c =>
-                      cf.util.UnionRight(c, col)
-                    } getOrElse col))
+                  cf.util.UnionRight(c, col)
+                } getOrElse col))
         }
     }
   }
@@ -1075,148 +1091,150 @@ trait Slice { source =>
 
       val optSchema = {
         def insert(
-            target: SchemaNode, ref: ColumnRef, col: Column): SchemaNode = {
+            target: SchemaNode,
+            ref: ColumnRef,
+            col: Column): SchemaNode = {
           val ColumnRef(selector, ctype) = ref
 
           selector.nodes match {
             case CPathField(name) :: tail => {
-                target match {
-                  case SchemaNode.Obj(nodes) => {
-                      val subTarget =
-                        nodes get name getOrElse SchemaNode.Union(Set())
-                      val result = insert(
-                          subTarget, ColumnRef(CPath(tail), ctype), col)
-                      SchemaNode.Obj(nodes + (name -> result))
-                    }
-
-                  case SchemaNode.Union(nodes) => {
-                      val objNode =
-                        nodes find {
-                          case _: SchemaNode.Obj => true
-                          case _ => false
-                        }
-
-                      val subTarget = objNode getOrElse SchemaNode.Obj(Map())
-                      SchemaNode.Union(
-                          nodes - subTarget + insert(subTarget, ref, col))
-                    }
-
-                  case node =>
-                    SchemaNode.Union(
-                        Set(node, insert(SchemaNode.Obj(Map()), ref, col)))
+              target match {
+                case SchemaNode.Obj(nodes) => {
+                  val subTarget =
+                    nodes get name getOrElse SchemaNode.Union(Set())
+                  val result =
+                    insert(subTarget, ColumnRef(CPath(tail), ctype), col)
+                  SchemaNode.Obj(nodes + (name -> result))
                 }
+
+                case SchemaNode.Union(nodes) => {
+                  val objNode =
+                    nodes find {
+                      case _: SchemaNode.Obj => true
+                      case _                 => false
+                    }
+
+                  val subTarget = objNode getOrElse SchemaNode.Obj(Map())
+                  SchemaNode.Union(
+                    nodes - subTarget + insert(subTarget, ref, col))
+                }
+
+                case node =>
+                  SchemaNode.Union(
+                    Set(node, insert(SchemaNode.Obj(Map()), ref, col)))
               }
+            }
 
             case CPathIndex(idx) :: tail => {
-                target match {
-                  case SchemaNode.Arr(map) => {
-                      val subTarget =
-                        map get idx getOrElse SchemaNode.Union(Set())
-                      val result = insert(
-                          subTarget, ColumnRef(CPath(tail), ctype), col)
-                      SchemaNode.Arr(map + (idx -> result))
-                    }
-
-                  case SchemaNode.Union(nodes) => {
-                      val objNode =
-                        nodes find {
-                          case _: SchemaNode.Arr => true
-                          case _ => false
-                        }
-
-                      val subTarget = objNode getOrElse SchemaNode.Arr(Map())
-                      SchemaNode.Union(
-                          nodes - subTarget + insert(subTarget, ref, col))
-                    }
-
-                  case node =>
-                    SchemaNode.Union(
-                        Set(node, insert(SchemaNode.Arr(Map()), ref, col)))
+              target match {
+                case SchemaNode.Arr(map) => {
+                  val subTarget =
+                    map get idx getOrElse SchemaNode.Union(Set())
+                  val result =
+                    insert(subTarget, ColumnRef(CPath(tail), ctype), col)
+                  SchemaNode.Arr(map + (idx -> result))
                 }
+
+                case SchemaNode.Union(nodes) => {
+                  val objNode =
+                    nodes find {
+                      case _: SchemaNode.Arr => true
+                      case _                 => false
+                    }
+
+                  val subTarget = objNode getOrElse SchemaNode.Arr(Map())
+                  SchemaNode.Union(
+                    nodes - subTarget + insert(subTarget, ref, col))
+                }
+
+                case node =>
+                  SchemaNode.Union(
+                    Set(node, insert(SchemaNode.Arr(Map()), ref, col)))
               }
+            }
 
             case CPathMeta(_) :: _ => target
 
             case CPathArray :: _ => sys.error("todo")
 
             case Nil => {
-                val node = SchemaNode.Leaf(ctype, col)
+              val node = SchemaNode.Leaf(ctype, col)
 
-                target match {
-                  case SchemaNode.Union(nodes) =>
-                    SchemaNode.Union(nodes + node)
-                  case oldNode => SchemaNode.Union(Set(oldNode, node))
-                }
+              target match {
+                case SchemaNode.Union(nodes) =>
+                  SchemaNode.Union(nodes + node)
+                case oldNode => SchemaNode.Union(Set(oldNode, node))
               }
+            }
           }
         }
 
         def normalize(schema: SchemaNode): Option[SchemaNode] = schema match {
           case SchemaNode.Obj(nodes) => {
-              val nodes2 =
-                nodes flatMap {
-                  case (key, value) => normalize(value) map { key -> _ }
-                }
-
-              val back =
-                if (nodes2.isEmpty) None
-                else Some(SchemaNode.Obj(nodes2))
-
-              back foreach { obj =>
-                obj.keys = new Array[String](nodes2.size)
-                obj.values = new Array[SchemaNode](nodes2.size)
+            val nodes2 =
+              nodes flatMap {
+                case (key, value) => normalize(value) map { key -> _ }
               }
 
-              var i = 0
-              back foreach { obj =>
-                for ((key, value) <- nodes2) {
-                  obj.keys(i) = key
-                  obj.values(i) = value
-                  i += 1
-                }
-              }
+            val back =
+              if (nodes2.isEmpty) None
+              else Some(SchemaNode.Obj(nodes2))
 
-              back
+            back foreach { obj =>
+              obj.keys = new Array[String](nodes2.size)
+              obj.values = new Array[SchemaNode](nodes2.size)
             }
+
+            var i = 0
+            back foreach { obj =>
+              for ((key, value) <- nodes2) {
+                obj.keys(i) = key
+                obj.values(i) = value
+                i += 1
+              }
+            }
+
+            back
+          }
 
           case SchemaNode.Arr(map) => {
-              val map2 =
-                map flatMap {
-                  case (idx, value) => normalize(value) map { idx -> _ }
-                }
-
-              val back =
-                if (map2.isEmpty) None
-                else Some(SchemaNode.Arr(map2))
-
-              back foreach { arr =>
-                arr.nodes = new Array[SchemaNode](map2.size)
+            val map2 =
+              map flatMap {
+                case (idx, value) => normalize(value) map { idx -> _ }
               }
 
-              var i = 0
-              back foreach { arr =>
-                val values = map2.toSeq sortBy { _._1 } map { _._2 }
+            val back =
+              if (map2.isEmpty) None
+              else Some(SchemaNode.Arr(map2))
 
-                for (value <- values) {
-                  arr.nodes(i) = value
-                  i += 1
-                }
-              }
-
-              back
+            back foreach { arr =>
+              arr.nodes = new Array[SchemaNode](map2.size)
             }
+
+            var i = 0
+            back foreach { arr =>
+              val values = map2.toSeq sortBy { _._1 } map { _._2 }
+
+              for (value <- values) {
+                arr.nodes(i) = value
+                i += 1
+              }
+            }
+
+            back
+          }
 
           case SchemaNode.Union(nodes) => {
-              val nodes2 = nodes flatMap normalize
+            val nodes2 = nodes flatMap normalize
 
-              if (nodes2.isEmpty) None
-              else if (nodes2.size == 1) nodes2.headOption
-              else {
-                val union = SchemaNode.Union(nodes2)
-                union.possibilities = nodes2.toArray
-                Some(union)
-              }
+            if (nodes2.isEmpty) None
+            else if (nodes2.size == 1) nodes2.headOption
+            else {
+              val union = SchemaNode.Union(nodes2)
+              union.possibilities = nodes2.toArray
+              Some(union)
             }
+          }
 
           case lf: SchemaNode.Leaf => Some(lf)
         }
@@ -1324,7 +1342,7 @@ trait Slice { source =>
             val c = str.charAt(idx)
 
             (c: @switch) match {
-              case '"' => pushStr("\\\"")
+              case '"'  => pushStr("\\\"")
               case '\\' => pushStr("\\\\")
               case '\b' => pushStr("\\b")
               case '\f' => pushStr("\\f")
@@ -1333,15 +1351,15 @@ trait Slice { source =>
               case '\t' => pushStr("\\t")
 
               case c => {
-                  if ((c >= '\u0000' && c < '\u001f') ||
-                      (c >= '\u0080' && c < '\u00a0') ||
-                      (c >= '\u2000' && c < '\u2100')) {
-                    pushStr("\\u")
-                    pushStr("%04x".format(Character.codePointAt(str, idx)))
-                  } else {
-                    push(c)
-                  }
+                if ((c >= '\u0000' && c < '\u001f') ||
+                    (c >= '\u0080' && c < '\u00a0') ||
+                    (c >= '\u2000' && c < '\u2100')) {
+                  pushStr("\\u")
+                  pushStr("%04x".format(Character.codePointAt(str, idx)))
+                } else {
+                  push(c)
                 }
+              }
             }
 
             renderString(str, idx + 1)
@@ -1448,237 +1466,237 @@ trait Slice { source =>
         def traverseSchema(row: Int, schema: SchemaNode): Boolean =
           schema match {
             case obj: SchemaNode.Obj => {
-                val keys = obj.keys
-                val values = obj.values
+              val keys = obj.keys
+              val values = obj.values
 
-                @inline
-                @tailrec
-                def loop(idx: Int, done: Boolean): Boolean = {
-                  if (idx < keys.length) {
-                    val key = keys(idx)
-                    val value = values(idx)
+              @inline
+              @tailrec
+              def loop(idx: Int, done: Boolean): Boolean = {
+                if (idx < keys.length) {
+                  val key = keys(idx)
+                  val value = values(idx)
+
+                  if (done) {
+                    pushIn(",", false)
+                  }
+
+                  pushIn(key, true)
+                  pushIn(":", false)
+
+                  val emitted = traverseSchema(row, value)
+
+                  if (!emitted) {
+                    // less efficient
+                    popIn()
+                    popIn()
 
                     if (done) {
-                      pushIn(",", false)
-                    }
-
-                    pushIn(key, true)
-                    pushIn(":", false)
-
-                    val emitted = traverseSchema(row, value)
-
-                    if (!emitted) {
-                      // less efficient
                       popIn()
-                      popIn()
-
-                      if (done) {
-                        popIn()
-                      }
                     }
-
-                    loop(idx + 1, done || emitted)
-                  } else {
-                    done
                   }
-                }
 
-                pushIn("{", false)
-                val done = loop(0, false)
-
-                if (done) {
-                  push('}')
+                  loop(idx + 1, done || emitted)
                 } else {
-                  popIn()
+                  done
                 }
-
-                done
               }
+
+              pushIn("{", false)
+              val done = loop(0, false)
+
+              if (done) {
+                push('}')
+              } else {
+                popIn()
+              }
+
+              done
+            }
 
             case arr: SchemaNode.Arr => {
-                val values = arr.nodes
+              val values = arr.nodes
 
-                @inline
-                @tailrec
-                def loop(idx: Int, done: Boolean): Boolean = {
-                  if (idx < values.length) {
-                    val value = values(idx)
+              @inline
+              @tailrec
+              def loop(idx: Int, done: Boolean): Boolean = {
+                if (idx < values.length) {
+                  val value = values(idx)
 
-                    if (done) {
-                      pushIn(",", false)
-                    }
-
-                    val emitted = traverseSchema(row, value)
-
-                    if (!emitted && done) {
-                      // less efficient
-                      popIn()
-                    }
-
-                    loop(idx + 1, done || emitted)
-                  } else {
-                    done
+                  if (done) {
+                    pushIn(",", false)
                   }
-                }
 
-                pushIn("[", false)
-                val done = loop(0, false)
+                  val emitted = traverseSchema(row, value)
 
-                if (done) {
-                  push(']')
+                  if (!emitted && done) {
+                    // less efficient
+                    popIn()
+                  }
+
+                  loop(idx + 1, done || emitted)
                 } else {
-                  popIn()
+                  done
                 }
-
-                done
               }
 
-            case union: SchemaNode.Union => {
-                val pos = union.possibilities
+              pushIn("[", false)
+              val done = loop(0, false)
 
-                @inline
-                @tailrec
-                def loop(idx: Int): Boolean = {
-                  if (idx < pos.length) {
-                    traverseSchema(row, pos(idx)) || loop(idx + 1)
+              if (done) {
+                push(']')
+              } else {
+                popIn()
+              }
+
+              done
+            }
+
+            case union: SchemaNode.Union => {
+              val pos = union.possibilities
+
+              @inline
+              @tailrec
+              def loop(idx: Int): Boolean = {
+                if (idx < pos.length) {
+                  traverseSchema(row, pos(idx)) || loop(idx + 1)
+                } else {
+                  false
+                }
+              }
+
+              loop(0)
+            }
+
+            case SchemaNode.Leaf(tpe, col) =>
+              tpe match {
+                case CString => {
+                  val specCol = col.asInstanceOf[StrColumn]
+
+                  if (specCol.isDefinedAt(row)) {
+                    flushIn()
+                    renderString(specCol(row))
+                    true
                   } else {
                     false
                   }
                 }
 
-                loop(0)
-              }
-
-            case SchemaNode.Leaf(tpe, col) =>
-              tpe match {
-                case CString => {
-                    val specCol = col.asInstanceOf[StrColumn]
-
-                    if (specCol.isDefinedAt(row)) {
-                      flushIn()
-                      renderString(specCol(row))
-                      true
-                    } else {
-                      false
-                    }
-                  }
-
                 case CBoolean => {
-                    val specCol = col.asInstanceOf[BoolColumn]
+                  val specCol = col.asInstanceOf[BoolColumn]
 
-                    if (specCol.isDefinedAt(row)) {
-                      flushIn()
-                      renderBoolean(specCol(row))
-                      true
-                    } else {
-                      false
-                    }
+                  if (specCol.isDefinedAt(row)) {
+                    flushIn()
+                    renderBoolean(specCol(row))
+                    true
+                  } else {
+                    false
                   }
+                }
 
                 case CLong => {
-                    val specCol = col.asInstanceOf[LongColumn]
+                  val specCol = col.asInstanceOf[LongColumn]
 
-                    if (specCol.isDefinedAt(row)) {
-                      flushIn()
-                      renderLong(specCol(row))
-                      true
-                    } else {
-                      false
-                    }
+                  if (specCol.isDefinedAt(row)) {
+                    flushIn()
+                    renderLong(specCol(row))
+                    true
+                  } else {
+                    false
                   }
+                }
 
                 case CDouble => {
-                    val specCol = col.asInstanceOf[DoubleColumn]
+                  val specCol = col.asInstanceOf[DoubleColumn]
 
-                    if (specCol.isDefinedAt(row)) {
-                      flushIn()
-                      renderDouble(specCol(row))
-                      true
-                    } else {
-                      false
-                    }
+                  if (specCol.isDefinedAt(row)) {
+                    flushIn()
+                    renderDouble(specCol(row))
+                    true
+                  } else {
+                    false
                   }
+                }
 
                 case CNum => {
-                    val specCol = col.asInstanceOf[NumColumn]
+                  val specCol = col.asInstanceOf[NumColumn]
 
-                    if (specCol.isDefinedAt(row)) {
-                      flushIn()
-                      renderNum(specCol(row))
-                      true
-                    } else {
-                      false
-                    }
+                  if (specCol.isDefinedAt(row)) {
+                    flushIn()
+                    renderNum(specCol(row))
+                    true
+                  } else {
+                    false
                   }
+                }
 
                 case CNull => {
-                    val specCol = col.asInstanceOf[NullColumn]
-                    if (specCol.isDefinedAt(row)) {
-                      flushIn()
-                      renderNull()
-                      true
-                    } else {
-                      false
-                    }
+                  val specCol = col.asInstanceOf[NullColumn]
+                  if (specCol.isDefinedAt(row)) {
+                    flushIn()
+                    renderNull()
+                    true
+                  } else {
+                    false
                   }
+                }
 
                 case CEmptyObject => {
-                    val specCol = col.asInstanceOf[EmptyObjectColumn]
-                    if (specCol.isDefinedAt(row)) {
-                      flushIn()
-                      renderEmptyObject()
-                      true
-                    } else {
-                      false
-                    }
+                  val specCol = col.asInstanceOf[EmptyObjectColumn]
+                  if (specCol.isDefinedAt(row)) {
+                    flushIn()
+                    renderEmptyObject()
+                    true
+                  } else {
+                    false
                   }
+                }
 
                 case CEmptyArray => {
-                    val specCol = col.asInstanceOf[EmptyArrayColumn]
-                    if (specCol.isDefinedAt(row)) {
-                      flushIn()
-                      renderEmptyArray()
-                      true
-                    } else {
-                      false
-                    }
+                  val specCol = col.asInstanceOf[EmptyArrayColumn]
+                  if (specCol.isDefinedAt(row)) {
+                    flushIn()
+                    renderEmptyArray()
+                    true
+                  } else {
+                    false
                   }
+                }
 
                 case CDate => {
-                    val specCol = col.asInstanceOf[DateColumn]
+                  val specCol = col.asInstanceOf[DateColumn]
 
-                    if (specCol.isDefinedAt(row)) {
-                      flushIn()
-                      renderDate(specCol(row))
-                      true
-                    } else {
-                      false
-                    }
+                  if (specCol.isDefinedAt(row)) {
+                    flushIn()
+                    renderDate(specCol(row))
+                    true
+                  } else {
+                    false
                   }
+                }
 
                 case CPeriod => {
-                    val specCol = col.asInstanceOf[PeriodColumn]
+                  val specCol = col.asInstanceOf[PeriodColumn]
 
-                    if (specCol.isDefinedAt(row)) {
-                      flushIn()
-                      renderPeriod(specCol(row))
-                      true
-                    } else {
-                      false
-                    }
+                  if (specCol.isDefinedAt(row)) {
+                    flushIn()
+                    renderPeriod(specCol(row))
+                    true
+                  } else {
+                    false
                   }
+                }
 
                 case CArrayType(_) => {
-                    val specCol = col.asInstanceOf[HomogeneousArrayColumn[_]]
+                  val specCol = col.asInstanceOf[HomogeneousArrayColumn[_]]
 
-                    if (specCol.isDefinedAt(row)) {
-                      flushIn()
-                      renderArray(specCol(row))
-                      true
-                    } else {
-                      false
-                    }
+                  if (specCol.isDefinedAt(row)) {
+                    flushIn()
+                    renderArray(specCol(row))
+                    true
+                  } else {
+                    false
                   }
+                }
 
                 case CUndefined => false
               }
@@ -1746,7 +1764,7 @@ trait Slice { source =>
   def toJson(row: Int): Option[JValue] = {
     toJValue(row) match {
       case JUndefined => None
-      case jv => Some(jv)
+      case jv         => Some(jv)
     }
   }
 
@@ -1755,7 +1773,7 @@ trait Slice { source =>
       if (i < source.size) {
         toJValue(i) match {
           case JUndefined => rec(i + 1, acc)
-          case jv => rec(i + 1, acc :+ jv)
+          case jv         => rec(i + 1, acc :+ jv)
         }
       } else acc
     }
@@ -1765,12 +1783,12 @@ trait Slice { source =>
 
   def toString(row: Int): Option[String] = {
     (columns.toList.sortBy(_._1) map {
-          case (ref, col) =>
-            ref.toString + ": " +
-            (if (col.isDefinedAt(row)) col.strValue(row) else "(undefined)")
-        }) match {
+      case (ref, col) =>
+        ref.toString + ": " +
+          (if (col.isDefinedAt(row)) col.strValue(row) else "(undefined)")
+    }) match {
       case Nil => None
-      case l => Some(l.mkString("[", ", ", "]"))
+      case l   => Some(l.mkString("[", ", ", "]"))
     }
   }
 
@@ -1792,10 +1810,11 @@ object Slice {
     }
   }
 
-  def updateRefs(rv: RValue,
-                 into: Map[ColumnRef, ArrayColumn[_]],
-                 sliceIndex: Int,
-                 sliceSize: Int): Map[ColumnRef, ArrayColumn[_]] = {
+  def updateRefs(
+      rv: RValue,
+      into: Map[ColumnRef, ArrayColumn[_]],
+      sliceIndex: Int,
+      sliceSize: Int): Map[ColumnRef, ArrayColumn[_]] = {
     rv.flattenWithPath.foldLeft(into) {
       case (acc, (cpath, CUndefined)) => acc
       case (acc, (cpath, cvalue)) =>
@@ -1860,8 +1879,9 @@ object Slice {
 
           case CArray(arr, cType) =>
             acc
-              .getOrElse(ref,
-                         ArrayHomogeneousArrayColumn.empty(sliceSize)(cType))
+              .getOrElse(
+                ref,
+                ArrayHomogeneousArrayColumn.empty(sliceSize)(cType))
               .asInstanceOf[ArrayHomogeneousArrayColumn[cType.tpe]]
               .unsafeTap { c =>
                 c.update(sliceIndex, arr)
@@ -1917,8 +1937,8 @@ object Slice {
     }
 
     new Slice {
-      val (columns, size) = buildColArrays(
-          values, Map.empty[ColumnRef, ArrayColumn[_]], 0)
+      val (columns, size) =
+        buildColArrays(values, Map.empty[ColumnRef, ArrayColumn[_]], 0)
     }
   }
 
@@ -1973,22 +1993,24 @@ object Slice {
     * Given a JValue, an existing map of columnrefs to column data,
     * a sliceIndex, and a sliceSize, return an updated map.
     */
-  def withIdsAndValues(jv: JValue,
-                       into: Map[ColumnRef, ArrayColumn[_]],
-                       sliceIndex: Int,
-                       sliceSize: Int,
-                       remapPath: Option[JPath => CPath] = None)
+  def withIdsAndValues(
+      jv: JValue,
+      into: Map[ColumnRef, ArrayColumn[_]],
+      sliceIndex: Int,
+      sliceSize: Int,
+      remapPath: Option[JPath => CPath] = None)
     : Map[ColumnRef, ArrayColumn[_]] = {
     jv.flattenWithPath.foldLeft(into) {
       case (acc, (jpath, JUndefined)) => acc
       case (acc, (jpath, v)) =>
         val ctype =
           CType.forJValue(v) getOrElse {
-            sys.error("Cannot determine ctype for " + v + " at " + jpath +
+            sys.error(
+              "Cannot determine ctype for " + v + " at " + jpath +
                 " in " + jv)
           }
         val ref =
-          ColumnRef(remapPath.map(_ (jpath)).getOrElse(CPath(jpath)), ctype)
+          ColumnRef(remapPath.map(_(jpath)).getOrElse(CPath(jpath)), ctype)
 
         val updatedColumn: ArrayColumn[_] = v match {
           case JBool(b) =>

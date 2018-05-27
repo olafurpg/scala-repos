@@ -14,7 +14,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
 
   def toRational(p: Int): Rational = this match {
     case Exact(n) => n
-    case _ => Rational(x(p), SafeLong.two.pow(p))
+    case _        => Rational(x(p), SafeLong.two.pow(p))
   }
 
   def toRational: Rational = toRational(Real.bits)
@@ -55,7 +55,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
 
   override def equals(y: Any): Boolean = y match {
     case y: Real => this === y
-    case y => toRational.equals(y)
+    case y       => toRational.equals(y)
   }
 
   def ===(y: Real): Boolean =
@@ -66,32 +66,32 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
 
   def compare(y: Real): Int = (x, y) match {
     case (Exact(nx), Exact(ny)) => nx compare ny
-    case _ => (x - y).signum
+    case _                      => (x - y).signum
   }
 
   def min(y: Real): Real = (x, y) match {
     case (Exact(nx), Exact(ny)) => Exact(nx min ny)
-    case _ => Real(p => x(p) min y(p))
+    case _                      => Real(p => x(p) min y(p))
   }
 
   def max(y: Real): Real = (x, y) match {
     case (Exact(nx), Exact(ny)) => Exact(nx max ny)
-    case _ => Real(p => x(p) max y(p))
+    case _                      => Real(p => x(p) max y(p))
   }
 
   def abs(): Real = this match {
     case Exact(n) => Exact(n.abs)
-    case _ => Real(p => x(p).abs)
+    case _        => Real(p => x(p).abs)
   }
 
   def signum(): Int = this match {
     case Exact(n) => n.signum
-    case _ => x(Real.bits).signum
+    case _        => x(Real.bits).signum
   }
 
   def unary_-(): Real = this match {
     case Exact(n) => Exact(-n)
-    case _ => Real(p => -x(p))
+    case _        => Real(p => -x(p))
   }
 
   def reciprocal(): Real = {
@@ -104,26 +104,26 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
         Real({ p =>
           val s = findNonzero(0)
           roundUp(
-              Rational(SafeLong.two.pow(2 * p + 2 * s + 2), x(p + 2 * s + 2)))
+            Rational(SafeLong.two.pow(2 * p + 2 * s + 2), x(p + 2 * s + 2)))
         })
     }
   }
 
   def +(y: Real): Real = (x, y) match {
-    case (Exact(nx), Exact(ny)) => Exact(nx + ny)
+    case (Exact(nx), Exact(ny))    => Exact(nx + ny)
     case (Exact(Rational.zero), _) => y
     case (_, Exact(Rational.zero)) => x
-    case _ => Real(p => roundUp(Rational(x(p + 2) + y(p + 2), 4)))
+    case _                         => Real(p => roundUp(Rational(x(p + 2) + y(p + 2), 4)))
   }
 
   def -(y: Real): Real = x + (-y)
 
   def *(y: Real): Real = (x, y) match {
-    case (Exact(nx), Exact(ny)) => Exact(nx * ny)
+    case (Exact(nx), Exact(ny))    => Exact(nx * ny)
     case (Exact(Rational.zero), _) => Real.zero
     case (_, Exact(Rational.zero)) => Real.zero
-    case (Exact(Rational.one), _) => y
-    case (_, Exact(Rational.one)) => x
+    case (Exact(Rational.one), _)  => y
+    case (_, Exact(Rational.one))  => x
     case _ =>
       Real({ p =>
         val x0 = x(0).abs + 2
@@ -258,12 +258,12 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
 
   override def toString: String = x match {
     case Exact(n) => n.toString
-    case _ => getString(Real.digits)
+    case _        => getString(Real.digits)
   }
 
   def repr: String = x match {
     case Exact(n) => s"Exact(${n.toString})"
-    case _ => s"Inexact(${toRational})"
+    case _        => s"Inexact(${toRational})"
   }
 
   def getString(d: Int): String = {
@@ -272,8 +272,8 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
     val m = roundUp(r)
     val (sign, str) = m.signum match {
       case -1 => ("-", m.abs.toString)
-      case 0 => ("", "0")
-      case 1 => ("", m.toString)
+      case 0  => ("", "0")
+      case 1  => ("", m.toString)
     }
     val i = str.length - d
     val s =
@@ -307,7 +307,7 @@ object Real extends RealInstances {
 
   lazy val pi: Real =
     Real(16) * atan(Real(Rational(1, 5))) - Real.four * atan(
-        Real(Rational(1, 239)))
+      Real(Rational(1, 239)))
 
   lazy val e: Real = exp(Real.one)
 
@@ -416,8 +416,8 @@ object Real extends RealInstances {
     val s = (Real.one - x * x).sqrt
     x0.signum match {
       case n if n > 0 => (Real.pi / Real.two) - atan(s / x)
-      case 0 => atan(x / s)
-      case _ => (-Real.pi / Real.two) - atan(s / x)
+      case 0          => atan(x / s)
+      case _          => (-Real.pi / Real.two) - atan(s / x)
     }
   }
 
@@ -459,9 +459,9 @@ object Real extends RealInstances {
 
   def div2n(x: Real, n: Int): Real =
     Real(
-        p =>
-          if (p >= n) x(p - n)
-          else roundUp(Rational(x(p), SafeLong.two.pow(n))))
+      p =>
+        if (p >= n) x(p - n)
+        else roundUp(Rational(x(p), SafeLong.two.pow(n))))
 
   def mul2n(x: Real, n: Int): Real =
     Real(p => x(p + n))
@@ -474,9 +474,10 @@ object Real extends RealInstances {
 
   lazy val sqrt1By2 = Real.two.reciprocal.sqrt
 
-  def accumulate(total: SafeLong,
-                 xs: Stream[SafeLong],
-                 cs: Stream[Rational]): SafeLong = {
+  def accumulate(
+      total: SafeLong,
+      xs: Stream[SafeLong],
+      cs: Stream[Rational]): SafeLong = {
     (xs, cs) match {
       case (_, Stream.Empty) => total
       case (Stream.Empty, _) => sys.error("nooooo")
@@ -487,7 +488,9 @@ object Real extends RealInstances {
   }
 
   private[spire] def powerSeries(
-      ps: Stream[Rational], terms: Int => Int, x: Real): Real = {
+      ps: Stream[Rational],
+      terms: Int => Int,
+      x: Real): Real = {
     Real({ p =>
       val t = terms(p)
       val l2t = 2 * sizeInBase(SafeLong(t) + 1, 2) + 6
@@ -523,11 +526,15 @@ object Real extends RealInstances {
 
   def sinDr(x: Real): Real =
     x * powerSeries(
-        accSeq((r, n) => -r * Rational(1, 2 * n * (2 * n + 1))), n => n, x * x)
+      accSeq((r, n) => -r * Rational(1, 2 * n * (2 * n + 1))),
+      n => n,
+      x * x)
 
   def cosDr(x: Real): Real =
     powerSeries(
-        accSeq((r, n) => -r * Rational(1, 2 * n * (2 * n - 1))), n => n, x * x)
+      accSeq((r, n) => -r * Rational(1, 2 * n * (2 * n - 1))),
+      n => n,
+      x * x)
 
   def atanDr(x: Real): Real = {
     val y = x * x + Real(1)
@@ -566,8 +573,10 @@ trait RealInstances {
 class RealAlgebra extends RealIsFractional {}
 
 trait RealIsFractional
-    extends Fractional[Real] with Order[Real]
-    with Signed[Real] with Trig[Real] {
+    extends Fractional[Real]
+    with Order[Real]
+    with Signed[Real]
+    with Trig[Real] {
   def abs(x: Real): Real = x.abs
   def signum(x: Real): Int = x.signum
 

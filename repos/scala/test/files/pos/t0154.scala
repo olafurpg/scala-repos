@@ -4,7 +4,7 @@ trait MyMatchers {
   trait Something {
     (null: AnyRef) match {
       case (StringMatch) =>
-      case _ =>
+      case _             =>
     }
   }
 }

@@ -20,7 +20,7 @@ trait Parsers {
         case Success(next, x) =>
           b(next) match {
             case Success(next2, y) => Success(next2, (x, y))
-            case Failure(_, msg) => Failure(in, msg)
+            case Failure(_, msg)   => Failure(in, msg)
           }
         case Failure(_, msg) => Failure(in, msg)
       }
@@ -34,7 +34,7 @@ trait Parsers {
         case Failure(_, _) =>
           b(in) match {
             case Success(next, y) => Success(next, y)
-            case Failure(_, msg) => Failure(in, msg)
+            case Failure(_, msg)  => Failure(in, msg)
           }
       }
     }
@@ -42,7 +42,7 @@ trait Parsers {
   // lifting
   def lift[T, U](f: T => U)(a: => Parser[T]): Parser[U] = new Parser[U] {
     def apply(in: Input): ParseResult[U] = a(in) match {
-      case Success(n, x) => Success(n, f(x))
+      case Success(n, x)   => Success(n, f(x))
       case Failure(n, msg) => Failure(n, msg)
     }
   }
@@ -50,7 +50,7 @@ trait Parsers {
   def accept[T](c: Char, r: T): Parser[T] = new Parser[T] {
     def apply(in: Input) = in match {
       case c2 :: n if c2 == c => Success(n, r)
-      case n => Failure(n, "expected " + c + " at the head of " + n)
+      case n                  => Failure(n, "expected " + c + " at the head of " + n)
     }
   }
 
@@ -73,11 +73,13 @@ trait Idioms {
   class IdiomaticTarget[idi[x], idiom <: Idiom[idi], s](i: idiom, tgt: s) {
     def dot[t](fun: s => t, name: String) =
       new IdiomaticApp2[idi, idiom, t](
-          i, i.liftedApply(i.pureMethod(name, fun))(i.pure(tgt)))
+        i,
+        i.liftedApply(i.pureMethod(name, fun))(i.pure(tgt)))
   } // TODO: `.` -->  java.lang.ClassFormatError: Illegal method name "." in class Idioms$Id$
 
   class IdiomaticFunction[idi[x], idiom <: Idiom[idi], s, t](
-      i: idiom, fun: s => t) {
+      i: idiom,
+      fun: s => t) {
     def <|(a: idi[s]) =
       new IdiomaticApp[idi, idiom, t](i, i.liftedApply(i.pure(fun))(a))
   }
@@ -86,7 +88,8 @@ trait Idioms {
     // where x <: s=>t -- TODO can this be expressed without generalised constraints?
     def <>[s, t](b: idi[s]) =
       new IdiomaticApp[idi, idiom, t](
-          i, i.liftedApply(a.asInstanceOf[idi[s => t]])(b))
+        i,
+        i.liftedApply(a.asInstanceOf[idi[s => t]])(b))
 
     def |> : idi[x] = a
   }

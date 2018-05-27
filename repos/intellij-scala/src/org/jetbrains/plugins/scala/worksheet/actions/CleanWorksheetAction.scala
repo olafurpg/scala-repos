@@ -21,7 +21,7 @@ import org.jetbrains.plugins.scala.worksheet.ui.WorksheetEditorPrinter
 
 /**
   * @author Ksenia.Sautina
-  * @author Dmitry Naydanov        
+  * @author Dmitry Naydanov
   * @since 11/12/12
   */
 class CleanWorksheetAction() extends AnAction with TopComponentAction {
@@ -52,7 +52,10 @@ class CleanWorksheetAction() extends AnAction with TopComponentAction {
         CleanWorksheetAction.resetScrollModel(viewer)
 
         CleanWorksheetAction.cleanWorksheet(
-            psiFile.getNode, editor, viewer, project)
+          psiFile.getNode,
+          editor,
+          viewer,
+          project)
 
         parent.remove(splitPane)
         parent.add(editor.getComponent, BorderLayout.CENTER)
@@ -79,25 +82,26 @@ object CleanWorksheetAction {
       case viewerEx: EditorImpl =>
         val commonModel = viewerEx.getScrollPane.getVerticalScrollBar.getModel
         viewerEx.getScrollPane.getVerticalScrollBar.setModel(
-            new DefaultBoundedRangeModel(
-                commonModel.getValue,
-                commonModel.getExtent,
-                commonModel.getMinimum,
-                commonModel.getMaximum
-            )
+          new DefaultBoundedRangeModel(
+            commonModel.getValue,
+            commonModel.getExtent,
+            commonModel.getMinimum,
+            commonModel.getMaximum
+          )
         )
       case _ =>
     }
   }
 
-  def cleanWorksheet(node: ASTNode,
-                     leftEditor: Editor,
-                     rightEditor: Editor,
-                     project: Project) {
+  def cleanWorksheet(
+      node: ASTNode,
+      leftEditor: Editor,
+      rightEditor: Editor,
+      project: Project) {
     val rightDocument = rightEditor.getDocument
 
     WorksheetEditorPrinter.deleteWorksheetEvaluation(
-        node.getPsi.asInstanceOf[ScalaFile])
+      node.getPsi.asInstanceOf[ScalaFile])
 
     if (rightDocument != null && !project.isDisposed) {
       ApplicationManager.getApplication runWriteAction new Runnable {

@@ -13,8 +13,8 @@ class GoToFailureLocationTest extends Scalatest2_10_2_2_1_Base {
   def testFailureLocationHyperlink(): Unit = {
 
     addFileToProject(
-        "FailureLocationTest.scala",
-        """
+      "FailureLocationTest.scala",
+      """
             |import org.scalatest._
             |
             |class FailureLocationTest extends FlatSpec with GivenWhenThen {
@@ -24,7 +24,8 @@ class GoToFailureLocationTest extends Scalatest2_10_2_2_1_Base {
             | }
             |}
             |
-          """.stripMargin)
+          """.stripMargin
+    )
 
     val project = getProject
     val projectScope = ProjectScope.getProjectScope(project)
@@ -32,11 +33,10 @@ class GoToFailureLocationTest extends Scalatest2_10_2_2_1_Base {
     val errorLocationString =
       "ScalaTestFailureLocation: FailureLocationTest at (FailureLocationTest.scala:6)"
     var filterRes: Filter.Result = null
-    UsefulTestCase.edt(
-        new Runnable() {
+    UsefulTestCase.edt(new Runnable() {
       override def run(): Unit =
-        filterRes = filter.applyFilter(
-            errorLocationString, errorLocationString.length)
+        filterRes =
+          filter.applyFilter(errorLocationString, errorLocationString.length)
     })
     assert(filterRes != null)
     assert(filterRes.getFirstHyperlinkInfo != null)

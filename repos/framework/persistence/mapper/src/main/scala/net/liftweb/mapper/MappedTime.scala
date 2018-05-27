@@ -65,42 +65,46 @@ abstract class MappedTime[T <: Mapper[T]](val fieldOwner: T)
     * @return the source field metadata for the field
     */
   def sourceInfoMetadata(): SourceFieldMetadata { type ST = Date } =
-    SourceFieldMetadataRep(name, manifest, new FieldConverter {
+    SourceFieldMetadataRep(
+      name,
+      manifest,
+      new FieldConverter {
 
-      /**
-        * The type of the field
-        */
-      type T = Date
+        /**
+          * The type of the field
+          */
+        type T = Date
 
-      /**
-        * Convert the field to a String
-        * @param v the field value
-        * @return the string representation of the field value
-        */
-      def asString(v: T): String = format(v)
+        /**
+          * Convert the field to a String
+          * @param v the field value
+          * @return the string representation of the field value
+          */
+        def asString(v: T): String = format(v)
 
-      /**
-        * Convert the field into NodeSeq, if possible
-        * @param v the field value
-        * @return a NodeSeq if the field can be represented as one
-        */
-      def asNodeSeq(v: T): Box[NodeSeq] = Full(Text(asString(v)))
+        /**
+          * Convert the field into NodeSeq, if possible
+          * @param v the field value
+          * @return a NodeSeq if the field can be represented as one
+          */
+        def asNodeSeq(v: T): Box[NodeSeq] = Full(Text(asString(v)))
 
-      /**
-        * Convert the field into a JSON value
-        * @param v the field value
-        * @return the JSON representation of the field
-        */
-      def asJson(v: T): Box[JValue] = Full(JInt(v.getTime))
+        /**
+          * Convert the field into a JSON value
+          * @param v the field value
+          * @return the JSON representation of the field
+          */
+        def asJson(v: T): Box[JValue] = Full(JInt(v.getTime))
 
-      /**
-        * If the field can represent a sequence of SourceFields,
-        * get that
-        * @param v the field value
-        * @return the field as a sequence of SourceFields
-        */
-      def asSeq(v: T): Box[Seq[SourceFieldInfo]] = Empty
-    })
+        /**
+          * If the field can represent a sequence of SourceFields,
+          * get that
+          * @param v the field value
+          * @return the field as a sequence of SourceFields
+          */
+        def asSeq(v: T): Box[Seq[SourceFieldInfo]] = Empty
+      }
+    )
 
   protected def real_i_set_!(value: Date): Date = {
     if (value != data.get) {
@@ -113,17 +117,16 @@ abstract class MappedTime[T <: Mapper[T]](val fieldOwner: T)
   def dbFieldClass = classOf[Date]
 
   def toLong: Long = get match {
-    case null => 0L
+    case null    => 0L
     case d: Date => d.getTime / 1000L
   }
 
   def asJsExp: JsExp = JE.Num(toLong)
 
   def asJsonValue: Box[JsonAST.JValue] =
-    Full(
-        get match {
+    Full(get match {
       case null => JsonAST.JNull
-      case x => JsonAST.JInt(x.getTime)
+      case x    => JsonAST.JInt(x.getTime)
     })
 
   /**
@@ -158,21 +161,21 @@ abstract class MappedTime[T <: Mapper[T]](val fieldOwner: T)
     }
 
   override def setFromAny(f: Any): Date = f match {
-    case JsonAST.JNull => this.set(null)
-    case JsonAST.JInt(v) => this.set(new Date(v.longValue))
-    case "" | null => this.set(null)
-    case s: String => parse(s).map(s => this.set(s)).openOr(this.get)
-    case x :: _ => setFromAny(x)
-    case d: Date => this.set(d)
-    case Some(d: Date) => this.set(d)
-    case Full(d: Date) => this.set(d)
+    case JsonAST.JNull                   => this.set(null)
+    case JsonAST.JInt(v)                 => this.set(new Date(v.longValue))
+    case "" | null                       => this.set(null)
+    case s: String                       => parse(s).map(s => this.set(s)).openOr(this.get)
+    case x :: _                          => setFromAny(x)
+    case d: Date                         => this.set(d)
+    case Some(d: Date)                   => this.set(d)
+    case Full(d: Date)                   => this.set(d)
     case None | Empty | Failure(_, _, _) => this.set(null)
-    case f => toDate(f).map(d => this.set(d)).openOr(this.get)
+    case f                               => toDate(f).map(d => this.set(d)).openOr(this.get)
   }
 
   def jdbcFriendly(field: String): Object = get match {
     case null => null
-    case d => new java.sql.Time(d.getTime)
+    case d    => new java.sql.Time(d.getTime)
   }
 
   def real_convertToJDBCFriendly(value: Date): Object =
@@ -181,33 +184,39 @@ abstract class MappedTime[T <: Mapper[T]](val fieldOwner: T)
   private def st(in: Box[Date]): Unit =
     in match {
       case Full(d) => data.set(d); orgData.set(d)
-      case _ => data.set(null); orgData.set(null)
+      case _       => data.set(null); orgData.set(null)
     }
 
   def buildSetActualValue(
-      accessor: Method, v: AnyRef, columnName: String): (T, AnyRef) => Unit =
+      accessor: Method,
+      v: AnyRef,
+      columnName: String): (T, AnyRef) => Unit =
     (inst, v) =>
       doField(inst, accessor, { case f: MappedTime[T] => f.st(toDate(v)) })
 
   def buildSetLongValue(
-      accessor: Method, columnName: String): (T, Long, Boolean) => Unit =
+      accessor: Method,
+      columnName: String): (T, Long, Boolean) => Unit =
     (inst, v, isNull) =>
       doField(inst, accessor, {
         case f: MappedTime[T] => f.st(if (isNull) Empty else Full(new Date(v)))
       })
 
   def buildSetStringValue(
-      accessor: Method, columnName: String): (T, String) => Unit =
+      accessor: Method,
+      columnName: String): (T, String) => Unit =
     (inst, v) =>
       doField(inst, accessor, { case f: MappedTime[T] => f.st(toDate(v)) })
 
   def buildSetDateValue(
-      accessor: Method, columnName: String): (T, Date) => Unit =
+      accessor: Method,
+      columnName: String): (T, Date) => Unit =
     (inst, v) =>
       doField(inst, accessor, { case f: MappedTime[T] => f.st(Full(v)) })
 
   def buildSetBooleanValue(
-      accessor: Method, columnName: String): (T, Boolean, Boolean) => Unit =
+      accessor: Method,
+      columnName: String): (T, Boolean, Boolean) => Unit =
     (inst, v, isNull) =>
       doField(inst, accessor, { case f: MappedTime[T] => f.st(Empty) })
 

@@ -7,8 +7,10 @@ import scala.annotation.tailrec
 import scala.language.existentials
 
 class PriorityQueue[E] protected (
-    ordering: Ordering[_ >: E], _comparator: Comparator[_ >: E])
-    extends AbstractQueue[E] with Serializable { self =>
+    ordering: Ordering[_ >: E],
+    _comparator: Comparator[_ >: E])
+    extends AbstractQueue[E]
+    with Serializable { self =>
 
   def this(initialCapacity: Int) = {
     this(defaultOrdering[E], null.asInstanceOf[Comparator[_ >: E]])
@@ -19,8 +21,9 @@ class PriorityQueue[E] protected (
     this(11)
 
   def this(initialCapacity: Int, comparator: Comparator[_ >: E]) = {
-    this(PriorityQueue.safeGetOrdering[E](comparator),
-         null.asInstanceOf[Comparator[E]])
+    this(
+      PriorityQueue.safeGetOrdering[E](comparator),
+      null.asInstanceOf[Comparator[E]])
     if (initialCapacity < 1) throw new IllegalArgumentException()
   }
 
@@ -30,14 +33,16 @@ class PriorityQueue[E] protected (
   }
 
   def this(c: PriorityQueue[_ <: E]) = {
-    this(PriorityQueue.safeGetOrdering[E](c.comparator()),
-         c.comparator().asInstanceOf[Comparator[E]])
+    this(
+      PriorityQueue.safeGetOrdering[E](c.comparator()),
+      c.comparator().asInstanceOf[Comparator[E]])
     addAll(c)
   }
 
   def this(sortedSet: SortedSet[_ <: E]) = {
-    this(PriorityQueue.safeGetOrdering[E](sortedSet.comparator()),
-         sortedSet.comparator().asInstanceOf[Comparator[E]])
+    this(
+      PriorityQueue.safeGetOrdering[E](sortedSet.comparator()),
+      sortedSet.comparator().asInstanceOf[Comparator[E]])
     addAll(sortedSet)
   }
 

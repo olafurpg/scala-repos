@@ -69,15 +69,15 @@ object TestPurgatoryPerformance {
       .ofType(classOf[java.lang.Long])
     val pct75Opt = parser
       .accepts(
-          "pct75",
-          "75th percentile of request latency in ms (log-normal distribution)")
+        "pct75",
+        "75th percentile of request latency in ms (log-normal distribution)")
       .withRequiredArg
       .describedAs("75th_percentile")
       .ofType(classOf[java.lang.Double])
     val pct50Opt = parser
       .accepts(
-          "pct50",
-          "50th percentile of request latency in ms (log-normal distribution)")
+        "pct50",
+        "50th percentile of request latency in ms (log-normal distribution)")
       .withRequiredArg
       .describedAs("50th_percentile")
       .ofType(classOf[java.lang.Double])
@@ -90,13 +90,14 @@ object TestPurgatoryPerformance {
 
     val options = parser.parse(args: _*)
 
-    CommandLineUtils.checkRequiredArgs(parser,
-                                       options,
-                                       numRequestsOpt,
-                                       requestRateOpt,
-                                       requestDataSizeOpt,
-                                       pct75Opt,
-                                       pct50Opt)
+    CommandLineUtils.checkRequiredArgs(
+      parser,
+      options,
+      numRequestsOpt,
+      requestRateOpt,
+      requestDataSizeOpt,
+      pct75Opt,
+      pct50Opt)
 
     val numRequests = options.valueOf(numRequestsOpt).intValue
     val requestRate = options.valueOf(requestRateOpt).doubleValue
@@ -124,8 +125,8 @@ object TestPurgatoryPerformance {
     val latch = new CountDownLatch(numRequests)
     val start = System.currentTimeMillis
     val rand = new Random()
-    val keys = (0 until numKeys).map(
-        i => "fakeKey%d".format(rand.nextInt(numPossibleKeys)))
+    val keys = (0 until numKeys).map(i =>
+      "fakeKey%d".format(rand.nextInt(numPossibleKeys)))
     @volatile var requestArrivalTime = start
     @volatile var end = 0L
     val generator = new Runnable {
@@ -141,7 +142,10 @@ object TestPurgatoryPerformance {
           if (requestArrivalTime > now) Thread.sleep(requestArrivalTime - now)
 
           val request = new FakeOperation(
-              timeout, requestDataSize, latencyToComplete, latch)
+            timeout,
+            requestDataSize,
+            latencyToComplete,
+            latch)
           if (latencyToComplete < timeout) queue.add(request)
           purgatory.tryCompleteElseWatch(request, keys)
         }
@@ -163,26 +167,27 @@ object TestPurgatoryPerformance {
       val gcCountHeader = gcNames.map("<" + _ + " count>").mkString(" ")
       val gcTimeHeader = gcNames.map("<" + _ + " time ms>").mkString(" ")
       println(
-          "# <elapsed time ms>\t<target rate>\t<actual rate>\t<process cpu time ms>\t%s\t%s"
-            .format(gcCountHeader, gcTimeHeader))
+        "# <elapsed time ms>\t<target rate>\t<actual rate>\t<process cpu time ms>\t%s\t%s"
+          .format(gcCountHeader, gcTimeHeader))
     }
 
     val targetRate =
       numRequests.toDouble * 1000d / (requestArrivalTime - start).toDouble
     val actualRate = numRequests.toDouble * 1000d / (end - start).toDouble
 
-    val cpuTime = getProcessCpuTimeNanos(osMXBean).map(
-        x => (x - initialCpuTimeNano.get) / 1000000L)
+    val cpuTime = getProcessCpuTimeNanos(osMXBean).map(x =>
+      (x - initialCpuTimeNano.get) / 1000000L)
     val gcCounts = gcMXBeans.map(_.getCollectionCount)
     val gcTimes = gcMXBeans.map(_.getCollectionTime)
 
     println(
-        "%d\t%f\t%f\t%d\t%s\t%s".format(done - start,
-                                        targetRate,
-                                        actualRate,
-                                        cpuTime.getOrElse(-1L),
-                                        gcCounts.mkString(" "),
-                                        gcTimes.mkString(" ")))
+      "%d\t%f\t%f\t%d\t%s\t%s".format(
+        done - start,
+        targetRate,
+        actualRate,
+        cpuTime.getOrElse(-1L),
+        gcCounts.mkString(" "),
+        gcTimes.mkString(" ")))
 
     purgatory.shutdown()
   }
@@ -191,20 +196,20 @@ object TestPurgatoryPerformance {
   private def getProcessCpuTimeNanos(osMXBean: OperatingSystemMXBean) = {
     try {
       Some(
-          Class
-            .forName("com.sun.management.OperatingSystemMXBean")
-            .getMethod("getProcessCpuTime")
-            .invoke(osMXBean)
-            .asInstanceOf[Long])
+        Class
+          .forName("com.sun.management.OperatingSystemMXBean")
+          .getMethod("getProcessCpuTime")
+          .invoke(osMXBean)
+          .asInstanceOf[Long])
     } catch {
       case _: Throwable =>
         try {
           Some(
-              Class
-                .forName("com.ibm.lang.management.OperatingSystemMXBean")
-                .getMethod("getProcessCpuTimeByNS")
-                .invoke(osMXBean)
-                .asInstanceOf[Long])
+            Class
+              .forName("com.ibm.lang.management.OperatingSystemMXBean")
+              .getMethod("getProcessCpuTimeByNS")
+              .invoke(osMXBean)
+              .asInstanceOf[Long])
         } catch {
           case _: Throwable => None
         }
@@ -241,7 +246,7 @@ object TestPurgatoryPerformance {
       val normalMean = math.log(pct50)
       val normalStDev =
         (math.log(pct75) -
-            normalMean) / 0.674490d // 0.674490 is 75th percentile point in N(0,1)
+          normalMean) / 0.674490d // 0.674490 is 75th percentile point in N(0,1)
       val dist = new LogNormalDistribution(normalMean, normalStDev)
       (0 until sampleSize).map { _ =>
         dist.next().toLong
@@ -254,8 +259,8 @@ object TestPurgatoryPerformance {
       val p50 = samples.sorted.apply((sampleSize.toDouble * 0.5d).toInt)
 
       println(
-          "# latency samples: pct75 = %d, pct50 = %d, min = %d, max = %d"
-            .format(p75, p50, samples.min, samples.max))
+        "# latency samples: pct75 = %d, pct50 = %d, min = %d, max = %d"
+          .format(p75, p50, samples.min, samples.max))
     }
   }
 
@@ -279,16 +284,19 @@ object TestPurgatoryPerformance {
 
     def printStats(): Unit = {
       println(
-          "# interval samples: rate = %f, min = %d, max = %d".format(
-              1000d / (samples.map(_.toDouble).sum / sampleSize.toDouble),
-              samples.min,
-              samples.max)
+        "# interval samples: rate = %f, min = %d, max = %d".format(
+          1000d / (samples.map(_.toDouble).sum / sampleSize.toDouble),
+          samples.min,
+          samples.max)
       )
     }
   }
 
   private class FakeOperation(
-      delayMs: Long, size: Int, val latencyMs: Long, latch: CountDownLatch)
+      delayMs: Long,
+      size: Int,
+      val latencyMs: Long,
+      latch: CountDownLatch)
       extends DelayedOperation(delayMs) {
     private[this] val data = new Array[Byte](size)
     val completesAt = System.currentTimeMillis + latencyMs
@@ -308,7 +316,8 @@ object TestPurgatoryPerformance {
   private class CompletionQueue {
     private[this] val delayQueue = new DelayQueue[Scheduled]()
     private[this] val thread = new ShutdownableThread(
-        name = "completion thread", isInterruptible = false) {
+      name = "completion thread",
+      isInterruptible = false) {
       override def doWork(): Unit = {
         val scheduled = delayQueue.poll(100, TimeUnit.MILLISECONDS)
         if (scheduled != null) {
@@ -328,8 +337,9 @@ object TestPurgatoryPerformance {
 
     private class Scheduled(val operation: FakeOperation) extends Delayed {
       def getDelay(unit: TimeUnit): Long = {
-        unit.convert(max(operation.completesAt - SystemTime.milliseconds, 0),
-                     TimeUnit.MILLISECONDS)
+        unit.convert(
+          max(operation.completesAt - SystemTime.milliseconds, 0),
+          TimeUnit.MILLISECONDS)
       }
 
       def compareTo(d: Delayed): Int = {

@@ -1,11 +1,12 @@
 package com.twitter.scalding
 
 object StringUtility {
-  private def fastSplitHelper(text: String,
-                              key: String,
-                              from: Int,
-                              textLength: Int,
-                              keyLength: Int): List[String] = {
+  private def fastSplitHelper(
+      text: String,
+      key: String,
+      from: Int,
+      textLength: Int,
+      keyLength: Int): List[String] = {
     val firstIndex = text.indexOf(key, from)
     if (firstIndex == -1) {
       if (from < textLength) {
@@ -16,7 +17,11 @@ object StringUtility {
     } else {
       // the text till the separator should be kept in any case
       text.substring(from, firstIndex) :: fastSplitHelper(
-          text, key, firstIndex + keyLength, textLength, keyLength)
+        text,
+        key,
+        firstIndex + keyLength,
+        textLength,
+        keyLength)
     }
   }
 

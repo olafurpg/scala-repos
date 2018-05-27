@@ -41,18 +41,20 @@ import scalafx.Includes._
   */
 @RunWith(classOf[JUnitRunner])
 class CurrencyStringConverterSpec
-    extends AbstractStringConverterDelegateSpec[Number,
-                                                jfxuc.CurrencyStringConverter,
-                                                Number,
-                                                CurrencyStringConverter](
-        classOf[jfxuc.CurrencyStringConverter],
-        classOf[CurrencyStringConverter],
-        classOf[Number]) {
+    extends AbstractStringConverterDelegateSpec[
+      Number,
+      jfxuc.CurrencyStringConverter,
+      Number,
+      CurrencyStringConverter](
+      classOf[jfxuc.CurrencyStringConverter],
+      classOf[CurrencyStringConverter],
+      classOf[Number]) {
 
   override protected def getConverterForExample =
     new CurrencyStringConverter(Locale.US)
 
-  val examples = List((new java.lang.Long(123), "$123.00"),
-                      (new java.lang.Long(0), "$0.00"),
-                      (new java.lang.Long(-123), "($123.00)"))
+  val examples = List(
+    (new java.lang.Long(123), "$123.00"),
+    (new java.lang.Long(0), "$0.00"),
+    (new java.lang.Long(-123), "($123.00)"))
 }

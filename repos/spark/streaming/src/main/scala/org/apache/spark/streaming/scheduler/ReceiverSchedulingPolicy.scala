@@ -73,8 +73,9 @@ private[streaming] class ReceiverSchedulingPolicy {
     *
     * @return a map for receivers and their scheduled locations
     */
-  def scheduleReceivers(receivers: Seq[Receiver[_]],
-                        executors: Seq[ExecutorCacheTaskLocation])
+  def scheduleReceivers(
+      receivers: Seq[Receiver[_]],
+      executors: Seq[ExecutorCacheTaskLocation])
     : Map[Int, Seq[TaskLocation]] = {
     if (receivers.isEmpty) {
       return Map.empty
@@ -101,11 +102,11 @@ private[streaming] class ReceiverSchedulingPolicy {
           case Some(executorsOnHost) =>
             // preferredLocation is a known host. Select an executor that has the least receivers in
             // this host
-            val leastScheduledExecutor = executorsOnHost.minBy(
-                executor => numReceiversOnExecutor(executor))
+            val leastScheduledExecutor = executorsOnHost.minBy(executor =>
+              numReceiversOnExecutor(executor))
             scheduledLocations(i) += leastScheduledExecutor
             numReceiversOnExecutor(leastScheduledExecutor) = numReceiversOnExecutor(
-                leastScheduledExecutor) + 1
+              leastScheduledExecutor) + 1
           case None =>
             // preferredLocation is an unknown host.
             // Note: There are two cases:
@@ -123,7 +124,7 @@ private[streaming] class ReceiverSchedulingPolicy {
     // For those receivers that don't have preferredLocation, make sure we assign at least one
     // executor to them.
     for (scheduledLocationsForOneReceiver <- scheduledLocations.filter(
-        _.isEmpty)) {
+           _.isEmpty)) {
       // Select the executor that has the least receivers
       val (leastScheduledExecutor, numReceivers) =
         numReceiversOnExecutor.minBy(_._2)
@@ -230,7 +231,7 @@ private[streaming] class ReceiverSchedulingPolicy {
           .filter(_.isInstanceOf[ExecutorCacheTaskLocation])
           .map { location =>
             location.asInstanceOf[ExecutorCacheTaskLocation] ->
-            (1.0 / scheduledLocations.size)
+              (1.0 / scheduledLocations.size)
           }
       case ReceiverState.ACTIVE =>
         Seq(receiverTrackingInfo.runningExecutor.get -> 1.0)

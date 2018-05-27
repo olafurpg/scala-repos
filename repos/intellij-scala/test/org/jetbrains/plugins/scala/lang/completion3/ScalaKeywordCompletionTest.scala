@@ -24,8 +24,7 @@ class ScalaKeywordCompletionTest extends ScalaCodeInsightTestBase {
       |}
       """.stripMargin('|').replaceAll("\r", "").trim()
 
-    completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "val").get)
+    completeLookupItem(activeLookup.find(le => le.getLookupString == "val").get)
     checkResultByText(resultText)
   }
 
@@ -45,7 +44,8 @@ class ScalaKeywordCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "private").get, '[')
+      activeLookup.find(le => le.getLookupString == "private").get,
+      '[')
     checkResultByText(resultText)
   }
 
@@ -69,7 +69,8 @@ class ScalaKeywordCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "val").get, ' ')
+      activeLookup.find(le => le.getLookupString == "val").get,
+      ' ')
     checkResultByText(resultText)
   }
 
@@ -89,7 +90,8 @@ class ScalaKeywordCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "if").get, ' ')
+      activeLookup.find(le => le.getLookupString == "if").get,
+      ' ')
     checkResultByText(resultText)
   }
 
@@ -111,7 +113,8 @@ class ScalaKeywordCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "val").get, ' ')
+      activeLookup.find(le => le.getLookupString == "val").get,
+      ' ')
     checkResultByText(resultText)
   }
 
@@ -133,7 +136,8 @@ class ScalaKeywordCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "def").get, ' ')
+      activeLookup.find(le => le.getLookupString == "def").get,
+      ' ')
     checkResultByText(resultText)
   }
 
@@ -155,7 +159,8 @@ class ScalaKeywordCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "if").get, '(')
+      activeLookup.find(le => le.getLookupString == "if").get,
+      '(')
     checkResultByText(resultText)
   }
 
@@ -177,7 +182,8 @@ class ScalaKeywordCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "try").get, '{')
+      activeLookup.find(le => le.getLookupString == "try").get,
+      '{')
     checkResultByText(resultText)
   }
 
@@ -195,7 +201,8 @@ class ScalaKeywordCompletionTest extends ScalaCodeInsightTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     completeLookupItem(
-        activeLookup.find(le => le.getLookupString == "while").get, '(')
+      activeLookup.find(le => le.getLookupString == "while").get,
+      '(')
     checkResultByText(resultText)
   }
 

@@ -24,9 +24,8 @@ object GenerateRoundtripSources {
       posts.schema ++ categories.schema ++ typeTest.schema ++ large.schema ++ `null`.schema ++ X.schema ++ SingleNonOptionColumn.schema ++ SelfRef.schema
     val a1 = profile
       .createModel(ignoreInvalidDefaults = false)
-      .map(
-          m =>
-            new SourceCodeGenerator(m) {
+      .map(m =>
+        new SourceCodeGenerator(m) {
           override def tableName = {
             case n if n.toLowerCase == "null" =>
               "null" // testing null as table name
@@ -36,15 +35,18 @@ object GenerateRoundtripSources {
     val a2 = profile
       .createModel(ignoreInvalidDefaults = false)
       .map(m =>
-            new SourceCodeGenerator(m) {
+        new SourceCodeGenerator(m) {
           override def Table = new Table(_) {
             override def autoIncLastAsOption = true
           }
       })
     val db = Database.forURL(
-        url = url, driver = jdbcDriver, keepAliveConnection = true)
-    val (gen, gen2) = try Await.result(
-        db.run(ddl.create >> (a1 zip a2)), Duration.Inf) finally db.close
+      url = url,
+      driver = jdbcDriver,
+      keepAliveConnection = true)
+    val (gen, gen2) =
+      try Await.result(db.run(ddl.create >> (a1 zip a2)), Duration.Inf)
+      finally db.close
     val pkg = "slick.test.codegen.roundtrip"
     gen.writeToFile("slick.jdbc.H2Profile", args(0), pkg)
     gen2.writeToFile("slick.jdbc.H2Profile", args(0), pkg + "2")
@@ -87,8 +89,19 @@ class Tables(val profile: JdbcProfile) {
 
   /** Tests slick term name collision */
   class X(tag: Tag)
-      extends Table[(Int, Int, Option[Int], Int, Double, String, Option[Int], Option[
-              Int], Option[String], Option[String], Option[String])](tag, "X") {
+      extends Table[
+        (
+            Int,
+            Int,
+            Option[Int],
+            Int,
+            Double,
+            String,
+            Option[Int],
+            Option[Int],
+            Option[String],
+            Option[String],
+            Option[String])](tag, "X") {
     def pk = column[Int]("pk")
     def pk2 = column[Int]("pk2")
     def pkpk = primaryKey("", (pk, pk2)) // pk column collision
@@ -141,12 +154,38 @@ class Tables(val profile: JdbcProfile) {
   // Clob disabled because it fails in postgres and mysql, see https://github.com/slick/slick/issues/637
   class TypeTest(tag: Tag)
       extends Table[
-          (String, Boolean, Byte, Short, Int, Long, Float, Double, String, java.sql.Date, java.sql.Time, java.sql.Timestamp, java.util.UUID, java.sql.Blob //,java.sql.Clob
-          , Option[Int], (Option[Boolean], Option[Byte], Option[Short], Option[
-              Int], Option[Long], Option[Float], Option[Double], Option[String], Option[
-              java.sql.Date], Option[java.sql.Time], Option[java.sql.Timestamp], Option[
-              java.util.UUID], Option[java.sql.Blob] //,Option[java.sql.Clob]
-          ))](tag, "TYPE_TEST") {
+        (
+            String,
+            Boolean,
+            Byte,
+            Short,
+            Int,
+            Long,
+            Float,
+            Double,
+            String,
+            java.sql.Date,
+            java.sql.Time,
+            java.sql.Timestamp,
+            java.util.UUID,
+            java.sql.Blob //,java.sql.Clob
+            ,
+            Option[Int],
+            (
+                Option[Boolean],
+                Option[Byte],
+                Option[Short],
+                Option[Int],
+                Option[Long],
+                Option[Float],
+                Option[Double],
+                Option[String],
+                Option[java.sql.Date],
+                Option[java.sql.Time],
+                Option[java.sql.Timestamp],
+                Option[java.util.UUID],
+                Option[java.sql.Blob] //,Option[java.sql.Clob]
+            ))](tag, "TYPE_TEST") {
     def `type` = column[String]("type") // <- test escaping of keywords
     def Boolean = column[Boolean]("Boolean", O.Default(true))
     def Byte = column[Byte]("Byte")
@@ -182,7 +221,9 @@ class Tables(val profile: JdbcProfile) {
     //def java_math_BigDecimal = column[Option[java.math.BigDecimal]]("java_math_BigDecimal")
     def Option_String =
       column[Option[String]](
-          "Option_String", O.Default(Some("someDefaultString")), O.Length(254))
+        "Option_String",
+        O.Default(Some("someDefaultString")),
+        O.Length(254))
     def Option_java_sql_Date =
       column[Option[java.sql.Date]]("Option_java_sql_Date")
     def Option_java_sql_Time =
@@ -197,37 +238,37 @@ class Tables(val profile: JdbcProfile) {
       column[Option[Option[java.sql.Blob]]]("Option_java_sql_Blob")
     //def Option_java_sql_Clob = column[Option[java.sql.Clob]]("Option_java_sql_Clob")
     def * = (
-        `type`,
-        Boolean,
-        Byte,
-        Short,
-        Int,
-        Long,
-        Float,
-        Double,
-        String,
-        java_sql_Date,
-        java_sql_Time,
-        java_sql_Timestamp,
-        java_util_UUID,
-        java_sql_Blob //,java_sql_Clob
-        ,
-        None_Int,
-        (
-            Option_Boolean,
-            Option_Byte,
-            Option_Short,
-            Option_Int,
-            Option_Long,
-            Option_Float,
-            Option_Double,
-            Option_String,
-            Option_java_sql_Date,
-            Option_java_sql_Time,
-            Option_java_sql_Timestamp,
-            Option_java_util_UUID,
-            Option_java_sql_Blob //,Option_java_sql_Clob
-        )
+      `type`,
+      Boolean,
+      Byte,
+      Short,
+      Int,
+      Long,
+      Float,
+      Double,
+      String,
+      java_sql_Date,
+      java_sql_Time,
+      java_sql_Timestamp,
+      java_util_UUID,
+      java_sql_Blob //,java_sql_Clob
+      ,
+      None_Int,
+      (
+        Option_Boolean,
+        Option_Byte,
+        Option_Short,
+        Option_Int,
+        Option_Long,
+        Option_Float,
+        Option_Double,
+        Option_String,
+        Option_java_sql_Date,
+        Option_java_sql_Time,
+        Option_java_sql_Timestamp,
+        Option_java_util_UUID,
+        Option_java_sql_Blob //,Option_java_sql_Clob
+      )
     )
     def pk = primaryKey("PK", (Int, Long))
   }
@@ -236,7 +277,13 @@ class Tables(val profile: JdbcProfile) {
   // testing table larger 22 columns (code gen round trip does not preserve structure of the * projection or names of mapped to classes)
   case class Part(i1: Int, i2: Int, i3: Int, i4: Int, i5: Int, i6: Int)
   case class Whole(
-      id: Long, p1: Part, p2: Part, p3: Part, p4: Part, p5: Part, p6: Part)
+      id: Long,
+      p1: Part,
+      p2: Part,
+      p3: Part,
+      p4: Part,
+      p5: Part,
+      p6: Part)
   class Large(tag: Tag) extends Table[Whole](tag, "LARGE") {
     def id = column[Long]("id", O.PrimaryKey)
     def p1i1 = column[Int]("p1i1", O.Default(11))
@@ -277,28 +324,29 @@ class Tables(val profile: JdbcProfile) {
     def p6i6 = column[Int]("p6i6", O.Default(66))
     def * =
       (
-          id,
-          (p1i1, p1i2, p1i3, p1i4, p1i5, p1i6),
-          (p2i1, p2i2, p2i3, p2i4, p2i5, p2i6),
-          (p3i1, p3i2, p3i3, p3i4, p3i5, p3i6),
-          (p4i1, p4i2, p4i3, p4i4, p4i5, p4i6),
-          (p5i1, p5i2, p5i3, p5i4, p5i5, p5i6),
-          (p6i1, p6i2, p6i3, p6i4, p6i5, p6i6)
+        id,
+        (p1i1, p1i2, p1i3, p1i4, p1i5, p1i6),
+        (p2i1, p2i2, p2i3, p2i4, p2i5, p2i6),
+        (p3i1, p3i2, p3i3, p3i4, p3i5, p3i6),
+        (p4i1, p4i2, p4i3, p4i4, p4i5, p4i6),
+        (p5i1, p5i2, p5i3, p5i4, p5i5, p5i6),
+        (p6i1, p6i2, p6i3, p6i4, p6i5, p6i6)
       ).shaped <>
-      ({
-        case (id, p1, p2, p3, p4, p5, p6) =>
-          // We could do this without .shaped but then we'd have to write a type annotation for the parameters
-          Whole(id,
-                Part.tupled.apply(p1),
-                Part.tupled.apply(p2),
-                Part.tupled.apply(p3),
-                Part.tupled.apply(p4),
-                Part.tupled.apply(p5),
-                Part.tupled.apply(p6))
-      }, { w: Whole =>
-        def f(p: Part) = Part.unapply(p).get
-        Some((w.id, f(w.p1), f(w.p2), f(w.p3), f(w.p4), f(w.p5), f(w.p6)))
-      })
+        ({
+          case (id, p1, p2, p3, p4, p5, p6) =>
+            // We could do this without .shaped but then we'd have to write a type annotation for the parameters
+            Whole(
+              id,
+              Part.tupled.apply(p1),
+              Part.tupled.apply(p2),
+              Part.tupled.apply(p3),
+              Part.tupled.apply(p4),
+              Part.tupled.apply(p5),
+              Part.tupled.apply(p6))
+        }, { w: Whole =>
+          def f(p: Part) = Part.unapply(p).get
+          Some((w.id, f(w.p1), f(w.p2), f(w.p3), f(w.p4), f(w.p5), f(w.p6)))
+        })
   }
   val large = TableQuery[Large]
 }

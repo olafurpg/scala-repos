@@ -13,9 +13,10 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.ScForStatement
   * @since 2/5/13
   */
 class ScalaMissingForBodyFixer extends ScalaFixer {
-  def apply(editor: Editor,
-            processor: ScalaSmartEnterProcessor,
-            psiElement: PsiElement): OperationPerformed = {
+  def apply(
+      editor: Editor,
+      processor: ScalaSmartEnterProcessor,
+      psiElement: PsiElement): OperationPerformed = {
     val forStatement =
       PsiTreeUtil.getParentOfType(psiElement, classOf[ScForStatement], false)
     if (forStatement == null) return NoOperation

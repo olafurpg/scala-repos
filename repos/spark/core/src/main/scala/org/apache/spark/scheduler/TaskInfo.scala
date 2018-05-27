@@ -26,14 +26,15 @@ import org.apache.spark.annotation.DeveloperApi
   * Information about a running task attempt inside a TaskSet.
   */
 @DeveloperApi
-class TaskInfo(val taskId: Long,
-               val index: Int,
-               val attemptNumber: Int,
-               val launchTime: Long,
-               val executorId: String,
-               val host: String,
-               val taskLocality: TaskLocality.TaskLocality,
-               val speculative: Boolean) {
+class TaskInfo(
+    val taskId: Long,
+    val index: Int,
+    val attemptNumber: Int,
+    val launchTime: Long,
+    val executorId: String,
+    val host: String,
+    val taskLocality: TaskLocality.TaskLocality,
+    val speculative: Boolean) {
 
   /**
     * The time when the task started remotely getting the result. Will not be set if the
@@ -99,7 +100,7 @@ class TaskInfo(val taskId: Long,
   def duration: Long = {
     if (!finished) {
       throw new UnsupportedOperationException(
-          "duration() called on unfinished task")
+        "duration() called on unfinished task")
     } else {
       finishTime - launchTime
     }

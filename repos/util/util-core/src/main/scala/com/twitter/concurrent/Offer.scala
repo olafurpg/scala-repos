@@ -51,7 +51,7 @@ trait Offer[+T] { self =>
     prepare() flatMap { tx =>
       tx.ack() flatMap {
         case Tx.Commit(v) => Future.value(v)
-        case Tx.Abort => sync()
+        case Tx.Abort     => sync()
       }
     }
 
@@ -74,7 +74,7 @@ trait Offer[+T] { self =>
         import Tx.{Commit, Abort}
         def ack() = tx.ack() map {
           case Commit(t) => Commit(f(t))
-          case Abort => Abort
+          case Abort     => Abort
         }
 
         def nack() { tx.nack() }
@@ -223,7 +223,8 @@ object Offer {
     * Package-exposed for testing.
     */
   private[concurrent] def choose[T](
-      random: Option[Random], evs: Seq[Offer[T]]): Offer[T] = {
+      random: Option[Random],
+      evs: Seq[Offer[T]]): Offer[T] = {
     if (evs.isEmpty) Offer.never
     else
       new Offer[T] {
@@ -260,7 +261,8 @@ object Offer {
           }
 
           def updateLosers(
-              winPos: Int, prepd: Array[Future[Tx[T]]]): Future[Tx[T]] = {
+              winPos: Int,
+              prepd: Array[Future[Tx[T]]]): Future[Tx[T]] = {
             val winner = prepd(winPos)
             var j = 0
             while (j < prepd.length) {

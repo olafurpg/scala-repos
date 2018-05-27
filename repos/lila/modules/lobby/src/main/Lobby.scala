@@ -25,8 +25,7 @@ private[lobby] final class Lobby(
   val scheduler = context.system.scheduler
 
   override def preStart {
-    scheduler.schedule(
-        5 seconds, broomPeriod, self, lila.socket.actorApi.Broom)
+    scheduler.schedule(5 seconds, broomPeriod, self, lila.socket.actorApi.Broom)
     scheduler.schedule(10 seconds, resyncIdsPeriod, self, actorApi.Resync)
   }
 
@@ -43,22 +42,22 @@ private[lobby] final class Lobby(
       }
 
     case msg @ AddHook(hook) => {
-        lila.mon.lobby.hook.create()
-        HookRepo byUid hook.uid foreach remove
-        hook.sid ?? { sid =>
-          HookRepo bySid sid foreach remove
-        }
-        findCompatible(hook) foreach {
-          case Some(h) => self ! BiteHook(h.id, hook.uid, hook.user)
-          case None => self ! SaveHook(msg)
-        }
+      lila.mon.lobby.hook.create()
+      HookRepo byUid hook.uid foreach remove
+      hook.sid ?? { sid =>
+        HookRepo bySid sid foreach remove
       }
+      findCompatible(hook) foreach {
+        case Some(h) => self ! BiteHook(h.id, hook.uid, hook.user)
+        case None    => self ! SaveHook(msg)
+      }
+    }
 
     case msg @ AddSeek(seek) =>
       lila.mon.lobby.seek.create()
       findCompatible(seek) foreach {
         case Some(s) => self ! BiteSeek(s.id, seek.user)
-        case None => self ! SaveSeek(msg)
+        case None    => self ! SaveSeek(msg)
       }
 
     case SaveHook(msg) =>
@@ -71,8 +70,8 @@ private[lobby] final class Lobby(
       }
 
     case CancelHook(uid) => {
-        HookRepo byUid uid foreach remove
-      }
+      HookRepo byUid uid foreach remove
+    }
 
     case CancelSeek(seekId, user) =>
       seekApi.removeBy(seekId, user.id) >>- {
@@ -149,29 +148,29 @@ private[lobby] final class Lobby(
       playban(u.id)
     } foreach {
       case None => f
-      case _ =>
+      case _    =>
     }
   }
 
   private def findCompatible(hook: Hook): Fu[Option[Hook]] =
     findCompatibleIn(hook, HookRepo findCompatible hook)
 
-  private def findCompatibleIn(
-      hook: Hook, in: Vector[Hook]): Fu[Option[Hook]] = in match {
-    case Vector() => fuccess(none)
-    case h +: rest =>
-      Biter.canJoin(h, hook.user) ?? ! {
-        (h.user |@| hook.user).tupled ?? {
-          case (u1, u2) =>
-            GameRepo.lastGameBetween(u1.id, u2.id, DateTime.now minusHours 1) map {
-              _ ?? (_.aborted)
-            }
+  private def findCompatibleIn(hook: Hook, in: Vector[Hook]): Fu[Option[Hook]] =
+    in match {
+      case Vector() => fuccess(none)
+      case h +: rest =>
+        Biter.canJoin(h, hook.user) ?? ! {
+          (h.user |@| hook.user).tupled ?? {
+            case (u1, u2) =>
+              GameRepo.lastGameBetween(u1.id, u2.id, DateTime.now minusHours 1) map {
+                _ ?? (_.aborted)
+              }
+          }
+        } flatMap {
+          case true  => fuccess(h.some)
+          case false => findCompatibleIn(hook, rest)
         }
-      } flatMap {
-        case true => fuccess(h.some)
-        case false => findCompatibleIn(hook, rest)
-      }
-  }
+    }
 
   private def findCompatible(seek: Seek): Fu[Option[Seek]] =
     seekApi forUser seek.user map {

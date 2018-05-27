@@ -23,7 +23,9 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.ScTypeAliasStub
   * Time: 9:55:13
   */
 class ScTypeAliasDefinitionImpl private (
-    stub: StubElement[ScTypeAlias], nodeType: IElementType, node: ASTNode)
+    stub: StubElement[ScTypeAlias],
+    nodeType: IElementType,
+    node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
     with ScTypeAliasDefinition {
   def this(node: ASTNode) = { this(null, null, node) }
@@ -37,8 +39,8 @@ class ScTypeAliasDefinitionImpl private (
       val id = ScalaPsiElementFactory.createIdentifier(name, getManager)
       if (id == null) {
         assert(
-            assertion = false,
-            s"Id is null. Name: $name. Text: $getText. Parent text: ${getParent.getText}.")
+          assertion = false,
+          s"Id is null. Name: $name. Text: $getText. Parent text: ${getParent.getText}.")
       }
       id.getPsi
     case n => n
@@ -59,14 +61,14 @@ class ScTypeAliasDefinitionImpl private (
       def getTextAttributesKey: TextAttributesKey = null
       def getLocationString: String =
         "(" + ScTypeAliasDefinitionImpl.this.containingClass.qualifiedName +
-        ")"
+          ")"
       override def getIcon(open: Boolean) =
         ScTypeAliasDefinitionImpl.this.getIcon(0)
     }
   }
 
   override def getOriginalElement: PsiElement =
-    super [ScTypeAliasDefinition].getOriginalElement
+    super[ScTypeAliasDefinition].getOriginalElement
 
   override def accept(visitor: ScalaElementVisitor) {
     visitor.visitTypeAliasDefinition(this)
@@ -75,7 +77,7 @@ class ScTypeAliasDefinitionImpl private (
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case s: ScalaElementVisitor => s.visitTypeAliasDefinition(this)
-      case _ => super.accept(visitor)
+      case _                      => super.accept(visitor)
     }
   }
 }

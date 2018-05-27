@@ -36,42 +36,47 @@ object CacheHint extends SFXEnumDelegateCompanion[jfxs.CacheHint, CacheHint] {
 
   val Default = new CacheHint(jfxs.CacheHint.DEFAULT)
   @deprecated(
-      "Use Default; DEFAULT will be removed in a future release", "8.0.60-R10")
+    "Use Default; DEFAULT will be removed in a future release",
+    "8.0.60-R10")
   val DEFAULT = Default
 
   val Quality = new CacheHint(jfxs.CacheHint.QUALITY)
   @deprecated(
-      "Use Quality; QUALITY will be removed in a future release", "8.0.60-R10")
+    "Use Quality; QUALITY will be removed in a future release",
+    "8.0.60-R10")
   val QUALITY = Quality
 
   val Rotate = new CacheHint(jfxs.CacheHint.ROTATE)
   @deprecated(
-      "Use Rotate; ROTATE will be removed in a future release", "8.0.60-R10")
+    "Use Rotate; ROTATE will be removed in a future release",
+    "8.0.60-R10")
   val ROTATE = Rotate
 
   val Scale = new CacheHint(jfxs.CacheHint.SCALE)
   @deprecated(
-      "Use Scale; SCALE will be removed in a future release", "8.0.60-R10")
+    "Use Scale; SCALE will be removed in a future release",
+    "8.0.60-R10")
   val SCALE = Scale
 
   val ScaleAndRotate = new CacheHint(jfxs.CacheHint.SCALE_AND_ROTATE)
   @deprecated(
-      "Use ScaleAndRotate; SCALE_AND_ROTATE will be removed in a future release",
-      "8.0.60-R10")
+    "Use ScaleAndRotate; SCALE_AND_ROTATE will be removed in a future release",
+    "8.0.60-R10")
   val SCALE_AND_ROTATE = ScaleAndRotate
 
   val Speed = new CacheHint(jfxs.CacheHint.SPEED)
   @deprecated(
-      "Use Speed; SPEED will be removed in a future release", "8.0.60-R10")
+    "Use Speed; SPEED will be removed in a future release",
+    "8.0.60-R10")
   val SPEED = Speed
 
   protected override def unsortedValues: Array[CacheHint] = Array(
-      Default,
-      Speed,
-      Quality,
-      Scale,
-      Rotate,
-      ScaleAndRotate
+    Default,
+    Speed,
+    Quality,
+    Scale,
+    Rotate,
+    ScaleAndRotate
   )
 }
 

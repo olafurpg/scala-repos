@@ -56,7 +56,7 @@ trait DirectoryFileLookup[FileEntryType <: ClassRepClassPathEntry]
   protected def files(inPackage: String): Seq[FileEntryType] = {
     val dirForPackage = getDirectory(inPackage)
     val files: Array[File] = dirForPackage match {
-      case None => Array.empty
+      case None            => Array.empty
       case Some(directory) => directory.listFiles(fileFilter)
     }
     val entries =
@@ -70,7 +70,7 @@ trait DirectoryFileLookup[FileEntryType <: ClassRepClassPathEntry]
   override private[nsc] def list(inPackage: String): FlatClassPathEntries = {
     val dirForPackage = getDirectory(inPackage)
     val files: Array[File] = dirForPackage match {
-      case None => Array.empty
+      case None            => Array.empty
       case Some(directory) => directory.listFiles()
     }
     val packagePrefix = PackageNameUtils.packagePrefix(inPackage)
@@ -101,7 +101,8 @@ object DirectoryFileLookup {
 }
 
 case class DirectoryFlatClassPath(dir: File)
-    extends DirectoryFileLookup[ClassFileEntryImpl] with NoSourcePaths {
+    extends DirectoryFileLookup[ClassFileEntryImpl]
+    with NoSourcePaths {
 
   override def findClass(
       className: String): Option[ClassRepresentation[AbstractFile]] =
@@ -134,7 +135,8 @@ object DirectoryFlatClassPath {
 }
 
 case class DirectoryFlatSourcePath(dir: File)
-    extends DirectoryFileLookup[SourceFileEntryImpl] with NoClassPaths {
+    extends DirectoryFileLookup[SourceFileEntryImpl]
+    with NoClassPaths {
 
   override def asSourcePathString: String = asClassPathString
 

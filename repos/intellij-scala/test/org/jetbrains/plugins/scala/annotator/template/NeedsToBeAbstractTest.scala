@@ -53,16 +53,17 @@ class NeedsToBeAbstractTest extends AnnotatorTestBase(NeedsToBeAbstract) {
     val ReversedMessage =
       NeedsToBeAbstract.message("Class", "C", ("a: Unit", "Holder.A"))
 
-    assertMatches(messages(
-            "trait A { def a }; trait B { def b }; class C extends A with B {}")) {
-      case Error("C", Message) :: Nil =>
+    assertMatches(
+      messages(
+        "trait A { def a }; trait B { def b }; class C extends A with B {}")) {
+      case Error("C", Message) :: Nil         =>
       case Error("C", ReversedMessage) :: Nil =>
     }
   }
 
   def testObjectOverrideDef() {
     assertMatches(
-        messages("trait A { def a }; class D extends A { object a };")) {
+      messages("trait A { def a }; class D extends A { object a };")) {
       case Nil =>
     }
   }

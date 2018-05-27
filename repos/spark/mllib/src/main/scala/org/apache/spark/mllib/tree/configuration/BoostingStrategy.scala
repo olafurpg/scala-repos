@@ -63,18 +63,19 @@ case class BoostingStrategy @Since("1.4.0")(
   private[spark] def assertValid(): Unit = {
     treeStrategy.algo match {
       case Classification =>
-        require(treeStrategy.numClasses == 2,
-                "Only binary classification is supported for boosting.")
+        require(
+          treeStrategy.numClasses == 2,
+          "Only binary classification is supported for boosting.")
       case Regression =>
       // nothing
       case _ =>
         throw new IllegalArgumentException(
-            s"BoostingStrategy given invalid algo parameter: ${treeStrategy.algo}." +
+          s"BoostingStrategy given invalid algo parameter: ${treeStrategy.algo}." +
             s"  Valid settings are: Classification, Regression.")
     }
     require(
-        learningRate > 0 && learningRate <= 1,
-        "Learning rate should be in range (0, 1]. Provided learning rate is " +
+      learningRate > 0 && learningRate <= 1,
+      "Learning rate should be in range (0, 1]. Provided learning rate is " +
         s"$learningRate.")
   }
 }
@@ -111,7 +112,7 @@ object BoostingStrategy {
         new BoostingStrategy(treeStrategy, SquaredError)
       case _ =>
         throw new IllegalArgumentException(
-            s"$algo is not supported by boosting.")
+          s"$algo is not supported by boosting.")
     }
   }
 }

@@ -15,18 +15,21 @@ case class BAdd(key: ChannelBuffer, field: ChannelBuffer, value: ChannelBuffer)
 object BAdd {
   def apply(args: Seq[Array[Byte]]) = {
     val list = trimList(args, 3, "BADD")
-    new BAdd(ChannelBuffers.wrappedBuffer(list(0)),
-             ChannelBuffers.wrappedBuffer(list(1)),
-             ChannelBuffers.wrappedBuffer(list(2)))
+    new BAdd(
+      ChannelBuffers.wrappedBuffer(list(0)),
+      ChannelBuffers.wrappedBuffer(list(1)),
+      ChannelBuffers.wrappedBuffer(list(2)))
   }
 }
 
 object BRem {
   def apply(args: Seq[Array[Byte]]) = {
     RequireClientProtocol(
-        args.length > 2, "BREM requires a hash key and at least one field")
-    new BRem(ChannelBuffers.wrappedBuffer(args(0)),
-             args.drop(1).map(ChannelBuffers.wrappedBuffer(_)))
+      args.length > 2,
+      "BREM requires a hash key and at least one field")
+    new BRem(
+      ChannelBuffers.wrappedBuffer(args(0)),
+      args.drop(1).map(ChannelBuffers.wrappedBuffer(_)))
   }
 }
 case class BRem(key: ChannelBuffer, fields: Seq[ChannelBuffer])
@@ -39,8 +42,9 @@ case class BRem(key: ChannelBuffer, fields: Seq[ChannelBuffer])
 object BGet {
   def apply(args: Seq[Array[Byte]]) = {
     val list = trimList(args, 2, "BGET")
-    new BGet(ChannelBuffers.wrappedBuffer(list(0)),
-             ChannelBuffers.wrappedBuffer(list(1)))
+    new BGet(
+      ChannelBuffers.wrappedBuffer(list(0)),
+      ChannelBuffers.wrappedBuffer(list(1)))
   }
 }
 
@@ -64,9 +68,10 @@ object BCard {
   }
 }
 
-case class BRange(key: ChannelBuffer,
-                  startField: Option[ChannelBuffer],
-                  endField: Option[ChannelBuffer])
+case class BRange(
+    key: ChannelBuffer,
+    startField: Option[ChannelBuffer],
+    endField: Option[ChannelBuffer])
     extends StrictKeyCommand {
   def command = Commands.BRANGE
   val request: Seq[ChannelBuffer] =

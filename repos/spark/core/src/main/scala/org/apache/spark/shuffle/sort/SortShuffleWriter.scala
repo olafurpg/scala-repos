@@ -20,7 +20,11 @@ package org.apache.spark.shuffle.sort
 import org.apache.spark._
 import org.apache.spark.internal.Logging
 import org.apache.spark.scheduler.MapStatus
-import org.apache.spark.shuffle.{BaseShuffleHandle, IndexShuffleBlockResolver, ShuffleWriter}
+import org.apache.spark.shuffle.{
+  BaseShuffleHandle,
+  IndexShuffleBlockResolver,
+  ShuffleWriter
+}
 import org.apache.spark.storage.ShuffleBlockId
 import org.apache.spark.util.Utils
 import org.apache.spark.util.collection.ExternalSorter
@@ -30,7 +34,8 @@ private[spark] class SortShuffleWriter[K, V, C](
     handle: BaseShuffleHandle[K, V, C],
     mapId: Int,
     context: TaskContext)
-    extends ShuffleWriter[K, V] with Logging {
+    extends ShuffleWriter[K, V]
+    with Logging {
 
   private val dep = handle.dependency
 
@@ -51,22 +56,25 @@ private[spark] class SortShuffleWriter[K, V, C](
   /** Write a bunch of records to this task's output */
   override def write(records: Iterator[Product2[K, V]]): Unit = {
     sorter = if (dep.mapSideCombine) {
-      require(dep.aggregator.isDefined,
-              "Map-side combine without Aggregator specified!")
-      new ExternalSorter[K, V, C](context,
-                                  dep.aggregator,
-                                  Some(dep.partitioner),
-                                  dep.keyOrdering,
-                                  dep.serializer)
+      require(
+        dep.aggregator.isDefined,
+        "Map-side combine without Aggregator specified!")
+      new ExternalSorter[K, V, C](
+        context,
+        dep.aggregator,
+        Some(dep.partitioner),
+        dep.keyOrdering,
+        dep.serializer)
     } else {
       // In this case we pass neither an aggregator nor an ordering to the sorter, because we don't
       // care whether the keys get sorted in each partition; that will be done on the reduce side
       // if the operation being run is sortByKey.
-      new ExternalSorter[K, V, V](context,
-                                  aggregator = None,
-                                  Some(dep.partitioner),
-                                  ordering = None,
-                                  dep.serializer)
+      new ExternalSorter[K, V, V](
+        context,
+        aggregator = None,
+        Some(dep.partitioner),
+        ordering = None,
+        dep.serializer)
     }
     sorter.insertAll(records)
 
@@ -76,10 +84,15 @@ private[spark] class SortShuffleWriter[K, V, C](
     val output = shuffleBlockResolver.getDataFile(dep.shuffleId, mapId)
     val tmp = Utils.tempFileWith(output)
     val blockId = ShuffleBlockId(
-        dep.shuffleId, mapId, IndexShuffleBlockResolver.NOOP_REDUCE_ID)
+      dep.shuffleId,
+      mapId,
+      IndexShuffleBlockResolver.NOOP_REDUCE_ID)
     val partitionLengths = sorter.writePartitionedFile(blockId, tmp)
     shuffleBlockResolver.writeIndexFileAndCommit(
-        dep.shuffleId, mapId, partitionLengths, tmp)
+      dep.shuffleId,
+      mapId,
+      partitionLengths,
+      tmp)
     mapStatus = MapStatus(blockManager.shuffleServerId, partitionLengths)
   }
 
@@ -111,11 +124,13 @@ private[spark] class SortShuffleWriter[K, V, C](
 
 private[spark] object SortShuffleWriter {
   def shouldBypassMergeSort(
-      conf: SparkConf, dep: ShuffleDependency[_, _, _]): Boolean = {
+      conf: SparkConf,
+      dep: ShuffleDependency[_, _, _]): Boolean = {
     // We cannot bypass sorting if we need to do map-side aggregation.
     if (dep.mapSideCombine) {
-      require(dep.aggregator.isDefined,
-              "Map-side combine without Aggregator specified!")
+      require(
+        dep.aggregator.isDefined,
+        "Map-side combine without Aggregator specified!")
       false
     } else {
       val bypassMergeThreshold: Int =

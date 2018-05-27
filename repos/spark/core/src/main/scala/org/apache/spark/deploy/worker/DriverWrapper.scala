@@ -21,7 +21,11 @@ import java.io.File
 
 import org.apache.spark.{SecurityManager, SparkConf}
 import org.apache.spark.rpc.RpcEnv
-import org.apache.spark.util.{ChildFirstURLClassLoader, MutableURLClassLoader, Utils}
+import org.apache.spark.util.{
+  ChildFirstURLClassLoader,
+  MutableURLClassLoader,
+  Utils
+}
 
 /**
   * Utility object for launching driver programs such that they share fate with the Worker process.
@@ -38,13 +42,15 @@ object DriverWrapper {
        */
       case workerUrl :: userJar :: mainClass :: extraArgs =>
         val conf = new SparkConf()
-        val rpcEnv = RpcEnv.create("Driver",
-                                   Utils.localHostName(),
-                                   0,
-                                   conf,
-                                   new SecurityManager(conf))
+        val rpcEnv = RpcEnv.create(
+          "Driver",
+          Utils.localHostName(),
+          0,
+          conf,
+          new SecurityManager(conf))
         rpcEnv.setupEndpoint(
-            "workerWatcher", new WorkerWatcher(rpcEnv, workerUrl))
+          "workerWatcher",
+          new WorkerWatcher(rpcEnv, workerUrl))
 
         val currentLoader = Thread.currentThread.getContextClassLoader
         val userJarUrl = new File(userJar).toURI().toURL()
@@ -68,7 +74,7 @@ object DriverWrapper {
       case _ =>
         // scalastyle:off println
         System.err.println(
-            "Usage: DriverWrapper <workerUrl> <userJar> <driverMainClass> [options]")
+          "Usage: DriverWrapper <workerUrl> <userJar> <driverMainClass> [options]")
         // scalastyle:on println
         System.exit(-1)
     }

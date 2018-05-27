@@ -27,10 +27,11 @@ object evdr extends UFunc {
 
   implicit object EVDR_DM_Impl4
       extends Impl4[DenseMatrix[Double], Int, Int, Int, DenseEigSym] {
-    def apply(M: DenseMatrix[Double],
-              s: Int,
-              nOversamples: Int,
-              nIter: Int): DenseEigSym =
+    def apply(
+        M: DenseMatrix[Double],
+        s: Int,
+        nOversamples: Int,
+        nIter: Int): DenseEigSym =
       doEigSymDouble(M, s, nOversamples, nIter)
   }
 
@@ -51,14 +52,15 @@ object evdr extends UFunc {
     * approximate matrix decompositions
     * Halko, et al., 2009 [[http://arxiv.org/abs/arXiv:0909.4061]]
     */
-  private def doEigSymDouble(M: DenseMatrix[Double],
-                             s: Int,
-                             nOversamples: Int = 10,
-                             nIter: Int = 0): DenseEigSym = {
+  private def doEigSymDouble(
+      M: DenseMatrix[Double],
+      s: Int,
+      nOversamples: Int = 10,
+      nIter: Int = 0): DenseEigSym = {
 
     require(
-        s <= (M.rows min M.cols),
-        "Number of columns in orthonormal matrix should be less than min(M.rows, M.cols)")
+      s <= (M.rows min M.cols),
+      "Number of columns in orthonormal matrix should be less than min(M.rows, M.cols)")
     require(s >= 1, "Sketch size should be greater than 1")
 
     val nRandom = s + nOversamples
@@ -90,9 +92,10 @@ object evdr extends UFunc {
     * Stochastic algorithms for constructing approximate matrix decompositions"
     * Halko, et al., 2009 (arXiv:909) [[http://arxiv.org/pdf/0909.4061]]
     */
-  private def randomizedStateFinder(M: DenseMatrix[Double],
-                                    size: Int,
-                                    nIter: Int): DenseMatrix[Double] = {
+  private def randomizedStateFinder(
+      M: DenseMatrix[Double],
+      size: Int,
+      nIter: Int): DenseMatrix[Double] = {
     val R = DenseMatrix.rand(M.cols, size, rand = Rand.gaussian)
     val Y = M * R
     cforRange(0 until nIter) { _ =>
@@ -113,10 +116,8 @@ object evdr extends UFunc {
     val abs_u = abs(u)
     val max_abs_cols = (0 until u.cols).map(c => argmax(abs_u(::, c)))
     val signs = max_abs_cols.zipWithIndex.map(e => signum(u(e._1, e._2)))
-    signs.zipWithIndex.foreach(
-        s =>
-          {
-        u(::, s._2) :*= s._1
+    signs.zipWithIndex.foreach(s => {
+      u(::, s._2) :*= s._1
     })
     u
   }

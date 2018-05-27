@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -31,7 +31,8 @@ import org.specs2.ScalaCheck
 import org.specs2.mutable._
 
 trait DistinctSpec[M[+ _]]
-    extends ColumnarTableModuleTestSupport[M] with Specification
+    extends ColumnarTableModuleTestSupport[M]
+    with Specification
     with ScalaCheck {
   import SampleData._
   import trans._
@@ -118,7 +119,7 @@ trait DistinctSpec[M[+ _]]
 
     val data: Stream[JValue] = (array match {
       case JArray(li) => li
-      case _ => sys.error("Expected a JArray")
+      case _          => sys.error("Expected a JArray")
     }).toStream
 
     val sample = SampleData(data)
@@ -198,7 +199,7 @@ trait DistinctSpec[M[+ _]]
 
     val data: Stream[JValue] = (array match {
       case JArray(li) => li
-      case _ => sys.error("Expected JArray")
+      case _          => sys.error("Expected JArray")
     }).toStream
 
     val sample = SampleData(data)
@@ -211,13 +212,11 @@ trait DistinctSpec[M[+ _]]
 
   def removeUndefined(jv: JValue): JValue = jv match {
     case JObject(jfields) =>
-      JObject(
-          jfields collect {
+      JObject(jfields collect {
         case (s, v) if v != JUndefined => JField(s, removeUndefined(v))
       })
     case JArray(jvs) =>
-      JArray(
-          jvs map { jv =>
+      JArray(jvs map { jv =>
         removeUndefined(jv)
       })
     case v => v

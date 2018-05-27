@@ -10,12 +10,10 @@ import akka.http.scaladsl.model._
 trait PredefinedFromEntityUnmarshallers extends MultipartUnmarshallers {
 
   implicit def byteStringUnmarshaller: FromEntityUnmarshaller[ByteString] =
-    Unmarshaller.withMaterializer(
-        _ ⇒
-          implicit mat ⇒
-            {
-          case HttpEntity.Strict(_, data) ⇒ FastFuture.successful(data)
-          case entity ⇒ entity.dataBytes.runFold(ByteString.empty)(_ ++ _)
+    Unmarshaller.withMaterializer(_ ⇒
+      implicit mat ⇒ {
+        case HttpEntity.Strict(_, data) ⇒ FastFuture.successful(data)
+        case entity ⇒ entity.dataBytes.runFold(ByteString.empty)(_ ++ _)
     })
 
   implicit def byteArrayUnmarshaller: FromEntityUnmarshaller[Array[Byte]] =
@@ -40,26 +38,29 @@ trait PredefinedFromEntityUnmarshallers extends MultipartUnmarshallers {
       if (entity.isKnownEmpty) ""
       else
         bytes.decodeString(
-            Unmarshaller.bestUnmarshallingCharsetFor(entity).nioCharset.name)
+          Unmarshaller.bestUnmarshallingCharsetFor(entity).nioCharset.name)
     }
 
-  implicit def defaultUrlEncodedFormDataUnmarshaller: FromEntityUnmarshaller[
-      FormData] =
+  implicit def defaultUrlEncodedFormDataUnmarshaller
+    : FromEntityUnmarshaller[FormData] =
     urlEncodedFormDataUnmarshaller(
-        MediaTypes.`application/x-www-form-urlencoded`)
+      MediaTypes.`application/x-www-form-urlencoded`)
   def urlEncodedFormDataUnmarshaller(
       ranges: ContentTypeRange*): FromEntityUnmarshaller[FormData] =
     stringUnmarshaller.forContentTypes(ranges: _*).mapWithInput {
       (entity, string) ⇒
         if (entity.isKnownEmpty) FormData.Empty
         else {
-          try FormData(Uri.Query(string,
-                                 Unmarshaller
-                                   .bestUnmarshallingCharsetFor(entity)
-                                   .nioCharset)) catch {
+          try FormData(
+            Uri.Query(
+              string,
+              Unmarshaller
+                .bestUnmarshallingCharsetFor(entity)
+                .nioCharset))
+          catch {
             case IllegalUriException(info) ⇒
               throw new IllegalArgumentException(
-                  info.formatPretty.replace("Query,", "form content,"))
+                info.formatPretty.replace("Query,", "form content,"))
           }
         }
     }

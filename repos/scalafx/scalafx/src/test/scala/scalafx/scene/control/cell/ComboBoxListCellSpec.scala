@@ -42,6 +42,8 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class ComboBoxListCellSpec[T]
     extends SimpleSFXDelegateSpec[
-        jfxscc.ComboBoxListCell[T], ComboBoxListCell[T]](
-        classOf[jfxscc.ComboBoxListCell[T]], classOf[ComboBoxListCell[T]])
+      jfxscc.ComboBoxListCell[T],
+      ComboBoxListCell[T]](
+      classOf[jfxscc.ComboBoxListCell[T]],
+      classOf[ComboBoxListCell[T]])
     with RunOnApplicationThread

@@ -2,7 +2,13 @@ package com.twitter.io
 
 import com.twitter.concurrent.AsyncStream
 import com.twitter.util._
-import java.io.{File, FileInputStream, FileNotFoundException, InputStream, OutputStream}
+import java.io.{
+  File,
+  FileInputStream,
+  FileNotFoundException,
+  InputStream,
+  OutputStream
+}
 
 /**
   * A Reader represents a stream of bytes, read in discrete chunks.
@@ -40,7 +46,7 @@ object Reader {
     def loop(left: Buf): Future[Buf] =
       r.read(Int.MaxValue) flatMap {
         case Some(right) => loop(left concat right)
-        case none => Future.value(left)
+        case none        => Future.value(left)
       }
 
     loop(Buf.Empty)
@@ -160,7 +166,7 @@ object Reader {
           val reof = new Promise[Unit]()
           state = Closing(reof)
           p.setException(
-              new IllegalStateException("close while write is pending"))
+            new IllegalStateException("close while write is pending"))
           reof
       }
     }
@@ -282,7 +288,7 @@ object Reader {
     val f =
       copyMany(readers, target) respond {
         case Throw(exc) => target.fail(exc)
-        case _ => target.close()
+        case _          => target.close()
       }
     new Reader {
       def read(n: Int) = target.read(n)
@@ -310,9 +316,10 @@ object Reader {
     *
     * @param bufsize The number of bytes to read each time.
     */
-  def copyMany(readers: AsyncStream[Reader],
-               target: Writer,
-               bufsize: Int): Future[Unit] =
+  def copyMany(
+      readers: AsyncStream[Reader],
+      target: Writer,
+      bufsize: Int): Future[Unit] =
     readers.foreachF(Reader.copy(_, target, bufsize))
 
   /**
@@ -340,7 +347,7 @@ object Reader {
   def copy(r: Reader, w: Writer, n: Int): Future[Unit] = {
     def loop(): Future[Unit] =
       r.read(n) flatMap {
-        case None => Future.Done
+        case None      => Future.Done
         case Some(buf) => w.write(buf) before loop()
       }
     val p = new Promise[Unit]

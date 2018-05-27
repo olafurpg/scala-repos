@@ -160,8 +160,9 @@ trait EventIncludes {
     * @return JavaFX EventHandler which handle method will call handler
     */
   implicit def eventClosureWrapperWithParam[
-      J <: jfxe.Event, S <: SFXDelegate[J], R](handler: (S) => R)(
-      implicit jfx2sfx: J => S): jfxe.EventHandler[J] =
+      J <: jfxe.Event,
+      S <: SFXDelegate[J],
+      R](handler: (S) => R)(implicit jfx2sfx: J => S): jfxe.EventHandler[J] =
     new jfxe.EventHandler[J] {
       def handle(event: J) {
         handler(event)

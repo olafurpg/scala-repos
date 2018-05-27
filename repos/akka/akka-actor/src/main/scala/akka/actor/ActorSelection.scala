@@ -37,9 +37,9 @@ abstract class ActorSelection extends Serializable {
     */
   def tell(msg: Any, sender: ActorRef): Unit =
     ActorSelection.deliverSelection(
-        anchor.asInstanceOf[InternalActorRef],
-        sender,
-        ActorSelectionMessage(msg, path, wildcardFanOut = false))
+      anchor.asInstanceOf[InternalActorRef],
+      sender,
+      ActorSelectionMessage(msg, path, wildcardFanOut = false))
 
   /**
     * Forwards the message and passes the original sender actor as the sender.
@@ -180,9 +180,10 @@ object ActorSelection {
     * The receive logic for ActorSelectionMessage. The idea is to recursively descend as far as possible
     * with local refs and hand over to that “foreign” child when we encounter it.
     */
-  private[akka] def deliverSelection(anchor: InternalActorRef,
-                                     sender: ActorRef,
-                                     sel: ActorSelectionMessage): Unit =
+  private[akka] def deliverSelection(
+      anchor: InternalActorRef,
+      sender: ActorRef,
+      sel: ActorSelectionMessage): Unit =
     if (sel.elements.isEmpty) anchor.tell(sel.msg, sender)
     else {
 
@@ -193,9 +194,9 @@ object ActorSelection {
           case refWithCell: ActorRefWithCell ⇒
             def emptyRef =
               new EmptyLocalActorRef(
-                  refWithCell.provider,
-                  anchor.path / sel.elements.map(_.toString),
-                  refWithCell.underlying.system.eventStream)
+                refWithCell.provider,
+                anchor.path / sel.elements.map(_.toString),
+                refWithCell.underlying.system.eventStream)
 
             iter.next() match {
               case SelectParent ⇒
@@ -222,16 +223,20 @@ object ActorSelection {
                 } else {
                   val matchingChildren =
                     chldr.filter(c ⇒ p.pattern.matcher(c.path.name).matches)
-                  // don't send to emptyRef after wildcard fan-out 
+                  // don't send to emptyRef after wildcard fan-out
                   if (matchingChildren.isEmpty && !sel.wildcardFanOut)
                     emptyRef.tell(sel, sender)
                   else {
-                    val m = sel.copy(elements = iter.toVector,
-                                     wildcardFanOut = sel.wildcardFanOut ||
-                                       matchingChildren.size > 1)
-                    matchingChildren.foreach(c ⇒
-                          deliverSelection(
-                              c.asInstanceOf[InternalActorRef], sender, m))
+                    val m = sel.copy(
+                      elements = iter.toVector,
+                      wildcardFanOut = sel.wildcardFanOut ||
+                        matchingChildren.size > 1)
+                    matchingChildren.foreach(
+                      c ⇒
+                        deliverSelection(
+                          c.asInstanceOf[InternalActorRef],
+                          sender,
+                          m))
                   }
                 }
             }
@@ -268,7 +273,8 @@ private[akka] final case class ActorSelectionMessage(
     msg: Any,
     elements: immutable.Iterable[SelectionPathElement],
     wildcardFanOut: Boolean)
-    extends AutoReceivedMessage with PossiblyHarmful {
+    extends AutoReceivedMessage
+    with PossiblyHarmful {
 
   def identifyRequest: Option[Identify] = msg match {
     case x: Identify ⇒ Some(x)

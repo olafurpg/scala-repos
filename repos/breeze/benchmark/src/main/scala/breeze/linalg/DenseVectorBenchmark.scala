@@ -9,11 +9,16 @@ object DenseVectorBenchmark extends MyRunner(classOf[DenseVectorBenchmark])
 trait BuildsRandomVectors {
   private val uniform = Uniform(0, 1)
   def randomArray(
-      size: Int, offset: Int = 0, stride: Int = 1): DenseVector[Double] = {
+      size: Int,
+      offset: Int = 0,
+      stride: Int = 1): DenseVector[Double] = {
     require(offset >= 0)
     require(stride >= 1)
     val result = new DenseVector(
-        new Array[Double](offset + stride * size), offset, stride, size)
+      new Array[Double](offset + stride * size),
+      offset,
+      stride,
+      size)
     var i = 0
     while (i < size) {
       result.unsafeUpdate(i, uniform.draw())
@@ -35,7 +40,8 @@ trait BuildsRandomVectors {
   }
 
   def randomSparseVector(
-      size: Int, sparsity: Double = 0.01): SparseVector[Double] = {
+      size: Int,
+      sparsity: Double = 0.01): SparseVector[Double] = {
     val nnz = (size * sparsity).toInt
     val vb = VectorBuilder.zeros[Double](size)
     cforRange(0 until nnz) { i =>
@@ -73,32 +79,30 @@ class DenseVectorBenchmark extends BreezeBenchmark with BuildsRandomVectors {
   }
 
   def valueAtBench(reps: Int, size: Int, stride: Int) =
-    runWith(reps, { randomArray(size, stride = stride) })(
-        arr =>
-          {
-        var i = 0
-        var t: Double = 0
-        while (i < arr.size) {
-          t += arr.valueAt(i) //This is not strictly part of the benchmark, but done so that the JIT doensn't eliminate everything
-          i += 1
-        }
-        t
+    runWith(reps, { randomArray(size, stride = stride) })(arr => {
+      var i = 0
+      var t: Double = 0
+      while (i < arr.size) {
+        t += arr
+          .valueAt(i) //This is not strictly part of the benchmark, but done so that the JIT doensn't eliminate everything
+        i += 1
+      }
+      t
     })
 
   def timeValueAt(reps: Int) = valueAtBench(reps, 1024 * 8, 1)
   def timeValueAtStride4(reps: Int) = valueAtBench(reps, 1024 * 8, 4)
 
   def unsafeValueAtBench(reps: Int, size: Int, stride: Int) =
-    runWith(reps, { randomArray(size, stride = stride) })(
-        arr =>
-          {
-        var i = 0
-        var t: Double = 0
-        while (i < arr.size) {
-          t += arr.unsafeValueAt(i) //This is not strictly part of the benchmark, but done so that the JIT doensn't eliminate everything
-          i += 1
-        }
-        t
+    runWith(reps, { randomArray(size, stride = stride) })(arr => {
+      var i = 0
+      var t: Double = 0
+      while (i < arr.size) {
+        t += arr
+          .unsafeValueAt(i) //This is not strictly part of the benchmark, but done so that the JIT doensn't eliminate everything
+        i += 1
+      }
+      t
     })
 
   def timeUnsafeValueAt(reps: Int) = unsafeValueAtBench(reps, 1024 * 8, 1)
@@ -106,30 +110,26 @@ class DenseVectorBenchmark extends BreezeBenchmark with BuildsRandomVectors {
     unsafeValueAtBench(reps, 1024 * 8, 4)
 
   def updateBench(reps: Int, size: Int, stride: Int) =
-    runWith(reps, { randomArray(size, stride = stride) })(
-        arr =>
-          {
-        var i = 0
-        while (i < arr.size) {
-          arr.update(i, i.toDouble)
-          i += 1
-        }
-        arr
+    runWith(reps, { randomArray(size, stride = stride) })(arr => {
+      var i = 0
+      while (i < arr.size) {
+        arr.update(i, i.toDouble)
+        i += 1
+      }
+      arr
     })
 
   def timeUpdate(reps: Int) = updateBench(reps, 1024 * 8, 1)
   def timeUpdateStride4(reps: Int) = updateBench(reps, 1024 * 8, 4)
 
   def unsafeUpdateBench(reps: Int, size: Int, stride: Int) =
-    runWith(reps, { randomArray(size, stride = stride) })(
-        arr =>
-          {
-        var i = 0
-        while (i < arr.size) {
-          arr.unsafeUpdate(i, i.toDouble)
-          i += 1
-        }
-        arr
+    runWith(reps, { randomArray(size, stride = stride) })(arr => {
+      var i = 0
+      while (i < arr.size) {
+        arr.unsafeUpdate(i, i.toDouble)
+        i += 1
+      }
+      arr
     })
 
   def timeUnsafeUpdate(reps: Int) = unsafeUpdateBench(reps, 1024 * 8, 1)

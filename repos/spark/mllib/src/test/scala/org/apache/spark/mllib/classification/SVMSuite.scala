@@ -25,27 +25,32 @@ import breeze.linalg.{DenseVector => BDV}
 import org.apache.spark.{SparkException, SparkFunSuite}
 import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.regression._
-import org.apache.spark.mllib.util.{LocalClusterSparkContext, MLlibTestSparkContext}
+import org.apache.spark.mllib.util.{
+  LocalClusterSparkContext,
+  MLlibTestSparkContext
+}
 import org.apache.spark.util.Utils
 
 object SVMSuite {
 
-  def generateSVMInputAsList(intercept: Double,
-                             weights: Array[Double],
-                             nPoints: Int,
-                             seed: Int): java.util.List[LabeledPoint] = {
+  def generateSVMInputAsList(
+      intercept: Double,
+      weights: Array[Double],
+      nPoints: Int,
+      seed: Int): java.util.List[LabeledPoint] = {
     generateSVMInput(intercept, weights, nPoints, seed).asJava
   }
 
   // Generate noisy input of the form Y = signum(x.dot(weights) + intercept + noise)
-  def generateSVMInput(intercept: Double,
-                       weights: Array[Double],
-                       nPoints: Int,
-                       seed: Int): Seq[LabeledPoint] = {
+  def generateSVMInput(
+      intercept: Double,
+      weights: Array[Double],
+      nPoints: Int,
+      seed: Int): Seq[LabeledPoint] = {
     val rnd = new Random(seed)
     val weightsMat = new BDV(weights)
     val x = Array.fill[Array[Double]](nPoints)(
-        Array.fill[Double](weights.length)(rnd.nextDouble() * 2.0 - 1.0))
+      Array.fill[Double](weights.length)(rnd.nextDouble() * 2.0 - 1.0))
     val y = x.map { xi =>
       val yD =
         new BDV(xi).dot(weightsMat) + intercept + 0.01 * rnd.nextGaussian()
@@ -55,8 +60,8 @@ object SVMSuite {
   }
 
   /** Binary labels, 3 features */
-  private val binaryModel = new SVMModel(
-      weights = Vectors.dense(0.1, 0.2, 0.3), intercept = 0.5)
+  private val binaryModel =
+    new SVMModel(weights = Vectors.dense(0.1, 0.2, 0.3), intercept = 0.5)
 }
 
 class SVMSuite extends SparkFunSuite with MLlibTestSparkContext {
@@ -134,11 +139,13 @@ class SVMSuite extends SparkFunSuite with MLlibTestSparkContext {
 
     // Test prediction on RDD.
     validatePrediction(
-        model.predict(validationRDD.map(_.features)).collect(), validationData)
+      model.predict(validationRDD.map(_.features)).collect(),
+      validationData)
 
     // Test prediction on Array.
     validatePrediction(
-        validationData.map(row => model.predict(row.features)), validationData)
+      validationData.map(row => model.predict(row.features)),
+      validationData)
   }
 
   test("SVM local random SGD with initial weights") {
@@ -170,11 +177,13 @@ class SVMSuite extends SparkFunSuite with MLlibTestSparkContext {
 
     // Test prediction on RDD.
     validatePrediction(
-        model.predict(validationRDD.map(_.features)).collect(), validationData)
+      model.predict(validationRDD.map(_.features)).collect(),
+      validationData)
 
     // Test prediction on Array.
     validatePrediction(
-        validationData.map(row => model.predict(row.features)), validationData)
+      validationData.map(row => model.predict(row.features)),
+      validationData)
   }
 
   test("SVM with invalid labels") {
@@ -248,8 +257,7 @@ class SVMClusterSuite extends SparkFunSuite with LocalClusterSparkContext {
       .mapPartitionsWithIndex { (idx, iter) =>
         val random = new Random(idx)
         iter.map(i =>
-              LabeledPoint(1.0,
-                           Vectors.dense(Array.fill(n)(random.nextDouble()))))
+          LabeledPoint(1.0, Vectors.dense(Array.fill(n)(random.nextDouble()))))
       }
       .cache()
     // If we serialize data directly in the task closure, the size of the serialized task would be

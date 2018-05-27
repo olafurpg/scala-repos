@@ -86,7 +86,8 @@ private[data] sealed abstract class CokleisliInstances0 {
 }
 
 private trait CokleisliArrow[F[_]]
-    extends Arrow[Cokleisli[F, ?, ?]] with CokleisliSplit[F]
+    extends Arrow[Cokleisli[F, ?, ?]]
+    with CokleisliSplit[F]
     with CokleisliProfunctor[F] {
   implicit def F: Comonad[F]
 
@@ -105,28 +106,29 @@ private trait CokleisliArrow[F[_]]
 
   override def dimap[A, B, C, D](fab: Cokleisli[F, A, B])(f: C => A)(
       g: B => D): Cokleisli[F, C, D] =
-    super [CokleisliProfunctor].dimap(fab)(f)(g)
+    super[CokleisliProfunctor].dimap(fab)(f)(g)
 
   override def split[A, B, C, D](
       f: Cokleisli[F, A, B],
       g: Cokleisli[F, C, D]): Cokleisli[F, (A, C), (B, D)] =
-    super [CokleisliSplit].split(f, g)
+    super[CokleisliSplit].split(f, g)
 }
 
 private trait CokleisliSplit[F[_]] extends Split[Cokleisli[F, ?, ?]] {
   implicit def F: CoflatMap[F]
 
   def compose[A, B, C](
-      f: Cokleisli[F, B, C], g: Cokleisli[F, A, B]): Cokleisli[F, A, C] =
+      f: Cokleisli[F, B, C],
+      g: Cokleisli[F, A, B]): Cokleisli[F, A, C] =
     f.compose(g)
 
-  def split[A, B, C, D](f: Cokleisli[F, A, B],
-                        g: Cokleisli[F, C, D]): Cokleisli[F, (A, C), (B, D)] =
+  def split[A, B, C, D](
+      f: Cokleisli[F, A, B],
+      g: Cokleisli[F, C, D]): Cokleisli[F, (A, C), (B, D)] =
     Cokleisli(fac => f.run(F.map(fac)(_._1)) -> g.run(F.map(fac)(_._2)))
 }
 
-private trait CokleisliProfunctor[F[_]]
-    extends Profunctor[Cokleisli[F, ?, ?]] {
+private trait CokleisliProfunctor[F[_]] extends Profunctor[Cokleisli[F, ?, ?]] {
   implicit def F: Functor[F]
 
   def dimap[A, B, C, D](fab: Cokleisli[F, A, B])(f: C => A)(
@@ -147,7 +149,8 @@ private trait CokleisliSemigroupK[F[_]]
   implicit def F: CoflatMap[F]
 
   def combineK[A](
-      a: Cokleisli[F, A, A], b: Cokleisli[F, A, A]): Cokleisli[F, A, A] =
+      a: Cokleisli[F, A, A],
+      b: Cokleisli[F, A, A]): Cokleisli[F, A, A] =
     a compose b
 }
 

@@ -14,14 +14,16 @@ import org.scalajs.core.ir.Trees.isValidIdentifier
   *  @param relPathMinified Path of the minified JavaScript file, relative to
   *      the classpath entry
   */
-final class FlatJSDependency(val origin: Origin,
-                             val relPath: String,
-                             val dependencies: List[String] = Nil,
-                             val commonJSName: Option[String] = None,
-                             val relPathMinified: Option[String] = None) {
+final class FlatJSDependency(
+    val origin: Origin,
+    val relPath: String,
+    val dependencies: List[String] = Nil,
+    val commonJSName: Option[String] = None,
+    val relPathMinified: Option[String] = None) {
 
-  require(commonJSName.forall(isValidIdentifier),
-          "commonJSName must be a valid JavaScript identifier")
+  require(
+    commonJSName.forall(isValidIdentifier),
+    "commonJSName must be a valid JavaScript identifier")
 
   override def toString(): String = {
     val b = new StringBuilder

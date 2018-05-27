@@ -10,8 +10,8 @@ case class Span[K <: Ordered[K]](low: Option[K], high: Option[K])
   }
   def apply(k: K): Boolean = this match {
     case Span(Some(low), Some(high)) => (k >= low && k <= high)
-    case Span(Some(low), None) => (k >= low)
-    case Span(None, Some(high)) => (k <= high)
-    case _ => false
+    case Span(Some(low), None)       => (k >= low)
+    case Span(None, Some(high))      => (k <= high)
+    case _                           => false
   }
 }

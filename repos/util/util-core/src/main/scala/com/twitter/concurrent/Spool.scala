@@ -78,9 +78,9 @@ sealed trait Spool[+A] {
     if (!isEmpty) {
       Future { f(Some(head)) } flatMap { _ =>
         tail transform {
-          case Return(s) => s.foreachElem(f)
+          case Return(s)              => s.foreachElem(f)
           case Throw(_: EOFException) => Future { f(None) }
-          case Throw(cause) => Future.exception(cause)
+          case Throw(cause)           => Future.exception(cause)
         }
       }
     } else {
@@ -104,10 +104,10 @@ sealed trait Spool[+A] {
 
   /**
     * Zips two [[Spool Spools]] returning a Spool of Tuple2s.
-    * 
+    *
     * If one Spool is shorter, excess elements of the longer
     * Spool are discarded.
-    * 
+    *
     * c.f. scala.collection.immutable.Stream#zip
     */
   def zip[B](that: Spool[B]): Spool[(A, B)] =
@@ -115,14 +115,14 @@ sealed trait Spool[+A] {
     else if (that.isEmpty) empty[(A, B)]
     else
       new LazyCons(
-          (head, that.head),
-          Future
-            .join(tail, that.tail)
-            .map {
-              case (thisTail, thatTail) =>
-                thisTail.zip(thatTail)
-            }
-        )
+        (head, that.head),
+        Future
+          .join(tail, that.tail)
+          .map {
+            case (thisTail, thatTail) =>
+              thisTail.zip(thatTail)
+          }
+      )
 
   /**
     * The standard Scala collect, in order to implement map & filter.
@@ -146,7 +146,7 @@ sealed trait Spool[+A] {
       // mutating.
       f.lift(head) match {
         case Some(result) => Future.value(new LazyCons(result, _tail))
-        case None => _tail
+        case None         => _tail
       }
     }
 
@@ -322,10 +322,12 @@ object Spool {
     * be changed in an ABI-breaking fashion in order to act lazily on the tail.
     */
   @deprecated(
-      "Use *:: instead: the ABI for this method will be changing.", "6.14.1")
+    "Use *:: instead: the ABI for this method will be changing.",
+    "6.14.1")
   def cons[A](value: A, next: Future[Spool[A]]): Spool[A] = Cons(value, next)
   @deprecated(
-      "Use *:: instead: the ABI for this method will be changing.", "6.14.1")
+    "Use *:: instead: the ABI for this method will be changing.",
+    "6.14.1")
   def cons[A](value: A, nextSpool: Spool[A]): Spool[A] =
     Cons(value, Future.value(nextSpool))
 
@@ -410,7 +412,7 @@ object Spool {
   private[this] def mergeNonempty[A](
       spools: Seq[Future[Spool[A]]]): Future[Spool[A]] =
     Future.select(spools).flatMap {
-      case (anything, Nil) => new ConstFuture(anything)
+      case (anything, Nil)             => new ConstFuture(anything)
       case (Return(Spool.Empty), rest) => merge(rest)
       case (Return(spool), rest) =>
         Future.value(new LazyCons(spool.head, merge(rest :+ spool.tail)))

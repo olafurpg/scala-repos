@@ -8,20 +8,21 @@ import lila.game.PerfPicker
 import lila.rating.PerfType
 import lila.user.User
 
-case class Challenge(_id: String,
-                     status: Challenge.Status,
-                     variant: Variant,
-                     initialFen: Option[String],
-                     timeControl: Challenge.TimeControl,
-                     mode: Mode,
-                     colorChoice: Challenge.ColorChoice,
-                     finalColor: chess.Color,
-                     challenger: EitherChallenger,
-                     destUser: Option[Challenge.Registered],
-                     rematchOf: Option[String],
-                     createdAt: DateTime,
-                     seenAt: DateTime,
-                     expiresAt: DateTime) {
+case class Challenge(
+    _id: String,
+    status: Challenge.Status,
+    variant: Variant,
+    initialFen: Option[String],
+    timeControl: Challenge.TimeControl,
+    mode: Mode,
+    colorChoice: Challenge.ColorChoice,
+    finalColor: chess.Color,
+    challenger: EitherChallenger,
+    destUser: Option[Challenge.Registered],
+    rematchOf: Option[String],
+    createdAt: DateTime,
+    seenAt: DateTime,
+    expiresAt: DateTime) {
 
   import Challenge._
 
@@ -34,13 +35,13 @@ case class Challenge(_id: String,
 
   def daysPerTurn = timeControl match {
     case TimeControl.Correspondence(d) => d.some
-    case _ => none
+    case _                             => none
   }
   def unlimited = timeControl == TimeControl.Unlimited
 
   def clock = timeControl match {
     case c: TimeControl.Clock => c.some
-    case _ => none
+    case _                    => none
   }
 
   def hasClock = clock.isDefined
@@ -100,19 +101,19 @@ object Challenge {
 
   private def speedOf(timeControl: TimeControl) = timeControl match {
     case c: TimeControl.Clock => Speed(c.chessClock)
-    case _ => Speed.Correspondence
+    case _                    => Speed.Correspondence
   }
 
-  private def perfTypeOf(
-      variant: Variant, timeControl: TimeControl): PerfType =
+  private def perfTypeOf(variant: Variant, timeControl: TimeControl): PerfType =
     PerfPicker
       .perfType(speedOf(timeControl), variant, timeControl match {
         case TimeControl.Correspondence(d) => d.some
-        case _ => none
+        case _                             => none
       })
       .orElse {
-        (variant == FromPosition) option perfTypeOf(chess.variant.Standard,
-                                                    timeControl)
+        (variant == FromPosition) option perfTypeOf(
+          chess.variant.Standard,
+          timeControl)
       }
       .|(PerfType.Correspondence)
 
@@ -124,14 +125,15 @@ object Challenge {
       u: User) =
     Registered(u.id, Rating(u.perfs(perfTypeOf(variant, timeControl))))
 
-  def make(variant: Variant,
-           initialFen: Option[String],
-           timeControl: TimeControl,
-           mode: Mode,
-           color: String,
-           challenger: Either[String, User],
-           destUser: Option[User],
-           rematchOf: Option[String]): Challenge = {
+  def make(
+      variant: Variant,
+      initialFen: Option[String],
+      timeControl: TimeControl,
+      mode: Mode,
+      color: String,
+      challenger: Either[String, User],
+      destUser: Option[User],
+      rematchOf: Option[String]): Challenge = {
     val (colorChoice, finalColor) = color match {
       case "white" => ColorChoice.White -> chess.White
       case "black" => ColorChoice.Black -> chess.Black
@@ -139,25 +141,26 @@ object Challenge {
         ColorChoice.Random -> chess.Color(scala.util.Random.nextBoolean)
     }
     new Challenge(
-        _id = randomId,
-        status = Status.Created,
-        variant = variant,
-        initialFen = (variant == FromPosition).fold(
-              initialFen,
-              Some(variant.initialFen).ifFalse(variant.standardInitialPosition)
-          ),
-        timeControl = timeControl,
-        mode = mode,
-        colorChoice = colorChoice,
-        finalColor = finalColor,
-        challenger = challenger.fold[EitherChallenger](
-              sid => Left(Anonymous(sid)),
-              u => Right(toRegistered(variant, timeControl)(u))
-          ),
-        destUser = destUser map toRegistered(variant, timeControl),
-        rematchOf = rematchOf,
-        createdAt = DateTime.now,
-        seenAt = DateTime.now,
-        expiresAt = inTwoWeeks)
+      _id = randomId,
+      status = Status.Created,
+      variant = variant,
+      initialFen = (variant == FromPosition).fold(
+        initialFen,
+        Some(variant.initialFen).ifFalse(variant.standardInitialPosition)
+      ),
+      timeControl = timeControl,
+      mode = mode,
+      colorChoice = colorChoice,
+      finalColor = finalColor,
+      challenger = challenger.fold[EitherChallenger](
+        sid => Left(Anonymous(sid)),
+        u => Right(toRegistered(variant, timeControl)(u))
+      ),
+      destUser = destUser map toRegistered(variant, timeControl),
+      rematchOf = rematchOf,
+      createdAt = DateTime.now,
+      seenAt = DateTime.now,
+      expiresAt = inTwoWeeks
+    )
   }
 }

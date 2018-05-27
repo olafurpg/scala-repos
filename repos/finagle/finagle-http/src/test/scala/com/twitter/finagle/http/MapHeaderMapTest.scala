@@ -19,8 +19,11 @@ class MapHeaderMapTest extends FunSuite {
 
     assert(map.get("a") == Some("1"))
     assert(map.getAll("a").toList == List("1", "3"))
-    assert(map.iterator.toList.sorted == List(
-            ("a" -> "1"), ("a" -> "3"), ("b" -> "2")))
+    assert(
+      map.iterator.toList.sorted == List(
+        ("a" -> "1"),
+        ("a" -> "3"),
+        ("b" -> "2")))
 
     assert(map.keys.toList.sorted == List("a", "b"))
     assert(map.keySet.toList.sorted == List("a", "b"))
@@ -46,8 +49,11 @@ class MapHeaderMapTest extends FunSuite {
 
     assert(map.get("a") == Some("1"))
     assert(map.getAll("a").toList == List("1", "3"))
-    assert(map.iterator.toList.sorted == List(
-            ("a" -> "1"), ("a" -> "3"), ("b" -> "2")))
+    assert(
+      map.iterator.toList.sorted == List(
+        ("a" -> "1"),
+        ("a" -> "3"),
+        ("b" -> "2")))
   }
 
   test("set") {

@@ -86,8 +86,8 @@ trait GlobalSettings {
     */
   def onRequestReceived(request: RequestHeader): (RequestHeader, Handler) = {
     def notFoundHandler =
-      Action.async(BodyParsers.parse.empty)(
-          req => configuredErrorHandler.onClientError(req, NOT_FOUND))
+      Action.async(BodyParsers.parse.empty)(req =>
+        configuredErrorHandler.onClientError(req, NOT_FOUND))
 
     val (routedRequest, handler) =
       onRouteRequest(request) map {
@@ -129,10 +129,10 @@ trait GlobalSettings {
       }
       val inContext =
         context.isEmpty || request.path == context ||
-        request.path.startsWith(context + "/")
+          request.path.startsWith(context + "/")
       next(request) match {
         case action: EssentialAction if inContext => doFilter(action)
-        case handler => handler
+        case handler                              => handler
       }
   }
 
@@ -190,7 +190,9 @@ trait GlobalSettings {
     */
   def onBadRequest(request: RequestHeader, error: String): Future[Result] =
     defaultErrorHandler.onClientError(
-        request, play.api.http.Status.BAD_REQUEST, error)
+      request,
+      play.api.http.Status.BAD_REQUEST,
+      error)
 }
 
 /**
@@ -210,18 +212,19 @@ object GlobalSettings {
     * @return
     */
   @deprecated("Use dependency injection", "2.5.0")
-  def apply(configuration: Configuration,
-            environment: Environment): GlobalSettings.Deprecated = {
+  def apply(
+      configuration: Configuration,
+      environment: Environment): GlobalSettings.Deprecated = {
     val globalClass =
       configuration.getString("application.global").getOrElse("Global")
 
     def javaGlobal: Option[play.GlobalSettings] =
       try {
         Option(
-            environment.classLoader
-              .loadClass(globalClass)
-              .newInstance()
-              .asInstanceOf[play.GlobalSettings])
+          environment.classLoader
+            .loadClass(globalClass)
+            .newInstance()
+            .asInstanceOf[play.GlobalSettings])
       } catch {
         case e: InstantiationException => None
         case e: ClassNotFoundException => None
@@ -239,24 +242,24 @@ object GlobalSettings {
             if !configuration.getString("application.global").isDefined =>
           DefaultGlobal
         case e if configuration.getString("application.global").isDefined => {
-            throw configuration.reportError(
-                "application.global",
-                s"Cannot initialize the custom Global object ($globalClass) (perhaps it's a wrong reference?)",
-                Some(e))
-          }
+          throw configuration.reportError(
+            "application.global",
+            s"Cannot initialize the custom Global object ($globalClass) (perhaps it's a wrong reference?)",
+            Some(e))
+        }
       }
 
     try {
       javaGlobal.map(new j.JavaGlobalSettingsAdapter(_)).getOrElse(scalaGlobal)
     } catch {
-      case e: PlayException => throw e
-      case e: ThreadDeath => throw e
+      case e: PlayException       => throw e
+      case e: ThreadDeath         => throw e
       case e: VirtualMachineError => throw e
       case e: Throwable =>
         throw new PlayException(
-            "Cannot init the Global object",
-            e.getMessage,
-            e
+          "Cannot init the Global object",
+          e.getMessage,
+          e
         )
     }
   }

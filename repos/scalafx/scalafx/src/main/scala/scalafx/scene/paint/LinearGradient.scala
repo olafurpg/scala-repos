@@ -33,8 +33,7 @@ import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
 object LinearGradient {
-  implicit def sfxLinearGradient2jfx(
-      lg: LinearGradient): jfxsp.LinearGradient =
+  implicit def sfxLinearGradient2jfx(lg: LinearGradient): jfxsp.LinearGradient =
     if (lg != null) lg.delegate else null
 
   /**
@@ -48,20 +47,22 @@ object LinearGradient {
     * @param cycleMethod  cycle method applied to the gradient
     * @param stops  the gradient's color specification
     */
-  def apply(startX: Double,
-            startY: Double,
-            endX: Double,
-            endY: Double,
-            proportional: Boolean,
-            cycleMethod: CycleMethod,
-            stops: List[Stop]) =
-    new LinearGradient(startX,
-                       startY,
-                       endX,
-                       endY,
-                       proportional,
-                       cycleMethod,
-                       stops.map(_.delegate))
+  def apply(
+      startX: Double,
+      startY: Double,
+      endX: Double,
+      endY: Double,
+      proportional: Boolean,
+      cycleMethod: CycleMethod,
+      stops: List[Stop]) =
+    new LinearGradient(
+      startX,
+      startY,
+      endX,
+      endY,
+      proportional,
+      cycleMethod,
+      stops.map(_.delegate))
 
   /**
     * Creates a new instance of LinearGradient.
@@ -74,20 +75,22 @@ object LinearGradient {
     * @param cycleMethod  cycle method applied to the gradient
     * @param stops  the gradient's color specification
     */
-  def apply(startX: Double,
-            startY: Double,
-            endX: Double,
-            endY: Double,
-            proportional: Boolean,
-            cycleMethod: CycleMethod,
-            stops: Stop*) =
-    new LinearGradient(startX,
-                       startY,
-                       endX,
-                       endY,
-                       proportional,
-                       cycleMethod,
-                       stops.map(_.delegate))
+  def apply(
+      startX: Double,
+      startY: Double,
+      endX: Double,
+      endY: Double,
+      proportional: Boolean,
+      cycleMethod: CycleMethod,
+      stops: Stop*) =
+    new LinearGradient(
+      startX,
+      startY,
+      endX,
+      endY,
+      proportional,
+      cycleMethod,
+      stops.map(_.delegate))
 
   /**
     * Creates a linear gradient value from a string representation.
@@ -99,7 +102,8 @@ object LinearGradient {
   *
   */
 class LinearGradient(override val delegate: jfxsp.LinearGradient)
-    extends Paint(delegate) with SFXDelegate[jfxsp.LinearGradient] {
+    extends Paint(delegate)
+    with SFXDelegate[jfxsp.LinearGradient] {
 
   /**
     * Creates a new instance of LinearGradient.
@@ -119,16 +123,23 @@ class LinearGradient(override val delegate: jfxsp.LinearGradient)
     * @param stops  the gradient's color specification.
     *               Default value = [[scala.Nil]]
     */
-  def this(startX: Double = 0,
-           startY: Double = 0,
-           endX: Double = 1,
-           endY: Double = 1,
-           proportional: Boolean = true,
-           cycleMethod: CycleMethod = CycleMethod.NoCycle,
-           stops: Seq[jfxsp.Stop] = Nil) =
+  def this(
+      startX: Double = 0,
+      startY: Double = 0,
+      endX: Double = 1,
+      endY: Double = 1,
+      proportional: Boolean = true,
+      cycleMethod: CycleMethod = CycleMethod.NoCycle,
+      stops: Seq[jfxsp.Stop] = Nil) =
     this(
-        new jfxsp.LinearGradient(
-            startX, startY, endX, endY, proportional, cycleMethod, stops))
+      new jfxsp.LinearGradient(
+        startX,
+        startY,
+        endX,
+        endY,
+        proportional,
+        cycleMethod,
+        stops))
 
   /**
     * Defines which of the following cycle method is applied to the

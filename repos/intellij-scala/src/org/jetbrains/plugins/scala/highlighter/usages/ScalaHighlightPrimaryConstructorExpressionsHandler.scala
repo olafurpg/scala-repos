@@ -8,7 +8,10 @@ import com.intellij.codeInsight.highlighting.HighlightUsagesHandlerBase
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.{PsiElement, PsiFile}
 import com.intellij.util.Consumer
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScPatternDefinition, ScVariableDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScPatternDefinition,
+  ScVariableDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefinition
 
 import scala.collection.JavaConversions._
@@ -30,8 +33,9 @@ class ScalaHighlightPrimaryConstructorExpressionsHandler(
     }
   }
 
-  def selectTargets(targets: util.List[PsiElement],
-                    selectionConsumer: Consumer[util.List[PsiElement]]) {
+  def selectTargets(
+      targets: util.List[PsiElement],
+      selectionConsumer: Consumer[util.List[PsiElement]]) {
     selectionConsumer.consume(targets)
   }
 
@@ -41,11 +45,11 @@ class ScalaHighlightPrimaryConstructorExpressionsHandler(
       case p: ScPatternDefinition =>
         p.expr // we include lazy vals, perhaps they could be excluded.
       case v: ScVariableDefinition => v.expr
-      case _ => None
+      case _                       => None
     }
     val constructorExprs =
       varAndValDefsExprs ++ eb.templateBody.toList.flatMap(_.exprs) ++ Seq(
-          keyword)
+        keyword)
     constructorExprs.toBuffer[PsiElement]
   }
 }

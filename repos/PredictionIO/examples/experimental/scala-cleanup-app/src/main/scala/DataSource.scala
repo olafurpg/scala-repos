@@ -21,12 +21,14 @@ import scala.concurrent.{Await, Future}
 case class DataSourceParams(
     appId: Int,
     cutoffTime: DateTime
-)
-    extends Params
+) extends Params
 
 class DataSource(val dsp: DataSourceParams)
     extends PDataSource[
-        TrainingData, EmptyEvaluationInfo, Query, EmptyActualResult] {
+      TrainingData,
+      EmptyEvaluationInfo,
+      Query,
+      EmptyActualResult] {
 
   @transient lazy val logger = Logger[this.type]
 
@@ -37,15 +39,15 @@ class DataSource(val dsp: DataSourceParams)
 
     val countBefore = eventsDb
       .find(
-          appId = dsp.appId
+        appId = dsp.appId
       )(sc)
       .count
     logger.info(s"Event count before cleanup: $countBefore")
 
     val countRemove = eventsDb
       .find(
-          appId = dsp.appId,
-          untilTime = Some(dsp.cutoffTime)
+        appId = dsp.appId,
+        untilTime = Some(dsp.cutoffTime)
       )(sc)
       .count
     logger.info(s"Number of events to remove: $countRemove")
@@ -53,8 +55,8 @@ class DataSource(val dsp: DataSourceParams)
     logger.info(s"Remove events from appId ${dsp.appId}")
     val eventsToRemove: Array[String] = eventsDb
       .find(
-          appId = dsp.appId,
-          untilTime = Some(dsp.cutoffTime)
+        appId = dsp.appId,
+        untilTime = Some(dsp.cutoffTime)
       )(sc)
       .map {
         case e =>
@@ -76,7 +78,7 @@ class DataSource(val dsp: DataSourceParams)
 
     val countAfter = eventsDb
       .find(
-          appId = dsp.appId
+        appId = dsp.appId
       )(sc)
       .count
     logger.info(s"Event count after cleanup: $countAfter")

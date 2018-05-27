@@ -38,7 +38,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class PrinterJobSpec
     extends SimpleSFXDelegateSpec[jfxp.PrinterJob, PrinterJob](
-        classOf[jfxp.PrinterJob], classOf[PrinterJob]) {
+      classOf[jfxp.PrinterJob],
+      classOf[PrinterJob]) {
 
   lazy val skipingMessage: String =
     if (jfxp.PrinterJob.createPrinterJob == null) {

@@ -17,7 +17,8 @@ import scala.concurrent.{ExecutionContext, Future}
   */
 @Singleton
 class ExampleFilter @Inject()(
-    implicit override val mat: Materializer, exec: ExecutionContext)
+    implicit override val mat: Materializer,
+    exec: ExecutionContext)
     extends Filter {
 
   override def apply(nextFilter: RequestHeader => Future[Result])(

@@ -4,7 +4,11 @@ package project.converter
 import java.io.{File, StringReader}
 
 import com.google.common.io.Files
-import com.intellij.conversion.{CannotConvertException, ConversionContext, ModuleSettings}
+import com.intellij.conversion.{
+  CannotConvertException,
+  ConversionContext,
+  ModuleSettings
+}
 import com.intellij.openapi.components.StorageScheme
 import org.jdom.input.SAXBuilder
 import org.jdom.xpath.XPath
@@ -17,10 +21,11 @@ import scala.xml.{Elem, PrettyPrinter}
 /**
   * @author Pavel Fatin
   */
-private case class ScalaSdkData(name: String,
-                                standardLibrary: LibraryData,
-                                languageLevel: String,
-                                compilerClasspath: Seq[String]) {
+private case class ScalaSdkData(
+    name: String,
+    standardLibrary: LibraryData,
+    languageLevel: String,
+    compilerClasspath: Seq[String]) {
   def isEquivalentTo(compilerLibrary: LibraryData): Boolean =
     compilerClasspath.toSet == compilerLibrary.classesAsFileUrls.toSet
 
@@ -42,7 +47,8 @@ private case class ScalaSdkData(name: String,
   }
 
   private def addDirectoryBasedLibrary(
-      library: Elem, context: ConversionContext): File = {
+      library: Elem,
+      context: ConversionContext): File = {
     val file = {
       val fileName = name.replaceAll("\\W", "_")
       suggestLibraryFile(fileName, context)
@@ -54,7 +60,8 @@ private case class ScalaSdkData(name: String,
   }
 
   private def addProjectBasedLibrary(
-      library: Elem, context: ConversionContext) {
+      library: Elem,
+      context: ConversionContext) {
     val libraryTableElement = {
       val rootElement = context.getProjectSettings.getRootElement
       XPath
@@ -87,11 +94,12 @@ private case class ScalaSdkData(name: String,
 }
 
 private object ScalaSdkData {
-  private val VersionToLanguageLevel = Seq(("2.7", "Scala_2_7"),
-                                           ("2.8", "Scala_2_8"),
-                                           ("2.9", "Scala_2_9"),
-                                           ("2.10", "Scala_2_10"),
-                                           ("2.11", "Scala_2_11"))
+  private val VersionToLanguageLevel = Seq(
+    ("2.7", "Scala_2_7"),
+    ("2.8", "Scala_2_8"),
+    ("2.9", "Scala_2_9"),
+    ("2.10", "Scala_2_10"),
+    ("2.11", "Scala_2_11"))
 
   def findAllIn(context: ConversionContext): Seq[ScalaSdkData] = {
     val elements =
@@ -112,10 +120,11 @@ private object ScalaSdkData {
 
     val languageLevel = languageLevelFrom(compilerClasspath)
 
-    ScalaSdkData(standardLibrary.name,
-                 standardLibrary,
-                 languageLevel,
-                 compilerClasspath)
+    ScalaSdkData(
+      standardLibrary.name,
+      standardLibrary,
+      languageLevel,
+      compilerClasspath)
   }
 
   def languageLevelFrom(compilerClasspath: Seq[String]): String = {
@@ -133,7 +142,7 @@ private object ScalaSdkData {
 
     file.getName match {
       case FileName(number) => Some(number)
-      case _ => None
+      case _                => None
     }
   }
 
@@ -152,21 +161,23 @@ private object ScalaSdkData {
   }
 
   private def suggestLibraryFile(
-      name: String, context: ConversionContext): File = {
+      name: String,
+      context: ConversionContext): File = {
     val base = Option(context.getSettingsBaseDir)
-      .getOrElse(throw new CannotConvertException(
-            "Only directory-based IDEA projects are supported"))
+      .getOrElse(
+        throw new CannotConvertException(
+          "Only directory-based IDEA projects are supported"))
 
     val candidates = {
       val suffixes =
         Iterator.single("") ++ Iterator.from(2).map("_" + _.toString)
-      suffixes.map(
-          suffix => new File(new File(base, "libraries"), s"$name$suffix.xml"))
+      suffixes.map(suffix =>
+        new File(new File(base, "libraries"), s"$name$suffix.xml"))
     }
 
     candidates
       .find(!_.exists)
       .getOrElse(
-          throw new IllegalStateException("Run out of integer numbers :)"))
+        throw new IllegalStateException("Run out of integer numbers :)"))
   }
 }

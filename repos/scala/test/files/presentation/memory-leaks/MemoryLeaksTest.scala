@@ -28,7 +28,8 @@ object Test extends InteractiveTest {
 
   import interactive.Global
   trait InteractiveScaladocAnalyzer
-      extends interactive.InteractiveAnalyzer with doc.ScaladocAnalyzer {
+      extends interactive.InteractiveAnalyzer
+      with doc.ScaladocAnalyzer {
     val global: Global
     override def newTyper(context: Context) =
       new Typer(context) with InteractiveTyper with ScaladocTyper {
@@ -55,16 +56,17 @@ object Test extends InteractiveTest {
     val filename = "usedmem-%tF.txt".format(Calendar.getInstance.getTime)
 
     val typerUnit = AbstractFile.getFile(
-        baseDir.parent.parent.parent.parent / "src/compiler/scala/tools/nsc/typechecker/Typers.scala")
+      baseDir.parent.parent.parent.parent / "src/compiler/scala/tools/nsc/typechecker/Typers.scala")
     val typesUnit = AbstractFile.getFile(
-        baseDir.parent.parent.parent.parent / "src/reflect/scala/reflect/internal/Types.scala")
+      baseDir.parent.parent.parent.parent / "src/reflect/scala/reflect/internal/Types.scala")
     val treesUnit = AbstractFile.getFile(
-        baseDir.parent.parent.parent.parent / "src/reflect/scala/reflect/internal/Trees.scala")
+      baseDir.parent.parent.parent.parent / "src/reflect/scala/reflect/internal/Trees.scala")
 
     askReload(
-        Seq(new BatchSourceFile(typerUnit),
-            new BatchSourceFile(typesUnit),
-            new BatchSourceFile(treesUnit)))
+      Seq(
+        new BatchSourceFile(typerUnit),
+        new BatchSourceFile(typesUnit),
+        new BatchSourceFile(treesUnit)))
     typeCheckWith(treesUnit, new String(treesUnit.toCharArray))
     typeCheckWith(typesUnit, new String(typesUnit.toCharArray))
 
@@ -127,7 +129,7 @@ object Test extends InteractiveTest {
 
     val beta =
       (mean((xs, ys).zipped.map(_ * _)) - meanXs * meanYs) /
-      (mean(xs.map(x => x * x)) - meanXs * meanXs)
+        (mean(xs.map(x => x * x)) - meanXs * meanXs)
     val alfa = meanYs - beta * meanXs
 
     (alfa, beta)

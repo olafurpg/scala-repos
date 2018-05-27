@@ -2,8 +2,23 @@ package com.twitter.finagle.factory
 
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import java.util.concurrent.atomic.AtomicInteger
-import com.twitter.finagle.{Status, Service, ServiceFactory, ClientConnection, ServiceProxy, ServiceFactoryProxy}
-import com.twitter.util.{Closable, Future, Stopwatch, Throw, Return, Time, Duration}
+import com.twitter.finagle.{
+  Status,
+  Service,
+  ServiceFactory,
+  ClientConnection,
+  ServiceProxy,
+  ServiceFactoryProxy
+}
+import com.twitter.util.{
+  Closable,
+  Future,
+  Stopwatch,
+  Throw,
+  Return,
+  Time,
+  Duration
+}
 import com.twitter.finagle.stats.{StatsReceiver, NullStatsReceiver}
 import com.twitter.finagle.tracing.Trace
 import scala.collection.immutable
@@ -26,8 +41,7 @@ private class IdlingFactory[Req, Rep](self: ServiceFactory[Req, Rep])
         Future.exception(exc)
 
       case Return(service) =>
-        Future.value(
-            new ServiceProxy(service) {
+        Future.value(new ServiceProxy(service) {
           override def close(deadline: Time) = {
             decr()
             super.close(deadline)
@@ -100,7 +114,8 @@ private[finagle] class ServiceFactoryCache[Key, Req, Rep](
   }
 
   private[this] def miss(
-      key: Key, conn: ClientConnection): Future[Service[Req, Rep]] = {
+      key: Key,
+      conn: ClientConnection): Future[Service[Req, Rep]] = {
     writeLock.lock()
 
     if (cache contains key) {

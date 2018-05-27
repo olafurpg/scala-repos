@@ -35,20 +35,20 @@ abstract class ReplTest extends DirectTest {
     val lines = ILoop
       .runForTranscript(code, s, inSession = inSession)
       .lines
-      (if (welcoming) {
-         val welcome = "(Welcome to Scala).*".r
-         //val welcome = Regex.quote(header.lines.next).r
-         //val version = "(.*version).*".r   // version on separate line?
-         //var inHead  = false
-         lines map {
-           //case s @ welcome()        => inHead = true  ; s
-           //case version(s) if inHead => inHead = false ; s
-           case welcome(s) => s
-           case s => s
-         }
-       } else {
-         lines drop header.lines.size
-       }) map normalize
+    (if (welcoming) {
+       val welcome = "(Welcome to Scala).*".r
+       //val welcome = Regex.quote(header.lines.next).r
+       //val version = "(.*version).*".r   // version on separate line?
+       //var inHead  = false
+       lines map {
+         //case s @ welcome()        => inHead = true  ; s
+         //case version(s) if inHead => inHead = false ; s
+         case welcome(s) => s
+         case s          => s
+       }
+     } else {
+       lines drop header.lines.size
+     }) map normalize
   }
   def show() = eval() foreach println
 }
@@ -89,7 +89,7 @@ abstract class SessionTest extends ReplTest {
       case pasted(null, null, prompted) =>
         def continued(m: Match): Option[String] = m match {
           case margin(text) => Some(text)
-          case _ => None
+          case _            => None
         }
         margin.replaceSomeIn(prompted, continued)
       case pasted(cmd, pasted, null) =>
@@ -107,7 +107,10 @@ abstract class SessionTest extends ReplTest {
       Console println s"Expected ${wanted.size} lines, got ${evaled.size}"
     if (evaled != wanted)
       Console print nest.FileManager.compareContents(
-          wanted, evaled, "expected", "actual")
+        wanted,
+        evaled,
+        "expected",
+        "actual")
   }
 }
 object SessionTest {

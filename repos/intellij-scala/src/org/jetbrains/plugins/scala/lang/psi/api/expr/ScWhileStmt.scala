@@ -6,7 +6,7 @@ package expr
 
 import com.intellij.psi.PsiElement
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   */
 trait ScWhileStmt extends ScExpression {

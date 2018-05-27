@@ -93,7 +93,7 @@ trait Map[A, B] extends scala.collection.mutable.Map[A, B] {
       val v = op
       putIfAbsent(key, v) match {
         case Some(nv) => nv
-        case None => v
+        case None     => v
       }
   }
 }

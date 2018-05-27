@@ -27,10 +27,10 @@ class UsingNativesTest extends FunSuite with Checkers {
   test("Using natives") {
     if (!usingNatives) {
       assert(
-          com.github.fommil.netlib.BLAS.getInstance.getClass.getName == "com.github.fommil.netlib.F2jBLAS")
+        com.github.fommil.netlib.BLAS.getInstance.getClass.getName == "com.github.fommil.netlib.F2jBLAS")
     } else {
       assert(
-          com.github.fommil.netlib.BLAS.getInstance.getClass.getName != "com.github.fommil.netlib.F2jBLAS")
+        com.github.fommil.netlib.BLAS.getInstance.getClass.getName != "com.github.fommil.netlib.F2jBLAS")
     }
   }
 }

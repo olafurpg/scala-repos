@@ -36,8 +36,8 @@ class EvaluationSuite extends FunSuite with Inside with SharedSparkContext {
 
   test("Load from class path") {
     val r = io.prediction.workflow.WorkflowUtils.getEvaluation(
-        "io.prediction.controller.EvaluationSuite.Evaluation0",
-        getClass.getClassLoader)
+      "io.prediction.controller.EvaluationSuite.Evaluation0",
+      getClass.getClassLoader)
 
     r._2 shouldBe EvaluationSuite.Evaluation0
   }

@@ -43,15 +43,16 @@ private[mllib] object EigenValueDecomposition {
     *       for more details). The maximum number of Arnoldi update iterations is set to 300 in this
     *       function.
     */
-  def symmetricEigs(mul: BDV[Double] => BDV[Double],
-                    n: Int,
-                    k: Int,
-                    tol: Double,
-                    maxIterations: Int): (BDV[Double], BDM[Double]) = {
+  def symmetricEigs(
+      mul: BDV[Double] => BDV[Double],
+      n: Int,
+      k: Int,
+      tol: Double,
+      maxIterations: Int): (BDV[Double], BDM[Double]) = {
     // TODO: remove this function and use eigs in breeze when switching breeze version
     require(
-        n > k,
-        s"Number of required eigenvalues $k must be smaller than matrix dimension $n")
+      n > k,
+      s"Number of required eigenvalues $k must be smaller than matrix dimension $n")
 
     val arpack = ARPACK.getInstance()
 
@@ -78,9 +79,9 @@ private[mllib] object EigenValueDecomposition {
     iparam(6) = 1
 
     require(
-        n * ncv.toLong <= Integer.MAX_VALUE &&
+      n * ncv.toLong <= Integer.MAX_VALUE &&
         ncv * (ncv.toLong + 8) <= Integer.MAX_VALUE,
-        s"k = $k and/or n = $n are too large to compute an eigendecomposition")
+      s"k = $k and/or n = $n are too large to compute an eigendecomposition")
 
     var ido = new intW(0)
     var info = new intW(0)
@@ -91,22 +92,23 @@ private[mllib] object EigenValueDecomposition {
     var ipntr = new Array[Int](11)
 
     // call ARPACK's reverse communication, first iteration with ido = 0
-    arpack.dsaupd(ido,
-                  bmat,
-                  n,
-                  which,
-                  nev.`val`,
-                  tolW,
-                  resid,
-                  ncv,
-                  v,
-                  n,
-                  iparam,
-                  ipntr,
-                  workd,
-                  workl,
-                  workl.length,
-                  info)
+    arpack.dsaupd(
+      ido,
+      bmat,
+      n,
+      which,
+      nev.`val`,
+      tolW,
+      resid,
+      ncv,
+      v,
+      n,
+      iparam,
+      ipntr,
+      workd,
+      workl,
+      workl.length,
+      info)
 
     val w = BDV(workd)
 
@@ -114,7 +116,7 @@ private[mllib] object EigenValueDecomposition {
     while (ido.`val` != 99) {
       if (ido.`val` != -1 && ido.`val` != 1) {
         throw new IllegalStateException(
-            "ARPACK returns ido = " + ido.`val` +
+          "ARPACK returns ido = " + ido.`val` +
             " This flag is not compatible with Mode 1: A*x = lambda*x, A symmetric.")
       }
       // multiply working vector with the matrix
@@ -124,38 +126,39 @@ private[mllib] object EigenValueDecomposition {
       val y = w.slice(outputOffset, outputOffset + n)
       y := mul(x)
       // call ARPACK's reverse communication
-      arpack.dsaupd(ido,
-                    bmat,
-                    n,
-                    which,
-                    nev.`val`,
-                    tolW,
-                    resid,
-                    ncv,
-                    v,
-                    n,
-                    iparam,
-                    ipntr,
-                    workd,
-                    workl,
-                    workl.length,
-                    info)
+      arpack.dsaupd(
+        ido,
+        bmat,
+        n,
+        which,
+        nev.`val`,
+        tolW,
+        resid,
+        ncv,
+        v,
+        n,
+        iparam,
+        ipntr,
+        workd,
+        workl,
+        workl.length,
+        info)
     }
 
     if (info.`val` != 0) {
       info.`val` match {
         case 1 =>
           throw new IllegalStateException(
-              "ARPACK returns non-zero info = " + info.`val` +
+            "ARPACK returns non-zero info = " + info.`val` +
               " Maximum number of iterations taken. (Refer ARPACK user guide for details)")
         case 3 =>
           throw new IllegalStateException(
-              "ARPACK returns non-zero info = " + info.`val` +
+            "ARPACK returns non-zero info = " + info.`val` +
               " No shifts could be applied. Try to increase NCV. " +
               "(Refer ARPACK user guide for details)")
         case _ =>
           throw new IllegalStateException(
-              "ARPACK returns non-zero info = " + info.`val` +
+            "ARPACK returns non-zero info = " + info.`val` +
               " Please refer ARPACK user guide for error message.")
       }
     }
@@ -166,28 +169,29 @@ private[mllib] object EigenValueDecomposition {
     val z = java.util.Arrays.copyOfRange(v, 0, nev.`val` * n)
 
     // call ARPACK's post-processing for eigenvectors
-    arpack.dseupd(true,
-                  "A",
-                  select,
-                  d,
-                  z,
-                  n,
-                  0.0,
-                  bmat,
-                  n,
-                  which,
-                  nev,
-                  tol,
-                  resid,
-                  ncv,
-                  v,
-                  n,
-                  iparam,
-                  ipntr,
-                  workd,
-                  workl,
-                  workl.length,
-                  info)
+    arpack.dseupd(
+      true,
+      "A",
+      select,
+      d,
+      z,
+      n,
+      0.0,
+      bmat,
+      n,
+      which,
+      nev,
+      tol,
+      resid,
+      ncv,
+      v,
+      n,
+      iparam,
+      ipntr,
+      workd,
+      workl,
+      workl.length,
+      info)
 
     // number of computed eigenvalues, might be smaller than k
     val computed = iparam(4)

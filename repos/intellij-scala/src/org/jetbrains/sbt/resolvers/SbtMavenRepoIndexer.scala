@@ -6,9 +6,17 @@ import java.io.{IOException, Closeable, File, FileNotFoundException}
 import com.intellij.openapi.progress.ProgressIndicator
 import org.apache.maven.index._
 import org.apache.maven.index.artifact.DefaultArtifactPackagingMapper
-import org.apache.maven.index.context.{IndexCreator, IndexUtils, IndexingContext}
+import org.apache.maven.index.context.{
+  IndexCreator,
+  IndexUtils,
+  IndexingContext
+}
 import org.apache.maven.index.incremental.DefaultIncrementalHandler
-import org.apache.maven.index.updater.{DefaultIndexUpdater, IndexUpdateRequest, WagonHelper}
+import org.apache.maven.index.updater.{
+  DefaultIndexUpdater,
+  IndexUpdateRequest,
+  WagonHelper
+}
 import org.apache.maven.wagon.events.TransferEvent
 import org.apache.maven.wagon.observers.AbstractTransferListener
 import org.apache.maven.wagon.{ResourceDoesNotExistException, Wagon}
@@ -35,16 +43,17 @@ class SbtMavenRepoIndexer private (val root: String, val indexDir: File)
 
   private val indexerEngine = new DefaultIndexerEngine
   private val queryCreator = new DefaultQueryCreator
-  private val indexer = new DefaultIndexer(
-      new DefaultSearchEngine, indexerEngine, queryCreator)
+  private val indexer =
+    new DefaultIndexer(new DefaultSearchEngine, indexerEngine, queryCreator)
   private val updater = new DefaultIndexUpdater(
-      new DefaultIncrementalHandler, java.util.Collections.emptyList())
+    new DefaultIncrementalHandler,
+    java.util.Collections.emptyList())
   private val httpWagon = container.lookup(classOf[Wagon], "http")
 
   private val indexers = Seq(
-      container.lookup(classOf[IndexCreator], "min"),
-      container.lookup(classOf[IndexCreator], "jarContent"),
-      container.lookup(classOf[IndexCreator], "maven-plugin")
+    container.lookup(classOf[IndexCreator], "min"),
+    container.lookup(classOf[IndexCreator], "jarContent"),
+    container.lookup(classOf[IndexCreator], "maven-plugin")
   ).asJava
 
   private var context = {
@@ -54,15 +63,15 @@ class SbtMavenRepoIndexer private (val root: String, val indexDir: File)
     if (repoDir != null && !repoDir.isDirectory)
       throw new InvalidRepository(repoDir.getAbsolutePath)
     indexer.createIndexingContext(
-        root.shaDigest,
-        root.shaDigest,
-        repoDir,
-        indexDir,
-        repoUrl,
-        null,
-        true,
-        true,
-        indexers
+      root.shaDigest,
+      root.shaDigest,
+      repoDir,
+      indexDir,
+      repoUrl,
+      null,
+      true,
+      true,
+      indexers
     )
   }
 
@@ -87,8 +96,7 @@ class SbtMavenRepoIndexer private (val root: String, val indexDir: File)
     val scannerListener = new ArtifactScanningListener {
       override def scanningStarted(p1: IndexingContext) =
         progressIndicator foreach { indicator =>
-          indicator.setText2(
-              SbtBundle("sbt.resolverIndexer.progress.scanning"))
+          indicator.setText2(SbtBundle("sbt.resolverIndexer.progress.scanning"))
           indicator.setFraction(0.0)
         }
       override def scanningFinished(p1: IndexingContext, p2: ScanningResult) =
@@ -103,32 +111,33 @@ class SbtMavenRepoIndexer private (val root: String, val indexDir: File)
 
     // TODO: when guys from maven-indexer fix their code (or at least Scanner class will work as it should)
     val nexusIndexer = new DefaultNexusIndexer(
-        indexer,
-        new DefaultScanner(new DefaultArtifactContextProducer(
-                new DefaultArtifactPackagingMapper)),
-        indexerEngine,
-        queryCreator
+      indexer,
+      new DefaultScanner(
+        new DefaultArtifactContextProducer(new DefaultArtifactPackagingMapper)),
+      indexerEngine,
+      queryCreator
     )
-    val nexusContext = nexusIndexer.addIndexingContext(root.shaDigest,
-                                                       root.shaDigest,
-                                                       context.getRepository,
-                                                       indexDir,
-                                                       null,
-                                                       null,
-                                                       indexers)
+    val nexusContext = nexusIndexer.addIndexingContext(
+      root.shaDigest,
+      root.shaDigest,
+      context.getRepository,
+      indexDir,
+      null,
+      null,
+      indexers)
     nexusIndexer.scan(nexusContext, scannerListener, true)
     nexusIndexer.removeIndexingContext(nexusContext, false)
 
     context = indexer.createIndexingContext(
-        root.shaDigest,
-        root.shaDigest,
-        repoDir,
-        indexDir,
-        null,
-        null,
-        true,
-        true,
-        indexers
+      root.shaDigest,
+      root.shaDigest,
+      repoDir,
+      indexDir,
+      null,
+      null,
+      true,
+      true,
+      indexers
     )
   }
 
@@ -136,7 +145,9 @@ class SbtMavenRepoIndexer private (val root: String, val indexDir: File)
     val transferListener = new AbstractTransferListener {
       var downloadedBytes = 0
       override def transferProgress(
-          evt: TransferEvent, bytes: Array[Byte], length: Int) =
+          evt: TransferEvent,
+          bytes: Array[Byte],
+          length: Int) =
         progressIndicator foreach { indicator =>
           downloadedBytes += length
           val done =
@@ -146,7 +157,7 @@ class SbtMavenRepoIndexer private (val root: String, val indexDir: File)
       override def transferStarted(evt: TransferEvent) =
         progressIndicator foreach { indicator =>
           indicator.setText2(
-              SbtBundle("sbt.resolverIndexer.progress.downloading"))
+            SbtBundle("sbt.resolverIndexer.progress.downloading"))
           indicator.setFraction(0.0)
         }
     }
@@ -156,10 +167,11 @@ class SbtMavenRepoIndexer private (val root: String, val indexDir: File)
     updater.fetchAndUpdateIndex(updateRequest)
   }
 
-  def foreach(f: (ArtifactInfo => Unit),
-              progressIndicator: Option[ProgressIndicator]) {
+  def foreach(
+      f: (ArtifactInfo => Unit),
+      progressIndicator: Option[ProgressIndicator]) {
     progressIndicator foreach
-    (_.setText2(SbtBundle("sbt.resolverIndexer.progress.converting")))
+      (_.setText2(SbtBundle("sbt.resolverIndexer.progress.converting")))
     val searcher = context.acquireIndexSearcher()
     try {
       val reader = searcher.getIndexReader
@@ -170,7 +182,7 @@ class SbtMavenRepoIndexer private (val root: String, val indexDir: File)
           IndexUtils.constructArtifactInfo(reader.document(i - 1), context)
         if (info != null) f(info)
         progressIndicator foreach
-        (_.setFraction(0.5 + 0.5 * (i.toFloat / maxDoc)))
+          (_.setFraction(0.5 + 0.5 * (i.toFloat / maxDoc)))
       }
     } finally {
       context.releaseIndexSearcher(searcher)

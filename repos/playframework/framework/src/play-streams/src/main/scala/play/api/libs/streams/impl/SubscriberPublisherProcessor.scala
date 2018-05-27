@@ -9,7 +9,8 @@ import org.reactivestreams._
   * Very simple Processor that delegates to its Subscriber and Publisher arguments.
   */
 final class SubscriberPublisherProcessor[T, U](
-    subr: Subscriber[T], pubr: Publisher[U])
+    subr: Subscriber[T],
+    pubr: Publisher[U])
     extends Processor[T, U] {
   override def subscribe(subscriber: Subscriber[_ >: U]): Unit =
     pubr.subscribe(subscriber)

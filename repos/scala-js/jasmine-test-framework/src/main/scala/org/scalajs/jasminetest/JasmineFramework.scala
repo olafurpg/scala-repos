@@ -23,17 +23,19 @@ final class JasmineFramework extends Framework {
 
   def fingerprints: Array[Fingerprint] = Array(JasmineFingerprint)
 
-  def runner(args: Array[String],
-             remoteArgs: Array[String],
-             testClassLoader: ClassLoader): Runner = {
+  def runner(
+      args: Array[String],
+      remoteArgs: Array[String],
+      testClassLoader: ClassLoader): Runner = {
     acquireRunner()
     new JasmineRunner(this, args, remoteArgs, testClassLoader)
   }
 
-  def slaveRunner(args: Array[String],
-                  remoteArgs: Array[String],
-                  testClassLoader: ClassLoader,
-                  channel: String => Unit): Runner = {
+  def slaveRunner(
+      args: Array[String],
+      remoteArgs: Array[String],
+      testClassLoader: ClassLoader,
+      channel: String => Unit): Runner = {
     acquireRunner()
     new JasmineRunner(this, args, remoteArgs, testClassLoader)
   }
@@ -42,8 +44,7 @@ final class JasmineFramework extends Framework {
 
   private def acquireRunner(): Unit = {
     if (hasRunner)
-      throw new IllegalStateException(
-          "Jasmine doesn't support concurrent runs")
+      throw new IllegalStateException("Jasmine doesn't support concurrent runs")
     hasRunner = true
   }
 }

@@ -12,7 +12,7 @@ object Test {
       } finally Console.println("ho!")
     } catch {
       case ex: IOException => Console.println("io exception!");
-      case ex => Console.println(ex);
+      case ex              => Console.println(ex);
     }
   }
 }

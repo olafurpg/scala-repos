@@ -47,7 +47,9 @@ object StatsSampleSingleMasterSpecConfig extends MultiNodeConfig {
 
   // this configuration will be used for all nodes
   // note that no fixed host names and ports are used
-  commonConfig(ConfigFactory.parseString("""
+  commonConfig(
+    ConfigFactory.parseString(
+      """
     akka.loglevel = INFO
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
     akka.remote.log-remote-lifecycle-events = off
@@ -77,8 +79,11 @@ class StatsSampleSingleMasterSpecMultiJvmNode3
     extends StatsSampleSingleMasterSpec
 
 abstract class StatsSampleSingleMasterSpec
-    extends MultiNodeSpec(StatsSampleSingleMasterSpecConfig) with WordSpecLike
-    with Matchers with BeforeAndAfterAll with ImplicitSender {
+    extends MultiNodeSpec(StatsSampleSingleMasterSpecConfig)
+    with WordSpecLike
+    with Matchers
+    with BeforeAndAfterAll
+    with ImplicitSender {
 
   import StatsSampleSingleMasterSpecConfig._
 
@@ -100,35 +105,36 @@ abstract class StatsSampleSingleMasterSpec
       Cluster(system) join firstAddress
 
       receiveN(3).collect { case MemberUp(m) => m.address }.toSet should be(
-          Set(firstAddress, secondAddress, thirdAddress))
+        Set(firstAddress, secondAddress, thirdAddress))
 
       Cluster(system).unsubscribe(testActor)
 
-      system.actorOf(ClusterSingletonManager.props(
-                         Props[StatsService],
-                         terminationMessage = PoisonPill,
-                         settings = ClusterSingletonManagerSettings(system)),
-                     name = "statsService")
+      system.actorOf(
+        ClusterSingletonManager.props(
+          Props[StatsService],
+          terminationMessage = PoisonPill,
+          settings = ClusterSingletonManagerSettings(system)),
+        name = "statsService")
 
       system.actorOf(
-          ClusterSingletonProxy.props(
-              "/user/statsService",
-              ClusterSingletonProxySettings(system).withRole("compute")),
-          "statsServiceProxy")
+        ClusterSingletonProxy.props(
+          "/user/statsService",
+          ClusterSingletonProxySettings(system).withRole("compute")),
+        "statsServiceProxy")
 
       testConductor.enter("all-up")
     }
 
     "show usage of the statsServiceProxy" in within(40 seconds) {
       val proxy = system.actorSelection(
-          RootActorPath(node(third).address) / "user" / "statsServiceProxy")
+        RootActorPath(node(third).address) / "user" / "statsServiceProxy")
 
       // eventually the service should be ok,
       // service and worker nodes might not be up yet
       awaitAssert {
         proxy ! new StatsJob("this is the text that will be analyzed")
         expectMsgType[StatsResult](1.second).getMeanWordLength should be(
-            3.875 +- 0.001)
+          3.875 +- 0.001)
       }
 
       testConductor.enter("done")

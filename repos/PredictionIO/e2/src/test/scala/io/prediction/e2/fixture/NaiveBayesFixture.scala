@@ -31,17 +31,17 @@ trait NaiveBayesFixture {
       val Yellow = "Yellow"
 
       val labeledPoints = Seq(
-          LabeledPoint(Banana, Array(Long, Sweet, Yellow)),
-          LabeledPoint(Banana, Array(Long, Sweet, Yellow)),
-          LabeledPoint(Banana, Array(Long, Sweet, Yellow)),
-          LabeledPoint(Banana, Array(Long, Sweet, Yellow)),
-          LabeledPoint(Banana, Array(NotLong, NotSweet, NotYellow)),
-          LabeledPoint(Orange, Array(NotLong, Sweet, NotYellow)),
-          LabeledPoint(Orange, Array(NotLong, NotSweet, NotYellow)),
-          LabeledPoint(OtherFruit, Array(Long, Sweet, NotYellow)),
-          LabeledPoint(OtherFruit, Array(NotLong, Sweet, NotYellow)),
-          LabeledPoint(OtherFruit, Array(Long, Sweet, Yellow)),
-          LabeledPoint(OtherFruit, Array(NotLong, NotSweet, NotYellow))
+        LabeledPoint(Banana, Array(Long, Sweet, Yellow)),
+        LabeledPoint(Banana, Array(Long, Sweet, Yellow)),
+        LabeledPoint(Banana, Array(Long, Sweet, Yellow)),
+        LabeledPoint(Banana, Array(Long, Sweet, Yellow)),
+        LabeledPoint(Banana, Array(NotLong, NotSweet, NotYellow)),
+        LabeledPoint(Orange, Array(NotLong, Sweet, NotYellow)),
+        LabeledPoint(Orange, Array(NotLong, NotSweet, NotYellow)),
+        LabeledPoint(OtherFruit, Array(Long, Sweet, NotYellow)),
+        LabeledPoint(OtherFruit, Array(NotLong, Sweet, NotYellow)),
+        LabeledPoint(OtherFruit, Array(Long, Sweet, Yellow)),
+        LabeledPoint(OtherFruit, Array(NotLong, NotSweet, NotYellow))
       )
     }
   }

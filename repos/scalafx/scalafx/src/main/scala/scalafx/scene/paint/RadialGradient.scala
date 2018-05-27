@@ -33,8 +33,7 @@ import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
 object RadialGradient {
-  implicit def sfxRadialGradient2jfx(
-      rg: RadialGradient): jfxsp.RadialGradient =
+  implicit def sfxRadialGradient2jfx(rg: RadialGradient): jfxsp.RadialGradient =
     if (rg != null) rg.delegate else null
 
   /**
@@ -42,25 +41,27 @@ object RadialGradient {
     */
   def valueOf(value: String) = jfxsp.RadialGradient.valueOf(value)
 
-  def apply(focusAngle: Double,
-            focusDistance: Double,
-            centerX: Double,
-            centerY: Double,
-            radius: Double,
-            proportional: Boolean,
-            cycleMethod: CycleMethod,
-            stops: List[Stop]): RadialGradient = {
+  def apply(
+      focusAngle: Double,
+      focusDistance: Double,
+      centerX: Double,
+      centerY: Double,
+      radius: Double,
+      proportional: Boolean,
+      cycleMethod: CycleMethod,
+      stops: List[Stop]): RadialGradient = {
     val stopsList = new java.util.ArrayList[jfxsp.Stop](stops.length)
     for (stop <- stops) stopsList.add(stop)
     new RadialGradient(
-        new jfxsp.RadialGradient(focusAngle,
-                                 focusDistance,
-                                 centerX,
-                                 centerY,
-                                 radius,
-                                 proportional,
-                                 cycleMethod,
-                                 stopsList))
+      new jfxsp.RadialGradient(
+        focusAngle,
+        focusDistance,
+        centerX,
+        centerY,
+        radius,
+        proportional,
+        cycleMethod,
+        stopsList))
   }
 
   /* This should work but it looks like it calls the constructor that
@@ -68,48 +69,53 @@ object RadialGradient {
     def apply(focusAngle: Double, focusDistance: Double, centerX: Double, centerY: Double, radius: Double, proportional: Boolean, cycleMethod: CycleMethod, stops: Stop*) =
       new RadialGradient(new jfxsp.RadialGradient(focusAngle, focusDistance, centerX, centerY, radius, proportional, cycleMethod, stops: _*))
    */
-  def apply(focusAngle: Double,
-            focusDistance: Double,
-            centerX: Double,
-            centerY: Double,
-            radius: Double,
-            proportional: Boolean,
-            cycleMethod: CycleMethod,
-            stops: Stop*): RadialGradient = {
+  def apply(
+      focusAngle: Double,
+      focusDistance: Double,
+      centerX: Double,
+      centerY: Double,
+      radius: Double,
+      proportional: Boolean,
+      cycleMethod: CycleMethod,
+      stops: Stop*): RadialGradient = {
     val stopsList = new java.util.ArrayList[jfxsp.Stop](stops.length)
     for (stop <- stops) stopsList.add(stop)
     new RadialGradient(
-        new jfxsp.RadialGradient(focusAngle,
-                                 focusDistance,
-                                 centerX,
-                                 centerY,
-                                 radius,
-                                 proportional,
-                                 cycleMethod,
-                                 stopsList))
+      new jfxsp.RadialGradient(
+        focusAngle,
+        focusDistance,
+        centerX,
+        centerY,
+        radius,
+        proportional,
+        cycleMethod,
+        stopsList))
   }
 }
 
 class RadialGradient(override val delegate: jfxsp.RadialGradient)
-    extends Paint(delegate) with SFXDelegate[jfxsp.RadialGradient] {
+    extends Paint(delegate)
+    with SFXDelegate[jfxsp.RadialGradient] {
 
-  def this(focusAngle: Double,
-           focusDistance: Double,
-           centerX: Double,
-           centerY: Double,
-           radius: Double,
-           proportional: Boolean,
-           cycleMethod: jfxsp.CycleMethod,
-           stops: Seq[jfxsp.Stop]) =
+  def this(
+      focusAngle: Double,
+      focusDistance: Double,
+      centerX: Double,
+      centerY: Double,
+      radius: Double,
+      proportional: Boolean,
+      cycleMethod: jfxsp.CycleMethod,
+      stops: Seq[jfxsp.Stop]) =
     this(
-        new jfxsp.RadialGradient(focusAngle,
-                                 focusDistance,
-                                 centerX,
-                                 centerY,
-                                 radius,
-                                 proportional,
-                                 cycleMethod,
-                                 stops))
+      new jfxsp.RadialGradient(
+        focusAngle,
+        focusDistance,
+        centerX,
+        centerY,
+        radius,
+        proportional,
+        cycleMethod,
+        stops))
 
   /**
     * Defines the X coordinate of the center point of the circle defining the gradient.

@@ -40,7 +40,8 @@ trait CanResolveAsync[ResolvableType, ResolvedType] {
     * example usages.
     */
   def resolveAsync(
-      resolvable: ResolvableType, onResolved: (ResolvedType) => Unit): Unit
+      resolvable: ResolvableType,
+      onResolved: (ResolvedType) => Unit): Unit
 }
 
 trait LowPriorityCanResolveAsyncImplicits { self: CanResolveAsync.type =>

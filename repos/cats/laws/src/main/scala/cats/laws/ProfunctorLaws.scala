@@ -27,14 +27,16 @@ trait ProfunctorLaws[F[_, _]] {
   def profunctorRmapIdentity[A, B](fab: F[A, B]): IsEq[F[A, B]] =
     fab.rmap(identity[B]) <-> fab
 
-  def profunctorLmapComposition[A2, A1, A0, B](fab: F[A0, B],
-                                               f: A2 => A1,
-                                               g: A1 => A0): IsEq[F[A2, B]] =
+  def profunctorLmapComposition[A2, A1, A0, B](
+      fab: F[A0, B],
+      f: A2 => A1,
+      g: A1 => A0): IsEq[F[A2, B]] =
     fab.lmap(g).lmap(f) <-> fab.lmap(g compose f)
 
-  def profunctorRmapComposition[A, B2, B1, B0](fab: F[A, B0],
-                                               f: B0 => B1,
-                                               g: B1 => B2): IsEq[F[A, B2]] =
+  def profunctorRmapComposition[A, B2, B1, B0](
+      fab: F[A, B0],
+      f: B0 => B1,
+      g: B1 => B2): IsEq[F[A, B2]] =
     fab.rmap(f).rmap(g) <-> fab.rmap(g compose f)
 }
 

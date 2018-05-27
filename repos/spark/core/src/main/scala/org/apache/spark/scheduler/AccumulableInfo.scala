@@ -37,7 +37,7 @@ import org.apache.spark.annotation.DeveloperApi
   * @param metadata internal metadata associated with this accumulator, if any
   */
 @DeveloperApi
-case class AccumulableInfo private[spark](
+case class AccumulableInfo private[spark] (
     id: Long,
     name: Option[String],
     update: Option[Any], // represents a partial update within a task
@@ -53,39 +53,44 @@ case class AccumulableInfo private[spark](
 object AccumulableInfo {
 
   @deprecated("do not create AccumulableInfo", "2.0.0")
-  def apply(id: Long,
-            name: String,
-            update: Option[String],
-            value: String,
-            internal: Boolean): AccumulableInfo = {
-    new AccumulableInfo(id,
-                        Option(name),
-                        update,
-                        Option(value),
-                        internal,
-                        countFailedValues = false)
+  def apply(
+      id: Long,
+      name: String,
+      update: Option[String],
+      value: String,
+      internal: Boolean): AccumulableInfo = {
+    new AccumulableInfo(
+      id,
+      Option(name),
+      update,
+      Option(value),
+      internal,
+      countFailedValues = false)
   }
 
   @deprecated("do not create AccumulableInfo", "2.0.0")
-  def apply(id: Long,
-            name: String,
-            update: Option[String],
-            value: String): AccumulableInfo = {
-    new AccumulableInfo(id,
-                        Option(name),
-                        update,
-                        Option(value),
-                        internal = false,
-                        countFailedValues = false)
+  def apply(
+      id: Long,
+      name: String,
+      update: Option[String],
+      value: String): AccumulableInfo = {
+    new AccumulableInfo(
+      id,
+      Option(name),
+      update,
+      Option(value),
+      internal = false,
+      countFailedValues = false)
   }
 
   @deprecated("do not create AccumulableInfo", "2.0.0")
   def apply(id: Long, name: String, value: String): AccumulableInfo = {
-    new AccumulableInfo(id,
-                        Option(name),
-                        None,
-                        Option(value),
-                        internal = false,
-                        countFailedValues = false)
+    new AccumulableInfo(
+      id,
+      Option(name),
+      None,
+      Option(value),
+      internal = false,
+      countFailedValues = false)
   }
 }

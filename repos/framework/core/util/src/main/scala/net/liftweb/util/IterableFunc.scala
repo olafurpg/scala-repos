@@ -26,7 +26,7 @@ object IterableFunc {
     new IterableFunc {
       def apply(in: NodeSeq): Seq[NodeSeq] = it(in) match {
         case null => List(NodeSeq.Empty)
-        case str => List(Text(str))
+        case str  => List(Text(str))
       }
     }
 

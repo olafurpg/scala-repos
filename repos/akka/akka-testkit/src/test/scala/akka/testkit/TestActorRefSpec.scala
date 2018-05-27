@@ -39,10 +39,10 @@ object TestActorRefSpec {
 
     def receiveT = {
       case "complexRequest" ⇒ {
-          replyTo = sender()
-          val worker = TestActorRef(Props[WorkerActor])
-          worker ! "work"
-        }
+        replyTo = sender()
+        val worker = TestActorRef(Props[WorkerActor])
+        worker ! "work"
+      }
       case "complexRequest2" ⇒
         val worker = TestActorRef(Props[WorkerActor])
         worker ! sender()
@@ -72,11 +72,11 @@ object TestActorRefSpec {
       case "complex2" ⇒ replyActor ! "complexRequest2"
       case "simple" ⇒ replyActor ! "simpleRequest"
       case "complexReply" ⇒ {
-          counter -= 1
-        }
+        counter -= 1
+      }
       case "simpleReply" ⇒ {
-          counter -= 1
-        }
+        counter -= 1
+      }
     }
   }
 
@@ -106,7 +106,8 @@ object TestActorRefSpec {
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class TestActorRefSpec
-    extends AkkaSpec("disp1.type=Dispatcher") with BeforeAndAfterEach
+    extends AkkaSpec("disp1.type=Dispatcher")
+    with BeforeAndAfterEach
     with DefaultTimeout {
 
   import TestActorRefSpec._
@@ -175,8 +176,7 @@ class TestActorRefSpec
     "stop when sent a poison pill" in {
       EventFilter[ActorKilledException]() intercept {
         val a = TestActorRef(Props[WorkerActor])
-        val forwarder = system.actorOf(
-            Props(new Actor {
+        val forwarder = system.actorOf(Props(new Actor {
           context.watch(a)
           def receive = {
             case t: Terminated ⇒ testActor forward WrappedTerminated(t)
@@ -197,17 +197,21 @@ class TestActorRefSpec
         counter = 2
 
         val boss = TestActorRef(Props(new TActor {
-          val ref = TestActorRef(Props(new TActor {
-            def receiveT = { case _ ⇒ }
-            override def preRestart(reason: Throwable, msg: Option[Any]) {
-              counter -= 1
-            }
-            override def postRestart(reason: Throwable) { counter -= 1 }
-          }), self, "child")
+          val ref = TestActorRef(
+            Props(new TActor {
+              def receiveT = { case _ ⇒ }
+              override def preRestart(reason: Throwable, msg: Option[Any]) {
+                counter -= 1
+              }
+              override def postRestart(reason: Throwable) { counter -= 1 }
+            }),
+            self,
+            "child"
+          )
 
           override def supervisorStrategy =
             OneForOneStrategy(maxNrOfRetries = 5, withinTimeRange = 1 second)(
-                List(classOf[ActorKilledException]))
+              List(classOf[ActorKilledException]))
 
           def receiveT = { case "sendKill" ⇒ ref ! Kill }
         }))
@@ -256,7 +260,7 @@ class TestActorRefSpec
     "set CallingThreadDispatcher" in {
       val a = TestActorRef[WorkerActor]
       a.underlying.dispatcher.getClass should ===(
-          classOf[CallingThreadDispatcher])
+        classOf[CallingThreadDispatcher])
     }
 
     "allow override of dispatcher" in {
@@ -283,7 +287,7 @@ class TestActorRefSpec
     "allow creation of a TestActorRef with a default supervisor" in {
       val ref = TestActorRef[WorkerActor]
       ref.underlyingActor.supervisor should be(
-          system.asInstanceOf[ActorSystemImpl].guardian)
+        system.asInstanceOf[ActorSystemImpl].guardian)
     }
 
     "allow creation of a TestActorRef with a default supervisor and specified name" in {
@@ -307,7 +311,7 @@ class TestActorRefSpec
     "allow creation of a TestActorRef with a default supervisor with Props" in {
       val ref = TestActorRef[WorkerActor](Props[WorkerActor])
       ref.underlyingActor.supervisor should be(
-          system.asInstanceOf[ActorSystemImpl].guardian)
+        system.asInstanceOf[ActorSystemImpl].guardian)
     }
 
     "allow creation of a TestActorRef with a default supervisor and specified name with Props" in {
@@ -325,7 +329,9 @@ class TestActorRefSpec
     "allow creation of a TestActorRef with a specified supervisor and specified name with Props" in {
       val parent = TestActorRef[ReplyActor]
       val ref = TestActorRef[WorkerActor](
-          Props[WorkerActor], parent, "specificSupervisedPropsActor")
+        Props[WorkerActor],
+        parent,
+        "specificSupervisedPropsActor")
       ref.underlyingActor.name should be("specificSupervisedPropsActor")
       ref.underlyingActor.supervisor should be(parent)
     }

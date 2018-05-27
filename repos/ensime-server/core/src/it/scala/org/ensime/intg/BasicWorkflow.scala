@@ -9,8 +9,10 @@ import org.ensime.util.EnsimeSpec
 import org.ensime.util.file._
 
 class BasicWorkflow
-    extends EnsimeSpec with IsolatedEnsimeConfigFixture
-    with IsolatedTestKitFixture with IsolatedProjectFixture {
+    extends EnsimeSpec
+    with IsolatedEnsimeConfigFixture
+    with IsolatedTestKitFixture
+    with IsolatedProjectFixture {
 
   val original = EnsimeConfigFixture.SimpleTestProject
 
@@ -36,19 +38,20 @@ class BasicWorkflow
           val missingFile = sourceRoot / "missing.scala"
           val missingFilePath = missingFile.getAbsolutePath
           project ! TypecheckFilesReq(List(Left(missingFile)))
-          expectMsg(EnsimeServerError(
-                  s"""file(s): "$missingFilePath" do not exist"""))
+          expectMsg(
+            EnsimeServerError(s"""file(s): "$missingFilePath" do not exist"""))
 
           //-----------------------------------------------------------------------------------------------
           // semantic highlighting
-          project ! SymbolDesignationsReq(Left(fooFile),
-                                          -1,
-                                          299,
-                                          SourceSymbol.allSymbols)
+          project ! SymbolDesignationsReq(
+            Left(fooFile),
+            -1,
+            299,
+            SourceSymbol.allSymbols)
           val designations = expectMsgType[SymbolDesignations]
           designations.file shouldBe fooFile
           designations.syms should contain(
-              SymbolDesignation(12, 19, PackageSymbol))
+            SymbolDesignation(12, 19, PackageSymbol))
           // expected Symbols
           // ((package 12 19) (package 8 11) (trait 40 43) (valField 69 70) (class 100 103) (param 125 126) (class 128 131) (param 133 134) (class 136 142) (operator 156 157) (param 154 155) (functionCall 160 166) (param 158 159) (valField 183 186) (class 193 199) (class 201 204) (valField 214 217) (class 224 227) (functionCall 232 239) (operator 250 251) (valField 256 257) (valField 252 255) (functionCall 261 268) (functionCall 273 283) (valField 269 272)))
 
@@ -70,7 +73,10 @@ class BasicWorkflow
           val javaSearchSymbol = expectMsgType[SymbolSearchResults]
           assert(javaSearchSymbol.syms.exists {
             case TypeSearchResult(
-                "java.io.File", "File", DeclaredAs.Class, Some(_)) =>
+                "java.io.File",
+                "File",
+                DeclaredAs.Class,
+                Some(_)) =>
               true
             case _ => false
           })
@@ -79,26 +85,37 @@ class BasicWorkflow
           project ! PublicSymbolSearchReq(List("scala", "util", "Random"), 2)
           expectMsgPF() {
             case SymbolSearchResults(
-                List(TypeSearchResult(
-                     "scala.util.Random", "Random", DeclaredAs.Class, Some(_)),
-                     TypeSearchResult("scala.util.Random$",
-                                      "Random$",
-                                      DeclaredAs.Class,
-                                      Some(_)))) =>
+                List(
+                  TypeSearchResult(
+                    "scala.util.Random",
+                    "Random",
+                    DeclaredAs.Class,
+                    Some(_)),
+                  TypeSearchResult(
+                    "scala.util.Random$",
+                    "Random$",
+                    DeclaredAs.Class,
+                    Some(_)))) =>
             case SymbolSearchResults(
-                List(TypeSearchResult(
-                     "java.util.Random", "Random", DeclaredAs.Class, Some(_)),
-                     TypeSearchResult("scala.util.Random",
-                                      "Random",
-                                      DeclaredAs.Class,
-                                      Some(_)))) =>
+                List(
+                  TypeSearchResult(
+                    "java.util.Random",
+                    "Random",
+                    DeclaredAs.Class,
+                    Some(_)),
+                  TypeSearchResult(
+                    "scala.util.Random",
+                    "Random",
+                    DeclaredAs.Class,
+                    Some(_)))) =>
             // this is a pretty ropey test at the best of times
           }
 
           //-----------------------------------------------------------------------------------------------
           // documentation for type at point
-          val intDocSig = DocSigPair(DocSig(DocFqn("scala", "Int"), None),
-                                     DocSig(DocFqn("", "int"), None))
+          val intDocSig = DocSigPair(
+            DocSig(DocFqn("scala", "Int"), None),
+            DocSig(DocFqn("", "int"), None))
 
           // NOTE these are handled as multi-phase queries in requesthandler
           project ! DocUriAtPointReq(Left(fooFile), OffsetRange(128))
@@ -109,7 +126,7 @@ class BasicWorkflow
 
           project ! intDocSig
           expectMsgType[StringResponse].text should endWith(
-              "/index.html#scala.Int")
+            "/index.html#scala.Int")
 
           //-----------------------------------------------------------------------------------------------
           // uses of symbol at point
@@ -125,8 +142,9 @@ class BasicWorkflow
           project ! UsesOfSymbolAtPointReq(Left(fooFile), 119) // point on testMethod
           expectMsgPF() {
             case ERangePositions(
-                List(ERangePosition(`fooFilePath`, 114, 110, 172),
-                     ERangePosition(`fooFilePath`, 273, 269, 283))) =>
+                List(
+                  ERangePosition(`fooFilePath`, 114, 110, 172),
+                  ERangePosition(`fooFilePath`, 273, 269, 283))) =>
           }
 
           log.info("------------------------------------222-")
@@ -141,41 +159,54 @@ class BasicWorkflow
                 "testMethod",
                 Some(OffsetSourcePosition(`fooFile`, 114)),
                 ArrowTypeInfo(
-                "(i: Int, s: String)Int",
-                BasicTypeInfo(
-                "Int", DeclaredAs.Class, "scala.Int", List(), List(), None),
-                List(
-                ParamSectionInfo(List((i,
-                                       BasicTypeInfo("Int",
-                                                     DeclaredAs.Class,
-                                                     "scala.Int",
-                                                     List(),
-                                                     List(),
-                                                     None)),
-                                      (s,
-                                       BasicTypeInfo("String",
-                                                     DeclaredAs.Class,
-                                                     "java.lang.String",
-                                                     List(),
-                                                     List(),
-                                                     None))),
-                                 false))),
+                  "(i: Int, s: String)Int",
+                  BasicTypeInfo(
+                    "Int",
+                    DeclaredAs.Class,
+                    "scala.Int",
+                    List(),
+                    List(),
+                    None),
+                  List(
+                    ParamSectionInfo(
+                      List(
+                        (
+                          i,
+                          BasicTypeInfo(
+                            "Int",
+                            DeclaredAs.Class,
+                            "scala.Int",
+                            List(),
+                            List(),
+                            None)),
+                        (
+                          s,
+                          BasicTypeInfo(
+                            "String",
+                            DeclaredAs.Class,
+                            "java.lang.String",
+                            List(),
+                            List(),
+                            None))),
+                      false))),
                 true) =>
           }
 
           // M-.  external symbol
           project ! SymbolAtPointReq(Left(fooFile), 190)
           expectMsgPF() {
-            case SymbolInfo("Map",
-                            "Map",
-                            Some(OffsetSourcePosition(_, _)),
-                            BasicTypeInfo("Map$",
-                                          DeclaredAs.Object,
-                                          "scala.collection.immutable.Map$",
-                                          List(),
-                                          List(),
-                                          None),
-                            false) =>
+            case SymbolInfo(
+                "Map",
+                "Map",
+                Some(OffsetSourcePosition(_, _)),
+                BasicTypeInfo(
+                  "Map$",
+                  DeclaredAs.Object,
+                  "scala.collection.immutable.Map$",
+                  List(),
+                  List(),
+                  None),
+                false) =>
           }
 
           project ! SymbolAtPointReq(Left(fooFile), 343)
@@ -184,23 +215,27 @@ class BasicWorkflow
                 "fn",
                 "fn",
                 Some(OffsetSourcePosition(`fooFile`, 304)),
-                BasicTypeInfo("Function1",
-                              DeclaredAs.Trait,
-                              "scala.Function1",
-                              List(BasicTypeInfo("String",
-                                                 DeclaredAs.Class,
-                                                 "java.lang.String",
-                                                 List(),
-                                                 List(),
-                                                 None),
-                                   BasicTypeInfo("Int",
-                                                 DeclaredAs.Class,
-                                                 "scala.Int",
-                                                 List(),
-                                                 List(),
-                                                 None)),
-                              List(),
-                              None),
+                BasicTypeInfo(
+                  "Function1",
+                  DeclaredAs.Trait,
+                  "scala.Function1",
+                  List(
+                    BasicTypeInfo(
+                      "String",
+                      DeclaredAs.Class,
+                      "java.lang.String",
+                      List(),
+                      List(),
+                      None),
+                    BasicTypeInfo(
+                      "Int",
+                      DeclaredAs.Class,
+                      "scala.Int",
+                      List(),
+                      List(),
+                      None)),
+                  List(),
+                  None),
                 false) =>
           }
 
@@ -211,28 +246,36 @@ class BasicWorkflow
                 "apply",
                 Some(OffsetSourcePosition(`barFile`, 59)),
                 ArrowTypeInfo(
-                "(bar: String, baz: Int)org.example.Bar.Foo",
-                BasicTypeInfo("Foo",
-                              DeclaredAs.Class,
-                              "org.example.Bar$$Foo",
-                              List(),
-                              List(),
-                              None),
-                List(ParamSectionInfo(List(("bar",
-                                            BasicTypeInfo("String",
-                                                          DeclaredAs.Class,
-                                                          "java.lang.String",
-                                                          List(),
-                                                          List(),
-                                                          None)),
-                                           ("baz",
-                                            BasicTypeInfo("Int",
-                                                          DeclaredAs.Class,
-                                                          "scala.Int",
-                                                          List(),
-                                                          List(),
-                                                          None))),
-                                      false))),
+                  "(bar: String, baz: Int)org.example.Bar.Foo",
+                  BasicTypeInfo(
+                    "Foo",
+                    DeclaredAs.Class,
+                    "org.example.Bar$$Foo",
+                    List(),
+                    List(),
+                    None),
+                  List(
+                    ParamSectionInfo(
+                      List(
+                        (
+                          "bar",
+                          BasicTypeInfo(
+                            "String",
+                            DeclaredAs.Class,
+                            "java.lang.String",
+                            List(),
+                            List(),
+                            None)),
+                        (
+                          "baz",
+                          BasicTypeInfo(
+                            "Int",
+                            DeclaredAs.Class,
+                            "scala.Int",
+                            List(),
+                            List(),
+                            None))),
+                      false))),
                 true) =>
           }
 
@@ -243,28 +286,36 @@ class BasicWorkflow
                 "copy",
                 Some(OffsetSourcePosition(`barFile`, 59)),
                 ArrowTypeInfo(
-                "(bar: String, baz: Int)org.example.Bar.Foo",
-                BasicTypeInfo("Foo",
-                              DeclaredAs.Class,
-                              "org.example.Bar$$Foo",
-                              List(),
-                              List(),
-                              None),
-                List(ParamSectionInfo(List(("bar",
-                                            BasicTypeInfo("String",
-                                                          DeclaredAs.Class,
-                                                          "java.lang.String",
-                                                          List(),
-                                                          List(),
-                                                          None)),
-                                           ("baz",
-                                            BasicTypeInfo("Int",
-                                                          DeclaredAs.Class,
-                                                          "scala.Int",
-                                                          List(),
-                                                          List(),
-                                                          None))),
-                                      false))),
+                  "(bar: String, baz: Int)org.example.Bar.Foo",
+                  BasicTypeInfo(
+                    "Foo",
+                    DeclaredAs.Class,
+                    "org.example.Bar$$Foo",
+                    List(),
+                    List(),
+                    None),
+                  List(
+                    ParamSectionInfo(
+                      List(
+                        (
+                          "bar",
+                          BasicTypeInfo(
+                            "String",
+                            DeclaredAs.Class,
+                            "java.lang.String",
+                            List(),
+                            List(),
+                            None)),
+                        (
+                          "baz",
+                          BasicTypeInfo(
+                            "Int",
+                            DeclaredAs.Class,
+                            "scala.Int",
+                            List(),
+                            List(),
+                            None))),
+                      false))),
                 true) =>
           }
 
@@ -274,102 +325,119 @@ class BasicWorkflow
             case PackageInfo(
                 "example",
                 "org.example",
-                List(BasicTypeInfo("Bar",
-                                   DeclaredAs.Class,
-                                   "org.example.Bar",
-                                   List(),
-                                   List(),
-                                   Some(_)),
-                     BasicTypeInfo("Bar$",
-                                   DeclaredAs.Object,
-                                   "org.example.Bar$",
-                                   List(),
-                                   List(),
-                                   Some(_)),
-                     BasicTypeInfo("Bloo",
-                                   DeclaredAs.Class,
-                                   "org.example.Bloo",
-                                   List(),
-                                   List(),
-                                   Some(_)),
-                     BasicTypeInfo("Bloo$",
-                                   DeclaredAs.Object,
-                                   "org.example.Bloo$",
-                                   List(),
-                                   List(),
-                                   Some(_)),
-                     BasicTypeInfo("Blue",
-                                   DeclaredAs.Class,
-                                   "org.example.Blue",
-                                   List(),
-                                   List(),
-                                   Some(_)),
-                     BasicTypeInfo("Blue$",
-                                   DeclaredAs.Object,
-                                   "org.example.Blue$",
-                                   List(),
-                                   List(),
-                                   Some(_)),
-                     BasicTypeInfo("CaseClassWithCamelCaseName",
-                                   DeclaredAs.Class,
-                                   "org.example.CaseClassWithCamelCaseName",
-                                   List(),
-                                   List(),
-                                   Some(_)),
-                     BasicTypeInfo("CaseClassWithCamelCaseName$",
-                                   DeclaredAs.Object,
-                                   "org.example.CaseClassWithCamelCaseName$",
-                                   List(),
-                                   List(),
-                                   Some(_)),
-                     BasicTypeInfo("Foo",
-                                   DeclaredAs.Class,
-                                   "org.example.Foo",
-                                   List(),
-                                   List(),
-                                   Some(_)),
-                     BasicTypeInfo("Foo$",
-                                   DeclaredAs.Object,
-                                   "org.example.Foo$",
-                                   List(),
-                                   List(),
-                                   Some(_)),
-                     BasicTypeInfo("Test1",
-                                   DeclaredAs.Class,
-                                   "org.example.Test1",
-                                   List(),
-                                   List(),
-                                   None),
-                     BasicTypeInfo("Test1$",
-                                   DeclaredAs.Object,
-                                   "org.example.Test1$",
-                                   List(),
-                                   List(),
-                                   None),
-                     BasicTypeInfo("Test2",
-                                   DeclaredAs.Class,
-                                   "org.example.Test2",
-                                   List(),
-                                   List(),
-                                   None),
-                     BasicTypeInfo("Test2$",
-                                   DeclaredAs.Object,
-                                   "org.example.Test2$",
-                                   List(),
-                                   List(),
-                                   None),
-                     BasicTypeInfo("package$",
-                                   DeclaredAs.Object,
-                                   "org.example.package$",
-                                   List(),
-                                   List(),
-                                   None),
-                     BasicTypeInfo("package$",
-                                   DeclaredAs.Object,
-                                   "org.example.package$",
-                                   List(),
-                                   List(),
-                                   None))) =>
+                List(
+                  BasicTypeInfo(
+                    "Bar",
+                    DeclaredAs.Class,
+                    "org.example.Bar",
+                    List(),
+                    List(),
+                    Some(_)),
+                  BasicTypeInfo(
+                    "Bar$",
+                    DeclaredAs.Object,
+                    "org.example.Bar$",
+                    List(),
+                    List(),
+                    Some(_)),
+                  BasicTypeInfo(
+                    "Bloo",
+                    DeclaredAs.Class,
+                    "org.example.Bloo",
+                    List(),
+                    List(),
+                    Some(_)),
+                  BasicTypeInfo(
+                    "Bloo$",
+                    DeclaredAs.Object,
+                    "org.example.Bloo$",
+                    List(),
+                    List(),
+                    Some(_)),
+                  BasicTypeInfo(
+                    "Blue",
+                    DeclaredAs.Class,
+                    "org.example.Blue",
+                    List(),
+                    List(),
+                    Some(_)),
+                  BasicTypeInfo(
+                    "Blue$",
+                    DeclaredAs.Object,
+                    "org.example.Blue$",
+                    List(),
+                    List(),
+                    Some(_)),
+                  BasicTypeInfo(
+                    "CaseClassWithCamelCaseName",
+                    DeclaredAs.Class,
+                    "org.example.CaseClassWithCamelCaseName",
+                    List(),
+                    List(),
+                    Some(_)),
+                  BasicTypeInfo(
+                    "CaseClassWithCamelCaseName$",
+                    DeclaredAs.Object,
+                    "org.example.CaseClassWithCamelCaseName$",
+                    List(),
+                    List(),
+                    Some(_)),
+                  BasicTypeInfo(
+                    "Foo",
+                    DeclaredAs.Class,
+                    "org.example.Foo",
+                    List(),
+                    List(),
+                    Some(_)),
+                  BasicTypeInfo(
+                    "Foo$",
+                    DeclaredAs.Object,
+                    "org.example.Foo$",
+                    List(),
+                    List(),
+                    Some(_)),
+                  BasicTypeInfo(
+                    "Test1",
+                    DeclaredAs.Class,
+                    "org.example.Test1",
+                    List(),
+                    List(),
+                    None),
+                  BasicTypeInfo(
+                    "Test1$",
+                    DeclaredAs.Object,
+                    "org.example.Test1$",
+                    List(),
+                    List(),
+                    None),
+                  BasicTypeInfo(
+                    "Test2",
+                    DeclaredAs.Class,
+                    "org.example.Test2",
+                    List(),
+                    List(),
+                    None),
+                  BasicTypeInfo(
+                    "Test2$",
+                    DeclaredAs.Object,
+                    "org.example.Test2$",
+                    List(),
+                    List(),
+                    None),
+                  BasicTypeInfo(
+                    "package$",
+                    DeclaredAs.Object,
+                    "org.example.package$",
+                    List(),
+                    List(),
+                    None),
+                  BasicTypeInfo(
+                    "package$",
+                    DeclaredAs.Object,
+                    "org.example.package$",
+                    List(),
+                    List(),
+                    None))) =>
           }
 
           // expand selection around 'val foo'
@@ -384,24 +452,29 @@ class BasicWorkflow
           // TODO get the before content of the file
 
           project ! PrepareRefactorReq(
-              1234, null, RenameRefactorDesc("bar", fooFile, 215, 215), false)
+            1234,
+            null,
+            RenameRefactorDesc("bar", fooFile, 215, 215),
+            false)
           expectMsgPF() {
-            case RefactorEffect(1234,
-                                RefactorType.Rename,
-                                List(
-                                TextEdit(`fooFile`, 214, 217, "bar"),
-                                TextEdit(`fooFile`, 252, 255, "bar"),
-                                TextEdit(`fooFile`, 269, 272, "bar")
-                                ),
-                                _) =>
+            case RefactorEffect(
+                1234,
+                RefactorType.Rename,
+                List(
+                  TextEdit(`fooFile`, 214, 217, "bar"),
+                  TextEdit(`fooFile`, 252, 255, "bar"),
+                  TextEdit(`fooFile`, 269, 272, "bar")
+                ),
+                _) =>
           }
 
           project ! ExecRefactorReq(1234, RefactorType.Rename)
           expectMsgPF() {
-            case RefactorResult(1234,
-                                RefactorType.Rename,
-                                List(`fooFile`),
-                                _) =>
+            case RefactorResult(
+                1234,
+                RefactorType.Rename,
+                List(`fooFile`),
+                _) =>
           }
         }
       }

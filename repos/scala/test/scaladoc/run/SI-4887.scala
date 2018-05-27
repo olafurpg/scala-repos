@@ -37,19 +37,28 @@ object Test extends ScaladocModelTest {
     val TEST = base._trait("TEST")
 
     val foo1 = TEST._method("foo1")
-    assert(foo1.valueParams(0)(0).resultType.name == "X[T, U, _]",
-           foo1.valueParams(0)(0).resultType.name + " == X[T, U, _]")
+    assert(
+      foo1.valueParams(0)(0).resultType.name == "X[T, U, _]",
+      foo1.valueParams(0)(0).resultType.name + " == X[T, U, _]")
 
     val foo2 = TEST._method("foo2")
     assert(
-        foo2.valueParams(0)(0).resultType.name == "X[Z[_], U, _ <: [_]AnyRef { def z: String } with Singleton]",
-        foo2.valueParams(0)(0).resultType.name +
-        " == X[Z[_], U, _ <: [_]AnyRef { def z: String } with Singleton]")
+      foo2
+        .valueParams(0)(0)
+        .resultType
+        .name == "X[Z[_], U, _ <: [_]AnyRef { def z: String } with Singleton]",
+      foo2.valueParams(0)(0).resultType.name +
+        " == X[Z[_], U, _ <: [_]AnyRef { def z: String } with Singleton]"
+    )
 
     val foo3 = TEST._method("foo3")
     assert(
-        foo3.valueParams(0)(0).resultType.name == "X[Z, Z, V] forSome {type Z <: T, type V <: T}",
-        foo3.valueParams(0)(0).resultType.name +
-        " == X[Z, Z, V] forSome {type Z <: T, type V <: T}")
+      foo3
+        .valueParams(0)(0)
+        .resultType
+        .name == "X[Z, Z, V] forSome {type Z <: T, type V <: T}",
+      foo3.valueParams(0)(0).resultType.name +
+        " == X[Z, Z, V] forSome {type Z <: T, type V <: T}"
+    )
   }
 }

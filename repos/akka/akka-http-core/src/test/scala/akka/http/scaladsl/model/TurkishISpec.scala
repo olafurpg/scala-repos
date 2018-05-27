@@ -29,7 +29,7 @@ class TurkishISpec extends WordSpec with Matchers {
         val newCharsets =
           charsetCons.newInstance().asInstanceOf[HttpCharsets.type]
         newCharsets.getForKey("iso-8859-1") shouldEqual Some(
-            newCharsets.`ISO-8859-1`)
+          newCharsets.`ISO-8859-1`)
       } finally {
         Locale.setDefault(previousLocale)
       }

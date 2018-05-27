@@ -19,12 +19,20 @@ package org.apache.spark
 
 import java.io.File
 
-import org.eclipse.jetty.security.{ConstraintMapping, ConstraintSecurityHandler, HashLoginService}
+import org.eclipse.jetty.security.{
+  ConstraintMapping,
+  ConstraintSecurityHandler,
+  HashLoginService
+}
 import org.eclipse.jetty.security.authentication.DigestAuthenticator
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.server.bio.SocketConnector
 import org.eclipse.jetty.server.ssl.SslSocketConnector
-import org.eclipse.jetty.servlet.{DefaultServlet, ServletContextHandler, ServletHolder}
+import org.eclipse.jetty.servlet.{
+  DefaultServlet,
+  ServletContextHandler,
+  ServletHolder
+}
 import org.eclipse.jetty.util.security.{Constraint, Password}
 import org.eclipse.jetty.util.thread.QueuedThreadPool
 
@@ -42,11 +50,12 @@ private[spark] class ServerStateException(message: String)
   * as well as classes created by the interpreter when the user types in code. This is just a wrapper
   * around a Jetty server.
   */
-private[spark] class HttpServer(conf: SparkConf,
-                                resourceBase: File,
-                                securityManager: SecurityManager,
-                                requestedPort: Int = 0,
-                                serverName: String = "HTTP server")
+private[spark] class HttpServer(
+    conf: SparkConf,
+    resourceBase: File,
+    securityManager: SecurityManager,
+    requestedPort: Int = 0,
+    serverName: String = "HTTP server")
     extends Logging {
 
   private var server: Server = null
@@ -62,8 +71,8 @@ private[spark] class HttpServer(conf: SparkConf,
       throw new ServerStateException("Server is already started")
     } else {
       logInfo("Starting HTTP Server")
-      val (actualServer, actualPort) = Utils.startServiceOnPort[Server](
-          requestedPort, doStart, conf, serverName)
+      val (actualServer, actualPort) = Utils
+        .startServiceOnPort[Server](requestedPort, doStart, conf, serverName)
       server = actualServer
       port = actualPort
     }
@@ -117,7 +126,7 @@ private[spark] class HttpServer(conf: SparkConf,
       .getConnectors()(0)
       .getLocalPort
 
-      (server, actualPort)
+    (server, actualPort)
   }
 
   /**

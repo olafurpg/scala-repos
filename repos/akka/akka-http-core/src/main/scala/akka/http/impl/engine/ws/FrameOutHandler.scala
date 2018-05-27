@@ -20,7 +20,9 @@ import akka.http.impl.engine.ws.FrameHandler.UserHandlerErredOut
   * INTERNAL API
   */
 private[http] class FrameOutHandler(
-    serverSide: Boolean, _closeTimeout: FiniteDuration, log: LoggingAdapter)
+    serverSide: Boolean,
+    _closeTimeout: FiniteDuration,
+    log: LoggingAdapter)
     extends StatefulStage[FrameOutHandler.Input, FrameStart] {
   def initial: StageState[AnyRef, FrameStart] = Idle
   def closeTimeout: Timestamp = Timestamp.now + _closeTimeout
@@ -34,12 +36,13 @@ private[http] class FrameOutHandler(
             if !code.exists(Protocol.CloseCodes.isError) ⇒
           // let user complete it, FIXME: maybe make configurable? immediately, or timeout
           become(
-              new WaitingForUserHandlerClosed(FrameEvent.closeFrame(
-                      code.getOrElse(Protocol.CloseCodes.Regular), reason)))
+            new WaitingForUserHandlerClosed(FrameEvent
+              .closeFrame(code.getOrElse(Protocol.CloseCodes.Regular), reason)))
           ctx.pull()
         case PeerClosed(code, reason) ⇒
           val closeFrame = FrameEvent.closeFrame(
-              code.getOrElse(Protocol.CloseCodes.Regular), reason)
+            code.getOrElse(Protocol.CloseCodes.Regular),
+            reason)
           if (serverSide) ctx.pushAndFinish(closeFrame)
           else {
             become(new WaitingForTransportClose)
@@ -47,7 +50,8 @@ private[http] class FrameOutHandler(
           }
         case ActivelyCloseWithCode(code, reason) ⇒
           val closeFrame = FrameEvent.closeFrame(
-              code.getOrElse(Protocol.CloseCodes.Regular), reason)
+            code.getOrElse(Protocol.CloseCodes.Regular),
+            reason)
           become(new WaitingForPeerCloseFrame())
           ctx.push(closeFrame)
         case UserHandlerCompleted ⇒
@@ -56,14 +60,17 @@ private[http] class FrameOutHandler(
         case UserHandlerErredOut(e) ⇒
           log.error(e, s"WebSocket handler failed with ${e.getMessage}")
           become(new WaitingForPeerCloseFrame())
-          ctx.push(FrameEvent.closeFrame(
-                  Protocol.CloseCodes.UnexpectedCondition, "internal error"))
+          ctx.push(
+            FrameEvent.closeFrame(
+              Protocol.CloseCodes.UnexpectedCondition,
+              "internal error"))
         case Tick ⇒ ctx.pull() // ignore
       }
 
     def onComplete(ctx: Context[FrameStart]): TerminationDirective = {
-      become(new SendOutCloseFrameAndComplete(
-              FrameEvent.closeFrame(Protocol.CloseCodes.Regular)))
+      become(
+        new SendOutCloseFrameAndComplete(
+          FrameEvent.closeFrame(Protocol.CloseCodes.Regular)))
       ctx.absorbTermination()
     }
   }
@@ -78,8 +85,8 @@ private[http] class FrameOutHandler(
         case UserHandlerCompleted ⇒ sendOutLastFrame(ctx)
         case UserHandlerErredOut(e) ⇒
           log.error(
-              e,
-              s"WebSocket handler failed while waiting for handler completion with ${e.getMessage}")
+            e,
+            s"WebSocket handler failed while waiting for handler completion with ${e.getMessage}")
           sendOutLastFrame(ctx)
         case start: FrameStart ⇒ ctx.push(start)
         case _ ⇒ ctx.pull() // ignore
@@ -93,8 +100,8 @@ private[http] class FrameOutHandler(
       }
 
     def onComplete(ctx: Context[FrameStart]): TerminationDirective =
-      ctx.fail(new IllegalStateException(
-              "Mustn't complete before user has completed"))
+      ctx.fail(
+        new IllegalStateException("Mustn't complete before user has completed"))
   }
 
   /**
@@ -141,8 +148,7 @@ private[http] class FrameOutHandler(
   private class SendOutCloseFrameAndComplete(closeFrame: FrameStart)
       extends CompletionHandlingState {
     def onPush(elem: AnyRef, ctx: Context[FrameStart]): SyncDirective =
-      ctx.fail(
-          new IllegalStateException("Didn't expect push after completion"))
+      ctx.fail(new IllegalStateException("Didn't expect push after completion"))
 
     override def onPull(ctx: Context[FrameStart]): SyncDirective =
       ctx.pushAndFinish(closeFrame)
@@ -160,11 +166,13 @@ private[http] class FrameOutHandler(
     current.asInstanceOf[CompletionHandlingState].onComplete(ctx)
 
   override def onUpstreamFailure(
-      cause: scala.Throwable, ctx: Context[FrameStart]): TerminationDirective =
+      cause: scala.Throwable,
+      ctx: Context[FrameStart]): TerminationDirective =
     cause match {
       case p: ProtocolException ⇒
-        become(new SendOutCloseFrameAndComplete(
-                FrameEvent.closeFrame(Protocol.CloseCodes.ProtocolError)))
+        become(
+          new SendOutCloseFrameAndComplete(
+            FrameEvent.closeFrame(Protocol.CloseCodes.ProtocolError)))
         ctx.absorbTermination()
       case _ ⇒ super.onUpstreamFailure(cause, ctx)
     }
@@ -173,9 +181,10 @@ private[http] class FrameOutHandler(
 private[http] object FrameOutHandler {
   type Input = AnyRef
 
-  def create(serverSide: Boolean,
-             closeTimeout: FiniteDuration,
-             log: LoggingAdapter): Flow[Input, FrameStart, NotUsed] =
-    Flow[Input].transform(
-        () ⇒ new FrameOutHandler(serverSide, closeTimeout, log))
+  def create(
+      serverSide: Boolean,
+      closeTimeout: FiniteDuration,
+      log: LoggingAdapter): Flow[Input, FrameStart, NotUsed] =
+    Flow[Input].transform(() ⇒
+      new FrameOutHandler(serverSide, closeTimeout, log))
 }

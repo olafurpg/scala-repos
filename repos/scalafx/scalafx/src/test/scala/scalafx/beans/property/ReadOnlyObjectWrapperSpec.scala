@@ -35,7 +35,12 @@ import org.scalatest.Matchers.{be, convertToAnyShouldWrapper, equal}
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.{BeforeAndAfterEach, FlatSpec}
 
-import scalafx.Includes.{jfxBooleanBinding2sfx, jfxBooleanProperty2sfx, jfxObjectProperty2sfx, sfxReadOnlyObjectWrapperWithSFXDelegate2jfxReadOnlyObjectWrapper}
+import scalafx.Includes.{
+  jfxBooleanBinding2sfx,
+  jfxBooleanProperty2sfx,
+  jfxObjectProperty2sfx,
+  sfxReadOnlyObjectWrapperWithSFXDelegate2jfxReadOnlyObjectWrapper
+}
 import scalafx.beans.property.BooleanProperty.sfxBooleanProperty2jfx
 import scalafx.beans.property.PropertyIncludes.jfxReadOnlyObjectWrapper2sfx
 import scalafx.scene.control.Button
@@ -48,7 +53,9 @@ import scalafx.testutil.RunOnApplicationThread
   */
 @RunWith(classOf[JUnitRunner])
 class ReadOnlyObjectWrapperSpec
-    extends FlatSpec with BeforeAndAfterEach with RunOnApplicationThread {
+    extends FlatSpec
+    with BeforeAndAfterEach
+    with RunOnApplicationThread {
 
   val bean = new Object()
   var objectProperty: jfxbp.ReadOnlyObjectWrapper[String] = null
@@ -59,8 +66,8 @@ class ReadOnlyObjectWrapperSpec
   override protected def beforeEach() {
     objectProperty = new ReadOnlyObjectWrapper[String](bean, "Test Object")
     objectProperty2 = new ReadOnlyObjectWrapper[String](bean, "Test Object 2")
-    sfxObjectProperty = new ReadOnlyObjectWrapper[String](
-        bean, "SFX Test Object")
+    sfxObjectProperty =
+      new ReadOnlyObjectWrapper[String](bean, "SFX Test Object")
     booleanProperty = new BooleanProperty(bean, "Test Boolean")
   }
 

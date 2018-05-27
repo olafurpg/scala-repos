@@ -32,28 +32,28 @@ object HashEqualsArrayWrapper {
       case c if classOf[Array[Long]].equals(c) =>
         a: Array[Long] =>
           new HashEqualsLongArrayWrapper(a)
-        case c if classOf[Array[Int]].equals(c) =>
+      case c if classOf[Array[Int]].equals(c) =>
         a: Array[Int] =>
           new HashEqualsIntArrayWrapper(a)
-        case c if classOf[Array[Short]].equals(c) =>
+      case c if classOf[Array[Short]].equals(c) =>
         a: Array[Short] =>
           new HashEqualsShortArrayWrapper(a)
-        case c if classOf[Array[Char]].equals(c) =>
+      case c if classOf[Array[Char]].equals(c) =>
         a: Array[Char] =>
           new HashEqualsCharArrayWrapper(a)
-        case c if classOf[Array[Byte]].equals(c) =>
+      case c if classOf[Array[Byte]].equals(c) =>
         a: Array[Byte] =>
           new HashEqualsByteArrayWrapper(a)
-        case c if classOf[Array[Boolean]].equals(c) =>
+      case c if classOf[Array[Boolean]].equals(c) =>
         a: Array[Boolean] =>
           new HashEqualsBooleanArrayWrapper(a)
-        case c if classOf[Array[Float]].equals(c) =>
+      case c if classOf[Array[Float]].equals(c) =>
         a: Array[Float] =>
           new HashEqualsFloatArrayWrapper(a)
-        case c if classOf[Array[Double]].equals(c) =>
+      case c if classOf[Array[Double]].equals(c) =>
         a: Array[Double] =>
           new HashEqualsDoubleArrayWrapper(a)
-        case c =>
+      case c =>
         a: Array[T] =>
           new HashEqualsObjectArrayWrapper(a)
     }
@@ -67,7 +67,7 @@ object HashEqualsArrayWrapper {
   private[typed] def classForTag[T](ct: ClassTag[T]): Class[T] =
     ct.runtimeClass.asInstanceOf[Class[T]]
 
-  def wrapByClassTagFn[T : ClassTag]: Array[T] => HashEqualsArrayWrapper[T] =
+  def wrapByClassTagFn[T: ClassTag]: Array[T] => HashEqualsArrayWrapper[T] =
     wrapByClassFn(classForTag(implicitly[ClassTag[T]].wrap))
 
   implicit val longArrayOrd: Ordering[Array[Long]] =
@@ -247,59 +247,71 @@ object HashEqualsArrayWrapper {
 
   implicit val hashEqualsLongOrdering: Ordering[HashEqualsArrayWrapper[Long]] =
     new Ordering[HashEqualsArrayWrapper[Long]] {
-      override def compare(x: HashEqualsArrayWrapper[Long],
-                           y: HashEqualsArrayWrapper[Long]): Int =
+      override def compare(
+          x: HashEqualsArrayWrapper[Long],
+          y: HashEqualsArrayWrapper[Long]): Int =
         longArrayOrd.compare(x.wrapped, y.wrapped)
     }
 
   implicit val hashEqualsIntOrdering: Ordering[HashEqualsArrayWrapper[Int]] =
     new Ordering[HashEqualsArrayWrapper[Int]] {
-      override def compare(x: HashEqualsArrayWrapper[Int],
-                           y: HashEqualsArrayWrapper[Int]): Int =
+      override def compare(
+          x: HashEqualsArrayWrapper[Int],
+          y: HashEqualsArrayWrapper[Int]): Int =
         intArrayOrd.compare(x.wrapped, y.wrapped)
     }
 
-  implicit val hashEqualsShortOrdering: Ordering[HashEqualsArrayWrapper[Short]] =
+  implicit val hashEqualsShortOrdering
+    : Ordering[HashEqualsArrayWrapper[Short]] =
     new Ordering[HashEqualsArrayWrapper[Short]] {
-      override def compare(x: HashEqualsArrayWrapper[Short],
-                           y: HashEqualsArrayWrapper[Short]): Int =
+      override def compare(
+          x: HashEqualsArrayWrapper[Short],
+          y: HashEqualsArrayWrapper[Short]): Int =
         shortArrayOrd.compare(x.wrapped, y.wrapped)
     }
 
   implicit val hashEqualsCharOrdering: Ordering[HashEqualsArrayWrapper[Char]] =
     new Ordering[HashEqualsArrayWrapper[Char]] {
-      override def compare(x: HashEqualsArrayWrapper[Char],
-                           y: HashEqualsArrayWrapper[Char]): Int =
+      override def compare(
+          x: HashEqualsArrayWrapper[Char],
+          y: HashEqualsArrayWrapper[Char]): Int =
         charArrayOrd.compare(x.wrapped, y.wrapped)
     }
 
   implicit val hashEqualsByteOrdering: Ordering[HashEqualsArrayWrapper[Byte]] =
     new Ordering[HashEqualsArrayWrapper[Byte]] {
-      override def compare(x: HashEqualsArrayWrapper[Byte],
-                           y: HashEqualsArrayWrapper[Byte]): Int =
+      override def compare(
+          x: HashEqualsArrayWrapper[Byte],
+          y: HashEqualsArrayWrapper[Byte]): Int =
         byteArrayOrd.compare(x.wrapped, y.wrapped)
     }
 
-  implicit val hashEqualsBooleanOrdering: Ordering[HashEqualsArrayWrapper[
-          Boolean]] = new Ordering[HashEqualsArrayWrapper[Boolean]] {
-    override def compare(x: HashEqualsArrayWrapper[Boolean],
-                         y: HashEqualsArrayWrapper[Boolean]): Int =
-      booleanArrayOrd.compare(x.wrapped, y.wrapped)
-  }
+  implicit val hashEqualsBooleanOrdering
+    : Ordering[HashEqualsArrayWrapper[Boolean]] =
+    new Ordering[HashEqualsArrayWrapper[Boolean]] {
+      override def compare(
+          x: HashEqualsArrayWrapper[Boolean],
+          y: HashEqualsArrayWrapper[Boolean]): Int =
+        booleanArrayOrd.compare(x.wrapped, y.wrapped)
+    }
 
-  implicit val hashEqualsFloatOrdering: Ordering[HashEqualsArrayWrapper[Float]] =
+  implicit val hashEqualsFloatOrdering
+    : Ordering[HashEqualsArrayWrapper[Float]] =
     new Ordering[HashEqualsArrayWrapper[Float]] {
-      override def compare(x: HashEqualsArrayWrapper[Float],
-                           y: HashEqualsArrayWrapper[Float]): Int =
+      override def compare(
+          x: HashEqualsArrayWrapper[Float],
+          y: HashEqualsArrayWrapper[Float]): Int =
         floatArrayOrd.compare(x.wrapped, y.wrapped)
     }
 
-  implicit val hashEqualsDoubleOrdering: Ordering[HashEqualsArrayWrapper[
-          Double]] = new Ordering[HashEqualsArrayWrapper[Double]] {
-    override def compare(x: HashEqualsArrayWrapper[Double],
-                         y: HashEqualsArrayWrapper[Double]): Int =
-      doubleArrayOrd.compare(x.wrapped, y.wrapped)
-  }
+  implicit val hashEqualsDoubleOrdering
+    : Ordering[HashEqualsArrayWrapper[Double]] =
+    new Ordering[HashEqualsArrayWrapper[Double]] {
+      override def compare(
+          x: HashEqualsArrayWrapper[Double],
+          y: HashEqualsArrayWrapper[Double]): Int =
+        doubleArrayOrd.compare(x.wrapped, y.wrapped)
+    }
 }
 
 final class HashEqualsLongArrayWrapper(override val wrapped: Array[Long])

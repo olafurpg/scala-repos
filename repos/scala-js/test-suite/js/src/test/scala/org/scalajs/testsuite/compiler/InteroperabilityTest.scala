@@ -34,7 +34,8 @@ class InteroperabilityTest {
 
   def assertArrayDynEquals[T](expected: Array[T], actual: js.Dynamic): Unit = {
     assertArrayEquals(
-        expected, jsArray2Array(actual.asInstanceOf[js.Array[Any]]))
+      expected,
+      jsArray2Array(actual.asInstanceOf[js.Array[Any]]))
   }
 
   @Test def should_support_backquotes_to_escape_Scala_fields(): Unit = {
@@ -253,7 +254,8 @@ class InteroperabilityTest {
     assertArrayDynEquals(Array(3, 6), dyn.foo(3, 6))
     assertArrayDynEquals(Array("hello", false), dyn.foo("hello", false))
     assertArrayDynEquals(
-        Array("plop", 42, 51), dyn.applyDynamic("foo")(elems: _*))
+      Array("plop", 42, 51),
+      dyn.applyDynamic("foo")(elems: _*))
 
     val stat = obj.asInstanceOf[InteroperabilityTestVariadicMethod]
     assertArrayEquals(Array(), stat.foo())
@@ -288,7 +290,9 @@ class InteroperabilityTest {
     val args3 = jsnew(ctor)(elems: _*).args
     assertArrayDynEquals(Array("plop", 42, 51), args3)
 
-    import org.scalajs.testsuite.compiler.{InteroperabilityTestVariadicCtor => C}
+    import org.scalajs.testsuite.compiler.{
+      InteroperabilityTestVariadicCtor => C
+    }
     assertArrayEquals(Array(), new C().args)
     assertArrayEquals(Array(3, 6), new C(3, 6).args)
     assertArrayEquals(Array("hello", false), new C("hello", false).args)

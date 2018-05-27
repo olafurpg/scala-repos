@@ -35,21 +35,24 @@ private[serverset2] object Stabilizer {
   // the notify() run each epoch can trigger some slow work.
   // nettyHwt required to get TimerStats
   private val nettyHwt = new netty.HashedWheelTimer(
-      new NamedPoolThreadFactory(
-          "finagle-serversets Stabilizer timer", true /*daemons*/ ),
-      HashedWheelTimer.TickDuration.inMilliseconds,
-      TimeUnit.MILLISECONDS,
-      HashedWheelTimer.TicksPerWheel)
+    new NamedPoolThreadFactory(
+      "finagle-serversets Stabilizer timer",
+      true /*daemons*/ ),
+    HashedWheelTimer.TickDuration.inMilliseconds,
+    TimeUnit.MILLISECONDS,
+    HashedWheelTimer.TicksPerWheel
+  )
   private val epochTimer = HashedWheelTimer(nettyHwt)
 
-  TimerStats.deviation(nettyHwt,
-                       10.milliseconds,
-                       FinagleStatsReceiver.scope("zk2").scope("timer"))
+  TimerStats.deviation(
+    nettyHwt,
+    10.milliseconds,
+    FinagleStatsReceiver.scope("zk2").scope("timer"))
 
   TimerStats.hashedWheelTimerInternals(
-      nettyHwt,
-      () => 10.seconds,
-      FinagleStatsReceiver.scope("zk2").scope("timer"))
+    nettyHwt,
+    () => 10.seconds,
+    FinagleStatsReceiver.scope("zk2").scope("timer"))
 
   private val notifyMs = FinagleStatsReceiver
     .scope("serverset2")
@@ -59,27 +62,30 @@ private[serverset2] object Stabilizer {
   // Create an event of epochs for the given duration.
   def epochs(period: Duration): Epoch =
     new Epoch(
-        new Event[Unit] {
-          def register(w: Witness[Unit]) = {
-            epochTimer.schedule(period) {
-              val elapsed = Stopwatch.start()
-              w.notify(())
-              notifyMs.add(elapsed().inMilliseconds)
-            }
+      new Event[Unit] {
+        def register(w: Witness[Unit]) = {
+          epochTimer.schedule(period) {
+            val elapsed = Stopwatch.start()
+            w.notify(())
+            notifyMs.add(elapsed().inMilliseconds)
           }
-        },
-        period
+        }
+      },
+      period
     )
 
   // Used for delaying removals
   private case class State(
-      limbo: Option[Set[Address]], active: Option[Set[Address]], addr: Addr)
+      limbo: Option[Set[Address]],
+      active: Option[Set[Address]],
+      addr: Addr)
 
   // Used for batching updates
-  private case class States(publish: Option[Addr],
-                            last: Addr,
-                            next: Option[Addr],
-                            lastEmit: Time)
+  private case class States(
+      publish: Option[Addr],
+      last: Addr,
+      next: Option[Addr],
+      lastEmit: Time)
 
   private val initState = State(None, None, Addr.Pending)
 
@@ -126,15 +132,17 @@ private[serverset2] object Stabilizer {
           case (st @ State(limbo, active, last), Left(addr)) =>
             addr match {
               case Addr.Failed(_) =>
-                State(None,
-                      Some(active.getOrElse(Set.empty) ++ limbo.getOrElse(
-                              Set.empty)),
-                      addr)
+                State(
+                  None,
+                  Some(
+                    active.getOrElse(Set.empty) ++ limbo.getOrElse(Set.empty)),
+                  addr)
 
               case Addr.Bound(bound, _) =>
-                State(limbo,
-                      Some(merge(active.getOrElse(Set.empty), bound)),
-                      addr)
+                State(
+                  limbo,
+                  Some(merge(active.getOrElse(Set.empty), bound)),
+                  addr)
 
               case Addr.Neg if (active == None && limbo == None) =>
                 State(limbo, Some(Set.empty), addr)

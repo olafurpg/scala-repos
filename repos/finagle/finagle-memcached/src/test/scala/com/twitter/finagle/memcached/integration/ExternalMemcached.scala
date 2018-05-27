@@ -25,11 +25,10 @@ private[memcached] object InternalMemcached {
   def start(address: Option[InetSocketAddress]): Option[TestMemcachedServer] = {
     try {
       val server = new InProcessMemcached(
-          address.getOrElse(
-              new InetSocketAddress(InetAddress.getLoopbackAddress, 0))
+        address.getOrElse(
+          new InetSocketAddress(InetAddress.getLoopbackAddress, 0))
       )
-      Some(
-          new TestMemcachedServer {
+      Some(new TestMemcachedServer {
         val address =
           server.start().boundAddress.asInstanceOf[InetSocketAddress]
         def stop() { server.stop(true) }
@@ -64,7 +63,7 @@ private[memcached] object ExternalMemcached { self =>
 
     takenPorts += address
       .getOrElse(
-          new InetSocketAddress(InetAddress.getLoopbackAddress, 0)
+        new InetSocketAddress(InetAddress.getLoopbackAddress, 0)
       )
       .getPort
     address
@@ -76,11 +75,12 @@ private[memcached] object ExternalMemcached { self =>
 
   def start(address: Option[InetSocketAddress]): Option[TestMemcachedServer] = {
     def exec(address: InetSocketAddress): Process = {
-      val cmd = Seq("memcached",
-                    "-l",
-                    address.getHostName,
-                    "-p",
-                    address.getPort.toString)
+      val cmd = Seq(
+        "memcached",
+        "-l",
+        address.getHostName,
+        "-p",
+        address.getPort.toString)
       val builder = new ProcessBuilder(cmd.toList)
       builder.start()
     }
@@ -91,8 +91,7 @@ private[memcached] object ExternalMemcached { self =>
         processes :+= proc
 
         if (waitForPort(addr.getPort))
-          Some(
-              new TestMemcachedServer {
+          Some(new TestMemcachedServer {
             val address = addr
             def stop() {
               proc.destroy()
@@ -139,8 +138,7 @@ private[memcached] object ExternalMemcached { self =>
   // Make sure the process is always killed eventually
   Runtime
     .getRuntime()
-    .addShutdownHook(
-        new Thread {
+    .addShutdownHook(new Thread {
       override def run() {
         processes foreach { p =>
           p.destroy()

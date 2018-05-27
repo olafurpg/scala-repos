@@ -4,11 +4,24 @@ import akka.actor.Props
 import akka.testkit.TestActorRef
 import mesosphere.marathon.core.task.Task
 import mesosphere.marathon.core.task.tracker.TaskTracker
-import mesosphere.marathon.event.{AppTerminatedEvent, HistoryActor, MesosStatusUpdateEvent}
-import mesosphere.marathon.state.{AppDefinition, PathId, TaskFailure, TaskFailureRepository}
+import mesosphere.marathon.event.{
+  AppTerminatedEvent,
+  HistoryActor,
+  MesosStatusUpdateEvent
+}
+import mesosphere.marathon.state.{
+  AppDefinition,
+  PathId,
+  TaskFailure,
+  TaskFailureRepository
+}
 import mesosphere.marathon.test.MarathonActorSupport
 import mesosphere.marathon.upgrade.StoppingBehavior.SynchronizeTasks
-import mesosphere.marathon.{MarathonSpec, MarathonTestHelper, TaskUpgradeCanceledException}
+import mesosphere.marathon.{
+  MarathonSpec,
+  MarathonTestHelper,
+  TaskUpgradeCanceledException
+}
 import org.apache.mesos.SchedulerDriver
 import org.mockito.Matchers.any
 import org.mockito.Mockito._
@@ -19,8 +32,11 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, Promise}
 
 class AppStopActorTest
-    extends MarathonActorSupport with MarathonSpec with Matchers
-    with BeforeAndAfterAll with MockitoSugar {
+    extends MarathonActorSupport
+    with MarathonSpec
+    with Matchers
+    with BeforeAndAfterAll
+    with MockitoSugar {
 
   var driver: SchedulerDriver = _
   var taskTracker: TaskTracker = _
@@ -35,54 +51,55 @@ class AppStopActorTest
   test("Stop App") {
     val app = AppDefinition(id = PathId("app"), instances = 2)
     val promise = Promise[Unit]()
-    val tasks = Set(MarathonTestHelper.runningTask("task_a"),
-                    MarathonTestHelper.runningTask("task_b"))
+    val tasks = Set(
+      MarathonTestHelper.runningTask("task_a"),
+      MarathonTestHelper.runningTask("task_b"))
 
     when(taskTracker.appTasksLaunchedSync(app.id)).thenReturn(tasks)
 
     val ref = TestActorRef[AppStopActor](
-        Props(
-            new AppStopActor(
-                driver,
-                taskTracker,
-                system.eventStream,
-                app,
-                promise
-            ))
+      Props(
+        new AppStopActor(
+          driver,
+          taskTracker,
+          system.eventStream,
+          app,
+          promise
+        ))
     )
     watch(ref)
 
     val historyRef = TestActorRef[HistoryActor](
-        Props(
-            new HistoryActor(
-                system.eventStream,
-                taskFailureRepository
-            )
+      Props(
+        new HistoryActor(
+          system.eventStream,
+          taskFailureRepository
         )
+      )
     )
 
     val statusUpdateEventA = MesosStatusUpdateEvent(
-        slaveId = "",
-        taskId = Task.Id("task_a"),
-        taskStatus = "TASK_FAILED",
-        message = "",
-        appId = app.id,
-        host = "",
-        ipAddresses = Nil,
-        ports = Nil,
-        version = app.version.toString
+      slaveId = "",
+      taskId = Task.Id("task_a"),
+      taskStatus = "TASK_FAILED",
+      message = "",
+      appId = app.id,
+      host = "",
+      ipAddresses = Nil,
+      ports = Nil,
+      version = app.version.toString
     )
 
     val statusUpdateEventB = MesosStatusUpdateEvent(
-        slaveId = "",
-        taskId = Task.Id("task_b"),
-        taskStatus = "TASK_LOST",
-        message = "",
-        appId = app.id,
-        host = "",
-        ipAddresses = Nil,
-        ports = Nil,
-        version = app.version.toString
+      slaveId = "",
+      taskId = Task.Id("task_b"),
+      taskStatus = "TASK_LOST",
+      message = "",
+      appId = app.id,
+      host = "",
+      ipAddresses = Nil,
+      ports = Nil,
+      version = app.version.toString
     )
 
     val Some(taskFailureA) =
@@ -117,14 +134,14 @@ class AppStopActorTest
       .thenReturn(Iterable.empty[Task])
 
     val ref = TestActorRef[AppStopActor](
-        Props(
-            new AppStopActor(
-                driver,
-                taskTracker,
-                system.eventStream,
-                app,
-                promise
-            ))
+      Props(
+        new AppStopActor(
+          driver,
+          taskTracker,
+          system.eventStream,
+          app,
+          promise
+        ))
     )
     watch(ref)
 
@@ -137,20 +154,21 @@ class AppStopActorTest
   test("Failed") {
     val app = AppDefinition(id = PathId("app"), instances = 2)
     val promise = Promise[Unit]()
-    val tasks = Set(MarathonTestHelper.runningTask("task_a"),
-                    MarathonTestHelper.runningTask("task_b"))
+    val tasks = Set(
+      MarathonTestHelper.runningTask("task_a"),
+      MarathonTestHelper.runningTask("task_b"))
 
     when(taskTracker.appTasksLaunchedSync(app.id)).thenReturn(tasks)
 
     val ref = TestActorRef[AppStopActor](
-        Props(
-            new AppStopActor(
-                driver,
-                taskTracker,
-                system.eventStream,
-                app,
-                promise
-            ))
+      Props(
+        new AppStopActor(
+          driver,
+          taskTracker,
+          system.eventStream,
+          app,
+          promise
+        ))
     )
     watch(ref)
 
@@ -167,22 +185,23 @@ class AppStopActorTest
   test("Task synchronization") {
     val app = AppDefinition(id = PathId("app"), instances = 2)
     val promise = Promise[Unit]()
-    val tasks = Set(MarathonTestHelper.runningTask("task_a"),
-                    MarathonTestHelper.runningTask("task_b"))
+    val tasks = Set(
+      MarathonTestHelper.runningTask("task_a"),
+      MarathonTestHelper.runningTask("task_b"))
 
     when(taskTracker.appTasksLaunchedSync(app.id))
       .thenReturn(tasks)
       .thenReturn(Iterable.empty[Task])
 
     val ref = TestActorRef[AppStopActor](
-        Props(
-            classOf[AppStopActor],
-            driver,
-            taskTracker,
-            system.eventStream,
-            app,
-            promise
-        )
+      Props(
+        classOf[AppStopActor],
+        driver,
+        taskTracker,
+        system.eventStream,
+        app,
+        promise
+      )
     )
     watch(ref)
 

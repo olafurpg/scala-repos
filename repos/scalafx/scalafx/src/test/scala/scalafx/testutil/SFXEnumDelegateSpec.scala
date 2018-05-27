@@ -66,11 +66,13 @@ import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
   *                it has to be resolved automatically by the compiler.
   */
 abstract class SFXEnumDelegateSpec[
-    E <: java.lang.Enum[E], S <: SFXEnumDelegate[E]] protected (
+    E <: java.lang.Enum[E],
+    S <: SFXEnumDelegate[E]] protected (
     javaClass: Class[E],
     scalaClass: Class[S],
     companion: SFXEnumDelegateCompanion[E, S])(
-    implicit jfx2sfx: E => S = null, sfx2jfx: S => E = null)
+    implicit jfx2sfx: E => S = null,
+    sfx2jfx: S => E = null)
     extends SFXDelegateSpec[E, S](javaClass, scalaClass) {
 
   private val javaEnumConstants = EnumSet.allOf(javaClass)
@@ -85,9 +87,10 @@ abstract class SFXEnumDelegateSpec[
   }
 
   private def assertScalaEnumWithOrdinal(s: S, index: Int) {
-    assert(s.delegate.ordinal() == index,
-           "%s - Expected position: %d, actual: %d".format(
-               s, s.delegate.ordinal(), index))
+    assert(
+      s.delegate.ordinal() == index,
+      "%s - Expected position: %d, actual: %d"
+        .format(s, s.delegate.ordinal(), index))
   }
 
   protected override def getDesirableMethodName(javaMethod: Method): String =
@@ -99,7 +102,7 @@ abstract class SFXEnumDelegateSpec[
    */
   protected override def isSpecialMethodName(name: String) =
     super.isImplementation(name) || (name == "values") || (name == "valueOf") ||
-    name.startsWith("is") || name.startsWith("get")
+      name.startsWith("is") || name.startsWith("get")
 
   // Simply it gets the first constant available.
   override protected def getScalaClassInstance = companion.values.toList.head
@@ -108,7 +111,7 @@ abstract class SFXEnumDelegateSpec[
   override protected def getJavaClassInstance = javaEnumConstants.iterator.next
 
   /////////////////
-  // TESTS - BEGIN 
+  // TESTS - BEGIN
   /////////////////
 
   it should "declare all public declared methods of " + javaClass.getName in {
@@ -125,8 +128,9 @@ abstract class SFXEnumDelegateSpec[
     val missingJavaEnumNames =
       javaEnumConstants.map(_.name).filterNot(nameIsPresent(_))
 
-    assert(missingJavaEnumNames.isEmpty,
-           "Missing constants: " + missingJavaEnumNames.mkString(", "))
+    assert(
+      missingJavaEnumNames.isEmpty,
+      "Missing constants: " + missingJavaEnumNames.mkString(", "))
   }
 
   it should "not find a non registered name among enum constants" in {
@@ -148,6 +152,6 @@ abstract class SFXEnumDelegateSpec[
   }
 
   ///////////////
-  // TESTS - END 
+  // TESTS - END
   ///////////////
 }

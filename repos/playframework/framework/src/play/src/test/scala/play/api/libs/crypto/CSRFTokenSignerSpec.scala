@@ -28,7 +28,7 @@ class CSRFTokenSignerSpec extends Specification {
       token.length must be_==(24)
       val signedToken = tokenSigner.signToken(token)
       signedToken must beEqualTo(
-          "77adb3c3dfe5ee567556b259549a4ddfa6797c05-0-0FFFFFFFFFFFFFFFFFFFFF24")
+        "77adb3c3dfe5ee567556b259549a4ddfa6797c05-0-0FFFFFFFFFFFFFFFFFFFFF24")
     }
   }
 

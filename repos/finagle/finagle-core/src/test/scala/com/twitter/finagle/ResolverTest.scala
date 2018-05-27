@@ -64,13 +64,13 @@ class ResolverTest extends FunSuite {
     val exc = new Exception
     ConstResolver(Addr.Failed(exc)).resolve("blah") match {
       case Throw(`exc`) =>
-      case _ => fail()
+      case _            => fail()
     }
 
     val sockaddr = new InetSocketAddress(0)
     ConstResolver(Addr.Bound(Address(sockaddr))).resolve("blah") match {
       case Return(g) => assert(g() == Set(sockaddr))
-      case _ => fail()
+      case _         => fail()
     }
   }
 
@@ -81,7 +81,7 @@ class ResolverTest extends FunSuite {
   }
 
   test(
-      "Resolver.evalLabeled: Resolve empty string as label for unlabeled addresses") {
+    "Resolver.evalLabeled: Resolve empty string as label for unlabeled addresses") {
     val binding = Resolver.evalLabeled("test!xyz")
     assert(binding._2.isEmpty)
   }

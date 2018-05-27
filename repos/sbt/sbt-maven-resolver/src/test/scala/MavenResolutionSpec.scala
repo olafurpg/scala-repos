@@ -4,7 +4,16 @@ import java.io.FileInputStream
 
 import sbt.internal.librarymanagement.BaseIvySpecification
 import sbt.internal.librarymanagement.mavenint.PomExtraDependencyAttributes
-import sbt.librarymanagement.{Artifact, Configurations, CrossVersion, DefaultMavenRepository, MavenRepository, ModuleID, Resolver, UpdateOptions}
+import sbt.librarymanagement.{
+  Artifact,
+  Configurations,
+  CrossVersion,
+  DefaultMavenRepository,
+  MavenRepository,
+  ModuleID,
+  Resolver,
+  UpdateOptions
+}
 
 import sbt.internal.util.ShowLines
 
@@ -38,24 +47,28 @@ class MavenResolutionSpec extends BaseIvySpecification {
   def scalaLibraryAll =
     ModuleID("org.scala-lang", "scala-library-all", "2.11.4", Some("compile"))
   def scalaCompiler =
-    ModuleID("org.scala-lang",
-             "scala-compiler",
-             "2.8.1",
-             Some("scala-tool->default(compile)"))
+    ModuleID(
+      "org.scala-lang",
+      "scala-compiler",
+      "2.8.1",
+      Some("scala-tool->default(compile)"))
   def scalaContinuationPlugin =
-    ModuleID("org.scala-lang.plugins",
-             "continuations",
-             "2.8.1",
-             Some("plugin->default(compile)"))
+    ModuleID(
+      "org.scala-lang.plugins",
+      "continuations",
+      "2.8.1",
+      Some("plugin->default(compile)"))
   def sbtPlugin =
     ModuleID("com.github.mpeltonen", "sbt-idea", "1.6.0", Some("compile"))
-      .extra(PomExtraDependencyAttributes.SbtVersionKey -> "0.13",
-             PomExtraDependencyAttributes.ScalaVersionKey -> "2.10")
+      .extra(
+        PomExtraDependencyAttributes.SbtVersionKey -> "0.13",
+        PomExtraDependencyAttributes.ScalaVersionKey -> "2.10")
       .copy(crossVersion = CrossVersion.Disabled)
   def oldSbtPlugin =
     ModuleID("com.github.mpeltonen", "sbt-idea", "1.6.0", Some("compile"))
-      .extra(PomExtraDependencyAttributes.SbtVersionKey -> "0.12",
-             PomExtraDependencyAttributes.ScalaVersionKey -> "2.9.2")
+      .extra(
+        PomExtraDependencyAttributes.SbtVersionKey -> "0.12",
+        PomExtraDependencyAttributes.ScalaVersionKey -> "2.9.2")
       .copy(crossVersion = CrossVersion.Disabled)
   def majorConflictLib =
     ModuleID("com.joestelmach", "natty", "0.3", Some("compile"))
@@ -63,8 +76,8 @@ class MavenResolutionSpec extends BaseIvySpecification {
   def testSnapshot =
     ModuleID("com.typesafe", "config", "0.4.9-SNAPSHOT", Some("compile"))
   val SnapshotResolver = MavenRepository(
-      "some-snapshots",
-      "https://oss.sonatype.org/content/repositories/snapshots/")
+    "some-snapshots",
+    "https://oss.sonatype.org/content/repositories/snapshots/")
 
   override def resolvers =
     Seq(DefaultMavenRepository, SnapshotResolver, Resolver.publishMavenLocal)
@@ -78,10 +91,11 @@ class MavenResolutionSpec extends BaseIvySpecification {
     UpdateOptions().withResolverConverter(MavenResolverConverter.converter)
 
   def resolveMajorConflicts = {
-    val m = module(ModuleID("com.example", "foo", "0.1.0", Some("compile")),
-                   Seq(majorConflictLib),
-                   None,
-                   defaultUpdateOptions)
+    val m = module(
+      ModuleID("com.example", "foo", "0.1.0", Some("compile")),
+      Seq(majorConflictLib),
+      None,
+      defaultUpdateOptions)
     val report = ivyUpdate(m) // should not(throwAn[IllegalStateException])
     val jars = for {
       conf <- report.configurations if conf.configuration == Compile.name
@@ -92,10 +106,11 @@ class MavenResolutionSpec extends BaseIvySpecification {
   }
 
   def resolveCrossConfigurations = {
-    val m = module(ModuleID("com.example", "foo", "0.1.0", Some("compile")),
-                   Seq(scalaCompiler, scalaContinuationPlugin),
-                   None,
-                   defaultUpdateOptions)
+    val m = module(
+      ModuleID("com.example", "foo", "0.1.0", Some("compile")),
+      Seq(scalaCompiler, scalaContinuationPlugin),
+      None,
+      defaultUpdateOptions)
     val report = ivyUpdate(m)
     val jars = for {
       conf <- report.configurations if conf.configuration == ScalaTool.name
@@ -109,10 +124,11 @@ class MavenResolutionSpec extends BaseIvySpecification {
 
     def sha(f: java.io.File): String = sbt.io.Hash.toHex(sbt.io.Hash(f))
     def findSbtIdeaJars(dep: ModuleID, name: String) = {
-      val m = module(ModuleID("com.example", name, "0.1.0", Some("compile")),
-                     Seq(dep),
-                     None,
-                     defaultUpdateOptions)
+      val m = module(
+        ModuleID("com.example", name, "0.1.0", Some("compile")),
+        Seq(dep),
+        None,
+        defaultUpdateOptions)
       val report = ivyUpdate(m)
       for {
         conf <- report.configurations if conf.configuration == "compile"
@@ -128,14 +144,15 @@ class MavenResolutionSpec extends BaseIvySpecification {
     (newJars should have size 1)
     (oldJars should have size 1)
     (oldJars.map(_._2) should not(
-            contain theSameElementsAs (newJars.map(_._2))))
+      contain theSameElementsAs (newJars.map(_._2))))
   }
 
   def resolveSnapshotPubDate = {
-    val m = module(ModuleID("com.example", "foo", "0.1.0", Some("compile")),
-                   Seq(testSnapshot),
-                   Some("2.10.2"),
-                   defaultUpdateOptions.withLatestSnapshots(true))
+    val m = module(
+      ModuleID("com.example", "foo", "0.1.0", Some("compile")),
+      Seq(testSnapshot),
+      Some("2.10.2"),
+      defaultUpdateOptions.withLatestSnapshots(true))
     val report = ivyUpdate(m)
     val pubTime = for {
       conf <- report.configurations if conf.configuration == "compile"
@@ -146,15 +163,16 @@ class MavenResolutionSpec extends BaseIvySpecification {
   }
 
   def resolvePomArtifactAndDependencies = {
-    val m = module(ModuleID("com.example", "foo", "0.1.0", Some("compile")),
-                   Seq(scalaLibraryAll),
-                   Some("2.10.2"),
-                   defaultUpdateOptions)
+    val m = module(
+      ModuleID("com.example", "foo", "0.1.0", Some("compile")),
+      Seq(scalaLibraryAll),
+      Some("2.10.2"),
+      defaultUpdateOptions)
     val report = ivyUpdate(m)
     val jars = for {
       conf <- report.configurations if conf.configuration == "compile"
       m <- conf.modules if (m.module.name == "scala-library") ||
-          (m.module.name contains "parser")
+        (m.module.name contains "parser")
       (a, f) <- m.artifacts if a.extension == "jar"
     } yield f
     jars should have size 2
@@ -163,27 +181,29 @@ class MavenResolutionSpec extends BaseIvySpecification {
   def failIfPomMissing = {
     // TODO - we need the jar to not exist too.
     val m = module(
-        ModuleID("com.example", "foo", "0.1.0", Some("compile")),
-        Seq(ModuleID(
-                "org.scala-sbt", "does-not-exist", "1.0", Some("compile"))),
-        Some("2.10.2"),
-        defaultUpdateOptions)
+      ModuleID("com.example", "foo", "0.1.0", Some("compile")),
+      Seq(ModuleID("org.scala-sbt", "does-not-exist", "1.0", Some("compile"))),
+      Some("2.10.2"),
+      defaultUpdateOptions
+    )
     an[Exception] should be thrownBy ivyUpdate(m)
   }
 
   def failIfMainArtifactMissing = {
-    val m = module(ModuleID("com.example", "foo", "0.1.0", Some("compile")),
-                   Seq(jmxri),
-                   Some("2.10.2"),
-                   defaultUpdateOptions)
+    val m = module(
+      ModuleID("com.example", "foo", "0.1.0", Some("compile")),
+      Seq(jmxri),
+      Some("2.10.2"),
+      defaultUpdateOptions)
     an[Exception] should be thrownBy ivyUpdate(m)
   }
 
   def resolveNonstandardClassifier = {
-    val m = module(ModuleID("com.example", "foo", "0.1.0", Some("compile")),
-                   Seq(testngJdk5),
-                   Some("2.10.2"),
-                   defaultUpdateOptions)
+    val m = module(
+      ModuleID("com.example", "foo", "0.1.0", Some("compile")),
+      Seq(testngJdk5),
+      Some("2.10.2"),
+      defaultUpdateOptions)
     val report = ivyUpdate(m)
     val jars = for {
       conf <- report.configurations if conf.configuration == "compile"
@@ -196,10 +216,11 @@ class MavenResolutionSpec extends BaseIvySpecification {
   }
 
   def resolveTransitiveMavenDependency = {
-    val m = module(ModuleID("com.example", "foo", "0.1.0", Some("compile")),
-                   Seq(akkaActor),
-                   Some("2.10.2"),
-                   defaultUpdateOptions)
+    val m = module(
+      ModuleID("com.example", "foo", "0.1.0", Some("compile")),
+      Seq(akkaActor),
+      Some("2.10.2"),
+      defaultUpdateOptions)
     val report = ivyUpdate(m)
     val jars = for {
       conf <- report.configurations if conf.configuration == "compile"
@@ -212,21 +233,22 @@ class MavenResolutionSpec extends BaseIvySpecification {
   }
 
   def resolveIntransitiveMavenDependency = {
-    val m = module(ModuleID("com.example", "foo", "0.1.0", Some("compile")),
-                   Seq(akkaActorTestkit.intransitive()),
-                   Some("2.10.2"),
-                   defaultUpdateOptions)
+    val m = module(
+      ModuleID("com.example", "foo", "0.1.0", Some("compile")),
+      Seq(akkaActorTestkit.intransitive()),
+      Some("2.10.2"),
+      defaultUpdateOptions)
     val report = ivyUpdate(m)
     val transitiveJars = for {
       conf <- report.configurations if conf.configuration == "compile"
       m <- conf.modules if (m.module.name contains "akka-actor") &&
-          !(m.module.name contains "testkit")
+        !(m.module.name contains "testkit")
       (a, f) <- m.artifacts if a.extension == "jar"
     } yield f
     val directJars = for {
       conf <- report.configurations if conf.configuration == "compile"
       m <- conf.modules if (m.module.name contains "akka-actor") &&
-          (m.module.name contains "testkit")
+        (m.module.name contains "testkit")
       (a, f) <- m.artifacts if a.extension == "jar"
     } yield f
     (report.configurations should have size configurations.size)
@@ -235,10 +257,11 @@ class MavenResolutionSpec extends BaseIvySpecification {
   }
 
   def resolveTransitiveConfigurationMavenDependency = {
-    val m = module(ModuleID("com.example", "foo", "0.1.0", Some("compile")),
-                   Seq(akkaActorTestkit),
-                   Some("2.10.2"),
-                   defaultUpdateOptions)
+    val m = module(
+      ModuleID("com.example", "foo", "0.1.0", Some("compile")),
+      Seq(akkaActorTestkit),
+      Some("2.10.2"),
+      defaultUpdateOptions)
     val report = ivyUpdate(m)
     val jars = for {
       conf <- report.configurations if conf.configuration == "test"
@@ -252,21 +275,23 @@ class MavenResolutionSpec extends BaseIvySpecification {
 
   def resolveSourceAndJavadoc = {
     val m = module(
-        ModuleID("com.example", "foo", "0.1.0", Some("sources")),
-        Seq(akkaActor.artifacts(Artifact(akkaActor.name, "javadoc"),
-                                Artifact(akkaActor.name, "sources"))),
-        Some("2.10.2"),
-        defaultUpdateOptions
+      ModuleID("com.example", "foo", "0.1.0", Some("sources")),
+      Seq(
+        akkaActor.artifacts(
+          Artifact(akkaActor.name, "javadoc"),
+          Artifact(akkaActor.name, "sources"))),
+      Some("2.10.2"),
+      defaultUpdateOptions
     )
     val report = ivyUpdate(m)
     val jars = for {
       conf <- report.configurations
-             //  We actually injected javadoc/sources into the compile scope, due to how we did the request.
-             //  SO, we report that here.
-             if conf.configuration == "compile"
+      //  We actually injected javadoc/sources into the compile scope, due to how we did the request.
+      //  SO, we report that here.
+      if conf.configuration == "compile"
       m <- conf.modules
       (a, f) <- m.artifacts if (f.getName contains "sources") ||
-               (f.getName contains "javadoc")
+        (f.getName contains "javadoc")
     } yield f
     (report.configurations should have size configurations.size)
     (jars should have size 2)
@@ -274,33 +299,36 @@ class MavenResolutionSpec extends BaseIvySpecification {
 
   def publishMavenMetadata = {
     val m = module(
-        ModuleID("com.example", "test-it", "1.0-SNAPSHOT", Some("compile")),
-        Seq(),
-        None,
-        defaultUpdateOptions.withLatestSnapshots(true)
+      ModuleID("com.example", "test-it", "1.0-SNAPSHOT", Some("compile")),
+      Seq(),
+      None,
+      defaultUpdateOptions.withLatestSnapshots(true)
     )
     sbt.io.IO.withTemporaryDirectory { dir =>
       val pomFile = new java.io.File(dir, "pom.xml")
-      sbt.io.IO.write(pomFile,
-                      """
+      sbt.io.IO.write(
+        pomFile,
+        """
           |<project>
           |   <groupId>com.example</groupId>
           |   <name>test-it</name>
           |   <version>1.0-SNAPSHOT</version>
           |</project>
-        """.stripMargin)
+        """.stripMargin
+      )
       val jarFile = new java.io.File(dir, "test-it-1.0-SNAPSHOT.jar")
       sbt.io.IO.touch(jarFile)
       System.err.println(
-          s"DEBUGME - Publishing $m to ${Resolver.publishMavenLocal}")
+        s"DEBUGME - Publishing $m to ${Resolver.publishMavenLocal}")
       ivyPublish(
-          m,
-          mkPublishConfiguration(
-              Resolver.publishMavenLocal,
-              Map(
-                  Artifact("test-it-1.0-SNAPSHOT.jar") -> pomFile,
-                  Artifact("test-it-1.0-SNAPSHOT.pom", "pom", "pom") -> jarFile
-              )))
+        m,
+        mkPublishConfiguration(
+          Resolver.publishMavenLocal,
+          Map(
+            Artifact("test-it-1.0-SNAPSHOT.jar") -> pomFile,
+            Artifact("test-it-1.0-SNAPSHOT.pom", "pom", "pom") -> jarFile
+          ))
+      )
     }
     val baseLocalMavenDir: java.io.File = Resolver.publishMavenLocal.rootFile
     val allFiles: Seq[java.io.File] = sbt.io

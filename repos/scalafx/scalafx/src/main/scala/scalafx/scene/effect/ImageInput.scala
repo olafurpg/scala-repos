@@ -39,9 +39,9 @@ object ImageInput {
     if (ii != null) ii.delegate else null
 }
 
-class ImageInput(
-    override val delegate: jfxse.ImageInput = new jfxse.ImageInput)
-    extends Effect(delegate) with PositionDelegate[jfxse.ImageInput]
+class ImageInput(override val delegate: jfxse.ImageInput = new jfxse.ImageInput)
+    extends Effect(delegate)
+    with PositionDelegate[jfxse.ImageInput]
     with SFXDelegate[jfxse.ImageInput] {
 
   /**

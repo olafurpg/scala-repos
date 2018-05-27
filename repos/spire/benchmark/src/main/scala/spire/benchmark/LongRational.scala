@@ -75,7 +75,8 @@ final class LongRational private (val n: Long, val d: Long) {
       LongRational.One
     } else if (exp < 0) {
       new LongRational(
-          d pow java.lang.Math.abs(exp), n pow java.lang.Math.abs(exp))
+        d pow java.lang.Math.abs(exp),
+        n pow java.lang.Math.abs(exp))
     } else {
       new LongRational(n pow exp, d pow exp)
     }

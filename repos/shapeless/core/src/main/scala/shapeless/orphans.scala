@@ -23,34 +23,39 @@ import scala.reflect.macros.whitebox
 case class Orphan[F[_], D, T](instance: F[T])
 
 object Orphan {
-  implicit def materializeOrphan[F[_], D, T]: Orphan[F, D, T] = macro OrphanMacros
-    .materializeOrphanImpl[F, D, T]
+  implicit def materializeOrphan[F[_], D, T]: Orphan[F, D, T] =
+    macro OrphanMacros
+      .materializeOrphanImpl[F, D, T]
 }
 
 case class WrappedOrphan[T](instance: T)
 
 object WrappedOrphan {
-  implicit def apply[T]: WrappedOrphan[T] = macro OrphanMacros
-    .materializeWrapped[T]
+  implicit def apply[T]: WrappedOrphan[T] =
+    macro OrphanMacros
+      .materializeWrapped[T]
 }
 
 trait OrphanDeriver[F[_], D] {
-  implicit def materialize[T]: F[T] = macro OrphanMacros
-    .materializeImpl[F, D, T]
+  implicit def materialize[T]: F[T] =
+    macro OrphanMacros
+      .materializeImpl[F, D, T]
 }
 
 @macrocompat.bundle
 class OrphanMacros(val c: whitebox.Context) extends CaseClassMacros {
   import c.universe._
 
-  def materializeImpl[F[_], D, T](implicit fTag: WeakTypeTag[F[_]],
-                                  dTag: WeakTypeTag[D],
-                                  tTag: WeakTypeTag[T]): Tree =
+  def materializeImpl[F[_], D, T](
+      implicit fTag: WeakTypeTag[F[_]],
+      dTag: WeakTypeTag[D],
+      tTag: WeakTypeTag[T]): Tree =
     materializeAux[F, D, T](false)
 
-  def materializeOrphanImpl[F[_], D, T](implicit fTag: WeakTypeTag[F[_]],
-                                        dTag: WeakTypeTag[D],
-                                        tTag: WeakTypeTag[T]): Tree = {
+  def materializeOrphanImpl[F[_], D, T](
+      implicit fTag: WeakTypeTag[F[_]],
+      dTag: WeakTypeTag[D],
+      tTag: WeakTypeTag[T]): Tree = {
     val inst = materializeAux[F, D, T](true)
     val fTpe = fTag.tpe.typeConstructor
     val dTpe = dTag.tpe
@@ -61,10 +66,10 @@ class OrphanMacros(val c: whitebox.Context) extends CaseClassMacros {
      """
   }
 
-  def materializeAux[F[_], D, T](
-      proxied: Boolean)(implicit fTag: WeakTypeTag[F[_]],
-                        dTag: WeakTypeTag[D],
-                        tTag: WeakTypeTag[T]): Tree = {
+  def materializeAux[F[_], D, T](proxied: Boolean)(
+      implicit fTag: WeakTypeTag[F[_]],
+      dTag: WeakTypeTag[D],
+      tTag: WeakTypeTag[T]): Tree = {
     val fTcTpe = fTag.tpe.typeConstructor
     val dTpe = dTag.tpe
     val tTpe = tTag.tpe
@@ -128,7 +133,7 @@ class OrphanMacros(val c: whitebox.Context) extends CaseClassMacros {
         val useDerived = resTpeD.typeArgs.zip(resTpeI.typeArgs).forall {
           case (ad, ai) =>
             ai.typeSymbol.isParameter ||
-            (!ad.typeSymbol.isParameter && !(ad <:< ai))
+              (!ad.typeSymbol.isParameter && !(ad <:< ai))
         }
 
         if (useDerived) derived else inst

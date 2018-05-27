@@ -9,7 +9,8 @@ import com.intellij.openapi.project.Project
   * Run configuration setting.
   */
 class SbtRunConfigurationEditor(
-    project: Project, configuration: SbtRunConfiguration)
+    project: Project,
+    configuration: SbtRunConfiguration)
     extends SettingsEditor[SbtRunConfiguration] {
   val form = new SbtRunConfigurationForm(project, configuration)
 

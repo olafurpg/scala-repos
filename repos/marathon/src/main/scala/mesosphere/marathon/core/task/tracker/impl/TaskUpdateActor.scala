@@ -6,7 +6,11 @@ import akka.actor.{Actor, Props, Status}
 import akka.event.LoggingReceive
 import mesosphere.marathon.core.base.Clock
 import mesosphere.marathon.core.task.Task
-import mesosphere.marathon.core.task.tracker.impl.TaskUpdateActor.{ActorMetrics, FinishedTaskOp, ProcessTaskOp}
+import mesosphere.marathon.core.task.tracker.impl.TaskUpdateActor.{
+  ActorMetrics,
+  FinishedTaskOp,
+  ProcessTaskOp
+}
 import mesosphere.marathon.metrics.Metrics.AtomicIntGauge
 import mesosphere.marathon.metrics.{MetricPrefixes, Metrics}
 import org.slf4j.LoggerFactory
@@ -15,9 +19,10 @@ import scala.collection.immutable.Queue
 import scala.concurrent.Future
 
 object TaskUpdateActor {
-  def props(clock: Clock,
-            metrics: ActorMetrics,
-            processor: TaskOpProcessor): Props = {
+  def props(
+      clock: Clock,
+      metrics: ActorMetrics,
+      processor: TaskOpProcessor): Props = {
     Props(new TaskUpdateActor(clock, metrics, processor))
   }
 
@@ -60,7 +65,9 @@ object TaskUpdateActor {
   * * Errors in this actor lead to a restart of the TaskTrackerActor.
   */
 private[impl] class TaskUpdateActor(
-    clock: Clock, metrics: ActorMetrics, processor: TaskOpProcessor)
+    clock: Clock,
+    metrics: ActorMetrics,
+    processor: TaskOpProcessor)
     extends Actor {
   private[this] val log = LoggerFactory.getLogger(getClass)
 
@@ -80,10 +87,9 @@ private[impl] class TaskUpdateActor(
     super.postStop()
 
     // Answer all outstanding requests.
-    operationsByTaskId.values.iterator.flatten.map(_.sender) foreach {
-      sender =>
-        sender ! Status.Failure(
-            new IllegalStateException("TaskUpdateActor stopped"))
+    operationsByTaskId.values.iterator.flatten.map(_.sender) foreach { sender =>
+      sender ! Status.Failure(
+        new IllegalStateException("TaskUpdateActor stopped"))
     }
 
     metrics.numberOfActiveOps.setValue(0)
@@ -114,7 +120,7 @@ private[impl] class TaskUpdateActor(
       if (log.isDebugEnabled) {
         val queuedCount = metrics.numberOfQueuedOps.getValue
         log.debug(
-            s"Finished processing ${op.action} for app [${op.appId}] and ${op.taskId} " +
+          s"Finished processing ${op.action} for app [${op.appId}] and ${op.taskId} " +
             s"$activeCount active, $queuedCount queued.");
       }
 
@@ -130,7 +136,7 @@ private[impl] class TaskUpdateActor(
       val queuedCount = metrics.numberOfQueuedOps.decrement()
       val activeCount = metrics.numberOfActiveOps.increment()
       log.debug(
-          s"Start processing ${op.action} for app [${op.appId}] and ${op.taskId}. " +
+        s"Start processing ${op.action} for app [${op.appId}] and ${op.taskId}. " +
           s"$activeCount active, $queuedCount queued.")
 
       import context.dispatcher
@@ -138,14 +144,14 @@ private[impl] class TaskUpdateActor(
         if (op.deadline <= clock.now()) {
           metrics.timedOutOpsMeter.mark()
           op.sender ! Status.Failure(
-              new TimeoutException(
-                  s"Timeout: ${op.action} for app [${op.appId}] and ${op.taskId}.")
+            new TimeoutException(
+              s"Timeout: ${op.action} for app [${op.appId}] and ${op.taskId}.")
           )
           Future.successful(())
         } else metrics.processOpTimer.timeFuture(processor.process(op))
       }.map { _ =>
         log.debug(
-            s"Finished processing ${op.action} for app [${op.appId}] and ${op.taskId}")
+          s"Finished processing ${op.action} for app [${op.appId}] and ${op.taskId}")
         FinishedTaskOp(op)
       }
 

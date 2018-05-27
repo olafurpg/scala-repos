@@ -12,8 +12,8 @@ import breeze.storage.Zero
   */
 object split extends UFunc {
 
-  implicit def implIntVec[T : ClassTag]: Impl2[
-      DenseVector[T], Int, IndexedSeq[DenseVector[T]]] = {
+  implicit def implIntVec[T: ClassTag]
+    : Impl2[DenseVector[T], Int, IndexedSeq[DenseVector[T]]] = {
     new Impl2[DenseVector[T], Int, IndexedSeq[DenseVector[T]]] {
       def apply(v: DenseVector[T], n: Int): IndexedSeq[DenseVector[T]] = {
         require(n >= 0)
@@ -36,11 +36,12 @@ object split extends UFunc {
     }
   }
 
-  implicit def implSeqVec[T : ClassTag]: Impl2[
-      DenseVector[T], Seq[Int], IndexedSeq[DenseVector[T]]] =
+  implicit def implSeqVec[T: ClassTag]
+    : Impl2[DenseVector[T], Seq[Int], IndexedSeq[DenseVector[T]]] =
     new Impl2[DenseVector[T], Seq[Int], IndexedSeq[DenseVector[T]]] {
       def apply(
-          v: DenseVector[T], nSeq: Seq[Int]): IndexedSeq[DenseVector[T]] = {
+          v: DenseVector[T],
+          nSeq: Seq[Int]): IndexedSeq[DenseVector[T]] = {
         require(nSeq.size < v.size)
 
         val result = new collection.mutable.ArrayBuffer[DenseVector[T]]()
@@ -65,11 +66,13 @@ object split extends UFunc {
       }
     }
 
-  implicit def implIntMatrix[T : ClassTag](implicit zero: Zero[T])
+  implicit def implIntMatrix[T: ClassTag](implicit zero: Zero[T])
     : Impl3[DenseMatrix[T], Int, Int, IndexedSeq[DenseMatrix[T]]] =
     new Impl3[DenseMatrix[T], Int, Int, IndexedSeq[DenseMatrix[T]]] {
       def apply(
-          v: DenseMatrix[T], n: Int, axis: Int): IndexedSeq[DenseMatrix[T]] =
+          v: DenseMatrix[T],
+          n: Int,
+          axis: Int): IndexedSeq[DenseMatrix[T]] =
         axis match {
           case 0 => vsplit(v, n)
           case 1 => hsplit(v, n)
@@ -80,23 +83,23 @@ object split extends UFunc {
 }
 
 object hsplit extends UFunc {
-  implicit def implIntVec[T : ClassTag]: Impl2[
-      DenseVector[T], Int, IndexedSeq[DenseVector[T]]] =
+  implicit def implIntVec[T: ClassTag]
+    : Impl2[DenseVector[T], Int, IndexedSeq[DenseVector[T]]] =
     new Impl2[DenseVector[T], Int, IndexedSeq[DenseVector[T]]] {
       //For vectors just an alias
       def apply(v: DenseVector[T], n: Int): IndexedSeq[DenseVector[T]] =
         hsplit(v, n)
     }
 
-  implicit def implSeqVec[T : ClassTag]: Impl2[
-      DenseVector[T], Seq[Int], IndexedSeq[DenseVector[T]]] =
+  implicit def implSeqVec[T: ClassTag]
+    : Impl2[DenseVector[T], Seq[Int], IndexedSeq[DenseVector[T]]] =
     new Impl2[DenseVector[T], Seq[Int], IndexedSeq[DenseVector[T]]] {
       //For vectors just an alias
       def apply(v: DenseVector[T], n: Seq[Int]): IndexedSeq[DenseVector[T]] =
         hsplit(v, n)
     }
 
-  implicit def implIntMat[T : ClassTag](implicit zero: Zero[T])
+  implicit def implIntMat[T: ClassTag](implicit zero: Zero[T])
     : Impl2[DenseMatrix[T], Int, IndexedSeq[DenseMatrix[T]]] =
     new Impl2[DenseMatrix[T], Int, IndexedSeq[DenseMatrix[T]]] {
       //for matrices
@@ -124,7 +127,7 @@ object hsplit extends UFunc {
 }
 
 object vsplit extends UFunc {
-  implicit def implIntMat[T : ClassTag](implicit zero: Zero[T])
+  implicit def implIntMat[T: ClassTag](implicit zero: Zero[T])
     : Impl2[DenseMatrix[T], Int, IndexedSeq[DenseMatrix[T]]] =
     new Impl2[DenseMatrix[T], Int, IndexedSeq[DenseMatrix[T]]] {
       //for matrices

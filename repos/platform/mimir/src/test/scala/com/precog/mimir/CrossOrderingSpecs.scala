@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -26,7 +26,9 @@ import org.specs2.mutable._
 import com.precog.yggdrasil._
 
 object CrossOrderingSpecs
-    extends Specification with CrossOrdering with FNDummyModule {
+    extends Specification
+    with CrossOrdering
+    with FNDummyModule {
   import instructions._
   import dag._
   import TableModule.CrossOrder._
@@ -67,14 +69,14 @@ object CrossOrderingSpecs
       val left = dag.AbsoluteLoad(Const(CString("/foo"))(line))(line)
       val right = Const(CLong(42))(line)
 
-      val input = Join(Or,
-                       IdentitySort,
-                       Join(Eq, Cross(None), left, right)(line),
-                       left)(line)
-      val expected = Join(Or,
-                          IdentitySort,
-                          Join(Eq, Cross(Some(CrossLeft)), left, right)(line),
-                          left)(line)
+      val input =
+        Join(Or, IdentitySort, Join(Eq, Cross(None), left, right)(line), left)(
+          line)
+      val expected = Join(
+        Or,
+        IdentitySort,
+        Join(Eq, Cross(Some(CrossLeft)), left, right)(line),
+        left)(line)
 
       orderCrosses(input) mustEqual expected
     }
@@ -85,13 +87,14 @@ object CrossOrderingSpecs
       val left = dag.AbsoluteLoad(Const(CString("/foo"))(line))(line)
       val right = Const(CLong(42))(line)
 
-      val input = Filter(IdentitySort,
-                         Join(Eq, Cross(None), left, right)(line),
-                         left)(line)
+      val input =
+        Filter(IdentitySort, Join(Eq, Cross(None), left, right)(line), left)(
+          line)
       val expected =
-        Filter(IdentitySort,
-               Join(Eq, Cross(Some(CrossLeft)), left, right)(line),
-               left)(line)
+        Filter(
+          IdentitySort,
+          Join(Eq, Cross(Some(CrossLeft)), left, right)(line),
+          left)(line)
 
       orderCrosses(input) mustEqual expected
     }
@@ -128,10 +131,10 @@ object CrossOrderingSpecs
       val foo = dag.AbsoluteLoad(Const(CString("/foo"))(line), JTextT)(line)
 
       val input = Join(
-          Add,
-          IdentitySort,
-          Join(Add, Cross(Some(CrossLeft)), foo, Const(CLong(42))(line))(line),
-          foo)(line)
+        Add,
+        IdentitySort,
+        Join(Add, Cross(Some(CrossLeft)), foo, Const(CLong(42))(line))(line),
+        foo)(line)
 
       orderCrosses(input) mustEqual input
     }
@@ -141,13 +144,15 @@ object CrossOrderingSpecs
 
       val foo = dag.AbsoluteLoad(Const(CString("/foo"))(line), JTextT)(line)
 
-      val input = Join(Add,
-                       ValueSort(0),
-                       Join(Add,
-                            Cross(Some(CrossLeft)),
-                            AddSortKey(foo, "a", "b", 0),
-                            Const(CLong(42))(line))(line),
-                       AddSortKey(foo, "a", "b", 0))(line)
+      val input = Join(
+        Add,
+        ValueSort(0),
+        Join(
+          Add,
+          Cross(Some(CrossLeft)),
+          AddSortKey(foo, "a", "b", 0),
+          Const(CLong(42))(line))(line),
+        AddSortKey(foo, "a", "b", 0))(line)
 
       orderCrosses(input) mustEqual input
     }

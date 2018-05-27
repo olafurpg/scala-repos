@@ -10,8 +10,7 @@ object intervalSubsetPartialOrder {
     *
     * I <= J if I is a subset of J.
     */
-  class IntervalSubsetPartialOrder[A : Order]
-      extends PartialOrder[Interval[A]] {
+  class IntervalSubsetPartialOrder[A: Order] extends PartialOrder[Interval[A]] {
     override def eqv(x: Interval[A], y: Interval[A]): Boolean = (x == y)
     override def lteqv(x: Interval[A], y: Interval[A]): Boolean =
       x.isSubsetOf(y)
@@ -29,6 +28,6 @@ object intervalSubsetPartialOrder {
       else Double.NaN
     }
   }
-  implicit def intervalSubsetPartialOrder[
-      A : Order]: PartialOrder[Interval[A]] = new IntervalSubsetPartialOrder[A]
+  implicit def intervalSubsetPartialOrder[A: Order]: PartialOrder[Interval[A]] =
+    new IntervalSubsetPartialOrder[A]
 }

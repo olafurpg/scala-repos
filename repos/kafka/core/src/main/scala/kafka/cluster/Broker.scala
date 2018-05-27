@@ -5,7 +5,7 @@
   * The ASF licenses this file to You under the Apache License, Version 2.0
   * (the "License"); you may not use this file except in compliance with
   * the License.  You may obtain a copy of the License at
-  * 
+  *
   *    http://www.apache.org/licenses/LICENSE-2.0
   *
   * Unless required by applicable law or agreed to in writing, software
@@ -19,7 +19,11 @@ package kafka.cluster
 import java.nio.ByteBuffer
 
 import kafka.api.ApiUtils._
-import kafka.common.{BrokerEndPointNotAvailableException, BrokerNotAvailableException, KafkaException}
+import kafka.common.{
+  BrokerEndPointNotAvailableException,
+  BrokerNotAvailableException,
+  KafkaException
+}
 import kafka.utils.Json
 import org.apache.kafka.common.Node
 import org.apache.kafka.common.protocol.SecurityProtocol
@@ -78,12 +82,15 @@ object Broker {
           val endpoints =
             if (version < 1)
               throw new KafkaException(
-                  s"Unsupported version of broker registration: $brokerInfoString")
+                s"Unsupported version of broker registration: $brokerInfoString")
             else if (version == 1) {
               val host = brokerInfo("host").asInstanceOf[String]
               val port = brokerInfo("port").asInstanceOf[Int]
-              Map(SecurityProtocol.PLAINTEXT -> new EndPoint(
-                      host, port, SecurityProtocol.PLAINTEXT))
+              Map(
+                SecurityProtocol.PLAINTEXT -> new EndPoint(
+                  host,
+                  port,
+                  SecurityProtocol.PLAINTEXT))
             } else {
               val listeners =
                 brokerInfo("endpoints").asInstanceOf[List[String]]
@@ -98,21 +105,21 @@ object Broker {
             .map(_.asInstanceOf[String])
           new Broker(id, endpoints, rack)
         case None =>
-          throw new BrokerNotAvailableException(
-              s"Broker id $id does not exist")
+          throw new BrokerNotAvailableException(s"Broker id $id does not exist")
       }
     } catch {
       case t: Throwable =>
         throw new KafkaException(
-            s"Failed to parse the broker info from zookeeper: $brokerInfoString",
-            t)
+          s"Failed to parse the broker info from zookeeper: $brokerInfoString",
+          t)
     }
   }
 }
 
-case class Broker(id: Int,
-                  endPoints: collection.Map[SecurityProtocol, EndPoint],
-                  rack: Option[String]) {
+case class Broker(
+    id: Int,
+    endPoints: collection.Map[SecurityProtocol, EndPoint],
+    rack: Option[String]) {
 
   override def toString: String =
     s"$id : ${endPoints.values.mkString("(", ",", ")")} : ${rack.orNull}"
@@ -121,10 +128,11 @@ case class Broker(id: Int,
     this(id, endPoints, None)
   }
 
-  def this(id: Int,
-           host: String,
-           port: Int,
-           protocol: SecurityProtocol = SecurityProtocol.PLAINTEXT) = {
+  def this(
+      id: Int,
+      host: String,
+      port: Int,
+      protocol: SecurityProtocol = SecurityProtocol.PLAINTEXT) = {
     this(id, Map(protocol -> EndPoint(host, port, protocol)), None)
   }
 
@@ -134,17 +142,17 @@ case class Broker(id: Int,
 
   def getNode(protocolType: SecurityProtocol): Node = {
     val endpoint = endPoints.getOrElse(
-        protocolType,
-        throw new BrokerEndPointNotAvailableException(
-            s"End point with security protocol $protocolType not found for broker $id"))
+      protocolType,
+      throw new BrokerEndPointNotAvailableException(
+        s"End point with security protocol $protocolType not found for broker $id"))
     new Node(id, endpoint.host, endpoint.port)
   }
 
   def getBrokerEndPoint(protocolType: SecurityProtocol): BrokerEndPoint = {
     val endpoint = endPoints.getOrElse(
-        protocolType,
-        throw new BrokerEndPointNotAvailableException(
-            s"End point with security protocol $protocolType not found for broker $id"))
+      protocolType,
+      throw new BrokerEndPointNotAvailableException(
+        s"End point with security protocol $protocolType not found for broker $id"))
     new BrokerEndPoint(id, endpoint.host, endpoint.port)
   }
 }

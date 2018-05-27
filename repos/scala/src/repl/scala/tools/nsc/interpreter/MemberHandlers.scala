@@ -62,15 +62,15 @@ trait MemberHandlers {
 
   def chooseHandler(member: Tree): MemberHandler = member match {
     case member: DefDef if isTermMacro(member) => new TermMacroHandler(member)
-    case member: DefDef => new DefHandler(member)
-    case member: ValDef => new ValHandler(member)
-    case member: ModuleDef => new ModuleHandler(member)
-    case member: ClassDef => new ClassHandler(member)
-    case member: TypeDef => new TypeAliasHandler(member)
-    case member: Assign => new AssignHandler(member)
-    case member: Import => new ImportHandler(member)
-    case DocDef(_, documented) => chooseHandler(documented)
-    case member => new GenericHandler(member)
+    case member: DefDef                        => new DefHandler(member)
+    case member: ValDef                        => new ValHandler(member)
+    case member: ModuleDef                     => new ModuleHandler(member)
+    case member: ClassDef                      => new ClassHandler(member)
+    case member: TypeDef                       => new TypeAliasHandler(member)
+    case member: Assign                        => new AssignHandler(member)
+    case member: Import                        => new ImportHandler(member)
+    case DocDef(_, documented)                 => chooseHandler(documented)
+    case member                                => new GenericHandler(member)
   }
 
   sealed abstract class MemberDefHandler(override val member: MemberDef)
@@ -165,8 +165,7 @@ trait MemberHandlers {
     }
   }
 
-  abstract class MacroHandler(member: DefDef)
-      extends MemberDefHandler(member) {
+  abstract class MacroHandler(member: DefDef) extends MemberDefHandler(member) {
     override def referencedNames =
       super.referencedNames
         .flatMap(name => List(name.toTermName, name.toTypeName))
@@ -197,7 +196,9 @@ trait MemberHandlers {
       val lhsType = string2code(req lookupTypeOf name)
       val res = string2code(req fullPath name)
       """ + "%s: %s = " + %s + "\n" """.format(
-          string2code(lhs.toString), lhsType, res) + "\n"
+        string2code(lhs.toString),
+        lhsType,
+        res) + "\n"
     }
   }
 
@@ -232,7 +233,7 @@ trait MemberHandlers {
     def targetType =
       intp.global.rootMirror.getModuleIfDefined("" + expr) match {
         case NoSymbol => intp.typeOfExpression("" + expr)
-        case sym => sym.thisType
+        case sym      => sym.thisType
       }
     private def importableTargetMembers = importableMembers(targetType).toList
     // wildcard imports, e.g. import foo._
@@ -247,12 +248,13 @@ trait MemberHandlers {
     def implicitSymbols = importedSymbols filter (_.isImplicit)
     def importedSymbols = individualSymbols ++ wildcardSymbols
 
-    private val selectorNames = selectorRenames filterNot (_ == nme.USCOREkw) flatMap
-    (_.bothNames) toSet
+    private val selectorNames =
+      selectorRenames filterNot (_ == nme.USCOREkw) flatMap
+        (_.bothNames) toSet
     lazy val individualSymbols: List[Symbol] = exitingTyper(
-        importableTargetMembers filter (m => selectorNames(m.name)))
+      importableTargetMembers filter (m => selectorNames(m.name)))
     lazy val wildcardSymbols: List[Symbol] = exitingTyper(
-        if (importsWildcard) importableTargetMembers else Nil)
+      if (importsWildcard) importableTargetMembers else Nil)
 
     /** Complete list of names imported by a wildcard */
     lazy val wildcardNames: List[Name] = wildcardSymbols map (_.name)
@@ -261,7 +263,8 @@ trait MemberHandlers {
     /** The names imported by this statement */
     override lazy val importedNames: List[Name] =
       wildcardNames ++ individualNames
-    lazy val importsSymbolNamed: Set[String] = importedNames map (_.toString) toSet
+    lazy val importsSymbolNamed: Set[String] =
+      importedNames map (_.toString) toSet
 
     def importString = imp.toString
     override def resultExtractionCode(req: Request) =

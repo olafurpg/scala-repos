@@ -25,12 +25,15 @@ import java.util.Comparator
  * Handles numerical hashing properly
  */
 class IntegralComparator
-    extends Comparator[AnyRef] with Hasher[AnyRef] with Serializable {
+    extends Comparator[AnyRef]
+    with Hasher[AnyRef]
+    with Serializable {
 
-  val integralTypes: Set[Class[_]] = Set(classOf[java.lang.Long],
-                                         classOf[java.lang.Integer],
-                                         classOf[java.lang.Short],
-                                         classOf[java.lang.Byte])
+  val integralTypes: Set[Class[_]] = Set(
+    classOf[java.lang.Long],
+    classOf[java.lang.Integer],
+    classOf[java.lang.Short],
+    classOf[java.lang.Byte])
 
   def isIntegral(boxed: AnyRef) = integralTypes(boxed.getClass)
 

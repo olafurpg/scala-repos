@@ -18,16 +18,18 @@ import org.bson.BSONObject // ADDED
 import com.mongodb.hadoop.MongoInputFormat // ADDED
 
 case class DataSourceParams( // CHANGED
-                            host: String,
-                            port: Int,
-                            db: String, // DB name
-                            collection: String // collection name
-)
-    extends Params
+    host: String,
+    port: Int,
+    db: String, // DB name
+    collection: String // collection name
+) extends Params
 
 class DataSource(val dsp: DataSourceParams)
     extends PDataSource[
-        TrainingData, EmptyEvaluationInfo, Query, EmptyActualResult] {
+      TrainingData,
+      EmptyEvaluationInfo,
+      Query,
+      EmptyActualResult] {
 
   @transient lazy val logger = Logger[this.type]
 
@@ -35,20 +37,22 @@ class DataSource(val dsp: DataSourceParams)
     // CHANGED
     val config = new Configuration()
     config.set(
-        "mongo.input.uri",
-        s"mongodb://${dsp.host}:${dsp.port}/${dsp.db}.${dsp.collection}")
+      "mongo.input.uri",
+      s"mongodb://${dsp.host}:${dsp.port}/${dsp.db}.${dsp.collection}")
 
-    val mongoRDD = sc.newAPIHadoopRDD(config,
-                                      classOf[MongoInputFormat],
-                                      classOf[Object],
-                                      classOf[BSONObject])
+    val mongoRDD = sc.newAPIHadoopRDD(
+      config,
+      classOf[MongoInputFormat],
+      classOf[Object],
+      classOf[BSONObject])
 
     // mongoRDD contains tuples of (ObjectId, BSONObject)
     val ratings = mongoRDD.map {
       case (id, bson) =>
-        Rating(bson.get("uid").asInstanceOf[String],
-               bson.get("iid").asInstanceOf[String],
-               bson.get("rating").asInstanceOf[Double])
+        Rating(
+          bson.get("uid").asInstanceOf[String],
+          bson.get("iid").asInstanceOf[String],
+          bson.get("rating").asInstanceOf[Double])
     }
     new TrainingData(ratings)
   }
@@ -62,8 +66,7 @@ case class Rating(
 
 class TrainingData(
     val ratings: RDD[Rating]
-)
-    extends Serializable {
+) extends Serializable {
   override def toString = {
     s"ratings: [${ratings.count()}] (${ratings.take(2).toList}...)"
   }

@@ -31,13 +31,13 @@ private[streaming] object UIUtils {
     * Return the short string for a `TimeUnit`.
     */
   def shortTimeUnitString(unit: TimeUnit): String = unit match {
-    case TimeUnit.NANOSECONDS => "ns"
+    case TimeUnit.NANOSECONDS  => "ns"
     case TimeUnit.MICROSECONDS => "us"
     case TimeUnit.MILLISECONDS => "ms"
-    case TimeUnit.SECONDS => "sec"
-    case TimeUnit.MINUTES => "min"
-    case TimeUnit.HOURS => "hrs"
-    case TimeUnit.DAYS => "days"
+    case TimeUnit.SECONDS      => "sec"
+    case TimeUnit.MINUTES      => "min"
+    case TimeUnit.HOURS        => "hrs"
+    case TimeUnit.DAYS         => "days"
   }
 
   /**
@@ -70,13 +70,13 @@ private[streaming] object UIUtils {
     */
   def convertToTimeUnit(milliseconds: Long, unit: TimeUnit): Double =
     unit match {
-      case TimeUnit.NANOSECONDS => milliseconds * 1000 * 1000
+      case TimeUnit.NANOSECONDS  => milliseconds * 1000 * 1000
       case TimeUnit.MICROSECONDS => milliseconds * 1000
       case TimeUnit.MILLISECONDS => milliseconds
-      case TimeUnit.SECONDS => milliseconds / 1000.0
-      case TimeUnit.MINUTES => milliseconds / 1000.0 / 60.0
-      case TimeUnit.HOURS => milliseconds / 1000.0 / 60.0 / 60.0
-      case TimeUnit.DAYS => milliseconds / 1000.0 / 60.0 / 60.0 / 24.0
+      case TimeUnit.SECONDS      => milliseconds / 1000.0
+      case TimeUnit.MINUTES      => milliseconds / 1000.0 / 60.0
+      case TimeUnit.HOURS        => milliseconds / 1000.0 / 60.0 / 60.0
+      case TimeUnit.DAYS         => milliseconds / 1000.0 / 60.0 / 60.0 / 24.0
     }
 
   // SimpleDateFormat is not thread-safe. Don't expose it to avoid improper use.
@@ -101,12 +101,14 @@ private[streaming] object UIUtils {
     *                     only `HH:mm:ss` or `HH:mm:ss.SSS` depending on `batchInterval`
     * @param timezone only for test
     */
-  def formatBatchTime(batchTime: Long,
-                      batchInterval: Long,
-                      showYYYYMMSS: Boolean = true,
-                      timezone: TimeZone = null): String = {
-    val oldTimezones = (batchTimeFormat.get.getTimeZone,
-                        batchTimeFormatWithMilliseconds.get.getTimeZone)
+  def formatBatchTime(
+      batchTime: Long,
+      batchInterval: Long,
+      showYYYYMMSS: Boolean = true,
+      timezone: TimeZone = null): String = {
+    val oldTimezones = (
+      batchTimeFormat.get.getTimeZone,
+      batchTimeFormatWithMilliseconds.get.getTimeZone)
     if (timezone != null) {
       batchTimeFormat.get.setTimeZone(timezone)
       batchTimeFormatWithMilliseconds.get.setTimeZone(timezone)
@@ -152,8 +154,7 @@ private[streaming] object UIUtils {
       includeFirstLineInExpandDetails: Boolean = true): Seq[Node] = {
     val isMultiline = failureReason.indexOf('\n') >= 0
     // Display the first line by default
-    val failureReasonSummary = StringEscapeUtils.escapeHtml4(
-        if (isMultiline) {
+    val failureReasonSummary = StringEscapeUtils.escapeHtml4(if (isMultiline) {
       failureReason.substring(0, failureReason.indexOf('\n'))
     } else {
       failureReason

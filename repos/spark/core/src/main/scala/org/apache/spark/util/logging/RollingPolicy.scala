@@ -49,14 +49,14 @@ private[spark] class TimeBasedRollingPolicy(
     var rolloverIntervalMillis: Long,
     rollingFileSuffixPattern: String,
     checkIntervalConstraint: Boolean = true // set to false while testing
-)
-    extends RollingPolicy with Logging {
+) extends RollingPolicy
+    with Logging {
 
   import TimeBasedRollingPolicy._
   if (checkIntervalConstraint &&
       rolloverIntervalMillis < MINIMUM_INTERVAL_SECONDS * 1000L) {
     logWarning(
-        s"Rolling interval [${rolloverIntervalMillis / 1000L} seconds] is too small. " +
+      s"Rolling interval [${rolloverIntervalMillis / 1000L} seconds] is too small. " +
         s"Setting the interval to the acceptable minimum of $MINIMUM_INTERVAL_SECONDS seconds.")
     rolloverIntervalMillis = MINIMUM_INTERVAL_SECONDS * 1000L
   }
@@ -73,7 +73,7 @@ private[spark] class TimeBasedRollingPolicy(
   def rolledOver() {
     nextRolloverTime = calculateNextRolloverTime()
     logDebug(
-        s"Current time: ${System.currentTimeMillis}, next rollover time: " +
+      s"Current time: ${System.currentTimeMillis}, next rollover time: " +
         nextRolloverTime)
   }
 
@@ -103,14 +103,13 @@ private[spark] object TimeBasedRollingPolicy {
 private[spark] class SizeBasedRollingPolicy(
     var rolloverSizeBytes: Long,
     checkSizeConstraint: Boolean = true // set to false while testing
-)
-    extends RollingPolicy with Logging {
+) extends RollingPolicy
+    with Logging {
 
   import SizeBasedRollingPolicy._
   if (checkSizeConstraint && rolloverSizeBytes < MINIMUM_SIZE_BYTES) {
-    logWarning(
-        s"Rolling size [$rolloverSizeBytes bytes] is too small. " +
-        s"Setting the size to the acceptable minimum of $MINIMUM_SIZE_BYTES bytes.")
+    logWarning(s"Rolling size [$rolloverSizeBytes bytes] is too small. " +
+      s"Setting the size to the acceptable minimum of $MINIMUM_SIZE_BYTES bytes.")
     rolloverSizeBytes = MINIMUM_SIZE_BYTES
   }
 
@@ -120,7 +119,7 @@ private[spark] class SizeBasedRollingPolicy(
   /** Should rollover if the next set of bytes is going to exceed the size limit */
   def shouldRollover(bytesToBeWritten: Long): Boolean = {
     logInfo(
-        s"$bytesToBeWritten + $bytesWrittenSinceRollover > $rolloverSizeBytes")
+      s"$bytesToBeWritten + $bytesWrittenSinceRollover > $rolloverSizeBytes")
     bytesToBeWritten + bytesWrittenSinceRollover > rolloverSizeBytes
   }
 

@@ -17,7 +17,12 @@
 
 package org.apache.spark.sql.api.r
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, DataInputStream, DataOutputStream}
+import java.io.{
+  ByteArrayInputStream,
+  ByteArrayOutputStream,
+  DataInputStream,
+  DataOutputStream
+}
 
 import scala.util.matching.Regex
 
@@ -51,36 +56,36 @@ private[r] object SQLUtils {
 
   def getSQLDataType(dataType: String): DataType = {
     dataType match {
-      case "byte" => org.apache.spark.sql.types.ByteType
-      case "integer" => org.apache.spark.sql.types.IntegerType
-      case "float" => org.apache.spark.sql.types.FloatType
-      case "double" => org.apache.spark.sql.types.DoubleType
-      case "numeric" => org.apache.spark.sql.types.DoubleType
+      case "byte"      => org.apache.spark.sql.types.ByteType
+      case "integer"   => org.apache.spark.sql.types.IntegerType
+      case "float"     => org.apache.spark.sql.types.FloatType
+      case "double"    => org.apache.spark.sql.types.DoubleType
+      case "numeric"   => org.apache.spark.sql.types.DoubleType
       case "character" => org.apache.spark.sql.types.StringType
-      case "string" => org.apache.spark.sql.types.StringType
-      case "binary" => org.apache.spark.sql.types.BinaryType
-      case "raw" => org.apache.spark.sql.types.BinaryType
-      case "logical" => org.apache.spark.sql.types.BooleanType
-      case "boolean" => org.apache.spark.sql.types.BooleanType
+      case "string"    => org.apache.spark.sql.types.StringType
+      case "binary"    => org.apache.spark.sql.types.BinaryType
+      case "raw"       => org.apache.spark.sql.types.BinaryType
+      case "logical"   => org.apache.spark.sql.types.BooleanType
+      case "boolean"   => org.apache.spark.sql.types.BooleanType
       case "timestamp" => org.apache.spark.sql.types.TimestampType
-      case "date" => org.apache.spark.sql.types.DateType
-      case r"\Aarray<(.+)${ elemType }>\Z" =>
+      case "date"      => org.apache.spark.sql.types.DateType
+      case r"\Aarray<(.+)${elemType}>\Z" =>
         org.apache.spark.sql.types.ArrayType(getSQLDataType(elemType))
-      case r"\Amap<(.+)${ keyType },(.+)${ valueType }>\Z" =>
+      case r"\Amap<(.+)${keyType},(.+)${valueType}>\Z" =>
         if (keyType != "string" && keyType != "character") {
           throw new IllegalArgumentException(
-              "Key type of a map must be string or character")
+            "Key type of a map must be string or character")
         }
         org.apache.spark.sql.types
           .MapType(getSQLDataType(keyType), getSQLDataType(valueType))
-      case r"\Astruct<(.+)${ fieldsStr }>\Z" =>
+      case r"\Astruct<(.+)${fieldsStr}>\Z" =>
         if (fieldsStr(fieldsStr.length - 1) == ',') {
           throw new IllegalArgumentException(s"Invaid type $dataType")
         }
         val fields = fieldsStr.split(",")
         val structFields = fields.map { field =>
           field match {
-            case r"\A(.+)${ fieldName }:(.+)${ fieldType }\Z" =>
+            case r"\A(.+)${fieldName}:(.+)${fieldType}\Z" =>
               createStructField(fieldName, fieldType, true)
 
             case _ =>
@@ -93,14 +98,17 @@ private[r] object SQLUtils {
   }
 
   def createStructField(
-      name: String, dataType: String, nullable: Boolean): StructField = {
+      name: String,
+      dataType: String,
+      nullable: Boolean): StructField = {
     val dtObj = getSQLDataType(dataType)
     StructField(name, dtObj, nullable)
   }
 
-  def createDF(rdd: RDD[Array[Byte]],
-               schema: StructType,
-               sqlContext: SQLContext): DataFrame = {
+  def createDF(
+      rdd: RDD[Array[Byte]],
+      schema: StructType,
+      sqlContext: SQLContext): DataFrame = {
     val num = schema.fields.length
     val rowRDD = rdd.map(bytesToRow(_, schema))
     sqlContext.createDataFrame(rowRDD, schema)
@@ -122,8 +130,7 @@ private[r] object SQLUtils {
     val bis = new ByteArrayInputStream(bytes)
     val dis = new DataInputStream(bis)
     val num = SerDe.readInt(dis)
-    Row.fromSeq(
-        (0 until num).map { i =>
+    Row.fromSeq((0 until num).map { i =>
       doConversion(SerDe.readObject(dis), schema.fields(i).dataType)
     }.toSeq)
   }
@@ -154,23 +161,25 @@ private[r] object SQLUtils {
 
   def saveMode(mode: String): SaveMode = {
     mode match {
-      case "append" => SaveMode.Append
+      case "append"    => SaveMode.Append
       case "overwrite" => SaveMode.Overwrite
-      case "error" => SaveMode.ErrorIfExists
-      case "ignore" => SaveMode.Ignore
+      case "error"     => SaveMode.ErrorIfExists
+      case "ignore"    => SaveMode.Ignore
     }
   }
 
-  def loadDF(sqlContext: SQLContext,
-             source: String,
-             options: java.util.Map[String, String]): DataFrame = {
+  def loadDF(
+      sqlContext: SQLContext,
+      source: String,
+      options: java.util.Map[String, String]): DataFrame = {
     sqlContext.read.format(source).options(options).load()
   }
 
-  def loadDF(sqlContext: SQLContext,
-             source: String,
-             schema: StructType,
-             options: java.util.Map[String, String]): DataFrame = {
+  def loadDF(
+      sqlContext: SQLContext,
+      source: String,
+      schema: StructType,
+      options: java.util.Map[String, String]): DataFrame = {
     sqlContext.read.format(source).schema(schema).options(options).load()
   }
 

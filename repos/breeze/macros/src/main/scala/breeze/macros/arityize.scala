@@ -26,13 +26,16 @@ object arityize {
         val results = for (order <- 1 to maxOrder) yield {
           val bindings = Map(name.encoded -> order)
           val newTemplate = Template(
-              impl.parents,
-              impl.self,
-              impl.body.flatMap(x => expandArity(c, order, bindings)(x)))
+            impl.parents,
+            impl.self,
+            impl.body.flatMap(x => expandArity(c, order, bindings)(x)))
           val newTargs =
             targs.flatMap(arg => expandTypeDef(c, order, bindings)(arg))
           ClassDef(
-              mods, newTypeName(name.encoded + order), newTargs, newTemplate)
+            mods,
+            newTypeName(name.encoded + order),
+            newTargs,
+            newTemplate)
         }
 
         val ret = c.Expr(Block(results.toList, Literal(Constant(()))))
@@ -49,12 +52,13 @@ object arityize {
           val newTargs =
             targs.flatMap(arg => expandTypeDef(c, order, bindings)(arg))
           val newRet = expandArity(c, order, bindings)(tpt).head
-          DefDef(mods,
-                 newTermName(name.encoded + order),
-                 newTargs,
-                 newVargs,
-                 newRet,
-                 newImpl)
+          DefDef(
+            mods,
+            newTermName(name.encoded + order),
+            newTargs,
+            newVargs,
+            newRet,
+            newImpl)
         }
 
         val ret = c.Expr(Block(results.toList, Literal(Constant(()))))
@@ -81,9 +85,9 @@ object arityize {
         val newParents =
           impl.parents.flatMap(tree => expandArity(c, order, bindings)(tree))
         val newTemplate = Template(
-            newParents,
-            impl.self,
-            impl.body.flatMap(x => expandArity(c, order, bindings)(x)))
+          newParents,
+          impl.self,
+          impl.body.flatMap(x => expandArity(c, order, bindings)(x)))
         val newTargs =
           targs.flatMap(arg => expandTypeDef(c, order, bindings)(arg))
         Seq(ClassDef(mods, name, newTargs, newTemplate))
@@ -101,7 +105,7 @@ object arityize {
                 Seq(Ident(newTermName(nme.encoded + bindings(sym.toString))))
               case AppliedTypeTree(Ident(nme), targs) =>
                 val newName = Ident(
-                    newTypeName(nme.encoded + bindings(sym.toString)))
+                  newTypeName(nme.encoded + bindings(sym.toString)))
                 val newTargs =
                   targs.flatMap(arg => expandArity(c, order, bindings)(arg))
                 Seq(AppliedTypeTree(newName, newTargs))
@@ -134,17 +138,20 @@ object arityize {
             Seq(tree)
         }
       case Block(stats, ret) =>
-        Seq(Block(stats.flatMap(st => expandArity(c, order, bindings)(st)),
-                  expandArity(c, order, bindings)(ret).last))
+        Seq(
+          Block(
+            stats.flatMap(st => expandArity(c, order, bindings)(st)),
+            expandArity(c, order, bindings)(ret).last))
       case Ident(nme) if nme.encoded == "__order__" =>
         Seq(Literal(Constant(order)))
-      case t @ Ident(x) => Seq(t)
+      case t @ Ident(x)   => Seq(t)
       case t @ Literal(x) => Seq(t)
       case Apply(who, args) =>
         for (w2 <- expandArity(c, order, bindings)(who);
-        args2 = args.flatMap(arg => expandArity(c, order, bindings)(arg))) yield {
-          Apply(w2, args2)
-        }
+             args2 = args.flatMap(arg => expandArity(c, order, bindings)(arg)))
+          yield {
+            Apply(w2, args2)
+          }
       case Select(lhs, name) =>
         for (w2 <- expandArity(c, order, bindings)(lhs)) yield {
           Select(w2, name)
@@ -170,10 +177,11 @@ object arityize {
       List.tabulate(order) { i =>
         val newBindings = bindings + (vdef.name.encoded -> (i + 1))
 //        println(vdef.tpt + " " + expandArity(c, order, newBindings)(vdef.tpt).head)
-        ValDef(vdef.mods,
-               newTermName(vdef.name.encoded + (i + 1)),
-               expandArity(c, order, newBindings)(vdef.tpt).head,
-               vdef.rhs)
+        ValDef(
+          vdef.mods,
+          newTermName(vdef.name.encoded + (i + 1)),
+          expandArity(c, order, newBindings)(vdef.tpt).head,
+          vdef.rhs)
       }
     } else {
       shouldRelativize(c)(vdef.mods) match {
@@ -181,10 +189,11 @@ object arityize {
           val newBindings = bindings + (vdef.name.encoded -> bindings(x))
           val newTpt = expandArity(c, order, newBindings)(vdef.tpt).head
           List(
-              ValDef(vdef.mods,
-                     newTermName(vdef.name.encoded + bindings(x)),
-                     newTpt,
-                     vdef.rhs))
+            ValDef(
+              vdef.mods,
+              newTermName(vdef.name.encoded + bindings(x)),
+              newTpt,
+              vdef.rhs))
         case _ =>
           val newTpt = expandArity(c, order, bindings)(vdef.tpt).head
           List(ValDef(vdef.mods, vdef.name, newTpt, vdef.rhs))
@@ -197,21 +206,23 @@ object arityize {
     import c.mirror.universe._
     if (shouldExpand(c)(vdef.mods)) {
       List.tabulate(order)(
-          i =>
-            TypeDef(vdef.mods,
-                    newTypeName(vdef.name.encoded + (i + 1)),
-                    vdef.tparams,
-                    vdef.rhs))
+        i =>
+          TypeDef(
+            vdef.mods,
+            newTypeName(vdef.name.encoded + (i + 1)),
+            vdef.tparams,
+            vdef.rhs))
     } else if (shouldRepeat(c)(vdef.mods)) {
       List.fill(order)(vdef)
     } else {
       shouldRelativize(c)(vdef.mods) match {
         case Some(x) =>
           List(
-              TypeDef(vdef.mods,
-                      newTypeName(vdef.name.encoded + bindings(x)),
-                      vdef.tparams,
-                      vdef.rhs))
+            TypeDef(
+              vdef.mods,
+              newTypeName(vdef.name.encoded + bindings(x)),
+              vdef.tparams,
+              vdef.rhs))
         case _ =>
           List(vdef)
       }
@@ -223,7 +234,7 @@ object arityize {
     import c.mirror.universe._
     td.annotations.exists {
       case q"new arityize.replicate" => true
-      case _ => false
+      case _                         => false
     }
   }
 
@@ -232,7 +243,7 @@ object arityize {
     import c.mirror.universe._
     td.annotations.exists {
       case q"new arityize.repeat" => true
-      case _ => false
+      case _                      => false
     }
   }
 

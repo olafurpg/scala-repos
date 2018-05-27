@@ -34,17 +34,17 @@ case class BitwiseAnd(left: Expression, right: Expression)
 
   private lazy val and: (Any, Any) => Any = dataType match {
     case ByteType =>
-      ((evalE1: Byte, evalE2: Byte) =>
-        (evalE1 & evalE2).toByte).asInstanceOf[(Any, Any) => Any]
+      ((evalE1: Byte, evalE2: Byte) => (evalE1 & evalE2).toByte)
+        .asInstanceOf[(Any, Any) => Any]
     case ShortType =>
-      ((evalE1: Short, evalE2: Short) =>
-        (evalE1 & evalE2).toShort).asInstanceOf[(Any, Any) => Any]
+      ((evalE1: Short, evalE2: Short) => (evalE1 & evalE2).toShort)
+        .asInstanceOf[(Any, Any) => Any]
     case IntegerType =>
-      ((evalE1: Int, evalE2: Int) =>
-        evalE1 & evalE2).asInstanceOf[(Any, Any) => Any]
+      ((evalE1: Int, evalE2: Int) => evalE1 & evalE2)
+        .asInstanceOf[(Any, Any) => Any]
     case LongType =>
-      ((evalE1: Long, evalE2: Long) =>
-        evalE1 & evalE2).asInstanceOf[(Any, Any) => Any]
+      ((evalE1: Long, evalE2: Long) => evalE1 & evalE2)
+        .asInstanceOf[(Any, Any) => Any]
   }
 
   protected override def nullSafeEval(input1: Any, input2: Any): Any =
@@ -65,17 +65,17 @@ case class BitwiseOr(left: Expression, right: Expression)
 
   private lazy val or: (Any, Any) => Any = dataType match {
     case ByteType =>
-      ((evalE1: Byte, evalE2: Byte) =>
-        (evalE1 | evalE2).toByte).asInstanceOf[(Any, Any) => Any]
+      ((evalE1: Byte, evalE2: Byte) => (evalE1 | evalE2).toByte)
+        .asInstanceOf[(Any, Any) => Any]
     case ShortType =>
-      ((evalE1: Short, evalE2: Short) =>
-        (evalE1 | evalE2).toShort).asInstanceOf[(Any, Any) => Any]
+      ((evalE1: Short, evalE2: Short) => (evalE1 | evalE2).toShort)
+        .asInstanceOf[(Any, Any) => Any]
     case IntegerType =>
-      ((evalE1: Int, evalE2: Int) =>
-        evalE1 | evalE2).asInstanceOf[(Any, Any) => Any]
+      ((evalE1: Int, evalE2: Int) => evalE1 | evalE2)
+        .asInstanceOf[(Any, Any) => Any]
     case LongType =>
-      ((evalE1: Long, evalE2: Long) =>
-        evalE1 | evalE2).asInstanceOf[(Any, Any) => Any]
+      ((evalE1: Long, evalE2: Long) => evalE1 | evalE2)
+        .asInstanceOf[(Any, Any) => Any]
   }
 
   protected override def nullSafeEval(input1: Any, input2: Any): Any =
@@ -96,17 +96,17 @@ case class BitwiseXor(left: Expression, right: Expression)
 
   private lazy val xor: (Any, Any) => Any = dataType match {
     case ByteType =>
-      ((evalE1: Byte, evalE2: Byte) =>
-        (evalE1 ^ evalE2).toByte).asInstanceOf[(Any, Any) => Any]
+      ((evalE1: Byte, evalE2: Byte) => (evalE1 ^ evalE2).toByte)
+        .asInstanceOf[(Any, Any) => Any]
     case ShortType =>
-      ((evalE1: Short, evalE2: Short) =>
-        (evalE1 ^ evalE2).toShort).asInstanceOf[(Any, Any) => Any]
+      ((evalE1: Short, evalE2: Short) => (evalE1 ^ evalE2).toShort)
+        .asInstanceOf[(Any, Any) => Any]
     case IntegerType =>
-      ((evalE1: Int, evalE2: Int) =>
-        evalE1 ^ evalE2).asInstanceOf[(Any, Any) => Any]
+      ((evalE1: Int, evalE2: Int) => evalE1 ^ evalE2)
+        .asInstanceOf[(Any, Any) => Any]
     case LongType =>
-      ((evalE1: Long, evalE2: Long) =>
-        evalE1 ^ evalE2).asInstanceOf[(Any, Any) => Any]
+      ((evalE1: Long, evalE2: Long) => evalE1 ^ evalE2)
+        .asInstanceOf[(Any, Any) => Any]
   }
 
   protected override def nullSafeEval(input1: Any, input2: Any): Any =
@@ -117,7 +117,8 @@ case class BitwiseXor(left: Expression, right: Expression)
   * A function that calculates bitwise not(~) of a number.
   */
 case class BitwiseNot(child: Expression)
-    extends UnaryExpression with ExpectsInputTypes {
+    extends UnaryExpression
+    with ExpectsInputTypes {
 
   override def inputTypes: Seq[AbstractDataType] = Seq(IntegralType)
 

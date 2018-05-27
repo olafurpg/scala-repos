@@ -44,8 +44,8 @@ class Dispatcher(
 
   @volatile private var executorServiceDelegate: LazyExecutorServiceDelegate =
     new LazyExecutorServiceDelegate(
-        executorServiceFactoryProvider.createExecutorServiceFactory(
-            id, threadFactory))
+      executorServiceFactoryProvider
+        .createExecutorServiceFactory(id, threadFactory))
 
   protected final def executorService: ExecutorServiceDelegate =
     executorServiceDelegate
@@ -54,7 +54,8 @@ class Dispatcher(
     * INTERNAL API
     */
   protected[akka] def dispatch(
-      receiver: ActorCell, invocation: Envelope): Unit = {
+      receiver: ActorCell,
+      invocation: Envelope): Unit = {
     val mbox = receiver.mailbox
     mbox.enqueue(receiver.self, invocation)
     registerForExecution(mbox, true, false)
@@ -64,7 +65,8 @@ class Dispatcher(
     * INTERNAL API
     */
   protected[akka] def systemDispatch(
-      receiver: ActorCell, invocation: SystemMessage): Unit = {
+      receiver: ActorCell,
+      invocation: SystemMessage): Unit = {
     val mbox = receiver.mailbox
     mbox.systemEnqueue(receiver.self, invocation)
     registerForExecution(mbox, false, true)
@@ -83,10 +85,11 @@ class Dispatcher(
         } catch {
           case e2: RejectedExecutionException ⇒
             eventStream.publish(
-                Error(e,
-                      getClass.getName,
-                      getClass,
-                      "executeTask was rejected twice!"))
+              Error(
+                e,
+                getClass.getName,
+                getClass,
+                "executeTask was rejected twice!"))
             throw e2
         }
     }
@@ -96,15 +99,16 @@ class Dispatcher(
     * INTERNAL API
     */
   protected[akka] def createMailbox(
-      actor: akka.actor.Cell, mailboxType: MailboxType): Mailbox = {
+      actor: akka.actor.Cell,
+      mailboxType: MailboxType): Mailbox = {
     new Mailbox(mailboxType.create(Some(actor.self), Some(actor.system)))
     with DefaultSystemMessageQueue
   }
 
   private val esUpdater = AtomicReferenceFieldUpdater.newUpdater(
-      classOf[Dispatcher],
-      classOf[LazyExecutorServiceDelegate],
-      "executorServiceDelegate")
+    classOf[Dispatcher],
+    classOf[LazyExecutorServiceDelegate],
+    "executorServiceDelegate")
 
   /**
     * INTERNAL API
@@ -141,10 +145,11 @@ class Dispatcher(
               case e: RejectedExecutionException ⇒
                 mbox.setAsIdle()
                 eventStream.publish(
-                    Error(e,
-                          getClass.getName,
-                          getClass,
-                          "registerForExecution was rejected twice!"))
+                  Error(
+                    e,
+                    getClass.getName,
+                    getClass,
+                    "registerForExecution was rejected twice!"))
                 throw e
             }
         }

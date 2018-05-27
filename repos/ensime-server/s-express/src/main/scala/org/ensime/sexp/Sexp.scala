@@ -44,9 +44,9 @@ object SexpNumber {
   def apply(n: Int) = new SexpNumber(BigDecimal(n))
   def apply(n: Long) = new SexpNumber(BigDecimal(n))
   def apply(n: Double) = n match {
-    case _ if n.isNaN => SexpNil
+    case _ if n.isNaN      => SexpNil
     case _ if n.isInfinity => SexpNil
-    case _ => new SexpNumber(BigDecimal(n))
+    case _                 => new SexpNumber(BigDecimal(n))
   }
   def apply(n: BigInt) = new SexpNumber(BigDecimal(n))
   def apply(n: String) = new SexpNumber(BigDecimal(n))
@@ -65,9 +65,9 @@ object SexpList {
     if (!sexp.isList) None
     else {
       def rec(s: Sexp): List[Sexp] = s match {
-        case SexpNil => Nil
+        case SexpNil            => Nil
         case SexpCons(car, cdr) => car :: rec(cdr)
-        case _ => throw new IllegalStateException("Not a list: " + s)
+        case _                  => throw new IllegalStateException("Not a list: " + s)
       }
       val res = rec(sexp)
       if (res.isEmpty) None
@@ -86,12 +86,14 @@ object SexpData {
     if (kvs.isEmpty) SexpNil
     else {
       val mapped = kvs.toMap
-      require(mapped.size == kvs.size,
-              "duplicate keys not allowed: " + mapped.keys)
-      require(mapped.keys.forall(_.value.startsWith(":")),
-              "keys must start with ':' " + mapped.keys)
+      require(
+        mapped.size == kvs.size,
+        "duplicate keys not allowed: " + mapped.keys)
+      require(
+        mapped.keys.forall(_.value.startsWith(":")),
+        "keys must start with ':' " + mapped.keys)
       SexpList(
-          kvs.flatMap { case (k, v) => k :: v :: Nil }(breakOut): List[Sexp])
+        kvs.flatMap { case (k, v) => k :: v :: Nil }(breakOut): List[Sexp])
     }
 
   def unapply(sexp: Sexp): Option[Map[SexpSymbol, Sexp]] = sexp match {

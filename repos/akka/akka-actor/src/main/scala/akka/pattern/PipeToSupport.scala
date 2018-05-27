@@ -65,14 +65,17 @@ trait PipeToSupport {
     }
     def to(recipient: ActorRef): PipeableCompletionStage[T] =
       to(recipient, Actor.noSender)
-    def to(recipient: ActorRef, sender: ActorRef): PipeableCompletionStage[T] = {
+    def to(
+        recipient: ActorRef,
+        sender: ActorRef): PipeableCompletionStage[T] = {
       pipeTo(recipient)(sender)
       this
     }
     def to(recipient: ActorSelection): PipeableCompletionStage[T] =
       to(recipient, Actor.noSender)
-    def to(recipient: ActorSelection,
-           sender: ActorRef): PipeableCompletionStage[T] = {
+    def to(
+        recipient: ActorSelection,
+        sender: ActorRef): PipeableCompletionStage[T] = {
       pipeToSelection(recipient)(sender)
       this
     }
@@ -117,6 +120,6 @@ trait PipeToSupport {
     * the failure is sent in a [[akka.actor.Status.Failure]] to the recipient.
     */
   implicit def pipeCompletionStage[T](future: CompletionStage[T])(
-      implicit executionContext: ExecutionContext)
-    : PipeableCompletionStage[T] = new PipeableCompletionStage(future)
+      implicit executionContext: ExecutionContext): PipeableCompletionStage[T] =
+    new PipeableCompletionStage(future)
 }

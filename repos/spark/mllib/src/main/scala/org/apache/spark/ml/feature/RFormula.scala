@@ -23,7 +23,14 @@ import scala.collection.mutable.ArrayBuffer
 import org.apache.hadoop.fs.Path
 
 import org.apache.spark.annotation.{Experimental, Since}
-import org.apache.spark.ml.{Estimator, Model, Pipeline, PipelineModel, PipelineStage, Transformer}
+import org.apache.spark.ml.{
+  Estimator,
+  Model,
+  Pipeline,
+  PipelineModel,
+  PipelineStage,
+  Transformer
+}
 import org.apache.spark.ml.attribute.AttributeGroup
 import org.apache.spark.ml.param.{Param, ParamMap}
 import org.apache.spark.ml.param.shared.{HasFeaturesCol, HasLabelCol}
@@ -71,7 +78,8 @@ private[feature] trait RFormulaBase extends HasFeaturesCol with HasLabelCol {
   */
 @Experimental
 class RFormula(override val uid: String)
-    extends Estimator[RFormulaModel] with RFormulaBase
+    extends Estimator[RFormulaModel]
+    with RFormulaBase
     with DefaultParamsWritable {
 
   def this() = this(Identifiable.randomUID("rFormula"))
@@ -127,7 +135,7 @@ class RFormula(override val uid: String)
             encoderStages += new StringIndexer()
               .setInputCol(term)
               .setOutputCol(indexCol)
-              (term, indexCol)
+            (term, indexCol)
           case _ =>
             (term, term)
         }
@@ -170,18 +178,19 @@ class RFormula(override val uid: String)
     val pipelineModel =
       new Pipeline(uid).setStages(encoderStages.toArray).fit(dataset)
     copyValues(
-        new RFormulaModel(uid, resolvedFormula, pipelineModel).setParent(this))
+      new RFormulaModel(uid, resolvedFormula, pipelineModel).setParent(this))
   }
 
   // optimistic schema; does not contain any ML attributes
   override def transformSchema(schema: StructType): StructType = {
     if (hasLabelCol(schema)) {
       StructType(
-          schema.fields :+ StructField($(featuresCol), new VectorUDT, true))
+        schema.fields :+ StructField($(featuresCol), new VectorUDT, true))
     } else {
       StructType(schema.fields :+ StructField(
-              $(featuresCol), new VectorUDT, true) :+ StructField(
-              $(labelCol), DoubleType, true))
+        $(featuresCol),
+        new VectorUDT,
+        true) :+ StructField($(labelCol), DoubleType, true))
     }
   }
 
@@ -204,11 +213,13 @@ object RFormula extends DefaultParamsReadable[RFormula] {
   * @param pipelineModel the fitted feature model, including factor to index mappings.
   */
 @Experimental
-class RFormulaModel private[feature](
+class RFormulaModel private[feature] (
     override val uid: String,
     private[ml] val resolvedFormula: ResolvedRFormula,
     private[ml] val pipelineModel: PipelineModel)
-    extends Model[RFormulaModel] with RFormulaBase with MLWritable {
+    extends Model[RFormulaModel]
+    with RFormulaBase
+    with MLWritable {
 
   override def transform(dataset: DataFrame): DataFrame = {
     checkCanTransform(dataset.schema)
@@ -223,10 +234,10 @@ class RFormulaModel private[feature](
     } else if (schema.exists(_.name == resolvedFormula.label)) {
       val nullable = schema(resolvedFormula.label).dataType match {
         case _: NumericType | BooleanType => false
-        case _ => true
+        case _                            => true
       }
-      StructType(withFeatures.fields :+ StructField(
-              $(labelCol), DoubleType, nullable))
+      StructType(
+        withFeatures.fields :+ StructField($(labelCol), DoubleType, nullable))
     } else {
       // Ignore the label field. This is a hack so that this transformer can also work on test
       // datasets in a Pipeline.
@@ -250,7 +261,7 @@ class RFormulaModel private[feature](
           dataset.withColumn($(labelCol), dataset(labelName).cast(DoubleType))
         case other =>
           throw new IllegalArgumentException(
-              "Unsupported type for label: " + other)
+            "Unsupported type for label: " + other)
       }
     } else {
       // Ignore the label field. This is a hack so that this transformer can also work on test
@@ -261,11 +272,13 @@ class RFormulaModel private[feature](
 
   private def checkCanTransform(schema: StructType) {
     val columnNames = schema.map(_.name)
-    require(!columnNames.contains($(featuresCol)),
-            "Features column already exists.")
-    require(!columnNames.contains($(labelCol)) ||
-            schema($(labelCol)).dataType == DoubleType,
-            "Label column already exists and is not of type DoubleType.")
+    require(
+      !columnNames.contains($(featuresCol)),
+      "Features column already exists.")
+    require(
+      !columnNames.contains($(labelCol)) ||
+        schema($(labelCol)).dataType == DoubleType,
+      "Label column already exists and is not of type DoubleType.")
   }
 
   @Since("2.0.0")
@@ -322,8 +335,8 @@ object RFormulaModel extends MLReadable[RFormulaModel] {
       val pmPath = new Path(path, "pipelineModel").toString
       val pipelineModel = PipelineModel.load(pmPath)
 
-      val model = new RFormulaModel(
-          metadata.uid, resolvedRFormula, pipelineModel)
+      val model =
+        new RFormulaModel(metadata.uid, resolvedRFormula, pipelineModel)
 
       DefaultParamsReader.getAndSetParams(model, metadata)
       model
@@ -336,8 +349,10 @@ object RFormulaModel extends MLReadable[RFormulaModel] {
   * TODO(ekl) make this a public transformer
   */
 private class ColumnPruner(
-    override val uid: String, val columnsToPrune: Set[String])
-    extends Transformer with MLWritable {
+    override val uid: String,
+    val columnsToPrune: Set[String])
+    extends Transformer
+    with MLWritable {
 
   def this(columnsToPrune: Set[String]) =
     this(Identifiable.randomUID("columnPruner"), columnsToPrune)
@@ -416,12 +431,14 @@ private class VectorAttributeRewriter(
     override val uid: String,
     val vectorCol: String,
     val prefixesToRewrite: Map[String, String])
-    extends Transformer with MLWritable {
+    extends Transformer
+    with MLWritable {
 
   def this(vectorCol: String, prefixesToRewrite: Map[String, String]) =
-    this(Identifiable.randomUID("vectorAttrRewriter"),
-         vectorCol,
-         prefixesToRewrite)
+    this(
+      Identifiable.randomUID("vectorAttrRewriter"),
+      vectorCol,
+      prefixesToRewrite)
 
   override def transform(dataset: DataFrame): DataFrame = {
     val metadata = {
@@ -451,8 +468,8 @@ private class VectorAttributeRewriter(
 
   override def transformSchema(schema: StructType): StructType = {
     StructType(
-        schema.fields.filter(_.name != vectorCol) ++ schema.fields.filter(
-            _.name == vectorCol))
+      schema.fields.filter(_.name != vectorCol) ++ schema.fields.filter(
+        _.name == vectorCol))
   }
 
   override def copy(extra: ParamMap): VectorAttributeRewriter =
@@ -476,7 +493,8 @@ private object VectorAttributeRewriter
       extends MLWriter {
 
     private case class Data(
-        vectorCol: String, prefixesToRewrite: Map[String, String])
+        vectorCol: String,
+        prefixesToRewrite: Map[String, String])
 
     override protected def saveImpl(path: String): Unit = {
       // Save metadata and Params
@@ -508,8 +526,8 @@ private object VectorAttributeRewriter
         .head()
       val vectorCol = data.getString(0)
       val prefixesToRewrite = data.getAs[Map[String, String]](1)
-      val rewriter = new VectorAttributeRewriter(
-          metadata.uid, vectorCol, prefixesToRewrite)
+      val rewriter =
+        new VectorAttributeRewriter(metadata.uid, vectorCol, prefixesToRewrite)
 
       DefaultParamsReader.getAndSetParams(rewriter, metadata)
       rewriter

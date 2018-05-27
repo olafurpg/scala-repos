@@ -48,8 +48,7 @@ trait AppImplicits {
       V <: android.support.v4.app.FragmentManager](fragmentManager: V) =
     new RichFragmentManager[V](fragmentManager)
   @inline implicit def fragmentTransaction2RichFragmentTransaction[
-      V <: android.support.v4.app.FragmentTransaction](
-      fragmentTransaction: V) =
+      V <: android.support.v4.app.FragmentTransaction](fragmentTransaction: V) =
     new RichFragmentTransaction[V](fragmentTransaction)
   @inline implicit def listFragment2RichListFragment[
       V <: android.support.v4.app.ListFragment](listFragment: V) =

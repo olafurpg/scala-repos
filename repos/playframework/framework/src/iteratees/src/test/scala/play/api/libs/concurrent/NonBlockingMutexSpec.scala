@@ -72,8 +72,9 @@ object NonBlockingMutexSpec extends Specification {
     "run code in order" in {
       import ExecutionContext.Implicits.global
 
-      def percentageOfRunsWithOrderingErrors(runSize: Int,
-                                             tester: Tester): Int = {
+      def percentageOfRunsWithOrderingErrors(
+          runSize: Int,
+          tester: Tester): Int = {
         val results: Seq[Future[Int]] = for (i <- 0 until 9) yield {
           countOrderingErrors(runSize, tester)
         }
@@ -91,8 +92,8 @@ object NonBlockingMutexSpec extends Specification {
       var errorPercentage = 0
       while (errorPercentage < 90 && runSize < 1000000) {
         runSize = runSize << 1
-        errorPercentage = percentageOfRunsWithOrderingErrors(runSize,
-                                                             new NaiveTester())
+        errorPercentage =
+          percentageOfRunsWithOrderingErrors(runSize, new NaiveTester())
       }
       //println(s"Got $errorPercentage% ordering errors on run size of $runSize")
 

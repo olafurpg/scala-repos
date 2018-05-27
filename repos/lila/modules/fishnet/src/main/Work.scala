@@ -36,38 +36,41 @@ object Work {
     override def toString = s"by $clientKey at $date"
   }
 
-  case class Game(id: String,
-                  initialFen: Option[FEN],
-                  variant: Variant,
-                  moves: String) {
+  case class Game(
+      id: String,
+      initialFen: Option[FEN],
+      variant: Variant,
+      moves: String) {
 
     def moveList = moves.split(' ').toList
   }
 
-  case class Sender(userId: Option[String],
-                    ip: Option[String],
-                    mod: Boolean,
-                    system: Boolean) {
+  case class Sender(
+      userId: Option[String],
+      ip: Option[String],
+      mod: Boolean,
+      system: Boolean) {
 
     override def toString =
       if (system) "lichess" else userId orElse ip getOrElse "unknown"
   }
 
-  case class Move(_id: Work.Id, // random
-                  game: Game,
-                  currentFen: FEN,
-                  level: Int,
-                  tries: Int,
-                  acquired: Option[Acquired],
-                  createdAt: DateTime)
+  case class Move(
+      _id: Work.Id, // random
+      game: Game,
+      currentFen: FEN,
+      level: Int,
+      tries: Int,
+      acquired: Option[Acquired],
+      createdAt: DateTime)
       extends Work {
 
     def skill = Client.Skill.Move
 
     def assignTo(client: Client) =
       copy(
-          acquired = Acquired(clientKey = client.key, date = DateTime.now).some,
-          tries = tries + 1)
+        acquired = Acquired(clientKey = client.key, date = DateTime.now).some,
+        tries = tries + 1)
 
     def timeout = copy(acquired = none)
     def invalid = copy(acquired = none)
@@ -81,22 +84,23 @@ object Work {
       s"id:$id game:${game.id} level:$level tries:$tries currentFen:$currentFen acquired:$acquired"
   }
 
-  case class Analysis(_id: Work.Id, // random
-                      sender: Sender,
-                      game: Game,
-                      startPly: Int,
-                      nbPly: Int,
-                      tries: Int,
-                      acquired: Option[Acquired],
-                      createdAt: DateTime)
+  case class Analysis(
+      _id: Work.Id, // random
+      sender: Sender,
+      game: Game,
+      startPly: Int,
+      nbPly: Int,
+      tries: Int,
+      acquired: Option[Acquired],
+      createdAt: DateTime)
       extends Work {
 
     def skill = Client.Skill.Analysis
 
     def assignTo(client: Client) =
       copy(
-          acquired = Acquired(clientKey = client.key, date = DateTime.now).some,
-          tries = tries + 1)
+        acquired = Acquired(clientKey = client.key, date = DateTime.now).some,
+        tries = tries + 1)
 
     def timeout = copy(acquired = none)
     def invalid = copy(acquired = none)

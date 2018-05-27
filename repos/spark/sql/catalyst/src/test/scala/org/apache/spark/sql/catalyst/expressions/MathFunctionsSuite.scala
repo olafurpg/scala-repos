@@ -56,12 +56,13 @@ class MathFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
     * @tparam T Generic type for primitives
     * @tparam U Generic type for the output of the given function `f`
     */
-  private def testUnary[T, U](c: Expression => Expression,
-                              f: T => U,
-                              domain: Iterable[T] = (-20 to 20).map(_ * 0.1),
-                              expectNull: Boolean = false,
-                              expectNaN: Boolean = false,
-                              evalType: DataType = DoubleType): Unit = {
+  private def testUnary[T, U](
+      c: Expression => Expression,
+      f: T => U,
+      domain: Iterable[T] = (-20 to 20).map(_ * 0.1),
+      expectNull: Boolean = false,
+      expectNaN: Boolean = false,
+      evalType: DataType = DoubleType): Unit = {
     if (expectNull) {
       domain.foreach { value =>
         checkEvaluation(c(Literal(value)), null, EmptyRow)
@@ -87,12 +88,13 @@ class MathFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
     * @param expectNull Whether the given values should return null or not
     * @param expectNaN Whether the given values should eval to NaN or not
     */
-  private def testBinary(c: (Expression, Expression) => Expression,
-                         f: (Double, Double) => Double,
-                         domain: Iterable[(Double, Double)] = (-20 to 20).map(
-                               v => (v * 0.1, v * -0.1)),
-                         expectNull: Boolean = false,
-                         expectNaN: Boolean = false): Unit = {
+  private def testBinary(
+      c: (Expression, Expression) => Expression,
+      f: (Double, Double) => Double,
+      domain: Iterable[(Double, Double)] =
+        (-20 to 20).map(v => (v * 0.1, v * -0.1)),
+      expectNull: Boolean = false,
+      expectNaN: Boolean = false): Unit = {
     if (expectNull) {
       domain.foreach {
         case (v1, v2) =>
@@ -107,57 +109,68 @@ class MathFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
       domain.foreach {
         case (v1, v2) =>
           checkEvaluation(
-              c(Literal(v1), Literal(v2)), f(v1 + 0.0, v2 + 0.0), EmptyRow)
+            c(Literal(v1), Literal(v2)),
+            f(v1 + 0.0, v2 + 0.0),
+            EmptyRow)
           checkEvaluation(
-              c(Literal(v2), Literal(v1)), f(v2 + 0.0, v1 + 0.0), EmptyRow)
+            c(Literal(v2), Literal(v1)),
+            f(v2 + 0.0, v1 + 0.0),
+            EmptyRow)
       }
     }
-    checkEvaluation(c(Literal.create(null, DoubleType), Literal(1.0)),
-                    null,
-                    create_row(null))
-    checkEvaluation(c(Literal(1.0), Literal.create(null, DoubleType)),
-                    null,
-                    create_row(null))
+    checkEvaluation(
+      c(Literal.create(null, DoubleType), Literal(1.0)),
+      null,
+      create_row(null))
+    checkEvaluation(
+      c(Literal(1.0), Literal.create(null, DoubleType)),
+      null,
+      create_row(null))
   }
 
   private def checkNaN(
-      expression: Expression, inputRow: InternalRow = EmptyRow): Unit = {
+      expression: Expression,
+      inputRow: InternalRow = EmptyRow): Unit = {
     checkNaNWithoutCodegen(expression, inputRow)
     checkNaNWithGeneratedProjection(expression, inputRow)
     checkNaNWithOptimization(expression, inputRow)
   }
 
   private def checkNaNWithoutCodegen(
-      expression: Expression, inputRow: InternalRow = EmptyRow): Unit = {
-    val actual = try evaluate(expression, inputRow) catch {
+      expression: Expression,
+      inputRow: InternalRow = EmptyRow): Unit = {
+    val actual = try evaluate(expression, inputRow)
+    catch {
       case e: Exception => fail(s"Exception evaluating $expression", e)
     }
     if (!actual.asInstanceOf[Double].isNaN) {
       fail(
-          s"Incorrect evaluation (codegen off): $expression, " +
+        s"Incorrect evaluation (codegen off): $expression, " +
           s"actual: $actual, " + s"expected: NaN")
     }
   }
 
   private def checkNaNWithGeneratedProjection(
-      expression: Expression, inputRow: InternalRow = EmptyRow): Unit = {
+      expression: Expression,
+      inputRow: InternalRow = EmptyRow): Unit = {
 
     val plan = generateProject(
-        GenerateMutableProjection.generate(
-            Alias(expression, s"Optimized($expression)")() :: Nil)(),
-        expression)
+      GenerateMutableProjection.generate(
+        Alias(expression, s"Optimized($expression)")() :: Nil)(),
+      expression)
 
     val actual = plan(inputRow).get(0, expression.dataType)
     if (!actual.asInstanceOf[Double].isNaN) {
-      fail(
-          s"Incorrect Evaluation: $expression, actual: $actual, expected: NaN")
+      fail(s"Incorrect Evaluation: $expression, actual: $actual, expected: NaN")
     }
   }
 
   private def checkNaNWithOptimization(
-      expression: Expression, inputRow: InternalRow = EmptyRow): Unit = {
+      expression: Expression,
+      inputRow: InternalRow = EmptyRow): Unit = {
     val plan = Project(
-        Alias(expression, s"Optimized($expression)")() :: Nil, OneRowRelation)
+      Alias(expression, s"Optimized($expression)")() :: Nil,
+      OneRowRelation)
     val optimizedPlan = DefaultOptimizer.execute(plan)
     checkNaNWithoutCodegen(optimizedPlan.expressions.head, inputRow)
   }
@@ -166,21 +179,23 @@ class MathFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
     checkEvaluation(Conv(Literal("3"), Literal(10), Literal(2)), "11")
     checkEvaluation(Conv(Literal("-15"), Literal(10), Literal(-16)), "-F")
     checkEvaluation(
-        Conv(Literal("-15"), Literal(10), Literal(16)), "FFFFFFFFFFFFFFF1")
+      Conv(Literal("-15"), Literal(10), Literal(16)),
+      "FFFFFFFFFFFFFFF1")
     checkEvaluation(Conv(Literal("big"), Literal(36), Literal(16)), "3A48")
     checkEvaluation(
-        Conv(Literal.create(null, StringType), Literal(36), Literal(16)), null)
+      Conv(Literal.create(null, StringType), Literal(36), Literal(16)),
+      null)
     checkEvaluation(
-        Conv(Literal("3"), Literal.create(null, IntegerType), Literal(16)),
-        null)
+      Conv(Literal("3"), Literal.create(null, IntegerType), Literal(16)),
+      null)
     checkEvaluation(
-        Conv(Literal("3"), Literal(16), Literal.create(null, IntegerType)),
-        null)
+      Conv(Literal("3"), Literal(16), Literal.create(null, IntegerType)),
+      null)
     checkEvaluation(Conv(Literal("1234"), Literal(10), Literal(37)), null)
     checkEvaluation(Conv(Literal(""), Literal(10), Literal(16)), null)
     checkEvaluation(
-        Conv(Literal("9223372036854775807"), Literal(36), Literal(16)),
-        "FFFFFFFFFFFFFFFF")
+      Conv(Literal("9223372036854775807"), Literal(36), Literal(16)),
+      "FFFFFFFFFFFFFFFF")
     // If there is an invalid digit in the number, the longest valid prefix should be converted.
     checkEvaluation(Conv(Literal("11abc"), Literal(10), Literal(16)), "B")
   }
@@ -260,7 +275,9 @@ class MathFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
     checkConsistencyBetweenInterpretedAndCodegen(Ceil, DoubleType)
 
     testUnary(
-        Ceil, (d: Decimal) => d.ceil, (-20 to 20).map(x => Decimal(x * 0.1)))
+      Ceil,
+      (d: Decimal) => d.ceil,
+      (-20 to 20).map(x => Decimal(x * 0.1)))
     checkConsistencyBetweenInterpretedAndCodegen(Ceil, DecimalType(25, 3))
     checkConsistencyBetweenInterpretedAndCodegen(Ceil, DecimalType(25, 0))
     checkConsistencyBetweenInterpretedAndCodegen(Ceil, DecimalType(5, 0))
@@ -271,7 +288,9 @@ class MathFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
     checkConsistencyBetweenInterpretedAndCodegen(Floor, DoubleType)
 
     testUnary(
-        Floor, (d: Decimal) => d.floor, (-20 to 20).map(x => Decimal(x * 0.1)))
+      Floor,
+      (d: Decimal) => d.floor,
+      (-20 to 20).map(x => Decimal(x * 0.1)))
     checkConsistencyBetweenInterpretedAndCodegen(Floor, DecimalType(25, 3))
     checkConsistencyBetweenInterpretedAndCodegen(Floor, DecimalType(25, 0))
     checkConsistencyBetweenInterpretedAndCodegen(Floor, DecimalType(5, 0))
@@ -280,13 +299,14 @@ class MathFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
   test("factorial") {
     (0 to 20).foreach { value =>
       checkEvaluation(
-          Factorial(Literal(value)), LongMath.factorial(value), EmptyRow)
+        Factorial(Literal(value)),
+        LongMath.factorial(value),
+        EmptyRow)
     }
     checkEvaluation(Literal.create(null, IntegerType), null, create_row(null))
     checkEvaluation(Factorial(Literal(20)), 2432902008176640000L, EmptyRow)
     checkEvaluation(Factorial(Literal(21)), null, EmptyRow)
-    checkConsistencyBetweenInterpretedAndCodegen(
-        Factorial.apply _, IntegerType)
+    checkConsistencyBetweenInterpretedAndCodegen(Factorial.apply _, IntegerType)
   }
 
   test("rint") {
@@ -328,10 +348,11 @@ class MathFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
   }
 
   test("bin") {
-    testUnary(Bin,
-              java.lang.Long.toBinaryString,
-              (-20 to 20).map(_.toLong),
-              evalType = LongType)
+    testUnary(
+      Bin,
+      java.lang.Long.toBinaryString,
+      (-20 to 20).map(_.toLong),
+      evalType = LongType)
 
     val row = create_row(null, 12L, 123L, 1234L, -123L)
     val l1 = 'a.long.at(0)
@@ -347,9 +368,11 @@ class MathFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
     checkEvaluation(Bin(l5), java.lang.Long.toBinaryString(-123), row)
 
     checkEvaluation(
-        Bin(positiveLongLit), java.lang.Long.toBinaryString(positiveLong))
+      Bin(positiveLongLit),
+      java.lang.Long.toBinaryString(positiveLong))
     checkEvaluation(
-        Bin(negativeLongLit), java.lang.Long.toBinaryString(negativeLong))
+      Bin(negativeLongLit),
+      java.lang.Long.toBinaryString(negativeLong))
 
     checkConsistencyBetweenInterpretedAndCodegen(Bin, LongType)
   }
@@ -366,7 +389,9 @@ class MathFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
     testUnary(Sqrt, math.sqrt, (-5 to -1).map(_ * 1.0), expectNaN = true)
 
     checkEvaluation(
-        Sqrt(Literal.create(null, DoubleType)), null, create_row(null))
+      Sqrt(Literal.create(null, DoubleType)),
+      null,
+      create_row(null))
     checkNaN(Sqrt(Literal(-1.0)), EmptyRow)
     checkNaN(Sqrt(Literal(-1.5)), EmptyRow)
     checkConsistencyBetweenInterpretedAndCodegen(Sqrt, DoubleType)
@@ -374,123 +399,172 @@ class MathFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
 
   test("pow") {
     testBinary(Pow, math.pow, (-5 to 5).map(v => (v * 1.0, v * 1.0)))
-    testBinary(Pow,
-               math.pow,
-               Seq((-1.0, 0.9), (-2.2, 1.7), (-2.2, -1.7)),
-               expectNaN = true)
+    testBinary(
+      Pow,
+      math.pow,
+      Seq((-1.0, 0.9), (-2.2, 1.7), (-2.2, -1.7)),
+      expectNaN = true)
     checkConsistencyBetweenInterpretedAndCodegen(Pow, DoubleType, DoubleType)
   }
 
   test("shift left") {
     checkEvaluation(
-        ShiftLeft(Literal.create(null, IntegerType), Literal(1)), null)
+      ShiftLeft(Literal.create(null, IntegerType), Literal(1)),
+      null)
     checkEvaluation(
-        ShiftLeft(Literal(21), Literal.create(null, IntegerType)), null)
-    checkEvaluation(ShiftLeft(Literal.create(null, IntegerType),
-                              Literal.create(null, IntegerType)),
-                    null)
+      ShiftLeft(Literal(21), Literal.create(null, IntegerType)),
+      null)
+    checkEvaluation(
+      ShiftLeft(
+        Literal.create(null, IntegerType),
+        Literal.create(null, IntegerType)),
+      null)
     checkEvaluation(ShiftLeft(Literal(21), Literal(1)), 42)
 
     checkEvaluation(ShiftLeft(Literal(21.toLong), Literal(1)), 42.toLong)
     checkEvaluation(ShiftLeft(Literal(-21.toLong), Literal(1)), -42.toLong)
 
     checkEvaluation(
-        ShiftLeft(positiveIntLit, positiveIntLit), positiveInt << positiveInt)
+      ShiftLeft(positiveIntLit, positiveIntLit),
+      positiveInt << positiveInt)
     checkEvaluation(
-        ShiftLeft(positiveIntLit, negativeIntLit), positiveInt << negativeInt)
+      ShiftLeft(positiveIntLit, negativeIntLit),
+      positiveInt << negativeInt)
     checkEvaluation(
-        ShiftLeft(negativeIntLit, positiveIntLit), negativeInt << positiveInt)
+      ShiftLeft(negativeIntLit, positiveIntLit),
+      negativeInt << positiveInt)
     checkEvaluation(
-        ShiftLeft(negativeIntLit, negativeIntLit), negativeInt << negativeInt)
-    checkEvaluation(ShiftLeft(positiveLongLit, positiveIntLit),
-                    positiveLong << positiveInt)
-    checkEvaluation(ShiftLeft(positiveLongLit, negativeIntLit),
-                    positiveLong << negativeInt)
-    checkEvaluation(ShiftLeft(negativeLongLit, positiveIntLit),
-                    negativeLong << positiveInt)
-    checkEvaluation(ShiftLeft(negativeLongLit, negativeIntLit),
-                    negativeLong << negativeInt)
+      ShiftLeft(negativeIntLit, negativeIntLit),
+      negativeInt << negativeInt)
+    checkEvaluation(
+      ShiftLeft(positiveLongLit, positiveIntLit),
+      positiveLong << positiveInt)
+    checkEvaluation(
+      ShiftLeft(positiveLongLit, negativeIntLit),
+      positiveLong << negativeInt)
+    checkEvaluation(
+      ShiftLeft(negativeLongLit, positiveIntLit),
+      negativeLong << positiveInt)
+    checkEvaluation(
+      ShiftLeft(negativeLongLit, negativeIntLit),
+      negativeLong << negativeInt)
 
     checkConsistencyBetweenInterpretedAndCodegen(
-        ShiftLeft, IntegerType, IntegerType)
+      ShiftLeft,
+      IntegerType,
+      IntegerType)
     checkConsistencyBetweenInterpretedAndCodegen(
-        ShiftLeft, LongType, IntegerType)
+      ShiftLeft,
+      LongType,
+      IntegerType)
   }
 
   test("shift right") {
     checkEvaluation(
-        ShiftRight(Literal.create(null, IntegerType), Literal(1)), null)
+      ShiftRight(Literal.create(null, IntegerType), Literal(1)),
+      null)
     checkEvaluation(
-        ShiftRight(Literal(42), Literal.create(null, IntegerType)), null)
-    checkEvaluation(ShiftRight(Literal.create(null, IntegerType),
-                               Literal.create(null, IntegerType)),
-                    null)
+      ShiftRight(Literal(42), Literal.create(null, IntegerType)),
+      null)
+    checkEvaluation(
+      ShiftRight(
+        Literal.create(null, IntegerType),
+        Literal.create(null, IntegerType)),
+      null)
     checkEvaluation(ShiftRight(Literal(42), Literal(1)), 21)
 
     checkEvaluation(ShiftRight(Literal(42.toLong), Literal(1)), 21.toLong)
     checkEvaluation(ShiftRight(Literal(-42.toLong), Literal(1)), -21.toLong)
 
     checkEvaluation(
-        ShiftRight(positiveIntLit, positiveIntLit), positiveInt >> positiveInt)
+      ShiftRight(positiveIntLit, positiveIntLit),
+      positiveInt >> positiveInt)
     checkEvaluation(
-        ShiftRight(positiveIntLit, negativeIntLit), positiveInt >> negativeInt)
+      ShiftRight(positiveIntLit, negativeIntLit),
+      positiveInt >> negativeInt)
     checkEvaluation(
-        ShiftRight(negativeIntLit, positiveIntLit), negativeInt >> positiveInt)
+      ShiftRight(negativeIntLit, positiveIntLit),
+      negativeInt >> positiveInt)
     checkEvaluation(
-        ShiftRight(negativeIntLit, negativeIntLit), negativeInt >> negativeInt)
-    checkEvaluation(ShiftRight(positiveLongLit, positiveIntLit),
-                    positiveLong >> positiveInt)
-    checkEvaluation(ShiftRight(positiveLongLit, negativeIntLit),
-                    positiveLong >> negativeInt)
-    checkEvaluation(ShiftRight(negativeLongLit, positiveIntLit),
-                    negativeLong >> positiveInt)
-    checkEvaluation(ShiftRight(negativeLongLit, negativeIntLit),
-                    negativeLong >> negativeInt)
+      ShiftRight(negativeIntLit, negativeIntLit),
+      negativeInt >> negativeInt)
+    checkEvaluation(
+      ShiftRight(positiveLongLit, positiveIntLit),
+      positiveLong >> positiveInt)
+    checkEvaluation(
+      ShiftRight(positiveLongLit, negativeIntLit),
+      positiveLong >> negativeInt)
+    checkEvaluation(
+      ShiftRight(negativeLongLit, positiveIntLit),
+      negativeLong >> positiveInt)
+    checkEvaluation(
+      ShiftRight(negativeLongLit, negativeIntLit),
+      negativeLong >> negativeInt)
 
     checkConsistencyBetweenInterpretedAndCodegen(
-        ShiftRight, IntegerType, IntegerType)
+      ShiftRight,
+      IntegerType,
+      IntegerType)
     checkConsistencyBetweenInterpretedAndCodegen(
-        ShiftRight, LongType, IntegerType)
+      ShiftRight,
+      LongType,
+      IntegerType)
   }
 
   test("shift right unsigned") {
     checkEvaluation(
-        ShiftRightUnsigned(Literal.create(null, IntegerType), Literal(1)),
-        null)
+      ShiftRightUnsigned(Literal.create(null, IntegerType), Literal(1)),
+      null)
     checkEvaluation(
-        ShiftRightUnsigned(Literal(42), Literal.create(null, IntegerType)),
-        null)
-    checkEvaluation(ShiftRight(Literal.create(null, IntegerType),
-                               Literal.create(null, IntegerType)),
-                    null)
+      ShiftRightUnsigned(Literal(42), Literal.create(null, IntegerType)),
+      null)
+    checkEvaluation(
+      ShiftRight(
+        Literal.create(null, IntegerType),
+        Literal.create(null, IntegerType)),
+      null)
     checkEvaluation(ShiftRightUnsigned(Literal(42), Literal(1)), 21)
 
     checkEvaluation(
-        ShiftRightUnsigned(Literal(42.toLong), Literal(1)), 21.toLong)
-    checkEvaluation(ShiftRightUnsigned(Literal(-42.toLong), Literal(1)),
-                    9223372036854775787L)
+      ShiftRightUnsigned(Literal(42.toLong), Literal(1)),
+      21.toLong)
+    checkEvaluation(
+      ShiftRightUnsigned(Literal(-42.toLong), Literal(1)),
+      9223372036854775787L)
 
-    checkEvaluation(ShiftRightUnsigned(positiveIntLit, positiveIntLit),
-                    positiveInt >>> positiveInt)
-    checkEvaluation(ShiftRightUnsigned(positiveIntLit, negativeIntLit),
-                    positiveInt >>> negativeInt)
-    checkEvaluation(ShiftRightUnsigned(negativeIntLit, positiveIntLit),
-                    negativeInt >>> positiveInt)
-    checkEvaluation(ShiftRightUnsigned(negativeIntLit, negativeIntLit),
-                    negativeInt >>> negativeInt)
-    checkEvaluation(ShiftRightUnsigned(positiveLongLit, positiveIntLit),
-                    positiveLong >>> positiveInt)
-    checkEvaluation(ShiftRightUnsigned(positiveLongLit, negativeIntLit),
-                    positiveLong >>> negativeInt)
-    checkEvaluation(ShiftRightUnsigned(negativeLongLit, positiveIntLit),
-                    negativeLong >>> positiveInt)
-    checkEvaluation(ShiftRightUnsigned(negativeLongLit, negativeIntLit),
-                    negativeLong >>> negativeInt)
+    checkEvaluation(
+      ShiftRightUnsigned(positiveIntLit, positiveIntLit),
+      positiveInt >>> positiveInt)
+    checkEvaluation(
+      ShiftRightUnsigned(positiveIntLit, negativeIntLit),
+      positiveInt >>> negativeInt)
+    checkEvaluation(
+      ShiftRightUnsigned(negativeIntLit, positiveIntLit),
+      negativeInt >>> positiveInt)
+    checkEvaluation(
+      ShiftRightUnsigned(negativeIntLit, negativeIntLit),
+      negativeInt >>> negativeInt)
+    checkEvaluation(
+      ShiftRightUnsigned(positiveLongLit, positiveIntLit),
+      positiveLong >>> positiveInt)
+    checkEvaluation(
+      ShiftRightUnsigned(positiveLongLit, negativeIntLit),
+      positiveLong >>> negativeInt)
+    checkEvaluation(
+      ShiftRightUnsigned(negativeLongLit, positiveIntLit),
+      negativeLong >>> positiveInt)
+    checkEvaluation(
+      ShiftRightUnsigned(negativeLongLit, negativeIntLit),
+      negativeLong >>> negativeInt)
 
     checkConsistencyBetweenInterpretedAndCodegen(
-        ShiftRightUnsigned, IntegerType, IntegerType)
+      ShiftRightUnsigned,
+      IntegerType,
+      IntegerType)
     checkConsistencyBetweenInterpretedAndCodegen(
-        ShiftRightUnsigned, LongType, IntegerType)
+      ShiftRightUnsigned,
+      LongType,
+      IntegerType)
   }
 
   test("hex") {
@@ -500,12 +574,14 @@ class MathFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
     checkEvaluation(Hex(Literal(100800200404L)), "177828FED4")
     checkEvaluation(Hex(Literal(-100800200404L)), "FFFFFFE887D7012C")
     checkEvaluation(Hex(Literal.create(null, BinaryType)), null)
-    checkEvaluation(Hex(Literal("helloHex".getBytes(StandardCharsets.UTF_8))),
-                    "68656C6C6F486578")
+    checkEvaluation(
+      Hex(Literal("helloHex".getBytes(StandardCharsets.UTF_8))),
+      "68656C6C6F486578")
     // scalastyle:off
     // Turn off scala style for non-ascii chars
-    checkEvaluation(Hex(Literal("三重的".getBytes(StandardCharsets.UTF_8))),
-                    "E4B889E9878DE79A84")
+    checkEvaluation(
+      Hex(Literal("三重的".getBytes(StandardCharsets.UTF_8))),
+      "E4B889E9878DE79A84")
     // scalastyle:on
     Seq(LongType, BinaryType, StringType).foreach { dt =>
       checkConsistencyBetweenInterpretedAndCodegen(Hex.apply _, dt)
@@ -514,16 +590,18 @@ class MathFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
 
   test("unhex") {
     checkEvaluation(Unhex(Literal.create(null, StringType)), null)
-    checkEvaluation(Unhex(Literal("737472696E67")),
-                    "string".getBytes(StandardCharsets.UTF_8))
+    checkEvaluation(
+      Unhex(Literal("737472696E67")),
+      "string".getBytes(StandardCharsets.UTF_8))
     checkEvaluation(Unhex(Literal("")), new Array[Byte](0))
     checkEvaluation(Unhex(Literal("F")), Array[Byte](15))
     checkEvaluation(Unhex(Literal("ff")), Array[Byte](-1))
     checkEvaluation(Unhex(Literal("GG")), null)
     // scalastyle:off
     // Turn off scala style for non-ascii chars
-    checkEvaluation(Unhex(Literal("E4B889E9878DE79A84")),
-                    "三重的".getBytes(StandardCharsets.UTF_8))
+    checkEvaluation(
+      Unhex(Literal("E4B889E9878DE79A84")),
+      "三重的".getBytes(StandardCharsets.UTF_8))
     checkEvaluation(Unhex(Literal("三重的")), null)
     // scalastyle:on
     checkConsistencyBetweenInterpretedAndCodegen(Unhex, StringType)
@@ -545,31 +623,43 @@ class MathFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
 
     domain.foreach {
       case (v1, v2) =>
-        checkEvaluation(Logarithm(Literal(v1), Literal(v2)),
-                        f(v1 + 0.0, v2 + 0.0),
-                        EmptyRow)
-        checkEvaluation(Logarithm(Literal(v2), Literal(v1)),
-                        f(v2 + 0.0, v1 + 0.0),
-                        EmptyRow)
         checkEvaluation(
-            new Logarithm(Literal(v1)), f(math.E, v1 + 0.0), EmptyRow)
+          Logarithm(Literal(v1), Literal(v2)),
+          f(v1 + 0.0, v2 + 0.0),
+          EmptyRow)
+        checkEvaluation(
+          Logarithm(Literal(v2), Literal(v1)),
+          f(v2 + 0.0, v1 + 0.0),
+          EmptyRow)
+        checkEvaluation(
+          new Logarithm(Literal(v1)),
+          f(math.E, v1 + 0.0),
+          EmptyRow)
     }
 
     // null input should yield null output
-    checkEvaluation(Logarithm(Literal.create(null, DoubleType), Literal(1.0)),
-                    null,
-                    create_row(null))
-    checkEvaluation(Logarithm(Literal(1.0), Literal.create(null, DoubleType)),
-                    null,
-                    create_row(null))
+    checkEvaluation(
+      Logarithm(Literal.create(null, DoubleType), Literal(1.0)),
+      null,
+      create_row(null))
+    checkEvaluation(
+      Logarithm(Literal(1.0), Literal.create(null, DoubleType)),
+      null,
+      create_row(null))
 
     // negative input should yield null output
     checkEvaluation(
-        Logarithm(Literal(-1.0), Literal(1.0)), null, create_row(null))
+      Logarithm(Literal(-1.0), Literal(1.0)),
+      null,
+      create_row(null))
     checkEvaluation(
-        Logarithm(Literal(1.0), Literal(-1.0)), null, create_row(null))
+      Logarithm(Literal(1.0), Literal(-1.0)),
+      null,
+      create_row(null))
     checkConsistencyBetweenInterpretedAndCodegen(
-        Logarithm, DoubleType, DoubleType)
+      Logarithm,
+      DoubleType,
+      DoubleType)
   }
 
   test("round") {
@@ -580,34 +670,21 @@ class MathFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
     val longPi: Long = 31415926535897932L
     val bdPi: BigDecimal = BigDecimal(31415927L, 7)
 
-    val doubleResults: Seq[Double] = Seq(0.0,
-                                         0.0,
-                                         0.0,
-                                         0.0,
-                                         0.0,
-                                         0.0,
-                                         3.0,
-                                         3.1,
-                                         3.14,
-                                         3.142,
-                                         3.1416,
-                                         3.14159,
-                                         3.141593)
+    val doubleResults: Seq[Double] = Seq(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 3.0, 3.1,
+      3.14, 3.142, 3.1416, 3.14159, 3.141593)
 
     val shortResults: Seq[Short] =
       Seq[Short](0, 0, 30000, 31000, 31400, 31420) ++ Seq.fill[Short](7)(31415)
 
     val intResults: Seq[Int] =
-      Seq(314000000, 314200000, 314160000, 314159000, 314159300, 314159270) ++ Seq
+      Seq(314000000, 314200000, 314160000, 314159000, 314159300,
+        314159270) ++ Seq
         .fill(7)(314159265)
 
     val longResults: Seq[Long] =
-      Seq(31415926536000000L,
-          31415926535900000L,
-          31415926535900000L,
-          31415926535898000L,
-          31415926535897900L,
-          31415926535897930L) ++ Seq.fill(7)(31415926535897932L)
+      Seq(31415926536000000L, 31415926535900000L, 31415926535900000L,
+        31415926535898000L, 31415926535897900L,
+        31415926535897930L) ++ Seq.fill(7)(31415926535897932L)
 
     scales.zipWithIndex.foreach {
       case (scale, i) =>
@@ -617,14 +694,15 @@ class MathFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
         checkEvaluation(Round(longPi, scale), longResults(i), EmptyRow)
     }
 
-    val bdResults: Seq[BigDecimal] = Seq(BigDecimal(3.0),
-                                         BigDecimal(3.1),
-                                         BigDecimal(3.14),
-                                         BigDecimal(3.142),
-                                         BigDecimal(3.1416),
-                                         BigDecimal(3.14159),
-                                         BigDecimal(3.141593),
-                                         BigDecimal(3.1415927))
+    val bdResults: Seq[BigDecimal] = Seq(
+      BigDecimal(3.0),
+      BigDecimal(3.1),
+      BigDecimal(3.14),
+      BigDecimal(3.142),
+      BigDecimal(3.1416),
+      BigDecimal(3.14159),
+      BigDecimal(3.141593),
+      BigDecimal(3.1415927))
     // round_scale > current_scale would result in precision increase
     // and not allowed by o.a.s.s.types.Decimal.changePrecision, therefore null
     (0 to 7).foreach { i =>
@@ -636,9 +714,11 @@ class MathFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
 
     DataTypeTestUtils.numericTypes.foreach { dataType =>
       checkEvaluation(Round(Literal.create(null, dataType), Literal(2)), null)
-      checkEvaluation(Round(Literal.create(null, dataType),
-                            Literal.create(null, IntegerType)),
-                      null)
+      checkEvaluation(
+        Round(
+          Literal.create(null, dataType),
+          Literal.create(null, IntegerType)),
+        null)
     }
   }
 }

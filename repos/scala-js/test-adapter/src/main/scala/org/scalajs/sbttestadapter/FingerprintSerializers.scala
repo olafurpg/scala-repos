@@ -31,7 +31,7 @@ private[testadapter] object FingerprintSerializers {
             .fld("requireNoArgConstructor", fp.requireNoArgConstructor)
         case _ =>
           throw new IllegalArgumentException(
-              s"Unknown Fingerprint type: ${fp.getClass}")
+            s"Unknown Fingerprint type: ${fp.getClass}")
       }
       bld.toJSON
     }
@@ -44,13 +44,13 @@ private[testadapter] object FingerprintSerializers {
       obj.fld[String]("fpType") match {
         case "AnnotatedFingerprint" =>
           new DeserializedAnnotatedFingerprint(
-              obj.fld[Boolean]("isModule"),
-              obj.fld[String]("annotationName"))
+            obj.fld[Boolean]("isModule"),
+            obj.fld[String]("annotationName"))
         case "SubclassFingerprint" =>
           new DeserializedSubclassFingerprint(
-              obj.fld[Boolean]("isModule"),
-              obj.fld[String]("superclassName"),
-              obj.fld[Boolean]("requireNoArgConstructor"))
+            obj.fld[Boolean]("isModule"),
+            obj.fld[String]("superclassName"),
+            obj.fld[Boolean]("requireNoArgConstructor"))
         case tpe =>
           throw new IllegalArgumentException(s"Unknown Fingerprint type: $tpe")
       }
@@ -60,13 +60,11 @@ private[testadapter] object FingerprintSerializers {
   final class DeserializedAnnotatedFingerprint(
       val isModule: Boolean,
       val annotationName: String
-  )
-      extends AnnotatedFingerprint
+  ) extends AnnotatedFingerprint
 
   final class DeserializedSubclassFingerprint(
       val isModule: Boolean,
       val superclassName: String,
       val requireNoArgConstructor: Boolean
-  )
-      extends SubclassFingerprint
+  ) extends SubclassFingerprint
 }

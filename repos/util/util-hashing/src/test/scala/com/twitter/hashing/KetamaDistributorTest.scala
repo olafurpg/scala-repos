@@ -12,14 +12,14 @@ import org.scalatest.junit.JUnitRunner
 class KetamaDistributorTest extends WordSpec {
   "KetamaDistributor" should {
     val nodes = Seq(
-        KetamaNode("10.0.1.1", 600, 1),
-        KetamaNode("10.0.1.2", 300, 2),
-        KetamaNode("10.0.1.3", 200, 3),
-        KetamaNode("10.0.1.4", 350, 4),
-        KetamaNode("10.0.1.5", 1000, 5),
-        KetamaNode("10.0.1.6", 800, 6),
-        KetamaNode("10.0.1.7", 950, 7),
-        KetamaNode("10.0.1.8", 100, 8)
+      KetamaNode("10.0.1.1", 600, 1),
+      KetamaNode("10.0.1.2", 300, 2),
+      KetamaNode("10.0.1.3", 200, 3),
+      KetamaNode("10.0.1.4", 350, 4),
+      KetamaNode("10.0.1.5", 1000, 5),
+      KetamaNode("10.0.1.6", 800, 6),
+      KetamaNode("10.0.1.7", 950, 7),
+      KetamaNode("10.0.1.8", 100, 8)
     )
 
     // 160 is the hard coded value for libmemcached, which was this input data is from
@@ -55,7 +55,7 @@ class KetamaDistributorTest extends WordSpec {
         val handle = ketamaDistributor.nodeForHash(hash)
         val handle2 =
           ketamaDistributorInoldLibMemcachedVersionComplianceMode.nodeForHash(
-              hash)
+            hash)
         val resultIp = handleToIp(handle)
         val resultIp2 = handleToIp(handle2)
         assert(testcase(3) == resultIp)
@@ -65,11 +65,11 @@ class KetamaDistributorTest extends WordSpec {
 
     "pick the correct node with 64-bit hash values" in {
       val knownGoodValues = Map(
-          -166124121512512L -> 5,
-          8796093022208L -> 3,
-          4312515125124L -> 2,
-          -8192481414141L -> 1,
-          -9515121512312L -> 5
+        -166124121512512L -> 5,
+        8796093022208L -> 3,
+        4312515125124L -> 2,
+        -8192481414141L -> 1,
+        -9515121512312L -> 5
       )
 
       knownGoodValues foreach {

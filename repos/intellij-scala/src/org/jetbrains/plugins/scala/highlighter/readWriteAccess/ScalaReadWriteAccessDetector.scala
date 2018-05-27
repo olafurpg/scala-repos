@@ -4,8 +4,14 @@ package highlighter.readWriteAccess
 import com.intellij.codeInsight.highlighting.ReadWriteAccessDetector
 import com.intellij.codeInsight.highlighting.ReadWriteAccessDetector.Access
 import com.intellij.psi.{PsiElement, PsiNamedElement, PsiReference}
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScAssignStmt, ScExpression}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScPatternDefinition, ScVariableDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScAssignStmt,
+  ScExpression
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScPatternDefinition,
+  ScVariableDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.{ScalaPsiElement, ScalaPsiUtil}
 
 /**
@@ -29,7 +35,8 @@ class ScalaReadWriteAccessDetector extends ReadWriteAccessDetector {
     }
   }
   def getReferenceAccess(
-      referencedElement: PsiElement, reference: PsiReference): Access =
+      referencedElement: PsiElement,
+      reference: PsiReference): Access =
     getExpressionAccess(reference.getElement)
 
   def isDeclarationWriteAccess(element: PsiElement): Boolean = {
@@ -37,7 +44,7 @@ class ScalaReadWriteAccessDetector extends ReadWriteAccessDetector {
       case x: PsiNamedElement =>
         ScalaPsiUtil.nameContext(x) match {
           case _: ScVariableDefinition | _: ScPatternDefinition => true
-          case _ => false
+          case _                                                => false
         }
       case _ => false
     }
@@ -52,7 +59,7 @@ private object ScalaReadWriteAccessDetector {
   def isAccessedForWriting(expression: ScExpression): Boolean = {
     expression.getParent match {
       case assign: ScAssignStmt if expression == assign.getLExpression => true
-      case _ => false
+      case _                                                           => false
     }
   }
 }

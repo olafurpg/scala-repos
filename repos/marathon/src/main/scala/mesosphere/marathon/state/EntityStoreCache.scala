@@ -21,7 +21,9 @@ import scala.concurrent.Future
   *    - clear everything
   */
 class EntityStoreCache[T <: MarathonState[_, T]](store: EntityStore[T])
-    extends EntityStore[T] with LeadershipCallback with VersionedEntry {
+    extends EntityStore[T]
+    with LeadershipCallback
+    with VersionedEntry {
 
   @volatile
   private[state] var cacheOpt: Option[TrieMap[String, Option[T]]] = None
@@ -34,7 +36,7 @@ class EntityStoreCache[T <: MarathonState[_, T]](store: EntityStore[T])
         Future.successful {
           cache.get(key) match {
             case Some(t) => t
-            case _ => None
+            case _       => None
           }
         }
       } else {
@@ -65,7 +67,8 @@ class EntityStoreCache[T <: MarathonState[_, T]](store: EntityStore[T])
   }
 
   override def expunge(
-      key: String, onSuccess: () => Unit = () => ()): Future[Boolean] =
+      key: String,
+      onSuccess: () => Unit = () => ()): Future[Boolean] =
     directOrCached(store.expunge(key, onSuccess)) { cache =>
       def onExpunged(): Unit = {
         cache.remove(key)
@@ -101,7 +104,7 @@ class EntityStoreCache[T <: MarathonState[_, T]](store: EntityStore[T])
       val (unversionedNames, versionedNames) = names.partition(noVersionKey)
       if (log.isDebugEnabled) {
         log.debug(
-            s"$store Preload and cache entries: $unversionedNames and versioned entries $versionedNames")
+          s"$store Preload and cache entries: $unversionedNames and versioned entries $versionedNames")
       }
       //add keys with None for version entries
       versionedNames.foreach(cache.put(_, None))
@@ -128,7 +131,7 @@ class EntityStoreCache[T <: MarathonState[_, T]](store: EntityStore[T])
       cached: TrieMap[String, Option[T]] => R): R = {
     cacheOpt match {
       case Some(cache) => cached(cache)
-      case None => direct
+      case None        => direct
     }
   }
 }

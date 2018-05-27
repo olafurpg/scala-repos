@@ -8,8 +8,9 @@ import com.twitter.util.NoStacktrace
   *
   * @see [[com.twitter.finagle.service.StatsFilter]]
   */
-class ResponseClassificationSyntheticException private[finagle]()
-    extends Exception with NoStacktrace {
+class ResponseClassificationSyntheticException private[finagle] ()
+    extends Exception
+    with NoStacktrace {
   override def getMessage: String =
     "A synthetic ResponseClassification failure"
 }

@@ -10,7 +10,8 @@ import lila.hub.actorApi.SendTo
 import lila.user.User
 
 private[notification] final class Api(
-    bus: lila.common.Bus, renderer: ActorSelection) {
+    bus: lila.common.Bus,
+    renderer: ActorSelection) {
 
   private val repo = mutable.Map[String, List[Notification]]()
   import makeTimeout.large

@@ -51,11 +51,13 @@ abstract class UntypedActorWithStash extends UntypedActor with Stash
   * See [[akka.actor.UntypedActorWithStash]] for details on how `Stash` works.
   */
 abstract class UntypedActorWithUnboundedStash
-    extends UntypedActor with UnboundedStash
+    extends UntypedActor
+    with UnboundedStash
 
 /**
   * Actor base class with `Stash` that does not enforce any mailbox type. The mailbox of the actor has to be configured
   * manually. See [[akka.actor.UntypedActorWithStash]] for details on how `Stash` works.
   */
 abstract class UntypedActorWithUnrestrictedStash
-    extends UntypedActor with UnrestrictedStash
+    extends UntypedActor
+    with UnrestrictedStash

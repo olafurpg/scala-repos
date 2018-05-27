@@ -37,20 +37,21 @@ object CubicCurveTo {
   implicit def sfxCubicCurveTo2jfx(v: CubicCurveTo): jfxss.CubicCurveTo =
     if (v != null) v.delegate else null
 
-  def apply(controlX1: Double,
-            controlY1: Double,
-            controlX2: Double,
-            controlY2: Double,
-            x: Double,
-            y: Double) =
+  def apply(
+      controlX1: Double,
+      controlY1: Double,
+      controlX2: Double,
+      controlY2: Double,
+      x: Double,
+      y: Double) =
     new CubicCurveTo(
-        new jfxss.CubicCurveTo(
-            controlX1, controlY1, controlX2, controlY2, x, y))
+      new jfxss.CubicCurveTo(controlX1, controlY1, controlX2, controlY2, x, y))
 }
 
 class CubicCurveTo(
     override val delegate: jfxss.CubicCurveTo = new jfxss.CubicCurveTo)
-    extends PathElement(delegate) with PositionDelegate[jfxss.CubicCurveTo]
+    extends PathElement(delegate)
+    with PositionDelegate[jfxss.CubicCurveTo]
     with SFXDelegate[jfxss.CubicCurveTo] {
 
   def controlX1: DoubleProperty = delegate.controlX1Property

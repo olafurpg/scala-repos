@@ -23,8 +23,9 @@ trait SourceLocation {
   val charOffset: Int
 }
 
-case class SourceLocation1(val outer: SourceLocation,
-                           val fileName: String,
-                           val line: Int,
-                           val charOffset: Int)
+case class SourceLocation1(
+    val outer: SourceLocation,
+    val fileName: String,
+    val line: Int,
+    val charOffset: Int)
     extends SourceLocation

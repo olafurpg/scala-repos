@@ -29,7 +29,12 @@ import org.json4s.DefaultFormats
 import org.json4s.JsonDSL._
 import org.json4s.jackson.JsonMethods.{compact, render}
 
-import org.apache.spark.{HashPartitioner, Partitioner, SparkContext, SparkException}
+import org.apache.spark.{
+  HashPartitioner,
+  Partitioner,
+  SparkContext,
+  SparkException
+}
 import org.apache.spark.annotation.Since
 import org.apache.spark.api.java.JavaRDD
 import org.apache.spark.api.java.JavaSparkContext.fakeClassTag
@@ -48,9 +53,10 @@ import org.apache.spark.storage.StorageLevel
   * @tparam Item item type
   */
 @Since("1.3.0")
-class FPGrowthModel[Item : ClassTag] @Since("1.3.0")(
+class FPGrowthModel[Item: ClassTag] @Since("1.3.0")(
     @Since("1.3.0") val freqItemsets: RDD[FreqItemset[Item]])
-    extends Saveable with Serializable {
+    extends Saveable
+    with Serializable {
 
   /**
     * Generates association rules for the [[Item]]s in [[freqItemsets]].
@@ -104,8 +110,7 @@ object FPGrowthModel extends Loader[FPGrowthModel[_]] {
       val sqlContext = SQLContext.getOrCreate(sc)
 
       val metadata = compact(
-          render(
-              ("class" -> thisClassName) ~ ("version" -> thisFormatVersion)))
+        render(("class" -> thisClassName) ~ ("version" -> thisFormatVersion)))
       sc.parallelize(Seq(metadata), 1)
         .saveAsTextFile(Loader.metadataPath(path))
 
@@ -117,8 +122,9 @@ object FPGrowthModel extends Loader[FPGrowthModel[_]] {
       val tpe = classSymbol.selfType
 
       val itemType = ScalaReflection.schemaFor(tpe).dataType
-      val fields = Array(StructField("items", ArrayType(itemType)),
-                         StructField("freq", LongType))
+      val fields = Array(
+        StructField("items", ArrayType(itemType)),
+        StructField("freq", LongType))
       val schema = StructType(fields)
       val rowDataRDD = model.freqItemsets.map { x =>
         Row(x.items, x.freq)
@@ -142,8 +148,9 @@ object FPGrowthModel extends Loader[FPGrowthModel[_]] {
       loadImpl(freqItemsets, sample)
     }
 
-    def loadImpl[Item : ClassTag](
-        freqItemsets: DataFrame, sample: Item): FPGrowthModel[Item] = {
+    def loadImpl[Item: ClassTag](
+        freqItemsets: DataFrame,
+        sample: Item): FPGrowthModel[Item] = {
       val freqItemsetsRDD = freqItemsets.select("items", "freq").rdd.map { x =>
         val items = x.getAs[Seq[Item]](0).toArray
         val freq = x.getLong(1)
@@ -172,8 +179,10 @@ object FPGrowthModel extends Loader[FPGrowthModel[_]] {
   */
 @Since("1.3.0")
 class FPGrowth private (
-    private var minSupport: Double, private var numPartitions: Int)
-    extends Logging with Serializable {
+    private var minSupport: Double,
+    private var numPartitions: Int)
+    extends Logging
+    with Serializable {
 
   /**
     * Constructs a default instance with default parameters {minSupport: `0.3`, numPartitions: same
@@ -210,7 +219,7 @@ class FPGrowth private (
     *
     */
   @Since("1.3.0")
-  def run[Item : ClassTag](data: RDD[Array[Item]]): FPGrowthModel[Item] = {
+  def run[Item: ClassTag](data: RDD[Array[Item]]): FPGrowthModel[Item] = {
     if (data.getStorageLevel == StorageLevel.NONE) {
       logWarning("Input data is not cached.")
     }
@@ -238,18 +247,20 @@ class FPGrowth private (
     * @param partitioner partitioner used to distribute items
     * @return array of frequent pattern ordered by their frequencies
     */
-  private def genFreqItems[Item : ClassTag](
+  private def genFreqItems[Item: ClassTag](
       data: RDD[Array[Item]],
       minCount: Long,
       partitioner: Partitioner): Array[Item] = {
-    data.flatMap { t =>
-      val uniq = t.toSet
-      if (t.length != uniq.size) {
-        throw new SparkException(
+    data
+      .flatMap { t =>
+        val uniq = t.toSet
+        if (t.length != uniq.size) {
+          throw new SparkException(
             s"Items in a transaction must be unique but got ${t.toSeq}.")
+        }
+        t
       }
-      t
-    }.map(v => (v, 1L))
+      .map(v => (v, 1L))
       .reduceByKey(partitioner, _ + _)
       .filter(_._2 >= minCount)
       .collect()
@@ -265,17 +276,19 @@ class FPGrowth private (
     * @param partitioner partitioner used to distribute transactions
     * @return an RDD of (frequent itemset, count)
     */
-  private def genFreqItemsets[Item : ClassTag](
+  private def genFreqItemsets[Item: ClassTag](
       data: RDD[Array[Item]],
       minCount: Long,
       freqItems: Array[Item],
       partitioner: Partitioner): RDD[FreqItemset[Item]] = {
     val itemToRank = freqItems.zipWithIndex.toMap
-    data.flatMap { transaction =>
-      genCondTransactions(transaction, itemToRank, partitioner)
-    }.aggregateByKey(new FPTree[Int], partitioner.numPartitions)(
-          (tree, transaction) => tree.add(transaction, 1L),
-          (tree1, tree2) => tree1.merge(tree2))
+    data
+      .flatMap { transaction =>
+        genCondTransactions(transaction, itemToRank, partitioner)
+      }
+      .aggregateByKey(new FPTree[Int], partitioner.numPartitions)(
+        (tree, transaction) => tree.add(transaction, 1L),
+        (tree1, tree2) => tree1.merge(tree2))
       .flatMap {
         case (part, tree) =>
           tree.extract(minCount, x => partitioner.getPartition(x) == part)
@@ -293,7 +306,7 @@ class FPGrowth private (
     * @param partitioner partitioner used to distribute transactions
     * @return a map of (target partition, conditional transaction)
     */
-  private def genCondTransactions[Item : ClassTag](
+  private def genCondTransactions[Item: ClassTag](
       transaction: Array[Item],
       itemToRank: Map[Item, Int],
       partitioner: Partitioner): mutable.Map[Int, Array[Int]] = {

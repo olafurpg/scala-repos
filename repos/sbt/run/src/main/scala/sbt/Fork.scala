@@ -36,13 +36,14 @@ trait ForkScalaRun extends ForkScala {
   * @param connectInput If true, the standard input of the forked process is connected to the standard input of this process.  Otherwise, it is connected to an empty input stream.  Connecting input streams can be problematic, especially on versions before Java 7.
   * @param envVars The environment variables to provide to the forked process.  By default, none are provided.
   */
-final case class ForkOptions(javaHome: Option[File] = None,
-                             outputStrategy: Option[OutputStrategy] = None,
-                             bootJars: Seq[File] = Nil,
-                             workingDirectory: Option[File] = None,
-                             runJVMOptions: Seq[String] = Nil,
-                             connectInput: Boolean = false,
-                             envVars: Map[String, String] = Map.empty)
+final case class ForkOptions(
+    javaHome: Option[File] = None,
+    outputStrategy: Option[OutputStrategy] = None,
+    bootJars: Seq[File] = Nil,
+    workingDirectory: Option[File] = None,
+    runJVMOptions: Seq[String] = Nil,
+    connectInput: Boolean = false,
+    envVars: Map[String, String] = Map.empty)
     extends ForkScalaRun {
   @deprecated("Use bootJars.", "0.13.0")
   def scalaJars: Iterable[File] = bootJars
@@ -108,8 +109,8 @@ sealed class Fork(val commandName: String, val runnerClass: Option[String]) {
     val environment = builder.environment
     for ((key, value) <- env) environment.put(key, value)
     for (cpenv <- classpathEnv)
-    // overriding, not appending, is correct due to the specified priorities of -classpath and CLASSPATH
-    environment.put(Fork.ClasspathEnvKey, cpenv)
+      // overriding, not appending, is correct due to the specified priorities of -classpath and CLASSPATH
+      environment.put(Fork.ClasspathEnvKey, cpenv)
     outputStrategy.getOrElse(StdoutOutput) match {
       case StdoutOutput => Process(builder).run(connectInput)
       case BufferedOutput(logger) =>
@@ -119,14 +120,15 @@ sealed class Fork(val commandName: String, val runnerClass: Option[String]) {
         (Process(builder) #> output).run(connectInput)
     }
   }
-  private[this] def makeOptions(jvmOptions: Seq[String],
-                                bootJars: Iterable[File],
-                                arguments: Seq[String]): Seq[String] = {
+  private[this] def makeOptions(
+      jvmOptions: Seq[String],
+      bootJars: Iterable[File],
+      arguments: Seq[String]): Seq[String] = {
     val boot =
       if (bootJars.isEmpty) None
       else
         Some(
-            "-Xbootclasspath/a:" +
+          "-Xbootclasspath/a:" +
             bootJars.map(_.getAbsolutePath).mkString(File.pathSeparator))
     jvmOptions ++ boot.toList ++ runnerClass.toList ++ arguments
   }
@@ -183,40 +185,45 @@ object Fork {
       apply(javaHome, options, BufferedOutput(log))
 
     @deprecated("Use apply(ForkOptions, Seq[String])", "0.13.0")
-    def apply(javaHome: Option[File],
-              options: Seq[String],
-              outputStrategy: OutputStrategy): Int =
+    def apply(
+        javaHome: Option[File],
+        options: Seq[String],
+        outputStrategy: OutputStrategy): Int =
       apply(javaHome, options, None, outputStrategy)
 
     @deprecated("Use apply(ForkOptions, Seq[String])", "0.13.0")
-    def apply(javaHome: Option[File],
-              options: Seq[String],
-              workingDirectory: Option[File],
-              log: Logger): Int =
+    def apply(
+        javaHome: Option[File],
+        options: Seq[String],
+        workingDirectory: Option[File],
+        log: Logger): Int =
       apply(javaHome, options, workingDirectory, BufferedOutput(log))
 
     @deprecated("Use apply(ForkOptions, Seq[String])", "0.13.0")
-    def apply(javaHome: Option[File],
-              options: Seq[String],
-              workingDirectory: Option[File],
-              outputStrategy: OutputStrategy): Int =
+    def apply(
+        javaHome: Option[File],
+        options: Seq[String],
+        workingDirectory: Option[File],
+        outputStrategy: OutputStrategy): Int =
       apply(javaHome, options, workingDirectory, Map.empty, outputStrategy)
 
     @deprecated("Use apply(ForkOptions, Seq[String])", "0.13.0")
-    def apply(javaHome: Option[File],
-              options: Seq[String],
-              workingDirectory: Option[File],
-              env: Map[String, String],
-              outputStrategy: OutputStrategy): Int =
+    def apply(
+        javaHome: Option[File],
+        options: Seq[String],
+        workingDirectory: Option[File],
+        env: Map[String, String],
+        outputStrategy: OutputStrategy): Int =
       fork(javaHome, options, workingDirectory, env, false, outputStrategy).exitValue
 
     @deprecated("Use apply(ForkOptions, Seq[String])", "0.13.0")
-    def fork(javaHome: Option[File],
-             options: Seq[String],
-             workingDirectory: Option[File],
-             env: Map[String, String],
-             connectInput: Boolean,
-             outputStrategy: OutputStrategy): Process = {
+    def fork(
+        javaHome: Option[File],
+        options: Seq[String],
+        workingDirectory: Option[File],
+        env: Map[String, String],
+        connectInput: Boolean,
+        outputStrategy: OutputStrategy): Process = {
       val executable = javaCommand(javaHome, commandName).getAbsolutePath
       val command = (executable :: options.toList).toArray
       val builder = new JProcessBuilder(command: _*)
@@ -237,86 +244,96 @@ object Fork {
   @deprecated("Use Fork", "0.13.0")
   final class ForkScala(mainClassName: String) {
     @deprecated("Use apply(ForkOptions, Seq[String])", "0.13.0")
-    def apply(javaHome: Option[File],
-              jvmOptions: Seq[String],
-              scalaJars: Iterable[File],
-              arguments: Seq[String],
-              log: Logger): Int =
-      apply(javaHome,
-            jvmOptions,
-            scalaJars,
-            arguments,
-            None,
-            BufferedOutput(log))
+    def apply(
+        javaHome: Option[File],
+        jvmOptions: Seq[String],
+        scalaJars: Iterable[File],
+        arguments: Seq[String],
+        log: Logger): Int =
+      apply(
+        javaHome,
+        jvmOptions,
+        scalaJars,
+        arguments,
+        None,
+        BufferedOutput(log))
 
     @deprecated("Use apply(ForkOptions, Seq[String])", "0.13.0")
-    def apply(javaHome: Option[File],
-              jvmOptions: Seq[String],
-              scalaJars: Iterable[File],
-              arguments: Seq[String],
-              workingDirectory: Option[File],
-              log: Logger): Int =
-      apply(javaHome,
-            jvmOptions,
-            scalaJars,
-            arguments,
-            workingDirectory,
-            BufferedOutput(log))
+    def apply(
+        javaHome: Option[File],
+        jvmOptions: Seq[String],
+        scalaJars: Iterable[File],
+        arguments: Seq[String],
+        workingDirectory: Option[File],
+        log: Logger): Int =
+      apply(
+        javaHome,
+        jvmOptions,
+        scalaJars,
+        arguments,
+        workingDirectory,
+        BufferedOutput(log))
 
     @deprecated("Use apply(ForkOptions, Seq[String])", "0.13.0")
-    def apply(javaHome: Option[File],
-              jvmOptions: Seq[String],
-              scalaJars: Iterable[File],
-              arguments: Seq[String],
-              workingDirectory: Option[File],
-              outputStrategy: OutputStrategy): Int =
-      fork(javaHome,
-           jvmOptions,
-           scalaJars,
-           arguments,
-           workingDirectory,
-           false,
-           outputStrategy).exitValue()
+    def apply(
+        javaHome: Option[File],
+        jvmOptions: Seq[String],
+        scalaJars: Iterable[File],
+        arguments: Seq[String],
+        workingDirectory: Option[File],
+        outputStrategy: OutputStrategy): Int =
+      fork(
+        javaHome,
+        jvmOptions,
+        scalaJars,
+        arguments,
+        workingDirectory,
+        false,
+        outputStrategy).exitValue()
 
     @deprecated("Use fork(ForkOptions, Seq[String])", "0.13.0")
-    def fork(javaHome: Option[File],
-             jvmOptions: Seq[String],
-             scalaJars: Iterable[File],
-             arguments: Seq[String],
-             workingDirectory: Option[File],
-             connectInput: Boolean,
-             outputStrategy: OutputStrategy): Process =
-      fork(javaHome,
-           jvmOptions,
-           scalaJars,
-           arguments,
-           workingDirectory,
-           Map.empty,
-           connectInput,
-           outputStrategy)
+    def fork(
+        javaHome: Option[File],
+        jvmOptions: Seq[String],
+        scalaJars: Iterable[File],
+        arguments: Seq[String],
+        workingDirectory: Option[File],
+        connectInput: Boolean,
+        outputStrategy: OutputStrategy): Process =
+      fork(
+        javaHome,
+        jvmOptions,
+        scalaJars,
+        arguments,
+        workingDirectory,
+        Map.empty,
+        connectInput,
+        outputStrategy)
 
     @deprecated("Use apply(ForkOptions, Seq[String])", "0.13.0")
-    def fork(javaHome: Option[File],
-             jvmOptions: Seq[String],
-             scalaJars: Iterable[File],
-             arguments: Seq[String],
-             workingDirectory: Option[File],
-             env: Map[String, String],
-             connectInput: Boolean,
-             outputStrategy: OutputStrategy): Process = {
+    def fork(
+        javaHome: Option[File],
+        jvmOptions: Seq[String],
+        scalaJars: Iterable[File],
+        arguments: Seq[String],
+        workingDirectory: Option[File],
+        env: Map[String, String],
+        connectInput: Boolean,
+        outputStrategy: OutputStrategy): Process = {
       if (scalaJars.isEmpty) sys.error("Scala jars not specified")
       val scalaClasspathString =
         "-Xbootclasspath/a:" +
-        scalaJars.map(_.getAbsolutePath).mkString(File.pathSeparator)
+          scalaJars.map(_.getAbsolutePath).mkString(File.pathSeparator)
       val mainClass = if (mainClassName.isEmpty) Nil else mainClassName :: Nil
       val options =
         jvmOptions ++ (scalaClasspathString :: mainClass ::: arguments.toList)
-      Fork.java.fork(javaHome,
-                     options,
-                     workingDirectory,
-                     env,
-                     connectInput,
-                     outputStrategy)
+      Fork.java.fork(
+        javaHome,
+        options,
+        workingDirectory,
+        env,
+        connectInput,
+        outputStrategy)
     }
   }
 }

@@ -4,10 +4,20 @@ package lang.refactoring.util
 import com.intellij.codeInsight.CodeInsightUtilCore
 import com.intellij.codeInsight.highlighting.HighlightManager
 import com.intellij.codeInsight.template._
-import com.intellij.codeInsight.template.impl.{TemplateImpl, TemplateManagerImpl, TemplateState, TextExpression}
+import com.intellij.codeInsight.template.impl.{
+  TemplateImpl,
+  TemplateManagerImpl,
+  TemplateState,
+  TextExpression
+}
 import com.intellij.openapi.editor.colors.{EditorColors, EditorColorsManager}
 import com.intellij.openapi.editor.markup.{RangeHighlighter, TextAttributes}
-import com.intellij.openapi.editor.{Document, Editor, EditorFactory, RangeMarker}
+import com.intellij.openapi.editor.{
+  Document,
+  Editor,
+  EditorFactory,
+  RangeMarker
+}
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.{PsiDocumentManager, PsiElement, PsiNamedElement}
 import com.intellij.refactoring.rename.inplace.MyLookupExpression
@@ -35,10 +45,11 @@ class InplaceRenameHelper(parent: PsiElement) {
     PsiDocumentManager.getInstance(project).getDocument(file)
   val editor = EditorFactory.getInstance.getEditors(document)(0)
 
-  def addGroup(primary: PsiElement,
-               newName: String,
-               dependentsWithRanges: Seq[(PsiElement, TextRange)],
-               suggestedNames: Seq[String]) {
+  def addGroup(
+      primary: PsiElement,
+      newName: String,
+      dependentsWithRanges: Seq[(PsiElement, TextRange)],
+      suggestedNames: Seq[String]) {
     val names = new java.util.LinkedHashSet[String]()
     suggestedNames.foreach(names.add)
     val lookupExpr = primary match {
@@ -55,8 +66,7 @@ class InplaceRenameHelper(parent: PsiElement) {
       depNames += dependentName
       val (depElem, depRange) = dependentsWithRanges(index)
       if (depRange != null)
-        builder.replaceElement(
-            depElem, depRange, dependentName, newName, false)
+        builder.replaceElement(depElem, depRange, dependentName, newName, false)
       else builder.replaceElement(depElem, dependentName, newName, false)
     }
     primaries += primary
@@ -64,13 +74,15 @@ class InplaceRenameHelper(parent: PsiElement) {
     dependentNames += (primary -> depNames)
   }
 
-  def addGroup(primary: ScNamedElement,
-               dependents: Seq[PsiElement],
-               suggestedNames: Seq[String]): Unit = {
-    addGroup(primary.nameId,
-             primary.name,
-             dependents.map((_, null)),
-             suggestedNames)
+  def addGroup(
+      primary: ScNamedElement,
+      dependents: Seq[PsiElement],
+      suggestedNames: Seq[String]): Unit = {
+    addGroup(
+      primary.nameId,
+      primary.name,
+      dependents.map((_, null)),
+      suggestedNames)
   }
 
   def startRenaming() {
@@ -80,8 +92,8 @@ class InplaceRenameHelper(parent: PsiElement) {
     val template = builder.buildInlineTemplate().asInstanceOf[TemplateImpl]
     val templateVariables = template.getVariables
     val stopAtVariables = templateVariables.asScala.filter(_.isAlwaysStopAt)
-    val primarySortedVariables = primaries.flatMap(
-        p => stopAtVariables.find(_.getName == primaryNames(p)))
+    val primarySortedVariables =
+      primaries.flatMap(p => stopAtVariables.find(_.getName == primaryNames(p)))
     for ((v, idx) <- primarySortedVariables.zipWithIndex) {
       templateVariables.set(idx, v)
     }
@@ -90,87 +102,96 @@ class InplaceRenameHelper(parent: PsiElement) {
 
     TemplateManager
       .getInstance(project)
-      .startTemplate(editor, template, new TemplateEditingAdapter {
-        override def waitingForInput(template: Template) {
-          markCurrentVariables(0)
-        }
-
-        override def currentVariableChanged(templateState: TemplateState,
-                                            template: Template,
-                                            oldIndex: Int,
-                                            newIndex: Int) {
-          if (oldIndex >= 0) clearHighlighters()
-          if (newIndex >= 0) markCurrentVariables(newIndex)
-        }
-
-        override def templateCancelled(template: Template) {
-          clearHighlighters()
-        }
-
-        override def templateFinished(template: Template, brokenOff: Boolean) {
-          clearHighlighters()
-        }
-
-        private def addHighlights(
-            ranges: mutable.HashMap[RangeMarker, TextAttributes],
-            editor: Editor,
-            highlighters: ArrayBuffer[RangeHighlighter],
-            highlightManager: HighlightManager) {
-          for ((range, attributes) <- ranges) {
-            import scala.collection.JavaConversions._
-            highlightManager.addOccurrenceHighlight(editor,
-                                                    range.getStartOffset,
-                                                    range.getEndOffset,
-                                                    attributes,
-                                                    0,
-                                                    highlighters,
-                                                    null)
+      .startTemplate(
+        editor,
+        template,
+        new TemplateEditingAdapter {
+          override def waitingForInput(template: Template) {
+            markCurrentVariables(0)
           }
-          for (highlighter <- highlighters) {
-            highlighter.setGreedyToLeft(true)
-            highlighter.setGreedyToRight(true)
+
+          override def currentVariableChanged(
+              templateState: TemplateState,
+              template: Template,
+              oldIndex: Int,
+              newIndex: Int) {
+            if (oldIndex >= 0) clearHighlighters()
+            if (newIndex >= 0) markCurrentVariables(newIndex)
           }
-        }
 
-        private def markCurrentVariables(groupIndex: Int) {
-          val colorsManager: EditorColorsManager =
-            EditorColorsManager.getInstance
-          val templateState: TemplateState =
-            TemplateManagerImpl.getTemplateState(editor)
-          val document = editor.getDocument
-          val primary = primaries(groupIndex)
+          override def templateCancelled(template: Template) {
+            clearHighlighters()
+          }
 
-          for (i <- 0 until templateState.getSegmentsCount) {
-            val segmentRange: TextRange = templateState.getSegmentRange(i)
-            val segmentMarker: RangeMarker =
-              document.createRangeMarker(segmentRange)
-            val name: String = template.getSegmentName(i)
-            val attributes: TextAttributes =
-              if (name == primaryNames(primary))
-                colorsManager.getGlobalScheme.getAttributes(
+          override def templateFinished(
+              template: Template,
+              brokenOff: Boolean) {
+            clearHighlighters()
+          }
+
+          private def addHighlights(
+              ranges: mutable.HashMap[RangeMarker, TextAttributes],
+              editor: Editor,
+              highlighters: ArrayBuffer[RangeHighlighter],
+              highlightManager: HighlightManager) {
+            for ((range, attributes) <- ranges) {
+              import scala.collection.JavaConversions._
+              highlightManager.addOccurrenceHighlight(
+                editor,
+                range.getStartOffset,
+                range.getEndOffset,
+                attributes,
+                0,
+                highlighters,
+                null)
+            }
+            for (highlighter <- highlighters) {
+              highlighter.setGreedyToLeft(true)
+              highlighter.setGreedyToRight(true)
+            }
+          }
+
+          private def markCurrentVariables(groupIndex: Int) {
+            val colorsManager: EditorColorsManager =
+              EditorColorsManager.getInstance
+            val templateState: TemplateState =
+              TemplateManagerImpl.getTemplateState(editor)
+            val document = editor.getDocument
+            val primary = primaries(groupIndex)
+
+            for (i <- 0 until templateState.getSegmentsCount) {
+              val segmentRange: TextRange = templateState.getSegmentRange(i)
+              val segmentMarker: RangeMarker =
+                document.createRangeMarker(segmentRange)
+              val name: String = template.getSegmentName(i)
+              val attributes: TextAttributes =
+                if (name == primaryNames(primary))
+                  colorsManager.getGlobalScheme.getAttributes(
                     EditorColors.WRITE_SEARCH_RESULT_ATTRIBUTES)
-              else if (dependentNames(primary) contains name)
-                colorsManager.getGlobalScheme.getAttributes(
+                else if (dependentNames(primary) contains name)
+                  colorsManager.getGlobalScheme.getAttributes(
                     EditorColors.SEARCH_RESULT_ATTRIBUTES)
-              else null
-            if (attributes != null)
-              rangesToHighlight.put(segmentMarker, attributes)
+                else null
+              if (attributes != null)
+                rangesToHighlight.put(segmentMarker, attributes)
+            }
+            addHighlights(
+              rangesToHighlight,
+              editor,
+              myHighlighters,
+              HighlightManager.getInstance(project))
           }
-          addHighlights(rangesToHighlight,
-                        editor,
-                        myHighlighters,
-                        HighlightManager.getInstance(project))
-        }
 
-        private def clearHighlighters() {
-          val highlightManager = HighlightManager.getInstance(project)
-          myHighlighters.foreach { a =>
-            highlightManager.removeSegmentHighlighter(editor, a)
+          private def clearHighlighters() {
+            val highlightManager = HighlightManager.getInstance(project)
+            myHighlighters.foreach { a =>
+              highlightManager.removeSegmentHighlighter(editor, a)
+            }
+            rangesToHighlight.clear()
+            myHighlighters.clear()
           }
-          rangesToHighlight.clear()
-          myHighlighters.clear()
         }
-      })
+      )
     PsiDocumentManager.getInstance(project).commitDocument(editor.getDocument)
   }
 }

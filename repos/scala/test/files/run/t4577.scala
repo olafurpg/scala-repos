@@ -9,7 +9,7 @@ object Test {
   class Symbol(val name: String) {
     override def equals(other: Any) = other match {
       case x: Symbol => name == x.name
-      case _ => false
+      case _         => false
     }
     override def toString = name
   }
@@ -18,14 +18,14 @@ object Test {
   // for now the optimizer doesn't quite get from `f` to `fDirect`
   def f(s: Symbol) = s match {
     case _: bippy.type => true
-    case _ => false
+    case _             => false
   }
   def fDirect(s: Symbol) = bippy eq s
 
   def g(s: Symbol) = s match {
     case _: bippy.type => 1
-    case `bippy` => 2
-    case _ => 3
+    case `bippy`       => 2
+    case _             => 3
   }
   def gDirect(s: Symbol) = if (bippy eq s) 1 else if (bippy == s) 2 else 3
 

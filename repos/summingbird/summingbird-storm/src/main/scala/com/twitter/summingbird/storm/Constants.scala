@@ -38,5 +38,7 @@ object Constants extends OnlineDefaultConstants {
   val DEFAULT_FM_PREFER_LOCAL_DEPENDENCY = PreferLocalDependency(false)
   val DEFAULT_ACK_ON_ENTRY = AckOnEntry(false)
   val DEFAULT_MAX_EXECUTE_PER_SEC = MaxExecutePerSecond(
-      lowerBound = Int.MaxValue, upperBound = Int.MaxValue, rampUptimeMS = 0L)
+    lowerBound = Int.MaxValue,
+    upperBound = Int.MaxValue,
+    rampUptimeMS = 0L)
 }

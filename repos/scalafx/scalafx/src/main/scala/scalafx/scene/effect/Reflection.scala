@@ -38,18 +38,19 @@ object Reflection {
     if (r != null) r.delegate else null
 }
 
-class Reflection(
-    override val delegate: jfxse.Reflection = new jfxse.Reflection)
-    extends Effect(delegate) with InputDelegate[jfxse.Reflection]
+class Reflection(override val delegate: jfxse.Reflection = new jfxse.Reflection)
+    extends Effect(delegate)
+    with InputDelegate[jfxse.Reflection]
     with SFXDelegate[jfxse.Reflection] {
 
   /**
     * Creates a new instance of Reflection with the specified topOffset, fraction, topOpacity and bottomOpacity.
     */
-  def this(topOffset: Double,
-           fraction: Double,
-           topOpacity: Double,
-           bottomOpacity: Double) =
+  def this(
+      topOffset: Double,
+      fraction: Double,
+      topOpacity: Double,
+      bottomOpacity: Double) =
     this(new jfxse.Reflection(topOffset, fraction, topOpacity, bottomOpacity))
 
   /**

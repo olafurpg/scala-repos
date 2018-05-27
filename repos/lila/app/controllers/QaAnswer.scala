@@ -14,12 +14,13 @@ object QaAnswer extends QaController {
     WithQuestion(id) { q =>
       implicit val req = ctx.body
       forms.answer.bindFromRequest.fold(
-          err => renderQuestion(q, Some(err)),
-          data =>
-            api.answer.create(data, q, me) map { answer =>
-              Redirect(routes.QaQuestion.show(q.id, q.slug) + "#answer-" +
-                  answer.id)
-          }
+        err => renderQuestion(q, Some(err)),
+        data =>
+          api.answer.create(data, q, me) map { answer =>
+            Redirect(
+              routes.QaQuestion.show(q.id, q.slug) + "#answer-" +
+                answer.id)
+        }
       )
     }
   }
@@ -29,7 +30,7 @@ object QaAnswer extends QaController {
       (api.question findById questionId) zip (api.answer findById answerId) flatMap {
         case (Some(q), Some(a)) if (QaAuth canEdit q) =>
           api.answer.accept(q, a) inject Redirect(
-              routes.QaQuestion.show(q.id, q.slug))
+            routes.QaQuestion.show(q.id, q.slug))
         case _ => notFound
       }
   }
@@ -38,15 +39,17 @@ object QaAnswer extends QaController {
     implicit ctx => me =>
       implicit val req = ctx.body
       forms.vote.bindFromRequest.fold(
-          err => fuccess(BadRequest),
-          v =>
-            api.answer.vote(answerId, me, v == 1) map {
-              case Some(vote) =>
-                Ok(html.qa.vote(routes.QaAnswer.vote(questionId, answerId).url,
-                                vote,
-                                true))
-              case None => NotFound
-          }
+        err => fuccess(BadRequest),
+        v =>
+          api.answer.vote(answerId, me, v == 1) map {
+            case Some(vote) =>
+              Ok(
+                html.qa.vote(
+                  routes.QaAnswer.vote(questionId, answerId).url,
+                  vote,
+                  true))
+            case None => NotFound
+        }
       )
   }
 
@@ -55,14 +58,15 @@ object QaAnswer extends QaController {
       WithOwnAnswer(questionId, answerId) { q => a =>
         implicit val req = ctx.body
         forms.editAnswer.bindFromRequest.fold(
-            err => renderQuestion(q),
-            body =>
-              api.answer.edit(body, a.id) map {
-                case None => NotFound
-                case Some(a2) =>
-                  Redirect(routes.QaQuestion.show(q.id, q.slug) + "#answer-" +
-                      a2.id)
-            }
+          err => renderQuestion(q),
+          body =>
+            api.answer.edit(body, a.id) map {
+              case None => NotFound
+              case Some(a2) =>
+                Redirect(
+                  routes.QaQuestion.show(q.id, q.slug) + "#answer-" +
+                    a2.id)
+          }
         )
       }
   }
@@ -71,9 +75,9 @@ object QaAnswer extends QaController {
     Secure(_.ModerateQa) { implicit ctx => me =>
       OptionFuRedirect(api.answer findById answerId) { a =>
         (api.answer remove a.id) >> Env.mod.logApi.deleteQaAnswer(
-            me.id,
-            a.userId,
-            a.body) inject routes.QaQuestion.show(questionId, "redirect")
+          me.id,
+          a.userId,
+          a.body) inject routes.QaQuestion.show(questionId, "redirect")
       }
     }
 
@@ -82,16 +86,16 @@ object QaAnswer extends QaController {
       WithOwnAnswer(questionId, answerId) { q => a =>
         implicit val req = ctx.body
         forms.moveAnswer.bindFromRequest.fold(
-            err => renderQuestion(q), {
-              case "question" =>
-                api.answer.moveToQuestionComment(a, q) inject Redirect(
-                    routes.QaQuestion.show(q.id, q.slug))
-              case str =>
-                parseIntOption(str).fold(renderQuestion(q)) { answerId =>
-                  api.answer.moveToAnswerComment(a, answerId) inject Redirect(
-                      routes.QaQuestion.show(q.id, q.slug))
-                }
-            }
+          err => renderQuestion(q), {
+            case "question" =>
+              api.answer.moveToQuestionComment(a, q) inject Redirect(
+                routes.QaQuestion.show(q.id, q.slug))
+            case str =>
+              parseIntOption(str).fold(renderQuestion(q)) { answerId =>
+                api.answer.moveToAnswerComment(a, answerId) inject Redirect(
+                  routes.QaQuestion.show(q.id, q.slug))
+              }
+          }
         )
       }
   }

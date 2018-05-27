@@ -25,7 +25,7 @@ class TestTapFactoryTest extends WordSpec with Matchers {
       the[IllegalArgumentException] thrownBy {
         createIllegalTap()
       } should have message
-      ("requirement failed: " +
+        ("requirement failed: " +
           TestTapFactory.sourceNotFoundError.format(testSource))
     }
   }

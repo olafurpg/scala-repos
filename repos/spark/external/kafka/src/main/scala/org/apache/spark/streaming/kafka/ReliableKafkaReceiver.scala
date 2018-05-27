@@ -27,13 +27,22 @@ import kafka.common.TopicAndPartition
 import kafka.consumer.{Consumer, ConsumerConfig, ConsumerConnector, KafkaStream}
 import kafka.message.MessageAndMetadata
 import kafka.serializer.Decoder
-import kafka.utils.{VerifiableProperties, ZKGroupTopicDirs, ZKStringSerializer, ZkUtils}
+import kafka.utils.{
+  VerifiableProperties,
+  ZKGroupTopicDirs,
+  ZKStringSerializer,
+  ZkUtils
+}
 import org.I0Itec.zkclient.ZkClient
 
 import org.apache.spark.SparkEnv
 import org.apache.spark.internal.Logging
 import org.apache.spark.storage.{StorageLevel, StreamBlockId}
-import org.apache.spark.streaming.receiver.{BlockGenerator, BlockGeneratorListener, Receiver}
+import org.apache.spark.streaming.receiver.{
+  BlockGenerator,
+  BlockGeneratorListener,
+  Receiver
+}
 import org.apache.spark.util.ThreadUtils
 
 /**
@@ -48,14 +57,16 @@ import org.apache.spark.util.ThreadUtils
   * commit mechanism in Kafka consumer. So setting this configuration manually within kafkaParams
   * will not take effect.
   */
-private[streaming] class ReliableKafkaReceiver[K : ClassTag,
-                                               V : ClassTag,
-                                               U <: Decoder[_]: ClassTag,
-                                               T <: Decoder[_]: ClassTag](
+private[streaming] class ReliableKafkaReceiver[
+    K: ClassTag,
+    V: ClassTag,
+    U <: Decoder[_]: ClassTag,
+    T <: Decoder[_]: ClassTag](
     kafkaParams: Map[String, String],
     topics: Map[String, Int],
     storageLevel: StorageLevel)
-    extends Receiver[(K, V)](storageLevel) with Logging {
+    extends Receiver[(K, V)](storageLevel)
+    with Logging {
 
   private val groupId = kafkaParams("group.id")
   private val AUTO_OFFSET_COMMIT = "auto.commit.enable"
@@ -71,12 +82,13 @@ private[streaming] class ReliableKafkaReceiver[K : ClassTag,
     * A HashMap to manage the offset for each topic/partition, this HashMap is called in
     * synchronized block, so mutable HashMap will not meet concurrency issue.
     */
-  private var topicPartitionOffsetMap: mutable.HashMap[TopicAndPartition, Long] =
+  private var topicPartitionOffsetMap
+    : mutable.HashMap[TopicAndPartition, Long] =
     null
 
   /** A concurrent HashMap to store the stream block id and related offset snapshot. */
-  private var blockOffsetMap: ConcurrentHashMap[
-      StreamBlockId, Map[TopicAndPartition, Long]] = null
+  private var blockOffsetMap
+    : ConcurrentHashMap[StreamBlockId, Map[TopicAndPartition, Long]] = null
 
   /**
     * Manage the BlockGenerator in receiver itself for better managing block store and offset
@@ -94,8 +106,8 @@ private[streaming] class ReliableKafkaReceiver[K : ClassTag,
     topicPartitionOffsetMap = new mutable.HashMap[TopicAndPartition, Long]
 
     // Initialize the stream block id / offset snapshot hash map.
-    blockOffsetMap = new ConcurrentHashMap[
-        StreamBlockId, Map[TopicAndPartition, Long]]()
+    blockOffsetMap =
+      new ConcurrentHashMap[StreamBlockId, Map[TopicAndPartition, Long]]()
 
     // Initialize the block generator for storing Kafka message.
     blockGenerator = supervisor.createBlockGenerator(new GeneratedBlockHandler)
@@ -103,7 +115,7 @@ private[streaming] class ReliableKafkaReceiver[K : ClassTag,
     if (kafkaParams.contains(AUTO_OFFSET_COMMIT) &&
         kafkaParams(AUTO_OFFSET_COMMIT) == "true") {
       logWarning(
-          s"$AUTO_OFFSET_COMMIT should be set to false in ReliableKafkaReceiver, " +
+        s"$AUTO_OFFSET_COMMIT should be set to false in ReliableKafkaReceiver, " +
           "otherwise we will manually set it to false to turn off auto offset commit in Kafka")
     }
 
@@ -122,13 +134,15 @@ private[streaming] class ReliableKafkaReceiver[K : ClassTag,
     consumerConnector = Consumer.create(consumerConfig)
     logInfo(s"Connected to Zookeeper: ${consumerConfig.zkConnect}")
 
-    zkClient = new ZkClient(consumerConfig.zkConnect,
-                            consumerConfig.zkSessionTimeoutMs,
-                            consumerConfig.zkConnectionTimeoutMs,
-                            ZKStringSerializer)
+    zkClient = new ZkClient(
+      consumerConfig.zkConnect,
+      consumerConfig.zkSessionTimeoutMs,
+      consumerConfig.zkConnectionTimeoutMs,
+      ZKStringSerializer)
 
     messageHandlerThreadPool = ThreadUtils.newDaemonFixedThreadPool(
-        topics.values.sum, "KafkaMessageHandler")
+      topics.values.sum,
+      "KafkaMessageHandler")
 
     blockGenerator.start()
 
@@ -187,8 +201,8 @@ private[streaming] class ReliableKafkaReceiver[K : ClassTag,
   /** Store a Kafka message and the associated metadata as a tuple. */
   private def storeMessageAndMetadata(
       msgAndMetadata: MessageAndMetadata[K, V]): Unit = {
-    val topicAndPartition = TopicAndPartition(
-        msgAndMetadata.topic, msgAndMetadata.partition)
+    val topicAndPartition =
+      TopicAndPartition(msgAndMetadata.topic, msgAndMetadata.partition)
     val data = (msgAndMetadata.key, msgAndMetadata.message)
     val metadata = (topicAndPartition, msgAndMetadata.offset)
     blockGenerator.addDataWithCallback(data, metadata)
@@ -196,7 +210,8 @@ private[streaming] class ReliableKafkaReceiver[K : ClassTag,
 
   /** Update stored offset */
   private def updateOffset(
-      topicAndPartition: TopicAndPartition, offset: Long): Unit = {
+      topicAndPartition: TopicAndPartition,
+      offset: Long): Unit = {
     topicPartitionOffsetMap.put(topicAndPartition, offset)
   }
 
@@ -216,7 +231,8 @@ private[streaming] class ReliableKafkaReceiver[K : ClassTag,
     * will try a fixed number of times to push the block. If the push fails, the receiver is stopped.
     */
   private def storeBlockAndCommitOffset(
-      blockId: StreamBlockId, arrayBuffer: mutable.ArrayBuffer[_]): Unit = {
+      blockId: StreamBlockId,
+      arrayBuffer: mutable.ArrayBuffer[_]): Unit = {
     var count = 0
     var pushed = false
     var exception: Exception = null
@@ -245,9 +261,10 @@ private[streaming] class ReliableKafkaReceiver[K : ClassTag,
   private def commitOffset(offsetMap: Map[TopicAndPartition, Long]): Unit = {
     if (zkClient == null) {
       val thrown = new IllegalStateException(
-          "Zookeeper client is unexpectedly null")
-      stop("Zookeeper client is not initialized before commit offsets to ZK",
-           thrown)
+        "Zookeeper client is unexpectedly null")
+      stop(
+        "Zookeeper client is not initialized before commit offsets to ZK",
+        thrown)
       return
     }
 
@@ -261,13 +278,13 @@ private[streaming] class ReliableKafkaReceiver[K : ClassTag,
       } catch {
         case e: Exception =>
           logWarning(
-              s"Exception during commit offset $offset for topic" +
+            s"Exception during commit offset $offset for topic" +
               s"${topicAndPart.topic}, partition ${topicAndPart.partition}",
-              e)
+            e)
       }
 
       logInfo(
-          s"Committed offset $offset for topic ${topicAndPart.topic}, " +
+        s"Committed offset $offset for topic ${topicAndPart.topic}, " +
           s"partition ${topicAndPart.partition}")
     }
   }
@@ -308,7 +325,8 @@ private[streaming] class ReliableKafkaReceiver[K : ClassTag,
     }
 
     def onPushBlock(
-        blockId: StreamBlockId, arrayBuffer: mutable.ArrayBuffer[_]): Unit = {
+        blockId: StreamBlockId,
+        arrayBuffer: mutable.ArrayBuffer[_]): Unit = {
       // Store block and commit the blocks offset
       storeBlockAndCommitOffset(blockId, arrayBuffer)
     }

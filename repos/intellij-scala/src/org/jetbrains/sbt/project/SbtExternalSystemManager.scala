@@ -10,7 +10,11 @@ import com.intellij.openapi.application.{ApplicationManager, PathManager}
 import com.intellij.openapi.externalSystem.model.ExternalSystemException
 import com.intellij.openapi.externalSystem.service.project.autoimport.CachingExternalSystemAutoImportAware
 import com.intellij.openapi.externalSystem.util._
-import com.intellij.openapi.externalSystem.{ExternalSystemAutoImportAware, ExternalSystemConfigurableAware, ExternalSystemManager}
+import com.intellij.openapi.externalSystem.{
+  ExternalSystemAutoImportAware,
+  ExternalSystemConfigurableAware,
+  ExternalSystemManager
+}
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.projectRoots.impl.JavaAwareProjectJdkTableImpl
@@ -20,7 +24,10 @@ import com.intellij.testFramework.IdeaTestUtil
 import com.intellij.util.net.HttpConfigurable
 import org.jetbrains.android.sdk.AndroidSdkType
 import org.jetbrains.sbt.project.settings._
-import org.jetbrains.sbt.settings.{SbtExternalSystemConfigurable, SbtSystemSettings}
+import org.jetbrains.sbt.settings.{
+  SbtExternalSystemConfigurable,
+  SbtSystemSettings
+}
 
 import scala.collection.mutable
 
@@ -28,11 +35,12 @@ import scala.collection.mutable
   * @author Pavel Fatin
   */
 class SbtExternalSystemManager
-    extends ExternalSystemManager[SbtProjectSettings,
-                                  SbtProjectSettingsListener,
-                                  SbtSystemSettings,
-                                  SbtLocalSettings,
-                                  SbtExecutionSettings]
+    extends ExternalSystemManager[
+      SbtProjectSettings,
+      SbtProjectSettingsListener,
+      SbtSystemSettings,
+      SbtLocalSettings,
+      SbtExecutionSettings]
     with ExternalSystemConfigurableAware {
 
   def enhanceLocalProcessing(urls: util.List[URL]) {
@@ -48,11 +56,11 @@ class SbtExternalSystemManager
     classpath.add(jarWith[scala.xml.Node])
 
     parameters.getVMParametersList.addProperty(
-        ExternalSystemConstants.EXTERNAL_SYSTEM_ID_KEY,
-        SbtProjectSystem.Id.getId)
+      ExternalSystemConstants.EXTERNAL_SYSTEM_ID_KEY,
+      SbtProjectSystem.Id.getId)
 
-    parameters.getVMParametersList.addProperty(
-        PathManager.PROPERTY_LOG_PATH, PathManager.getLogPath)
+    parameters.getVMParametersList
+      .addProperty(PathManager.PROPERTY_LOG_PATH, PathManager.getLogPath)
   }
 
   def getSystemId = SbtProjectSystem.Id
@@ -94,29 +102,32 @@ object SbtExternalSystemManager {
     val environment =
       Map.empty ++ getAndroidEnvironmentVariables(projectJdkName)
 
-    new SbtExecutionSettings(realProjectPath,
-                             vmExecutable,
-                             vmOptions,
-                             environment,
-                             customLauncher,
-                             customSbtStructureFile,
-                             projectJdkName,
-                             projectSettings.resolveClassifiers,
-                             projectSettings.resolveJavadocs,
-                             projectSettings.resolveSbtClassifiers)
+    new SbtExecutionSettings(
+      realProjectPath,
+      vmExecutable,
+      vmOptions,
+      environment,
+      customLauncher,
+      customSbtStructureFile,
+      projectJdkName,
+      projectSettings.resolveClassifiers,
+      projectSettings.resolveJavadocs,
+      projectSettings.resolveSbtClassifiers
+    )
   }
 
   private def getProjectJdkName(
       project: Project,
       projectSettings: SbtProjectSettings): Option[String] = {
     val jdkInProject = Option(
-        ProjectRootManager.getInstance(project).getProjectSdk).map(_.getName)
+      ProjectRootManager.getInstance(project).getProjectSdk).map(_.getName)
     val jdkInImportSettings = projectSettings.jdkName
     jdkInImportSettings.orElse(jdkInProject)
   }
 
   private def getVmExecutable(
-      projectJdkName: Option[String], settings: SbtSystemSettings): File =
+      projectJdkName: Option[String],
+      settings: SbtSystemSettings): File =
     if (!ApplicationManager.getApplication.isUnitTestMode)
       getRealVmExecutable(projectJdkName, settings)
     else getUnitTestVmExecutable
@@ -130,25 +141,26 @@ object SbtExternalSystemManager {
   }
 
   private def getRealVmExecutable(
-      projectJdkName: Option[String], settings: SbtSystemSettings): File = {
+      projectJdkName: Option[String],
+      settings: SbtSystemSettings): File = {
     val customVmFile = new File(settings.getCustomVMPath) / "bin" / "java"
     val customVmExecutable = settings.customVMEnabled.option(customVmFile)
 
     customVmExecutable.orElse {
-      val projectSdk = projectJdkName.flatMap(
-          name => Option(ProjectJdkTable.getInstance().findJdk(name)))
+      val projectSdk = projectJdkName.flatMap(name =>
+        Option(ProjectJdkTable.getInstance().findJdk(name)))
       projectSdk.map { sdk =>
         sdk.getSdkType match {
           case sdkType: JavaSdkType =>
             new File(sdkType.getVMExecutablePath(sdk))
           case _ =>
             throw new ExternalSystemException(
-                SbtBundle("sbt.import.noProjectJvmFound"))
+              SbtBundle("sbt.import.noProjectJvmFound"))
         }
       }
     } getOrElse {
       throw new ExternalSystemException(
-          SbtBundle("sbt.import.noCustomJvmFound"))
+        SbtBundle("sbt.import.noCustomJvmFound"))
     }
   }
 
@@ -181,9 +193,10 @@ object SbtExternalSystemManager {
     val useProxy = http.USE_HTTP_PROXY && !http.PROXY_TYPE_IS_SOCKS
     val useCredentials = useProxy && http.PROXY_AUTHENTICATION
 
-    useProxy.seq(s"-Dhttp.proxyHost=${http.PROXY_HOST}",
-                 s"-Dhttp.proxyPort=${http.PROXY_PORT}") ++ useCredentials.seq(
-        s"-Dhttp.proxyUser=${http.PROXY_LOGIN}",
-        s"-Dhttp.proxyPassword=${http.getPlainProxyPassword}")
+    useProxy.seq(
+      s"-Dhttp.proxyHost=${http.PROXY_HOST}",
+      s"-Dhttp.proxyPort=${http.PROXY_PORT}") ++ useCredentials.seq(
+      s"-Dhttp.proxyUser=${http.PROXY_LOGIN}",
+      s"-Dhttp.proxyPassword=${http.getPlainProxyPassword}")
   }
 }

@@ -67,7 +67,8 @@ class StablePriorityQueue[E <: AnyRef](capacity: Int, cmp: Comparator[E])
     extends PriorityQueueStabilizer[E] {
   val backingQueue =
     new PriorityQueue[PriorityQueueStabilizer.WrappedElement[E]](
-        capacity, new PriorityQueueStabilizer.WrappedElementComparator[E](cmp))
+      capacity,
+      new PriorityQueueStabilizer.WrappedElementComparator[E](cmp))
 }
 
 /**
@@ -76,9 +77,11 @@ class StablePriorityQueue[E <: AnyRef](capacity: Int, cmp: Comparator[E])
   * @param cmp - Comparator for comparing Queue elements
   */
 class StablePriorityBlockingQueue[E <: AnyRef](
-    capacity: Int, cmp: Comparator[E])
+    capacity: Int,
+    cmp: Comparator[E])
     extends PriorityQueueStabilizer[E] {
   val backingQueue =
     new PriorityBlockingQueue[PriorityQueueStabilizer.WrappedElement[E]](
-        capacity, new PriorityQueueStabilizer.WrappedElementComparator[E](cmp))
+      capacity,
+      new PriorityQueueStabilizer.WrappedElementComparator[E](cmp))
 }

@@ -50,8 +50,7 @@ object Invariant extends AlgebraInvariantInstances {
       F.imap(fga)(ga => G.imap(ga)(f)(g))(gb => G.imap(gb)(g)(f))
   }
 
-  trait CovariantComposite[F[_], G[_]]
-      extends Invariant[Lambda[X => F[G[X]]]] {
+  trait CovariantComposite[F[_], G[_]] extends Invariant[Lambda[X => F[G[X]]]] {
     def F: Invariant[F]
     def G: Functor[G]
 

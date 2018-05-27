@@ -26,8 +26,9 @@ import java.util.{List => JList, ArrayList}
 import collection.JavaConverters._
 
 object TraversableSpout {
-  def apply[T](items: TraversableOnce[T],
-               fieldName: String = "item"): TraversableSpout[T] =
+  def apply[T](
+      items: TraversableOnce[T],
+      fieldName: String = "item"): TraversableSpout[T] =
     new TraversableSpout(items, fieldName)
 }
 

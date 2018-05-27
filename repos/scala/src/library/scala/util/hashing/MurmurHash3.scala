@@ -220,7 +220,7 @@ object MurmurHash3 extends MurmurHash3 {
     */
   def seqHash(xs: scala.collection.Seq[_]): Int = xs match {
     case xs: List[_] => listHash(xs, seqSeed)
-    case xs => orderedHash(xs, seqSeed)
+    case xs          => orderedHash(xs, seqSeed)
   }
 
   def mapHash(xs: scala.collection.Map[_, _]): Int = unorderedHash(xs, mapSeed)

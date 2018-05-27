@@ -63,7 +63,9 @@ trait BddDsl extends FieldConversions with PipeOperationsConversions {
   }
 
   case class TestCaseGiven3(
-      source: TestSource, other: TestSource, third: TestSource) {
+      source: TestSource,
+      other: TestSource,
+      third: TestSource) {
     def And(next: TestSource) =
       TestCaseGivenList(List(source, other, third, next))
 

@@ -17,7 +17,7 @@ trait BasicFormats {
     def write(x: Boolean) = if (x) SexpTrue else SexpNil
     def read(value: Sexp) = value match {
       case SexpNil => false
-      case _ => true
+      case _       => true
     }
   }
 
@@ -25,7 +25,7 @@ trait BasicFormats {
     def write(x: Char) = SexpChar(x)
     def read(value: Sexp) = value match {
       case SexpChar(x) => x
-      case x => deserializationError(x)
+      case x           => deserializationError(x)
     }
   }
 
@@ -33,7 +33,7 @@ trait BasicFormats {
     def write(x: String) = SexpString(x)
     def read(value: Sexp) = value match {
       case SexpString(x) => x
-      case x => deserializationError(x)
+      case x             => deserializationError(x)
     }
   }
 
@@ -42,7 +42,7 @@ trait BasicFormats {
     def write(x: Symbol): Sexp = SexpString(x.name)
     def read(value: Sexp): Symbol = value match {
       case SexpString(x) => Symbol(x)
-      case x => deserializationError(x)
+      case x             => deserializationError(x)
     }
   }
 
@@ -71,10 +71,10 @@ trait BasicFormats {
 
       def read(value: Sexp): T = value match {
         case SexpNumber(x) => c.from(x)
-        case SexpNaN => c.NaN
-        case SexpPosInf => c.PosInf
-        case SexpNegInf => c.NegInf
-        case x => deserializationError(x)
+        case SexpNaN       => c.NaN
+        case SexpPosInf    => c.PosInf
+        case SexpNegInf    => c.NegInf
+        case x             => deserializationError(x)
       }
     }
 
@@ -95,7 +95,7 @@ trait SymbolAltFormat {
     def write(x: Symbol): Sexp = SexpSymbol(x.name)
     def read(value: Sexp): Symbol = value match {
       case SexpSymbol(x) => Symbol(x)
-      case x => deserializationError(x)
+      case x             => deserializationError(x)
     }
   }
 }

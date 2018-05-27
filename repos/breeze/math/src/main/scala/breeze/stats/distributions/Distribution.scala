@@ -65,13 +65,15 @@ trait HasInverseCdf {
 }
 
 trait PdfIsUFunc[U <: UFunc, T, P <: PdfIsUFunc[U, T, P]] { self: P =>
-  final def pdf[@specialized(Int, Double, Float) V,
-                @specialized(Int, Double, Float) VR](v: V)(
+  final def pdf[
+      @specialized(Int, Double, Float) V,
+      @specialized(Int, Double, Float) VR](v: V)(
       implicit impl: UFunc.UImpl2[U, P, V, VR]): VR = impl(self, v)
 }
 
 trait ContinuousDistributionUFuncProvider[T, D <: ContinuousDistr[T]]
-    extends UFunc with MappingUFunc { self: UFunc =>
+    extends UFunc
+    with MappingUFunc { self: UFunc =>
   implicit object basicImpl
       extends Impl2[ContinuousDistrUFuncWrapper, T, Double] {
     def apply(w: ContinuousDistrUFuncWrapper, v: T) = w.dist.pdf(v)

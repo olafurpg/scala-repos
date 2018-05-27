@@ -200,7 +200,8 @@ trait Trees { self: Universe =>
   /** The API that all term trees support
     *  @group API
     */
-  trait TermTreeApi extends TreeApi { this: TermTree => }
+  trait TermTreeApi extends TreeApi { this: TermTree =>
+  }
 
   /** A tree for a type. Not all trees representing types are TypTrees; use isType
     *  to reliably identify types.
@@ -212,7 +213,8 @@ trait Trees { self: Universe =>
   /** The API that all typ trees support
     *  @group API
     */
-  trait TypTreeApi extends TreeApi { this: TypTree => }
+  trait TypTreeApi extends TreeApi { this: TypTree =>
+  }
 
   /** A tree that carries a symbol, e.g. by defining it (`DefTree`) or by referring to it (`RefTree`).
     *  Such trees start their life naked, returning `NoSymbol`, but after being typechecked without errors
@@ -398,10 +400,11 @@ trait Trees { self: Universe =>
     *  @group Extractors
     */
   abstract class ClassDefExtractor {
-    def apply(mods: Modifiers,
-              name: TypeName,
-              tparams: List[TypeDef],
-              impl: Template): ClassDef
+    def apply(
+        mods: Modifiers,
+        name: TypeName,
+        tparams: List[TypeDef],
+        impl: Template): ClassDef
     def unapply(classDef: ClassDef)
       : Option[(Modifiers, TypeName, List[TypeDef], Template)]
 
@@ -594,20 +597,23 @@ trait Trees { self: Universe =>
     *  @group Extractors
     */
   abstract class DefDefExtractor {
-    def apply(mods: Modifiers,
-              name: TermName,
-              tparams: List[TypeDef],
-              vparamss: List[List[ValDef]],
-              tpt: Tree,
-              rhs: Tree): DefDef
+    def apply(
+        mods: Modifiers,
+        name: TermName,
+        tparams: List[TypeDef],
+        vparamss: List[List[ValDef]],
+        tpt: Tree,
+        rhs: Tree): DefDef
     def unapply(defDef: DefDef): Option[
-        (Modifiers, TermName, List[TypeDef], List[List[ValDef]], Tree, Tree)]
+      (Modifiers, TermName, List[TypeDef], List[List[ValDef]], Tree, Tree)]
 
     /** @see [[InternalApi.defDef]] */
     @deprecated("Use `internal.defDef` instead", "2.11.0")
     def apply(
-        sym: Symbol, mods: Modifiers, vparamss: List[List[ValDef]], rhs: Tree)(
-        implicit token: CompatToken): DefDef =
+        sym: Symbol,
+        mods: Modifiers,
+        vparamss: List[List[ValDef]],
+        rhs: Tree)(implicit token: CompatToken): DefDef =
       internal.defDef(sym, mods, vparamss, rhs)
 
     /** @see [[InternalApi.defDef]] */
@@ -682,10 +688,11 @@ trait Trees { self: Universe =>
     *  @group Extractors
     */
   abstract class TypeDefExtractor {
-    def apply(mods: Modifiers,
-              name: TypeName,
-              tparams: List[TypeDef],
-              rhs: Tree): TypeDef
+    def apply(
+        mods: Modifiers,
+        name: TypeName,
+        tparams: List[TypeDef],
+        rhs: Tree): TypeDef
     def unapply(
         typeDef: TypeDef): Option[(Modifiers, TypeName, List[TypeDef], Tree)]
 
@@ -814,7 +821,10 @@ trait Trees { self: Universe =>
     */
   abstract class ImportSelectorExtractor {
     def apply(
-        name: Name, namePos: Int, rename: Name, renamePos: Int): ImportSelector
+        name: Name,
+        namePos: Int,
+        rename: Name,
+        renamePos: Int): ImportSelector
     def unapply(importSelector: ImportSelector): Option[(Name, Int, Name, Int)]
   }
 
@@ -1680,7 +1690,8 @@ trait Trees { self: Universe =>
   /** The API that all type applies support
     *  @group API
     */
-  trait TypeApplyApi extends GenericApplyApi { this: TypeApply => }
+  trait TypeApplyApi extends GenericApplyApi { this: TypeApply =>
+  }
 
   /** Value application
     *  @group Trees
@@ -1715,7 +1726,8 @@ trait Trees { self: Universe =>
   /** The API that all applies support
     *  @group API
     */
-  trait ApplyApi extends GenericApplyApi { this: Apply => }
+  trait ApplyApi extends GenericApplyApi { this: Apply =>
+  }
 
   /** Super reference, where `qual` is the corresponding `this` reference.
     *  A super reference `C.super[M]` is represented as `Super(This(C), M)`.
@@ -2248,8 +2260,8 @@ trait Trees { self: Universe =>
     *  @group Factories
     */
   @deprecated(
-      "Use q\"{..$stats}\" instead. Flatten directly nested blocks manually if needed",
-      "2.10.1")
+    "Use q\"{..$stats}\" instead. Flatten directly nested blocks manually if needed",
+    "2.10.1")
   def Block(stats: Tree*): Block
 
   /** A factory method for `CaseDef` nodes.
@@ -2262,16 +2274,16 @@ trait Trees { self: Universe =>
     *  @group Factories
     */
   @deprecated(
-      "Use the canonical Bind constructor to create a bind and then initialize its symbol manually",
-      "2.10.1")
+    "Use the canonical Bind constructor to create a bind and then initialize its symbol manually",
+    "2.10.1")
   def Bind(sym: Symbol, body: Tree): Bind
 
   /** A factory method for `Try` nodes.
     *  @group Factories
     */
   @deprecated(
-      "Convert cases into casedefs and use q\"try $body catch { case ..$newcases }\" instead",
-      "2.10.1")
+    "Convert cases into casedefs and use q\"try $body catch { case ..$newcases }\" instead",
+    "2.10.1")
   def Try(body: Tree, cases: (Tree, Tree)*): Try
 
   /** A factory method for `Throw` nodes.
@@ -2381,11 +2393,12 @@ trait Trees { self: Universe =>
     /** Creates a `ClassDef` node from the given components, having a given `tree` as a prototype.
       *  Having a tree as a prototype means that the tree's attachments, type and symbol will be copied into the result.
       */
-    def ClassDef(tree: Tree,
-                 mods: Modifiers,
-                 name: Name,
-                 tparams: List[TypeDef],
-                 impl: Template): ClassDef
+    def ClassDef(
+        tree: Tree,
+        mods: Modifiers,
+        name: Name,
+        tparams: List[TypeDef],
+        impl: Template): ClassDef
 
     /** Creates a `PackageDef` node from the given components, having a given `tree` as a prototype.
       *  Having a tree as a prototype means that the tree's attachments, type and symbol will be copied into the result.
@@ -2396,39 +2409,51 @@ trait Trees { self: Universe =>
       *  Having a tree as a prototype means that the tree's attachments, type and symbol will be copied into the result.
       */
     def ModuleDef(
-        tree: Tree, mods: Modifiers, name: Name, impl: Template): ModuleDef
+        tree: Tree,
+        mods: Modifiers,
+        name: Name,
+        impl: Template): ModuleDef
 
     /** Creates a `ValDef` node from the given components, having a given `tree` as a prototype.
       *  Having a tree as a prototype means that the tree's attachments, type and symbol will be copied into the result.
       */
     def ValDef(
-        tree: Tree, mods: Modifiers, name: Name, tpt: Tree, rhs: Tree): ValDef
+        tree: Tree,
+        mods: Modifiers,
+        name: Name,
+        tpt: Tree,
+        rhs: Tree): ValDef
 
     /** Creates a `DefDef` node from the given components, having a given `tree` as a prototype.
       *  Having a tree as a prototype means that the tree's attachments, type and symbol will be copied into the result.
       */
-    def DefDef(tree: Tree,
-               mods: Modifiers,
-               name: Name,
-               tparams: List[TypeDef],
-               vparamss: List[List[ValDef]],
-               tpt: Tree,
-               rhs: Tree): DefDef
+    def DefDef(
+        tree: Tree,
+        mods: Modifiers,
+        name: Name,
+        tparams: List[TypeDef],
+        vparamss: List[List[ValDef]],
+        tpt: Tree,
+        rhs: Tree): DefDef
 
     /** Creates a `TypeDef` node from the given components, having a given `tree` as a prototype.
       *  Having a tree as a prototype means that the tree's attachments, type and symbol will be copied into the result.
       */
-    def TypeDef(tree: Tree,
-                mods: Modifiers,
-                name: Name,
-                tparams: List[TypeDef],
-                rhs: Tree): TypeDef
+    def TypeDef(
+        tree: Tree,
+        mods: Modifiers,
+        name: Name,
+        tparams: List[TypeDef],
+        rhs: Tree): TypeDef
 
     /** Creates a `LabelDef` node from the given components, having a given `tree` as a prototype.
       *  Having a tree as a prototype means that the tree's attachments, type and symbol will be copied into the result.
       */
     def LabelDef(
-        tree: Tree, name: Name, params: List[Ident], rhs: Tree): LabelDef
+        tree: Tree,
+        name: Name,
+        params: List[Ident],
+        rhs: Tree): LabelDef
 
     /** Creates a `Import` node from the given components, having a given `tree` as a prototype.
       *  Having a tree as a prototype means that the tree's attachments, type and symbol will be copied into the result.
@@ -2438,10 +2463,11 @@ trait Trees { self: Universe =>
     /** Creates a `Template` node from the given components, having a given `tree` as a prototype.
       *  Having a tree as a prototype means that the tree's attachments, type and symbol will be copied into the result.
       */
-    def Template(tree: Tree,
-                 parents: List[Tree],
-                 self: ValDef,
-                 body: List[Tree]): Template
+    def Template(
+        tree: Tree,
+        parents: List[Tree],
+        self: ValDef,
+        body: List[Tree]): Template
 
     /** Creates a `Block` node from the given components, having a given `tree` as a prototype.
       *  Having a tree as a prototype means that the tree's attachments, type and symbol will be copied into the result.
@@ -2507,7 +2533,10 @@ trait Trees { self: Universe =>
       *  Having a tree as a prototype means that the tree's attachments, type and symbol will be copied into the result.
       */
     def Try(
-        tree: Tree, block: Tree, catches: List[CaseDef], finalizer: Tree): Try
+        tree: Tree,
+        block: Tree,
+        catches: List[CaseDef],
+        finalizer: Tree): Try
 
     /** Creates a `Throw` node from the given components, having a given `tree` as a prototype.
       *  Having a tree as a prototype means that the tree's attachments, type and symbol will be copied into the result.
@@ -2588,7 +2617,9 @@ trait Trees { self: Universe =>
       *  Having a tree as a prototype means that the tree's attachments, type and symbol will be copied into the result.
       */
     def SelectFromTypeTree(
-        tree: Tree, qualifier: Tree, selector: Name): SelectFromTypeTree
+        tree: Tree,
+        qualifier: Tree,
+        selector: Name): SelectFromTypeTree
 
     /** Creates a `CompoundTypeTree` node from the given components, having a given `tree` as a prototype.
       *  Having a tree as a prototype means that the tree's attachments, type and symbol will be copied into the result.
@@ -2599,7 +2630,9 @@ trait Trees { self: Universe =>
       *  Having a tree as a prototype means that the tree's attachments, type and symbol will be copied into the result.
       */
     def AppliedTypeTree(
-        tree: Tree, tpt: Tree, args: List[Tree]): AppliedTypeTree
+        tree: Tree,
+        tpt: Tree,
+        args: List[Tree]): AppliedTypeTree
 
     /** Creates a `TypeBoundsTree` node from the given components, having a given `tree` as a prototype.
       *  Having a tree as a prototype means that the tree's attachments, type and symbol will be copied into the result.
@@ -2609,9 +2642,10 @@ trait Trees { self: Universe =>
     /** Creates a `ExistentialTypeTree` node from the given components, having a given `tree` as a prototype.
       *  Having a tree as a prototype means that the tree's attachments, type and symbol will be copied into the result.
       */
-    def ExistentialTypeTree(tree: Tree,
-                            tpt: Tree,
-                            whereClauses: List[MemberDef]): ExistentialTypeTree
+    def ExistentialTypeTree(
+        tree: Tree,
+        tpt: Tree,
+        whereClauses: List[MemberDef]): ExistentialTypeTree
   }
 
 // ---------------------- traversing and transforming ------------------------------
@@ -2656,9 +2690,9 @@ trait Trees { self: Universe =>
     /** Traverses a list of trees with a given owner symbol. */
     def traverseStats(stats: List[Tree], exprOwner: Symbol) {
       stats foreach
-      (stat =>
-            if (exprOwner != currentOwner) atOwner(exprOwner)(traverse(stat))
-            else traverse(stat))
+        (stat =>
+          if (exprOwner != currentOwner) atOwner(exprOwner)(traverse(stat))
+          else traverse(stat))
     }
 
     /** Performs a traversal with a given owner symbol. */
@@ -2757,10 +2791,10 @@ trait Trees { self: Universe =>
     /** Traverses a list of trees with a given owner symbol. */
     def transformStats(stats: List[Tree], exprOwner: Symbol): List[Tree] =
       stats mapConserve
-      (stat =>
-            if (exprOwner != currentOwner && stat.isTerm)
-              atOwner(exprOwner)(transform(stat))
-            else transform(stat)) filter (EmptyTree != _)
+        (stat =>
+          if (exprOwner != currentOwner && stat.isTerm)
+            atOwner(exprOwner)(transform(stat))
+          else transform(stat)) filter (EmptyTree != _)
 
     /** Transforms `Modifiers`. */
     def transformModifiers(mods: Modifiers): Modifiers = {
@@ -2840,9 +2874,10 @@ trait Trees { self: Universe =>
     */
   abstract class ModifiersExtractor {
     def apply(): Modifiers = Modifiers(NoFlags, typeNames.EMPTY, List())
-    def apply(flags: FlagSet,
-              privateWithin: Name,
-              annotations: List[Tree]): Modifiers
+    def apply(
+        flags: FlagSet,
+        privateWithin: Name,
+        annotations: List[Tree]): Modifiers
     def unapply(mods: Modifiers): Option[(FlagSet, Name, List[Tree])]
   }
 

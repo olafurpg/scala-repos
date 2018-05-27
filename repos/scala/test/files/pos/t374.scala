@@ -12,7 +12,7 @@ object test extends AnyRef with App {
 
   if (true) {
     reserved.get("a") match {
-      case None => IDENT
+      case None     => IDENT
       case Some(tk) => tk
     }
   } else BAD

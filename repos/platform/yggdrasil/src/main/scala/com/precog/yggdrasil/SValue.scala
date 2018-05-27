@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -46,13 +46,13 @@ sealed trait SValue {
         case SObject(obj) =>
           (selector.nodes: @unchecked) match {
             case JPathField(name) :: Nil => obj.get(name)
-            case JPathField(name) :: xs => obj.get(name).flatMap(_ \ JPath(xs))
+            case JPathField(name) :: xs  => obj.get(name).flatMap(_ \ JPath(xs))
           }
 
         case SArray(arr) =>
           (selector.nodes: @unchecked) match {
             case JPathIndex(i) :: Nil => arr.lift(i)
-            case JPathIndex(i) :: xs => arr.lift(i).flatMap(_ \ JPath(xs))
+            case JPathIndex(i) :: xs  => arr.lift(i).flatMap(_ \ JPath(xs))
           }
 
         case _ => None
@@ -126,11 +126,11 @@ sealed trait SValue {
           }
         }
 
-      case SString(_) => List((JPath(), CString))
+      case SString(_)     => List((JPath(), CString))
       case STrue | SFalse => List((JPath(), CBoolean))
-      case SDecimal(_) => List((JPath(), CNum))
-      case SNull => List((JPath(), CNull))
-      case SUndefined => List((JPath(), CUndefined))
+      case SDecimal(_)    => List((JPath(), CNum))
+      case SNull          => List((JPath(), CNull))
+      case SUndefined     => List((JPath(), CUndefined))
     }
 
     s.sorted
@@ -140,26 +140,26 @@ sealed trait SValue {
 
   lazy val toJValue: JValue = this match {
     case SObject(obj) =>
-      JObject(obj.map({ case (k, v) => JField(k, v.toJValue) })(
-              collection.breakOut))
+      JObject(
+        obj.map({ case (k, v) => JField(k, v.toJValue) })(collection.breakOut))
     case SArray(arr) => JArray(arr.map(_.toJValue)(collection.breakOut): _*)
-    case SString(s) => JString(s)
-    case STrue => JBool(true)
-    case SFalse => JBool(false)
+    case SString(s)  => JString(s)
+    case STrue       => JBool(true)
+    case SFalse      => JBool(false)
     case SDecimal(n) => JNum(n)
-    case SNull => JNull
-    case SUndefined => JUndefined
+    case SNull       => JNull
+    case SUndefined  => JUndefined
   }
 
   lazy val toRValue: RValue = this match {
     case SObject(obj) => RObject(obj.map({ case (k, v) => (k, v.toRValue) }))
-    case SArray(arr) => RArray(arr.map(_.toRValue)(collection.breakOut): _*)
-    case SString(s) => CString(s)
-    case STrue => CBoolean(true)
-    case SFalse => CBoolean(false)
-    case SDecimal(n) => CNum(n)
-    case SNull => CNull
-    case SUndefined => CUndefined
+    case SArray(arr)  => RArray(arr.map(_.toRValue)(collection.breakOut): _*)
+    case SString(s)   => CString(s)
+    case STrue        => CBoolean(true)
+    case SFalse       => CBoolean(false)
+    case SDecimal(n)  => CNum(n)
+    case SNull        => CNull
+    case SUndefined   => CUndefined
   }
 }
 
@@ -174,45 +174,43 @@ trait SValueInstances {
         num: BigDecimal => BigDecimal => A,
         nul: => A) = {
       (sv1, sv2) match {
-        case (SObject(o1), SObject(o2)) => obj(o1)(o2)
-        case (SArray(a1), SArray(a2)) => arr(a1)(a2)
-        case (SString(s1), SString(s2)) => str(s1)(s2)
+        case (SObject(o1), SObject(o2))   => obj(o1)(o2)
+        case (SArray(a1), SArray(a2))     => arr(a1)(a2)
+        case (SString(s1), SString(s2))   => str(s1)(s2)
         case (SBoolean(b1), SBoolean(b2)) => bool(b1)(b2)
         case (SDecimal(d1), SDecimal(d2)) => num(d1)(d2)
-        case (SNull, SNull) => nul
-        case _ => default
+        case (SNull, SNull)               => nul
+        case _                            => default
       }
     }
   }
 
   def typeIndex(sv: SValue) = sv match {
-    case SObject(_) => 7
-    case SArray(_) => 6
-    case SString(_) => 5
-    case SDecimal(_) => 4
+    case SObject(_)     => 7
+    case SArray(_)      => 6
+    case SString(_)     => 5
+    case SDecimal(_)    => 4
     case STrue | SFalse => 1
-    case SNull => 0
-    case SUndefined => 2
+    case SNull          => 0
+    case SUndefined     => 2
   }
 
   implicit def order: Order[SValue] = new Order[SValue] {
     private val objectOrder = (o1: Map[String, SValue]) =>
-      (o2: Map[String, SValue]) =>
-        {
-          (o1.size ?|? o2.size) |+|
+      (o2: Map[String, SValue]) => {
+        (o1.size ?|? o2.size) |+|
           (o1.toSeq.sortBy(_._1) zip o2.toSeq.sortBy(_._1))
             .foldLeft[Ordering](EQ) {
-            case (ord, ((k1, v1), (k2, v2))) =>
-              ord |+| (k1 ?|? k2) |+| (v1 ?|? v2)
-          }
+              case (ord, ((k1, v1), (k2, v2))) =>
+                ord |+| (k1 ?|? k2) |+| (v1 ?|? v2)
+            }
     }
 
     private val arrayOrder = (o1: Vector[SValue]) =>
-      (o2: Vector[SValue]) =>
-        {
-          (o1.length ?|? o2.length) |+| (o1 zip o2).foldLeft[Ordering](EQ) {
-            case (ord, (v1, v2)) => ord |+| (v1 ?|? v2)
-          }
+      (o2: Vector[SValue]) => {
+        (o1.length ?|? o2.length) |+| (o1 zip o2).foldLeft[Ordering](EQ) {
+          case (ord, (v1, v2)) => ord |+| (v1 ?|? v2)
+        }
     }
 
     private val stringOrder = (Order[String].order _).curried
@@ -223,12 +221,12 @@ trait SValueInstances {
 
     def order(sv1: SValue, sv2: SValue) =
       paired(sv1, sv2).fold(typeIndex(sv1) ?|? typeIndex(sv2))(
-          obj = objectOrder,
-          arr = arrayOrder,
-          str = stringOrder,
-          bool = boolOrder,
-          num = numOrder,
-          nul = EQ
+        obj = objectOrder,
+        arr = arrayOrder,
+        str = stringOrder,
+        bool = boolOrder,
+        num = numOrder,
+        nul = EQ
       )
   }
 
@@ -236,9 +234,9 @@ trait SValueInstances {
     private val objectEqual = (o1: Map[String, SValue]) =>
       (o2: Map[String, SValue]) =>
         (o1.size == o2.size) &&
-        (o1.toSeq.sortBy(_._1) zip o2.toSeq.sortBy(_._1)).foldLeft(true) {
-          case (eql, ((k1, v1), (k2, v2))) => eql && k1 == k2 && v1 === v2
-    }
+          (o1.toSeq.sortBy(_._1) zip o2.toSeq.sortBy(_._1)).foldLeft(true) {
+            case (eql, ((k1, v1), (k2, v2))) => eql && k1 == k2 && v1 === v2
+      }
 
     private val arrayEqual = (o1: Vector[SValue]) =>
       (o2: Vector[SValue]) =>
@@ -253,12 +251,12 @@ trait SValueInstances {
     private val numEqual = (Equal[BigDecimal].equal _).curried
 
     def equal(sv1: SValue, sv2: SValue) = paired(sv1, sv2).fold(false)(
-        obj = objectEqual,
-        arr = arrayEqual,
-        str = stringEqual,
-        bool = boolEqual,
-        num = numEqual,
-        nul = true
+      obj = objectEqual,
+      arr = arrayEqual,
+      str = stringEqual,
+      bool = boolEqual,
+      num = numEqual,
+      nul = true
     )
   }
 
@@ -271,19 +269,19 @@ trait SValueInstances {
 object SValue extends SValueInstances {
   @inline
   def fromCValue(cv: CValue): SValue = cv match {
-    case CString(s) => SString(s)
+    case CString(s)  => SString(s)
     case CBoolean(b) => SBoolean(b)
-    case CLong(n) => SDecimal(BigDecimal(n))
-    case CDouble(n) => SDecimal(BigDecimal(n))
-    case CNum(n) => SDecimal(n)
-    case CDate(d) => sys.error("todo") // Should this be SString(d.toString)?
-    case CPeriod(p) => sys.error("todo") // Should this be SString(d.toString)?
+    case CLong(n)    => SDecimal(BigDecimal(n))
+    case CDouble(n)  => SDecimal(BigDecimal(n))
+    case CNum(n)     => SDecimal(n)
+    case CDate(d)    => sys.error("todo") // Should this be SString(d.toString)?
+    case CPeriod(p)  => sys.error("todo") // Should this be SString(d.toString)?
     case CArray(as, CArrayType(aType)) =>
       SArray(as.map(a => fromCValue(aType(a)))(collection.breakOut))
-    case CNull => SNull
-    case CEmptyArray => SArray(Vector())
+    case CNull        => SNull
+    case CEmptyArray  => SArray(Vector())
     case CEmptyObject => SObject(Map())
-    case CUndefined => SUndefined
+    case CUndefined   => SUndefined
   }
 
   // Note this conversion has a peer for CValues that should always be changed
@@ -291,15 +289,16 @@ object SValue extends SValueInstances {
   @inline
   def fromJValue(jv: JValue): SValue = jv match {
     case JObject(fields) =>
-      SObject(fields.map { case JField(name, v) => (name, fromJValue(v)) }(
-              collection.breakOut))
+      SObject(
+        fields.map { case JField(name, v) => (name, fromJValue(v)) }(
+          collection.breakOut))
     case JArray(elements) =>
       SArray((elements map fromJValue)(collection.breakOut))
     case JString(s) => SString(s)
-    case JBool(s) => SBoolean(s)
-    case JNum(d) => SDecimal(d)
-    case JNull => SNull
-    case _ => sys.error("Fix JValue")
+    case JBool(s)   => SBoolean(s)
+    case JNum(d)    => SDecimal(d)
+    case JNull      => SNull
+    case _          => sys.error("Fix JValue")
   }
 
   def apply(selector: JPath, cv: CValue): SValue = {
@@ -326,16 +325,16 @@ sealed trait SType {
 object SType {
   @inline
   def fromCType(ct: CType): SType = ct match {
-    case CString => SString
-    case CBoolean => SBoolean
+    case CString              => SString
+    case CBoolean             => SBoolean
     case (_: CNumericType[_]) => SDecimal
-    case CDate => sys.error("todo")
-    case CPeriod => sys.error("todo")
-    case CNull => SNull
-    case CArrayType(_) => SArray
-    case CEmptyObject => SObject
-    case CEmptyArray => SArray
-    case CUndefined => SUndefined
+    case CDate                => sys.error("todo")
+    case CPeriod              => sys.error("todo")
+    case CNull                => SNull
+    case CArrayType(_)        => SArray
+    case CEmptyObject         => SObject
+    case CEmptyArray          => SArray
+    case CUndefined           => SUndefined
   }
 }
 
@@ -347,7 +346,7 @@ case object SObject extends SType {
   val Empty = SObject(Map())
   def =~(v: SValue): Boolean = v match {
     case SObject(_) => true
-    case _ => false
+    case _          => false
   }
 }
 
@@ -359,7 +358,7 @@ case object SArray extends SType {
   val Empty = SArray(Vector())
   def =~(v: SValue): Boolean = v match {
     case SArray(_) => true
-    case _ => false
+    case _         => false
   }
 }
 
@@ -370,21 +369,21 @@ case class SString(value: String) extends SValue {
 case object SString extends SType with (String => SString) {
   def =~(v: SValue): Boolean = v match {
     case SString(_) => true
-    case _ => false
+    case _          => false
   }
 }
 
 case object SBoolean extends SType with (Boolean => SValue) {
   def apply(v: Boolean) = if (v) STrue else SFalse
   def unapply(v: SValue): Option[Boolean] = v match {
-    case STrue => Some(true)
+    case STrue  => Some(true)
     case SFalse => Some(false)
-    case _ => None
+    case _      => None
   }
 
   def =~(v: SValue): Boolean = v match {
     case STrue | SFalse => true
-    case _ => false
+    case _              => false
   }
 
   override def toString(): String = "SBoolean"
@@ -413,7 +412,7 @@ case class SDecimal(value: BigDecimal) extends SValue {
 case object SDecimal extends SType {
   def =~(v: SValue): Boolean = v match {
     case SDecimal(_) => true
-    case _ => false
+    case _           => false
   }
 }
 
@@ -421,7 +420,7 @@ case object SNull extends SType with SValue {
   def isA(stype: SType) = stype == this
   def =~(v: SValue): Boolean = v match {
     case SNull => true
-    case _ => false
+    case _     => false
   }
 }
 
@@ -429,6 +428,6 @@ case object SUndefined extends SType with SValue {
   def isA(stype: SType) = stype == this
   def =~(v: SValue): Boolean = v match {
     case SUndefined => true
-    case _ => false
+    case _          => false
   }
 }

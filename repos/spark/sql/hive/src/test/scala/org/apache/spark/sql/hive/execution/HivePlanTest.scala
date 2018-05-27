@@ -41,12 +41,13 @@ class HivePlanTest extends QueryTest with TestHiveSingleton {
     val df = Seq.empty[(Int, String, Int, Int)].toDF("id", "grp", "seq", "val")
     val window = Window.partitionBy($"grp").orderBy($"val")
     val query = df.select(
-        $"id",
-        sum($"val").over(window.rowsBetween(-1, 1)),
-        sum($"val").over(window.rangeBetween(-1, 1))
+      $"id",
+      sum($"val").over(window.rowsBetween(-1, 1)),
+      sum($"val").over(window.rangeBetween(-1, 1))
     )
     val plan = query.queryExecution.analyzed
-    assert(plan.collect { case w: logical.Window => w }.size === 1,
-           "Should have only 1 Window operator.")
+    assert(
+      plan.collect { case w: logical.Window => w }.size === 1,
+      "Should have only 1 Window operator.")
   }
 }

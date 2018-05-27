@@ -40,17 +40,17 @@ object XmlApiSpec extends Specification {
     // This method exists to test the non-XML implicit conversions on XMLApiHelper
     def produce(in: Any): LiftResponse = in match {
       // Tests boolToResponse
-      case "true" => true
+      case "true"  => true
       case "false" => false
       // Tests canBoolToResponse
       case s: String => tryo[Boolean] { s.toInt > 5 }
       // Tests pairToResponse
       case i: Int if i == 42 => (true, "But what is the question?")
       // These test the listElemToResponse conversion
-      case f: Float if f == 42f => ( <float>perfect</float>: Elem)
-      case f: Float if f == 0f => ( <float>zero</float>: Node)
-      case f: Float if f > 0f => ( <float>positive</float>: NodeSeq)
-      case f: Float if f < 0f => ( <float>negative</float>: Seq[Node])
+      case f: Float if f == 42f => (<float>perfect</float>: Elem)
+      case f: Float if f == 0f  => (<float>zero</float>: Node)
+      case f: Float if f > 0f   => (<float>positive</float>: NodeSeq)
+      case f: Float if f < 0f   => (<float>negative</float>: Seq[Node])
     }
 
     // This method tests the XML implicit conversions on XMLApiHelper
@@ -58,17 +58,17 @@ object XmlApiSpec extends Specification {
       case r @ Req(List("api", "sum"), _, GetRequest) =>
         () =>
           doSum(r)
-        case r @ Req(List("api", "product"), _, GetRequest) =>
+      case r @ Req(List("api", "product"), _, GetRequest) =>
         () =>
           doProduct(r)
-        case r @ Req(List("api", "max"), _, GetRequest) =>
+      case r @ Req(List("api", "max"), _, GetRequest) =>
         () =>
           doMax(r)
-        case r @ Req(List("api", "min"), _, GetRequest) =>
+      case r @ Req(List("api", "min"), _, GetRequest) =>
         () =>
           doMin(r)
-        // Tests putResponseInBox
-        case Req("api" :: _, _, _) =>
+      // Tests putResponseInBox
+      case Req("api" :: _, _, _) =>
         () =>
           BadRequestResponse()
     }
@@ -81,9 +81,9 @@ object XmlApiSpec extends Specification {
             <result>{args.split(",").map(_.toInt).reduceLeft(operation)}</result>
           }) ?~ "Missing args"
       } match {
-        case Full(x) => x
+        case Full(x)    => x
         case f: Failure => f
-        case Empty => Empty
+        case Empty      => Empty
       }
 
     // We specify the LiftResponse return type to force use of the implicit
@@ -100,15 +100,16 @@ object XmlApiSpec extends Specification {
     def apply[T <: LiftResponse](response: org.specs2.matcher.Expectable[T]) =
       response.value match {
         case x: XmlResponse => {
-            /* For some reason, the UnprefixedAttributes that Lift uses to merge in
-             * new attributes makes comparison fail. Instead, we simply stringify and
-             * reparse the response contents and that seems to fix the issue. */
-            val converted = secureXML.loadString(x.xml.toString)
-            result(converted == expected,
-                   "%s matches %s".format(converted, expected),
-                   "%s does not match %s".format(converted, expected),
-                   response)
-          }
+          /* For some reason, the UnprefixedAttributes that Lift uses to merge in
+           * new attributes makes comparison fail. Instead, we simply stringify and
+           * reparse the response contents and that seems to fix the issue. */
+          val converted = secureXML.loadString(x.xml.toString)
+          result(
+            converted == expected,
+            "%s matches %s".format(converted, expected),
+            "%s does not match %s".format(converted, expected),
+            response)
+        }
         case other => result(false, "matches", "not an XmlResponse", response)
       }
   }
@@ -122,42 +123,42 @@ object XmlApiSpec extends Specification {
 
     "Convert booleans to LiftResponses" in {
       produce("true") must matchXmlResponse(
-          <api success="true"><xml:group/></api>)
+        <api success="true"><xml:group/></api>)
       produce("false") must matchXmlResponse(
-          <api success="false"><xml:group/></api>)
+        <api success="false"><xml:group/></api>)
     }
 
     "Convert Boxed booleans to LiftResponses" in {
       produce("42") must matchXmlResponse(
-          <api success="true"><xml:group/></api>)
+        <api success="true"><xml:group/></api>)
       produce("1") must matchXmlResponse(
-          <api success="false"><xml:group/></api>)
+        <api success="false"><xml:group/></api>)
 
       val failure = produce("invalidInt")
 
       failure must haveClass[XmlResponse]
       failure match {
         case x: XmlResponse => {
-            x.xml.attribute("success").map(_.text) must_== Some("false")
-            x.xml.attribute("msg").isDefined must_== true
-          }
+          x.xml.attribute("success").map(_.text) must_== Some("false")
+          x.xml.attribute("msg").isDefined must_== true
+        }
       }
     }
 
     "Convert Pairs to responses" in {
       produce(42) must matchXmlResponse(
-          <api success="true" msg="But what is the question?"><xml:group/></api>)
+        <api success="true" msg="But what is the question?"><xml:group/></api>)
     }
 
     "Convert various XML types to a response" in {
       produce(0f) must matchXmlResponse(
-          <api success="true"><float>zero</float></api>)
+        <api success="true"><float>zero</float></api>)
       produce(-1f) must matchXmlResponse(
-          <api success="true"><float>negative</float></api>)
+        <api success="true"><float>negative</float></api>)
       produce(1f) must matchXmlResponse(
-          <api success="true"><float>positive</float></api>)
+        <api success="true"><float>positive</float></api>)
       produce(42f) must matchXmlResponse(
-          <api success="true"><float>perfect</float></api>)
+        <api success="true"><float>perfect</float></api>)
     }
   }
 }

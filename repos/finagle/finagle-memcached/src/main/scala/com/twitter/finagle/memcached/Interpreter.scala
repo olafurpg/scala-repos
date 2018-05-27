@@ -93,17 +93,16 @@ class Interpreter(map: AtomicMap[Buf, Entry]) {
         }
       case Get(keys) =>
         Values(
-            keys.flatMap { key =>
-              map.lock(key) {
-                data =>
-                  data.get(key) filter { entry =>
-                    if (!entry.valid) data.remove(key) // expired
-                    entry.valid
-                  } map { entry =>
-                    Value(key, entry.value)
-                  }
+          keys.flatMap { key =>
+            map.lock(key) { data =>
+              data.get(key) filter { entry =>
+                if (!entry.valid) data.remove(key) // expired
+                entry.valid
+              } map { entry =>
+                Value(key, entry.value)
               }
             }
+          }
         )
       case Gets(keys) =>
         getByKeys(keys)
@@ -121,7 +120,7 @@ class Interpreter(map: AtomicMap[Buf, Entry]) {
               if (!existingString.isEmpty &&
                   !DigitsPattern.matcher(existingString).matches())
                 throw new ClientError(
-                    "cannot increment or decrement non-numeric value")
+                  "cannot increment or decrement non-numeric value")
 
               val existingValue: Long =
                 if (existingString.isEmpty) 0L
@@ -149,19 +148,19 @@ class Interpreter(map: AtomicMap[Buf, Entry]) {
 
   private def getByKeys(keys: Seq[Buf]): Values = {
     Values(
-        keys.flatMap { key =>
-          map.lock(key) { data =>
-            data
-              .get(key)
-              .filter { entry =>
-                entry.valid
-              }
-              .map { entry =>
-                val value = entry.value
-                Value(key, value, Some(generateCasUnique(value)))
-              }
-          }
+      keys.flatMap { key =>
+        map.lock(key) { data =>
+          data
+            .get(key)
+            .filter { entry =>
+              entry.valid
+            }
+            .map { entry =>
+              val value = entry.value
+              Value(key, value, Some(generateCasUnique(value)))
+            }
         }
+      }
     )
   }
 }

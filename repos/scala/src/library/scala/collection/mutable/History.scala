@@ -24,8 +24,10 @@ package mutable
   */
 @SerialVersionUID(5219213543849892588L)
 class History[Evt, Pub]
-    extends AbstractIterable[(Pub, Evt)] with Subscriber[Evt, Pub]
-    with Iterable[(Pub, Evt)] with Serializable {
+    extends AbstractIterable[(Pub, Evt)]
+    with Subscriber[Evt, Pub]
+    with Iterable[(Pub, Evt)]
+    with Serializable {
   protected val log: Queue[(Pub, Evt)] = new Queue
   val maxHistory: Int = 1000
 
@@ -52,7 +54,7 @@ class History[Evt, Pub]
     */
   override def equals(obj: Any): Boolean = obj match {
     case that: History[_, _] => this.log equals that.log
-    case _ => false
+    case _                   => false
   }
   override def hashCode = log.hashCode()
 }

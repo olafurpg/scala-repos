@@ -24,7 +24,8 @@ private[tracker] object TaskOpProcessorImpl {
     *                          without going through the WhenLeaderActor indirection.
     */
   class StatusUpdateActionResolver(
-      clock: Clock, directTaskTracker: TaskTracker) {
+      clock: Clock,
+      directTaskTracker: TaskTracker) {
     private[this] val log = LoggerFactory.getLogger(getClass)
 
     /**
@@ -41,20 +42,22 @@ private[tracker] object TaskOpProcessorImpl {
         case Some(existingTask) =>
           actionForTaskAndStatus(existingTask, status)
         case None =>
-          Action.Fail(new IllegalStateException(
-                  s"$taskId of app [${taskId.appId}] does not exist"))
+          Action.Fail(
+            new IllegalStateException(
+              s"$taskId of app [${taskId.appId}] does not exist"))
       }
     }
 
     private[this] def actionForTaskAndStatus(
-        task: Task, statusUpdate: TaskStatus): Action = {
-      val change = task.update(TaskStateOp.MesosUpdate(
-              MarathonTaskStatus(statusUpdate), clock.now()))
+        task: Task,
+        statusUpdate: TaskStatus): Action = {
+      val change = task.update(
+        TaskStateOp.MesosUpdate(MarathonTaskStatus(statusUpdate), clock.now()))
       change match {
         case TaskStateChange.Update(updatedTask) => Action.Update(updatedTask)
-        case TaskStateChange.Expunge => Action.Expunge
-        case TaskStateChange.NoChange => Action.Noop
-        case TaskStateChange.Failure(cause) => Action.Fail(cause)
+        case TaskStateChange.Expunge             => Action.Expunge
+        case TaskStateChange.NoChange            => Action.Noop
+        case TaskStateChange.Failure(cause)      => Action.Fail(cause)
       }
     }
   }
@@ -87,7 +90,8 @@ private[tracker] class TaskOpProcessorImpl(
           .store(marathonTask)
           .map { _ =>
             taskTrackerRef ! TaskTrackerActor.TaskUpdated(
-                task, TaskTrackerActor.Ack(op.sender))
+              task,
+              TaskTrackerActor.Ack(op.sender))
           }
           .recoverWith(tryToRecover(op)(expectedTaskState = Some(task)))
 
@@ -98,7 +102,8 @@ private[tracker] class TaskOpProcessorImpl(
           .expunge(op.taskId.idString)
           .map { _ =>
             taskTrackerRef ! TaskTrackerActor.TaskRemoved(
-                op.taskId, TaskTrackerActor.Ack(op.sender))
+              op.taskId,
+              TaskTrackerActor.Ack(op.sender))
           }
           .recoverWith(tryToRecover(op)(expectedTaskState = None))
 
@@ -147,8 +152,8 @@ private[tracker] class TaskOpProcessorImpl(
       }
 
       log.warn(
-          s"${op.taskId} of app [${op.taskId.appId}]: try to recover from failed ${op.action.toString}",
-          cause
+        s"${op.taskId} of app [${op.taskId.appId}]: try to recover from failed ${op.action.toString}",
+        cause
       )
 
       repo
@@ -156,16 +161,17 @@ private[tracker] class TaskOpProcessorImpl(
         .map {
           case Some(task) =>
             val taskState = TaskSerializer.fromProto(task)
-            taskTrackerRef ! TaskTrackerActor.TaskUpdated(taskState,
-                                                          ack(Some(task)))
+            taskTrackerRef ! TaskTrackerActor.TaskUpdated(
+              taskState,
+              ack(Some(task)))
           case None =>
             taskTrackerRef ! TaskTrackerActor.TaskRemoved(op.taskId, ack(None))
         }
         .recover {
           case NonFatal(loadingFailure) =>
             log.warn(
-                s"${op.taskId} of app [${op.taskId.appId}]: task reloading failed as well",
-                loadingFailure
+              s"${op.taskId} of app [${op.taskId.appId}]: task reloading failed as well",
+              loadingFailure
             )
             throw cause
         }

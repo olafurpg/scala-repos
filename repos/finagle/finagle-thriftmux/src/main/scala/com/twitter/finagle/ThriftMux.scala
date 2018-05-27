@@ -3,11 +3,31 @@ package com.twitter.finagle
 import com.twitter.finagle.client.{StackClient, StackBasedClient}
 import com.twitter.finagle.mux.transport.Message
 import com.twitter.finagle.netty3.Netty3Listener
-import com.twitter.finagle.param.{Monitor => _, ResponseClassifier => _, ExceptionStatsHandler => _, Tracer => _, _}
-import com.twitter.finagle.server.{StackBasedServer, Listener, StackServer, StdStackServer}
+import com.twitter.finagle.param.{
+  Monitor => _,
+  ResponseClassifier => _,
+  ExceptionStatsHandler => _,
+  Tracer => _,
+  _
+}
+import com.twitter.finagle.server.{
+  StackBasedServer,
+  Listener,
+  StackServer,
+  StdStackServer
+}
 import com.twitter.finagle.service._
-import com.twitter.finagle.stats.{ClientStatsReceiver, ExceptionStatsHandler, ServerStatsReceiver, StatsReceiver}
-import com.twitter.finagle.thrift.{ClientId, ThriftClientRequest, UncaughtAppExceptionFilter}
+import com.twitter.finagle.stats.{
+  ClientStatsReceiver,
+  ExceptionStatsHandler,
+  ServerStatsReceiver,
+  StatsReceiver
+}
+import com.twitter.finagle.thrift.{
+  ClientId,
+  ThriftClientRequest,
+  UncaughtAppExceptionFilter
+}
 import com.twitter.finagle.thriftmux.service.ThriftMuxResponseClassifier
 import com.twitter.finagle.tracing.{Tracer, Trace}
 import com.twitter.finagle.transport.Transport
@@ -46,22 +66,24 @@ import org.jboss.netty.buffer.ChannelBuffer
   * @define serverExampleObject ThriftMux
   */
 object ThriftMux
-    extends Client[ThriftClientRequest, Array[Byte]] with ThriftRichClient
-    with Server[Array[Byte], Array[Byte]] with ThriftRichServer {
+    extends Client[ThriftClientRequest, Array[Byte]]
+    with ThriftRichClient
+    with Server[Array[Byte], Array[Byte]]
+    with ThriftRichServer {
 
   /**
     * Base [[com.twitter.finagle.Stack]] for ThriftMux clients.
     */
-  private[twitter] val BaseClientStack: Stack[
-      ServiceFactory[mux.Request, mux.Response]] =
+  private[twitter] val BaseClientStack
+    : Stack[ServiceFactory[mux.Request, mux.Response]] =
     (ThriftMuxUtil.protocolRecorder +: Mux.client.stack)
       .replace(StackClient.Role.protoTracing, ClientRpcTracing)
 
   /**
     * Base [[com.twitter.finagle.Stack]] for ThriftMux servers.
     */
-  private[twitter] val BaseServerStack: Stack[ServiceFactory[
-          mux.Request, mux.Response]] =
+  private[twitter] val BaseServerStack
+    : Stack[ServiceFactory[mux.Request, mux.Response]] =
     // NOTE: ideally this would not use the `prepConn` role, but it's conveniently
     // located in the right location of the stack and is defaulted to a no-op.
     // We would like this located anywhere before the StatsFilter so that success
@@ -99,14 +121,19 @@ object ThriftMux
 
   case class Client(
       muxer: StackClient[mux.Request, mux.Response] = Mux.client
-          .copy(stack = BaseClientStack)
-          .configured(ProtocolLibrary("thriftmux")))
+        .copy(stack = BaseClientStack)
+        .configured(ProtocolLibrary("thriftmux")))
       extends StackBasedClient[ThriftClientRequest, Array[Byte]]
-      with Stack.Parameterized[Client] with Stack.Transformable[Client]
-      with CommonParams[Client] with ClientParams[Client]
-      with WithClientTransport[Client] with WithClientAdmissionControl[Client]
-      with WithSession[Client] with WithSessionQualifier[Client]
-      with WithDefaultLoadBalancer[Client] with ThriftRichClient {
+      with Stack.Parameterized[Client]
+      with Stack.Transformable[Client]
+      with CommonParams[Client]
+      with ClientParams[Client]
+      with WithClientTransport[Client]
+      with WithClientAdmissionControl[Client]
+      with WithSession[Client]
+      with WithSessionQualifier[Client]
+      with WithDefaultLoadBalancer[Client]
+      with ThriftRichClient {
 
     def stack: Stack[ServiceFactory[mux.Request, mux.Response]] =
       muxer.stack
@@ -145,13 +172,16 @@ object ThriftMux
 
     private[this] object ThriftMuxToMux
         extends Filter[
-            ThriftClientRequest, Array[Byte], mux.Request, mux.Response] {
+          ThriftClientRequest,
+          Array[Byte],
+          mux.Request,
+          mux.Response] {
       def apply(
           req: ThriftClientRequest,
           service: Service[mux.Request, mux.Response]): Future[Array[Byte]] = {
         if (req.oneway)
           return Future.exception(
-              new Exception("ThriftMux does not support one-way messages"))
+            new Exception("ThriftMux does not support one-way messages"))
 
         // We do a dance here to ensure that the proper ClientId is set when
         // `service` is applied because Mux relies on
@@ -165,8 +195,8 @@ object ThriftMux
       }
     }
 
-    private[this] def deserializingClassifier: StackClient[
-        mux.Request, mux.Response] = {
+    private[this] def deserializingClassifier
+      : StackClient[mux.Request, mux.Response] = {
       // Note: what type of deserializer used is important if none is specified
       // so that we keep the prior behavior of Thrift exceptions
       // being counted as a success. Otherwise, even using the default
@@ -177,7 +207,7 @@ object ThriftMux
       val classifier =
         if (params.contains[param.ResponseClassifier]) {
           ThriftMuxResponseClassifier.usingDeserializeCtx(
-              params[param.ResponseClassifier].responseClassifier
+            params[param.ResponseClassifier].responseClassifier
           )
         } else {
           ThriftMuxResponseClassifier.DeserializeCtxOnly
@@ -186,7 +216,8 @@ object ThriftMux
     }
 
     def newService(
-        dest: Name, label: String): Service[ThriftClientRequest, Array[Byte]] =
+        dest: Name,
+        label: String): Service[ThriftClientRequest, Array[Byte]] =
       ThriftMuxToMux andThen deserializingClassifier.newService(dest, label)
 
     def newClient(
@@ -313,8 +344,8 @@ object ThriftMux
       // to vanilla thrift.
       new Listener[In, Out] {
         private[this] val underlying = Netty3Listener[In, Out](
-            new thriftmux.PipelineFactory(scoped, pf),
-            params
+          new thriftmux.PipelineFactory(scoped, pf),
+          params
         )
 
         def listen(addr: SocketAddress)(
@@ -330,17 +361,17 @@ object ThriftMux
       val param.Tracer(tracer) = params[param.Tracer]
 
       val negotiatedTrans = mux.Handshake.server(
-          trans = transport,
-          version = Mux.LatestVersion,
-          headers = _ => Nil,
-          negotiate = mux.Handshake.NoopNegotiator)
+        trans = transport,
+        version = Mux.LatestVersion,
+        headers = _ => Nil,
+        negotiate = mux.Handshake.NoopNegotiator)
 
       mux.ServerDispatcher.newRequestResponse(
-          negotiatedTrans,
-          service,
-          mux.lease.exp.ClockedDrainer.flagged,
-          tracer,
-          muxStatsReceiver)
+        negotiatedTrans,
+        service,
+        mux.lease.exp.ClockedDrainer.flagged,
+        tracer,
+        muxStatsReceiver)
     }
   }
 
@@ -371,14 +402,17 @@ object ThriftMux
             Future.exception(e)
           case e if !e.isInstanceOf[TException] =>
             val msg = UncaughtAppExceptionFilter.writeExceptionMessage(
-                request.body, e, protocolFactory)
+              request.body,
+              e,
+              protocolFactory)
             Future.value(mux.Response(msg))
         }
     }
 
     private[ThriftMux] val ExnHandler =
-      new Stack.Module1[Thrift.param.ProtocolFactory,
-                        ServiceFactory[mux.Request, mux.Response]] {
+      new Stack.Module1[
+        Thrift.param.ProtocolFactory,
+        ServiceFactory[mux.Request, mux.Response]] {
         val role = Stack.Role("appExceptionHandling")
         val description =
           "Translates uncaught application exceptions into Thrift messages"
@@ -393,11 +427,12 @@ object ThriftMux
       }
   }
 
-  case class Server(
-      muxer: StackServer[mux.Request, mux.Response] = serverMuxer)
-      extends StackBasedServer[Array[Byte], Array[Byte]] with ThriftRichServer
+  case class Server(muxer: StackServer[mux.Request, mux.Response] = serverMuxer)
+      extends StackBasedServer[Array[Byte], Array[Byte]]
+      with ThriftRichServer
       with Stack.Parameterized[Server]
-      with CommonParams[Server] with WithServerTransport[Server]
+      with CommonParams[Server]
+      with WithServerTransport[Server]
       with WithServerAdmissionControl[Server] {
 
     import Server.MuxToArrayFilter
@@ -452,7 +487,8 @@ object ThriftMux
         factory: ServiceFactory[Array[Byte], Array[Byte]]
     ): ListeningServer = {
       muxer.serve(
-          addr, MuxToArrayFilter.andThen(tracingFilter).andThen(factory))
+        addr,
+        MuxToArrayFilter.andThen(tracingFilter).andThen(factory))
     }
 
     // Java-friendly forwarders

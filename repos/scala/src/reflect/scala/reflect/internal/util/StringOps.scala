@@ -23,7 +23,7 @@ trait StringOps {
   def oempty(xs: String*) = xs filterNot (x => x == null || x == "")
   def ojoin(xs: String*): String = oempty(xs: _*) mkString " "
   def longestCommonPrefix(xs: List[String]): String = xs match {
-    case Nil => ""
+    case Nil      => ""
     case w :: Nil => w
     case _ =>
       def lcp(ss: List[String]): String = {
@@ -63,14 +63,16 @@ trait StringOps {
 
   def words(str: String): List[String] = decompose(str, ' ')
 
-  def splitWhere(str: String,
-                 f: Char => Boolean,
-                 doDropIndex: Boolean = false): Option[(String, String)] =
+  def splitWhere(
+      str: String,
+      f: Char => Boolean,
+      doDropIndex: Boolean = false): Option[(String, String)] =
     splitAt(str, str indexWhere f, doDropIndex)
 
-  def splitAt(str: String,
-              idx: Int,
-              doDropIndex: Boolean = false): Option[(String, String)] =
+  def splitAt(
+      str: String,
+      idx: Int,
+      doDropIndex: Boolean = false): Option[(String, String)] =
     if (idx == -1) None
     else Some((str take idx, str drop (if (doDropIndex) idx + 1 else idx)))
 

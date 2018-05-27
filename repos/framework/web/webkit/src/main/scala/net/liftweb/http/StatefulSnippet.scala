@@ -87,10 +87,11 @@ trait StatefulSnippet extends DispatchSnippet {
     * @param body - the NodeSeq to wrap in the anchor tag
     * @param attrs - the (optional) attributes for the HTML element
     */
-  def link(to: String,
-           func: () => Any,
-           body: NodeSeq,
-           attrs: SHtml.ElemAttr*): Elem =
+  def link(
+      to: String,
+      func: () => Any,
+      body: NodeSeq,
+      attrs: SHtml.ElemAttr*): Elem =
     SHtml.link(to, () => { registerThisSnippet(); func() }, body, attrs: _*)
 
   /**
@@ -110,10 +111,12 @@ trait StatefulSnippet extends DispatchSnippet {
     * Merge the SHtml into the form
     */
   private[http] def mergeIntoForm(
-      isForm: Boolean, res: NodeSeq, toMerge: => NodeSeq): NodeSeq = {
+      isForm: Boolean,
+      res: NodeSeq,
+      toMerge: => NodeSeq): NodeSeq = {
     val formElem = Helpers.findOption(res) {
       case e: Elem if e.label == "form" && null == e.prefix => Some(e)
-      case _ => None
+      case _                                                => None
     }
 
     if (formElem.isDefined) {
@@ -167,8 +170,7 @@ trait RenderFuncDispatch {
   * The simple composition of StatefulSnippet, Whence and RenderFuncDispatch.
   * This is the common use of stateful snippets and makes things easier.
   */
-trait SimpleStateful
-    extends StatefulSnippet with Whence with RenderFuncDispatch
+trait SimpleStateful extends StatefulSnippet with Whence with RenderFuncDispatch
 
 trait DispatchSnippet {
   type DispatchIt = PartialFunction[String, NodeSeq => NodeSeq]
@@ -198,7 +200,7 @@ object TransientSnippet {
     */
   def notTransient(obj: Any): Boolean = obj match {
     case t: TransientSnippet => !t.transient_?
-    case _ => true
+    case _                   => true
   }
 }
 

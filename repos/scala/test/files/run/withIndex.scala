@@ -12,7 +12,7 @@ object Test {
     assert {
       ary.zipWithIndex match {
         case _: Array[Tuple2[_, _]] => true
-        case _ => false
+        case _                      => false
       }
     }
 

@@ -5,7 +5,12 @@ import com.intellij.lang.documentation.AbstractDocumentationProvider
 import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.editor.documentationProvider.ScalaDocumentationProvider
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScLiteral
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScInfixExpr, ScMethodCall, ScReferenceExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression,
+  ScInfixExpr,
+  ScMethodCall,
+  ScReferenceExpression
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScPatternDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScNamedElement
 import org.jetbrains.plugins.scala.lang.psi.impl.base.ScLiteralImpl
@@ -20,18 +25,20 @@ class SbtDocumentationProvider extends AbstractDocumentationProvider {
   private val scalaDocProvider = new ScalaDocumentationProvider
 
   override def getQuickNavigateInfo(
-      element: PsiElement, originalElement: PsiElement): String = {
+      element: PsiElement,
+      originalElement: PsiElement): String = {
     val scalaDoc = Option(
-        scalaDocProvider.getQuickNavigateInfo(element, originalElement))
+      scalaDocProvider.getQuickNavigateInfo(element, originalElement))
     scalaDoc.map { doc =>
       appendToScalaDoc(doc, extractDoc(element))
     }.orNull
   }
 
   override def generateDoc(
-      element: PsiElement, originalElement: PsiElement): String = {
+      element: PsiElement,
+      originalElement: PsiElement): String = {
     val scalaDoc = Option(
-        scalaDocProvider.generateDoc(element, originalElement))
+      scalaDocProvider.generateDoc(element, originalElement))
     scalaDoc.map { doc =>
       appendToScalaDoc(doc, extractDoc(element))
     }.orNull
@@ -79,7 +86,7 @@ class SbtDocumentationProvider extends AbstractDocumentationProvider {
       keyDefinition: ScPatternDefinition): Seq[ScExpression] =
     keyDefinition.lastChild match {
       case Some(call: ScMethodCall) => call.argumentExpressions
-      case _ => Seq.empty
+      case _                        => Seq.empty
     }
 
   private def argToString(arg: ScExpression): Option[String] = arg match {

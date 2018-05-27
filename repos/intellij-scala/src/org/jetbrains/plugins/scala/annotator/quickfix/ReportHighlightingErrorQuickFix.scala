@@ -22,8 +22,7 @@ object ReportHighlightingErrorQuickFix extends IntentionAction {
   }
 
   def invoke(project: Project, editor: Editor, file: PsiFile) {
-    DesktopUtils.browse(
-        "http://youtrack.jetbrains.net/issues/SCL#newissue=yes")
+    DesktopUtils.browse("http://youtrack.jetbrains.net/issues/SCL#newissue=yes")
   }
 
   def getFamilyName: String =

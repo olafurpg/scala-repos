@@ -20,16 +20,21 @@ import java.util.concurrent.BlockingQueue
 import kafka.serializer.Decoder
 import kafka.message.MessageAndMetadata
 
-class KafkaStream[K, V](private val queue: BlockingQueue[FetchedDataChunk],
-                        consumerTimeoutMs: Int,
-                        private val keyDecoder: Decoder[K],
-                        private val valueDecoder: Decoder[V],
-                        val clientId: String)
+class KafkaStream[K, V](
+    private val queue: BlockingQueue[FetchedDataChunk],
+    consumerTimeoutMs: Int,
+    private val keyDecoder: Decoder[K],
+    private val valueDecoder: Decoder[V],
+    val clientId: String)
     extends Iterable[MessageAndMetadata[K, V]]
     with java.lang.Iterable[MessageAndMetadata[K, V]] {
 
   private val iter: ConsumerIterator[K, V] = new ConsumerIterator[K, V](
-      queue, consumerTimeoutMs, keyDecoder, valueDecoder, clientId)
+    queue,
+    consumerTimeoutMs,
+    keyDecoder,
+    valueDecoder,
+    clientId)
 
   /**
     *  Create an iterator over messages in the stream.

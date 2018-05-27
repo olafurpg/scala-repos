@@ -24,11 +24,20 @@ import backtype.storm.topology.OutputFieldsDeclarer
 import backtype.storm.tuple.{Tuple, TupleImpl, Fields}
 
 import java.util.{Map => JMap}
-import com.twitter.summingbird.storm.option.{AckOnEntry, AnchorTuples, MaxExecutePerSecond}
+import com.twitter.summingbird.storm.option.{
+  AckOnEntry,
+  AnchorTuples,
+  MaxExecutePerSecond
+}
 import com.twitter.summingbird.online.executor.OperationContainer
 import com.twitter.summingbird.online.executor.{InflightTuples, InputState}
 import com.twitter.summingbird.option.JobId
-import com.twitter.summingbird.{Group, JobCounters, Name, SummingbirdRuntimeStats}
+import com.twitter.summingbird.{
+  Group,
+  JobCounters,
+  Name,
+  SummingbirdRuntimeStats
+}
 import com.twitter.summingbird.online.Externalizer
 
 import scala.collection.JavaConverters._
@@ -52,14 +61,18 @@ case class BaseBolt[I, O](
     ackOnEntry: AckOnEntry,
     maxExecutePerSec: MaxExecutePerSecond,
     executor: OperationContainer[
-        I, O, InputState[Tuple], JList[AnyRef], TopologyContext])
+      I,
+      O,
+      InputState[Tuple],
+      JList[AnyRef],
+      TopologyContext])
     extends IRichBolt {
 
   @transient protected lazy val logger: Logger =
     LoggerFactory.getLogger(getClass)
 
   private[this] val lockedCounters = Externalizer(
-      JobCounters.getCountersForJob(jobID).getOrElse(Nil))
+    JobCounters.getCountersForJob(jobID).getOrElse(Nil))
 
   lazy val countersForBolt: Seq[(Group, Name)] = lockedCounters.get
 
@@ -144,7 +157,9 @@ case class BaseBolt[I, O](
     val curResults =
       if (!tuple.getSourceStreamId.equals("__tick")) {
         val tsIn =
-          executor.decoder.invert(tuple.getValues).get // Failing to decode here is an ERROR
+          executor.decoder
+            .invert(tuple.getValues)
+            .get // Failing to decode here is an ERROR
         // Don't hold on to the input values
         clearValues(tuple)
         if (earlyAck) { collector.ack(tuple) }
@@ -158,13 +173,14 @@ case class BaseBolt[I, O](
       case (tups, res) =>
         res match {
           case Success(outs) => finish(tups, outs)
-          case Failure(t) => fail(tups, t)
+          case Failure(t)    => fail(tups, t)
         }
     }
   }
 
   private def finish(
-      inputs: Seq[InputState[Tuple]], results: TraversableOnce[O]) {
+      inputs: Seq[InputState[Tuple]],
+      results: TraversableOnce[O]) {
     var emitCount = 0
     if (hasDependants) {
       if (anchorTuples.anchor) {
@@ -183,20 +199,24 @@ case class BaseBolt[I, O](
     // Always ack a tuple on completion:
     if (!earlyAck) { inputs.foreach(_.ack(collector.ack(_))) }
 
-    logger.debug("bolt finished processed {} linked tuples, emitted: {}",
-                 inputs.size,
-                 emitCount)
+    logger.debug(
+      "bolt finished processed {} linked tuples, emitted: {}",
+      inputs.size,
+      emitCount)
   }
 
   override def prepare(
-      conf: JMap[_, _], context: TopologyContext, oc: OutputCollector) {
+      conf: JMap[_, _],
+      context: TopologyContext,
+      oc: OutputCollector) {
     collector = oc
     metrics().foreach { _.register(context) }
     executor.init(context)
     StormStatProvider.registerMetrics(jobID, context, countersForBolt)
     SummingbirdRuntimeStats.addPlatformStatProvider(StormStatProvider)
     logger.debug(
-        "In Bolt prepare: added jobID stat provider for jobID {}", jobID)
+      "In Bolt prepare: added jobID stat provider for jobID {}",
+      jobID)
   }
 
   override def declareOutputFields(declarer: OutputFieldsDeclarer) {

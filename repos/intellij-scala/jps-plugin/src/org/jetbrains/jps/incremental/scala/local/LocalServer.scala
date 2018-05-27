@@ -14,16 +14,19 @@ class LocalServer extends Server {
   private var cachedCompilerFactory: Option[CompilerFactory] = None
   private val lock = new Object()
 
-  def compile(sbtData: SbtData,
-              compilerData: CompilerData,
-              compilationData: CompilationData,
-              client: Client): ExitCode = {
+  def compile(
+      sbtData: SbtData,
+      compilerData: CompilerData,
+      compilationData: CompilationData,
+      client: Client): ExitCode = {
     val compiler = lock.synchronized {
       val compilerFactory = compilerFactoryFrom(sbtData)
 
       client.progress("Instantiating compiler...")
       compilerFactory.createCompiler(
-          compilerData, client, LocalServer.createAnalysisStore)
+        compilerData,
+        client,
+        LocalServer.createAnalysisStore)
     }
 
     if (!client.isCanceled) {

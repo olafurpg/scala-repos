@@ -13,10 +13,10 @@ object ServerConfigSpec extends Specification {
   "ServerConfig construction" should {
     "fail when both http and https ports are missing" in {
       ServerConfig(
-          rootDir = new File("/asdasd"),
-          port = None,
-          sslPort = None,
-          properties = new Properties()
+        rootDir = new File("/asdasd"),
+        port = None,
+        sslPort = None,
+        properties = new Properties()
       ) must throwAn[IllegalArgumentException]
     }
   }

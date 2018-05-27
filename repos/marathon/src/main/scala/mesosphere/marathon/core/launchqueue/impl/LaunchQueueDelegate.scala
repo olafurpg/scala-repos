@@ -13,9 +13,10 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 import scala.util.control.NonFatal
 
-private[launchqueue] class LaunchQueueDelegate(config: LaunchQueueConfig,
-                                               actorRef: ActorRef,
-                                               rateLimiterRef: ActorRef)
+private[launchqueue] class LaunchQueueDelegate(
+    config: LaunchQueueConfig,
+    actorRef: ActorRef,
+    rateLimiterRef: ActorRef)
     extends LaunchQueue {
 
   override def list: Seq[QueuedTaskInfo] = {

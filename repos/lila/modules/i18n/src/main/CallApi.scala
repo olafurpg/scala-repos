@@ -6,7 +6,9 @@ import scala.util.Random.shuffle
 import lila.user.User
 
 private final class CallApi(
-    minGames: Int, hideCallsCookieName: String, transInfos: TransInfos) {
+    minGames: Int,
+    hideCallsCookieName: String,
+    transInfos: TransInfos) {
 
   private var submitted = Set.empty[String]
 

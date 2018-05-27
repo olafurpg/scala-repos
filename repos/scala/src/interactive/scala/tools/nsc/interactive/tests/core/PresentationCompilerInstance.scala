@@ -27,8 +27,7 @@ private[tests] trait PresentationCompilerInstance extends TestSettings {
   protected def prepareSettings(settings: Settings) {}
 
   protected def printClassPath(implicit reporter: Reporter) {
-    reporter.println(
-        "\tbootClassPath: %s".format(settings.bootclasspath.value))
+    reporter.println("\tbootClassPath: %s".format(settings.bootclasspath.value))
     reporter.println("\tverbose: %b".format(settings.verbose.value))
   }
 }

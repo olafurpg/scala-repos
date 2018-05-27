@@ -22,8 +22,11 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.elements.wrappers.DummyASTNode
   * Date: 22.02.2008
   */
 class ScClassParameterImpl private (
-    stub: StubElement[ScParameter], nodeType: IElementType, node: ASTNode)
-    extends ScParameterImpl(stub, nodeType, node) with ScClassParameter {
+    stub: StubElement[ScParameter],
+    nodeType: IElementType,
+    node: ASTNode)
+    extends ScParameterImpl(stub, nodeType, node)
+    with ScClassParameter {
 
   def this(node: ASTNode) = { this(null, null, node) }
 
@@ -88,7 +91,7 @@ class ScClassParameterImpl private (
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case s: ScalaElementVisitor => s.visitClassParameter(this)
-      case _ => super.accept(visitor)
+      case _                      => super.accept(visitor)
     }
   }
 }

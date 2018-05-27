@@ -5,7 +5,7 @@ package api
 package base
 package types
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 07.03.2008
   */

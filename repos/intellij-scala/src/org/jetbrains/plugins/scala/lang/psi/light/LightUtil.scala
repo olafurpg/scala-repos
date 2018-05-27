@@ -4,7 +4,10 @@ package lang.psi.light
 import com.intellij.psi.{PsiClass, PsiClassType}
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScAnnotationsHolder
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypingContext
+}
 import org.jetbrains.plugins.scala.lang.psi.types.{ScParameterizedType, ScType}
 
 import _root_.scala.collection.mutable.ArrayBuffer
@@ -34,13 +37,14 @@ object LightUtil {
                   ScType.extractClass(des) match {
                     case Some(clazz)
                         if clazz.qualifiedName == "java.lang.Class" =>
-                      ScType.toPsi(arg,
-                                   holder.getProject,
-                                   holder.getResolveScope) match {
+                      ScType.toPsi(
+                        arg,
+                        holder.getProject,
+                        holder.getResolveScope) match {
                         case c: PsiClassType =>
                           c.resolve() match {
                             case clazz: PsiClass => Seq(clazz.getQualifiedName)
-                            case _ => Seq.empty
+                            case _               => Seq.empty
                           }
                         case _ => Seq.empty
                       }
@@ -57,12 +61,11 @@ object LightUtil {
                   .filter(_.isDefined)
                   .map(_.get)
                   .flatMap { arg =>
-                    ScType.toPsi(
-                        arg, holder.getProject, holder.getResolveScope) match {
+                    ScType.toPsi(arg, holder.getProject, holder.getResolveScope) match {
                       case c: PsiClassType =>
                         c.resolve() match {
                           case clazz: PsiClass => Seq(clazz.getQualifiedName)
-                          case _ => Seq.empty
+                          case _               => Seq.empty
                         }
                       case _ => Seq.empty
                     }

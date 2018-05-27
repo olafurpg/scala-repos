@@ -62,7 +62,7 @@ class ChunkedByteBufferSuite extends SparkFunSuite {
     val chunkedByteBuffer =
       new ChunkedByteBuffer(Array(ByteBuffer.allocate(8)))
     chunkedByteBuffer.writeFully(
-        new ByteArrayWritableChannel(chunkedByteBuffer.size.toInt))
+      new ByteArrayWritableChannel(chunkedByteBuffer.size.toInt))
     assert(chunkedByteBuffer.getChunks().head.position() === 0)
   }
 

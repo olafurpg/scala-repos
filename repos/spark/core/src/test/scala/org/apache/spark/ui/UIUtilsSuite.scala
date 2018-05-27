@@ -26,52 +26,52 @@ class UIUtilsSuite extends SparkFunSuite {
 
   test("makeDescription") {
     verify(
-        """test <a href="/link"> text </a>""",
-        <span class="description-input">test <a href="/link"> text </a></span>,
-        "Correctly formatted text with only anchors and relative links should generate HTML"
+      """test <a href="/link"> text </a>""",
+      <span class="description-input">test <a href="/link"> text </a></span>,
+      "Correctly formatted text with only anchors and relative links should generate HTML"
     )
 
     verify(
-        """test <a href="/link" text </a>""",
-        <span class="description-input">{"""test <a href="/link" text </a>"""}</span>,
-        "Badly formatted text should make the description be treated as a streaming instead of HTML"
+      """test <a href="/link" text </a>""",
+      <span class="description-input">{"""test <a href="/link" text </a>"""}</span>,
+      "Badly formatted text should make the description be treated as a streaming instead of HTML"
     )
 
     verify(
-        """test <a href="link"> text </a>""",
-        <span class="description-input">{"""test <a href="link"> text </a>"""}</span>,
-        "Non-relative links should make the description be treated as a string instead of HTML"
+      """test <a href="link"> text </a>""",
+      <span class="description-input">{"""test <a href="link"> text </a>"""}</span>,
+      "Non-relative links should make the description be treated as a string instead of HTML"
     )
 
     verify(
-        """test<a><img></img></a>""",
-        <span class="description-input">{"""test<a><img></img></a>"""}</span>,
-        "Non-anchor elements should make the description be treated as a string instead of HTML"
+      """test<a><img></img></a>""",
+      <span class="description-input">{"""test<a><img></img></a>"""}</span>,
+      "Non-anchor elements should make the description be treated as a string instead of HTML"
     )
 
     verify(
-        """test <a href="/link"> text </a>""",
-        <span class="description-input">test <a href="base/link"> text </a></span>,
-        baseUrl = "base",
-        errorMsg = "Base URL should be prepended to html links"
+      """test <a href="/link"> text </a>""",
+      <span class="description-input">test <a href="base/link"> text </a></span>,
+      baseUrl = "base",
+      errorMsg = "Base URL should be prepended to html links"
     )
   }
 
   test(
-      "SPARK-11906: Progress bar should not overflow because of speculative tasks") {
+    "SPARK-11906: Progress bar should not overflow because of speculative tasks") {
     val generated =
       makeProgressBar(2, 3, 0, 0, 4).head.child.filter(_.label == "div")
     val expected = Seq(
-        <div class="bar bar-completed" style="width: 75.0%"></div>,
-        <div class="bar bar-running" style="width: 25.0%"></div>
+      <div class="bar bar-completed" style="width: 75.0%"></div>,
+      <div class="bar bar-running" style="width: 25.0%"></div>
     )
     assert(
-        generated.sameElements(expected),
-        s"\nRunning progress bar should round down\n\nExpected:\n$expected\nGenerated:\n$generated")
+      generated.sameElements(expected),
+      s"\nRunning progress bar should round down\n\nExpected:\n$expected\nGenerated:\n$generated")
   }
 
   test(
-      "decodeURLParameter (SPARK-12708: Sorting task error in Stages Page when yarn mode.)") {
+    "decodeURLParameter (SPARK-12708: Sorting task error in Stages Page when yarn mode.)") {
     val encoded1 = "%252F"
     val decoded1 = "/"
     val encoded2 = "%253Cdriver%253E"
@@ -85,12 +85,14 @@ class UIUtilsSuite extends SparkFunSuite {
     assert(decoded2 === decodeURLParameter(decoded2))
   }
 
-  private def verify(desc: String,
-                     expected: Elem,
-                     errorMsg: String = "",
-                     baseUrl: String = ""): Unit = {
+  private def verify(
+      desc: String,
+      expected: Elem,
+      errorMsg: String = "",
+      baseUrl: String = ""): Unit = {
     val generated = makeDescription(desc, baseUrl)
-    assert(generated.sameElements(expected),
-           s"\n$errorMsg\n\nExpected:\n$expected\nGenerated:\n$generated")
+    assert(
+      generated.sameElements(expected),
+      s"\n$errorMsg\n\nExpected:\n$expected\nGenerated:\n$generated")
   }
 }

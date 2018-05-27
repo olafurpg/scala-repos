@@ -27,7 +27,9 @@ package immutable {
     def update(idx: Int, elem: T) = throw new UnsupportedOperationException
 
     class ParIterator(
-        var i: Int = 0, val until: Int = length, elem: T = self.elem)
+        var i: Int = 0,
+        val until: Int = length,
+        elem: T = self.elem)
         extends SeqSplitter[T] {
       def remaining = until - i
       def hasNext = i < until
@@ -35,8 +37,8 @@ package immutable {
       def dup = new ParIterator(i, until, elem)
       def psplit(sizes: Int*) = {
         val incr = sizes.scanLeft(0)(_ + _)
-        for ((start, end) <- incr.init zip incr.tail) yield
-          new ParIterator(i + start, (i + end) min until, elem)
+        for ((start, end) <- incr.init zip incr.tail)
+          yield new ParIterator(i + start, (i + end) min until, elem)
       }
       def split = psplit(remaining / 2, remaining - remaining / 2)
     }

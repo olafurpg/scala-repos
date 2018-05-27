@@ -35,11 +35,11 @@ case class TestServer(
 
     try {
       val config = ServerConfig(
-          rootDir = application.path,
-          port = Option(port),
-          sslPort = sslPort,
-          mode = Mode.Test,
-          properties = System.getProperties
+        rootDir = application.path,
+        port = Option(port),
+        sslPort = sslPort,
+        mode = Mode.Test,
+        properties = System.getProperties
       )
       testServerProcess = TestServer.start(serverProvider, config, application)
     } catch {
@@ -67,15 +67,17 @@ object TestServer {
     * Start a TestServer with the given config and application. To stop it,
     * call `shutdown` on the returned TestServerProcess.
     */
-  private[play] def start(testServerProvider: Option[ServerProvider],
-                          config: ServerConfig,
-                          application: Application): TestServerProcess = {
+  private[play] def start(
+      testServerProvider: Option[ServerProvider],
+      config: ServerConfig,
+      application: Application): TestServerProcess = {
     val process = new TestServerProcess
     val serverProvider: ServerProvider = {
       testServerProvider
     } getOrElse {
       ServerProvider.fromConfiguration(
-          process.classLoader, config.configuration)
+        process.classLoader,
+        config.configuration)
     }
     Play.start(application)
     val server = serverProvider.createServer(config, application)
@@ -107,13 +109,16 @@ private[play] class TestServerProcess extends ServerProcess {
   override def properties = System.getProperties
   override def pid = None
 
-  override def exit(message: String,
-                    cause: Option[Throwable] = None,
-                    returnCode: Int = -1): Nothing = {
+  override def exit(
+      message: String,
+      cause: Option[Throwable] = None,
+      returnCode: Int = -1): Nothing = {
     throw new TestServerExitException(message, cause, returnCode)
   }
 }
 
 private[play] case class TestServerExitException(
-    message: String, cause: Option[Throwable] = None, returnCode: Int = -1)
+    message: String,
+    cause: Option[Throwable] = None,
+    returnCode: Int = -1)
     extends Exception(s"Exit with $message, $cause, $returnCode", cause.orNull)

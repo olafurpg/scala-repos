@@ -20,8 +20,9 @@ trait ScalacShared extends ScalaMatchingTask {
 
     val debugString =
       paths map (x => " (@ = '%s')".format(io.File(x).slurp())) mkString ""
-    log(java.getCommandLine.getCommandline.mkString("", " ", debugString),
-        Project.MSG_VERBOSE)
+    log(
+      java.getCommandLine.getCommandline.mkString("", " ", debugString),
+      Project.MSG_VERBOSE)
     java.executeJava()
   }
 }

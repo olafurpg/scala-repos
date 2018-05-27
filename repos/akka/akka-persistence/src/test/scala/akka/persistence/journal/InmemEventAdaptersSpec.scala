@@ -47,7 +47,7 @@ class InmemEventAdaptersSpec extends AkkaSpec {
     "parse configuration and resolve adapter definitions" in {
       val adapters = EventAdapters(extendedActorSystem, inmemConfig)
       adapters.get(classOf[EventMarkerInterface]).getClass should ===(
-          classOf[MarkerInterfaceAdapter])
+        classOf[MarkerInterfaceAdapter])
     }
 
     "pick the most specific adapter available" in {
@@ -55,19 +55,19 @@ class InmemEventAdaptersSpec extends AkkaSpec {
 
       // sanity check; precise case, matching non-user classes
       adapters.get(classOf[java.lang.String]).getClass should ===(
-          classOf[ExampleEventAdapter])
+        classOf[ExampleEventAdapter])
 
       // pick adapter by implemented marker interface
       adapters.get(classOf[SampleEvent]).getClass should ===(
-          classOf[MarkerInterfaceAdapter])
+        classOf[MarkerInterfaceAdapter])
 
       // more general adapter matches as well, but most specific one should be picked
       adapters.get(classOf[PreciseAdapterEvent]).getClass should ===(
-          classOf[PreciseAdapter])
+        classOf[PreciseAdapter])
 
       // no adapter defined for Long, should return identity adapter
       adapters.get(classOf[java.lang.Long]).getClass should ===(
-          IdentityEventAdapter.getClass)
+        IdentityEventAdapter.getClass)
     }
 
     "fail with useful message when binding to not defined adapter" in {
@@ -87,7 +87,7 @@ class InmemEventAdaptersSpec extends AkkaSpec {
       }
 
       ex.getMessage should include(
-          "java.lang.Integer was bound to undefined event-adapter: undefined-adapter")
+        "java.lang.Integer was bound to undefined event-adapter: undefined-adapter")
     }
 
     "allow implementing only the read-side (ReadEventAdapter)" in {
@@ -95,8 +95,10 @@ class InmemEventAdaptersSpec extends AkkaSpec {
 
       // read-side only adapter
       val r: EventAdapter = adapters.get(classOf[ReadMeEvent])
-      r.fromJournal(r.toJournal(ReadMeEvent()), "").events.head.toString should ===(
-          "from-ReadMeEvent()")
+      r.fromJournal(r.toJournal(ReadMeEvent()), "")
+        .events
+        .head
+        .toString should ===("from-ReadMeEvent()")
     }
 
     "allow implementing only the write-side (WriteEventAdapter)" in {
@@ -104,8 +106,10 @@ class InmemEventAdaptersSpec extends AkkaSpec {
 
       // write-side only adapter
       val w: EventAdapter = adapters.get(classOf[WriteMeEvent])
-      w.fromJournal(w.toJournal(WriteMeEvent()), "").events.head.toString should ===(
-          "to-WriteMeEvent()")
+      w.fromJournal(w.toJournal(WriteMeEvent()), "")
+        .events
+        .head
+        .toString should ===("to-WriteMeEvent()")
     }
   }
 }

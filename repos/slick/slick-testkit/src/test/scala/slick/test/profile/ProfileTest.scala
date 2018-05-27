@@ -49,5 +49,4 @@ class OracleTest extends ProfileTest(StandardTestDBs.Oracle)
 class SQLServerJTDSTest extends ProfileTest(StandardTestDBs.SQLServerJTDS)
 
 @RunWith(classOf[Testkit])
-class SQLServerSQLJDBCTest
-    extends ProfileTest(StandardTestDBs.SQLServerSQLJDBC)
+class SQLServerSQLJDBCTest extends ProfileTest(StandardTestDBs.SQLServerSQLJDBC)

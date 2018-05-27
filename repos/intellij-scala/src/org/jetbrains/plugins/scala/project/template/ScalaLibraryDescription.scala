@@ -25,7 +25,8 @@ object ScalaLibraryDescription extends ScalaLibraryDescription {
   override protected val sdkDescriptor = ScalaSdkDescriptor
 
   override def dialog(
-      parentComponent: JComponent, provider: () => util.List[SdkChoice]) = {
+      parentComponent: JComponent,
+      provider: () => util.List[SdkChoice]) = {
     new SdkSelectionDialog(parentComponent, provider)
   }
 
@@ -94,8 +95,9 @@ trait ScalaLibraryDescription extends CustomLibraryDescription {
 
   protected val mavenScalaRoot = mavenRepository / "org" / "scala-lang"
 
-  def dialog(parentComponent: JComponent,
-             provide: () => java.util.List[SdkChoice]): SdkSelectionDialog
+  def dialog(
+      parentComponent: JComponent,
+      provide: () => java.util.List[SdkChoice]): SdkSelectionDialog
 
   def sdks(contextDirectory: VirtualFile): Seq[SdkChoice] = {
     val localSdks = Option(contextDirectory).toSeq
@@ -111,7 +113,8 @@ trait ScalaLibraryDescription extends CustomLibraryDescription {
   def getSuitableLibraryKinds = Collections.singleton(libraryKind)
 
   def createNewLibrary(
-      parentComponent: JComponent, contextDirectory: VirtualFile) = {
+      parentComponent: JComponent,
+      contextDirectory: VirtualFile) = {
     implicit val ordering = implicitly[Ordering[Version]].reverse
     Option(dialog(parentComponent, () => sdks(contextDirectory).asJava).open())
       .map(_.createNewLibraryConfiguration())

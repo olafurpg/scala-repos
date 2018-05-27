@@ -33,8 +33,10 @@ private[akka] trait MetricsKitOps extends MetricKeyDSL {
     */
   def timedWithKnownOps[T](key: MetricKey, ops: Long)(run: ⇒ T): T = {
     val c = getOrRegister(
-        key.toString, new KnownOpsInTimespanTimer(expectedOps = ops))
-    try run finally c.stop()
+      key.toString,
+      new KnownOpsInTimespanTimer(expectedOps = ops))
+    try run
+    finally c.stop()
   }
 
   /**
@@ -44,14 +46,17 @@ private[akka] trait MetricsKitOps extends MetricKeyDSL {
     *
     * @param unitString just for human readable output, during console printing
     */
-  def hdrHistogram(key: MetricKey,
-                   highestTrackableValue: Long,
-                   numberOfSignificantValueDigits: Int,
-                   unitString: String = ""): HdrHistogram =
+  def hdrHistogram(
+      key: MetricKey,
+      highestTrackableValue: Long,
+      numberOfSignificantValueDigits: Int,
+      unitString: String = ""): HdrHistogram =
     getOrRegister(
-        (key / "hdr-histogram").toString,
-        new HdrHistogram(
-            highestTrackableValue, numberOfSignificantValueDigits, unitString))
+      (key / "hdr-histogram").toString,
+      new HdrHistogram(
+        highestTrackableValue,
+        numberOfSignificantValueDigits,
+        unitString))
 
   /**
     * Use when measuring for 9x'th percentiles as well as min / max / mean values.
@@ -87,14 +92,13 @@ private[akka] trait MetricsKitOps extends MetricKeyDSL {
   /** Enable GC measurements */
   def measureGc(key: MetricKey) =
     registry.registerAll(
-        new jvm.GarbageCollectorMetricSet() with MetricsPrefix {
-      val prefix = key / "gc"
-    })
+      new jvm.GarbageCollectorMetricSet() with MetricsPrefix {
+        val prefix = key / "gc"
+      })
 
   /** Enable File Descriptor measurements */
   def measureFileDescriptors(key: MetricKey) =
-    registry.registerAll(
-        new FileDescriptorMetricSet() with MetricsPrefix {
+    registry.registerAll(new FileDescriptorMetricSet() with MetricsPrefix {
       val prefix = key / "file-descriptors"
     })
 }

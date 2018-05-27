@@ -42,5 +42,6 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class ColorPickerSpec
     extends SimpleSFXDelegateSpec[jfxsc.ColorPicker, ColorPicker](
-        classOf[jfxsc.ColorPicker], classOf[ColorPicker])
+      classOf[jfxsc.ColorPicker],
+      classOf[ColorPicker])
     with RunOnApplicationThread

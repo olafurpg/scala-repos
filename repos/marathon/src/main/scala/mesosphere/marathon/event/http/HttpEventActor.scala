@@ -29,11 +29,13 @@ object HttpEventActor {
   case class NotificationSuccess(url: String)
 
   case class EventNotificationLimit(
-      failedCount: Long, backoffUntil: Option[Deadline]) {
+      failedCount: Long,
+      backoffUntil: Option[Deadline]) {
     def nextFailed: EventNotificationLimit = {
       val next = failedCount + 1
       EventNotificationLimit(
-          next, Some(math.pow(2, next.toDouble).seconds.fromNow))
+        next,
+        Some(math.pow(2, next.toDouble).seconds.fromNow))
     }
     def notLimited: Boolean = backoffUntil.fold(true)(_.isOverdue())
     def limited: Boolean = !notLimited
@@ -41,7 +43,8 @@ object HttpEventActor {
   val NoLimit = EventNotificationLimit(0, None)
 
   private case class Broadcast(
-      event: MarathonEvent, subscribers: EventSubscribers)
+      event: MarathonEvent,
+      subscribers: EventSubscribers)
 
   class HttpEventActorMetrics @Inject()(metrics: Metrics) {
     private val pre = MetricPrefixes.SERVICE
@@ -63,11 +66,14 @@ object HttpEventActor {
   }
 }
 
-class HttpEventActor(conf: HttpEventConfiguration,
-                     subscribersKeeper: ActorRef,
-                     metrics: HttpEventActorMetrics,
-                     clock: Clock)
-    extends Actor with ActorLogging with PlayJsonSupport {
+class HttpEventActor(
+    conf: HttpEventConfiguration,
+    subscribersKeeper: ActorRef,
+    metrics: HttpEventActorMetrics,
+    clock: Clock)
+    extends Actor
+    with ActorLogging
+    with PlayJsonSupport {
 
   implicit val timeout = HttpEventModule.timeout
   def pipeline(
@@ -78,11 +84,11 @@ class HttpEventActor(conf: HttpEventConfiguration,
     Map.empty[String, EventNotificationLimit].withDefaultValue(NoLimit)
 
   def receive: Receive = {
-    case event: MarathonEvent => resolveSubscribersForEventAndBroadcast(event)
+    case event: MarathonEvent          => resolveSubscribersForEventAndBroadcast(event)
     case Broadcast(event, subscribers) => broadcast(event, subscribers)
-    case NotificationSuccess(url) => limiter += url -> NoLimit
-    case NotificationFailed(url) => limiter += url -> limiter(url).nextFailed
-    case _ => log.warning("Message not understood!")
+    case NotificationSuccess(url)      => limiter += url -> NoLimit
+    case NotificationFailed(url)       => limiter += url -> limiter(url).nextFailed
+    case _                             => log.warning("Message not understood!")
   }
 
   def resolveSubscribersForEventAndBroadcast(event: MarathonEvent): Unit = {
@@ -105,8 +111,8 @@ class HttpEventActor(conf: HttpEventConfiguration,
     val (active, limited) = subscribers.urls.partition(limiter(_).notLimited)
     if (limited.nonEmpty) {
       log.info(
-          s"""Will not send event ${event.eventType} to unresponsive hosts: ${limited
-        .mkString(" ")}""")
+        s"""Will not send event ${event.eventType} to unresponsive hosts: ${limited
+          .mkString(" ")}""")
     }
     //remove all unsubscribed callback listener
     limiter = limiter
@@ -137,14 +143,14 @@ class HttpEventActor(conf: HttpEventConfiguration,
       case Success(res) if res.status.isSuccess =>
         val inTime = start.until(clock.now()) < conf.slowConsumerTimeout
         eventActor !
-        (if (inTime) NotificationSuccess(url) else NotificationFailed(url))
+          (if (inTime) NotificationSuccess(url) else NotificationFailed(url))
       case Success(res) =>
         log.warning(s"No success response for post $event to $url")
         metrics.failedCallbacks.mark()
         eventActor ! NotificationFailed(url)
       case Failure(ex) =>
         log.warning(
-            s"Failed to post $event to $url because ${ex.getClass.getSimpleName}: ${ex.getMessage}")
+          s"Failed to post $event to $url because ${ex.getClass.getSimpleName}: ${ex.getMessage}")
         metrics.failedCallbacks.mark()
         eventActor ! NotificationFailed(url)
     }

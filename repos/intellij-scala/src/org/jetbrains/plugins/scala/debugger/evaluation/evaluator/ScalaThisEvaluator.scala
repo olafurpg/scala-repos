@@ -62,12 +62,12 @@ class ScalaThisEvaluator(iterations: Int = 0) extends Evaluator {
       }
       if (thisRef == null)
         throw EvaluationException(
-            ScalaBundle.message("outer.this.not.available"))
+          ScalaBundle.message("outer.this.not.available"))
       objRef = thisRef
     }
     if (objRef == null) {
       throw EvaluationException(
-          DebuggerBundle.message("evaluation.error.this.not.avalilable"))
+        DebuggerBundle.message("evaluation.error.this.not.avalilable"))
     }
     objRef
   }

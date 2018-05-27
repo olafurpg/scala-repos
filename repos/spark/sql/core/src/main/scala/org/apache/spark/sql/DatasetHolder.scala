@@ -27,7 +27,7 @@ package org.apache.spark.sql
   *
   * @since 1.6.0
   */
-case class DatasetHolder[T] private[sql](private val ds: Dataset[T]) {
+case class DatasetHolder[T] private[sql] (private val ds: Dataset[T]) {
 
   // This is declared with parentheses to prevent the Scala compiler from treating
   // `rdd.toDS("1")` as invoking this toDS and then apply on the returned Dataset.

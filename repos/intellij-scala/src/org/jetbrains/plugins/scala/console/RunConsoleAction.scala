@@ -31,7 +31,7 @@ class RunConsoleAction extends AnAction {
       val file = CommonDataKeys.PSI_FILE.getData(e.getDataContext)
       file match {
         case _: ScalaFile => enable()
-        case _ => disable()
+        case _            => disable()
       }
     } catch {
       case e: Exception => disable()
@@ -46,7 +46,7 @@ class RunConsoleAction extends AnAction {
       case file: ScalaFile =>
         val runManagerEx = RunManagerEx.getInstanceEx(file.getProject)
         val configurationType = ConfigurationTypeUtil.findConfigurationType(
-            classOf[ScalaConsoleConfigurationType])
+          classOf[ScalaConsoleConfigurationType])
         val settings =
           runManagerEx.getConfigurationSettingsList(configurationType)
 
@@ -67,9 +67,9 @@ class RunConsoleAction extends AnAction {
             } catch {
               case e: ExecutionException =>
                 Messages.showErrorDialog(
-                    file.getProject,
-                    e.getMessage,
-                    ExecutionBundle.message("error.common.title"))
+                  file.getProject,
+                  e.getMessage,
+                  ExecutionBundle.message("error.common.title"))
             }
           }
         }
@@ -77,28 +77,28 @@ class RunConsoleAction extends AnAction {
         import scala.collection.JavaConversions._
         for (setting <- settings) {
           ActionRunner.runInsideReadAction(
-              new ActionRunner.InterruptibleRunnable {
-            def run() {
-              execute(setting)
-            }
-          })
+            new ActionRunner.InterruptibleRunnable {
+              def run() {
+                execute(setting)
+              }
+            })
           return
         }
         ActionRunner.runInsideReadAction(
-            new ActionRunner.InterruptibleRunnable {
-          def run() {
-            val factory: ScalaConsoleRunConfigurationFactory =
-              configurationType.getConfigurationFactories
-                .apply(0)
-                .asInstanceOf[ScalaConsoleRunConfigurationFactory]
-            val setting = RunManager
-              .getInstance(project)
-              .createRunConfiguration("Scala Console", factory)
+          new ActionRunner.InterruptibleRunnable {
+            def run() {
+              val factory: ScalaConsoleRunConfigurationFactory =
+                configurationType.getConfigurationFactories
+                  .apply(0)
+                  .asInstanceOf[ScalaConsoleRunConfigurationFactory]
+              val setting = RunManager
+                .getInstance(project)
+                .createRunConfiguration("Scala Console", factory)
 
-            runManagerEx.setTemporaryConfiguration(setting)
-            execute(setting)
-          }
-        })
+              runManagerEx.setTemporaryConfiguration(setting)
+              execute(setting)
+            }
+          })
       case _ =>
     }
   }

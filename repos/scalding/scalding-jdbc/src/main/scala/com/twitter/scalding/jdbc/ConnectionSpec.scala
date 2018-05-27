@@ -8,4 +8,6 @@ case class Password(get: String)
   * Pass your DB credentials to this class in a preferred secure way
   */
 case class ConnectionSpec(
-    connectUrl: ConnectUrl, userName: UserName, password: Password)
+    connectUrl: ConnectUrl,
+    userName: UserName,
+    password: Password)

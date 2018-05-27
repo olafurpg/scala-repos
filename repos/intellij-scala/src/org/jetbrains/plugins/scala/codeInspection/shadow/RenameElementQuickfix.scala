@@ -31,7 +31,8 @@ class RenameElementQuickfix(myRef: PsiElement, name: String)
   }
 
   private def actionEventForElement(
-      project: Project, action: AnAction): AnActionEvent = {
+      project: Project,
+      action: AnAction): AnActionEvent = {
     import scala.collection.JavaConversions._
     import scala.collection.mutable
 
@@ -45,18 +46,20 @@ class RenameElementQuickfix(myRef: PsiElement, name: String)
       map.put(CommonDataKeys.PSI_ELEMENT.getName, ref)
     } else if (ApplicationManager.getApplication.isUnitTestMode) {
       val element = new TextEditorPsiDataProvider().getData(
-          CommonDataKeys.PSI_ELEMENT.getName,
-          editor,
-          editor.getCaretModel.getCurrentCaret)
+        CommonDataKeys.PSI_ELEMENT.getName,
+        editor,
+        editor.getCaretModel.getCurrentCaret)
       map.put(CommonDataKeys.PSI_ELEMENT.getName, element)
     }
     val dataContext = SimpleDataContext.getSimpleContext(
-        map, DataManager.getInstance.getDataContext(editor.getComponent))
-    new AnActionEvent(null,
-                      dataContext,
-                      "",
-                      action.getTemplatePresentation,
-                      ActionManager.getInstance,
-                      0)
+      map,
+      DataManager.getInstance.getDataContext(editor.getComponent))
+    new AnActionEvent(
+      null,
+      dataContext,
+      "",
+      action.getTemplatePresentation,
+      ActionManager.getInstance,
+      0)
   }
 }

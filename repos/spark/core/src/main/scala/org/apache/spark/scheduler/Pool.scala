@@ -28,11 +28,13 @@ import org.apache.spark.scheduler.SchedulingMode.SchedulingMode
 /**
   * An Schedulable entity that represent collection of Pools or TaskSetManagers
   */
-private[spark] class Pool(val poolName: String,
-                          val schedulingMode: SchedulingMode,
-                          initMinShare: Int,
-                          initWeight: Int)
-    extends Schedulable with Logging {
+private[spark] class Pool(
+    val poolName: String,
+    val schedulingMode: SchedulingMode,
+    initMinShare: Int,
+    initWeight: Int)
+    extends Schedulable
+    with Logging {
 
   val schedulableQueue = new ConcurrentLinkedQueue[Schedulable]
   val schedulableNameToSchedulable = new ConcurrentHashMap[String, Schedulable]
@@ -81,7 +83,9 @@ private[spark] class Pool(val poolName: String,
   }
 
   override def executorLost(
-      executorId: String, host: String, reason: ExecutorLossReason) {
+      executorId: String,
+      host: String,
+      reason: ExecutorLossReason) {
     schedulableQueue.asScala.foreach(_.executorLost(executorId, host, reason))
   }
 

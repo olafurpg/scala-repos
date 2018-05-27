@@ -13,7 +13,7 @@ object Test extends App {
     def toInt =
       x match {
         case Num(n) => n
-        case _ => throw new RuntimeException
+        case _      => throw new RuntimeException
       }
   }
 

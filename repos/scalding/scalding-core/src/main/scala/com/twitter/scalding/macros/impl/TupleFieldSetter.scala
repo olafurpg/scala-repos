@@ -35,15 +35,18 @@ object TupleFieldSetter extends CaseClassFieldSetter {
   }
 
   override def default(c: Context)(
-      idx: Int, container: c.TermName, fieldValue: c.Tree): c.Tree = {
+      idx: Int,
+      container: c.TermName,
+      fieldValue: c.Tree): c.Tree = {
     import c.universe._
     q"""$container.set($idx, $fieldValue)"""
   }
 
-  override def from(c: Context)(fieldType: c.Type,
-                                idx: Int,
-                                container: c.TermName,
-                                fieldValue: c.Tree): Try[c.Tree] = Try {
+  override def from(c: Context)(
+      fieldType: c.Type,
+      idx: Int,
+      container: c.TermName,
+      fieldValue: c.Tree): Try[c.Tree] = Try {
     import c.universe._
 
     def simpleType(accessor: Tree) = q"""${accessor}(${idx}, $fieldValue)"""
@@ -52,12 +55,12 @@ object TupleFieldSetter extends CaseClassFieldSetter {
       case tpe if tpe =:= typeOf[String] => simpleType(q"$container.setString")
       case tpe if tpe =:= typeOf[Boolean] =>
         simpleType(q"$container.setBoolean")
-      case tpe if tpe =:= typeOf[Short] => simpleType(q"$container.setShort")
-      case tpe if tpe =:= typeOf[Int] => simpleType(q"$container.setInteger")
-      case tpe if tpe =:= typeOf[Long] => simpleType(q"$container.setLong")
-      case tpe if tpe =:= typeOf[Float] => simpleType(q"$container.setFloat")
+      case tpe if tpe =:= typeOf[Short]  => simpleType(q"$container.setShort")
+      case tpe if tpe =:= typeOf[Int]    => simpleType(q"$container.setInteger")
+      case tpe if tpe =:= typeOf[Long]   => simpleType(q"$container.setLong")
+      case tpe if tpe =:= typeOf[Float]  => simpleType(q"$container.setFloat")
       case tpe if tpe =:= typeOf[Double] => simpleType(q"$container.setDouble")
-      case _ => sys.error(s"Unsupported primitive type ${fieldType}")
+      case _                             => sys.error(s"Unsupported primitive type ${fieldType}")
     }
   }
 }

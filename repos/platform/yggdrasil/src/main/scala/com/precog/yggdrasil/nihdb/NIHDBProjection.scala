@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -32,8 +32,11 @@ import com.weiglewilczek.slf4s.Logging
 import scalaz.{NonEmptyList => NEL, Monad, StreamT}
 
 final class NIHDBProjection(
-    snapshot: NIHDBSnapshot, val authorities: Authorities, projectionId: Int)
-    extends ProjectionLike[Future, Slice] with Logging {
+    snapshot: NIHDBSnapshot,
+    val authorities: Authorities,
+    projectionId: Int)
+    extends ProjectionLike[Future, Slice]
+    with Logging {
   type Key = Long
 
   private[this] val readers = snapshot.readers
@@ -42,7 +45,9 @@ final class NIHDBProjection(
 
   override def toString =
     "NIHDBProjection(id = %d, len = %d, authorities = %s)".format(
-        projectionId, length, authorities)
+      projectionId,
+      length,
+      authorities)
 
   def structure(implicit M: Monad[Future]) =
     M.point(readers.flatMap(_.structure)(collection.breakOut): Set[ColumnRef])
@@ -74,7 +79,8 @@ final class NIHDBProjection(
   }
 
   private def getSnapshotBlock(
-      id: Option[Long], columns: Option[Set[CPath]]): Option[Block] = {
+      id: Option[Long],
+      columns: Option[Set[CPath]]): Option[Block] = {
     try {
       // We're limiting ourselves to 2 billion blocks total here
       val index = id.map(_.toInt).getOrElse(0)

@@ -126,7 +126,9 @@ object Field {
     def pow(a: BigDecimal, b: BigDecimal): BigDecimal = a.pow(b.toInt)
 
     override def close(
-        a: BigDecimal, b: BigDecimal, tolerance: Double): Boolean = {
+        a: BigDecimal,
+        b: BigDecimal,
+        tolerance: Double): Boolean = {
       (a - b).abs <= tolerance * (a.abs max b.abs)
     }
 

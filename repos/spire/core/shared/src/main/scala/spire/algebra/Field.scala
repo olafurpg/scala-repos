@@ -5,7 +5,9 @@ import java.lang.Double.{isInfinite, isNaN, doubleToLongBits}
 import java.lang.Long.{numberOfTrailingZeros}
 
 trait Field[@sp(Byte, Short, Int, Long, Float, Double) A]
-    extends Any with EuclideanRing[A] with MultiplicativeAbGroup[A] {
+    extends Any
+    with EuclideanRing[A]
+    with MultiplicativeAbGroup[A] {
 
   /**
     * This is implemented in terms of basic Field ops. However, this is
@@ -18,8 +20,9 @@ trait Field[@sp(Byte, Short, Int, Long, Float, Double) A]
     if (a == 0.0) {
       fromInt(0)
     } else {
-      require(!isInfinite(a) && !isNaN(a),
-              "Double must be representable as a fraction.")
+      require(
+        !isInfinite(a) && !isNaN(a),
+        "Double must be representable as a fraction.")
 
       val bits = doubleToLongBits(a)
       val m = bits & 0x000FFFFFFFFFFFFFL | 0x0010000000000000L

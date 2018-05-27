@@ -49,7 +49,8 @@ object RotateEvent {
     */
   val Rotate: EventType[jfxsi.RotateEvent] = jfxsi.RotateEvent.ROTATE
   @deprecated(
-      "Use Rotate; ROTATE will be removed in a future release", "8.0.60-R10")
+    "Use Rotate; ROTATE will be removed in a future release",
+    "8.0.60-R10")
   val ROTATE = Rotate
 
   /**
@@ -58,8 +59,8 @@ object RotateEvent {
   val RotationFinished: EventType[jfxsi.RotateEvent] =
     jfxsi.RotateEvent.ROTATION_FINISHED
   @deprecated(
-      "Use RotationFinished; ROTATION_FINISHED will be removed in a future release",
-      "8.0.60-R10")
+    "Use RotationFinished; ROTATION_FINISHED will be removed in a future release",
+    "8.0.60-R10")
   val ROTATION_FINISHED = RotationFinished
 
   /**
@@ -68,8 +69,8 @@ object RotateEvent {
   val RotationStarted: EventType[jfxsi.RotateEvent] =
     jfxsi.RotateEvent.ROTATION_STARTED
   @deprecated(
-      "Use RotationStarted; ROTATION_STARTED will be removed in a future release",
-      "8.0.60-R10")
+    "Use RotationStarted; ROTATION_STARTED will be removed in a future release",
+    "8.0.60-R10")
   val ROTATION_STARTED = RotationStarted
 }
 
@@ -77,7 +78,8 @@ object RotateEvent {
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/input/RotateEvent.html]]
   */
 class RotateEvent(override val delegate: jfxsi.RotateEvent)
-    extends InputEvent(delegate) with SFXDelegate[jfxsi.RotateEvent] {
+    extends InputEvent(delegate)
+    with SFXDelegate[jfxsi.RotateEvent] {
 
   /**
     * Gets the rotation angle of this event.

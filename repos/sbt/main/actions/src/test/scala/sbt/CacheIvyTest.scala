@@ -11,19 +11,21 @@ class CacheIvyTest extends Properties("CacheIvy") {
   import sbinary._
   import sbinary.DefaultProtocol._
 
-  private def cachePreservesEquality[T : Format](
-      m: T, eq: (T, T) => Prop, str: T => String): Prop = {
+  private def cachePreservesEquality[T: Format](
+      m: T,
+      eq: (T, T) => Prop,
+      str: T => String): Prop = {
     val out = fromByteArray[T](toByteArray(m))
     eq(out, m) :| s"Expected: ${str(m)}" :| s"Got: ${str(out)}"
   }
 
   implicit val arbExclusionRule: Arbitrary[ExclusionRule] = Arbitrary(
-      for {
-        o <- Gen.alphaStr
-        n <- Gen.alphaStr
-        a <- Gen.alphaStr
-        cs <- arbitrary[List[String]]
-      } yield ExclusionRule(o, n, a, cs)
+    for {
+      o <- Gen.alphaStr
+      n <- Gen.alphaStr
+      a <- Gen.alphaStr
+      cs <- arbitrary[List[String]]
+    } yield ExclusionRule(o, n, a, cs)
   )
 
   implicit val arbCrossVersion: Arbitrary[CrossVersion] = Arbitrary {
@@ -54,35 +56,37 @@ class CacheIvyTest extends Properties("CacheIvy") {
       extraAttributes <- Gen.mapOf(arbitrary[(String, String)])
       crossVersion <- arbitrary[CrossVersion]
     } yield
-      ModuleID(organization = o,
-               name = n,
-               revision = r,
-               configurations = cs,
-               isChanging = isChanging,
-               isTransitive = isTransitive,
-               isForce = isForce,
-               explicitArtifacts = explicitArtifacts,
-               inclusions = inclusions,
-               exclusions = exclusions,
-               extraAttributes = extraAttributes,
-               crossVersion = crossVersion,
-               branchName = branch)
+      ModuleID(
+        organization = o,
+        name = n,
+        revision = r,
+        configurations = cs,
+        isChanging = isChanging,
+        isTransitive = isTransitive,
+        isForce = isForce,
+        explicitArtifacts = explicitArtifacts,
+        inclusions = inclusions,
+        exclusions = exclusions,
+        extraAttributes = extraAttributes,
+        crossVersion = crossVersion,
+        branchName = branch
+      )
   }
 
   property("moduleIDFormat") = forAll { (m: ModuleID) =>
     def str(m: ModuleID) = {
       import m._
       s"ModuleID($organization, ${m.name}, $revision, $configurations, $isChanging, $isTransitive, $isForce, $explicitArtifacts, $exclusions, " +
-      s"$inclusions, $extraAttributes, $crossVersion, $branchName)"
+        s"$inclusions, $extraAttributes, $crossVersion, $branchName)"
     }
     def eq(a: ModuleID, b: ModuleID): Prop = {
       import CrossVersion._
       def rest = a.copy(crossVersion = b.crossVersion) == b
       (a.crossVersion, b.crossVersion) match {
-        case (Disabled, Disabled) => rest
+        case (Disabled, Disabled)   => rest
         case (_: Binary, _: Binary) => rest
-        case (_: Full, _: Full) => rest
-        case (a, b) => Prop(false) :| s"CrossVersions don't match: $a vs $b"
+        case (_: Full, _: Full)     => rest
+        case (a, b)                 => Prop(false) :| s"CrossVersions don't match: $a vs $b"
       }
     }
     cachePreservesEquality(m, eq _, str)

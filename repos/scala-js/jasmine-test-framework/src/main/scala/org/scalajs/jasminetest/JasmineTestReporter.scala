@@ -20,10 +20,11 @@ import scala.scalajs.js.annotation.JSExport
 import scala.scalajs.runtime.StackTrace
 
 /** This class is passed to the actual jasmine framework as a reporter */
-class JasmineTestReporter(taskDef: TaskDef,
-                          eventHandler: EventHandler,
-                          loggers: Array[Logger],
-                          runnerDone: () => Unit) {
+class JasmineTestReporter(
+    taskDef: TaskDef,
+    eventHandler: EventHandler,
+    loggers: Array[Logger],
+    runnerDone: () => Unit) {
   private var currentSuite: Suite = _
 
   @JSExport
@@ -44,8 +45,7 @@ class JasmineTestReporter(taskDef: TaskDef,
     val results = spec.results()
     val description = spec.description
 
-    val selector = new NestedTestSelector(
-        spec.suite.getFullName(), description)
+    val selector = new NestedTestSelector(spec.suite.getFullName(), description)
 
     if (results.passed) {
       eventHandler.handle(new JasmineEvent(taskDef, Status.Success, selector))
@@ -116,7 +116,7 @@ class JasmineTestReporter(taskDef: TaskDef,
     message match {
       case FilePattern(originalMessage) => originalMessage
       case EvalPattern(originalMessage) => originalMessage
-      case message => message
+      case message                      => message
     }
   }
 
@@ -131,7 +131,7 @@ class JasmineTestReporter(taskDef: TaskDef,
           val message = sanitizeMessage(r.message)
           val stack = StackTrace.extract(r.trace).takeWhile { stackElem =>
             (stackElem.getFileName == null ||
-                !stackElem.getFileName.endsWith("jasmine.js"))
+            !stackElem.getFileName.endsWith("jasmine.js"))
           }
 
           if (stack.isEmpty) log.error(s"    $message")

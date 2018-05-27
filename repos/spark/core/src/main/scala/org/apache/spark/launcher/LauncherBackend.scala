@@ -89,8 +89,7 @@ private[spark] abstract class LauncherBackend {
   protected def onDisconnected(): Unit = {}
 
   private def fireStopRequest(): Unit = {
-    val thread = LauncherBackend.threadFactory.newThread(
-        new Runnable() {
+    val thread = LauncherBackend.threadFactory.newThread(new Runnable() {
       override def run(): Unit = Utils.tryLogNonFatalError {
         onStopRequest()
       }
@@ -106,7 +105,7 @@ private[spark] abstract class LauncherBackend {
 
       case _ =>
         throw new IllegalArgumentException(
-            s"Unexpected message type: ${m.getClass().getName()}")
+          s"Unexpected message type: ${m.getClass().getName()}")
     }
 
     override def close(): Unit = {

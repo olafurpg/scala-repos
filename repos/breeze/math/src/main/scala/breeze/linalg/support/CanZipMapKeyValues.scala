@@ -42,11 +42,12 @@ import scala.reflect.ClassTag
   *
   * @author dlwh
   */
-trait CanZipMapKeyValues[From,
-                         @spec(Int) K,
-                         @spec(Double, Int, Float, Long) V,
-                         @spec(Double, Int, Float, Long) RV,
-                         +To] {
+trait CanZipMapKeyValues[
+    From,
+    @spec(Int) K,
+    @spec(Double, Int, Float, Long) V,
+    @spec(Double, Int, Float, Long) RV,
+    +To] {
 
   /** Maps all corresponding values from the two collections. */
   def map(from: From, from2: From, fn: (K, V, V) => RV): To
@@ -72,8 +73,9 @@ object CanZipMapKeyValues {
   // Arrays
   //
 
-  class OpArray[@spec(Double, Int, Float, Long) V,
-                @spec(Double, Int, Float, Long) RV : ClassTag]
+  class OpArray[
+      @spec(Double, Int, Float, Long) V,
+      @spec(Double, Int, Float, Long) RV: ClassTag]
       extends CanZipMapKeyValues[Array[V], Int, V, RV, Array[RV]] {
 
     /**Maps all values from the given collection. */
@@ -87,14 +89,16 @@ object CanZipMapKeyValues {
     }
 
     override def mapActive(
-        from: Array[V], from2: Array[V], fn: (Int, V, V) => RV): Array[RV] = {
+        from: Array[V],
+        from2: Array[V],
+        fn: (Int, V, V) => RV): Array[RV] = {
       map(from, from2, fn)
     }
   }
 
   // <editor-fold defaultstate="collapsed" desc=" implicit CanZipMapValues[V, RV] implementations ">
 
-  implicit def opArray[@spec V, @spec RV : ClassTag] = new OpArray[V, RV]
+  implicit def opArray[@spec V, @spec RV: ClassTag] = new OpArray[V, RV]
 
   implicit object OpArrayII extends OpArray[Int, Int]
 

@@ -13,16 +13,21 @@ class ScalaDelegateMethodTest
     extends ScalaLightPlatformCodeInsightTestCaseAdapter {
 
   def runTest(
-      fileText: String, expectedText: String, specifyType: Boolean = true) {
+      fileText: String,
+      expectedText: String,
+      specifyType: Boolean = true) {
     configureFromFileTextAdapter(
-        "dummy.scala", fileText.replace("\r", "").stripMargin.trim)
+      "dummy.scala",
+      fileText.replace("\r", "").stripMargin.trim)
     val oldSpecifyType =
       ScalaApplicationSettings.getInstance.SPECIFY_RETURN_TYPE_EXPLICITLY
-    ScalaApplicationSettings.getInstance.SPECIFY_RETURN_TYPE_EXPLICITLY = specifyType
+    ScalaApplicationSettings.getInstance.SPECIFY_RETURN_TYPE_EXPLICITLY =
+      specifyType
     new ScalaGenerateDelegateHandler()
       .invoke(getProjectAdapter, getEditorAdapter, getFileAdapter)
     checkResultByText(expectedText.replace("\r", "").stripMargin.trim)
-    ScalaApplicationSettings.getInstance.SPECIFY_RETURN_TYPE_EXPLICITLY = oldSpecifyType
+    ScalaApplicationSettings.getInstance.SPECIFY_RETURN_TYPE_EXPLICITLY =
+      oldSpecifyType
   }
 
   def testVal() {
@@ -173,7 +178,7 @@ class ScalaDelegateMethodTest
         |<caret>
         |}"""
     val result = //no action
-    """class Base {
+      """class Base {
         |  private val d = new D()
         |}
         |
@@ -247,7 +252,7 @@ class ScalaDelegateMethodTest
         |  }
         |}"""
     val result = //no effect
-    """class D {
+      """class D {
         |  def foo(x: Int): Int = x
         |}
         |

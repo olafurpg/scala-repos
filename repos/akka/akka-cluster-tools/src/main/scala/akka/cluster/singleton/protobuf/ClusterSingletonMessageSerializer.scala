@@ -19,7 +19,8 @@ import akka.serialization.SerializerWithStringManifest
   */
 private[akka] class ClusterSingletonMessageSerializer(
     val system: ExtendedActorSystem)
-    extends SerializerWithStringManifest with BaseSerializer {
+    extends SerializerWithStringManifest
+    with BaseSerializer {
 
   private lazy val serialization = SerializationExtension(system)
 
@@ -31,15 +32,20 @@ private[akka] class ClusterSingletonMessageSerializer(
   private val emptyByteArray = Array.empty[Byte]
 
   private val fromBinaryMap = collection.immutable
-    .HashMap[String, Array[Byte] ⇒ AnyRef](HandOverToMeManifest -> { _ ⇒
-    HandOverToMe
-  }, HandOverInProgressManifest -> { _ ⇒
-    HandOverInProgress
-  }, HandOverDoneManifest -> { _ ⇒
-    HandOverDone
-  }, TakeOverFromMeManifest -> { _ ⇒
-    TakeOverFromMe
-  })
+    .HashMap[String, Array[Byte] ⇒ AnyRef](
+      HandOverToMeManifest -> { _ ⇒
+        HandOverToMe
+      },
+      HandOverInProgressManifest -> { _ ⇒
+        HandOverInProgress
+      },
+      HandOverDoneManifest -> { _ ⇒
+        HandOverDone
+      },
+      TakeOverFromMeManifest -> { _ ⇒
+        TakeOverFromMe
+      }
+    )
 
   override def manifest(obj: AnyRef): String = obj match {
     case HandOverToMe ⇒ HandOverToMeManifest
@@ -48,7 +54,7 @@ private[akka] class ClusterSingletonMessageSerializer(
     case TakeOverFromMe ⇒ TakeOverFromMeManifest
     case _ ⇒
       throw new IllegalArgumentException(
-          s"Can't serialize object of type ${obj.getClass} in [${getClass.getName}]")
+        s"Can't serialize object of type ${obj.getClass} in [${getClass.getName}]")
   }
 
   override def toBinary(obj: AnyRef): Array[Byte] = obj match {
@@ -58,7 +64,7 @@ private[akka] class ClusterSingletonMessageSerializer(
     case TakeOverFromMe ⇒ emptyByteArray
     case _ ⇒
       throw new IllegalArgumentException(
-          s"Can't serialize object of type ${obj.getClass} in [${getClass.getName}]")
+        s"Can't serialize object of type ${obj.getClass} in [${getClass.getName}]")
   }
 
   override def fromBinary(bytes: Array[Byte], manifest: String): AnyRef =
@@ -66,6 +72,6 @@ private[akka] class ClusterSingletonMessageSerializer(
       case Some(f) ⇒ f(bytes)
       case None ⇒
         throw new IllegalArgumentException(
-            s"Unimplemented deserialization of message with manifest [$manifest] in [${getClass.getName}]")
+          s"Unimplemented deserialization of message with manifest [$manifest] in [${getClass.getName}]")
     }
 }

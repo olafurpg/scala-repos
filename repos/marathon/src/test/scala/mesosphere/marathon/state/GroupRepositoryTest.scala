@@ -26,8 +26,9 @@ class GroupRepositoryTest extends MarathonSpec with Matchers {
     val repo = new GroupRepository(store, None, metrics)
     val res = repo.store("root", group)
 
-    assert(group == Await.result(res, 5 seconds),
-           "Should return the correct Group")
+    assert(
+      group == Await.result(res, 5 seconds),
+      "Should return the correct Group")
     verify(store).store(versionedKey, group)
     verify(store).store(s"root", group)
   }

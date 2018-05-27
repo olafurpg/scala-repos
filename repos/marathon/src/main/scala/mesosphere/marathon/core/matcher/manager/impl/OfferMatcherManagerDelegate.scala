@@ -13,8 +13,7 @@ private[matcher] object OfferMatcherManagerDelegate {
   sealed trait ChangeMatchersRequest
   case class AddOrUpdateMatcher(consumer: OfferMatcher)
       extends ChangeMatchersRequest
-  case class RemoveMatcher(consumer: OfferMatcher)
-      extends ChangeMatchersRequest
+  case class RemoveMatcher(consumer: OfferMatcher) extends ChangeMatchersRequest
 
   sealed trait ChangeConsumersResponse
   case class MatcherAdded(consumer: OfferMatcher)

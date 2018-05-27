@@ -28,8 +28,7 @@ object ModeledCustomHeaderSpec {
   }
   //#modeled-api-key-custom-header
 
-  object DifferentHeader
-      extends ModeledCustomHeaderCompanion[DifferentHeader] {
+  object DifferentHeader extends ModeledCustomHeaderCompanion[DifferentHeader] {
     def renderInRequests = false
     def renderInResponses = false
     override val name = "different"
@@ -117,7 +116,7 @@ class ModeledCustomHeaderSpec extends RoutingSpec {
       }
 
       ex.getMessage should ===(
-          "Unable to construct custom header by parsing: 'Hello world'")
+        "Unable to construct custom header by parsing: 'Hello world'")
       ex.getCause.getMessage should include("whitespace")
     }
   }

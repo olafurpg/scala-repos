@@ -26,8 +26,7 @@ object ScNotVisibleInJavaShortClassNameIndex {
   val KEY = ScalaIndexKeys.NOT_VISIBLE_IN_JAVA_SHORT_NAME_KEY
 }
 
-class ScShortNamePackageObjectIndex
-    extends StringStubIndexExtension[PsiClass] {
+class ScShortNamePackageObjectIndex extends StringStubIndexExtension[PsiClass] {
   def getKey = ScShortNamePackageObjectIndex.KEY
 }
 

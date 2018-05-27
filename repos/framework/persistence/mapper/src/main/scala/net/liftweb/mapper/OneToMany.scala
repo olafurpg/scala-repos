@@ -35,10 +35,10 @@ trait OneToMany[K, T <: KeyedMapper[K, T]] extends KeyedMapper[K, T] {
 
   private[mapper] lazy val oneToManyFields: List[MappedOneToManyBase[Rec]] = {
     new FieldFinder[MappedOneToManyBase[Rec]](
-        getSingleton,
-        net.liftweb.common.Logger(classOf[OneToMany[K, T]])
+      getSingleton,
+      net.liftweb.common.Logger(classOf[OneToMany[K, T]])
     ).accessorMethods map
-    (_.invoke(this).asInstanceOf[MappedOneToManyBase[Rec]])
+      (_.invoke(this).asInstanceOf[MappedOneToManyBase[Rec]])
   }
 
   /**
@@ -62,7 +62,7 @@ trait OneToMany[K, T <: KeyedMapper[K, T]] extends KeyedMapper[K, T] {
     if (oneToManyFields.forall {
           (_: MappedOneToManyBase[_ <: Mapper[_]]) match {
             case f: Cascade[_] => f.delete_!
-            case _ => true
+            case _             => true
           }
         }) super.delete_!
     else {
@@ -82,23 +82,23 @@ trait OneToMany[K, T <: KeyedMapper[K, T]] extends KeyedMapper[K, T] {
   /**
     * Simple OneToMany support for children from the same table
     */
-  class MappedOneToMany[O <: Mapper[O]](meta: MetaMapper[O],
-                                        foreign: MappedForeignKey[K, O, T],
-                                        qp: QueryParam[O]*)
+  class MappedOneToMany[O <: Mapper[O]](
+      meta: MetaMapper[O],
+      foreign: MappedForeignKey[K, O, T],
+      qp: QueryParam[O]*)
       extends MappedOneToManyBase[O](
-          () =>
-            {
-              val ret =
-                meta.findAll(By(foreign, primaryKeyField.get) :: qp.toList: _*)
-              for (child <- ret) {
-                foreign
-                  .actualField(child)
-                  .asInstanceOf[MappedForeignKey[K, O, T]]
-                  .primeObj(net.liftweb.common.Full(OneToMany.this: T))
-              }
-              ret
-          },
-          foreign
+        () => {
+          val ret =
+            meta.findAll(By(foreign, primaryKeyField.get) :: qp.toList: _*)
+          for (child <- ret) {
+            foreign
+              .actualField(child)
+              .asInstanceOf[MappedForeignKey[K, O, T]]
+              .primeObj(net.liftweb.common.Full(OneToMany.this: T))
+          }
+          ret
+        },
+        foreign
       )
 
   /**
@@ -249,7 +249,9 @@ trait OneToMany[K, T <: KeyedMapper[K, T]] extends KeyedMapper[K, T] {
       val c = getClass.getSimpleName
       val l = c.lastIndexOf("$")
       c.substring(c.lastIndexOf("$", l - 1) + 1, l) + delegate.mkString(
-          "[", ", ", "]")
+        "[",
+        ", ",
+        "]")
     }
   }
 

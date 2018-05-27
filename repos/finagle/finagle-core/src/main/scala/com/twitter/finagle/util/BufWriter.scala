@@ -129,7 +129,7 @@ private class FixedBufWriter(arr: Array[Byte]) extends BufWriter {
   def writeBytes(bs: Array[Byte]): BufWriter = {
     if (remaining < bs.length) {
       throw new OverflowException(
-          s"insufficient space to write ${bs.length} bytes")
+        s"insufficient space to write ${bs.length} bytes")
     }
     System.arraycopy(bs, 0, arr, index, bs.length)
     index += bs.length

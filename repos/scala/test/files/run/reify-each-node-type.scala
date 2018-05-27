@@ -51,9 +51,11 @@ object s {
     act(reify { null: D with E /* CompoundTypeTree */ })
     act(reify { type T = Int /* TypeDef */ })
     act(reify { type CC[T <: D] = C[T] /* TypeBoundsTree */ })
-    act(reify { try 0 finally println("") /* Try */ })
-    act(
-        reify { (x: Int) =>
+    act(reify {
+      try 0
+      finally println("") /* Try */
+    })
+    act(reify { (x: Int) =>
       x /* Function */
     })
     act(reify { var v = 1; v = 2 /* Assign */ })
@@ -67,10 +69,10 @@ object s {
     act(reify { def f: Int = return 0 /* Return */ })
     act(reify { object x /* ModuleDef */ })
     act(reify { throw new java.lang.Exception /* Throw */ })
-    act(reify { 0 match { case _ => 0 } /* Match CaseDef */ })
-    act(reify { 0 match { case 1 | 2 => 0 } /* Alternative */ })
-    act(reify { q match { case x @ List => 0 } /* Bind */ })
-    act(reify { q match { case UnSeq(1, _ *) => 0 } /* Star */ })
+    act(reify { 0 match { case _            => 0 } /* Match CaseDef */ })
+    act(reify { 0 match { case 1 | 2        => 0 } /* Alternative */ })
+    act(reify { q match { case x @ List     => 0 } /* Bind */ })
+    act(reify { q match { case UnSeq(1, _*) => 0 } /* Star */ })
 
     // ``unexpected: bound type that doesn't have a tpe: Ident(newTypeName("Int"))''
     // act(reify { r.List[T forSome { type T <: Int }]() })    // Was crashing , no longer
@@ -104,12 +106,12 @@ object Test {
     def act[T](expr: Expr[T]): Unit = {
       idx += 1
       val ts = expr.tree filter (_ => true) map
-      (_.getClass.getName split "[.$]" last) filterNot seen distinct;
+        (_.getClass.getName split "[.$]" last) filterNot seen distinct;
       println(
-          "%2d  %60s  %s".format(
-              idx,
-              expr.tree.toString.replaceAll("""\s+""", " ").take(60),
-              ts mkString " "))
+        "%2d  %60s  %s".format(
+          idx,
+          expr.tree.toString.replaceAll("""\s+""", " ").take(60),
+          ts mkString " "))
       seen ++= ts
     }
   }

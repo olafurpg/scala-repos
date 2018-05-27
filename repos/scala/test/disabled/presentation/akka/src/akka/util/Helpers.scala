@@ -20,8 +20,9 @@ object Helpers {
   }
 
   def bytesToInt(bytes: Array[Byte], offset: Int): Int = {
-    (0 until 4).foldLeft(0)((value, index) =>
-          value +
+    (0 until 4).foldLeft(0)(
+      (value, index) =>
+        value +
           ((bytes(index + offset) & 0x000000FF) << ((4 - 1 - index) * 8)))
   }
 
@@ -38,7 +39,7 @@ object Helpers {
     * Convenience helper to cast the given Option of Any to an Option of the given type. Will swallow a possible
     * ClassCastException and return None in that case.
     */
-  def narrowSilently[T : ClassTag](o: Option[Any]): Option[T] =
+  def narrowSilently[T: ClassTag](o: Option[Any]): Option[T] =
     try {
       narrow(o)
     } catch {

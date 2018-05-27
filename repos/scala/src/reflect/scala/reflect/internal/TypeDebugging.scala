@@ -19,7 +19,7 @@ trait TypeDebugging { self: SymbolTable =>
   object noPrint extends (Tree => Boolean) {
     def skipScalaName(name: Name) = name match {
       case tpnme.Any | tpnme.Nothing | tpnme.AnyRef => true
-      case _ => false
+      case _                                        => false
     }
     def skipRefTree(t: RefTree) = t match {
       case Select(Select(Ident(nme.ROOTPKG), nme.scala_), name)
@@ -31,30 +31,30 @@ trait TypeDebugging { self: SymbolTable =>
       case Select(Super(This(tpnme.EMPTY), tpnme.EMPTY), nme.CONSTRUCTOR) =>
         true
       case Ident(nme.ROOTPKG) => true
-      case _ => skipSym(t.symbol)
+      case _                  => skipSym(t.symbol)
     }
     def skipSym(sym: Symbol): Boolean = sym match {
-      case null => false
+      case null                    => false
       case NothingClass | AnyClass => true
-      case PredefModule => true
-      case ObjectClass => true
-      case _ => sym.hasPackageFlag
+      case PredefModule            => true
+      case ObjectClass             => true
+      case _                       => sym.hasPackageFlag
     }
     def skipType(tpe: Type): Boolean =
       (tpe eq null) || skipSym(tpe.typeSymbolDirect)
 
     def skip(t: Tree): Boolean = t match {
-      case EmptyTree => true
-      case PackageDef(_, _) => true
-      case t: RefTree => skipRefTree(t)
-      case TypeBoundsTree(lo, hi) => skip(lo) && skip(hi)
-      case Block(Nil, expr) => skip(expr)
-      case Apply(fn, Nil) => skip(fn)
-      case Block(stmt :: Nil, expr) => skip(stmt) && skip(expr)
+      case EmptyTree                                          => true
+      case PackageDef(_, _)                                   => true
+      case t: RefTree                                         => skipRefTree(t)
+      case TypeBoundsTree(lo, hi)                             => skip(lo) && skip(hi)
+      case Block(Nil, expr)                                   => skip(expr)
+      case Apply(fn, Nil)                                     => skip(fn)
+      case Block(stmt :: Nil, expr)                           => skip(stmt) && skip(expr)
       case DefDef(_, nme.CONSTRUCTOR, Nil, ListOfNil, _, rhs) => skip(rhs)
-      case Literal(Constant(())) => true
-      case tt @ TypeTree() => skipType(tt.tpe)
-      case _ => skipSym(t.symbol)
+      case Literal(Constant(()))                              => true
+      case tt @ TypeTree()                                    => skipType(tt.tpe)
+      case _                                                  => skipSym(t.symbol)
     }
     def apply(t: Tree) = skip(t)
   }
@@ -83,10 +83,10 @@ trait TypeDebugging { self: SymbolTable =>
 
     private def to_s(x: Any): String = x match {
       // otherwise case classes are caught looking like products
-      case _: Tree | _: Type => "" + x
+      case _: Tree | _: Type     => "" + x
       case x: TraversableOnce[_] => x mkString ", "
-      case x: Product => x.productIterator mkString ("(", ", ", ")")
-      case _ => "" + x
+      case x: Product            => x.productIterator mkString ("(", ", ", ")")
+      case _                     => "" + x
     }
     def ptBlock(label: String, pairs: (String, Any)*): String = {
       if (pairs.isEmpty) label + "{ }"
@@ -98,13 +98,14 @@ trait TypeDebugging { self: SymbolTable =>
         strs.mkString(label + " {\n  ", "\n  ", "\n}")
       }
     }
-    def ptLine(pairs: (String, Any)*): String = (pairs map {
-          case (k, v) => (k, to_s(v))
-        } filterNot { case (_, v) => v == "" } map {
-          case ("", v) => v; case (k, v) => s"$k=$v"
-        } mkString ", ")
+    def ptLine(pairs: (String, Any)*): String =
+      (pairs map {
+        case (k, v)             => (k, to_s(v))
+      } filterNot { case (_, v) => v == "" } map {
+        case ("", v)            => v; case (k, v) => s"$k=$v"
+      } mkString ", ")
     def ptTree(t: Tree): String = t match {
-      case PackageDef(pid, _) => s"package $pid"
+      case PackageDef(pid, _)    => s"package $pid"
       case ModuleDef(_, name, _) => s"object $name"
       case DefDef(_, name, tparams, _, _, _) =>
         "def " + name + ptTypeParams(tparams)
@@ -119,7 +120,7 @@ trait TypeDebugging { self: SymbolTable =>
         val hi_s = if (noPrint(hi)) "" else " <: " + ptTree(hi)
         lo_s + hi_s
       case _ if (t.symbol eq null) || (t.symbol eq NoSymbol) => to_s(t)
-      case _ => "" + t.symbol.tpe
+      case _                                                 => "" + t.symbol.tpe
     }
     def ptTypeParam(td: TypeDef): String = {
       val TypeDef(_, name, tparams, rhs) = td
@@ -145,14 +146,14 @@ trait TypeDebugging { self: SymbolTable =>
     private def debug(tp: Type): String = tp match {
       case TypeRef(pre, sym, args) =>
         s"${debug(pre)}.${sym.nameString}.${tparams(args)}"
-      case ThisType(sym) => s"${sym.nameString}.this"
-      case SingleType(pre, sym) => s"${debug(pre)}.${sym.nameString}.type"
+      case ThisType(sym)          => s"${sym.nameString}.this"
+      case SingleType(pre, sym)   => s"${debug(pre)}.${sym.nameString}.type"
       case RefinedType(ps, decls) => s"${parents(ps)} ${refine(decls)}"
       case ClassInfoType(ps, decls, clazz) =>
         s"class ${clazz.nameString} ${parents(ps)} ${refine(decls)}"
       case PolyType(tparams, result) => s"${brackets(tparams)}${debug(result)}"
-      case TypeBounds(lo, hi) => bounds(lo, hi)
-      case tv @ TypeVar(_, _) => "" + tv
+      case TypeBounds(lo, hi)        => bounds(lo, hi)
+      case tv @ TypeVar(_, _)        => "" + tv
       case ExistentialType(tparams, qtpe) =>
         s"forSome ${brackets(tparams)} ${debug(qtpe)}"
       case _ =>

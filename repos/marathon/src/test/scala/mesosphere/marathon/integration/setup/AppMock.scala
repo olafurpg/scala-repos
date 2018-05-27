@@ -26,15 +26,16 @@ class AppMock(appId: String, version: String, url: String)
     server.start()
     val taskId = System.getenv().getOrDefault("MESOS_TASK_ID", "<UNKNOWN>")
     println(
-        s"AppMock[$appId $version]: $taskId has taken the stage at port $port. Will query $url for health status.")
+      s"AppMock[$appId $version]: $taskId has taken the stage at port $port. Will query $url for health status.")
     server.join()
     println(s"AppMock[$appId $version]: says goodbye")
   }
 
-  override def handle(target: String,
-                      baseRequest: Request,
-                      request: HttpServletRequest,
-                      response: HttpServletResponse): Unit = {
+  override def handle(
+      target: String,
+      baseRequest: Request,
+      request: HttpServletRequest,
+      response: HttpServletResponse): Unit = {
 
     if (request.getMethod == "GET" && request.getPathInfo == "/ping") {
       response.setStatus(200)

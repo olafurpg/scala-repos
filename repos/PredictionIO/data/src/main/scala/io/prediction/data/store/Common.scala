@@ -25,26 +25,29 @@ private[prediction] object Common {
 
   /* throw exception if invalid app name or channel name */
   def appNameToId(
-      appName: String, channelName: Option[String]): (Int, Option[Int]) = {
+      appName: String,
+      channelName: Option[String]): (Int, Option[Int]) = {
     val appOpt = appsDb.getByName(appName)
 
-    appOpt.map { app =>
-      val channelMap: Map[String, Int] =
-        channelsDb.getByAppid(app.id).map(c => (c.name, c.id)).toMap
+    appOpt
+      .map { app =>
+        val channelMap: Map[String, Int] =
+          channelsDb.getByAppid(app.id).map(c => (c.name, c.id)).toMap
 
-      val channelId: Option[Int] = channelName.map { ch =>
-        if (channelMap.contains(ch)) {
-          channelMap(ch)
-        } else {
-          logger.error(s"Invalid channel name ${ch}.")
-          throw new IllegalArgumentException(s"Invalid channel name ${ch}.")
+        val channelId: Option[Int] = channelName.map { ch =>
+          if (channelMap.contains(ch)) {
+            channelMap(ch)
+          } else {
+            logger.error(s"Invalid channel name ${ch}.")
+            throw new IllegalArgumentException(s"Invalid channel name ${ch}.")
+          }
         }
-      }
 
-      (app.id, channelId)
-    }.getOrElse {
-      logger.error(s"Invalid app name ${appName}")
-      throw new IllegalArgumentException(s"Invalid app name ${appName}")
-    }
+        (app.id, channelId)
+      }
+      .getOrElse {
+        logger.error(s"Invalid app name ${appName}")
+        throw new IllegalArgumentException(s"Invalid app name ${appName}")
+      }
   }
 }

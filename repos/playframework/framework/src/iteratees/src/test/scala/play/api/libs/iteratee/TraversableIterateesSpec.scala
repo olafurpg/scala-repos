@@ -6,7 +6,8 @@ package play.api.libs.iteratee
 import org.specs2.mutable._
 
 object TraversableIterateesSpec
-    extends Specification with IterateeSpecification
+    extends Specification
+    with IterateeSpecification
     with ExecutionSpecification {
 
   "Traversable.splitOnceAt" should {
@@ -15,7 +16,8 @@ object TraversableIterateesSpec
       mustExecute(1) { splitEC =>
         val e = Traversable.splitOnceAt[String, Char] { c =>
           c != 'e'
-        }(implicitly[String => scala.collection.TraversableLike[Char, String]],
+        }(
+          implicitly[String => scala.collection.TraversableLike[Char, String]],
           splitEC)
         mustTransformTo("hello", "there")("h")(e)
       }

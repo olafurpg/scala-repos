@@ -58,8 +58,12 @@ import scala.annotation.migration
   *  undeprecated methods throughout the collections hierarchy.
   */
 trait BufferLike[A, +This <: BufferLike[A, This] with Buffer[A]]
-    extends Growable[A] with Shrinkable[A] with Scriptable[A]
-    with Subtractable[A, This] with SeqLike[A, This] with scala.Cloneable {
+    extends Growable[A]
+    with Shrinkable[A]
+    with Scriptable[A]
+    with Subtractable[A, This]
+    with SeqLike[A, This]
+    with scala.Cloneable {
   self: This =>
 
   // Abstract methods from Seq:
@@ -112,7 +116,7 @@ trait BufferLike[A, +This <: BufferLike[A, This] with Buffer[A]]
   def remove(n: Int, count: Int) {
     if (count < 0)
       throw new IllegalArgumentException(
-          "removing negative number of elements: " + count.toString)
+        "removing negative number of elements: " + count.toString)
     for (i <- 0 until count) remove(n)
   }
 
@@ -187,25 +191,25 @@ trait BufferLike[A, +This <: BufferLike[A, This] with Buffer[A]]
     */
   @deprecated("Scripting is deprecated.", "2.11.0")
   def <<(cmd: Message[A]): Unit = cmd match {
-    case Include(Start, x) => prepend(x)
-    case Include(End, x) => append(x)
+    case Include(Start, x)    => prepend(x)
+    case Include(End, x)      => append(x)
     case Include(Index(n), x) => insert(n, x)
-    case Include(NoLo, x) => this += x
+    case Include(NoLo, x)     => this += x
 
-    case Update(Start, x) => update(0, x)
-    case Update(End, x) => update(length - 1, x)
+    case Update(Start, x)    => update(0, x)
+    case Update(End, x)      => update(length - 1, x)
     case Update(Index(n), x) => update(n, x)
 
-    case Remove(Start, x) => if (this(0) == x) remove(0)
-    case Remove(End, x) => if (this(length - 1) == x) remove(length - 1)
+    case Remove(Start, x)    => if (this(0) == x) remove(0)
+    case Remove(End, x)      => if (this(length - 1) == x) remove(length - 1)
     case Remove(Index(n), x) => if (this(n) == x) remove(n)
-    case Remove(NoLo, x) => this -= x
+    case Remove(NoLo, x)     => this -= x
 
-    case Reset() => clear()
+    case Reset()      => clear()
     case s: Script[_] => s.iterator foreach <<
     case _ =>
       throw new UnsupportedOperationException(
-          "message " + cmd + " not understood")
+        "message " + cmd + " not understood")
   }
 
   /** Defines the prefix of this object's `toString` representation.
@@ -221,8 +225,8 @@ trait BufferLike[A, +This <: BufferLike[A, This] with Buffer[A]]
     *  @return       a new collection consisting of all the elements of this collection and `xs`.
     */
   @migration(
-      "`++` creates a new buffer. Use `++=` to add an element from this buffer and return that buffer itself.",
-      "2.8.0")
+    "`++` creates a new buffer. Use `++=` to add an element from this buffer and return that buffer itself.",
+    "2.8.0")
   def ++(xs: GenTraversableOnce[A]): This = clone() ++= xs.seq
 
   /** Creates a new collection with all the elements of this collection except `elem`.
@@ -231,8 +235,8 @@ trait BufferLike[A, +This <: BufferLike[A, This] with Buffer[A]]
     *  @return      a new collection consisting of all the elements of this collection except `elem`.
     */
   @migration(
-      "`-` creates a new buffer. Use `-=` to remove an element from this buffer and return that buffer itself.",
-      "2.8.0")
+    "`-` creates a new buffer. Use `-=` to remove an element from this buffer and return that buffer itself.",
+    "2.8.0")
   override def -(elem: A): This = clone() -= elem
 
   /** Creates a new collection with all the elements of this collection except the two
@@ -245,8 +249,8 @@ trait BufferLike[A, +This <: BufferLike[A, This] with Buffer[A]]
     *               `elem1`, `elem2` and those in `elems`.
     */
   @migration(
-      "`-` creates a new buffer. Use `-=` to remove an element from this buffer and return that buffer itself.",
-      "2.8.0")
+    "`-` creates a new buffer. Use `-=` to remove an element from this buffer and return that buffer itself.",
+    "2.8.0")
   override def -(elem1: A, elem2: A, elems: A*): This =
     clone() -= elem1 -= elem2 --= elems
 
@@ -258,8 +262,8 @@ trait BufferLike[A, +This <: BufferLike[A, This] with Buffer[A]]
     *                  those in `xs`
     */
   @migration(
-      "`--` creates a new buffer. Use `--=` to remove an element from this buffer and return that buffer itself.",
-      "2.8.0")
+    "`--` creates a new buffer. Use `--=` to remove an element from this buffer and return that buffer itself.",
+    "2.8.0")
   override def --(xs: GenTraversableOnce[A]): This = clone() --= xs.seq
 
   /** Return a clone of this buffer.

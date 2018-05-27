@@ -22,7 +22,7 @@ class SCL6417 {
 
   def validateOptionalY(y: Option[Int]): ValidationNel[String, Int] = y match {
     case Some(yy) => Success(yy)
-    case None => Failure("Required!").toValidationNel
+    case None     => Failure("Required!").toValidationNel
   }
 }
 //Int

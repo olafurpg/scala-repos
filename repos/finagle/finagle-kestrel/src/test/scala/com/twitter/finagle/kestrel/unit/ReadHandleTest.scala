@@ -53,8 +53,7 @@ class ReadHandleTest extends FunSuite {
     }
   }
 
-  test(
-      "ReadHandle.buffered should not synchronize on send when buffer is full") {
+  test("ReadHandle.buffered should not synchronize on send when buffer is full") {
     new BufferedReadHandle {
       0 until N foreach { _ =>
         assert((messages ! msg(0)).isDefined == true)
@@ -114,7 +113,7 @@ class ReadHandleTest extends FunSuite {
   }
 
   test(
-      "ReadHandle.buffered should when closed wait for outstanding acks before closing underlying") {
+    "ReadHandle.buffered should when closed wait for outstanding acks before closing underlying") {
     new BufferedReadHandle {
       val closed = (close ?)
       assert(closed.isDefined == false)
@@ -150,7 +149,7 @@ class ReadHandleTest extends FunSuite {
   }
 
   test(
-      "ReadHandle.merged should provide a merged stream of errors provide a merged stream of messages") {
+    "ReadHandle.merged should provide a merged stream of errors provide a merged stream of messages") {
     new MergedReadHandle {
       var count = 0
       merged.error.foreach { _ =>

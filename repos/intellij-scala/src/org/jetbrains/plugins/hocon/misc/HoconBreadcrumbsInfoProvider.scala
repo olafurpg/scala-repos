@@ -10,12 +10,12 @@ class HoconBreadcrumbsInfoProvider extends BreadcrumbsInfoProvider {
 
   def getElementInfo(e: PsiElement) = e match {
     case kf: HKeyedField => kf.key.map(_.stringValue).getOrElse("")
-    case _ => ""
+    case _               => ""
   }
 
   def acceptElement(e: PsiElement) = e match {
     case _: HKeyedField => true
-    case _ => false
+    case _              => false
   }
 
   def getLanguages = Array(HoconLanguage)

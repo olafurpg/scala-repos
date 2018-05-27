@@ -86,10 +86,11 @@ object Cmwc5 extends GeneratorCompanion[Cmwc5, Array[Long]] {
 
   def fromTime(time: Long = System.nanoTime()): Cmwc5 = {
     val lcg = Lcg64.fromTime(time)
-    new Cmwc5(lcg.nextLong(),
-              lcg.nextLong(),
-              lcg.nextLong(),
-              lcg.nextLong(),
-              lcg.nextLong())
+    new Cmwc5(
+      lcg.nextLong(),
+      lcg.nextLong(),
+      lcg.nextLong(),
+      lcg.nextLong(),
+      lcg.nextLong())
   }
 }

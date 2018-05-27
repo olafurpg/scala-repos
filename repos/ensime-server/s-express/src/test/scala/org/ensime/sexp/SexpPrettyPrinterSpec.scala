@@ -24,8 +24,8 @@ class SexpPrettyPrinterSpec extends EnsimeSpec {
 
   it should "output lists of atoms" in {
     assertPrinter(
-        SexpList(foo, SexpNumber(13), foosym),
-        """("foo"
+      SexpList(foo, SexpNumber(13), foosym),
+      """("foo"
           |  13
           |  foo)""".stripMargin
     )
@@ -33,27 +33,28 @@ class SexpPrettyPrinterSpec extends EnsimeSpec {
 
   it should "output lists of lists" in {
     assertPrinter(
-        SexpList(SexpList(foo), SexpList(foo)),
-        """(("foo")
+      SexpList(SexpList(foo), SexpList(foo)),
+      """(("foo")
           |  ("foo"))""".stripMargin
     )
   }
 
   it should "output data" in {
     assertPrinter(
-        SexpData(fookey -> foosym, barkey -> foosym),
-        """(
+      SexpData(fookey -> foosym, barkey -> foosym),
+      """(
   :foo foo
   :bar foo
 )"""
     )
 
     val datum = SexpData(fookey -> foo, barkey -> foo)
-    assertPrinter(SexpData(
-                      fookey -> datum,
-                      barkey -> datum
-                  ),
-                  """(
+    assertPrinter(
+      SexpData(
+        fookey -> datum,
+        barkey -> datum
+      ),
+      """(
   :foo (
     :foo "foo"
     :bar "foo"

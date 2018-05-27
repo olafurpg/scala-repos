@@ -67,7 +67,7 @@ class CssHelpersSpec extends Specification {
       |}""".stripMargin('|')
 
       CssUrlPrefixer("prefix").fixCss(baseCss) must_== Full(
-          """
+        """
           |#booyan {
           |  background: url(prefix/boom);
           |  background-image: url('prefix/boom?bam,"sloop#shap%20bap');

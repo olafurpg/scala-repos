@@ -13,7 +13,8 @@ import org.apache.commons.collections.map.LRUMap
   * of the generic maps returned by JavaConverters
   */
 trait JMapWrapperLike[A, B, +Repr <: MapLike[A, B, Repr] with Map[A, B]]
-    extends Map[A, B] with MapLike[A, B, Repr] {
+    extends Map[A, B]
+    with MapLike[A, B, Repr] {
   def underlying: ju.Map[A, B]
 
   override def size = underlying.size

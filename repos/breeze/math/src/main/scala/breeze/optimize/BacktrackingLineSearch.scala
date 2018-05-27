@@ -8,25 +8,28 @@ package breeze.optimize
   *
   * @author dlwh
   */
-class BacktrackingLineSearch(initfval: Double,
-                             maxIterations: Int = 20,
-                             shrinkStep: Double = 0.5,
-                             growStep: Double = 2.1,
-                             cArmijo: Double = 1E-4,
-                             cWolfe: Double = 0.9,
-                             minAlpha: Double = 1E-10,
-                             maxAlpha: Double = 1E10,
-                             enforceWolfeConditions: Boolean = true,
-                             enforceStrongWolfeConditions: Boolean = true)
+class BacktrackingLineSearch(
+    initfval: Double,
+    maxIterations: Int = 20,
+    shrinkStep: Double = 0.5,
+    growStep: Double = 2.1,
+    cArmijo: Double = 1E-4,
+    cWolfe: Double = 0.9,
+    minAlpha: Double = 1E-10,
+    maxAlpha: Double = 1E10,
+    enforceWolfeConditions: Boolean = true,
+    enforceStrongWolfeConditions: Boolean = true)
     extends ApproximateLineSearch {
-  require(shrinkStep * growStep != 1.0,
-          "Can't do a line search with growStep * shrinkStep == 1.0")
+  require(
+    shrinkStep * growStep != 1.0,
+    "Can't do a line search with growStep * shrinkStep == 1.0")
   require(cArmijo < 0.5)
   require(cArmijo > 0.0)
   require(cWolfe > cArmijo)
   require(cWolfe < 1.0)
   def iterations(
-      f: DiffFunction[Double], init: Double = 1.0): Iterator[State] = {
+      f: DiffFunction[Double],
+      init: Double = 1.0): Iterator[State] = {
     val (f0, df0) = f.calculate(0.0)
     val initfderiv = f.calculate(init)._2
     //val (initfval, initfderiv) = f.calculate(init)

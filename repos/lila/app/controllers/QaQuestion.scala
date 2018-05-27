@@ -56,11 +56,11 @@ object QaQuestion extends QaController {
     if (QaAuth.canAsk) {
       implicit val req = ctx.body
       forms.question.bindFromRequest.fold(
-          err => renderAsk(err, Results.BadRequest),
-          data =>
-            api.question.create(data, me) map { q =>
-              Redirect(routes.QaQuestion.show(q.id, q.slug))
-          }
+        err => renderAsk(err, Results.BadRequest),
+        data =>
+          api.question.create(data, me) map { q =>
+            Redirect(routes.QaQuestion.show(q.id, q.slug))
+        }
       )
     } else renderN00b
   }
@@ -75,12 +75,12 @@ object QaQuestion extends QaController {
     WithOwnQuestion(id) { q =>
       implicit val req = ctx.body
       forms.question.bindFromRequest.fold(
-          err => renderEdit(err, q, Results.BadRequest),
-          data =>
-            api.question.edit(data, q.id) map {
-              case None => NotFound
-              case Some(q2) => Redirect(routes.QaQuestion.show(q2.id, q2.slug))
-          }
+        err => renderEdit(err, q, Results.BadRequest),
+        data =>
+          api.question.edit(data, q.id) map {
+            case None     => NotFound
+            case Some(q2) => Redirect(routes.QaQuestion.show(q2.id, q2.slug))
+        }
       )
     }
   }
@@ -95,13 +95,13 @@ object QaQuestion extends QaController {
   def vote(id: QuestionId) = AuthBody { implicit ctx => me =>
     implicit val req = ctx.body
     forms.vote.bindFromRequest.fold(
-        err => fuccess(BadRequest),
-        v =>
-          api.question.vote(id, me, v == 1) map {
-            case Some(vote) =>
-              Ok(html.qa.vote(routes.QaQuestion.vote(id).url, vote))
-            case None => NotFound
-        }
+      err => fuccess(BadRequest),
+      v =>
+        api.question.vote(id, me, v == 1) map {
+          case Some(vote) =>
+            Ok(html.qa.vote(routes.QaQuestion.vote(id).url, vote))
+          case None => NotFound
+      }
     )
   }
 
@@ -110,7 +110,7 @@ object QaQuestion extends QaController {
       WithQuestion(questionId) { q =>
         (api.question remove q.id) >> Env.mod.logApi
           .deleteQaQuestion(me.id, q.userId, q.title) inject Redirect(
-            routes.QaQuestion.index())
+          routes.QaQuestion.index())
       }
   }
 }

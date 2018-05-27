@@ -59,7 +59,7 @@ class SendSelectionToConsoleAction extends AnAction {
 
       file match {
         case _: ScalaFile => enable()
-        case _ => disable()
+        case _            => disable()
       }
     } catch {
       case e: Exception => disable()
@@ -88,8 +88,8 @@ class SendSelectionToConsoleAction extends AnAction {
 
       extensions.inWriteAction {
         val range: TextRange = new TextRange(0, document.getTextLength)
-        consoleEditor.getSelectionModel.setSelection(
-            range.getStartOffset, range.getEndOffset)
+        consoleEditor.getSelectionModel
+          .setSelection(range.getStartOffset, range.getEndOffset)
         console.addToHistory(range, console.getConsoleEditor, true)
         controller.addToHistory(text)
 
@@ -99,19 +99,18 @@ class SendSelectionToConsoleAction extends AnAction {
 
       text
         .split('\n')
-        .foreach(line =>
-              {
-            if (line != "") {
-              val outputStream: OutputStream = processHandler.getProcessInput
-              try {
-                val bytes: Array[Byte] = (line + "\n").getBytes
-                outputStream.write(bytes)
-                outputStream.flush()
-              } catch {
-                case e: IOException => //ignore
-              }
+        .foreach(line => {
+          if (line != "") {
+            val outputStream: OutputStream = processHandler.getProcessInput
+            try {
+              val bytes: Array[Byte] = (line + "\n").getBytes
+              outputStream.write(bytes)
+              outputStream.flush()
+            } catch {
+              case e: IOException => //ignore
             }
-            console.textSent(line + "\n")
+          }
+          console.textSent(line + "\n")
         })
     }
   }

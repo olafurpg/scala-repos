@@ -112,7 +112,9 @@ class GenerationalQueueTest extends FunSuite {
 
   val generationalQueue = () => new ExactGenerationalQueue[String]()
   genericGenerationalQueueTest(
-      "ExactGenerationalQueue", generationalQueue, 100.milliseconds)
+    "ExactGenerationalQueue",
+    generationalQueue,
+    100.milliseconds)
 
   val timeout = 100.milliseconds
   val bucketQueue = () => new BucketGenerationalQueue[String](timeout)

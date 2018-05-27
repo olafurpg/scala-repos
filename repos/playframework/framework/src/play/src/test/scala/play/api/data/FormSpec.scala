@@ -44,58 +44,57 @@ object FormSpec extends Specification {
 
     "support mapping 22 fields" in {
       val form = Form(
-          tuple(
-              "k1" -> of[String],
-              "k2" -> of[String],
-              "k3" -> of[String],
-              "k4" -> of[String],
-              "k5" -> of[String],
-              "k6" -> of[String],
-              "k7" -> of[String],
-              "k8" -> of[String],
-              "k9" -> of[String],
-              "k10" -> of[String],
-              "k11" -> of[String],
-              "k12" -> of[String],
-              "k13" -> of[String],
-              "k14" -> of[String],
-              "k15" -> of[String],
-              "k16" -> of[String],
-              "k17" -> of[String],
-              "k18" -> of[String],
-              "k19" -> of[String],
-              "k20" -> of[String],
-              "k21" -> of[String],
-              "k22" -> of[String]
-          )
+        tuple(
+          "k1" -> of[String],
+          "k2" -> of[String],
+          "k3" -> of[String],
+          "k4" -> of[String],
+          "k5" -> of[String],
+          "k6" -> of[String],
+          "k7" -> of[String],
+          "k8" -> of[String],
+          "k9" -> of[String],
+          "k10" -> of[String],
+          "k11" -> of[String],
+          "k12" -> of[String],
+          "k13" -> of[String],
+          "k14" -> of[String],
+          "k15" -> of[String],
+          "k16" -> of[String],
+          "k17" -> of[String],
+          "k18" -> of[String],
+          "k19" -> of[String],
+          "k20" -> of[String],
+          "k21" -> of[String],
+          "k22" -> of[String]
+        )
       )
 
       form
-        .bind(
-            Map(
-                "k1" -> "v1",
-                "k2" -> "v2",
-                "k3" -> "v3",
-                "k4" -> "v4",
-                "k5" -> "v5",
-                "k6" -> "v6",
-                "k7" -> "v7",
-                "k8" -> "v8",
-                "k9" -> "v9",
-                "k10" -> "v10",
-                "k11" -> "v11",
-                "k12" -> "v12",
-                "k13" -> "v13",
-                "k14" -> "v14",
-                "k15" -> "v15",
-                "k16" -> "v16",
-                "k17" -> "v17",
-                "k18" -> "v18",
-                "k19" -> "v19",
-                "k20" -> "v20",
-                "k21" -> "v21",
-                "k22" -> "v22"
-            ))
+        .bind(Map(
+          "k1" -> "v1",
+          "k2" -> "v2",
+          "k3" -> "v3",
+          "k4" -> "v4",
+          "k5" -> "v5",
+          "k6" -> "v6",
+          "k7" -> "v7",
+          "k8" -> "v8",
+          "k9" -> "v9",
+          "k10" -> "v10",
+          "k11" -> "v11",
+          "k12" -> "v12",
+          "k13" -> "v13",
+          "k14" -> "v14",
+          "k15" -> "v15",
+          "k16" -> "v16",
+          "k17" -> "v17",
+          "k18" -> "v18",
+          "k19" -> "v19",
+          "k20" -> "v20",
+          "k21" -> "v21",
+          "k22" -> "v22"
+        ))
         .fold(_ => "errors", t => t._21) must_== "v21"
     }
 
@@ -191,13 +190,13 @@ object FormSpec extends Specification {
 
     "not even attempt to validate on fill" in {
       val failingValidatorForm = Form(
-          "foo" -> Forms.text.verifying(
-              "isEmpty",
-              s =>
-                if (s.isEmpty) true
-                else
-                  throw new AssertionError(
-                      "Validation was run when it wasn't meant to"))
+        "foo" -> Forms.text.verifying(
+          "isEmpty",
+          s =>
+            if (s.isEmpty) true
+            else
+              throw new AssertionError(
+                "Validation was run when it wasn't meant to"))
       )
       failingValidatorForm.fill("foo").errors must beEmpty
     }
@@ -206,17 +205,18 @@ object FormSpec extends Specification {
   "render form using field[Type] syntax" in {
     val anyData = Map("email" -> "bob@gmail.com", "password" -> "123")
     ScalaForms.loginForm.bind(anyData).get.toString must equalTo(
-        "(bob@gmail.com,123)")
+      "(bob@gmail.com,123)")
   }
 
   "support default values" in {
     ScalaForms.defaultValuesForm.bindFromRequest(Map()).get must equalTo(
-        (42, "default text"))
+      (42, "default text"))
     ScalaForms.defaultValuesForm
       .bindFromRequest(Map("name" -> Seq("another text")))
       .get must equalTo((42, "another text"))
-    ScalaForms.defaultValuesForm.bindFromRequest(Map("pos" -> Seq("123"))).get must equalTo(
-        (123, "default text"))
+    ScalaForms.defaultValuesForm
+      .bindFromRequest(Map("pos" -> Seq("123")))
+      .get must equalTo((123, "default text"))
     ScalaForms.defaultValuesForm
       .bindFromRequest(Map("pos" -> Seq("123"), "name" -> Seq("another text")))
       .get must equalTo((123, "another text"))
@@ -227,30 +227,36 @@ object FormSpec extends Specification {
   }
 
   "support repeated values" in {
-    ScalaForms.repeatedForm.bindFromRequest(Map("name" -> Seq("Kiki"))).get must equalTo(
-        ("Kiki", Seq()))
+    ScalaForms.repeatedForm
+      .bindFromRequest(Map("name" -> Seq("Kiki")))
+      .get must equalTo(("Kiki", Seq()))
     ScalaForms.repeatedForm
       .bindFromRequest(
-          Map("name" -> Seq("Kiki"), "emails[0]" -> Seq("kiki@gmail.com")))
+        Map("name" -> Seq("Kiki"), "emails[0]" -> Seq("kiki@gmail.com")))
       .get must equalTo(("Kiki", Seq("kiki@gmail.com")))
     ScalaForms.repeatedForm
-      .bindFromRequest(Map("name" -> Seq("Kiki"),
-                           "emails[0]" -> Seq("kiki@gmail.com"),
-                           "emails[1]" -> Seq("kiki@zen.com")))
+      .bindFromRequest(
+        Map(
+          "name" -> Seq("Kiki"),
+          "emails[0]" -> Seq("kiki@gmail.com"),
+          "emails[1]" -> Seq("kiki@zen.com")))
       .get must equalTo(("Kiki", Seq("kiki@gmail.com", "kiki@zen.com")))
     ScalaForms.repeatedForm
-      .bindFromRequest(Map("name" -> Seq("Kiki"),
-                           "emails[0]" -> Seq(),
-                           "emails[1]" -> Seq("kiki@zen.com")))
+      .bindFromRequest(
+        Map(
+          "name" -> Seq("Kiki"),
+          "emails[0]" -> Seq(),
+          "emails[1]" -> Seq("kiki@zen.com")))
       .hasErrors must equalTo(true)
     ScalaForms.repeatedForm
       .bindFromRequest(
-          Map("name" -> Seq("Kiki"), "emails[]" -> Seq("kiki@gmail.com")))
+        Map("name" -> Seq("Kiki"), "emails[]" -> Seq("kiki@gmail.com")))
       .get must equalTo(("Kiki", Seq("kiki@gmail.com")))
     ScalaForms.repeatedForm
       .bindFromRequest(
-          Map("name" -> Seq("Kiki"),
-              "emails[]" -> Seq("kiki@gmail.com", "kiki@zen.com")))
+        Map(
+          "name" -> Seq("Kiki"),
+          "emails[]" -> Seq("kiki@gmail.com", "kiki@zen.com")))
       .get must equalTo(("Kiki", Seq("kiki@gmail.com", "kiki@zen.com")))
   }
 
@@ -260,31 +266,37 @@ object FormSpec extends Specification {
       .get must equalTo(("Kiki", Set()))
     ScalaForms.repeatedFormWithSet
       .bindFromRequest(
-          Map("name" -> Seq("Kiki"), "emails[0]" -> Seq("kiki@gmail.com")))
+        Map("name" -> Seq("Kiki"), "emails[0]" -> Seq("kiki@gmail.com")))
       .get must equalTo(("Kiki", Set("kiki@gmail.com")))
     ScalaForms.repeatedFormWithSet
-      .bindFromRequest(Map("name" -> Seq("Kiki"),
-                           "emails[0]" -> Seq("kiki@gmail.com"),
-                           "emails[1]" -> Seq("kiki@zen.com")))
+      .bindFromRequest(
+        Map(
+          "name" -> Seq("Kiki"),
+          "emails[0]" -> Seq("kiki@gmail.com"),
+          "emails[1]" -> Seq("kiki@zen.com")))
       .get must equalTo(("Kiki", Set("kiki@gmail.com", "kiki@zen.com")))
     ScalaForms.repeatedFormWithSet
-      .bindFromRequest(Map("name" -> Seq("Kiki"),
-                           "emails[0]" -> Seq(),
-                           "emails[1]" -> Seq("kiki@zen.com")))
+      .bindFromRequest(
+        Map(
+          "name" -> Seq("Kiki"),
+          "emails[0]" -> Seq(),
+          "emails[1]" -> Seq("kiki@zen.com")))
       .hasErrors must equalTo(true)
     ScalaForms.repeatedFormWithSet
       .bindFromRequest(
-          Map("name" -> Seq("Kiki"), "emails[]" -> Seq("kiki@gmail.com")))
+        Map("name" -> Seq("Kiki"), "emails[]" -> Seq("kiki@gmail.com")))
       .get must equalTo(("Kiki", Set("kiki@gmail.com")))
     ScalaForms.repeatedFormWithSet
       .bindFromRequest(
-          Map("name" -> Seq("Kiki"),
-              "emails[]" -> Seq("kiki@gmail.com", "kiki@zen.com")))
+        Map(
+          "name" -> Seq("Kiki"),
+          "emails[]" -> Seq("kiki@gmail.com", "kiki@zen.com")))
       .get must equalTo(("Kiki", Set("kiki@gmail.com", "kiki@zen.com")))
     ScalaForms.repeatedFormWithSet
       .bindFromRequest(
-          Map("name" -> Seq("Kiki"),
-              "emails[]" -> Seq("kiki@gmail.com", "kiki@gmail.com")))
+        Map(
+          "name" -> Seq("Kiki"),
+          "emails[]" -> Seq("kiki@gmail.com", "kiki@gmail.com")))
       .get must equalTo(("Kiki", Set("kiki@gmail.com")))
   }
 
@@ -293,7 +305,7 @@ object FormSpec extends Specification {
       .bind(Map("name" -> "foo", "repeat" -> "1"))
       .get
       .toString must equalTo(
-        "(foo,1,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None)")
+      "(foo,1,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None)")
   }
 
   "render form using jodaDate" in {
@@ -328,17 +340,17 @@ object FormSpec extends Specification {
     case class Item(text: String)
     case class Items(seq: Seq[Item])
     val itemForm = Form[Items](
-        mapping(
-            "seq" -> seq(
-                mapping("text" -> nonEmptyText)(Item)(Item.unapply)
-            )
-        )(Items)(Items.unapply)
+      mapping(
+        "seq" -> seq(
+          mapping("text" -> nonEmptyText)(Item)(Item.unapply)
+        )
+      )(Items)(Items.unapply)
     )
 
     val filled = itemForm.fillAndValidate(Items(Seq(Item(""))))
     val result = filled.fold(
-        errors => false,
-        success => true
+      errors => false,
+      success => true
     )
 
     result should beFalse
@@ -346,7 +358,9 @@ object FormSpec extends Specification {
 
   "support boolean binding from json" in {
     ScalaForms.booleanForm.bind(Json.obj("accepted" -> "true")).get must beTrue
-    ScalaForms.booleanForm.bind(Json.obj("accepted" -> "false")).get must beFalse
+    ScalaForms.booleanForm
+      .bind(Json.obj("accepted" -> "false"))
+      .get must beFalse
   }
 
   "reject boolean binding from an invalid json" in {
@@ -356,18 +370,20 @@ object FormSpec extends Specification {
 
   "correctly lookup error messages when using errorsAsJson" in {
     val messagesApi =
-      new DefaultMessagesApi(Environment.simple(),
-                             Configuration.reference,
-                             new DefaultLangs(Configuration.reference))
+      new DefaultMessagesApi(
+        Environment.simple(),
+        Configuration.reference,
+        new DefaultLangs(Configuration.reference))
     implicit val messages = messagesApi.preferred(Seq.empty)
 
     val form =
-      Form(single("foo" -> Forms.text),
-           Map.empty,
-           Seq(FormError("foo", "error.custom", Seq("error.customarg"))),
-           None)
+      Form(
+        single("foo" -> Forms.text),
+        Map.empty,
+        Seq(FormError("foo", "error.custom", Seq("error.customarg"))),
+        None)
     (form.errorsAsJson \ "foo")(0).asOpt[String] must beSome(
-        "This is a custom error")
+      "This is a custom error")
   }
 }
 
@@ -378,76 +394,77 @@ object ScalaForms {
   case class User(name: String, age: Int)
 
   val userForm = Form(
-      mapping(
-          "name" -> of[String].verifying(nonEmpty),
-          "age" -> of[Int].verifying(min(0), max(100))
-      )(User.apply)(User.unapply)
+    mapping(
+      "name" -> of[String].verifying(nonEmpty),
+      "age" -> of[Int].verifying(min(0), max(100))
+    )(User.apply)(User.unapply)
   )
 
   val loginForm = Form(
-      tuple(
-          "email" -> of[String],
-          "password" -> of[Int]
-      )
+    tuple(
+      "email" -> of[String],
+      "password" -> of[Int]
+    )
   )
 
   val defaultValuesForm = Form(
-      tuple(
-          "pos" -> default(number, 42),
-          "name" -> default(text, "default text")
-      )
+    tuple(
+      "pos" -> default(number, 42),
+      "name" -> default(text, "default text")
+    )
   )
 
   val helloForm = Form(
-      tuple(
-          "name" -> nonEmptyText,
-          "repeat" -> number(min = 1, max = 100),
-          "color" -> optional(text),
-          "still works" -> optional(text),
-          "1" -> optional(text),
-          "2" -> optional(text),
-          "3" -> optional(text),
-          "4" -> optional(text),
-          "5" -> optional(text),
-          "6" -> optional(text),
-          "7" -> optional(text),
-          "8" -> optional(text),
-          "9" -> optional(text),
-          "10" -> optional(text),
-          "11" -> optional(text),
-          "12" -> optional(text),
-          "13" -> optional(text),
-          "14" -> optional(text)
-      )
+    tuple(
+      "name" -> nonEmptyText,
+      "repeat" -> number(min = 1, max = 100),
+      "color" -> optional(text),
+      "still works" -> optional(text),
+      "1" -> optional(text),
+      "2" -> optional(text),
+      "3" -> optional(text),
+      "4" -> optional(text),
+      "5" -> optional(text),
+      "6" -> optional(text),
+      "7" -> optional(text),
+      "8" -> optional(text),
+      "9" -> optional(text),
+      "10" -> optional(text),
+      "11" -> optional(text),
+      "12" -> optional(text),
+      "13" -> optional(text),
+      "14" -> optional(text)
+    )
   )
 
   val repeatedForm = Form(
-      tuple(
-          "name" -> nonEmptyText,
-          "emails" -> list(nonEmptyText)
-      )
+    tuple(
+      "name" -> nonEmptyText,
+      "emails" -> list(nonEmptyText)
+    )
   )
 
   val repeatedFormWithSet = Form(
-      tuple(
-          "name" -> nonEmptyText,
-          "emails" -> set(nonEmptyText)
-      )
+    tuple(
+      "name" -> nonEmptyText,
+      "emails" -> set(nonEmptyText)
+    )
   )
 
   val form = Form(
-      "foo" -> Forms.text
-        .verifying("first.digit",
-                   s => (s.headOption map { _ == '3' }) getOrElse false)
-        .transform[Int](Integer.parseInt _, _.toString)
-        .verifying("number.42", _ < 42)
-    )
+    "foo" -> Forms.text
+      .verifying(
+        "first.digit",
+        s => (s.headOption map { _ == '3' }) getOrElse false)
+      .transform[Int](Integer.parseInt _, _.toString)
+      .verifying("number.42", _ < 42)
+  )
 
   val emailForm = Form(
-      tuple(
-          "email" -> email,
-          "name" -> of[String]
-      )
+    tuple(
+      "email" -> email,
+      "name" -> of[String]
+    )
   )
 
   val longNumberForm = Form("longNumber" -> longNumber(10, 42))

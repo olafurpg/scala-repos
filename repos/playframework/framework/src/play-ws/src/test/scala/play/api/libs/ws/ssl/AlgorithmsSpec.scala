@@ -27,12 +27,12 @@ object AlgorithmsSpec extends Specification {
       keyGen.initialize(1024, new SecureRandom())
       val pair = keyGen.generateKeyPair()
       val cert = CertificateGenerator.generateCertificate(
-          dn,
-          pair,
-          from.toDate,
-          to.toDate,
-          "SHA1WithRSA",
-          AlgorithmId.sha1WithRSAEncryption_oid)
+        dn,
+        pair,
+        from.toDate,
+        to.toDate,
+        "SHA1WithRSA",
+        AlgorithmId.sha1WithRSAEncryption_oid)
 
       // RSA is getModulus.bitLength
       keySize(cert.getPublicKey) must_== Some(1024)
@@ -48,12 +48,13 @@ object AlgorithmsSpec extends Specification {
       keyGen.initialize(1024, new SecureRandom())
       val pair = keyGen.generateKeyPair()
       val cert =
-        CertificateGenerator.generateCertificate(dn,
-                                                 pair,
-                                                 from.toDate,
-                                                 to.toDate,
-                                                 "SHA1WithDSA",
-                                                 AlgorithmId.sha1WithDSA_oid)
+        CertificateGenerator.generateCertificate(
+          dn,
+          pair,
+          from.toDate,
+          to.toDate,
+          "SHA1WithDSA",
+          AlgorithmId.sha1WithDSA_oid)
 
       // DSA is getP.bitLength
       keySize(cert.getPublicKey) must_== Some(1024)
@@ -72,17 +73,17 @@ object AlgorithmsSpec extends Specification {
 
     "decompose SHA1" in {
       decomposes("SHA1WithRSA") must containTheSameElementsAs(
-          Seq("SHA1", "SHA-1", "RSA"))
+        Seq("SHA1", "SHA-1", "RSA"))
     }
 
     "map SHA-1 to SHA1" in {
       decomposes("SHA-1WithRSA") must containTheSameElementsAs(
-          Seq("SHA1", "SHA-1", "RSA"))
+        Seq("SHA1", "SHA-1", "RSA"))
     }
 
     "decompose SHA256" in {
       decomposes("SHA256WithRSA") must containTheSameElementsAs(
-          Seq("SHA256", "RSA"))
+        Seq("SHA256", "RSA"))
     }
   }
 }

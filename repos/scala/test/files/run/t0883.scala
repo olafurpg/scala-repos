@@ -5,10 +5,10 @@ case class Baz() extends Foo("Baz")
 object Test extends App {
   Foo("Bar") match {
     case Bar => println("What?")
-    case _ => println("OK")
+    case _   => println("OK")
   }
   Foo("Baz") match {
     case Baz() => println("What?")
-    case _ => println("OK")
+    case _     => println("OK")
   }
 }

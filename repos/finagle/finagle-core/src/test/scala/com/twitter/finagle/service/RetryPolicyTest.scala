@@ -2,7 +2,12 @@ package com.twitter.finagle.service
 
 import RetryPolicy._
 import com.twitter.conversions.time._
-import com.twitter.finagle.{ChannelClosedException, Failure, TimeoutException, WriteException}
+import com.twitter.finagle.{
+  ChannelClosedException,
+  Failure,
+  TimeoutException,
+  WriteException
+}
 import com.twitter.util._
 import org.junit.runner.RunWith
 import org.scalatest.FunSpec
@@ -18,7 +23,7 @@ class RetryPolicyTest extends FunSpec {
       case Stream.Empty => Stream.empty
       case e #:: tail =>
         policy(Throw(e)) match {
-          case None => Stream.empty
+          case None                => Stream.empty
           case Some((backoff, p2)) => backoff #:: getBackoffs(p2, tail)
         }
     }
@@ -40,9 +45,11 @@ class RetryPolicyTest extends FunSpec {
       assert(weo(Throw(Failure(new Exception, Failure.Interrupted))) == false)
       // it's important that this failure isn't retried, despite being "restartable".
       // interrupted futures should never be retried.
-      assert(weo(Throw(Failure(
-                      new Exception,
-                      Failure.Interrupted | Failure.Restartable))) == false)
+      assert(
+        weo(
+          Throw(Failure(
+            new Exception,
+            Failure.Interrupted | Failure.Restartable))) == false)
       assert(weo(Throw(Failure(new Exception, Failure.Restartable))) == true)
       assert(weo(Throw(timeoutExc)) == false)
     }
@@ -52,8 +59,7 @@ class RetryPolicyTest extends FunSpec {
 
       assert(taweo(Throw(new Exception)) == false)
       assert(taweo(Throw(WriteException(new Exception))) == true)
-      assert(
-          taweo(Throw(Failure(new Exception, Failure.Interrupted))) == false)
+      assert(taweo(Throw(Failure(new Exception, Failure.Interrupted))) == false)
       assert(taweo(Throw(Failure(timeoutExc, Failure.Interrupted))) == true)
       assert(taweo(Throw(timeoutExc)) == true)
       assert(taweo(Throw(new com.twitter.util.TimeoutException(""))) == true)
@@ -62,13 +68,14 @@ class RetryPolicyTest extends FunSpec {
     it("RetryableWriteException matches retryable exception") {
       val retryable =
         Seq(Failure.rejected("test"), WriteException(new Exception))
-      val nonRetryable = Seq(Failure("test", Failure.Interrupted),
-                             new Exception,
-                             new ChannelClosedException)
+      val nonRetryable = Seq(
+        Failure("test", Failure.Interrupted),
+        new Exception,
+        new ChannelClosedException)
 
       retryable.foreach {
         case RetryPolicy.RetryableWriteException(_) =>
-        case _ => fail("should match RetryableWriteException")
+        case _                                      => fail("should match RetryableWriteException")
       }
 
       nonRetryable.foreach {
@@ -87,7 +94,7 @@ class RetryPolicyTest extends FunSpec {
 
   val iGreaterThan1: Try[Nothing] => Boolean = {
     case Throw(IException(i)) if i > 1 => true
-    case _ => false
+    case _                             => false
   }
 
   describe("RetryPolicy.filter/filterEach") {
@@ -117,8 +124,8 @@ class RetryPolicyTest extends FunSpec {
     }
 
     it("returns underlying result if filterEach accepts") {
-      val actual = getBackoffs(
-          policy, Stream(IException(2), IException(2), IException(0)))
+      val actual =
+        getBackoffs(policy, Stream(IException(2), IException(2), IException(0)))
       assert(actual == backoffs.take(2))
     }
   }
@@ -145,10 +152,10 @@ class RetryPolicyTest extends FunSpec {
     val writeExceptionBackoff = 0.milliseconds
 
     val combinedPolicy = RetryPolicy.combine(
-        RetryPolicy.backoff(Backoff.const(Duration.Zero).take(2))(
-            RetryPolicy.WriteExceptionsOnly),
-        RetryPolicy.backoff(Stream.fill(3)(channelClosedBackoff))(
-            RetryPolicy.ChannelClosedExceptionsOnly)
+      RetryPolicy.backoff(Backoff.const(Duration.Zero).take(2))(
+        RetryPolicy.WriteExceptionsOnly),
+      RetryPolicy.backoff(Stream.fill(3)(channelClosedBackoff))(
+        RetryPolicy.ChannelClosedExceptionsOnly)
     )
 
     it("return None for unmatched exception") {
@@ -158,32 +165,34 @@ class RetryPolicyTest extends FunSpec {
     }
 
     it("mimicks first policy") {
-      val backoffs = getBackoffs(combinedPolicy,
-                                 Stream.fill(4)(WriteException(new Exception)))
+      val backoffs = getBackoffs(
+        combinedPolicy,
+        Stream.fill(4)(WriteException(new Exception)))
       assert(backoffs == Stream.fill(2)(writeExceptionBackoff))
     }
 
     it("mimicks second policy") {
-      val backoffs = getBackoffs(combinedPolicy,
-                                 Stream.fill(4)(new ChannelClosedException()))
+      val backoffs = getBackoffs(
+        combinedPolicy,
+        Stream.fill(4)(new ChannelClosedException()))
       assert(backoffs == Stream.fill(3)(channelClosedBackoff))
     }
 
     it("interleaves backoffs") {
       val exceptions = Stream(
-          new ChannelClosedException(),
-          WriteException(new Exception),
-          WriteException(new Exception),
-          new ChannelClosedException(),
-          WriteException(new Exception)
+        new ChannelClosedException(),
+        WriteException(new Exception),
+        WriteException(new Exception),
+        new ChannelClosedException(),
+        WriteException(new Exception)
       )
 
       val backoffs = getBackoffs(combinedPolicy, exceptions)
       val expectedBackoffs = Stream(
-          channelClosedBackoff,
-          writeExceptionBackoff,
-          writeExceptionBackoff,
-          channelClosedBackoff
+        channelClosedBackoff,
+        writeExceptionBackoff,
+        writeExceptionBackoff,
+        channelClosedBackoff
       )
       assert(backoffs == expectedBackoffs)
     }

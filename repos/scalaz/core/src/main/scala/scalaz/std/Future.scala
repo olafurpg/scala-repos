@@ -8,18 +8,23 @@ import scala.util.{Try, Success => TSuccess}
 
 trait FutureInstances1 {
   implicit def futureInstance(
-      implicit ec: ExecutionContext): Nondeterminism[Future] with Cobind[
-      Future] with MonadError[Future, Throwable] with Catchable[Future] =
+      implicit ec: ExecutionContext): Nondeterminism[Future]
+    with Cobind[Future]
+    with MonadError[Future, Throwable]
+    with Catchable[Future] =
     new FutureInstance
 
   implicit def futureSemigroup[A](
-      implicit m: Semigroup[A], ec: ExecutionContext): Semigroup[Future[A]] =
+      implicit m: Semigroup[A],
+      ec: ExecutionContext): Semigroup[Future[A]] =
     Semigroup.liftSemigroup[Future, A]
 }
 
 private class FutureInstance(implicit ec: ExecutionContext)
-    extends Nondeterminism[Future] with Cobind[Future]
-    with MonadError[Future, Throwable] with Catchable[Future] {
+    extends Nondeterminism[Future]
+    with Cobind[Future]
+    with MonadError[Future, Throwable]
+    with Catchable[Future] {
   def point[A](a: => A): Future[A] = Future(a)
   def bind[A, B](fa: Future[A])(f: A => Future[B]): Future[B] = fa flatMap f
   override def map[A, B](fa: Future[A])(f: A => B): Future[B] = fa map f
@@ -27,16 +32,17 @@ private class FutureInstance(implicit ec: ExecutionContext)
   override def cojoin[A](a: Future[A]): Future[Future[A]] = Future(a)
 
   def chooseAny[A](
-      head: Future[A], tail: Seq[Future[A]]): Future[(A, Seq[Future[A]])] = {
+      head: Future[A],
+      tail: Seq[Future[A]]): Future[(A, Seq[Future[A]])] = {
     val fs = (head +: tail).iterator.zipWithIndex.toIndexedSeq
     val counter = new AtomicInteger(fs.size)
     val result = Promise[(A, Int)]()
     def attemptComplete(t: Try[(A, Int)]): Unit = {
       val remaining = counter.decrementAndGet
       t match {
-        case TSuccess(_) => result tryComplete t
+        case TSuccess(_)         => result tryComplete t
         case _ if remaining == 0 => result tryComplete t
-        case _ =>
+        case _                   =>
       }
     }
 

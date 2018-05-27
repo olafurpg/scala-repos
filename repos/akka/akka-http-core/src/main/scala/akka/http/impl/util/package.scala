@@ -52,7 +52,7 @@ package object util {
 
   private[http] def printEvent[T](marker: String): Flow[T, T, NotUsed] =
     Flow[T].transform(() ⇒
-          new PushPullStage[T, T] {
+      new PushPullStage[T, T] {
         override def onPush(element: T, ctx: Context[T]): SyncDirective = {
           println(s"$marker: $element")
           ctx.push(element)
@@ -62,7 +62,8 @@ package object util {
           ctx.pull()
         }
         override def onUpstreamFailure(
-            cause: Throwable, ctx: Context[T]): TerminationDirective = {
+            cause: Throwable,
+            ctx: Context[T]): TerminationDirective = {
           println(s"$marker: Error $cause")
           super.onUpstreamFailure(cause, ctx)
         }
@@ -83,13 +84,14 @@ package object util {
     synchronized {
       if (eventStreamLogger == null)
         eventStreamLogger = system.actorOf(
-            Props[util.EventStreamLogger]().withDeploy(Deploy.local),
-            name = "event-stream-logger")
+          Props[util.EventStreamLogger]().withDeploy(Deploy.local),
+          name = "event-stream-logger")
     }
     system.eventStream.subscribe(eventStreamLogger, channel)
   }
   private[http] def installEventStreamLoggerFor[T](
-      implicit ct: ClassTag[T], system: ActorSystem): Unit =
+      implicit ct: ClassTag[T],
+      system: ActorSystem): Unit =
     installEventStreamLoggerFor(ct.runtimeClass)
 
   private[http] implicit class AddFutureAwaitResult[T](future: Future[T]) {
@@ -101,8 +103,8 @@ package object util {
         case Success(t) ⇒ t
         case Failure(ex) ⇒
           throw new RuntimeException(
-              "Trying to await result of failed Future, see the cause for the original problem.",
-              ex)
+            "Trying to await result of failed Future, see the cause for the original problem.",
+            ex)
       }
     }
   }
@@ -147,7 +149,8 @@ package util {
   }
 
   private[http] class ToStrict(
-      timeout: FiniteDuration, contentType: ContentType)
+      timeout: FiniteDuration,
+      contentType: ContentType)
       extends GraphStage[FlowShape[ByteString, HttpEntity.Strict]] {
 
     val in = Inlet[ByteString]("in")
@@ -157,8 +160,7 @@ package util {
 
     override val shape = FlowShape(in, out)
 
-    override def createLogic(
-        inheritedAttributes: Attributes): GraphStageLogic =
+    override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
       new TimerGraphStageLogic(shape) {
         val bytes = ByteString.newBuilder
         private var emptyStream = false
@@ -175,23 +177,25 @@ package util {
           }
         })
 
-        setHandler(in, new InHandler {
-          override def onPush(): Unit = {
-            bytes ++= grab(in)
-            pull(in)
+        setHandler(
+          in,
+          new InHandler {
+            override def onPush(): Unit = {
+              bytes ++= grab(in)
+              pull(in)
+            }
+            override def onUpstreamFinish(): Unit = {
+              if (isAvailable(out)) {
+                push(out, HttpEntity.Strict(contentType, bytes.result()))
+                completeStage()
+              } else emptyStream = true
+            }
           }
-          override def onUpstreamFinish(): Unit = {
-            if (isAvailable(out)) {
-              push(out, HttpEntity.Strict(contentType, bytes.result()))
-              completeStage()
-            } else emptyStream = true
-          }
-        })
+        )
 
         override def onTimer(key: Any): Unit =
-          failStage(
-              new java.util.concurrent.TimeoutException(
-                  s"HttpEntity.toStrict timed out after $timeout while still waiting for outstanding data"))
+          failStage(new java.util.concurrent.TimeoutException(
+            s"HttpEntity.toStrict timed out after $timeout while still waiting for outstanding data"))
       }
 
     override def toString = "ToStrict"

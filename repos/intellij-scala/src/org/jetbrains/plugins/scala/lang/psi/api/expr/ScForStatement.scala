@@ -7,7 +7,7 @@ package expr
 import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns._
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 06.03.2008
   */
@@ -30,7 +30,8 @@ trait ScForStatement extends ScExpression {
 }
 
 object ScForStatement {
-  def unapply(forStmt: ScForStatement): Option[(ScEnumerators, ScExpression)] = {
+  def unapply(
+      forStmt: ScForStatement): Option[(ScEnumerators, ScExpression)] = {
     forStmt.enumerators.zip(forStmt.body).headOption
   }
 }

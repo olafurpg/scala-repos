@@ -48,11 +48,12 @@ object System {
   def nanoTime(): scala.Long =
     (getHighPrecisionTime() * 1000000).toLong
 
-  def arraycopy(src: Object,
-                srcPos: scala.Int,
-                dest: Object,
-                destPos: scala.Int,
-                length: scala.Int): Unit = {
+  def arraycopy(
+      src: Object,
+      srcPos: scala.Int,
+      dest: Object,
+      destPos: scala.Int,
+      length: scala.Int): Unit = {
 
     import scala.{Boolean, Char, Byte, Short, Int, Long, Float, Double}
 
@@ -109,47 +110,47 @@ object System {
         case src: Array[AnyRef] =>
           dest match {
             case dest: Array[AnyRef] => copyRef(src, dest)
-            case _ => mismatch()
+            case _                   => mismatch()
           }
         case src: Array[Boolean] =>
           dest match {
             case dest: Array[Boolean] => copyPrim(src, dest)
-            case _ => mismatch()
+            case _                    => mismatch()
           }
         case src: Array[Char] =>
           dest match {
             case dest: Array[Char] => copyPrim(src, dest)
-            case _ => mismatch()
+            case _                 => mismatch()
           }
         case src: Array[Byte] =>
           dest match {
             case dest: Array[Byte] => copyPrim(src, dest)
-            case _ => mismatch()
+            case _                 => mismatch()
           }
         case src: Array[Short] =>
           dest match {
             case dest: Array[Short] => copyPrim(src, dest)
-            case _ => mismatch()
+            case _                  => mismatch()
           }
         case src: Array[Int] =>
           dest match {
             case dest: Array[Int] => copyPrim(src, dest)
-            case _ => mismatch()
+            case _                => mismatch()
           }
         case src: Array[Long] =>
           dest match {
             case dest: Array[Long] => copyPrim(src, dest)
-            case _ => mismatch()
+            case _                 => mismatch()
           }
         case src: Array[Float] =>
           dest match {
             case dest: Array[Float] => copyPrim(src, dest)
-            case _ => mismatch()
+            case _                  => mismatch()
           }
         case src: Array[Double] =>
           dest match {
             case dest: Array[Double] => copyPrim(src, dest)
-            case _ => mismatch()
+            case _                   => mismatch()
           }
         case _ =>
           mismatch()
@@ -224,14 +225,16 @@ object System {
       sysProp.setProperty("java.vm.specification.version", "1.8")
       sysProp.setProperty("java.vm.specification.vendor", "Oracle Corporation")
       sysProp.setProperty(
-          "java.vm.specification.name", "Java Virtual Machine Specification")
+        "java.vm.specification.name",
+        "Java Virtual Machine Specification")
       sysProp.setProperty("java.vm.name", "Scala.js")
-      linkingInfo.linkerVersion.foreach(
-          v => sysProp.setProperty("java.vm.version", v))
+      linkingInfo.linkerVersion.foreach(v =>
+        sysProp.setProperty("java.vm.version", v))
       sysProp.setProperty("java.specification.version", "1.8")
       sysProp.setProperty("java.specification.vendor", "Oracle Corporation")
       sysProp.setProperty(
-          "java.specification.name", "Java Platform API Specification")
+        "java.specification.name",
+        "Java Platform API Specification")
       sysProp.setProperty("file.separator", "/")
       sysProp.setProperty("path.separator", ":")
       sysProp.setProperty("line.separator", "\n")
@@ -250,8 +253,9 @@ object System {
     SystemProperties.value
 
   def setProperties(properties: ju.Properties): Unit = {
-    SystemProperties.value = if (properties != null) properties
-    else SystemProperties.loadSystemProperties()
+    SystemProperties.value =
+      if (properties != null) properties
+      else SystemProperties.loadSystemProperties()
   }
 
   def getProperty(key: String): String =
@@ -371,6 +375,6 @@ private[lang] object JSConsoleBasedPrintStream {
   class DummyOutputStream extends OutputStream {
     def write(c: Int): Unit =
       throw new AssertionError(
-          "Should not get in JSConsoleBasedPrintStream.DummyOutputStream")
+        "Should not get in JSConsoleBasedPrintStream.DummyOutputStream")
   }
 }

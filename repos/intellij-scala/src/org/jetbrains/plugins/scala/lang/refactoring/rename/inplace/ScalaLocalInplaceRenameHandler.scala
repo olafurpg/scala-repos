@@ -7,17 +7,24 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.search.LocalSearchScope
 import com.intellij.psi.{PsiElement, PsiFile, PsiNamedElement}
-import com.intellij.refactoring.rename.inplace.{InplaceRefactoring, VariableInplaceRenameHandler, VariableInplaceRenamer}
+import com.intellij.refactoring.rename.inplace.{
+  InplaceRefactoring,
+  VariableInplaceRenameHandler,
+  VariableInplaceRenamer
+}
 
 /**
   * Nikolay.Tropin
   * 1/20/14
   */
 class ScalaLocalInplaceRenameHandler
-    extends VariableInplaceRenameHandler with ScalaInplaceRenameHandler {
+    extends VariableInplaceRenameHandler
+    with ScalaInplaceRenameHandler {
 
   override def isAvailable(
-      element: PsiElement, editor: Editor, file: PsiFile): Boolean = {
+      element: PsiElement,
+      editor: Editor,
+      file: PsiFile): Boolean = {
     val processor = renameProcessor(element)
     editor.getSettings.isVariableInplaceRenameEnabled && processor != null &&
     processor.canProcessElement(element) &&
@@ -25,27 +32,30 @@ class ScalaLocalInplaceRenameHandler
   }
 
   override def createRenamer(
-      elementToRename: PsiElement, editor: Editor): VariableInplaceRenamer = {
+      elementToRename: PsiElement,
+      editor: Editor): VariableInplaceRenamer = {
     elementToRename match {
       case named: PsiNamedElement =>
         new ScalaLocalInplaceRenamer(named, editor)
       case _ =>
         throw new IllegalArgumentException(
-            s"Cannot rename element: \n${elementToRename.getText}")
+          s"Cannot rename element: \n${elementToRename.getText}")
     }
   }
 
-  override def invoke(project: Project,
-                      editor: Editor,
-                      file: PsiFile,
-                      dataContext: DataContext) = {
+  override def invoke(
+      project: Project,
+      editor: Editor,
+      file: PsiFile,
+      dataContext: DataContext) = {
     UsageTrigger.trigger(ScalaBundle.message("rename.local.id"))
     super.invoke(project, editor, file, dataContext)
   }
 
-  override def doRename(elementToRename: PsiElement,
-                        editor: Editor,
-                        dataContext: DataContext): InplaceRefactoring = {
+  override def doRename(
+      elementToRename: PsiElement,
+      editor: Editor,
+      dataContext: DataContext): InplaceRefactoring = {
     afterElementSubstitution(elementToRename, editor, dataContext) {
       super.doRename(_, editor, dataContext)
     }

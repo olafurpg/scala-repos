@@ -40,12 +40,16 @@ object Ellipse {
   def apply(radiusX: Double, radiusY: Double) =
     new Ellipse(new jfxss.Ellipse(radiusX, radiusY))
   def apply(
-      centerX: Double, centerY: Double, radiusX: Double, radiusY: Double) =
+      centerX: Double,
+      centerY: Double,
+      radiusX: Double,
+      radiusY: Double) =
     new Ellipse(new jfxss.Ellipse(centerX, centerY, radiusX, radiusY))
 }
 
 class Ellipse(override val delegate: jfxss.Ellipse = new jfxss.Ellipse())
-    extends Shape(delegate) with SFXDelegate[jfxss.Ellipse] {
+    extends Shape(delegate)
+    with SFXDelegate[jfxss.Ellipse] {
   def centerX: DoubleProperty = delegate.centerXProperty
   def centerX_=(v: Double) {
     centerX() = v

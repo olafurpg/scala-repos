@@ -2,7 +2,13 @@ package com.twitter.finagle.http.netty
 
 import com.twitter.finagle.http.{Status, Version, Method, Request, Response}
 import java.net.InetSocketAddress
-import org.jboss.netty.handler.codec.http.{HttpVersion, HttpResponseStatus, HttpMethod, HttpRequest, HttpResponse}
+import org.jboss.netty.handler.codec.http.{
+  HttpVersion,
+  HttpResponseStatus,
+  HttpMethod,
+  HttpRequest,
+  HttpResponse
+}
 
 // TODO Use bijection-core when bijection.Conversion is contravariant in A.
 // See: github.com/twitter/bijection/pull/180.
@@ -31,7 +37,7 @@ object Bijections {
     def apply(v: HttpVersion) = v match {
       case HttpVersion.HTTP_1_1 => Version.Http11
       case HttpVersion.HTTP_1_0 => Version.Http10
-      case _ => Version.Http11
+      case _                    => Version.Http11
     }
   }
 

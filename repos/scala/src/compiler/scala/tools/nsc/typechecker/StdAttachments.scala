@@ -13,9 +13,10 @@ trait StdAttachments { self: Analyzer =>
   type MacroContext = UnaffiliatedMacroContext {
     val universe: self.global.type
   }
-  case class MacroRuntimeAttachment(delayed: Boolean,
-                                    typerContext: Context,
-                                    macroContext: Option[MacroContext])
+  case class MacroRuntimeAttachment(
+      delayed: Boolean,
+      typerContext: Context,
+      macroContext: Option[MacroContext])
 
   /** Scratchpad for the macro expander, which is used to store all intermediate data except the details about the runtime.
     */
@@ -51,7 +52,7 @@ trait StdAttachments { self: Analyzer =>
     */
   def hasMacroExpansionAttachment(any: Any): Boolean = any match {
     case tree: Tree => tree.hasAttachment[MacroExpansionAttachment]
-    case _ => false
+    case _          => false
   }
 
   /** Returns the original tree of the macro expansion if the argument is a macro expansion or EmptyTree otherwise.
@@ -95,9 +96,9 @@ trait StdAttachments { self: Analyzer =>
     tree match {
       // see the comment to `isMacroExpansionSuppressed` to learn why we need
       // a special traversal strategy here
-      case Apply(fn, _) => unsuppressMacroExpansion(fn)
+      case Apply(fn, _)     => unsuppressMacroExpansion(fn)
       case TypeApply(fn, _) => unsuppressMacroExpansion(fn)
-      case _ => // do nothing
+      case _                => // do nothing
     }
     tree
   }
@@ -106,15 +107,15 @@ trait StdAttachments { self: Analyzer =>
     */
   def isMacroExpansionSuppressed(tree: Tree): Boolean =
     (settings.Ymacroexpand.value == settings.MacroExpand.None // SI-6812
-        || tree.hasAttachment[SuppressMacroExpansionAttachment.type] ||
-        (tree match {
-              // we have to account for the fact that during typechecking an expandee might become wrapped,
-              // i.e. surrounded by an inferred implicit argument application or by an inferred type argument application.
-              // in that case the expandee itself will no longer be suppressed and we need to look at the core
-              case Apply(fn, _) => isMacroExpansionSuppressed(fn)
-              case TypeApply(fn, _) => isMacroExpansionSuppressed(fn)
-              case _ => false
-            }))
+      || tree.hasAttachment[SuppressMacroExpansionAttachment.type] ||
+      (tree match {
+        // we have to account for the fact that during typechecking an expandee might become wrapped,
+        // i.e. surrounded by an inferred implicit argument application or by an inferred type argument application.
+        // in that case the expandee itself will no longer be suppressed and we need to look at the core
+        case Apply(fn, _)     => isMacroExpansionSuppressed(fn)
+        case TypeApply(fn, _) => isMacroExpansionSuppressed(fn)
+        case _                => false
+      }))
 
   /** After being synthesized by the parser, primary constructors aren't fully baked yet.
     *  A call to super in such constructors is just a fill-me-in-later dummy resolved later

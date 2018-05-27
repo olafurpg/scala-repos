@@ -5,7 +5,8 @@ object Macros {
   def impl(c: Context) = {
     import c.universe._
     val wut = c.typecheck(
-        Select(Literal(Constant(10)), newTermName("$minus")), silent = true)
+      Select(Literal(Constant(10)), newTermName("$minus")),
+      silent = true)
     // println(showRaw(wut, printIds = true, printTypes = true))
     c.Expr[Unit](q"()")
   }

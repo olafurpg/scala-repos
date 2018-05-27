@@ -32,10 +32,10 @@ class TopKTest extends FunSuite with Checkers {
         (topk.iterator zip topk.iterator.drop(1))
           .forall(tup => (tup._1 >= tup._2)) &&
         (topk.isEmpty || {
-              val set = topk.toSet;
-              val last = topk.min;
-              values.forall(n => n < last || set.contains(n))
-            })
+          val set = topk.toSet;
+          val last = topk.min;
+          values.forall(n => n < last || set.contains(n))
+        })
       }
     };
   }
@@ -48,10 +48,10 @@ class TopKTest extends FunSuite with Checkers {
         (topk.iterator zip topk.iterator.drop(1))
           .forall(tup => (tup._1 >= tup._2)) &&
         (topk.isEmpty || {
-              val set = topk.toSet;
-              val last = topk.min;
-              values.forall(n => n < last || set.contains(n))
-            })
+          val set = topk.toSet;
+          val last = topk.min;
+          values.forall(n => n < last || set.contains(n))
+        })
       }
     };
   }

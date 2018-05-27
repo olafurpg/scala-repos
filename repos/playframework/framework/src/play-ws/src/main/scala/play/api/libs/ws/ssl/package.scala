@@ -5,7 +5,12 @@
  */
 package play.api.libs.ws
 
-import java.security.cert.{PKIXCertPathValidatorResult, CertPathValidatorResult, Certificate, X509Certificate}
+import java.security.cert.{
+  PKIXCertPathValidatorResult,
+  CertPathValidatorResult,
+  Certificate,
+  X509Certificate
+}
 import scala.util.Properties.{isJavaAtLeast, javaVmName}
 
 package object ssl {

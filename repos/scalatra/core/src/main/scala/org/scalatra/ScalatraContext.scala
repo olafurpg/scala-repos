@@ -7,14 +7,17 @@ import org.scalatra.servlet.{HttpServletRequestReadOnly, ServletApiImplicits}
 
 object ScalatraContext {
 
-  private class StableValuesContext(implicit val request: HttpServletRequest,
-                                    val response: HttpServletResponse,
-                                    val servletContext: ServletContext)
+  private class StableValuesContext(
+      implicit val request: HttpServletRequest,
+      val response: HttpServletResponse,
+      val servletContext: ServletContext)
       extends ScalatraContext
 }
 
 trait ScalatraContext
-    extends ServletApiImplicits with SessionSupport with CookieContext {
+    extends ServletApiImplicits
+    with SessionSupport
+    with CookieContext {
 
   import org.scalatra.ScalatraContext.StableValuesContext
 
@@ -67,6 +70,8 @@ trait ScalatraContext
 
   protected[this] implicit def scalatraContext: ScalatraContext = {
     new StableValuesContext()(
-        HttpServletRequestReadOnly(request), response, servletContext)
+      HttpServletRequestReadOnly(request),
+      response,
+      servletContext)
   }
 }

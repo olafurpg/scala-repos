@@ -32,7 +32,9 @@ class MongoSpec extends Specification {
   }
 
   def passDefinitionTests(
-      id: ConnectionIdentifier, mc: MongoClient, db: String): Result = {
+      id: ConnectionIdentifier,
+      mc: MongoClient,
+      db: String): Result = {
     // define the db
     MongoDB.defineDb(id, mc, db)
 
@@ -49,7 +51,7 @@ class MongoSpec extends Specification {
     MongoDB.use(DefaultConnectionIdentifier) { db =>
       db.getCollectionNames
     } must throwA(
-        new MongoException("Mongo not found: ConnectionIdentifier(lift)"))
+      new MongoException("Mongo not found: ConnectionIdentifier(lift)"))
     // remove defined db
     MongoDB.closeAll()
     success
@@ -60,9 +62,9 @@ class MongoSpec extends Specification {
     "Define DB with MongoClient instance" in {
       val opts = MongoClientOptions.builder.connectionsPerHost(12).build
       passDefinitionTests(
-          TestMongoIdentifier,
-          new MongoClient(new ServerAddress("localhost"), opts),
-          "test_default_b")
+        TestMongoIdentifier,
+        new MongoClient(new ServerAddress("localhost"), opts),
+        "test_default_b")
     }
 
     /* Requires a server other than localhost with auth setup.

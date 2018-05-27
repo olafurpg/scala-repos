@@ -20,9 +20,10 @@ trait DateHelper { self: I18nHelper =>
   private val dateFormatters = mutable.Map[String, DateTimeFormatter]()
   private val periodFormatters = mutable.Map[String, PeriodFormatter]()
   private val periodType =
-    PeriodType forFields Array(DurationFieldType.days,
-                               DurationFieldType.hours,
-                               DurationFieldType.minutes)
+    PeriodType forFields Array(
+      DurationFieldType.days,
+      DurationFieldType.hours,
+      DurationFieldType.minutes)
 
   private val isoFormatter = ISODateTimeFormat.dateTime
 
@@ -30,15 +31,15 @@ trait DateHelper { self: I18nHelper =>
 
   private def dateTimeFormatter(ctx: Context): DateTimeFormatter =
     dateTimeFormatters.getOrElseUpdate(
-        lang(ctx).language,
-        DateTimeFormat forStyle dateTimeStyle withLocale new Locale(
-            lang(ctx).language))
+      lang(ctx).language,
+      DateTimeFormat forStyle dateTimeStyle withLocale new Locale(
+        lang(ctx).language))
 
   private def dateFormatter(ctx: Context): DateTimeFormatter =
     dateFormatters.getOrElseUpdate(
-        lang(ctx).language,
-        DateTimeFormat forStyle dateStyle withLocale new Locale(
-            lang(ctx).language))
+      lang(ctx).language,
+      DateTimeFormat forStyle dateStyle withLocale new Locale(
+        lang(ctx).language))
 
   private def periodFormatter(ctx: Context): PeriodFormatter =
     periodFormatters.getOrElseUpdate(lang(ctx).language, {
@@ -74,7 +75,7 @@ trait DateHelper { self: I18nHelper =>
 
   def momentFromNow(date: DateTime)(implicit ctx: Context) = Html {
     s"""<time class="moment-from-now" title="${showDate(date)}" datetime="${isoDate(
-        date)}"></time>"""
+      date)}"></time>"""
   }
   def momentFromNowNoCtx(date: DateTime) = Html {
     s"""<time class="moment-from-now" datetime="${isoDate(date)}"></time>"""

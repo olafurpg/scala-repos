@@ -2,7 +2,6 @@
 // Licence: http://www.gnu.org/licenses/gpl-3.0.en.html
 package org.ensime.indexer.lucene
 
-abstract class EntityS[T <: Entity](clazz: Class[T])
-    extends Serializer(clazz) {
+abstract class EntityS[T <: Entity](clazz: Class[T]) extends Serializer(clazz) {
   def id(t: T) = t.id
 }

@@ -17,8 +17,10 @@ trait LoggerMessageQueueSemantics
   * INTERNAL API
   */
 private[akka] class LoggerMailboxType(
-    settings: ActorSystem.Settings, config: Config)
-    extends MailboxType with ProducesMessageQueue[LoggerMailbox] {
+    settings: ActorSystem.Settings,
+    config: Config)
+    extends MailboxType
+    with ProducesMessageQueue[LoggerMailbox] {
 
   override def create(owner: Option[ActorRef], system: Option[ActorSystem]) =
     (owner, system) match {
@@ -32,7 +34,8 @@ private[akka] class LoggerMailboxType(
   * INTERNAL API
   */
 private[akka] class LoggerMailbox(owner: ActorRef, system: ActorSystem)
-    extends UnboundedMailbox.MessageQueue with LoggerMessageQueueSemantics {
+    extends UnboundedMailbox.MessageQueue
+    with LoggerMessageQueueSemantics {
 
   override def cleanUp(owner: ActorRef, deadLetters: MessageQueue): Unit = {
     if (hasMessages) {

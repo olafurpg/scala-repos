@@ -25,7 +25,7 @@ import akka.shapeless._
   * should allow you a safer and easier way to interact with the stack.
   * However, in some cases, when you know what you are doing, direct access can be helpful.
   */
-class ValueStack private[parboiled2](initialSize: Int, maxSize: Int)
+class ValueStack private[parboiled2] (initialSize: Int, maxSize: Int)
     extends Iterable[Any] {
 
   private[this] var buffer = new Array[Any](initialSize)
@@ -227,7 +227,9 @@ class ValueStack private[parboiled2](initialSize: Int, maxSize: Int)
     * Throws a `ValueStackUnderflowException` if `end > size`.
     */
   @tailrec final def toHList[L <: HList](
-      start: Int = 0, end: Int = _size, prependTo: HList = HNil): L = {
+      start: Int = 0,
+      end: Int = _size,
+      prependTo: HList = HNil): L = {
     require(0 <= start && start <= end, "`start` must be >= 0 and <= `end`")
     if (start == end) prependTo.asInstanceOf[L]
     else toHList[L](start, end - 1, buffer(end - 1) :: prependTo)

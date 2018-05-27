@@ -10,10 +10,10 @@ object ThrowableSerializer {
 
   def serialize(t: Throwable): js.Dynamic = {
     val res = lit(
-        `class` = t.getClass().toString,
-        message = t.getMessage(),
-        toString = t.toString(),
-        stackTrace = t.getStackTrace().map(serializeTraceElem).toJSArray)
+      `class` = t.getClass().toString,
+      message = t.getMessage(),
+      toString = t.toString(),
+      stackTrace = t.getStackTrace().map(serializeTraceElem).toJSArray)
 
     if (t.getCause() != null) res.cause = serialize(t.getCause())
 
@@ -21,9 +21,10 @@ object ThrowableSerializer {
   }
 
   private def serializeTraceElem(e: StackTraceElement): js.Dynamic = {
-    lit(className = e.getClassName,
-        methodName = e.getMethodName,
-        fileName = e.getFileName,
-        lineNumber = e.getLineNumber)
+    lit(
+      className = e.getClassName,
+      methodName = e.getMethodName,
+      fileName = e.getFileName,
+      lineNumber = e.getLineNumber)
   }
 }

@@ -4,63 +4,85 @@ package tests
 import algebra.laws.{GroupLaws, OrderLaws}
 
 import cats.data.{NonEmptyList, OneAnd}
-import cats.laws.discipline.{ComonadTests, FunctorTests, SemigroupKTests, FoldableTests, MonadTests, SerializableTests, CartesianTests, TraverseTests, ReducibleTests}
+import cats.laws.discipline.{
+  ComonadTests,
+  FunctorTests,
+  SemigroupKTests,
+  FoldableTests,
+  MonadTests,
+  SerializableTests,
+  CartesianTests,
+  TraverseTests,
+  ReducibleTests
+}
 import cats.laws.discipline.arbitrary.oneAndArbitrary
 import cats.laws.discipline.eq._
 
 class OneAndTests extends CatsSuite {
   checkAll("OneAnd[List, Int]", OrderLaws[OneAnd[List, Int]].eqv)
 
-  checkAll("OneAnd[List, Int] with Option",
-           TraverseTests[OneAnd[List, ?]]
-             .traverse[Int, Int, Int, Int, Option, Option])
-  checkAll("Traverse[OneAnd[List, A]]",
-           SerializableTests.serializable(Traverse[OneAnd[List, ?]]))
+  checkAll(
+    "OneAnd[List, Int] with Option",
+    TraverseTests[OneAnd[List, ?]]
+      .traverse[Int, Int, Int, Int, Option, Option])
+  checkAll(
+    "Traverse[OneAnd[List, A]]",
+    SerializableTests.serializable(Traverse[OneAnd[List, ?]]))
 
   checkAll(
-      "OneAnd[List, Int]", ReducibleTests[OneAnd[List, ?]].reducible[Int, Int])
-  checkAll("Reducible[OneAnd[List, ?]]",
-           SerializableTests.serializable(Reducible[OneAnd[List, ?]]))
+    "OneAnd[List, Int]",
+    ReducibleTests[OneAnd[List, ?]].reducible[Int, Int])
+  checkAll(
+    "Reducible[OneAnd[List, ?]]",
+    SerializableTests.serializable(Reducible[OneAnd[List, ?]]))
 
   implicit val iso =
     CartesianTests.Isomorphisms.invariant[OneAnd[ListWrapper, ?]](
-        OneAnd.oneAndFunctor(ListWrapper.functor))
+      OneAnd.oneAndFunctor(ListWrapper.functor))
 
   // Test instances that have more general constraints
   {
     implicit val monadCombine = ListWrapper.monadCombine
-    checkAll("OneAnd[ListWrapper, Int]",
-             CartesianTests[OneAnd[ListWrapper, ?]].cartesian[Int, Int, Int])
-    checkAll("Cartesian[OneAnd[ListWrapper, A]]",
-             SerializableTests.serializable(Cartesian[OneAnd[ListWrapper, ?]]))
+    checkAll(
+      "OneAnd[ListWrapper, Int]",
+      CartesianTests[OneAnd[ListWrapper, ?]].cartesian[Int, Int, Int])
+    checkAll(
+      "Cartesian[OneAnd[ListWrapper, A]]",
+      SerializableTests.serializable(Cartesian[OneAnd[ListWrapper, ?]]))
   }
 
   {
     implicit val functor = ListWrapper.functor
-    checkAll("OneAnd[ListWrapper, Int]",
-             FunctorTests[OneAnd[ListWrapper, ?]].functor[Int, Int, Int])
-    checkAll("Functor[OneAnd[ListWrapper, A]]",
-             SerializableTests.serializable(Functor[OneAnd[ListWrapper, ?]]))
+    checkAll(
+      "OneAnd[ListWrapper, Int]",
+      FunctorTests[OneAnd[ListWrapper, ?]].functor[Int, Int, Int])
+    checkAll(
+      "Functor[OneAnd[ListWrapper, A]]",
+      SerializableTests.serializable(Functor[OneAnd[ListWrapper, ?]]))
   }
 
   {
     implicit val monadCombine = ListWrapper.monadCombine
-    checkAll("OneAnd[ListWrapper, Int]",
-             SemigroupKTests[OneAnd[ListWrapper, ?]].semigroupK[Int])
+    checkAll(
+      "OneAnd[ListWrapper, Int]",
+      SemigroupKTests[OneAnd[ListWrapper, ?]].semigroupK[Int])
     checkAll("OneAnd[List, Int]", GroupLaws[OneAnd[List, Int]].semigroup)
     checkAll(
-        "SemigroupK[OneAnd[ListWrapper, A]]",
-        SerializableTests.serializable(SemigroupK[OneAnd[ListWrapper, ?]]))
-    checkAll("Semigroup[NonEmptyList[Int]]",
-             SerializableTests.serializable(Semigroup[OneAnd[List, Int]]))
+      "SemigroupK[OneAnd[ListWrapper, A]]",
+      SerializableTests.serializable(SemigroupK[OneAnd[ListWrapper, ?]]))
+    checkAll(
+      "Semigroup[NonEmptyList[Int]]",
+      SerializableTests.serializable(Semigroup[OneAnd[List, Int]]))
   }
 
   {
     implicit val foldable = ListWrapper.foldable
-    checkAll("OneAnd[ListWrapper, Int]",
-             FoldableTests[OneAnd[ListWrapper, ?]].foldable[Int, Int])
-    checkAll("Foldable[OneAnd[ListWrapper, A]]",
-             SerializableTests.serializable(Foldable[OneAnd[ListWrapper, ?]]))
+    checkAll(
+      "OneAnd[ListWrapper, Int]",
+      FoldableTests[OneAnd[ListWrapper, ?]].foldable[Int, Int])
+    checkAll(
+      "Foldable[OneAnd[ListWrapper, A]]",
+      SerializableTests.serializable(Foldable[OneAnd[ListWrapper, ?]]))
   }
 
   {
@@ -73,13 +95,16 @@ class OneAndTests extends CatsSuite {
   implicit val iso2 = CartesianTests.Isomorphisms.invariant[OneAnd[List, ?]]
 
   checkAll("NonEmptyList[Int]", MonadTests[NonEmptyList].monad[Int, Int, Int])
-  checkAll("Monad[NonEmptyList[A]]",
-           SerializableTests.serializable(Monad[NonEmptyList]))
+  checkAll(
+    "Monad[NonEmptyList[A]]",
+    SerializableTests.serializable(Monad[NonEmptyList]))
 
   checkAll(
-      "NonEmptyList[Int]", ComonadTests[NonEmptyList].comonad[Int, Int, Int])
-  checkAll("Comonad[NonEmptyList[A]]",
-           SerializableTests.serializable(Comonad[NonEmptyList]))
+    "NonEmptyList[Int]",
+    ComonadTests[NonEmptyList].comonad[Int, Int, Int])
+  checkAll(
+    "Comonad[NonEmptyList[A]]",
+    SerializableTests.serializable(Comonad[NonEmptyList]))
 
   test("Show is not empty and is formatted as expected") {
     forAll { (nel: NonEmptyList[Int]) =>

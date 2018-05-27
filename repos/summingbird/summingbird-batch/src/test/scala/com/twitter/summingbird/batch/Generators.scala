@@ -41,7 +41,7 @@ object Generators {
     }
   }
 
-  implicit def intervalArb[T : Arbitrary : Ordering]: Arbitrary[Interval[T]] =
+  implicit def intervalArb[T: Arbitrary: Ordering]: Arbitrary[Interval[T]] =
     Arbitrary {
       for {
         l <- Arbitrary.arbitrary[T]

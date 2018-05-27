@@ -32,10 +32,11 @@ import org.apache.spark.util.Utils
   * by the Workers still run in separate JVMs. This can be used to test distributed operation and
   * fault recovery without spinning up a lot of processes.
   */
-private[spark] class LocalSparkCluster(numWorkers: Int,
-                                       coresPerWorker: Int,
-                                       memoryPerWorker: Int,
-                                       conf: SparkConf)
+private[spark] class LocalSparkCluster(
+    numWorkers: Int,
+    coresPerWorker: Int,
+    memoryPerWorker: Int,
+    conf: SparkConf)
     extends Logging {
 
   private val localHostname = Utils.localHostName()
@@ -64,15 +65,16 @@ private[spark] class LocalSparkCluster(numWorkers: Int,
 
     /* Start the Workers */
     for (workerNum <- 1 to numWorkers) {
-      val workerEnv = Worker.startRpcEnvAndEndpoint(localHostname,
-                                                    0,
-                                                    0,
-                                                    coresPerWorker,
-                                                    memoryPerWorker,
-                                                    masters,
-                                                    null,
-                                                    Some(workerNum),
-                                                    _conf)
+      val workerEnv = Worker.startRpcEnvAndEndpoint(
+        localHostname,
+        0,
+        0,
+        coresPerWorker,
+        memoryPerWorker,
+        masters,
+        null,
+        Some(workerNum),
+        _conf)
       workerRpcEnvs += workerEnv
     }
 

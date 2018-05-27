@@ -8,7 +8,7 @@ trait Iso[T, U] {
 
 object Iso {
   implicit def materializeIso[T, U]: Iso[T, U] = macro impl[T, U]
-  def impl[T : c.WeakTypeTag, U : c.WeakTypeTag](
+  def impl[T: c.WeakTypeTag, U: c.WeakTypeTag](
       c: Context): c.Expr[Iso[T, U]] = {
     import c.universe._
     import definitions._
@@ -30,44 +30,63 @@ object Iso {
     def mkFrom() = {
       if (fields.length == 0) Literal(Constant(Unit))
       else
-        Apply(Ident(newTermName("Tuple" + fields.length)),
-              fields map
-              (f =>
-                    Select(Ident(newTermName("f")),
-                           newTermName(f.name.toString.trim))))
+        Apply(
+          Ident(newTermName("Tuple" + fields.length)),
+          fields map
+            (
+                f =>
+                  Select(
+                    Ident(newTermName("f")),
+                    newTermName(f.name.toString.trim))))
     }
 
     val evidenceClass = ClassDef(
-        Modifiers(FINAL),
-        newTypeName("$anon"),
-        List(),
-        Template(
-            List(AppliedTypeTree(Ident(newTypeName("Iso")),
-                                 List(Ident(sym), mkTpt()))),
-            emptyValDef,
-            List(DefDef(Modifiers(),
-                        termNames.CONSTRUCTOR,
-                        List(),
-                        List(List()),
-                        TypeTree(),
-                        Block(List(Apply(Select(Super(This(typeNames.EMPTY),
-                                                      typeNames.EMPTY),
-                                                termNames.CONSTRUCTOR),
-                                         List())),
-                              Literal(Constant(())))),
-                 DefDef(Modifiers(),
-                        newTermName("to"),
-                        List(),
-                        List(List(ValDef(Modifiers(PARAM),
-                                         newTermName("f"),
-                                         Ident(sym),
-                                         EmptyTree))),
-                        TypeTree(),
-                        mkFrom()))))
+      Modifiers(FINAL),
+      newTypeName("$anon"),
+      List(),
+      Template(
+        List(
+          AppliedTypeTree(
+            Ident(newTypeName("Iso")),
+            List(Ident(sym), mkTpt()))),
+        emptyValDef,
+        List(
+          DefDef(
+            Modifiers(),
+            termNames.CONSTRUCTOR,
+            List(),
+            List(List()),
+            TypeTree(),
+            Block(
+              List(
+                Apply(
+                  Select(
+                    Super(This(typeNames.EMPTY), typeNames.EMPTY),
+                    termNames.CONSTRUCTOR),
+                  List())),
+              Literal(Constant(())))
+          ),
+          DefDef(
+            Modifiers(),
+            newTermName("to"),
+            List(),
+            List(
+              List(
+                ValDef(
+                  Modifiers(PARAM),
+                  newTermName("f"),
+                  Ident(sym),
+                  EmptyTree))),
+            TypeTree(),
+            mkFrom())
+        )
+      )
+    )
     c.Expr[Iso[T, U]](
-        Block(List(evidenceClass),
-              Apply(Select(New(Ident(newTypeName("$anon"))),
-                           termNames.CONSTRUCTOR),
-                    List())))
+      Block(
+        List(evidenceClass),
+        Apply(
+          Select(New(Ident(newTypeName("$anon"))), termNames.CONSTRUCTOR),
+          List())))
   }
 }

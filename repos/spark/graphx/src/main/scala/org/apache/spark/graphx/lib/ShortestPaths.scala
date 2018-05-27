@@ -38,8 +38,9 @@ object ShortestPaths {
 
   private def addMaps(spmap1: SPMap, spmap2: SPMap): SPMap =
     (spmap1.keySet ++ spmap2.keySet).map { k =>
-      k -> math.min(spmap1.getOrElse(k, Int.MaxValue),
-                    spmap2.getOrElse(k, Int.MaxValue))
+      k -> math.min(
+        spmap1.getOrElse(k, Int.MaxValue),
+        spmap2.getOrElse(k, Int.MaxValue))
     }.toMap
 
   /**
@@ -54,8 +55,9 @@ object ShortestPaths {
     * @return a graph where each vertex attribute is a map containing the shortest-path distance to
     * each reachable landmark vertex.
     */
-  def run[VD, ED : ClassTag](
-      graph: Graph[VD, ED], landmarks: Seq[VertexId]): Graph[SPMap, ED] = {
+  def run[VD, ED: ClassTag](
+      graph: Graph[VD, ED],
+      landmarks: Seq[VertexId]): Graph[SPMap, ED] = {
     val spGraph = graph.mapVertices { (vid, attr) =>
       if (landmarks.contains(vid)) makeMap(vid -> 0) else makeMap()
     }
@@ -66,7 +68,8 @@ object ShortestPaths {
       addMaps(attr, msg)
     }
 
-    def sendMessage(edge: EdgeTriplet[SPMap, _]): Iterator[(VertexId, SPMap)] = {
+    def sendMessage(
+        edge: EdgeTriplet[SPMap, _]): Iterator[(VertexId, SPMap)] = {
       val newAttr = incrementMap(edge.dstAttr)
       if (edge.srcAttr != addMaps(newAttr, edge.srcAttr))
         Iterator((edge.srcId, newAttr))

@@ -59,7 +59,7 @@ class UncleanLeaderElectionTest extends ZooKeeperTestHarness {
   val syncProducerLogger =
     Logger.getLogger(classOf[kafka.producer.SyncProducer])
   val eventHandlerLogger = Logger.getLogger(
-      classOf[kafka.producer.async.DefaultEventHandler[Object, Object]])
+    classOf[kafka.producer.async.DefaultEventHandler[Object, Object]])
 
   @Before
   override def setUp() {
@@ -69,11 +69,13 @@ class UncleanLeaderElectionTest extends ZooKeeperTestHarness {
     configProps2 = createBrokerConfig(brokerId2, zkConnect)
 
     for (configProps <- List(configProps1, configProps2)) {
-      configProps.put("controlled.shutdown.enable",
-                      String.valueOf(enableControlledShutdown))
+      configProps.put(
+        "controlled.shutdown.enable",
+        String.valueOf(enableControlledShutdown))
       configProps.put("controlled.shutdown.max.retries", String.valueOf(1))
       configProps.put(
-          "controlled.shutdown.retry.backoff.ms", String.valueOf(1000))
+        "controlled.shutdown.retry.backoff.ms",
+        String.valueOf(1000))
     }
 
     // temporarily set loggers to a higher level so that tests run quietly
@@ -113,7 +115,9 @@ class UncleanLeaderElectionTest extends ZooKeeperTestHarness {
 
     // create topic with 1 partition, 2 replicas, one on each broker
     AdminUtils.createOrUpdateTopicPartitionAssignmentPathInZK(
-        zkUtils, topic, Map(partitionId -> Seq(brokerId1, brokerId2)))
+      zkUtils,
+      topic,
+      Map(partitionId -> Seq(brokerId1, brokerId2)))
 
     verifyUncleanLeaderElectionEnabled
   }
@@ -127,7 +131,9 @@ class UncleanLeaderElectionTest extends ZooKeeperTestHarness {
 
     // create topic with 1 partition, 2 replicas, one on each broker
     AdminUtils.createOrUpdateTopicPartitionAssignmentPathInZK(
-        zkUtils, topic, Map(partitionId -> Seq(brokerId1, brokerId2)))
+      zkUtils,
+      topic,
+      Map(partitionId -> Seq(brokerId1, brokerId2)))
 
     verifyUncleanLeaderElectionDisabled
   }
@@ -143,10 +149,10 @@ class UncleanLeaderElectionTest extends ZooKeeperTestHarness {
     val topicProps = new Properties()
     topicProps.put("unclean.leader.election.enable", String.valueOf(true))
     AdminUtils.createOrUpdateTopicPartitionAssignmentPathInZK(
-        zkUtils,
-        topic,
-        Map(partitionId -> Seq(brokerId1, brokerId2)),
-        topicProps)
+      zkUtils,
+      topic,
+      Map(partitionId -> Seq(brokerId1, brokerId2)),
+      topicProps)
 
     verifyUncleanLeaderElectionEnabled
   }
@@ -162,10 +168,10 @@ class UncleanLeaderElectionTest extends ZooKeeperTestHarness {
     val topicProps = new Properties()
     topicProps.put("unclean.leader.election.enable", String.valueOf(false))
     AdminUtils.createOrUpdateTopicPartitionAssignmentPathInZK(
-        zkUtils,
-        topic,
-        Map(partitionId -> Seq(brokerId1, brokerId2)),
-        topicProps)
+      zkUtils,
+      topic,
+      Map(partitionId -> Seq(brokerId1, brokerId2)),
+      topicProps)
 
     verifyUncleanLeaderElectionDisabled
   }
@@ -180,19 +186,23 @@ class UncleanLeaderElectionTest extends ZooKeeperTestHarness {
 
     intercept[ConfigException] {
       AdminUtils.createOrUpdateTopicPartitionAssignmentPathInZK(
-          zkUtils, topic, Map(partitionId -> Seq(brokerId1)), topicProps)
+        zkUtils,
+        topic,
+        Map(partitionId -> Seq(brokerId1)),
+        topicProps)
     }
   }
 
   def verifyUncleanLeaderElectionEnabled {
     // wait until leader is elected
-    val leaderIdOpt = waitUntilLeaderIsElectedOrChanged(
-        zkUtils, topic, partitionId)
+    val leaderIdOpt =
+      waitUntilLeaderIsElectedOrChanged(zkUtils, topic, partitionId)
     assertTrue("Leader should get elected", leaderIdOpt.isDefined)
     val leaderId = leaderIdOpt.get
     debug("Leader for " + topic + " is elected to be: %s".format(leaderId))
-    assertTrue("Leader id is set to expected value for topic: " + topic,
-               leaderId == brokerId1 || leaderId == brokerId2)
+    assertTrue(
+      "Leader id is set to expected value for topic: " + topic,
+      leaderId == brokerId1 || leaderId == brokerId2)
 
     // the non-leader broker is the follower
     val followerId = if (leaderId == brokerId1) brokerId2 else brokerId1
@@ -220,7 +230,10 @@ class UncleanLeaderElectionTest extends ZooKeeperTestHarness {
 
     // wait until new leader is (uncleanly) elected
     waitUntilLeaderIsElectedOrChanged(
-        zkUtils, topic, partitionId, newLeaderOpt = Some(followerId))
+      zkUtils,
+      topic,
+      partitionId,
+      newLeaderOpt = Some(followerId))
 
     produceMessage(servers, topic, "third")
 
@@ -230,13 +243,14 @@ class UncleanLeaderElectionTest extends ZooKeeperTestHarness {
 
   def verifyUncleanLeaderElectionDisabled {
     // wait until leader is elected
-    val leaderIdOpt = waitUntilLeaderIsElectedOrChanged(
-        zkUtils, topic, partitionId)
+    val leaderIdOpt =
+      waitUntilLeaderIsElectedOrChanged(zkUtils, topic, partitionId)
     assertTrue("Leader should get elected", leaderIdOpt.isDefined)
     val leaderId = leaderIdOpt.get
     debug("Leader for " + topic + " is elected to be: %s".format(leaderId))
-    assertTrue("Leader id is set to expected value for topic: " + topic,
-               leaderId == brokerId1 || leaderId == brokerId2)
+    assertTrue(
+      "Leader id is set to expected value for topic: " + topic,
+      leaderId == brokerId1 || leaderId == brokerId2)
 
     // the non-leader broker is the follower
     val followerId = if (leaderId == brokerId1) brokerId2 else brokerId1
@@ -264,16 +278,18 @@ class UncleanLeaderElectionTest extends ZooKeeperTestHarness {
 
     // verify that unclean election to non-ISR follower does not occur
     waitUntilLeaderIsElectedOrChanged(
-        zkUtils, topic, partitionId, newLeaderOpt = Some(-1))
+      zkUtils,
+      topic,
+      partitionId,
+      newLeaderOpt = Some(-1))
 
     // message production and consumption should both fail while leader is down
     try {
       produceMessage(servers, topic, "third")
       fail(
-          "Message produced while leader is down should fail, but it succeeded")
+        "Message produced while leader is down should fail, but it succeeded")
     } catch {
-      case e: ExecutionException
-          if e.getCause.isInstanceOf[TimeoutException] => // expected
+      case e: ExecutionException if e.getCause.isInstanceOf[TimeoutException] => // expected
     }
 
     assertEquals(List.empty[String], consumeAllMessages(topic))
@@ -283,7 +299,10 @@ class UncleanLeaderElectionTest extends ZooKeeperTestHarness {
       .filter(server => server.config.brokerId == leaderId)
       .map(server => server.startup())
     waitUntilLeaderIsElectedOrChanged(
-        zkUtils, topic, partitionId, newLeaderOpt = Some(leaderId))
+      zkUtils,
+      topic,
+      partitionId,
+      newLeaderOpt = Some(leaderId))
 
     produceMessage(servers, topic, "third")
     waitUntilMetadataIsPropagated(servers, topic, partitionId)
@@ -293,7 +312,10 @@ class UncleanLeaderElectionTest extends ZooKeeperTestHarness {
 
     // verify clean leader transition to ISR follower
     waitUntilLeaderIsElectedOrChanged(
-        zkUtils, topic, partitionId, newLeaderOpt = Some(followerId))
+      zkUtils,
+      topic,
+      partitionId,
+      newLeaderOpt = Some(followerId))
 
     // verify messages can be consumed from ISR follower that was just promoted to leader
     assertEquals(List("first", "second", "third"), consumeAllMessages(topic))
@@ -307,11 +329,13 @@ class UncleanLeaderElectionTest extends ZooKeeperTestHarness {
   private def consumeAllMessages(topic: String): List[String] = {
     // use a fresh consumer group every time so that we don't need to mess with disabling auto-commit or
     // resetting the ZK offset
-    val consumerProps = createConsumerProperties(
-        zkConnect, "group" + random.nextLong, "id", 1000)
+    val consumerProps =
+      createConsumerProperties(zkConnect, "group" + random.nextLong, "id", 1000)
     val consumerConnector = Consumer.create(new ConsumerConfig(consumerProps))
     val messageStream = consumerConnector.createMessageStreams(
-        Map(topic -> 1), new StringDecoder(), new StringDecoder())
+      Map(topic -> 1),
+      new StringDecoder(),
+      new StringDecoder())
 
     val messages = getMessages(messageStream)
     consumerConnector.shutdown

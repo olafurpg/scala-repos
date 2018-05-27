@@ -42,7 +42,8 @@ object Cylinder {
   * Wraps [[http://docs.oracle.com/javafx/8/api/javafx/scene/shape/Cylinder.html]].
   */
 class Cylinder(override val delegate: jfxss.Cylinder = new jfxss.Cylinder())
-    extends Shape3D(delegate) with SFXDelegate[jfxss.Cylinder] {
+    extends Shape3D(delegate)
+    with SFXDelegate[jfxss.Cylinder] {
 
   /** Creates a new instance of Cylinder of a given radius and height.
     * Resolution defaults to 15 divisions along X and Z axis.

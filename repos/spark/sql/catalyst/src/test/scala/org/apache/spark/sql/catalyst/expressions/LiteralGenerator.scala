@@ -69,19 +69,21 @@ object LiteralGenerator {
   } yield Literal.create(l, LongType)
 
   lazy val floatLiteralGen: Gen[Literal] = for {
-    f <- Gen.chooseNum(Float.MinValue / 2,
-                       Float.MaxValue / 2,
-                       Float.NaN,
-                       Float.PositiveInfinity,
-                       Float.NegativeInfinity)
+    f <- Gen.chooseNum(
+      Float.MinValue / 2,
+      Float.MaxValue / 2,
+      Float.NaN,
+      Float.PositiveInfinity,
+      Float.NegativeInfinity)
   } yield Literal.create(f, FloatType)
 
   lazy val doubleLiteralGen: Gen[Literal] = for {
-    f <- Gen.chooseNum(Double.MinValue / 2,
-                       Double.MaxValue / 2,
-                       Double.NaN,
-                       Double.PositiveInfinity,
-                       Double.NegativeInfinity)
+    f <- Gen.chooseNum(
+      Double.MinValue / 2,
+      Double.MaxValue / 2,
+      Double.NaN,
+      Double.PositiveInfinity,
+      Double.NegativeInfinity)
   } yield Literal.create(f, DoubleType)
 
   // TODO cache the generated data
@@ -91,8 +93,9 @@ object LiteralGenerator {
     Arbitrary.arbBigInt.arbitrary.map { s =>
       val a = (s % BigInt(10).pow(precision - scale)).toString()
       val b = (s % BigInt(10).pow(scale)).abs.toString()
-      Literal.create(Decimal(BigDecimal(s"$a.$b"), precision, scale),
-                     DecimalType(precision, scale))
+      Literal.create(
+        Decimal(BigDecimal(s"$a.$b"), precision, scale),
+        DecimalType(precision, scale))
     }
   }
 
@@ -130,17 +133,17 @@ object LiteralGenerator {
 
   def randomGen(dt: DataType): Gen[Literal] = {
     dt match {
-      case ByteType => byteLiteralGen
-      case ShortType => shortLiteralGen
-      case IntegerType => integerLiteralGen
-      case LongType => longLiteralGen
-      case DoubleType => doubleLiteralGen
-      case FloatType => floatLiteralGen
-      case DateType => dateLiteralGen
-      case TimestampType => timestampLiteralGen
-      case BooleanType => booleanLiteralGen
-      case StringType => stringLiteralGen
-      case BinaryType => binaryLiteralGen
+      case ByteType             => byteLiteralGen
+      case ShortType            => shortLiteralGen
+      case IntegerType          => integerLiteralGen
+      case LongType             => longLiteralGen
+      case DoubleType           => doubleLiteralGen
+      case FloatType            => floatLiteralGen
+      case DateType             => dateLiteralGen
+      case TimestampType        => timestampLiteralGen
+      case BooleanType          => booleanLiteralGen
+      case StringType           => stringLiteralGen
+      case BinaryType           => binaryLiteralGen
       case CalendarIntervalType => calendarIntervalLiterGen
       case DecimalType.Fixed(precision, scale) =>
         decimalLiteralGen(precision, scale)

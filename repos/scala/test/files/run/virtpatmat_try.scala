@@ -7,9 +7,9 @@ object Test extends App {
     throw new A("meh")
   } catch {
     // this should emit a "catch-switch"
-    case y: A => println(y.x)
+    case y: A          => println(y.x)
     case (_: A | _: B) => println("B")
-    case _: Throwable => println("other")
+    case _: Throwable  => println("other")
   }
 
   try {
@@ -17,9 +17,9 @@ object Test extends App {
   } catch {
     // case classes and alternative flattening aren't supported yet, but could be in principle
     // case A(x) => println(x)
-    case y: A => println(y.x)
+    case y: A                  => println(y.x)
     case x @ ((_: A) | (_: B)) => println(x)
-    case _: Throwable => println("other")
+    case _: Throwable          => println("other")
   }
 
   def simpleTry {
@@ -27,7 +27,7 @@ object Test extends App {
       bla
     } catch {
       case x: Exception if x.getMessage == "test" => println("first case " + x)
-      case x: Exception => println("second case " + x)
+      case x: Exception                           => println("second case " + x)
     }
   }
 

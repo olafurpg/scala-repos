@@ -20,5 +20,5 @@ object TestSink {
     */
   def probe[T](implicit system: ActorSystem): Sink[T, Probe[T]] =
     new Sink[T, TestSubscriber.Probe[T]](
-        new StreamTestKit.ProbeSink(none, SinkShape(Inlet("ProbeSink.in"))))
+      new StreamTestKit.ProbeSink(none, SinkShape(Inlet("ProbeSink.in"))))
 }

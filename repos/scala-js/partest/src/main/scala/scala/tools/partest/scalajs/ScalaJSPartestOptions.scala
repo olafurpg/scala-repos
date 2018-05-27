@@ -38,7 +38,7 @@ object ScalaJSPartestOptions {
       case "none" => NoOpt
       case "fast" => FastOpt
       case "full" => FullOpt
-      case _ => sys.error(s"Unknown optimization mode: $id")
+      case _      => sys.error(s"Unknown optimization mode: $id")
     }
   }
   case object NoOpt extends OptMode {
@@ -54,8 +54,9 @@ object ScalaJSPartestOptions {
     def id: String = "full"
   }
 
-  def apply(args: Array[String],
-            errorReporter: String => Unit): Option[ScalaJSPartestOptions] = {
+  def apply(
+      args: Array[String],
+      errorReporter: String => Unit): Option[ScalaJSPartestOptions] = {
 
     var failed = false
 
@@ -74,7 +75,7 @@ object ScalaJSPartestOptions {
         filter = Some(SomeTests(oldNames ++ newNames))
       case (Some(fil), newFilter) =>
         error(
-            s"You cannot specify twice what tests to use (already specified: $fil, new: $newFilter)")
+          s"You cannot specify twice what tests to use (already specified: $fil, new: $newFilter)")
       case (None, newFilter) =>
         filter = Some(newFilter)
     }
@@ -104,7 +105,9 @@ object ScalaJSPartestOptions {
     else
       Some {
         new ScalaJSPartestOptions(
-            filter.getOrElse(WhitelistedTests), optMode, showDiff)
+          filter.getOrElse(WhitelistedTests),
+          optMode,
+          showDiff)
       }
   }
 }

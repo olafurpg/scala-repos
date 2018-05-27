@@ -41,15 +41,16 @@ class InlinerSeparateCompilationTest {
       """.stripMargin
 
     val warns = Set(
-        "T::f()I is annotated @inline but cannot be inlined: the method is not final and may be overridden",
-        // TODO SD-85
-        """O$::f()I is annotated @inline but could not be inlined:
+      "T::f()I is annotated @inline but cannot be inlined: the method is not final and may be overridden",
+      // TODO SD-85
+      """O$::f()I is annotated @inline but could not be inlined:
         |The callee O$::f()I contains the instruction INVOKESPECIAL T.f ()I
-        |that would cause an IllegalAccessError when inlined into class C""".stripMargin)
+        |that would cause an IllegalAccessError when inlined into class C""".stripMargin
+    )
     val List(c, o, oMod, t) = compileClassesSeparately(
-        List(codeA, codeB),
-        args + " -Yopt-warnings",
-        i => warns.exists(i.msg contains _))
+      List(codeA, codeB),
+      args + " -Yopt-warnings",
+      i => warns.exists(i.msg contains _))
     assertInvoke(getSingleMethod(c, "t1"), "T", "f")
 //    assertNoInvoke(getSingleMethod(c, "t2")) // SD-85
     assertNoInvoke(getSingleMethod(c, "t3"))

@@ -10,8 +10,7 @@ import org.scalatest.FunSuite
 class PoolingReadRepairClientTest extends FunSuite {
 
   class Context {
-    val full: MockClient = new MockClient(
-        Map("key" -> "value", "foo" -> "bar"))
+    val full: MockClient = new MockClient(Map("key" -> "value", "foo" -> "bar"))
     val partial: MockClient = new MockClient(Map("key" -> "value"))
     val pooled: Client = new PoolingReadRepairClient(Seq(full, partial), 1, 1)
   }

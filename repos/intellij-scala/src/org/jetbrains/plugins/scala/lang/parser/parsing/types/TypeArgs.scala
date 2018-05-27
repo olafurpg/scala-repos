@@ -38,7 +38,7 @@ object TypeArgs {
                           ScalaTokenTypes.tRSQBRACKET =>
                         idMarker.drop()
                         typeParameterMarker.done(
-                            ScalaElementTypes.TYPE_VARIABLE)
+                          ScalaElementTypes.TYPE_VARIABLE)
                         true
                       case _ =>
                         idMarker.rollbackTo()
@@ -54,7 +54,7 @@ object TypeArgs {
           if (checkTypeVariable || Type.parse(builder)) {
             var parsedType = true
             while (builder.getTokenType == ScalaTokenTypes.tCOMMA &&
-            parsedType) {
+                   parsedType) {
               builder.advanceLexer()
               parsedType = checkTypeVariable || Type.parse(builder)
               if (!parsedType) builder error ScalaBundle.message("wrong.type")

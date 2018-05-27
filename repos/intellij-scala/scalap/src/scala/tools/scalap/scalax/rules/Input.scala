@@ -43,8 +43,7 @@ class ArrayInput[A](val array: Array[A], val index: Int) extends Input[A] {
   override lazy val toString = this.iterator.mkString("\"", "", "\"")
 }
 
-class IterableInput[A](iterator: Iterator[A], val index: Int)
-    extends Input[A] {
+class IterableInput[A](iterator: Iterator[A], val index: Int) extends Input[A] {
   def this(iterable: Iterable[A]) = this(iterable.iterator, 0)
 
   lazy val next: Result[IterableInput[A], A, Nothing] =
@@ -55,9 +54,10 @@ class IterableInput[A](iterator: Iterator[A], val index: Int)
 }
 
 /** View one type of input as another based on a transformation rule */
-class View[A, B](transform: Input[A] => Result[Input[A], B, Nothing],
-                 val input: Input[A],
-                 val index: Int)
+class View[A, B](
+    transform: Input[A] => Result[Input[A], B, Nothing],
+    val input: Input[A],
+    val index: Int)
     extends Input[B] {
 
   def next: Result[Input[B], B, Nothing] = transform(input) match {

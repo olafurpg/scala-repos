@@ -44,9 +44,10 @@ object ComboBoxDemo extends JFXApp {
   val mainPane = new BorderPane {
     top = comboBox
     center = new VBox {
-      children = List(comboBoxControls,
-                      new ComboBoxBaseControls[String](comboBox),
-                      new ControlControls(comboBox))
+      children = List(
+        comboBoxControls,
+        new ComboBoxBaseControls[String](comboBox),
+        new ControlControls(comboBox))
     }
     vgrow = Priority.Always
     hgrow = Priority.Always

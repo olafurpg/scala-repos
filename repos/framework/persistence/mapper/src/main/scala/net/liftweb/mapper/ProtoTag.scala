@@ -44,7 +44,8 @@ trait MetaProtoTag[ModelType <: ProtoTag[ModelType]]
   }
 
   override def findDbByKey(
-      dbId: ConnectionIdentifier, key: Long): Box[ModelType] = synchronized {
+      dbId: ConnectionIdentifier,
+      key: Long): Box[ModelType] = synchronized {
     if (idCache.contains(key)) Full(idCache(key))
     else {
       val ret = super.findDbByKey(dbId, key)
@@ -67,7 +68,8 @@ trait MetaProtoTag[ModelType <: ProtoTag[ModelType]]
 }
 
 abstract class ProtoTag[MyType <: ProtoTag[MyType]]
-    extends KeyedMapper[Long, MyType] with Ordered[MyType] { self: MyType =>
+    extends KeyedMapper[Long, MyType]
+    with Ordered[MyType] { self: MyType =>
 
   def getSingleton: MetaProtoTag[MyType]
 

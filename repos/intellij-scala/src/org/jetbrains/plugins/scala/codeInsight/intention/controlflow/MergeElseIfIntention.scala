@@ -23,7 +23,9 @@ class MergeElseIfIntention extends PsiElementBaseIntentionAction {
   override def getText: String = "Merge 'else if'"
 
   def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+      project: Project,
+      editor: Editor,
+      element: PsiElement): Boolean = {
     val ifStmt: ScIfStmt =
       PsiTreeUtil.getParentOfType(element, classOf[ScIfStmt], false)
     if (ifStmt == null) return false
@@ -34,7 +36,7 @@ class MergeElseIfIntention extends PsiElementBaseIntentionAction {
     if (thenBranch == null || elseBranch == null) return false
 
     if (!(thenBranch.getTextRange.getEndOffset <= offset &&
-            offset <= elseBranch.getTextRange.getStartOffset)) return false
+          offset <= elseBranch.getTextRange.getStartOffset)) return false
 
     val blockExpr = ifStmt.elseBranch.orNull
     if (blockExpr != null && blockExpr.isInstanceOf[ScBlockExpr]) {
@@ -55,15 +57,15 @@ class MergeElseIfIntention extends PsiElementBaseIntentionAction {
     val start = ifStmt.getTextRange.getStartOffset
     val startIndex =
       ifStmt.thenBranch.get.getTextRange.getEndOffset -
-      ifStmt.getTextRange.getStartOffset
+        ifStmt.getTextRange.getStartOffset
     val endIndex =
       ifStmt.elseBranch.get.getTextRange.getStartOffset -
-      ifStmt.getTextRange.getStartOffset
+        ifStmt.getTextRange.getStartOffset
     val elseIndex =
       ifStmt.getText.substring(startIndex, endIndex).indexOf("else") - 1
     val diff =
       editor.getCaretModel.getOffset -
-      ifStmt.thenBranch.get.getTextRange.getEndOffset - elseIndex
+        ifStmt.thenBranch.get.getTextRange.getEndOffset - elseIndex
 
     val expr = new StringBuilder
     expr
@@ -76,10 +78,16 @@ class MergeElseIfIntention extends PsiElementBaseIntentionAction {
 
     val newIfStmt: ScExpression =
       ScalaPsiElementFactory.createExpressionFromText(
-          expr.toString(), element.getManager)
+        expr.toString(),
+        element.getManager)
     val size =
-      newIfStmt.asInstanceOf[ScIfStmt].thenBranch.get.getTextRange.getEndOffset -
-      newIfStmt.asInstanceOf[ScIfStmt].getTextRange.getStartOffset
+      newIfStmt
+        .asInstanceOf[ScIfStmt]
+        .thenBranch
+        .get
+        .getTextRange
+        .getEndOffset -
+        newIfStmt.asInstanceOf[ScIfStmt].getTextRange.getStartOffset
 
     inWriteAction {
       ifStmt.replaceExpression(newIfStmt, true)

@@ -29,7 +29,7 @@ trait Cozip[F[_]] { self =>
       x: F[(A \/ (B \/ (C \/ (D \/ (E \/ (G \/ H))))))])
     : (F[A] \/ (F[B] \/ (F[C] \/ (F[D] \/ (F[E] \/ (F[G] \/ F[H])))))) =
     cozip(x).map(
-        cozip(_) map (cozip(_) map (cozip(_) map (cozip(_) map (cozip(_))))))
+      cozip(_) map (cozip(_) map (cozip(_) map (cozip(_) map (cozip(_))))))
 
   ////
   val cozipSyntax = new scalaz.syntax.CozipSyntax[F] { def F = Cozip.this }

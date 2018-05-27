@@ -16,10 +16,11 @@ object Video extends LilaController {
       implicit ctx: Context): Fu[A] = {
     val reqTags = get("tags") ?? (_.split('^').toList.map(_.trim.toLowerCase))
     env.api.tag.paths(reqTags) map { tags =>
-      UserControl(filter = Filter(reqTags),
-                  tags = tags,
-                  query = get("q"),
-                  bot = HTTPRequest.isBot(ctx.req))
+      UserControl(
+        filter = Filter(reqTags),
+        tags = tags,
+        query = get("q"),
+        bot = HTTPRequest.isBot(ctx.req))
     } flatMap f
   }
 
@@ -32,7 +33,8 @@ object Video extends LilaController {
               Ok(html.video.search(videos, control))
           }
         case None =>
-          env.api.video.byTags(ctx.me, control.filter.tags, getInt("page") | 1) zip env.api.video.count.apply map {
+          env.api.video
+            .byTags(ctx.me, control.filter.tags, getInt("page") | 1) zip env.api.video.count.apply map {
             case (videos, count) =>
               Ok(html.video.index(videos, count, control))
           }
@@ -57,9 +59,8 @@ object Video extends LilaController {
 
   def author(author: String) = Open { implicit ctx =>
     WithUserControl { control =>
-      env.api.video.byAuthor(ctx.me, author, getInt("page") | 1) map {
-        videos =>
-          Ok(html.video.author(author, videos, control))
+      env.api.video.byAuthor(ctx.me, author, getInt("page") | 1) map { videos =>
+        Ok(html.video.author(author, videos, control))
       }
     }
   }

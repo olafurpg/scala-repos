@@ -39,6 +39,6 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class FontWeightSpec
     extends SFXEnumDelegateSpec[jfxst.FontWeight, FontWeight](
-        javaClass = classOf[jfxst.FontWeight],
-        scalaClass = classOf[FontWeight],
-        companion = FontWeight)
+      javaClass = classOf[jfxst.FontWeight],
+      scalaClass = classOf[FontWeight],
+      companion = FontWeight)

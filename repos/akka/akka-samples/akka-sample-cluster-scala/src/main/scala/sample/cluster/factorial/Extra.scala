@@ -12,13 +12,16 @@ abstract class FactorialFrontend2 extends Actor {
   import akka.cluster.metrics.HeapMetricsSelector
 
   val backend = context.actorOf(
-      ClusterRouterGroup(AdaptiveLoadBalancingGroup(HeapMetricsSelector),
-                         ClusterRouterGroupSettings(
-                             totalInstances = 100,
-                             routeesPaths = List("/user/factorialBackend"),
-                             allowLocalRoutees = true,
-                             useRole = Some("backend"))).props(),
-      name = "factorialBackendRouter2")
+    ClusterRouterGroup(
+      AdaptiveLoadBalancingGroup(HeapMetricsSelector),
+      ClusterRouterGroupSettings(
+        totalInstances = 100,
+        routeesPaths = List("/user/factorialBackend"),
+        allowLocalRoutees = true,
+        useRole = Some("backend"))
+    ).props(),
+    name = "factorialBackendRouter2"
+  )
   //#router-lookup-in-code
 }
 
@@ -31,13 +34,15 @@ abstract class FactorialFrontend3 extends Actor {
   import akka.cluster.metrics.SystemLoadAverageMetricsSelector
 
   val backend = context.actorOf(
-      ClusterRouterPool(
-          AdaptiveLoadBalancingPool(SystemLoadAverageMetricsSelector),
-          ClusterRouterPoolSettings(
-              totalInstances = 100,
-              maxInstancesPerNode = 3,
-              allowLocalRoutees = false,
-              useRole = Some("backend"))).props(Props[FactorialBackend]),
-      name = "factorialBackendRouter3")
+    ClusterRouterPool(
+      AdaptiveLoadBalancingPool(SystemLoadAverageMetricsSelector),
+      ClusterRouterPoolSettings(
+        totalInstances = 100,
+        maxInstancesPerNode = 3,
+        allowLocalRoutees = false,
+        useRole = Some("backend"))
+    ).props(Props[FactorialBackend]),
+    name = "factorialBackendRouter3"
+  )
   //#router-deploy-in-code
 }

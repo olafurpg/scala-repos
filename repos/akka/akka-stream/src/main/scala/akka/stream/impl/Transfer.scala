@@ -131,7 +131,8 @@ private[akka] object NotInitialized extends TransferState {
   * INTERNAL API
   */
 private[akka] case class WaitingForUpstreamSubscription(
-    remaining: Int, andThen: TransferPhase)
+    remaining: Int,
+    andThen: TransferPhase)
     extends TransferState {
   def isReady = false
   def isCompleted = false
@@ -158,22 +159,25 @@ private[akka] trait Pump {
   private var transferState: TransferState = NotInitialized
   private var currentAction: () ⇒ Unit = () ⇒
     throw new IllegalStateException(
-        "Pump has been not initialized with a phase")
+      "Pump has been not initialized with a phase")
 
   final def initialPhase(waitForUpstream: Int, andThen: TransferPhase): Unit = {
-    require(waitForUpstream >= 1,
-            s"waitForUpstream must be >= 1 (was $waitForUpstream)")
+    require(
+      waitForUpstream >= 1,
+      s"waitForUpstream must be >= 1 (was $waitForUpstream)")
     if (transferState != NotInitialized)
       throw new IllegalStateException(
-          s"initialPhase expected NotInitialized, but was [$transferState]")
+        s"initialPhase expected NotInitialized, but was [$transferState]")
     transferState = WaitingForUpstreamSubscription(waitForUpstream, andThen)
   }
 
   final def waitForUpstreams(waitForUpstream: Int): Unit = {
-    require(waitForUpstream >= 1,
-            s"waitForUpstream must be >= 1 (was $waitForUpstream)")
+    require(
+      waitForUpstream >= 1,
+      s"waitForUpstream must be >= 1 (was $waitForUpstream)")
     transferState = WaitingForUpstreamSubscription(
-        waitForUpstream, TransferPhase(transferState)(currentAction))
+      waitForUpstream,
+      TransferPhase(transferState)(currentAction))
   }
 
   def gotUpstreamSubscription(): Unit = {
@@ -200,7 +204,7 @@ private[akka] trait Pump {
 
   protected final val completedPhase = TransferPhase(Completed) { () ⇒
     throw new IllegalStateException(
-        "The action of completed phase must be never executed")
+      "The action of completed phase must be never executed")
   }
 
   // Exchange input buffer elements and output buffer "requests" until one of them becomes empty.

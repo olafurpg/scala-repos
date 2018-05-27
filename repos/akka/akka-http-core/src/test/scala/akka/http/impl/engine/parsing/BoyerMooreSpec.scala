@@ -67,22 +67,27 @@ class BoyerMooreSpec extends WordSpec with Matchers {
     }
   }
 
-  def findString(needle: String,
-                 haystack: String,
-                 skipFindsThatStartInFinds: Boolean = false): Seq[Int] =
+  def findString(
+      needle: String,
+      haystack: String,
+      skipFindsThatStartInFinds: Boolean = false): Seq[Int] =
     find(ByteString(needle), ByteString(haystack), skipFindsThatStartInFinds)
 
-  def find(needle: ByteString,
-           haystack: ByteString,
-           skipFindsThatStartInFinds: Boolean = false): Seq[Int] = {
+  def find(
+      needle: ByteString,
+      haystack: ByteString,
+      skipFindsThatStartInFinds: Boolean = false): Seq[Int] = {
     val boyerMoore = new BoyerMoore(needle.toArray[Byte])
     @tailrec def rec(offset: Int, result: Seq[Int]): Seq[Int] = {
-      val ix = try boyerMoore.nextIndex(haystack, offset) catch {
+      val ix = try boyerMoore.nextIndex(haystack, offset)
+      catch {
         case NotEnoughDataException ⇒ -1
       }
       if (ix >= 0)
-        rec(if (skipFindsThatStartInFinds) ix + needle.length else ix + 1,
-            result :+ ix) else result
+        rec(
+          if (skipFindsThatStartInFinds) ix + needle.length else ix + 1,
+          result :+ ix)
+      else result
     }
     rec(0, Seq.empty)
   }

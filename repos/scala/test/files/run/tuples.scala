@@ -6,7 +6,7 @@ object Test extends App {
   Console.println(xyz)
   xyz match {
     case (1, "abc", true) => Console.println("OK")
-    case _ => ???
+    case _                => ???
   }
   def func(x: Int, y: String, z: Double) {
     Console.println("x = " + x + "; y = " + y + "; z = " + z);

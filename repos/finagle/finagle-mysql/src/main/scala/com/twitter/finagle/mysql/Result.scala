@@ -29,8 +29,9 @@ object HandshakeInit extends Decoder[HandshakeInit] {
     // the rest of the fields are optional and protocol version specific
     val capLow = if (br.readable(2)) br.readUnsignedShort() else 0
 
-    require(protocol == 10 && (capLow & Capability.Protocol41) != 0,
-            "unsupported protocol version")
+    require(
+      protocol == 10 && (capLow & Capability.Protocol41) != 0,
+      "unsupported protocol version")
 
     val charset = br.readUnsignedByte()
     val status = br.readShort()
@@ -49,13 +50,13 @@ object HandshakeInit extends Decoder[HandshakeInit] {
       else br.readNullTerminatedBytes()
 
     HandshakeInit(
-        protocol,
-        new String(bytesVersion, Charset(charset)),
-        threadId,
-        Array.concat(salt1, salt2),
-        serverCap,
-        charset,
-        status
+      protocol,
+      new String(bytesVersion, Charset(charset)),
+      threadId,
+      Array.concat(salt1, salt2),
+      serverCap,
+      charset,
+      status
     )
   }
 }
@@ -68,8 +69,7 @@ case class HandshakeInit(
     serverCap: Capability,
     charset: Short,
     status: Short
-)
-    extends Result
+) extends Result
 
 /**
   * Represents the OK Packet received from the server. It is sent
@@ -80,11 +80,11 @@ object OK extends Decoder[OK] {
   def decode(packet: Packet) = {
     val br = BufferReader(packet.body, offset = 1)
     OK(
-        br.readLengthCodedBinary(),
-        br.readLengthCodedBinary(),
-        br.readUnsignedShort(),
-        br.readUnsignedShort(),
-        new String(br.takeRest())
+      br.readLengthCodedBinary(),
+      br.readLengthCodedBinary(),
+      br.readUnsignedShort(),
+      br.readUnsignedShort(),
+      new String(br.takeRest())
     )
   }
 }
@@ -95,8 +95,7 @@ case class OK(
     serverStatus: Int,
     warningCount: Int,
     message: String
-)
-    extends Result
+) extends Result
 
 /**
   * Represents the Error Packet received from the server and the data sent along with it.
@@ -158,17 +157,17 @@ object Field extends Decoder[Field] {
     val flags = bw.readShort()
     val decimals = bw.readByte()
     Field(
-        catalog,
-        db,
-        table,
-        origTable,
-        name,
-        origName,
-        charset,
-        length,
-        fieldType,
-        flags,
-        decimals
+      catalog,
+      db,
+      table,
+      origTable,
+      name,
+      origName,
+      charset,
+      length,
+      fieldType,
+      flags,
+      decimals
     )
   }
 }
@@ -185,8 +184,7 @@ case class Field(
     fieldType: Short,
     flags: Short,
     decimals: Byte
-)
-    extends Result {
+) extends Result {
   def id: String = if (name.isEmpty) origName else name
   override val toString = "Field(%s)".format(id)
 }
@@ -216,8 +214,7 @@ case class PrepareOK(
     warningCount: Int,
     columns: Seq[Field] = Nil,
     params: Seq[Field] = Nil
-)
-    extends Result
+) extends Result
 
 /**
   * Used internally to synthesize a response from
@@ -242,7 +239,9 @@ object ResultSet {
     Try(decode(isBinaryEncoded)(header, fieldPackets, rowPackets))
 
   def decode(isBinaryEncoded: Boolean)(
-      header: Packet, fieldPackets: Seq[Packet], rowPackets: Seq[Packet]) = {
+      header: Packet,
+      fieldPackets: Seq[Packet],
+      rowPackets: Seq[Packet]) = {
     val fields = fieldPackets.map(Field.decode(_)).toIndexedSeq
 
     // A name -> index map used to allow quick lookups for rows based on name.

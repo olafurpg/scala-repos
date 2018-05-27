@@ -50,7 +50,7 @@ class Properties(protected val defaults: Properties)
     entrySet().foreach { entry =>
       (entry.getKey, entry.getValue) match {
         case (key: String, _: String) => set.add(key)
-        case _ => // Ignore key
+        case _                        => // Ignore key
       }
     }
     if (defaults != null) set ++= defaults.stringPropertyNames()

@@ -60,7 +60,8 @@ object UnapplyInference extends App {
     import scalaz._
     val k: Kleisli[NumberFormatException \/ ?, String, Int] =
       Kleisli.kleisliU { s: String =>
-        try \/-(s.toInt) catch { case e: NumberFormatException => -\/(e) }
+        try \/-(s.toInt)
+        catch { case e: NumberFormatException => -\/(e) }
       }
   }
 
@@ -80,18 +81,18 @@ object UnapplyInference extends App {
     (1, 2)
       .map(1 +)
       .map(1 +)
-      (1, 2, 3)
+    (1, 2, 3)
       .map(1 +)
       .map(1 +)
-      (1, 2, 3, 4)
+    (1, 2, 3, 4)
       .map(1 +)
       .map(1 +)
-      (1, 2, 3, 4, 5)
+    (1, 2, 3, 4, 5)
       .map(1 +)
       .map(1 +)
-      (1, 2, 3, 4, 5, 6)
+    (1, 2, 3, 4, 5, 6)
       .map(1 +)
       .map(1 +)
-      (1, 2, 3, 4, 5, 6, 7).map(1 +).map(1 +)
+    (1, 2, 3, 4, 5, 6, 7).map(1 +).map(1 +)
   }
 }

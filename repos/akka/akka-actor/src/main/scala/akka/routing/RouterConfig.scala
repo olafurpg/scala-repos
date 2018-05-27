@@ -193,7 +193,8 @@ abstract class PoolBase extends Pool
 trait Pool extends RouterConfig {
 
   @deprecated(
-      "Implement nrOfInstances with ActorSystem parameter instead", "2.4")
+    "Implement nrOfInstances with ActorSystem parameter instead",
+    "2.4")
   def nrOfInstances: Int = -1
 
   /**
@@ -212,18 +213,21 @@ trait Pool extends RouterConfig {
     * INTERNAL API
     */
   private[akka] def newRoutee(
-      routeeProps: Props, context: ActorContext): Routee =
+      routeeProps: Props,
+      context: ActorContext): Routee =
     ActorRefRoutee(
-        context.actorOf(enrichWithPoolDispatcher(routeeProps, context)))
+      context.actorOf(enrichWithPoolDispatcher(routeeProps, context)))
 
   /**
     * INTERNAL API
     */
   private[akka] def enrichWithPoolDispatcher(
-      routeeProps: Props, context: ActorContext): Props =
+      routeeProps: Props,
+      context: ActorContext): Props =
     if (usePoolDispatcher &&
         routeeProps.dispatcher == Dispatchers.DefaultDispatcherId)
-      routeeProps.withDispatcher("akka.actor.deployment." +
+      routeeProps.withDispatcher(
+        "akka.actor.deployment." +
           context.self.path.elements.drop(1).mkString("/", "/", "") +
           ".pool-dispatcher")
     else routeeProps
@@ -304,28 +308,28 @@ case object FromConfig extends FromConfig {
   * (defaults to default-dispatcher).
   */
 @SerialVersionUID(1L)
-class FromConfig(override val resizer: Option[Resizer],
-                 override val supervisorStrategy: SupervisorStrategy,
-                 override val routerDispatcher: String)
+class FromConfig(
+    override val resizer: Option[Resizer],
+    override val supervisorStrategy: SupervisorStrategy,
+    override val routerDispatcher: String)
     extends Pool {
 
   def this() =
     this(None, Pool.defaultSupervisorStrategy, Dispatchers.DefaultDispatcherId)
 
   override def createRouter(system: ActorSystem): Router =
-    throw new UnsupportedOperationException(
-        "FromConfig must not create Router")
+    throw new UnsupportedOperationException("FromConfig must not create Router")
 
   /**
     * INTERNAL API
     */
   override private[akka] def createRouterActor(): RouterActor =
     throw new UnsupportedOperationException(
-        "FromConfig must not create RouterActor")
+      "FromConfig must not create RouterActor")
 
   override def verifyConfig(path: ActorPath): Unit =
     throw new ConfigurationException(
-        s"Configuration missing for router [$path] in 'akka.actor.deployment' section.")
+      s"Configuration missing for router [$path] in 'akka.actor.deployment' section.")
 
   /**
     * Setting the supervisor strategy to be used for the “head” Router actor.
@@ -373,7 +377,7 @@ case object NoRouter extends NoRouter {
     */
   override private[akka] def createRouterActor(): RouterActor =
     throw new UnsupportedOperationException(
-        "NoRouter must not create RouterActor")
+      "NoRouter must not create RouterActor")
   override def routerDispatcher: String =
     throw new UnsupportedOperationException("NoRouter has no dispatcher")
   override def withFallback(

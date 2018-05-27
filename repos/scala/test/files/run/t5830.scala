@@ -7,7 +7,7 @@ object Test extends App {
 
   def onlyThen(ch: Char, eof: Boolean) = ch match {
     case 'a' if eof => println("a with oef") // then branch
-    case 'c' =>
+    case 'c'        =>
   }
 
   def ifThenElse(ch: Char, eof: Boolean) = (ch: @switch) match {
@@ -20,7 +20,7 @@ object Test extends App {
 
   def defaultUnguarded(ch: Char, eof: Boolean) = ch match {
     case ' ' if eof => println("spacey oef")
-    case _ => println("default")
+    case _          => println("default")
   }
 
   def defaults(ch: Char, eof: Boolean) = (ch: @switch) match {
@@ -36,7 +36,7 @@ object Test extends App {
     try { println("") } // work around SI-6015
     catch {
       case _ if guard(null) =>
-      case x if guard(x) => throw x
+      case x if guard(x)    => throw x
     }
 
   // def unreachable(ch: Char) = (ch: @switch) match {

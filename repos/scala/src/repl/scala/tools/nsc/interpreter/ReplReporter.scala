@@ -15,7 +15,9 @@ import scala.reflect.internal.util.Position
   */
 class ReplReporter(intp: IMain)
     extends ConsoleReporter(
-        intp.settings, Console.in, new ReplStrippingWriter(intp)) {
+      intp.settings,
+      Console.in,
+      new ReplStrippingWriter(intp)) {
   def printUntruncatedMessage(msg: String) =
     withoutTruncating(printMessage(msg))
 
@@ -28,7 +30,8 @@ class ReplReporter(intp: IMain)
   def withoutTruncating[T](body: => T): T = {
     val saved = _truncationOK
     _truncationOK = false
-    try body finally _truncationOK = saved
+    try body
+    finally _truncationOK = saved
   }
 
   override def warning(pos: Position, msg: String): Unit =
@@ -39,9 +42,9 @@ class ReplReporter(intp: IMain)
   import scala.io.AnsiColor.{RED, YELLOW, RESET}
 
   def severityColor(severity: Severity): String = severity match {
-    case ERROR => RED
+    case ERROR   => RED
     case WARNING => YELLOW
-    case INFO => RESET
+    case INFO    => RESET
   }
 
   override def print(pos: Position, msg: String, severity: Severity) {

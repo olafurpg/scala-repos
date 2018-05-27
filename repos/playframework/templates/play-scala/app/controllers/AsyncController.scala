@@ -18,8 +18,8 @@ import scala.concurrent.duration._
   * asynchronous code.
   */
 @Singleton
-class AsyncController @Inject()(
-    actorSystem: ActorSystem)(implicit exec: ExecutionContext)
+class AsyncController @Inject()(actorSystem: ActorSystem)(
+    implicit exec: ExecutionContext)
     extends Controller {
 
   /**

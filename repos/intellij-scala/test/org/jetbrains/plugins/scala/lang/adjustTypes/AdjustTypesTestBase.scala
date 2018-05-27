@@ -32,28 +32,31 @@ abstract class AdjustTypesTestBase
     import _root_.junit.framework.Assert._
     val filePath = folderPath + getTestName(false) + ".scala"
     val file = LocalFileSystem.getInstance.refreshAndFindFileByPath(
-        filePath.replace(File.separatorChar, '/'))
+      filePath.replace(File.separatorChar, '/'))
     assert(file != null, "file " + filePath + " not found")
 
-    var fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(
-            new File(file.getCanonicalPath), CharsetToolkit.UTF8))
+    var fileText = StringUtil.convertLineSeparators(
+      FileUtil.loadFile(new File(file.getCanonicalPath), CharsetToolkit.UTF8))
 
     val startOffset = fileText.indexOf(startMarker)
     assert(
-        startOffset != -1,
-        "Not specified start marker in test case. Use /*start*/ in scala file for this.")
+      startOffset != -1,
+      "Not specified start marker in test case. Use /*start*/ in scala file for this.")
     fileText = fileText.replace(startMarker, "")
 
     val endOffset = fileText.indexOf(endMarker)
     assert(
-        endOffset != -1,
-        "Not specified end marker in test case. Use /*end*/ in scala file for this.")
+      endOffset != -1,
+      "Not specified end marker in test case. Use /*end*/ in scala file for this.")
     fileText = fileText.replace(endMarker, "")
 
     configureFromFileTextAdapter(getTestName(false) + ".scala", fileText)
     val scalaFile = getFileAdapter.asInstanceOf[ScalaFile]
     val element = PsiTreeUtil.findElementOfClassAtRange(
-        scalaFile, startOffset, endOffset, classOf[PsiElement])
+      scalaFile,
+      startOffset,
+      endOffset,
+      classOf[PsiElement])
 
     var res: String = null
     val lastPsi = scalaFile.findElementAt(scalaFile.getText.length - 1)
@@ -70,7 +73,8 @@ abstract class AdjustTypesTestBase
       case e: Exception =>
         println(e)
         assert(
-            assertion = false, message = e.getMessage + "\n" + e.getStackTrace)
+          assertion = false,
+          message = e.getMessage + "\n" + e.getStackTrace)
     }
 
     val text = lastPsi.getText

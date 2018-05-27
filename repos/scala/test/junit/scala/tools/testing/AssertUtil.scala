@@ -50,25 +50,27 @@ object AssertUtil {
     } catch {
       case e: Throwable
           if (manifest.runtimeClass isAssignableFrom e.getClass) &&
-          checkMessage(e.getMessage) =>
+            checkMessage(e.getMessage) =>
     }
   }
 
   /** JUnit-style assertion for `IterableLike.sameElements`.
     */
-  def assertSameElements[A, B >: A](expected: IterableLike[A, _],
-                                    actual: GenIterable[B],
-                                    message: String = ""): Unit =
+  def assertSameElements[A, B >: A](
+      expected: IterableLike[A, _],
+      actual: GenIterable[B],
+      message: String = ""): Unit =
     if (!(expected sameElements actual))
       fail(
-          f"${if (message.nonEmpty) s"$message " else ""}expected:<${stringOf(
-              expected)}> but was:<${stringOf(actual)}>"
+        f"${if (message.nonEmpty) s"$message " else ""}expected:<${stringOf(
+          expected)}> but was:<${stringOf(actual)}>"
       )
 
   /** Convenient for testing iterators.
     */
   def assertSameElements[A, B >: A](
-      expected: IterableLike[A, _], actual: Iterator[B]): Unit =
+      expected: IterableLike[A, _],
+      actual: Iterator[B]): Unit =
     assertSameElements(expected, actual.toList, "")
 
   /** Value is not strongly reachable from roots after body is evaluated.
@@ -83,8 +85,8 @@ object AssertUtil {
           seen.put(o, ())
           for {
             f <- o.getClass.allFields if !Modifier.isStatic(f.getModifiers)
-                if !f.getType.isPrimitive
-                if !classOf[Reference[_]].isAssignableFrom(f.getType)
+            if !f.getType.isPrimitive
+            if !classOf[Reference[_]].isAssignableFrom(f.getType)
           } loop(f follow o)
         }
       loop(root)

@@ -9,7 +9,9 @@ import slick.relational.{ResultConverter, CompiledMapping}
 trait JdbcInvokerComponent { self: JdbcProfile =>
 
   def createQueryInvoker[R](
-      tree: Node, param: Any, sql: String): QueryInvokerImpl[R] =
+      tree: Node,
+      param: Any,
+      sql: String): QueryInvokerImpl[R] =
     new QueryInvokerImpl[R](tree, param, sql)
 
   // Parameters for invokers -- can be overridden by profiles as needed
@@ -26,7 +28,9 @@ trait JdbcInvokerComponent { self: JdbcProfile =>
   class QueryInvokerImpl[R](tree: Node, param: Any, overrideSql: String)
       extends QueryInvoker[R] {
     protected[this] val ResultSetMapping(
-    _, compiled, CompiledMapping(_converter, _)) = tree
+      _,
+      compiled,
+      CompiledMapping(_converter, _)) = tree
     protected[this] val converter =
       _converter.asInstanceOf[ResultConverter[JdbcResultConverterDomain, R]]
     protected[this] val CompiledStatement(_, sres: SQLBuilder.Result, _) =
@@ -37,9 +41,10 @@ trait JdbcInvokerComponent { self: JdbcProfile =>
         case c: CompiledStatement => c
         case ParameterSwitch(cases, default) =>
           findCompiledStatement(
-              cases.find { case (f, n) => f(param) }
-                .map(_._2)
-                .getOrElse(default))
+            cases
+              .find { case (f, n) => f(param) }
+              .map(_._2)
+              .getOrElse(default))
       }
 
     protected def getStatement =

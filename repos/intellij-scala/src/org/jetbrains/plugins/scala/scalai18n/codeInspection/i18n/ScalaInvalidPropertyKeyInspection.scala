@@ -15,7 +15,10 @@ import com.intellij.openapi.util.{Comparing, Ref}
 import com.intellij.psi.{util => _, _}
 import org.jetbrains.annotations.{NotNull, Nullable}
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaRecursiveElementVisitor
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScInterpolatedStringLiteral, ScLiteral}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScInterpolatedStringLiteral,
+  ScLiteral
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 
 import scala.collection.mutable
@@ -31,7 +34,7 @@ class ScalaInvalidPropertyKeyInspection extends LocalInspectionTool {
 
   @NotNull override def getDisplayName: String = {
     CodeInsightBundle.message(
-        "inspection.unresolved.property.key.reference.name")
+      "inspection.unresolved.property.key.reference.name")
   }
 
   @NotNull override def getShortName: String = {
@@ -50,8 +53,8 @@ class ScalaInvalidPropertyKeyInspection extends LocalInspectionTool {
       @NotNull file: PsiFile,
       @NotNull manager: InspectionManager,
       isOnTheFly: Boolean): Array[ProblemDescriptor] = {
-    val visitor: UnresolvedPropertyVisitor = new UnresolvedPropertyVisitor(
-        manager, isOnTheFly)
+    val visitor: UnresolvedPropertyVisitor =
+      new UnresolvedPropertyVisitor(manager, isOnTheFly)
     file.accept(visitor)
     val problems: util.List[ProblemDescriptor] = visitor.getProblems
     if (problems.isEmpty) null
@@ -67,19 +70,21 @@ class ScalaInvalidPropertyKeyInspection extends LocalInspectionTool {
         @NotNull problems: util.List[ProblemDescriptor],
         onTheFly: Boolean) {
       val description: String = CodeInsightBundle.message(
-          "inspection.unresolved.property.key.reference.message", key)
+        "inspection.unresolved.property.key.reference.message",
+        key)
       problems.add(
-          manager.createProblemDescriptor(
-              expression,
-              description,
-              null: LocalQuickFix,
-              ProblemHighlightType.LIKE_UNKNOWN_SYMBOL,
-              onTheFly))
+        manager.createProblemDescriptor(
+          expression,
+          description,
+          null: LocalQuickFix,
+          ProblemHighlightType.LIKE_UNKNOWN_SYMBOL,
+          onTheFly))
     }
 
     @NotNull
-    def filterNotInLibrary(@NotNull project: Project,
-                           @NotNull propertiesFiles: util.List[PropertiesFile])
+    def filterNotInLibrary(
+        @NotNull project: Project,
+        @NotNull propertiesFiles: util.List[PropertiesFile])
       : util.List[PropertiesFile] = {
       val fileIndex: ProjectFileIndex =
         ProjectRootManager.getInstance(project).getFileIndex
@@ -98,7 +103,7 @@ class ScalaInvalidPropertyKeyInspection extends LocalInspectionTool {
     def isComputablePropertyExpression(myExpression: ScExpression): Boolean = {
       var expression = myExpression
       while (expression != null &&
-      expression.getParent.isInstanceOf[ScParenthesisedExpr]) {
+             expression.getParent.isInstanceOf[ScParenthesisedExpr]) {
         expression = expression.getParent.asInstanceOf[ScExpression]
       }
       expression != null && expression.getParent.isInstanceOf[ScExpression]
@@ -106,7 +111,8 @@ class ScalaInvalidPropertyKeyInspection extends LocalInspectionTool {
   }
 
   class UnresolvedPropertyVisitor(
-      myManager: InspectionManager, onTheFly: Boolean)
+      myManager: InspectionManager,
+      onTheFly: Boolean)
       extends ScalaRecursiveElementVisitor {
     override def visitLiteral(expression: ScLiteral) {
       if (expression.isInstanceOf[ScInterpolatedStringLiteral]) return
@@ -117,20 +123,23 @@ class ScalaInvalidPropertyKeyInspection extends LocalInspectionTool {
         return
       val resourceBundleName: Ref[String] = new Ref[String]
       if (!ScalaI18nUtil.isValidPropertyReference(
-              myManager.getProject, expression, key, resourceBundleName)) {
-        UnresolvedPropertyVisitor.appendPropertyKeyNotFoundProblem(
-            resourceBundleName.get,
-            key,
+            myManager.getProject,
             expression,
-            myManager,
-            myProblems,
-            onTheFly)
+            key,
+            resourceBundleName)) {
+        UnresolvedPropertyVisitor.appendPropertyKeyNotFoundProblem(
+          resourceBundleName.get,
+          key,
+          expression,
+          myManager,
+          myProblems,
+          onTheFly)
       } else {
         expression.getParent match {
           case nvp: ScNameValuePair =>
             if (Comparing.equal(
-                    nvp.getName,
-                    AnnotationUtil.PROPERTY_KEY_RESOURCE_BUNDLE_PARAMETER)) {
+                  nvp.getName,
+                  AnnotationUtil.PROPERTY_KEY_RESOURCE_BUNDLE_PARAMETER)) {
               val manager: PropertiesReferenceManager =
                 PropertiesReferenceManager.getInstance(expression.getProject)
               val module: Module =
@@ -140,14 +149,15 @@ class ScalaInvalidPropertyKeyInspection extends LocalInspectionTool {
                   manager.findPropertiesFiles(module, key)
                 if (propFiles.isEmpty) {
                   val description: String = CodeInsightBundle.message(
-                      "inspection.invalid.resource.bundle.reference", key)
+                    "inspection.invalid.resource.bundle.reference",
+                    key)
                   val problem: ProblemDescriptor =
                     myManager.createProblemDescriptor(
-                        expression,
-                        description,
-                        null.asInstanceOf[LocalQuickFix],
-                        ProblemHighlightType.LIKE_UNKNOWN_SYMBOL,
-                        onTheFly)
+                      expression,
+                      description,
+                      null.asInstanceOf[LocalQuickFix],
+                      ProblemHighlightType.LIKE_UNKNOWN_SYMBOL,
+                      onTheFly)
                   myProblems.add(problem)
                 }
               }
@@ -156,9 +166,12 @@ class ScalaInvalidPropertyKeyInspection extends LocalInspectionTool {
               if expression.getParent.getParent.isInstanceOf[ScMethodCall] =>
             val annotationParams = new mutable.HashMap[String, AnyRef]
             annotationParams.put(
-                AnnotationUtil.PROPERTY_KEY_RESOURCE_BUNDLE_PARAMETER, null)
+              AnnotationUtil.PROPERTY_KEY_RESOURCE_BUNDLE_PARAMETER,
+              null)
             if (!ScalaI18nUtil.mustBePropertyKey(
-                    myManager.getProject, expression, annotationParams)) return
+                  myManager.getProject,
+                  expression,
+                  annotationParams)) return
             val paramsCount: java.lang.Integer =
               ScalaI18nUtil.getPropertyValueParamsMaxCount(expression)
             if (paramsCount == -1) return
@@ -177,18 +190,19 @@ class ScalaInvalidPropertyKeyInspection extends LocalInspectionTool {
                         val parameters = method.getParameterList.getParameters
                         if (i + paramsCount >= args.length && method != null &&
                             method.getParameterList.getParametersCount == i +
-                            2 && parameters(i + 1).isVarArgs) {
+                              2 && parameters(i + 1).isVarArgs) {
                           myProblems.add(
-                              myManager.createProblemDescriptor(
-                                  methodCall,
-                                  CodeInsightBundle.message(
-                                      "property.has.more.parameters.than.passed",
-                                      key,
-                                      paramsCount,
-                                      param),
-                                  onTheFly,
-                                  new Array[LocalQuickFix](0),
-                                  ProblemHighlightType.GENERIC_ERROR))
+                            myManager.createProblemDescriptor(
+                              methodCall,
+                              CodeInsightBundle.message(
+                                "property.has.more.parameters.than.passed",
+                                key,
+                                paramsCount,
+                                param),
+                              onTheFly,
+                              new Array[LocalQuickFix](0),
+                              ProblemHighlightType.GENERIC_ERROR
+                            ))
                         }
                         flag = false
                       }

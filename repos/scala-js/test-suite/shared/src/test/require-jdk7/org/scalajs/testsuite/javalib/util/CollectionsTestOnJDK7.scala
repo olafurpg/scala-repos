@@ -26,7 +26,7 @@ class CollectionsTestOnJDK7 {
   }
 
   @Test def should_implement_emptyListIterator(): Unit = {
-    def test[E : ClassTag](toElem: Int => E): Unit = {
+    def test[E: ClassTag](toElem: Int => E): Unit = {
       def freshIter: ju.ListIterator[E] = ju.Collections.emptyListIterator[E]
 
       assertFalse(freshIter.hasNext)
@@ -35,7 +35,8 @@ class CollectionsTestOnJDK7 {
       expectThrows(classOf[NoSuchElementException], freshIter.previous())
       expectThrows(classOf[IllegalStateException], freshIter.remove())
       expectThrows(
-          classOf[UnsupportedOperationException], freshIter.add(toElem(0)))
+        classOf[UnsupportedOperationException],
+        freshIter.add(toElem(0)))
       expectThrows(classOf[IllegalStateException], freshIter.set(toElem(0)))
     }
 

@@ -79,10 +79,9 @@ class IndexSpec extends AkkaSpec with Matchers with DefaultTimeout {
       val index = indexWithValues
 
       var valueCount = 0
-      index.foreach((key, value) ⇒
-            {
-          valueCount = valueCount + 1
-          index.findValue(key)(_ == value) should ===(Some(value))
+      index.foreach((key, value) ⇒ {
+        valueCount = valueCount + 1
+        index.findValue(key)(_ == value) should ===(Some(value))
       })
       valueCount should ===(6)
     }
@@ -98,8 +97,8 @@ class IndexSpec extends AkkaSpec with Matchers with DefaultTimeout {
       val nrOfKeys = 10
       val nrOfValues = 10
       //Fill index
-      for (key ← 0 until nrOfKeys; value ← 0 until nrOfValues) index.put(key,
-                                                                         value)
+      for (key ← 0 until nrOfKeys; value ← 0 until nrOfValues)
+        index.put(key, value)
       //Tasks to be executed in parallel
       def putTask() = Future {
         index.put(Random.nextInt(nrOfKeys), Random.nextInt(nrOfValues))

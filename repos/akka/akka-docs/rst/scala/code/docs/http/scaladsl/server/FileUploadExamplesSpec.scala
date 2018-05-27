@@ -47,9 +47,11 @@ class FileUploadExamplesSpec extends RoutingSpec {
 
         val done = allPartsF.map { allParts =>
           // You would have some better validation/unmarshalling here
-          db.create(Video(file = allParts("file").asInstanceOf[File],
-                          title = allParts("title").asInstanceOf[String],
-                          author = allParts("author").asInstanceOf[String]))
+          db.create(
+            Video(
+              file = allParts("file").asInstanceOf[File],
+              title = allParts("title").asInstanceOf[String],
+              author = allParts("author").asInstanceOf[String]))
         }
 
         // when processing have finished create a response for the user
@@ -78,8 +80,7 @@ class FileUploadExamplesSpec extends RoutingSpec {
               b.entity.dataBytes
                 .via(splitLines)
                 .map(_.utf8String.split(",").toVector)
-                .runForeach(csv =>
-                      metadataActor ! MetadataActor.Entry(id, csv))
+                .runForeach(csv => metadataActor ! MetadataActor.Entry(id, csv))
             case _ => Future.successful(Done)
           }
           .runWith(Sink.ignore)

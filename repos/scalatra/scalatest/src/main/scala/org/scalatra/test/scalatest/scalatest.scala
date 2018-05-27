@@ -11,7 +11,10 @@ import org.scalatest.testng.TestNGSuite
   * is started before the first test in the suite and stopped after the last.
   */
 trait ScalatraSuite
-    extends Suite with ScalatraTests with BeforeAndAfterAll with Matchers {
+    extends Suite
+    with ScalatraTests
+    with BeforeAndAfterAll
+    with Matchers {
   override protected def beforeAll(): Unit = start()
   override protected def afterAll(): Unit = stop()
 }

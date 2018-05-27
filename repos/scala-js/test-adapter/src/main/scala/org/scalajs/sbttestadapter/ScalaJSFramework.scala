@@ -21,8 +21,7 @@ final class ScalaJSFramework(
     private[testadapter] val libEnv: ComJSEnv,
     private[testadapter] val logger: Logger,
     private[testadapter] val jsConsole: JSConsole
-)
-    extends Framework {
+) extends Framework {
 
   private[this] val frameworkInfo = fetchFrameworkInfo()
 
@@ -32,13 +31,14 @@ final class ScalaJSFramework(
 
   def fingerprints: Array[Fingerprint] = frameworkInfo.fingerprints.toArray
 
-  def runner(args: Array[String],
-             remoteArgs: Array[String],
-             testClassLoader: ClassLoader): Runner = synchronized {
+  def runner(
+      args: Array[String],
+      remoteArgs: Array[String],
+      testClassLoader: ClassLoader): Runner = synchronized {
 
     if (_isRunning) {
       throw new IllegalStateException(
-          "Scala.js test frameworks do not support concurrent runs")
+        "Scala.js test frameworks do not support concurrent runs")
     }
 
     _isRunning = true

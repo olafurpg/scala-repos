@@ -38,11 +38,12 @@ trait OAuth2Credentials {
   * the user as a [[akka.http.javadsl.server.RequestVal]].
   */
 abstract class OAuth2Authenticator[T](val realm: String)
-    extends AbstractDirective with ExtractionImplBase[T] with RequestVal[T] {
+    extends AbstractDirective
+    with ExtractionImplBase[T]
+    with RequestVal[T] {
   protected[http] implicit def classTag: ClassTag[T] =
     reflect.classTag[AnyRef].asInstanceOf[ClassTag[T]]
-  def authenticate(
-      credentials: OAuth2Credentials): CompletionStage[Optional[T]]
+  def authenticate(credentials: OAuth2Credentials): CompletionStage[Optional[T]]
 
   /**
     * Creates a return value for use in [[#authenticate]] that successfully authenticates the requests and provides
@@ -61,6 +62,7 @@ abstract class OAuth2Authenticator[T](val realm: String)
     * INTERNAL API
     */
   protected[http] final def createRoute(
-      first: Route, others: Array[Route]): Route =
+      first: Route,
+      others: Array[Route]): Route =
     RouteStructure.OAuth2Authentication(this)(first, others.toList)
 }

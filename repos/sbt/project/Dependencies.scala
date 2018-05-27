@@ -66,7 +66,7 @@ object Dependencies {
     Def.setting {
       scalaVersion.value match {
         case sv if (sv startsWith "2.9.") || (sv startsWith "2.10.") => Nil
-        case _ => ("org.scala-lang.modules" %% name % moduleVersion) :: Nil
+        case _                                                       => ("org.scala-lang.modules" %% name % moduleVersion) :: Nil
       }
     }
   lazy val scalaXml = scala211Module("scala-xml", "1.0.1")
@@ -107,10 +107,11 @@ object Dependencies {
   val mvnWagonFile = "org.apache.maven.wagon" % "wagon-file" % mvnWagonVersion
    */
   def aetherLibs =
-    Seq(guava,
-        javaxInject,
-        sisuPlexus,
-        aetherImpl,
-        aetherConnectorBasic,
-        mvnAether)
+    Seq(
+      guava,
+      javaxInject,
+      sisuPlexus,
+      aetherImpl,
+      aetherConnectorBasic,
+      mvnAether)
 }

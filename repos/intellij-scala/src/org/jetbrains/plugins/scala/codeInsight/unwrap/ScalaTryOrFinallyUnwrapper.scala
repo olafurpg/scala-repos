@@ -5,7 +5,11 @@ import java.util
 
 import com.intellij.codeInsight.CodeInsightBundle
 import com.intellij.psi.PsiElement
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScFinallyBlock, ScTryBlock, ScTryStmt}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScFinallyBlock,
+  ScTryBlock,
+  ScTryStmt
+}
 
 /**
   * Nikolay.Tropin
@@ -13,9 +17,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScFinallyBlock, ScTryBlock
   */
 class ScalaTryOrFinallyUnwrapper extends ScalaUnwrapper {
   override def isApplicableTo(e: PsiElement) = e match {
-    case _: ScTryBlock => true
+    case _: ScTryBlock                                   => true
     case fBl: ScFinallyBlock if fBl.expression.isDefined => true
-    case _ => false
+    case _                                               => false
   }
 
   override def doUnwrap(element: PsiElement, context: ScalaUnwrapContext) =
@@ -31,13 +35,14 @@ class ScalaTryOrFinallyUnwrapper extends ScalaUnwrapper {
     }
 
   override def getDescription(e: PsiElement) = e match {
-    case _: ScTryBlock => CodeInsightBundle.message("unwrap.try")
+    case _: ScTryBlock     => CodeInsightBundle.message("unwrap.try")
     case _: ScFinallyBlock => ScalaBundle.message("unwrap.finally")
-    case _ => ""
+    case _                 => ""
   }
 
   override def collectAffectedElements(
-      e: PsiElement, toExtract: util.List[PsiElement]) = e.getParent match {
+      e: PsiElement,
+      toExtract: util.List[PsiElement]) = e.getParent match {
     case _: ScTryStmt =>
       super.collectAffectedElements(e, toExtract)
       e

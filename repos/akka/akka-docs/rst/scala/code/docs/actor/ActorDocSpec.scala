@@ -27,7 +27,7 @@ class MyActor extends Actor {
 
   def receive = {
     case "test" => log.info("received test")
-    case _ => log.info("received unknown message")
+    case _      => log.info("received unknown message")
   }
 }
 //#my-actor
@@ -95,7 +95,7 @@ class ActorWithMessagesWrapper {
     import MyActor._
     def receive = {
       case Greeting(greeter) => log.info(s"I was greeted by $greeter.")
-      case Goodbye => log.info("Someone said goodbye to me.")
+      case Goodbye           => log.info("Someone said goodbye to me.")
     }
   }
   //#messages-in-companion
@@ -247,7 +247,9 @@ class Consumer extends Actor with ActorLogging with ConsumerBehavior {
 }
 
 class ProducerConsumer
-    extends Actor with ActorLogging with ProducerBehavior
+    extends Actor
+    with ActorLogging
+    with ProducerBehavior
     with ConsumerBehavior {
 
   def receive = producerBehavior.orElse[Any, Unit](consumerBehavior)
@@ -290,7 +292,7 @@ class ActorDocSpec extends AkkaSpec("""
     // TODO: convert docs to AkkaSpec(Map(...))
     val filter = EventFilter.custom {
       case e: Logging.Info => true
-      case _ => false
+      case _               => false
     }
     system.eventStream.publish(TestEvent.Mute(filter))
     system.eventStream.subscribe(testActor, classOf[Logging.Info])
@@ -367,8 +369,8 @@ class ActorDocSpec extends AkkaSpec("""
       }
 
       val actorRef = system.actorOf(
-          Props(classOf[DependencyInjector], applicationContext, "hello"),
-          "helloBean")
+        Props(classOf[DependencyInjector], applicationContext, "hello"),
+        "helloBean")
       //#creating-indirectly
     }
     val actorRef = {
@@ -614,12 +616,13 @@ class ActorDocSpec extends AkkaSpec("""
 
   "using ActorDSL outside of akka.actor package" in {
     import akka.actor.ActorDSL._
-    actor(
-        new Act {
-      superviseWith(
-          OneForOneStrategy() { case _ => Stop; Restart; Resume; Escalate })
-      superviseWith(
-          AllForOneStrategy() { case _ => Stop; Restart; Resume; Escalate })
+    actor(new Act {
+      superviseWith(OneForOneStrategy() {
+        case _ => Stop; Restart; Resume; Escalate
+      })
+      superviseWith(AllForOneStrategy() {
+        case _ => Stop; Restart; Resume; Escalate
+      })
     })
   }
 }

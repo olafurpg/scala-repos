@@ -2,7 +2,8 @@ import org.scalacheck._, Prop._, Gen._, Arbitrary._
 import scala.reflect.runtime.universe._, Flag._, internal.reificationSupport._
 
 object TypecheckedProps
-    extends QuasiquoteProperties("typechecked") with TypecheckedTypes {
+    extends QuasiquoteProperties("typechecked")
+    with TypecheckedTypes {
   property("tuple term") = test {
     val q"(..$elements)" = typecheck(q"(1, 2)")
     assert(elements ≈ List(q"1", q"2"))
@@ -52,7 +53,7 @@ object TypecheckedProps
         new Cell(0) match { case Cell(v) => v }
       }
     """)
-    val q"$_ match { case ${ f: TypeTree }(..$args) => $_ }" = m
+    val q"$_ match { case ${f: TypeTree}(..$args) => $_ }" = m
     assert(f.original ≈ pq"Test.this.Cell")
     assert(args ≈ List(pq"v"))
   }
@@ -60,8 +61,8 @@ object TypecheckedProps
   property("extract inferred val type") = test {
     val typechecked = typecheck(q"val x = 42")
     val q"val x = 42" = typechecked
-    val q"val x: ${ tq"" } = 42" = typechecked
-    val q"val x: ${ t: Type } = 42" = typechecked
+    val q"val x: ${tq""} = 42" = typechecked
+    val q"val x: ${t: Type} = 42" = typechecked
   }
 
   property("class with param (1)") = test {
@@ -84,9 +85,9 @@ object TypecheckedProps
     val pName1 = TermName("x1")
     val pName2 = TermName("x2")
     val q"{class $_($param1)(..$params2)}" = typecheck(
-        q"class Test(val x0: Float)(val $pName1: Int = 3, $pName2: String)")
+      q"class Test(val x0: Float)(val $pName1: Int = 3, $pName2: String)")
 
-    val List(p1, p2, _ *) = params2
+    val List(p1, p2, _*) = params2
 
     assert(p1.name == pName1)
     assert(p2.name == pName2)
@@ -165,7 +166,7 @@ trait TypecheckedTypes { self: QuasiquoteProperties =>
 
   property("super type select") = test {
     val q"$_; class $_ extends $_ { type $_ = $tpt }" = typecheck(
-        q"class C1 { type A = Int }; class C2 extends C1 { type B = super[C1].A }")
+      q"class C1 { type A = Int }; class C2 extends C1 { type B = super[C1].A }")
     val tq"$empty.super[$c1].$a" = tpt
     val TypeName("") = empty
     val TypeName("C1") = c1

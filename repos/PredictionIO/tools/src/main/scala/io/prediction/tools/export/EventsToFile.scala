@@ -25,14 +25,15 @@ import grizzled.slf4j.Logging
 import org.apache.spark.sql.SQLContext
 import org.json4s.native.Serialization._
 
-case class EventsToFileArgs(env: String = "",
-                            logFile: String = "",
-                            appId: Int = 0,
-                            channel: Option[String] = None,
-                            outputPath: String = "",
-                            format: String = "parquet",
-                            verbose: Boolean = false,
-                            debug: Boolean = false)
+case class EventsToFileArgs(
+    env: String = "",
+    logFile: String = "",
+    appId: Int = 0,
+    channel: Option[String] = None,
+    outputPath: String = "",
+    format: String = "parquet",
+    verbose: Boolean = false,
+    debug: Boolean = false)
 
 object EventsToFile extends Logging {
   def main(args: Array[String]): Unit = {
@@ -82,9 +83,10 @@ object EventsToFile extends Logging {
       WorkflowUtils.modifyLogging(verbose = args.verbose)
       @transient lazy implicit val formats =
         Utils.json4sDefaultFormats + new EventJson4sSupport.APISerializer
-      val sc = WorkflowContext(mode = "Export",
-                               batch = "App ID " + args.appId + channelStr,
-                               executorEnv = Runner.envStringToMap(args.env))
+      val sc = WorkflowContext(
+        mode = "Export",
+        batch = "App ID " + args.appId + channelStr,
+        executorEnv = Runner.envStringToMap(args.env))
       val sqlContext = new SQLContext(sc)
       val events = Storage.getPEvents()
       val eventsRdd =

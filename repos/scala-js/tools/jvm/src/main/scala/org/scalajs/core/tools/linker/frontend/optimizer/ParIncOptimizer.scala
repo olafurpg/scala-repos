@@ -20,7 +20,9 @@ import org.scalajs.core.tools.javascript.ESLevel
 import ConcurrencyUtils._
 
 final class ParIncOptimizer(
-    semantics: Semantics, esLevel: ESLevel, considerPositions: Boolean)
+    semantics: Semantics,
+    esLevel: ESLevel,
+    considerPositions: Boolean)
     extends GenIncOptimizer(semantics, esLevel, considerPositions) {
 
   private[optimizer] object CollOps extends GenIncOptimizer.AbsCollOps {
@@ -77,7 +79,8 @@ final class ParIncOptimizer(
     methodsToProcess += method
 
   private[optimizer] def newMethodImpl(
-      owner: MethodContainer, encodedName: String): MethodImpl =
+      owner: MethodContainer,
+      encodedName: String): MethodImpl =
     new ParMethodImpl(owner, encodedName)
 
   private[optimizer] def processAllTaggedMethods(): Unit = {

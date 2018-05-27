@@ -14,8 +14,8 @@ import com.intellij.util.containers.WeakHashMap
 object ScalaConsoleInfo {
   private val NULL = (null, null, null)
   private val allConsoles = new WeakHashMap[
-      Project,
-      List[(ScalaLanguageConsole, ConsoleHistoryController, ProcessHandler)]]()
+    Project,
+    List[(ScalaLanguageConsole, ConsoleHistoryController, ProcessHandler)]]()
 
   def getConsole(file: PsiFile): ScalaLanguageConsole = get(file)._1
   def getConsole(project: Project): ScalaLanguageConsole = get(project)._1
@@ -26,16 +26,17 @@ object ScalaConsoleInfo {
   def getController(editor: Editor): ConsoleHistoryController = get(editor)._2
   def getProcessHandler(editor: Editor): ProcessHandler = get(editor)._3
 
-  def addConsole(console: ScalaLanguageConsole,
-                 model: ConsoleHistoryController,
-                 processHandler: ProcessHandler) {
+  def addConsole(
+      console: ScalaLanguageConsole,
+      model: ConsoleHistoryController,
+      processHandler: ProcessHandler) {
     val project = console.getProject
     synchronized {
       allConsoles.get(project) match {
         case null =>
           allConsoles.put(project, (console, model, processHandler) :: Nil)
-        case list: List[
-                (ScalaLanguageConsole, ConsoleHistoryController, ProcessHandler)] =>
+        case list: List[(ScalaLanguageConsole, ConsoleHistoryController,
+            ProcessHandler)] =>
           allConsoles.put(project, (console, model, processHandler) :: list)
       }
     }
@@ -46,8 +47,8 @@ object ScalaConsoleInfo {
     synchronized {
       allConsoles.get(project) match {
         case null =>
-        case list: List[
-                (ScalaLanguageConsole, ConsoleHistoryController, ProcessHandler)] =>
+        case list: List[(ScalaLanguageConsole, ConsoleHistoryController,
+            ProcessHandler)] =>
           allConsoles.put(project, list.filter {
             case (sConsole, _, _) => sConsole != console
           })
@@ -71,13 +72,14 @@ object ScalaConsoleInfo {
         case null => NULL
         case list =>
           list.find {
-            case (console: ScalaLanguageConsole,
-                  model: ConsoleHistoryController,
-                  handler: ProcessHandler) =>
+            case (
+                console: ScalaLanguageConsole,
+                model: ConsoleHistoryController,
+                handler: ProcessHandler) =>
               console.getConsoleEditor == editor
           } match {
             case Some(res) => res
-            case _ => NULL
+            case _         => NULL
           }
       }
     }
@@ -89,13 +91,14 @@ object ScalaConsoleInfo {
         case null => NULL
         case list =>
           list.find {
-            case (console: ScalaLanguageConsole,
-                  model: ConsoleHistoryController,
-                  handler: ProcessHandler) =>
+            case (
+                console: ScalaLanguageConsole,
+                model: ConsoleHistoryController,
+                handler: ProcessHandler) =>
               console.getFile == file
           } match {
             case Some(res) => res
-            case _ => NULL
+            case _         => NULL
           }
       }
     }

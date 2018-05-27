@@ -40,7 +40,7 @@ object StreamsStressTest extends App {
   def run1: Unit = {
     val sub = env.newManualSubscriber(createPublisher(1L))
     sub.requestNextElementOrEndOfStream(
-        "Timeout while waiting for next element from Publisher")
+      "Timeout while waiting for next element from Publisher")
     sub.requestEndOfStream()
   }
 

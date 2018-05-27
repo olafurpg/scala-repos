@@ -30,8 +30,9 @@ final class NodeOps(val tree: Node) extends AnyVal {
   import Util._
   import NodeOps._
 
-  def collect[T](pf: PartialFunction[Node, T],
-                 stopOnMatch: Boolean = false): ConstArray[T] = {
+  def collect[T](
+      pf: PartialFunction[Node, T],
+      stopOnMatch: Boolean = false): ConstArray[T] = {
     val retNull: (Node => T) = (_ => null.asInstanceOf[T])
     val b = ConstArray.newBuilder[T]()
     def f(n: Node): Unit = {
@@ -48,9 +49,10 @@ final class NodeOps(val tree: Node) extends AnyVal {
   def collectAll[T](pf: PartialFunction[Node, ConstArray[T]]): ConstArray[T] =
     collect[ConstArray[T]](pf).flatten
 
-  def replace(f: PartialFunction[Node, Node],
-              keepType: Boolean = false,
-              bottomUp: Boolean = false): Node = {
+  def replace(
+      f: PartialFunction[Node, Node],
+      keepType: Boolean = false,
+      bottomUp: Boolean = false): Node = {
     if (bottomUp) {
       def r(n: Node): Node = f.applyOrElse(g(n), identity[Node])
       def g(n: Node): Node = n.mapChildren(r, keepType)
@@ -109,6 +111,6 @@ final class NodeOps(val tree: Node) extends AnyVal {
     case (s: FieldSymbol, StructNode(ch)) =>
       ch.find { case (s2, _) => s == s2 }.get._2
     case (s: ElementSymbol, ProductNode(ch)) => ch(s.idx - 1)
-    case (s, n) => Select(n, s)
+    case (s, n)                              => Select(n, s)
   }
 }

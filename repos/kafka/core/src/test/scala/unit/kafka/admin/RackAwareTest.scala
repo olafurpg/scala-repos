@@ -21,45 +21,49 @@ import org.junit.Assert._
 
 trait RackAwareTest {
 
-  def checkReplicaDistribution(assignment: Map[Int, Seq[Int]],
-                               brokerRackMapping: Map[Int, String],
-                               numBrokers: Int,
-                               numPartitions: Int,
-                               replicationFactor: Int,
-                               verifyRackAware: Boolean = true,
-                               verifyLeaderDistribution: Boolean = true,
-                               verifyReplicasDistribution: Boolean = true) {
+  def checkReplicaDistribution(
+      assignment: Map[Int, Seq[Int]],
+      brokerRackMapping: Map[Int, String],
+      numBrokers: Int,
+      numPartitions: Int,
+      replicationFactor: Int,
+      verifyRackAware: Boolean = true,
+      verifyLeaderDistribution: Boolean = true,
+      verifyReplicasDistribution: Boolean = true) {
     // always verify that no broker will be assigned for more than one replica
     for ((_, brokerList) <- assignment) {
       assertEquals(
-          "More than one replica is assigned to same broker for the same partition",
-          brokerList.toSet.size,
-          brokerList.size)
+        "More than one replica is assigned to same broker for the same partition",
+        brokerList.toSet.size,
+        brokerList.size)
     }
     val distribution = getReplicaDistribution(assignment, brokerRackMapping)
 
     if (verifyRackAware) {
       val partitionRackMap = distribution.partitionRacks
       assertEquals(
-          "More than one replica of the same partition is assigned to the same rack",
-          List.fill(numPartitions)(replicationFactor),
-          partitionRackMap.values.toList.map(_.distinct.size))
+        "More than one replica of the same partition is assigned to the same rack",
+        List.fill(numPartitions)(replicationFactor),
+        partitionRackMap.values.toList.map(_.distinct.size)
+      )
     }
 
     if (verifyLeaderDistribution) {
       val leaderCount = distribution.brokerLeaderCount
       val leaderCountPerBroker = numPartitions / numBrokers
-      assertEquals("Preferred leader count is not even for brokers",
-                   List.fill(numBrokers)(leaderCountPerBroker),
-                   leaderCount.values.toList)
+      assertEquals(
+        "Preferred leader count is not even for brokers",
+        List.fill(numBrokers)(leaderCountPerBroker),
+        leaderCount.values.toList)
     }
 
     if (verifyReplicasDistribution) {
       val replicasCount = distribution.brokerReplicasCount
       val numReplicasPerBroker = numPartitions * replicationFactor / numBrokers
-      assertEquals("Replica count is not even for broker",
-                   List.fill(numBrokers)(numReplicasPerBroker),
-                   replicasCount.values.toList)
+      assertEquals(
+        "Replica count is not even for broker",
+        List.fill(numBrokers)(numReplicasPerBroker),
+        replicasCount.values.toList)
     }
   }
 
@@ -76,11 +80,11 @@ trait RackAwareTest {
         for (brokerId <- replicaList) {
           partitionCount(brokerId) = partitionCount.getOrElse(brokerId, 0) + 1
           val rack = brokerRackMapping.getOrElse(
-              brokerId,
-              sys.error(
-                  s"No mapping found for $brokerId in `brokerRackMapping`"))
+            brokerId,
+            sys.error(s"No mapping found for $brokerId in `brokerRackMapping`"))
           partitionRackMap(partitionId) = rack :: partitionRackMap.getOrElse(
-              partitionId, List())
+            partitionId,
+            List())
         }
     }
     ReplicaDistributions(partitionRackMap, leaderCount, partitionCount)
@@ -92,11 +96,14 @@ trait RackAwareTest {
     rackMap.toSeq.map {
       case (brokerId, rack) =>
         BrokerMetadata(brokerId, Some(rack))
-    } ++ brokersWithoutRack.map { brokerId =>
-      BrokerMetadata(brokerId, None)
-    }.sortBy(_.id)
+    } ++ brokersWithoutRack
+      .map { brokerId =>
+        BrokerMetadata(brokerId, None)
+      }
+      .sortBy(_.id)
 }
 
-case class ReplicaDistributions(partitionRacks: Map[Int, Seq[String]],
-                                brokerLeaderCount: Map[Int, Int],
-                                brokerReplicasCount: Map[Int, Int])
+case class ReplicaDistributions(
+    partitionRacks: Map[Int, Seq[String]],
+    brokerLeaderCount: Map[Int, Int],
+    brokerReplicasCount: Map[Int, Int])

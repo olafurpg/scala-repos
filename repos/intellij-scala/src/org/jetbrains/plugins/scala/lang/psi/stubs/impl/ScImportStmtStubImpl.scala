@@ -16,19 +16,22 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.ScImportStmt
 class ScImportStmtStubImpl[ParentPsi <: PsiElement](
     parent: StubElement[ParentPsi],
     elemType: IStubElementType[
-        _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
+      _ <: StubElement[_ <: PsiElement],
+      _ <: PsiElement])
     extends StubBaseWrapper[ScImportStmt](parent, elemType)
     with ScImportStmtStub {
   private var importText: StringRef = _
 
-  def this(parent: StubElement[ParentPsi],
-           elemType: IStubElementType[
-               _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
-           importText: String) {
+  def this(
+      parent: StubElement[ParentPsi],
+      elemType: IStubElementType[
+        _ <: StubElement[_ <: PsiElement],
+        _ <: PsiElement],
+      importText: String) {
     this(
-        parent,
-        elemType
-          .asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
+      parent,
+      elemType
+        .asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
     this.importText = StringRef.fromString(importText)
   }
 

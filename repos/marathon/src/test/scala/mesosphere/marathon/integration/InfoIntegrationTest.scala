@@ -4,8 +4,10 @@ import mesosphere.marathon.integration.setup._
 import org.scalatest.{GivenWhenThen, Matchers}
 
 class InfoIntegrationTest
-    extends IntegrationFunSuite with SingleMarathonIntegrationTest
-    with GivenWhenThen with Matchers {
+    extends IntegrationFunSuite
+    with SingleMarathonIntegrationTest
+    with GivenWhenThen
+    with Matchers {
   test("v2/info returns the right values") {
     When("fetching the info")
     val response = marathon.info
@@ -17,7 +19,7 @@ class InfoIntegrationTest
 
     And("the http port should be correct")
     (info \ "http_config" \ "http_port").as[Int] should be(
-        config.marathonBasePort)
+      config.marathonBasePort)
 
     And("the ZooKeeper info should be correct")
     (info \ "zookeeper_config" \ "zk").as[String] should be(config.zk)
@@ -34,7 +36,7 @@ class InfoIntegrationTest
       .get
       .value
       .replace("http://", "")
-      (info \ "leader").as[String] should be(headerLeader)
+    (info \ "leader").as[String] should be(headerLeader)
 
     And("the leader should match the value returned by /v2/leader")
     (info \ "leader").as[String] should be(marathon.leader().value.leader)

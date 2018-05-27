@@ -14,6 +14,6 @@ class ScalaExtractTraitAction extends ExtractSuperActionBase {
   override def getRefactoringHandler(provider: RefactoringSupportProvider) =
     provider match {
       case _: ScalaRefactoringSupportProvider => new ScalaExtractTraitHandler
-      case _ => null
+      case _                                  => null
     }
 }

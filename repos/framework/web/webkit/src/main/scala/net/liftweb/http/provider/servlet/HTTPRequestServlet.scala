@@ -29,7 +29,8 @@ import net.liftweb.util._
 import Helpers._
 
 class HTTPRequestServlet(
-    val req: HttpServletRequest, val provider: HTTPProvider)
+    val req: HttpServletRequest,
+    val provider: HTTPProvider)
     extends HTTPRequest {
   private lazy val ctx = {
     new HTTPServletContext(req.getSession.getServletContext)
@@ -38,14 +39,16 @@ class HTTPRequestServlet(
   lazy val cookies: List[HTTPCookie] = {
     req.getSession(false) // do this to make sure we capture the JSESSIONID cookie
     (Box !! req.getCookies).map(
-        _.toList.map(c =>
-              HTTPCookie(c.getName,
-                         Box !! (c.getValue),
-                         Box !! (c.getDomain),
-                         Box !! (c.getPath),
-                         Box !! (c.getMaxAge),
-                         Box !! (c.getVersion),
-                         Box !! (c.getSecure)))) openOr Nil
+      _.toList.map(
+        c =>
+          HTTPCookie(
+            c.getName,
+            Box !! (c.getValue),
+            Box !! (c.getDomain),
+            Box !! (c.getPath),
+            Box !! (c.getMaxAge),
+            Box !! (c.getVersion),
+            Box !! (c.getSecure)))) openOr Nil
   }
 
   lazy val authType: Box[String] = Box !! req.getAuthType
@@ -84,11 +87,11 @@ class HTTPRequestServlet(
 
   def param(name: String): List[String] = req.getParameterValues(name) match {
     case null => Nil
-    case x => x.toList
+    case x    => x.toList
   }
 
   lazy val params: List[HTTPParam] = enumToList[String](
-      req.getParameterNames.asInstanceOf[java.util.Enumeration[String]])
+    req.getParameterNames.asInstanceOf[java.util.Enumeration[String]])
     .map(n => HTTPParam(n, param(n)))
 
   lazy val paramNames: List[String] = params map (_.name)
@@ -100,7 +103,7 @@ class HTTPRequestServlet(
     */
   lazy val userAgent: Box[String] =
     headers find (_.name equalsIgnoreCase "user-agent") flatMap
-    (_.values.headOption)
+      (_.values.headOption)
 
   def remotePort: Int = req.getRemotePort
 
@@ -142,10 +145,10 @@ class HTTPRequestServlet(
   def extractFiles: List[ParamHolder] =
     (new Iterator[ParamHolder] {
       val mimeUpload = (new ServletFileUpload)
-      mimeUpload.setProgressListener(
-          new ProgressListener {
+      mimeUpload.setProgressListener(new ProgressListener {
         lazy val progList: (Long, Long, Int) => Unit =
-          S.session.flatMap(_.progressListener) openOr LiftRules.progressListener
+          S.session
+            .flatMap(_.progressListener) openOr LiftRules.progressListener
 
         def update(a: Long, b: Long, c: Int) { progList(a, b, c) }
       })
@@ -160,28 +163,33 @@ class HTTPRequestServlet(
 
       def next = what.next match {
         case f if (f.isFormField) =>
-          NormalParamHolder(f.getFieldName,
-                            new String(readWholeStream(f.openStream), "UTF-8"))
+          NormalParamHolder(
+            f.getFieldName,
+            new String(readWholeStream(f.openStream), "UTF-8"))
         case f => {
-            val headers = f.getHeaders()
-            val names: List[String] =
-              if (headers eq null) Nil
-              else
-                headers
-                  .getHeaderNames()
+          val headers = f.getHeaders()
+          val names: List[String] =
+            if (headers eq null) Nil
+            else
+              headers
+                .getHeaderNames()
+                .asInstanceOf[java.util.Iterator[String]]
+                .toList
+          val map: Map[String, List[String]] = Map(
+            names.map(
+              n =>
+                n -> headers
+                  .getHeaders(n)
                   .asInstanceOf[java.util.Iterator[String]]
-                  .toList
-            val map: Map[String, List[String]] = Map(
-                names.map(n =>
-                      n -> headers
-                        .getHeaders(n)
-                        .asInstanceOf[java.util.Iterator[String]]
-                        .toList): _*)
-            LiftRules.withMimeHeaders(map) {
-              LiftRules.handleMimeFile(
-                  f.getFieldName, f.getContentType, f.getName, f.openStream)
-            }
+                  .toList): _*)
+          LiftRules.withMimeHeaders(map) {
+            LiftRules.handleMimeFile(
+              f.getFieldName,
+              f.getContentType,
+              f.getName,
+              f.openStream)
           }
+        }
       }
     }).toList
 
@@ -191,7 +199,7 @@ class HTTPRequestServlet(
   def snapshot: HTTPRequest = new OfflineRequestSnapshot(this, provider)
 
   private lazy val asyncProvider: Box[ServletAsyncProvider] =
-    LiftRules.theServletAsyncProvider.map(_ (this))
+    LiftRules.theServletAsyncProvider.map(_(this))
 
   def resumeInfo: Option[(Req, LiftResponse)] =
     asyncProvider.flatMap(_.resumeInfo)
@@ -199,23 +207,25 @@ class HTTPRequestServlet(
   def suspend(timeout: Long): RetryState.Value =
     asyncProvider
       .openOrThrowException(
-          "open_! is bad, but presumably, the suspendResume support was checked")
+        "open_! is bad, but presumably, the suspendResume support was checked")
       .suspend(timeout)
 
   def resume(what: (Req, LiftResponse)): Boolean =
     asyncProvider
       .openOrThrowException(
-          "open_! is bad, but presumably, the suspendResume support was checked")
+        "open_! is bad, but presumably, the suspendResume support was checked")
       .resume(what)
 
   lazy val suspendResumeSupport_? = {
-    LiftRules.asyncProviderMeta.map(_.suspendResumeSupport_? &&
+    LiftRules.asyncProviderMeta.map(
+      _.suspendResumeSupport_? &&
         (asyncProvider.map(_.suspendResumeSupport_?) openOr false)) openOr false
   }
 }
 
 private class OfflineRequestSnapshot(
-    req: HTTPRequest, val provider: HTTPProvider)
+    req: HTTPRequest,
+    val provider: HTTPProvider)
     extends HTTPRequest {
 
   private val _cookies = List(req.cookies: _*)
@@ -307,7 +317,7 @@ private class OfflineRequestSnapshot(
 
   def setCharacterEncoding(encoding: String) =
     throw new UnsupportedOperationException(
-        "It is unsafe to set the character encoding ")
+      "It is unsafe to set the character encoding ")
 
   def snapshot = this
 
@@ -316,5 +326,5 @@ private class OfflineRequestSnapshot(
     */
   lazy val userAgent: Box[String] =
     headers find (_.name equalsIgnoreCase "user-agent") flatMap
-    (_.values.headOption)
+      (_.values.headOption)
 }

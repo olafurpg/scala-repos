@@ -29,15 +29,14 @@ trait TypeConverterSupport {
 object TypeConverterSupport extends TypeConverterSupport
 
 trait LowestPriorityImplicitConversions extends TypeConverterSupport {
-  implicit def lowestPriorityAny2T[T : Manifest]: TypeConverter[Any, T] =
+  implicit def lowestPriorityAny2T[T: Manifest]: TypeConverter[Any, T] =
     safe {
       case a if manifest[T].erasure.isAssignableFrom(a.getClass) =>
         a.asInstanceOf[T]
     }
 }
 
-trait LowPriorityImplicitConversions
-    extends LowestPriorityImplicitConversions {
+trait LowPriorityImplicitConversions extends LowestPriorityImplicitConversions {
 
   implicit val anyToBoolean: TypeConverter[Any, Boolean] = safe {
     case b: Boolean => b
@@ -45,66 +44,66 @@ trait LowPriorityImplicitConversions
         "ENABLED" =>
       true
     case n: Number => n != 0
-    case _ => false
+    case _         => false
   }
 
   implicit val anyToFloat: TypeConverter[Any, Float] = safe {
-    case i: Byte => i.toFloat
-    case i: Short => i.toFloat
-    case i: Int => i.toFloat
-    case i: Long => i.toFloat
+    case i: Byte   => i.toFloat
+    case i: Short  => i.toFloat
+    case i: Int    => i.toFloat
+    case i: Long   => i.toFloat
     case i: Double => i.toFloat
-    case i: Float => i
+    case i: Float  => i
     case i: String => i.toFloat
   }
 
   implicit val anyToDouble: TypeConverter[Any, Double] = safe {
-    case i: Byte => i.toDouble
-    case i: Short => i.toDouble
-    case i: Int => i.toDouble
-    case i: Long => i.toDouble
+    case i: Byte   => i.toDouble
+    case i: Short  => i.toDouble
+    case i: Int    => i.toDouble
+    case i: Long   => i.toDouble
     case i: Double => i
-    case i: Float => i.toDouble
+    case i: Float  => i.toDouble
     case i: String => i.toDouble
   }
 
   implicit val anyToByte: TypeConverter[Any, Byte] = safe {
-    case i: Byte => i
-    case i: Short => i.toByte
-    case i: Int => i.toByte
-    case i: Long => i.toByte
+    case i: Byte   => i
+    case i: Short  => i.toByte
+    case i: Int    => i.toByte
+    case i: Long   => i.toByte
     case i: Double => i.toByte
-    case i: Float => i.toByte
+    case i: Float  => i.toByte
     case i: String => i.toByte
   }
 
   implicit val anyToShort: TypeConverter[Any, Short] = safe {
-    case i: Byte => i.toShort
-    case i: Short => i
-    case i: Int => i.toShort
-    case i: Long => i.toShort
+    case i: Byte   => i.toShort
+    case i: Short  => i
+    case i: Int    => i.toShort
+    case i: Long   => i.toShort
     case i: Double => i.toShort
-    case i: Float => i.toShort
+    case i: Float  => i.toShort
     case i: String => i.toShort
   }
 
   implicit val anyToInt: TypeConverter[Any, Int] = safe {
-    case i: Byte => i.toInt
-    case i: Short => i.toInt
-    case i: Int => i
-    case i: Long => i.toInt
+    case i: Byte   => i.toInt
+    case i: Short  => i.toInt
+    case i: Int    => i
+    case i: Long   => i.toInt
     case i: Double => i.toInt
-    case i: Float => i.toInt
+    case i: Float  => i.toInt
     case i: String => i.toInt
   }
 
   implicit val anyToLong: TypeConverter[Any, Long] = safe {
-    case i: Byte => i.toLong
-    case i: Short => i.toLong
-    case i: Int => i.toLong
-    case i: Long => i
+    case i: Byte   => i.toLong
+    case i: Short  => i.toLong
+    case i: Int    => i.toLong
+    case i: Long   => i
     case i: Double => i.toLong
-    case i: Float => i.toLong
+    case i: Float  => i.toLong
     case i: String => i.toLong
   }
 
@@ -113,7 +112,7 @@ trait LowPriorityImplicitConversions
 
 trait BigDecimalImplicitConversions { self: DefaultImplicitConversions =>
   implicit val stringToBigDecimal: TypeConverter[String, BigDecimal] = safe(
-      BigDecimal(_))
+    BigDecimal(_))
   implicit val stringToSeqBigDecimal: TypeConverter[String, Seq[BigDecimal]] =
     stringToSeq(stringToBigDecimal)
 }
@@ -158,13 +157,14 @@ trait DefaultImplicitConversions extends LowPriorityImplicitConversions {
       mf: Manifest[T]): TypeConverter[String, Seq[T]] =
     stringToSeq[T](elementConverter)
 
-  def stringToSeq[T : Manifest](
+  def stringToSeq[T: Manifest](
       elementConverter: TypeConverter[String, T],
       separator: String = ","): TypeConverter[String, Seq[T]] =
     safe(s => s.split(separator).toSeq.flatMap(e => elementConverter(e.trim)))
 
-  implicit def seqHead[T](implicit elementConverter: TypeConverter[String, T],
-                          mf: Manifest[T]): TypeConverter[Seq[String], T] =
+  implicit def seqHead[T](
+      implicit elementConverter: TypeConverter[String, T],
+      mf: Manifest[T]): TypeConverter[Seq[String], T] =
     safeOption(_.headOption.flatMap(elementConverter(_)))
 
   implicit def seqToSeq[T](
@@ -177,7 +177,7 @@ object Conversions extends DefaultImplicitConversions {
 
   private type StringTypeConverter[T] = TypeConverter[String, T]
   class ValConversion(source: String) {
-    def as[T : StringTypeConverter]: Option[T] =
+    def as[T: StringTypeConverter]: Option[T] =
       implicitly[TypeConverter[String, T]].apply(source)
   }
 

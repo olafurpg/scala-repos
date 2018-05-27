@@ -33,11 +33,12 @@ private[lease] trait ByteCounter {
   * running.
   */
 // It might be simpler to just make it an exponential moving average.
-private[lease] class WindowedByteCounter private[lease](
+private[lease] class WindowedByteCounter private[lease] (
     val info: JvmInfo,
     ctx: Context
-)
-    extends Thread("WindowedByteClock") with ByteCounter with Closable {
+) extends Thread("WindowedByteClock")
+    with ByteCounter
+    with Closable {
 
   import WindowedByteCounter._
 
@@ -82,7 +83,7 @@ private[lease] class WindowedByteCounter private[lease](
 
   override def toString =
     "WindowedByteCounter(windowed=" + rate() + "bpms; last=" + lastRate() +
-    "bpms; count=" + count + "; sum=" + sum() + "bytes)"
+      "bpms; count=" + count + "; sum=" + sum() + "bytes)"
 
   /**
     * Measures the amount of bytes used since the last sample, and bumps

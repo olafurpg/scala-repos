@@ -13,7 +13,9 @@ import breeze.plot.Plot.Listener
   * @author dlwh, dramage
   */
 class Figure(
-    name: String, private var rows_ : Int = 1, private var cols_ : Int = 1) {
+    name: String,
+    private var rows_ : Int = 1,
+    private var cols_ : Int = 1) {
 
   protected val plots = ArrayBuffer[Option[Plot]]()
 
@@ -139,9 +141,12 @@ class Figure(
       opt match {
         case Some(plot) =>
           plot.chart.draw(
-              g2d,
-              new java.awt.Rectangle(
-                  px * plotWidth, py * plotHeight, plotWidth, plotHeight))
+            g2d,
+            new java.awt.Rectangle(
+              px * plotWidth,
+              py * plotHeight,
+              plotWidth,
+              plotHeight))
         case None => {}
       }
       px = (px + 1) % cols
@@ -154,11 +159,12 @@ class Figure(
     // make sure figure is visible or saved image will come up empty
     refresh()
 
-    ExportGraphics.writeFile(new java.io.File(filename),
-                             draw = drawPlots _,
-                             width = contents.getWidth,
-                             height = contents.getHeight,
-                             dpi = dpi)
+    ExportGraphics.writeFile(
+      new java.io.File(filename),
+      draw = drawPlots _,
+      width = contents.getWidth,
+      height = contents.getHeight,
+      dpi = dpi)
   }
 
   private def selectPlot(i: Int) = {

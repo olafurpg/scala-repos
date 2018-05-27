@@ -15,18 +15,21 @@ class HStringManipulator extends AbstractElementManipulator[HString] {
   import org.jetbrains.plugins.hocon.lexer.HoconTokenType._
   import org.jetbrains.plugins.hocon.parser.HoconElementType._
 
-  def handleContentChange(str: HString, range: TextRange, newContent: String) = {
+  def handleContentChange(
+      str: HString,
+      range: TextRange,
+      newContent: String) = {
     val strType = str.stringType
     val oldText = str.getText
 
     val escapedContent = strType match {
       case MultilineString => newContent
-      case _ => StringUtil.escapeStringCharacters(newContent)
+      case _               => StringUtil.escapeStringCharacters(newContent)
     }
 
     val needsQuoting =
       strType == UnquotedString &&
-      (newContent.isEmpty || newContent.startsWith(" ") ||
+        (newContent.isEmpty || newContent.startsWith(" ") ||
           newContent.endsWith(" ") ||
           (str.elementType == KeyPart && newContent.contains('.')) ||
           newContent.exists(HoconLexer.ForbiddenChars.contains) ||
@@ -34,7 +37,7 @@ class HStringManipulator extends AbstractElementManipulator[HString] {
 
     val unquotedText =
       oldText.substring(0, range.getStartOffset) + escapedContent +
-      oldText.substring(range.getEndOffset)
+        oldText.substring(range.getEndOffset)
     val quotedText =
       if (needsQuoting) "\"" + unquotedText + "\"" else unquotedText
 
@@ -55,11 +58,9 @@ class HStringManipulator extends AbstractElementManipulator[HString] {
     case UnquotedString =>
       new TextRange(0, element.getTextLength)
     case QuotedString =>
-      new TextRange(
-          1, element.getTextLength - (if (element.isClosed) 1 else 0))
+      new TextRange(1, element.getTextLength - (if (element.isClosed) 1 else 0))
     case MultilineString =>
-      new TextRange(
-          3, element.getTextLength - (if (element.isClosed) 3 else 0))
+      new TextRange(3, element.getTextLength - (if (element.isClosed) 3 else 0))
     case _ =>
       super.getRangeInElement(element)
   }

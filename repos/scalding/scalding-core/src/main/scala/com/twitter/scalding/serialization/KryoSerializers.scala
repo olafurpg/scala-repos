@@ -94,7 +94,10 @@ class StringFieldSerializer extends KSerializer[StringField[_]] {
     kser.writeClassAndObject(out, a.ord)
     kser.writeClassAndObject(out, a.mf)
   }
-  def read(kser: Kryo, in: Input, cls: Class[StringField[_]]): StringField[_] = {
+  def read(
+      kser: Kryo,
+      in: Input,
+      cls: Class[StringField[_]]): StringField[_] = {
     val id = in.readString
     val ord = kser.readClassAndObject(in).asInstanceOf[Ordering[Any]]
     val mf = kser.readClassAndObject(in).asInstanceOf[Option[Manifest[Any]]]

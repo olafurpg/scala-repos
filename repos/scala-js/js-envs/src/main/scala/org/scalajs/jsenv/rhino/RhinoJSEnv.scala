@@ -38,13 +38,13 @@ final class RhinoJSEnv private (
     semantics: Semantics,
     withDOM: Boolean,
     val sourceMap: Boolean
-)
-    extends LinkingUnitComJSEnv {
+) extends LinkingUnitComJSEnv {
 
   import RhinoJSEnv._
 
   def this(
-      semantics: Semantics = Semantics.Defaults, withDOM: Boolean = false) =
+      semantics: Semantics = Semantics.Defaults,
+      withDOM: Boolean = false) =
     this(semantics, withDOM, sourceMap = true)
 
   def withSourceMap(sourceMap: Boolean): RhinoJSEnv =
@@ -70,45 +70,57 @@ final class RhinoJSEnv private (
     *  `code` is called.
     */
   override def jsRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile): JSRunner = {
+      libs: Seq[ResolvedJSDependency],
+      code: VirtualJSFile): JSRunner = {
     new Runner(libs, None, Nil, code)
   }
 
-  override def jsRunner(preLibs: Seq[ResolvedJSDependency],
-                        linkingUnit: LinkingUnit,
-                        postLibs: Seq[ResolvedJSDependency],
-                        code: VirtualJSFile): JSRunner = {
+  override def jsRunner(
+      preLibs: Seq[ResolvedJSDependency],
+      linkingUnit: LinkingUnit,
+      postLibs: Seq[ResolvedJSDependency],
+      code: VirtualJSFile): JSRunner = {
     verifyUnit(linkingUnit)
     new Runner(preLibs, Some(linkingUnit), postLibs, code)
   }
 
-  private class Runner(preLibs: Seq[ResolvedJSDependency],
-                       optLinkingUnit: Option[LinkingUnit],
-                       postLibs: Seq[ResolvedJSDependency],
-                       code: VirtualJSFile)
+  private class Runner(
+      preLibs: Seq[ResolvedJSDependency],
+      optLinkingUnit: Option[LinkingUnit],
+      postLibs: Seq[ResolvedJSDependency],
+      code: VirtualJSFile)
       extends JSRunner {
     def run(logger: Logger, console: JSConsole): Unit =
       internalRunJS(
-          preLibs, optLinkingUnit, postLibs, code, logger, console, None)
+        preLibs,
+        optLinkingUnit,
+        postLibs,
+        code,
+        logger,
+        console,
+        None)
   }
 
   override def asyncRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile): AsyncJSRunner = {
+      libs: Seq[ResolvedJSDependency],
+      code: VirtualJSFile): AsyncJSRunner = {
     new AsyncRunner(libs, None, Nil, code)
   }
 
-  override def asyncRunner(preLibs: Seq[ResolvedJSDependency],
-                           linkingUnit: LinkingUnit,
-                           postLibs: Seq[ResolvedJSDependency],
-                           code: VirtualJSFile): AsyncJSRunner = {
+  override def asyncRunner(
+      preLibs: Seq[ResolvedJSDependency],
+      linkingUnit: LinkingUnit,
+      postLibs: Seq[ResolvedJSDependency],
+      code: VirtualJSFile): AsyncJSRunner = {
     verifyUnit(linkingUnit)
     new AsyncRunner(preLibs, Some(linkingUnit), postLibs, code)
   }
 
-  private class AsyncRunner(preLibs: Seq[ResolvedJSDependency],
-                            optLinkingUnit: Option[LinkingUnit],
-                            postLibs: Seq[ResolvedJSDependency],
-                            code: VirtualJSFile)
+  private class AsyncRunner(
+      preLibs: Seq[ResolvedJSDependency],
+      optLinkingUnit: Option[LinkingUnit],
+      postLibs: Seq[ResolvedJSDependency],
+      code: VirtualJSFile)
       extends AsyncJSRunner {
 
     private[this] val promise = Promise[Unit]
@@ -120,13 +132,14 @@ final class RhinoJSEnv private (
       _thread = new Thread {
         override def run(): Unit = {
           try {
-            internalRunJS(preLibs,
-                          optLinkingUnit,
-                          postLibs,
-                          code,
-                          logger,
-                          console,
-                          optChannel)
+            internalRunJS(
+              preLibs,
+              optLinkingUnit,
+              postLibs,
+              code,
+              logger,
+              console,
+              optChannel)
             promise.success(())
           } catch {
             case t: Throwable =>
@@ -145,22 +158,25 @@ final class RhinoJSEnv private (
   }
 
   override def comRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile): ComJSRunner = {
+      libs: Seq[ResolvedJSDependency],
+      code: VirtualJSFile): ComJSRunner = {
     new ComRunner(libs, None, Nil, code)
   }
 
-  override def comRunner(preLibs: Seq[ResolvedJSDependency],
-                         linkingUnit: LinkingUnit,
-                         postLibs: Seq[ResolvedJSDependency],
-                         code: VirtualJSFile): ComJSRunner = {
+  override def comRunner(
+      preLibs: Seq[ResolvedJSDependency],
+      linkingUnit: LinkingUnit,
+      postLibs: Seq[ResolvedJSDependency],
+      code: VirtualJSFile): ComJSRunner = {
     verifyUnit(linkingUnit)
     new ComRunner(preLibs, Some(linkingUnit), postLibs, code)
   }
 
-  private class ComRunner(preLibs: Seq[ResolvedJSDependency],
-                          optLinkingUnit: Option[LinkingUnit],
-                          postLibs: Seq[ResolvedJSDependency],
-                          code: VirtualJSFile)
+  private class ComRunner(
+      preLibs: Seq[ResolvedJSDependency],
+      optLinkingUnit: Option[LinkingUnit],
+      postLibs: Seq[ResolvedJSDependency],
+      code: VirtualJSFile)
       extends AsyncRunner(preLibs, optLinkingUnit, postLibs, code)
       with ComJSRunner {
 
@@ -182,13 +198,14 @@ final class RhinoJSEnv private (
     def close(): Unit = channel.closeJVM()
   }
 
-  private def internalRunJS(preLibs: Seq[ResolvedJSDependency],
-                            optLinkingUnit: Option[LinkingUnit],
-                            postLibs: Seq[ResolvedJSDependency],
-                            code: VirtualJSFile,
-                            logger: Logger,
-                            console: JSConsole,
-                            optChannel: Option[Channel]): Unit = {
+  private def internalRunJS(
+      preLibs: Seq[ResolvedJSDependency],
+      optLinkingUnit: Option[LinkingUnit],
+      postLibs: Seq[ResolvedJSDependency],
+      code: VirtualJSFile,
+      logger: Logger,
+      console: JSConsole,
+      optChannel: Option[Channel]): Unit = {
 
     val context = Context.enter()
     try {
@@ -207,11 +224,12 @@ final class RhinoJSEnv private (
       // Optionally setup scalaJSCom
       var recvCallback: Option[String => Unit] = None
       for (channel <- optChannel) {
-        setupCom(context,
-                 scope,
-                 channel,
-                 setCallback = cb => recvCallback = Some(cb),
-                 clrCallback = () => recvCallback = None)
+        setupCom(
+          context,
+          scope,
+          channel,
+          setCallback = cb => recvCallback = Some(cb),
+          clrCallback = () => recvCallback = None)
       }
 
       try {
@@ -230,10 +248,11 @@ final class RhinoJSEnv private (
         // Start the event loop
 
         for (channel <- optChannel) {
-          comEventLoop(taskQ,
-                       channel,
-                       () => recvCallback.get,
-                       () => recvCallback.isDefined)
+          comEventLoop(
+            taskQ,
+            channel,
+            () => recvCallback.get,
+            () => recvCallback.isDefined)
         }
 
         // Channel is closed. Fall back to basic event loop
@@ -277,131 +296,134 @@ final class RhinoJSEnv private (
     val topLevelPackageIds = ScriptableObject.getPropertyIds(PackagesObject)
     for (id <- topLevelPackageIds) (id: Any) match {
       case name: String => ScriptableObject.deleteProperty(scope, name)
-      case index: Int => ScriptableObject.deleteProperty(scope, index)
-      case _ => // should not happen, I think, but with Rhino you never know
+      case index: Int   => ScriptableObject.deleteProperty(scope, index)
+      case _            => // should not happen, I think, but with Rhino you never know
     }
   }
 
   private def setupConsole(
-      context: Context, scope: Scriptable, console: JSConsole): Unit = {
+      context: Context,
+      scope: Scriptable,
+      console: JSConsole): Unit = {
     // Setup console.log
     val jsconsole = context.newObject(scope)
     jsconsole.addFunction("log", _.foreach(console.log _))
     ScriptableObject.putProperty(scope, "console", jsconsole)
   }
 
-  private def setupSetTimeout(context: Context, scope: Scriptable): TaskQueue = {
+  private def setupSetTimeout(
+      context: Context,
+      scope: Scriptable): TaskQueue = {
 
     val ordering = Ordering.by[TimedTask, Deadline](_.deadline).reverse
     val taskQ = mutable.PriorityQueue.empty(ordering)
 
-    def ensure[T : ClassTag](v: AnyRef, errMsg: String) = v match {
+    def ensure[T: ClassTag](v: AnyRef, errMsg: String) = v match {
       case v: T => v
-      case _ => sys.error(errMsg)
+      case _    => sys.error(errMsg)
     }
 
     scope.addFunction(
-        "setTimeout",
-        args =>
-          {
-            val cb = ensure[Function](
-                args(0), "First argument to setTimeout must be a function")
+      "setTimeout",
+      args => {
+        val cb = ensure[Function](
+          args(0),
+          "First argument to setTimeout must be a function")
 
-            val deadline = Context.toNumber(args(1)).toInt.millis.fromNow
+        val deadline = Context.toNumber(args(1)).toInt.millis.fromNow
 
-            val task = new TimeoutTask(
-                deadline,
-                () =>
-                  cb.call(context, scope, scope, args.slice(2, args.length)))
+        val task = new TimeoutTask(
+          deadline,
+          () => cb.call(context, scope, scope, args.slice(2, args.length)))
 
-            taskQ += task
+        taskQ += task
 
-            task
-        })
-
-    scope.addFunction(
-        "setInterval",
-        args =>
-          {
-            val cb = ensure[Function](
-                args(0), "First argument to setInterval must be a function")
-
-            val interval = Context.toNumber(args(1)).toInt.millis
-            val firstDeadline = interval.fromNow
-
-            val task = new IntervalTask(
-                firstDeadline,
-                interval,
-                () =>
-                  cb.call(context, scope, scope, args.slice(2, args.length)))
-
-            taskQ += task
-
-            task
-        })
+        task
+      }
+    )
 
     scope.addFunction(
-        "clearTimeout",
-        args =>
-          {
-            val task = ensure[TimeoutTask](
-                args(0),
-                "First argument to " +
-                "clearTimeout must be a value returned by setTimeout")
-            task.cancel()
-        })
+      "setInterval",
+      args => {
+        val cb = ensure[Function](
+          args(0),
+          "First argument to setInterval must be a function")
+
+        val interval = Context.toNumber(args(1)).toInt.millis
+        val firstDeadline = interval.fromNow
+
+        val task = new IntervalTask(
+          firstDeadline,
+          interval,
+          () => cb.call(context, scope, scope, args.slice(2, args.length)))
+
+        taskQ += task
+
+        task
+      }
+    )
+
+    scope.addFunction("clearTimeout", args => {
+      val task = ensure[TimeoutTask](
+        args(0),
+        "First argument to " +
+          "clearTimeout must be a value returned by setTimeout")
+      task.cancel()
+    })
 
     scope.addFunction(
-        "clearInterval",
-        args =>
-          {
-            val task = ensure[IntervalTask](
-                args(0),
-                "First argument to " +
-                "clearInterval must be a value returned by setInterval")
-            task.cancel()
-        })
+      "clearInterval",
+      args => {
+        val task = ensure[IntervalTask](
+          args(0),
+          "First argument to " +
+            "clearInterval must be a value returned by setInterval")
+        task.cancel()
+      }
+    )
 
     taskQ
   }
 
-  private def setupCom(context: Context,
-                       scope: Scriptable,
-                       channel: Channel,
-                       setCallback: (String => Unit) => Unit,
-                       clrCallback: () => Unit): Unit = {
+  private def setupCom(
+      context: Context,
+      scope: Scriptable,
+      channel: Channel,
+      setCallback: (String => Unit) => Unit,
+      clrCallback: () => Unit): Unit = {
 
     val comObj = context.newObject(scope)
 
     comObj.addFunction("send", s => channel.sendToJVM(Context.toString(s(0))))
 
     comObj.addFunction(
-        "init",
-        s =>
-          s(0) match {
-            case f: Function =>
-              val cb: String => Unit =
-                msg => f.call(context, scope, scope, Array(msg))
-              setCallback(cb)
-            case _ =>
-              sys.error("First argument to init must be a function")
-        })
+      "init",
+      s =>
+        s(0) match {
+          case f: Function =>
+            val cb: String => Unit =
+              msg => f.call(context, scope, scope, Array(msg))
+            setCallback(cb)
+          case _ =>
+            sys.error("First argument to init must be a function")
+      }
+    )
 
-    comObj.addFunction("close",
-                       _ =>
-                         {
-                           // Tell JVM side we won't send anything
-                           channel.closeJS()
-                           // Internally register that we're done
-                           clrCallback()
-                       })
+    comObj.addFunction("close", _ => {
+      // Tell JVM side we won't send anything
+      channel.closeJS()
+      // Internally register that we're done
+      clrCallback()
+    })
 
     ScriptableObject.putProperty(scope, "scalajsCom", comObj)
   }
 
   /** Loads a [[LinkingUnit]] with lazy loading of classes and source mapping. */
   private def loadLinkingUnit(
-      context: Context, scope: Scriptable, linkingUnit: LinkingUnit): Unit = {
+      context: Context,
+      scope: Scriptable,
+      linkingUnit: LinkingUnit): Unit = {
 
     val loader = new ScalaJSCoreLib(linkingUnit)
 
@@ -418,12 +440,10 @@ final class RhinoJSEnv private (
           oldScalaJSenv
       }
 
-      scalaJSenv.addFunction("sourceMapper",
-                             args =>
-                               {
-                                 val trace = Context.toObject(args(0), scope)
-                                 loader.mapStackTrace(trace, context, scope)
-                             })
+      scalaJSenv.addFunction("sourceMapper", args => {
+        val trace = Context.toObject(args(0), scope)
+        loader.mapStackTrace(trace, context, scope)
+      })
     }
 
     loader.insertInto(context, scope)
@@ -432,10 +452,11 @@ final class RhinoJSEnv private (
   private def basicEventLoop(taskQ: TaskQueue): Unit =
     eventLoopImpl(taskQ, sleepWait, () => true)
 
-  private def comEventLoop(taskQ: TaskQueue,
-                           channel: Channel,
-                           callback: () => String => Unit,
-                           isOpen: () => Boolean): Unit = {
+  private def comEventLoop(
+      taskQ: TaskQueue,
+      channel: Channel,
+      callback: () => String => Unit,
+      isOpen: () => Boolean): Unit = {
 
     if (!isOpen())
       // The channel has not been opened yet. Wait for opening.
@@ -485,9 +506,10 @@ final class RhinoJSEnv private (
     *      returned false, or there are no more tasks (i.e. [[taskQ]] is empty)
     *  @throws InterruptedException if the thread was interrupted
     */
-  private def eventLoopImpl[T](taskQ: TaskQueue,
-                               waitFct: Deadline => Option[T],
-                               continue: () => Boolean): Option[T] = {
+  private def eventLoopImpl[T](
+      taskQ: TaskQueue,
+      waitFct: Deadline => Option[T],
+      continue: () => Boolean): Option[T] = {
 
     @tailrec
     def loop(): Option[T] = {
@@ -528,8 +550,9 @@ final class RhinoJSEnv private (
   }
 
   private def verifyUnit(linkingUnit: LinkingUnit) = {
-    require(linkingUnit.semantics == semantics,
-            "RhinoJSEnv and LinkingUnit must agree on semantics")
+    require(
+      linkingUnit.semantics == semantics,
+      "RhinoJSEnv and LinkingUnit must agree on semantics")
     require(linkingUnit.esLevel == ESLevel.ES5, "RhinoJSEnv only supports ES5")
   }
 }
@@ -562,7 +585,7 @@ object RhinoJSEnv {
       val deadline = OptDeadline(timeout)
 
       while (js2jvm.isEmpty && ensureOpen(_closedJS) &&
-      !deadline.isOverdue) wait(deadline.millisLeft)
+             !deadline.isOverdue) wait(deadline.millisLeft)
 
       if (js2jvm.isEmpty) throw new TimeoutException("Timeout expired")
       js2jvm.dequeue()
@@ -624,7 +647,9 @@ object RhinoJSEnv {
   }
 
   private final class IntervalTask(
-      firstDeadline: Deadline, interval: FiniteDuration, task: () => Unit)
+      firstDeadline: Deadline,
+      interval: FiniteDuration,
+      task: () => Unit)
       extends TimedTask(task) {
 
     private[this] var _deadline = firstDeadline

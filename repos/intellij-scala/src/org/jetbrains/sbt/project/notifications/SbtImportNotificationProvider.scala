@@ -11,7 +11,11 @@ import com.intellij.openapi.externalSystem.model.project.ProjectData
 import com.intellij.openapi.externalSystem.service.execution.ProgressExecutionMode
 import com.intellij.openapi.externalSystem.service.project.ExternalProjectRefreshCallback
 import com.intellij.openapi.externalSystem.service.project.manage.ProjectDataManager
-import com.intellij.openapi.externalSystem.util.{DisposeAwareProjectChange, ExternalSystemApiUtil, ExternalSystemUtil}
+import com.intellij.openapi.externalSystem.util.{
+  DisposeAwareProjectChange,
+  ExternalSystemApiUtil,
+  ExternalSystemUtil
+}
 import com.intellij.openapi.fileEditor._
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ex.ProjectRootManagerEx
@@ -29,7 +33,8 @@ import scala.collection.mutable
   * @since 3/24/15.
   */
 abstract class SbtImportNotificationProvider(
-    project: Project, notifications: EditorNotifications)
+    project: Project,
+    notifications: EditorNotifications)
     extends EditorNotifications.Provider[EditorNotificationPanel] {
 
   private val ignoredFiles = mutable.Set.empty[VirtualFile]
@@ -39,14 +44,17 @@ abstract class SbtImportNotificationProvider(
   def createPanel(file: VirtualFile): EditorNotificationPanel
 
   override def createNotificationPanel(
-      file: VirtualFile, fileEditor: FileEditor): EditorNotificationPanel =
+      file: VirtualFile,
+      fileEditor: FileEditor): EditorNotificationPanel =
     if (!isIgnored(file) && isSbtFile(file) &&
-        shouldShowPanel(file, fileEditor)) createPanel(file) else null
+        shouldShowPanel(file, fileEditor)) createPanel(file)
+    else null
 
   protected def refreshProject(): Unit = {
     FileDocumentManager.getInstance.saveAllDocuments()
-    ExternalSystemUtil.refreshProjects(new ImportSpecBuilder(
-            project, SbtProjectSystem.Id).forceWhenUptodate(true))
+    ExternalSystemUtil.refreshProjects(
+      new ImportSpecBuilder(project, SbtProjectSystem.Id)
+        .forceWhenUptodate(true))
   }
 
   protected def importProject(file: VirtualFile): Unit = {
@@ -68,41 +76,43 @@ abstract class SbtImportNotificationProvider(
         val sbtSystemSettings = SbtSystemSettings.getInstance(project)
 
         val projects = ContainerUtilRt.newHashSet(
-            sbtSystemSettings.getLinkedProjectsSettings)
+          sbtSystemSettings.getLinkedProjectsSettings)
         projects.add(projectSettings)
         sbtSystemSettings.setLinkedProjectsSettings(projects)
 
         ExternalSystemApiUtil.executeProjectChangeAction(
-            new DisposeAwareProjectChange(project) {
-          def execute() {
-            ProjectRootManagerEx
-              .getInstanceEx(project)
-              .mergeRootsChangesDuring(new Runnable {
-                def run() {
-                  val dataManager: ProjectDataManager =
-                    ServiceManager.getService(classOf[ProjectDataManager])
-                  dataManager.importData[ProjectData](
-                      Collections.singleton(externalProject), project, false)
-                }
-              })
-          }
-        })
+          new DisposeAwareProjectChange(project) {
+            def execute() {
+              ProjectRootManagerEx
+                .getInstanceEx(project)
+                .mergeRootsChangesDuring(new Runnable {
+                  def run() {
+                    val dataManager: ProjectDataManager =
+                      ServiceManager.getService(classOf[ProjectDataManager])
+                    dataManager.importData[ProjectData](
+                      Collections.singleton(externalProject),
+                      project,
+                      false)
+                  }
+                })
+            }
+          })
       }
     }
 
     FileDocumentManager.getInstance.saveAllDocuments()
     ExternalSystemUtil.refreshProject(
-        project,
-        SbtProjectSystem.Id,
-        projectSettings.getExternalProjectPath,
-        callback,
-        false,
-        ProgressExecutionMode.IN_BACKGROUND_ASYNC)
+      project,
+      SbtProjectSystem.Id,
+      projectSettings.getExternalProjectPath,
+      callback,
+      false,
+      ProgressExecutionMode.IN_BACKGROUND_ASYNC)
   }
 
   protected def getExternalProject(filePath: String): Option[String] =
     (!project.isDisposed &&
-        Sbt.isProjectDefinitionFile(project, filePath.toFile))
+      Sbt.isProjectDefinitionFile(project, filePath.toFile))
       .option(project.getBasePath)
 
   protected def getProjectSettings(
@@ -112,7 +122,7 @@ abstract class SbtImportNotificationProvider(
         .flatMap(getExternalProject)
       sbtSettings <- Option(SbtSystemSettings.getInstance(project))
       projectSettings <- Option(
-          sbtSettings.getLinkedProjectSettings(externalProjectPath))
+        sbtSettings.getLinkedProjectSettings(externalProjectPath))
     } yield {
       projectSettings
     }

@@ -27,7 +27,7 @@ trait JettyContainer extends Container {
       addFilter(filter.asInstanceOf[Class[_ <: Filter]], path)
     case _ =>
       throw new IllegalArgumentException(
-          klass + " is not assignable to either HttpServlet or Filter")
+        klass + " is not assignable to either HttpServlet or Filter")
   }
 
   def mount(servlet: HttpServlet, path: String) { addServlet(servlet, path) }
@@ -35,9 +35,10 @@ trait JettyContainer extends Container {
     addServlet(servlet, path, name)
   }
 
-  def mount(app: Filter,
-            path: String,
-            dispatches: EnumSet[DispatcherType] = DefaultDispatcherTypes) =
+  def mount(
+      app: Filter,
+      path: String,
+      dispatches: EnumSet[DispatcherType] = DefaultDispatcherTypes) =
     addFilter(app, path, dispatches)
 
   def addServlet(servlet: HttpServlet, path: String) {
@@ -48,16 +49,17 @@ trait JettyContainer extends Container {
 
     servlet match {
       case s: HasMultipartConfig => {
-          holder.getRegistration.setMultipartConfig(
-              s.multipartConfig.toMultipartConfigElement)
-        }
+        holder.getRegistration.setMultipartConfig(
+          s.multipartConfig.toMultipartConfigElement)
+      }
       case s: ScalatraAsyncSupport =>
         holder.getRegistration.setAsyncSupported(true)
       case _ =>
     }
 
     servletContextHandler.addServlet(
-        holder, if (path.endsWith("/*")) path else path + "/*")
+      holder,
+      if (path.endsWith("/*")) path else path + "/*")
   }
 
   def addServlet(servlet: Class[_ <: HttpServlet], path: String) =
@@ -76,19 +78,21 @@ trait JettyContainer extends Container {
   def addFilter(filter: Class[_ <: Filter], path: String): FilterHolder =
     addFilter(filter, path, DefaultDispatcherTypes)
 
-  def addFilter(filter: Class[_ <: Filter],
-                path: String,
-                dispatches: util.EnumSet[DispatcherType]): FilterHolder =
+  def addFilter(
+      filter: Class[_ <: Filter],
+      path: String,
+      dispatches: util.EnumSet[DispatcherType]): FilterHolder =
     servletContextHandler.addFilter(filter, path, dispatches)
 
   // Add a default servlet.  If there is no underlying servlet, then
   // filters just return 404.
   if (!skipDefaultServlet)
     servletContextHandler.addServlet(
-        new ServletHolder("default", classOf[DefaultServlet]), "/")
+      new ServletHolder("default", classOf[DefaultServlet]),
+      "/")
 
   protected def ensureSessionIsSerializable() {
     servletContextHandler.getSessionHandler.addEventListener(
-        SessionSerializingListener)
+      SessionSerializingListener)
   }
 }

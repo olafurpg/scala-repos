@@ -97,12 +97,13 @@ trait ItemsList[T <: Mapper[T]] {
               aval.toLowerCase < bval.toLowerCase
             case (aval: Ordered[_], bval: Ordered[_]) =>
               aval.asInstanceOf[Ordered[Any]] < bval.asInstanceOf[Ordered[Any]]
-            case (aval: java.lang.Comparable[_],
-                  bval: java.lang.Comparable[_]) =>
+            case (
+                aval: java.lang.Comparable[_],
+                bval: java.lang.Comparable[_]) =>
               (aval.asInstanceOf[java.lang.Comparable[Any]] compareTo bval
-                    .asInstanceOf[java.lang.Comparable[Any]]) < 0
-            case (null, _) => sortNullFirst
-            case (_, null) => !sortNullFirst
+                .asInstanceOf[java.lang.Comparable[Any]]) < 0
+            case (null, _)    => sortNullFirst
+            case (_, null)    => !sortNullFirst
             case (aval, bval) => aval.toString < bval.toString
           }) match {
             case cmp =>
@@ -173,7 +174,7 @@ trait ItemsList[T <: Mapper[T]] {
     case (Some(f), true) if f eq field =>
       () =>
         ascending = false
-      case _ | null =>
+    case _ | null =>
       () =>
         {
           sortField = Some(field)
@@ -198,7 +199,9 @@ object TableEditor {
   private[view] val map =
     new scala.collection.mutable.HashMap[String, TableEditorImpl[_]]
   def registerTable[T <: Mapper[T]](
-      name: String, meta: T with MetaMapper[T], title: String) =
+      name: String,
+      meta: T with MetaMapper[T],
+      title: String) =
     map(name) = new TableEditorImpl(title, meta)
 }
 
@@ -224,7 +227,7 @@ package snippet {
     def dispatch = {
       case "edit" =>
         val o = getInstance.openOrThrowException(
-            "if we don't have the table attr, we want the dev to know about it.")
+          "if we don't have the table attr, we want the dev to know about it.")
         o.edit
     }
   }
@@ -236,7 +239,8 @@ package snippet {
   * @author nafg
   */
 protected class TableEditorImpl[T <: Mapper[T]](
-    val title: String, meta: T with MetaMapper[T])
+    val title: String,
+    meta: T with MetaMapper[T])
     extends ItemsListEditor[T] {
   var items = new ItemsList[T] {
     def metaMapper = meta
@@ -262,13 +266,12 @@ trait ItemsListEditor[T <: Mapper[T]] {
     }
   def sortFn(f: MappedField[_, T]): () => Unit = items.sortFn(f)
 
-  val fieldFilter: MappedField[_, T] => Boolean = (f: MappedField[_, T]) =>
-    true
+  val fieldFilter: MappedField[_, T] => Boolean = (f: MappedField[_, T]) => true
 
   def customBind(item: T): NodeSeq => NodeSeq = (ns: NodeSeq) => ns
 
   def edit: (NodeSeq) => NodeSeq = {
-    def unsavedScript = ( <head>{Script(Run("""
+    def unsavedScript = (<head>{Script(Run("""
                            var safeToContinue = false
                            window.onbeforeunload = function(evt) {{  // thanks Tim!
                              if(!safeToContinue) {{
@@ -292,19 +295,20 @@ trait ItemsListEditor[T <: Mapper[T]] {
       "^" #> customBind(item) andThen ".fields" #> eachField(item, {
         f: MappedField[_, T] =>
           ".form" #> <strike>{f.asHtml}</strike>
-      }) & ".removeBtn" #> SHtml.submit(?("Remove"),
-                                        () => onRemove(item),
-                                        noPrompt) & ".msg" #> Text(
-          ?("Deleted"))
+      }) & ".removeBtn" #> SHtml.submit(
+        ?("Remove"),
+        () => onRemove(item),
+        noPrompt) & ".msg" #> Text(?("Deleted"))
     }
 
     val bindRegularItems = items.items.map { item =>
       "^" #> customBind(item) andThen ".fields" #> eachField(item, {
         f: MappedField[_, T] =>
           ".form" #> f.toForm
-      }) & ".removeBtn" #> SHtml.submit(?("Remove"),
-                                        () => onRemove(item),
-                                        noPrompt) & ".msg" #> {
+      }) & ".removeBtn" #> SHtml.submit(
+        ?("Remove"),
+        () => onRemove(item),
+        noPrompt) & ".msg" #> {
         item.validate match {
           case Nil =>
             if (!item.saved_?) Text(?("New"))
@@ -318,19 +322,20 @@ trait ItemsListEditor[T <: Mapper[T]] {
 
     "^ >*" #> optScript andThen ".fields *" #> {
       eachField[T](
-          items.metaMapper, { f: MappedField[_, T] =>
-            ".name" #> SHtml.link(S.uri,
-                                  sortFn(f),
-                                  Text(capify(f.displayName)))
-          },
-          fieldFilter
+        items.metaMapper, { f: MappedField[_, T] =>
+          ".name" #> SHtml.link(S.uri, sortFn(f), Text(capify(f.displayName)))
+        },
+        fieldFilter
       )
     } & ".table" #> {
-      ".title *" #> title & ".insertBtn" #> SHtml.submit(?("Insert"),
-                                                         onInsert _,
-                                                         noPrompt) & ".item" #>
-      (bindRegularItems ++ bindRemovedItems) & ".saveBtn" #> SHtml.submit(
-          ?("Save"), onSubmit _, noPrompt)
+      ".title *" #> title & ".insertBtn" #> SHtml.submit(
+        ?("Insert"),
+        onInsert _,
+        noPrompt) & ".item" #>
+        (bindRegularItems ++ bindRemovedItems) & ".saveBtn" #> SHtml.submit(
+        ?("Save"),
+        onSubmit _,
+        noPrompt)
     }
   }
 }

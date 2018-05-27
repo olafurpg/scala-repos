@@ -32,7 +32,7 @@ object StatusStreamer {
     * scalding jobs.
     */
   implicit val timeOf: TimeExtractor[Status] = TimeExtractor(
-      _.getCreatedAt.getTime)
+    _.getCreatedAt.getTime)
   implicit val batcher = Batcher.ofHours(1)
 
   def tokenize(text: String): TraversableOnce[String] =
@@ -45,7 +45,8 @@ object StatusStreamer {
     * Summingbird.
     */
   def wordCount[P <: Platform[P]](
-      source: Producer[P, Status], store: P#Store[String, Long]) =
+      source: Producer[P, Status],
+      store: P#Store[String, Long]) =
     source
       .filter(_.getText != null)
       .flatMap { tweet: Status =>

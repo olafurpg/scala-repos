@@ -23,11 +23,11 @@ object ToSetAndBackToDistinct extends SimplificationType {
     expr match {
       case (qual @ ExpressionType(qualType)) `.toSet` () `.toCollection` ()
           if sameCollectionType(qualType, expr.getType().getOrAny) &&
-          (isSeq(qual) || isArray(qual)) =>
+            (isSeq(qual) || isArray(qual)) =>
         Some(
-            replace(expr)
-              .withText(invocationText(qual, "distinct"))
-              .highlightFrom(qual))
+          replace(expr)
+            .withText(invocationText(qual, "distinct"))
+            .highlightFrom(qual))
       case _ => None
     }
   }

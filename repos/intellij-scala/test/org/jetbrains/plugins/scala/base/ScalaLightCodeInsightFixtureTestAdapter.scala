@@ -10,7 +10,10 @@ import com.intellij.lang.surroundWith.Surrounder
 import com.intellij.openapi.actionSystem.IdeActions
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.util.TextRange
-import com.intellij.testFramework.fixtures.{CodeInsightTestFixture, LightCodeInsightFixtureTestCase}
+import com.intellij.testFramework.fixtures.{
+  CodeInsightTestFixture,
+  LightCodeInsightFixtureTestCase
+}
 import org.jetbrains.plugins.scala.util.TestUtils.ScalaSdkVersion
 import org.jetbrains.plugins.scala.util.{ScalaToolsFactory, TestUtils}
 
@@ -33,17 +36,20 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
 
     myFixture.allowTreeAccessForAllFiles()
     libLoader = ScalaLibraryLoader.withMockJdk(
-        myFixture.getProject, myFixture.getModule, rootPath = null)
+      myFixture.getProject,
+      myFixture.getModule,
+      rootPath = null)
     libLoader.loadScala(libVersion)
   }
 
   protected def libVersion: ScalaSdkVersion =
     TestUtils.DEFAULT_SCALA_SDK_VERSION
 
-  protected def checkAfterSurroundWith(text: String,
-                                       assumedText: String,
-                                       surrounder: Surrounder,
-                                       canSurround: Boolean) {
+  protected def checkAfterSurroundWith(
+      text: String,
+      assumedText: String,
+      surrounder: Surrounder,
+      canSurround: Boolean) {
     myFixture.configureByText("dummy.scala", text)
     val scaladocSurroundDescriptor = ScalaToolsFactory
       .getInstance()
@@ -52,20 +58,22 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
     val selectionModel = myFixture.getEditor.getSelectionModel
 
     val elementsToSurround = scaladocSurroundDescriptor.getElementsToSurround(
-        myFixture.getFile,
-        selectionModel.getSelectionStart,
-        selectionModel.getSelectionEnd)
+      myFixture.getFile,
+      selectionModel.getSelectionStart,
+      selectionModel.getSelectionEnd)
 
     if (!canSurround) {
-      assert(elementsToSurround == null || elementsToSurround.isEmpty,
-             elementsToSurround.mkString("![", ",", "]!"))
+      assert(
+        elementsToSurround == null || elementsToSurround.isEmpty,
+        elementsToSurround.mkString("![", ",", "]!"))
     } else {
       assert(elementsToSurround.nonEmpty, "No elements to surround!")
       extensions.startCommand(getProject, "Surround With Test") {
-        SurroundWithHandler.invoke(myFixture.getProject,
-                                   myFixture.getEditor,
-                                   myFixture.getFile,
-                                   surrounder)
+        SurroundWithHandler.invoke(
+          myFixture.getProject,
+          myFixture.getEditor,
+          myFixture.getFile,
+          surrounder)
       }
       myFixture.checkResult(assumedText)
     }
@@ -78,7 +86,10 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
       .buildInitialFoldings(myFixture.getEditor)
 
     myFixture.testHighlighting(
-        false, false, false, myFixture.getFile.getVirtualFile)
+      false,
+      false,
+      false,
+      myFixture.getFile.getVirtualFile)
   }
 
   protected def checkTextHasNoErrors(
@@ -93,12 +104,14 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
     val caretIndex = text.indexOf(CARET_MARKER)
     val highlights: mutable.Buffer[HighlightInfo] = for {
       info <- myFixture.doHighlighting() if info.getDescription == annotation
-             if caretIndex == -1 || new TextRange(
-                 info.getStartOffset, info.getEndOffset).contains(caretIndex)
+      if caretIndex == -1 || new TextRange(
+        info.getStartOffset,
+        info.getEndOffset).contains(caretIndex)
     } yield info
     val ranges = highlights.map(info => (info.startOffset, info.endOffset))
-    assert(highlights.isEmpty,
-           "Highlights with this errors at " + ranges.mkString("", ", ", "."))
+    assert(
+      highlights.isEmpty,
+      "Highlights with this errors at " + ranges.mkString("", ", ", "."))
   }
 
   protected def performTest(text: String, assumedText: String)(
@@ -107,7 +120,8 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
     val cleanedAssumed = assumedText.replace("\r", "")
     val caretIndex = cleanedText.indexOf(CARET_MARKER)
     myFixture.configureByText(
-        "dummy.scala", cleanedText.replace(CARET_MARKER, ""))
+      "dummy.scala",
+      cleanedText.replace(CARET_MARKER, ""))
     myFixture.getEditor.getCaretModel.moveToOffset(caretIndex)
 
     testBody()
@@ -123,26 +137,33 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
     * @param charTyped       Char typed
     */
   protected def checkGeneratedTextAfterTyping(
-      text: String, assumedText: String, charTyped: Char) {
+      text: String,
+      assumedText: String,
+      charTyped: Char) {
     performTest(text, assumedText) { () =>
       myFixture.`type`(charTyped)
     }
   }
 
   protected def checkGeneratedTextAfterBackspace(
-      text: String, assumedText: String) {
+      text: String,
+      assumedText: String) {
     performTest(text, assumedText) { () =>
       CommandProcessor.getInstance.executeCommand(
-          myFixture.getProject, new Runnable {
-        def run() {
-          myFixture.performEditorAction(IdeActions.ACTION_EDITOR_BACKSPACE)
-        }
-      }, "", null)
+        myFixture.getProject,
+        new Runnable {
+          def run() {
+            myFixture.performEditorAction(IdeActions.ACTION_EDITOR_BACKSPACE)
+          }
+        },
+        "",
+        null)
     }
   }
 
   protected def checkGeneratedTextAfterEnter(
-      text: String, assumedText: String) {
+      text: String,
+      assumedText: String) {
     performTest(text, assumedText) { () =>
       CommandProcessor
         .getInstance()
@@ -176,18 +197,21 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
     val withRightDescription = myFixture
       .doHighlighting()
       .filter(info => info.getDescription == annotation)
-    assert(withRightDescription.nonEmpty,
-           "No highlightings with such description: " + annotation)
+    assert(
+      withRightDescription.nonEmpty,
+      "No highlightings with such description: " + annotation)
 
-    val ranges = withRightDescription.map(
-        info => (info.getStartOffset, info.getEndOffset))
+    val ranges =
+      withRightDescription.map(info => (info.getStartOffset, info.getEndOffset))
     val message =
       "Highlights with this description are at " + ranges.mkString(" ") +
-      ", but has to be at " + (selectionStart, selectionEnd)
-    assert(withRightDescription.exists(info =>
-                 info.getStartOffset == selectionStart &&
-                 info.getEndOffset == selectionEnd),
-           message)
+        ", but has to be at " + (selectionStart, selectionEnd)
+    assert(
+      withRightDescription.exists(
+        info =>
+          info.getStartOffset == selectionStart &&
+            info.getEndOffset == selectionEnd),
+      message)
   }
 
   /**
@@ -216,12 +240,13 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
     }
     myFixture
       .doHighlighting()
-      .foreach(info =>
-            if (info != null && info.quickFixActionRanges != null &&
-                checkCaret(info.getStartOffset, info.getEndOffset))
-              actions ++=
-              (for (pair <- info.quickFixActionRanges if pair != null) yield
-                    pair.getFirst.getAction))
+      .foreach(
+        info =>
+          if (info != null && info.quickFixActionRanges != null &&
+              checkCaret(info.getStartOffset, info.getEndOffset))
+            actions ++=
+              (for (pair <- info.quickFixActionRanges if pair != null)
+                yield pair.getFirst.getAction))
 
     assert(actions.nonEmpty, "There is no available fixes.")
 
@@ -229,15 +254,21 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
       case Some(action) =>
         CommandProcessor
           .getInstance()
-          .executeCommand(myFixture.getProject, new Runnable {
-            def run() {
-              extensions.inWriteAction {
-                action.invoke(myFixture.getProject,
-                              myFixture.getEditor,
-                              myFixture.getFile)
+          .executeCommand(
+            myFixture.getProject,
+            new Runnable {
+              def run() {
+                extensions.inWriteAction {
+                  action.invoke(
+                    myFixture.getProject,
+                    myFixture.getEditor,
+                    myFixture.getFile)
+                }
               }
-            }
-          }, "", null)
+            },
+            "",
+            null
+          )
         myFixture.checkResult(assumedStub, /*stripTrailingSpaces = */ true)
       case _ => assert(false, "There is no fixes with such hint.")
     }

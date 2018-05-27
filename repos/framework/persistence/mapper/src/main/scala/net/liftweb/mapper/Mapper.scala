@@ -35,7 +35,9 @@ trait BaseMapper extends FieldContainer {
 }
 
 trait Mapper[A <: Mapper[A]]
-    extends BaseMapper with Serializable with SourceInfo { self: A =>
+    extends BaseMapper
+    with Serializable
+    with SourceInfo { self: A =>
   type MapperType = A
 
   private var was_deleted_? = false
@@ -64,7 +66,8 @@ trait Mapper[A <: Mapper[A]]
 
   def connectionIdentifier = dbConnectionIdentifier openOr calcDbId
 
-  def dbCalculateConnectionIdentifier: PartialFunction[A, ConnectionIdentifier] =
+  def dbCalculateConnectionIdentifier
+    : PartialFunction[A, ConnectionIdentifier] =
     Map.empty
 
   private def calcDbId =
@@ -183,16 +186,18 @@ trait Mapper[A <: Mapper[A]]
     * flat map the fields titles and forms to generate a list
     * @param func called with displayHtml, fieldId, form
     */
-  def flatMapFieldTitleForm[T](func: (NodeSeq, Box[NodeSeq],
-      NodeSeq) => scala.collection.Seq[T]): List[T] =
+  def flatMapFieldTitleForm[T](
+      func: (NodeSeq, Box[NodeSeq], NodeSeq) => scala.collection.Seq[T])
+    : List[T] =
     getSingleton.flatMapFieldTitleForm(this, func)
 
   /**
     * flat map the fields titles and forms to generate a list
     * @param func called with displayHtml, fieldId, form
     */
-  def flatMapFieldTitleForm2[T](func: (NodeSeq, MappedField[_, A],
-      NodeSeq) => scala.collection.Seq[T]): List[T] =
+  def flatMapFieldTitleForm2[T](
+      func: (NodeSeq, MappedField[_, A], NodeSeq) => scala.collection.Seq[T])
+    : List[T] =
     getSingleton.flatMapFieldTitleForm2(this, func)
 
   /**
@@ -204,14 +209,12 @@ trait Mapper[A <: Mapper[A]]
     * @return the form
     */
   def toForm(button: Box[String], onSuccess: String): NodeSeq =
-    toForm(button,
-           (what: A) =>
-             {
-               what.validate match {
-                 case Nil => what.save; S.redirectTo(onSuccess)
-                 case xs => S.error(xs)
-               }
-           })
+    toForm(button, (what: A) => {
+      what.validate match {
+        case Nil => what.save; S.redirectTo(onSuccess)
+        case xs  => S.error(xs)
+      }
+    })
 
   /**
     * Present the model as a HTML using the same formatting as toForm
@@ -231,16 +234,18 @@ trait Mapper[A <: Mapper[A]]
   def toForm(button: Box[String], f: A => Any): NodeSeq =
     getSingleton.toForm(this) ++ S
       .fmapFunc((ignore: List[String]) => f(this)) { (name: String) =>
-      ( <input type='hidden' name={name} value="n/a" />)
-    } ++
-    (button.map(b =>
-              getSingleton.formatFormElement(
-                  <xml:group>&nbsp;</xml:group>,
-                  <input type="submit" value={b}/>)) openOr scala.xml.Text(""))
+        (<input type='hidden' name={name} value="n/a" />)
+      } ++
+      (button.map(
+        b =>
+          getSingleton.formatFormElement(
+            <xml:group>&nbsp;</xml:group>,
+            <input type="submit" value={b}/>)) openOr scala.xml.Text(""))
 
-  def toForm(button: Box[String],
-             redoSnippet: NodeSeq => NodeSeq,
-             onSuccess: A => Unit): NodeSeq = {
+  def toForm(
+      button: Box[String],
+      redoSnippet: NodeSeq => NodeSeq,
+      onSuccess: A => Unit): NodeSeq = {
     val snipName = S.currentSnippet
     def doSubmit() {
       this.validate match {
@@ -251,13 +256,13 @@ trait Mapper[A <: Mapper[A]]
       }
     }
 
-    getSingleton.toForm(this) ++ S.fmapFunc(
-        (ignore: List[String]) => doSubmit())(
-        name => <input type='hidden' name={name} value="n/a" />) ++
-    (button.map(b =>
-              getSingleton.formatFormElement(
-                  <xml:group>&nbsp;</xml:group>,
-                  <input type="submit" value={b}/>)) openOr scala.xml.Text(""))
+    getSingleton.toForm(this) ++ S.fmapFunc((ignore: List[String]) =>
+      doSubmit())(name => <input type='hidden' name={name} value="n/a" />) ++
+      (button.map(
+        b =>
+          getSingleton.formatFormElement(
+            <xml:group>&nbsp;</xml:group>,
+            <input type="submit" value={b}/>)) openOr scala.xml.Text(""))
   }
 
   def saved_? : Boolean = getSingleton.saved_?(this)
@@ -291,7 +296,7 @@ trait Mapper[A <: Mapper[A]]
     runSafe {
       getSingleton match {
         case null =>
-        case s => s.checkFieldNames(this)
+        case s    => s.checkFieldNames(this)
       }
     }
   }
@@ -348,7 +353,8 @@ trait Mapper[A <: Mapper[A]]
 }
 
 trait LongKeyedMapper[OwnerType <: LongKeyedMapper[OwnerType]]
-    extends KeyedMapper[Long, OwnerType] with BaseLongKeyedMapper {
+    extends KeyedMapper[Long, OwnerType]
+    with BaseLongKeyedMapper {
   self: OwnerType =>
 }
 
@@ -356,8 +362,8 @@ trait BaseKeyedMapper extends BaseMapper {
   type TheKeyType
   type KeyedMapperType <: KeyedMapper[TheKeyType, KeyedMapperType]
 
-  def primaryKeyField: MappedField[TheKeyType, MapperType] with IndexedField[
-      TheKeyType]
+  def primaryKeyField
+    : MappedField[TheKeyType, MapperType] with IndexedField[TheKeyType]
 
   /**
     * Delete the model from the RDBMS
@@ -446,13 +452,14 @@ trait CreatedUpdated extends CreatedTrait with UpdatedTrait {
 }
 
 trait KeyedMapper[KeyType, OwnerType <: KeyedMapper[KeyType, OwnerType]]
-    extends Mapper[OwnerType] with BaseKeyedMapper { self: OwnerType =>
+    extends Mapper[OwnerType]
+    with BaseKeyedMapper { self: OwnerType =>
 
   type TheKeyType = KeyType
   type KeyedMapperType = OwnerType
 
-  def primaryKeyField: MappedField[KeyType, OwnerType] with IndexedField[
-      KeyType]
+  def primaryKeyField
+    : MappedField[KeyType, OwnerType] with IndexedField[KeyType]
   def getSingleton: KeyedMetaMapper[KeyType, OwnerType];
 
   override def comparePrimaryKeys(other: OwnerType) =
@@ -470,7 +477,7 @@ trait KeyedMapper[KeyType, OwnerType <: KeyedMapper[KeyType, OwnerType]]
       case null => false
       case km: KeyedMapper[_, _]
           if this.getClass.isAssignableFrom(km.getClass) ||
-          km.getClass.isAssignableFrom(this.getClass) =>
+            km.getClass.isAssignableFrom(this.getClass) =>
         this.primaryKeyField == km.primaryKeyField
       case k => super.equals(k)
     }

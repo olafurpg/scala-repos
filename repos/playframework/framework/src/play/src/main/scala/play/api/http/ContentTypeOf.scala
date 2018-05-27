@@ -17,7 +17,7 @@ import scala.annotation._
   * @param mimeType the default content type for `A`, if any
   */
 @implicitNotFound(
-    "Cannot guess the content type to use for ${A}. Try to define a ContentTypeOf[${A}]"
+  "Cannot guess the content type to use for ${A}. Try to define a ContentTypeOf[${A}]"
 )
 case class ContentTypeOf[-A](mimeType: Option[String])
 
@@ -34,7 +34,8 @@ trait DefaultContentTypeOfs {
   /**
     * Default content type for `Html` values (`text/html`).
     */
-  implicit def contentTypeOf_Html(implicit codec: Codec): ContentTypeOf[Html] = {
+  implicit def contentTypeOf_Html(
+      implicit codec: Codec): ContentTypeOf[Html] = {
     ContentTypeOf[Html](Some(ContentTypes.HTML))
   }
 

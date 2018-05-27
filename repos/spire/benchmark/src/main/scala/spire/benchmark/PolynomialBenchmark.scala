@@ -36,11 +36,11 @@ class PolynomialBenchmarks extends MyBenchmark {
 
     spireDenseRationalPolys = coeffs.map(cs => Polynomial.dense(cs))
     spireSparseRationalPolys = spireDenseRationalPolys.map(_.toSparse)
-    spireDenseDoublePolys = coeffs.map(
-        cs => Polynomial.dense(cs.map(_.toDouble)))
+    spireDenseDoublePolys =
+      coeffs.map(cs => Polynomial.dense(cs.map(_.toDouble)))
     spireSparseDoublePolys = spireDenseDoublePolys.map(_.toSparse)
-    commonsDoublePolys = coeffs.map(
-        cs => new PolynomialFunction(cs.map(_.toDouble)))
+    commonsDoublePolys =
+      coeffs.map(cs => new PolynomialFunction(cs.map(_.toDouble)))
   }
 
   def addSpireRationalPolynomials(
@@ -134,7 +134,8 @@ class PolynomialBenchmarks extends MyBenchmark {
     total
   }
 
-  def evaluateSpireDoublePolynomials(data: Array[Polynomial[Double]]): Double = {
+  def evaluateSpireDoublePolynomials(
+      data: Array[Polynomial[Double]]): Double = {
     val testVariable = 2.0
     var total: Double = 0.0
     var i = 0

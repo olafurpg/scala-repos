@@ -55,7 +55,8 @@ object Printer {
     */
   object MarginType
       extends SFXEnumDelegateCompanion[
-          jfxp.Printer.MarginType, Printer.MarginType] {
+        jfxp.Printer.MarginType,
+        Printer.MarginType] {
 
     /**
       * This requests a default 0.75 inch margin on all sides.
@@ -73,14 +74,13 @@ object Printer {
       * top/bottom hardware margins separately, so that the top and bottom margins are equal,
       * and the left and right margins are equal.
       */
-    val EqualOpposites = new MarginType(
-        jfxp.Printer.MarginType.EQUAL_OPPOSITES)
+    val EqualOpposites = new MarginType(jfxp.Printer.MarginType.EQUAL_OPPOSITES)
 
     /**
       * Request margins are set to be the smallest on each side that the hardware allows.
       */
     val HardwareMinimum = new MarginType(
-        jfxp.Printer.MarginType.HARDWARE_MINIMUM)
+      jfxp.Printer.MarginType.HARDWARE_MINIMUM)
 
     protected override def unsortedValues: Array[Printer.MarginType] =
       Array(Default, Equal, EqualOpposites, HardwareMinimum)
@@ -150,14 +150,14 @@ final class Printer(override val delegate: jfxp.Printer)
     * @param bMargin the bottom margin to use in pts.
     * @return PageLayout based on the specified parameters.
     */
-  def createPageLayout(paper: Paper,
-                       orient: PageOrientation,
-                       lMargin: Double,
-                       rMargin: Double,
-                       tMargin: Double,
-                       bMargin: Double): PageLayout =
-    delegate.createPageLayout(
-        paper, orient, lMargin, rMargin, tMargin, bMargin)
+  def createPageLayout(
+      paper: Paper,
+      orient: PageOrientation,
+      lMargin: Double,
+      rMargin: Double,
+      tMargin: Double,
+      bMargin: Double): PageLayout =
+    delegate.createPageLayout(paper, orient, lMargin, rMargin, tMargin, bMargin)
 
   /**
     * Obtain a new PageLayout instance for this printer using the specified parameters.
@@ -167,8 +167,9 @@ final class Printer(override val delegate: jfxp.Printer)
     * @param mType - the margin type to use
     * @return PageLayout based on the specified parameters.
     */
-  def createPageLayout(paper: Paper,
-                       orient: PageOrientation,
-                       mType: jfxp.Printer.MarginType): PageLayout =
+  def createPageLayout(
+      paper: Paper,
+      orient: PageOrientation,
+      mType: jfxp.Printer.MarginType): PageLayout =
     delegate.createPageLayout(paper, orient, mType)
 }

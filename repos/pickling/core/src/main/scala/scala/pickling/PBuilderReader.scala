@@ -176,7 +176,7 @@ abstract class AbtsractPBuilder extends PBuilder with PickleTools
   */
 trait PReader extends Hintable {
 
-  /** Start reading a pickled value.  
+  /** Start reading a pickled value.
     *  This will return any serialized type tag key string.   This string can be used
     *  to reconstitute a FastTypeTag w/ a mirror, but is intended for use as fast string-matching.
     */
@@ -228,7 +228,8 @@ abstract class AbstractPReader extends PReader with PickleTools
   * @param cause exception causing the pickling exception if any
   */
 final case class PicklingException(
-    message: String, cause: Option[Throwable] = None)
+    message: String,
+    cause: Option[Throwable] = None)
     extends RuntimeException(message, cause.orNull)
 
 /**

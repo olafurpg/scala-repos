@@ -39,7 +39,7 @@ class FutureCache[-K, V] {
     val promise = Promise[V]()
     val fut = promise.future
     cache.putIfAbsent(k, fut) match {
-      case null => Left(promise)
+      case null   => Left(promise)
       case exists => Right(exists)
     }
   }

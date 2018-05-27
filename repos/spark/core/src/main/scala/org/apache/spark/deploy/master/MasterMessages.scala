@@ -33,14 +33,17 @@ private[master] object MasterMessages {
   case object CheckForWorkerTimeOut
 
   case class BeginRecovery(
-      storedApps: Seq[ApplicationInfo], storedWorkers: Seq[WorkerInfo])
+      storedApps: Seq[ApplicationInfo],
+      storedWorkers: Seq[WorkerInfo])
 
   case object CompleteRecovery
 
   case object BoundPortsRequest
 
   case class BoundPortsResponse(
-      rpcEndpointPort: Int, webUIPort: Int, restPort: Option[Int])
+      rpcEndpointPort: Int,
+      webUIPort: Int,
+      restPort: Option[Int])
 
   case class AttachCompletedRebuildUI(appId: String)
 }

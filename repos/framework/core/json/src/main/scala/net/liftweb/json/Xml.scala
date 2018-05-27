@@ -43,11 +43,11 @@ object Xml {
     *         &lt;id&gt;2&lt;/id&gt;
     *         &lt;name&gt;David&lt;/name&gt;
     *       &lt;/user&gt;
-    *     &lt;/users&gt;   
+    *     &lt;/users&gt;
     *
     * scala> val json = toJson(xml)
     * scala> pretty(render(json))
-    * 
+    *
     * {
     *   "users":{
     *     "user":[{
@@ -72,7 +72,7 @@ object Xml {
     * json map {
     *   case JField("id", JString(s)) => JField("id", JInt(s.toInt))
     *   case JField("user", x: JObject) => JField("user", JArray(x :: Nil))
-    *   case x => x 
+    *   case x => x
     * }
     * </pre>
     */
@@ -114,12 +114,12 @@ object Xml {
       case XValue(s) => JString(s)
       case XLeaf((name, value), attrs) =>
         (value, attrs) match {
-          case (_, Nil) => toJValue(value)
+          case (_, Nil)         => toJValue(value)
           case (XValue(""), xs) => JObject(mkFields(xs))
           case (_, xs) =>
             JObject(JField(name, toJValue(value)) :: mkFields(xs))
         }
-      case XNode(xs) => JObject(mkFields(xs))
+      case XNode(xs)     => JObject(mkFields(xs))
       case XArray(elems) => JArray(elems.map(toJValue))
     }
 
@@ -128,11 +128,11 @@ object Xml {
         case (name, value) =>
           (value, toJValue(value)) match {
             // This special case is needed to flatten nested objects which resulted from
-            // XML attributes. Flattening keeps transformation more predicatable.  
+            // XML attributes. Flattening keeps transformation more predicatable.
             // <a><foo id="1">x</foo></a> -> {"a":{"foo":{"foo":"x","id":"1"}}} vs
             // <a><foo id="1">x</foo></a> -> {"a":{"foo":"x","id":"1"}}
             case (XLeaf(v, x :: xs), o: JObject) => o.obj
-            case (_, json) => JField(name, json) :: Nil
+            case (_, json)                       => JField(name, json) :: Nil
           }
       }
 
@@ -144,16 +144,15 @@ object Xml {
         else {
           val children = directChildren(n)
           XNode(
-              buildAttrs(n) ::: children
-                .map(nameOf)
-                .toList
-                .zip(buildNodes(children))) :: Nil
+            buildAttrs(n) ::: children
+              .map(nameOf)
+              .toList
+              .zip(buildNodes(children))) :: Nil
         }
       case nodes: NodeSeq =>
         val allLabels = nodes.map(_.label)
         if (array_?(allLabels)) {
-          val arr = XArray(
-              nodes.toList.flatMap { n =>
+          val arr = XArray(nodes.toList.flatMap { n =>
             if (leaf_?(n) && n.attributes.length == 0) XValue(n.text) :: Nil
             else buildNodes(n)
           })
@@ -163,8 +162,8 @@ object Xml {
 
     buildNodes(xml) match {
       case List(x @ XLeaf(_, _ :: _)) => toJValue(x)
-      case List(x) => JObject(JField(nameOf(xml.head), toJValue(x)) :: Nil)
-      case x => JArray(x.map(toJValue))
+      case List(x)                    => JObject(JField(nameOf(xml.head), toJValue(x)) :: Nil)
+      case x                          => JArray(x.map(toJValue))
     }
   }
 
@@ -195,12 +194,12 @@ object Xml {
         xs flatMap { v =>
           toXml(name, v)
         }
-      case JInt(x) => new XmlElem(name, x.toString)
+      case JInt(x)    => new XmlElem(name, x.toString)
       case JDouble(x) => new XmlElem(name, x.toString)
       case JString(x) => new XmlElem(name, x)
-      case JBool(x) => new XmlElem(name, x.toString)
-      case JNull => new XmlElem(name, "null")
-      case JNothing => Text("")
+      case JBool(x)   => new XmlElem(name, x.toString)
+      case JNull      => new XmlElem(name, "null")
+      case JNothing   => Text("")
     }
 
     json match {

@@ -20,7 +20,9 @@ case class OAuth(info: ServiceInfo, use10a: Boolean = true) {
 
   private val provider = {
     val p = new CommonsHttpOAuthProvider(
-        info.requestTokenURL, info.accessTokenURL, info.authorizationURL)
+      info.requestTokenURL,
+      info.accessTokenURL,
+      info.authorizationURL)
     p.setOAuth10a(use10a)
     p
   }
@@ -69,9 +71,9 @@ case class OAuth(info: ServiceInfo, use10a: Boolean = true) {
     */
   def redirectUrl(token: String): String = {
     _root_.oauth.signpost.OAuth.addQueryParameters(
-        provider.getAuthorizationWebsiteUrl(),
-        _root_.oauth.signpost.OAuth.OAUTH_TOKEN,
-        token
+      provider.getAuthorizationWebsiteUrl(),
+      _root_.oauth.signpost.OAuth.OAUTH_TOKEN,
+      token
     )
   }
 }
@@ -89,28 +91,34 @@ case class RequestToken(token: String, secret: String)
 /**
   * The information identifying a oauth provider: URLs and the consumer key / consumer secret pair.
   */
-case class ServiceInfo(requestTokenURL: String,
-                       accessTokenURL: String,
-                       authorizationURL: String,
-                       key: ConsumerKey)
+case class ServiceInfo(
+    requestTokenURL: String,
+    accessTokenURL: String,
+    authorizationURL: String,
+    key: ConsumerKey)
 
 /**
   * The public AsyncHttpClient implementation of WSSignatureCalculator.
   */
 class OAuthCalculator(consumerKey: ConsumerKey, requestToken: RequestToken)
-    extends WSSignatureCalculator with SignatureCalculator {
+    extends WSSignatureCalculator
+    with SignatureCalculator {
 
-  import org.asynchttpclient.oauth.{ConsumerKey => AHCConsumerKey, RequestToken => AHCRequestToken}
+  import org.asynchttpclient.oauth.{
+    ConsumerKey => AHCConsumerKey,
+    RequestToken => AHCRequestToken
+  }
 
-  private val ahcConsumerKey = new AHCConsumerKey(
-      consumerKey.key, consumerKey.secret)
-  private val ahcRequestToken = new AHCRequestToken(
-      requestToken.token, requestToken.secret)
-  private val calculator = new OAuthSignatureCalculator(
-      ahcConsumerKey, ahcRequestToken)
+  private val ahcConsumerKey =
+    new AHCConsumerKey(consumerKey.key, consumerKey.secret)
+  private val ahcRequestToken =
+    new AHCRequestToken(requestToken.token, requestToken.secret)
+  private val calculator =
+    new OAuthSignatureCalculator(ahcConsumerKey, ahcRequestToken)
 
   override def calculateAndAddSignature(
-      request: Request, requestBuilder: RequestBuilderBase[_]): Unit = {
+      request: Request,
+      requestBuilder: RequestBuilderBase[_]): Unit = {
     calculator.calculateAndAddSignature(request, requestBuilder)
   }
 }
@@ -128,7 +136,8 @@ class OAuthCalculator(consumerKey: ConsumerKey, requestToken: RequestToken)
   */
 object OAuthCalculator {
   def apply(
-      consumerKey: ConsumerKey, token: RequestToken): WSSignatureCalculator = {
+      consumerKey: ConsumerKey,
+      token: RequestToken): WSSignatureCalculator = {
     new OAuthCalculator(consumerKey, token)
   }
 }

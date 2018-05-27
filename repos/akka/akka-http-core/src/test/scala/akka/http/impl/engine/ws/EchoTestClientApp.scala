@@ -34,10 +34,11 @@ object EchoTestClientApp extends App {
       .asInstanceOf[Source[Nothing, NotUsed]]
 
   def messages: List[Message] =
-    List(TextMessage("Test 1"),
-         BinaryMessage(ByteString("abc")),
-         TextMessage("Test 2"),
-         BinaryMessage(ByteString("def")))
+    List(
+      TextMessage("Test 1"),
+      BinaryMessage(ByteString("abc")),
+      TextMessage("Test 2"),
+      BinaryMessage(ByteString("def")))
 
   def source: Source[Message, NotUsed] =
     Source(messages) ++ delayedCompletion(1.second) // otherwise, we may start closing too soon

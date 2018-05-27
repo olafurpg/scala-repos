@@ -27,7 +27,7 @@ object Error {
 
   def extractFailed(injectorName: String, outDir: File) = {
     throw new Exception(
-        s"Failed to extract injector sources for $injectorName - failed to create directory $outDir")
+      s"Failed to extract injector sources for $injectorName - failed to create directory $outDir")
     with InjectorIOException
   }
 }

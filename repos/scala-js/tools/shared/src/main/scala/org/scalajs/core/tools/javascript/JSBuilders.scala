@@ -67,7 +67,9 @@ class JSFileBuilder(val name: String, protected val outputWriter: Writer)
 }
 
 class JSFileBuilderWithSourceMapWriter(
-    n: String, ow: Writer, protected val sourceMapWriter: SourceMapWriter)
+    n: String,
+    ow: Writer,
+    protected val sourceMapWriter: SourceMapWriter)
     extends JSFileBuilder(n, ow) {
 
   override def addLine(line: String): Unit = {
@@ -138,10 +140,12 @@ class JSFileBuilderWithSourceMap(
     sourceMapOutputWriter: Writer,
     relativizeSourceMapBasePath: Option[URI] = None)
     extends JSFileBuilderWithSourceMapWriter(
+      n,
+      ow,
+      new SourceMapWriter(
+        sourceMapOutputWriter,
         n,
-        ow,
-        new SourceMapWriter(
-            sourceMapOutputWriter, n, relativizeSourceMapBasePath)) {
+        relativizeSourceMapBasePath)) {
 
   override def complete(): Unit = {
     addLine("//# sourceMappingURL=" + name + ".map")

@@ -34,15 +34,19 @@ import org.apache.spark.sql.types.{StructField, StructType}
   * Params for [[MaxAbsScaler]] and [[MaxAbsScalerModel]].
   */
 private[feature] trait MaxAbsScalerParams
-    extends Params with HasInputCol with HasOutputCol {
+    extends Params
+    with HasInputCol
+    with HasOutputCol {
 
   /** Validates and transforms the input schema. */
   protected def validateAndTransformSchema(schema: StructType): StructType = {
     val inputType = schema($(inputCol)).dataType
-    require(inputType.isInstanceOf[VectorUDT],
-            s"Input column ${$(inputCol)} must be a vector column")
-    require(!schema.fieldNames.contains($(outputCol)),
-            s"Output column ${$(outputCol)} already exists.")
+    require(
+      inputType.isInstanceOf[VectorUDT],
+      s"Input column ${$(inputCol)} must be a vector column")
+    require(
+      !schema.fieldNames.contains($(outputCol)),
+      s"Output column ${$(outputCol)} already exists.")
     val outputFields =
       schema.fields :+ StructField($(outputCol), new VectorUDT, false)
     StructType(outputFields)
@@ -57,7 +61,8 @@ private[feature] trait MaxAbsScalerParams
   */
 @Experimental
 class MaxAbsScaler @Since("2.0.0")(override val uid: String)
-    extends Estimator[MaxAbsScalerModel] with MaxAbsScalerParams
+    extends Estimator[MaxAbsScalerModel]
+    with MaxAbsScalerParams
     with DefaultParamsWritable {
 
   @Since("2.0.0")
@@ -82,7 +87,7 @@ class MaxAbsScaler @Since("2.0.0")(override val uid: String)
     }
 
     copyValues(
-        new MaxAbsScalerModel(uid, Vectors.dense(maxAbs)).setParent(this))
+      new MaxAbsScalerModel(uid, Vectors.dense(maxAbs)).setParent(this))
   }
 
   override def transformSchema(schema: StructType): StructType = {
@@ -105,9 +110,12 @@ object MaxAbsScaler extends DefaultParamsReadable[MaxAbsScaler] {
   *
   */
 @Experimental
-class MaxAbsScalerModel private[ml](
-    override val uid: String, val maxAbs: Vector)
-    extends Model[MaxAbsScalerModel] with MaxAbsScalerParams with MLWritable {
+class MaxAbsScalerModel private[ml] (
+    override val uid: String,
+    val maxAbs: Vector)
+    extends Model[MaxAbsScalerModel]
+    with MaxAbsScalerParams
+    with MLWritable {
 
   import MaxAbsScalerModel._
 

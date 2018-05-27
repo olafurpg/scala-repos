@@ -5,11 +5,12 @@ import com.typesafe.config.Config
 
 import lila.common.PimpedConfig._
 
-final class Env(config: Config,
-                db: lila.db.Env,
-                flood: lila.security.Flood,
-                shutup: ActorSelection,
-                system: ActorSystem) {
+final class Env(
+    config: Config,
+    db: lila.db.Env,
+    flood: lila.security.Flood,
+    shutup: ActorSelection,
+    system: ActorSystem) {
 
   private val settings = new {
     val CollectionChat = config getString "collection.chat"
@@ -19,11 +20,12 @@ final class Env(config: Config,
   }
   import settings._
 
-  lazy val api = new ChatApi(coll = chatColl,
-                             flood = flood,
-                             shutup = shutup,
-                             maxLinesPerChat = MaxLinesPerChat,
-                             netDomain = NetDomain)
+  lazy val api = new ChatApi(
+    coll = chatColl,
+    flood = flood,
+    shutup = shutup,
+    maxLinesPerChat = MaxLinesPerChat,
+    netDomain = NetDomain)
 
   system.actorOf(Props(new FrontActor(api)), name = ActorName)
 
@@ -33,9 +35,11 @@ final class Env(config: Config,
 object Env {
 
   lazy val current: Env =
-    "chat" boot new Env(config = lila.common.PlayApp loadConfig "chat",
-                        db = lila.db.Env.current,
-                        flood = lila.security.Env.current.flood,
-                        shutup = lila.hub.Env.current.actor.shutup,
-                        system = lila.common.PlayApp.system)
+    "chat" boot new Env(
+      config = lila.common.PlayApp loadConfig "chat",
+      db = lila.db.Env.current,
+      flood = lila.security.Env.current.flood,
+      shutup = lila.hub.Env.current.actor.shutup,
+      system = lila.common.PlayApp.system
+    )
 }

@@ -10,15 +10,16 @@ import com.twitter.util.Future
   * Respond with 405 Method Not Allowed error if method not in supported method list.
   */
 class MethodRequiredFilter[REQUEST <: Request](
-    val supportedMethods: Set[Method] = Set(
-          Method.Get, Method.Head, Method.Post))
+    val supportedMethods: Set[Method] =
+      Set(Method.Get, Method.Head, Method.Post))
     extends SimpleFilter[REQUEST, Response] {
 
   private[this] val allowedMethods =
     supportedMethods.mkString(", ").toUpperCase
 
-  def apply(request: REQUEST,
-            service: Service[REQUEST, Response]): Future[Response] =
+  def apply(
+      request: REQUEST,
+      service: Service[REQUEST, Response]): Future[Response] =
     if (!supportedMethods.contains(request.method)) {
       val response = request.response
       response.status = Status.MethodNotAllowed
@@ -31,4 +32,4 @@ class MethodRequiredFilter[REQUEST <: Request](
 
 object MethodRequiredFilter
     extends MethodRequiredFilter[Request](
-        Set(Method.Get, Method.Head, Method.Post))
+      Set(Method.Get, Method.Head, Method.Post))

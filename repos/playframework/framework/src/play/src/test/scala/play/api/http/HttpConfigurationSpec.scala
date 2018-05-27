@@ -6,7 +6,12 @@ package play.api.http
 import com.typesafe.config.ConfigFactory
 import org.specs2.mutable.Specification
 import play.api.{PlayException, Configuration}
-import play.core.netty.utils.{ClientCookieEncoder, ClientCookieDecoder, ServerCookieDecoder, ServerCookieEncoder}
+import play.core.netty.utils.{
+  ClientCookieEncoder,
+  ClientCookieDecoder,
+  ServerCookieDecoder,
+  ServerCookieEncoder
+}
 
 object HttpConfigurationSpec extends Specification {
 
@@ -16,20 +21,20 @@ object HttpConfigurationSpec extends Specification {
 
     def properties = {
       Map(
-          "play.http.context" -> "/",
-          "play.http.parser.maxMemoryBuffer" -> "10k",
-          "play.http.parser.maxDiskBuffer" -> "20k",
-          "play.http.actionComposition.controllerAnnotationsFirst" -> "true",
-          "play.http.actionComposition.executeActionCreatorActionFirst" -> "true",
-          "play.http.cookies.strict" -> "true",
-          "play.http.session.cookieName" -> "PLAY_SESSION",
-          "play.http.session.secure" -> "true",
-          "play.http.session.maxAge" -> "10s",
-          "play.http.session.httpOnly" -> "true",
-          "play.http.session.domain" -> "playframework.com",
-          "play.http.flash.cookieName" -> "PLAY_FLASH",
-          "play.http.flash.secure" -> "true",
-          "play.http.flash.httpOnly" -> "true"
+        "play.http.context" -> "/",
+        "play.http.parser.maxMemoryBuffer" -> "10k",
+        "play.http.parser.maxDiskBuffer" -> "20k",
+        "play.http.actionComposition.controllerAnnotationsFirst" -> "true",
+        "play.http.actionComposition.executeActionCreatorActionFirst" -> "true",
+        "play.http.cookies.strict" -> "true",
+        "play.http.session.cookieName" -> "PLAY_SESSION",
+        "play.http.session.secure" -> "true",
+        "play.http.session.maxAge" -> "10s",
+        "play.http.session.httpOnly" -> "true",
+        "play.http.session.domain" -> "playframework.com",
+        "play.http.flash.cookieName" -> "PLAY_FLASH",
+        "play.http.flash.secure" -> "true",
+        "play.http.flash.httpOnly" -> "true"
       )
     }
 
@@ -45,7 +50,7 @@ object HttpConfigurationSpec extends Specification {
       val config = properties + ("play.http.context" -> "something")
       val wrongConfiguration = Configuration(ConfigFactory.parseMap(config))
       new HttpConfiguration.HttpConfigurationProvider(wrongConfiguration).get must throwA[
-          PlayException]
+        PlayException]
     }
 
     "configure max memory buffer" in {
@@ -84,7 +89,7 @@ object HttpConfigurationSpec extends Specification {
         val httpConfiguration =
           new HttpConfiguration.HttpConfigurationProvider(configuration).get
         httpConfiguration.session.maxAge.map(_.toSeconds) must beEqualTo(
-            Some(10))
+          Some(10))
       }
 
       "cookie httpOnly" in {
@@ -97,7 +102,7 @@ object HttpConfigurationSpec extends Specification {
         val httpConfiguration =
           new HttpConfiguration.HttpConfigurationProvider(configuration).get
         httpConfiguration.session.domain must beEqualTo(
-            Some("playframework.com"))
+          Some("playframework.com"))
       }
     }
 
@@ -146,22 +151,22 @@ object HttpConfigurationSpec extends Specification {
 
       "for server encoder" in {
         cookieConfiguration.serverEncoder must beEqualTo(
-            ServerCookieEncoder.STRICT)
+          ServerCookieEncoder.STRICT)
       }
 
       "for server decoder" in {
         cookieConfiguration.serverDecoder must beEqualTo(
-            ServerCookieDecoder.STRICT)
+          ServerCookieDecoder.STRICT)
       }
 
       "for client encoder" in {
         cookieConfiguration.clientEncoder must beEqualTo(
-            ClientCookieEncoder.STRICT)
+          ClientCookieEncoder.STRICT)
       }
 
       "for client decoder" in {
         cookieConfiguration.clientDecoder must beEqualTo(
-            ClientCookieDecoder.STRICT)
+          ClientCookieDecoder.STRICT)
       }
     }
 
@@ -171,22 +176,22 @@ object HttpConfigurationSpec extends Specification {
 
       "for server encoder" in {
         cookieConfiguration.serverEncoder must beEqualTo(
-            ServerCookieEncoder.LAX)
+          ServerCookieEncoder.LAX)
       }
 
       "for server decoder" in {
         cookieConfiguration.serverDecoder must beEqualTo(
-            ServerCookieDecoder.LAX)
+          ServerCookieDecoder.LAX)
       }
 
       "for client encoder" in {
         cookieConfiguration.clientEncoder must beEqualTo(
-            ClientCookieEncoder.LAX)
+          ClientCookieEncoder.LAX)
       }
 
       "for client decoder" in {
         cookieConfiguration.clientDecoder must beEqualTo(
-            ClientCookieDecoder.LAX)
+          ClientCookieDecoder.LAX)
       }
     }
   }

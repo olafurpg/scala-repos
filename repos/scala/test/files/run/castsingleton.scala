@@ -4,7 +4,7 @@ object Test extends App {
 
   def empty(xs: L): Unit = xs match {
     case x @ N => println(x); println(x);
-    case x => println(x); println(x);
+    case x     => println(x); println(x);
   }
 
   empty(L())

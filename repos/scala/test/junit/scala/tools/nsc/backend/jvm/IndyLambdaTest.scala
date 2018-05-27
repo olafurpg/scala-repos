@@ -39,21 +39,26 @@ class IndyLambdaTest extends ClearAfterClass {
 
     // 1. Here we show that we are calling the boxing bridge (the lambda bodies here are compiled into
     //    methods of `(I)Ljava/lang/Object;` / `(I)Ljava/lang/Object;` respectively.)
-    assertEquals("(Ljava/lang/Object;)Ljava/lang/Object;",
-                 implMethodDescriptorFor("(x: Int) => new Object"))
-    assertEquals("(Ljava/lang/Object;)Ljava/lang/Object;",
-                 implMethodDescriptorFor("(x: Object) => 0"))
+    assertEquals(
+      "(Ljava/lang/Object;)Ljava/lang/Object;",
+      implMethodDescriptorFor("(x: Int) => new Object"))
+    assertEquals(
+      "(Ljava/lang/Object;)Ljava/lang/Object;",
+      implMethodDescriptorFor("(x: Object) => 0"))
 
     // 2a. We don't need such adaptations for parameters or return values with types that differ
     // from Object due to other generic substitution, LambdaMetafactory will downcast the arguments.
-    assertEquals("(Ljava/lang/String;)Ljava/lang/String;",
-                 implMethodDescriptorFor("(x: String) => x"))
+    assertEquals(
+      "(Ljava/lang/String;)Ljava/lang/String;",
+      implMethodDescriptorFor("(x: String) => x"))
 
     // 2b. Testing 2a. in combination with 1.
-    assertEquals("(Ljava/lang/Object;)Ljava/lang/String;",
-                 implMethodDescriptorFor("(x: Int) => \"\""))
-    assertEquals("(Ljava/lang/String;)Ljava/lang/Object;",
-                 implMethodDescriptorFor("(x: String) => 0"))
+    assertEquals(
+      "(Ljava/lang/Object;)Ljava/lang/String;",
+      implMethodDescriptorFor("(x: Int) => \"\""))
+    assertEquals(
+      "(Ljava/lang/String;)Ljava/lang/Object;",
+      implMethodDescriptorFor("(x: String) => 0"))
 
     // 3. Specialized functions, don't need any of this as they implement a method like `apply$mcII$sp`,
     //    and the (un)boxing is handled in the base class in code emitted by scalac.

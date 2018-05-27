@@ -22,7 +22,8 @@ class ChannelRequestStatsHandlerTest extends FunSuite with MockitoSugar {
       def getAndRemove(): AtomicInteger = ???
       def remove(): Unit = ???
       def compareAndSet(
-          oldValue: AtomicInteger, newValue: AtomicInteger): Boolean = ???
+          oldValue: AtomicInteger,
+          newValue: AtomicInteger): Boolean = ???
       def setIfAbsent(value: AtomicInteger): AtomicInteger = ???
       def getAndSet(value: AtomicInteger): AtomicInteger = ???
     }
@@ -32,7 +33,7 @@ class ChannelRequestStatsHandlerTest extends FunSuite with MockitoSugar {
 
     def requestsEqual(requests: Seq[Float]) =
       assert(
-          sr.stat("connection_requests")() == requests
+        sr.stat("connection_requests")() == requests
       )
 
     val handler = new ChannelRequestStatsHandler(sr)

@@ -21,8 +21,9 @@ trait SimpleFunction extends Node {
 }
 
 object SimpleFunction {
-  def apply[T : TypedType](
-      fname: String, fn: Boolean = false): (Seq[Rep[_]] => Rep[T]) = {
+  def apply[T: TypedType](
+      fname: String,
+      fn: Boolean = false): (Seq[Rep[_]] => Rep[T]) = {
     def build(params: IndexedSeq[Node]): SimpleFeatureNode[T] =
       new SimpleFeatureNode[T] with SimpleFunction {
         val name = fname
@@ -35,23 +36,25 @@ object SimpleFunction {
       Rep.forNode(build(paramsC.map(_.toNode)(collection.breakOut)))
     }
   }
-  def nullary[R : TypedType](fname: String, fn: Boolean = false): Rep[R] =
+  def nullary[R: TypedType](fname: String, fn: Boolean = false): Rep[R] =
     apply(fname, fn).apply(Seq())
-  def unary[T1, R : TypedType](
-      fname: String, fn: Boolean = false): (Rep[T1] => Rep[R]) = {
+  def unary[T1, R: TypedType](
+      fname: String,
+      fn: Boolean = false): (Rep[T1] => Rep[R]) = {
     val f = apply(fname, fn);
     { t1: Rep[T1] =>
       f(Seq(t1))
     }
   }
-  def binary[T1, T2, R : TypedType](
-      fname: String, fn: Boolean = false): ((Rep[T1], Rep[T2]) => Rep[R]) = {
+  def binary[T1, T2, R: TypedType](
+      fname: String,
+      fn: Boolean = false): ((Rep[T1], Rep[T2]) => Rep[R]) = {
     val f = apply(fname, fn);
     { (t1: Rep[T1], t2: Rep[T2]) =>
       f(Seq(t1, t2))
     }
   }
-  def ternary[T1, T2, T3, R : TypedType](
+  def ternary[T1, T2, T3, R: TypedType](
       fname: String,
       fn: Boolean = false): ((Rep[T1], Rep[T2], Rep[T3]) => Rep[R]) = {
     val f = apply(fname, fn);
@@ -67,7 +70,7 @@ trait SimpleBinaryOperator extends BinaryNode {
 }
 
 object SimpleBinaryOperator {
-  def apply[T : TypedType](fname: String): ((Rep[_], Rep[_]) => Rep[T]) = {
+  def apply[T: TypedType](fname: String): ((Rep[_], Rep[_]) => Rep[T]) = {
     def build(leftN: Node, rightN: Node): SimpleFeatureNode[T] =
       new SimpleFeatureNode[T] with SimpleBinaryOperator {
         val name = fname
@@ -86,7 +89,8 @@ object SimpleBinaryOperator {
   * purpose of handling it in the query compiler it is assumed to be an
   * expression of the specified type. */
 final case class SimpleLiteral(name: String)(val buildType: Type)
-    extends NullaryNode with SimplyTypedNode {
+    extends NullaryNode
+    with SimplyTypedNode {
   type Self = SimpleLiteral
   def rebuild = copy()(buildType)
 }
@@ -101,7 +105,7 @@ trait SimpleExpression extends Node {
 }
 
 object SimpleExpression {
-  def apply[T : TypedType](
+  def apply[T: TypedType](
       f: (Seq[Node], JdbcStatementBuilderComponent#QueryBuilder) => Unit)
     : (Seq[Rep[_]] => Rep[T]) = {
     def build(params: IndexedSeq[Node]): SimpleFeatureNode[T] =
@@ -116,7 +120,7 @@ object SimpleExpression {
     }
   }
 
-  def nullary[R : TypedType](
+  def nullary[R: TypedType](
       f: JdbcStatementBuilderComponent#QueryBuilder => Unit): Rep[R] = {
     val g = apply({
       (ch: Seq[Node], qb: JdbcStatementBuilderComponent#QueryBuilder) =>
@@ -125,7 +129,7 @@ object SimpleExpression {
     g.apply(Seq())
   }
 
-  def unary[T1, R : TypedType](
+  def unary[T1, R: TypedType](
       f: (Node, JdbcStatementBuilderComponent#QueryBuilder) => Unit)
     : (Rep[T1] => Rep[R]) = {
     val g = apply({
@@ -137,7 +141,7 @@ object SimpleExpression {
     }
   }
 
-  def binary[T1, T2, R : TypedType](
+  def binary[T1, T2, R: TypedType](
       f: (Node, Node, JdbcStatementBuilderComponent#QueryBuilder) => Unit)
     : ((Rep[T1], Rep[T2]) => Rep[R]) = {
     val g = apply({
@@ -149,8 +153,8 @@ object SimpleExpression {
     }
   }
 
-  def ternary[T1, T2, T3, R : TypedType](f: (Node, Node, Node,
-      JdbcStatementBuilderComponent#QueryBuilder) => Unit)
+  def ternary[T1, T2, T3, R: TypedType](
+      f: (Node, Node, Node, JdbcStatementBuilderComponent#QueryBuilder) => Unit)
     : ((Rep[T1], Rep[T2], Rep[T3]) => Rep[R]) = {
     val g = apply({
       (ch: Seq[Node], qb: JdbcStatementBuilderComponent#QueryBuilder) =>

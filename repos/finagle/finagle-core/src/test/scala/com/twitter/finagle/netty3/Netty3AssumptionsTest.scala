@@ -18,13 +18,14 @@ class Netty3AssumptionsTest extends FunSuite {
 
   def makeServer() = {
     val bootstrap = new ServerBootstrap(
-        new NioServerSocketChannelFactory(executor, executor))
+      new NioServerSocketChannelFactory(executor, executor))
     bootstrap.setPipelineFactory(new ChannelPipelineFactory {
       def getPipeline = {
         val pipeline = Channels.pipeline()
         pipeline.addLast("stfu", new SimpleChannelUpstreamHandler {
           override def messageReceived(
-              ctx: ChannelHandlerContext, e: MessageEvent) {
+              ctx: ChannelHandlerContext,
+              e: MessageEvent) {
             /* nothing */
           }
         })
@@ -35,7 +36,7 @@ class Netty3AssumptionsTest extends FunSuite {
   }
 
   test(
-      "Channel.close() should leave the channel in a closed state [immediately]") {
+    "Channel.close() should leave the channel in a closed state [immediately]") {
 
     val ch = makeServer()
     val addr = ch.getLocalAddress
@@ -45,8 +46,9 @@ class Netty3AssumptionsTest extends FunSuite {
 
     val pipeline = Channels.pipeline
     pipeline.addLast("stfu", new SimpleChannelUpstreamHandler {
-      override def exceptionCaught(ctx: ChannelHandlerContext,
-                                   e: ExceptionEvent) {
+      override def exceptionCaught(
+          ctx: ChannelHandlerContext,
+          e: ExceptionEvent) {
         // nothing here.
       }
     })

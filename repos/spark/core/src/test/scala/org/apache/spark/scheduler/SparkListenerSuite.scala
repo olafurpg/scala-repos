@@ -24,12 +24,20 @@ import scala.collection.JavaConverters._
 
 import org.scalatest.Matchers
 
-import org.apache.spark.{LocalSparkContext, SparkConf, SparkContext, SparkException, SparkFunSuite}
+import org.apache.spark.{
+  LocalSparkContext,
+  SparkConf,
+  SparkContext,
+  SparkException,
+  SparkFunSuite
+}
 import org.apache.spark.executor.TaskMetrics
 import org.apache.spark.util.{ResetSystemProperties, RpcUtils}
 
 class SparkListenerSuite
-    extends SparkFunSuite with LocalSparkContext with Matchers
+    extends SparkFunSuite
+    with LocalSparkContext
+    with Matchers
     with ResetSystemProperties {
 
   /** Length of time to wait while draining listener events. */
@@ -238,12 +246,16 @@ class SparkListenerSuite
     sc.listenerBus.waitUntilEmpty(WAIT_TIMEOUT_MILLIS)
     listener.stageInfos.size should be(1)
 
-    val d2 = d.map { i =>
-      w(i) -> i * 2
-    }.setName("shuffle input 1")
-    val d3 = d.map { i =>
-      w(i) -> (0 to (i % 5))
-    }.setName("shuffle input 2")
+    val d2 = d
+      .map { i =>
+        w(i) -> i * 2
+      }
+      .setName("shuffle input 1")
+    val d3 = d
+      .map { i =>
+        w(i) -> (0 to (i % 5))
+      }
+      .setName("shuffle input 2")
     val d4 = d2.cogroup(d3, numSlices).map {
       case (k, (v1, v2)) =>
         w(k) -> (v1.size, v2.size)
@@ -259,10 +271,12 @@ class SparkListenerSuite
           * Small test, so some tasks might take less than 1 millisecond, but average should be greater
           * than 0 ms.
           */
-        checkNonZeroAvg(taskInfoMetrics.map(_._2.executorRunTime),
-                        stageInfo + " executorRunTime")
-        checkNonZeroAvg(taskInfoMetrics.map(_._2.executorDeserializeTime),
-                        stageInfo + " executorDeserializeTime")
+        checkNonZeroAvg(
+          taskInfoMetrics.map(_._2.executorRunTime),
+          stageInfo + " executorRunTime")
+        checkNonZeroAvg(
+          taskInfoMetrics.map(_._2.executorDeserializeTime),
+          stageInfo + " executorDeserializeTime")
 
         /* Test is disabled (SEE SPARK-2208)
       if (stageInfo.rddInfos.exists(_.name == d4.name)) {
@@ -276,7 +290,7 @@ class SparkListenerSuite
           case (taskInfo, taskMetrics) =>
             taskMetrics.resultSize should be > (0L)
             if (stageInfo.rddInfos.exists(
-                    info => info.name == d2.name || info.name == d3.name)) {
+                  info => info.name == d2.name || info.name == d3.name)) {
               taskMetrics.inputMetrics should not be ('defined)
               taskMetrics.outputMetrics should not be ('defined)
               taskMetrics.shuffleWriteMetrics should be('defined)
@@ -336,7 +350,7 @@ class SparkListenerSuite
   }
 
   test(
-      "onTaskEnd() should be called for all started tasks, even after job has been killed") {
+    "onTaskEnd() should be called for all started tasks, even after job has been killed") {
     sc = new SparkContext("local", "SparkListenerSuite")
     val WAIT_TIMEOUT_MILLIS = 10000
     val listener = new SaveTaskEvents
@@ -368,7 +382,7 @@ class SparkListenerSuite
     listener.synchronized {
       var remainingWait = finishTime - System.currentTimeMillis
       while (listener.endedTasks.size < listener.startedTasks.size &&
-      remainingWait > 0) {
+             remainingWait > 0) {
         listener.wait(finishTime - System.currentTimeMillis)
         remainingWait = finishTime - System.currentTimeMillis
       }
@@ -404,12 +418,13 @@ class SparkListenerSuite
     val conf = new SparkConf()
       .setMaster("local")
       .setAppName("test")
-      .set("spark.extraListeners",
-           classOf[ListenerThatAcceptsSparkConf].getName + "," +
-           classOf[BasicJobCounter].getName)
+      .set(
+        "spark.extraListeners",
+        classOf[ListenerThatAcceptsSparkConf].getName + "," +
+          classOf[BasicJobCounter].getName)
     sc = new SparkContext(conf)
-    sc.listenerBus.listeners.asScala.count(_.isInstanceOf[BasicJobCounter]) should be(
-        1)
+    sc.listenerBus.listeners.asScala
+      .count(_.isInstanceOf[BasicJobCounter]) should be(1)
     sc.listenerBus.listeners.asScala
       .count(_.isInstanceOf[ListenerThatAcceptsSparkConf]) should be(1)
   }

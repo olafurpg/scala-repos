@@ -20,17 +20,19 @@ package object compiler {
         sdk.getSdkType match {
           case jdkType: SdkType with JavaSdkType =>
             val vmExecutable =
-              Either.cond(jdkType.sdkHasValidPath(sdk),
-                          new File(jdkType.getVMExecutablePath(sdk)),
-                          "Not valid SDK path: " + sdkName)
+              Either.cond(
+                jdkType.sdkHasValidPath(sdk),
+                new File(jdkType.getVMExecutablePath(sdk)),
+                "Not valid SDK path: " + sdkName)
 
             vmExecutable.right.flatMap { executable =>
               val tools =
                 new File(jdkType.getToolsPath(sdk)) // TODO properly handle JDK 6 on Mac OS
               val toolsPresent = true //tools.exists()
-              Either.cond(toolsPresent,
-                          JDK(executable, tools),
-                          "SDK tools not found: " + tools)
+              Either.cond(
+                toolsPresent,
+                JDK(executable, tools),
+                "SDK tools not found: " + tools)
             }
           case _ => Left("Not a Java SDK: " + sdkName)
         }

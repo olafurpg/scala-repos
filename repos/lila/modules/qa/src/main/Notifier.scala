@@ -8,7 +8,9 @@ import lila.user.User
 import akka.actor.ActorSelection
 
 private[qa] final class Notifier(
-    sender: String, messenger: ActorSelection, timeline: ActorSelection) {
+    sender: String,
+    messenger: ActorSelection,
+    timeline: ActorSelection) {
 
   private[qa] def createQuestion(q: Question, u: User) {
     val msg = Propagate(QaQuestion(u.id, q.id, q.title))
@@ -20,12 +22,14 @@ private[qa] final class Notifier(
     timeline ! (msg toFollowersOf u.id toUser q.userId exceptUser u.id)
     if (u.id != q.userId)
       messenger ! LichessThread(
-          from = sender,
-          to = q.userId,
-          subject = s"""${u.username} replied to your question""",
-          message = s"""Your question "${q.title}" got a new answer from ${u.username}!
+        from = sender,
+        to = q.userId,
+        subject = s"""${u.username} replied to your question""",
+        message =
+          s"""Your question "${q.title}" got a new answer from ${u.username}!
 
-Check it out on ${questionUrl(q)}#answer-${a.id}""")
+Check it out on ${questionUrl(q)}#answer-${a.id}"""
+      )
   }
 
   private[qa] def createQuestionComment(q: Question, c: Comment, u: User) {
@@ -34,7 +38,10 @@ Check it out on ${questionUrl(q)}#answer-${a.id}""")
   }
 
   private[qa] def createAnswerComment(
-      q: Question, a: Answer, c: Comment, u: User) {
+      q: Question,
+      a: Answer,
+      c: Comment,
+      u: User) {
     val msg = Propagate(QaComment(u.id, q.id, q.title, c.id))
     timeline ! (msg toFollowersOf u.id toUser a.userId exceptUser u.id)
   }

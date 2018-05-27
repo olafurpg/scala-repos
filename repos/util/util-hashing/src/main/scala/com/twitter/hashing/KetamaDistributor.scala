@@ -14,8 +14,7 @@ class KetamaDistributor[A](
     // clients who depend on those versions of libmemcached, we have to reproduce their result.
     // If the oldLibMemcachedVersionComplianceMode is true the behavior will be reproduced.
     oldLibMemcachedVersionComplianceMode: Boolean = false
-)
-    extends Distributor[A] {
+) extends Distributor[A] {
   private[this] val continuum = {
     val continuum = new TreeMap[Long, KetamaNode[A]]()
 

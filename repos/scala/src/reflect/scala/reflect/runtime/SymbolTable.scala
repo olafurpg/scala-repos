@@ -8,8 +8,12 @@ package runtime
   *  a runtime compiler that uses reflection to get a class information (class scala.tools.reflect.ReflectGlobal)
   */
 private[scala] trait SymbolTable
-    extends internal.SymbolTable with JavaMirrors with SymbolLoaders
-    with SynchronizedOps with Gil with ThreadLocalStorage {
+    extends internal.SymbolTable
+    with JavaMirrors
+    with SymbolLoaders
+    with SynchronizedOps
+    with Gil
+    with ThreadLocalStorage {
 
   def info(msg: => String) =
     if (settings.verbose) println("[reflect-compiler] " + msg)

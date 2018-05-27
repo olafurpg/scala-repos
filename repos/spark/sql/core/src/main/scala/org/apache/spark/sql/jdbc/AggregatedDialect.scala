@@ -34,10 +34,11 @@ private class AggregatedDialect(dialects: List[JdbcDialect])
   override def canHandle(url: String): Boolean =
     dialects.map(_.canHandle(url)).reduce(_ && _)
 
-  override def getCatalystType(sqlType: Int,
-                               typeName: String,
-                               size: Int,
-                               md: MetadataBuilder): Option[DataType] = {
+  override def getCatalystType(
+      sqlType: Int,
+      typeName: String,
+      size: Int,
+      md: MetadataBuilder): Option[DataType] = {
     dialects.flatMap(_.getCatalystType(sqlType, typeName, size, md)).headOption
   }
 

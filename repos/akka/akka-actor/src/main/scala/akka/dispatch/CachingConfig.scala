@@ -21,10 +21,15 @@ private[akka] object CachingConfig {
     val config: Config
   }
   final case class ValuePathEntry(
-      valid: Boolean, exists: Boolean, config: Config = emptyConfig)
+      valid: Boolean,
+      exists: Boolean,
+      config: Config = emptyConfig)
       extends PathEntry
   final case class StringPathEntry(
-      valid: Boolean, exists: Boolean, config: Config, value: String)
+      valid: Boolean,
+      exists: Boolean,
+      config: Config,
+      value: String)
       extends PathEntry
 
   val invalidPathEntry = ValuePathEntry(false, true)
@@ -63,10 +68,11 @@ private[akka] class CachingConfig(_config: Config) extends Config {
                 emptyPathEntry
               case Success(v) ⇒
                 if (v.valueType() == ConfigValueType.STRING)
-                  StringPathEntry(true,
-                                  true,
-                                  v.atKey("cached"),
-                                  v.unwrapped().asInstanceOf[String])
+                  StringPathEntry(
+                    true,
+                    true,
+                    v.atKey("cached"),
+                    v.unwrapped().asInstanceOf[String])
                 else ValuePathEntry(true, true, v.atKey("cached"))
             }
         }

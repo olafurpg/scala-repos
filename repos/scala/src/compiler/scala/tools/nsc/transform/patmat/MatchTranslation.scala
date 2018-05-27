@@ -23,7 +23,7 @@ trait MatchTranslation { self: PatternMatching =>
   // Always map repeated params to sequences
   private def setVarInfo(sym: Symbol, info: Type) =
     sym setInfo debug.patmatResult(s"changing ${sym.defString} to")(
-        repeatedToSeq(info))
+      repeatedToSeq(info))
 
   private def hasSym(t: Tree) = t.symbol != null && t.symbol != NoSymbol
 
@@ -38,10 +38,10 @@ trait MatchTranslation { self: PatternMatching =>
         case Bind(nme.WILDCARD, WildcardPattern()) =>
           true // don't skip when binding an interesting symbol!
         case Star(WildcardPattern()) => true
-        case x: Ident => treeInfo.isVarPattern(x)
-        case Alternative(ps) => ps forall unapply
-        case EmptyTree => true
-        case _ => false
+        case x: Ident                => treeInfo.isVarPattern(x)
+        case Alternative(ps)         => ps forall unapply
+        case EmptyTree               => true
+        case _                       => false
       }
     }
 
@@ -49,17 +49,17 @@ trait MatchTranslation { self: PatternMatching =>
       def unapply(pat: Tree): Boolean = pat match {
         case Bind(nme.WILDCARD, _) =>
           true // don't skip when binding an interesting symbol!
-        case Ident(nme.WILDCARD) => true
-        case Alternative(ps) => ps forall unapply
+        case Ident(nme.WILDCARD)                  => true
+        case Alternative(ps)                      => ps forall unapply
         case Typed(PatternBoundToUnderscore(), _) => true
-        case _ => false
+        case _                                    => false
       }
     }
 
     object SymbolBound {
       def unapply(tree: Tree): Option[(Symbol, Tree)] = tree match {
         case Bind(_, expr) if hasSym(tree) => Some(tree.symbol -> expr)
-        case _ => None
+        case _                             => None
       }
     }
 
@@ -76,24 +76,24 @@ trait MatchTranslation { self: PatternMatching =>
       def tpe =
         binder.info.dealiasWiden // the type of the variable bound to the pattern
       def pt = unbound match {
-        case Star(tpt) => this glbWith seqType(tpt.tpe)
+        case Star(tpt)      => this glbWith seqType(tpt.tpe)
         case TypeBound(tpe) => tpe
-        case tree => tree.tpe
+        case tree           => tree.tpe
       }
       def glbWith(other: Type) = glb(tpe :: other :: Nil).normalize
 
       object SymbolAndTypeBound {
         def unapply(tree: Tree): Option[(Symbol, Type)] = tree match {
           case SymbolBound(sym, TypeBound(tpe)) => Some(sym -> tpe)
-          case TypeBound(tpe) => Some(binder -> tpe)
-          case _ => None
+          case TypeBound(tpe)                   => Some(binder -> tpe)
+          case _                                => None
         }
       }
 
       object TypeBound {
         def unapply(tree: Tree): Option[Type] = tree match {
           case Typed(Ident(_), _) if tree.tpe != null => Some(tree.tpe)
-          case _ => None
+          case _                                      => None
         }
       }
 
@@ -109,8 +109,8 @@ trait MatchTranslation { self: PatternMatching =>
       private def typeTestStep(sub: Symbol, subPt: Type) =
         step(TypeTestTreeMaker(sub, binder, subPt, glbWith(subPt))(pos))()
       private def alternativesStep(alts: List[Tree]) =
-        step(AlternativesTreeMaker(
-                binder, translatedAlts(alts), alts.head.pos))()
+        step(
+          AlternativesTreeMaker(binder, translatedAlts(alts), alts.head.pos))()
       private def translatedAlts(alts: List[Tree]) =
         alts map (alt => rebindTo(alt).translate())
       private def noStep() = step()()
@@ -129,21 +129,24 @@ trait MatchTranslation { self: PatternMatching =>
         // (the prefix of the argument passed to the unapply must equal the prefix of the type of the binder)
         lazy val typeTest =
           TypeTestTreeMaker(binder, binder, paramType, paramType)(
-              pos, extractorArgTypeTest = true)
+            pos,
+            extractorArgTypeTest = true)
         // check whether typetest implies binder is not null,
         // even though the eventual null check will be on typeTest.nextBinder
         // it'll be equal to binder casted to paramType anyway (and the type test is on binder)
         def extraction: TreeMaker =
           treeMaker(
-              typeTest.nextBinder, typeTest impliesBinderNonNull binder, pos)
+            typeTest.nextBinder,
+            typeTest impliesBinderNonNull binder,
+            pos)
 
         // paramType = the type expected by the unapply
         // TODO: paramType may contain unbound type params (run/t2800, run/t3530)
         val makers =
           (// Statically conforms to paramType
-           if (this ensureConformsTo paramType)
-             treeMaker(binder, false, pos) :: Nil
-           else typeTest :: extraction :: Nil)
+          if (this ensureConformsTo paramType)
+            treeMaker(binder, false, pos) :: Nil
+          else typeTest :: extraction :: Nil)
         step(makers: _*)(extractor.subBoundTrees: _*)
       }
 
@@ -162,15 +165,15 @@ trait MatchTranslation { self: PatternMatching =>
       // [7] symbol-less bind patterns - this happens in certain ill-formed programs, there'll be an error later
       //     don't fail here though (or should we?)
       def nextStep(): TranslationStep = tree match {
-        case WildcardPattern() => noStep()
-        case _: UnApply | _: Apply => extractorStep()
+        case WildcardPattern()            => noStep()
+        case _: UnApply | _: Apply        => extractorStep()
         case SymbolAndTypeBound(sym, tpe) => typeTestStep(sym, tpe)
-        case TypeBound(tpe) => typeTestStep(binder, tpe)
-        case SymbolBound(sym, expr) => bindingStep(sym, expr)
+        case TypeBound(tpe)               => typeTestStep(binder, tpe)
+        case SymbolBound(sym, expr)       => bindingStep(sym, expr)
         case Literal(Constant(_)) | Ident(_) | Select(_, _) | This(_) =>
           equalityTestStep()
         case Alternative(alts) => alternativesStep(alts)
-        case _ => reporter.error(pos, unsupportedPatternMsg); noStep()
+        case _                 => reporter.error(pos, unsupportedPatternMsg); noStep()
       }
       def translate(): List[TreeMaker] = nextStep() merge (_.translate())
 
@@ -185,7 +188,8 @@ trait MatchTranslation { self: PatternMatching =>
       // accessors) TODO: get to the bottom of this -- I assume it happens when type checking
       // infers a weird type for an unapply call. By going back to the parameterType for the
       // extractor call we get a saner type, so let's just do that for now.
-      def ensureConformsTo(paramType: Type): Boolean = ((tpe =:= paramType) ||
+      def ensureConformsTo(paramType: Type): Boolean =
+        ((tpe =:= paramType) ||
           (tpe <:< paramType) && setInfo(paramType))
 
       private def concreteType = tpe.bounds.hi
@@ -194,14 +198,15 @@ trait MatchTranslation { self: PatternMatching =>
         if (pt <:< concreteType) "" + pt else s"$pt (binder: $tpe)"
       private def at_s = unbound match {
         case WildcardPattern() => ""
-        case pat => s" @ $pat"
+        case pat               => s" @ $pat"
       }
       override def toString = s"${binder.name}: $tpe_s$at_s"
     }
 
     // a list of TreeMakers that encode `patTree`, and a list of arguments for recursive invocations of `translatePattern` to encode its subpatterns
     final case class TranslationStep(
-        makers: List[TreeMaker], subpatterns: List[BoundTree]) {
+        makers: List[TreeMaker],
+        subpatterns: List[BoundTree]) {
       def merge(f: BoundTree => List[TreeMaker]): List[TreeMaker] =
         makers ::: (subpatterns flatMap f)
       override def toString =
@@ -235,7 +240,7 @@ trait MatchTranslation { self: PatternMatching =>
       //  and the only place that emits Matches after typers is for exception handling anyway)
       if (phase.id >= currentRun.uncurryPhase.id)
         devWarning(
-            s"running translateMatch past uncurry (at $phase) on $selector match $cases")
+          s"running translateMatch past uncurry (at $phase) on $selector match $cases")
 
       debug.patmat("translating " + cases.mkString("{", "\n", "}"))
 
@@ -243,7 +248,7 @@ trait MatchTranslation { self: PatternMatching =>
         if (Statistics.canEnable) Statistics.startTimer(patmatNanos) else null
 
       val selectorTp = repeatedToSeq(
-          elimAnonymousClass(selector.tpe.widen.withoutAnnotations))
+        elimAnonymousClass(selector.tpe.widen.withoutAnnotations))
 
       // when one of the internal cps-type-state annotations is present, strip all CPS annotations
       val origPt = removeCPSFromPt(match_.tpe)
@@ -257,12 +262,12 @@ trait MatchTranslation { self: PatternMatching =>
 
       // pt = Any* occurs when compiling test/files/pos/annotDepMethType.scala  with -Xexperimental
       val combined = combineCases(
-          selector,
-          selectorSym,
-          nonSyntheticCases map translateCase(selectorSym, pt),
-          pt,
-          matchOwner,
-          defaultOverride)
+        selector,
+        selectorSym,
+        nonSyntheticCases map translateCase(selectorSym, pt),
+        pt,
+        matchOwner,
+        defaultOverride)
 
       if (Statistics.canEnable) Statistics.stopTimer(patmatNanos, start)
       combined
@@ -274,7 +279,9 @@ trait MatchTranslation { self: PatternMatching =>
     // try to simplify to a type-based switch, or fall back to a catch-all case that runs a normal pattern match
     // unlike translateMatch, we type our result before returning it
     def translateTry(
-        caseDefs: List[CaseDef], pt: Type, pos: Position): List[CaseDef] =
+        caseDefs: List[CaseDef],
+        pt: Type,
+        pos: Position): List[CaseDef] =
       // if they're already simple enough to be handled by the back-end, we're done
       if (caseDefs forall treeInfo.isCatchCase) caseDefs
       else {
@@ -288,15 +295,17 @@ trait MatchTranslation { self: PatternMatching =>
               // generate a fresh symbol for each case, hoping we'll end up emitting a type-switch (we don't have a global scrut there)
               // if we fail to emit a fine-grained switch, have to do translateCase again with a single scrutSym (TODO: uniformize substitution on treemakers so we can avoid this)
               val caseScrutSym = freshSym(pos, pureType(ThrowableTpe))
-              (caseScrutSym,
-               propagateSubstitution(translateCase(caseScrutSym, pt)(caseDef),
-                                     EmptySubstitution))
+              (
+                caseScrutSym,
+                propagateSubstitution(
+                  translateCase(caseScrutSym, pt)(caseDef),
+                  EmptySubstitution))
             }
 
           for (cases <- emitTypeSwitch(bindersAndCases, pt).toList
-                           if cases forall treeInfo.isCatchCase; // must check again, since it's not guaranteed -- TODO: can we eliminate this? e.g., a type test could test for a trait or a non-trivial prefix, which are not handled by the back-end
-          cse <- cases) yield
-            fixerUpper(matchOwner, pos)(cse).asInstanceOf[CaseDef]
+               if cases forall treeInfo.isCatchCase; // must check again, since it's not guaranteed -- TODO: can we eliminate this? e.g., a type test could test for a trait or a non-trivial prefix, which are not handled by the back-end
+               cse <- cases)
+            yield fixerUpper(matchOwner, pos)(cse).asInstanceOf[CaseDef]
         }
 
         val catches =
@@ -306,21 +315,23 @@ trait MatchTranslation { self: PatternMatching =>
             val casesNoSubstOnly =
               caseDefs map { caseDef =>
                 (propagateSubstitution(
-                    translateCase(scrutSym, pt)(caseDef), EmptySubstitution))
+                  translateCase(scrutSym, pt)(caseDef),
+                  EmptySubstitution))
               }
 
             val exSym = freshSym(pos, pureType(ThrowableTpe), "ex")
 
             List(atPos(pos) {
               CaseDef(
-                  Bind(exSym, Ident(nme.WILDCARD)), // TODO: does this need fixing upping?
-                  EmptyTree,
-                  combineCasesNoSubstOnly(REF(exSym),
-                                          scrutSym,
-                                          casesNoSubstOnly,
-                                          pt,
-                                          matchOwner,
-                                          Some(scrut => Throw(REF(exSym))))
+                Bind(exSym, Ident(nme.WILDCARD)), // TODO: does this need fixing upping?
+                EmptyTree,
+                combineCasesNoSubstOnly(
+                  REF(exSym),
+                  scrutSym,
+                  casesNoSubstOnly,
+                  pt,
+                  matchOwner,
+                  Some(scrut => Throw(REF(exSym))))
               )
             })
           }
@@ -359,7 +370,8 @@ trait MatchTranslation { self: PatternMatching =>
     def translateCase(scrutSym: Symbol, pt: Type)(caseDef: CaseDef) = {
       val CaseDef(pattern, guard, body) = caseDef
       translatePattern(BoundTree(scrutSym, pattern)) ++ translateGuard(guard) :+ translateBody(
-          body, pt)
+        body,
+        pt)
     }
 
     def translatePattern(bound: BoundTree): List[TreeMaker] = bound.translate()
@@ -450,9 +462,10 @@ trait MatchTranslation { self: PatternMatching =>
         * `binderKnownNonNull` indicates whether the cast implies `binder` cannot be null
         * when `binderKnownNonNull` is `true`, `ProductExtractorTreeMaker` does not do a (redundant) null check on binder
         */
-      def treeMaker(binder: Symbol,
-                    binderKnownNonNull: Boolean,
-                    pos: Position): TreeMaker
+      def treeMaker(
+          binder: Symbol,
+          binderKnownNonNull: Boolean,
+          pos: Position): TreeMaker
 
       // `subPatBinders` are the variables bound by this pattern in the following patterns
       // subPatBinders are replaced by references to the relevant part of the extractor's result (tuple component, seq element, the result as-is)
@@ -495,10 +508,11 @@ trait MatchTranslation { self: PatternMatching =>
       // the trees that select the subpatterns on the extractor's result,
       // referenced by `binder`
       protected def subPatRefsSeq(binder: Symbol): List[Tree] = {
-        def lastTrees: List[Tree] = (if (!aligner.isStar) Nil
-                                     else if (expectedLength == 0)
-                                       seqTree(binder) :: Nil
-                                     else genDrop(binder, expectedLength))
+        def lastTrees: List[Tree] =
+          (if (!aligner.isStar) Nil
+           else if (expectedLength == 0)
+             seqTree(binder) :: Nil
+           else genDrop(binder, expectedLength))
         // this error-condition has already been checked by checkStarPatOK:
         //   if(isSeq) assert(firstIndexingBinder + nbIndexingIndices + (if(lastIsStar) 1 else 0) == totalArity, "(resultInMonad, ts, subPatTypes, subPats)= "+(resultInMonad, ts, subPatTypes, subPats))
 
@@ -507,7 +521,8 @@ trait MatchTranslation { self: PatternMatching =>
         // [3] the last one -- if the last subpattern is a sequence wildcard:
         //       drop the prefix (indexed by the refs on the preceding line), return the remainder
         (productElemsToN(binder, firstIndexingBinder) ++ genTake(
-                binder, expectedLength) ++ lastTrees).toList
+          binder,
+          expectedLength) ++ lastTrees).toList
       }
 
       // the trees that select the subpatterns on the extractor's result, referenced by `binder`
@@ -517,10 +532,11 @@ trait MatchTranslation { self: PatternMatching =>
          else productElemsToN(binder, totalArity))
 
       private def compareInts(t1: Tree, t2: Tree) =
-        gen.mkMethodCall(termMember(ScalaPackage, "math"),
-                         TermName("signum"),
-                         Nil,
-                         (t1 INT_- t2) :: Nil)
+        gen.mkMethodCall(
+          termMember(ScalaPackage, "math"),
+          TermName("signum"),
+          Nil,
+          (t1 INT_- t2) :: Nil)
 
       protected def lengthGuard(binder: Symbol): Option[Tree] =
         // no need to check unless it's an unapplySeq and the minimal length is non-trivially satisfied
@@ -532,7 +548,8 @@ trait MatchTranslation { self: PatternMatching =>
             sequenceType member nme.lengthCompare match {
               case NoSymbol =>
                 compareInts(
-                    Select(seqTree(binder), nme.length), LIT(expectedLength))
+                  Select(seqTree(binder), nme.length),
+                  LIT(expectedLength))
               case lencmp => (seqTree(binder) DOT lencmp)(LIT(expectedLength))
             }
 
@@ -544,8 +561,7 @@ trait MatchTranslation { self: PatternMatching =>
             else _ INT_== _
 
           // `if (binder != null && $checkExpectedLength [== | >=] 0) then else zero`
-          (seqTree(binder) ANY_!= NULL) AND compareOp(checkExpectedLength,
-                                                      ZERO)
+          (seqTree(binder) ANY_!= NULL) AND compareOp(checkExpectedLength, ZERO)
         }
 
       def checkedLength: Option[Int] =
@@ -558,7 +574,9 @@ trait MatchTranslation { self: PatternMatching =>
     // U must have N members _1,..., _N -- the _i are type checked, call their type Ti,
     // for now only used for case classes -- pretending there's an unapplyProd that's the identity (and don't call it)
     class ExtractorCallProd(
-        aligner: PatternAligned, val fun: Tree, val args: List[Tree])
+        aligner: PatternAligned,
+        val fun: Tree,
+        val args: List[Tree])
         extends ExtractorCall(aligner) {
 
       /** Create the TreeMaker that embodies this extractor call
@@ -567,9 +585,10 @@ trait MatchTranslation { self: PatternMatching =>
         * `binderKnownNonNull` indicates whether the cast implies `binder` cannot be null
         * when `binderKnownNonNull` is `true`, `ProductExtractorTreeMaker` does not do a (redundant) null check on binder
         */
-      def treeMaker(binder: Symbol,
-                    binderKnownNonNull: Boolean,
-                    pos: Position): TreeMaker = {
+      def treeMaker(
+          binder: Symbol,
+          binderKnownNonNull: Boolean,
+          pos: Position): TreeMaker = {
         val paramAccessors = binder.constrParamAccessors
         val numParams = paramAccessors.length
         def paramAccessorAt(subPatIndex: Int) =
@@ -579,30 +598,30 @@ trait MatchTranslation { self: PatternMatching =>
         // to optimize matching on List
         val hasRepeated = paramAccessors.lastOption match {
           case Some(x) => definitions.isRepeated(x)
-          case _ => false
+          case _       => false
         }
         val mutableBinders =
           (if (!binder.info.typeSymbol.hasTransOwner(ScalaPackageClass) &&
                (paramAccessors exists
-                   (x => x.isMutable || definitions.isRepeated(x)))) {
+                 (x => x.isMutable || definitions.isRepeated(x)))) {
 
              subPatBinders.zipWithIndex.flatMap {
                case (binder, idx) =>
                  val param = paramAccessorAt(idx)
                  if (param.isMutable ||
                      (definitions.isRepeated(param) &&
-                         !aligner.isStar)) binder :: Nil
+                     !aligner.isStar)) binder :: Nil
                  else Nil
              }
            } else Nil)
 
         // checks binder ne null before chaining to the next extractor
         ProductExtractorTreeMaker(binder, lengthGuard(binder))(
-            subPatBinders,
-            subPatRefs(binder),
-            mutableBinders,
-            binderKnownNonNull,
-            ignoredSubPatBinders)
+          subPatBinders,
+          subPatRefs(binder),
+          mutableBinders,
+          binderKnownNonNull,
+          ignoredSubPatBinders)
       }
 
       // reference the (i-1)th case accessor if it exists, otherwise the (i-1)th tuple component
@@ -615,9 +634,10 @@ trait MatchTranslation { self: PatternMatching =>
       }
     }
 
-    class ExtractorCallRegular(aligner: PatternAligned,
-                               extractorCallIncludingDummy: Tree,
-                               val args: List[Tree])
+    class ExtractorCallRegular(
+        aligner: PatternAligned,
+        extractorCallIncludingDummy: Tree,
+        val args: List[Tree])
         extends ExtractorCall(aligner) {
       val Unapplied(fun) = extractorCallIncludingDummy
 
@@ -631,9 +651,10 @@ trait MatchTranslation { self: PatternMatching =>
         *       case class Binder(sym: Symbol, knownNotNull: Boolean).
         *    Perhaps it hasn't reached critical mass, but it would already clean things up a touch.
         */
-      def treeMaker(patBinderOrCasted: Symbol,
-                    binderKnownNonNull: Boolean,
-                    pos: Position): TreeMaker = {
+      def treeMaker(
+          patBinderOrCasted: Symbol,
+          binderKnownNonNull: Boolean,
+          pos: Position): TreeMaker = {
         // the extractor call (applied to the binder bound by the flatMap corresponding
         // to the previous (i.e., enclosing/outer) pattern)
         val extractorApply = atPos(pos)(spliceApply(patBinderOrCasted))
@@ -649,13 +670,13 @@ trait MatchTranslation { self: PatternMatching =>
             subPatBinders.toSet
 
         ExtractorTreeMaker(extractorApply, lengthGuard(binder), binder)(
-            subPatBinders,
-            subPatRefs(binder),
-            potentiallyMutableBinders,
-            aligner.isBool,
-            checkedLength,
-            patBinderOrCasted,
-            ignoredSubPatBinders
+          subPatBinders,
+          subPatRefs(binder),
+          potentiallyMutableBinders,
+          aligner.isBool,
+          checkedLength,
+          patBinderOrCasted,
+          ignoredSubPatBinders
         )
       }
 
@@ -678,11 +699,13 @@ trait MatchTranslation { self: PatternMatching =>
             case Apply(x, List(i @ Ident(nme.SELECTOR_DUMMY))) =>
               treeCopy.Apply(t, x, binderRef(i.pos) :: Nil)
             // SI-7868 Account for numeric widening, e.g. <unapplySelector>.toInt
-            case Apply(x,
-                       List(
-                       i @ (sel @ Select(Ident(nme.SELECTOR_DUMMY), name)))) =>
+            case Apply(
+                x,
+                List(i @ (sel @ Select(Ident(nme.SELECTOR_DUMMY), name)))) =>
               treeCopy.Apply(
-                  t, x, treeCopy.Select(sel, binderRef(i.pos), name) :: Nil)
+                t,
+                x,
+                treeCopy.Select(sel, binderRef(i.pos), name) :: Nil)
             case _ =>
               super.transform(t)
           }

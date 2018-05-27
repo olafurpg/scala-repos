@@ -18,7 +18,13 @@
 package org.apache.spark.mllib.stat
 
 import org.apache.spark.SparkFunSuite
-import org.apache.spark.mllib.stat.test.{BinarySample, StreamingTest, StreamingTestResult, StudentTTest, WelchTTest}
+import org.apache.spark.mllib.stat.test.{
+  BinarySample,
+  StreamingTest,
+  StreamingTestResult,
+  StudentTTest,
+  WelchTTest
+}
 import org.apache.spark.streaming.TestSuiteBase
 import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.util.StatCounter
@@ -44,17 +50,24 @@ class StreamingTestSuite extends SparkFunSuite with TestSuiteBase {
       .setTestMethod(testMethod)
 
     val input = generateTestData(
-        numBatches, pointsPerBatch, meanA, stdevA, meanB, stdevB, 42)
+      numBatches,
+      pointsPerBatch,
+      meanA,
+      stdevA,
+      meanB,
+      stdevB,
+      42)
 
     // setup and run the model
-    val ssc = setupStreams(input,
-                           (inputDStream: DStream[BinarySample]) =>
-                             model.registerStream(inputDStream))
+    val ssc = setupStreams(
+      input,
+      (inputDStream: DStream[BinarySample]) =>
+        model.registerStream(inputDStream))
     val outputBatches =
       runStreams[StreamingTestResult](ssc, numBatches, numBatches)
 
-    assert(outputBatches.flatten.forall(
-            res => res.pValue > 0.05 && res.method == WelchTTest.methodName))
+    assert(outputBatches.flatten.forall(res =>
+      res.pValue > 0.05 && res.method == WelchTTest.methodName))
   }
 
   test("accuracy for alternative hypothesis using welch t-test") {
@@ -73,17 +86,24 @@ class StreamingTestSuite extends SparkFunSuite with TestSuiteBase {
       .setTestMethod(testMethod)
 
     val input = generateTestData(
-        numBatches, pointsPerBatch, meanA, stdevA, meanB, stdevB, 42)
+      numBatches,
+      pointsPerBatch,
+      meanA,
+      stdevA,
+      meanB,
+      stdevB,
+      42)
 
     // setup and run the model
-    val ssc = setupStreams(input,
-                           (inputDStream: DStream[BinarySample]) =>
-                             model.registerStream(inputDStream))
+    val ssc = setupStreams(
+      input,
+      (inputDStream: DStream[BinarySample]) =>
+        model.registerStream(inputDStream))
     val outputBatches =
       runStreams[StreamingTestResult](ssc, numBatches, numBatches)
 
-    assert(outputBatches.flatten.forall(
-            res => res.pValue < 0.05 && res.method == WelchTTest.methodName))
+    assert(outputBatches.flatten.forall(res =>
+      res.pValue < 0.05 && res.method == WelchTTest.methodName))
   }
 
   test("accuracy for null hypothesis using student t-test") {
@@ -102,17 +122,24 @@ class StreamingTestSuite extends SparkFunSuite with TestSuiteBase {
       .setTestMethod(testMethod)
 
     val input = generateTestData(
-        numBatches, pointsPerBatch, meanA, stdevA, meanB, stdevB, 42)
+      numBatches,
+      pointsPerBatch,
+      meanA,
+      stdevA,
+      meanB,
+      stdevB,
+      42)
 
     // setup and run the model
-    val ssc = setupStreams(input,
-                           (inputDStream: DStream[BinarySample]) =>
-                             model.registerStream(inputDStream))
+    val ssc = setupStreams(
+      input,
+      (inputDStream: DStream[BinarySample]) =>
+        model.registerStream(inputDStream))
     val outputBatches =
       runStreams[StreamingTestResult](ssc, numBatches, numBatches)
 
-    assert(outputBatches.flatten.forall(
-            res => res.pValue > 0.05 && res.method == StudentTTest.methodName))
+    assert(outputBatches.flatten.forall(res =>
+      res.pValue > 0.05 && res.method == StudentTTest.methodName))
   }
 
   test("accuracy for alternative hypothesis using student t-test") {
@@ -131,17 +158,24 @@ class StreamingTestSuite extends SparkFunSuite with TestSuiteBase {
       .setTestMethod(testMethod)
 
     val input = generateTestData(
-        numBatches, pointsPerBatch, meanA, stdevA, meanB, stdevB, 42)
+      numBatches,
+      pointsPerBatch,
+      meanA,
+      stdevA,
+      meanB,
+      stdevB,
+      42)
 
     // setup and run the model
-    val ssc = setupStreams(input,
-                           (inputDStream: DStream[BinarySample]) =>
-                             model.registerStream(inputDStream))
+    val ssc = setupStreams(
+      input,
+      (inputDStream: DStream[BinarySample]) =>
+        model.registerStream(inputDStream))
     val outputBatches =
       runStreams[StreamingTestResult](ssc, numBatches, numBatches)
 
-    assert(outputBatches.flatten.forall(
-            res => res.pValue < 0.05 && res.method == StudentTTest.methodName))
+    assert(outputBatches.flatten.forall(res =>
+      res.pValue < 0.05 && res.method == StudentTTest.methodName))
   }
 
   test("batches within same test window are grouped") {
@@ -157,27 +191,36 @@ class StreamingTestSuite extends SparkFunSuite with TestSuiteBase {
     val model = new StreamingTest().setWindowSize(testWindow).setPeacePeriod(0)
 
     val input = generateTestData(
-        numBatches, pointsPerBatch, meanA, stdevA, meanB, stdevB, 42)
+      numBatches,
+      pointsPerBatch,
+      meanA,
+      stdevA,
+      meanB,
+      stdevB,
+      42)
 
     // setup and run the model
-    val ssc = setupStreams(input,
-                           (inputDStream: DStream[BinarySample]) =>
-                             model.summarizeByKeyAndWindow(inputDStream))
+    val ssc = setupStreams(
+      input,
+      (inputDStream: DStream[BinarySample]) =>
+        model.summarizeByKeyAndWindow(inputDStream))
     val outputBatches =
       runStreams[(Boolean, StatCounter)](ssc, numBatches, numBatches)
     val outputCounts = outputBatches.flatten.map(_._2.count)
 
     // number of batches seen so far does not exceed testWindow, expect counts to continue growing
     for (i <- 0 until testWindow) {
-      assert(outputCounts
-            .slice(2 * i, 2 * i + 2)
-            .forall(_ == (i + 1) * pointsPerBatch / 2))
+      assert(
+        outputCounts
+          .slice(2 * i, 2 * i + 2)
+          .forall(_ == (i + 1) * pointsPerBatch / 2))
     }
 
     // number of batches seen exceeds testWindow, expect counts to be constant
-    assert(outputCounts
-          .drop(2 * (testWindow - 1))
-          .forall(_ == testWindow * pointsPerBatch / 2))
+    assert(
+      outputCounts
+        .drop(2 * (testWindow - 1))
+        .forall(_ == testWindow * pointsPerBatch / 2))
   }
 
   test("entries in peace period are dropped") {
@@ -194,17 +237,24 @@ class StreamingTestSuite extends SparkFunSuite with TestSuiteBase {
       new StreamingTest().setWindowSize(0).setPeacePeriod(peacePeriod)
 
     val input = generateTestData(
-        numBatches, pointsPerBatch, meanA, stdevA, meanB, stdevB, 42)
+      numBatches,
+      pointsPerBatch,
+      meanA,
+      stdevA,
+      meanB,
+      stdevB,
+      42)
 
     // setup and run the model
-    val ssc = setupStreams(input,
-                           (inputDStream: DStream[BinarySample]) =>
-                             model.dropPeacePeriod(inputDStream))
+    val ssc = setupStreams(
+      input,
+      (inputDStream: DStream[BinarySample]) =>
+        model.dropPeacePeriod(inputDStream))
     val outputBatches =
       runStreams[(Boolean, Double)](ssc, numBatches, numBatches)
 
     assert(
-        outputBatches.flatten.length == (numBatches - peacePeriod) * pointsPerBatch)
+      outputBatches.flatten.length == (numBatches - peacePeriod) * pointsPerBatch)
   }
 
   test("null hypothesis when only data from one group is present") {
@@ -219,18 +269,24 @@ class StreamingTestSuite extends SparkFunSuite with TestSuiteBase {
     val model = new StreamingTest().setWindowSize(0).setPeacePeriod(0)
 
     val input = generateTestData(
-        numBatches, pointsPerBatch, meanA, stdevA, meanB, stdevB, 42).map(
-        batch => batch.filter(_.isExperiment)) // only keep one test group
+      numBatches,
+      pointsPerBatch,
+      meanA,
+      stdevA,
+      meanB,
+      stdevB,
+      42).map(batch => batch.filter(_.isExperiment)) // only keep one test group
 
     // setup and run the model
-    val ssc = setupStreams(input,
-                           (inputDStream: DStream[BinarySample]) =>
-                             model.registerStream(inputDStream))
+    val ssc = setupStreams(
+      input,
+      (inputDStream: DStream[BinarySample]) =>
+        model.registerStream(inputDStream))
     val outputBatches =
       runStreams[StreamingTestResult](ssc, numBatches, numBatches)
 
-    assert(outputBatches.flatten.forall(
-            result => (result.pValue - 1.0).abs < 0.001))
+    assert(
+      outputBatches.flatten.forall(result => (result.pValue - 1.0).abs < 0.001))
   }
 
   // Generate testing input with half of the entries in group A and half in group B

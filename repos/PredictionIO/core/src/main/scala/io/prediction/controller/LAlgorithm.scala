@@ -38,7 +38,7 @@ import scala.reflect._
   * @tparam P Output prediction class.
   * @group Algorithm
   */
-abstract class LAlgorithm[PD, M : ClassTag, Q, P]
+abstract class LAlgorithm[PD, M: ClassTag, Q, P]
     extends BaseAlgorithm[RDD[PD], RDD[M], Q, P] {
 
   def trainBase(sc: SparkContext, pd: RDD[PD]): RDD[M] = pd.map(train)
@@ -51,7 +51,9 @@ abstract class LAlgorithm[PD, M : ClassTag, Q, P]
   def train(pd: PD): M
 
   def batchPredictBase(
-      sc: SparkContext, bm: Any, qs: RDD[(Long, Q)]): RDD[(Long, P)] = {
+      sc: SparkContext,
+      bm: Any,
+      qs: RDD[(Long, Q)]): RDD[(Long, P)] = {
     val mRDD = bm.asInstanceOf[RDD[M]]
     batchPredict(mRDD, qs)
   }
@@ -109,7 +111,10 @@ abstract class LAlgorithm[PD, M : ClassTag, Q, P]
     */
   @DeveloperApi
   override def makePersistentModel(
-      sc: SparkContext, modelId: String, algoParams: Params, bm: Any): Any = {
+      sc: SparkContext,
+      modelId: String,
+      algoParams: Params,
+      bm: Any): Any = {
     // Check RDD[M].count == 1
     val m = bm.asInstanceOf[RDD[M]].first()
     if (m.isInstanceOf[PersistentModel[_]]) {

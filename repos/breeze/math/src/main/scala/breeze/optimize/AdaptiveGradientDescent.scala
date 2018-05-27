@@ -2,7 +2,11 @@ package breeze.optimize
 
 import breeze.linalg._
 import breeze.linalg.support.{CanMapValues, CanZipMapValues, CanTraverseValues}
-import breeze.math.{MutableFiniteCoordinateField, MutableVectorRing, MutableVectorField}
+import breeze.math.{
+  MutableFiniteCoordinateField,
+  MutableVectorRing,
+  MutableVectorField
+}
 import breeze.numerics._
 import breeze.stats.distributions.{Rand, RandBasis}
 
@@ -26,15 +30,19 @@ object AdaptiveGradientDescent {
     *
     * where g_ti is the gradient and s_ti = \sqrt(\sum_t'^{t} g_ti^2)
     */
-  class L2Regularization[T](val regularizationConstant: Double = 1.0,
-                            stepSize: Double,
-                            maxIter: Int,
-                            tolerance: Double = 1E-8,
-                            minImprovementWindow: Int = 50)(
+  class L2Regularization[T](
+      val regularizationConstant: Double = 1.0,
+      stepSize: Double,
+      maxIter: Int,
+      tolerance: Double = 1E-8,
+      minImprovementWindow: Int = 50)(
       implicit vspace: MutableFiniteCoordinateField[T, _, Double],
       rand: RandBasis = Rand)
       extends StochasticGradientDescent[T](
-          stepSize, maxIter, tolerance, minImprovementWindow) {
+        stepSize,
+        maxIter,
+        tolerance,
+        minImprovementWindow) {
 
     val delta = 1E-4
     import vspace._
@@ -43,11 +51,12 @@ object AdaptiveGradientDescent {
     override def initialHistory(f: StochasticDiffFunction[T], init: T) =
       History(zeroLike(init))
 
-    override def updateHistory(newX: T,
-                               newGrad: T,
-                               newValue: Double,
-                               f: StochasticDiffFunction[T],
-                               oldState: State) = {
+    override def updateHistory(
+        newX: T,
+        newGrad: T,
+        newValue: Double,
+        f: StochasticDiffFunction[T],
+        oldState: State) = {
       val oldHistory = oldState.history
       val newG = (oldState.grad :* oldState.grad)
       val maxAge = 1000.0
@@ -63,7 +72,7 @@ object AdaptiveGradientDescent {
     override protected def takeStep(state: State, dir: T, stepSize: Double) = {
       import state._
       val s = sqrt(
-          state.history.sumOfSquaredGradients :+ (state.grad :* state.grad))
+        state.history.sumOfSquaredGradients :+ (state.grad :* state.grad))
       val newx = x :* s
       axpy(stepSize, dir, newx)
       s += (delta + regularizationConstant * stepSize)
@@ -72,7 +81,9 @@ object AdaptiveGradientDescent {
     }
 
     override def determineStepSize(
-        state: State, f: StochasticDiffFunction[T], dir: T) = {
+        state: State,
+        f: StochasticDiffFunction[T],
+        dir: T) = {
       defaultStepSize
     }
 
@@ -92,10 +103,11 @@ object AdaptiveGradientDescent {
     *
     * where g_ti is the gradient and s_ti = \sqrt(\sum_t'^{t} g_ti^2)
     */
-  class L1Regularization[T](val lambda: Double = 1.0,
-                            delta: Double = 1E-5,
-                            eta: Double = 4,
-                            maxIter: Int = 100)(
+  class L1Regularization[T](
+      val lambda: Double = 1.0,
+      delta: Double = 1E-5,
+      eta: Double = 4,
+      maxIter: Int = 100)(
       implicit space: MutableFiniteCoordinateField[T, _, Double],
       rand: RandBasis = Rand)
       extends StochasticGradientDescent[T](eta, maxIter) {
@@ -112,11 +124,12 @@ object AdaptiveGradientDescent {
     }
      */
 
-    override def updateHistory(newX: T,
-                               newGrad: T,
-                               newValue: Double,
-                               f: StochasticDiffFunction[T],
-                               oldState: State) = {
+    override def updateHistory(
+        newX: T,
+        newGrad: T,
+        newValue: Double,
+        f: StochasticDiffFunction[T],
+        oldState: State) = {
       val oldHistory = oldState.history
       val newG = (oldState.grad :* oldState.grad)
       val maxAge = 200.0
@@ -132,7 +145,7 @@ object AdaptiveGradientDescent {
     override protected def takeStep(state: State, dir: T, stepSize: Double) = {
       import state._
       val s: T = sqrt(
-          state.history.sumOfSquaredGradients :+ (grad :* grad) :+ delta)
+        state.history.sumOfSquaredGradients :+ (grad :* grad) :+ delta)
       val res: T = x + (dir :* stepSize :/ s)
       val tlambda = lambda * stepSize
       space.zipMapValues.map(res, s, {
@@ -146,7 +159,9 @@ object AdaptiveGradientDescent {
     }
 
     override def determineStepSize(
-        state: State, f: StochasticDiffFunction[T], dir: T) = {
+        state: State,
+        f: StochasticDiffFunction[T],
+        dir: T) = {
       defaultStepSize
     }
 

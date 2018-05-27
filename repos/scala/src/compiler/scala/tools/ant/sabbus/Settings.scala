@@ -89,7 +89,7 @@ class Settings {
                                                                                                                                            else
                                                                                                                                              Nil) ::: (if (!targetBf.isEmpty)
                                                                                                                                                          "-target:" +
-                                                                                                                                                         target :: Nil
+                                                                                                                                                           target :: Nil
                                                                                                                                                        else
                                                                                                                                                          Nil) ::: (if (optimiseBf)
                                                                                                                                                                      "-optimise" :: Nil
@@ -99,29 +99,29 @@ class Settings {
   override def equals(that: Any): Boolean = that match {
     case cs: Settings =>
       this.gBf == cs.gBf && this.uncheckedBf == cs.uncheckedBf &&
-      this.classpathBf == cs.classpathBf &&
-      this.sourcepathBf == cs.sourcepathBf &&
-      this.sourcedirBf == cs.sourcedirBf &&
-      this.bootclasspathBf == cs.bootclasspathBf &&
-      this.extdirsBf == cs.extdirsBf && this.dBf == cs.dBf &&
-      this.encodingBf == cs.encodingBf && this.targetBf == cs.targetBf &&
-      this.optimiseBf == cs.optimiseBf &&
-      this.extraParamsBf == cs.extraParamsBf
+        this.classpathBf == cs.classpathBf &&
+        this.sourcepathBf == cs.sourcepathBf &&
+        this.sourcedirBf == cs.sourcedirBf &&
+        this.bootclasspathBf == cs.bootclasspathBf &&
+        this.extdirsBf == cs.extdirsBf && this.dBf == cs.dBf &&
+        this.encodingBf == cs.encodingBf && this.targetBf == cs.targetBf &&
+        this.optimiseBf == cs.optimiseBf &&
+        this.extraParamsBf == cs.extraParamsBf
     case _ => false
   }
 
   override lazy val hashCode: Int = Seq[Any](
-      gBf,
-      uncheckedBf,
-      classpathBf,
-      sourcepathBf,
-      sourcedirBf,
-      bootclasspathBf,
-      extdirsBf,
-      dBf,
-      encodingBf,
-      targetBf,
-      optimiseBf,
-      extraParamsBf
+    gBf,
+    uncheckedBf,
+    classpathBf,
+    sourcepathBf,
+    sourcedirBf,
+    bootclasspathBf,
+    extdirsBf,
+    dBf,
+    encodingBf,
+    targetBf,
+    optimiseBf,
+    extraParamsBf
   ).##
 }

@@ -9,7 +9,12 @@ import akka.event.EventHandler
 import akka.config.Configuration
 import akka.config.Config.TIME_UNIT
 import akka.util.{Duration, Switch, ReentrantGuard}
-import java.util.concurrent.ThreadPoolExecutor.{AbortPolicy, CallerRunsPolicy, DiscardOldestPolicy, DiscardPolicy}
+import java.util.concurrent.ThreadPoolExecutor.{
+  AbortPolicy,
+  CallerRunsPolicy,
+  DiscardOldestPolicy,
+  DiscardPolicy
+}
 import akka.actor._
 
 /**
@@ -29,24 +34,26 @@ final case class MessageInvocation(
     } catch {
       case e: NullPointerException =>
         throw new ActorInitializationException(
-            "Don't call 'self ! message' in the Actor's constructor (in Scala this means in the body of the class).")
+          "Don't call 'self ! message' in the Actor's constructor (in Scala this means in the body of the class).")
     }
 }
 
 final case class FutureInvocation[T](
-    future: CompletableFuture[T], function: () => T, cleanup: () => Unit)
+    future: CompletableFuture[T],
+    function: () => T,
+    cleanup: () => Unit)
     extends Runnable {
   def run = {
     future complete
-    (try {
-          Right(function())
-        } catch {
-          case e =>
-            EventHandler.error(e, this, e.getMessage)
-            Left(e)
-        } finally {
-          cleanup()
-        })
+      (try {
+        Right(function())
+      } catch {
+        case e =>
+          EventHandler.error(e, this, e.getMessage)
+          Left(e)
+      } finally {
+        cleanup()
+      })
   }
 }
 
@@ -91,11 +98,12 @@ trait MessageDispatcher {
     unregister(actorRef)
   }
 
-  private[akka] final def dispatchMessage(
-      invocation: MessageInvocation): Unit = dispatch(invocation)
+  private[akka] final def dispatchMessage(invocation: MessageInvocation): Unit =
+    dispatch(invocation)
 
   private[akka] final def dispatchFuture[T](
-      block: () => T, timeout: Long): Future[T] = {
+      block: () => T,
+      timeout: Long): Future[T] = {
     futures.getAndIncrement()
     try {
       val future = new DefaultCompletableFuture[T](timeout)
@@ -119,7 +127,9 @@ trait MessageDispatcher {
             case UNSCHEDULED =>
               shutdownSchedule = SCHEDULED
               Scheduler.scheduleOnce(
-                  shutdownAction, timeoutMs, TimeUnit.MILLISECONDS)
+                shutdownAction,
+                timeoutMs,
+                TimeUnit.MILLISECONDS)
             case SCHEDULED =>
               shutdownSchedule = RESCHEDULED
             case RESCHEDULED => //Already marked for reschedule
@@ -147,7 +157,9 @@ trait MessageDispatcher {
           case UNSCHEDULED =>
             shutdownSchedule = SCHEDULED
             Scheduler.scheduleOnce(
-                shutdownAction, timeoutMs, TimeUnit.MILLISECONDS)
+              shutdownAction,
+              timeoutMs,
+              TimeUnit.MILLISECONDS)
           case SCHEDULED =>
             shutdownSchedule = RESCHEDULED
           case RESCHEDULED => //Already marked for reschedule
@@ -165,7 +177,7 @@ trait MessageDispatcher {
       val uuid = i.next()
       Actor.registry.actorFor(uuid) match {
         case Some(actor) => actor.stop()
-        case None => {}
+        case None        => {}
       }
     }
   }
@@ -249,11 +261,12 @@ abstract class MessageDispatcherConfigurator {
     if (capacity < 1) UnboundedMailbox()
     else
       BoundedMailbox(
-          capacity,
-          Duration(
-              config.getInt("mailbox-push-timeout-time",
-                            Dispatchers.MAILBOX_PUSH_TIME_OUT.toMillis.toInt),
-              TIME_UNIT))
+        capacity,
+        Duration(
+          config.getInt(
+            "mailbox-push-timeout-time",
+            Dispatchers.MAILBOX_PUSH_TIME_OUT.toMillis.toInt),
+          TIME_UNIT))
   }
 
   def configureThreadPool(
@@ -264,24 +277,26 @@ abstract class MessageDispatcherConfigurator {
 
     //Apply the following options to the config if they are present in the config
     ThreadPoolConfigDispatcherBuilder(createDispatcher, ThreadPoolConfig())
-      .configure(conf_?(config getInt "keep-alive-time")(
-                     time => _.setKeepAliveTime(Duration(time, TIME_UNIT))),
-                 conf_?(config getDouble "core-pool-size-factor")(
-                     factor => _.setCorePoolSizeFromFactor(factor)),
-                 conf_?(config getDouble "max-pool-size-factor")(
-                     factor => _.setMaxPoolSizeFromFactor(factor)),
-                 conf_?(config getInt "executor-bounds")(
-                     bounds => _.setExecutorBounds(bounds)),
-                 conf_?(config getBool "allow-core-timeout")(
-                     allow => _.setAllowCoreThreadTimeout(allow)),
-                 conf_?(config getString "rejection-policy" map {
-                   case "abort" => new AbortPolicy()
-                   case "caller-runs" => new CallerRunsPolicy()
-                   case "discard-oldest" => new DiscardOldestPolicy()
-                   case "discard" => new DiscardPolicy()
-                   case x =>
-                     throw new IllegalArgumentException(
-                         "[%s] is not a valid rejectionPolicy!" format x)
-                 })(policy => _.setRejectionPolicy(policy)))
+      .configure(
+        conf_?(config getInt "keep-alive-time")(time =>
+          _.setKeepAliveTime(Duration(time, TIME_UNIT))),
+        conf_?(config getDouble "core-pool-size-factor")(factor =>
+          _.setCorePoolSizeFromFactor(factor)),
+        conf_?(config getDouble "max-pool-size-factor")(factor =>
+          _.setMaxPoolSizeFromFactor(factor)),
+        conf_?(config getInt "executor-bounds")(bounds =>
+          _.setExecutorBounds(bounds)),
+        conf_?(config getBool "allow-core-timeout")(allow =>
+          _.setAllowCoreThreadTimeout(allow)),
+        conf_?(config getString "rejection-policy" map {
+          case "abort"          => new AbortPolicy()
+          case "caller-runs"    => new CallerRunsPolicy()
+          case "discard-oldest" => new DiscardOldestPolicy()
+          case "discard"        => new DiscardPolicy()
+          case x =>
+            throw new IllegalArgumentException(
+              "[%s] is not a valid rejectionPolicy!" format x)
+        })(policy => _.setRejectionPolicy(policy))
+      )
   }
 }

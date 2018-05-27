@@ -19,7 +19,11 @@ import scala.language.experimental.macros
 import scala.reflect.macros.Context
 
 import com.twitter.scalding._
-import com.twitter.scalding.serialization.macros.impl.ordered_serialization.{CompileTimeLengthTypes, ProductLike, TreeOrderedBuf}
+import com.twitter.scalding.serialization.macros.impl.ordered_serialization.{
+  CompileTimeLengthTypes,
+  ProductLike,
+  TreeOrderedBuf
+}
 import CompileTimeLengthTypes._
 import com.twitter.scalding.serialization.OrderedSerialization
 
@@ -87,7 +91,7 @@ object EitherOrderedBuf {
       q"""
         val $tmpGetHolder = $inputStreamA.readByte
         if($tmpGetHolder == (0: _root_.scala.Byte)) Left(${leftBuf.get(
-          inputStreamA)})
+        inputStreamA)})
         else Right(${rightBuf.get(inputStreamA)})
       """
     }
@@ -139,7 +143,8 @@ object EitherOrderedBuf {
       override val ctx: c.type = c
       override val tpe = outerType
       override def compareBinary(
-          inputStreamA: TermName, inputStreamB: TermName) =
+          inputStreamA: TermName,
+          inputStreamB: TermName) =
         genBinaryCompare(inputStreamA, inputStreamB)
       override def hash(element: TermName): ctx.Tree = genHashFn(element)
       override def put(inputStream: TermName, element: TermName) =
@@ -157,10 +162,12 @@ object EitherOrderedBuf {
         val dyn =
           q"""_root_.com.twitter.scalding.serialization.macros.impl.ordered_serialization.runtime_helpers.DynamicLen"""
 
-        (leftBuf.length(q"$element.left.get"),
-         rightBuf.length(q"$element.right.get")) match {
-          case (lconst: ConstantLengthCalculation[_],
-                rconst: ConstantLengthCalculation[_])
+        (
+          leftBuf.length(q"$element.left.get"),
+          rightBuf.length(q"$element.right.get")) match {
+          case (
+              lconst: ConstantLengthCalculation[_],
+              rconst: ConstantLengthCalculation[_])
               if lconst.toInt == rconst.toInt =>
             // We got lucky, they are the same size:
             ConstantLengthCalculation(c)(1 + rconst.toInt)
@@ -168,8 +175,9 @@ object EitherOrderedBuf {
             NoLengthCalculationAvailable(c)
           case (_, _: NoLengthCalculationAvailable[_]) =>
             NoLengthCalculationAvailable(c)
-          case (left: MaybeLengthCalculation[_],
-                right: MaybeLengthCalculation[_]) =>
+          case (
+              left: MaybeLengthCalculation[_],
+              right: MaybeLengthCalculation[_]) =>
             MaybeLengthCalculation(c)(q"""
             if ($element.isLeft) { ${tree(left)} + $dyn(1) }
             else { ${tree(right)} + $dyn(1) }

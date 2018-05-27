@@ -192,20 +192,21 @@ final class MutableAny extends MutableValue {
   * values of primitive columns.
   */
 final class SpecificMutableRow(val values: Array[MutableValue])
-    extends MutableRow with BaseGenericInternalRow {
+    extends MutableRow
+    with BaseGenericInternalRow {
 
   def this(dataTypes: Seq[DataType]) =
     this(dataTypes.map {
       case BooleanType => new MutableBoolean
-      case ByteType => new MutableByte
-      case ShortType => new MutableShort
+      case ByteType    => new MutableByte
+      case ShortType   => new MutableShort
       // We use INT for DATE internally
       case IntegerType | DateType => new MutableInt
       // We use Long for Timestamp internally
       case LongType | TimestampType => new MutableLong
-      case FloatType => new MutableFloat
-      case DoubleType => new MutableDouble
-      case _ => new MutableAny
+      case FloatType                => new MutableFloat
+      case DoubleType               => new MutableDouble
+      case _                        => new MutableAny
     }.toArray)
 
   def this() = this(Seq.empty)

@@ -52,8 +52,8 @@ object TouchEvent {
   val TouchPressed: EventType[jfxsi.TouchEvent] =
     jfxsi.TouchEvent.TOUCH_PRESSED
   @deprecated(
-      "Use TouchPressed; TOUCH_PRESSED will be removed in a future release",
-      "8.0.60-R10")
+    "Use TouchPressed; TOUCH_PRESSED will be removed in a future release",
+    "8.0.60-R10")
   val TOUCH_PRESSED = TouchPressed
 
   /**
@@ -61,8 +61,8 @@ object TouchEvent {
     */
   val TouchMoved: EventType[jfxsi.TouchEvent] = jfxsi.TouchEvent.TOUCH_MOVED
   @deprecated(
-      "Use TouchMoved; TOUCH_MOVED will be removed in a future release",
-      "8.0.60-R10")
+    "Use TouchMoved; TOUCH_MOVED will be removed in a future release",
+    "8.0.60-R10")
   val TOUCH_MOVED = TouchMoved
 
   /**
@@ -71,8 +71,8 @@ object TouchEvent {
   val TouchReleased: EventType[jfxsi.TouchEvent] =
     jfxsi.TouchEvent.TOUCH_RELEASED
   @deprecated(
-      "Use TouchReleased; TOUCH_RELEASED will be removed in a future release",
-      "8.0.60-R10")
+    "Use TouchReleased; TOUCH_RELEASED will be removed in a future release",
+    "8.0.60-R10")
   val TOUCH_RELEASED = TouchReleased
 
   /**
@@ -81,8 +81,8 @@ object TouchEvent {
   val TouchStationary: EventType[jfxsi.TouchEvent] =
     jfxsi.TouchEvent.TOUCH_STATIONARY
   @deprecated(
-      "Use TouchStationary; TOUCH_STATIONARY will be removed in a future release",
-      "8.0.60-R10")
+    "Use TouchStationary; TOUCH_STATIONARY will be removed in a future release",
+    "8.0.60-R10")
   val TOUCH_STATIONARY = TouchStationary
 }
 
@@ -90,7 +90,8 @@ object TouchEvent {
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/input/TouchEvent.html]]
   */
 class TouchEvent(override val delegate: jfxsi.TouchEvent)
-    extends InputEvent(delegate) with SFXDelegate[jfxsi.TouchEvent] {
+    extends InputEvent(delegate)
+    with SFXDelegate[jfxsi.TouchEvent] {
 
   /**
     * Returns number of touch points represented by this touch event set.

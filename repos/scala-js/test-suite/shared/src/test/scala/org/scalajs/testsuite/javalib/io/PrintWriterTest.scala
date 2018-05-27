@@ -109,10 +109,14 @@ class PrintWriterTest {
     testPrintlnForward(_.println('\n'), "\n\n", autoFlush = true)
     testPrintlnForward(_.println(5), "5\n", autoFlush = true)
     testPrintlnForward(
-        _.println(1234567891011L), "1234567891011\n", autoFlush = true)
+      _.println(1234567891011L),
+      "1234567891011\n",
+      autoFlush = true)
     testPrintlnForward(_.println(1.5f), "1.5\n", autoFlush = true)
     testPrintlnForward(
-        _.println(Math.PI), "3.141592653589793\n", autoFlush = true)
+      _.println(Math.PI),
+      "3.141592653589793\n",
+      autoFlush = true)
     testPrintlnForward(_.println(Array('A', '\n')), "A\n\n", autoFlush = true)
     testPrintlnForward(_.println("hello\n"), "hello\n\n", autoFlush = true)
     testPrintlnForward(_.println(null: String), "null\n", autoFlush = true)
@@ -120,17 +124,22 @@ class PrintWriterTest {
     testPrintlnForward(_.println(null: AnyRef), "null\n", autoFlush = true)
   }
 
-  @Test def println_and_forwards_do_not_flush_when_autoFlush_is_false(): Unit = {
+  @Test def println_and_forwards_do_not_flush_when_autoFlush_is_false()
+    : Unit = {
     testPrintlnForward(_.println(), "\n", autoFlush = false)
     testPrintlnForward(_.println(true), "true\n", autoFlush = false)
     testPrintlnForward(_.println('Z'), "Z\n", autoFlush = false)
     testPrintlnForward(_.println('\n'), "\n\n", autoFlush = false)
     testPrintlnForward(_.println(5), "5\n", autoFlush = false)
     testPrintlnForward(
-        _.println(1234567891011L), "1234567891011\n", autoFlush = false)
+      _.println(1234567891011L),
+      "1234567891011\n",
+      autoFlush = false)
     testPrintlnForward(_.println(1.5f), "1.5\n", autoFlush = false)
     testPrintlnForward(
-        _.println(Math.PI), "3.141592653589793\n", autoFlush = false)
+      _.println(Math.PI),
+      "3.141592653589793\n",
+      autoFlush = false)
     testPrintlnForward(_.println(Array('A', '\n')), "A\n\n", autoFlush = false)
     testPrintlnForward(_.println("hello\n"), "hello\n\n", autoFlush = false)
     testPrintlnForward(_.println(null: String), "null\n", autoFlush = false)
@@ -138,9 +147,10 @@ class PrintWriterTest {
     testPrintlnForward(_.println(null: AnyRef), "null\n", autoFlush = false)
   }
 
-  private def testPrintlnForward(body: PrintWriter => Unit,
-                                 expected: String,
-                                 autoFlush: Boolean): Unit = {
+  private def testPrintlnForward(
+      body: PrintWriter => Unit,
+      expected: String,
+      autoFlush: Boolean): Unit = {
     val (pw, sw) = newPrintWriter(autoFlush = autoFlush)
     body(pw)
     if (autoFlush) assertTrue(sw.flushed)
@@ -152,18 +162,23 @@ class PrintWriterTest {
   @Test def printf_and_format_which_flushes_when_autoFlush_is_true(): Unit = {
     testPrintfFormat(_.printf("%04d", Int.box(5)), "0005", autoFlush = true)
     testPrintfFormat(
-        _.format("%.5f", Double.box(Math.PI)), "3.14159", autoFlush = true)
+      _.format("%.5f", Double.box(Math.PI)),
+      "3.14159",
+      autoFlush = true)
   }
 
   @Test def printf_and_format_do_not_flush_when_autoFlush_is_false(): Unit = {
     testPrintfFormat(_.printf("%04d", Int.box(5)), "0005", autoFlush = false)
     testPrintfFormat(
-        _.format("%.5f", Double.box(Math.PI)), "3.14159", autoFlush = false)
+      _.format("%.5f", Double.box(Math.PI)),
+      "3.14159",
+      autoFlush = false)
   }
 
-  private def testPrintfFormat(body: PrintWriter => Unit,
-                               expected: String,
-                               autoFlush: Boolean): Unit = {
+  private def testPrintfFormat(
+      body: PrintWriter => Unit,
+      expected: String,
+      autoFlush: Boolean): Unit = {
     val (pw, sw) = newPrintWriter(autoFlush = autoFlush)
     body(pw)
     if (autoFlush) assertTrue(sw.flushed)
@@ -287,8 +302,7 @@ class PrintWriterTest {
     override def append(csq: CharSequence): StringWriter =
       writeOp(super.append(csq))
 
-    override def append(
-        csq: CharSequence, start: Int, end: Int): StringWriter =
+    override def append(csq: CharSequence, start: Int, end: Int): StringWriter =
       writeOp(super.append(csq, start, end))
 
     override def write(c: Int): Unit =

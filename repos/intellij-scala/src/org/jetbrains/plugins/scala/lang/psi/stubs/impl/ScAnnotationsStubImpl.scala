@@ -15,6 +15,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.ScAnnotations
 class ScAnnotationsStubImpl[ParentPsi <: PsiElement](
     parent: StubElement[ParentPsi],
     elemType: IStubElementType[
-        _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
+      _ <: StubElement[_ <: PsiElement],
+      _ <: PsiElement])
     extends StubBaseWrapper[ScAnnotations](parent, elemType)
     with ScAnnotationsStub {}

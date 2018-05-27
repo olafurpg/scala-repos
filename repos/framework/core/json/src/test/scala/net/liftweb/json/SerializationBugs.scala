@@ -37,9 +37,11 @@ object SerializationBugs extends Specification {
     import plan2._
 
     val g1 = Game(
-        Map("a" -> Plan(Some(Action("f1", "s", Array(), None)),
-                        Some("A"),
-                        Some(Action("f2", "s2", Array(0, 1, 2), None)))))
+      Map(
+        "a" -> Plan(
+          Some(Action("f1", "s", Array(), None)),
+          Some("A"),
+          Some(Action("f2", "s2", Array(0, 1, 2), None)))))
     val ser = swrite(g1)
     val g2 = read[Game](ser)
     val plan = g2.buy("a")
@@ -47,11 +49,11 @@ object SerializationBugs extends Specification {
     val rightOp = plan.rightOperand.get
 
     (g2.buy.size mustEqual 1) and (leftOp.functionName mustEqual "f1") and
-    (leftOp.symbol mustEqual "s") and (leftOp.inParams.toList mustEqual Nil) and
-    (leftOp.subOperand mustEqual None) and (plan.operator mustEqual Some("A")) and
-    (rightOp.functionName mustEqual "f2") and (rightOp.symbol mustEqual "s2") and
-    (rightOp.inParams.toList mustEqual List(0, 1, 2)) and
-    (rightOp.subOperand mustEqual None)
+      (leftOp.symbol mustEqual "s") and (leftOp.inParams.toList mustEqual Nil) and
+      (leftOp.subOperand mustEqual None) and (plan.operator mustEqual Some("A")) and
+      (rightOp.functionName mustEqual "f2") and (rightOp.symbol mustEqual "s2") and
+      (rightOp.inParams.toList mustEqual List(0, 1, 2)) and
+      (rightOp.subOperand mustEqual None)
   }
 
   "null serialization bug" in {
@@ -85,7 +87,7 @@ object SerializationBugs extends Specification {
     val o2 = OptionalUUID(Some(UUID.randomUUID))
 
     (read[OptionalUUID](swrite(o1)) mustEqual o1) and
-    (read[OptionalUUID](swrite(o2)) mustEqual o2)
+      (read[OptionalUUID](swrite(o2)) mustEqual o2)
   }
 
   "TypeInfo is not correctly constructed for customer serializer -- 970" in {
@@ -99,11 +101,11 @@ object SerializationBugs extends Specification {
       def deserialize(implicit format: Formats) = {
         case (TypeInfo(SeqClass, parameterizedType), JArray(xs)) =>
           val typeInfo = TypeInfo(
-              parameterizedType
-                .map(_.getActualTypeArguments()(0))
-                .getOrElse(failure("No type parameter info for type Seq"))
-                .asInstanceOf[Class[_]],
-              None)
+            parameterizedType
+              .map(_.getActualTypeArguments()(0))
+              .getOrElse(failure("No type parameter info for type Seq"))
+              .asInstanceOf[Class[_]],
+            None)
           xs.map(x => Extraction.extract(x, typeInfo))
       }
     }
@@ -146,10 +148,10 @@ object SerializationBugs extends Specification {
             case JObject(List(JField("val", JDouble(x)))) => SingleValue(x)
             case JObject(List(JField("val", JArray(xs: List[_])))) =>
               VectorValue(
-                  xs.asInstanceOf[List[JDouble]].map(_.num).toIndexedSeq)
+                xs.asInstanceOf[List[JDouble]].map(_.num).toIndexedSeq)
             case x =>
               throw new MappingException(
-                  "Can't convert " + x + " to SingleOrVector")
+                "Can't convert " + x + " to SingleOrVector")
           }
       }
 
@@ -157,11 +159,13 @@ object SerializationBugs extends Specification {
         case SingleValue(x: Double) => JObject(List(JField("val", JDouble(x))))
         case VectorValue(x: Vector[_]) =>
           JObject(
-              List(JField("val",
-                          JArray(x
-                                .asInstanceOf[Vector[Double]]
-                                .toList
-                                .map(JDouble(_))))))
+            List(
+              JField(
+                "val",
+                JArray(
+                  x.asInstanceOf[Vector[Double]]
+                    .toList
+                    .map(JDouble(_))))))
       }
     }
 
@@ -175,10 +179,9 @@ object SerializationBugs extends Specification {
     val jsonA = """ { "data": { "foo": "string" }, "success": true } """
     val jsonB = """ { "data": { "bar": "string" }, "success": true } """
 
-    (read[SomeContainer[TypeA]](jsonA) mustEqual SomeContainer(
-            TypeA("string"))) and
-    (read[SomeContainer[TypeB]](jsonB) mustEqual SomeContainer(
-            TypeB("string")))
+    (read[SomeContainer[TypeA]](jsonA) mustEqual SomeContainer(TypeA("string"))) and
+      (read[SomeContainer[TypeB]](jsonB) mustEqual SomeContainer(
+        TypeB("string")))
   }
 }
 
@@ -205,14 +208,16 @@ package plan1 {
 }
 
 package plan2 {
-  case class Plan(leftOperand: Option[Action],
-                  operator: Option[String],
-                  rightOperand: Option[Action])
+  case class Plan(
+      leftOperand: Option[Action],
+      operator: Option[String],
+      rightOperand: Option[Action])
   case class Game(buy: Map[String, Plan])
-  case class Action(functionName: String,
-                    symbol: String,
-                    inParams: Array[Number],
-                    subOperand: Option[Action])
+  case class Action(
+      functionName: String,
+      symbol: String,
+      inParams: Array[Number],
+      subOperand: Option[Action])
 }
 
 case class Opaque(x: JValue)

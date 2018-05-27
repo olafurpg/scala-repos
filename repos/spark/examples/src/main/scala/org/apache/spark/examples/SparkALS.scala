@@ -43,9 +43,10 @@ object SparkALS {
     mh.multiply(uh.transpose())
   }
 
-  def rmse(targetR: RealMatrix,
-           ms: Array[RealVector],
-           us: Array[RealVector]): Double = {
+  def rmse(
+      targetR: RealMatrix,
+      ms: Array[RealVector],
+      us: Array[RealVector]): Double = {
     val r = new Array2DRowRealMatrix(M, U)
     for (i <- 0 until M; j <- 0 until U) {
       r.setEntry(i, j, ms(i).dotProduct(us(j)))
@@ -59,10 +60,11 @@ object SparkALS {
     math.sqrt(sumSqs / (M.toDouble * U.toDouble))
   }
 
-  def update(i: Int,
-             m: RealVector,
-             us: Array[RealVector],
-             R: RealMatrix): RealVector = {
+  def update(
+      i: Int,
+      m: RealVector,
+      us: Array[RealVector],
+      R: RealMatrix): RealVector = {
     val U = us.length
     val F = us(0).getDimension
     var XtX: RealMatrix = new Array2DRowRealMatrix(F, F)
@@ -84,7 +86,8 @@ object SparkALS {
   }
 
   def showWarning() {
-    System.err.println("""WARN: This is a naive implementation of ALS and is given as an example!
+    System.err.println(
+      """WARN: This is a naive implementation of ALS and is given as an example!
         |Please use the ALS method found in org.apache.spark.mllib.recommendation
         |for more conventional use.
       """.stripMargin)

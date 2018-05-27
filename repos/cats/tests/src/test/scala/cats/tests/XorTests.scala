@@ -4,7 +4,13 @@ package tests
 import cats.data.{NonEmptyList, Xor, XorT}
 import cats.data.Xor._
 import cats.laws.discipline.arbitrary._
-import cats.laws.discipline.{BitraverseTests, TraverseTests, MonadErrorTests, SerializableTests, CartesianTests}
+import cats.laws.discipline.{
+  BitraverseTests,
+  TraverseTests,
+  MonadErrorTests,
+  SerializableTests,
+  CartesianTests
+}
 import cats.laws.discipline.eq.tuple3Eq
 import algebra.laws.{GroupLaws, OrderLaws}
 import org.scalacheck.Arbitrary
@@ -17,66 +23,79 @@ class XorTests extends CatsSuite {
 
   implicit val iso = CartesianTests.Isomorphisms.invariant[Xor[String, ?]]
 
-  checkAll("Xor[String, Int]",
-           CartesianTests[Xor[String, ?]].cartesian[Int, Int, Int])
-  checkAll("Cartesian[Xor, ?]",
-           SerializableTests.serializable(Cartesian[Xor[String, ?]]))
+  checkAll(
+    "Xor[String, Int]",
+    CartesianTests[Xor[String, ?]].cartesian[Int, Int, Int])
+  checkAll(
+    "Cartesian[Xor, ?]",
+    SerializableTests.serializable(Cartesian[Xor[String, ?]]))
 
-  checkAll("Xor[String, NonEmptyList[Int]]",
-           GroupLaws[Xor[String, NonEmptyList[Int]]].semigroup)
+  checkAll(
+    "Xor[String, NonEmptyList[Int]]",
+    GroupLaws[Xor[String, NonEmptyList[Int]]].semigroup)
 
   implicit val eq0 = XorT.xorTEq[Xor[String, ?], String, Int]
 
-  checkAll("Xor[String, Int]",
-           MonadErrorTests[Xor[String, ?], String].monadError[Int, Int, Int])
-  checkAll("MonadError[Xor, String]",
-           SerializableTests.serializable(MonadError[Xor[String, ?], String]))
+  checkAll(
+    "Xor[String, Int]",
+    MonadErrorTests[Xor[String, ?], String].monadError[Int, Int, Int])
+  checkAll(
+    "MonadError[Xor, String]",
+    SerializableTests.serializable(MonadError[Xor[String, ?], String]))
 
-  checkAll("Xor[String, Int] with Option",
-           TraverseTests[Xor[String, ?]]
-             .traverse[Int, Int, Int, Int, Option, Option])
-  checkAll("Traverse[Xor[String,?]]",
-           SerializableTests.serializable(Traverse[Xor[String, ?]]))
+  checkAll(
+    "Xor[String, Int] with Option",
+    TraverseTests[Xor[String, ?]]
+      .traverse[Int, Int, Int, Int, Option, Option])
+  checkAll(
+    "Traverse[Xor[String,?]]",
+    SerializableTests.serializable(Traverse[Xor[String, ?]]))
 
   checkAll("Xor[Int, String]", OrderLaws[String Xor Int].order)
 
   {
     implicit val S = ListWrapper.partialOrder[String]
     implicit val I = ListWrapper.partialOrder[Int]
-    checkAll("ListWrapper[String] Xor ListWrapper[Int]",
-             OrderLaws[ListWrapper[String] Xor ListWrapper[Int]].partialOrder)
-    checkAll("PartialOrder[ListWrapper[String] Xor ListWrapper[Int]]",
-             SerializableTests.serializable(
-                 PartialOrder[ListWrapper[String] Xor ListWrapper[Int]]))
+    checkAll(
+      "ListWrapper[String] Xor ListWrapper[Int]",
+      OrderLaws[ListWrapper[String] Xor ListWrapper[Int]].partialOrder)
+    checkAll(
+      "PartialOrder[ListWrapper[String] Xor ListWrapper[Int]]",
+      SerializableTests.serializable(
+        PartialOrder[ListWrapper[String] Xor ListWrapper[Int]]))
   }
 
   {
     implicit val S = ListWrapper.eqv[String]
     implicit val I = ListWrapper.eqv[Int]
-    checkAll("ListWrapper[String] Xor ListWrapper[Int]",
-             OrderLaws[ListWrapper[String] Xor ListWrapper[Int]].eqv)
-    checkAll("Eq[ListWrapper[String] Xor ListWrapper[Int]]",
-             SerializableTests.serializable(
-                 Eq[ListWrapper[String] Xor ListWrapper[Int]]))
+    checkAll(
+      "ListWrapper[String] Xor ListWrapper[Int]",
+      OrderLaws[ListWrapper[String] Xor ListWrapper[Int]].eqv)
+    checkAll(
+      "Eq[ListWrapper[String] Xor ListWrapper[Int]]",
+      SerializableTests.serializable(
+        Eq[ListWrapper[String] Xor ListWrapper[Int]]))
   }
 
   implicit val arbitraryXor: Arbitrary[Xor[Int, String]] = Arbitrary {
     for {
       left <- arbitrary[Boolean]
       xor <- if (left) arbitrary[Int].map(Xor.left)
-            else arbitrary[String].map(Xor.right)
+      else arbitrary[String].map(Xor.right)
     } yield xor
   }
 
-  checkAll("? Xor ?",
-           BitraverseTests[Xor]
-             .bitraverse[Option, Int, Int, Int, String, String, String])
+  checkAll(
+    "? Xor ?",
+    BitraverseTests[Xor]
+      .bitraverse[Option, Int, Int, Int, String, String, String])
   checkAll("Bitraverse[Xor]", SerializableTests.serializable(Bitraverse[Xor]))
 
   test("catchOnly catches matching exceptions") {
-    assert(Xor
-          .catchOnly[NumberFormatException] { "foo".toInt }
-          .isInstanceOf[Xor.Left[NumberFormatException]])
+    assert(
+      Xor
+        .catchOnly[NumberFormatException] { "foo".toInt }
+        .isInstanceOf[Xor.Left[NumberFormatException]])
   }
 
   test("catchOnly lets non-matching exceptions escape") {
@@ -170,13 +189,13 @@ class XorTests extends CatsSuite {
   test("recoverWith recovers handled values") {
     val xor = Xor.left[String, Int]("xor")
     xor.recoverWith { case "xor" => Xor.right[String, Int](5) }.isRight should ===(
-        true)
+      true)
   }
 
   test("recoverWith ignores unhandled values") {
     val xor = Xor.left[String, Int]("xor")
     xor.recoverWith { case "notxor" => Xor.right[String, Int](5) } should ===(
-        xor)
+      xor)
   }
 
   test("recoverWith ignores the right side") {

@@ -36,13 +36,13 @@ trait StringTypedField extends TypedField[String] with StringValidators {
 
   def setFromAny(in: Any): Box[String] = in match {
     case seq: Seq[_] if !seq.isEmpty => setFromAny(seq.head)
-    case _ => genericSetFromAny(in)
+    case _                           => genericSetFromAny(in)
   }
 
   def setFromString(s: String): Box[String] = s match {
     case null | "" if optional_? => setBox(Empty)
-    case null | "" => setBox(Failure(notOptionalErrorMessage))
-    case _ => setBox(Full(s))
+    case null | ""               => setBox(Failure(notOptionalErrorMessage))
+    case _                       => setBox(Full(s))
   }
 
   private def elem = S.fmapFunc(SFuncHolder(this.setFromAny(_))) { funcName =>
@@ -55,7 +55,7 @@ trait StringTypedField extends TypedField[String] with StringValidators {
   def toForm: Box[NodeSeq] =
     uniqueFieldId match {
       case Full(id) => Full(elem % ("id" -> id))
-      case _ => Full(elem)
+      case _        => Full(elem)
     }
 
   def defaultValue = ""
@@ -66,14 +66,16 @@ trait StringTypedField extends TypedField[String] with StringValidators {
     valueBox.map(v => JString(v)) openOr (JNothing: JValue)
   def setFromJValue(jvalue: JValue): Box[MyType] = jvalue match {
     case JNothing | JNull if optional_? => setBox(Empty)
-    case JString(s) => setFromString(s)
-    case other => setBox(FieldHelpers.expectedA("JString", other))
+    case JString(s)                     => setFromString(s)
+    case other                          => setBox(FieldHelpers.expectedA("JString", other))
   }
 }
 
 class StringField[OwnerType <: Record[OwnerType]](
-    rec: OwnerType, val maxLength: Int)
-    extends Field[String, OwnerType] with MandatoryTypedField[String]
+    rec: OwnerType,
+    val maxLength: Int)
+    extends Field[String, OwnerType]
+    with MandatoryTypedField[String]
     with StringTypedField {
 
   def this(rec: OwnerType, maxLength: Int, value: String) = {
@@ -94,7 +96,8 @@ class StringField[OwnerType <: Record[OwnerType]](
 }
 
 abstract class UniqueIdField[OwnerType <: Record[OwnerType]](
-    rec: OwnerType, override val maxLength: Int)
+    rec: OwnerType,
+    override val maxLength: Int)
     extends StringField[OwnerType](rec, maxLength) {
   override lazy val defaultValue = randomString(maxLen)
 
@@ -102,8 +105,10 @@ abstract class UniqueIdField[OwnerType <: Record[OwnerType]](
 }
 
 class OptionalStringField[OwnerType <: Record[OwnerType]](
-    rec: OwnerType, val maxLength: Int)
-    extends Field[String, OwnerType] with OptionalTypedField[String]
+    rec: OwnerType,
+    val maxLength: Int)
+    extends Field[String, OwnerType]
+    with OptionalTypedField[String]
     with StringTypedField {
 
   def this(rec: OwnerType, maxLength: Int, value: Box[String]) = {

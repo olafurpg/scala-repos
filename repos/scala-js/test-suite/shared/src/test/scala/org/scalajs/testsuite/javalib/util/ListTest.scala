@@ -455,11 +455,13 @@ trait ListTest extends CollectionTest {
 object ListFactory {
   def allFactories: Iterator[ListFactory] =
     Iterator(
-        new ArrayListFactory, new LinkedListFactory, new AbstractListFactory)
+      new ArrayListFactory,
+      new LinkedListFactory,
+      new AbstractListFactory)
 }
 
 trait ListFactory extends CollectionFactory {
-  def empty[E : ClassTag]: ju.List[E]
+  def empty[E: ClassTag]: ju.List[E]
 
   /** Sortable using java.util.Collections.sort
     */

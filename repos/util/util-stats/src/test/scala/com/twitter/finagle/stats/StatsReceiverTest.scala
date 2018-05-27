@@ -76,21 +76,24 @@ class StatsReceiverTest extends FunSuite {
   test("StatsReceiver timeFuture") {
     val receiver = spy(new InMemoryStatsReceiver)
 
-    Await.ready(Stat.timeFuture(receiver.stat("2", "chainz")) { Future.Unit },
-                1.second)
+    Await.ready(
+      Stat.timeFuture(receiver.stat("2", "chainz")) { Future.Unit },
+      1.second)
     verify(receiver, times(1)).stat("2", "chainz")
 
     Await.ready(
-        Stat.timeFuture(receiver.stat("2", "chainz"), TimeUnit.MINUTES) {
-      Future.Unit
-    }, 1.second)
+      Stat.timeFuture(receiver.stat("2", "chainz"), TimeUnit.MINUTES) {
+        Future.Unit
+      },
+      1.second)
     verify(receiver, times(2)).stat("2", "chainz")
 
     val stat = receiver.stat("2", "chainz")
     verify(receiver, times(3)).stat("2", "chainz")
 
     Await.result(
-        Stat.timeFuture(stat, TimeUnit.HOURS) { Future.Unit }, 1.second)
+      Stat.timeFuture(stat, TimeUnit.HOURS) { Future.Unit },
+      1.second)
     verify(receiver, times(3)).stat("2", "chainz")
   }
 
@@ -143,46 +146,46 @@ class StatsReceiverTest extends FunSuite {
   test("toString") {
     assert("NullStatsReceiver" == NullStatsReceiver.toString)
     assert(
-        "NullStatsReceiver" == NullStatsReceiver
-          .scope("hi")
-          .scopeSuffix("bye")
-          .toString)
+      "NullStatsReceiver" == NullStatsReceiver
+        .scope("hi")
+        .scopeSuffix("bye")
+        .toString)
 
     assert(
-        "BlacklistStatsReceiver(NullStatsReceiver)" == new BlacklistStatsReceiver(
-            NullStatsReceiver, { _ =>
-      false
-    }).toString)
+      "BlacklistStatsReceiver(NullStatsReceiver)" == new BlacklistStatsReceiver(
+        NullStatsReceiver, { _ =>
+          false
+        }).toString)
 
     val inMem = new InMemoryStatsReceiver()
     assert("InMemoryStatsReceiver" == inMem.toString)
 
     assert("InMemoryStatsReceiver/scope1" == inMem.scope("scope1").toString)
     assert(
-        "InMemoryStatsReceiver/scope1/scope2" == inMem
-          .scope("scope1")
-          .scope("scope2")
-          .toString)
+      "InMemoryStatsReceiver/scope1/scope2" == inMem
+        .scope("scope1")
+        .scope("scope2")
+        .toString)
 
     assert(
-        "InMemoryStatsReceiver/begin/end" == inMem
-          .scopeSuffix("end")
-          .scope("begin")
-          .toString)
+      "InMemoryStatsReceiver/begin/end" == inMem
+        .scopeSuffix("end")
+        .scope("begin")
+        .toString)
 
     assert(
-        "InMemoryStatsReceiver/begin/mid/end" == inMem
-          .scope("begin")
-          .scopeSuffix("end")
-          .scope("mid")
-          .toString)
+      "InMemoryStatsReceiver/begin/mid/end" == inMem
+        .scope("begin")
+        .scopeSuffix("end")
+        .scope("mid")
+        .toString)
 
     assert(
-        "Broadcast(InMemoryStatsReceiver, InMemoryStatsReceiver)" == BroadcastStatsReceiver(
-            Seq(inMem, inMem)).toString)
+      "Broadcast(InMemoryStatsReceiver, InMemoryStatsReceiver)" == BroadcastStatsReceiver(
+        Seq(inMem, inMem)).toString)
 
     assert(
-        "Broadcast(InMemoryStatsReceiver, InMemoryStatsReceiver, InMemoryStatsReceiver)" == BroadcastStatsReceiver(
-            Seq(inMem, inMem, inMem)).toString)
+      "Broadcast(InMemoryStatsReceiver, InMemoryStatsReceiver, InMemoryStatsReceiver)" == BroadcastStatsReceiver(
+        Seq(inMem, inMem, inMem)).toString)
   }
 }

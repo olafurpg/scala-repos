@@ -33,11 +33,12 @@ trait Hashes { self: BaseClient =>
     * @param hash key, field
     * @return Value if field exists
     */
-  def hGet(key: ChannelBuffer,
-           field: ChannelBuffer): Future[Option[ChannelBuffer]] =
+  def hGet(
+      key: ChannelBuffer,
+      field: ChannelBuffer): Future[Option[ChannelBuffer]] =
     doRequest(HGet(key, field)) {
       case BulkReply(message) => Future.value(Some(message))
-      case EmptyBulkReply() => Future.value(None)
+      case EmptyBulkReply()   => Future.value(None)
     }
 
   /**
@@ -45,8 +46,7 @@ trait Hashes { self: BaseClient =>
     * @param hash key
     * @return Sequence of field/value pairs
     */
-  def hGetAll(
-      key: ChannelBuffer): Future[Seq[(ChannelBuffer, ChannelBuffer)]] =
+  def hGetAll(key: ChannelBuffer): Future[Seq[(ChannelBuffer, ChannelBuffer)]] =
     doRequest(HGetAll(key)) {
       case MBulkReply(messages) =>
         Future.value(returnPairs(ReplyFormat.toChannelBuffers(messages)))
@@ -59,7 +59,9 @@ trait Hashes { self: BaseClient =>
     * @return new value of field
     */
   def hIncrBy(
-      key: ChannelBuffer, field: ChannelBuffer, amount: Long): Future[JLong] =
+      key: ChannelBuffer,
+      field: ChannelBuffer,
+      amount: Long): Future[JLong] =
     doRequest(HIncrBy(key, field, amount)) {
       case IntegerReply(n) => Future.value(n)
     }
@@ -81,8 +83,9 @@ trait Hashes { self: BaseClient =>
     * @param hash key, fields
     * @return List of values
     */
-  def hMGet(key: ChannelBuffer,
-            fields: Seq[ChannelBuffer]): Future[Seq[ChannelBuffer]] =
+  def hMGet(
+      key: ChannelBuffer,
+      fields: Seq[ChannelBuffer]): Future[Seq[ChannelBuffer]] =
     doRequest(HMGet(key, fields)) {
       case MBulkReply(messages) =>
         Future.value(ReplyFormat.toChannelBuffers(messages))
@@ -95,8 +98,9 @@ trait Hashes { self: BaseClient =>
     * @param fv map of field to value
     * @see http://redis.io/commands/hmset
     */
-  def hMSet(key: ChannelBuffer,
-            fv: Map[ChannelBuffer, ChannelBuffer]): Future[Unit] =
+  def hMSet(
+      key: ChannelBuffer,
+      fv: Map[ChannelBuffer, ChannelBuffer]): Future[Unit] =
     doRequest(HMSet(key, fv)) {
       case StatusReply(msg) => Future.Unit
     }
@@ -106,10 +110,11 @@ trait Hashes { self: BaseClient =>
     * @param hash key, cursor, count, pattern
     * @return cursor followed by matching keys
     */
-  def hScan(key: ChannelBuffer,
-            cursor: JLong,
-            count: Option[JLong],
-            pattern: Option[ChannelBuffer]): Future[Seq[ChannelBuffer]] =
+  def hScan(
+      key: ChannelBuffer,
+      cursor: JLong,
+      count: Option[JLong],
+      pattern: Option[ChannelBuffer]): Future[Seq[ChannelBuffer]] =
     doRequest(HScan(key, cursor, count, pattern)) {
       case MBulkReply(messages) =>
         Future.value(ReplyFormat.toChannelBuffers(messages))
@@ -121,9 +126,10 @@ trait Hashes { self: BaseClient =>
     * @param hash key, field, value
     * @return 1 if field is new, 0 if field was updated
     */
-  def hSet(key: ChannelBuffer,
-           field: ChannelBuffer,
-           value: ChannelBuffer): Future[JLong] =
+  def hSet(
+      key: ChannelBuffer,
+      field: ChannelBuffer,
+      value: ChannelBuffer): Future[JLong] =
     doRequest(HSet(key, field, value)) {
       case IntegerReply(n) => Future.value(n)
     }
@@ -133,9 +139,10 @@ trait Hashes { self: BaseClient =>
     * @param hash key, field, value
     * @return 1 if field is new, 0 if no operation was performed
     */
-  def hSetNx(key: ChannelBuffer,
-             field: ChannelBuffer,
-             value: ChannelBuffer): Future[JLong] =
+  def hSetNx(
+      key: ChannelBuffer,
+      field: ChannelBuffer,
+      value: ChannelBuffer): Future[JLong] =
     doRequest(HSetNx(key, field, value)) {
       case IntegerReply(n) => Future.value(n)
     }

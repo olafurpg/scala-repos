@@ -42,8 +42,9 @@ import scalafx.scene.media.{Media, MediaPlayer, MediaView}
 object SnapshotNPETester extends JFXApp {
   val movie =
     "http://download.oracle.com/otndocs/products/javafx/oow2010-2.flv"
-  val mediaView = new MediaView(
-      new MediaPlayer(new Media(movie)) { autoPlay.value = true })
+  val mediaView = new MediaView(new MediaPlayer(new Media(movie)) {
+    autoPlay.value = true
+  })
 
   test(mediaView)
 

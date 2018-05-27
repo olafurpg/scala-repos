@@ -48,10 +48,10 @@ private[ml] trait CrossValidatorParams extends ValidatorParams with HasSeed {
     * @group param
     */
   val numFolds: IntParam = new IntParam(
-      this,
-      "numFolds",
-      "number of folds for cross validation (>= 2)",
-      ParamValidators.gtEq(2))
+    this,
+    "numFolds",
+    "number of folds for cross validation (>= 2)",
+    ParamValidators.gtEq(2))
 
   /** @group getParam */
   def getNumFolds: Int = $(numFolds)
@@ -66,8 +66,10 @@ private[ml] trait CrossValidatorParams extends ValidatorParams with HasSeed {
 @Since("1.2.0")
 @Experimental
 class CrossValidator @Since("1.2.0")(@Since("1.4.0") override val uid: String)
-    extends Estimator[CrossValidatorModel] with CrossValidatorParams
-    with MLWritable with Logging {
+    extends Estimator[CrossValidatorModel]
+    with CrossValidatorParams
+    with MLWritable
+    with Logging {
 
   @Since("1.2.0")
   def this() = this(Identifiable.randomUID("cv"))
@@ -134,8 +136,7 @@ class CrossValidator @Since("1.2.0")(@Since("1.4.0") override val uid: String)
     logInfo(s"Best set of parameters:\n${epm(bestIndex)}")
     logInfo(s"Best cross-validation metric: $bestMetric.")
     val bestModel = est.fit(dataset, epm(bestIndex)).asInstanceOf[Model[_]]
-    copyValues(
-        new CrossValidatorModel(uid, bestModel, metrics).setParent(this))
+    copyValues(new CrossValidatorModel(uid, bestModel, metrics).setParent(this))
   }
 
   @Since("1.4.0")
@@ -206,7 +207,7 @@ object CrossValidator extends MLReadable[CrossValidator] {
       val uidMap = uidList.toMap
       if (uidList.size != uidMap.size) {
         throw new RuntimeException(
-            "CrossValidator.load found a compound estimator with stages" +
+          "CrossValidator.load found a compound estimator with stages" +
             s" with duplicate UIDs.  List of UIDs: ${uidList.map(_._1).mkString(", ")}")
       }
       uidMap
@@ -214,16 +215,16 @@ object CrossValidator extends MLReadable[CrossValidator] {
 
     def getUidMapImpl(instance: Params): List[(String, Params)] = {
       val subStages: Array[Params] = instance match {
-        case p: Pipeline => p.getStages.asInstanceOf[Array[Params]]
-        case pm: PipelineModel => pm.stages.asInstanceOf[Array[Params]]
-        case v: ValidatorParams => Array(v.getEstimator, v.getEvaluator)
+        case p: Pipeline          => p.getStages.asInstanceOf[Array[Params]]
+        case pm: PipelineModel    => pm.stages.asInstanceOf[Array[Params]]
+        case v: ValidatorParams   => Array(v.getEstimator, v.getEvaluator)
         case ovr: OneVsRestParams =>
           // TODO: SPARK-11892: This case may require special handling.
           throw new UnsupportedOperationException(
-              "CrossValidator write will fail because it" +
+            "CrossValidator write will fail because it" +
               " cannot yet handle an estimator containing type: ${ovr.getClass.getName}")
         case rformModel: RFormulaModel => Array(rformModel.pipelineModel)
-        case _: Params => Array()
+        case _: Params                 => Array()
       }
       val subStageMaps = subStages
         .map(getUidMapImpl)
@@ -243,7 +244,7 @@ object CrossValidator extends MLReadable[CrossValidator] {
         case stage: MLWritable => // good
         case other =>
           throw new UnsupportedOperationException(
-              "CrossValidator write will fail " +
+            "CrossValidator write will fail " +
               s" because it contains $name which does not implement Writable." +
               s" Non-Writable $name: ${other.uid} of type ${other.getClass}")
       }
@@ -258,10 +259,11 @@ object CrossValidator extends MLReadable[CrossValidator] {
           pMap.toSeq.foreach {
             case ParamPair(p, v) =>
               require(
-                  uidToInstance.contains(p.parent),
-                  s"CrossValidator save requires all Params in" +
+                uidToInstance.contains(p.parent),
+                s"CrossValidator save requires all Params in" +
                   s" estimatorParamMaps to apply to this CrossValidator, its Estimator, or its" +
-                  s" Evaluator.  An extraneous Param was found: $p")
+                  s" Evaluator.  An extraneous Param was found: $p"
+              )
           }
       }
     }
@@ -274,24 +276,28 @@ object CrossValidator extends MLReadable[CrossValidator] {
       import org.json4s.JsonDSL._
 
       val estimatorParamMapsJson = compact(
-          render(
-              instance.getEstimatorParamMaps.map {
+        render(
+          instance.getEstimatorParamMaps.map {
             case paramMap =>
               paramMap.toSeq.map {
                 case ParamPair(p, v) =>
-                  Map("parent" -> p.parent,
-                      "name" -> p.name,
-                      "value" -> p.jsonEncode(v))
+                  Map(
+                    "parent" -> p.parent,
+                    "name" -> p.name,
+                    "value" -> p.jsonEncode(v))
               }
           }.toSeq
-          ))
+        ))
       val jsonParams = List(
-          "numFolds" -> parse(
-              instance.numFolds.jsonEncode(instance.getNumFolds)),
-          "estimatorParamMaps" -> parse(estimatorParamMapsJson)
+        "numFolds" -> parse(instance.numFolds.jsonEncode(instance.getNumFolds)),
+        "estimatorParamMaps" -> parse(estimatorParamMapsJson)
       )
       DefaultParamsWriter.saveMetadata(
-          instance, path, sc, extraMetadata, Some(jsonParams))
+        instance,
+        path,
+        sc,
+        extraMetadata,
+        Some(jsonParams))
 
       val evaluatorPath = new Path(path, "evaluator").toString
       instance.getEvaluator.asInstanceOf[MLWritable].save(evaluatorPath)
@@ -300,7 +306,9 @@ object CrossValidator extends MLReadable[CrossValidator] {
     }
 
     private[tuning] def load[M <: Model[M]](
-        path: String, sc: SparkContext, expectedClassName: String)
+        path: String,
+        sc: SparkContext,
+        expectedClassName: String)
       : (Metadata, Estimator[M], Evaluator, Array[ParamMap], Int) = {
 
       val metadata =
@@ -316,7 +324,7 @@ object CrossValidator extends MLReadable[CrossValidator] {
 
       val uidToParams =
         Map(evaluator.uid -> evaluator) ++ CrossValidatorReader.getUidMap(
-            estimator)
+          estimator)
 
       val numFolds = (metadata.params \ "numFolds").extract[Int]
       val estimatorParamMaps: Array[ParamMap] =
@@ -333,7 +341,7 @@ object CrossValidator extends MLReadable[CrossValidator] {
             ParamMap(paramPairs: _*)
           }
           .toArray
-        (metadata, estimator, evaluator, estimatorParamMaps, numFolds)
+      (metadata, estimator, evaluator, estimatorParamMaps, numFolds)
     }
   }
 }
@@ -348,11 +356,12 @@ object CrossValidator extends MLReadable[CrossValidator] {
   */
 @Since("1.2.0")
 @Experimental
-class CrossValidatorModel private[ml](
+class CrossValidatorModel private[ml] (
     @Since("1.4.0") override val uid: String,
     @Since("1.2.0") val bestModel: Model[_],
     @Since("1.5.0") val avgMetrics: Array[Double])
-    extends Model[CrossValidatorModel] with CrossValidatorParams
+    extends Model[CrossValidatorModel]
+    with CrossValidatorParams
     with MLWritable {
 
   @Since("1.4.0")
@@ -369,9 +378,9 @@ class CrossValidatorModel private[ml](
   @Since("1.4.0")
   override def copy(extra: ParamMap): CrossValidatorModel = {
     val copied = new CrossValidatorModel(
-        uid,
-        bestModel.copy(extra).asInstanceOf[Model[_]],
-        avgMetrics.clone())
+      uid,
+      bestModel.copy(extra).asInstanceOf[Model[_]],
+      avgMetrics.clone())
     copyValues(copied, extra).setParent(parent)
   }
 

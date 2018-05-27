@@ -57,7 +57,10 @@ object Printers {
     }
 
     protected final def printColumn(
-        ts: List[Tree], start: String, sep: String, end: String): Unit = {
+        ts: List[Tree],
+        start: String,
+        sep: String,
+        end: String): Unit = {
       print(start); indent(); println()
       var rest = ts
       while (rest.nonEmpty) {
@@ -72,7 +75,10 @@ object Printers {
     }
 
     protected final def printRow(
-        ts: List[Tree], start: String, sep: String, end: String): Unit = {
+        ts: List[Tree],
+        start: String,
+        sep: String,
+        end: String): Unit = {
       print(start)
       var rest = ts
       while (rest.nonEmpty) {
@@ -312,11 +318,11 @@ object Printers {
           import UnaryOp._
           print('(')
           print((op: @switch) match {
-            case Boolean_! => "!"
+            case Boolean_!                => "!"
             case IntToLong | DoubleToLong => "(long)"
-            case DoubleToInt | LongToInt => "(int)"
-            case DoubleToFloat => "(float)"
-            case LongToDouble => "(double)"
+            case DoubleToInt | LongToInt  => "(int)"
+            case DoubleToFloat            => "(float)"
+            case LongToDouble             => "(double)"
           })
           print(lhs)
           print(')')
@@ -346,9 +352,10 @@ object Printers {
           print(rhs)
           print(')')
 
-        case BinaryOp(BinaryOp.Double_-,
-                      IntLiteral(0) | FloatLiteral(0.0f) | DoubleLiteral(0.0),
-                      rhs) =>
+        case BinaryOp(
+            BinaryOp.Double_-,
+            IntLiteral(0) | FloatLiteral(0.0f) | DoubleLiteral(0.0),
+            rhs) =>
           print("(-")
           print(rhs)
           print(')')
@@ -370,12 +377,12 @@ object Printers {
             case Int_/ => "/[int]"
             case Int_% => "%[int]"
 
-            case Int_| => "|"
-            case Int_& => "&"
-            case Int_^ => "^"
-            case Int_<< => "<<"
+            case Int_|   => "|"
+            case Int_&   => "&"
+            case Int_^   => "^"
+            case Int_<<  => "<<"
             case Int_>>> => ">>>"
-            case Int_>> => ">>"
+            case Int_>>  => ">>"
 
             case Float_+ => "+[float]"
             case Float_- => "-[float]"
@@ -391,9 +398,9 @@ object Printers {
 
             case Num_== => "=="
             case Num_!= => "!="
-            case Num_< => "<"
+            case Num_<  => "<"
             case Num_<= => "<="
-            case Num_> => ">"
+            case Num_>  => ">"
             case Num_>= => ">="
 
             case Long_+ => "+[long]"
@@ -402,24 +409,24 @@ object Printers {
             case Long_/ => "/[long]"
             case Long_% => "%[long]"
 
-            case Long_| => "|[long]"
-            case Long_& => "&[long]"
-            case Long_^ => "^[long]"
-            case Long_<< => "<<[long]"
+            case Long_|   => "|[long]"
+            case Long_&   => "&[long]"
+            case Long_^   => "^[long]"
+            case Long_<<  => "<<[long]"
             case Long_>>> => ">>>[long]"
-            case Long_>> => ">>[long]"
+            case Long_>>  => ">>[long]"
 
             case Long_== => "==[long]"
             case Long_!= => "!=[long]"
-            case Long_< => "<[long]"
+            case Long_<  => "<[long]"
             case Long_<= => "<=[long]"
-            case Long_> => ">[long]"
+            case Long_>  => ">[long]"
             case Long_>= => ">=[long]"
 
             case Boolean_== => "==[bool]"
             case Boolean_!= => "!=[bool]"
-            case Boolean_| => "|[bool]"
-            case Boolean_& => "&[bool]"
+            case Boolean_|  => "|[bool]"
+            case Boolean_&  => "&[bool]"
           })
           print(' ')
           print(rhs)
@@ -491,11 +498,11 @@ object Printers {
 
         case JSNew(ctor, args) =>
           def containsOnlySelectsFromAtom(tree: Tree): Boolean = tree match {
-            case JSDotSelect(qual, _) => containsOnlySelectsFromAtom(qual)
+            case JSDotSelect(qual, _)     => containsOnlySelectsFromAtom(qual)
             case JSBracketSelect(qual, _) => containsOnlySelectsFromAtom(qual)
-            case VarRef(_) => true
-            case This() => true
-            case _ => false // in particular, Apply
+            case VarRef(_)                => true
+            case This()                   => true
+            case _                        => false // in particular, Apply
           }
           if (containsOnlySelectsFromAtom(ctor)) {
             print("new ")
@@ -584,8 +591,7 @@ object Printers {
         case JSUnaryOp(op, lhs) =>
           import JSUnaryOp._
           print('(')
-          print(
-              (op: @switch) match {
+          print((op: @switch) match {
             case + => "+"
             case - => "-"
             case ~ => "~"
@@ -611,22 +617,22 @@ object Printers {
             case / => "/"
             case % => "%"
 
-            case | => "|"
-            case & => "&"
-            case ^ => "^"
-            case << => "<<"
-            case >> => ">>"
+            case |   => "|"
+            case &   => "&"
+            case ^   => "^"
+            case <<  => "<<"
+            case >>  => ">>"
             case >>> => ">>>"
 
-            case < => "<"
+            case <  => "<"
             case <= => "<="
-            case > => ">"
+            case >  => ">"
             case >= => ">="
 
             case && => "&&"
             case || => "||"
 
-            case `in` => "in"
+            case `in`         => "in"
             case `instanceof` => "instanceof"
           })
           print(" ")
@@ -739,12 +745,12 @@ object Printers {
           val ClassDef(name, kind, superClass, interfaces, jsName, defs) = tree
           print(tree.optimizerHints)
           kind match {
-            case ClassKind.Class => print("class ")
-            case ClassKind.ModuleClass => print("module class ")
-            case ClassKind.Interface => print("interface ")
-            case ClassKind.RawJSType => print("jstype ")
+            case ClassKind.Class         => print("class ")
+            case ClassKind.ModuleClass   => print("module class ")
+            case ClassKind.Interface     => print("interface ")
+            case ClassKind.RawJSType     => print("jstype ")
             case ClassKind.HijackedClass => print("hijacked class ")
-            case ClassKind.JSClass => print("js class ")
+            case ClassKind.JSClass       => print("js class ")
             case ClassKind.JSModuleClass => print("js module class ")
           }
           print(name)
@@ -818,18 +824,18 @@ object Printers {
       print(tpe.asInstanceOf[Type])
 
     def print(tpe: Type): Unit = tpe match {
-      case AnyType => print("any")
-      case NothingType => print("nothing")
-      case UndefType => print("void")
-      case BooleanType => print("boolean")
-      case IntType => print("int")
-      case LongType => print("long")
-      case FloatType => print("float")
-      case DoubleType => print("number")
-      case StringType => print("string")
-      case NullType => print("null")
+      case AnyType              => print("any")
+      case NothingType          => print("nothing")
+      case UndefType            => print("void")
+      case BooleanType          => print("boolean")
+      case IntType              => print("int")
+      case LongType             => print("long")
+      case FloatType            => print("float")
+      case DoubleType           => print("number")
+      case StringType           => print("string")
+      case NullType             => print("null")
       case ClassType(className) => print(className)
-      case NoType => print("<notype>")
+      case NoType               => print("<notype>")
 
       case ArrayType(base, dims) =>
         print(base)
@@ -854,7 +860,7 @@ object Printers {
 
     private final def print(propName: PropertyName): Unit = propName match {
       case lit: StringLiteral => print(lit: Tree)
-      case ident: Ident => print(ident)
+      case ident: Ident       => print(ident)
     }
 
     protected def print(s: String): Unit =
@@ -988,7 +994,10 @@ object Printers {
     }
 
     protected def printRow(
-        ts: List[String], start: String, sep: String, end: String): Unit = {
+        ts: List[String],
+        start: String,
+        sep: String,
+        end: String): Unit = {
       print(start)
       var rest = ts
       while (rest.nonEmpty) {

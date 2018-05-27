@@ -26,7 +26,9 @@ class ConvertFromInfixExpressionIntention
   override def getText: String = getFamilyName
 
   def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+      project: Project,
+      editor: Editor,
+      element: PsiElement): Boolean = {
     val infixExpr: ScInfixExpr =
       PsiTreeUtil.getParentOfType(element, classOf[ScInfixExpr], false)
     if (infixExpr == null) return false
@@ -43,7 +45,7 @@ class ConvertFromInfixExpressionIntention
     val start = infixExpr.getTextRange.getStartOffset
     val diff =
       editor.getCaretModel.getOffset -
-      infixExpr.operation.nameId.getTextRange.getStartOffset
+        infixExpr.operation.nameId.getTextRange.getStartOffset
 
     val methodCallExpr =
       ScalaPsiElementFactory.createEquivMethodCall(infixExpr)
@@ -54,7 +56,7 @@ class ConvertFromInfixExpressionIntention
     }
     val size =
       referenceExpr.nameId.getTextRange.getStartOffset -
-      methodCallExpr.getTextRange.getStartOffset
+        methodCallExpr.getTextRange.getStartOffset
 
     inWriteAction {
       infixExpr.replaceExpression(methodCallExpr, removeParenthesis = true)

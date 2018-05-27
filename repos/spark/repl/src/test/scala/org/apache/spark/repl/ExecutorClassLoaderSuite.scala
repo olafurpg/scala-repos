@@ -45,12 +45,14 @@ import org.apache.spark.rpc.RpcEnv
 import org.apache.spark.util.Utils
 
 class ExecutorClassLoaderSuite
-    extends SparkFunSuite with BeforeAndAfterAll with MockitoSugar
+    extends SparkFunSuite
+    with BeforeAndAfterAll
+    with MockitoSugar
     with Logging {
 
   val childClassNames = List("ReplFakeClass1", "ReplFakeClass2")
-  val parentClassNames = List(
-      "ReplFakeClass1", "ReplFakeClass2", "ReplFakeClass3")
+  val parentClassNames =
+    List("ReplFakeClass1", "ReplFakeClass2", "ReplFakeClass3")
   val parentResourceNames = List("fake-resource.txt")
   var tempDir1: File = _
   var tempDir2: File = _
@@ -67,7 +69,8 @@ class ExecutorClassLoaderSuite
     childClassNames.foreach(TestUtils.createCompiledClass(_, tempDir1, "1"))
     parentResourceNames.foreach { x =>
       Files.write(
-          "resource".getBytes(StandardCharsets.UTF_8), new File(tempDir2, x))
+        "resource".getBytes(StandardCharsets.UTF_8),
+        new File(tempDir2, x))
     }
     parentClassNames.foreach(TestUtils.createCompiledClass(_, tempDir2, "2"))
   }
@@ -143,12 +146,13 @@ class ExecutorClassLoaderSuite
     val fileReader = Source
       .fromInputStream(resources.nextElement().openStream())
       .bufferedReader()
-    assert(fileReader.readLine().contains("resource"),
-           "File doesn't contain 'resource'")
+    assert(
+      fileReader.readLine().contains("resource"),
+      "File doesn't contain 'resource'")
   }
 
   test(
-      "failing to fetch classes from HTTP server should not leak resources (SPARK-6209)") {
+    "failing to fetch classes from HTTP server should not leak resources (SPARK-6209)") {
     // This is a regression test for SPARK-6209, a bug where each failed attempt to load a class
     // from the driver's class server would leak a HTTP connection, causing the class server's
     // thread / connection pool to be exhausted.
@@ -204,19 +208,22 @@ class ExecutorClassLoaderSuite
     when(env.rpcEnv).thenReturn(rpcEnv)
     when(rpcEnv.openChannel(anyString()))
       .thenAnswer(new Answer[ReadableByteChannel]() {
-      override def answer(invocation: InvocationOnMock): ReadableByteChannel = {
-        val uri = new URI(invocation.getArguments()(0).asInstanceOf[String])
-        val path =
-          Paths.get(tempDir1.getAbsolutePath(), uri.getPath().stripPrefix("/"))
-        FileChannel.open(path, StandardOpenOption.READ)
-      }
-    })
+        override def answer(
+            invocation: InvocationOnMock): ReadableByteChannel = {
+          val uri = new URI(invocation.getArguments()(0).asInstanceOf[String])
+          val path =
+            Paths
+              .get(tempDir1.getAbsolutePath(), uri.getPath().stripPrefix("/"))
+          FileChannel.open(path, StandardOpenOption.READ)
+        }
+      })
 
-    val classLoader = new ExecutorClassLoader(new SparkConf(),
-                                              env,
-                                              "spark://localhost:1234",
-                                              getClass().getClassLoader(),
-                                              false)
+    val classLoader = new ExecutorClassLoader(
+      new SparkConf(),
+      env,
+      "spark://localhost:1234",
+      getClass().getClassLoader(),
+      false)
 
     val fakeClass = classLoader.loadClass("ReplFakeClass2").newInstance()
     val fakeClassVersion = fakeClass.toString

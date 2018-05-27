@@ -8,7 +8,11 @@ import com.intellij.psi.search.searches.ClassInheritorsSearch
 import com.intellij.psi.{FileViewProvider, PsiClass, PsiElement, ResolveState}
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.ScDeclarationSequenceHolder
-import org.jetbrains.plugins.scala.lang.psi.impl.{ScalaFileImpl, ScalaPsiElementFactory, ScalaPsiManager}
+import org.jetbrains.plugins.scala.lang.psi.impl.{
+  ScalaFileImpl,
+  ScalaPsiElementFactory,
+  ScalaPsiManager
+}
 import org.jetbrains.sbt.project.module.SbtModule
 
 import scala.collection.JavaConverters._
@@ -25,33 +29,38 @@ class SbtFileImpl(provider: FileViewProvider)
 
   override def packagings = Seq.empty
 
-  override def processDeclarations(processor: PsiScopeProcessor,
-                                   state: ResolveState,
-                                   lastParent: PsiElement,
-                                   place: PsiElement): Boolean =
-    super [ScalaFileImpl]
+  override def processDeclarations(
+      processor: PsiScopeProcessor,
+      state: ResolveState,
+      lastParent: PsiElement,
+      place: PsiElement): Boolean =
+    super[ScalaFileImpl]
       .processDeclarations(processor, state, lastParent, place) &&
-    super [ScDeclarationSequenceHolder].processDeclarations(
-        processor, state, lastParent, place) &&
-    processImplicitImports(processor, state, lastParent, place)
+      super[ScDeclarationSequenceHolder].processDeclarations(
+        processor,
+        state,
+        lastParent,
+        place) &&
+      processImplicitImports(processor, state, lastParent, place)
 
-  private def processImplicitImports(processor: PsiScopeProcessor,
-                                     state: ResolveState,
-                                     lastParent: PsiElement,
-                                     place: PsiElement): Boolean = {
+  private def processImplicitImports(
+      processor: PsiScopeProcessor,
+      state: ResolveState,
+      lastParent: PsiElement,
+      place: PsiElement): Boolean = {
     val expressions =
       implicitImportExpressions ++ localObjectsWithDefinitions.map(
-          _.qualifiedName + "._")
+        _.qualifiedName + "._")
 
     // TODO this is a workaround, we need to find out why references stopped resolving via the chained imports
     val expressions0 = expressions.map {
-      case "Keys._" => "sbt.Keys._"
+      case "Keys._"  => "sbt.Keys._"
       case "Build._" => "sbt.Build._"
       // TODO: this is a workaround. `processDeclarations` does not resolve "Play.autoImport -> PlayImport"
       //    However, when object with implicit imports is located in the same file where plugin object resides
       //    everything is resolved, but PlayImport and Play are in different files.
       case "_root_.play.Play.autoImport._" => "_root_.play.PlayImport._"
-      case it => it
+      case it                              => it
     }
 
     expressions0.isEmpty || {
@@ -76,19 +85,20 @@ class SbtFileImpl(provider: FileViewProvider)
       Sbt.DefinitionHolderClasses
         .flatMap(manager.getCachedClasses(moduleWithLibrariesScope, _))
         .flatMap(
-            ClassInheritorsSearch.search(_, moduleScope, true).findAll.asScala)
+          ClassInheritorsSearch.search(_, moduleScope, true).findAll.asScala)
     }
   }
 
   override def getFileResolveScope: GlobalSearchScope =
     projectDefinitionModule.fold(super.getFileResolveScope)(
-        _.getModuleWithLibrariesScope)
+      _.getModuleWithLibrariesScope)
 
   private def projectDefinitionModule: Option[Module] = fileModule.flatMap {
     module =>
-      Option(ModuleManager
-            .getInstance(getProject)
-            .findModuleByName(module.getName + Sbt.BuildModuleSuffix))
+      Option(
+        ModuleManager
+          .getInstance(getProject)
+          .findModuleByName(module.getName + Sbt.BuildModuleSuffix))
   }
 
   private def fileModule: Option[Module] =

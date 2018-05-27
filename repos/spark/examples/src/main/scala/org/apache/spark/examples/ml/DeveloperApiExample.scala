@@ -19,7 +19,11 @@
 package org.apache.spark.examples.ml
 
 import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.ml.classification.{ClassificationModel, Classifier, ClassifierParams}
+import org.apache.spark.ml.classification.{
+  ClassificationModel,
+  Classifier,
+  ClassifierParams
+}
 import org.apache.spark.ml.param.{IntParam, ParamMap}
 import org.apache.spark.ml.util.Identifiable
 import org.apache.spark.mllib.linalg.{BLAS, Vector, Vectors}
@@ -45,10 +49,12 @@ object DeveloperApiExample {
 
     // Prepare training data.
     val training = sc.parallelize(
-        Seq(LabeledPoint(1.0, Vectors.dense(0.0, 1.1, 0.1)),
-            LabeledPoint(0.0, Vectors.dense(2.0, 1.0, -1.0)),
-            LabeledPoint(0.0, Vectors.dense(2.0, 1.3, 1.0)),
-            LabeledPoint(1.0, Vectors.dense(0.0, 1.2, -0.5))))
+      Seq(
+        LabeledPoint(1.0, Vectors.dense(0.0, 1.1, 0.1)),
+        LabeledPoint(0.0, Vectors.dense(2.0, 1.0, -1.0)),
+        LabeledPoint(0.0, Vectors.dense(2.0, 1.3, 1.0)),
+        LabeledPoint(1.0, Vectors.dense(0.0, 1.2, -0.5))
+      ))
 
     // Create a LogisticRegression instance.  This instance is an Estimator.
     val lr = new MyLogisticRegression()
@@ -63,9 +69,10 @@ object DeveloperApiExample {
 
     // Prepare test data.
     val test = sc.parallelize(
-        Seq(LabeledPoint(1.0, Vectors.dense(-1.0, 1.5, 1.3)),
-            LabeledPoint(0.0, Vectors.dense(3.0, 2.0, -0.1)),
-            LabeledPoint(1.0, Vectors.dense(0.0, 2.2, -1.5))))
+      Seq(
+        LabeledPoint(1.0, Vectors.dense(-1.0, 1.5, 1.3)),
+        LabeledPoint(0.0, Vectors.dense(3.0, 2.0, -0.1)),
+        LabeledPoint(1.0, Vectors.dense(0.0, 2.2, -1.5))))
 
     // Make predictions on test data.
     val sumPredictions: Double = model
@@ -78,8 +85,8 @@ object DeveloperApiExample {
       }
       .sum
     assert(
-        sumPredictions == 0.0,
-        "MyLogisticRegression predicted something other than 0, even though all coefficients are 0!")
+      sumPredictions == 0.0,
+      "MyLogisticRegression predicted something other than 0, even though all coefficients are 0!")
 
     sc.stop()
   }
@@ -103,8 +110,8 @@ private trait MyLogisticRegressionParams extends ClassifierParams {
     * and MyLogisticRegressionModel).  We place the setter (setMaxIter) method in the Estimator
     * class since the maxIter parameter is only used during training (not in the Model).
     */
-  val maxIter: IntParam = new IntParam(
-      this, "maxIter", "max number of iterations")
+  val maxIter: IntParam =
+    new IntParam(this, "maxIter", "max number of iterations")
   def getMaxIter: Int = $(maxIter)
 }
 
@@ -125,7 +132,8 @@ private class MyLogisticRegression(override val uid: String)
   def setMaxIter(value: Int): this.type = set(maxIter, value)
 
   // This method is used by fit()
-  override protected def train(dataset: DataFrame): MyLogisticRegressionModel = {
+  override protected def train(
+      dataset: DataFrame): MyLogisticRegressionModel = {
     // Extract columns from data using helper method.
     val oldDataset = extractLabeledPoints(dataset)
 
@@ -147,7 +155,8 @@ private class MyLogisticRegression(override val uid: String)
   * NOTE: This is private since it is an example.  In practice, you may not want it to be private.
   */
 private class MyLogisticRegressionModel(
-    override val uid: String, val coefficients: Vector)
+    override val uid: String,
+    val coefficients: Vector)
     extends ClassificationModel[Vector, MyLogisticRegressionModel]
     with MyLogisticRegressionParams {
 

@@ -75,7 +75,8 @@ class SerialServerDispatcherTest extends FunSuite with MockitoSugar {
     val service = new Service[String, String] {
       override def apply(request: String): Future[String] = Future.value {
         if (Contexts.local.get(RemoteInfo.Upstream.AddressCtx) == Some(
-                mockAddr)) "ok" else "not ok"
+              mockAddr)) "ok"
+        else "not ok"
       }
     }
 
@@ -128,8 +129,7 @@ class SerialServerDispatcherTest extends FunSuite with MockitoSugar {
     val disp = new SerialServerDispatcher(trans, service)
   }
 
-  test("interrupt on hangup: while pending")(
-      new Ictx {
+  test("interrupt on hangup: while pending")(new Ictx {
     readp.setValue("ok")
     verify(service).apply("ok")
     assert(!replyp.interrupted.isDefined)
@@ -178,8 +178,7 @@ class SerialServerDispatcherTest extends FunSuite with MockitoSugar {
     verify(trans).read()
   }
 
-  test("isClosing")(
-      new Ictx {
+  test("isClosing")(new Ictx {
     assert(!disp.isClosing)
     disp.close(Time.now)
     assert(disp.isClosing)

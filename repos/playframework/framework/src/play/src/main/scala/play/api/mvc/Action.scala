@@ -37,7 +37,8 @@ trait RequestTaggingHandler extends Handler {
   * that Play uses to handle requests.
   */
 trait EssentialAction
-    extends (RequestHeader => Accumulator[ByteString, Result]) with Handler { self =>
+    extends (RequestHeader => Accumulator[ByteString, Result])
+    with Handler { self =>
 
   /**
     * Returns itself, for better support in the routes file.
@@ -111,13 +112,15 @@ trait Action[A] extends EssentialAction {
       case Right(a) =>
         val request = Request(rh, a)
         logger.trace("Invoking action with request: " + request)
-        Play.privateMaybeApplication.map { app =>
-          play.utils.Threads.withContextClassLoader(app.classloader) {
+        Play.privateMaybeApplication
+          .map { app =>
+            play.utils.Threads.withContextClassLoader(app.classloader) {
+              apply(request)
+            }
+          }
+          .getOrElse {
             apply(request)
           }
-        }.getOrElse {
-          apply(request)
-        }
     }(executionContext)
 
   /**
@@ -221,7 +224,7 @@ trait BodyParser[+A]
     new BodyParser[B] {
       def apply(request: RequestHeader) =
         self(request).map {
-          case Left(e) => Left(e)
+          case Left(e)  => Left(e)
           case Right(a) => f(a)
         }(pec)
       override def toString = self.toString
@@ -327,7 +330,8 @@ trait ActionFunction[-R[_], +P[_]] { self =>
     * @return A future of the result
     */
   def invokeBlock[A](
-      request: R[A], block: P[A] => Future[Result]): Future[Result]
+      request: R[A],
+      block: P[A] => Future[Result]): Future[Result]
 
   /**
     * Get the execution context to run the request in.  Override this if you want a custom execution context
@@ -472,8 +476,7 @@ trait ActionBuilder[+R[_]] extends ActionFunction[Request, R] { self =>
     */
   final def async[A](bodyParser: BodyParser[A])(
       block: R[A] => Future[Result]): Action[A] =
-    composeAction(
-        new Action[A] {
+    composeAction(new Action[A] {
       def parser = composeParser(bodyParser)
       def apply(request: Request[A]) =
         try {
@@ -523,7 +526,8 @@ object Action extends ActionBuilder[Request] {
   private val logger = Logger(Action.getClass)
 
   def invokeBlock[A](
-      request: Request[A], block: (Request[A]) => Future[Result]) =
+      request: Request[A],
+      block: (Request[A]) => Future[Result]) =
     block(request)
 }
 

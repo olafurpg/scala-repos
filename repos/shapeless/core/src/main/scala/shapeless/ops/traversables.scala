@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-15 Miles Sabin 
+ * Copyright (c) 2011-15 Miles Sabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ import scala.collection.{GenTraversable, GenTraversableLike}
 object traversable {
 
   /**
-    * Type class supporting type safe conversion of `Traversables` to `HLists`. 
-    * 
+    * Type class supporting type safe conversion of `Traversables` to `HLists`.
+    *
     * @author Miles Sabin
     */
   trait FromTraversable[Out <: HList] extends Serializable {
@@ -32,7 +32,7 @@ object traversable {
 
   /**
     * `FromTraversable` type class instances.
-    * 
+    *
     * @author Miles Sabin
     */
   object FromTraversable {
@@ -46,7 +46,8 @@ object traversable {
     }
 
     implicit def hlistFromTraversable[OutH, OutT <: HList](
-        implicit flt: FromTraversable[OutT], oc: Typeable[OutH]) =
+        implicit flt: FromTraversable[OutT],
+        oc: Typeable[OutH]) =
       new FromTraversable[OutH :: OutT] {
         def apply(l: GenTraversable[_]): Option[OutH :: OutT] =
           if (l.isEmpty) None
@@ -56,7 +57,7 @@ object traversable {
 
   /**
     * Type class supporting type safe conversion of `Traversables` to `HLists` of a specific length.
-    * 
+    *
     * @author Rob Norris
     */
   trait ToSizedHList[CC[T] <: GenTraversable[T], A, N <: Nat]
@@ -67,7 +68,7 @@ object traversable {
 
   /**
     * `ToSizedHList` type class instances.
-    * 
+    *
     * @author Rob Norris
     */
   object ToSizedHList {
@@ -81,10 +82,10 @@ object traversable {
     import ops.nat._
     import ops.sized._
 
-    type Aux[CC[T] <: GenTraversable[T], A, N <: Nat, Out0] = ToSizedHList[
-        CC, A, N] {
-      type Out = Out0
-    }
+    type Aux[CC[T] <: GenTraversable[T], A, N <: Nat, Out0] =
+      ToSizedHList[CC, A, N] {
+        type Out = Out0
+      }
 
     implicit def instance[CC[T] <: GenTraversable[T], A, N <: Nat](
         implicit gt: CC[A] => GenTraversableLike[A, CC[A]],

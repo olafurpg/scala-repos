@@ -28,11 +28,13 @@ import org.apache.spark.rpc.RpcEndpointAddress
 import org.apache.spark.scheduler._
 import org.apache.spark.util.Utils
 
-private[spark] class SparkDeploySchedulerBackend(scheduler: TaskSchedulerImpl,
-                                                 sc: SparkContext,
-                                                 masters: Array[String])
+private[spark] class SparkDeploySchedulerBackend(
+    scheduler: TaskSchedulerImpl,
+    sc: SparkContext,
+    masters: Array[String])
     extends CoarseGrainedSchedulerBackend(scheduler, sc.env.rpcEnv)
-    with AppClientListener with Logging {
+    with AppClientListener
+    with Logging {
 
   private var client: AppClient = null
   private var stopping = false
@@ -55,21 +57,23 @@ private[spark] class SparkDeploySchedulerBackend(scheduler: TaskSchedulerImpl,
 
     // The endpoint for executors to talk to us
     val driverUrl = RpcEndpointAddress(
-        sc.conf.get("spark.driver.host"),
-        sc.conf.get("spark.driver.port").toInt,
-        CoarseGrainedSchedulerBackend.ENDPOINT_NAME).toString
-    val args = Seq("--driver-url",
-                   driverUrl,
-                   "--executor-id",
-                   "{{EXECUTOR_ID}}",
-                   "--hostname",
-                   "{{HOSTNAME}}",
-                   "--cores",
-                   "{{CORES}}",
-                   "--app-id",
-                   "{{APP_ID}}",
-                   "--worker-url",
-                   "{{WORKER_URL}}")
+      sc.conf.get("spark.driver.host"),
+      sc.conf.get("spark.driver.port").toInt,
+      CoarseGrainedSchedulerBackend.ENDPOINT_NAME).toString
+    val args = Seq(
+      "--driver-url",
+      driverUrl,
+      "--executor-id",
+      "{{EXECUTOR_ID}}",
+      "--hostname",
+      "{{HOSTNAME}}",
+      "--cores",
+      "{{CORES}}",
+      "--app-id",
+      "{{APP_ID}}",
+      "--worker-url",
+      "{{WORKER_URL}}"
+    )
     val extraJavaOpts = sc.conf
       .getOption("spark.executor.extraJavaOptions")
       .map(Utils.splitCommandString)
@@ -98,12 +102,12 @@ private[spark] class SparkDeploySchedulerBackend(scheduler: TaskSchedulerImpl,
       Utils.sparkJavaOpts(conf, SparkConf.isExecutorStartupConf)
     val javaOpts = sparkJavaOpts ++ extraJavaOpts
     val command = Command(
-        "org.apache.spark.executor.CoarseGrainedExecutorBackend",
-        args,
-        sc.executorEnvs,
-        classPathEntries ++ testingClassPath,
-        libraryPathEntries,
-        javaOpts)
+      "org.apache.spark.executor.CoarseGrainedExecutorBackend",
+      args,
+      sc.executorEnvs,
+      classPathEntries ++ testingClassPath,
+      libraryPathEntries,
+      javaOpts)
     val appUIAddress = sc.ui.map(_.appUIAddress).getOrElse("")
     val coresPerExecutor = conf.getOption("spark.executor.cores").map(_.toInt)
     // If we're using dynamic allocation, set our initial executor limit to 0 for now.
@@ -114,15 +118,16 @@ private[spark] class SparkDeploySchedulerBackend(scheduler: TaskSchedulerImpl,
       } else {
         None
       }
-    val appDesc = new ApplicationDescription(sc.appName,
-                                             maxCores,
-                                             sc.executorMemory,
-                                             command,
-                                             appUIAddress,
-                                             sc.eventLogDir,
-                                             sc.eventLogCodec,
-                                             coresPerExecutor,
-                                             initialExecutorLimit)
+    val appDesc = new ApplicationDescription(
+      sc.appName,
+      maxCores,
+      sc.executorMemory,
+      command,
+      appUIAddress,
+      sc.eventLogDir,
+      sc.eventLogCodec,
+      coresPerExecutor,
+      initialExecutorLimit)
     client = new AppClient(sc.env.rpcEnv, masters, appDesc, this, conf)
     client.start()
     launcherBackend.setState(SparkAppHandle.State.SUBMITTED)
@@ -144,8 +149,7 @@ private[spark] class SparkDeploySchedulerBackend(scheduler: TaskSchedulerImpl,
   override def disconnected() {
     notifyContext()
     if (!stopping) {
-      logWarning(
-          "Disconnected from Spark cluster! Waiting for reconnection...")
+      logWarning("Disconnected from Spark cluster! Waiting for reconnection...")
     }
   }
 
@@ -163,21 +167,24 @@ private[spark] class SparkDeploySchedulerBackend(scheduler: TaskSchedulerImpl,
     }
   }
 
-  override def executorAdded(fullId: String,
-                             workerId: String,
-                             hostPort: String,
-                             cores: Int,
-                             memory: Int) {
+  override def executorAdded(
+      fullId: String,
+      workerId: String,
+      hostPort: String,
+      cores: Int,
+      memory: Int) {
     logInfo(
-        "Granted executor ID %s on hostPort %s with %d cores, %s RAM".format(
-            fullId, hostPort, cores, Utils.megabytesToString(memory)))
+      "Granted executor ID %s on hostPort %s with %d cores, %s RAM"
+        .format(fullId, hostPort, cores, Utils.megabytesToString(memory)))
   }
 
   override def executorRemoved(
-      fullId: String, message: String, exitStatus: Option[Int]) {
+      fullId: String,
+      message: String,
+      exitStatus: Option[Int]) {
     val reason: ExecutorLossReason = exitStatus match {
       case Some(code) => ExecutorExited(code, exitCausedByApp = true, message)
-      case None => SlaveLost(message)
+      case None       => SlaveLost(message)
     }
     logInfo("Executor %s removed: %s".format(fullId, message))
     removeExecutor(fullId.split("/")(1), reason)
@@ -205,7 +212,7 @@ private[spark] class SparkDeploySchedulerBackend(scheduler: TaskSchedulerImpl,
       case Some(c) => c.requestTotalExecutors(requestedTotal)
       case None =>
         logWarning(
-            "Attempted to request executors before driver fully initialized.")
+          "Attempted to request executors before driver fully initialized.")
         false
     }
   }
@@ -219,7 +226,7 @@ private[spark] class SparkDeploySchedulerBackend(scheduler: TaskSchedulerImpl,
       case Some(c) => c.killExecutors(executorIds)
       case None =>
         logWarning(
-            "Attempted to kill executors before driver fully initialized.")
+          "Attempted to kill executors before driver fully initialized.")
         false
     }
   }

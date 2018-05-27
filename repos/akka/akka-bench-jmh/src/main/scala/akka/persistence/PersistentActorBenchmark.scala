@@ -19,10 +19,11 @@ class PersistentActorThroughputBenchmark {
   val config = PersistenceSpec.config("leveldb", "benchmark")
 
   lazy val storageLocations =
-    List("akka.persistence.journal.leveldb.dir",
-         "akka.persistence.journal.leveldb-shared.store.dir",
-         "akka.persistence.snapshot-store.local.dir").map(
-        s ⇒ new File(system.settings.config.getString(s)))
+    List(
+      "akka.persistence.journal.leveldb.dir",
+      "akka.persistence.journal.leveldb-shared.store.dir",
+      "akka.persistence.snapshot-store.local.dir").map(s ⇒
+      new File(system.settings.config.getString(s)))
 
   var system: ActorSystem = _
 
@@ -46,15 +47,18 @@ class PersistentActorThroughputBenchmark {
     actor = system.actorOf(Props(classOf[BaselineActor], data10k.last), "a-1")
 
     noPersistPersistentActor = system.actorOf(
-        Props(classOf[NoPersistPersistentActor], data10k.last), "nop-1")
+      Props(classOf[NoPersistPersistentActor], data10k.last),
+      "nop-1")
     persistPersistentActor = system.actorOf(
-        Props(classOf[PersistPersistentActor], data10k.last), "ep-1")
+      Props(classOf[PersistPersistentActor], data10k.last),
+      "ep-1")
     persistAsync1PersistentActor = system.actorOf(
-        Props(classOf[PersistAsyncPersistentActor], data10k.last), "epa-1")
+      Props(classOf[PersistAsyncPersistentActor], data10k.last),
+      "epa-1")
 
     persistAsyncQuickReplyPersistentActor = system.actorOf(
-        Props(classOf[PersistAsyncQuickReplyPersistentActor], data10k.last),
-        "epa-2")
+      Props(classOf[PersistAsyncQuickReplyPersistentActor], data10k.last),
+      "epa-2")
   }
 
   @TearDown

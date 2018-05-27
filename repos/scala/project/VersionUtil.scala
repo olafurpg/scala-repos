@@ -6,7 +6,7 @@ import scala.collection.JavaConverters._
 
 object VersionUtil {
   lazy val baseVersion = settingKey[String](
-      "The base version number from which all others are derived")
+    "The base version number from which all others are derived")
   lazy val baseVersionSuffix =
     settingKey[String]("Identifies the kind of version to build")
   lazy val copyrightString = settingKey[String]("Copyright string.")
@@ -17,29 +17,30 @@ object VersionUtil {
     taskKey[File]("Generating buildcharacter.properties file.")
 
   lazy val globalVersionSettings = Seq[Setting[_]](
-      // Set the version properties globally (they are the same for all projects)
-      versionProperties in Global := versionPropertiesImpl.value,
-      version in Global := versionProperties.value.mavenVersion
+    // Set the version properties globally (they are the same for all projects)
+    versionProperties in Global := versionPropertiesImpl.value,
+    version in Global := versionProperties.value.mavenVersion
   )
 
   lazy val generatePropertiesFileSettings = Seq[Setting[_]](
-      copyrightString := "Copyright 2002-2016, LAMP/EPFL",
-      resourceGenerators in Compile +=
-        generateVersionPropertiesFile.map(file => Seq(file)).taskValue,
-      generateVersionPropertiesFile := generateVersionPropertiesFileImpl.value
+    copyrightString := "Copyright 2002-2016, LAMP/EPFL",
+    resourceGenerators in Compile +=
+      generateVersionPropertiesFile.map(file => Seq(file)).taskValue,
+    generateVersionPropertiesFile := generateVersionPropertiesFileImpl.value
   )
 
   lazy val generateBuildCharacterFileSettings = Seq[Setting[_]](
-      generateBuildCharacterPropertiesFile :=
-        generateBuildCharacterPropertiesFileImpl.value
+    generateBuildCharacterPropertiesFile :=
+      generateBuildCharacterPropertiesFileImpl.value
   )
 
-  case class Versions(canonicalVersion: String,
-                      mavenVersion: String,
-                      osgiVersion: String,
-                      commitSha: String,
-                      commitDate: String,
-                      isRelease: Boolean) {
+  case class Versions(
+      canonicalVersion: String,
+      mavenVersion: String,
+      osgiVersion: String,
+      commitSha: String,
+      commitDate: String,
+      isRelease: Boolean) {
     val githubTree =
       if (isRelease) "v" + mavenVersion
       else if (commitSha != "unknown") commitSha
@@ -49,9 +50,9 @@ object VersionUtil {
       s"Canonical: $canonicalVersion, Maven: $mavenVersion, OSGi: $osgiVersion, github: $githubTree"
 
     def toMap: Map[String, String] = Map(
-        "version.number" -> canonicalVersion,
-        "maven.version.number" -> mavenVersion,
-        "osgi.version.number" -> osgiVersion
+      "version.number" -> canonicalVersion,
+      "maven.version.number" -> mavenVersion,
+      "osgi.version.number" -> osgiVersion
     )
   }
 
@@ -91,40 +92,43 @@ object VersionUtil {
 
       val date = executeTool("get-scala-commit-date")
       val sha =
-        executeTool("get-scala-commit-sha").substring(0, 7) // The script produces 10 digits at the moment
+        executeTool("get-scala-commit-sha")
+          .substring(0, 7) // The script produces 10 digits at the moment
 
       val (canonicalV, mavenV, osgiV, release) = suffix match {
         case "SNAPSHOT" =>
           (s"$base-$date-$sha", s"$base-SNAPSHOT", s"$base.v$date-$sha", false)
         case "SHA-SNAPSHOT" =>
-          (s"$base-$date-$sha",
-           s"$base-$sha-SNAPSHOT",
-           s"$base.v$date-$sha",
-           false)
+          (
+            s"$base-$date-$sha",
+            s"$base-$sha-SNAPSHOT",
+            s"$base.v$date-$sha",
+            false)
         case "" => (s"$base", s"$base", s"$base.v$date-VFINAL-$sha", true)
         case suffix =>
-          (s"$base-$suffix",
-           s"$base-$suffix",
-           s"$base.v$date-$suffix-$sha",
-           true)
+          (
+            s"$base-$suffix",
+            s"$base-$suffix",
+            s"$base.v$date-$suffix-$sha",
+            true)
       }
 
       Versions(canonicalV, mavenV, osgiV, sha, date, release)
     }
 
-  private lazy val generateVersionPropertiesFileImpl: Def.Initialize[
-      Task[File]] = Def.task {
+  private lazy val generateVersionPropertiesFileImpl
+    : Def.Initialize[Task[File]] = Def.task {
     writeProps(
-        versionProperties.value.toMap +
+      versionProperties.value.toMap +
         ("copyright.string" -> copyrightString.value),
-        (resourceManaged in Compile).value / s"${thisProject.value.id}.properties")
+      (resourceManaged in Compile).value / s"${thisProject.value.id}.properties")
   }
 
-  private lazy val generateBuildCharacterPropertiesFileImpl: Def.Initialize[
-      Task[File]] = Def.task {
+  private lazy val generateBuildCharacterPropertiesFileImpl
+    : Def.Initialize[Task[File]] = Def.task {
     writeProps(
-        versionProperties.value.toMap,
-        (baseDirectory in ThisBuild).value / "buildcharacter.properties")
+      versionProperties.value.toMap,
+      (baseDirectory in ThisBuild).value / "buildcharacter.properties")
   }
 
   private def writeProps(m: Map[String, String], propFile: File): File = {
@@ -142,7 +146,8 @@ object VersionUtil {
   lazy val versionProps: Map[String, String] = {
     val props = new Properties()
     val in = new FileInputStream(file("versions.properties"))
-    try props.load(in) finally in.close()
+    try props.load(in)
+    finally in.close()
     props.asScala.toMap.map {
       case (k, v) =>
         (k, sys.props.getOrElse(k, v)) // allow system properties to override versions.properties

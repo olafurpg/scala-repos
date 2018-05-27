@@ -15,12 +15,31 @@ import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.plugins.scala.icons.Icons
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScPrimaryConstructor
 import org.jetbrains.plugins.scala.lang.psi.api.base.types._
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScFunctionExpr, ScUnderScoreSectionUtil}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScMember}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{ScImportableDeclarationsOwner, ScModifierListOwner, ScTypedDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression,
+  ScFunctionExpr,
+  ScUnderScoreSectionUtil
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass,
+  ScMember
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{
+  ScImportableDeclarationsOwner,
+  ScModifierListOwner,
+  ScTypedDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, TypingContext}
-import org.jetbrains.plugins.scala.lang.psi.types.{ScFunctionType, ScParameterizedType, ScType}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypeResult,
+  TypingContext
+}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  ScFunctionType,
+  ScParameterizedType,
+  ScType
+}
 import org.jetbrains.plugins.scala.macroAnnotations.{Cached, ModCount}
 
 import scala.annotation.tailrec
@@ -31,8 +50,11 @@ import scala.collection.immutable.HashSet
   * Date: 22.02.2008
   */
 trait ScParameter
-    extends ScTypedDefinition with ScModifierListOwner with PsiParameter
-    with ScAnnotationsHolder with ScImportableDeclarationsOwner {
+    extends ScTypedDefinition
+    with ScModifierListOwner
+    with PsiParameter
+    with ScAnnotationsHolder
+    with ScImportableDeclarationsOwner {
   def getTypeElement: PsiTypeElement
 
   def isWildcard: Boolean = "_" == name
@@ -70,9 +92,10 @@ trait ScParameter
       case f @ Success(tp: ScType, elem) =>
         val seq = ScalaPsiManager
           .instance(getProject)
-          .getCachedClass("scala.collection.Seq",
-                          getResolveScope,
-                          ScalaPsiManager.ClassCategory.TYPE)
+          .getCachedClass(
+            "scala.collection.Seq",
+            getResolveScope,
+            ScalaPsiManager.ClassCategory.TYPE)
         if (seq != null) {
           Success(ScParameterizedType(ScType.designator(seq), Seq(tp)), elem)
         } else f
@@ -82,16 +105,19 @@ trait ScParameter
 
   def getDeclarationScope =
     PsiTreeUtil.getParentOfType(
-        this, classOf[ScParameterOwner], classOf[ScFunctionExpr])
+      this,
+      classOf[ScParameterOwner],
+      classOf[ScFunctionExpr])
 
   def deprecatedName: Option[String]
 
   def owner: PsiElement = {
-    ScalaPsiUtil.getContextOfType(this,
-                                  true,
-                                  classOf[ScFunctionExpr],
-                                  classOf[ScFunction],
-                                  classOf[ScPrimaryConstructor])
+    ScalaPsiUtil.getContextOfType(
+      this,
+      true,
+      classOf[ScFunctionExpr],
+      classOf[ScFunction],
+      classOf[ScPrimaryConstructor])
   }
 
   def remove()
@@ -116,8 +142,8 @@ trait ScParameter
 
   abstract override def getUseScope = {
     val specificScope = getDeclarationScope match {
-      case null => GlobalSearchScope.EMPTY_SCOPE
-      case expr: ScFunctionExpr => new LocalSearchScope(expr)
+      case null                           => GlobalSearchScope.EMPTY_SCOPE
+      case expr: ScFunctionExpr           => new LocalSearchScope(expr)
       case clazz: ScClass if clazz.isCase => clazz.getUseScope
       case clazz: ScClass if this.isInstanceOf[ScClassParameter] =>
         clazz.getUseScope //for named parameters
@@ -127,15 +153,16 @@ trait ScParameter
   }
 
   def getType: PsiType =
-    ScType.toPsi(getRealParameterType(TypingContext.empty).getOrNothing,
-                 getProject,
-                 getResolveScope)
+    ScType.toPsi(
+      getRealParameterType(TypingContext.empty).getOrNothing,
+      getProject,
+      getResolveScope)
 
   def isAnonymousParameter: Boolean = getContext match {
     case clause: ScParameterClause =>
       clause.getContext.getContext match {
         case f: ScFunctionExpr => true
-        case _ => false
+        case _                 => false
       }
     case _ => false
   }
@@ -174,7 +201,8 @@ trait ScParameter
               }
             }
             applyForFunction(
-                tp, ScUnderScoreSectionUtil.underscores(f).nonEmpty)
+              tp,
+              ScUnderScoreSectionUtil.underscores(f).nonEmpty)
           }
           result
         case _ => None
@@ -188,7 +216,8 @@ trait ScParameter
 
   @tailrec
   private def calcIsDefaultParam(
-      param: ScParameter, visited: HashSet[ScParameter]): Boolean = {
+      param: ScParameter,
+      visited: HashSet[ScParameter]): Boolean = {
     if (param.baseDefaultParam) return true
     if (visited.contains(param)) return false
     getSuperParameter match {
@@ -221,19 +250,19 @@ trait ScParameter
                   owner: ScParameterOwner): Option[ScExpression] = {
                 owner.parameters.find(_.name == name) match {
                   case Some(param) => param.getDefaultExpression
-                  case _ => res
+                  case _           => res
                 }
               }
               containingMember match {
                 case c: ScClass =>
                   c.getSourceMirrorClass match {
                     case c: ScClass => extractFromParameterOwner(c)
-                    case _ => res
+                    case _          => res
                   }
                 case f: ScFunction =>
                   f.getNavigationElement match {
                     case f: ScFunction => extractFromParameterOwner(f)
-                    case _ => res
+                    case _             => res
                   }
                 case _ => res
               }

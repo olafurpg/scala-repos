@@ -47,7 +47,7 @@ object LogisticRegressionWithElasticNetExample {
 
     // Print the coefficients and intercept for logistic regression
     println(
-        s"Coefficients: ${lrModel.coefficients} Intercept: ${lrModel.intercept}")
+      s"Coefficients: ${lrModel.coefficients} Intercept: ${lrModel.intercept}")
     // $example off$
 
     sc.stop()

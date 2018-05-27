@@ -16,21 +16,24 @@ object PhongMaterial {
 /** The PhongMaterial class provides definitions of properties that represent a form of Phong shaded material. */
 class PhongMaterial(
     override val delegate: jfxsp.PhongMaterial = new jfxsp.PhongMaterial())
-    extends Material(delegate) with SFXDelegate[jfxsp.PhongMaterial] {
+    extends Material(delegate)
+    with SFXDelegate[jfxsp.PhongMaterial] {
 
   def this(diffuseColor: Color) = this(new jfxsp.PhongMaterial(diffuseColor))
 
-  def this(diffuseColor: Color,
-           diffuseMap: Image,
-           specularMap: Image,
-           bumpMap: Image,
-           selfIlluminationMap: Image) =
+  def this(
+      diffuseColor: Color,
+      diffuseMap: Image,
+      specularMap: Image,
+      bumpMap: Image,
+      selfIlluminationMap: Image) =
     this(
-        new jfxsp.PhongMaterial(diffuseColor,
-                                diffuseMap,
-                                specularMap,
-                                bumpMap,
-                                selfIlluminationMap))
+      new jfxsp.PhongMaterial(
+        diffuseColor,
+        diffuseMap,
+        specularMap,
+        bumpMap,
+        selfIlluminationMap))
 
   /** The bump map of this `PhongMaterial`. */
   def bumpMap: ObjectProperty[jfxsi.Image] = delegate.bumpMapProperty

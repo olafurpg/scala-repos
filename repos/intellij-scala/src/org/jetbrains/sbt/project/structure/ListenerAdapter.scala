@@ -1,7 +1,11 @@
 package org.jetbrains.sbt
 package project.structure
 
-import com.intellij.execution.process.{ProcessAdapter, ProcessEvent, ProcessOutputTypes}
+import com.intellij.execution.process.{
+  ProcessAdapter,
+  ProcessEvent,
+  ProcessOutputTypes
+}
 import com.intellij.openapi.util.Key
 
 /**
@@ -13,7 +17,7 @@ class ListenerAdapter(listener: (OutputType, String) => Unit)
     val textType = outputType match {
       case ProcessOutputTypes.STDOUT => Some(OutputType.StdOut)
       case ProcessOutputTypes.STDERR => Some(OutputType.StdErr)
-      case _ => None
+      case _                         => None
     }
     textType.foreach(t => listener(t, event.getText))
   }

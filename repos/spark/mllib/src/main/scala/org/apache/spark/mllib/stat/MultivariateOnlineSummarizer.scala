@@ -40,7 +40,8 @@ import org.apache.spark.mllib.linalg.{Vector, Vectors}
 @Since("1.1.0")
 @DeveloperApi
 class MultivariateOnlineSummarizer
-    extends MultivariateStatisticalSummary with Serializable {
+    extends MultivariateStatisticalSummary
+    with Serializable {
 
   private var n = 0
   private var currMean: Array[Double] = _
@@ -69,7 +70,8 @@ class MultivariateOnlineSummarizer
 
     if (n == 0) {
       require(
-          instance.size > 0, s"Vector should have dimension larger than zero.")
+        instance.size > 0,
+        s"Vector should have dimension larger than zero.")
       n = instance.size
 
       currMean = Array.ofDim[Double](n)
@@ -81,9 +83,10 @@ class MultivariateOnlineSummarizer
       currMin = Array.fill[Double](n)(Double.MaxValue)
     }
 
-    require(n == instance.size,
-            s"Dimensions mismatch when adding new sample." +
-            s" Expecting $n but got ${instance.size}.")
+    require(
+      n == instance.size,
+      s"Dimensions mismatch when adding new sample." +
+        s" Expecting $n but got ${instance.size}.")
 
     val localCurrMean = currMean
     val localCurrM2n = currM2n
@@ -104,7 +107,7 @@ class MultivariateOnlineSummarizer
         val prevMean = localCurrMean(index)
         val diff = value - prevMean
         localCurrMean(index) = prevMean + weight * diff /
-        (localNnz(index) + weight)
+          (localNnz(index) + weight)
         localCurrM2n(index) += weight * (value - localCurrMean(index)) * diff
         localCurrM2(index) += weight * value * value
         localCurrL1(index) += weight * math.abs(value)
@@ -129,9 +132,10 @@ class MultivariateOnlineSummarizer
   @Since("1.1.0")
   def merge(other: MultivariateOnlineSummarizer): this.type = {
     if (this.weightSum != 0.0 && other.weightSum != 0.0) {
-      require(n == other.n,
-              s"Dimensions mismatch when merging with another summarizer. " +
-              s"Expecting $n but got ${other.n}.")
+      require(
+        n == other.n,
+        s"Dimensions mismatch when merging with another summarizer. " +
+          s"Expecting $n but got ${other.n}.")
       totalCnt += other.totalCnt
       weightSum += other.weightSum
       weightSquareSum += other.weightSquareSum
@@ -146,7 +150,7 @@ class MultivariateOnlineSummarizer
           currMean(i) += deltaMean * otherNnz / totalNnz
           // merge m2n together
           currM2n(i) += other.currM2n(i) +
-          deltaMean * deltaMean * thisNnz * otherNnz / totalNnz
+            deltaMean * deltaMean * thisNnz * otherNnz / totalNnz
           // merge m2 together
           currM2(i) += other.currM2(i)
           // merge l1 together
@@ -210,7 +214,7 @@ class MultivariateOnlineSummarizer
       val len = currM2n.length
       while (i < len) {
         realVariance(i) =
-        (currM2n(i) + deltaMean(i) * deltaMean(i) * nnz(i) *
+          (currM2n(i) + deltaMean(i) * deltaMean(i) * nnz(i) *
             (weightSum - nnz(i)) / weightSum) / denominator
         i += 1
       }

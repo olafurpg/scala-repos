@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -31,7 +31,7 @@ object Run {
     val cwd = new java.io.File(".").getCanonicalFile
     val db = cwd.getName match {
       case "jprofiler" => "jprofiler.db"
-      case _ => "jprofiler/jprofiler.db"
+      case _           => "jprofiler/jprofiler.db"
     }
 
     val args2 = args.toList ++ List("--root-dir", db)
@@ -39,7 +39,7 @@ object Run {
       RunConfig.fromCommandLine(args2) | sys.error("invalid arguments!")
 
     val queries = List(
-        """
+      """
       foo := //foo where (//foo).a
       solve 'b
         foo' := foo where foo.b = 'b
@@ -52,7 +52,7 @@ object Run {
 //agents := //snap
 //--se8429501/8504352d-b063-400b-a10b-d6c637539469
 //
-//lowerBound :=  1353135306278 
+//lowerBound :=  1353135306278
 //upperBound :=  lowerBound + (1000*60*60*24*95)
 //--count(agents where agents.timestamp > lowerBound & agents.timestamp < upperBound)
 //

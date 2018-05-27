@@ -14,7 +14,7 @@ trait Semigroup[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A]
   def combinen(a: A, n: Int): A =
     if (n <= 0)
       throw new IllegalArgumentException(
-          "Repeated combination for semigroups must have repetitions > 0")
+        "Repeated combination for semigroups must have repetitions > 0")
     else if (n == 1) a
     else combinenAboveOne(a, n)
 
@@ -61,7 +61,8 @@ object Semigroup {
   * A semigroup is commutative if for all x and y, x |+| y === y |+| x.
   */
 trait CSemigroup[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A]
-    extends Any with Semigroup[A]
+    extends Any
+    with Semigroup[A]
 
 object CSemigroup {
   @inline final def apply[A](implicit ev: CSemigroup[A]): CSemigroup[A] = ev

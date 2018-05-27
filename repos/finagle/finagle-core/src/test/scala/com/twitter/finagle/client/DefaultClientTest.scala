@@ -5,7 +5,11 @@ import com.twitter.finagle._
 import com.twitter.finagle.Address.failing
 import com.twitter.finagle.dispatch.SerialClientDispatcher
 import com.twitter.finagle.service.exp.FailureAccrualPolicy
-import com.twitter.finagle.service.{ResponseClassifier, Backoff, FailureAccrualFactory}
+import com.twitter.finagle.service.{
+  ResponseClassifier,
+  Backoff,
+  FailureAccrualFactory
+}
 import com.twitter.finagle.stats.{StatsReceiver, InMemoryStatsReceiver}
 import com.twitter.finagle.transport.{QueueTransport, Transport}
 import com.twitter.finagle.util.DefaultLogger
@@ -19,7 +23,9 @@ import org.scalatest.junit.{JUnitRunner, AssertionsForJUnit}
 
 @RunWith(classOf[JUnitRunner])
 class DefaultClientTest
-    extends FunSuite with Eventually with IntegrationPatience
+    extends FunSuite
+    with Eventually
+    with IntegrationPatience
     with AssertionsForJUnit {
   trait StatsReceiverHelper {
     val statsReceiver = new InMemoryStatsReceiver()
@@ -29,8 +35,8 @@ class DefaultClientTest
     val qIn = new AsyncQueue[Int]()
     val qOut = new AsyncQueue[Int]()
 
-    val transporter: (SocketAddress,
-    StatsReceiver) => Future[Transport[Int, Int]] = {
+    val transporter
+      : (SocketAddress, StatsReceiver) => Future[Transport[Int, Int]] = {
       case (_, _) =>
         Future.value(new QueueTransport(qIn, qOut))
     }
@@ -63,11 +69,13 @@ class DefaultClientTest
   }
 
   trait SourcedExceptionHelper
-      extends QueueTransportHelper with SourcedExceptionDispatcherHelper
+      extends QueueTransportHelper
+      with SourcedExceptionDispatcherHelper
       with BaseClientHelper
 
   class DefaultClientHelper
-      extends QueueTransportHelper with SerialDispatcherHelper
+      extends QueueTransportHelper
+      with SerialDispatcherHelper
       with BaseClientHelper
 
   test("DefaultClient should successfully add sourcedexception") {
@@ -91,8 +99,10 @@ class DefaultClientTest
   }
 
   trait TimeoutHelper
-      extends TimingHelper with QueueTransportHelper
-      with SerialDispatcherHelper with ServiceHelper {
+      extends TimingHelper
+      with QueueTransportHelper
+      with SerialDispatcherHelper
+      with ServiceHelper {
     val pool = new DefaultPool[Int, Int](0, 1, timer = timer) // pool of size 1
   }
 
@@ -101,11 +111,11 @@ class DefaultClientTest
 
     new TimeoutHelper {
       val client = DefaultClient(
-          name,
-          endPointer,
-          pool = pool,
-          requestTimeout = rTimeout,
-          timer = timer
+        name,
+        endPointer,
+        pool = pool,
+        requestTimeout = rTimeout,
+        timer = timer
       )
 
       Time.withCurrentTimeFrozen { control =>
@@ -135,21 +145,24 @@ class DefaultClientTest
   }
 
   trait StatsHelper
-      extends TimingHelper with QueueTransportHelper
-      with SerialDispatcherHelper with StatsReceiverHelper with ServiceHelper {
+      extends TimingHelper
+      with QueueTransportHelper
+      with SerialDispatcherHelper
+      with StatsReceiverHelper
+      with ServiceHelper {
 
     val pool = new DefaultPool[Int, Int](0, 1, timer = timer) // pool of size 1
     val client = new DefaultClient[Int, Int](
-        name,
-        endPointer,
-        pool = pool,
-        timer = timer,
-        statsReceiver = statsReceiver
+      name,
+      endPointer,
+      pool = pool,
+      timer = timer,
+      statsReceiver = statsReceiver
     )
   }
 
   test(
-      "DefaultClient statsfilter should time stats on dispatch, not on queueing") {
+    "DefaultClient statsfilter should time stats on dispatch, not on queueing") {
     val dur = 1.second
 
     new StatsHelper {
@@ -168,7 +181,8 @@ class DefaultClientTest
         Await.result(f2)
       }
 
-      assert(statsReceiver.stats(Seq(name, "request_latency_ms")) ==
+      assert(
+        statsReceiver.stats(Seq(name, "request_latency_ms")) ==
           (Seq(dur, dur) map (_.inMillis)))
     }
   }
@@ -187,13 +201,14 @@ class DefaultClientTest
     new DefaultClientHelper {
       @volatile var closed = false
 
-      val dest = Name.Bound.singleton(
-          Var.async(Addr.Bound(Seq.empty[Address]: _*)) { _ =>
-        Closable.make { _ =>
-          closed = true
-          Future.Done
-        }
-      })
+      val dest =
+        Name.Bound.singleton(Var.async(Addr.Bound(Seq.empty[Address]: _*)) {
+          _ =>
+            Closable.make { _ =>
+              closed = true
+              Future.Done
+            }
+        })
       val svc = client.newService(dest, "test")
       assert(!closed, "client closed too early")
       val f = svc.close()
@@ -217,18 +232,20 @@ class DefaultClientTest
   }
 
   trait DefaultFailureAccrualHelper
-      extends TimingHelper with QueueTransportHelper
-      with FailureAccuralDispatchHelper with StatsReceiverHelper
+      extends TimingHelper
+      with QueueTransportHelper
+      with FailureAccuralDispatchHelper
+      with StatsReceiverHelper
       with ServiceHelper {
 
     val pool = new DefaultPool[Int, Int](0, 1, timer = timer) // pool of size 1
 
     val client = new DefaultClient[Int, Int](
-        name,
-        endPointer,
-        pool = pool,
-        timer = timer,
-        statsReceiver = statsReceiver
+      name,
+      endPointer,
+      pool = pool,
+      timer = timer,
+      statsReceiver = statsReceiver
     )
   }
 
@@ -243,21 +260,21 @@ class DefaultClientTest
     new DefaultFailureAccrualHelper {
       initialFailures = 10
       override val client = new DefaultClient[Int, Int](
-          name,
-          endPointer,
-          pool = pool,
-          timer = timer,
-          statsReceiver = statsReceiver,
-          failureAccrual = { factory: ServiceFactory[Int, Int] =>
-            FailureAccrualFactory.wrapper(
-                statsReceiver,
-                FailureAccrualPolicy.consecutiveFailures(
-                    6, Backoff.const(3.seconds)),
-                name,
-                DefaultLogger,
-                failing,
-                ResponseClassifier.Default)(timer) andThen factory
-          }
+        name,
+        endPointer,
+        pool = pool,
+        timer = timer,
+        statsReceiver = statsReceiver,
+        failureAccrual = { factory: ServiceFactory[Int, Int] =>
+          FailureAccrualFactory.wrapper(
+            statsReceiver,
+            FailureAccrualPolicy
+              .consecutiveFailures(6, Backoff.const(3.seconds)),
+            name,
+            DefaultLogger,
+            failing,
+            ResponseClassifier.Default)(timer) andThen factory
+        }
       )
 
       Time.withCurrentTimeFrozen { control =>
@@ -266,7 +283,8 @@ class DefaultClientTest
         control.advance(4.seconds)
         timer.tick()
         assert(
-            statsReceiver.counters.get(Seq("failure_accrual", "revivals")) == None)
+          statsReceiver.counters
+            .get(Seq("failure_accrual", "revivals")) == None)
       }
     }
   }

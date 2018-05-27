@@ -90,7 +90,9 @@ final class NullnessInterpreter(bTypes: BTypes)
   }
 
   override def newParameterValue(
-      isInstanceMethod: Boolean, local: Int, tp: Type): NullnessValue = {
+      isInstanceMethod: Boolean,
+      local: Int,
+      tp: Type): NullnessValue = {
     // For instance methods, the `this` parameter is known to be not null.
     if (isInstanceMethod && local == 0) NotNullValue
     else super.newParameterValue(isInstanceMethod, local, tp)
@@ -103,7 +105,7 @@ final class NullnessInterpreter(bTypes: BTypes)
       case Opcodes.LDC =>
         insn.asInstanceOf[LdcInsnNode].cst match {
           case _: String | _: Type => NotNullValue
-          case _ => NullnessValue.unknown(insn)
+          case _                   => NullnessValue.unknown(insn)
         }
 
       // for Opcodes.NEW, we use Unknown. The value will become NotNull after the constructor call.
@@ -111,10 +113,12 @@ final class NullnessInterpreter(bTypes: BTypes)
     }
 
   def copyOperation(
-      insn: AbstractInsnNode, value: NullnessValue): NullnessValue = value
+      insn: AbstractInsnNode,
+      value: NullnessValue): NullnessValue = value
 
   def unaryOperation(
-      insn: AbstractInsnNode, value: NullnessValue): NullnessValue =
+      insn: AbstractInsnNode,
+      value: NullnessValue): NullnessValue =
     (insn.getOpcode: @switch) match {
       case Opcodes.CHECKCAST => value
 
@@ -123,16 +127,18 @@ final class NullnessInterpreter(bTypes: BTypes)
       case _ => NullnessValue.unknown(insn)
     }
 
-  def binaryOperation(insn: AbstractInsnNode,
-                      value1: NullnessValue,
-                      value2: NullnessValue): NullnessValue = {
+  def binaryOperation(
+      insn: AbstractInsnNode,
+      value1: NullnessValue,
+      value2: NullnessValue): NullnessValue = {
     NullnessValue.unknown(insn)
   }
 
-  def ternaryOperation(insn: AbstractInsnNode,
-                       value1: NullnessValue,
-                       value2: NullnessValue,
-                       value3: NullnessValue): NullnessValue = UnknownValue1
+  def ternaryOperation(
+      insn: AbstractInsnNode,
+      value1: NullnessValue,
+      value2: NullnessValue,
+      value3: NullnessValue): NullnessValue = UnknownValue1
 
   def naryOperation(
       insn: AbstractInsnNode,
@@ -146,9 +152,10 @@ final class NullnessInterpreter(bTypes: BTypes)
       else NullnessValue.unknown(insn)
   }
 
-  def returnOperation(insn: AbstractInsnNode,
-                      value: NullnessValue,
-                      expected: NullnessValue): Unit = ()
+  def returnOperation(
+      insn: AbstractInsnNode,
+      value: NullnessValue,
+      expected: NullnessValue): Unit = ()
 
   def merge(a: NullnessValue, b: NullnessValue): NullnessValue = a merge b
 }
@@ -161,8 +168,9 @@ class NullnessFrame(nLocals: Int, nStack: Int)
     init(src)
   }
 
-  override def execute(insn: AbstractInsnNode,
-                       interpreter: Interpreter[NullnessValue]): Unit = {
+  override def execute(
+      insn: AbstractInsnNode,
+      interpreter: Interpreter[NullnessValue]): Unit = {
     import Opcodes._
 
     // get the alias set the object that is known to be not-null after this operation.
@@ -173,8 +181,8 @@ class NullnessFrame(nLocals: Int, nStack: Int)
           SALOAD =>
         aliasesOf(this.stackTop - 1)
 
-      case IASTORE | FASTORE | AASTORE | BASTORE | CASTORE | SASTORE |
-          LASTORE | DASTORE =>
+      case IASTORE | FASTORE | AASTORE | BASTORE | CASTORE | SASTORE | LASTORE |
+          DASTORE =>
         aliasesOf(this.stackTop - 2)
 
       case GETFIELD =>

@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -36,7 +36,11 @@ import blueeyes.core.http.HttpStatusCodes.{Response => _, _}
 import blueeyes.core.service._
 import blueeyes.json._
 import blueeyes.json.serialization._
-import blueeyes.json.serialization.DefaultSerialization.{DateTimeDecomposer => _, DateTimeExtractor => _, _}
+import blueeyes.json.serialization.DefaultSerialization.{
+  DateTimeDecomposer => _,
+  DateTimeExtractor => _,
+  _
+}
 
 import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
@@ -65,21 +69,18 @@ object WebAPIKeyFinder {
       success(new StaticAPIKeyFinder[Response](apiKey))
     } getOrElse {
       (config
-            .get[String]("rootKey")
-            .toSuccess("Configuration property \"rootKey\" is required")
-            .toValidationNel |@| serviceConfig
-            .get[String]("protocol")
-            .toSuccess(
-                NEL("Configuration property \"service.protocol\" is required")) |@| serviceConfig
-            .get[String]("host")
-            .toSuccess(
-                NEL("Configuration property \"service.host\" is required")) |@| serviceConfig
-            .get[Int]("port")
-            .toSuccess(
-                NEL("Configuration property \"service.port\" is required")) |@| serviceConfig
-            .get[String]("path")
-            .toSuccess(
-                NEL("Configuration property \"service.path\" is required"))) {
+        .get[String]("rootKey")
+        .toSuccess("Configuration property \"rootKey\" is required")
+        .toValidationNel |@| serviceConfig
+        .get[String]("protocol")
+        .toSuccess(
+          NEL("Configuration property \"service.protocol\" is required")) |@| serviceConfig
+        .get[String]("host")
+        .toSuccess(NEL("Configuration property \"service.host\" is required")) |@| serviceConfig
+        .get[Int]("port")
+        .toSuccess(NEL("Configuration property \"service.port\" is required")) |@| serviceConfig
+        .get[String]("path")
+        .toSuccess(NEL("Configuration property \"service.path\" is required"))) {
         (rootKey, protocol, host, port, path) =>
           new RealWebAPIKeyFinder(protocol, host, port, path, rootKey)
       }
@@ -87,13 +88,14 @@ object WebAPIKeyFinder {
   }
 }
 
-class RealWebAPIKeyFinder(protocol: String,
-                          host: String,
-                          port: Int,
-                          path: String,
-                          val rootAPIKey: APIKey)(
-    implicit val executor: ExecutionContext)
-    extends WebClient(protocol, host, port, path) with WebAPIKeyFinder {
+class RealWebAPIKeyFinder(
+    protocol: String,
+    host: String,
+    port: Int,
+    path: String,
+    val rootAPIKey: APIKey)(implicit val executor: ExecutionContext)
+    extends WebClient(protocol, host, port, path)
+    with WebAPIKeyFinder {
   implicit val M = new FutureMonad(executor)
 }
 
@@ -116,19 +118,20 @@ trait WebAPIKeyFinder extends BaseClient with APIKeyFinder[Response] {
       eitherT(client.get[JValue]("apikeys/" + apiKey) map {
         case HttpResponse(HttpStatus(OK, _), _, Some(jvalue), _) =>
           (((_: Extractor.Error).message) <-: jvalue
-                .validated[v1.APIKeyDetails] :-> { details =>
-                Some(details)
-              }).disjunction
+            .validated[v1.APIKeyDetails] :-> { details =>
+            Some(details)
+          }).disjunction
 
         case res @ HttpResponse(HttpStatus(NotFound, _), _, _, _) =>
           logger.warn("apiKey " + apiKey + " not found:\n" + res)
           right(None)
 
         case res =>
-          logger.error("Unexpected response from auth service for apiKey " +
+          logger.error(
+            "Unexpected response from auth service for apiKey " +
               apiKey + ":\n" + res)
           left(
-              "Unexpected response from security service; unable to proceed." +
+            "Unexpected response from security service; unable to proceed." +
               res)
       })
     }
@@ -139,12 +142,13 @@ trait WebAPIKeyFinder extends BaseClient with APIKeyFinder[Response] {
       eitherT(client.query("apiKey", fromRoot).get[JValue]("apikeys/") map {
         case HttpResponse(HttpStatus(OK, _), _, Some(jvalue), _) =>
           (((_: Extractor.Error).message) <-: jvalue
-                .validated[Set[v1.APIKeyDetails]]).disjunction
+            .validated[Set[v1.APIKeyDetails]]).disjunction
         case res =>
-          logger.error("Unexpected response from auth service for apiKey " +
+          logger.error(
+            "Unexpected response from auth service for apiKey " +
               fromRoot + ":\n" + res)
           left(
-              "Unexpected response from security service; unable to proceed." +
+            "Unexpected response from security service; unable to proceed." +
               res)
       })
     }
@@ -160,25 +164,27 @@ trait WebAPIKeyFinder extends BaseClient with APIKeyFinder[Response] {
       val client =
         at map (fmt.print(_)) map (client0.query("at", _)) getOrElse client0
       eitherT(
-          client
-            .query("apiKey", apiKey)
-            .get[JValue]("permissions/fs" + path.urlEncode.path) map {
-        case HttpResponse(HttpStatus(OK, _), _, Some(jvalue), _) =>
-          (((_: Extractor.Error).message) <-: jvalue
-                .validated[Set[Permission]]).disjunction
-        case res =>
-          logger.error("Unexpected response from auth service for apiKey " +
-              apiKey + ":\n" + res)
-          left(
+        client
+          .query("apiKey", apiKey)
+          .get[JValue]("permissions/fs" + path.urlEncode.path) map {
+          case HttpResponse(HttpStatus(OK, _), _, Some(jvalue), _) =>
+            (((_: Extractor.Error).message) <-: jvalue
+              .validated[Set[Permission]]).disjunction
+          case res =>
+            logger.error(
+              "Unexpected response from auth service for apiKey " +
+                apiKey + ":\n" + res)
+            left(
               "Unexpected response from security service; unable to proceed." +
-              res)
-      })
+                res)
+        })
     }
   }
 
-  def hasCapability(apiKey: APIKey,
-                    perms: Set[Permission],
-                    at: Option[DateTime]): Response[Boolean] = {
+  def hasCapability(
+      apiKey: APIKey,
+      perms: Set[Permission],
+      at: Option[DateTime]): Response[Boolean] = {
     // We group permissions by path, then find the permissions for each path individually.
     // This means a call to this will do 1 HTTP request per path, which isn't efficient.
 
@@ -204,19 +210,20 @@ trait WebAPIKeyFinder extends BaseClient with APIKeyFinder[Response] {
 
     withJsonClient { client =>
       eitherT(
-          client
-            .query("apiKey", rootAPIKey)
-            .post[JValue]("apikeys/")(keyRequest.serialize) map {
-        case HttpResponse(HttpStatus(OK, _), _, Some(wrappedKey), _) =>
-          (((_: Extractor.Error).message) <-: wrappedKey
-                .validated[v1.APIKeyDetails]).disjunction
+        client
+          .query("apiKey", rootAPIKey)
+          .post[JValue]("apikeys/")(keyRequest.serialize) map {
+          case HttpResponse(HttpStatus(OK, _), _, Some(wrappedKey), _) =>
+            (((_: Extractor.Error).message) <-: wrappedKey
+              .validated[v1.APIKeyDetails]).disjunction
 
-        case res =>
-          logger.error(
+          case res =>
+            logger.error(
               "Unexpected response from api provisioning service: " + res)
-          left("Unexpected response from api key provisioning service; unable to proceed." +
-              res)
-      })
+            left(
+              "Unexpected response from api key provisioning service; unable to proceed." +
+                res)
+        })
     }
   }
 
@@ -225,11 +232,11 @@ trait WebAPIKeyFinder extends BaseClient with APIKeyFinder[Response] {
 
     withJsonClient { client =>
       eitherT(
-          client.post[JValue]("apikeys/" + accountKey + "/grants/")(
-              requestBody) map {
-        case HttpResponse(HttpStatus(Created, _), _, None, _) => right(true)
-        case _ => right(false)
-      })
+        client
+          .post[JValue]("apikeys/" + accountKey + "/grants/")(requestBody) map {
+          case HttpResponse(HttpStatus(Created, _), _, None, _) => right(true)
+          case _                                                => right(false)
+        })
     }
   }
 }

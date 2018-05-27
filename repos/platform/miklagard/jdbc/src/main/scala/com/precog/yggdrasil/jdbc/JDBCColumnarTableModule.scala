@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -70,15 +70,17 @@ trait JDBCColumnarTableModuleConfig {}
 
 object JDBCColumnarTableModule {
   def escapePath(path: String) =
-    path.toList.map {
-      case '[' => "PCLBRACKET"
-      case ']' => "PCRBRACKET"
-      case '-' => "PCFIELDDASH"
-      case '.' => "PCDOTSEP"
-      case ' ' => "PCSPACE"
-      case c if c.isUpper => "PCUPPER" + c
-      case c => c.toString
-    }.mkString("")
+    path.toList
+      .map {
+        case '['            => "PCLBRACKET"
+        case ']'            => "PCRBRACKET"
+        case '-'            => "PCFIELDDASH"
+        case '.'            => "PCDOTSEP"
+        case ' '            => "PCSPACE"
+        case c if c.isUpper => "PCUPPER" + c
+        case c              => c.toString
+      }
+      .mkString("")
 
   def unescapePath(name: String): String = {
     val initial = name
@@ -91,10 +93,12 @@ object JDBCColumnarTableModule {
     val parts = initial.split("PCUPPER")
 
     if (parts.length > 1) {
-      parts.head.toLowerCase + parts.tail.map { ucSeg =>
-        val (ucChar, rest) = ucSeg.splitAt(1)
-        ucChar.toUpperCase + rest.toLowerCase
-      }.mkString("")
+      parts.head.toLowerCase + parts.tail
+        .map { ucSeg =>
+          val (ucChar, rest) = ucSeg.splitAt(1)
+          ucChar.toUpperCase + rest.toLowerCase
+        }
+        .mkString("")
     } else {
       parts.head.toLowerCase
     }
@@ -119,7 +123,9 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
   }
 
   case class SingleDBColumn(
-      cref: ColumnRef, column: Column, extractor: (ResultSet, Int) => Unit)
+      cref: ColumnRef,
+      column: Column,
+      extractor: (ResultSet, Int) => Unit)
       extends DBColumns {
     def extract(rs: ResultSet, rowId: Int) = extractor(rs, rowId)
     def columns = Seq(cref -> column)
@@ -141,7 +147,7 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
     val columnName = meta.getColumnLabel(index)
     val selector =
       paths.Value \ CPath(
-          if (unescapeColumnNames) unescapePath(columnName) else columnName)
+        if (unescapeColumnNames) unescapePath(columnName) else columnName)
 
     import Types._
 
@@ -246,8 +252,8 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
                             val hsRef = ColumnRef(selector \ key, CString)
                             val column = buildColumns
                               .getOrElse(
-                                  hsRef,
-                                  ArrayStrColumn.empty(yggConfig.maxSliceSize))
+                                hsRef,
+                                ArrayStrColumn.empty(yggConfig.maxSliceSize))
                               .asInstanceOf[ArrayStrColumn]
                               .unsafeTap { c =>
                                 c.update(rowId, value)
@@ -256,24 +262,25 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
 
                           case invalid =>
                             logger.error(
-                                "Invalid pair in hstore value: " + invalid)
+                              "Invalid pair in hstore value: " + invalid)
                         }
 
                     case "json" =>
                       JParser.parseFromString(pgo.getValue) match {
                         case Success(jv) =>
                           buildColumns = Slice.withIdsAndValues(
-                              jv,
-                              buildColumns,
-                              rowId,
-                              yggConfig.maxSliceSize,
-                              Some(selector \ CPath(_)))
+                            jv,
+                            buildColumns,
+                            rowId,
+                            yggConfig.maxSliceSize,
+                            Some(selector \ CPath(_)))
 
                         case Failure(error) =>
                           logger.error(
-                              "Failure parsing JSON column value (%s): %s"
-                                .format(truncateString(pgo.getValue),
-                                        error.getMessage))
+                            "Failure parsing JSON column value (%s): %s"
+                              .format(
+                                truncateString(pgo.getValue),
+                                error.getMessage))
                       }
 
                     case other =>
@@ -282,8 +289,8 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
 
                 case other =>
                   logger.warn(
-                      "Encountered unknown data from PostgreSQL: %s (%s)"
-                        .format(other, other.getClass))
+                    "Encountered unknown data from PostgreSQL: %s (%s)"
+                      .format(other, other.getClass))
               }
           }
         } else {
@@ -292,7 +299,8 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
 
       case other =>
         logger.warn(
-            "Unsupported JDBC column type %d for %s".format(other, selector)); EmptyDBColumn
+          "Unsupported JDBC column type %d for %s".format(other, selector));
+        EmptyDBColumn
     }
   }
 
@@ -305,35 +313,43 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
   }
 
   trait JDBCColumnarTableCompanion
-      extends BlockStoreColumnarTableCompanion with Logging {
+      extends BlockStoreColumnarTableCompanion
+      with Logging {
 
     /** Maps a given database name to a JDBC connection URL */
     def databaseMap: Map[String, String]
 
     private def jTypeToProperties(
-        tpe: JType, current: Set[String]): Set[String] = tpe match {
+        tpe: JType,
+        current: Set[String]): Set[String] = tpe match {
       case JArrayFixedT(elements) if current.nonEmpty =>
-        elements.map {
-          case (index, childType) =>
-            val newPaths = current.map { s =>
-              s + "[" + index + "]"
-            }
-            jTypeToProperties(childType, newPaths)
-        }.toSet.flatten
+        elements
+          .map {
+            case (index, childType) =>
+              val newPaths = current.map { s =>
+                s + "[" + index + "]"
+              }
+              jTypeToProperties(childType, newPaths)
+          }
+          .toSet
+          .flatten
 
       case JObjectFixedT(fields) =>
-        fields.map {
-          case (name, childType) =>
-            val newPaths =
-              if (current.nonEmpty) {
-                current.map { s =>
-                  s + "." + name
+        fields
+          .map {
+            case (name, childType) =>
+              val newPaths =
+                if (current.nonEmpty) {
+                  current.map { s =>
+                    s + "." + name
+                  }
+                } else {
+                  Set(name)
                 }
-              } else {
-                Set(name)
-              }
-            jTypeToProperties(childType, newPaths)
-        }.toSet.flatten
+              jTypeToProperties(childType, newPaths)
+          }
+          .toSet
+          .flatten
 
       case _ => current
     }
@@ -348,10 +364,11 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
 
     sealed trait LoadState
     case class InitialLoad(paths: List[Path]) extends LoadState
-    case class InLoad(connGen: () => Connection,
-                      query: Query,
-                      skip: Int,
-                      remainingPaths: List[Path])
+    case class InLoad(
+        connGen: () => Connection,
+        query: Query,
+        skip: Int,
+        remainingPaths: List[Path])
         extends LoadState
 
     def load(table: Table, apiKey: APIKey, tpe: JType): Future[Table] = {
@@ -360,82 +377,86 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
       } yield {
         import trans._
         val idSpec = InnerObjectConcat(
-            Leaf(Source),
-            WrapObject(WrapArray(Scan(Leaf(Source), freshIdScanner)),
-                       TransSpecModule.paths.Key.name))
+          Leaf(Source),
+          WrapObject(
+            WrapArray(Scan(Leaf(Source), freshIdScanner)),
+            TransSpecModule.paths.Key.name))
 
         Table(
-            StreamT.unfoldM[Future, Slice, LoadState](
-                InitialLoad(paths.toList)) {
-              case InLoad(connGen, query, skip, remaining) =>
-                M.point {
-                  val (slice, nextSkip) = makeSlice(connGen, query, skip)
-                  Some((slice,
-                        nextSkip
-                          .map(InLoad(connGen, query, _, remaining))
-                          .getOrElse(InitialLoad(remaining))))
-                }
+          StreamT.unfoldM[Future, Slice, LoadState](InitialLoad(paths.toList)) {
+            case InLoad(connGen, query, skip, remaining) =>
+              M.point {
+                val (slice, nextSkip) = makeSlice(connGen, query, skip)
+                Some(
+                  (
+                    slice,
+                    nextSkip
+                      .map(InLoad(connGen, query, _, remaining))
+                      .getOrElse(InitialLoad(remaining))))
+              }
 
-              case InitialLoad(path :: xs) =>
-                path.elements.toList match {
-                  case dbName :: tableName :: Nil =>
-                    M.point {
-                      try {
-                        databaseMap.get(dbName).map {
-                          url =>
-                            // Extra split/take at the end is because we can only map to column level. While hstore and json column types
-                            // will end up with deepeer paths, they cannot be queried against in PostgreSQL
-                            val columns = jTypeToProperties(tpe, Set()).map {
-                              c =>
-                                c.split('.').head
-                            }
-                            val query = Query("SELECT %s FROM %s".format(
-                                                  if (columns.isEmpty) "*"
-                                                  else columns.mkString(","),
-                                                  tableName),
-                                              yggConfig.maxSliceSize)
+            case InitialLoad(path :: xs) =>
+              path.elements.toList match {
+                case dbName :: tableName :: Nil =>
+                  M.point {
+                    try {
+                      databaseMap.get(dbName).map {
+                        url =>
+                          // Extra split/take at the end is because we can only map to column level. While hstore and json column types
+                          // will end up with deepeer paths, they cannot be queried against in PostgreSQL
+                          val columns = jTypeToProperties(tpe, Set()).map { c =>
+                            c.split('.').head
+                          }
+                          val query = Query(
+                            "SELECT %s FROM %s".format(
+                              if (columns.isEmpty) "*"
+                              else columns.mkString(","),
+                              tableName),
+                            yggConfig.maxSliceSize)
 
-                            logger.debug("Running query: " + query)
+                          logger.debug("Running query: " + query)
 
-                            val connGen =
-                              () => DriverManager.getConnection(url)
+                          val connGen =
+                            () => DriverManager.getConnection(url)
 
-                            val (slice, nextSkip) =
-                              makeSlice(connGen, query, 0)
-                            Some(slice,
-                                 nextSkip
-                                   .map(InLoad(connGen, query, _, xs))
-                                   .getOrElse(InitialLoad(xs)))
-                        } getOrElse {
-                          throw new Exception(
-                              "Database %s is not configured" format dbName)
-                        }
-                      } catch {
-                        case t =>
-                          logger.error(
-                              "Failure during JDBC query: " + t.getMessage)
-                          // FIXME: We should be able to throw here and terminate the query, but something in BlueEyes is hanging when we do so
-                          //throw new Exception("Failure during JDBC query: " + t.getMessage)
-                          None
+                          val (slice, nextSkip) =
+                            makeSlice(connGen, query, 0)
+                          Some(
+                            slice,
+                            nextSkip
+                              .map(InLoad(connGen, query, _, xs))
+                              .getOrElse(InitialLoad(xs)))
+                      } getOrElse {
+                        throw new Exception(
+                          "Database %s is not configured" format dbName)
                       }
+                    } catch {
+                      case t =>
+                        logger.error(
+                          "Failure during JDBC query: " + t.getMessage)
+                        // FIXME: We should be able to throw here and terminate the query, but something in BlueEyes is hanging when we do so
+                        //throw new Exception("Failure during JDBC query: " + t.getMessage)
+                        None
                     }
+                  }
 
-                  case err =>
-                    sys.error("JDBC path " + path.path +
-                        " does not have the form /dbName/tableName; rollups not yet supported.")
-                }
+                case err =>
+                  sys.error("JDBC path " + path.path +
+                    " does not have the form /dbName/tableName; rollups not yet supported.")
+              }
 
-              case InitialLoad(Nil) =>
-                M.point(None)
-            },
-            UnknownSize
+            case InitialLoad(Nil) =>
+              M.point(None)
+          },
+          UnknownSize
         ).transform(idSpec) //.printer("JDBC Table")
       }
     }
 
-    def makeSlice(connGen: () => Connection,
-                  query: Query,
-                  skip: Int): (Slice, Option[Int]) = {
+    def makeSlice(
+        connGen: () => Connection,
+        query: Query,
+        skip: Int): (Slice, Option[Int]) = {
       import TransSpecModule.paths._
 
       try {

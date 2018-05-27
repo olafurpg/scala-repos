@@ -31,7 +31,7 @@ object Mod extends LilaController {
     modApi.troll(me.id, username, getBool("set")) inject {
       get("then") match {
         case Some("reports") => Redirect(routes.Report.list)
-        case _ => redirect(username)
+        case _               => redirect(username)
       }
     }
   }
@@ -60,10 +60,11 @@ object Mod extends LilaController {
     implicit def req = ctx.body
     if (isGranted(_.SetTitle))
       lila.user.DataForm.title.bindFromRequest.fold(
-          err => fuccess(redirect(username, mod = true)),
-          title =>
-            modApi.setTitle(me.id, username, title) inject redirect(
-                username, mod = false)
+        err => fuccess(redirect(username, mod = true)),
+        title =>
+          modApi.setTitle(me.id, username, title) inject redirect(
+            username,
+            mod = false)
       )
     else fuccess(authorizationFailed(ctx.req))
   }
@@ -76,10 +77,11 @@ object Mod extends LilaController {
           .modEmail(user)
           .bindFromRequest
           .fold(
-              err => BadRequest(err.toString).fuccess,
-              email =>
-                modApi.setEmail(me.id, user.id, email) inject redirect(
-                    user.username, mod = true)
+            err => BadRequest(err.toString).fuccess,
+            email =>
+              modApi.setEmail(me.id, user.id, email) inject redirect(
+                user.username,
+                mod = true)
           )
       else fuccess(authorizationFailed(ctx.req))
     }
@@ -88,7 +90,7 @@ object Mod extends LilaController {
   def notifySlack(username: String) = Auth { implicit ctx => me =>
     OptionFuResult(UserRepo named username) { user =>
       Env.slack.api.userMod(user = user, mod = me) inject redirect(
-          user.username)
+        user.username)
     }
   }
 
@@ -120,31 +122,32 @@ object Mod extends LilaController {
   }
 
   private val ipIntelCache = lila.memo.AsyncCache[String, Int](
-      ip =>
-        {
-          import play.api.libs.ws.WS
-          import play.api.Play.current
-          val email = "lichess.contact@gmail.com"
-          val url =
-            s"http://check.getipintel.net/check.php?ip=$ip&contact=$email"
-          WS.url(url)
-            .get()
-            .map(_.body)
-            .mon(_.security.proxy.request.time)
-            .flatMap { str =>
-              parseFloatOption(str).fold[Fu[Int]](
-                  fufail(s"Invalid ratio $str")) { ratio =>
-                fuccess((ratio * 100).toInt)
-              }
-            }
-            .addEffects(fail = _ => lila.mon.security.proxy.request.failure(),
-                        succ = percent =>
-                            {
-                            lila.mon.security.proxy.percent(percent max 0)
-                            lila.mon.security.proxy.request.success()
-                        })
-      },
-      maxCapacity = 1024)
+    ip => {
+      import play.api.libs.ws.WS
+      import play.api.Play.current
+      val email = "lichess.contact@gmail.com"
+      val url =
+        s"http://check.getipintel.net/check.php?ip=$ip&contact=$email"
+      WS.url(url)
+        .get()
+        .map(_.body)
+        .mon(_.security.proxy.request.time)
+        .flatMap { str =>
+          parseFloatOption(str).fold[Fu[Int]](fufail(s"Invalid ratio $str")) {
+            ratio =>
+              fuccess((ratio * 100).toInt)
+          }
+        }
+        .addEffects(
+          fail = _ => lila.mon.security.proxy.request.failure(),
+          succ = percent => {
+            lila.mon.security.proxy.percent(percent max 0)
+            lila.mon.security.proxy.request.success()
+          }
+        )
+    },
+    maxCapacity = 1024
+  )
 
   def ipIntel(ip: String) = Secure(_.IpBan) { ctx => me =>
     ipIntelCache(ip).map { Ok(_) }
@@ -159,7 +162,8 @@ object Mod extends LilaController {
   }
 
   def gamify = Secure(_.SeeReport) { implicit ctx => me =>
-    Env.mod.gamify.leaderboards zip Env.mod.gamify.history(orCompute = true) map {
+    Env.mod.gamify.leaderboards zip Env.mod.gamify
+      .history(orCompute = true) map {
       case (leaderboards, history) =>
         Ok(html.mod.gamify.index(leaderboards, history))
     }

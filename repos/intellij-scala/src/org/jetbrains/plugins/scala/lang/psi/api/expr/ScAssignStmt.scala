@@ -7,7 +7,10 @@ package expr
 import com.intellij.psi.{PsiElement, PsiField}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScVariable
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScClassParameter
-import org.jetbrains.plugins.scala.lang.resolve.{ResolvableReferenceExpression, ScalaResolveResult}
+import org.jetbrains.plugins.scala.lang.resolve.{
+  ResolvableReferenceExpression,
+  ScalaResolveResult
+}
 
 /**
   * @author Alexander Podkhalyuzin
@@ -19,7 +22,7 @@ trait ScAssignStmt extends ScExpression {
   def getRExpression: Option[ScExpression] =
     findLastChild(classOf[ScExpression]) match {
       case Some(expr: ScExpression) if expr != getLExpression => Some(expr)
-      case _ => None
+      case _                                                  => None
     }
 
   def assignName: Option[String] = {
@@ -39,7 +42,7 @@ trait ScAssignStmt extends ScExpression {
       case expr: ScReferenceExpression =>
         expr.bind() match {
           case Some(r) => r.isNamedParameter
-          case _ => false
+          case _       => false
         }
       case _ => false
     }
@@ -63,7 +66,7 @@ trait ScAssignStmt extends ScExpression {
       case methodCall: ScMethodCall =>
         methodCall.applyOrUpdateElement match {
           case Some(r) => r.getActualElement
-          case None => null
+          case None    => null
         }
       case left =>
         resolveAssignment match {
@@ -72,10 +75,10 @@ trait ScAssignStmt extends ScExpression {
             left match {
               case ref: ScReferenceExpression =>
                 ref.resolve() match {
-                  case v: ScVariable => v
+                  case v: ScVariable                  => v
                   case p: ScClassParameter if p.isVar => p
-                  case f: PsiField => f
-                  case _ => null
+                  case f: PsiField                    => f
+                  case _                              => null
                 }
               case _ => null
             }
@@ -94,13 +97,13 @@ trait ScAssignStmt extends ScExpression {
                 r.bind() match {
                   case Some(resolveResult)
                       if resolveResult.isDynamic &&
-                      resolveResult.name == ResolvableReferenceExpression.APPLY_DYNAMIC_NAMED =>
+                        resolveResult.name == ResolvableReferenceExpression.APPLY_DYNAMIC_NAMED =>
                     return true
                   case _ =>
                     m.applyOrUpdateElement match {
                       case Some(innerResult)
                           if innerResult.isDynamic &&
-                          innerResult.name == ResolvableReferenceExpression.APPLY_DYNAMIC_NAMED =>
+                            innerResult.name == ResolvableReferenceExpression.APPLY_DYNAMIC_NAMED =>
                         return true
                       case _ =>
                     }

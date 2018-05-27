@@ -5,7 +5,7 @@ package api
 package base
 package types
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 13.03.2008
   */
@@ -25,7 +25,7 @@ object ScParameterizedTypeElement {
     : Option[(ScTypeElement, Seq[ScTypeElement])] = {
     pte match {
       case null => None
-      case _ => Some(pte.typeElement, pte.typeArgList.typeArgs)
+      case _    => Some(pte.typeElement, pte.typeArgList.typeArgs)
     }
   }
 }

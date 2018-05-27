@@ -23,20 +23,25 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.ScFunctionStub
   * @author ilyas
   */
 abstract class ScFunctionImpl protected (
-    stub: StubElement[ScFunction], nodeType: IElementType, node: ASTNode)
-    extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScMember
-    with ScFunction with ScTypeParametersOwner {
+    stub: StubElement[ScFunction],
+    nodeType: IElementType,
+    node: ASTNode)
+    extends ScalaStubBasedElementImpl(stub, nodeType, node)
+    with ScMember
+    with ScFunction
+    with ScTypeParametersOwner {
   override def isStable = false
 
   def nameId: PsiElement = {
     val n = getNode.findChildByType(ScalaTokenTypes.tIDENTIFIER) match {
-      case null => getNode.findChildByType(ScalaTokenTypes.kTHIS)
+      case null    => getNode.findChildByType(ScalaTokenTypes.kTHIS)
       case notNull => notNull
     }
     if (n == null) {
       return ScalaPsiElementFactory
         .createIdentifier(
-            getStub.asInstanceOf[ScFunctionStub].getName, getManager)
+          getStub.asInstanceOf[ScFunctionStub].getName,
+          getManager)
         .getPsi
     }
     n.getPsi
@@ -46,13 +51,17 @@ abstract class ScFunctionImpl protected (
     getStubOrPsiChild(ScalaElementTypes.PARAM_CLAUSES)
   }
 
-  override def processDeclarations(processor: PsiScopeProcessor,
-                                   state: ResolveState,
-                                   lastParent: PsiElement,
-                                   place: PsiElement): Boolean = {
+  override def processDeclarations(
+      processor: PsiScopeProcessor,
+      state: ResolveState,
+      lastParent: PsiElement,
+      place: PsiElement): Boolean = {
     // process function's process type parameters
-    if (!super [ScTypeParametersOwner].processDeclarations(
-            processor, state, lastParent, place)) return false
+    if (!super[ScTypeParametersOwner].processDeclarations(
+          processor,
+          state,
+          lastParent,
+          place)) return false
 
     lazy val parameterIncludingSynthetic: Seq[ScParameter] =
       effectiveParameterClauses.flatMap(_.effectiveParameters)
@@ -60,7 +69,7 @@ abstract class ScFunctionImpl protected (
       returnTypeElement match {
         case Some(x)
             if lastParent != null &&
-            x.startOffsetInParent == lastParent.startOffsetInParent =>
+              x.startOffsetInParent == lastParent.startOffsetInParent =>
           for (p <- parameterIncludingSynthetic) {
             ProgressManager.checkCanceled()
             if (!processor.execute(p, state)) return false

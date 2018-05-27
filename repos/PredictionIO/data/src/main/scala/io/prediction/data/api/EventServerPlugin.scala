@@ -24,7 +24,9 @@ trait EventServerPlugin {
   def process(eventInfo: EventInfo, context: EventServerPluginContext)
 
   def handleREST(
-      appId: Int, channelId: Option[Int], arguments: Seq[String]): String
+      appId: Int,
+      channelId: Option[Int],
+      arguments: Seq[String]): String
 }
 
 object EventServerPlugin {

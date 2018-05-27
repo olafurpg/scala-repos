@@ -87,11 +87,12 @@ object Array extends FallbackArrayBuilding {
   def newBuilder[T](implicit t: ClassTag[T]): ArrayBuilder[T] =
     ArrayBuilder.make[T]()(t)
 
-  private def slowcopy(src: AnyRef,
-                       srcPos: Int,
-                       dest: AnyRef,
-                       destPos: Int,
-                       length: Int) {
+  private def slowcopy(
+      src: AnyRef,
+      srcPos: Int,
+      dest: AnyRef,
+      destPos: Int,
+      length: Int) {
     var i = srcPos
     var j = destPos
     val srcUntil = srcPos + length
@@ -125,7 +126,7 @@ object Array extends FallbackArrayBuilding {
   }
 
   /** Returns an array of length 0 */
-  def empty[T : ClassTag]: Array[T] = new Array[T](0)
+  def empty[T: ClassTag]: Array[T] = new Array[T](0)
 
   /** Creates an array with given elements.
     *
@@ -134,7 +135,7 @@ object Array extends FallbackArrayBuilding {
     */
   // Subject to a compiler optimization in Cleanup.
   // Array(e0, ..., en) is translated to { val a = new Array(3); a(i) = ei; a }
-  def apply[T : ClassTag](xs: T*): Array[T] = {
+  def apply[T: ClassTag](xs: T*): Array[T] = {
     val array = new Array[T](xs.length)
     var i = 0
     for (x <- xs.iterator) { array(i) = x; i += 1 }
@@ -231,11 +232,11 @@ object Array extends FallbackArrayBuilding {
   }
 
   /** Creates array with given dimensions */
-  def ofDim[T : ClassTag](n1: Int): Array[T] =
+  def ofDim[T: ClassTag](n1: Int): Array[T] =
     new Array[T](n1)
 
   /** Creates a 2-dimensional array */
-  def ofDim[T : ClassTag](n1: Int, n2: Int): Array[Array[T]] = {
+  def ofDim[T: ClassTag](n1: Int, n2: Int): Array[Array[T]] = {
     val arr: Array[Array[T]] = (new Array[Array[T]](n1): Array[Array[T]])
     for (i <- 0 until n1) arr(i) = new Array[T](n2)
     arr
@@ -243,20 +244,24 @@ object Array extends FallbackArrayBuilding {
   }
 
   /** Creates a 3-dimensional array */
-  def ofDim[T : ClassTag](n1: Int, n2: Int, n3: Int): Array[Array[Array[T]]] =
+  def ofDim[T: ClassTag](n1: Int, n2: Int, n3: Int): Array[Array[Array[T]]] =
     tabulate(n1)(_ => ofDim[T](n2, n3))
 
   /** Creates a 4-dimensional array */
-  def ofDim[T : ClassTag](
-      n1: Int, n2: Int, n3: Int, n4: Int): Array[Array[Array[Array[T]]]] =
+  def ofDim[T: ClassTag](
+      n1: Int,
+      n2: Int,
+      n3: Int,
+      n4: Int): Array[Array[Array[Array[T]]]] =
     tabulate(n1)(_ => ofDim[T](n2, n3, n4))
 
   /** Creates a 5-dimensional array */
-  def ofDim[T : ClassTag](n1: Int,
-                          n2: Int,
-                          n3: Int,
-                          n4: Int,
-                          n5: Int): Array[Array[Array[Array[Array[T]]]]] =
+  def ofDim[T: ClassTag](
+      n1: Int,
+      n2: Int,
+      n3: Int,
+      n4: Int,
+      n5: Int): Array[Array[Array[Array[Array[T]]]]] =
     tabulate(n1)(_ => ofDim[T](n2, n3, n4, n5))
 
   /** Concatenates all arrays into a single array.
@@ -264,7 +269,7 @@ object Array extends FallbackArrayBuilding {
     *  @param xss the given arrays
     *  @return   the array created from concatenating `xss`
     */
-  def concat[T : ClassTag](xss: Array[T]*): Array[T] = {
+  def concat[T: ClassTag](xss: Array[T]*): Array[T] = {
     val b = newBuilder[T]
     b.sizeHint(xss.map(_.length).sum)
     for (xs <- xss) b ++= xs
@@ -285,7 +290,7 @@ object Array extends FallbackArrayBuilding {
     *  @return an Array of size n, where each element contains the result of computing
     *  `elem`.
     */
-  def fill[T : ClassTag](n: Int)(elem: => T): Array[T] = {
+  def fill[T: ClassTag](n: Int)(elem: => T): Array[T] = {
     val b = newBuilder[T]
     b.sizeHint(n)
     var i = 0
@@ -303,7 +308,7 @@ object Array extends FallbackArrayBuilding {
     *  @param   n2  the number of elements in the 2nd dimension
     *  @param   elem the element computation
     */
-  def fill[T : ClassTag](n1: Int, n2: Int)(elem: => T): Array[Array[T]] =
+  def fill[T: ClassTag](n1: Int, n2: Int)(elem: => T): Array[Array[T]] =
     tabulate(n1)(_ => fill(n2)(elem))
 
   /** Returns a three-dimensional array that contains the results of some element
@@ -314,7 +319,7 @@ object Array extends FallbackArrayBuilding {
     *  @param   n3  the number of elements in the 3nd dimension
     *  @param   elem the element computation
     */
-  def fill[T : ClassTag](n1: Int, n2: Int, n3: Int)(
+  def fill[T: ClassTag](n1: Int, n2: Int, n3: Int)(
       elem: => T): Array[Array[Array[T]]] =
     tabulate(n1)(_ => fill(n2, n3)(elem))
 
@@ -327,7 +332,7 @@ object Array extends FallbackArrayBuilding {
     *  @param   n4  the number of elements in the 4th dimension
     *  @param   elem the element computation
     */
-  def fill[T : ClassTag](n1: Int, n2: Int, n3: Int, n4: Int)(
+  def fill[T: ClassTag](n1: Int, n2: Int, n3: Int, n4: Int)(
       elem: => T): Array[Array[Array[Array[T]]]] =
     tabulate(n1)(_ => fill(n2, n3, n4)(elem))
 
@@ -341,7 +346,7 @@ object Array extends FallbackArrayBuilding {
     *  @param   n5  the number of elements in the 5th dimension
     *  @param   elem the element computation
     */
-  def fill[T : ClassTag](n1: Int, n2: Int, n3: Int, n4: Int, n5: Int)(
+  def fill[T: ClassTag](n1: Int, n2: Int, n3: Int, n4: Int, n5: Int)(
       elem: => T): Array[Array[Array[Array[Array[T]]]]] =
     tabulate(n1)(_ => fill(n2, n3, n4, n5)(elem))
 
@@ -352,7 +357,7 @@ object Array extends FallbackArrayBuilding {
     *  @param  f   The function computing element values
     *  @return A traversable consisting of elements `f(0),f(1), ..., f(n - 1)`
     */
-  def tabulate[T : ClassTag](n: Int)(f: Int => T): Array[T] = {
+  def tabulate[T: ClassTag](n: Int)(f: Int => T): Array[T] = {
     val b = newBuilder[T]
     b.sizeHint(n)
     var i = 0
@@ -370,7 +375,7 @@ object Array extends FallbackArrayBuilding {
     *  @param   n2  the number of elements in the 2nd dimension
     *  @param   f   The function computing element values
     */
-  def tabulate[T : ClassTag](n1: Int, n2: Int)(
+  def tabulate[T: ClassTag](n1: Int, n2: Int)(
       f: (Int, Int) => T): Array[Array[T]] =
     tabulate(n1)(i1 => tabulate(n2)(f(i1, _)))
 
@@ -382,7 +387,7 @@ object Array extends FallbackArrayBuilding {
     *  @param   n3  the number of elements in the 3rd dimension
     *  @param   f   The function computing element values
     */
-  def tabulate[T : ClassTag](n1: Int, n2: Int, n3: Int)(
+  def tabulate[T: ClassTag](n1: Int, n2: Int, n3: Int)(
       f: (Int, Int, Int) => T): Array[Array[Array[T]]] =
     tabulate(n1)(i1 => tabulate(n2, n3)(f(i1, _, _)))
 
@@ -395,7 +400,7 @@ object Array extends FallbackArrayBuilding {
     *  @param   n4  the number of elements in the 4th dimension
     *  @param   f   The function computing element values
     */
-  def tabulate[T : ClassTag](n1: Int, n2: Int, n3: Int, n4: Int)(
+  def tabulate[T: ClassTag](n1: Int, n2: Int, n3: Int, n4: Int)(
       f: (Int, Int, Int, Int) => T): Array[Array[Array[Array[T]]]] =
     tabulate(n1)(i1 => tabulate(n2, n3, n4)(f(i1, _, _, _)))
 
@@ -409,9 +414,8 @@ object Array extends FallbackArrayBuilding {
     *  @param   n5  the number of elements in the 5th dimension
     *  @param   f   The function computing element values
     */
-  def tabulate[T : ClassTag](n1: Int, n2: Int, n3: Int, n4: Int, n5: Int)(
-      f: (Int,
-      Int, Int, Int, Int) => T): Array[Array[Array[Array[Array[T]]]]] =
+  def tabulate[T: ClassTag](n1: Int, n2: Int, n3: Int, n4: Int, n5: Int)(
+      f: (Int, Int, Int, Int, Int) => T): Array[Array[Array[Array[Array[T]]]]] =
     tabulate(n1)(i1 => tabulate(n2, n3, n4, n5)(f(i1, _, _, _, _)))
 
   /** Returns an array containing a sequence of increasing integers in a range.
@@ -450,7 +454,7 @@ object Array extends FallbackArrayBuilding {
     *  @param f     the function that is repeatedly applied
     *  @return      the array returning `len` values in the sequence `start, f(start), f(f(start)), ...`
     */
-  def iterate[T : ClassTag](start: T, len: Int)(f: T => T): Array[T] = {
+  def iterate[T: ClassTag](start: T, len: Int)(f: T => T): Array[T] = {
     val b = newBuilder[T]
 
     if (len > 0) {
@@ -535,7 +539,8 @@ object Array extends FallbackArrayBuilding {
   *    representation type `Repr` and the new element type `B`.
   */
 final class Array[T](_length: Int)
-    extends java.io.Serializable with java.lang.Cloneable {
+    extends java.io.Serializable
+    with java.lang.Cloneable {
 
   /** The length of the array */
   def length: Int = throw new Error()

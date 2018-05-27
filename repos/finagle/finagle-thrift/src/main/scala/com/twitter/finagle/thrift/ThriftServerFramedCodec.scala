@@ -10,7 +10,13 @@ import com.twitter.util.Future
 import org.apache.thrift.protocol.{TMessage, TMessageType, TProtocolFactory}
 import org.apache.thrift.{TApplicationException, TException}
 import org.jboss.netty.buffer.ChannelBuffers
-import org.jboss.netty.channel.{ChannelHandlerContext, ChannelPipelineFactory, Channels, MessageEvent, SimpleChannelDownstreamHandler}
+import org.jboss.netty.channel.{
+  ChannelHandlerContext,
+  ChannelPipelineFactory,
+  Channels,
+  MessageEvent,
+  SimpleChannelDownstreamHandler
+}
 
 private[finagle] object ThriftServerFramedPipelineFactory
     extends ChannelPipelineFactory {
@@ -47,13 +53,12 @@ class ThriftServerFramedCodecFactory(protocolFactory: TProtocolFactory)
 class ThriftServerFramedCodec(
     config: ServerCodecConfig,
     protocolFactory: TProtocolFactory = Protocols.binaryFactory()
-)
-    extends Codec[Array[Byte], Array[Byte]] {
+) extends Codec[Array[Byte], Array[Byte]] {
   def pipelineFactory: ChannelPipelineFactory =
     ThriftServerFramedPipelineFactory
 
-  private[this] val preparer = ThriftServerPreparer(
-      protocolFactory, config.serviceName)
+  private[this] val preparer =
+    ThriftServerPreparer(protocolFactory, config.serviceName)
 
   override def prepareConnFactory(
       factory: ServiceFactory[Array[Byte], Array[Byte]],
@@ -67,16 +72,19 @@ class ThriftServerFramedCodec(
 }
 
 private[finagle] case class ThriftServerPreparer(
-    protocolFactory: TProtocolFactory, serviceName: String) {
+    protocolFactory: TProtocolFactory,
+    serviceName: String) {
   private[this] val uncaughtExceptionsFilter = new UncaughtAppExceptionFilter(
-      protocolFactory)
+    protocolFactory)
 
   def prepare(
       factory: ServiceFactory[Array[Byte], Array[Byte]],
       params: Stack.Params
   ): ServiceFactory[Array[Byte], Array[Byte]] = factory.map { service =>
     val payloadSize = new PayloadSizeFilter[Array[Byte], Array[Byte]](
-        params[param.Stats].statsReceiver, _.length, _.length)
+      params[param.Stats].statsReceiver,
+      _.length,
+      _.length)
 
     val ttwitter = new TTwitterServerFilter(serviceName, protocolFactory)
 
@@ -122,13 +130,13 @@ private[finagle] object UncaughtAppExceptionFilter {
 
     val buffer = new OutputBuffer(protocolFactory)
     buffer().writeMessageBegin(
-        new TMessage(name, TMessageType.EXCEPTION, msg.seqid))
+      new TMessage(name, TMessageType.EXCEPTION, msg.seqid))
 
     // Note: The wire contents of the exception message differ from Apache's Thrift in that here,
     // e.toString is appended to the error message.
     val x = new TApplicationException(
-        TApplicationException.INTERNAL_ERROR,
-        s"Internal error processing $name: '$throwable'")
+      TApplicationException.INTERNAL_ERROR,
+      s"Internal error processing $name: '$throwable'")
 
     x.write(buffer())
     buffer().writeMessageEnd()

@@ -23,12 +23,12 @@ trait MethodSynthesis { self: Analyzer =>
   class ClassMethodSynthesis(val clazz: Symbol, localTyper: Typer) {
     def mkThis = This(clazz) setPos clazz.pos.focus
     def mkThisSelect(sym: Symbol) = atPos(clazz.pos.focus)(
-        if (clazz.isClass) Select(This(clazz), sym) else Ident(sym)
+      if (clazz.isClass) Select(This(clazz), sym) else Ident(sym)
     )
 
     private def isOverride(name: TermName) =
       clazzMember(name).alternatives exists
-      (sym => !sym.isDeferred && (sym.owner != clazz))
+        (sym => !sym.isDeferred && (sym.owner != clazz))
 
     def newMethodFlags(name: TermName) = {
       val overrideFlag = if (isOverride(name)) OVERRIDE else 0L
@@ -42,23 +42,29 @@ trait MethodSynthesis { self: Analyzer =>
 
     private def finishMethod(method: Symbol, f: Symbol => Tree): Tree =
       localTyper typed
-      (if (method.isLazy) ValDef(method, f(method))
-       else DefDef(method, f(method)))
+        (if (method.isLazy) ValDef(method, f(method))
+         else DefDef(method, f(method)))
 
     private def createInternal(
-        name: Name, f: Symbol => Tree, info: Type): Tree = {
+        name: Name,
+        f: Symbol => Tree,
+        info: Type): Tree = {
       val name1 = name.toTermName
       val m = clazz.newMethod(name1, clazz.pos.focus, newMethodFlags(name1))
       finishMethod(m setInfoAndEnter info, f)
     }
     private def createInternal(
-        name: Name, f: Symbol => Tree, infoFn: Symbol => Type): Tree = {
+        name: Name,
+        f: Symbol => Tree,
+        infoFn: Symbol => Type): Tree = {
       val name1 = name.toTermName
       val m = clazz.newMethod(name1, clazz.pos.focus, newMethodFlags(name1))
       finishMethod(m setInfoAndEnter infoFn(m), f)
     }
     private def cloneInternal(
-        original: Symbol, f: Symbol => Tree, name: Name): Tree = {
+        original: Symbol,
+        f: Symbol => Tree,
+        name: Name): Tree = {
       val m =
         original.cloneSymbol(clazz, newMethodFlags(original), name) setPos clazz.pos.focus
       finishMethod(clazz.info.decls enter m, f)
@@ -74,10 +80,10 @@ trait MethodSynthesis { self: Analyzer =>
     def createMethod(name: Name, paramTypes: List[Type], returnType: Type)(
         f: Symbol => Tree): Tree =
       createInternal(
-          name,
-          f,
-          (m: Symbol) =>
-            MethodType(m newSyntheticValueParams paramTypes, returnType))
+        name,
+        f,
+        (m: Symbol) =>
+          MethodType(m newSyntheticValueParams paramTypes, returnType))
 
     def createMethod(name: Name, returnType: Type)(f: Symbol => Tree): Tree =
       createInternal(name, f, NullaryMethodType(returnType))
@@ -88,16 +94,16 @@ trait MethodSynthesis { self: Analyzer =>
     def forwardMethod(original: Symbol, newMethod: Symbol)(
         transformArgs: List[Tree] => List[Tree]): Tree =
       createMethod(original)(m =>
-            gen.mkMethodCall(
-                newMethod, transformArgs(m.paramss.head map Ident)))
+        gen.mkMethodCall(newMethod, transformArgs(m.paramss.head map Ident)))
 
     def createSwitchMethod(name: Name, range: Seq[Int], returnType: Type)(
         f: Int => Tree) = {
       createMethod(name, List(IntTpe), returnType) { m =>
         val arg0 = Ident(m.firstParam)
         val default =
-          DEFAULT ==> Throw(IndexOutOfBoundsExceptionClass.tpe_*,
-                            fn(arg0, nme.toString_))
+          DEFAULT ==> Throw(
+            IndexOutOfBoundsExceptionClass.tpe_*,
+            fn(arg0, nme.toString_))
         val cases =
           range.map(num => CASE(LIT(num)) ==> f(num)).toList :+ default
 
@@ -171,17 +177,21 @@ trait MethodSynthesis { self: Analyzer =>
       val targetClass = defaultAnnotationTarget(tree)
       val retained =
         annotations filter annotationFilter(
-            targetClass, defaultRetention = true)
+          targetClass,
+          defaultRetention = true)
 
       annotations filterNot (retained contains _) foreach
-      (ann => issueAnnotationWarning(tree, ann, targetClass))
+        (ann => issueAnnotationWarning(tree, ann, targetClass))
     }
     private def issueAnnotationWarning(
-        tree: Tree, ann: AnnotationInfo, defaultTarget: Symbol) {
+        tree: Tree,
+        ann: AnnotationInfo,
+        defaultTarget: Symbol) {
       global.reporter.warning(
-          ann.pos,
-          s"no valid targets for annotation on ${tree.symbol} - it is discarded unused. " +
-          s"You may specify targets with meta-annotations, e.g. @($ann @${defaultTarget.name})")
+        ann.pos,
+        s"no valid targets for annotation on ${tree.symbol} - it is discarded unused. " +
+          s"You may specify targets with meta-annotations, e.g. @($ann @${defaultTarget.name})"
+      )
     }
 
     def addDerivedTrees(typer: Typer, stat: Tree): List[Tree] = stat match {
@@ -191,8 +201,8 @@ trait MethodSynthesis { self: Analyzer =>
         val annotations = stat.symbol.initialize.annotations
         val trees =
           ((field(vd) ::: standardAccessors(vd) ::: beanAccessors(vd)) map
-              (acc => atPos(vd.pos.focus)(acc derive annotations)) filterNot
-              (_ eq EmptyTree))
+            (acc => atPos(vd.pos.focus)(acc derive annotations)) filterNot
+            (_ eq EmptyTree))
         // Verify each annotation landed safely somewhere, else warn.
         // Filtering when isParamAccessor is a necessary simplification
         // because there's a bunch of unwritten annotation code involving
@@ -201,9 +211,9 @@ trait MethodSynthesis { self: Analyzer =>
         // well as fields of the class, etc.
         if (!mods.isParamAccessor)
           annotations foreach
-          (ann =>
-                if (!trees.exists(_.symbol hasAnnotation ann.symbol))
-                  issueAnnotationWarning(vd, ann, GetterTargetClass))
+            (ann =>
+              if (!trees.exists(_.symbol hasAnnotation ann.symbol))
+                issueAnnotationWarning(vd, ann, GetterTargetClass))
 
         trees
       case vd: ValDef =>
@@ -218,18 +228,20 @@ trait MethodSynthesis { self: Analyzer =>
           case Some(mdef) =>
             context.unit.synthetics -= meth
             meth setAnnotations
-            (annotations filter annotationFilter(MethodTargetClass,
-                                                 defaultRetention = false))
+              (annotations filter annotationFilter(
+                MethodTargetClass,
+                defaultRetention = false))
             cd.symbol setAnnotations
-            (annotations filter annotationFilter(ClassTargetClass,
-                                                 defaultRetention = true))
+              (annotations filter annotationFilter(
+                ClassTargetClass,
+                defaultRetention = true))
             List(cd, mdef)
           case _ =>
             // Shouldn't happen, but let's give ourselves a reasonable error when it does
             context.error(
-                cd.pos,
-                s"Internal error: Symbol for synthetic factory method not found among ${context.unit.synthetics.keys
-                  .mkString(", ")}")
+              cd.pos,
+              s"Internal error: Symbol for synthetic factory method not found among ${context.unit.synthetics.keys
+                .mkString(", ")}")
             // Soldier on for the sake of the presentation compiler
             List(cd)
         }
@@ -328,9 +340,10 @@ trait MethodSynthesis { self: Analyzer =>
       }
       private def logDerived(result: Tree): Tree = {
         debuglog(
-            "[+derived] " + ojoin(mods.flagString,
-                                  basisSym.accurateKindString,
-                                  basisSym.getterName.decode) + " (" +
+          "[+derived] " + ojoin(
+            mods.flagString,
+            basisSym.accurateKindString,
+            basisSym.getterName.decode) + " (" +
             derivedSym + ")\n        " + result)
 
         result
@@ -352,7 +365,8 @@ trait MethodSynthesis { self: Analyzer =>
           // By default annotations go to the field, except if the field is generated for a class parameter (PARAMACCESSOR).
           case _: Field =>
             annotationFilter(
-                FieldTargetClass, defaultRetention = !mods.isParamAccessor)
+              FieldTargetClass,
+              defaultRetention = !mods.isParamAccessor)
           case _: BaseGetter =>
             annotationFilter(GetterTargetClass, defaultRetention = false)
           case _: Setter =>
@@ -378,13 +392,13 @@ trait MethodSynthesis { self: Analyzer =>
       override def isSetter = true
       private def setterParam = derivedSym.paramss match {
         case (p :: Nil) :: _ => p
-        case _ => NoSymbol
+        case _               => NoSymbol
       }
 
       private def setterRhs = {
         assert(
-            !derivedSym.isOverloaded,
-            s"Unexpected overloaded setter $derivedSym for $basisSym in $enclClass")
+          !derivedSym.isOverloaded,
+          s"Unexpected overloaded setter $derivedSym for $basisSym in $enclClass")
         if (Field.noFieldFor(tree) || derivedSym.isOverloaded) EmptyTree
         else Assign(fieldSelection, Ident(setterParam))
       }
@@ -408,8 +422,8 @@ trait MethodSynthesis { self: Analyzer =>
           enclClass.info decl name filter (x => x.isMethod && x.isSynthetic)
         if (result == NoSymbol || result.isOverloaded)
           context.error(
-              tree.pos,
-              s"Internal error: Unable to find the synthetic factory method corresponding to implicit class $name in $enclClass / ${enclClass.info.decls}")
+            tree.pos,
+            s"Internal error: Unable to find the synthetic factory method corresponding to implicit class $name in $enclClass / ${enclClass.info.decls}")
         result
       }
       def derivedTree: DefDef = factoryMeth(derivedMods, name, tree)
@@ -452,7 +466,7 @@ trait MethodSynthesis { self: Analyzer =>
           // circumstances (at least: concrete vals with existential types.)
           case _: ExistentialType =>
             TypeTree() setOriginal
-            (tree.tpt.duplicate setPos tree.tpt.pos.focus)
+              (tree.tpt.duplicate setPos tree.tpt.pos.focus)
           case _ if isDeferred =>
             TypeTree() setOriginal tree.tpt // keep type tree of original abstract field
           case _ => TypeTree(getterTp)
@@ -472,13 +486,14 @@ trait MethodSynthesis { self: Analyzer =>
       */
     case class LazyValGetter(tree: ValDef) extends BaseGetter(tree) {
       class ChangeOwnerAndModuleClassTraverser(
-          oldowner: Symbol, newowner: Symbol)
+          oldowner: Symbol,
+          newowner: Symbol)
           extends ChangeOwnerTraverser(oldowner, newowner) {
 
         override def traverse(tree: Tree) {
           tree match {
             case _: DefTree => change(tree.symbol.moduleClass)
-            case _ =>
+            case _          =>
           }
           super.traverse(tree)
         }
@@ -497,8 +512,8 @@ trait MethodSynthesis { self: Analyzer =>
 
         derivedSym setPos tree.pos // cannot set it at createAndEnterSymbol because basisSym can possibly still have NoPosition
         val ddefRes = DefDef(
-            derivedSym,
-            new ChangeOwnerAndModuleClassTraverser(basisSym, derivedSym)(body))
+          derivedSym,
+          new ChangeOwnerAndModuleClassTraverser(basisSym, derivedSym)(body))
         // ValDef will have its position focused whereas DefDef will have original correct rangepos
         // ideally positions would be correct at the creation time but lazy vals are really a special case
         // here so for the sake of keeping api clean we fix positions manually in LazyValGetter
@@ -541,9 +556,10 @@ trait MethodSynthesis { self: Analyzer =>
       // handle lazy val first for now (we emit a Field even though we probably shouldn't...)
       override def derivedTree =
         if (mods.isLazy)
-          copyValDef(tree)(mods = mods | flagsExtra,
-                           name = this.name,
-                           rhs = EmptyTree).setPos(tree.pos.focus)
+          copyValDef(tree)(
+            mods = mods | flagsExtra,
+            name = this.name,
+            rhs = EmptyTree).setPos(tree.pos.focus)
         else if (Field.noFieldFor(tree)) EmptyTree
         else copyValDef(tree)(mods = mods | flagsExtra, name = this.name)
     }
@@ -557,8 +573,7 @@ trait MethodSynthesis { self: Analyzer =>
       Param(tree).derive(tree.symbol.annotations)
     }
 
-    sealed abstract class BeanAccessor(bean: String)
-        extends DerivedFromValDef {
+    sealed abstract class BeanAccessor(bean: String) extends DerivedFromValDef {
       val name = newTermName(bean + tree.name.toString.capitalize)
       def flagsMask = BeanPropertyFlags
       def flagsExtra = 0
@@ -578,23 +593,27 @@ trait MethodSynthesis { self: Analyzer =>
       // Derives a tree without attempting to use the original tree's symbol.
       override def derivedTree = {
         atPos(tree.pos.focus) {
-          DefDef(derivedMods mapAnnotations (_ => Nil),
-                 name,
-                 Nil,
-                 ListOfNil,
-                 tree.tpt.duplicate,
-                 if (isDeferred) EmptyTree else Select(This(owner), tree.name))
+          DefDef(
+            derivedMods mapAnnotations (_ => Nil),
+            name,
+            Nil,
+            ListOfNil,
+            tree.tpt.duplicate,
+            if (isDeferred) EmptyTree else Select(This(owner), tree.name))
         }
       }
       override def createAndEnterSymbol(): MethodSymbol =
         enterSyntheticSym(derivedTree).asInstanceOf[MethodSymbol]
     }
     case class BooleanBeanGetter(tree: ValDef)
-        extends BeanAccessor("is") with AnyBeanGetter {}
+        extends BeanAccessor("is")
+        with AnyBeanGetter {}
     case class BeanGetter(tree: ValDef)
-        extends BeanAccessor("get") with AnyBeanGetter {}
+        extends BeanAccessor("get")
+        with AnyBeanGetter {}
     case class BeanSetter(tree: ValDef)
-        extends BeanAccessor("set") with DerivedSetter
+        extends BeanAccessor("set")
+        with DerivedSetter
 
     // No Symbols available.
     private def beanAccessorsFromNames(tree: ValDef) = {

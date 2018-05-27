@@ -21,8 +21,10 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 class ScValueStubImpl[ParentPsi <: PsiElement](
     parent: StubElement[ParentPsi],
     elemType: IStubElementType[
-        _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
-    extends StubBaseWrapper[ScValue](parent, elemType) with ScValueStub {
+      _ <: StubElement[_ <: PsiElement],
+      _ <: PsiElement])
+    extends StubBaseWrapper[ScValue](parent, elemType)
+    with ScValueStub {
   private var names: Array[StringRef] = _
   private var declaration: Boolean = false
   private var typeText: StringRef = _
@@ -35,20 +37,22 @@ class ScValueStubImpl[ParentPsi <: PsiElement](
   private var _implicit: Boolean = false
   private var local: Boolean = false
 
-  def this(parent: StubElement[ParentPsi],
-           elemType: IStubElementType[
-               _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
-           names: Array[String],
-           isDeclaration: Boolean,
-           typeText: String,
-           bodyText: String,
-           containerText: String,
-           isImplicit: Boolean,
-           isLocal: Boolean) = {
+  def this(
+      parent: StubElement[ParentPsi],
+      elemType: IStubElementType[
+        _ <: StubElement[_ <: PsiElement],
+        _ <: PsiElement],
+      names: Array[String],
+      isDeclaration: Boolean,
+      typeText: String,
+      bodyText: String,
+      containerText: String,
+      isImplicit: Boolean,
+      isLocal: Boolean) = {
     this(
-        parent,
-        elemType
-          .asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
+      parent,
+      elemType
+        .asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
     this.names = for (name <- names) yield StringRef.fromString(name)
     this.declaration = isDeclaration
     this.typeText = StringRef.fromString(typeText)
@@ -58,20 +62,22 @@ class ScValueStubImpl[ParentPsi <: PsiElement](
     local = isLocal
   }
 
-  def this(parent: StubElement[ParentPsi],
-           elemType: IStubElementType[
-               _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
-           names: Array[StringRef],
-           isDeclaration: Boolean,
-           typeText: StringRef,
-           bodyText: StringRef,
-           containerText: StringRef,
-           isImplicit: Boolean,
-           isLocal: Boolean) = {
+  def this(
+      parent: StubElement[ParentPsi],
+      elemType: IStubElementType[
+        _ <: StubElement[_ <: PsiElement],
+        _ <: PsiElement],
+      names: Array[StringRef],
+      isDeclaration: Boolean,
+      typeText: StringRef,
+      bodyText: StringRef,
+      containerText: StringRef,
+      isImplicit: Boolean,
+      isLocal: Boolean) = {
     this(
-        parent,
-        elemType
-          .asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
+      parent,
+      elemType
+        .asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
     this.names = names
     this.declaration = isDeclaration
     this.typeText = typeText
@@ -84,8 +90,8 @@ class ScValueStubImpl[ParentPsi <: PsiElement](
   def isLocal: Boolean = local
 
   def getNames: Array[String] =
-    for (name <- names) yield
-      StringRef.toString(name) //todo: remove it if unused
+    for (name <- names)
+      yield StringRef.toString(name) //todo: remove it if unused
 
   def isDeclaration = declaration
 
@@ -99,8 +105,9 @@ class ScValueStubImpl[ParentPsi <: PsiElement](
     }
     val res: Option[ScPatternList] =
       if (getBindingsContainerText != "") {
-        Some(ScalaPsiElementFactory.createPatterListFromText(
-                getBindingsContainerText, getPsi, null))
+        Some(
+          ScalaPsiElementFactory
+            .createPatterListFromText(getBindingsContainerText, getPsi, null))
       } else None
     myPatterns = new SofterReference(res)
     res
@@ -116,8 +123,9 @@ class ScValueStubImpl[ParentPsi <: PsiElement](
     }
     val res: Option[ScExpression] =
       if (getBodyText != "") {
-        Some(ScalaPsiElementFactory.createExpressionWithContextFromText(
-                getBodyText, getPsi, null))
+        Some(
+          ScalaPsiElementFactory
+            .createExpressionWithContextFromText(getBodyText, getPsi, null))
       } else None
     myBodyExpression = new SofterReference(res)
     res
@@ -133,8 +141,8 @@ class ScValueStubImpl[ParentPsi <: PsiElement](
     val res: Option[ScTypeElement] =
       if (getTypeText != "")
         Some(
-            ScalaPsiElementFactory.createTypeElementFromText(
-                getTypeText, getPsi, null))
+          ScalaPsiElementFactory
+            .createTypeElementFromText(getTypeText, getPsi, null))
       else None
     myTypeElement = new SofterReference[Option[ScTypeElement]](res)
     res
@@ -149,8 +157,9 @@ class ScValueStubImpl[ParentPsi <: PsiElement](
     }
     val res: Option[ScIdList] =
       if (getBindingsContainerText != "") {
-        Some(ScalaPsiElementFactory.createIdsListFromText(
-                getBindingsContainerText, getPsi, null))
+        Some(
+          ScalaPsiElementFactory
+            .createIdsListFromText(getBindingsContainerText, getPsi, null))
       } else None
     myIds = new SofterReference[Option[ScIdList]](res)
     res

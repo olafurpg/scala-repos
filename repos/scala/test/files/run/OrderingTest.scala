@@ -33,13 +33,14 @@ object Test extends App {
   val words = "The quick brown fox jumped over the lazy dog".split(' ')
   val result = words.sortBy(x => (x.length, x.head))
   assert(
-      result sameElements Array[String]("The",
-                                        "dog",
-                                        "fox",
-                                        "the",
-                                        "lazy",
-                                        "over",
-                                        "brown",
-                                        "quick",
-                                        "jumped"))
+    result sameElements Array[String](
+      "The",
+      "dog",
+      "fox",
+      "the",
+      "lazy",
+      "over",
+      "brown",
+      "quick",
+      "jumped"))
 }

@@ -1,7 +1,12 @@
 package com.twitter.finagle.exp.mysql
 
 import com.twitter.concurrent.AsyncQueue
-import com.twitter.finagle.exp.mysql.transport.{Buffer, BufferReader, BufferWriter, Packet}
+import com.twitter.finagle.exp.mysql.transport.{
+  Buffer,
+  BufferReader,
+  BufferWriter,
+  Packet
+}
 import com.twitter.finagle.transport.{Transport, QueueTransport}
 import com.twitter.util.{Await, Future, Try}
 import org.junit.runner.RunWith
@@ -11,58 +16,9 @@ import org.scalatest.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
 class ClientDispatcherTest extends FunSuite {
   val rawInit = Array[Byte](
-      10,
-      53,
-      46,
-      53,
-      46,
-      50,
-      52,
-      0,
-      31,
-      0,
-      0,
-      0,
-      70,
-      38,
-      43,
-      66,
-      74,
-      48,
-      79,
-      126,
-      0,
-      -1,
-      -9,
-      33,
-      2,
-      0,
-      15,
-      -128,
-      21,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      76,
-      66,
-      70,
-      118,
-      67,
-      40,
-      63,
-      68,
-      120,
-      80,
-      103,
-      54,
-      0
+    10, 53, 46, 53, 46, 50, 52, 0, 31, 0, 0, 0, 70, 38, 43, 66, 74, 48, 79, 126,
+    0, -1, -9, 33, 2, 0, 15, -128, 21, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 76, 66, 70,
+    118, 67, 40, 63, 68, 120, 80, 103, 54, 0
   )
   val initPacket = Packet(0, Buffer(rawInit))
   val init = HandshakeInit.decode(initPacket)
@@ -81,8 +37,8 @@ class ClientDispatcherTest extends FunSuite {
     clientq.offer(okPacket)
   }
 
-  val okPacket = Packet(
-      1, Buffer(Array[Byte](0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00)))
+  val okPacket =
+    Packet(1, Buffer(Array[Byte](0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00)))
 
   test("handshaking") {
     val ctx = newCtx
@@ -150,17 +106,17 @@ class ClientDispatcherTest extends FunSuite {
         val maxLen = 12
         val fieldName = "field" + len
         val f = Field(
-            catalog,
-            db,
-            table,
-            table,
-            fieldName,
-            fieldName,
-            33.toShort,
-            maxLen,
-            Type.VarChar,
-            0,
-            0
+          catalog,
+          db,
+          table,
+          table,
+          fieldName,
+          fieldName,
+          33.toShort,
+          maxLen,
+          Type.VarChar,
+          0,
+          0
         )
         f :: aux(len - 1)
     }
@@ -172,7 +128,7 @@ class ClientDispatcherTest extends FunSuite {
 
     val sizeOfField =
       (strLen(f.catalog) + strLen(f.db) + strLen(f.table) +
-          strLen(f.origTable) + strLen(f.name) + strLen(f.origName) + 12)
+        strLen(f.origTable) + strLen(f.name) + strLen(f.origName) + 12)
 
     val fieldData = new Array[Byte](sizeOfField)
     val bw = BufferWriter(fieldData)
@@ -194,8 +150,8 @@ class ClientDispatcherTest extends FunSuite {
   val numFields = 5
   val numRows = 3
   val headerPacket = Packet(0, Buffer(Array(numFields.toByte)))
-  val eof = Packet(
-      0, Buffer(Array[Byte](Packet.EofByte, 0x00, 0x00, 0x00, 0x00)))
+  val eof =
+    Packet(0, Buffer(Array[Byte](Packet.EofByte, 0x00, 0x00, 0x00, 0x00)))
   val fields = createFields(numFields)
   val fieldPackets = fields map { toPacket(_) }
 
@@ -252,8 +208,8 @@ class ClientDispatcherTest extends FunSuite {
   test("Decode PreparedStatement numParams > 0, numCols > 0") {
     val ctx = newCtx
     import ctx._
-    val query = service(
-        PrepareRequest("SELECT name FROM t1 WHERE id IN (?, ?, ?, ?, ?)"))
+    val query =
+      service(PrepareRequest("SELECT name FROM t1 WHERE id IN (?, ?, ?, ?, ?)"))
     val numParams = numFields
     clientq.offer(makePreparedHeader(1, numParams))
     fieldPackets foreach { clientq.offer(_) }

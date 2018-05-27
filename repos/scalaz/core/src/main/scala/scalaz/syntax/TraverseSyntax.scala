@@ -2,8 +2,8 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Traverse` */
-final class TraverseOps[F[_], A] private[syntax](
-    val self: F[A])(implicit val F: Traverse[F])
+final class TraverseOps[F[_], A] private[syntax] (val self: F[A])(
+    implicit val F: Traverse[F])
     extends Ops[F[A]] {
   ////
 
@@ -22,13 +22,14 @@ final class TraverseOps[F[_], A] private[syntax](
     F.traverseU[A, GB](self)(f)(G)
 
   /** A version of `traverse` where a subsequent monadic join is applied to the inner result. */
-  final def traverseM[G[_], B](f: A => G[F[B]])(
-      implicit G: Applicative[G], FM: Bind[F]): G[F[B]] =
+  final def traverseM[G[_], B](
+      f: A => G[F[B]])(implicit G: Applicative[G], FM: Bind[F]): G[F[B]] =
     F.traverseM[A, G, B](self)(f)(G, FM)
 
   /** Traverse with the identity function */
   final def sequence[G[_], B](
-      implicit ev: A === G[B], G: Applicative[G]): G[F[B]] = {
+      implicit ev: A === G[B],
+      G: Applicative[G]): G[F[B]] = {
     val fgb: F[G[B]] = ev.subst[F](self)
     F.sequence(fgb)
   }
@@ -87,7 +88,9 @@ sealed trait ToTraverseOps0 {
 }
 
 trait ToTraverseOps
-    extends ToTraverseOps0 with ToFunctorOps with ToFoldableOps {
+    extends ToTraverseOps0
+    with ToFunctorOps
+    with ToFoldableOps {
   implicit def ToTraverseOps[F[_], A](v: F[A])(implicit F0: Traverse[F]) =
     new TraverseOps[F, A](v)
 

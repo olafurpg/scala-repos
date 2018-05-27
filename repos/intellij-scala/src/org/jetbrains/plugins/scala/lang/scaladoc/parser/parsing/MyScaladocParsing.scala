@@ -100,8 +100,8 @@ class MyScaladocParsing(private val psiBuilder: PsiBuilder)
     def canClose(element: IElementType): Boolean = {
       element != null &&
       (element == tokenType ||
-          ((tokenType == DOC_LINK_TAG) || (tokenType == DOC_HTTP_LINK_TAG)) &&
-          element == DOC_LINK_CLOSE_TAG)
+      ((tokenType == DOC_LINK_TAG) || (tokenType == DOC_HTTP_LINK_TAG)) &&
+      element == DOC_LINK_CLOSE_TAG)
     }
 
     if (tokenType == DOC_HEADER) {
@@ -113,12 +113,14 @@ class MyScaladocParsing(private val psiBuilder: PsiBuilder)
         builder.getTokenType == ScalaTokenTypes.tIDENTIFIER &&
         !isEndOfComment) {
       StableId.parse(
-          new ScalaPsiBuilderImpl(builder), true, DOC_CODE_LINK_VALUE)
+        new ScalaPsiBuilderImpl(builder),
+        true,
+        DOC_CODE_LINK_VALUE)
     }
 
     while (!isEndOfComment) {
       if (!(builder.getTokenType == DOC_WHITESPACE &&
-              builder.getTokenText.contains("\n")) &&
+            builder.getTokenText.contains("\n")) &&
           builder.getTokenType != DOC_COMMENT_LEADING_ASTERISKS) {
         hasClosingElementsInWikiSyntax = false
       }
@@ -178,7 +180,9 @@ class MyScaladocParsing(private val psiBuilder: PsiBuilder)
           return true
         case DOC_INLINE_TAG_START
             if ParserUtils.lookAhead(
-                builder, DOC_INLINE_TAG_START, DOC_TAG_NAME) && canHaveTags =>
+              builder,
+              DOC_INLINE_TAG_START,
+              DOC_TAG_NAME) && canHaveTags =>
           isInInlinedTag = true
           parseTag
         case DOC_WHITESPACE if tokenType != DOC_MONOSPACE_TAG =>
@@ -188,7 +192,7 @@ class MyScaladocParsing(private val psiBuilder: PsiBuilder)
           }
           if (!hasClosingElementsInWikiSyntax &&
               (builder.getTokenText.indexOf("\n") == builder.getTokenText
-                    .lastIndexOf("\n"))) {
+                .lastIndexOf("\n"))) {
             //check is it single nl
             hasClosingElementsInWikiSyntax = true
             builder.advanceLexer()
@@ -222,7 +226,7 @@ class MyScaladocParsing(private val psiBuilder: PsiBuilder)
     builder.advanceLexer()
 
     while (!isEndOfComment &&
-    builder.getTokenType != DOC_INNER_CLOSE_CODE_TAG) {
+           builder.getTokenType != DOC_INNER_CLOSE_CODE_TAG) {
       builder.advanceLexer()
     }
     if (isEndOfComment) {
@@ -241,9 +245,10 @@ class MyScaladocParsing(private val psiBuilder: PsiBuilder)
     val marker = builder.mark()
     if (isInInlinedTag) ParserUtils.getToken(builder, DOC_INLINE_TAG_START)
 
-    assert(builder.getTokenType eq DOC_TAG_NAME,
-           builder.getTokenText + "  " + builder.getTokenType + "  " +
-           builder.getCurrentOffset)
+    assert(
+      builder.getTokenType eq DOC_TAG_NAME,
+      builder.getTokenText + "  " + builder.getTokenType + "  " +
+        builder.getCurrentOffset)
 
     val tagName = builder.getTokenText
     if (!isEndOfComment) builder.advanceLexer()
@@ -257,10 +262,14 @@ class MyScaladocParsing(private val psiBuilder: PsiBuilder)
             builder.advanceLexer()
           }
           StableId.parse(
-              new ScalaPsiBuilderImpl(builder), true, DOC_TAG_VALUE_TOKEN)
+            new ScalaPsiBuilderImpl(builder),
+            true,
+            DOC_TAG_VALUE_TOKEN)
         case PARAM_TAG | TYPE_PARAM_TAG | DEFINE_TAG =>
           if (!ParserUtils.lookAhead(
-                  builder, builder.getTokenType, DOC_TAG_VALUE_TOKEN))
+                builder,
+                builder.getTokenType,
+                DOC_TAG_VALUE_TOKEN))
             builder.error("Missing tag param")
         case SEE_TAG | AUTHOR_TAG | NOTE_TAG | RETURN_TAG | SINCE_TAG |
             VERSION_TAG | USECASE_TAG | EXAMPLE_TAG | TODO_TAG |
@@ -333,35 +342,37 @@ object MyScaladocParsing {
   val CONSTRUCTOR_TAG = "@constructor"
 
   val escapeSequencesForWiki = HashMap[String, String](
-      "`" -> "&#96;",
-      "^" -> "&#94;",
-      "__" -> "&#95;&#95;",
-      "'''" -> "&#39;&#39;&#39;",
-      "''" -> "&#39;&#39;",
-      ",," -> "&#44;&#44;",
-      "[[" -> "&#91;&#91;",
-      "=" -> "&#61;")
+    "`" -> "&#96;",
+    "^" -> "&#94;",
+    "__" -> "&#95;&#95;",
+    "'''" -> "&#39;&#39;&#39;",
+    "''" -> "&#39;&#39;",
+    ",," -> "&#44;&#44;",
+    "[[" -> "&#91;&#91;",
+    "=" -> "&#61;")
 
-  val allTags = Set(PARAM_TAG,
-                    TYPE_PARAM_TAG,
-                    THROWS_TAG,
-                    SEE_TAG,
-                    AUTHOR_TAG,
-                    NOTE_TAG,
-                    RETURN_TAG,
-                    SINCE_TAG,
-                    DEFINE_TAG,
-                    VERSION_TAG,
-                    TODO_TAG,
-                    USECASE_TAG,
-                    EXAMPLE_TAG,
-                    DEPRECATED_TAG,
-                    MIGRATION_TAG,
-                    GROUP_TAG,
-                    GROUP_NAME_TAG,
-                    GROUP_DESC_TAG,
-                    GROUP_PRIO_TAG,
-                    CONSTRUCTOR_TAG,
-                    INHERITDOC_TAG)
+  val allTags = Set(
+    PARAM_TAG,
+    TYPE_PARAM_TAG,
+    THROWS_TAG,
+    SEE_TAG,
+    AUTHOR_TAG,
+    NOTE_TAG,
+    RETURN_TAG,
+    SINCE_TAG,
+    DEFINE_TAG,
+    VERSION_TAG,
+    TODO_TAG,
+    USECASE_TAG,
+    EXAMPLE_TAG,
+    DEPRECATED_TAG,
+    MIGRATION_TAG,
+    GROUP_TAG,
+    GROUP_NAME_TAG,
+    GROUP_DESC_TAG,
+    GROUP_PRIO_TAG,
+    CONSTRUCTOR_TAG,
+    INHERITDOC_TAG
+  )
   val tagsWithParameters = Set(PARAM_TAG, TYPE_PARAM_TAG, THROWS_TAG)
 }

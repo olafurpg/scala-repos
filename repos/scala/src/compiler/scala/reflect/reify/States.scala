@@ -37,7 +37,7 @@ trait States { self: Reifier =>
             CannotReifyWeakType(s" having unresolved type parameter $tpe")
           case sym: Symbol =>
             CannotReifyWeakType(
-                s" referring to ${sym.kindString} ${sym.fullName} local to the reifee")
+              s" referring to ${sym.kindString} ${sym.fullName} local to the reifee")
           case _ => CannotReifyWeakType("")
         }
       }

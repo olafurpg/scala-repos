@@ -88,8 +88,7 @@ trait ProtoUser[T <: ProtoUser[T]] extends Record[T] { self: T =>
     */
   lazy val lastName: StringField[T] = new MyLastName(this, 32)
 
-  protected class MyLastName(obj: T, size: Int)
-      extends StringField(obj, size) {
+  protected class MyLastName(obj: T, size: Int) extends StringField(obj, size) {
     override def displayName = owner.lastNameDisplayName
     override val fieldId = Some(Text("txtLastName"))
   }
@@ -164,14 +163,14 @@ trait ProtoUser[T <: ProtoUser[T]] extends Record[T] { self: T =>
       f + " " + l + " (" + e + ")"
     case (f, _, e) if f.length > 1 => f + " (" + e + ")"
     case (_, l, e) if l.length > 1 => l + " (" + e + ")"
-    case (_, _, e) => e
+    case (_, _, e)                 => e
   }
 
   def shortName: String = (firstName.get, lastName.get) match {
     case (f, l) if f.length > 1 && l.length > 1 => f + " " + l
-    case (f, _) if f.length > 1 => f
-    case (_, l) if l.length > 1 => l
-    case _ => email.get
+    case (f, _) if f.length > 1                 => f
+    case (_, l) if l.length > 1                 => l
+    case _                                      => email.get
   }
 
   def niceNameWEmailLink = <a href={"mailto:"+email.get}>{niceName}</a>
@@ -182,7 +181,8 @@ trait ProtoUser[T <: ProtoUser[T]] extends Record[T] { self: T =>
   * get a bunch of user functionality including password reset, etc.
   */
 trait MetaMegaProtoUser[ModelType <: MegaProtoUser[ModelType]]
-    extends MetaRecord[ModelType] with GenProtoUser { self: ModelType =>
+    extends MetaRecord[ModelType]
+    with GenProtoUser { self: ModelType =>
 
   type TheUserType = ModelType
 
@@ -197,8 +197,7 @@ trait MetaMegaProtoUser[ModelType <: MegaProtoUser[ModelType]]
   protected implicit def buildFieldBridge(
       from: FieldPointerType): FieldPointerBridge = new MyPointer(from)
 
-  protected class MyPointer(from: FieldPointerType)
-      extends FieldPointerBridge {
+  protected class MyPointer(from: FieldPointerType) extends FieldPointerBridge {
 
     /**
       * What is the display name of this field?
@@ -210,7 +209,7 @@ trait MetaMegaProtoUser[ModelType <: MegaProtoUser[ModelType]]
       */
     def isPasswordField_? : Boolean = from match {
       case a: PasswordField[_] => true
-      case _ => false
+      case _                   => false
     }
   }
 
@@ -302,7 +301,8 @@ trait MetaMegaProtoUser[ModelType <: MegaProtoUser[ModelType]]
     * Given a field pointer and an instance, get the field on that instance
     */
   protected def computeFieldFromPointer(
-      instance: TheUserType, pointer: FieldPointerType): Box[BaseField] =
+      instance: TheUserType,
+      pointer: FieldPointerType): Box[BaseField] =
     fieldByName(pointer.name, instance)
 
   /**
@@ -329,22 +329,13 @@ trait MetaMegaProtoUser[ModelType <: MegaProtoUser[ModelType]]
     * The list of fields presented to the user at sign-up
     */
   def signupFields: List[FieldPointerType] =
-    List(firstName,
-         lastName,
-         email,
-         locale,
-         timezone,
-         password)
+    List(firstName, lastName, email, locale, timezone, password)
 
   /**
     * The list of fields presented to the user for editing
     */
   def editFields: List[FieldPointerType] =
-    List(firstName,
-         lastName,
-         email,
-         locale,
-         timezone)
+    List(firstName, lastName, email, locale, timezone)
 }
 
 /**

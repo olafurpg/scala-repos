@@ -91,8 +91,9 @@ package scalaguide.cache {
       "composition cached page" in {
         running() { app =>
           val cachedApp = app.injector.instanceOf[cachedaction.Application1]
-          testAction(action = cachedApp.userProfile,
-                     expectedResponse = UNAUTHORIZED)
+          testAction(
+            action = cachedApp.userProfile,
+            expectedResponse = UNAUTHORIZED)
         }
       }
 
@@ -123,18 +124,19 @@ package scalaguide.cache {
       }
     }
 
-    def testAction[A](action: EssentialAction,
-                      request: => Request[A] = FakeRequest(),
-                      expectedResponse: Int = OK) = {
+    def testAction[A](
+        action: EssentialAction,
+        request: => Request[A] = FakeRequest(),
+        expectedResponse: Int = OK) = {
       assertAction(action, request, expectedResponse) { result =>
         success
       }
     }
 
-    def assertAction[A, T : AsResult](action: EssentialAction,
-                                      request: => Request[A] = FakeRequest(),
-                                      expectedResponse: Int = OK)(
-        assertions: Future[Result] => T) = {
+    def assertAction[A, T: AsResult](
+        action: EssentialAction,
+        request: => Request[A] = FakeRequest(),
+        expectedResponse: Int = OK)(assertions: Future[Result] => T) = {
       running() { app =>
         implicit val mat = ActorMaterializer()(app.actorSystem)
         val result = action(request).run()
@@ -171,8 +173,7 @@ package scalaguide.cache {
 
     class Application @Inject()(
         @NamedCache("session-cache") sessionCache: CacheApi
-    )
-        extends Controller {}
+    ) extends Controller {}
 //#qualified
   }
 

@@ -108,8 +108,7 @@ class StatsReportListener(numBatchInfos: Int = 10) extends StreamingListener {
   // Queue containing latest completed batches
   val batchInfos = new Queue[BatchInfo]()
 
-  override def onBatchCompleted(
-      batchStarted: StreamingListenerBatchCompleted) {
+  override def onBatchCompleted(batchStarted: StreamingListenerBatchCompleted) {
     batchInfos.enqueue(batchStarted.batchInfo)
     if (batchInfos.size > numBatchInfos) batchInfos.dequeue()
     printStats()
@@ -121,7 +120,8 @@ class StatsReportListener(numBatchInfos: Int = 10) extends StreamingListener {
   }
 
   def showMillisDistribution(
-      heading: String, getMetric: BatchInfo => Option[Long]) {
+      heading: String,
+      getMetric: BatchInfo => Option[Long]) {
     org.apache.spark.scheduler.StatsReportListener
       .showMillisDistribution(heading, extractDistribution(getMetric))
   }

@@ -9,7 +9,9 @@ import prop._
 import spire.laws.arb.{ubyte, ushort, uint, ulong}
 
 class ULongTest
-    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+    extends PropSpec
+    with Matchers
+    with GeneratorDrivenPropertyChecks {
 
   val zero = ULong(0L)
   val one = ULong(1L)
@@ -45,7 +47,7 @@ class ULongTest
         false
       } catch {
         case _: ArithmeticException => true
-        case _: Exception => false
+        case _: Exception           => false
       }
       error shouldBe true
     }
@@ -144,7 +146,9 @@ class ULongTest
 }
 
 class UIntTest
-    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+    extends PropSpec
+    with Matchers
+    with GeneratorDrivenPropertyChecks {
 
   val zero = UInt(0)
   val one = UInt(1)
@@ -180,7 +184,7 @@ class UIntTest
         false
       } catch {
         case _: ArithmeticException => true
-        case _: Exception => false
+        case _: Exception           => false
       }
       error shouldBe true
     }
@@ -253,7 +257,9 @@ class UIntTest
 }
 
 class UShortTest
-    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+    extends PropSpec
+    with Matchers
+    with GeneratorDrivenPropertyChecks {
 
   val zero = UShort(0)
   val one = UShort(1)
@@ -289,7 +295,7 @@ class UShortTest
         false
       } catch {
         case _: ArithmeticException => true
-        case _: Exception => false
+        case _: Exception           => false
       }
       error shouldBe true
     }
@@ -362,7 +368,9 @@ class UShortTest
 }
 
 class UByteTest
-    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+    extends PropSpec
+    with Matchers
+    with GeneratorDrivenPropertyChecks {
 
   val zero = UByte(0)
   val one = UByte(1)
@@ -398,7 +406,7 @@ class UByteTest
         false
       } catch {
         case _: ArithmeticException => true
-        case _: Exception => false
+        case _: Exception           => false
       }
       error shouldBe true
     }

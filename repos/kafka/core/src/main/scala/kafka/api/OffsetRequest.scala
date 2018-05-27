@@ -5,7 +5,7 @@
   * The ASF licenses this file to You under the Apache License, Version 2.0
   * (the "License"); you may not use this file except in compliance with
   * the License.  You may obtain a copy of the License at
-  * 
+  *
   *    http://www.apache.org/licenses/LICENSE-2.0
   *
   * Unless required by applicable law or agreed to in writing, software
@@ -39,24 +39,24 @@ object OffsetRequest {
     val clientId = readShortString(buffer)
     val replicaId = buffer.getInt
     val topicCount = buffer.getInt
-    val pairs = (1 to topicCount).flatMap(_ =>
-          {
-        val topic = readShortString(buffer)
-        val partitionCount = buffer.getInt
-        (1 to partitionCount).map(_ =>
-              {
-            val partitionId = buffer.getInt
-            val time = buffer.getLong
-            val maxNumOffsets = buffer.getInt
-            (TopicAndPartition(topic, partitionId),
-             PartitionOffsetRequestInfo(time, maxNumOffsets))
-        })
+    val pairs = (1 to topicCount).flatMap(_ => {
+      val topic = readShortString(buffer)
+      val partitionCount = buffer.getInt
+      (1 to partitionCount).map(_ => {
+        val partitionId = buffer.getInt
+        val time = buffer.getLong
+        val maxNumOffsets = buffer.getInt
+        (
+          TopicAndPartition(topic, partitionId),
+          PartitionOffsetRequestInfo(time, maxNumOffsets))
+      })
     })
-    OffsetRequest(Map(pairs: _*),
-                  versionId = versionId,
-                  clientId = clientId,
-                  correlationId = correlationId,
-                  replicaId = replicaId)
+    OffsetRequest(
+      Map(pairs: _*),
+      versionId = versionId,
+      clientId = clientId,
+      correlationId = correlationId,
+      replicaId = replicaId)
   }
 }
 
@@ -70,14 +70,16 @@ case class OffsetRequest(
     replicaId: Int = Request.OrdinaryConsumerId)
     extends RequestOrResponse(Some(ApiKeys.LIST_OFFSETS.id)) {
 
-  def this(requestInfo: Map[TopicAndPartition, PartitionOffsetRequestInfo],
-           correlationId: Int,
-           replicaId: Int) =
-    this(requestInfo,
-         OffsetRequest.CurrentVersion,
-         correlationId,
-         OffsetRequest.DefaultClientId,
-         replicaId)
+  def this(
+      requestInfo: Map[TopicAndPartition, PartitionOffsetRequestInfo],
+      correlationId: Int,
+      replicaId: Int) =
+    this(
+      requestInfo,
+      OffsetRequest.CurrentVersion,
+      correlationId,
+      OffsetRequest.DefaultClientId,
+      replicaId)
 
   lazy val requestInfoGroupedByTopic = requestInfo.groupBy(_._1.topic)
 
@@ -106,15 +108,14 @@ case class OffsetRequest(
     4 + /* correlationId */
     shortStringLength(clientId) + 4 + /* replicaId */
     4 + /* topic count */
-    requestInfoGroupedByTopic.foldLeft(0)((foldedTopics, currTopic) =>
-          {
-        val (topic, partitionInfos) = currTopic
-        foldedTopics + shortStringLength(topic) + 4 + /* partition count */
-        partitionInfos.size *
+    requestInfoGroupedByTopic.foldLeft(0)((foldedTopics, currTopic) => {
+      val (topic, partitionInfos) = currTopic
+      foldedTopics + shortStringLength(topic) + 4 + /* partition count */
+      partitionInfos.size *
         (4 + /* partition */
-            8 + /* time */
-            4 /* maxNumOffsets */
-            )
+        8 + /* time */
+        4 /* maxNumOffsets */
+        )
     })
 
   def isFromOrdinaryClient = replicaId == Request.OrdinaryConsumerId
@@ -124,20 +125,22 @@ case class OffsetRequest(
     describe(true)
   }
 
-  override def handleError(e: Throwable,
-                           requestChannel: RequestChannel,
-                           request: RequestChannel.Request): Unit = {
+  override def handleError(
+      e: Throwable,
+      requestChannel: RequestChannel,
+      request: RequestChannel.Request): Unit = {
     val partitionOffsetResponseMap = requestInfo.map {
       case (topicAndPartition, partitionOffsetRequest) =>
-        (topicAndPartition,
-         PartitionOffsetsResponse(Errors.forException(e).code, Nil))
+        (
+          topicAndPartition,
+          PartitionOffsetsResponse(Errors.forException(e).code, Nil))
     }
-    val errorResponse = OffsetResponse(
-        correlationId, partitionOffsetResponseMap)
+    val errorResponse =
+      OffsetResponse(correlationId, partitionOffsetResponseMap)
     requestChannel.sendResponse(
-        new Response(
-            request,
-            new RequestOrResponseSend(request.connectionId, errorResponse)))
+      new Response(
+        request,
+        new RequestOrResponseSend(request.connectionId, errorResponse)))
   }
 
   override def describe(details: Boolean): String = {

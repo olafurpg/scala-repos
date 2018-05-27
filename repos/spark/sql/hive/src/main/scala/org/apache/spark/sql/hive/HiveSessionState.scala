@@ -18,7 +18,11 @@
 package org.apache.spark.sql.hive
 
 import org.apache.spark.sql._
-import org.apache.spark.sql.catalyst.analysis.{Analyzer, FunctionRegistry, OverrideCatalog}
+import org.apache.spark.sql.catalyst.analysis.{
+  Analyzer,
+  FunctionRegistry,
+  OverrideCatalog
+}
 import org.apache.spark.sql.catalyst.parser.ParserInterface
 import org.apache.spark.sql.execution.{python, SparkPlanner}
 import org.apache.spark.sql.execution.datasources._
@@ -46,8 +50,7 @@ private[hive] class HiveSessionState(ctx: HiveContext)
     * Note that HiveUDFs will be overridden by functions registered in this context.
     */
   override lazy val functionRegistry: FunctionRegistry = {
-    new HiveFunctionRegistry(
-        FunctionRegistry.builtin.copy(), ctx.executionHive)
+    new HiveFunctionRegistry(FunctionRegistry.builtin.copy(), ctx.executionHive)
   }
 
   /**
@@ -57,7 +60,7 @@ private[hive] class HiveSessionState(ctx: HiveContext)
     new Analyzer(catalog, functionRegistry, conf) {
       override val extendedResolutionRules =
         catalog.ParquetConversions :: catalog.CreateTables :: catalog.PreInsertionCasts :: python.ExtractPythonUDFs :: PreInsertCastAndRename :: DataSourceAnalysis ::
-        (if (conf.runSQLOnFile) new ResolveDataSource(ctx) :: Nil else Nil)
+          (if (conf.runSQLOnFile) new ResolveDataSource(ctx) :: Nil else Nil)
 
       override val extendedCheckRules = Seq(PreWriteCheck(catalog))
     }
@@ -78,23 +81,23 @@ private[hive] class HiveSessionState(ctx: HiveContext)
 
       override def strategies: Seq[Strategy] = {
         experimentalMethods.extraStrategies ++ Seq(
-            FileSourceStrategy,
-            DataSourceStrategy,
-            HiveCommandStrategy(ctx),
-            HiveDDLStrategy,
-            DDLStrategy,
-            SpecialLimits,
-            InMemoryScans,
-            HiveTableScans,
-            DataSinks,
-            Scripts,
-            Aggregation,
-            LeftSemiJoin,
-            EquiJoinSelection,
-            BasicOperators,
-            BroadcastNestedLoop,
-            CartesianProduct,
-            DefaultJoin
+          FileSourceStrategy,
+          DataSourceStrategy,
+          HiveCommandStrategy(ctx),
+          HiveDDLStrategy,
+          DDLStrategy,
+          SpecialLimits,
+          InMemoryScans,
+          HiveTableScans,
+          DataSinks,
+          Scripts,
+          Aggregation,
+          LeftSemiJoin,
+          EquiJoinSelection,
+          BasicOperators,
+          BroadcastNestedLoop,
+          CartesianProduct,
+          DefaultJoin
         )
       }
     }

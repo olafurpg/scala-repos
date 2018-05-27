@@ -27,10 +27,10 @@ import StatusCodes._
 import HttpEntity._
 import ParserOutput._
 
-class ResponseParserSpec
-    extends FreeSpec with Matchers with BeforeAndAfterAll {
+class ResponseParserSpec extends FreeSpec with Matchers with BeforeAndAfterAll {
   val testConf: Config =
-    ConfigFactory.parseString("""
+    ConfigFactory.parseString(
+      """
     akka.event-handlers = ["akka.testkit.TestEventListener"]
     akka.loglevel = WARNING
     akka.http.parsing.max-response-reason-length = 21""")
@@ -82,7 +82,7 @@ class ResponseParserSpec
 
       "a response with a missing reason phrase" in new Test {
         "HTTP/1.1 200 \r\nContent-Length: 0\r\n\r\n" should parseTo(
-            HttpResponse(OK))
+          HttpResponse(OK))
         closeAfterResponseCompletion shouldEqual Seq(false)
       }
 
@@ -94,11 +94,14 @@ class ResponseParserSpec
           |Transfer-Encoding: foo, chunked, bar
           |Content-Length: 0
           |
-          |""" should parseTo(HttpResponse(
-                ServerOnTheMove,
-                List(`Transfer-Encoding`(TransferEncodings.Extension("foo"),
-                                         TransferEncodings.chunked,
-                                         TransferEncodings.Extension("bar")))))
+          |""" should parseTo(
+          HttpResponse(
+            ServerOnTheMove,
+            List(
+              `Transfer-Encoding`(
+                TransferEncodings.Extension("foo"),
+                TransferEncodings.chunked,
+                TransferEncodings.Extension("bar")))))
         closeAfterResponseCompletion shouldEqual Seq(false)
       }
 
@@ -106,10 +109,12 @@ class ResponseParserSpec
         """HTTP/1.0 404 Not Found
           |Host: api.example.com
           |
-          |Foobs""" should parseTo(HttpResponse(NotFound,
-                                                List(Host("api.example.com")),
-                                                "Foobs".getBytes,
-                                                `HTTP/1.0`))
+          |Foobs""" should parseTo(
+          HttpResponse(
+            NotFound,
+            List(Host("api.example.com")),
+            "Foobs".getBytes,
+            `HTTP/1.0`))
         closeAfterResponseCompletion shouldEqual Seq(true)
       }
 
@@ -117,27 +122,31 @@ class ResponseParserSpec
         """HTTP/1.0 404 Not Found
           |Host: api.example.com
           |
-          |""" should parseTo(HttpResponse(
-                NotFound,
-                List(Host("api.example.com")),
-                HttpEntity.empty(ContentTypes.`application/octet-stream`),
-                `HTTP/1.0`))
+          |""" should parseTo(
+          HttpResponse(
+            NotFound,
+            List(Host("api.example.com")),
+            HttpEntity.empty(ContentTypes.`application/octet-stream`),
+            `HTTP/1.0`))
         closeAfterResponseCompletion shouldEqual Seq(true)
       }
 
       "a response with 3 headers, a body and remaining content" in new Test {
-        Seq("""HTTP/1.1 500 Internal Server Error
+        Seq(
+          """HTTP/1.1 500 Internal Server Error
           |User-Agent: curl/7.19.7 xyz
           |Connection:close
           |Content-Length: 17
           |Content-Type: text/plain; charset=UTF-8
           |
           |Sh""",
-            "ake your BOODY!HTTP/1.") should generalMultiParseTo(
-            Right(HttpResponse(InternalServerError,
-                               List(`User-Agent`("curl/7.19.7 xyz"),
-                                    Connection("close")),
-                               "Shake your BOODY!")))
+          "ake your BOODY!HTTP/1."
+        ) should generalMultiParseTo(
+          Right(
+            HttpResponse(
+              InternalServerError,
+              List(`User-Agent`("curl/7.19.7 xyz"), Connection("close")),
+              "Shake your BOODY!")))
         closeAfterResponseCompletion shouldEqual Seq(true)
       }
 
@@ -148,7 +157,7 @@ class ResponseParserSpec
             |
             |ABCD"""
         }.toCharArray.map(_.toString).toSeq should rawMultiParseTo(
-            HttpResponse(entity = "ABCD".getBytes))
+          HttpResponse(entity = "ABCD".getBytes))
         closeAfterResponseCompletion shouldEqual Seq(false)
       }
     }
@@ -166,78 +175,88 @@ class ResponseParserSpec
 
       "response start" in new Test {
         Seq(start, "rest") should generalMultiParseTo(
-            Right(
-                baseResponse.withEntity(Chunked(`application/pdf`, source()))),
-            Left(EntityStreamError(
-                    ErrorInfo("Illegal character 'r' in chunk start"))))
+          Right(baseResponse.withEntity(Chunked(`application/pdf`, source()))),
+          Left(
+            EntityStreamError(
+              ErrorInfo("Illegal character 'r' in chunk start"))))
         closeAfterResponseCompletion shouldEqual Seq(false)
       }
 
       "message chunk with and without extension" in new Test {
-        Seq(start + """3
+        Seq(
+          start + """3
             |abc
             |10;some=stuff;bla
             |0123456789ABCDEF
             |""",
-            "10;foo=",
-            """bar
+          "10;foo=",
+          """bar
             |0123456789ABCDEF
             |10
             |0123456789""",
-            """ABCDEF
+          """ABCDEF
             |0
             |
-            |""") should generalMultiParseTo(Right(baseResponse.withEntity(
-                    Chunked(`application/pdf`,
-                            source(Chunk(ByteString("abc")),
-                                   Chunk(ByteString("0123456789ABCDEF"),
-                                         "some=stuff;bla"),
-                                   Chunk(ByteString("0123456789ABCDEF"),
-                                         "foo=bar"),
-                                   Chunk(ByteString("0123456789ABCDEF")),
-                                   LastChunk)))))
+            |"""
+        ) should generalMultiParseTo(
+          Right(baseResponse.withEntity(Chunked(
+            `application/pdf`,
+            source(
+              Chunk(ByteString("abc")),
+              Chunk(ByteString("0123456789ABCDEF"), "some=stuff;bla"),
+              Chunk(ByteString("0123456789ABCDEF"), "foo=bar"),
+              Chunk(ByteString("0123456789ABCDEF")),
+              LastChunk
+            )
+          ))))
         closeAfterResponseCompletion shouldEqual Seq(false)
       }
 
       "message end" in new Test {
         Seq(start, """0
             |
-            |""") should generalMultiParseTo(Right(baseResponse.withEntity(
-                    Chunked(`application/pdf`, source(LastChunk)))))
+            |""") should generalMultiParseTo(
+          Right(baseResponse.withEntity(
+            Chunked(`application/pdf`, source(LastChunk)))))
         closeAfterResponseCompletion shouldEqual Seq(false)
       }
 
       "message end with extension, trailer and remaining content" in new Test {
-        Seq(start,
-            """000;nice=true
+        Seq(start, """000;nice=true
             |Foo: pip
             | apo
             |Bar: xyz
             |
             |HT""") should generalMultiParseTo(
-            Right(baseResponse.withEntity(Chunked(
-                        `application/pdf`,
-                        source(LastChunk("nice=true",
-                                         List(RawHeader("Foo", "pip apo"),
-                                              RawHeader("Bar", "xyz"))))))),
-            Left(MessageStartError(400: StatusCode,
-                                   ErrorInfo("Illegal HTTP message start"))))
+          Right(
+            baseResponse.withEntity(Chunked(
+              `application/pdf`,
+              source(LastChunk(
+                "nice=true",
+                List(RawHeader("Foo", "pip apo"), RawHeader("Bar", "xyz"))))))),
+          Left(
+            MessageStartError(
+              400: StatusCode,
+              ErrorInfo("Illegal HTTP message start")))
+        )
         closeAfterResponseCompletion shouldEqual Seq(false)
       }
 
       "response with additional transfer encodings" in new Test {
-        Seq("""HTTP/1.1 200 OK
+        Seq(
+          """HTTP/1.1 200 OK
           |Transfer-Encoding: fancy, chunked
           |Cont""",
-            """ent-Type: application/pdf
+          """ent-Type: application/pdf
           |
           |""") should generalMultiParseTo(
-            Right(
-                HttpResponse(headers = List(`Transfer-Encoding`(
-                                       TransferEncodings.Extension("fancy"))),
-                             entity = HttpEntity.Chunked(`application/pdf`,
-                                                         source()))),
-            Left(EntityStreamError(ErrorInfo("Entity stream truncation"))))
+          Right(
+            HttpResponse(
+              headers =
+                List(`Transfer-Encoding`(TransferEncodings.Extension("fancy"))),
+              entity = HttpEntity.Chunked(`application/pdf`, source()))),
+          Left(EntityStreamError(ErrorInfo("Entity stream truncation")))
+        )
         closeAfterResponseCompletion shouldEqual Seq(false)
       }
     }
@@ -245,31 +264,34 @@ class ResponseParserSpec
     "reject a response with" - {
       "HTTP version 1.2" in new Test {
         Seq("HTTP/1.2 200 OK\r\n") should generalMultiParseTo(
-            Left(MessageStartError(
-                    400: StatusCode,
-                    ErrorInfo(
-                        "The server-side HTTP version is not supported"))))
+          Left(
+            MessageStartError(
+              400: StatusCode,
+              ErrorInfo("The server-side HTTP version is not supported"))))
       }
 
       "an illegal status code" in new Test {
         Seq("HTTP/1", ".1 2000 Something") should generalMultiParseTo(
-            Left(MessageStartError(400: StatusCode,
-                                   ErrorInfo("Illegal response status code"))))
+          Left(
+            MessageStartError(
+              400: StatusCode,
+              ErrorInfo("Illegal response status code"))))
       }
 
       "a too-long response status reason" in new Test {
         Seq("HTTP/1.1 204 12345678", "90123456789012\r\n") should generalMultiParseTo(
-            Left(MessageStartError(
-                    400: StatusCode,
-                    ErrorInfo(
-                        "Response reason phrase exceeds the configured limit of 21 characters"))))
+          Left(MessageStartError(
+            400: StatusCode,
+            ErrorInfo(
+              "Response reason phrase exceeds the configured limit of 21 characters"))))
       }
 
       "with a missing reason phrase and no trailing space" in new Test {
         Seq("HTTP/1.1 200\r\nContent-Length: 0\r\n\r\n") should generalMultiParseTo(
-            Left(MessageStartError(
-                    400: StatusCode,
-                    ErrorInfo("Status code misses trailing space"))))
+          Left(
+            MessageStartError(
+              400: StatusCode,
+              ErrorInfo("Status code misses trailing space"))))
       }
     }
   }
@@ -283,8 +305,8 @@ class ResponseParserSpec
       override def equals(other: scala.Any): Boolean = other match {
         case other: StrictEqualHttpResponse ⇒
           this.resp.copy(entity = HttpEntity.Empty) == other.resp.copy(
-              entity = HttpEntity.Empty) && Await.result(
-              this.resp.entity.toStrict(250.millis), 250.millis) == Await
+            entity = HttpEntity.Empty) && Await
+            .result(this.resp.entity.toStrict(250.millis), 250.millis) == Await
             .result(other.resp.entity.toStrict(250.millis), 250.millis)
       }
 
@@ -298,36 +320,39 @@ class ResponseParserSpec
     def parseTo(expected: HttpResponse*): Matcher[String] =
       parseTo(GET, expected: _*)
     def parseTo(
-        requestMethod: HttpMethod, expected: HttpResponse*): Matcher[String] =
+        requestMethod: HttpMethod,
+        expected: HttpResponse*): Matcher[String] =
       multiParseTo(requestMethod, expected: _*).compose(_ :: Nil)
 
     def multiParseTo(expected: HttpResponse*): Matcher[Seq[String]] =
       multiParseTo(GET, expected: _*)
-    def multiParseTo(requestMethod: HttpMethod,
-                     expected: HttpResponse*): Matcher[Seq[String]] =
+    def multiParseTo(
+        requestMethod: HttpMethod,
+        expected: HttpResponse*): Matcher[Seq[String]] =
       rawMultiParseTo(requestMethod, expected: _*).compose(_ map prep)
 
     def rawMultiParseTo(expected: HttpResponse*): Matcher[Seq[String]] =
       rawMultiParseTo(GET, expected: _*)
-    def rawMultiParseTo(requestMethod: HttpMethod,
-                        expected: HttpResponse*): Matcher[Seq[String]] =
+    def rawMultiParseTo(
+        requestMethod: HttpMethod,
+        expected: HttpResponse*): Matcher[Seq[String]] =
       generalRawMultiParseTo(requestMethod, expected.map(Right(_)): _*)
 
     def parseToError(error: ResponseOutput): Matcher[String] =
       generalMultiParseTo(Left(error)).compose(_ :: Nil)
 
-    def generalMultiParseTo(expected: Either[ResponseOutput, HttpResponse]*)
-      : Matcher[Seq[String]] =
+    def generalMultiParseTo(
+        expected: Either[ResponseOutput, HttpResponse]*): Matcher[Seq[String]] =
       generalRawMultiParseTo(expected: _*).compose(_ map prep)
 
-    def generalRawMultiParseTo(expected: Either[ResponseOutput, HttpResponse]*)
-      : Matcher[Seq[String]] =
+    def generalRawMultiParseTo(
+        expected: Either[ResponseOutput, HttpResponse]*): Matcher[Seq[String]] =
       generalRawMultiParseTo(GET, expected: _*)
-    def generalRawMultiParseTo(requestMethod: HttpMethod,
-                               expected: Either[ResponseOutput, HttpResponse]*)
-      : Matcher[Seq[String]] =
-      equal(expected.map(strictEqualify)).matcher[Seq[Either[
-                  ResponseOutput, StrictEqualHttpResponse]]] compose {
+    def generalRawMultiParseTo(
+        requestMethod: HttpMethod,
+        expected: Either[ResponseOutput, HttpResponse]*): Matcher[Seq[String]] =
+      equal(expected.map(strictEqualify))
+        .matcher[Seq[Either[ResponseOutput, StrictEqualHttpResponse]]] compose {
         input: Seq[String] ⇒
           collectBlocking {
             rawParse(requestMethod, input: _*).mapAsync(1) {
@@ -339,25 +364,37 @@ class ResponseParserSpec
           }.map(strictEqualify)
       }
 
-    def rawParse(requestMethod: HttpMethod, input: String*)
-      : Source[Either[ResponseOutput, HttpResponse], NotUsed] =
+    def rawParse(
+        requestMethod: HttpMethod,
+        input: String*): Source[Either[ResponseOutput, HttpResponse], NotUsed] =
       Source(input.toList)
         .map(bytes ⇒ SessionBytes(TLSPlacebo.dummySession, ByteString(bytes)))
         .transform(() ⇒ newParserStage(requestMethod))
         .named("parser")
         .splitWhen(x ⇒
-              x.isInstanceOf[MessageStart] ||
-              x.isInstanceOf[EntityStreamError])
+          x.isInstanceOf[MessageStart] ||
+            x.isInstanceOf[EntityStreamError])
         .prefixAndTail(1)
         .collect {
-          case (Seq(ResponseStart(
-                statusCode, protocol, headers, createEntity, close)),
-                entityParts) ⇒
+          case (
+              Seq(
+                ResponseStart(
+                  statusCode,
+                  protocol,
+                  headers,
+                  createEntity,
+                  close)),
+              entityParts) ⇒
             closeAfterResponseCompletion :+= close
-            Right(HttpResponse(
-                    statusCode, headers, createEntity(entityParts), protocol))
-          case (Seq(x @ (MessageStartError(_, _) | EntityStreamError(_))),
-                tail) ⇒
+            Right(
+              HttpResponse(
+                statusCode,
+                headers,
+                createEntity(entityParts),
+                protocol))
+          case (
+              Seq(x @ (MessageStartError(_, _) | EntityStreamError(_))),
+              tail) ⇒
             tail.runWith(Sink.ignore)
             Left(x)
         }
@@ -370,9 +407,10 @@ class ResponseParserSpec
 
     def newParserStage(requestMethod: HttpMethod = GET) = {
       val parser = new HttpResponseParser(
-          parserSettings, HttpHeaderParser(parserSettings)())
+        parserSettings,
+        HttpHeaderParser(parserSettings)())
       parser.setContextForNextResponse(
-          HttpResponseParser.ResponseContext(requestMethod, None))
+        HttpResponseParser.ResponseContext(requestMethod, None))
       parser.stage
     }
 

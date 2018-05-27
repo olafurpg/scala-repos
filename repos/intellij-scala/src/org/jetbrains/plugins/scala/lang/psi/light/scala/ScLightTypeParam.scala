@@ -17,7 +17,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult}
   */
 class ScLightTypeParam(t: TypeParameter, tParam: ScTypeParam)
     extends LightElement(tParam.getManager, tParam.getLanguage)
-    with ScTypeParam with PsiClassFake {
+    with ScTypeParam
+    with PsiClassFake {
   override def nameId: PsiElement = tParam.nameId
 
   override def upperBound: TypeResult[ScType] =
@@ -63,8 +64,8 @@ class ScLightTypeParam(t: TypeParameter, tParam: ScTypeParam)
         new ScLightTypeParam(t, tParam)
     }
 
-  override protected def findChildrenByClassScala[
-      T >: Null <: ScalaPsiElement](clazz: Class[T]): Array[T] =
+  override protected def findChildrenByClassScala[T >: Null <: ScalaPsiElement](
+      clazz: Class[T]): Array[T] =
     throw new UnsupportedOperationException("Operation on light element")
 
   override protected def findChildByClassScala[T >: Null <: ScalaPsiElement](

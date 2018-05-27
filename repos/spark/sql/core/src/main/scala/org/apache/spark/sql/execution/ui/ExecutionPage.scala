@@ -25,15 +25,17 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.ui.{UIUtils, WebUIPage}
 
 private[sql] class ExecutionPage(parent: SQLTab)
-    extends WebUIPage("execution") with Logging {
+    extends WebUIPage("execution")
+    with Logging {
 
   private val listener = parent.listener
 
   override def render(request: HttpServletRequest): Seq[Node] =
     listener.synchronized {
       val parameterExecutionId = request.getParameter("id")
-      require(parameterExecutionId != null && parameterExecutionId.nonEmpty,
-              "Missing execution id parameter")
+      require(
+        parameterExecutionId != null && parameterExecutionId.nonEmpty,
+        "Missing execution id parameter")
 
       val executionId = parameterExecutionId.toLong
       val content = listener
@@ -42,7 +44,7 @@ private[sql] class ExecutionPage(parent: SQLTab)
           val currentTime = System.currentTimeMillis()
           val duration =
             executionUIData.completionTime.getOrElse(currentTime) -
-            executionUIData.submissionTime
+              executionUIData.submissionTime
 
           val summary = <div>
           <ul class="unstyled">
@@ -82,16 +84,19 @@ private[sql] class ExecutionPage(parent: SQLTab)
           val metrics = listener.getExecutionMetrics(executionId)
 
           summary ++ planVisualization(
-              metrics,
-              executionUIData.physicalPlanGraph) ++ physicalPlanDescription(
-              executionUIData.physicalPlanDescription)
+            metrics,
+            executionUIData.physicalPlanGraph) ++ physicalPlanDescription(
+            executionUIData.physicalPlanDescription)
         }
         .getOrElse {
           <div>No information to display for Plan {executionId}</div>
         }
 
       UIUtils.headerSparkPage(
-          s"Details for Query $executionId", content, parent, Some(5000))
+        s"Details for Query $executionId",
+        content,
+        parent,
+        Some(5000))
     }
 
   private def planVisualizationResources: Seq[Node] = {
@@ -105,7 +110,8 @@ private[sql] class ExecutionPage(parent: SQLTab)
   }
 
   private def planVisualization(
-      metrics: Map[Long, String], graph: SparkPlanGraph): Seq[Node] = {
+      metrics: Map[Long, String],
+      graph: SparkPlanGraph): Seq[Node] = {
     val metadata = graph.allNodes.flatMap { node =>
       val nodeId = s"plan-meta-data-${node.id}"
       <div id={nodeId}>{node.desc}</div>

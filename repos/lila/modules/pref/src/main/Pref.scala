@@ -4,39 +4,40 @@ import lila.db.JsTube
 import lila.db.JsTube.Helpers._
 import lila.user.User
 
-case class Pref(_id: String, // user id
-                dark: Boolean,
-                transp: Boolean,
-                bgImg: Option[String],
-                is3d: Boolean,
-                theme: String,
-                pieceSet: String,
-                theme3d: String,
-                pieceSet3d: String,
-                soundSet: String,
-                blindfold: Int,
-                autoQueen: Int,
-                autoThreefold: Int,
-                takeback: Int,
-                clockTenths: Int,
-                clockBar: Boolean,
-                clockSound: Boolean,
-                premove: Boolean,
-                animation: Int,
-                captured: Boolean,
-                follow: Boolean,
-                highlight: Boolean,
-                destination: Boolean,
-                coords: Int,
-                replay: Int,
-                challenge: Int,
-                message: Int,
-                coordColor: Int,
-                puzzleDifficulty: Int,
-                submitMove: Int,
-                confirmResign: Int,
-                insightShare: Int,
-                tags: Map[String, String] = Map.empty) {
+case class Pref(
+    _id: String, // user id
+    dark: Boolean,
+    transp: Boolean,
+    bgImg: Option[String],
+    is3d: Boolean,
+    theme: String,
+    pieceSet: String,
+    theme3d: String,
+    pieceSet3d: String,
+    soundSet: String,
+    blindfold: Int,
+    autoQueen: Int,
+    autoThreefold: Int,
+    takeback: Int,
+    clockTenths: Int,
+    clockBar: Boolean,
+    clockSound: Boolean,
+    premove: Boolean,
+    animation: Int,
+    captured: Boolean,
+    follow: Boolean,
+    highlight: Boolean,
+    destination: Boolean,
+    coords: Int,
+    replay: Int,
+    challenge: Int,
+    message: Int,
+    coordColor: Int,
+    puzzleDifficulty: Int,
+    submitMove: Int,
+    confirmResign: Int,
+    insightShare: Int,
+    tags: Map[String, String] = Map.empty) {
 
   import Pref._
 
@@ -55,15 +56,15 @@ case class Pref(_id: String, // user id
   def hasSeenVerifyTitle = tags contains Tag.verifyTitle
 
   def get(name: String): Option[String] = name match {
-    case "bg" => transp.fold("transp", dark.fold("dark", "light")).some
-    case "bgImg" => bgImg
-    case "theme" => theme.some
-    case "pieceSet" => pieceSet.some
-    case "theme3d" => theme3d.some
+    case "bg"         => transp.fold("transp", dark.fold("dark", "light")).some
+    case "bgImg"      => bgImg
+    case "theme"      => theme.some
+    case "pieceSet"   => pieceSet.some
+    case "theme3d"    => theme3d.some
     case "pieceSet3d" => pieceSet3d.some
-    case "is3d" => is3d.toString.some
-    case "soundSet" => soundSet.some
-    case _ => none
+    case "is3d"       => is3d.toString.some
+    case "soundSet"   => soundSet.some
+    case _            => none
   }
   def set(name: String, value: String): Option[Pref] = name match {
     case "bg" =>
@@ -98,11 +99,11 @@ case class Pref(_id: String, // user id
   }
 
   def animationFactor = animation match {
-    case Animation.NONE => 0
-    case Animation.FAST => 0.5f
+    case Animation.NONE   => 0
+    case Animation.FAST   => 0.5f
     case Animation.NORMAL => 1
-    case Animation.SLOW => 2
-    case _ => 1
+    case Animation.SLOW   => 2
+    case _                => 1
   }
 
   def isBlindfold = blindfold == Pref.Blindfold.YES
@@ -140,9 +141,8 @@ object Pref {
     val PREMOVE = 2
     val ALWAYS = 3
 
-    val choices = Seq(NEVER -> "Never",
-                      ALWAYS -> "Always",
-                      PREMOVE -> "When premoving")
+    val choices =
+      Seq(NEVER -> "Never", ALWAYS -> "Always", PREMOVE -> "When premoving")
   }
 
   object SubmitMove {
@@ -152,10 +152,10 @@ object Pref {
     val ALWAYS = 2
 
     val choices = Seq(
-        NEVER -> "Never",
-        CORRESPONDENCE_ONLY -> "Correspondence games only",
-        CORRESPONDENCE_UNLIMITED -> "Correspondence and unlimited",
-        ALWAYS -> "Always")
+      NEVER -> "Never",
+      CORRESPONDENCE_ONLY -> "Correspondence games only",
+      CORRESPONDENCE_UNLIMITED -> "Correspondence and unlimited",
+      ALWAYS -> "Always")
   }
 
   object ConfirmResign {
@@ -170,9 +170,10 @@ object Pref {
     val FRIENDS = 1
     val EVERYBODY = 2
 
-    val choices = Seq(NOBODY -> "With nobody",
-                      FRIENDS -> "With friends",
-                      EVERYBODY -> "With everybody")
+    val choices = Seq(
+      NOBODY -> "With nobody",
+      FRIENDS -> "With friends",
+      EVERYBODY -> "With everybody")
   }
 
   object Blindfold {
@@ -187,9 +188,10 @@ object Pref {
     val TIME = 2
     val ALWAYS = 3
 
-    val choices = Seq(NEVER -> "Never",
-                      ALWAYS -> "Always",
-                      TIME -> "When time remaining < 30 seconds")
+    val choices = Seq(
+      NEVER -> "Never",
+      ALWAYS -> "Always",
+      TIME -> "When time remaining < 30 seconds")
   }
 
   object Takeback {
@@ -197,9 +199,10 @@ object Pref {
     val CASUAL = 2
     val ALWAYS = 3
 
-    val choices = Seq(NEVER -> "Never",
-                      ALWAYS -> "Always",
-                      CASUAL -> "In casual games only")
+    val choices = Seq(
+      NEVER -> "Never",
+      ALWAYS -> "Always",
+      CASUAL -> "In casual games only")
   }
 
   object Animation {
@@ -208,10 +211,8 @@ object Pref {
     val NORMAL = 2
     val SLOW = 3
 
-    val choices = Seq(NONE -> "None",
-                      FAST -> "Fast",
-                      NORMAL -> "Normal",
-                      SLOW -> "Slow")
+    val choices =
+      Seq(NONE -> "None", FAST -> "Fast", NORMAL -> "Normal", SLOW -> "Slow")
   }
 
   object Coords {
@@ -219,9 +220,10 @@ object Pref {
     val INSIDE = 1
     val OUTSIDE = 2
 
-    val choices = Seq(NONE -> "No",
-                      INSIDE -> "Inside the board",
-                      OUTSIDE -> "Outside the board")
+    val choices = Seq(
+      NONE -> "No",
+      INSIDE -> "Inside the board",
+      OUTSIDE -> "Outside the board")
   }
 
   object Replay {
@@ -229,8 +231,8 @@ object Pref {
     val SLOW = 1
     val ALWAYS = 2
 
-    val choices = Seq(
-        NEVER -> "Never", SLOW -> "On slow games", ALWAYS -> "Always")
+    val choices =
+      Seq(NEVER -> "Never", SLOW -> "On slow games", ALWAYS -> "Always")
   }
 
   object ClockTenths {
@@ -238,9 +240,10 @@ object Pref {
     val LOWTIME = 1
     val ALWAYS = 2
 
-    val choices = Seq(NEVER -> "Never",
-                      LOWTIME -> "When time remaining < 10 seconds",
-                      ALWAYS -> "Always")
+    val choices = Seq(
+      NEVER -> "Never",
+      LOWTIME -> "When time remaining < 10 seconds",
+      ALWAYS -> "Always")
   }
 
   object Challenge {
@@ -251,22 +254,25 @@ object Pref {
 
     private val ratingThreshold = 500
 
-    val choices = Seq(NEVER -> "Never",
-                      RATING -> s"If rating is ± $ratingThreshold",
-                      FRIEND -> "Only friends",
-                      ALWAYS -> "Always")
+    val choices = Seq(
+      NEVER -> "Never",
+      RATING -> s"If rating is ± $ratingThreshold",
+      FRIEND -> "Only friends",
+      ALWAYS -> "Always")
 
-    def block(from: User,
-              to: User,
-              pref: Int,
-              follow: Boolean,
-              fromCheat: Boolean): Option[String] = pref match {
+    def block(
+        from: User,
+        to: User,
+        pref: Int,
+        follow: Boolean,
+        fromCheat: Boolean): Option[String] = pref match {
       case NEVER => "{{user}} doesn't accept challenges.".some
       case _ if fromCheat && !follow =>
         "{{user}} only accepts challenges from friends.".some
       case RATING if from.perfs.bestRating > to.perfs.bestRating => none
       case RATING
-          if math.abs(from.perfs.bestRating - to.perfs.bestRating) > ratingThreshold =>
+          if math
+            .abs(from.perfs.bestRating - to.perfs.bestRating) > ratingThreshold =>
         s"{{user}} only accepts challenges if rating is ± $ratingThreshold.".some
       case FRIEND if !follow =>
         "{{user}} only accepts challenges from friends.".some
@@ -279,45 +285,47 @@ object Pref {
     val FRIEND = 2
     val ALWAYS = 3
 
-    val choices = Seq(
-        NEVER -> "Never", FRIEND -> "Only friends", ALWAYS -> "Always")
+    val choices =
+      Seq(NEVER -> "Never", FRIEND -> "Only friends", ALWAYS -> "Always")
   }
 
   def create(id: String) = default.copy(_id = id)
 
-  lazy val default = Pref(_id = "",
-                          dark = false,
-                          transp = false,
-                          bgImg = none,
-                          is3d = false,
-                          theme = Theme.default.name,
-                          pieceSet = PieceSet.default.name,
-                          theme3d = Theme3d.default.name,
-                          pieceSet3d = PieceSet3d.default.name,
-                          soundSet = SoundSet.default.name,
-                          blindfold = Blindfold.NO,
-                          autoQueen = AutoQueen.PREMOVE,
-                          autoThreefold = AutoThreefold.TIME,
-                          takeback = Takeback.ALWAYS,
-                          clockBar = true,
-                          clockSound = true,
-                          premove = true,
-                          animation = 2,
-                          captured = true,
-                          follow = true,
-                          highlight = true,
-                          destination = true,
-                          coords = Coords.OUTSIDE,
-                          replay = Replay.ALWAYS,
-                          clockTenths = ClockTenths.LOWTIME,
-                          challenge = Challenge.ALWAYS,
-                          message = Message.ALWAYS,
-                          coordColor = Color.RANDOM,
-                          puzzleDifficulty = Difficulty.NORMAL,
-                          submitMove = SubmitMove.CORRESPONDENCE_ONLY,
-                          confirmResign = ConfirmResign.YES,
-                          insightShare = InsightShare.FRIENDS,
-                          tags = Map.empty)
+  lazy val default = Pref(
+    _id = "",
+    dark = false,
+    transp = false,
+    bgImg = none,
+    is3d = false,
+    theme = Theme.default.name,
+    pieceSet = PieceSet.default.name,
+    theme3d = Theme3d.default.name,
+    pieceSet3d = PieceSet3d.default.name,
+    soundSet = SoundSet.default.name,
+    blindfold = Blindfold.NO,
+    autoQueen = AutoQueen.PREMOVE,
+    autoThreefold = AutoThreefold.TIME,
+    takeback = Takeback.ALWAYS,
+    clockBar = true,
+    clockSound = true,
+    premove = true,
+    animation = 2,
+    captured = true,
+    follow = true,
+    highlight = true,
+    destination = true,
+    coords = Coords.OUTSIDE,
+    replay = Replay.ALWAYS,
+    clockTenths = ClockTenths.LOWTIME,
+    challenge = Challenge.ALWAYS,
+    message = Message.ALWAYS,
+    coordColor = Color.RANDOM,
+    puzzleDifficulty = Difficulty.NORMAL,
+    submitMove = SubmitMove.CORRESPONDENCE_ONLY,
+    confirmResign = ConfirmResign.YES,
+    insightShare = InsightShare.FRIENDS,
+    tags = Map.empty
+  )
 
   import ornicar.scalalib.Zero
   implicit def PrefZero: Zero[Pref] = Zero.instance(default)

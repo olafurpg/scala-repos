@@ -62,10 +62,11 @@ class ServerSetResolver {
     implicit val timer = DefaultTimer.twitter
 
     val stabilizationWindow = Duration.fromSeconds(stabilizationSec)
-    val resolver = new Zk2Resolver(NullStatsReceiver,
-                                   stabilizationWindow,
-                                   stabilizationWindow,
-                                   stabilizationWindow)
+    val resolver = new Zk2Resolver(
+      NullStatsReceiver,
+      stabilizationWindow,
+      stabilizationWindow,
+      stabilizationWindow)
 
     val serverSetPaths =
       LocalServerSetService.createServerSetPaths(serverSetsToResolve)
@@ -92,9 +93,9 @@ class ServerSetResolver {
     resolver.bind(s"localhost:$zkListenPort!$zkPath").changes.respond {
       case Addr.Bound(set, metadata) =>
         logger.info(s"Serverset $zkPath has ${set.size} entries")
-      case Addr.Neg => unexpectedError(s"negative resolution of $zkPath")
+      case Addr.Neg         => unexpectedError(s"negative resolution of $zkPath")
       case Addr.Failed(exc) => unexpectedError(s"$zkPath: Addr.Failure[$exc]")
-      case Addr.Pending => logger.info(s"$zkPath is pending...")
+      case Addr.Pending     => logger.info(s"$zkPath is pending...")
     }
   }
 

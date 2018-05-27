@@ -5,7 +5,10 @@ import org.jetbrains.plugins.scala.codeInspection.methodSignature.quickfix.AddCa
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
-import org.jetbrains.plugins.scala.lang.psi.types.result.{TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  TypeResult,
+  TypingContext
+}
 import org.jetbrains.plugins.scala.lang.psi.types.{ScFunctionType, ScType}
 import org.jetbrains.plugins.scala.util.IntentionAvailabilityChecker
 
@@ -31,28 +34,29 @@ import org.jetbrains.plugins.scala.util.IntentionAvailabilityChecker
   */
 class EmptyParenMethodAccessedAsParameterlessInspection
     extends AbstractMethodSignatureInspection(
-        "ScalaEmptyParenMethodAccessedAsParameterless",
-        "Empty-paren method accessed as parameterless") {
+      "ScalaEmptyParenMethodAccessedAsParameterless",
+      "Empty-paren method accessed as parameterless") {
 
   def actionFor(holder: ProblemsHolder) = {
     case e: ScReferenceExpression
         if e.isValid &&
-        IntentionAvailabilityChecker.checkInspection(this, e) =>
+          IntentionAvailabilityChecker.checkInspection(this, e) =>
       e.getParent match {
         case gc: ScGenericCall =>
           ScalaPsiUtil.findCall(gc) match {
-            case None => check(e, holder, gc.getType(TypingContext.empty))
+            case None    => check(e, holder, gc.getType(TypingContext.empty))
             case Some(_) =>
           }
         case _: ScMethodCall | _: ScInfixExpr | _: ScPrefixExpr |
             _: ScUnderscoreSection => // okay
-        case _ => check(e, holder, e.getType(TypingContext.empty))
+        case _                     => check(e, holder, e.getType(TypingContext.empty))
       }
   }
 
-  private def check(e: ScReferenceExpression,
-                    holder: ProblemsHolder,
-                    callType: TypeResult[ScType]) {
+  private def check(
+      e: ScReferenceExpression,
+      holder: ProblemsHolder,
+      callType: TypeResult[ScType]) {
     e.resolve() match {
       case (f: ScFunction) if !f.isInCompiledFile && f.isEmptyParen =>
         callType.toOption match {
@@ -62,7 +66,9 @@ class EmptyParenMethodAccessedAsParameterlessInspection
           // flag in ScalaResolveResult.
           case _ =>
             holder.registerProblem(
-                e.nameId, getDisplayName, new AddCallParentheses(e))
+              e.nameId,
+              getDisplayName,
+              new AddCallParentheses(e))
         }
       case _ =>
     }

@@ -60,10 +60,12 @@ private[streaming] object WriteAheadLogUtils extends Logging {
   def getRollingIntervalSecs(conf: SparkConf, isDriver: Boolean): Int = {
     if (isDriver) {
       conf.getInt(
-          DRIVER_WAL_ROLLING_INTERVAL_CONF_KEY, DEFAULT_ROLLING_INTERVAL_SECS)
+        DRIVER_WAL_ROLLING_INTERVAL_CONF_KEY,
+        DEFAULT_ROLLING_INTERVAL_SECS)
     } else {
-      conf.getInt(RECEIVER_WAL_ROLLING_INTERVAL_CONF_KEY,
-                  DEFAULT_ROLLING_INTERVAL_SECS)
+      conf.getInt(
+        RECEIVER_WAL_ROLLING_INTERVAL_CONF_KEY,
+        DEFAULT_ROLLING_INTERVAL_SECS)
     }
   }
 
@@ -91,10 +93,12 @@ private[streaming] object WriteAheadLogUtils extends Logging {
   def shouldCloseFileAfterWrite(conf: SparkConf, isDriver: Boolean): Boolean = {
     if (isDriver) {
       conf.getBoolean(
-          DRIVER_WAL_CLOSE_AFTER_WRITE_CONF_KEY, defaultValue = false)
+        DRIVER_WAL_CLOSE_AFTER_WRITE_CONF_KEY,
+        defaultValue = false)
     } else {
       conf.getBoolean(
-          RECEIVER_WAL_CLOSE_AFTER_WRITE_CONF_KEY, defaultValue = false)
+        RECEIVER_WAL_CLOSE_AFTER_WRITE_CONF_KEY,
+        defaultValue = false)
     }
   }
 
@@ -142,26 +146,31 @@ private[streaming] object WriteAheadLogUtils extends Logging {
       } else {
         sparkConf.getOption(RECEIVER_WAL_CLASS_CONF_KEY)
       }
-    val wal = classNameOption.map { className =>
-      try {
-        instantiateClass(Utils
-                           .classForName(className)
-                           .asInstanceOf[Class[_ <: WriteAheadLog]],
-                         sparkConf)
-      } catch {
-        case NonFatal(e) =>
-          throw new SparkException(
-              s"Could not create a write ahead log of class $className", e)
+    val wal = classNameOption
+      .map { className =>
+        try {
+          instantiateClass(
+            Utils
+              .classForName(className)
+              .asInstanceOf[Class[_ <: WriteAheadLog]],
+            sparkConf)
+        } catch {
+          case NonFatal(e) =>
+            throw new SparkException(
+              s"Could not create a write ahead log of class $className",
+              e)
+        }
       }
-    }.getOrElse {
-      new FileBasedWriteAheadLog(
+      .getOrElse {
+        new FileBasedWriteAheadLog(
           sparkConf,
           fileWalLogDirectory,
           fileWalHadoopConf,
           getRollingIntervalSecs(sparkConf, isDriver),
           getMaxFailures(sparkConf, isDriver),
-          shouldCloseFileAfterWrite(sparkConf, isDriver))
-    }
+          shouldCloseFileAfterWrite(sparkConf, isDriver)
+        )
+      }
     if (isBatchingEnabled(sparkConf, isDriver)) {
       new BatchedWriteAheadLog(wal, sparkConf)
     } else {
@@ -171,7 +180,8 @@ private[streaming] object WriteAheadLogUtils extends Logging {
 
   /** Instantiate the class, either using single arg constructor or zero arg constructor */
   private def instantiateClass(
-      cls: Class[_ <: WriteAheadLog], conf: SparkConf): WriteAheadLog = {
+      cls: Class[_ <: WriteAheadLog],
+      conf: SparkConf): WriteAheadLog = {
     try {
       cls.getConstructor(classOf[SparkConf]).newInstance(conf)
     } catch {

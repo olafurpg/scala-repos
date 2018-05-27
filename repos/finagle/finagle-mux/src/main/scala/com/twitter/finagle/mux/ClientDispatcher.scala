@@ -6,7 +6,14 @@ import com.twitter.finagle.mux.util.{TagMap, TagSet}
 import com.twitter.finagle.netty3.{BufChannelBuffer, ChannelBufferBuf}
 import com.twitter.finagle.tracing.Trace
 import com.twitter.finagle.transport.Transport
-import com.twitter.finagle.{Dtab, Filter, Failure, NoStacktrace, Service, Status}
+import com.twitter.finagle.{
+  Dtab,
+  Filter,
+  Failure,
+  NoStacktrace,
+  Service,
+  Status
+}
 import com.twitter.util.{Future, Promise, Return, Throw, Time, Try, Updatable}
 
 /**
@@ -23,7 +30,8 @@ case class ServerError(what: String) extends Exception(what) with NoStacktrace
   * failure to interpret the request.
   */
 case class ServerApplicationError(what: String)
-    extends Exception(what) with NoStacktrace
+    extends Exception(what)
+    with NoStacktrace
 
 /**
   * Implements a dispatcher for a mux client. The dispatcher implements the bookkeeping
@@ -39,10 +47,9 @@ private[twitter] class ClientDispatcher(trans: Transport[Message, Message])
   private[this] val tags = TagSet(Message.Tags.MinTag to Message.Tags.MaxTag)
   private[this] val messages = TagMap[Updatable[Try[Message]]](tags)
 
-  private[this] val processAndRead: Message => Future[Unit] = msg =>
-    {
-      process(msg)
-      readLoop()
+  private[this] val processAndRead: Message => Future[Unit] = msg => {
+    process(msg)
+    readLoop()
   }
 
   /**
@@ -152,28 +159,30 @@ private class ReqRepFilter
       FutureNackedException
 
     case t @ Throw(_) => Future.const(t.cast[Response])
-    case Return(m) => Future.exception(Failure(s"unexpected response: $m"))
+    case Return(m)    => Future.exception(Failure(s"unexpected response: $m"))
   }
 
-  def apply(req: Request,
-            svc: Service[Int => Message, Message]): Future[Response] = {
+  def apply(
+      req: Request,
+      svc: Service[Int => Message, Message]): Future[Response] = {
     val couldDispatch = canDispatch
 
     val msg = couldDispatch match {
       case CanDispatch.No => { tag: Int =>
-          Message.Treq(tag, Some(Trace.id), BufChannelBuffer(req.body))
-        }
+        Message.Treq(tag, Some(Trace.id), BufChannelBuffer(req.body))
+      }
 
       case CanDispatch.Yes | CanDispatch.Unknown => { tag: Int =>
-          val contexts = Contexts.broadcast.marshal().map {
-            case (k, v) => (BufChannelBuffer(k), BufChannelBuffer(v))
-          }
-          Message.Tdispatch(tag,
-                            contexts.toSeq,
-                            req.destination,
-                            Dtab.local,
-                            BufChannelBuffer(req.body))
+        val contexts = Contexts.broadcast.marshal().map {
+          case (k, v) => (BufChannelBuffer(k), BufChannelBuffer(v))
         }
+        Message.Tdispatch(
+          tag,
+          contexts.toSeq,
+          req.destination,
+          Dtab.local,
+          BufChannelBuffer(req.body))
+      }
     }
 
     if (couldDispatch != CanDispatch.Unknown) svc(msg).transform(reply)

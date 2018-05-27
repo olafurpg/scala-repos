@@ -19,37 +19,37 @@ object Extractor4 {
 
 class A {
   def f1(x: Any) = x match {
-    case CaseClass1() => -1
-    case CaseClass2(xs @ _ *) => xs.sum
-    case CaseClass3(x) => x
-    case CaseClass4(x, xs @ _ *) => x + xs.sum
-    case Extractor4(x, xs @ _ *) => 1000 + x + xs.sum
-    case Extractor3(x) => 1000 + x
-    case Extractor2(xs @ _ *) => 1000 + xs.sum
-    case Extractor1() => -3
-    case _ => -2
+    case CaseClass1()           => -1
+    case CaseClass2(xs @ _*)    => xs.sum
+    case CaseClass3(x)          => x
+    case CaseClass4(x, xs @ _*) => x + xs.sum
+    case Extractor4(x, xs @ _*) => 1000 + x + xs.sum
+    case Extractor3(x)          => 1000 + x
+    case Extractor2(xs @ _*)    => 1000 + xs.sum
+    case Extractor1()           => -3
+    case _                      => -2
   }
   def f2(x: Any) = x match {
-    case Extractor4(x, xs @ _ *) => 1000 + x + xs.sum
-    case Extractor3(x) => 1000 + x
-    case Extractor2(xs @ _ *) => 1000 + xs.sum
-    case Extractor1() => -3
-    case CaseClass1() => -1
-    case CaseClass2(xs @ _ *) => xs.sum
-    case CaseClass3(x) => x
-    case CaseClass4(x, xs @ _ *) => x + xs.sum
-    case _ => -2
+    case Extractor4(x, xs @ _*) => 1000 + x + xs.sum
+    case Extractor3(x)          => 1000 + x
+    case Extractor2(xs @ _*)    => 1000 + xs.sum
+    case Extractor1()           => -3
+    case CaseClass1()           => -1
+    case CaseClass2(xs @ _*)    => xs.sum
+    case CaseClass3(x)          => x
+    case CaseClass4(x, xs @ _*) => x + xs.sum
+    case _                      => -2
   }
   def run() {
     List(
-        f1(CaseClass1()),
-        f1(CaseClass2(1, 2, 3)),
-        f1(CaseClass3(4)),
-        f1(CaseClass4(5, 6, 7)),
-        f2(CaseClass1()),
-        f2(CaseClass2(1, 2, 3)),
-        f2(CaseClass3(4)),
-        f2(CaseClass4(5, 6, 7))
+      f1(CaseClass1()),
+      f1(CaseClass2(1, 2, 3)),
+      f1(CaseClass3(4)),
+      f1(CaseClass4(5, 6, 7)),
+      f2(CaseClass1()),
+      f2(CaseClass2(1, 2, 3)),
+      f2(CaseClass3(4)),
+      f2(CaseClass4(5, 6, 7))
     ) foreach println
   }
 }
@@ -74,28 +74,28 @@ class B {
   }
 
   def f1(x: CaseClass) = x match { case CaseClass(y, z) => y }
-  def f2(x: Any) = x match { case Extractor(y, z) => y }
+  def f2(x: Any) = x match { case Extractor(y, z)       => y }
 
   def f3(x: CaseSeq) = x match {
-    case CaseSeq(x, y) => y
+    case CaseSeq(x, y)    => y
     case CaseSeq(x, y, z) => z
   }
   def f4(x: CaseSeq) = x match {
-    case CaseSeq(x, y, z) => z :: Nil
-    case CaseSeq(x, y, z @ _ *) => z
+    case CaseSeq(x, y, z)      => z :: Nil
+    case CaseSeq(x, y, z @ _*) => z
   }
 
-  def f5(x: Any) = x match { case ExtractorSeq(x, y, z) => z }
-  def f6(x: Any) = x match { case ExtractorSeq(x, y, z @ _ *) => z }
+  def f5(x: Any) = x match { case ExtractorSeq(x, y, z)      => z }
+  def f6(x: Any) = x match { case ExtractorSeq(x, y, z @ _*) => z }
 
   def g1(x: CaseClass0) = x match {
     case CaseClass0() => true
   }
   def g2(x: CaseClass0v) = x match {
-    case CaseClass0v() => true
-    case CaseClass0v(5) => true
-    case CaseClass0v(x) => true
-    case CaseClass0v(xs @ _ *) => false
+    case CaseClass0v()        => true
+    case CaseClass0v(5)       => true
+    case CaseClass0v(x)       => true
+    case CaseClass0v(xs @ _*) => false
   }
 }
 
@@ -111,7 +111,7 @@ package p1 {
     val foo = _Foo()
     foo match {
       case _Bar() =>
-      case _ => assert(false)
+      case _      => assert(false)
     }
   }
 }

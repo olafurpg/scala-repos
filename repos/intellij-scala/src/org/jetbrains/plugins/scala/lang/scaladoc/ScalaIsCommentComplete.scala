@@ -1,7 +1,16 @@
 package org.jetbrains.plugins.scala.lang.scaladoc
 
-import com.intellij.codeInsight.editorActions.{CommentCompleteHandler, JavaLikeQuoteHandler, QuoteHandler, TypedHandler}
-import com.intellij.lang.{CodeDocumentationAwareCommenter, Language, LanguageParserDefinitions}
+import com.intellij.codeInsight.editorActions.{
+  CommentCompleteHandler,
+  JavaLikeQuoteHandler,
+  QuoteHandler,
+  TypedHandler
+}
+import com.intellij.lang.{
+  CodeDocumentationAwareCommenter,
+  Language,
+  LanguageParserDefinitions
+}
 import com.intellij.lexer.Lexer
 import com.intellij.openapi.editor.Editor
 import com.intellij.psi.tree.IElementType
@@ -12,15 +21,17 @@ import org.jetbrains.plugins.scala.ScalaFileType
   * @author Alexander Podkhalyuzin
   */
 class ScalaIsCommentComplete extends CommentCompleteHandler {
-  def isApplicable(comment: PsiComment,
-                   commenter: CodeDocumentationAwareCommenter): Boolean = {
+  def isApplicable(
+      comment: PsiComment,
+      commenter: CodeDocumentationAwareCommenter): Boolean = {
     comment.getParent.getLanguage == ScalaFileType.SCALA_LANGUAGE
   }
 
   //same code in com.intellij.codeInsight.editorActions.EnterHandler
-  def isCommentComplete(comment: PsiComment,
-                        commenter: CodeDocumentationAwareCommenter,
-                        editor: Editor): Boolean = {
+  def isCommentComplete(
+      comment: PsiComment,
+      commenter: CodeDocumentationAwareCommenter,
+      editor: Editor): Boolean = {
     val commentText: String = comment.getText
     val docComment: Boolean = isDocComment(comment, commenter)
     val expectedCommentEnd: String =
@@ -35,14 +46,15 @@ class ScalaIsCommentComplete extends CommentCompleteHandler {
     val commentPrefix: String =
       if (docComment) commenter.getDocumentationCommentPrefix
       else commenter.getBlockCommentPrefix
-    lexer.start(commentText,
-                if (commentPrefix eq null) 0 else commentPrefix.length,
-                commentText.length)
+    lexer.start(
+      commentText,
+      if (commentPrefix eq null) 0 else commentPrefix.length,
+      commentText.length)
     val fileTypeHandler: QuoteHandler =
       TypedHandler.getQuoteHandler(containingFile, editor)
     val javaLikeQuoteHandler: JavaLikeQuoteHandler = fileTypeHandler match {
       case quoteHandler: JavaLikeQuoteHandler => quoteHandler
-      case _ => null
+      case _                                  => null
     }
     while (true) {
       val tokenType: IElementType = lexer.getTokenType
@@ -65,21 +77,21 @@ class ScalaIsCommentComplete extends CommentCompleteHandler {
       if (lexer.getTokenEnd == commentText.length) {
         if (lexer.getTokenType eq commenter.getLineCommentTokenType) {
           lexer.start(
-              commentText,
-              lexer.getTokenStart + commenter.getLineCommentPrefix.length,
-              commentText.length)
+            commentText,
+            lexer.getTokenStart + commenter.getLineCommentPrefix.length,
+            commentText.length)
           lexer.advance()
           continue = true
         } else if (isInvalidPsi(comment)) {
           return false
         } else {
           return lexer.getTokenEnd -
-          lexer.getTokenStart == 2 //difference from EnterHandler
+            lexer.getTokenStart == 2 //difference from EnterHandler
         }
       }
       if (!continue &&
           (tokenType == commenter.getDocumentationCommentTokenType ||
-              tokenType == commenter.getBlockCommentTokenType)) {
+          tokenType == commenter.getBlockCommentTokenType)) {
         return false
       } else if (!continue) {
         lexer.advance()

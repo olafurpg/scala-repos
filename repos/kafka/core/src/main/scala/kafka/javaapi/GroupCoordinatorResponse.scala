@@ -46,5 +46,5 @@ class GroupCoordinatorResponse(
 object GroupCoordinatorResponse {
   def readFrom(buffer: ByteBuffer) =
     new GroupCoordinatorResponse(
-        kafka.api.GroupCoordinatorResponse.readFrom(buffer))
+      kafka.api.GroupCoordinatorResponse.readFrom(buffer))
 }

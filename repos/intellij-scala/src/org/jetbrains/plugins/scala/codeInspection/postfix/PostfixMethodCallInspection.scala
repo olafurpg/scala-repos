@@ -12,7 +12,8 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
 class PostfixMethodCallInspection
     extends AbstractInspection(
-        "UseOfPostfixMethodCall", "Use of postfix method call") {
+      "UseOfPostfixMethodCall",
+      "Use of postfix method call") {
 
   def actionFor(holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
     case pexpr: ScPostfixExpr if !safe(pexpr) =>
@@ -22,7 +23,7 @@ class PostfixMethodCallInspection
   private def safe(pexpr: ScPostfixExpr): Boolean = {
     pexpr.getContext match {
       case _: ScParenthesisedExpr => true
-      case _: ScArgumentExprList => true
+      case _: ScArgumentExprList  => true
       case (_: ScAssignStmt) childOf (_: ScArgumentExprList) =>
         true //named arguments
       case _ =>

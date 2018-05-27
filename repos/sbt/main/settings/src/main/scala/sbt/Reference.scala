@@ -24,14 +24,16 @@ final case object ThisBuild extends BuildReference
 
 /** Uniquely identifies a build by a URI. */
 final case class BuildRef(build: URI)
-    extends BuildReference with ResolvedReference
+    extends BuildReference
+    with ResolvedReference
 
 /** Identifies a project. */
 sealed trait ProjectReference extends Reference
 
 /** Uniquely references a project by a URI and a project identifier String. */
 final case class ProjectRef(build: URI, project: String)
-    extends ProjectReference with ResolvedReference
+    extends ProjectReference
+    with ResolvedReference
 
 /** Identifies a project in the current build context. */
 final case class LocalProject(project: String) extends ProjectReference
@@ -80,34 +82,34 @@ object Reference {
   def display(ref: Reference): String =
     ref match {
       case pr: ProjectReference => display(pr)
-      case br: BuildReference => display(br)
+      case br: BuildReference   => display(br)
     }
 
   def display(ref: BuildReference): String =
     ref match {
-      case ThisBuild => "{<this>}"
+      case ThisBuild     => "{<this>}"
       case BuildRef(uri) => "{" + uri + "}"
     }
   def display(ref: ProjectReference): String =
     ref match {
-      case ThisProject => "{<this>}<this>"
-      case LocalRootProject => "{<this>}<root>"
-      case LocalProject(id) => "{<this>}" + id
-      case RootProject(uri) => "{" + uri + " }<root>"
+      case ThisProject         => "{<this>}<this>"
+      case LocalRootProject    => "{<this>}<root>"
+      case LocalProject(id)    => "{<this>}" + id
+      case RootProject(uri)    => "{" + uri + " }<root>"
       case ProjectRef(uri, id) => "{" + uri + "}" + id
     }
 
   def buildURI(ref: ResolvedReference): URI = ref match {
-    case BuildRef(b) => b
+    case BuildRef(b)      => b
     case ProjectRef(b, _) => b
   }
 
   /** Extracts the build URI from a Reference if one has been explicitly defined.*/
   def uri(ref: Reference): Option[URI] = ref match {
-    case RootProject(b) => Some(b)
+    case RootProject(b)   => Some(b)
     case ProjectRef(b, _) => Some(b)
-    case BuildRef(b) => Some(b)
-    case _ => None
+    case BuildRef(b)      => Some(b)
+    case _                => None
   }
 
   @deprecated("Explicitly wrap the URI in a call to RootProject.", "0.13.0")
@@ -116,7 +118,6 @@ object Reference {
   @deprecated("Explicitly wrap the File in a call to RootProject.", "0.13.0")
   implicit def fileToRef(f: File): ProjectReference = RootProject(f)
 
-  @deprecated(
-      "Explicitly wrap the String in a call to LocalProject.", "0.13.0")
+  @deprecated("Explicitly wrap the String in a call to LocalProject.", "0.13.0")
   implicit def stringToReference(s: String): ProjectReference = LocalProject(s)
 }

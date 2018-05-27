@@ -47,8 +47,8 @@ object Transform {
 
   def taskToNode(pre: Task ~> Task): NodeView[Task] = new NodeView[Task] {
     def apply[T](t: Task[T]): Node[Task, T] = pre(t).work match {
-      case Pure(eval, _) => uniform(Nil)(_ => Right(eval()))
-      case m: Mapped[t, k] => toNode[t, k](m.in)(right ∙ m.f)(m.alist)
+      case Pure(eval, _)       => uniform(Nil)(_ => Right(eval()))
+      case m: Mapped[t, k]     => toNode[t, k](m.in)(right ∙ m.f)(m.alist)
       case m: FlatMapped[t, k] => toNode[t, k](m.in)(left ∙ m.f)(m.alist)
       case DependsOn(in, deps) =>
         uniform(existToAny(deps))(const(Left(in)) ∙ all)
@@ -56,7 +56,7 @@ object Transform {
     }
     def inline[T](t: Task[T]) = t.work match {
       case Pure(eval, true) => Some(eval)
-      case _ => None
+      case _                => None
     }
   }
 

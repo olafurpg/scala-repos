@@ -16,8 +16,7 @@ object ValueUsed {
   }
 }
 
-case class ReadValueUsed(override val e: PsiNamedElement)
-    extends ValueUsed(e) {
+case class ReadValueUsed(override val e: PsiNamedElement) extends ValueUsed(e) {
   override def toString: String = "ValueRead(" + super.toString + ""
 }
 

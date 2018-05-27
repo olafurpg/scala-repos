@@ -18,7 +18,9 @@ import java.util.UUID.{randomUUID ⇒ newUuid}
 object ActorLifeCycleSpec {
 
   class LifeCycleTestActor(
-      testActor: ActorRef, id: String, generationProvider: AtomicInteger)
+      testActor: ActorRef,
+      id: String,
+      generationProvider: AtomicInteger)
       extends Actor {
     def report(msg: Any) = testActor ! message(msg)
     def message(msg: Any): Tuple3[Any, String, Int] = (msg, id, currentGen)
@@ -32,7 +34,9 @@ object ActorLifeCycleSpec {
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class ActorLifeCycleSpec
     extends AkkaSpec("akka.actor.serialize-messages=off")
-    with BeforeAndAfterEach with ImplicitSender with DefaultTimeout {
+    with BeforeAndAfterEach
+    with ImplicitSender
+    with DefaultTimeout {
   import ActorLifeCycleSpec._
 
   "An Actor" must {
@@ -41,20 +45,21 @@ class ActorLifeCycleSpec
       filterException[ActorKilledException] {
         val id = newUuid.toString
         val supervisor =
-          system.actorOf(Props(classOf[Supervisor],
-                               OneForOneStrategy(maxNrOfRetries = 3)(
-                                   List(classOf[Exception]))))
+          system.actorOf(
+            Props(
+              classOf[Supervisor],
+              OneForOneStrategy(maxNrOfRetries = 3)(List(classOf[Exception]))))
         val gen = new AtomicInteger(0)
-        val restarterProps = Props(
-            new LifeCycleTestActor(testActor, id, gen) {
+        val restarterProps = Props(new LifeCycleTestActor(testActor, id, gen) {
           override def preRestart(reason: Throwable, message: Option[Any]) {
             report("preRestart")
           }
           override def postRestart(reason: Throwable) { report("postRestart") }
         }).withDeploy(Deploy.local)
         val restarter =
-          Await.result((supervisor ? restarterProps).mapTo[ActorRef],
-                       timeout.duration)
+          Await.result(
+            (supervisor ? restarterProps).mapTo[ActorRef],
+            timeout.duration)
 
         expectMsg(("preStart", id, 0))
         restarter ! Kill
@@ -83,15 +88,17 @@ class ActorLifeCycleSpec
       filterException[ActorKilledException] {
         val id = newUuid().toString
         val supervisor =
-          system.actorOf(Props(classOf[Supervisor],
-                               OneForOneStrategy(maxNrOfRetries = 3)(
-                                   List(classOf[Exception]))))
+          system.actorOf(
+            Props(
+              classOf[Supervisor],
+              OneForOneStrategy(maxNrOfRetries = 3)(List(classOf[Exception]))))
         val gen = new AtomicInteger(0)
         val restarterProps =
           Props(classOf[LifeCycleTestActor], testActor, id, gen)
         val restarter =
-          Await.result((supervisor ? restarterProps).mapTo[ActorRef],
-                       timeout.duration)
+          Await.result(
+            (supervisor ? restarterProps).mapTo[ActorRef],
+            timeout.duration)
 
         expectMsg(("preStart", id, 0))
         restarter ! Kill
@@ -118,9 +125,10 @@ class ActorLifeCycleSpec
 
     "not invoke preRestart and postRestart when never restarted using OneForOneStrategy" in {
       val id = newUuid().toString
-      val supervisor = system.actorOf(Props(
-              classOf[Supervisor],
-              OneForOneStrategy(maxNrOfRetries = 3)(List(classOf[Exception]))))
+      val supervisor = system.actorOf(
+        Props(
+          classOf[Supervisor],
+          OneForOneStrategy(maxNrOfRetries = 3)(List(classOf[Exception]))))
       val gen = new AtomicInteger(0)
       val props = Props(classOf[LifeCycleTestActor], testActor, id, gen)
       val a =
@@ -146,21 +154,19 @@ class ActorLifeCycleSpec
 
     "clear the behavior stack upon restart" in {
       final case class Become(recv: ActorContext ⇒ Receive)
-      val a = system.actorOf(
-          Props(new Actor {
+      val a = system.actorOf(Props(new Actor {
         def receive = {
           case Become(beh) ⇒ {
-              context.become(beh(context), discardOld = false); sender() ! "ok"
-            }
+            context.become(beh(context), discardOld = false); sender() ! "ok"
+          }
           case x ⇒ sender() ! 42
         }
       }))
       a ! "hello"
       expectMsg(42)
-      a ! Become(ctx ⇒
-            {
-          case "fail" ⇒ throw new RuntimeException("buh")
-          case x ⇒ ctx.sender() ! 43
+      a ! Become(ctx ⇒ {
+        case "fail" ⇒ throw new RuntimeException("buh")
+        case x ⇒ ctx.sender() ! 43
       })
       expectMsg("ok")
       a ! "hello"

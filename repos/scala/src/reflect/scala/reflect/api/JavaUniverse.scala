@@ -45,7 +45,8 @@ trait JavaUniverse extends Universe { self =>
     *  @group JavaMirrors
     */
   trait JavaMirror
-      extends scala.reflect.api.Mirror[self.type] with RuntimeMirror {
+      extends scala.reflect.api.Mirror[self.type]
+      with RuntimeMirror {
     val classLoader: ClassLoader
     override def toString =
       s"JavaMirror with ${runtime.ReflectionUtils.show(classLoader)}"

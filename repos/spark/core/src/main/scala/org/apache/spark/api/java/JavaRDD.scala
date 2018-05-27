@@ -122,7 +122,9 @@ class JavaRDD[T](val rdd: RDD[T])(implicit val classTag: ClassTag[T])
     * @param seed seed for the random number generator
     */
   def sample(
-      withReplacement: Boolean, fraction: Double, seed: Long): JavaRDD[T] =
+      withReplacement: Boolean,
+      fraction: Double,
+      seed: Long): JavaRDD[T] =
     wrapRDD(rdd.sample(withReplacement, fraction, seed))
 
   /**
@@ -192,9 +194,10 @@ class JavaRDD[T](val rdd: RDD[T])(implicit val classTag: ClassTag[T])
   /**
     * Return this RDD sorted by the given key function.
     */
-  def sortBy[S](f: JFunction[T, S],
-                ascending: Boolean,
-                numPartitions: Int): JavaRDD[T] = {
+  def sortBy[S](
+      f: JFunction[T, S],
+      ascending: Boolean,
+      numPartitions: Int): JavaRDD[T] = {
     def fn: (T) => S = (x: T) => f.call(x)
     import com.google.common.collect.Ordering // shadows scala.math.Ordering
     implicit val ordering = Ordering.natural().asInstanceOf[Ordering[S]]
@@ -205,7 +208,7 @@ class JavaRDD[T](val rdd: RDD[T])(implicit val classTag: ClassTag[T])
 
 object JavaRDD {
 
-  implicit def fromRDD[T : ClassTag](rdd: RDD[T]): JavaRDD[T] =
+  implicit def fromRDD[T: ClassTag](rdd: RDD[T]): JavaRDD[T] =
     new JavaRDD[T](rdd)
 
   implicit def toRDD[T](rdd: JavaRDD[T]): RDD[T] = rdd.rdd

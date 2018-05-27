@@ -14,7 +14,7 @@ private[message] final class MessageSecurity(
       case true => fuccess(false)
       case false =>
         getPref(to).map(_.message) flatMap {
-          case NEVER => fuccess(false)
+          case NEVER  => fuccess(false)
           case FRIEND => follows(to, from)
           case ALWAYS => fuccess(true)
         }

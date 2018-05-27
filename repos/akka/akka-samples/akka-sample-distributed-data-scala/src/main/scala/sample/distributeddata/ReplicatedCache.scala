@@ -34,7 +34,7 @@ class ReplicatedCache extends Actor {
   def receive = {
     case PutInCache(key, value) ⇒
       replicator ! Update(dataKey(key), LWWMap(), WriteLocal)(
-          _ + (key -> value))
+        _ + (key -> value))
     case Evict(key) ⇒
       replicator ! Update(dataKey(key), LWWMap(), WriteLocal)(_ - key)
     case GetFromCache(key) ⇒

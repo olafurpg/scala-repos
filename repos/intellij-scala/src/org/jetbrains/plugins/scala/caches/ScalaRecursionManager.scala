@@ -34,19 +34,22 @@ object ScalaRecursionManager {
   }
 
   private def getSearches[Dom <: PsiElement](
-      element: Dom, key: String): List[Object] = {
+      element: Dom,
+      key: String): List[Object] = {
     recursionMap.get().get((element, key)) match {
       case Some(buffer: List[Object]) => buffer
-      case _ => List.empty
+      case _                          => List.empty
     }
   }
 
   private def addLast[Dom <: PsiElement](
-      element: Dom, key: String, obj: Object) {
+      element: Dom,
+      key: String,
+      obj: Object) {
     recursionMap.get().get((element, key)) match {
       case Some(list) =>
         recursionMap.set(
-            recursionMap.get().updated((element, key), obj :: list))
+          recursionMap.get().updated((element, key), obj :: list))
       case _ =>
         recursionMap.set(recursionMap.get() + ((element, key) -> List(obj)))
     }

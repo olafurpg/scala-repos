@@ -25,21 +25,21 @@ import java.util.concurrent.{ConcurrentHashMap => CHash}
 
 object ResourceServer {
   var allowedPaths: PartialFunction[List[String], Boolean] = {
-    case "lift.js" :: Nil => true
-    case "jquery.js" :: Nil => true
-    case "yui" :: _ => true
-    case "liftYUI.js" :: Nil => true
-    case "extcore" :: _ => true
+    case "lift.js" :: Nil        => true
+    case "jquery.js" :: Nil      => true
+    case "yui" :: _              => true
+    case "liftYUI.js" :: Nil     => true
+    case "extcore" :: _          => true
     case "liftExtCore.js" :: Nil => true
-    case "json2.js" :: Nil => true
-    case "json.js" :: Nil => true
-    case "jlift.js" :: Nil => true
+    case "json2.js" :: Nil       => true
+    case "json.js" :: Nil        => true
+    case "jlift.js" :: Nil       => true
     case bp @ ("blueprint" :: _)
         if bp.last.endsWith(".css") || bp.last.endsWith(".png") =>
       true
-    case "jquery-autocomplete" :: "jquery.autocomplete.js" :: Nil => true
+    case "jquery-autocomplete" :: "jquery.autocomplete.js" :: Nil  => true
     case "jquery-autocomplete" :: "jquery.autocomplete.css" :: Nil => true
-    case "jquery-autocomplete" :: "indicator.gif" :: Nil => true
+    case "jquery-autocomplete" :: "indicator.gif" :: Nil           => true
   }
 
   private def rewriter = new PartialFunction[List[String], List[String]] {
@@ -52,10 +52,10 @@ object ResourceServer {
 
   @volatile var pathRewriter: PartialFunction[List[String], List[String]] =
     rewriter orElse {
-      case "lift.js" :: Nil => List("lift-min.js")
-      case "json.js" :: Nil => List("json2-min.js")
+      case "lift.js" :: Nil  => List("lift-min.js")
+      case "json.js" :: Nil  => List("json2-min.js")
       case "json2.js" :: Nil => List("json2-min.js")
-      case xs => xs
+      case xs                => xs
     }
 
   /**
@@ -79,7 +79,7 @@ object ResourceServer {
                 case jc: JarURLConnection =>
                   jc.getJarEntry() match {
                     case null => 0L
-                    case e => e.getTime()
+                    case e    => e.getTime()
                   }
                 case _ => 0L
               }
@@ -102,23 +102,26 @@ object ResourceServer {
       lastModified = calcLastModified(url)
     } yield
       request.testFor304(
-          lastModified, "Expires" -> toInternetDate(millis + 30.days)) openOr {
+        lastModified,
+        "Expires" -> toInternetDate(millis + 30.days)) openOr {
         val stream = url.openStream
         val uc = url.openConnection
         StreamingResponse(
-            stream,
-            () => stream.close,
-            uc.getContentLength,
-            (if (lastModified == 0L) Nil
-             else
-               List("Last-Modified" -> toInternetDate(lastModified))) ::: List(
-                "Expires" -> toInternetDate(millis + 30.days),
-                "Date" -> Helpers.nowAsInternetDate,
-                "Pragma" -> "",
-                "Cache-Control" -> "",
-                "Content-Type" -> detectContentType(rw.last)),
-            Nil,
-            200)
+          stream,
+          () => stream.close,
+          uc.getContentLength,
+          (if (lastModified == 0L) Nil
+           else
+             List("Last-Modified" -> toInternetDate(lastModified))) ::: List(
+            "Expires" -> toInternetDate(millis + 30.days),
+            "Date" -> Helpers.nowAsInternetDate,
+            "Pragma" -> "",
+            "Cache-Control" -> "",
+            "Content-Type" -> detectContentType(rw.last)
+          ),
+          Nil,
+          200
+        )
       }
 
   /**
@@ -135,7 +138,9 @@ object ResourceServer {
   def detectContentType(path: String): String = {
     // Configure response with content type of resource
     (LiftRules.context.mimeType(path) or
-        (Box !! URLConnection.getFileNameMap().getContentTypeFor(path))) openOr "application/octet-stream"
+      (Box !! URLConnection
+        .getFileNameMap()
+        .getContentTypeFor(path))) openOr "application/octet-stream"
   }
 
   private def isAllowed(path: List[String]) =

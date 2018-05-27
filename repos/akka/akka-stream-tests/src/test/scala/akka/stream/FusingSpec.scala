@@ -24,15 +24,18 @@ class FusingSpec extends AkkaSpec {
     Source
       .unfold(1)(x ⇒ Some(x -> x))
       .filter(_ % 2 == 1)
-      .alsoTo(Flow[Int]
-            .fold(0)(_ + _)
-            .to(Sink.head.named("otherSink"))
-            .addAttributes(if (async) Attributes.asyncBoundary
-                else Attributes.none))
+      .alsoTo(
+        Flow[Int]
+          .fold(0)(_ + _)
+          .to(Sink.head.named("otherSink"))
+          .addAttributes(if (async) Attributes.asyncBoundary
+          else Attributes.none))
       .via(Flow[Int].fold(1)(_ + _).named("mainSink"))
 
   def singlePath[S <: Shape, M](
-      fg: FusedGraph[S, M], from: Attribute, to: Attribute): Unit = {
+      fg: FusedGraph[S, M],
+      from: Attribute,
+      to: Attribute): Unit = {
     val starts = fg.module.info.allModules.filter(_.attributes.contains(from))
     starts.size should ===(1)
     val start = starts.head
@@ -59,15 +62,16 @@ class FusingSpec extends AkkaSpec {
   "Fusing" must {
 
     def verify[S <: Shape, M](
-        fused: FusedGraph[S, M], modules: Int, downstreams: Int): Unit = {
+        fused: FusedGraph[S, M],
+        modules: Int,
+        downstreams: Int): Unit = {
       val module = fused.module
       module.subModules.size should ===(modules)
       module.downstreams.size should ===(modules - 1)
       module.info.downstreams.size should be >= downstreams
       module.info.upstreams.size should be >= downstreams
       singlePath(fused, Attributes.Name("mainSink"), Attributes.Name("unfold"))
-      singlePath(
-          fused, Attributes.Name("otherSink"), Attributes.Name("unfold"))
+      singlePath(fused, Attributes.Name("otherSink"), Attributes.Name("unfold"))
     }
 
     "fuse a moderately complex graph" in {

@@ -20,7 +20,7 @@ class RingTest extends FunSuite {
     *
     *   a=-3  b=3  c=-9
     */
-  def runWith[@sp A : Ring : ClassTag](cls: String)(a: A, b: A, c: A): Unit = {
+  def runWith[@sp A: Ring: ClassTag](cls: String)(a: A, b: A, c: A): Unit = {
 
     val m = implicitly[ClassTag[A]]
 
@@ -78,9 +78,9 @@ class RingTest extends FunSuite {
   // commented out due to specialization bug
   runWith[Complex[Double]]("Complex[Double]")(-3, 3, -9)
   runWith[Complex[BigDecimal]]("Complex[BigDecimal]")(
-      Complex(BigDecimal(-3), BigDecimal(0)),
-      Complex(BigDecimal(3), BigDecimal(0)),
-      Complex(BigDecimal(-9), BigDecimal(0)))
+    Complex(BigDecimal(-3), BigDecimal(0)),
+    Complex(BigDecimal(3), BigDecimal(0)),
+    Complex(BigDecimal(-9), BigDecimal(0)))
   runWith[Jet[Double]]("Jet[Double]")(Jet(-3), Jet(3), Jet(-9))
 
   {

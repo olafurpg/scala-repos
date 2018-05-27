@@ -5,7 +5,10 @@ package akka.remote.transport.netty
 
 import akka.actor.Address
 import akka.remote.transport.AssociationHandle
-import akka.remote.transport.AssociationHandle.{HandleEventListener, InboundPayload}
+import akka.remote.transport.AssociationHandle.{
+  HandleEventListener,
+  InboundPayload
+}
 import akka.remote.transport.Transport.AssociationEventListener
 import akka.util.ByteString
 import java.net.{SocketAddress, InetAddress, InetSocketAddress}
@@ -18,9 +21,10 @@ import scala.concurrent.{Future, Promise}
   */
 private[remote] trait UdpHandlers extends CommonHandlers {
 
-  override def createHandle(channel: Channel,
-                            localAddress: Address,
-                            remoteAddress: Address): AssociationHandle =
+  override def createHandle(
+      channel: Channel,
+      localAddress: Address,
+      remoteAddress: Address): AssociationHandle =
     new UdpAssociationHandle(localAddress, remoteAddress, channel, transport)
 
   override def registerListener(
@@ -28,11 +32,12 @@ private[remote] trait UdpHandlers extends CommonHandlers {
       listener: HandleEventListener,
       msg: ChannelBuffer,
       remoteSocketAddress: InetSocketAddress): Unit = {
-    transport.udpConnectionTable.putIfAbsent(remoteSocketAddress, listener) match {
+    transport.udpConnectionTable
+      .putIfAbsent(remoteSocketAddress, listener) match {
       case null ⇒ listener notify InboundPayload(ByteString(msg.array()))
       case oldReader ⇒
         throw new NettyTransportException(
-            s"Listener $listener attempted to register for remote address $remoteSocketAddress but $oldReader was already registered.")
+          s"Listener $listener attempted to register for remote address $remoteSocketAddress but $oldReader was already registered.")
     }
   }
 
@@ -41,9 +46,10 @@ private[remote] trait UdpHandlers extends CommonHandlers {
       case inetSocketAddress: InetSocketAddress ⇒
         if (!transport.udpConnectionTable.containsKey(inetSocketAddress)) {
           e.getChannel.setReadable(false)
-          initUdp(e.getChannel,
-                  e.getRemoteAddress,
-                  e.getMessage.asInstanceOf[ChannelBuffer])
+          initUdp(
+            e.getChannel,
+            e.getRemoteAddress,
+            e.getMessage.asInstanceOf[ChannelBuffer])
         } else {
           val listener = transport.udpConnectionTable.get(inetSocketAddress)
           val bytes: Array[Byte] =
@@ -54,9 +60,10 @@ private[remote] trait UdpHandlers extends CommonHandlers {
       case _ ⇒
     }
 
-  def initUdp(channel: Channel,
-              remoteSocketAddress: SocketAddress,
-              msg: ChannelBuffer): Unit
+  def initUdp(
+      channel: Channel,
+      remoteSocketAddress: SocketAddress,
+      msg: ChannelBuffer): Unit
 }
 
 /**
@@ -68,9 +75,10 @@ private[remote] class UdpServerHandler(
     extends ServerHandler(_transport, _associationListenerFuture)
     with UdpHandlers {
 
-  override def initUdp(channel: Channel,
-                       remoteSocketAddress: SocketAddress,
-                       msg: ChannelBuffer): Unit =
+  override def initUdp(
+      channel: Channel,
+      remoteSocketAddress: SocketAddress,
+      msg: ChannelBuffer): Unit =
     initInbound(channel, remoteSocketAddress, msg)
 }
 
@@ -78,12 +86,15 @@ private[remote] class UdpServerHandler(
   * INTERNAL API
   */
 private[remote] class UdpClientHandler(
-    _transport: NettyTransport, remoteAddress: Address)
-    extends ClientHandler(_transport, remoteAddress) with UdpHandlers {
+    _transport: NettyTransport,
+    remoteAddress: Address)
+    extends ClientHandler(_transport, remoteAddress)
+    with UdpHandlers {
 
-  override def initUdp(channel: Channel,
-                       remoteSocketAddress: SocketAddress,
-                       msg: ChannelBuffer): Unit =
+  override def initUdp(
+      channel: Channel,
+      remoteSocketAddress: SocketAddress,
+      msg: ChannelBuffer): Unit =
     initOutbound(channel, remoteSocketAddress, msg)
 }
 
@@ -102,8 +113,9 @@ private[remote] class UdpAssociationHandle(
   override def write(payload: ByteString): Boolean = {
     if (!channel.isConnected)
       channel.connect(
-          new InetSocketAddress(InetAddress.getByName(remoteAddress.host.get),
-                                remoteAddress.port.get))
+        new InetSocketAddress(
+          InetAddress.getByName(remoteAddress.host.get),
+          remoteAddress.port.get))
 
     if (channel.isWritable && channel.isOpen) {
       channel.write(ChannelBuffers.wrappedBuffer(payload.asByteBuffer))
@@ -112,6 +124,7 @@ private[remote] class UdpAssociationHandle(
   }
 
   override def disassociate(): Unit =
-    try channel.close() finally transport.udpConnectionTable.remove(
-        transport.addressToSocketAddress(remoteAddress))
+    try channel.close()
+    finally transport.udpConnectionTable.remove(
+      transport.addressToSocketAddress(remoteAddress))
 }

@@ -1,18 +1,20 @@
 package java.nio
 
 private[nio] object ByteArrayBits {
-  def apply(array: Array[Byte],
-            arrayOffset: Int,
-            isBigEndian: Boolean,
-            indexMultiplier: Int = 1): ByteArrayBits =
+  def apply(
+      array: Array[Byte],
+      arrayOffset: Int,
+      isBigEndian: Boolean,
+      indexMultiplier: Int = 1): ByteArrayBits =
     new ByteArrayBits(array, arrayOffset, isBigEndian, indexMultiplier)
 }
 
 @inline
-private[nio] final class ByteArrayBits(array: Array[Byte],
-                                       arrayOffset: Int,
-                                       isBigEndian: Boolean,
-                                       indexMultiplier: Int) {
+private[nio] final class ByteArrayBits(
+    array: Array[Byte],
+    arrayOffset: Int,
+    isBigEndian: Boolean,
+    indexMultiplier: Int) {
 
   /* We use tuples of bytes instead of, say, arrays, because they can be
    * completely stack-allocated.
@@ -87,28 +89,30 @@ private[nio] final class ByteArrayBits(array: Array[Byte],
     makeLong(bs._1, bs._2, bs._3, bs._4, bs._5, bs._6, bs._7, bs._8)
 
   @inline
-  private def makeLong(b0: Byte,
-                       b1: Byte,
-                       b2: Byte,
-                       b3: Byte,
-                       b4: Byte,
-                       b5: Byte,
-                       b6: Byte,
-                       b7: Byte): Long =
+  private def makeLong(
+      b0: Byte,
+      b1: Byte,
+      b2: Byte,
+      b3: Byte,
+      b4: Byte,
+      b5: Byte,
+      b6: Byte,
+      b7: Byte): Long =
     if (isBigEndian) makeLongBE(b0, b1, b2, b3, b4, b5, b6, b7)
     else makeLongBE(b7, b6, b5, b4, b3, b2, b1, b0)
 
   @inline
-  private def makeLongBE(b0: Byte,
-                         b1: Byte,
-                         b2: Byte,
-                         b3: Byte,
-                         b4: Byte,
-                         b5: Byte,
-                         b6: Byte,
-                         b7: Byte): Long = {
+  private def makeLongBE(
+      b0: Byte,
+      b1: Byte,
+      b2: Byte,
+      b3: Byte,
+      b4: Byte,
+      b5: Byte,
+      b6: Byte,
+      b7: Byte): Long = {
     (makeIntBE(b0, b1, b2, b3).toLong << 32) |
-    (makeIntBE(b4, b5, b6, b7).toLong & 0xffffffffL)
+      (makeIntBE(b4, b5, b6, b7).toLong & 0xffffffffL)
   }
 
   @inline
@@ -125,14 +129,15 @@ private[nio] final class ByteArrayBits(array: Array[Byte],
     makeDouble(bs._1, bs._2, bs._3, bs._4, bs._5, bs._6, bs._7, bs._8)
 
   @inline
-  private def makeDouble(b0: Byte,
-                         b1: Byte,
-                         b2: Byte,
-                         b3: Byte,
-                         b4: Byte,
-                         b5: Byte,
-                         b6: Byte,
-                         b7: Byte): Double =
+  private def makeDouble(
+      b0: Byte,
+      b1: Byte,
+      b2: Byte,
+      b3: Byte,
+      b4: Byte,
+      b5: Byte,
+      b6: Byte,
+      b7: Byte): Double =
     java.lang.Double.longBitsToDouble(makeLong(b0, b1, b2, b3, b4, b5, b6, b7))
 
   @inline
@@ -205,14 +210,15 @@ private[nio] final class ByteArrayBits(array: Array[Byte],
   private def load8Bytes(
       index: Int): (Byte, Byte, Byte, Byte, Byte, Byte, Byte, Byte) = {
     val idx = indexMultiplier * index + arrayOffset
-    (array(idx),
-     array(idx + 1),
-     array(idx + 2),
-     array(idx + 3),
-     array(idx + 4),
-     array(idx + 5),
-     array(idx + 6),
-     array(idx + 7))
+    (
+      array(idx),
+      array(idx + 1),
+      array(idx + 2),
+      array(idx + 3),
+      array(idx + 4),
+      array(idx + 5),
+      array(idx + 6),
+      array(idx + 7))
   }
 
   @inline
@@ -232,9 +238,9 @@ private[nio] final class ByteArrayBits(array: Array[Byte],
   }
 
   @inline
-  private def store8Bytes(index: Int,
-                          bs: (Byte, Byte, Byte, Byte, Byte, Byte, Byte,
-                          Byte)): Unit = {
+  private def store8Bytes(
+      index: Int,
+      bs: (Byte, Byte, Byte, Byte, Byte, Byte, Byte, Byte)): Unit = {
     val idx = indexMultiplier * index + arrayOffset
     array(idx) = bs._1
     array(idx + 1) = bs._2

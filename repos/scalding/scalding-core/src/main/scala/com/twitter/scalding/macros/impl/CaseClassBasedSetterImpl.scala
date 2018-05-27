@@ -28,9 +28,10 @@ import com.twitter.bijection.macros.impl.IsCaseClassImpl
   */
 object CaseClassBasedSetterImpl {
 
-  def apply[T](c: Context)(container: c.TermName,
-                           allowUnknownTypes: Boolean,
-                           fsetter: CaseClassFieldSetter)(
+  def apply[T](c: Context)(
+      container: c.TermName,
+      allowUnknownTypes: Boolean,
+      fsetter: CaseClassFieldSetter)(
       implicit T: c.WeakTypeTag[T]): (Int, c.Tree) = {
     import c.universe._
 
@@ -49,8 +50,8 @@ object CaseClassBasedSetterImpl {
           case Success(tree) => tree
           case Failure(e) =>
             c.abort(
-                c.enclosingPosition,
-                s"Case class ${T} is supported. Error on $tpe, ${e.getMessage}")
+              c.enclosingPosition,
+              s"Case class ${T} is supported. Error on $tpe, ${e.getMessage}")
         }
     }
     case object DefaultSetter extends SetterBuilder {
@@ -80,8 +81,9 @@ object CaseClassBasedSetterImpl {
             case ((off, _), (access, sb)) =>
               val cca = newTermName(c.fresh(s"access"))
               val ccaT = q"$cca"
-              (off + sb.columns,
-               Some(q"val $cca = ${access(value)}; ${sb.setTree(ccaT, off)}"))
+              (
+                off + sb.columns,
+                Some(q"val $cca = ${access(value)}; ${sb.setTree(ccaT, off)}"))
           }
           .collect { case (_, Some(tree)) => tree }
         q"""..$setters"""
@@ -110,36 +112,40 @@ object CaseClassBasedSetterImpl {
           OptionSetter(matchField(innerType))
         case tpe
             if (tpe.typeSymbol.isClass && tpe.typeSymbol.asClass.isCaseClass) =>
-          CaseClassSetter(
-              expandMethod(normalized(tpe)).map {
+          CaseClassSetter(expandMethod(normalized(tpe)).map {
             case (fn, tpe) =>
               (fn, matchField(tpe))
           })
         case tpe if allowUnknownTypes =>
           DefaultSetter
         case _ =>
-          c.abort(c.enclosingPosition,
-                  s"Case class ${T.tpe} is not supported at type: $outerType")
+          c.abort(
+            c.enclosingPosition,
+            s"Case class ${T.tpe} is not supported at type: $outerType")
       }
     }
     def expandMethod(outerTpe: Type): Vector[(Tree => Tree, Type)] =
-      outerTpe.declarations.collect {
-        case m: MethodSymbol if m.isCaseAccessor => m
-      }.map { accessorMethod =>
-        val fieldType = normalized(accessorMethod.returnType.asSeenFrom(
-                outerTpe, outerTpe.typeSymbol.asClass))
+      outerTpe.declarations
+        .collect {
+          case m: MethodSymbol if m.isCaseAccessor => m
+        }
+        .map { accessorMethod =>
+          val fieldType = normalized(
+            accessorMethod.returnType
+              .asSeenFrom(outerTpe, outerTpe.typeSymbol.asClass))
 
-        ({ pTree: Tree =>
-          q"""$pTree.$accessorMethod"""
-        }, fieldType)
-      }.toVector
+          ({ pTree: Tree =>
+            q"""$pTree.$accessorMethod"""
+          }, fieldType)
+        }
+        .toVector
 
     // in TupleSetterImpl, the outer-most input val is called t, so we pass that in here:
     val sb = matchField(normalized(T.tpe))
     if (sb.columns == 0)
       c.abort(
-          c.enclosingPosition,
-          "Didn't consume any elements in the tuple, possibly empty case class?")
+        c.enclosingPosition,
+        "Didn't consume any elements in the tuple, possibly empty case class?")
     (sb.columns, sb.setTree(q"t", 0))
   }
 }

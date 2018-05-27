@@ -28,18 +28,20 @@ import org.json4s.JsonDSL._
   * @param metadata The metadata of this field. The metadata should be preserved during
   *                 transformation if the content of the column is not modified, e.g, in selection.
   */
-case class StructField(name: String,
-                       dataType: DataType,
-                       nullable: Boolean = true,
-                       metadata: Metadata = Metadata.empty) {
+case class StructField(
+    name: String,
+    dataType: DataType,
+    nullable: Boolean = true,
+    metadata: Metadata = Metadata.empty) {
 
   /** No-arg constructor for kryo. */
   protected def this() = this(null, null)
 
   private[sql] def buildFormattedString(
-      prefix: String, builder: StringBuilder): Unit = {
+      prefix: String,
+      builder: StringBuilder): Unit = {
     builder.append(
-        s"$prefix-- $name: ${dataType.typeName} (nullable = $nullable)\n")
+      s"$prefix-- $name: ${dataType.typeName} (nullable = $nullable)\n")
     DataType.buildFormattedString(dataType, s"$prefix    |", builder)
   }
 
@@ -48,6 +50,6 @@ case class StructField(name: String,
 
   private[sql] def jsonValue: JValue = {
     ("name" -> name) ~ ("type" -> dataType.jsonValue) ~
-    ("nullable" -> nullable) ~ ("metadata" -> metadata.jsonValue)
+      ("nullable" -> nullable) ~ ("metadata" -> metadata.jsonValue)
   }
 }

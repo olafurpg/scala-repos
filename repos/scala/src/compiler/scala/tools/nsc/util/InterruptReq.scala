@@ -43,7 +43,7 @@ abstract class InterruptReq {
 
     result.get match {
       case Left(res) => res
-      case Right(t) => throw new FailedInterrupt(t)
+      case Right(t)  => throw new FailedInterrupt(t)
     }
   }
 

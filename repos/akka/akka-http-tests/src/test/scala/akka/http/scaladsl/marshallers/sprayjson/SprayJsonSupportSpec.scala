@@ -21,7 +21,9 @@ class SprayJsonSupportSpec extends JsonSupportSpec {
 
   implicit val orderedFieldPrint: JsonPrinter = new PrettyPrinter {
     override protected def printObject(
-        members: Map[String, JsValue], sb: StringBuilder, indent: Int): Unit =
+        members: Map[String, JsValue],
+        sb: StringBuilder,
+        indent: Int): Unit =
       super.printObject(ListMap(members.toSeq.sortBy(_._1): _*), sb, indent)
   }
 

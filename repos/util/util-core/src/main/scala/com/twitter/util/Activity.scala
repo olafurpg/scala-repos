@@ -38,7 +38,8 @@ case class Activity[+T](run: Var[Activity.State[T]]) {
     */
   def collect[U](f: PartialFunction[T, U]): Activity[U] = flatMap {
     case t if f.isDefinedAt(t) =>
-      try Activity.value(f(t)) catch {
+      try Activity.value(f(t))
+      catch {
         case NonFatal(exc) => Activity.exception(exc)
       }
     case _ => Activity.pending
@@ -54,15 +55,15 @@ case class Activity[+T](run: Var[Activity.State[T]]) {
     * The activity which behaves as `f` applied to Ok values.
     */
   def flatMap[U](f: T => Activity[U]): Activity[U] =
-    Activity(
-        run flatMap {
+    Activity(run flatMap {
       case Ok(v) =>
-        val a = try f(v) catch {
+        val a = try f(v)
+        catch {
           case NonFatal(exc) => Activity.exception(exc)
         }
 
         a.run
-      case Pending => Var.value(Activity.Pending)
+      case Pending         => Var.value(Activity.Pending)
       case exc @ Failed(_) => Var.value(exc)
     })
 
@@ -71,9 +72,9 @@ case class Activity[+T](run: Var[Activity.State[T]]) {
     * of this activity.
     */
   def transform[U](f: Activity.State[T] => Activity[U]): Activity[U] =
-    Activity(
-        run flatMap { act =>
-      val a = try f(act) catch {
+    Activity(run flatMap { act =>
+      val a = try f(act)
+      catch {
         case NonFatal(exc) => Activity.exception(exc)
       }
       a.run
@@ -85,9 +86,9 @@ case class Activity[+T](run: Var[Activity.State[T]]) {
   def handle[U >: T](h: PartialFunction[Throwable, U]): Activity[U] =
     transform {
       case Activity.Failed(e) if h.isDefinedAt(e) => Activity.value(h(e))
-      case Activity.Pending => Activity.pending
-      case Activity.Failed(e) => Activity.exception(e)
-      case Activity.Ok(t) => Activity.value(t)
+      case Activity.Pending                       => Activity.pending
+      case Activity.Failed(e)                     => Activity.exception(e)
+      case Activity.Ok(t)                         => Activity.value(t)
     }
 
   /**
@@ -100,7 +101,7 @@ case class Activity[+T](run: Var[Activity.State[T]]) {
     * values.
     */
   def values: Event[Try[T]] = states collect {
-    case Ok(v) => Return(v)
+    case Ok(v)       => Return(v)
     case Failed(exc) => Throw(exc)
   }
 
@@ -124,7 +125,7 @@ object Activity {
     val v = Var(Pending: State[T])
     val w: Witness[Try[T]] =
       Witness(v) comap {
-        case Return(v) => Ok(v)
+        case Return(v)  => Ok(v)
         case Throw(exc) => Failed(exc)
       }
 
@@ -145,7 +146,7 @@ object Activity {
     *
     *   @inheritdoc
     */
-  def collect[T : ClassTag, CC[X] <: Traversable[X]](acts: CC[Activity[T]])(
+  def collect[T: ClassTag, CC[X] <: Traversable[X]](acts: CC[Activity[T]])(
       implicit newBuilder: CanBuild[T, CC[T]]): Activity[CC[T]] = {
     if (acts.isEmpty) return Activity.value(newBuilder().result)
 
@@ -156,20 +157,20 @@ object Activity {
       val notOk =
         states find {
           case Pending | Failed(_) => true
-          case Ok(_) => false
+          case Ok(_)               => false
         }
 
       notOk match {
-        case None =>
-        case Some(Pending) => return Pending
+        case None                =>
+        case Some(Pending)       => return Pending
         case Some(f @ Failed(_)) => return f
-        case Some(_) => assert(false)
+        case Some(_)             => assert(false)
       }
 
       val ts = newBuilder()
       states foreach {
         case Ok(t) => ts += t
-        case _ => assert(false)
+        case _     => assert(false)
       }
 
       Ok(ts.result)
@@ -194,7 +195,9 @@ object Activity {
     * do.
     */
   def join[A, B, C](
-      a: Activity[A], b: Activity[B], c: Activity[C]): Activity[(A, B, C)] =
+      a: Activity[A],
+      b: Activity[B],
+      c: Activity[C]): Activity[(A, B, C)] =
     collect(Seq(a, b, c)) map { ss =>
       (ss(0).asInstanceOf[A], ss(1).asInstanceOf[B], ss(2).asInstanceOf[C])
     }
@@ -204,15 +207,17 @@ object Activity {
     * underlying Activities are nonpending. It fails immediately if any of them
     * do.
     */
-  def join[A, B, C, D](a: Activity[A],
-                       b: Activity[B],
-                       c: Activity[C],
-                       d: Activity[D]): Activity[(A, B, C, D)] =
+  def join[A, B, C, D](
+      a: Activity[A],
+      b: Activity[B],
+      c: Activity[C],
+      d: Activity[D]): Activity[(A, B, C, D)] =
     collect(Seq(a, b, c, d)) map { ss =>
-      (ss(0).asInstanceOf[A],
-       ss(1).asInstanceOf[B],
-       ss(2).asInstanceOf[C],
-       ss(3).asInstanceOf[D])
+      (
+        ss(0).asInstanceOf[A],
+        ss(1).asInstanceOf[B],
+        ss(2).asInstanceOf[C],
+        ss(3).asInstanceOf[D])
     }
 
   /**
@@ -220,17 +225,19 @@ object Activity {
     * underlying Activities are nonpending. It fails immediately if any of them
     * do.
     */
-  def join[A, B, C, D, E](a: Activity[A],
-                          b: Activity[B],
-                          c: Activity[C],
-                          d: Activity[D],
-                          e: Activity[E]): Activity[(A, B, C, D, E)] =
+  def join[A, B, C, D, E](
+      a: Activity[A],
+      b: Activity[B],
+      c: Activity[C],
+      d: Activity[D],
+      e: Activity[E]): Activity[(A, B, C, D, E)] =
     collect(Seq(a, b, c, d, e)) map { ss =>
-      (ss(0).asInstanceOf[A],
-       ss(1).asInstanceOf[B],
-       ss(2).asInstanceOf[C],
-       ss(3).asInstanceOf[D],
-       ss(4).asInstanceOf[E])
+      (
+        ss(0).asInstanceOf[A],
+        ss(1).asInstanceOf[B],
+        ss(2).asInstanceOf[C],
+        ss(3).asInstanceOf[D],
+        ss(4).asInstanceOf[E])
     }
 
   /**
@@ -238,19 +245,21 @@ object Activity {
     * underlying Activities are nonpending. It fails immediately if any of them
     * do.
     */
-  def join[A, B, C, D, E, F](a: Activity[A],
-                             b: Activity[B],
-                             c: Activity[C],
-                             d: Activity[D],
-                             e: Activity[E],
-                             f: Activity[F]): Activity[(A, B, C, D, E, F)] =
+  def join[A, B, C, D, E, F](
+      a: Activity[A],
+      b: Activity[B],
+      c: Activity[C],
+      d: Activity[D],
+      e: Activity[E],
+      f: Activity[F]): Activity[(A, B, C, D, E, F)] =
     collect(Seq(a, b, c, d, e, f)) map { ss =>
-      (ss(0).asInstanceOf[A],
-       ss(1).asInstanceOf[B],
-       ss(2).asInstanceOf[C],
-       ss(3).asInstanceOf[D],
-       ss(4).asInstanceOf[E],
-       ss(5).asInstanceOf[F])
+      (
+        ss(0).asInstanceOf[A],
+        ss(1).asInstanceOf[B],
+        ss(2).asInstanceOf[C],
+        ss(3).asInstanceOf[D],
+        ss(4).asInstanceOf[E],
+        ss(5).asInstanceOf[F])
     }
 
   /**
@@ -267,13 +276,14 @@ object Activity {
       f: Activity[F],
       g: Activity[G]): Activity[(A, B, C, D, E, F, G)] =
     collect(Seq(a, b, c, d, e, f, g)) map { ss =>
-      (ss(0).asInstanceOf[A],
-       ss(1).asInstanceOf[B],
-       ss(2).asInstanceOf[C],
-       ss(3).asInstanceOf[D],
-       ss(4).asInstanceOf[E],
-       ss(5).asInstanceOf[F],
-       ss(6).asInstanceOf[G])
+      (
+        ss(0).asInstanceOf[A],
+        ss(1).asInstanceOf[B],
+        ss(2).asInstanceOf[C],
+        ss(3).asInstanceOf[D],
+        ss(4).asInstanceOf[E],
+        ss(5).asInstanceOf[F],
+        ss(6).asInstanceOf[G])
     }
 
   /**
@@ -291,14 +301,15 @@ object Activity {
       g: Activity[G],
       h: Activity[H]): Activity[(A, B, C, D, E, F, G, H)] =
     collect(Seq(a, b, c, d, e, f, g, h)) map { ss =>
-      (ss(0).asInstanceOf[A],
-       ss(1).asInstanceOf[B],
-       ss(2).asInstanceOf[C],
-       ss(3).asInstanceOf[D],
-       ss(4).asInstanceOf[E],
-       ss(5).asInstanceOf[F],
-       ss(6).asInstanceOf[G],
-       ss(7).asInstanceOf[H])
+      (
+        ss(0).asInstanceOf[A],
+        ss(1).asInstanceOf[B],
+        ss(2).asInstanceOf[C],
+        ss(3).asInstanceOf[D],
+        ss(4).asInstanceOf[E],
+        ss(5).asInstanceOf[F],
+        ss(6).asInstanceOf[G],
+        ss(7).asInstanceOf[H])
     }
 
   /**
@@ -317,15 +328,16 @@ object Activity {
       h: Activity[H],
       i: Activity[I]): Activity[(A, B, C, D, E, F, G, H, I)] =
     collect(Seq(a, b, c, d, e, f, g, h, i)) map { ss =>
-      (ss(0).asInstanceOf[A],
-       ss(1).asInstanceOf[B],
-       ss(2).asInstanceOf[C],
-       ss(3).asInstanceOf[D],
-       ss(4).asInstanceOf[E],
-       ss(5).asInstanceOf[F],
-       ss(6).asInstanceOf[G],
-       ss(7).asInstanceOf[H],
-       ss(8).asInstanceOf[I])
+      (
+        ss(0).asInstanceOf[A],
+        ss(1).asInstanceOf[B],
+        ss(2).asInstanceOf[C],
+        ss(3).asInstanceOf[D],
+        ss(4).asInstanceOf[E],
+        ss(5).asInstanceOf[F],
+        ss(6).asInstanceOf[G],
+        ss(7).asInstanceOf[H],
+        ss(8).asInstanceOf[I])
     }
 
   /**
@@ -345,16 +357,17 @@ object Activity {
       i: Activity[I],
       j: Activity[J]): Activity[(A, B, C, D, E, F, G, H, I, J)] =
     collect(Seq(a, b, c, d, e, f, g, h, i, j)) map { ss =>
-      (ss(0).asInstanceOf[A],
-       ss(1).asInstanceOf[B],
-       ss(2).asInstanceOf[C],
-       ss(3).asInstanceOf[D],
-       ss(4).asInstanceOf[E],
-       ss(5).asInstanceOf[F],
-       ss(6).asInstanceOf[G],
-       ss(7).asInstanceOf[H],
-       ss(8).asInstanceOf[I],
-       ss(9).asInstanceOf[J])
+      (
+        ss(0).asInstanceOf[A],
+        ss(1).asInstanceOf[B],
+        ss(2).asInstanceOf[C],
+        ss(3).asInstanceOf[D],
+        ss(4).asInstanceOf[E],
+        ss(5).asInstanceOf[F],
+        ss(6).asInstanceOf[G],
+        ss(7).asInstanceOf[H],
+        ss(8).asInstanceOf[I],
+        ss(9).asInstanceOf[J])
     }
 
   /**
@@ -375,17 +388,18 @@ object Activity {
       j: Activity[J],
       k: Activity[K]): Activity[(A, B, C, D, E, F, G, H, I, J, K)] =
     collect(Seq(a, b, c, d, e, f, g, h, i, j, k)) map { ss =>
-      (ss(0).asInstanceOf[A],
-       ss(1).asInstanceOf[B],
-       ss(2).asInstanceOf[C],
-       ss(3).asInstanceOf[D],
-       ss(4).asInstanceOf[E],
-       ss(5).asInstanceOf[F],
-       ss(6).asInstanceOf[G],
-       ss(7).asInstanceOf[H],
-       ss(8).asInstanceOf[I],
-       ss(9).asInstanceOf[J],
-       ss(10).asInstanceOf[K])
+      (
+        ss(0).asInstanceOf[A],
+        ss(1).asInstanceOf[B],
+        ss(2).asInstanceOf[C],
+        ss(3).asInstanceOf[D],
+        ss(4).asInstanceOf[E],
+        ss(5).asInstanceOf[F],
+        ss(6).asInstanceOf[G],
+        ss(7).asInstanceOf[H],
+        ss(8).asInstanceOf[I],
+        ss(9).asInstanceOf[J],
+        ss(10).asInstanceOf[K])
     }
 
   /**
@@ -407,18 +421,19 @@ object Activity {
       k: Activity[K],
       l: Activity[L]): Activity[(A, B, C, D, E, F, G, H, I, J, K, L)] =
     collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l)) map { ss =>
-      (ss(0).asInstanceOf[A],
-       ss(1).asInstanceOf[B],
-       ss(2).asInstanceOf[C],
-       ss(3).asInstanceOf[D],
-       ss(4).asInstanceOf[E],
-       ss(5).asInstanceOf[F],
-       ss(6).asInstanceOf[G],
-       ss(7).asInstanceOf[H],
-       ss(8).asInstanceOf[I],
-       ss(9).asInstanceOf[J],
-       ss(10).asInstanceOf[K],
-       ss(11).asInstanceOf[L])
+      (
+        ss(0).asInstanceOf[A],
+        ss(1).asInstanceOf[B],
+        ss(2).asInstanceOf[C],
+        ss(3).asInstanceOf[D],
+        ss(4).asInstanceOf[E],
+        ss(5).asInstanceOf[F],
+        ss(6).asInstanceOf[G],
+        ss(7).asInstanceOf[H],
+        ss(8).asInstanceOf[I],
+        ss(9).asInstanceOf[J],
+        ss(10).asInstanceOf[K],
+        ss(11).asInstanceOf[L])
     }
 
   /**
@@ -441,19 +456,20 @@ object Activity {
       l: Activity[L],
       m: Activity[M]): Activity[(A, B, C, D, E, F, G, H, I, J, K, L, M)] =
     collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m)) map { ss =>
-      (ss(0).asInstanceOf[A],
-       ss(1).asInstanceOf[B],
-       ss(2).asInstanceOf[C],
-       ss(3).asInstanceOf[D],
-       ss(4).asInstanceOf[E],
-       ss(5).asInstanceOf[F],
-       ss(6).asInstanceOf[G],
-       ss(7).asInstanceOf[H],
-       ss(8).asInstanceOf[I],
-       ss(9).asInstanceOf[J],
-       ss(10).asInstanceOf[K],
-       ss(11).asInstanceOf[L],
-       ss(12).asInstanceOf[M])
+      (
+        ss(0).asInstanceOf[A],
+        ss(1).asInstanceOf[B],
+        ss(2).asInstanceOf[C],
+        ss(3).asInstanceOf[D],
+        ss(4).asInstanceOf[E],
+        ss(5).asInstanceOf[F],
+        ss(6).asInstanceOf[G],
+        ss(7).asInstanceOf[H],
+        ss(8).asInstanceOf[I],
+        ss(9).asInstanceOf[J],
+        ss(10).asInstanceOf[K],
+        ss(11).asInstanceOf[L],
+        ss(12).asInstanceOf[M])
     }
 
   /**
@@ -477,20 +493,21 @@ object Activity {
       m: Activity[M],
       n: Activity[N]): Activity[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)] =
     collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n)) map { ss =>
-      (ss(0).asInstanceOf[A],
-       ss(1).asInstanceOf[B],
-       ss(2).asInstanceOf[C],
-       ss(3).asInstanceOf[D],
-       ss(4).asInstanceOf[E],
-       ss(5).asInstanceOf[F],
-       ss(6).asInstanceOf[G],
-       ss(7).asInstanceOf[H],
-       ss(8).asInstanceOf[I],
-       ss(9).asInstanceOf[J],
-       ss(10).asInstanceOf[K],
-       ss(11).asInstanceOf[L],
-       ss(12).asInstanceOf[M],
-       ss(13).asInstanceOf[N])
+      (
+        ss(0).asInstanceOf[A],
+        ss(1).asInstanceOf[B],
+        ss(2).asInstanceOf[C],
+        ss(3).asInstanceOf[D],
+        ss(4).asInstanceOf[E],
+        ss(5).asInstanceOf[F],
+        ss(6).asInstanceOf[G],
+        ss(7).asInstanceOf[H],
+        ss(8).asInstanceOf[I],
+        ss(9).asInstanceOf[J],
+        ss(10).asInstanceOf[K],
+        ss(11).asInstanceOf[L],
+        ss(12).asInstanceOf[M],
+        ss(13).asInstanceOf[N])
     }
 
   /**
@@ -498,38 +515,39 @@ object Activity {
     * underlying Activities are nonpending. It fails immediately if any of them
     * do.
     */
-  def join[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](a: Activity[A],
-                                                        b: Activity[B],
-                                                        c: Activity[C],
-                                                        d: Activity[D],
-                                                        e: Activity[E],
-                                                        f: Activity[F],
-                                                        g: Activity[G],
-                                                        h: Activity[H],
-                                                        i: Activity[I],
-                                                        j: Activity[J],
-                                                        k: Activity[K],
-                                                        l: Activity[L],
-                                                        m: Activity[M],
-                                                        n: Activity[N],
-                                                        o: Activity[O])
-    : Activity[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)] =
+  def join[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
+      a: Activity[A],
+      b: Activity[B],
+      c: Activity[C],
+      d: Activity[D],
+      e: Activity[E],
+      f: Activity[F],
+      g: Activity[G],
+      h: Activity[H],
+      i: Activity[I],
+      j: Activity[J],
+      k: Activity[K],
+      l: Activity[L],
+      m: Activity[M],
+      n: Activity[N],
+      o: Activity[O]): Activity[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)] =
     collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o)) map { ss =>
-      (ss(0).asInstanceOf[A],
-       ss(1).asInstanceOf[B],
-       ss(2).asInstanceOf[C],
-       ss(3).asInstanceOf[D],
-       ss(4).asInstanceOf[E],
-       ss(5).asInstanceOf[F],
-       ss(6).asInstanceOf[G],
-       ss(7).asInstanceOf[H],
-       ss(8).asInstanceOf[I],
-       ss(9).asInstanceOf[J],
-       ss(10).asInstanceOf[K],
-       ss(11).asInstanceOf[L],
-       ss(12).asInstanceOf[M],
-       ss(13).asInstanceOf[N],
-       ss(14).asInstanceOf[O])
+      (
+        ss(0).asInstanceOf[A],
+        ss(1).asInstanceOf[B],
+        ss(2).asInstanceOf[C],
+        ss(3).asInstanceOf[D],
+        ss(4).asInstanceOf[E],
+        ss(5).asInstanceOf[F],
+        ss(6).asInstanceOf[G],
+        ss(7).asInstanceOf[H],
+        ss(8).asInstanceOf[I],
+        ss(9).asInstanceOf[J],
+        ss(10).asInstanceOf[K],
+        ss(11).asInstanceOf[L],
+        ss(12).asInstanceOf[M],
+        ss(13).asInstanceOf[N],
+        ss(14).asInstanceOf[O])
     }
 
   /**
@@ -537,40 +555,42 @@ object Activity {
     * underlying Activities are nonpending. It fails immediately if any of them
     * do.
     */
-  def join[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](a: Activity[A],
-                                                           b: Activity[B],
-                                                           c: Activity[C],
-                                                           d: Activity[D],
-                                                           e: Activity[E],
-                                                           f: Activity[F],
-                                                           g: Activity[G],
-                                                           h: Activity[H],
-                                                           i: Activity[I],
-                                                           j: Activity[J],
-                                                           k: Activity[K],
-                                                           l: Activity[L],
-                                                           m: Activity[M],
-                                                           n: Activity[N],
-                                                           o: Activity[O],
-                                                           p: Activity[P])
+  def join[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
+      a: Activity[A],
+      b: Activity[B],
+      c: Activity[C],
+      d: Activity[D],
+      e: Activity[E],
+      f: Activity[F],
+      g: Activity[G],
+      h: Activity[H],
+      i: Activity[I],
+      j: Activity[J],
+      k: Activity[K],
+      l: Activity[L],
+      m: Activity[M],
+      n: Activity[N],
+      o: Activity[O],
+      p: Activity[P])
     : Activity[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)] =
     collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p)) map { ss =>
-      (ss(0).asInstanceOf[A],
-       ss(1).asInstanceOf[B],
-       ss(2).asInstanceOf[C],
-       ss(3).asInstanceOf[D],
-       ss(4).asInstanceOf[E],
-       ss(5).asInstanceOf[F],
-       ss(6).asInstanceOf[G],
-       ss(7).asInstanceOf[H],
-       ss(8).asInstanceOf[I],
-       ss(9).asInstanceOf[J],
-       ss(10).asInstanceOf[K],
-       ss(11).asInstanceOf[L],
-       ss(12).asInstanceOf[M],
-       ss(13).asInstanceOf[N],
-       ss(14).asInstanceOf[O],
-       ss(15).asInstanceOf[P])
+      (
+        ss(0).asInstanceOf[A],
+        ss(1).asInstanceOf[B],
+        ss(2).asInstanceOf[C],
+        ss(3).asInstanceOf[D],
+        ss(4).asInstanceOf[E],
+        ss(5).asInstanceOf[F],
+        ss(6).asInstanceOf[G],
+        ss(7).asInstanceOf[H],
+        ss(8).asInstanceOf[I],
+        ss(9).asInstanceOf[J],
+        ss(10).asInstanceOf[K],
+        ss(11).asInstanceOf[L],
+        ss(12).asInstanceOf[M],
+        ss(13).asInstanceOf[N],
+        ss(14).asInstanceOf[O],
+        ss(15).asInstanceOf[P])
     }
 
   /**
@@ -578,42 +598,44 @@ object Activity {
     * underlying Activities are nonpending. It fails immediately if any of them
     * do.
     */
-  def join[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](a: Activity[A],
-                                                              b: Activity[B],
-                                                              c: Activity[C],
-                                                              d: Activity[D],
-                                                              e: Activity[E],
-                                                              f: Activity[F],
-                                                              g: Activity[G],
-                                                              h: Activity[H],
-                                                              i: Activity[I],
-                                                              j: Activity[J],
-                                                              k: Activity[K],
-                                                              l: Activity[L],
-                                                              m: Activity[M],
-                                                              n: Activity[N],
-                                                              o: Activity[O],
-                                                              p: Activity[P],
-                                                              q: Activity[Q])
+  def join[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
+      a: Activity[A],
+      b: Activity[B],
+      c: Activity[C],
+      d: Activity[D],
+      e: Activity[E],
+      f: Activity[F],
+      g: Activity[G],
+      h: Activity[H],
+      i: Activity[I],
+      j: Activity[J],
+      k: Activity[K],
+      l: Activity[L],
+      m: Activity[M],
+      n: Activity[N],
+      o: Activity[O],
+      p: Activity[P],
+      q: Activity[Q])
     : Activity[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)] =
     collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q)) map { ss =>
-      (ss(0).asInstanceOf[A],
-       ss(1).asInstanceOf[B],
-       ss(2).asInstanceOf[C],
-       ss(3).asInstanceOf[D],
-       ss(4).asInstanceOf[E],
-       ss(5).asInstanceOf[F],
-       ss(6).asInstanceOf[G],
-       ss(7).asInstanceOf[H],
-       ss(8).asInstanceOf[I],
-       ss(9).asInstanceOf[J],
-       ss(10).asInstanceOf[K],
-       ss(11).asInstanceOf[L],
-       ss(12).asInstanceOf[M],
-       ss(13).asInstanceOf[N],
-       ss(14).asInstanceOf[O],
-       ss(15).asInstanceOf[P],
-       ss(16).asInstanceOf[Q])
+      (
+        ss(0).asInstanceOf[A],
+        ss(1).asInstanceOf[B],
+        ss(2).asInstanceOf[C],
+        ss(3).asInstanceOf[D],
+        ss(4).asInstanceOf[E],
+        ss(5).asInstanceOf[F],
+        ss(6).asInstanceOf[G],
+        ss(7).asInstanceOf[H],
+        ss(8).asInstanceOf[I],
+        ss(9).asInstanceOf[J],
+        ss(10).asInstanceOf[K],
+        ss(11).asInstanceOf[L],
+        ss(12).asInstanceOf[M],
+        ss(13).asInstanceOf[N],
+        ss(14).asInstanceOf[O],
+        ss(15).asInstanceOf[P],
+        ss(16).asInstanceOf[Q])
     }
 
   /**
@@ -643,24 +665,25 @@ object Activity {
     : Activity[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)] =
     collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r)) map {
       ss =>
-        (ss(0).asInstanceOf[A],
-         ss(1).asInstanceOf[B],
-         ss(2).asInstanceOf[C],
-         ss(3).asInstanceOf[D],
-         ss(4).asInstanceOf[E],
-         ss(5).asInstanceOf[F],
-         ss(6).asInstanceOf[G],
-         ss(7).asInstanceOf[H],
-         ss(8).asInstanceOf[I],
-         ss(9).asInstanceOf[J],
-         ss(10).asInstanceOf[K],
-         ss(11).asInstanceOf[L],
-         ss(12).asInstanceOf[M],
-         ss(13).asInstanceOf[N],
-         ss(14).asInstanceOf[O],
-         ss(15).asInstanceOf[P],
-         ss(16).asInstanceOf[Q],
-         ss(17).asInstanceOf[R])
+        (
+          ss(0).asInstanceOf[A],
+          ss(1).asInstanceOf[B],
+          ss(2).asInstanceOf[C],
+          ss(3).asInstanceOf[D],
+          ss(4).asInstanceOf[E],
+          ss(5).asInstanceOf[F],
+          ss(6).asInstanceOf[G],
+          ss(7).asInstanceOf[H],
+          ss(8).asInstanceOf[I],
+          ss(9).asInstanceOf[J],
+          ss(10).asInstanceOf[K],
+          ss(11).asInstanceOf[L],
+          ss(12).asInstanceOf[M],
+          ss(13).asInstanceOf[N],
+          ss(14).asInstanceOf[O],
+          ss(15).asInstanceOf[P],
+          ss(16).asInstanceOf[Q],
+          ss(17).asInstanceOf[R])
     }
 
   /**
@@ -691,25 +714,26 @@ object Activity {
     : Activity[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)] =
     collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s)) map {
       ss =>
-        (ss(0).asInstanceOf[A],
-         ss(1).asInstanceOf[B],
-         ss(2).asInstanceOf[C],
-         ss(3).asInstanceOf[D],
-         ss(4).asInstanceOf[E],
-         ss(5).asInstanceOf[F],
-         ss(6).asInstanceOf[G],
-         ss(7).asInstanceOf[H],
-         ss(8).asInstanceOf[I],
-         ss(9).asInstanceOf[J],
-         ss(10).asInstanceOf[K],
-         ss(11).asInstanceOf[L],
-         ss(12).asInstanceOf[M],
-         ss(13).asInstanceOf[N],
-         ss(14).asInstanceOf[O],
-         ss(15).asInstanceOf[P],
-         ss(16).asInstanceOf[Q],
-         ss(17).asInstanceOf[R],
-         ss(18).asInstanceOf[S])
+        (
+          ss(0).asInstanceOf[A],
+          ss(1).asInstanceOf[B],
+          ss(2).asInstanceOf[C],
+          ss(3).asInstanceOf[D],
+          ss(4).asInstanceOf[E],
+          ss(5).asInstanceOf[F],
+          ss(6).asInstanceOf[G],
+          ss(7).asInstanceOf[H],
+          ss(8).asInstanceOf[I],
+          ss(9).asInstanceOf[J],
+          ss(10).asInstanceOf[K],
+          ss(11).asInstanceOf[L],
+          ss(12).asInstanceOf[M],
+          ss(13).asInstanceOf[N],
+          ss(14).asInstanceOf[O],
+          ss(15).asInstanceOf[P],
+          ss(16).asInstanceOf[Q],
+          ss(17).asInstanceOf[R],
+          ss(18).asInstanceOf[S])
     }
 
   /**
@@ -741,26 +765,27 @@ object Activity {
     : Activity[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)] =
     collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t)) map {
       ss =>
-        (ss(0).asInstanceOf[A],
-         ss(1).asInstanceOf[B],
-         ss(2).asInstanceOf[C],
-         ss(3).asInstanceOf[D],
-         ss(4).asInstanceOf[E],
-         ss(5).asInstanceOf[F],
-         ss(6).asInstanceOf[G],
-         ss(7).asInstanceOf[H],
-         ss(8).asInstanceOf[I],
-         ss(9).asInstanceOf[J],
-         ss(10).asInstanceOf[K],
-         ss(11).asInstanceOf[L],
-         ss(12).asInstanceOf[M],
-         ss(13).asInstanceOf[N],
-         ss(14).asInstanceOf[O],
-         ss(15).asInstanceOf[P],
-         ss(16).asInstanceOf[Q],
-         ss(17).asInstanceOf[R],
-         ss(18).asInstanceOf[S],
-         ss(19).asInstanceOf[T])
+        (
+          ss(0).asInstanceOf[A],
+          ss(1).asInstanceOf[B],
+          ss(2).asInstanceOf[C],
+          ss(3).asInstanceOf[D],
+          ss(4).asInstanceOf[E],
+          ss(5).asInstanceOf[F],
+          ss(6).asInstanceOf[G],
+          ss(7).asInstanceOf[H],
+          ss(8).asInstanceOf[I],
+          ss(9).asInstanceOf[J],
+          ss(10).asInstanceOf[K],
+          ss(11).asInstanceOf[L],
+          ss(12).asInstanceOf[M],
+          ss(13).asInstanceOf[N],
+          ss(14).asInstanceOf[O],
+          ss(15).asInstanceOf[P],
+          ss(16).asInstanceOf[Q],
+          ss(17).asInstanceOf[R],
+          ss(18).asInstanceOf[S],
+          ss(19).asInstanceOf[T])
     }
 
   /**
@@ -790,30 +815,31 @@ object Activity {
       s: Activity[S],
       t: Activity[T],
       u: Activity[U]): Activity[
-      (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)] =
+    (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)] =
     collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u)) map {
       ss =>
-        (ss(0).asInstanceOf[A],
-         ss(1).asInstanceOf[B],
-         ss(2).asInstanceOf[C],
-         ss(3).asInstanceOf[D],
-         ss(4).asInstanceOf[E],
-         ss(5).asInstanceOf[F],
-         ss(6).asInstanceOf[G],
-         ss(7).asInstanceOf[H],
-         ss(8).asInstanceOf[I],
-         ss(9).asInstanceOf[J],
-         ss(10).asInstanceOf[K],
-         ss(11).asInstanceOf[L],
-         ss(12).asInstanceOf[M],
-         ss(13).asInstanceOf[N],
-         ss(14).asInstanceOf[O],
-         ss(15).asInstanceOf[P],
-         ss(16).asInstanceOf[Q],
-         ss(17).asInstanceOf[R],
-         ss(18).asInstanceOf[S],
-         ss(19).asInstanceOf[T],
-         ss(20).asInstanceOf[U])
+        (
+          ss(0).asInstanceOf[A],
+          ss(1).asInstanceOf[B],
+          ss(2).asInstanceOf[C],
+          ss(3).asInstanceOf[D],
+          ss(4).asInstanceOf[E],
+          ss(5).asInstanceOf[F],
+          ss(6).asInstanceOf[G],
+          ss(7).asInstanceOf[H],
+          ss(8).asInstanceOf[I],
+          ss(9).asInstanceOf[J],
+          ss(10).asInstanceOf[K],
+          ss(11).asInstanceOf[L],
+          ss(12).asInstanceOf[M],
+          ss(13).asInstanceOf[N],
+          ss(14).asInstanceOf[O],
+          ss(15).asInstanceOf[P],
+          ss(16).asInstanceOf[Q],
+          ss(17).asInstanceOf[R],
+          ss(18).asInstanceOf[S],
+          ss(19).asInstanceOf[T],
+          ss(20).asInstanceOf[U])
     }
 
   /**
@@ -844,51 +870,53 @@ object Activity {
       t: Activity[T],
       u: Activity[U],
       v: Activity[V]): Activity[
-      (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)] =
-    collect(Seq(a,
-                b,
-                c,
-                d,
-                e,
-                f,
-                g,
-                h,
-                i,
-                j,
-                k,
-                l,
-                m,
-                n,
-                o,
-                p,
-                q,
-                r,
-                s,
-                t,
-                u,
-                v)) map { ss =>
-      (ss(0).asInstanceOf[A],
-       ss(1).asInstanceOf[B],
-       ss(2).asInstanceOf[C],
-       ss(3).asInstanceOf[D],
-       ss(4).asInstanceOf[E],
-       ss(5).asInstanceOf[F],
-       ss(6).asInstanceOf[G],
-       ss(7).asInstanceOf[H],
-       ss(8).asInstanceOf[I],
-       ss(9).asInstanceOf[J],
-       ss(10).asInstanceOf[K],
-       ss(11).asInstanceOf[L],
-       ss(12).asInstanceOf[M],
-       ss(13).asInstanceOf[N],
-       ss(14).asInstanceOf[O],
-       ss(15).asInstanceOf[P],
-       ss(16).asInstanceOf[Q],
-       ss(17).asInstanceOf[R],
-       ss(18).asInstanceOf[S],
-       ss(19).asInstanceOf[T],
-       ss(20).asInstanceOf[U],
-       ss(21).asInstanceOf[V])
+    (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)] =
+    collect(Seq(
+      a,
+      b,
+      c,
+      d,
+      e,
+      f,
+      g,
+      h,
+      i,
+      j,
+      k,
+      l,
+      m,
+      n,
+      o,
+      p,
+      q,
+      r,
+      s,
+      t,
+      u,
+      v)) map { ss =>
+      (
+        ss(0).asInstanceOf[A],
+        ss(1).asInstanceOf[B],
+        ss(2).asInstanceOf[C],
+        ss(3).asInstanceOf[D],
+        ss(4).asInstanceOf[E],
+        ss(5).asInstanceOf[F],
+        ss(6).asInstanceOf[G],
+        ss(7).asInstanceOf[H],
+        ss(8).asInstanceOf[I],
+        ss(9).asInstanceOf[J],
+        ss(10).asInstanceOf[K],
+        ss(11).asInstanceOf[L],
+        ss(12).asInstanceOf[M],
+        ss(13).asInstanceOf[N],
+        ss(14).asInstanceOf[O],
+        ss(15).asInstanceOf[P],
+        ss(16).asInstanceOf[Q],
+        ss(17).asInstanceOf[R],
+        ss(18).asInstanceOf[S],
+        ss(19).asInstanceOf[T],
+        ss(20).asInstanceOf[U],
+        ss(21).asInstanceOf[V])
     }
 
   /**
@@ -905,8 +933,8 @@ object Activity {
     */
   def sample[T](act: Activity[T]): T =
     act.run.sample() match {
-      case Ok(t) => t
-      case Pending => throw new IllegalStateException("Still pending")
+      case Ok(t)       => t
+      case Pending     => throw new IllegalStateException("Still pending")
       case Failed(exc) => throw exc
     }
 
@@ -931,7 +959,7 @@ object Activity {
     val run = Var(Pending: State[T])
     f respond {
       case Return(v) => run() = Ok(v)
-      case Throw(e) => run() = Failed(e)
+      case Throw(e)  => run() = Failed(e)
     }
     Activity(run)
   }

@@ -19,5 +19,5 @@ import org.apache.kafka.common.protocol.SecurityProtocol
 class SslConsumerTest extends BaseConsumerTest {
   override protected def securityProtocol = SecurityProtocol.SSL
   override protected lazy val trustStoreFile = Some(
-      File.createTempFile("truststore", ".jks"))
+    File.createTempFile("truststore", ".jks"))
 }

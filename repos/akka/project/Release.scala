@@ -16,11 +16,11 @@ object Release {
 
   lazy val settings: Seq[Setting[_]] =
     commandSettings ++ Seq(
-        releaseDirectory <<= crossTarget / "release"
+      releaseDirectory <<= crossTarget / "release"
     )
 
   lazy val commandSettings = Seq(
-      commands ++= Seq(buildReleaseCommand, uploadReleaseCommand)
+    commands ++= Seq(buildReleaseCommand, uploadReleaseCommand)
   )
 
   def buildReleaseCommand = Command.command("buildRelease") { state =>
@@ -35,8 +35,8 @@ object Release {
     val (state3, docs) = extracted.runTask(generate in Sphinx, state2)
     val (state4, _) = extracted.runTask(Dist.dist, state3)
     val (state5, activatorDist) = extracted.runTask(
-        ActivatorDist.activatorDist in LocalProject(AkkaBuild.samples.id),
-        state4)
+      ActivatorDist.activatorDist in LocalProject(AkkaBuild.samples.id),
+      state4)
 
     IO.delete(release)
     IO.createDirectory(release)
@@ -47,11 +47,11 @@ object Release {
 
     // copy all distributions from dist dir to downloads dir
     // may contain distributions from cross-builds
-    for (f <- (dist * "akka_*.zip").get) IO.copyFile(
-        f, release / "downloads" / f.name)
+    for (f <- (dist * "akka_*.zip").get)
+      IO.copyFile(f, release / "downloads" / f.name)
 
-    for (f <- (activatorDist * "*.zip").get) IO.copyFile(
-        f, release / "downloads" / f.name)
+    for (f <- (activatorDist * "*.zip").get)
+      IO.copyFile(f, release / "downloads" / f.name)
 
     state5
   }

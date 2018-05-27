@@ -17,7 +17,9 @@ import lila.db.api._
 import tube.firewallTube
 
 final class Firewall(
-    cookieName: Option[String], enabled: Boolean, cachedIpsTtl: Duration) {
+    cookieName: Option[String],
+    enabled: Boolean,
+    cachedIpsTtl: Duration) {
 
   // def requestHandler(req: RequestHeader): Fu[Option[Handler]] =
   //   cookieName.filter(_ => enabled) ?? { cn =>
@@ -41,9 +43,10 @@ final class Firewall(
   def accepts(req: RequestHeader): Fu[Boolean] = blocks(req) map (!_)
 
   def blockIp(ip: String): Funit = validIp(ip) ?? {
-    $update(Json.obj("_id" -> ip),
-            Json.obj("_id" -> ip, "date" -> $date(DateTime.now)),
-            upsert = true) >>- refresh
+    $update(
+      Json.obj("_id" -> ip),
+      Json.obj("_id" -> ip, "date" -> $date(DateTime.now)),
+      upsert = true) >>- refresh
   }
 
   def unblockIps(ips: Iterable[String]): Funit =
@@ -64,7 +67,9 @@ final class Firewall(
 
   private def formatReq(req: RequestHeader) =
     "%s %s %s".format(
-        req.remoteAddress, req.uri, req.headers.get("User-Agent") | "?")
+      req.remoteAddress,
+      req.uri,
+      req.headers.get("User-Agent") | "?")
 
   private def blocksCookies(cookies: Cookies, name: String) =
     (cookies get name).isDefined

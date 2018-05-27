@@ -110,7 +110,7 @@ abstract class Expression extends TreeNode[Expression] {
         if (ve.code != "") {
           // Add `this` in the comment.
           ve.copy(
-              s"/* ${toCommentSafeString(this.toString)} */\n" + ve.code.trim)
+            s"/* ${toCommentSafeString(this.toString)} */\n" + ve.code.trim)
         } else {
           ve
         }
@@ -171,7 +171,7 @@ abstract class Expression extends TreeNode[Expression] {
     */
   def semanticEquals(other: Expression): Boolean =
     deterministic && other.deterministic &&
-    canonicalized == other.canonicalized
+      canonicalized == other.canonicalized
 
   /**
     * Returns a `hashCode` for the calculation performed by this expression. Unlike the standard
@@ -196,7 +196,7 @@ abstract class Expression extends TreeNode[Expression] {
 
   private def flatArguments = productIterator.flatMap {
     case t: Traversable[_] => t
-    case single => single :: Nil
+    case single            => single :: Nil
   }
 
   override def simpleString: String = toString
@@ -222,12 +222,13 @@ trait Unevaluable extends Expression {
 
   final override def eval(input: InternalRow = null): Any =
     throw new UnsupportedOperationException(
-        s"Cannot evaluate expression: $this")
+      s"Cannot evaluate expression: $this")
 
   final override protected def genCode(
-      ctx: CodegenContext, ev: ExprCode): String =
+      ctx: CodegenContext,
+      ev: ExprCode): String =
     throw new UnsupportedOperationException(
-        s"Cannot evaluate expression: $this")
+      s"Cannot evaluate expression: $this")
 }
 
 /**
@@ -260,8 +261,8 @@ trait Nondeterministic extends Expression {
 
   final override def eval(input: InternalRow = null): Any = {
     require(
-        initialized,
-        "nondeterministic expression should be initialized before evaluate")
+      initialized,
+      "nondeterministic expression should be initialized before evaluate")
     evalInternal(input)
   }
 
@@ -322,13 +323,12 @@ abstract class UnaryExpression extends Expression {
     * @param f function that accepts a variable name and returns Java code to compute the output.
     */
   protected def defineCodeGen(
-      ctx: CodegenContext, ev: ExprCode, f: String => String): String = {
-    nullSafeCodeGen(ctx,
-                    ev,
-                    eval =>
-                      {
-                        s"${ev.value} = ${f(eval)};"
-                    })
+      ctx: CodegenContext,
+      ev: ExprCode,
+      f: String => String): String = {
+    nullSafeCodeGen(ctx, ev, eval => {
+      s"${ev.value} = ${f(eval)};"
+    })
   }
 
   /**
@@ -339,7 +339,9 @@ abstract class UnaryExpression extends Expression {
     *          code to compute the output.
     */
   protected def nullSafeCodeGen(
-      ctx: CodegenContext, ev: ExprCode, f: String => String): String = {
+      ctx: CodegenContext,
+      ev: ExprCode,
+      f: String => String): String = {
     val childGen = child.gen(ctx)
     val resultCode = f(childGen.value)
 
@@ -411,15 +413,13 @@ abstract class BinaryExpression extends Expression {
     *
     * @param f accepts two variable names and returns Java code to compute the output.
     */
-  protected def defineCodeGen(ctx: CodegenContext,
-                              ev: ExprCode,
-                              f: (String, String) => String): String = {
-    nullSafeCodeGen(ctx,
-                    ev,
-                    (eval1, eval2) =>
-                      {
-                        s"${ev.value} = ${f(eval1, eval2)};"
-                    })
+  protected def defineCodeGen(
+      ctx: CodegenContext,
+      ev: ExprCode,
+      f: (String, String) => String): String = {
+    nullSafeCodeGen(ctx, ev, (eval1, eval2) => {
+      s"${ev.value} = ${f(eval1, eval2)};"
+    })
   }
 
   /**
@@ -430,9 +430,10 @@ abstract class BinaryExpression extends Expression {
     * @param f function that accepts the 2 non-null evaluation result names of children
     *          and returns Java code to compute the output.
     */
-  protected def nullSafeCodeGen(ctx: CodegenContext,
-                                ev: ExprCode,
-                                f: (String, String) => String): String = {
+  protected def nullSafeCodeGen(
+      ctx: CodegenContext,
+      ev: ExprCode,
+      f: (String, String) => String): String = {
     val leftGen = left.gen(ctx)
     val rightGen = right.gen(ctx)
     val resultCode = f(leftGen.value, rightGen.value)
@@ -492,10 +493,10 @@ abstract class BinaryOperator extends BinaryExpression with ExpectsInputTypes {
     // First check whether left and right have the same type, then check if the type is acceptable.
     if (left.dataType != right.dataType) {
       TypeCheckResult.TypeCheckFailure(s"differing types in '$sql' " +
-          s"(${left.dataType.simpleString} and ${right.dataType.simpleString}).")
+        s"(${left.dataType.simpleString} and ${right.dataType.simpleString}).")
     } else if (!inputType.acceptsType(left.dataType)) {
       TypeCheckResult.TypeCheckFailure(
-          s"'$sql' requires ${inputType.simpleString} type," +
+        s"'$sql' requires ${inputType.simpleString} type," +
           s" not ${left.dataType.simpleString}")
     } else {
       TypeCheckResult.TypeCheckSuccess
@@ -554,16 +555,13 @@ abstract class TernaryExpression extends Expression {
     *
     * @param f accepts three variable names and returns Java code to compute the output.
     */
-  protected def defineCodeGen(ctx: CodegenContext,
-                              ev: ExprCode,
-                              f: (String, String,
-                              String) => String): String = {
-    nullSafeCodeGen(ctx,
-                    ev,
-                    (eval1, eval2, eval3) =>
-                      {
-                        s"${ev.value} = ${f(eval1, eval2, eval3)};"
-                    })
+  protected def defineCodeGen(
+      ctx: CodegenContext,
+      ev: ExprCode,
+      f: (String, String, String) => String): String = {
+    nullSafeCodeGen(ctx, ev, (eval1, eval2, eval3) => {
+      s"${ev.value} = ${f(eval1, eval2, eval3)};"
+    })
   }
 
   /**
@@ -574,10 +572,10 @@ abstract class TernaryExpression extends Expression {
     * @param f function that accepts the 3 non-null evaluation result names of children
     *          and returns Java code to compute the output.
     */
-  protected def nullSafeCodeGen(ctx: CodegenContext,
-                                ev: ExprCode,
-                                f: (String, String,
-                                String) => String): String = {
+  protected def nullSafeCodeGen(
+      ctx: CodegenContext,
+      ev: ExprCode,
+      f: (String, String, String) => String): String = {
     val leftGen = children(0).gen(ctx)
     val midGen = children(1).gen(ctx)
     val rightGen = children(2).gen(ctx)
@@ -588,12 +586,12 @@ abstract class TernaryExpression extends Expression {
         leftGen.code + ctx.nullSafeExec(children(0).nullable, leftGen.isNull) {
           midGen.code + ctx.nullSafeExec(children(1).nullable, midGen.isNull) {
             rightGen.code +
-            ctx.nullSafeExec(children(2).nullable, rightGen.isNull) {
-              s"""
+              ctx.nullSafeExec(children(2).nullable, rightGen.isNull) {
+                s"""
                 ${ev.isNull} = false; // resultCode could change nullability.
                 $resultCode
               """
-            }
+              }
           }
         }
 

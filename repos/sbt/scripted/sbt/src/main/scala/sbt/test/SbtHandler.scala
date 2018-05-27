@@ -16,17 +16,19 @@ import scala.sys.process.{BasicIO, Process}
 
 final case class SbtInstance(process: Process, server: IPC.Server)
 
-final class SbtHandler(directory: File,
-                       launcher: File,
-                       log: Logger,
-                       launchOpts: Seq[String] = Seq())
+final class SbtHandler(
+    directory: File,
+    launcher: File,
+    log: Logger,
+    launchOpts: Seq[String] = Seq())
     extends StatementHandler {
   type State = Option[SbtInstance]
   def initialState = None
 
-  def apply(command: String,
-            arguments: List[String],
-            i: Option[SbtInstance]): Option[SbtInstance] = onSbtInstance(i) {
+  def apply(
+      command: String,
+      arguments: List[String],
+      i: Option[SbtInstance]): Option[SbtInstance] = onSbtInstance(i) {
     (process, server) =>
       send((command :: arguments.map(escape)).mkString(" "), server)
       receive(command + " failed", server)
@@ -45,11 +47,13 @@ final class SbtHandler(directory: File,
   private[this] def onNewSbtInstance(
       f: (Process, IPC.Server) => Unit): Option[SbtInstance] = {
     val server = IPC.unmanagedServer
-    val p = try newRemote(server) catch {
+    val p = try newRemote(server)
+    catch {
       case e: Throwable => server.close(); throw e
     }
     val ai = Some(SbtInstance(p, server))
-    try f(p, server) catch {
+    try f(p, server)
+    catch {
       case e: Throwable =>
         // TODO: closing is necessary only because StatementHandler uses exceptions for signaling errors
         finish(ai); throw e
@@ -81,8 +85,8 @@ final class SbtHandler(directory: File,
       "-Dsbt.global.base=" + (new File(directory, "global")).getAbsolutePath
     val args =
       "java" ::
-      (launchOpts.toList ++
-          (globalBase :: "-jar" :: launcherJar :: ("<" + server.port) :: Nil))
+        (launchOpts.toList ++
+        (globalBase :: "-jar" :: launcherJar :: ("<" + server.port) :: Nil))
     val io = BasicIO(false, log).withInput(_.close())
     val p = Process(args, directory) run (io)
     val thread = new Thread() {
@@ -100,6 +104,7 @@ final class SbtHandler(directory: File,
   def escape(argument: String) =
     if (argument.contains(" "))
       "\"" +
-      argument.replaceAll(q("""\"""), """\\""").replaceAll(q("\""), "\\\"") +
-      "\"" else argument
+        argument.replaceAll(q("""\"""), """\\""").replaceAll(q("\""), "\\\"") +
+        "\""
+    else argument
 }

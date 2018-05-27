@@ -19,7 +19,7 @@ abstract class ScalaElseUnwrapperBase extends ScalaUnwrapper {
   override def doUnwrap(element: PsiElement, context: ScalaUnwrapContext) =
     elseBranch(element) match {
       case Some((ifStmt, expr)) => unwrapElseBranch(expr, ifStmt, context)
-      case _ =>
+      case _                    =>
     }
 
   protected def elseBranch(e: PsiElement): Option[(ScIfStmt, ScExpression)] = {
@@ -27,7 +27,9 @@ abstract class ScalaElseUnwrapperBase extends ScalaUnwrapper {
 
     e.getParent match {
       case ifSt @ ScIfStmt(_, Some(expr), _) childOf (parentIf @ ScIfStmt(
-          _, _, Some(elseIf))) if ifSt == elseIf && e == expr =>
+            _,
+            _,
+            Some(elseIf))) if ifSt == elseIf && e == expr =>
         Some((parentIf, expr))
       case ifStmt @ ScIfStmt(_, _, Some(elseBr)) =>
         if (e.getNode.getElementType == ScalaTokenTypes.kELSE || elseBr == e)
@@ -40,9 +42,11 @@ abstract class ScalaElseUnwrapperBase extends ScalaUnwrapper {
   @tailrec
   final def maxIfStmt(ifStmt: ScIfStmt): ScIfStmt = ifStmt.getParent match {
     case ifSt: ScIfStmt => maxIfStmt(ifSt)
-    case _ => ifStmt
+    case _              => ifStmt
   }
 
   protected def unwrapElseBranch(
-      expr: ScExpression, ifStmt: ScIfStmt, context: ScalaUnwrapContext)
+      expr: ScExpression,
+      ifStmt: ScIfStmt,
+      context: ScalaUnwrapContext)
 }

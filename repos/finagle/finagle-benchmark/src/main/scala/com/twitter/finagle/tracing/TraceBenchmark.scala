@@ -13,11 +13,11 @@ import org.openjdk.jmh.infra.Blackhole
 class TraceBenchmark extends StdBenchAnnotations {
 
   private[this] val traceId = TraceId(
-      Some(SpanId(5L)),
-      Some(SpanId(6L)),
-      SpanId(7L),
-      None,
-      Flags.apply()
+    Some(SpanId(5L)),
+    Some(SpanId(6L)),
+    SpanId(7L),
+    None,
+    Flags.apply()
   )
 
   // Note that this needs to == to @OperationsPerInvocation above

@@ -43,7 +43,8 @@ private[tree] case class NodeIndexUpdater(split: Split, nodeIndex: Int) {
     * @return Child node index to update to.
     */
   def updateNodeIndex(
-      binnedFeatures: Array[Int], bins: Array[Array[Bin]]): Int = {
+      binnedFeatures: Array[Int],
+      bins: Array[Array[Bin]]): Int = {
     if (split.featureType == Continuous) {
       val featureIndex = split.feature
       val binIndex = binnedFeatures(featureIndex)
@@ -77,7 +78,8 @@ private[tree] case class NodeIndexUpdater(split: Split, nodeIndex: Int) {
   */
 @DeveloperApi
 private[spark] class NodeIdCache(
-    var nodeIdsForInstances: RDD[Array[Int]], val checkpointInterval: Int) {
+    var nodeIdsForInstances: RDD[Array[Int]],
+    val checkpointInterval: Int) {
 
   // Keep a reference to a previous node Ids for instances.
   // Because we will keep on re-persisting updated node Ids,
@@ -109,22 +111,22 @@ private[spark] class NodeIdCache(
     prevNodeIdsForInstances = nodeIdsForInstances
     nodeIdsForInstances = data.zip(nodeIdsForInstances).map {
       case (point, node) => {
-          var treeId = 0
-          while (treeId < nodeIdUpdaters.length) {
-            val nodeIdUpdater =
-              nodeIdUpdaters(treeId).getOrElse(node(treeId), null)
-            if (nodeIdUpdater != null) {
-              val newNodeIndex = nodeIdUpdater.updateNodeIndex(
-                  binnedFeatures = point.datum.binnedFeatures,
-                  bins = bins)
-              node(treeId) = newNodeIndex
-            }
-
-            treeId += 1
+        var treeId = 0
+        while (treeId < nodeIdUpdaters.length) {
+          val nodeIdUpdater =
+            nodeIdUpdaters(treeId).getOrElse(node(treeId), null)
+          if (nodeIdUpdater != null) {
+            val newNodeIndex = nodeIdUpdater.updateNodeIndex(
+              binnedFeatures = point.datum.binnedFeatures,
+              bins = bins)
+            node(treeId) = newNodeIndex
           }
 
-          node
+          treeId += 1
         }
+
+        node
+      }
     }
 
     // Keep on persisting new ones.
@@ -186,11 +188,13 @@ private[spark] object NodeIdCache {
     * @param initVal The initial values in the cache.
     * @return A node Id cache containing an RDD of initial root node Indices.
     */
-  def init(data: RDD[BaggedPoint[TreePoint]],
-           numTrees: Int,
-           checkpointInterval: Int,
-           initVal: Int = 1): NodeIdCache = {
+  def init(
+      data: RDD[BaggedPoint[TreePoint]],
+      numTrees: Int,
+      checkpointInterval: Int,
+      initVal: Int = 1): NodeIdCache = {
     new NodeIdCache(
-        data.map(_ => Array.fill[Int](numTrees)(initVal)), checkpointInterval)
+      data.map(_ => Array.fill[Int](numTrees)(initVal)),
+      checkpointInterval)
   }
 }

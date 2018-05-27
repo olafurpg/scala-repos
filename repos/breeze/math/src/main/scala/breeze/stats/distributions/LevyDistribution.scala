@@ -16,7 +16,9 @@ package distributions
  limitations under the License.
  */
 
-import org.apache.commons.math3.distribution.{LevyDistribution => ApacheLevyDistribution}
+import org.apache.commons.math3.distribution.{
+  LevyDistribution => ApacheLevyDistribution
+}
 import org.apache.commons.math3.random.{RandomGenerator, JDKRandomGenerator}
 
 /**
@@ -24,9 +26,10 @@ import org.apache.commons.math3.random.{RandomGenerator, JDKRandomGenerator}
   *
   * @author stucchio
   */
-class LevyDistribution(mu: Double,
-                       c: Double,
-                       generator: RandomGenerator = new JDKRandomGenerator())
+class LevyDistribution(
+    mu: Double,
+    c: Double,
+    generator: RandomGenerator = new JDKRandomGenerator())
     extends ApacheContinuousDistribution {
   protected final val inner = new ApacheLevyDistribution(generator, mu, c)
 }

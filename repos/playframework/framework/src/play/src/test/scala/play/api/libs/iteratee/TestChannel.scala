@@ -44,7 +44,9 @@ class TestChannel[A](defaultTimeout: Duration) extends Concurrent.Channel[A] {
     expect(expected, defaultTimeout, test)
 
   def expect(
-      expected: A, timeout: Duration, test: BiFunction[A, A, JBoolean]): A =
+      expected: A,
+      timeout: Duration,
+      test: BiFunction[A, A, JBoolean]): A =
     expect(expected, timeout, test.apply(_, _))
 
   def expect(expected: A, test: (A, A) => Boolean): A =
@@ -56,11 +58,12 @@ class TestChannel[A](defaultTimeout: Duration) extends Concurrent.Channel[A] {
         throw new AssertionError(s"timeout ($timeout) waiting for $expected")
       case Input.El(input) =>
         assert(
-            test(expected, input), s"expected [$expected] but found [$input]")
+          test(expected, input),
+          s"expected [$expected] but found [$input]")
         input
       case other =>
         throw new AssertionError(
-            s"expected Input.El [$expected] but found [$other]")
+          s"expected Input.El [$expected] but found [$other]")
     }
   }
 
@@ -85,16 +88,18 @@ class TestChannel[A](defaultTimeout: Duration) extends Concurrent.Channel[A] {
 
   def expectEnd[T](expected: Class[T], timeout: Duration): T = {
     val end = takeEnd(timeout)
-    assert(end ne null,
-           s"timeout ($timeout) waiting for end with failure [$expected]")
+    assert(
+      end ne null,
+      s"timeout ($timeout) waiting for end with failure [$expected]")
     end match {
       case Some(throwable) =>
-        assert(expected isInstance throwable,
-               s"expected end with failure [$expected] but found [$throwable]")
+        assert(
+          expected isInstance throwable,
+          s"expected end with failure [$expected] but found [$throwable]")
         throwable.asInstanceOf[T]
       case None =>
         throw new AssertionError(
-            s"expected end with failure [$expected] but found end (without failure)")
+          s"expected end with failure [$expected] but found end (without failure)")
     }
   }
 
@@ -105,7 +110,7 @@ class TestChannel[A](defaultTimeout: Duration) extends Concurrent.Channel[A] {
     assert(end ne null, s"timeout ($timeout) waiting for end")
     if (end.isDefined)
       throw new AssertionError(
-          s"expected end (without failure) but found [${end.get}]")
+        s"expected end (without failure) but found [${end.get}]")
   }
 
   def expectEmpty(): Unit = {

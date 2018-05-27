@@ -22,7 +22,8 @@ import scalikejdbc._
 
 /** JDBC implementation of [[Models]] */
 class JDBCModels(client: String, config: StorageClientConfig, prefix: String)
-    extends Models with Logging {
+    extends Models
+    with Logging {
 
   /** Database table name for this data access object */
   val tableName = JDBCUtils.prefixTableName(prefix, "models")
@@ -41,9 +42,12 @@ class JDBCModels(client: String, config: StorageClientConfig, prefix: String)
   }
 
   def get(id: String): Option[Model] = DB readOnly { implicit session =>
-    sql"select id, models from $tableName where id = $id".map { r =>
-      Model(id = r.string("id"), models = r.bytes("models"))
-    }.single().apply()
+    sql"select id, models from $tableName where id = $id"
+      .map { r =>
+        Model(id = r.string("id"), models = r.bytes("models"))
+      }
+      .single()
+      .apply()
   }
 
   def delete(id: String): Unit = DB localTx { implicit session =>

@@ -4,13 +4,26 @@ import com.twitter.io.{Buf, Reader => BufReader, Writer => BufWriter}
 import com.twitter.finagle.netty3.{ChannelBufferBuf, BufChannelBuffer}
 import com.twitter.finagle.http.netty.{HttpMessageProxy, Bijections}
 import com.twitter.util.{Await, Duration, Closable}
-import java.io.{InputStream, InputStreamReader, OutputStream, OutputStreamWriter, Reader, Writer}
+import java.io.{
+  InputStream,
+  InputStreamReader,
+  OutputStream,
+  OutputStreamWriter,
+  Reader,
+  Writer
+}
 import java.util.{Iterator => JIterator}
 import java.nio.charset.Charset
 import java.util.{Date, TimeZone}
 import org.apache.commons.lang.StringUtils
 import org.apache.commons.lang.time.FastDateFormat
-import org.jboss.netty.buffer.{ChannelBufferInputStream, DynamicChannelBuffer, ChannelBuffer, ChannelBufferOutputStream, ChannelBuffers}
+import org.jboss.netty.buffer.{
+  ChannelBufferInputStream,
+  DynamicChannelBuffer,
+  ChannelBuffer,
+  ChannelBufferOutputStream,
+  ChannelBuffers
+}
 import scala.collection.JavaConverters._
 
 import Bijections._
@@ -73,7 +86,7 @@ abstract class Message extends HttpMessageProxy {
   def accept: Seq[String] =
     Option(headers.get(Fields.Accept)) match {
       case Some(s) => s.split(",").map(_.trim).filter(_.nonEmpty)
-      case None => Seq()
+      case None    => Seq()
     }
 
   /** Set Accept header */
@@ -243,7 +256,7 @@ abstract class Message extends HttpMessageProxy {
     contentType.flatMap { contentType =>
       val beforeSemi = contentType.indexOf(";") match {
         case -1 => contentType
-        case n => contentType.substring(0, n)
+        case n  => contentType.substring(0, n)
       }
       val mediaType = beforeSemi.trim
       if (mediaType.nonEmpty) Some(mediaType.toLowerCase)
@@ -422,7 +435,7 @@ abstract class Message extends HttpMessageProxy {
     // Use buffer size of 1024.  Netty default is 256, which seems too small.
     // Netty doubles buffers on resize.
     val outputStream = new ChannelBufferOutputStream(
-        ChannelBuffers.dynamicBuffer(1024))
+      ChannelBuffers.dynamicBuffer(1024))
     val result = f(outputStream) // throws
     outputStream.close()
     write(outputStream.buffer)
@@ -465,8 +478,8 @@ object Message {
   val ContentTypeWwwFrom = MediaType.WwwForm + ";" + CharsetUtf8
 
   private val HttpDateFormat = FastDateFormat.getInstance(
-      "EEE, dd MMM yyyy HH:mm:ss",
-      TimeZone.getTimeZone("GMT"))
+    "EEE, dd MMM yyyy HH:mm:ss",
+    TimeZone.getTimeZone("GMT"))
   def httpDateFormat(date: Date): String =
     HttpDateFormat.format(date) + " GMT"
 }

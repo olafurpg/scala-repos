@@ -6,7 +6,7 @@ trait Baz {
   def foo() = {
     NameAfterRename match {
       case NameAfterRename =>
-      case _ =>
+      case _               =>
     }
   }
 }

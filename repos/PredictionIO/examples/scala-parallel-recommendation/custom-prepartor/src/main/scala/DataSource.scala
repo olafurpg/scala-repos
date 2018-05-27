@@ -17,34 +17,37 @@ case class DataSourceParams(appId: Int) extends Params
 
 class DataSource(val dsp: DataSourceParams)
     extends PDataSource[
-        TrainingData, EmptyEvaluationInfo, Query, EmptyActualResult] {
+      TrainingData,
+      EmptyEvaluationInfo,
+      Query,
+      EmptyActualResult] {
 
   @transient lazy val logger = Logger[this.type]
 
   override def readTraining(sc: SparkContext): TrainingData = {
     val eventsDb = Storage.getPEvents()
     val eventsRDD: RDD[Event] = eventsDb.find(
-        appId = dsp.appId,
-        entityType = Some("user"),
-        eventNames = Some(List("rate", "buy")), // read "rate" and "buy" event
-        // targetEntityType is optional field of an event.
-        targetEntityType = Some(Some("item")))(sc)
+      appId = dsp.appId,
+      entityType = Some("user"),
+      eventNames = Some(List("rate", "buy")), // read "rate" and "buy" event
+      // targetEntityType is optional field of an event.
+      targetEntityType = Some(Some("item"))
+    )(sc)
 
     val ratingsRDD: RDD[Rating] = eventsRDD.map { event =>
       val rating = try {
         val ratingValue: Double = event.event match {
           case "rate" => event.properties.get[Double]("rating")
-          case "buy" => 4.0 // map buy event to rating value of 4
-          case _ => throw new Exception(s"Unexpected event ${event} is read.")
+          case "buy"  => 4.0 // map buy event to rating value of 4
+          case _      => throw new Exception(s"Unexpected event ${event} is read.")
         }
         // entityId and targetEntityId is String
         Rating(event.entityId, event.targetEntityId.get, ratingValue)
       } catch {
         case e: Exception => {
-            logger.error(
-                s"Cannot convert ${event} to Rating. Exception: ${e}.")
-            throw e
-          }
+          logger.error(s"Cannot convert ${event} to Rating. Exception: ${e}.")
+          throw e
+        }
       }
       rating
     }
@@ -60,8 +63,7 @@ case class Rating(
 
 class TrainingData(
     val ratings: RDD[Rating]
-)
-    extends Serializable {
+) extends Serializable {
   override def toString = {
     s"ratings: [${ratings.count()}] (${ratings.take(2).toList}...)"
   }

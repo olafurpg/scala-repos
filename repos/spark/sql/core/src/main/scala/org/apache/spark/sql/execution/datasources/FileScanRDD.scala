@@ -27,10 +27,11 @@ import org.apache.spark.sql.catalyst.InternalRow
   * need to be prepended to each row.  The reading should start at the first
   * valid record found after `offset`.
   */
-case class PartitionedFile(partitionValues: InternalRow,
-                           filePath: String,
-                           start: Long,
-                           length: Long)
+case class PartitionedFile(
+    partitionValues: InternalRow,
+    filePath: String,
+    start: Long,
+    length: Long)
 
 /**
   * A collection of files that should be read as a single task possibly from multiple partitioned
@@ -42,13 +43,15 @@ case class PartitionedFile(partitionValues: InternalRow,
 case class FilePartition(val index: Int, files: Seq[PartitionedFile])
     extends Partition
 
-class FileScanRDD(@transient val sqlContext: SQLContext,
-                  readFunction: (PartitionedFile) => Iterator[InternalRow],
-                  @transient val filePartitions: Seq[FilePartition])
+class FileScanRDD(
+    @transient val sqlContext: SQLContext,
+    readFunction: (PartitionedFile) => Iterator[InternalRow],
+    @transient val filePartitions: Seq[FilePartition])
     extends RDD[InternalRow](sqlContext.sparkContext, Nil) {
 
   override def compute(
-      split: Partition, context: TaskContext): Iterator[InternalRow] = {
+      split: Partition,
+      context: TaskContext): Iterator[InternalRow] = {
     throw new NotImplementedError("Not Implemented Yet")
   }
 

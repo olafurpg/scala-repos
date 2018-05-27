@@ -33,7 +33,7 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.rdd.RDD
 import org.apache.spark.util.Utils
 
-private abstract class BaseRRDD[T : ClassTag, U : ClassTag](
+private abstract class BaseRRDD[T: ClassTag, U: ClassTag](
     parent: RDD[T],
     numPartitions: Int,
     func: Array[Byte],
@@ -41,13 +41,15 @@ private abstract class BaseRRDD[T : ClassTag, U : ClassTag](
     serializer: String,
     packageNames: Array[Byte],
     broadcastVars: Array[Broadcast[Object]])
-    extends RDD[U](parent) with Logging {
+    extends RDD[U](parent)
+    with Logging {
   protected var dataStream: DataInputStream = _
   private var bootTime: Double = _
   override def getPartitions: Array[Partition] = parent.partitions
 
   override def compute(
-      partition: Partition, context: TaskContext): Iterator[U] = {
+      partition: Partition,
+      context: TaskContext): Iterator[U] = {
 
     // Timing start
     bootTime = System.currentTimeMillis / 1000.0
@@ -56,8 +58,8 @@ private abstract class BaseRRDD[T : ClassTag, U : ClassTag](
     val parentIterator = firstParent[T].iterator(partition, context)
 
     // we expect two connections
-    val serverSocket = new ServerSocket(
-        0, 2, InetAddress.getByName("localhost"))
+    val serverSocket =
+      new ServerSocket(0, 2, InetAddress.getByName("localhost"))
     val listenPort = serverSocket.getLocalPort()
 
     // The stdout/stderr is shared by multiple tasks, because we use one daemon
@@ -72,7 +74,9 @@ private abstract class BaseRRDD[T : ClassTag, U : ClassTag](
     serverSocket.setSoTimeout(10000)
     val inSocket = serverSocket.accept()
     startStdinThread(
-        inSocket.getOutputStream(), parentIterator, partition.index)
+      inSocket.getOutputStream(),
+      parentIterator,
+      partition.index)
 
     // the socket used to receive the output of task
     val outSocket = serverSocket.accept()
@@ -104,7 +108,7 @@ private abstract class BaseRRDD[T : ClassTag, U : ClassTag](
     } catch {
       case e: Exception =>
         throw new SparkException(
-            "R computation failed with\n " + errThread.getLines())
+          "R computation failed with\n " + errThread.getLines())
     }
   }
 
@@ -112,7 +116,9 @@ private abstract class BaseRRDD[T : ClassTag, U : ClassTag](
     * Start a thread to write RDD data to the R process.
     */
   private def startStdinThread[T](
-      output: OutputStream, iter: Iterator[T], partition: Int): Unit = {
+      output: OutputStream,
+      iter: Iterator[T],
+      partition: Int): Unit = {
 
     val env = SparkEnv.get
     val taskContext = TaskContext.get()
@@ -208,24 +214,23 @@ private abstract class BaseRRDD[T : ClassTag, U : ClassTag](
           val compute = dataStream.readDouble
           val output = dataStream.readDouble
           logInfo(
-              ("Times: boot = %.3f s, init = %.3f s, broadcast = %.3f s, " +
-                  "read-input = %.3f s, compute = %.3f s, write-output = %.3f s, " +
-                  "total = %.3f s").format(
-                  boot,
-                  init,
-                  broadcast,
-                  input,
-                  compute,
-                  output,
-                  boot + init + broadcast + input + compute + output))
+            ("Times: boot = %.3f s, init = %.3f s, broadcast = %.3f s, " +
+              "read-input = %.3f s, compute = %.3f s, write-output = %.3f s, " +
+              "total = %.3f s").format(
+              boot,
+              init,
+              broadcast,
+              input,
+              compute,
+              output,
+              boot + init + broadcast + input + compute + output))
           read()
         case length if length >= 0 =>
           readData(length)
       }
     } catch {
       case eof: EOFException =>
-        throw new SparkException(
-            "R worker exited unexpectedly (cranshed)", eof)
+        throw new SparkException("R worker exited unexpectedly (cranshed)", eof)
     }
   }
 }
@@ -234,20 +239,21 @@ private abstract class BaseRRDD[T : ClassTag, U : ClassTag](
   * Form an RDD[(Int, Array[Byte])] from key-value pairs returned from R.
   * This is used by SparkR's shuffle operations.
   */
-private class PairwiseRRDD[T : ClassTag](parent: RDD[T],
-                                         numPartitions: Int,
-                                         hashFunc: Array[Byte],
-                                         deserializer: String,
-                                         packageNames: Array[Byte],
-                                         broadcastVars: Array[Object])
+private class PairwiseRRDD[T: ClassTag](
+    parent: RDD[T],
+    numPartitions: Int,
+    hashFunc: Array[Byte],
+    deserializer: String,
+    packageNames: Array[Byte],
+    broadcastVars: Array[Object])
     extends BaseRRDD[T, (Int, Array[Byte])](
-        parent,
-        numPartitions,
-        hashFunc,
-        deserializer,
-        SerializationFormats.BYTE,
-        packageNames,
-        broadcastVars.map(x => x.asInstanceOf[Broadcast[Object]])) {
+      parent,
+      numPartitions,
+      hashFunc,
+      deserializer,
+      SerializationFormats.BYTE,
+      packageNames,
+      broadcastVars.map(x => x.asInstanceOf[Broadcast[Object]])) {
 
   override protected def readData(length: Int): (Int, Array[Byte]) = {
     length match {
@@ -268,20 +274,21 @@ private class PairwiseRRDD[T : ClassTag](parent: RDD[T],
 /**
   * An RDD that stores serialized R objects as Array[Byte].
   */
-private class RRDD[T : ClassTag](parent: RDD[T],
-                                 func: Array[Byte],
-                                 deserializer: String,
-                                 serializer: String,
-                                 packageNames: Array[Byte],
-                                 broadcastVars: Array[Object])
+private class RRDD[T: ClassTag](
+    parent: RDD[T],
+    func: Array[Byte],
+    deserializer: String,
+    serializer: String,
+    packageNames: Array[Byte],
+    broadcastVars: Array[Object])
     extends BaseRRDD[T, Array[Byte]](
-        parent,
-        -1,
-        func,
-        deserializer,
-        serializer,
-        packageNames,
-        broadcastVars.map(x => x.asInstanceOf[Broadcast[Object]])) {
+      parent,
+      -1,
+      func,
+      deserializer,
+      serializer,
+      packageNames,
+      broadcastVars.map(x => x.asInstanceOf[Broadcast[Object]])) {
 
   override protected def readData(length: Int): Array[Byte] = {
     length match {
@@ -299,19 +306,20 @@ private class RRDD[T : ClassTag](parent: RDD[T],
 /**
   * An RDD that stores R objects as Array[String].
   */
-private class StringRRDD[T : ClassTag](parent: RDD[T],
-                                       func: Array[Byte],
-                                       deserializer: String,
-                                       packageNames: Array[Byte],
-                                       broadcastVars: Array[Object])
+private class StringRRDD[T: ClassTag](
+    parent: RDD[T],
+    func: Array[Byte],
+    deserializer: String,
+    packageNames: Array[Byte],
+    broadcastVars: Array[Object])
     extends BaseRRDD[T, String](
-        parent,
-        -1,
-        func,
-        deserializer,
-        SerializationFormats.STRING,
-        packageNames,
-        broadcastVars.map(x => x.asInstanceOf[Broadcast[Object]])) {
+      parent,
+      -1,
+      func,
+      deserializer,
+      SerializationFormats.STRING,
+      packageNames,
+      broadcastVars.map(x => x.asInstanceOf[Broadcast[Object]])) {
 
   override protected def readData(length: Int): String = {
     length match {
@@ -329,8 +337,11 @@ private object SpecialLengths {
 }
 
 private[r] class BufferedStreamThread(
-    in: InputStream, name: String, errBufferSize: Int)
-    extends Thread(name) with Logging {
+    in: InputStream,
+    name: String,
+    errBufferSize: Int)
+    extends Thread(name)
+    with Logging {
   val lines = new Array[String](errBufferSize)
   var lineIdx = 0
   override def run() {
@@ -344,11 +355,14 @@ private[r] class BufferedStreamThread(
   }
 
   def getLines(): String = synchronized {
-    (0 until errBufferSize).filter { x =>
-      lines((x + lineIdx) % errBufferSize) != null
-    }.map { x =>
-      lines((x + lineIdx) % errBufferSize)
-    }.mkString("\n")
+    (0 until errBufferSize)
+      .filter { x =>
+        lines((x + lineIdx) % errBufferSize) != null
+      }
+      .map { x =>
+        lines((x + lineIdx) % errBufferSize)
+      }
+      .mkString("\n")
   }
 }
 
@@ -399,13 +413,17 @@ private[r] object RRDD {
   private def startStdoutThread(proc: Process): BufferedStreamThread = {
     val BUFFER_SIZE = 100
     val thread = new BufferedStreamThread(
-        proc.getInputStream, "stdout reader for R", BUFFER_SIZE)
+      proc.getInputStream,
+      "stdout reader for R",
+      BUFFER_SIZE)
     thread.setDaemon(true)
     thread.start()
     thread
   }
 
-  private def createRProcess(port: Int, script: String): BufferedStreamThread = {
+  private def createRProcess(
+      port: Int,
+      script: String): BufferedStreamThread = {
     // "spark.sparkr.r.command" is deprecated and replaced by "spark.r.command",
     // but kept here for backward compatibility.
     val sparkConf = SparkEnv.get.conf
@@ -446,8 +464,8 @@ private[r] object RRDD {
           // the socket used to send out the input of task
           serverSocket.setSoTimeout(10000)
           val sock = serverSocket.accept()
-          daemonChannel = new DataOutputStream(
-              new BufferedOutputStream(sock.getOutputStream))
+          daemonChannel =
+            new DataOutputStream(new BufferedOutputStream(sock.getOutputStream))
           serverSocket.close()
         }
         try {
@@ -474,7 +492,8 @@ private[r] object RRDD {
     * called from R.
     */
   def createRDDFromArray(
-      jsc: JavaSparkContext, arr: Array[Array[Byte]]): JavaRDD[Array[Byte]] = {
+      jsc: JavaSparkContext,
+      arr: Array[Array[Byte]]): JavaRDD[Array[Byte]] = {
     JavaRDD.fromRDD(jsc.sc.parallelize(arr, arr.length))
   }
 }

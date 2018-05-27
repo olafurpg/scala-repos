@@ -57,13 +57,13 @@ object MemcacheStress extends App {
 
     if (config.nworkers() > 0)
       builder = builder.channelFactory(
-          new NioClientSocketChannelFactory(
-              Executors.newCachedThreadPool(
-                  new NamedPoolThreadFactory("memcacheboss")),
-              Executors.newCachedThreadPool(
-                  new NamedPoolThreadFactory("memcacheIO")),
-              config.nworkers()
-          )
+        new NioClientSocketChannelFactory(
+          Executors.newCachedThreadPool(
+            new NamedPoolThreadFactory("memcacheboss")),
+          Executors.newCachedThreadPool(
+            new NamedPoolThreadFactory("memcacheIO")),
+          config.nworkers()
+        )
       )
 
     if (config.stats()) builder = builder.reportTo(new OstrichStatsReceiver)

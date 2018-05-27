@@ -69,12 +69,12 @@ object CpuProfile {
 
   // (class name, method names) that say they are runnable, but are actually doing nothing.
   private[this] val IdleClassAndMethod: Set[(String, String)] = Set(
-      ("sun.nio.ch.EPollArrayWrapper", "epollWait"),
-      ("sun.nio.ch.KQueueArrayWrapper", "kevent0"),
-      ("java.net.SocketInputStream", "socketRead0"),
-      ("java.net.SocketOutputStream", "socketWrite0"),
-      ("java.net.PlainSocketImpl", "socketAvailable"),
-      ("java.net.PlainSocketImpl", "socketAccept")
+    ("sun.nio.ch.EPollArrayWrapper", "epollWait"),
+    ("sun.nio.ch.KQueueArrayWrapper", "kevent0"),
+    ("java.net.SocketInputStream", "socketRead0"),
+    ("java.net.SocketOutputStream", "socketWrite0"),
+    ("java.net.PlainSocketImpl", "socketAvailable"),
+    ("java.net.PlainSocketImpl", "socketAccept")
   )
 
   /**
@@ -85,7 +85,7 @@ object CpuProfile {
     */
   private[jvm] def isRunnable(stackElem: StackTraceElement): Boolean =
     !IdleClassAndMethod.contains(
-        (stackElem.getClassName, stackElem.getMethodName))
+      (stackElem.getClassName, stackElem.getMethodName))
 
   /**
     * Profile CPU usage of threads in `state` for `howlong`, sampling
@@ -109,7 +109,9 @@ object CpuProfile {
     *   - Limit stack depth?
     */
   def record(
-      howlong: Duration, frequency: Int, state: Thread.State): CpuProfile = {
+      howlong: Duration,
+      frequency: Int,
+      state: Thread.State): CpuProfile = {
     require(frequency < 1000)
 
     // TODO: it may make sense to write a custom hash function here
@@ -128,8 +130,8 @@ object CpuProfile {
 
     while (Time.now < end) {
       for (thread <- bean.dumpAllThreads(false, false)
-                        if thread.getThreadState() == state &&
-                    thread.getThreadId() != myId) {
+           if thread.getThreadState() == state &&
+             thread.getThreadId() != myId) {
         val s = thread.getStackTrace().toSeq
         if (s.nonEmpty) {
           val include = state != Thread.State.RUNNABLE || isRunnable(s.head)
@@ -159,9 +161,10 @@ object CpuProfile {
     * Call `record` in a thread with the given parameters, returning a
     * `Future` representing the completion of the profile.
     */
-  def recordInThread(howlong: Duration,
-                     frequency: Int,
-                     state: Thread.State): Future[CpuProfile] = {
+  def recordInThread(
+      howlong: Duration,
+      frequency: Int,
+      state: Thread.State): Future[CpuProfile] = {
     val p = new Promise[CpuProfile]
     val thr = new Thread("CpuProfile") {
       override def run() {

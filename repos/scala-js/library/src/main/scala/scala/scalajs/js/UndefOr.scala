@@ -42,8 +42,7 @@ object UndefOr extends UndefOrLowPrioImplicits {
   implicit def undefOr2ops[A](value: UndefOr[A]): UndefOrOps[A] =
     new UndefOrOps(value)
 
-  implicit def undefOr2jsAny[A](value: UndefOr[A])(
-      implicit ev: A => Any): Any =
+  implicit def undefOr2jsAny[A](value: UndefOr[A])(implicit ev: A => Any): Any =
     value.map(ev).asInstanceOf[Any]
 }
 

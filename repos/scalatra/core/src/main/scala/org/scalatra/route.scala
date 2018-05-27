@@ -10,10 +10,11 @@ import org.scalatra.util.MultiMap
   * may be invoked.  The route parameters extracted by the matchers are made
   * available to the action.
   */
-case class Route(routeMatchers: Seq[RouteMatcher] = Seq.empty,
-                 action: Action,
-                 contextPath: HttpServletRequest => String = _ => "",
-                 metadata: Map[Symbol, Any] = Map.empty) {
+case class Route(
+    routeMatchers: Seq[RouteMatcher] = Seq.empty,
+    action: Action,
+    contextPath: HttpServletRequest => String = _ => "",
+    metadata: Map[Symbol, Any] = Map.empty) {
 
   /**
     * Optionally returns this route's action and the multi-map of route
@@ -54,9 +55,10 @@ object Route {
   def apply(transformers: Seq[RouteTransformer], action: Action): Route =
     apply(transformers, action, (_: HttpServletRequest) => "")
 
-  def apply(transformers: Seq[RouteTransformer],
-            action: Action,
-            contextPath: HttpServletRequest => String): Route = {
+  def apply(
+      transformers: Seq[RouteTransformer],
+      action: Action,
+      contextPath: HttpServletRequest => String): Route = {
     val route = Route(action = action, contextPath = contextPath)
     transformers.foldLeft(route) { (route, transformer) =>
       transformer(route)

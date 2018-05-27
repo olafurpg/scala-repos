@@ -48,8 +48,8 @@ object Scalajsld {
     val reads = { (s: String) =>
       OutputMode.All
         .find(_.toString() == s)
-        .getOrElse(throw new IllegalArgumentException(
-                s"$s is not a valid output mode"))
+        .getOrElse(
+          throw new IllegalArgumentException(s"$s is not a valid output mode"))
     }
   }
 
@@ -77,57 +77,82 @@ object Scalajsld {
           c.copy(jsoutput = true)
         }
         .text("Deprecated: Does nothing but printing a warning")
-      opt[Unit]('f', "fastOpt").action { (_, c) =>
-        c.copy(noOpt = false, fullOpt = false)
-      }.text("Optimize code (this is the default)")
-      opt[Unit]('n', "noOpt").action { (_, c) =>
-        c.copy(noOpt = true, fullOpt = false)
-      }.text("Don't optimize code")
-      opt[Unit]('u', "fullOpt").action { (_, c) =>
-        c.copy(noOpt = false, fullOpt = true)
-      }.text("Fully optimize code (uses Google Closure Compiler)")
-      opt[Unit]('p', "prettyPrint").action { (_, c) =>
-        c.copy(prettyPrint = true)
-      }.text("Pretty print full opted code (meaningful with -u)")
-      opt[Unit]('s', "sourceMap").action { (_, c) =>
-        c.copy(sourceMap = true)
-      }.text("Produce a source map for the produced code")
-      opt[Unit]("compliantAsInstanceOfs").action { (_, c) =>
-        c.copy(semantics = c.semantics.withAsInstanceOfs(Compliant))
-      }.text("Use compliant asInstanceOfs")
-      opt[OutputMode]('m', "outputMode").action { (mode, c) =>
-        c.copy(outputMode = mode)
-      }.text("Output mode " + OutputMode.All.mkString("(", ", ", ")"))
-      opt[Unit]('b', "bypassLinkingErrors").action { (_, c) =>
-        c.copy(bypassLinkingErrors = true)
-      }.text("Only warn if there are linking errors (deprecated)")
-      opt[Unit]('c', "checkIR").action { (_, c) =>
-        c.copy(checkIR = true)
-      }.text("Check IR before optimizing")
+      opt[Unit]('f', "fastOpt")
+        .action { (_, c) =>
+          c.copy(noOpt = false, fullOpt = false)
+        }
+        .text("Optimize code (this is the default)")
+      opt[Unit]('n', "noOpt")
+        .action { (_, c) =>
+          c.copy(noOpt = true, fullOpt = false)
+        }
+        .text("Don't optimize code")
+      opt[Unit]('u', "fullOpt")
+        .action { (_, c) =>
+          c.copy(noOpt = false, fullOpt = true)
+        }
+        .text("Fully optimize code (uses Google Closure Compiler)")
+      opt[Unit]('p', "prettyPrint")
+        .action { (_, c) =>
+          c.copy(prettyPrint = true)
+        }
+        .text("Pretty print full opted code (meaningful with -u)")
+      opt[Unit]('s', "sourceMap")
+        .action { (_, c) =>
+          c.copy(sourceMap = true)
+        }
+        .text("Produce a source map for the produced code")
+      opt[Unit]("compliantAsInstanceOfs")
+        .action { (_, c) =>
+          c.copy(semantics = c.semantics.withAsInstanceOfs(Compliant))
+        }
+        .text("Use compliant asInstanceOfs")
+      opt[OutputMode]('m', "outputMode")
+        .action { (mode, c) =>
+          c.copy(outputMode = mode)
+        }
+        .text("Output mode " + OutputMode.All.mkString("(", ", ", ")"))
+      opt[Unit]('b', "bypassLinkingErrors")
+        .action { (_, c) =>
+          c.copy(bypassLinkingErrors = true)
+        }
+        .text("Only warn if there are linking errors (deprecated)")
+      opt[Unit]('c', "checkIR")
+        .action { (_, c) =>
+          c.copy(checkIR = true)
+        }
+        .text("Check IR before optimizing")
       opt[File]('r', "relativizeSourceMap")
         .valueName("<path>")
         .action { (x, c) =>
           c.copy(relativizeSourceMap = Some(x.toURI))
         }
         .text("Relativize source map with respect to given path (meaningful with -s)")
-      opt[Unit]("noStdlib").action { (_, c) =>
-        c.copy(stdLib = None)
-      }.text("Don't automatically include Scala.js standard library")
+      opt[Unit]("noStdlib")
+        .action { (_, c) =>
+          c.copy(stdLib = None)
+        }
+        .text("Don't automatically include Scala.js standard library")
       opt[File]("stdlib")
         .valueName("<scala.js stdlib jar>")
         .hidden()
         .action { (x, c) =>
           c.copy(stdLib = Some(x))
         }
-        .text("Location of Scala.js standard libarary. This is set by the " +
+        .text(
+          "Location of Scala.js standard libarary. This is set by the " +
             "runner script and automatically prepended to the classpath. " +
             "Use -n to not include it.")
-      opt[Unit]('d', "debug").action { (_, c) =>
-        c.copy(logLevel = Level.Debug)
-      }.text("Debug mode: Show full log")
-      opt[Unit]('q', "quiet").action { (_, c) =>
-        c.copy(logLevel = Level.Warn)
-      }.text("Only show warnings & errors")
+      opt[Unit]('d', "debug")
+        .action { (_, c) =>
+          c.copy(logLevel = Level.Debug)
+        }
+        .text("Debug mode: Show full log")
+      opt[Unit]('q', "quiet")
+        .action { (_, c) =>
+          c.copy(logLevel = Level.Warn)
+        }
+        .text("Only show warnings & errors")
       opt[Unit]("really-quiet")
         .abbr("qq")
         .action { (_, c) =>
@@ -147,7 +172,7 @@ object Scalajsld {
       // Warn if writing JS dependencies was requested.
       if (options.jsoutput) {
         Console.err.println(
-            "Support for the --jsoutput flag has been dropped. " +
+          "Support for the --jsoutput flag has been dropped. " +
             "JS dependencies will not be written to disk. " +
             "Comment on https://github.com/scala-js/scala-js/issues/2163 " +
             "if you rely on this feature.")
@@ -156,7 +181,7 @@ object Scalajsld {
       // Warn if bypassing linking errors was requested.
       if (options.bypassLinkingErrors) {
         Console.err.println(
-            "Support for bypassing linking errors with -b or " +
+          "Support for bypassing linking errors with -b or " +
             "--bypassLinkingErrors will be dropped in the next major version.")
       }
 
@@ -174,14 +199,16 @@ object Scalajsld {
         .withRelativizeSourceMapBase(options.relativizeSourceMap)
         .withPrettyPrint(options.prettyPrint)
 
-      val linker = Linker(semantics,
-                          options.outputMode,
-                          options.sourceMap,
-                          disableOptimizer = options.noOpt,
-                          parallel = true,
-                          useClosureCompiler = options.fullOpt,
-                          frontendConfig,
-                          backendConfig)
+      val linker = Linker(
+        semantics,
+        options.outputMode,
+        options.sourceMap,
+        disableOptimizer = options.noOpt,
+        parallel = true,
+        useClosureCompiler = options.fullOpt,
+        frontendConfig,
+        backendConfig
+      )
 
       val logger = new ScalaConsoleLogger(options.logLevel)
       val outFile = WritableFileVirtualJSFile(options.output)

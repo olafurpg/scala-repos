@@ -6,12 +6,13 @@ import java.net.InetSocketAddress
 import java.nio.ByteBuffer
 import java.util.logging.Logger
 
-private[tracing] object RecordTimeFormat
-    extends TimeFormat("MMdd HH:mm:ss.SSS")
+private[tracing] object RecordTimeFormat extends TimeFormat("MMdd HH:mm:ss.SSS")
 
 object Record {
   def apply(
-      traceId: TraceId, timestamp: Time, annotation: Annotation): Record = {
+      traceId: TraceId,
+      timestamp: Time,
+      annotation: Annotation): Record = {
     Record(traceId, timestamp, annotation, None)
   }
 }
@@ -24,10 +25,11 @@ object Record {
   * @param annotation What kind of information should we record?
   * @param duration Did this event have a duration? For example: how long did a certain code block take to run
   */
-case class Record(traceId: TraceId,
-                  timestamp: Time,
-                  annotation: Annotation,
-                  duration: Option[Duration]) {
+case class Record(
+    traceId: TraceId,
+    timestamp: Time,
+    annotation: Annotation,
+    duration: Option[Duration]) {
   override def toString: String =
     s"${RecordTimeFormat.format(timestamp)} $traceId] $annotation"
 }
@@ -94,10 +96,10 @@ object NullTracer extends NullTracer
 object BroadcastTracer {
   def apply(tracers: Seq[Tracer]): Tracer =
     tracers.filterNot(_ == NullTracer) match {
-      case Seq() => NullTracer
-      case Seq(tracer) => tracer
+      case Seq()              => NullTracer
+      case Seq(tracer)        => tracer
       case Seq(first, second) => new Two(first, second)
-      case _ => new N(tracers)
+      case _                  => new N(tracers)
     }
 
   private class Two(first: Tracer, second: Tracer) extends Tracer {

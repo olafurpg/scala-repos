@@ -27,7 +27,14 @@ import scala.reflect.ClassTag
 import org.apache.spark.api.java.{JavaPairRDD, JavaRDD, JavaRDDLike}
 import org.apache.spark.api.java.JavaPairRDD._
 import org.apache.spark.api.java.JavaSparkContext.fakeClassTag
-import org.apache.spark.api.java.function.{Function => JFunction, Function2 => JFunction2, Function3 => JFunction3, VoidFunction => JVoidFunction, VoidFunction2 => JVoidFunction2, _}
+import org.apache.spark.api.java.function.{
+  Function => JFunction,
+  Function2 => JFunction2,
+  Function3 => JFunction3,
+  VoidFunction => JVoidFunction,
+  VoidFunction2 => JVoidFunction2,
+  _
+}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming._
 import org.apache.spark.streaming.api.java.JavaDStream._
@@ -103,8 +110,9 @@ trait JavaDStreamLike[
     * of elements in a window over this DStream. windowDuration and slideDuration are as defined in
     * the window() operation. This is equivalent to window(windowDuration, slideDuration).count()
     */
-  def countByWindow(windowDuration: Duration,
-                    slideDuration: Duration): JavaDStream[jl.Long] = {
+  def countByWindow(
+      windowDuration: Duration,
+      slideDuration: Duration): JavaDStream[jl.Long] = {
     dstream.countByWindow(windowDuration, slideDuration)
   }
 
@@ -122,7 +130,7 @@ trait JavaDStreamLike[
       windowDuration: Duration,
       slideDuration: Duration): JavaPairDStream[T, jl.Long] = {
     JavaPairDStream.scalaToJavaLong(
-        dstream.countByValueAndWindow(windowDuration, slideDuration))
+      dstream.countByValueAndWindow(windowDuration, slideDuration))
   }
 
   /**
@@ -140,8 +148,9 @@ trait JavaDStreamLike[
       windowDuration: Duration,
       slideDuration: Duration,
       numPartitions: Int): JavaPairDStream[T, jl.Long] = {
-    JavaPairDStream.scalaToJavaLong(dstream.countByValueAndWindow(
-            windowDuration, slideDuration, numPartitions))
+    JavaPairDStream.scalaToJavaLong(
+      dstream
+        .countByValueAndWindow(windowDuration, slideDuration, numPartitions))
   }
 
   /**
@@ -164,7 +173,8 @@ trait JavaDStreamLike[
   def mapToPair[K2, V2](f: PairFunction[T, K2, V2]): JavaPairDStream[K2, V2] = {
     def cm: ClassTag[(K2, V2)] = fakeClassTag
     new JavaPairDStream(dstream.map[(K2, V2)](f)(cm))(
-        fakeClassTag[K2], fakeClassTag[V2])
+      fakeClassTag[K2],
+      fakeClassTag[V2])
   }
 
   /**
@@ -185,7 +195,8 @@ trait JavaDStreamLike[
     def fn: (T) => Iterator[(K2, V2)] = (x: T) => f.call(x).asScala
     def cm: ClassTag[(K2, V2)] = fakeClassTag
     new JavaPairDStream(dstream.flatMap(fn)(cm))(
-        fakeClassTag[K2], fakeClassTag[V2])
+      fakeClassTag[K2],
+      fakeClassTag[V2])
   }
 
   /**
@@ -198,8 +209,7 @@ trait JavaDStreamLike[
     def fn: (Iterator[T]) => Iterator[U] = { (x: Iterator[T]) =>
       f.call(x.asJava).asScala
     }
-    new JavaDStream(dstream.mapPartitions(fn)(fakeClassTag[U]))(
-        fakeClassTag[U])
+    new JavaDStream(dstream.mapPartitions(fn)(fakeClassTag[U]))(fakeClassTag[U])
   }
 
   /**
@@ -214,7 +224,8 @@ trait JavaDStreamLike[
       f.call(x.asJava).asScala
     }
     new JavaPairDStream(dstream.mapPartitions(fn))(
-        fakeClassTag[K2], fakeClassTag[V2])
+      fakeClassTag[K2],
+      fakeClassTag[V2])
   }
 
   /**
@@ -264,7 +275,10 @@ trait JavaDStreamLike[
       slideDuration: Duration
   ): JavaDStream[T] = {
     dstream.reduceByWindow(
-        reduceFunc, invReduceFunc, windowDuration, slideDuration)
+      reduceFunc,
+      invReduceFunc,
+      windowDuration,
+      slideDuration)
   }
 
   /**
@@ -372,7 +386,9 @@ trait JavaDStreamLike[
     implicit val cmk2: ClassTag[K2] = fakeClassTag
     implicit val cmv2: ClassTag[V2] = fakeClassTag
     def scalaTransform(
-        inThis: RDD[T], inThat: RDD[U], time: Time): RDD[(K2, V2)] =
+        inThis: RDD[T],
+        inThat: RDD[U],
+        time: Time): RDD[(K2, V2)] =
       transformFunc.call(wrapRDD(inThis), other.wrapRDD(inThat), time).rdd
     dstream.transformWith[U, (K2, V2)](other.dstream, scalaTransform(_, _, _))
   }
@@ -390,7 +406,9 @@ trait JavaDStreamLike[
     implicit val cmw: ClassTag[W] = fakeClassTag
 
     def scalaTransform(
-        inThis: RDD[T], inThat: RDD[(K2, V2)], time: Time): RDD[W] = {
+        inThis: RDD[T],
+        inThat: RDD[(K2, V2)],
+        time: Time): RDD[W] = {
       transformFunc.call(wrapRDD(inThis), other.wrapRDD(inThat), time).rdd
     }
     dstream.transformWith[(K2, V2), W](other.dstream, scalaTransform(_, _, _))
@@ -403,17 +421,22 @@ trait JavaDStreamLike[
   def transformWithToPair[K2, V2, K3, V3](
       other: JavaPairDStream[K2, V2],
       transformFunc: JFunction3[
-          R, JavaPairRDD[K2, V2], Time, JavaPairRDD[K3, V3]]
+        R,
+        JavaPairRDD[K2, V2],
+        Time,
+        JavaPairRDD[K3, V3]]
   ): JavaPairDStream[K3, V3] = {
     implicit val cmk2: ClassTag[K2] = fakeClassTag
     implicit val cmv2: ClassTag[V2] = fakeClassTag
     implicit val cmk3: ClassTag[K3] = fakeClassTag
     implicit val cmv3: ClassTag[V3] = fakeClassTag
     def scalaTransform(
-        inThis: RDD[T], inThat: RDD[(K2, V2)], time: Time): RDD[(K3, V3)] =
+        inThis: RDD[T],
+        inThat: RDD[(K2, V2)],
+        time: Time): RDD[(K3, V3)] =
       transformFunc.call(wrapRDD(inThis), other.wrapRDD(inThat), time).rdd
-    dstream.transformWith[(K2, V2), (K3, V3)](
-        other.dstream, scalaTransform(_, _, _))
+    dstream
+      .transformWith[(K2, V2), (K3, V3)](other.dstream, scalaTransform(_, _, _))
   }
 
   /**

@@ -70,8 +70,8 @@ object Announcer {
       announcers groupBy (_.scheme) filter { case (_, rs) => rs.size > 1 }
     if (dups.size > 0) throw new MultipleAnnouncersPerSchemeException(dups)
 
-    for (r <- announcers) log.info(
-        "Announcer[%s] = %s(%s)".format(r.scheme, r.getClass.getName, r))
+    for (r <- announcers)
+      log.info("Announcer[%s] = %s(%s)".format(r.scheme, r.getClass.getName, r))
     announcers
   }
 
@@ -89,7 +89,7 @@ object Announcer {
       case Array(scheme, name) =>
         announcers.find(_.scheme == scheme) match {
           case Some(announcer) => announcer.announce(addr, name)
-          case None => Future.exception(new AnnouncerNotFoundException(scheme))
+          case None            => Future.exception(new AnnouncerNotFoundException(scheme))
         }
 
       case _ =>
@@ -99,7 +99,7 @@ object Announcer {
     announcement map { ann =>
       val lastForums = ann match {
         case a: ProxyAnnouncement => a.forums
-        case _ => Nil
+        case _                    => Nil
       }
 
       val proxyAnnouncement = new ProxyAnnouncement {

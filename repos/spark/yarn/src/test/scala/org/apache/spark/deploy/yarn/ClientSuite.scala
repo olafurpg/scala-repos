@@ -45,7 +45,9 @@ import org.apache.spark.deploy.yarn.config._
 import org.apache.spark.util.{ResetSystemProperties, SparkConfWithEnv, Utils}
 
 class ClientSuite
-    extends SparkFunSuite with Matchers with BeforeAndAfterAll
+    extends SparkFunSuite
+    with Matchers
+    with BeforeAndAfterAll
     with ResetSystemProperties {
 
   import Client._
@@ -69,7 +71,7 @@ class ClientSuite
 
   test("default Yarn application classpath") {
     getDefaultYarnApplicationClasspath should be(
-        Some(Fixtures.knownDefYarnAppCP))
+      Some(Fixtures.knownDefYarnAppCP))
   }
 
   test("default MR application classpath") {
@@ -77,32 +79,31 @@ class ClientSuite
   }
 
   test(
-      "resultant classpath for an application that defines a classpath for YARN") {
+    "resultant classpath for an application that defines a classpath for YARN") {
     withAppConf(Fixtures.mapYARNAppConf) { conf =>
       val env = newEnv
       populateHadoopClasspath(conf, env)
       classpath(env) should be(
-          flatten(Fixtures.knownYARNAppCP, getDefaultMRApplicationClasspath))
+        flatten(Fixtures.knownYARNAppCP, getDefaultMRApplicationClasspath))
     }
   }
 
-  test(
-      "resultant classpath for an application that defines a classpath for MR") {
+  test("resultant classpath for an application that defines a classpath for MR") {
     withAppConf(Fixtures.mapMRAppConf) { conf =>
       val env = newEnv
       populateHadoopClasspath(conf, env)
       classpath(env) should be(
-          flatten(getDefaultYarnApplicationClasspath, Fixtures.knownMRAppCP))
+        flatten(getDefaultYarnApplicationClasspath, Fixtures.knownMRAppCP))
     }
   }
 
   test(
-      "resultant classpath for an application that defines both classpaths, YARN and MR") {
+    "resultant classpath for an application that defines both classpaths, YARN and MR") {
     withAppConf(Fixtures.mapAppConf) { conf =>
       val env = newEnv
       populateHadoopClasspath(conf, env)
       classpath(env) should be(
-          flatten(Fixtures.knownYARNAppCP, Fixtures.knownMRAppCP))
+        flatten(Fixtures.knownYARNAppCP, Fixtures.knownMRAppCP))
     }
   }
 
@@ -160,15 +161,13 @@ class ClientSuite
       // staging dir.
       val expected = ADDED
         .split(",")
-        .map(
-            p =>
-              {
-            val uri = new URI(p)
-            if (LOCAL_SCHEME == uri.getScheme()) {
-              p
-            } else {
-              Option(uri.getFragment()).getOrElse(new File(p).getName())
-            }
+        .map(p => {
+          val uri = new URI(p)
+          if (LOCAL_SCHEME == uri.getScheme()) {
+            p
+          } else {
+            Option(uri.getFragment()).getOrElse(new File(p).getName())
+          }
         })
         .mkString(",")
 
@@ -187,22 +186,23 @@ class ClientSuite
 
     getClusterPath(sparkConf, "/localPath") should be("/remotePath")
     getClusterPath(sparkConf, "/localPath/1:/localPath/2") should be(
-        "/remotePath/1:/remotePath/2")
+      "/remotePath/1:/remotePath/2")
 
     val env = new MutableHashMap[String, String]()
-    populateClasspath(null,
-                      conf,
-                      sparkConf,
-                      env,
-                      false,
-                      extraClassPath = Some("/localPath/my1.jar"))
+    populateClasspath(
+      null,
+      conf,
+      sparkConf,
+      env,
+      false,
+      extraClassPath = Some("/localPath/my1.jar"))
     val cp = classpath(env)
     cp should contain("/remotePath/spark.jar")
     cp should contain("/remotePath/my1.jar")
   }
 
   test(
-      "configuration and args propagate through createApplicationSubmissionContext") {
+    "configuration and args propagate through createApplicationSubmissionContext") {
     val conf = new Configuration()
     // When parsing tags, duplicates and leading/trailing whitespace should be removed.
     // Spaces between non-comma strings should be preserved as single tags. Empty strings may or
@@ -211,8 +211,8 @@ class ClientSuite
       .set(APPLICATION_TAGS.key, ",tag1, dup,tag2 , ,multi word , dup")
       .set(MAX_APP_ATTEMPTS, 42)
     val args = new ClientArguments(
-        Array("--name", "foo-test-app", "--queue", "staging-queue"),
-        sparkConf)
+      Array("--name", "foo-test-app", "--queue", "staging-queue"),
+      sparkConf)
 
     val appContext = Records.newRecord(classOf[ApplicationSubmissionContext])
     val getNewApplicationResponse =
@@ -222,8 +222,8 @@ class ClientSuite
 
     val client = new Client(args, conf, sparkConf)
     client.createApplicationSubmissionContext(
-        new YarnClientApplication(getNewApplicationResponse, appContext),
-        containerLaunchContext)
+      new YarnClientApplication(getNewApplicationResponse, appContext),
+      containerLaunchContext)
 
     appContext.getApplicationName should be("foo-test-app")
     appContext.getQueue should be("staging-queue")
@@ -248,10 +248,11 @@ class ClientSuite
     val jar3 = TestUtils.createJarWithFiles(Map(), single)
     val jar4 = TestUtils.createJarWithFiles(Map(), single)
 
-    val jarsConf = Seq(s"${libs.getAbsolutePath()}/*",
-                       jar3.getPath(),
-                       s"local:${jar4.getPath()}",
-                       s"local:${single.getAbsolutePath()}/*")
+    val jarsConf = Seq(
+      s"${libs.getAbsolutePath()}/*",
+      jar3.getPath(),
+      s"local:${jar4.getPath()}",
+      s"local:${single.getAbsolutePath()}/*")
 
     val sparkConf = new SparkConf().set(SPARK_JARS, jarsConf)
     val client = createClient(sparkConf)
@@ -259,17 +260,21 @@ class ClientSuite
     val tempDir = Utils.createTempDir()
     client.prepareLocalResources(tempDir.getAbsolutePath(), Nil)
 
-    assert(
-        sparkConf.get(SPARK_JARS) === Some(
-            Seq(s"local:${jar4.getPath()}",
-                s"local:${single.getAbsolutePath()}/*")))
+    assert(sparkConf.get(SPARK_JARS) === Some(
+      Seq(s"local:${jar4.getPath()}", s"local:${single.getAbsolutePath()}/*")))
 
     verify(client).copyFileToRemote(
-        any(classOf[Path]), meq(new Path(jar1.toURI())), anyShort())
+      any(classOf[Path]),
+      meq(new Path(jar1.toURI())),
+      anyShort())
     verify(client).copyFileToRemote(
-        any(classOf[Path]), meq(new Path(jar2.toURI())), anyShort())
+      any(classOf[Path]),
+      meq(new Path(jar2.toURI())),
+      anyShort())
     verify(client).copyFileToRemote(
-        any(classOf[Path]), meq(new Path(jar3.toURI())), anyShort())
+      any(classOf[Path]),
+      meq(new Path(jar3.toURI())),
+      anyShort())
 
     val cp = classpath(client)
     cp should contain(buildPath(PWD, LOCALIZED_LIB_DIR, "*"))
@@ -287,7 +292,9 @@ class ClientSuite
     client.prepareLocalResources(temp.getAbsolutePath(), Nil)
 
     verify(client).copyFileToRemote(
-        any(classOf[Path]), meq(new Path(archive.toURI())), anyShort())
+      any(classOf[Path]),
+      meq(new Path(archive.toURI())),
+      anyShort())
     classpath(client) should contain(buildPath(PWD, LOCALIZED_LIB_DIR, "*"))
 
     sparkConf.set(SPARK_ARCHIVE, LOCAL_SCHEME + ":" + archive.getPath())
@@ -307,7 +314,9 @@ class ClientSuite
     val client = createClient(sparkConf)
     client.prepareLocalResources(temp.getAbsolutePath(), Nil)
     verify(client).copyFileToRemote(
-        any(classOf[Path]), meq(new Path(jar.toURI())), anyShort())
+      any(classOf[Path]),
+      meq(new Path(jar.toURI())),
+      anyShort())
     classpath(client) should contain(buildPath(PWD, LOCALIZED_LIB_DIR, "*"))
   }
 
@@ -315,29 +324,29 @@ class ClientSuite
 
     val knownDefYarnAppCP: Seq[String] =
       getFieldValue[Array[String], Seq[String]](
-          classOf[YarnConfiguration],
-          "DEFAULT_YARN_APPLICATION_CLASSPATH",
-          Seq[String]())(a => a.toSeq)
+        classOf[YarnConfiguration],
+        "DEFAULT_YARN_APPLICATION_CLASSPATH",
+        Seq[String]())(a => a.toSeq)
 
     val knownDefMRAppCP: Seq[String] =
       getFieldValue2[String, Array[String], Seq[String]](
-          classOf[MRJobConfig],
-          "DEFAULT_MAPREDUCE_APPLICATION_CLASSPATH",
-          Seq[String]())(a => a.split(","))(a => a.toSeq)
+        classOf[MRJobConfig],
+        "DEFAULT_MAPREDUCE_APPLICATION_CLASSPATH",
+        Seq[String]())(a => a.split(","))(a => a.toSeq)
 
     val knownYARNAppCP = Some(Seq("/known/yarn/path"))
 
     val knownMRAppCP = Some(Seq("/known/mr/path"))
 
     val mapMRAppConf = Map(
-        "mapreduce.application.classpath" -> knownMRAppCP
-          .map(_.mkString(":"))
-          .get)
+      "mapreduce.application.classpath" -> knownMRAppCP
+        .map(_.mkString(":"))
+        .get)
 
     val mapYARNAppConf = Map(
-        YarnConfiguration.YARN_APPLICATION_CLASSPATH -> knownYARNAppCP
-          .map(_.mkString(":"))
-          .get)
+      YarnConfiguration.YARN_APPLICATION_CLASSPATH -> knownYARNAppCP
+        .map(_.mkString(":"))
+        .get)
 
     val mapAppConf = mapYARNAppConf ++ mapMRAppConf
   }
@@ -366,23 +375,25 @@ class ClientSuite
       .getOrElse(defaults)
   }
 
-  def getFieldValue2[A : ClassTag, A1 : ClassTag, B](
-      clazz: Class[_], field: String, defaults: => B)(mapTo: A => B)(
-      mapTo1: A1 => B): B = {
+  def getFieldValue2[A: ClassTag, A1: ClassTag, B](
+      clazz: Class[_],
+      field: String,
+      defaults: => B)(mapTo: A => B)(mapTo1: A1 => B): B = {
     Try(clazz.getField(field))
       .map(_.get(null))
       .map {
-        case v: A => mapTo(v)
+        case v: A   => mapTo(v)
         case v1: A1 => mapTo1(v1)
-        case _ => defaults
+        case _      => defaults
       }
       .toOption
       .getOrElse(defaults)
   }
 
-  private def createClient(sparkConf: SparkConf,
-                           conf: Configuration = new Configuration(),
-                           args: Array[String] = Array()): Client = {
+  private def createClient(
+      sparkConf: SparkConf,
+      conf: Configuration = new Configuration(),
+      args: Array[String] = Array()): Client = {
     val clientArgs = new ClientArguments(args, sparkConf)
     val client = spy(new Client(clientArgs, conf, sparkConf))
     doReturn(new Path("/"))

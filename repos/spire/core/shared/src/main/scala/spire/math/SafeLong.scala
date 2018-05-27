@@ -20,7 +20,9 @@ import spire.std.bigInteger._
   * to a Long when possible.
   */
 sealed abstract class SafeLong
-    extends ScalaNumber with ScalaNumericConversions with Ordered[SafeLong] {
+    extends ScalaNumber
+    with ScalaNumericConversions
+    with Ordered[SafeLong] {
   lhs =>
 
   def isZero: Boolean
@@ -31,31 +33,31 @@ sealed abstract class SafeLong
 
   final def +(rhs: SafeLong): SafeLong =
     rhs match {
-      case SafeLongLong(n) => lhs + n
+      case SafeLongLong(n)       => lhs + n
       case SafeLongBigInteger(n) => lhs + n
     }
 
   final def -(rhs: SafeLong): SafeLong =
     rhs match {
-      case SafeLongLong(n) => lhs - n
+      case SafeLongLong(n)       => lhs - n
       case SafeLongBigInteger(n) => lhs - n
     }
 
   final def *(rhs: SafeLong): SafeLong =
     rhs match {
-      case SafeLongLong(n) => lhs * n
+      case SafeLongLong(n)       => lhs * n
       case SafeLongBigInteger(n) => lhs * n
     }
 
   final def /(rhs: SafeLong): SafeLong =
     rhs match {
-      case SafeLongLong(n) => lhs / n
+      case SafeLongLong(n)       => lhs / n
       case SafeLongBigInteger(n) => lhs / n
     }
 
   final def %(rhs: SafeLong): SafeLong =
     rhs match {
-      case SafeLongLong(n) => lhs % n
+      case SafeLongLong(n)       => lhs % n
       case SafeLongBigInteger(n) => lhs % n
     }
 
@@ -64,25 +66,25 @@ sealed abstract class SafeLong
 
   final def /%(rhs: SafeLong): (SafeLong, SafeLong) =
     rhs match {
-      case SafeLongLong(n) => lhs /% n
+      case SafeLongLong(n)       => lhs /% n
       case SafeLongBigInteger(n) => lhs /% n
     }
 
   final def &(rhs: SafeLong): SafeLong =
     rhs match {
-      case SafeLongLong(n) => lhs & n
+      case SafeLongLong(n)       => lhs & n
       case SafeLongBigInteger(n) => lhs & n
     }
 
   final def |(rhs: SafeLong): SafeLong =
     rhs match {
-      case SafeLongLong(n) => lhs | n
+      case SafeLongLong(n)       => lhs | n
       case SafeLongBigInteger(n) => lhs | n
     }
 
   final def ^(rhs: SafeLong): SafeLong =
     rhs match {
-      case SafeLongLong(n) => lhs ^ n
+      case SafeLongLong(n)       => lhs ^ n
       case SafeLongBigInteger(n) => lhs ^ n
     }
 
@@ -156,7 +158,10 @@ sealed abstract class SafeLong
 
     @tailrec
     def loop(
-        total: SafeLong, base: SafeLong, k: Int, mod: SafeLong): SafeLong = {
+        total: SafeLong,
+        base: SafeLong,
+        k: Int,
+        mod: SafeLong): SafeLong = {
       if (k == 0) total
       else if ((k & 1) == 1)
         loop((total * base) % mod, (base * base) % mod, k >> 1, mod)
@@ -184,7 +189,7 @@ sealed abstract class SafeLong
 
   override def toString: String =
     this match {
-      case SafeLongLong(n) => n.toString
+      case SafeLongLong(n)       => n.toString
       case SafeLongBigInteger(n) => n.toString
     }
 
@@ -247,7 +252,7 @@ object SafeLong extends SafeLongInstances {
       SafeLong(SafeLong.big64 gcd y)
     } else {
       SafeLongLong(
-          spire.math.gcd(x, (y remainder BigInteger.valueOf(x)).longValue))
+        spire.math.gcd(x, (y remainder BigInteger.valueOf(x)).longValue))
     }
 }
 
@@ -259,15 +264,15 @@ private[math] final case class SafeLongLong(x: Long) extends SafeLong {
 
   def +(y: Long): SafeLong =
     Checked.tryOrReturn[SafeLong](SafeLongLong(x + y))(
-        SafeLongBigInteger(BigInteger.valueOf(x) add BigInteger.valueOf(y)))
+      SafeLongBigInteger(BigInteger.valueOf(x) add BigInteger.valueOf(y)))
 
   def -(y: Long): SafeLong =
-    Checked.tryOrReturn[SafeLong](SafeLongLong(x - y))(SafeLongBigInteger(
-            BigInteger.valueOf(x) subtract BigInteger.valueOf(y)))
+    Checked.tryOrReturn[SafeLong](SafeLongLong(x - y))(
+      SafeLongBigInteger(BigInteger.valueOf(x) subtract BigInteger.valueOf(y)))
 
   def *(y: Long): SafeLong =
-    Checked.tryOrReturn[SafeLong](SafeLongLong(x * y))(SafeLongBigInteger(
-            BigInteger.valueOf(x) multiply BigInteger.valueOf(y)))
+    Checked.tryOrReturn[SafeLong](SafeLongLong(x * y))(
+      SafeLongBigInteger(BigInteger.valueOf(x) multiply BigInteger.valueOf(y)))
 
   def /(y: Long): SafeLong =
     Checked.tryOrReturn[SafeLong](SafeLongLong(x / y))(SafeLong.safe64)
@@ -317,29 +322,29 @@ private[math] final case class SafeLongLong(x: Long) extends SafeLong {
 
   def unary_-(): SafeLong =
     Checked.tryOrReturn[SafeLong](SafeLongLong(-x))(
-        SafeLongBigInteger(BigInteger.valueOf(x).negate()))
+      SafeLongBigInteger(BigInteger.valueOf(x).negate()))
 
   override def <(that: SafeLong): Boolean =
     that match {
-      case SafeLongLong(y) => x < y
+      case SafeLongLong(y)       => x < y
       case SafeLongBigInteger(y) => y.signum > 0
     }
 
   override def <=(that: SafeLong): Boolean =
     that match {
-      case SafeLongLong(y) => x <= y
+      case SafeLongLong(y)       => x <= y
       case SafeLongBigInteger(y) => y.signum > 0
     }
 
   override def >(that: SafeLong): Boolean =
     that match {
-      case SafeLongLong(y) => x > y
+      case SafeLongLong(y)       => x > y
       case SafeLongBigInteger(y) => y.signum < 0
     }
 
   override def >=(that: SafeLong): Boolean =
     that match {
-      case SafeLongLong(y) => x >= y
+      case SafeLongLong(y)       => x >= y
       case SafeLongBigInteger(y) => y.signum < 0
     }
 
@@ -373,10 +378,10 @@ private[math] final case class SafeLongLong(x: Long) extends SafeLong {
 
   override def equals(that: Any): Boolean =
     that match {
-      case SafeLongLong(y) => x == y
+      case SafeLongLong(y)       => x == y
       case SafeLongBigInteger(y) => false
-      case that: BigInt => if (that.bitLength > 63) false else that.toLong == x
-      case that => that == x
+      case that: BigInt          => if (that.bitLength > 63) false else that.toLong == x
+      case that                  => that == x
     }
 
   def abs: SafeLong =
@@ -386,7 +391,7 @@ private[math] final case class SafeLongLong(x: Long) extends SafeLong {
 
   def gcd(that: SafeLong): SafeLong =
     that match {
-      case SafeLongLong(y) => SafeLong.longGcd(x, y)
+      case SafeLongLong(y)       => SafeLong.longGcd(x, y)
       case SafeLongBigInteger(y) => SafeLong.mixedGcd(x, y)
     }
 
@@ -474,10 +479,10 @@ private[math] final case class SafeLongBigInteger(x: BigInteger)
 
   override def equals(that: Any): Boolean =
     that match {
-      case SafeLongLong(y) => false
+      case SafeLongLong(y)       => false
       case SafeLongBigInteger(y) => x == y
-      case that: BigInt => x equals that.bigInteger
-      case that => that == BigInt(x)
+      case that: BigInt          => x equals that.bigInteger
+      case that                  => that == BigInt(x)
     }
 
   def abs: SafeLong =
@@ -486,7 +491,7 @@ private[math] final case class SafeLongBigInteger(x: BigInteger)
 
   def gcd(that: SafeLong): SafeLong =
     that match {
-      case SafeLongLong(y) => SafeLong.mixedGcd(y, x)
+      case SafeLongLong(y)       => SafeLong.mixedGcd(y, x)
       case SafeLongBigInteger(y) => SafeLong(x gcd y)
     }
 
@@ -514,7 +519,9 @@ private[math] final case class SafeLongBigInteger(x: BigInteger)
 trait SafeLongInstances {
   @SerialVersionUID(1L)
   implicit object SafeLongAlgebra
-      extends SafeLongIsEuclideanRing with SafeLongIsNRoot with Serializable
+      extends SafeLongIsEuclideanRing
+      with SafeLongIsNRoot
+      with Serializable
 
   @SerialVersionUID(1L)
   implicit object SafeLongIsReal extends SafeLongIsReal with Serializable
@@ -536,7 +543,8 @@ private[math] trait SafeLongIsRing extends Ring[SafeLong] {
 }
 
 private[math] trait SafeLongIsEuclideanRing
-    extends EuclideanRing[SafeLong] with SafeLongIsRing {
+    extends EuclideanRing[SafeLong]
+    with SafeLongIsRing {
   def quot(a: SafeLong, b: SafeLong): SafeLong = a / b
   def mod(a: SafeLong, b: SafeLong): SafeLong = a % b
   override def quotmod(a: SafeLong, b: SafeLong): (SafeLong, SafeLong) = a /% b
@@ -546,7 +554,7 @@ private[math] trait SafeLongIsEuclideanRing
 private[math] trait SafeLongIsNRoot extends NRoot[SafeLong] {
   def nroot(a: SafeLong, k: Int): SafeLong =
     a match {
-      case SafeLongLong(n) => SafeLong(NRoot[Long].nroot(n, k))
+      case SafeLongLong(n)       => SafeLong(NRoot[Long].nroot(n, k))
       case SafeLongBigInteger(n) => SafeLong(NRoot[BigInteger].nroot(n, k))
     }
 
@@ -571,7 +579,9 @@ private[math] trait SafeLongIsSigned extends Signed[SafeLong] {
 }
 
 private[math] trait SafeLongIsReal
-    extends IsIntegral[SafeLong] with SafeLongOrder with SafeLongIsSigned {
+    extends IsIntegral[SafeLong]
+    with SafeLongOrder
+    with SafeLongIsSigned {
   def toDouble(n: SafeLong): Double = n.toDouble
   def toBigInt(n: SafeLong): BigInt = n.toBigInt
 }

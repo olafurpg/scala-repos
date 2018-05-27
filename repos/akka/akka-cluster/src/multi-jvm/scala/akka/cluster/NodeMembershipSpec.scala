@@ -13,8 +13,9 @@ object NodeMembershipMultiJvmSpec extends MultiNodeConfig {
   val second = role("second")
   val third = role("third")
 
-  commonConfig(debugConfig(on = false).withFallback(
-          MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet))
+  commonConfig(
+    debugConfig(on = false).withFallback(
+      MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet))
 }
 
 class NodeMembershipMultiJvmNode1 extends NodeMembershipSpec
@@ -42,7 +43,7 @@ abstract class NodeMembershipSpec
         awaitAssert(clusterView.members.size should ===(2))
         assertMembers(clusterView.members, first, second)
         awaitAssert(
-            clusterView.members.map(_.status) should ===(Set(MemberStatus.Up)))
+          clusterView.members.map(_.status) should ===(Set(MemberStatus.Up)))
       }
 
       enterBarrier("after-1")
@@ -57,7 +58,7 @@ abstract class NodeMembershipSpec
       awaitAssert(clusterView.members.size should ===(3))
       assertMembers(clusterView.members, first, second, third)
       awaitAssert(
-          clusterView.members.map(_.status) should ===(Set(MemberStatus.Up)))
+        clusterView.members.map(_.status) should ===(Set(MemberStatus.Up)))
 
       enterBarrier("after-2")
     }

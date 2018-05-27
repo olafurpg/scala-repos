@@ -11,30 +11,37 @@ import com.intellij.psi.codeStyle.arrangement.std.ArrangementSettingsToken
   * @author Roman.Shein
   * Date: 08.07.13
   */
-class ScalaArrangementEntry(parent: ArrangementEntry,
-                            startOffset: Int,
-                            endOffset: Int,
-                            entryType: ArrangementSettingsToken,
-                            name: String,
-                            canBeMatched: Boolean)
+class ScalaArrangementEntry(
+    parent: ArrangementEntry,
+    startOffset: Int,
+    endOffset: Int,
+    entryType: ArrangementSettingsToken,
+    name: String,
+    canBeMatched: Boolean)
     extends DefaultArrangementEntry(
-        parent, startOffset, endOffset, canBeMatched)
-    with TypeAwareArrangementEntry with NameAwareArrangementEntry
+      parent,
+      startOffset,
+      endOffset,
+      canBeMatched)
+    with TypeAwareArrangementEntry
+    with NameAwareArrangementEntry
     with ModifierAwareArrangementEntry {
 
   val modifiers = new util.HashSet[ArrangementSettingsToken]
 
-  def this(parent: ArrangementEntry,
-           range: TextRange,
-           entryType: ArrangementSettingsToken,
-           name: String,
-           canBeMatched: Boolean) =
-    this(parent,
-         range.getStartOffset,
-         range.getEndOffset,
-         entryType,
-         name,
-         canBeMatched)
+  def this(
+      parent: ArrangementEntry,
+      range: TextRange,
+      entryType: ArrangementSettingsToken,
+      name: String,
+      canBeMatched: Boolean) =
+    this(
+      parent,
+      range.getStartOffset,
+      range.getEndOffset,
+      entryType,
+      name,
+      canBeMatched)
 
   override def getName: String = name
 
@@ -58,7 +65,7 @@ class ScalaArrangementEntry(parent: ArrangementEntry,
   override def equals(o: Any) = o match {
     case other: ScalaArrangementEntry =>
       other.getStartOffset == startOffset && other.getEndOffset == endOffset &&
-      other.getType == entryType && other.getParent == parent
+        other.getType == entryType && other.getParent == parent
     case _ => false
   }
 }

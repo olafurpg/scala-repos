@@ -11,8 +11,12 @@ import javac._
 /** An nsc sub-component.
   */
 abstract class SyntaxAnalyzer
-    extends SubComponent with Parsers with MarkupParsers with Scanners
-    with JavaParsers with JavaScanners {
+    extends SubComponent
+    with Parsers
+    with MarkupParsers
+    with Scanners
+    with JavaParsers
+    with JavaScanners {
   import global._
 
   val phaseName = "parser"
@@ -24,21 +28,23 @@ abstract class SyntaxAnalyzer
     private var depth: Int = 0
     private def lower[T](body: => T): T = {
       depth += 1
-      try body finally depth -= 1
+      try body
+      finally depth -= 1
     }
     def currentDepth = depth
 
     /** Prune this tree and all trees beneath it. Can be overridden. */
-    def prune(md: MemberDef): Boolean = (md.mods.isSynthetic ||
+    def prune(md: MemberDef): Boolean =
+      (md.mods.isSynthetic ||
         md.mods.isParamAccessor || nme.isConstructorName(md.name) ||
         (md.name containsName nme.ANON_CLASS_NAME))
 
     override def traverse(t: Tree): Unit = t match {
       case md: MemberDef if prune(md) =>
-      case md @ PackageDef(_, stats) => traverseTrees(stats)
-      case md: ImplDef => onMember(md); lower(traverseTrees(md.impl.body))
-      case md: ValOrDefDef => onMember(md); lower(traverse(md.rhs))
-      case _ => super.traverse(t)
+      case md @ PackageDef(_, stats)  => traverseTrees(stats)
+      case md: ImplDef                => onMember(md); lower(traverseTrees(md.impl.body))
+      case md: ValOrDefDef            => onMember(md); lower(traverse(md.rhs))
+      case _                          => super.traverse(t)
     }
   }
 

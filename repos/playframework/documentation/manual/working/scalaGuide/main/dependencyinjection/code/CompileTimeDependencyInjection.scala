@@ -12,16 +12,17 @@ object CompileTimeDependencyInjection extends Specification {
   import play.api._
 
   val environment = Environment(
-      new File("."),
-      CompileTimeDependencyInjection.getClass.getClassLoader,
-      Mode.Test)
+    new File("."),
+    CompileTimeDependencyInjection.getClass.getClassLoader,
+    Mode.Test)
 
   "compile time dependency injection" should {
     "allow creating an application with the built in components from context" in {
       val context = ApplicationLoader
-        .createContext(environment,
-                       Map("play.application.loader" -> classOf[
-                               basic.MyApplicationLoader].getName))
+        .createContext(
+          environment,
+          Map(
+            "play.application.loader" -> classOf[basic.MyApplicationLoader].getName))
       val application = ApplicationLoader(context).load(context)
       application must beAnInstanceOf[Application]
       application.routes.documentation must beEmpty
@@ -37,7 +38,7 @@ object CompileTimeDependencyInjection extends Specification {
       val components = new routers.MyComponents(context)
       components.application must beAnInstanceOf[Application]
       components.router must beAnInstanceOf[
-          scalaguide.dependencyinjection.Routes]
+        scalaguide.dependencyinjection.Routes]
     }
   }
 }
@@ -83,7 +84,8 @@ package messages {
   import play.api.i18n._
 
   class MyComponents(context: Context)
-      extends BuiltInComponentsFromContext(context) with I18nComponents {
+      extends BuiltInComponentsFromContext(context)
+      with I18nComponents {
     lazy val router = Router.empty
 
     lazy val myComponent = new MyComponent(messagesApi)
@@ -118,8 +120,8 @@ package routers {
   class MyComponents(context: Context)
       extends BuiltInComponentsFromContext(context) {
 
-    lazy val router = new Routes(
-        httpErrorHandler, applicationController, barRoutes, assets)
+    lazy val router =
+      new Routes(httpErrorHandler, applicationController, barRoutes, assets)
 
     lazy val barRoutes = new bar.Routes(httpErrorHandler)
     lazy val applicationController = new controllers.Application()

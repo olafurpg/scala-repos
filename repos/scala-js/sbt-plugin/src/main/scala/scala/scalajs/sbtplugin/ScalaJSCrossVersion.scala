@@ -23,13 +23,12 @@ object ScalaJSCrossVersion {
   private final val MinorSnapshotVersion =
     raw"""(\d+)\.(\d+)\.([1-9]\d*)-SNAPSHOT""".r
 
-  val currentBinaryVersion = binaryScalaJSVersion(
-      ScalaJSVersions.binaryEmitted)
+  val currentBinaryVersion = binaryScalaJSVersion(ScalaJSVersions.binaryEmitted)
 
   def binaryScalaJSVersion(full: String): String = full match {
-    case ReleaseVersion(major, minor, _) => s"$major.$minor"
+    case ReleaseVersion(major, minor, _)       => s"$major.$minor"
     case MinorSnapshotVersion(major, minor, _) => s"$major.$minor"
-    case _ => full
+    case _                                     => full
   }
 
   def scalaJSMapped(cross: CrossVersion): CrossVersion = cross match {

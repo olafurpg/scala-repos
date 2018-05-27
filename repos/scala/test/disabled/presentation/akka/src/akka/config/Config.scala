@@ -21,12 +21,12 @@ object Config {
   val HOME = {
     val envHome = System.getenv("AKKA_HOME") match {
       case null | "" | "." => None
-      case value => Some(value)
+      case value           => Some(value)
     }
 
     val systemHome = System.getProperty("akka.home") match {
       case null | "" => None
-      case value => Some(value)
+      case value     => Some(value)
     }
 
     envHome orElse systemHome
@@ -36,12 +36,12 @@ object Config {
     val confName = {
       val envConf = System.getenv("AKKA_MODE") match {
         case null | "" => None
-        case value => Some(value)
+        case value     => Some(value)
       }
 
       val systemConf = System.getProperty("akka.mode") match {
         case null | "" => None
-        case value => Some(value)
+        case value     => Some(value)
       }
 
       (envConf orElse systemConf)
@@ -55,17 +55,19 @@ object Config {
         println("Loading config from -Dakka.config=" + configFile)
         Configuration.fromFile(configFile)
       } else if (getClass.getClassLoader.getResource(confName) ne null) {
-        println("Loading config [" + confName +
+        println(
+          "Loading config [" + confName +
             "] from the application classpath.")
         Configuration.fromResource(confName, getClass.getClassLoader)
       } else if (HOME.isDefined) {
         val configFile = HOME.get + "/config/" + confName
-        println("AKKA_HOME is defined as [" + HOME.get +
+        println(
+          "AKKA_HOME is defined as [" + HOME.get +
             "], loading config from [" + configFile + "].")
         Configuration.fromFile(configFile)
       } else {
         println(
-            "\nCan't load '" +
+          "\nCan't load '" +
             confName + "'." + "\nOne of the three ways of locating the '" +
             confName + "' file needs to be defined:" +
             "\n\t1. Define the '-Dakka.config=...' system property option." +
@@ -79,7 +81,7 @@ object Config {
     val configVersion = newInstance.getString("akka.version", VERSION)
     if (configVersion != VERSION)
       throw new ConfigurationException(
-          "Akka JAR version [" + VERSION +
+        "Akka JAR version [" + VERSION +
           "] is different than the provided config version [" + configVersion +
           "]")
 

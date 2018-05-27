@@ -94,8 +94,8 @@ case class Dtab(dentries0: IndexedSeq[Dentry]) extends IndexedSeq[Dentry] {
     */
   def print(printer: PrintWriter) {
     printer.println("Dtab(" + size + ")")
-    for (Dentry(prefix, dst) <- this) printer.println(
-        "	" + prefix.show + " => " + dst.show)
+    for (Dentry(prefix, dst) <- this)
+      printer.println("	" + prefix.show + " => " + dst.show)
   }
 
   /**
@@ -149,7 +149,8 @@ object Dentry {
   val nop: Dentry = Dentry(Path.Utf8("/"), NameTree.Neg)
 
   implicit val equiv: Equiv[Dentry] = new Equiv[Dentry] {
-    def equiv(d1: Dentry, d2: Dentry): Boolean = (d1.prefix == d2.prefix &&
+    def equiv(d1: Dentry, d2: Dentry): Boolean =
+      (d1.prefix == d2.prefix &&
         d1.dst.simplified == d2.dst.simplified)
   }
 }
@@ -159,7 +160,8 @@ object Dentry {
   */
 object Dtab {
   implicit val equiv: Equiv[Dtab] = new Equiv[Dtab] {
-    def equiv(d1: Dtab, d2: Dtab): Boolean = (d1.size == d2.size &&
+    def equiv(d1: Dtab, d2: Dtab): Boolean =
+      (d1.size == d2.size &&
         d1.zip(d2).forall { case (de1, de2) => Equiv[Dentry].equiv(de1, de2) })
   }
 
@@ -204,7 +206,7 @@ object Dtab {
     */
   def local: Dtab = l() match {
     case Some(dtab) => dtab
-    case None => Dtab.empty
+    case None       => Dtab.empty
   }
   def local_=(dtab: Dtab) { l() = dtab }
 
@@ -215,7 +217,8 @@ object Dtab {
 
   def unwind[T](f: => T): T = {
     val save = l()
-    try f finally l.set(save)
+    try f
+    finally l.set(save)
   }
 
   /**
@@ -234,8 +237,8 @@ object Dtab {
   /** Scala collection plumbing required to build new dtabs */
   def newBuilder: DtabBuilder = new DtabBuilder
 
-  implicit val canBuildFrom: CanBuildFrom[
-      TraversableOnce[Dentry], Dentry, Dtab] =
+  implicit val canBuildFrom
+    : CanBuildFrom[TraversableOnce[Dentry], Dentry, Dtab] =
     new CanBuildFrom[TraversableOnce[Dentry], Dentry, Dtab] {
       def apply(_ign: TraversableOnce[Dentry]): DtabBuilder = newBuilder
       def apply(): DtabBuilder = newBuilder

@@ -10,7 +10,15 @@ import spire.math._
 import spire.optional.partialIterable._
 import spire.optional.mapIntIntPermutation._
 
-import spire.implicits.{SeqOrder => _, SeqEq => _, ArrayOrder => _, ArrayEq => _, MapEq => _, MapGroup => _, _}
+import spire.implicits.{
+  SeqOrder => _,
+  SeqEq => _,
+  ArrayOrder => _,
+  ArrayEq => _,
+  MapEq => _,
+  MapGroup => _,
+  _
+}
 
 import org.typelevel.discipline.scalatest.Discipline
 
@@ -20,7 +28,7 @@ import org.scalacheck.Arbitrary._
 
 class LawTests extends FunSuite with Discipline {
 
-  def fuzzyEq[@sp(Float, Double) A : Ring : Signed : Order](eps: A): Eq[A] =
+  def fuzzyEq[@sp(Float, Double) A: Ring: Signed: Order](eps: A): Eq[A] =
     new Eq[A] {
       def eqv(x: A, y: A): Boolean = {
         val delta = Order[A].max(x.abs, y.abs) * eps
@@ -54,53 +62,58 @@ class LawTests extends FunSuite with Discipline {
   checkAll("List[Int]", VectorSpaceLaws[List[Int], Int].module)
   checkAll("Vector[Int]", VectorSpaceLaws[Vector[Int], Int].module)
   checkAll(
-      "List[Rational]", VectorSpaceLaws[List[Rational], Rational].vectorSpace)
-  checkAll("Vector[Rational]",
-           VectorSpaceLaws[Vector[Rational], Rational].vectorSpace)
+    "List[Rational]",
+    VectorSpaceLaws[List[Rational], Rational].vectorSpace)
+  checkAll(
+    "Vector[Rational]",
+    VectorSpaceLaws[Vector[Rational], Rational].vectorSpace)
 
   checkAll("Array[Int]", VectorSpaceLaws[Array[Int], Int].module)
-  checkAll("Array[VectorSpace]",
-           VectorSpaceLaws[Array[Rational], Rational].vectorSpace)
+  checkAll(
+    "Array[VectorSpace]",
+    VectorSpaceLaws[Array[Rational], Rational].vectorSpace)
 
   checkAll("Map[String,Int]", VectorSpaceLaws[Map[String, Int], Int].module)
-  checkAll("Map[String,Rational]",
-           VectorSpaceLaws[Map[String, Rational], Rational].vectorSpace)
+  checkAll(
+    "Map[String,Rational]",
+    VectorSpaceLaws[Map[String, Rational], Rational].vectorSpace)
 
   val max = NormedVectorSpace.max[Rational, List]
-  checkAll("List[Rational]",
-           VectorSpaceLaws[List[Rational], Rational]
-             .normedVectorSpace(max, implicitly, implicitly))
+  checkAll(
+    "List[Rational]",
+    VectorSpaceLaws[List[Rational], Rational]
+      .normedVectorSpace(max, implicitly, implicitly))
 
   checkAll("List[Int]", GroupLaws[List[Int]].monoid)
   checkAll("Vector[Int]", GroupLaws[Vector[Int]].monoid)
   checkAll(
-      "Set[Int]",
-      GroupLaws[Set[Int]](spire.optional.genericEq.generic, implicitly).monoid)
+    "Set[Int]",
+    GroupLaws[Set[Int]](spire.optional.genericEq.generic, implicitly).monoid)
   checkAll("String[Int]", GroupLaws[String].monoid)
   checkAll("Array[Int]", GroupLaws[Array[Int]].monoid)
 
-  checkAll("Seq[String]",
-           PartialGroupLaws[Seq[String]](
-               spire.optional.genericEq.generic, implicitly).semigroupoid)
+  checkAll(
+    "Seq[String]",
+    PartialGroupLaws[Seq[String]](spire.optional.genericEq.generic, implicitly).semigroupoid)
   checkAll("Seq[Int]", PartialGroupLaws[Seq[Int]].groupoid)
 
   checkAll("String", VectorSpaceLaws[String, Int].metricSpace)
 
   checkAll("Sign", ActionLaws[Sign, Int].multiplicativeMonoidAction)
 
-  implicit def eqFreeMonoid[A : Monoid : Eq]: Eq[FreeMonoid[A]] =
+  implicit def eqFreeMonoid[A: Monoid: Eq]: Eq[FreeMonoid[A]] =
     new Eq[FreeMonoid[A]] {
       def eqv(x: FreeMonoid[A], y: FreeMonoid[A]): Boolean =
         Eq[A].eqv(x.run(n => n), y.run(n => n))
     }
 
-  implicit def eqFreeGroup[A : Group : Eq]: Eq[FreeGroup[A]] =
+  implicit def eqFreeGroup[A: Group: Eq]: Eq[FreeGroup[A]] =
     new Eq[FreeGroup[A]] {
       def eqv(x: FreeGroup[A], y: FreeGroup[A]): Boolean =
         Eq[A].eqv(x.run(n => n), y.run(n => n))
     }
 
-  implicit def eqFreeAbGroup[A : AbGroup : Eq]: Eq[FreeAbGroup[A]] =
+  implicit def eqFreeAbGroup[A: AbGroup: Eq]: Eq[FreeAbGroup[A]] =
     new Eq[FreeAbGroup[A]] {
       def eqv(x: FreeAbGroup[A], y: FreeAbGroup[A]): Boolean =
         Eq[A].eqv(x.run(n => n), y.run(n => n))
@@ -118,7 +131,8 @@ class LawTests extends FunSuite with Discipline {
   checkAll("Heyting[Trilean]", LogicLaws[Int].heyting)
 
   object intMinMaxLattice
-      extends MinMaxLattice[Int] with BoundedLattice[Int]
+      extends MinMaxLattice[Int]
+      with BoundedLattice[Int]
       with spire.std.IntOrder {
     def zero = Int.MinValue
     def one = Int.MaxValue
@@ -128,16 +142,19 @@ class LawTests extends FunSuite with Discipline {
   checkAll("Order[BigInteger]", OrderLaws[BigInteger].order)
   checkAll("Order[Unit]", OrderLaws[Unit].order)
   checkAll("AbGroup[Unit]", GroupLaws[Unit].abGroup)
-  checkAll("LatticePartialOrder[Int]",
-           LatticePartialOrderLaws[Int].boundedLatticePartialOrder(
-               intMinMaxLattice, implicitly[Order[Int]]))
+  checkAll(
+    "LatticePartialOrder[Int]",
+    LatticePartialOrderLaws[Int]
+      .boundedLatticePartialOrder(intMinMaxLattice, implicitly[Order[Int]]))
 
   checkAll(
-      "Map[Int, Int]",
-      PartialActionLaws
-        .apply[Map[Int, Int], Seq[Int]](implicitly,
-                                        Arbitrary(arbitrary[Perm].map(_.map)),
-                                        implicitly,
-                                        implicitly)
-        .groupPartialAction)
+    "Map[Int, Int]",
+    PartialActionLaws
+      .apply[Map[Int, Int], Seq[Int]](
+        implicitly,
+        Arbitrary(arbitrary[Perm].map(_.map)),
+        implicitly,
+        implicitly)
+      .groupPartialAction
+  )
 }

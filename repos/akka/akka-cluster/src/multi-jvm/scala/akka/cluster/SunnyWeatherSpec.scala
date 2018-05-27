@@ -23,7 +23,9 @@ object SunnyWeatherMultiJvmSpec extends MultiNodeConfig {
 
   // Note that this test uses default configuration,
   // not MultiNodeClusterSpec.clusterConfig
-  commonConfig(ConfigFactory.parseString("""
+  commonConfig(
+    ConfigFactory.parseString(
+      """
     akka.actor.provider = akka.cluster.ClusterActorRefProvider
     akka.loggers = ["akka.testkit.TestEventListener"]
     akka.loglevel = INFO
@@ -39,7 +41,8 @@ class SunnyWeatherMultiJvmNode4 extends SunnyWeatherSpec
 class SunnyWeatherMultiJvmNode5 extends SunnyWeatherSpec
 
 abstract class SunnyWeatherSpec
-    extends MultiNodeSpec(SunnyWeatherMultiJvmSpec) with MultiNodeClusterSpec {
+    extends MultiNodeSpec(SunnyWeatherMultiJvmSpec)
+    with MultiNodeClusterSpec {
 
   import SunnyWeatherMultiJvmSpec._
   import ClusterEvent._
@@ -58,14 +61,17 @@ abstract class SunnyWeatherSpec
       log.debug("5 joined")
 
       val unexpected = new AtomicReference[SortedSet[Member]](SortedSet.empty)
-      cluster.subscribe(system.actorOf(Props(new Actor {
-        def receive = {
-          case event: MemberEvent ⇒
-            // we don't expected any changes to the cluster
-            unexpected.set(unexpected.get + event.member)
-          case _: CurrentClusterState ⇒ // ignore
-        }
-      })), classOf[MemberEvent])
+      cluster.subscribe(
+        system.actorOf(Props(new Actor {
+          def receive = {
+            case event: MemberEvent ⇒
+              // we don't expected any changes to the cluster
+              unexpected.set(unexpected.get + event.member)
+            case _: CurrentClusterState ⇒ // ignore
+          }
+        })),
+        classOf[MemberEvent]
+      )
 
       for (n ← 1 to 30) {
         enterBarrier("period-" + n)

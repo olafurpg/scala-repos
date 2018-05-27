@@ -11,17 +11,22 @@ import org.scalatest.finders.Selection
   * @since 10.02.2015.
   */
 trait FindersApiTest
-    extends FeatureSpecGenerator with FlatSpecGenerator with FreeSpecGenerator
-    with FreeSpecPathGenerator with FunSpecGenerator with FunSuiteGenerator
-    with PropSpecGenerator with WordSpecGenerator {
-  def checkSelection(lineNumber: Int,
-                     offset: Int,
-                     fileName: String,
-                     testNames: Set[String]) = {
+    extends FeatureSpecGenerator
+    with FlatSpecGenerator
+    with FreeSpecGenerator
+    with FreeSpecPathGenerator
+    with FunSpecGenerator
+    with FunSuiteGenerator
+    with PropSpecGenerator
+    with WordSpecGenerator {
+  def checkSelection(
+      lineNumber: Int,
+      offset: Int,
+      fileName: String,
+      testNames: Set[String]) = {
     val location = createLocation(lineNumber, offset, fileName)
     var selection: Selection = null
-    UsefulTestCase.edt(
-        new Runnable() {
+    UsefulTestCase.edt(new Runnable() {
       override def run(): Unit =
         selection = new ScalaTestAstTransformer().testSelection(location)
     })
@@ -46,7 +51,10 @@ trait FindersApiTest
     checkSelection(3, 7, fileName, Set(scenarioA, scenarioB))
     //on feature name
     checkSelection(
-        14, 15, fileName, Set("Feature: Feature 2 Scenario: Scenario C"))
+      14,
+      15,
+      fileName,
+      Set("Feature: Feature 2 Scenario: Scenario C"))
     //inside scenario
     checkSelection(5, 8, fileName, Set(scenarioA))
   }
@@ -74,8 +82,8 @@ trait FindersApiTest
   def testBehaviorFlatSpec() {
     addBehaviorFlatSpec()
 
-    val testNames = Set(
-        "FlatSpec should run scopes", "FlatSpec should do other stuff")
+    val testNames =
+      Set("FlatSpec should run scopes", "FlatSpec should do other stuff")
     val fileName = "BehaviorFlatSpec.scala"
 
     //'behavior' word
@@ -91,8 +99,8 @@ trait FindersApiTest
   def testItFlatSpec(): Unit = {
     val fileName = "TestItFlatSpec.scala"
     addFileToProject(
-        fileName,
-        """
+      fileName,
+      """
         |import org.scalatest._
         |
         |class TestItFlatSpec extends FlatSpec with GivenWhenThen {
@@ -103,7 +111,8 @@ trait FindersApiTest
         |
         | it should "change name" in {}
         |}
-      """.stripMargin.trim())
+      """.stripMargin.trim()
+    )
 
     checkSelection(3, 10, fileName, Set("should run test with correct name"))
 

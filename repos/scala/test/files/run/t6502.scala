@@ -12,9 +12,10 @@ object Test extends StoreReporterDirectTest {
   def compileCode(code: String, jarFileName: String) = {
     val classpath =
       List(sys.props("partest.lib"), testOutput.path) mkString sys.props(
-          "path.separator")
-    compileString(newCompiler(
-            "-cp", classpath, "-d", s"${testOutput.path}/$jarFileName"))(code)
+        "path.separator")
+    compileString(
+      newCompiler("-cp", classpath, "-d", s"${testOutput.path}/$jarFileName"))(
+      code)
   }
 
   // TODO flat classpath doesn't support the classpath invalidation yet so we force using the recursive one
@@ -71,8 +72,8 @@ object Test extends StoreReporterDirectTest {
     lines = lines drop promptLength
     val added = lines.next
     assert(
-        added.contains("Added") && added.contains("test1.jar"),
-        s"[${added}] in [${output.lines.mkString("/")}]"
+      added.contains("Added") && added.contains("test1.jar"),
+      s"[${added}] in [${output.lines.mkString("/")}]"
     )
     lines = lines drop promptLength
     assert {

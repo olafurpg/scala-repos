@@ -19,9 +19,9 @@ object CheckIsEmpty extends SimplificationType {
       case _ `.isEmpty` () => None
       case CheckIsEmpty(qual, start, end) if !isArray(qual) =>
         Some(
-            replace(expr)
-              .withText(invocationText(qual, "isEmpty"))
-              .highlightRange(start, end))
+          replace(expr)
+            .withText(invocationText(qual, "isEmpty"))
+            .highlightRange(start, end))
       case _ => None
     }
 
@@ -66,9 +66,9 @@ object CheckNonEmpty extends SimplificationType {
       case CheckNonEmpty(qual, start, end)
           if !isOption(qual) && !isArray(qual) =>
         Some(
-            replace(expr)
-              .withText(invocationText(qual, "nonEmpty"))
-              .highlightRange(start, end))
+          replace(expr)
+            .withText(invocationText(qual, "nonEmpty"))
+            .highlightRange(start, end))
       case _ => None
     }
 
@@ -105,9 +105,9 @@ object CheckIsDefined extends SimplificationType {
       case _ `.isDefined` () => None
       case CheckIsDefined(qual, start, end) =>
         Some(
-            replace(expr)
-              .withText(invocationText(qual, "isDefined"))
-              .highlightRange(start, end))
+          replace(expr)
+            .withText(invocationText(qual, "isDefined"))
+            .highlightRange(start, end))
       case _ => None
     }
 

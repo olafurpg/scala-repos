@@ -25,7 +25,7 @@ object Decode {
   private def getAliasSymbol(t: Type): Symbol = t match {
     case TypeRefType(_, s, _) => s
     case PolyType(typeRef, _) => getAliasSymbol(typeRef)
-    case _ => NoSymbol
+    case _                    => NoSymbol
   }
 
   /** Return the classfile bytes representing the scala sig classfile attribute.
@@ -34,7 +34,8 @@ object Decode {
   def scalaSigBytes(name: String): Option[Array[Byte]] =
     scalaSigBytes(name, appLoader)
   def scalaSigBytes(
-      name: String, classLoader: ScalaClassLoader): Option[Array[Byte]] = {
+      name: String,
+      classLoader: ScalaClassLoader): Option[Array[Byte]] = {
     val bytes = classLoader.classBytes(name)
     val reader = new ByteArrayReader(bytes)
     val cf = new Classfile(reader)
@@ -46,7 +47,8 @@ object Decode {
   def scalaSigAnnotationBytes(name: String): Option[Array[Byte]] =
     scalaSigAnnotationBytes(name, appLoader)
   def scalaSigAnnotationBytes(
-      name: String, classLoader: ScalaClassLoader): Option[Array[Byte]] = {
+      name: String,
+      classLoader: ScalaClassLoader): Option[Array[Byte]] = {
     val bytes = classLoader.classBytes(name)
     val byteCode = ByteCode(bytes)
     val classFile = ClassFileParser.parse(byteCode)
@@ -55,7 +57,7 @@ object Decode {
     classFile annotation SCALA_SIG_ANNOTATION map {
       case Annotation(_, els) =>
         val bytesElem = els find
-        (x => constant(x.elementNameIndex) == BYTES_VALUE) orNull
+          (x => constant(x.elementNameIndex) == BYTES_VALUE) orNull
         val _bytes = bytesElem.elementValue match {
           case ConstValueIndex(x) => constantWrapped(x)
         }
@@ -71,7 +73,7 @@ object Decode {
   private[scala] def caseParamNames(path: String): Option[List[String]] = {
     val (outer, inner) = (path indexOf '$') match {
       case -1 => (path, "")
-      case x => (path take x, path drop (x + 1))
+      case x  => (path take x, path drop (x + 1))
     }
 
     for {
@@ -86,7 +88,7 @@ object Decode {
           case x: ClassSymbol if x.name == inner =>
             val xs =
               x.children filter
-              (child => child.isCaseAccessor && (child.name endsWith " "))
+                (child => child.isCaseAccessor && (child.name endsWith " "))
             xs.toList map (_.name dropRight 1)
         }
 

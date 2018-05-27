@@ -34,81 +34,95 @@ class PrefixSpanSuite extends SparkFunSuite with MLlibTestSparkContext {
       resSeq
      */
 
-    val sequences = Array(Array(0, 1, 0, 3, 0, 4, 0, 5, 0),
-                          Array(0, 2, 0, 3, 0, 1, 0),
-                          Array(0, 2, 0, 4, 0, 1, 0),
-                          Array(0, 3, 0, 1, 0, 3, 0, 4, 0, 5, 0),
-                          Array(0, 3, 0, 4, 0, 4, 0, 3, 0),
-                          Array(0, 6, 0, 5, 0, 3, 0))
+    val sequences = Array(
+      Array(0, 1, 0, 3, 0, 4, 0, 5, 0),
+      Array(0, 2, 0, 3, 0, 1, 0),
+      Array(0, 2, 0, 4, 0, 1, 0),
+      Array(0, 3, 0, 1, 0, 3, 0, 4, 0, 5, 0),
+      Array(0, 3, 0, 4, 0, 4, 0, 3, 0),
+      Array(0, 6, 0, 5, 0, 3, 0))
 
     val rdd = sc.parallelize(sequences, 2).cache()
 
     val result1 = PrefixSpan.genFreqPatterns(
-        rdd, minCount = 2L, maxPatternLength = 50, maxLocalProjDBSize = 16L)
+      rdd,
+      minCount = 2L,
+      maxPatternLength = 50,
+      maxLocalProjDBSize = 16L)
     val expectedValue1 = Array(
-        (Array(0, 1, 0), 4L),
-        (Array(0, 1, 0, 3, 0), 2L),
-        (Array(0, 1, 0, 3, 0, 4, 0), 2L),
-        (Array(0, 1, 0, 3, 0, 4, 0, 5, 0), 2L),
-        (Array(0, 1, 0, 3, 0, 5, 0), 2L),
-        (Array(0, 1, 0, 4, 0), 2L),
-        (Array(0, 1, 0, 4, 0, 5, 0), 2L),
-        (Array(0, 1, 0, 5, 0), 2L),
-        (Array(0, 2, 0), 2L),
-        (Array(0, 2, 0, 1, 0), 2L),
-        (Array(0, 3, 0), 5L),
-        (Array(0, 3, 0, 1, 0), 2L),
-        (Array(0, 3, 0, 3, 0), 2L),
-        (Array(0, 3, 0, 4, 0), 3L),
-        (Array(0, 3, 0, 4, 0, 5, 0), 2L),
-        (Array(0, 3, 0, 5, 0), 2L),
-        (Array(0, 4, 0), 4L),
-        (Array(0, 4, 0, 5, 0), 2L),
-        (Array(0, 5, 0), 3L)
+      (Array(0, 1, 0), 4L),
+      (Array(0, 1, 0, 3, 0), 2L),
+      (Array(0, 1, 0, 3, 0, 4, 0), 2L),
+      (Array(0, 1, 0, 3, 0, 4, 0, 5, 0), 2L),
+      (Array(0, 1, 0, 3, 0, 5, 0), 2L),
+      (Array(0, 1, 0, 4, 0), 2L),
+      (Array(0, 1, 0, 4, 0, 5, 0), 2L),
+      (Array(0, 1, 0, 5, 0), 2L),
+      (Array(0, 2, 0), 2L),
+      (Array(0, 2, 0, 1, 0), 2L),
+      (Array(0, 3, 0), 5L),
+      (Array(0, 3, 0, 1, 0), 2L),
+      (Array(0, 3, 0, 3, 0), 2L),
+      (Array(0, 3, 0, 4, 0), 3L),
+      (Array(0, 3, 0, 4, 0, 5, 0), 2L),
+      (Array(0, 3, 0, 5, 0), 2L),
+      (Array(0, 4, 0), 4L),
+      (Array(0, 4, 0, 5, 0), 2L),
+      (Array(0, 5, 0), 3L)
     )
     compareInternalResults(expectedValue1, result1.collect())
 
     val result2 = PrefixSpan.genFreqPatterns(
-        rdd, minCount = 3, maxPatternLength = 50, maxLocalProjDBSize = 32L)
+      rdd,
+      minCount = 3,
+      maxPatternLength = 50,
+      maxLocalProjDBSize = 32L)
     val expectedValue2 = Array(
-        (Array(0, 1, 0), 4L),
-        (Array(0, 3, 0), 5L),
-        (Array(0, 3, 0, 4, 0), 3L),
-        (Array(0, 4, 0), 4L),
-        (Array(0, 5, 0), 3L)
+      (Array(0, 1, 0), 4L),
+      (Array(0, 3, 0), 5L),
+      (Array(0, 3, 0, 4, 0), 3L),
+      (Array(0, 4, 0), 4L),
+      (Array(0, 5, 0), 3L)
     )
     compareInternalResults(expectedValue2, result2.collect())
 
     val result3 = PrefixSpan.genFreqPatterns(
-        rdd, minCount = 2, maxPatternLength = 2, maxLocalProjDBSize = 32L)
+      rdd,
+      minCount = 2,
+      maxPatternLength = 2,
+      maxLocalProjDBSize = 32L)
     val expectedValue3 = Array(
-        (Array(0, 1, 0), 4L),
-        (Array(0, 1, 0, 3, 0), 2L),
-        (Array(0, 1, 0, 4, 0), 2L),
-        (Array(0, 1, 0, 5, 0), 2L),
-        (Array(0, 2, 0, 1, 0), 2L),
-        (Array(0, 2, 0), 2L),
-        (Array(0, 3, 0), 5L),
-        (Array(0, 3, 0, 1, 0), 2L),
-        (Array(0, 3, 0, 3, 0), 2L),
-        (Array(0, 3, 0, 4, 0), 3L),
-        (Array(0, 3, 0, 5, 0), 2L),
-        (Array(0, 4, 0), 4L),
-        (Array(0, 4, 0, 5, 0), 2L),
-        (Array(0, 5, 0), 3L)
+      (Array(0, 1, 0), 4L),
+      (Array(0, 1, 0, 3, 0), 2L),
+      (Array(0, 1, 0, 4, 0), 2L),
+      (Array(0, 1, 0, 5, 0), 2L),
+      (Array(0, 2, 0, 1, 0), 2L),
+      (Array(0, 2, 0), 2L),
+      (Array(0, 3, 0), 5L),
+      (Array(0, 3, 0, 1, 0), 2L),
+      (Array(0, 3, 0, 3, 0), 2L),
+      (Array(0, 3, 0, 4, 0), 3L),
+      (Array(0, 3, 0, 5, 0), 2L),
+      (Array(0, 4, 0), 4L),
+      (Array(0, 4, 0, 5, 0), 2L),
+      (Array(0, 5, 0), 3L)
     )
     compareInternalResults(expectedValue3, result3.collect())
   }
 
   test(
-      "PrefixSpan internal (integer seq, -1 delim) run, variable-size itemsets") {
-    val sequences = Array(Array(0, 1, 0, 1, 2, 3, 0, 1, 3, 0, 4, 0, 3, 6, 0),
-                          Array(0, 1, 4, 0, 3, 0, 2, 3, 0, 1, 5, 0),
-                          Array(0, 5, 6, 0, 1, 2, 0, 4, 6, 0, 3, 0, 2, 0),
-                          Array(0, 5, 0, 7, 0, 1, 6, 0, 3, 0, 2, 0, 3, 0))
+    "PrefixSpan internal (integer seq, -1 delim) run, variable-size itemsets") {
+    val sequences = Array(
+      Array(0, 1, 0, 1, 2, 3, 0, 1, 3, 0, 4, 0, 3, 6, 0),
+      Array(0, 1, 4, 0, 3, 0, 2, 3, 0, 1, 5, 0),
+      Array(0, 5, 6, 0, 1, 2, 0, 4, 6, 0, 3, 0, 2, 0),
+      Array(0, 5, 0, 7, 0, 1, 6, 0, 3, 0, 2, 0, 3, 0))
     val rdd = sc.parallelize(sequences, 2).cache()
     val result = PrefixSpan.genFreqPatterns(
-        rdd, minCount = 2, maxPatternLength = 5, maxLocalProjDBSize = 128L)
+      rdd,
+      minCount = 2,
+      maxPatternLength = 5,
+      maxLocalProjDBSize = 128L)
 
     /*
       To verify results, create file "prefixSpanSeqs" with content
@@ -196,59 +210,61 @@ class PrefixSpanSuite extends SparkFunSuite with MLlibTestSparkContext {
         52   <{1},{2,3},{1}>    0.50
         53     <{1},{2},{1}>    0.50
      */
-    val expectedValue = Array((Array(0, 1, 0), 4L),
-                              (Array(0, 2, 0), 4L),
-                              (Array(0, 3, 0), 4L),
-                              (Array(0, 4, 0), 3L),
-                              (Array(0, 5, 0), 3L),
-                              (Array(0, 6, 0), 3L),
-                              (Array(0, 1, 0, 6, 0), 2L),
-                              (Array(0, 2, 0, 6, 0), 2L),
-                              (Array(0, 5, 0, 6, 0), 2L),
-                              (Array(0, 1, 2, 0, 6, 0), 2L),
-                              (Array(0, 1, 0, 4, 0), 2L),
-                              (Array(0, 2, 0, 4, 0), 2L),
-                              (Array(0, 1, 2, 0, 4, 0), 2L),
-                              (Array(0, 1, 0, 3, 0), 4L),
-                              (Array(0, 2, 0, 3, 0), 3L),
-                              (Array(0, 2, 3, 0), 2L),
-                              (Array(0, 3, 0, 3, 0), 3L),
-                              (Array(0, 4, 0, 3, 0), 3L),
-                              (Array(0, 5, 0, 3, 0), 2L),
-                              (Array(0, 6, 0, 3, 0), 2L),
-                              (Array(0, 5, 0, 6, 0, 3, 0), 2L),
-                              (Array(0, 6, 0, 2, 0, 3, 0), 2L),
-                              (Array(0, 5, 0, 2, 0, 3, 0), 2L),
-                              (Array(0, 5, 0, 1, 0, 3, 0), 2L),
-                              (Array(0, 2, 0, 4, 0, 3, 0), 2L),
-                              (Array(0, 1, 0, 4, 0, 3, 0), 2L),
-                              (Array(0, 1, 2, 0, 4, 0, 3, 0), 2L),
-                              (Array(0, 1, 0, 3, 0, 3, 0), 3L),
-                              (Array(0, 1, 2, 0, 3, 0), 2L),
-                              (Array(0, 1, 0, 2, 0, 3, 0), 2L),
-                              (Array(0, 1, 0, 2, 3, 0), 2L),
-                              (Array(0, 1, 0, 2, 0), 4L),
-                              (Array(0, 1, 2, 0), 2L),
-                              (Array(0, 3, 0, 2, 0), 3L),
-                              (Array(0, 4, 0, 2, 0), 2L),
-                              (Array(0, 5, 0, 2, 0), 2L),
-                              (Array(0, 6, 0, 2, 0), 2L),
-                              (Array(0, 5, 0, 6, 0, 2, 0), 2L),
-                              (Array(0, 6, 0, 3, 0, 2, 0), 2L),
-                              (Array(0, 5, 0, 3, 0, 2, 0), 2L),
-                              (Array(0, 5, 0, 1, 0, 2, 0), 2L),
-                              (Array(0, 4, 0, 3, 0, 2, 0), 2L),
-                              (Array(0, 1, 0, 3, 0, 2, 0), 3L),
-                              (Array(0, 5, 0, 6, 0, 3, 0, 2, 0), 2L),
-                              (Array(0, 5, 0, 1, 0, 3, 0, 2, 0), 2L),
-                              (Array(0, 1, 0, 1, 0), 2L),
-                              (Array(0, 2, 0, 1, 0), 2L),
-                              (Array(0, 3, 0, 1, 0), 2L),
-                              (Array(0, 5, 0, 1, 0), 2L),
-                              (Array(0, 2, 3, 0, 1, 0), 2L),
-                              (Array(0, 1, 0, 3, 0, 1, 0), 2L),
-                              (Array(0, 1, 0, 2, 3, 0, 1, 0), 2L),
-                              (Array(0, 1, 0, 2, 0, 1, 0), 2L))
+    val expectedValue = Array(
+      (Array(0, 1, 0), 4L),
+      (Array(0, 2, 0), 4L),
+      (Array(0, 3, 0), 4L),
+      (Array(0, 4, 0), 3L),
+      (Array(0, 5, 0), 3L),
+      (Array(0, 6, 0), 3L),
+      (Array(0, 1, 0, 6, 0), 2L),
+      (Array(0, 2, 0, 6, 0), 2L),
+      (Array(0, 5, 0, 6, 0), 2L),
+      (Array(0, 1, 2, 0, 6, 0), 2L),
+      (Array(0, 1, 0, 4, 0), 2L),
+      (Array(0, 2, 0, 4, 0), 2L),
+      (Array(0, 1, 2, 0, 4, 0), 2L),
+      (Array(0, 1, 0, 3, 0), 4L),
+      (Array(0, 2, 0, 3, 0), 3L),
+      (Array(0, 2, 3, 0), 2L),
+      (Array(0, 3, 0, 3, 0), 3L),
+      (Array(0, 4, 0, 3, 0), 3L),
+      (Array(0, 5, 0, 3, 0), 2L),
+      (Array(0, 6, 0, 3, 0), 2L),
+      (Array(0, 5, 0, 6, 0, 3, 0), 2L),
+      (Array(0, 6, 0, 2, 0, 3, 0), 2L),
+      (Array(0, 5, 0, 2, 0, 3, 0), 2L),
+      (Array(0, 5, 0, 1, 0, 3, 0), 2L),
+      (Array(0, 2, 0, 4, 0, 3, 0), 2L),
+      (Array(0, 1, 0, 4, 0, 3, 0), 2L),
+      (Array(0, 1, 2, 0, 4, 0, 3, 0), 2L),
+      (Array(0, 1, 0, 3, 0, 3, 0), 3L),
+      (Array(0, 1, 2, 0, 3, 0), 2L),
+      (Array(0, 1, 0, 2, 0, 3, 0), 2L),
+      (Array(0, 1, 0, 2, 3, 0), 2L),
+      (Array(0, 1, 0, 2, 0), 4L),
+      (Array(0, 1, 2, 0), 2L),
+      (Array(0, 3, 0, 2, 0), 3L),
+      (Array(0, 4, 0, 2, 0), 2L),
+      (Array(0, 5, 0, 2, 0), 2L),
+      (Array(0, 6, 0, 2, 0), 2L),
+      (Array(0, 5, 0, 6, 0, 2, 0), 2L),
+      (Array(0, 6, 0, 3, 0, 2, 0), 2L),
+      (Array(0, 5, 0, 3, 0, 2, 0), 2L),
+      (Array(0, 5, 0, 1, 0, 2, 0), 2L),
+      (Array(0, 4, 0, 3, 0, 2, 0), 2L),
+      (Array(0, 1, 0, 3, 0, 2, 0), 3L),
+      (Array(0, 5, 0, 6, 0, 3, 0, 2, 0), 2L),
+      (Array(0, 5, 0, 1, 0, 3, 0, 2, 0), 2L),
+      (Array(0, 1, 0, 1, 0), 2L),
+      (Array(0, 2, 0, 1, 0), 2L),
+      (Array(0, 3, 0, 1, 0), 2L),
+      (Array(0, 5, 0, 1, 0), 2L),
+      (Array(0, 2, 3, 0, 1, 0), 2L),
+      (Array(0, 1, 0, 3, 0, 1, 0), 2L),
+      (Array(0, 1, 0, 2, 3, 0, 1, 0), 2L),
+      (Array(0, 1, 0, 2, 0, 1, 0), 2L)
+    )
 
     compareInternalResults(expectedValue, result.collect())
   }
@@ -258,26 +274,29 @@ class PrefixSpanSuite extends SparkFunSuite with MLlibTestSparkContext {
     val rdd = sc.parallelize(sequences, 2)
     val prefixSpan = new PrefixSpan().setMinSupport(1.0).setMaxPatternLength(2)
     val model = prefixSpan.run(rdd)
-    val expected = Array((Array(Array(1)), 1L),
-                         (Array(Array(1, 2)), 1L),
-                         (Array(Array(1), Array(1)), 1L),
-                         (Array(Array(1), Array(2)), 1L),
-                         (Array(Array(1), Array(3)), 1L),
-                         (Array(Array(1, 3)), 1L),
-                         (Array(Array(2)), 1L),
-                         (Array(Array(2, 3)), 1L),
-                         (Array(Array(2), Array(1)), 1L),
-                         (Array(Array(2), Array(2)), 1L),
-                         (Array(Array(2), Array(3)), 1L),
-                         (Array(Array(3)), 1L))
+    val expected = Array(
+      (Array(Array(1)), 1L),
+      (Array(Array(1, 2)), 1L),
+      (Array(Array(1), Array(1)), 1L),
+      (Array(Array(1), Array(2)), 1L),
+      (Array(Array(1), Array(3)), 1L),
+      (Array(Array(1, 3)), 1L),
+      (Array(Array(2)), 1L),
+      (Array(Array(2, 3)), 1L),
+      (Array(Array(2), Array(1)), 1L),
+      (Array(Array(2), Array(2)), 1L),
+      (Array(Array(2), Array(3)), 1L),
+      (Array(Array(3)), 1L)
+    )
     compareResults(expected, model.freqSequences.collect())
   }
 
   test("PrefixSpan Integer type, variable-size itemsets") {
-    val sequences = Seq(Array(Array(1, 2), Array(3)),
-                        Array(Array(1), Array(3, 2), Array(1, 2)),
-                        Array(Array(1, 2), Array(5)),
-                        Array(Array(6)))
+    val sequences = Seq(
+      Array(Array(1, 2), Array(3)),
+      Array(Array(1), Array(3, 2), Array(1, 2)),
+      Array(Array(1, 2), Array(5)),
+      Array(Array(6)))
     val rdd = sc.parallelize(sequences, 2).cache()
 
     val prefixSpan = new PrefixSpan().setMinSupport(0.5).setMaxPatternLength(5)
@@ -311,11 +330,11 @@ class PrefixSpanSuite extends SparkFunSuite with MLlibTestSparkContext {
 
     val model = prefixSpan.run(rdd)
     val expected = Array(
-        (Array(Array(1)), 3L),
-        (Array(Array(2)), 3L),
-        (Array(Array(3)), 2L),
-        (Array(Array(1), Array(3)), 2L),
-        (Array(Array(1, 2)), 3L)
+      (Array(Array(1)), 3L),
+      (Array(Array(2)), 3L),
+      (Array(Array(3)), 2L),
+      (Array(Array(1), Array(3)), 2L),
+      (Array(Array(1, 2)), 3L)
     )
     compareResults(expected, model.freqSequences.collect())
   }
@@ -324,10 +343,11 @@ class PrefixSpanSuite extends SparkFunSuite with MLlibTestSparkContext {
     // This is the same test as "PrefixSpan Int type, variable-size itemsets" except
     // mapped to Strings
     val intToString = (1 to 6).zip(Seq("a", "b", "c", "d", "e", "f")).toMap
-    val sequences = Seq(Array(Array(1, 2), Array(3)),
-                        Array(Array(1), Array(3, 2), Array(1, 2)),
-                        Array(Array(1, 2), Array(5)),
-                        Array(Array(6)))
+    val sequences = Seq(
+      Array(Array(1, 2), Array(3)),
+      Array(Array(1), Array(3, 2), Array(1, 2)),
+      Array(Array(1, 2), Array(5)),
+      Array(Array(6)))
       .map(seq => seq.map(itemSet => itemSet.map(intToString)))
     val rdd = sc.parallelize(sequences, 2).cache()
 
@@ -335,11 +355,11 @@ class PrefixSpanSuite extends SparkFunSuite with MLlibTestSparkContext {
 
     val model = prefixSpan.run(rdd)
     val expected = Array(
-        (Array(Array(1)), 3L),
-        (Array(Array(2)), 3L),
-        (Array(Array(3)), 2L),
-        (Array(Array(1), Array(3)), 2L),
-        (Array(Array(1, 2)), 3L)
+      (Array(Array(1)), 3L),
+      (Array(Array(2)), 3L),
+      (Array(Array(3)), 2L),
+      (Array(Array(1), Array(3)), 2L),
+      (Array(Array(1, 2)), 3L)
     ).map {
       case (pattern, count) =>
         (pattern.map(itemSet => itemSet.map(intToString)), count)

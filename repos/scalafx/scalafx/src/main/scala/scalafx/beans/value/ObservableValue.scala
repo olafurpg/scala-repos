@@ -57,8 +57,7 @@ object ObservableValue {
     ov.delegate.asInstanceOf[jfxbv.ObservableDoubleValue]
 
   implicit def sfxObservableValue2jfxBooleanValue(
-      ov: ObservableValue[Boolean, java.lang.Boolean])
-    : ObservableBooleanValue =
+      ov: ObservableValue[Boolean, java.lang.Boolean]): ObservableBooleanValue =
     ov.delegate.asInstanceOf[jfxbv.ObservableBooleanValue]
 
   implicit def sfxObservableValue2jfxStringValue(
@@ -87,7 +86,8 @@ object ObservableValue {
   * @define SUBRET A new [[scalafx.event.subscriptions.Subscription]] to remove $OV.
   */
 trait ObservableValue[@specialized(Int, Long, Float, Double, Boolean) T, J]
-    extends Observable with SFXDelegate[jfxbv.ObservableValue[J]] {
+    extends Observable
+    with SFXDelegate[jfxbv.ObservableValue[J]] {
 
   /**
     * Returns $OV
@@ -109,7 +109,7 @@ trait ObservableValue[@specialized(Int, Long, Float, Double, Boolean) T, J]
     * method from $CV.
     *
     * @tparam J1 J superclass.
-    * @param op Function that receives a 
+    * @param op Function that receives a
     *           [[http://docs.oracle.com/javase/8/javafx/api/javafx/beans/value/ObservableValue.html $OV]],
     *           the old value and the new value. It will be called when value changes.
     * @return $SUBRET
@@ -117,9 +117,10 @@ trait ObservableValue[@specialized(Int, Long, Float, Double, Boolean) T, J]
   def onChange[J1 >: J](
       op: (ObservableValue[T, J], J1, J1) => Unit): Subscription = {
     val listener = new jfxbv.ChangeListener[J1] {
-      def changed(observable: jfxbv.ObservableValue[_ <: J1],
-                  oldValue: J1,
-                  newValue: J1) {
+      def changed(
+          observable: jfxbv.ObservableValue[_ <: J1],
+          oldValue: J1,
+          newValue: J1) {
         op(ObservableValue.this, oldValue, newValue)
       }
     }
@@ -141,9 +142,10 @@ trait ObservableValue[@specialized(Int, Long, Float, Double, Boolean) T, J]
     */
   def onChange[J1 >: J](op: => Unit): Subscription = {
     val listener = new jfxbv.ChangeListener[J1] {
-      def changed(observable: jfxbv.ObservableValue[_ <: J1],
-                  oldValue: J1,
-                  newValue: J1) {
+      def changed(
+          observable: jfxbv.ObservableValue[_ <: J1],
+          oldValue: J1,
+          newValue: J1) {
         op
       }
     }

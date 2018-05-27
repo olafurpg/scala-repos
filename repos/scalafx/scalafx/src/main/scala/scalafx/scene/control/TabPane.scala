@@ -42,14 +42,16 @@ object TabPane {
 
   object TabClosingPolicy
       extends SFXEnumDelegateCompanion[
-          jfxsc.TabPane.TabClosingPolicy, TabClosingPolicy] {
+        jfxsc.TabPane.TabClosingPolicy,
+        TabClosingPolicy] {
 
     /**
       * All tabs will have the option to be closed.
       */
     val AllTabs = new TabClosingPolicy(jfxsc.TabPane.TabClosingPolicy.ALL_TABS)
-    @deprecated("Use AllTabs; ALL_TABS will be removed in a future release",
-                "8.0.60-R10")
+    @deprecated(
+      "Use AllTabs; ALL_TABS will be removed in a future release",
+      "8.0.60-R10")
     val ALL_TABS = AllTabs
 
     /**
@@ -57,20 +59,20 @@ object TabPane {
       * shown.
       */
     val SelectedTab = new TabClosingPolicy(
-        jfxsc.TabPane.TabClosingPolicy.SELECTED_TAB)
+      jfxsc.TabPane.TabClosingPolicy.SELECTED_TAB)
     @deprecated(
-        "Use SelectedTab; SELECTED_TAB will be removed in a future release",
-        "8.0.60-R10")
+      "Use SelectedTab; SELECTED_TAB will be removed in a future release",
+      "8.0.60-R10")
     val SELECTED_TAB = SelectedTab
 
     /**
       * Tabs can not be closed by the user.
       */
     val Unavailable = new TabClosingPolicy(
-        jfxsc.TabPane.TabClosingPolicy.UNAVAILABLE)
+      jfxsc.TabPane.TabClosingPolicy.UNAVAILABLE)
     @deprecated(
-        "Use Unavailable; UNAVAILABLE will be removed in a future release",
-        "8.0.60-R10")
+      "Use Unavailable; UNAVAILABLE will be removed in a future release",
+      "8.0.60-R10")
     val UNAVAILABLE = Unavailable
 
     protected override def unsortedValues: Array[TabClosingPolicy] =
@@ -89,7 +91,8 @@ object TabPane {
 }
 
 class TabPane(override val delegate: jfxsc.TabPane = new jfxsc.TabPane)
-    extends Control(delegate) with SFXDelegate[jfxsc.TabPane] {
+    extends Control(delegate)
+    with SFXDelegate[jfxsc.TabPane] {
 
   /**
     * The rotatedGraphic state of the tabs in the TabPane.

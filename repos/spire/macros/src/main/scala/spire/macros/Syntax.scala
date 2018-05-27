@@ -1,7 +1,13 @@
 package spire
 package macros
 
-import spire.macros.compat.{termName, freshTermName, resetLocalAttrs, Context, setOrig}
+import spire.macros.compat.{
+  termName,
+  freshTermName,
+  resetLocalAttrs,
+  Context,
+  setOrig
+}
 
 import scala.language.higherKinds
 
@@ -11,32 +17,33 @@ object Ops extends machinist.Ops {
 
   val operatorNames: Map[String, String] =
     machinist.DefaultOps.operatorNames ++ Map(
-        // partial operations |+|? |+|?? |-|? |-|??
-        ("$bar$plus$bar$qmark$qmark", "opIsDefined"),
-        ("$bar$minus$bar$qmark$qmark", "opInverseIsDefined"),
-        ("$bar$plus$bar$qmark", "partialOp"),
-        ("$bar$minus$bar$qmark", "partialOpInverse"),
-        // partial actions ?|+|> ??|+|> <|+|? <|+|??
-        ("$qmark$bar$plus$bar$greater", "partialActl"),
-        ("$qmark$qmark$bar$plus$bar$greater", "actlIsDefined"),
-        ("$less$bar$plus$bar$qmark", "partialActr"),
-        ("$less$bar$plus$bar$qmark$qmark", "actrIsDefined"),
-        // square root
-        (uesc('√'), "sqrt"),
-        // equality, comparisons
-        (uesc('≡'), "eqv"),
-        (uesc('≠'), "neqv"),
-        (uesc('≤'), "lteqv"),
-        (uesc('≥'), "gteqv"),
-        // lattices/heyting
-        (uesc('∧'), "meet"),
-        (uesc('∨'), "join"),
-        (uesc('⊃'), "imp"),
-        (uesc('¬'), "complement"),
-        // bool
-        (uesc('⊻'), "xor"),
-        (uesc('⊼'), "nand"),
-        (uesc('⊽'), "nor"))
+      // partial operations |+|? |+|?? |-|? |-|??
+      ("$bar$plus$bar$qmark$qmark", "opIsDefined"),
+      ("$bar$minus$bar$qmark$qmark", "opInverseIsDefined"),
+      ("$bar$plus$bar$qmark", "partialOp"),
+      ("$bar$minus$bar$qmark", "partialOpInverse"),
+      // partial actions ?|+|> ??|+|> <|+|? <|+|??
+      ("$qmark$bar$plus$bar$greater", "partialActl"),
+      ("$qmark$qmark$bar$plus$bar$greater", "actlIsDefined"),
+      ("$less$bar$plus$bar$qmark", "partialActr"),
+      ("$less$bar$plus$bar$qmark$qmark", "actrIsDefined"),
+      // square root
+      (uesc('√'), "sqrt"),
+      // equality, comparisons
+      (uesc('≡'), "eqv"),
+      (uesc('≠'), "neqv"),
+      (uesc('≤'), "lteqv"),
+      (uesc('≥'), "gteqv"),
+      // lattices/heyting
+      (uesc('∧'), "meet"),
+      (uesc('∨'), "join"),
+      (uesc('⊃'), "imp"),
+      (uesc('¬'), "complement"),
+      // bool
+      (uesc('⊻'), "xor"),
+      (uesc('⊼'), "nand"),
+      (uesc('⊽'), "nor")
+    )
 
   def eqv[A, B](c: Context)(rhs: c.Expr[B])(
       ev: c.Expr[A =:= B]): c.Expr[Boolean] = {
@@ -65,8 +72,8 @@ case class SyntaxUtil[C <: Context with Singleton](val c: C) {
     es.forall {
       _.tree match {
         case t @ Ident(_: TermName) if t.symbol.asTerm.isStable => true
-        case Function(_, _) => true
-        case _ => false
+        case Function(_, _)                                     => true
+        case _                                                  => false
       }
     }
 }
@@ -127,9 +134,9 @@ class InlineUtil[C <: Context with Singleton](val c: C) {
 
 object Syntax {
 
-  def cforMacro[A](c: Context)(
-      init: c.Expr[A])(test: c.Expr[A => Boolean], next: c.Expr[A => A])(
-      body: c.Expr[A => Unit]): c.Expr[Unit] = {
+  def cforMacro[A](c: Context)(init: c.Expr[A])(
+      test: c.Expr[A => Boolean],
+      next: c.Expr[A => A])(body: c.Expr[A => Unit]): c.Expr[Unit] = {
 
     import c.universe._
     val util = SyntaxUtil[c.type](c)
@@ -191,7 +198,7 @@ v     */
       case Literal(Constant(a)) =>
         a match {
           case n: Int => Some(n)
-          case _ => None
+          case _      => None
         }
       case _ => None
     }

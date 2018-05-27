@@ -68,9 +68,10 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
 
   /** Binary functor traverse on this disjunction. */
   def bitraverse[G[_], C, D](f: A => G[C], g: B => G[D])(
-      implicit F: Traverse[F], G: Applicative[G]): G[EitherT[F, C, D]] =
+      implicit F: Traverse[F],
+      G: Applicative[G]): G[EitherT[F, C, D]] =
     Applicative[G].map(F.traverse(run)(Bitraverse[\/].bitraverseF(f, g)))(
-        EitherT(_: F[C \/ D]))
+      EitherT(_: F[C \/ D]))
 
   /** Map on the right of this disjunction. */
   def map[C](f: B => C)(implicit F: Functor[F]): EitherT[F, A, C] =
@@ -78,7 +79,8 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
 
   /** Traverse on the right of this disjunction. */
   def traverse[G[_], C](f: B => G[C])(
-      implicit F: Traverse[F], G: Applicative[G]): G[EitherT[F, A, C]] =
+      implicit F: Traverse[F],
+      G: Applicative[G]): G[EitherT[F, A, C]] =
     G.map(F.traverse(run)(o => Traverse[A \/ ?].traverse(o)(f)))(EitherT(_))
 
   /** Apply a function in the environment of the right of this
@@ -103,14 +105,14 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
     F.foldRight[A \/ B, Z](run, z)((a, b) => a.foldRight(b)(f))
 
   /** Filter on the right of this disjunction. */
-  def filter(p: B => Boolean)(
-      implicit M: Monoid[A], F: Monad[F]): EitherT[F, A, B] =
+  def filter(
+      p: B => Boolean)(implicit M: Monoid[A], F: Monad[F]): EitherT[F, A, B] =
     MonadPlus[EitherT[F, A, ?]].filter(this)(p)
 
   /** Alias for `filter`.
     */
-  def withFilter(p: B => Boolean)(
-      implicit M: Monoid[A], F: Monad[F]): EitherT[F, A, B] =
+  def withFilter(
+      p: B => Boolean)(implicit M: Monoid[A], F: Monad[F]): EitherT[F, A, B] =
     filter(p)(M, F)
 
   /** Return `true` if this disjunction is a right value satisfying the given predicate. */
@@ -156,9 +158,8 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
   /** Return this if it is a right, otherwise, return the given value. Alias for `|||` */
   def orElse(x: => EitherT[F, A, B])(implicit F: Monad[F]): EitherT[F, A, B] = {
     val g = run
-    EitherT(
-        F.bind(g) {
-      case -\/(_) => x.run
+    EitherT(F.bind(g) {
+      case -\/(_)       => x.run
       case r @ (\/-(_)) => F.point(r)
     })
   }
@@ -176,9 +177,10 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
     * -\/(v1) +++ -\/(v2) → -\/(v1 + v2)
     * }}}
     */
-  def +++(x: => EitherT[F, A, B])(implicit M1: Semigroup[B],
-                                  M2: Semigroup[A],
-                                  F: Apply[F]): EitherT[F, A, B] =
+  def +++(x: => EitherT[F, A, B])(
+      implicit M1: Semigroup[B],
+      M2: Semigroup[A],
+      F: Apply[F]): EitherT[F, A, B] =
     EitherT(F.apply2(run, x.run)(_ +++ _))
 
   /** Ensures that the right value of this disjunction satisfies the given predicate, or returns left with the given value. */
@@ -188,12 +190,16 @@ final case class EitherT[F[_], A, B](run: F[A \/ B]) {
 
   /** Compare two disjunction values for equality. */
   def ===(x: EitherT[F, A, B])(
-      implicit EA: Equal[A], EB: Equal[B], F: Apply[F]): F[Boolean] =
+      implicit EA: Equal[A],
+      EB: Equal[B],
+      F: Apply[F]): F[Boolean] =
     F.apply2(run, x.run)(_ === _)
 
   /** Compare two disjunction values for ordering. */
   def compare(x: EitherT[F, A, B])(
-      implicit EA: Order[A], EB: Order[B], F: Apply[F]): F[Ordering] =
+      implicit EA: Order[A],
+      EB: Order[B],
+      F: Apply[F]): F[Ordering] =
     F.apply2(run, x.run)(_ compare _)
 
   /** Show for a disjunction value. */
@@ -233,8 +239,9 @@ object EitherT extends EitherTInstances {
       eitherT(F.point(a))
   }
 
-  def eitherTU[FAB, AB, A0, B0](fab: FAB)(
-      implicit u1: Unapply[Functor, FAB] { type A = AB }, u2: Unapply2[Bifunctor, AB] {
+  def eitherTU[FAB, AB, A0, B0](fab: FAB)(implicit u1: Unapply[Functor, FAB] {
+    type A = AB
+  }, u2: Unapply2[Bifunctor, AB] {
     type A = A0; type B = B0
   }, l: Leibniz.===[AB, A0 \/ B0]): EitherT[u1.M, A0, B0] =
     eitherT(l.subst[u1.M](u1(fab)))
@@ -301,8 +308,8 @@ object EitherT extends EitherTInstances {
         left(F.point(e.asInstanceOf[B]))
     }
 
-  def fromTryCatchNonFatal[F[_], A](
-      a: => F[A])(implicit F: Applicative[F]): EitherT[F, Throwable, A] =
+  def fromTryCatchNonFatal[F[_], A](a: => F[A])(
+      implicit F: Applicative[F]): EitherT[F, Throwable, A] =
     try {
       right(a)
     } catch {
@@ -312,7 +319,8 @@ object EitherT extends EitherTInstances {
 
 sealed abstract class EitherTInstances4 {
   implicit def eitherTBindRec[F[_], E](
-      implicit F0: Monad[F], B0: BindRec[F]): BindRec[EitherT[F, E, ?]] =
+      implicit F0: Monad[F],
+      B0: BindRec[F]): BindRec[EitherT[F, E, ?]] =
     new EitherTBindRec[F, E] {
       implicit def F = F0
       implicit def B = B0
@@ -342,7 +350,8 @@ sealed abstract class EitherTInstances1 extends EitherTInstances2 {
       implicit def F = F0
     }
   implicit def eitherTPlus[F[_], L](
-      implicit F0: Monad[F], L0: Semigroup[L]): Plus[EitherT[F, L, ?]] =
+      implicit F0: Monad[F],
+      L0: Semigroup[L]): Plus[EitherT[F, L, ?]] =
     new EitherTPlus[F, L] {
       implicit def F = F0
       implicit def G = L0
@@ -361,7 +370,8 @@ sealed abstract class EitherTInstances0 extends EitherTInstances1 {
       implicit def F = F0
     }
   implicit def eitherTMonadPlus[F[_], L](
-      implicit F0: Monad[F], L0: Monoid[L]): MonadPlus[EitherT[F, L, ?]] =
+      implicit F0: Monad[F],
+      L0: Monoid[L]): MonadPlus[EitherT[F, L, ?]] =
     new EitherTMonadPlus[F, L] {
       implicit def F = F0
       implicit def G = L0
@@ -406,7 +416,8 @@ private trait EitherTFunctor[F[_], E] extends Functor[EitherT[F, E, ?]] {
 }
 
 private trait EitherTBind[F[_], E]
-    extends Bind[EitherT[F, E, ?]] with EitherTFunctor[F, E] {
+    extends Bind[EitherT[F, E, ?]]
+    with EitherTFunctor[F, E] {
   implicit def F: Monad[F]
 
   final def bind[A, B](fa: EitherT[F, E, A])(
@@ -414,24 +425,27 @@ private trait EitherTBind[F[_], E]
 }
 
 private trait EitherTBindRec[F[_], E]
-    extends BindRec[EitherT[F, E, ?]] with EitherTBind[F, E] {
+    extends BindRec[EitherT[F, E, ?]]
+    with EitherTBind[F, E] {
   implicit def F: Monad[F]
   implicit def B: BindRec[F]
 
-  final def tailrecM[A, B](
-      f: A => EitherT[F, E, A \/ B])(a: A): EitherT[F, E, B] =
+  final def tailrecM[A, B](f: A => EitherT[F, E, A \/ B])(
+      a: A): EitherT[F, E, B] =
     EitherT(
-        B.tailrecM[A, E \/ B](a =>
-              F.map(f(a).run) {
-            // E \/ (A \/ B) => A \/ (E \/ B) is _.sequenceU but can't use here
-            _.fold(e => \/.right(\/.left(e)),
-                   _.fold(a => \/.left(a), b => \/.right(\/.right(b))))
-        })(a)
+      B.tailrecM[A, E \/ B](a =>
+        F.map(f(a).run) {
+          // E \/ (A \/ B) => A \/ (E \/ B) is _.sequenceU but can't use here
+          _.fold(
+            e => \/.right(\/.left(e)),
+            _.fold(a => \/.left(a), b => \/.right(\/.right(b))))
+      })(a)
     )
 }
 
 private trait EitherTMonad[F[_], E]
-    extends Monad[EitherT[F, E, ?]] with EitherTBind[F, E] {
+    extends Monad[EitherT[F, E, ?]]
+    with EitherTBind[F, E] {
   implicit def F: Monad[F]
 
   def point[A](a: => A): EitherT[F, E, A] = EitherT(F.point(\/-(a)))
@@ -442,11 +456,10 @@ private trait EitherTPlus[F[_], E] extends Plus[EitherT[F, E, ?]] {
   def G: Semigroup[E]
 
   def plus[A](a: EitherT[F, E, A], b: => EitherT[F, E, A]): EitherT[F, E, A] =
-    EitherT(
-        F.bind(a.run) {
+    EitherT(F.bind(a.run) {
       case -\/(l) =>
         F.map(b.run) {
-          case -\/(ll) => -\/(G.append(l, ll))
+          case -\/(ll)    => -\/(G.append(l, ll))
           case r @ \/-(_) => r
         }
       case r =>
@@ -455,7 +468,8 @@ private trait EitherTPlus[F[_], E] extends Plus[EitherT[F, E, ?]] {
 }
 
 private trait EitherTMonadPlus[F[_], E]
-    extends MonadPlus[EitherT[F, E, ?]] with EitherTMonad[F, E]
+    extends MonadPlus[EitherT[F, E, ?]]
+    with EitherTMonad[F, E]
     with EitherTPlus[F, E] {
   def G: Monoid[E]
 
@@ -471,7 +485,8 @@ private trait EitherTFoldable[F[_], E]
 }
 
 private trait EitherTTraverse[F[_], E]
-    extends Traverse[EitherT[F, E, ?]] with EitherTFoldable[F, E] {
+    extends Traverse[EitherT[F, E, ?]]
+    with EitherTFoldable[F, E] {
   implicit def F: Traverse[F]
 
   def traverseImpl[G[_]: Applicative, A, B](fa: EitherT[F, E, A])(
@@ -481,26 +496,28 @@ private trait EitherTTraverse[F[_], E]
 private trait EitherTBifunctor[F[_]] extends Bifunctor[EitherT[F, ?, ?]] {
   implicit def F: Functor[F]
 
-  override def bimap[A, B, C, D](fab: EitherT[F, A, B])(
-      f: A => C, g: B => D): EitherT[F, C, D] = fab.bimap(f, g)
+  override def bimap[A, B, C, D](
+      fab: EitherT[F, A, B])(f: A => C, g: B => D): EitherT[F, C, D] =
+    fab.bimap(f, g)
 }
 
 private trait EitherTBifoldable[F[_]]
     extends Bifoldable.FromBifoldMap[EitherT[F, ?, ?]] {
   implicit def F: Foldable[F]
 
-  override final def bifoldMap[A, B, M : Monoid](fab: EitherT[F, A, B])(
+  override final def bifoldMap[A, B, M: Monoid](fab: EitherT[F, A, B])(
       f: A => M)(g: B => M) =
     F.foldMap(fab.run)(Bifoldable[\/].bifoldMap(_)(f)(g))
 }
 
 private trait EitherTBitraverse[F[_]]
-    extends Bitraverse[EitherT[F, ?, ?]] with EitherTBifunctor[F]
+    extends Bitraverse[EitherT[F, ?, ?]]
+    with EitherTBifunctor[F]
     with EitherTBifoldable[F] {
   implicit def F: Traverse[F]
 
-  def bitraverseImpl[G[_]: Applicative, A, B, C, D](fab: EitherT[F, A, B])(
-      f: A => G[C], g: B => G[D]): G[EitherT[F, C, D]] =
+  def bitraverseImpl[G[_]: Applicative, A, B, C, D](
+      fab: EitherT[F, A, B])(f: A => G[C], g: B => G[D]): G[EitherT[F, C, D]] =
     fab.bitraverse(f, g)
 }
 
@@ -519,7 +536,8 @@ private trait EitherTHoist[A] extends Hoist[λ[(α[_], β) => EitherT[α, A, β]
 }
 
 private[scalaz] trait EitherTMonadTell[F[_], W, A]
-    extends MonadTell[EitherT[F, A, ?], W] with EitherTMonad[F, A]
+    extends MonadTell[EitherT[F, A, ?], W]
+    with EitherTMonad[F, A]
     with EitherTHoist[A] {
   def MT: MonadTell[F, W]
 
@@ -536,7 +554,8 @@ private[scalaz] trait EitherTMonadTell[F[_], W, A]
 }
 
 private[scalaz] trait EitherTMonadListen[F[_], W, A]
-    extends MonadListen[EitherT[F, A, ?], W] with EitherTMonadTell[F, W, A] {
+    extends MonadListen[EitherT[F, A, ?], W]
+    with EitherTMonadTell[F, W, A] {
   implicit def MT: MonadListen[F, W]
 
   def listen[B](ma: EitherT[F, A, B]): EitherT[F, A, (B, W)] = {
@@ -550,14 +569,14 @@ private[scalaz] trait EitherTMonadListen[F[_], W, A]
 }
 
 private trait EitherTMonadError[F[_], E]
-    extends MonadError[EitherT[F, E, ?], E] with EitherTMonad[F, E] {
+    extends MonadError[EitherT[F, E, ?], E]
+    with EitherTMonad[F, E] {
   implicit def F: Monad[F]
   def raiseError[A](e: E): EitherT[F, E, A] = EitherT(F.point(-\/(e)))
   def handleError[A](fa: EitherT[F, E, A])(
       f: E => EitherT[F, E, A]): EitherT[F, E, A] =
-    EitherT(
-        F.bind(fa.run) {
+    EitherT(F.bind(fa.run) {
       case -\/(e) => f(e).run
-      case r => F.point(r)
+      case r      => F.point(r)
     })
 }

@@ -25,10 +25,10 @@ object RestartNodeMultiJvmSpec extends MultiNodeConfig {
   val third = role("third")
 
   commonConfig(
-      debugConfig(on = false)
-        .withFallback(ConfigFactory.parseString(
-                "akka.cluster.auto-down-unreachable-after = 5s"))
-        .withFallback(MultiNodeClusterSpec.clusterConfig))
+    debugConfig(on = false)
+      .withFallback(ConfigFactory.parseString(
+        "akka.cluster.auto-down-unreachable-after = 5s"))
+      .withFallback(MultiNodeClusterSpec.clusterConfig))
 }
 
 class RestartNodeMultiJvmNode1 extends RestartNodeSpec
@@ -36,7 +36,8 @@ class RestartNodeMultiJvmNode2 extends RestartNodeSpec
 class RestartNodeMultiJvmNode3 extends RestartNodeSpec
 
 abstract class RestartNodeSpec
-    extends MultiNodeSpec(RestartNodeMultiJvmSpec) with MultiNodeClusterSpec
+    extends MultiNodeSpec(RestartNodeMultiJvmSpec)
+    with MultiNodeClusterSpec
     with ImplicitSender {
 
   import RestartNodeMultiJvmSpec._
@@ -50,11 +51,12 @@ abstract class RestartNodeSpec
     Vector(first, secondUniqueAddress.address, third)
 
   lazy val restartedSecondSystem = ActorSystem(
-      system.name,
-      ConfigFactory
-        .parseString("akka.remote.netty.tcp.port=" +
-            secondUniqueAddress.address.port.get)
-        .withFallback(system.settings.config))
+    system.name,
+    ConfigFactory
+      .parseString(
+        "akka.remote.netty.tcp.port=" +
+          secondUniqueAddress.address.port.get)
+      .withFallback(system.settings.config))
 
   override def afterAll(): Unit = {
     runOn(second) {
@@ -67,7 +69,7 @@ abstract class RestartNodeSpec
 
   "Cluster nodes" must {
     "be able to restart and join again" taggedAs LongRunningTest in within(
-        60 seconds) {
+      60 seconds) {
       // secondSystem is a separate ActorSystem, to be able to simulate restart
       // we must transfer its address to first
       runOn(first, third) {
@@ -100,8 +102,8 @@ abstract class RestartNodeSpec
         Cluster(secondSystem).joinSeedNodes(seedNodes)
         awaitAssert(Cluster(secondSystem).readView.members.size should ===(3))
         awaitAssert(
-            Cluster(secondSystem).readView.members.map(_.status) should ===(
-                Set(Up)))
+          Cluster(secondSystem).readView.members.map(_.status) should ===(
+            Set(Up)))
       }
       enterBarrier("started")
 
@@ -115,9 +117,10 @@ abstract class RestartNodeSpec
       runOn(second) {
         Cluster(restartedSecondSystem).joinSeedNodes(seedNodes)
         awaitAssert(
-            Cluster(restartedSecondSystem).readView.members.size should ===(3))
-        awaitAssert(Cluster(restartedSecondSystem).readView.members
-              .map(_.status) should ===(Set(Up)))
+          Cluster(restartedSecondSystem).readView.members.size should ===(3))
+        awaitAssert(
+          Cluster(restartedSecondSystem).readView.members
+            .map(_.status) should ===(Set(Up)))
       }
       runOn(first, third) {
         awaitAssert {

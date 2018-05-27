@@ -105,7 +105,8 @@ object ThriftMuxResponseClassifier {
 
       reqRep.response match {
         case Return(rep: mux.Response) =>
-          try classifier.isDefinedAt(deserialized(deserCtx, rep.body)) catch {
+          try classifier.isDefinedAt(deserialized(deserCtx, rep.body))
+          catch {
             case _: Throwable => false
           }
         case _ => false

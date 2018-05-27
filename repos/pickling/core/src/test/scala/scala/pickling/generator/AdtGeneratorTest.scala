@@ -21,7 +21,7 @@ object SimpleAdt {
 object NestedAdt {
   import scala.pickling.Defaults._
   @scala.pickling.directSubclasses(
-      value = Array(classOf[Foo], classOf[NestedAdt]))
+    value = Array(classOf[Foo], classOf[NestedAdt]))
   sealed trait Adt
   final case class Foo(x: Int) extends Adt
   @scala.pickling.directSubclasses(value = Array(classOf[Bar]))

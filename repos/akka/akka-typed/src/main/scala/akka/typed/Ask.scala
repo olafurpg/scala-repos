@@ -39,14 +39,17 @@ object AskPattern {
     val (ref: ActorRef[U], future: Future[U], promiseRef: PromiseActorRef) =
       actorRef.untypedRef match {
         case ref: InternalActorRef if ref.isTerminated ⇒
-          (ActorRef[U](ref.provider.deadLetters),
-           Future.failed[U](new AskTimeoutException(
-                   s"Recipient[$actorRef] had already been terminated.")))
+          (
+            ActorRef[U](ref.provider.deadLetters),
+            Future.failed[U](
+              new AskTimeoutException(
+                s"Recipient[$actorRef] had already been terminated.")))
         case ref: InternalActorRef ⇒
           if (timeout.duration.length <= 0)
-            (ActorRef[U](ref.provider.deadLetters),
-             Future.failed[U](new IllegalArgumentException(
-                     s"Timeout length must not be negative, question not sent to [$actorRef]")))
+            (
+              ActorRef[U](ref.provider.deadLetters),
+              Future.failed[U](new IllegalArgumentException(
+                s"Timeout length must not be negative, question not sent to [$actorRef]")))
           else {
             val a = PromiseActorRef(ref.provider, timeout, actorRef, "unknown")
             val b = ActorRef[U](a)
@@ -54,7 +57,7 @@ object AskPattern {
           }
         case _ ⇒
           throw new IllegalArgumentException(
-              s"cannot create PromiseRef for non-Akka ActorRef (${actorRef.getClass})")
+            s"cannot create PromiseRef for non-Akka ActorRef (${actorRef.getClass})")
       }
   }
 
@@ -63,9 +66,10 @@ object AskPattern {
       new PromiseRef[U](actorRef, timeout)
   }
 
-  private[typed] def ask[T, U](actorRef: ActorRef[T],
-                               timeout: Timeout,
-                               f: ActorRef[U] ⇒ T): Future[U] = {
+  private[typed] def ask[T, U](
+      actorRef: ActorRef[T],
+      timeout: Timeout,
+      f: ActorRef[U] ⇒ T): Future[U] = {
     val p = PromiseRef[U](actorRef)(timeout)
     val m = f(p.ref)
     p.promiseRef.messageClassName = m.getClass.getName

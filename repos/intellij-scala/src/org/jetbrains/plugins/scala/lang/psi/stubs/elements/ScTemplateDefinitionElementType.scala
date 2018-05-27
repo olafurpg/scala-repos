@@ -5,23 +5,33 @@ package stubs
 package elements
 
 import com.intellij.psi.impl.java.stubs.index.JavaStubIndexKeys
-import com.intellij.psi.stubs.{IndexSink, StubElement, StubInputStream, StubOutputStream}
+import com.intellij.psi.stubs.{
+  IndexSink,
+  StubElement,
+  StubInputStream,
+  StubOutputStream
+}
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiClass, PsiElement}
 import com.intellij.util.io.StringRef
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScAnnotation
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject, ScTemplateDefinition, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass,
+  ScObject,
+  ScTemplateDefinition,
+  ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.stubs.impl.ScTemplateDefinitionStubImpl
 import org.jetbrains.plugins.scala.lang.psi.stubs.index.ScalaIndexKeys
 
 /**
   * @author ilyas, alefas
   */
-abstract class ScTemplateDefinitionElementType[
-    TypeDef <: ScTemplateDefinition](debugName: String)
+abstract class ScTemplateDefinitionElementType[TypeDef <: ScTemplateDefinition](
+    debugName: String)
     extends ScStubElementType[ScTemplateDefinitionStub, ScTemplateDefinition](
-        debugName) {
+      debugName) {
 
   override def createStubImpl[ParentPsi <: PsiElement](
       psi: ScTemplateDefinition,
@@ -29,25 +39,25 @@ abstract class ScTemplateDefinitionElementType[
     val file = psi.getContainingFile
     val fileName =
       if (file != null && file.getVirtualFile != null)
-        file.getVirtualFile.getName else null
+        file.getVirtualFile.getName
+      else null
     val signs = psi.functions.map(_.name).toArray
     val isPO = psi match {
       case td: ScTypeDefinition => td.isPackageObject
-      case _ => false
+      case _                    => false
     }
     val isSFC = psi.isScriptFileClass
 
     val isDepr =
       psi.isInstanceOf[ScTypeDefinition] && psi.getModifierList != null &&
-      !psi.getModifierList.getAnnotations.forall(
-          p =>
-            p match {
-          case a: ScAnnotation => {
+        !psi.getModifierList.getAnnotations.forall(p =>
+          p match {
+            case a: ScAnnotation => {
               val typeText = a.constructor.typeElement.getText
               typeText != "deprecated" && typeText != "scala.deprecated"
             }
-          case _ => true
-      })
+            case _ => true
+        })
 
     val isImplicitObject =
       psi.isInstanceOf[ScObject] && psi.hasModifierProperty("implicit")
@@ -63,7 +73,7 @@ abstract class ScTemplateDefinitionElementType[
       while (element != null && res) {
         element match {
           case o: ScObject if o.isPackageObject => res = false
-          case _ =>
+          case _                                =>
         }
         element = element.getParent
       }
@@ -72,24 +82,26 @@ abstract class ScTemplateDefinitionElementType[
 
     val isLocal: Boolean =
       psi.containingClass == null &&
-      PsiTreeUtil.getParentOfType(psi, classOf[ScTemplateDefinition]) != null
+        PsiTreeUtil.getParentOfType(psi, classOf[ScTemplateDefinition]) != null
 
-    new ScTemplateDefinitionStubImpl[ParentPsi](parent,
-                                                this,
-                                                psi.name,
-                                                psi.qualifiedName,
-                                                psi.getQualifiedName,
-                                                fileName,
-                                                signs,
-                                                isPO,
-                                                isSFC,
-                                                isDepr,
-                                                isImplicitObject,
-                                                isImplicitClass,
-                                                javaName,
-                                                additionalJavaNames,
-                                                isLocal,
-                                                isOkForJava(psi))
+    new ScTemplateDefinitionStubImpl[ParentPsi](
+      parent,
+      this,
+      psi.name,
+      psi.qualifiedName,
+      psi.getQualifiedName,
+      fileName,
+      signs,
+      isPO,
+      isSFC,
+      isDepr,
+      isImplicitObject,
+      isImplicitClass,
+      javaName,
+      additionalJavaNames,
+      isLocal,
+      isOkForJava(psi)
+    )
   }
 
   def serialize(stub: ScTemplateDefinitionStub, dataStream: StubOutputStream) {
@@ -113,8 +125,9 @@ abstract class ScTemplateDefinitionElementType[
     dataStream.writeBoolean(stub.isVisibleInJava)
   }
 
-  override def deserializeImpl(dataStream: StubInputStream,
-                               parentStub: Any): ScTemplateDefinitionStub = {
+  override def deserializeImpl(
+      dataStream: StubInputStream,
+      parentStub: Any): ScTemplateDefinitionStub = {
     val name = dataStream.readName
     val qualName = dataStream.readName
     val javaQualName = dataStream.readName()
@@ -134,22 +147,24 @@ abstract class ScTemplateDefinitionElementType[
     for (i <- 0 until lengthA) additionalNames(i) = dataStream.readName()
     val isLocal = dataStream.readBoolean()
     val visibleInJava = dataStream.readBoolean()
-    new ScTemplateDefinitionStubImpl(parent,
-                                     this,
-                                     name,
-                                     qualName,
-                                     javaQualName,
-                                     fileName,
-                                     methodNames,
-                                     isPO,
-                                     isSFC,
-                                     isDepr,
-                                     isImplcitObject,
-                                     isImplcitClass,
-                                     javaName,
-                                     additionalNames,
-                                     isLocal,
-                                     visibleInJava)
+    new ScTemplateDefinitionStubImpl(
+      parent,
+      this,
+      name,
+      qualName,
+      javaQualName,
+      fileName,
+      methodNames,
+      isPO,
+      isSFC,
+      isDepr,
+      isImplcitObject,
+      isImplcitClass,
+      javaName,
+      additionalNames,
+      isLocal,
+      visibleInJava
+    )
   }
 
   def indexStub(stub: ScTemplateDefinitionStub, sink: IndexSink) {
@@ -171,7 +186,8 @@ abstract class ScTemplateDefinitionElementType[
     val javaFqn = stub.javaQualName
     if (javaFqn != null && !stub.isLocal && stub.isVisibleInJava) {
       sink.occurrence[PsiClass, java.lang.Integer](
-          JavaStubIndexKeys.CLASS_FQN, javaFqn.hashCode)
+        JavaStubIndexKeys.CLASS_FQN,
+        javaFqn.hashCode)
       val i = javaFqn.lastIndexOf(".")
       val pack =
         if (i == -1) ""
@@ -181,7 +197,8 @@ abstract class ScTemplateDefinitionElementType[
     val fqn = stub.qualName
     if (fqn != null && !stub.isLocal) {
       sink.occurrence[PsiClass, java.lang.Integer](
-          ScalaIndexKeys.FQN_KEY, fqn.hashCode)
+        ScalaIndexKeys.FQN_KEY,
+        fqn.hashCode)
       val i = fqn.lastIndexOf(".")
       val pack =
         if (i == -1) ""
@@ -202,9 +219,11 @@ abstract class ScTemplateDefinitionElementType[
         else packageName.substring(index + 1, packageName.size)
       }
       sink.occurrence[PsiClass, java.lang.Integer](
-          ScalaIndexKeys.PACKAGE_OBJECT_KEY, packageName.hashCode)
+        ScalaIndexKeys.PACKAGE_OBJECT_KEY,
+        packageName.hashCode)
       sink.occurrence[PsiClass, String](
-          ScalaIndexKeys.PACKAGE_OBJECT_SHORT_NAME_KEY, shortName)
+        ScalaIndexKeys.PACKAGE_OBJECT_SHORT_NAME_KEY,
+        shortName)
     }
   }
 }

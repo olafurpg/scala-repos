@@ -19,7 +19,12 @@ package com.twitter.summingbird.online
 import com.twitter.util.{Await, Duration, Future, Try}
 
 import java.util.{Queue => JQueue}
-import java.util.concurrent.{ArrayBlockingQueue, BlockingQueue, LinkedBlockingQueue, TimeUnit}
+import java.util.concurrent.{
+  ArrayBlockingQueue,
+  BlockingQueue,
+  LinkedBlockingQueue,
+  TimeUnit
+}
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -129,7 +134,7 @@ abstract class Queue[T] {
   @annotation.tailrec
   final def foldLeft[V](init: V)(fn: (V, T) => V): V =
     poll match {
-      case None => init
+      case None     => init
       case Some(it) => foldLeft(fn(init, it))(fn)
     }
 

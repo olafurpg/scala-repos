@@ -15,14 +15,16 @@ object SSLContextUtil {
     * Create an SSLContext which accepts the certificates in the given key store (if any).
     */
   def createSSLContext(
-      keyStoreOpt: Option[String], passwordOpt: Option[String]): SSLContext =
+      keyStoreOpt: Option[String],
+      passwordOpt: Option[String]): SSLContext =
     keyStoreOpt match {
       case Some(keystorePath) => createSSLContext(keystorePath, passwordOpt)
-      case None => SSLContext.getDefault
+      case None               => SSLContext.getDefault
     }
 
   private[this] def createSSLContext(
-      keyStorePath: String, passwordOpt: Option[String]): SSLContext = {
+      keyStorePath: String,
+      passwordOpt: Option[String]): SSLContext = {
     // load keystore from specified cert store (or default)
     val ts = KeyStore.getInstance(KeyStore.getDefaultType)
     IO.using(new FileInputStream(keyStorePath)) { in =>
@@ -36,8 +38,9 @@ object SSLContextUtil {
 
     // acquire X509 trust manager from factory
     val context = SSLContext.getInstance("TLS")
-    context.init( /* no key managers */ null,
-                 tmf.getTrustManagers, /* no secure random */ null)
+    context.init(
+      /* no key managers */ null,
+      tmf.getTrustManagers, /* no secure random */ null)
     context
   }
 }

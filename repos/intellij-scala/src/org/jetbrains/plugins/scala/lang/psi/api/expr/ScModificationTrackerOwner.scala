@@ -7,8 +7,15 @@ import com.intellij.psi.{PsiElement, PsiModifiableCodeBlock}
 import org.jetbrains.plugins.scala.caches.CachesUtil
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiElement
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScValue, ScVariable}
-import org.jetbrains.plugins.scala.lang.psi.impl.{ScalaPsiElementFactory, ScalaPsiManager}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction,
+  ScValue,
+  ScVariable
+}
+import org.jetbrains.plugins.scala.lang.psi.impl.{
+  ScalaPsiElementFactory,
+  ScalaPsiManager
+}
 import org.jetbrains.plugins.scala.macroAnnotations.{Cached, ModCount}
 
 import scala.annotation.tailrec
@@ -18,7 +25,8 @@ import scala.annotation.tailrec
   * Date: 11/09/2015
   */
 trait ScModificationTrackerOwner
-    extends ScalaPsiElement with PsiModifiableCodeBlock {
+    extends ScalaPsiElement
+    with PsiModifiableCodeBlock {
   private val blockModificationCount = new AtomicLong(0L)
 
   def rawModificationCount: Long = blockModificationCount.get()
@@ -56,7 +64,7 @@ trait ScModificationTrackerOwner
     getContext match {
       case f: ScFunction =>
         f.returnTypeElement match {
-          case Some(ret) => true
+          case Some(ret)            => true
           case None if !f.hasAssign => true
           case _ =>
             if (checkForChangedReturn) {
@@ -69,16 +77,15 @@ trait ScModificationTrackerOwner
       case v: ScValue =>
         CachesUtil.addModificationFunctionsReturnType(v)
         true
-      case v: ScVariable
-          if !checkForChangedReturn || v.typeElement.isDefined =>
+      case v: ScVariable if !checkForChangedReturn || v.typeElement.isDefined =>
         true
       case v: ScVariable =>
         CachesUtil.addModificationFunctionsReturnType(v)
         true
-      case _: ScWhileStmt => true
+      case _: ScWhileStmt    => true
       case _: ScFinallyBlock => true
-      case _: ScDoStmt => true
-      case _ => false
+      case _: ScDoStmt       => true
+      case _                 => false
     }
   }
 
@@ -90,12 +97,15 @@ trait ScModificationTrackerOwner
 
   def createMirror(text: String): PsiElement = {
     ScalaPsiElementFactory.createExpressionWithContextFromText(
-        text, getContext, this)
+      text,
+      getContext,
+      this)
   }
 
   @Cached(synchronized = true, ModCount.getBlockModificationCount, this)
   def getMirrorPositionForCompletion(
-      dummyIdentifier: String, pos: Int): Option[PsiElement] = {
+      dummyIdentifier: String,
+      pos: Int): Option[PsiElement] = {
     val text = new StringBuilder(getText)
     text.insert(pos, dummyIdentifier)
     val newBlock = createMirror(text.toString())

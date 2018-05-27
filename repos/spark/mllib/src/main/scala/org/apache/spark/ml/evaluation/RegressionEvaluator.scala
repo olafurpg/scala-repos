@@ -20,7 +20,11 @@ package org.apache.spark.ml.evaluation
 import org.apache.spark.annotation.{Experimental, Since}
 import org.apache.spark.ml.param.{Param, ParamMap, ParamValidators}
 import org.apache.spark.ml.param.shared.{HasLabelCol, HasPredictionCol}
-import org.apache.spark.ml.util.{DefaultParamsReadable, DefaultParamsWritable, Identifiable}
+import org.apache.spark.ml.util.{
+  DefaultParamsReadable,
+  DefaultParamsWritable,
+  Identifiable
+}
 import org.apache.spark.mllib.evaluation.RegressionMetrics
 import org.apache.spark.sql.{DataFrame, Row}
 import org.apache.spark.sql.functions._
@@ -34,7 +38,9 @@ import org.apache.spark.sql.types.{DoubleType, FloatType}
 @Experimental
 final class RegressionEvaluator @Since("1.4.0")(
     @Since("1.4.0") override val uid: String)
-    extends Evaluator with HasPredictionCol with HasLabelCol
+    extends Evaluator
+    with HasPredictionCol
+    with HasLabelCol
     with DefaultParamsWritable {
 
   @Since("1.4.0")
@@ -52,10 +58,11 @@ final class RegressionEvaluator @Since("1.4.0")(
   val metricName: Param[String] = {
     val allowedParams =
       ParamValidators.inArray(Array("mse", "rmse", "r2", "mae"))
-    new Param(this,
-              "metricName",
-              "metric name in evaluation (mse|rmse|r2|mae)",
-              allowedParams)
+    new Param(
+      this,
+      "metricName",
+      "metric name in evaluation (mse|rmse|r2|mae)",
+      allowedParams)
   }
 
   /** @group getParam */
@@ -82,18 +89,20 @@ final class RegressionEvaluator @Since("1.4.0")(
     val predictionColName = $(predictionCol)
     val predictionType = schema($(predictionCol)).dataType
     require(
-        predictionType == FloatType || predictionType == DoubleType,
-        s"Prediction column $predictionColName must be of type float or double, " +
-        s" but not $predictionType")
+      predictionType == FloatType || predictionType == DoubleType,
+      s"Prediction column $predictionColName must be of type float or double, " +
+        s" but not $predictionType"
+    )
     val labelColName = $(labelCol)
     val labelType = schema($(labelCol)).dataType
     require(
-        labelType == FloatType || labelType == DoubleType,
-        s"Label column $labelColName must be of type float or double, but not $labelType")
+      labelType == FloatType || labelType == DoubleType,
+      s"Label column $labelColName must be of type float or double, but not $labelType")
 
     val predictionAndLabels = dataset
-      .select(col($(predictionCol)).cast(DoubleType),
-              col($(labelCol)).cast(DoubleType))
+      .select(
+        col($(predictionCol)).cast(DoubleType),
+        col($(labelCol)).cast(DoubleType))
       .rdd
       .map {
         case Row(prediction: Double, label: Double) =>
@@ -102,9 +111,9 @@ final class RegressionEvaluator @Since("1.4.0")(
     val metrics = new RegressionMetrics(predictionAndLabels)
     val metric = $(metricName) match {
       case "rmse" => metrics.rootMeanSquaredError
-      case "mse" => metrics.meanSquaredError
-      case "r2" => metrics.r2
-      case "mae" => metrics.meanAbsoluteError
+      case "mse"  => metrics.meanSquaredError
+      case "r2"   => metrics.r2
+      case "mae"  => metrics.meanAbsoluteError
     }
     metric
   }
@@ -112,9 +121,9 @@ final class RegressionEvaluator @Since("1.4.0")(
   @Since("1.4.0")
   override def isLargerBetter: Boolean = $(metricName) match {
     case "rmse" => false
-    case "mse" => false
-    case "r2" => true
-    case "mae" => false
+    case "mse"  => false
+    case "r2"   => true
+    case "mae"  => false
   }
 
   @Since("1.5.0")

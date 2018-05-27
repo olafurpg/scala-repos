@@ -39,26 +39,27 @@ object ScrollEvent {
 
   object HorizontalTextScrollUnits
       extends SFXEnumDelegateCompanion[
-          jfxsi.ScrollEvent.HorizontalTextScrollUnits,
-          HorizontalTextScrollUnits] {
+        jfxsi.ScrollEvent.HorizontalTextScrollUnits,
+        HorizontalTextScrollUnits] {
 
     /**
       * The horizontal text-based scrolling amount is a number of characters to scroll.
       */
     val Characters = new HorizontalTextScrollUnits(
-        jfxsi.ScrollEvent.HorizontalTextScrollUnits.CHARACTERS)
+      jfxsi.ScrollEvent.HorizontalTextScrollUnits.CHARACTERS)
     @deprecated(
-        "Use Characters; CHARACTERS will be removed in a future release",
-        "8.0.60-R10")
+      "Use Characters; CHARACTERS will be removed in a future release",
+      "8.0.60-R10")
     val CHARACTERS = Characters
 
     /**
       * The horizontal text-based scrolling data is not available (not provided by the underlying platform).
       */
     val None = new HorizontalTextScrollUnits(
-        jfxsi.ScrollEvent.HorizontalTextScrollUnits.NONE)
+      jfxsi.ScrollEvent.HorizontalTextScrollUnits.NONE)
     @deprecated(
-        "Use None; NONE will be removed in a future release", "8.0.60-R10")
+      "Use None; NONE will be removed in a future release",
+      "8.0.60-R10")
     val NONE = None
 
     protected override def unsortedValues: Array[HorizontalTextScrollUnits] =
@@ -74,33 +75,37 @@ object ScrollEvent {
 
   object VerticalTextScrollUnits
       extends SFXEnumDelegateCompanion[
-          jfxsi.ScrollEvent.VerticalTextScrollUnits, VerticalTextScrollUnits] {
+        jfxsi.ScrollEvent.VerticalTextScrollUnits,
+        VerticalTextScrollUnits] {
 
     /**
       * The vertical text-based scrolling amount is a number of lines to scroll.
       */
     val Lines = new VerticalTextScrollUnits(
-        jfxsi.ScrollEvent.VerticalTextScrollUnits.LINES)
+      jfxsi.ScrollEvent.VerticalTextScrollUnits.LINES)
     @deprecated(
-        "Use Lines; LINES will be removed in a future release", "8.0.60-R10")
+      "Use Lines; LINES will be removed in a future release",
+      "8.0.60-R10")
     val LINES = Lines
 
     /**
       * The vertical text-based scrolling amount is a number of pages to scroll.
       */
     val Pages = new VerticalTextScrollUnits(
-        jfxsi.ScrollEvent.VerticalTextScrollUnits.PAGES)
+      jfxsi.ScrollEvent.VerticalTextScrollUnits.PAGES)
     @deprecated(
-        "Use Pages; PAGES will be removed in a future release", "8.0.60-R10")
+      "Use Pages; PAGES will be removed in a future release",
+      "8.0.60-R10")
     val PAGES = Pages
 
     /**
       * The vertical text-based scrolling data is not available (not provided by the underlying platform).
       */
     val None = new VerticalTextScrollUnits(
-        jfxsi.ScrollEvent.VerticalTextScrollUnits.NONE)
+      jfxsi.ScrollEvent.VerticalTextScrollUnits.NONE)
     @deprecated(
-        "Use None; NONE will be removed in a future release", "8.0.60-R10")
+      "Use None; NONE will be removed in a future release",
+      "8.0.60-R10")
     val NONE = None
 
     protected override def unsortedValues: Array[VerticalTextScrollUnits] =
@@ -127,7 +132,8 @@ object ScrollEvent {
     */
   val Scroll: EventType[jfxsi.ScrollEvent] = jfxsi.ScrollEvent.SCROLL
   @deprecated(
-      "Use Scroll; SCROLL will be removed in a future release", "8.0.60-R10")
+    "Use Scroll; SCROLL will be removed in a future release",
+    "8.0.60-R10")
   val SCROLL = Scroll
 
   /**
@@ -136,8 +142,8 @@ object ScrollEvent {
   val ScrollFinished: EventType[jfxsi.ScrollEvent] =
     jfxsi.ScrollEvent.SCROLL_FINISHED
   @deprecated(
-      "Use ScrollFinished; SCROLL_FINISHED will be removed in a future release",
-      "8.0.60-R10")
+    "Use ScrollFinished; SCROLL_FINISHED will be removed in a future release",
+    "8.0.60-R10")
   val SCROLL_FINISHED = ScrollFinished
 
   /**
@@ -146,8 +152,8 @@ object ScrollEvent {
   val ScrollStarted: EventType[jfxsi.ScrollEvent] =
     jfxsi.ScrollEvent.SCROLL_STARTED
   @deprecated(
-      "Use ScrollStarted; SCROLL_STARTED will be removed in a future release",
-      "8.0.60-R10")
+    "Use ScrollStarted; SCROLL_STARTED will be removed in a future release",
+    "8.0.60-R10")
   val SCROLL_STARTED = ScrollStarted
 }
 
@@ -155,7 +161,8 @@ object ScrollEvent {
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/input/ScrollEvent.html]]
   */
 class ScrollEvent(override val delegate: jfxsi.ScrollEvent)
-    extends GestureEvent(delegate) with SFXDelegate[jfxsi.ScrollEvent] {
+    extends GestureEvent(delegate)
+    with SFXDelegate[jfxsi.ScrollEvent] {
 
   /**
     * Gets the horizontal scroll amount.
@@ -177,7 +184,7 @@ class ScrollEvent(override val delegate: jfxsi.ScrollEvent)
     */
   def textDeltaXUnits: ScrollEvent.HorizontalTextScrollUnits =
     ScrollEvent.HorizontalTextScrollUnits.jfxEnum2sfx(
-        delegate.getTextDeltaXUnits)
+      delegate.getTextDeltaXUnits)
 
   /**
     * Gets the vertical text-based scroll amount.
@@ -188,6 +195,5 @@ class ScrollEvent(override val delegate: jfxsi.ScrollEvent)
     * Gets the vertical scrolling units for text-based scrolling.
     */
   def textDeltaYUnits: ScrollEvent.VerticalTextScrollUnits =
-    ScrollEvent.VerticalTextScrollUnits.jfxEnum2sfx(
-        delegate.getTextDeltaYUnits)
+    ScrollEvent.VerticalTextScrollUnits.jfxEnum2sfx(delegate.getTextDeltaYUnits)
 }

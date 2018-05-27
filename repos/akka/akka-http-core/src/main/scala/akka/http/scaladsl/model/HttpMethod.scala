@@ -28,25 +28,28 @@ object RequestEntityAcceptance {
   * @param isIdempotent true if requests can be safely (& automatically) repeated
   * @param requestEntityAcceptance Expected if meaning of request entities is properly defined
   */
-final case class HttpMethod private[http](
+final case class HttpMethod private[http] (
     override val value: String,
     isSafe: Boolean,
     isIdempotent: Boolean,
     requestEntityAcceptance: RequestEntityAcceptance)
-    extends jm.HttpMethod with SingletonValueRenderable {
+    extends jm.HttpMethod
+    with SingletonValueRenderable {
   override def isEntityAccepted: Boolean =
     requestEntityAcceptance.isEntityAccepted
   override def toString: String = s"HttpMethod($value)"
 }
 
 object HttpMethod {
-  def custom(name: String,
-             safe: Boolean,
-             idempotent: Boolean,
-             requestEntityAcceptance: RequestEntityAcceptance): HttpMethod = {
+  def custom(
+      name: String,
+      safe: Boolean,
+      idempotent: Boolean,
+      requestEntityAcceptance: RequestEntityAcceptance): HttpMethod = {
     require(name.nonEmpty, "value must be non-empty")
-    require(!safe || idempotent,
-            "An HTTP method cannot be safe without being idempotent")
+    require(
+      !safe || idempotent,
+      "An HTTP method cannot be safe without being idempotent")
     apply(name, safe, idempotent, requestEntityAcceptance)
   }
 
@@ -55,10 +58,11 @@ object HttpMethod {
     * safe = false, idempotent = false and requestEntityAcceptance = Expected.
     */
   def custom(name: String): HttpMethod =
-    custom(name,
-           safe = false,
-           idempotent = false,
-           requestEntityAcceptance = Expected)
+    custom(
+      name,
+      safe = false,
+      idempotent = false,
+      requestEntityAcceptance = Expected)
 }
 
 object HttpMethods extends ObjectRegistry[String, HttpMethod] {

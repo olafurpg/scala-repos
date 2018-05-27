@@ -11,10 +11,11 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr._
 /**
   * @author Nikolay.Tropin
   */
-class ScalaFunExprSmartStepTarget(val funExpr: ScExpression,
-                                  val stmts: Seq[ScBlockStatement],
-                                  label: String,
-                                  expressionLines: Range[Integer])
+class ScalaFunExprSmartStepTarget(
+    val funExpr: ScExpression,
+    val stmts: Seq[ScBlockStatement],
+    label: String,
+    expressionLines: Range[Integer])
     extends SmartStepTarget(label, funExpr, true, expressionLines) {
 
   override def getIcon: Icon = Icons.LAMBDA
@@ -45,7 +46,7 @@ object FunExpressionTarget {
   private def blockStmts(expr: ScExpression): Seq[ScBlockStatement] = {
     expr match {
       case b: ScBlock => b.statements
-      case e => Seq(e)
+      case e          => Seq(e)
     }
   }
 
@@ -54,7 +55,7 @@ object FunExpressionTarget {
       case Some(p) if p.isByName =>
         Some(s"${p.name}: => ${p.paramType.presentableText}")
       case Some(p) => Some(s"${p.name}: ${p.paramType.presentableText}")
-      case _ => None
+      case _       => None
     }
   }
 

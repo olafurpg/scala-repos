@@ -3,7 +3,10 @@ package mesosphere.marathon
 import mesosphere.marathon.core.base.Clock
 import mesosphere.marathon.core.launcher.TaskOpFactory
 import mesosphere.marathon.core.launcher.impl.TaskOpFactoryHelper
-import mesosphere.marathon.core.launchqueue.{LaunchQueueConfig, LaunchQueueModule}
+import mesosphere.marathon.core.launchqueue.{
+  LaunchQueueConfig,
+  LaunchQueueModule
+}
 import mesosphere.marathon.core.leadership.AlwaysElectedLeadershipModule
 import mesosphere.marathon.core.matcher.DummyOfferMatcherManager
 import mesosphere.marathon.core.task.Task
@@ -20,7 +23,9 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 
 class LaunchQueueModuleTest
-    extends MarathonSpec with BeforeAndAfter with GivenWhenThen
+    extends MarathonSpec
+    with BeforeAndAfter
+    with GivenWhenThen
     with MarathonShutdownHookSupport {
 
   test("empty queue returns no results") {
@@ -202,14 +207,14 @@ class LaunchQueueModuleTest
     val config: LaunchQueueConfig = new LaunchQueueConfig {}
     config.afterInit()
     module = new LaunchQueueModule(
-        config,
-        AlwaysElectedLeadershipModule(shutdownHooks),
-        clock,
-        subOfferMatcherManager = offerMatcherManager,
-        maybeOfferReviver = None,
-        appRepository,
-        taskTracker,
-        taskOpFactory
+      config,
+      AlwaysElectedLeadershipModule(shutdownHooks),
+      clock,
+      subOfferMatcherManager = offerMatcherManager,
+      maybeOfferReviver = None,
+      appRepository,
+      taskTracker,
+      taskOpFactory
     )
   }
 

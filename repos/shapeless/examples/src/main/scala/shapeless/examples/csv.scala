@@ -94,7 +94,7 @@ object CSVConverter {
     new CSVConverter[HNil] {
       def from(s: String): Try[HNil] = s match {
         case "" => Success(HNil)
-        case s => fail("Cannot convert '" ++ s ++ "' to HNil")
+        case s  => fail("Cannot convert '" ++ s ++ "' to HNil")
       }
       def to(n: HNil) = ""
     }
@@ -138,7 +138,7 @@ object CSVConverter {
 
       def to(ft: Option[V] :: T): String = {
         ft.head.map(scv.value.to(_) ++ ",").getOrElse("") ++ sct.value.to(
-            ft.tail)
+          ft.tail)
       }
     }
 

@@ -25,16 +25,17 @@ case class BaseRemoved(f: FileObject) extends FileWatcherMessage
   * true OS and FS support, which is lacking on all major platforms.
   */
 abstract class FileWatcherSpec
-    extends EnsimeSpec with ParallelTestExecution with IsolatedTestKitFixture
+    extends EnsimeSpec
+    with ParallelTestExecution
+    with IsolatedTestKitFixture
     with IsolatedEnsimeVFSFixture {
 
   // variant that watches a jar file
-  def createJarWatcher(jar: File)(
-      implicit vfs: EnsimeVFS, tk: TestKit): Watcher
+  def createJarWatcher(jar: File)(implicit vfs: EnsimeVFS, tk: TestKit): Watcher
 
   // variant that recursively watches a directory of classes
-  def createClassWatcher(base: File)(
-      implicit vfs: EnsimeVFS, tk: TestKit): Watcher
+  def createClassWatcher(
+      base: File)(implicit vfs: EnsimeVFS, tk: TestKit): Watcher
 
   /**
     * The Linux ext2+ filesystems have a timestamp precision of 1
@@ -123,7 +124,7 @@ abstract class FileWatcherSpec
 
             val createOrDelete: Fish = {
               case r: BaseRemoved => true
-              case a: BaseAdded => true
+              case a: BaseAdded   => true
             }
 
             tk.fishForMessage()(createOrDelete)
@@ -146,7 +147,7 @@ abstract class FileWatcherSpec
 
             val createOrDelete: Fish = {
               case r: BaseRemoved => true
-              case a: BaseAdded => true
+              case a: BaseAdded   => true
             }
             tk.fishForMessage()(createOrDelete)
             tk.fishForMessage()(createOrDelete)
@@ -173,8 +174,8 @@ abstract class FileWatcherSpec
 
             val createOrDelete: Fish = {
               case r: BaseRemoved => true
-              case a: BaseAdded => true
-              case r: Removed => false // foo/bar
+              case a: BaseAdded   => true
+              case r: Removed     => false // foo/bar
             }
 
             tk.fishForMessage()(createOrDelete)
@@ -183,7 +184,7 @@ abstract class FileWatcherSpec
             foo.createWithParents() shouldBe true
             bar.createWithParents() shouldBe true
             val nonDeterministicAdd: Fish = {
-              case a: Added => true
+              case a: Added   => true
               case c: Changed => true
               case r: Removed => false
             }
@@ -195,7 +196,7 @@ abstract class FileWatcherSpec
   }
 
   it should "be able to start up from a non-existent directory" taggedAs
-  (Retryable) in withVFS { implicit vfs =>
+    (Retryable) in withVFS { implicit vfs =>
     withTestKit { implicit tk =>
       val dir = Files.createTempDir().canon
       dir.delete()
@@ -217,7 +218,7 @@ abstract class FileWatcherSpec
   }
 
   it should "survive removed parent base directory and recreated base" taggedAs
-  (Retryable) in withVFS { implicit vfs =>
+    (Retryable) in withVFS { implicit vfs =>
     withTestKit { implicit tk =>
       val parent = Files.createTempDir().canon
       val dir = parent / "base"
@@ -238,8 +239,8 @@ abstract class FileWatcherSpec
 
           val createOrDelete: Fish = {
             case r: BaseRemoved => true
-            case a: BaseAdded => true
-            case r: Removed => false
+            case a: BaseAdded   => true
+            case r: Removed     => false
           }
           tk.fishForMessage()(createOrDelete)
           tk.fishForMessage()(createOrDelete)
@@ -250,7 +251,7 @@ abstract class FileWatcherSpec
           // non-deterministically receive zero, one or two more Removed
           // and either Added or Changed for foo / bar.
           val nonDeterministicAdd: Fish = {
-            case a: Added => true
+            case a: Added   => true
             case c: Changed => true
             case r: Removed => false
           }
@@ -297,7 +298,7 @@ abstract class FileWatcherSpec
   }
 
   it should "be able to start up from a non-existent base file" taggedAs
-  (Retryable) in withVFS { implicit vfs =>
+    (Retryable) in withVFS { implicit vfs =>
     withTestKit { implicit tk =>
       withTempDir { dir =>
         val jar = (dir / "jar.jar")
@@ -337,40 +338,45 @@ abstract class FileWatcherSpec
   type -->[A, B] = PartialFunction[A, B]
   type Fish = PartialFunction[Any, Boolean]
 
-  def withClassWatcher[T](base: File)(code: Watcher => T)(
-      implicit vfs: EnsimeVFS, tk: TestKit) = {
+  def withClassWatcher[T](base: File)(
+      code: Watcher => T)(implicit vfs: EnsimeVFS, tk: TestKit) = {
     val w = createClassWatcher(base)
-    try code(w) finally w.shutdown()
+    try code(w)
+    finally w.shutdown()
   }
 
-  def withJarWatcher[T](jar: File)(code: Watcher => T)(
-      implicit vfs: EnsimeVFS, tk: TestKit) = {
+  def withJarWatcher[T](jar: File)(
+      code: Watcher => T)(implicit vfs: EnsimeVFS, tk: TestKit) = {
     val w = createJarWatcher(jar)
-    try code(w) finally w.shutdown()
+    try code(w)
+    finally w.shutdown()
   }
 
   def listeners(implicit vfs: EnsimeVFS, tk: TestKit) = List(
-      new FileChangeListener {
-        def fileAdded(f: FileObject): Unit = { tk.testActor ! Added(f) }
-        def fileRemoved(f: FileObject): Unit = { tk.testActor ! Removed(f) }
-        def fileChanged(f: FileObject): Unit = { tk.testActor ! Changed(f) }
-        override def baseReCreated(f: FileObject): Unit = {
-          tk.testActor ! BaseAdded(f)
-        }
-        override def baseRemoved(f: FileObject): Unit = {
-          tk.testActor ! BaseRemoved(f)
-        }
+    new FileChangeListener {
+      def fileAdded(f: FileObject): Unit = { tk.testActor ! Added(f) }
+      def fileRemoved(f: FileObject): Unit = { tk.testActor ! Removed(f) }
+      def fileChanged(f: FileObject): Unit = { tk.testActor ! Changed(f) }
+      override def baseReCreated(f: FileObject): Unit = {
+        tk.testActor ! BaseAdded(f)
       }
+      override def baseRemoved(f: FileObject): Unit = {
+        tk.testActor ! BaseRemoved(f)
+      }
+    }
   )
 }
 
 class ApacheFileWatcherSpec extends FileWatcherSpec {
-  override def createClassWatcher(base: File)(
-      implicit vfs: EnsimeVFS, tk: TestKit): Watcher =
+  override def createClassWatcher(
+      base: File)(implicit vfs: EnsimeVFS, tk: TestKit): Watcher =
     new ApachePollingFileWatcher(base, ClassfileSelector, true, listeners)
 
-  override def createJarWatcher(jar: File)(
-      implicit vfs: EnsimeVFS, tk: TestKit): Watcher =
+  override def createJarWatcher(
+      jar: File)(implicit vfs: EnsimeVFS, tk: TestKit): Watcher =
     new ApachePollingFileWatcher(
-        jar.getParentFile, JarSelector, false, listeners)
+      jar.getParentFile,
+      JarSelector,
+      false,
+      listeners)
 }

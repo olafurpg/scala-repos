@@ -12,8 +12,7 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration.Duration
 import scala.util.control.NonFatal
 
-class MesosStateStore(state: State, timeout: Duration)
-    extends PersistentStore {
+class MesosStateStore(state: State, timeout: Duration) extends PersistentStore {
 
   private[this] val log = LoggerFactory.getLogger(getClass)
   implicit val timeoutDuration = Timeout(timeout)
@@ -31,13 +30,14 @@ class MesosStateStore(state: State, timeout: Duration)
   }
 
   override def create(
-      key: ID, content: IndexedSeq[Byte]): Future[PersistentEntity] = {
+      key: ID,
+      content: IndexedSeq[Byte]): Future[PersistentEntity] = {
     futureToFuture(state.fetch(key))
       .map(throwOnNull)
       .flatMap { variable =>
         if (entityExists(variable))
           throw new StoreCommandFailedException(
-              s"Entity with id $key already exists!")
+            s"Entity with id $key already exists!")
         else
           futureToFuture(state.store(variable.mutate(content.toArray)))
             .map(MesosStateEntity(key, _))
@@ -49,14 +49,12 @@ class MesosStateStore(state: State, timeout: Duration)
     entity match {
       case MesosStateEntity(id, v) =>
         futureToFuture(state.store(v))
-          .recover(
-              mapException(s"Can not update entity with key ${entity.id}"))
+          .recover(mapException(s"Can not update entity with key ${entity.id}"))
           .map(throwOnNull)
           .map(MesosStateEntity(id, _))
 
       case _ =>
-        throw new IllegalArgumentException(
-            "Can not handle this kind of entity")
+        throw new IllegalArgumentException("Can not handle this kind of entity")
     }
 
   override def delete(key: ID): Future[Boolean] = {
@@ -64,7 +62,7 @@ class MesosStateStore(state: State, timeout: Duration)
       .map(throwOnNull)
       .flatMap { variable =>
         futureToFuture(state.expunge(variable)).map {
-          case java.lang.Boolean.TRUE => true
+          case java.lang.Boolean.TRUE  => true
           case java.lang.Boolean.FALSE => false
         }
       }
@@ -82,10 +80,11 @@ class MesosStateStore(state: State, timeout: Duration)
         // differentiate between exceptions which are "normal" and exceptions which indicate real errors
         // and we have to log them all.
         log.warn(
-            s"Exception while calling $getClass.allIds(). " +
+          s"Exception while calling $getClass.allIds(). " +
             s"This problem should occur only with an empty zookeeper state. " +
             s"In that case, you can ignore this message",
-            ex)
+          ex
+        )
         Seq.empty[ID]
     }
   }
@@ -97,8 +96,7 @@ class MesosStateStore(state: State, timeout: Duration)
     Option(t) match {
       case Some(value) => value
       case None =>
-        throw new StoreCommandFailedException(
-            "Null returned from state store!")
+        throw new StoreCommandFailedException("Null returned from state store!")
     }
   }
 

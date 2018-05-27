@@ -21,6 +21,5 @@ object ResultSetConcurrency {
   case object ReadOnly extends ResultSetConcurrency(ResultSet.CONCUR_READ_ONLY)
 
   /** The concurrency mode which indicates that the result set may be updated. */
-  case object Updatable
-      extends ResultSetConcurrency(ResultSet.CONCUR_UPDATABLE)
+  case object Updatable extends ResultSetConcurrency(ResultSet.CONCUR_UPDATABLE)
 }

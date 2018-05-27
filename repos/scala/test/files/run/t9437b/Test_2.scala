@@ -5,7 +5,7 @@ object Test extends App {
   def printParams(params: Array[java.lang.reflect.Parameter]) = {
     params.foreach { param =>
       println(
-          s"name: ${param.getName}; isNamePresent: ${param.isNamePresent}; isSynthetic: ${param.isSynthetic}")
+        s"name: ${param.getName}; isNamePresent: ${param.isNamePresent}; isSynthetic: ${param.isSynthetic}")
     }
   }
 

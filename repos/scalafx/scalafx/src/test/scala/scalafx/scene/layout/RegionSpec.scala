@@ -42,4 +42,5 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class RegionSpec
     extends SimpleSFXDelegateSpec[jfxsl.Region, Region](
-        classOf[jfxsl.Region], classOf[Region])
+      classOf[jfxsl.Region],
+      classOf[Region])

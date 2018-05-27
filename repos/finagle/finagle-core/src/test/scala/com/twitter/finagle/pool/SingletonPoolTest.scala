@@ -79,7 +79,7 @@ class SingletonPoolTest extends FunSuite with MockitoSugar {
   }
 
   test(
-      "reestablish connections when the service becomes unavailable, releasing dead service") {
+    "reestablish connections when the service becomes unavailable, releasing dead service") {
     val ctx = new Ctx
     import ctx._
 
@@ -171,7 +171,7 @@ class SingletonPoolTest extends FunSuite with MockitoSugar {
     assert(!f.isDefined)
     exc match {
       case Some(_: ServiceClosedException) =>
-      case _ => fail()
+      case _                               => fail()
     }
 
     verify(service, never).close(any[Time])

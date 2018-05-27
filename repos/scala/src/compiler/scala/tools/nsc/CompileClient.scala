@@ -48,15 +48,17 @@ class StandardCompileClient extends HasCompileSocket with CompileOutputCommon {
     val socket =
       if (settings.server.value == "")
         compileSocket.getOrCreateSocket(
-            vmArgs mkString " ", !shutdown, settings.port.value)
+          vmArgs mkString " ",
+          !shutdown,
+          settings.port.value)
       else compileSocket.getSocket(settings.server.value)
 
     socket match {
       case Some(sock) => compileOnServer(sock, fscArgs)
       case _ =>
         echo(
-            if (shutdown) "[No compilation server running.]"
-            else "Compilation failed."
+          if (shutdown) "[No compilation server running.]"
+          else "Compilation failed."
         )
         shutdown
     }

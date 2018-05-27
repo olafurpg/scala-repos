@@ -14,12 +14,13 @@ trait JdbcModelComponent { self: JdbcProfile =>
   /** Gets the Slick data model describing this data source
     * @param tables used to build the model, uses defaultTables if None given
     * @param ignoreInvalidDefaults logs unrecognized default values instead of throwing an exception */
-  def createModel(tables: Option[DBIO[Seq[MTable]]] = None,
-                  ignoreInvalidDefaults: Boolean = true)(
+  def createModel(
+      tables: Option[DBIO[Seq[MTable]]] = None,
+      ignoreInvalidDefaults: Boolean = true)(
       implicit ec: ExecutionContext): DBIO[Model] = {
     val tablesA = tables.getOrElse(defaultTables)
-    tablesA.flatMap(
-        t => createModelBuilder(t, ignoreInvalidDefaults).buildModel)
+    tablesA.flatMap(t =>
+      createModelBuilder(t, ignoreInvalidDefaults).buildModel)
   }
 
   def createModelBuilder(tables: Seq[MTable], ignoreInvalidDefaults: Boolean)(

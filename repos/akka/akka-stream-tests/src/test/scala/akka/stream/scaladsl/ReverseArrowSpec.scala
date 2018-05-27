@@ -17,23 +17,25 @@ class ReverseArrowSpec extends AkkaSpec {
   "Reverse Arrows in the Graph DSL" must {
 
     "work from Inlets" in {
-      Await.result(RunnableGraph
-                     .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
-                       s.in <~ source
-                       ClosedShape
-                     })
-                     .run(),
-                   1.second) should ===(Seq(1, 2, 3))
+      Await.result(
+        RunnableGraph
+          .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
+            s.in <~ source
+            ClosedShape
+          })
+          .run(),
+        1.second) should ===(Seq(1, 2, 3))
     }
 
     "work from SinkShape" in {
-      Await.result(RunnableGraph
-                     .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
-                       s <~ source
-                       ClosedShape
-                     })
-                     .run(),
-                   1.second) should ===(Seq(1, 2, 3))
+      Await.result(
+        RunnableGraph
+          .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
+            s <~ source
+            ClosedShape
+          })
+          .run(),
+        1.second) should ===(Seq(1, 2, 3))
     }
 
     "work from Sink" in {
@@ -50,8 +52,7 @@ class ReverseArrowSpec extends AkkaSpec {
     }
 
     "not work from Outlets" in {
-      RunnableGraph.fromGraph(
-          GraphDSL.create() { implicit b ⇒
+      RunnableGraph.fromGraph(GraphDSL.create() { implicit b ⇒
         val o: Outlet[Int] = b.add(source).out
         "o <~ source" shouldNot compile
         sink <~ o
@@ -60,8 +61,7 @@ class ReverseArrowSpec extends AkkaSpec {
     }
 
     "not work from SourceShape" in {
-      RunnableGraph.fromGraph(
-          GraphDSL.create() { implicit b ⇒
+      RunnableGraph.fromGraph(GraphDSL.create() { implicit b ⇒
         val o: SourceShape[Int] = b.add(source)
         "o <~ source" shouldNot compile
         sink <~ o
@@ -74,172 +74,183 @@ class ReverseArrowSpec extends AkkaSpec {
     }
 
     "work from FlowShape" in {
-      Await.result(RunnableGraph
-                     .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
-                       val f: FlowShape[Int, Int] = b.add(Flow[Int])
-                       f <~ source
-                       f ~> s
-                       ClosedShape
-                     })
-                     .run(),
-                   1.second) should ===(Seq(1, 2, 3))
+      Await.result(
+        RunnableGraph
+          .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
+            val f: FlowShape[Int, Int] = b.add(Flow[Int])
+            f <~ source
+            f ~> s
+            ClosedShape
+          })
+          .run(),
+        1.second) should ===(Seq(1, 2, 3))
     }
 
     "work from UniformFanInShape" in {
       Await.result(
-          RunnableGraph
-            .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
-              val f: UniformFanInShape[Int, Int] = b.add(Merge[Int](2))
-              f <~ source
-              f <~ Source.empty
-              f ~> s
-              ClosedShape
-            })
-            .run(),
-          1.second) should ===(Seq(1, 2, 3))
+        RunnableGraph
+          .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
+            val f: UniformFanInShape[Int, Int] = b.add(Merge[Int](2))
+            f <~ source
+            f <~ Source.empty
+            f ~> s
+            ClosedShape
+          })
+          .run(),
+        1.second
+      ) should ===(Seq(1, 2, 3))
     }
 
     "work from UniformFanOutShape" in {
       Await.result(
-          RunnableGraph
-            .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
-              val f: UniformFanOutShape[Int, Int] = b.add(Broadcast[Int](2))
-              f <~ source
-              f ~> Sink.ignore
-              f ~> s
-              ClosedShape
-            })
-            .run(),
-          1.second) should ===(Seq(1, 2, 3))
+        RunnableGraph
+          .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
+            val f: UniformFanOutShape[Int, Int] = b.add(Broadcast[Int](2))
+            f <~ source
+            f ~> Sink.ignore
+            f ~> s
+            ClosedShape
+          })
+          .run(),
+        1.second
+      ) should ===(Seq(1, 2, 3))
     }
 
     "work towards Outlets" in {
-      Await.result(RunnableGraph
-                     .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
-                       val o: Outlet[Int] = b.add(source).out
-                       s <~ o
-                       ClosedShape
-                     })
-                     .run(),
-                   1.second) should ===(Seq(1, 2, 3))
+      Await.result(
+        RunnableGraph
+          .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
+            val o: Outlet[Int] = b.add(source).out
+            s <~ o
+            ClosedShape
+          })
+          .run(),
+        1.second) should ===(Seq(1, 2, 3))
     }
 
     "work towards SourceShape" in {
-      Await.result(RunnableGraph
-                     .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
-                       val o: SourceShape[Int] = b.add(source)
-                       s <~ o
-                       ClosedShape
-                     })
-                     .run(),
-                   1.second) should ===(Seq(1, 2, 3))
+      Await.result(
+        RunnableGraph
+          .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
+            val o: SourceShape[Int] = b.add(source)
+            s <~ o
+            ClosedShape
+          })
+          .run(),
+        1.second) should ===(Seq(1, 2, 3))
     }
 
     "work towards Source" in {
-      Await.result(RunnableGraph
-                     .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
-                       s <~ source
-                       ClosedShape
-                     })
-                     .run(),
-                   1.second) should ===(Seq(1, 2, 3))
+      Await.result(
+        RunnableGraph
+          .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
+            s <~ source
+            ClosedShape
+          })
+          .run(),
+        1.second) should ===(Seq(1, 2, 3))
     }
 
     "work towards FlowShape" in {
-      Await.result(RunnableGraph
-                     .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
-                       val f: FlowShape[Int, Int] = b.add(Flow[Int])
-                       s <~ f
-                       source ~> f
-                       ClosedShape
-                     })
-                     .run(),
-                   1.second) should ===(Seq(1, 2, 3))
+      Await.result(
+        RunnableGraph
+          .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
+            val f: FlowShape[Int, Int] = b.add(Flow[Int])
+            s <~ f
+            source ~> f
+            ClosedShape
+          })
+          .run(),
+        1.second) should ===(Seq(1, 2, 3))
     }
 
     "work towards UniformFanInShape" in {
       Await.result(
-          RunnableGraph
-            .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
-              val f: UniformFanInShape[Int, Int] = b.add(Merge[Int](2))
-              s <~ f
-              Source.empty ~> f
-              source ~> f
-              ClosedShape
-            })
-            .run(),
-          1.second) should ===(Seq(1, 2, 3))
+        RunnableGraph
+          .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
+            val f: UniformFanInShape[Int, Int] = b.add(Merge[Int](2))
+            s <~ f
+            Source.empty ~> f
+            source ~> f
+            ClosedShape
+          })
+          .run(),
+        1.second
+      ) should ===(Seq(1, 2, 3))
     }
 
     "fail towards already full UniformFanInShape" in {
-      Await.result(RunnableGraph
-                     .fromGraph(GraphDSL.create(sink) {
-                       implicit b ⇒ s ⇒
-                         val f: UniformFanInShape[Int, Int] =
-                           b.add(Merge[Int](2))
-                         val src = b.add(source)
-                         Source.empty ~> f
-                         src ~> f
-                         (the[IllegalArgumentException] thrownBy
-                             (s <~ f <~ src)).getMessage should include(
-                             "no more inlets free")
-                         ClosedShape
-                     })
-                     .run(),
-                   1.second) should ===(Seq(1, 2, 3))
+      Await.result(
+        RunnableGraph
+          .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
+            val f: UniformFanInShape[Int, Int] =
+              b.add(Merge[Int](2))
+            val src = b.add(source)
+            Source.empty ~> f
+            src ~> f
+            (the[IllegalArgumentException] thrownBy
+              (s <~ f <~ src)).getMessage should include("no more inlets free")
+            ClosedShape
+          })
+          .run(),
+        1.second
+      ) should ===(Seq(1, 2, 3))
     }
 
     "work towards UniformFanOutShape" in {
       Await.result(
-          RunnableGraph
-            .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
-              val f: UniformFanOutShape[Int, Int] = b.add(Broadcast[Int](2))
-              s <~ f
-              Sink.ignore <~ f
-              source ~> f
-              ClosedShape
-            })
-            .run(),
-          1.second) should ===(Seq(1, 2, 3))
+        RunnableGraph
+          .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
+            val f: UniformFanOutShape[Int, Int] = b.add(Broadcast[Int](2))
+            s <~ f
+            Sink.ignore <~ f
+            source ~> f
+            ClosedShape
+          })
+          .run(),
+        1.second
+      ) should ===(Seq(1, 2, 3))
     }
 
     "fail towards already full UniformFanOutShape" in {
-      Await.result(RunnableGraph
-                     .fromGraph(GraphDSL.create(sink) {
-                       implicit b ⇒ s ⇒
-                         val f: UniformFanOutShape[Int, Int] =
-                           b.add(Broadcast[Int](2))
-                         val sink2: SinkShape[Int] = b.add(Sink.ignore)
-                         val src = b.add(source)
-                         src ~> f
-                         sink2 <~ f
-                         (the[IllegalArgumentException] thrownBy
-                             (s <~ f <~ src)).getMessage should include(
-                             "already connected")
-                         ClosedShape
-                     })
-                     .run(),
-                   1.second) should ===(Seq(1, 2, 3))
+      Await.result(
+        RunnableGraph
+          .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
+            val f: UniformFanOutShape[Int, Int] =
+              b.add(Broadcast[Int](2))
+            val sink2: SinkShape[Int] = b.add(Sink.ignore)
+            val src = b.add(source)
+            src ~> f
+            sink2 <~ f
+            (the[IllegalArgumentException] thrownBy
+              (s <~ f <~ src)).getMessage should include("already connected")
+            ClosedShape
+          })
+          .run(),
+        1.second
+      ) should ===(Seq(1, 2, 3))
     }
 
     "work across a Flow" in {
-      Await.result(RunnableGraph
-                     .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
-                       s <~ Flow[Int] <~ source
-                       ClosedShape
-                     })
-                     .run(),
-                   1.second) should ===(Seq(1, 2, 3))
+      Await.result(
+        RunnableGraph
+          .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
+            s <~ Flow[Int] <~ source
+            ClosedShape
+          })
+          .run(),
+        1.second) should ===(Seq(1, 2, 3))
     }
 
     "work across a FlowShape" in {
-      Await.result(RunnableGraph
-                     .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
-                       s <~ b.add(Flow[Int]) <~ source
-                       ClosedShape
-                     })
-                     .run(),
-                   1.second) should ===(Seq(1, 2, 3))
+      Await.result(
+        RunnableGraph
+          .fromGraph(GraphDSL.create(sink) { implicit b ⇒ s ⇒
+            s <~ b.add(Flow[Int]) <~ source
+            ClosedShape
+          })
+          .run(),
+        1.second) should ===(Seq(1, 2, 3))
     }
   }
 }

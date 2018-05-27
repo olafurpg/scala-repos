@@ -33,9 +33,10 @@ import org.apache.spark.streaming.{StreamingContext, Time}
   *                 "Description" which maps to the content that will be shown in the UI.
   */
 @DeveloperApi
-case class StreamInputInfo(inputStreamId: Int,
-                           numRecords: Long,
-                           metadata: Map[String, Any] = Map.empty) {
+case class StreamInputInfo(
+    inputStreamId: Int,
+    numRecords: Long,
+    metadata: Map[String, Any] = Map.empty) {
   require(numRecords >= 0, "numRecords must not be negative")
 
   def metadataDescription: Option[String] =
@@ -66,11 +67,12 @@ private[streaming] class InputInfoTracker(ssc: StreamingContext)
   def reportInfo(batchTime: Time, inputInfo: StreamInputInfo): Unit =
     synchronized {
       val inputInfos = batchTimeToInputInfos.getOrElseUpdate(
-          batchTime, new mutable.HashMap[Int, StreamInputInfo]())
+        batchTime,
+        new mutable.HashMap[Int, StreamInputInfo]())
 
       if (inputInfos.contains(inputInfo.inputStreamId)) {
         throw new IllegalStateException(
-            s"Input stream ${inputInfo.inputStreamId} for batch" +
+          s"Input stream ${inputInfo.inputStreamId} for batch" +
             s"$batchTime is already added into InputInfoTracker, this is a illegal state")
       }
       inputInfos += ((inputInfo.inputStreamId, inputInfo))

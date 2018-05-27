@@ -32,15 +32,17 @@ object AtmosphereClient {
     }
   }
 
-  def broadcast(path: String,
-                message: OutboundMessage,
-                filter: ClientFilter = new Everyone)(
+  def broadcast(
+      path: String,
+      message: OutboundMessage,
+      filter: ClientFilter = new Everyone)(
       implicit executionContext: ExecutionContext) = {
     lookup(path) foreach { _.broadcast(message, filter) }
   }
 
   def broadcastAll(
-      message: OutboundMessage, filter: ClientFilter = new Everyone)(
+      message: OutboundMessage,
+      filter: ClientFilter = new Everyone)(
       implicit executionContext: ExecutionContext) = {
     lookupAll() foreach {
       _ broadcast (message, filter)

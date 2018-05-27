@@ -13,7 +13,8 @@ sealed trait ScaldingDBAnnotation
 // For integers its really for display purposes
 @scala.annotation.meta.getter
 class size(val size: Int)
-    extends annotation.StaticAnnotation with ScaldingDBAnnotation
+    extends annotation.StaticAnnotation
+    with ScaldingDBAnnotation
 
 // JDBC TEXT type, this forces the String field in question to be a text type
 @scala.annotation.meta.getter
@@ -31,8 +32,7 @@ class date() extends annotation.StaticAnnotation with ScaldingDBAnnotation
 // This is the entry point to explicitly calling the JDBC macros.
 // Most often the implicits will be used in the package however
 object DBMacro {
-  def toColumnDefinitionProvider[T]: ColumnDefinitionProvider[T] = macro ColumnDefinitionProviderImpl[
-      T]
-  def toDBTypeDescriptor[T]: DBTypeDescriptor[T] = macro DBTypeDescriptorImpl[
-      T]
+  def toColumnDefinitionProvider[T]: ColumnDefinitionProvider[T] =
+    macro ColumnDefinitionProviderImpl[T]
+  def toDBTypeDescriptor[T]: DBTypeDescriptor[T] = macro DBTypeDescriptorImpl[T]
 }

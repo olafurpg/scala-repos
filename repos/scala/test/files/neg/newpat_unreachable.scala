@@ -13,7 +13,7 @@ object Test {
       case `b` => println("matched b")
       case `c` => println("matched c")
       case `d` => println("matched d")
-      case _ => println("matched neither")
+      case _   => println("matched neither")
     }
 
     def f[A](a: A) = {

@@ -59,8 +59,9 @@ object PromiseMock {
     // static
     private def resolve[A](value: A | js.Thenable[A]): MockPromise[A] = {
       new MockPromise[A]({
-        (resolve: js.Function1[A | js.Thenable[A], _],
-        reject: js.Function1[Any, _]) =>
+        (
+            resolve: js.Function1[A | js.Thenable[A], _],
+            reject: js.Function1[Any, _]) =>
           resolve(value)
       })
     }
@@ -68,8 +69,9 @@ object PromiseMock {
     // static
     private def reject(reason: Any): MockPromise[Nothing] = {
       new MockPromise[Nothing]({
-        (resolve: js.Function1[Nothing | js.Thenable[Nothing], _],
-        reject: js.Function1[Any, _]) =>
+        (
+            resolve: js.Function1[Nothing | js.Thenable[Nothing], _],
+            reject: js.Function1[Any, _]) =>
           reject(reason)
       })
     }
@@ -89,7 +91,7 @@ object PromiseMock {
 
     private def isNotAnObject(x: Any): Boolean = x match {
       case null | () | _: Double | _: Boolean | _: String => true
-      case _ => false
+      case _                                              => false
     }
 
     private def isCallable(x: Any): Boolean =
@@ -98,7 +100,7 @@ object PromiseMock {
     private def throwAny(e: Any): Nothing = {
       throw (e match {
         case th: Throwable => th
-        case _ => js.JavaScriptException(e)
+        case _             => js.JavaScriptException(e)
       })
     }
 
@@ -107,19 +109,22 @@ object PromiseMock {
         tryBody
       } catch {
         case th: Throwable =>
-          catchBody(
-              th match {
+          catchBody(th match {
             case js.JavaScriptException(e) => e
-            case _ => th
+            case _                         => th
           })
       }
     }
   }
 
   @ScalaJSDefined
-  private class MockPromise[+A](executor: js.Function2[
-          js.Function1[A | Thenable[A], _], js.Function1[scala.Any, _], _])
-      extends js.Object with js.Thenable[A] {
+  private class MockPromise[+A](
+      executor: js.Function2[
+        js.Function1[A | Thenable[A], _],
+        js.Function1[scala.Any, _],
+        _])
+      extends js.Object
+      with js.Thenable[A] {
 
     import MockPromise._
 
@@ -132,9 +137,10 @@ object PromiseMock {
 
     // 25.4.3.1 Promise(executor)
     private[this] def init(
-        executor: js.Function2[js.Function1[A | Thenable[A], _],
-                               js.Function1[scala.Any, _],
-                               _]) = {
+        executor: js.Function2[
+          js.Function1[A | Thenable[A], _],
+          js.Function1[scala.Any, _],
+          _]) = {
       tryCatchAny[Unit] {
         executor(resolve _, reject _)
       } { e =>
@@ -149,7 +155,8 @@ object PromiseMock {
     }
 
     private[this] def clearAndTriggerReactions[A](
-        reactions: js.Array[js.Function1[A, Any]], argument: A): Unit = {
+        reactions: js.Array[js.Function1[A, Any]],
+        argument: A): Unit = {
 
       assert(state != Pending)
 
@@ -185,7 +192,8 @@ object PromiseMock {
 
     // 25.4.2.2 PromiseResolveThenableJob
     private[this] def promiseResolveThenableJob(
-        thenable: Thenable[A], thenAction: js.Function): Unit = {
+        thenable: Thenable[A],
+        thenAction: js.Function): Unit = {
       thenAction.call(thenable, resolve _, reject _)
     }
 
@@ -204,8 +212,9 @@ object PromiseMock {
       : MockPromise[B] = {
 
       new MockPromise[B]({
-        (innerResolve: js.Function1[B | Thenable[B], _],
-        innerReject: js.Function1[scala.Any, _]) =>
+        (
+            innerResolve: js.Function1[B | Thenable[B], _],
+            innerReject: js.Function1[scala.Any, _]) =>
           def doFulfilled(value: A): Unit = {
             tryCatchAny[Unit] {
               innerResolve(onFulfilled(value))

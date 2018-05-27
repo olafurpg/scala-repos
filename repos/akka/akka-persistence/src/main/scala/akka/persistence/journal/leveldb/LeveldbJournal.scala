@@ -26,12 +26,17 @@ private[persistence] class LeveldbJournal extends {
 
   override def receivePluginInternal: Receive = {
     case r @ ReplayTaggedMessages(
-        fromSequenceNr, toSequenceNr, max, tag, replyTo) ⇒
+          fromSequenceNr,
+          toSequenceNr,
+          max,
+          tag,
+          replyTo) ⇒
       import context.dispatcher
       val readHighestSequenceNrFrom = math.max(0L, fromSequenceNr - 1)
-      asyncReadHighestSequenceNr(tagAsPersistenceId(tag),
-                                 readHighestSequenceNrFrom).flatMap {
-        highSeqNr ⇒
+      asyncReadHighestSequenceNr(
+        tagAsPersistenceId(tag),
+        readHighestSequenceNrFrom)
+        .flatMap { highSeqNr ⇒
           val toSeqNr = math.min(toSequenceNr, highSeqNr)
           if (highSeqNr == 0L || fromSequenceNr > toSeqNr)
             Future.successful(highSeqNr)
@@ -39,18 +44,20 @@ private[persistence] class LeveldbJournal extends {
             asyncReplayTaggedMessages(tag, fromSequenceNr, toSeqNr, max) {
               case ReplayedTaggedMessage(p, tag, offset) ⇒
                 adaptFromJournal(p).foreach { adaptedPersistentRepr ⇒
-                  replyTo.tell(ReplayedTaggedMessage(adaptedPersistentRepr,
-                                                     tag,
-                                                     offset),
-                               Actor.noSender)
+                  replyTo.tell(
+                    ReplayedTaggedMessage(adaptedPersistentRepr, tag, offset),
+                    Actor.noSender)
                 }
             }.map(_ ⇒ highSeqNr)
           }
-      }.map { highSeqNr ⇒
-        RecoverySuccess(highSeqNr)
-      }.recover {
-        case e ⇒ ReplayMessagesFailure(e)
-      }.pipeTo(replyTo)
+        }
+        .map { highSeqNr ⇒
+          RecoverySuccess(highSeqNr)
+        }
+        .recover {
+          case e ⇒ ReplayMessagesFailure(e)
+        }
+        .pipeTo(replyTo)
 
     case SubscribePersistenceId(persistenceId: String) ⇒
       addPersistenceIdSubscriber(sender(), persistenceId)
@@ -105,15 +112,19 @@ private[persistence] object LeveldbJournal {
   final case class TaggedEventAppended(tag: String)
       extends DeadLetterSuppression
 
-  final case class ReplayTaggedMessages(fromSequenceNr: Long,
-                                        toSequenceNr: Long,
-                                        max: Long,
-                                        tag: String,
-                                        replyTo: ActorRef)
+  final case class ReplayTaggedMessages(
+      fromSequenceNr: Long,
+      toSequenceNr: Long,
+      max: Long,
+      tag: String,
+      replyTo: ActorRef)
       extends SubscriptionCommand
   final case class ReplayedTaggedMessage(
-      persistent: PersistentRepr, tag: String, offset: Long)
-      extends DeadLetterSuppression with NoSerializationVerificationNeeded
+      persistent: PersistentRepr,
+      tag: String,
+      offset: Long)
+      extends DeadLetterSuppression
+      with NoSerializationVerificationNeeded
 }
 
 /**
@@ -132,9 +143,9 @@ private[persistence] class SharedLeveldbJournal extends AsyncWriteProxy {
         case Some(s) ⇒ s.forward(cmd)
         case None ⇒
           log.error(
-              "Failed {} request. " +
+            "Failed {} request. " +
               "Store not initialized. Use `SharedLeveldbJournal.setStore(sharedStore, system)`",
-              cmd)
+            cmd)
       }
   }
 }

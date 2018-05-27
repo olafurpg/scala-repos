@@ -4,7 +4,11 @@ import com.twitter.finagle.Failure
 import com.twitter.finagle.stats.StatsReceiver
 import com.twitter.util.{Duration, Monitor, Stopwatch}
 import io.netty.buffer.ByteBuf
-import io.netty.channel.{ChannelDuplexHandler, ChannelHandlerContext, ChannelPromise}
+import io.netty.channel.{
+  ChannelDuplexHandler,
+  ChannelHandlerContext,
+  ChannelPromise
+}
 import io.netty.channel.ChannelHandler.Sharable
 import io.netty.util.AttributeKey
 import java.io.IOException
@@ -12,7 +16,8 @@ import java.util.concurrent.atomic.AtomicLong
 import java.util.logging.{Level, Logger}
 
 private[channel] case class ChannelStats(
-    bytesRead: AtomicLong, bytesWritten: AtomicLong)
+    bytesRead: AtomicLong,
+    bytesWritten: AtomicLong)
 
 private[netty4] object ChannelStatsHandler {
   private[channel] val ConnectionStatsKey =
@@ -58,7 +63,9 @@ private[netty4] class ChannelStatsHandler(statsReceiver: StatsReceiver)
   }
 
   override def channelActive(ctx: ChannelHandlerContext): Unit = {
-    ctx.attr(ChannelWasWritableKey).set(true) //netty channels start in writable state
+    ctx
+      .attr(ChannelWasWritableKey)
+      .set(true) //netty channels start in writable state
     ctx.attr(ChannelWritableDurationKey).set(Stopwatch.start())
     ctx
       .attr(ConnectionStatsKey)
@@ -71,7 +78,9 @@ private[netty4] class ChannelStatsHandler(statsReceiver: StatsReceiver)
   }
 
   override def write(
-      ctx: ChannelHandlerContext, msg: Object, p: ChannelPromise) {
+      ctx: ChannelHandlerContext,
+      msg: Object,
+      p: ChannelPromise) {
     val channelWriteCount = ctx.attr(ConnectionStatsKey).get.bytesWritten
 
     msg match {
@@ -124,8 +133,8 @@ private[netty4] class ChannelStatsHandler(statsReceiver: StatsReceiver)
     if (!Monitor.isActive) {
       val level = cause match {
         case t: IOException => Level.FINE
-        case f: Failure => f.logLevel
-        case _ => Level.WARNING
+        case f: Failure     => f.logLevel
+        case _              => Level.WARNING
       }
       log.log(level, "ChannelStatsHandler caught an exception", cause)
     }

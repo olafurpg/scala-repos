@@ -7,7 +7,8 @@ object Test {
     ll.insert(LinkedList(0))
     println(ll)
     val ll2 = LinkedList[Int]()
-    try println("Empty head? " + ll2.head) catch {
+    try println("Empty head? " + ll2.head)
+    catch {
       case _: NoSuchElementException => ()
     }
   }

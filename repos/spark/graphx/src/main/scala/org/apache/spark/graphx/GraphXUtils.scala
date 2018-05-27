@@ -32,25 +32,29 @@ object GraphXUtils {
     */
   def registerKryoClasses(conf: SparkConf) {
     conf.registerKryoClasses(
-        Array(classOf[Edge[Object]],
-              classOf[(VertexId, Object)],
-              classOf[EdgePartition[Object, Object]],
-              classOf[BitSet],
-              classOf[VertexIdToIndexMap],
-              classOf[VertexAttributeBlock[Object]],
-              classOf[PartitionStrategy],
-              classOf[BoundedPriorityQueue[Object]],
-              classOf[EdgeDirection],
-              classOf[GraphXPrimitiveKeyOpenHashMap[VertexId, Int]],
-              classOf[OpenHashSet[Int]],
-              classOf[OpenHashSet[Long]]))
+      Array(
+        classOf[Edge[Object]],
+        classOf[(VertexId, Object)],
+        classOf[EdgePartition[Object, Object]],
+        classOf[BitSet],
+        classOf[VertexIdToIndexMap],
+        classOf[VertexAttributeBlock[Object]],
+        classOf[PartitionStrategy],
+        classOf[BoundedPriorityQueue[Object]],
+        classOf[EdgeDirection],
+        classOf[GraphXPrimitiveKeyOpenHashMap[VertexId, Int]],
+        classOf[OpenHashSet[Int]],
+        classOf[OpenHashSet[Long]]
+      ))
   }
 
   /**
     * A proxy method to map the obsolete API to the new one.
     */
   private[graphx] def mapReduceTriplets[
-      VD : ClassTag, ED : ClassTag, A : ClassTag](
+      VD: ClassTag,
+      ED: ClassTag,
+      A: ClassTag](
       g: Graph[VD, ED],
       mapFunc: EdgeTriplet[VD, ED] => Iterator[(VertexId, A)],
       reduceFunc: (A, A) => A,
@@ -69,6 +73,9 @@ object GraphXUtils {
       }
     }
     g.aggregateMessagesWithActiveSet(
-        sendMsg, reduceFunc, TripletFields.All, activeSetOpt)
+      sendMsg,
+      reduceFunc,
+      TripletFields.All,
+      activeSetOpt)
   }
 }

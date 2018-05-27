@@ -21,8 +21,14 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.errors._
 import org.apache.spark.sql.catalyst.expressions._
-import org.apache.spark.sql.catalyst.expressions.codegen.{CodegenContext, ExprCode}
-import org.apache.spark.sql.catalyst.plans.physical.{Partitioning, UnknownPartitioning}
+import org.apache.spark.sql.catalyst.expressions.codegen.{
+  CodegenContext,
+  ExprCode
+}
+import org.apache.spark.sql.catalyst.plans.physical.{
+  Partitioning,
+  UnknownPartitioning
+}
 import org.apache.spark.sql.execution.metric.SQLMetrics
 
 /**
@@ -33,14 +39,16 @@ import org.apache.spark.sql.execution.metric.SQLMetrics
   * @param output      The output Schema
   * @param child       Child operator
   */
-case class Expand(projections: Seq[Seq[Expression]],
-                  output: Seq[Attribute],
-                  child: SparkPlan)
-    extends UnaryNode with CodegenSupport {
+case class Expand(
+    projections: Seq[Seq[Expression]],
+    output: Seq[Attribute],
+    child: SparkPlan)
+    extends UnaryNode
+    with CodegenSupport {
 
   private[sql] override lazy val metrics = Map(
-      "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext,
-                                                     "number of output rows"))
+    "numOutputRows" -> SQLMetrics
+      .createLongMetric(sparkContext, "number of output rows"))
 
   // The GroupExpressions can output data with arbitrary partitioning, so set it
   // as UNKNOWN partitioning
@@ -96,7 +104,9 @@ case class Expand(projections: Seq[Seq[Expression]],
   }
 
   override def doConsume(
-      ctx: CodegenContext, input: Seq[ExprCode], row: String): String = {
+      ctx: CodegenContext,
+      input: Seq[ExprCode],
+      row: String): String = {
     /*
      * When the projections list looks like:
      *   expr1A, exprB, expr1C
@@ -159,7 +169,7 @@ case class Expand(projections: Seq[Seq[Expression]],
         val code = s"""
           |boolean $isNull = true;
           |${ctx.javaType(firstExpr.dataType)} $value = ${ctx.defaultValue(
-                          firstExpr.dataType)};
+                        firstExpr.dataType)};
          """.stripMargin
         ExprCode(code, isNull, value)
       }

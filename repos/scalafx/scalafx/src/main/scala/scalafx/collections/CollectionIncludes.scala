@@ -36,7 +36,7 @@ object CollectionIncludes extends CollectionIncludes
 //trait CollectionIncludes extends TransformationIncludes with LowerPriorityIncludes
 
 /**
-  * Contains implicit methods to convert from 
+  * Contains implicit methods to convert from
   * [[http://docs.oracle.com/javase/8/javafx/api/javafx/collections/package-summary.html `javafx.collections`]]
   * Classes to their ScalaFX counterparts.
   */

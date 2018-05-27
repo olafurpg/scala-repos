@@ -2,7 +2,11 @@ package org.jetbrains.plugins.scala.project
 
 import java.io.File
 
-import com.intellij.openapi.vfs.{VirtualFile, VirtualFileListener, VirtualFileSystem}
+import com.intellij.openapi.vfs.{
+  VirtualFile,
+  VirtualFileListener,
+  VirtualFileSystem
+}
 
 /**
   * @author Pavel Fatin
@@ -19,13 +23,17 @@ class AbsentLocalFile(url: String, path: String) extends VirtualFile {
   def getParent = throw new UnsupportedOperationException()
 
   def refresh(
-      asynchronous: Boolean, recursive: Boolean, postRunnable: Runnable) =
+      asynchronous: Boolean,
+      recursive: Boolean,
+      postRunnable: Runnable) =
     throw new UnsupportedOperationException()
 
   def getTimeStamp = throw new UnsupportedOperationException()
 
   def getOutputStream(
-      requestor: AnyRef, newModificationStamp: Long, newTimeStamp: Long) =
+      requestor: AnyRef,
+      newModificationStamp: Long,
+      newTimeStamp: Long) =
     throw new UnsupportedOperationException()
 
   def isDirectory = throw new UnsupportedOperationException()
@@ -58,10 +66,11 @@ object AbsentLocalFileSystem extends VirtualFileSystem {
   def refreshAndFindFileByPath(s: String) =
     throw new UnsupportedOperationException()
 
-  def copyFile(requestor: AnyRef,
-               virtualFile: VirtualFile,
-               newParent: VirtualFile,
-               copyName: String) =
+  def copyFile(
+      requestor: AnyRef,
+      virtualFile: VirtualFile,
+      newParent: VirtualFile,
+      copyName: String) =
     throw new UnsupportedOperationException()
 
   def refresh(asynchronous: Boolean) =
@@ -70,7 +79,9 @@ object AbsentLocalFileSystem extends VirtualFileSystem {
   def isReadOnly = throw new UnsupportedOperationException()
 
   def createChildDirectory(
-      requestor: AnyRef, vDir: VirtualFile, dirName: String) =
+      requestor: AnyRef,
+      vDir: VirtualFile,
+      dirName: String) =
     throw new UnsupportedOperationException()
 
   def removeVirtualFileListener(virtualFileListener: VirtualFileListener) =

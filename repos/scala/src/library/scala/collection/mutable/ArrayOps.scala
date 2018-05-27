@@ -33,10 +33,11 @@ import parallel.mutable.ParArray
   *  @define willNotTerminateInf
   */
 @deprecatedInheritance(
-    "ArrayOps will be sealed to facilitate greater flexibility with array/collections integration in future releases.",
-    "2.11.0")
+  "ArrayOps will be sealed to facilitate greater flexibility with array/collections integration in future releases.",
+  "2.11.0")
 trait ArrayOps[T]
-    extends Any with ArrayLike[T, Array[T]]
+    extends Any
+    with ArrayLike[T, Array[T]]
     with CustomParallelizable[T, ParArray[T]] {
 
   private def elementClass: Class[_] =
@@ -47,20 +48,20 @@ trait ArrayOps[T]
     if (l > 0) Array.copy(repr, 0, xs, start, l)
   }
 
-  override def toArray[U >: T : ClassTag]: Array[U] = {
+  override def toArray[U >: T: ClassTag]: Array[U] = {
     val thatElementClass = arrayElementClass(implicitly[ClassTag[U]])
     if (elementClass eq thatElementClass) repr.asInstanceOf[Array[U]]
     else super.toArray[U]
   }
 
-  def :+[B >: T : ClassTag](elem: B): Array[B] = {
+  def :+[B >: T: ClassTag](elem: B): Array[B] = {
     val result = Array.ofDim[B](repr.length + 1)
     Array.copy(repr, 0, result, 0, repr.length)
     result(repr.length) = elem
     result
   }
 
-  def +:[B >: T : ClassTag](elem: B): Array[B] = {
+  def +:[B >: T: ClassTag](elem: B): Array[B] = {
     val result = Array.ofDim[B](repr.length + 1)
     result(0) = elem
     Array.copy(repr, 0, result, 1, repr.length)
@@ -76,13 +77,13 @@ trait ArrayOps[T]
     *  @param asTrav    A function that converts elements of this array to rows - arrays of type `U`.
     *  @return          An array obtained by concatenating rows of this array.
     */
-  def flatten[U](implicit asTrav: T => scala.collection.Traversable[U],
-                 m: ClassTag[U]): Array[U] = {
+  def flatten[U](
+      implicit asTrav: T => scala.collection.Traversable[U],
+      m: ClassTag[U]): Array[U] = {
     val b = Array.newBuilder[U]
-    b.sizeHint(
-        map {
+    b.sizeHint(map {
       case is: scala.collection.IndexedSeq[_] => is.size
-      case _ => 0
+      case _                                  => 0
     }.sum)
     for (xs <- this) b ++= asTrav(xs)
     b.result()
@@ -129,9 +130,10 @@ trait ArrayOps[T]
     */
   // implementation NOTE: ct1 and ct2 can't be written as context bounds because desugared
   // implicits are put in front of asPair parameter that is supposed to guide type inference
-  def unzip[T1, T2](implicit asPair: T => (T1, T2),
-                    ct1: ClassTag[T1],
-                    ct2: ClassTag[T2]): (Array[T1], Array[T2]) = {
+  def unzip[T1, T2](
+      implicit asPair: T => (T1, T2),
+      ct1: ClassTag[T1],
+      ct2: ClassTag[T2]): (Array[T1], Array[T2]) = {
     val a1 = new Array[T1](length)
     val a2 = new Array[T2](length)
     var i = 0
@@ -193,15 +195,16 @@ object ArrayOps {
 
   /** A class of `ArrayOps` for arrays containing reference types. */
   final class ofRef[T <: AnyRef](override val repr: Array[T])
-      extends AnyVal with ArrayOps[T] with ArrayLike[T, Array[T]] {
+      extends AnyVal
+      with ArrayOps[T]
+      with ArrayLike[T, Array[T]] {
 
     override protected[this] def thisCollection: WrappedArray[T] =
       new WrappedArray.ofRef[T](repr)
-    override protected[this] def toCollection(
-        repr: Array[T]): WrappedArray[T] = new WrappedArray.ofRef[T](repr)
+    override protected[this] def toCollection(repr: Array[T]): WrappedArray[T] =
+      new WrappedArray.ofRef[T](repr)
     override protected[this] def newBuilder =
-      new ArrayBuilder.ofRef[T]()(
-          ClassTag[T](arrayElementClass(repr.getClass)))
+      new ArrayBuilder.ofRef[T]()(ClassTag[T](arrayElementClass(repr.getClass)))
 
     def length: Int = repr.length
     def apply(index: Int): T = repr(index)
@@ -210,7 +213,9 @@ object ArrayOps {
 
   /** A class of `ArrayOps` for arrays containing `byte`s. */
   final class ofByte(override val repr: Array[Byte])
-      extends AnyVal with ArrayOps[Byte] with ArrayLike[Byte, Array[Byte]] {
+      extends AnyVal
+      with ArrayOps[Byte]
+      with ArrayLike[Byte, Array[Byte]] {
 
     override protected[this] def thisCollection: WrappedArray[Byte] =
       new WrappedArray.ofByte(repr)
@@ -225,7 +230,9 @@ object ArrayOps {
 
   /** A class of `ArrayOps` for arrays containing `short`s. */
   final class ofShort(override val repr: Array[Short])
-      extends AnyVal with ArrayOps[Short] with ArrayLike[Short, Array[Short]] {
+      extends AnyVal
+      with ArrayOps[Short]
+      with ArrayLike[Short, Array[Short]] {
 
     override protected[this] def thisCollection: WrappedArray[Short] =
       new WrappedArray.ofShort(repr)
@@ -241,7 +248,9 @@ object ArrayOps {
 
   /** A class of `ArrayOps` for arrays containing `char`s. */
   final class ofChar(override val repr: Array[Char])
-      extends AnyVal with ArrayOps[Char] with ArrayLike[Char, Array[Char]] {
+      extends AnyVal
+      with ArrayOps[Char]
+      with ArrayLike[Char, Array[Char]] {
 
     override protected[this] def thisCollection: WrappedArray[Char] =
       new WrappedArray.ofChar(repr)
@@ -256,7 +265,9 @@ object ArrayOps {
 
   /** A class of `ArrayOps` for arrays containing `int`s. */
   final class ofInt(override val repr: Array[Int])
-      extends AnyVal with ArrayOps[Int] with ArrayLike[Int, Array[Int]] {
+      extends AnyVal
+      with ArrayOps[Int]
+      with ArrayLike[Int, Array[Int]] {
 
     override protected[this] def thisCollection: WrappedArray[Int] =
       new WrappedArray.ofInt(repr)
@@ -271,7 +282,9 @@ object ArrayOps {
 
   /** A class of `ArrayOps` for arrays containing `long`s. */
   final class ofLong(override val repr: Array[Long])
-      extends AnyVal with ArrayOps[Long] with ArrayLike[Long, Array[Long]] {
+      extends AnyVal
+      with ArrayOps[Long]
+      with ArrayLike[Long, Array[Long]] {
 
     override protected[this] def thisCollection: WrappedArray[Long] =
       new WrappedArray.ofLong(repr)
@@ -286,7 +299,9 @@ object ArrayOps {
 
   /** A class of `ArrayOps` for arrays containing `float`s. */
   final class ofFloat(override val repr: Array[Float])
-      extends AnyVal with ArrayOps[Float] with ArrayLike[Float, Array[Float]] {
+      extends AnyVal
+      with ArrayOps[Float]
+      with ArrayLike[Float, Array[Float]] {
 
     override protected[this] def thisCollection: WrappedArray[Float] =
       new WrappedArray.ofFloat(repr)
@@ -302,7 +317,8 @@ object ArrayOps {
 
   /** A class of `ArrayOps` for arrays containing `double`s. */
   final class ofDouble(override val repr: Array[Double])
-      extends AnyVal with ArrayOps[Double]
+      extends AnyVal
+      with ArrayOps[Double]
       with ArrayLike[Double, Array[Double]] {
 
     override protected[this] def thisCollection: WrappedArray[Double] =
@@ -319,7 +335,8 @@ object ArrayOps {
 
   /** A class of `ArrayOps` for arrays containing `boolean`s. */
   final class ofBoolean(override val repr: Array[Boolean])
-      extends AnyVal with ArrayOps[Boolean]
+      extends AnyVal
+      with ArrayOps[Boolean]
       with ArrayLike[Boolean, Array[Boolean]] {
 
     override protected[this] def thisCollection: WrappedArray[Boolean] =
@@ -336,7 +353,9 @@ object ArrayOps {
 
   /** A class of `ArrayOps` for arrays of `Unit` types. */
   final class ofUnit(override val repr: Array[Unit])
-      extends AnyVal with ArrayOps[Unit] with ArrayLike[Unit, Array[Unit]] {
+      extends AnyVal
+      with ArrayOps[Unit]
+      with ArrayLike[Unit, Array[Unit]] {
 
     override protected[this] def thisCollection: WrappedArray[Unit] =
       new WrappedArray.ofUnit(repr)

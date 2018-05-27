@@ -55,7 +55,7 @@ private[scalding] object CounterImpl {
   def apply(fp: FlowProcess[_], statKey: StatKey): CounterImpl =
     fp match {
       case hFP: HadoopFlowProcess => HadoopFlowPCounterImpl(hFP, statKey)
-      case _ => GenericFlowPCounterImpl(fp, statKey)
+      case _                      => GenericFlowPCounterImpl(fp, statKey)
     }
 }
 
@@ -64,14 +64,16 @@ sealed private[scalding] trait CounterImpl {
 }
 
 private[scalding] case class GenericFlowPCounterImpl(
-    fp: FlowProcess[_], statKey: StatKey)
+    fp: FlowProcess[_],
+    statKey: StatKey)
     extends CounterImpl {
   override def increment(amount: Long): Unit =
     fp.increment(statKey.group, statKey.counter, amount)
 }
 
 private[scalding] case class HadoopFlowPCounterImpl(
-    fp: HadoopFlowProcess, statKey: StatKey)
+    fp: HadoopFlowProcess,
+    statKey: StatKey)
     extends CounterImpl {
   private[this] val cntr =
     fp.getReporter().getCounter(statKey.group, statKey.counter)
@@ -82,8 +84,8 @@ object Stat {
 
   def apply(k: StatKey)(implicit uid: UniqueID): Stat = new Stat {
     // This is materialized on the mappers, and will throw an exception if users incBy before then
-    private[this] lazy val cntr = CounterImpl(
-        RuntimeStats.getFlowProcessForUniqueId(uid), k)
+    private[this] lazy val cntr =
+      CounterImpl(RuntimeStats.getFlowProcessForUniqueId(uid), k)
 
     def incBy(amount: Long): Unit = cntr.increment(amount)
     def key: StatKey = k
@@ -148,8 +150,8 @@ object RuntimeStats extends java.io.Serializable {
   @transient private lazy val logger: Logger =
     LoggerFactory.getLogger(this.getClass)
 
-  private val flowMappingStore: mutable.Map[
-      String, WeakReference[FlowProcess[_]]] = {
+  private val flowMappingStore
+    : mutable.Map[String, WeakReference[FlowProcess[_]]] = {
     (new ConcurrentHashMap[String, WeakReference[FlowProcess[_]]]).asScala
   }
 
@@ -161,8 +163,8 @@ object RuntimeStats extends java.io.Serializable {
       flowProcess
     }).getOrElse {
       sys.error(
-          "Error in job deployment, the FlowProcess for unique id %s isn't available"
-            .format(uniqueId))
+        "Error in job deployment, the FlowProcess for unique id %s isn't available"
+          .format(uniqueId))
     }
   }
 

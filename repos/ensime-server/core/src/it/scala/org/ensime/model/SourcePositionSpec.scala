@@ -10,18 +10,19 @@ import org.ensime.util.EnsimeSpec
 import org.ensime.util.file._
 
 class SourcePositionSpec
-    extends EnsimeSpec with SharedEnsimeConfigFixture
+    extends EnsimeSpec
+    with SharedEnsimeConfigFixture
     with SharedEnsimeVFSFixture {
 
   val original = EnsimeConfigFixture.SimpleTestProject.copy(
-      javaLibs = Nil
+    javaLibs = Nil
   )
 
   "SourcePosition" should "resolve FqnSymbols for local files with no line number" in {
     withEnsimeConfig { implicit config =>
       lookup(knownFile) match {
         case Some(LineSourcePosition(name, 0)) if name.isFile =>
-        case o => fail(s"not resolved $o")
+        case o                                                => fail(s"not resolved $o")
       }
     }
   }
@@ -30,7 +31,7 @@ class SourcePositionSpec
     withEnsimeConfig { implicit config =>
       lookup(knownFile, Some(100)) match {
         case Some(LineSourcePosition(name, 100)) if name.isFile =>
-        case o => fail(s"not resolved $o")
+        case o                                                  => fail(s"not resolved $o")
       }
     }
   }
@@ -39,7 +40,7 @@ class SourcePositionSpec
     withEnsimeConfig { implicit config =>
       lookup(knownJarEntry) match {
         case Some(LineSourcePosition(name, 0)) if name.isFile =>
-        case o => fail(s"not resolved $o")
+        case o                                                => fail(s"not resolved $o")
       }
     }
   }
@@ -48,7 +49,7 @@ class SourcePositionSpec
     withEnsimeConfig { implicit config =>
       lookup(knownJarEntry, Some(100)) match {
         case Some(LineSourcePosition(name, 100)) if name.isFile =>
-        case o => fail(s"not resolved $o")
+        case o                                                  => fail(s"not resolved $o")
       }
     }
   }
@@ -61,7 +62,7 @@ class SourcePositionSpec
   def knownJarEntry(implicit config: EnsimeConfig): String = {
     val scalatest = config.subprojects.head.referenceSourceJars
       .find(
-          _.getName.contains("scalatest_")
+        _.getName.contains("scalatest_")
       )
       .get
       .getAbsoluteFile

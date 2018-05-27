@@ -17,8 +17,7 @@ object BalancerBench {
 
   def newActivity(num: Int): Activity[Set[ServiceFactory[Unit, Unit]]] = {
     val underlying = Var((0 until num).map(_ => newFactory()).toSet)
-    Activity(
-        underlying.map { facs =>
+    Activity(underlying.map { facs =>
       Activity.Ok(facs)
     })
   }
@@ -39,9 +38,9 @@ class HeapBalancerBench extends StdBenchAnnotations {
     heap = Balancers
       .heap()
       .newBalancer(
-          newActivity(numNodes),
-          NullStatsReceiver,
-          NoBrokersExc
+        newActivity(numNodes),
+        NullStatsReceiver,
+        NoBrokersExc
       )
   }
 
@@ -65,16 +64,16 @@ class P2CBalancerBench extends StdBenchAnnotations {
     p2c = Balancers
       .p2c()
       .newBalancer(
-          newActivity(numNodes),
-          NullStatsReceiver,
-          NoBrokersExc
+        newActivity(numNodes),
+        NullStatsReceiver,
+        NoBrokersExc
       )
     p2cEwma = Balancers
       .p2cPeakEwma()
       .newBalancer(
-          newActivity(numNodes),
-          NullStatsReceiver,
-          NoBrokersExc
+        newActivity(numNodes),
+        NullStatsReceiver,
+        NoBrokersExc
       )
   }
 
@@ -100,9 +99,9 @@ class ApertureBalancerBench extends StdBenchAnnotations {
     aperture = Balancers
       .aperture()
       .newBalancer(
-          newActivity(numNodes),
-          NullStatsReceiver,
-          NoBrokersExc
+        newActivity(numNodes),
+        NullStatsReceiver,
+        NoBrokersExc
       )
   }
 

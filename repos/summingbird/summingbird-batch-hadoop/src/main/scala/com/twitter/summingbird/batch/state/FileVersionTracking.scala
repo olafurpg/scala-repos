@@ -34,7 +34,8 @@ private[summingbird] object FileVersionTracking {
 }
 
 private[summingbird] case class FileVersionTracking(
-    root: String, fs: FileSystem) {
+    root: String,
+    fs: FileSystem) {
   import FileVersionTracking._
 
   fs.mkdirs(root)
@@ -57,10 +58,14 @@ private[summingbird] case class FileVersionTracking(
     logger.debug("Version on disk : " + v.toString)
 
   def getAllVersions: List[Long] =
-    getOnDiskVersions.map { v =>
-      logVersion(v)
-      v
-    }.collect { case Success(s) => s }.sorted.reverse
+    getOnDiskVersions
+      .map { v =>
+        logVersion(v)
+        v
+      }
+      .collect { case Success(s) => s }
+      .sorted
+      .reverse
 
   def hasVersion(version: Long) = getAllVersions.contains(version)
 

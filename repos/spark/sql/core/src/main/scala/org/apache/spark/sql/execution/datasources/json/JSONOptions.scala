@@ -20,7 +20,10 @@ package org.apache.spark.sql.execution.datasources.json
 import com.fasterxml.jackson.core.{JsonFactory, JsonParser}
 
 import org.apache.spark.internal.Logging
-import org.apache.spark.sql.execution.datasources.{CompressionCodecs, ParseModes}
+import org.apache.spark.sql.execution.datasources.{
+  CompressionCodecs,
+  ParseModes
+}
 
 /**
   * Options for the JSON data source.
@@ -29,7 +32,8 @@ import org.apache.spark.sql.execution.datasources.{CompressionCodecs, ParseModes
   */
 private[sql] class JSONOptions(
     @transient private val parameters: Map[String, String])
-    extends Logging with Serializable {
+    extends Logging
+    with Serializable {
 
   val samplingRatio =
     parameters.get("samplingRatio").map(_.toDouble).getOrElse(1.0)
@@ -60,7 +64,7 @@ private[sql] class JSONOptions(
   // Parse mode flags
   if (!ParseModes.isValidMode(parseMode)) {
     logWarning(
-        s"$parseMode is not a valid parse mode. Using ${ParseModes.DEFAULT}.")
+      s"$parseMode is not a valid parse mode. Using ${ParseModes.DEFAULT}.")
   }
 
   val failFast = ParseModes.isFailFastMode(parseMode)
@@ -71,15 +75,17 @@ private[sql] class JSONOptions(
   def setJacksonOptions(factory: JsonFactory): Unit = {
     factory.configure(JsonParser.Feature.ALLOW_COMMENTS, allowComments)
     factory.configure(
-        JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, allowUnquotedFieldNames)
+      JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES,
+      allowUnquotedFieldNames)
+    factory.configure(JsonParser.Feature.ALLOW_SINGLE_QUOTES, allowSingleQuotes)
     factory.configure(
-        JsonParser.Feature.ALLOW_SINGLE_QUOTES, allowSingleQuotes)
-    factory.configure(JsonParser.Feature.ALLOW_NUMERIC_LEADING_ZEROS,
-                      allowNumericLeadingZeros)
+      JsonParser.Feature.ALLOW_NUMERIC_LEADING_ZEROS,
+      allowNumericLeadingZeros)
     factory.configure(
-        JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, allowNonNumericNumbers)
+      JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS,
+      allowNonNumericNumbers)
     factory.configure(
-        JsonParser.Feature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER,
-        allowBackslashEscapingAnyCharacter)
+      JsonParser.Feature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER,
+      allowBackslashEscapingAnyCharacter)
   }
 }

@@ -31,7 +31,7 @@ trait Lists { self: BaseClient =>
   def lIndex(key: ChannelBuffer, index: JLong): Future[Option[ChannelBuffer]] =
     doRequest(LIndex(key, index)) {
       case BulkReply(message) => Future.value(Some(message))
-      case EmptyBulkReply() => Future.value(None)
+      case EmptyBulkReply()   => Future.value(None)
     }
 
   /**
@@ -81,7 +81,7 @@ trait Lists { self: BaseClient =>
   def lPop(key: ChannelBuffer): Future[Option[ChannelBuffer]] =
     doRequest(LPop(key)) {
       case BulkReply(message) => Future.value(Some(message))
-      case EmptyBulkReply() => Future.value(None)
+      case EmptyBulkReply()   => Future.value(None)
     }
 
   /**
@@ -106,7 +106,9 @@ trait Lists { self: BaseClient =>
     * @return the number of removed elements.
     */
   def lRem(
-      key: ChannelBuffer, count: JLong, value: ChannelBuffer): Future[JLong] =
+      key: ChannelBuffer,
+      count: JLong,
+      value: ChannelBuffer): Future[JLong] =
     doRequest(LRem(key, count, value)) {
       case IntegerReply(n) => Future.value(n)
     }
@@ -119,7 +121,9 @@ trait Lists { self: BaseClient =>
     * @param value
     */
   def lSet(
-      key: ChannelBuffer, index: JLong, value: ChannelBuffer): Future[Unit] =
+      key: ChannelBuffer,
+      index: JLong,
+      value: ChannelBuffer): Future[Unit] =
     doRequest(LSet(key, index, value)) {
       case StatusReply(message) => Future.Unit
     }
@@ -132,9 +136,10 @@ trait Lists { self: BaseClient =>
     * @param end (inclusive)
     * @return a list of the value
     */
-  def lRange(key: ChannelBuffer,
-             start: JLong,
-             end: JLong): Future[List[ChannelBuffer]] =
+  def lRange(
+      key: ChannelBuffer,
+      start: JLong,
+      end: JLong): Future[List[ChannelBuffer]] =
     doRequest(LRange(key, start, end)) {
       case MBulkReply(message) =>
         Future.value(ReplyFormat.toChannelBuffers(message))
@@ -150,7 +155,7 @@ trait Lists { self: BaseClient =>
   def rPop(key: ChannelBuffer): Future[Option[ChannelBuffer]] =
     doRequest(RPop(key)) {
       case BulkReply(message) => Future.value(Some(message))
-      case EmptyBulkReply() => Future.value(None)
+      case EmptyBulkReply()   => Future.value(None)
     }
 
   /**

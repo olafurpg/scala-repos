@@ -50,7 +50,7 @@ trait Manifest[T] extends ClassManifest[T] with Equals {
 
   override def canEqual(that: Any): Boolean = that match {
     case _: Manifest[_] => true
-    case _ => false
+    case _              => false
   }
 
   /** Note: testing for erasure here is important, as it is many times
@@ -59,7 +59,7 @@ trait Manifest[T] extends ClassManifest[T] with Equals {
   override def equals(that: Any): Boolean = that match {
     case m: Manifest[_] =>
       (m canEqual this) && (this.runtimeClass == m.runtimeClass) &&
-      (this <:< m) && (m <:< this)
+        (this <:< m) && (m <:< this)
     case _ => false
   }
   override def hashCode = this.runtimeClass.##
@@ -69,12 +69,13 @@ trait Manifest[T] extends ClassManifest[T] with Equals {
 // @deprecated("Use type tags and manually check the corresponding class or type instead", "2.10.0")
 @SerialVersionUID(1L)
 abstract class AnyValManifest[T <: AnyVal](override val toString: String)
-    extends Manifest[T] with Equals {
+    extends Manifest[T]
+    with Equals {
   override def <:<(that: ClassManifest[_]): Boolean =
     (that eq this) || (that eq Manifest.Any) || (that eq Manifest.AnyVal)
   override def canEqual(other: Any) = other match {
     case _: AnyValManifest[_] => true
-    case _ => false
+    case _                    => false
   }
   override def equals(that: Any): Boolean = this eq that.asInstanceOf[AnyRef]
   @transient
@@ -255,21 +256,24 @@ object ManifestFactory {
 
   /** Manifest for the class type `clazz`, where `clazz` is
     * a top-level or static class and args are its type arguments. */
-  def classType[T](clazz: Predef.Class[T],
-                   arg1: Manifest[_],
-                   args: Manifest[_]*): Manifest[T] =
+  def classType[T](
+      clazz: Predef.Class[T],
+      arg1: Manifest[_],
+      args: Manifest[_]*): Manifest[T] =
     new ClassTypeManifest[T](None, clazz, arg1 :: args.toList)
 
   /** Manifest for the class type `clazz[args]`, where `clazz` is
     * a class with non-package prefix type `prefix` and type arguments `args`.
     */
-  def classType[T](prefix: Manifest[_],
-                   clazz: Predef.Class[_],
-                   args: Manifest[_]*): Manifest[T] =
+  def classType[T](
+      prefix: Manifest[_],
+      clazz: Predef.Class[_],
+      args: Manifest[_]*): Manifest[T] =
     new ClassTypeManifest[T](Some(prefix), clazz, args.toList)
 
-  private abstract class PhantomManifest[T](_runtimeClass: Predef.Class[_],
-                                            override val toString: String)
+  private abstract class PhantomManifest[T](
+      _runtimeClass: Predef.Class[_],
+      override val toString: String)
       extends ClassTypeManifest[T](None, _runtimeClass, Nil) {
     override def equals(that: Any): Boolean = this eq that.asInstanceOf[AnyRef]
     @transient
@@ -285,7 +289,7 @@ object ManifestFactory {
       extends Manifest[T] {
     override def toString =
       (if (prefix.isEmpty) "" else prefix.get.toString + "#") +
-      (if (runtimeClass.isArray) "Array" else runtimeClass.getName) + argString
+        (if (runtimeClass.isArray) "Array" else runtimeClass.getName) + argString
   }
 
   def arrayType[T](arg: Manifest[_]): Manifest[Array[T]] =
@@ -294,10 +298,11 @@ object ManifestFactory {
   /** Manifest for the abstract type `prefix # name`. `upperBound` is not
     * strictly necessary as it could be obtained by reflection. It was
     * added so that erasure can be calculated without reflection. */
-  def abstractType[T](prefix: Manifest[_],
-                      name: String,
-                      upperBound: Predef.Class[_],
-                      args: Manifest[_]*): Manifest[T] =
+  def abstractType[T](
+      prefix: Manifest[_],
+      name: String,
+      upperBound: Predef.Class[_],
+      args: Manifest[_]*): Manifest[T] =
     new Manifest[T] {
       def runtimeClass = upperBound
       override val typeArguments = args.toList
@@ -307,12 +312,13 @@ object ManifestFactory {
   /** Manifest for the unknown type `_ >: L <: U` in an existential.
     */
   def wildcardType[T](
-      lowerBound: Manifest[_], upperBound: Manifest[_]): Manifest[T] =
+      lowerBound: Manifest[_],
+      upperBound: Manifest[_]): Manifest[T] =
     new Manifest[T] {
       def runtimeClass = upperBound.runtimeClass
       override def toString =
         "_" + (if (lowerBound eq Nothing) "" else " >: " + lowerBound) +
-        (if (upperBound eq Nothing) "" else " <: " + upperBound)
+          (if (upperBound eq Nothing) "" else " <: " + upperBound)
     }
 
   /** Manifest for the intersection type `parents_0 with ... with parents_n`. */

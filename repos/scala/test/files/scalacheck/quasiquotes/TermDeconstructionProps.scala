@@ -234,12 +234,13 @@ object TermDeconstructionProps
     val q"new C()" = q"new C"
   }
 
-  property("SI-8350 new applications extracted only for non-empty ctor calls") = test {
-    val q"new $c1" = q"new C()"
-    assert(c1 ≈ tq"C")
-    val q"new $c2" = q"new C(x)"
-    assert(c2 ≈ q"${tq"C"}(x)")
-  }
+  property("SI-8350 new applications extracted only for non-empty ctor calls") =
+    test {
+      val q"new $c1" = q"new C()"
+      assert(c1 ≈ tq"C")
+      val q"new $c2" = q"new C(x)"
+      assert(c2 ≈ q"${tq"C"}(x)")
+    }
 
   property("SI-8350 original test case") = test {
     val q"new ..$parents" = q"new Foo with Bar"

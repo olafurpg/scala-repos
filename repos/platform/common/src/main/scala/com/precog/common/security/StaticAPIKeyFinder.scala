@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -34,19 +34,21 @@ import scalaz.syntax.monad._
 import Permission._
 
 class StaticAPIKeyFinder[M[+ _]](apiKey: APIKey)(implicit val M: Monad[M])
-    extends APIKeyFinder[M] with Logging { self =>
+    extends APIKeyFinder[M]
+    with Logging { self =>
   private val permissions = Set[Permission](
-      ReadPermission(Path("/"), WrittenByAny),
-      WritePermission(Path("/"), WriteAs.any),
-      DeletePermission(Path("/"), WrittenByAny)
+    ReadPermission(Path("/"), WrittenByAny),
+    WritePermission(Path("/"), WriteAs.any),
+    DeletePermission(Path("/"), WrittenByAny)
   )
 
-  val rootGrant = v1.GrantDetails(java.util.UUID.randomUUID.toString,
-                                  None,
-                                  None,
-                                  permissions,
-                                  new Instant(0l),
-                                  None)
+  val rootGrant = v1.GrantDetails(
+    java.util.UUID.randomUUID.toString,
+    None,
+    None,
+    permissions,
+    new Instant(0l),
+    None)
   val rootAPIKeyRecord =
     v1.APIKeyDetails(apiKey, Some("Static api key"), None, Set(rootGrant), Nil)
 
@@ -61,19 +63,21 @@ class StaticAPIKeyFinder[M[+ _]](apiKey: APIKey)(implicit val M: Monad[M])
   def findAllAPIKeys(fromRoot: APIKey): M[Set[v1.APIKeyDetails]] =
     findAPIKey(fromRoot, None) map { _.toSet }
 
-  def createAPIKey(accountId: AccountId,
-                   keyName: Option[String] = None,
-                   keyDesc: Option[String] = None): M[v1.APIKeyDetails] = {
+  def createAPIKey(
+      accountId: AccountId,
+      keyName: Option[String] = None,
+      keyDesc: Option[String] = None): M[v1.APIKeyDetails] = {
     throw new UnsupportedOperationException(
-        "API key management unavailable for standalone system.")
+      "API key management unavailable for standalone system.")
   }
 
   def addGrant(accountKey: APIKey, grantId: GrantId): M[Boolean] = {
     throw new UnsupportedOperationException(
-        "Grant management unavailable for standalone system.")
+      "Grant management unavailable for standalone system.")
   }
 
-  def hasCapability(apiKey: APIKey,
-                    perms: Set[Permission],
-                    at: Option[DateTime]): M[Boolean] = M.point(true)
+  def hasCapability(
+      apiKey: APIKey,
+      perms: Set[Permission],
+      at: Option[DateTime]): M[Boolean] = M.point(true)
 }

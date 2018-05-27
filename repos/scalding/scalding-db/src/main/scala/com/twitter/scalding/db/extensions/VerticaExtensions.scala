@@ -19,7 +19,8 @@ package com.twitter.scalding.db.extensions
 import com.twitter.scalding.db._
 
 object VerticaExtensions {
-  def verticaMutator: PartialFunction[DBColumnDefinition, DBColumnDefinition] = {
+  def verticaMutator
+    : PartialFunction[DBColumnDefinition, DBColumnDefinition] = {
     case t @ DBColumnDefinition(BIGINT, _, _, None, _, _) =>
       t.copy(sizeOpt = None)
     case t @ DBColumnDefinition(INT, _, _, None, _, _) =>

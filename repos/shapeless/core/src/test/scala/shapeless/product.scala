@@ -68,7 +68,7 @@ class ProductTests {
   def testToHList = {
     {
       // FIXME: should work (needs changes in GenericMacros?)
-      // Empty.toHList 
+      // Empty.toHList
     }
 
     {
@@ -115,7 +115,7 @@ class ProductTests {
   def testToRecord = {
     {
       // FIXME: should work (needs changes in GenericMacros?)
-      // Empty.toRecord 
+      // Empty.toRecord
     }
 
     {
@@ -162,7 +162,8 @@ class ProductTests {
   def testToTraversable {
     def assertArrayEquals0[T](a: Array[T], b: Array[T]) =
       assertArrayEquals(
-          a.asInstanceOf[Array[Object]], b.asInstanceOf[Array[Object]])
+        a.asInstanceOf[Array[Object]],
+        b.asInstanceOf[Array[Object]])
 
     {
       // FIXME: should work (needs changes in GenericMacros?)
@@ -223,7 +224,8 @@ class ProductTests {
   def testToSized {
     def assertArrayEquals0[T](a: Array[T], b: Array[T]) =
       assertArrayEquals(
-          a.asInstanceOf[Array[Object]], b.asInstanceOf[Array[Object]])
+        a.asInstanceOf[Array[Object]],
+        b.asInstanceOf[Array[Object]])
 
     {
       // FIXME: should work (needs changes in GenericMacros?)

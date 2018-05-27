@@ -26,12 +26,18 @@ import org.json4s._
 import java.io.File
 
 case class DataSourceParams(
-    val filepath: String, val k: Int = 3, val seed: Int = 9527)
+    val filepath: String,
+    val k: Int = 3,
+    val seed: Int = 9527)
     extends Params
 
 case class ParallelDataSource(val dsp: DataSourceParams)
     extends PDataSource[
-        DataSourceParams, Integer, RDD[LabeledPoint], Vector, Double] {
+      DataSourceParams,
+      Integer,
+      RDD[LabeledPoint],
+      Vector,
+      Double] {
   override def read(sc: SparkContext)
     : Seq[(Integer, RDD[LabeledPoint], RDD[(Vector, Double)])] = {
     val input = sc.textFile(dsp.filepath)
@@ -42,20 +48,23 @@ case class ParallelDataSource(val dsp: DataSourceParams)
 
     MLUtils.kFold(points, dsp.k, dsp.seed).zipWithIndex.map {
       case (dataSet, index) =>
-        (Int.box(index),
-         dataSet._1,
-         dataSet._2.map(p => (p.features, p.label)))
+        (Int.box(index), dataSet._1, dataSet._2.map(p => (p.features, p.label)))
     }
   }
 }
 
 case class AlgorithmParams(
-    val numIterations: Int = 200, val stepSize: Double = 0.1)
+    val numIterations: Int = 200,
+    val stepSize: Double = 0.1)
     extends Params
 
 case class ParallelSGDAlgorithm(val ap: AlgorithmParams)
     extends P2LAlgorithm[
-        AlgorithmParams, RDD[LabeledPoint], RegressionModel, Vector, Double] {
+      AlgorithmParams,
+      RDD[LabeledPoint],
+      RegressionModel,
+      Vector,
+      Double] {
 
   def train(data: RDD[LabeledPoint]): RegressionModel = {
     LinearRegressionWithSGD.train(data, ap.numIterations, ap.stepSize)
@@ -71,10 +80,12 @@ case class ParallelSGDAlgorithm(val ap: AlgorithmParams)
 
 object RegressionEngineFactory extends IEngineFactory {
   def apply() = {
-    new Engine(classOf[ParallelDataSource],
-               classOf[IdentityPreparator[RDD[LabeledPoint]]],
-               Map("SGD" -> classOf[ParallelSGDAlgorithm]),
-               LAverageServing(classOf[ParallelSGDAlgorithm]))
+    new Engine(
+      classOf[ParallelDataSource],
+      classOf[IdentityPreparator[RDD[LabeledPoint]]],
+      Map("SGD" -> classOf[ParallelSGDAlgorithm]),
+      LAverageServing(classOf[ParallelSGDAlgorithm])
+    )
   }
 }
 
@@ -83,27 +94,27 @@ object Run {
     val filepath = new File("../data/lr_data.txt").getCanonicalPath
     val dataSourceParams = DataSourceParams(filepath, 3)
     val SGD = "SGD"
-    val algorithmParamsList = Seq((SGD, AlgorithmParams(stepSize = 0.1)),
-                                  (SGD, AlgorithmParams(stepSize = 0.2)),
-                                  (SGD, AlgorithmParams(stepSize = 0.4)))
+    val algorithmParamsList = Seq(
+      (SGD, AlgorithmParams(stepSize = 0.1)),
+      (SGD, AlgorithmParams(stepSize = 0.2)),
+      (SGD, AlgorithmParams(stepSize = 0.4)))
 
     Workflow.run(
-        dataSourceClassOpt = Some(classOf[ParallelDataSource]),
-        dataSourceParams = dataSourceParams,
-        preparatorClassOpt = Some(
-              classOf[IdentityPreparator[RDD[LabeledPoint]]]),
-        algorithmClassMapOpt = Some(Map(SGD -> classOf[ParallelSGDAlgorithm])),
-        algorithmParamsList = algorithmParamsList,
-        servingClassOpt = Some(LAverageServing(classOf[ParallelSGDAlgorithm])),
-        evaluatorClassOpt = Some(classOf[MeanSquareError]),
-        params = WorkflowParams(batch = "Imagine: Parallel Regression"))
+      dataSourceClassOpt = Some(classOf[ParallelDataSource]),
+      dataSourceParams = dataSourceParams,
+      preparatorClassOpt = Some(classOf[IdentityPreparator[RDD[LabeledPoint]]]),
+      algorithmClassMapOpt = Some(Map(SGD -> classOf[ParallelSGDAlgorithm])),
+      algorithmParamsList = algorithmParamsList,
+      servingClassOpt = Some(LAverageServing(classOf[ParallelSGDAlgorithm])),
+      evaluatorClassOpt = Some(classOf[MeanSquareError]),
+      params = WorkflowParams(batch = "Imagine: Parallel Regression")
+    )
   }
 }
 
 class VectorSerializer
-    extends CustomSerializer[Vector](
-        format =>
-          ({
+    extends CustomSerializer[Vector](format =>
+      ({
         case JArray(x) =>
           val v = x.toArray.map { y =>
             y match {

@@ -6,11 +6,19 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 import org.jetbrains.plugins.scala.codeInspection.collections.MethodRepr
 import org.jetbrains.plugins.scala.extensions.ResolvesTo
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, ScForStatement, ScInfixExpr, ScMethodCall}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScExpression,
+  ScForStatement,
+  ScInfixExpr,
+  ScMethodCall
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDefinition
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameter
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypingContext
+}
 
 /**
   * @author Nikolay.Tropin
@@ -21,19 +29,25 @@ class AddBreakoutQuickFix(expr: ScExpression) extends IntentionAction {
   override def getFamilyName: String = "Add `collection.breakOut`"
 
   override def invoke(
-      project: Project, editor: Editor, psiFile: PsiFile): Unit = {
+      project: Project,
+      editor: Editor,
+      psiFile: PsiFile): Unit = {
     def createWithClauses(text: String) =
       ScalaPsiElementFactory.createExpressionWithContextFromText(
-          text + "(collection.breakOut)", expr.getContext, expr)
+        text + "(collection.breakOut)",
+        expr.getContext,
+        expr)
 
     expr match {
       case mc: ScMethodCall =>
         mc.replaceExpression(
-            createWithClauses(mc.getText), removeParenthesis = true)
+          createWithClauses(mc.getText),
+          removeParenthesis = true)
       case inf: ScInfixExpr =>
         val equivCall = ScalaPsiElementFactory.createEquivMethodCall(inf)
         inf.replaceExpression(
-            createWithClauses(equivCall.getText), removeParenthesis = true)
+          createWithClauses(equivCall.getText),
+          removeParenthesis = true)
       case forStmt: ScForStatement =>
         val withClauses = createWithClauses(s"(${forStmt.getText})")
         forStmt.replaceExpression(withClauses, removeParenthesis = true)
@@ -44,7 +58,9 @@ class AddBreakoutQuickFix(expr: ScExpression) extends IntentionAction {
   override def startInWriteAction(): Boolean = true
 
   override def isAvailable(
-      project: Project, editor: Editor, psiFile: PsiFile): Boolean =
+      project: Project,
+      editor: Editor,
+      psiFile: PsiFile): Boolean =
     AddBreakoutQuickFix.isAvailable(expr)
 }
 
@@ -69,7 +85,7 @@ object AddBreakoutQuickFix {
     p.getType(TypingContext.empty) match {
       case Success(tpe, _)
           if tpe.canonicalText.startsWith(
-              "_root_.scala.collection.generic.CanBuildFrom") =>
+            "_root_.scala.collection.generic.CanBuildFrom") =>
         true
       case _ => false
     }

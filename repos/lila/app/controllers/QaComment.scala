@@ -15,12 +15,13 @@ object QaComment extends QaController {
       WithQuestion(id) { q =>
         implicit val req = ctx.body
         forms.comment.bindFromRequest.fold(
-            err => renderQuestion(q, None),
-            data =>
-              api.comment.create(data, Left(q), me) map { comment =>
-                Redirect(routes.QaQuestion.show(q.id, q.slug) + "#comment-" +
-                    comment.id)
-            }
+          err => renderQuestion(q, None),
+          data =>
+            api.comment.create(data, Left(q), me) map { comment =>
+              Redirect(
+                routes.QaQuestion.show(q.id, q.slug) + "#comment-" +
+                  comment.id)
+          }
         )
       }
     }
@@ -33,12 +34,13 @@ object QaComment extends QaController {
           case (Some(q), Some(a)) =>
             implicit val req = ctx.body
             forms.comment.bindFromRequest.fold(
-                err => renderQuestion(q, None),
-                data =>
-                  api.comment.create(data, Right(a), me) map { comment =>
-                    Redirect(routes.QaQuestion.show(q.id, q.slug) +
-                        "#comment-" + comment.id)
-                }
+              err => renderQuestion(q, None),
+              data =>
+                api.comment.create(data, Right(a), me) map { comment =>
+                  Redirect(
+                    routes.QaQuestion.show(q.id, q.slug) +
+                      "#comment-" + comment.id)
+              }
             )
           case _ => notFound
         }
@@ -48,7 +50,7 @@ object QaComment extends QaController {
   def remove(questionId: QuestionId, commentId: String) =
     Secure(_.ModerateQa) { implicit ctx => me =>
       api.comment.remove(questionId, commentId) inject Redirect(
-          routes.QaQuestion.show(questionId, "redirect"))
+        routes.QaQuestion.show(questionId, "redirect"))
     }
 
   private def IfCanComment(block: => Fu[Result])(implicit ctx: Context) =

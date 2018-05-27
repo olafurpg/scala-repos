@@ -5,7 +5,9 @@ import scala.pickling._, scala.pickling.Defaults._, binary._
 
 case class Person(val name: String, val age: Int)
 case class Philipp(
-    val nationality: String, val weird: Boolean, val mother: Person)
+    val nationality: String,
+    val weird: Boolean,
+    val mother: Person)
 
 class BinaryNonPrimitiveFieldsTest extends FunSuite {
   test("main") {

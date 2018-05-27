@@ -29,10 +29,10 @@ abstract class OptimizeImportsTestBase
 
     val filePath = folderPath + getTestName(false) + ".scala"
     val file = LocalFileSystem.getInstance.findFileByPath(
-        filePath.replace(File.separatorChar, '/'))
+      filePath.replace(File.separatorChar, '/'))
     assert(file != null, "file " + filePath + " not found")
-    val fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(
-            new File(file.getCanonicalPath), CharsetToolkit.UTF8))
+    val fileText = StringUtil.convertLineSeparators(
+      FileUtil.loadFile(new File(file.getCanonicalPath), CharsetToolkit.UTF8))
     configureFromFileTextAdapter(getTestName(false) + ".scala", fileText)
     val scalaFile = getFileAdapter.asInstanceOf[ScalaFile]
 
@@ -44,9 +44,9 @@ abstract class OptimizeImportsTestBase
         .getInstance(getProjectAdapter)
         .setSortImports(true)
     ScalaUtils.runWriteActionDoNotRequestConfirmation(
-        new ScalaImportOptimizer().processFile(scalaFile),
-        getProjectAdapter,
-        "Test")
+      new ScalaImportOptimizer().processFile(scalaFile),
+      getProjectAdapter,
+      "Test")
     res = scalaFile.getText.substring(0, lastPsi.getTextOffset).trim //getImportStatements.map(_.getText()).mkString("\n")
 
     lastPsi = scalaFile.findElementAt(scalaFile.getText.length - 1)

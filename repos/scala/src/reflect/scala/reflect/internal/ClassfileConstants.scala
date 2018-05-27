@@ -337,11 +337,13 @@ object ClassfileConstants {
     private def isAnnotation(flags: Int): Boolean =
       (flags & JAVA_ACC_ANNOTATION) != 0
     private def translateFlag(
-        jflag: Int, isAnnotation: Boolean, isClass: Boolean): Long =
+        jflag: Int,
+        isAnnotation: Boolean,
+        isClass: Boolean): Long =
       (jflag: @switch) match {
-        case JAVA_ACC_PRIVATE => PRIVATE
+        case JAVA_ACC_PRIVATE   => PRIVATE
         case JAVA_ACC_PROTECTED => PROTECTED
-        case JAVA_ACC_FINAL => FINAL
+        case JAVA_ACC_FINAL     => FINAL
         case JAVA_ACC_SYNTHETIC =>
           SYNTHETIC | ARTIFACT // maybe should be just artifact?
         case JAVA_ACC_STATIC => STATIC
@@ -349,12 +351,14 @@ object ClassfileConstants {
           if (isAnnotation) 0L else if (isClass) ABSTRACT else DEFERRED
         case JAVA_ACC_INTERFACE =>
           if (isAnnotation) 0L else TRAIT | INTERFACE | ABSTRACT
-        case JAVA_ACC_ENUM => JAVA_ENUM
+        case JAVA_ACC_ENUM       => JAVA_ENUM
         case JAVA_ACC_ANNOTATION => JAVA_ANNOTATION
-        case _ => 0L
+        case _                   => 0L
       }
     private def translateFlags(
-        jflags: Int, baseFlags: Long, isClass: Boolean): Long = {
+        jflags: Int,
+        baseFlags: Long,
+        isClass: Boolean): Long = {
       val isAnnot = isAnnotation(jflags)
       def translateFlag0(jflags: Int): Long =
         translateFlag(jflags, isAnnot, isClass)
@@ -376,15 +380,16 @@ object ClassfileConstants {
       translateFlags(jflags, 0, isClass = true)
     }
     def fieldFlags(jflags: Int): Long = {
-      translateFlags(jflags,
-                     if ((jflags & JAVA_ACC_FINAL) == 0) MUTABLE else 0,
-                     isClass = false)
+      translateFlags(
+        jflags,
+        if ((jflags & JAVA_ACC_FINAL) == 0) MUTABLE else 0,
+        isClass = false)
     }
     def methodFlags(jflags: Int): Long = {
       translateFlags(
-          jflags,
-          if ((jflags & JAVA_ACC_BRIDGE) != 0) BRIDGE | ARTIFACT else 0,
-          isClass = false)
+        jflags,
+        if ((jflags & JAVA_ACC_BRIDGE) != 0) BRIDGE | ARTIFACT else 0,
+        isClass = false)
     }
   }
   object FlagTranslation extends FlagTranslation {}

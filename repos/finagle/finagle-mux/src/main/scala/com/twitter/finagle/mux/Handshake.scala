@@ -27,8 +27,9 @@ private[finagle] object Handshake {
     * than mux `Message` types to more easily allow for features that need to
     * operate on the raw byte frame (e.g. compression, checksums, etc).
     */
-  type Negotiator = (Headers,
-  Transport[ChannelBuffer, ChannelBuffer]) => Transport[Message, Message]
+  type Negotiator = (
+      Headers,
+      Transport[ChannelBuffer, ChannelBuffer]) => Transport[Message, Message]
 
   /**
     * Returns Some(value) if `key` exists in `headers`, otherwise None.
@@ -61,9 +62,8 @@ private[finagle] object Handshake {
     * A noop negotiator returns a transport that ignores the headers and
     * encodes / decodes mux messages.
     */
-  val NoopNegotiator: Negotiator = (_, trans) =>
-    {
-      trans.map(Message.encode, Message.decode)
+  val NoopNegotiator: Negotiator = (_, trans) => {
+    trans.map(Message.encode, Message.decode)
   }
 
   /**
@@ -119,8 +119,7 @@ private[finagle] object Handshake {
         case Return(true) =>
           msgTrans.write(Message.Tinit(TinitTag, version, headers)).before {
             msgTrans.read().transform {
-              case Return(Message.Rinit(_, v, serverHeaders))
-                  if v == version =>
+              case Return(Message.Rinit(_, v, serverHeaders)) if v == version =>
                 Future(negotiate(serverHeaders, trans))
 
               case Return(Message.Rerr(_, msg)) =>
@@ -179,8 +178,7 @@ private[finagle] object Handshake {
     val handshake: Future[Transport[Message, Message]] =
       msgTrans.read().transform {
         // A Tinit with a matching version
-        case Return(Message.Tinit(tag, ver, clientHeaders))
-            if ver == version =>
+        case Return(Message.Tinit(tag, ver, clientHeaders)) if ver == version =>
           val hdrs = headers(clientHeaders)
           msgTrans.write(Message.Rinit(tag, version, hdrs)).before {
             Future(negotiate(hdrs, trans))
@@ -252,8 +250,8 @@ private class DeferredTransport(
 
   def status: Status = underlying.poll match {
     case Some(Return(t)) => t.status
-    case None => Status.Busy
-    case _ => Status.Closed
+    case None            => Status.Busy
+    case _               => Status.Closed
   }
 
   val onClose: Future[Throwable] = gate().flatMap(_.onClose)

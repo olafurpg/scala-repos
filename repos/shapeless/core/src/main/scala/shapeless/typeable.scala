@@ -32,8 +32,9 @@ trait Typeable[T] extends Serializable {
 }
 
 trait LowPriorityTypeable {
-  implicit def dfltTypeable[T]: Typeable[T] = macro TypeableMacros
-    .dfltTypeableImpl[T]
+  implicit def dfltTypeable[T]: Typeable[T] =
+    macro TypeableMacros
+      .dfltTypeableImpl[T]
 }
 
 /**
@@ -93,8 +94,8 @@ object Typeable extends TupleTypeableInstances with LowPriorityTypeable {
 
   def isValClass[T](clazz: Class[T]) =
     (classOf[jl.Number] isAssignableFrom clazz) ||
-    clazz == classOf[jl.Boolean] || clazz == classOf[jl.Character] ||
-    clazz == classOf[runtime.BoxedUnit]
+      clazz == classOf[jl.Boolean] || clazz == classOf[jl.Character] ||
+      clazz == classOf[runtime.BoxedUnit]
 
   /** Typeable instance for `Any`. */
   implicit val anyTypeable: Typeable[Any] = new Typeable[Any] {
@@ -125,7 +126,8 @@ object Typeable extends TupleTypeableInstances with LowPriorityTypeable {
     new Typeable[T] {
       def cast(t: Any): Option[T] = {
         if (t != null && erased.isAssignableFrom(t.getClass))
-          Some(t.asInstanceOf[T]) else None
+          Some(t.asInstanceOf[T])
+        else None
       }
       def describe = {
         // Workaround for https://issues.scala-lang.org/browse/SI-5425
@@ -148,7 +150,8 @@ object Typeable extends TupleTypeableInstances with LowPriorityTypeable {
 
   /** Typeable instance for singleton reference types */
   def referenceSingletonTypeable[T <: AnyRef](
-      value: T, name: String): Typeable[T] =
+      value: T,
+      name: String): Typeable[T] =
     new Typeable[T] {
       def cast(t: Any): Option[T] =
         if (t.asInstanceOf[AnyRef] eq value) Some(value) else None
@@ -160,7 +163,8 @@ object Typeable extends TupleTypeableInstances with LowPriorityTypeable {
     new Typeable[T] {
       def cast(t: Any): Option[T] = {
         if (t != null && parents.forall(_.cast(t).isDefined))
-          Some(t.asInstanceOf[T]) else None
+          Some(t.asInstanceOf[T])
+        else None
       }
       def describe = parents map (_.describe) mkString " with "
     }
@@ -257,7 +261,8 @@ object Typeable extends TupleTypeableInstances with LowPriorityTypeable {
 
   /** Typeable instance for polymorphic case classes with typeable elements */
   def caseClassTypeable[T](
-      erased: Class[T], fields: Array[Typeable[_]]): Typeable[T] =
+      erased: Class[T],
+      fields: Array[Typeable[_]]): Typeable[T] =
     new Typeable[T] {
       def cast(t: Any): Option[T] =
         if (classOf[Product].isAssignableFrom(erased) &&
@@ -292,14 +297,15 @@ object Typeable extends TupleTypeableInstances with LowPriorityTypeable {
 
   /** Typeable instance for `HList`s. Note that the contents will be tested for conformance to the element types. */
   implicit def hlistTypeable[H, T <: HList](
-      implicit castH: Typeable[H], castT: Typeable[T]): Typeable[H :: T] =
+      implicit castH: Typeable[H],
+      castT: Typeable[T]): Typeable[H :: T] =
     new Typeable[H :: T] {
       def cast(t: Any): Option[H :: T] = {
         if (t == null) None
         else if (t.isInstanceOf[::[_, _ <: HList]]) {
           val l = t.asInstanceOf[::[_, _ <: HList]]
-          for (hd <- l.head.cast[H]; tl <- (l.tail: Any).cast[T]) yield
-            t.asInstanceOf[H :: T]
+          for (hd <- l.head.cast[H]; tl <- (l.tail: Any).cast[T])
+            yield t.asInstanceOf[H :: T]
         } else None
       }
       def describe = s"${castH.describe} :: ${castT.describe}"
@@ -316,7 +322,8 @@ object Typeable extends TupleTypeableInstances with LowPriorityTypeable {
     * Note that the contents will be tested for conformance to one of the element types.
     */
   implicit def coproductTypeable[H, T <: Coproduct](
-      implicit castH: Typeable[H], castT: Typeable[T]): Typeable[H :+: T] =
+      implicit castH: Typeable[H],
+      castT: Typeable[T]): Typeable[H :+: T] =
     new Typeable[H :+: T] {
       def cast(t: Any): Option[H :+: T] = {
         t.cast[Inl[H, T]] orElse t.cast[Inr[H, T]]
@@ -378,7 +385,7 @@ class TypeableMacros(val c: blackbox.Context) extends SingletonTypeUtils {
   import internal._
   import definitions.NothingClass
 
-  def dfltTypeableImpl[T : WeakTypeTag]: Tree = {
+  def dfltTypeableImpl[T: WeakTypeTag]: Tree = {
     val tpe = weakTypeOf[T]
 
     val typeableTpe = typeOf[Typeable[_]].typeConstructor
@@ -397,8 +404,9 @@ class TypeableMacros(val c: blackbox.Context) extends SingletonTypeUtils {
         val normalizedTypeable =
           c.inferImplicitValue(appliedType(typeableTpe, List(normalized)))
         if (normalizedTypeable == EmptyTree)
-          c.abort(c.enclosingPosition,
-                  s"No default Typeable for parametrized type $tpe")
+          c.abort(
+            c.enclosingPosition,
+            s"No default Typeable for parametrized type $tpe")
         normalizedTypeable
 
       case SingletonSymbolType(c) =>
@@ -408,15 +416,17 @@ class TypeableMacros(val c: blackbox.Context) extends SingletonTypeUtils {
 
       case RefinedType(parents, decls) =>
         if (decls.nonEmpty)
-          c.abort(c.enclosingPosition,
-                  "No Typeable for a refinement with non-empty decls")
+          c.abort(
+            c.enclosingPosition,
+            "No Typeable for a refinement with non-empty decls")
         val parentTypeables = parents.filterNot(_ =:= typeOf[AnyRef]).map {
           parent =>
             c.inferImplicitValue(appliedType(typeableTpe, List(parent)))
         }
         if (parentTypeables.exists(_ == EmptyTree))
-          c.abort(c.enclosingPosition,
-                  "Missing Typeable for parent of a refinement")
+          c.abort(
+            c.enclosingPosition,
+            "Missing Typeable for parent of a refinement")
 
         q"""
           _root_.shapeless.Typeable.intersectionTypeable(
@@ -428,8 +438,9 @@ class TypeableMacros(val c: blackbox.Context) extends SingletonTypeUtils {
         val pSym = {
           val sym = pTpe.typeSymbol
           if (!sym.isClass)
-            c.abort(c.enclosingPosition,
-                    s"No default Typeable for parametrized type $tpe")
+            c.abort(
+              c.enclosingPosition,
+              s"No default Typeable for parametrized type $tpe")
 
           val pSym0 = sym.asClass
           pSym0.typeSignature // Workaround for <https://issues.scala-lang.org/browse/SI-7755>
@@ -438,8 +449,9 @@ class TypeableMacros(val c: blackbox.Context) extends SingletonTypeUtils {
         }
 
         if (!pSym.isCaseClass)
-          c.abort(c.enclosingPosition,
-                  s"No default Typeable for parametrized type $tpe")
+          c.abort(
+            c.enclosingPosition,
+            s"No default Typeable for parametrized type $tpe")
         val fields =
           tpe.decls.toList collect {
             case sym: TermSymbol if sym.isVal && sym.isCaseAccessor =>
@@ -449,8 +461,9 @@ class TypeableMacros(val c: blackbox.Context) extends SingletonTypeUtils {
           c.inferImplicitValue(appliedType(typeableTpe, List(field)))
         }
         if (fieldTypeables.exists(_ == EmptyTree))
-          c.abort(c.enclosingPosition,
-                  "Missing Typeable for field of a case class")
+          c.abort(
+            c.enclosingPosition,
+            "Missing Typeable for field of a case class")
 
         q"""
           _root_.shapeless.Typeable.caseClassTypeable(

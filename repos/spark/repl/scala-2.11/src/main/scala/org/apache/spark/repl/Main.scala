@@ -60,11 +60,11 @@ object Main extends Logging {
       .getOrElse("")
     val interpArguments =
       List(
-          "-Yrepl-class-based",
-          "-Yrepl-outdir",
-          s"${outputDir.getAbsolutePath}",
-          "-classpath",
-          jars
+        "-Yrepl-class-based",
+        "-Yrepl-outdir",
+        s"${outputDir.getAbsolutePath}",
+        "-classpath",
+        jars
       ) ++ args.toList
 
     val settings = new GenericRunnerSettings(scalaOptionError)

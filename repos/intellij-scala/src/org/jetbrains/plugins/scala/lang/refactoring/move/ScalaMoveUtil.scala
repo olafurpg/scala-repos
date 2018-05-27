@@ -7,11 +7,22 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiClass, PsiDirectory, PsiElement, PsiFile}
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.plugins.scala.actions.ScalaFileTemplateUtil
-import org.jetbrains.plugins.scala.conversion.copy.{Associations, ScalaCopyPastePostProcessor}
+import org.jetbrains.plugins.scala.conversion.copy.{
+  Associations,
+  ScalaCopyPastePostProcessor
+}
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject, ScTrait, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass,
+  ScObject,
+  ScTrait,
+  ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.api.{ScPackage, ScalaFile}
-import org.jetbrains.plugins.scala.lang.refactoring.util.{ScalaDirectoryService, ScalaNamesUtil}
+import org.jetbrains.plugins.scala.lang.refactoring.util.{
+  ScalaDirectoryService,
+  ScalaNamesUtil
+}
 
 import scala.collection.JavaConverters._
 
@@ -49,9 +60,10 @@ object ScalaMoveUtil {
     withSameName.isEmpty
   }
 
-  def doMoveClass(@NotNull aClass: PsiClass,
-                  @NotNull moveDestination: PsiDirectory,
-                  withCompanion: Boolean): PsiClass = {
+  def doMoveClass(
+      @NotNull aClass: PsiClass,
+      @NotNull moveDestination: PsiDirectory,
+      withCompanion: Boolean): PsiClass = {
     var fileWasDeleted: Boolean = false
     def deleteClass(aClass: PsiClass) = {
       aClass.getContainingFile match {
@@ -66,14 +78,15 @@ object ScalaMoveUtil {
       }
     }
     def moveClassInner(
-        aClass: PsiClass, moveDestination: PsiDirectory): PsiClass = {
+        aClass: PsiClass,
+        moveDestination: PsiDirectory): PsiClass = {
       var newClass: PsiClass = null
       (aClass, aClass.getContainingFile) match {
         case (td: ScTypeDefinition, file: ScalaFile) =>
           val fileWithOldFileName = moveDestination.findFile(file.getName)
           val className = td.name
           val fileWithClassName = moveDestination.findFile(
-              className + "." + ScalaFileType.DEFAULT_EXTENSION)
+            className + "." + ScalaFileType.DEFAULT_EXTENSION)
           // moving second of two classes which were in the same file to a different directory (IDEADEV-3089)
           if (moveDestination != file.getContainingDirectory &&
               fileWithOldFileName != null && classCanBeAdded(file, aClass)) {
@@ -89,16 +102,16 @@ object ScalaMoveUtil {
           //create new file with template
           else {
             val template: String = td match {
-              case _: ScClass => ScalaFileTemplateUtil.SCALA_CLASS
-              case _: ScTrait => ScalaFileTemplateUtil.SCALA_TRAIT
+              case _: ScClass  => ScalaFileTemplateUtil.SCALA_CLASS
+              case _: ScTrait  => ScalaFileTemplateUtil.SCALA_TRAIT
               case _: ScObject => ScalaFileTemplateUtil.SCALA_OBJECT
             }
             val created: PsiClass =
               ScalaDirectoryService.createClassFromTemplate(
-                  moveDestination,
-                  td.name,
-                  template,
-                  askToDefineVariables = false)
+                moveDestination,
+                td.name,
+                template,
+                askToDefineVariables = false)
             if (td.getDocComment == null) {
               val createdDocComment: PsiDocComment = created.getDocComment
               if (createdDocComment != null) {
@@ -127,13 +140,14 @@ object ScalaMoveUtil {
     def collectData(clazz: PsiClass, file: ScalaFile) {
       val range: TextRange = clazz.getTextRange
       val associations = PROCESSOR.collectTransferableData(
-          file,
-          null,
-          Array[Int](range.getStartOffset),
-          Array[Int](range.getEndOffset))
-      clazz.putCopyableUserData(ASSOCIATIONS_KEY,
-                                if (associations.isEmpty) null
-                                else associations.get(0))
+        file,
+        null,
+        Array[Int](range.getStartOffset),
+        Array[Int](range.getEndOffset))
+      clazz.putCopyableUserData(
+        ASSOCIATIONS_KEY,
+        if (associations.isEmpty) null
+        else associations.get(0))
     }
     val alreadyMoved =
       getMoveDestination(aClass) == aClass.getContainingFile.getContainingDirectory
@@ -154,10 +168,11 @@ object ScalaMoveUtil {
         clazz.getCopyableUserData(ASSOCIATIONS_KEY)
       if (associations != null) {
         try {
-          PROCESSOR.restoreAssociations(associations,
-                                        clazz.getContainingFile,
-                                        clazz.getTextRange.getStartOffset,
-                                        clazz.getProject)
+          PROCESSOR.restoreAssociations(
+            associations,
+            clazz.getContainingFile,
+            clazz.getTextRange.getStartOffset,
+            clazz.getProject)
         } finally {
           clazz.putCopyableUserData(ASSOCIATIONS_KEY, null)
         }
@@ -172,24 +187,26 @@ object ScalaMoveUtil {
     aClass.getCopyableUserData(ASSOCIATIONS_KEY) match {
       case null =>
       case as: Associations =>
-        as.associations.foreach(
-            a => a.range = a.range.shiftRight(offsetChange))
+        as.associations.foreach(a => a.range = a.range.shiftRight(offsetChange))
     }
   }
 
   def saveMoveDestination(
-      @NotNull element: PsiElement, moveDestination: PsiDirectory) = {
+      @NotNull element: PsiElement,
+      moveDestination: PsiDirectory) = {
     val classes = element match {
-      case c: PsiClass => Seq(c)
+      case c: PsiClass  => Seq(c)
       case f: ScalaFile => f.typeDefinitions
       case p: ScPackage => p.getClasses.toSeq
-      case _ => Nil
+      case _            => Nil
     }
-    classes.flatMap {
-      case td: ScTypeDefinition =>
-        td :: ScalaPsiUtil.getBaseCompanionModule(td).toList
-      case e => List(e)
-    }.foreach(_.putUserData(MOVE_DESTINATION, moveDestination))
+    classes
+      .flatMap {
+        case td: ScTypeDefinition =>
+          td :: ScalaPsiUtil.getBaseCompanionModule(td).toList
+        case e => List(e)
+      }
+      .foreach(_.putUserData(MOVE_DESTINATION, moveDestination))
   }
 
   def getMoveDestination(@NotNull element: PsiElement): PsiDirectory =

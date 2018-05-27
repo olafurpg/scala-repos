@@ -5,6 +5,6 @@ object Temp {
   val b: A = B(5, 3.3)
   b match {
     case B(x, y) => Console.println(y)
-    case A(x) => Console.println(x)
+    case A(x)    => Console.println(x)
   }
 }

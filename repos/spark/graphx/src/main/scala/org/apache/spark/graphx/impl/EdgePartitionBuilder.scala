@@ -21,12 +21,15 @@ import scala.reflect.ClassTag
 
 import org.apache.spark.graphx._
 import org.apache.spark.graphx.util.collection.GraphXPrimitiveKeyOpenHashMap
-import org.apache.spark.util.collection.{PrimitiveVector, SortDataFormat, Sorter}
+import org.apache.spark.util.collection.{
+  PrimitiveVector,
+  SortDataFormat,
+  Sorter
+}
 
 /** Constructs an EdgePartition from scratch. */
-private[graphx] class EdgePartitionBuilder[
-    @specialized(Long, Int, Double) ED : ClassTag, VD : ClassTag](
-    size: Int = 64) {
+private[graphx] class EdgePartitionBuilder[@specialized(Long, Int, Double) ED: ClassTag,
+VD: ClassTag](size: Int = 64) {
   private[this] val edges = new PrimitiveVector[Edge[ED]](size)
 
   /** Add a new edge to the partition. */
@@ -71,14 +74,15 @@ private[graphx] class EdgePartitionBuilder[
       }
       vertexAttrs = new Array[VD](currLocalId + 1)
     }
-    new EdgePartition(localSrcIds,
-                      localDstIds,
-                      data,
-                      index,
-                      global2local,
-                      local2global.trim().array,
-                      vertexAttrs,
-                      None)
+    new EdgePartition(
+      localSrcIds,
+      localDstIds,
+      data,
+      index,
+      global2local,
+      local2global.trim().array,
+      vertexAttrs,
+      None)
   }
 }
 
@@ -87,7 +91,8 @@ private[graphx] class EdgePartitionBuilder[
   * reuse of the local vertex ids. Intended for internal use in EdgePartition only.
   */
 private[impl] class ExistingEdgePartitionBuilder[
-    @specialized(Long, Int, Double) ED : ClassTag, VD : ClassTag](
+    @specialized(Long, Int, Double) ED: ClassTag,
+    VD: ClassTag](
     global2local: GraphXPrimitiveKeyOpenHashMap[VertexId, Int],
     local2global: Array[VertexId],
     vertexAttrs: Array[VD],
@@ -103,7 +108,10 @@ private[impl] class ExistingEdgePartitionBuilder[
   def toEdgePartition: EdgePartition[ED, VD] = {
     val edgeArray = edges.trim().array
     new Sorter(EdgeWithLocalIds.edgeArraySortDataFormat[ED]).sort(
-        edgeArray, 0, edgeArray.length, EdgeWithLocalIds.lexicographicOrdering)
+      edgeArray,
+      0,
+      edgeArray.length,
+      EdgeWithLocalIds.lexicographicOrdering)
     val localSrcIds = new Array[Int](edgeArray.length)
     val localDstIds = new Array[Int](edgeArray.length)
     val data = new Array[ED](edgeArray.length)
@@ -126,28 +134,31 @@ private[impl] class ExistingEdgePartitionBuilder[
       }
     }
 
-    new EdgePartition(localSrcIds,
-                      localDstIds,
-                      data,
-                      index,
-                      global2local,
-                      local2global,
-                      vertexAttrs,
-                      activeSet)
+    new EdgePartition(
+      localSrcIds,
+      localDstIds,
+      data,
+      index,
+      global2local,
+      local2global,
+      vertexAttrs,
+      activeSet)
   }
 }
 
-private[impl] case class EdgeWithLocalIds[@specialized ED](srcId: VertexId,
-                                                           dstId: VertexId,
-                                                           localSrcId: Int,
-                                                           localDstId: Int,
-                                                           attr: ED)
+private[impl] case class EdgeWithLocalIds[@specialized ED](
+    srcId: VertexId,
+    dstId: VertexId,
+    localSrcId: Int,
+    localDstId: Int,
+    attr: ED)
 
 private[impl] object EdgeWithLocalIds {
   implicit def lexicographicOrdering[ED]: Ordering[EdgeWithLocalIds[ED]] =
     new Ordering[EdgeWithLocalIds[ED]] {
       override def compare(
-          a: EdgeWithLocalIds[ED], b: EdgeWithLocalIds[ED]): Int = {
+          a: EdgeWithLocalIds[ED],
+          b: EdgeWithLocalIds[ED]): Int = {
         if (a.srcId == b.srcId) {
           if (a.dstId == b.dstId) 0
           else if (a.dstId < b.dstId) -1
@@ -159,30 +170,35 @@ private[impl] object EdgeWithLocalIds {
 
   private[graphx] def edgeArraySortDataFormat[ED] = {
     new SortDataFormat[EdgeWithLocalIds[ED], Array[EdgeWithLocalIds[ED]]] {
-      override def getKey(data: Array[EdgeWithLocalIds[ED]],
-                          pos: Int): EdgeWithLocalIds[ED] = {
+      override def getKey(
+          data: Array[EdgeWithLocalIds[ED]],
+          pos: Int): EdgeWithLocalIds[ED] = {
         data(pos)
       }
 
       override def swap(
-          data: Array[EdgeWithLocalIds[ED]], pos0: Int, pos1: Int): Unit = {
+          data: Array[EdgeWithLocalIds[ED]],
+          pos0: Int,
+          pos1: Int): Unit = {
         val tmp = data(pos0)
         data(pos0) = data(pos1)
         data(pos1) = tmp
       }
 
-      override def copyElement(src: Array[EdgeWithLocalIds[ED]],
-                               srcPos: Int,
-                               dst: Array[EdgeWithLocalIds[ED]],
-                               dstPos: Int) {
+      override def copyElement(
+          src: Array[EdgeWithLocalIds[ED]],
+          srcPos: Int,
+          dst: Array[EdgeWithLocalIds[ED]],
+          dstPos: Int) {
         dst(dstPos) = src(srcPos)
       }
 
-      override def copyRange(src: Array[EdgeWithLocalIds[ED]],
-                             srcPos: Int,
-                             dst: Array[EdgeWithLocalIds[ED]],
-                             dstPos: Int,
-                             length: Int) {
+      override def copyRange(
+          src: Array[EdgeWithLocalIds[ED]],
+          srcPos: Int,
+          dst: Array[EdgeWithLocalIds[ED]],
+          dstPos: Int,
+          length: Int) {
         System.arraycopy(src, srcPos, dst, dstPos, length)
       }
 

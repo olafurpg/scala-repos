@@ -23,7 +23,8 @@ object SCL6507 {
     val myProduct = MyProduct("one", 2)
     (myProduct, myProduct) match {
       case (MyProduct(one, two), MyProduct2(three, four)) =>
-        /*start*/ (one, two, three, four) /*end*/
+        /*start*/
+        (one, two, three, four) /*end*/
     }
   }
 }

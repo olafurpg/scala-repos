@@ -42,11 +42,12 @@ object StackedAreaChart {
   def apply[X, Y](xAxis: Axis[X], yAxis: Axis[Y]) =
     new StackedAreaChart[X, Y](new jfxsc.StackedAreaChart[X, Y](xAxis, yAxis))
 
-  def apply[X, Y](xAxis: Axis[X],
-                  yAxis: Axis[Y],
-                  data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) =
+  def apply[X, Y](
+      xAxis: Axis[X],
+      yAxis: Axis[Y],
+      data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) =
     new StackedAreaChart[X, Y](
-        new jfxsc.StackedAreaChart[X, Y](xAxis, yAxis, data))
+      new jfxsc.StackedAreaChart[X, Y](xAxis, yAxis, data))
 }
 
 class StackedAreaChart[X, Y](
@@ -58,9 +59,10 @@ class StackedAreaChart[X, Y](
     this(new jfxsc.StackedAreaChart[X, Y](xAxis, yAxis))
   }
 
-  def this(xAxis: Axis[X],
-           yAxis: Axis[Y],
-           data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) {
+  def this(
+      xAxis: Axis[X],
+      yAxis: Axis[Y],
+      data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) {
     this(new jfxsc.StackedAreaChart[X, Y](xAxis, yAxis, data))
   }
 

@@ -43,9 +43,9 @@ object SimpleApp {
 
     // Regression test for SPARK-1167: Remove metrics-ganglia from default build due to LGPL issue
     val foundConsole = Try(
-        Class.forName("org.apache.spark.metrics.sink.ConsoleSink")).isSuccess
+      Class.forName("org.apache.spark.metrics.sink.ConsoleSink")).isSuccess
     val foundGanglia = Try(
-        Class.forName("org.apache.spark.metrics.sink.GangliaSink")).isSuccess
+      Class.forName("org.apache.spark.metrics.sink.GangliaSink")).isSuccess
     if (!foundConsole) {
       println("Console sink not loaded via spark-core")
       System.exit(-1)
@@ -56,8 +56,9 @@ object SimpleApp {
     }
 
     // Remove kinesis from default build due to ASL license issue
-    val foundKinesis = Try(Class.forName(
-            "org.apache.spark.streaming.kinesis.KinesisUtils")).isSuccess
+    val foundKinesis = Try(
+      Class
+        .forName("org.apache.spark.streaming.kinesis.KinesisUtils")).isSuccess
     if (foundKinesis) {
       println("Kinesis was loaded via spark-core")
       System.exit(-1)

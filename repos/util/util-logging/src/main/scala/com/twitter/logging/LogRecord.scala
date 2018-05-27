@@ -67,7 +67,7 @@ class LogRecord(level: javalog.Level, msg: String)
 
     val (cName, mName) = elt match {
       case Some(element) => (element.getClassName, element.getMethodName)
-      case None => (super.getSourceClassName, super.getSourceMethodName)
+      case None          => (super.getSourceClassName, super.getSourceMethodName)
     }
     setSourceMethodName(mName)
     setSourceClassName(cName)

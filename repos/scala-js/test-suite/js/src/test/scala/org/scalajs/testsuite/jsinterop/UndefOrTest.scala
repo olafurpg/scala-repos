@@ -127,12 +127,10 @@ class UndefOrTest {
     assertEquals("ok", some("hello") collect {
       case "hello" => "ok"
     })
-    assertTrue(
-        js.isUndefined(some("hello") collect {
+    assertTrue(js.isUndefined(some("hello") collect {
       case "notthis" => "ko"
     }))
-    assertTrue(
-        js.isUndefined(none[String] collect {
+    assertTrue(js.isUndefined(none[String] collect {
       case "hello" => "ko"
     }))
   }

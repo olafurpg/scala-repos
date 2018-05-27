@@ -39,17 +39,19 @@ trait ConfigHandler {
   * The callback provides the topic name and the full properties set read from ZK
   */
 class TopicConfigHandler(
-    private val logManager: LogManager, kafkaConfig: KafkaConfig)
-    extends ConfigHandler with Logging {
+    private val logManager: LogManager,
+    kafkaConfig: KafkaConfig)
+    extends ConfigHandler
+    with Logging {
 
   def processConfigChanges(topic: String, topicConfig: Properties) {
     // Validate the compatibility of message format version.
     val configNameToExclude = Option(
-        topicConfig.getProperty(LogConfig.MessageFormatVersionProp)).flatMap {
+      topicConfig.getProperty(LogConfig.MessageFormatVersionProp)).flatMap {
       versionString =>
         if (kafkaConfig.interBrokerProtocolVersion < ApiVersion(versionString)) {
           warn(
-              s"Log configuration ${LogConfig.MessageFormatVersionProp} is ignored for `$topic` because `$versionString` " +
+            s"Log configuration ${LogConfig.MessageFormatVersionProp} is ignored for `$topic` because `$versionString` " +
               s"is not compatible with Kafka inter-broker protocol version `${kafkaConfig.interBrokerProtocolVersionString}`")
           Some(LogConfig.MessageFormatVersionProp)
         } else None
@@ -90,20 +92,22 @@ class ClientIdConfigHandler(
   def processConfigChanges(clientId: String, clientConfig: Properties) = {
     if (clientConfig.containsKey(ClientConfigOverride.ProducerOverride)) {
       quotaManagers(ApiKeys.PRODUCE.id).updateQuota(
-          clientId,
-          new Quota(clientConfig
-                      .getProperty(ClientConfigOverride.ProducerOverride)
-                      .toLong,
-                    true))
+        clientId,
+        new Quota(
+          clientConfig
+            .getProperty(ClientConfigOverride.ProducerOverride)
+            .toLong,
+          true))
     }
 
     if (clientConfig.containsKey(ClientConfigOverride.ConsumerOverride)) {
       quotaManagers(ApiKeys.FETCH.id).updateQuota(
-          clientId,
-          new Quota(clientConfig
-                      .getProperty(ClientConfigOverride.ConsumerOverride)
-                      .toLong,
-                    true))
+        clientId,
+        new Quota(
+          clientConfig
+            .getProperty(ClientConfigOverride.ConsumerOverride)
+            .toLong,
+          true))
     }
   }
 }

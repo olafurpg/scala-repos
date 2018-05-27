@@ -12,33 +12,39 @@ import org.jetbrains.plugins.scala.lang.refactoring.extractTrait.ScalaExtractTra
 abstract class ExtractTraitTestBase
     extends ScalaLightPlatformCodeInsightTestCaseAdapter {
 
-  def checkResult(fileText: String,
-                  expectedText: String,
-                  onlyDeclarations: Boolean,
-                  onlyFirstMember: Boolean = false) {
+  def checkResult(
+      fileText: String,
+      expectedText: String,
+      onlyDeclarations: Boolean,
+      onlyFirstMember: Boolean = false) {
     configureFromFileTextAdapter(
-        "dummy.scala", fileText.replace("\r", "").stripMargin.trim)
-    new ScalaExtractTraitHandler().testInvoke(getProjectAdapter,
-                                              getEditorAdapter,
-                                              getFileAdapter,
-                                              onlyDeclarations,
-                                              onlyFirstMember)
+      "dummy.scala",
+      fileText.replace("\r", "").stripMargin.trim)
+    new ScalaExtractTraitHandler().testInvoke(
+      getProjectAdapter,
+      getEditorAdapter,
+      getFileAdapter,
+      onlyDeclarations,
+      onlyFirstMember)
     UsefulTestCase.doPostponedFormatting(getProjectAdapter)
     checkResultByText(expectedText.replace("\r", "").stripMargin.trim)
   }
 
-  def checkException(fileText: String,
-                     messageText: String,
-                     onlyDeclarations: Boolean,
-                     onlyFirstMember: Boolean) {
+  def checkException(
+      fileText: String,
+      messageText: String,
+      onlyDeclarations: Boolean,
+      onlyFirstMember: Boolean) {
     configureFromFileTextAdapter(
-        "dummy.scala", fileText.replace("\r", "").stripMargin.trim)
+      "dummy.scala",
+      fileText.replace("\r", "").stripMargin.trim)
     try {
-      new ScalaExtractTraitHandler().testInvoke(getProjectAdapter,
-                                                getEditorAdapter,
-                                                getFileAdapter,
-                                                onlyDeclarations,
-                                                onlyFirstMember)
+      new ScalaExtractTraitHandler().testInvoke(
+        getProjectAdapter,
+        getEditorAdapter,
+        getFileAdapter,
+        onlyDeclarations,
+        onlyFirstMember)
       assert(assertion = false, "Exception was not thrown")
     } catch {
       case e: Exception => assert(messageText == e.getMessage)

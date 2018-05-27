@@ -46,9 +46,10 @@ class DefaultSource extends FileFormat with DataSourceRegister {
 
   override def equals(other: Any): Boolean = other.isInstanceOf[DefaultSource]
 
-  override def inferSchema(sqlContext: SQLContext,
-                           options: Map[String, String],
-                           files: Seq[FileStatus]): Option[StructType] = {
+  override def inferSchema(
+      sqlContext: SQLContext,
+      options: Map[String, String],
+      files: Seq[FileStatus]): Option[StructType] = {
     val csvOptions = new CSVOptions(options)
 
     // TODO: Move filtering.
@@ -79,10 +80,11 @@ class DefaultSource extends FileFormat with DataSourceRegister {
     Some(schema)
   }
 
-  override def prepareWrite(sqlContext: SQLContext,
-                            job: Job,
-                            options: Map[String, String],
-                            dataSchema: StructType): OutputWriterFactory = {
+  override def prepareWrite(
+      sqlContext: SQLContext,
+      job: Job,
+      options: Map[String, String],
+      dataSchema: StructType): OutputWriterFactory = {
     val conf = job.getConfiguration
     val csvOptions = new CSVOptions(options)
     csvOptions.compressionCodec.foreach { codec =>
@@ -114,31 +116,34 @@ class DefaultSource extends FileFormat with DataSourceRegister {
     val pathsString = csvFiles.map(_.getPath.toUri.toString)
     val header = dataSchema.fields.map(_.name)
     val tokenizedRdd = tokenRdd(sqlContext, csvOptions, header, pathsString)
-    val rows = CSVRelation.parseCsv(tokenizedRdd,
-                                    dataSchema,
-                                    requiredColumns,
-                                    csvFiles,
-                                    sqlContext,
-                                    csvOptions)
+    val rows = CSVRelation.parseCsv(
+      tokenizedRdd,
+      dataSchema,
+      requiredColumns,
+      csvFiles,
+      sqlContext,
+      csvOptions)
 
     val requiredDataSchema = StructType(
-        requiredColumns.map(c => dataSchema.find(_.name == c).get))
+      requiredColumns.map(c => dataSchema.find(_.name == c).get))
     rows.mapPartitions { iterator =>
       val unsafeProjection = UnsafeProjection.create(requiredDataSchema)
       iterator.map(unsafeProjection)
     }
   }
 
-  private def baseRdd(sqlContext: SQLContext,
-                      options: CSVOptions,
-                      inputPaths: Seq[String]): RDD[String] = {
+  private def baseRdd(
+      sqlContext: SQLContext,
+      options: CSVOptions,
+      inputPaths: Seq[String]): RDD[String] = {
     readText(sqlContext, options, inputPaths.mkString(","))
   }
 
-  private def tokenRdd(sqlContext: SQLContext,
-                       options: CSVOptions,
-                       header: Array[String],
-                       inputPaths: Seq[String]): RDD[Array[String]] = {
+  private def tokenRdd(
+      sqlContext: SQLContext,
+      options: CSVOptions,
+      header: Array[String],
+      inputPaths: Seq[String]): RDD[Array[String]] = {
     val rdd = baseRdd(sqlContext, options, inputPaths)
     // Make sure firstLine is materialized before sending to executors
     val firstLine =
@@ -152,19 +157,24 @@ class DefaultSource extends FileFormat with DataSourceRegister {
   private def findFirstLine(options: CSVOptions, rdd: RDD[String]): String = {
     if (options.isCommentSet) {
       val comment = options.comment.toString
-      rdd.filter { line =>
-        line.trim.nonEmpty && !line.startsWith(comment)
-      }.first()
+      rdd
+        .filter { line =>
+          line.trim.nonEmpty && !line.startsWith(comment)
+        }
+        .first()
     } else {
-      rdd.filter { line =>
-        line.trim.nonEmpty
-      }.first()
+      rdd
+        .filter { line =>
+          line.trim.nonEmpty
+        }
+        .first()
     }
   }
 
-  private def readText(sqlContext: SQLContext,
-                       options: CSVOptions,
-                       location: String): RDD[String] = {
+  private def readText(
+      sqlContext: SQLContext,
+      options: CSVOptions,
+      location: String): RDD[String] = {
     if (Charset.forName(options.charset) == StandardCharsets.UTF_8) {
       sqlContext.sparkContext.textFile(location)
     } else {
@@ -172,7 +182,7 @@ class DefaultSource extends FileFormat with DataSourceRegister {
       sqlContext.sparkContext
         .hadoopFile[LongWritable, Text, TextInputFormat](location)
         .mapPartitions(_.map(pair =>
-                  new String(pair._2.getBytes, 0, pair._2.getLength, charset)))
+          new String(pair._2.getBytes, 0, pair._2.getLength, charset)))
     }
   }
 }

@@ -10,12 +10,13 @@ import org.apache.mesos.SchedulerDriver
 import scala.collection.mutable
 import scala.concurrent.Promise
 
-class TaskKillActor(val driver: SchedulerDriver,
-                    val appId: PathId,
-                    val taskTracker: TaskTracker,
-                    val eventBus: EventStream,
-                    tasksToKill: Iterable[Task.Id],
-                    val promise: Promise[Unit])
+class TaskKillActor(
+    val driver: SchedulerDriver,
+    val appId: PathId,
+    val taskTracker: TaskTracker,
+    val eventBus: EventStream,
+    tasksToKill: Iterable[Task.Id],
+    val promise: Promise[Unit])
     extends StoppingBehavior {
 
   override var idsToKill = tasksToKill.to[mutable.Set]
@@ -29,13 +30,20 @@ class TaskKillActor(val driver: SchedulerDriver,
 }
 
 object TaskKillActor {
-  def props(driver: SchedulerDriver,
-            appId: PathId,
-            taskTracker: TaskTracker,
-            eventBus: EventStream,
-            tasksToKill: Iterable[Task.Id],
-            promise: Promise[Unit]): Props = {
-    Props(new TaskKillActor(
-            driver, appId, taskTracker, eventBus, tasksToKill, promise))
+  def props(
+      driver: SchedulerDriver,
+      appId: PathId,
+      taskTracker: TaskTracker,
+      eventBus: EventStream,
+      tasksToKill: Iterable[Task.Id],
+      promise: Promise[Unit]): Props = {
+    Props(
+      new TaskKillActor(
+        driver,
+        appId,
+        taskTracker,
+        eventBus,
+        tasksToKill,
+        promise))
   }
 }

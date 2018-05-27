@@ -88,7 +88,7 @@ abstract class StreamingLinearAlgorithm[
   def trainOn(data: DStream[LabeledPoint]): Unit = {
     if (model.isEmpty) {
       throw new IllegalArgumentException(
-          "Model must be initialized before starting training.")
+        "Model must be initialized before starting training.")
     }
     data.foreachRDD { (rdd, time) =>
       if (!rdd.isEmpty) {
@@ -121,7 +121,7 @@ abstract class StreamingLinearAlgorithm[
   def predictOn(data: DStream[Vector]): DStream[Double] = {
     if (model.isEmpty) {
       throw new IllegalArgumentException(
-          "Model must be initialized before starting prediction.")
+        "Model must be initialized before starting prediction.")
     }
     data.map { x =>
       model.get.predict(x)
@@ -135,7 +135,7 @@ abstract class StreamingLinearAlgorithm[
   @Since("1.3.0")
   def predictOn(data: JavaDStream[Vector]): JavaDStream[java.lang.Double] = {
     JavaDStream.fromDStream(
-        predictOn(data.dstream).asInstanceOf[DStream[java.lang.Double]])
+      predictOn(data.dstream).asInstanceOf[DStream[java.lang.Double]])
   }
 
   /**
@@ -146,11 +146,11 @@ abstract class StreamingLinearAlgorithm[
     *
     */
   @Since("1.1.0")
-  def predictOnValues[K : ClassTag](
+  def predictOnValues[K: ClassTag](
       data: DStream[(K, Vector)]): DStream[(K, Double)] = {
     if (model.isEmpty) {
       throw new IllegalArgumentException(
-          "Model must be initialized before starting prediction")
+        "Model must be initialized before starting prediction")
     }
     data.mapValues { x =>
       model.get.predict(x)
@@ -165,7 +165,8 @@ abstract class StreamingLinearAlgorithm[
   def predictOnValues[K](data: JavaPairDStream[K, Vector])
     : JavaPairDStream[K, java.lang.Double] = {
     implicit val tag = fakeClassTag[K]
-    JavaPairDStream.fromPairDStream(predictOnValues(data.dstream)
-          .asInstanceOf[DStream[(K, java.lang.Double)]])
+    JavaPairDStream.fromPairDStream(
+      predictOnValues(data.dstream)
+        .asInstanceOf[DStream[(K, java.lang.Double)]])
   }
 }

@@ -24,22 +24,23 @@ object LilaCookie {
 
   def newSession(implicit req: RequestHeader): Cookie = withSession(identity)
 
-  def withSession(op: Session => Session)(
-      implicit req: RequestHeader): Cookie = cookie(
+  def withSession(op: Session => Session)(implicit req: RequestHeader): Cookie =
+    cookie(
       Session.COOKIE_NAME,
       Session.encode(Session.serialize(op(req.session)))
-  )
+    )
 
   def cookie(
       name: String,
       value: String,
       maxAge: Option[Int] = None,
       httpOnly: Option[Boolean] = None)(implicit req: RequestHeader): Cookie =
-    Cookie(name,
-           value,
-           maxAge orElse Session.maxAge orElse 86400.some,
-           "/",
-           domain(req).some,
-           Session.secure,
-           httpOnly | Session.httpOnly)
+    Cookie(
+      name,
+      value,
+      maxAge orElse Session.maxAge orElse 86400.some,
+      "/",
+      domain(req).some,
+      Session.secure,
+      httpOnly | Session.httpOnly)
 }

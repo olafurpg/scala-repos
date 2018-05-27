@@ -51,24 +51,26 @@ trait Loc[T] {
     * When the menu item is displayed, what CSS class do we add to the
     * node?
     */
-  def cssClassForMenuItem: Box[String] = cacheCssClassForMenuItem.map(_ ())
+  def cssClassForMenuItem: Box[String] = cacheCssClassForMenuItem.map(_())
 
   /**
     * By default, this lazy val looks for the MenuCssClass LocParam and
     * uses it.
     */
   protected lazy val cacheCssClassForMenuItem: Box[() => String] =
-    allParams.flatMap {
-      case a: Loc.MenuCssClass => List(a)
-      case _ => Nil
-    }.headOption.map(_.cssClass.func)
+    allParams
+      .flatMap {
+        case a: Loc.MenuCssClass => List(a)
+        case _                   => Nil
+      }
+      .headOption
+      .map(_.cssClass.func)
 
   /**
     * Given a value calculate the HREF to this item
     */
   def calcHref(in: T): String =
-    appendQueryParameters(link.createPath(in),
-                          Full(in))
+    appendQueryParameters(link.createPath(in), Full(in))
 
   /**
     * Calculate HREF to this item using currentValue
@@ -105,7 +107,7 @@ trait Loc[T] {
     * Calculate the Query parameters
     */
   def queryParameters(what: Box[T]): List[(String, String)] =
-    addlQueryParams.flatMap(_ ()) ::: calcQueryParams.flatMap(_ (what))
+    addlQueryParams.flatMap(_()) ::: calcQueryParams.flatMap(_(what))
 
   protected def appendQueryParams(what: T)(nodeSeq: NodeSeq): NodeSeq =
     Text(appendQueryParameters(nodeSeq.text, Full(what)))
@@ -130,7 +132,8 @@ trait Loc[T] {
   def params: List[Loc.LocParam[T]]
 
   def allParams: List[Loc.AnyLocParam] =
-    (params.asInstanceOf[List[Loc.AnyLocParam]]) ::: parentParams ::: siteMap.globalParams
+    (params
+      .asInstanceOf[List[Loc.AnyLocParam]]) ::: parentParams ::: siteMap.globalParams
 
   private def parentParams: List[Loc.AnyLocParam] =
     _menu match {
@@ -172,27 +175,27 @@ trait Loc[T] {
   override def toString =
     "Loc(" + name + ", " + link + ", " + text + ", " + params + ")"
 
-  type LocRewrite = Box[PartialFunction[
-          RewriteRequest, (RewriteResponse, Box[T])]]
+  type LocRewrite =
+    Box[PartialFunction[RewriteRequest, (RewriteResponse, Box[T])]]
 
   def rewrite: LocRewrite = Empty
 
   def rewritePF: Box[LiftRules.RewritePF] = rewrite.map(
-      rw =>
-        new NamedPartialFunction[RewriteRequest, RewriteResponse] {
-          def functionName = rw match {
-            case rw: NamedPartialFunction[_, _] => rw.functionName
-            case _ => "Unnamed"
-          }
+    rw =>
+      new NamedPartialFunction[RewriteRequest, RewriteResponse] {
+        def functionName = rw match {
+          case rw: NamedPartialFunction[_, _] => rw.functionName
+          case _                              => "Unnamed"
+        }
 
-          def isDefinedAt(in: RewriteRequest) = rw.isDefinedAt(in)
+        def isDefinedAt(in: RewriteRequest) = rw.isDefinedAt(in)
 
-          def apply(in: RewriteRequest): RewriteResponse = {
-            val (ret, param) = rw.apply(in)
-            requestValue.set(param)
-            ret
-          }
-      }
+        def apply(in: RewriteRequest): RewriteResponse = {
+          val (ret, param) = rw.apply(in)
+          requestValue.set(param)
+          ret
+        }
+    }
   )
 
   /**
@@ -228,14 +231,14 @@ trait Loc[T] {
   protected def calcStateless(): Boolean =
     allParams.find {
       case Loc.Stateless => true
-      case _ => false
+      case _             => false
     }.isDefined
 
   /**
     * Find the stateless calculation Loc params
     */
-  protected def findStatelessCalc: (Box[Loc.CalcStateless],
-  Box[Loc.CalcParamStateless[T]]) =
+  protected def findStatelessCalc
+    : (Box[Loc.CalcStateless], Box[Loc.CalcParamStateless[T]]) =
     (allParams.collect {
       case v @ Loc.CalcStateless(_) => v
     }.headOption, allParams.collect {
@@ -245,11 +248,12 @@ trait Loc[T] {
   /**
     * The cached Loc params
     */
-  protected lazy val _foundStatelessCalc: (Box[Loc.CalcStateless],
-  Box[Loc.CalcParamStateless[T]]) = findStatelessCalc
+  protected lazy val _foundStatelessCalc
+    : (Box[Loc.CalcStateless], Box[Loc.CalcParamStateless[T]]) =
+    findStatelessCalc
 
-  protected def foundStatelessCalc: (Box[Loc.CalcStateless],
-  Box[Loc.CalcParamStateless[T]]) =
+  protected def foundStatelessCalc
+    : (Box[Loc.CalcStateless], Box[Loc.CalcParamStateless[T]]) =
     if (Props.devMode) findStatelessCalc else _foundStatelessCalc
 
   /**
@@ -263,9 +267,12 @@ trait Loc[T] {
   /**
     * The snippets provided by `LocParam`s
     */
-  lazy val calcSnippets: SnippetTest = allParams.collect {
-    case v: Loc.ValueSnippets[T] => v.snippets
-  }.reduceLeftOption(_ orElse _).getOrElse(Map.empty)
+  lazy val calcSnippets: SnippetTest = allParams
+    .collect {
+      case v: Loc.ValueSnippets[T] => v.snippets
+    }
+    .reduceLeftOption(_ orElse _)
+    .getOrElse(Map.empty)
 
   /**
     * Look up a snippet by name, taking into account the current
@@ -283,38 +290,39 @@ trait Loc[T] {
   def testAccess: Either[Boolean, Box[() => LiftResponse]] = accessTestRes.is
 
   protected def _testAccess: Either[Boolean, Box[() => LiftResponse]] = {
-    def testParams(what: List[Loc.LocParam[T]])
-      : Either[Boolean, Box[() => LiftResponse]] = what match {
-      case Nil => Left(true)
+    def testParams(
+        what: List[Loc.LocParam[T]]): Either[Boolean, Box[() => LiftResponse]] =
+      what match {
+        case Nil => Left(true)
 
-      case Loc.If(test, msg) :: xs =>
-        if (!test()) Right(Full(msg)) else testParams(xs)
-      case Loc.IfValue(test, msg) :: xs =>
-        if (!test(currentValue)) Right(Full(msg)) else testParams(xs)
+        case Loc.If(test, msg) :: xs =>
+          if (!test()) Right(Full(msg)) else testParams(xs)
+        case Loc.IfValue(test, msg) :: xs =>
+          if (!test(currentValue)) Right(Full(msg)) else testParams(xs)
 
-      case Loc.Unless(test, msg) :: xs =>
-        if (test()) Right(Full(msg)) else testParams(xs)
-      case Loc.UnlessValue(test, msg) :: xs =>
-        if (test(currentValue)) Right(Full(msg)) else testParams(xs)
+        case Loc.Unless(test, msg) :: xs =>
+          if (test()) Right(Full(msg)) else testParams(xs)
+        case Loc.UnlessValue(test, msg) :: xs =>
+          if (test(currentValue)) Right(Full(msg)) else testParams(xs)
 
-      case Loc.TestAccess(func) :: xs =>
-        func() match {
-          case Full(resp) => Right(Full(() => resp))
-          case _ => testParams(xs)
-        }
+        case Loc.TestAccess(func) :: xs =>
+          func() match {
+            case Full(resp) => Right(Full(() => resp))
+            case _          => testParams(xs)
+          }
 
-      case Loc.TestValueAccess(func) :: xs =>
-        func(currentValue) match {
-          case Full(resp) => Right(Full(() => resp))
-          case _ => testParams(xs)
-        }
+        case Loc.TestValueAccess(func) :: xs =>
+          func(currentValue) match {
+            case Full(resp) => Right(Full(() => resp))
+            case _          => testParams(xs)
+          }
 
-      case x :: xs => testParams(xs)
-    }
+        case x :: xs => testParams(xs)
+      }
 
     testParams(allParams) match {
       case Left(true) => _menu.testParentAccess
-      case x => x
+      case x          => x
     }
   }
 
@@ -325,7 +333,7 @@ trait Loc[T] {
       case Loc.EarlyResponse(func) :: xs =>
         func() match {
           case Full(r) => Full(r)
-          case _ => early(xs)
+          case _       => early(xs)
         }
 
       case x :: xs => early(xs)
@@ -344,11 +352,11 @@ trait Loc[T] {
     */
   def paramTemplate: Box[NodeSeq] =
     allParams.flatMap {
-      case Loc.Template(f) => Some(f());
-      case Loc.ValueTemplate(f) => Some(f(currentValue));
-      case Loc.TemplateBox(f) => f()
+      case Loc.Template(f)         => Some(f());
+      case Loc.ValueTemplate(f)    => Some(f(currentValue));
+      case Loc.TemplateBox(f)      => f()
       case Loc.ValueTemplateBox(f) => f(currentValue)
-      case _ => None
+      case _                       => None
     }.headOption
 
   /**
@@ -363,7 +371,7 @@ trait Loc[T] {
     */
   lazy val paramTitle: Box[T => NodeSeq] = allParams.flatMap {
     case Loc.Title(f) => Some(f);
-    case _ => None
+    case _            => None
   }.headOption
 
   /**
@@ -399,10 +407,12 @@ trait Loc[T] {
 
   def menu = _menu
 
-  private def testAllParams(params: List[Loc.LocParam[T]], req: Req): Boolean = {
+  private def testAllParams(
+      params: List[Loc.LocParam[T]],
+      req: Req): Boolean = {
     params.forall {
       case Loc.Test(test) => test(req)
-      case _ => true
+      case _              => true
     }
   }
 
@@ -423,44 +433,46 @@ trait Loc[T] {
       l <- link.createLink(p).map(appendQueryParams(p))
     } yield
       MenuItem(
-          text.text(p),
-          l,
-          Nil,
-          false,
-          false,
-          allParams.flatMap {
-            case v: Loc.LocInfo[_] => List(v())
-            case _ => Nil
-          }
+        text.text(p),
+        l,
+        Nil,
+        false,
+        false,
+        allParams.flatMap {
+          case v: Loc.LocInfo[_] => List(v())
+          case _                 => Nil
+        }
       )
 
   def buildMenu: CompleteMenu = {
     CompleteMenu(
-        _menu.buildUpperLines(_menu, _menu, buildKidMenuItems(_menu.kids)))
+      _menu.buildUpperLines(_menu, _menu, buildKidMenuItems(_menu.kids)))
   }
 
   private[liftweb] def buildItem(
-      kids: List[MenuItem], current: Boolean, path: Boolean): Box[MenuItem] =
+      kids: List[MenuItem],
+      current: Boolean,
+      path: Boolean): Box[MenuItem] =
     (calcHidden(kids), testAccess) match {
       case (false, Left(true)) => {
-          for {
-            p <- currentValue
-            t <- link.createLink(p).map(appendQueryParams(p))
-          } yield
-            new MenuItem(
-                text.text(p),
-                t,
-                kids,
-                current,
-                path,
-                allParams.flatMap {
-                  case v: Loc.LocInfo[_] => List(v())
-                  case _ => Nil
-                },
-                placeHolder_?,
-                this
-            )
-        }
+        for {
+          p <- currentValue
+          t <- link.createLink(p).map(appendQueryParams(p))
+        } yield
+          new MenuItem(
+            text.text(p),
+            t,
+            kids,
+            current,
+            path,
+            allParams.flatMap {
+              case v: Loc.LocInfo[_] => List(v())
+              case _                 => Nil
+            },
+            placeHolder_?,
+            this
+          )
+      }
 
       case _ => Empty
     }
@@ -472,10 +484,9 @@ trait Loc[T] {
 
   def hidden = _hidden
 
-  private lazy val groupSet: Set[String] = Set(
-      allParams.flatMap {
+  private lazy val groupSet: Set[String] = Set(allParams.flatMap {
     case s: Loc.LocGroup => s.group
-    case _ => Nil
+    case _               => Nil
   }: _*)
 
   def inGroup_?(group: String): Boolean = groupSet.contains(group)
@@ -509,15 +520,17 @@ object Loc {
     * @param text -- the text to display when the link is displayed
     * @param params -- access test, title calculation, etc.
     */
-  def apply(name: String,
-            link: Link[Unit],
-            text: LinkText[Unit],
-            params: LocParam[Unit]*): Loc[Unit] =
+  def apply(
+      name: String,
+      link: Link[Unit],
+      text: LinkText[Unit],
+      params: LocParam[Unit]*): Loc[Unit] =
     UnitLoc(name, link, text, params.toList)
-  def apply(name: String,
-            link: Link[Unit],
-            text: LinkText[Unit],
-            params: List[LocParam[Unit]]): Loc[Unit] =
+  def apply(
+      name: String,
+      link: Link[Unit],
+      text: LinkText[Unit],
+      params: List[LocParam[Unit]]): Loc[Unit] =
     UnitLoc(name, link, text, params)
 
   private final case class UnitLoc(
@@ -525,8 +538,7 @@ object Loc {
       override val link: Link[Unit],
       override val text: LinkText[Unit],
       override val params: List[LocParam[Unit]]
-  )
-      extends Loc[Unit] {
+  ) extends Loc[Unit] {
     override def defaultValue: Box[Unit] = Full(())
 
     init()
@@ -538,8 +550,7 @@ object Loc {
       override val text: LinkText[T],
       override val defaultValue: Box[T],
       xparams: LocParam[T]*
-  )
-      extends Loc[T] {
+  ) extends Loc[T] {
     override val params = xparams.toList
 
     init()
@@ -567,10 +578,10 @@ object Loc {
 
     override def onCreate(loc: Loc[_]) {
       LiftRules.httpAuthProtectedResource.append(
-          new LiftRules.HttpAuthProtectedResourcePF() {
-            def isDefinedAt(in: Req) = in.path.partPath == loc.link.uriList
-            def apply(in: Req): Box[Role] = role(in)
-          }
+        new LiftRules.HttpAuthProtectedResourcePF() {
+          def isDefinedAt(in: Req) = in.path.partPath == loc.link.uriList
+          def apply(in: Req): Box[Role] = role(in)
+        }
       )
     }
   }
@@ -721,10 +732,11 @@ object Loc {
     * the function is invoked.
     */
   class Snippet(val name: String, _func: => NodeSeq => NodeSeq)
-      extends ValueSnippets[Any] with AnyLocParam {
+      extends ValueSnippets[Any]
+      with AnyLocParam {
 
     /**
-      * The NodeSeq => NodeSeq function 
+      * The NodeSeq => NodeSeq function
       */
     def func: NodeSeq => NodeSeq = _func
 
@@ -759,7 +771,8 @@ object Loc {
     */
   trait LocSnippets
       extends PartialFunction[String, NodeSeq => NodeSeq]
-      with ValueSnippets[Any] with AnyLocParam {
+      with ValueSnippets[Any]
+      with AnyLocParam {
     def snippets = {
       case (s, _) if isDefinedAt(s) => apply(s)
     }
@@ -957,12 +970,11 @@ object Loc {
   }
 
   implicit def strToFailMsg(in: => String): FailMsg =
-    () =>
-      {
-        RedirectWithState(
-            LiftRules.siteMapFailRedirectLocation.mkString("/", "/", ""),
-            RedirectState(Empty, in -> NoticeType.Error)
-        )
+    () => {
+      RedirectWithState(
+        LiftRules.siteMapFailRedirectLocation.mkString("/", "/", ""),
+        RedirectState(Empty, in -> NoticeType.Error)
+      )
     }
 
   implicit def strFuncToFailMsg(in: () => String): FailMsg = strToFailMsg(in())
@@ -974,12 +986,13 @@ case class CompleteMenu(lines: Seq[MenuItem]) {
   lazy val breadCrumbs: Seq[MenuItem] = lines.flatMap(_.breadCrumbs)
 }
 
-case class MenuItem(text: NodeSeq,
-                    uri: NodeSeq,
-                    kids: Seq[MenuItem],
-                    current: Boolean,
-                    path: Boolean,
-                    info: List[Box[() => _]]) {
+case class MenuItem(
+    text: NodeSeq,
+    uri: NodeSeq,
+    kids: Seq[MenuItem],
+    current: Boolean,
+    path: Boolean,
+    info: List[Box[() => _]]) {
 
   private var _placeholder = false
   def placeholder_? = _placeholder
@@ -987,25 +1000,27 @@ case class MenuItem(text: NodeSeq,
   private var _cssClass: Box[String] = Empty
   def cssClass: Box[String] = _cssClass
 
-  def this(text: NodeSeq,
-           uri: NodeSeq,
-           kids: Seq[MenuItem],
-           current: Boolean,
-           path: Boolean,
-           info: List[Box[() => _]],
-           ph: Boolean) = {
+  def this(
+      text: NodeSeq,
+      uri: NodeSeq,
+      kids: Seq[MenuItem],
+      current: Boolean,
+      path: Boolean,
+      info: List[Box[() => _]],
+      ph: Boolean) = {
     this(text, uri, kids, current, path, info)
     _placeholder = ph
   }
 
-  def this(text: NodeSeq,
-           uri: NodeSeq,
-           kids: Seq[MenuItem],
-           current: Boolean,
-           path: Boolean,
-           info: List[Box[() => _]],
-           ph: Boolean,
-           loc: Loc[_]) = {
+  def this(
+      text: NodeSeq,
+      uri: NodeSeq,
+      kids: Seq[MenuItem],
+      current: Boolean,
+      path: Boolean,
+      info: List[Box[() => _]],
+      ph: Boolean,
+      loc: Loc[_]) = {
     this(text, uri, kids, current, path, info)
     _placeholder = ph
     _cssClass = loc.cssClassForMenuItem

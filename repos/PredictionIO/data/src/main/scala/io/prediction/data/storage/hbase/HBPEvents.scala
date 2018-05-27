@@ -30,22 +30,24 @@ import org.apache.spark.rdd.RDD
 import org.joda.time.DateTime
 
 class HBPEvents(
-    client: HBClient, config: StorageClientConfig, namespace: String)
+    client: HBClient,
+    config: StorageClientConfig,
+    namespace: String)
     extends PEvents {
 
   def checkTableExists(appId: Int, channelId: Option[Int]): Unit = {
     if (!client.admin.tableExists(
-            HBEventsUtil.tableName(namespace, appId, channelId))) {
+          HBEventsUtil.tableName(namespace, appId, channelId))) {
       if (channelId.nonEmpty) {
         logger.error(
-            s"The appId $appId with channelId $channelId does not exist." +
+          s"The appId $appId with channelId $channelId does not exist." +
             s" Please use valid appId and channelId.")
         throw new Exception(
-            s"HBase table not found for appId $appId" +
+          s"HBase table not found for appId $appId" +
             s" with channelId $channelId.")
       } else {
         logger.error(
-            s"The appId $appId does not exist. Please use valid appId.")
+          s"The appId $appId does not exist. Please use valid appId.")
         throw new Exception(s"HBase table not found for appId $appId.")
       }
     }
@@ -66,17 +68,20 @@ class HBPEvents(
     checkTableExists(appId, channelId)
 
     val conf = HBaseConfiguration.create()
-    conf.set(TableInputFormat.INPUT_TABLE,
-             HBEventsUtil.tableName(namespace, appId, channelId))
+    conf.set(
+      TableInputFormat.INPUT_TABLE,
+      HBEventsUtil.tableName(namespace, appId, channelId))
 
-    val scan = HBEventsUtil.createScan(startTime = startTime,
-                                       untilTime = untilTime,
-                                       entityType = entityType,
-                                       entityId = entityId,
-                                       eventNames = eventNames,
-                                       targetEntityType = targetEntityType,
-                                       targetEntityId = targetEntityId,
-                                       reversed = None)
+    val scan = HBEventsUtil.createScan(
+      startTime = startTime,
+      untilTime = untilTime,
+      entityType = entityType,
+      entityId = entityId,
+      eventNames = eventNames,
+      targetEntityType = targetEntityType,
+      targetEntityId = targetEntityId,
+      reversed = None
+    )
     scan.setCaching(500) // TODO
     scan.setCacheBlocks(false) // TODO
 
@@ -84,10 +89,11 @@ class HBPEvents(
 
     // HBase is not accessed until this rdd is actually used.
     val rdd = sc
-      .newAPIHadoopRDD(conf,
-                       classOf[TableInputFormat],
-                       classOf[ImmutableBytesWritable],
-                       classOf[Result])
+      .newAPIHadoopRDD(
+        conf,
+        classOf[TableInputFormat],
+        classOf[ImmutableBytesWritable],
+        classOf[Result])
       .map {
         case (key, row) => HBEventsUtil.resultToEvent(row, appId)
       }
@@ -101,15 +107,19 @@ class HBPEvents(
     checkTableExists(appId, channelId)
 
     val conf = HBaseConfiguration.create()
-    conf.set(TableOutputFormat.OUTPUT_TABLE,
-             HBEventsUtil.tableName(namespace, appId, channelId))
-    conf.setClass("mapreduce.outputformat.class",
-                  classOf[TableOutputFormat[Object]],
-                  classOf[OutputFormat[Object, Writable]])
+    conf.set(
+      TableOutputFormat.OUTPUT_TABLE,
+      HBEventsUtil.tableName(namespace, appId, channelId))
+    conf.setClass(
+      "mapreduce.outputformat.class",
+      classOf[TableOutputFormat[Object]],
+      classOf[OutputFormat[Object, Writable]])
 
-    events.map { event =>
-      val (put, rowKey) = HBEventsUtil.eventToPut(event, appId)
-      (new ImmutableBytesWritable(rowKey.toBytes), put)
-    }.saveAsNewAPIHadoopDataset(conf)
+    events
+      .map { event =>
+        val (put, rowKey) = HBEventsUtil.eventToPut(event, appId)
+        (new ImmutableBytesWritable(rowKey.toBytes), put)
+      }
+      .saveAsNewAPIHadoopDataset(conf)
   }
 }

@@ -62,7 +62,7 @@ abstract class TreeBuilder {
     val lname = freshTermName(nme.WHILE_PREFIX)
     def default = wrappingPos(List(cond, body)) match {
       case p if p.isDefined => p.end
-      case _ => startPos
+      case _                => startPos
     }
     val continu = atPos(o2p(body.pos pointOrElse default)) {
       Apply(Ident(lname), Nil)
@@ -91,7 +91,7 @@ abstract class TreeBuilder {
   def makeAlternative(ts: List[Tree]): Tree = {
     def alternatives(t: Tree): List[Tree] = t match {
       case Alternative(ts) => ts
-      case _ => List(t)
+      case _               => List(t)
     }
     Alternative(ts flatMap alternatives)
   }
@@ -110,17 +110,20 @@ abstract class TreeBuilder {
     val binder = freshTermName()
     val pat = Bind(binder, Typed(Ident(nme.WILDCARD), Ident(tpnme.Throwable)))
     val catchDef = ValDef(
-        Modifiers(ARTIFACT), freshTermName("catchExpr"), TypeTree(), catchExpr)
+      Modifiers(ARTIFACT),
+      freshTermName("catchExpr"),
+      TypeTree(),
+      catchExpr)
     val catchFn = Ident(catchDef.name)
     val body = atPos(catchExpr.pos.makeTransparent)(
-        Block(
-            List(catchDef),
-            If(
-                Apply(Select(catchFn, nme.isDefinedAt), List(Ident(binder))),
-                Apply(Select(catchFn, nme.apply), List(Ident(binder))),
-                Throw(Ident(binder))
-            )
-        ))
+      Block(
+        List(catchDef),
+        If(
+          Apply(Select(catchFn, nme.isDefinedAt), List(Ident(binder))),
+          Apply(Select(catchFn, nme.apply), List(Ident(binder))),
+          Throw(Ident(binder))
+        )
+      ))
     makeCaseDef(pat, EmptyTree, body)
   }
 
@@ -129,18 +132,20 @@ abstract class TreeBuilder {
     gen.mkFunctionTypeTree(argtpes, restpe)
 
   /** Append implicit parameter section if `contextBounds` nonempty */
-  def addEvidenceParams(owner: Name,
-                        vparamss: List[List[ValDef]],
-                        contextBounds: List[Tree]): List[List[ValDef]] = {
+  def addEvidenceParams(
+      owner: Name,
+      vparamss: List[List[ValDef]],
+      contextBounds: List[Tree]): List[List[ValDef]] = {
     if (contextBounds.isEmpty) vparamss
     else {
       val mods = Modifiers(
-          if (owner.isTypeName) PARAMACCESSOR | LOCAL | PRIVATE else PARAM)
+        if (owner.isTypeName) PARAMACCESSOR | LOCAL | PRIVATE else PARAM)
       def makeEvidenceParam(tpt: Tree) =
-        ValDef(mods | IMPLICIT | SYNTHETIC,
-               freshTermName(nme.EVIDENCE_PARAM_PREFIX),
-               tpt,
-               EmptyTree)
+        ValDef(
+          mods | IMPLICIT | SYNTHETIC,
+          freshTermName(nme.EVIDENCE_PARAM_PREFIX),
+          tpt,
+          EmptyTree)
       val evidenceParams = contextBounds map makeEvidenceParam
 
       val vparamssLast = if (vparamss.nonEmpty) vparamss.last else Nil

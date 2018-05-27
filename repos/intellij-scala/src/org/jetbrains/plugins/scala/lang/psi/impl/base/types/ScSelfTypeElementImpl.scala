@@ -15,16 +15,20 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.types._
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefinition
 import org.jetbrains.plugins.scala.lang.psi.stubs.ScSelfTypeElementStub
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  TypeResult,
+  TypingContext
+}
 
 import scala.collection.mutable.ArrayBuffer
 
 /**
   * @author Alexander Podkhalyuzin
   */
-class ScSelfTypeElementImpl private (stub: StubElement[ScSelfTypeElement],
-                                     nodeType: IElementType,
-                                     node: ASTNode)
+class ScSelfTypeElementImpl private (
+    stub: StubElement[ScSelfTypeElement],
+    nodeType: IElementType,
+    node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
     with ScSelfTypeElement {
   def this(node: ASTNode) = { this(null, null, node) }
@@ -46,8 +50,7 @@ class ScSelfTypeElementImpl private (stub: StubElement[ScSelfTypeElement],
         for {
           templateType <- parent.getType(ctx)
           selfType <- ste.getType(ctx)
-          ct = ScCompoundType(
-              Seq(templateType, selfType), Map.empty, Map.empty)
+          ct = ScCompoundType(Seq(templateType, selfType), Map.empty, Map.empty)
         } yield ct
       case None => parent.getType(ctx)
     }
@@ -60,8 +63,7 @@ class ScSelfTypeElementImpl private (stub: StubElement[ScSelfTypeElement],
         case "" => None
         case text =>
           Some(
-              ScalaPsiElementFactory.createTypeElementFromText(
-                  text, this, this))
+            ScalaPsiElementFactory.createTypeElementFromText(text, this, this))
       }
     }
     findChild(classOf[ScTypeElement])
@@ -78,7 +80,7 @@ class ScSelfTypeElementImpl private (stub: StubElement[ScSelfTypeElement],
         case s: ScSimpleTypeElement =>
           s.reference match {
             case Some(ref) => names += ref.refName
-            case _ =>
+            case _         =>
           }
         case p: ScParameterizedTypeElement => fillNames(p.typeElement)
         case c: ScCompoundTypeElement =>

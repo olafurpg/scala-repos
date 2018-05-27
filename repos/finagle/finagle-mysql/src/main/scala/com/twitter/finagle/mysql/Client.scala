@@ -24,8 +24,9 @@ object Client {
     * and the finagle-mysql netty pipeline.
     * @param statsReceiver collects finagle stats scoped to "mysql"
     */
-  @deprecated("Use the com.twitter.finagle.exp.Mysql object to build a client",
-              "6.6.2")
+  @deprecated(
+    "Use the com.twitter.finagle.exp.Mysql object to build a client",
+    "6.6.2")
   def apply(
       host: String,
       username: String,
@@ -102,7 +103,8 @@ trait Transactions {
 }
 
 private[mysql] class StdClient(factory: ServiceFactory[Request, Result])
-    extends Client with Transactions {
+    extends Client
+    with Transactions {
   private[this] val service = factory.toService
 
   def query(sql: String): Future[Result] = service(QueryRequest(sql))
@@ -111,7 +113,7 @@ private[mysql] class StdClient(factory: ServiceFactory[Request, Result])
   def select[T](sql: String)(f: Row => T): Future[Seq[T]] =
     query(sql) map {
       case rs: ResultSet => rs.rows.map(f)
-      case _ => Nil
+      case _             => Nil
     }
 
   def prepare(sql: String): PreparedStatement = new PreparedStatement {
@@ -119,8 +121,9 @@ private[mysql] class StdClient(factory: ServiceFactory[Request, Result])
       svc(PrepareRequest(sql)).flatMap {
         case ok: PrepareOK => svc(ExecuteRequest(ok.id, ps.toIndexedSeq))
         case r =>
-          Future.exception(new Exception(
-                  "Unexpected result %s when preparing %s".format(r, sql)))
+          Future.exception(
+            new Exception(
+              "Unexpected result %s when preparing %s".format(r, sql)))
       } ensure {
         svc.close()
       }

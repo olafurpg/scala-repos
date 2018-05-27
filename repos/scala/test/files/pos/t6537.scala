@@ -7,7 +7,7 @@ object PatMatWarning {
 
   def f(x: X) = x match {
     case _: Y => false
-    case _ => true
+    case _    => true
   }
 
   class X1 extends X

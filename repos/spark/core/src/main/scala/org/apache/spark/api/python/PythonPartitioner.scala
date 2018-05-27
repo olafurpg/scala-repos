@@ -31,7 +31,8 @@ import org.apache.spark.util.Utils
   * to the Python partitioning function so that its id() is not reused.
   */
 private[spark] class PythonPartitioner(
-    override val numPartitions: Int, val pyPartitionFunctionId: Long)
+    override val numPartitions: Int,
+    val pyPartitionFunctionId: Long)
     extends Partitioner {
 
   override def getPartition(key: Any): Int = key match {
@@ -39,13 +40,13 @@ private[spark] class PythonPartitioner(
     // we don't trust the Python partition function to return valid partition ID's so
     // let's do a modulo numPartitions in any case
     case key: Long => Utils.nonNegativeMod(key.toInt, numPartitions)
-    case _ => Utils.nonNegativeMod(key.hashCode(), numPartitions)
+    case _         => Utils.nonNegativeMod(key.hashCode(), numPartitions)
   }
 
   override def equals(other: Any): Boolean = other match {
     case h: PythonPartitioner =>
       h.numPartitions == numPartitions &&
-      h.pyPartitionFunctionId == pyPartitionFunctionId
+        h.pyPartitionFunctionId == pyPartitionFunctionId
     case _ =>
       false
   }

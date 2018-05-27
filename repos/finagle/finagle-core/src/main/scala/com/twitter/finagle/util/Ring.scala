@@ -53,7 +53,7 @@ class Ring(positions: Array[Int]) {
     // is out of bounds, which in any case would snap to the last index.
     var i = binarySearch(nodes, 0, N * 2, pos) match {
       case i if i < 0 => -1 - i
-      case i => i
+      case i          => i
     }
 
     // In the case where positions overlap, we always

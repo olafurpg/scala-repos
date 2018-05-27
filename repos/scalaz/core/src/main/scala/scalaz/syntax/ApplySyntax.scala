@@ -2,7 +2,7 @@ package scalaz
 package syntax
 
 /** Wraps a value `self` and provides methods related to `Apply` */
-final class ApplyOps[F[_], A] private[syntax](val self: F[A])(
+final class ApplyOps[F[_], A] private[syntax] (val self: F[A])(
     implicit val F: Apply[F])
     extends Ops[F[A]] {
   ////
@@ -63,32 +63,37 @@ trait ToApplyOps extends ToApplyOps0 with ToFunctorOps {
     F.apply3(fa, fb, fc)(f)
 
   def ^^^[F[_], A, B, C, D, E](
-      fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D])(
-      f: (A, B, C, D) => E)(implicit F: Apply[F]): F[E] =
+      fa: => F[A],
+      fb: => F[B],
+      fc: => F[C],
+      fd: => F[D])(f: (A, B, C, D) => E)(implicit F: Apply[F]): F[E] =
     F.apply4(fa, fb, fc, fd)(f)
 
   def ^^^^[F[_], A, B, C, D, E, I](
-      fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E])(
-      f: (A, B, C, D, E) => I)(implicit F: Apply[F]): F[I] =
+      fa: => F[A],
+      fb: => F[B],
+      fc: => F[C],
+      fd: => F[D],
+      fe: => F[E])(f: (A, B, C, D, E) => I)(implicit F: Apply[F]): F[I] =
     F.apply5(fa, fb, fc, fd, fe)(f)
 
-  def ^^^^^[F[_], A, B, C, D, E, I, J](fa: => F[A],
-                                       fb: => F[B],
-                                       fc: => F[C],
-                                       fd: => F[D],
-                                       fe: => F[E],
-                                       fi: => F[I])(
-      f: (A, B, C, D, E, I) => J)(implicit F: Apply[F]): F[J] =
+  def ^^^^^[F[_], A, B, C, D, E, I, J](
+      fa: => F[A],
+      fb: => F[B],
+      fc: => F[C],
+      fd: => F[D],
+      fe: => F[E],
+      fi: => F[I])(f: (A, B, C, D, E, I) => J)(implicit F: Apply[F]): F[J] =
     F.apply6(fa, fb, fc, fd, fe, fi)(f)
 
-  def ^^^^^^[F[_], A, B, C, D, E, I, J, K](fa: => F[A],
-                                           fb: => F[B],
-                                           fc: => F[C],
-                                           fd: => F[D],
-                                           fe: => F[E],
-                                           fi: => F[I],
-                                           fj: => F[J])(
-      f: (A, B, C, D, E, I, J) => K)(implicit F: Apply[F]): F[K] =
+  def ^^^^^^[F[_], A, B, C, D, E, I, J, K](
+      fa: => F[A],
+      fb: => F[B],
+      fc: => F[C],
+      fd: => F[D],
+      fe: => F[E],
+      fi: => F[I],
+      fj: => F[J])(f: (A, B, C, D, E, I, J) => K)(implicit F: Apply[F]): F[K] =
     F.apply7(fa, fb, fc, fd, fe, fi, fj)(f)
 
   ////
@@ -112,27 +117,30 @@ trait ApplySyntax[F[_]] extends FunctorSyntax[F] {
     F.apply4(fa, fb, fc, fd)(f)
 
   def ^^^^[A, B, C, D, E, I](
-      fa: => F[A], fb: => F[B], fc: => F[C], fd: => F[D], fe: => F[E])(
-      f: (A, B, C, D, E) => I): F[I] =
+      fa: => F[A],
+      fb: => F[B],
+      fc: => F[C],
+      fd: => F[D],
+      fe: => F[E])(f: (A, B, C, D, E) => I): F[I] =
     F.apply5(fa, fb, fc, fd, fe)(f)
 
-  def ^^^^^[A, B, C, D, E, I, J](fa: => F[A],
-                                 fb: => F[B],
-                                 fc: => F[C],
-                                 fd: => F[D],
-                                 fe: => F[E],
-                                 fi: => F[I])(
-      f: (A, B, C, D, E, I) => J): F[J] =
+  def ^^^^^[A, B, C, D, E, I, J](
+      fa: => F[A],
+      fb: => F[B],
+      fc: => F[C],
+      fd: => F[D],
+      fe: => F[E],
+      fi: => F[I])(f: (A, B, C, D, E, I) => J): F[J] =
     F.apply6(fa, fb, fc, fd, fe, fi)(f)
 
-  def ^^^^^^[A, B, C, D, E, I, J, K](fa: => F[A],
-                                     fb: => F[B],
-                                     fc: => F[C],
-                                     fd: => F[D],
-                                     fe: => F[E],
-                                     fi: => F[I],
-                                     fj: => F[J])(
-      f: (A, B, C, D, E, I, J) => K): F[K] =
+  def ^^^^^^[A, B, C, D, E, I, J, K](
+      fa: => F[A],
+      fb: => F[B],
+      fc: => F[C],
+      fd: => F[D],
+      fe: => F[E],
+      fi: => F[I],
+      fj: => F[J])(f: (A, B, C, D, E, I, J) => K): F[K] =
     F.apply7(fa, fb, fc, fd, fe, fi, fj)(f)
 
   ////

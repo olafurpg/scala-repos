@@ -21,7 +21,11 @@ import java.sql.{Date, Timestamp}
 
 import scala.language.implicitConversions
 
-import org.apache.spark.sql.catalyst.analysis.{EliminateSubqueryAliases, UnresolvedAttribute, UnresolvedExtractValue}
+import org.apache.spark.sql.catalyst.analysis.{
+  EliminateSubqueryAliases,
+  UnresolvedAttribute,
+  UnresolvedExtractValue
+}
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.expressions.aggregate._
 import org.apache.spark.sql.catalyst.plans.{Inner, JoinType}
@@ -93,10 +97,12 @@ package object dsl {
     def startsWith(other: Expression): Expression = StartsWith(expr, other)
     def endsWith(other: Expression): Expression = EndsWith(expr, other)
     def substr(
-        pos: Expression, len: Expression = Literal(Int.MaxValue)): Expression =
+        pos: Expression,
+        len: Expression = Literal(Int.MaxValue)): Expression =
       Substring(expr, pos, len)
     def substring(
-        pos: Expression, len: Expression = Literal(Int.MaxValue)): Expression =
+        pos: Expression,
+        len: Expression = Literal(Int.MaxValue)): Expression =
       Substring(expr, pos, len)
 
     def isNull: Predicate = IsNull(expr)
@@ -275,9 +281,10 @@ package object dsl {
       def limit(limitExpr: Expression): LogicalPlan =
         Limit(limitExpr, logicalPlan)
 
-      def join(otherPlan: LogicalPlan,
-               joinType: JoinType = Inner,
-               condition: Option[Expression] = None): LogicalPlan =
+      def join(
+          otherPlan: LogicalPlan,
+          joinType: JoinType = Inner,
+          condition: Option[Expression] = None): LogicalPlan =
         Join(logicalPlan, otherPlan, joinType, condition)
 
       def orderBy(sortExprs: SortOrder*): LogicalPlan =
@@ -290,14 +297,15 @@ package object dsl {
           aggregateExprs: Expression*): LogicalPlan = {
         val aliasedExprs = aggregateExprs.map {
           case ne: NamedExpression => ne
-          case e => Alias(e, e.toString)()
+          case e                   => Alias(e, e.toString)()
         }
         Aggregate(groupingExprs, aliasedExprs, logicalPlan)
       }
 
-      def window(windowExpressions: Seq[NamedExpression],
-                 partitionSpec: Seq[Expression],
-                 orderSpec: Seq[SortOrder]): LogicalPlan =
+      def window(
+          windowExpressions: Seq[NamedExpression],
+          partitionSpec: Seq[Expression],
+          orderSpec: Seq[SortOrder]): LogicalPlan =
         Window(windowExpressions, partitionSpec, orderSpec, logicalPlan)
 
       def subquery(alias: Symbol): LogicalPlan =
@@ -312,26 +320,29 @@ package object dsl {
       def unionAll(otherPlan: LogicalPlan): LogicalPlan =
         Union(logicalPlan, otherPlan)
 
-      def generate(generator: Generator,
-                   join: Boolean = false,
-                   outer: Boolean = false,
-                   alias: Option[String] = None,
-                   outputNames: Seq[String] = Nil): LogicalPlan =
-        Generate(generator,
-                 join = join,
-                 outer = outer,
-                 alias,
-                 outputNames.map(UnresolvedAttribute(_)),
-                 logicalPlan)
+      def generate(
+          generator: Generator,
+          join: Boolean = false,
+          outer: Boolean = false,
+          alias: Option[String] = None,
+          outputNames: Seq[String] = Nil): LogicalPlan =
+        Generate(
+          generator,
+          join = join,
+          outer = outer,
+          alias,
+          outputNames.map(UnresolvedAttribute(_)),
+          logicalPlan)
 
       def insertInto(
-          tableName: String, overwrite: Boolean = false): LogicalPlan =
+          tableName: String,
+          overwrite: Boolean = false): LogicalPlan =
         InsertIntoTable(
-            analysis.UnresolvedRelation(TableIdentifier(tableName)),
-            Map.empty,
-            logicalPlan,
-            overwrite,
-            false)
+          analysis.UnresolvedRelation(TableIdentifier(tableName)),
+          Map.empty,
+          logicalPlan,
+          overwrite,
+          false)
 
       def analyze: LogicalPlan =
         EliminateSubqueryAliases(analysis.SimpleAnalyzer.execute(logicalPlan))

@@ -23,7 +23,7 @@ final case class Cord(self: FingerTree[Int, String]) {
     */
   def apply(i: Int): Char = {
     val (a, b) = self.split(_ > i)
-    b.viewl.headOption.map(_ (i - a.measure)).getOrElse(rangeError(i))
+    b.viewl.headOption.map(_(i - a.measure)).getOrElse(rangeError(i))
   }
 
   /**
@@ -145,7 +145,7 @@ object Cord {
     cord(as.foldLeft(FingerTree.empty[Int, String](sizer))((x, y) => x :+ y))
 
   implicit val sizer: Reducer[String, Int] = UnitReducer(
-      (a: String) => a.length)
+    (a: String) => a.length)
 
   def mkCord(sep: Cord, as: Cord*): Cord =
     if (!as.isEmpty) as.tail.foldLeft(as.head)(_ ++ sep ++ _)

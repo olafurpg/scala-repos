@@ -3,8 +3,7 @@ package codeInsight.intention.types
 
 import org.jetbrains.plugins.scala.codeInsight.intentions.ScalaIntentionTestBase
 
-class ConvertScalaToJavaCollectionIntentionTest
-    extends ScalaIntentionTestBase {
+class ConvertScalaToJavaCollectionIntentionTest extends ScalaIntentionTestBase {
 
   def familyName: String = ConvertScalaToJavaCollectionIntention.getFamilyName
 
@@ -18,7 +17,7 @@ class ConvertScalaToJavaCollectionIntentionTest
 
   def testIntentionIsAvailable2() {
     checkIntentionIsAvailable(
-        """
+      """
         |class UsesScalaCollections {
         |  val list = List(1,2,3)
         |  val javaList = lis<caret>t
@@ -29,7 +28,7 @@ class ConvertScalaToJavaCollectionIntentionTest
 
   def testIntentionIsAvailable_MutableMap() {
     checkIntentionIsAvailable(
-        """
+      """
         |import scala.collection.mutable
         |
         |class UsesScalaCollections {
@@ -42,7 +41,7 @@ class ConvertScalaToJavaCollectionIntentionTest
 
   def testIntentionIsAvailable_Seq() {
     checkIntentionIsAvailable(
-        """
+      """
         |class UsesScalaCollections {
         |  val seq = Seq("1")
         |  val javaList = se<caret>q
@@ -53,7 +52,7 @@ class ConvertScalaToJavaCollectionIntentionTest
 
   def testIntentionIsAvailable_Set() {
     checkIntentionIsAvailable(
-        """
+      """
         |class UsesScalaCollections {
         |  val set = Set("1")
         |  val javaSet = se<caret>t
@@ -64,7 +63,7 @@ class ConvertScalaToJavaCollectionIntentionTest
 
   def testIntentionIsAvailable_Iterator() {
     checkIntentionIsAvailable(
-        """
+      """
         |class UsesScalaCollections {
         |  val iter = Iterator(1)
         |  val javaIter = it<caret>er
@@ -75,7 +74,7 @@ class ConvertScalaToJavaCollectionIntentionTest
 
   def testIntentionIsAvailable_Iterable() {
     checkIntentionIsAvailable(
-        """
+      """
         |class UsesScalaCollections {
         |  val iter = Iterable(1)
         |  val javaIter = it<caret>er

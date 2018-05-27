@@ -43,7 +43,8 @@ object Combinatorics {
     * This brings down 90 tuples to the desired 45 tuples = 10C2
     */
   def combinations[T](input: IndexedSeq[T], k: Int)(
-      implicit flowDef: FlowDef, mode: Mode): Pipe = {
+      implicit flowDef: FlowDef,
+      mode: Mode): Pipe = {
 
     // make k pipes with 1 column each
     // pipe 1 = 1 to n
@@ -52,39 +53,34 @@ object Combinatorics {
     val n = input.size
     val allc = (1 to k).toList.map(x => Symbol("n" + x)) // all column names
 
-    val pipes = allc.zipWithIndex.map(
-        x =>
-          {
-        val num = x._2 + 1
-        val pipe = IterableSource((num to n), x._1).read
-        (pipe, num)
+    val pipes = allc.zipWithIndex.map(x => {
+      val num = x._2 + 1
+      val pipe = IterableSource((num to n), x._1).read
+      (pipe, num)
     })
 
     val res = pipes
-      .reduceLeft((a, b) =>
-            {
-          val num = b._2
-          val prevname = Symbol("n" + (num - 1))
-          val myname = Symbol("n" + num)
-          val mypipe = a._1
-            .crossWithSmaller(b._1)
-            .filter(prevname, myname) { foo: (Int, Int) =>
-              val (nn1, nn2) = foo
-              nn1 < nn2
-            }
-            (mypipe, -1)
+      .reduceLeft((a, b) => {
+        val num = b._2
+        val prevname = Symbol("n" + (num - 1))
+        val myname = Symbol("n" + num)
+        val mypipe = a._1
+          .crossWithSmaller(b._1)
+          .filter(prevname, myname) { foo: (Int, Int) =>
+            val (nn1, nn2) = foo
+            nn1 < nn2
+          }
+        (mypipe, -1)
       })
       ._1
 
-      (1 to k).foldLeft(res)(
-        (a, b) =>
-          {
-        val myname = Symbol("n" + b)
-        val newname = Symbol("k" + b)
-        a.map(myname -> newname) { inpc: Int =>
-            input(inpc - 1)
-          }
-          .discard(myname)
+    (1 to k).foldLeft(res)((a, b) => {
+      val myname = Symbol("n" + b)
+      val newname = Symbol("k" + b)
+      a.map(myname -> newname) { inpc: Int =>
+          input(inpc - 1)
+        }
+        .discard(myname)
     })
   }
 
@@ -99,7 +95,8 @@ object Combinatorics {
     * For details, see combinations(...) above
     */
   def permutations[T](input: IndexedSeq[T], k: Int)(
-      implicit flowDef: FlowDef, mode: Mode): Pipe = {
+      implicit flowDef: FlowDef,
+      mode: Mode): Pipe = {
 
     val n = input.size
     val allc = (1 to k).toList.map(x => Symbol("n" + x)) // all column names
@@ -117,15 +114,13 @@ object Combinatorics {
       }
 
     // map numerals to actual data
-    (1 to k).foldLeft(res)(
-        (a, b) =>
-          {
-        val myname = Symbol("n" + b)
-        val newname = Symbol("k" + b)
-        a.map(myname -> newname) { inpc: Int =>
-            input(inpc - 1)
-          }
-          .discard(myname)
+    (1 to k).foldLeft(res)((a, b) => {
+      val myname = Symbol("n" + b)
+      val newname = Symbol("k" + b)
+      a.map(myname -> newname) { inpc: Int =>
+          input(inpc - 1)
+        }
+        .discard(myname)
     })
   }
 
@@ -175,17 +170,17 @@ object Combinatorics {
     *
     */
   def weightedSum(weights: IndexedSeq[Double], result: Double, error: Double)(
-      implicit flowDef: FlowDef, mode: Mode): Pipe = {
+      implicit flowDef: FlowDef,
+      mode: Mode): Pipe = {
     val numWeights = weights.size
     val allColumns = (1 to numWeights).map(x => Symbol("k" + x))
 
     // create as many single-column pipes as the number of weights
     val pipes = allColumns
       .zip(weights)
-      .map(x =>
-            {
-          val (name, wt) = x
-          IterableSource((0.0 to result by wt), name).read
+      .map(x => {
+        val (name, wt) = x
+        IterableSource((0.0 to result by wt), name).read
       })
       .zip(allColumns)
 
@@ -194,47 +189,46 @@ object Combinatorics {
     val rest = pipes.tail
 
     val res = rest
-      .foldLeft(accum)((a, b) =>
-            {
+      .foldLeft(accum)((a, b) => {
 
-          val (apipe, aname) = a
-          val (bpipe, bname) = b
-          val allc = (List(aname)).flatten ++ List[Symbol](bname)
+        val (apipe, aname) = a
+        val (bpipe, bname) = b
+        val allc = (List(aname)).flatten ++ List[Symbol](bname)
 
-          // Algorithm:
-          // Cross two pipes
-          // Create a temp column that stores intermediate results
-          // Apply progressive filtering on the temp column
-          // Discard the temp column
-          // Once all pipes are crossed, test for temp column within error bounds of result
-          // Discard duplicates at end of process
+        // Algorithm:
+        // Cross two pipes
+        // Create a temp column that stores intermediate results
+        // Apply progressive filtering on the temp column
+        // Discard the temp column
+        // Once all pipes are crossed, test for temp column within error bounds of result
+        // Discard duplicates at end of process
 
-          (apipe
-             .crossWithSmaller(bpipe)
-             .map(allc -> 'temp) { x: TupleEntry =>
-               val values = (0 until allc.size).map(
-                   i => x.getDouble(i.asInstanceOf[java.lang.Integer]))
-               values.sum
-             }
-             .filter('temp) { x: Double =>
-               if (allc.size == numWeights) (math.abs(x - result) <= error)
-               else (x <= result)
-             }
-             .discard('temp),
-           allc)
+        (
+          apipe
+            .crossWithSmaller(bpipe)
+            .map(allc -> 'temp) { x: TupleEntry =>
+              val values = (0 until allc.size).map(i =>
+                x.getDouble(i.asInstanceOf[java.lang.Integer]))
+              values.sum
+            }
+            .filter('temp) { x: Double =>
+              if (allc.size == numWeights) (math.abs(x - result) <= error)
+              else (x <= result)
+            }
+            .discard('temp),
+          allc)
       })
       ._1
       .unique(allColumns)
 
-      (1 to numWeights)
+    (1 to numWeights)
       .zip(weights)
-      .foldLeft(res)((a, b) =>
-            {
-          val (num, wt) = b
-          val myname = Symbol("k" + num)
-          a.map(myname -> myname) { x: Int =>
-            (x / wt).toInt
-          }
+      .foldLeft(res)((a, b) => {
+        val (num, wt) = b
+        val myname = Symbol("k" + num)
+        a.map(myname -> myname) { x: Int =>
+          (x / wt).toInt
+        }
       })
   }
 
@@ -243,8 +237,9 @@ object Combinatorics {
     * The returned pipe contain only positive non-zero weights.
     */
   def positiveWeightedSum(
-      weights: IndexedSeq[Double], result: Double, error: Double)(
-      implicit flowDef: FlowDef, mode: Mode): Pipe = {
+      weights: IndexedSeq[Double],
+      result: Double,
+      error: Double)(implicit flowDef: FlowDef, mode: Mode): Pipe = {
     val allColumns = (1 to weights.size).map(x => Symbol("k" + x))
     weightedSum(weights, result, error).filter(allColumns) { x: TupleEntry =>
       (0 until allColumns.size)

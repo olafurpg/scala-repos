@@ -31,15 +31,17 @@ object Test extends ScaladocModelTest {
     val boo = rootPackage._package("a")._trait("Boo")
     val conversions =
       boo._conversions("a.Boo.BooShouldNotAppearIsFoo") ++ boo._conversions(
-          "a.Boo.BooLongIsFoo")
+        "a.Boo.BooLongIsFoo")
     assert(conversions.length == 1, conversions.length + " == 1")
 
     // Assert that the implicit conversion is not "BooShouldNotAppearIsFoo"
-    assert(conversions.head.conversionShortName == "BooLongIsFoo",
-           conversions.head.conversionShortName + " == BooLongIsFoo")
+    assert(
+      conversions.head.conversionShortName == "BooLongIsFoo",
+      conversions.head.conversionShortName + " == BooLongIsFoo")
 
     // Assert that the same for full path
-    assert(conversions.head.conversionQualifiedName == "a.Boo.BooLongIsFoo",
-           conversions.head.conversionQualifiedName + " == a.Boo.BooLongIsFoo")
+    assert(
+      conversions.head.conversionQualifiedName == "a.Boo.BooLongIsFoo",
+      conversions.head.conversionQualifiedName + " == a.Boo.BooLongIsFoo")
   }
 }

@@ -1,11 +1,17 @@
 package org.jetbrains.plugins.scala.lang.completion.weighter
 
-import com.intellij.codeInsight.completion.{CompletionLocation, CompletionWeigher}
+import com.intellij.codeInsight.completion.{
+  CompletionLocation,
+  CompletionWeigher
+}
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiClass, PsiElement}
 import org.jetbrains.plugins.scala.lang.completion.lookups.ScalaLookupItem
-import org.jetbrains.plugins.scala.lang.completion.{ScalaAfterNewCompletionUtil, ScalaCompletionUtil}
+import org.jetbrains.plugins.scala.lang.completion.{
+  ScalaAfterNewCompletionUtil,
+  ScalaCompletionUtil
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScBlockExpr
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScTypeAlias
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
@@ -17,11 +23,12 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
 class ScalaByTypeWeigher extends CompletionWeigher {
 
   override def weigh(
-      element: LookupElement, location: CompletionLocation): Comparable[_] = {
+      element: LookupElement,
+      location: CompletionLocation): Comparable[_] = {
     import KindWeights._
 
     val position = ScalaCompletionUtil.positionFromParameters(
-        location.getCompletionParameters)
+      location.getCompletionParameters)
     val context = location.getProcessingContext
 
     val isAfterNew = ScalaAfterNewCompletionUtil.isAfterNew(position, context)
@@ -36,20 +43,20 @@ class ScalaByTypeWeigher extends CompletionWeigher {
         case s: ScalaLookupItem =>
           s.element match {
             case ta: ScTypeAlias if ta.isLocal => localType
-            case ta: ScTypeAlias => typeDefinition
+            case ta: ScTypeAlias               => typeDefinition
             case te: ScTypeDefinition
                 if !te.isObject && (te.isLocal || inFunction(te)) =>
               localType
             case te: ScTypeDefinition => typeDefinition
-            case te: PsiClass => typeDefinition
-            case _ => normal
+            case te: PsiClass         => typeDefinition
+            case _                    => normal
           }
         case _ => null
       }
 
     ScalaLookupItem.original(element) match {
       case _ if isTypeDefiniton || isAfterNew => typedWeight
-      case _ => null
+      case _                                  => null
     }
   }
 

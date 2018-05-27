@@ -9,12 +9,14 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScLiteral
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScNamedElement
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 07.03.2008
   */
 trait ScNameValuePair
-    extends ScalaPsiElement with ScNamedElement with PsiNameValuePair {
+    extends ScalaPsiElement
+    with ScNamedElement
+    with PsiNameValuePair {
   override def getName: String = {
     if (nameId == null) ""
     else super.getName

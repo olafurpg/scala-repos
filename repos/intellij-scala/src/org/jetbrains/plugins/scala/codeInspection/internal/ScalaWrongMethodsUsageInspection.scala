@@ -1,7 +1,11 @@
 package org.jetbrains.plugins.scala.codeInspection.internal
 
 import com.intellij.codeHighlighting.HighlightDisplayLevel
-import com.intellij.codeInspection.{LocalInspectionTool, ProblemHighlightType, ProblemsHolder}
+import com.intellij.codeInspection.{
+  LocalInspectionTool,
+  ProblemHighlightType,
+  ProblemsHolder
+}
 import com.intellij.psi.{PsiElement, PsiElementVisitor, PsiMethod}
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScReferenceExpression
@@ -30,7 +34,8 @@ class ScalaWrongMethodsUsageInspection extends LocalInspectionTool {
   override def getDisplayName: String = "Wrong method usage"
 
   override def buildVisitor(
-      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
+      holder: ProblemsHolder,
+      isOnTheFly: Boolean): PsiElementVisitor = {
     if (!holder.getFile.isInstanceOf[ScalaFile])
       return new PsiElementVisitor {}
     new ScalaElementVisitor {
@@ -40,13 +45,19 @@ class ScalaWrongMethodsUsageInspection extends LocalInspectionTool {
         map += (("getContainingClass", Seq("com.intellij.psi.PsiMember")))
         map += (("getQualifiedName", Seq("com.intellij.psi.PsiClass")))
         map +=
-        (("getName",
-          Seq("com.intellij.navigation.NavigationItem",
-              "com.intellij.psi.PsiNamedElement")))
+          (
+            (
+              "getName",
+              Seq(
+                "com.intellij.navigation.NavigationItem",
+                "com.intellij.psi.PsiNamedElement")))
         map += (("getClasses", Seq("com.intellij.psi.PsiClassOwner")))
         map += (("getClassNames", Seq("com.intellij.psi.PsiClassOwnerEx")))
         map +=
-        (("hasModifierProperty", Seq("com.intellij.psi.PsiModifierListOwner")))
+          (
+            (
+              "hasModifierProperty",
+              Seq("com.intellij.psi.PsiModifierListOwner")))
         resolve match {
           case m: PsiMethod =>
             map.get(m.name) match {
@@ -59,8 +70,9 @@ class ScalaWrongMethodsUsageInspection extends LocalInspectionTool {
                       instance.getCachedClass(m.getResolveScope, clazz).orNull
                     if (cachedClass != null && containingClass != null) {
                       if (cachedClass == containingClass ||
-                          instance.cachedDeepIsInheritor(cachedClass,
-                                                         containingClass)) {
+                          instance.cachedDeepIsInheritor(
+                            cachedClass,
+                            containingClass)) {
                         true
                       } else false
                     } else false
@@ -80,10 +92,11 @@ class ScalaWrongMethodsUsageInspection extends LocalInspectionTool {
                       parent = parent.getParent
                     }
                     holder.registerProblem(
-                        ref.nameId,
-                        "Don't use this method, use appropriate method implemented for Scala, or use " +
+                      ref.nameId,
+                      "Don't use this method, use appropriate method implemented for Scala, or use " +
                         "\"for Java only\" text in bounded doc comment owner ScalaDoc",
-                        ProblemHighlightType.LIKE_DEPRECATED)
+                      ProblemHighlightType.LIKE_DEPRECATED
+                    )
                   case _ =>
                 }
               case _ =>

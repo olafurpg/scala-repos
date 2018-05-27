@@ -38,13 +38,13 @@ abstract class HoconFileSetTestCase(subpath: String)
     val fileContents = new String(FileUtil.loadFileText(file, "UTF-8"))
       .replaceAllLiterally("\r", "")
     val allParts = preprocessData(
-        fileContents.split("-{5,}").map(trimNewLines).toSeq)
+      fileContents.split("-{5,}").map(trimNewLines).toSeq)
     Assert.assertTrue(allParts.nonEmpty)
     val data = allParts.init
     val expectedResult = allParts.last
     Assert.assertEquals(
-        expectedResult,
-        trimNewLines(transform(data).replaceAllLiterally("\r", "")))
+      expectedResult,
+      trimNewLines(transform(data).replaceAllLiterally("\r", "")))
   }
 
   protected def settings =
@@ -69,16 +69,17 @@ abstract class HoconFileSetTestCase(subpath: String)
   protected def extractCaret(fileText: String): (String, Int) = {
     val caretOffset = fileText.indexOf(CaretMarker)
     if (caretOffset >= 0)
-      (fileText.substring(0, caretOffset) +
-       fileText.substring(caretOffset + CaretMarker.length),
-       caretOffset)
+      (
+        fileText.substring(0, caretOffset) +
+          fileText.substring(caretOffset + CaretMarker.length),
+        caretOffset)
     else (fileText, -1)
   }
 
   protected def insertCaret(fileText: String, caretOffset: Int) =
     if (caretOffset >= 0 && caretOffset <= fileText.length)
       fileText.substring(0, caretOffset) + CaretMarker + fileText.substring(
-          caretOffset)
+        caretOffset)
     else fileText
 
   protected def inWriteCommandAction[T](code: => T): T =

@@ -9,8 +9,8 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.ScalaTestTestCase
 trait FreeSpecPathGenerator extends ScalaTestTestCase {
   def addPathFreeSpec() {
     addFileToProject(
-        "FreeSpecPathTest.scala",
-        """
+      "FreeSpecPathTest.scala",
+      """
         |import org.scalatest._
         |
         |class FreeSpecPathTest extends path.FreeSpec {
@@ -24,6 +24,7 @@ trait FreeSpecPathGenerator extends ScalaTestTestCase {
         |    }
         |  }
         |}
-      """.stripMargin.trim())
+      """.stripMargin.trim()
+    )
   }
 }

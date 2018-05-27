@@ -10,9 +10,9 @@ package scalaguide.forms.scalafieldconstructor {
   object ScalaFieldConstructorSpec extends Specification {
 
     val conf = Configuration.reference
-    implicit val messages: Messages = new DefaultMessagesApi(
-        Environment.simple(), conf, new DefaultLangs(conf))
-      .preferred(Seq.empty)
+    implicit val messages: Messages =
+      new DefaultMessagesApi(Environment.simple(), conf, new DefaultLangs(conf))
+        .preferred(Seq.empty)
 
     "field constructors" should {
 
@@ -32,9 +32,9 @@ package scalaguide.forms.scalafieldconstructor {
     import html.models.User
 
     val form = Form(
-        mapping(
-            "username" -> text
-        )(User.apply)(User.unapply))
+      mapping(
+        "username" -> text
+      )(User.apply)(User.unapply))
   }
 
   package html {
@@ -42,7 +42,7 @@ package scalaguide.forms.scalafieldconstructor {
     object MyHelpers {
       import views.html.helper.FieldConstructor
       implicit val myFields = FieldConstructor(
-          html.myFieldConstructorTemplate.f)
+        html.myFieldConstructorTemplate.f)
     }
 //#form-myfield-helper
   }

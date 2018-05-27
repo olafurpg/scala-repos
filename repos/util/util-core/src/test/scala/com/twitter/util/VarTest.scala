@@ -101,7 +101,7 @@ class VarTest extends FunSuite with GeneratorDrivenPropertyChecks {
   test("flatMap") {
     val us = Seq.fill(5) { U(0) }
     def short(us: Seq[Var[Int]]): Var[Int] = us match {
-      case Seq(hd, tl @ _ *) =>
+      case Seq(hd, tl @ _*) =>
         hd flatMap {
           case 0 => short(tl)
           case i => Var(i)
@@ -116,8 +116,9 @@ class VarTest extends FunSuite with GeneratorDrivenPropertyChecks {
 
     Var.sample(s); Var.sample(s)
     assert(us.forall(_.accessCount == 3))
-    assert(us.forall(_.observerCount == 0),
-           us.map(_.observerCount.toString).mkString(","))
+    assert(
+      us.forall(_.observerCount == 0),
+      us.map(_.observerCount.toString).mkString(","))
 
     // Now maintain a subscription.
     var cur = Var.sample(s)
@@ -357,13 +358,13 @@ class VarTest extends FunSuite with GeneratorDrivenPropertyChecks {
     val v = Var(123)
     v match {
       case Var.Sampled(123) =>
-      case _ => fail()
+      case _                => fail()
     }
 
     v() = 333
     v match {
       case Var.Sampled(333) =>
-      case _ => fail()
+      case _                => fail()
     }
   }
 
@@ -392,7 +393,7 @@ class VarTest extends FunSuite with GeneratorDrivenPropertyChecks {
       val x =
         v flatMap {
           case 123 => w1
-          case _ => w2
+          case _   => w2
         }
 
       var buf = mutable.Buffer[Int]()

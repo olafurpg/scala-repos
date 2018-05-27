@@ -116,11 +116,12 @@ object Types {
 
   /** Array type. */
   final case class ArrayType(baseClassName: String, dimensions: Int)
-      extends Type with ReferenceType
+      extends Type
+      with ReferenceType
 
   object ArrayType {
     def apply(innerType: ReferenceType): ArrayType = innerType match {
-      case ClassType(className) => ArrayType(className, 1)
+      case ClassType(className)      => ArrayType(className, 1)
       case ArrayType(className, dim) => ArrayType(className, dim + 1)
     }
   }
@@ -138,10 +139,11 @@ object Types {
   }
 
   object RecordType {
-    final case class Field(name: String,
-                           originalName: Option[String],
-                           tpe: Type,
-                           mutable: Boolean)
+    final case class Field(
+        name: String,
+        originalName: Option[String],
+        tpe: Type,
+        mutable: Boolean)
   }
 
   /** No type. */
@@ -150,13 +152,13 @@ object Types {
   /** Generates a literal zero of the given type. */
   def zeroOf(tpe: Type)(implicit pos: Position): Literal = tpe match {
     case BooleanType => BooleanLiteral(false)
-    case IntType => IntLiteral(0)
-    case LongType => LongLiteral(0L)
-    case FloatType => FloatLiteral(0.0f)
-    case DoubleType => DoubleLiteral(0.0)
-    case StringType => StringLiteral("")
-    case UndefType => Undefined()
-    case _ => Null()
+    case IntType     => IntLiteral(0)
+    case LongType    => LongLiteral(0L)
+    case FloatType   => FloatLiteral(0.0f)
+    case DoubleType  => DoubleLiteral(0.0)
+    case StringType  => StringLiteral("")
+    case UndefType   => Undefined()
+    case _           => Null()
   }
 
   /** Tests whether a type `lhs` is a subtype of `rhs` (or equal).
@@ -172,59 +174,59 @@ object Types {
     (lhs != NoType && rhs != NoType) && {
       (lhs == rhs) ||
       ((lhs, rhs) match {
-            case (_, AnyType) => true
-            case (NothingType, _) => true
+        case (_, AnyType)     => true
+        case (NothingType, _) => true
 
-            case (ClassType(lhsClass), ClassType(rhsClass)) =>
-              isSubclass(lhsClass, rhsClass)
+        case (ClassType(lhsClass), ClassType(rhsClass)) =>
+          isSubclass(lhsClass, rhsClass)
 
-            case (NullType, ClassType(_)) => true
-            case (NullType, ArrayType(_, _)) => true
+        case (NullType, ClassType(_))    => true
+        case (NullType, ArrayType(_, _)) => true
 
-            case (UndefType, ClassType(cls)) =>
-              isSubclass(BoxedUnitClass, cls)
-            case (BooleanType, ClassType(cls)) =>
-              isSubclass(BoxedBooleanClass, cls)
-            case (IntType, ClassType(cls)) =>
-              isSubclass(BoxedIntegerClass, cls) || cls == BoxedByteClass ||
-              cls == BoxedShortClass || cls == BoxedDoubleClass
-            case (LongType, ClassType(cls)) =>
-              isSubclass(BoxedLongClass, cls)
-            case (FloatType, ClassType(cls)) =>
-              isSubclass(BoxedFloatClass, cls) || cls == BoxedDoubleClass
-            case (DoubleType, ClassType(cls)) =>
-              isSubclass(BoxedDoubleClass, cls)
-            case (StringType, ClassType(cls)) =>
-              isSubclass(StringClass, cls)
+        case (UndefType, ClassType(cls)) =>
+          isSubclass(BoxedUnitClass, cls)
+        case (BooleanType, ClassType(cls)) =>
+          isSubclass(BoxedBooleanClass, cls)
+        case (IntType, ClassType(cls)) =>
+          isSubclass(BoxedIntegerClass, cls) || cls == BoxedByteClass ||
+            cls == BoxedShortClass || cls == BoxedDoubleClass
+        case (LongType, ClassType(cls)) =>
+          isSubclass(BoxedLongClass, cls)
+        case (FloatType, ClassType(cls)) =>
+          isSubclass(BoxedFloatClass, cls) || cls == BoxedDoubleClass
+        case (DoubleType, ClassType(cls)) =>
+          isSubclass(BoxedDoubleClass, cls)
+        case (StringType, ClassType(cls)) =>
+          isSubclass(StringClass, cls)
 
-            case (IntType, DoubleType) => true
-            case (FloatType, DoubleType) => true
+        case (IntType, DoubleType)   => true
+        case (FloatType, DoubleType) => true
 
-            case (ArrayType(lhsBase, lhsDims), ArrayType(rhsBase, rhsDims)) =>
-              if (lhsDims < rhsDims) {
-                false // because Array[A] </: Array[Array[A]]
-              } else if (lhsDims > rhsDims) {
-                rhsBase == ObjectClass // because Array[Array[A]] <: Array[Object]
-              } else {
-                // lhsDims == rhsDims
-                // lhsBase must be <: rhsBase
-                if (isPrimitiveClass(lhsBase) || isPrimitiveClass(rhsBase)) {
-                  lhsBase == rhsBase
-                } else {
-                  /* All things must be considered subclasses of Object for this
-                   * purpose, even raw JS types and interfaces, which do not have
-                   * Object in their ancestors.
-                   */
-                  rhsBase == ObjectClass || isSubclass(lhsBase, rhsBase)
-                }
-              }
+        case (ArrayType(lhsBase, lhsDims), ArrayType(rhsBase, rhsDims)) =>
+          if (lhsDims < rhsDims) {
+            false // because Array[A] </: Array[Array[A]]
+          } else if (lhsDims > rhsDims) {
+            rhsBase == ObjectClass // because Array[Array[A]] <: Array[Object]
+          } else {
+            // lhsDims == rhsDims
+            // lhsBase must be <: rhsBase
+            if (isPrimitiveClass(lhsBase) || isPrimitiveClass(rhsBase)) {
+              lhsBase == rhsBase
+            } else {
+              /* All things must be considered subclasses of Object for this
+               * purpose, even raw JS types and interfaces, which do not have
+               * Object in their ancestors.
+               */
+              rhsBase == ObjectClass || isSubclass(lhsBase, rhsBase)
+            }
+          }
 
-            case (ArrayType(_, _), ClassType(cls)) =>
-              AncestorsOfPseudoArrayClass.contains(cls)
+        case (ArrayType(_, _), ClassType(cls)) =>
+          AncestorsOfPseudoArrayClass.contains(cls)
 
-            case _ =>
-              false
-          })
+        case _ =>
+          false
+      })
     }
   }
 }

@@ -55,9 +55,10 @@ object HttpHeader {
     * 3. The header name or value are illegal according to the basic requirements for HTTP headers
     *    (http://tools.ietf.org/html/rfc7230#section-3.2). In this case the method returns a `ParsingResult.Error`.
     */
-  def parse(name: String,
-            value: String,
-            settings: HeaderParser.Settings = HeaderParser.DefaultSettings)
+  def parse(
+      name: String,
+      value: String,
+      settings: HeaderParser.Settings = HeaderParser.DefaultSettings)
     : ParsingResult =
     if (name.forall(CharacterClasses.tchar)) {
       import akka.parboiled2.Parser.DeliveryScheme.Try
@@ -66,7 +67,9 @@ object HttpHeader {
         case Success(preProcessedValue) ⇒
           try {
             HeaderParser.parseFull(
-                name.toLowerCase, preProcessedValue, settings) match {
+              name.toLowerCase,
+              preProcessedValue,
+              settings) match {
               case Right(header) ⇒ ParsingResult.Ok(header, Nil)
               case Left(info) ⇒
                 val errors =
@@ -83,7 +86,7 @@ object HttpHeader {
             case e ⇒ parser.failure(e)
           }
           ParsingResult.Error(
-              info.left.get.withSummaryPrepended(s"Illegal HTTP header value"))
+            info.left.get.withSummaryPrepended(s"Illegal HTTP header value"))
       }
     } else ParsingResult.Error(ErrorInfo(s"Illegal HTTP header name", name))
 

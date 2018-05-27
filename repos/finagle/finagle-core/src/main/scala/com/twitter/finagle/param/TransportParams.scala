@@ -27,18 +27,20 @@ abstract class TransportParams[A <: Stack.Parameterized[A]](
     * a system-level value will be used).
     */
   def sendBufferSize(size: StorageUnit): A =
-    self.configured(self
-          .params[Transport.BufferSizes]
-          .copy(send = Some(size.inBytes.toInt)))
+    self.configured(
+      self
+        .params[Transport.BufferSizes]
+        .copy(send = Some(size.inBytes.toInt)))
 
   /**
     * Configures this client or server with given TCP receive buffer `size` (default: unspecified,
     * a system-level value will be used).
     */
   def receiveBufferSize(size: StorageUnit): A =
-    self.configured(self
-          .params[Transport.BufferSizes]
-          .copy(recv = Some(size.inBytes.toInt)))
+    self.configured(
+      self
+        .params[Transport.BufferSizes]
+        .copy(recv = Some(size.inBytes.toInt)))
 
   /**
     * Configures this client or server with given transport-level read `timeout`
@@ -48,8 +50,7 @@ abstract class TransportParams[A <: Stack.Parameterized[A]](
     * connection/transport may have received no data.
     */
   def readTimeout(timeout: Duration): A =
-    self.configured(
-        self.params[Transport.Liveness].copy(readTimeout = timeout))
+    self.configured(self.params[Transport.Liveness].copy(readTimeout = timeout))
 
   /**
     * Configures this client or server with given transport-level write `timeout`
@@ -60,7 +61,7 @@ abstract class TransportParams[A <: Stack.Parameterized[A]](
     */
   def writeTimeout(timeout: Duration): A =
     self.configured(
-        self.params[Transport.Liveness].copy(writeTimeout = timeout))
+      self.params[Transport.Liveness].copy(writeTimeout = timeout))
 
   /**
     * Makes the transport of this client or server verbose (default: disabled).

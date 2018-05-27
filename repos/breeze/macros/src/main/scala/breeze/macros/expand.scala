@@ -91,27 +91,32 @@ object expand {
 
         val configurations =
           makeTypeMaps(c)(typesToUnrollAs).filterNot(exclusions.toSet)
-        val valExpansions = valsToExpand2.map { v =>
-          v.name -> solveSequence(c)(v, typesToUnrollAs)
-        }.asInstanceOf[List[(c.Name, (c.Name, Map[c.Type, c.Tree]))]].toMap
+        val valExpansions = valsToExpand2
+          .map { v =>
+            v.name -> solveSequence(c)(v, typesToUnrollAs)
+          }
+          .asInstanceOf[List[(c.Name, (c.Name, Map[c.Type, c.Tree]))]]
+          .toMap
 
         val newDefs = configurations.map { typeMap =>
           val grounded = substitute(c)(typeMap, valExpansions, rhs)
           val newvargs = valsToLeave
             .filterNot(_.isEmpty)
             .map(_.map(substitute(c)(typeMap, valExpansions, _)
-                      .asInstanceOf[ValDef]))
+              .asInstanceOf[ValDef]))
           val newtpt = substitute(c)(typeMap, valExpansions, tpt)
           val newName = newTermName(mkName(c)(name, typeMap))
           if (shouldValify) {
             if (typesLeftAbstract.nonEmpty)
-              c.error(tree.pos,
-                      "Can't valify: Not all types were grounded: " +
-                      typesLeftAbstract.mkString(", "))
+              c.error(
+                tree.pos,
+                "Can't valify: Not all types were grounded: " +
+                  typesLeftAbstract.mkString(", "))
             if (newvargs.exists(_.nonEmpty))
-              c.error(tree.pos,
-                      "Can't valify: Not all arguments were grounded: " +
-                      newvargs.map(_.mkString(", ")).mkString("(", ")(", ")"))
+              c.error(
+                tree.pos,
+                "Can't valify: Not all arguments were grounded: " +
+                  newvargs.map(_.mkString(", ")).mkString("(", ")(", ")"))
             ValDef(mods, newName, newtpt, grounded)
           } else {
             val newTargs = typesLeftAbstract
@@ -126,11 +131,13 @@ object expand {
     }
   }
 
-  private def mkName(c: Context)(
-      name: c.Name, typeMap: Map[c.Name, c.Type]): String = {
-    name.toString + "_" + typeMap.map {
-      case (k, v) => v.toString.reverse.takeWhile(_ != '.').reverse
-    }.mkString("_")
+  private def mkName(
+      c: Context)(name: c.Name, typeMap: Map[c.Name, c.Type]): String = {
+    name.toString + "_" + typeMap
+      .map {
+        case (k, v) => v.toString.reverse.takeWhile(_ != '.').reverse
+      }
+      .mkString("_")
   }
 
   // valExpansions is a [value identifier -> (
@@ -143,7 +150,7 @@ object expand {
     class InlineTerm(name: TermName, value: Tree) extends Transformer {
       override def transform(tree: Tree): Tree = tree match {
         case Ident(`name`) => value
-        case _ => super.transform(tree)
+        case _             => super.transform(tree)
       }
     }
 
@@ -185,11 +192,11 @@ object expand {
     : (context.Name, Map[context.Type, context.Tree]) = {
     import context.mirror.universe._
     val x = v.mods.annotations.collectFirst {
-      case x @ q"new expand.sequence[${ Ident(nme2) }](...$args)" =>
+      case x @ q"new expand.sequence[${Ident(nme2)}](...$args)" =>
         if (args.flatten.length != typeMappings(nme2).length) {
           context.error(
-              x.pos,
-              s"@sequence arguments list does not match the expand.args for $nme2")
+            x.pos,
+            s"@sequence arguments list does not match the expand.args for $nme2")
         }
         val predef = context.mirror.staticModule("scala.Predef").asModule
         val missing = Select(Ident(predef), newTermName("???"))
@@ -218,8 +225,8 @@ object expand {
           } catch {
             case ex: Exception =>
               c.abort(
-                  tree.pos,
-                  s"${tree.symbol} does not have a companion. Is it maybe an alias?")
+                tree.pos,
+                s"${tree.symbol} does not have a companion. Is it maybe an alias?")
           }
         }
     }.flatten
@@ -235,26 +242,34 @@ object expand {
   }
 
   private def getExclusions(c: Context)(
-      mods: c.Modifiers, targs: Seq[c.Name]): Seq[Map[c.Name, c.Type]] = {
+      mods: c.Modifiers,
+      targs: Seq[c.Name]): Seq[Map[c.Name, c.Type]] = {
     import c.mirror.universe._
-    mods.annotations.collect {
-      case t @ q"new expand.exclude(...$args)" =>
-        for (aa <- args) if (aa.length != targs.length)
-          c.error(
-              t.pos,
-              "arguments to @exclude does not have the same arity as the type symbols!")
-        args.map(aa =>
+    mods.annotations
+      .collect {
+        case t @ q"new expand.exclude(...$args)" =>
+          for (aa <- args)
+            if (aa.length != targs.length)
+              c.error(
+                t.pos,
+                "arguments to @exclude does not have the same arity as the type symbols!")
+          args.map(
+            aa =>
               (targs zip aa
-                    .map(c.typeCheck(_))
-                    .map(_.symbol.asModule.companionSymbol.asType.toType)).toMap)
-    }.flatten.toSeq
+                .map(c.typeCheck(_))
+                .map(_.symbol.asModule.companionSymbol.asType.toType)).toMap)
+      }
+      .flatten
+      .toSeq
   }
 
   private def checkValify(c: Context)(mods: c.Modifiers) = {
     import c.mirror.universe._
-    mods.annotations.collectFirst {
-      case q"new expand.valify" => true
-    }.getOrElse(false)
+    mods.annotations
+      .collectFirst {
+        case q"new expand.valify" => true
+      }
+      .getOrElse(false)
   }
 
   private def shouldExpand(c: Context)(
@@ -262,7 +277,7 @@ object expand {
     import c.mirror.universe._
     td.mods.annotations.exists {
       case q"new expand.args(...$args)" => true
-      case _ => false
+      case _                            => false
     }
   }
 
@@ -271,7 +286,7 @@ object expand {
     import c.mirror.universe._
     td.mods.annotations.exists {
       case x @ q"new expand.sequence[..$targs](...$args)" => true
-      case _ => false
+      case _                                              => false
     }
   }
 }

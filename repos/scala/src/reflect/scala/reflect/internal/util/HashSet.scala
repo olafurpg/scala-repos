@@ -11,12 +11,14 @@ object HashSet {
   def apply[T >: Null <: AnyRef](initialCapacity: Int): HashSet[T] =
     this("No Label", initialCapacity)
   def apply[T >: Null <: AnyRef](
-      label: String, initialCapacity: Int): HashSet[T] =
+      label: String,
+      initialCapacity: Int): HashSet[T] =
     new HashSet[T](label, initialCapacity)
 }
 
 class HashSet[T >: Null <: AnyRef](val label: String, initialCapacity: Int)
-    extends Set[T] with scala.collection.generic.Clearable {
+    extends Set[T]
+    with scala.collection.generic.Clearable {
   private var used = 0
   private var table = new Array[AnyRef](initialCapacity)
   private def index(x: Int): Int = math.abs(x % table.length)
@@ -45,7 +47,7 @@ class HashSet[T >: Null <: AnyRef](val label: String, initialCapacity: Int)
   def findEntry(x: T): T = {
     var h = index(x.##)
     var entry = table(h)
-    while ( (entry ne null) && x != entry) {
+    while ((entry ne null) && x != entry) {
       h = index(h + 1)
       entry = table(h)
     }

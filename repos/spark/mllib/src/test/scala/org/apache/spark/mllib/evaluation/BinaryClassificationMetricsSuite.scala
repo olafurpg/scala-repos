@@ -22,7 +22,8 @@ import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.mllib.util.TestingUtils._
 
 class BinaryClassificationMetricsSuite
-    extends SparkFunSuite with MLlibTestSparkContext {
+    extends SparkFunSuite
+    with MLlibTestSparkContext {
 
   private def areWithinEpsilon(x: (Double, Double)): Boolean =
     x._1 ~= (x._2) absTol 1E-5
@@ -32,52 +33,61 @@ class BinaryClassificationMetricsSuite
     (x._1._1 ~= x._2._1 absTol 1E-5) && (x._1._2 ~= x._2._2 absTol 1E-5)
 
   private def assertSequencesMatch(
-      left: Seq[Double], right: Seq[Double]): Unit = {
+      left: Seq[Double],
+      right: Seq[Double]): Unit = {
     assert(left.zip(right).forall(areWithinEpsilon))
   }
 
   private def assertTupleSequencesMatch(
-      left: Seq[(Double, Double)], right: Seq[(Double, Double)]): Unit = {
+      left: Seq[(Double, Double)],
+      right: Seq[(Double, Double)]): Unit = {
     assert(left.zip(right).forall(pairsWithinEpsilon))
   }
 
-  private def validateMetrics(metrics: BinaryClassificationMetrics,
-                              expectedThresholds: Seq[Double],
-                              expectedROCCurve: Seq[(Double, Double)],
-                              expectedPRCurve: Seq[(Double, Double)],
-                              expectedFMeasures1: Seq[Double],
-                              expectedFmeasures2: Seq[Double],
-                              expectedPrecisions: Seq[Double],
-                              expectedRecalls: Seq[Double]) = {
+  private def validateMetrics(
+      metrics: BinaryClassificationMetrics,
+      expectedThresholds: Seq[Double],
+      expectedROCCurve: Seq[(Double, Double)],
+      expectedPRCurve: Seq[(Double, Double)],
+      expectedFMeasures1: Seq[Double],
+      expectedFmeasures2: Seq[Double],
+      expectedPrecisions: Seq[Double],
+      expectedRecalls: Seq[Double]) = {
 
     assertSequencesMatch(metrics.thresholds().collect(), expectedThresholds)
     assertTupleSequencesMatch(metrics.roc().collect(), expectedROCCurve)
     assert(
-        metrics.areaUnderROC() ~==
-          AreaUnderCurve.of(expectedROCCurve) absTol 1E-5)
+      metrics.areaUnderROC() ~==
+        AreaUnderCurve.of(expectedROCCurve) absTol 1E-5)
     assertTupleSequencesMatch(metrics.pr().collect(), expectedPRCurve)
     assert(
-        metrics.areaUnderPR() ~==
-          AreaUnderCurve.of(expectedPRCurve) absTol 1E-5)
-    assertTupleSequencesMatch(metrics.fMeasureByThreshold().collect(),
-                              expectedThresholds.zip(expectedFMeasures1))
-    assertTupleSequencesMatch(metrics.fMeasureByThreshold(2.0).collect(),
-                              expectedThresholds.zip(expectedFmeasures2))
-    assertTupleSequencesMatch(metrics.precisionByThreshold().collect(),
-                              expectedThresholds.zip(expectedPrecisions))
-    assertTupleSequencesMatch(metrics.recallByThreshold().collect(),
-                              expectedThresholds.zip(expectedRecalls))
+      metrics.areaUnderPR() ~==
+        AreaUnderCurve.of(expectedPRCurve) absTol 1E-5)
+    assertTupleSequencesMatch(
+      metrics.fMeasureByThreshold().collect(),
+      expectedThresholds.zip(expectedFMeasures1))
+    assertTupleSequencesMatch(
+      metrics.fMeasureByThreshold(2.0).collect(),
+      expectedThresholds.zip(expectedFmeasures2))
+    assertTupleSequencesMatch(
+      metrics.precisionByThreshold().collect(),
+      expectedThresholds.zip(expectedPrecisions))
+    assertTupleSequencesMatch(
+      metrics.recallByThreshold().collect(),
+      expectedThresholds.zip(expectedRecalls))
   }
 
   test("binary evaluation metrics") {
-    val scoreAndLabels = sc.parallelize(Seq((0.1, 0.0),
-                                            (0.1, 1.0),
-                                            (0.4, 0.0),
-                                            (0.6, 0.0),
-                                            (0.6, 1.0),
-                                            (0.6, 1.0),
-                                            (0.8, 1.0)),
-                                        2)
+    val scoreAndLabels = sc.parallelize(
+      Seq(
+        (0.1, 0.0),
+        (0.1, 1.0),
+        (0.4, 0.0),
+        (0.6, 0.0),
+        (0.6, 1.0),
+        (0.6, 1.0),
+        (0.8, 1.0)),
+      2)
     val metrics = new BinaryClassificationMetrics(scoreAndLabels)
     val thresholds = Seq(0.8, 0.6, 0.4, 0.1)
     val numTruePositives = Seq(1, 3, 3, 4)
@@ -97,11 +107,18 @@ class BinaryClassificationMetricsSuite
     val f2 = pr.map { case (r, p) => 5.0 * (p * r) / (4.0 * p + r) }
 
     validateMetrics(
-        metrics, thresholds, rocCurve, prCurve, f1, f2, precisions, recalls)
+      metrics,
+      thresholds,
+      rocCurve,
+      prCurve,
+      f1,
+      f2,
+      precisions,
+      recalls)
   }
 
   test(
-      "binary evaluation metrics for RDD where all examples have positive label") {
+    "binary evaluation metrics for RDD where all examples have positive label") {
     val scoreAndLabels = sc.parallelize(Seq((0.5, 1.0), (0.5, 1.0)), 2)
     val metrics = new BinaryClassificationMetrics(scoreAndLabels)
 
@@ -116,11 +133,18 @@ class BinaryClassificationMetricsSuite
     val f2 = pr.map { case (r, p) => 5.0 * (p * r) / (4.0 * p + r) }
 
     validateMetrics(
-        metrics, thresholds, rocCurve, prCurve, f1, f2, precisions, recalls)
+      metrics,
+      thresholds,
+      rocCurve,
+      prCurve,
+      f1,
+      f2,
+      precisions,
+      recalls)
   }
 
   test(
-      "binary evaluation metrics for RDD where all examples have negative label") {
+    "binary evaluation metrics for RDD where all examples have negative label") {
     val scoreAndLabels = sc.parallelize(Seq((0.5, 0.0), (0.5, 0.0)), 2)
     val metrics = new BinaryClassificationMetrics(scoreAndLabels)
 
@@ -141,19 +165,27 @@ class BinaryClassificationMetricsSuite
     }
 
     validateMetrics(
-        metrics, thresholds, rocCurve, prCurve, f1, f2, precisions, recalls)
+      metrics,
+      thresholds,
+      rocCurve,
+      prCurve,
+      f1,
+      f2,
+      precisions,
+      recalls)
   }
 
   test("binary evaluation metrics with downsampling") {
-    val scoreAndLabels = Seq((0.1, 0.0),
-                             (0.2, 0.0),
-                             (0.3, 1.0),
-                             (0.4, 0.0),
-                             (0.5, 0.0),
-                             (0.6, 1.0),
-                             (0.7, 1.0),
-                             (0.8, 0.0),
-                             (0.9, 1.0))
+    val scoreAndLabels = Seq(
+      (0.1, 0.0),
+      (0.2, 0.0),
+      (0.3, 1.0),
+      (0.4, 0.0),
+      (0.5, 0.0),
+      (0.6, 1.0),
+      (0.7, 1.0),
+      (0.8, 0.0),
+      (0.9, 1.0))
 
     val scoreAndLabelsRDD = sc.parallelize(scoreAndLabels, 1)
 
@@ -162,19 +194,19 @@ class BinaryClassificationMetricsSuite
     // Add 2 for (0,0) and (1,1) appended at either end
     assert(2 + scoreAndLabels.size == originalROC.size)
     assert(
-        List(
-            (0.0, 0.0),
-            (0.0, 0.25),
-            (0.2, 0.25),
-            (0.2, 0.5),
-            (0.2, 0.75),
-            (0.4, 0.75),
-            (0.6, 0.75),
-            (0.6, 1.0),
-            (0.8, 1.0),
-            (1.0, 1.0),
-            (1.0, 1.0)
-        ) == originalROC)
+      List(
+        (0.0, 0.0),
+        (0.0, 0.25),
+        (0.2, 0.25),
+        (0.2, 0.5),
+        (0.2, 0.75),
+        (0.4, 0.75),
+        (0.6, 0.75),
+        (0.6, 1.0),
+        (0.8, 1.0),
+        (1.0, 1.0),
+        (1.0, 1.0)
+      ) == originalROC)
 
     val numBins = 4
 
@@ -182,17 +214,17 @@ class BinaryClassificationMetricsSuite
       new BinaryClassificationMetrics(scoreAndLabelsRDD, numBins)
     val downsampledROC = downsampled.roc().collect().sorted.toList
     assert(
-        // May have to add 1 if the sample factor didn't divide evenly
-        2 + (numBins + (if (scoreAndLabels.size % numBins == 0) 0 else 1)) == downsampledROC.size)
+      // May have to add 1 if the sample factor didn't divide evenly
+      2 + (numBins + (if (scoreAndLabels.size % numBins == 0) 0 else 1)) == downsampledROC.size)
     assert(
-        List(
-            (0.0, 0.0),
-            (0.2, 0.25),
-            (0.2, 0.75),
-            (0.6, 0.75),
-            (0.8, 1.0),
-            (1.0, 1.0),
-            (1.0, 1.0)
-        ) == downsampledROC)
+      List(
+        (0.0, 0.0),
+        (0.2, 0.25),
+        (0.2, 0.75),
+        (0.6, 0.75),
+        (0.8, 1.0),
+        (1.0, 1.0),
+        (1.0, 1.0)
+      ) == downsampledROC)
   }
 }

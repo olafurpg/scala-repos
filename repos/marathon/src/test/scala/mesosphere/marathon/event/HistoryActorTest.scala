@@ -14,8 +14,12 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatest.{BeforeAndAfterAll, Matchers}
 
 class HistoryActorTest
-    extends MarathonActorSupport with MarathonSpec with MockitoSugar
-    with BeforeAndAfterAll with Matchers with ImplicitSender {
+    extends MarathonActorSupport
+    with MarathonSpec
+    with MockitoSugar
+    with BeforeAndAfterAll
+    with Matchers
+    with ImplicitSender {
   import org.apache.mesos.Protos.TaskState._
 
   var historyActor: ActorRef = _
@@ -24,33 +28,33 @@ class HistoryActorTest
   before {
     failureRepo = mock[TaskFailureRepository]
     historyActor = TestActorRef(
-        Props(
-            new HistoryActor(system.eventStream, failureRepo)
-        ))
+      Props(
+        new HistoryActor(system.eventStream, failureRepo)
+      ))
   }
 
   test("Store TASK_FAILED") {
     val message = statusMessage(TASK_FAILED)
     historyActor ! message
 
-    verify(failureRepo).store(
-        message.appId, TaskFailure.FromMesosStatusUpdateEvent(message).get)
+    verify(failureRepo)
+      .store(message.appId, TaskFailure.FromMesosStatusUpdateEvent(message).get)
   }
 
   test("Store TASK_ERROR") {
     val message = statusMessage(TASK_ERROR)
     historyActor ! message
 
-    verify(failureRepo).store(
-        message.appId, TaskFailure.FromMesosStatusUpdateEvent(message).get)
+    verify(failureRepo)
+      .store(message.appId, TaskFailure.FromMesosStatusUpdateEvent(message).get)
   }
 
   test("Store TASK_LOST") {
     val message = statusMessage(TASK_LOST)
     historyActor ! message
 
-    verify(failureRepo).store(
-        message.appId, TaskFailure.FromMesosStatusUpdateEvent(message).get)
+    verify(failureRepo)
+      .store(message.appId, TaskFailure.FromMesosStatusUpdateEvent(message).get)
   }
 
   test("Ignore TASK_RUNNING") {
@@ -89,15 +93,15 @@ class HistoryActorTest
       .build()
 
     MesosStatusUpdateEvent(
-        slaveId = "slaveId",
-        taskId = Task.Id("taskId"),
-        taskStatus = state.name(),
-        message = "message",
-        appId = "appId".toPath,
-        host = "host",
-        ipAddresses = Seq(ipAddress),
-        ports = Nil,
-        version = Timestamp.now().toString
+      slaveId = "slaveId",
+      taskId = Task.Id("taskId"),
+      taskStatus = state.name(),
+      message = "message",
+      appId = "appId".toPath,
+      host = "host",
+      ipAddresses = Seq(ipAddress),
+      ports = Nil,
+      version = Timestamp.now().toString
     )
   }
 }

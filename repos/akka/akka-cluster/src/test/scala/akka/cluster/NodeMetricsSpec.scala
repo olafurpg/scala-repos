@@ -27,14 +27,14 @@ class NodeMetricsSpec extends WordSpec with Matchers {
     }
 
     "merge 2 NodeMetrics by most recent" in {
-      val sample1 = NodeMetrics(node1,
-                                1,
-                                Set(Metric.create("a", 10, None),
-                                    Metric.create("b", 20, None)).flatten)
-      val sample2 = NodeMetrics(node1,
-                                2,
-                                Set(Metric.create("a", 11, None),
-                                    Metric.create("c", 30, None)).flatten)
+      val sample1 = NodeMetrics(
+        node1,
+        1,
+        Set(Metric.create("a", 10, None), Metric.create("b", 20, None)).flatten)
+      val sample2 = NodeMetrics(
+        node1,
+        2,
+        Set(Metric.create("a", 11, None), Metric.create("c", 30, None)).flatten)
 
       val merged = sample1 merge sample2
       merged.timestamp should ===(sample2.timestamp)
@@ -44,14 +44,14 @@ class NodeMetricsSpec extends WordSpec with Matchers {
     }
 
     "not merge 2 NodeMetrics if master is more recent" in {
-      val sample1 = NodeMetrics(node1,
-                                1,
-                                Set(Metric.create("a", 10, None),
-                                    Metric.create("b", 20, None)).flatten)
-      val sample2 = NodeMetrics(node1,
-                                0,
-                                Set(Metric.create("a", 11, None),
-                                    Metric.create("c", 30, None)).flatten)
+      val sample1 = NodeMetrics(
+        node1,
+        1,
+        Set(Metric.create("a", 10, None), Metric.create("b", 20, None)).flatten)
+      val sample2 = NodeMetrics(
+        node1,
+        0,
+        Set(Metric.create("a", 11, None), Metric.create("c", 30, None)).flatten)
 
       val merged = sample1 merge sample2 // older and not same
       merged.timestamp should ===(sample1.timestamp)

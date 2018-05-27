@@ -12,9 +12,9 @@ private[i18n] object TranslationRepo {
 
   def nextId: Fu[ID] =
     $primitive.one(
-        $select.all,
-        "_id",
-        _ sort $sort.descId
+      $select.all,
+      "_id",
+      _ sort $sort.descId
     )(_.asOpt[Int]) map (opt => ~opt + 1)
 
   def findFrom(id: ID): Fu[List[Translation]] =

@@ -39,6 +39,6 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class StageStyleSpec
     extends SFXEnumDelegateSpec[jfxs.StageStyle, StageStyle](
-        javaClass = classOf[jfxs.StageStyle],
-        scalaClass = classOf[StageStyle],
-        companion = StageStyle)
+      javaClass = classOf[jfxs.StageStyle],
+      scalaClass = classOf[StageStyle],
+      companion = StageStyle)

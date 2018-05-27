@@ -17,23 +17,27 @@ import org.scalatest.{BeforeAndAfterEach, FunSuite}
   */
 @RunWith(classOf[JUnitRunner])
 class LatencyCompensationTest
-    extends FunSuite with AssertionsForJUnit with Eventually
-    with BeforeAndAfterEach with IntegrationPatience {
+    extends FunSuite
+    with AssertionsForJUnit
+    with Eventually
+    with BeforeAndAfterEach
+    with IntegrationPatience {
   def verifyCompensationModule(expected: Duration) =
     new Stack.Module[ServiceFactory[String, String]] {
       val role = Stack.Role("verify")
       val description = "Verify stack behavior"
       val parameters = Seq(
-          implicitly[Stack.Param[LatencyCompensation.Compensator]])
+        implicitly[Stack.Param[LatencyCompensation.Compensator]])
       def make(
-          prms: Stack.Params, next: Stack[ServiceFactory[String, String]]) = {
+          prms: Stack.Params,
+          next: Stack[ServiceFactory[String, String]]) = {
         val LatencyCompensation.Compensation(compensation) =
           prms[LatencyCompensation.Compensation]
         assert(expected == compensation)
 
         Stack.Leaf(
-            this,
-            ServiceFactory.const(Service.mk[String, String](Future.value)))
+          this,
+          ServiceFactory.const(Service.mk[String, String](Future.value)))
       }
     }
 
@@ -42,27 +46,27 @@ class LatencyCompensationTest
     LatencyCompensation.DefaultOverride.reset()
 
   test("Sets Compensation param") {
-    val stk = new StackBuilder[ServiceFactory[String, String]](
-        nilStack[String, String])
+    val stk =
+      new StackBuilder[ServiceFactory[String, String]](nilStack[String, String])
     stk.push(verifyCompensationModule(100.millis))
     stk.push(LatencyCompensation.module)
     stk.result.make(
-        Stack.Params.empty + LatencyCompensation.Compensator(_ => 100.millis))
+      Stack.Params.empty + LatencyCompensation.Compensator(_ => 100.millis))
   }
 
   test("Defaults to zero") {
-    val stk = new StackBuilder[ServiceFactory[String, String]](
-        nilStack[String, String])
+    val stk =
+      new StackBuilder[ServiceFactory[String, String]](nilStack[String, String])
     stk.push(verifyCompensationModule(0.second))
     stk.push(LatencyCompensation.module)
     stk.result.make(Stack.Params.empty)
   }
 
   test("Override can only be set once") {
-    assert(LatencyCompensation.DefaultOverride.set(
-            Compensator(_ => Duration.Zero)))
-    assert(!LatencyCompensation.DefaultOverride.set(
-            Compensator(_ => Duration.Zero)))
+    assert(
+      LatencyCompensation.DefaultOverride.set(Compensator(_ => Duration.Zero)))
+    assert(
+      !LatencyCompensation.DefaultOverride.set(Compensator(_ => Duration.Zero)))
   }
 
   class Ctx {
@@ -92,7 +96,7 @@ class LatencyCompensationTest
     var compensator: (Addr.Metadata => Duration) = { metadata =>
       metadata.get("compensation") match {
         case Some(compensation: Duration) => compensation
-        case _ => Duration.Zero
+        case _                            => Duration.Zero
       }
     }
 
@@ -115,8 +119,8 @@ class LatencyCompensationTest
       val client =
         echoClient.newService(Name.Bound(Var.value(addr), "id"), "label")
 
-      try f(client) finally Await.result(
-          client.close() join server.close(), 10.seconds)
+      try f(client)
+      finally Await.result(client.close() join server.close(), 10.seconds)
     }
   }
 
@@ -146,12 +150,12 @@ class LatencyCompensationTest
   }
 
   test(
-      "TimeoutFilter.module accomodates configured latency compensation even when default override is set") {
+    "TimeoutFilter.module accomodates configured latency compensation even when default override is set") {
     new Ctx {
       // set a compensation to 0 which should cause a failure if the caller does not
       // explicitly .configure the client with a compensation parameter.
-      LatencyCompensation.DefaultOverride.set(
-          new Compensator(_ => Duration.Zero))
+      LatencyCompensation.DefaultOverride.set(new Compensator(_ =>
+        Duration.Zero))
 
       metadata = Addr.Metadata("compensation" -> 2.seconds)
 
@@ -178,7 +182,7 @@ class LatencyCompensationTest
   }
 
   test(
-      "TimeoutFilter.module accomodates configured latency compensation when set by override") {
+    "TimeoutFilter.module accomodates configured latency compensation when set by override") {
     new Ctx {
       // Do not set the .configured param for LatencyCompensation. Instead override the default
       // compensation to 2 seconds which will make this succeed.

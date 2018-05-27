@@ -27,12 +27,13 @@ import org.junit.{Before, Test}
 import kafka.utils.TestUtils
 import org.apache.kafka.common.utils.Utils
 
-case class MessageTestVal(val key: Array[Byte],
-                          val payload: Array[Byte],
-                          val codec: CompressionCodec,
-                          val timestamp: Long,
-                          val magicValue: Byte,
-                          val message: Message)
+case class MessageTestVal(
+    val key: Array[Byte],
+    val payload: Array[Byte],
+    val codec: CompressionCodec,
+    val timestamp: Long,
+    val magicValue: Byte,
+    val message: Message)
 
 class MessageTest extends JUnitSuite {
 
@@ -42,17 +43,23 @@ class MessageTest extends JUnitSuite {
   def setUp(): Unit = {
     val keys = Array(null, "key".getBytes, "".getBytes)
     val vals = Array("value".getBytes, "".getBytes, null)
-    val codecs = Array(NoCompressionCodec,
-                       GZIPCompressionCodec,
-                       SnappyCompressionCodec,
-                       LZ4CompressionCodec)
+    val codecs = Array(
+      NoCompressionCodec,
+      GZIPCompressionCodec,
+      SnappyCompressionCodec,
+      LZ4CompressionCodec)
     val timestamps = Array(Message.NoTimestamp, 0L, 1L)
     val magicValues = Array(Message.MagicValue_V0, Message.MagicValue_V1)
     for (k <- keys; v <- vals; codec <- codecs; t <- timestamps;
-    mv <- magicValues) {
+         mv <- magicValues) {
       val timestamp = ensureValid(mv, t)
       messages += new MessageTestVal(
-          k, v, codec, timestamp, mv, new Message(v, k, timestamp, codec, mv))
+        k,
+        v,
+        codec,
+        timestamp,
+        mv,
+        new Message(v, k, timestamp, codec, mv))
     }
 
     def ensureValid(magicValue: Byte, timestamp: Long): Long =
@@ -73,11 +80,14 @@ class MessageTest extends JUnitSuite {
       // check timestamp
       if (v.magicValue > Message.MagicValue_V0)
         assertEquals(
-            "Timestamp should be the same", v.timestamp, v.message.timestamp)
+          "Timestamp should be the same",
+          v.timestamp,
+          v.message.timestamp)
       else
-        assertEquals("Timestamp should be the NoTimestamp",
-                     Message.NoTimestamp,
-                     v.message.timestamp)
+        assertEquals(
+          "Timestamp should be the NoTimestamp",
+          Message.NoTimestamp,
+          v.message.timestamp)
 
       // check magic value
       assertEquals(v.magicValue, v.message.magic)
@@ -98,7 +108,8 @@ class MessageTest extends JUnitSuite {
       val badChecksum: Int = (v.message.checksum + 1 % Int.MaxValue).toInt
       Utils.writeUnsignedInt(v.message.buffer, Message.CrcOffset, badChecksum)
       assertFalse(
-          "Message with invalid checksum should be invalid", v.message.isValid)
+        "Message with invalid checksum should be invalid",
+        v.message.isValid)
     }
   }
 
@@ -108,13 +119,15 @@ class MessageTest extends JUnitSuite {
       assertFalse("Should not equal null", v.message.equals(null))
       assertFalse("Should not equal a random string", v.message.equals("asdf"))
       assertTrue("Should equal itself", v.message.equals(v.message))
-      val copy = new Message(bytes = v.payload,
-                             key = v.key,
-                             v.timestamp,
-                             codec = v.codec,
-                             v.magicValue)
-      assertTrue("Should equal another message with the same content.",
-                 v.message.equals(copy))
+      val copy = new Message(
+        bytes = v.payload,
+        key = v.key,
+        v.timestamp,
+        codec = v.codec,
+        v.magicValue)
+      assertTrue(
+        "Should equal another message with the same content.",
+        v.message.equals(copy))
     }
   }
 
@@ -122,38 +135,46 @@ class MessageTest extends JUnitSuite {
   def testMessageFormatConversion() {
 
     def convertAndVerify(
-        v: MessageTestVal, fromMessageFormat: Byte, toMessageFormat: Byte) {
+        v: MessageTestVal,
+        fromMessageFormat: Byte,
+        toMessageFormat: Byte) {
       assertEquals(
-          "Message should be the same when convert to the same version.",
-          v.message.toFormatVersion(fromMessageFormat),
-          v.message)
+        "Message should be the same when convert to the same version.",
+        v.message.toFormatVersion(fromMessageFormat),
+        v.message)
       val convertedMessage = v.message.toFormatVersion(toMessageFormat)
-      assertEquals("Size difference is not expected value",
-                   convertedMessage.size - v.message.size,
-                   Message.headerSizeDiff(fromMessageFormat, toMessageFormat))
+      assertEquals(
+        "Size difference is not expected value",
+        convertedMessage.size - v.message.size,
+        Message.headerSizeDiff(fromMessageFormat, toMessageFormat))
       assertTrue("Message should still be valid", convertedMessage.isValid)
-      assertEquals("Timestamp should be NoTimestamp",
-                   convertedMessage.timestamp,
-                   Message.NoTimestamp)
-      assertEquals(s"Magic value should be $toMessageFormat now",
-                   convertedMessage.magic,
-                   toMessageFormat)
+      assertEquals(
+        "Timestamp should be NoTimestamp",
+        convertedMessage.timestamp,
+        Message.NoTimestamp)
+      assertEquals(
+        s"Magic value should be $toMessageFormat now",
+        convertedMessage.magic,
+        toMessageFormat)
       if (convertedMessage.hasKey)
-        assertEquals("Message key should not change",
-                     convertedMessage.key,
-                     ByteBuffer.wrap(v.key))
+        assertEquals(
+          "Message key should not change",
+          convertedMessage.key,
+          ByteBuffer.wrap(v.key))
       else assertNull(convertedMessage.key)
       if (v.payload == null) {
         assertTrue(convertedMessage.isNull)
         assertEquals("Payload should be null", null, convertedMessage.payload)
       } else {
-        assertEquals("Message payload should not change",
-                     convertedMessage.payload,
-                     ByteBuffer.wrap(v.payload))
+        assertEquals(
+          "Message payload should not change",
+          convertedMessage.payload,
+          ByteBuffer.wrap(v.payload))
       }
-      assertEquals("Compression codec should not change",
-                   convertedMessage.compressionCodec,
-                   v.codec)
+      assertEquals(
+        "Compression codec should not change",
+        convertedMessage.compressionCodec,
+        v.codec)
     }
 
     for (v <- messages) {
@@ -194,8 +215,8 @@ class MessageTest extends JUnitSuite {
     val actual = Errors.forException(new InvalidMessageException())
 
     assertEquals(
-        "InvalidMessageException should map to a corrupt message error",
-        expected,
-        actual)
+      "InvalidMessageException should map to a corrupt message error",
+      expected,
+      actual)
   }
 }

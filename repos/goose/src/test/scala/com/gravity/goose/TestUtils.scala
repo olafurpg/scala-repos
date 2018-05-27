@@ -16,7 +16,7 @@ object TestUtils {
   private val NL = '\n';
   private val TAB = "\t\t";
   val articleReport = new StringBuilder(
-      "=======================::. ARTICLE REPORT .::======================\n");
+    "=======================::. ARTICLE REPORT .::======================\n");
 
   val DEFAULT_CONFIG: Configuration = new Configuration
   val NO_IMAGE_CONFIG: Configuration = new Configuration
@@ -45,12 +45,13 @@ object TestUtils {
     article
   }
 
-  def runArticleAssertions(article: Article,
-                           expectedTitle: String = null,
-                           expectedStart: String = null,
-                           expectedImage: String = null,
-                           expectedDescription: String = null,
-                           expectedKeywords: String = null): Unit = {
+  def runArticleAssertions(
+      article: Article,
+      expectedTitle: String = null,
+      expectedStart: String = null,
+      expectedImage: String = null,
+      expectedDescription: String = null,
+      expectedKeywords: String = null): Unit = {
     articleReport
       .append("URL:      ")
       .append(TAB)
@@ -122,12 +123,14 @@ object TestUtils {
     if (expectedStart != null) {
       val articleText: String = article.cleanedArticleText
       assertNotNull("Resulting article text was NULL!", articleText)
-      assertTrue("Article text was not as long as expected beginning!",
-                 expectedStart.length <= articleText.length)
+      assertTrue(
+        "Article text was not as long as expected beginning!",
+        expectedStart.length <= articleText.length)
       val actual: String = articleText.substring(0, expectedStart.length)
-      assertEquals("The beginning of the article text was not as expected!",
-                   expectedStart,
-                   actual)
+      assertEquals(
+        "The beginning of the article text was not as expected!",
+        expectedStart,
+        actual)
     }
     if (expectedImage != null) {
       val image: Image = article.topImage
@@ -139,15 +142,18 @@ object TestUtils {
     if (expectedDescription != null) {
       val description: String = article.metaDescription
       assertNotNull("Meta Description was NULL!", description)
-      assertEquals("Meta Description was not as expected!",
-                   expectedDescription,
-                   description)
+      assertEquals(
+        "Meta Description was not as expected!",
+        expectedDescription,
+        description)
     }
     if (expectedKeywords != null) {
       val keywords: String = article.metaDescription
       assertNotNull("Meta Keywords was NULL!", keywords)
       assertEquals(
-          "Meta Keywords was not as expected!", expectedKeywords, keywords)
+        "Meta Keywords was not as expected!",
+        expectedKeywords,
+        keywords)
     }
   }
 

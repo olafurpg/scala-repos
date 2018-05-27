@@ -11,7 +11,8 @@ import scala.collection.{breakOut, immutable}
 abstract class Dns {
   def cached(name: String): Option[Dns.Resolved] = None
   def resolve(name: String)(
-      system: ActorSystem, sender: ActorRef): Option[Dns.Resolved] = {
+      system: ActorSystem,
+      sender: ActorRef): Option[Dns.Resolved] = {
     val ret = cached(name)
     if (ret.isEmpty) IO(Dns)(system).tell(Dns.Resolve(name), sender)
     ret
@@ -25,9 +26,10 @@ object Dns extends ExtensionId[DnsExt] with ExtensionIdProvider {
     override def consistentHashKey = name
   }
 
-  case class Resolved(name: String,
-                      ipv4: immutable.Seq[Inet4Address],
-                      ipv6: immutable.Seq[Inet6Address])
+  case class Resolved(
+      name: String,
+      ipv4: immutable.Seq[Inet4Address],
+      ipv6: immutable.Seq[Inet6Address])
       extends Command {
     val addrOption: Option[InetAddress] =
       ipv4.headOption orElse ipv6.headOption
@@ -55,8 +57,8 @@ object Dns extends ExtensionId[DnsExt] with ExtensionIdProvider {
     Dns(system).cache.cached(name)
   }
 
-  def resolve(name: String)(
-      system: ActorSystem, sender: ActorRef): Option[Resolved] = {
+  def resolve(
+      name: String)(system: ActorSystem, sender: ActorRef): Option[Resolved] = {
     Dns(system).cache.resolve(name)(system, sender)
   }
 
@@ -74,7 +76,7 @@ object Dns extends ExtensionId[DnsExt] with ExtensionIdProvider {
 class DnsExt(system: ExtendedActorSystem) extends IO.Extension {
   val Settings = new Settings(system.settings.config.getConfig("akka.io.dns"))
 
-  class Settings private[DnsExt](_config: Config) {
+  class Settings private[DnsExt] (_config: Config) {
 
     import _config._
 
@@ -92,10 +94,11 @@ class DnsExt(system: ExtendedActorSystem) extends IO.Extension {
   val cache: Dns = provider.cache
 
   val manager: ActorRef = {
-    system.systemActorOf(props = Props(classOf[SimpleDnsManager], this)
-                             .withDeploy(Deploy.local)
-                             .withDispatcher(Settings.Dispatcher),
-                         name = "IO-DNS")
+    system.systemActorOf(
+      props = Props(classOf[SimpleDnsManager], this)
+        .withDeploy(Deploy.local)
+        .withDispatcher(Settings.Dispatcher),
+      name = "IO-DNS")
   }
 
   def getResolver: ActorRef = manager

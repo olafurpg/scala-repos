@@ -4,15 +4,23 @@ import com.twitter.collection.BucketGenerationalQueue
 import com.twitter.finagle.service.FailedService
 import com.twitter.finagle.{param, Stack, Stackable}
 import com.twitter.finagle.stats.{NullStatsReceiver, StatsReceiver}
-import com.twitter.finagle.{ConnectionRefusedException, SimpleFilter, Service, ClientConnection}
+import com.twitter.finagle.{
+  ConnectionRefusedException,
+  SimpleFilter,
+  Service,
+  ClientConnection
+}
 import com.twitter.finagle.{ServiceFactory, ServiceFactoryProxy}
 import com.twitter.util.{Future, Duration}
 import java.util.concurrent.atomic.AtomicInteger
 
 case class OpenConnectionsThresholds(
-    lowWaterMark: Int, highWaterMark: Int, idleTimeout: Duration) {
+    lowWaterMark: Int,
+    highWaterMark: Int,
+    idleTimeout: Duration) {
   require(
-      lowWaterMark <= highWaterMark, "lowWaterMark must be <= highWaterMark")
+    lowWaterMark <= highWaterMark,
+    "lowWaterMark must be <= highWaterMark")
 }
 
 object IdleConnectionFilter {
@@ -39,10 +47,11 @@ object IdleConnectionFilter {
       val role = IdleConnectionFilter.role
       val description =
         "Refuse requests and try to close idle connections " +
-        "based on the number of active connections"
-      def make(_param: Param,
-               _stats: param.Stats,
-               next: ServiceFactory[Req, Rep]) = {
+          "based on the number of active connections"
+      def make(
+          _param: Param,
+          _stats: param.Stats,
+          next: ServiceFactory[Req, Rep]) = {
         _param match {
           case Param(Some(thres)) =>
             val param.Stats(sr) = _stats
@@ -73,8 +82,7 @@ class IdleConnectionFilter[Req, Rep](
     self: ServiceFactory[Req, Rep],
     threshold: OpenConnectionsThresholds,
     statsReceiver: StatsReceiver = NullStatsReceiver
-)
-    extends ServiceFactoryProxy[Req, Rep](self) {
+) extends ServiceFactoryProxy[Req, Rep](self) {
   private[this] val queue =
     new BucketGenerationalQueue[ClientConnection](threshold.idleTimeout)
   private[this] val connectionCounter = new AtomicInteger(0)

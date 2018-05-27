@@ -111,8 +111,7 @@ private[sbt] case class SbtParser(file: File, lines: Seq[String])
     // Check No val (a,b) = foo *or* val a,b = foo as these are problematic to range positions and the WHOLE architecture.
     def isBadValDef(t: Tree): Boolean =
       t match {
-        case x @ toolbox.u.ValDef(_, _, _, rhs)
-            if rhs != toolbox.u.EmptyTree =>
+        case x @ toolbox.u.ValDef(_, _, _, rhs) if rhs != toolbox.u.EmptyTree =>
           val c = content.substring(x.pos.start, x.pos.end)
           !(c contains "=")
         case _ => false
@@ -121,13 +120,13 @@ private[sbt] case class SbtParser(file: File, lines: Seq[String])
       // Issue errors
       val positionLine = badTree.pos.line
       throw new MessageOnlyException(
-          s"""[$fileName]:$positionLine: Pattern matching in val statements is not supported""".stripMargin)
+        s"""[$fileName]:$positionLine: Pattern matching in val statements is not supported""".stripMargin)
     }
 
     val (imports, statements) =
       parsedTrees partition {
         case _: Import => true
-        case _ => false
+        case _         => false
       }
 
     /**
@@ -139,8 +138,8 @@ private[sbt] case class SbtParser(file: File, lines: Seq[String])
     def parseStatementAgain(t: Tree, originalStatement: String): String = {
       val statement = scala.util.Try(toolbox.parse(originalStatement)) match {
         case scala.util.Failure(th) =>
-          val missingText = findMissingText(
-              content, t.pos.end, t.pos.line, fileName, th)
+          val missingText =
+            findMissingText(content, t.pos.end, t.pos.line, fileName, th)
           originalStatement + missingText
         case _ =>
           originalStatement
@@ -158,14 +157,15 @@ private[sbt] case class SbtParser(file: File, lines: Seq[String])
           val statement = parseStatementAgain(t, originalStatement)
           val numberLines = countLines(statement)
           Some(
-              (statement,
-               t,
-               LineRange(position.line - 1, position.line + numberLines)))
+            (
+              statement,
+              t,
+              LineRange(position.line - 1, position.line + numberLines)))
       }
     val stmtTreeLineRange = statements flatMap convertStatement
     val importsLineRange = importsToLineRanges(content, imports)
     (importsLineRange, stmtTreeLineRange.map {
-      case (stmt, _, lr) => (stmt, lr)
+      case (stmt, _, lr)                            => (stmt, lr)
     }, stmtTreeLineRange.map { case (stmt, tree, _) => (stmt, tree) })
   }
 
@@ -176,7 +176,8 @@ private[sbt] case class SbtParser(file: File, lines: Seq[String])
     * @return imports per line
     */
   private def importsToLineRanges(
-      modifiedContent: String, imports: Seq[Tree]): Seq[(String, Int)] = {
+      modifiedContent: String,
+      imports: Seq[Tree]): Seq[(String, Int)] = {
     val toLineRange = imports map convertImport(modifiedContent)
     val groupedByLineNumber = toLineRange.groupBy {
       case (_, lineNumber) => lineNumber
@@ -205,8 +206,9 @@ private[sbt] case class SbtParser(file: File, lines: Seq[String])
     * @param importsInOneLine - imports in line
     * @return - text
     */
-  private def extractLine(modifiedContent: String,
-                          importsInOneLine: Seq[((Int, Int), Int)]): String = {
+  private def extractLine(
+      modifiedContent: String,
+      importsInOneLine: Seq[((Int, Int), Int)]): String = {
     val (begin, end) =
       importsInOneLine.foldLeft((Int.MaxValue, Int.MinValue)) {
         case ((min, max), ((start, end), _)) =>
@@ -234,11 +236,12 @@ private[sbt] object MissingBracketHandler {
     * @param originalException - original exception
     * @return missing text
     */
-  private[sbt] def findMissingText(content: String,
-                                   positionEnd: Int,
-                                   positionLine: Int,
-                                   fileName: String,
-                                   originalException: Throwable): String = {
+  private[sbt] def findMissingText(
+      content: String,
+      positionEnd: Int,
+      positionLine: Int,
+      fileName: String,
+      originalException: Throwable): String = {
     findClosingBracketIndex(content, positionEnd) match {
       case Some(index) =>
         val text = content.substring(positionEnd, index + 1)
@@ -248,11 +251,15 @@ private[sbt] object MissingBracketHandler {
             text
           case scala.util.Failure(th) =>
             findMissingText(
-                content, index + 1, positionLine, fileName, originalException)
+              content,
+              index + 1,
+              positionLine,
+              fileName,
+              originalException)
         }
       case _ =>
         throw new MessageOnlyException(
-            s"""[$fileName]:$positionLine: ${originalException.getMessage}""".stripMargin)
+          s"""[$fileName]:$positionLine: ${originalException.getMessage}""".stripMargin)
     }
   }
 
@@ -263,7 +270,8 @@ private[sbt] object MissingBracketHandler {
     * @return first not commented index or None
     */
   private[sbt] def findClosingBracketIndex(
-      content: String, from: Int): Option[Int] = {
+      content: String,
+      from: Int): Option[Int] = {
     val index = content.indexWhere(c => c == '}' || c == ')', from)
     if (index == NOT_FOUND_INDEX) {
       None

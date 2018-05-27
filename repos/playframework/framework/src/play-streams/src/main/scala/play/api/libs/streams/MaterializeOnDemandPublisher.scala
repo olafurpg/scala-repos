@@ -46,7 +46,8 @@ import MaterializeOnDemandPublisher._
   */
 private[play] class MaterializeOnDemandPublisher[T](source: Source[T, _])(
     implicit mat: Materializer)
-    extends StateMachine[State](AwaitingDemand) with Publisher[T] {
+    extends StateMachine[State](AwaitingDemand)
+    with Publisher[T] {
 
   def subscribe(subscriber: Subscriber[_ >: T]) = {
     subscriber.onSubscribe(new ForwardingSubscription(subscriber))
@@ -69,7 +70,7 @@ private[play] class MaterializeOnDemandPublisher[T](source: Source[T, _])(
       case AwaitingDemand =>
         state = CachingDemand(n)
         source.runWith(
-            Sink.fromSubscriber(new ForwardingSubscriber(subscriber)))
+          Sink.fromSubscriber(new ForwardingSubscriber(subscriber)))
       case CachingDemand(demand) =>
         state = CachingDemand(n + demand)
       case Cancelled =>
@@ -93,7 +94,7 @@ private[play] class MaterializeOnDemandPublisher[T](source: Source[T, _])(
         throw new IllegalStateException("Subscribe invoked twice")
       case AwaitingDemand =>
         throw new IllegalStateException(
-            "Impossible state: awaiting demand when a forwarding subscriber has already been created")
+          "Impossible state: awaiting demand when a forwarding subscriber has already been created")
     }
 
     def onError(t: Throwable) = subscriber.onError(t)

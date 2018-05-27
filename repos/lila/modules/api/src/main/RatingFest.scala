@@ -14,10 +14,11 @@ import lila.user.{User, UserRepo}
 
 object RatingFest {
 
-  def apply(db: lila.db.Env,
-            perfsUpdater: PerfsUpdater,
-            gameEnv: lila.game.Env,
-            userEnv: lila.user.Env) = {
+  def apply(
+      db: lila.db.Env,
+      perfsUpdater: PerfsUpdater,
+      gameEnv: lila.game.Env,
+      userEnv: lila.user.Env) = {
 
     // val limit = Int.MaxValue
     // val limit = 100000
@@ -33,7 +34,7 @@ object RatingFest {
 
     def unrate(game: Game) =
       (game.whitePlayer.ratingDiff.isDefined ||
-          game.blackPlayer.ratingDiff.isDefined) ?? GameRepo
+        game.blackPlayer.ratingDiff.isDefined) ?? GameRepo
         .unrate(game.id)
         .void
 
@@ -45,26 +46,27 @@ object RatingFest {
       _ <- db("history3").remove(BSONDocument())
       _ = log("Reseting perfs")
       _ <- lila.user.tube.userTube.coll.update(
-          BSONDocument(),
-          BSONDocument(
-              "$unset" -> BSONDocument(
-                  List(
-                      "global",
-                      "white",
-                      "black",
-                      "standard",
-                      "chess960",
-                      "kingOfTheHill",
-                      "threeCheck",
-                      "bullet",
-                      "blitz",
-                      "classical",
-                      "correspondence"
-                  ).map { name =>
-                s"perfs.$name" -> BSONBoolean(true)
-              }
-              )),
-          multi = true)
+        BSONDocument(),
+        BSONDocument(
+          "$unset" -> BSONDocument(
+            List(
+              "global",
+              "white",
+              "black",
+              "standard",
+              "chess960",
+              "kingOfTheHill",
+              "threeCheck",
+              "bullet",
+              "blitz",
+              "classical",
+              "correspondence"
+            ).map { name =>
+              s"perfs.$name" -> BSONBoolean(true)
+            }
+          )),
+        multi = true
+      )
       _ = log("Gathering cheater IDs")
       engineIds <- UserRepo.engineIds
       _ = log(s"Found ${engineIds.size} cheaters")
@@ -82,18 +84,21 @@ object RatingFest {
             started = nowMillis
             log("Processed %d games at %d/s".format(nb, perS))
           }
-          games.map { game =>
-            game.userIds match {
-              case _ if !game.rated => funit
-              case _ if !game.finished => funit
-              case _ if game.fromPosition => funit
-              case List(uidW, uidB) if (uidW == uidB) => funit
-              case List(uidW, uidB) if engineIds(uidW) || engineIds(uidB) =>
-                unrate(game)
-              case List(uidW, uidB) => rerate(game)
-              case _ => funit
+          games
+            .map { game =>
+              game.userIds match {
+                case _ if !game.rated                   => funit
+                case _ if !game.finished                => funit
+                case _ if game.fromPosition             => funit
+                case List(uidW, uidB) if (uidW == uidB) => funit
+                case List(uidW, uidB) if engineIds(uidW) || engineIds(uidB) =>
+                  unrate(game)
+                case List(uidW, uidB) => rerate(game)
+                case _                => funit
+              }
             }
-          }.sequenceFu.void
+            .sequenceFu
+            .void
         } andThen { case _ => log(nb) }
       }
     } yield ()

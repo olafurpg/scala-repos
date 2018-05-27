@@ -42,7 +42,8 @@ object Foo {
     val allbodies = Body(throws.values.flatMap(_.blocks).toSeq)
 
     val links = countLinksInBody(allbodies, _.link.isInstanceOf[LinkToTpl[_]])
-    assert(links == 2,
-           links + " ==  2 (links to MyException and MyOtherException)")
+    assert(
+      links == 2,
+      links + " ==  2 (links to MyException and MyOtherException)")
   }
 }

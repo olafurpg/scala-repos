@@ -80,7 +80,8 @@ abstract class BasicDirectives extends BasicDirectivesBase {
     * A route that extracts a value and completes the request with it.
     */
   def extractAndComplete[T](
-      marshaller: Marshaller[T], extraction: RequestVal[T]): Route =
+      marshaller: Marshaller[T],
+      extraction: RequestVal[T]): Route =
     handle(extraction)(ctx ⇒ ctx.completeAs(marshaller, extraction.get(ctx)))
 
   /**
@@ -89,8 +90,9 @@ abstract class BasicDirectives extends BasicDirectivesBase {
     */
   @varargs
   def extractHere(extractions: RequestVal[_]*): Directive =
-    Directives.custom(Extract(extractions.map(
-                _.asInstanceOf[StandaloneExtractionImpl[_ <: AnyRef]])))
+    Directives.custom(
+      Extract(
+        extractions.map(_.asInstanceOf[StandaloneExtractionImpl[_ <: AnyRef]])))
 
   private[http] def handle(extractions: RequestVal[_]*)(
       f: RequestContext ⇒ RouteResult): Route = {
@@ -113,11 +115,11 @@ abstract class BasicDirectives extends BasicDirectivesBase {
     * public static RouteResult methodName(RequestContext ctx, T1 t1, T2 t2, ...)
     */
   @varargs
-  def handleReflectively(instance: AnyRef,
-                         methodName: String,
-                         extractions: RequestVal[_]*): Route =
-    handleReflectively(
-        instance.getClass, instance, methodName, extractions: _*)
+  def handleReflectively(
+      instance: AnyRef,
+      methodName: String,
+      extractions: RequestVal[_]*): Route =
+    handleReflectively(instance.getClass, instance, methodName, extractions: _*)
 
   /**
     * Handles the route by reflectively calling the static method specified by `clazz`, and `methodName`.
@@ -128,9 +130,10 @@ abstract class BasicDirectives extends BasicDirectivesBase {
     * public static RouteResult methodName(RequestContext ctx, T1 t1, T2 t2, ...)
     */
   @varargs
-  def handleReflectively(clazz: Class[_],
-                         methodName: String,
-                         extractions: RequestVal[_]*): Route =
+  def handleReflectively(
+      clazz: Class[_],
+      methodName: String,
+      extractions: RequestVal[_]*): Route =
     handleReflectively(clazz, null, methodName, extractions: _*)
 
   /**
@@ -142,10 +145,11 @@ abstract class BasicDirectives extends BasicDirectivesBase {
     * public static RouteResult methodName(RequestContext ctx, T1 t1, T2 t2, ...)
     */
   @varargs
-  def handleReflectively(clazz: Class[_],
-                         instance: AnyRef,
-                         methodName: String,
-                         extractions: RequestVal[_]*): Route = {
+  def handleReflectively(
+      clazz: Class[_],
+      instance: AnyRef,
+      methodName: String,
+      extractions: RequestVal[_]*): Route = {
     def chooseOverload(
         methods: Seq[Method]): (RequestContext, Seq[Any]) ⇒ RouteResult = {
       val extractionTypes = extractions.map(_.resultClass).toList
@@ -167,57 +171,56 @@ abstract class BasicDirectives extends BasicDirectivesBase {
       def paramsMatch(params: Seq[Class[_]]): Boolean = {
         val res =
           params.size == extractionTypes.size &&
-          (params, extractionTypes).zipped.forall(paramMatches)
+            (params, extractionTypes).zipped.forall(paramMatches)
 
         res
       }
       def returnTypeMatches(method: Method): Boolean =
         method.getReturnType == classOf[RouteResult] ||
-        returnsFuture(method) || returnsCompletionStage(method)
+          returnsFuture(method) || returnsCompletionStage(method)
 
       def returnsFuture(method: Method): Boolean =
         method.getReturnType == classOf[Future[_]] &&
-        method.getGenericReturnType.isInstanceOf[ParameterizedType] &&
-        method.getGenericReturnType
-          .asInstanceOf[ParameterizedType]
-          .getActualTypeArguments()(0) == classOf[RouteResult]
+          method.getGenericReturnType.isInstanceOf[ParameterizedType] &&
+          method.getGenericReturnType
+            .asInstanceOf[ParameterizedType]
+            .getActualTypeArguments()(0) == classOf[RouteResult]
 
       def returnsCompletionStage(method: Method): Boolean =
         method.getReturnType == classOf[CompletionStage[_]] &&
-        method.getGenericReturnType.isInstanceOf[ParameterizedType] &&
-        method.getGenericReturnType
-          .asInstanceOf[ParameterizedType]
-          .getActualTypeArguments()(0) == classOf[RouteResult]
+          method.getGenericReturnType.isInstanceOf[ParameterizedType] &&
+          method.getGenericReturnType
+            .asInstanceOf[ParameterizedType]
+            .getActualTypeArguments()(0) == classOf[RouteResult]
 
       /** Makes sure both RouteResult and Future[RouteResult] are acceptable result types. */
       def adaptResult(method: Method): (RequestContext, AnyRef) ⇒ RouteResult =
-        if (returnsFuture(method))
-          (ctx, v) ⇒
-            ctx.completeWith(v.asInstanceOf[Future[RouteResult]].toJava)
-        else if (returnsCompletionStage(method))
-          (ctx, v) =>
-            ctx.completeWith(v.asInstanceOf[CompletionStage[RouteResult]])
+        if (returnsFuture(method))(ctx, v) ⇒
+          ctx.completeWith(v.asInstanceOf[Future[RouteResult]].toJava)
+        else if (returnsCompletionStage(method))(ctx, v) =>
+          ctx.completeWith(v.asInstanceOf[CompletionStage[RouteResult]])
         else (_, v) ⇒ v.asInstanceOf[RouteResult]
 
       val IdentityAdaptor: (RequestContext, Seq[Any]) ⇒ Seq[Any] = (_, ps) ⇒ ps
       def methodInvocator(
           method: Method,
-          adaptParams: (RequestContext,
-          Seq[Any]) ⇒ Seq[Any]): (RequestContext, Seq[Any]) ⇒ RouteResult = {
+          adaptParams: (RequestContext, Seq[Any]) ⇒ Seq[Any])
+        : (RequestContext, Seq[Any]) ⇒ RouteResult = {
         val resultAdaptor = adaptResult(method)
         if (!method.isAccessible) method.setAccessible(true)
-        if (adaptParams == IdentityAdaptor)
-          (ctx, params) ⇒
-            resultAdaptor(
-                ctx,
-                method.invoke(
-                    instance, params.toArray.asInstanceOf[Array[AnyRef]]: _*))
+        if (adaptParams == IdentityAdaptor)(ctx, params) ⇒
+          resultAdaptor(
+            ctx,
+            method
+              .invoke(instance, params.toArray.asInstanceOf[Array[AnyRef]]: _*))
         else
           (ctx, params) ⇒
-            resultAdaptor(ctx,
-                          method.invoke(instance,
-                                        adaptParams(ctx, params).toArray
-                                          .asInstanceOf[Array[AnyRef]]: _*))
+            resultAdaptor(
+              ctx,
+              method.invoke(
+                instance,
+                adaptParams(ctx, params).toArray
+                  .asInstanceOf[Array[AnyRef]]: _*))
       }
 
       object ParameterTypes {

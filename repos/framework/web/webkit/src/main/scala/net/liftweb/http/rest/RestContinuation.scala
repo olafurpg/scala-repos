@@ -78,7 +78,7 @@ object RestContinuation {
 
 object ContinuationsStore
     extends SessionVar[HashMap[ContinuationKey, Continuation]](
-        new HashMap[ContinuationKey, Continuation])
+      new HashMap[ContinuationKey, Continuation])
 
 trait Continuation {
   def tryRespond: Box[LiftResponse]

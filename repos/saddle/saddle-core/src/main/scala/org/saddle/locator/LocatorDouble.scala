@@ -15,7 +15,10 @@
   **/
 package org.saddle.locator
 
-import it.unimi.dsi.fastutil.doubles.{Double2IntOpenHashMap, Double2IntLinkedOpenHashMap}
+import it.unimi.dsi.fastutil.doubles.{
+  Double2IntOpenHashMap,
+  Double2IntLinkedOpenHashMap
+}
 
 /**
   * A double-to-integer hash map, backed by fastutil implementation

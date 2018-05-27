@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -35,7 +35,8 @@ import org.specs2.ScalaCheck
 import org.specs2.mutable._
 
 trait CompactSpec[M[+ _]]
-    extends ColumnarTableModuleTestSupport[M] with Specification
+    extends ColumnarTableModuleTestSupport[M]
+    with Specification
     with ScalaCheck {
   import SampleData._
   import trans._
@@ -59,7 +60,7 @@ trait CompactSpec[M[+ _]]
     def mkDeref0(nodes: List[CPathNode]): TransSpec1 = nodes match {
       case (f: CPathField) :: rest => DerefObjectStatic(mkDeref0(rest), f)
       case (i: CPathIndex) :: rest => DerefArrayStatic(mkDeref0(rest), i)
-      case _ => Leaf(Source)
+      case _                       => Leaf(Source)
     }
 
     mkDeref0(path.nodes)
@@ -67,10 +68,10 @@ trait CompactSpec[M[+ _]]
 
   def extractPath(spec: TransSpec1): Option[CPath] = spec match {
     case DerefObjectStatic(TransSpec1.Id, f) => Some(f)
-    case DerefObjectStatic(lhs, f) => extractPath(lhs).map(_ \ f)
-    case DerefArrayStatic(TransSpec1.Id, i) => Some(i)
-    case DerefArrayStatic(lhs, f) => extractPath(lhs).map(_ \ f)
-    case _ => None
+    case DerefObjectStatic(lhs, f)           => extractPath(lhs).map(_ \ f)
+    case DerefArrayStatic(TransSpec1.Id, i)  => Some(i)
+    case DerefArrayStatic(lhs, f)            => extractPath(lhs).map(_ \ f)
+    case _                                   => None
   }
 
   def chooseColumn(table: Table): TransSpec1 = table match {
@@ -103,9 +104,8 @@ trait CompactSpec[M[+ _]]
           new Slice {
             val size = slice.size
             val columns = slice.columns.mapValues { col =>
-              (col |> cf.util.filter(0,
-                                     slice.size,
-                                     BitSetUtil.create(retained))).get
+              (col |> cf.util
+                .filter(0, slice.size, BitSetUtil.create(retained))).get
             }
           }
         }
@@ -131,9 +131,8 @@ trait CompactSpec[M[+ _]]
               val retained = (0 until slice.size).map { (x: Int) =>
                 if (scala.util.Random.nextDouble < 0.75) Some(x) else None
               }.flatten
-              (col |> cf.util.filter(0,
-                                     slice.size,
-                                     BitSetUtil.create(retained))).get
+              (col |> cf.util
+                .filter(0, slice.size, BitSetUtil.create(retained))).get
             }
           new Slice {
             val size = slice.size

@@ -26,7 +26,8 @@ package syntax
   * @author Miles Sabin
   */
 final class CoproductOps[C <: Coproduct](val c: C)
-    extends AnyVal with Serializable {
+    extends AnyVal
+    with Serializable {
   import ops.adjoin.Adjoin
   import ops.coproduct._
 
@@ -71,8 +72,7 @@ final class CoproductOps[C <: Coproduct](val c: C)
   /**
     * Returns all elements of type `U` of this `Coproduct`. An explicit type argument must be provided.
     */
-  def filter[U](
-      implicit partition: Partition[C, U]): Option[partition.Prefix] =
+  def filter[U](implicit partition: Partition[C, U]): Option[partition.Prefix] =
     partition.filter(c)
 
   /**
@@ -153,7 +153,7 @@ final class CoproductOps[C <: Coproduct](val c: C)
   def align[K <: Coproduct](implicit align: Align[C, K]): K = align(c)
 
   /**
-    * Permutes this `Coproduct` into the same order as another `Coproduct`. Available only if 
+    * Permutes this `Coproduct` into the same order as another `Coproduct`. Available only if
     * both `Coproduct`s have elements of the same types.
     */
   def align[K <: Coproduct](k: K)(implicit align: Align[C, K]): K = align(c)
@@ -250,8 +250,7 @@ final class CoproductOps[C <: Coproduct](val c: C)
   /**
     * Extend this `Coproduct` on the right.
     */
-  def extendRight[T](
-      implicit extendRight: ExtendRight[C, T]): extendRight.Out =
+  def extendRight[T](implicit extendRight: ExtendRight[C, T]): extendRight.Out =
     extendRight(c)
 
   /**

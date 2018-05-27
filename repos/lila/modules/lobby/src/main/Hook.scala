@@ -35,9 +35,9 @@ case class Hook(
 
   def compatibleWith(h: Hook) =
     compatibilityProperties == h.compatibilityProperties &&
-    (realColor compatibleWith h.realColor) && (memberOnly || h.memberOnly)
+      (realColor compatibleWith h.realColor) && (memberOnly || h.memberOnly)
       .fold(isAuth && h.isAuth, true) && ratingRangeCompatibleWith(h) &&
-    h.ratingRangeCompatibleWith(this)
+      h.ratingRangeCompatibleWith(this)
 
   private def ratingRangeCompatibleWith(h: Hook) = realRatingRange.fold(true) {
     range =>
@@ -63,17 +63,17 @@ case class Hook(
   def render: JsObject =
     Json
       .obj(
-          "id" -> id,
-          "uid" -> uid,
-          "u" -> user.map(_.username),
-          "rating" -> rating,
-          "variant" -> realVariant.exotic.option(realVariant.key),
-          "ra" -> realMode.rated.option(1),
-          "clock" -> clock.show,
-          "t" -> clock.estimateTotalTime,
-          "s" -> speed.id,
-          "c" -> chess.Color(color).map(_.name),
-          "perf" -> perfType.map(_.name)
+        "id" -> id,
+        "uid" -> uid,
+        "u" -> user.map(_.username),
+        "rating" -> rating,
+        "variant" -> realVariant.exotic.option(realVariant.key),
+        "ra" -> realMode.rated.option(1),
+        "clock" -> clock.show,
+        "t" -> clock.estimateTotalTime,
+        "s" -> speed.id,
+        "c" -> chess.Color(color).map(_.name),
+        "perf" -> perfType.map(_.name)
       )
       .noNull
 
@@ -86,25 +86,28 @@ object Hook {
 
   val idSize = 8
 
-  def make(uid: String,
-           variant: chess.variant.Variant,
-           clock: Clock,
-           mode: Mode,
-           allowAnon: Boolean,
-           color: String,
-           user: Option[User],
-           sid: Option[String],
-           ratingRange: RatingRange,
-           blocking: Set[String]): Hook =
-    new Hook(id = Random nextStringUppercase idSize,
-             uid = uid,
-             variant = variant.id,
-             clock = clock,
-             mode = mode.id,
-             allowAnon = allowAnon || user.isEmpty,
-             color = color,
-             user = user map { LobbyUser.make(_, blocking) },
-             sid = sid,
-             ratingRange = ratingRange.toString,
-             createdAt = DateTime.now)
+  def make(
+      uid: String,
+      variant: chess.variant.Variant,
+      clock: Clock,
+      mode: Mode,
+      allowAnon: Boolean,
+      color: String,
+      user: Option[User],
+      sid: Option[String],
+      ratingRange: RatingRange,
+      blocking: Set[String]): Hook =
+    new Hook(
+      id = Random nextStringUppercase idSize,
+      uid = uid,
+      variant = variant.id,
+      clock = clock,
+      mode = mode.id,
+      allowAnon = allowAnon || user.isEmpty,
+      color = color,
+      user = user map { LobbyUser.make(_, blocking) },
+      sid = sid,
+      ratingRange = ratingRange.toString,
+      createdAt = DateTime.now
+    )
 }

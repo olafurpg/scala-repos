@@ -8,7 +8,6 @@ object SCL5871 {
   def goo(x: Int) = x
 
   /*start*/
-  (foo(scala.reflect.runtime.universe.typeTag[String]),
-   goo(ru.typeTag[String])) /*end*/
+  (foo(scala.reflect.runtime.universe.typeTag[String]), goo(ru.typeTag[String])) /*end*/
 }
 //(Boolean, Boolean)

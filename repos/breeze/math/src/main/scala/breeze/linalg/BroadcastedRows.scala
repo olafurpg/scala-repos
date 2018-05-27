@@ -36,20 +36,20 @@ object BroadcastedRows {
       new BroadcastedDMRowsISeq(bc.underlying)
   }
 
-  implicit def canMapValues[
-      T, RowType, ResultRow, Result](implicit cc: CanCollapseAxis[
-          T, Axis._1.type, RowType, ResultRow, Result])
+  implicit def canMapValues[T, RowType, ResultRow, Result](
+      implicit cc: CanCollapseAxis[T, Axis._1.type, RowType, ResultRow, Result])
     : CanMapValues[BroadcastedRows[T, RowType], RowType, ResultRow, Result] = {
     new CanMapValues[BroadcastedRows[T, RowType], RowType, ResultRow, Result] {
-      def apply(from: BroadcastedRows[T, RowType],
-                fn: (RowType) => ResultRow): Result = {
+      def apply(
+          from: BroadcastedRows[T, RowType],
+          fn: (RowType) => ResultRow): Result = {
         cc(from.underlying, Axis._1) { fn }
       }
     }
   }
 
-  implicit def scalarOf[T, RowType]: ScalarOf[
-      BroadcastedRows[T, RowType], RowType] = ScalarOf.dummy
+  implicit def scalarOf[T, RowType]
+    : ScalarOf[BroadcastedRows[T, RowType], RowType] = ScalarOf.dummy
 
   implicit def broadcastOp[Op, T, RowType, OpResult, Result](
       implicit handhold: CanCollapseAxis.HandHold[T, Axis._1.type, RowType],
@@ -106,7 +106,8 @@ object BroadcastedRows {
 
       /** Maps all key-value pairs from the given collection. */
       override def foreach[U](
-          from: BroadcastedRows[T, RowType], fn: (RowType) => U): Unit = {
+          from: BroadcastedRows[T, RowType],
+          fn: (RowType) => U): Unit = {
         iter(from.underlying, Axis._1)(fn)
       }
     }
@@ -115,7 +116,8 @@ object BroadcastedRows {
   // This is a more memory efficient representation if the sequence is long-lived but rarely accessed.
   @SerialVersionUID(1L)
   class BroadcastedDMRowsISeq[T](val underlying: DenseMatrix[T])
-      extends IndexedSeq[Transpose[DenseVector[T]]] with Serializable {
+      extends IndexedSeq[Transpose[DenseVector[T]]]
+      with Serializable {
     override def length: Int = underlying.cols
 
     override def apply(idx: Int): Transpose[DenseVector[T]] =

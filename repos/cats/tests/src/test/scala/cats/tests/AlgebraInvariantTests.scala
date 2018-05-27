@@ -27,15 +27,17 @@ class AlgebraInvariantTests extends CatsSuite {
   implicit val arbMonoidInt: Arbitrary[Monoid[Int]] = Arbitrary(genMonoidInt)
 
   implicit val arbSemigoupInt: Arbitrary[Semigroup[Int]] = Arbitrary(
-      genMonoidInt)
-
-  checkAll("Invariant[Semigroup]",
-           InvariantTests[Semigroup].invariant[Int, Int, Int])
-  checkAll("Invariant[Semigroup]",
-           SerializableTests.serializable(Invariant[Semigroup]))
+    genMonoidInt)
 
   checkAll(
-      "Invariant[Monoid]", InvariantTests[Monoid].invariant[Int, Int, Int])
+    "Invariant[Semigroup]",
+    InvariantTests[Semigroup].invariant[Int, Int, Int])
   checkAll(
-      "Invariant[Monoid]", SerializableTests.serializable(Invariant[Monoid]))
+    "Invariant[Semigroup]",
+    SerializableTests.serializable(Invariant[Semigroup]))
+
+  checkAll("Invariant[Monoid]", InvariantTests[Monoid].invariant[Int, Int, Int])
+  checkAll(
+    "Invariant[Monoid]",
+    SerializableTests.serializable(Invariant[Monoid]))
 }

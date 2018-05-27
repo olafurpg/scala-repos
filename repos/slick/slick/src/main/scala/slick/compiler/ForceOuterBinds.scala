@@ -25,7 +25,7 @@ class ForceOuterBinds extends Phase {
     logger.debug("Introducing new Bind " + gen + " for " + n)
     n match {
       case p: Pure => Bind(gen, Pure(ProductNode(ConstArray.empty)), p)
-      case _ => Bind(gen, n, Pure(Ref(gen)))
+      case _       => Bind(gen, n, Pure(Ref(gen)))
     }
   }
 
@@ -43,7 +43,7 @@ class ForceOuterBinds extends Phase {
     case f: FilteredQuery =>
       f.mapChildren { ch =>
         if ((ch eq f.from) && !(ch.isInstanceOf[Join] ||
-                ch.isInstanceOf[Distinct] || ch.isInstanceOf[Pure])) nowrap(ch)
+              ch.isInstanceOf[Distinct] || ch.isInstanceOf[Pure])) nowrap(ch)
         else maybewrap(ch)
       }
     case b: Bind =>
@@ -52,7 +52,7 @@ class ForceOuterBinds extends Phase {
         else maybewrap(ch)
       }
     case Path(path) => Path(path) // recreate untyped copy
-    case n => n.mapChildren(maybewrap)
+    case n          => n.mapChildren(maybewrap)
   }
 
   def maybewrap(n: Node): Node = n match {

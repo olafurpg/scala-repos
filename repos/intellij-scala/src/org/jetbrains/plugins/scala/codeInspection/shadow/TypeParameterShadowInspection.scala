@@ -11,14 +11,16 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypeParametersOwner
   * Date: 06.02.12
   */
 class TypeParameterShadowInspection
-    extends AbstractInspection("TypeParameterShadowInspection",
-                               "Suspicious shadowing by a Type Parameter") {
+    extends AbstractInspection(
+      "TypeParameterShadowInspection",
+      "Suspicious shadowing by a Type Parameter") {
 
   def actionFor(holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
     case refPat: ScTypeParam => check(refPat, holder)
   }
 
-  private def isShadowing(refPat: ScTypeParam): Option[ScTypeParametersOwner] = {
+  private def isShadowing(
+      refPat: ScTypeParam): Option[ScTypeParametersOwner] = {
     var parent: PsiElement = refPat.getParent
     val owner = refPat.owner
     while (parent != null) {
@@ -37,9 +39,10 @@ class TypeParameterShadowInspection
   private def check(typeParam: ScTypeParam, holder: ProblemsHolder) {
     isShadowing(typeParam) match {
       case Some(_) =>
-        holder.registerProblem(typeParam.nameId,
-                               getDisplayName + ": " + typeParam.name,
-                               new RenameTypeParameterFix(typeParam))
+        holder.registerProblem(
+          typeParam.nameId,
+          getDisplayName + ": " + typeParam.name,
+          new RenameTypeParameterFix(typeParam))
       case _ =>
     }
   }

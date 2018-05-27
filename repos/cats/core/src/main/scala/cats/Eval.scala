@@ -274,15 +274,16 @@ object Eval extends EvalInstances {
           case c: Compute[_] =>
             c.start() match {
               case cc: Compute[_] =>
-                loop(cc.start().asInstanceOf[L],
-                     cc.run.asInstanceOf[C] :: c.run.asInstanceOf[C] :: fs)
+                loop(
+                  cc.start().asInstanceOf[L],
+                  cc.run.asInstanceOf[C] :: c.run.asInstanceOf[C] :: fs)
               case xx =>
                 loop(c.run(xx.value).asInstanceOf[L], fs)
             }
           case x =>
             fs match {
               case f :: fs => loop(f(x.value), fs)
-              case Nil => x.value
+              case Nil     => x.value
             }
         }
       loop(this.asInstanceOf[L], Nil).asInstanceOf[A]
@@ -301,35 +302,35 @@ private[cats] trait EvalInstances extends EvalInstances0 {
     def coflatMap[A, B](fa: Eval[A])(f: Eval[A] => B): Eval[B] = Later(f(fa))
   }
 
-  implicit def evalOrder[A : Order]: Order[Eval[A]] =
+  implicit def evalOrder[A: Order]: Order[Eval[A]] =
     new Order[Eval[A]] {
       def compare(lx: Eval[A], ly: Eval[A]): Int =
         lx.value compare ly.value
     }
 
-  implicit def evalGroup[A : Group]: Group[Eval[A]] =
+  implicit def evalGroup[A: Group]: Group[Eval[A]] =
     new EvalGroup[A] { val algebra: Group[A] = Group[A] }
 }
 
 private[cats] trait EvalInstances0 extends EvalInstances1 {
-  implicit def evalPartialOrder[A : PartialOrder]: PartialOrder[Eval[A]] =
+  implicit def evalPartialOrder[A: PartialOrder]: PartialOrder[Eval[A]] =
     new PartialOrder[Eval[A]] {
       def partialCompare(lx: Eval[A], ly: Eval[A]): Double =
         lx.value partialCompare ly.value
     }
 
-  implicit def evalMonoid[A : Monoid]: Monoid[Eval[A]] =
+  implicit def evalMonoid[A: Monoid]: Monoid[Eval[A]] =
     new EvalMonoid[A] { val algebra = Monoid[A] }
 }
 
 private[cats] trait EvalInstances1 {
-  implicit def evalEq[A : Eq]: Eq[Eval[A]] =
+  implicit def evalEq[A: Eq]: Eq[Eval[A]] =
     new Eq[Eval[A]] {
       def eqv(lx: Eval[A], ly: Eval[A]): Boolean =
         lx.value === ly.value
     }
 
-  implicit def evalSemigroup[A : Semigroup]: Semigroup[Eval[A]] =
+  implicit def evalSemigroup[A: Semigroup]: Semigroup[Eval[A]] =
     new EvalSemigroup[A] { val algebra = Semigroup[A] }
 }
 

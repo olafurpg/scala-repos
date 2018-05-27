@@ -5,7 +5,7 @@ object TestExpressions {
 
     val res = z1 match {
       case Some(msg) => msg
-      case None => "failed"
+      case None      => "failed"
     }
     print("lazy val in scrutinee: ")
     if (res == "lazy z1") println("ok")

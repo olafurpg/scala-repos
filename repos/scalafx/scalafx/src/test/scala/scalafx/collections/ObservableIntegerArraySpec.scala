@@ -43,9 +43,10 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class ObservableIntegerArraySpec
     extends SimpleSFXDelegateSpec[
-        jfxc.ObservableIntegerArray, ObservableIntegerArray](
-        classOf[jfxc.ObservableIntegerArray],
-        classOf[ObservableIntegerArray]
+      jfxc.ObservableIntegerArray,
+      ObservableIntegerArray](
+      classOf[jfxc.ObservableIntegerArray],
+      classOf[ObservableIntegerArray]
     ) {
 
   /**
@@ -72,11 +73,12 @@ class ObservableIntegerArraySpec
     instance1.onChange(onChangeBrief)
     instance2.onChange(onChangeFull(_, _))
     instance2.onChange(onChangeBrief)
-    def verifyChange(n: Int,
-                     array: ObservableIntegerArray,
-                     sizeChanged: Boolean,
-                     start: Int,
-                     end: Int) {
+    def verifyChange(
+        n: Int,
+        array: ObservableIntegerArray,
+        sizeChanged: Boolean,
+        start: Int,
+        end: Int) {
       val (a, c) = change(n)
       assert(a eq array)
       assert(c.sizeChanged === sizeChanged)
@@ -329,7 +331,8 @@ class ObservableIntegerArraySpec
     testEmpty(ObservableIntegerArray.iterate(0, 0)(_ + 1))
     testNonEmpty(ObservableIntegerArray.iterate(0, 1)(_ + 1), Array(0))
     testNonEmpty(
-        ObservableIntegerArray.iterate(0, 5)(_ + 1), Array(0, 1, 2, 3, 4))
+      ObservableIntegerArray.iterate(0, 5)(_ + 1),
+      Array(0, 1, 2, 3, 4))
   }
   it should "return valid initialized array from companion's range(start, end)" in {
     testIllegalArgumentExceptionThrown(ObservableIntegerArray.range(1, 2, 0))

@@ -31,7 +31,7 @@ object ListHelpersSpec extends Specification with ListHelpers {
     "insert after 2" in {
       val ret = delta(List(1, 2, 4, 5), List(1, 2, 3, 4, 5)) {
         case InsertAfterDelta(3, 2) => "ok"
-        case _ => "not ok"
+        case _                      => "not ok"
       }
       ret must_== List("ok")
     }
@@ -39,11 +39,11 @@ object ListHelpersSpec extends Specification with ListHelpers {
     "prepend and append 2,4, 99" in {
       val ret = delta(List(2, 4, 99), List(1, 2, 3, 4, 5)) {
         case InsertAfterDelta(3, 2) => "ok"
-        case AppendDelta(5) => "ok5"
-        case RemoveDelta(99) => "99"
-        case InsertAtStartDelta(1) => "1"
+        case AppendDelta(5)         => "ok5"
+        case RemoveDelta(99)        => "99"
+        case InsertAtStartDelta(1)  => "1"
         case InsertAfterDelta(5, 4) => "ok5"
-        case _ => "fail"
+        case _                      => "fail"
       }
       ret must_== List("1", "ok", "ok5", "99")
     }
@@ -52,12 +52,12 @@ object ListHelpersSpec extends Specification with ListHelpers {
       val ret = delta(List(4, 2, 99), List(1, 2, 3, 4, 5)) {
         case InsertAfterDelta(3, 2) => "ok"
         case InsertAfterDelta(4, 3) => "ok3"
-        case RemoveDelta(4) => "r4"
-        case AppendDelta(5) => "ok5"
-        case RemoveDelta(99) => "99"
-        case InsertAtStartDelta(1) => "1"
+        case RemoveDelta(4)         => "r4"
+        case AppendDelta(5)         => "ok5"
+        case RemoveDelta(99)        => "99"
+        case InsertAtStartDelta(1)  => "1"
         case InsertAfterDelta(5, 4) => "ok5"
-        case _ => "fail"
+        case _                      => "fail"
       }
       ret must_== List("1", "r4", "ok", "ok3", "ok5", "99")
     }
@@ -85,7 +85,7 @@ object ListHelpersSpec extends Specification with ListHelpers {
     "return the first Full can returned by a function f over the list elements" in {
       val f = (i: Int) =>
         i >= 2 match {
-          case true => Full(3)
+          case true  => Full(3)
           case false => Empty
       }
       first(List(1, 2, 3))(f) must_== Full(3)
@@ -156,32 +156,35 @@ object ListHelpersSpec extends Specification with ListHelpers {
 
   "The ListHelpers permuteList function (permute method on a List object)" should {
     "create a List of all the permutations of a given list" in {
-      List(1, 2, 3).permute must_== List(List(1, 2, 3),
-                                         List(1, 3, 2),
-                                         List(2, 3, 1),
-                                         List(2, 1, 3),
-                                         List(3, 1, 2),
-                                         List(3, 2, 1))
+      List(1, 2, 3).permute must_== List(
+        List(1, 2, 3),
+        List(1, 3, 2),
+        List(2, 3, 1),
+        List(2, 1, 3),
+        List(3, 1, 2),
+        List(3, 2, 1))
     }
   }
 
   "The ListHelpers permuteWithSublists function (permuteAll method on a List object)" should {
     "create a List of all the permutations of a given list" in {
-      List(1, 2, 3).permuteAll must_== List(List(1, 2, 3),
-                                            List(1, 3, 2),
-                                            List(2, 3, 1),
-                                            List(2, 1, 3),
-                                            List(3, 1, 2),
-                                            List(3, 2, 1),
-                                            List(2, 3),
-                                            List(3, 2),
-                                            List(3, 1),
-                                            List(1, 3),
-                                            List(1, 2),
-                                            List(2, 1),
-                                            List(3),
-                                            List(2),
-                                            List(1))
+      List(1, 2, 3).permuteAll must_== List(
+        List(1, 2, 3),
+        List(1, 3, 2),
+        List(2, 3, 1),
+        List(2, 1, 3),
+        List(3, 1, 2),
+        List(3, 2, 1),
+        List(2, 3),
+        List(3, 2),
+        List(3, 1),
+        List(1, 3),
+        List(1, 2),
+        List(2, 1),
+        List(3),
+        List(2),
+        List(1)
+      )
     }
   }
 
@@ -204,7 +207,7 @@ object ListHelpersSpec extends Specification with ListHelpers {
       List(1).? must beTrue
     }
     "provide a replace method to replace one element of the list at a given position (0-based index)." +
-    " If the position is negative, the first element is replaced" in {
+      " If the position is negative, the first element is replaced" in {
       List(1, 2, 3).replace(1, 4) must_== List(1, 4, 3)
       List(1, 2, 3).replace(4, 4) must_== List(1, 2, 3)
       List(1, 2, 3).replace(-1, 4) must_== List(4, 2, 3)

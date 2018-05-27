@@ -14,33 +14,33 @@ class MapContainsTrue extends OperationsOnCollectionInspectionTest {
 
   def testSimple(): Unit = {
     doTest(
-        s"Seq(1, 2).${START}map(_ => true).contains(true)$END",
-        "Seq(1, 2).map(_ => true).contains(true)",
-        "Seq(1, 2).exists(_ => true)"
+      s"Seq(1, 2).${START}map(_ => true).contains(true)$END",
+      "Seq(1, 2).map(_ => true).contains(true)",
+      "Seq(1, 2).exists(_ => true)"
     )
   }
 
   def testInfix(): Unit = {
     doTest(
-        s"Seq(1, 2) ${START}map (_ => true) contains true$END",
-        "Seq(1, 2) map (_ => true) contains true",
-        "Seq(1, 2) exists (_ => true)"
+      s"Seq(1, 2) ${START}map (_ => true) contains true$END",
+      "Seq(1, 2) map (_ => true) contains true",
+      "Seq(1, 2) exists (_ => true)"
     )
   }
 
   def testBlockArg(): Unit = {
     doTest(
-        s"""
+      s"""
          |Seq(1, 2).${START}map { x =>
          |  true
          |}.contains(true)$END
        """.stripMargin,
-        """
+      """
         |Seq(1, 2).map { x =>
         |  true
         |}.contains(true)
       """.stripMargin,
-        """
+      """
         |Seq(1, 2).exists { x =>
         |  true
         |}
@@ -58,33 +58,33 @@ class MapContainsFalse extends OperationsOnCollectionInspectionTest {
 
   def testSimple(): Unit = {
     doTest(
-        s"Seq(1, 2).${START}map(_ => true).contains(false)$END",
-        "Seq(1, 2).map(_ => true).contains(false)",
-        "!Seq(1, 2).forall(_ => true)"
+      s"Seq(1, 2).${START}map(_ => true).contains(false)$END",
+      "Seq(1, 2).map(_ => true).contains(false)",
+      "!Seq(1, 2).forall(_ => true)"
     )
   }
 
   def testInfix(): Unit = {
     doTest(
-        s"Seq(1, 2) ${START}map (_ => true) contains false$END",
-        "Seq(1, 2) map (_ => true) contains false",
-        "!(Seq(1, 2) forall (_ => true))"
+      s"Seq(1, 2) ${START}map (_ => true) contains false$END",
+      "Seq(1, 2) map (_ => true) contains false",
+      "!(Seq(1, 2) forall (_ => true))"
     )
   }
 
   def testBlockArg(): Unit = {
     doTest(
-        s"""
+      s"""
          |Seq(1, 2).${START}map { x =>
          |  true
          |}.contains(false)$END
       """.stripMargin,
-        """
+      """
         |Seq(1, 2).map { x =>
         |  true
         |}.contains(false)
       """.stripMargin,
-        """
+      """
         |!Seq(1, 2).forall { x =>
         |  true
         |}

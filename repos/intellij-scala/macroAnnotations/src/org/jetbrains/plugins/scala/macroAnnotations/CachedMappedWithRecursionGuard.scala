@@ -15,9 +15,12 @@ import scala.reflect.macros.whitebox
   * Date: 9/23/15.
   */
 class CachedMappedWithRecursionGuard(
-    psiElement: Any, defaultValue: => Any, dependencyItem: Object)
+    psiElement: Any,
+    defaultValue: => Any,
+    dependencyItem: Object)
     extends StaticAnnotation {
-  def macroTransform(annottees: Any*) = macro CachedMappedWithRecursionGuard.cachedMappedWithRecursionGuardImpl
+  def macroTransform(annottees: Any*) =
+    macro CachedMappedWithRecursionGuard.cachedMappedWithRecursionGuardImpl
 }
 
 object CachedMappedWithRecursionGuard {
@@ -36,9 +39,10 @@ object CachedMappedWithRecursionGuard {
     def parameters: (Tree, Tree, Tree) = c.prefix.tree match {
       case q"new CachedMappedWithRecursionGuard(..$params)"
           if params.length == 3 =>
-        (params(0),
-         params(1),
-         modCountParamToModTracker(c)(params(2), params(0)))
+        (
+          params(0),
+          params(1),
+          modCountParamToModTracker(c)(params(2), params(0)))
       case _ => abort("Wrong annotation parameters!")
     }
 
@@ -55,7 +59,7 @@ object CachedMappedWithRecursionGuard {
         val keyId: String = c.freshName(name + "cacheKey")
         val key: c.universe.TermName = generateTermName(name + "Key")
         val cacheStatsName: c.universe.TermName = generateTermName(
-            name + "cacheStats")
+          name + "cacheStats")
         val defdefFQN = thisFunctionFQN(name.toString)
         val analyzeCaches = analyzeCachesEnabled(c)
 
@@ -69,10 +73,11 @@ object CachedMappedWithRecursionGuard {
           case _ =>
             flatParams.zipWithIndex.map {
               case (param, i) =>
-                ValDef(NoMods,
-                       param.name,
-                       param.tpt,
-                       q"$dataName.${TermName("_" + (i + 1))}")
+                ValDef(
+                  NoMods,
+                  param.name,
+                  param.tpt,
+                  q"$dataName.${TermName("_" + (i + 1))}")
             }
         }
 
@@ -177,8 +182,8 @@ object CachedMappedWithRecursionGuard {
             q"private val $cacheStatsName = $cacheStatisticsFQN($keyId, $defdefFQN)"
           } else EmptyTree
 
-        val updatedDef = DefDef(
-            mods, name, tpParams, paramss, retTp, updatedRhs)
+        val updatedDef =
+          DefDef(mods, name, tpParams, paramss, retTp, updatedRhs)
         val res = q"""
           private val $key = $cachesUtilFQN.getOrCreateKey[$mappedKeyTypeFQN[(..$parameterTypes), $retTp]]($keyId)
           ..$cacheStatsField

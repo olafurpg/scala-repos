@@ -10,7 +10,9 @@ import org.slf4j.LoggerFactory
   * Start an actor system for all test methods and provide akka TestKit utility methods.
   */
 trait MarathonActorSupport
-    extends Suite with TestKitBase with BeforeAndAfterAll {
+    extends Suite
+    with TestKitBase
+    with BeforeAndAfterAll {
 
   private[this] val log = LoggerFactory.getLogger(getClass)
 
@@ -20,8 +22,8 @@ trait MarathonActorSupport
   private[this] lazy val stoppingConfig =
     ConfigFactory.parseString(stoppingConfigStr)
 
-  implicit lazy val system: ActorSystem = ActorSystem(
-      getClass.getSimpleName, stoppingConfig)
+  implicit lazy val system: ActorSystem =
+    ActorSystem(getClass.getSimpleName, stoppingConfig)
   log.info("actor system {}: starting", system.name)
 
   override protected def afterAll(): Unit = {

@@ -14,8 +14,8 @@ object Test extends App {
     val scrut: O.LK = A
     scrut match {
       case B if "".isEmpty => ???
-      case A =>
-      case B => ???
+      case A               =>
+      case B               => ???
     }
   }
 }

@@ -13,9 +13,10 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.ScBlockExpr
   * @since 1/28/13
   */
 trait ScalaFixer {
-  def apply(editor: Editor,
-            processor: ScalaSmartEnterProcessor,
-            psiElement: PsiElement): OperationPerformed
+  def apply(
+      editor: Editor,
+      processor: ScalaSmartEnterProcessor,
+      psiElement: PsiElement): OperationPerformed
 
   protected def startLine(doc: Document, psiElement: PsiElement): Int =
     doc.getLineNumber(psiElement.getTextRange.getStartOffset)
@@ -29,7 +30,9 @@ trait ScalaFixer {
   protected def moveToEnd(editor: Editor, psiElement: PsiElement) =
     editor.getCaretModel.moveToOffset(psiElement.getTextRange.getEndOffset)
 
-  protected def getOffsetOrParent(parent: PsiElement, child: PsiElement): Int = {
+  protected def getOffsetOrParent(
+      parent: PsiElement,
+      child: PsiElement): Int = {
     var s = child.getNextSibling
 
     while (s != null) {
@@ -47,7 +50,8 @@ trait ScalaFixer {
   }
 
   protected def placeInWholeBlock(
-      block: ScBlockExpr, editor: Editor): OperationPerformed = {
+      block: ScBlockExpr,
+      editor: Editor): OperationPerformed = {
     @inline def move2start(psi: PsiElement) =
       editor.getCaretModel.moveToOffset(psi.getTextRange.getStartOffset)
     @inline def move2end(psi: PsiElement) =
@@ -71,9 +75,10 @@ trait ScalaFixer {
                 WithEnter(0)
               case ws: PsiWhiteSpace if ws.getNextSibling == r =>
                 move2start(l)
-                editor.getDocument.replaceString(l.getTextRange.getStartOffset,
-                                                 r.getTextRange.getEndOffset,
-                                                 "{}")
+                editor.getDocument.replaceString(
+                  l.getTextRange.getStartOffset,
+                  r.getTextRange.getEndOffset,
+                  "{}")
                 WithEnter(1)
               case other =>
                 move2end(other)

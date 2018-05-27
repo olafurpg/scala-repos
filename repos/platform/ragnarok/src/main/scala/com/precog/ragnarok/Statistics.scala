@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -30,12 +30,13 @@ import scalaz.std.option._
   * `n > 2 * tails`. If `n <= 2 * tails`, then the mean and variance will be
   * `NaN` and the count will be `0`.
   */
-case class Statistics private[ragnarok](tails: Int,
-                                        allMin: List[Double],
-                                        allMax: List[Double],
-                                        m: Double,
-                                        vn: Double,
-                                        n: Int) {
+case class Statistics private[ragnarok] (
+    tails: Int,
+    allMin: List[Double],
+    allMax: List[Double],
+    m: Double,
+    vn: Double,
+    n: Int) {
 
   //FIXME: keep track of Double error
 
@@ -48,14 +49,20 @@ case class Statistics private[ragnarok](tails: Int,
   def *(x: Double): Statistics =
     if (x >= 0.0) {
       Statistics(
-          tails, allMin map (_ * x), allMax map (_ * x), m * x, vn * x * x, n)
+        tails,
+        allMin map (_ * x),
+        allMax map (_ * x),
+        m * x,
+        vn * x * x,
+        n)
     } else {
-      Statistics(tails,
-                 allMax map (_ * x),
-                 allMin map (_ * x),
-                 m * x,
-                 vn * math.abs(x) * math.abs(x),
-                 n)
+      Statistics(
+        tails,
+        allMax map (_ * x),
+        allMin map (_ * x),
+        m * x,
+        vn * math.abs(x) * math.abs(x),
+        n)
     }
 
   def +(x: Double): Statistics = this + Statistics(x, tails = tails)
@@ -92,12 +99,14 @@ case class Statistics private[ragnarok](tails: Int,
 
   def toJson: JObject =
     JObject(
-        List(JField("mean", JNum(mean)),
-             JField("variance", JNum(variance)),
-             JField("stdDev", JNum(stdDev)),
-             JField("min", JNum(min)),
-             JField("max", JNum(max)),
-             JField("count", JNum(count))))
+      List(
+        JField("mean", JNum(mean)),
+        JField("variance", JNum(variance)),
+        JField("stdDev", JNum(stdDev)),
+        JField("min", JNum(min)),
+        JField("max", JNum(max)),
+        JField("count", JNum(count))
+      ))
 }
 
 object Statistics {
@@ -117,12 +126,13 @@ object Statistics {
       val z_vn = x.vn + y.vn + y.n * (y.m - x.m) * (y.m - z_m)
       val z_tails = x.tails min y.tails
 
-      Statistics(z_tails,
-                 (x.allMin ++ y.allMin).sorted take (z_tails + 1),
-                 (x.allMax ++ y.allMax).sorted takeRight (z_tails + 1),
-                 z_m,
-                 z_vn,
-                 x.n + y.n)
+      Statistics(
+        z_tails,
+        (x.allMin ++ y.allMin).sorted take (z_tails + 1),
+        (x.allMax ++ y.allMax).sorted takeRight (z_tails + 1),
+        z_m,
+        z_vn,
+        x.n + y.n)
     }
   }
 }

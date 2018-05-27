@@ -43,4 +43,5 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class BorderPaneSpec
     extends SimpleSFXDelegateSpec[jfxsl.BorderPane, BorderPane](
-        classOf[jfxsl.BorderPane], classOf[BorderPane])
+      classOf[jfxsl.BorderPane],
+      classOf[BorderPane])

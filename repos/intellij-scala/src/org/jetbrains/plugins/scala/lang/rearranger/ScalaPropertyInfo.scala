@@ -5,7 +5,8 @@ package lang.rearranger
   * @author Roman.Shein
   * Date: 31.07.13
   */
-class ScalaPropertyInfo(val getter: ScalaArrangementEntry,
-                        val setter: ScalaArrangementEntry) {
+class ScalaPropertyInfo(
+    val getter: ScalaArrangementEntry,
+    val setter: ScalaArrangementEntry) {
   def isComplete = getter != null && setter != null
 }

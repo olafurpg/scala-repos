@@ -14,7 +14,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScCommentOwner
   */
 object ScalaSuppressableInspectionTool {
   def findElementToolSuppressedIn(
-      element: PsiElement, toolId: String): Option[PsiElement] = {
+      element: PsiElement,
+      toolId: String): Option[PsiElement] = {
     if (element == null) return None
 
     def commentWithSuppression(elem: PsiElement): Option[PsiComment] = {
@@ -23,7 +24,8 @@ object ScalaSuppressableInspectionTool {
         val matcher: Matcher =
           SuppressionUtil.SUPPRESS_IN_LINE_COMMENT_PATTERN.matcher(text)
         if (matcher.matches && SuppressionUtil.isInspectionToolIdMentioned(
-                matcher.group(1), toolId)) {
+              matcher.group(1),
+              toolId)) {
           return Some(comment)
         }
       }
@@ -41,7 +43,7 @@ object ScalaSuppressableInspectionTool {
   def commentsFor(elem: PsiElement): Seq[PsiComment] = {
     elem match {
       case null | _: PsiFile | _: PsiDirectory => Seq.empty
-      case co: ScCommentOwner => co.allComments
+      case co: ScCommentOwner                  => co.allComments
       case stmt =>
         val prev = stmt.getPrevSiblingNotWhitespace
         prev.asOptionOf[PsiComment].toSeq
@@ -57,10 +59,10 @@ object ScalaSuppressableInspectionTool {
 
   def allFixesForKey(key: HighlightDisplayKey): Array[SuppressQuickFix] =
     Array(
-        new ScalaSuppressForStatementFix(key),
-        new ScalaSuppressForClassFix(key),
-        new ScalaSuppressForFunctionFix(key),
-        new ScalaSuppressForVariableFix(key),
-        new ScalaSuppressForTypeAliasFix(key)
+      new ScalaSuppressForStatementFix(key),
+      new ScalaSuppressForClassFix(key),
+      new ScalaSuppressForFunctionFix(key),
+      new ScalaSuppressForVariableFix(key),
+      new ScalaSuppressForTypeAliasFix(key)
     )
 }

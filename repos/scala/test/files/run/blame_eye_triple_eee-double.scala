@@ -27,14 +27,14 @@ object Test extends App {
 
   x match {
     case 0.0d => println("x matched 0!")
-    case NaN => println("x matched NaN!")
-    case _ => println("x matching was good")
+    case NaN  => println("x matched NaN!")
+    case _    => println("x matching was good")
   }
 
   NaN match {
     case 0.0d => println("NaN matched 0!")
-    case NaN => println("NaN matched NaN!")
-    case _ => println("NaN matching was good")
+    case NaN  => println("NaN matched NaN!")
+    case _    => println("NaN matching was good")
   }
 
   var z = 0.0d

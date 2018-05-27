@@ -16,23 +16,26 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScSelfTypeElement
 class ScSelfTypeElementStubImpl[ParentPsi <: PsiElement](
     parent: StubElement[ParentPsi],
     elemType: IStubElementType[
-        _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
+      _ <: StubElement[_ <: PsiElement],
+      _ <: PsiElement])
     extends StubBaseWrapper[ScSelfTypeElement](parent, elemType)
     with ScSelfTypeElementStub {
   private var name: StringRef = _
   private var typeElementText: StringRef = _
   private var typeNames: Array[String] = Array.empty
 
-  def this(parent: StubElement[ParentPsi],
-           elemType: IStubElementType[
-               _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
-           name: String,
-           typeElementText: String,
-           typeNames: Array[String]) = {
+  def this(
+      parent: StubElement[ParentPsi],
+      elemType: IStubElementType[
+        _ <: StubElement[_ <: PsiElement],
+        _ <: PsiElement],
+      name: String,
+      typeElementText: String,
+      typeNames: Array[String]) = {
     this(
-        parent,
-        elemType
-          .asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
+      parent,
+      elemType
+        .asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
     this.name = StringRef.fromString(name)
     this.typeElementText = StringRef.fromString(typeElementText)
     this.typeNames = typeNames

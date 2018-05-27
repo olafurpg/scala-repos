@@ -18,7 +18,11 @@
 package org.apache.spark.rdd
 
 import org.apache.spark.{SharedSparkContext, SparkFunSuite}
-import org.apache.spark.util.random.{BernoulliSampler, PoissonSampler, RandomSampler}
+import org.apache.spark.util.random.{
+  BernoulliSampler,
+  PoissonSampler,
+  RandomSampler
+}
 
 /** a sampler that outputs its seed */
 class MockSampler extends RandomSampler[Long, Long] {
@@ -37,7 +41,8 @@ class MockSampler extends RandomSampler[Long, Long] {
 }
 
 class PartitionwiseSampledRDDSuite
-    extends SparkFunSuite with SharedSparkContext {
+    extends SparkFunSuite
+    with SharedSparkContext {
 
   test("seed distribution") {
     val rdd = sc.makeRDD(Array(1L, 2L, 3L, 4L), 2)
@@ -52,7 +57,8 @@ class PartitionwiseSampledRDDSuite
     // We want to make sure there are no concurrency issues.
     val rdd = sc.parallelize(0 until 111, 10)
     for (sampler <- Seq(
-        new BernoulliSampler[Int](0.5), new PoissonSampler[Int](0.5))) {
+           new BernoulliSampler[Int](0.5),
+           new PoissonSampler[Int](0.5))) {
       val sampled = new PartitionwiseSampledRDD[Int, Int](rdd, sampler, true)
       sampled.zip(sampled).count()
     }

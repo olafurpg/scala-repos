@@ -24,9 +24,11 @@ object PlayCommands {
     val extracted = Project.extract(state)
     import extracted._
 
-    (name in currentRef get structure.data).map { name =>
-      "[" + Colors.cyan(name) + "] $ "
-    }.getOrElse("> ")
+    (name in currentRef get structure.data)
+      .map { name =>
+        "[" + Colors.cyan(name) + "] $ "
+      }
+      .getOrElse("> ")
   }
 
   // ----- Play commands
@@ -52,7 +54,8 @@ object PlayCommands {
       log.debug("Using parent loader for play common classloader: " + parent)
 
       commonClassLoader = new java.net.URLClassLoader(
-          classpath.map(_.data).collect(commonJars).toArray, parent) {
+        classpath.map(_.data).collect(commonJars).toArray,
+        parent) {
         override def toString =
           "Common ClassLoader: " + getURLs.map(_.toString).mkString(",")
       }
@@ -67,9 +70,9 @@ object PlayCommands {
       Def.taskDyn(playAssetsWithCompilation ?? (compile in Compile).value)
 
     compileTask.all(
-        ScopeFilter(
-            inDependencies(thisProjectRef.value)
-        )
+      ScopeFilter(
+        inDependencies(thisProjectRef.value)
+      )
     )
   }
 
@@ -91,15 +94,15 @@ object PlayCommands {
     val projectRef = thisProjectRef.value
 
     def filter = ScopeFilter(
-        inDependencies(projectRef),
-        inConfigurations(Compile, Assets)
+      inDependencies(projectRef),
+      inConfigurations(Compile, Assets)
     )
 
     Def.task {
 
       val allDirectories =
         (unmanagedSourceDirectories ?? Nil).all(filter).value.flatten ++
-        (unmanagedResourceDirectories ?? Nil).all(filter).value.flatten
+          (unmanagedResourceDirectories ?? Nil).all(filter).value.flatten
 
       val existingDirectories = allDirectories.filter(_.exists)
 
@@ -111,7 +114,7 @@ object PlayCommands {
         .foldLeft(List.empty[Path]) { (result, next) =>
           result.headOption match {
             case Some(previous) if next.startsWith(previous) => result
-            case _ => next :: result
+            case _                                           => next :: result
           }
         }
 

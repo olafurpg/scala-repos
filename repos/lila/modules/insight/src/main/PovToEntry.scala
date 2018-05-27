@@ -11,19 +11,21 @@ object PovToEntry {
 
   private type Ply = Int
 
-  case class RichPov(pov: Pov,
-                     provisional: Boolean,
-                     initialFen: Option[String],
-                     analysis: Option[lila.analyse.Analysis],
-                     division: chess.Division,
-                     moveAccuracy: Option[List[Int]],
-                     boards: NonEmptyList[Board],
-                     movetimes: NonEmptyList[Int],
-                     advices: Map[Ply, Advice])
+  case class RichPov(
+      pov: Pov,
+      provisional: Boolean,
+      initialFen: Option[String],
+      analysis: Option[lila.analyse.Analysis],
+      division: chess.Division,
+      moveAccuracy: Option[List[Int]],
+      boards: NonEmptyList[Board],
+      movetimes: NonEmptyList[Int],
+      advices: Map[Ply, Advice])
 
-  def apply(game: Game,
-            userId: String,
-            provisional: Boolean): Fu[Either[Game, Entry]] =
+  def apply(
+      game: Game,
+      userId: String,
+      provisional: Boolean): Fu[Either[Game, Entry]] =
     enrich(game, userId, provisional) map (_ flatMap convert toRight game) addFailureEffect {
       e =>
         println(s"http://l.org/${game.id}")
@@ -39,47 +41,51 @@ object PovToEntry {
   }
 
   private def enrich(
-      game: Game, userId: String, provisional: Boolean): Fu[Option[RichPov]] =
+      game: Game,
+      userId: String,
+      provisional: Boolean): Fu[Option[RichPov]] =
     if (removeWrongAnalysis(game)) fuccess(none)
     else
       lila.game.Pov.ofUserId(game, userId) ?? { pov =>
         lila.game.GameRepo.initialFen(game) zip
-        (game.metadata.analysed ?? lila.analyse.AnalysisRepo.byId(game.id)) map {
+          (game.metadata.analysed ?? lila.analyse.AnalysisRepo
+            .byId(game.id)) map {
           case (fen, an) =>
             for {
               boards <- chess.Replay
-                .boards(moveStrs = game.pgnMoves,
-                        initialFen = fen,
-                        variant = game.variant)
+                .boards(
+                  moveStrs = game.pgnMoves,
+                  initialFen = fen,
+                  variant = game.variant)
                 .toOption
                 .flatMap(_.toNel)
               movetimes <- game.moveTimes(pov.color).toNel
             } yield
               RichPov(
-                  pov = pov,
-                  provisional = provisional,
-                  initialFen = fen,
-                  analysis = an,
-                  division = chess.Divider(boards.list),
-                  moveAccuracy = an.map { Accuracy.diffsList(pov, _) },
-                  boards = boards,
-                  movetimes = movetimes,
-                  advices = an.?? {
-                    _.advices.map { a =>
-                      a.info.ply -> a
-                    }.toMap
-                  }
+                pov = pov,
+                provisional = provisional,
+                initialFen = fen,
+                analysis = an,
+                division = chess.Divider(boards.list),
+                moveAccuracy = an.map { Accuracy.diffsList(pov, _) },
+                boards = boards,
+                movetimes = movetimes,
+                advices = an.?? {
+                  _.advices.map { a =>
+                    a.info.ply -> a
+                  }.toMap
+                }
               )
         }
       }
 
   private def pgnMoveToRole(pgn: String): Role = pgn.head match {
-    case 'N' => chess.Knight
-    case 'B' => chess.Bishop
-    case 'R' => chess.Rook
-    case 'Q' => chess.Queen
+    case 'N'       => chess.Knight
+    case 'B'       => chess.Bishop
+    case 'R'       => chess.Rook
+    case 'Q'       => chess.Queen
     case 'K' | 'O' => chess.King
-    case _ => chess.Pawn
+    case _         => chess.Pawn
   }
 
   private def makeMoves(from: RichPov): List[Move] = {
@@ -106,7 +112,7 @@ object PovToEntry {
             case o if o.nag == Nag.Blunder =>
               from.advices get ply match {
                 case Some(p) if p.nag == Nag.Blunder => false.some
-                case _ => true.some
+                case _                               => true.some
               }
             case _ => none
           }
@@ -115,19 +121,21 @@ object PovToEntry {
             case o if o.nag == Nag.Blunder =>
               from.advices.get(ply + 1) match {
                 case Some(p) if p.nag == Nag.Blunder => true.some
-                case _ => false.some
+                case _                               => false.some
               }
             case _ => none
           }
-        Move(phase = Phase.of(from.division, ply),
-             tenths = tenths,
-             role = role,
-             eval = prevInfo.flatMap(_.score).map(_.ceiled.centipawns),
-             mate = prevInfo.flatMap(_.mate),
-             cpl = cpDiffs lift i map (_ min 1000),
-             material = board.materialImbalance * from.pov.color.fold(1, -1),
-             opportunism = opportunism,
-             luck = luck)
+        Move(
+          phase = Phase.of(from.division, ply),
+          tenths = tenths,
+          role = role,
+          eval = prevInfo.flatMap(_.score).map(_.ceiled.centipawns),
+          mate = prevInfo.flatMap(_.mate),
+          cpl = cpDiffs lift i map (_ min 1000),
+          material = board.materialImbalance * from.pov.color.fold(1, -1),
+          opportunism = opportunism,
+          luck = luck
+        )
     }
   }
 
@@ -152,27 +160,28 @@ object PovToEntry {
       perfType <- pov.game.perfType
     } yield
       Entry(
-          id = Entry povToId pov,
-          number = 0, // temporary :-/ the Indexer will set it
-          userId = myId,
-          color = pov.color,
-          perf = perfType,
-          eco = Ecopening fromGame pov.game,
-          myCastling = Castling.fromMoves(pov.game pgnMoves pov.color),
-          opponentRating = opRating,
-          opponentStrength = RelativeStrength(opRating - myRating),
-          opponentCastling = Castling.fromMoves(pov.game pgnMoves !pov.color),
-          moves = makeMoves(from),
-          queenTrade = queenTrade(from),
-          result = pov.game.winnerUserId match {
-            case None => Result.Draw
-            case Some(u) if u == myId => Result.Win
-            case _ => Result.Loss
-          },
-          termination = Termination fromStatus pov.game.status,
-          ratingDiff = ~pov.player.ratingDiff,
-          analysed = analysis.isDefined,
-          provisional = provisional,
-          date = pov.game.createdAt)
+        id = Entry povToId pov,
+        number = 0, // temporary :-/ the Indexer will set it
+        userId = myId,
+        color = pov.color,
+        perf = perfType,
+        eco = Ecopening fromGame pov.game,
+        myCastling = Castling.fromMoves(pov.game pgnMoves pov.color),
+        opponentRating = opRating,
+        opponentStrength = RelativeStrength(opRating - myRating),
+        opponentCastling = Castling.fromMoves(pov.game pgnMoves !pov.color),
+        moves = makeMoves(from),
+        queenTrade = queenTrade(from),
+        result = pov.game.winnerUserId match {
+          case None                 => Result.Draw
+          case Some(u) if u == myId => Result.Win
+          case _                    => Result.Loss
+        },
+        termination = Termination fromStatus pov.game.status,
+        ratingDiff = ~pov.player.ratingDiff,
+        analysed = analysis.isDefined,
+        provisional = provisional,
+        date = pov.game.createdAt
+      )
   }
 }

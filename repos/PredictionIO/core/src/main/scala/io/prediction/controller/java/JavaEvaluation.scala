@@ -39,7 +39,8 @@ abstract class JavaEvaluation extends Evaluation {
     * @tparam A Actual result class
     */
   def setEngineMetric[EI, Q, P, A](
-      baseEngine: BaseEngine[EI, Q, P, A], metric: Metric[EI, Q, P, A, _]) {
+      baseEngine: BaseEngine[EI, Q, P, A],
+      metric: Metric[EI, Q, P, A, _]) {
 
     engineMetric = (baseEngine, metric)
   }

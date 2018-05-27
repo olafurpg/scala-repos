@@ -42,4 +42,6 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class SliderSpec
     extends SimpleSFXDelegateSpec[jfxsc.Slider, Slider](
-        classOf[jfxsc.Slider], classOf[Slider]) with RunOnApplicationThread
+      classOf[jfxsc.Slider],
+      classOf[Slider])
+    with RunOnApplicationThread

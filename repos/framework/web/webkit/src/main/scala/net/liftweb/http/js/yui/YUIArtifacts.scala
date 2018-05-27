@@ -67,8 +67,8 @@ object YUIArtifacts extends JSArtifacts {
   def showAndFocus(id: String) = new JsExp {
     def toJsCmd =
       "YAHOO.util.Dom.setStyle(" + id.encJs + ", 'display', 'block');" +
-      "setTimeout(function() { document.getElementById(" + id.encJs +
-      ").focus(); }, 200);"
+        "setTimeout(function() { document.getElementById(" + id.encJs +
+        ").focus(); }, 200);"
   }
 
   /**
@@ -90,9 +90,9 @@ object YUIArtifacts extends JSArtifacts {
         """
 	  try {
 	  var parent1 = document.getElementById(""" + id.encJs +
-        """);
+          """);
 	  parent1.innerHTML = """ + html +
-        """;
+          """;
 	  for (var i = 0; i < parent1.childNodes.length; i++) {
 	    var node = parent1.childNodes[i];
 	    parent1.parentNode.insertBefore(node.cloneNode(true), parent1);
@@ -112,7 +112,7 @@ object YUIArtifacts extends JSArtifacts {
   def setHtml(uid: String, content: NodeSeq): JsCmd = new JsCmd {
     val toJsCmd = fixHtmlCmdFunc(uid, content) { s =>
       "try{document.getElementById(" + uid.encJs + ").innerHTML = " + s +
-      ";} catch (e) {}"
+        ";} catch (e) {}"
     }
   }
 
@@ -147,9 +147,8 @@ object YUIArtifacts extends JSArtifacts {
 
   private def toJson(info: AjaxInfo): String =
     ("timeout : " + info.timeout :: "cache : " +
-        info.cache :: "success : function(resp) { res = YAHOO.lift.eval(resp);" +
-        info.successFunc.map(_ + "(res);").openOr("") + "}" :: "failure : " +
-        info.failFunc.openOr(
-            "function (arg) {YAHOO.log('Ajax request failed');}") :: Nil) mkString
-    ("{ ", ", ", " }")
+      info.cache :: "success : function(resp) { res = YAHOO.lift.eval(resp);" +
+      info.successFunc.map(_ + "(res);").openOr("") + "}" :: "failure : " +
+      info.failFunc.openOr("function (arg) {YAHOO.log('Ajax request failed');}") :: Nil) mkString
+      ("{ ", ", ", " }")
 }

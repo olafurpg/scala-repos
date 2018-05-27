@@ -7,7 +7,7 @@ package types
 import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
 import org.jetbrains.plugins.scala.lang.parser.parsing.expressions._
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 06.02.2008
   */
@@ -16,16 +16,17 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.expressions._
  */
 
 object AnnotType {
-  def parse(builder: ScalaPsiBuilder,
-            isPattern: Boolean,
-            multipleSQBrackets: Boolean = true): Boolean = {
+  def parse(
+      builder: ScalaPsiBuilder,
+      isPattern: Boolean,
+      multipleSQBrackets: Boolean = true): Boolean = {
     val annotMarker = builder.mark
     var isAnnotation = false
     //parse Simple type
     if (SimpleType.parse(builder, isPattern, multipleSQBrackets)) {
       val annotationsMarker = builder.mark
       while (!builder.newlineBeforeCurrentToken &&
-      Annotation.parse(builder, countLinesAfterAnnotation = false)) {
+             Annotation.parse(builder, countLinesAfterAnnotation = false)) {
         isAnnotation = true
       }
 

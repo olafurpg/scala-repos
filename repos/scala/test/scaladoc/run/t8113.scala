@@ -22,7 +22,7 @@ object Test extends ScaladocModelTest {
 
     // find Link
     def find(body: Any): Option[Link] = body match {
-      case l: Link => Some(l)
+      case l: Link   => Some(l)
       case s: Seq[_] => s.toList.map(find(_)).flatten.headOption
       case p: Product =>
         p.productIterator.toList.map(find(_)).flatten.headOption

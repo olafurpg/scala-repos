@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -54,12 +54,12 @@ object CTypeFlags {
       @tailrec
       def flagForCValueType(t: CValueType[_]) {
         t match {
-          case CString => buffer += FString
+          case CString  => buffer += FString
           case CBoolean => buffer += FBoolean
-          case CLong => buffer += FLong
-          case CDouble => buffer += FDouble
-          case CNum => buffer += FBigDecimal
-          case CDate => buffer += FDate
+          case CLong    => buffer += FLong
+          case CDouble  => buffer += FDouble
+          case CNum     => buffer += FBigDecimal
+          case CDate    => buffer += FDate
           case CArrayType(tpe) =>
             buffer += FArray
             flagForCValueType(tpe)
@@ -77,7 +77,7 @@ object CTypeFlags {
           buffer += FEmptyObject
         case CUndefined =>
           sys.error(
-              "Unexpected CUndefined type. Undefined segments don't exist!")
+            "Unexpected CUndefined type. Undefined segments don't exist!")
       }
     }
 
@@ -93,23 +93,23 @@ object CTypeFlags {
 
     def readCValueType(flag: Byte): Validation[IOException, CValueType[_]] =
       flag match {
-        case FBoolean => Success(CBoolean)
-        case FString => Success(CString)
-        case FLong => Success(CLong)
-        case FDouble => Success(CDouble)
+        case FBoolean    => Success(CBoolean)
+        case FString     => Success(CString)
+        case FLong       => Success(CLong)
+        case FDouble     => Success(CDouble)
         case FBigDecimal => Success(CNum)
-        case FDate => Success(CDate)
-        case FArray => readCValueType(buffer.get()) map (CArrayType(_))
+        case FDate       => Success(CDate)
+        case FArray      => readCValueType(buffer.get()) map (CArrayType(_))
         case flag =>
           Failure(
-              new IOException("Unexpected segment type flag: %x" format flag))
+            new IOException("Unexpected segment type flag: %x" format flag))
       }
 
     buffer.get() match {
-      case FNull => Success(CNull)
-      case FEmptyArray => Success(CEmptyArray)
+      case FNull        => Success(CNull)
+      case FEmptyArray  => Success(CEmptyArray)
       case FEmptyObject => Success(CEmptyObject)
-      case flag => readCValueType(flag)
+      case flag         => readCValueType(flag)
     }
   }
 }

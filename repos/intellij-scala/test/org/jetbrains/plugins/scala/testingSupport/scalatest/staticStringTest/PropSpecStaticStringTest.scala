@@ -11,8 +11,9 @@ trait PropSpecStaticStringTest extends ScalaTestTestCase {
   val propSpecFileName = propSpecClassName + ".scala"
 
   def addPropSpec() = {
-    addFileToProject(propSpecFileName,
-                     """
+    addFileToProject(
+      propSpecFileName,
+      """
         |import org.scalatest._
         |
         |class PropSpecStringTest extends PropSpec {
@@ -29,43 +30,46 @@ trait PropSpecStaticStringTest extends ScalaTestTestCase {
         |  property("time: " + System.currentTimeMillis()) {
         |  }
         |}
-      """.stripMargin.trim())
+      """.stripMargin.trim()
+    )
   }
 
   def testPropSpecSum() = {
     addPropSpec()
 
     assert(
-        checkConfigAndSettings(
-            createTestFromLocation(10, 10, propSpecFileName),
-            propSpecClassName,
-            "string sum"))
+      checkConfigAndSettings(
+        createTestFromLocation(10, 10, propSpecFileName),
+        propSpecClassName,
+        "string sum"))
   }
 
   def testPropSpecVal() = {
     addPropSpec()
 
     assert(
-        checkConfigAndSettings(createTestFromLocation(4, 10, propSpecFileName),
-                               propSpecClassName,
-                               "const"))
+      checkConfigAndSettings(
+        createTestFromLocation(4, 10, propSpecFileName),
+        propSpecClassName,
+        "const"))
   }
 
   def testPropSpecValSum() = {
     addPropSpec()
 
     assert(
-        checkConfigAndSettings(createTestFromLocation(7, 10, propSpecFileName),
-                               propSpecClassName,
-                               "const test name"))
+      checkConfigAndSettings(
+        createTestFromLocation(7, 10, propSpecFileName),
+        propSpecClassName,
+        "const test name"))
   }
 
   def testPropSpecNonConst() = {
     addPropSpec()
 
     assert(
-        checkConfigAndSettings(
-            createTestFromLocation(13, 10, propSpecFileName),
-            propSpecClassName))
+      checkConfigAndSettings(
+        createTestFromLocation(13, 10, propSpecFileName),
+        propSpecClassName))
   }
 }

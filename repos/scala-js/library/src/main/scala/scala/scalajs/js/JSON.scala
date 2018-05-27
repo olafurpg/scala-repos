@@ -47,9 +47,10 @@ object JSON extends Object {
     *
     * MDN
     */
-  def stringify(value: Any,
-                replacer: Function2[String, Any, Any] = ???,
-                space: Any = ???): String = native
+  def stringify(
+      value: Any,
+      replacer: Function2[String, Any, Any] = ???,
+      space: Any = ???): String = native
   def stringify(value: Any, replacer: Array[Any]): String = native
   def stringify(value: Any, replacer: Array[Any], space: Any): String = native
 }

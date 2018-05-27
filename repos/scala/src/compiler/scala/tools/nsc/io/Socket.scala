@@ -6,7 +6,13 @@
 package scala.tools.nsc
 package io
 
-import java.io.{IOException, InputStreamReader, BufferedReader, PrintWriter, Closeable}
+import java.io.{
+  IOException,
+  InputStreamReader,
+  BufferedReader,
+  PrintWriter,
+  Closeable
+}
 import java.io.{BufferedOutputStream, BufferedReader}
 import java.net.{InetAddress, Socket => JSocket}
 import scala.io.Codec
@@ -15,15 +21,18 @@ import scala.io.Codec
   */
 object Socket {
   class Box[+T](f: () => T) {
-    private def handlerFn[U](
-        f: Throwable => U): PartialFunction[Throwable, U] = {
+    private def handlerFn[U](f: Throwable => U): PartialFunction[Throwable, U] = {
       case x @ (_: IOException | _: SecurityException) => f(x)
     }
     private val optHandler = handlerFn[Option[T]](_ => None)
     private val eitherHandler = handlerFn[Either[Throwable, T]](x => Left(x))
 
-    def either: Either[Throwable, T] = try Right(f()) catch eitherHandler
-    def opt: Option[T] = try Some(f()) catch optHandler
+    def either: Either[Throwable, T] =
+      try Right(f())
+      catch eitherHandler
+    def opt: Option[T] =
+      try Some(f())
+      catch optHandler
   }
 
   def localhost(port: Int) = apply(InetAddress.getLocalHost(), port)
@@ -51,7 +60,8 @@ class Socket(jsocket: JSocket) extends Streamable.Bytes with Closeable {
     val out = printWriter()
     val in = bufferedReader
 
-    try f(in, out) finally {
+    try f(in, out)
+    finally {
       in.close()
       out.close()
     }

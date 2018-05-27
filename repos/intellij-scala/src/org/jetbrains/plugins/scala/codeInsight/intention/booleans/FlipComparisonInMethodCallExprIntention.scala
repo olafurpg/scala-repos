@@ -29,7 +29,9 @@ class FlipComparisonInMethodCallExprIntention
   override def getText: String = getFamilyName
 
   def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+      project: Project,
+      editor: Editor,
+      element: PsiElement): Boolean = {
     val methodCallExpr: ScMethodCall =
       PsiTreeUtil.getParentOfType(element, classOf[ScMethodCall], false)
     if (methodCallExpr == null) return false
@@ -83,15 +85,16 @@ class FlipComparisonInMethodCallExprIntention
     val expr = new StringBuilder
     val qualBuilder = new StringBuilder
     val argsBuilder = new StringBuilder
-    val replaceOper = Map("equals" -> "equals",
-                          "==" -> "==",
-                          "!=" -> "!=",
-                          "eq" -> "eq",
-                          "ne" -> "ne",
-                          ">" -> "<",
-                          "<" -> ">",
-                          ">=" -> "<=",
-                          "<=" -> ">=")
+    val replaceOper = Map(
+      "equals" -> "equals",
+      "==" -> "==",
+      "!=" -> "!=",
+      "eq" -> "eq",
+      "ne" -> "ne",
+      ">" -> "<",
+      "<" -> ">",
+      ">=" -> "<=",
+      "<=" -> ">=")
 
     argsBuilder.append(methodCallExpr.args.getText)
 
@@ -114,19 +117,23 @@ class FlipComparisonInMethodCallExprIntention
 
     val newQualExpr: ScExpression =
       ScalaPsiElementFactory.createExpressionFromText(
-          newQual, element.getManager)
+        newQual,
+        element.getManager)
 
     expr
       .append(methodCallExpr.args.getText)
       .append(".")
-      .append(replaceOper(methodCallExpr.getInvokedExpr
-                .asInstanceOf[ScReferenceExpression]
-                .nameId
-                .getText))
+      .append(
+        replaceOper(
+          methodCallExpr.getInvokedExpr
+            .asInstanceOf[ScReferenceExpression]
+            .nameId
+            .getText))
       .append(newArgs)
 
     val newMethodCallExpr = ScalaPsiElementFactory.createExpressionFromText(
-        expr.toString(), element.getManager)
+      expr.toString(),
+      element.getManager)
 
     newMethodCallExpr
       .asInstanceOf[ScMethodCall]
@@ -147,7 +154,8 @@ class FlipComparisonInMethodCallExprIntention
 
     inWriteAction {
       methodCallExpr.replaceExpression(
-          newMethodCallExpr, removeParenthesis = true)
+        newMethodCallExpr,
+        removeParenthesis = true)
       editor.getCaretModel.moveToOffset(start + diff + size)
       PsiDocumentManager
         .getInstance(project)

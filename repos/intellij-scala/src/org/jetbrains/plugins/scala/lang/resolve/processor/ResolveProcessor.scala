@@ -10,19 +10,35 @@ import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScSuperReference, ScThisReference}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScSuperReference,
+  ScThisReference
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScTypeParam
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScTypeAlias, ScTypeAliasDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScTypeAlias,
+  ScTypeAliasDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject, ScTrait, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScClass,
+  ScObject,
+  ScTrait,
+  ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScPackageImpl
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypingContext
+}
 
 import scala.collection.Set
 
 object ResolveProcessor {
-  def getQualifiedName(result: ScalaResolveResult, place: PsiElement): String = {
+  def getQualifiedName(
+      result: ScalaResolveResult,
+      place: PsiElement): String = {
     def defaultForTypeAlias(t: ScTypeAlias): String = {
       if (t.getParent.isInstanceOf[ScTemplateBody] &&
           t.containingClass != null) {
@@ -32,8 +48,8 @@ object ResolveProcessor {
 
     result.getActualElement match {
       case c: ScTypeParam => null
-      case c: ScObject => "Object:" + c.qualifiedName
-      case c: PsiClass => "Class:" + c.qualifiedName
+      case c: ScObject    => "Object:" + c.qualifiedName
+      case c: PsiClass    => "Class:" + c.qualifiedName
       case t: ScTypeAliasDefinition if t.typeParameters.length == 0 =>
         t.aliasedType(TypingContext.empty) match {
           case Success(tp, elem) =>
@@ -41,7 +57,7 @@ object ResolveProcessor {
               case Some(c: ScObject) => defaultForTypeAlias(t)
               case Some(td: ScTypeDefinition)
                   if td.typeParameters.length == 0 &&
-                  ScalaPsiUtil.hasStablePath(td) =>
+                    ScalaPsiUtil.hasStablePath(td) =>
                 "Class:" + td.qualifiedName
               case Some(c: PsiClass) if c.getTypeParameters.length == 0 =>
                 "Class:" + c.qualifiedName
@@ -50,16 +66,18 @@ object ResolveProcessor {
           case _ => defaultForTypeAlias(t)
         }
       case t: ScTypeAlias => defaultForTypeAlias(t)
-      case p: PsiPackage => "Package:" + p.getQualifiedName
-      case _ => null
+      case p: PsiPackage  => "Package:" + p.getQualifiedName
+      case _              => null
     }
   }
 }
 
-class ResolveProcessor(override val kinds: Set[ResolveTargets.Value],
-                       val ref: PsiElement,
-                       val name: String)
-    extends BaseProcessor(kinds) with PrecedenceHelper[String] {
+class ResolveProcessor(
+    override val kinds: Set[ResolveTargets.Value],
+    val ref: PsiElement,
+    val name: String)
+    extends BaseProcessor(kinds)
+    with PrecedenceHelper[String] {
   @volatile
   private var resolveScope: GlobalSearchScope = null
   def getResolveScope: GlobalSearchScope = {
@@ -73,7 +91,7 @@ class ResolveProcessor(override val kinds: Set[ResolveTargets.Value],
 
   val isThisOrSuperResolve = ref.getParent match {
     case _: ScThisReference | _: ScSuperReference => true
-    case _ => false
+    case _                                        => false
   }
 
   def emptyResultSet: Boolean = candidatesSet.isEmpty || levelSet.isEmpty
@@ -95,7 +113,8 @@ class ResolveProcessor(override val kinds: Set[ResolveTargets.Value],
 
   def checkPredefinedClassesAndPackages(): Boolean = precedence <= SCALA_PREDEF
 
-  override protected def getQualifiedName(result: ScalaResolveResult): String = {
+  override protected def getQualifiedName(
+      result: ScalaResolveResult): String = {
     ResolveProcessor.getQualifiedName(result, getPlace)
   }
 
@@ -132,7 +151,7 @@ class ResolveProcessor(override val kinds: Set[ResolveTargets.Value],
         case pl =>
           ScalaPsiUtil.nameContext(named) match {
             case memb: PsiMember => memb
-            case _ => return true //something strange
+            case _               => return true //something strange
           }
       }
     }
@@ -153,41 +172,44 @@ class ResolveProcessor(override val kinds: Set[ResolveTargets.Value],
               .findPackage(o.qualifiedName) != null =>
         case pack: PsiPackage =>
           val resolveResult: ScalaResolveResult = new ScalaResolveResult(
-              ScPackageImpl(pack),
-              getSubst(state),
-              getImports(state),
-              nameShadow,
-              isAccessible = accessible)
+            ScPackageImpl(pack),
+            getSubst(state),
+            getImports(state),
+            nameShadow,
+            isAccessible = accessible)
           addResult(resolveResult)
         case clazz: PsiClass
             if !isThisOrSuperResolve ||
-            PsiTreeUtil.isContextAncestor(clazz, ref, true) =>
+              PsiTreeUtil.isContextAncestor(clazz, ref, true) =>
           addResult(
-              new ScalaResolveResult(named,
-                                     getSubst(state),
-                                     getImports(state),
-                                     nameShadow,
-                                     boundClass = getBoundClass(state),
-                                     fromType = getFromType(state),
-                                     isAccessible = accessible))
-        case clazz: PsiClass => //do nothing, it's wrong class or object
+            new ScalaResolveResult(
+              named,
+              getSubst(state),
+              getImports(state),
+              nameShadow,
+              boundClass = getBoundClass(state),
+              fromType = getFromType(state),
+              isAccessible = accessible))
+        case clazz: PsiClass           => //do nothing, it's wrong class or object
         case _ if isThisOrSuperResolve => //do nothing for type alias
         case _ =>
           addResult(
-              new ScalaResolveResult(named,
-                                     getSubst(state),
-                                     getImports(state),
-                                     nameShadow,
-                                     boundClass = getBoundClass(state),
-                                     fromType = getFromType(state),
-                                     isAccessible = accessible))
+            new ScalaResolveResult(
+              named,
+              getSubst(state),
+              getImports(state),
+              nameShadow,
+              boundClass = getBoundClass(state),
+              fromType = getFromType(state),
+              isAccessible = accessible))
       }
     }
     true
   }
 
   protected def nameAndKindMatch(
-      named: PsiNamedElement, state: ResolveState): Boolean = {
+      named: PsiNamedElement,
+      state: ResolveState): Boolean = {
     val nameSet = state.get(ResolverEnv.nameKey)
     val elName =
       if (nameSet == null) {
@@ -203,7 +225,7 @@ class ResolveProcessor(override val kinds: Set[ResolveTargets.Value],
   override def getHint[T](hintKey: Key[T]): T = {
     hintKey match {
       case NameHint.KEY if name != "" => ScalaNameHint.asInstanceOf[T]
-      case _ => super.getHint(hintKey)
+      case _                          => super.getHint(hintKey)
     }
   }
 
@@ -238,12 +260,15 @@ class ResolveProcessor(override val kinds: Set[ResolveTargets.Value],
      */
     res.filter {
       case r @ ScalaResolveResult(
-          _: ScTypeAlias | _: ScClass | _: ScTrait, _) =>
+            _: ScTypeAlias | _: ScClass | _: ScTrait,
+            _) =>
         res.foldLeft(true) {
           case (false, _) => false
-          case (true,
-                rr @ ScalaResolveResult(
-                _: ScTypeAlias | _: ScClass | _: ScTrait, _)) =>
+          case (
+              true,
+              rr @ ScalaResolveResult(
+                _: ScTypeAlias | _: ScClass | _: ScTrait,
+                _)) =>
             rr.element.name != r.element.name || ScalaPsiUtil
               .superTypeMembers(rr.element)
               .find(_ == r.element) == None

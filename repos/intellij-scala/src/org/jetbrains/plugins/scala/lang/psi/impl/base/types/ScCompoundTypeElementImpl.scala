@@ -11,13 +11,17 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.base.types._
 import org.jetbrains.plugins.scala.lang.psi.types
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
-import org.jetbrains.plugins.scala.lang.psi.types.{ScCompoundType, ScSubstitutor}
+import org.jetbrains.plugins.scala.lang.psi.types.{
+  ScCompoundType,
+  ScSubstitutor
+}
 
 /**
   * @author Alexander Podkhalyuzin
   */
 class ScCompoundTypeElementImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScCompoundTypeElement {
+    extends ScalaPsiElementImpl(node)
+    with ScCompoundTypeElement {
   override def toString: String = "CompoundType: " + getText
 
   protected def innerType(ctx: TypingContext) = {
@@ -25,10 +29,11 @@ class ScCompoundTypeElementImpl(node: ASTNode)
     refinement match {
       case None =>
         collectFailures(comps, types.Any)(
-            new ScCompoundType(_, Map.empty, Map.empty))
+          new ScCompoundType(_, Map.empty, Map.empty))
       case Some(r) =>
-        collectFailures(comps, types.Any)(ScCompoundType.fromPsi(
-                _, r.holders.toList, r.types.toList, ScSubstitutor.empty))
+        collectFailures(comps, types.Any)(
+          ScCompoundType
+            .fromPsi(_, r.holders.toList, r.types.toList, ScSubstitutor.empty))
     }
   }
 
@@ -39,7 +44,7 @@ class ScCompoundTypeElementImpl(node: ASTNode)
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case s: ScalaElementVisitor => s.visitCompoundTypeElement(this)
-      case _ => super.accept(visitor)
+      case _                      => super.accept(visitor)
     }
   }
 }

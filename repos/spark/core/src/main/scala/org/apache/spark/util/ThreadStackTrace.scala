@@ -20,7 +20,8 @@ package org.apache.spark.util
 /**
   * Used for shipping per-thread stacktraces from the executors to driver.
   */
-private[spark] case class ThreadStackTrace(threadId: Long,
-                                           threadName: String,
-                                           threadState: Thread.State,
-                                           stackTrace: String)
+private[spark] case class ThreadStackTrace(
+    threadId: Long,
+    threadName: String,
+    threadState: Thread.State,
+    stackTrace: String)

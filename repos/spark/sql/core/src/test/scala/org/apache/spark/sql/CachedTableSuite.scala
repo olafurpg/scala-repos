@@ -33,7 +33,9 @@ import org.apache.spark.storage.{RDDBlockId, StorageLevel}
 private case class BigData(s: String)
 
 class CachedTableSuite
-    extends QueryTest with SQLTestUtils with SharedSQLContext {
+    extends QueryTest
+    with SQLTestUtils
+    with SharedSQLContext {
   import testImplicits._
 
   def rddIdOf(tableName: String): Int = {
@@ -48,8 +50,8 @@ class CachedTableSuite
 
   def isMaterialized(rddId: Int): Boolean = {
     val maybeBlock = sparkContext.env.blockManager.get(RDDBlockId(rddId, 0))
-    maybeBlock.foreach(
-        _ => sparkContext.env.blockManager.releaseLock(RDDBlockId(rddId, 0)))
+    maybeBlock.foreach(_ =>
+      sparkContext.env.blockManager.releaseLock(RDDBlockId(rddId, 0)))
     maybeBlock.nonEmpty
   }
 
@@ -144,33 +146,32 @@ class CachedTableSuite
     sqlContext.cacheTable("testData")
 
     assertCached(sqlContext.table("testData"))
-    assert(
-        sqlContext.table("testData").queryExecution.withCachedData match {
+    assert(sqlContext.table("testData").queryExecution.withCachedData match {
       case _: InMemoryRelation => true
-      case _ => false
+      case _                   => false
     })
 
     sqlContext.uncacheTable("testData")
     assert(!sqlContext.isCached("testData"))
-    assert(
-        sqlContext.table("testData").queryExecution.withCachedData match {
+    assert(sqlContext.table("testData").queryExecution.withCachedData match {
       case _: InMemoryRelation => false
-      case _ => true
+      case _                   => true
     })
   }
 
   test("SPARK-1669: cacheTable should be idempotent") {
     assume(
-        !sqlContext
-          .table("testData")
-          .logicalPlan
-          .isInstanceOf[InMemoryRelation])
+      !sqlContext
+        .table("testData")
+        .logicalPlan
+        .isInstanceOf[InMemoryRelation])
 
     sqlContext.cacheTable("testData")
     assertCached(sqlContext.table("testData"))
 
     assertResult(
-        1, "InMemoryRelation not found, testData should have been cached") {
+      1,
+      "InMemoryRelation not found, testData should have been cached") {
       sqlContext
         .table("testData")
         .queryExecution
@@ -183,14 +184,20 @@ class CachedTableSuite
 
     sqlContext.cacheTable("testData")
     assertResult(
-        0, "Double InMemoryRelations found, cacheTable() is not idempotent") {
+      0,
+      "Double InMemoryRelations found, cacheTable() is not idempotent") {
       sqlContext
         .table("testData")
         .queryExecution
         .withCachedData
         .collect {
           case r @ InMemoryRelation(
-              _, _, _, _, _: InMemoryColumnarTableScan, _) =>
+                _,
+                _,
+                _,
+                _,
+                _: InMemoryColumnarTableScan,
+                _) =>
             r
         }
         .size
@@ -218,18 +225,17 @@ class CachedTableSuite
   test("SELECT star from cached table") {
     sql("SELECT * FROM testData").registerTempTable("selectStar")
     sqlContext.cacheTable("selectStar")
-    checkAnswer(
-        sql("SELECT * FROM selectStar WHERE key = 1"), Seq(Row(1, "1")))
+    checkAnswer(sql("SELECT * FROM selectStar WHERE key = 1"), Seq(Row(1, "1")))
     sqlContext.uncacheTable("selectStar")
   }
 
   test("Self-join cached") {
-    val unCachedAnswer = sql(
-        "SELECT * FROM testData a JOIN testData b ON a.key = b.key").collect()
+    val unCachedAnswer =
+      sql("SELECT * FROM testData a JOIN testData b ON a.key = b.key").collect()
     sqlContext.cacheTable("testData")
     checkAnswer(
-        sql("SELECT * FROM testData a JOIN testData b ON a.key = b.key"),
-        unCachedAnswer.toSeq)
+      sql("SELECT * FROM testData a JOIN testData b ON a.key = b.key"),
+      unCachedAnswer.toSeq)
     sqlContext.uncacheTable("testData")
   }
 
@@ -239,16 +245,18 @@ class CachedTableSuite
 
     val rddId = rddIdOf("testData")
     assert(
-        isMaterialized(rddId),
-        "Eagerly cached in-memory table should have already been materialized")
+      isMaterialized(rddId),
+      "Eagerly cached in-memory table should have already been materialized")
 
     sql("UNCACHE TABLE testData")
-    assert(!sqlContext.isCached("testData"),
-           "Table 'testData' should not be cached")
+    assert(
+      !sqlContext.isCached("testData"),
+      "Table 'testData' should not be cached")
 
     eventually(timeout(10 seconds)) {
-      assert(!isMaterialized(rddId),
-             "Uncached in-memory table should have been unpersisted")
+      assert(
+        !isMaterialized(rddId),
+        "Uncached in-memory table should have been unpersisted")
     }
   }
 
@@ -258,13 +266,14 @@ class CachedTableSuite
 
     val rddId = rddIdOf("testCacheTable")
     assert(
-        isMaterialized(rddId),
-        "Eagerly cached in-memory table should have already been materialized")
+      isMaterialized(rddId),
+      "Eagerly cached in-memory table should have already been materialized")
 
     sqlContext.uncacheTable("testCacheTable")
     eventually(timeout(10 seconds)) {
-      assert(!isMaterialized(rddId),
-             "Uncached in-memory table should have been unpersisted")
+      assert(
+        !isMaterialized(rddId),
+        "Uncached in-memory table should have been unpersisted")
     }
   }
 
@@ -274,13 +283,14 @@ class CachedTableSuite
 
     val rddId = rddIdOf("testCacheTable")
     assert(
-        isMaterialized(rddId),
-        "Eagerly cached in-memory table should have already been materialized")
+      isMaterialized(rddId),
+      "Eagerly cached in-memory table should have already been materialized")
 
     sqlContext.uncacheTable("testCacheTable")
     eventually(timeout(10 seconds)) {
-      assert(!isMaterialized(rddId),
-             "Uncached in-memory table should have been unpersisted")
+      assert(
+        !isMaterialized(rddId),
+        "Uncached in-memory table should have been unpersisted")
     }
   }
 
@@ -289,17 +299,20 @@ class CachedTableSuite
     assertCached(sqlContext.table("testData"))
 
     val rddId = rddIdOf("testData")
-    assert(!isMaterialized(rddId),
-           "Lazily cached in-memory table shouldn't be materialized eagerly")
+    assert(
+      !isMaterialized(rddId),
+      "Lazily cached in-memory table shouldn't be materialized eagerly")
 
     sql("SELECT COUNT(*) FROM testData").collect()
-    assert(isMaterialized(rddId),
-           "Lazily cached in-memory table should have been materialized")
+    assert(
+      isMaterialized(rddId),
+      "Lazily cached in-memory table should have been materialized")
 
     sqlContext.uncacheTable("testData")
     eventually(timeout(10 seconds)) {
-      assert(!isMaterialized(rddId),
-             "Uncached in-memory table should have been unpersisted")
+      assert(
+        !isMaterialized(rddId),
+        "Uncached in-memory table should have been unpersisted")
     }
   }
 
@@ -370,7 +383,7 @@ class CachedTableSuite
   }
 
   test(
-      "SPARK-10327 Cache Table is not working while subquery has alias in its project list") {
+    "SPARK-10327 Cache Table is not working while subquery has alias in its project list") {
     sparkContext
       .parallelize((1, 1) :: (2, 2) :: Nil)
       .toDF("key", "value")
@@ -383,8 +396,8 @@ class CachedTableSuite
         |join abc c on a.key=c.key""".stripMargin).queryExecution.sparkPlan
 
     assert(
-        sparkPlan.collect { case e: InMemoryColumnarTableScan => e }.size === 3)
-    assert(sparkPlan.collect { case e: PhysicalRDD => e }.size === 0)
+      sparkPlan.collect { case e: InMemoryColumnarTableScan => e }.size === 3)
+    assert(sparkPlan.collect { case e: PhysicalRDD          => e }.size === 0)
   }
 
   /**
@@ -397,21 +410,23 @@ class CachedTableSuite
   }
 
   test(
-      "A cached table preserves the partitioning and ordering of its cached SparkPlan") {
+    "A cached table preserves the partitioning and ordering of its cached SparkPlan") {
     val table3x = testData.unionAll(testData).unionAll(testData)
     table3x.registerTempTable("testData3x")
 
     sql("SELECT key, value FROM testData3x ORDER BY key").registerTempTable(
-        "orderedTable")
+      "orderedTable")
     sqlContext.cacheTable("orderedTable")
     assertCached(sqlContext.table("orderedTable"))
     // Should not have an exchange as the query is already sorted on the group by key.
     verifyNumExchanges(
-        sql("SELECT key, count(*) FROM orderedTable GROUP BY key"), 0)
+      sql("SELECT key, count(*) FROM orderedTable GROUP BY key"),
+      0)
     checkAnswer(
-        sql("SELECT key, count(*) FROM orderedTable GROUP BY key ORDER BY key"),
-        sql("SELECT key, count(*) FROM testData3x GROUP BY key ORDER BY key")
-          .collect())
+      sql("SELECT key, count(*) FROM orderedTable GROUP BY key ORDER BY key"),
+      sql("SELECT key, count(*) FROM testData3x GROUP BY key ORDER BY key")
+        .collect()
+    )
     sqlContext.uncacheTable("orderedTable")
     sqlContext.dropTempTable("orderedTable")
 
@@ -426,15 +441,17 @@ class CachedTableSuite
 
         // Joining them should result in no exchanges.
         verifyNumExchanges(
-            sql("SELECT * FROM t1 t1 JOIN t2 t2 ON t1.key = t2.a"), 0)
+          sql("SELECT * FROM t1 t1 JOIN t2 t2 ON t1.key = t2.a"),
+          0)
         checkAnswer(
-            sql("SELECT * FROM t1 t1 JOIN t2 t2 ON t1.key = t2.a"),
-            sql("SELECT * FROM testData t1 JOIN testData2 t2 ON t1.key = t2.a"))
+          sql("SELECT * FROM t1 t1 JOIN t2 t2 ON t1.key = t2.a"),
+          sql("SELECT * FROM testData t1 JOIN testData2 t2 ON t1.key = t2.a"))
 
         // Grouping on the partition key should result in no exchanges
         verifyNumExchanges(sql("SELECT count(*) FROM t1 GROUP BY key"), 0)
-        checkAnswer(sql("SELECT count(*) FROM t1 GROUP BY key"),
-                    sql("SELECT count(*) FROM testData GROUP BY key"))
+        checkAnswer(
+          sql("SELECT count(*) FROM t1 GROUP BY key"),
+          sql("SELECT count(*) FROM testData GROUP BY key"))
 
         sqlContext.uncacheTable("t1")
         sqlContext.uncacheTable("t2")
@@ -452,11 +469,12 @@ class CachedTableSuite
         sql("SELECT key, value, a, b FROM t1 t1 JOIN t2 t2 ON t1.key = t2.a")
       verifyNumExchanges(query, 1)
       assert(
-          query.queryExecution.executedPlan.outputPartitioning.numPartitions === 6)
-      checkAnswer(query,
-                  testData
-                    .join(testData2, $"key" === $"a")
-                    .select($"key", $"value", $"a", $"b"))
+        query.queryExecution.executedPlan.outputPartitioning.numPartitions === 6)
+      checkAnswer(
+        query,
+        testData
+          .join(testData2, $"key" === $"a")
+          .select($"key", $"value", $"a", $"b"))
       sqlContext.uncacheTable("t1")
       sqlContext.uncacheTable("t2")
     }
@@ -472,11 +490,12 @@ class CachedTableSuite
         sql("SELECT key, value, a, b FROM t1 t1 JOIN t2 t2 ON t1.key = t2.a")
       verifyNumExchanges(query, 1)
       assert(
-          query.queryExecution.executedPlan.outputPartitioning.numPartitions === 6)
-      checkAnswer(query,
-                  testData
-                    .join(testData2, $"key" === $"a")
-                    .select($"key", $"value", $"a", $"b"))
+        query.queryExecution.executedPlan.outputPartitioning.numPartitions === 6)
+      checkAnswer(
+        query,
+        testData
+          .join(testData2, $"key" === $"a")
+          .select($"key", $"value", $"a", $"b"))
       sqlContext.uncacheTable("t1")
       sqlContext.uncacheTable("t2")
     }
@@ -491,11 +510,12 @@ class CachedTableSuite
         sql("SELECT key, value, a, b FROM t1 t1 JOIN t2 t2 ON t1.key = t2.a")
       verifyNumExchanges(query, 1)
       assert(
-          query.queryExecution.executedPlan.outputPartitioning.numPartitions === 12)
-      checkAnswer(query,
-                  testData
-                    .join(testData2, $"key" === $"a")
-                    .select($"key", $"value", $"a", $"b"))
+        query.queryExecution.executedPlan.outputPartitioning.numPartitions === 12)
+      checkAnswer(
+        query,
+        testData
+          .join(testData2, $"key" === $"a")
+          .select($"key", $"value", $"a", $"b"))
       sqlContext.uncacheTable("t1")
       sqlContext.uncacheTable("t2")
     }
@@ -512,10 +532,11 @@ class CachedTableSuite
       val query =
         sql("SELECT key, value, a, b FROM t1 t1 JOIN t2 t2 ON t1.key = t2.a")
       verifyNumExchanges(query, 2)
-      checkAnswer(query,
-                  testData
-                    .join(testData2, $"key" === $"a")
-                    .select($"key", $"value", $"a", $"b"))
+      checkAnswer(
+        query,
+        testData
+          .join(testData2, $"key" === $"a")
+          .select($"key", $"value", $"a", $"b"))
       sqlContext.uncacheTable("t1")
       sqlContext.uncacheTable("t2")
     }
@@ -545,14 +566,15 @@ class CachedTableSuite
       sqlContext.cacheTable("t2")
 
       val query = sql(
-          "SELECT key, value, a, b FROM t1 t1 JOIN t2 t2 ON t1.key = t2.a and t1.value = t2.b")
+        "SELECT key, value, a, b FROM t1 t1 JOIN t2 t2 ON t1.key = t2.a and t1.value = t2.b")
       verifyNumExchanges(query, 1)
       assert(
-          query.queryExecution.executedPlan.outputPartitioning.numPartitions === 6)
-      checkAnswer(query,
-                  df1
-                    .join(df2, $"key" === $"a" && $"value" === $"b")
-                    .select($"key", $"value", $"a", $"b"))
+        query.queryExecution.executedPlan.outputPartitioning.numPartitions === 6)
+      checkAnswer(
+        query,
+        df1
+          .join(df2, $"key" === $"a" && $"value" === $"b")
+          .select($"key", $"value", $"a", $"b"))
       sqlContext.uncacheTable("t1")
       sqlContext.uncacheTable("t2")
     }

@@ -15,7 +15,9 @@ import scala.language.reflectiveCalls
 
 @RunWith(classOf[JUnitRunner])
 class TraceTest
-    extends FunSuite with MockitoSugar with BeforeAndAfter
+    extends FunSuite
+    with MockitoSugar
+    with BeforeAndAfter
     with OneInstancePerTest {
   val Seq(id0, id1, id2) =
     0 until 3 map { i =>
@@ -23,10 +25,9 @@ class TraceTest
     }
 
   test("have a default id without parents, etc.") {
-    assert(
-        Trace.id match {
+    assert(Trace.id match {
       case TraceId(None, None, _, None, Flags(0)) => true
-      case _ => false
+      case _                                      => false
     })
   }
 
@@ -62,7 +63,7 @@ class TraceTest
       assert(Trace.id != defaultId)
       assert(Trace.id match {
         case TraceId(None, None, _, None, Flags(0)) => true
-        case _ => false
+        case _                                      => false
       })
     }
   }
@@ -71,8 +72,7 @@ class TraceTest
     Trace.letId(Trace.nextId) {
       val topId = Trace.id
       Trace.letId(Trace.nextId) {
-        assert(
-            Trace.id match {
+        assert(Trace.id match {
           case TraceId(Some(traceId), Some(parentId), _, None, Flags(0))
               if traceId == topId.traceId && parentId == topId.spanId =>
             true
@@ -235,14 +235,14 @@ class TraceTest
         val currentId = Trace.id
         assert(currentId match {
           case TraceId(None, None, _, None, Flags(0)) => true
-          case _ => false
+          case _                                      => false
         })
         assert(Trace.isTerminal == false)
         assert(Trace.tracers == List(tracer))
         Trace.record("Hello world")
         verify(tracer, times(1)).sampleTrace(currentId)
-        verify(tracer, times(1)).record(Record(
-                currentId, Time.now, Annotation.Message("Hello world"), None))
+        verify(tracer, times(1)).record(
+          Record(currentId, Time.now, Annotation.Message("Hello world"), None))
       }
     }
   }
@@ -252,20 +252,25 @@ class TraceTest
       val tracer = mock[Tracer]
       when(tracer.sampleTrace(any[TraceId])).thenReturn(Some(true))
 
-      val parentId = TraceId(Some(SpanId(123)),
-                             Some(SpanId(456)),
-                             SpanId(789),
-                             Some(false),
-                             Flags(0))
+      val parentId = TraceId(
+        Some(SpanId(123)),
+        Some(SpanId(456)),
+        SpanId(789),
+        Some(false),
+        Flags(0))
       Trace.letId(parentId) {
         Trace.letTracerAndNextId(tracer) {
           val currentId = Trace.id
           assert(currentId match {
             case TraceId(
-                Some(_traceId), Some(_parentId), _, Some(_sampled), Flags(0))
+                Some(_traceId),
+                Some(_parentId),
+                _,
+                Some(_sampled),
+                Flags(0))
                 if (_traceId == parentId.traceId) &&
-                (_parentId == parentId.spanId) &&
-                (_sampled == parentId.sampled.get) =>
+                  (_parentId == parentId.spanId) &&
+                  (_sampled == parentId.sampled.get) =>
               true
             case _ => false
           })
@@ -288,29 +293,30 @@ class TraceTest
         val currentId = Trace.id
         assert(currentId match {
           case TraceId(None, None, _, None, Flags(0)) => true
-          case _ => false
+          case _                                      => false
         })
         assert(Trace.isTerminal == true)
         assert(Trace.tracers == List(tracer))
         verify(tracer, times(1)).sampleTrace(currentId)
         Trace.record("Hello world")
-        verify(tracer, times(1)).record(Record(
-                currentId, Time.now, Annotation.Message("Hello world"), None))
+        verify(tracer, times(1)).record(
+          Record(currentId, Time.now, Annotation.Message("Hello world"), None))
       }
     }
   }
 
   test(
-      "Trace.letTracerAndNextId: trace with terminal set for the current state") {
+    "Trace.letTracerAndNextId: trace with terminal set for the current state") {
     Time.withCurrentTimeFrozen { tc =>
       val tracer = mock[Tracer]
       when(tracer.sampleTrace(any[TraceId])).thenReturn(Some(true))
 
-      val parentId = TraceId(Some(SpanId(123)),
-                             Some(SpanId(456)),
-                             SpanId(789),
-                             Some(true),
-                             Flags(0))
+      val parentId = TraceId(
+        Some(SpanId(123)),
+        Some(SpanId(456)),
+        SpanId(789),
+        Some(true),
+        Flags(0))
       Trace.letId(parentId, terminal = true) {
         Trace.letTracerAndNextId(tracer) {
           val currentId = Trace.id
@@ -320,10 +326,11 @@ class TraceTest
           verify(tracer, never()).sampleTrace(currentId)
           Trace.record("Hello world")
           verify(tracer, times(1)).record(
-              Record(currentId,
-                     Time.now,
-                     Annotation.Message("Hello world"),
-                     None))
+            Record(
+              currentId,
+              Time.now,
+              Annotation.Message("Hello world"),
+              None))
         }
       }
     }
@@ -399,8 +406,8 @@ class TraceTest
       sampled <- Seq(None, Some(false), Some(true))
     } yield TraceId(traceId, parentId, spanId, sampled, flags)
 
-    for (id <- traceIds) assert(
-        Trace.idCtx.tryUnmarshal(Trace.idCtx.marshal(id)) == Return(id))
+    for (id <- traceIds)
+      assert(Trace.idCtx.tryUnmarshal(Trace.idCtx.marshal(id)) == Return(id))
   }
 
   test("trace ID serialization: throw in handle on invalid size") {
@@ -408,21 +415,22 @@ class TraceTest
 
     Trace.idCtx.tryUnmarshal(Buf.ByteArray.Owned(bytes)) match {
       case Throw(_: IllegalArgumentException) =>
-      case rv => fail(s"Got $rv")
+      case rv                                 => fail(s"Got $rv")
     }
   }
 
   test("Trace.isActivelyTracing: trace id with SamplingKnown flag set") {
-    val id = TraceId(Some(SpanId(12)),
-                     Some(SpanId(13)),
-                     SpanId(14),
-                     Some(true),
-                     Flags(Flags.SamplingKnown | Flags.Sampled))
+    val id = TraceId(
+      Some(SpanId(12)),
+      Some(SpanId(13)),
+      SpanId(14),
+      Some(true),
+      Flags(Flags.SamplingKnown | Flags.Sampled))
     val tracer = mock[Tracer]
     Trace.letTracerAndId(tracer, id) {
       assert(Trace.isActivelyTracing == true)
-      Trace.letId(id.copy(_sampled = Some(false),
-                          flags = Flags(Flags.SamplingKnown))) {
+      Trace.letId(
+        id.copy(_sampled = Some(false), flags = Flags(Flags.SamplingKnown))) {
         assert(Trace.isActivelyTracing == false)
       }
     }

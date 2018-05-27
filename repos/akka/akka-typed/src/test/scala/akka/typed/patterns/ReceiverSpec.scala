@@ -20,12 +20,13 @@ class ReceiverSpec extends TypedSpec {
   private val dummyInbox = Inbox.sync[Replies[Msg]]("dummy")
 
   private val startingPoints: Seq[Setup] = Seq(
-      Setup("initial", ctx ⇒ behavior[Msg], 0, 0),
-      Setup("afterGetOneFirst", afterGetOneFirst, 1, 0),
-      Setup("afterGetOneLater", afterGetOneLater, 1, 2),
-      Setup("afterGetOneTimeout", afterGetOneTimeout, 1, 2),
-      Setup("afterGetAll", afterGetAll, 1, 1),
-      Setup("afterGetAllTimeout", afterGetAllTimeout, 1, 1))
+    Setup("initial", ctx ⇒ behavior[Msg], 0, 0),
+    Setup("afterGetOneFirst", afterGetOneFirst, 1, 0),
+    Setup("afterGetOneLater", afterGetOneLater, 1, 2),
+    Setup("afterGetOneTimeout", afterGetOneTimeout, 1, 2),
+    Setup("afterGetAll", afterGetAll, 1, 1),
+    Setup("afterGetAllTimeout", afterGetAllTimeout, 1, 1)
+  )
 
   private def afterGetOneFirst(
       ctx: ActorContext[Command[Msg]]): Behavior[Command[Msg]] =
@@ -64,20 +65,24 @@ class ReceiverSpec extends TypedSpec {
       .message(ctx, GetAll(1.nano)(dummyInbox.ref))
       .message(ctx, GetAll(Duration.Zero)(dummyInbox.ref))
 
-  private def setup(
-      name: String, behv: Behavior[Command[Msg]] = behavior[Msg])(
-      proc: (EffectfulActorContext[Command[Msg]], EffectfulActorContext[Msg],
-      Inbox.SyncInbox[Replies[Msg]]) ⇒ Unit): Unit =
+  private def setup(name: String, behv: Behavior[Command[Msg]] = behavior[Msg])(
+      proc: (
+          EffectfulActorContext[Command[Msg]],
+          EffectfulActorContext[Msg],
+          Inbox.SyncInbox[Replies[Msg]]) ⇒ Unit): Unit =
     for (Setup(description, behv, messages, effects) ← startingPoints) {
       val ctx = new EffectfulActorContext(
-          "ctx", Props(ScalaDSL.ContextAware(behv)), system)
+        "ctx",
+        Props(ScalaDSL.ContextAware(behv)),
+        system)
       withClue(
-          s"[running for starting point '$description' (${ctx.currentBehavior})]: ") {
+        s"[running for starting point '$description' (${ctx.currentBehavior})]: ") {
         dummyInbox.receiveAll() should have size messages
         ctx.getAllEffects() should have size effects
-        proc(ctx,
-             ctx.asInstanceOf[EffectfulActorContext[Msg]],
-             Inbox.sync[Replies[Msg]](name))
+        proc(
+          ctx,
+          ctx.asInstanceOf[EffectfulActorContext[Msg]],
+          Inbox.sync[Replies[Msg]](name))
       }
     }
 
@@ -102,19 +107,19 @@ class ReceiverSpec extends TypedSpec {
         int.run(GetOne(Duration.Zero)(inbox.ref))
         int.getAllEffects() should be(Nil)
         inbox.receiveAll() should be(
-            GetOneResult(int.self, Some(Msg(1))) :: Nil)
+          GetOneResult(int.self, Some(Msg(1))) :: Nil)
         // then with positive timeout
         ext.run(Msg(2))
         int.run(GetOne(1.second)(inbox.ref))
         int.getAllEffects() should be(Nil)
         inbox.receiveAll() should be(
-            GetOneResult(int.self, Some(Msg(2))) :: Nil)
+          GetOneResult(int.self, Some(Msg(2))) :: Nil)
         // then with negative timeout
         ext.run(Msg(3))
         int.run(GetOne(-1.second)(inbox.ref))
         int.getAllEffects() should be(Nil)
         inbox.receiveAll() should be(
-            GetOneResult(int.self, Some(Msg(3))) :: Nil)
+          GetOneResult(int.self, Some(Msg(3))) :: Nil)
       }
 
     def `must receive one message which arrives later`(): Unit =
@@ -131,7 +136,7 @@ class ReceiverSpec extends TypedSpec {
             d should be theSameInstanceAs (Duration.Undefined)
         }
         inbox.receiveAll() should be(
-            GetOneResult(int.self, Some(Msg(1))) :: Nil)
+          GetOneResult(int.self, Some(Msg(1))) :: Nil)
       }
 
     def `must reply with no message when asked for immediate value`(): Unit =
@@ -172,15 +177,16 @@ class ReceiverSpec extends TypedSpec {
         ext.run(Msg(4))
         int.run(GetOne(Duration.Zero)(inbox.ref))
         inbox.receiveAll() should be(
-            GetOneResult(int.self, Some(Msg(1))) :: Nil)
+          GetOneResult(int.self, Some(Msg(1))) :: Nil)
         int.run(GetOne(Duration.Zero)(inbox.ref))
         inbox.receiveAll() should be(
-            GetOneResult(int.self, Some(Msg(2))) :: Nil)
+          GetOneResult(int.self, Some(Msg(2))) :: Nil)
         int.run(GetOne(Duration.Zero)(inbox.ref))
         int.run(GetOne(Duration.Zero)(inbox.ref))
         inbox.receiveAll() should be(
-            GetOneResult(int.self, Some(Msg(3))) :: GetOneResult(
-                int.self, Some(Msg(4))) :: Nil)
+          GetOneResult(int.self, Some(Msg(3))) :: GetOneResult(
+            int.self,
+            Some(Msg(4))) :: Nil)
         int.hasEffects should be(false)
       }
 
@@ -191,18 +197,19 @@ class ReceiverSpec extends TypedSpec {
         ext.run(Msg(2))
         int.run(GetAll(Duration.Zero)(inbox.ref))
         inbox.receiveAll() should be(
-            GetAllResult(int.self, List(Msg(1), Msg(2))) :: Nil)
+          GetAllResult(int.self, List(Msg(1), Msg(2))) :: Nil)
         // now with negative timeout
         ext.run(Msg(3))
         ext.run(Msg(4))
         int.run(GetAll(-1.second)(inbox.ref))
         inbox.receiveAll() should be(
-            GetAllResult(int.self, List(Msg(3), Msg(4))) :: Nil)
+          GetAllResult(int.self, List(Msg(3), Msg(4))) :: Nil)
         int.hasEffects should be(false)
       }
 
     private def assertScheduled[T, U](
-        s: Scheduled[T], target: ActorRef[U]): U = {
+        s: Scheduled[T],
+        target: ActorRef[U]): U = {
       s.target should be(target)
       // unfortunately Scala cannot automatically transfer the hereby established type knowledge
       s.msg.asInstanceOf[U]
@@ -218,7 +225,7 @@ class ReceiverSpec extends TypedSpec {
         }
         int.run(msg)
         inbox.receiveAll() should be(
-            GetAllResult(int.self, List(Msg(1), Msg(2))) :: Nil)
+          GetAllResult(int.self, List(Msg(1), Msg(2))) :: Nil)
         int.hasEffects should be(false)
       }
 
@@ -235,7 +242,7 @@ class ReceiverSpec extends TypedSpec {
         ext.run(Msg(3))
         int.run(msg)
         inbox.receiveAll() should be(
-            GetAllResult(int.self, List(Msg(1), Msg(2), Msg(3))) :: Nil)
+          GetAllResult(int.self, List(Msg(1), Msg(2), Msg(3))) :: Nil)
         int.hasEffects should be(false)
       }
 
@@ -250,7 +257,7 @@ class ReceiverSpec extends TypedSpec {
         inbox.hasMessages should be(false)
         int.run(msg)
         inbox.receiveAll() should be(
-            GetAllResult(int.self, List(Msg(1), Msg(2))) :: Nil)
+          GetAllResult(int.self, List(Msg(1), Msg(2))) :: Nil)
         int.hasEffects should be(false)
       }
 

@@ -18,20 +18,22 @@ private[sbt] final class LoadedSbtFile(
     val generatedFiles: Seq[File]) {
   // We still use merge for now.  We track originating sbt file in an alternative manner.
   def merge(o: LoadedSbtFile): LoadedSbtFile =
-    new LoadedSbtFile(settings ++ o.settings,
-                      projects ++ o.projects,
-                      importedDefs ++ o.importedDefs,
-                      manipulations,
-                      definitions zip o.definitions,
-                      generatedFiles ++ o.generatedFiles)
+    new LoadedSbtFile(
+      settings ++ o.settings,
+      projects ++ o.projects,
+      importedDefs ++ o.importedDefs,
+      manipulations,
+      definitions zip o.definitions,
+      generatedFiles ++ o.generatedFiles)
 
   def clearProjects =
-    new LoadedSbtFile(settings,
-                      Nil,
-                      importedDefs,
-                      manipulations,
-                      definitions,
-                      generatedFiles)
+    new LoadedSbtFile(
+      settings,
+      Nil,
+      importedDefs,
+      manipulations,
+      definitions,
+      generatedFiles)
 }
 
 /**

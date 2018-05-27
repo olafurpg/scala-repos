@@ -13,25 +13,27 @@ import breeze.numerics.isOdd
   * @date 2/28/14.
   */
 trait CanFilterMedian[Input] {
-  def apply(data: DenseVector[Input],
-            windowLength: Int,
-            overhang: OptOverhang): DenseVector[Input]
+  def apply(
+      data: DenseVector[Input],
+      windowLength: Int,
+      overhang: OptOverhang): DenseVector[Input]
 }
 
 object CanFilterMedian {
 
   //Int, Long and Float will calculate in Double (see algorithm, needs infinitesimal small numbers for ordering)
   @expand
-  implicit def dvFilterMedianT[
-      @expand.args(Int, Long, Double, Float) T]: CanFilterMedian[T] =
+  implicit def dvFilterMedianT[@expand.args(Int, Long, Double, Float) T]
+    : CanFilterMedian[T] =
     new CanFilterMedian[T] {
-      def apply(data: DenseVector[T],
-                windowLength: Int,
-                overhang: OptOverhang): DenseVector[T] = {
+      def apply(
+          data: DenseVector[T],
+          windowLength: Int,
+          overhang: OptOverhang): DenseVector[T] = {
 
         require(
-            isOdd(windowLength),
-            "median filter can only take odd windowLength values, since even values will cause a half-frame time shift")
+          isOdd(windowLength),
+          "median filter can only take odd windowLength values, since even values will cause a half-frame time shift")
         require(data.length >= 3, "data must be longer than 3")
         require(windowLength >= 1, "window length must be longer than 1")
 
@@ -44,18 +46,18 @@ object CanFilterMedian {
 
           overhang match {
             case OptOverhang.PreserveLength => {
-                //calculate beginning and end separately, for partial-windows (no overhang)
-                for (indexFromBeginning <- 0 until halfWindow) tempret(
-                    indexFromBeginning) = median(
-                    data(0 to indexFromBeginning * 2))
-                for (indexToEnd <- 0 until halfWindow) tempret(
-                    data.length - indexToEnd - 1) = median(
-                    data(data.length - 2 * indexToEnd - 1 until data.length))
-              }
+              //calculate beginning and end separately, for partial-windows (no overhang)
+              for (indexFromBeginning <- 0 until halfWindow)
+                tempret(indexFromBeginning) = median(
+                  data(0 to indexFromBeginning * 2))
+              for (indexToEnd <- 0 until halfWindow)
+                tempret(data.length - indexToEnd - 1) = median(
+                  data(data.length - 2 * indexToEnd - 1 until data.length))
+            }
             case OptOverhang.None => {}
             case opt: OptOverhang =>
               throw new IllegalArgumentException(
-                  "Option " + opt + " is invalid here.")
+                "Option " + opt + " is invalid here.")
           }
 
           //first full-window value must be initialized separately
@@ -73,15 +75,16 @@ object CanFilterMedian {
             //if the obsolete value is not equal to the new value...
             if (nowObsoleteWindowValue != newWindowValue) {
               //replace now obsolete value with new data value within temporary array
-              findAndReplaceInstanceInPlace(tempDataExtract,
-                                            nowObsoleteWindowValue,
-                                            newWindowValue,
-                                            halfWindow)
+              findAndReplaceInstanceInPlace(
+                tempDataExtract,
+                nowObsoleteWindowValue,
+                newWindowValue,
+                halfWindow)
               //if the new value and old value lie on different sides of the current Median,
               if ((nowObsoleteWindowValue >= currentMedian ||
-                      newWindowValue >= currentMedian) &&
+                  newWindowValue >= currentMedian) &&
                   (nowObsoleteWindowValue <= currentMedian ||
-                      newWindowValue <= currentMedian)) {
+                  newWindowValue <= currentMedian)) {
                 //then the median needs to be recalculated
                 currentMedian = quickSelectImpl(tempDataExtract, halfWindow)
               }
@@ -101,7 +104,10 @@ object CanFilterMedian {
       }
 
       def findAndReplaceInstanceInPlace(
-          arr: Array[T], fromValue: T, toValue: T, pivotPoint: Int): Unit = {
+          arr: Array[T],
+          fromValue: T,
+          toValue: T,
+          pivotPoint: Int): Unit = {
         val pivotValue: T = arr(pivotPoint)
         var found = false
 
@@ -134,8 +140,8 @@ object CanFilterMedian {
         }
 
         require(
-            found,
-            "The fromValue was not found within the given array, something is wrong!")
+          found,
+          "The fromValue was not found within the given array, something is wrong!")
       }
     }
 }

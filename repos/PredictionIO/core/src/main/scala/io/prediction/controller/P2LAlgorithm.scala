@@ -39,7 +39,7 @@ import scala.reflect._
   * @tparam P Output prediction class.
   * @group Algorithm
   */
-abstract class P2LAlgorithm[PD, M : ClassTag, Q : ClassTag, P]
+abstract class P2LAlgorithm[PD, M: ClassTag, Q: ClassTag, P]
     extends BaseAlgorithm[PD, M, Q, P] {
 
   def trainBase(sc: SparkContext, pd: PD): M = train(sc, pd)
@@ -52,7 +52,9 @@ abstract class P2LAlgorithm[PD, M : ClassTag, Q : ClassTag, P]
   def train(sc: SparkContext, pd: PD): M
 
   def batchPredictBase(
-      sc: SparkContext, bm: Any, qs: RDD[(Long, Q)]): RDD[(Long, P)] =
+      sc: SparkContext,
+      bm: Any,
+      qs: RDD[(Long, Q)]): RDD[(Long, P)] =
     batchPredict(bm.asInstanceOf[M], qs)
 
   /** This is a default implementation to perform batch prediction. Override
@@ -103,7 +105,10 @@ abstract class P2LAlgorithm[PD, M : ClassTag, Q : ClassTag, P]
     */
   @DeveloperApi
   override def makePersistentModel(
-      sc: SparkContext, modelId: String, algoParams: Params, bm: Any): Any = {
+      sc: SparkContext,
+      modelId: String,
+      algoParams: Params,
+      bm: Any): Any = {
     val m = bm.asInstanceOf[M]
     if (m.isInstanceOf[PersistentModel[_]]) {
       if (m.asInstanceOf[PersistentModel[Params]]

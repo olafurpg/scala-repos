@@ -18,10 +18,12 @@ import play.mvc.Http
 import play.mvc.Http.Context
 
 object NettyGlobalSettingsSpec
-    extends GlobalSettingsSpec with NettyIntegrationSpecification
+    extends GlobalSettingsSpec
+    with NettyIntegrationSpecification
 
 trait GlobalSettingsSpec
-    extends PlaySpecification with WsTestClient
+    extends PlaySpecification
+    with WsTestClient
     with ServerIntegrationSpecification {
 
   sequential
@@ -33,7 +35,7 @@ trait GlobalSettingsSpec
       applicationGlobal.fold(Map.empty[String, String]) { s: String =>
         Map("application.global" -> s"play.it.bindings.$s")
       } +
-      ("play.http.requestHandler" -> "play.http.GlobalSettingsHttpRequestHandler")
+        ("play.http.requestHandler" -> "play.http.GlobalSettingsHttpRequestHandler")
     import play.api.inject._
     import play.api.routing.sird._
     lazy val app: Application = new GuiceApplicationBuilder()
@@ -54,19 +56,19 @@ trait GlobalSettingsSpec
 
   "GlobalSettings filters" should {
     "not have X-Foo header when no Global is configured" in withServer(None)(
-        "/scala") { body =>
+      "/scala") { body =>
       body must_== "null"
     }
     "have X-Foo header when Scala Global with filters is configured" in withServer(
-        Some("FooFilteringScalaGlobal"))("/scala") { body =>
+      Some("FooFilteringScalaGlobal"))("/scala") { body =>
       body must_== "filter-constructor-called-by-scala-global"
     }
     "have X-Foo header when Java Global with filters is configured" in withServer(
-        Some("FooFilteringJavaGlobal"))("/scala") { body =>
+      Some("FooFilteringJavaGlobal"))("/scala") { body =>
       body must_== "filter-default-constructor"
     }
     "allow intercepting by Java GlobalSettings.onRequest" in withServer(
-        Some("OnRequestJavaGlobal"))("/java") { body =>
+      Some("OnRequestJavaGlobal"))("/java") { body =>
       body must_== "intercepted"
     }
   }
@@ -85,8 +87,9 @@ class FooFilter(headerValue: String) extends EssentialFilter {
 /** Scala GlobalSettings object that uses a filter */
 object FooFilteringScalaGlobal extends play.api.GlobalSettings {
   override def doFilter(next: EssentialAction): EssentialAction = {
-    Filters(super.doFilter(next),
-            new FooFilter("filter-constructor-called-by-scala-global"))
+    Filters(
+      super.doFilter(next),
+      new FooFilter("filter-constructor-called-by-scala-global"))
   }
 }
 

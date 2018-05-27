@@ -82,37 +82,56 @@ object Test extends DirectTest {
       def treeClass(t: Tree) = t.getClass.toString.split('.').last
 
       override def pluginsPt(
-          pt: Type, typer: Typer, tree: Tree, mode: Mode): Type = {
+          pt: Type,
+          typer: Typer,
+          tree: Tree,
+          mode: Mode): Type = {
         output += s"pluginsPt($pt, ${treeClass(tree)})"
         pt
       }
 
       override def pluginsTyped(
-          tpe: Type, typer: Typer, tree: Tree, mode: Mode, pt: Type): Type = {
+          tpe: Type,
+          typer: Typer,
+          tree: Tree,
+          mode: Mode,
+          pt: Type): Type = {
         output += s"pluginsTyped($tpe, ${treeClass(tree)})"
         tpe
       }
 
       override def pluginsTypeSig(
-          tpe: Type, typer: Typer, defTree: Tree, pt: Type): Type = {
+          tpe: Type,
+          typer: Typer,
+          defTree: Tree,
+          pt: Type): Type = {
         output += s"pluginsTypeSig(${defTree.symbol}, ${treeClass(defTree)})"
         tpe
       }
 
       override def pluginsTypeSigAccessor(
-          tpe: Type, typer: Typer, tree: ValDef, sym: Symbol): Type = {
+          tpe: Type,
+          typer: Typer,
+          tree: ValDef,
+          sym: Symbol): Type = {
         output += s"pluginsTypeSigAccessor(${tree.symbol})"
         tpe
       }
 
       override def canAdaptAnnotations(
-          tree: Tree, typer: Typer, mode: Mode, pt: Type): Boolean = {
+          tree: Tree,
+          typer: Typer,
+          mode: Mode,
+          pt: Type): Boolean = {
         output += s"canAdaptAnnotations(${treeClass(tree)}, $pt)"
         false
       }
 
       override def pluginsTypedReturn(
-          tpe: Type, typer: Typer, tree: Return, pt: Type): Type = {
+          tpe: Type,
+          typer: Typer,
+          tree: Return,
+          pt: Type): Type = {
         output += s"pluginsTypedReturn($tree, $pt)"
         tpe
       }

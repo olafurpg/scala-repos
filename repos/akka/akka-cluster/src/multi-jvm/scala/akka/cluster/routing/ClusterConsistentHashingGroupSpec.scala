@@ -38,7 +38,7 @@ object ClusterConsistentHashingGroupMultiJvmSpec extends MultiNodeConfig {
   val third = role("third")
 
   commonConfig(
-      debugConfig(on = false).withFallback(MultiNodeClusterSpec.clusterConfig))
+    debugConfig(on = false).withFallback(MultiNodeClusterSpec.clusterConfig))
 }
 
 class ClusterConsistentHashingGroupMultiJvmNode1
@@ -50,7 +50,9 @@ class ClusterConsistentHashingGroupMultiJvmNode3
 
 abstract class ClusterConsistentHashingGroupSpec
     extends MultiNodeSpec(ClusterConsistentHashingGroupMultiJvmSpec)
-    with MultiNodeClusterSpec with ImplicitSender with DefaultTimeout {
+    with MultiNodeClusterSpec
+    with ImplicitSender
+    with DefaultTimeout {
   import ClusterConsistentHashingGroupMultiJvmSpec._
 
   /**
@@ -81,13 +83,16 @@ abstract class ClusterConsistentHashingGroupSpec
       }
       val paths = List("/user/dest")
       val router = system.actorOf(
-          ClusterRouterGroup(
-              local = ConsistentHashingGroup(paths, hashMapping = hashMapping),
-              settings = ClusterRouterGroupSettings(totalInstances = 10,
-                                                    paths,
-                                                    allowLocalRoutees = true,
-                                                    useRole = None)).props(),
-          "router")
+        ClusterRouterGroup(
+          local = ConsistentHashingGroup(paths, hashMapping = hashMapping),
+          settings = ClusterRouterGroupSettings(
+            totalInstances = 10,
+            paths,
+            allowLocalRoutees = true,
+            useRole = None)
+        ).props(),
+        "router"
+      )
       // it may take some time until router receives cluster member events
       awaitAssert { currentRoutees(router).size should ===(3) }
       val keys = List("A", "B", "C", "D", "E", "F", "G")

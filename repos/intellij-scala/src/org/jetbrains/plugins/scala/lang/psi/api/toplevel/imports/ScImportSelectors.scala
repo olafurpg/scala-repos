@@ -7,7 +7,7 @@ package imports
 
 import com.intellij.psi.PsiElement
 
-/** 
+/**
   * @author Alexander Podkhalyuzin
   * Date: 20.02.2008
   */

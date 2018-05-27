@@ -72,7 +72,7 @@ private[hive] trait HiveClient {
   /** Returns the specified table, or throws [[NoSuchTableException]]. */
   final def getTable(dbName: String, tableName: String): CatalogTable = {
     getTableOption(dbName, tableName).getOrElse(
-        throw new NoSuchTableException(dbName, tableName))
+      throw new NoSuchTableException(dbName, tableName))
   }
 
   /** Returns the metadata for the specified table or None if it doesn't exist. */
@@ -89,7 +89,9 @@ private[hive] trait HiveClient {
 
   /** Drop the specified table. */
   def dropTable(
-      dbName: String, tableName: String, ignoreIfNotExists: Boolean): Unit
+      dbName: String,
+      tableName: String,
+      ignoreIfNotExists: Boolean): Unit
 
   /** Alter a table whose name matches the one specified in `table`, assuming it exists. */
   final def alterTable(table: CatalogTable): Unit =
@@ -109,7 +111,9 @@ private[hive] trait HiveClient {
     * @param cascade whether to remove all associated objects such as tables and functions
     */
   def dropDatabase(
-      name: String, ignoreIfNotExists: Boolean, cascade: Boolean): Unit
+      name: String,
+      ignoreIfNotExists: Boolean,
+      cascade: Boolean): Unit
 
   /**
     * Alter a database whose name matches the one specified in `database`, assuming it exists.
@@ -119,10 +123,11 @@ private[hive] trait HiveClient {
   /**
     * Create one or many partitions in the given table.
     */
-  def createPartitions(db: String,
-                       table: String,
-                       parts: Seq[CatalogTablePartition],
-                       ignoreIfExists: Boolean): Unit
+  def createPartitions(
+      db: String,
+      table: String,
+      parts: Seq[CatalogTablePartition],
+      ignoreIfExists: Boolean): Unit
 
   /**
     * Drop one or many partitions in the given table.
@@ -131,24 +136,28 @@ private[hive] trait HiveClient {
     * partitions do not already exist. The seemingly relevant flag `ifExists` in
     * [[org.apache.hadoop.hive.metastore.PartitionDropOptions]] is not read anywhere.
     */
-  def dropPartitions(db: String,
-                     table: String,
-                     specs: Seq[ExternalCatalog.TablePartitionSpec]): Unit
+  def dropPartitions(
+      db: String,
+      table: String,
+      specs: Seq[ExternalCatalog.TablePartitionSpec]): Unit
 
   /**
     * Rename one or many existing table partitions, assuming they exist.
     */
-  def renamePartitions(db: String,
-                       table: String,
-                       specs: Seq[ExternalCatalog.TablePartitionSpec],
-                       newSpecs: Seq[ExternalCatalog.TablePartitionSpec]): Unit
+  def renamePartitions(
+      db: String,
+      table: String,
+      specs: Seq[ExternalCatalog.TablePartitionSpec],
+      newSpecs: Seq[ExternalCatalog.TablePartitionSpec]): Unit
 
   /**
     * Alter one or more table partitions whose specs match the ones specified in `newParts`,
     * assuming the partitions exist.
     */
   def alterPartitions(
-      db: String, table: String, newParts: Seq[CatalogTablePartition]): Unit
+      db: String,
+      table: String,
+      newParts: Seq[CatalogTablePartition]): Unit
 
   /** Returns the specified partition, or throws [[NoSuchPartitionException]]. */
   final def getPartition(
@@ -161,9 +170,10 @@ private[hive] trait HiveClient {
   }
 
   /** Returns the specified partition or None if it does not exist. */
-  final def getPartitionOption(db: String,
-                               table: String,
-                               spec: ExternalCatalog.TablePartitionSpec)
+  final def getPartitionOption(
+      db: String,
+      table: String,
+      spec: ExternalCatalog.TablePartitionSpec)
     : Option[CatalogTablePartition] = {
     getPartitionOption(getTable(db, table), spec)
   }
@@ -175,7 +185,8 @@ private[hive] trait HiveClient {
 
   /** Returns all partitions for the given table. */
   final def getAllPartitions(
-      db: String, table: String): Seq[CatalogTablePartition] = {
+      db: String,
+      table: String): Seq[CatalogTablePartition] = {
     getAllPartitions(getTable(db, table))
   }
 
@@ -198,10 +209,11 @@ private[hive] trait HiveClient {
       isSkewedStoreAsSubdir: Boolean): Unit
 
   /** Loads data into an existing table. */
-  def loadTable(loadPath: String, // TODO URI
-                tableName: String,
-                replace: Boolean,
-                holdDDLTime: Boolean): Unit
+  def loadTable(
+      loadPath: String, // TODO URI
+      tableName: String,
+      replace: Boolean,
+      holdDDLTime: Boolean): Unit
 
   /** Loads new dynamic partitions into an existing table. */
   def loadDynamicPartitions(
@@ -228,7 +240,7 @@ private[hive] trait HiveClient {
   /** Return an existing function in the database, assuming it exists. */
   final def getFunction(db: String, name: String): CatalogFunction = {
     getFunctionOption(db, name).getOrElse(
-        throw new NoSuchFunctionException(db, name))
+      throw new NoSuchFunctionException(db, name))
   }
 
   /** Return an existing function in the database, or None if it doesn't exist. */

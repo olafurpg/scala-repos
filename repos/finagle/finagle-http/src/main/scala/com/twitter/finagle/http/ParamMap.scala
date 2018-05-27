@@ -3,7 +3,10 @@ package com.twitter.finagle.http
 import com.twitter.finagle.http.util.StringUtil
 import java.nio.charset.Charset
 import java.util.{List => JList, Map => JMap}
-import org.jboss.netty.handler.codec.http.{QueryStringDecoder, QueryStringEncoder}
+import org.jboss.netty.handler.codec.http.{
+  QueryStringDecoder,
+  QueryStringEncoder
+}
 import scala.collection.immutable
 import scala.collection.JavaConverters._
 
@@ -106,7 +109,8 @@ abstract class ParamMap
 
 /** Map-backed ParamMap. */
 class MapParamMap(
-    underlying: Map[String, Seq[String]], val isValid: Boolean = true)
+    underlying: Map[String, Seq[String]],
+    val isValid: Boolean = true)
     extends ParamMap {
 
   def get(name: String): Option[String] =
@@ -131,8 +135,7 @@ object MapParamMap {
     new MapParamMap(MapParamMap.tuplesToMultiMap(params))
 
   def apply(map: Map[String, String]): MapParamMap =
-    new MapParamMap(
-        map.mapValues { value =>
+    new MapParamMap(map.mapValues { value =>
       Seq(value)
     })
 
@@ -166,7 +169,7 @@ class RequestParamMap(val request: Request) extends ParamMap {
   private[this] var _isValid = true
 
   private[this] val getParams: JMap[String, JList[String]] = parseParams(
-      request.uri)
+    request.uri)
 
   private[this] val postParams: JMap[String, JList[String]] = {
     if (request.method != Method.Trace &&
@@ -197,7 +200,7 @@ class RequestParamMap(val request: Request) extends ParamMap {
   /** Get value */
   def get(name: String): Option[String] =
     jget(postParams, name) match {
-      case None => jget(getParams, name)
+      case None  => jget(getParams, name)
       case value => value
     }
 
@@ -212,7 +215,8 @@ class RequestParamMap(val request: Request) extends ParamMap {
 
   // Get value from JMap, which might be null
   private def jget(
-      params: JMap[String, JList[String]], name: String): Option[String] = {
+      params: JMap[String, JList[String]],
+      name: String): Option[String] = {
     val values = params.get(name)
     if (values != null && !values.isEmpty()) {
       Some(values.get(0))
@@ -223,7 +227,8 @@ class RequestParamMap(val request: Request) extends ParamMap {
 
   // Get values from JMap, which might be null
   private def jgetAll(
-      params: JMap[String, JList[String]], name: String): Iterable[String] = {
+      params: JMap[String, JList[String]],
+      name: String): Iterable[String] = {
     val values = params.get(name)
     if (values != null) {
       values.asScala

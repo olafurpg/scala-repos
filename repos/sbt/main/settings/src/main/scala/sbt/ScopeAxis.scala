@@ -6,8 +6,8 @@ sealed trait ScopeAxis[+S] {
   def foldStrict[T](f: S => T, ifGlobal: T, ifThis: T): T =
     fold(f, ifGlobal, ifThis)
   def fold[T](f: S => T, ifGlobal: => T, ifThis: => T): T = this match {
-    case This => ifThis
-    case Global => ifGlobal
+    case This      => ifThis
+    case Global    => ifGlobal
     case Select(s) => f(s)
   }
   def toOption: Option[S] = foldStrict(some.fn, None, None)
@@ -25,6 +25,6 @@ object ScopeAxis {
     Scope(axis, axis, axis, axis)
   def fromOption[T](o: Option[T]): ScopeAxis[T] = o match {
     case Some(v) => Select(v)
-    case None => Global
+    case None    => Global
   }
 }

@@ -143,17 +143,18 @@ class BinaryClassificationMetrics @Since("1.3.0")(
   @Since("1.0.0")
   def recallByThreshold(): RDD[(Double, Double)] = createCurve(Recall)
 
-  private lazy val (cumulativeCounts: RDD[(Double, BinaryLabelCounter)],
-                    confusions: RDD[(Double, BinaryConfusionMatrix)]) = {
+  private lazy val (
+    cumulativeCounts: RDD[(Double, BinaryLabelCounter)],
+    confusions: RDD[(Double, BinaryConfusionMatrix)]) = {
     // Create a bin for each distinct score value, count positives and negatives within each bin,
     // and then sort by score values in descending order.
     val counts = scoreAndLabels
       .combineByKey(
-          createCombiner = (label: Double) =>
-              new BinaryLabelCounter(0L, 0L) += label,
-          mergeValue = (c: BinaryLabelCounter, label: Double) => c += label,
-          mergeCombiners = (c1: BinaryLabelCounter,
-            c2: BinaryLabelCounter) => c1 += c2
+        createCombiner =
+          (label: Double) => new BinaryLabelCounter(0L, 0L) += label,
+        mergeValue = (c: BinaryLabelCounter, label: Double) => c += label,
+        mergeCombiners =
+          (c1: BinaryLabelCounter, c2: BinaryLabelCounter) => c1 += c2
       )
       .sortByKey(ascending = false)
 
@@ -170,16 +171,15 @@ class BinaryClassificationMetrics @Since("1.3.0")(
         if (grouping < 2) {
           // numBins was more than half of the size; no real point in down-sampling to bins
           logInfo(
-              s"Curve is too small ($countsSize) for $numBins bins to be useful")
+            s"Curve is too small ($countsSize) for $numBins bins to be useful")
           counts
         } else {
           if (grouping >= Int.MaxValue) {
             logWarning(
-                s"Curve too large ($countsSize) for $numBins bins; capping at ${Int.MaxValue}")
+              s"Curve too large ($countsSize) for $numBins bins; capping at ${Int.MaxValue}")
             grouping = Int.MaxValue
           }
-          counts.mapPartitions(
-              _.grouped(grouping.toInt).map { pairs =>
+          counts.mapPartitions(_.grouped(grouping.toInt).map { pairs =>
             // The score of the combined point will be just the first one's score
             val firstScore = pairs.head._1
             // The point will contain all counts in this chunk
@@ -190,32 +190,35 @@ class BinaryClassificationMetrics @Since("1.3.0")(
         }
       }
 
-    val agg = binnedCounts.values.mapPartitions { iter =>
-      val agg = new BinaryLabelCounter()
-      iter.foreach(agg += _)
-      Iterator(agg)
-    }.collect()
+    val agg = binnedCounts.values
+      .mapPartitions { iter =>
+        val agg = new BinaryLabelCounter()
+        iter.foreach(agg += _)
+        Iterator(agg)
+      }
+      .collect()
     val partitionwiseCumulativeCounts = agg.scanLeft(new BinaryLabelCounter())(
-        (agg: BinaryLabelCounter, c: BinaryLabelCounter) => agg.clone() += c)
+      (agg: BinaryLabelCounter, c: BinaryLabelCounter) => agg.clone() += c)
     val totalCount = partitionwiseCumulativeCounts.last
     logInfo(s"Total counts: $totalCount")
     val cumulativeCounts = binnedCounts.mapPartitionsWithIndex(
-        (index: Int, iter: Iterator[(Double, BinaryLabelCounter)]) =>
-          {
-            val cumCount = partitionwiseCumulativeCounts(index)
-            iter.map {
-              case (score, c) =>
-                cumCount += c
-                (score, cumCount.clone())
-            }
-        },
-        preservesPartitioning = true)
+      (index: Int, iter: Iterator[(Double, BinaryLabelCounter)]) => {
+        val cumCount = partitionwiseCumulativeCounts(index)
+        iter.map {
+          case (score, c) =>
+            cumCount += c
+            (score, cumCount.clone())
+        }
+      },
+      preservesPartitioning = true
+    )
     cumulativeCounts.persist()
     val confusions = cumulativeCounts.map {
       case (score, cumCount) =>
-        (score,
-         BinaryConfusionMatrixImpl(cumCount, totalCount)
-           .asInstanceOf[BinaryConfusionMatrix])
+        (
+          score,
+          BinaryConfusionMatrixImpl(cumCount, totalCount)
+            .asInstanceOf[BinaryConfusionMatrix])
     }
     (cumulativeCounts, confusions)
   }

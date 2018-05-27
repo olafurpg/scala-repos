@@ -13,8 +13,8 @@ class FutureTests extends MinimalScalaTest {
     s match {
       case "Hello" => Future { "World" }
       case "Failure" =>
-        Future.failed(new RuntimeException(
-                "Expected exception; to test fault-tolerance"))
+        Future.failed(
+          new RuntimeException("Expected exception; to test fault-tolerance"))
       case "NoReply" => Promise[String]().future
     }
 
@@ -41,8 +41,8 @@ class FutureTests extends MinimalScalaTest {
       with mutable.SynchronizedSet[Throwable]
       implicit val ec = scala.concurrent.ExecutionContext
         .fromExecutor(new java.util.concurrent.ForkJoinPool(), { t =>
-        ms += t
-      })
+          ms += t
+        })
 
       class ThrowableTest(m: String) extends Throwable(m)
 
@@ -110,7 +110,9 @@ class FutureTests extends MinimalScalaTest {
       p.toString mustBe expectNotCompleteString
       Promise[Int]().success(s).toString mustBe expectSuccessString
       Promise[Int]().failure(f).toString mustBe expectFailureString
-      Await.ready(Future { throw f }, 2000 millis).toString mustBe expectFailureString
+      Await
+        .ready(Future { throw f }, 2000 millis)
+        .toString mustBe expectFailureString
       Await.ready(Future { s }, 2000 millis).toString mustBe expectSuccessString
 
       Future.never.toString mustBe "Future(<never>)"
@@ -122,54 +124,57 @@ class FutureTests extends MinimalScalaTest {
       val f = Future.successful(s)
 
       ECNotUsed(ec =>
-            f.onFailure({
+        f.onFailure({
           case _ => fail("onFailure should not have been called")
         })(ec))
       assert(ECNotUsed(ec =>
-                f.recover({
+        f.recover({
           case _ => fail("recover should not have been called")
         })(ec)) eq f)
       assert(ECNotUsed(ec =>
-                f.recoverWith({
+        f.recoverWith({
           case _ => fail("flatMap should not have been called")
         })(ec)) eq f)
       assert(
-          f.fallbackTo(f) eq f,
-          "Future.fallbackTo must be the same instance as Future.fallbackTo")
+        f.fallbackTo(f) eq f,
+        "Future.fallbackTo must be the same instance as Future.fallbackTo")
     }
 
     "have proper const representation for failure" in {
       val e = new Exception("foo")
       val f = Future.failed[Future[String]](e)
 
-      assert(f.mapTo[String] eq f,
-             "Future.mapTo must be the same instance as Future.mapTo")
-      assert(f.zip(f) eq f,
-             "Future.zip must be the same instance as Future.zip")
-      assert(f.flatten eq f,
-             "Future.flatten must be the same instance as Future.flatten")
-      assert(f.failed eq f,
-             "Future.failed must be the same instance as Future.failed")
+      assert(
+        f.mapTo[String] eq f,
+        "Future.mapTo must be the same instance as Future.mapTo")
+      assert(
+        f.zip(f) eq f,
+        "Future.zip must be the same instance as Future.zip")
+      assert(
+        f.flatten eq f,
+        "Future.flatten must be the same instance as Future.flatten")
+      assert(
+        f.failed eq f,
+        "Future.failed must be the same instance as Future.failed")
 
+      ECNotUsed(
+        ec => f.foreach(_ => fail("foreach should not have been called"))(ec))
       ECNotUsed(ec =>
-            f.foreach(_ => fail("foreach should not have been called"))(ec))
-      ECNotUsed(ec =>
-            f.onSuccess({
+        f.onSuccess({
           case _ => fail("onSuccess should not have been called")
         })(ec))
       assert(ECNotUsed(ec =>
-                f.map(_ => fail("map should not have been called"))(ec)) eq f)
+        f.map(_ => fail("map should not have been called"))(ec)) eq f)
       assert(ECNotUsed(ec =>
-                f.flatMap(_ => fail("flatMap should not have been called"))(
-                    ec)) eq f)
+        f.flatMap(_ => fail("flatMap should not have been called"))(ec)) eq f)
       assert(ECNotUsed(ec =>
-                f.filter(_ => fail("filter should not have been called"))(ec)) eq f)
+        f.filter(_ => fail("filter should not have been called"))(ec)) eq f)
       assert(ECNotUsed(ec =>
-                f.collect({
+        f.collect({
           case _ => fail("collect should not have been called")
         })(ec)) eq f)
       assert(ECNotUsed(ec =>
-                f.zipWith(f)({ (_, _) =>
+        f.zipWith(f)({ (_, _) =>
           fail("zipWith should not have been called")
         })(ec)) eq f)
     }
@@ -196,11 +201,13 @@ class FutureTests extends MinimalScalaTest {
 
     "have a unit member representing an already completed Future containing Unit" in {
       assert(Future.unit ne null, "Future.unit must not be null")
-      assert(Future.unit eq Future.unit,
-             "Future.unit must be the same instance as Future.unit")
+      assert(
+        Future.unit eq Future.unit,
+        "Future.unit must be the same instance as Future.unit")
       assert(Future.unit.isCompleted, "Future.unit must already be completed")
-      assert(Future.unit.value.get == Success(()),
-             "Future.unit must contain a Success(())")
+      assert(
+        Future.unit.value.get == Success(()),
+        "Future.unit must contain a Success(())")
     }
 
     "have a never member representing a never completed Future of Nothing" in {
@@ -210,14 +217,16 @@ class FutureTests extends MinimalScalaTest {
       //Verify stable identifier
       test match {
         case Future.`never` =>
-        case _ => fail("Future.never did not match Future.`never`")
+        case _              => fail("Future.never did not match Future.`never`")
       }
 
-      assert(test eq Future.never,
-             "Future.never must be the same instance as Future.never")
+      assert(
+        test eq Future.never,
+        "Future.never must be the same instance as Future.never")
       assert(test ne null, "Future.never must not be null")
-      assert(!test.isCompleted && test.value.isEmpty,
-             "Future.never must never be completed")
+      assert(
+        !test.isCompleted && test.value.isEmpty,
+        "Future.never must never be completed")
       assert(test.failed eq test)
       assert(test.asInstanceOf[Future[Future[Nothing]]].flatten eq test)
       assert(test.zip(test) eq test)
@@ -225,47 +234,49 @@ class FutureTests extends MinimalScalaTest {
       assert(test.mapTo[String] eq test)
 
       ECNotUsed(ec =>
-            test.foreach(_ => fail("foreach should not have been called"))(ec))
+        test.foreach(_ => fail("foreach should not have been called"))(ec))
       ECNotUsed(ec =>
-            test.onSuccess({
+        test.onSuccess({
           case _ => fail("onSuccess should not have been called")
         })(ec))
       ECNotUsed(ec =>
-            test.onFailure({
+        test.onFailure({
           case _ => fail("onFailure should not have been called")
         })(ec))
       ECNotUsed(ec =>
-            test.onComplete({
+        test.onComplete({
           case _ => fail("onComplete should not have been called")
         })(ec))
       ECNotUsed(ec => test.transform(identity, identity)(ec) eq test)
       ECNotUsed(ec => test.transform(identity)(ec) eq test)
       ECNotUsed(ec =>
-            test.transformWith(_ =>
-                  fail("transformWith should not have been called"))(ec) eq test)
+        test.transformWith(_ =>
+          fail("transformWith should not have been called"))(ec) eq test)
       ECNotUsed(ec => test.map(identity)(ec) eq test)
       ECNotUsed(ec =>
-            test.flatMap(_ => fail("flatMap should not have been called"))(ec) eq test)
+        test
+          .flatMap(_ => fail("flatMap should not have been called"))(ec) eq test)
       ECNotUsed(ec =>
-            test.filter(_ => fail("filter should not have been called"))(ec) eq test)
+        test
+          .filter(_ => fail("filter should not have been called"))(ec) eq test)
       ECNotUsed(ec =>
-            test.collect({
+        test.collect({
           case _ => fail("collect should not have been called")
         })(ec) eq test)
       ECNotUsed(ec =>
-            test.recover({
+        test.recover({
           case _ => fail("recover should not have been called")
         })(ec) eq test)
       ECNotUsed(ec =>
-            test.recoverWith({
+        test.recoverWith({
           case _ => fail("recoverWith should not have been called")
         })(ec) eq test)
       ECNotUsed(ec =>
-            test.andThen({
+        test.andThen({
           case _ => fail("andThen should not have been called")
         })(ec) eq test)
       ECNotUsed(ec =>
-            test.zipWith(test)({ (_, _) =>
+        test.zipWith(test)({ (_, _) =>
           fail("zipWith should not have been called")
         })(ec) eq test)
     }
@@ -315,7 +326,7 @@ class FutureTests extends MinimalScalaTest {
       case class Res[T](res: T)
       def async[T](req: Req[T]) = (req: @unchecked) match {
         case Req(s: String) => Future { Res(s.length) }
-        case Req(i: Int) => Future { Res((i * 2).toString) }
+        case Req(i: Int)    => Future { Res((i * 2).toString) }
       }
 
       val future1 = for {
@@ -429,12 +440,12 @@ class FutureTests extends MinimalScalaTest {
       val f1 =
         Future(throw initial) transform {
           case Failure(`initial`) => Failure(expected1)
-          case x => x
+          case x                  => x
         }
       val f2 =
         Future.failed(initial) transform {
           case Failure(`initial`) => Failure(expected2)
-          case x => x
+          case x                  => x
         }
 
       intercept[Exception] { Await.result(f1, defaultTimeout) } mustBe expected1
@@ -447,12 +458,12 @@ class FutureTests extends MinimalScalaTest {
       val f1 =
         Future.failed[String](initial1) transform {
           case Failure(`initial1`) => Success("foo")
-          case x => x
+          case x                   => x
         }
       val f2 =
         Future[String](throw initial2) transform {
           case Failure(`initial2`) => Success("bar")
-          case x => x
+          case x                   => x
         }
       Await.result(f1, defaultTimeout) mustBe "foo"
       Await.result(f2, defaultTimeout) mustBe "bar"
@@ -465,17 +476,17 @@ class FutureTests extends MinimalScalaTest {
       val f1 =
         Future.successful("foo") transform {
           case Success("foo") => Failure(expected1)
-          case x => x
+          case x              => x
         }
       val f2 =
         Future("bar") transform {
           case Success("bar") => Failure(expected2)
-          case x => x
+          case x              => x
         }
       val f3 =
         Future("bar") transform {
           case Success("bar") => throw expected3
-          case x => x
+          case x              => x
         }
       intercept[Exception] { Await.result(f1, defaultTimeout) } mustBe expected1
       intercept[Exception] { Await.result(f2, defaultTimeout) } mustBe expected2
@@ -484,11 +495,11 @@ class FutureTests extends MinimalScalaTest {
 
     "transformWith results" in {
       val f1 = Future.successful("foo").transformWith {
-        case Success(r) => Future(r.toUpperCase)
+        case Success(r)     => Future(r.toUpperCase)
         case f @ Failure(_) => Future.fromTry(f)
       }
       val f2 = Future("bar").transformWith {
-        case Success(r) => Future(r.toUpperCase)
+        case Success(r)     => Future(r.toUpperCase)
         case f @ Failure(_) => Future.fromTry(f)
       }
       Await.result(f1, defaultTimeout) mustBe "FOO"
@@ -503,15 +514,15 @@ class FutureTests extends MinimalScalaTest {
 
       val f1 = Future[Int](throw initial).transformWith {
         case Failure(`initial`) => Future failed expected1
-        case x => Future fromTry x
+        case x                  => Future fromTry x
       }
       val f2 = Future.failed[Int](initial).transformWith {
         case Failure(`initial`) => Future failed expected2
-        case x => Future fromTry x
+        case x                  => Future fromTry x
       }
       val f3 = Future[Int](throw initial).transformWith {
         case Failure(`initial`) => throw expected3
-        case x => Future fromTry x
+        case x                  => Future fromTry x
       }
 
       intercept[Exception] { Await.result(f1, defaultTimeout) } mustBe expected1
@@ -523,11 +534,11 @@ class FutureTests extends MinimalScalaTest {
       val initial = new Exception("Initial")
       val f1 = Future.failed[String](initial).transformWith {
         case Failure(`initial`) => Future("FOO")
-        case _ => Future failed initial
+        case _                  => Future failed initial
       }
       val f2 = Future[String](throw initial).transformWith {
         case Failure(`initial`) => Future("BAR")
-        case _ => Future failed initial
+        case _                  => Future failed initial
       }
       Await.result(f1, defaultTimeout) mustBe "FOO"
       Await.result(f2, defaultTimeout) mustBe "BAR"
@@ -542,17 +553,17 @@ class FutureTests extends MinimalScalaTest {
       val f1 =
         Future[String]("FOO") transformWith {
           case Success("FOO") => Future failed expected1
-          case _ => Future successful "FOO"
+          case _              => Future successful "FOO"
         }
       val f2 =
         Future.successful("FOO") transformWith {
           case Success("FOO") => Future failed expected2
-          case _ => Future successful "FOO"
+          case _              => Future successful "FOO"
         }
       val f3 =
         Future.successful("FOO") transformWith {
           case Success("FOO") => throw expected3
-          case _ => Future successful "FOO"
+          case _              => Future successful "FOO"
         }
 
       intercept[Exception] { Await.result(f1, defaultTimeout) } mustBe expected1
@@ -589,14 +600,15 @@ class FutureTests extends MinimalScalaTest {
 
       Await.result(Future.firstCompletedOf(futures), defaultTimeout) mustBe (5)
       Await.result(Future.firstCompletedOf(futures.iterator), defaultTimeout) mustBe
-      (5)
+        (5)
     }
 
     "find" in {
-      val futures = for (i <- 1 to 10) yield
-        Future {
-          i
-        }
+      val futures = for (i <- 1 to 10)
+        yield
+          Future {
+            i
+          }
 
       val result = Future.find[Int](futures)(_ == 3)
       Await.result(result, defaultTimeout) mustBe (Some(3))
@@ -704,7 +716,7 @@ class FutureTests extends MinimalScalaTest {
         Thread.sleep(wait)
         if (add == 6)
           throw new IllegalArgumentException(
-              "shouldFoldResultsWithException: expected")
+            "shouldFoldResultsWithException: expected")
         add
       }
       def futures = (0 to 9) map { idx =>
@@ -722,7 +734,7 @@ class FutureTests extends MinimalScalaTest {
         val fs = (0 to 1000) map (i => Future(i))
         val f = Future.fold(fs)(ArrayBuffer.empty[AnyRef]) {
           case (l, i) if i % 2 == 0 => l += i.asInstanceOf[AnyRef]
-          case (l, _) => l
+          case (l, _)               => l
         }
         val result = Await.result(f.mapTo[ArrayBuffer[Int]], 10000 millis).sum
 
@@ -758,7 +770,7 @@ class FutureTests extends MinimalScalaTest {
         Thread.sleep(wait)
         if (add == 6)
           throw new IllegalArgumentException(
-              "shouldFoldResultsWithException: expected")
+            "shouldFoldResultsWithException: expected")
         else add
       }
       val timeout = 10000 millis
@@ -927,7 +939,8 @@ class FutureTests extends MinimalScalaTest {
     }
 
     "should not throw when Await.ready" in {
-      val expected = try Success(5 / 0) catch {
+      val expected = try Success(5 / 0)
+      catch {
         case a: ArithmeticException => Failure(a)
       }
       val f = Future(5).map(_ / 0)

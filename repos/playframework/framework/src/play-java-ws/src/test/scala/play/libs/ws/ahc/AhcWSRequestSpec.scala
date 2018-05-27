@@ -65,7 +65,7 @@ class AhcWSRequestSpec extends Specification with Mockito {
         .buildRequest()
       // Note we use getFormParams instead of getByteData here.
       req.getFormParams.asScala must containTheSameElementsAs(
-          List(new org.asynchttpclient.Param("param1", "value1")))
+        List(new org.asynchttpclient.Param("param1", "value1")))
     }
 
     "Remove a user defined content length header if we are parsing body explicitly when signed" in {
@@ -84,7 +84,7 @@ class AhcWSRequestSpec extends Specification with Mockito {
 
       val headers = req.getHeaders
       req.getFormParams.asScala must containTheSameElementsAs(
-          List(new org.asynchttpclient.Param("param1", "value1")))
+        List(new org.asynchttpclient.Param("param1", "value1")))
       headers.get("Content-Length") must beNull // no content length!
     }
 
@@ -102,14 +102,14 @@ class AhcWSRequestSpec extends Specification with Mockito {
 
     "not support setting a request timeout > Integer.MAX_VALUE" in {
       requestWithTimeout(Int.MaxValue.toLong + 1) must throwA[
-          IllegalArgumentException]
+        IllegalArgumentException]
     }
 
     "set a query string appropriately" in {
       val queryParams = requestWithQueryString("q=playframework&src=typd")
       queryParams.size must beEqualTo(2)
       queryParams.exists(p =>
-            (p.getName == "q") && (p.getValue == "playframework")) must beTrue
+        (p.getName == "q") && (p.getValue == "playframework")) must beTrue
       queryParams.exists(p => (p.getName == "src") && (p.getValue == "typd")) must beTrue
     }
 
@@ -118,7 +118,7 @@ class AhcWSRequestSpec extends Specification with Mockito {
       queryParams.size must beEqualTo(3)
       queryParams.exists(p => (p.getName == "q") && (p.getValue == "scala")) must beTrue
       queryParams.exists(p =>
-            (p.getName == "q") && (p.getValue == "playframework")) must beTrue
+        (p.getName == "q") && (p.getValue == "playframework")) must beTrue
       queryParams.exists(p => (p.getName == "q") && (p.getValue == "fp")) must beTrue
       queryParams.count(p => p.getName == "q") must beEqualTo(3)
     }
@@ -127,14 +127,13 @@ class AhcWSRequestSpec extends Specification with Mockito {
       val queryParams = requestWithQueryString("q=playframework&src=")
       queryParams.size must beEqualTo(2)
       queryParams.exists(p =>
-            (p.getName == "q") && (p.getValue == "playframework")) must beTrue
-      queryParams.exists(
-          p => (p.getName.equals("src")) && (p.getValue == null)) must beTrue
+        (p.getName == "q") && (p.getValue == "playframework")) must beTrue
+      queryParams.exists(p => (p.getName.equals("src")) && (p.getValue == null)) must beTrue
     }
 
     "not support a query string with more than 2 = per part" in {
       requestWithQueryString("q=scala=playframework&src=typd") must throwA[
-          RuntimeException]
+        RuntimeException]
     }
 
     "not support a query string if it starts with = and is empty" in {
@@ -161,14 +160,14 @@ class AhcWSRequestSpec extends Specification with Mockito {
       request.setHeader("Content-Type", "application/xml")
       val req = request.buildRequest()
       req.getHeaders.get("Content-Type") must be_==(
-          "application/json; charset=US-ASCII")
+        "application/json; charset=US-ASCII")
     }
   }
 
   def requestWithTimeout(timeout: Long) = {
     val client = mock[AhcWSClient]
-    val request = new AhcWSRequest(
-        client, "http://example.com", /*materializer*/ null)
+    val request =
+      new AhcWSRequest(client, "http://example.com", /*materializer*/ null)
     request.setRequestTimeout(timeout)
     request.buildRequest().getRequestTimeout()
   }
@@ -176,8 +175,8 @@ class AhcWSRequestSpec extends Specification with Mockito {
   def requestWithQueryString(query: String) = {
     import scala.collection.JavaConverters._
     val client = mock[AhcWSClient]
-    val request = new AhcWSRequest(
-        client, "http://example.com", /*materializer*/ null)
+    val request =
+      new AhcWSRequest(client, "http://example.com", /*materializer*/ null)
     request.setQueryString(query)
     val queryParams = request.buildRequest().getQueryParams
     queryParams.asScala.toSeq

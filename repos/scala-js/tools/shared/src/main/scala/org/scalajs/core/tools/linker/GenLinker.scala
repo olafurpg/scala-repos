@@ -23,11 +23,13 @@ trait GenLinker {
   def semantics: Semantics
   def esLevel: ESLevel
 
-  def linkUnit(irFiles: Seq[VirtualScalaJSIRFile],
-               symbolRequirements: SymbolRequirement,
-               logger: Logger): LinkingUnit
+  def linkUnit(
+      irFiles: Seq[VirtualScalaJSIRFile],
+      symbolRequirements: SymbolRequirement,
+      logger: Logger): LinkingUnit
 
-  def link(irFiles: Seq[VirtualScalaJSIRFile],
-           output: WritableVirtualJSFile,
-           logger: Logger): Unit
+  def link(
+      irFiles: Seq[VirtualScalaJSIRFile],
+      output: WritableVirtualJSFile,
+      logger: Logger): Unit
 }

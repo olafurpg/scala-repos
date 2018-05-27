@@ -21,7 +21,7 @@ import JavaStreamEnrichments._
 object PositionInputStream {
   def apply(in: InputStream): PositionInputStream = in match {
     case p: PositionInputStream => p
-    case nonPos => new PositionInputStream(nonPos)
+    case nonPos                 => new PositionInputStream(nonPos)
   }
 }
 

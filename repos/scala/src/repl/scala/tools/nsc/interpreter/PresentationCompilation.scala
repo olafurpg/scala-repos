@@ -32,15 +32,16 @@ trait PresentationCompilation { self: IMain =>
       // and for multi-line input.
       val line1 =
         partialInput +
-        (if (Completion.looksLikeInvocation(line)) {
-           self.mostRecentVar + line
-         } else line)
+          (if (Completion.looksLikeInvocation(line)) {
+             self.mostRecentVar + line
+           } else line)
       val compiler = newPresentationCompiler()
       val trees = compiler.newUnitParser(line1).parseStats()
       val importer = global.mkImporter(compiler)
-      val request = new Request(line1,
-                                trees map (t => importer.importTree(t)),
-                                generousImports = true)
+      val request = new Request(
+        line1,
+        trees map (t => importer.importTree(t)),
+        generousImports = true)
       val wrappedCode: String = request.ObjectSourceCode(request.handlers)
       val unit = compiler.newCompilationUnit(wrappedCode)
       import compiler._
@@ -48,8 +49,8 @@ trait PresentationCompilation { self: IMain =>
       unitOfFile(richUnit.source.file) = richUnit
       enteringTyper(typeCheck(richUnit))
       val result = PresentationCompileResult(compiler)(
-          richUnit,
-          request.ObjectSourceCode.preambleLength + line1.length - line.length)
+        richUnit,
+        request.ObjectSourceCode.preambleLength + line1.length - line.length)
       Right(result)
     }
   }
@@ -63,11 +64,11 @@ trait PresentationCompilation { self: IMain =>
     * You may downcast the `reporter` to `StoreReporter` to access type errors.
     */
   def newPresentationCompiler(): interactive.Global = {
-    val replOutClasspath: DirectoryClassPath = new DirectoryClassPath(
-        replOutput.dir, DefaultJavaContext)
+    val replOutClasspath: DirectoryClassPath =
+      new DirectoryClassPath(replOutput.dir, DefaultJavaContext)
     val mergedClasspath = new MergedClassPath[AbstractFile](
-        replOutClasspath :: global.platform.classPath :: Nil,
-        DefaultJavaContext)
+      replOutClasspath :: global.platform.classPath :: Nil,
+      DefaultJavaContext)
     def copySettings: Settings = {
       val s = new Settings(_ => () /* ignores "bad option -nc" errors, etc */ )
       s.processArguments(global.settings.recreateArgs, processAll = false)
@@ -102,9 +103,10 @@ trait PresentationCompilation { self: IMain =>
       val pos = unit.source.position(preambleLength + cursor)
       compiler.completionsAt(pos)
     }
-    def typedTreeAt(code: String,
-                    selectionStart: Int,
-                    selectionEnd: Int): compiler.Tree = {
+    def typedTreeAt(
+        code: String,
+        selectionStart: Int,
+        selectionEnd: Int): compiler.Tree = {
       val start = selectionStart + preambleLength
       val end = selectionEnd + preambleLength
       val pos = new RangePosition(unit.source, start, start, end)
@@ -114,7 +116,8 @@ trait PresentationCompilation { self: IMain =>
 
   object PresentationCompileResult {
     def apply(compiler0: interactive.Global)(
-        unit0: compiler0.RichCompilationUnit, preambleLength0: Int) =
+        unit0: compiler0.RichCompilationUnit,
+        preambleLength0: Int) =
       new PresentationCompileResult {
 
         override val compiler = compiler0

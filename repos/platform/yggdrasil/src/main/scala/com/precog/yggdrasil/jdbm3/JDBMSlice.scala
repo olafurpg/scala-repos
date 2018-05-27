@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -87,7 +87,7 @@ object JDBMSlice {
       }
       if (finalCount == -1) {
         throw new VicciniException(
-            "Block read failed with too many concurrent mods.")
+          "Block read failed with too many concurrent mods.")
       } else {
         finalCount
       }
@@ -99,16 +99,16 @@ object JDBMSlice {
   def columnFor(prefix: CPath, sliceSize: Int)(
       ref: ColumnRef): (ColumnRef, ArrayColumn[_]) =
     (ref.copy(selector = (prefix \ ref.selector)), (ref.ctype match {
-      case CString => ArrayStrColumn.empty(sliceSize)
-      case CBoolean => ArrayBoolColumn.empty()
-      case CLong => ArrayLongColumn.empty(sliceSize)
-      case CDouble => ArrayDoubleColumn.empty(sliceSize)
-      case CNum => ArrayNumColumn.empty(sliceSize)
-      case CDate => ArrayDateColumn.empty(sliceSize)
-      case CPeriod => ArrayPeriodColumn.empty(sliceSize)
-      case CNull => MutableNullColumn.empty()
+      case CString      => ArrayStrColumn.empty(sliceSize)
+      case CBoolean     => ArrayBoolColumn.empty()
+      case CLong        => ArrayLongColumn.empty(sliceSize)
+      case CDouble      => ArrayDoubleColumn.empty(sliceSize)
+      case CNum         => ArrayNumColumn.empty(sliceSize)
+      case CDate        => ArrayDateColumn.empty(sliceSize)
+      case CPeriod      => ArrayPeriodColumn.empty(sliceSize)
+      case CNull        => MutableNullColumn.empty()
       case CEmptyObject => MutableEmptyObjectColumn.empty()
-      case CEmptyArray => MutableEmptyArrayColumn.empty()
+      case CEmptyArray  => MutableEmptyArrayColumn.empty()
       case CArrayType(elemType) =>
         ArrayHomogeneousArrayColumn.empty(sliceSize)(elemType)
       case CUndefined => sys.error("CUndefined cannot be serialized")

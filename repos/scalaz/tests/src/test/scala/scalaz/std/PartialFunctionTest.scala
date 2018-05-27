@@ -9,7 +9,7 @@ object PartialFunctionTest extends SpecLite {
 
   private val A = Arrow[PartialFunction]
 
-  private val pfnegonly: PF[Int, Int] = { case a if a < 0 => 0 - a }
+  private val pfnegonly: PF[Int, Int] = { case a if a < 0  => 0 - a }
   private val pfposonly: PF[Int, Int] = { case a if a >= 0 => 0 - a }
 
   "arrow equivalence" ! forAll { (num: Int, num2: Int) =>

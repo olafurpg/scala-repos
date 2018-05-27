@@ -38,9 +38,10 @@ private object NullFailureDetector extends FailureDetector {
   */
 object sessionFailureDetector
     extends GlobalFlag[String](
-        "threshold:5.seconds:2:100:4.seconds",
-        "The failure detector used to determine session liveness " +
-        "[none|threshold:minPeriod:threshold:win:closeTimeout]")
+      "threshold:5.seconds:2:100:4.seconds",
+      "The failure detector used to determine session liveness " +
+        "[none|threshold:minPeriod:threshold:win:closeTimeout]"
+    )
 
 /**
   * Companion object capable of creating a FailureDetector based on parameterized config.
@@ -80,10 +81,11 @@ object FailureDetector {
     * a networking issue, so that it can choose an alternative networking path instead.
     * The default 4 seconds is pretty conservative regarding normal ping RTT.
     */
-  case class ThresholdConfig(minPeriod: Duration = 5.seconds,
-                             threshold: Double = 2,
-                             windowSize: Int = 100,
-                             closeTimeout: Duration = 4.seconds)
+  case class ThresholdConfig(
+      minPeriod: Duration = 5.seconds,
+      threshold: Double = 2,
+      windowSize: Int = 100,
+      closeTimeout: Duration = 4.seconds)
       extends Config
 
   /**
@@ -113,12 +115,13 @@ object FailureDetector {
       case NullConfig => NullFailureDetector
 
       case cfg: ThresholdConfig =>
-        new ThresholdFailureDetector(ping,
-                                     cfg.minPeriod,
-                                     cfg.threshold,
-                                     cfg.windowSize,
-                                     cfg.closeTimeout,
-                                     statsReceiver = statsReceiver)
+        new ThresholdFailureDetector(
+          ping,
+          cfg.minPeriod,
+          cfg.threshold,
+          cfg.windowSize,
+          cfg.closeTimeout,
+          statsReceiver = statsReceiver)
 
       case GlobalFlagConfig =>
         parseConfigFromFlags(ping, statsReceiver = statsReceiver)
@@ -135,43 +138,57 @@ object FailureDetector {
       statsReceiver: StatsReceiver = NullStatsReceiver
   ): FailureDetector = {
     sessionFailureDetector() match {
-      case list("threshold",
-                duration(min),
-                double(threshold),
-                int(win),
-                duration(closeTimeout)) =>
+      case list(
+          "threshold",
+          duration(min),
+          double(threshold),
+          int(win),
+          duration(closeTimeout)) =>
         new ThresholdFailureDetector(
-            ping, min, threshold, win, closeTimeout, nanoTime, statsReceiver)
+          ping,
+          min,
+          threshold,
+          win,
+          closeTimeout,
+          nanoTime,
+          statsReceiver)
 
       case list("threshold", duration(min), double(threshold), int(win)) =>
-        new ThresholdFailureDetector(ping,
-                                     min,
-                                     threshold,
-                                     win,
-                                     nanoTime = nanoTime,
-                                     statsReceiver = statsReceiver)
+        new ThresholdFailureDetector(
+          ping,
+          min,
+          threshold,
+          win,
+          nanoTime = nanoTime,
+          statsReceiver = statsReceiver)
 
       case list("threshold", duration(min), double(threshold)) =>
-        new ThresholdFailureDetector(ping,
-                                     min,
-                                     threshold,
-                                     nanoTime = nanoTime,
-                                     statsReceiver = statsReceiver)
+        new ThresholdFailureDetector(
+          ping,
+          min,
+          threshold,
+          nanoTime = nanoTime,
+          statsReceiver = statsReceiver)
 
       case list("threshold", duration(min)) =>
         new ThresholdFailureDetector(
-            ping, min, nanoTime = nanoTime, statsReceiver = statsReceiver)
+          ping,
+          min,
+          nanoTime = nanoTime,
+          statsReceiver = statsReceiver)
 
       case list("threshold") =>
         new ThresholdFailureDetector(
-            ping, nanoTime = nanoTime, statsReceiver = statsReceiver)
+          ping,
+          nanoTime = nanoTime,
+          statsReceiver = statsReceiver)
 
       case list("none") =>
         NullFailureDetector
 
-      case list(_ *) =>
+      case list(_*) =>
         log.warning(
-            s"unknown failure detector ${sessionFailureDetector()} specified")
+          s"unknown failure detector ${sessionFailureDetector()} specified")
         NullFailureDetector
     }
   }

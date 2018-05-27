@@ -5,7 +5,7 @@
   * The ASF licenses this file to You under the Apache License, Version 2.0
   * (the "License"); you may not use this file except in compliance with
   * the License.  You may obtain a copy of the License at
-  * 
+  *
   *    http://www.apache.org/licenses/LICENSE-2.0
   *
   * Unless required by applicable law or agreed to in writing, software
@@ -49,12 +49,13 @@ object Message {
   val ValueSizeLength = 4
 
   private val MessageHeaderSizeMap = Map(
-      (0: Byte) ->
+    (0: Byte) ->
       (CrcLength +
-          MagicLength + AttributesLength + KeySizeLength + ValueSizeLength),
-      (1: Byte) ->
+        MagicLength + AttributesLength + KeySizeLength + ValueSizeLength),
+    (1: Byte) ->
       (CrcLength + MagicLength + AttributesLength + TimestampLength +
-          KeySizeLength + ValueSizeLength))
+        KeySizeLength + ValueSizeLength)
+  )
 
   /**
     * The amount of overhead bytes in a message
@@ -148,23 +149,25 @@ class Message(
     * @param payloadSize The size of the payload to use
     * @param magicValue the magic value to use
     */
-  def this(bytes: Array[Byte],
-           key: Array[Byte],
-           timestamp: Long,
-           timestampType: TimestampType,
-           codec: CompressionCodec,
-           payloadOffset: Int,
-           payloadSize: Int,
-           magicValue: Byte) = {
+  def this(
+      bytes: Array[Byte],
+      key: Array[Byte],
+      timestamp: Long,
+      timestampType: TimestampType,
+      codec: CompressionCodec,
+      payloadOffset: Int,
+      payloadSize: Int,
+      magicValue: Byte) = {
     this(
-        ByteBuffer.allocate(Message.CrcLength + Message.MagicLength +
-            Message.AttributesLength +
-            (if (magicValue == Message.MagicValue_V0) 0
-             else Message.TimestampLength) + Message.KeySizeLength +
-            (if (key == null) 0 else key.length) + Message.ValueSizeLength +
-            (if (bytes == null) 0
-             else if (payloadSize >= 0) payloadSize
-             else bytes.length - payloadOffset)))
+      ByteBuffer.allocate(
+        Message.CrcLength + Message.MagicLength +
+          Message.AttributesLength +
+          (if (magicValue == Message.MagicValue_V0) 0
+           else Message.TimestampLength) + Message.KeySizeLength +
+          (if (key == null) 0 else key.length) + Message.ValueSizeLength +
+          (if (bytes == null) 0
+           else if (payloadSize >= 0) payloadSize
+           else bytes.length - payloadOffset)))
     validateTimestampAndMagicValue(timestamp, magicValue)
     // skip crc, we will fill that in at the end
     buffer.position(MagicOffset)
@@ -172,7 +175,7 @@ class Message(
     val attributes: Byte =
       if (codec.codec > 0)
         timestampType.updateAttributes(
-            (CompressionCodeMask & codec.codec).toByte)
+          (CompressionCodeMask & codec.codec).toByte)
       else 0
     buffer.put(attributes)
     // Only put timestamp when "magic" value is greater than 0
@@ -195,61 +198,70 @@ class Message(
     Utils.writeUnsignedInt(buffer, CrcOffset, computeChecksum)
   }
 
-  def this(bytes: Array[Byte],
-           key: Array[Byte],
-           timestamp: Long,
-           codec: CompressionCodec,
-           magicValue: Byte) =
-    this(bytes = bytes,
-         key = key,
-         timestamp = timestamp,
-         timestampType = TimestampType.CREATE_TIME,
-         codec = codec,
-         payloadOffset = 0,
-         payloadSize = -1,
-         magicValue = magicValue)
+  def this(
+      bytes: Array[Byte],
+      key: Array[Byte],
+      timestamp: Long,
+      codec: CompressionCodec,
+      magicValue: Byte) =
+    this(
+      bytes = bytes,
+      key = key,
+      timestamp = timestamp,
+      timestampType = TimestampType.CREATE_TIME,
+      codec = codec,
+      payloadOffset = 0,
+      payloadSize = -1,
+      magicValue = magicValue)
 
-  def this(bytes: Array[Byte],
-           timestamp: Long,
-           codec: CompressionCodec,
-           magicValue: Byte) =
-    this(bytes = bytes,
-         key = null,
-         timestamp = timestamp,
-         codec = codec,
-         magicValue = magicValue)
+  def this(
+      bytes: Array[Byte],
+      timestamp: Long,
+      codec: CompressionCodec,
+      magicValue: Byte) =
+    this(
+      bytes = bytes,
+      key = null,
+      timestamp = timestamp,
+      codec = codec,
+      magicValue = magicValue)
 
-  def this(bytes: Array[Byte],
-           key: Array[Byte],
-           timestamp: Long,
-           magicValue: Byte) =
-    this(bytes = bytes,
-         key = key,
-         timestamp = timestamp,
-         codec = NoCompressionCodec,
-         magicValue = magicValue)
+  def this(
+      bytes: Array[Byte],
+      key: Array[Byte],
+      timestamp: Long,
+      magicValue: Byte) =
+    this(
+      bytes = bytes,
+      key = key,
+      timestamp = timestamp,
+      codec = NoCompressionCodec,
+      magicValue = magicValue)
 
   def this(bytes: Array[Byte], timestamp: Long, magicValue: Byte) =
-    this(bytes = bytes,
-         key = null,
-         timestamp = timestamp,
-         codec = NoCompressionCodec,
-         magicValue = magicValue)
+    this(
+      bytes = bytes,
+      key = null,
+      timestamp = timestamp,
+      codec = NoCompressionCodec,
+      magicValue = magicValue)
 
   def this(bytes: Array[Byte]) =
-    this(bytes = bytes,
-         key = null,
-         timestamp = Message.NoTimestamp,
-         codec = NoCompressionCodec,
-         magicValue = Message.CurrentMagicValue)
+    this(
+      bytes = bytes,
+      key = null,
+      timestamp = Message.NoTimestamp,
+      codec = NoCompressionCodec,
+      magicValue = Message.CurrentMagicValue)
 
   /**
     * Compute the checksum of the message from the message contents
     */
   def computeChecksum: Long =
-    CoreUtils.crc32(buffer.array,
-                    buffer.arrayOffset + MagicOffset,
-                    buffer.limit - MagicOffset)
+    CoreUtils.crc32(
+      buffer.array,
+      buffer.arrayOffset + MagicOffset,
+      buffer.limit - MagicOffset)
 
   /**
     * Retrieve the previously computed CRC for this message
@@ -267,7 +279,7 @@ class Message(
   def ensureValid() {
     if (!isValid)
       throw new InvalidMessageException(
-          s"Message is corrupt (stored crc = ${checksum}, computed crc = ${computeChecksum})")
+        s"Message is corrupt (stored crc = ${checksum}, computed crc = ${computeChecksum})")
   }
 
   /**
@@ -332,7 +344,7 @@ class Message(
     if (magic == MagicValue_V0) Message.NoTimestamp
     // Case 2
     else if (wrapperMessageTimestampType.exists(
-                 _ == TimestampType.LOG_APPEND_TIME) &&
+               _ == TimestampType.LOG_APPEND_TIME) &&
              wrapperMessageTimestamp.isDefined) wrapperMessageTimestamp.get
     else
       // case 1, 3
@@ -346,7 +358,7 @@ class Message(
     if (magic == MagicValue_V0) TimestampType.NO_TIMESTAMP_TYPE
     else
       wrapperMessageTimestampType.getOrElse(
-          TimestampType.forAttributes(attributes))
+        TimestampType.forAttributes(attributes))
   }
 
   /**
@@ -354,7 +366,7 @@ class Message(
     */
   def compressionCodec: CompressionCodec =
     CompressionCodec.getCompressionCodec(
-        buffer.get(AttributesOffset) & CompressionCodeMask)
+      buffer.get(AttributesOffset) & CompressionCodeMask)
 
   /**
     * A ByteBuffer containing the content of the message
@@ -385,10 +397,10 @@ class Message(
       byteBuffer: ByteBuffer,
       now: Long,
       timestampType: TimestampType = wrapperMessageTimestampType.getOrElse(
-            TimestampType.forAttributes(attributes))) {
+        TimestampType.forAttributes(attributes))) {
     if (byteBuffer.remaining() < size + headerSizeDiff(magic, toMagicValue))
       throw new IndexOutOfBoundsException(
-          "The byte buffer does not have enough capacity to hold new message format " +
+        "The byte buffer does not have enough capacity to hold new message format " +
           s"version $toMagicValue")
     if (toMagicValue == Message.MagicValue_V1) {
       // Up-conversion, reserve CRC and update magic byte
@@ -399,23 +411,27 @@ class Message(
       if (timestampType == TimestampType.LOG_APPEND_TIME)
         byteBuffer.putLong(now)
       else byteBuffer.putLong(Message.NoTimestamp)
-      byteBuffer.put(buffer.array(),
-                     buffer.arrayOffset() + Message.KeySizeOffset_V0,
-                     size - Message.KeySizeOffset_V0)
+      byteBuffer.put(
+        buffer.array(),
+        buffer.arrayOffset() + Message.KeySizeOffset_V0,
+        size - Message.KeySizeOffset_V0)
     } else {
       // Down-conversion, reserve CRC and update magic byte
       byteBuffer.position(Message.MagicOffset)
       byteBuffer.put(Message.MagicValue_V0)
       byteBuffer.put(TimestampType.CREATE_TIME.updateAttributes(attributes))
       // Down-conversion, skip the timestamp field
-      byteBuffer.put(buffer.array(),
-                     buffer.arrayOffset() + Message.KeySizeOffset_V1,
-                     size - Message.KeySizeOffset_V1)
+      byteBuffer.put(
+        buffer.array(),
+        buffer.arrayOffset() + Message.KeySizeOffset_V1,
+        size - Message.KeySizeOffset_V1)
     }
     // update crc value
     val newMessage = new Message(byteBuffer)
     Utils.writeUnsignedInt(
-        byteBuffer, Message.CrcOffset, newMessage.computeChecksum)
+      byteBuffer,
+      Message.CrcOffset,
+      newMessage.computeChecksum)
     byteBuffer.rewind()
   }
 
@@ -444,10 +460,10 @@ class Message(
       throw new IllegalArgumentException(s"Invalid magic value $magic")
     if (timestamp < 0 && timestamp != NoTimestamp)
       throw new IllegalArgumentException(
-          s"Invalid message timestamp $timestamp")
+        s"Invalid message timestamp $timestamp")
     if (magic == MagicValue_V0 && timestamp != NoTimestamp)
       throw new IllegalArgumentException(
-          s"Invalid timestamp $timestamp. Timestamp must be ${NoTimestamp} when magic = ${MagicValue_V0}")
+        s"Invalid timestamp $timestamp. Timestamp must be ${NoTimestamp} when magic = ${MagicValue_V0}")
   }
 
   override def toString(): String = {
@@ -460,7 +476,7 @@ class Message(
   override def equals(any: Any): Boolean = {
     any match {
       case that: Message => this.buffer.equals(that.buffer)
-      case _ => false
+      case _             => false
     }
   }
 

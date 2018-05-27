@@ -32,7 +32,7 @@ private[ui] class StoragePage(parent: StorageTab) extends WebUIPage("") {
   def render(request: HttpServletRequest): Seq[Node] = {
     val content =
       rddTable(listener.rddInfoList) ++ receiverBlockTables(
-          listener.allExecutorStreamBlockStatus.sortBy(_.executorId))
+        listener.allExecutorStreamBlockStatus.sortBy(_.executorId))
     UIUtils.headerSparkPage("Storage", content, parent)
   }
 
@@ -49,12 +49,13 @@ private[ui] class StoragePage(parent: StorageTab) extends WebUIPage("") {
   }
 
   /** Header fields for the RDD table */
-  private val rddHeader = Seq("RDD Name",
-                              "Storage Level",
-                              "Cached Partitions",
-                              "Fraction Cached",
-                              "Size in Memory",
-                              "Size on Disk")
+  private val rddHeader = Seq(
+    "RDD Name",
+    "Storage Level",
+    "Cached Partitions",
+    "Fraction Cached",
+    "Size in Memory",
+    "Size on Disk")
 
   /** Render an HTML row representing an RDD */
   private def rddRow(rdd: RDDInfo): Seq[Node] = {
@@ -104,11 +105,12 @@ private[ui] class StoragePage(parent: StorageTab) extends WebUIPage("") {
     </div>
   }
 
-  private val executorMetricsTableHeader = Seq("Executor ID",
-                                               "Address",
-                                               "Total Size in Memory",
-                                               "Total Size on Disk",
-                                               "Stream Blocks")
+  private val executorMetricsTableHeader = Seq(
+    "Executor ID",
+    "Address",
+    "Total Size in Memory",
+    "Total Size on Disk",
+    "Stream Blocks")
 
   private def executorMetricsTableRow(
       status: ExecutorStreamBlockStatus): Seq[Node] = {
@@ -148,11 +150,8 @@ private[ui] class StoragePage(parent: StorageTab) extends WebUIPage("") {
     }
   }
 
-  private val streamBlockTableHeader = Seq("Block ID",
-                                           "Replication Level",
-                                           "Location",
-                                           "Storage Level",
-                                           "Size")
+  private val streamBlockTableHeader =
+    Seq("Block ID", "Replication Level", "Location", "Storage Level", "Size")
 
   /** Render a stream block */
   private def streamBlockTableRow(
@@ -161,20 +160,25 @@ private[ui] class StoragePage(parent: StorageTab) extends WebUIPage("") {
     assert(replications.size > 0) // This must be true because it's the result of "groupBy"
     if (replications.size == 1) {
       streamBlockTableSubrow(
-          block._1, replications.head, replications.size, true)
+        block._1,
+        replications.head,
+        replications.size,
+        true)
     } else {
-      streamBlockTableSubrow(block._1,
-                             replications.head,
-                             replications.size,
-                             true) ++ replications.tail.flatMap(
-          streamBlockTableSubrow(block._1, _, replications.size, false))
+      streamBlockTableSubrow(
+        block._1,
+        replications.head,
+        replications.size,
+        true) ++ replications.tail.flatMap(
+        streamBlockTableSubrow(block._1, _, replications.size, false))
     }
   }
 
-  private def streamBlockTableSubrow(blockId: BlockId,
-                                     block: BlockUIData,
-                                     replication: Int,
-                                     firstSubrow: Boolean): Seq[Node] = {
+  private def streamBlockTableSubrow(
+      blockId: BlockId,
+      block: BlockUIData,
+      replication: Int,
+      firstSubrow: Boolean): Seq[Node] = {
     val (storageLevel, size) = streamBlockStorageLevelDescriptionAndSize(block)
 
     <tr>
@@ -206,7 +210,7 @@ private[ui] class StoragePage(parent: StorageTab) extends WebUIPage("") {
       ("Memory Serialized", block.memSize)
     } else {
       throw new IllegalStateException(
-          s"Invalid Storage Level: ${block.storageLevel}")
+        s"Invalid Storage Level: ${block.storageLevel}")
     }
   }
 }

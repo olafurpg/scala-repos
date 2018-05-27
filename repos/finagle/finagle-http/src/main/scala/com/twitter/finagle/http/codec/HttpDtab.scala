@@ -27,7 +27,7 @@ object HttpDtab {
   private val Base64 = BaseEncoding.base64()
 
   private val indexstr: Int => String = ((0 until Maxsize) map
-      (i => i -> "%02d".format(i))).toMap
+    (i => i -> "%02d".format(i))).toMap
 
   private def b64Encode(v: String): String =
     Base64.encode(v.getBytes(Utf8))
@@ -72,12 +72,12 @@ object HttpDtab {
 
   private def validHeaderPair(aKey: String, bKey: String): Boolean =
     aKey.length == bKey.length && aKey(aKey.length - 1) == 'a' &&
-    bKey(bKey.length - 1) == 'b' &&
-    aKey.substring(0, aKey.length - 1) == bKey.substring(0, bKey.length - 1)
+      bKey(bKey.length - 1) == 'b' &&
+      aKey.substring(0, aKey.length - 1) == bKey.substring(0, bKey.length - 1)
 
   private def isDtabHeader(hdr: (String, String)): Boolean =
     hdr._1.equalsIgnoreCase(Header) ||
-    hdr._1.regionMatches(true, 0, Prefix, 0, Prefix.length)
+      hdr._1.regionMatches(true, 0, Prefix, 0, Prefix.length)
 
   private val EmptyReturn = Return(Dtab.empty)
 
@@ -120,7 +120,7 @@ object HttpDtab {
 
     if (dtab.size >= Maxsize) {
       throw new IllegalArgumentException(
-          "Dtabs with length greater than 100 are not serializable with HTTP")
+        "Dtabs with length greater than 100 are not serializable with HTTP")
     }
 
     for ((Dentry(prefix, dst), i) <- dtab.zipWithIndex) {

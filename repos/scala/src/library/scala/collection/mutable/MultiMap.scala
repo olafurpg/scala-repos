@@ -110,7 +110,7 @@ trait MultiMap[A, B] extends Map[A, Set[B]] {
     *  @return      A boolean if such a binding exists
     */
   def entryExists(key: A, p: B => Boolean): Boolean = get(key) match {
-    case None => false
+    case None      => false
     case Some(set) => set exists p
   }
 }

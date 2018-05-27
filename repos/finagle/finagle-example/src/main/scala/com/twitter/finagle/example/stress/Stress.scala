@@ -3,7 +3,14 @@ package com.twitter.finagle.example.stress
 import com.google.common.util.concurrent.AtomicLongMap
 import com.twitter.finagle.Service
 import com.twitter.finagle.builder.ClientBuilder
-import com.twitter.finagle.http.{Http, Method, Request, Response, Status, Version}
+import com.twitter.finagle.http.{
+  Http,
+  Method,
+  Request,
+  Response,
+  Status,
+  Version
+}
 import com.twitter.finagle.stats.SummarizingStatsReceiver
 import com.twitter.util.{Stopwatch, Future}
 import java.net.{InetSocketAddress, URI}
@@ -60,14 +67,14 @@ object Stress {
 
       val duration = elapsed()
       println("%20s\t%s".format("Status", "Count"))
-      for ((status, count) <- responses.asMap.asScala) println(
-          "%20s\t%d".format(status, count))
+      for ((status, count) <- responses.asMap.asScala)
+        println("%20s\t%d".format(status, count))
       println("================")
       println(
-          "%d requests completed in %dms (%f requests per second)".format(
-              completedRequests.get,
-              duration.inMilliseconds,
-              totalRequests.toFloat / duration.inMillis.toFloat * 1000))
+        "%d requests completed in %dms (%f requests per second)".format(
+          completedRequests.get,
+          duration.inMilliseconds,
+          totalRequests.toFloat / duration.inMillis.toFloat * 1000))
       println("%d errors".format(errors.get))
 
       println("stats")

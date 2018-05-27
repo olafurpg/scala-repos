@@ -75,8 +75,8 @@ object WebSocketBoilerplate {
   ): Flow[Incoming, Outgoing, Unit] = {
     val (target, pub) = Source
       .actorRef[Outgoing](
-          0,
-          OverflowStrategy.fail
+        0,
+        OverflowStrategy.fail
       )
       .toMat(Sink.publisher)(Keep.both)
       .run()
@@ -101,14 +101,17 @@ object WebSocketBoilerplate {
       oc: ClassTag[Outgoing],
       printer: JsonPrinter = PrettyPrinter
   ): Flow[Message, Message, Unit] = {
-    Flow[Message].collect {
-      case TextMessage.Strict(msg) =>
-        msg.parseJson.convertTo[Incoming]
-      case _ =>
-        throw new IllegalArgumentException("not a valid message")
-    }.via(flow).map {
-      case e: Outgoing =>
-        TextMessage.Strict(e.toJson.toString(printer)): Message
-    }
+    Flow[Message]
+      .collect {
+        case TextMessage.Strict(msg) =>
+          msg.parseJson.convertTo[Incoming]
+        case _ =>
+          throw new IllegalArgumentException("not a valid message")
+      }
+      .via(flow)
+      .map {
+        case e: Outgoing =>
+          TextMessage.Strict(e.toJson.toString(printer)): Message
+      }
   }
 }

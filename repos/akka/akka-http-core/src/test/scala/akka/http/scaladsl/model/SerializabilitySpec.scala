@@ -23,8 +23,9 @@ class SerializabilitySpec extends WordSpec with Matchers {
       }
       "with content type" in {
         HttpRequest()
-          .withEntity(HttpEntity(ContentTypes.`application/json`,
-                                 ByteString.empty)) should beSerializable
+          .withEntity(HttpEntity(
+            ContentTypes.`application/json`,
+            ByteString.empty)) should beSerializable
       }
       "with accepted media types" in {
         HttpRequest().withHeaders(Accept(MediaTypes.`application/json`)) should beSerializable
@@ -35,8 +36,8 @@ class SerializabilitySpec extends WordSpec with Matchers {
       }
       "with accepted encodings" in {
         HttpRequest().withHeaders(`Accept-Encoding`(HttpEncodings.chunked)) should beSerializable
-        HttpRequest().withHeaders(`Accept-Encoding`(
-                HttpEncoding.custom("test"))) should beSerializable
+        HttpRequest().withHeaders(
+          `Accept-Encoding`(HttpEncoding.custom("test"))) should beSerializable
       }
     }
   }
@@ -67,9 +68,10 @@ class SerializabilitySpec extends WordSpec with Matchers {
 
   def beSerializable: Matcher[AnyRef] = Matcher[AnyRef] { value ⇒
     val result = Try(tryToSerialize(value))
-    MatchResult(result.isSuccess,
-                "Failed with " + result,
-                "Was unexpectly successful and returned " + result)
+    MatchResult(
+      result.isSuccess,
+      "Failed with " + result,
+      "Was unexpectly successful and returned " + result)
   }
 
   def tryToSerialize[T](obj: T): T = {

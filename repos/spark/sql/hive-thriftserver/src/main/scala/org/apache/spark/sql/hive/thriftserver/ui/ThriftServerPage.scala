@@ -25,13 +25,18 @@ import scala.xml.Node
 import org.apache.commons.lang3.StringEscapeUtils
 
 import org.apache.spark.internal.Logging
-import org.apache.spark.sql.hive.thriftserver.HiveThriftServer2.{ExecutionInfo, ExecutionState, SessionInfo}
+import org.apache.spark.sql.hive.thriftserver.HiveThriftServer2.{
+  ExecutionInfo,
+  ExecutionState,
+  SessionInfo
+}
 import org.apache.spark.ui._
 import org.apache.spark.ui.UIUtils._
 
 /** Page for Spark Web UI that shows statistics of a thrift server */
 private[ui] class ThriftServerPage(parent: ThriftServerTab)
-    extends WebUIPage("") with Logging {
+    extends WebUIPage("")
+    with Logging {
 
   private val listener = parent.listener
   private val startTime = Calendar.getInstance().getTime()
@@ -67,15 +72,16 @@ private[ui] class ThriftServerPage(parent: ThriftServerTab)
     val numStatement = listener.getExecutionList.size
     val table =
       if (numStatement > 0) {
-        val headerRow = Seq("User",
-                            "JobID",
-                            "GroupID",
-                            "Start Time",
-                            "Finish Time",
-                            "Duration",
-                            "Statement",
-                            "State",
-                            "Detail")
+        val headerRow = Seq(
+          "User",
+          "JobID",
+          "GroupID",
+          "Start Time",
+          "Finish Time",
+          "Duration",
+          "Statement",
+          "State",
+          "Detail")
         val dataRows = listener.getExecutionList
 
         def generateDataRow(info: ExecutionInfo): Seq[Node] = {
@@ -103,13 +109,14 @@ private[ui] class ThriftServerPage(parent: ThriftServerTab)
         }
 
         Some(
-            UIUtils.listingTable(headerRow,
-                                 generateDataRow,
-                                 dataRows,
-                                 false,
-                                 None,
-                                 Seq(null),
-                                 false))
+          UIUtils.listingTable(
+            headerRow,
+            generateDataRow,
+            dataRows,
+            false,
+            None,
+            Seq(null),
+            false))
       } else {
         None
       }
@@ -125,8 +132,7 @@ private[ui] class ThriftServerPage(parent: ThriftServerTab)
 
   private def errorMessageCell(errorMessage: String): Seq[Node] = {
     val isMultiline = errorMessage.indexOf('\n') >= 0
-    val errorSummary = StringEscapeUtils.escapeHtml4(
-        if (isMultiline) {
+    val errorSummary = StringEscapeUtils.escapeHtml4(if (isMultiline) {
       errorMessage.substring(0, errorMessage.indexOf('\n'))
     } else {
       errorMessage
@@ -154,18 +160,19 @@ private[ui] class ThriftServerPage(parent: ThriftServerTab)
     val table =
       if (numBatches > 0) {
         val dataRows = sessionList
-        val headerRow = Seq("User",
-                            "IP",
-                            "Session ID",
-                            "Start Time",
-                            "Finish Time",
-                            "Duration",
-                            "Total Execute")
+        val headerRow = Seq(
+          "User",
+          "IP",
+          "Session ID",
+          "Start Time",
+          "Finish Time",
+          "Duration",
+          "Total Execute")
         def generateDataRow(session: SessionInfo): Seq[Node] = {
           val sessionLink = "%s/%s/session?id=%s".format(
-              UIUtils.prependBaseUri(parent.basePath),
-              parent.prefix,
-              session.sessionId)
+            UIUtils.prependBaseUri(parent.basePath),
+            parent.prefix,
+            session.sessionId)
           <tr>
           <td> {session.userName} </td>
           <td> {session.ip} </td>
@@ -177,13 +184,14 @@ private[ui] class ThriftServerPage(parent: ThriftServerTab)
         </tr>
         }
         Some(
-            UIUtils.listingTable(headerRow,
-                                 generateDataRow,
-                                 dataRows,
-                                 true,
-                                 None,
-                                 Seq(null),
-                                 false))
+          UIUtils.listingTable(
+            headerRow,
+            generateDataRow,
+            dataRows,
+            true,
+            None,
+            Seq(null),
+            false))
       } else {
         None
       }

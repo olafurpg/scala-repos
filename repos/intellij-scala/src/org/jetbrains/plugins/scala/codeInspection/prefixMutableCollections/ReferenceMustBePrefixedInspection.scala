@@ -4,11 +4,17 @@ import com.intellij.codeInspection.ProblemsHolder
 import com.intellij.openapi.project.Project
 import com.intellij.psi.{JavaPsiFacade, PsiClass}
 import org.jetbrains.plugins.scala.codeInspection.prefixMutableCollections.ReferenceMustBePrefixedInspection._
-import org.jetbrains.plugins.scala.codeInspection.{AbstractFixOnTwoPsiElements, AbstractInspection}
+import org.jetbrains.plugins.scala.codeInspection.{
+  AbstractFixOnTwoPsiElements,
+  AbstractInspection
+}
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.formatting.settings.ScalaCodeStyleSettings
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
-import org.jetbrains.plugins.scala.lang.psi.api.base.{ScReferenceElement, ScStableCodeReferenceElement}
+import org.jetbrains.plugins.scala.lang.psi.api.base.{
+  ScReferenceElement,
+  ScStableCodeReferenceElement
+}
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScReferenceExpression
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.ScImportSelector
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
@@ -23,7 +29,7 @@ class ReferenceMustBePrefixedInspection
   def actionFor(holder: ProblemsHolder) = {
     case ref: ScReferenceElement
         if ref.qualifier.isEmpty &&
-        !ref.getParent.isInstanceOf[ScImportSelector] =>
+          !ref.getParent.isInstanceOf[ScImportSelector] =>
       ref.bind() match {
         case Some(r: ScalaResolveResult) if r.nameShadow.isEmpty =>
           r.getActualElement match {
@@ -33,7 +39,9 @@ class ReferenceMustBePrefixedInspection
                     .getInstance(holder.getProject)
                     .hasImportWithPrefix(qualName)) {
                 holder.registerProblem(
-                    ref, getDisplayName, new AddPrefixFix(ref, clazz))
+                  ref,
+                  getDisplayName,
+                  new AddPrefixFix(ref, clazz))
               }
             case _ =>
           }
@@ -61,15 +69,19 @@ class AddPrefixFix(ref: ScReferenceElement, clazz: PsiClass)
     val newRefText = parts.takeRight(2).mkString(".")
     refElem match {
       case stRef: ScStableCodeReferenceElement =>
-        stRef.replace(ScalaPsiElementFactory.createReferenceFromText(
-                newRefText, stRef.getManager)) match {
+        stRef.replace(
+          ScalaPsiElementFactory
+            .createReferenceFromText(newRefText, stRef.getManager)) match {
           case r: ScStableCodeReferenceElement =>
             r.qualifier.foreach(_.bindToPackage(pckg, addImport = true))
           case _ =>
         }
       case ref: ScReferenceExpression =>
-        ref.replace(ScalaPsiElementFactory.createExpressionWithContextFromText(
-                newRefText, ref.getContext, ref)) match {
+        ref.replace(
+          ScalaPsiElementFactory.createExpressionWithContextFromText(
+            newRefText,
+            ref.getContext,
+            ref)) match {
           case ScReferenceExpression.withQualifier(q: ScReferenceExpression) =>
             q.bindToPackage(pckg, addImport = true)
           case _ =>

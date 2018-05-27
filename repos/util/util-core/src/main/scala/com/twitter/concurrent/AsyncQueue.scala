@@ -44,7 +44,7 @@ class AsyncQueue[T](maxPendingOffers: Int) {
     */
   def size: Int = state.get match {
     case Offering(q) => q.size
-    case _ => 0
+    case _           => 0
   }
 
   private[this] def queueOf[E](e: E): Queue[E] =
@@ -158,7 +158,8 @@ class AsyncQueue[T](maxPendingOffers: Int) {
 
     case s @ Polling(q) =>
       if (!state.compareAndSet(s, Excepting(Queue.empty, exc)))
-        fail(exc, discard) else q.foreach(_.setException(exc))
+        fail(exc, discard)
+      else q.foreach(_.setException(exc))
 
     case s @ Offering(q) =>
       val nextq = if (discard) Queue.empty else q

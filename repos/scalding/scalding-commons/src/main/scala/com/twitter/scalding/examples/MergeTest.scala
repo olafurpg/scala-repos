@@ -33,22 +33,28 @@ class MergeTest(args: Args) extends Job(args) {
   def cmpTup(t1: (String, Long), t2: (String, Long)) = t2._2.compareTo(t1._2)
 
   def mergeSort2[T](
-      v1: List[T], v2: List[T], k: Int, cmp: Function2[T, T, Int]) = {
+      v1: List[T],
+      v2: List[T],
+      k: Int,
+      cmp: Function2[T, T, Int]) = {
     @tailrec
     def mergeSortR(
-        acc: List[T], list1: List[T], list2: List[T], k: Int): List[T] = {
+        acc: List[T],
+        list1: List[T],
+        list2: List[T],
+        k: Int): List[T] = {
       (list1, list2, k) match {
         case (_, _, 0) => acc
         case (x1 :: t1, x2 :: t2, _) => {
-            if (cmp(x1, x2) < 0) {
-              mergeSortR(x1 :: acc, t1, list2, k - 1)
-            } else {
-              mergeSortR(x2 :: acc, list1, t2, k - 1)
-            }
+          if (cmp(x1, x2) < 0) {
+            mergeSortR(x1 :: acc, t1, list2, k - 1)
+          } else {
+            mergeSortR(x2 :: acc, list1, t2, k - 1)
           }
+        }
         case (x1 :: t1, Nil, _) => mergeSortR(x1 :: acc, t1, Nil, k - 1)
         case (Nil, x2 :: t2, _) => mergeSortR(x2 :: acc, Nil, t2, k - 1)
-        case (Nil, Nil, _) => acc
+        case (Nil, Nil, _)      => acc
       }
     }
     mergeSortR(Nil, v1, v2, k).reverse

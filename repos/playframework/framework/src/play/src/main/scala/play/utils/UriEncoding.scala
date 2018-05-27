@@ -102,19 +102,19 @@ object UriEncoding {
         // Read high digit
         if (inPos >= in.length)
           throw new InvalidUriEncodingException(
-              s"Cannot decode $s: % at end of string")
+            s"Cannot decode $s: % at end of string")
         val high = fromHex(next())
         if (high == -1)
           throw new InvalidUriEncodingException(
-              s"Cannot decode $s: expected hex digit at position $inPos.")
+            s"Cannot decode $s: expected hex digit at position $inPos.")
         // Read low digit
         if (inPos >= in.length)
           throw new InvalidUriEncodingException(
-              s"Cannot decode $s: incomplete percent encoding at end of string")
+            s"Cannot decode $s: incomplete percent encoding at end of string")
         val low = fromHex(next())
         if (low == -1)
           throw new InvalidUriEncodingException(
-              s"Cannot decode $s: expected hex digit at position $inPos.")
+            s"Cannot decode $s: expected hex digit at position $inPos.")
         // Write decoded byte
         out.write((high << 4) + low)
       } else if (segmentChars.get(b)) {
@@ -122,7 +122,7 @@ object UriEncoding {
         out.write(b)
       } else {
         throw new InvalidUriEncodingException(
-            s"Cannot decode $s: illegal character at position $inPos.")
+          s"Cannot decode $s: illegal character at position $inPos.")
       }
     }
     out.toString(outputCharset)
@@ -162,8 +162,8 @@ object UriEncoding {
   private def pchar: Seq[Char] = {
     // RFC 3986, 2.3. Unreserved Characters
     // unreserved  = ALPHA / DIGIT / "-" / "." / "_" / "~"
-    val alphaDigit = for ((min, max) <- Seq(
-        ('a', 'z'), ('A', 'Z'), ('0', '9')); c <- min to max) yield c
+    val alphaDigit = for ((min, max) <- Seq(('a', 'z'), ('A', 'Z'), ('0', '9'));
+                          c <- min to max) yield c
     val unreserved = alphaDigit ++ Seq('-', '.', '_', '~')
 
     // RFC 3986, 2.2. Reserved Characters

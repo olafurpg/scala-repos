@@ -39,6 +39,6 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class OverrunStyleSpec
     extends SFXEnumDelegateSpec[jfxsc.OverrunStyle, OverrunStyle](
-        javaClass = classOf[jfxsc.OverrunStyle],
-        scalaClass = classOf[OverrunStyle],
-        companion = OverrunStyle)
+      javaClass = classOf[jfxsc.OverrunStyle],
+      scalaClass = classOf[OverrunStyle],
+      companion = OverrunStyle)

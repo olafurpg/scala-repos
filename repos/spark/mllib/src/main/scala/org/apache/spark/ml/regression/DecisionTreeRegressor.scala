@@ -30,8 +30,13 @@ import org.apache.spark.ml.tree.impl.RandomForest
 import org.apache.spark.ml.util._
 import org.apache.spark.mllib.linalg.Vector
 import org.apache.spark.mllib.regression.LabeledPoint
-import org.apache.spark.mllib.tree.configuration.{Algo => OldAlgo, Strategy => OldStrategy}
-import org.apache.spark.mllib.tree.model.{DecisionTreeModel => OldDecisionTreeModel}
+import org.apache.spark.mllib.tree.configuration.{
+  Algo => OldAlgo,
+  Strategy => OldStrategy
+}
+import org.apache.spark.mllib.tree.model.{
+  DecisionTreeModel => OldDecisionTreeModel
+}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions._
@@ -47,8 +52,11 @@ import org.apache.spark.sql.functions._
 final class DecisionTreeRegressor @Since("1.4.0")(
     @Since("1.4.0") override val uid: String)
     extends Predictor[
-        Vector, DecisionTreeRegressor, DecisionTreeRegressionModel]
-    with DecisionTreeRegressorParams with DefaultParamsWritable {
+      Vector,
+      DecisionTreeRegressor,
+      DecisionTreeRegressionModel]
+    with DecisionTreeRegressorParams
+    with DefaultParamsWritable {
 
   @Since("1.4.0")
   def this() = this(Identifiable.randomUID("dtr"))
@@ -94,12 +102,13 @@ final class DecisionTreeRegressor @Since("1.4.0")(
       MetadataUtils.getCategoricalFeatures(dataset.schema($(featuresCol)))
     val oldDataset: RDD[LabeledPoint] = extractLabeledPoints(dataset)
     val strategy = getOldStrategy(categoricalFeatures)
-    val trees = RandomForest.run(oldDataset,
-                                 strategy,
-                                 numTrees = 1,
-                                 featureSubsetStrategy = "all",
-                                 seed = $(seed),
-                                 parentUID = Some(uid))
+    val trees = RandomForest.run(
+      oldDataset,
+      strategy,
+      numTrees = 1,
+      featureSubsetStrategy = "all",
+      seed = $(seed),
+      parentUID = Some(uid))
     trees.head.asInstanceOf[DecisionTreeRegressionModel]
   }
 
@@ -107,23 +116,25 @@ final class DecisionTreeRegressor @Since("1.4.0")(
   private[ml] def train(
       data: RDD[LabeledPoint],
       oldStrategy: OldStrategy): DecisionTreeRegressionModel = {
-    val trees = RandomForest.run(data,
-                                 oldStrategy,
-                                 numTrees = 1,
-                                 featureSubsetStrategy = "all",
-                                 seed = 0L,
-                                 parentUID = Some(uid))
+    val trees = RandomForest.run(
+      data,
+      oldStrategy,
+      numTrees = 1,
+      featureSubsetStrategy = "all",
+      seed = 0L,
+      parentUID = Some(uid))
     trees.head.asInstanceOf[DecisionTreeRegressionModel]
   }
 
   /** (private[ml]) Create a Strategy instance to use with the old API. */
   private[ml] def getOldStrategy(
       categoricalFeatures: Map[Int, Int]): OldStrategy = {
-    super.getOldStrategy(categoricalFeatures,
-                         numClasses = 0,
-                         OldAlgo.Regression,
-                         getOldImpurity,
-                         subsamplingRate = 1.0)
+    super.getOldStrategy(
+      categoricalFeatures,
+      numClasses = 0,
+      OldAlgo.Regression,
+      getOldImpurity,
+      subsamplingRate = 1.0)
   }
 
   @Since("1.4.0")
@@ -152,20 +163,22 @@ object DecisionTreeRegressor
   */
 @Since("1.4.0")
 @Experimental
-final class DecisionTreeRegressionModel private[ml](
+final class DecisionTreeRegressionModel private[ml] (
     override val uid: String,
     override val rootNode: Node,
     override val numFeatures: Int)
     extends PredictionModel[Vector, DecisionTreeRegressionModel]
-    with DecisionTreeModel with DecisionTreeRegressorParams with MLWritable
+    with DecisionTreeModel
+    with DecisionTreeRegressorParams
+    with MLWritable
     with Serializable {
 
   /** @group setParam */
   def setVarianceCol(value: String): this.type = set(varianceCol, value)
 
   require(
-      rootNode != null,
-      "DecisionTreeRegressionModel given null rootNode, but it requires a non-null rootNode.")
+    rootNode != null,
+    "DecisionTreeRegressionModel given null rootNode, but it requires a non-null rootNode.")
 
   /**
     * Construct a decision tree regression model.
@@ -197,20 +210,22 @@ final class DecisionTreeRegressionModel private[ml](
     }
     var output = dataset
     if ($(predictionCol).nonEmpty) {
-      output = output.withColumn(
-          $(predictionCol), predictUDF(col($(featuresCol))))
+      output =
+        output.withColumn($(predictionCol), predictUDF(col($(featuresCol))))
     }
     if (isDefined(varianceCol) && $(varianceCol).nonEmpty) {
       output = output.withColumn(
-          $(varianceCol), predictVarianceUDF(col($(featuresCol))))
+        $(varianceCol),
+        predictVarianceUDF(col($(featuresCol))))
     }
     output
   }
 
   @Since("1.4.0")
   override def copy(extra: ParamMap): DecisionTreeRegressionModel = {
-    copyValues(new DecisionTreeRegressionModel(uid, rootNode, numFeatures),
-               extra).setParent(parent)
+    copyValues(
+      new DecisionTreeRegressionModel(uid, rootNode, numFeatures),
+      extra).setParent(parent)
   }
 
   @Since("1.4.0")
@@ -284,8 +299,8 @@ object DecisionTreeRegressionModel
       val metadata = DefaultParamsReader.loadMetadata(path, sc, className)
       val numFeatures = (metadata.metadata \ "numFeatures").extract[Int]
       val root = loadTreeNodes(path, metadata, sqlContext)
-      val model = new DecisionTreeRegressionModel(
-          metadata.uid, root, numFeatures)
+      val model =
+        new DecisionTreeRegressionModel(metadata.uid, root, numFeatures)
       DefaultParamsReader.getAndSetParams(model, metadata)
       model
     }
@@ -298,9 +313,10 @@ object DecisionTreeRegressionModel
       categoricalFeatures: Map[Int, Int],
       numFeatures: Int = -1): DecisionTreeRegressionModel = {
     require(
-        oldModel.algo == OldAlgo.Regression,
-        s"Cannot convert non-regression DecisionTreeModel (old API) to" +
-        s" DecisionTreeRegressionModel (new API).  Algo is: ${oldModel.algo}")
+      oldModel.algo == OldAlgo.Regression,
+      s"Cannot convert non-regression DecisionTreeModel (old API) to" +
+        s" DecisionTreeRegressionModel (new API).  Algo is: ${oldModel.algo}"
+    )
     val rootNode = Node.fromOld(oldModel.topNode, categoricalFeatures)
     val uid = if (parent != null) parent.uid else Identifiable.randomUID("dtr")
     new DecisionTreeRegressionModel(uid, rootNode, numFeatures)

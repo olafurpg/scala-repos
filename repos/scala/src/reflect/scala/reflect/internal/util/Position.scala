@@ -10,7 +10,8 @@ package util
 
 /** @inheritdoc */
 class Position
-    extends scala.reflect.api.Position with InternalPositionImpl
+    extends scala.reflect.api.Position
+    with InternalPositionImpl
     with DeprecatedPosition {
   type Pos = Position
   def pos: Position = this
@@ -42,12 +43,14 @@ object Position {
 
   /** Prints the message with the given position indication. */
   def formatMessage(
-      posIn: Position, msg: String, shortenFile: Boolean): String = {
+      posIn: Position,
+      msg: String,
+      shortenFile: Boolean): String = {
     val pos = if (posIn eq null) NoPosition else posIn
     val prefix = pos.source match {
-      case NoSourceFile => ""
+      case NoSourceFile     => ""
       case s if shortenFile => s.file.name + ":"
-      case s => s.file.path + ":"
+      case s                => s.file.path + ":"
     }
     prefix + (pos showError msg)
   }
@@ -57,7 +60,10 @@ object Position {
   def range(source: SourceFile, start: Int, point: Int, end: Int): Position =
     validate(new RangePosition(source, start, point, end))
   def transparent(
-      source: SourceFile, start: Int, point: Int, end: Int): Position =
+      source: SourceFile,
+      start: Int,
+      point: Int,
+      end: Int): Position =
     validate(new TransparentPosition(source, start, point, end))
 }
 
@@ -70,14 +76,20 @@ class OffsetPosition(sourceIn: SourceFile, pointIn: Int)
   override def end = point
 }
 class RangePosition(
-    sourceIn: SourceFile, startIn: Int, pointIn: Int, endIn: Int)
+    sourceIn: SourceFile,
+    startIn: Int,
+    pointIn: Int,
+    endIn: Int)
     extends OffsetPosition(sourceIn, pointIn) {
   override def isRange = true
   override def start = startIn
   override def end = endIn
 }
 class TransparentPosition(
-    sourceIn: SourceFile, startIn: Int, pointIn: Int, endIn: Int)
+    sourceIn: SourceFile,
+    startIn: Int,
+    pointIn: Int,
+    endIn: Int)
     extends RangePosition(sourceIn, startIn, pointIn, endIn) {
   override def isTransparent = true
 }
@@ -91,7 +103,7 @@ sealed abstract class DefinedPosition extends Position {
   override def equals(that: Any) = that match {
     case that: DefinedPosition =>
       source.file == that.source.file && start == that.start &&
-      point == that.point && end == that.end
+        point == that.point && end == that.end
     case _ => false
   }
   override def hashCode = Seq[Any](source.file, start, point, end).##
@@ -167,12 +179,11 @@ private[util] trait InternalPositionImpl { self: Position =>
   def |^(that: Position): Position = (this | that) ^ that.point
   def ^|(that: Position): Position = (this | that) ^ this.point
 
-  def union(pos: Position): Position = (if (!pos.isRange) this
-                                        else if (this.isRange)
-                                          copyRange(
-                                              start = start min pos.start,
-                                              end = end max pos.end)
-                                        else pos)
+  def union(pos: Position): Position =
+    (if (!pos.isRange) this
+     else if (this.isRange)
+       copyRange(start = start min pos.start, end = end max pos.end)
+     else pos)
 
   def includes(pos: Position): Boolean =
     isRange && pos.isDefined && start <= pos.start && pos.end <= end
@@ -215,21 +226,23 @@ private[util] trait InternalPositionImpl { self: Position =>
     }
     finalPosition match {
       case FakePos(fmsg) => s"$fmsg $msg"
-      case NoPosition => msg
-      case pos => errorAt(pos)
+      case NoPosition    => msg
+      case pos           => errorAt(pos)
     }
   }
   def showDebug: String = toString
-  def show = (if (isOpaqueRange) s"[$start:$end]"
-              else if (isTransparent) s"<$start:$end>"
-              else if (isDefined) s"[$point]"
-              else "[NoPosition]")
+  def show =
+    (if (isOpaqueRange) s"[$start:$end]"
+     else if (isTransparent) s"<$start:$end>"
+     else if (isDefined) s"[$point]"
+     else "[NoPosition]")
 
   private def asOffset(point: Int): Position = Position.offset(source, point)
-  private def copyRange(source: SourceFile = source,
-                        start: Int = start,
-                        point: Int = point,
-                        end: Int = end): Position =
+  private def copyRange(
+      source: SourceFile = source,
+      start: Int = start,
+      point: Int = point,
+      end: Int = end): Position =
     Position.range(source, start, point, end)
 
   private def calculateColumn(): Int = {
@@ -237,8 +250,9 @@ private[util] trait InternalPositionImpl { self: Position =>
     var col = 0
     while (idx != point) {
       col +=
-      (if (source.content(idx) == '\t') Position.tabInc - col % Position.tabInc
-       else 1)
+        (if (source.content(idx) == '\t')
+           Position.tabInc - col % Position.tabInc
+         else 1)
       idx += 1
     }
     col + 1

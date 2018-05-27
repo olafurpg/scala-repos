@@ -44,8 +44,9 @@ object JavaRouting extends Specification {
     }
     "support default values for parameters" in {
       contentOf(FakeRequest("GET", "/clients"), classOf[defaultvalue.Routes]) must_== "clients page 1"
-      contentOf(FakeRequest("GET", "/clients?page=2"),
-                classOf[defaultvalue.Routes]) must_== "clients page 2"
+      contentOf(
+        FakeRequest("GET", "/clients?page=2"),
+        classOf[defaultvalue.Routes]) must_== "clients page 2"
     }
     "support optional values for parameters" in {
       contentOf(FakeRequest("GET", "/api/list-all")) must_== "version null"
@@ -57,14 +58,15 @@ object JavaRouting extends Specification {
         header("Location", call(new MockJavaAction {
           override def invocation =
             F.Promise.pure(
-                new javaguide.http.routing.controllers.Application().index())
+              new javaguide.http.routing.controllers.Application().index())
         }, FakeRequest())) must beSome("/hello/Bob")
       }
     }
   }
 
   def contentOf(
-      rh: RequestHeader, router: Class[_ <: Router] = classOf[Routes]) = {
+      rh: RequestHeader,
+      router: Class[_ <: Router] = classOf[Routes]) = {
     running(_.configure("play.http.router" -> router.getName)) { app =>
       implicit val mat = ActorMaterializer()(app.actorSystem)
       contentAsString(app.requestHandler.handlerForRequest(rh)._2 match {

@@ -89,22 +89,23 @@ private[http] trait LiftMerge { self: LiftSession =>
     waitUntilSnippetsDone()
 
     val processedSnippets: Map[String, NodeSeq] = Map(
-        snippetHashs.toList.flatMap {
-      case (name, Full(value)) => List((name, value))
-      case (name, f: Failure) =>
-        List((name, LiftRules.deferredSnippetFailure.vend(f)))
-      case (name, Empty) => List((name, LiftRules.deferredSnippetTimeout.vend))
-      case _ => Nil
-    }: _*)
+      snippetHashs.toList.flatMap {
+        case (name, Full(value)) => List((name, value))
+        case (name, f: Failure) =>
+          List((name, LiftRules.deferredSnippetFailure.vend(f)))
+        case (name, Empty) =>
+          List((name, LiftRules.deferredSnippetTimeout.vend))
+        case _ => Nil
+      }: _*)
 
     val hasHtmlHeadAndBody: Boolean = xhtml.find {
       case e: Elem if e.label == "html" =>
         e.child.find {
           case e: Elem if e.label == "head" => true
-          case _ => false
+          case _                            => false
         }.isDefined && e.child.find {
           case e: Elem if e.label == "body" => true
-          case _ => false
+          case _                            => false
         }.isDefined
       case _ => false
     }.isDefined
@@ -124,14 +125,16 @@ private[http] trait LiftMerge { self: LiftSession =>
     val contextPath: String = S.contextPath
 
     def normalizeMergeAndExtractEvents(
-        nodes: NodeSeq, startingState: HtmlState): NodesAndEventJs = {
-      val HtmlState(htmlDescendant,
-                    headChild,
-                    bodyDescendant,
-                    headInBodyChild,
-                    tailInBodyChild,
-                    _bodyChild,
-                    mergeHeadAndTail) = startingState
+        nodes: NodeSeq,
+        startingState: HtmlState): NodesAndEventJs = {
+      val HtmlState(
+        htmlDescendant,
+        headChild,
+        bodyDescendant,
+        headInBodyChild,
+        tailInBodyChild,
+        _bodyChild,
+        mergeHeadAndTail) = startingState
 
       nodes.foldLeft(NodesAndEventJs(Vector[Node](), Noop)) {
         case (soFar, node) =>
@@ -143,34 +146,36 @@ private[http] trait LiftMerge { self: LiftSession =>
 
             case element: Elem
                 if element.label == "head" && htmlDescendant &&
-                !bodyDescendant =>
+                  !bodyDescendant =>
               headElement = element
 
               startingState.copy(headChild = true && mergeHeadAndTail)
 
             case element: Elem
                 if mergeHeadAndTail &&
-                (element.label == "head" ||
+                  (element.label == "head" ||
                     element.label.startsWith("head_")) && htmlDescendant &&
-                bodyDescendant =>
+                  bodyDescendant =>
               startingState.copy(headInBodyChild = true)
 
             case element: Elem
                 if mergeHeadAndTail && element.label == "tail" &&
-                htmlDescendant && bodyDescendant =>
+                  htmlDescendant && bodyDescendant =>
               startingState.copy(tailInBodyChild = true)
 
             case element: Elem if element.label == "body" && htmlDescendant =>
               bodyElement = element
 
-              startingState.copy(bodyDescendant = true && mergeHeadAndTail,
-                                 bodyChild = true && mergeHeadAndTail)
+              startingState.copy(
+                bodyDescendant = true && mergeHeadAndTail,
+                bodyChild = true && mergeHeadAndTail)
 
             case _ =>
-              startingState.copy(headChild = false,
-                                 headInBodyChild = false,
-                                 tailInBodyChild = false,
-                                 bodyChild = false)
+              startingState.copy(
+                headChild = false,
+                headInBodyChild = false,
+                tailInBodyChild = false,
+                bodyChild = false)
           }
 
           val bodyHead = childInfo.headInBodyChild && !headInBodyChild
@@ -181,11 +186,12 @@ private[http] trait LiftMerge { self: LiftSession =>
             .map {
               case normalized @ NodeAndEventJs(normalizedElement: Elem, _) =>
                 val normalizedChildren = normalizeMergeAndExtractEvents(
-                    normalizedElement.child, childInfo)
+                  normalizedElement.child,
+                  childInfo)
 
                 normalized.copy(
-                    normalizedElement.copy(child = normalizedChildren.nodes),
-                    js = normalized.js & normalizedChildren.js
+                  normalizedElement.copy(child = normalizedChildren.nodes),
+                  js = normalized.js & normalizedChildren.js
                 )
 
               case other =>
@@ -204,7 +210,7 @@ private[http] trait LiftMerge { self: LiftSession =>
                   }
 
                   deferredNodes.foldLeft(soFar.append(normalizedResults))(
-                      _ append _)
+                    _ append _)
 
                 case _ =>
                   if (headChild) {
@@ -231,15 +237,17 @@ private[http] trait LiftMerge { self: LiftSession =>
 
     if (!hasHtmlHeadAndBody) {
       val fixedHtml = normalizeMergeAndExtractEvents(
-          xhtml, HtmlState(mergeHeadAndTail = false)).nodes
+        xhtml,
+        HtmlState(mergeHeadAndTail = false)).nodes
 
       fixedHtml.find {
         case e: Elem => true
-        case _ => false
+        case _       => false
       } getOrElse Text("")
     } else {
       val eventJs = normalizeMergeAndExtractEvents(
-          xhtml, HtmlState(mergeHeadAndTail = true)).js
+        xhtml,
+        HtmlState(mergeHeadAndTail = true)).js
 
       val htmlKids = new ListBuffer[Node]
 
@@ -275,11 +283,12 @@ private[http] trait LiftMerge { self: LiftSession =>
       val bodyAttributes: List[(String, String)] =
         if (stateful_? && (autoIncludeComet || LiftRules.enableLiftGC)) {
           ("data-lift-gc" -> RenderVersion.get) ::
-          (if (autoIncludeComet) {
-             ("data-lift-session-id" -> (S.session.map(_.uniqueId) openOr "xx")) :: S.requestCometVersions.is.toList.map {
-               case CometVersionPair(guid, version) =>
-                 (s"data-lift-comet-$guid" -> version.toString)
-             }
+            (if (autoIncludeComet) {
+             ("data-lift-session-id" -> (S.session.map(_.uniqueId) openOr "xx")) :: S.requestCometVersions.is.toList
+               .map {
+                 case CometVersionPair(guid, version) =>
+                   (s"data-lift-comet-$guid" -> version.toString)
+               }
            } else {
              Nil
            })
@@ -291,25 +300,26 @@ private[http] trait LiftMerge { self: LiftSession =>
       htmlKids += headElement.copy(child = headChildren.toList)
       htmlKids += nl
       htmlKids += bodyAttributes.foldLeft(
-          bodyElement.copy(child = bodyChildren.toList))(_ % _)
+        bodyElement.copy(child = bodyChildren.toList))(_ % _)
       htmlKids += nl
 
-      val tmpRet = Elem(htmlElement.prefix,
-                        htmlElement.label,
-                        htmlElement.attributes,
-                        htmlElement.scope,
-                        htmlElement.minimizeEmpty,
-                        htmlKids.toList: _*)
+      val tmpRet = Elem(
+        htmlElement.prefix,
+        htmlElement.label,
+        htmlElement.attributes,
+        htmlElement.scope,
+        htmlElement.minimizeEmpty,
+        htmlKids.toList: _*)
 
       val ret: Node =
         if (Props.devMode) {
-          LiftRules.xhtmlValidator.toList.flatMap(_ (tmpRet)) match {
+          LiftRules.xhtmlValidator.toList.flatMap(_(tmpRet)) match {
             case Nil => tmpRet
             case xs =>
               import scala.xml.transform._
 
               val errors: NodeSeq = xs.map(e =>
-                    <div style="border: red solid 2px">XHTML Validation error:{e.msg}at line{e.line + 1}and column{e.col}</div>)
+                <div style="border: red solid 2px">XHTML Validation error:{e.msg}at line{e.line + 1}and column{e.col}</div>)
 
               val rule = new RewriteRule {
                 override def transform(n: Node) = n match {

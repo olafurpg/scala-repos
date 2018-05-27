@@ -67,8 +67,7 @@ class WeakEventHandler[T <: jfxe.Event](
     * @param eventHandler The original event handler to which to forward event notifications
     */
   def this(eventHandler: (T) => Unit) =
-    this(
-        new jfxe.WeakEventHandler[T](new jfxe.EventHandler[T] {
+    this(new jfxe.WeakEventHandler[T](new jfxe.EventHandler[T] {
       def handle(event: T) = eventHandler(event)
     }))
 

@@ -55,7 +55,7 @@ object EventSource {
     * @tparam E from type of the Enumeratee
     */
   @deprecated("Use apply with an Akka source instead", "2.5.0")
-  def apply[E : EventDataExtractor : EventNameExtractor : EventIdExtractor](
+  def apply[E: EventDataExtractor: EventNameExtractor: EventIdExtractor](
       ): Enumeratee[E, Event] =
     Enumeratee.map[E] { e =>
       Event(e)
@@ -71,9 +71,8 @@ object EventSource {
     *   Ok.chunked(jsonStream via EventSource.flow).as(ContentTypes.EVENT_STREAM)
     * }}}
     */
-  def flow[
-      E : EventDataExtractor : EventNameExtractor : EventIdExtractor]: Flow[
-      E, Event, _] = {
+  def flow[E: EventDataExtractor: EventNameExtractor: EventIdExtractor]
+    : Flow[E, Event, _] = {
     Flow[E].map(Event(_))
   }
 
@@ -111,12 +110,14 @@ object EventSource {
       * and the nameExtractor and idExtractor will implicitly resolve to `None`.
       *
       */
-    def apply[A](a: A)(implicit dataExtractor: EventDataExtractor[A],
-                       nameExtractor: EventNameExtractor[A],
-                       idExtractor: EventIdExtractor[A]): Event = {
-      Event(dataExtractor.eventData(a),
-            idExtractor.eventId(a),
-            nameExtractor.eventName(a))
+    def apply[A](a: A)(
+        implicit dataExtractor: EventDataExtractor[A],
+        nameExtractor: EventNameExtractor[A],
+        idExtractor: EventIdExtractor[A]): Event = {
+      Event(
+        dataExtractor.eventData(a),
+        idExtractor.eventId(a),
+        nameExtractor.eventName(a))
     }
 
     implicit def writeable(implicit codec: Codec): Writeable[Event] = {
@@ -136,10 +137,10 @@ object EventSource {
 
   trait LowPriorityEventEncoder {
     implicit val stringEvents: EventDataExtractor[String] = EventDataExtractor(
-        identity)
+      identity)
 
     implicit val jsonEvents: EventDataExtractor[JsValue] = EventDataExtractor(
-        Json.stringify)
+      Json.stringify)
   }
 
   object EventDataExtractor extends LowPriorityEventEncoder

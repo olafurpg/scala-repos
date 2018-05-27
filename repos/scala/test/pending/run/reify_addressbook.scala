@@ -47,7 +47,9 @@ object Test extends App {
       </head>;
 
     val people = new AddressBook(
-        Person("Tom", 20), Person("Bob", 22), Person("James", 19));
+      Person("Tom", 20),
+      Person("Bob", 22),
+      Person("James", 19));
 
     val page = <html>
         { header }

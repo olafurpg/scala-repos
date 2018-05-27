@@ -114,7 +114,8 @@ object Test extends App {
   testOnFailure()
   testOnFailureWhenSpecialThrowable(5, new Error)
   testOnFailureWhenSpecialThrowable(
-      6, new scala.util.control.ControlThrowable {})
+    6,
+    new scala.util.control.ControlThrowable {})
   testOnFailureWhenSpecialThrowable(7, new InterruptedException)
   // testOnFailureWhenFutureTimeoutException()
 }

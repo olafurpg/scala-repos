@@ -31,8 +31,8 @@ import org.apache.spark.rdd.RDD
 @Since("1.4.0")
 class PCA @Since("1.4.0")(@Since("1.4.0") val k: Int) {
   require(
-      k >= 1,
-      s"PCA requires a number of principal components k >= 1 but was given $k")
+    k >= 1,
+    s"PCA requires a number of principal components k >= 1 but was given $k")
 
   /**
     * Computes a [[PCAModel]] that contains the principal components of the input vectors.
@@ -42,8 +42,8 @@ class PCA @Since("1.4.0")(@Since("1.4.0") val k: Int) {
   @Since("1.4.0")
   def fit(sources: RDD[Vector]): PCAModel = {
     require(
-        k <= sources.first().size,
-        s"source vector size is ${sources.first().size} must be greater than k=$k")
+      k <= sources.first().size,
+      s"source vector size is ${sources.first().size} must be greater than k=$k")
 
     val mat = new RowMatrix(sources)
     val (pc, explainedVariance) =
@@ -60,7 +60,7 @@ class PCA @Since("1.4.0")(@Since("1.4.0") val k: Int) {
         sm.toDense
       case m =>
         throw new IllegalArgumentException(
-            "Unsupported matrix format. Expected " +
+          "Unsupported matrix format. Expected " +
             s"SparseMatrix or DenseMatrix. Instead got: ${m.getClass}")
     }
     val denseExplainedVariance = explainedVariance match {
@@ -86,7 +86,7 @@ class PCA @Since("1.4.0")(@Since("1.4.0") val k: Int) {
   * @param pc a principal components Matrix. Each column is one principal component.
   */
 @Since("1.4.0")
-class PCAModel private[spark](
+class PCAModel private[spark] (
     @Since("1.4.0") val k: Int,
     @Since("1.4.0") val pc: DenseMatrix,
     @Since("1.6.0") val explainedVariance: DenseVector)
@@ -113,7 +113,7 @@ class PCAModel private[spark](
         Vectors.dense(projection.values)
       case _ =>
         throw new IllegalArgumentException(
-            "Unsupported vector format. Expected " +
+          "Unsupported vector format. Expected " +
             s"SparseVector or DenseVector. Instead got: ${vector.getClass}")
     }
   }

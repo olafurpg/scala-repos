@@ -36,7 +36,8 @@ private[streams] object IterateeSubscriber {
     * @param result A Promise of the eventual result of this Subscriber.
     */
   case class SubscribedNoStep[T, R](
-      subs: Subscription, result: Promise[Iteratee[T, R]])
+      subs: Subscription,
+      result: Promise[Iteratee[T, R]])
       extends State[T, R]
 
   /**
@@ -47,7 +48,8 @@ private[streams] object IterateeSubscriber {
     * @param result A Promise of the eventual result of this Subscriber.
     */
   case class NotSubscribedWithCont[T, R](
-      cont: Step.Cont[T, R], result: Promise[Iteratee[T, R]])
+      cont: Step.Cont[T, R],
+      result: Promise[Iteratee[T, R]])
       extends State[T, R]
 
   /**
@@ -59,9 +61,10 @@ private[streams] object IterateeSubscriber {
     * @param cont The current Step of the Iteratee.
     * @param result A Promise of the eventual result of this Subscriber.
     */
-  case class SubscribedWithCont[T, R](subs: Subscription,
-                                      cont: Step.Cont[T, R],
-                                      result: Promise[Iteratee[T, R]])
+  case class SubscribedWithCont[T, R](
+      subs: Subscription,
+      cont: Step.Cont[T, R],
+      result: Promise[Iteratee[T, R]])
       extends State[T, R]
 
   /**
@@ -87,7 +90,7 @@ import IterateeSubscriber._
 
 private[streams] class IterateeSubscriber[T, R, S](iter0: Iteratee[T, R])
     extends StateMachine[State[T, R]](
-        initialState = NotSubscribedNoStep(Promise[Iteratee[T, R]]()))
+      initialState = NotSubscribedNoStep(Promise[Iteratee[T, R]]()))
     with Subscriber[T] {
 
   // We immediately fold on the iteratee
@@ -175,10 +178,11 @@ private[streams] class IterateeSubscriber[T, R, S](iter0: Iteratee[T, R])
       ()
   }
 
-  private def continueWithNext(subs: Subscription,
-                               cont: Step.Cont[T, R],
-                               element: T,
-                               result: Promise[Iteratee[T, R]]): Unit = {
+  private def continueWithNext(
+      subs: Subscription,
+      cont: Step.Cont[T, R],
+      element: T,
+      result: Promise[Iteratee[T, R]]): Unit = {
     val nextIteratee = cont.k(Input.El(element))
     getNextStepFromIteratee(nextIteratee)
     state = SubscribedNoStep(subs, result)
@@ -232,8 +236,8 @@ private[streams] class IterateeSubscriber[T, R, S](iter0: Iteratee[T, R])
     */
   private def getNextStepFromIteratee(iter: Iteratee[T, R]): Unit = {
     iter.pureFold {
-      case c @ Step.Cont(_) => onContStep(c)
-      case d @ Step.Done(_, _) => onDoneOrErrorStep(d)
+      case c @ Step.Cont(_)     => onContStep(c)
+      case d @ Step.Done(_, _)  => onDoneOrErrorStep(d)
       case e @ Step.Error(_, _) => onDoneOrErrorStep(e)
     }(Execution.trampoline)
   }
@@ -247,7 +251,8 @@ private[streams] class IterateeSubscriber[T, R, S](iter0: Iteratee[T, R])
     * has been called. This is done by feeding EOF to the Cont Iteratee.
     */
   private def finishWithCompletedCont(
-      cont: Step.Cont[T, R], result: Promise[Iteratee[T, R]]): Unit = {
+      cont: Step.Cont[T, R],
+      result: Promise[Iteratee[T, R]]): Unit = {
     val nextIteratee = cont.k(Input.EOF)
     result.success(nextIteratee)
     state = Finished(nextIteratee)
@@ -258,7 +263,8 @@ private[streams] class IterateeSubscriber[T, R, S](iter0: Iteratee[T, R])
     * setting the Iteratee Future to an failed state.
     */
   private def finishWithError(
-      cause: Throwable, result: Promise[Iteratee[T, R]]): Unit = {
+      cause: Throwable,
+      result: Promise[Iteratee[T, R]]): Unit = {
     result.failure(cause)
     state = Finished(promiseToIteratee(result))
   }
@@ -268,7 +274,8 @@ private[streams] class IterateeSubscriber[T, R, S](iter0: Iteratee[T, R])
     * setting the result to the Step's iteratee.
     */
   private def finishWithDoneOrErrorStep(
-      step: Step[T, R], result: Promise[Iteratee[T, R]]): Unit = {
+      step: Step[T, R],
+      result: Promise[Iteratee[T, R]]): Unit = {
     val nextIteratee = step.it
     result.success(nextIteratee)
     state = Finished(nextIteratee)

@@ -16,8 +16,20 @@
 
 package com.twitter.summingbird.scalding
 
-import com.twitter.algebird.{InclusiveUpper, Intersection, Interval, ExclusiveUpper}
-import com.twitter.summingbird.batch.{Batcher, BatchID, PrepareState, RunningState, Timestamp, WaitingState}
+import com.twitter.algebird.{
+  InclusiveUpper,
+  Intersection,
+  Interval,
+  ExclusiveUpper
+}
+import com.twitter.summingbird.batch.{
+  Batcher,
+  BatchID,
+  PrepareState,
+  RunningState,
+  Timestamp,
+  WaitingState
+}
 import com.twitter.summingbird.batch.store.HDFSMetadata
 
 import org.slf4j.LoggerFactory
@@ -34,8 +46,9 @@ private[scalding] object VersionedState {
 }
 
 private[scalding] class VersionedState(
-    meta: HDFSMetadata, startDate: Option[Timestamp], maxBatches: Int)(
-    implicit batcher: Batcher)
+    meta: HDFSMetadata,
+    startDate: Option[Timestamp],
+    maxBatches: Int)(implicit batcher: Batcher)
     extends WaitingState[Interval[Timestamp]] { outer =>
 
   private val logger = LoggerFactory.getLogger(classOf[VersionedState])
@@ -45,19 +58,22 @@ private[scalding] class VersionedState(
   private class VersionedPrepareState
       extends PrepareState[Interval[Timestamp]] {
     def newestCompleted: Option[BatchID] =
-      meta.versions.map { vers =>
-        val thisMeta = meta(vers)
-        thisMeta.get[String].flatMap { str =>
-          ScalaTry(BatchID(str))
-        } match {
-          case Success(batchID) => Some(batchID)
-          case Failure(ex) =>
-            logger.warn(
+      meta.versions
+        .map { vers =>
+          val thisMeta = meta(vers)
+          thisMeta.get[String].flatMap { str =>
+            ScalaTry(BatchID(str))
+          } match {
+            case Success(batchID) => Some(batchID)
+            case Failure(ex) =>
+              logger.warn(
                 "Path: {} missing or corrupt completion file. Ignoring and trying previous",
                 thisMeta.path)
-            None
+              None
+          }
         }
-      }.flatten.headOption
+        .flatten
+        .headOption
 
     /**
       * Returns a date interval spanning from the beginning of the the
@@ -73,8 +89,8 @@ private[scalding] class VersionedState(
       val end = beginning + maxBatches
       Interval
         .leftClosedRightOpen(
-            batcher.earliestTimeOf(beginning),
-            batcher.earliestTimeOf(end)
+          batcher.earliestTimeOf(beginning),
+          batcher.earliestTimeOf(end)
         )
         .right
         .get
@@ -85,9 +101,9 @@ private[scalding] class VersionedState(
         case intr @ Intersection(_, _) => // is finite:
           Right(new VersionedRunningState(intr))
         case _ => {
-            logger.info("Will not accept: %s".format(available))
-            Left(outer)
-          }
+          logger.info("Will not accept: %s".format(available))
+          Left(outer)
+        }
       }
 
     /**
@@ -108,7 +124,7 @@ private[scalding] class VersionedState(
     def nextTime: Timestamp = succeedPart match {
       case Intersection(_, ExclusiveUpper(up)) => up
       case Intersection(_, InclusiveUpper(up)) => up.next
-      case _ => sys.error("We should always be running for a finite interval")
+      case _                                   => sys.error("We should always be running for a finite interval")
     }
     def batchID: BatchID = batcher.batchOf(nextTime)
 

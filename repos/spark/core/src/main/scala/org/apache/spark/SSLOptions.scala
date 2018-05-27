@@ -66,14 +66,14 @@ private[spark] case class SSLOptions(
     if (enabled) {
       val sslContextFactory = new SslContextFactory()
 
-      keyStore.foreach(
-          file => sslContextFactory.setKeyStorePath(file.getAbsolutePath))
+      keyStore.foreach(file =>
+        sslContextFactory.setKeyStorePath(file.getAbsolutePath))
       keyStorePassword.foreach(sslContextFactory.setKeyStorePassword)
       keyPassword.foreach(sslContextFactory.setKeyManagerPassword)
       keyStoreType.foreach(sslContextFactory.setKeyStoreType)
       if (needClientAuth) {
-        trustStore.foreach(
-            file => sslContextFactory.setTrustStore(file.getAbsolutePath))
+        trustStore.foreach(file =>
+          sslContextFactory.setTrustStore(file.getAbsolutePath))
         trustStorePassword.foreach(sslContextFactory.setTrustStorePassword)
         trustStoreType.foreach(sslContextFactory.setTrustStoreType)
       }
@@ -120,18 +120,19 @@ private[spark] case class SSLOptions(
       }
 
       val supported = enabledAlgorithms & providerAlgorithms
-      require(supported.nonEmpty || sys.env.contains("SPARK_TESTING"),
-              "SSLContext does not support any of the enabled algorithms: " +
-              enabledAlgorithms.mkString(","))
+      require(
+        supported.nonEmpty || sys.env.contains("SPARK_TESTING"),
+        "SSLContext does not support any of the enabled algorithms: " +
+          enabledAlgorithms.mkString(","))
       supported
     }
 
   /** Returns a string representation of this SSLOptions with all the passwords masked. */
   override def toString: String =
     s"SSLOptions{enabled=$enabled, " +
-    s"keyStore=$keyStore, keyStorePassword=${keyStorePassword.map(_ => "xxx")}, " +
-    s"trustStore=$trustStore, trustStorePassword=${trustStorePassword.map(_ => "xxx")}, " +
-    s"protocol=$protocol, enabledAlgorithms=$enabledAlgorithms}"
+      s"keyStore=$keyStore, keyStorePassword=${keyStorePassword.map(_ => "xxx")}, " +
+      s"trustStore=$trustStore, trustStorePassword=${trustStorePassword.map(_ => "xxx")}, " +
+      s"protocol=$protocol, enabledAlgorithms=$enabledAlgorithms}"
 }
 
 private[spark] object SSLOptions extends Logging {
@@ -164,11 +165,12 @@ private[spark] object SSLOptions extends Logging {
     * @param defaults the default configuration
     * @return [[org.apache.spark.SSLOptions]] object
     */
-  def parse(conf: SparkConf,
-            ns: String,
-            defaults: Option[SSLOptions] = None): SSLOptions = {
-    val enabled = conf.getBoolean(
-        s"$ns.enabled", defaultValue = defaults.exists(_.enabled))
+  def parse(
+      conf: SparkConf,
+      ns: String,
+      defaults: Option[SSLOptions] = None): SSLOptions = {
+    val enabled =
+      conf.getBoolean(s"$ns.enabled", defaultValue = defaults.exists(_.enabled))
 
     val keyStore = conf
       .getOption(s"$ns.keyStore")
@@ -188,8 +190,8 @@ private[spark] object SSLOptions extends Logging {
       .orElse(defaults.flatMap(_.keyStoreType))
 
     val needClientAuth = conf.getBoolean(
-        s"$ns.needClientAuth",
-        defaultValue = defaults.exists(_.needClientAuth))
+      s"$ns.needClientAuth",
+      defaultValue = defaults.exists(_.needClientAuth))
 
     val trustStore = conf
       .getOption(s"$ns.trustStore")
@@ -213,16 +215,17 @@ private[spark] object SSLOptions extends Logging {
       .orElse(defaults.map(_.enabledAlgorithms))
       .getOrElse(Set.empty)
 
-    new SSLOptions(enabled,
-                   keyStore,
-                   keyStorePassword,
-                   keyPassword,
-                   keyStoreType,
-                   needClientAuth,
-                   trustStore,
-                   trustStorePassword,
-                   trustStoreType,
-                   protocol,
-                   enabledAlgorithms)
+    new SSLOptions(
+      enabled,
+      keyStore,
+      keyStorePassword,
+      keyPassword,
+      keyStoreType,
+      needClientAuth,
+      trustStore,
+      trustStorePassword,
+      trustStoreType,
+      protocol,
+      enabledAlgorithms)
   }
 }

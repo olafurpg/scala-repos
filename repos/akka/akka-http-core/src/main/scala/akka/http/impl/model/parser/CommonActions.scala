@@ -9,13 +9,14 @@ import MediaTypes._
 
 private[parser] trait CommonActions {
 
-  type StringMapBuilder = scala.collection.mutable.Builder[
-      (String, String), Map[String, String]]
+  type StringMapBuilder =
+    scala.collection.mutable.Builder[(String, String), Map[String, String]]
 
-  def getMediaType(mainType: String,
-                   subType: String,
-                   charsetDefined: Boolean,
-                   params: Map[String, String]): MediaType = {
+  def getMediaType(
+      mainType: String,
+      subType: String,
+      charsetDefined: Boolean,
+      params: Map[String, String]): MediaType = {
     val subLower = subType.toRootLowerCase
     mainType.toRootLowerCase match {
       case "multipart" ⇒
@@ -34,16 +35,18 @@ private[parser] trait CommonActions {
             if (params.isEmpty) registered else registered.withParams(params)
           case None ⇒
             if (charsetDefined)
-              MediaType.customWithOpenCharset(mainLower,
-                                              subType,
-                                              params = params,
-                                              allowArbitrarySubtypes = true)
+              MediaType.customWithOpenCharset(
+                mainLower,
+                subType,
+                params = params,
+                allowArbitrarySubtypes = true)
             else
-              MediaType.customBinary(mainLower,
-                                     subType,
-                                     MediaType.Compressible,
-                                     params = params,
-                                     allowArbitrarySubtypes = true)
+              MediaType.customBinary(
+                mainLower,
+                subType,
+                MediaType.Compressible,
+                params = params,
+                allowArbitrarySubtypes = true)
         }
     }
   }

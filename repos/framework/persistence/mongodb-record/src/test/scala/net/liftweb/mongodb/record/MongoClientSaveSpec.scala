@@ -30,7 +30,8 @@ package mongoclientsaverecords {
   import field._
 
   class SaveDoc private ()
-      extends MongoRecord[SaveDoc] with ObjectIdPk[SaveDoc] {
+      extends MongoRecord[SaveDoc]
+      with ObjectIdPk[SaveDoc] {
     def meta = SaveDoc
 
     object name extends StringField(this, 12)

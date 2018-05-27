@@ -7,8 +7,16 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.{PsiClass, PsiElement, PsiElementVisitor}
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScConstructor
-import org.jetbrains.plugins.scala.lang.psi.api.base.types.{ScFunctionalTypeElement, ScInfixTypeElement, ScParameterizedTypeElement, ScSimpleTypeElement}
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{ScClassParents, ScTraitParents}
+import org.jetbrains.plugins.scala.lang.psi.api.base.types.{
+  ScFunctionalTypeElement,
+  ScInfixTypeElement,
+  ScParameterizedTypeElement,
+  ScSimpleTypeElement
+}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.{
+  ScClassParents,
+  ScTraitParents
+}
 import org.jetbrains.plugins.scala.lang.psi.api.{ScalaElementVisitor, ScalaFile}
 import org.jetbrains.plugins.scala.lang.psi.{ScalaPsiElement, ScalaPsiUtil}
 
@@ -18,14 +26,15 @@ class FunctionTupleSyntacticSugarInspection extends LocalInspectionTool {
   override def getID: String = "ScalaSyntacticSugar"
 
   override def buildVisitor(
-      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
+      holder: ProblemsHolder,
+      isOnTheFly: Boolean): PsiElementVisitor = {
     if (!holder.getFile.isInstanceOf[ScalaFile])
       return new PsiElementVisitor {}
 
     object QualifiedName {
       def unapply(p: PsiElement): Option[String] = p match {
         case x: PsiClass => Some(x.qualifiedName)
-        case _ => None
+        case _           => None
       }
     }
 
@@ -46,22 +55,22 @@ class FunctionTupleSyntacticSugarInspection extends LocalInspectionTool {
                         case Some(QualifiedName(FunctionN(n)))
                             if te.typeArgList.typeArgs.length == (n.toInt + 1) =>
                           holder.registerProblem(
-                              holder.getManager.createProblemDescriptor(
-                                  te,
-                                  "syntactic sugar could be used",
-                                  new FunctionTypeSyntacticSugarQuickFix(te),
-                                  ProblemHighlightType.WEAK_WARNING,
-                                  false))
+                            holder.getManager.createProblemDescriptor(
+                              te,
+                              "syntactic sugar could be used",
+                              new FunctionTypeSyntacticSugarQuickFix(te),
+                              ProblemHighlightType.WEAK_WARNING,
+                              false))
                         case Some(QualifiedName(TupleN(n)))
                             if (te.typeArgList.typeArgs.length == n.toInt) &&
-                            n.toInt != 1 =>
+                              n.toInt != 1 =>
                           holder.registerProblem(
-                              holder.getManager.createProblemDescriptor(
-                                  te,
-                                  "syntactic sugar could be used",
-                                  new TupleTypeSyntacticSugarQuickFix(te),
-                                  ProblemHighlightType.WEAK_WARNING,
-                                  false))
+                            holder.getManager.createProblemDescriptor(
+                              te,
+                              "syntactic sugar could be used",
+                              new TupleTypeSyntacticSugarQuickFix(te),
+                              ProblemHighlightType.WEAK_WARNING,
+                              false))
                         case _ =>
                       }
                     }
@@ -85,7 +94,8 @@ object FunctionTupleSyntacticSugarInspection {
 
   class TupleTypeSyntacticSugarQuickFix(te: ScParameterizedTypeElement)
       extends AbstractFixOnPsiElement(
-          ScalaBundle.message("replace.tuple.type"), te) {
+        ScalaBundle.message("replace.tuple.type"),
+        te) {
     def doApplyFix(project: Project): Unit = {
       val typeElement = getElement
 
@@ -98,14 +108,15 @@ object FunctionTupleSyntacticSugarInspection {
         ("(" + typeElement.typeArgList.getText.drop(1).dropRight(1) + ")")
           .parenthesisedIf(needParens)
       }
-      typeElement.replace(createTypeElementFromText(
-              typeTextWithParens, typeElement.getManager))
+      typeElement.replace(
+        createTypeElementFromText(typeTextWithParens, typeElement.getManager))
     }
   }
 
   class FunctionTypeSyntacticSugarQuickFix(te: ScParameterizedTypeElement)
       extends AbstractFixOnPsiElement(
-          ScalaBundle.message("replace.fun.type"), te) {
+        ScalaBundle.message("replace.fun.type"),
+        te) {
     def doApplyFix(project: Project): Unit = {
       val typeElement = getElement
       val paramTypes = typeElement.typeArgList.typeArgs.dropRight(1)
@@ -117,24 +128,24 @@ object FunctionTupleSyntacticSugarInspection {
       val returnTypeTextWithParens = {
         val returnTypeNeedParens = returnType match {
           case ft: ScFunctionalTypeElement => true
-          case ft: ScInfixTypeElement => true
-          case _ => false
+          case ft: ScInfixTypeElement      => true
+          case _                           => false
         }
         returnType.getText.parenthesisedIf(returnTypeNeedParens)
       }
       val typeTextWithParens = {
         val needParens = typeElement.getContext match {
-          case ft: ScFunctionalTypeElement => true
-          case ft: ScInfixTypeElement => true
+          case ft: ScFunctionalTypeElement                              => true
+          case ft: ScInfixTypeElement                                   => true
           case _: ScConstructor | _: ScTraitParents | _: ScClassParents => true
-          case _ => false
+          case _                                                        => false
         }
         val arrow = ScalaPsiUtil.functionArrow(project)
         s"(${elemsInParamTypes.map(_.getText).mkString}) $arrow $returnTypeTextWithParens"
           .parenthesisedIf(needParens)
       }
-      typeElement.replace(createTypeElementFromText(
-              typeTextWithParens, typeElement.getManager))
+      typeElement.replace(
+        createTypeElementFromText(typeTextWithParens, typeElement.getManager))
     }
   }
 }

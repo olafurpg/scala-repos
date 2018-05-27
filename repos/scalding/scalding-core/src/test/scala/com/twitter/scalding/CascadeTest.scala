@@ -49,24 +49,26 @@ class CascadeTestJob(args: Args) extends CascadeJob(args) {
   }
 }
 
-class TwoPhaseCascadeTest
-    extends WordSpec with Matchers with FieldConversions {
+class TwoPhaseCascadeTest extends WordSpec with Matchers with FieldConversions {
   "A Cascade job" should {
     CascadeTest("com.twitter.scalding.CascadeTestJob")
       .arg("input0", "input0")
       .arg("output0", "output0")
       .arg("output1", "output1")
-      .source(Tsv("input0", ('line)),
-              List(Tuple1("line1"),
-                   Tuple1("line2"),
-                   Tuple1("line3"),
-                   Tuple1("line4")))
+      .source(
+        Tsv("input0", ('line)),
+        List(
+          Tuple1("line1"),
+          Tuple1("line2"),
+          Tuple1("line3"),
+          Tuple1("line4")))
       .sink[String](Tsv("output1")) { ob =>
         "verify output got changed by both flows" in {
-          ob.toList shouldBe List("job2job1:line1",
-                                  "job2job1:line2",
-                                  "job2job1:line3",
-                                  "job2job1:line4")
+          ob.toList shouldBe List(
+            "job2job1:line1",
+            "job2job1:line2",
+            "job2job1:line3",
+            "job2job1:line4")
         }
       }
       .runHadoop
@@ -87,14 +89,16 @@ class TwoPhaseCascadeTest
     val output1 = File.createTempFile("cascading-job-output1-", "")
     output1.mkdir()
 
-    val args = Array[String]("com.twitter.scalding.CascadeTestJob",
-                             "--local",
-                             "--input0",
-                             input0.getAbsolutePath,
-                             "--output0",
-                             output0.getAbsolutePath,
-                             "--output1",
-                             output1.getAbsolutePath)
+    val args = Array[String](
+      "com.twitter.scalding.CascadeTestJob",
+      "--local",
+      "--input0",
+      input0.getAbsolutePath,
+      "--output0",
+      output0.getAbsolutePath,
+      "--output1",
+      output1.getAbsolutePath
+    )
 
     Tool.main(args)
 
@@ -102,7 +106,11 @@ class TwoPhaseCascadeTest
 
     "verify output got changed by both flows" in {
       lines shouldBe List(
-          "job2job1:a", "job2job1:b", "job2job1:c", "job2job1:d", "job2job1:e")
+        "job2job1:a",
+        "job2job1:b",
+        "job2job1:c",
+        "job2job1:d",
+        "job2job1:e")
     }
 
     input0.delete()

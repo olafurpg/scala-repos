@@ -172,15 +172,14 @@ trait Pattern {
 
     private def generalize(implicit num: NumericOps[T]): Expr[T] = {
       this match {
-        case Add2(a, b) => Add(a :: b :: Nil)
+        case Add2(a, b)    => Add(a :: b :: Nil)
         case Add3(a, b, c) => Add(a :: b :: c :: Nil)
-        case Sub(a, b) => Add(a :: Neg(b) :: Nil)
+        case Sub(a, b)     => Add(a :: Neg(b) :: Nil)
         case Add(x) =>
-          Add(
-              x flatMap {
+          Add(x flatMap {
             case Neg(Add(y)) => y.map(Neg(_))
-            case Add(y) => y
-            case y => y :: Nil
+            case Add(y)      => y
+            case y           => y :: Nil
           })
         case x => x
       }
@@ -188,9 +187,9 @@ trait Pattern {
 
     private def specialize(implicit num: NumericOps[T]): Expr[T] = {
       this match {
-        case Add(Seq(a, b)) => Add2(a, b)
+        case Add(Seq(a, b))    => Add2(a, b)
         case Add(Seq(a, b, c)) => Add3(a, b, c)
-        case x => x
+        case x                 => x
       }
     }
 
@@ -198,7 +197,7 @@ trait Pattern {
     private def reduceComponents(components: List[Expr[T]])(
         implicit num: NumericOps[T]): List[Expr[T]] = {
       val pairs = for (a <- components; b <- components if Neg(a) == b ||
-                                            a == Neg(b)) yield (a, b)
+                         a == Neg(b)) yield (a, b)
       pairs.foldLeft(components) { (c, pair) =>
         if (c.contains(pair._1) && c.contains(pair._2))
           c.diff(pair._1 :: pair._2 :: Nil)
@@ -210,7 +209,7 @@ trait Pattern {
       *  Performs only one pass. */
     private def reduce(implicit num: NumericOps[T]): Expr[T] = {
       this match {
-        case Add(Seq(Neg(x), Neg(y), Neg(z))) => Neg(Add(List(x, y, z)))
+        case Add(Seq(Neg(x), Neg(y), Neg(z)))   => Neg(Add(List(x, y, z)))
         case Add(Seq(Mul(x, y), z)) if (x == z) => Mul(x, Add(List(y, One[T])))
         case Add(Seq(Mul(x, y), z)) if (y == z) => Mul(y, Add(List(z, One[T])))
         case Add(Seq(Mul(x, y), Mul(u, w))) if (x == u) =>
@@ -218,56 +217,56 @@ trait Pattern {
         case Add(Seq(Mul(x, y), Mul(u, w))) if (y == w) =>
           Mul(y, Add(List(x, u)))
         case Add(Seq(Add(x), Add(y))) => Add(x.toList ::: y.toList).simplify
-        case Add(Seq(Add(x), y)) => Add(y :: x.toList).simplify
-        case Add(Seq(x, Add(y))) => Add(x :: y.toList).simplify
+        case Add(Seq(Add(x), y))      => Add(y :: x.toList).simplify
+        case Add(Seq(x, Add(y)))      => Add(x :: y.toList).simplify
         case Add(x) => {
-            val noZeros = x.filter(_ != Zero[T])
-            val noOnes = noZeros.map {
-              case y: One[_] => Const(num.one); case y => y
-            }
-            val constant =
-              num.sum(noOnes.collect { case c: Const[T] => c.value })
-            val rest = noOnes.filter(x => !x.isInstanceOf[Const[_]]).toList
-            val reduced = reduceComponents(rest)
-            val args =
-              if (num.similar(constant, num.zero)) reduced
-              else reduced ::: Const(constant) :: Nil
-            args.size match {
-              case 0 => Zero[T]
-              case 1 => args.head
-              case 2 => Add2(args(0), args(1))
-              case 3 => Add3(args(0), args(1), args(2))
-              case _ => Add(args)
-            }
+          val noZeros = x.filter(_ != Zero[T])
+          val noOnes = noZeros.map {
+            case y: One[_] => Const(num.one); case y => y
           }
-        case Sub(x: Zero[_], y) => Neg(y)
-        case Sub(x, y: Zero[_]) => x
-        case Sub(x, y) if x == y => Zero[T]
-        case Sub(Mul(x, y), z) if (x == z) => Mul(x, Sub(y, One[T]))
-        case Sub(Mul(x, y), z) if (y == z) => Mul(y, Sub(z, One[T]))
+          val constant =
+            num.sum(noOnes.collect { case c: Const[T] => c.value })
+          val rest = noOnes.filter(x => !x.isInstanceOf[Const[_]]).toList
+          val reduced = reduceComponents(rest)
+          val args =
+            if (num.similar(constant, num.zero)) reduced
+            else reduced ::: Const(constant) :: Nil
+          args.size match {
+            case 0 => Zero[T]
+            case 1 => args.head
+            case 2 => Add2(args(0), args(1))
+            case 3 => Add3(args(0), args(1), args(2))
+            case _ => Add(args)
+          }
+        }
+        case Sub(x: Zero[_], y)                    => Neg(y)
+        case Sub(x, y: Zero[_])                    => x
+        case Sub(x, y) if x == y                   => Zero[T]
+        case Sub(Mul(x, y), z) if (x == z)         => Mul(x, Sub(y, One[T]))
+        case Sub(Mul(x, y), z) if (y == z)         => Mul(y, Sub(z, One[T]))
         case Sub(Mul(x, y), Mul(u, w)) if (x == u) => Mul(x, Sub(y, w))
         case Sub(Mul(x, y), Mul(u, w)) if (y == w) => Mul(y, Sub(x, u))
-        case Mul(x: Zero[_], y) => Zero[T]
-        case Mul(x, y: Zero[_]) => Zero[T]
-        case Mul(x: One[_], y) => y
-        case Mul(x, y: One[_]) => x
-        case Mul(Neg(x: One[_]), y) => Neg(y)
-        case Mul(x, Neg(y: One[_])) => Neg(x)
+        case Mul(x: Zero[_], y)                    => Zero[T]
+        case Mul(x, y: Zero[_])                    => Zero[T]
+        case Mul(x: One[_], y)                     => y
+        case Mul(x, y: One[_])                     => x
+        case Mul(Neg(x: One[_]), y)                => Neg(y)
+        case Mul(x, Neg(y: One[_]))                => Neg(x)
 
-        case Mul(x, y) if (x == y) => Sqr(x)
-        case Div(x: Zero[_], y) => Zero[T] // warning: possibly extends domain
-        case Div(x, y: One[_]) => x
-        case Div(Sqr(x), y) if x == y => x
-        case Div(Mul(x, y), z) if (x == z) => y
-        case Div(Mul(x, y), z) if (y == z) => y
+        case Mul(x, y) if (x == y)                 => Sqr(x)
+        case Div(x: Zero[_], y)                    => Zero[T] // warning: possibly extends domain
+        case Div(x, y: One[_])                     => x
+        case Div(Sqr(x), y) if x == y              => x
+        case Div(Mul(x, y), z) if (x == z)         => y
+        case Div(Mul(x, y), z) if (y == z)         => y
         case Div(Mul(Mul(x, y), z), w) if (x == w) => Mul(y, z)
         case Div(Mul(Mul(x, y), z), w) if (y == w) => Mul(x, z)
         case Div(Mul(z, Mul(x, y)), w) if (x == w) => Mul(y, z)
         case Div(Mul(z, Mul(x, y)), w) if (y == w) => Mul(x, z)
         case Div(Mul(x, y), Mul(u, w)) if (x == u) => Div(y, w)
         case Div(Mul(x, y), Mul(u, w)) if (y == w) => Div(x, u)
-        case Div(x: One[_], y) => Inv(y)
-        case Div(x, Sqr(y)) if x == y => Inv(y)
+        case Div(x: One[_], y)                     => Inv(y)
+        case Div(x, Sqr(y)) if x == y              => Inv(y)
         case Div(Mul(x, y), Sqr(Mul(u, w))) if x == u && y == w =>
           Inv(Mul(x, y))
         case Div(x, y) if x == y => One[T]
@@ -275,42 +274,43 @@ trait Pattern {
         case Mul(Neg(a), Neg(b)) => Mul(a, b)
         case Div(Neg(a), Neg(b)) => Div(a, b)
 
-        case Neg(x: Zero[_]) => Zero[T]
-        case Neg(x: One[_]) => Const(num.neg(num.one))
+        case Neg(x: Zero[_])         => Zero[T]
+        case Neg(x: One[_])          => Const(num.neg(num.one))
         case Sub(Const(x), Const(y)) => const(num.sub(x, y))
         case Mul(Const(x), Const(y)) => const(num.mul(x, y))
         case Div(Const(x), Const(y)) => const(num.div(x, y))
-        case Neg(Const(x)) => const(num.neg(x))
-        case Sqr(Const(x)) => const(num.sqr(x))
+        case Neg(Const(x))           => const(num.neg(x))
+        case Sqr(Const(x))           => const(num.sqr(x))
 
         case Mul(Const(x), Mul(Const(y), z)) => Mul(const(num.mul(x, y)), z)
         case Mul(Const(x), Mul(y, Const(z))) => Mul(const(num.mul(x, z)), y)
         case Mul(Mul(Const(y), z), Const(x)) => Mul(const(num.mul(x, y)), z)
         case Mul(Mul(y, Const(z)), Const(x)) => Mul(const(num.mul(x, z)), y)
 
-        case Const(x) if x == num.one => One[T]
+        case Const(x) if x == num.one  => One[T]
         case Const(x) if x == num.zero => Zero[T]
 
-        case Sub(x, Neg(y)) => Add(List(x, y))
-        case Sub(Neg(x), y) => Neg(Add(List(x, y)))
-        case Neg(Neg(x)) => x
+        case Sub(x, Neg(y))           => Add(List(x, y))
+        case Sub(Neg(x), y)           => Neg(Add(List(x, y)))
+        case Neg(Neg(x))              => x
         case Neg(Mul(a: Const[T], x)) => Mul(const(num.neg(a.value)), x)
         case Neg(Mul(x, a: Const[T])) => Mul(const(num.neg(a.value)), x)
-        case Neg(Div(Neg(a), b)) => Div(a, b)
-        case Neg(Div(a, Neg(b))) => Div(a, b)
-        case Neg(Mul(Neg(a), b)) => Mul(a, b)
-        case Neg(Mul(a, Neg(b))) => Mul(a, b)
+        case Neg(Div(Neg(a), b))      => Div(a, b)
+        case Neg(Div(a, Neg(b)))      => Div(a, b)
+        case Neg(Mul(Neg(a), b))      => Mul(a, b)
+        case Neg(Mul(a, Neg(b)))      => Mul(a, b)
 
         case Log(Exp(x)) => x
-        case x => x
+        case x           => x
       }
     }
 
     private def optimizeWith(f: Expr[T] => Expr[T]): Expr[T] = {
       f(
-          mapArgs(EndoFunction[Expr[_]](
-                  a => a match { case x: Expr[T] => x.optimizeWith(f) }
-              )))
+        mapArgs(
+          EndoFunction[Expr[_]](
+            a => a match { case x: Expr[T] => x.optimizeWith(f) }
+          )))
     }
 
     /** Simplifies this expression to make evaluation faster and more accurate.*/
@@ -346,7 +346,8 @@ trait Pattern {
   trait NonZero[T] extends Expr[T]
 
   case class Const[T](value: T)(implicit num: NumericOps[T])
-      extends Leaf[T] with NonZero[T] {
+      extends Leaf[T]
+      with NonZero[T] {
     def derivative(variable: Var[T]) = Zero[T]
     def eval(f: Any => Any) = value
     override def toString = value.toString
@@ -385,8 +386,7 @@ trait Pattern {
     override lazy val hashCode = ScalaRunTime._hashCode(this);
   }
 
-  case class Add2[T](
-      left: Expr[T], right: Expr[T])(implicit num: NumericOps[T])
+  case class Add2[T](left: Expr[T], right: Expr[T])(implicit num: NumericOps[T])
       extends TwoArg[T] {
     def eval(f: Any => Any) = num.add(left.eval(f), right.eval(f))
     def derivative(v: Var[T]) = Add2(left.derivative(v), right.derivative(v))
@@ -443,9 +443,8 @@ trait Pattern {
     //    f'(x) / g(x) + f(x) * [-1 / g(x) ^ 2] * g'(x) = (f'(x) * g(x) - f(x) * g'(x)) / g(x)^2
     def derivative(v: Var[T]) =
       Div(
-          Sub(Mul(left.derivative(v), right),
-              Mul(left, right.derivative(v))),
-          Sqr(right)
+        Sub(Mul(left.derivative(v), right), Mul(left, right.derivative(v))),
+        Sqr(right)
       )
 
     def eval(f: Any => Any) = num.div(left.eval(f), right.eval(f))
@@ -523,8 +522,9 @@ trait Pattern {
   }
 
   abstract class Compare[T](
-      left: Expr[T], right: Expr[T], cmp: (T, T) => Boolean)(
-      implicit num: NumericOps[T])
+      left: Expr[T],
+      right: Expr[T],
+      cmp: (T, T) => Boolean)(implicit num: NumericOps[T])
       extends Expr[Boolean] {
     def derivative(v: Var[Boolean]) =
       throw new IllegalStateException("Derivative of Boolean not allowed")
@@ -533,36 +533,41 @@ trait Pattern {
   }
 
   case class LE[T](left: Expr[T], right: Expr[T])(
-      implicit num: NumericOps[T], ord: Ordering[T])
+      implicit num: NumericOps[T],
+      ord: Ordering[T])
       extends Compare[T](left, right, ord.compare(_, _) <= 0) {
     def mapArgs(f: EndoFunction[Expr[_]]) = LE(f(left), f(right))
     override def toString = left.toString + " <= " + right.toString
   }
 
   case class LT[T](left: Expr[T], right: Expr[T])(
-      implicit num: NumericOps[T], ord: Ordering[T])
+      implicit num: NumericOps[T],
+      ord: Ordering[T])
       extends Compare[T](left, right, ord.compare(_, _) < 0) {
     def mapArgs(f: EndoFunction[Expr[_]]) = LT(f(left), f(right))
     override def toString = left.toString + " < " + right.toString
   }
 
   case class GE[T](left: Expr[T], right: Expr[T])(
-      implicit num: NumericOps[T], ord: Ordering[T])
+      implicit num: NumericOps[T],
+      ord: Ordering[T])
       extends Compare[T](left, right, ord.compare(_, _) >= 0) {
     def mapArgs(f: EndoFunction[Expr[_]]) = GE(f(left), f(right))
     override def toString = left.toString + " >= " + right.toString
   }
 
   case class GT[T](left: Expr[T], right: Expr[T])(
-      implicit num: NumericOps[T], ord: Ordering[T])
+      implicit num: NumericOps[T],
+      ord: Ordering[T])
       extends Compare[T](left, right, ord.compare(_, _) > 0) {
     def mapArgs(f: EndoFunction[Expr[_]]) = GT(f(left), f(right))
     override def toString = left.toString + " > " + right.toString
   }
 
   case class IfElse[T <: Numeric[T]](
-      condition: Expr[Boolean], left: Expr[T], right: Expr[T])(
-      implicit num: NumericOps[T])
+      condition: Expr[Boolean],
+      left: Expr[T],
+      right: Expr[T])(implicit num: NumericOps[T])
       extends Expr[T] {
 
     val args = List(condition, left, right)
@@ -592,8 +597,7 @@ trait Pattern {
         implicit num: NumericOps[T]): Leaf[T] =
       const(num.fromDouble(f.toDouble))
 
-    implicit def int2Constant[T](i: Int)(
-        implicit num: NumericOps[T]): Leaf[T] =
+    implicit def int2Constant[T](i: Int)(implicit num: NumericOps[T]): Leaf[T] =
       const(num.fromDouble(i.toDouble))
 
     implicit def long2Constant[T](l: Long)(

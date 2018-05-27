@@ -63,7 +63,7 @@ abstract class Generator {
 
     if (n < 1)
       throw new IllegalArgumentException(
-          "argument must be positive %d" format n)
+        "argument must be positive %d" format n)
     else if ((n & -n) == n) ((n * ((nextInt() >>> 1).toLong)) >>> 31).toInt
     else loop(nextInt() >>> 1)
   }
@@ -109,7 +109,7 @@ abstract class Generator {
 
     if (n < 1)
       throw new IllegalArgumentException(
-          "argument must be positive %d" format n)
+        "argument must be positive %d" format n)
     else if ((n & -n) == n) nextLong() & (n - 1)
     else loop(nextLong() >>> 1)
   }
@@ -288,7 +288,7 @@ abstract class Generator {
   /**
     * Generate an Array[A] using the given Dist[A] instance.
     */
-  def generateArray[@sp A : Dist : ClassTag](n: Int): Array[A] = {
+  def generateArray[@sp A: Dist: ClassTag](n: Int): Array[A] = {
     val arr = new Array[A](n)
     fillArray(arr)
     arr
@@ -297,7 +297,7 @@ abstract class Generator {
   /**
     * Fill an Array[A] using the given Dist[A] instance.
     */
-  def fillArray[@sp A : Dist](arr: Array[A]): Unit = {
+  def fillArray[@sp A: Dist](arr: Array[A]): Unit = {
     var i = 0
     val len = arr.length
     while (i < len) {
@@ -317,12 +317,11 @@ abstract class Generator {
   def chooseFromIterable[A](as: Iterable[A])(implicit gen: Generator): A =
     as.iterator.drop(gen.nextInt(as.size)).next()
 
-  def sampleFromArray[@sp A : ClassTag](as: Array[A], size: Int)(
+  def sampleFromArray[@sp A: ClassTag](as: Array[A], size: Int)(
       implicit gen: Generator): Array[A] = {
     val chosen: Array[A] = new Array[A](size)
     if (size < 1) {
-      throw new IllegalArgumentException(
-          "illegal sample size (%d)" format size)
+      throw new IllegalArgumentException("illegal sample size (%d)" format size)
     } else if (size < as.length) {
       var i = 0
       while (i < as.length) {
@@ -339,12 +338,12 @@ abstract class Generator {
       shuffle(chosen)
     } else {
       throw new IllegalArgumentException(
-          "sample size (%d) exceeds input size (%d)" format (size, as.length))
+        "sample size (%d) exceeds input size (%d)" format (size, as.length))
     }
     chosen
   }
 
-  def sampleFromTraversable[@sp A : ClassTag](as: Traversable[A], size: Int)(
+  def sampleFromTraversable[@sp A: ClassTag](as: Traversable[A], size: Int)(
       implicit gen: Generator): Array[A] = {
     val chosen: Array[A] = new Array[A](size)
     var i: Int = 0
@@ -359,7 +358,7 @@ abstract class Generator {
     }
     if (i < size) {
       throw new IllegalArgumentException(
-          "sample size (%d) exceeds input size (%d)" format (size, i))
+        "sample size (%d) exceeds input size (%d)" format (size, i))
     }
     chosen
   }

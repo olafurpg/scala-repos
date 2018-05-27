@@ -34,9 +34,9 @@ object EnforceUFuncCoverage {
       opC2: UFunc.UImpl[F, Counter2[String, Long, Double], Any])
     : Witness[F, One, Counter.type] = null
 
-  implicit def vectorsAndMatrices1[F <: UFunc](
-      f: F)(implicit wV: Witness[F, One, Vector.type],
-            wM: Witness[F, One, Matrix.type])
+  implicit def vectorsAndMatrices1[F <: UFunc](f: F)(
+      implicit wV: Witness[F, One, Vector.type],
+      wM: Witness[F, One, Matrix.type])
     : Witness[F, One, Vector.type with Matrix.type] = null
 
   implicit def linalg1[F <: UFunc](f: F)(

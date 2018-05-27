@@ -16,7 +16,7 @@ import MediaTypes._
 trait ScalaXmlSupport {
   implicit def defaultNodeSeqMarshaller: ToEntityMarshaller[NodeSeq] =
     Marshaller.oneOf(
-        ScalaXmlSupport.nodeSeqMediaTypes.map(nodeSeqMarshaller): _*)
+      ScalaXmlSupport.nodeSeqMediaTypes.map(nodeSeqMarshaller): _*)
 
   def nodeSeqMarshaller(
       mediaType: MediaType.NonBinary): ToEntityMarshaller[NodeSeq] =
@@ -32,8 +32,11 @@ trait ScalaXmlSupport {
       .mapWithCharset { (bytes, charset) ⇒
         if (bytes.length > 0) {
           val reader = new InputStreamReader(
-              new ByteArrayInputStream(bytes), charset.nioCharset)
-          XML.withSAXParser(createSAXParser()).load(reader): NodeSeq // blocking call! Ideally we'd have a `loadToFuture`
+            new ByteArrayInputStream(bytes),
+            charset.nioCharset)
+          XML
+            .withSAXParser(createSAXParser())
+            .load(reader): NodeSeq // blocking call! Ideally we'd have a `loadToFuture`
         } else NodeSeq.Empty
       }
 
@@ -45,8 +48,8 @@ trait ScalaXmlSupport {
     ScalaXmlSupport.createSaferSAXParser()
 }
 object ScalaXmlSupport extends ScalaXmlSupport {
-  val nodeSeqMediaTypes: immutable.Seq[MediaType.NonBinary] = List(
-      `text/xml`, `application/xml`, `text/html`, `application/xhtml+xml`)
+  val nodeSeqMediaTypes: immutable.Seq[MediaType.NonBinary] =
+    List(`text/xml`, `application/xml`, `text/html`, `application/xhtml+xml`)
   val nodeSeqContentTypeRanges: immutable.Seq[ContentTypeRange] =
     nodeSeqMediaTypes.map(ContentTypeRange(_))
 
@@ -56,20 +59,24 @@ object ScalaXmlSupport extends ScalaXmlSupport {
     import com.sun.org.apache.xerces.internal.impl.Constants
     import javax.xml.XMLConstants
 
-    factory.setFeature(Constants.SAX_FEATURE_PREFIX +
-                       Constants.EXTERNAL_GENERAL_ENTITIES_FEATURE,
-                       false)
-    factory.setFeature(Constants.SAX_FEATURE_PREFIX +
-                       Constants.EXTERNAL_PARAMETER_ENTITIES_FEATURE,
-                       false)
-    factory.setFeature(Constants.XERCES_FEATURE_PREFIX +
-                       Constants.DISALLOW_DOCTYPE_DECL_FEATURE,
-                       true)
+    factory.setFeature(
+      Constants.SAX_FEATURE_PREFIX +
+        Constants.EXTERNAL_GENERAL_ENTITIES_FEATURE,
+      false)
+    factory.setFeature(
+      Constants.SAX_FEATURE_PREFIX +
+        Constants.EXTERNAL_PARAMETER_ENTITIES_FEATURE,
+      false)
+    factory.setFeature(
+      Constants.XERCES_FEATURE_PREFIX +
+        Constants.DISALLOW_DOCTYPE_DECL_FEATURE,
+      true)
     factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)
     val parser = factory.newSAXParser()
     try {
       parser.setProperty(
-          "http://apache.org/xml/properties/locale", java.util.Locale.ROOT)
+        "http://apache.org/xml/properties/locale",
+        java.util.Locale.ROOT)
     } catch {
       case e: org.xml.sax.SAXNotRecognizedException ⇒ // property is not needed
     }

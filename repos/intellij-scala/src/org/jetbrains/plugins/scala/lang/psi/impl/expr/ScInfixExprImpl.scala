@@ -10,7 +10,10 @@ import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 import org.jetbrains.plugins.scala.lang.psi.api.expr._
 import org.jetbrains.plugins.scala.lang.psi.types._
-import org.jetbrains.plugins.scala.lang.psi.types.result.{TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  TypeResult,
+  TypingContext
+}
 
 import scala.collection.Seq
 
@@ -19,7 +22,8 @@ import scala.collection.Seq
   * Date: 06.03.2008
   */
 class ScInfixExprImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScInfixExpr {
+    extends ScalaPsiElementImpl(node)
+    with ScInfixExpr {
   override def toString: String = "InfixExpression"
 
   override def argumentExpressions: Seq[ScExpression] = {
@@ -30,10 +34,10 @@ class ScInfixExprImpl(node: ASTNode)
         case t: ScParenthesisedExpr =>
           t.expr match {
             case Some(expr) => Seq(expr)
-            case None => Seq(t)
+            case None       => Seq(t)
           }
         case unit: ScUnitExpr => Seq.empty
-        case expr => Seq(expr)
+        case expr             => Seq(expr)
       }
   }
 
@@ -47,7 +51,9 @@ class ScInfixExprImpl(node: ASTNode)
         val exprText = s"$lText = $lText ${r.element.name} $rText"
         val newExpr =
           ScalaPsiElementFactory.createExpressionWithContextFromText(
-              exprText, getContext, this)
+            exprText,
+            getContext,
+            this)
         newExpr.getType(TypingContext.empty)
       case _ => super.innerType(ctx)
     }
@@ -60,7 +66,7 @@ class ScInfixExprImpl(node: ASTNode)
   override def accept(visitor: PsiElementVisitor) {
     visitor match {
       case visitor: ScalaElementVisitor => visitor.visitInfixExpression(this)
-      case _ => super.accept(visitor)
+      case _                            => super.accept(visitor)
     }
   }
 }

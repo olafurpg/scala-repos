@@ -28,9 +28,9 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.streaming.Time
 import org.apache.spark.util.Utils
 
-private[streaming] class DStreamCheckpointData[T : ClassTag](
-    dstream: DStream[T])
-    extends Serializable with Logging {
+private[streaming] class DStreamCheckpointData[T: ClassTag](dstream: DStream[T])
+    extends Serializable
+    with Logging {
   protected val data = new HashMap[Time, AnyRef]()
 
   // Mapping of the batch time to the checkpointed RDD file of that time
@@ -56,7 +56,7 @@ private[streaming] class DStreamCheckpointData[T : ClassTag](
       .filter(_._2.getCheckpointFile.isDefined)
       .map(x => (x._1, x._2.getCheckpointFile.get))
     logDebug(
-        "Current checkpoint files:\n" + checkpointFiles.toSeq.mkString("\n"))
+      "Current checkpoint files:\n" + checkpointFiles.toSeq.mkString("\n"))
 
     // Add the checkpoint files to the data to be serialized
     if (!checkpointFiles.isEmpty) {
@@ -66,8 +66,8 @@ private[streaming] class DStreamCheckpointData[T : ClassTag](
       // This will be used to delete old checkpoint files
       timeToCheckpointFile ++= currentCheckpointFiles
       // Remember the time of the oldest checkpoint RDD in current state
-      timeToOldestCheckpointFileTime(time) = currentCheckpointFiles.keys.min(
-          Time.ordering)
+      timeToOldestCheckpointFileTime(time) =
+        currentCheckpointFiles.keys.min(Time.ordering)
     }
   }
 
@@ -92,17 +92,17 @@ private[streaming] class DStreamCheckpointData[T : ClassTag](
               val path = new Path(file)
               if (fileSystem == null) {
                 fileSystem = path.getFileSystem(
-                    dstream.ssc.sparkContext.hadoopConfiguration)
+                  dstream.ssc.sparkContext.hadoopConfiguration)
               }
               fileSystem.delete(path, true)
               timeToCheckpointFile -= time
-              logInfo(
-                  "Deleted checkpoint file '" + file + "' for time " + time)
+              logInfo("Deleted checkpoint file '" + file + "' for time " + time)
             } catch {
               case e: Exception =>
-                logWarning("Error deleting old checkpoint file '" + file +
-                           "' for time " + time,
-                           e)
+                logWarning(
+                  "Error deleting old checkpoint file '" + file +
+                    "' for time " + time,
+                  e)
                 fileSystem = null
             }
         }
@@ -120,17 +120,18 @@ private[streaming] class DStreamCheckpointData[T : ClassTag](
     // Create RDDs from the checkpoint data
     currentCheckpointFiles.foreach {
       case (time, file) => {
-          logInfo("Restoring checkpointed RDD for time " + time +
-              " from file '" + file + "'")
-          dstream.generatedRDDs +=
+        logInfo(
+          "Restoring checkpointed RDD for time " + time +
+            " from file '" + file + "'")
+        dstream.generatedRDDs +=
           ((time, dstream.context.sparkContext.checkpointFile[T](file)))
-        }
+      }
     }
   }
 
   override def toString: String = {
     "[\n" + currentCheckpointFiles.size + " checkpoint files \n" +
-    currentCheckpointFiles.mkString("\n") + "\n]"
+      currentCheckpointFiles.mkString("\n") + "\n]"
   }
 
   @throws(classOf[IOException])
@@ -144,17 +145,17 @@ private[streaming] class DStreamCheckpointData[T : ClassTag](
           } else {
             val msg =
               "Object of " + this.getClass.getName + " is being serialized " +
-              " possibly as a part of closure of an RDD operation. This is because " +
-              " the DStream object is being referred to from within the closure. " +
-              " Please rewrite the RDD operation inside this DStream to avoid this. " +
-              " This has been enforced to avoid bloating of Spark tasks " +
-              " with unnecessary objects."
+                " possibly as a part of closure of an RDD operation. This is because " +
+                " the DStream object is being referred to from within the closure. " +
+                " Please rewrite the RDD operation inside this DStream to avoid this. " +
+                " This has been enforced to avoid bloating of Spark tasks " +
+                " with unnecessary objects."
             throw new java.io.NotSerializableException(msg)
           }
         }
       } else {
         throw new java.io.NotSerializableException(
-            "Graph is unexpectedly null when DStream is being serialized.")
+          "Graph is unexpectedly null when DStream is being serialized.")
       }
     }
 

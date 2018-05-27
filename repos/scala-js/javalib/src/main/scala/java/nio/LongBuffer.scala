@@ -13,10 +13,12 @@ object LongBuffer {
     wrap(array, 0, array.length)
 }
 
-abstract class LongBuffer private[nio](_capacity: Int,
-                                       private[nio] val _array: Array[Long],
-                                       private[nio] val _arrayOffset: Int)
-    extends Buffer(_capacity) with Comparable[LongBuffer] {
+abstract class LongBuffer private[nio] (
+    _capacity: Int,
+    private[nio] val _array: Array[Long],
+    private[nio] val _arrayOffset: Int)
+    extends Buffer(_capacity)
+    with Comparable[LongBuffer] {
 
   private[nio] type ElementType = Long
   private[nio] type BufferType = LongBuffer
@@ -77,7 +79,7 @@ abstract class LongBuffer private[nio](_capacity: Int,
 
   override def equals(that: Any): Boolean = that match {
     case that: LongBuffer => compareTo(that) == 0
-    case _ => false
+    case _                => false
   }
 
   @noinline
@@ -94,11 +96,17 @@ abstract class LongBuffer private[nio](_capacity: Int,
 
   @inline
   private[nio] def load(
-      startIndex: Int, dst: Array[Long], offset: Int, length: Int): Unit =
+      startIndex: Int,
+      dst: Array[Long],
+      offset: Int,
+      length: Int): Unit =
     GenBuffer(this).generic_load(startIndex, dst, offset, length)
 
   @inline
   private[nio] def store(
-      startIndex: Int, src: Array[Long], offset: Int, length: Int): Unit =
+      startIndex: Int,
+      src: Array[Long],
+      offset: Int,
+      length: Int): Unit =
     GenBuffer(this).generic_store(startIndex, src, offset, length)
 }

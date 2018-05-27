@@ -160,8 +160,7 @@ trait PaintIncludes {
     * @param lg $JFX $LGD
     * @return $SFX $LGD
     */
-  implicit def jfxLinearGradient2sfx(
-      lg: jfxsp.LinearGradient): LinearGradient =
+  implicit def jfxLinearGradient2sfx(lg: jfxsp.LinearGradient): LinearGradient =
     if (lg != null) new LinearGradient(lg) else null
 
   /**
@@ -179,8 +178,7 @@ trait PaintIncludes {
     * @param rg $JFX $RGD
     * @return $SFX $RGD
     */
-  implicit def jfxRadialGradient2sfx(
-      rg: jfxsp.RadialGradient): RadialGradient =
+  implicit def jfxRadialGradient2sfx(rg: jfxsp.RadialGradient): RadialGradient =
     if (rg != null) new RadialGradient(rg) else null
 
   /**

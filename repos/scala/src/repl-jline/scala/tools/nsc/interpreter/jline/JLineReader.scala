@@ -59,7 +59,8 @@ class InteractiveReader(completer: () => Completion)
 
 // implements a jline interface
 private class JLineConsoleReader
-    extends jconsole.ConsoleReader with interpreter.VariColumnTabulator {
+    extends jconsole.ConsoleReader
+    with interpreter.VariColumnTabulator {
   val isAcross = interpreter.`package`.isAcross
   val marginSize = 3
 
@@ -72,8 +73,8 @@ private class JLineConsoleReader
     val key = readOneKey(morePrompt)
     try key match {
       case '\r' | '\n' => 1
-      case 'q' => -1
-      case _ => height - 1
+      case 'q'         => -1
+      case _           => height - 1
     } finally {
       eraseLine()
       // TODO: still not quite managing to erase --More-- and get
@@ -125,9 +126,10 @@ private class JLineConsoleReader
     def completer =
       new Completer {
         val tc = completion
-        def complete(_buf: String,
-                     cursor: Int,
-                     candidates: JList[CharSequence]): Int = {
+        def complete(
+            _buf: String,
+            cursor: Int,
+            candidates: JList[CharSequence]): Int = {
           val buf = if (_buf == null) "" else _buf
           val Candidates(newCursor, newCandidates) =
             completion.complete(buf, cursor)
@@ -138,7 +140,7 @@ private class JLineConsoleReader
 
     completion match {
       case NoCompletion => ()
-      case _ => this addCompleter completer
+      case _            => this addCompleter completer
     }
 
     // This is a workaround for https://github.com/jline/jline2/issues/208
@@ -151,9 +153,10 @@ private class JLineConsoleReader
     ///
     val handler = getCompletionHandler
     setCompletionHandler(new CompletionHandler {
-      override def complete(consoleReader: ConsoleReader,
-                            list: JList[CharSequence],
-                            i: Int): Boolean = {
+      override def complete(
+          consoleReader: ConsoleReader,
+          list: JList[CharSequence],
+          i: Int): Boolean = {
         try {
           handler.complete(consoleReader, list, i)
         } finally if (getCursorBuffer.cursor != getCursorBuffer.length()) {

@@ -31,14 +31,14 @@ trait ScentrySupport[UserType <: AnyRef] extends Initializable {
   private def initializeScentry = {
     val store = new ScentryAuthStore.SessionAuthStore(this)
     request.setAttribute(
-        Scentry.ScentryRequestKey,
-        new Scentry[UserType](self, toSession, fromSession, store))
+      Scentry.ScentryRequestKey,
+      new Scentry[UserType](self, toSession, fromSession, store))
   }
 
   private def readStrategiesFromConfig(config: ConfigT) =
     _strategiesFromConfig = {
       config.context.getInitParameter("scentry.strategies").blankOption map
-      (s ⇒ (s split ";").toList) getOrElse Nil
+        (s ⇒ (s split ";").toList) getOrElse Nil
     }
 
   private def registerStrategiesFromConfig = _strategiesFromConfig foreach {
@@ -81,16 +81,18 @@ trait ScentrySupport[UserType <: AnyRef] extends Initializable {
     scentry.user
   protected def user_=(user: UserType)(implicit request: HttpServletRequest) =
     scentry.user = user
-  protected def isAuthenticated(
-      implicit request: HttpServletRequest): Boolean = scentry.isAuthenticated
+  protected def isAuthenticated(implicit request: HttpServletRequest): Boolean =
+    scentry.isAuthenticated
   protected def isAnonymous(implicit request: HttpServletRequest): Boolean =
     !isAuthenticated
 
   protected def authenticate()(
-      implicit request: HttpServletRequest, response: HttpServletResponse) =
+      implicit request: HttpServletRequest,
+      response: HttpServletResponse) =
     scentry.authenticate()
 
   protected def logOut()(
-      implicit request: HttpServletRequest, response: HttpServletResponse) =
+      implicit request: HttpServletRequest,
+      response: HttpServletResponse) =
     scentry.logout()
 }

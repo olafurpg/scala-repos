@@ -227,7 +227,7 @@ object SetFactory {
 }
 
 trait SetFactory extends CollectionFactory {
-  def empty[E : ClassTag]: ju.Set[E]
+  def empty[E: ClassTag]: ju.Set[E]
 
   def allowsNullElement: Boolean
 }

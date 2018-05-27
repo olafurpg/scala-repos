@@ -8,15 +8,17 @@ import akka.http.impl.util.{Renderer, Rendering, ValueRenderable}
 import akka.http.javadsl.{model ⇒ jm}
 
 final case class EntityTag(tag: String, weak: Boolean = false)
-    extends jm.headers.EntityTag with ValueRenderable {
+    extends jm.headers.EntityTag
+    with ValueRenderable {
   def render[R <: Rendering](r: R): r.type =
     if (weak) r ~~ "W/" ~~#! tag else r ~~#! tag
 }
 
 object EntityTag {
-  def matchesRange(eTag: EntityTag,
-                   entityTagRange: EntityTagRange,
-                   weakComparison: Boolean) =
+  def matchesRange(
+      eTag: EntityTag,
+      entityTagRange: EntityTagRange,
+      weakComparison: Boolean) =
     entityTagRange match {
       case EntityTagRange.`*` ⇒ weakComparison || !eTag.weak
       case EntityTagRange.Default(tags) ⇒
@@ -27,7 +29,8 @@ object EntityTag {
 }
 
 sealed abstract class EntityTagRange
-    extends jm.headers.EntityTagRange with ValueRenderable
+    extends jm.headers.EntityTagRange
+    with ValueRenderable
 
 object EntityTagRange {
   def apply(tags: EntityTag*) = Default(immutable.Seq(tags: _*))

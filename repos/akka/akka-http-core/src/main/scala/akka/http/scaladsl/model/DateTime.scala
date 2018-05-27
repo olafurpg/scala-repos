@@ -20,7 +20,8 @@ final case class DateTime private (
     weekday: Int, // the day of the week. Sunday is 0.
     clicks: Long, // milliseconds since January 1, 1970, 00:00:00 GMT
     isLeapYear: Boolean)
-    extends akka.http.javadsl.model.DateTime with Ordered[DateTime]
+    extends akka.http.javadsl.model.DateTime
+    with Ordered[DateTime]
     with Renderable {
 
   /**
@@ -70,8 +71,9 @@ final case class DateTime private (
     * `yyyy-mm-ddThh:mm:ss`
     */
   def renderIsoDateTimeString[R <: Rendering](r: R): r.type =
-    put_##(put_##(put_##(renderIsoDate(r) ~~ 'T', hour) ~~ ':', minute) ~~ ':',
-           second)
+    put_##(
+      put_##(put_##(renderIsoDate(r) ~~ 'T', hour) ~~ ':', minute) ~~ ':',
+      second)
 
   /**
     * `yyyy-mm-ddThh:mm:ss`
@@ -82,8 +84,9 @@ final case class DateTime private (
     * `yyyy-mm-dd hh:mm:ss`
     */
   def renderIsoLikeDateTimeString[R <: Rendering](r: R): r.type =
-    put_##(put_##(put_##(renderIsoDate(r) ~~ ' ', hour) ~~ ':', minute) ~~ ':',
-           second)
+    put_##(
+      put_##(put_##(renderIsoDate(r) ~~ ' ', hour) ~~ ':', minute) ~~ ':',
+      second)
 
   /**
     * `yyyy-mm-dd hh:mm:ss`
@@ -96,12 +99,12 @@ final case class DateTime private (
     */
   def renderRfc1123DateTimeString[R <: Rendering](r: R): r.type =
     put_##(
+      put_##(
         put_##(
-            put_##(
-                put_##(r ~~ weekdayStr ~~ ',' ~~ ' ', day) ~~ ' ' ~~ monthStr ~~ ' ' ~~ year ~~ ' ',
-                hour) ~~ ':',
-            minute) ~~ ':',
-        second) ~~ " GMT"
+          put_##(r ~~ weekdayStr ~~ ',' ~~ ' ', day) ~~ ' ' ~~ monthStr ~~ ' ' ~~ year ~~ ' ',
+          hour) ~~ ':',
+        minute) ~~ ':',
+      second) ~~ " GMT"
 
   /**
     * RFC1123 date string, e.g. `Sun, 06 Nov 1994 08:49:37 GMT`
@@ -123,20 +126,21 @@ final case class DateTime private (
 }
 
 object DateTime {
-  private[this] val WEEKDAYS = Array(
-      "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
-  private[this] val MONTHS = Array("Jan",
-                                   "Feb",
-                                   "Mar",
-                                   "Apr",
-                                   "May",
-                                   "Jun",
-                                   "Jul",
-                                   "Aug",
-                                   "Sep",
-                                   "Oct",
-                                   "Nov",
-                                   "Dec")
+  private[this] val WEEKDAYS =
+    Array("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
+  private[this] val MONTHS = Array(
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec")
 
   /**
     * Returns the three-letter string for the weekday with the given index. Sunday is zero.
@@ -155,12 +159,13 @@ object DateTime {
     * Creates a new `DateTime` with the given properties.
     * Note that this implementation discards milliseconds (i.e. rounds down to full seconds).
     */
-  def apply(year: Int,
-            month: Int,
-            day: Int,
-            hour: Int = 0,
-            minute: Int = 0,
-            second: Int = 0): DateTime = {
+  def apply(
+      year: Int,
+      month: Int,
+      day: Int,
+      hour: Int = 0,
+      minute: Int = 0,
+      second: Int = 0): DateTime = {
     require(1800 <= year && year <= 9999, "year must be >= 1800 and <= 9999")
     require(1 <= month && month <= 12, "month must be >= 1 and <= 12")
     require(1 <= day && day <= 31, "day must be >= 1 and <= 31")
@@ -184,17 +189,18 @@ object DateTime {
     val dn = d - (1969 * 365 + 492 - 19 + 4)
     val c =
       (dn - 1) * 86400L + hour * 3600L + minute * 60L +
-      second // seconds since Jan 1, 1970, 00:00:00
+        second // seconds since Jan 1, 1970, 00:00:00
 
-    new DateTime(year,
-                 month,
-                 day,
-                 hour,
-                 minute,
-                 second,
-                 weekday = d % 7,
-                 clicks = c * 1000,
-                 isLeapYear = isLeap)
+    new DateTime(
+      year,
+      month,
+      day,
+      hour,
+      minute,
+      second,
+      weekday = d % 7,
+      clicks = c * 1000,
+      isLeapYear = isLeap)
   }
 
   /**
@@ -203,10 +209,11 @@ object DateTime {
     * Note that this implementation discards milliseconds (i.e. rounds down to full seconds).
     */
   def apply(clicks: Long): DateTime = {
-    require(DateTime.MinValue.clicks <= clicks &&
-            clicks <= DateTime.MaxValue.clicks,
-            "DateTime value must be >= " + DateTime.MinValue + " and <= " +
-            DateTime.MaxValue)
+    require(
+      DateTime.MinValue.clicks <= clicks &&
+        clicks <= DateTime.MaxValue.clicks,
+      "DateTime value must be >= " + DateTime.MinValue + " and <= " +
+        DateTime.MaxValue)
 
     // based on a fast RFC1123 implementation (C) 2000 by Tim Kientzle <kientzle@acm.org>
     val c = clicks - clicks % 1000
@@ -255,15 +262,16 @@ object DateTime {
     m %= 60
     val w = (dn + 1) % 7 // day of week, 0==Sun
 
-    new DateTime(year = y,
-                 month = mon + 1,
-                 day = d,
-                 hour = h,
-                 minute = m,
-                 second = s.toInt,
-                 weekday = w,
-                 clicks = c,
-                 isLeapYear = isLeap)
+    new DateTime(
+      year = y,
+      month = mon + 1,
+      day = d,
+      hour = h,
+      minute = m,
+      second = s.toInt,
+      weekday = w,
+      clicks = c,
+      isLeapYear = isLeap)
   }
 
   private def isLeapYear(year: Int): Boolean =
@@ -296,10 +304,10 @@ object DateTime {
       len match {
         case 19 ⇒
           c(4) == '-' && c(7) == '-' && c(10) == 'T' && c(13) == ':' &&
-          c(16) == ':'
+            c(16) == ':'
         case 24 ⇒
           check(19) && c(19) == '.' && isDigit(c(20)) && isDigit(c(21)) &&
-          isDigit(c(22)) && c(23) == 'Z'
+            isDigit(c(22)) && c(23) == 'Z'
         case _ ⇒ false
       }
     def mul10(i: Int) = (i << 3) + (i << 1)

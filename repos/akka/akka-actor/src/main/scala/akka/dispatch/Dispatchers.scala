@@ -55,8 +55,9 @@ object Dispatchers {
   * Look in `akka.actor.default-dispatcher` section of the reference.conf
   * for documentation of dispatcher options.
   */
-class Dispatchers(val settings: ActorSystem.Settings,
-                  val prerequisites: DispatcherPrerequisites) {
+class Dispatchers(
+    val settings: ActorSystem.Settings,
+    val prerequisites: DispatcherPrerequisites) {
 
   import Dispatchers._
 
@@ -100,8 +101,7 @@ class Dispatchers(val settings: ActorSystem.Settings,
         val newConfigurator =
           if (cachingConfig.hasPath(id)) configuratorFrom(config(id))
           else
-            throw new ConfigurationException(
-                s"Dispatcher [$id] not configured")
+            throw new ConfigurationException(s"Dispatcher [$id] not configured")
 
         dispatcherConfigurators.putIfAbsent(id, newConfigurator) match {
           case null ⇒ newConfigurator
@@ -125,7 +125,8 @@ class Dispatchers(val settings: ActorSystem.Settings,
     * the specified configurator was successfully registered.
     */
   def registerConfigurator(
-      id: String, configurator: MessageDispatcherConfigurator): Boolean =
+      id: String,
+      configurator: MessageDispatcherConfigurator): Boolean =
     dispatcherConfigurators.putIfAbsent(id, configurator) == null
 
   /**
@@ -180,31 +181,33 @@ class Dispatchers(val settings: ActorSystem.Settings,
   private def configuratorFrom(cfg: Config): MessageDispatcherConfigurator = {
     if (!cfg.hasPath("id"))
       throw new ConfigurationException(
-          "Missing dispatcher 'id' property in config: " + cfg.root.render)
+        "Missing dispatcher 'id' property in config: " + cfg.root.render)
 
     cfg.getString("type") match {
       case "Dispatcher" ⇒ new DispatcherConfigurator(cfg, prerequisites)
       case "BalancingDispatcher" ⇒
         // FIXME remove this case in 2.4
         throw new IllegalArgumentException(
-            "BalancingDispatcher is deprecated, use a BalancingPool instead. " +
+          "BalancingDispatcher is deprecated, use a BalancingPool instead. " +
             "During a migration period you can still use BalancingDispatcher by specifying the full class name: " +
             classOf[BalancingDispatcherConfigurator].getName)
       case "PinnedDispatcher" ⇒
         new PinnedDispatcherConfigurator(cfg, prerequisites)
       case fqn ⇒
-        val args = List(classOf[Config] -> cfg,
-                        classOf[DispatcherPrerequisites] -> prerequisites)
+        val args = List(
+          classOf[Config] -> cfg,
+          classOf[DispatcherPrerequisites] -> prerequisites)
         prerequisites.dynamicAccess
           .createInstanceFor[MessageDispatcherConfigurator](fqn, args)
           .recover({
             case exception ⇒
               throw new ConfigurationException(
-                  ("Cannot instantiate MessageDispatcherConfigurator type [%s], defined in [%s], " +
-                      "make sure it has constructor with [com.typesafe.config.Config] and " +
-                      "[akka.dispatch.DispatcherPrerequisites] parameters")
-                    .format(fqn, cfg.getString("id")),
-                  exception)
+                ("Cannot instantiate MessageDispatcherConfigurator type [%s], defined in [%s], " +
+                  "make sure it has constructor with [com.typesafe.config.Config] and " +
+                  "[akka.dispatch.DispatcherPrerequisites] parameters")
+                  .format(fqn, cfg.getString("id")),
+                exception
+              )
           })
           .get
     }
@@ -217,16 +220,18 @@ class Dispatchers(val settings: ActorSystem.Settings,
   * of the `dispatcher()` method.
   */
 class DispatcherConfigurator(
-    config: Config, prerequisites: DispatcherPrerequisites)
+    config: Config,
+    prerequisites: DispatcherPrerequisites)
     extends MessageDispatcherConfigurator(config, prerequisites) {
 
   private val instance = new Dispatcher(
-      this,
-      config.getString("id"),
-      config.getInt("throughput"),
-      config.getNanosDuration("throughput-deadline-time"),
-      configureExecutor(),
-      config.getMillisDuration("shutdown-timeout"))
+    this,
+    config.getString("id"),
+    config.getInt("throughput"),
+    config.getNanosDuration("throughput-deadline-time"),
+    configureExecutor(),
+    config.getMillisDuration("shutdown-timeout")
+  )
 
   /**
     * Returns the same dispatcher instance for each invocation
@@ -239,7 +244,7 @@ class DispatcherConfigurator(
   */
 private[akka] object BalancingDispatcherConfigurator {
   private val defaultRequirement = ConfigFactory.parseString(
-      "mailbox-requirement = akka.dispatch.MultipleConsumerSemantics")
+    "mailbox-requirement = akka.dispatch.MultipleConsumerSemantics")
   def amendConfig(config: Config): Config =
     if (config.getString("mailbox-requirement") != Mailboxes.NoMailboxRequirement)
       config
@@ -252,9 +257,11 @@ private[akka] object BalancingDispatcherConfigurator {
   * of the `dispatcher()` method.
   */
 class BalancingDispatcherConfigurator(
-    _config: Config, _prerequisites: DispatcherPrerequisites)
+    _config: Config,
+    _prerequisites: DispatcherPrerequisites)
     extends MessageDispatcherConfigurator(
-        BalancingDispatcherConfigurator.amendConfig(_config), _prerequisites) {
+      BalancingDispatcherConfigurator.amendConfig(_config),
+      _prerequisites) {
 
   private val instance = {
     val mailboxes = prerequisites.mailboxes
@@ -262,22 +269,22 @@ class BalancingDispatcherConfigurator(
     val requirement = mailboxes.getMailboxRequirement(config)
     if (!classOf[MultipleConsumerSemantics].isAssignableFrom(requirement))
       throw new IllegalArgumentException(
-          "BalancingDispatcher must have 'mailbox-requirement' which implements akka.dispatch.MultipleConsumerSemantics; " +
+        "BalancingDispatcher must have 'mailbox-requirement' which implements akka.dispatch.MultipleConsumerSemantics; " +
           s"dispatcher [$id] has [$requirement]")
     val mailboxType =
       if (config.hasPath("mailbox")) {
         val mt = mailboxes.lookup(config.getString("mailbox"))
         if (!requirement.isAssignableFrom(
-                mailboxes.getProducedMessageQueueType(mt)))
+              mailboxes.getProducedMessageQueueType(mt)))
           throw new IllegalArgumentException(
-              s"BalancingDispatcher [$id] has 'mailbox' [${mt.getClass}] which is incompatible with 'mailbox-requirement' [$requirement]")
+            s"BalancingDispatcher [$id] has 'mailbox' [${mt.getClass}] which is incompatible with 'mailbox-requirement' [$requirement]")
         mt
       } else if (config.hasPath("mailbox-type")) {
         val mt = mailboxes.lookup(id)
         if (!requirement.isAssignableFrom(
-                mailboxes.getProducedMessageQueueType(mt)))
+              mailboxes.getProducedMessageQueueType(mt)))
           throw new IllegalArgumentException(
-              s"BalancingDispatcher [$id] has 'mailbox-type' [${mt.getClass}] which is incompatible with 'mailbox-requirement' [$requirement]")
+            s"BalancingDispatcher [$id] has 'mailbox-type' [${mt.getClass}] which is incompatible with 'mailbox-requirement' [$requirement]")
         mt
       } else mailboxes.lookupByQueueType(requirement)
     create(mailboxType)
@@ -285,14 +292,15 @@ class BalancingDispatcherConfigurator(
 
   protected def create(mailboxType: MailboxType): BalancingDispatcher =
     new BalancingDispatcher(
-        this,
-        config.getString("id"),
-        config.getInt("throughput"),
-        config.getNanosDuration("throughput-deadline-time"),
-        mailboxType,
-        configureExecutor(),
-        config.getMillisDuration("shutdown-timeout"),
-        config.getBoolean("attempt-teamwork"))
+      this,
+      config.getString("id"),
+      config.getInt("throughput"),
+      config.getNanosDuration("throughput-deadline-time"),
+      mailboxType,
+      configureExecutor(),
+      config.getMillisDuration("shutdown-timeout"),
+      config.getBoolean("attempt-teamwork")
+    )
 
   /**
     * Returns the same dispatcher instance for each invocation
@@ -306,17 +314,20 @@ class BalancingDispatcherConfigurator(
   * of the `dispatcher()` method.
   */
 class PinnedDispatcherConfigurator(
-    config: Config, prerequisites: DispatcherPrerequisites)
+    config: Config,
+    prerequisites: DispatcherPrerequisites)
     extends MessageDispatcherConfigurator(config, prerequisites) {
 
   private val threadPoolConfig: ThreadPoolConfig = configureExecutor() match {
     case e: ThreadPoolExecutorConfigurator ⇒ e.threadPoolConfig
     case other ⇒
       prerequisites.eventStream.publish(
-          Warning("PinnedDispatcherConfigurator",
-                  this.getClass,
-                  "PinnedDispatcher [%s] not configured to use ThreadPoolExecutor, falling back to default config."
-                    .format(config.getString("id"))))
+        Warning(
+          "PinnedDispatcherConfigurator",
+          this.getClass,
+          "PinnedDispatcher [%s] not configured to use ThreadPoolExecutor, falling back to default config."
+            .format(config.getString("id"))
+        ))
       ThreadPoolConfig()
   }
 
@@ -324,9 +335,10 @@ class PinnedDispatcherConfigurator(
     * Creates new dispatcher for each invocation.
     */
   override def dispatcher(): MessageDispatcher =
-    new PinnedDispatcher(this,
-                         null,
-                         config.getString("id"),
-                         config.getMillisDuration("shutdown-timeout"),
-                         threadPoolConfig)
+    new PinnedDispatcher(
+      this,
+      null,
+      config.getString("id"),
+      config.getMillisDuration("shutdown-timeout"),
+      threadPoolConfig)
 }

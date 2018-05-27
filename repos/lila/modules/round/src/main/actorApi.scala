@@ -28,59 +28,64 @@ sealed trait Member extends SocketMember {
 }
 
 object Member {
-  def apply(channel: JsChannel,
-            user: Option[User],
-            color: Color,
-            playerIdOption: Option[String],
-            ip: String,
-            userTv: Option[String]): Member = {
+  def apply(
+      channel: JsChannel,
+      user: Option[User],
+      color: Color,
+      playerIdOption: Option[String],
+      ip: String,
+      userTv: Option[String]): Member = {
     val userId = user map (_.id)
     val troll = user.??(_.troll)
     playerIdOption.fold[Member](
-        Watcher(channel, userId, color, troll, ip, userTv)) { playerId =>
+      Watcher(channel, userId, color, troll, ip, userTv)) { playerId =>
       Owner(channel, userId, playerId, color, troll, ip)
     }
   }
 }
 
-case class Owner(channel: JsChannel,
-                 userId: Option[String],
-                 playerId: String,
-                 color: Color,
-                 troll: Boolean,
-                 ip: String)
+case class Owner(
+    channel: JsChannel,
+    userId: Option[String],
+    playerId: String,
+    color: Color,
+    troll: Boolean,
+    ip: String)
     extends Member {
 
   val playerIdOption = playerId.some
   val userTv = none
 }
 
-case class Watcher(channel: JsChannel,
-                   userId: Option[String],
-                   color: Color,
-                   troll: Boolean,
-                   ip: String,
-                   userTv: Option[String])
+case class Watcher(
+    channel: JsChannel,
+    userId: Option[String],
+    color: Color,
+    troll: Boolean,
+    ip: String,
+    userTv: Option[String])
     extends Member {
 
   val playerIdOption = none
 }
 
-case class Join(uid: String,
-                user: Option[User],
-                color: Color,
-                playerId: Option[String],
-                ip: String,
-                userTv: Option[String])
+case class Join(
+    uid: String,
+    user: Option[User],
+    color: Color,
+    playerId: Option[String],
+    ip: String,
+    userTv: Option[String])
 case class Connected(enumerator: JsEnumerator, member: Member)
 case class Bye(color: Color)
 case class IsGone(color: Color)
 case object GetSocketStatus
-case class SocketStatus(version: Int,
-                        whiteOnGame: Boolean,
-                        whiteIsGone: Boolean,
-                        blackOnGame: Boolean,
-                        blackIsGone: Boolean) {
+case class SocketStatus(
+    version: Int,
+    whiteOnGame: Boolean,
+    whiteIsGone: Boolean,
+    blackOnGame: Boolean,
+    blackIsGone: Boolean) {
   def onGame(color: Color) = color.fold(whiteOnGame, blackOnGame)
   def isGone(color: Color) = color.fold(whiteIsGone, blackIsGone)
 }
@@ -88,11 +93,12 @@ case class SetGame(game: Option[lila.game.Game])
 
 package round {
 
-  case class HumanPlay(playerId: String,
-                       uci: Uci,
-                       blur: Boolean,
-                       lag: FiniteDuration,
-                       promise: Option[Promise[Unit]] = None) {
+  case class HumanPlay(
+      playerId: String,
+      uci: Uci,
+      blur: Boolean,
+      lag: FiniteDuration,
+      promise: Option[Promise[Unit]] = None) {
 
     val atNanos = nowNanos
   }

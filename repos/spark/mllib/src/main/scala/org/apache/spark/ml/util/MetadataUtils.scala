@@ -34,8 +34,8 @@ private[spark] object MetadataUtils {
     */
   def getNumClasses(labelSchema: StructField): Option[Int] = {
     Attribute.fromStructField(labelSchema) match {
-      case binAttr: BinaryAttribute => Some(2)
-      case nomAttr: NominalAttribute => nomAttr.getNumValues
+      case binAttr: BinaryAttribute                  => Some(2)
+      case nomAttr: NominalAttribute                 => nomAttr.getNumValues
       case _: NumericAttribute | UnresolvedAttribute => None
     }
   }
@@ -62,13 +62,13 @@ private[spark] object MetadataUtils {
           } else {
             attr match {
               case _: NumericAttribute | UnresolvedAttribute => Iterator()
-              case binAttr: BinaryAttribute => Iterator(idx -> 2)
+              case binAttr: BinaryAttribute                  => Iterator(idx -> 2)
               case nomAttr: NominalAttribute =>
                 nomAttr.getNumValues match {
                   case Some(numValues: Int) => Iterator(idx -> numValues)
                   case None =>
                     throw new IllegalArgumentException(
-                        s"Feature $idx is marked as" +
+                      s"Feature $idx is marked as" +
                         " Nominal (categorical), but it does not have the number of values specified.")
                 }
             }
@@ -84,15 +84,18 @@ private[spark] object MetadataUtils {
     * @param names  List of feature names
     */
   def getFeatureIndicesFromNames(
-      col: StructField, names: Array[String]): Array[Int] = {
-    require(col.dataType.isInstanceOf[VectorUDT],
-            s"getFeatureIndicesFromNames expected column $col" +
-            s" to be Vector type, but it was type ${col.dataType} instead.")
+      col: StructField,
+      names: Array[String]): Array[Int] = {
+    require(
+      col.dataType.isInstanceOf[VectorUDT],
+      s"getFeatureIndicesFromNames expected column $col" +
+        s" to be Vector type, but it was type ${col.dataType} instead."
+    )
     val inputAttr = AttributeGroup.fromStructField(col)
     names.map { name =>
       require(
-          inputAttr.hasAttr(name),
-          s"getFeatureIndicesFromNames found no feature with name $name in column $col.")
+        inputAttr.hasAttr(name),
+        s"getFeatureIndicesFromNames found no feature with name $name in column $col.")
       inputAttr.getAttr(name).index.get
     }
   }

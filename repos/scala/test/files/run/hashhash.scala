@@ -2,8 +2,9 @@ object Test {
   def confirmSame(x: Any) =
     assert(x.## == x.hashCode, "%s.## != %s.hashCode".format(x, x))
   def confirmDifferent(x: Any) =
-    assert(x.## != x.hashCode,
-           "%s.## == %s.hashCode (but should not)".format(x, x))
+    assert(
+      x.## != x.hashCode,
+      "%s.## == %s.hashCode (but should not)".format(x, x))
 
   def main(args: Array[String]): Unit = {
 

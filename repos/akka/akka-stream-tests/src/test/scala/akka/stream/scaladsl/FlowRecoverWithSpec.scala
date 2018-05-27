@@ -12,8 +12,8 @@ import scala.util.control.NoStackTrace
 
 class FlowRecoverWithSpec extends AkkaSpec {
 
-  val settings = ActorMaterializerSettings(system).withInputBuffer(
-      initialSize = 1, maxSize = 1)
+  val settings = ActorMaterializerSettings(system)
+    .withInputBuffer(initialSize = 1, maxSize = 1)
 
   implicit val materializer = ActorMaterializer(settings)
 
@@ -21,9 +21,11 @@ class FlowRecoverWithSpec extends AkkaSpec {
 
   "A RecoverWith" must {
     "recover when there is a handler" in assertAllStagesStopped {
-      Source(1 to 4).map { a ⇒
-        if (a == 3) throw ex else a
-      }.recoverWith { case t: Throwable ⇒ Source(List(0, -1)) }
+      Source(1 to 4)
+        .map { a ⇒
+          if (a == 3) throw ex else a
+        }
+        .recoverWith { case t: Throwable ⇒ Source(List(0, -1)) }
         .runWith(TestSink.probe[Int])
         .request(2)
         .expectNextN(1 to 2)
@@ -35,9 +37,11 @@ class FlowRecoverWithSpec extends AkkaSpec {
     }
 
     "cancel substream if parent is terminated when there is a handler" in assertAllStagesStopped {
-      Source(1 to 4).map { a ⇒
-        if (a == 3) throw ex else a
-      }.recoverWith { case t: Throwable ⇒ Source(List(0, -1)) }
+      Source(1 to 4)
+        .map { a ⇒
+          if (a == 3) throw ex else a
+        }
+        .recoverWith { case t: Throwable ⇒ Source(List(0, -1)) }
         .runWith(TestSink.probe[Int])
         .request(2)
         .expectNextN(1 to 2)
@@ -47,9 +51,11 @@ class FlowRecoverWithSpec extends AkkaSpec {
     }
 
     "failed stream if handler is not for such exception type" in assertAllStagesStopped {
-      Source(1 to 3).map { a ⇒
-        if (a == 2) throw ex else a
-      }.recoverWith { case t: IndexOutOfBoundsException ⇒ Source.single(0) }
+      Source(1 to 3)
+        .map { a ⇒
+          if (a == 2) throw ex else a
+        }
+        .recoverWith { case t: IndexOutOfBoundsException ⇒ Source.single(0) }
         .runWith(TestSink.probe[Int])
         .request(1)
         .expectNext(1)
@@ -61,7 +67,8 @@ class FlowRecoverWithSpec extends AkkaSpec {
       val src = Source(1 to 3).map { a ⇒
         if (a == 3) throw ex else a
       }
-      src.recoverWith { case t: Throwable ⇒ src }
+      src
+        .recoverWith { case t: Throwable ⇒ src }
         .runWith(TestSink.probe[Int])
         .request(2)
         .expectNextN(1 to 2)
@@ -92,14 +99,17 @@ class FlowRecoverWithSpec extends AkkaSpec {
     }
 
     "switch the second time if alternative source throws exception" in assertAllStagesStopped {
-      val k = Source(1 to 3).map { a ⇒
-        if (a == 3) throw new IndexOutOfBoundsException() else a
-      }.recoverWith {
-        case t: IndexOutOfBoundsException ⇒
-          Source(List(11, 22)).map(
-              m ⇒ if (m == 22) throw new IllegalArgumentException() else m)
-        case t: IllegalArgumentException ⇒ Source(List(33, 44))
-      }.runWith(TestSink.probe[Int])
+      val k = Source(1 to 3)
+        .map { a ⇒
+          if (a == 3) throw new IndexOutOfBoundsException() else a
+        }
+        .recoverWith {
+          case t: IndexOutOfBoundsException ⇒
+            Source(List(11, 22)).map(m ⇒
+              if (m == 22) throw new IllegalArgumentException() else m)
+          case t: IllegalArgumentException ⇒ Source(List(33, 44))
+        }
+        .runWith(TestSink.probe[Int])
         .request(2)
         .expectNextN(List(1, 2))
         .request(2)
@@ -110,12 +120,15 @@ class FlowRecoverWithSpec extends AkkaSpec {
     }
 
     "terminate with exception if altrnative source failed" in assertAllStagesStopped {
-      Source(1 to 3).map { a ⇒
-        if (a == 3) throw new IndexOutOfBoundsException() else a
-      }.recoverWith {
-        case t: IndexOutOfBoundsException ⇒
-          Source(List(11, 22)).map(m ⇒ if (m == 22) throw ex else m)
-      }.runWith(TestSink.probe[Int])
+      Source(1 to 3)
+        .map { a ⇒
+          if (a == 3) throw new IndexOutOfBoundsException() else a
+        }
+        .recoverWith {
+          case t: IndexOutOfBoundsException ⇒
+            Source(List(11, 22)).map(m ⇒ if (m == 22) throw ex else m)
+        }
+        .runWith(TestSink.probe[Int])
         .request(2)
         .expectNextN(List(1, 2))
         .request(1)

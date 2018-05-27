@@ -14,7 +14,8 @@ import akka.http.scaladsl.util.FastFuture._
 
 class FastFutureSpec extends FreeSpec with Matchers {
   object TheException
-      extends RuntimeException("Expected exception") with NoStackTrace
+      extends RuntimeException("Expected exception")
+      with NoStackTrace
 
   "FastFuture should implement" - {
     "transformWith(Try => Future)" - {
@@ -29,14 +30,16 @@ class FastFutureSpec extends FreeSpec with Matchers {
         }
       }
       "Failure -> Success" in {
-        test(Failure(TheException),
-             _.transformWith(t ⇒ FastFuture.successful(23))) {
+        test(
+          Failure(TheException),
+          _.transformWith(t ⇒ FastFuture.successful(23))) {
           _ shouldEqual Success(23)
         }
       }
       "Failure -> Failure" in {
-        test(Failure(TheException),
-             _.transformWith(_ ⇒ FastFuture.failed(TheException))) {
+        test(
+          Failure(TheException),
+          _.transformWith(_ ⇒ FastFuture.failed(TheException))) {
           _ shouldEqual Failure(TheException)
         }
       }
@@ -53,26 +56,30 @@ class FastFutureSpec extends FreeSpec with Matchers {
     }
     "transformWith(A => Future[B], Throwable => Future[B])" - {
       "Success -> Success" in {
-        test(Success(23),
-             _.transformWith(t ⇒ FastFuture.successful(t + 19), neverCalled)) {
+        test(
+          Success(23),
+          _.transformWith(t ⇒ FastFuture.successful(t + 19), neverCalled)) {
           _ shouldEqual Success(42)
         }
       }
       "Success -> Failure" in {
-        test(Success(23),
-             _.transformWith(_ ⇒ FastFuture.failed(TheException), neverCalled)) {
+        test(
+          Success(23),
+          _.transformWith(_ ⇒ FastFuture.failed(TheException), neverCalled)) {
           _ shouldEqual Failure(TheException)
         }
       }
       "Failure -> Success" in {
-        test(Failure(TheException),
-             _.transformWith(neverCalled, t ⇒ FastFuture.successful(23))) {
+        test(
+          Failure(TheException),
+          _.transformWith(neverCalled, t ⇒ FastFuture.successful(23))) {
           _ shouldEqual Success(23)
         }
       }
       "Failure -> Failure" in {
-        test(Failure(TheException),
-             _.transformWith(neverCalled, _ ⇒ FastFuture.failed(TheException))) {
+        test(
+          Failure(TheException),
+          _.transformWith(neverCalled, _ ⇒ FastFuture.failed(TheException))) {
           _ shouldEqual Failure(TheException)
         }
       }

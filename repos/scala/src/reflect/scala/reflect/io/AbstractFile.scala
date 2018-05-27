@@ -7,7 +7,13 @@ package scala
 package reflect
 package io
 
-import java.io.{IOException, InputStream, OutputStream, BufferedOutputStream, ByteArrayOutputStream}
+import java.io.{
+  IOException,
+  InputStream,
+  OutputStream,
+  BufferedOutputStream,
+  ByteArrayOutputStream
+}
 import java.io.{File => JFile}
 import java.net.URL
 import scala.reflect.internal.util.Statistics
@@ -211,9 +217,10 @@ abstract class AbstractFile extends Iterable[AbstractFile] {
     lookup((f, p, dir) => f.lookupNameUnchecked(p, dir), path, directory)
   }
 
-  private def lookup(getFile: (AbstractFile, String, Boolean) => AbstractFile,
-                     path0: String,
-                     directory: Boolean): AbstractFile = {
+  private def lookup(
+      getFile: (AbstractFile, String, Boolean) => AbstractFile,
+      path0: String,
+      directory: Boolean): AbstractFile = {
     val separator = java.io.File.separatorChar
     // trim trailing '/'s
     val path: String =
@@ -234,7 +241,8 @@ abstract class AbstractFile extends Iterable[AbstractFile] {
   }
 
   private def fileOrSubdirectoryNamed(
-      name: String, isDir: Boolean): AbstractFile = {
+      name: String,
+      isDir: Boolean): AbstractFile = {
     val lookup = lookupName(name, isDir)
     if (lookup != null) lookup
     else {
@@ -249,9 +257,9 @@ abstract class AbstractFile extends Iterable[AbstractFile] {
     * creating an empty file if it does not already existing.
     */
   def fileNamed(name: String): AbstractFile = {
-    assert(isDirectory,
-           "Tried to find '%s' in '%s' but it is not a directory".format(
-               name, path))
+    assert(
+      isDirectory,
+      "Tried to find '%s' in '%s' but it is not a directory".format(name, path))
     fileOrSubdirectoryNamed(name, isDir = false)
   }
 
@@ -260,9 +268,9 @@ abstract class AbstractFile extends Iterable[AbstractFile] {
     * does not already exist.
     */
   def subdirectoryNamed(name: String): AbstractFile = {
-    assert(isDirectory,
-           "Tried to find '%s' in '%s' but it is not a directory".format(
-               name, path))
+    assert(
+      isDirectory,
+      "Tried to find '%s' in '%s' but it is not a directory".format(name, path))
     fileOrSubdirectoryNamed(name, isDir = true)
   }
 

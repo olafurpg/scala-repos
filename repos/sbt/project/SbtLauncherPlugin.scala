@@ -9,38 +9,39 @@ object SbtLauncherPlugin extends AutoPlugin {
     val sbtLaunchJar =
       taskKey[File]("constructs an sbt-launch.jar for this version of sbt.")
     val rawSbtLaunchJar = taskKey[File](
-        "The released version of the sbt-launcher we use to bundle this application.")
+      "The released version of the sbt-launcher we use to bundle this application.")
   }
   import autoImport._
 
   override def projectConfigurations: Seq[Configuration] =
     Seq(SbtLaunchConfiguration)
   override def projectSettings: Seq[Setting[_]] = Seq(
-      libraryDependencies +=
-        Dependencies.rawLauncher % SbtLaunchConfiguration.name,
-      rawSbtLaunchJar := {
-        Classpaths
-          .managedJars(SbtLaunchConfiguration, Set("jar"), update.value)
-          .headOption match {
-          case Some(jar) => jar.data
-          case None =>
-            sys.error(
-                s"Could not resolve sbt launcher!, dependencies := ${libraryDependencies.value}")
-        }
-      },
-      sbtLaunchJar := {
-        val propFiles = (resources in Compile).value
-        val propFileLocations =
-          for (file <- propFiles; if file.getName != "resources") yield {
-            if (file.getName == "sbt.boot.properties")
-              "sbt/sbt.boot.properties" -> file
-            else file.getName -> file
-          }
-        // TODO - We need to inject the appropriate boot.properties file for this version of sbt.
-        rebundle(rawSbtLaunchJar.value,
-                 propFileLocations.toMap,
-                 target.value / "sbt-launch.jar")
+    libraryDependencies +=
+      Dependencies.rawLauncher % SbtLaunchConfiguration.name,
+    rawSbtLaunchJar := {
+      Classpaths
+        .managedJars(SbtLaunchConfiguration, Set("jar"), update.value)
+        .headOption match {
+        case Some(jar) => jar.data
+        case None =>
+          sys.error(
+            s"Could not resolve sbt launcher!, dependencies := ${libraryDependencies.value}")
       }
+    },
+    sbtLaunchJar := {
+      val propFiles = (resources in Compile).value
+      val propFileLocations =
+        for (file <- propFiles; if file.getName != "resources") yield {
+          if (file.getName == "sbt.boot.properties")
+            "sbt/sbt.boot.properties" -> file
+          else file.getName -> file
+        }
+      // TODO - We need to inject the appropriate boot.properties file for this version of sbt.
+      rebundle(
+        rawSbtLaunchJar.value,
+        propFileLocations.toMap,
+        target.value / "sbt-launch.jar")
+    }
   )
 
   def rebundle(jar: File, overrides: Map[String, File], target: File): File = {

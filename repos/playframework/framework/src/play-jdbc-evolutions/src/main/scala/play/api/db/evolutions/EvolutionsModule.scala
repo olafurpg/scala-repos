@@ -16,13 +16,13 @@ import play.core.WebCommands
 class EvolutionsModule extends Module {
   def bindings(environment: Environment, configuration: Configuration) = {
     Seq(
-        bind[EvolutionsConfig].toProvider[DefaultEvolutionsConfigParser],
-        bind[EvolutionsReader].to[EnvironmentEvolutionsReader],
-        bind[EvolutionsApi].to[DefaultEvolutionsApi],
-        bind[ApplicationEvolutions]
-          .toProvider[ApplicationEvolutionsProvider]
-          .eagerly
-      )
+      bind[EvolutionsConfig].toProvider[DefaultEvolutionsConfigParser],
+      bind[EvolutionsReader].to[EnvironmentEvolutionsReader],
+      bind[EvolutionsApi].to[DefaultEvolutionsApi],
+      bind[ApplicationEvolutions]
+        .toProvider[ApplicationEvolutionsProvider]
+        .eagerly
+    )
   }
 }
 
@@ -42,31 +42,33 @@ trait EvolutionsComponents {
     new EnvironmentEvolutionsReader(environment)
   lazy val evolutionsApi: EvolutionsApi = new DefaultEvolutionsApi(dbApi)
   lazy val applicationEvolutions: ApplicationEvolutions =
-    new ApplicationEvolutions(evolutionsConfig,
-                              evolutionsReader,
-                              evolutionsApi,
-                              dynamicEvolutions,
-                              dbApi,
-                              environment,
-                              webCommands)
-}
-
-@Singleton
-class ApplicationEvolutionsProvider @Inject()(config: EvolutionsConfig,
-                                              reader: EvolutionsReader,
-                                              evolutions: EvolutionsApi,
-                                              dbApi: DBApi,
-                                              environment: Environment,
-                                              webCommands: WebCommands,
-                                              injector: Injector)
-    extends Provider[ApplicationEvolutions] {
-
-  lazy val get = new ApplicationEvolutions(
-      config,
-      reader,
-      evolutions,
-      injector.instanceOf[DynamicEvolutions],
+    new ApplicationEvolutions(
+      evolutionsConfig,
+      evolutionsReader,
+      evolutionsApi,
+      dynamicEvolutions,
       dbApi,
       environment,
       webCommands)
+}
+
+@Singleton
+class ApplicationEvolutionsProvider @Inject()(
+    config: EvolutionsConfig,
+    reader: EvolutionsReader,
+    evolutions: EvolutionsApi,
+    dbApi: DBApi,
+    environment: Environment,
+    webCommands: WebCommands,
+    injector: Injector)
+    extends Provider[ApplicationEvolutions] {
+
+  lazy val get = new ApplicationEvolutions(
+    config,
+    reader,
+    evolutions,
+    injector.instanceOf[DynamicEvolutions],
+    dbApi,
+    environment,
+    webCommands)
 }

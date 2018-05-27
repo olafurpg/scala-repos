@@ -25,22 +25,23 @@ class BatcherSpec extends WordSpec {
     m.foreach {
       case (input, expected) =>
         assert(
-            other.enclosedBy(BatchID(input), hourlyBatcher).toList == expected
-              .map(BatchID(_))
-              .toList)
+          other.enclosedBy(BatchID(input), hourlyBatcher).toList == expected
+            .map(BatchID(_))
+            .toList)
     }
 
   "DurationBatcher should properly enclose a smaller, offset batcher" in {
     assertRelation(
-        Batcher.ofMinutes(22),
-        Map(
-            0L -> List(0L), // 0 -> 22 minutes
-            1L -> List(0L), // 23 -> 44 minutes
-            2L -> List(0L, 1L), // 45 -> 1 hr, 6 minutes
-            3L -> List(1L), // 1 hr, 7 minutes -> 1 hr, 28 minutes
-            4L -> List(1L), // 1 hr, 29 minutes -> 1 hr, 50 minutes
-            5L -> List(1L, 2L) // 1 hr, 51 minutes -> 2 hr, 12 minutes
-        ))
+      Batcher.ofMinutes(22),
+      Map(
+        0L -> List(0L), // 0 -> 22 minutes
+        1L -> List(0L), // 23 -> 44 minutes
+        2L -> List(0L, 1L), // 45 -> 1 hr, 6 minutes
+        3L -> List(1L), // 1 hr, 7 minutes -> 1 hr, 28 minutes
+        4L -> List(1L), // 1 hr, 29 minutes -> 1 hr, 50 minutes
+        5L -> List(1L, 2L) // 1 hr, 51 minutes -> 2 hr, 12 minutes
+      )
+    )
   }
 
   "DurationBatcher when called on current batch should be within the last few seconds" in {
@@ -55,7 +56,7 @@ class BatcherSpec extends WordSpec {
   "DurationBatcher should always require n batches to fit into a batcher of n hours" in {
     (10 to 100).foreach { n =>
       assert(
-          Batcher.ofHours(n).enclosedBy(BatchID(100), hourlyBatcher).size == n)
+        Batcher.ofHours(n).enclosedBy(BatchID(100), hourlyBatcher).size == n)
     }
   }
 }

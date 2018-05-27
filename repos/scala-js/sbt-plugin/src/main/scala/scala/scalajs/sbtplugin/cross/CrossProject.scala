@@ -234,8 +234,9 @@ final class CrossProject private (
   // Concrete alteration members
 
   def aggregate(refs: CrossProject*): CrossProject = {
-    copy(jvm.aggregate(refs.map(_.jvm: ProjectReference): _*),
-         js.aggregate(refs.map(_.js: ProjectReference): _*))
+    copy(
+      jvm.aggregate(refs.map(_.jvm: ProjectReference): _*),
+      js.aggregate(refs.map(_.js: ProjectReference): _*))
   }
 
   def configs(cs: Configuration*): CrossProject =
@@ -284,10 +285,11 @@ object CrossProject extends CrossProjectExtra {
     CrossProject(id + "JVM", id + "JS", base, crossType).settings(name := id)
   }
 
-  def apply(jvmId: String,
-            jsId: String,
-            base: File,
-            crossType: CrossType): CrossProject = {
+  def apply(
+      jvmId: String,
+      jsId: String,
+      base: File,
+      crossType: CrossType): CrossProject = {
 
     val sss = sharedSrcSettings(crossType)
 
@@ -301,28 +303,32 @@ object CrossProject extends CrossProjectExtra {
   }
 
   private def sharedSrcSettings(crossType: CrossType) = Seq(
-      unmanagedSourceDirectories in Compile ++= {
-        makeCrossSources(crossType.sharedSrcDir(baseDirectory.value, "main"),
-                         scalaBinaryVersion.value,
-                         crossPaths.value)
-      },
-      unmanagedSourceDirectories in Test ++= {
-        makeCrossSources(crossType.sharedSrcDir(baseDirectory.value, "test"),
-                         scalaBinaryVersion.value,
-                         crossPaths.value)
-      }
+    unmanagedSourceDirectories in Compile ++= {
+      makeCrossSources(
+        crossType.sharedSrcDir(baseDirectory.value, "main"),
+        scalaBinaryVersion.value,
+        crossPaths.value)
+    },
+    unmanagedSourceDirectories in Test ++= {
+      makeCrossSources(
+        crossType.sharedSrcDir(baseDirectory.value, "test"),
+        scalaBinaryVersion.value,
+        crossPaths.value)
+    }
   )
 
   // Inspired by sbt's Defaults.makeCrossSources
-  private def makeCrossSources(sharedSrcDir: Option[File],
-                               scalaBinaryVersion: String,
-                               cross: Boolean): Seq[File] = {
+  private def makeCrossSources(
+      sharedSrcDir: Option[File],
+      scalaBinaryVersion: String,
+      cross: Boolean): Seq[File] = {
     sharedSrcDir.fold[Seq[File]] {
       Seq.empty
     } { srcDir =>
       if (cross)
-        Seq(srcDir.getParentFile / s"${srcDir.name}-$scalaBinaryVersion",
-            srcDir)
+        Seq(
+          srcDir.getParentFile / s"${srcDir.name}-$scalaBinaryVersion",
+          srcDir)
       else Seq(srcDir)
     }
   }
@@ -335,9 +341,9 @@ object CrossProject extends CrossProjectExtra {
   def crossProject_impl(c: Context): c.Expr[Builder] = {
     import c.universe._
     val enclosingValName = MacroUtils.definingValName(
-        c,
-        methodName =>
-          s"""$methodName must be directly assigned to a val, such as `val x = $methodName`.""")
+      c,
+      methodName =>
+        s"""$methodName must be directly assigned to a val, such as `val x = $methodName`.""")
     val name = c.Expr[String](Literal(Constant(enclosingValName)))
     reify { new Builder(name.splice, new File(name.splice)) }
   }

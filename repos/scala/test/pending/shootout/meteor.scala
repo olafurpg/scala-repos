@@ -27,16 +27,17 @@ final class Solver(n: Int) {
 
   private val board = new Board()
 
-  val pieces = Array(new Piece(0),
-                     new Piece(1),
-                     new Piece(2),
-                     new Piece(3),
-                     new Piece(4),
-                     new Piece(5),
-                     new Piece(6),
-                     new Piece(7),
-                     new Piece(8),
-                     new Piece(9))
+  val pieces = Array(
+    new Piece(0),
+    new Piece(1),
+    new Piece(2),
+    new Piece(3),
+    new Piece(4),
+    new Piece(5),
+    new Piece(6),
+    new Piece(7),
+    new Piece(8),
+    new Piece(9))
 
   val unplaced = new BitSet(pieces.length)
 
@@ -109,7 +110,7 @@ final class Solver(n: Int) {
     printBoard(last)
   }
 
-/*
+  /*
    def printPieces() =
       for (i <- Iterator.range(0,Board.pieces)) pieces(i).print
  */
@@ -134,10 +135,10 @@ final class Board {
 
   def asString() =
     new String(
-        cells map
+      cells map
         (c =>
-              if (c.piece == null) '-'.toByte
-              else (c.piece.number + 48).toByte))
+          if (c.piece == null) '-'.toByte
+          else (c.piece.number + 48).toByte))
 
   def firstEmptyCellIndex() = cells.findIndexOf(c => c.isEmpty)
 
@@ -198,7 +199,7 @@ final class Board {
     }
     a
   }
-/*
+  /*
 // Printing all the board cells and their neighbours
 // helps check that they are connected properly
 
@@ -377,7 +378,7 @@ final class Piece(_number: Int) {
     cells(3).next(Cell.SE) = cells(4)
   }
 
-/*
+  /*
    def print() = {
       Console.println("Piece # " + number)
       Console.println("cell\tNW NE W  E  SW SE")
@@ -436,8 +437,9 @@ final class BoardCell(_number: Int) extends {
       mark
       var count = 1
 
-      for (neighbour <- next) if (neighbour != null && neighbour.isEmpty)
-        count = count + neighbour.contiguousEmptyCells
+      for (neighbour <- next)
+        if (neighbour != null && neighbour.isEmpty)
+          count = count + neighbour.contiguousEmptyCells
 
       count
     } else { 0 }

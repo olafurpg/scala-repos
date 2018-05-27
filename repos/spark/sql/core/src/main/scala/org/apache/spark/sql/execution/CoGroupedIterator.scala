@@ -18,7 +18,11 @@
 package org.apache.spark.sql.execution
 
 import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.catalyst.expressions.{Ascending, Attribute, SortOrder}
+import org.apache.spark.sql.catalyst.expressions.{
+  Ascending,
+  Attribute,
+  SortOrder
+}
 import org.apache.spark.sql.catalyst.expressions.codegen.GenerateOrdering
 
 /**
@@ -26,14 +30,16 @@ import org.apache.spark.sql.catalyst.expressions.codegen.GenerateOrdering
   * grouping key with its associated values from all [[GroupedIterator]]s.
   * Note: we assume the output of each [[GroupedIterator]] is ordered by the grouping key.
   */
-class CoGroupedIterator(left: Iterator[(InternalRow, Iterator[InternalRow])],
-                        right: Iterator[(InternalRow, Iterator[InternalRow])],
-                        groupingSchema: Seq[Attribute])
+class CoGroupedIterator(
+    left: Iterator[(InternalRow, Iterator[InternalRow])],
+    right: Iterator[(InternalRow, Iterator[InternalRow])],
+    groupingSchema: Seq[Attribute])
     extends Iterator[
-        (InternalRow, Iterator[InternalRow], Iterator[InternalRow])] {
+      (InternalRow, Iterator[InternalRow], Iterator[InternalRow])] {
 
   private val keyOrdering = GenerateOrdering.generate(
-      groupingSchema.map(SortOrder(_, Ascending)), groupingSchema)
+    groupingSchema.map(SortOrder(_, Ascending)),
+    groupingSchema)
 
   private var currentLeftData: (InternalRow, Iterator[InternalRow]) = _
   private var currentRightData: (InternalRow, Iterator[InternalRow]) = _

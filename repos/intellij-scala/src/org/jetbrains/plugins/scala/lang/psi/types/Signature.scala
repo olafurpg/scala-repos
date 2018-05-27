@@ -8,28 +8,35 @@ import com.intellij.psi._
 import com.intellij.psi.util.MethodSignatureUtil
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameters
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScTypeAlias, ScTypeAliasDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction,
+  ScTypeAlias,
+  ScTypeAliasDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.TypeParameter
 
 import scala.collection.mutable.ArrayBuffer
 
-case class TypeAliasSignature(name: String,
-                              typeParams: List[TypeParameter],
-                              lowerBound: ScType,
-                              upperBound: ScType,
-                              isDefinition: Boolean,
-                              ta: ScTypeAlias) {
+case class TypeAliasSignature(
+    name: String,
+    typeParams: List[TypeParameter],
+    lowerBound: ScType,
+    upperBound: ScType,
+    isDefinition: Boolean,
+    ta: ScTypeAlias) {
   def this(ta: ScTypeAlias) {
-    this(ta.name,
-         ta.typeParameters.map(new TypeParameter(_)).toList,
-         ta.lowerBound.getOrNothing,
-         ta.upperBound.getOrAny,
-         ta.isInstanceOf[ScTypeAliasDefinition],
-         ta)
+    this(
+      ta.name,
+      ta.typeParameters.map(new TypeParameter(_)).toList,
+      ta.lowerBound.getOrNothing,
+      ta.upperBound.getOrAny,
+      ta.isInstanceOf[ScTypeAliasDefinition],
+      ta)
   }
 
   def updateTypes(
-      fun: ScType => ScType, withCopy: Boolean = true): TypeAliasSignature = {
+      fun: ScType => ScType,
+      withCopy: Boolean = true): TypeAliasSignature = {
     def updateTypeParam(tp: TypeParameter): TypeParameter = {
       new TypeParameter(tp.name, tp.typeParams.map(updateTypeParam), {
         val res = fun(tp.lowerType())
@@ -41,33 +48,37 @@ case class TypeAliasSignature(name: String,
           res
       }, tp.ptp)
     }
-    val res = TypeAliasSignature(name,
-                                 typeParams.map(updateTypeParam),
-                                 fun(lowerBound),
-                                 fun(upperBound),
-                                 isDefinition,
-                                 ta)
+    val res = TypeAliasSignature(
+      name,
+      typeParams.map(updateTypeParam),
+      fun(lowerBound),
+      fun(upperBound),
+      isDefinition,
+      ta)
 
     if (withCopy) res.copy(ta = ScTypeAlias.getCompoundCopy(res, ta))
     else res
   }
 
-  def updateTypesWithVariance(fun: (ScType, Int) => ScType,
-                              variance: Int,
-                              withCopy: Boolean = true): TypeAliasSignature = {
+  def updateTypesWithVariance(
+      fun: (ScType, Int) => ScType,
+      variance: Int,
+      withCopy: Boolean = true): TypeAliasSignature = {
     def updateTypeParam(tp: TypeParameter): TypeParameter = {
-      new TypeParameter(tp.name,
-                        tp.typeParams.map(updateTypeParam),
-                        () => fun(tp.lowerType(), variance),
-                        () => fun(tp.upperType(), -variance),
-                        tp.ptp)
+      new TypeParameter(
+        tp.name,
+        tp.typeParams.map(updateTypeParam),
+        () => fun(tp.lowerType(), variance),
+        () => fun(tp.upperType(), -variance),
+        tp.ptp)
     }
-    val res = TypeAliasSignature(name,
-                                 typeParams.map(updateTypeParam),
-                                 fun(lowerBound, variance),
-                                 fun(upperBound, -variance),
-                                 isDefinition,
-                                 ta)
+    val res = TypeAliasSignature(
+      name,
+      typeParams.map(updateTypeParam),
+      fun(lowerBound, variance),
+      fun(upperBound, -variance),
+      isDefinition,
+      ta)
 
     if (withCopy) res.copy(ta = ScTypeAlias.getCompoundCopy(res, ta))
     else res
@@ -78,8 +89,8 @@ case class TypeAliasSignature(name: String,
   override def equals(other: Any): Boolean = other match {
     case that: TypeAliasSignature =>
       (that canEqual this) && name == that.name &&
-      typeParams == that.typeParams && lowerBound == that.lowerBound &&
-      upperBound == that.upperBound && isDefinition == that.isDefinition
+        typeParams == that.typeParams && lowerBound == that.lowerBound &&
+        upperBound == that.upperBound && isDefinition == that.isDefinition
     case _ => false
   }
 
@@ -89,25 +100,28 @@ case class TypeAliasSignature(name: String,
   }
 }
 
-class Signature(val name: String,
-                private val typesEval: List[Seq[() => ScType]],
-                val paramLength: List[Int],
-                private val tParams: Array[TypeParameter],
-                val substitutor: ScSubstitutor,
-                val namedElement: PsiNamedElement,
-                val hasRepeatedParam: Seq[Int] = Seq.empty) {
+class Signature(
+    val name: String,
+    private val typesEval: List[Seq[() => ScType]],
+    val paramLength: List[Int],
+    private val tParams: Array[TypeParameter],
+    val substitutor: ScSubstitutor,
+    val namedElement: PsiNamedElement,
+    val hasRepeatedParam: Seq[Int] = Seq.empty) {
 
-  def this(name: String,
-           stream: Seq[() => ScType],
-           paramLength: Int,
-           substitutor: ScSubstitutor,
-           namedElement: PsiNamedElement) =
-    this(name,
-         List(stream),
-         List(paramLength),
-         Array.empty,
-         substitutor,
-         namedElement)
+  def this(
+      name: String,
+      stream: Seq[() => ScType],
+      paramLength: Int,
+      substitutor: ScSubstitutor,
+      namedElement: PsiNamedElement) =
+    this(
+      name,
+      List(stream),
+      List(paramLength),
+      Array.empty,
+      substitutor,
+      namedElement)
 
   private def types: List[Seq[() => ScType]] = typesEval
 
@@ -124,10 +138,10 @@ class Signature(val name: String,
     }
 
     ScalaPsiUtil.convertMemberName(name) == ScalaPsiUtil.convertMemberName(
-        other.name) &&
+      other.name) &&
     ((typeParams.length == other.typeParams.length &&
-            paramTypesEquiv(other)) ||
-        (paramLength == other.paramLength && javaErasedEquiv(other))) &&
+    paramTypesEquiv(other)) ||
+    (paramLength == other.paramLength && javaErasedEquiv(other))) &&
     fieldCheck(other)
   }
 
@@ -136,20 +150,26 @@ class Signature(val name: String,
       case (ps1: PhysicalSignature, ps2: PhysicalSignature)
           if ps1.isJava && ps2.isJava =>
         val psiSub1 = ScalaPsiUtil.getPsiSubstitutor(
-            ps1.substitutor, ps1.method.getProject, ps1.method.getResolveScope)
+          ps1.substitutor,
+          ps1.method.getProject,
+          ps1.method.getResolveScope)
         val psiSub2 = ScalaPsiUtil.getPsiSubstitutor(
-            ps2.substitutor, ps2.method.getProject, ps2.method.getResolveScope)
+          ps2.substitutor,
+          ps2.method.getProject,
+          ps2.method.getResolveScope)
         val psiSig1 = ps1.method.getSignature(psiSub1)
         val psiSig2 = ps2.method.getSignature(psiSub2)
-        MethodSignatureUtil.METHOD_PARAMETERS_ERASURE_EQUALITY.equals(
-            psiSig1, psiSig2)
+        MethodSignatureUtil.METHOD_PARAMETERS_ERASURE_EQUALITY
+          .equals(psiSig1, psiSig2)
       case _ => false
     }
   }
 
   def paramTypesEquiv(other: Signature): Boolean = {
     paramTypesEquivExtended(
-        other, new ScUndefinedSubstitutor, falseUndef = true)._1
+      other,
+      new ScUndefinedSubstitutor,
+      falseUndef = true)._1
   }
 
   def paramTypesEquivExtended(
@@ -195,14 +215,14 @@ class Signature(val name: String,
 
   override def equals(that: Any) = that match {
     case s: Signature => equiv(s) && parameterlessKind == s.parameterlessKind
-    case _ => false
+    case _            => false
   }
 
   def parameterlessKind: Int = {
     namedElement match {
       case f: ScFunction if !f.hasParameterClause => 1
-      case p: PsiMethod => 2
-      case _ => 3
+      case p: PsiMethod                           => 2
+      case _                                      => 3
     }
   }
 
@@ -227,18 +247,19 @@ class Signature(val name: String,
       case (f1: ScFunction, p: PsiMethod) => f1.hasParameterClause
       case (p: PsiMethod, f2: ScFunction) => f2.hasParameterClause
       case (p1: PsiMethod, p2: PsiMethod) => true
-      case (p: PsiMethod, _) => false
-      case (_, f: ScFunction) => !f.hasParameterClause
-      case (_, f: PsiMethod) => false
-      case _ => true
+      case (p: PsiMethod, _)              => false
+      case (_, f: ScFunction)             => !f.hasParameterClause
+      case (_, f: PsiMethod)              => false
+      case _                              => true
     }
   }
 }
 
 object Signature {
-  def unify(subst: ScSubstitutor,
-            tps1: Array[TypeParameter],
-            tps2: Array[TypeParameter]) = {
+  def unify(
+      subst: ScSubstitutor,
+      tps1: Array[TypeParameter],
+      tps2: Array[TypeParameter]) = {
     var res = subst
     val iterator1 = tps1.iterator
     val iterator2 = tps2.iterator
@@ -246,8 +267,8 @@ object Signature {
       val (tp1, tp2) = (iterator1.next(), iterator2.next())
 
       res = res bindT
-      ((tp2.name, ScalaPsiUtil.getPsiElementId(tp2.ptp)),
-          ScTypeParameterType.toTypeParameterType(tp1))
+        ((tp2.name, ScalaPsiUtil.getPsiElementId(tp2.ptp)),
+        ScTypeParameterType.toTypeParameterType(tp1))
     }
     res
   }
@@ -259,13 +280,12 @@ object PhysicalSignature {
     case fun: ScFunction =>
       fun.effectiveParameterClauses
         .map(clause =>
-              ScalaPsiUtil.mapToLazyTypesSeq(clause.effectiveParameters))
+          ScalaPsiUtil.mapToLazyTypesSeq(clause.effectiveParameters))
         .toList
     case _ =>
-      List(
-          ScalaPsiUtil.mapToLazyTypesSeq(method.getParameterList match {
+      List(ScalaPsiUtil.mapToLazyTypesSeq(method.getParameterList match {
         case p: ScParameters => p.params
-        case p => p.getParameters.toSeq
+        case p               => p.getParameters.toSeq
       }))
   }
 
@@ -302,13 +322,16 @@ object PhysicalSignature {
 }
 
 class PhysicalSignature(
-    val method: PsiMethod, override val substitutor: ScSubstitutor)
-    extends Signature(method.name,
-                      PhysicalSignature.typesEval(method),
-                      PhysicalSignature.paramLength(method),
-                      TypeParameter.fromArray(method.getTypeParameters),
-                      substitutor,
-                      method,
-                      PhysicalSignature.hasRepeatedParam(method)) {
+    val method: PsiMethod,
+    override val substitutor: ScSubstitutor)
+    extends Signature(
+      method.name,
+      PhysicalSignature.typesEval(method),
+      PhysicalSignature.paramLength(method),
+      TypeParameter.fromArray(method.getTypeParameters),
+      substitutor,
+      method,
+      PhysicalSignature.hasRepeatedParam(method)
+    ) {
   override def isJava = method.getLanguage == JavaFileType.INSTANCE.getLanguage
 }

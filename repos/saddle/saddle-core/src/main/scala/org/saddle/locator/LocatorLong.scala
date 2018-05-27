@@ -15,7 +15,10 @@
   **/
 package org.saddle.locator
 
-import it.unimi.dsi.fastutil.longs.{Long2IntLinkedOpenHashMap, Long2IntOpenHashMap}
+import it.unimi.dsi.fastutil.longs.{
+  Long2IntLinkedOpenHashMap,
+  Long2IntOpenHashMap
+}
 
 /**
   * A Long-to-integer hash map, backed by fastutil implementation

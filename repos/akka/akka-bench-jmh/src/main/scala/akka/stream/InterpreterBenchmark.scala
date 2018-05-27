@@ -3,7 +3,10 @@ package akka.stream
 import akka.event._
 import akka.stream.impl.fusing.{GraphInterpreterSpecKit, GraphStages}
 import akka.stream.impl.fusing.GraphStages
-import akka.stream.impl.fusing.GraphInterpreter.{DownstreamBoundaryStageLogic, UpstreamBoundaryStageLogic}
+import akka.stream.impl.fusing.GraphInterpreter.{
+  DownstreamBoundaryStageLogic,
+  UpstreamBoundaryStageLogic
+}
 import akka.stream.stage._
 import org.openjdk.jmh.annotations._
 
@@ -55,17 +58,20 @@ object InterpreterBenchmark {
     override val out: akka.stream.Outlet[T] = Outlet[T]("out")
     out.id = 0
 
-    setHandler(out, new OutHandler {
-      override def onPull(): Unit = {
-        if (idx < data.size) {
-          push(out, data(idx))
-          idx += 1
-        } else {
-          completeStage()
+    setHandler(
+      out,
+      new OutHandler {
+        override def onPull(): Unit = {
+          if (idx < data.size) {
+            push(out, data(idx))
+            idx += 1
+          } else {
+            completeStage()
+          }
         }
+        override def onDownstreamFinish(): Unit = completeStage()
       }
-      override def onDownstreamFinish(): Unit = completeStage()
-    })
+    )
   }
 
   case class GraphDataSink[T](override val toString: String, var expected: Int)
@@ -89,7 +95,8 @@ object InterpreterBenchmark {
       true
     override def publish(event: Event): Unit = ()
     override def unsubscribe(
-        subscriber: Subscriber, from: Classifier): Boolean = true
+        subscriber: Subscriber,
+        from: Classifier): Boolean = true
     override def unsubscribe(subscriber: Subscriber): Unit = ()
   }
 }

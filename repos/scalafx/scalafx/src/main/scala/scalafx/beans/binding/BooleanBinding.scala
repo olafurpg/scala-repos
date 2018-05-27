@@ -32,8 +32,7 @@ import scala.language.implicitConversions
 import scalafx.beans.value.ObservableValue
 
 object BooleanBinding {
-  implicit def sfxBooleanBinding2jfx(
-      bb: BooleanBinding): jfxbb.BooleanBinding =
+  implicit def sfxBooleanBinding2jfx(bb: BooleanBinding): jfxbb.BooleanBinding =
     if (bb != null) bb.delegate else null
 }
 

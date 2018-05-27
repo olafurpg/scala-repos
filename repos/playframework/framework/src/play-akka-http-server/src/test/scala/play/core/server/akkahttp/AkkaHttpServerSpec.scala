@@ -20,15 +20,15 @@ object AkkaHttpServerSpec extends PlaySpecification with WsTestClient {
 
   sequential
 
-  def requestFromServer[T](path: String)(
-      exec: WSRequest => Future[WSResponse])(
+  def requestFromServer[T](path: String)(exec: WSRequest => Future[WSResponse])(
       routes: PartialFunction[(String, String), Handler])(
       check: WSResponse => T)(implicit awaitTimeout: Timeout): T = {
     val app = GuiceApplicationBuilder().routes(routes).build()
     running(
-        TestServer(testServerPort,
-                   app,
-                   serverProvider = Some(AkkaHttpServer.provider))) {
+      TestServer(
+        testServerPort,
+        app,
+        serverProvider = Some(AkkaHttpServer.provider))) {
       val plainRequest = wsUrl(path)(testServerPort)
       val responseFuture = exec(plainRequest)
       val response = await(responseFuture)(awaitTimeout)
@@ -81,8 +81,8 @@ object AkkaHttpServerSpec extends PlaySpecification with WsTestClient {
       }
     }
 
-    def headerDump(
-        headerNames: String*)(implicit request: Request[_]): String = {
+    def headerDump(headerNames: String*)(
+        implicit request: Request[_]): String = {
       val headerGroups: Seq[String] = for (n <- headerNames) yield {
         val headerGroup = request.headers.getAll(n)
         headerGroup.mkString("<", ", ", ">")
@@ -110,8 +110,8 @@ object AkkaHttpServerSpec extends PlaySpecification with WsTestClient {
       requestFromServer("/abc?foo=bar") { request =>
         request
           .withHeaders(
-              ACCEPT_ENCODING -> "utf-8",
-              ACCEPT_LANGUAGE -> "en-US"
+            ACCEPT_ENCODING -> "utf-8",
+            ACCEPT_LANGUAGE -> "en-US"
           )
           .get()
       } {
@@ -130,9 +130,9 @@ object AkkaHttpServerSpec extends PlaySpecification with WsTestClient {
       requestFromServer("/abc?foo=bar") { request =>
         request
           .withHeaders(
-              ACCEPT_ENCODING -> "utf-8",
-              ACCEPT_LANGUAGE -> "en-US",
-              `Raw-Request-URI`.name -> "/foo/bar/baz"
+            ACCEPT_ENCODING -> "utf-8",
+            ACCEPT_LANGUAGE -> "en-US",
+            `Raw-Request-URI`.name -> "/foo/bar/baz"
           )
           .get()
       } {
@@ -198,8 +198,8 @@ object AkkaHttpServerSpec extends PlaySpecification with WsTestClient {
     }
 
     "support WithServer form" in new WithServer(
-        app = GuiceApplicationBuilder().routes(httpServerTagRoutes).build(),
-        serverProvider = Some(AkkaHttpServer.provider)) {
+      app = GuiceApplicationBuilder().routes(httpServerTagRoutes).build(),
+      serverProvider = Some(AkkaHttpServer.provider)) {
       val response = await(wsUrl("/httpServerTag").get())
       response.status must equalTo(OK)
       response.body must_== "Some(akka-http)"
@@ -209,13 +209,16 @@ object AkkaHttpServerSpec extends PlaySpecification with WsTestClient {
       PlayRunners.mutex.synchronized {
         def testStartAndStop(i: Int) = {
           val resultString = s"result-$i"
-          val app = GuiceApplicationBuilder().routes {
-            case ("GET", "/") => Action(Ok(resultString))
-          }.build()
+          val app = GuiceApplicationBuilder()
+            .routes {
+              case ("GET", "/") => Action(Ok(resultString))
+            }
+            .build()
           val server =
-            TestServer(testServerPort,
-                       app,
-                       serverProvider = Some(AkkaHttpServer.provider))
+            TestServer(
+              testServerPort,
+              app,
+              serverProvider = Some(AkkaHttpServer.provider))
           server.start()
           try {
             val response = await(wsUrl("/")(testServerPort).get())

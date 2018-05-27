@@ -59,7 +59,7 @@ import org.apache.spark.storage.{BlockId, BlockStatus}
   * @param countFailedValues whether to accumulate values from failed tasks
   * @tparam T result type
   */
-class Accumulator[T] private[spark](
+class Accumulator[T] private[spark] (
     // SI-8813: This must explicitly be a private val, or else scala 2.11 doesn't compile
     @transient private val initialValue: T,
     param: AccumulatorParam[T],
@@ -67,7 +67,11 @@ class Accumulator[T] private[spark](
     internal: Boolean,
     private[spark] override val countFailedValues: Boolean = false)
     extends Accumulable[T, T](
-        initialValue, param, name, internal, countFailedValues) {
+      initialValue,
+      param,
+      name,
+      internal,
+      countFailedValues) {
 
   def this(initialValue: T, param: AccumulatorParam[T], name: Option[String]) = {
     this(initialValue, param, name, false /* internal */ )
@@ -132,7 +136,7 @@ private[spark] object Accumulators extends Logging {
       // Since we are storing weak references, we must check whether the underlying data is valid.
       weakRef.get.getOrElse {
         throw new IllegalAccessError(
-            s"Attempted to access garbage collected accumulator $id")
+          s"Attempted to access garbage collected accumulator $id")
       }
     }
   }

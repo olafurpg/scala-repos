@@ -3,10 +3,19 @@ package com.twitter.finagle.memcached.integration
 import com.twitter.common.application.ShutdownRegistry.ShutdownRegistryImpl
 import com.twitter.common.zookeeper.ServerSet.EndpointStatus
 import com.twitter.common.zookeeper.testing.ZooKeeperTestServer
-import com.twitter.common.zookeeper.{CompoundServerSet, ZooKeeperUtils, ServerSets, ZooKeeperClient}
+import com.twitter.common.zookeeper.{
+  CompoundServerSet,
+  ZooKeeperUtils,
+  ServerSets,
+  ZooKeeperClient
+}
 import com.twitter.conversions.time._
 import com.twitter.finagle.Group
-import com.twitter.finagle.cacheresolver.{CacheNode, CachePoolConfig, ZookeeperCacheNodeGroup}
+import com.twitter.finagle.cacheresolver.{
+  CacheNode,
+  CachePoolConfig,
+  ZookeeperCacheNodeGroup
+}
 import com.twitter.util.{Duration, Stopwatch, TimeoutException}
 import java.io.ByteArrayOutputStream
 import java.net.InetSocketAddress
@@ -37,27 +46,29 @@ class CacheNodeGroupTest extends FunSuite with BeforeAndAfterEach {
 
     // connect to zookeeper server
     zookeeperClient = zookeeperServer.createClient(
-        ZooKeeperClient.digestCredentials("user", "pass"))
+      ZooKeeperClient.digestCredentials("user", "pass"))
 
     // create serverset
     serverSet = new CompoundServerSet(
-        List(ServerSets.create(zookeeperClient,
-                               ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL,
-                               zkPath)))
+      List(
+        ServerSets.create(
+          zookeeperClient,
+          ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL,
+          zkPath)))
 
     // start five memcached server and join the cluster
     addShards(List(0, 1, 2, 3, 4))
 
     // set cache pool config node data
     val cachePoolConfig: CachePoolConfig = new CachePoolConfig(
-        cachePoolSize = 5)
+      cachePoolSize = 5)
     val output: ByteArrayOutputStream = new ByteArrayOutputStream
     CachePoolConfig.jsonCodec.serialize(cachePoolConfig, output)
     zookeeperClient.get().setData(zkPath, output.toByteArray, -1)
 
     // a separate client which only does zk discovery for integration test
     zookeeperClient = zookeeperServer.createClient(
-        ZooKeeperClient.digestCredentials("user", "pass"))
+      ZooKeeperClient.digestCredentials("user", "pass"))
   }
 
   override def afterEach() {
@@ -130,8 +141,8 @@ class CacheNodeGroupTest extends FunSuite with BeforeAndAfterEach {
     test("node key remap") {
       // turn on detecting key remapping
       val output: ByteArrayOutputStream = new ByteArrayOutputStream
-      CachePoolConfig.jsonCodec.serialize(
-          CachePoolConfig(5, detectKeyRemapping = true), output)
+      CachePoolConfig.jsonCodec
+        .serialize(CachePoolConfig(5, detectKeyRemapping = true), output)
       zookeeperClient.get().setData(zkPath, output.toByteArray, -1)
 
       // the cluster initially must have 5 members
@@ -144,34 +155,38 @@ class CacheNodeGroupTest extends FunSuite with BeforeAndAfterEach {
       testServers(3)._2.leave()
       addShards(List(2, 3))
       assert(waitForMemberSize(myPool, 5, 5))
-      assert(myPool.members != currentMembers,
-             myPool.members + " should NOT equal to " + currentMembers)
+      assert(
+        myPool.members != currentMembers,
+        myPool.members + " should NOT equal to " + currentMembers)
       currentMembers = myPool.members
 
       // turn off detecting key remapping
-      CachePoolConfig.jsonCodec.serialize(
-          CachePoolConfig(5, detectKeyRemapping = false), output)
+      CachePoolConfig.jsonCodec
+        .serialize(CachePoolConfig(5, detectKeyRemapping = false), output)
       zookeeperClient.get().setData(zkPath, output.toByteArray, -1)
       assert(waitForMemberSize(myPool, 5, 5))
-      assert(myPool.members == currentMembers,
-             myPool.members + " should NOT equal to " + currentMembers)
+      assert(
+        myPool.members == currentMembers,
+        myPool.members + " should NOT equal to " + currentMembers)
       testServers(4)._2.leave()
       addShards(List(4))
       assert(waitForMemberSize(myPool, 5, 5))
-      assert(myPool.members == currentMembers,
-             myPool.members + " should equal to " + currentMembers)
+      assert(
+        myPool.members == currentMembers,
+        myPool.members + " should equal to " + currentMembers)
 
       /***** remap shard key while adding keys should not take effect ******/
-      CachePoolConfig.jsonCodec.serialize(
-          CachePoolConfig(5, detectKeyRemapping = true), output)
+      CachePoolConfig.jsonCodec
+        .serialize(CachePoolConfig(5, detectKeyRemapping = true), output)
       zookeeperClient.get().setData(zkPath, output.toByteArray, -1)
       assert(waitForMemberSize(myPool, 5, 5))
       testServers(0)._2.leave()
       testServers(1)._2.leave()
       addShards(List(5, 0, 1))
       assert(waitForMemberSize(myPool, 5, 5))
-      assert(myPool.members == currentMembers,
-             myPool.members + " should equal to " + currentMembers)
+      assert(
+        myPool.members == currentMembers,
+        myPool.members + " should equal to " + currentMembers)
     }
 
   if (!Option(System.getProperty("SKIP_FLAKY")).isDefined)
@@ -204,10 +219,11 @@ class CacheNodeGroupTest extends FunSuite with BeforeAndAfterEach {
       currentMembers = myPool.members
     }
 
-  private def waitForMemberSize(pool: Group[CacheNode],
-                                current: Int,
-                                expect: Int,
-                                timeout: Duration = 15.seconds): Boolean = {
+  private def waitForMemberSize(
+      pool: Group[CacheNode],
+      current: Int,
+      expect: Int,
+      timeout: Duration = 15.seconds): Boolean = {
     val elapsed = Stopwatch.start()
     def loop(): Boolean = {
       if (current != expect && pool.members.size == expect)
@@ -217,7 +233,7 @@ class CacheNodeGroupTest extends FunSuite with BeforeAndAfterEach {
       else if (timeout < elapsed()) {
         if (current != expect)
           throw new TimeoutException(
-              "timed out waiting for CacheNode pool to reach the expected size")
+            "timed out waiting for CacheNode pool to reach the expected size")
         else true
       } else {
         Thread.sleep(100)
@@ -229,7 +245,7 @@ class CacheNodeGroupTest extends FunSuite with BeforeAndAfterEach {
 
   private def updateCachePoolConfigData(size: Int) {
     val cachePoolConfig: CachePoolConfig = new CachePoolConfig(
-        cachePoolSize = size)
+      cachePoolSize = size)
     val output: ByteArrayOutputStream = new ByteArrayOutputStream
     CachePoolConfig.jsonCodec.serialize(cachePoolConfig, output)
     zookeeperClient.get().setData(zkPath, output.toByteArray, -1)
@@ -241,9 +257,13 @@ class CacheNodeGroupTest extends FunSuite with BeforeAndAfterEach {
       TestMemcachedServer.start() match {
         case Some(server) =>
           testServers :+=
-          ((server,
-            serverSet.join(
-                server.address, Map[String, InetSocketAddress](), shardId)))
+            (
+              (
+                server,
+                serverSet.join(
+                  server.address,
+                  Map[String, InetSocketAddress](),
+                  shardId)))
         case None => fail("Cannot start memcached. Skipping...")
       }
     }

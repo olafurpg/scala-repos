@@ -19,10 +19,21 @@ import org.jetbrains.jps.incremental.messages.BuildMessage
 import org.jetbrains.jps.incremental.messages.BuildMessage.Kind
 import org.jetbrains.jps.incremental.scala.DummyClient
 import org.jetbrains.jps.incremental.scala.remote._
-import org.jetbrains.plugins.scala.compiler.{ErrorHandler, NonServerRunner, RemoteServerConnectorBase, RemoteServerRunner}
+import org.jetbrains.plugins.scala.compiler.{
+  ErrorHandler,
+  NonServerRunner,
+  RemoteServerConnectorBase,
+  RemoteServerRunner
+}
 import org.jetbrains.plugins.scala.worksheet.actions.WorksheetFileHook
-import org.jetbrains.plugins.scala.worksheet.processor.{WorksheetCompiler, WorksheetSourceProcessor}
-import org.jetbrains.plugins.scala.worksheet.server.RemoteServerConnector.{MyTranslatingClient, OuterCompilerInterface}
+import org.jetbrains.plugins.scala.worksheet.processor.{
+  WorksheetCompiler,
+  WorksheetSourceProcessor
+}
+import org.jetbrains.plugins.scala.worksheet.server.RemoteServerConnector.{
+  MyTranslatingClient,
+  OuterCompilerInterface
+}
 import org.jetbrains.plugins.scala.worksheet.ui.WorksheetEditorPrinter
 
 /**
@@ -30,28 +41,35 @@ import org.jetbrains.plugins.scala.worksheet.ui.WorksheetEditorPrinter
   * Date: 1/28/14
   */
 class RemoteServerConnector(
-    module: Module, worksheet: File, output: File, worksheetClassName: String)
+    module: Module,
+    worksheet: File,
+    output: File,
+    worksheetClassName: String)
     extends RemoteServerConnectorBase(
-        module: Module, worksheet: File, output: File) {
+      module: Module,
+      worksheet: File,
+      output: File) {
 
   val runType = WorksheetCompiler.getRunType(module.getProject)
 
   override val worksheetArgs: Array[String] =
     if (runType != OutOfProcessServer)
-      Array(worksheetClassName,
-            runnersJar.getAbsolutePath,
-            output.getAbsolutePath) ++ outputDirs
+      Array(
+        worksheetClassName,
+        runnersJar.getAbsolutePath,
+        output.getAbsolutePath) ++ outputDirs
     else Array.empty[String]
 
-  def compileAndRun(callback: Runnable,
-                    originalFile: VirtualFile,
-                    consumer: OuterCompilerInterface): ExitCode = {
+  def compileAndRun(
+      callback: Runnable,
+      originalFile: VirtualFile,
+      consumer: OuterCompilerInterface): ExitCode = {
 
     val project = module.getProject
     val worksheetHook = WorksheetFileHook.instance(project)
 
-    val client = new MyTranslatingClient(
-        callback, project, originalFile, consumer)
+    val client =
+      new MyTranslatingClient(callback, project, originalFile, consumer)
 
     try {
       val worksheetProcess = runType match {
@@ -63,29 +81,27 @@ class RemoteServerConnector(
           val encodedArgs =
             arguments map {
               case "" => Base64Converter.encode("#STUB#" getBytes "UTF-8")
-              case s => Base64Converter.encode(s getBytes "UTF-8")
+              case s  => Base64Converter.encode(s getBytes "UTF-8")
             }
 
           val errorHandler = new ErrorHandler {
             override def error(message: String): Unit =
               Notifications.Bus notify {
                 new Notification(
-                    "scala",
-                    "Cannot run worksheet",
-                    s"<html><body>${message.replace("\n", "<br>")}</body></html>",
-                    NotificationType.ERROR
+                  "scala",
+                  "Cannot run worksheet",
+                  s"<html><body>${message.replace("\n", "<br>")}</body></html>",
+                  NotificationType.ERROR
                 )
               }
           }
 
-          new NonServerRunner(project, Some(errorHandler)).buildProcess(
-              encodedArgs,
-              (text: String) =>
-                {
-                  val event = Event.fromBytes(
-                      Base64Converter.decode(text.getBytes("UTF-8")))
-                  eventClient.process(event)
-              })
+          new NonServerRunner(project, Some(errorHandler))
+            .buildProcess(encodedArgs, (text: String) => {
+              val event =
+                Event.fromBytes(Base64Converter.decode(text.getBytes("UTF-8")))
+              eventClient.process(event)
+            })
       }
 
       if (worksheetProcess == null) return ExitCode.ABORT
@@ -113,10 +129,11 @@ class RemoteServerConnector(
 }
 
 object RemoteServerConnector {
-  class MyTranslatingClient(callback: Runnable,
-                            project: Project,
-                            worksheet: VirtualFile,
-                            consumer: OuterCompilerInterface)
+  class MyTranslatingClient(
+      callback: Runnable,
+      project: Project,
+      worksheet: VirtualFile,
+      consumer: OuterCompilerInterface)
       extends DummyClient {
     private val length = WorksheetSourceProcessor.END_GENERATED_MARKER.length
 
@@ -132,11 +149,12 @@ object RemoteServerConnector {
       consumer trace exception
     }
 
-    override def message(kind: Kind,
-                         text: String,
-                         source: Option[File],
-                         line: Option[Long],
-                         column: Option[Long]) {
+    override def message(
+        kind: Kind,
+        text: String,
+        source: Option[File],
+        line: Option[Long],
+        column: Option[Long]) {
       val lines = text split "\n"
       val linesLength = lines.length
 
@@ -152,12 +170,14 @@ object RemoteServerConnector {
         else {
           val buffer = new StringBuilder
 
-          for (j <- 0 until (linesLength - 2)) buffer append lines(j) append "\n"
+          for (j <- 0 until (linesLength - 2))
+            buffer append lines(j) append "\n"
 
           val lines1 = lines(linesLength - 1)
 
-          buffer append lines(linesLength - 2).substring(differ) append "\n" append
-          (if (lines1.length > differ) lines1.substring(differ) else lines1) append "\n"
+          buffer append lines(linesLength - 2)
+            .substring(differ) append "\n" append
+            (if (lines1.length > differ) lines1.substring(differ) else lines1) append "\n"
           buffer.toString()
         }
 
@@ -170,17 +190,18 @@ object RemoteServerConnector {
           hasErrors = true
           CompilerMessageCategory.ERROR
         case BuildMessage.Kind.PROGRESS => CompilerMessageCategory.STATISTICS
-        case BuildMessage.Kind.WARNING => CompilerMessageCategory.WARNING
+        case BuildMessage.Kind.WARNING  => CompilerMessageCategory.WARNING
       }
 
       consumer.message(
-          new CompilerMessageImpl(project,
-                                  category,
-                                  finalText,
-                                  worksheet,
-                                  line1 getOrElse -1,
-                                  column1 getOrElse -1,
-                                  null)
+        new CompilerMessageImpl(
+          project,
+          category,
+          finalText,
+          worksheet,
+          line1 getOrElse -1,
+          column1 getOrElse -1,
+          null)
       )
     }
 
@@ -201,10 +222,11 @@ object RemoteServerConnector {
     def trace(thr: Throwable)
   }
 
-  class CompilerInterfaceImpl(task: CompilerTask,
-                              worksheetPrinter: WorksheetEditorPrinter,
-                              indicator: Option[ProgressIndicator],
-                              auto: Boolean = false)
+  class CompilerInterfaceImpl(
+      task: CompilerTask,
+      worksheetPrinter: WorksheetEditorPrinter,
+      indicator: Option[ProgressIndicator],
+      auto: Boolean = false)
       extends OuterCompilerInterface {
     override def progress(text: String, done: Option[Float]) {
       if (auto) return

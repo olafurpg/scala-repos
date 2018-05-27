@@ -27,11 +27,12 @@ class MessageWriter(segmentSize: Int)
 
   import Message._
 
-  def write(key: Array[Byte] = null,
-            codec: CompressionCodec,
-            timestamp: Long,
-            timestampType: TimestampType,
-            magicValue: Byte)(writePayload: OutputStream => Unit): Unit = {
+  def write(
+      key: Array[Byte] = null,
+      codec: CompressionCodec,
+      timestamp: Long,
+      timestampType: TimestampType,
+      magicValue: Byte)(writePayload: OutputStream => Unit): Unit = {
     withCrc32Prefix {
       // write magic value
       write(magicValue)
@@ -172,7 +173,11 @@ class BufferingOutputStream(segmentSize: Int) extends OutputStream {
 
         val amount = math.min(currentSegment.freeSpace, remaining)
         System.arraycopy(
-            b, offset, currentSegment.bytes, currentSegment.written, amount)
+          b,
+          offset,
+          currentSegment.bytes,
+          currentSegment.written,
+          amount)
         currentSegment.written += amount
         offset += amount
         remaining -= amount
@@ -187,9 +192,10 @@ class BufferingOutputStream(segmentSize: Int) extends OutputStream {
     while (amount >= 0) {
       currentSegment.written += amount
       if (currentSegment.freeSpace <= 0) addSegment()
-      amount = in.read(currentSegment.bytes,
-                       currentSegment.written,
-                       currentSegment.freeSpace)
+      amount = in.read(
+        currentSegment.bytes,
+        currentSegment.written,
+        currentSegment.freeSpace)
     }
   }
 

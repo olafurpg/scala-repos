@@ -14,7 +14,7 @@ import io.netty.handler.codec.{http => NettyHttp}
 
 private[http4] object HttpClientDispatcher {
   val NackFailure = Throw(
-      Failure.rejected("The request was nacked by the server"))
+    Failure.rejected("The request was nacked by the server"))
   private val log = Logger(getClass.getName)
   private val isNack = { res: NettyHttp.HttpResponse =>
     res.status.code == HttpNackFilter.ResponseStatus.code &&
@@ -28,9 +28,11 @@ private[http4] object HttpClientDispatcher {
   * @param statsReceiver typically scoped to `clientName/dispatcher`
   */
 private[http4] class HttpClientDispatcher(
-    trans: Transport[Any, Any], statsReceiver: StatsReceiver)
+    trans: Transport[Any, Any],
+    statsReceiver: StatsReceiver)
     extends GenSerialClientDispatcher[Request, Response, Any, Any](
-        trans, statsReceiver) {
+      trans,
+      statsReceiver) {
 
   import GenSerialClientDispatcher.wrapWriteException
   import HttpClientDispatcher._
@@ -46,7 +48,7 @@ private[http4] class HttpClientDispatcher(
       val headersString =
         dtabHeaders.map({ case (k, v) => s"[$k: $v]" }).mkString(", ")
       log.error(
-          s"discarding manually set dtab headers in request: $headersString\n" +
+        s"discarding manually set dtab headers in request: $headersString\n" +
           s"set Dtab.local instead to send Dtab information.")
     }
     HttpDtab.write(Dtab.local, req)
@@ -90,7 +92,7 @@ private[http4] class HttpClientDispatcher(
           case invalid =>
             // relies on GenSerialClientDispatcher satisfying `p`
             Future.exception(
-                new IllegalArgumentException(s"invalid message '$invalid'"))
+              new IllegalArgumentException(s"invalid message '$invalid'"))
         }
 
         Future.join(reqStreamF, repF).unit

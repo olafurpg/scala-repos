@@ -29,7 +29,7 @@ object NonFatal {
     */
   def apply(t: Throwable): Boolean = t match {
     case _: NoSuchMethodException => false
-    case t => isNonFatal(t)
+    case t                        => isNonFatal(t)
   }
 
   /**

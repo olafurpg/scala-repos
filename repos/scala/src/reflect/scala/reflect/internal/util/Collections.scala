@@ -20,8 +20,9 @@ trait Collections {
     *  the function is true for all the triples.
     */
   @tailrec final def corresponds3[A, B, C](
-      xs1: List[A], xs2: List[B], xs3: List[C])(
-      f: (A, B, C) => Boolean): Boolean =
+      xs1: List[A],
+      xs2: List[B],
+      xs3: List[C])(f: (A, B, C) => Boolean): Boolean =
     (if (xs1.isEmpty) xs2.isEmpty && xs3.isEmpty
      else
        !xs2.isEmpty && !xs3.isEmpty && f(xs1.head, xs2.head, xs3.head) &&
@@ -72,9 +73,9 @@ trait Collections {
       pf: PartialFunction[A, B]): Option[B] = {
     @tailrec
     def loop(rest: List[A]): Option[B] = rest match {
-      case Nil => None
+      case Nil                          => None
       case a :: as if pf.isDefinedAt(a) => Some(pf(a))
-      case a :: as => loop(as)
+      case a :: as                      => loop(as)
     }
     loop(as)
   }
@@ -100,10 +101,11 @@ trait Collections {
     // Note to developers: there exists a duplication between this function and `List#mapConserve`.
     // If any successful optimization attempts or other changes are made, please rehash them there too.
     @tailrec
-    def loop(mapped: ListBuffer[A],
-             unchanged: List[A],
-             pending0: List[A],
-             pending1: List[B]): List[A] = {
+    def loop(
+        mapped: ListBuffer[A],
+        unchanged: List[A],
+        pending0: List[A],
+        pending1: List[B]): List[A] = {
       if (pending0.isEmpty || pending1.isEmpty) {
         if (mapped eq null) unchanged
         else mapped.prependToList(unchanged)
@@ -117,7 +119,7 @@ trait Collections {
         } else {
           val b = if (mapped eq null) new ListBuffer[A] else mapped
           var xc = unchanged
-          while ( (xc ne pending0) && (xc ne pending1)) {
+          while ((xc ne pending0) && (xc ne pending1)) {
             b += xc.head
             xc = xc.tail
           }

@@ -17,9 +17,10 @@ class CORSFilter @Inject()(config: MarathonConf) extends Filter {
 
   override def init(filterConfig: FilterConfig): Unit = {}
 
-  override def doFilter(request: ServletRequest,
-                        response: ServletResponse,
-                        chain: FilterChain): Unit = {
+  override def doFilter(
+      request: ServletRequest,
+      response: ServletResponse,
+      chain: FilterChain): Unit = {
 
     response match {
       case httpResponse: HttpServletResponse if maybeOrigins.isDefined =>
@@ -37,11 +38,13 @@ class CORSFilter @Inject()(config: MarathonConf) extends Filter {
           .asScala
           .flatMap(_.split(","))
 
-        httpResponse.setHeader("Access-Control-Allow-Headers",
-                               accessControlRequestHeaders.mkString(", "))
+        httpResponse.setHeader(
+          "Access-Control-Allow-Headers",
+          accessControlRequestHeaders.mkString(", "))
 
         httpResponse.setHeader(
-            "Access-Control-Allow-Methods", "GET, HEAD, OPTIONS")
+          "Access-Control-Allow-Methods",
+          "GET, HEAD, OPTIONS")
         httpResponse.setHeader("Access-Control-Max-Age", "86400")
 
       case _ => // Ignore other responses

@@ -25,7 +25,7 @@ abstract class Env {
   def extend[a](v: Var[a], x: a) = new Env {
     def apply[b](w: Var[b]): b = w match {
       case _: v.type => x // v eq w, hence a = b
-      case _ => Env.this.apply(w)
+      case _         => Env.this.apply(w)
     }
   }
 }
@@ -44,17 +44,17 @@ object Test {
 
   def eval[a](t: Term[a], env: Env): a = t match {
     // First three work
-    case v: Var[b] => env(v) // a = b
+    case v: Var[b]      => env(v) // a = b
     case n @ Num(value) => value // a = Int
-    case a @ App(f, e) => eval(f, env)(eval(e, env)) // a = c
+    case a @ App(f, e)  => eval(f, env)(eval(e, env)) // a = c
 
     // Next one fails like:
     //
     // found   : (Int) => Int
-    // required: a    
+    // required: a
     case i @ Suc() => { (y: Int) =>
-        y + 1
-      } // a = Int => Int
+      y + 1
+    } // a = Int => Int
 
     // Next one fails like:
     //
@@ -62,8 +62,8 @@ object Test {
     //     case f @ Lam[b,c](x, e) => { (y: b) => eval(e, env.extend(x, y)) }  // a = b=>c
     //                 ^
     case f @ Lam[b, c](x, e) => { (y: b) =>
-        eval(e, env.extend(x, y))
-      } // a = b=>c
+      eval(e, env.extend(x, y))
+    } // a = b=>c
   }
 
   val f1 = () => eval(v1, anEnv)

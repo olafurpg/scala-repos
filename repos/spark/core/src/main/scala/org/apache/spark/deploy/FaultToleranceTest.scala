@@ -223,7 +223,9 @@ private object FaultToleranceTest extends App with Logging {
     // property, we need to reset it.
     System.setProperty("spark.driver.port", "0")
     sc = new SparkContext(
-        getMasterUrls(masters), "fault-tolerance", containerSparkHome)
+      getMasterUrls(masters),
+      "fault-tolerance",
+      containerSparkHome)
   }
 
   private def getMasterUrls(masters: Seq[TestMasterInfo]): String = {
@@ -329,10 +331,11 @@ private object FaultToleranceTest extends App with Logging {
         logError("Master states: " + masters.map(_.state))
         logError("Num apps: " + numLiveApps)
         logError(
-            "IPs expected: " + workers.map(_.ip) + " / found: " +
+          "IPs expected: " + workers.map(_.ip) + " / found: " +
             liveWorkerIPs)
         throw new RuntimeException(
-            "Failed to get into acceptable cluster state after 2 min.", e)
+          "Failed to get into acceptable cluster state after 2 min.",
+          e)
     }
   }
 
@@ -343,12 +346,14 @@ private object FaultToleranceTest extends App with Logging {
   }
 
   logInfo(
-      "Ran %s tests, %s passed and %s failed".format(
-          numPassed + numFailed, numPassed, numFailed))
+    "Ran %s tests, %s passed and %s failed"
+      .format(numPassed + numFailed, numPassed, numFailed))
 }
 
 private class TestMasterInfo(
-    val ip: String, val dockerId: DockerId, val logFile: File)
+    val ip: String,
+    val dockerId: DockerId,
+    val logFile: File)
     extends Logging {
 
   implicit val formats = org.json4s.DefaultFormats
@@ -361,8 +366,8 @@ private class TestMasterInfo(
   def readState() {
     try {
       val masterStream = new InputStreamReader(
-          new URL("http://%s:8080/json".format(ip)).openStream,
-          StandardCharsets.UTF_8)
+        new URL("http://%s:8080/json".format(ip)).openStream,
+        StandardCharsets.UTF_8)
       val json = JsonMethods.parse(masterStream)
 
       val workers = json \ "workers"
@@ -395,11 +400,16 @@ private class TestMasterInfo(
 
   override def toString: String =
     "[ip=%s, id=%s, logFile=%s, state=%s]".format(
-        ip, dockerId.id, logFile.getAbsolutePath, state)
+      ip,
+      dockerId.id,
+      logFile.getAbsolutePath,
+      state)
 }
 
 private class TestWorkerInfo(
-    val ip: String, val dockerId: DockerId, val logFile: File)
+    val ip: String,
+    val dockerId: DockerId,
+    val logFile: File)
     extends Logging {
 
   implicit val formats = org.json4s.DefaultFormats
@@ -421,7 +431,9 @@ private object SparkDocker {
 
   def startWorker(mountDir: String, masters: String): TestWorkerInfo = {
     val cmd = Docker.makeRunCmd(
-        "spark-test-worker", args = masters, mountDir = mountDir)
+      "spark-test-worker",
+      args = masters,
+      mountDir = mountDir)
     val (ip, id, outFile) = startNode(cmd)
     new TestWorkerInfo(ip, id, outFile)
   }
@@ -453,9 +465,10 @@ private class DockerId(val id: String) {
 }
 
 private object Docker extends Logging {
-  def makeRunCmd(imageTag: String,
-                 args: String = "",
-                 mountDir: String = ""): ProcessBuilder = {
+  def makeRunCmd(
+      imageTag: String,
+      args: String = "",
+      mountDir: String = ""): ProcessBuilder = {
     val mountCmd = if (mountDir != "") { " -v " + mountDir } else ""
 
     val cmd =

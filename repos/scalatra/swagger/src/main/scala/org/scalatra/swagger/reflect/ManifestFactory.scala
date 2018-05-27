@@ -1,6 +1,12 @@
 package org.scalatra.swagger.reflect
 
-import java.lang.reflect.{GenericArrayType, ParameterizedType, Type, TypeVariable, WildcardType}
+import java.lang.reflect.{
+  GenericArrayType,
+  ParameterizedType,
+  Type,
+  TypeVariable,
+  WildcardType
+}
 
 import scala.reflect.Manifest
 
@@ -57,15 +63,15 @@ private[swagger] object ManifestFactory {
   }
 
   private def fromClass(clazz: Class[_]): Manifest[_] = clazz match {
-    case java.lang.Byte.TYPE => Manifest.Byte
-    case java.lang.Short.TYPE => Manifest.Short
+    case java.lang.Byte.TYPE      => Manifest.Byte
+    case java.lang.Short.TYPE     => Manifest.Short
     case java.lang.Character.TYPE => Manifest.Char
-    case java.lang.Integer.TYPE => Manifest.Int
-    case java.lang.Long.TYPE => Manifest.Long
-    case java.lang.Float.TYPE => Manifest.Float
-    case java.lang.Double.TYPE => Manifest.Double
-    case java.lang.Boolean.TYPE => Manifest.Boolean
-    case java.lang.Void.TYPE => Manifest.Unit
-    case _ => Manifest.classType(clazz)
+    case java.lang.Integer.TYPE   => Manifest.Int
+    case java.lang.Long.TYPE      => Manifest.Long
+    case java.lang.Float.TYPE     => Manifest.Float
+    case java.lang.Double.TYPE    => Manifest.Double
+    case java.lang.Boolean.TYPE   => Manifest.Boolean
+    case java.lang.Void.TYPE      => Manifest.Unit
+    case _                        => Manifest.classType(clazz)
   }
 }

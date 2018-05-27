@@ -247,7 +247,7 @@ object TestGraphGenerators {
       _ <- Gen.choose(0, 1) // avoids blowup on self recursion
       out <- genProd1
       ignored <- oneOf(summed, written, aTailDependency(out)): Gen[
-          TailProducer[P, _]]
+        TailProducer[P, _]]
     } yield ignored.name("Named ignore").also(out)
 
   def also2[P <: Platform[P]](
@@ -261,7 +261,7 @@ object TestGraphGenerators {
       _ <- Gen.choose(0, 1) // avoids blowup on self recursion
       out <- genProd2
       ignored <- oneOf(summed, written, aTailDependency(out)): Gen[
-          TailProducer[P, _]]
+        TailProducer[P, _]]
     } yield IdentityKeyedProducer(ignored.also(out))
 
   def service2[P <: Platform[P]](
@@ -277,8 +277,9 @@ object TestGraphGenerators {
       service <- genService2.arbitrary
     } yield
       IdentityKeyedProducer(
-          FlatMappedProducer[P, (Int, (Int, Option[Int])), (Int, Int)](
-              in.leftJoin(service), postMerge))
+        FlatMappedProducer[P, (Int, (Int, Option[Int])), (Int, Int)](
+          in.leftJoin(service),
+          postMerge))
 
   def summed[P <: Platform[P]](
       implicit genSource1: Arbitrary[Producer[P, Int]],
@@ -309,17 +310,19 @@ object TestGraphGenerators {
       testStore: P#Store[Int, Int],
       sink1: P#Sink[Int],
       sink2: P#Sink[(Int, Int)]): Gen[KeyedProducer[P, Int, Int]] =
-    frequency((25, genSource2.arbitrary),
-              (12, genNamedProducer22),
-              (3, genOptMap12),
-              (3, genOptMap22),
-              (4, genWrite22),
-              (1, service2),
-              (1, genMerged2),
-              (1, also2),
-              (3, genFlatMap22),
-              (3, genFlatMap12),
-              (5, genSumByKey22))
+    frequency(
+      (25, genSource2.arbitrary),
+      (12, genNamedProducer22),
+      (3, genOptMap12),
+      (3, genOptMap22),
+      (4, genWrite22),
+      (1, service2),
+      (1, genMerged2),
+      (1, also2),
+      (3, genFlatMap22),
+      (3, genFlatMap12),
+      (5, genSumByKey22)
+    )
 
   def genProd1[P <: Platform[P]](
       implicit genSource1: Arbitrary[Producer[P, Int]],
@@ -328,12 +331,13 @@ object TestGraphGenerators {
       testStore: P#Store[Int, Int],
       sink1: P#Sink[Int],
       sink2: P#Sink[(Int, Int)]): Gen[Producer[P, Int]] =
-    frequency((25, genSource1.arbitrary),
-              (12, genNamedProducer11),
-              (3, genOptMap11),
-              (3, genOptMap21),
-              (1, genMerged1),
-              (1, also1),
-              (3, genFlatMap11),
-              (3, genFlatMap21))
+    frequency(
+      (25, genSource1.arbitrary),
+      (12, genNamedProducer11),
+      (3, genOptMap11),
+      (3, genOptMap21),
+      (1, genMerged1),
+      (1, also1),
+      (3, genFlatMap11),
+      (3, genFlatMap21))
 }

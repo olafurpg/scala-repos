@@ -8,8 +8,10 @@ import org.scalatest.{GivenWhenThen, Matchers}
 import scala.concurrent.duration._
 
 class TaskQueueIntegrationTest
-    extends IntegrationFunSuite with SingleMarathonIntegrationTest
-    with GivenWhenThen with Matchers {
+    extends IntegrationFunSuite
+    with SingleMarathonIntegrationTest
+    with GivenWhenThen
+    with Matchers {
   test("GET /v2/queue with an empty queue") {
     Given("no pending deployments")
     marathon.listDeploymentsForBaseGroup().value should have size 0
@@ -31,17 +33,19 @@ class TaskQueueIntegrationTest
       .setValue("na")
       .build()
     val appId = testBasePath / "app"
-    val app = AppDefinition(appId,
-                            constraints = Set(c),
-                            cmd = Some("na"),
-                            instances = 5,
-                            portDefinitions = List.empty)
+    val app = AppDefinition(
+      appId,
+      constraints = Set(c),
+      cmd = Some("na"),
+      instances = 5,
+      portDefinitions = List.empty)
     val create = marathon.createAppV2(app)
     create.code should be(201) // Created
 
     Then("the app shows up in the task queue")
-    WaitTestSupport.waitUntil("Deployment is put in the deployment queue",
-                              30.seconds) {
+    WaitTestSupport.waitUntil(
+      "Deployment is put in the deployment queue",
+      30.seconds) {
       marathon.taskQueue().value.queue.size == 1
     }
     val response = marathon.taskQueue()

@@ -20,7 +20,9 @@ import com.twitter.zk.{NativeConnector, RetryPolicy, ZkClient}
 
 @RunWith(classOf[JUnitRunner])
 class ZkAsyncSemaphoreTest
-    extends WordSpec with MockitoSugar with AsyncAssertions {
+    extends WordSpec
+    with MockitoSugar
+    with AsyncAssertions {
 
   "ZkAsyncSemaphore" should {
 
@@ -58,15 +60,13 @@ class ZkAsyncSemaphoreTest
             }
 
             "execute immediately while permits are available" in {
-              Await.result(
-                  acquire(sem1) within (new JavaTimer(true), 2.second))
+              Await.result(acquire(sem1) within (new JavaTimer(true), 2.second))
               assert(sem1.numPermitsAvailable == 1)
               assert(sem1.numWaiters == 0)
               assert(sem2.numPermitsAvailable == 1)
               assert(sem2.numWaiters == 0)
 
-              Await.result(
-                  acquire(sem2) within (new JavaTimer(true), 2.second))
+              Await.result(acquire(sem2) within (new JavaTimer(true), 2.second))
               assert(sem1.numPermitsAvailable == 0)
               assert(sem1.numWaiters == 0)
               assert(sem2.numPermitsAvailable == 0)
@@ -78,8 +78,9 @@ class ZkAsyncSemaphoreTest
 
             "queue waiters when no permits are available" in {
               implicit val config =
-                PatienceConfig(timeout = scaled(Span(1, Seconds)),
-                               interval = scaled(Span(100, Millis)))
+                PatienceConfig(
+                  timeout = scaled(Span(1, Seconds)),
+                  interval = scaled(Span(100, Millis)))
 
               awaiting1 = acquire(sem1)
               assert(awaiting1.poll == (None))
@@ -104,8 +105,9 @@ class ZkAsyncSemaphoreTest
 
             "have correct gauges as permit holders release" in {
               implicit val config =
-                PatienceConfig(timeout = scaled(Span(1, Seconds)),
-                               interval = scaled(Span(100, Millis)))
+                PatienceConfig(
+                  timeout = scaled(Span(1, Seconds)),
+                  interval = scaled(Span(100, Millis)))
 
               assert(permits.size == (2))
 

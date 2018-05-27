@@ -49,9 +49,9 @@ object CheckBoxListCellDemo extends JFXApp {
   }
 
   val data = ObservableBuffer[Item](
-      (1 to 10).map { i =>
-        new Item(i % 2 == 0, s"Item $i")
-      }
+    (1 to 10).map { i =>
+      new Item(i % 2 == 0, s"Item $i")
+    }
   )
 
   stage = new PrimaryStage {
@@ -59,18 +59,18 @@ object CheckBoxListCellDemo extends JFXApp {
       title = "CheckBoxListCell Demo"
       root = new VBox {
         children = Seq(
-            new ListView[Item] {
-              prefHeight = 250
-              items = data
-              cellFactory = CheckBoxListCell.forListView(_.selected)
-            },
-            new Button("Print State ") {
-              onAction = handle {
-                println("-------------")
-                println(
-                    data.map(d => d.name + ": " + d.selected()).mkString("\n"))
-              }
+          new ListView[Item] {
+            prefHeight = 250
+            items = data
+            cellFactory = CheckBoxListCell.forListView(_.selected)
+          },
+          new Button("Print State ") {
+            onAction = handle {
+              println("-------------")
+              println(
+                data.map(d => d.name + ": " + d.selected()).mkString("\n"))
             }
+          }
         )
       }
     }

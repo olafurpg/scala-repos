@@ -38,7 +38,9 @@ trait Authorizer extends Configurable {
     * @return
     */
   def authorize(
-      session: Session, operation: Operation, resource: Resource): Boolean
+      session: Session,
+      operation: Operation,
+      resource: Resource): Boolean
 
   /**
     * add the acls to resource, this is an additive operation so existing acls will not be overwritten, instead these new

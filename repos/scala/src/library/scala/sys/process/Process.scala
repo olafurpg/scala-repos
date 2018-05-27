@@ -75,9 +75,10 @@ trait ProcessCreation {
     *
     * @example {{{ apply("java", new java.io.File("/opt/app"), "CLASSPATH" -> "library.jar") }}}
     */
-  def apply(command: String,
-            cwd: File,
-            extraEnv: (String, String)*): ProcessBuilder =
+  def apply(
+      command: String,
+      cwd: File,
+      extraEnv: (String, String)*): ProcessBuilder =
     apply(command, Some(cwd), extraEnv: _*)
 
   /** Creates a [[scala.sys.process.ProcessBuilder]] with working dir set to `File` and extra
@@ -85,9 +86,10 @@ trait ProcessCreation {
     *
     * @example {{{ apply("java" :: javaArgs, new java.io.File("/opt/app"), "CLASSPATH" -> "library.jar") }}}
     */
-  def apply(command: Seq[String],
-            cwd: File,
-            extraEnv: (String, String)*): ProcessBuilder =
+  def apply(
+      command: Seq[String],
+      cwd: File,
+      extraEnv: (String, String)*): ProcessBuilder =
     apply(command, Some(cwd), extraEnv: _*)
 
   /** Creates a [[scala.sys.process.ProcessBuilder]] with working dir optionally set to
@@ -95,9 +97,10 @@ trait ProcessCreation {
     *
     * @example {{{ apply("java", params.get("cwd"), "CLASSPATH" -> "library.jar") }}}
     */
-  def apply(command: String,
-            cwd: Option[File],
-            extraEnv: (String, String)*): ProcessBuilder = {
+  def apply(
+      command: String,
+      cwd: Option[File],
+      extraEnv: (String, String)*): ProcessBuilder = {
     apply(command.split("""\s+"""), cwd, extraEnv: _*)
     // not smart to use this on windows, because CommandParser uses \ to escape ".
     /*CommandParser.parse(command) match {
@@ -111,9 +114,10 @@ trait ProcessCreation {
     *
     * @example {{{ apply("java" :: javaArgs, params.get("cwd"), "CLASSPATH" -> "library.jar") }}}
     */
-  def apply(command: Seq[String],
-            cwd: Option[File],
-            extraEnv: (String, String)*): ProcessBuilder = {
+  def apply(
+      command: Seq[String],
+      cwd: Option[File],
+      extraEnv: (String, String)*): ProcessBuilder = {
     val jpb = new JProcessBuilder(command.toArray: _*)
     cwd foreach (jpb directory _)
     extraEnv foreach { case (k, v) => jpb.environment.put(k, v) }

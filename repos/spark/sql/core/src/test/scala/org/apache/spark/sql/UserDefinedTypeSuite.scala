@@ -28,8 +28,7 @@ import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.sql.types._
 
 @SQLUserDefinedType(udt = classOf[MyDenseVectorUDT])
-private[sql] class MyDenseVector(val data: Array[Double])
-    extends Serializable {
+private[sql] class MyDenseVector(val data: Array[Double]) extends Serializable {
   override def equals(other: Any): Boolean = other match {
     case v: MyDenseVector =>
       java.util.Arrays.equals(this.data, v.data)
@@ -39,7 +38,8 @@ private[sql] class MyDenseVector(val data: Array[Double])
 
 @BeanInfo
 private[sql] case class MyLabeledPoint(
-    @BeanProperty label: Double, @BeanProperty features: MyDenseVector)
+    @BeanProperty label: Double,
+    @BeanProperty features: MyDenseVector)
 
 private[sql] class MyDenseVectorUDT extends UserDefinedType[MyDenseVector] {
 
@@ -62,17 +62,20 @@ private[sql] class MyDenseVectorUDT extends UserDefinedType[MyDenseVector] {
 
   override def equals(other: Any): Boolean = other match {
     case _: MyDenseVectorUDT => true
-    case _ => false
+    case _                   => false
   }
 }
 
 class UserDefinedTypeSuite
-    extends QueryTest with SharedSQLContext with ParquetTest {
+    extends QueryTest
+    with SharedSQLContext
+    with ParquetTest {
   import testImplicits._
 
   private lazy val pointsRDD =
-    Seq(MyLabeledPoint(1.0, new MyDenseVector(Array(0.1, 1.0))),
-        MyLabeledPoint(0.0, new MyDenseVector(Array(0.2, 2.0)))).toDF()
+    Seq(
+      MyLabeledPoint(1.0, new MyDenseVector(Array(0.1, 1.0))),
+      MyLabeledPoint(0.0, new MyDenseVector(Array(0.2, 2.0)))).toDF()
 
   test("register user type: MyDenseVector for MyLabeledPoint") {
     val labels: RDD[Double] =
@@ -91,20 +94,23 @@ class UserDefinedTypeSuite
   }
 
   test("UDTs and UDFs") {
-    sqlContext.udf.register(
-        "testType", (d: MyDenseVector) => d.isInstanceOf[MyDenseVector])
+    sqlContext.udf
+      .register("testType", (d: MyDenseVector) => d.isInstanceOf[MyDenseVector])
     pointsRDD.registerTempTable("points")
-    checkAnswer(sql("SELECT testType(features) from points"),
-                Seq(Row(true), Row(true)))
+    checkAnswer(
+      sql("SELECT testType(features) from points"),
+      Seq(Row(true), Row(true)))
   }
 
   testStandardAndLegacyModes("UDTs with Parquet") {
     withTempPath { dir =>
       val path = dir.getCanonicalPath
       pointsRDD.write.parquet(path)
-      checkAnswer(sqlContext.read.parquet(path),
-                  Seq(Row(1.0, new MyDenseVector(Array(0.1, 1.0))),
-                      Row(0.0, new MyDenseVector(Array(0.2, 2.0)))))
+      checkAnswer(
+        sqlContext.read.parquet(path),
+        Seq(
+          Row(1.0, new MyDenseVector(Array(0.1, 1.0))),
+          Row(0.0, new MyDenseVector(Array(0.2, 2.0)))))
     }
   }
 
@@ -112,9 +118,11 @@ class UserDefinedTypeSuite
     withTempPath { dir =>
       val path = dir.getCanonicalPath
       pointsRDD.repartition(1).write.parquet(path)
-      checkAnswer(sqlContext.read.parquet(path),
-                  Seq(Row(1.0, new MyDenseVector(Array(0.1, 1.0))),
-                      Row(0.0, new MyDenseVector(Array(0.2, 2.0)))))
+      checkAnswer(
+        sqlContext.read.parquet(path),
+        Seq(
+          Row(1.0, new MyDenseVector(Array(0.1, 1.0))),
+          Row(0.0, new MyDenseVector(Array(0.2, 2.0)))))
     }
   }
 
@@ -138,21 +146,22 @@ class UserDefinedTypeSuite
 
   test("UDTs with JSON") {
     val data = Seq(
-        "{\"id\":1,\"vec\":[1.1,2.2,3.3,4.4]}",
-        "{\"id\":2,\"vec\":[2.25,4.5,8.75]}"
+      "{\"id\":1,\"vec\":[1.1,2.2,3.3,4.4]}",
+      "{\"id\":2,\"vec\":[2.25,4.5,8.75]}"
     )
     val schema = StructType(
-        Seq(
-            StructField("id", IntegerType, false),
-            StructField("vec", new MyDenseVectorUDT, false)
-        ))
+      Seq(
+        StructField("id", IntegerType, false),
+        StructField("vec", new MyDenseVectorUDT, false)
+      ))
 
     val stringRDD = sparkContext.parallelize(data)
     val jsonRDD = sqlContext.read.schema(schema).json(stringRDD)
     checkAnswer(
-        jsonRDD,
-        Row(1, new MyDenseVector(Array(1.1, 2.2, 3.3, 4.4))) :: Row(
-            2, new MyDenseVector(Array(2.25, 4.5, 8.75))) :: Nil
+      jsonRDD,
+      Row(1, new MyDenseVector(Array(1.1, 2.2, 3.3, 4.4))) :: Row(
+        2,
+        new MyDenseVector(Array(2.25, 4.5, 8.75))) :: Nil
     )
   }
 

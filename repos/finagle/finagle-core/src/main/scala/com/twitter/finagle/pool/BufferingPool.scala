@@ -52,7 +52,7 @@ class BufferingPool[Req, Rep](underlying: ServiceFactory[Req, Rep], size: Int)
     while (true) {
       buffer.tryGet() match {
         case Some(service) => service.releaseSelf()
-        case None => return
+        case None          => return
       }
     }
   }

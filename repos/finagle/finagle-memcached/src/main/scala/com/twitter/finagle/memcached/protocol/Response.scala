@@ -17,10 +17,11 @@ case class InfoLines(lines: Seq[Info]) extends Response
 case class Values(values: Seq[Value]) extends Response
 case class Number(value: Long) extends Response
 
-case class Value(key: Buf,
-                 value: Buf,
-                 casUnique: Option[Buf] = None,
-                 flags: Option[Buf] = None)
+case class Value(
+    key: Buf,
+    value: Buf,
+    casUnique: Option[Buf] = None,
+    flags: Option[Buf] = None)
 
 private[protocol] object Response {
   val NotFound = new NotFound()

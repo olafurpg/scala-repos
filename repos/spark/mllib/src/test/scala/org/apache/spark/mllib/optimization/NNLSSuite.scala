@@ -35,7 +35,9 @@ class NNLSSuite extends SparkFunSuite {
 
   /** Compute the objective value */
   def computeObjectiveValue(
-      ata: BDM[Double], atb: BDV[Double], x: BDV[Double]): Double =
+      ata: BDM[Double],
+      atb: BDV[Double],
+      x: BDV[Double]): Double =
     (x.t * ata * x) / 2.0 - atb.dot(x)
 
   test("NNLS: exact solution cases") {
@@ -55,7 +57,7 @@ class NNLSSuite extends SparkFunSuite {
       val answer = new BDV(Array.fill(n)(1.0))
       val solved =
         (breeze.linalg.norm(x - answer) < 0.01) && // L2 norm
-        ((x - answer).toArray.map(_.abs).max < 0.001) // inf norm
+          ((x - answer).toArray.map(_.abs).max < 0.001) // inf norm
       if (solved) {
         numSolved += 1
       }
@@ -66,31 +68,9 @@ class NNLSSuite extends SparkFunSuite {
 
   test("NNLS: nonnegativity constraint active") {
     val n = 5
-    val ata = Array(4.377,
-                    -3.531,
-                    -1.306,
-                    -0.139,
-                    3.418,
-                    -3.531,
-                    4.344,
-                    0.934,
-                    0.305,
-                    -2.140,
-                    -1.306,
-                    0.934,
-                    2.644,
-                    -0.203,
-                    -0.170,
-                    -0.139,
-                    0.305,
-                    -0.203,
-                    5.883,
-                    1.428,
-                    3.418,
-                    -2.140,
-                    -0.170,
-                    1.428,
-                    4.684)
+    val ata = Array(4.377, -3.531, -1.306, -0.139, 3.418, -3.531, 4.344, 0.934,
+      0.305, -2.140, -1.306, 0.934, 2.644, -0.203, -0.170, -0.139, 0.305,
+      -0.203, 5.883, 1.428, 3.418, -2.140, -0.170, 1.428, 4.684)
     val atb = Array(-1.632, 2.115, 1.094, -1.025, -0.636)
 
     val goodx = Array(0.13025, 0.54506, 0.2874, 0.0, 0.028628)
@@ -105,35 +85,18 @@ class NNLSSuite extends SparkFunSuite {
 
   test("NNLS: objective value test") {
     val n = 5
-    val ata = new BDM(5,
-                      5,
-                      Array(517399.13534,
-                            242529.67289,
-                            -153644.98976,
-                            130802.84503,
-                            -798452.29283,
-                            242529.67289,
-                            126017.69765,
-                            -75944.21743,
-                            81785.36128,
-                            -405290.60884,
-                            -153644.98976,
-                            -75944.21743,
-                            46986.44577,
-                            -45401.12659,
-                            247059.51049,
-                            130802.84503,
-                            81785.36128,
-                            -45401.12659,
-                            67457.31310,
-                            -253747.03819,
-                            -798452.29283,
-                            -405290.60884,
-                            247059.51049,
-                            -253747.03819,
-                            1310939.40814))
-    val atb = new BDV(Array(
-            -31755.05710, 13047.14813, -20191.24443, 25993.77580, 11963.55017))
+    val ata = new BDM(
+      5,
+      5,
+      Array(517399.13534, 242529.67289, -153644.98976, 130802.84503,
+        -798452.29283, 242529.67289, 126017.69765, -75944.21743, 81785.36128,
+        -405290.60884, -153644.98976, -75944.21743, 46986.44577, -45401.12659,
+        247059.51049, 130802.84503, 81785.36128, -45401.12659, 67457.31310,
+        -253747.03819, -798452.29283, -405290.60884, 247059.51049,
+        -253747.03819, 1310939.40814)
+    )
+    val atb = new BDV(
+      Array(-31755.05710, 13047.14813, -20191.24443, 25993.77580, 11963.55017))
 
     /** reference solution obtained from matlab function quadprog */
     val refx = new BDV(Array(34.90751, 103.96254, 0.00000, 27.82094, 58.79627))

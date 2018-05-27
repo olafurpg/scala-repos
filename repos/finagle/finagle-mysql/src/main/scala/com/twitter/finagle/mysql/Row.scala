@@ -51,7 +51,9 @@ trait Row {
   * [[http://dev.mysql.com/doc/internals/en/com-query-response.html#packet-ProtocolText::ResultsetRow]]
   */
 class StringEncodedRow(
-    rawRow: Buffer, val fields: IndexedSeq[Field], indexMap: Map[String, Int])
+    rawRow: Buffer,
+    val fields: IndexedSeq[Field],
+    indexMap: Map[String, Int])
     extends Row {
   val buffer = BufferReader(rawRow)
 
@@ -69,14 +71,14 @@ class StringEncodedRow(
     else {
       val str = new String(bytes, Charset(field.charset))
       field.fieldType match {
-        case Type.Tiny => ByteValue(str.toByte)
-        case Type.Short => ShortValue(str.toShort)
-        case Type.Int24 => IntValue(str.toInt)
-        case Type.Long => IntValue(str.toInt)
+        case Type.Tiny     => ByteValue(str.toByte)
+        case Type.Short    => ShortValue(str.toShort)
+        case Type.Int24    => IntValue(str.toInt)
+        case Type.Long     => IntValue(str.toInt)
         case Type.LongLong => LongValue(str.toLong)
-        case Type.Float => FloatValue(str.toFloat)
-        case Type.Double => DoubleValue(str.toDouble)
-        case Type.Year => ShortValue(str.toShort)
+        case Type.Float    => FloatValue(str.toFloat)
+        case Type.Double   => DoubleValue(str.toDouble)
+        case Type.Year     => ShortValue(str.toShort)
         // Nonbinary strings as stored in the CHAR, VARCHAR, and TEXT data types
         case Type.VarChar | Type.String | Type.VarString | Type.TinyBlob |
             Type.Blob | Type.MediumBlob if !Charset.isBinary(field.charset) =>
@@ -100,7 +102,9 @@ class StringEncodedRow(
   * [[http://dev.mysql.com/doc/internals/en/binary-protocol-resultset-row.html]]
   */
 class BinaryEncodedRow(
-    rawRow: Buffer, val fields: IndexedSeq[Field], indexMap: Map[String, Int])
+    rawRow: Buffer,
+    val fields: IndexedSeq[Field],
+    indexMap: Map[String, Int])
     extends Row {
   val buffer = BufferReader(rawRow, offset = 1)
 
@@ -131,24 +135,24 @@ class BinaryEncodedRow(
       if (isNull(idx)) NullValue
       else
         field.fieldType match {
-          case Type.Tiny => ByteValue(buffer.readByte())
-          case Type.Short => ShortValue(buffer.readShort())
-          case Type.Int24 => IntValue(buffer.readInt())
-          case Type.Long => IntValue(buffer.readInt())
+          case Type.Tiny     => ByteValue(buffer.readByte())
+          case Type.Short    => ShortValue(buffer.readShort())
+          case Type.Int24    => IntValue(buffer.readInt())
+          case Type.Long     => IntValue(buffer.readInt())
           case Type.LongLong => LongValue(buffer.readLong())
-          case Type.Float => FloatValue(buffer.readFloat())
-          case Type.Double => DoubleValue(buffer.readDouble())
-          case Type.Year => ShortValue(buffer.readShort())
+          case Type.Float    => FloatValue(buffer.readFloat())
+          case Type.Double   => DoubleValue(buffer.readDouble())
+          case Type.Year     => ShortValue(buffer.readShort())
           // Nonbinary strings as stored in the CHAR, VARCHAR, and TEXT data types
           case Type.VarChar | Type.String | Type.VarString | Type.TinyBlob |
               Type.Blob | Type.MediumBlob
               if !Charset.isBinary(field.charset) &&
-              Charset.isCompatible(field.charset) =>
+                Charset.isCompatible(field.charset) =>
             StringValue(buffer.readLengthCodedString(Charset(field.charset)))
 
           case Type.LongBlob =>
             throw new UnsupportedOperationException(
-                "LongBlob is not supported!")
+              "LongBlob is not supported!")
           case typ =>
             RawValue(typ, field.charset, true, buffer.readLengthCodedBytes())
         }

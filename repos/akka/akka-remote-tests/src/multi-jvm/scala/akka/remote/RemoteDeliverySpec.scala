@@ -24,8 +24,8 @@ object RemoteDeliveryMultiJvmSpec extends MultiNodeConfig {
   val third = role("third")
 
   commonConfig(
-      debugConfig(on = false)
-        .withFallback(ConfigFactory.parseString("akka.loglevel=INFO")))
+    debugConfig(on = false)
+      .withFallback(ConfigFactory.parseString("akka.loglevel=INFO")))
 
   final case class Letter(n: Int, route: List[ActorRef])
 
@@ -41,7 +41,8 @@ class RemoteDeliveryMultiJvmNode2 extends RemoteDeliverySpec
 class RemoteDeliveryMultiJvmNode3 extends RemoteDeliverySpec
 
 abstract class RemoteDeliverySpec
-    extends MultiNodeSpec(RemoteDeliveryMultiJvmSpec) with STMultiNodeSpec
+    extends MultiNodeSpec(RemoteDeliveryMultiJvmSpec)
+    with STMultiNodeSpec
     with ImplicitSender {
 
   import RemoteDeliveryMultiJvmSpec._
@@ -51,7 +52,7 @@ abstract class RemoteDeliverySpec
   def identify(role: RoleName, actorName: String): ActorRef =
     within(10 seconds) {
       system.actorSelection(node(role) / "user" / actorName) ! Identify(
-          actorName)
+        actorName)
       expectMsgType[ActorIdentity].ref.get
     }
 

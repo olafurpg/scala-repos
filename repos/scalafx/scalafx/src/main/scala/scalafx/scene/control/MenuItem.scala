@@ -31,7 +31,12 @@ import javafx.{event => jfxe, scene => jfxs}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{BooleanProperty, ObjectProperty, ReadOnlyObjectProperty, StringProperty}
+import scalafx.beans.property.{
+  BooleanProperty,
+  ObjectProperty,
+  ReadOnlyObjectProperty,
+  StringProperty
+}
 import scalafx.css.Styleable
 import scalafx.delegate.{FireDelegate, SFXDelegate}
 import scalafx.event.EventHandlerDelegate
@@ -44,8 +49,11 @@ object MenuItem {
 }
 
 class MenuItem(override val delegate: jfxsc.MenuItem = new jfxsc.MenuItem)
-    extends jfxe.EventTarget with Styleable with EventHandlerDelegate
-    with FireDelegate[jfxsc.MenuItem] with SFXDelegate[jfxsc.MenuItem] {
+    extends jfxe.EventTarget
+    with Styleable
+    with EventHandlerDelegate
+    with FireDelegate[jfxsc.MenuItem]
+    with SFXDelegate[jfxsc.MenuItem] {
 
   /**
     * Constructs a MenuItem and sets the display text with the specified text

@@ -27,7 +27,7 @@ package org.apache.spark.sql
   *
   * @since 1.3.0
   */
-case class DataFrameHolder private[sql](private val df: DataFrame) {
+case class DataFrameHolder private[sql] (private val df: DataFrame) {
 
   // This is declared with parentheses to prevent the Scala compiler from treating
   // `rdd.toDF("1")` as invoking this toDF and then apply on the returned DataFrame.

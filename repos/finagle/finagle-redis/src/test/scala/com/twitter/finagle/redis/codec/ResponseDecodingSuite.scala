@@ -4,7 +4,14 @@ import com.twitter.finagle.redis.{ClientError, ServerError}
 import com.twitter.finagle.redis.util._
 import com.twitter.util.Time
 import org.jboss.netty.buffer.ChannelBuffer
-import com.twitter.finagle.redis.protocol.{BulkReply, ErrorReply, IntegerReply, MBulkReply, StatusReply, ReplyCodec}
+import com.twitter.finagle.redis.protocol.{
+  BulkReply,
+  ErrorReply,
+  IntegerReply,
+  MBulkReply,
+  StatusReply,
+  ReplyCodec
+}
 import com.twitter.finagle.redis.util.StringToChannelBuffer
 import org.jboss.netty.buffer.ChannelBuffer
 import org.scalatest.FunSuite
@@ -19,8 +26,10 @@ final class ResponseDecodingSuite extends RedisResponseTest {
   }
 
   test("Correctly decode OK status reply with message") {
-    assert(codec(wrap("+OK\r\n+Hello World\r\n")) == List(
-            StatusReply("OK"), StatusReply("Hello World")))
+    assert(
+      codec(wrap("+OK\r\n+Hello World\r\n")) == List(
+        StatusReply("OK"),
+        StatusReply("Hello World")))
   }
 
   test("Throw ServerError when decoding BLANK OK reply") {
@@ -35,8 +44,9 @@ final class ResponseDecodingSuite extends RedisResponseTest {
 
   test("Correctly decode BAD error reply with message") {
     assert(
-        codec(wrap("-BAD\r\n-Bad Thing\r\n")) == List(ErrorReply("BAD"),
-                                                      ErrorReply("Bad Thing")))
+      codec(wrap("-BAD\r\n-Bad Thing\r\n")) == List(
+        ErrorReply("BAD"),
+        ErrorReply("Bad Thing")))
   }
 
   test("Throw ServerError when decoding BLANK error reply") {
@@ -66,8 +76,9 @@ final class ResponseDecodingSuite extends RedisResponseTest {
   }
 
   test("Correctly decode Long.MaxValue reply") {
-    assert(codec(wrap(":9223372036854775807\r\n")) == List(
-            IntegerReply(9223372036854775807L)))
+    assert(
+      codec(wrap(":9223372036854775807\r\n")) == List(
+        IntegerReply(9223372036854775807L)))
   }
 
   test("Throw ServerError when decoding Long.MaxValue + 1") {
@@ -77,8 +88,9 @@ final class ResponseDecodingSuite extends RedisResponseTest {
   }
 
   test("Correctly decode Long.MinValue") {
-    assert(codec(wrap(":-9223372036854775807\r\n")) == List(
-            IntegerReply(-9223372036854775807L)))
+    assert(
+      codec(wrap(":-9223372036854775807\r\n")) == List(
+        IntegerReply(-9223372036854775807L)))
   }
 
   test("Throw ServerError when decoding Long.MinValue -1") {
@@ -89,7 +101,7 @@ final class ResponseDecodingSuite extends RedisResponseTest {
 
   test("Correctly decode multiple integers in one reply") {
     assert(
-        codec(wrap(":1\r\n:2\r\n")) == List(IntegerReply(1), IntegerReply(2)))
+      codec(wrap(":1\r\n:2\r\n")) == List(IntegerReply(1), IntegerReply(2)))
   }
 
   test("Throw ServerError when decoding BLANK integer reply") {
@@ -110,8 +122,11 @@ final class ResponseDecodingSuite extends RedisResponseTest {
   }
 
   test("Correctly decodec multi line reply") {
-    assert(decomposeMultiElemDecoding(
-            codec(wrap("$3\r\nfoo\r\n$3\r\nbar\r\n"))) == (("foo", "bar")))
+    assert(
+      decomposeMultiElemDecoding(codec(wrap("$3\r\nfoo\r\n$3\r\nbar\r\n"))) == (
+        (
+          "foo",
+          "bar")))
   }
 
   test("Correctly decode EMPTY bulk reply") {
@@ -160,8 +175,9 @@ final class ResponseDecodingSuite extends RedisResponseTest {
       case reply :: Nil =>
         reply match {
           case MBulkReply(msgs) =>
-            assert(ReplyFormat.toString(msgs) == List(
-                    "foo", "bar", "Hello", "World"))
+            assert(
+              ReplyFormat
+                .toString(msgs) == List("foo", "bar", "Hello", "World"))
           case _ => fail("Expected MBulkReply")
         }
       case _ => fail("Expected one element in list")
@@ -364,8 +380,9 @@ final class ResponseDecodingSuite extends RedisResponseTest {
         reply match {
           case BulkReply(msg) => (CBToString(msg), "")
           case _ =>
-            ("USE FAILURE MSG, NOT THIS VALUE",
-             "Expected BulkReply, got something else")
+            (
+              "USE FAILURE MSG, NOT THIS VALUE",
+              "Expected BulkReply, got something else")
         }
       case _ =>
         ("USE FAILURE MSG, NOT THIS VALUE", "Found no or multiple reply lines")
@@ -375,16 +392,16 @@ final class ResponseDecodingSuite extends RedisResponseTest {
       reply: List[AnyRef]): (String, String) =
     reply match {
       case fooR :: booR :: Nil => {
-          val fooMsg = fooR match {
-            case BulkReply(msg) => CBToString(msg)
-            case _ => "Expected Bulk Reply"
-          }
-          val barMsg = booR match {
-            case BulkReply(msg) => CBToString(msg)
-            case _ => "Expected Bulk Reply"
-          }
-          (fooMsg, barMsg)
+        val fooMsg = fooR match {
+          case BulkReply(msg) => CBToString(msg)
+          case _              => "Expected Bulk Reply"
         }
+        val barMsg = booR match {
+          case BulkReply(msg) => CBToString(msg)
+          case _              => "Expected Bulk Reply"
+        }
+        (fooMsg, barMsg)
+      }
       case _ => fail("Expected two element in list")
     }
 }

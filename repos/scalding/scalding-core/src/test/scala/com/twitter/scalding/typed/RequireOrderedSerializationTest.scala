@@ -56,8 +56,9 @@ class RequireOrderedSerializationTest extends WordSpec with Matchers {
       val ex =
         the[Exception] thrownBy {
           JobTest(new NoOrderdSerJob(_))
-            .source(TypedTsv[(String, String)]("input"),
-                    List(("a", "a"), ("b", "b")))
+            .source(
+              TypedTsv[(String, String)]("input"),
+              List(("a", "a"), ("b", "b")))
             .sink[(String, String)](TypedTsv[(String, String)]("output")) {
               outBuf =>
                 ()
@@ -72,8 +73,9 @@ class RequireOrderedSerializationTest extends WordSpec with Matchers {
     // throw if we try to run in:
     "run" in {
       JobTest(new OrderdSerJob(_))
-        .source(TypedTsv[(String, String)]("input"),
-                List(("a", "a"), ("a", "b"), ("b", "b")))
+        .source(
+          TypedTsv[(String, String)]("input"),
+          List(("a", "a"), ("a", "b"), ("b", "b")))
         .sink[(String, String)](TypedTsv[(String, String)]("output")) {
           outBuf =>
             outBuf.toSet shouldBe Set(("a", "b"), ("b", "b"))

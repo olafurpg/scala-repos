@@ -15,18 +15,19 @@ import lila.hub.SequentialActor
 import lila.i18n.I18nKey.{Select => SelectI18nKey}
 import makeTimeout.large
 
-private[round] final class Round(gameId: String,
-                                 messenger: Messenger,
-                                 takebacker: Takebacker,
-                                 finisher: Finisher,
-                                 rematcher: Rematcher,
-                                 player: Player,
-                                 drawer: Drawer,
-                                 forecastApi: ForecastApi,
-                                 socketHub: ActorRef,
-                                 monitorMove: Option[Long] => Unit,
-                                 moretimeDuration: Duration,
-                                 activeTtl: Duration)
+private[round] final class Round(
+    gameId: String,
+    messenger: Messenger,
+    takebacker: Takebacker,
+    finisher: Finisher,
+    rematcher: Rematcher,
+    player: Player,
+    drawer: Drawer,
+    forecastApi: ForecastApi,
+    socketHub: ActorRef,
+    monitorMove: Option[Long] => Unit,
+    moretimeDuration: Duration,
+    activeTtl: Duration)
     extends SequentialActor {
 
   context setReceiveTimeout activeTtl
@@ -81,17 +82,19 @@ private[round] final class Round(gameId: String,
     case Resign(playerId) =>
       handle(playerId) { pov =>
         pov.game.resignable ?? finisher.other(
-            pov.game, _.Resign, Some(!pov.color))
+          pov.game,
+          _.Resign,
+          Some(!pov.color))
       }
 
     case GoBerserk(color) =>
       handle(color) { pov =>
         pov.game.goBerserk(color) ?? { progress =>
           messenger.system(
-              pov.game,
-              (_.untranslated(
-                  s"${pov.color.name.capitalize} is going berserk!"
-              )))
+            pov.game,
+            (_.untranslated(
+              s"${pov.color.name.capitalize} is going berserk!"
+            )))
           GameRepo.save(progress) >> GameRepo.goBerserk(pov) inject progress.events
         }
       }
@@ -101,7 +104,7 @@ private[round] final class Round(gameId: String,
         (pov.game.resignable && !pov.game.hasAi && pov.game.hasClock) ?? {
           socketHub ? Ask(pov.gameId, IsGone(!pov.color)) flatMap {
             case true => finisher.rageQuit(pov.game, Some(pov.color))
-            case _ => fuccess(List(Event.Reload))
+            case _    => fuccess(List(Event.Reload))
           }
         }
       }
@@ -116,7 +119,7 @@ private[round] final class Round(gameId: String,
         (pov.game.drawable && !pov.game.hasAi && pov.game.hasClock) ?? {
           socketHub ? Ask(pov.gameId, IsGone(!pov.color)) flatMap {
             case true => finisher.rageQuit(pov.game, None)
-            case _ => fuccess(List(Event.Reload))
+            case _    => fuccess(List(Event.Reload))
           }
         }
       }
@@ -140,10 +143,10 @@ private[round] final class Round(gameId: String,
         }
       }
 
-    case DrawYes(playerRef) => handle(playerRef)(drawer.yes)
-    case DrawNo(playerRef) => handle(playerRef)(drawer.no)
+    case DrawYes(playerRef)  => handle(playerRef)(drawer.yes)
+    case DrawNo(playerRef)   => handle(playerRef)(drawer.no)
     case DrawClaim(playerId) => handle(playerId)(drawer.claim)
-    case DrawForce => handle(drawer force _)
+    case DrawForce           => handle(drawer force _)
     case Cheat(color) =>
       handle { game =>
         (game.playable && !game.imported) ?? {
@@ -166,28 +169,28 @@ private[round] final class Round(gameId: String,
           lila
             .log("cheat")
             .info(
-                s"hold alert $ip http://lichess.org/${pov.gameId}/${pov.color.name}#${pov.game.turns} ${pov.player.userId | "anon"} mean: $mean SD: $sd")
+              s"hold alert $ip http://lichess.org/${pov.gameId}/${pov.color.name}#${pov.game.turns} ${pov.player.userId | "anon"} mean: $mean SD: $sd")
           lila.mon.cheat.holdAlert()
           GameRepo.setHoldAlert(pov, mean, sd) inject List[Event]()
         }
       }
 
     case RematchYes(playerRef) => handle(playerRef)(rematcher.yes)
-    case RematchNo(playerRef) => handle(playerRef)(rematcher.no)
+    case RematchNo(playerRef)  => handle(playerRef)(rematcher.no)
 
     case TakebackYes(playerRef) => handle(playerRef)(takebacker.yes)
-    case TakebackNo(playerRef) => handle(playerRef)(takebacker.no)
+    case TakebackNo(playerRef)  => handle(playerRef)(takebacker.no)
 
     case Moretime(playerRef) =>
       handle(playerRef) { pov =>
         pov.game.clock.ifTrue(pov.game moretimeable !pov.color) ?? { clock =>
           val newClock = clock.giveTime(!pov.color, moretimeDuration.toSeconds)
           val progress = (pov.game withClock newClock) + Event.Clock(newClock)
-          messenger.system(pov.game,
-                           (_.untranslated(
-                               "%s + %d seconds".format(
-                                   !pov.color, moretimeDuration.toSeconds)
-                           )))
+          messenger.system(
+            pov.game,
+            (_.untranslated(
+              "%s + %d seconds".format(!pov.color, moretimeDuration.toSeconds)
+            )))
           GameRepo save progress inject progress.events
         }
       }
@@ -211,11 +214,13 @@ private[round] final class Round(gameId: String,
             .giveTime(Color.Black, freeSeconds)
           val progress = (game withClock newClock) + Event.Clock(newClock)
           messenger.system(game, (_.untranslated("Lichess has been updated")))
-          messenger.system(game,
-                           (_.untranslated("Sorry for the inconvenience!")))
+          messenger.system(
+            game,
+            (_.untranslated("Sorry for the inconvenience!")))
           Color.all.foreach { c =>
-            messenger.system(game,
-                             (_.untranslated(s"$c + $freeSeconds seconds")))
+            messenger.system(
+              game,
+              (_.untranslated(s"$c + $freeSeconds seconds")))
           }
           GameRepo save progress inject progress.events
         }
@@ -224,9 +229,9 @@ private[round] final class Round(gameId: String,
     case AbortForMaintenance =>
       handle { game =>
         messenger.system(
-            game, (_.untranslated("Game aborted for server maintenance")))
-        messenger.system(
-            game, (_.untranslated("Sorry for the inconvenience!")))
+          game,
+          (_.untranslated("Game aborted for server maintenance")))
+        messenger.system(game, (_.untranslated("Sorry for the inconvenience!")))
         game.playable ?? finisher.other(game, _.Aborted)
       }
   }
@@ -248,8 +253,9 @@ private[round] final class Round(gameId: String,
     handleGame(GameRepo game gameId)(op)
 
   protected def handle(playerId: String)(op: Pov => Fu[Events]): Funit =
-    handlePov((GameRepo pov PlayerRef(gameId, playerId))
-          .mon(_.round.move.segment.fetch))(op)
+    handlePov(
+      (GameRepo pov PlayerRef(gameId, playerId))
+        .mon(_.round.move.segment.fetch))(op)
 
   protected def handle(color: Color)(op: Pov => Fu[Events]): Funit =
     handlePov(GameRepo pov PovRef(gameId, color))(op)
@@ -261,8 +267,8 @@ private[round] final class Round(gameId: String,
       }
     } recover errorHandler("handlePov")
 
-  private def handleGame(
-      game: Fu[Option[Game]])(op: Game => Fu[Events]): Funit =
+  private def handleGame(game: Fu[Option[Game]])(
+      op: Game => Fu[Events]): Funit =
     publish {
       game flatten "game not found" flatMap op
     } recover errorHandler("handleGame")
@@ -272,13 +278,13 @@ private[round] final class Round(gameId: String,
       if (events.nonEmpty) socketHub ! Tell(gameId, EventList(events))
       if (events exists {
             case e: Event.Move => e.threefold
-            case _ => false
+            case _             => false
           }) self ! Threefold
     }.void recover errorHandler("publish")
 
   private def errorHandler(name: String): PartialFunction[Throwable, Unit] = {
-    case e: ClientError => lila.mon.round.error.client()
+    case e: ClientError  => lila.mon.round.error.client()
     case e: FishnetError => lila.mon.round.error.fishnet()
-    case e: Exception => logger.warn(s"$name: ${e.getMessage}")
+    case e: Exception    => logger.warn(s"$name: ${e.getMessage}")
   }
 }

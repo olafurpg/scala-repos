@@ -82,13 +82,13 @@ object XmlParserSpec extends Specification with XmlMatchers {
     val str = AltXML.toXML(data, false, true)
 
     def cntIllegal(in: Char): Int = in match {
-      case '\u0085' => 1
+      case '\u0085'                              => 1
       case c if (c >= '\u007f' && c <= '\u0095') => 1
-      case '\n' => 0
-      case '\r' => 0
-      case '\t' => 0
-      case c if c < ' ' => 1
-      case _ => 0
+      case '\n'                                  => 0
+      case '\r'                                  => 0
+      case '\t'                                  => 0
+      case c if c < ' '                          => 1
+      case _                                     => 0
     }
 
     str.toList.foldLeft(0)((a, b) => a + cntIllegal(b)) must_== 0

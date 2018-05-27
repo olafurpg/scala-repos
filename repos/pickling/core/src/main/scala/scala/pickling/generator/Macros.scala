@@ -4,38 +4,46 @@ package generator
 // TODO - move these into Pickler/Unpickler and replace the existing macros.
 private[pickling] object PicklingMacros {
   import scala.language.experimental.macros
-  def genPickler[T]: Pickler[T] with Generated = macro scala.pickling.generator.Compat
-    .genPickler_impl[T]
-  def genUnpickler[T]: Unpickler[T] with Generated = macro scala.pickling.generator.Compat
-    .genUnpickler_impl[T]
-  def genPicklerUnpickler[T]: AbstractPicklerUnpickler[T] with Generated = macro scala.pickling.generator.Compat
-    .genPicklerUnpickler_impl[T]
+  def genPickler[T]: Pickler[T] with Generated =
+    macro scala.pickling.generator.Compat
+      .genPickler_impl[T]
+  def genUnpickler[T]: Unpickler[T] with Generated =
+    macro scala.pickling.generator.Compat
+      .genUnpickler_impl[T]
+  def genPicklerUnpickler[T]: AbstractPicklerUnpickler[T] with Generated =
+    macro scala.pickling.generator.Compat
+      .genPicklerUnpickler_impl[T]
 }
 private[pickling] trait PicklingMacros
-    extends Macro with SourceGenerator with TypeAnalysis {
+    extends Macro
+    with SourceGenerator
+    with TypeAnalysis {
   import c.universe._
   val symbols = new IrScalaSymbols[c.universe.type, c.type](c.universe, tools)
   // TODO - We should have more customization than this
   val handleCaseClassSubclasses = !configOption(
-      typeOf[IsIgnoreCaseClassSubclasses])
+    typeOf[IsIgnoreCaseClassSubclasses])
   val generator =
     if (isStaticOnly) {
       // TODO - should we consider externalizable "safe" or "static only" since we know it's externalizable at compile time?
       PicklingAlgorithm.aggregate(
-          Seq(new CaseClassPickling(
-                  allowReflection = false,
-                  careAboutSubclasses = handleCaseClassSubclasses),
-              AdtPickling,
-              ScalaSingleton))
+        Seq(
+          new CaseClassPickling(
+            allowReflection = false,
+            careAboutSubclasses = handleCaseClassSubclasses),
+          AdtPickling,
+          ScalaSingleton))
     } else {
       PicklingAlgorithm.aggregate(
-          Seq(new CaseClassPickling(
-                  allowReflection = true,
-                  careAboutSubclasses = handleCaseClassSubclasses),
-              AdtPickling,
-              ScalaSingleton,
-              new ExternalizablePickling,
-              WillRobinsonPickling))
+        Seq(
+          new CaseClassPickling(
+            allowReflection = true,
+            careAboutSubclasses = handleCaseClassSubclasses),
+          AdtPickling,
+          ScalaSingleton,
+          new ExternalizablePickling,
+          WillRobinsonPickling
+        ))
     }
 
   object logger extends AlgorithmLogger {
@@ -51,23 +59,27 @@ private[pickling] trait PicklingMacros
     import definitions._
     tpe.normalize match {
       case NothingTpe =>
-        c.abort(c.enclosingPosition,
-                "cannot generate pickling logic for type Nothing")
+        c.abort(
+          c.enclosingPosition,
+          "cannot generate pickling logic for type Nothing")
       case RefinedType(parents, decls) =>
-        c.abort(c.enclosingPosition,
-                "cannot generate pickling logic for refined type")
+        c.abort(
+          c.enclosingPosition,
+          "cannot generate pickling logic for refined type")
       case _ if tpe.isEffectivelyPrimitive || tpe.typeSymbol == StringClass =>
-        c.abort(c.enclosingPosition,
-                s"cannot generate pickling logic for primitive type: $tpe")
+        c.abort(
+          c.enclosingPosition,
+          s"cannot generate pickling logic for primitive type: $tpe")
       case tpe1 if tpe1.typeSymbol.isClass =>
         () // This case is fine.
       case _ =>
-        c.abort(c.enclosingPosition,
-                s"cannot generate pickling logic for non-class type $tpe")
+        c.abort(
+          c.enclosingPosition,
+          s"cannot generate pickling logic for non-class type $tpe")
     }
   }
 
-  def genPickler[T : c.WeakTypeTag]: c.Tree = preferringAlternativeImplicits {
+  def genPickler[T: c.WeakTypeTag]: c.Tree = preferringAlternativeImplicits {
     val tpe = computeType[T]
     checkClassType(tpe)
     val sym = symbols.newClass(tpe)
@@ -86,7 +98,7 @@ private[pickling] trait PicklingMacros
         tree
     }
   }
-  def genUnPickler[T : c.WeakTypeTag]: c.Tree =
+  def genUnPickler[T: c.WeakTypeTag]: c.Tree =
     preferringAlternativeImplicits {
       val tpe = computeType[T]
       checkClassType(tpe)
@@ -99,15 +111,14 @@ private[pickling] trait PicklingMacros
         }
       tree2 match {
         case None =>
-          c.error(
-              c.enclosingPosition, s"Failed to generate unpickler for $tpe")
+          c.error(c.enclosingPosition, s"Failed to generate unpickler for $tpe")
           ???
         case Some(tree) =>
           //System.err.println(s" --=== $tpe ===--\n$tree\n --=== / $tpe ===--")
           tree
       }
     }
-  def genPicklerUnpickler[T : c.WeakTypeTag]: c.Tree =
+  def genPicklerUnpickler[T: c.WeakTypeTag]: c.Tree =
     preferringAlternativeImplicits {
       val tpe = computeType[T]
       checkClassType(tpe)
@@ -117,8 +128,9 @@ private[pickling] trait PicklingMacros
       val tree2 = impl map generatePicklerUnpicklerClass[T]
       tree2 match {
         case None =>
-          c.error(c.enclosingPosition,
-                  s"Failed to generate pickler/unpickler for $tpe")
+          c.error(
+            c.enclosingPosition,
+            s"Failed to generate pickler/unpickler for $tpe")
           ???
         case Some(tree) =>
           //System.err.println(s" --=== $tpe ===--\n$tree\n --=== / $tpe ===--")

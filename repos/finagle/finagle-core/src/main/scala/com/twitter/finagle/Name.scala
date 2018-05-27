@@ -57,8 +57,8 @@ object Name {
       val addr: Var[Addr],
       val id: Any,
       val path: com.twitter.finagle.Path
-  )
-      extends Name with Proxy {
+  ) extends Name
+      with Proxy {
     def self = id
 
     // Workaround for https://issues.scala-lang.org/browse/SI-4807
@@ -67,13 +67,15 @@ object Name {
     def idStr: String =
       id match {
         case path: com.twitter.finagle.Path => path.show
-        case _ => id.toString
+        case _                              => id.toString
       }
   }
 
   object Bound {
     def apply(
-        addr: Var[Addr], id: Any, path: com.twitter.finagle.Path): Name.Bound =
+        addr: Var[Addr],
+        id: Any,
+        path: com.twitter.finagle.Path): Name.Bound =
       new Bound(addr, id, path)
 
     def apply(addr: Var[Addr], id: Any): Name.Bound =
@@ -94,7 +96,7 @@ object Name {
       case bound @ Bound(_) =>
         bound.id match {
           case id: com.twitter.finagle.Path => id.show
-          case id => id.toString
+          case id                           => id.toString
         }
     }
   }
@@ -122,25 +124,28 @@ object Name {
   def fromGroup(g: Group[SocketAddress]): Name.Bound = g match {
     case NameGroup(name) => name
     case group =>
-      Name.Bound({
-        // Group doesn't support the abstraction of "not yet bound" so
-        // this is a bit of a hack
-        @volatile var first = true
+      Name.Bound(
+        {
+          // Group doesn't support the abstraction of "not yet bound" so
+          // this is a bit of a hack
+          @volatile var first = true
 
-        group.set map {
-          case newSet if first && newSet.isEmpty => Addr.Pending
-          case newSet =>
-            first = false
-            newSet.foldLeft[Addr](Addr.Bound()) {
-              case (Addr.Bound(set, metadata), ia: InetSocketAddress) =>
-                Addr.Bound(set + Address(ia), metadata)
-              case (Addr.Bound(_, _), sa) =>
-                Addr.Failed(new IllegalArgumentException(
-                        s"Unsupported SocketAddress of type '${sa.getClass.getName}': $sa"))
-              case (addr, _) => addr
-            }
-        }
-      }, group)
+          group.set map {
+            case newSet if first && newSet.isEmpty => Addr.Pending
+            case newSet =>
+              first = false
+              newSet.foldLeft[Addr](Addr.Bound()) {
+                case (Addr.Bound(set, metadata), ia: InetSocketAddress) =>
+                  Addr.Bound(set + Address(ia), metadata)
+                case (Addr.Bound(_, _), sa) =>
+                  Addr.Failed(new IllegalArgumentException(
+                    s"Unsupported SocketAddress of type '${sa.getClass.getName}': $sa"))
+                case (addr, _) => addr
+              }
+          }
+        },
+        group
+      )
   }
 
   /**
@@ -170,7 +175,7 @@ object Name {
               }) =>
             val endpointAddrs = addrs.flatMap {
               case Addr.Bound(as, _) => as
-              case _ => Set.empty[Address]
+              case _                 => Set.empty[Address]
             }.toSet
             Addr.Bound(endpointAddrs, Addr.Metadata.empty)
 

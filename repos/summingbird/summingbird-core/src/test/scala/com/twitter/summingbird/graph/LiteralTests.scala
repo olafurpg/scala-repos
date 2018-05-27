@@ -48,12 +48,14 @@ object LiteralTests extends Properties("Literal") {
   def genBinary: Gen[Literal[Int, Box]] =
     for {
       fn <- Arbitrary.arbitrary[(Int, Int) => (Int)]
-      bfn = { case (Box(l), Box(r)) => Box(fn(l, r)) }: (Box[Int],
-      Box[Int]) => Box[Int]
+      bfn = { case (Box(l), Box(r)) => Box(fn(l, r)) }: (
+          Box[Int],
+          Box[Int]) => Box[Int]
       left <- genLiteral
       // We have to make dags, so select from the closure of left sometimes
       right <- Gen.oneOf(
-          genLiteral, genChooseFrom(transitiveClosure[Box](left)))
+        genLiteral,
+        genChooseFrom(transitiveClosure[Box](left)))
     } yield BinaryLit(left, right, bfn)
 
   def genChooseFrom[N[_]](s: Set[Literal[_, N]]): Gen[Literal[Int, N]] =
@@ -68,13 +70,13 @@ object LiteralTests extends Properties("Literal") {
   //This evaluates by recursively walking the tree without memoization
   //as lit.evaluate should do
   def slowEvaluate[T](lit: Literal[T, Box]): Box[T] = lit match {
-    case ConstLit(n) => n
-    case UnaryLit(in, fn) => fn(slowEvaluate(in))
+    case ConstLit(n)         => n
+    case UnaryLit(in, fn)    => fn(slowEvaluate(in))
     case BinaryLit(a, b, fn) => fn(slowEvaluate(a), slowEvaluate(b))
   }
 
-  property("Literal.evaluate must match simple explanation") = forAll(
-      genLiteral) { (l: Literal[Int, Box]) =>
-    l.evaluate == slowEvaluate(l)
-  }
+  property("Literal.evaluate must match simple explanation") =
+    forAll(genLiteral) { (l: Literal[Int, Box]) =>
+      l.evaluate == slowEvaluate(l)
+    }
 }

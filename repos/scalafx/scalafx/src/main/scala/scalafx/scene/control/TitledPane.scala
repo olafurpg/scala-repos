@@ -41,9 +41,9 @@ object TitledPane {
     if (v != null) v.delegate else null
 }
 
-class TitledPane(
-    override val delegate: jfxsc.TitledPane = new jfxsc.TitledPane)
-    extends Labeled(delegate) with SFXDelegate[jfxsc.TitledPane] {
+class TitledPane(override val delegate: jfxsc.TitledPane = new jfxsc.TitledPane)
+    extends Labeled(delegate)
+    with SFXDelegate[jfxsc.TitledPane] {
 
   def animated: BooleanProperty = delegate.animatedProperty
   def animated_=(v: Boolean) {

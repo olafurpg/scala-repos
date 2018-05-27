@@ -27,7 +27,7 @@ object ResolvesTo {
   def unapply(ref: PsiReference): Option[PsiElement] = {
     ref match {
       case null => None
-      case r => Option(r.resolve())
+      case r    => Option(r.resolve())
     }
   }
 }

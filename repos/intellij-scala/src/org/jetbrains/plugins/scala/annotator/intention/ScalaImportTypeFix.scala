@@ -6,8 +6,15 @@ import javax.swing.Icon
 import com.intellij.codeInsight.completion.JavaCompletionUtil
 import com.intellij.codeInsight.daemon.QuickFixBundle
 import com.intellij.codeInsight.daemon.impl.actions.AddImportAction
-import com.intellij.codeInsight.hint.{HintManager, HintManagerImpl, QuestionAction}
-import com.intellij.codeInsight.{FileModificationService, JavaProjectCodeInsightSettings}
+import com.intellij.codeInsight.hint.{
+  HintManager,
+  HintManagerImpl,
+  QuestionAction
+}
+import com.intellij.codeInsight.{
+  FileModificationService,
+  JavaProjectCodeInsightSettings
+}
 import com.intellij.codeInspection.HintAction
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.CommandProcessor
@@ -25,14 +32,27 @@ import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.formatting.settings.ScalaCodeStyleSettings
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScReferenceElement
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScTypeProjection
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScInfixExpr, ScMethodCall, ScPostfixExpr, ScPrefixExpr}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScInfixExpr,
+  ScMethodCall,
+  ScPostfixExpr,
+  ScPrefixExpr
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScTypeAlias
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.packaging.ScPackaging
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBody
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTemplateDefinition, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScObject,
+  ScTemplateDefinition,
+  ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.api.{ScPackage, ScalaFile}
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.ScTypeDefinitionImpl
-import org.jetbrains.plugins.scala.lang.psi.impl.{ScPackageImpl, ScalaPsiElementFactory, ScalaPsiManager}
+import org.jetbrains.plugins.scala.lang.psi.impl.{
+  ScPackageImpl,
+  ScalaPsiElementFactory,
+  ScalaPsiManager
+}
 import org.jetbrains.plugins.scala.lang.psi.{ScImportsHolder, ScalaPsiUtil}
 import org.jetbrains.plugins.scala.lang.resolve.ResolveUtils
 import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.ScDocResolvableCodeReference
@@ -47,7 +67,8 @@ import scala.collection.mutable.ArrayBuffer
   * Date: 15.07.2009
   */
 class ScalaImportTypeFix(
-    private var classes: Array[TypeToImport], ref: ScReferenceElement)
+    private var classes: Array[TypeToImport],
+    ref: ScReferenceElement)
     extends {
   val project = ref.getProject
 } with HintAction {
@@ -61,8 +82,7 @@ class ScalaImportTypeFix(
   def invoke(project: Project, editor: Editor, file: PsiFile) {
     CommandProcessor
       .getInstance()
-      .runUndoTransparentAction(
-          new Runnable {
+      .runUndoTransparentAction(new Runnable {
         def run() {
           if (!ref.isValid) return
           classes = ScalaImportTypeFix.getTypesToImport(ref, project)
@@ -76,8 +96,8 @@ class ScalaImportTypeFix(
     if (ref.qualifier.isDefined) return false
     ref.getContext match {
       case postf: ScPostfixExpr if postf.operation == ref => false
-      case pref: ScPrefixExpr if pref.operation == ref => false
-      case inf: ScInfixExpr if inf.operation == ref => false
+      case pref: ScPrefixExpr if pref.operation == ref    => false
+      case inf: ScInfixExpr if inf.operation == ref       => false
       case _ =>
         classes = ScalaImportTypeFix.getTypesToImport(ref, project)
         classes.length match {
@@ -107,13 +127,14 @@ class ScalaImportTypeFix(
   private def range(editor: Editor) = {
     val visibleRectangle = editor.getScrollingModel.getVisibleArea
     val startPosition = editor.xyToLogicalPosition(
-        new Point(visibleRectangle.x, visibleRectangle.y))
+      new Point(visibleRectangle.x, visibleRectangle.y))
     val myStartOffset = editor.logicalPositionToOffset(startPosition)
     val endPosition = editor.xyToLogicalPosition(
-        new Point(visibleRectangle.x + visibleRectangle.width,
-                  visibleRectangle.y + visibleRectangle.height))
+      new Point(
+        visibleRectangle.x + visibleRectangle.width,
+        visibleRectangle.y + visibleRectangle.height))
     val myEndOffset = editor.logicalPositionToOffset(
-        new LogicalPosition(endPosition.line + 1, 0))
+      new LogicalPosition(endPosition.line + 1, 0))
     new TextRange(myStartOffset, myEndOffset)
   }
 
@@ -138,15 +159,17 @@ class ScalaImportTypeFix(
             offset <= editor.getDocument.getTextLength) {
           HintManager
             .getInstance()
-            .showQuestionHint(editor,
-                              if (classes.length == 1)
-                                classes(0).qualifiedName + "? Alt+Enter"
-                              else
-                                classes(0).qualifiedName +
-                                "? (multiple choices...) Alt+Enter",
-                              offset,
-                              offset + ref.getTextLength,
-                              action)
+            .showQuestionHint(
+              editor,
+              if (classes.length == 1)
+                classes(0).qualifiedName + "? Alt+Enter"
+              else
+                classes(0).qualifiedName +
+                  "? (multiple choices...) Alt+Enter",
+              offset,
+              offset + ref.getTextLength,
+              action
+            )
           return
         }
       }
@@ -156,34 +179,41 @@ class ScalaImportTypeFix(
   def startInWriteAction(): Boolean = true
 
   class ScalaAddImportAction(
-      editor: Editor, classes: Array[TypeToImport], ref: ScReferenceElement)
+      editor: Editor,
+      classes: Array[TypeToImport],
+      ref: ScReferenceElement)
       extends QuestionAction {
     def addImportOrReference(clazz: TypeToImport) {
       ApplicationManager.getApplication.invokeLater(new Runnable() {
         def run() {
           if (!ref.isValid || !FileModificationService.getInstance
                 .prepareFileForWrite(ref.getContainingFile)) return
-          ScalaUtils.runWriteAction(new Runnable {
-            def run() {
-              PsiDocumentManager
-                .getInstance(project)
-                .commitDocument(editor.getDocument)
-              if (!ref.isValid) return
-              if (!ref.isInstanceOf[ScDocResolvableCodeReference])
-                ref.bindToElement(clazz.element)
-              else
-                ref.replace(ScalaPsiElementFactory.createDocLinkValue(
-                        clazz.qualifiedName, ref.getManager))
-            }
-          }, clazz.getProject, "Add import action")
+          ScalaUtils.runWriteAction(
+            new Runnable {
+              def run() {
+                PsiDocumentManager
+                  .getInstance(project)
+                  .commitDocument(editor.getDocument)
+                if (!ref.isValid) return
+                if (!ref.isInstanceOf[ScDocResolvableCodeReference])
+                  ref.bindToElement(clazz.element)
+                else
+                  ref.replace(
+                    ScalaPsiElementFactory
+                      .createDocLinkValue(clazz.qualifiedName, ref.getManager))
+              }
+            },
+            clazz.getProject,
+            "Add import action"
+          )
         }
       })
     }
 
     def chooseClass() {
       val popup = new BaseListPopupStep[TypeToImport](
-          QuickFixBundle.message("class.to.import.chooser.title"),
-          classes: _*) {
+        QuickFixBundle.message("class.to.import.chooser.title"),
+        classes: _*) {
         override def getIconFor(aValue: TypeToImport): Icon = {
           aValue.getIcon
         }
@@ -196,8 +226,9 @@ class ScalaImportTypeFix(
 
         import com.intellij.openapi.ui.popup.PopupStep.FINAL_CHOICE
 
-        override def onChosen(selectedValue: TypeToImport,
-                              finalChoice: Boolean): PopupStep[_] = {
+        override def onChosen(
+            selectedValue: TypeToImport,
+            finalChoice: Boolean): PopupStep[_] = {
           if (selectedValue == null) {
             return FINAL_CHOICE
           }
@@ -212,7 +243,8 @@ class ScalaImportTypeFix(
             AddImportAction.getAllExcludableStrings(qname)
           new BaseListPopupStep[String](null, toExclude) {
             override def onChosen(
-                selectedValue: String, finalChoice: Boolean): PopupStep[_] = {
+                selectedValue: String,
+                finalChoice: Boolean): PopupStep[_] = {
               if (finalChoice) {
                 AddImportAction.excludeFromImport(project, selectedValue)
               }
@@ -271,7 +303,7 @@ object ScalaImportTypeFix {
         case clazz: PsiClass => Some(ClassTypeToImport(clazz))
         case ta: ScTypeAlias => Some(TypeAliasToImport(ta))
         case pack: ScPackage => Some(PrefixPackageToImport(pack))
-        case _ => None
+        case _               => None
       }
     }
   }
@@ -318,7 +350,7 @@ object ScalaImportTypeFix {
             case holder: ScImportsHolder => holder
             case file =>
               throw new AssertionError(
-                  s"Holder is wrong, file text: ${file.getText}")
+                s"Holder is wrong, file text: ${file.getText}")
           }
         case packaging: ScPackaging => packaging
       }
@@ -336,11 +368,11 @@ object ScalaImportTypeFix {
       case o: ScObject if o.isSyntheticObject =>
         ScalaPsiUtil.getCompanionModule(o) match {
           case Some(cl) => notInner(cl, ref)
-          case _ => true
+          case _        => true
         }
       case t: ScTypeDefinition =>
         parent(t) match {
-          case _: ScalaFile => true
+          case _: ScalaFile   => true
           case _: ScPackaging => true
           case _: ScTemplateBody =>
             Option(t.containingClass) match {
@@ -355,7 +387,8 @@ object ScalaImportTypeFix {
   }
 
   def getTypesToImport(
-      ref: ScReferenceElement, myProject: Project): Array[TypeToImport] = {
+      ref: ScReferenceElement,
+      myProject: Project): Array[TypeToImport] = {
     if (!ref.isValid) return Array.empty
     if (ref.isInstanceOf[ScTypeProjection]) return Array.empty
     val kinds = ref.getKinds(incomplete = false)
@@ -378,7 +411,7 @@ object ScalaImportTypeFix {
           if (ScalaPsiUtil.getBaseCompanionModule(c).isEmpty) {
             ScalaPsiUtil.getCompanionModule(c) match {
               case Some(companion) => addClazz(companion)
-              case _ =>
+              case _               =>
             }
           }
         case _ =>
@@ -423,12 +456,15 @@ object ScalaImportTypeFix {
     }
 
     if (ref.getParent.isInstanceOf[ScMethodCall]) {
-      buffer.filter {
-        case ClassTypeToImport(clazz) =>
-          clazz.isInstanceOf[ScObject] &&
-          clazz.asInstanceOf[ScObject].functionsByName("apply").nonEmpty
-        case _ => false
-      }.sortBy(_.qualifiedName).toArray
+      buffer
+        .filter {
+          case ClassTypeToImport(clazz) =>
+            clazz.isInstanceOf[ScObject] &&
+              clazz.asInstanceOf[ScObject].functionsByName("apply").nonEmpty
+          case _ => false
+        }
+        .sortBy(_.qualifiedName)
+        .toArray
     } else buffer.sortBy(_.qualifiedName).toArray
   }
 }

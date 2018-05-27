@@ -19,6 +19,6 @@ object Env {
 
   lazy val current: Env =
     "coordinate" boot new Env(
-        config = lila.common.PlayApp loadConfig "coordinate",
-        db = lila.db.Env.current)
+      config = lila.common.PlayApp loadConfig "coordinate",
+      db = lila.db.Env.current)
 }

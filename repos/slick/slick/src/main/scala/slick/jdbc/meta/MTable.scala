@@ -5,12 +5,13 @@ import slick.jdbc.{ResultSetAction, Invoker}
 import slick.basic.BasicStreamingAction
 
 /** A wrapper for a row in the ResultSet returned by DatabaseMetaData.getTables(). */
-case class MTable(name: MQName,
-                  tableType: String,
-                  remarks: String,
-                  typeName: Option[MQName],
-                  selfRefColName: Option[String],
-                  refGen: Option[String]) {
+case class MTable(
+    name: MQName,
+    tableType: String,
+    remarks: String,
+    typeName: Option[MQName],
+    selfRefColName: Option[String],
+    refGen: Option[String]) {
 
   def getColumns = MColumn.getColumns(name, "%")
   def getPrimaryKeys = MPrimaryKey.getPrimaryKeys(name)
@@ -19,7 +20,8 @@ case class MTable(name: MQName,
   def getVersionColumns = MVersionColumn.getVersionColumns(name)
   def getTablePrivileges = MTablePrivilege.getTablePrivileges(name)
   def getBestRowIdentifier(
-      scope: MBestRowIdentifierColumn.Scope, nullable: Boolean = false) =
+      scope: MBestRowIdentifierColumn.Scope,
+      nullable: Boolean = false) =
     MBestRowIdentifierColumn.getBestRowIdentifier(name, scope, nullable)
 
   /** @param unique when true, return only indices for unique values; when false, return indices regardless of whether unique or not */
@@ -28,15 +30,17 @@ case class MTable(name: MQName,
 }
 
 object MTable {
-  def getTables(cat: Option[String],
-                schemaPattern: Option[String],
-                namePattern: Option[String],
-                types: Option[Seq[String]]) =
+  def getTables(
+      cat: Option[String],
+      schemaPattern: Option[String],
+      namePattern: Option[String],
+      types: Option[Seq[String]]) =
     ResultSetAction[MTable](
-        _.metaData.getTables(cat.orNull,
-                             schemaPattern.orNull,
-                             namePattern.orNull,
-                             types.map(_.toArray).orNull)) { r =>
+      _.metaData.getTables(
+        cat.orNull,
+        schemaPattern.orNull,
+        namePattern.orNull,
+        types.map(_.toArray).orNull)) { r =>
       if (r.numColumns > 5)
         MTable(MQName.from(r), r.<<, r.<<, MQName.optionalFrom(r), r.<<, r.<<)
       else MTable(MQName.from(r), r.<<, r.<<, None, None, None)

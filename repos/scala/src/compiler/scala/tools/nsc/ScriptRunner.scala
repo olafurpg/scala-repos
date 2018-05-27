@@ -49,19 +49,20 @@ class ScriptRunner extends HasCompileSocket {
   /** Pick a main object name from the specified settings */
   def scriptMain(settings: Settings) = settings.script.value match {
     case "" => defaultScriptMain
-    case x => x
+    case x  => x
   }
 
   /** Choose a jar filename to hold the compiled version of a script. */
   private def jarFileFor(scriptFile: String) = File(
-      if (scriptFile endsWith ".jar") scriptFile
-      else scriptFile.stripSuffix(".scala") + ".jar"
+    if (scriptFile endsWith ".jar") scriptFile
+    else scriptFile.stripSuffix(".scala") + ".jar"
   )
 
   /** Compile a script using the fsc compilation daemon.
     */
   private def compileWithDaemon(
-      settings: GenericRunnerSettings, scriptFileIn: String) = {
+      settings: GenericRunnerSettings,
+      scriptFileIn: String) = {
     val scriptFile = Path(scriptFileIn).toAbsolute.path
     val compSettingNames =
       new Settings(sys.error).visibleSettings.toList map (_.name)
@@ -73,7 +74,7 @@ class ScriptRunner extends HasCompileSocket {
 
     CompileSocket getOrCreateSocket "" match {
       case Some(sock) => compileOnServer(sock, compArgs)
-      case _ => false
+      case _          => false
     }
   }
 
@@ -86,8 +87,8 @@ class ScriptRunner extends HasCompileSocket {
     * @return true if compilation and the handler succeeds, false otherwise.
     */
   private def withCompiledScript(
-      settings: GenericRunnerSettings, scriptFile: String)(
-      handler: String => Boolean): Boolean = {
+      settings: GenericRunnerSettings,
+      scriptFile: String)(handler: String => Boolean): Boolean = {
     def mainClass = scriptMain(settings)
 
     /* Compiles the script file, and returns the directory with the compiled
@@ -143,7 +144,8 @@ class ScriptRunner extends HasCompileSocket {
                 // running an empty script should succeed
                 true
               } else {
-                try io.Jar.create(jarFile, compiledPath, mainClass) catch {
+                try io.Jar.create(jarFile, compiledPath, mainClass)
+                catch {
                   case _: Exception => jarFile.delete()
                 }
 
@@ -171,13 +173,14 @@ class ScriptRunner extends HasCompileSocket {
     *
     * @return true if execution succeeded, false otherwise
     */
-  private def runCompiled(settings: GenericRunnerSettings,
-                          compiledLocation: String,
-                          scriptArgs: List[String]): Boolean = {
+  private def runCompiled(
+      settings: GenericRunnerSettings,
+      compiledLocation: String,
+      scriptArgs: List[String]): Boolean = {
     val cp = File(compiledLocation).toURL +: settings.classpathURLs
     ObjectRunner.runAndCatch(cp, scriptMain(settings), scriptArgs) match {
       case Left(ex) => ex.printStackTrace(); false
-      case _ => true
+      case _        => true
     }
   }
 
@@ -186,9 +189,10 @@ class ScriptRunner extends HasCompileSocket {
     *
     * @return true if compilation and execution succeeded, false otherwise.
     */
-  def runScript(settings: GenericRunnerSettings,
-                scriptFile: String,
-                scriptArgs: List[String]): Boolean = {
+  def runScript(
+      settings: GenericRunnerSettings,
+      scriptFile: String,
+      scriptArgs: List[String]): Boolean = {
     if (File(scriptFile).isFile)
       withCompiledScript(settings, scriptFile) {
         runCompiled(settings, _, scriptArgs)
@@ -202,7 +206,8 @@ class ScriptRunner extends HasCompileSocket {
       settings: GenericRunnerSettings,
       scriptFile: String,
       scriptArgs: List[String]): Either[Throwable, Boolean] = {
-    try Right(runScript(settings, scriptFile, scriptArgs)) catch {
+    try Right(runScript(settings, scriptFile, scriptArgs))
+    catch {
       case e: Throwable => Left(unwrap(e))
     }
   }
@@ -211,9 +216,10 @@ class ScriptRunner extends HasCompileSocket {
     *
     * @return true if compilation and execution succeeded, false otherwise.
     */
-  def runCommand(settings: GenericRunnerSettings,
-                 command: String,
-                 scriptArgs: List[String]): Boolean = {
+  def runCommand(
+      settings: GenericRunnerSettings,
+      command: String,
+      scriptArgs: List[String]): Boolean = {
     val scriptFile = File.makeTemp("scalacmd", ".scala")
     // save the command to the file
     scriptFile writeAll command

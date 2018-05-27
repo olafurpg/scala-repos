@@ -31,31 +31,28 @@ class DecodingToCommandTest extends FunSuite {
     Time.withCurrentTimeFrozen { _ =>
       val expireTimeTableData =
         Table(
-            "expectedTime" -> "allowedDelta",
-            ExpectedTimeTable(0, Time.epoch) -> 0.seconds,
-            ExpectedTimeTable(200.seconds.fromNow.inSeconds,
-                              200.seconds.fromNow) -> 1.seconds,
-            ExpectedTimeTable(200, 200.seconds.fromNow) -> 1.seconds
+          "expectedTime" -> "allowedDelta",
+          ExpectedTimeTable(0, Time.epoch) -> 0.seconds,
+          ExpectedTimeTable(200.seconds.fromNow.inSeconds, 200.seconds.fromNow) -> 1.seconds,
+          ExpectedTimeTable(200, 200.seconds.fromNow) -> 1.seconds
         )
 
       forAll(expireTimeTableData) {
         (expectedTime: ExpectedTimeTable, allowedDelta: Duration) =>
           val buffer = TokensWithData(
-              Seq("set",
-                  key,
-                  flags,
-                  expectedTime.expireTime.toString,
-                  dataSize).map(Buf.Utf8(_)),
-              Buf.Utf8(data),
-              None
+            Seq("set", key, flags, expectedTime.expireTime.toString, dataSize)
+              .map(Buf.Utf8(_)),
+            Buf.Utf8(data),
+            None
           )
           val command = decodingToCommand.decode(null, null, buffer)
           assert(command.getClass == classOf[Set])
           val set = command.asInstanceOf[Set]
           assert(set.key == Buf.Utf8(key))
           assert(set.value == Buf.Utf8(data))
-          assert(set.expiry.moreOrLessEquals(expectedTime.expirationTime,
-                                             allowedDelta))
+          assert(
+            set.expiry
+              .moreOrLessEquals(expectedTime.expirationTime, allowedDelta))
       }
     }
   }
@@ -66,7 +63,7 @@ class DecodingToCommandTest extends FunSuite {
 
     Seq(None, Some("slabs"), Some("items")).foreach { arg =>
       val cmd = arg match {
-        case None => Seq("stats") map { Buf.Utf8(_) }
+        case None    => Seq("stats") map { Buf.Utf8(_) }
         case Some(s) => Seq("stats", s) map { Buf.Utf8(_) }
       }
       val buffer = Tokens(cmd)
@@ -74,7 +71,7 @@ class DecodingToCommandTest extends FunSuite {
       assert(command.getClass == classOf[Stats])
       val stats = command.asInstanceOf[Stats]
       stats.args.headOption match {
-        case None => assert(arg == None)
+        case None               => assert(arg == None)
         case Some(Buf.Utf8(cb)) => assert(cb == arg.get)
       }
     }

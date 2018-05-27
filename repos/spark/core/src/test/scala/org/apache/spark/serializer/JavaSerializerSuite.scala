@@ -33,7 +33,7 @@ class JavaSerializerSuite extends SparkFunSuite {
     val serializer = new JavaSerializer(new SparkConf())
     val instance = serializer.newInstance()
     val obj = instance.deserialize[ContainsPrimitiveClass](
-        instance.serialize(new ContainsPrimitiveClass()))
+      instance.serialize(new ContainsPrimitiveClass()))
     // enforce class cast
     obj.getClass
   }

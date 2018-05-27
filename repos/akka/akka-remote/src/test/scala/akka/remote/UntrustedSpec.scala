@@ -59,22 +59,26 @@ object UntrustedSpec {
 }
 
 class UntrustedSpec
-    extends AkkaSpec("""
+    extends AkkaSpec(
+      """
 akka.actor.provider = akka.remote.RemoteActorRefProvider
 akka.remote.untrusted-mode = on
 akka.remote.trusted-selection-paths = ["/user/receptionist", ]    
 akka.remote.netty.tcp.port = 0
 akka.loglevel = DEBUG
-""") with ImplicitSender {
+""")
+    with ImplicitSender {
 
   import UntrustedSpec._
 
   val client = ActorSystem(
-      "UntrustedSpec-client",
-      ConfigFactory.parseString("""
+    "UntrustedSpec-client",
+    ConfigFactory.parseString(
+      """
       akka.actor.provider = akka.remote.RemoteActorRefProvider
       akka.remote.netty.tcp.port = 0
-  """))
+  """)
+  )
   val addr =
     system.asInstanceOf[ExtendedActorSystem].provider.getDefaultAddress
 
@@ -118,22 +122,29 @@ akka.loglevel = DEBUG
     "discard harmful messages to /remote" in {
       val logProbe = TestProbe()
       // but instead install our own listener
-      system.eventStream.subscribe(system.actorOf(Props(new Actor {
-        import Logging._
-        def receive = {
-          case d @ Debug(_, _, msg: String) if msg contains "dropping" ⇒
-            logProbe.ref ! d
-          case _ ⇒
-        }
-      }).withDeploy(Deploy.local), "debugSniffer"), classOf[Logging.Debug])
+      system.eventStream.subscribe(
+        system.actorOf(
+          Props(new Actor {
+            import Logging._
+            def receive = {
+              case d @ Debug(_, _, msg: String) if msg contains "dropping" ⇒
+                logProbe.ref ! d
+              case _ ⇒
+            }
+          }).withDeploy(Deploy.local),
+          "debugSniffer"
+        ),
+        classOf[Logging.Debug]
+      )
 
       remoteDaemon ! "hello"
       logProbe.expectMsgType[Logging.Debug]
     }
 
     "discard harmful messages to testActor" in {
-      target2 ! Terminated(remoteDaemon)(existenceConfirmed = true,
-                                         addressTerminated = false)
+      target2 ! Terminated(remoteDaemon)(
+        existenceConfirmed = true,
+        addressTerminated = false)
       target2 ! PoisonPill
       client.stop(target2)
       target2 ! "blech"
@@ -141,8 +152,7 @@ akka.loglevel = DEBUG
     }
 
     "discard watch messages" in {
-      client.actorOf(
-          Props(new Actor {
+      client.actorOf(Props(new Actor {
         context.watch(target2)
         def receive = {
           case x ⇒ testActor forward x
@@ -168,22 +178,23 @@ akka.loglevel = DEBUG
         .tell(Identify(None), p.ref)
       val clientReceptionistRef = p.expectMsgType[ActorIdentity].ref.get
 
-      val sel = ActorSelection(clientReceptionistRef,
-                               receptionist.path.toStringWithoutAddress)
+      val sel = ActorSelection(
+        clientReceptionistRef,
+        receptionist.path.toStringWithoutAddress)
       sel ! "hello"
       expectNoMsg(1.second)
     }
 
     "discard actor selection to child of matching white list" in {
       val sel = client.actorSelection(
-          RootActorPath(addr) / receptionist.path.elements / "child1")
+        RootActorPath(addr) / receptionist.path.elements / "child1")
       sel ! "hello"
       expectNoMsg(1.second)
     }
 
     "discard actor selection with wildcard" in {
       val sel = client.actorSelection(
-          RootActorPath(addr) / receptionist.path.elements / "*")
+        RootActorPath(addr) / receptionist.path.elements / "*")
       sel ! "hello"
       expectNoMsg(1.second)
     }

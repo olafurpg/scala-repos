@@ -39,6 +39,5 @@ trait ClientParams[A <: Stack.Parameterized[A]] {
     * @see [[https://twitter.github.io/finagle/guide/Clients.html#retries]]
     */
   def withRetryBackoff(backoff: Stream[Duration]): A =
-    self.configured(
-        self.params[Retries.Budget].copy(requeueBackoffs = backoff))
+    self.configured(self.params[Retries.Budget].copy(requeueBackoffs = backoff))
 }

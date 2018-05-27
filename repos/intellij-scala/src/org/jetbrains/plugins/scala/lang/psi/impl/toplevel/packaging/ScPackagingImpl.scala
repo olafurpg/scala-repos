@@ -31,11 +31,14 @@ import scala.collection.mutable.ArrayBuffer
   * @author Alexander Podkhalyuzin, Pavel Fatin
   * Date: 20.02.2008
   */
-class ScPackagingImpl private (stub: StubElement[ScPackageContainer],
-                               nodeType: IElementType,
-                               node: ASTNode)
-    extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScPackaging
-    with ScImportsHolder with ScDeclarationSequenceHolder {
+class ScPackagingImpl private (
+    stub: StubElement[ScPackageContainer],
+    nodeType: IElementType,
+    node: ASTNode)
+    extends ScalaStubBasedElementImpl(stub, nodeType, node)
+    with ScPackaging
+    with ScImportsHolder
+    with ScDeclarationSequenceHolder {
   def this(node: ASTNode) = { this(null, null, node) }
 
   def this(stub: ScPackageContainerStub) = {
@@ -56,7 +59,7 @@ class ScPackagingImpl private (stub: StubElement[ScPackageContainer],
     if (next == null) return None
     next match {
       case ref: ScStableCodeReferenceElement => Some(ref)
-      case _ => findChild(classOf[ScStableCodeReferenceElement])
+      case _                                 => findChild(classOf[ScStableCodeReferenceElement])
     }
   }
 
@@ -77,7 +80,7 @@ class ScPackagingImpl private (stub: StubElement[ScPackageContainer],
     }
     reference match {
       case Some(r) => r.qualName
-      case None => ""
+      case None    => ""
     }
   }
 
@@ -92,8 +95,8 @@ class ScPackagingImpl private (stub: StubElement[ScPackageContainer],
         if (_packName.length > 0) _packName + "." + p.getPackageName
         else p.getPackageName
       case f: ScalaFileImpl => "" //f.getPackageName
-      case null => ""
-      case parent => parentPackageName(parent)
+      case null             => ""
+      case parent           => parentPackageName(parent)
     }
     parentPackageName(this)
   }
@@ -101,19 +104,20 @@ class ScPackagingImpl private (stub: StubElement[ScPackageContainer],
   def typeDefs = {
     val stub = getStub
     if (stub != null) {
-      stub.getChildrenByType(TokenSet.create(
-                                 ScalaElementTypes.OBJECT_DEF,
-                                 ScalaElementTypes.CLASS_DEF,
-                                 ScalaElementTypes.TRAIT_DEF
-                             ),
-                             JavaArrayFactoryUtil.ScTypeDefinitionFactory)
+      stub.getChildrenByType(
+        TokenSet.create(
+          ScalaElementTypes.OBJECT_DEF,
+          ScalaElementTypes.CLASS_DEF,
+          ScalaElementTypes.TRAIT_DEF
+        ),
+        JavaArrayFactoryUtil.ScTypeDefinitionFactory)
     } else {
       val buffer = new ArrayBuffer[ScTypeDefinition]
       var curr = getFirstChild
       while (curr != null) {
         curr match {
           case definition: ScTypeDefinition => buffer += definition
-          case _ =>
+          case _                            =>
         }
         curr = curr.getNextSibling
       }
@@ -132,14 +136,15 @@ class ScPackagingImpl private (stub: StubElement[ScPackageContainer],
     val top =
       if (_prefix.length > 0) _prefix + "." + topRefName else topRefName
     val p = ScPackageImpl(
-        JavaPsiFacade.getInstance(getProject).findPackage(top))
+      JavaPsiFacade.getInstance(getProject).findPackage(top))
     if (p == null) Seq.empty else Seq(p)
   }
 
-  override def processDeclarations(processor: PsiScopeProcessor,
-                                   state: ResolveState,
-                                   lastParent: PsiElement,
-                                   place: PsiElement): Boolean = {
+  override def processDeclarations(
+      processor: PsiScopeProcessor,
+      state: ResolveState,
+      lastParent: PsiElement,
+      place: PsiElement): Boolean = {
     if (DumbService.getInstance(getProject).isDumb) return true
 
     //If stub is not null, then we are not trying to resolve packaging reference.
@@ -148,7 +153,7 @@ class ScPackagingImpl private (stub: StubElement[ScPackageContainer],
         (if (prefix.length == 0) "" else prefix + ".") + getPackageName
       ProgressManager.checkCanceled()
       val p = ScPackageImpl(
-          JavaPsiFacade.getInstance(getProject).findPackage(pName))
+        JavaPsiFacade.getInstance(getProject).findPackage(pName))
       if (p != null &&
           !p.processDeclarations(processor, state, lastParent, place)) {
         return false
@@ -168,12 +173,18 @@ class ScPackagingImpl private (stub: StubElement[ScPackageContainer],
     }
 
     if (lastParent != null && lastParent.getContext == this) {
-      if (!super [ScImportsHolder].processDeclarations(
-              processor, state, lastParent, place)) return false
+      if (!super[ScImportsHolder].processDeclarations(
+            processor,
+            state,
+            lastParent,
+            place)) return false
 
       if (ScalaFileImpl.isProcessLocalClasses(lastParent) &&
-          !super [ScDeclarationSequenceHolder].processDeclarations(
-              processor, state, lastParent, place)) return false
+          !super[ScDeclarationSequenceHolder].processDeclarations(
+            processor,
+            state,
+            lastParent,
+            place)) return false
     }
 
     true
@@ -181,16 +192,16 @@ class ScPackagingImpl private (stub: StubElement[ScPackageContainer],
 
   def findPackageObject(scope: GlobalSearchScope): Option[ScTypeDefinition] = {
     Option(
-        ScalaShortNamesCacheManager
-          .getInstance(getProject)
-          .getPackageObjectByName(getPackageName, scope))
+      ScalaShortNamesCacheManager
+        .getInstance(getProject)
+        .getPackageObjectByName(getPackageName, scope))
   }
 
   def getBodyText: String = {
     if (isExplicit) {
       val startOffset =
         findChildByType[PsiElement](ScalaTokenTypes.tLBRACE).getTextRange.getEndOffset -
-        getTextRange.getStartOffset
+          getTextRange.getStartOffset
       val text = getText
       val endOffset =
         if (text.apply(text.length - 1) == '}') { text.length - 1 } else

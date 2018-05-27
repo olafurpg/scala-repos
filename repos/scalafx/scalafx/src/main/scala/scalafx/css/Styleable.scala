@@ -65,9 +65,9 @@ trait Styleable extends SFXDelegate[jfxcss.Styleable] {
   /**
     * The id of this Styleable.
     *
-    * IMPLEMENTATION NOTE: For this method was adopted the name `getId` instead `id` to not 
-    * conflict with its subclasses already have a method with this name which returns a 
-    * `StringProperty`. 
+    * IMPLEMENTATION NOTE: For this method was adopted the name `getId` instead `id` to not
+    * conflict with its subclasses already have a method with this name which returns a
+    * `StringProperty`.
     */
   def getId: String = delegate.getId
 
@@ -80,9 +80,9 @@ trait Styleable extends SFXDelegate[jfxcss.Styleable] {
   /**
     * A string representation of the CSS style associated with this specific Node.
     *
-    * IMPLEMENTATION NOTE: For this method was adopted the name `getStyle` instead `style` to not 
-    * conflict with its subclasses already have a method with this name which returns a 
-    * `StringProperty`. 
+    * IMPLEMENTATION NOTE: For this method was adopted the name `getStyle` instead `style` to not
+    * conflict with its subclasses already have a method with this name which returns a
+    * `StringProperty`.
     */
   def getStyle: String = delegate.getStyle
 

@@ -2,7 +2,7 @@ class Foo(val n: Int) {
   override def hashCode = n % 2 // pretty bad hash
   override def equals(other: Any): Boolean = other match {
     case f: Foo => f.n == n
-    case _ => false
+    case _      => false
   }
 
   override def toString = "" + n

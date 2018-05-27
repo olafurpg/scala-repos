@@ -13,18 +13,19 @@ import scala.concurrent.duration.FiniteDuration
   * The preferred way of creating dispatchers is to define configuration of it and use the
   * the `lookup` method in [[akka.dispatch.Dispatchers]].
   */
-class PinnedDispatcher(_configurator: MessageDispatcherConfigurator,
-                       _actor: ActorCell,
-                       _id: String,
-                       _shutdownTimeout: FiniteDuration,
-                       _threadPoolConfig: ThreadPoolConfig)
+class PinnedDispatcher(
+    _configurator: MessageDispatcherConfigurator,
+    _actor: ActorCell,
+    _id: String,
+    _shutdownTimeout: FiniteDuration,
+    _threadPoolConfig: ThreadPoolConfig)
     extends Dispatcher(
-        _configurator,
-        _id,
-        Int.MaxValue,
-        Duration.Zero,
-        _threadPoolConfig.copy(corePoolSize = 1, maxPoolSize = 1),
-        _shutdownTimeout) {
+      _configurator,
+      _id,
+      Int.MaxValue,
+      Duration.Zero,
+      _threadPoolConfig.copy(corePoolSize = 1, maxPoolSize = 1),
+      _shutdownTimeout) {
 
   @volatile
   private var owner: ActorCell = _actor
@@ -34,7 +35,7 @@ class PinnedDispatcher(_configurator: MessageDispatcherConfigurator,
     val actor = owner
     if ((actor ne null) && actorCell != actor)
       throw new IllegalArgumentException(
-          "Cannot register to anyone but " + actor)
+        "Cannot register to anyone but " + actor)
     owner = actorCell
     super.register(actorCell)
   }

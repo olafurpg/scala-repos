@@ -31,7 +31,10 @@ import javafx.{event => jfxe}
 
 import scala.language.implicitConversions
 import scalafx.scene.input.KeyCombination.{Modifier, ModifierValue}
-import scalafx.scene.input.ScrollEvent.{HorizontalTextScrollUnits, VerticalTextScrollUnits}
+import scalafx.scene.input.ScrollEvent.{
+  HorizontalTextScrollUnits,
+  VerticalTextScrollUnits
+}
 import scalafx.scene.input.TouchPoint.State
 
 object InputIncludes extends InputIncludes
@@ -195,8 +198,7 @@ trait InputIncludes {
     * @param kc $JFX $KYCB
     * @return $SFX $KYCB
     */
-  implicit def jfxKeyCombination2sfx(
-      kc: jfxsi.KeyCombination): KeyCombination =
+  implicit def jfxKeyCombination2sfx(kc: jfxsi.KeyCombination): KeyCombination =
     if (kc != null) new KeyCombination(kc) {} else null
 
   /**

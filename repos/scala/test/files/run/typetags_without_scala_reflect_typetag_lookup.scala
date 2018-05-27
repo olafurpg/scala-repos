@@ -14,8 +14,7 @@ object Test extends StoreReporterDirectTest {
     val classpath =
       List(sys.props("partest.lib"), sys.props("partest.reflect")) mkString sys
         .props("path.separator")
-    compileString(newCompiler("-cp", classpath, "-d", testOutput.path))(
-        library)
+    compileString(newCompiler("-cp", classpath, "-d", testOutput.path))(library)
   }
 
   def app =
@@ -33,7 +32,7 @@ object Test extends StoreReporterDirectTest {
   def compileApp() = {
     val classpath =
       List(sys.props("partest.lib"), testOutput.path) mkString sys.props(
-          "path.separator")
+        "path.separator")
     compileString(newCompiler("-cp", classpath, "-d", testOutput.path))(app)
   }
 
@@ -45,8 +44,8 @@ object Test extends StoreReporterDirectTest {
     // we should get "missing or invalid dependency detected" errors, because we're trying to use an implicit that can't be unpickled
     // but we don't know the number of these errors and their order, so I just ignore them all
     println(
-        filteredInfos
-          .filterNot(_.msg.contains("missing or invalid dependency detected"))
-          .mkString("\n"))
+      filteredInfos
+        .filterNot(_.msg.contains("missing or invalid dependency detected"))
+        .mkString("\n"))
   }
 }

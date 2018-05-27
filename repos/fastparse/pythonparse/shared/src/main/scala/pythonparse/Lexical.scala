@@ -14,13 +14,13 @@ object Lexical {
   def kw(s: String) = s ~ !(letter | digit | "_")
   val comment = P("#" ~ CharsWhile(_ != '\n', min = 0))
   val wscomment = P(
-      (CharsWhile(" \n".toSet, min = 1) | Lexical.comment | "\\\n").rep)
+    (CharsWhile(" \n".toSet, min = 1) | Lexical.comment | "\\\n").rep)
   val nonewlinewscomment = P(
-      (CharsWhile(" ".toSet, min = 1) | Lexical.comment | "\\\n").rep)
+    (CharsWhile(" ".toSet, min = 1) | Lexical.comment | "\\\n").rep)
 
   val identifier: P[Ast.identifier] =
-    P((letter | "_") ~ (letter | digit | "_").rep).!
-      .filter(!keywordList.contains(_))
+    P((letter | "_") ~ (letter | digit | "_").rep).!.filter(
+      !keywordList.contains(_))
       .map(Ast.identifier)
   val letter = P(lowercase | uppercase)
   val lowercase = P(CharIn('a' to 'z'))
@@ -28,42 +28,42 @@ object Lexical {
   val digit = P(CharIn('0' to '9'))
 
   val keywordList = Set(
-      "and",
-      "del",
-      "from",
-      "not",
-      "while",
-      "as",
-      "elif",
-      "global",
-      "or",
-      "with",
-      "assert",
-      "else",
-      "if",
-      "pass",
-      "yield",
-      "break",
-      "except",
-      "import",
-      "print",
-      "class",
-      "exec",
-      "in",
-      "raise",
-      "continue",
-      "finally",
-      "is",
-      "return",
-      "def",
-      "for",
-      "lambda",
-      "try"
+    "and",
+    "del",
+    "from",
+    "not",
+    "while",
+    "as",
+    "elif",
+    "global",
+    "or",
+    "with",
+    "assert",
+    "else",
+    "if",
+    "pass",
+    "yield",
+    "break",
+    "except",
+    "import",
+    "print",
+    "class",
+    "exec",
+    "in",
+    "raise",
+    "continue",
+    "finally",
+    "is",
+    "return",
+    "def",
+    "for",
+    "lambda",
+    "try"
   )
 
   val stringliteral: P[String] = P(stringprefix.? ~ (longstring | shortstring))
   val stringprefix: P0 = P(
-      "r" | "u" | "ur" | "R" | "U" | "UR" | "Ur" | "uR" | "b" | "B" | "br" | "Br" | "bR" | "BR"
+    "r" | "u" | "ur" | "R" | "U" | "UR" | "Ur" | "uR" | "b" | "B" | "br" | "Br" | "bR" | "BR"
   )
   val shortstring: P[String] = P(shortstring0("'") | shortstring0("\""))
   def shortstring0(delimiter: String) =
@@ -85,7 +85,7 @@ object Lexical {
 
   val longinteger: P[BigInt] = P(integer ~ ("l" | "L"))
   val integer: P[BigInt] = P(
-      octinteger | hexinteger | bininteger | decimalinteger)
+    octinteger | hexinteger | bininteger | decimalinteger)
   val decimalinteger: P[BigInt] =
     P(nonzerodigit ~ digit.rep | "0").!.map(scala.BigInt(_))
   val octinteger: P[BigInt] =

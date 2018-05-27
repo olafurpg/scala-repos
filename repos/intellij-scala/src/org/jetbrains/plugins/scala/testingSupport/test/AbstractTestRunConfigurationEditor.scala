@@ -11,7 +11,8 @@ import com.intellij.openapi.project.Project
   * Date: 03.05.2009
   */
 class AbstractTestRunConfigurationEditor(
-    project: Project, configuration: AbstractTestRunConfiguration)
+    project: Project,
+    configuration: AbstractTestRunConfiguration)
     extends SettingsEditor[AbstractTestRunConfiguration] {
   val form = new TestRunConfigurationForm(project, configuration)
 

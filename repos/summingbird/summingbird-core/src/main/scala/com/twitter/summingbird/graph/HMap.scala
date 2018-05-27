@@ -29,9 +29,9 @@ sealed abstract class HMap[K[_], V[_]] {
     "H%s".format(map)
 
   override def equals(that: Any): Boolean = that match {
-    case null => false
+    case null          => false
     case h: HMap[_, _] => map.equals(h.map)
-    case _ => false
+    case _             => false
   }
   override def hashCode = map.hashCode
 

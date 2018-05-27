@@ -44,8 +44,8 @@ object Credentials {
     def apply(in: String): Map[String, String] = {
       parseAll(content, in) match {
         case Success(result, _) => result
-        case x: Failure => throw new IOException(x.toString)
-        case x: Error => throw new IOException(x.toString)
+        case x: Failure         => throw new IOException(x.toString)
+        case x: Error           => throw new IOException(x.toString)
       }
     }
   }
@@ -57,8 +57,9 @@ object Credentials {
 
   def byName(name: String): Map[String, String] = {
     apply(
-        new File(System.getenv().asScala.getOrElse("KEY_FOLDER", "/etc/keys"),
-                 name))
+      new File(
+        System.getenv().asScala.getOrElse("KEY_FOLDER", "/etc/keys"),
+        name))
   }
 }
 

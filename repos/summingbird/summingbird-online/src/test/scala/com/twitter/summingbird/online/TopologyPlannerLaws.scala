@@ -51,7 +51,7 @@ object TopologyPlannerLaws extends Properties("Online Dag") {
     List((i -> i))
   }
 
-  def sample[T : Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
+  def sample[T: Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
 
   var dumpNumber = 1
   def dumpGraph[P <: Platform[P]](dag: Dag[P]): String = {
@@ -98,36 +98,36 @@ object TopologyPlannerLaws extends Properties("Online Dag") {
       }
   }
 
-  property("If a Node contains a Summer, all other producers must be NOP's") = forAll {
-    (dag: MemoryDag) =>
+  property("If a Node contains a Summer, all other producers must be NOP's") =
+    forAll { (dag: MemoryDag) =>
       summersOnlyShareNoOps(dag)
-  }
+    }
 
-  property("The first producer in a online node cannot be a NamedProducer") = forAll {
-    (dag: MemoryDag) =>
+  property("The first producer in a online node cannot be a NamedProducer") =
+    forAll { (dag: MemoryDag) =>
       dag.nodes.forall { n =>
         val inError = n.members.last.isInstanceOf[NamedProducer[_, _]]
         if (inError) dumpGraph(dag)
         !inError
       }
-  }
+    }
 
   property(
-      "0 or more merge producers at the start of every online bolts, followed by 1+ non-merge producers and no other merge producers following those.") = forAll {
-    (dag: MemoryDag) =>
+    "0 or more merge producers at the start of every online bolts, followed by 1+ non-merge producers and no other merge producers following those.") =
+    forAll { (dag: MemoryDag) =>
       dag.nodes.forall { n =>
         val (_, inError) = n.members.foldLeft((false, false)) {
           case ((seenMergeProducer, inError), producer) =>
             producer match {
               case MergedProducer(_, _) => (true, inError)
-              case NamedProducer(_, _) => (seenMergeProducer, inError)
-              case _ => (seenMergeProducer, (inError || seenMergeProducer))
+              case NamedProducer(_, _)  => (seenMergeProducer, inError)
+              case _                    => (seenMergeProducer, (inError || seenMergeProducer))
             }
         }
         if (inError) dumpGraph(dag)
         !inError
       }
-  }
+    }
 
   property("No producer is repeated") = forAll { (dag: MemoryDag) =>
     val numAllProducers = dag.nodes.foldLeft(0) { (sum, n) =>
@@ -153,7 +153,7 @@ object TopologyPlannerLaws extends Properties("Online Dag") {
       dag.nodes.forall { n =>
         val success = n match {
           case _: SourceNode[_] => true
-          case _ => dag.dependenciesOf(n).size > 0
+          case _                => dag.dependenciesOf(n).size > 0
         }
         if (!success) dumpGraph(dag)
         success
@@ -161,8 +161,8 @@ object TopologyPlannerLaws extends Properties("Online Dag") {
   }
 
   property(
-      "Sources must have no incoming dependencies, and they must have dependants") = forAll {
-    (dag: MemoryDag) =>
+    "Sources must have no incoming dependencies, and they must have dependants") =
+    forAll { (dag: MemoryDag) =>
       dag.nodes.forall { n =>
         val success = n match {
           case _: SourceNode[_] =>
@@ -172,7 +172,7 @@ object TopologyPlannerLaws extends Properties("Online Dag") {
         if (!success) dumpGraph(dag)
         success
       }
-  }
+    }
 
   property("Prior to a summer the Node should be a FlatMap Node") = forAll {
     (dag: MemoryDag) =>
@@ -215,27 +215,27 @@ object TopologyPlannerLaws extends Properties("Online Dag") {
   }
 
   property(
-      "Running through the optimizer should only reduce the number of nodes") = forAll {
-    (tail: TailProducer[Memory, _]) =>
+    "Running through the optimizer should only reduce the number of nodes") =
+    forAll { (tail: TailProducer[Memory, _]) =>
       val (_, stripped) = StripNamedNode(tail)
       Producer.entireGraphOf(stripped).size <= Producer
         .entireGraphOf(tail)
         .size
-  }
+    }
 
   property(
-      "The number of non-named nodes should remain constant running with StripNamedNode") = forAll {
-    (tail: TailProducer[Memory, _]) =>
+    "The number of non-named nodes should remain constant running with StripNamedNode") =
+    forAll { (tail: TailProducer[Memory, _]) =>
       def countNonNamed(tail: Producer[Memory, _]): Int = {
         Producer
           .entireGraphOf(tail)
           .collect {
             case NamedProducer(_, _) => 0
-            case _ => 1
+            case _                   => 1
           }
           .sum
       }
       val (_, stripped) = StripNamedNode(tail)
       countNonNamed(tail) == countNonNamed(stripped)
-  }
+    }
 }

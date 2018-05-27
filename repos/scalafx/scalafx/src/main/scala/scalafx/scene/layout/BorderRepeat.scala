@@ -41,7 +41,7 @@ object BorderRepeat
     extends SFXEnumDelegateCompanion[jfxsl.BorderRepeat, BorderRepeat] {
 
   /**
-    * The image is tiled (repeated) to fill the area. 
+    * The image is tiled (repeated) to fill the area.
     */
   val Repeat: BorderRepeat = jfxsl.BorderRepeat.REPEAT
 

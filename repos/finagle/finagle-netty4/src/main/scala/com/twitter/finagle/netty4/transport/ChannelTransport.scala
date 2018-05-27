@@ -4,7 +4,13 @@ import com.twitter.concurrent.AsyncQueue
 import com.twitter.finagle._
 import com.twitter.finagle.transport.Transport
 import com.twitter.util.{Future, Promise, Return, Time}
-import io.netty.channel.{Channel, ChannelHandlerContext, ChannelFutureListener, ChannelFuture, SimpleChannelInboundHandler}
+import io.netty.channel.{
+  Channel,
+  ChannelHandlerContext,
+  ChannelFutureListener,
+  ChannelFuture,
+  SimpleChannelInboundHandler
+}
 import java.net.SocketAddress
 import java.security.cert.Certificate
 import java.util.concurrent.atomic.AtomicBoolean
@@ -116,18 +122,23 @@ private[netty4] class ChannelTransport[In, Out](ch: Channel)
 
   ch.pipeline()
     .addLast(
-        "finagleChannelTransport", new SimpleChannelInboundHandler[Out]() {
-      override def channelRead0(ctx: ChannelHandlerContext, msg: Out): Unit = {
-        queue.offer(msg)
-      }
+      "finagleChannelTransport",
+      new SimpleChannelInboundHandler[Out]() {
+        override def channelRead0(
+            ctx: ChannelHandlerContext,
+            msg: Out): Unit = {
+          queue.offer(msg)
+        }
 
-      override def channelInactive(ctx: ChannelHandlerContext): Unit = {
-        fail(new ChannelClosedException(remoteAddress))
-      }
+        override def channelInactive(ctx: ChannelHandlerContext): Unit = {
+          fail(new ChannelClosedException(remoteAddress))
+        }
 
-      override def exceptionCaught(
-          ctx: ChannelHandlerContext, e: Throwable): Unit = {
-        fail(ChannelException(e, remoteAddress))
+        override def exceptionCaught(
+            ctx: ChannelHandlerContext,
+            e: Throwable): Unit = {
+          fail(ChannelException(e, remoteAddress))
+        }
       }
-    })
+    )
 }

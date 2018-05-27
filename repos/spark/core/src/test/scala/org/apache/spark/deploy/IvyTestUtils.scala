@@ -37,10 +37,11 @@ private[deploy] object IvyTestUtils {
     * Create the path for the jar and pom from the maven coordinate. Extension should be `jar`
     * or `pom`.
     */
-  private[deploy] def pathFromCoordinate(artifact: MavenCoordinate,
-                                         prefix: File,
-                                         ext: String,
-                                         useIvyLayout: Boolean): File = {
+  private[deploy] def pathFromCoordinate(
+      artifact: MavenCoordinate,
+      prefix: File,
+      ext: String,
+      useIvyLayout: Boolean): File = {
     val groupDirs = artifact.groupId.replace(".", File.separator)
     val artifactDirs = artifact.artifactId
     val artifactPath =
@@ -54,9 +55,10 @@ private[deploy] object IvyTestUtils {
   }
 
   /** Returns the artifact naming based on standard ivy or maven format. */
-  private[deploy] def artifactName(artifact: MavenCoordinate,
-                                   useIvyLayout: Boolean,
-                                   ext: String = ".jar"): String = {
+  private[deploy] def artifactName(
+      artifact: MavenCoordinate,
+      useIvyLayout: Boolean,
+      ext: String = ".jar"): String = {
     if (!useIvyLayout) {
       s"${artifact.artifactId}-${artifact.version}$ext"
     } else {
@@ -66,7 +68,8 @@ private[deploy] object IvyTestUtils {
 
   /** Returns the directory for the given groupId based on standard ivy or maven format. */
   private def getBaseGroupDirectory(
-      artifact: MavenCoordinate, useIvyLayout: Boolean): String = {
+      artifact: MavenCoordinate,
+      useIvyLayout: Boolean): String = {
     if (!useIvyLayout) {
       artifact.groupId.replace(".", File.separator)
     } else {
@@ -76,7 +79,9 @@ private[deploy] object IvyTestUtils {
 
   /** Write the contents to a file to the supplied directory. */
   private[deploy] def writeFile(
-      dir: File, fileName: String, contents: String): File = {
+      dir: File,
+      fileName: String,
+      contents: String): File = {
     val outputFile = new File(dir, fileName)
     val outputStream = new FileOutputStream(outputFile)
     outputStream.write(contents.toCharArray.map(_.toByte))
@@ -93,12 +98,13 @@ private[deploy] object IvyTestUtils {
   }
 
   /** Create an example R package that calls the given Java class. */
-  private def createRFiles(dir: File,
-                           className: String,
-                           packageName: String): Seq[(String, File)] = {
+  private def createRFiles(
+      dir: File,
+      className: String,
+      packageName: String): Seq[(String, File)] = {
     val rFilesDir = new File(dir, "R" + File.separator + "pkg")
     Files.createParentDirs(
-        new File(rFilesDir, "R" + File.separator + "mylib.R"))
+      new File(rFilesDir, "R" + File.separator + "mylib.R"))
     val contents = s"""myfunc <- function(x) {
         |  SparkR:::callJStatic("$packageName.$className", "myFunc", x)
         |}
@@ -122,14 +128,17 @@ private[deploy] object IvyTestUtils {
         |export("myfunc")
       """.stripMargin
     val nameFile = writeFile(rFilesDir, "NAMESPACE", namespace)
-    Seq(("R/pkg/R/mylib.R", source),
-        ("R/pkg/DESCRIPTION", descFile),
-        ("R/pkg/NAMESPACE", nameFile))
+    Seq(
+      ("R/pkg/R/mylib.R", source),
+      ("R/pkg/DESCRIPTION", descFile),
+      ("R/pkg/NAMESPACE", nameFile))
   }
 
   /** Create a simple testable Class. */
   private def createJavaClass(
-      dir: File, className: String, packageName: String): File = {
+      dir: File,
+      className: String,
+      packageName: String): File = {
     val contents = s"""package $packageName;
         |
         |import java.lang.Integer;
@@ -141,14 +150,16 @@ private[deploy] object IvyTestUtils {
         |}
       """.stripMargin
     val sourceFile = new JavaSourceFromString(
-        new File(dir, className).getAbsolutePath, contents)
+      new File(dir, className).getAbsolutePath,
+      contents)
     createCompiledClass(className, dir, sourceFile, Seq.empty)
   }
 
-  private def createDescriptor(tempPath: File,
-                               artifact: MavenCoordinate,
-                               dependencies: Option[Seq[MavenCoordinate]],
-                               useIvyLayout: Boolean): File = {
+  private def createDescriptor(
+      tempPath: File,
+      artifact: MavenCoordinate,
+      dependencies: Option[Seq[MavenCoordinate]],
+      useIvyLayout: Boolean): File = {
     if (useIvyLayout) {
       val ivyXmlPath = pathFromCoordinate(artifact, tempPath, "ivy", true)
       Files.createParentDirs(new File(ivyXmlPath, "dummy"))
@@ -162,20 +173,22 @@ private[deploy] object IvyTestUtils {
 
   /** Helper method to write artifact information in the pom. */
   private def pomArtifactWriter(
-      artifact: MavenCoordinate, tabCount: Int = 1): String = {
+      artifact: MavenCoordinate,
+      tabCount: Int = 1): String = {
     var result =
       "\n" + "  " * tabCount + s"<groupId>${artifact.groupId}</groupId>"
     result += "\n" + "  " * tabCount +
-    s"<artifactId>${artifact.artifactId}</artifactId>"
+      s"<artifactId>${artifact.artifactId}</artifactId>"
     result +=
       "\n" + "  " * tabCount + s"<version>${artifact.version}</version>"
     result
   }
 
   /** Create a pom file for this artifact. */
-  private def createPom(dir: File,
-                        artifact: MavenCoordinate,
-                        dependencies: Option[Seq[MavenCoordinate]]): File = {
+  private def createPom(
+      dir: File,
+      artifact: MavenCoordinate,
+      dependencies: Option[Seq[MavenCoordinate]]): File = {
     var content = """
                     |<?xml version="1.0" encoding="UTF-8"?>
                     |<project xmlns="http://maven.apache.org/POM/4.0.0"
@@ -185,12 +198,16 @@ private[deploy] object IvyTestUtils {
                     |   <modelVersion>4.0.0</modelVersion>
                   """.stripMargin.trim
     content += pomArtifactWriter(artifact)
-    content += dependencies.map { deps =>
-      val inside = deps.map { dep =>
-        "\t<dependency>" + pomArtifactWriter(dep, 3) + "\n\t</dependency>"
-      }.mkString("\n")
-      "\n  <dependencies>\n" + inside + "\n  </dependencies>"
-    }.getOrElse("")
+    content += dependencies
+      .map { deps =>
+        val inside = deps
+          .map { dep =>
+            "\t<dependency>" + pomArtifactWriter(dep, 3) + "\n\t</dependency>"
+          }
+          .mkString("\n")
+        "\n  <dependencies>\n" + inside + "\n  </dependencies>"
+      }
+      .getOrElse("")
     content += "\n</project>"
     writeFile(dir, artifactName(artifact, false, ".pom"), content.trim)
   }
@@ -226,21 +243,24 @@ private[deploy] object IvyTestUtils {
         |               conf="master"/>
         |  </publications>
       """.stripMargin.trim
-    content += dependencies.map { deps =>
-      val inside = deps.map(ivyArtifactWriter).mkString("\n")
-      "\n  <dependencies>\n" + inside + "\n  </dependencies>"
-    }.getOrElse("")
+    content += dependencies
+      .map { deps =>
+        val inside = deps.map(ivyArtifactWriter).mkString("\n")
+        "\n  <dependencies>\n" + inside + "\n  </dependencies>"
+      }
+      .getOrElse("")
     content += "\n</ivy-module>"
     writeFile(dir, "ivy.xml", content.trim)
   }
 
   /** Create the jar for the given maven coordinate, using the supplied files. */
-  private[deploy] def packJar(dir: File,
-                              artifact: MavenCoordinate,
-                              files: Seq[(String, File)],
-                              useIvyLayout: Boolean,
-                              withR: Boolean,
-                              withManifest: Option[Manifest] = None): File = {
+  private[deploy] def packJar(
+      dir: File,
+      artifact: MavenCoordinate,
+      files: Seq[(String, File)],
+      useIvyLayout: Boolean,
+      withR: Boolean,
+      withManifest: Option[Manifest] = None): File = {
     val jarFile = new File(dir, artifactName(artifact, useIvyLayout))
     val jarFileStream = new FileOutputStream(jarFile)
     val manifest = withManifest.getOrElse {
@@ -302,8 +322,9 @@ private[deploy] object IvyTestUtils {
       val javaClass = createJavaClass(root, className, artifact.groupId)
       // A tuple of files representation in the jar, and the file
       val javaFile =
-        (artifact.groupId.replace(".", "/") + "/" + javaClass.getName,
-         javaClass)
+        (
+          artifact.groupId.replace(".", "/") + "/" + javaClass.getName,
+          javaClass)
       val allFiles = ArrayBuffer[(String, File)](javaFile)
       if (withPython) {
         val pythonFile = createPythonFile(root)
@@ -315,8 +336,8 @@ private[deploy] object IvyTestUtils {
       }
       val jarFile = packJar(jarPath, artifact, allFiles, useIvyLayout, withR)
       assert(jarFile.exists(), "Problem creating Jar file")
-      val descriptor = createDescriptor(
-          tempPath, artifact, dependencies, useIvyLayout)
+      val descriptor =
+        createDescriptor(tempPath, artifact, dependencies, useIvyLayout)
       assert(descriptor.exists(), "Problem creating Pom file")
     } finally {
       FileUtils.deleteDirectory(root)
@@ -342,11 +363,20 @@ private[deploy] object IvyTestUtils {
       withR: Boolean = false): File = {
     val deps = dependencies.map(SparkSubmitUtils.extractMavenCoordinates)
     val mainRepo = createLocalRepository(
-        artifact, deps, rootDir, useIvyLayout, withPython, withR)
+      artifact,
+      deps,
+      rootDir,
+      useIvyLayout,
+      withPython,
+      withR)
     deps.foreach { seq =>
       seq.foreach { dep =>
         createLocalRepository(
-            dep, None, Some(mainRepo), useIvyLayout, withPython = false)
+          dep,
+          None,
+          Some(mainRepo),
+          useIvyLayout,
+          withPython = false)
       }
     }
     mainRepo
@@ -373,7 +403,12 @@ private[deploy] object IvyTestUtils {
     val deps = dependencies.map(SparkSubmitUtils.extractMavenCoordinates)
     purgeLocalIvyCache(artifact, deps, ivySettings)
     val repo = createLocalRepositoryForTests(
-        artifact, dependencies, rootDir, useIvyLayout, withPython, withR)
+      artifact,
+      dependencies,
+      rootDir,
+      useIvyLayout,
+      withPython,
+      withR)
     try {
       f(repo.toURI.toString)
     } finally {
@@ -381,11 +416,11 @@ private[deploy] object IvyTestUtils {
       if (repo.toString.contains(".m2") || repo.toString.contains(".ivy2")) {
         val groupDir = getBaseGroupDirectory(artifact, useIvyLayout)
         FileUtils.deleteDirectory(
-            new File(repo, groupDir + File.separator + artifact.artifactId))
+          new File(repo, groupDir + File.separator + artifact.artifactId))
         deps.foreach {
           _.foreach { dep =>
             FileUtils.deleteDirectory(
-                new File(repo, getBaseGroupDirectory(dep, useIvyLayout)))
+              new File(repo, getBaseGroupDirectory(dep, useIvyLayout)))
           }
         }
       } else {
@@ -396,16 +431,17 @@ private[deploy] object IvyTestUtils {
   }
 
   /** Deletes the test packages from the ivy cache */
-  private def purgeLocalIvyCache(artifact: MavenCoordinate,
-                                 dependencies: Option[Seq[MavenCoordinate]],
-                                 ivySettings: IvySettings): Unit = {
+  private def purgeLocalIvyCache(
+      artifact: MavenCoordinate,
+      dependencies: Option[Seq[MavenCoordinate]],
+      ivySettings: IvySettings): Unit = {
     // delete the artifact from the cache as well if it already exists
     FileUtils.deleteDirectory(
-        new File(ivySettings.getDefaultCache, artifact.groupId))
+      new File(ivySettings.getDefaultCache, artifact.groupId))
     dependencies.foreach {
       _.foreach { dep =>
         FileUtils.deleteDirectory(
-            new File(ivySettings.getDefaultCache, dep.groupId))
+          new File(ivySettings.getDefaultCache, dep.groupId))
       }
     }
   }

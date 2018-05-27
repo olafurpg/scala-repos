@@ -59,11 +59,26 @@ package api
   *  @contentDiagram hideNodes "*Api"
   */
 abstract class Universe
-    extends Symbols with Types with FlagSets with Scopes with Names with Trees
-    with Constants with Annotations with Positions with Exprs with TypeTags
-    with ImplicitTags with StandardDefinitions with StandardNames
-    with StandardLiftables with Mirrors with Printers with Liftables
-    with Quasiquotes with Internals {
+    extends Symbols
+    with Types
+    with FlagSets
+    with Scopes
+    with Names
+    with Trees
+    with Constants
+    with Annotations
+    with Positions
+    with Exprs
+    with TypeTags
+    with ImplicitTags
+    with StandardDefinitions
+    with StandardNames
+    with StandardLiftables
+    with Mirrors
+    with Printers
+    with Liftables
+    with Quasiquotes
+    with Internals {
 
   /** Use `reify` to produce the abstract syntax tree representing a given Scala expression.
     *

@@ -86,9 +86,9 @@ private[repl] trait SparkExprTyper extends Logging {
       interpretSynthetic(code) match {
         case IR.Success =>
           repl.definedSymbolList filterNot old match {
-            case Nil => NoSymbol
+            case Nil        => NoSymbol
             case sym :: Nil => sym
-            case syms => NoSymbol.newOverloaded(NoPrefix, syms)
+            case syms       => NoSymbol.newOverloaded(NoPrefix, syms)
           }
         case _ => NoSymbol
       }
@@ -99,8 +99,7 @@ private[repl] trait SparkExprTyper extends Logging {
   private var typeOfExpressionDepth = 0
   def typeOfExpression(expr: String, silent: Boolean = true): Type = {
     if (typeOfExpressionDepth > 2) {
-      logDebug(
-          "Terminating typeOfExpression recursion for expression: " + expr)
+      logDebug("Terminating typeOfExpression recursion for expression: " + expr)
       return NoType
     }
     typeOfExpressionDepth += 1
@@ -110,7 +109,7 @@ private[repl] trait SparkExprTyper extends Logging {
     // to induce the error message.
     try beSilentDuring(symbolOfLine(expr).tpe) match {
       case NoType if !silent => symbolOfLine(expr).tpe // generate error
-      case tpe => tpe
+      case tpe               => tpe
     } finally typeOfExpressionDepth -= 1
   }
 }

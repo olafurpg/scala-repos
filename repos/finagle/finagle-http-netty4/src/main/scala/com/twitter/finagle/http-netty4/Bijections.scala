@@ -16,7 +16,7 @@ private[http4] object Bijections {
       v match {
         case NettyHttp.HttpVersion.HTTP_1_0 => FinagleHttp.Version.Http10
         case NettyHttp.HttpVersion.HTTP_1_1 => FinagleHttp.Version.Http11
-        case _ => FinagleHttp.Version.Http11
+        case _                              => FinagleHttp.Version.Http11
       }
 
     def methodToFinagle(m: NettyHttp.HttpMethod): FinagleHttp.Method =
@@ -27,9 +27,9 @@ private[http4] object Bijections {
 
     def requestToFinagle(r: NettyHttp.FullHttpRequest): FinagleHttp.Request = {
       val result = FinagleHttp.Request(
-          method = methodToFinagle(r.method),
-          uri = r.uri,
-          version = versionToFinagle(r.protocolVersion)
+        method = methodToFinagle(r.method),
+        uri = r.uri,
+        version = versionToFinagle(r.protocolVersion)
       )
       writeNettyHeadersToFinagle(r.headers, result.headerMap)
       result.content = ByteBufAsBuf.Owned(r.content)
@@ -37,7 +37,8 @@ private[http4] object Bijections {
     }
 
     private[this] def writeNettyHeadersToFinagle(
-        head: NettyHttp.HttpHeaders, out: HeaderMap): Unit = {
+        head: NettyHttp.HttpHeaders,
+        out: HeaderMap): Unit = {
       val itr = head.iteratorAsString()
       while (itr.hasNext) {
         val entry = itr.next()
@@ -49,8 +50,8 @@ private[http4] object Bijections {
       rep match {
         case full: NettyHttp.FullHttpResponse =>
           val resp = FinagleHttp.Response(
-              versionToFinagle(rep.protocolVersion),
-              statusToFinagle(rep.status)
+            versionToFinagle(rep.protocolVersion),
+            statusToFinagle(rep.status)
           )
           writeNettyHeadersToFinagle(rep.headers, resp.headerMap)
           resp.content = ByteBufAsBuf.Owned(full.content)
@@ -59,8 +60,8 @@ private[http4] object Bijections {
 
         case empty: NettyHttp.HttpResponse =>
           val resp = FinagleHttp.Response(
-              versionToFinagle(rep.protocolVersion),
-              statusToFinagle(rep.status)
+            versionToFinagle(rep.protocolVersion),
+            statusToFinagle(rep.status)
           )
           writeNettyHeadersToFinagle(rep.headers, resp.headerMap)
 
@@ -69,7 +70,7 @@ private[http4] object Bijections {
         // note: HttpContent chunks are handled in the dispatcher
         case invalid =>
           throw new IllegalArgumentException(
-              "unexpected response type: " + invalid.toString)
+            "unexpected response type: " + invalid.toString)
       }
   }
 
@@ -100,11 +101,11 @@ private[http4] object Bijections {
 
     def responseToNetty(r: FinagleHttp.Response): NettyHttp.FullHttpResponse =
       new NettyHttp.DefaultFullHttpResponse(
-          versionToNetty(r.version),
-          statusToNetty(r.status),
-          BufAsByteBuf.Owned(r.content),
-          headersToNetty(r.headerMap),
-          NettyHttp.EmptyHttpHeaders.INSTANCE // only chunked messages have trailing headers
+        versionToNetty(r.version),
+        statusToNetty(r.status),
+        BufAsByteBuf.Owned(r.content),
+        headersToNetty(r.headerMap),
+        NettyHttp.EmptyHttpHeaders.INSTANCE // only chunked messages have trailing headers
       )
 
     def methodToNetty(m: FinagleHttp.Method): NettyHttp.HttpMethod =
@@ -112,12 +113,12 @@ private[http4] object Bijections {
 
     def requestToNetty(r: FinagleHttp.Request): NettyHttp.FullHttpRequest =
       new NettyHttp.DefaultFullHttpRequest(
-          versionToNetty(r.version),
-          methodToNetty(r.method),
-          r.uri,
-          BufAsByteBuf.Owned(r.content),
-          headersToNetty(r.headerMap),
-          NettyHttp.EmptyHttpHeaders.INSTANCE // only chunked messages have trailing headers
+        versionToNetty(r.version),
+        methodToNetty(r.method),
+        r.uri,
+        BufAsByteBuf.Owned(r.content),
+        headersToNetty(r.headerMap),
+        NettyHttp.EmptyHttpHeaders.INSTANCE // only chunked messages have trailing headers
       )
   }
 }

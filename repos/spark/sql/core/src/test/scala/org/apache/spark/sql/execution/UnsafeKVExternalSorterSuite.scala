@@ -23,7 +23,11 @@ import org.apache.spark._
 import org.apache.spark.memory.{TaskMemoryManager, TestMemoryManager}
 import org.apache.spark.sql.{RandomDataGenerator, Row}
 import org.apache.spark.sql.catalyst.{CatalystTypeConverters, InternalRow}
-import org.apache.spark.sql.catalyst.expressions.{InterpretedOrdering, UnsafeProjection, UnsafeRow}
+import org.apache.spark.sql.catalyst.expressions.{
+  InterpretedOrdering,
+  UnsafeProjection,
+  UnsafeRow
+}
 import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.sql.types._
 
@@ -36,9 +40,13 @@ class UnsafeKVExternalSorterSuite extends SparkFunSuite with SharedSQLContext {
 
   testKVSorter(new StructType, new StructType, spill = true)
   testKVSorter(
-      new StructType().add("c1", IntegerType), new StructType, spill = true)
+    new StructType().add("c1", IntegerType),
+    new StructType,
+    spill = true)
   testKVSorter(
-      new StructType, new StructType().add("c1", IntegerType), spill = true)
+    new StructType,
+    new StructType().add("c1", IntegerType),
+    spill = true)
 
   private val rand = new Random(42)
   for (i <- 0 until 6) {
@@ -63,7 +71,9 @@ class UnsafeKVExternalSorterSuite extends SparkFunSuite with SharedSQLContext {
     * If spill is set to true, the sorter will spill probabilistically roughly every 100 records.
     */
   private def testKVSorter(
-      keySchema: StructType, valueSchema: StructType, spill: Boolean): Unit = {
+      keySchema: StructType,
+      valueSchema: StructType,
+      spill: Boolean): Unit = {
     // Create the data converters
     val kExternalConverter =
       CatalystTypeConverters.createToCatalystConverter(keySchema)
@@ -78,12 +88,14 @@ class UnsafeKVExternalSorterSuite extends SparkFunSuite with SharedSQLContext {
       RandomDataGenerator.forType(valueSchema, nullable = false).get
 
     val inputData = Seq.fill(1024) {
-      val k = kConverter(kExternalConverter
-            .apply(keyDataGen.apply())
-            .asInstanceOf[InternalRow])
-      val v = vConverter(vExternalConverter
-            .apply(valueDataGen.apply())
-            .asInstanceOf[InternalRow])
+      val k = kConverter(
+        kExternalConverter
+          .apply(keyDataGen.apply())
+          .asInstanceOf[InternalRow])
+      val v = vConverter(
+        vExternalConverter
+          .apply(valueDataGen.apply())
+          .asInstanceOf[InternalRow])
       (k.asInstanceOf[InternalRow].copy(), v.asInstanceOf[InternalRow].copy())
     }
 
@@ -93,13 +105,13 @@ class UnsafeKVExternalSorterSuite extends SparkFunSuite with SharedSQLContext {
       valueSchema.map(_.dataType.simpleString).mkString("[", ",", "]")
 
     test(
-        s"kv sorting key schema $keySchemaStr and value schema $valueSchemaStr") {
+      s"kv sorting key schema $keySchemaStr and value schema $valueSchemaStr") {
       testKVSorter(
-          keySchema,
-          valueSchema,
-          inputData,
-          pageSize = 16 * 1024 * 1024,
-          spill
+        keySchema,
+        valueSchema,
+        inputData,
+        pageSize = 16 * 1024 * 1024,
+        spill
       )
     }
   }
@@ -117,24 +129,29 @@ class UnsafeKVExternalSorterSuite extends SparkFunSuite with SharedSQLContext {
     *
     * If spill is set to true, the sorter will spill probabilistically roughly every 100 records.
     */
-  private def testKVSorter(keySchema: StructType,
-                           valueSchema: StructType,
-                           inputData: Seq[(InternalRow, InternalRow)],
-                           pageSize: Long,
-                           spill: Boolean): Unit = {
+  private def testKVSorter(
+      keySchema: StructType,
+      valueSchema: StructType,
+      inputData: Seq[(InternalRow, InternalRow)],
+      pageSize: Long,
+      spill: Boolean): Unit = {
     val memoryManager = new TestMemoryManager(
-        new SparkConf().set("spark.memory.offHeap.enabled", "false"))
+      new SparkConf().set("spark.memory.offHeap.enabled", "false"))
     val taskMemMgr = new TaskMemoryManager(memoryManager, 0)
     TaskContext.setTaskContext(
-        new TaskContextImpl(stageId = 0,
-                            partitionId = 0,
-                            taskAttemptId = 98456,
-                            attemptNumber = 0,
-                            taskMemoryManager = taskMemMgr,
-                            metricsSystem = null))
+      new TaskContextImpl(
+        stageId = 0,
+        partitionId = 0,
+        taskAttemptId = 98456,
+        attemptNumber = 0,
+        taskMemoryManager = taskMemMgr,
+        metricsSystem = null))
 
     val sorter = new UnsafeKVExternalSorter(
-        keySchema, valueSchema, SparkEnv.get.blockManager, pageSize)
+      keySchema,
+      valueSchema,
+      SparkEnv.get.blockManager,
+      pageSize)
 
     // Insert the keys and values into the sorter
     inputData.foreach {
@@ -160,10 +177,11 @@ class UnsafeKVExternalSorterSuite extends SparkFunSuite with SharedSQLContext {
     val valueOrdering =
       InterpretedOrdering.forSchema(valueSchema.map(_.dataType))
     val kvOrdering = new Ordering[(InternalRow, InternalRow)] {
-      override def compare(x: (InternalRow, InternalRow),
-                           y: (InternalRow, InternalRow)): Int = {
+      override def compare(
+          x: (InternalRow, InternalRow),
+          y: (InternalRow, InternalRow)): Int = {
         keyOrdering.compare(x._1, y._1) match {
-          case 0 => valueOrdering.compare(x._2, y._2)
+          case 0   => valueOrdering.compare(x._2, y._2)
           case cmp => cmp
         }
       }
@@ -174,12 +192,14 @@ class UnsafeKVExternalSorterSuite extends SparkFunSuite with SharedSQLContext {
     out.zipWithIndex.foreach {
       case ((k, v), i) =>
         if (prevK != null) {
-          assert(keyOrdering.compare(prevK, k) <= 0,
-                 s"""
+          assert(
+            keyOrdering.compare(prevK, k) <= 0,
+            s"""
              |key is not in sorted order:
              |previous key: $prevK
              |current key : $k
-             """.stripMargin)
+             """.stripMargin
+          )
         }
         prevK = k
     }
@@ -207,18 +227,18 @@ class UnsafeKVExternalSorterSuite extends SparkFunSuite with SharedSQLContext {
       rand.nextBytes(kBytes)
       rand.nextBytes(vBytes)
       val k = converter(
-          externalConverter.apply(Row(kBytes)).asInstanceOf[InternalRow])
+        externalConverter.apply(Row(kBytes)).asInstanceOf[InternalRow])
       val v = converter(
-          externalConverter.apply(Row(vBytes)).asInstanceOf[InternalRow])
+        externalConverter.apply(Row(vBytes)).asInstanceOf[InternalRow])
       (k.asInstanceOf[InternalRow].copy(), v.asInstanceOf[InternalRow].copy())
     }
 
     testKVSorter(
-        schema,
-        schema,
-        inputData,
-        pageSize,
-        spill = true
+      schema,
+      schema,
+      inputData,
+      pageSize,
+      spill = true
     )
   }
 }

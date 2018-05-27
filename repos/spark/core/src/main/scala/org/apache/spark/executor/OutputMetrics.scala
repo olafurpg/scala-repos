@@ -36,18 +36,21 @@ object DataWriteMethod extends Enumeration with Serializable {
   * A collection of accumulators that represents metrics about writing data to external systems.
   */
 @DeveloperApi
-class OutputMetrics private (_bytesWritten: Accumulator[Long],
-                             _recordsWritten: Accumulator[Long],
-                             _writeMethod: Accumulator[String])
+class OutputMetrics private (
+    _bytesWritten: Accumulator[Long],
+    _recordsWritten: Accumulator[Long],
+    _writeMethod: Accumulator[String])
     extends Serializable {
 
   private[executor] def this(accumMap: Map[String, Accumulator[_]]) {
-    this(TaskMetrics.getAccum[Long](
-             accumMap, InternalAccumulator.output.BYTES_WRITTEN),
-         TaskMetrics.getAccum[Long](
-             accumMap, InternalAccumulator.output.RECORDS_WRITTEN),
-         TaskMetrics.getAccum[String](
-             accumMap, InternalAccumulator.output.WRITE_METHOD))
+    this(
+      TaskMetrics
+        .getAccum[Long](accumMap, InternalAccumulator.output.BYTES_WRITTEN),
+      TaskMetrics
+        .getAccum[Long](accumMap, InternalAccumulator.output.RECORDS_WRITTEN),
+      TaskMetrics
+        .getAccum[String](accumMap, InternalAccumulator.output.WRITE_METHOD)
+    )
   }
 
   /**
@@ -59,12 +62,12 @@ class OutputMetrics private (_bytesWritten: Accumulator[Long],
     */
   private[executor] def this() {
     this(
-        InternalAccumulator
-          .createOutputAccums()
-          .map { a =>
-        (a.name.get, a)
-      }
-          .toMap[String, Accumulator[_]])
+      InternalAccumulator
+        .createOutputAccums()
+        .map { a =>
+          (a.name.get, a)
+        }
+        .toMap[String, Accumulator[_]])
   }
 
   /**
@@ -96,7 +99,8 @@ class OutputMetrics private (_bytesWritten: Accumulator[Long],
 object OutputMetrics {
 
   @deprecated(
-      "matching on OutputMetrics will not be supported in the future", "2.0.0")
+    "matching on OutputMetrics will not be supported in the future",
+    "2.0.0")
   def apply(writeMethod: DataWriteMethod.Value): OutputMetrics = {
     val om = new OutputMetrics
     om.setWriteMethod(writeMethod)
@@ -104,7 +108,8 @@ object OutputMetrics {
   }
 
   @deprecated(
-      "matching on OutputMetrics will not be supported in the future", "2.0.0")
+    "matching on OutputMetrics will not be supported in the future",
+    "2.0.0")
   def unapply(output: OutputMetrics): Option[DataWriteMethod.Value] = {
     Some(output.writeMethod)
   }

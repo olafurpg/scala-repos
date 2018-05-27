@@ -72,7 +72,7 @@ class LineTokenizer() extends Parsers {
     } else {
       lineParsers.parseAll(parser, in.first) match {
         case lineParsers.Success(t, _) => Success(t, in.rest)
-        case n: lineParsers.NoSuccess => Failure(n.msg, in)
+        case n: lineParsers.NoSuccess  => Failure(n.msg, in)
       }
     }
   }
@@ -169,11 +169,11 @@ class LineTokenizer() extends Parsers {
           case (_, '>') => p(lineParsers.blockquoteLine)(in)
           case (_, n) if (n >= '0' && n <= '9') =>
             p(lineParsers.oItemStartLine)(in)
-          case (_, ' ') => p(lineParsers.emptyOrCode)(in)
+          case (_, ' ')  => p(lineParsers.emptyOrCode)(in)
           case (_, '\t') => p(lineParsers.emptyOrCode)(in)
           case (_, '\n') => p(lineParsers.emptyLine)(in)
-          case (_, '`') => p(lineParsers.fencedCodeStartOrEnd)(in)
-          case _ => p(lineParsers.otherLine)(in)
+          case (_, '`')  => p(lineParsers.fencedCodeStartOrEnd)(in)
+          case _         => p(lineParsers.otherLine)(in)
         }
       }
     } | p(lineParsers.otherLine) //this makes sure every line is consumed, even if our guess was no good
@@ -215,7 +215,7 @@ class LineTokenizer() extends Parsers {
         for (t <- ts) {
           t match {
             case ld: LinkDefinition => lookup(ld.id) = ld
-            case ml: MarkdownLine => lines.append(ml)
+            case ml: MarkdownLine   => lines.append(ml)
           }
         }
         new MarkdownLineReader(lines.toList, lookup.toMap)
@@ -244,7 +244,7 @@ class LineTokenizer() extends Parsers {
       case Success(reader, _) => reader
       case n: NoSuccess =>
         throw new IllegalStateException(
-            "Inner line Tokenizing failed. This is a bug. Message was: " +
+          "Inner line Tokenizing failed. This is a bug. Message was: " +
             n.msg)
     }
 
@@ -264,6 +264,6 @@ class LineTokenizer() extends Parsers {
       case Success(reader, _) => reader
       case n: NoSuccess =>
         throw new IllegalStateException(
-            "Tokenizing failed. This is a bug. Message was: " + n.msg)
+          "Tokenizing failed. This is a bug. Message was: " + n.msg)
     }
 }

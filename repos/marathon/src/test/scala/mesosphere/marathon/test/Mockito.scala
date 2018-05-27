@@ -52,7 +52,7 @@ trait Mockito extends MockitoSugar {
     def throws[E <: Throwable](e: E*): OngoingStubbing[T] = {
       if (e.isEmpty)
         throw new java.lang.IllegalArgumentException(
-            "The parameter passed to throws must not be empty")
+          "The parameter passed to throws must not be empty")
       e.drop(1).foldLeft(M.when(c).thenThrow(e.head)) { (res, cur) =>
         res.thenThrow(cur)
       }

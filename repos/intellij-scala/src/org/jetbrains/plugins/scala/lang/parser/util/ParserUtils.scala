@@ -15,12 +15,10 @@ import scala.annotation.tailrec
 object ParserUtils extends ParserUtilsBase {
 
   def lookAheadSeq(n: Int)(builder: PsiBuilder) =
-    (1 to n).map(
-        i =>
-          {
-        val token = if (!builder.eof) builder.getTokenType else null
-        builder.advanceLexer()
-        token
+    (1 to n).map(i => {
+      val token = if (!builder.eof) builder.getTokenType else null
+      builder.advanceLexer()
+      token
     })
 
   //Write element node
@@ -62,7 +60,8 @@ object ParserUtils extends ParserUtilsBase {
     }
   }
 
-  def build(t: IElementType, builder: PsiBuilder)(inner: => Boolean): Boolean = {
+  def build(t: IElementType, builder: PsiBuilder)(
+      inner: => Boolean): Boolean = {
     val marker = builder.mark
     val parsed = inner
     if (parsed) marker.done(t) else marker.rollbackTo()
@@ -72,7 +71,7 @@ object ParserUtils extends ParserUtilsBase {
   def isAssignmentOperator(id: String) = id.charAt(id.length - 1) match {
     case '='
         if id != "<=" && id != ">=" &&
-        id != "!=" && (id.charAt(0) != '=' || id == "=") =>
+          id != "!=" && (id.charAt(0) != '=' || id == "=") =>
       true
     case _ => false
   }
@@ -84,15 +83,15 @@ object ParserUtils extends ParserUtilsBase {
     }
     id.charAt(0) match {
       case '~' | '#' | '@' | '?' | '\\' => 0 //todo: other special characters?
-      case '*' | '/' | '%' => 1
-      case '+' | '-' => 2
-      case ':' => 3
-      case '=' | '!' => 4
-      case '<' | '>' => 5
-      case '&' => 6
-      case '^' => 7
-      case '|' => 8
-      case _ => 9
+      case '*' | '/' | '%'              => 1
+      case '+' | '-'                    => 2
+      case ':'                          => 3
+      case '=' | '!'                    => 4
+      case '<' | '>'                    => 5
+      case '&'                          => 6
+      case '^'                          => 7
+      case '|'                          => 8
+      case _                            => 9
     }
   }
 
@@ -105,9 +104,10 @@ object ParserUtils extends ParserUtilsBase {
   }
 
   @tailrec
-  def parseLoopUntilRBrace(builder: ScalaPsiBuilder,
-                           fun: () => Unit,
-                           braceReported: Boolean = false) {
+  def parseLoopUntilRBrace(
+      builder: ScalaPsiBuilder,
+      fun: () => Unit,
+      braceReported: Boolean = false) {
     var br = braceReported
     fun()
     builder.getTokenType match {
@@ -125,7 +125,7 @@ object ParserUtils extends ParserUtilsBase {
           builder.getTokenType match {
             case ScalaTokenTypes.tRBRACE => balance -= 1
             case ScalaTokenTypes.tLBRACE => balance += 1
-            case _ =>
+            case _                       =>
           }
           builder.advanceLexer()
         }
@@ -144,35 +144,36 @@ object ParserUtils extends ParserUtilsBase {
   }
 
   def elementCanStartStatement(
-      element: IElementType, builder: ScalaPsiBuilder): Boolean = {
+      element: IElementType,
+      builder: ScalaPsiBuilder): Boolean = {
     element match {
-      case ScalaTokenTypes.kCATCH => false
-      case ScalaTokenTypes.kELSE => false
-      case ScalaTokenTypes.kEXTENDS => false
-      case ScalaTokenTypes.kFINALLY => false
-      case ScalaTokenTypes.kMATCH => false
-      case ScalaTokenTypes.kWITH => false
-      case ScalaTokenTypes.kYIELD => false
-      case ScalaTokenTypes.tCOMMA => false
-      case ScalaTokenTypes.tDOT => false
-      case ScalaTokenTypes.tSEMICOLON => false
-      case ScalaTokenTypes.tCOLON => false
-      case ScalaTokenTypes.tASSIGN => false
-      case ScalaTokenTypes.tFUNTYPE => false
-      case ScalaTokenTypes.tCHOOSE => false
-      case ScalaTokenTypes.tUPPER_BOUND => false
-      case ScalaTokenTypes.tLOWER_BOUND => false
-      case ScalaTokenTypes.tVIEW => false
-      case ScalaTokenTypes.tINNER_CLASS => false
-      case ScalaTokenTypes.tLSQBRACKET => false
-      case ScalaTokenTypes.tRSQBRACKET => false
+      case ScalaTokenTypes.kCATCH        => false
+      case ScalaTokenTypes.kELSE         => false
+      case ScalaTokenTypes.kEXTENDS      => false
+      case ScalaTokenTypes.kFINALLY      => false
+      case ScalaTokenTypes.kMATCH        => false
+      case ScalaTokenTypes.kWITH         => false
+      case ScalaTokenTypes.kYIELD        => false
+      case ScalaTokenTypes.tCOMMA        => false
+      case ScalaTokenTypes.tDOT          => false
+      case ScalaTokenTypes.tSEMICOLON    => false
+      case ScalaTokenTypes.tCOLON        => false
+      case ScalaTokenTypes.tASSIGN       => false
+      case ScalaTokenTypes.tFUNTYPE      => false
+      case ScalaTokenTypes.tCHOOSE       => false
+      case ScalaTokenTypes.tUPPER_BOUND  => false
+      case ScalaTokenTypes.tLOWER_BOUND  => false
+      case ScalaTokenTypes.tVIEW         => false
+      case ScalaTokenTypes.tINNER_CLASS  => false
+      case ScalaTokenTypes.tLSQBRACKET   => false
+      case ScalaTokenTypes.tRSQBRACKET   => false
       case ScalaTokenTypes.tRPARENTHESIS => false
-      case ScalaTokenTypes.tRBRACE => false
+      case ScalaTokenTypes.tRBRACE       => false
       case ScalaTokenTypes.kCASE =>
         caseLookAheadFunction(builder) match {
           case ScalaTokenTypes.kOBJECT => true
-          case ScalaTokenTypes.kCLASS => true
-          case _ => false
+          case ScalaTokenTypes.kCLASS  => true
+          case _                       => false
         }
       case _ => true
     }

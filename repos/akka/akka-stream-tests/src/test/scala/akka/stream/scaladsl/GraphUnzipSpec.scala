@@ -4,15 +4,20 @@
 package akka.stream.scaladsl
 
 import scala.concurrent.duration._
-import akka.stream.{ClosedShape, OverflowStrategy, ActorMaterializerSettings, ActorMaterializer}
+import akka.stream.{
+  ClosedShape,
+  OverflowStrategy,
+  ActorMaterializerSettings,
+  ActorMaterializer
+}
 import akka.stream.testkit._
 import akka.stream.testkit.Utils._
 import akka.testkit.AkkaSpec
 
 class GraphUnzipSpec extends AkkaSpec {
 
-  val settings = ActorMaterializerSettings(system).withInputBuffer(
-      initialSize = 2, maxSize = 16)
+  val settings = ActorMaterializerSettings(system)
+    .withInputBuffer(initialSize = 2, maxSize = 16)
 
   implicit val materializer = ActorMaterializer(settings)
 
@@ -24,16 +29,16 @@ class GraphUnzipSpec extends AkkaSpec {
       val c2 = TestSubscriber.manualProbe[String]()
 
       RunnableGraph
-        .fromGraph(GraphDSL.create() {
-          implicit b ⇒
-            val unzip = b.add(Unzip[Int, String]())
-            Source(List(1 -> "a", 2 -> "b", 3 -> "c")) ~> unzip.in
-            unzip.out1 ~> Flow[String].buffer(
-                16, OverflowStrategy.backpressure) ~> Sink.fromSubscriber(c2)
-            unzip.out0 ~> Flow[Int]
-              .buffer(16, OverflowStrategy.backpressure)
-              .map(_ * 2) ~> Sink.fromSubscriber(c1)
-            ClosedShape
+        .fromGraph(GraphDSL.create() { implicit b ⇒
+          val unzip = b.add(Unzip[Int, String]())
+          Source(List(1 -> "a", 2 -> "b", 3 -> "c")) ~> unzip.in
+          unzip.out1 ~> Flow[String]
+            .buffer(16, OverflowStrategy.backpressure) ~> Sink.fromSubscriber(
+            c2)
+          unzip.out0 ~> Flow[Int]
+            .buffer(16, OverflowStrategy.backpressure)
+            .map(_ * 2) ~> Sink.fromSubscriber(c1)
+          ClosedShape
         })
         .run()
 

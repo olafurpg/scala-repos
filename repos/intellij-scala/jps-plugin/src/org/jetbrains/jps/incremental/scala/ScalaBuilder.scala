@@ -10,8 +10,16 @@ import com.intellij.openapi.util.io.FileUtil
 import org.jetbrains.jps.ModuleChunk
 import org.jetbrains.jps.builders.java.JavaBuilderUtil
 import org.jetbrains.jps.incremental._
-import org.jetbrains.jps.incremental.messages.{BuildMessage, CompilerMessage, ProgressMessage}
-import org.jetbrains.jps.incremental.scala.data.{CompilationData, CompilerData, SbtData}
+import org.jetbrains.jps.incremental.messages.{
+  BuildMessage,
+  CompilerMessage,
+  ProgressMessage
+}
+import org.jetbrains.jps.incremental.scala.data.{
+  CompilationData,
+  CompilerData,
+  SbtData
+}
 import org.jetbrains.jps.incremental.scala.local.LocalServer
 import org.jetbrains.jps.incremental.scala.model.IncrementalityType
 import org.jetbrains.jps.incremental.scala.remote.RemoteServer
@@ -26,14 +34,15 @@ import _root_.scala.collection.JavaConverters._
   */
 object ScalaBuilder {
 
-  def compile(context: CompileContext,
-              chunk: ModuleChunk,
-              sources: Seq[File],
-              modules: Set[JpsModule],
-              client: Client): Either[String, ModuleLevelBuilder.ExitCode] = {
+  def compile(
+      context: CompileContext,
+      chunk: ModuleChunk,
+      sources: Seq[File],
+      modules: Set[JpsModule],
+      client: Client): Either[String, ModuleLevelBuilder.ExitCode] = {
 
     context.processMessage(
-        new ProgressMessage("Reading compilation settings..."))
+      new ProgressMessage("Reading compilation settings..."))
 
     for {
       sbtData <- sbtData
@@ -57,8 +66,9 @@ object ScalaBuilder {
 
     def getPreviousIncrementalType: Option[IncrementalityType] = {
       storageFile.filter(_.exists).flatMap { file =>
-        val result = using(new DataInputStream(
-                new BufferedInputStream(new FileInputStream(file)))) { in =>
+        val result = using(
+          new DataInputStream(
+            new BufferedInputStream(new FileInputStream(file)))) { in =>
           try {
             Some(IncrementalityType.valueOf(in.readUTF()))
           } catch {
@@ -76,8 +86,9 @@ object ScalaBuilder {
       storageFile.foreach { file =>
         val parentDir = file.getParentFile
         if (!parentDir.exists()) parentDir.mkdirs()
-        using(new DataOutputStream(
-                new BufferedOutputStream(new FileOutputStream(file)))) {
+        using(
+          new DataOutputStream(
+            new BufferedOutputStream(new FileOutputStream(file)))) {
           _.writeUTF(incrType.name)
         }
       }
@@ -92,7 +103,7 @@ object ScalaBuilder {
       } catch {
         case e: Exception =>
           throw new IOException(
-              "Can not delete project system directory: \n" + e.getMessage)
+            "Can not delete project system directory: \n" + e.getMessage)
       }
     }
 
@@ -108,20 +119,20 @@ object ScalaBuilder {
       case Some(`incrType`) => //same incremental type, nothing to be done
       case Some(_) if isMakeProject(context) =>
         if (ScalaBuilder.isScalaProject(
-                context.getProjectDescriptor.getProject)) {
+              context.getProjectDescriptor.getProject)) {
           cleanCaches()
           setPreviousIncrementalType(incrType)
           context.processMessage(
-              new CompilerMessage(
-                  "scala",
-                  BuildMessage.Kind.WARNING,
-                  "type of incremental compiler has been changed, full rebuild..."))
+            new CompilerMessage(
+              "scala",
+              BuildMessage.Kind.WARNING,
+              "type of incremental compiler has been changed, full rebuild..."))
         }
       case Some(_) =>
         if (ScalaBuilder.isScalaProject(
-                context.getProjectDescriptor.getProject)) {
+              context.getProjectDescriptor.getProject)) {
           throw new ProjectBuildException(
-              "scala: type of incremental compiler has been changed, full rebuild is required")
+            "scala: type of incremental compiler has been changed, full rebuild is required")
         }
     }
   }
@@ -187,9 +198,10 @@ object ScalaBuilder {
     SbtData.from(classLoader, pluginRoot, javaClassVersion)
   }
 
-  private def scalaLibraryWarning(modules: Set[JpsModule],
-                                  compilationData: CompilationData,
-                                  client: Client) {
+  private def scalaLibraryWarning(
+      modules: Set[JpsModule],
+      compilationData: CompilationData,
+      client: Client) {
     val hasScalaFacet = modules.exists(SettingsManager.hasScalaSdk)
     val hasScalaLibrary =
       compilationData.classpath.exists(_.getName.startsWith("scala-library"))
@@ -197,19 +209,20 @@ object ScalaBuilder {
     if (hasScalaFacet && !hasScalaLibrary) {
       val names = modules.map(_.getName).mkString(", ")
       client.warning(
-          "No 'scala-library*.jar' in module dependencies [%s]".format(names))
+        "No 'scala-library*.jar' in module dependencies [%s]".format(names))
     }
   }
 
   private def getServer(context: CompileContext): Server = {
     val settings = SettingsManager.getGlobalSettings(
-        context.getProjectDescriptor.getModel.getGlobal)
+      context.getProjectDescriptor.getModel.getGlobal)
 
     if (settings.isCompileServerEnabled &&
         JavaBuilderUtil.CONSTANT_SEARCH_SERVICE.get(context) != null) {
       cleanLocalServerCache()
       new RemoteServer(
-          InetAddress.getByName(null), settings.getCompileServerPort)
+        InetAddress.getByName(null),
+        settings.getCompileServerPort)
     } else {
       localServer
     }

@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -87,34 +87,42 @@ trait MongoColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
   def includeIdField: Boolean
 
   trait MongoColumnarTableCompanion
-      extends BlockStoreColumnarTableCompanion with Logging {
+      extends BlockStoreColumnarTableCompanion
+      with Logging {
     def mongo: Mongo
     def dbAuthParams: Map[String, String]
 
     private def jTypeToProperties(
-        tpe: JType, current: Set[String]): Set[String] = tpe match {
+        tpe: JType,
+        current: Set[String]): Set[String] = tpe match {
       case JArrayFixedT(elements) if current.nonEmpty =>
-        elements.map {
-          case (index, childType) =>
-            val newPaths = current.map { s =>
-              s + "[" + index + "]"
-            }
-            jTypeToProperties(childType, newPaths)
-        }.toSet.flatten
+        elements
+          .map {
+            case (index, childType) =>
+              val newPaths = current.map { s =>
+                s + "[" + index + "]"
+              }
+              jTypeToProperties(childType, newPaths)
+          }
+          .toSet
+          .flatten
 
       case JObjectFixedT(fields) =>
-        fields.map {
-          case (name, childType) =>
-            val newPaths =
-              if (current.nonEmpty) {
-                current.map { s =>
-                  s + "." + name
+        fields
+          .map {
+            case (name, childType) =>
+              val newPaths =
+                if (current.nonEmpty) {
+                  current.map { s =>
+                    s + "." + name
+                  }
+                } else {
+                  Set(name)
                 }
-              } else {
-                Set(name)
-              }
-            jTypeToProperties(childType, newPaths)
-        }.toSet.flatten
+              jTypeToProperties(childType, newPaths)
+          }
+          .toSet
+          .flatten
 
       case _ => current
     }
@@ -122,7 +130,9 @@ trait MongoColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
     sealed trait LoadState
     case class InitialLoad(paths: List[Path]) extends LoadState
     case class InLoad(
-        cursorGen: () => DBCursor, skip: Int, remainingPaths: List[Path])
+        cursorGen: () => DBCursor,
+        skip: Int,
+        remainingPaths: List[Path])
         extends LoadState
 
     def safeOp[A](nullMessage: String)(v: => A): Option[A] =
@@ -130,8 +140,9 @@ trait MongoColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
         Option(v) orElse { logger.error(nullMessage); None }
       } catch {
         case t: Throwable =>
-          logger.error("Failure during Mongo query: %s(%s)".format(
-                  t.getClass, t.getMessage)); None
+          logger.error(
+            "Failure during Mongo query: %s(%s)"
+              .format(t.getClass, t.getMessage)); None
       }
 
     def load(table: Table, apiKey: APIKey, tpe: JType): Future[Table] = {
@@ -139,18 +150,19 @@ trait MongoColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
         paths <- pathsM(table)
       } yield {
         Table(
-            StreamT.unfoldM[Future, Slice, LoadState](
-                InitialLoad(paths.toList)) {
+          StreamT
+            .unfoldM[Future, Slice, LoadState](InitialLoad(paths.toList)) {
               case InLoad(cursorGen, skip, remaining) =>
                 M.point {
                   val (slice, nextSkip) = makeSlice(cursorGen, skip)
                   logger.trace(
-                      "Running InLoad: fetched %d rows, next skip = %s".format(
-                          slice.size, nextSkip))
-                  Some(slice,
-                       nextSkip
-                         .map(InLoad(cursorGen, _, remaining))
-                         .getOrElse(InitialLoad(remaining)))
+                    "Running InLoad: fetched %d rows, next skip = %s"
+                      .format(slice.size, nextSkip))
+                  Some(
+                    slice,
+                    nextSkip
+                      .map(InLoad(cursorGen, _, remaining))
+                      .getOrElse(InitialLoad(remaining)))
                 }
 
               case InitialLoad(path :: xs) =>
@@ -160,44 +172,47 @@ trait MongoColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
                     M.point {
                       for {
                         db <- safeOp("Database " + dbName + " does not exist")(
-                            mongo.getDB(dbName)).flatMap {
+                          mongo.getDB(dbName)).flatMap {
                           d =>
                             if (!d.isAuthenticated &&
                                 dbAuthParams.contains(dbName)) {
                               logger.trace("Running auth setup for " + dbName)
-                              dbAuthParams.get(dbName).map(_.split(':')) flatMap {
+                              dbAuthParams
+                                .get(dbName)
+                                .map(_.split(':')) flatMap {
                                 case Array(user, password) =>
-                                  if (d.authenticate(user,
-                                                     password.toCharArray)) {
+                                  if (d.authenticate(
+                                        user,
+                                        password.toCharArray)) {
                                     Some(d)
                                   } else {
                                     logger.error(
-                                        "Authentication failed for database " +
+                                      "Authentication failed for database " +
                                         dbName); None
                                   }
 
                                 case invalid =>
                                   logger.error(
-                                      "Invalid user:password for %s: \"%s\""
-                                        .format(dbName,
-                                                invalid.mkString(":"))); None
+                                    "Invalid user:password for %s: \"%s\""
+                                      .format(dbName, invalid.mkString(":")));
+                                  None
                               }
                             } else {
                               Some(d)
                             }
                         }
-                        coll <- safeOp("Collection " + collectionName +
+                        coll <- safeOp(
+                          "Collection " + collectionName +
                             " does not exist") {
-                          logger.trace(
-                              "Fetching collection: " + collectionName)
+                          logger.trace("Fetching collection: " + collectionName)
                           db.getCollection(collectionName)
                         }
                         slice <- safeOp("Invalid result in query") {
                           logger.trace("Getting data from " + coll)
                           val selector = jTypeToProperties(tpe, Set())
                             .foldLeft(new BasicDBObject()) {
-                            case (obj, path) => obj.append(path, 1)
-                          }
+                              case (obj, path) => obj.append(path, 1)
+                            }
 
                           val cursorGen =
                             () => coll.find(new BasicDBObject(), selector)
@@ -205,28 +220,31 @@ trait MongoColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
                           val (slice, nextSkip) = makeSlice(cursorGen, 0)
 
                           logger.debug("Gen slice of size " + slice.size)
-                          (slice,
-                           nextSkip
-                             .map(InLoad(cursorGen, _, xs))
-                             .getOrElse(InitialLoad(xs)))
+                          (
+                            slice,
+                            nextSkip
+                              .map(InLoad(cursorGen, _, xs))
+                              .getOrElse(InitialLoad(xs)))
                         }
                       } yield slice
                     }
 
                   case err =>
                     sys.error("MongoDB path " + path.path +
-                        " does not have the form /dbName/collectionName; rollups not yet supported.")
+                      " does not have the form /dbName/collectionName; rollups not yet supported.")
                 }
 
               case InitialLoad(Nil) =>
                 M.point(None)
             },
-            UnknownSize
+          UnknownSize
         )
       }
     }
 
-    def makeSlice(cursorGen: () => DBCursor, skip: Int): (Slice, Option[Int]) = {
+    def makeSlice(
+        cursorGen: () => DBCursor,
+        skip: Int): (Slice, Option[Int]) = {
       import TransSpecModule.paths._
 
       // Sort by _id always to mimic NIHDB
@@ -245,7 +263,7 @@ trait MongoColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
           if (includeIdField) {
             columns0 get ColumnRef(Key \ 0, CString) map { idCol =>
               columns0 +
-              (ColumnRef(Value \ CPathField("_id"), CString) -> idCol)
+                (ColumnRef(Value \ CPathField("_id"), CString) -> idCol)
             } getOrElse columns0
           } else columns0
       }
@@ -405,14 +423,15 @@ trait MongoColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
         row += 1
       }
 
-      (dbObjIter.hasNext,
-       row,
-       acc
-         .map({
-           case ((rprefix, cType), col) =>
-             (ColumnRef(CPath(rprefix.reverse), cType), col)
-         })
-         .toMap)
+      (
+        dbObjIter.hasNext,
+        row,
+        acc
+          .map({
+            case ((rprefix, cType), col) =>
+              (ColumnRef(CPath(rprefix.reverse), cType), col)
+          })
+          .toMap)
     }
   }
 }

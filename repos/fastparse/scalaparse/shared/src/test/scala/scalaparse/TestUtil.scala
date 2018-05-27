@@ -10,9 +10,10 @@ import scalaparse.Scala._
   * Created by haoyi on 5/3/15.
   */
 object TestUtil {
-  def checkNeg[T](input: String,
-                  expected: String = "ADA???D",
-                  found: String = "ADQW??") = {
+  def checkNeg[T](
+      input: String,
+      expected: String = "ADA???D",
+      found: String = "ADQW??") = {
 //    println("Checking Neg...\n" )
 //    println(input)
     Scala.CompilationUnit.parse(input) match {

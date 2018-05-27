@@ -137,19 +137,55 @@ trait Syntaxes {
 }
 
 trait ToDataOps
-    extends ToIdOps with ToTreeOps with ToReducerOps with ToWriterOps
-    with ToStateOps with ToValidationOps with ToKleisliOps with ToEitherOps
-    with ToNelOps with ToTheseOps with ToMaybeOps
+    extends ToIdOps
+    with ToTreeOps
+    with ToReducerOps
+    with ToWriterOps
+    with ToStateOps
+    with ToValidationOps
+    with ToKleisliOps
+    with ToEitherOps
+    with ToNelOps
+    with ToTheseOps
+    with ToMaybeOps
 
 trait ToTypeClassOps
-    extends ToSemigroupOps with ToMonoidOps with ToEqualOps with ToShowOps
-    with ToOrderOps with ToEnumOps with ToPlusEmptyOps with ToFunctorOps
-    with ToContravariantOps with ToApplyOps with ToApplicativeOps
-    with ToBindOps with ToMonadOps with ToComonadOps with ToBifoldableOps
-    with ToCozipOps with ToPlusOps with ToApplicativePlusOps
-    with ToMonadPlusOps with ToTraverseOps with ToBifunctorOps
-    with ToAssociativeOps with ToBitraverseOps with ToComposeOps
-    with ToCategoryOps with ToArrowOps with ToFoldableOps with ToChoiceOps
-    with ToSplitOps with ToZipOps with ToUnzipOps with ToMonadTellOps
-    with ToMonadListenOps with ToMonadErrorOps with ToFoldable1Ops
-    with ToTraverse1Ops with ToOptionalOps with ToCatchableOps with ToAlignOps
+    extends ToSemigroupOps
+    with ToMonoidOps
+    with ToEqualOps
+    with ToShowOps
+    with ToOrderOps
+    with ToEnumOps
+    with ToPlusEmptyOps
+    with ToFunctorOps
+    with ToContravariantOps
+    with ToApplyOps
+    with ToApplicativeOps
+    with ToBindOps
+    with ToMonadOps
+    with ToComonadOps
+    with ToBifoldableOps
+    with ToCozipOps
+    with ToPlusOps
+    with ToApplicativePlusOps
+    with ToMonadPlusOps
+    with ToTraverseOps
+    with ToBifunctorOps
+    with ToAssociativeOps
+    with ToBitraverseOps
+    with ToComposeOps
+    with ToCategoryOps
+    with ToArrowOps
+    with ToFoldableOps
+    with ToChoiceOps
+    with ToSplitOps
+    with ToZipOps
+    with ToUnzipOps
+    with ToMonadTellOps
+    with ToMonadListenOps
+    with ToMonadErrorOps
+    with ToFoldable1Ops
+    with ToTraverse1Ops
+    with ToOptionalOps
+    with ToCatchableOps
+    with ToAlignOps

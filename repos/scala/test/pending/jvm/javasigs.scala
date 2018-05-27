@@ -12,7 +12,8 @@ object Scalatest {
     val tmpfile = new FileWriter(tmpfilename)
     tmpfile.write(src)
     tmpfile.close
-    exec(javac + " -d " + outputdir + " -classpath " + classpath + " " + opts +
+    exec(
+      javac + " -d " + outputdir + " -classpath " + classpath + " " + opts +
         tmpfilename)
   }
 

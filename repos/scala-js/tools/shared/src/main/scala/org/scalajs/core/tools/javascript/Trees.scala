@@ -93,14 +93,14 @@ object Trees {
     def apply(stats: List[Tree])(implicit pos: Position): Tree = {
       val flattenedStats =
         stats flatMap {
-          case Skip() => Nil
+          case Skip()          => Nil
           case Block(subStats) => subStats
-          case other => other :: Nil
+          case other           => other :: Nil
         }
       flattenedStats match {
-        case Nil => Skip()
+        case Nil         => Skip()
         case only :: Nil => only
-        case _ => new Block(flattenedStats)
+        case _           => new Block(flattenedStats)
       }
     }
 
@@ -117,7 +117,7 @@ object Trees {
       extends Tree {
     require(lhs match {
       case _: VarRef | _: DotSelect | _: BracketSelect => true
-      case _ => false
+      case _                                           => false
     }, s"Invalid lhs for Assign: $lhs")
   }
 
@@ -158,8 +158,7 @@ object Trees {
   case class New(ctor: Tree, args: List[Tree])(implicit val pos: Position)
       extends Tree
 
-  case class DotSelect(qualifier: Tree, item: Ident)(
-      implicit val pos: Position)
+  case class DotSelect(qualifier: Tree, item: Ident)(implicit val pos: Position)
       extends Tree
 
   case class BracketSelect(qualifier: Tree, item: Tree)(
@@ -185,7 +184,7 @@ object Trees {
   case class Delete(prop: Tree)(implicit val pos: Position) extends Tree {
     require(prop match {
       case _: DotSelect | _: BracketSelect => true
-      case _ => false
+      case _                               => false
     }, s"Invalid prop for Delete: $prop")
   }
 
@@ -243,7 +242,8 @@ object Trees {
       extends Literal
 
   case class StringLiteral(value: String)(implicit val pos: Position)
-      extends Literal with PropertyName {
+      extends Literal
+      with PropertyName {
     override def name = value
   }
 
@@ -265,14 +265,17 @@ object Trees {
 
   // ECMAScript 6 classes
 
-  case class ClassDef(className: Option[Ident],
-                      parentClass: Option[Tree],
-                      members: List[Tree])(implicit val pos: Position)
+  case class ClassDef(
+      className: Option[Ident],
+      parentClass: Option[Tree],
+      members: List[Tree])(implicit val pos: Position)
       extends Tree
 
   case class MethodDef(
-      static: Boolean, name: PropertyName, args: List[ParamDef], body: Tree)(
-      implicit val pos: Position)
+      static: Boolean,
+      name: PropertyName,
+      args: List[ParamDef],
+      body: Tree)(implicit val pos: Position)
       extends Tree
 
   case class GetterDef(static: Boolean, name: PropertyName, body: Tree)(
@@ -280,8 +283,10 @@ object Trees {
       extends Tree
 
   case class SetterDef(
-      static: Boolean, name: PropertyName, param: ParamDef, body: Tree)(
-      implicit val pos: Position)
+      static: Boolean,
+      name: PropertyName,
+      param: ParamDef,
+      body: Tree)(implicit val pos: Position)
       extends Tree
 
   case class Super()(implicit val pos: Position) extends Tree

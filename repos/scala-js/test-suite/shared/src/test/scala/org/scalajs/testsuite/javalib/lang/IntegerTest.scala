@@ -400,14 +400,16 @@ class IntegerTest {
   }
 
   @Test def toBinaryString(): Unit = {
+    assertEquals("11111111111111111111111111111111", Integer.toBinaryString(-1))
     assertEquals(
-        "11111111111111111111111111111111", Integer.toBinaryString(-1))
+      "11111111111111111101100011101111",
+      Integer.toBinaryString(-10001))
     assertEquals(
-        "11111111111111111101100011101111", Integer.toBinaryString(-10001))
+      "10000000000000000000000000000000",
+      Integer.toBinaryString(MinValue))
     assertEquals(
-        "10000000000000000000000000000000", Integer.toBinaryString(MinValue))
-    assertEquals(
-        "1111111111111111111111111111111", Integer.toBinaryString(MaxValue))
+      "1111111111111111111111111111111",
+      Integer.toBinaryString(MaxValue))
   }
 
   @Test def toHexString(): Unit = {
@@ -533,17 +535,20 @@ class IntegerTest {
     assertEquals("17777777777", Integer.toString(2147483647, 8))
     assertEquals("7fffffff", Integer.toString(2147483647, 16))
     assertEquals(
-        "1111111111111111111111111111111", Integer.toString(2147483647, 2))
+      "1111111111111111111111111111111",
+      Integer.toString(2147483647, 2))
     assertEquals("2147483647", Integer.toString(2147483647, 10))
     assertEquals("-17777777777", Integer.toString(-2147483647, 8))
     assertEquals("-7fffffff", Integer.toString(-2147483647, 16))
     assertEquals(
-        "-1111111111111111111111111111111", Integer.toString(-2147483647, 2))
+      "-1111111111111111111111111111111",
+      Integer.toString(-2147483647, 2))
     assertEquals("-2147483647", Integer.toString(-2147483647, 10))
     assertEquals("-20000000000", Integer.toString(-2147483648, 8))
     assertEquals("-80000000", Integer.toString(-2147483648, 16))
     assertEquals(
-        "-10000000000000000000000000000000", Integer.toString(-2147483648, 2))
+      "-10000000000000000000000000000000",
+      Integer.toString(-2147483648, 2))
     assertEquals("-2147483648", Integer.toString(-2147483648, 10))
   }
 }

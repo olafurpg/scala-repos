@@ -17,7 +17,12 @@
 
 package org.apache.spark.util
 
-import java.io.{EOFException, IOException, ObjectInputStream, ObjectOutputStream}
+import java.io.{
+  EOFException,
+  IOException,
+  ObjectInputStream,
+  ObjectOutputStream
+}
 import java.nio.ByteBuffer
 import java.nio.channels.Channels
 

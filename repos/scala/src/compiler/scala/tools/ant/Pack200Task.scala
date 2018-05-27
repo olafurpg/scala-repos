@@ -50,8 +50,7 @@ class Pack200Task extends ScalaMatchingTask {
   def setDir(dir: File) {
     if (dir.exists && dir.isDirectory) srcdir = Some(dir)
     else
-      buildError(
-          "Please specify a valid directory with Jar files for packing.")
+      buildError("Please specify a valid directory with Jar files for packing.")
   }
 
   /** A level from 0 (none) to 9 (max) of effort for applying Pack200 */
@@ -83,7 +82,7 @@ class Pack200Task extends ScalaMatchingTask {
     if (file != null && file.exists && file.isDirectory) destdir = Some(file)
     else
       buildError(
-          "The destination directory is invalid: " + file.getAbsolutePath)
+        "The destination directory is invalid: " + file.getAbsolutePath)
   }
 
   def setSuffix(s: String) { packFileSuffix = s }
@@ -100,7 +99,7 @@ class Pack200Task extends ScalaMatchingTask {
     val ds = fs.getDirectoryScanner(getProject())
     val dir = fs.getDir(getProject())
     for (filename <- ds.getIncludedFiles()
-                        if filename.toLowerCase.endsWith(".jar")) {
+         if filename.toLowerCase.endsWith(".jar")) {
       val file = new File(dir, filename)
       if (files.exists(file.equals(_)) == false) files = file :: files
     }
@@ -145,8 +144,7 @@ class Pack200Task extends ScalaMatchingTask {
       if (repack) {
         val repackedFile = new File(packDir, file.getName)
         if (file.lastModified > repackedFile.lastModified) {
-          println(
-              "Repacking " + file.toString + " to " + repackedFile.toString)
+          println("Repacking " + file.toString + " to " + repackedFile.toString)
           val tmpFile = new File(packDir, file.getName + ".tmp")
           val os = makeOutputStream(tmpFile)
           packer.pack(new JarFile(file), os)

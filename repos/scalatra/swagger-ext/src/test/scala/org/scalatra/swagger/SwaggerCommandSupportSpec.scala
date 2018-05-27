@@ -7,7 +7,8 @@ import org.scalatra.test.specs2.MutableScalatraSpec
 
 object SwaggerCommandSupportSpec {
   implicit val stringFormat = DefaultJsonFormats.GenericFormat(
-      DefaultReaders.StringReader, DefaultWriters.StringWriter)
+    DefaultReaders.StringReader,
+    DefaultWriters.StringWriter)
   class SimpleCommand extends ParamsOnlyCommand {
     val name: Field[String] = asString("name").notBlank.position(1)
     val age: Field[Int] = bind[Int]("age").optional(0)
@@ -33,7 +34,9 @@ object SwaggerCommandSupportSpec {
   }
 
   class CommandSupportServlet()(protected implicit val swagger: Swagger)
-      extends ScalatraServlet with ParamsOnlyCommandSupport with SwaggerSupport
+      extends ScalatraServlet
+      with ParamsOnlyCommandSupport
+      with SwaggerSupport
       with SwaggerCommandSupport {
 
     val allOperation =
@@ -61,42 +64,50 @@ class SwaggerCommandSupportSpec extends MutableScalatraSpec {
     "generate a model and parameters for a simple command" in {
       val (parameters, model) =
         SwaggerCommandSupport.parametersFromCommand(new SimpleCommand)
-      parameters must_== List(Parameter("body",
-                                        DataType("SimpleCommand"),
-                                        None,
-                                        paramType = ParamType.Body))
+      parameters must_== List(
+        Parameter(
+          "body",
+          DataType("SimpleCommand"),
+          None,
+          paramType = ParamType.Body))
       model must beSome[Model]
       model.get.id must_== "SimpleCommand"
       model.get.description must beEmpty
       model.get.properties must containTheSameElementsAs(
-          List("age" -> ModelProperty(DataType.Int, required = false),
-               "name" -> ModelProperty(DataType.String, 1, required = true)))
+        List(
+          "age" -> ModelProperty(DataType.Int, required = false),
+          "name" -> ModelProperty(DataType.String, 1, required = true)))
     }
 
     "generate a model and parameters for a full command" in {
       val parameterList = List(
-          Parameter("body",
-                    DataType("FullCommand"),
-                    None,
-                    paramType = ParamType.Body),
-          Parameter("limit",
-                    DataType.Int,
-                    Some("the max number of items to return"),
-                    paramType = ParamType.Query,
-                    defaultValue = Some("20"),
-                    required = false),
-          Parameter("skip",
-                    DataType.Int,
-                    Some("The offset for this collection index"),
-                    paramType = ParamType.Query,
-                    defaultValue = Some("0"),
-                    required = false),
-          Parameter("API-TOKEN",
-                    DataType.String,
-                    Some("The API token for this request"),
-                    notes = Some("Invalid data kills kittens"),
-                    paramType = ParamType.Header,
-                    allowableValues = AllowableValues("123"))
+        Parameter(
+          "body",
+          DataType("FullCommand"),
+          None,
+          paramType = ParamType.Body),
+        Parameter(
+          "limit",
+          DataType.Int,
+          Some("the max number of items to return"),
+          paramType = ParamType.Query,
+          defaultValue = Some("20"),
+          required = false),
+        Parameter(
+          "skip",
+          DataType.Int,
+          Some("The offset for this collection index"),
+          paramType = ParamType.Query,
+          defaultValue = Some("0"),
+          required = false),
+        Parameter(
+          "API-TOKEN",
+          DataType.String,
+          Some("The API token for this request"),
+          notes = Some("Invalid data kills kittens"),
+          paramType = ParamType.Header,
+          allowableValues = AllowableValues("123")
+        )
       )
       val (parameters, model) =
         SwaggerCommandSupport.parametersFromCommand(new FullCommand)
@@ -110,8 +121,9 @@ class SwaggerCommandSupportSpec extends MutableScalatraSpec {
       model.get.id must_== "FullCommand"
       model.get.description must beEmpty
       model.get.properties must containTheSameElementsAs(
-          List("age" -> ModelProperty(DataType.Int, required = false),
-               "name" -> ModelProperty(DataType.String, 1, required = true)))
+        List(
+          "age" -> ModelProperty(DataType.Int, required = false),
+          "name" -> ModelProperty(DataType.String, 1, required = true)))
     }
   }
 }

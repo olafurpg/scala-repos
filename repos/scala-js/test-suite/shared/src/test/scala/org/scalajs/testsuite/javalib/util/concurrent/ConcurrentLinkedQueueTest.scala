@@ -12,7 +12,10 @@ import java.{util => ju}
 
 import org.junit.Assert._
 import org.junit.Test
-import org.scalajs.testsuite.javalib.util.{AbstractCollectionFactory, AbstractCollectionTest}
+import org.scalajs.testsuite.javalib.util.{
+  AbstractCollectionFactory,
+  AbstractCollectionTest
+}
 
 import scala.collection.JavaConversions._
 import scala.language.implicitConversions
@@ -112,7 +115,8 @@ class ConcurrentLinkedQueueTest extends AbstractCollectionTest {
     assertEquals(6, pq.size())
   }
 
-  @Test def should_check_contained_values_even_in_double_corner_cases(): Unit = {
+  @Test def should_check_contained_values_even_in_double_corner_cases()
+    : Unit = {
     val pq = factory.empty[Double]
 
     assertTrue(pq.add(11111.0))
@@ -175,7 +179,7 @@ class ConcurrentLinkedQueueFactory extends AbstractCollectionFactory {
   override def implementationName: String =
     "java.util.concurrent.ConcurrentLinkedQueue"
 
-  override def empty[E : ClassTag]: ConcurrentLinkedQueue[E] =
+  override def empty[E: ClassTag]: ConcurrentLinkedQueue[E] =
     new ConcurrentLinkedQueue[E]()
 
   def newFrom[E](coll: ju.Collection[E]): ConcurrentLinkedQueue[E] =

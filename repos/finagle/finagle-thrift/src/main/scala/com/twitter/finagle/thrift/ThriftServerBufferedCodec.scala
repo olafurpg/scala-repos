@@ -10,9 +10,10 @@ private[finagle] case class ThriftServerBufferedPipelineFactory(
 
   def getPipeline() = {
     val pipeline = ThriftServerFramedPipelineFactory.getPipeline()
-    pipeline.replace("thriftFrameCodec",
-                     "thriftBufferDecoder",
-                     new ThriftBufferDecoder(protocolFactory))
+    pipeline.replace(
+      "thriftFrameCodec",
+      "thriftBufferDecoder",
+      new ThriftBufferDecoder(protocolFactory))
     pipeline
   }
 }
@@ -51,7 +52,8 @@ class ThriftServerBufferedCodecFactory(protocolFactory: TProtocolFactory)
 }
 
 class ThriftServerBufferedCodec(
-    protocolFactory: TProtocolFactory, config: ServerCodecConfig)
+    protocolFactory: TProtocolFactory,
+    config: ServerCodecConfig)
     extends ThriftServerFramedCodec(config) {
   override def pipelineFactory =
     ThriftServerBufferedPipelineFactory(protocolFactory)

@@ -19,7 +19,7 @@ trait ScImportExpr extends ScalaPsiElement {
 
   def selectors: Seq[ScImportSelector] = {
     selectorSet match {
-      case None => Seq.empty
+      case None    => Seq.empty
       case Some(s) => s.selectors
     }
   }

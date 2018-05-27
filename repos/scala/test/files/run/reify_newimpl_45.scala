@@ -11,7 +11,9 @@ object Test extends App {
     }
     println(freeTypes(code.tree))
     val tree = substituteSymbols(
-        code.tree, freeTypes(code.tree), List(definitions.StringClass))
+      code.tree,
+      freeTypes(code.tree),
+      List(definitions.StringClass))
     cm.mkToolBox().eval(tree)
   }
 

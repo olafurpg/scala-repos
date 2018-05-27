@@ -37,7 +37,7 @@ package org.scaloid.common
 
 import android.app._
 import android.content._
-import android.graphics.drawable.{ Drawable, StateListDrawable }
+import android.graphics.drawable.{Drawable, StateListDrawable}
 import android.os._
 import android.view._
 import android.view.WindowManager.LayoutParams._
@@ -56,7 +56,8 @@ trait TraitActivity[+This <: Activity] {
 
   @inline def contentView(p: View) = contentView_=(p)
 
-  @inline def contentView(implicit no: NoGetterForThisProperty): Nothing = throw new Error("Android does not support the getter for 'contentView'")
+  @inline def contentView(implicit no: NoGetterForThisProperty): Nothing =
+    throw new Error("Android does not support the getter for 'contentView'")
 
   def intent = Some[Intent](basis.getIntent)
 
@@ -78,49 +79,55 @@ trait TraitActivity[+This <: Activity] {
 }
 
 /**
- * Enriched trait for the class android.app.Activity.
- * To enable Scaloid, inherit this trait instead of the class Activity.
- *
- * SActivity has shortcut methods for each lifecycle stages. These methods shorten the method overriding, which is
- * very frequent for activity classes.
- *
- * For example, instead of this:
- *
- * {{{
- *   override def onCreate(b: Bundle) {
- *     super.onCreate(b)
- *     // do something for onCreate
- *   }
- * }}}
- *
- * The equivalent is:
- *
- * {{{
- *   onCreate {
- *     // do something for onCreate
- *   }
- * }}}
- * or
- * {{{
- *   onCreate(doSomething())
- * }}}
- *
- * If the `Bundle` is needed in the `onCreate` call to restore saved state, a function can be supplied which accepts
- * `Option[Bundle]`:
- *
- * {{{
- *   onCreate { ob: Option[Bundle] =>
- *     // do something for onCreate
- *     ob.foreach { b =>
- *       // do things if bundle was defined at onCreate time
- *     }
- *   }
- * }}}
- *
- * In contrast of method overriding, this shortcut can be called multiple times from different places of your code.
- *
- */
-trait SActivity extends Activity with SContext with TraitActivity[SActivity] with Destroyable with Creatable with Registerable {
+  * Enriched trait for the class android.app.Activity.
+  * To enable Scaloid, inherit this trait instead of the class Activity.
+  *
+  * SActivity has shortcut methods for each lifecycle stages. These methods shorten the method overriding, which is
+  * very frequent for activity classes.
+  *
+  * For example, instead of this:
+  *
+  * {{{
+  *   override def onCreate(b: Bundle) {
+  *     super.onCreate(b)
+  *     // do something for onCreate
+  *   }
+  * }}}
+  *
+  * The equivalent is:
+  *
+  * {{{
+  *   onCreate {
+  *     // do something for onCreate
+  *   }
+  * }}}
+  * or
+  * {{{
+  *   onCreate(doSomething())
+  * }}}
+  *
+  * If the `Bundle` is needed in the `onCreate` call to restore saved state, a function can be supplied which accepts
+  * `Option[Bundle]`:
+  *
+  * {{{
+  *   onCreate { ob: Option[Bundle] =>
+  *     // do something for onCreate
+  *     ob.foreach { b =>
+  *       // do things if bundle was defined at onCreate time
+  *     }
+  *   }
+  * }}}
+  *
+  * In contrast of method overriding, this shortcut can be called multiple times from different places of your code.
+  *
+  */
+trait SActivity
+    extends Activity
+    with SContext
+    with TraitActivity[SActivity]
+    with Destroyable
+    with Creatable
+    with Registerable {
 
   override def basis = this
   override implicit val ctx = this
@@ -212,9 +219,14 @@ trait SActivity extends Activity with SContext with TraitActivity[SActivity] wit
 }
 
 /**
- * Enriched trait of the class android.app.Service. To enable Scaloid support for subclasses of android.app.Service, extend this trait.
- */
-trait SService extends Service with SContext with Destroyable with Creatable with Registerable {
+  * Enriched trait of the class android.app.Service. To enable Scaloid support for subclasses of android.app.Service, extend this trait.
+  */
+trait SService
+    extends Service
+    with SContext
+    with Destroyable
+    with Creatable
+    with Registerable {
   override def basis = this
   override implicit val ctx = this
 
@@ -233,12 +245,12 @@ trait SService extends Service with SContext with Destroyable with Creatable wit
 }
 
 /**
- * An in-process service that can be bound with [[LocalServiceConnection]]. This yields far more concise code than that uses plain-old Android API.
- *
- * Please refer to the URL below for more details.
- *
- * [[http://blog.scaloid.org/2013/03/introducing-localservice.html]]
- */
+  * An in-process service that can be bound with [[LocalServiceConnection]]. This yields far more concise code than that uses plain-old Android API.
+  *
+  * Please refer to the URL below for more details.
+  *
+  * [[http://blog.scaloid.org/2013/03/introducing-localservice.html]]
+  */
 trait LocalService extends SService {
   private val binder = new ScaloidServiceBinder
 
@@ -251,55 +263,70 @@ trait LocalService extends SService {
 }
 
 /**
- * A Scala-style builder for AlertDialog.
- * {{{
- *  new AlertDialogBuilder("Exit the app", "Do you really want to exit?") {
- *    positiveButton("Exit", finishTheApplication())
- *    negativeButton("Cancel")
- *  }.show()
- * }}}
- * This displays an alert dialog with given string resources.
- *
- * Although this builder displays some UI element, this builder can be called from any thread, because the method `show()` handles threading internally.
- *
- * Please refer to the URL below for more details.
- *
- * [[https://github.com/pocorall/scaloid/wiki/Basics#class-alertdialogbuilder]]
- *
- * See also: `alert()`
- */
-class AlertDialogBuilder(_title: CharSequence = null, _message: CharSequence = null)(implicit context: Context) extends AlertDialog.Builder(context) {
+  * A Scala-style builder for AlertDialog.
+  * {{{
+  *  new AlertDialogBuilder("Exit the app", "Do you really want to exit?") {
+  *    positiveButton("Exit", finishTheApplication())
+  *    negativeButton("Cancel")
+  *  }.show()
+  * }}}
+  * This displays an alert dialog with given string resources.
+  *
+  * Although this builder displays some UI element, this builder can be called from any thread, because the method `show()` handles threading internally.
+  *
+  * Please refer to the URL below for more details.
+  *
+  * [[https://github.com/pocorall/scaloid/wiki/Basics#class-alertdialogbuilder]]
+  *
+  * See also: `alert()`
+  */
+class AlertDialogBuilder(
+    _title: CharSequence = null,
+    _message: CharSequence = null)(implicit context: Context)
+    extends AlertDialog.Builder(context) {
   if (_title != null) setTitle(_title)
   if (_message != null) setMessage(_message)
 
-  @inline def positiveButton(name: CharSequence = android.R.string.yes, onClick: => Unit = {}): AlertDialogBuilder =
+  @inline def positiveButton(
+      name: CharSequence = android.R.string.yes,
+      onClick: => Unit = {}): AlertDialogBuilder =
     positiveButton(name, (_, _) => {
       onClick
     })
 
-  @inline def positiveButton(name: CharSequence, onClick: (DialogInterface, Int) => Unit): AlertDialogBuilder = {
+  @inline def positiveButton(
+      name: CharSequence,
+      onClick: (DialogInterface, Int) => Unit): AlertDialogBuilder = {
     setPositiveButton(name, func2DialogOnClickListener(onClick))
     this
   }
 
-  @inline def neutralButton(name: CharSequence = android.R.string.ok, onClick: => Unit = {}): AlertDialogBuilder =
+  @inline def neutralButton(
+      name: CharSequence = android.R.string.ok,
+      onClick: => Unit = {}): AlertDialogBuilder =
     neutralButton(name, (_, _) => {
       onClick
     })
 
-  @inline def neutralButton(name: CharSequence, onClick: (DialogInterface, Int) => Unit): AlertDialogBuilder = {
+  @inline def neutralButton(
+      name: CharSequence,
+      onClick: (DialogInterface, Int) => Unit): AlertDialogBuilder = {
     setNeutralButton(name, func2DialogOnClickListener(onClick))
     this
   }
 
-  @inline def negativeButton(name: CharSequence, onClick: => Unit): AlertDialogBuilder =
+  @inline def negativeButton(
+      name: CharSequence,
+      onClick: => Unit): AlertDialogBuilder =
     negativeButton(name, (_, _) => {
       onClick
     })
 
-  @inline def negativeButton(name: CharSequence = android.R.string.no, onClick: (DialogInterface, Int) => Unit = (d, _) => {
-    d.cancel()
-  }): AlertDialogBuilder = {
+  @inline def negativeButton(
+      name: CharSequence = android.R.string.no,
+      onClick: (DialogInterface, Int) => Unit = (d, _) => {
+        d.cancel()
+      }): AlertDialogBuilder = {
     setNegativeButton(name, func2DialogOnClickListener(onClick))
     this
   }
@@ -323,23 +350,24 @@ class AlertDialogBuilder(_title: CharSequence = null, _message: CharSequence = n
   @inline def message = msg
 
   /**
-   * Shows the dialog that is currently building.
-   * Because this method runs runOnUiThread internally, you can call this method from any thread.
-   * This method blocks until the dialog has been built in the UI thread.
-   */
-  override def show(): AlertDialog = Await.result(evalOnUiThread(super.show()), Duration.Inf)
+    * Shows the dialog that is currently building.
+    * Because this method runs runOnUiThread internally, you can call this method from any thread.
+    * This method blocks until the dialog has been built in the UI thread.
+    */
+  override def show(): AlertDialog =
+    Await.result(evalOnUiThread(super.show()), Duration.Inf)
 }
 
 /**
- * Scaloid wrapper of android.graphics.drawable.StateListDrawable.
- * You can write StateListDrawable simply, for example:
- * {{{
- * new SStateListDrawable {
- *   +=(R.drawable.pressed, PRESSED)
- *   +=(R.drawable.normal)
- * }
- * }}}
- */
+  * Scaloid wrapper of android.graphics.drawable.StateListDrawable.
+  * You can write StateListDrawable simply, for example:
+  * {{{
+  * new SStateListDrawable {
+  *   +=(R.drawable.pressed, PRESSED)
+  *   +=(R.drawable.normal)
+  * }
+  * }}}
+  */
 class SStateListDrawable extends StateListDrawable {
   val ABOVE_ANCHOR = android.R.attr.state_above_anchor
   val ACTIVE = android.R.attr.state_active

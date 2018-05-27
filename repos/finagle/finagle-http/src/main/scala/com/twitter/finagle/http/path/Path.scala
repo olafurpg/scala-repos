@@ -116,7 +116,7 @@ case object Root extends Path {
 object /: {
   def unapply(path: Path): Option[(String, Path)] = {
     path.toList match {
-      case Nil => None
+      case Nil          => None
       case head :: tail => Some((head, Path(tail)))
     }
   }

@@ -11,8 +11,10 @@ import org.ensime.util.file._
   * Verifies common operations work correctly for unsaved files.
   */
 class UnsavedFileTest
-    extends EnsimeSpec with IsolatedEnsimeConfigFixture
-    with IsolatedTestKitFixture with IsolatedProjectFixture {
+    extends EnsimeSpec
+    with IsolatedEnsimeConfigFixture
+    with IsolatedTestKitFixture
+    with IsolatedProjectFixture {
 
   val original = EnsimeConfigFixture.TimingTestProject
 
@@ -28,23 +30,24 @@ class UnsavedFileTest
           assert(!missing.exists)
 
           val inMemory = SourceFileInfo(
-              missing,
-              Some("class Foo { def main = { System.out.println(1) } }"),
-              None
+            missing,
+            Some("class Foo { def main = { System.out.println(1) } }"),
+            None
           )
 
           project ! TypecheckFileReq(inMemory)
           expectMsg(VoidResponse)
           asyncHelper.expectMsg(FullTypeCheckCompleteEvent)
 
-          project ! SymbolDesignationsReq(Right(inMemory),
-                                          0,
-                                          50,
-                                          SourceSymbol.allSymbols)
+          project ! SymbolDesignationsReq(
+            Right(inMemory),
+            0,
+            50,
+            SourceSymbol.allSymbols)
           expectMsgPF() {
-            case SymbolDesignations(inMemory.file,
-                                    syms: List[SymbolDesignation])
-                if syms.nonEmpty =>
+            case SymbolDesignations(
+                inMemory.file,
+                syms: List[SymbolDesignation]) if syms.nonEmpty =>
           }
 
           project ! CompletionsReq(inMemory, 27, 0, false, false)
@@ -72,10 +75,11 @@ class UnsavedFileTest
           project ! TypecheckFileReq(unsaved)
           expectMsgPF() { case EnsimeServerError(e) => }
 
-          project ! SymbolDesignationsReq(Right(unsaved),
-                                          0,
-                                          0,
-                                          SourceSymbol.allSymbols)
+          project ! SymbolDesignationsReq(
+            Right(unsaved),
+            0,
+            0,
+            SourceSymbol.allSymbols)
           expectMsgPF() { case EnsimeServerError(e) => }
 
           project ! CompletionsReq(unsaved, 0, 0, false, false)

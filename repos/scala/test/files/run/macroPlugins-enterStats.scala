@@ -24,12 +24,13 @@ object Test extends DirectTest {
     def deriveStat(pluginName: String, typer: Typer, stat: Tree): List[Tree] =
       stat match {
         case DefDef(mods, name, Nil, Nil, TypeTree(), body) =>
-          val derived = DefDef(NoMods,
-                               TermName(name + pluginName),
-                               Nil,
-                               Nil,
-                               TypeTree(),
-                               Ident(TermName("$qmark$qmark$qmark")))
+          val derived = DefDef(
+            NoMods,
+            TermName(name + pluginName),
+            Nil,
+            Nil,
+            TypeTree(),
+            Ident(TermName("$qmark$qmark$qmark")))
           newNamer(typer.context).enterSym(derived)
           List(derived)
         case _ =>
@@ -38,14 +39,16 @@ object Test extends DirectTest {
 
     object macroPlugin1 extends MacroPlugin {
       override def pluginsEnterStats(
-          typer: Typer, stats: List[Tree]): List[Tree] = {
+          typer: Typer,
+          stats: List[Tree]): List[Tree] = {
         stats.foreach(stat => logEnterStat("macroPlugin1", stat))
         stats.flatMap(stat => stat +: deriveStat("macroPlugin1", typer, stat))
       }
     }
     object macroPlugin2 extends MacroPlugin {
       override def pluginsEnterStats(
-          typer: Typer, stats: List[Tree]): List[Tree] = {
+          typer: Typer,
+          stats: List[Tree]): List[Tree] = {
         stats.foreach(stat => logEnterStat("macroPlugin2", stat))
         stats.flatMap(stat => stat +: deriveStat("macroPlugin2", typer, stat))
       }

@@ -79,8 +79,7 @@ object TextFieldListCell {
   /**
     * Added to satisfy Spec Texts.
     */
-  @deprecated(
-      message = "Use forListView[T](StringConverter[T])", since = "1.0")
+  @deprecated(message = "Use forListView[T](StringConverter[T])", since = "1.0")
   def forListView[T](converter: jfxu.StringConverter[T]) =
     jfxscc.TextFieldListCell.forListView[T](converter)
 }
@@ -95,8 +94,8 @@ object TextFieldListCell {
   * @define TFLC `TextFieldListCell`
   */
 class TextFieldListCell[T](
-    override val delegate: jfxscc.TextFieldListCell[T] = new jfxscc.TextFieldListCell[
-          T])
+    override val delegate: jfxscc.TextFieldListCell[T] =
+      new jfxscc.TextFieldListCell[T])
     extends ListCell[T](delegate)
     with ConvertableCell[jfxscc.TextFieldListCell[T], T, T]
     with UpdatableCell[jfxscc.TextFieldListCell[T], T]

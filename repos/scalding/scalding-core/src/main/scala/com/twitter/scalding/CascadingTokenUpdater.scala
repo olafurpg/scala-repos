@@ -49,7 +49,8 @@ object CascadingTokenUpdater {
   // assign each of the class names given to al the subsequent
   // positions
   private def assignTokens(
-      first: Int, names: Iterable[String]): Map[Int, String] =
+      first: Int,
+      names: Iterable[String]): Map[Int, String] =
     names
       .foldLeft((first, Map[Int, String]())) { (idMap, clz) =>
         val (id, m) = idMap
@@ -63,7 +64,7 @@ object CascadingTokenUpdater {
     val newClasses: Iterable[String] = clazzes.map { _.getName } -- toks.values
 
     config +
-    (Config.CascadingSerializationTokens -> toksToString(
-            toks ++ assignTokens(firstAvailableToken(toks), newClasses)))
+      (Config.CascadingSerializationTokens -> toksToString(
+        toks ++ assignTokens(firstAvailableToken(toks), newClasses)))
   }
 }

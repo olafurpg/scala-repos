@@ -26,52 +26,52 @@ class HtmlFactory(val universe: doc.Universe, val reporter: ScalaDocReporter) {
   def siteRoot: JFile = new JFile(universe.settings.outdir.value)
 
   def libResources = List(
-      "class.svg",
-      "object.svg",
-      "trait.svg",
-      "package.svg",
-      "class_comp.svg",
-      "object_comp.svg",
-      "trait_comp.svg",
-      "abstract_type.svg",
-      "lato-v11-latin-100.eot",
-      "lato-v11-latin-100.ttf",
-      "lato-v11-latin-100.woff",
-      "lato-v11-latin-regular.eot",
-      "lato-v11-latin-regular.ttf",
-      "lato-v11-latin-regular.woff",
-      "open-sans-v13-latin-regular.eot",
-      "open-sans-v13-latin-regular.ttf",
-      "open-sans-v13-latin-regular.woff",
-      "source-code-pro-v6-latin-700.eot",
-      "source-code-pro-v6-latin-700.ttf",
-      "source-code-pro-v6-latin-700.woff",
-      "source-code-pro-v6-latin-regular.eot",
-      "source-code-pro-v6-latin-regular.ttf",
-      "source-code-pro-v6-latin-regular.woff",
-      "MaterialIcons-Regular.eot",
-      "MaterialIcons-Regular.ttf",
-      "MaterialIcons-Regular.woff",
-      "index.js",
-      "jquery.js",
-      "jquery.mousewheel.min.js",
-      "jquery.panzoom.min.js",
-      "scheduler.js",
-      "diagrams.js",
-      "template.js",
-      "tools.tooltip.js",
-      "modernizr.custom.js",
-      "index.css",
-      "ref-index.css",
-      "template.css",
-      "diagrams.css",
-      "class_diagram.png",
-      "object_diagram.png",
-      "trait_diagram.png",
-      "type_diagram.png",
-      "ownderbg2.gif",
-      "ownerbg.gif",
-      "ownerbg2.gif"
+    "class.svg",
+    "object.svg",
+    "trait.svg",
+    "package.svg",
+    "class_comp.svg",
+    "object_comp.svg",
+    "trait_comp.svg",
+    "abstract_type.svg",
+    "lato-v11-latin-100.eot",
+    "lato-v11-latin-100.ttf",
+    "lato-v11-latin-100.woff",
+    "lato-v11-latin-regular.eot",
+    "lato-v11-latin-regular.ttf",
+    "lato-v11-latin-regular.woff",
+    "open-sans-v13-latin-regular.eot",
+    "open-sans-v13-latin-regular.ttf",
+    "open-sans-v13-latin-regular.woff",
+    "source-code-pro-v6-latin-700.eot",
+    "source-code-pro-v6-latin-700.ttf",
+    "source-code-pro-v6-latin-700.woff",
+    "source-code-pro-v6-latin-regular.eot",
+    "source-code-pro-v6-latin-regular.ttf",
+    "source-code-pro-v6-latin-regular.woff",
+    "MaterialIcons-Regular.eot",
+    "MaterialIcons-Regular.ttf",
+    "MaterialIcons-Regular.woff",
+    "index.js",
+    "jquery.js",
+    "jquery.mousewheel.min.js",
+    "jquery.panzoom.min.js",
+    "scheduler.js",
+    "diagrams.js",
+    "template.js",
+    "tools.tooltip.js",
+    "modernizr.custom.js",
+    "index.css",
+    "ref-index.css",
+    "template.css",
+    "diagrams.css",
+    "class_diagram.png",
+    "object_diagram.png",
+    "trait_diagram.png",
+    "type_diagram.png",
+    "ownderbg2.gif",
+    "ownerbg.gif",
+    "ownerbg2.gif"
   )
 
   /** Generates the Scaladoc site for a model into the site root.
@@ -89,7 +89,8 @@ class HtmlFactory(val universe: doc.Universe, val reporter: ScalaDocReporter) {
       val dest = Directory(siteRoot) / subPath
       dest.parent.createDirectory()
       val out = dest.toFile.bufferedOutput()
-      try out.write(bytes, 0, bytes.length) finally out.close()
+      try out.write(bytes, 0, bytes.length)
+      finally out.close()
     }
 
     libResources foreach (s => copyResource("lib/" + s))
@@ -109,10 +110,9 @@ class HtmlFactory(val universe: doc.Universe, val reporter: ScalaDocReporter) {
 
     def writeTemplate(tpl: DocTemplateEntity) {
       if (!(written contains tpl)) {
-        val diagramGenerator: DiagramGenerator = new DotDiagramGenerator(
-            universe.settings, universe.dotRunner)
-        writeForThis(
-            page.EntityPage(universe, diagramGenerator, tpl, reporter))
+        val diagramGenerator: DiagramGenerator =
+          new DotDiagramGenerator(universe.settings, universe.dotRunner)
+        writeForThis(page.EntityPage(universe, diagramGenerator, tpl, reporter))
         written += tpl
         tpl.templates collect { case d: DocTemplateEntity => d } map writeTemplate
       }

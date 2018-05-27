@@ -30,8 +30,8 @@ trait FamilyFormats {
     }
 
   abstract class TraitFormat[T] extends SexpFormat[T] {
-    protected def wrap[E](t: E)(
-        implicit th: TypeHint[E], sf: SexpFormat[E]): Sexp = {
+    protected def wrap[E](
+        t: E)(implicit th: TypeHint[E], sf: SexpFormat[E]): Sexp = {
       val contents = t.toSexp
       // special cases: empty case clases, and case objects (hopefully)
       if (contents == SexpNil) SexpList(th.hint)

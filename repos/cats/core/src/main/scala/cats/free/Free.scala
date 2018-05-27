@@ -84,8 +84,8 @@ sealed abstract class Free[S[_], A] extends Product with Serializable {
   @tailrec
   final def step: Free[S, A] = this match {
     case Gosub(Gosub(c, f), g) => c.flatMap(cc => f(cc).flatMap(g)).step
-    case Gosub(Pure(a), f) => f(a).step
-    case x => x
+    case Gosub(Pure(a), f)     => f(a).step
+    case x                     => x
   }
 
   /**
@@ -93,12 +93,12 @@ sealed abstract class Free[S[_], A] extends Product with Serializable {
     */
   @tailrec
   final def resume(implicit S: Functor[S]): S[Free[S, A]] Xor A = this match {
-    case Pure(a) => Right(a)
+    case Pure(a)    => Right(a)
     case Suspend(t) => Left(S.map(t)(Pure(_)))
     case Gosub(c, f) =>
       c match {
-        case Pure(a) => f(a).resume
-        case Suspend(t) => Left(S.map(t)(f))
+        case Pure(a)     => f(a).resume
+        case Suspend(t)  => Left(S.map(t)(f))
         case Gosub(d, g) => d.flatMap(dd => g(dd).flatMap(f)).resume
       }
   }
@@ -110,7 +110,7 @@ sealed abstract class Free[S[_], A] extends Product with Serializable {
   final def go(f: S[Free[S, A]] => Free[S, A])(implicit S: Functor[S]): A = {
     @tailrec def loop(t: Free[S, A]): A =
       t.resume match {
-        case Left(s) => loop(f(s))
+        case Left(s)  => loop(f(s))
         case Right(r) => r
       }
     loop(this)
@@ -123,9 +123,10 @@ sealed abstract class Free[S[_], A] extends Product with Serializable {
     * from `S` to a monad `M`.
     */
   final def runM[M[_]](f: S[Free[S, A]] => M[Free[S, A]])(
-      implicit S: Functor[S], M: Monad[M]): M[A] = {
+      implicit S: Functor[S],
+      M: Monad[M]): M[A] = {
     def runM2(t: Free[S, A]): M[A] = t.resume match {
-      case Left(s) => Monad[M].flatMap(f(s))(runM2)
+      case Left(s)  => Monad[M].flatMap(f(s))(runM2)
       case Right(r) => Monad[M].pure(r)
     }
     runM2(this)
@@ -139,8 +140,8 @@ sealed abstract class Free[S[_], A] extends Product with Serializable {
     */
   final def foldMap[M[_]](f: S ~> M)(implicit M: Monad[M]): M[A] =
     step match {
-      case Pure(a) => M.pure(a)
-      case Suspend(s) => f(s)
+      case Pure(a)     => M.pure(a)
+      case Suspend(s)  => f(s)
       case Gosub(c, g) => M.flatMap(c.foldMap(f))(cc => g(cc).foldMap(f))
     }
 

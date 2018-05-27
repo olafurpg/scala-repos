@@ -12,9 +12,10 @@ import sbt.inc.{Analysis, AnalysisStore, IncOptions, Locate}
 /**
   * @author Pavel Fatin
   */
-class SbtCompiler(javac: JavaCompiler,
-                  scalac: Option[AnalyzingCompiler],
-                  fileToStore: File => AnalysisStore)
+class SbtCompiler(
+    javac: JavaCompiler,
+    scalac: Option[AnalyzingCompiler],
+    fileToStore: File => AnalysisStore)
     extends AbstractCompiler {
   def compile(compilationData: CompilationData, client: Client) {
 
@@ -49,7 +50,7 @@ class SbtCompiler(javac: JavaCompiler,
           .get()
           .map(_._1)
           .getOrElse(Analysis.Empty)
-          (output, analysis)
+        (output, analysis)
     }
 
     val incOptions = compilationData.sbtIncOptions match {
@@ -64,23 +65,23 @@ class SbtCompiler(javac: JavaCompiler,
 
     try {
       val Result(analysis, setup, hasModified) = IC.incrementalCompile(
-          scalac.orNull,
-          javac,
-          compilationData.sources,
-          compilationData.classpath,
-          compileOutput,
-          CompilerCache.fresh,
-          Some(progress),
-          compilationData.scalaOptions,
-          compilationData.javaOptions,
-          previousAnalysis,
-          previousSetup,
-          outputToAnalysisMap.get,
-          Locate.definesClass,
-          reporter,
-          order,
-          skip = false,
-          incOptions
+        scalac.orNull,
+        javac,
+        compilationData.sources,
+        compilationData.classpath,
+        compileOutput,
+        CompilerCache.fresh,
+        Some(progress),
+        compilationData.scalaOptions,
+        compilationData.javaOptions,
+        previousAnalysis,
+        previousSetup,
+        outputToAnalysisMap.get,
+        Locate.definesClass,
+        reporter,
+        order,
+        skip = false,
+        incOptions
       )(logger)
 
       analysisStore.set(analysis, setup)

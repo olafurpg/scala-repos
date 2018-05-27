@@ -7,9 +7,10 @@ import lila.game.{Game, GameRepo}
 import lila.hub.actorApi.map.Tell
 import lila.hub.actorApi.round.AnalysisAvailable
 
-final class Analyser(indexer: ActorSelection,
-                     roundSocket: ActorSelection,
-                     bus: lila.common.Bus) {
+final class Analyser(
+    indexer: ActorSelection,
+    roundSocket: ActorSelection,
+    bus: lila.common.Bus) {
 
   def get(id: String): Fu[Option[Analysis]] = AnalysisRepo byId id
 

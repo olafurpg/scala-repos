@@ -42,24 +42,27 @@ object BuildSummer {
   def apply(storm: Storm, dag: Dag[Storm], node: StormNode, jobID: JobId) = {
     val opSummerConstructor = storm.get[SummerConstructor](dag, node).map(_._2)
     logger.debug(
-        s"Node (${dag.getNodeName(node)}): Queried for SummerConstructor, got $opSummerConstructor")
+      s"Node (${dag.getNodeName(node)}): Queried for SummerConstructor, got $opSummerConstructor")
 
     opSummerConstructor match {
       case Some(cons) =>
         logger.debug(
-            s"Node (${dag.getNodeName(node)}): Using user supplied SummerConstructor: $cons")
+          s"Node (${dag.getNodeName(node)}): Using user supplied SummerConstructor: $cons")
         cons.get
       case None => legacyBuilder(storm, dag, node, jobID)
     }
   }
 
   private[this] final def legacyBuilder(
-      storm: Storm, dag: Dag[Storm], node: StormNode, jobID: JobId) = {
+      storm: Storm,
+      dag: Dag[Storm],
+      node: StormNode,
+      jobID: JobId) = {
     val nodeName = dag.getNodeName(node)
     val cacheSize = storm.getOrElse(dag, node, DEFAULT_FM_CACHE)
     require(
-        jobID.get != null,
-        "Unable to register metrics with no job id present in the config updater")
+      jobID.get != null,
+      "Unable to register metrics with no job id present in the config updater")
     logger.info(s"[$nodeName] cacheSize lowerbound: ${cacheSize.lowerBound}")
 
     val memoryCounter = counter(jobID, Group(nodeName), Name("memory"))
@@ -72,11 +75,11 @@ object BuildSummer {
 
     if (cacheSize.lowerBound == 0) {
       new SummerBuilder {
-        def getSummer[
-            K, V : Semigroup]: com.twitter.algebird.util.summer.AsyncSummer[
-            (K, V), Map[K, V]] = {
+        def getSummer[K, V: Semigroup]
+          : com.twitter.algebird.util.summer.AsyncSummer[(K, V), Map[K, V]] = {
           new com.twitter.algebird.util.summer.NullSummer[K, V](
-              tupleInCounter, tupleOutCounter)
+            tupleInCounter,
+            tupleOutCounter)
         }
       }
     } else {
@@ -92,18 +95,19 @@ object BuildSummer {
 
       if (!useAsyncCache.get) {
         new SummerBuilder {
-          def getSummer[
-              K, V : Semigroup]: com.twitter.algebird.util.summer.AsyncSummer[
-              (K, V), Map[K, V]] = {
-            new SyncSummingQueue[K, V](BufferSize(cacheSize.lowerBound),
-                                       FlushFrequency(flushFrequency.get),
-                                       MemoryFlushPercent(softMemoryFlush.get),
-                                       memoryCounter,
-                                       timeoutCounter,
-                                       sizeCounter,
-                                       insertCounter,
-                                       tupleInCounter,
-                                       tupleOutCounter)
+          def getSummer[K, V: Semigroup]
+            : com.twitter.algebird.util.summer.AsyncSummer[(K, V), Map[K, V]] = {
+            new SyncSummingQueue[K, V](
+              BufferSize(cacheSize.lowerBound),
+              FlushFrequency(flushFrequency.get),
+              MemoryFlushPercent(softMemoryFlush.get),
+              memoryCounter,
+              timeoutCounter,
+              sizeCounter,
+              insertCounter,
+              tupleInCounter,
+              tupleOutCounter
+            )
           }
         }
       } else {
@@ -113,35 +117,33 @@ object BuildSummer {
         val valueCombinerCrushSize =
           storm.getOrElse(dag, node, DEFAULT_VALUE_COMBINER_CACHE_SIZE)
         logger.info(
-            s"[$nodeName] valueCombinerCrushSize : ${valueCombinerCrushSize.get}")
+          s"[$nodeName] valueCombinerCrushSize : ${valueCombinerCrushSize.get}")
 
         new SummerBuilder {
-          def getSummer[
-              K, V : Semigroup]: com.twitter.algebird.util.summer.AsyncSummer[
-              (K, V), Map[K, V]] = {
+          def getSummer[K, V: Semigroup]
+            : com.twitter.algebird.util.summer.AsyncSummer[(K, V), Map[K, V]] = {
             val executor = Executors.newFixedThreadPool(asyncPoolSize.get)
             val futurePool = FuturePool(executor)
             val summer = new AsyncListSum[K, V](
-                BufferSize(cacheSize.lowerBound),
-                FlushFrequency(flushFrequency.get),
-                MemoryFlushPercent(softMemoryFlush.get),
-                memoryCounter,
-                timeoutCounter,
-                insertCounter,
-                insertFailCounter,
-                sizeCounter,
-                tupleInCounter,
-                tupleOutCounter,
-                futurePool,
-                Compact(false),
-                CompactionSize(0))
-            summer.withCleanup(
-                () =>
-                  {
-                Future {
-                  executor.shutdown
-                  executor.awaitTermination(10, TimeUnit.SECONDS)
-                }
+              BufferSize(cacheSize.lowerBound),
+              FlushFrequency(flushFrequency.get),
+              MemoryFlushPercent(softMemoryFlush.get),
+              memoryCounter,
+              timeoutCounter,
+              insertCounter,
+              insertFailCounter,
+              sizeCounter,
+              tupleInCounter,
+              tupleOutCounter,
+              futurePool,
+              Compact(false),
+              CompactionSize(0)
+            )
+            summer.withCleanup(() => {
+              Future {
+                executor.shutdown
+                executor.awaitTermination(10, TimeUnit.SECONDS)
+              }
             })
           }
         }

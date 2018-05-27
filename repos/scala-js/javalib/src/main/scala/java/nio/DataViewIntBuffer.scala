@@ -83,12 +83,18 @@ private[nio] final class DataViewIntBuffer private (
 
   @inline
   override private[nio] def load(
-      startIndex: Int, dst: Array[Int], offset: Int, length: Int): Unit =
+      startIndex: Int,
+      dst: Array[Int],
+      offset: Int,
+      length: Int): Unit =
     GenBuffer(this).generic_load(startIndex, dst, offset, length)
 
   @inline
   override private[nio] def store(
-      startIndex: Int, src: Array[Int], offset: Int, length: Int): Unit =
+      startIndex: Int,
+      src: Array[Int],
+      offset: Int,
+      length: Int): Unit =
     GenBuffer(this).generic_store(startIndex, src, offset, length)
 }
 
@@ -97,13 +103,18 @@ private[nio] object DataViewIntBuffer {
       extends GenDataViewBuffer.NewDataViewBuffer[IntBuffer] {
     def bytesPerElem: Int = 4
 
-    def apply(dataView: DataView,
-              initialPosition: Int,
-              initialLimit: Int,
-              readOnly: Boolean,
-              isBigEndian: Boolean): IntBuffer = {
+    def apply(
+        dataView: DataView,
+        initialPosition: Int,
+        initialLimit: Int,
+        readOnly: Boolean,
+        isBigEndian: Boolean): IntBuffer = {
       new DataViewIntBuffer(
-          dataView, initialPosition, initialLimit, readOnly, isBigEndian)
+        dataView,
+        initialPosition,
+        initialLimit,
+        readOnly,
+        isBigEndian)
     }
   }
 

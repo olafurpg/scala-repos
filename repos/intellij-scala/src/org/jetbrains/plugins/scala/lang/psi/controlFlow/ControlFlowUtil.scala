@@ -20,8 +20,9 @@ object ControlFlowUtil {
     var buffer = new ArrayBuffer[collection.Set[Instruction]]
 
     @tailrec
-    def inner(next: Iterable[Instruction],
-              currentSet: mutable.HashSet[Instruction]): Unit = {
+    def inner(
+        next: Iterable[Instruction],
+        currentSet: mutable.HashSet[Instruction]): Unit = {
       if (next.isEmpty) {
         buffer += currentSet
         mainSeq --= currentSet
@@ -38,7 +39,7 @@ object ControlFlowUtil {
     while (mainSeq.nonEmpty) {
       mainSeq.headOption match {
         case Some(h) => inner(Seq(h), new mutable.HashSet[Instruction])
-        case None =>
+        case None    =>
       }
     }
     buffer

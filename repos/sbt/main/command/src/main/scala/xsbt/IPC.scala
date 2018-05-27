@@ -3,7 +3,14 @@
  */
 package xsbt
 
-import java.io.{BufferedReader, BufferedWriter, InputStream, InputStreamReader, OutputStreamWriter, OutputStream}
+import java.io.{
+  BufferedReader,
+  BufferedWriter,
+  InputStream,
+  InputStreamReader,
+  OutputStreamWriter,
+  OutputStream
+}
 import java.net.{InetAddress, ServerSocket, Socket}
 
 object IPC {
@@ -37,7 +44,7 @@ object IPC {
     def listen(): T = {
       ipc(server.accept())(f) match {
         case Some(done) => done
-        case None => listen()
+        case None       => listen()
       }
     }
 
@@ -46,7 +53,7 @@ object IPC {
   private def ipc[T](s: Socket)(f: IPC => T): T =
     try { f(new IPC(s)) } finally { s.close() }
 
-  final class Server private[IPC](s: ServerSocket) extends NotNull {
+  final class Server private[IPC] (s: ServerSocket) extends NotNull {
     def port = s.getLocalPort
     def close() = s.close()
     def isClosed: Boolean = s.isClosed
@@ -57,7 +64,7 @@ final class IPC private (s: Socket) extends NotNull {
   def port = s.getLocalPort
   private val in = new BufferedReader(new InputStreamReader(s.getInputStream))
   private val out = new BufferedWriter(
-      new OutputStreamWriter(s.getOutputStream))
+    new OutputStreamWriter(s.getOutputStream))
 
   def send(s: String) = { out.write(s); out.newLine(); out.flush() }
   def receive: String = in.readLine()

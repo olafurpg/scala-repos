@@ -20,14 +20,17 @@ import org.jetbrains.plugins.scala.components.StopWorksheetAction
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 import org.jetbrains.plugins.scala.worksheet.interactive.WorksheetAutoRunner
 import org.jetbrains.plugins.scala.worksheet.runconfiguration.WorksheetViewerInfo
-import org.jetbrains.plugins.scala.worksheet.ui.{WorksheetEditorPrinter, WorksheetFoldGroup, WorksheetUiConstructor}
+import org.jetbrains.plugins.scala.worksheet.ui.{
+  WorksheetEditorPrinter,
+  WorksheetFoldGroup,
+  WorksheetUiConstructor
+}
 
 /**
   * User: Dmitry Naydanov
   * Date: 1/24/14
   */
-class WorksheetFileHook(private val project: Project)
-    extends ProjectComponent {
+class WorksheetFileHook(private val project: Project) extends ProjectComponent {
   private var statusDisplay: Option[InteractiveStatusDisplay] = None
 
   override def disposeComponent() {}
@@ -45,44 +48,50 @@ class WorksheetFileHook(private val project: Project)
   override def projectOpened() {
     project.getMessageBus
       .connect(project)
-      .subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER,
-                 WorksheetEditorListener)
+      .subscribe(
+        FileEditorManagerListener.FILE_EDITOR_MANAGER,
+        WorksheetEditorListener)
     project.getMessageBus
       .connect(project)
-      .subscribe(DumbService.DUMB_MODE, new DumbModeListener {
-        override def enteredDumbMode() {}
+      .subscribe(
+        DumbService.DUMB_MODE,
+        new DumbModeListener {
+          override def enteredDumbMode() {}
 
-        override def exitDumbMode() {
-          val editor =
-            FileEditorManager.getInstance(project).getSelectedTextEditor
-          if (editor == null) return
+          override def exitDumbMode() {
+            val editor =
+              FileEditorManager.getInstance(project).getSelectedTextEditor
+            if (editor == null) return
 
-          val file =
-            PsiDocumentManager.getInstance(project) getPsiFile editor.getDocument
-          if (file == null) return
+            val file =
+              PsiDocumentManager
+                .getInstance(project) getPsiFile editor.getDocument
+            if (file == null) return
 
-          val vFile = file.getVirtualFile
-          if (vFile == null) return
+            val vFile = file.getVirtualFile
+            if (vFile == null) return
 
-          WorksheetFileHook getPanel vFile foreach {
-            case ref =>
-              val panel = ref.get()
-              if (panel != null) {
-                panel.getComponents.foreach {
-                  case ab: ActionButton => ab.addNotify()
-                  case _ =>
+            WorksheetFileHook getPanel vFile foreach {
+              case ref =>
+                val panel = ref.get()
+                if (panel != null) {
+                  panel.getComponents.foreach {
+                    case ab: ActionButton => ab.addNotify()
+                    case _                =>
+                  }
                 }
-              }
+            }
           }
         }
-      })
+      )
   }
 
   override def getComponentName: String = "Clean worksheet on editor close"
 
-  def initTopComponent(file: VirtualFile,
-                       run: Boolean,
-                       exec: Option[CompilationProcess] = None) {
+  def initTopComponent(
+      file: VirtualFile,
+      run: Boolean,
+      exec: Option[CompilationProcess] = None) {
     if (project.isDisposed) return
 
     val myFileEditorManager = FileEditorManager.getInstance(project)
@@ -93,8 +102,7 @@ class WorksheetFileHook(private val project: Project)
         case ref =>
           val p = ref.get()
 
-          ApplicationManager.getApplication.invokeLater(
-              new Runnable {
+          ApplicationManager.getApplication.invokeLater(new Runnable {
             override def run() {
               if (p != null) myFileEditorManager.removeTopComponent(editor, p)
             }
@@ -119,13 +127,15 @@ class WorksheetFileHook(private val project: Project)
 
   def enableRun(file: VirtualFile, hasErrors: Boolean) {
     cleanAndAdd(file, Some(new RunWorksheetAction))
-    statusDisplay.foreach(display =>
-          if (hasErrors) display.onFailedCompiling()
-          else display.onSuccessfulCompiling())
+    statusDisplay.foreach(
+      display =>
+        if (hasErrors) display.onFailedCompiling()
+        else display.onSuccessfulCompiling())
   }
 
   private def cleanAndAdd(
-      file: VirtualFile, action: Option[TopComponentDisplayable]) {
+      file: VirtualFile,
+      action: Option[TopComponentDisplayable]) {
     WorksheetFileHook getPanel file foreach {
       case panelRef =>
         val panel = panelRef.get()
@@ -177,11 +187,13 @@ class WorksheetFileHook(private val project: Project)
       loadEvaluationResult(source, file)
 
       WorksheetAutoRunner.getInstance(source.getProject) addListener doc(
-          source, file)
+        source,
+        file)
     }
 
     private def loadEvaluationResult(
-        source: FileEditorManager, file: VirtualFile) {
+        source: FileEditorManager,
+        file: VirtualFile) {
       source getSelectedEditor file match {
         case txt: TextEditor =>
           txt.getEditor match {
@@ -192,10 +204,10 @@ class WorksheetFileHook(private val project: Project)
                     case (result, ratio) if !result.isEmpty =>
                       val viewer =
                         WorksheetEditorPrinter.createRightSideViewer(
-                            ext,
-                            file,
-                            WorksheetEditorPrinter.createWorksheetEditor(ext),
-                            modelSync = true)
+                          ext,
+                          file,
+                          WorksheetEditorPrinter.createWorksheetEditor(ext),
+                          modelSync = true)
                       val document = viewer.getDocument
 
                       val splitter =
@@ -210,7 +222,11 @@ class WorksheetFileHook(private val project: Project)
                         if (splitter != null) {
                           splitter setProportion ratio
                           WorksheetFoldGroup.load(
-                              viewer, ext, project, splitter, scalaFile)
+                            viewer,
+                            ext,
+                            project,
+                            splitter,
+                            scalaFile)
                         }
                       }
                     case _ =>

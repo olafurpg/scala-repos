@@ -43,5 +43,6 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class ChoiceDialogSpec[T]
     extends SimpleSFXDelegateSpec[jfxsc.ChoiceDialog[T], ChoiceDialog[T]](
-        classOf[jfxsc.ChoiceDialog[T]], classOf[ChoiceDialog[T]])
+      classOf[jfxsc.ChoiceDialog[T]],
+      classOf[ChoiceDialog[T]])
     with RunOnApplicationThread

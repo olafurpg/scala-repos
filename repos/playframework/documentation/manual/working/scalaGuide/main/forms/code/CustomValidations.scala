@@ -25,7 +25,7 @@ package scalaguide.forms.scalaforms {
         val errors = plainText match {
           case allNumbers() => Seq(ValidationError("Password is all numbers"))
           case allLetters() => Seq(ValidationError("Password is all letters"))
-          case _ => Nil
+          case _            => Nil
         }
         if (errors.isEmpty) {
           Valid
@@ -46,12 +46,12 @@ package scalaguide.forms.scalaforms {
 
       "return invalid with all letters" in {
         passwordCheckConstraint("abcdef").must(
-            be_==(Invalid(ValidationError("Password is all letters"))))
+          be_==(Invalid(ValidationError("Password is all letters"))))
       }
 
       "return invalid with all numbers" in {
         passwordCheckConstraint("12324").must(
-            be_==(Invalid(ValidationError("Password is all numbers"))))
+          be_==(Invalid(ValidationError("Password is all numbers"))))
       }
 
       "return valid with both letters and numbers" in {

@@ -8,7 +8,7 @@ object Test extends App {
     override def hashCode = value / 5
   }
 
-  def testCorrectness[T : Ordering](n: Int, mkKey: Int => T) {
+  def testCorrectness[T: Ordering](n: Int, mkKey: Int => T) {
     val o = implicitly[Ordering[T]]
     val s = HashMap.empty[T, Unit] ++ (0 until n).map(x => mkKey(x) -> (()))
     for (i <- 0 until n) {
@@ -45,14 +45,14 @@ object Test extends App {
         equalsCount += 1
         that match {
           case HashCounter(value) => this.value == value
-          case _ => false
+          case _                  => false
         }
       }
     }
 
     val s =
-      HashMap.empty[HashCounter, Unit] ++ (0 until 100).map(
-          k => HashCounter(k) -> (()))
+      HashMap.empty[HashCounter, Unit] ++ (0 until 100).map(k =>
+        HashCounter(k) -> (()))
     val hashCount0 = hashCount
     val equalsCount0 = equalsCount
     val t = s.filter(_._1 < HashCounter(50))

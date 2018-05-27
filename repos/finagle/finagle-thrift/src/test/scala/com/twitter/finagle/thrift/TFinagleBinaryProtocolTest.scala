@@ -14,7 +14,9 @@ import scala.util.Random
 
 @RunWith(classOf[JUnitRunner])
 class TFinagleBinaryProtocolTest
-    extends FunSuite with BeforeAndAfter with ShouldMatchers {
+    extends FunSuite
+    with BeforeAndAfter
+    with ShouldMatchers {
 
   private val NullCounter = NullStatsReceiver.counter("")
 
@@ -24,8 +26,7 @@ class TFinagleBinaryProtocolTest
   ) {
     // 4 bytes for the string length
     trans.length() should be(expectedBytes.length + 4)
-    trans.getArray().drop(4).take(expectedBytes.length) should be(
-        expectedBytes)
+    trans.getArray().drop(4).take(expectedBytes.length) should be(expectedBytes)
   }
 
   private def assertSerializedBytes(
@@ -41,8 +42,8 @@ class TFinagleBinaryProtocolTest
     val fastEncodeFailed = stats.counter("fastEncodeFailed")
     val largerThanTlOutBuffer = stats.counter("largerThanTlOutBuffer")
     val trans = new TMemoryBuffer(128)
-    val proto = new TFinagleBinaryProtocol(
-        trans, fastEncodeFailed, largerThanTlOutBuffer)
+    val proto =
+      new TFinagleBinaryProtocol(trans, fastEncodeFailed, largerThanTlOutBuffer)
 
     proto.writeString("abc")
     assertSerializedBytes("abc", trans)
@@ -61,9 +62,10 @@ class TFinagleBinaryProtocolTest
     val trans = new TMemoryBuffer(128)
     val stats = new InMemoryStatsReceiver
     val fastEncodeFailed = stats.counter("fastEncodeFailed")
-    val proto = new TFinagleBinaryProtocol(trans,
-                                           fastEncodeFailed = fastEncodeFailed,
-                                           largerThanTlOutBuffer = NullCounter)
+    val proto = new TFinagleBinaryProtocol(
+      trans,
+      fastEncodeFailed = fastEncodeFailed,
+      largerThanTlOutBuffer = NullCounter)
     proto.writeString(str)
     fastEncodeFailed() should be(1)
     assertSerializedBytes(str, trans)
@@ -97,9 +99,10 @@ class TFinagleBinaryProtocolTest
     val stats = new InMemoryStatsReceiver
     val largerThanTlOutBuffer = stats.counter("largerThanTlOutBuffer")
     val proto =
-      new TFinagleBinaryProtocol(trans,
-                                 fastEncodeFailed = NullCounter,
-                                 largerThanTlOutBuffer = largerThanTlOutBuffer)
+      new TFinagleBinaryProtocol(
+        trans,
+        fastEncodeFailed = NullCounter,
+        largerThanTlOutBuffer = largerThanTlOutBuffer)
     proto.writeString(longStr)
     largerThanTlOutBuffer() should be(1)
     assertSerializedBytes(longStr, trans)

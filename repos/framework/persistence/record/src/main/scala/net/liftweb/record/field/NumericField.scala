@@ -34,11 +34,11 @@ trait NumericTypedField[MyType] extends TypedField[MyType] {
   protected final def setNumericFromAny(in: Any, f: Number => MyType)(
       implicit m: Manifest[MyType]): Box[MyType] =
     in match {
-      case (n: Number) => setBox(Full(f(n)))
-      case Some(n: Number) => setBox(Full(f(n)))
-      case Full(n: Number) => setBox(Full(f(n)))
+      case (n: Number)      => setBox(Full(f(n)))
+      case Some(n: Number)  => setBox(Full(f(n)))
+      case Full(n: Number)  => setBox(Full(f(n)))
       case (n: Number) :: _ => setBox(Full(f(n)))
-      case _ => genericSetFromAny(in)
+      case _                => genericSetFromAny(in)
     }
 
   private def elem = S.fmapFunc((s: List[String]) => setFromAny(s)) {
@@ -52,7 +52,7 @@ trait NumericTypedField[MyType] extends TypedField[MyType] {
   def toForm: Box[NodeSeq] =
     uniqueFieldId match {
       case Full(id) => Full(elem % ("id" -> id))
-      case _ => Full(elem)
+      case _        => Full(elem)
     }
 
   override def noValueErrorMessage = S.?("number.required")

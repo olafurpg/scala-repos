@@ -10,51 +10,59 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScTypeElement
   *  on 8/18/15
   */
 object OccurrenceData {
-  def apply(typeElement: ScTypeElement,
-            usualOccurrence: Array[ScTypeElement],
-            isReplaceAllUsual: Boolean): OccurrenceData = {
-    new OccurrenceData(typeElement,
-                       usualOccurrence,
-                       isReplaceAllUsual,
-                       Array[ScTypeElement](),
-                       false,
-                       Array[ScTypeElement](),
-                       false)
+  def apply(
+      typeElement: ScTypeElement,
+      usualOccurrence: Array[ScTypeElement],
+      isReplaceAllUsual: Boolean): OccurrenceData = {
+    new OccurrenceData(
+      typeElement,
+      usualOccurrence,
+      isReplaceAllUsual,
+      Array[ScTypeElement](),
+      false,
+      Array[ScTypeElement](),
+      false)
   }
 
-  def apply(typeElement: ScTypeElement,
-            isReplaceAllUsual: Boolean,
-            isReplaceOccurrenceIncompanionObject: Boolean,
-            isReplaceOccurrenceInInheritors: Boolean,
-            scopeItem: ScopeItem): OccurrenceData = {
+  def apply(
+      typeElement: ScTypeElement,
+      isReplaceAllUsual: Boolean,
+      isReplaceOccurrenceIncompanionObject: Boolean,
+      isReplaceOccurrenceInInheritors: Boolean,
+      scopeItem: ScopeItem): OccurrenceData = {
     scopeItem match {
       case simpleScope: SimpleScopeItem =>
-        new OccurrenceData(typeElement,
-                           simpleScope.usualOccurrences,
-                           isReplaceAllUsual,
-                           simpleScope.occurrencesInCompanion,
-                           isReplaceOccurrenceIncompanionObject,
-                           simpleScope.occurrencesFromInheretors,
-                           isReplaceOccurrenceInInheritors)
+        new OccurrenceData(
+          typeElement,
+          simpleScope.usualOccurrences,
+          isReplaceAllUsual,
+          simpleScope.occurrencesInCompanion,
+          isReplaceOccurrenceIncompanionObject,
+          simpleScope.occurrencesFromInheretors,
+          isReplaceOccurrenceInInheritors
+        )
       case packageScope: PackageScopeItem =>
-        new OccurrenceData(typeElement,
-                           packageScope.occurrences,
-                           isReplaceAllUsual,
-                           Array[ScTypeElement](),
-                           isReplaceOccurrenceIncompanionObject,
-                           Array[ScTypeElement](),
-                           isReplaceOccurrenceInInheritors)
+        new OccurrenceData(
+          typeElement,
+          packageScope.occurrences,
+          isReplaceAllUsual,
+          Array[ScTypeElement](),
+          isReplaceOccurrenceIncompanionObject,
+          Array[ScTypeElement](),
+          isReplaceOccurrenceInInheritors
+        )
     }
   }
 }
 
-class OccurrenceData(typeElement: ScTypeElement,
-                     usualOccurrence: Array[ScTypeElement],
-                     isReplaceAllUsual: Boolean,
-                     companiomObjOccurrence: Array[ScTypeElement],
-                     isReplaceInCompanion: Boolean,
-                     extendedClassOccurrence: Array[ScTypeElement],
-                     isReplaceInExtendedClasses: Boolean) {
+class OccurrenceData(
+    typeElement: ScTypeElement,
+    usualOccurrence: Array[ScTypeElement],
+    isReplaceAllUsual: Boolean,
+    companiomObjOccurrence: Array[ScTypeElement],
+    isReplaceInCompanion: Boolean,
+    extendedClassOccurrence: Array[ScTypeElement],
+    isReplaceInExtendedClasses: Boolean) {
   def getUsualOccurrences = {
     if (isReplaceAllUsual) {
       usualOccurrence
@@ -75,7 +83,8 @@ class OccurrenceData(typeElement: ScTypeElement,
     getUsualOccurrences ++ getCompanionObjOccurrences ++ getExtendedOccurrences
 
   private def getOccurrences(
-      occ: Array[ScTypeElement], needAll: Boolean): Array[ScTypeElement] = {
+      occ: Array[ScTypeElement],
+      needAll: Boolean): Array[ScTypeElement] = {
     if (needAll) {
       occ
     } else {

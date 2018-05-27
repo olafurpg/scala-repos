@@ -13,7 +13,7 @@ final class VectorOps[A](val self: Vector[A]) extends AnyVal {
 
   final def zipperEnd: Option[Zipper[A]] = v.zipperEnd(self)
 
-  final def <^>[B : Monoid](f: NonEmptyList[A] => B): B = v.<^>(self)(f)
+  final def <^>[B: Monoid](f: NonEmptyList[A] => B): B = v.<^>(self)(f)
 
   final def takeWhileM[M[_]: Monad](p: A => M[Boolean]): M[Vector[A]] =
     v.takeWhileM(self)(p)
@@ -35,8 +35,8 @@ final class VectorOps[A](val self: Vector[A]) extends AnyVal {
   final def spanM[M[_]: Monad](p: A => M[Boolean]): M[(Vector[A], Vector[A])] =
     v.spanM(self)(p)
 
-  final def breakM[M[_]: Monad](
-      p: A => M[Boolean]): M[(Vector[A], Vector[A])] = v.breakM(self)(p)
+  final def breakM[M[_]: Monad](p: A => M[Boolean]): M[(Vector[A], Vector[A])] =
+    v.breakM(self)(p)
 
   final def groupWhenM[M[_]: Monad](
       p: (A, A) => M[Boolean]): M[Vector[Vector[A]]] = v.groupWhenM(self)(p)

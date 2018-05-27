@@ -32,7 +32,8 @@ class RunLengthEncodingSuite extends SparkFunSuite {
   testRunLengthEncoding(new StringColumnStats, STRING)
 
   def testRunLengthEncoding[T <: AtomicType](
-      columnStats: ColumnStats, columnType: NativeColumnType[T]) {
+      columnStats: ColumnStats,
+      columnType: NativeColumnType[T]) {
 
     val typeName = columnType.getClass.getSimpleName.stripSuffix("$")
 
@@ -42,9 +43,11 @@ class RunLengthEncodingSuite extends SparkFunSuite {
       // -------------
 
       val builder = TestCompressibleColumnBuilder(
-          columnStats, columnType, RunLengthEncoding)
-      val (values, rows) = makeUniqueValuesAndSingleValueRows(
-          columnType, uniqueValueCount)
+        columnStats,
+        columnType,
+        RunLengthEncoding)
+      val (values, rows) =
+        makeUniqueValuesAndSingleValueRows(columnType, uniqueValueCount)
       val inputSeq = inputRuns.flatMap {
         case (index, run) =>
           Seq.fill(run)(index)
@@ -66,17 +69,17 @@ class RunLengthEncodingSuite extends SparkFunSuite {
 
       // 4 extra bytes for compression scheme type ID
       assertResult(headerSize + compressedSize, "Wrong buffer capacity")(
-          buffer.capacity)
+        buffer.capacity)
 
       // Skips column header
       buffer.position(headerSize)
       assertResult(RunLengthEncoding.typeId, "Wrong compression scheme ID")(
-          buffer.getInt())
+        buffer.getInt())
 
       inputRuns.foreach {
         case (index, run) =>
           assertResult(values(index), "Wrong column element value")(
-              columnType.extract(buffer))
+            columnType.extract(buffer))
           assertResult(run, "Wrong run length")(buffer.getInt())
       }
 

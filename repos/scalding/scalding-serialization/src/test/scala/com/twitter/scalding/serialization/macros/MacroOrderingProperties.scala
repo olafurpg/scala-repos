@@ -19,7 +19,15 @@ package com.twitter.scalding.serialization.macros
 import java.io.{ByteArrayOutputStream, InputStream}
 import java.nio.ByteBuffer
 
-import com.twitter.scalding.serialization.{JavaStreamEnrichments, Law, Law1, Law2, Law3, OrderedSerialization, Serialization}
+import com.twitter.scalding.serialization.{
+  JavaStreamEnrichments,
+  Law,
+  Law1,
+  Law2,
+  Law3,
+  OrderedSerialization,
+  Serialization
+}
 import org.scalacheck.Arbitrary.{arbitrary => arb}
 import org.scalacheck.{Arbitrary, Gen, Prop}
 import org.scalatest.prop.{Checkers, PropertyChecks}
@@ -29,12 +37,13 @@ import scala.collection.immutable.Queue
 import scala.language.experimental.macros
 
 trait LowerPriorityImplicit {
-  implicit def primitiveOrderedBufferSupplier[T]: OrderedSerialization[T] = macro impl
-    .OrderedSerializationProviderImpl[T]
+  implicit def primitiveOrderedBufferSupplier[T]: OrderedSerialization[T] =
+    macro impl
+      .OrderedSerializationProviderImpl[T]
 }
 
 object LawTester {
-  def apply[T : Arbitrary](laws: Iterable[Law[T]]): Prop =
+  def apply[T: Arbitrary](laws: Iterable[Law[T]]): Prop =
     apply(implicitly[Arbitrary[T]].arbitrary, laws)
 
   def apply[T](g: Gen[T], laws: Iterable[Law[T]]): Prop =
@@ -66,13 +75,14 @@ object TestCC {
       anOptionOfAListOfStrings <- arb[Option[List[String]]]
       aBB <- arb[ByteBuffer]
     } yield
-      TestCC(aInt,
-             aLong,
-             anOption,
-             aDouble,
-             anStrOption,
-             anOptionOfAListOfStrings,
-             aBB)
+      TestCC(
+        aInt,
+        aLong,
+        anOption,
+        aDouble,
+        anStrOption,
+        anOptionOfAListOfStrings,
+        aBB)
   }
 
   implicit def arbitraryTestCaseClassB: Arbitrary[TestCaseClassB] = Arbitrary {
@@ -113,8 +123,8 @@ object TestCC {
       } yield t
     }
 
-  implicit def arbitraryTestSealedAbstractClass: Arbitrary[
-      TestSealedAbstractClass] = Arbitrary {
+  implicit def arbitraryTestSealedAbstractClass
+    : Arbitrary[TestSealedAbstractClass] = Arbitrary {
     for {
       testSealedAbstractClass <- Gen.oneOf(A, B)
     } yield testSealedAbstractClass
@@ -126,17 +136,22 @@ case object A extends TestSealedAbstractClass(None)
 case object B extends TestSealedAbstractClass(Some("b"))
 
 sealed trait SealedTraitTest
-case class TestCC(a: Int,
-                  b: Long,
-                  c: Option[Int],
-                  d: Double,
-                  e: Option[String],
-                  f: Option[List[String]],
-                  aBB: ByteBuffer)
+case class TestCC(
+    a: Int,
+    b: Long,
+    c: Option[Int],
+    d: Double,
+    e: Option[String],
+    f: Option[List[String]],
+    aBB: ByteBuffer)
     extends SealedTraitTest
 
 case class TestCaseClassB(
-    a: Int, b: Long, c: Option[Int], d: Double, e: Option[String])
+    a: Int,
+    b: Long,
+    c: Option[Int],
+    d: Double,
+    e: Option[String])
     extends SealedTraitTest
 
 case class TestCaseClassD(a: Int) extends SealedTraitTest
@@ -158,15 +173,15 @@ class MyData(override val _1: Int, override val _2: Option[Long])
     extends Product2[Int, Option[Long]] {
   override def canEqual(that: Any): Boolean = that match {
     case o: MyData => true
-    case _ => false
+    case _         => false
   }
 
   override def equals(obj: scala.Any): Boolean = obj match {
     case o: MyData =>
       (o._2, _2) match {
         case (Some(l), Some(r)) => r == l && _1 == o._1
-        case (None, None) => _1 == o._1
-        case _ => false
+        case (None, None)       => _1 == o._1
+        case _                  => false
       }
     case _ => false
   }
@@ -175,8 +190,9 @@ class MyData(override val _1: Int, override val _2: Option[Long])
 }
 
 object MacroOpaqueContainer {
-  def getOrdSer[T]: OrderedSerialization[T] = macro impl
-    .OrderedSerializationProviderImpl[T]
+  def getOrdSer[T]: OrderedSerialization[T] =
+    macro impl
+      .OrderedSerializationProviderImpl[T]
   import java.io._
   implicit val myContainerOrderedSerializer =
     new OrderedSerialization[MacroOpaqueContainer] {
@@ -215,7 +231,7 @@ class MacroOpaqueContainer(val myField: Int) {
 
   override def equals(obj: scala.Any): Boolean = obj match {
     case that: MacroOpaqueContainer => that.myField == myField
-    case _ => false
+    case _                          => false
   }
 }
 
@@ -230,7 +246,9 @@ object Container {
   case class InnerCaseClass(e: SetAlias)
 }
 class MacroOrderingProperties
-    extends FunSuite with PropertyChecks with ShouldMatchers
+    extends FunSuite
+    with PropertyChecks
+    with ShouldMatchers
     with LowerPriorityImplicit {
   type SetAlias = Set[Double]
 
@@ -238,12 +256,12 @@ class MacroOrderingProperties
   import Container.arbitraryInnerCaseClass
   import OrderedSerialization.{compare => oBufCompare}
 
-  def gen[T : Arbitrary]: Gen[T] = implicitly[Arbitrary[T]].arbitrary
+  def gen[T: Arbitrary]: Gen[T] = implicitly[Arbitrary[T]].arbitrary
 
-  def arbMap[T : Arbitrary, U](fn: T => U): Arbitrary[U] =
+  def arbMap[T: Arbitrary, U](fn: T => U): Arbitrary[U] =
     Arbitrary(gen[T].map(fn))
 
-  def collectionArb[C[_], T : Arbitrary](
+  def collectionArb[C[_], T: Arbitrary](
       implicit cbf: collection.generic.CanBuildFrom[Nothing, T, C[T]])
     : Arbitrary[C[T]] = Arbitrary {
     gen[List[T]].map { l =>
@@ -287,17 +305,17 @@ class MacroOrderingProperties
         val compareMem = obuf.compare(a, b)
         if (compareBinary < 0) {
           assert(
-              compareMem < 0,
-              s"Compare binary: $compareBinary, and compareMem : $compareMem must have the same sign")
+            compareMem < 0,
+            s"Compare binary: $compareBinary, and compareMem : $compareMem must have the same sign")
         } else if (compareBinary > 0) {
           assert(
-              compareMem > 0,
-              s"Compare binary: $compareBinary, and compareMem : $compareMem must have the same sign")
+            compareMem > 0,
+            s"Compare binary: $compareBinary, and compareMem : $compareMem must have the same sign")
         }
     }
   }
 
-  def checkMany[T : Arbitrary](implicit obuf: OrderedSerialization[T]) =
+  def checkMany[T: Arbitrary](implicit obuf: OrderedSerialization[T]) =
     forAll { i: List[(T, T)] =>
       checkManyExplicit(i)
     }
@@ -307,57 +325,65 @@ class MacroOrderingProperties
     val rtb = rt(b) // before we do anything ensure these don't throw
     val asize = Serialization.toBytes(a).length
     if (obuf.dynamicSize(a).isDefined) {
-      assert(obuf.dynamicSize(a).get == asize,
-             "dynamic size matches the correct value")
+      assert(
+        obuf.dynamicSize(a).get == asize,
+        "dynamic size matches the correct value")
     }
     if (obuf.staticSize.isDefined) {
-      assert(obuf.dynamicSize(a).get == asize,
-             "dynamic size matches the correct value")
-      assert(obuf.staticSize.get == asize,
-             "dynamic size matches the correct value")
+      assert(
+        obuf.dynamicSize(a).get == asize,
+        "dynamic size matches the correct value")
+      assert(
+        obuf.staticSize.get == asize,
+        "dynamic size matches the correct value")
     }
-    assert(oBufCompare(rta, a) === 0,
-           s"A should be equal to itself after an RT -- ${rt(a)}")
-    assert(oBufCompare(rtb, b) === 0,
-           s"B should be equal to itself after an RT-- ${rt(b)}")
-    assert(oBufCompare(a, b) + oBufCompare(b, a) === 0,
-           "In memory comparasons make sense")
     assert(
-        rawCompare(a, b) + rawCompare(b, a) === 0,
-        "When adding the raw compares in inverse order they should sum to 0")
+      oBufCompare(rta, a) === 0,
+      s"A should be equal to itself after an RT -- ${rt(a)}")
     assert(
-        oBufCompare(rta, rtb) === oBufCompare(a, b),
-        "Comparing a and b with ordered bufferables compare after a serialization RT")
+      oBufCompare(rtb, b) === 0,
+      s"B should be equal to itself after an RT-- ${rt(b)}")
+    assert(
+      oBufCompare(a, b) + oBufCompare(b, a) === 0,
+      "In memory comparasons make sense")
+    assert(
+      rawCompare(a, b) + rawCompare(b, a) === 0,
+      "When adding the raw compares in inverse order they should sum to 0")
+    assert(
+      oBufCompare(rta, rtb) === oBufCompare(a, b),
+      "Comparing a and b with ordered bufferables compare after a serialization RT")
   }
 
   def checkAreSame[T](a: T, b: T)(implicit obuf: OrderedSerialization[T]) {
     val rta = rt(a) // before we do anything ensure these don't throw
     val rtb = rt(b) // before we do anything ensure these don't throw
-    assert(oBufCompare(rta, a) === 0,
-           s"A should be equal to itself after an RT -- ${rt(a)}")
-    assert(oBufCompare(rtb, b) === 0,
-           "B should be equal to itself after an RT-- ${rt(b)}")
+    assert(
+      oBufCompare(rta, a) === 0,
+      s"A should be equal to itself after an RT -- ${rt(a)}")
+    assert(
+      oBufCompare(rtb, b) === 0,
+      "B should be equal to itself after an RT-- ${rt(b)}")
     assert(oBufCompare(a, b) === 0, "In memory comparasons make sense")
     assert(oBufCompare(b, a) === 0, "In memory comparasons make sense")
     assert(
-        rawCompare(a, b) === 0,
-        "When adding the raw compares in inverse order they should sum to 0")
+      rawCompare(a, b) === 0,
+      "When adding the raw compares in inverse order they should sum to 0")
     assert(
-        rawCompare(b, a) === 0,
-        "When adding the raw compares in inverse order they should sum to 0")
+      rawCompare(b, a) === 0,
+      "When adding the raw compares in inverse order they should sum to 0")
     assert(
-        oBufCompare(rta, rtb) === 0,
-        "Comparing a and b with ordered bufferables compare after a serialization RT")
+      oBufCompare(rta, rtb) === 0,
+      "Comparing a and b with ordered bufferables compare after a serialization RT")
   }
 
-  def check[T : Arbitrary](implicit obuf: OrderedSerialization[T]) = {
+  def check[T: Arbitrary](implicit obuf: OrderedSerialization[T]) = {
     Checkers.check(LawTester(OrderedSerialization.allLaws))
     forAll(minSuccessful(500)) { (a: T, b: T) =>
       checkWithInputs(a, b)
     }
   }
 
-  def checkCollisions[T : Arbitrary : OrderedSerialization] = {
+  def checkCollisions[T: Arbitrary: OrderedSerialization] = {
     val ord = implicitly[OrderedSerialization[T]]
 
     val arbInput = Gen.containerOfN[Set, T](100, arb[T]).map(_.toList)
@@ -589,8 +615,9 @@ class MacroOrderingProperties
   test("Test out Map[Long, Set[Int]]") {
     primitiveOrderedBufferSupplier[Map[Long, Set[Int]]]
     check[Map[Long, Set[Int]]]
-    val c = List(Map(9223372036854775807L -> Set[Int]()),
-                 Map(-1L -> Set[Int](-2043106012)))
+    val c = List(
+      Map(9223372036854775807L -> Set[Int]()),
+      Map(-1L -> Set[Int](-2043106012)))
     checkManyExplicit(c.map { i =>
       (i, i)
     })
@@ -606,8 +633,8 @@ class MacroOrderingProperties
   test("Test out HashMap[Long, Long]") {
     import scala.collection.immutable.HashMap
     implicit val isa = Arbitrary(
-        implicitly[Arbitrary[List[(Long, Long)]]].arbitrary
-          .map(HashMap(_: _*)))
+      implicitly[Arbitrary[List[(Long, Long)]]].arbitrary
+        .map(HashMap(_: _*)))
     primitiveOrderedBufferSupplier[HashMap[Long, Long]]
     check[HashMap[Long, Long]]
     checkCollisions[HashMap[Long, Long]]
@@ -615,8 +642,8 @@ class MacroOrderingProperties
   test("Test out ListMap[Long, Long]") {
     import scala.collection.immutable.ListMap
     implicit val isa = Arbitrary(
-        implicitly[Arbitrary[List[(Long, Long)]]].arbitrary
-          .map(ListMap(_: _*)))
+      implicitly[Arbitrary[List[(Long, Long)]]].arbitrary
+        .map(ListMap(_: _*)))
     primitiveOrderedBufferSupplier[ListMap[Long, Long]]
     check[ListMap[Long, Long]]
     checkCollisions[ListMap[Long, Long]]
@@ -640,15 +667,17 @@ class MacroOrderingProperties
     val a = "6"
     val b = "곆"
     val ord = Ordering.String
-    assert(rawCompare(a, b) === ord.compare(a, b).signum,
-           "Raw and in memory compares match.")
+    assert(
+      rawCompare(a, b) === ord.compare(a, b).signum,
+      "Raw and in memory compares match.")
 
     val c = List(
-        "榴㉕⊟풠湜ᙬ覹ꜻ裧뚐⠂覝쫨塢䇺楠谭픚ᐌ轮뺷Ⱟ洦擄黏著탅ﮓꆋ숷梸傠ァ蹵窥轲闇涡飽ꌳ䝞慙擃",
-        "堒凳媨쉏떽㶥⾽샣井ㆠᇗ裉깴辫࠷᤭塈䎙寫㸉ᶴ䰄똇䡷䥞㷗䷱赫懓䷏剆祲ᝯ졑쐯헢鷴ӕ秔㽰ퟡ㏉鶖奚㙰银䮌ᕗ膾买씋썴행䣈丶偝쾕鐗쇊ኋ넥︇瞤䋗噯邧⹆♣ἷ铆玼⪷沕辤ᠥ⥰箼䔄◗",
-        "騰쓢堷뛭ᣣﰩ嚲ﲯ㤑ᐜ檊೦⠩奯ᓩ윇롇러ᕰెꡩ璞﫼᭵礀閮䈦椄뾪ɔ믻䖔᪆嬽ﾌ鶬曭꣍ᆏ灖㐸뗋ㆃ녵ퟸ겵晬礙㇩䫓ᘞ昑싨",
-        "좃ఱ䨻綛糔唄࿁劸酊᫵橻쩳괊筆ݓ淤숪輡斋靑耜঄骐冠㝑⧠떅漫곡祈䵾ᳺ줵됵↲搸虂㔢Ꝅ芆٠풐쮋炞哙⨗쾄톄멛癔짍避쇜畾㣕剼⫁়╢ꅢ澛氌ᄚ㍠ꃫᛔ匙㜗詇閦單錖⒅瘧崥",
-        "獌癚畇")
+      "榴㉕⊟풠湜ᙬ覹ꜻ裧뚐⠂覝쫨塢䇺楠谭픚ᐌ轮뺷Ⱟ洦擄黏著탅ﮓꆋ숷梸傠ァ蹵窥轲闇涡飽ꌳ䝞慙擃",
+      "堒凳媨쉏떽㶥⾽샣井ㆠᇗ裉깴辫࠷᤭塈䎙寫㸉ᶴ䰄똇䡷䥞㷗䷱赫懓䷏剆祲ᝯ졑쐯헢鷴ӕ秔㽰ퟡ㏉鶖奚㙰银䮌ᕗ膾买씋썴행䣈丶偝쾕鐗쇊ኋ넥︇瞤䋗噯邧⹆♣ἷ铆玼⪷沕辤ᠥ⥰箼䔄◗",
+      "騰쓢堷뛭ᣣﰩ嚲ﲯ㤑ᐜ檊೦⠩奯ᓩ윇롇러ᕰెꡩ璞﫼᭵礀閮䈦椄뾪ɔ믻䖔᪆嬽ﾌ鶬曭꣍ᆏ灖㐸뗋ㆃ녵ퟸ겵晬礙㇩䫓ᘞ昑싨",
+      "좃ఱ䨻綛糔唄࿁劸酊᫵橻쩳괊筆ݓ淤숪輡斋靑耜঄骐冠㝑⧠떅漫곡祈䵾ᳺ줵됵↲搸虂㔢Ꝅ芆٠풐쮋炞哙⨗쾄톄멛癔짍避쇜畾㣕剼⫁়╢ꅢ澛氌ᄚ㍠ꃫᛔ匙㜗詇閦單錖⒅瘧崥",
+      "獌癚畇"
+    )
     checkManyExplicit(c.map { i =>
       (i, i)
     })
@@ -686,9 +715,9 @@ class MacroOrderingProperties
     val oser = primitiveOrderedBufferSupplier[Either[Int, String]]
     assert(oser.staticSize === None, "can't get the size statically")
     assert(
-        Some(Serialization.toBytes[Either[Int, String]](Left(1)).length) === oser
-          .dynamicSize(Left(1)),
-        "serialization size matches dynamic size")
+      Some(Serialization.toBytes[Either[Int, String]](Left(1)).length) === oser
+        .dynamicSize(Left(1)),
+      "serialization size matches dynamic size")
     check[Either[Int, String]]
     checkCollisions[Either[Int, String]]
   }
@@ -788,8 +817,7 @@ class MacroOrderingProperties
     implicitly[OrderedSerialization[MacroOpaqueContainer]]
 
     // Put inside a tuple2 to test that
-    primitiveOrderedBufferSupplier[
-        (MacroOpaqueContainer, MacroOpaqueContainer)]
+    primitiveOrderedBufferSupplier[(MacroOpaqueContainer, MacroOpaqueContainer)]
     check[(MacroOpaqueContainer, MacroOpaqueContainer)]
     checkCollisions[(MacroOpaqueContainer, MacroOpaqueContainer)]
     check[Option[MacroOpaqueContainer]]

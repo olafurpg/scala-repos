@@ -8,14 +8,15 @@ trait ForeignKeyOption[T]
 trait IndexOption[T]
 
 /** Qualified name of a database table */
-case class QualifiedName(table: String,
-                         schema: Option[String] = None,
-                         catalog: Option[String] = None) {
+case class QualifiedName(
+    table: String,
+    schema: Option[String] = None,
+    catalog: Option[String] = None) {
 
   /** human readable String representation */
   def asString =
     catalog.map(_ + ".").getOrElse("") + schema.map(_ + ".").getOrElse("") +
-    table
+      table
 }
 
 case class Table(
@@ -98,61 +99,75 @@ case class Model(
     * In case such things are found, throws an AssertionError.
     */
   def assertConsistency() {
-    assert(tables.size == tables.map(_.name).distinct.size,
-           "duplicate tables names detected")
+    assert(
+      tables.size == tables.map(_.name).distinct.size,
+      "duplicate tables names detected")
     tables.foreach { table =>
       import table._
-      assert(columns.size == columns.map(_.name).distinct.size,
-             "duplicate column names detected")
+      assert(
+        columns.size == columns.map(_.name).distinct.size,
+        "duplicate column names detected")
       def msg(what: String, where: String) =
         s"Reference to non-existent $what in $where of table $table."
       primaryKey.foreach { pk =>
-        assert(tablesByName.isDefinedAt(pk.table),
-               msg("table " + pk.table, "primary key " + pk))
+        assert(
+          tablesByName.isDefinedAt(pk.table),
+          msg("table " + pk.table, "primary key " + pk))
         pk.columns.foreach { column =>
-          assert(table.columns.contains(column),
-                 msg("column " + column, "primary key " + pk))
+          assert(
+            table.columns.contains(column),
+            msg("column " + column, "primary key " + pk))
         }
       }
-      assert(foreignKeys.count(_.name.isDefined) == foreignKeys
-               .filter(_.name.isDefined)
-               .map(_.name)
-               .distinct
-               .size,
-             "duplicate foreign key names detected")
+      assert(
+        foreignKeys.count(_.name.isDefined) == foreignKeys
+          .filter(_.name.isDefined)
+          .map(_.name)
+          .distinct
+          .size,
+        "duplicate foreign key names detected")
       foreignKeys.foreach { fk =>
-        assert(tablesByName.isDefinedAt(fk.referencedTable),
-               msg("table " + fk.referencedTable, "foreign key " + fk))
-        assert(tablesByName.isDefinedAt(fk.referencingTable),
-               msg("table " + fk.referencingTable, "foreign key " + fk))
+        assert(
+          tablesByName.isDefinedAt(fk.referencedTable),
+          msg("table " + fk.referencedTable, "foreign key " + fk))
+        assert(
+          tablesByName.isDefinedAt(fk.referencingTable),
+          msg("table " + fk.referencingTable, "foreign key " + fk))
         val pkTable = tablesByName(fk.referencedTable)
         val fkTable = tablesByName(fk.referencingTable)
         assert(
-            table == fkTable,
-            "Referencing table $fkTable does not match table $table the foreign key $fk is contained in.")
+          table == fkTable,
+          "Referencing table $fkTable does not match table $table the foreign key $fk is contained in.")
         fk.referencedColumns.foreach { pkColumn =>
-          assert(pkTable.columns.contains(pkColumn),
-                 msg("column " + pkColumn + " of table " + pkTable,
-                     "foreign key " + fk))
+          assert(
+            pkTable.columns.contains(pkColumn),
+            msg(
+              "column " + pkColumn + " of table " + pkTable,
+              "foreign key " + fk))
         }
         fk.referencingColumns.foreach { fkColumn =>
-          assert(fkTable.columns.contains(fkColumn),
-                 msg("column " + fkColumn + " of table " + fkTable,
-                     "foreign key " + fk))
+          assert(
+            fkTable.columns.contains(fkColumn),
+            msg(
+              "column " + fkColumn + " of table " + fkTable,
+              "foreign key " + fk))
         }
       }
-      assert(indices.count(_.name.isDefined) == indices
-               .filter(_.name.isDefined)
-               .map(_.name)
-               .distinct
-               .size,
-             "duplicate index names detected")
+      assert(
+        indices.count(_.name.isDefined) == indices
+          .filter(_.name.isDefined)
+          .map(_.name)
+          .distinct
+          .size,
+        "duplicate index names detected")
       indices.foreach { idx =>
-        assert(tablesByName.isDefinedAt(idx.table),
-               msg("table " + idx.table, "index " + idx))
+        assert(
+          tablesByName.isDefinedAt(idx.table),
+          msg("table " + idx.table, "index " + idx))
         idx.columns.foreach { column =>
-          assert(table.columns.contains(column),
-                 msg("column " + column, "index " + idx))
+          assert(
+            table.columns.contains(column),
+            msg("column " + column, "index " + idx))
         }
       }
     }

@@ -48,17 +48,18 @@ import org.apache.spark.util.Utils
   * @param masterEndpoint reference to the Master endpoint to which requests can be sent
   * @param masterUrl the URL of the Master new drivers will attempt to connect to
   */
-private[deploy] class StandaloneRestServer(host: String,
-                                           requestedPort: Int,
-                                           masterConf: SparkConf,
-                                           masterEndpoint: RpcEndpointRef,
-                                           masterUrl: String)
+private[deploy] class StandaloneRestServer(
+    host: String,
+    requestedPort: Int,
+    masterConf: SparkConf,
+    masterEndpoint: RpcEndpointRef,
+    masterUrl: String)
     extends RestSubmissionServer(host, requestedPort, masterConf) {
 
   protected override val submitRequestServlet =
     new StandaloneSubmitRequestServlet(masterEndpoint, masterUrl, masterConf)
-  protected override val killRequestServlet = new StandaloneKillRequestServlet(
-      masterEndpoint, masterConf)
+  protected override val killRequestServlet =
+    new StandaloneKillRequestServlet(masterEndpoint, masterConf)
   protected override val statusRequestServlet =
     new StandaloneStatusRequestServlet(masterEndpoint, masterConf)
 }
@@ -67,13 +68,14 @@ private[deploy] class StandaloneRestServer(host: String,
   * A servlet for handling kill requests passed to the [[StandaloneRestServer]].
   */
 private[rest] class StandaloneKillRequestServlet(
-    masterEndpoint: RpcEndpointRef, conf: SparkConf)
+    masterEndpoint: RpcEndpointRef,
+    conf: SparkConf)
     extends KillRequestServlet {
 
   protected def handleKill(submissionId: String): KillSubmissionResponse = {
     val response =
       masterEndpoint.askWithRetry[DeployMessages.KillDriverResponse](
-          DeployMessages.RequestKillDriver(submissionId))
+        DeployMessages.RequestKillDriver(submissionId))
     val k = new KillSubmissionResponse
     k.serverSparkVersion = sparkVersion
     k.message = response.message
@@ -87,13 +89,14 @@ private[rest] class StandaloneKillRequestServlet(
   * A servlet for handling status requests passed to the [[StandaloneRestServer]].
   */
 private[rest] class StandaloneStatusRequestServlet(
-    masterEndpoint: RpcEndpointRef, conf: SparkConf)
+    masterEndpoint: RpcEndpointRef,
+    conf: SparkConf)
     extends StatusRequestServlet {
 
   protected def handleStatus(submissionId: String): SubmissionStatusResponse = {
     val response =
       masterEndpoint.askWithRetry[DeployMessages.DriverStatusResponse](
-          DeployMessages.RequestDriverStatus(submissionId))
+        DeployMessages.RequestDriverStatus(submissionId))
     val message = response.exception.map {
       s"Exception from the cluster:\n" + formatException(_)
     }
@@ -113,7 +116,9 @@ private[rest] class StandaloneStatusRequestServlet(
   * A servlet for handling submit requests passed to the [[StandaloneRestServer]].
   */
 private[rest] class StandaloneSubmitRequestServlet(
-    masterEndpoint: RpcEndpointRef, masterUrl: String, conf: SparkConf)
+    masterEndpoint: RpcEndpointRef,
+    masterUrl: String,
+    conf: SparkConf)
     extends SubmitRequestServlet {
 
   /**
@@ -161,22 +166,24 @@ private[rest] class StandaloneSubmitRequestServlet(
     val sparkJavaOpts = Utils.sparkJavaOpts(conf)
     val javaOpts = sparkJavaOpts ++ extraJavaOpts
     val command = new Command(
-        "org.apache.spark.deploy.worker.DriverWrapper",
-        Seq("{{WORKER_URL}}", "{{USER_JAR}}", mainClass) ++ appArgs, // args to the DriverWrapper
-        environmentVariables,
-        extraClassPath,
-        extraLibraryPath,
-        javaOpts)
+      "org.apache.spark.deploy.worker.DriverWrapper",
+      Seq("{{WORKER_URL}}", "{{USER_JAR}}", mainClass) ++ appArgs, // args to the DriverWrapper
+      environmentVariables,
+      extraClassPath,
+      extraLibraryPath,
+      javaOpts
+    )
     val actualDriverMemory =
       driverMemory.map(Utils.memoryStringToMb).getOrElse(DEFAULT_MEMORY)
     val actualDriverCores = driverCores.map(_.toInt).getOrElse(DEFAULT_CORES)
     val actualSuperviseDriver =
       superviseDriver.map(_.toBoolean).getOrElse(DEFAULT_SUPERVISE)
-    new DriverDescription(appResource,
-                          actualDriverMemory,
-                          actualDriverCores,
-                          actualSuperviseDriver,
-                          command)
+    new DriverDescription(
+      appResource,
+      actualDriverMemory,
+      actualDriverCores,
+      actualSuperviseDriver,
+      command)
   }
 
   /**
@@ -194,14 +201,14 @@ private[rest] class StandaloneSubmitRequestServlet(
         val driverDescription = buildDriverDescription(submitRequest)
         val response =
           masterEndpoint.askWithRetry[DeployMessages.SubmitDriverResponse](
-              DeployMessages.RequestSubmitDriver(driverDescription))
+            DeployMessages.RequestSubmitDriver(driverDescription))
         val submitResponse = new CreateSubmissionResponse
         submitResponse.serverSparkVersion = sparkVersion
         submitResponse.message = response.message
         submitResponse.success = response.success
         submitResponse.submissionId = response.driverId.orNull
-        val unknownFields = findUnknownFields(
-            requestMessageJson, requestMessage)
+        val unknownFields =
+          findUnknownFields(requestMessageJson, requestMessage)
         if (unknownFields.nonEmpty) {
           // If there are fields that the server does not know about, warn the client
           submitResponse.unknownFields = unknownFields
@@ -210,7 +217,7 @@ private[rest] class StandaloneSubmitRequestServlet(
       case unexpected =>
         responseServlet.setStatus(HttpServletResponse.SC_BAD_REQUEST)
         handleError(
-            s"Received message of unexpected type ${unexpected.messageType}.")
+          s"Received message of unexpected type ${unexpected.messageType}.")
     }
   }
 }

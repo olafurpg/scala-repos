@@ -7,7 +7,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.ScInterpolatedStringLiteral
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
 
 /**
-  * @author kfeodorov 
+  * @author kfeodorov
   * @since 15.03.14.
   */
 class ScInterpolatedStringPartReference(node: ASTNode)
@@ -18,7 +18,7 @@ class ScInterpolatedStringPartReference(node: ASTNode)
   override def multiResolve(incomplete: Boolean): Array[ResolveResult] = {
     val parent = getParent match {
       case p: ScInterpolatedStringLiteral => p
-      case _ => return Array[ResolveResult]()
+      case _                              => return Array[ResolveResult]()
     }
 
     parent.getStringContextExpression match {

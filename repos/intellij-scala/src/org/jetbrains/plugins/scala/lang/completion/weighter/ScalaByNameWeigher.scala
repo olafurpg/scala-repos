@@ -1,15 +1,28 @@
 package org.jetbrains.plugins.scala.lang.completion.weighter
 
-import com.intellij.codeInsight.completion.{CompletionLocation, CompletionWeigher}
+import com.intellij.codeInsight.completion.{
+  CompletionLocation,
+  CompletionWeigher
+}
 import com.intellij.codeInsight.lookup.LookupElement
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiClass, PsiElement, PsiNamedElement}
 import com.intellij.util.text.EditDistance
 import org.jetbrains.plugins.scala.lang.completion.lookups.ScalaLookupItem
-import org.jetbrains.plugins.scala.lang.completion.{ScalaAfterNewCompletionUtil, ScalaCompletionUtil}
+import org.jetbrains.plugins.scala.lang.completion.{
+  ScalaAfterNewCompletionUtil,
+  ScalaCompletionUtil
+}
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScBindingPattern
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScAssignStmt, ScNewTemplateDefinition}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScPatternDefinition, ScTypeAlias, ScTypedDeclaration}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScAssignStmt,
+  ScNewTemplateDefinition
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScPatternDefinition,
+  ScTypeAlias,
+  ScTypedDeclaration
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinition
 
 import scala.collection.mutable
@@ -24,10 +37,11 @@ class ScalaByNameWeigher extends CompletionWeigher {
   val MAX_DISTANCE = 4
 
   override def weigh(
-      element: LookupElement, location: CompletionLocation): Comparable[_] = {
+      element: LookupElement,
+      location: CompletionLocation): Comparable[_] = {
     val textForPosition = new mutable.HashMap[PsiElement, String]
     val position = ScalaCompletionUtil.positionFromParameters(
-        location.getCompletionParameters)
+      location.getCompletionParameters)
     val context = location.getProcessingContext
 
     def extractVariableNameFromPosition: Option[String] = {
@@ -57,8 +71,8 @@ class ScalaByNameWeigher extends CompletionWeigher {
 
       def afterNew: Option[String] = {
         val newTemplateDefinition = Option(
-            PsiTreeUtil.getContextOfType(
-                position, classOf[ScNewTemplateDefinition]))
+          PsiTreeUtil
+            .getContextOfType(position, classOf[ScNewTemplateDefinition]))
         val result = newTemplateDefinition.map(_.getContext).flatMap {
           case patterDef: ScPatternDefinition =>
             patterDef.bindings.headOption.map(_.name)
@@ -72,24 +86,25 @@ class ScalaByNameWeigher extends CompletionWeigher {
       }
 
       Option(
-          textForPosition.getOrElse(
-              position,
-              afterColonType.getOrElse(
-                  asBindingPattern.getOrElse(afterNew.orNull))))
+        textForPosition.getOrElse(
+          position,
+          afterColonType.getOrElse(
+            asBindingPattern.getOrElse(afterNew.orNull))))
     }
 
     def handleByText(element: PsiNamedElement): Option[Integer] = {
 
       def computeDistance(
-          element: PsiNamedElement, text: String): Option[Integer] = {
+          element: PsiNamedElement,
+          text: String): Option[Integer] = {
 
         def testEq(elementText: String, text: String): Boolean =
           elementText.toUpperCase == text.toUpperCase
 
         // prevent MAX_DISTANCE be more or equals on of comparing strings
         val maxDist = Math.min(
-            MAX_DISTANCE,
-            Math.ceil(Math.max(text.length, element.getName.length) / 2))
+          MAX_DISTANCE,
+          Math.ceil(Math.max(text.length, element.getName.length) / 2))
 
         if (testEq(element.getName, text)) Some(0)
         // prevent computing distance on long non including strings
@@ -107,9 +122,9 @@ class ScalaByNameWeigher extends CompletionWeigher {
 
       extractVariableNameFromPosition.flatMap { text =>
         text.length match {
-          case 0 => None
+          case 0                                         => None
           case 1 if oneSymbolText(element.getName, text) => Some(0)
-          case _ => computeDistance(element, text)
+          case _                                         => computeDistance(element, text)
         }
       }
     }

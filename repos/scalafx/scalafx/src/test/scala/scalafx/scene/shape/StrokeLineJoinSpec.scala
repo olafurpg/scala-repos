@@ -39,6 +39,6 @@ import scalafx.testutil.SFXEnumDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class StrokeLineJoinSpec
     extends SFXEnumDelegateSpec[jfxss.StrokeLineJoin, StrokeLineJoin](
-        javaClass = classOf[jfxss.StrokeLineJoin],
-        scalaClass = classOf[StrokeLineJoin],
-        companion = StrokeLineJoin)
+      javaClass = classOf[jfxss.StrokeLineJoin],
+      scalaClass = classOf[StrokeLineJoin],
+      companion = StrokeLineJoin)

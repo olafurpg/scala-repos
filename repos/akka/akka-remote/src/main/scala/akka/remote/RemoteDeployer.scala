@@ -21,7 +21,8 @@ final case class RemoteScope(node: Address) extends Scope {
   * INTERNAL API
   */
 private[akka] class RemoteDeployer(
-    _settings: ActorSystem.Settings, _pm: DynamicAccess)
+    _settings: ActorSystem.Settings,
+    _pm: DynamicAccess)
     extends Deployer(_settings, _pm) {
   override def parseConfig(path: String, config: Config): Option[Deploy] = {
 
@@ -32,7 +33,7 @@ private[akka] class RemoteDeployer(
             Some(deploy.copy(scope = RemoteScope(r)))
           case str if !str.isEmpty ⇒
             throw new ConfigurationException(
-                s"unparseable remote node name [${str}]")
+              s"unparseable remote node name [${str}]")
           case _ ⇒
             val nodes =
               immutableSeq(deploy.config.getStringList("target.nodes"))
@@ -41,8 +42,7 @@ private[akka] class RemoteDeployer(
             else
               deploy.routerConfig match {
                 case r: Pool ⇒
-                  Some(
-                      deploy.copy(routerConfig = RemoteRouterConfig(r, nodes)))
+                  Some(deploy.copy(routerConfig = RemoteRouterConfig(r, nodes)))
                 case _ ⇒ d
               }
         }

@@ -43,7 +43,7 @@ private[twitter] object ClientRegistry extends StackRegistry {
             resolution match {
               case bound: Addr.Bound =>
                 log.info(
-                    s"${name} resolved to Addr.Bound, current size=${bound.addrs.size}")
+                  s"${name} resolved to Addr.Bound, current size=${bound.addrs.size}")
               case _ =>
                 log.info(s"${name} resolved to ${resolution}")
             }
@@ -68,7 +68,7 @@ private[finagle] object RegistryEntryLifecycle {
 
       val description: String = "Maintains the ClientRegistry for the stack"
       def parameters: Seq[Stack.Param[_]] = Seq(
-          implicitly[Stack.Param[BindingFactory.Dest]]
+        implicitly[Stack.Param[BindingFactory.Dest]]
       )
 
       def make(
@@ -81,7 +81,7 @@ private[finagle] object RegistryEntryLifecycle {
         // for the benefit of ClientRegistry.expAllRegisteredClientsResolved
         // which waits for these to become non-Pending
         val va = dest match {
-          case Name.Bound(va) => va
+          case Name.Bound(va)  => va
           case Name.Path(path) => Namer.resolve(baseDtab(), path)
         }
 
@@ -91,14 +91,16 @@ private[finagle] object RegistryEntryLifecycle {
 
         CanStackFrom
           .fromFun[ServiceFactory[Req, Rep]]
-          .toStackable(role, { factory: ServiceFactory[Req, Rep] =>
-            new ServiceFactoryProxy[Req, Rep](factory) {
-              override def close(deadline: Time): Future[Unit] = {
-                ClientRegistry.unregister(shown, next, params)
-                self.close(deadline)
+          .toStackable(
+            role, { factory: ServiceFactory[Req, Rep] =>
+              new ServiceFactoryProxy[Req, Rep](factory) {
+                override def close(deadline: Time): Future[Unit] = {
+                  ClientRegistry.unregister(shown, next, params)
+                  self.close(deadline)
+                }
               }
             }
-          }) +: next
+          ) +: next
       }
     }
 }

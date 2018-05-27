@@ -51,9 +51,11 @@ class CookieDirectivesExamplesSpec extends RoutingSpec {
     Get("/") ~> route ~> check {
       responseAs[String] shouldEqual "The user was logged out"
       header[`Set-Cookie`] shouldEqual Some(
-          `Set-Cookie`(HttpCookie("userName",
-                                  value = "deleted",
-                                  expires = Some(DateTime.MinValue))))
+        `Set-Cookie`(
+          HttpCookie(
+            "userName",
+            value = "deleted",
+            expires = Some(DateTime.MinValue))))
     }
   }
   "setCookie" in {
@@ -65,7 +67,7 @@ class CookieDirectivesExamplesSpec extends RoutingSpec {
     Get("/") ~> route ~> check {
       responseAs[String] shouldEqual "The user was logged in"
       header[`Set-Cookie`] shouldEqual Some(
-          `Set-Cookie`(HttpCookie("userName", value = "paul")))
+        `Set-Cookie`(HttpCookie("userName", value = "paul")))
     }
   }
 }

@@ -8,7 +8,11 @@ import org.jetbrains.plugins.scala.components.libinjection.LibraryInjectorLoader
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScTypeElement
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScMember, ScObject, ScTypeDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{
+  ScMember,
+  ScObject,
+  ScTypeDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
 import scala.collection.mutable.ArrayBuffer
@@ -89,11 +93,12 @@ object SyntheticMembersInjector {
   }
 
   def inject(
-      source: ScTypeDefinition, withOverride: Boolean): Seq[ScFunction] = {
+      source: ScTypeDefinition,
+      withOverride: Boolean): Seq[ScFunction] = {
     val buffer = new ArrayBuffer[ScFunction]()
     for {
       injector <- EP_NAME.getExtensions.toSet ++ injectedExtensions(
-          source.getProject).toSet
+        source.getProject).toSet
       template <- injector.injectFunctions(source)
     } try {
       val context = source match {
@@ -102,7 +107,9 @@ object SyntheticMembersInjector {
         case _ => source
       }
       val function = ScalaPsiElementFactory.createMethodWithContext(
-          template, context, source)
+        template,
+        context,
+        source)
       function.setSynthetic(context)
       function.syntheticContainingClass = Some(source)
       if (withOverride ^ !function.hasModifierProperty("override"))
@@ -110,8 +117,8 @@ object SyntheticMembersInjector {
     } catch {
       case e: Throwable =>
         LOG.error(
-            s"Error during parsing template from injector: ${injector.getClass.getName}",
-            e)
+          s"Error during parsing template from injector: ${injector.getClass.getName}",
+          e)
     }
     buffer
   }
@@ -120,7 +127,7 @@ object SyntheticMembersInjector {
     val buffer = new ArrayBuffer[ScTypeDefinition]()
     for {
       injector <- EP_NAME.getExtensions.toSet ++ injectedExtensions(
-          source.getProject).toSet
+        source.getProject).toSet
       template <- injector.injectInners(source)
     } try {
       val context = (source match {
@@ -129,7 +136,9 @@ object SyntheticMembersInjector {
         case _ => source
       }).extendsBlock
       val td = ScalaPsiElementFactory.createTypeDefinitionWithContext(
-          template, context, source)
+        template,
+        context,
+        source)
       td.syntheticContainingClass = Some(source)
       def updateSynthetic(element: ScMember): Unit = {
         element match {
@@ -137,7 +146,7 @@ object SyntheticMembersInjector {
             td.setSynthetic(context)
             td.members.foreach(updateSynthetic)
           case fun: ScFunction => fun.setSynthetic(context)
-          case _ => //todo: ?
+          case _               => //todo: ?
         }
       }
       updateSynthetic(td)
@@ -146,8 +155,8 @@ object SyntheticMembersInjector {
       case p: ProcessCanceledException => throw p
       case e: Throwable =>
         LOG.error(
-            s"Error during parsing template from injector: ${injector.getClass.getName}",
-            e)
+          s"Error during parsing template from injector: ${injector.getClass.getName}",
+          e)
     }
     buffer
   }
@@ -169,13 +178,15 @@ object SyntheticMembersInjector {
         case _ => source
       }
       buffer += ScalaPsiElementFactory.createTypeElementFromText(
-          supers, context, source)
+        supers,
+        context,
+        source)
     } catch {
       case p: ProcessCanceledException => throw p
       case e: Throwable =>
         LOG.error(
-            s"Error during parsing type element from injector: ${injector.getClass.getName}",
-            e)
+          s"Error during parsing type element from injector: ${injector.getClass.getName}",
+          e)
     }
     buffer
   }

@@ -21,7 +21,13 @@ import org.apache.hadoop.mapred.{FileOutputCommitter, TaskAttemptContext}
 import org.scalatest.concurrent.Timeouts
 import org.scalatest.time.{Seconds, Span}
 
-import org.apache.spark.{LocalSparkContext, SparkConf, SparkContext, SparkFunSuite, TaskContext}
+import org.apache.spark.{
+  LocalSparkContext,
+  SparkConf,
+  SparkContext,
+  SparkFunSuite,
+  TaskContext
+}
 import org.apache.spark.util.Utils
 
 /**
@@ -30,7 +36,9 @@ import org.apache.spark.util.Utils
   * See also: [[OutputCommitCoordinatorSuite]] for unit tests that use mocks.
   */
 class OutputCommitCoordinatorIntegrationSuite
-    extends SparkFunSuite with LocalSparkContext with Timeouts {
+    extends SparkFunSuite
+    with LocalSparkContext
+    with Timeouts {
 
   override def beforeAll(): Unit = {
     super.beforeAll()
@@ -38,8 +46,8 @@ class OutputCommitCoordinatorIntegrationSuite
       .set("master", "local[2,4]")
       .set("spark.speculation", "true")
       .set(
-          "spark.hadoop.mapred.output.committer.class",
-          classOf[ThrowExceptionOnFirstAttemptOutputCommitter].getCanonicalName)
+        "spark.hadoop.mapred.output.committer.class",
+        classOf[ThrowExceptionOnFirstAttemptOutputCommitter].getCanonicalName)
     sc = new SparkContext("local[2, 4]", "test", conf)
   }
 

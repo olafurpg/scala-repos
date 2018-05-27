@@ -13,7 +13,8 @@ import _root_.scala.collection.immutable.HashMap
   * @since 27.02.12
   */
 class StaticPsiMethodWrapper private (
-    val method: PsiMethod, containingClass: PsiClass)
+    val method: PsiMethod,
+    containingClass: PsiClass)
     extends LightMethodAdapter(method.getManager, method, containingClass)
     with LightScalaMethod {
   setNavigationElement(method)
@@ -21,7 +22,7 @@ class StaticPsiMethodWrapper private (
   override def hasModifierProperty(name: String): Boolean = {
     name match {
       case "static" => true
-      case _ => super.hasModifierProperty(name)
+      case _        => super.hasModifierProperty(name)
     }
   }
 
@@ -30,14 +31,14 @@ class StaticPsiMethodWrapper private (
       override def hasModifierProperty(name: String): Boolean = {
         name match {
           case "static" => true
-          case _ => super.hasModifierProperty(name)
+          case _        => super.hasModifierProperty(name)
         }
       }
 
       override def hasExplicitModifier(name: String): Boolean = {
         name match {
           case "static" => true
-          case _ => super.hasModifierProperty(name)
+          case _        => super.hasModifierProperty(name)
         }
       }
     }
@@ -50,7 +51,8 @@ object StaticPsiMethodWrapper {
     Key.create("static.psi.method.wrapper.key")
 
   def getWrapper(
-      method: PsiMethod, containingClass: PsiClass): StaticPsiMethodWrapper = {
+      method: PsiMethod,
+      containingClass: PsiClass): StaticPsiMethodWrapper = {
     var data = method.getUserData(KEY)
     if (data == null) {
       data = new HashMap()

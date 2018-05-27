@@ -15,7 +15,10 @@ class Plugin(val global: Global) extends NscPlugin {
 
   object MacroPlugin extends MacroPlugin {
     override def pluginsMacroExpand(
-        typer: Typer, expandee: Tree, mode: Mode, pt: Type): Option[Tree] = {
+        typer: Typer,
+        expandee: Tree,
+        mode: Mode,
+        pt: Type): Option[Tree] = {
       object expander extends DefMacroExpander(typer, expandee, mode, pt) {
         override def onSuccess(expanded: Tree) = {
           val message = s"expanded into ${expanded.toString}"

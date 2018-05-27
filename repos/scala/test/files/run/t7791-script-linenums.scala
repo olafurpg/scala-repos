@@ -8,8 +8,8 @@ object Test extends ScriptTest {
     import util._
     Try(super.show()) match {
       case Failure(ExceptionLine(7)) => ()
-      case Failure(e) => e.printStackTrace()
-      case Success(_) => Console println "Expected error"
+      case Failure(e)                => e.printStackTrace()
+      case Success(_)                => Console println "Expected error"
     }
   }
 }

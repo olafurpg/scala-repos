@@ -54,7 +54,8 @@ object ShuffleTestAccessor {
   }
 
   def reloadRegisteredExecutors(file: File): ConcurrentMap[
-      ExternalShuffleBlockResolver.AppExecId, ExecutorShuffleInfo] = {
+    ExternalShuffleBlockResolver.AppExecId,
+    ExecutorShuffleInfo] = {
     val options: Options = new Options
     options.createIfMissing(true)
     val factory = new JniDBFactory
@@ -65,7 +66,8 @@ object ShuffleTestAccessor {
   }
 
   def reloadRegisteredExecutors(db: DB): ConcurrentMap[
-      ExternalShuffleBlockResolver.AppExecId, ExecutorShuffleInfo] = {
+    ExternalShuffleBlockResolver.AppExecId,
+    ExecutorShuffleInfo] = {
     ExternalShuffleBlockResolver.reloadRegisteredExecutors(db)
   }
 }

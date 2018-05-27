@@ -2,14 +2,16 @@ package org.jetbrains.plugins.scala.codeInspection.parentheses
 
 import com.intellij.codeInspection.LocalInspectionTool
 import org.jetbrains.plugins.scala.codeInspection.ScalaLightInspectionFixtureTestAdapter
-import org.jetbrains.plugins.scala.codeInspection.parameters.{AutoTuplingInspection, MakeTuplesExplicitFix}
+import org.jetbrains.plugins.scala.codeInspection.parameters.{
+  AutoTuplingInspection,
+  MakeTuplesExplicitFix
+}
 
 /**
   * Author: Svyatoslav Ilinskiy
   * Date: 10/14/15.
   */
-class AutoTuplingInspectionTest
-    extends ScalaLightInspectionFixtureTestAdapter {
+class AutoTuplingInspectionTest extends ScalaLightInspectionFixtureTestAdapter {
   override protected def classOfInspection: Class[_ <: LocalInspectionTool] =
     classOf[AutoTuplingInspection]
 

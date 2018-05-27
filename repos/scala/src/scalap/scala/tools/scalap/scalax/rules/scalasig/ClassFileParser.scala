@@ -162,19 +162,19 @@ object ClassFileParser extends ByteCodeReader {
       case bootstrapMethodAttrIndex ~ nameAndTypeIndex =>
         pool =>
           "InvokeDynamic: " + "bootstrapMethodAttrIndex = " +
-          bootstrapMethodAttrIndex + ", " + pool(nameAndTypeIndex)
+            bootstrapMethodAttrIndex + ", " + pool(nameAndTypeIndex)
     }
 
   val constantPoolEntry =
     u1 >> {
-      case 1 => utf8String
-      case 3 => intConstant
-      case 4 => floatConstant
-      case 5 => longConstant
-      case 6 => doubleConstant
-      case 7 => classRef
-      case 8 => stringRef
-      case 9 => fieldRef
+      case 1  => utf8String
+      case 3  => intConstant
+      case 4  => floatConstant
+      case 5  => longConstant
+      case 6  => doubleConstant
+      case 7  => classRef
+      case 8  => stringRef
+      case 9  => fieldRef
       case 10 => methodRef
       case 11 => interfaceMethodRef
       case 12 => nameAndType
@@ -193,13 +193,15 @@ object ClassFileParser extends ByteCodeReader {
   // parse runtime-visible annotations
   abstract class ElementValue
   case class AnnotationElement(
-      elementNameIndex: Int, elementValue: ElementValue)
+      elementNameIndex: Int,
+      elementValue: ElementValue)
   case class ConstValueIndex(index: Int) extends ElementValue
   case class EnumConstValue(typeNameIndex: Int, constNameIndex: Int)
       extends ElementValue
   case class ClassInfoIndex(index: Int) extends ElementValue
   case class Annotation(
-      typeIndex: Int, elementValuePairs: Seq[AnnotationElement])
+      typeIndex: Int,
+      elementValuePairs: Seq[AnnotationElement])
       extends ElementValue
   case class ArrayValue(values: Seq[ElementValue]) extends ElementValue
 
@@ -242,10 +244,11 @@ object ClassFileParser extends ByteCodeReader {
     }
 }
 
-case class ClassFile(header: ClassFileHeader,
-                     fields: Seq[Field],
-                     methods: Seq[Method],
-                     attributes: Seq[Attribute]) {
+case class ClassFile(
+    header: ClassFileHeader,
+    fields: Seq[Field],
+    methods: Seq[Method],
+    attributes: Seq[Attribute]) {
 
   def majorVersion = header.major
   def minorVersion = header.minor
@@ -256,7 +259,7 @@ case class ClassFile(header: ClassFileHeader,
 
   def constant(index: Int) = header.constants(index) match {
     case StringBytesPair(str, _) => str
-    case z => z
+    case z                       => z
   }
 
   def constantWrapped(index: Int) = header.constants(index)
@@ -272,27 +275,30 @@ case class ClassFile(header: ClassFileHeader,
       .map(attr => ClassFileParser.parseAnnotations(attr.byteCode)))
 
   def annotation(name: String) =
-    annotations.flatMap(
-        seq => seq.find(annot => constant(annot.typeIndex) == name))
+    annotations.flatMap(seq =>
+      seq.find(annot => constant(annot.typeIndex) == name))
 }
 
 case class Attribute(nameIndex: Int, byteCode: ByteCode)
-case class Field(flags: Int,
-                 nameIndex: Int,
-                 descriptorIndex: Int,
-                 attributes: Seq[Attribute])
-case class Method(flags: Int,
-                  nameIndex: Int,
-                  descriptorIndex: Int,
-                  attributes: Seq[Attribute])
+case class Field(
+    flags: Int,
+    nameIndex: Int,
+    descriptorIndex: Int,
+    attributes: Seq[Attribute])
+case class Method(
+    flags: Int,
+    nameIndex: Int,
+    descriptorIndex: Int,
+    attributes: Seq[Attribute])
 
-case class ClassFileHeader(minor: Int,
-                           major: Int,
-                           constants: ConstantPool,
-                           flags: Int,
-                           classIndex: Int,
-                           superClassIndex: Int,
-                           interfaces: Seq[Int]) {
+case class ClassFileHeader(
+    minor: Int,
+    major: Int,
+    constants: ConstantPool,
+    flags: Int,
+    classIndex: Int,
+    superClassIndex: Int,
+    interfaces: Seq[Int]) {
 
   def constant(index: Int) = constants(index)
 }

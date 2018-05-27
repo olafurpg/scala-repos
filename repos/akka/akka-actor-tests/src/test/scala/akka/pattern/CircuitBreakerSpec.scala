@@ -28,34 +28,51 @@ object CircuitBreakerSpec {
   }
 
   def shortCallTimeoutCb()(
-      implicit system: ActorSystem, ec: ExecutionContext): Breaker =
+      implicit system: ActorSystem,
+      ec: ExecutionContext): Breaker =
     new Breaker(
-        new CircuitBreaker(
-            system.scheduler, 1, 50.millis.dilated, 500.millis.dilated))
+      new CircuitBreaker(
+        system.scheduler,
+        1,
+        50.millis.dilated,
+        500.millis.dilated))
 
   def shortResetTimeoutCb()(
-      implicit system: ActorSystem, ec: ExecutionContext): Breaker =
+      implicit system: ActorSystem,
+      ec: ExecutionContext): Breaker =
     new Breaker(
-        new CircuitBreaker(
-            system.scheduler, 1, 1000.millis.dilated, 50.millis.dilated))
+      new CircuitBreaker(
+        system.scheduler,
+        1,
+        1000.millis.dilated,
+        50.millis.dilated))
 
   def longCallTimeoutCb()(
-      implicit system: ActorSystem, ec: ExecutionContext): Breaker =
+      implicit system: ActorSystem,
+      ec: ExecutionContext): Breaker =
     new Breaker(
-        new CircuitBreaker(system.scheduler, 1, 5 seconds, 500.millis.dilated))
+      new CircuitBreaker(system.scheduler, 1, 5 seconds, 500.millis.dilated))
 
   val longResetTimeout = 5.seconds
   def longResetTimeoutCb()(
-      implicit system: ActorSystem, ec: ExecutionContext): Breaker =
+      implicit system: ActorSystem,
+      ec: ExecutionContext): Breaker =
     new Breaker(
-        new CircuitBreaker(
-            system.scheduler, 1, 100.millis.dilated, longResetTimeout))
+      new CircuitBreaker(
+        system.scheduler,
+        1,
+        100.millis.dilated,
+        longResetTimeout))
 
   def multiFailureCb()(
-      implicit system: ActorSystem, ec: ExecutionContext): Breaker =
+      implicit system: ActorSystem,
+      ec: ExecutionContext): Breaker =
     new Breaker(
-        new CircuitBreaker(
-            system.scheduler, 5, 200.millis.dilated, 500.millis.dilated))
+      new CircuitBreaker(
+        system.scheduler,
+        5,
+        200.millis.dilated,
+        500.millis.dilated))
 }
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
@@ -87,7 +104,7 @@ class CircuitBreakerSpec extends AkkaSpec with BeforeAndAfter {
       }
       (e.remainingDuration > Duration.Zero) should ===(true)
       (e.remainingDuration <= CircuitBreakerSpec.longResetTimeout) should ===(
-          true)
+        true)
     }
 
     "transition to half-open on reset timeout" in {
@@ -202,7 +219,7 @@ class CircuitBreakerSpec extends AkkaSpec with BeforeAndAfter {
       breaker().withCircuitBreaker(Future(throwException))
       checkLatch(breaker.halfOpenLatch)
       Await.result(breaker().withCircuitBreaker(Future(sayHi)), awaitTimeout) should ===(
-          "hi")
+        "hi")
       checkLatch(breaker.closedLatch)
     }
 
@@ -211,8 +228,9 @@ class CircuitBreakerSpec extends AkkaSpec with BeforeAndAfter {
       breaker().withCircuitBreaker(Future(throwException))
       checkLatch(breaker.halfOpenLatch)
       intercept[TestException] {
-        Await.result(breaker().withCircuitBreaker(Future(throwException)),
-                     awaitTimeout)
+        Await.result(
+          breaker().withCircuitBreaker(Future(throwException)),
+          awaitTimeout)
       }
       checkLatch(breaker.openLatch)
     }
@@ -231,14 +249,15 @@ class CircuitBreakerSpec extends AkkaSpec with BeforeAndAfter {
     "allow calls through" in {
       val breaker = CircuitBreakerSpec.longCallTimeoutCb()
       Await.result(breaker().withCircuitBreaker(Future(sayHi)), awaitTimeout) should ===(
-          "hi")
+        "hi")
     }
 
     "increment failure count on exception" in {
       val breaker = CircuitBreakerSpec.longCallTimeoutCb()
       intercept[TestException] {
-        Await.result(breaker().withCircuitBreaker(Future(throwException)),
-                     awaitTimeout)
+        Await.result(
+          breaker().withCircuitBreaker(Future(throwException)),
+          awaitTimeout)
       }
       checkLatch(breaker.openLatch)
       breaker().currentFailureCount should ===(1)

@@ -42,7 +42,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class PieChartDataSpec
     extends SimpleSFXDelegateSpec[jfxsc.PieChart.Data, PieChart.Data](
-        classOf[jfxsc.PieChart.Data], classOf[PieChart.Data]) {
+      classOf[jfxsc.PieChart.Data],
+      classOf[PieChart.Data]) {
 
   override def getJavaClassInstance = new jfxsc.PieChart.Data("", 0.0)
 }

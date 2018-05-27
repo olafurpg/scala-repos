@@ -22,7 +22,8 @@ object SeqActorName {
 }
 
 private[akka] final class SeqActorNameImpl(
-    val prefix: String, counter: AtomicLong)
+    val prefix: String,
+    counter: AtomicLong)
     extends SeqActorName {
   def next(): String = prefix + '-' + counter.getAndIncrement()
 

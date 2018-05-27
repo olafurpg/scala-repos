@@ -52,7 +52,7 @@ object Line {
     }
   }
   def lineToStr(x: Line) = x match {
-    case u: UserLine => userLineToStr(u)
+    case u: UserLine   => userLineToStr(u)
     case p: PlayerLine => s"${p.color.letter} ${p.text}"
   }
 

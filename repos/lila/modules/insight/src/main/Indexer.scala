@@ -29,11 +29,11 @@ private final class Indexer(storage: Storage, sequencer: ActorRef) {
   def update(game: Game, userId: String, previous: Entry): Funit =
     PovToEntry(game, userId, previous.provisional) flatMap {
       case Right(e) => storage update e.copy(number = previous.number)
-      case _ => funit
+      case _        => funit
     }
 
   private def compute(user: User): Funit = storage.fetchLast(user.id) flatMap {
-    case None => fromScratch(user)
+    case None    => fromScratch(user)
     case Some(e) => computeFrom(user, e.date plusSeconds 1, e.number + 1)
   }
 
@@ -46,7 +46,7 @@ private final class Indexer(storage: Storage, sequencer: ActorRef) {
 
   private def gameQuery(user: User) =
     Query.user(user.id) ++ Query.rated ++ Query.finished ++ Query.turnsMoreThan(
-        2) ++ Query.notFromPosition ++ Query.notHordeOrSincePawnsAreWhite
+      2) ++ Query.notFromPosition ++ Query.notHordeOrSincePawnsAreWhite
 
   // private val maxGames = 1 * 10
   private val maxGames = 10 * 1000
@@ -62,25 +62,28 @@ private final class Indexer(storage: Storage, sequencer: ActorRef) {
       .sort(Query.sortChronological)
       .one[Game]
 
-  private def computeFrom(user: User, from: DateTime, fromNumber: Int): Funit = {
+  private def computeFrom(
+      user: User,
+      from: DateTime,
+      fromNumber: Int): Funit = {
     storage nbByPerf user.id flatMap { nbs =>
       var nbByPerf = nbs
       def toEntry(game: Game): Fu[Option[Entry]] = game.perfType ?? { pt =>
         val nb = nbByPerf.getOrElse(pt, 0) + 1
         nbByPerf = nbByPerf.updated(pt, nb)
-        PovToEntry(game, user.id, provisional = nb < 10).addFailureEffect {
-          e =>
-            println(e)
-            e.printStackTrace
+        PovToEntry(game, user.id, provisional = nb < 10).addFailureEffect { e =>
+          println(e)
+          e.printStackTrace
         } map (_.toOption)
       }
-      val query = $query(gameQuery(user) ++ Json.obj(
-              Game.BSONFields.createdAt -> $gte($date(from))))
+      val query = $query(
+        gameQuery(user) ++ Json.obj(
+          Game.BSONFields.createdAt -> $gte($date(from))))
       pimpQB(query)
         .sort(Query.sortChronological)
         .cursor[Game]()
         .enumerate(maxGames, stopOnError = true) &> Enumeratee.grouped(
-          Iteratee takeUpTo 4) &> Enumeratee
+        Iteratee takeUpTo 4) &> Enumeratee
         .mapM[Seq[Game]]
         .apply[Seq[Entry]] { games =>
           games.map(toEntry).sequenceFu.map(_.flatten).addFailureEffect { e =>
@@ -89,13 +92,13 @@ private final class Indexer(storage: Storage, sequencer: ActorRef) {
           }
         } &> Enumeratee.grouped(Iteratee takeUpTo 50) |>>> Iteratee
         .foldM[Seq[Seq[Entry]], Int](fromNumber) {
-        case (number, xs) =>
-          val entries = xs.flatten.sortBy(_.date).zipWithIndex.map {
-            case (e, i) => e.copy(number = number + i)
-          }
-          val nextNumber = number + entries.size
-          storage bulkInsert entries inject nextNumber
-      }
+          case (number, xs) =>
+            val entries = xs.flatten.sortBy(_.date).zipWithIndex.map {
+              case (e, i) => e.copy(number = number + i)
+            }
+            val nextNumber = number + entries.size
+            storage bulkInsert entries inject nextNumber
+        }
     } void
   }
 }

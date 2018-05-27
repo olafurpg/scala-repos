@@ -28,7 +28,8 @@ class UnserializableClass {
 }
 
 class ProactiveClosureSerializationSuite
-    extends SparkFunSuite with SharedSparkContext {
+    extends SparkFunSuite
+    with SharedSparkContext {
 
   def fixture: (RDD[String], UnserializableClass) = {
     (sc.parallelize(0 until 1000).map(_.toString), new UnserializableClass)
@@ -47,11 +48,11 @@ class ProactiveClosureSerializationSuite
   // transformation on a given RDD, creating one test case for each
 
   for (transformation <- Map(
-      "map" -> xmap _,
-      "flatMap" -> xflatMap _,
-      "filter" -> xfilter _,
-      "mapPartitions" -> xmapPartitions _,
-      "mapPartitionsWithIndex" -> xmapPartitionsWithIndex _)) {
+         "map" -> xmap _,
+         "flatMap" -> xflatMap _,
+         "filter" -> xfilter _,
+         "mapPartitions" -> xmapPartitions _,
+         "mapPartitionsWithIndex" -> xmapPartitionsWithIndex _)) {
     val (name, xf) = transformation
 
     test(s"$name transformations throw proactive serialization exceptions") {
@@ -59,8 +60,9 @@ class ProactiveClosureSerializationSuite
       val ex = intercept[SparkException] {
         xf(data, uc)
       }
-      assert(ex.getMessage.contains("Task not serializable"),
-             s"RDD.$name doesn't proactively throw NotSerializableException")
+      assert(
+        ex.getMessage.contains("Task not serializable"),
+        s"RDD.$name doesn't proactively throw NotSerializableException")
     }
   }
 
@@ -74,10 +76,12 @@ class ProactiveClosureSerializationSuite
     x.filter(y => uc.pred(y))
 
   private def xmapPartitions(
-      x: RDD[String], uc: UnserializableClass): RDD[String] =
+      x: RDD[String],
+      uc: UnserializableClass): RDD[String] =
     x.mapPartitions(_.map(y => uc.op(y)))
 
   private def xmapPartitionsWithIndex(
-      x: RDD[String], uc: UnserializableClass): RDD[String] =
+      x: RDD[String],
+      uc: UnserializableClass): RDD[String] =
     x.mapPartitionsWithIndex((_, it) => it.map(y => uc.op(y)))
 }

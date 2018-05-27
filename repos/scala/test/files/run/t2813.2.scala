@@ -3,9 +3,10 @@ import collection.JavaConversions._
 
 object Test extends App {
   def assertListEquals[A](expected: List[A], actual: Seq[A]) {
-    assert(expected.sameElements(actual),
-           "Expected list to contain " + expected.mkString("[", ", ", "]") +
-           ", but was " + actual.mkString("[", ", ", "]"))
+    assert(
+      expected.sameElements(actual),
+      "Expected list to contain " + expected.mkString("[", ", ", "]") +
+        ", but was " + actual.mkString("[", ", ", "]"))
   }
 
   def addAllOfNonCollectionWrapperAtZeroOnEmptyLinkedList() {

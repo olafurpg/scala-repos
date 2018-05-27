@@ -7,8 +7,7 @@ final class SlaveRunner(
     remoteArgs: Array[String],
     testClassLoader: ClassLoader,
     send: String => Unit
-)
-    extends BaseRunner(args, remoteArgs, testClassLoader) {
+) extends BaseRunner(args, remoteArgs, testClassLoader) {
 
   /** Number of tasks completed on this node */
   private[this] var doneCount = 0
@@ -42,13 +41,15 @@ final class SlaveRunner(
   }
 
   override def serializeTask(
-      task: Task, serializer: TaskDef => String): String = {
+      task: Task,
+      serializer: TaskDef => String): String = {
     ensureSeenHello()
     super.serializeTask(task, serializer)
   }
 
   override def deserializeTask(
-      task: String, deserializer: String => TaskDef): Task = {
+      task: String,
+      deserializer: String => TaskDef): Task = {
     ensureSeenHello()
     super.deserializeTask(task, deserializer)
   }

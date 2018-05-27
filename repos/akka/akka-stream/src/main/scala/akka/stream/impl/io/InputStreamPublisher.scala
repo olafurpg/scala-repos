@@ -17,9 +17,10 @@ import scala.util.{Failure, Success}
 /** INTERNAL API */
 private[akka] object InputStreamPublisher {
 
-  def props(is: InputStream,
-            completionPromise: Promise[IOResult],
-            chunkSize: Int): Props = {
+  def props(
+      is: InputStream,
+      completionPromise: Promise[IOResult],
+      chunkSize: Int): Props = {
     require(chunkSize > 0, s"chunkSize must be > 0 (was $chunkSize)")
 
     Props(classOf[InputStreamPublisher], is, completionPromise, chunkSize)
@@ -31,8 +32,11 @@ private[akka] object InputStreamPublisher {
 
 /** INTERNAL API */
 private[akka] class InputStreamPublisher(
-    is: InputStream, completionPromise: Promise[IOResult], chunkSize: Int)
-    extends akka.stream.actor.ActorPublisher[ByteString] with ActorLogging {
+    is: InputStream,
+    completionPromise: Promise[IOResult],
+    chunkSize: Int)
+    extends akka.stream.actor.ActorPublisher[ByteString]
+    with ActorLogging {
 
   // TODO possibly de-duplicate with FilePublisher?
 

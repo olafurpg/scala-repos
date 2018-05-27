@@ -25,9 +25,9 @@ object ContainerSerializer {
       if (proto.hasDocker) Some(DockerSerializer.fromProto(proto.getDocker))
       else None
     Container(
-        `type` = proto.getType,
-        volumes = proto.getVolumesList.asScala.map(Volume(_)).to[Seq],
-        docker = maybeDocker
+      `type` = proto.getType,
+      volumes = proto.getVolumesList.asScala.map(Volume(_)).to[Seq],
+      docker = maybeDocker
     )
   }
 
@@ -88,7 +88,7 @@ object DockerSerializer {
       .setImage(docker.image)
       .setPrivileged(docker.privileged)
       .addAllParameters(
-          docker.parameters.map(ParameterSerializer.toMesos).asJava)
+        docker.parameters.map(ParameterSerializer.toMesos).asJava)
       .setForcePullImage(docker.forcePullImage)
 
     docker.network foreach builder.setNetwork
@@ -102,18 +102,19 @@ object DockerSerializer {
 
   def fromProto(proto: Protos.ExtendedContainerInfo.DockerInfo): Docker =
     Docker(
-        image = proto.getImage,
-        network = if (proto.hasNetwork) Some(proto.getNetwork) else None,
-        portMappings = {
-          val pms = proto.getPortMappingsList.asScala
+      image = proto.getImage,
+      network = if (proto.hasNetwork) Some(proto.getNetwork) else None,
+      portMappings = {
+        val pms = proto.getPortMappingsList.asScala
 
-          if (pms.isEmpty) None
-          else Some(pms.map(PortMappingSerializer.fromProto).to[Seq])
-        },
-        privileged = proto.getPrivileged,
-        parameters = proto.getParametersList.asScala.map(Parameter(_)).to[Seq],
-        forcePullImage = if (proto.hasForcePullImage) proto.getForcePullImage
-          else false
+        if (pms.isEmpty) None
+        else Some(pms.map(PortMappingSerializer.fromProto).to[Seq])
+      },
+      privileged = proto.getPrivileged,
+      parameters = proto.getParametersList.asScala.map(Parameter(_)).to[Seq],
+      forcePullImage =
+        if (proto.hasForcePullImage) proto.getForcePullImage
+        else false
     )
 
   def toMesos(
@@ -131,7 +132,7 @@ object DockerSerializer {
     builder.setPrivileged(docker.privileged)
 
     builder.addAllParameters(
-        docker.parameters.map(ParameterSerializer.toMesos).asJava)
+      docker.parameters.map(ParameterSerializer.toMesos).asJava)
 
     builder.setForcePullImage(docker.forcePullImage)
 
@@ -150,25 +151,27 @@ object PortMappingSerializer {
         .setServicePort(mapping.servicePort)
 
     mapping.name.foreach(builder.setName)
-    mapping.labels.map {
-      case (key, value) =>
-        mesos.Protos.Label.newBuilder.setKey(key).setValue(value).build
-    }.foreach(builder.addLabels)
+    mapping.labels
+      .map {
+        case (key, value) =>
+          mesos.Protos.Label.newBuilder.setKey(key).setValue(value).build
+      }
+      .foreach(builder.addLabels)
 
     builder.build
   }
 
-  def fromProto(proto: Protos.ExtendedContainerInfo.DockerInfo.PortMapping)
-    : PortMapping =
+  def fromProto(
+      proto: Protos.ExtendedContainerInfo.DockerInfo.PortMapping): PortMapping =
     PortMapping(
-        proto.getContainerPort,
-        proto.getHostPort,
-        proto.getServicePort,
-        proto.getProtocol,
-        if (proto.hasName) Some(proto.getName) else None,
-        proto.getLabelsList.asScala.map { p =>
-          p.getKey -> p.getValue
-        }.toMap
+      proto.getContainerPort,
+      proto.getHostPort,
+      proto.getServicePort,
+      proto.getProtocol,
+      if (proto.hasName) Some(proto.getName) else None,
+      proto.getLabelsList.asScala.map { p =>
+        p.getKey -> p.getValue
+      }.toMap
     )
 
   def toMesos(mapping: Container.Docker.PortMapping)

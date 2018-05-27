@@ -106,8 +106,9 @@ trait FutureAction[T] extends Future[T] {
   * count, collect, reduce.
   */
 @DeveloperApi
-class SimpleFutureAction[T] private[spark](
-    jobWaiter: JobWaiter[_], resultFunc: => T)
+class SimpleFutureAction[T] private[spark] (
+    jobWaiter: JobWaiter[_],
+    resultFunc: => T)
     extends FutureAction[T] {
 
   @volatile private var _cancelled: Boolean = false
@@ -161,11 +162,12 @@ trait JobSubmitter {
     * This is a wrapper around the same functionality provided by SparkContext
     * to enable cancellation.
     */
-  def submitJob[T, U, R](rdd: RDD[T],
-                         processPartition: Iterator[T] => U,
-                         partitions: Seq[Int],
-                         resultHandler: (Int, U) => Unit,
-                         resultFunc: => R): FutureAction[R]
+  def submitJob[T, U, R](
+      rdd: RDD[T],
+      processPartition: Iterator[T] => U,
+      partitions: Seq[Int],
+      resultHandler: (Int, U) => Unit,
+      resultFunc: => R): FutureAction[R]
 }
 
 /**
@@ -200,11 +202,12 @@ class ComplexFutureAction[T](run: JobSubmitter => Future[T])
       // If the action hasn't been cancelled yet, submit the job. The check and the submitJob
       // command need to be in an atomic block.
       if (!isCancelled) {
-        val job = rdd.context.submitJob(rdd,
-                                        processPartition,
-                                        partitions,
-                                        resultHandler,
-                                        resultFunc)
+        val job = rdd.context.submitJob(
+          rdd,
+          processPartition,
+          partitions,
+          resultHandler,
+          resultFunc)
         subActions = job :: subActions
         job
       } else {
@@ -240,7 +243,8 @@ class ComplexFutureAction[T](run: JobSubmitter => Future[T])
 }
 
 private[spark] class JavaFutureActionWrapper[S, T](
-    futureAction: FutureAction[S], converter: S => T)
+    futureAction: FutureAction[S],
+    converter: S => T)
     extends JavaFutureAction[T] {
 
   import scala.collection.JavaConverters._
@@ -255,7 +259,7 @@ private[spark] class JavaFutureActionWrapper[S, T](
 
   override def jobIds(): java.util.List[java.lang.Integer] = {
     Collections.unmodifiableList(
-        futureAction.jobIds.map(Integer.valueOf).asJava)
+      futureAction.jobIds.map(Integer.valueOf).asJava)
   }
 
   private def getImpl(timeout: Duration): T = {

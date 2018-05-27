@@ -49,8 +49,8 @@ object ScalarTagBool extends ScalarTag[Boolean] {
   def makeLoc(sz: Int = Buffer.INIT_CAPACITY) = new LocatorBool()
   def makeVec(arr: Array[Boolean]) = new VecBool(arr)
   def makeMat(r: Int, c: Int, arr: Array[Boolean]) = new MatBool(r, c, arr)
-  def makeIndex(vec: Vec[Boolean])(
-      implicit ord: ORD[Boolean]): Index[Boolean] = new IndexAny[Boolean](vec)
+  def makeIndex(vec: Vec[Boolean])(implicit ord: ORD[Boolean]): Index[Boolean] =
+    new IndexAny[Boolean](vec)
   def makeSorter(implicit ord: ORD[Boolean]): Sorter[Boolean] =
     Sorter.boolSorter
 

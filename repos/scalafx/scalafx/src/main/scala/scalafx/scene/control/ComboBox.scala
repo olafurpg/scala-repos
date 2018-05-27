@@ -31,7 +31,11 @@ import javafx.{collections => jfxc, scene => jfxs, util => jfxu}
 
 import scala.language.implicitConversions
 import scalafx.Includes._
-import scalafx.beans.property.{IntegerProperty, ObjectProperty, ReadOnlyObjectProperty}
+import scalafx.beans.property.{
+  IntegerProperty,
+  ObjectProperty,
+  ReadOnlyObjectProperty
+}
 import scalafx.collections.ObservableBuffer
 import scalafx.collections.ObservableBuffer._
 import scalafx.delegate.SFXDelegate
@@ -46,7 +50,8 @@ object ComboBox {
 
 class ComboBox[T](
     override val delegate: jfxsc.ComboBox[T] = new jfxsc.ComboBox[T])
-    extends ComboBoxBase(delegate) with SFXDelegate[jfxsc.ComboBox[T]] {
+    extends ComboBoxBase(delegate)
+    with SFXDelegate[jfxsc.ComboBox[T]] {
 
   /**
     * Creates a default ComboBox instance from a [[scalafx.collections.ObservableBuffer]]
@@ -65,16 +70,15 @@ class ComboBox[T](
     * Providing a custom cell factory allows for complete customization of the rendering of items in the ComboBox.
     */
   def cellFactory: ObjectProperty[ListView[T] => ListCell[T]] =
-    ObjectProperty(
-        (view: ListView[T]) =>
-          new ListCell(delegate.cellFactoryProperty.getValue.call(view)))
+    ObjectProperty((view: ListView[T]) =>
+      new ListCell(delegate.cellFactoryProperty.getValue.call(view)))
   def cellFactory_=(f: ListView[T] => ListCell[T]) {
     delegate.cellFactoryProperty.setValue(
-        new jfxu.Callback[jfxsc.ListView[T], jfxsc.ListCell[T]] {
-      def call(v: jfxsc.ListView[T]): jfxsc.ListCell[T] = {
-        f(v)
-      }
-    })
+      new jfxu.Callback[jfxsc.ListView[T], jfxsc.ListCell[T]] {
+        def call(v: jfxsc.ListView[T]): jfxsc.ListCell[T] = {
+          f(v)
+        }
+      })
   }
 
   /**

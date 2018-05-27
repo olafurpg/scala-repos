@@ -24,31 +24,32 @@ private[finagle] class ZooKeeperHealthHandler extends Watcher {
       permit <- mu.acquire()
       () <- evt.getState match {
         case KeeperState.SyncConnected => pulse ! Healthy
-        case _ => pulse ! Unhealthy
+        case _                         => pulse ! Unhealthy
       }
     } permit.release()
 }
 
 private[finagle] object DefaultZkClientFactory
     extends ZkClientFactory(
-        Amount
-          .of(ZooKeeperUtils.DEFAULT_ZK_SESSION_TIMEOUT.getValue.toLong,
-              ZooKeeperUtils.DEFAULT_ZK_SESSION_TIMEOUT.getUnit)
-          .toDuration)
+      Amount
+        .of(
+          ZooKeeperUtils.DEFAULT_ZK_SESSION_TIMEOUT.getValue.toLong,
+          ZooKeeperUtils.DEFAULT_ZK_SESSION_TIMEOUT.getUnit)
+        .toDuration)
 
 private[finagle] class ZkClientFactory(val sessionTimeout: Duration) {
-  private[this] val zkClients: mutable.Map[
-      Set[InetSocketAddress], ZooKeeperClient] = mutable.Map()
+  private[this] val zkClients
+    : mutable.Map[Set[InetSocketAddress], ZooKeeperClient] = mutable.Map()
 
   def hostSet(hosts: String) = InetSocketAddressUtil.parseHosts(hosts).toSet
 
   def get(zkHosts: Set[InetSocketAddress]): (ZooKeeperClient, Offer[Health]) =
     synchronized {
       val client = zkClients.getOrElseUpdate(
-          zkHosts,
-          new ZooKeeperClient(Amount.of(sessionTimeout.inMillis.toInt,
-                                        CommonTime.MILLISECONDS),
-                              zkHosts.asJava))
+        zkHosts,
+        new ZooKeeperClient(
+          Amount.of(sessionTimeout.inMillis.toInt, CommonTime.MILLISECONDS),
+          zkHosts.asJava))
       // TODO: Watchers are tied to the life of the client,
       // which, in turn, is tied to the life of ZkClientFactory.
       // Maybe we should expose a way to unregister watchers.

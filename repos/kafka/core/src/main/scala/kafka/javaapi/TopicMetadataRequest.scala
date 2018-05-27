@@ -23,29 +23,35 @@ import org.apache.kafka.common.protocol.ApiKeys
 
 import scala.collection.mutable
 
-class TopicMetadataRequest(val versionId: Short,
-                           val correlationId: Int,
-                           val clientId: String,
-                           val topics: java.util.List[String])
+class TopicMetadataRequest(
+    val versionId: Short,
+    val correlationId: Int,
+    val clientId: String,
+    val topics: java.util.List[String])
     extends RequestOrResponse(Some(ApiKeys.METADATA.id)) {
 
   val underlying: kafka.api.TopicMetadataRequest = {
     import scala.collection.JavaConversions._
     new kafka.api.TopicMetadataRequest(
-        versionId, correlationId, clientId, topics: mutable.Buffer[String])
+      versionId,
+      correlationId,
+      clientId,
+      topics: mutable.Buffer[String])
   }
 
   def this(topics: java.util.List[String]) =
-    this(kafka.api.TopicMetadataRequest.CurrentVersion,
-         0,
-         kafka.api.TopicMetadataRequest.DefaultClientId,
-         topics)
+    this(
+      kafka.api.TopicMetadataRequest.CurrentVersion,
+      0,
+      kafka.api.TopicMetadataRequest.DefaultClientId,
+      topics)
 
   def this(topics: java.util.List[String], correlationId: Int) =
-    this(kafka.api.TopicMetadataRequest.CurrentVersion,
-         correlationId,
-         kafka.api.TopicMetadataRequest.DefaultClientId,
-         topics)
+    this(
+      kafka.api.TopicMetadataRequest.CurrentVersion,
+      correlationId,
+      kafka.api.TopicMetadataRequest.DefaultClientId,
+      topics)
 
   def writeTo(buffer: ByteBuffer) = underlying.writeTo(buffer)
 

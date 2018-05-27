@@ -74,24 +74,25 @@ object Mode {
   /** Translates a mask of mode flags into something readable.
     */
   private val modeNameMap = Map[Int, String](
-      // TODO why duplicate the bitmasks here, rather than just referring to this.EXPRmode etc?
-      (1 << 0) -> "EXPRmode",
-      (1 << 1) -> "PATTERNmode",
-      (1 << 2) -> "TYPEmode",
-      (1 << 3) -> "SCCmode",
-      (1 << 4) -> "FUNmode",
-      (1 << 5) -> "POLYmode",
-      (1 << 6) -> "QUALmode",
-      (1 << 7) -> "TAPPmode",
-      (1 << 8) -> "<>", // formerly SUPERCONSTRmode
-      (1 << 9) -> "<>", // formerly SNDTRYmode
-      (1 << 10) -> "LHSmode",
-      (1 << 11) -> "<>",
-      (1 << 12) -> "<>", // formerly STARmode
-      (1 << 13) -> "<>", // formerly ALTmode
-      (1 << 14) -> "<>", // formerly HKmode
-      (1 << 15) -> "BYVALmode",
-      (1 << 16) -> "TYPEPATmode").map({ case (k, v) => Mode(k) -> v })
+    // TODO why duplicate the bitmasks here, rather than just referring to this.EXPRmode etc?
+    (1 << 0) -> "EXPRmode",
+    (1 << 1) -> "PATTERNmode",
+    (1 << 2) -> "TYPEmode",
+    (1 << 3) -> "SCCmode",
+    (1 << 4) -> "FUNmode",
+    (1 << 5) -> "POLYmode",
+    (1 << 6) -> "QUALmode",
+    (1 << 7) -> "TAPPmode",
+    (1 << 8) -> "<>", // formerly SUPERCONSTRmode
+    (1 << 9) -> "<>", // formerly SNDTRYmode
+    (1 << 10) -> "LHSmode",
+    (1 << 11) -> "<>",
+    (1 << 12) -> "<>", // formerly STARmode
+    (1 << 13) -> "<>", // formerly ALTmode
+    (1 << 14) -> "<>", // formerly HKmode
+    (1 << 15) -> "BYVALmode",
+    (1 << 16) -> "TYPEPATmode"
+  ).map({ case (k, v) => Mode(k) -> v })
 }
 import Mode._
 

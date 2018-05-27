@@ -5,7 +5,10 @@ import com.intellij.lang.annotation.{AnnotationHolder, Annotator}
 import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.{PsiComment, PsiElement, PsiWhiteSpace}
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunctionDefinition, ScPatternDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunctionDefinition,
+  ScPatternDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.ScImportStmt
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.types
@@ -30,13 +33,14 @@ class SbtAnnotator extends Annotator {
       case _ =>
     }
 
-  private class Worker(sbtFileElements: Seq[PsiElement],
-                       sbtVersion: String,
-                       holder: AnnotationHolder) {
+  private class Worker(
+      sbtFileElements: Seq[PsiElement],
+      sbtVersion: String,
+      holder: AnnotationHolder) {
     def annotate(): Unit = {
       sbtFileElements.collect {
         case exp: ScExpression => annotateTypeMismatch(exp)
-        case element => annotateNonExpression(element)
+        case element           => annotateNonExpression(element)
       }
       if (sbtVersionLessThan("0.13.7")) annotateMissingBlankLines()
     }
@@ -49,8 +53,8 @@ class SbtAnnotator extends Annotator {
             if !sbtVersionLessThan("0.13.0") =>
         case other =>
           holder.createErrorAnnotation(
-              other,
-              SbtBundle("sbt.annotation.sbtFileMustContainOnlyExpressions"))
+            other,
+            SbtBundle("sbt.annotation.sbtFileMustContainOnlyExpressions"))
       }
 
     private def annotateTypeMismatch(expression: ScExpression): Unit =
@@ -58,25 +62,28 @@ class SbtAnnotator extends Annotator {
         if (expressionType.equiv(types.Nothing) ||
             expressionType.equiv(types.Null)) {
           holder.createErrorAnnotation(
-              expression, SbtBundle("sbt.annotation.expectedExpressionType"))
+            expression,
+            SbtBundle("sbt.annotation.expectedExpressionType"))
         } else {
           if (!isTypeAllowed(expression, expressionType))
             holder.createErrorAnnotation(
-                expression,
-                SbtBundle("sbt.annotation.expressionMustConform",
-                          expressionType))
+              expression,
+              SbtBundle("sbt.annotation.expressionMustConform", expressionType))
         }
       }
 
     private def findTypeByText(
-        exp: ScExpression, text: String): Option[ScType] =
+        exp: ScExpression,
+        text: String): Option[ScType] =
       Option(
-          ScalaPsiElementFactory.createTypeFromText(text, exp.getContext, exp))
+        ScalaPsiElementFactory.createTypeFromText(text, exp.getContext, exp))
 
     private def isTypeAllowed(
-        expression: ScExpression, expressionType: ScType): Boolean =
-      SbtAnnotator.AllowedTypes.exists(typeStr =>
-            findTypeByText(expression, typeStr) exists
+        expression: ScExpression,
+        expressionType: ScType): Boolean =
+      SbtAnnotator.AllowedTypes.exists(
+        typeStr =>
+          findTypeByText(expression, typeStr) exists
             (t => expressionType conforms t))
 
     private def annotateMissingBlankLines(): Unit =
@@ -84,7 +91,8 @@ class SbtAnnotator extends Annotator {
         case Seq(_: ScExpression, space: PsiWhiteSpace, e: ScExpression)
             if space.getText.count(_ == '\n') == 1 =>
           holder.createErrorAnnotation(
-              e, SbtBundle("sbt.annotation.blankLineRequired", sbtVersion))
+            e,
+            SbtBundle("sbt.annotation.blankLineRequired", sbtVersion))
         case _ =>
       }
 
@@ -94,6 +102,6 @@ class SbtAnnotator extends Annotator {
 }
 
 object SbtAnnotator {
-  val AllowedTypes = List(
-      "Seq[Def.SettingsDefinition]", "Def.SettingsDefinition")
+  val AllowedTypes =
+    List("Seq[Def.SettingsDefinition]", "Def.SettingsDefinition")
 }

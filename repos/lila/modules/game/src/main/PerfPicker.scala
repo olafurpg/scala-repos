@@ -8,14 +8,16 @@ object PerfPicker {
 
   val default = (perfs: Perfs) => perfs.standard
 
-  def perfType(speed: Speed,
-               variant: chess.variant.Variant,
-               daysPerTurn: Option[Int]): Option[PerfType] =
+  def perfType(
+      speed: Speed,
+      variant: chess.variant.Variant,
+      daysPerTurn: Option[Int]): Option[PerfType] =
     PerfType(key(speed, variant, daysPerTurn))
 
-  def key(speed: Speed,
-          variant: chess.variant.Variant,
-          daysPerTurn: Option[Int]): String =
+  def key(
+      speed: Speed,
+      variant: chess.variant.Variant,
+      daysPerTurn: Option[Int]): String =
     if (variant.standard) {
       if (daysPerTurn.isDefined || speed == Speed.Correspondence)
         PerfType.Correspondence.key
@@ -25,9 +27,10 @@ object PerfPicker {
   def key(game: Game): String =
     key(game.speed, game.ratingVariant, game.daysPerTurn)
 
-  def main(speed: Speed,
-           variant: chess.variant.Variant,
-           daysPerTurn: Option[Int]): Option[Perfs => Perf] =
+  def main(
+      speed: Speed,
+      variant: chess.variant.Variant,
+      daysPerTurn: Option[Int]): Option[Perfs => Perf] =
     if (variant.standard)
       Some {
         if (daysPerTurn.isDefined) (perfs: Perfs) => perfs.correspondence
@@ -37,13 +40,15 @@ object PerfPicker {
   def main(game: Game): Option[Perfs => Perf] =
     main(game.speed, game.ratingVariant, game.daysPerTurn)
 
-  def mainOrDefault(speed: Speed,
-                    variant: chess.variant.Variant,
-                    daysPerTurn: Option[Int]): Perfs => Perf =
+  def mainOrDefault(
+      speed: Speed,
+      variant: chess.variant.Variant,
+      daysPerTurn: Option[Int]): Perfs => Perf =
     main(speed, variant, daysPerTurn) orElse {
-      (variant == chess.variant.FromPosition) ?? main(speed,
-                                                      chess.variant.Standard,
-                                                      daysPerTurn)
+      (variant == chess.variant.FromPosition) ?? main(
+        speed,
+        chess.variant.Standard,
+        daysPerTurn)
     } getOrElse default
 
   def mainOrDefault(game: Game): Perfs => Perf =

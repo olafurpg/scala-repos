@@ -12,16 +12,24 @@ import language.experimental.macros
   */
 object JsMacroImpl {
 
-  def formatImpl[A : c.WeakTypeTag](c: Context): c.Expr[OFormat[A]] =
+  def formatImpl[A: c.WeakTypeTag](c: Context): c.Expr[OFormat[A]] =
     macroImpl[A, OFormat, Format](
-        c, "format", "inmap", reads = true, writes = true)
+      c,
+      "format",
+      "inmap",
+      reads = true,
+      writes = true)
 
-  def readsImpl[A : c.WeakTypeTag](c: Context): c.Expr[Reads[A]] =
+  def readsImpl[A: c.WeakTypeTag](c: Context): c.Expr[Reads[A]] =
     macroImpl[A, Reads, Reads](c, "read", "map", reads = true, writes = false)
 
-  def writesImpl[A : c.WeakTypeTag](c: Context): c.Expr[OWrites[A]] =
+  def writesImpl[A: c.WeakTypeTag](c: Context): c.Expr[OWrites[A]] =
     macroImpl[A, OWrites, Writes](
-        c, "write", "contramap", reads = false, writes = true)
+      c,
+      "write",
+      "contramap",
+      reads = false,
+      writes = true)
 
   /**
     * Generic implementation of the macro
@@ -41,11 +49,12 @@ object JsMacroImpl {
     * @param matag The class of the reads/writes/format.
     * @param natag The class of the reads/writes/format.
     */
-  private def macroImpl[A, M[_], N[_]](c: Context,
-                                       methodName: String,
-                                       mapLikeMethod: String,
-                                       reads: Boolean,
-                                       writes: Boolean)(
+  private def macroImpl[A, M[_], N[_]](
+      c: Context,
+      methodName: String,
+      mapLikeMethod: String,
+      reads: Boolean,
+      writes: Boolean)(
       implicit atag: c.WeakTypeTag[A],
       matag: c.WeakTypeTag[M[A]],
       natag: c.WeakTypeTag[N[A]]): c.Expr[M[A]] = {
@@ -54,7 +63,7 @@ object JsMacroImpl {
     // writes or both.
     def conditionalList[T](ifReads: T, ifWrites: T): List[T] =
       (if (reads) List(ifReads) else Nil) :::
-      (if (writes) List(ifWrites) else Nil)
+        (if (writes) List(ifWrites) else Nil)
 
     import c.universe._
 
@@ -97,8 +106,8 @@ object JsMacroImpl {
       effectiveUnapply.returnType match {
         case TypeRef(_, _, Nil) =>
           c.abort(
-              c.enclosingPosition,
-              s"Unapply of $companionObject has no parameters. Are you using an empty case class?")
+            c.enclosingPosition,
+            s"Unapply of $companionObject has no parameters. Are you using an empty case class?")
           None
 
         case TypeRef(_, _, args) =>
@@ -107,7 +116,7 @@ object JsMacroImpl {
             case t @ TypeRef(_, _, args) =>
               import c.universe.definitions.TupleClass
               if (!TupleClass.seq.exists(
-                      tupleSym => t.baseType(tupleSym) ne NoType))
+                    tupleSym => t.baseType(tupleSym) ne NoType))
                 Some(List(t))
               else if (t <:< typeOf[Product]) Some(args)
               else None
@@ -119,7 +128,7 @@ object JsMacroImpl {
     // Now the apply methods for the object
     val applies = companionType.decl(TermName("apply")) match {
       case NoSymbol => c.abort(c.enclosingPosition, "No apply function found")
-      case s => s.asTerm.alternatives
+      case s        => s.asTerm.alternatives
     }
 
     // Find an apply method that matches the unapply
@@ -148,16 +157,18 @@ object JsMacroImpl {
       case Some(apply) =>
         apply.paramLists.head //verify there is a single parameter group
       case None =>
-        c.abort(c.enclosingPosition,
-                "No apply function found matching unapply parameters")
+        c.abort(
+          c.enclosingPosition,
+          "No apply function found matching unapply parameters")
     }
 
     // Now we find all the implicits that we need
-    final case class Implicit(paramName: Name,
-                              paramType: Type,
-                              neededImplicit: Tree,
-                              isRecursive: Boolean,
-                              tpe: Type)
+    final case class Implicit(
+        paramName: Name,
+        paramType: Type,
+        neededImplicit: Tree,
+        isRecursive: Boolean,
+        tpe: Type)
 
     val createImplicit = { (name: Name, implType: c.universe.type#Type) =>
       val (isRecursive, tpe) = implType match {
@@ -166,15 +177,16 @@ object JsMacroImpl {
           // Option[_] needs special treatment because we need to use XXXOpt
           val tp =
             if (implType.typeConstructor <:< typeOf[Option[_]].typeConstructor)
-              args.head else implType
+              args.head
+            else implType
           (isRec, tp)
         case TypeRef(_, t, _) =>
           (false, implType)
       }
 
       // builds M implicit from expected type
-      val neededImplicitType = appliedType(
-          natag.tpe.typeConstructor, tpe :: Nil)
+      val neededImplicitType =
+        appliedType(natag.tpe.typeConstructor, tpe :: Nil)
       // infers implicit
       val neededImplicit = c.inferImplicitValue(neededImplicitType)
       Implicit(name, implType, neededImplicit, isRecursive, tpe)
@@ -186,7 +198,8 @@ object JsMacroImpl {
     val effectiveInferredImplicits =
       if (hasVarArgs) {
         val varArgsImplicit = createImplicit(
-            applyParamImplicits.last.paramName, unapplyReturnTypes.get.last)
+          applyParamImplicits.last.paramName,
+          unapplyReturnTypes.get.last)
         applyParamImplicits.init :+ varArgsImplicit
       } else applyParamImplicits
 
@@ -196,62 +209,65 @@ object JsMacroImpl {
     }
     if (missingImplicits.nonEmpty)
       c.abort(
-          c.enclosingPosition,
-          s"No implicit format for ${missingImplicits.mkString(", ")} available.")
+        c.enclosingPosition,
+        s"No implicit format for ${missingImplicits.mkString(", ")} available.")
 
     var hasRec = false
 
     // combines all reads into CanBuildX
-    val canBuild = effectiveInferredImplicits.map {
-      case Implicit(name, t, impl, rec, tpe) =>
-        // Equivalent to __ \ "name"
-        val jspathTree = q"""$JsPath \ ${name.decodedName.toString}"""
+    val canBuild = effectiveInferredImplicits
+      .map {
+        case Implicit(name, t, impl, rec, tpe) =>
+          // Equivalent to __ \ "name"
+          val jspathTree = q"""$JsPath \ ${name.decodedName.toString}"""
 
-        // If we're not recursive, simple, just invoke read/write/format
-        if (!rec) {
-          // If we're an option, invoke the nullable version
-          if (t.typeConstructor <:< typeOf[Option[_]].typeConstructor) {
-            q"$jspathTree.$callNullable($impl)"
+          // If we're not recursive, simple, just invoke read/write/format
+          if (!rec) {
+            // If we're an option, invoke the nullable version
+            if (t.typeConstructor <:< typeOf[Option[_]].typeConstructor) {
+              q"$jspathTree.$callNullable($impl)"
+            } else {
+              q"$jspathTree.$call($impl)"
+            }
           } else {
-            q"$jspathTree.$call($impl)"
-          }
-        } else {
-          // Otherwise we have to invoke the lazy version
-          hasRec = true
-          if (t.typeConstructor <:< typeOf[Option[_]].typeConstructor) {
-            q"$jspathTree.$callNullable($JsPath.$lazyCall(this.lazyStuff))"
-          } else {
-            // If this is a list/set/seq/map, then we need to wrap the reads into that.
-            def readsWritesHelper(methodName: String): List[Tree] =
-              conditionalList(Reads, Writes).map(
-                  s => q"$s.${TermName(methodName)}(this.lazyStuff)")
+            // Otherwise we have to invoke the lazy version
+            hasRec = true
+            if (t.typeConstructor <:< typeOf[Option[_]].typeConstructor) {
+              q"$jspathTree.$callNullable($JsPath.$lazyCall(this.lazyStuff))"
+            } else {
+              // If this is a list/set/seq/map, then we need to wrap the reads into that.
+              def readsWritesHelper(methodName: String): List[Tree] =
+                conditionalList(Reads, Writes).map(s =>
+                  q"$s.${TermName(methodName)}(this.lazyStuff)")
 
-            val arg =
-              if (tpe.typeConstructor <:< typeOf[List[_]].typeConstructor)
-                readsWritesHelper("list")
-              else if (tpe.typeConstructor <:< typeOf[Set[_]].typeConstructor)
-                readsWritesHelper("set")
-              else if (tpe.typeConstructor <:< typeOf[Seq[_]].typeConstructor)
-                readsWritesHelper("seq")
-              else if (tpe.typeConstructor <:< typeOf[Map[_, _]].typeConstructor)
-                readsWritesHelper("map")
-              else List(q"this.lazyStuff")
+              val arg =
+                if (tpe.typeConstructor <:< typeOf[List[_]].typeConstructor)
+                  readsWritesHelper("list")
+                else if (tpe.typeConstructor <:< typeOf[Set[_]].typeConstructor)
+                  readsWritesHelper("set")
+                else if (tpe.typeConstructor <:< typeOf[Seq[_]].typeConstructor)
+                  readsWritesHelper("seq")
+                else if (tpe.typeConstructor <:< typeOf[Map[_, _]].typeConstructor)
+                  readsWritesHelper("map")
+                else List(q"this.lazyStuff")
 
-            q"$jspathTree.$lazyCall(..$arg)"
+              q"$jspathTree.$lazyCall(..$arg)"
+            }
           }
-        }
-    }.reduceLeft[Tree] { (acc, r) =>
-      q"$acc.and($r)"
-    }
+      }
+      .reduceLeft[Tree] { (acc, r) =>
+        q"$acc.and($r)"
+      }
 
     val applyFunction = {
       if (hasVarArgs) {
 
-        val applyParams = params.foldLeft(List[Tree]())(
-            (l, e) => l :+ Ident(TermName(e.name.encodedName.toString)))
-        val vals = params.foldLeft(List[Tree]())((l, e) =>
-              // Let type inference infer the type by using the empty type, TypeTree()
-              l :+ q"val ${TermName(e.name.encodedName.toString)}: ${TypeTree()}")
+        val applyParams = params.foldLeft(List[Tree]())((l, e) =>
+          l :+ Ident(TermName(e.name.encodedName.toString)))
+        val vals = params.foldLeft(List[Tree]())(
+          (l, e) =>
+            // Let type inference infer the type by using the empty type, TypeTree()
+            l :+ q"val ${TermName(e.name.encodedName.toString)}: ${TypeTree()}")
 
         q"(..$vals) => $companionObject.apply(..${applyParams.init}, ${applyParams.last}: _*)"
       } else {
@@ -263,8 +279,7 @@ object JsMacroImpl {
 
     // if case class has one single field, needs to use map/contramap/inmap on the Reads/Writes/Format instead of
     // canbuild.apply
-    val applyOrMap = TermName(
-        if (params.length > 1) "apply" else mapLikeMethod)
+    val applyOrMap = TermName(if (params.length > 1) "apply" else mapLikeMethod)
     val finalTree = q"""
       import $syntax._
 

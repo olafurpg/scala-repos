@@ -44,13 +44,15 @@ import scala.util.Random
   * @param context execution context used by scheduler
   */
 @SerialVersionUID(1L)
-final case class TailChoppingRoutingLogic(scheduler: Scheduler,
-                                          within: FiniteDuration,
-                                          interval: FiniteDuration,
-                                          context: ExecutionContext)
+final case class TailChoppingRoutingLogic(
+    scheduler: Scheduler,
+    within: FiniteDuration,
+    interval: FiniteDuration,
+    context: ExecutionContext)
     extends RoutingLogic {
   override def select(
-      message: Any, routees: immutable.IndexedSeq[Routee]): Routee = {
+      message: Any,
+      routees: immutable.IndexedSeq[Routee]): Routee = {
     if (routees.isEmpty) NoRoutee
     else TailChoppingRoutees(scheduler, routees, within, interval)(context)
   }
@@ -89,8 +91,8 @@ private[akka] final case class TailChoppingRoutees(
     }
 
     val sendTimeout = scheduler.scheduleOnce(within)(
-        promise.tryFailure(new AskTimeoutException(
-                s"Ask timed out on [$sender] after [$within.toMillis} ms]")))
+      promise.tryFailure(new AskTimeoutException(
+        s"Ask timed out on [$sender] after [$within.toMillis} ms]")))
 
     val f = promise.future
     f.onComplete {
@@ -153,17 +155,21 @@ final case class TailChoppingPool(
     override val resizer: Option[Resizer] = None,
     within: FiniteDuration,
     interval: FiniteDuration,
-    override val supervisorStrategy: SupervisorStrategy = Pool.defaultSupervisorStrategy,
+    override val supervisorStrategy: SupervisorStrategy =
+      Pool.defaultSupervisorStrategy,
     override val routerDispatcher: String = Dispatchers.DefaultDispatcherId,
     override val usePoolDispatcher: Boolean = false)
-    extends Pool with PoolOverrideUnsetConfig[TailChoppingPool] {
+    extends Pool
+    with PoolOverrideUnsetConfig[TailChoppingPool] {
 
   def this(config: Config) =
-    this(nrOfInstances = config.getInt("nr-of-instances"),
-         within = config.getMillisDuration("within"),
-         interval = config.getMillisDuration("tail-chopping-router.interval"),
-         resizer = Resizer.fromConfig(config),
-         usePoolDispatcher = config.hasPath("pool-dispatcher"))
+    this(
+      nrOfInstances = config.getInt("nr-of-instances"),
+      within = config.getMillisDuration("within"),
+      interval = config.getMillisDuration("tail-chopping-router.interval"),
+      resizer = Resizer.fromConfig(config),
+      usePoolDispatcher = config.hasPath("pool-dispatcher")
+    )
 
   /**
     * Java API
@@ -177,10 +183,11 @@ final case class TailChoppingPool(
 
   override def createRouter(system: ActorSystem): Router =
     new Router(
-        TailChoppingRoutingLogic(system.scheduler,
-                                 within,
-                                 interval,
-                                 system.dispatchers.lookup(routerDispatcher)))
+      TailChoppingRoutingLogic(
+        system.scheduler,
+        within,
+        interval,
+        system.dispatchers.lookup(routerDispatcher)))
 
   override def nrOfInstances(sys: ActorSystem) = this.nrOfInstances
 
@@ -248,9 +255,11 @@ final case class TailChoppingGroup(
     extends Group {
 
   def this(config: Config) =
-    this(paths = immutableSeq(config.getStringList("routees.paths")),
-         within = config.getMillisDuration("within"),
-         interval = config.getMillisDuration("tail-chopping-router.interval"))
+    this(
+      paths = immutableSeq(config.getStringList("routees.paths")),
+      within = config.getMillisDuration("within"),
+      interval = config.getMillisDuration("tail-chopping-router.interval")
+    )
 
   /**
     * Java API
@@ -260,19 +269,22 @@ final case class TailChoppingGroup(
     *   it will reply with [[akka.pattern.AskTimeoutException]] in a [[akka.actor.Status.Failure]]
     * @param interval duration after which next routee will be picked
     */
-  def this(routeePaths: java.lang.Iterable[String],
-           within: FiniteDuration,
-           interval: FiniteDuration) =
-    this(paths = immutableSeq(routeePaths),
-         within = within,
-         interval = interval)
+  def this(
+      routeePaths: java.lang.Iterable[String],
+      within: FiniteDuration,
+      interval: FiniteDuration) =
+    this(
+      paths = immutableSeq(routeePaths),
+      within = within,
+      interval = interval)
 
   override def createRouter(system: ActorSystem): Router =
     new Router(
-        TailChoppingRoutingLogic(system.scheduler,
-                                 within,
-                                 interval,
-                                 system.dispatchers.lookup(routerDispatcher)))
+      TailChoppingRoutingLogic(
+        system.scheduler,
+        within,
+        interval,
+        system.dispatchers.lookup(routerDispatcher)))
 
   override def paths(system: ActorSystem): immutable.Iterable[String] =
     this.paths

@@ -25,11 +25,13 @@ abstract class CacheConditionDirectives extends BasicDirectives {
     * must be on a deeper level in your route structure in order to function correctly.
     */
   @varargs
-  def conditional(entityTag: EntityTag,
-                  innerRoute: Route,
-                  moreInnerRoutes: Route*): Route =
+  def conditional(
+      entityTag: EntityTag,
+      innerRoute: Route,
+      moreInnerRoutes: Route*): Route =
     RouteStructure.Conditional(entityTag = Some(entityTag))(
-        innerRoute, moreInnerRoutes.toList)
+      innerRoute,
+      moreInnerRoutes.toList)
 
   /**
     * Wraps its inner route with support for Conditional Requests as defined
@@ -43,11 +45,13 @@ abstract class CacheConditionDirectives extends BasicDirectives {
     * must be on a deeper level in your route structure in order to function correctly.
     */
   @varargs
-  def conditional(lastModified: DateTime,
-                  innerRoute: Route,
-                  moreInnerRoutes: Route*): Route =
+  def conditional(
+      lastModified: DateTime,
+      innerRoute: Route,
+      moreInnerRoutes: Route*): Route =
     RouteStructure.Conditional(lastModified = Some(lastModified))(
-        innerRoute, moreInnerRoutes.toList)
+      innerRoute,
+      moreInnerRoutes.toList)
 
   /**
     * Wraps its inner route with support for Conditional Requests as defined
@@ -61,10 +65,12 @@ abstract class CacheConditionDirectives extends BasicDirectives {
     * must be on a deeper level in your route structure in order to function correctly.
     */
   @varargs
-  def conditional(entityTag: EntityTag,
-                  lastModified: DateTime,
-                  innerRoute: Route,
-                  moreInnerRoutes: Route*): Route =
+  def conditional(
+      entityTag: EntityTag,
+      lastModified: DateTime,
+      innerRoute: Route,
+      moreInnerRoutes: Route*): Route =
     RouteStructure.Conditional(Some(entityTag), Some(lastModified))(
-        innerRoute, moreInnerRoutes.toList)
+      innerRoute,
+      moreInnerRoutes.toList)
 }

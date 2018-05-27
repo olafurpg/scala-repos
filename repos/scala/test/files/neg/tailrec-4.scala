@@ -22,7 +22,8 @@ object Tail {
     if ({
       @tailrec def foo: Int = foo + 1
       foo
-    } == v) true else false
+    } == v) true
+    else false
   }
   def tcInPatternGuard(x: Int, v: Int): Boolean =
     v match {

@@ -10,7 +10,10 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScAnnotationsHolder
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScModifierListOwner
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScClassParents
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypingContext
+}
 
 /**
   * User: Alefas
@@ -18,19 +21,23 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext
   */
 object JavaConversionUtil {
 
-  val keywordAnnotations = Map("scala.native" -> "native",
-                               "scala.annotation.strictfp" -> "strictfp",
-                               "scala.volatile" -> "volatile",
-                               "scala.transient" -> "transient")
+  val keywordAnnotations = Map(
+    "scala.native" -> "native",
+    "scala.annotation.strictfp" -> "strictfp",
+    "scala.volatile" -> "volatile",
+    "scala.transient" -> "transient")
 
   def typeText(
-      tp: ScType, project: Project, scope: GlobalSearchScope): String = {
+      tp: ScType,
+      project: Project,
+      scope: GlobalSearchScope): String = {
     val psiType = ScType.toPsi(tp, project, scope)
     psiType.getCanonicalText
   }
 
   def annotationsAndModifiers(
-      s: ScModifierListOwner, isStatic: Boolean): String = {
+      s: ScModifierListOwner,
+      isStatic: Boolean): String = {
     val builder = new StringBuilder
 
     s match {
@@ -65,14 +72,14 @@ object JavaConversionUtil {
   def annotations(holder: ScAnnotationsHolder): Seq[String] = {
     val convertibleAnnotations = holder.annotations.filterNot { a =>
       a.getQualifiedName match {
-        case null => true
+        case null                                       => true
         case s if keywordAnnotations.keySet.contains(s) => true
         case s
             if Set("scala.throws", "scala.inline", "scala.unchecked").contains(
-                s) =>
+              s) =>
           true
         case s if s.endsWith("BeanProperty") => true
-        case _ => false
+        case _                               => false
       }
     }
     convertibleAnnotations.map { a =>
@@ -89,7 +96,7 @@ object JavaConversionUtil {
         val res = a.getLExpression.getText + " = "
         a.getRExpression match {
           case Some(expr) => res + convertExpression(expr)
-          case _ => res
+          case _          => res
         }
       case l: ScLiteral if !l.isMultiLineString => l.getText
       case l: ScLiteral =>
@@ -107,7 +114,7 @@ object JavaConversionUtil {
               case Success(tp, _) =>
                 ScType.extractClass(tp, Some(e.getProject)) match {
                   case Some(clazz) => clazz.getQualifiedName + ".class"
-                  case _ => problem
+                  case _           => problem
                 }
               case _ => problem
             }

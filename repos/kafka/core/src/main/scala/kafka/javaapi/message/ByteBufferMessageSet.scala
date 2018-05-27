@@ -28,9 +28,13 @@ class ByteBufferMessageSet(val buffer: ByteBuffer) extends MessageSet {
     new kafka.message.ByteBufferMessageSet(buffer)
 
   def this(
-      compressionCodec: CompressionCodec, messages: java.util.List[Message]) {
-    this(new kafka.message.ByteBufferMessageSet(
-            compressionCodec, new LongRef(0), messages.asScala: _*).buffer)
+      compressionCodec: CompressionCodec,
+      messages: java.util.List[Message]) {
+    this(
+      new kafka.message.ByteBufferMessageSet(
+        compressionCodec,
+        new LongRef(0),
+        messages.asScala: _*).buffer)
   }
 
   def this(messages: java.util.List[Message]) {
@@ -54,7 +58,7 @@ class ByteBufferMessageSet(val buffer: ByteBuffer) extends MessageSet {
 
       override def remove =
         throw new UnsupportedOperationException(
-            "remove API on MessageSet is not supported")
+          "remove API on MessageSet is not supported")
     }
 
   override def toString: String = underlying.toString
@@ -64,7 +68,7 @@ class ByteBufferMessageSet(val buffer: ByteBuffer) extends MessageSet {
   override def equals(other: Any): Boolean = {
     other match {
       case that: ByteBufferMessageSet => buffer.equals(that.buffer)
-      case _ => false
+      case _                          => false
     }
   }
 

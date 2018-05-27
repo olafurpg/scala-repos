@@ -72,7 +72,7 @@ private[testutil] trait AbstractComparator extends Assertions {
     private def findMethodWithManyArgs(argTypes: List[Class[_]])(
         scalaMethod: Method): Boolean =
       (scalaMethod.getParameterTypes.length == argTypes.size) &&
-      (scalaMethod.getParameterTypes.toList == argTypes)
+        (scalaMethod.getParameterTypes.toList == argTypes)
 
     /**
       *
@@ -80,16 +80,16 @@ private[testutil] trait AbstractComparator extends Assertions {
     private def findMethodWithManyArgsVarargs(
         argTypesExceptLast: List[Class[_]])(method: Method): Boolean =
       (method.getParameterTypes.length == argTypesExceptLast.size + 1) &&
-      (method.getParameterTypes.init.toList == argTypesExceptLast) &&
-      lastArgumentIsVararg(method)
+        (method.getParameterTypes.init.toList == argTypesExceptLast) &&
+        lastArgumentIsVararg(method)
 
     def getFinderMethod(javaMethod: Method) =
       (javaMethod.getParameterTypes.size, javaMethod.isVarArgs) match {
-        case (0, _) => methodHasNoArgs _
+        case (0, _)    => methodHasNoArgs _
         case (1, true) => methodHasOneArgVararg _
         case (_, true) =>
           findMethodWithManyArgsVarargs(
-              javaMethod.getParameterTypes.toList.init) _
+            javaMethod.getParameterTypes.toList.init) _
         case (_, false) =>
           findMethodWithManyArgs(javaMethod.getParameterTypes.toList) _
       }
@@ -116,13 +116,14 @@ private[testutil] trait AbstractComparator extends Assertions {
 
     private val boolGetterPattern = "^is.+$"
 
-    private def isValid(m: Method,
-                        pattern: String,
-                        parametersLength: Int,
-                        returnEvaluator: Class[_] => Boolean) =
+    private def isValid(
+        m: Method,
+        pattern: String,
+        parametersLength: Int,
+        returnEvaluator: Class[_] => Boolean) =
       m.getName.matches(pattern) &&
-      (m.getParameterTypes.length == parametersLength) &&
-      returnEvaluator(m.getReturnType)
+        (m.getParameterTypes.length == parametersLength) &&
+        returnEvaluator(m.getReturnType)
 
     private def isSetter(m: Method): Boolean =
       isValid(m, setterPattern, 1, (_ == JVoid))
@@ -162,11 +163,13 @@ private[testutil] trait AbstractComparator extends Assertions {
   private def methodToString(m: Method) = {
 
     def classParameterToString(
-        classParameter: Class[_], isVarargs: Boolean = false) = {
-      (classParameter.isArray,
-       classParameter.getName.matches("""^\[.$"""),
-       isVarargs) match {
-        case (true, true, true) => classParameter.getName.last + "..."
+        classParameter: Class[_],
+        isVarargs: Boolean = false) = {
+      (
+        classParameter.isArray,
+        classParameter.getName.matches("""^\[.$"""),
+        isVarargs) match {
+        case (true, true, true)  => classParameter.getName.last + "..."
         case (true, true, false) => classParameter.getName.last + "[]"
         case (true, false, true) =>
           classParameter.getName.substring(2).init + "..."
@@ -177,19 +180,20 @@ private[testutil] trait AbstractComparator extends Assertions {
     }
 
     val strParameters = (m.getParameterTypes.size, m.isVarArgs) match {
-      case (0, _) => ""
+      case (0, _)    => ""
       case (1, true) => classParameterToString(m.getParameterTypes.last, true)
       case (_, true) =>
         m.getParameterTypes.init
           .map(classParameterToString(_))
           .mkString("", ", ", ", ") + classParameterToString(
-            m.getParameterTypes.last, true)
+          m.getParameterTypes.last,
+          true)
       case (_, false) =>
         m.getParameterTypes.map(classParameterToString(_)).mkString(", ")
     }
 
     classParameterToString(m.getReturnType) + " " + m.getName + "(" +
-    strParameters + ")"
+      strParameters + ")"
   }
 
   private val nameComparator: (Method, Method) => Boolean = (m1, m2) =>
@@ -204,11 +208,11 @@ private[testutil] trait AbstractComparator extends Assertions {
     */
   private def groupMethods(cls: Class[_], useStatic: Boolean) = {
     val staticIndicator: Boolean => Boolean =
-      if (useStatic) (b => b) else (b => !b)
+      if (useStatic)(b => b) else (b => !b)
     val isAcceptable: Method => Boolean = (m =>
       isPublicMethod(m) &&
-      staticIndicator(Modifier.isStatic(m.getModifiers)) &&
-      !isSpecialMethodName(m.getName))
+        staticIndicator(Modifier.isStatic(m.getModifiers)) &&
+        !isSpecialMethodName(m.getName))
 
     cls.getDeclaredMethods.filter(isAcceptable).sortWith(nameComparator).toList
   }
@@ -229,17 +233,17 @@ private[testutil] trait AbstractComparator extends Assertions {
     javaMethods match {
       case Nil => javaMethodsNotMirrored
       case javaMethod :: otherMethods => {
-          val finderMethod = MethodsComparators.getFinderMethod(javaMethod)
-          val desirableName = getDesirableMethodName(javaMethod)
-          val scalaHasMethod = scalaMethods
-            .filter(MethodsComparators.sameName(desirableName, _))
-            .exists(finderMethod)
-          val javaMethods =
-            if (scalaHasMethod) javaMethodsNotMirrored
-            else javaMethod :: javaMethodsNotMirrored
+        val finderMethod = MethodsComparators.getFinderMethod(javaMethod)
+        val desirableName = getDesirableMethodName(javaMethod)
+        val scalaHasMethod = scalaMethods
+          .filter(MethodsComparators.sameName(desirableName, _))
+          .exists(finderMethod)
+        val javaMethods =
+          if (scalaHasMethod) javaMethodsNotMirrored
+          else javaMethod :: javaMethodsNotMirrored
 
-          compare(otherMethods, scalaMethods, javaMethods)
-        }
+        compare(otherMethods, scalaMethods, javaMethods)
+      }
     }
   }
 
@@ -252,20 +256,22 @@ private[testutil] trait AbstractComparator extends Assertions {
     * @param useStatic If it will be compared only static methods (`true`) or only declared methods (`false`).
     */
   private def compareMethods(
-      javaClass: Class[_], scalaClass: Class[_], useStatic: Boolean) {
+      javaClass: Class[_],
+      scalaClass: Class[_],
+      useStatic: Boolean) {
     val javaMethods = groupMethods(javaClass, useStatic)
     val scalaMethods = groupMethods(scalaClass, useStatic)
 
     val methodsNotFound = compare(javaMethods, scalaMethods)
 
-    assert(methodsNotFound.isEmpty,
-           "Missing %s Methods: ".format(
-               if (useStatic) "Static" else "Declared") +
-           methodsNotFound.map(methodToString).mkString(", "))
+    assert(
+      methodsNotFound.isEmpty,
+      "Missing %s Methods: ".format(if (useStatic) "Static" else "Declared") +
+        methodsNotFound.map(methodToString).mkString(", "))
   }
 
   //////////////////
-  // HELPER METHODS 
+  // HELPER METHODS
   //////////////////
 
   /**
@@ -283,7 +289,7 @@ private[testutil] trait AbstractComparator extends Assertions {
     Modifier.isPublic(method.getModifiers)
 
   ////////////////////
-  // ABSTRACT METHODS 
+  // ABSTRACT METHODS
   ////////////////////
 
   /**
@@ -301,7 +307,7 @@ private[testutil] trait AbstractComparator extends Assertions {
   protected def getDesirableMethodName(javaMethod: Method): String
 
   //////////////////
-  // PUBLIC METHODS 
+  // PUBLIC METHODS
   //////////////////
 
   /**

@@ -19,118 +19,124 @@ private[html] object SyntaxHigh {
 
   /** Reserved words, sorted alphabetically
     * (see [[scala.reflect.internal.StdNames]]) */
-  val reserved = Array("abstract",
-                       "case",
-                       "catch",
-                       "class",
-                       "def",
-                       "do",
-                       "else",
-                       "extends",
-                       "false",
-                       "final",
-                       "finally",
-                       "for",
-                       "if",
-                       "implicit",
-                       "import",
-                       "lazy",
-                       "match",
-                       "new",
-                       "null",
-                       "object",
-                       "override",
-                       "package",
-                       "private",
-                       "protected",
-                       "return",
-                       "sealed",
-                       "super",
-                       "this",
-                       "throw",
-                       "trait",
-                       "true",
-                       "try",
-                       "type",
-                       "val",
-                       "var",
-                       "while",
-                       "with",
-                       "yield").sorted
+  val reserved = Array(
+    "abstract",
+    "case",
+    "catch",
+    "class",
+    "def",
+    "do",
+    "else",
+    "extends",
+    "false",
+    "final",
+    "finally",
+    "for",
+    "if",
+    "implicit",
+    "import",
+    "lazy",
+    "match",
+    "new",
+    "null",
+    "object",
+    "override",
+    "package",
+    "private",
+    "protected",
+    "return",
+    "sealed",
+    "super",
+    "this",
+    "throw",
+    "trait",
+    "true",
+    "try",
+    "type",
+    "val",
+    "var",
+    "while",
+    "with",
+    "yield"
+  ).sorted
 
   /** Annotations, sorted alphabetically */
-  val annotations = Array("BeanProperty",
-                          "SerialVersionUID",
-                          "beanGetter",
-                          "beanSetter",
-                          "bridge",
-                          "deprecated",
-                          "deprecatedName",
-                          "deprecatedOverriding",
-                          "deprecatedInheritance",
-                          "elidable",
-                          "field",
-                          "getter",
-                          "inline",
-                          "migration",
-                          "native",
-                          "noinline",
-                          "param",
-                          "remote",
-                          "setter",
-                          "specialized",
-                          "strictfp",
-                          "switch",
-                          "tailrec",
-                          "throws",
-                          "transient",
-                          "unchecked",
-                          "uncheckedStable",
-                          "uncheckedVariance",
-                          "varargs",
-                          "volatile").sorted
+  val annotations = Array(
+    "BeanProperty",
+    "SerialVersionUID",
+    "beanGetter",
+    "beanSetter",
+    "bridge",
+    "deprecated",
+    "deprecatedName",
+    "deprecatedOverriding",
+    "deprecatedInheritance",
+    "elidable",
+    "field",
+    "getter",
+    "inline",
+    "migration",
+    "native",
+    "noinline",
+    "param",
+    "remote",
+    "setter",
+    "specialized",
+    "strictfp",
+    "switch",
+    "tailrec",
+    "throws",
+    "transient",
+    "unchecked",
+    "uncheckedStable",
+    "uncheckedVariance",
+    "varargs",
+    "volatile"
+  ).sorted
 
   /** Standard library classes/objects, sorted alphabetically */
-  val standards = Array("Any",
-                        "AnyRef",
-                        "AnyVal",
-                        "App",
-                        "Array",
-                        "Boolean",
-                        "Byte",
-                        "Char",
-                        "Class",
-                        "ClassManifest",
-                        "ClassTag",
-                        "Console",
-                        "Double",
-                        "Enumeration",
-                        "Float",
-                        "Function",
-                        "Int",
-                        "List",
-                        "Long",
-                        "Manifest",
-                        "Map",
-                        "NoManifest",
-                        "None",
-                        "Nothing",
-                        "Null",
-                        "Object",
-                        "Option",
-                        "OptManifest",
-                        "Pair",
-                        "Predef",
-                        "Seq",
-                        "Set",
-                        "Short",
-                        "Some",
-                        "String",
-                        "Symbol",
-                        "Triple",
-                        "TypeTag",
-                        "Unit",
-                        "WeakTypeTag").sorted
+  val standards = Array(
+    "Any",
+    "AnyRef",
+    "AnyVal",
+    "App",
+    "Array",
+    "Boolean",
+    "Byte",
+    "Char",
+    "Class",
+    "ClassManifest",
+    "ClassTag",
+    "Console",
+    "Double",
+    "Enumeration",
+    "Float",
+    "Function",
+    "Int",
+    "List",
+    "Long",
+    "Manifest",
+    "Map",
+    "NoManifest",
+    "None",
+    "Nothing",
+    "Null",
+    "Object",
+    "Option",
+    "OptManifest",
+    "Pair",
+    "Predef",
+    "Seq",
+    "Set",
+    "Short",
+    "Some",
+    "String",
+    "Symbol",
+    "Triple",
+    "TypeTag",
+    "Unit",
+    "WeakTypeTag"
+  ).sorted
 
   def apply(data: String): NodeSeq = {
     val buf = data.toCharArray
@@ -151,8 +157,8 @@ private[html] object SyntaxHigh {
       if (j < l) -1
       else if (i < buf.length &&
                ('A' <= buf(i) && buf(i) <= 'Z' || 'a' <= buf(i) &&
-                   buf(i) <= 'z' || '0' <= buf(i) && buf(i) <= '9' ||
-                   buf(i) == '_')) 1
+               buf(i) <= 'z' || '0' <= buf(i) && buf(i) <= '9' ||
+               buf(i) == '_')) 1
       else 0
     }
 
@@ -329,26 +335,29 @@ private[html] object SyntaxHigh {
         case '@' =>
           val k = lookup(annotations, i + 1)
           if (k >= 0)
-            parse("<span class=\"ano\">@" + annotations(k) + "</span>",
-                  i + annotations(k).length + 1)
+            parse(
+              "<span class=\"ano\">@" + annotations(k) + "</span>",
+              i + annotations(k).length + 1)
           else parse(buf(i).toString, i + 1)
         case _ =>
           if (i == 0 || (i >= 1 && !Character.isJavaIdentifierPart(buf(i - 1)))) {
             if (Character.isDigit(buf(i).toInt) ||
                 (buf(i) == '.' && i + 1 < buf.length &&
-                    Character.isDigit(buf(i + 1).toInt))) {
+                Character.isDigit(buf(i + 1).toInt))) {
               val s = numlit(i)
               parse("<span class=\"num\">" + s + "</span>", i + s.length)
             } else {
               val k = lookup(reserved, i)
               if (k >= 0)
-                parse("<span class=\"kw\">" + reserved(k) + "</span>",
-                      i + reserved(k).length)
+                parse(
+                  "<span class=\"kw\">" + reserved(k) + "</span>",
+                  i + reserved(k).length)
               else {
                 val k = lookup(standards, i)
                 if (k >= 0)
-                  parse("<span class=\"std\">" + standards(k) + "</span>",
-                        i + standards(k).length)
+                  parse(
+                    "<span class=\"std\">" + standards(k) + "</span>",
+                    i + standards(k).length)
                 else parse(buf(i).toString, i + 1)
               }
             }

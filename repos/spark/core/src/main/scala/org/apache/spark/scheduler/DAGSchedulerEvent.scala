@@ -56,8 +56,7 @@ private[scheduler] case class MapStageSubmitted(
 private[scheduler] case class StageCancelled(stageId: Int)
     extends DAGSchedulerEvent
 
-private[scheduler] case class JobCancelled(jobId: Int)
-    extends DAGSchedulerEvent
+private[scheduler] case class JobCancelled(jobId: Int) extends DAGSchedulerEvent
 
 private[scheduler] case class JobGroupCancelled(groupId: String)
     extends DAGSchedulerEvent
@@ -85,7 +84,9 @@ private[scheduler] case class ExecutorLost(execId: String)
     extends DAGSchedulerEvent
 
 private[scheduler] case class TaskSetFailed(
-    taskSet: TaskSet, reason: String, exception: Option[Throwable])
+    taskSet: TaskSet,
+    reason: String,
+    exception: Option[Throwable])
     extends DAGSchedulerEvent
 
 private[scheduler] case object ResubmitFailedStages extends DAGSchedulerEvent

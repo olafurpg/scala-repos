@@ -24,7 +24,8 @@ package org.apache.spark.mllib.evaluation.binary
   * @param numNegatives number of negative labels
   */
 private[evaluation] class BinaryLabelCounter(
-    var numPositives: Long = 0L, var numNegatives: Long = 0L)
+    var numPositives: Long = 0L,
+    var numNegatives: Long = 0L)
     extends Serializable {
 
   /** Processes a label. */

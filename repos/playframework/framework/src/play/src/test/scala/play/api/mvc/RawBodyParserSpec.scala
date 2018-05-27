@@ -59,8 +59,8 @@ object RawBodyParserSpec extends Specification with AfterAll {
       parse(body, memoryThreshold = 1) must beRight.like {
         case rawBuffer =>
           rawBuffer.push(ByteString(
-                  "This fails because the stream was closed!")) must throwA[
-              IOException]
+            "This fails because the stream was closed!")) must throwA[
+            IOException]
       }
     }
 

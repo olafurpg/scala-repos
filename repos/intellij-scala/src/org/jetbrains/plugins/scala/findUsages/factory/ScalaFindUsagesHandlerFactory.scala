@@ -2,7 +2,10 @@ package org.jetbrains.plugins.scala.findUsages.factory
 
 import javax.swing.SwingUtilities
 
-import com.intellij.find.findUsages.{FindUsagesHandler, FindUsagesHandlerFactory}
+import com.intellij.find.findUsages.{
+  FindUsagesHandler,
+  FindUsagesHandlerFactory
+}
 import com.intellij.openapi.extensions.Extensions
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
@@ -11,7 +14,10 @@ import com.intellij.util.containers.ContainerUtil
 import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScTypeParam
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinition
-import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{ScNamedElement, ScTypedDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.toplevel.{
+  ScNamedElement,
+  ScTypedDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.fake.FakePsiMethod
 import org.jetbrains.plugins.scala.lang.psi.light._
 import org.jetbrains.plugins.scala.lang.refactoring.rename.RenameSuperMembersUtil
@@ -32,36 +38,40 @@ class ScalaFindUsagesHandlerFactory(project: Project)
 
   override def canFindUsages(element: PsiElement): Boolean = {
     element match {
-      case _: FakePsiMethod => true
-      case _: ScTypedDefinition => true
-      case _: ScTypeDefinition => true
-      case _: ScTypeParam => true
-      case _: PsiClassWrapper => true
-      case _: ScFunctionWrapper => true
-      case _: StaticPsiMethodWrapper => true
-      case _: PsiTypedDefinitionWrapper => true
+      case _: FakePsiMethod                   => true
+      case _: ScTypedDefinition               => true
+      case _: ScTypeDefinition                => true
+      case _: ScTypeParam                     => true
+      case _: PsiClassWrapper                 => true
+      case _: ScFunctionWrapper               => true
+      case _: StaticPsiMethodWrapper          => true
+      case _: PsiTypedDefinitionWrapper       => true
       case _: StaticPsiTypedDefinitionWrapper => true
-      case _ => false
+      case _                                  => false
     }
   }
 
   override def createFindUsagesHandler(
-      element: PsiElement, forHighlightUsages: Boolean): FindUsagesHandler = {
+      element: PsiElement,
+      forHighlightUsages: Boolean): FindUsagesHandler = {
     var replacedElement = element match {
-      case wrapper: PsiClassWrapper => wrapper.definition
-      case p: PsiTypedDefinitionWrapper => p.typedDefinition
+      case wrapper: PsiClassWrapper           => wrapper.definition
+      case p: PsiTypedDefinitionWrapper       => p.typedDefinition
       case p: StaticPsiTypedDefinitionWrapper => p.typedDefinition
-      case f: ScFunctionWrapper => f.function
-      case f: FakePsiMethod => f.navElement
-      case s: StaticPsiMethodWrapper => s.method
-      case _ => element
+      case f: ScFunctionWrapper               => f.function
+      case f: FakePsiMethod                   => f.navElement
+      case s: StaticPsiMethodWrapper          => s.method
+      case _                                  => element
     }
     def chooseSuper(name: String, supers: Seq[PsiNamedElement]) {
       def showDialog() {
         val message =
           ScalaBundle.message("find.usages.member.has.supers", name)
         val result = Messages.showYesNoCancelDialog(
-            element.getProject, message, "Warning", Messages.getQuestionIcon)
+          element.getProject,
+          message,
+          "Warning",
+          Messages.getQuestionIcon)
         result match {
           case 0 =>
             val elem = supers.last
@@ -91,7 +101,7 @@ class ScalaFindUsagesHandlerFactory(project: Project)
     named match {
       case fun: ScFunction
           if fun.containingClass.qualifiedName.startsWith("scala.Function") &&
-          fun.name == "apply" =>
+            fun.name == "apply" =>
         false
       case _ => true
     }
@@ -101,7 +111,7 @@ class ScalaFindUsagesHandlerFactory(project: Project)
 object ScalaFindUsagesHandlerFactory {
   def getInstance(project: Project): ScalaFindUsagesHandlerFactory = {
     ContainerUtil.findInstance(
-        Extensions.getExtensions(FindUsagesHandlerFactory.EP_NAME, project),
-        classOf[ScalaFindUsagesHandlerFactory])
+      Extensions.getExtensions(FindUsagesHandlerFactory.EP_NAME, project),
+      classOf[ScalaFindUsagesHandlerFactory])
   }
 }

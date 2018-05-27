@@ -1,19 +1,19 @@
 /*
- *  ____    ____    _____    ____    ___     ____ 
+ *  ____    ____    _____    ____    ___     ____
  * |  _ \  |  _ \  | ____|  / ___|  / _/    / ___|        Precog (R)
  * | |_) | | |_) | |  _|   | |     | |  /| | |  _         Advanced Analytics Engine for NoSQL Data
  * |  __/  |  _ <  | |___  | |___  |/ _| | | |_| |        Copyright (C) 2010 - 2013 SlamData, Inc.
  * |_|     |_| \_\ |_____|  \____|   /__/   \____|        All Rights Reserved.
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the 
- * GNU Affero General Public License as published by the Free Software Foundation, either version 
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version
  * 3 of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See 
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
  * the GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this 
+ * You should have received a copy of the GNU Affero General Public License along with this
  * program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
@@ -51,11 +51,12 @@ object ContentEncoding {
 
   val extractorV1: Extractor[ContentEncoding] =
     new Extractor[ContentEncoding] {
-      override def validated(obj: JValue): Validation[Error, ContentEncoding] = {
+      override def validated(
+          obj: JValue): Validation[Error, ContentEncoding] = {
         obj.validated[String]("encoding").flatMap {
           case "uncompressed" => Success(RawUTF8Encoding)
-          case "base64" => Success(Base64Encoding)
-          case invalid => Failure(Invalid("Unknown encoding " + invalid))
+          case "base64"       => Success(Base64Encoding)
+          case invalid        => Failure(Invalid("Unknown encoding " + invalid))
         }
       }
     }
@@ -77,7 +78,9 @@ object Base64Encoding extends ContentEncoding {
 }
 
 case class FileContent(
-    data: Array[Byte], mimeType: MimeType, encoding: ContentEncoding)
+    data: Array[Byte],
+    mimeType: MimeType,
+    encoding: ContentEncoding)
 
 object FileContent {
   import MimeTypes._
@@ -101,9 +104,9 @@ object FileContent {
 
   val DecomposerV0: Decomposer[FileContent] = new Decomposer[FileContent] {
     def decompose(v: FileContent) = JObject(
-        "data" -> JString(v.encoding.encode(v.data)),
-        "mimeType" -> v.mimeType.jv,
-        "encoding" -> v.encoding.jv
+      "data" -> JString(v.encoding.encode(v.data)),
+      "mimeType" -> v.mimeType.jv,
+      "encoding" -> v.encoding.jv
     )
   }
 
@@ -112,22 +115,24 @@ object FileContent {
       jv match {
         case JObject(fields) =>
           (fields
-                .get("encoding")
-                .toSuccess(Invalid("File data object missing encoding field."))
-                .flatMap(_.validated[ContentEncoding]) |@| fields
-                .get("mimeType")
-                .toSuccess(Invalid("File data object missing MIME type."))
-                .flatMap(_.validated[MimeType]) |@| fields
-                .get("data")
-                .toSuccess(Invalid("File data object missing data field."))
-                .flatMap(_.validated[String])) {
+            .get("encoding")
+            .toSuccess(Invalid("File data object missing encoding field."))
+            .flatMap(_.validated[ContentEncoding]) |@| fields
+            .get("mimeType")
+            .toSuccess(Invalid("File data object missing MIME type."))
+            .flatMap(_.validated[MimeType]) |@| fields
+            .get("data")
+            .toSuccess(Invalid("File data object missing data field."))
+            .flatMap(_.validated[String])) {
             (encoding, mimeType, contentString) =>
               FileContent(encoding.decode(contentString), mimeType, encoding)
           }
 
         case _ =>
-          Failure(Invalid("File contents " + jv.renderCompact +
-                  " was not properly encoded as a JSON object."))
+          Failure(
+            Invalid(
+              "File contents " + jv.renderCompact +
+                " was not properly encoded as a JSON object."))
       }
     }
   }

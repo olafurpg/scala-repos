@@ -26,14 +26,20 @@ object Infos {
   )
 
   object ClassInfo {
-    def apply(encodedName: String,
-              isExported: Boolean = false,
-              kind: ClassKind = ClassKind.Class,
-              superClass: Option[String] = None,
-              interfaces: List[String] = Nil,
-              methods: List[MethodInfo] = Nil): ClassInfo = {
+    def apply(
+        encodedName: String,
+        isExported: Boolean = false,
+        kind: ClassKind = ClassKind.Class,
+        superClass: Option[String] = None,
+        interfaces: List[String] = Nil,
+        methods: List[MethodInfo] = Nil): ClassInfo = {
       new ClassInfo(
-          encodedName, isExported, kind, superClass, interfaces, methods)
+        encodedName,
+        isExported,
+        kind,
+        superClass,
+        interfaces,
+        methods)
     }
   }
 
@@ -55,28 +61,31 @@ object Infos {
   )
 
   object MethodInfo {
-    def apply(encodedName: String,
-              isStatic: Boolean = false,
-              isAbstract: Boolean = false,
-              isExported: Boolean = false,
-              methodsCalled: Map[String, List[String]] = Map.empty,
-              methodsCalledStatically: Map[String, List[String]] = Map.empty,
-              staticMethodsCalled: Map[String, List[String]] = Map.empty,
-              instantiatedClasses: List[String] = Nil,
-              accessedModules: List[String] = Nil,
-              usedInstanceTests: List[String] = Nil,
-              accessedClassData: List[String] = Nil): MethodInfo = {
-      new MethodInfo(encodedName,
-                     isStatic,
-                     isAbstract,
-                     isExported,
-                     methodsCalled,
-                     methodsCalledStatically,
-                     staticMethodsCalled,
-                     instantiatedClasses,
-                     accessedModules,
-                     usedInstanceTests,
-                     accessedClassData)
+    def apply(
+        encodedName: String,
+        isStatic: Boolean = false,
+        isAbstract: Boolean = false,
+        isExported: Boolean = false,
+        methodsCalled: Map[String, List[String]] = Map.empty,
+        methodsCalledStatically: Map[String, List[String]] = Map.empty,
+        staticMethodsCalled: Map[String, List[String]] = Map.empty,
+        instantiatedClasses: List[String] = Nil,
+        accessedModules: List[String] = Nil,
+        usedInstanceTests: List[String] = Nil,
+        accessedClassData: List[String] = Nil): MethodInfo = {
+      new MethodInfo(
+        encodedName,
+        isStatic,
+        isAbstract,
+        isExported,
+        methodsCalled,
+        methodsCalledStatically,
+        staticMethodsCalled,
+        instantiatedClasses,
+        accessedModules,
+        usedInstanceTests,
+        accessedClassData
+      )
     }
   }
 
@@ -124,12 +133,13 @@ object Infos {
     }
 
     def result(): ClassInfo = {
-      ClassInfo(encodedName,
-                isExported,
-                kind,
-                superClass,
-                interfaces.toList,
-                methods.toList)
+      ClassInfo(
+        encodedName,
+        isExported,
+        kind,
+        superClass,
+        interfaces.toList,
+        methods.toList)
     }
   }
 
@@ -171,15 +181,15 @@ object Infos {
 
     def addMethodCalled(receiverTpe: Type, method: String): this.type = {
       receiverTpe match {
-        case ClassType(cls) => addMethodCalled(cls, method)
-        case AnyType => addMethodCalled(ObjectClass, method)
-        case UndefType => addMethodCalled(BoxedUnitClass, method)
-        case BooleanType => addMethodCalled(BoxedBooleanClass, method)
-        case IntType => addMethodCalled(BoxedIntegerClass, method)
-        case LongType => addMethodCalled(BoxedLongClass, method)
-        case FloatType => addMethodCalled(BoxedFloatClass, method)
-        case DoubleType => addMethodCalled(BoxedDoubleClass, method)
-        case StringType => addMethodCalled(StringClass, method)
+        case ClassType(cls)  => addMethodCalled(cls, method)
+        case AnyType         => addMethodCalled(ObjectClass, method)
+        case UndefType       => addMethodCalled(BoxedUnitClass, method)
+        case BooleanType     => addMethodCalled(BoxedBooleanClass, method)
+        case IntType         => addMethodCalled(BoxedIntegerClass, method)
+        case LongType        => addMethodCalled(BoxedLongClass, method)
+        case FloatType       => addMethodCalled(BoxedFloatClass, method)
+        case DoubleType      => addMethodCalled(BoxedDoubleClass, method)
+        case StringType      => addMethodCalled(StringClass, method)
         case ArrayType(_, _) => addMethodCalled(PseudoArrayClass, method)
 
         case NullType | NothingType =>
@@ -187,7 +197,7 @@ object Infos {
 
         case NoType | RecordType(_) =>
           throw new IllegalArgumentException(
-              s"Illegal receiver type: $receiverTpe")
+            s"Illegal receiver type: $receiverTpe")
       }
 
       this
@@ -238,24 +248,24 @@ object Infos {
     }
 
     private def baseNameOf(tpe: ReferenceType): String = tpe match {
-      case ClassType(name) => name
+      case ClassType(name)    => name
       case ArrayType(base, _) => base
     }
 
     def result(): MethodInfo = {
       MethodInfo(
-          encodedName = encodedName,
-          isStatic = isStatic,
-          isAbstract = isAbstract,
-          isExported = isExported,
-          methodsCalled = methodsCalled.toMap.mapValues(_.toList),
-          methodsCalledStatically = methodsCalledStatically.toMap.mapValues(
-                _.toList),
-          staticMethodsCalled = staticMethodsCalled.toMap.mapValues(_.toList),
-          instantiatedClasses = instantiatedClasses.toList,
-          accessedModules = accessedModules.toList,
-          usedInstanceTests = usedInstanceTests.toList,
-          accessedClassData = accessedClassData.toList
+        encodedName = encodedName,
+        isStatic = isStatic,
+        isAbstract = isAbstract,
+        isExported = isExported,
+        methodsCalled = methodsCalled.toMap.mapValues(_.toList),
+        methodsCalledStatically =
+          methodsCalledStatically.toMap.mapValues(_.toList),
+        staticMethodsCalled = staticMethodsCalled.toMap.mapValues(_.toList),
+        instantiatedClasses = instantiatedClasses.toList,
+        accessedModules = accessedModules.toList,
+        usedInstanceTests = usedInstanceTests.toList,
+        accessedClassData = accessedClassData.toList
       )
     }
   }

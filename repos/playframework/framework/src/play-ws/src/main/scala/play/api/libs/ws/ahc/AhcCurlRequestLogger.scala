@@ -17,7 +17,8 @@ import scala.concurrent.Future
   * @param logger an SLF4J logger
   */
 class AhcCurlRequestLogger(logger: org.slf4j.Logger)
-    extends WSRequestFilter with CurlFormat {
+    extends WSRequestFilter
+    with CurlFormat {
   def apply(executor: WSRequestExecutor): WSRequestExecutor = {
     new WSRequestExecutor {
       override def execute(request: WSRequest): Future[WSResponse] = {
@@ -90,11 +91,15 @@ trait CurlFormat {
   }
 
   protected def findCharset(request: AhcWSRequest): String = {
-    request.contentType.map { ct =>
-      Option(HttpUtils.parseCharset(ct)).getOrElse {
-        StandardCharsets.UTF_8
-      }.name()
-    }.getOrElse(HttpUtils.parseCharset("UTF-8").name())
+    request.contentType
+      .map { ct =>
+        Option(HttpUtils.parseCharset(ct))
+          .getOrElse {
+            StandardCharsets.UTF_8
+          }
+          .name()
+      }
+      .getOrElse(HttpUtils.parseCharset("UTF-8").name())
   }
 
   def quote(unsafe: String): String = unsafe.replace("'", "'\\''")

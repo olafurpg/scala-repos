@@ -32,9 +32,10 @@ import org.apache.spark.util.Utils
   * is written to the local, ephemeral block storage that lives in each executor. This is useful
   * for use cases where RDDs build up long lineages that need to be truncated often (e.g. GraphX).
   */
-private[spark] class LocalRDDCheckpointData[T : ClassTag](
+private[spark] class LocalRDDCheckpointData[T: ClassTag](
     @transient private val rdd: RDD[T])
-    extends RDDCheckpointData[T](rdd) with Logging {
+    extends RDDCheckpointData[T](rdd)
+    with Logging {
 
   /**
     * Ensure the RDD is fully cached so the partitions can be recovered later.
@@ -43,8 +44,9 @@ private[spark] class LocalRDDCheckpointData[T : ClassTag](
     val level = rdd.getStorageLevel
 
     // Assume storage level uses disk; otherwise memory eviction may cause data loss
-    assume(level.useDisk,
-           s"Storage level $level is not appropriate for local checkpointing")
+    assume(
+      level.useDisk,
+      s"Storage level $level is not appropriate for local checkpointing")
 
     // Not all actions compute all partitions of the RDD (e.g. take). For correctness, we
     // must cache any missing partitions. TODO: avoid running another job here (SPARK-8582).
@@ -76,6 +78,9 @@ private[spark] object LocalRDDCheckpointData {
     */
   def transformStorageLevel(level: StorageLevel): StorageLevel = {
     StorageLevel(
-        useDisk = true, level.useMemory, level.deserialized, level.replication)
+      useDisk = true,
+      level.useMemory,
+      level.deserialized,
+      level.replication)
   }
 }

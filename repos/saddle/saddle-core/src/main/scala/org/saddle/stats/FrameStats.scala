@@ -25,7 +25,7 @@ import org.saddle._
   * @tparam CX Type of the column index elements
   * @tparam T Type of the elements of the frame
   */
-class FrameStats[RX, CX, T : ST](frame: Frame[RX, CX, T]) {
+class FrameStats[RX, CX, T: ST](frame: Frame[RX, CX, T]) {
   // --------------------------------------
   // helpful math ops
 

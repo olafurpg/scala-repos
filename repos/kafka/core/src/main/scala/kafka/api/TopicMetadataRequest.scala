@@ -31,17 +31,19 @@ object TopicMetadataRequest extends Logging {
   val DefaultClientId = ""
 }
 
-case class TopicMetadataRequest(versionId: Short,
-                                correlationId: Int,
-                                clientId: String,
-                                topics: Seq[String])
+case class TopicMetadataRequest(
+    versionId: Short,
+    correlationId: Int,
+    clientId: String,
+    topics: Seq[String])
     extends RequestOrResponse(Some(ApiKeys.METADATA.id)) {
 
   def this(topics: Seq[String], correlationId: Int) =
-    this(TopicMetadataRequest.CurrentVersion,
-         correlationId,
-         TopicMetadataRequest.DefaultClientId,
-         topics)
+    this(
+      TopicMetadataRequest.CurrentVersion,
+      correlationId,
+      TopicMetadataRequest.DefaultClientId,
+      topics)
 
   def writeTo(buffer: ByteBuffer) {
     buffer.putShort(versionId)
@@ -63,18 +65,19 @@ case class TopicMetadataRequest(versionId: Short,
     describe(true)
   }
 
-  override def handleError(e: Throwable,
-                           requestChannel: RequestChannel,
-                           request: RequestChannel.Request): Unit = {
+  override def handleError(
+      e: Throwable,
+      requestChannel: RequestChannel,
+      request: RequestChannel.Request): Unit = {
     val topicMetadata = topics.map { topic =>
       TopicMetadata(topic, Nil, Errors.forException(e).code)
     }
-    val errorResponse = TopicMetadataResponse(
-        Seq(), topicMetadata, correlationId)
+    val errorResponse =
+      TopicMetadataResponse(Seq(), topicMetadata, correlationId)
     requestChannel.sendResponse(
-        new Response(
-            request,
-            new RequestOrResponseSend(request.connectionId, errorResponse)))
+      new Response(
+        request,
+        new RequestOrResponseSend(request.connectionId, errorResponse)))
   }
 
   override def describe(details: Boolean): String = {

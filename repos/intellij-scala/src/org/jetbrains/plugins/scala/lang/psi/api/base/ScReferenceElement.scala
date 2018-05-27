@@ -13,9 +13,18 @@ import org.jetbrains.plugins.scala.annotator.intention.ScalaImportTypeFix.TypeTo
 import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.formatting.settings.ScalaCodeStyleSettings
 import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.ScStableReferenceElementPattern
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScAssignStmt, ScReferenceExpression}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{ScClassParameter, ScParameter}
-import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunction, ScTypeAliasDefinition}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScAssignStmt,
+  ScReferenceExpression
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.params.{
+  ScClassParameter,
+  ScParameter
+}
+import org.jetbrains.plugins.scala.lang.psi.api.statements.{
+  ScFunction,
+  ScTypeAliasDefinition
+}
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.ScImportSelector
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.usages.ImportExprUsed
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
@@ -32,15 +41,16 @@ import scala.collection.{Set, mutable}
   * Date: 22.02.2008
   */
 trait ScReferenceElement
-    extends ScalaPsiElement with ResolvableReferenceElement {
+    extends ScalaPsiElement
+    with ResolvableReferenceElement {
   override def getReference = this
 
   def nameId: PsiElement
 
   def refName: String = {
     assert(
-        nameId != null,
-        s"nameId is null for reference with text $getText; parent: ${getParent.getText}")
+      nameId != null,
+      s"nameId is null for reference with text $getText; parent: ${getParent.getText}")
     nameId.getText
   }
 
@@ -53,7 +63,7 @@ trait ScReferenceElement
 
   private def patternNeedBackticks(name: String) =
     name != "" && name.charAt(0).isLower &&
-    getParent.isInstanceOf[ScStableReferenceElementPattern]
+      getParent.isInstanceOf[ScStableReferenceElementPattern]
 
   def getElement = this
 
@@ -71,9 +81,9 @@ trait ScReferenceElement
       case clazz: ScObject if clazz.isStatic => clazz.qualifiedName
       case c: ScTypeDefinition =>
         if (c.containingClass == null) c.qualifiedName else c.name
-      case c: PsiClass => c.qualifiedName
+      case c: PsiClass        => c.qualifiedName
       case n: PsiNamedElement => n.name
-      case _ => refName
+      case _                  => refName
     }
   }
 
@@ -82,14 +92,15 @@ trait ScReferenceElement
   def handleElementRename(newElementName: String): PsiElement = {
     val needBackticks =
       patternNeedBackticks(newElementName) ||
-      ScalaNamesUtil.isKeyword(newElementName)
+        ScalaNamesUtil.isKeyword(newElementName)
     val newName =
       if (needBackticks) "`" + newElementName + "`" else newElementName
     if (!ScalaNamesUtil.isIdentifier(newName)) return this
     val id = nameId.getNode
     val parent = id.getTreeParent
     parent.replaceChild(
-        id, ScalaPsiElementFactory.createIdentifier(newName, getManager))
+      id,
+      ScalaPsiElementFactory.createIdentifier(newName, getManager))
     this
   }
 
@@ -100,7 +111,7 @@ trait ScReferenceElement
           if !PsiTreeUtil.isContextAncestor(param.owner, this, true) =>
         getParent match {
           case ScAssignStmt(left, _) if left == this =>
-          case _ => return false
+          case _                                     => return false
         }
       case _ =>
     }
@@ -113,17 +124,18 @@ trait ScReferenceElement
   }
 
   def createReplacingElementWithClassName(
-      useFullQualifiedName: Boolean, clazz: TypeToImport): ScReferenceElement =
+      useFullQualifiedName: Boolean,
+      clazz: TypeToImport): ScReferenceElement =
     ScalaPsiElementFactory.createReferenceFromText(
-        if (useFullQualifiedName) clazz.qualifiedName else clazz.name,
-        clazz.element.getManager)
+      if (useFullQualifiedName) clazz.qualifiedName else clazz.name,
+      clazz.element.getManager)
 
   def isReferenceTo(element: PsiElement, resolved: PsiElement): Boolean = {
     if (ScEquivalenceUtil.smartEquivalence(resolved, element)) return true
     resolved match {
       case isLightScNamedElement(named) => return isReferenceTo(element, named)
-      case isWrapper(named) => return isReferenceTo(element, named)
-      case _ =>
+      case isWrapper(named)             => return isReferenceTo(element, named)
+      case _                            =>
     }
     element match {
       case isWrapper(named) => return isReferenceTo(named, resolved)
@@ -143,7 +155,8 @@ trait ScReferenceElement
                 val nodeMethodContainingClass: PsiClass =
                   n.method.containingClass
                 val classesEquiv: Boolean = ScEquivalenceUtil.smartEquivalence(
-                    methodContainingClass, nodeMethodContainingClass)
+                  methodContainingClass,
+                  nodeMethodContainingClass)
                 if (classesEquiv) break = true
               }
             }
@@ -152,14 +165,14 @@ trait ScReferenceElement
                 td.asInstanceOf[ScClass].isCase && method.isSynthetic) {
               ScalaPsiUtil.getCompanionModule(td) match {
                 case Some(typeDef) => return isReferenceTo(typeDef)
-                case _ =>
+                case _             =>
               }
             }
             if (break) return true
           case obj: ScObject if obj.isSyntheticObject =>
             ScalaPsiUtil.getCompanionModule(td) match {
               case Some(typeDef) if typeDef == obj => return true
-              case _ =>
+              case _                               =>
             }
           case _ =>
         }
@@ -196,7 +209,8 @@ trait ScReferenceElement
     * Corresponding references are used in FindUsages, but filtered from Rename
     */
   def isIndirectReferenceTo(
-      resolved: PsiElement, element: PsiElement): Boolean = {
+      resolved: PsiElement,
+      element: PsiElement): Boolean = {
     if (resolved == null) return false
     (resolved, element) match {
       case (typeAlias: ScTypeAliasDefinition, cls: PsiClass) =>
@@ -206,7 +220,7 @@ trait ScReferenceElement
           case Some(r: ScalaResolveResult) =>
             r.parentElement match {
               case Some(ta: ScTypeAliasDefinition) => ta.isExactAliasFor(cls)
-              case _ => false
+              case _                               => false
             }
           case None => false
         }
@@ -223,11 +237,13 @@ trait ScReferenceElement
   def qualifier: Option[ScalaPsiElement]
 
   //provides the set of possible namespace alternatives based on syntactic position
-  def getKinds(incomplete: Boolean,
-               completion: Boolean = false): Set[ResolveTargets.Value]
+  def getKinds(
+      incomplete: Boolean,
+      completion: Boolean = false): Set[ResolveTargets.Value]
 
   def getVariants(
-      implicits: Boolean, filterNotNamedVariants: Boolean): Array[Object] =
+      implicits: Boolean,
+      filterNotNamedVariants: Boolean): Array[Object] =
     getVariants
 
   def getSameNameVariants: Array[ResolveResult]
@@ -237,13 +253,14 @@ trait ScReferenceElement
   }
 
   protected def safeBindToElement[T <: ScReferenceElement](
-      qualName: String, referenceCreator: (String, Boolean) => T)(
+      qualName: String,
+      referenceCreator: (String, Boolean) => T)(
       simpleImport: => PsiElement): PsiElement = {
     val parts: Array[String] = qualName.split('.')
     val last = parts.last
     assert(
-        !last.trim.isEmpty,
-        s"Empty last part with safe bind to element with qualName: '$qualName'")
+      !last.trim.isEmpty,
+      s"Empty last part with safe bind to element with qualName: '$qualName'")
     val anotherRef: T = referenceCreator(last, true)
     val resolve: Array[ResolveResult] = anotherRef.multiResolve(false)
     def checkForPredefinedTypes(): Boolean = {
@@ -346,23 +363,25 @@ trait ScReferenceElement
     }
   }
 
-  def bindToPackage(pckg: PsiPackage, addImport: Boolean = false): PsiElement = {
+  def bindToPackage(
+      pckg: PsiPackage,
+      addImport: Boolean = false): PsiElement = {
     val qualifiedName = pckg.getQualifiedName
     extensions.inWriteAction {
       val refText =
         if (addImport) {
-          val importHolder = ScalaImportTypeFix.getImportHolder(
-              ref = this, project = getProject)
+          val importHolder =
+            ScalaImportTypeFix.getImportHolder(ref = this, project = getProject)
           val imported = importHolder.getAllImportUsed.exists {
             case ImportExprUsed(expr) =>
               expr.reference.exists { ref =>
                 ref
                   .multiResolve(false)
                   .exists(rr =>
-                        rr.getElement match {
-                      case p: ScPackage => p.getQualifiedName == qualifiedName
+                    rr.getElement match {
+                      case p: ScPackage  => p.getQualifiedName == qualifiedName
                       case p: PsiPackage => p.getQualifiedName == qualifiedName
-                      case _ => false
+                      case _             => false
                   })
               }
             case _ => false
@@ -373,11 +392,13 @@ trait ScReferenceElement
         } else qualifiedName
       this match {
         case stRef: ScStableCodeReferenceElement =>
-          stRef.replace(ScalaPsiElementFactory.createReferenceFromText(
-                  refText, stRef.getManager))
+          stRef.replace(
+            ScalaPsiElementFactory
+              .createReferenceFromText(refText, stRef.getManager))
         case ref: ScReferenceExpression =>
-          ref.replace(ScalaPsiElementFactory.createExpressionFromText(
-                  refText, ref.getManager))
+          ref.replace(
+            ScalaPsiElementFactory
+              .createExpressionFromText(refText, ref.getManager))
         case _ => null
       }
     }

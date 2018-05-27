@@ -22,13 +22,13 @@ import slick.util.{CloseableIterator, DumpInfo, SQLBuilder, ignoreFollowOnError}
 
 trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
 
-  type ProfileAction[+R, +S <: NoStream, -E <: Effect] = FixedSqlAction[
-      R, S, E]
-  type StreamingProfileAction[+R, +T, -E <: Effect] = FixedSqlStreamingAction[
-      R, T, E]
+  type ProfileAction[+R, +S <: NoStream, -E <: Effect] = FixedSqlAction[R, S, E]
+  type StreamingProfileAction[+R, +T, -E <: Effect] =
+    FixedSqlStreamingAction[R, T, E]
 
   abstract class SimpleJdbcProfileAction[+R](
-      _name: String, val statements: Vector[String])
+      _name: String,
+      val statements: Vector[String])
       extends SynchronousDatabaseAction[R, NoStream, Backend, Effect]
       with ProfileAction[R, NoStream, Effect] {
     self =>
@@ -55,14 +55,16 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
   protected object Commit
       extends SynchronousDatabaseAction[Unit, NoStream, Backend, Effect] {
     def run(ctx: Backend#Context): Unit =
-      try ctx.session.endInTransaction(ctx.session.conn.commit()) finally ctx.unpin
+      try ctx.session.endInTransaction(ctx.session.conn.commit())
+      finally ctx.unpin
     def getDumpInfo = DumpInfo(name = "Commit")
   }
 
   protected object Rollback
       extends SynchronousDatabaseAction[Unit, NoStream, Backend, Effect] {
     def run(ctx: Backend#Context): Unit =
-      try ctx.session.endInTransaction(ctx.session.conn.rollback()) finally ctx.unpin
+      try ctx.session.endInTransaction(ctx.session.conn.rollback())
+      finally ctx.unpin
     def getDumpInfo = DumpInfo(name = "Rollback")
   }
 
@@ -102,12 +104,12 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
       * action. */
     def transactionally: DBIOAction[R, S, E with Effect.Transactional] =
       SynchronousDatabaseAction.fuseUnsafe(
-          StartTransaction
-            .andThen(a)
-            .cleanUp(eo => if (eo.isEmpty) Commit else Rollback)(
-                DBIO.sameThreadExecutionContext)
-            .asInstanceOf[DBIOAction[R, S, E with Effect.Transactional]]
-        )
+        StartTransaction
+          .andThen(a)
+          .cleanUp(eo => if (eo.isEmpty) Commit else Rollback)(
+            DBIO.sameThreadExecutionContext)
+          .asInstanceOf[DBIOAction[R, S, E with Effect.Transactional]]
+      )
 
     /** Run this Action with the specified transaction isolation level. This should be used around
       * the outermost `transactionally` Action. The semantics of using it inside a transaction are
@@ -136,13 +138,19 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
       *                      `withStatementParameters` Actions are nested, all init functions
       *                      are run, starting with the outermost one.
       * @param fetchSize The fetch size for all statements or 0 for the default. */
-    def withStatementParameters(rsType: ResultSetType = null,
-                                rsConcurrency: ResultSetConcurrency = null,
-                                rsHoldability: ResultSetHoldability = null,
-                                statementInit: Statement => Unit = null,
-                                fetchSize: Int = 0): DBIOAction[R, S, E] =
-      (new PushStatementParameters(JdbcBackend.StatementParameters(
-              rsType, rsConcurrency, rsHoldability, statementInit, fetchSize)))
+    def withStatementParameters(
+        rsType: ResultSetType = null,
+        rsConcurrency: ResultSetConcurrency = null,
+        rsHoldability: ResultSetHoldability = null,
+        statementInit: Statement => Unit = null,
+        fetchSize: Int = 0): DBIOAction[R, S, E] =
+      (new PushStatementParameters(
+        JdbcBackend.StatementParameters(
+          rsType,
+          rsConcurrency,
+          rsHoldability,
+          statementInit,
+          fetchSize)))
         .andThen(a)
         .andFinally(PopStatementParameters)
   }
@@ -151,31 +159,38 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
   //////////////////////////////////////////////////////////// Query Actions
   ///////////////////////////////////////////////////////////////////////////////////////////////
 
-  type QueryActionExtensionMethods[R, S <: NoStream] = QueryActionExtensionMethodsImpl[
-      R, S]
-  type StreamingQueryActionExtensionMethods[R, T] = StreamingQueryActionExtensionMethodsImpl[
-      R, T]
+  type QueryActionExtensionMethods[R, S <: NoStream] =
+    QueryActionExtensionMethodsImpl[R, S]
+  type StreamingQueryActionExtensionMethods[R, T] =
+    StreamingQueryActionExtensionMethodsImpl[R, T]
 
   def createQueryActionExtensionMethods[R, S <: NoStream](
-      tree: Node, param: Any): QueryActionExtensionMethods[R, S] =
+      tree: Node,
+      param: Any): QueryActionExtensionMethods[R, S] =
     new QueryActionExtensionMethods[R, S](tree, param)
   def createStreamingQueryActionExtensionMethods[R, T](
-      tree: Node, param: Any): StreamingQueryActionExtensionMethods[R, T] =
+      tree: Node,
+      param: Any): StreamingQueryActionExtensionMethods[R, T] =
     new StreamingQueryActionExtensionMethods[R, T](tree, param)
 
-  class MutatingResultAction[T](rsm: ResultSetMapping,
-                                elemType: Type,
-                                collectionType: CollectionType,
-                                sql: String,
-                                param: Any,
-                                sendEndMarker: Boolean)
+  class MutatingResultAction[T](
+      rsm: ResultSetMapping,
+      elemType: Type,
+      collectionType: CollectionType,
+      sql: String,
+      param: Any,
+      sendEndMarker: Boolean)
       extends SynchronousDatabaseAction[
-          Nothing, Streaming[ResultSetMutator[T]], Backend, Effect]
+        Nothing,
+        Streaming[ResultSetMutator[T]],
+        Backend,
+        Effect]
       with ProfileAction[Nothing, Streaming[ResultSetMutator[T]], Effect] {
     streamingAction =>
-    class Mutator(val prit: PositionedResultIterator[T],
-                  val bufferNext: Boolean,
-                  val inv: QueryInvokerImpl[T])
+    class Mutator(
+        val prit: PositionedResultIterator[T],
+        val bufferNext: Boolean,
+        val inv: QueryInvokerImpl[T])
         extends ResultSetMutator[T] {
       val pr = prit.pr
       val rs = pr.rs
@@ -221,7 +236,8 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
           }
         } catch {
           case NonFatal(ex) =>
-            try prit.close() catch ignoreFollowOnError
+            try prit.close()
+            catch ignoreFollowOnError
             throw ex
         }
         if (state < 2) this else null
@@ -235,41 +251,47 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
     def statements = List(sql)
     def run(ctx: Backend#Context) =
       throw new SlickException(
-          "The result of .mutate can only be used in a streaming way")
-    override def emitStream(ctx: Backend#StreamingContext,
-                            limit: Long,
-                            state: StreamState): StreamState = {
+        "The result of .mutate can only be used in a streaming way")
+    override def emitStream(
+        ctx: Backend#StreamingContext,
+        limit: Long,
+        state: StreamState): StreamState = {
       val mu =
         if (state ne null) state
         else {
           val inv = createQueryInvoker[T](rsm, param, sql)
-          new Mutator(inv
-                        .results(0,
-                                 defaultConcurrency = invokerMutateConcurrency,
-                                 defaultType = invokerMutateType)(ctx.session)
-                        .right
-                        .get,
-                      ctx.bufferNext,
-                      inv)
+          new Mutator(
+            inv
+              .results(
+                0,
+                defaultConcurrency = invokerMutateConcurrency,
+                defaultType = invokerMutateType)(ctx.session)
+              .right
+              .get,
+            ctx.bufferNext,
+            inv)
         }
       mu.emitStream(ctx, limit)
     }
     override def cancelStream(
-        ctx: Backend#StreamingContext, state: StreamState): Unit =
+        ctx: Backend#StreamingContext,
+        state: StreamState): Unit =
       state.prit.close()
     override def getDumpInfo = super.getDumpInfo.copy(name = "mutate")
     def overrideStatements(
         _statements: Iterable[String]): MutatingResultAction[T] =
-      new MutatingResultAction[T](rsm,
-                                  elemType,
-                                  collectionType,
-                                  _statements.head,
-                                  param,
-                                  sendEndMarker)
+      new MutatingResultAction[T](
+        rsm,
+        elemType,
+        collectionType,
+        _statements.head,
+        param,
+        sendEndMarker)
   }
 
   class QueryActionExtensionMethodsImpl[R, S <: NoStream](
-      tree: Node, param: Any)
+      tree: Node,
+      param: Any)
       extends super.QueryActionExtensionMethodsImpl[R, S] {
     def result: ProfileAction[R, S, Effect.Read] = {
       def findSql(n: Node): String = n match {
@@ -277,15 +299,13 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
           c.extra.asInstanceOf[SQLBuilder.Result].sql
         case ParameterSwitch(cases, default) =>
           findSql(
-              cases.find { case (f, n) => f(param) }
-                .map(_._2)
-                .getOrElse(default))
+            cases
+              .find { case (f, n) => f(param) }
+              .map(_._2)
+              .getOrElse(default))
       }
       (tree match {
-        case (rsm @ ResultSetMapping(
-            _,
-            compiled,
-            CompiledMapping(_, elemType))) :@ (ct: CollectionType) =>
+        case (rsm @ ResultSetMapping(_, compiled, CompiledMapping(_, elemType))) :@ (ct: CollectionType) =>
           val sql = findSql(compiled)
           new StreamingInvokerAction[R, Any, Effect] { streamingAction =>
             protected[this] def createInvoker(sql: Iterable[String]) =
@@ -314,9 +334,10 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
       super.result.asInstanceOf[StreamingProfileAction[R, T, Effect.Read]]
 
     /** Same as `mutate(sendEndMarker = false)`. */
-    def mutate: ProfileAction[Nothing,
-                              Streaming[ResultSetMutator[T]],
-                              Effect.Read with Effect.Write] = mutate(false)
+    def mutate: ProfileAction[
+      Nothing,
+      Streaming[ResultSetMutator[T]],
+      Effect.Read with Effect.Write] = mutate(false)
 
     /** Create an Action that can be streamed in order to modify a mutable result set. All stream
       * elements will be the same [[slick.jdbc.ResultSetMutator]] object but it is in a different state each
@@ -327,10 +348,10 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
       *                      set, poviding you with a chance to insert additional rows after
       *                      seeing all results. Only `end` (to check for this special event) and
       *                      `insert` may be called in the ResultSetMutator in this case. */
-    def mutate(sendEndMarker: Boolean = false)
-      : ProfileAction[Nothing,
-                      Streaming[ResultSetMutator[T]],
-                      Effect.Read with Effect.Write] = {
+    def mutate(sendEndMarker: Boolean = false): ProfileAction[
+      Nothing,
+      Streaming[ResultSetMutator[T]],
+      Effect.Read with Effect.Write] = {
       val sql = tree
         .findNode(_.isInstanceOf[CompiledStatement])
         .get
@@ -351,7 +372,8 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
   type DeleteActionExtensionMethods = DeleteActionExtensionMethodsImpl
 
   def createDeleteActionExtensionMethods(
-      tree: Node, param: Any): DeleteActionExtensionMethods =
+      tree: Node,
+      param: Any): DeleteActionExtensionMethods =
     new DeleteActionExtensionMethods(tree, param)
 
   class DeleteActionExtensionMethodsImpl(tree: Node, param: Any) {
@@ -359,7 +381,9 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
     /** An Action that deletes the data selected by this query. */
     def delete: ProfileAction[Int, NoStream, Effect.Write] = {
       val ResultSetMapping(
-      _, CompiledStatement(_, sres: SQLBuilder.Result, _), _) = tree
+        _,
+        CompiledStatement(_, sres: SQLBuilder.Result, _),
+        _) = tree
       new SimpleJdbcProfileAction[Int]("delete", Vector(sres.sql)) {
         def run(ctx: Backend#Context, sql: Vector[String]): Int =
           ctx.session.withPreparedStatement(sql.head) { st =>
@@ -384,14 +408,16 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
       extends super.SchemaActionExtensionMethodsImpl {
     def create: ProfileAction[Unit, NoStream, Effect.Schema] =
       new SimpleJdbcProfileAction[Unit](
-          "schema.create", schema.createStatements.toVector) {
+        "schema.create",
+        schema.createStatements.toVector) {
         def run(ctx: Backend#Context, sql: Vector[String]): Unit =
           for (s <- sql) ctx.session.withPreparedStatement(s)(_.execute)
       }
 
     def drop: ProfileAction[Unit, NoStream, Effect.Schema] =
       new SimpleJdbcProfileAction[Unit](
-          "schema.drop", schema.dropStatements.toVector) {
+        "schema.drop",
+        schema.dropStatements.toVector) {
         def run(ctx: Backend#Context, sql: Vector[String]): Unit =
           for (s <- sql) ctx.session.withPreparedStatement(s)(_.execute)
       }
@@ -404,14 +430,15 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
   type UpdateActionExtensionMethods[T] = UpdateActionExtensionMethodsImpl[T]
 
   def createUpdateActionExtensionMethods[T](
-      tree: Node, param: Any): UpdateActionExtensionMethods[T] =
+      tree: Node,
+      param: Any): UpdateActionExtensionMethods[T] =
     new UpdateActionExtensionMethodsImpl[T](tree, param)
 
   class UpdateActionExtensionMethodsImpl[T](tree: Node, param: Any) {
     protected[this] val ResultSetMapping(
-    _,
-    CompiledStatement(_, sres: SQLBuilder.Result, _),
-    CompiledMapping(_converter, _)) = tree
+      _,
+      CompiledStatement(_, sres: SQLBuilder.Result, _),
+      CompiledMapping(_converter, _)) = tree
     protected[this] val converter =
       _converter.asInstanceOf[ResultConverter[JdbcResultConverterDomain, T]]
 
@@ -521,8 +548,8 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
       : String
 
     /** Insert a single row from a scalar expression */
-    def forceInsertExpr[TT](
-        c: TT)(implicit shape: Shape[_ <: FlatShapeLevel, TT, U, _])
+    def forceInsertExpr[TT](c: TT)(
+        implicit shape: Shape[_ <: FlatShapeLevel, TT, U, _])
       : ProfileAction[QueryInsertResult, NoStream, Effect.Write]
 
     /** Insert data produced by another query */
@@ -549,7 +576,8 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
 
   /** An InsertActionComposer that returns generated keys or other columns. */
   trait ReturningInsertActionComposer[U, RU]
-      extends InsertActionComposer[U] with IntoInsertActionComposer[U, RU] {
+      extends InsertActionComposer[U]
+      with IntoInsertActionComposer[U, RU] {
     self =>
 
     /** Specifies a mapping from inserted values and generated keys to a desired value.
@@ -617,8 +645,8 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
         compiledQuery: CompiledStreamingExecutable[Query[TT, U, C], _, _]) =
       buildQueryBasedInsert(compiledQuery).sql
 
-    def forceInsertExpr[TT](
-        c: TT)(implicit shape: Shape[_ <: FlatShapeLevel, TT, U, _])
+    def forceInsertExpr[TT](c: TT)(
+        implicit shape: Shape[_ <: FlatShapeLevel, TT, U, _])
       : ProfileAction[QueryInsertResult, NoStream, Effect.Write] =
       new InsertQueryAction(buildQueryBasedInsert((Query(c)(shape))), null)
 
@@ -630,7 +658,8 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
         compiledQuery: CompiledStreamingExecutable[Query[TT, U, C], _, _])
       : ProfileAction[QueryInsertResult, NoStream, Effect.Write] =
       new InsertQueryAction(
-          buildQueryBasedInsert(compiledQuery), compiledQuery.param)
+        buildQueryBasedInsert(compiledQuery),
+        compiledQuery.param)
 
     protected def useServerSideUpsert = self.useServerSideUpsert
     protected def useTransactionForUpsert = self.useTransactionForUpsert
@@ -638,17 +667,24 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
       session.capabilities.supportsBatchUpdates
 
     protected def retOne(
-        st: Statement, value: U, updateCount: Int): SingleInsertResult
+        st: Statement,
+        value: U,
+        updateCount: Int): SingleInsertResult
     protected def retMany(
         values: Iterable[U],
         individual: Seq[SingleInsertResult]): MultiInsertResult
-    protected def retManyBatch(st: Statement,
-                               values: Iterable[U],
-                               updateCounts: Array[Int]): MultiInsertResult
+    protected def retManyBatch(
+        st: Statement,
+        values: Iterable[U],
+        updateCounts: Array[Int]): MultiInsertResult
     protected def retOneInsertOrUpdate(
-        st: Statement, value: U, updateCount: Int): SingleInsertOrUpdateResult
+        st: Statement,
+        value: U,
+        updateCount: Int): SingleInsertOrUpdateResult
     protected def retOneInsertOrUpdateFromInsert(
-        st: Statement, value: U, updateCount: Int): SingleInsertOrUpdateResult
+        st: Statement,
+        value: U,
+        updateCount: Int): SingleInsertOrUpdateResult
     protected def retOneInsertOrUpdateFromUpdate: SingleInsertOrUpdateResult
     protected def retQuery(st: Statement, updateCount: Int): QueryInsertResult
 
@@ -662,7 +698,8 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
 
     class SingleInsertAction(a: compiled.Artifacts, value: U)
         extends SimpleJdbcProfileAction[SingleInsertResult](
-            "SingleInsertAction", Vector(a.sql)) {
+          "SingleInsertAction",
+          Vector(a.sql)) {
       def run(ctx: Backend#Context, sql: Vector[String]) =
         preparedInsert(a.sql, ctx.session) { st =>
           st.clearParameters()
@@ -674,19 +711,23 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
 
     class MultiInsertAction(a: compiled.Artifacts, values: Iterable[U])
         extends SimpleJdbcProfileAction[MultiInsertResult](
-            "MultiInsertAction", Vector(a.sql)) {
+          "MultiInsertAction",
+          Vector(a.sql)) {
       def run(ctx: Backend#Context, sql: Vector[String]) = {
         val sql1 = sql.head
         if (!useBatchUpdates(ctx.session) ||
             (values.isInstanceOf[IndexedSeq[_]] &&
-                values.asInstanceOf[IndexedSeq[_]].length < 2))
-          retMany(values, values.map { v =>
-            preparedInsert(sql1, ctx.session) { st =>
-              st.clearParameters()
-              a.converter.set(v, st)
-              retOne(st, v, st.executeUpdate())
-            }
-          }(collection.breakOut): Vector[SingleInsertResult])
+            values.asInstanceOf[IndexedSeq[_]].length < 2))
+          retMany(
+            values,
+            values.map { v =>
+              preparedInsert(sql1, ctx.session) { st =>
+                st.clearParameters()
+                a.converter.set(v, st)
+                retOne(st, v, st.executeUpdate())
+              }
+            }(collection.breakOut): Vector[SingleInsertResult]
+          )
         else
           preparedInsert(a.sql, ctx.session) { st =>
             st.clearParameters()
@@ -702,12 +743,14 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
 
     class InsertOrUpdateAction(value: U)
         extends SimpleJdbcProfileAction[SingleInsertOrUpdateResult](
-            "InsertOrUpdateAction",
-            if (useServerSideUpsert) Vector(compiled.upsert.sql)
-            else
-              Vector(compiled.checkInsert.sql,
-                     compiled.updateInsert.sql,
-                     compiled.standardInsert.sql)) {
+          "InsertOrUpdateAction",
+          if (useServerSideUpsert) Vector(compiled.upsert.sql)
+          else
+            Vector(
+              compiled.checkInsert.sql,
+              compiled.updateInsert.sql,
+              compiled.standardInsert.sql)
+        ) {
 
       def run(ctx: Backend#Context, sql: Vector[String]) = {
         def f: SingleInsertOrUpdateResult =
@@ -723,7 +766,8 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
             res
           } finally {
             if (!done)
-              try ctx.session.endInTransaction(ctx.session.conn.rollback()) catch ignoreFollowOnError
+              try ctx.session.endInTransaction(ctx.session.conn.rollback())
+              catch ignoreFollowOnError
           }
         } else f
       }
@@ -738,13 +782,17 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
         }
 
       protected def emulate(
-          value: U, checkSql: String, updateSql: String, insertSql: String)(
+          value: U,
+          checkSql: String,
+          updateSql: String,
+          insertSql: String)(
           implicit session: Backend#Session): SingleInsertOrUpdateResult = {
         val found = preparedOther(checkSql, session) { st =>
           st.clearParameters()
           compiled.checkInsert.converter.set(value, st)
           val rs = st.executeQuery()
-          try rs.next() finally rs.close()
+          try rs.next()
+          finally rs.close()
         }
         if (found)
           preparedOther(updateSql, session) { st =>
@@ -764,7 +812,8 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
 
     class InsertQueryAction(sbr: SQLBuilder.Result, param: Any)
         extends SimpleJdbcProfileAction[QueryInsertResult](
-            "InsertQueryAction", Vector(sbr.sql)) {
+          "InsertQueryAction",
+          Vector(sbr.sql)) {
       def run(ctx: Backend#Context, sql: Vector[String]) =
         preparedInsert(sql.head, ctx.session) { st =>
           st.clearParameters()
@@ -780,22 +829,31 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
     def returning[RT, RU, C[_]](
         value: Query[RT, RU, C]): ReturningInsertActionComposer[U, RU] =
       createReturningInsertActionComposer[U, RU, RU](
-          compiled, value.toNode, (_, r) => r)
+        compiled,
+        value.toNode,
+        (_, r) => r)
 
     protected def retOne(st: Statement, value: U, updateCount: Int) =
       updateCount
     protected def retOneInsertOrUpdate(
-        st: Statement, value: U, updateCount: Int) = 1
+        st: Statement,
+        value: U,
+        updateCount: Int) = 1
     protected def retOneInsertOrUpdateFromInsert(
-        st: Statement, value: U, updateCount: Int) = 1
+        st: Statement,
+        value: U,
+        updateCount: Int) = 1
     protected def retOneInsertOrUpdateFromUpdate = 1
     protected def retQuery(st: Statement, updateCount: Int) = updateCount
     protected def retMany(
-        values: Iterable[U], individual: Seq[SingleInsertResult]) =
+        values: Iterable[U],
+        individual: Seq[SingleInsertResult]) =
       Some(individual.sum)
 
     protected def retManyBatch(
-        st: Statement, values: Iterable[U], updateCounts: Array[Int]) = {
+        st: Statement,
+        values: Iterable[U],
+        updateCounts: Array[Int]) = {
       var unknown = false
       var count = 0
       for ((res, idx) <- updateCounts.zipWithIndex) res match {
@@ -809,12 +867,16 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
   }
 
   protected class ReturningInsertActionComposerImpl[U, QR, RU](
-      compiled: CompiledInsert, val keys: Node, val mux: (U, QR) => RU)
+      compiled: CompiledInsert,
+      val keys: Node,
+      val mux: (U, QR) => RU)
       extends InsertActionComposerImpl[U](compiled)
       with ReturningInsertActionComposer[U, RU] {
     def into[R](f: (U, RU) => R): IntoInsertActionComposer[U, R] =
       createReturningInsertActionComposer[U, QR, R](
-          compiled, keys, (v, r) => f(v, mux(v, r)))
+        compiled,
+        keys,
+        (v, r) => f(v, mux(v, r)))
 
     override protected def useServerSideUpsert =
       self.useServerSideUpsertReturning
@@ -824,11 +886,11 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
     protected def checkInsertOrUpdateKeys: Unit =
       if (keyReturnOther)
         throw new SlickException(
-            "Only a single AutoInc column may be returned from an insertOrUpdate call")
+          "Only a single AutoInc column may be returned from an insertOrUpdate call")
 
     protected def buildKeysResult(st: Statement): Invoker[QR] =
-      ResultSetInvoker[QR](_ => st.getGeneratedKeys)(
-          pr => keyConverter.read(pr.rs).asInstanceOf[QR])
+      ResultSetInvoker[QR](_ => st.getGeneratedKeys)(pr =>
+        keyConverter.read(pr.rs).asInstanceOf[QR])
 
     // Returning keys from batch inserts is generally not supported
     override protected def useBatchUpdates(implicit session: Backend#Session) =
@@ -838,17 +900,21 @@ trait JdbcActionComponent extends SqlActionComponent { self: JdbcProfile =>
       compiled.buildReturnColumns(keys)
 
     override protected def preparedInsert[T](
-        sql: String, session: Backend#Session)(f: PreparedStatement => T) =
+        sql: String,
+        session: Backend#Session)(f: PreparedStatement => T) =
       session.withPreparedInsertStatement(sql, keyColumns.toArray)(f)
 
     protected def retOne(st: Statement, value: U, updateCount: Int) =
       mux(value, buildKeysResult(st).first(null))
 
     protected def retMany(
-        values: Iterable[U], individual: Seq[SingleInsertResult]) = individual
+        values: Iterable[U],
+        individual: Seq[SingleInsertResult]) = individual
 
     protected def retManyBatch(
-        st: Statement, values: Iterable[U], updateCounts: Array[Int]) =
+        st: Statement,
+        values: Iterable[U],
+        updateCounts: Array[Int]) =
       (values, buildKeysResult(st).buildColl[Vector](null, implicitly)).zipped
         .map(mux)(collection.breakOut)
 

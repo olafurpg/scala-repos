@@ -24,13 +24,15 @@ private[prediction] object Utils {
     * Add prefix to custom attribute keys.
     */
   def addPrefixToAttributeKeys[T](
-      attributes: Map[String, T], prefix: String = "ca_"): Map[String, T] = {
+      attributes: Map[String, T],
+      prefix: String = "ca_"): Map[String, T] = {
     attributes map { case (k, v) => (prefix + k, v) }
   }
 
   /** Remove prefix from custom attribute keys. */
   def removePrefixFromAttributeKeys[T](
-      attributes: Map[String, T], prefix: String = "ca_"): Map[String, T] = {
+      attributes: Map[String, T],
+      prefix: String = "ca_"): Map[String, T] = {
     attributes map { case (k, v) => (k.stripPrefix(prefix), v) }
   }
 

@@ -21,15 +21,15 @@ object Dependencies {
       "ornicar maven" at "https://raw.githubusercontent.com/ornicar/maven/master/oss.sonatype.org/content/repositories/snapshots"
 
     val commons = Seq(
-                      // sonatypeS,
-                      ornicarMaven,
-                      sonatype,
-                      awesomepom,
-                      typesafe,
-                      prismic,
-                      t2v,
-                      jgitMaven,
-                      sprayRepo)
+      // sonatypeS,
+      ornicarMaven,
+      sonatype,
+      awesomepom,
+      typesafe,
+      prismic,
+      t2v,
+      jgitMaven,
+      sprayRepo)
   }
 
   val scalaz = "org.scalaz" %% "scalaz-core" % "7.1.7"

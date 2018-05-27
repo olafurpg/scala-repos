@@ -34,7 +34,7 @@ object ScalarTagTime extends ScalarTagAny[DateTime] {
     while (i < sz) {
       larr(i) = Option(arr(i)) match {
         case Some(x) => x.getMillis
-        case None => ScalarTagLong.missing
+        case None    => ScalarTagLong.missing
       }
       i += 1
     }

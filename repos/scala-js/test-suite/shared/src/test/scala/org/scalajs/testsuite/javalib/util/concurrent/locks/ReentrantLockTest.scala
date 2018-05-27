@@ -40,7 +40,8 @@ class ReentrantLockTest {
     assertFalse(lock.isLocked)
     Thread.currentThread().interrupt()
     assertThrows(
-        classOf[InterruptedException], lock.tryLock(1L, TimeUnit.SECONDS))
+      classOf[InterruptedException],
+      lock.tryLock(1L, TimeUnit.SECONDS))
   }
 
   @Test def properly_lockInterruptibly(): Unit = {

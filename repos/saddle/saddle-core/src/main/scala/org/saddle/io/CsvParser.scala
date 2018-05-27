@@ -29,10 +29,11 @@ import it.unimi.dsi.fastutil.objects.ObjectLinkedOpenHashSet
   * @param withQuote If true, do not strip quote character from quoted fields
   * @param skipLines Whether to skip some integer number of lines, default 0
   */
-case class CsvParams(separChar: Char = ',',
-                     quoteChar: Char = '"',
-                     withQuote: Boolean = false,
-                     skipLines: Int = 0)
+case class CsvParams(
+    separChar: Char = ',',
+    quoteChar: Char = '"',
+    withQuote: Boolean = false,
+    skipLines: Int = 0)
 
 /**
   * Csv parsing utilities
@@ -66,8 +67,9 @@ object CsvParser {
   def parse(cols: Seq[Int] = List(), params: CsvParams = CsvParams())(
       source: CsvSource): Frame[Int, Int, String] = {
 
-    require(params.separChar != params.quoteChar,
-            "Separator character and quote character cannot be the same")
+    require(
+      params.separChar != params.quoteChar,
+      "Separator character and quote character cannot be the same")
 
     // sorted, unique column locations to parse
     var locs = Set(cols: _*).toArray[Int].sorted
@@ -114,10 +116,11 @@ object CsvParser {
     Frame(columns: _*).row(params.skipLines -> *)
   }
 
-  private def extractFields(line: String,
-                            callback: (String, Int) => Unit,
-                            locs: Array[Int],
-                            params: CsvParams) {
+  private def extractFields(
+      line: String,
+      callback: (String, Int) => Unit,
+      locs: Array[Int],
+      params: CsvParams) {
 
     val quote = params.quoteChar
     val sep = params.separChar
@@ -151,7 +154,8 @@ object CsvParser {
         if (curFld == locs(locIdx)) {
           // we want this field
           callback(
-              String.valueOf(carr, curBeg, curEnd - curBeg - inQoff), locIdx)
+            String.valueOf(carr, curBeg, curEnd - curBeg - inQoff),
+            locIdx)
           locIdx += 1
         }
         inQoff = 0
@@ -177,7 +181,8 @@ object CsvParser {
 
     // if we didn't scan a field for all requested locations, throw an error
     if (locIdx < locs.length) {
-      throw new ArrayIndexOutOfBoundsException("""Unable to read column %d in line:
+      throw new ArrayIndexOutOfBoundsException(
+        """Unable to read column %d in line:
           | ------------
           | %s
           | ------------""".stripMargin.format(locs(locIdx), line))
@@ -185,7 +190,8 @@ object CsvParser {
   }
 
   private def extractAllFields(
-      line: String, params: CsvParams): Array[String] = {
+      line: String,
+      params: CsvParams): Array[String] = {
     val quote = params.quoteChar
     val sep = params.separChar
     val stripQuote = !params.withQuote

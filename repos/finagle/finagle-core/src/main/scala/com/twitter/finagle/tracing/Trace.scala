@@ -48,7 +48,7 @@ object Trace {
   private[this] val someFalse = Some(false)
 
   private[finagle] val idCtx = new Contexts.broadcast.Key[TraceId](
-      "com.twitter.finagle.tracing.TraceContext"
+    "com.twitter.finagle.tracing.TraceContext"
   ) {
     private val local = new ThreadLocal[Array[Byte]] {
       override def initialValue() = new Array[Byte](32)
@@ -80,19 +80,19 @@ object Trace {
         } else None
 
       val traceId = TraceId(
-          if (trace64 == parent64) None else Some(SpanId(trace64)),
-          if (parent64 == span64) None else Some(SpanId(parent64)),
-          SpanId(span64),
-          sampled,
-          flags)
+        if (trace64 == parent64) None else Some(SpanId(trace64)),
+        if (parent64 == span64) None else Some(SpanId(parent64)),
+        SpanId(span64),
+        sampled,
+        flags)
 
       Return(traceId)
     }
   }
 
   private[this] val rng = new Random
-  private[this] val defaultId = TraceId(
-      None, None, SpanId(rng.nextLong()), None, Flags())
+  private[this] val defaultId =
+    TraceId(None, None, SpanId(rng.nextLong()), None, Flags())
   @volatile private[this] var tracingEnabled = true
 
   private[this] val EmptyTraceCtxFn = () => TraceCtx.empty
@@ -147,8 +147,7 @@ object Trace {
     val spanId = SpanId(rng.nextLong())
     idOption match {
       case Some(id) =>
-        TraceId(
-            Some(id.traceId), Some(id.spanId), spanId, id.sampled, id.flags)
+        TraceId(Some(id.traceId), Some(id.spanId), spanId, id.sampled, id.flags)
       case None =>
         TraceId(None, None, spanId, None, Flags())
     }
@@ -178,7 +177,7 @@ object Trace {
   def letIdOption[R](traceIdOpt: Option[TraceId])(f: => R): R =
     traceIdOpt match {
       case Some(traceId) => letId(traceId)(f)
-      case None => f
+      case None          => f
     }
 
   /**
@@ -207,14 +206,14 @@ object Trace {
     * @param terminal true if the next traceId is a terminal id. Future
     *                 attempts to set nextId will be ignored.
     */
-  def letTracerAndId[R](
-      tracer: Tracer, id: TraceId, terminal: Boolean = false)(f: => R): R = {
+  def letTracerAndId[R](tracer: Tracer, id: TraceId, terminal: Boolean = false)(
+      f: => R): R = {
     if (ctx.terminal) {
       letTracer(tracer)(f)
     } else {
       val newCtx = ctx.withTracer(tracer).withTerminal(terminal)
       val newId = id.sampled match {
-        case None => id.copy(_sampled = tracer.sampleTrace(id))
+        case None    => id.copy(_sampled = tracer.sampleTrace(id))
         case Some(_) => id
       }
       Contexts.local.let(traceCtx, newCtx) {
@@ -240,15 +239,17 @@ object Trace {
     * the correct fields filled in.
     */
   def traceService[T](
-      service: String, rpc: String, hostOpt: Option[InetSocketAddress] = None)(
-      f: => T): T = {
+      service: String,
+      rpc: String,
+      hostOpt: Option[InetSocketAddress] = None)(f: => T): T = {
     Trace.letId(Trace.nextId) {
       Trace.recordBinary("finagle.version", Init.finagleVersion)
       Trace.recordServiceName(service)
       Trace.recordRpc(rpc)
       hostOpt.map { Trace.recordServerAddr(_) }
       Trace.record(Annotation.ServerRecv())
-      try f finally {
+      try f
+      finally {
         Trace.record(Annotation.ServerSend())
       }
     }
@@ -260,13 +261,13 @@ object Trace {
     */
   def isActivelyTracing: Boolean =
     tracingEnabled &&
-    (id match {
-          case TraceId(_, _, _, Some(false), flags) if !flags.isDebug => false
-          case TraceId(_, _, _, _, Flags(Flags.Debug)) => true
-          case _ =>
-            tracers.nonEmpty &&
+      (id match {
+        case TraceId(_, _, _, Some(false), flags) if !flags.isDebug => false
+        case TraceId(_, _, _, _, Flags(Flags.Debug))                => true
+        case _ =>
+          tracers.nonEmpty &&
             (tracers.size > 1 || tracers.head != NullTracer)
-        })
+      })
 
   /**
     * Record a raw record without checking if it's sampled/enabled/etc.

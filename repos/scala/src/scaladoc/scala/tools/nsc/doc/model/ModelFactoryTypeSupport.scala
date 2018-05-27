@@ -11,7 +11,13 @@ import scala.collection._
 
 /** This trait extracts all required information for documentation from compilation units */
 trait ModelFactoryTypeSupport {
-  thisFactory: ModelFactory with ModelFactoryImplicitSupport with ModelFactoryTypeSupport with DiagramFactory with CommentFactory with TreeFactory with MemberLookup =>
+  thisFactory: ModelFactory
+    with ModelFactoryImplicitSupport
+    with ModelFactoryTypeSupport
+    with DiagramFactory
+    with CommentFactory
+    with TreeFactory
+    with MemberLookup =>
 
   import global._
   import definitions.{ObjectClass, AnyClass, AnyRefClass}
@@ -78,7 +84,7 @@ trait ModelFactoryTypeSupport {
               // (0) the owner's class is linked AND has a template - lovely
               bTpl match {
                 case dtpl: DocTemplateEntity => new LinkToTpl(dtpl)
-                case _ => new Tooltip(bTpl.qualifiedName)
+                case _                       => new Tooltip(bTpl.qualifiedName)
               }
             case _ =>
               val oTpl = findTemplateMaybe(owner)
@@ -91,8 +97,8 @@ trait ModelFactoryTypeSupport {
                   if (!bSym.owner.hasPackageFlag) Tooltip(name)
                   else
                     findExternalLink(bSym, name).getOrElse(
-                        // (3) if we couldn't find neither the owner nor external URL to link to, show a tooltip with the qualified name
-                        Tooltip(name)
+                      // (3) if we couldn't find neither the owner nor external URL to link to, show a tooltip with the qualified name
+                      Tooltip(name)
                     )
               }
           }
@@ -164,9 +170,9 @@ trait ModelFactoryTypeSupport {
         case RefinedType(parents, defs) =>
           val ignoreParents = Set[Symbol](AnyClass, ObjectClass)
           val filtParents = parents filterNot
-          (x => ignoreParents(x.typeSymbol)) match {
+            (x => ignoreParents(x.typeSymbol)) match {
             case Nil => parents
-            case ps => ps
+            case ps  => ps
           }
           appendTypes0(filtParents, " with ")
           // XXX Still todo: properly printing refinements.
@@ -174,11 +180,11 @@ trait ModelFactoryTypeSupport {
           // printing single method refinements (which should be the most common) and printing
           // the number of members if there are more.
           defs.toList match {
-            case Nil => ()
+            case Nil      => ()
             case x :: Nil => nameBuffer append (" { " + x.defString + " }")
             case xs =>
               nameBuffer append
-              (" { ... /* %d definitions in type refinement */ }" format xs.size)
+                (" { ... /* %d definitions in type refinement */ }" format xs.size)
           }
         /* Eval-by-name types */
         case NullaryMethodType(result) =>
@@ -191,10 +197,12 @@ trait ModelFactoryTypeSupport {
           def typeParamsToString(tps: List[Symbol]): String =
             if (tps.isEmpty) ""
             else
-              tps.map { tparam =>
-                tparam.varianceString + tparam.name +
-                typeParamsToString(tparam.typeParams)
-              }.mkString("[", ", ", "]")
+              tps
+                .map { tparam =>
+                  tparam.varianceString + tparam.name +
+                    typeParamsToString(tparam.typeParams)
+                }
+                .mkString("[", ", ", "]")
           nameBuffer append typeParamsToString(tparams)
           appendType0(result)
 

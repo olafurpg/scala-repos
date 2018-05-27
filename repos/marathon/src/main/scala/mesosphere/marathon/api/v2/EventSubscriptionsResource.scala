@@ -35,28 +35,30 @@ class EventSubscriptionsResource @Inject()(val config: MarathonConf)
 
   @POST
   @Timed
-  def subscribe(@Context req: HttpServletRequest,
-                @QueryParam("callbackUrl") callbackUrl: String): Response = {
+  def subscribe(
+      @Context req: HttpServletRequest,
+      @QueryParam("callbackUrl") callbackUrl: String): Response = {
     validateSubscriptionService()
-    val future: Future[MarathonEvent] = service.handleSubscriptionEvent(
-        Subscribe(req.getRemoteAddr, callbackUrl))
+    val future: Future[MarathonEvent] =
+      service.handleSubscriptionEvent(Subscribe(req.getRemoteAddr, callbackUrl))
     ok(jsonString(eventToJson(result(future))))
   }
 
   @DELETE
   @Timed
-  def unsubscribe(@Context req: HttpServletRequest,
-                  @QueryParam("callbackUrl") callbackUrl: String): Response = {
+  def unsubscribe(
+      @Context req: HttpServletRequest,
+      @QueryParam("callbackUrl") callbackUrl: String): Response = {
     validateSubscriptionService()
     val future = service.handleSubscriptionEvent(
-        Unsubscribe(req.getRemoteAddr, callbackUrl))
+      Unsubscribe(req.getRemoteAddr, callbackUrl))
     ok(jsonString(eventToJson(result(future))))
   }
 
   private def validateSubscriptionService(): Unit = {
     if (service eq null)
       throw new BadRequestException(
-          "http event callback system is not running on this Marathon instance. " +
+        "http event callback system is not running on this Marathon instance. " +
           "Please re-start this instance with \"--event_subscriber http_callback\"."
       )
   }

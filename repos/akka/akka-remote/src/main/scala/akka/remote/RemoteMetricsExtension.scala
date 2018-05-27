@@ -20,7 +20,8 @@ import akka.routing.RouterEnvelope
   * as max size of different message types.
   */
 private[akka] object RemoteMetricsExtension
-    extends ExtensionId[RemoteMetrics] with ExtensionIdProvider {
+    extends ExtensionId[RemoteMetrics]
+    with ExtensionIdProvider {
   override def get(system: ActorSystem): RemoteMetrics = super.get(system)
 
   override def lookup = RemoteMetricsExtension
@@ -80,15 +81,17 @@ private[akka] class RemoteMetricsOn(system: ExtendedActorSystem)
         val max = maxPayloadBytes.get(clazz)
         if (max eq null) {
           if (maxPayloadBytes.putIfAbsent(clazz, newMax) eq null)
-            log.info("Payload size for [{}] is [{}] bytes",
-                     clazz.getName,
-                     payloadBytes)
+            log.info(
+              "Payload size for [{}] is [{}] bytes",
+              clazz.getName,
+              payloadBytes)
           else check()
         } else if (payloadBytes > max) {
           if (maxPayloadBytes.replace(clazz, max, newMax))
-            log.info("New maximum payload size for [{}] is [{}] bytes",
-                     clazz.getName,
-                     payloadBytes)
+            log.info(
+              "New maximum payload size for [{}] is [{}] bytes",
+              clazz.getName,
+              payloadBytes)
           else check()
         }
       }

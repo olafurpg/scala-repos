@@ -42,15 +42,15 @@ private[kestrel] class DecodingToCommand
     val commandName = tokens.head
     val args = tokens.tail
     commandName match {
-      case GET => validateGetCommand(args)
-      case DELETE => Delete(validateDeleteCommand(args))
-      case FLUSH => Flush(validateDeleteCommand(args))
-      case FLUSH_ALL => FlushAll()
-      case VERSION => Version()
-      case SHUTDOWN => ShutDown()
-      case STATS => Stats()
+      case GET        => validateGetCommand(args)
+      case DELETE     => Delete(validateDeleteCommand(args))
+      case FLUSH      => Flush(validateDeleteCommand(args))
+      case FLUSH_ALL  => FlushAll()
+      case VERSION    => Version()
+      case SHUTDOWN   => ShutDown()
+      case STATS      => Stats()
       case DUMP_STATS => DumpStats()
-      case _ => throw new NonexistentCommand(commandName.toString)
+      case _          => throw new NonexistentCommand(commandName.toString)
     }
   }
 
@@ -72,15 +72,15 @@ private[kestrel] class DecodingToCommand
     }
 
     split.tail match {
-      case Seq() => Get(queueName, timeout)
-      case Seq(OPEN) => Open(queueName, timeout)
-      case Seq(CLOSE) => Close(queueName, timeout)
+      case Seq()            => Get(queueName, timeout)
+      case Seq(OPEN)        => Open(queueName, timeout)
+      case Seq(CLOSE)       => Close(queueName, timeout)
       case Seq(CLOSE, OPEN) => CloseAndOpen(queueName, timeout)
-      case Seq(ABORT) => Abort(queueName, timeout)
-      case Seq(PEEK) => Peek(queueName, timeout)
+      case Seq(ABORT)       => Abort(queueName, timeout)
+      case Seq(PEEK)        => Peek(queueName, timeout)
       case _ =>
         throw new NonexistentCommand(
-            tokens.map { case Buf.Utf8(s) => s }.mkString)
+          tokens.map { case Buf.Utf8(s) => s }.mkString)
     }
   }
 }

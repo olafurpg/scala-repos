@@ -39,4 +39,5 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class BoxSpec
     extends SimpleSFXDelegateSpec[jfxss.Box, Box](
-        classOf[jfxss.Box], classOf[Box])
+      classOf[jfxss.Box],
+      classOf[Box])

@@ -93,7 +93,8 @@ private[spark] object MapStatus {
 private[spark] class CompressedMapStatus(
     private[this] var loc: BlockManagerId,
     private[this] var compressedSizes: Array[Byte])
-    extends MapStatus with Externalizable {
+    extends MapStatus
+    with Externalizable {
 
   protected def this() =
     this(null, null.asInstanceOf[Array[Byte]]) // For deserialization only
@@ -137,12 +138,13 @@ private[spark] class HighlyCompressedMapStatus private (
     private[this] var numNonEmptyBlocks: Int,
     private[this] var emptyBlocks: RoaringBitmap,
     private[this] var avgSize: Long)
-    extends MapStatus with Externalizable {
+    extends MapStatus
+    with Externalizable {
 
   // loc could be null when the default constructor is called during deserialization
   require(
-      loc == null || avgSize > 0 || numNonEmptyBlocks == 0,
-      "Average size can only be zero for map stages that produced no output")
+    loc == null || avgSize > 0 || numNonEmptyBlocks == 0,
+    "Average size can only be zero for map stages that produced no output")
 
   protected def this() = this(null, -1, null, -1) // For deserialization only
 
@@ -172,8 +174,9 @@ private[spark] class HighlyCompressedMapStatus private (
 }
 
 private[spark] object HighlyCompressedMapStatus {
-  def apply(loc: BlockManagerId,
-            uncompressedSizes: Array[Long]): HighlyCompressedMapStatus = {
+  def apply(
+      loc: BlockManagerId,
+      uncompressedSizes: Array[Long]): HighlyCompressedMapStatus = {
     // We must keep track of which blocks are empty so that we don't report a zero-sized
     // block as being non-empty (or vice-versa) when using the average block size.
     var i = 0

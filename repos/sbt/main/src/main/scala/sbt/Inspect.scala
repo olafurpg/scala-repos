@@ -24,13 +24,12 @@ object Inspect {
         case opt @ (DependencyTree | Details(_)) =>
           spacedKeyParser(s).map(key => (opt, key))
     }
-  val spacedModeParser: (State => Parser[Mode]) = (s: State) =>
-    {
-      val actual = "actual" ^^^ Details(true)
-      val tree = "tree" ^^^ DependencyTree
-      val uses = "uses" ^^^ Uses
-      val definitions = "definitions" ^^^ Definitions
-      token(Space ~> (tree | actual | uses | definitions)) ?? Details(false)
+  val spacedModeParser: (State => Parser[Mode]) = (s: State) => {
+    val actual = "actual" ^^^ Details(true)
+    val tree = "tree" ^^^ DependencyTree
+    val uses = "uses" ^^^ Uses
+    val definitions = "definitions" ^^^ Definitions
+    token(Space ~> (tree | actual | uses | definitions)) ?? Details(false)
   }
 
   def allKeyParser(s: State): Parser[AttributeKey[_]] = {
@@ -56,7 +55,8 @@ object Inspect {
         Project.showUses(Project.usedBy(structure, true, sk.key))
       case Definitions =>
         Project.showDefinitions(
-            sk.key, Project.definitions(structure, true, sk.key))
+          sk.key,
+          Project.definitions(structure, true, sk.key))
     }
   }
 }

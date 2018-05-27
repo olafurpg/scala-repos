@@ -8,7 +8,7 @@ object Client {
     implicit def build(cb: ConfigBuilder): Config = cb.build
   }
 
-  final class Config private[Client](val clientID: Int) extends ConfigLike
+  final class Config private[Client] (val clientID: Int) extends ConfigLike
 
   final class ConfigBuilder private () extends ConfigLike {
     var clientID: Int = 0

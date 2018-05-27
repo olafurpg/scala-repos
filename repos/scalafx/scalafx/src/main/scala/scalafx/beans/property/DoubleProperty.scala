@@ -32,8 +32,7 @@ import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
 object DoubleProperty {
-  implicit def sfxDoubleProperty2jfx(
-      dp: DoubleProperty): jfxbp.DoubleProperty =
+  implicit def sfxDoubleProperty2jfx(dp: DoubleProperty): jfxbp.DoubleProperty =
     if (dp != null) dp.delegate else null
 
   /**
@@ -46,9 +45,10 @@ object DoubleProperty {
     new DoubleProperty(new jfxbp.SimpleDoubleProperty(value))
 }
 
-class DoubleProperty(
-    override val delegate: jfxbp.DoubleProperty = new jfxbp.SimpleDoubleProperty)
-    extends ReadOnlyDoubleProperty(delegate) with Property[Double, Number]
+class DoubleProperty(override val delegate: jfxbp.DoubleProperty =
+  new jfxbp.SimpleDoubleProperty)
+    extends ReadOnlyDoubleProperty(delegate)
+    with Property[Double, Number]
     with SFXDelegate[jfxbp.DoubleProperty] {
 
   def this(bean: Object, name: String) =

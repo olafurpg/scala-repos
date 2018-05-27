@@ -25,15 +25,14 @@ object ResourcesSpec extends Specification {
   lazy val spacesDir = createTempDir("spaces ", ".tmp", tmpDir)
   lazy val spacesJar = File.createTempFile("jar-spaces", ".tmp", spacesDir)
   lazy val resourcesDir = new File(app.classloader.getResource("").getPath)
-  lazy val tmpResourcesDir = createTempDir(
-      "test-bundle-", ".tmp", resourcesDir)
+  lazy val tmpResourcesDir = createTempDir("test-bundle-", ".tmp", resourcesDir)
   lazy val fileBundle = File.createTempFile("file-", ".tmp", tmpResourcesDir)
   lazy val dirBundle = createTempDir("dir-", ".tmp", tmpResourcesDir)
-  lazy val spacesDirBundle = createTempDir(
-      "dir spaces ", ".tmp", tmpResourcesDir)
+  lazy val spacesDirBundle =
+    createTempDir("dir spaces ", ".tmp", tmpResourcesDir)
   lazy val classloader = app.classloader
-  lazy val osgiClassloader = new OsgiClassLoaderSimulator(
-      app.classloader, resourcesDir)
+  lazy val osgiClassloader =
+    new OsgiClassLoaderSimulator(app.classloader, resourcesDir)
 
   /* In order to test Resources.isDirectory when the protocol is "bundle://", there are 2 options:
    * a) run the test within an OSGi container (using Pax Exam),
@@ -131,19 +130,27 @@ object ResourcesSpec extends Specification {
 
     "return true for a directory resource URL that contains spaces in the zip path with the 'zip' protocol" in {
       val url = new URL(
-          "zip", "", 0, createZipUrl(spacesJar, dirRes), EmptyURLStreamHandler)
+        "zip",
+        "",
+        0,
+        createZipUrl(spacesJar, dirRes),
+        EmptyURLStreamHandler)
       isDirectory(classloader, url) must beTrue
     }
 
     "return true for a directory resource URL that contains spaces in the file path with the 'zip' protocol" in {
       val url = new URL(
-          "zip", "", 0, createZipUrl(jar, dirSpacesRes), EmptyURLStreamHandler)
+        "zip",
+        "",
+        0,
+        createZipUrl(jar, dirSpacesRes),
+        EmptyURLStreamHandler)
       isDirectory(classloader, url) must beTrue
     }
 
     "return false for a file resource URL with the 'zip' protocol" in {
-      val url = new URL(
-          "zip", "", 0, createZipUrl(jar, fileRes), EmptyURLStreamHandler)
+      val url =
+        new URL("zip", "", 0, createZipUrl(jar, fileRes), EmptyURLStreamHandler)
       isDirectory(classloader, url) must beFalse
     }
 
@@ -177,7 +184,9 @@ object ResourcesSpec extends Specification {
   }
 
   private def createTempDir(
-      prefix: String, suffix: String, parent: File = null) = {
+      prefix: String,
+      suffix: String,
+      parent: File = null) = {
     val f = File.createTempFile(prefix, suffix, parent)
     f.delete()
     f.mkdir()

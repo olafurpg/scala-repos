@@ -137,16 +137,17 @@ class ORMapSpec extends WordSpec with Matchers {
       val m1 = ORMap
         .empty[ORSet[String]]
         .put(node1, "a", ORSet.empty.add(node1, "A"))
-        .put(node1,
-             "b",
-             ORSet.empty.add(node1, "B01").add(node1, "B02").add(node1, "B03"))
+        .put(
+          node1,
+          "b",
+          ORSet.empty.add(node1, "B01").add(node1, "B02").add(node1, "B03"))
       val m2 =
         ORMap.empty[ORSet[String]].put(node2, "c", ORSet.empty.add(node2, "C"))
 
       val merged1: ORMap[ORSet[String]] = m1 merge m2
 
       val m3 = merged1.updated(node1, "b", ORSet.empty[String])(
-          _.clear(node1).add(node1, "B2"))
+        _.clear(node1).add(node1, "B2"))
 
       val merged2 = merged1 merge m3
       merged2.entries("a").elements should be(Set("A"))
@@ -167,9 +168,10 @@ class ORMapSpec extends WordSpec with Matchers {
         .put(node1, "a", ORSet.empty.add(node1, "A01"))
         .updated(node1, "a", ORSet.empty[String])(_.add(node1, "A02"))
         .updated(node1, "a", ORSet.empty[String])(_.add(node1, "A03"))
-        .put(node1,
-             "b",
-             ORSet.empty.add(node1, "B01").add(node1, "B02").add(node1, "B03"))
+        .put(
+          node1,
+          "b",
+          ORSet.empty.add(node1, "B01").add(node1, "B02").add(node1, "B03"))
       val m2 =
         ORMap.empty[ORSet[String]].put(node2, "c", ORSet.empty.add(node2, "C"))
 
@@ -197,9 +199,10 @@ class ORMapSpec extends WordSpec with Matchers {
     "be able to update ORSet entry with remove -> merge -> put" in {
       val m1 = ORMap.empty
         .put(node1, "a", ORSet.empty.add(node1, "A"))
-        .put(node1,
-             "b",
-             ORSet.empty.add(node1, "B01").add(node1, "B02").add(node1, "B03"))
+        .put(
+          node1,
+          "b",
+          ORSet.empty.add(node1, "B01").add(node1, "B02").add(node1, "B03"))
       val m2 = ORMap.empty.put(node2, "c", ORSet.empty.add(node2, "C"))
 
       val merged1 = m1 merge m2

@@ -26,8 +26,9 @@ import org.apache.spark.annotation.{DeveloperApi, Since}
   */
 @Since("1.2.0")
 @DeveloperApi
-class Predict @Since("1.2.0")(@Since("1.2.0") val predict: Double,
-                              @Since("1.2.0") val prob: Double = 0.0)
+class Predict @Since("1.2.0")(
+    @Since("1.2.0") val predict: Double,
+    @Since("1.2.0") val prob: Double = 0.0)
     extends Serializable {
 
   override def toString: String = s"$predict (prob = $prob)"
@@ -35,7 +36,7 @@ class Predict @Since("1.2.0")(@Since("1.2.0") val predict: Double,
   override def equals(other: Any): Boolean = {
     other match {
       case p: Predict => predict == p.predict && prob == p.prob
-      case _ => false
+      case _          => false
     }
   }
 

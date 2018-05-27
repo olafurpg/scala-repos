@@ -38,11 +38,12 @@ case class StringEncoding(toStr: String) extends AnyVal
 /**
   * Pass your DB credentials to this class in a preferred secure way
   */
-case class ConnectionConfig(connectUrl: ConnectUrl,
-                            userName: UserName,
-                            password: Password,
-                            adapter: Adapter,
-                            encoding: StringEncoding)
+case class ConnectionConfig(
+    connectUrl: ConnectUrl,
+    userName: UserName,
+    password: Password,
+    adapter: Adapter,
+    encoding: StringEncoding)
 
 case class Database(toStr: String) extends AnyVal
 

@@ -6,7 +6,7 @@ class Test {
 
   (0: Int) match {
     case WARNING.id =>
-    case INFO.id => // reachable
+    case INFO.id    => // reachable
     case WARNING.id => // unreachable
   }
 }

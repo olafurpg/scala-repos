@@ -25,10 +25,9 @@ class WeightedPageRankSpec extends WordSpec with Matchers {
       .arg("weighted", "true")
       .arg("maxiterations", "1")
       .arg("jumpprob", "0.1")
-      .source(Tsv("./nodes"),
-              List((1, "2,3", "1,2", 0.26),
-                   (2, "3", "1", 0.54),
-                   (3, "", "", 0.2)))
+      .source(
+        Tsv("./nodes"),
+        List((1, "2,3", "1,2", 0.26), (2, "3", "1", 0.54), (3, "", "", 0.2)))
       .source(Tsv("./numnodes"), List((3)))
       .source(Tsv("./pagerank_0"), List((1, 0.086), (2, 0.192), (3, 0.722)))
       .typedSink(TypedTsv[Double]("./totaldiff")) { ob =>
@@ -54,9 +53,9 @@ class WeightedPageRankSpec extends WordSpec with Matchers {
 
           println(pageRank)
           (pageRank(1) + pageRank(2) + pageRank(3)) shouldBe 1.0 +- 0.001
-          pageRank(1) shouldBe(expected(0)) +- 0.001
-          pageRank(2) shouldBe(expected(1)) +- 0.001
-          pageRank(3) shouldBe(expected(2)) +- 0.001
+          pageRank(1) shouldBe (expected(0)) +- 0.001
+          pageRank(2) shouldBe (expected(1)) +- 0.001
+          pageRank(3) shouldBe (expected(2)) +- 0.001
         }
         idx += 1
       }

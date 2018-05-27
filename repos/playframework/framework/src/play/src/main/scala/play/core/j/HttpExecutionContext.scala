@@ -15,33 +15,35 @@ object HttpExecutionContext {
     * Create an HttpExecutionContext with values from the current thread.
     */
   def fromThread(delegate: ExecutionContext): ExecutionContextExecutor =
-    new HttpExecutionContext(Thread.currentThread().getContextClassLoader(),
-                             Http.Context.current.get(),
-                             delegate)
+    new HttpExecutionContext(
+      Thread.currentThread().getContextClassLoader(),
+      Http.Context.current.get(),
+      delegate)
 
   /**
     * Create an HttpExecutionContext with values from the current thread.
     *
     * This method is necessary to prevent ambiguous method compile errors since ExecutionContextExecutor
     */
-  def fromThread(
-      delegate: ExecutionContextExecutor): ExecutionContextExecutor =
+  def fromThread(delegate: ExecutionContextExecutor): ExecutionContextExecutor =
     fromThread(delegate: ExecutionContext)
 
   /**
     * Create an HttpExecutionContext with values from the current thread.
     */
   def fromThread(delegate: Executor): ExecutionContextExecutor =
-    new HttpExecutionContext(Thread.currentThread().getContextClassLoader(),
-                             Http.Context.current.get(),
-                             FutureConverters.fromExecutor(delegate))
+    new HttpExecutionContext(
+      Thread.currentThread().getContextClassLoader(),
+      Http.Context.current.get(),
+      FutureConverters.fromExecutor(delegate))
 
   /**
     * Create an ExecutionContext that will, when prepared, be created with values from that thread.
     */
   def unprepared(delegate: ExecutionContext) = new ExecutionContext {
     def execute(runnable: Runnable) =
-      delegate.execute(runnable) // FIXME: Make calling this an error once SI-7383 is fixed
+      delegate
+        .execute(runnable) // FIXME: Make calling this an error once SI-7383 is fixed
     def reportFailure(t: Throwable) = delegate.reportFailure(t)
     override def prepare(): ExecutionContext = fromThread(delegate)
   }
@@ -51,9 +53,10 @@ object HttpExecutionContext {
   * Manages execution to ensure that the given context ClassLoader and Http.Context are set correctly
   * in the current thread. Actual execution is performed by a delegate ExecutionContext.
   */
-class HttpExecutionContext(contextClassLoader: ClassLoader,
-                           httpContext: Http.Context,
-                           delegate: ExecutionContext)
+class HttpExecutionContext(
+    contextClassLoader: ClassLoader,
+    httpContext: Http.Context,
+    delegate: ExecutionContext)
     extends ExecutionContextExecutor {
   override def execute(runnable: Runnable) =
     delegate.execute(new Runnable {
@@ -80,7 +83,9 @@ class HttpExecutionContext(contextClassLoader: ClassLoader,
       this
     } else {
       new HttpExecutionContext(
-          contextClassLoader, httpContext, delegatePrepared)
+        contextClassLoader,
+        httpContext,
+        delegatePrepared)
     }
   }
 }

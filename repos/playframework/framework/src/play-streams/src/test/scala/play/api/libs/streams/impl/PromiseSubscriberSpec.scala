@@ -4,7 +4,10 @@
 package play.api.libs.streams.impl
 
 import org.specs2.mutable.Specification
-import scala.concurrent.duration.{FiniteDuration => ScalaFiniteDuration, SECONDS}
+import scala.concurrent.duration.{
+  FiniteDuration => ScalaFiniteDuration,
+  SECONDS
+}
 import scala.concurrent.Promise
 import scala.util.{Failure, Success, Try}
 

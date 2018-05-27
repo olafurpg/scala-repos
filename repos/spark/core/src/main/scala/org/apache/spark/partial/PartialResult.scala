@@ -48,7 +48,7 @@ class PartialResult[R](initialVal: R, isFinal: Boolean) {
   def onComplete(handler: R => Unit): PartialResult[R] = synchronized {
     if (completionHandler.isDefined) {
       throw new UnsupportedOperationException(
-          "onComplete cannot be called twice")
+        "onComplete cannot be called twice")
     }
     completionHandler = Some(handler)
     if (finalValue.isDefined) {
@@ -65,8 +65,7 @@ class PartialResult[R](initialVal: R, isFinal: Boolean) {
   def onFail(handler: Exception => Unit) {
     synchronized {
       if (failureHandler.isDefined) {
-        throw new UnsupportedOperationException(
-            "onFail cannot be called twice")
+        throw new UnsupportedOperationException("onFail cannot be called twice")
       }
       failureHandler = Some(handler)
       if (failure.isDefined) {
@@ -96,7 +95,7 @@ class PartialResult[R](initialVal: R, isFinal: Boolean) {
       override def toString: String = synchronized {
         PartialResult.this.getFinalValueInternal() match {
           case Some(value) => "(final: " + f(value) + ")"
-          case None => "(partial: " + initialValue + ")"
+          case None        => "(partial: " + initialValue + ")"
         }
       }
       def getFinalValueInternal(): Option[T] =
@@ -108,7 +107,7 @@ class PartialResult[R](initialVal: R, isFinal: Boolean) {
     synchronized {
       if (finalValue.isDefined) {
         throw new UnsupportedOperationException(
-            "setFinalValue called twice on a PartialResult")
+          "setFinalValue called twice on a PartialResult")
       }
       finalValue = Some(value)
       // Call the completion handler if it was set
@@ -124,7 +123,7 @@ class PartialResult[R](initialVal: R, isFinal: Boolean) {
     synchronized {
       if (failure.isDefined) {
         throw new UnsupportedOperationException(
-            "setFailure called twice on a PartialResult")
+          "setFailure called twice on a PartialResult")
       }
       failure = Some(exception)
       // Call the failure handler if it was set
@@ -137,7 +136,7 @@ class PartialResult[R](initialVal: R, isFinal: Boolean) {
   override def toString: String = synchronized {
     finalValue match {
       case Some(value) => "(final: " + value + ")"
-      case None => "(partial: " + initialValue + ")"
+      case None        => "(partial: " + initialValue + ")"
     }
   }
 }

@@ -40,8 +40,8 @@ trait AbstractExamples extends Specification {
     val json = parse(person)
     val renderedPerson = prettyRender(json)
     (json mustEqual parse(renderedPerson)) and
-    (print(json \\ "name") mustEqual """{"name":"Joe","name":"Marilyn"}""") and
-    (print(json \ "person" \ "name") mustEqual "\"Joe\"")
+      (print(json \\ "name") mustEqual """{"name":"Joe","name":"Marilyn"}""") and
+      (print(json \ "person" \ "name") mustEqual "\"Joe\"")
   }
 
   "Transformation example" in {
@@ -62,15 +62,16 @@ trait AbstractExamples extends Specification {
     val filtered =
       json filterField {
         case JField("name", _) => true
-        case _ => false
+        case _                 => false
       }
-    filtered mustEqual List(JField("name", JString("Joe")),
-                            JField("name", JString("Marilyn")))
+    filtered mustEqual List(
+      JField("name", JString("Joe")),
+      JField("name", JString("Marilyn")))
 
     val found =
       json findField {
         case JField("name", _) => true
-        case _ => false
+        case _                 => false
       }
     found mustEqual Some(JField("name", JString("Joe")))
   }
@@ -78,18 +79,18 @@ trait AbstractExamples extends Specification {
   "Object array example" in {
     val json = parse(objArray)
     (print(json \ "children" \ "name") mustEqual """["Mary","Mazy"]""") and
-    (print((json \ "children")(0) \ "name") mustEqual "\"Mary\"") and
-    (print((json \ "children")(1) \ "name") mustEqual "\"Mazy\"") and
-    ((for { JObject(o) <- json; JField("name", JString(y)) <- o } yield
-          y) mustEqual List("joe", "Mary", "Mazy"))
+      (print((json \ "children")(0) \ "name") mustEqual "\"Mary\"") and
+      (print((json \ "children")(1) \ "name") mustEqual "\"Mazy\"") and
+      ((for { JObject(o) <- json; JField("name", JString(y)) <- o } yield
+        y) mustEqual List("joe", "Mary", "Mazy"))
   }
 
   "Unbox values using XPath-like type expression" in {
     (parse(objArray) \ "children" \\ classOf[JInt] mustEqual List(5, 3)) and
-    (parse(lotto) \ "lotto" \ "winning-numbers" \ classOf[JInt] mustEqual List(
-            2, 45, 34, 23, 7, 5, 3)) and
-    (parse(lotto) \\ "winning-numbers" \ classOf[JInt] mustEqual List(
-            2, 45, 34, 23, 7, 5, 3))
+      (parse(lotto) \ "lotto" \ "winning-numbers" \ classOf[JInt] mustEqual List(
+          2, 45, 34, 23, 7, 5, 3)) and
+      (parse(lotto) \\ "winning-numbers" \ classOf[JInt] mustEqual List(2, 45,
+        34, 23, 7, 5, 3))
   }
 
   "Quoted example" in {
@@ -111,24 +112,25 @@ trait AbstractExamples extends Specification {
 
   "Unicode example" in {
     parse("[\" \\u00e4\\u00e4li\\u00f6t\"]") mustEqual JArray(
-        List(JString(" \u00e4\u00e4li\u00f6t")))
+      List(JString(" \u00e4\u00e4li\u00f6t")))
   }
 
   "Exponent example" in {
     (parse("""{"num": 2e5 }""") mustEqual JObject(
-            List(JField("num", JDouble(200000.0))))) and
-    (parse("""{"num": -2E5 }""") mustEqual JObject(
-            List(JField("num", JDouble(-200000.0))))) and
-    (parse("""{"num": 2.5e5 }""") mustEqual JObject(
-            List(JField("num", JDouble(250000.0))))) and
-    (parse("""{"num": 2.5e-5 }""") mustEqual JObject(
-            List(JField("num", JDouble(2.5e-5)))))
+      List(JField("num", JDouble(200000.0))))) and
+      (parse("""{"num": -2E5 }""") mustEqual JObject(
+        List(JField("num", JDouble(-200000.0))))) and
+      (parse("""{"num": 2.5e5 }""") mustEqual JObject(
+        List(JField("num", JDouble(250000.0))))) and
+      (parse("""{"num": 2.5e-5 }""") mustEqual JObject(
+        List(JField("num", JDouble(2.5e-5)))))
   }
 
   "JSON building example" in {
     val json =
       JObject(JField("name", JString("joe")), JField("age", JInt(34))) ++ JObject(
-          JField("name", ("mazy")), JField("age", JInt(31)))
+        JField("name", ("mazy")),
+        JField("age", JInt(31)))
     print(json) mustEqual """[{"name":"joe","age":34},{"name":"mazy","age":31}]"""
   }
 
@@ -136,7 +138,8 @@ trait AbstractExamples extends Specification {
     import Implicits._
     val json =
       JObject(JField("name", "joe"), JField("age", 34)) ++ JObject(
-          JField("name", "mazy"), JField("age", 31))
+        JField("name", "mazy"),
+        JField("age", 31))
     print(json) mustEqual """[{"name":"joe","age":34},{"name":"mazy","age":31}]"""
   }
 
@@ -145,7 +148,7 @@ trait AbstractExamples extends Specification {
     val ints = json.fold(JNothing: JValue) { (a, v) =>
       v match {
         case x: JInt => a ++ x
-        case _ => a
+        case _       => a
       }
     }
     print(ints) mustEqual """[35,33]"""
@@ -198,7 +201,7 @@ object Examples {
 
   val personDSL =
     ("person" -> ("name" -> "Joe") ~ ("age" -> 35) ~
-        ("spouse" -> ("person" -> ("name" -> "Marilyn") ~ ("age" -> 33))))
+      ("spouse" -> ("person" -> ("name" -> "Marilyn") ~ ("age" -> 33))))
 
   val objArray = """
 { "name": "joe",

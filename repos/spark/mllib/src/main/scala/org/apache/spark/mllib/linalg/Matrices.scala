@@ -19,7 +19,11 @@ package org.apache.spark.mllib.linalg
 
 import java.util.{Arrays, Random}
 
-import scala.collection.mutable.{ArrayBuffer, ArrayBuilder => MArrayBuilder, HashSet => MHashSet}
+import scala.collection.mutable.{
+  ArrayBuffer,
+  ArrayBuilder => MArrayBuilder,
+  HashSet => MHashSet
+}
 
 import breeze.linalg.{CSCMatrix => BSM, DenseMatrix => BDM, Matrix => BM}
 import com.github.fommil.netlib.BLAS.{getInstance => blas}
@@ -168,21 +172,24 @@ private[spark] class MatrixUDT extends UserDefinedType[Matrix] {
     // the sparse matrix needs colPtrs and rowIndices, which are set as
     // null, while building the dense matrix.
     StructType(
-        Seq(
-            StructField("type", ByteType, nullable = false),
-            StructField("numRows", IntegerType, nullable = false),
-            StructField("numCols", IntegerType, nullable = false),
-            StructField("colPtrs",
-                        ArrayType(IntegerType, containsNull = false),
-                        nullable = true),
-            StructField("rowIndices",
-                        ArrayType(IntegerType, containsNull = false),
-                        nullable = true),
-            StructField("values",
-                        ArrayType(DoubleType, containsNull = false),
-                        nullable = true),
-            StructField("isTransposed", BooleanType, nullable = false)
-        ))
+      Seq(
+        StructField("type", ByteType, nullable = false),
+        StructField("numRows", IntegerType, nullable = false),
+        StructField("numCols", IntegerType, nullable = false),
+        StructField(
+          "colPtrs",
+          ArrayType(IntegerType, containsNull = false),
+          nullable = true),
+        StructField(
+          "rowIndices",
+          ArrayType(IntegerType, containsNull = false),
+          nullable = true),
+        StructField(
+          "values",
+          ArrayType(DoubleType, containsNull = false),
+          nullable = true),
+        StructField("isTransposed", BooleanType, nullable = false)
+      ))
   }
 
   override def serialize(obj: Matrix): InternalRow = {
@@ -192,10 +199,10 @@ private[spark] class MatrixUDT extends UserDefinedType[Matrix] {
         row.setByte(0, 0)
         row.setInt(1, sm.numRows)
         row.setInt(2, sm.numCols)
+        row.update(3, new GenericArrayData(sm.colPtrs.map(_.asInstanceOf[Any])))
         row.update(
-            3, new GenericArrayData(sm.colPtrs.map(_.asInstanceOf[Any])))
-        row.update(
-            4, new GenericArrayData(sm.rowIndices.map(_.asInstanceOf[Any])))
+          4,
+          new GenericArrayData(sm.rowIndices.map(_.asInstanceOf[Any])))
         row.update(5, new GenericArrayData(sm.values.map(_.asInstanceOf[Any])))
         row.setBoolean(6, sm.isTransposed)
 
@@ -215,8 +222,8 @@ private[spark] class MatrixUDT extends UserDefinedType[Matrix] {
     datum match {
       case row: InternalRow =>
         require(
-            row.numFields == 7,
-            s"MatrixUDT.deserialize given row with length ${row.numFields} but requires length == 7")
+          row.numFields == 7,
+          s"MatrixUDT.deserialize given row with length ${row.numFields} but requires length == 7")
         val tpe = row.getByte(0)
         val numRows = row.getInt(1)
         val numCols = row.getInt(2)
@@ -227,7 +234,12 @@ private[spark] class MatrixUDT extends UserDefinedType[Matrix] {
             val colPtrs = row.getArray(3).toIntArray()
             val rowIndices = row.getArray(4).toIntArray()
             new SparseMatrix(
-                numRows, numCols, colPtrs, rowIndices, values, isTransposed)
+              numRows,
+              numCols,
+              colPtrs,
+              rowIndices,
+              values,
+              isTransposed)
           case 1 =>
             new DenseMatrix(numRows, numCols, values, isTransposed)
         }
@@ -239,7 +251,7 @@ private[spark] class MatrixUDT extends UserDefinedType[Matrix] {
   override def equals(o: Any): Boolean = {
     o match {
       case v: MatrixUDT => true
-      case _ => false
+      case _            => false
     }
   }
 
@@ -280,9 +292,10 @@ class DenseMatrix @Since("1.3.0")(
     extends Matrix {
 
   require(
-      values.length == numRows * numCols,
-      "The number of values supplied doesn't match the " +
-      s"size of the matrix! values.length: ${values.length}, numRows * numCols: ${numRows * numCols}")
+    values.length == numRows * numCols,
+    "The number of values supplied doesn't match the " +
+      s"size of the matrix! values.length: ${values.length}, numRows * numCols: ${numRows * numCols}"
+  )
 
   /**
     * Column-major dense matrix.
@@ -305,7 +318,7 @@ class DenseMatrix @Since("1.3.0")(
 
   override def equals(o: Any): Boolean = o match {
     case m: Matrix => toBreeze == m.toBreeze
-    case _ => false
+    case _         => false
   }
 
   override def hashCode: Int = {
@@ -419,7 +432,11 @@ class DenseMatrix @Since("1.3.0")(
       colPtrs(j) = nnz
     }
     new SparseMatrix(
-        numRows, numCols, colPtrs, rowIndices.result(), spVals.result())
+      numRows,
+      numCols,
+      colPtrs,
+      rowIndices.result(),
+      spVals.result())
   }
 
   @Since("2.0.0")
@@ -452,8 +469,9 @@ object DenseMatrix {
     */
   @Since("1.3.0")
   def zeros(numRows: Int, numCols: Int): DenseMatrix = {
-    require(numRows.toLong * numCols <= Int.MaxValue,
-            s"$numRows x $numCols dense matrix is too large to allocate")
+    require(
+      numRows.toLong * numCols <= Int.MaxValue,
+      s"$numRows x $numCols dense matrix is too large to allocate")
     new DenseMatrix(numRows, numCols, new Array[Double](numRows * numCols))
   }
 
@@ -465,8 +483,9 @@ object DenseMatrix {
     */
   @Since("1.3.0")
   def ones(numRows: Int, numCols: Int): DenseMatrix = {
-    require(numRows.toLong * numCols <= Int.MaxValue,
-            s"$numRows x $numCols dense matrix is too large to allocate")
+    require(
+      numRows.toLong * numCols <= Int.MaxValue,
+      s"$numRows x $numCols dense matrix is too large to allocate")
     new DenseMatrix(numRows, numCols, Array.fill(numRows * numCols)(1.0))
   }
 
@@ -495,10 +514,13 @@ object DenseMatrix {
     */
   @Since("1.3.0")
   def rand(numRows: Int, numCols: Int, rng: Random): DenseMatrix = {
-    require(numRows.toLong * numCols <= Int.MaxValue,
-            s"$numRows x $numCols dense matrix is too large to allocate")
+    require(
+      numRows.toLong * numCols <= Int.MaxValue,
+      s"$numRows x $numCols dense matrix is too large to allocate")
     new DenseMatrix(
-        numRows, numCols, Array.fill(numRows * numCols)(rng.nextDouble()))
+      numRows,
+      numCols,
+      Array.fill(numRows * numCols)(rng.nextDouble()))
   }
 
   /**
@@ -510,10 +532,13 @@ object DenseMatrix {
     */
   @Since("1.3.0")
   def randn(numRows: Int, numCols: Int, rng: Random): DenseMatrix = {
-    require(numRows.toLong * numCols <= Int.MaxValue,
-            s"$numRows x $numCols dense matrix is too large to allocate")
+    require(
+      numRows.toLong * numCols <= Int.MaxValue,
+      s"$numRows x $numCols dense matrix is too large to allocate")
     new DenseMatrix(
-        numRows, numCols, Array.fill(numRows * numCols)(rng.nextGaussian()))
+      numRows,
+      numCols,
+      Array.fill(numRows * numCols)(rng.nextGaussian()))
   }
 
   /**
@@ -570,19 +595,22 @@ class SparseMatrix @Since("1.3.0")(
     extends Matrix {
 
   require(
-      values.length == rowIndices.length,
-      "The number of row indices and values don't match! " +
-      s"values.length: ${values.length}, rowIndices.length: ${rowIndices.length}")
+    values.length == rowIndices.length,
+    "The number of row indices and values don't match! " +
+      s"values.length: ${values.length}, rowIndices.length: ${rowIndices.length}"
+  )
   // The Or statement is for the case when the matrix is transposed
   require(
-      colPtrs.length == numCols + 1 || colPtrs.length == numRows + 1,
-      "The length of the " +
+    colPtrs.length == numCols + 1 || colPtrs.length == numRows + 1,
+    "The length of the " +
       "column indices should be the number of columns + 1. Currently, colPointers.length: " +
-      s"${colPtrs.length}, numCols: $numCols")
+      s"${colPtrs.length}, numCols: $numCols"
+  )
   require(
-      values.length == colPtrs.last,
-      "The last value of colPtrs must equal the number of " +
-      s"elements. values.length: ${values.length}, colPtrs.last: ${colPtrs.last}")
+    values.length == colPtrs.last,
+    "The last value of colPtrs must equal the number of " +
+      s"elements. values.length: ${values.length}, colPtrs.last: ${colPtrs.last}"
+  )
 
   /**
     * Column-major sparse matrix.
@@ -604,16 +632,17 @@ class SparseMatrix @Since("1.3.0")(
     * @param values non-zero matrix entries in column major
     */
   @Since("1.2.0")
-  def this(numRows: Int,
-           numCols: Int,
-           colPtrs: Array[Int],
-           rowIndices: Array[Int],
-           values: Array[Double]) =
+  def this(
+      numRows: Int,
+      numCols: Int,
+      colPtrs: Array[Int],
+      rowIndices: Array[Int],
+      values: Array[Double]) =
     this(numRows, numCols, colPtrs, rowIndices, values, false)
 
   override def equals(o: Any): Boolean = o match {
     case m: Matrix => toBreeze == m.toBreeze
-    case _ => false
+    case _         => false
   }
 
   private[mllib] def toBreeze: BM[Double] = {
@@ -646,7 +675,7 @@ class SparseMatrix @Since("1.3.0")(
     val ind = index(i, j)
     if (ind == -1) {
       throw new NoSuchElementException(
-          "The given row and column indices correspond to a zero " +
+        "The given row and column indices correspond to a zero " +
           "value. Only non-zero elements in Sparse Matrices can be updated.")
     } else {
       values(ind) = v
@@ -660,7 +689,12 @@ class SparseMatrix @Since("1.3.0")(
 
   private[spark] def map(f: Double => Double) =
     new SparseMatrix(
-        numRows, numCols, colPtrs, rowIndices, values.map(f), isTransposed)
+      numRows,
+      numCols,
+      colPtrs,
+      rowIndices,
+      values.map(f),
+      isTransposed)
 
   private[mllib] def update(f: Double => Double): SparseMatrix = {
     val len = values.length
@@ -675,7 +709,12 @@ class SparseMatrix @Since("1.3.0")(
   @Since("1.3.0")
   override def transpose: SparseMatrix =
     new SparseMatrix(
-        numCols, numRows, colPtrs, rowIndices, values, !isTransposed)
+      numCols,
+      numRows,
+      colPtrs,
+      rowIndices,
+      values,
+      !isTransposed)
 
   private[spark] override def foreachActive(
       f: (Int, Int, Double) => Unit): Unit = {
@@ -770,16 +809,18 @@ object SparseMatrix {
     * @return The corresponding `SparseMatrix`
     */
   @Since("1.3.0")
-  def fromCOO(numRows: Int,
-              numCols: Int,
-              entries: Iterable[(Int, Int, Double)]): SparseMatrix = {
+  def fromCOO(
+      numRows: Int,
+      numCols: Int,
+      entries: Iterable[(Int, Int, Double)]): SparseMatrix = {
     val sortedEntries = entries.toSeq.sortBy(v => (v._2, v._1))
     val numEntries = sortedEntries.size
     if (sortedEntries.nonEmpty) {
       // Since the entries are sorted by column index, we only need to check the first and the last.
       for (col <- Seq(sortedEntries.head._2, sortedEntries.last._2)) {
-        require(col >= 0 && col < numCols,
-                s"Column index out of range [0, $numCols): $col.")
+        require(
+          col >= 0 && col < numCols,
+          s"Column index out of range [0, $numCols): $col.")
       }
     }
     val colPtrs = new Array[Int](numCols + 1)
@@ -799,8 +840,9 @@ object SparseMatrix {
             prevVal += v
           } else {
             if (prevVal != 0) {
-              require(prevRow >= 0 && prevRow < numRows,
-                      s"Row index out of range [0, $numRows): $prevRow.")
+              require(
+                prevRow >= 0 && prevRow < numRows,
+                s"Row index out of range [0, $numRows): $prevRow.")
               nnz += 1
               rowIndices += prevRow
               values += prevVal
@@ -815,7 +857,11 @@ object SparseMatrix {
         }
     }
     new SparseMatrix(
-        numRows, numCols, colPtrs, rowIndices.result(), values.result())
+      numRows,
+      numCols,
+      colPtrs,
+      rowIndices.result(),
+      values.result())
   }
 
   /**
@@ -826,42 +872,49 @@ object SparseMatrix {
   @Since("1.3.0")
   def speye(n: Int): SparseMatrix = {
     new SparseMatrix(
-        n, n, (0 to n).toArray, (0 until n).toArray, Array.fill(n)(1.0))
+      n,
+      n,
+      (0 to n).toArray,
+      (0 until n).toArray,
+      Array.fill(n)(1.0))
   }
 
   /**
     * Generates the skeleton of a random `SparseMatrix` with a given random number generator.
     * The values of the matrix returned are undefined.
     */
-  private def genRandMatrix(numRows: Int,
-                            numCols: Int,
-                            density: Double,
-                            rng: Random): SparseMatrix = {
+  private def genRandMatrix(
+      numRows: Int,
+      numCols: Int,
+      density: Double,
+      rng: Random): SparseMatrix = {
     require(numRows > 0, s"numRows must be greater than 0 but got $numRows")
     require(numCols > 0, s"numCols must be greater than 0 but got $numCols")
     require(
-        density >= 0.0 && density <= 1.0,
-        s"density must be a double in the range 0.0 <= d <= 1.0. Currently, density: $density")
+      density >= 0.0 && density <= 1.0,
+      s"density must be a double in the range 0.0 <= d <= 1.0. Currently, density: $density")
     val size = numRows.toLong * numCols
     val expected = size * density
     assert(
-        expected < Int.MaxValue,
-        "The expected number of nonzeros cannot be greater than Int.MaxValue.")
+      expected < Int.MaxValue,
+      "The expected number of nonzeros cannot be greater than Int.MaxValue.")
     val nnz = math.ceil(expected).toInt
     if (density == 0.0) {
-      new SparseMatrix(numRows,
-                       numCols,
-                       new Array[Int](numCols + 1),
-                       Array[Int](),
-                       Array[Double]())
+      new SparseMatrix(
+        numRows,
+        numCols,
+        new Array[Int](numCols + 1),
+        Array[Int](),
+        Array[Double]())
     } else if (density == 1.0) {
       val colPtrs = Array.tabulate(numCols + 1)(j => j * numRows)
       val rowIndices = Array.tabulate(size.toInt)(idx => idx % numRows)
-      new SparseMatrix(numRows,
-                       numCols,
-                       colPtrs,
-                       rowIndices,
-                       new Array[Double](numRows * numCols))
+      new SparseMatrix(
+        numRows,
+        numCols,
+        colPtrs,
+        rowIndices,
+        new Array[Double](numRows * numCols))
     } else if (density < 0.34) {
       // draw-by-draw, expected number of iterations is less than 1.5 * nnz
       val entries = MHashSet[(Int, Int)]()
@@ -869,7 +922,9 @@ object SparseMatrix {
         entries += ((rng.nextInt(numRows), rng.nextInt(numCols)))
       }
       SparseMatrix.fromCOO(
-          numRows, numCols, entries.map(v => (v._1, v._2, 1.0)))
+        numRows,
+        numCols,
+        entries.map(v => (v._1, v._2, 1.0)))
     } else {
       // selection-rejection method
       var idx = 0L
@@ -891,7 +946,11 @@ object SparseMatrix {
         j += 1
       }
       new SparseMatrix(
-          numRows, numCols, colPtrs, rowIndices, new Array[Double](nnz))
+        numRows,
+        numCols,
+        colPtrs,
+        rowIndices,
+        new Array[Double](nnz))
     }
   }
 
@@ -906,10 +965,11 @@ object SparseMatrix {
     * @return `SparseMatrix` with size `numRows` x `numCols` and values in U(0, 1)
     */
   @Since("1.3.0")
-  def sprand(numRows: Int,
-             numCols: Int,
-             density: Double,
-             rng: Random): SparseMatrix = {
+  def sprand(
+      numRows: Int,
+      numCols: Int,
+      density: Double,
+      rng: Random): SparseMatrix = {
     val mat = genRandMatrix(numRows, numCols, density, rng)
     mat.update(i => rng.nextDouble())
   }
@@ -923,10 +983,11 @@ object SparseMatrix {
     * @return `SparseMatrix` with size `numRows` x `numCols` and values in N(0, 1)
     */
   @Since("1.3.0")
-  def sprandn(numRows: Int,
-              numCols: Int,
-              density: Double,
-              rng: Random): SparseMatrix = {
+  def sprandn(
+      numRows: Int,
+      numCols: Int,
+      density: Double,
+      rng: Random): SparseMatrix = {
     val mat = genRandMatrix(numRows, numCols, density, rng)
     mat.update(i => rng.nextGaussian())
   }
@@ -943,7 +1004,9 @@ object SparseMatrix {
     vector match {
       case sVec: SparseVector =>
         SparseMatrix.fromCOO(
-            n, n, sVec.indices.zip(sVec.values).map(v => (v._1, v._1, v._2)))
+          n,
+          n,
+          sVec.indices.zip(sVec.values).map(v => (v._1, v._1, v._2)))
       case dVec: DenseVector =>
         val entries = dVec.values.zipWithIndex
         val nnzVals = entries.filter(v => v._1 != 0.0)
@@ -980,11 +1043,12 @@ object Matrices {
     * @param values non-zero matrix entries in column major
     */
   @Since("1.2.0")
-  def sparse(numRows: Int,
-             numCols: Int,
-             colPtrs: Array[Int],
-             rowIndices: Array[Int],
-             values: Array[Double]): Matrix = {
+  def sparse(
+      numRows: Int,
+      numCols: Int,
+      colPtrs: Array[Int],
+      rowIndices: Array[Int],
+      values: Array[Double]): Matrix = {
     new SparseMatrix(numRows, numCols, colPtrs, rowIndices, values)
   }
 
@@ -1002,7 +1066,7 @@ object Matrices {
         new SparseMatrix(sm.rows, sm.cols, sm.colPtrs, sm.rowIndices, sm.data)
       case _ =>
         throw new UnsupportedOperationException(
-            s"Do not support conversion from type ${breeze.getClass.getName}.")
+          s"Do not support conversion from type ${breeze.getClass.getName}.")
     }
   }
 
@@ -1062,8 +1126,7 @@ object Matrices {
     * @return `Matrix` with size `numRows` x `numCols` and values in U(0, 1)
     */
   @Since("1.3.0")
-  def sprand(
-      numRows: Int, numCols: Int, density: Double, rng: Random): Matrix =
+  def sprand(numRows: Int, numCols: Int, density: Double, rng: Random): Matrix =
     SparseMatrix.sprand(numRows, numCols, density, rng)
 
   /**
@@ -1087,7 +1150,10 @@ object Matrices {
     */
   @Since("1.3.0")
   def sprandn(
-      numRows: Int, numCols: Int, density: Double, rng: Random): Matrix =
+      numRows: Int,
+      numCols: Int,
+      density: Double,
+      rng: Random): Matrix =
     SparseMatrix.sprandn(numRows, numCols, density, rng)
 
   /**
@@ -1117,15 +1183,16 @@ object Matrices {
     var hasSparse = false
     var numCols = 0
     matrices.foreach { mat =>
-      require(numRows == mat.numRows,
-              "The number of rows of the matrices in this sequence, " +
-              "don't match!")
+      require(
+        numRows == mat.numRows,
+        "The number of rows of the matrices in this sequence, " +
+          "don't match!")
       mat match {
         case sparse: SparseMatrix => hasSparse = true
-        case dense: DenseMatrix => // empty on purpose
+        case dense: DenseMatrix   => // empty on purpose
         case _ =>
           throw new IllegalArgumentException(
-              "Unsupported matrix format. Expected " +
+            "Unsupported matrix format. Expected " +
               s"SparseMatrix or DenseMatrix. Instead got: ${mat.getClass}")
       }
       numCols += mat.numCols
@@ -1179,15 +1246,16 @@ object Matrices {
     var hasSparse = false
     var numRows = 0
     matrices.foreach { mat =>
-      require(numCols == mat.numCols,
-              "The number of rows of the matrices in this sequence, " +
-              "don't match!")
+      require(
+        numCols == mat.numCols,
+        "The number of rows of the matrices in this sequence, " +
+          "don't match!")
       mat match {
         case sparse: SparseMatrix => hasSparse = true
-        case dense: DenseMatrix => // empty on purpose
+        case dense: DenseMatrix   => // empty on purpose
         case _ =>
           throw new IllegalArgumentException(
-              "Unsupported matrix format. Expected " +
+            "Unsupported matrix format. Expected " +
               s"SparseMatrix or DenseMatrix. Instead got: ${mat.getClass}")
       }
       numRows += mat.numRows

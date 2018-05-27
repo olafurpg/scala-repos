@@ -7,7 +7,8 @@ object ComparisonFailure {
   private final val MAX_CONTEXT_LENGTH = 20
 
   private class ComparisonCompactor(
-      private val expected: String, private val actual: String) {
+      private val expected: String,
+      private val actual: String) {
 
     private val ELLIPSIS: String = "..."
     private val DIFF_END: String = "]"
@@ -21,9 +22,9 @@ object ComparisonFailure {
         val compactedPrefix = extractor.compactPrefix()
         val compactedSuffix = extractor.compactSuffix()
         Assert.format(
-            message,
-            compactedPrefix + extractor.expectedDiff() + compactedSuffix,
-            compactedPrefix + extractor.actualDiff() + compactedSuffix)
+          message,
+          compactedPrefix + extractor.expectedDiff() + compactedSuffix,
+          compactedPrefix + extractor.actualDiff() + compactedSuffix)
       }
     }
 
@@ -37,8 +38,9 @@ object ComparisonFailure {
     private def sharedSuffix(prefix: String): String = {
       var suffixLength = 0
       var maxSuffixLength =
-        Math.min(expected.length() - prefix.length(),
-                 actual.length() - prefix.length()) - 1
+        Math.min(
+          expected.length() - prefix.length(),
+          actual.length() - prefix.length()) - 1
       while (suffixLength <= maxSuffixLength) {
         if (expected.charAt(expected.length() - 1 - suffixLength) != actual
               .charAt(actual.length() - 1 - suffixLength)) {
@@ -62,7 +64,7 @@ object ComparisonFailure {
         if (_sharedPrefix.length() <= MAX_CONTEXT_LENGTH) _sharedPrefix
         else
           ELLIPSIS + _sharedPrefix.substring(
-              _sharedPrefix.length() - MAX_CONTEXT_LENGTH)
+            _sharedPrefix.length() - MAX_CONTEXT_LENGTH)
       }
 
       def compactSuffix(): String = {
@@ -72,7 +74,8 @@ object ComparisonFailure {
 
       private def extractDiff(source: String): String = {
         val sub = source.substring(
-            _sharedPrefix.length(), source.length() - _sharedSuffix.length())
+          _sharedPrefix.length(),
+          source.length() - _sharedSuffix.length())
         DIFF_START + sub + DIFF_END
       }
     }

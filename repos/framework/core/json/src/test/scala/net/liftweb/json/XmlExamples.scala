@@ -39,7 +39,7 @@ object XmlExamples extends Specification {
 
   "Conversion transformation example 2" in {
     val json = toJson(users2).transformField {
-      case JField("id", JString(s)) => JField("id", JInt(s.toInt))
+      case JField("id", JString(s))   => JField("id", JInt(s.toInt))
       case JField("user", x: JObject) => JField("user", JArray(x :: Nil))
     }
     compactRender(json) mustEqual """{"users":{"user":[{"id":1,"name":"Harry"}]}}"""
@@ -56,8 +56,7 @@ object XmlExamples extends Specification {
 
     val printer = new scala.xml.PrettyPrinter(100, 2)
     val lotto: JObject = LottoExample.json
-    val xml = toXml(
-        lotto.transformField {
+    val xml = toXml(lotto.transformField {
       case JField("winning-numbers", JArray(nums)) =>
         JField("winning-numbers", flattenArray(nums))
       case JField("numbers", JArray(nums)) =>

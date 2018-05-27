@@ -27,13 +27,14 @@ import org.apache.spark.util.CallSite
   * partition, and the set of partition IDs, `partitions`. Some stages may not run on all partitions
   * of the RDD, for actions like first() and lookup().
   */
-private[spark] class ResultStage(id: Int,
-                                 rdd: RDD[_],
-                                 val func: (TaskContext, Iterator[_]) => _,
-                                 val partitions: Array[Int],
-                                 parents: List[Stage],
-                                 firstJobId: Int,
-                                 callSite: CallSite)
+private[spark] class ResultStage(
+    id: Int,
+    rdd: RDD[_],
+    val func: (TaskContext, Iterator[_]) => _,
+    val partitions: Array[Int],
+    parents: List[Stage],
+    firstJobId: Int,
+    callSite: CallSite)
     extends Stage(id, rdd, partitions.length, parents, firstJobId, callSite) {
 
   /**

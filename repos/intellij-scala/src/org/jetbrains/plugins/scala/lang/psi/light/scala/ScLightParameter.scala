@@ -6,10 +6,17 @@ import com.intellij.psi.{PsiAnnotation, PsiClass, PsiElement, PsiTypeElement}
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiElement
 import org.jetbrains.plugins.scala.lang.psi.api.base.ScModifierList
 import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScTypeElement
-import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScAnnotation, ScExpression}
+import org.jetbrains.plugins.scala.lang.psi.api.expr.{
+  ScAnnotation,
+  ScExpression
+}
 import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameter
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
-import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, TypingContext}
+import org.jetbrains.plugins.scala.lang.psi.types.result.{
+  Success,
+  TypeResult,
+  TypingContext
+}
 
 /**
   * @author Alefas
@@ -81,8 +88,8 @@ class ScLightParameter(val param: ScParameter, tp: ScType, i: Int)
   override def setModifierProperty(name: String, value: Boolean): Unit =
     throw new UnsupportedOperationException("Operation on light element")
 
-  override protected def findChildrenByClassScala[
-      T >: Null <: ScalaPsiElement](clazz: Class[T]): Array[T] =
+  override protected def findChildrenByClassScala[T >: Null <: ScalaPsiElement](
+      clazz: Class[T]): Array[T] =
     throw new UnsupportedOperationException("Operation on light element")
 
   override protected def findChildByClassScala[T >: Null <: ScalaPsiElement](

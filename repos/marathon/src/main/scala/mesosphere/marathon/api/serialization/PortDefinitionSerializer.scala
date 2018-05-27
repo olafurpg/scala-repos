@@ -15,10 +15,12 @@ object PortDefinitionSerializer {
 
     if (portDefinition.labels.nonEmpty) {
       val labelsBuilder = mesos.Protos.Labels.newBuilder
-      portDefinition.labels.map {
-        case (key, value) =>
-          mesos.Protos.Label.newBuilder.setKey(key).setValue(value).build
-      }.foreach(labelsBuilder.addLabels)
+      portDefinition.labels
+        .map {
+          case (key, value) =>
+            mesos.Protos.Label.newBuilder.setKey(key).setValue(value).build
+        }
+        .foreach(labelsBuilder.addLabels)
       builder.setLabels(labelsBuilder.build())
     }
 
@@ -34,10 +36,10 @@ object PortDefinitionSerializer {
       else Map.empty[String, String]
 
     PortDefinition(
-        proto.getNumber,
-        proto.getProtocol,
-        if (proto.hasName) Some(proto.getName) else None,
-        labels
+      proto.getNumber,
+      proto.getProtocol,
+      if (proto.hasName) Some(proto.getName) else None,
+      labels
     )
   }
 }

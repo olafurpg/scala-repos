@@ -40,7 +40,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class NodeSpec
     extends SimpleSFXDelegateSpec[jfxs.Node, Node](
-        classOf[jfxs.Node], classOf[Node]) {
+      classOf[jfxs.Node],
+      classOf[Node]) {
 
   override protected def getScalaClassInstance =
     new Node(getJavaClassInstance) {}

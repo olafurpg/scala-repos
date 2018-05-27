@@ -8,7 +8,10 @@ import scala.concurrent.duration._
 import com.typesafe.config.ConfigFactory
 import akka.actor._
 import akka.remote.testconductor.RoleName
-import akka.remote.transport.ThrottlerTransportAdapter.{ForceDisassociate, Direction}
+import akka.remote.transport.ThrottlerTransportAdapter.{
+  ForceDisassociate,
+  Direction
+}
 import akka.remote.testkit.MultiNodeConfig
 import akka.remote.testkit.MultiNodeSpec
 import akka.remote.testkit.STMultiNodeSpec
@@ -22,7 +25,9 @@ object RemoteQuarantinePiercingSpec extends MultiNodeConfig {
   val first = role("first")
   val second = role("second")
 
-  commonConfig(debugConfig(on = false).withFallback(ConfigFactory.parseString("""
+  commonConfig(
+    debugConfig(on = false).withFallback(
+      ConfigFactory.parseString("""
       akka.loglevel = INFO
       akka.remote.log-remote-lifecycle-events = INFO
                               """)))
@@ -36,13 +41,12 @@ object RemoteQuarantinePiercingSpec extends MultiNodeConfig {
   }
 }
 
-class RemoteQuarantinePiercingMultiJvmNode1
-    extends RemoteQuarantinePiercingSpec
-class RemoteQuarantinePiercingMultiJvmNode2
-    extends RemoteQuarantinePiercingSpec
+class RemoteQuarantinePiercingMultiJvmNode1 extends RemoteQuarantinePiercingSpec
+class RemoteQuarantinePiercingMultiJvmNode2 extends RemoteQuarantinePiercingSpec
 
 abstract class RemoteQuarantinePiercingSpec
-    extends MultiNodeSpec(RemoteQuarantinePiercingSpec) with STMultiNodeSpec
+    extends MultiNodeSpec(RemoteQuarantinePiercingSpec)
+    with STMultiNodeSpec
     with ImplicitSender {
 
   import RemoteQuarantinePiercingSpec._
@@ -70,8 +74,7 @@ abstract class RemoteQuarantinePiercingSpec
           .quarantine(node(second).address, Some(uidFirst))
 
         // Quarantine is up -- Cannot communicate with remote system any more
-        system.actorSelection(
-            RootActorPath(secondAddress) / "user" / "subject") ! "identify"
+        system.actorSelection(RootActorPath(secondAddress) / "user" / "subject") ! "identify"
         expectNoMsg(2.seconds)
 
         // Shut down the other system -- which results in restart (see runOn(second))
@@ -82,7 +85,7 @@ abstract class RemoteQuarantinePiercingSpec
           // retry because the Subject actor might not be started yet
           awaitAssert {
             system.actorSelection(
-                RootActorPath(secondAddress) / "user" / "subject") ! "identify"
+              RootActorPath(secondAddress) / "user" / "subject") ! "identify"
             val (uidSecond, subjectSecond) =
               expectMsgType[(Int, ActorRef)](1.second)
             uidSecond should not be (uidFirst)
@@ -92,8 +95,7 @@ abstract class RemoteQuarantinePiercingSpec
 
         // If we got here the Quarantine was successfully pierced since it is configured to last 1 day
 
-        system.actorSelection(
-            RootActorPath(secondAddress) / "user" / "subject") ! "shutdown"
+        system.actorSelection(RootActorPath(secondAddress) / "user" / "subject") ! "shutdown"
       }
 
       runOn(second) {
@@ -107,12 +109,15 @@ abstract class RemoteQuarantinePiercingSpec
         Await.ready(system.whenTerminated, 30.seconds)
 
         val freshSystem =
-          ActorSystem(system.name, ConfigFactory.parseString(s"""
+          ActorSystem(
+            system.name,
+            ConfigFactory.parseString(s"""
                     akka.remote.netty.tcp {
                       hostname = ${addr.host.get}
                       port = ${addr.port.get}
                     }
-                    """).withFallback(system.settings.config))
+                    """).withFallback(system.settings.config)
+          )
         freshSystem.actorOf(Props[Subject], "subject")
 
         Await.ready(freshSystem.whenTerminated, 30.seconds)

@@ -12,10 +12,10 @@ import lila.game._
 private[importer] final class DataForm {
 
   lazy val importForm = Form(
-      mapping(
-          "pgn" -> nonEmptyText.verifying("Invalid PGN", checkPgn _),
-          "analyse" -> optional(nonEmptyText)
-      )(ImportData.apply)(ImportData.unapply))
+    mapping(
+      "pgn" -> nonEmptyText.verifying("Invalid PGN", checkPgn _),
+      "analyse" -> optional(nonEmptyText)
+    )(ImportData.apply)(ImportData.unapply))
 
   private def checkPgn(pgn: String): Boolean =
     ImportData(pgn, none).preprocess(none).isSuccess
@@ -23,7 +23,9 @@ private[importer] final class DataForm {
 
 private[importer] case class Result(status: Status, winner: Option[Color])
 private[importer] case class Preprocessed(
-    game: Game, replay: Replay, result: Option[Result])
+    game: Game,
+    replay: Replay,
+    result: Option[Result])
 
 case class ImportData(pgn: String, analyse: Option[String]) {
 
@@ -48,8 +50,9 @@ case class ImportData(pgn: String, analyse: Option[String]) {
               tag(_.Variant)
                 .map(Chess960.fixVariantName)
                 .flatMap(chess.variant.Variant.byName) | {
-                fromPosition.fold(chess.variant.FromPosition,
-                                  chess.variant.Standard)
+                fromPosition.fold(
+                  chess.variant.FromPosition,
+                  chess.variant.Standard)
               }
             } match {
               case chess.variant.Chess960
@@ -60,8 +63,8 @@ case class ImportData(pgn: String, analyse: Option[String]) {
 
             val result =
               tag(_.Result) ifFalse game.situation.end collect {
-                case "1-0" => Result(Status.UnknownFinish, Color.White.some)
-                case "0-1" => Result(Status.UnknownFinish, Color.Black.some)
+                case "1-0"     => Result(Status.UnknownFinish, Color.White.some)
+                case "0-1"     => Result(Status.UnknownFinish, Color.Black.some)
                 case "1/2-1/2" => Result(Status.Draw, none)
               }
 
@@ -74,20 +77,18 @@ case class ImportData(pgn: String, analyse: Option[String]) {
 
             val dbGame = Game
               .make(
-                  game = replay.state,
-                  whitePlayer = Player.white withName name(_.White,
-                                                           _.WhiteElo),
-                  blackPlayer = Player.black withName name(_.Black,
-                                                           _.BlackElo),
-                  mode = Mode.Casual,
-                  variant = variant,
-                  source = Source.Import,
-                  pgnImport = PgnImport
-                      .make(user = user, date = date, pgn = pgn)
-                      .some
-                )
+                game = replay.state,
+                whitePlayer = Player.white withName name(_.White, _.WhiteElo),
+                blackPlayer = Player.black withName name(_.Black, _.BlackElo),
+                mode = Mode.Casual,
+                variant = variant,
+                source = Source.Import,
+                pgnImport = PgnImport
+                  .make(user = user, date = date, pgn = pgn)
+                  .some
+              )
               .copy(
-                  binaryPgn = BinaryFormat.pgn write replay.state.pgnMoves
+                binaryPgn = BinaryFormat.pgn write replay.state.pgnMoves
               )
               .start
 

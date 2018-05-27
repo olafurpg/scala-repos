@@ -36,25 +36,30 @@ object AsyncExecutor extends Logging {
       lazy val executionContext = {
         if (!state.compareAndSet(0, 1))
           throw new IllegalStateException(
-              "Cannot initialize ExecutionContext; AsyncExecutor already shut down")
+            "Cannot initialize ExecutionContext; AsyncExecutor already shut down")
         val queue = queueSize match {
-          case 0 => new SynchronousQueue[Runnable]
+          case 0  => new SynchronousQueue[Runnable]
           case -1 => new LinkedBlockingQueue[Runnable]
           case n =>
             new ManagedArrayBlockingQueue[Runnable](n * 2) {
               def accept(r: Runnable, size: Int) = r match {
                 case pr: PrioritizedRunnable if pr.highPriority => true
-                case _ => size < n
+                case _                                          => size < n
               }
             }
         }
         val tf = new DaemonThreadFactory(name + "-")
         executor = new ThreadPoolExecutor(
-            numThreads, numThreads, 1, TimeUnit.MINUTES, queue, tf)
+          numThreads,
+          numThreads,
+          1,
+          TimeUnit.MINUTES,
+          queue,
+          tf)
         if (!state.compareAndSet(1, 2)) {
           executor.shutdownNow()
           throw new IllegalStateException(
-              "Cannot initialize ExecutionContext; AsyncExecutor shut down during initialization")
+            "Cannot initialize ExecutionContext; AsyncExecutor shut down during initialization")
         }
         ExecutionContext.fromExecutorService(executor, loggingReporter)
       }
@@ -62,7 +67,7 @@ object AsyncExecutor extends Logging {
         executor.shutdownNow()
         if (!executor.awaitTermination(30, TimeUnit.SECONDS))
           logger.warn(
-              "Abandoning ThreadPoolExecutor (not yet destroyed after 30 seconds)")
+            "Abandoning ThreadPoolExecutor (not yet destroyed after 30 seconds)")
       }
     }
   }
@@ -80,8 +85,7 @@ object AsyncExecutor extends Logging {
     private[this] val threadNumber = new AtomicInteger(1)
 
     def newThread(r: Runnable): Thread = {
-      val t = new Thread(
-          group, r, namePrefix + threadNumber.getAndIncrement, 0)
+      val t = new Thread(group, r, namePrefix + threadNumber.getAndIncrement, 0)
       if (!t.isDaemon) t.setDaemon(true)
       if (t.getPriority != Thread.NORM_PRIORITY)
         t.setPriority(Thread.NORM_PRIORITY)
@@ -100,8 +104,7 @@ object AsyncExecutor extends Logging {
     }
   }
 
-  val loggingReporter: Throwable => Unit = (t: Throwable) =>
-    {
-      logger.warn("Execution of asynchronous I/O action failed", t)
+  val loggingReporter: Throwable => Unit = (t: Throwable) => {
+    logger.warn("Execution of asynchronous I/O action failed", t)
   }
 }

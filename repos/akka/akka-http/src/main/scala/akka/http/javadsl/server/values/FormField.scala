@@ -48,9 +48,10 @@ object FormFields {
     FormFieldImpl(name.as(Unmarshaller.HexLong))
 
   /** Unmarshals the `name` field using the provided `convert` function. */
-  def fromString[T](name: String,
-                    clazz: Class[T],
-                    convert: Function[String, T]): FormField[T] = {
+  def fromString[T](
+      name: String,
+      clazz: Class[T],
+      convert: Function[String, T]): FormField[T] = {
     implicit val tTag: ClassTag[T] = ClassTag(clazz)
     FormFieldImpl(name.as(Util.fromStringUnmarshallerFromFunction(convert)))
   }

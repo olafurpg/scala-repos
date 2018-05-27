@@ -9,7 +9,7 @@ import com.typesafe.config.Config
 /**
   * Public API but not intended for subclassing
   */
-abstract class RoutingSettings private[akka]() { self: RoutingSettingsImpl ⇒
+abstract class RoutingSettings private[akka] () { self: RoutingSettingsImpl ⇒
   def getVerboseErrorMessages: Boolean
   def getFileGetConditional: Boolean
   def getRenderVanityFooter: Boolean
@@ -18,8 +18,7 @@ abstract class RoutingSettings private[akka]() { self: RoutingSettingsImpl ⇒
   def getDecodeMaxBytesPerChunk: Int
   def getFileIODispatcher: String
 
-  def withVerboseErrorMessages(
-      verboseErrorMessages: Boolean): RoutingSettings =
+  def withVerboseErrorMessages(verboseErrorMessages: Boolean): RoutingSettings =
     self.copy(verboseErrorMessages = verboseErrorMessages)
   def withFileGetConditional(fileGetConditional: Boolean): RoutingSettings =
     self.copy(fileGetConditional = fileGetConditional)
@@ -30,8 +29,7 @@ abstract class RoutingSettings private[akka]() { self: RoutingSettingsImpl ⇒
   def withRangeCoalescingThreshold(
       rangeCoalescingThreshold: Long): RoutingSettings =
     self.copy(rangeCoalescingThreshold = rangeCoalescingThreshold)
-  def withDecodeMaxBytesPerChunk(
-      decodeMaxBytesPerChunk: Int): RoutingSettings =
+  def withDecodeMaxBytesPerChunk(decodeMaxBytesPerChunk: Int): RoutingSettings =
     self.copy(decodeMaxBytesPerChunk = decodeMaxBytesPerChunk)
   def withFileIODispatcher(fileIODispatcher: String): RoutingSettings =
     self.copy(fileIODispatcher = fileIODispatcher)

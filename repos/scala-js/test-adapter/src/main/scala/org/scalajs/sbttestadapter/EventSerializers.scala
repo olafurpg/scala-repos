@@ -26,13 +26,15 @@ private[testadapter] object EventSerializers {
     def deserialize(x: JSON): Event = {
       val obj = new JSONObjExtractor(x)
 
-      new DeserializedEvent(obj.fld[String]("fullyQualifiedName"),
-                            obj.fld[Fingerprint]("fingerprint"),
-                            obj.fld[Selector]("selector"),
-                            Status.valueOf(obj.fld[String]("status")),
-                            obj.opt[RemoteException]("throwable"),
-                            (obj.fld[Int]("durationMS").toLong << 32) |
-                            (obj.fld[Int]("durationLS").toLong & 0xffffffffL))
+      new DeserializedEvent(
+        obj.fld[String]("fullyQualifiedName"),
+        obj.fld[Fingerprint]("fingerprint"),
+        obj.fld[Selector]("selector"),
+        Status.valueOf(obj.fld[String]("status")),
+        obj.opt[RemoteException]("throwable"),
+        (obj.fld[Int]("durationMS").toLong << 32) |
+          (obj.fld[Int]("durationLS").toLong & 0xffffffffL)
+      )
     }
   }
 
@@ -43,6 +45,5 @@ private[testadapter] object EventSerializers {
       val status: Status,
       val throwable: OptionalThrowable,
       val duration: Long
-  )
-      extends Event
+  ) extends Event
 }

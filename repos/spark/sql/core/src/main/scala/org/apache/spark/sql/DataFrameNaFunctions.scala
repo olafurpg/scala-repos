@@ -33,7 +33,7 @@ import org.apache.spark.sql.types._
   * @since 1.3.1
   */
 @Experimental
-final class DataFrameNaFunctions private[sql](df: DataFrame) {
+final class DataFrameNaFunctions private[sql] (df: DataFrame) {
 
   /**
     * Returns a new [[DataFrame]] that drops rows containing any null or NaN values.
@@ -93,8 +93,7 @@ final class DataFrameNaFunctions private[sql](df: DataFrame) {
       case "any" => drop(cols.size, cols)
       case "all" => drop(1, cols)
       case _ =>
-        throw new IllegalArgumentException(
-            s"how ($how) must be 'any' or 'all'")
+        throw new IllegalArgumentException(s"how ($how) must be 'any' or 'all'")
     }
   }
 
@@ -124,8 +123,8 @@ final class DataFrameNaFunctions private[sql](df: DataFrame) {
   def drop(minNonNulls: Int, cols: Seq[String]): DataFrame = {
     // Filtering condition:
     // only keep the row if it has at least `minNonNulls` non-null and non-NaN values.
-    val predicate = AtLeastNNonNulls(
-        minNonNulls, cols.map(name => df.resolve(name)))
+    val predicate =
+      AtLeastNNonNulls(minNonNulls, cols.map(name => df.resolve(name)))
     df.filter(Column(predicate))
   }
 
@@ -288,7 +287,8 @@ final class DataFrameNaFunctions private[sql](df: DataFrame) {
     * @since 1.3.1
     */
   def replace[T](
-      cols: Array[String], replacement: java.util.Map[T, T]): DataFrame = {
+      cols: Array[String],
+      replacement: java.util.Map[T, T]): DataFrame = {
     replace(cols.toSeq, replacement.asScala.toMap)
   }
 
@@ -345,14 +345,15 @@ final class DataFrameNaFunctions private[sql](df: DataFrame) {
     replace0(cols, replacement)
 
   private def replace0[T](
-      cols: Seq[String], replacement: Map[T, T]): DataFrame = {
+      cols: Seq[String],
+      replacement: Map[T, T]): DataFrame = {
     if (replacement.isEmpty || cols.isEmpty) {
       return df
     }
 
     // replacementMap is either Map[String, String] or Map[Double, Double] or Map[Boolean,Boolean]
     val replacementMap: Map[_, _] = replacement.head._2 match {
-      case v: String => replacement
+      case v: String  => replacement
       case v: Boolean => replacement
       case _ =>
         replacement.map {
@@ -365,7 +366,7 @@ final class DataFrameNaFunctions private[sql](df: DataFrame) {
       case _: jl.Double | _: jl.Float | _: jl.Integer | _: jl.Long =>
         DoubleType
       case _: jl.Boolean => BooleanType
-      case _: String => StringType
+      case _: String     => StringType
     }
 
     val columnEquals = df.sqlContext.sessionState.analyzer.resolver
@@ -397,23 +398,26 @@ final class DataFrameNaFunctions private[sql](df: DataFrame) {
           // This is good
           case _ =>
             throw new IllegalArgumentException(
-                s"Unsupported value type ${replaceValue.getClass.getName} ($replaceValue).")
+              s"Unsupported value type ${replaceValue.getClass.getName} ($replaceValue).")
         }
     }
 
     val columnEquals = df.sqlContext.sessionState.analyzer.resolver
     val projections = df.schema.fields.map { f =>
-      values.find { case (k, _) => columnEquals(k, f.name) }.map {
-        case (_, v) =>
-          v match {
-            case v: jl.Float => fillCol[Double](f, v.toDouble)
-            case v: jl.Double => fillCol[Double](f, v)
-            case v: jl.Long => fillCol[Double](f, v.toDouble)
-            case v: jl.Integer => fillCol[Double](f, v.toDouble)
-            case v: jl.Boolean => fillCol[Boolean](f, v.booleanValue())
-            case v: String => fillCol[String](f, v)
-          }
-      }.getOrElse(df.col(f.name))
+      values
+        .find { case (k, _) => columnEquals(k, f.name) }
+        .map {
+          case (_, v) =>
+            v match {
+              case v: jl.Float   => fillCol[Double](f, v.toDouble)
+              case v: jl.Double  => fillCol[Double](f, v)
+              case v: jl.Long    => fillCol[Double](f, v.toDouble)
+              case v: jl.Integer => fillCol[Double](f, v.toDouble)
+              case v: jl.Boolean => fillCol[Boolean](f, v.booleanValue())
+              case v: String     => fillCol[String](f, v)
+            }
+        }
+        .getOrElse(df.col(f.name))
     }
     df.select(projections: _*)
   }
@@ -424,11 +428,13 @@ final class DataFrameNaFunctions private[sql](df: DataFrame) {
   private def fillCol[T](col: StructField, replacement: T): Column = {
     col.dataType match {
       case DoubleType | FloatType =>
-        coalesce(nanvl(df.col("`" + col.name + "`"), lit(null)),
-                 lit(replacement).cast(col.dataType)).as(col.name)
+        coalesce(
+          nanvl(df.col("`" + col.name + "`"), lit(null)),
+          lit(replacement).cast(col.dataType)).as(col.name)
       case _ =>
-        coalesce(df.col("`" + col.name + "`"),
-                 lit(replacement).cast(col.dataType)).as(col.name)
+        coalesce(
+          df.col("`" + col.name + "`"),
+          lit(replacement).cast(col.dataType)).as(col.name)
     }
   }
 
@@ -438,7 +444,9 @@ final class DataFrameNaFunctions private[sql](df: DataFrame) {
     *
     * TODO: This can be optimized to use broadcast join when replacementMap is large.
     */
-  private def replaceCol(col: StructField, replacementMap: Map[_, _]): Column = {
+  private def replaceCol(
+      col: StructField,
+      replacementMap: Map[_, _]): Column = {
     val keyExpr = df.col(col.name).expr
     def buildExpr(v: Any) = Cast(Literal(v), keyExpr.dataType)
     val branches = replacementMap.flatMap {
@@ -449,12 +457,12 @@ final class DataFrameNaFunctions private[sql](df: DataFrame) {
   }
 
   private def convertToDouble(v: Any): Double = v match {
-    case v: Float => v.toDouble
+    case v: Float  => v.toDouble
     case v: Double => v
-    case v: Long => v.toDouble
-    case v: Int => v.toDouble
+    case v: Long   => v.toDouble
+    case v: Int    => v.toDouble
     case v =>
       throw new IllegalArgumentException(
-          s"Unsupported value type ${v.getClass.getName} ($v).")
+        s"Unsupported value type ${v.getClass.getName} ($v).")
   }
 }

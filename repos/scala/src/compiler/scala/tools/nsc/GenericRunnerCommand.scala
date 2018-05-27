@@ -10,7 +10,8 @@ import scala.reflect.internal.util.ScalaClassLoader
 
 /** A command for ScriptRunner */
 class GenericRunnerCommand(
-    args: List[String], override val settings: GenericRunnerSettings)
+    args: List[String],
+    override val settings: GenericRunnerSettings)
     extends CompilerCommand(args, settings) {
 
   def this(args: List[String], error: String => Unit) =
@@ -55,7 +56,7 @@ class GenericRunnerCommand(
     case Nil => AsRepl
     case hd :: _ =>
       waysToRun find (_.name == settings.howtorun.value) getOrElse guessHowToRun(
-          hd)
+        hd)
   }
 
   def shortUsageMsg =

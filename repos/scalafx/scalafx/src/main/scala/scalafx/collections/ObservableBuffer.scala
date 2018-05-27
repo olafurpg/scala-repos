@@ -32,7 +32,12 @@ import javafx.collections.ObservableList
 import javafx.{collections => jfxc}
 
 import scala.collection.JavaConversions._
-import scala.collection.generic.{CanBuildFrom, GenericCompanion, GenericTraversableTemplate, SeqFactory}
+import scala.collection.generic.{
+  CanBuildFrom,
+  GenericCompanion,
+  GenericTraversableTemplate,
+  SeqFactory
+}
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.{GenTraversableOnce, TraversableOnce, mutable}
 import scala.language.implicitConversions
@@ -118,8 +123,7 @@ object ObservableBuffer extends SeqFactory[ObservableBuffer] {
     * @see [[http://docs.oracle.com/javase/8/javafx/api/javafx/collections/ListChangeListener.Change.html#getFrom() `ListChangeListener.Change.getFrom()`]]
     * @see [[http://docs.oracle.com/javase/8/javafx/api/javafx/collections/ListChangeListener.Change.html#getRemoved() `ListChangeListener.Change.getRemoved()`]]
     */
-  case class Remove[T](position: Int, removed: Traversable[T])
-      extends Change[T]
+  case class Remove[T](position: Int, removed: Traversable[T]) extends Change[T]
 
   /**
     * Indicates a Reordering in an $OB.
@@ -251,10 +255,12 @@ object ObservableBuffer extends SeqFactory[ObservableBuffer] {
   */
 class ObservableBuffer[T](
     override val delegate: jfxc.ObservableList[T] = jfxc.FXCollections
-        .observableArrayList[T])
-    extends mutable.Buffer[T] with mutable.BufferLike[T, ObservableBuffer[T]]
+      .observableArrayList[T])
+    extends mutable.Buffer[T]
+    with mutable.BufferLike[T, ObservableBuffer[T]]
     with GenericTraversableTemplate[T, ObservableBuffer]
-    with mutable.Builder[T, ObservableBuffer[T]] with Observable
+    with mutable.Builder[T, ObservableBuffer[T]]
+    with Observable
     with SFXDelegate[jfxc.ObservableList[T]] {
 
   /**
@@ -538,7 +544,7 @@ class ObservableBuffer[T](
       })
     } else {
       throw new IllegalStateException(
-          "Type of this Observable List does not implement " +
+        "Type of this Observable List does not implement " +
           "java.util.Comparable. Please use a Comparator function.")
     }
   }

@@ -18,7 +18,9 @@ class ChainedPackageInspection extends LocalInspectionTool {
 
   // TODO support multiple base packages simultaneously
   override def checkFile(
-      file: PsiFile, manager: InspectionManager, isOnTheFly: Boolean) = {
+      file: PsiFile,
+      manager: InspectionManager,
+      isOnTheFly: Boolean) = {
     val problems =
       file.asOptionOf[ScalaFile].filter(!_.isScriptFile()).flatMap {
         scalaFile =>
@@ -30,17 +32,18 @@ class ChainedPackageInspection extends LocalInspectionTool {
 
             basePackages
               .find(basePackage =>
-                    firstPackaging.getPackageName != basePackage &&
-                    firstPackaging.getPackageName.startsWith(basePackage))
+                firstPackaging.getPackageName != basePackage &&
+                  firstPackaging.getPackageName.startsWith(basePackage))
               .flatMap { basePackage =>
                 firstPackaging.reference.map(_.getTextRange).map { range =>
                   manager.createProblemDescriptor(
-                      file,
-                      range,
-                      "Package declaration could use chained package clauses",
-                      ProblemHighlightType.WEAK_WARNING,
-                      false,
-                      new UseChainedPackageQuickFix(scalaFile, basePackage))
+                    file,
+                    range,
+                    "Package declaration could use chained package clauses",
+                    ProblemHighlightType.WEAK_WARNING,
+                    false,
+                    new UseChainedPackageQuickFix(scalaFile, basePackage)
+                  )
                 }
               }
           }
@@ -52,8 +55,8 @@ class ChainedPackageInspection extends LocalInspectionTool {
 
 class UseChainedPackageQuickFix(myFile: ScalaFile, basePackage: String)
     extends AbstractFixOnPsiElement(
-        s"Use chained package clauses: package $basePackage; package ...",
-        myFile) {
+      s"Use chained package clauses: package $basePackage; package ...",
+      myFile) {
   def doApplyFix(project: Project) {
     val file = getElement
     if (file.isValid) file.setPackageName(file.packageName)

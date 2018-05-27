@@ -54,13 +54,13 @@ package object unicode {
     def ≥(rhs: A): Boolean = macro Ops.binop[A, A]
   }
 
-  implicit class MeetSemilatticeOps[
-      A](lhs: A)(implicit ev: MeetSemilattice[A]) {
+  implicit class MeetSemilatticeOps[A](lhs: A)(
+      implicit ev: MeetSemilattice[A]) {
     def ∧(rhs: A): A = macro Ops.binop[A, A]
   }
 
-  implicit class JoinSemilatticeOps[
-      A](lhs: A)(implicit ev: JoinSemilattice[A]) {
+  implicit class JoinSemilatticeOps[A](lhs: A)(
+      implicit ev: JoinSemilattice[A]) {
     def ∨(rhs: A): A = macro Ops.binop[A, A]
   }
 

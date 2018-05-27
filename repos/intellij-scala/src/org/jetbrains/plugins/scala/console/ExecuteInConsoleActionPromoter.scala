@@ -11,8 +11,9 @@ import com.intellij.openapi.actionSystem.{ActionPromoter, AnAction, DataContext}
   * Date: 11/14/13
   */
 class ExecuteInConsoleActionPromoter extends ActionPromoter {
-  def promote(actions: util.List[AnAction],
-              context: DataContext): util.List[AnAction] = {
+  def promote(
+      actions: util.List[AnAction],
+      context: DataContext): util.List[AnAction] = {
     for (i <- 0 until actions.size()) {
       val action: AnAction = actions.get(i)
 

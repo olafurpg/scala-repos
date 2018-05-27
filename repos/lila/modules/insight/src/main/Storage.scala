@@ -35,8 +35,8 @@ private final class Storage(coll: Coll) {
 
   def bulkInsert(ps: Seq[Entry]) =
     coll.bulkInsert(
-        documents = ps.map(BSONHandlers.EntryBSONHandler.write).toStream,
-        ordered = false)
+      documents = ps.map(BSONHandlers.EntryBSONHandler.write).toStream,
+      ordered = false)
 
   def update(p: Entry) = coll.update(selectId(p.id), p, upsert = true).void
 
@@ -52,8 +52,8 @@ private final class Storage(coll: Coll) {
   def nbByPerf(userId: String): Fu[Map[PerfType, Int]] =
     coll
       .aggregate(
-          Match(BSONDocument(F.userId -> userId)),
-          List(GroupField(F.perf)("nb" -> SumValue(1)))
+        Match(BSONDocument(F.userId -> userId)),
+        List(GroupField(F.perf)("nb" -> SumValue(1)))
       )
       .map {
         _.documents.flatMap { doc =>

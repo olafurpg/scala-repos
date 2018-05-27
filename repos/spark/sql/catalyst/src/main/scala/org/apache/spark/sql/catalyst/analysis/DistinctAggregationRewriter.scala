@@ -18,8 +18,16 @@
 package org.apache.spark.sql.catalyst.analysis
 
 import org.apache.spark.sql.catalyst.expressions._
-import org.apache.spark.sql.catalyst.expressions.aggregate.{AggregateExpression, AggregateFunction, Complete}
-import org.apache.spark.sql.catalyst.plans.logical.{Aggregate, Expand, LogicalPlan}
+import org.apache.spark.sql.catalyst.expressions.aggregate.{
+  AggregateExpression,
+  AggregateFunction,
+  Complete
+}
+import org.apache.spark.sql.catalyst.plans.logical.{
+  Aggregate,
+  Expand,
+  LogicalPlan
+}
 import org.apache.spark.sql.catalyst.rules.Rule
 import org.apache.spark.sql.types.IntegerType
 
@@ -126,7 +134,7 @@ object DistinctAggregationRewriter extends Rule[LogicalPlan] {
         new AttributeReference("gid", IntegerType, false)(isGenerated = true)
       val groupByMap = a.groupingExpressions.collect {
         case ne: NamedExpression => ne -> ne.toAttribute
-        case e => e -> new AttributeReference(e.sql, e.dataType, e.nullable)()
+        case e                   => e -> new AttributeReference(e.sql, e.dataType, e.nullable)()
       }
       val groupByAttrs = groupByMap.map(_._2)
 
@@ -157,7 +165,7 @@ object DistinctAggregationRewriter extends Rule[LogicalPlan] {
           val projection =
             distinctAggChildren.map {
               case e if group.contains(e) => e
-              case e => nullify(e)
+              case e                      => nullify(e)
             } :+ id
 
           // Final aggregate
@@ -185,22 +193,22 @@ object DistinctAggregationRewriter extends Rule[LogicalPlan] {
       val regularAggOperatorMap = regularAggExprs.map { e =>
         // Perform the actual aggregation in the initial aggregate.
         val af = patchAggregateFunctionChildren(e.aggregateFunction)(
-            regularAggChildAttrLookup)
+          regularAggChildAttrLookup)
         val operator = Alias(e.copy(aggregateFunction = af), e.sql)()
 
         // Select the result of the first aggregate in the last aggregate.
         val result = AggregateExpression(
-            aggregate.First(evalWithinGroup(regularGroupId,
-                                            operator.toAttribute),
-                            Literal(true)),
-            mode = Complete,
-            isDistinct = false)
+          aggregate.First(
+            evalWithinGroup(regularGroupId, operator.toAttribute),
+            Literal(true)),
+          mode = Complete,
+          isDistinct = false)
 
         // Some aggregate functions (COUNT) have the special property that they can return a
         // non-null result without any input. We need to make sure we return a result in this case.
         val resultWithDefault = af.defaultResult match {
           case Some(lit) => Coalesce(Seq(result, lit))
-          case None => result
+          case None      => result
         }
 
         // Return a Tuple3 containing:
@@ -213,8 +221,9 @@ object DistinctAggregationRewriter extends Rule[LogicalPlan] {
       // Construct the regular aggregate input projection only if we need one.
       val regularAggProjection =
         if (regularAggExprs.nonEmpty) {
-          Seq(a.groupingExpressions ++ distinctAggChildren.map(nullify) ++ Seq(
-                  regularGroupId) ++ regularAggChildren)
+          Seq(
+            a.groupingExpressions ++ distinctAggChildren.map(nullify) ++ Seq(
+              regularGroupId) ++ regularAggChildren)
         } else {
           Seq.empty[Seq[Expression]]
         }
@@ -228,35 +237,36 @@ object DistinctAggregationRewriter extends Rule[LogicalPlan] {
 
       // Construct the expand operator.
       val expand = Expand(
-          regularAggProjection ++ distinctAggProjections,
-          groupByAttrs ++ distinctAggChildAttrs ++ Seq(gid) ++ regularAggChildAttrMap
-            .map(_._2),
-          a.child)
+        regularAggProjection ++ distinctAggProjections,
+        groupByAttrs ++ distinctAggChildAttrs ++ Seq(gid) ++ regularAggChildAttrMap
+          .map(_._2),
+        a.child)
 
       // Construct the first aggregate operator. This de-duplicates the all the children of
       // distinct operators, and applies the regular aggregate operators.
       val firstAggregateGroupBy = groupByAttrs ++ distinctAggChildAttrs :+ gid
       val firstAggregate = Aggregate(
-          firstAggregateGroupBy,
-          firstAggregateGroupBy ++ regularAggOperatorMap.map(_._2),
-          expand)
+        firstAggregateGroupBy,
+        firstAggregateGroupBy ++ regularAggOperatorMap.map(_._2),
+        expand)
 
       // Construct the second aggregate
       val transformations: Map[Expression, Expression] =
-        (distinctAggOperatorMap.flatMap(_._2) ++ regularAggOperatorMap.map(
-                e => (e._1, e._3))).toMap
+        (distinctAggOperatorMap.flatMap(_._2) ++ regularAggOperatorMap.map(e =>
+          (e._1, e._3))).toMap
 
       val patchedAggExpressions = a.aggregateExpressions.map { e =>
         e.transformDown {
-          case e: Expression =>
-            // The same GROUP BY clauses can have different forms (different names for instance) in
-            // the groupBy and aggregate expressions of an aggregate. This makes a map lookup
-            // tricky. So we do a linear search for a semantically equal group by expression.
-            groupByMap
-              .find(ge => e.semanticEquals(ge._1))
-              .map(_._2)
-              .getOrElse(transformations.getOrElse(e, e))
-        }.asInstanceOf[NamedExpression]
+            case e: Expression =>
+              // The same GROUP BY clauses can have different forms (different names for instance) in
+              // the groupBy and aggregate expressions of an aggregate. This makes a map lookup
+              // tricky. So we do a linear search for a semantically equal group by expression.
+              groupByMap
+                .find(ge => e.semanticEquals(ge._1))
+                .map(_._2)
+                .getOrElse(transformations.getOrElse(e, e))
+          }
+          .asInstanceOf[NamedExpression]
       }
       Aggregate(groupByAttrs, patchedAggExpressions, firstAggregate)
     } else {

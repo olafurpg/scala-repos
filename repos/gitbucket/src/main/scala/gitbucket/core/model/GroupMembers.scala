@@ -5,14 +5,13 @@ trait GroupMemberComponent { self: Profile =>
 
   lazy val GroupMembers = TableQuery[GroupMembers]
 
-  class GroupMembers(tag: Tag)
-      extends Table[GroupMember](tag, "GROUP_MEMBER") {
+  class GroupMembers(tag: Tag) extends Table[GroupMember](tag, "GROUP_MEMBER") {
     val groupName = column[String]("GROUP_NAME", O PrimaryKey)
     val userName = column[String]("USER_NAME", O PrimaryKey)
     val isManager = column[Boolean]("MANAGER")
     def * =
       (groupName, userName, isManager) <>
-      (GroupMember.tupled, GroupMember.unapply)
+        (GroupMember.tupled, GroupMember.unapply)
   }
 }
 

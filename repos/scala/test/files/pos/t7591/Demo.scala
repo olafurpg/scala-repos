@@ -32,7 +32,7 @@ trait DemoSpec extends Spec with Meta.StdOpts with Interpolation {
 
   val optIsUnary = "unary" / "a unary option" --?;
   ("action" / "a body which may be run") --> println(
-      "Hello, I am the --action body.")
+    "Hello, I am the --action body.")
 
   heading("Binary options:")
   val optopt = "str" / "an optional String" --|
@@ -64,7 +64,7 @@ class Demo(args: List[String]) extends {
   def demoSpecMethods = this.getClass.getMethods.toList
   private def isDemo(m: Method) =
     (m.getName startsWith "opt") && !(m.getName contains "$") &&
-    (m.getParameterTypes.isEmpty)
+      (m.getParameterTypes.isEmpty)
 
   def demoString(ms: List[Method]) = {
     val longest = ms map (_.getName.length) max

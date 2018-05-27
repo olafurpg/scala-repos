@@ -14,7 +14,7 @@ import scala.util.Try
 object Validation {
   def validateOrThrow[T](t: T)(implicit validator: Validator[T]): T =
     validate(t) match {
-      case Success => t
+      case Success    => t
       case f: Failure => throw new ValidationFailedException(t, f)
     }
 
@@ -40,27 +40,32 @@ object Validation {
         if (violations.isEmpty) Success
         else
           Failure(
-              Set(GroupViolation(seq,
-                                 "Seq contains elements, which are not valid.",
-                                 None,
-                                 violations.toSet)))
+            Set(
+              GroupViolation(
+                seq,
+                "Seq contains elements, which are not valid.",
+                None,
+                violations.toSet)))
       }
     }
   }
 
   implicit lazy val failureWrites: Writes[Failure] = Writes { f =>
-    Json.obj("message" -> "Object is not valid", "details" -> {
-      f.violations
-        .flatMap(allRuleViolationsWithFullDescription(_))
-        .groupBy(_.description)
-        .map {
-          case (description, ruleViolation) =>
-            Json.obj(
+    Json.obj(
+      "message" -> "Object is not valid",
+      "details" -> {
+        f.violations
+          .flatMap(allRuleViolationsWithFullDescription(_))
+          .groupBy(_.description)
+          .map {
+            case (description, ruleViolation) =>
+              Json.obj(
                 "path" -> description,
                 "errors" -> ruleViolation.map(r => JsString(r.constraint))
-            )
-        }
-    })
+              )
+          }
+      }
+    )
   }
 
   def allRuleViolationsWithFullDescription(
@@ -68,7 +73,9 @@ object Validation {
       parentDesc: Option[String] = None,
       prependSlash: Boolean = false): Set[RuleViolation] = {
     def concatPath(
-        parent: String, child: Option[String], slash: Boolean): String = {
+        parent: String,
+        child: Option[String],
+        slash: Boolean): String = {
       child.map(c => parent + { if (slash) "/" else "" } + c).getOrElse(parent)
     }
 
@@ -81,7 +88,7 @@ object Validation {
             // Error is on property level, having a parent description. Prepend '/' as root.
             case s: String =>
               r.withDescription(
-                  concatPath("/" + p, r.description, prependSlash))
+                concatPath("/" + p, r.description, prependSlash))
             // Error is on unknown level, having a parent description. Prepend '/' as root.
           } getOrElse r.withDescription("/" + p)
         } getOrElse {
@@ -96,7 +103,7 @@ object Validation {
         g.children.flatMap { c =>
           val dot = g.value match {
             case _: Iterable[_] => false
-            case _ => true
+            case _              => true
           }
 
           val desc =
@@ -119,15 +126,14 @@ object Validation {
               http.setRequestMethod("HEAD")
               if (http.getResponseCode == HttpURLConnection.HTTP_OK) Success
               else
-                Failure(Set(RuleViolation(
-                            url, "URL could not be resolved.", None)))
+                Failure(
+                  Set(RuleViolation(url, "URL could not be resolved.", None)))
             case other: URLConnection =>
               other.getInputStream
               Success //if we come here, we could read the stream
           }
         }.getOrElse(
-            Failure(
-                Set(RuleViolation(url, "URL could not be resolved.", None)))
+          Failure(Set(RuleViolation(url, "URL could not be resolved.", None)))
         )
       }
     }
@@ -142,7 +148,7 @@ object Validation {
         } catch {
           case _: URISyntaxException =>
             Failure(
-                Set(RuleViolation(uri.uri, "URI has invalid syntax.", None)))
+              Set(RuleViolation(uri.uri, "URI has invalid syntax.", None)))
         }
       }
     }
@@ -192,7 +198,7 @@ object Validation {
     else Failure(Set(RuleViolation(seq, errorMessage, None)))
   }
 
-  def theOnlyDefinedOptionIn[A <: Product : ClassTag, B](
+  def theOnlyDefinedOptionIn[A <: Product: ClassTag, B](
       product: A): Validator[Option[B]] =
     new Validator[Option[B]] {
       def apply(option: Option[B]) = {
@@ -200,16 +206,17 @@ object Validation {
           case Some(prop) =>
             val n = product.productIterator.count {
               case Some(_) => true
-              case _ => false
+              case _       => false
             }
 
             if (n == 1) Success
             else
               Failure(
-                  Set(RuleViolation(
-                          product,
-                          s"not allowed in conjunction with other properties.",
-                          None)))
+                Set(
+                  RuleViolation(
+                    product,
+                    s"not allowed in conjunction with other properties.",
+                    None)))
           case None => Success
         }
       }
@@ -218,22 +225,22 @@ object Validation {
   def oneOf[T <: AnyRef](options: Set[T]): Validator[T] = {
     import ViolationBuilder._
     new NullSafeValidator[T](
-        test = options.contains,
-        failure = _ -> s"is not one of (${options.mkString(",")})"
+      test = options.contains,
+      failure = _ -> s"is not one of (${options.mkString(",")})"
     )
   }
 
   def oneOf[T <: AnyRef](options: T*): Validator[T] = {
     import ViolationBuilder._
     new NullSafeValidator[T](
-        test = options.contains,
-        failure = _ -> s"is not one of (${options.mkString(",")})"
+      test = options.contains,
+      failure = _ -> s"is not one of (${options.mkString(",")})"
     )
   }
 
   def configValueSet[T <: AnyRef](config: String*): Validator[T] =
     isTrue(
-        s"""You have to supply ${config.mkString(", ")} on the command line.""") {
+      s"""You have to supply ${config.mkString(", ")} on the command line.""") {
       _ =>
         config.forall(AllConf.suppliedOptionNames)
     }

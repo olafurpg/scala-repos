@@ -1,7 +1,15 @@
 package com.twitter.finagle.load
 
 import com.twitter.finagle.{Service, SimpleFilter}
-import com.twitter.util.{Duration, Future, MockTimer, Promise, Time, TimeControl, Try}
+import com.twitter.util.{
+  Duration,
+  Future,
+  MockTimer,
+  Promise,
+  Time,
+  TimeControl,
+  Try
+}
 import com.twitter.conversions.time.intToTimeableNumber
 import scala.collection.immutable.SortedSet
 
@@ -74,7 +82,8 @@ class LoadGenerator[Req, Rep](
 
 object LoadGenerator {
   def mkHistory[Req, Rep](
-      event: () => Event[Req, Rep], num: Int): Iterator[Event[Req, Rep]] =
+      event: () => Event[Req, Rep],
+      num: Int): Iterator[Event[Req, Rep]] =
     new Iterator[Event[Req, Rep]] {
       def hasNext: Boolean = true
       def next(): Event[Req, Rep] = event()
